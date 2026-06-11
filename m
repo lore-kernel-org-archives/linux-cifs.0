@@ -1,148 +1,149 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FD94949FF
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 20:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA713FADFD
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 20:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781210053; cv=pass; b=msmiIsRR89uJFhRr6CnlU995jjdwsGVmaqkTA7DaXzD/zJDlbf9x8KvIcZHZDhIR0YVNgtZPKlZU7aSz8oV8DUY/T9974Hp48NBFz8IOz83/atsEiBvFRvL2V2e9MH97UDDVndbRYMOIcGL7vqA82HlPZg0HVCVeTmULcMo6xWo=
+	t=1781210234; cv=pass; b=IWJ+wBChS8HBGephxJhOP16wHXResPyCBDTVgEhNcweYIpkzXecEUoWyU/LdbAIvhnocq3pJAOP/PWwcqPHH7x6Kj4CzzIYkxN2sYWxBJ9ycvxkvk80TLMk+P5Tkd7ByJ+xaFY/4/5wxXdqB/7NU4GJyJWvVDKgbxsAf5eVOA+g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781210053; c=relaxed/simple;
-	bh=+k9Qjy1NkF0FDiPkGEmSGqZVWGbN48lhI4YAZOO5Z9E=;
+	s=arc-20240116; t=1781210234; c=relaxed/simple;
+	bh=73WLJC21hhKpLbbOzveQZZ1Rz8sJ9alAYv7Z/ugl/4g=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S8F4VXvKD7YfLwJ9OQ33nZSBD88GgWCKxXpzBVUf9FDUeuJfk8xe8WwSOeuvwxqYnhcsXCn0H56xMJA/SFAIxgIFR/nRZuwRM0CVDdL9AaYrcncY/Q2q8YlbNcVxNCYrfdicLcNR87q/u4KsBh3sYlKWAvfJ1U/gnu6FwuMCyoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P5wshO8B; arc=pass smtp.client-ip=209.85.167.46
+	 To:Cc:Content-Type; b=C0LxnSBSqGidp1IZHJVqVibFAX/6R4mwVGzCB8YjWxrmJKubkYL25978Dm/Aw/OxPdx1QK0wgH9mCbsRvku60Ew799ARFZd8KDaNRF2Dcg1zz4vsYTAFjn+HHcYDXWrXQ3KEMOL2oujd60t7DFNIJtCdq2DbBF4sAdNGuNQd0/M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUVmH4wn; arc=pass smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P5wshO8B"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5aa68cfc182so192779e87.0
-        for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 13:34:06 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781210045; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUVmH4wn"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-396bed274b9so2528881fa.0
+        for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 13:37:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781210231; cv=none;
         d=google.com; s=arc-20240605;
-        b=H9NUXnmYtImHFoojSd7jQbe1renPSO2+DdraGJ6bp2NQEZx9p+3T4U6ckvHvAovOK8
-         hDKX1Tm6vionFlGfyr3Pb9FmGFU3lu0KCLds+8kf8U37c0BBTcfJR/MXDaVTaH+kFnzU
-         e2bzP4pQtrwQ4klmETKV6eNDoZILErc9eGbt93XxNW4U8TfFmNaF4gXlBqlxGavCn7t7
-         XPaQm+TFJEzQ7Y8YrfsgylPbsfMFzfrhzpaYE717cToeOgaggBKFkKPsWeOX2hPVa/2I
-         alasvi9SIKvQ8deOatTemL+B/pITj5CW2mzpyOGShuAQkb69Cp/Xu2WWMNPygAJEe4eY
-         uorg==
+        b=QMUxYyhZdQ0OR/CR3VoH/2fhxiKs32WIaCIpz/WjSQ1EWxiFQfXEagj34GHm+psd0e
+         EXG42lh/npNdYfd9vQOZvTJoSkF7wcykU72f1A8EmmDlpd5X8Tq97CPRgKp564zZq+kS
+         FX+n6c1mFaiVEXKgrU+6VGn/gFqaO9KXvkSYf7o7aQ3CHHyZCcg5nCurf50pxRliZdoT
+         GJVMqv2U5zMkLbgLBnoZjoPsOoku8pu2VQEqmyEKDcp4bc3IHYs661fTmgdTdFCkjxJT
+         0ZiWIOTn4y4Bp+68Fg84VhtK6sPYWXTng3sttYWajBANrasiEB0zFyDDhBJYdeSJV7xT
+         o5wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=VXgpEb7Jl6rYUuemLw2bRvtLoodxIHoILodPUeD0OiE=;
-        fh=aN6NFjxx5wXl5Q48BVx9tfVrN4QToyN5rtduMi51gkE=;
-        b=gJdKviBCEJs2vM7FgOD6JcUmW6GlGZCxFo55GWOHkSbHZF6ccypbCaKQTSv1qm1nZI
-         KGLRhbkCZqs22Qzudt7f6/fr4e4qVhtiL3IFnmyKjAP3aZ+YCvOJ+3dpPA2eyRwYavWV
-         lxUIMQSX64BB00fxBo6Rhc69Mztw7srm2VpUrrX180/Xcr4kS96GbSGlH5O3c5Wzwo8i
-         AIfyjIr2QL07U0chzsMANUCaIhgV6WsuAmGSt2406kWHEqe8KfM+vSRosZYZeb5luzsd
-         rhHS8TSX8rflLP3JBwecyQF2B/ygo3k5vp/O2ylQOstjwVxwAWMfmuop5+OiXxTTGqoN
-         R1kw==;
+        bh=hR6L+m7wu2NX+62gnu6yr+xDqGZjBXR2Xn5NG9Z4K9g=;
+        fh=88KV1mrCqhXD7Zg1lRgX+tKCOO9Z12HBEMPsom7x0wk=;
+        b=XHqWTBj1i64BF9gcHWKEfTRzMadl5UpRTHgVIpFzTdJPLvj7K+hDTCzBnp2m8BGGcD
+         YcIeCKqfWj73SIiRBb40fIbK0DuDhE85VEYESXrx+b16Amz6pqj/pqImIXtq1nW33z3m
+         1BxlkBzB4nFSJgcEXMNNkEjcUw8TW1QrxLnnKv3z/NJ6XDvpNviqf+fbR7rofhd4dCpz
+         2F1wlci1S7z5lToLv8QD9+D7uHlETKPcSoFXF0X4O0pMsbO1L48QXrq5raCVU2lSIJ51
+         UxvAPhNLSa53G1uaju+TCRIt50/8ZSjVd7+2sVbauftVPwM3HLj1wUlOdL0VXeVQTm1a
+         uk/g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781210045; x=1781814845; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781210231; x=1781815031; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VXgpEb7Jl6rYUuemLw2bRvtLoodxIHoILodPUeD0OiE=;
-        b=P5wshO8Bkr2jXP3OfF+ta8++tZQnze+5aUYtNpuOxocg3g+8xbfnnjUUAPZi1aml2m
-         pkvmCeZQ3zFTHc2D+ZDgiiQb5n2t14luKs5H1fJVy4cPZaBiQBvxFa4anTXkCBKHGrLX
-         he1zuvBbaq6Q7DUAdCKsgi53QaD+RKZsWfpZscL07Xg/LcBj6f3p3YoxQ0BlhfX4I/DJ
-         MIH8VlT511umTEtrZvJFbdH+Gp50HJLXKybfLDZhMaSJqU2LRFXIQV5PS19E1o6z5Pwo
-         8Snmi9+2j2WV5Q4CFEv2sGmvY3nZ2YNs1PISpbMH+YKg1M7s9h5r7kXUcRp+z5i0EprU
-         JCwA==
+        bh=hR6L+m7wu2NX+62gnu6yr+xDqGZjBXR2Xn5NG9Z4K9g=;
+        b=QUVmH4wn6WGBiPfSiWio+QRAYJkBtGALeM5dpU9NpBj/5/2udTMFDXv/nzE6L5Qrs6
+         PBpRQDQQ+fwLTlu1X8V+1wB22DHVUt0ZKj92M8ib4RsQjKN6cqTsJ1W6diKKRMU3zykQ
+         YNy0CbCh5MjD4H8Ux/oVHtfEHEKTPlTjuIiYYJC+aOYVU6h4opvUUPWSIGfjSlWXl+GF
+         6Pw4temSBOYZj3KBxS6PM6uEOYyKRueCB6KBYQlJAQBptpKqmmhVHT9znWa8JJCKVusz
+         IEuz3x5qdt0aW6I08p4U8IcYLXxn47BX6gmDAVOsRgyJRaUvE+07rSeG7SV77UvFRqf3
+         YKAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781210045; x=1781814845;
+        d=1e100.net; s=20251104; t=1781210231; x=1781815031;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=VXgpEb7Jl6rYUuemLw2bRvtLoodxIHoILodPUeD0OiE=;
-        b=dYcPOLLbPnch6XP3akCq6u+QZaqbKLhFlhD4QFZazTFfysc3eoZvFUWlezg8wR4dnq
-         E8AMFZI7BQdmz5EYTxDNdIPfma9PWJ5RrwvZY+LOcbyTK9uvfKEhmxGyllS2ncdLOdUr
-         8jqNosmSqZ/vlavydLLEObwCw5z/yfGCPugA+z5PAz1Zc6uFOUDENyI1JmdjYKtJGa0k
-         GoFhVB1vbwYUdeu3uDUs/HeWU28oKECDPL4S1rPL9HL0m0TiO/gucSVjex+oUvvzBFGA
-         7dgPAjUwCzmdvWnmm4L5QkblHT74LLvzB7KyNmVF8ocdiJMuNzEcg+nXviscT0JTcYr/
-         017Q==
-X-Forwarded-Encrypted: i=1; AFNElJ+0k7w1TsOZvL+YWKSjTYt13k4MuHyNnUn4ryZuZ0GKFHoP/oZoix+ZcQLgHhhTxn+t0Jl/R+DHHFAk@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ595+pqBpLr/uq5RoPAg7tnJCkUPzkqC0h199PWHp6l0laLAA
-	Kake4AJBgp0+R5fHyNbMWrsTT2NfmIySRN1/2h4EcJe+WO3RSp8rGUcc1EHXFkcu8vet6W/IDb+
-	gvZQW7I50zsT3ZVw+Qt9oWRnUb92IT9c=
-X-Gm-Gg: Acq92OHRgEND4MW1QNcmx/u5isexEGBAC/KYBZauICQMJ6idoGfrnr/lW+5I0nxgbuq
-	kKDA6Y1tgZwJvs6gbVgSB+/o4AyG7Ovt4xeHcWk3OO39moBVt8Qjxw0QUeSzPyj1vwpXrev1U8A
-	7zUAesE9Eo2A3IHSdoEoYH8JaAdBXDpA+iqgsUMofmukDIxJrph3MgckmuX95Z1Ox/9k1IyFk1/
-	GFnDkUakIE+RyoZo/HBC6jZSAFE1VxUFURqD1vWMbKR4KGJOhmBxgjAoWTR/i6UUPVuT6luY4T5
-	AzvNxEwBRuIFzyQutE4uAuNh8poY/dki2D5PeCDPoi8NBGdgGeAoiamExSiEnn0Q5fKj3upWmYy
-	reOFKsgQsnDjpgMFTdGWT11gkuYEwbwxPErRUhOoq3hwcAbNZMB7dtgdZaQ4nLMMJR+cb/4E9Dl
-	VNHlnZepaBvv6fGT1gTxky
-X-Received: by 2002:a05:6512:230e:b0:5aa:7ad2:f4d5 with SMTP id
- 2adb3069b0e04-5ad27fb780emr1375910e87.38.1781210044818; Thu, 11 Jun 2026
- 13:34:04 -0700 (PDT)
+        bh=hR6L+m7wu2NX+62gnu6yr+xDqGZjBXR2Xn5NG9Z4K9g=;
+        b=oaI7z4mI1cs7tPpYWSJbUbmcqKTr0/6q78Thm+dobXX5ARQpCCVYKL6WtP2gkytKXS
+         bbOdSppGcYUVFtRfO6lxrF0NMrkUW2GXpxCli/fQE3sUgwdGaTBdNRqaXil0gw4nwuHj
+         9K7vdCvPRABqVRQKMcaSi2sVj1uuA4Ka+3iSEI3SDeQ3PbD86kuAQLBPkOekZP3iGTeU
+         qmF4jNe6eFowsZqBSWP4zr9ZW9TfxZ3EL9eb9kF/AN1YEcGrEqCK0/7geoOt8TIMa4l6
+         ArWXJ+eLQOS50swb5Zx+2pRT+B7QSf8rlpuAWPxTS9HfKnvF4B05Tq09Zp0qWx0nhNe5
+         7mxg==
+X-Forwarded-Encrypted: i=1; AFNElJ8E6xK/w1SCMEyW86UX42r7+bQS5kE4oaRdbKcsusVLhQtQMK4ukKX7pi6gg36weavr4JUdvZBJ8tfN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4pHjKtuULrSjj34Zdv1jjXPwhHzK9BUfFhOx4Wrct26bA9XAe
+	50ck6O16onK3F+k1zeHue1oj5Dhs2Zv49EqcJp8vUY165IKDkF7lN/IC8B/ZqkJSiIUfqTY5TQD
+	t+1otEZhtnKH3ZvIiZl/x9q6soO0gMjQ=
+X-Gm-Gg: Acq92OFj1O+RA/VhMVgb0Q4sVgejiA8UXwS1xY4UpxhDG8MY8RfjqSFpRZy8GojMTcC
+	tYnNx51opZrjrTAy2DpO77X7lLiwqKxBumeNVTmckpgZnMNTe9m1IVUgdz9WHkbDcRf6wL1nyXF
+	1UcGVuLft1rb+gwNzqB7T2YQ+sB6E6yDGTccpLz9GP62sXppBR+zemWQf+spA9kHjMoGNd96gOI
+	pal/dBiTx2NIzMwiV3sWmLy7klC20b1m9fxI21kkx7uKj3QdPhBa0G6YUBR5yZSiJ1q8lqYm51v
+	cs6NZ9KZiB0XwIPjpgD8nyiLZ+1lc6eu+nzb3bcQTk4xWJcqcDd7zD8DT1rB5Oxjk8j+ZA50yco
+	C6OAn+MvqDkwtGg8KevCGxQmYMgkeW9m0ndy3j4HoctAFsYiRsvaeO0Eu6Gxs8RPQ2EzqI2wHrf
+	rMI964ZrALPhZGpT0Vhd0p
+X-Received: by 2002:a05:6512:224a:b0:5aa:6f5d:ee0b with SMTP id
+ 2adb3069b0e04-5ad2db15619mr5675e87.2.1781210231441; Thu, 11 Jun 2026 13:37:11
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aiplG8fGQOYmXS5g@stanley.mountain>
-In-Reply-To: <aiplG8fGQOYmXS5g@stanley.mountain>
+References: <aiplQF3QGXmXAEk2@stanley.mountain>
+In-Reply-To: <aiplQF3QGXmXAEk2@stanley.mountain>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 11 Jun 2026 15:33:50 -0500
-X-Gm-Features: AVVi8Cdu1uKQmjCfULGU_wu_t2erX4cmfDuYdIGcEcJxfNgKRpgUCSSL2tyI2Ps
-Message-ID: <CAH2r5mutN9yDPF8Q=z_GYbgAzJFS6OE+2zBd8na9zY1Wbt3gyg@mail.gmail.com>
-Subject: Re: [PATCH] smb/client: clean up a type issue in cifs_xattr_get()
+Date: Thu, 11 Jun 2026 15:36:56 -0500
+X-Gm-Features: AVVi8Cd4EQliyIHLF8hHkVDnv7pEGey5HCW41kivA4WOaBYOV5igv-hjRbl4GJw
+Message-ID: <CAH2r5mvKDLssgLBs8x5zNhp-+-h7yNPYzgtf_LQm3kchRVtZ4w@mail.gmail.com>
+Subject: Re: [PATCH] smb/client: Fix error code in smb2_aead_req_alloc()
 To: Dan Carpenter <error27@gmail.com>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
-	Shyam Prasad N <sprasad@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, 
+Cc: David Howells <dhowells@redhat.com>, Tom Talpey <tom@talpey.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
 	kernel-janitors@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, Tom Talpey <tom@talpey.com>, 
+	linux-kernel@vger.kernel.org, Steve French <sfrench@samba.org>, 
 	Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Doesn't your patch need a cast in the following code in xattr.c since
-it returns a ssize_t and you changed rc to int with your patch?
-
-315                 if (pTcon->ses->server->ops->query_all_EAs)
-316                         rc =3D
-pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
-317                                 full_path, name, value, size, cifs_sb);
-
+merged into cifs-2.6.git for-next
 
 On Thu, Jun 11, 2026 at 4:00=E2=80=AFAM Dan Carpenter via samba-technical
 <samba-technical@lists.samba.org> wrote:
 >
-> The cifs_xattr_get() function returns type int, not ssize_t so
-> declare "rc" as int as well.  This has no effect on runtime.
+> The "*num_sgs" variable is a u32 so "ERR_PTR(*num_sgs)" doesn't work.
+> We would have to do something similar to the previous line where it's
+> cast to int and then long.  However, it's simpler to store the return in
+> an int ret variable.
 >
+> This bug would eventually result in a crash when dereference the invalid
+> error pointer.
+>
+> Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rathe=
+r than a page list")
+> Cc: stable@kernel.org
 > Signed-off-by: Dan Carpenter <error27@gmail.com>
 > ---
->  fs/smb/client/xattr.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fs/smb/client/smb2ops.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
-> index 23227f2f9428..5091f6c0d7fe 100644
-> --- a/fs/smb/client/xattr.c
-> +++ b/fs/smb/client/xattr.c
-> @@ -272,7 +272,7 @@ static int cifs_xattr_get(const struct xattr_handler =
-*handler,
->                           struct dentry *dentry, struct inode *inode,
->                           const char *name, void *value, size_t size)
->  {
-> -       ssize_t rc =3D -EOPNOTSUPP;
-> +       int rc =3D -EOPNOTSUPP;
->         unsigned int xid;
->         struct super_block *sb =3D dentry->d_sb;
->         struct cifs_sb_info *cifs_sb =3D CIFS_SB(sb);
-> @@ -354,7 +354,7 @@ static int cifs_xattr_get(const struct xattr_handler =
-*handler,
->                                 inode, full_path, &acllen, extra_info);
->                 if (IS_ERR(pacl)) {
->                         rc =3D PTR_ERR(pacl);
-> -                       cifs_dbg(VFS, "%s: error %zd getting sec desc\n",
-> +                       cifs_dbg(VFS, "%s: error %d getting sec desc\n",
->                                  __func__, rc);
->                 } else {
->                         if (value) {
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index a3257815e661..a8f8feeeccb5 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -4359,11 +4359,13 @@ static void *smb2_aead_req_alloc(struct crypto_ae=
+ad *tfm, const struct smb_rqst
+>         unsigned int req_size =3D sizeof(**req) + crypto_aead_reqsize(tfm=
+);
+>         unsigned int iv_size =3D crypto_aead_ivsize(tfm);
+>         unsigned int len;
+> +       int ret;
+>         u8 *p;
+>
+> -       *num_sgs =3D cifs_get_num_sgs(rqst, num_rqst, sig);
+> -       if (IS_ERR_VALUE((long)(int)*num_sgs))
+> -               return ERR_PTR(*num_sgs);
+> +       ret =3D cifs_get_num_sgs(rqst, num_rqst, sig);
+> +       if (ret < 0)
+> +               return ERR_PTR(ret);
+> +       *num_sgs =3D ret;
+>
+>         len =3D iv_size;
+>         len +=3D crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment(=
+) - 1);
 > --
 > 2.53.0
 >
