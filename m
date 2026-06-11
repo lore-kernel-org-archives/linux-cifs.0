@@ -1,119 +1,164 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1DAE3BB126
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 08:59:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6433C0606
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 14:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781168395; cv=none; b=GmM01Fvwzz+e5bY0ytl9j0ufPeihhJXvy5CnP05aojTAEaXReR7mktSUzkF8J2E6ANMO4MlRhbiVn7HNIKsp7xgemNmm6R2RamWDO0fU29A0WjUx8ff0mmjSIsQwYGjlGcWZ58E5KmizF6l10CBTexdmTsD1iGwsJxzv4fLpz6Q=
+	t=1781189881; cv=none; b=oR/FasSGorJxj+mFNXCLmrxB0yvCkXNrB41jH83xHlfcRXL0Y9U1aQG+IRp74VnnyNO2TTlUJQ9XeZ5bXeySzQIUyUI1i2yPZRmEE+qj/6lA5rfpBBivEHLyoN18oWHlvv/2CFYRmbrg04dz65C/WUKXassgRlYUGxi6jfFTuNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781168395; c=relaxed/simple;
-	bh=QgmccsK5dccfuLVpxKECy02Cyq4fJw4GPvf8VwxeAUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Xz5HcYaeCjmI0P5SSUAM+lHOeeTqET+Tw9zAnBt81mDexCoPw/w5NZCGIGMFBgRoeXa4s9aH9gGIVJll47KG6Xwg2u8lDNoCChxphjyK3jfzSUrH1EWptkka+Jp8sOOpjveY09ZW09RNXTzf6RbcGxvYjSqIbk8NDY78c0KapUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kQB2UwI/; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781189881; c=relaxed/simple;
+	bh=WG5Ps8BZ3M0xByFL5vgCqiWsDqFk/WJHfWIDwRyKZjA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jQqkz9dNuj7xsVYIwJBIwsEj+kv/aW1Tb1IYF/fUCJX+LZufY+iTRrIcvBcVkDInRX0XeCnJ1FtaT3JHxV71pJNXBXafmoKZO86yZQbbPxhh/a5++dMXFDRm3XPSh4qwCe2Ex4cWBk7dWnKFv21lnqqR45uO2npvxBmsZlzu0+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=GI8u4OZY; arc=none smtp.client-ip=195.121.94.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kQB2UwI/"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8ce9df31840so59256576d6.1
-        for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 01:59:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="GI8u4OZY"
+X-KPN-MessageId: eae1c854-65a5-11f1-89f6-00505699b430
+Received: from smtp.kpnmail.nl (unknown [10.31.155.8])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id eae1c854-65a5-11f1-89f6-00505699b430;
+	Thu, 11 Jun 2026 16:57:50 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781168393; x=1781773193; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SDvuiII1LGFXTJ1G7CEro7BK7MfvK9SQkUAqzNSYDJU=;
-        b=kQB2UwI/TU51v2bvMzTGySkGg8hGMVg/4zYf+LVdTIWnK5ntIFSjDxFVvMpYt4OLUI
-         Jvcmq2kNGkDYFavHIK68p86IZMQyveDi9nmbig4OLnvo7ZJgud4k2lRxd+JaWcbJ1PV5
-         +IelYTNu93jUT3KsUjSSccSG6UaKGKWnTjQaw90CO3ZUAuKskbUWe+HrNOmKRkl5RHhF
-         00Q7+IgzQYAATmssnJLE9WW3SZqsvY5NlUj5J1u41O/8uMG8vxUmOV9QQl1DFHLFSMLs
-         r11n08qlrcFDHIO6f+P+Kj7sYdXVEmtXHcBVS+b3h/O71emqHJBleX5fm+Hc64mEtEOj
-         9JvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781168393; x=1781773193;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SDvuiII1LGFXTJ1G7CEro7BK7MfvK9SQkUAqzNSYDJU=;
-        b=Umlq+pdU8e4S9WFiqcWceYJQuWXZF5UIm0xWbIowK/VlrkL6xCxd3I8jMLCzTFsd9y
-         D2JPmDi/NDPBFCFLCqtFiB3WndRxaA8VfJqvy4ecvAOjhDsd+PE9jM/jST7pur0+sIE0
-         Xi89LoOqA926SnR2gyulzsPzlpxmjkSblqI68lYkPA3HdVhtWJzEwIkW5UGj/66Y72/8
-         3c5cQCUhj3etSez0gzX3T+quR1qjnFxxDjPQIqtVqG9sBcaKcsP1JvNSaVdbVELvIHuW
-         d0XAMNrG+iidHIsJVMqFTqiT0D/pHVcracurzDdLPBy5xpQu+XNeUg6ds6iRKSr77Uf6
-         Zu0w==
-X-Forwarded-Encrypted: i=1; AFNElJ8r6P+cFkZQOyv3gVHZ7TFUIya3RcvwhqqJptemEwptn5BiLXAB246o131fSU4KhPOGdPKXLtEVeRII@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGLEaeWKNCMWrGcabV5OdSFGEAixK7YvFedR8SPZZBfDWrxw17
-	IxDOXRnyIxAGBBP2SDhl6u4oriSREkEjHZxE4XyxPTsjiX/wxNsEtriW
-X-Gm-Gg: Acq92OHnbGENuXBfpQONOBJw+sOwAAbmE6h3sgKMxIeaHRkAXshvrArW60AEB7ExM8d
-	wO3XbBTU1GgjrK/fK4CONOddSXZRPdnN0tF7QNI8yLgjLARoaCW7riSOm4U/WAprIN29gP3rXOJ
-	AmWUs3BRemUcwvC5Okg7bW0I/I6T6w0OJtIQ8z8oeENxJ8vaql91A0lZ90F80WLRVpkGTTzXiB0
-	LpEnDQWgPktBXkCCfJDfbWqTe6e+lBr3UNsfUMxRnSAjsxani1T9IDb+R0aItczsp5f/RKR5CD5
-	/iIyYS8czYnnyP2iiPp3cfAAf8HBLqGOJ79ZstEcf8ntNwQJLqTZZxCVY6d5ccoZJA6S6fEkZ7p
-	QLqDcSFBAZPd+4yFpKMNqXa8A7Yw7NNtoJHC+amC2T/EYgiPNK3UkiTAPJk3U71kcVcNuZpA5Eu
-	LhogKEmbi9DcXPQpMYxtv2OXjq1EY=
-X-Received: by 2002:a05:6214:434a:b0:8ce:d77e:e5f with SMTP id 6a1803df08f44-8d1dac289e1mr31795746d6.36.1781168392876;
-        Thu, 11 Jun 2026 01:59:52 -0700 (PDT)
-Received: from localhost ([149.40.50.215])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8d1e819f58fsm12553176d6.11.2026.06.11.01.59.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jun 2026 01:59:51 -0700 (PDT)
-Date: Thu, 11 Jun 2026 10:35:28 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: David Howells <dhowells@redhat.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH] smb/client: Fix error code in smb2_aead_req_alloc()
-Message-ID: <aiplQF3QGXmXAEk2@stanley.mountain>
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:message-id:date:subject:to:from;
+	bh=E04F1I5e7mS1zEgYDN4bGAlthuHFKxrqo2BjnfxCIQs=;
+	b=GI8u4OZYd0XgjmTk+AOvjdRqlzLHbRMNXBzYO0aVkzyrWMHNpL1uWcJLwHSVA26y8k6j0o3L50Soh
+	 0PA0NCH4fjKuhCq2vfD4NHbvQRDSmJnG/yP64oSx5pv+lK7fXqKJs6bA8pW2xEVFjm8Tmsihn/xRD/
+	 m/NdyVRfNuPC5K5M2Z8YwU9hSE05zL2ZAggX8ig39zYmI03KeMxCqwqMmJXfgrLOg2YlYWArjyNmj9
+	 TCRzvBiIJHegcaAtceAGj0BhfEqi3NdjEjPgzGobDh/qq/YGJJC7Foyy0ZSQyKKy/almCGIrzxmNSI
+	 5lpMv1grUMU96+0Kl8AuFtE25UWL9Sw==
+X-KPN-MID: 33|47fcke+1ON7eanjgmYgu4pqab+/Lp1ddWofic8fys7yNTseYYHwhKojo22SRFzH
+ rj+bjt8/muclXLgGFA+dp7xYY8lhADRUtjuNDUM+ExYA=
+X-KPN-VerifiedSender: Yes
+X-CMASSUN: 33|hIU8PPtSnVoLJsj17k7+AEOIVlYQjTm+JatKlKpYBr96vuyO6UbxqX7fdJeawP6
+ R8AOfVTvo8SHkivB5lFeBjw==
+Received: from lt-jori.home (unknown [178.226.150.234])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id e7da8a26-65a5-11f1-9c0d-00505699d6e5;
+	Thu, 11 Jun 2026 16:57:51 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Steve French <sfrench@samba.org>,
+	Steve French <smfrench@gmail.com>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	NeilBrown <neil@brown.name>,
+	Jeff Layton <jlayton@kernel.org>
+Cc: linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jkoolstra@xs4all.nl
+Subject: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
+Date: Thu, 11 Jun 2026 16:57:06 +0200
+Message-ID: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The "*num_sgs" variable is a u32 so "ERR_PTR(*num_sgs)" doesn't work.
-We would have to do something similar to the previous line where it's
-cast to int and then long.  However, it's simpler to store the return in
-an int ret variable.
+There is a comment in vfs_prepare_mode() that says:
 
-This bug would eventually result in a crash when dereference the invalid
-error pointer.
+  Note that it's currently valid for @type to be 0 if a directory is
+  created. Filesystems raise that flag individually and we need to check
+  whether each filesystem can deal with receiving S_IFDIR from the vfs
+  before we enforce a non-zero type.
 
-Fixes: d08089f649a0 ("cifs: Change the I/O paths to use an iterator rather than a page list")
-Cc: stable@kernel.org
-Signed-off-by: Dan Carpenter <error27@gmail.com>
----
- fs/smb/client/smb2ops.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+This is a bit challenging since there are many filesystems. Claude Opus
+4.8 was used to generate the context for each mkdir implementation from
+which it can be judged whether passing S_IFDIR is safe. The result was
+then verified by hand by looking at how the mode argument is used in
+each case. To check whether all mkdir implementations are convered,
+'rg "\.mkdir" ' was used and checked against the list of uses Claude
+found.
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index a3257815e661..a8f8feeeccb5 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -4359,11 +4359,13 @@ static void *smb2_aead_req_alloc(struct crypto_aead *tfm, const struct smb_rqst
- 	unsigned int req_size = sizeof(**req) + crypto_aead_reqsize(tfm);
- 	unsigned int iv_size = crypto_aead_ivsize(tfm);
- 	unsigned int len;
-+	int ret;
- 	u8 *p;
- 
--	*num_sgs = cifs_get_num_sgs(rqst, num_rqst, sig);
--	if (IS_ERR_VALUE((long)(int)*num_sgs))
--		return ERR_PTR(*num_sgs);
-+	ret = cifs_get_num_sgs(rqst, num_rqst, sig);
-+	if (ret < 0)
-+		return ERR_PTR(ret);
-+	*num_sgs = ret;
- 
- 	len = iv_size;
- 	len += crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment() - 1);
+The only mkdir implementation that I am not as sure of is
+cifs_mkdir(). So this goes cc to the cifs people. But of course, I might
+have made errors in other places (except probably not for the A list as
+those are all just mode | S_IFDIR cases without other uses of mode
+besides logging)
+
+
+This is the AI context I worked with:
+
+Here's each filesystem with the exact line(s) that make it safe, grouped by why.
+
+  A. Forces S_IFDIR itself (redundant if pre-set → harmless)
+
+  9p          fs/9p/vfs_inode.c:683        perm = unixmode2p9mode(v9ses, mode | S_IFDIR);
+  9p (dotl)   fs/9p/vfs_inode_dotl.c:365   omode |= S_IFDIR;
+  affs        fs/affs/namei.c:290          inode->i_mode = S_IFDIR | mode;
+  afs         fs/afs/dir.c:1326            op->create.mode = S_IFDIR | mode;
+  autofs      fs/autofs/root.c:744         inode = autofs_get_inode(dir->i_sb, S_IFDIR | mode);
+  btrfs       fs/btrfs/inode.c:7123        inode_init_owner(idmap, inode, dir, S_IFDIR | mode);
+  ceph        fs/ceph/dir.c:1145           mode |= S_IFDIR;
+  ext2        fs/ext2/namei.c:239          inode = ext2_new_inode(dir, S_IFDIR | mode, &dentry->d_name);
+  ext4        fs/ext4/namei.c:3012         inode = ext4_new_inode_start_handle(idmap, dir, S_IFDIR | mode,
+  f2fs        fs/f2fs/namei.c:745          inode = f2fs_new_inode(idmap, dir, S_IFDIR | mode, NULL);
+  fuse        fs/fuse/dir.c:1131           return create_new_entry(idmap, fm, &args, dir, entry, S_IFDIR);
+  gfs2        fs/gfs2/inode.c:1351         gfs2_create_inode(dir, dentry, NULL, S_IFDIR | mode, ...)
+  hfs         fs/hfs/dir.c:228             inode = hfs_new_inode(dir, &dentry->d_name, S_IFDIR | mode);
+  hfsplus     fs/hfsplus/dir.c:579         hfsplus_mknod(&nop_mnt_idmap, dir, dentry, mode | S_IFDIR, 0)
+  hpfs        fs/hpfs/namei.c:66           result->i_mode |= S_IFDIR;
+  hugetlbfs   fs/hugetlbfs/inode.c:974     mode | S_IFDIR, 0);
+  jffs2       fs/jffs2/dir.c:465           mode |= S_IFDIR;
+  jfs         fs/jfs/namei.c:226           ip = ialloc(dip, S_IFDIR | mode);
+  minix       fs/minix/namei.c:113         inode = minix_new_inode(dir, S_IFDIR | mode);
+  nilfs2      fs/nilfs2/namei.c:234        inode = nilfs_new_inode(dir, S_IFDIR | mode);
+  ntfs3       fs/ntfs3/namei.c:216         S_IFDIR | mode, 0, NULL, 0, NULL));
+  ocfs2       fs/ocfs2/namei.c:660         ocfs2_mknod(&nop_mnt_idmap, dir, dentry, mode | S_IFDIR, 0);
+  dlmfs       fs/ocfs2/dlmfs/dlmfs.c:425   inode = dlmfs_get_inode(dir, dentry, mode | S_IFDIR);
+  omfs        fs/omfs/dir.c:285            return ERR_PTR(omfs_add_node(dir, dentry, mode | S_IFDIR));
+  orangefs    fs/orangefs/namei.c:336      orangefs_new_inode(dir->i_sb, dir, S_IFDIR | mode, 0, &ref);
+  ramfs       fs/ramfs/inode.c:124         ramfs_mknod(&nop_mnt_idmap, dir, dentry, mode | S_IFDIR, 0);
+  ubifs       fs/ubifs/dir.c:1034          inode = ubifs_new_inode(c, dir, S_IFDIR | mode, false);
+  udf         fs/udf/namei.c:431           inode = udf_new_inode(dir, S_IFDIR | mode);
+  ufs         fs/ufs/namei.c:177           inode = ufs_new_inode(dir, S_IFDIR|mode);
+  xfs         fs/xfs/xfs_iops.c:309        xfs_generic_create(idmap, dir, dentry, mode | S_IFDIR, 0, NULL)
+  nfs         fs/nfs/dir.c:2475            attr.ia_mode = mode | S_IFDIR;
+
+  B. Masks the type bits away before use (pre-set S_IFDIR stripped)
+
+  overlayfs   fs/overlayfs/dir.c:743       ovl_create_object(dentry, (mode & 07777) | S_IFDIR, 0, NULL)
+  vboxsf      fs/vboxsf/dir.c:272-273      params.info.attr.mode = (mode & 0777) |
+                                             (is_dir ? SHFL_TYPE_DIRECTORY : SHFL_TYPE_FILE);
+  nfs (v3)    fs/nfs/nfs3xdr.c:562         *p++ = cpu_to_be32(attr->ia_mode & S_IALLUGO);
+  nfs (v4)    fs/nfs/nfs4xdr.c:1170,1196   *p++ = cpu_to_be32(iap->ia_mode & S_IALLUGO);
+
+  C. Type comes from elsewhere — incoming mode's type is never consulted
+
+  exfat       fs/exfat/namei.c:856         exfat_add_entry(dir, ..., TYPE_DIR, &info);   // literal dir type
+  fat/msdos   fs/fat/namei_msdos.c:376     msdos_add_entry(dir, ..., 1, ...);            // is_dir=1 literal
+  fat/vfat    fs/fat/namei_vfat.c:867      vfat_add_entry(dir, &dentry->d_name, 1, ...); // is_dir=1 literal
+  coda        fs/coda/dir.c:182            attrs.va_mode = mode;     // type assigned by Venus userspace server
+  hostfs      fs/hostfs/hostfs_kern.c:698  err = do_mkdir(file, mode);  // type re-read from host stat()
+  cifs        fs/smb/client/inode.c:2253   cifs_mkdir(...)  // SMB protocol carries dir-vs-file separately, not in mode
+  ecryptfs    fs/ecryptfs/inode.c:521      vfs_mkdir(&nop_mnt_idmap, lower_dir, ...)  // delegates to lower fs (cat.
+  A/B)
+  bad_inode   fs/bad_inode.c:64            return ERR_PTR(-EIO);     // never creates anything
+
+  These ignore the type field of mode entirely (or never create an inode), so a pre-set S_IFDIR is irrelevant.
+
+  D. Pseudo-filesystems — mode is permission-only or dropped
+
+  configfs    fs/configfs/dir.c            mode unused; dir created by make_group()/make_item() callbacks
+  kernfs      fs/kernfs/dir.c:1382         scops->mkdir(parent, dentry->d_name.name, mode)  // passed on, never
+  type-switched
+  resctrl     fs/resctrl/rdtgroup.c:3936   rdtgroup_mkdir() branches on parent/name, not on mode's type bits
+  tracefs     fs/tracefs/inode.c:~222      tracefs_ops.mkdir(name.name.name)  // mode dropped entirely
+
+Jori Koolstra (1):
+  vfs: pass S_IFDIR mode to vfs_prepare_mode()
+
+ fs/namei.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
 -- 
-2.53.0
+2.54.0
 
