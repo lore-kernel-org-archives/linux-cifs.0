@@ -1,95 +1,76 @@
-Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD2F1624C0;
-	Thu, 11 Jun 2026 15:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290042EEE76;
+	Thu, 11 Jun 2026 16:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781193312; cv=none; b=PO/3A/kWDXji8SNTryXbHW0LYLSBrV5mAvozqA/0slj4X/bM/wz1kSEwCyXOWDNKVaAXUJgd2CTTd132zmpPpio/CNDUMT+j9QhI9v0ce8UwakT3Yyf0cwdnsNBzgU/OciM2hDMLfkVF97+IjKL75EOkw07QLs47iCB9/O0xD7I=
+	t=1781195864; cv=none; b=r+TvMUW6KkSyU7CpmOil/2ND06AJ5LVNNACitMPM3WmaeAYJgNNDyFEppNcBobE1GrDMd3fgXlG+ftU0j0GTSDkBNCHv7QgbTL9MCcrj1wTWldwYZoSkXDw7Nv5QfN5o4rzqsNgcwelARp0I9FOOR5w4QV3ihb80ISZF88LqtMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781193312; c=relaxed/simple;
-	bh=pJPz4Q++TgGVQ2L6ETh/zhmgiC++tx7flyeXPRWjUCY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tCy0SbjS83/+XBs85UPgbulZCkA24/YbOe1g8shXVdG3vBRrgkhHO8UKaNbo8CIGK4JSZi9Naju8tt6OvqsVhRL+2qO9KvnKZ2Kh48Baz7NBfYEmmKl6QlyuudxVCYqZVjgjCpAfoAtGTQke4FBtXrBtHyi4wEi0Ix4VpUL7VoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [117.182.75.76])
-	by APP-05 (Coremail) with SMTP id zQCowAD3Z+tV2ipq2jAZEw--.25771S2;
-	Thu, 11 Jun 2026 23:55:02 +0800 (CST)
-From: WenTao Liang <vulab@iscas.ac.cn>
-To: linkinjeon@kernel.org,
-	smfrench@gmail.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	WenTao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] fs/smb/server: fix refcount leak in oplock_break()
-Date: Thu, 11 Jun 2026 23:54:59 +0800
-Message-ID: <20260611155500.95075-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1781195864; c=relaxed/simple;
+	bh=EX/srIKOg+Hk1+KF2S5xseAjGQf+OJxX7IWergv49ms=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7/adRa+zg/uxWumN7B3YJJBYyCMi2ncu64YlumeH4Yv39LnSQb5JsE8NmyyJHlYwZX/8DAFsNbCB++7rhrIhrCIcnLKPn6ABXnL4GrShrrQSvFKG8sSnwIKni6CGjKgKYZpSZp+Iz2GCccKhS1qAPE+i6Qvd5XF9KHj+QI+eAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=Ec1680Jc; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="Ec1680Jc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=RQdjEqQFdXM28Z7LFRzPSwwRncXEeuLQgbmf3ywKZHk=; b=Ec1680Jclw2zxeno1f1AyL5IEp
+	lUiDxh8AVXRLOMdmcmZrhpE5XvolyCFWLW+oi1Gtfw9Ca3CpFxxJ2W33I8JKeIU+KPKtQk5fiFE8I
+	gw00HBGjA1ZBeYpWA/wNcVdpceZiUGPHD/P2kYBblSxWrp9UKszWv6hN/OyNFIXvSDS9kVYMXql1N
+	7Akn+WbZkE2EG9yqxS3FG/1N2yWY1o5c+n6oHuhPo3H8Zi5XwHlI07ek0o2PswTSrshTRiLHVFd+Z
+	R0t7kO6uiZ7nRFl8/66g/0bu/Cz3CNsgBSetsMv3E2SWpmfZljlQS1jxDRMCQL4dczAaYh1i4Jrjm
+	6IIFGRmA==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.99.2 #2 (Red Hat Linux))
+	id 1wXiPQ-00000006laO-0Jll;
+	Thu, 11 Jun 2026 16:37:36 +0000
+Date: Thu, 11 Jun 2026 17:37:36 +0100
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Jori Koolstra <jkoolstra@xs4all.nl>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>,
+	NeilBrown <neil@brown.name>, Jeff Layton <jlayton@kernel.org>,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
+Message-ID: <20260611163736.GM2636677@ZenIV>
+References: <20260611145733.43776-1-jkoolstra@xs4all.nl>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAD3Z+tV2ipq2jAZEw--.25771S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7trWktr47Kr1DtF1rtrWfAFb_yoW8GFyUpr
-	4jy3s0kF45Jw1xZwn8AFWvka1jvw1UC398Crs5Ww17Xr9xXws3Xr4FywnF9rWI9F1fJ34Y
-	q3y29w4vv3W8ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUvXd8UUU
-	UU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRAPA2oqzrsjxgAAsF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-In oplock_break(), when handling a lease oplock, the breaking_cnt
-refcount is incremented with atomic_inc() before calling
-oplock_break_pending(). If oplock_break_pending() returns a non-zero
-error (1 when another break is already pending, or -ENOENT when the
-oplock is closing), the function returns immediately without
-decrementing the refcount, leaking a reference. The leak can
-eventually lead to resource exhaustion, though in practice it may be
-masked by a timeout in wait_lease_breaking().
+On Thu, Jun 11, 2026 at 04:57:06PM +0200, Jori Koolstra wrote:
+> There is a comment in vfs_prepare_mode() that says:
+> 
+>   Note that it's currently valid for @type to be 0 if a directory is
+>   created. Filesystems raise that flag individually and we need to check
+>   whether each filesystem can deal with receiving S_IFDIR from the vfs
+>   before we enforce a non-zero type.
+> 
+> This is a bit challenging since there are many filesystems. Claude Opus
+> 4.8 was used to generate the context for each mkdir implementation from
+> which it can be judged whether passing S_IFDIR is safe. The result was
+> then verified by hand by looking at how the mode argument is used in
+> each case. To check whether all mkdir implementations are convered,
+> 'rg "\.mkdir" ' was used and checked against the list of uses Claude
+> found.
+> 
+> The only mkdir implementation that I am not as sure of is
+> cifs_mkdir(). So this goes cc to the cifs people. But of course, I might
+> have made errors in other places (except probably not for the A list as
+> those are all just mode | S_IFDIR cases without other uses of mode
+> besides logging)
 
-Fix this by adding an atomic_dec() on the error path before returning
-early, restoring the refcount.
-
-Cc: stable@vger.kernel.org
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
----
- fs/smb/server/oplock.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index b193dde4810d..cae756efa8cf 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -898,8 +898,10 @@ static int oplock_break(struct oplock_info *brk_opinfo, int req_op_level,
- 
- 		atomic_inc(&brk_opinfo->breaking_cnt);
- 		err = oplock_break_pending(brk_opinfo, req_op_level);
--		if (err)
-+		if (err) {
-+			atomic_dec(&brk_opinfo->breaking_cnt);
- 			return err < 0 ? err : 0;
-+		}
- 
- 		if (brk_opinfo->open_trunc) {
- 			/*
--- 
-2.50.1 (Apple Git-155)
-
+There's a missing bit here: what's the point?
