@@ -1,232 +1,181 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879E240BCB3
-	for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 15:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86C8408608;
+	Thu, 11 Jun 2026 15:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781192032; cv=none; b=u8kVY+Ky2t66oMKbuBFZOM3Dj/h3lgwAugKdACyOf5xaFjKvklD+VgpfEtQENoEso5Plwo1j9OHIf88YW7QJMliDpE1XlpV6WRuRvtedxOQXdN98UHtPlwxT5nP6ObWTRxiyoa4eYd7qPtnDqaJGwdbAMAwHmbEZCQtUu2Z9jjI=
+	t=1781192542; cv=none; b=lOTPwfGRdn5JIbKx7kFMf0u9ubfRDMBEUUbdNyLHVTwCJ1AXJYzR9RcXp86WyJ35TVyuFygcWtilg6XEGWkNUkeiyilKTCAGn8EudbQBd3lzokM1Y1Cwa0QGTjRh1sI+IGdDUS3JVCd35uv+kRloyXrg8RBKLIN8sMepyf/ftH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781192032; c=relaxed/simple;
-	bh=DJZNWltygh7n32wiepOQlNy4iRac0MmrbqElhk5ZGMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fCj54R6vQ2eL+YUhRQGs+Sh2Rg6RDifXFANE5vL0lCQF8DDEVheaHzNSIweodzkBFA99YyaUL8VuPd5woa9rG/DV5b3PwFs8TDCf+KWkOZQg8/TqU+o4AIRT7cNNrL4WTsM+rfOBc2yn+vhH+lN8r2zzJbtKbtM4T1/2nr3B7gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mFufpgsW; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gFi8oInp; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mFufpgsW; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gFi8oInp; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1781192542; c=relaxed/simple;
+	bh=3rJ2KIAt5Qekidf6ayFD/V9jH7JnMuFKFXlhNV1vehs=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=IQa2K9iWreDHcoCb/VXc29gHMTlgKjTgYnhFhySVDWi7v3fygz9dWOX6hJorxBaR7qLmd1JhrfjKdmyA18KTxhcxkke/gLhq7901O4/8wHWKiyyu8ga/JhivyEXHuPm1UxTlmg0X7uI11jL8vrtZYsJZ/0bYP7WLJKBW3HtZzUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=KYkAwZd/; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mFufpgsW";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gFi8oInp";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mFufpgsW";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gFi8oInp"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 9503F6AF82;
-	Thu, 11 Jun 2026 15:33:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1781192017; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qI1DCrjojIvfp4V0fb9SUexR3zxzsh3I/Dr0x91vqc=;
-	b=mFufpgsWB6k/Niyuk7xxzDDEBsr386bmlLR0UzQUgYRJUGyInoUT9vRqLUweUh6PQ7vV3R
-	dr7w04dT+XoUyt/ZpEjxG/rdTJplv9MAeVpLD+ppccJTQckNETF3Q9lBbZVWKDpZjPDhAc
-	stDGfTj+xMwruMfw2U1XnX4tQGoouoU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1781192017;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qI1DCrjojIvfp4V0fb9SUexR3zxzsh3I/Dr0x91vqc=;
-	b=gFi8oInpkDgn3AGR0VVI5zDz1HfuAmOe7tfAw0MlMy5MTbgjRJNgc51mG7WegKdokZ0hQ3
-	CcpgrG2vyyouuOBg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1781192017; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qI1DCrjojIvfp4V0fb9SUexR3zxzsh3I/Dr0x91vqc=;
-	b=mFufpgsWB6k/Niyuk7xxzDDEBsr386bmlLR0UzQUgYRJUGyInoUT9vRqLUweUh6PQ7vV3R
-	dr7w04dT+XoUyt/ZpEjxG/rdTJplv9MAeVpLD+ppccJTQckNETF3Q9lBbZVWKDpZjPDhAc
-	stDGfTj+xMwruMfw2U1XnX4tQGoouoU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1781192017;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qI1DCrjojIvfp4V0fb9SUexR3zxzsh3I/Dr0x91vqc=;
-	b=gFi8oInpkDgn3AGR0VVI5zDz1HfuAmOe7tfAw0MlMy5MTbgjRJNgc51mG7WegKdokZ0hQ3
-	CcpgrG2vyyouuOBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8366B779A7;
-	Thu, 11 Jun 2026 15:33:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Zl4SIFHVKmrwEQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 11 Jun 2026 15:33:37 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id E55B6A10CE; Thu, 11 Jun 2026 17:33:36 +0200 (CEST)
-Date: Thu, 11 Jun 2026 17:33:36 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jori Koolstra <jkoolstra@xs4all.nl>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>, 
-	Al Viro <viro@zeniv.linux.org.uk>, NeilBrown <neil@brown.name>, Jeff Layton <jlayton@kernel.org>, 
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
-Message-ID: <7iocwlr7jg2jiyx53q7lxaccrybu6fpv6ch36u64igdmddafdk@3ejeqvr4e7rh>
-References: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="KYkAwZd/"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1781192530; x=1781797330; i=markus.elfring@web.de;
+	bh=TC414nfr9kv7aWjwVWIk5zquDi+fNOTFUYdZW0Ad2nk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=KYkAwZd/ST2A/cLNFnBIgFDqE8tEI2PXU6e66oTOS/QNOwX4vT+JoEO19r95fTY2
+	 gKubmshqY3V7pFRGW4jkrxeHDPwChcM3/ks7n55ooChv47RAc0/gyhRv8h6iFDQ+H
+	 qVa4vHA641HLNS8Et9pDCbRJ9E/oNv74NBNTYyd53KUrxQLwxfM+MaeaImjFh7mKq
+	 2fE5561YBXInEfS0MFH5jABz/IHdEJXVZcNFg4S44NSleoaCgRTZsGhXtb0JjlOcR
+	 q8jSXhT5NY1EY/fAC12qNuMgJCNypu6KSErH/bHYKCZ4jBxrbVhhRWObsqzOYHZcv
+	 5tC9tfPPex1r2xs/sA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from client.hidden.invalid by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MkElZ-1ww50t2u3V-00dPBS; Thu, 11
+ Jun 2026 17:42:10 +0200
+Message-ID: <328ba830-24f6-4358-b88f-9aec843ecf14@web.de>
+Date: Thu, 11 Jun 2026 17:42:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+User-Agent: Mozilla Thunderbird
+To: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ Bharath SM <bharathsm@microsoft.com>, Paulo Alcantara <pc@manguebit.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Steve French <sfrench@samba.org>,
+ Tom Talpey <tom@talpey.com>
+Content-Language: en-GB, de-DE
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] smb: client: Use more common error handling code in
+ smb3_reconfigure()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:tRHOrCTt/wJyHTqmWy1ofcnZ9YPjQfZ4DZ4tfzSnhy0yq3kvmxA
+ MzVci56jtmL2wxIfJoZRDjRfeXQtIL6Txx/1y8OvamLwMGbf3nENBYRGhU4NyYGepRTQkG0
+ IOitKJFSRa0vFB3erEI4Hn76JK888krGZ9sQ5FDERnCP71h4o+eO5oX877uUl5qFpIJ62zK
+ 3FvojQIjvdF+NHeL3W+eQ==
 X-Spam-Flag: NO
-X-Spam-Score: -3.80
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_TO(0.00)[xs4all.nl];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com,xs4all.nl];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,suse.cz,samba.org,gmail.com,zeniv.linux.org.uk,brown.name,vger.kernel.org];
-	RCVD_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Level: 
+UI-OutboundReport: notjunk:1;M01:P0:+CSzs/aTPRk=;gZAzBzAbF5hMBUPJ3j1/iZBOGpo
+ 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
 
-On Thu 11-06-26 16:57:06, Jori Koolstra wrote:
-> There is a comment in vfs_prepare_mode() that says:
-> 
->   Note that it's currently valid for @type to be 0 if a directory is
->   created. Filesystems raise that flag individually and we need to check
->   whether each filesystem can deal with receiving S_IFDIR from the vfs
->   before we enforce a non-zero type.
-> 
-> This is a bit challenging since there are many filesystems. Claude Opus
-> 4.8 was used to generate the context for each mkdir implementation from
-> which it can be judged whether passing S_IFDIR is safe. The result was
-> then verified by hand by looking at how the mode argument is used in
-> each case. To check whether all mkdir implementations are convered,
-> 'rg "\.mkdir" ' was used and checked against the list of uses Claude
-> found.
-> 
-> The only mkdir implementation that I am not as sure of is
-> cifs_mkdir(). So this goes cc to the cifs people. But of course, I might
-> have made errors in other places (except probably not for the A list as
-> those are all just mode | S_IFDIR cases without other uses of mode
-> besides logging)
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Thu, 11 Jun 2026 17:33:39 +0200
 
-For the filesystems I know this looks sound. Thanks for the cleanup. But
-this series should then follow with the removal of now-pointless "|
-S_IFDIR" statements.
+Use an additional label so that a bit of exception handling can be better
+reused at the end of this function implementation.
 
-								Honza
+This issue was detected by using the Coccinelle software.
 
-> This is the AI context I worked with:
-> 
-> Here's each filesystem with the exact line(s) that make it safe, grouped by why.
-> 
->   A. Forces S_IFDIR itself (redundant if pre-set → harmless)
-> 
->   9p          fs/9p/vfs_inode.c:683        perm = unixmode2p9mode(v9ses, mode | S_IFDIR);
->   9p (dotl)   fs/9p/vfs_inode_dotl.c:365   omode |= S_IFDIR;
->   affs        fs/affs/namei.c:290          inode->i_mode = S_IFDIR | mode;
->   afs         fs/afs/dir.c:1326            op->create.mode = S_IFDIR | mode;
->   autofs      fs/autofs/root.c:744         inode = autofs_get_inode(dir->i_sb, S_IFDIR | mode);
->   btrfs       fs/btrfs/inode.c:7123        inode_init_owner(idmap, inode, dir, S_IFDIR | mode);
->   ceph        fs/ceph/dir.c:1145           mode |= S_IFDIR;
->   ext2        fs/ext2/namei.c:239          inode = ext2_new_inode(dir, S_IFDIR | mode, &dentry->d_name);
->   ext4        fs/ext4/namei.c:3012         inode = ext4_new_inode_start_handle(idmap, dir, S_IFDIR | mode,
->   f2fs        fs/f2fs/namei.c:745          inode = f2fs_new_inode(idmap, dir, S_IFDIR | mode, NULL);
->   fuse        fs/fuse/dir.c:1131           return create_new_entry(idmap, fm, &args, dir, entry, S_IFDIR);
->   gfs2        fs/gfs2/inode.c:1351         gfs2_create_inode(dir, dentry, NULL, S_IFDIR | mode, ...)
->   hfs         fs/hfs/dir.c:228             inode = hfs_new_inode(dir, &dentry->d_name, S_IFDIR | mode);
->   hfsplus     fs/hfsplus/dir.c:579         hfsplus_mknod(&nop_mnt_idmap, dir, dentry, mode | S_IFDIR, 0)
->   hpfs        fs/hpfs/namei.c:66           result->i_mode |= S_IFDIR;
->   hugetlbfs   fs/hugetlbfs/inode.c:974     mode | S_IFDIR, 0);
->   jffs2       fs/jffs2/dir.c:465           mode |= S_IFDIR;
->   jfs         fs/jfs/namei.c:226           ip = ialloc(dip, S_IFDIR | mode);
->   minix       fs/minix/namei.c:113         inode = minix_new_inode(dir, S_IFDIR | mode);
->   nilfs2      fs/nilfs2/namei.c:234        inode = nilfs_new_inode(dir, S_IFDIR | mode);
->   ntfs3       fs/ntfs3/namei.c:216         S_IFDIR | mode, 0, NULL, 0, NULL));
->   ocfs2       fs/ocfs2/namei.c:660         ocfs2_mknod(&nop_mnt_idmap, dir, dentry, mode | S_IFDIR, 0);
->   dlmfs       fs/ocfs2/dlmfs/dlmfs.c:425   inode = dlmfs_get_inode(dir, dentry, mode | S_IFDIR);
->   omfs        fs/omfs/dir.c:285            return ERR_PTR(omfs_add_node(dir, dentry, mode | S_IFDIR));
->   orangefs    fs/orangefs/namei.c:336      orangefs_new_inode(dir->i_sb, dir, S_IFDIR | mode, 0, &ref);
->   ramfs       fs/ramfs/inode.c:124         ramfs_mknod(&nop_mnt_idmap, dir, dentry, mode | S_IFDIR, 0);
->   ubifs       fs/ubifs/dir.c:1034          inode = ubifs_new_inode(c, dir, S_IFDIR | mode, false);
->   udf         fs/udf/namei.c:431           inode = udf_new_inode(dir, S_IFDIR | mode);
->   ufs         fs/ufs/namei.c:177           inode = ufs_new_inode(dir, S_IFDIR|mode);
->   xfs         fs/xfs/xfs_iops.c:309        xfs_generic_create(idmap, dir, dentry, mode | S_IFDIR, 0, NULL)
->   nfs         fs/nfs/dir.c:2475            attr.ia_mode = mode | S_IFDIR;
-> 
->   B. Masks the type bits away before use (pre-set S_IFDIR stripped)
-> 
->   overlayfs   fs/overlayfs/dir.c:743       ovl_create_object(dentry, (mode & 07777) | S_IFDIR, 0, NULL)
->   vboxsf      fs/vboxsf/dir.c:272-273      params.info.attr.mode = (mode & 0777) |
->                                              (is_dir ? SHFL_TYPE_DIRECTORY : SHFL_TYPE_FILE);
->   nfs (v3)    fs/nfs/nfs3xdr.c:562         *p++ = cpu_to_be32(attr->ia_mode & S_IALLUGO);
->   nfs (v4)    fs/nfs/nfs4xdr.c:1170,1196   *p++ = cpu_to_be32(iap->ia_mode & S_IALLUGO);
-> 
->   C. Type comes from elsewhere — incoming mode's type is never consulted
-> 
->   exfat       fs/exfat/namei.c:856         exfat_add_entry(dir, ..., TYPE_DIR, &info);   // literal dir type
->   fat/msdos   fs/fat/namei_msdos.c:376     msdos_add_entry(dir, ..., 1, ...);            // is_dir=1 literal
->   fat/vfat    fs/fat/namei_vfat.c:867      vfat_add_entry(dir, &dentry->d_name, 1, ...); // is_dir=1 literal
->   coda        fs/coda/dir.c:182            attrs.va_mode = mode;     // type assigned by Venus userspace server
->   hostfs      fs/hostfs/hostfs_kern.c:698  err = do_mkdir(file, mode);  // type re-read from host stat()
->   cifs        fs/smb/client/inode.c:2253   cifs_mkdir(...)  // SMB protocol carries dir-vs-file separately, not in mode
->   ecryptfs    fs/ecryptfs/inode.c:521      vfs_mkdir(&nop_mnt_idmap, lower_dir, ...)  // delegates to lower fs (cat.
->   A/B)
->   bad_inode   fs/bad_inode.c:64            return ERR_PTR(-EIO);     // never creates anything
-> 
->   These ignore the type field of mode entirely (or never create an inode), so a pre-set S_IFDIR is irrelevant.
-> 
->   D. Pseudo-filesystems — mode is permission-only or dropped
-> 
->   configfs    fs/configfs/dir.c            mode unused; dir created by make_group()/make_item() callbacks
->   kernfs      fs/kernfs/dir.c:1382         scops->mkdir(parent, dentry->d_name.name, mode)  // passed on, never
->   type-switched
->   resctrl     fs/resctrl/rdtgroup.c:3936   rdtgroup_mkdir() branches on parent/name, not on mode's type bits
->   tracefs     fs/tracefs/inode.c:~222      tracefs_ops.mkdir(name.name.name)  // mode dropped entirely
-> 
-> Jori Koolstra (1):
->   vfs: pass S_IFDIR mode to vfs_prepare_mode()
-> 
->  fs/namei.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
-> 
-> -- 
-> 2.54.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ fs/smb/client/fs_context.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index fd4b13cd654d..9addc74ce57e 100644
+=2D-- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1092,10 +1092,8 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 		return -ENOMEM;
+=20
+ 	rc =3D smb3_fs_context_dup(old_ctx, cifs_sb->ctx);
+-	if (rc) {
+-		kfree(old_ctx);
+-		return rc;
+-	}
++	if (rc)
++		goto free_old_ctx;
+=20
+ 	/*
+ 	 * We can not change UNC/username/password/domainname/
+@@ -1244,6 +1242,7 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	kfree_sensitive(new_password2);
+ 	smb3_cleanup_fs_context_contents(cifs_sb->ctx);
+ 	memcpy(cifs_sb->ctx, old_ctx, sizeof(*old_ctx));
++free_old_ctx:
+ 	kfree(old_ctx);
+=20
+ 	return rc;
+=2D-=20
+2.54.0
+
