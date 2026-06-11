@@ -1,45 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13912DC79A
-	for <linux-cifs@vger.kernel.org>; Wed, 10 Jun 2026 15:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D10370AC9
+	for <linux-cifs@vger.kernel.org>; Thu, 11 Jun 2026 08:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781104584; cv=none; b=SVK4/nsHcdg7/wR5W5rnZS9d2ZxUWQvuGjhHf1MFlEmefWj++KdqwNLGrSogPUztiIXZJPczZxDsb/SsWCEZKCDHdToy3U01fN2hHI/lFLbVdGnpg/yjzIhw4DvztslxehmjMNWS8sjlv0NS72CGiRCQlyUwF/OlG0sAG3LQcHM=
+	t=1781166001; cv=none; b=dL8fCf8i+KiDYYmNSSrmX/TK9FBDoc/7EbvE08B+0o9huMkjwjWO9G0vSRObW2xcdgNmaQgO1Q8u1V6Aohsc2ZNBds9a2x5BYYA3gM9LV6/WO72X5TZNvZ1DbX4Zr3KTSqGcPoPbeAEuUseeWsABnJSzkslm7E0e99etz6OkvVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781104584; c=relaxed/simple;
-	bh=fHZq2iG/GdpXb9TgI/hga9bi1OB/9dbL75XnV31tKpM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q0i2cSFOnDveY3hvmgWyPYqtNtXHGBfoU8bd1PBNw3up+QQQs2e2rIPxdogMfENopTjmXE9ZPXOxWybPv8vJUDUIvB5hk1oK4MieggxcpKAdLL8at5+T958oo/So7mB8pr97gNGmDsIbsEN5TUJFLrt5Ax/BC0bUuEmpJh6FMEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTvOsmQa; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781166001; c=relaxed/simple;
+	bh=zfUHBvOS9rLd1Jwao3dD4EjPfWEHPV7ZqtcvIiZwq2U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=MwnMqkQCQUrw1MgJP+4uiVneT9ArPkUAt+wuv/VuOd9ui4dzcTvg8Qj1wBy/YvYA1cmpczlmq0Q8urN3ijNIRoGnxC27aaHaUpDmW9dYHj1QNs9FhhZRPfbfAVMV/wzNjIc5ijqtJpdTu/OUlwkRnx6twXkyAQXuu0yxT9AMjQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IiENIECL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTvOsmQa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532921F00898;
-	Wed, 10 Jun 2026 15:16:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781104582;
-	bh=QR7STUmqxTPJkY1xhC/S6lDRYWw4qbOFnTr/KlAiKCM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XTvOsmQaDxs947LHkBsObZjOomXeLNOnIIrHJGaOHUhKwksL2Wapu2JdHiVNHHNmd
-	 T4GIqdEZvTzByO1jueV0/2EHr47gJHpFatDz5RD8+ZEbhCREdTtn0cpRbTZJytNtBq
-	 gqXHP3bOumiP23eaJzuI7Wh4p+fDp2zNPR2rzou+45z0kcsr3Ukr86LlYPlFrypmAm
-	 EjGNUiZmXUBT3Y8pGKtQX0i77YbbZBHs2B2UyAzaWBJOjMW0l44oTBFGebVRz70ZK+
-	 qsYO5Nq2Uwzy5LTxjcg0c2YRayf5GNFKgu7nS4Z3DziOszxefaBJRtb/0QWu0wNSSk
-	 0fpfdPojTr9nQ==
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IiENIECL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781165997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=k2Tbl5YSafMDU9v5maENUMhUQohNtmwiAB1oNrOT/RY=;
+	b=IiENIECLpjQTe6xoveuJJ2MzkulT+aJBLAL5GFYA5hDfKpFHVv6wK/ZUl4pI3ABuQDIIkG
+	0wcukaRXKkcUP1LgO2Ym4TV9ToT8Qt3s2Frag3PfnfqFY016+J4Zf90bQ8xDUJLtVzFdBP
+	ROA8DNqdbTnkJnXrxORg7n/ARCN4K5I=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-311-ybql3r6cPaOiNFqK4AmwzA-1; Thu,
+ 11 Jun 2026 04:19:53 -0400
+X-MC-Unique: ybql3r6cPaOiNFqK4AmwzA-1
+X-Mimecast-MFC-AGG-ID: ybql3r6cPaOiNFqK4AmwzA_1781165989
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A43D41955F26;
+	Thu, 11 Jun 2026 08:19:47 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.48.53])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 83A8C1954B0B;
+	Thu, 11 Jun 2026 08:19:36 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: lucien.xin@gmail.com
+Cc: netdev@vger.kernel.org,
+	quic@lists.linux.dev,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
 	metze@samba.org,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 5/5] ksmbd: compress SMB2 READ responses
-Date: Thu, 11 Jun 2026 00:15:43 +0900
-Message-Id: <20260610151543.25218-6-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260610151543.25218-1-linkinjeon@kernel.org>
-References: <20260610151543.25218-1-linkinjeon@kernel.org>
+	mbuhl@openbsd.org,
+	tfanelli@redhat.com,
+	hepengtao@xiaomi.com,
+	dreibh@simula.no,
+	linux-cifs@vger.kernel.org,
+	smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	tom@talpey.com,
+	kernel-tls-handshake@lists.linux.dev,
+	chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	steved@redhat.com,
+	hare@suse.de,
+	aahringo@redhat.com,
+	dhowells@redhat.com,
+	matttbe@kernel.org,
+	mail@johnericson.me,
+	xiyou.wangcong@gmail.com,
+	alibuda@linux.alibaba.com,
+	jbaron@akamai.com,
+	illiliti@protonmail.com,
+	sd@queasysnail.net,
+	marcelo.leitner@gmail.com,
+	daniel@haxx.se,
+	andrew.gospodarek@broadcom.com,
+	mef@scarletmail.rutgers.edu,
+	paul@jakma.org
+Subject: Re: [PATCH net-next v13 07/15] quic: add connection id management
+Date: Thu, 11 Jun 2026 10:19:28 +0200
+Message-ID: <20260611081928.137149-1-pabeni@redhat.com>
+In-Reply-To: <0565988e6b54dac937fa00cdb3b09adef9650be6.1780855297.git.lucien.xin@gmail.com>
+References: <0565988e6b54dac937fa00cdb3b09adef9650be6.1780855297.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -47,262 +91,217 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Handle SMB2_READFLAG_REQUEST_COMPRESSED for non-RDMA reads.
+From: AI Reviewer <ai@example.com>
 
-Flatten the response iov, emit chained or unchained LZ77 transforms when
-compression is beneficial, and retain the generated buffer until the work
-item is released.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 ---
- fs/smb/server/compress.c   | 132 +++++++++++++++++++++++++++++++++++++
- fs/smb/server/compress.h   |   1 +
- fs/smb/server/ksmbd_work.c |   1 +
- fs/smb/server/ksmbd_work.h |   4 ++
- fs/smb/server/server.c     |  10 +++
- fs/smb/server/smb2pdu.c    |   9 +++
- 6 files changed, 157 insertions(+)
+Now I have enough information to produce the report.
 
-diff --git a/fs/smb/server/compress.c b/fs/smb/server/compress.c
-index 7c9f8a6cceb8..f8cf515b9c30 100644
---- a/fs/smb/server/compress.c
-+++ b/fs/smb/server/compress.c
-@@ -10,6 +10,9 @@
- 
- #include "compress.h"
- #include "smb_common.h"
-+#include "../common/compress/lz77.h"
-+
-+#define SMB_COMPRESS_MIN_LEN	PAGE_SIZE
- 
- /**
-  * ksmbd_decompress_request() - replace a compressed request with its SMB2 PDU
-@@ -75,3 +78,132 @@ int ksmbd_decompress_request(struct ksmbd_conn *conn)
- 	conn->request_buf = out;
- 	return 0;
- }
-+
-+/**
-+ * ksmbd_compress_response() - compress an eligible ksmbd response
-+ * @work: request work item containing the response iov
-+ *
-+ * Compression transforms describe one contiguous SMB2 message, while ksmbd
-+ * builds responses from multiple iov entries. Flatten the response first,
-+ * produce the negotiated transform, and replace the response iov only when the
-+ * result is smaller than the original message.
-+ *
-+ * Encrypted and compound responses are intentionally left unchanged. The
-+ * caller may still continue sending the original response when this function
-+ * returns zero.
-+ *
-+ * Return: 1 if the response was replaced, 0 if compression was skipped, or a
-+ * negative errno on failure.
-+ */
-+int ksmbd_compress_response(struct ksmbd_work *work)
-+{
-+	struct smb2_compression_hdr *chdr;
-+	struct smb2_hdr *req_hdr;
-+	u32 src_len, dst_len, compressed_pdu_len, max_dst_len;
-+	u8 *src = NULL, *out = NULL, *p;
-+	int i, rc;
-+
-+	if (!work->compress_response || work->encrypted ||
-+	    work->conn->compress_algorithm != SMB3_COMPRESS_LZ77)
-+		return 0;
-+
-+	req_hdr = smb_get_msg(work->request_buf);
-+	if (req_hdr->NextCommand || work->next_smb2_rcv_hdr_off ||
-+	    work->next_smb2_rsp_hdr_off)
-+		return 0;
-+
-+	src_len = get_rfc1002_len(work->iov[0].iov_base);
-+	if (src_len < SMB_COMPRESS_MIN_LEN)
-+		return 0;
-+
-+	src = kvmalloc(src_len, KSMBD_DEFAULT_GFP);
-+	if (!src)
-+		return -ENOMEM;
-+
-+	p = src;
-+	/* iov[0] contains only the RFC1002 length; the SMB2 PDU starts at iov[1]. */
-+	for (i = 1; i < work->iov_cnt; i++) {
-+		if (work->iov[i].iov_len > src + src_len - p) {
-+			rc = -EINVAL;
-+			goto out;
-+		}
-+		memcpy(p, work->iov[i].iov_base, work->iov[i].iov_len);
-+		p += work->iov[i].iov_len;
-+	}
-+	if (p != src + src_len) {
-+		rc = -EINVAL;
-+		goto out;
-+	}
-+
-+	max_dst_len = smb_lz77_compressed_alloc_size(src_len) +
-+		sizeof(struct smb2_compression_hdr) +
-+		3 * sizeof(struct smb2_compression_payload_hdr) +
-+		2 * sizeof(struct smb2_compression_pattern_v1);
-+	out = kvzalloc(sizeof(__be32) + max_dst_len,
-+		       KSMBD_DEFAULT_GFP);
-+	if (!out) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+
-+	if (work->conn->compress_chained) {
-+		dst_len = max_dst_len;
-+		rc = smb_compression_compress_chained(SMB3_COMPRESS_LZ77,
-+						      work->conn->compress_pattern,
-+						      src, src_len,
-+						      out + sizeof(__be32),
-+						      &dst_len);
-+		if (rc == -EMSGSIZE || dst_len >= src_len) {
-+			rc = 0;
-+			goto out;
-+		}
-+		if (rc)
-+			goto out;
-+		compressed_pdu_len = dst_len;
-+	} else {
-+		/*
-+		 * Peers which did not negotiate chained compression still use
-+		 * the original 16-byte unchained transform format.
-+		 */
-+		dst_len = smb_lz77_compressed_alloc_size(src_len);
-+		rc = smb_lz77_compress(src, src_len,
-+				       out + sizeof(__be32) + sizeof(*chdr),
-+				       &dst_len);
-+		if (rc == -EMSGSIZE ||
-+		    dst_len + sizeof(*chdr) >= src_len) {
-+			rc = 0;
-+			goto out;
-+		}
-+		if (rc)
-+			goto out;
-+
-+		compressed_pdu_len = sizeof(*chdr) + dst_len;
-+		chdr = (struct smb2_compression_hdr *)(out + sizeof(__be32));
-+		chdr->ProtocolId = SMB2_COMPRESSION_TRANSFORM_ID;
-+		chdr->OriginalCompressedSegmentSize = cpu_to_le32(src_len);
-+		chdr->CompressionAlgorithm = SMB3_COMPRESS_LZ77;
-+		chdr->Flags = cpu_to_le16(SMB2_COMPRESSION_FLAG_NONE);
-+		chdr->Offset = 0;
-+	}
-+
-+	*(__be32 *)out = cpu_to_be32(compressed_pdu_len);
-+
-+	/*
-+	 * Keep the transform in work->compress_buf until send completion.
-+	 * Existing response iovs can then be replaced without changing their
-+	 * individual ownership rules.
-+	 */
-+	work->compress_buf = out;
-+	work->iov[0].iov_base = out;
-+	work->iov[0].iov_len = sizeof(__be32);
-+	work->iov[1].iov_base = out + sizeof(__be32);
-+	work->iov[1].iov_len = compressed_pdu_len;
-+	work->iov_cnt = 2;
-+	work->iov_idx = 1;
-+	out = NULL;
-+	rc = 1;
-+out:
-+	kvfree(out);
-+	kvfree(src);
-+	return rc;
-+}
-diff --git a/fs/smb/server/compress.h b/fs/smb/server/compress.h
-index 49b36d931aac..663c6f44f09b 100644
---- a/fs/smb/server/compress.h
-+++ b/fs/smb/server/compress.h
-@@ -11,5 +11,6 @@
- #include "../common/compress/compress.h"
- 
- int ksmbd_decompress_request(struct ksmbd_conn *conn);
-+int ksmbd_compress_response(struct ksmbd_work *work);
- 
- #endif /* __KSMBD_COMPRESS_H__ */
-diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
-index ab4958dc3eb0..a5ab6799a65c 100644
---- a/fs/smb/server/ksmbd_work.c
-+++ b/fs/smb/server/ksmbd_work.c
-@@ -53,6 +53,7 @@ void ksmbd_free_work_struct(struct ksmbd_work *work)
- 	}
- 
- 	kfree(work->tr_buf);
-+	kvfree(work->compress_buf);
- 	kvfree(work->request_buf);
- 	kfree(work->iov);
- 
-diff --git a/fs/smb/server/ksmbd_work.h b/fs/smb/server/ksmbd_work.h
-index d36393ff8310..0da8cc0972d6 100644
---- a/fs/smb/server/ksmbd_work.h
-+++ b/fs/smb/server/ksmbd_work.h
-@@ -67,12 +67,16 @@ struct ksmbd_work {
- 	unsigned int                    response_sz;
- 
- 	void				*tr_buf;
-+	/* Contiguous SMB2 compression transform owned by this work item. */
-+	void				*compress_buf;
- 
- 	unsigned char			state;
- 	/* No response for cancelled request */
- 	bool                            send_no_response:1;
- 	/* Request is encrypted */
- 	bool                            encrypted:1;
-+	/* READ response should be wrapped in a compression transform. */
-+	bool                            compress_response:1;
- 	/* Is this SYNC or ASYNC ksmbd_work */
- 	bool                            asynchronous:1;
- 	bool                            need_invalidate_rkey:1;
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 5d799b2d4c62..36feda7e0942 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -22,6 +22,7 @@
- #include "crypto_ctx.h"
- #include "auth.h"
- #include "stats.h"
-+#include "compress.h"
- 
- int ksmbd_debug_types;
- 
-@@ -244,6 +245,15 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
- 	if (work->tcon)
- 		ksmbd_tree_connect_put(work->tcon);
- 	smb3_preauth_hash_rsp(work);
-+	/*
-+	 * Preauthentication hashes cover the original SMB2 response. Apply the
-+	 * transport compression wrapper only after updating the hash.
-+	 */
-+	if (work->compress_response) {
-+		rc = ksmbd_compress_response(work);
-+		if (rc < 0)
-+			ksmbd_debug(CONN, "Failed to compress response: %d\n", rc);
-+	}
- 	if (work->sess && work->sess->enc && work->encrypted &&
- 	    conn->ops->encrypt_resp) {
- 		rc = conn->ops->encrypt_resp(work);
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 86309dc70a62..5d5f868e7817 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -7097,6 +7097,15 @@ int smb2_read(struct ksmbd_work *work)
- 		kvfree(aux_payload_buf);
- 		goto out;
- 	}
-+	/*
-+	 * RDMA responses are transferred through channel buffers and encrypted
-+	 * responses use the encryption transform, so only normal SMB transport
-+	 * responses are candidates for compression.
-+	 */
-+	if (!is_rdma_channel && nbytes &&
-+	    (req->Flags & SMB2_READFLAG_REQUEST_COMPRESSED) &&
-+	    conn->compress_algorithm != SMB3_COMPRESS_NONE)
-+		work->compress_response = true;
- 	ksmbd_fd_put(work, fp);
- 	return 0;
- 
+commit e00266d0eea858a744fd827548eb8ebc6868f92c
+Author: Xin Long <lucien.xin@gmail.com>
+
+quic: add connection id management
+
+This commit introduces struct quic_conn_id_set for managing QUIC
+Connection IDs along with helpers to add, remove, and look up source
+and destination CIDs, including a global hash table for source CID
+lookup on the RX path.
+
+> diff --git a/net/quic/connid.c b/net/quic/connid.c
+> new file mode 100644
+> index 000000000000..b1a39feb827e
+> --- /dev/null
+> +++ b/net/quic/connid.c
+> @@ -0,0 +1,256 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Initialization/cleanup for QUIC protocol support.
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
+> +
+> +#include <linux/quic.h>
+> +#include <net/sock.h>
+> +
+> +#include "common.h"
+> +#include "connid.h"
+> +
+> +/* Lookup a source connection ID (scid) in the global source connection ID hash
+> + * table.
+> + */
+> +struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len)
+> +{
+> +	struct quic_shash_head *head = quic_source_conn_id_head(net, scid, len);
+> +	struct quic_source_conn_id *s_conn_id;
+> +	struct quic_conn_id *conn_id = NULL;
+> +	struct hlist_nulls_node *node;
+> +
+> +	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
+> +		if (net != sock_net(s_conn_id->sk))
+> +			continue;
+> +		if (s_conn_id->common.id.len != len ||
+> +		    memcmp(scid, &s_conn_id->common.id.data, len))
+> +			continue;
+> +		if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt)))
+> +			conn_id = &s_conn_id->common.id;
+> +		break;
+> +	}
+
+[Critical]
+Can s_conn_id->sk be freed while this RCU walk is running?  The
+s_conn_id itself is freed via call_rcu() in quic_source_conn_id_free(),
+but the struct sock it points to does not appear to be RCU-protected.
+
+A grep across this series for SOCK_RCU_FREE and SLAB_TYPESAFE_BY_RCU
+under net/quic returns no matches, and quic_init_sock() does not call
+sock_set_flag(sk, SOCK_RCU_FREE), so sk_destruct() will free the sock
+synchronously rather than after a grace period.
+
+Consider this sequence:
+
+  CPU0 (RX path, rcu_read_lock held)        CPU1 (close path)
+  hlist_nulls_for_each_entry_rcu(..)
+    /* sees s_conn_id still linked */
+                                            sk_destruct()
+                                              quic_destroy_sock()
+                                                quic_conn_id_set_free()
+                                                  /* unhash + call_rcu
+                                                     defers s_conn_id
+                                                     free, but not sk */
+                                              sk_prot_free()  /* sk gone */
+    sock_net(s_conn_id->sk)         /* UAF read of freed sock */
+    refcount_inc_not_zero(
+        &s_conn_id->sk->sk_refcnt)  /* UAF refcount op */
+
+Once quic_packet_get_sock() (in the later 'quic: add packet parser
+base' patch) wires this lookup into every short- and long-header
+packet, an incoming packet racing with close() on the matching socket
+would dereference freed sock memory.
+
+Would setting SOCK_RCU_FREE on the QUIC sockets, switching the proto
+slabs to SLAB_TYPESAFE_BY_RCU, taking sock_hold() when the sk pointer
+is stored in s_conn_id, or otherwise gating the sk free behind an RCU
+grace period address this?
+
+> +
+> +/* Check if a given stateless reset token exists in any connection ID in the
+> + * connection ID set.
+> + */
+> +bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token)
+> +{
+> +	struct quic_common_conn_id *common;
+> +	struct quic_dest_conn_id *dcid;
+> +
+> +	dcid = (struct quic_dest_conn_id *)id_set->active;
+> +	if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
+> +	    !memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
+> +		return true; /* Fast path. */
+> +
+> +	list_for_each_entry(common, &id_set->head, list) {
+> +		dcid = (struct quic_dest_conn_id *)common;
+> +		if (common == id_set->active)
+> +			continue;
+> +		if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
+> +		    !memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
+> +			return true;
+> +	}
+> +	return false;
+> +}
+
+[Medium]
+Is memcmp() the right comparison primitive for the stateless reset
+token here?  RFC 9000 section 10.3 treats the token as a secret that
+authorises tearing down a connection, and the commit message states
+this helper is used during stateless reset processing on incoming
+packets.
+
+lib/string.c's memcmp() returns at the first differing byte (and
+performs unaligned word-sized loads on architectures that allow it),
+so the time taken to return false leaks how many leading bytes of the
+supplied token match a stored token.  Would crypto_memneq() from
+<crypto/algapi.h>, which is constant-time, be more appropriate for
+comparing the token bytes?
+
+> +
+[ ... ]
+> +/* Add a connection ID with sequence number and associated private data to the
+> + * connection ID set.
+> + */
+> +int quic_conn_id_add(struct quic_conn_id_set *id_set,
+> +		     struct quic_conn_id *conn_id, u32 number, void *data)
+> +{
+[ ... ]
+> +	/* Locate insertion point to keep list ordered by number. */
+> +	list = &id_set->head;
+> +	list_for_each_entry(common, list, list) {
+> +		if (number == common->number)
+> +			return 0; /* Ignore if it already exists on the list. */
+> +		if (number < common->number) {
+> +			list = &common->list;
+> +			break;
+> +		}
+> +	}
+[ ... ]
+> +	list_add_tail(&common->list, list);
+> +
+> +	if (number == quic_conn_id_last_number(id_set) + 1) {
+> +		if (!id_set->active)
+> +			id_set->active = common;
+> +		id_set->count++;
+> +
+> +		/* Increment count for consecutive following IDs. */
+> +		list_for_each_entry_continue(common, &id_set->head, list) {
+> +			if (common->number != ++number)
+> +				break;
+> +			id_set->count++;
+> +		}
+> +	}
+> +	return 0;
+> +}
+
+[Medium]
+Does this function correctly maintain id_set->count when a CID is
+inserted before all existing entries?  The loop above explicitly
+handles the "number < common->number" case, suggesting out-of-order
+insertion is intended to be supported.
+
+Consider starting from list=[5], count=1 (so first=5, last=5) and
+calling quic_conn_id_add(..., number=3, ...):
+
+  - The location loop sets list = &common(5)->list and breaks.
+  - list_add_tail() inserts common(3) before common(5),
+    yielding list=[3, 5].
+  - The post-insert check evaluates:
+        quic_conn_id_last_number(id_set)
+            = quic_conn_id_first_number(id_set) + count - 1
+            = 3 + 1 - 1
+            = 3
+    so the test "number == last + 1" becomes "3 == 4" and the count
+    update branch is skipped.
+
+The end state is list=[3, 5] with count still 1, so entry 5 is
+silently uncounted.  A subsequent quic_conn_id_remove(id_set, 3)
+then trips the WARN_ON_ONCE(number >= last_number) because
+last_number reads as 3.
+
+Should the count adjustment also handle the case where the inserted
+CID lowers first_number?
+
+> +
+> +/* Remove consecutive connection IDs from the set with sequence numbers less
+> + * than or equal to a number.
+> + */
+> +void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number)
+[ ... ]
 -- 
-2.25.1
+This is an AI-generated review.
 
