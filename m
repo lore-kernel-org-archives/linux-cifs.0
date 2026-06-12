@@ -1,93 +1,94 @@
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D87936AB5A
-	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 19:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F5B369211
+	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 19:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781293066; cv=pass; b=QnqMtLGUZgrrqx77fIrY1Pr4zP3mQEsbCS2/1lf2Ek3wj0j5+a3ntUVFO9TDGDw6XX/44g/WamNLlgrCfJZZpkW/zTB4gmF0IV71YF6COgn0cdJXGGg/FVLlYshfQLAtCe6HRv4uCjFWr9eIrwsJ1tnZu3PY0BMfe2FeTMMSaSM=
+	t=1781293299; cv=pass; b=PG6VpBz1/kri8DLVkSkqQWU4nXH5+Ci12slfZ5EYHeADco+ToxURLDlMwmEJQT+LifWjzNsHS8tr5OrAdyazmXd45KOLN42lp99nBohO38rjehsGQCvfFVPAMBFc1tIxJdkwdncdY5jnWlg/fAyu5m92ZTsFEUBSg0xdm0xvXHU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781293066; c=relaxed/simple;
-	bh=QEUU0s90pEvT4hfT4qXSU5rJ24bOjblDhPsz3FQQoIs=;
+	s=arc-20240116; t=1781293299; c=relaxed/simple;
+	bh=8ZLOGvGFodYhD0qua0VuzQdoTndbnD664tOVgr1qn2c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=edLyCHGhXhztmVYf+tRLilQiq5ZfU9N7gLgDwP3Qs4/BjbPYUCYpog9Pca9PFxokWSr9of+xI1rpIZs8Abvhiyjeu5frx+uFqyq0rK2CBOdyo3H934SjKwg7RdrB9OSWghd2umqposT8mqAnWZxKD8OatSRwANeYFB/QN/OM2fM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pPeK0p1p; arc=pass smtp.client-ip=209.85.215.173
+	 To:Cc:Content-Type; b=olkpUZABD3/OOO1QYYbvWsGJ9U22t5Z5bmxoPM+RV6YrJn/1aXiPWJ9Tzc/WtmgDaSjjnjZKROKRZtcY1E+9C220dPfqYICG5NkKk4Eg//LUeBHYBiqSUHJsg9RTPqXM9nqPuzrPRDIUthM0z3hTTBaAaQd3IFSlzl/nVGxpLYo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=shfDh4E5; arc=pass smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pPeK0p1p"
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-c8587427468so573726a12.1
-        for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 12:37:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781293065; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="shfDh4E5"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8422871b42dso877675b3a.3
+        for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 12:41:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781293298; cv=none;
         d=google.com; s=arc-20240605;
-        b=SooAqtVRbzQcSph+JS1IJQZBHiUPYnQu3xTM2jPBCcOoegr+kIUAQG4gguVljZEGjZ
-         Yotb6i3yuJ2UqxvvrZG/FbSiExXlgRbexr+D99JXvxt2KdWnjGP1H0cQZimgri6rA/NQ
-         Rx3v24PgYTYVFYHI5wDCDfn+oOSs0mmgcQibYRRgLydUlq+yu7cbxsPFVXNcLWVajfCN
-         TYRQ5bM7H9BhSrNZH4GWlBdEFhdBofsOOLJ66G8HKbZ0lzIVUA84kc7qQli5lextBlRB
-         M0Iaa7A94ArRF44RQURh20eosKogKXkEUKksu2SKZbHBRQ1AqH5jMOU9LOVBdBrg3rF+
-         ptdQ==
+        b=EDrM8cujq2FYiN21cw4X7ArZGNNgCwrtezdLPtlJkmoUL4vlZKdcSlqtvcBgwC7x7V
+         Gik+NrxB91R+Dajbuvz5f8gTZ4t4NoQLSOZ6AVAZOYkT9yvAmiJ5vKdH5Ew15dW39+Gs
+         OZnpfwZEF3K6HBvWzfho3v4dKL3rkbxywi/N6hvkFrUsbKCIYP8zzbVobp57eYIqFxmx
+         zHnxkjN+VDQ5531MlXPXY9YCPLLczccgMm/0rYfwEQIoauu08gynrZ615P15B/eXV7xy
+         yOJ6oHmpF7xltpeO8xDvzA8I9V3TVU3Vgm/2sOJrhU4cq+QQMMIIfjTLG7LI/PCCP6XM
+         c3MA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=QEUU0s90pEvT4hfT4qXSU5rJ24bOjblDhPsz3FQQoIs=;
-        fh=yduhiOJ9Z0xteEiK4a1t5EJMxthqIX0VSWY5wAyFEWk=;
-        b=JRP+jl887YTeZRngJy66wRAvYYeEscQE+SeZl9xrqiPIC86uoAyah8EegtKmc8jlkn
-         OsBHIzfcYbkGGAryQyD4qQU80Bc/n7JJ1qdZRmRH5c95F9UbZU+KOqJeOJWv20n9+FfH
-         Dgb5F6feFWq5OASGuhCJ8YgmvvE/Rs8hcP8IXyxud3JbYZ+MAwEMFGlf0pu0VZnTFKTZ
-         4UF8BsPLU2D+79Ugc7mhxlArvyRyQLxv2bj/p5C+yQYTsKEmrVRZNDLwhbF4vvemxGwX
-         DXF+3CcBWJFy2lpun+wK8f0kmPA271AFGwFz6NlIv0wuTLmkvH263wSNFVDmqUdg3SVZ
-         rcHw==;
+        bh=Rbi30ru7gSioJ7/e48J895iPmcFfwsVcpIndfODcrgQ=;
+        fh=10zYu2xDT3XRduIjK80UagrJTZqlh2ML+Z0qfj3U5zw=;
+        b=kOqTLxV6u6FtRY8X7xYxnCMyi6z3oyEpMlh/o6eVQuwUx8GF6IYTzdgNCl/gCYVWPa
+         JeWcs20Tq62ZSa9Ib4pLIFbGIwz6QnfvL1hDOxRK589tVqGVWDvgA4g1gUvbZU8yfebe
+         TqFab2Dq0PWsein5P3KgrlX/2cMw789yiGA5nlHViFKDnqawRVuzcLEu4c2NWFRoO23b
+         phLV6LcmbPIeFwRIr7ShC61D63TkGOtRPI7mKH3qrNhrg17LwyZXVCAgUQD2Sx6DGF1n
+         RoDd9rPs0Qhob8Guv7+fGOewigUUbjwqhw50EuefY1lvAuFPnDbb//mZjKKxBncEQbw5
+         xm/A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781293065; x=1781897865; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781293298; x=1781898098; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QEUU0s90pEvT4hfT4qXSU5rJ24bOjblDhPsz3FQQoIs=;
-        b=pPeK0p1p+H2Stw/gIDmIEtvzYV7T8dn0cxMytCd4A88Z4lvAWO+BCS2RSElRBNQ9i4
-         iI+Ky+99b3tUnqTLGLiXpbnPzDJ2+gmBg27EGCMOMxOfmenUofUi7jlVUlzJJgErv+vm
-         VBzVw+fNQ2JAzPDUWUYubHrAkGYv5v9anvl4I+elqoBnM/wccdPdZjJ/Sz2J82iGl3pP
-         Ezn3/TgI5qw7JFysi/CF4Xre5+kgajC6q9D0z+/rbXhFBqO5nSvh9PfS606o7K0S1yKW
-         bk8slfH4rettH7FKzJeHTQLgI8vEgwpIzAkjFoeO5TC09FDuIUpRtnK3EmEEcfL/bNmN
-         ynXQ==
+        bh=Rbi30ru7gSioJ7/e48J895iPmcFfwsVcpIndfODcrgQ=;
+        b=shfDh4E5C1zufMfR1LU5U6amaDdkIGzntIK5JptXPmIXPyTZfMbVnUelrPu4jxQlU8
+         aL6DLro/v59IYt5baaEe+0848jo2VilIMZK3oXL8DbvHvJjY8vl8Ioo6GIJKEMZ569ky
+         5dTyCi/SrdvA7tFM3tMKK8I8uroh1b//lSilaCS8DjFwjc0Kp7/GXY49n5KK0OczfyyM
+         DIMMdKJtR1UFEPDUByg0NfrgBepJq64rqVtaxMpe1jkqdNoJIu31JH1bksTsZaY4Za6O
+         vzOFEyQw26JB35EcaMCkJl1n2qnLu7h2nFN8p6a96R+4ZejwfwkV3iGTzDSG5ZH7JL2a
+         YEnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781293065; x=1781897865;
+        d=1e100.net; s=20251104; t=1781293298; x=1781898098;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QEUU0s90pEvT4hfT4qXSU5rJ24bOjblDhPsz3FQQoIs=;
-        b=pKyGc1L0z1wUR+riTxQ2g3UxN6hmx5P6gD3LsUqByyjQa4lu1EzANunyTXBWnmHYNg
-         4kN+eWURY7zRDOrdTvSxWrMWQWjGm+uuBrOjT2RXZM7452pkx4uYssMoKXzvtYL7pb7t
-         9polrU/a7mIu6lj2DvUECmRFlV0W9C5JY7J6F/oca8eF9CQzJJumaoWg4pdatrhf1Roa
-         teDYgtVLDiVnhIAkI1AruzySm3+yRdGO+vaMjPRjelO8eOZ66kLYC5wNFuHO96hRradQ
-         uZT0LvVc7QRnqpaO8yzdIB6KONoEDQE8CVwdJJTwx2OdUVaPawZHJPkSSTWS1Byc4v7Z
-         A8Pw==
-X-Forwarded-Encrypted: i=1; AFNElJ84pbujey/Y+swv+40+CCrnDJQ7pgMEgx+l64nyWiZa0ZnJe7DSxLBnVDxUXb5eSJKq7Sanv++F+LvI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0kx9t6TFsSXqPmyDLivpSCCyLzv1j0vXY0Fb9qyRfSL4e3clT
-	4ApH0glP94jeJp2whw02ix1th2sj1w8EN+R662xjZ5GLwZxAZ98htio6wnvrpfvH//V0PEXdp0L
-	jGa428lFFH7SmQuofA3yLjprq4cEm0PE=
-X-Gm-Gg: Acq92OE6LYLKi/BJZ/Qim6RljXNZsGQfaJ3mzMZPWGk6hTkUGYm4gZK37dS289D836o
-	liXNxlUCVAzXIxLnCRvr6tkO5xdqVgbx/isjzVcz5AVaa6thyirNtJCoA0wZ7wUX/FNw0RJAR7A
-	Tud8h5wqwMgf+x8fBZrCyEJIexCRAZPc+PBA3REtsB+V65CNAYUVNi3dN2pimeV25tfP+EZBtzI
-	NRy5pGWMqAnC5LFzamxuebh5sYSeYh7PzzJgde0d73B0myUZqC+Agi+KYUB6pderGEfbxyfPO+i
-	et4uFiZYYAgd0HfrFpco5HY1t80IzOwk9lrEqYGQYrSnadXX/+FofxWWBhiUheeJLZPWNlNZHds
-	IMsrgxA==
-X-Received: by 2002:a05:6a00:1391:b0:82a:5d55:5807 with SMTP id
- d2e1a72fcca58-8434cb01ac7mr4736200b3a.6.1781293064808; Fri, 12 Jun 2026
- 12:37:44 -0700 (PDT)
+        bh=Rbi30ru7gSioJ7/e48J895iPmcFfwsVcpIndfODcrgQ=;
+        b=kcJgvwogNdpiIVUZ9ymC5XUR+tUE6LkfLYRjX1XjR6uCOsphTZlNTx5e3B42t2pA16
+         46RaANgn8mem6wS0+dYikDdtyn4LhT0sFCyveOrTmSgTUC6AFJXcOBRVT9hgp4GjUTEo
+         hKYArjg4kU5Wad6adD0joGfzGBzCsobjBGOwcgkQMbhDDgJRI/9rXIvmv9u4hLz28ZU7
+         oc1D70peCzjCDX+RUH9EXwb87QkNWmubqKmbEkuHp4L9c66eZc4hkmlmXIT+YaNgwuh7
+         pN2GmSLYauv/1DTz5bc5vfuBmbHk8nNkE5ibWtHaDtUYVLz0rKtJy3/v2fBYB/9gNA4j
+         X5Sw==
+X-Forwarded-Encrypted: i=1; AFNElJ/P/+fjokqSLm0/MDH5BHbFLiVPkPfMhVpnM1HWavrGRp6g11KwVpnQJvtZWNwlgu5VCNWxUAbTlpxY@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC1NnbyuITY1UFOq7wNDI9M1uIYsJlO2XIx+8+cE1XofrnlNdI
+	gu7Tt7sATF7dqhbgSYW/5Y/6j4/RNNE1o+uenOnVnz8qjLzJjdqDp4GM0QWCXTwTRutZxH22jHG
+	MctjyJBSM4z2R/h4wE7GulbHQH/A7LYE=
+X-Gm-Gg: Acq92OHjNjRoOyS/c2jLuhhxv7WyqOKiw+LsiysRDkJD+CxLg0FpWZ0BnU/K6DguBfa
+	s8YFoff0WKIIuQIYAvsXgV6EvSe9K+Q1atcRfuiApvdV3c7CeFfb76NgWM1SCWCf8ejBNoEapEu
+	HhJJnzivpr75AIvdthsa0ObHSTWimmTQnBCdJOEc50208dYVm4gEzr5Ze3ZfeS7cWZA/5BnpKbi
+	vxHbhZMgRymn8iuyFMpkb7hrCtT+1q2zhoooyDf5J5vGZFqqdHEFs38XuXh8Obc2RQd9Uzqqz8H
+	Jc2EDsMjnmH/yRWVS+pIj94sALOJ5sJmxD96sWmwx0/gW8GAwlOV8Vw2usVCfzB1TDcBBphe6+z
+	AiBdpuUfVqeFq9tss
+X-Received: by 2002:a05:6a00:18aa:b0:842:4387:34b7 with SMTP id
+ d2e1a72fcca58-8434cd41f33mr4652675b3a.10.1781293298066; Fri, 12 Jun 2026
+ 12:41:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1780855296.git.lucien.xin@gmail.com> <465489e5fafa9326b4a21c4851e420d344bbfdfe.1780855297.git.lucien.xin@gmail.com>
-In-Reply-To: <465489e5fafa9326b4a21c4851e420d344bbfdfe.1780855297.git.lucien.xin@gmail.com>
+References: <cover.1780855296.git.lucien.xin@gmail.com> <e73d8f69b67fdeeec076fbe772ca465d7e1af4cb.1780855297.git.lucien.xin@gmail.com>
+In-Reply-To: <e73d8f69b67fdeeec076fbe772ca465d7e1af4cb.1780855297.git.lucien.xin@gmail.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 12 Jun 2026 15:37:33 -0400
-X-Gm-Features: AVVi8CcBYZ4beNIIRotqS0HdShlGTPsplHhO3h8wRDUTXq00moRwOci60wjQJnA
-Message-ID: <CADvbK_c_qBNuad6HkYTZe0MpgMSbMdYSsSAz62DhEYaEapaCTg@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 09/15] quic: add congestion control
+Date: Fri, 12 Jun 2026 15:41:26 -0400
+X-Gm-Features: AVVi8CccjtCVNlXysoHMU93ce-8zqlj8T5zFjNLF2CVr-6fSHzwtKPVAgQLYHfw
+Message-ID: <CADvbK_e7wpf=-C9h97b2JWUMQ6YkQLtVeTcxxCdQPaFTN+Litw@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 04/15] quic: provide family ops for address
+ and protocol
 To: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev
 Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -105,19 +106,42 @@ Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
 	mef@scarletmail.rutgers.edu, paul@jakma.org
 Content-Type: text/plain; charset="UTF-8"
 
-[sashiko-gemini]
+[sashiko-claude]
 
-> + case QUIC_CONG_CONGESTION_AVOIDANCE:
-> + /* cong->window is never zero; it is initialized by
-> + * quic_packet_route() during connect/accept.
-> + */
-> + cong->window += cong->mss * bytes / cong->window;
-Can this arithmetic permanently stall congestion window growth or cause an
-overflow? Since all variables are 32-bit integers, the division could
-truncate to 0 as the window grows larger than cong->mss * bytes. Also,
-if bytes is large due to coalesced ACKs, could the multiplication wrap
-around U32_MAX?
+> +static void quic_v4_lower_xmit(struct sock *sk, struct sk_buff *skb,
+> +        struct flowi *fl)
+> +{
+> + struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> + u8 tos = (inet_sk(sk)->tos | cb->ecn), ttl;
+> + struct flowi4 *fl4 = &fl->u.ip4;
+> + struct dst_entry *dst;
+> + __be16 df = 0;
+> +
+> + pr_debug("%s: skb: %p, len: %d, num: %llu, %pI4:%d -> %pI4:%d\n",
+> + __func__, skb, skb->len, cb->number, &fl4->saddr,
+> + ntohs(fl4->fl4_sport), &fl4->daddr, ntohs(fl4->fl4_dport));
+Should cb->number use %lld here rather than %llu? Looking at struct
+quic_skb_cb in net/quic/common.h:
+    s64 number;  /* Parsed packet number, or the largest previously seen */
+Since number is s64, a negative initial value (such as -1 for "largest
+previously seen") would be printed as 18446744073709551615 with %llu, and
+compilers with -Wformat-signedness flag the mismatch.
+[ ... ]
+> +static void quic_v6_lower_xmit(struct sock *sk, struct sk_buff *skb,
+> +        struct flowi *fl)
+> +{
+> + struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> + u8 tc = (inet6_sk(sk)->tclass | cb->ecn), ttl;
+> + struct flowi6 *fl6 = &fl->u.ip6;
+> + struct dst_entry *dst;
+> + __be32 label;
+> +
+> + pr_debug("%s: skb: %p, len: %d, num: %llu, %pI6c:%d -> %pI6c:%d\n",
+> + __func__, skb, skb->len, cb->number, &fl6->saddr,
+> + ntohs(fl6->fl6_sport), &fl6->daddr, ntohs(fl6->fl6_dport));
+Same question about cb->number being printed with %llu while the field is
+declared s64.
 
-This looks a legit one, will confirm and fix it.
+A minor one but legit, will fix it.
 
 Thanks.
