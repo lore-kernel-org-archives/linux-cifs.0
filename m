@@ -1,107 +1,71 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D87083D0C07
-	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 11:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D962E370D5A;
+	Fri, 12 Jun 2026 12:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781263665; cv=none; b=Bit2j2HtiqT9wNOj0f7lm7MJyEKgYZ2RrDS8CVXYe0ewtHn+/Ffs79ECk7tGIaTCt42x3oBJxLhm6wDohHvfvWgs8SmLhrbM2pmAOE0gZGdz0hJwmzM+mrRfcG4/NvA8ytd79gGeJDpzjxULiKyLrB7FvLl3h+h2g2VjEr4D7KA=
+	t=1781266746; cv=none; b=nEYomwO3rqcCMVpAcCdGcGfMRdxctO01n4eUS1Acv1hWEP/ajL2AigVFl+F7cCGU8HgwD7iDutz5FROg/1EQ5JmMejizwlp2R67eVAvr8YuY5Sz6mf/DY97dUHQ8MXO+1wU++QGz9Ru7a3ij0oo+q6Q4UJPCF6OKxO6435o0TsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781263665; c=relaxed/simple;
-	bh=d+w2KM5PL5C2KimehS5Esc0JceN1aTb6ivn6DXuosrQ=;
+	s=arc-20240116; t=1781266746; c=relaxed/simple;
+	bh=1l0rFnrX25bcDADvh/n7RyDXM2YgvNap+9EAAx8Lnek=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Up/jA2bEMthAcGpIhUTXqntbQanNCHUAUv83ONezRSotJN0lfaOjl+PvKdOe5WkO98XqzZMDNyaNd0MibsfSLy2bE/6e0fH9uMlPoXBcgwFMCOe7mUTEao7H7rNRuctrUntHdrF8IWTBJe3dQQ6ZYJDoe6GCafQFJ0N3NET2vDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LVmXynyZ; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=VyoHAv+F1JvxawQ9YTF79fLKKaW5jUvQURYOTmFNif5j/NDfMzj4PBmnoKA/shPUrrURLceTZEjIx05iUZ2w1ecKE1EJKMtRXhCN5NEdZic1sYMwItXVQA56fDe1yDQkb76wtkSMOSQaKU4yuAdZdgk9xstvktNKQlZMTC9cEfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gsDTO58D; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVmXynyZ"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-517907feed0so20665301cf.1
-        for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 04:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781263658; x=1781868458; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X2S6USlGZ8AevZY+EuoNTTF7i0a23QNfsyQXA8t1ZiA=;
-        b=LVmXynyZWchz8IhSL9dudd79LeuKXMVr9DY1NjGx6jZY9jT/ImwgYMclJFprtIjN6h
-         ET21Z3rd+naPhCn2ur3J5Pf6t0jsBozDeiTUC2JtiCjRpJJX/ZftNNQiqxRIOj3CQQXC
-         xoaTFQ2Z8tp9/n165lzwBsvTB6ULBS5TdPV4EOrN5H48hsi9I/vswBHSwjBTozxoNfAU
-         x25+s0jeRZwUfb1zIutbvoZvCQ2u1Rb7eyLrT8gHhAR4QvzRFOR7aDjeQEBRURRXDLEO
-         rZeoQdjWCd4bFHgibeVyi6CeJ5NXT/TPcIn668KhooJKQfgO36Wzi4yazXM/9Q6QuuWd
-         UjYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781263658; x=1781868458;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X2S6USlGZ8AevZY+EuoNTTF7i0a23QNfsyQXA8t1ZiA=;
-        b=b5BIzf/iu+EXqpcKWYJkvM6yKWh8RUSJIqhbPnVsezINq0HYgBriVUbJXM6O2y013s
-         094jfBufR7KnLECHXTAV47p3eHl1AogA605ZxTaDNpP1TROcP7GkvWivuM08JaAOMi3b
-         e/vs7lugfVu2JO7DDxx2Vwc9MYgdNm7Ndk94D/xLFoOe6ILtEfyYjVq0btclcKfLMZeV
-         k6Zb4DKgyCGOpBq0AJAI1+iyk5MkGnhy2KnTVF/B4lRKPNiipo4KKoanL/4GDV7INSu4
-         SeghB40tFPC9lUKpgsTFSESRKDrSUawlyWcqwKJUpC4q05p7LXKu0A47JN6tfDZnsN2h
-         v0TQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+mb427QmbVVYZc3/OgfVXLAoly44iHXHd7OGwbTjoFO926VxCt9ysEGN++A1yaMoT97G/8yss6Meq0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4XTiRVsLP3WaOas5wcEmr9lTZJmGp+9YlBEqodrhtaV6kAgCr
-	r6HLcWDgf1Cjka5jUF7EK6G+smYL6/FnuOehL/G1CdKzsO4zLgzeD/g9
-X-Gm-Gg: Acq92OEb59LserwGZvhDwcxeKlykqkuuFB8UIWCSfzUKt4UEdCFdSss/o3FOs1b2dQx
-	DswHn/pQv6AyHHcvfImILEvCleWwnEq1cl5PtZv6ujDIKbfSsw+ODnRMfIKO0lyYeahKA5xTZjt
-	SL2+XNRklH3PLNzxLQy/7LcKuEsWqL/l46pyR/SmxWV2i7x46gVCNHGcmidZ9J/qFGKdw9Sj9fO
-	87dcDrtzSkkkoFRxi8x/lbxwgL5b0dpUzHPAgh3wD+vlQTMIBRgWDcit2pEm0JXcgp7dnM33frJ
-	+RlB/oBkDqZFbDM4SLQNiEWYde/aKCR+cc73zLxxho3KZATnDECLN9aZX85m9t9unLyTmZWWLap
-	M7lIJw3rWGJzOdXHw/gpiO/PiqYAztP3Jtu3iEYGbWGZOBkhHq1Bw+GEA1nnG2Fj6Bx39JavOV2
-	FPf2qmo+Rq9Ujlf/N60A==
-X-Received: by 2002:a05:622a:244f:b0:517:64b2:2388 with SMTP id d75a77b69052e-517fbcc58bcmr31767711cf.15.1781263658445;
-        Fri, 12 Jun 2026 04:27:38 -0700 (PDT)
-Received: from localhost ([43.225.189.109])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-517fb79e2f2sm18254261cf.17.2026.06.12.04.27.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jun 2026 04:27:37 -0700 (PDT)
-Date: Fri, 12 Jun 2026 14:27:30 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Steve French <smfrench@gmail.com>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Paulo Alcantara <pc@manguebit.org>, kernel-janitors@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>
-Subject: Re: [PATCH] smb/client: clean up a type issue in cifs_xattr_get()
-Message-ID: <aivtIut3kQ5s3GKM@stanley.mountain>
-References: <aiplG8fGQOYmXS5g@stanley.mountain>
- <CAH2r5mutN9yDPF8Q=z_GYbgAzJFS6OE+2zBd8na9zY1Wbt3gyg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gsDTO58D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97C3A1F00A3A;
+	Fri, 12 Jun 2026 12:19:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781266745;
+	bh=vYtOrK4Dq5zpikk3Pl2z6fn8G44xM4GUjAwqmUordCw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=gsDTO58DU87H5WHkJ9FoT+wX00LrkGXxk9DoEaAyu/VRjyDm+BV+EURNQfgLQmeAQ
+	 dwNJfjTAFztIf4sbCFgmovQP7WSseN5HOBRA9qg2qaI05MORk7ZnCmm2VTaCJnuu1m
+	 bzof0i3eByH3T2eBLmnv9KI6F7ygHzrV13C53j+2MRsDIcMKvGSSAG0EZit9DKmMdn
+	 e3rVSF8TGrTQVT+1yG6P4LsaErI7doknqKPS4kbHMBD9m7QFr74SIdPd+9xbO96ozi
+	 623Ncg0KemwHgPAhmUXy/BYegOumfTuOzR5FOdWveO1CHVSLi1n2J9MwioTavVbrAU
+	 2OKiVTtY1v04w==
+Date: Fri, 12 Jun 2026 14:19:00 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Jori Koolstra <jkoolstra@xs4all.nl>, Steve French <sfrench@samba.org>, 
+	Steve French <smfrench@gmail.com>, Al Viro <viro@zeniv.linux.org.uk>, NeilBrown <neil@brown.name>, 
+	Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
+Message-ID: <20260612-sturz-infizieren-heckscheibe-76f3ed250ea8@brauner>
+References: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+ <7iocwlr7jg2jiyx53q7lxaccrybu6fpv6ch36u64igdmddafdk@3ejeqvr4e7rh>
+ <987538907.1434294.1781209240897@kpc.webmail.kpnmail.nl>
+ <vt6zmgnwz3n5jc3opm5i3bckkocfmzcysrbivbin52nudayus5@5stfgorwnob7>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAH2r5mutN9yDPF8Q=z_GYbgAzJFS6OE+2zBd8na9zY1Wbt3gyg@mail.gmail.com>
+In-Reply-To: <vt6zmgnwz3n5jc3opm5i3bckkocfmzcysrbivbin52nudayus5@5stfgorwnob7>
 
-On Thu, Jun 11, 2026 at 03:33:50PM -0500, Steve French wrote:
-> Doesn't your patch need a cast in the following code in xattr.c since
-> it returns a ssize_t and you changed rc to int with your patch?
+On Fri, Jun 12, 2026 at 12:33:53PM +0200, Jan Kara wrote:
+> On Thu 11-06-26 22:20:40, Jori Koolstra wrote:
+> > Hi Jan,
+> > 
+> > > Op 11-06-2026 17:33 CEST schreef Jan Kara <jack@suse.cz>:
+> > > 
+> > > For the filesystems I know this looks sound. Thanks for the cleanup. But
+> > > this series should then follow with the removal of now-pointless "|
+> > > S_IFDIR" statements.
+> > > 
+> > 
+> > Right, perhaps it should. But wouldn't that be too much churn? I know Al can
+> > really be on the brake sometimes with regards to that. But it isn't a lot of
+> > effort, so I am fine with it.
 > 
-> 315                 if (pTcon->ses->server->ops->query_all_EAs)
-> 316                         rc =
-> pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
-> 317                                 full_path, name, value, size, cifs_sb);
-> 
+> I agree it will be more churn but leaving the now-pointless | S_IFDIR in
+> the filesystems is confusing for code readers which isn't good either. So
+> at least for filesystems I maintain I would like that cleanup to be done.
 
-It's not required.  The ->query_all_EAs() pointer returns ssize_t but
-the two functions which implement ->query_all_EAs(), CIFSSMBQAllEAs()
-and smb2_query_eas() return an rc variable which is an int.
-
-I would tend to leave it out, but if you want I can add it if you
-would prefer.
-
-My real motivation for making this change is that we have an
-"acllen = -ERANGE;" assignment where acllen is a u32.  Then we
-store the -ERANGE in a signed long and Smatch triggers a warning
-at that point.  But then we truncate away the upper 32 bits so it
-ends being fine.
-
-regards,
-dan carpenter
-
+Jan is (as usual) right.
