@@ -1,156 +1,143 @@
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B07131B80E
-	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 09:23:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781256206; cv=pass; b=tqXgqLzHXiEYuGHT1M3+iscsB2pfaeZVPBnuCcKilhedPCArQXrdTIM5gSQbJkaY7JiP1SHSpGlCVdSruQ8+qrGmbJbuWKenfZ29YkvUk3XjdRTWqQ3Te/jYhjanjvEuKRuoJS5M/XgzBrqpMR0eTf479oii4kRwjoHWmw6w5EY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781256206; c=relaxed/simple;
-	bh=LurVipVlsDEqkzCMv4tfDxpB0T92l33Cfno6fVx9fPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mtn5aAJTL03GwpmUPhx+8CkJeU3Szmmo3WBMqOq1O7/q1XekyGnlpWjn/YoJP8GtCeCsQzonZKTK/5uBacZS4VsBEB2wjp03DeI6aeDrpCC3Ha22sODGFwK4Abyk3HHgmzO1a1IrnGf2icRy3XtWl6idHBCuapakOYG9TsRLKSw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IDtgcxoy; arc=pass smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD55376A1C
+	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 10:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781260437; cv=none; b=Yr3/INhWDUSVomNp4174K6yAsafZk9qEtMCdsHK215W1yHwbGswiXCk9x8is4ssAFT5Ao17kgEMsy0SPbOO50RYrYd8o8u2fh0IGwGP2wsPgxYnhAy3lHUigvkdRTxQAMNkI1R1a4NSWe02XFCEZi36GRrS6GsOwqfR1KXScs5g=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781260437; c=relaxed/simple;
+	bh=UuBzp+U+fCiduQSi3jeEARo9Ia0OhnlAwwM6gzeVfsQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qg7Aq7C+5U/oJM3nB3vSZxyK4MhH94ZT2JZyqeDl3azmYZQ3c73WBGDOPbZ5dX3WJ8hce+RHA/vrpLuQm5TgEIi9gjYFUlx89CiCnRuCzK/xeuOe/xWJW4xMGmJAxgathCTN7BRoSiCqFSihDuRo+89QdEK4O+URzpmMdF4WGCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mxrEQ/P/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cqeu32Qb; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=mxrEQ/P/; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cqeu32Qb; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDtgcxoy"
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-8d18de80b29so10638996d6.1
-        for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 02:23:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781256202; cv=none;
-        d=google.com; s=arc-20240605;
-        b=X6Batn3c6RFVnDe6XchGTBmDbU1xZNp2PnrFkFyQRuNHKryCLjG530WJJ55oujYta3
-         BE+0hkKX1urLf1LEGq/5RoizuNwvZAHFOKcwCpm9q1V5YLF3SeMgVwdNwfihsAaZ0lDd
-         UQTrwJ5TBUAxXDcl5KOwO5uBvWFWuuzRprnAghEcF+mH/IQXl8j5e4e/46eyJqDy6p3Z
-         jCySiekcLAv1qFXAH2qSeOj2aVn7/h8LiTAciYXrvFI/vIy2AuuP66IUVuaOpVi8aeMj
-         aiHkYNf4oS74vPnR1lCMF+Z7gxV8Hpb6QyAVSio6jYqsl4WqpRqGZrJWW9n+0Dj7KUYd
-         r55w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=nuI5bR1iu7ixrP8tODt5ims/R4kRWQmPNBCPO/mnqsc=;
-        fh=+ptEt3uHDCBp565C9vEjpLZ+G+mUjY4Hgo+r5zncWw8=;
-        b=d7gytKX215QfDEMpouqgEJTnWCAj5QJLkabz26V8wR5dPae8YK51Xx3dFJSHDZwJ8M
-         KrdzSwOpi9flxqsbNzYGBDsN4hKAbymsw3pjM+ioo1n23kQaMrAVqxdZ0UnakHOojGn0
-         90E262PQpvzJUlAiugFQagLqwUxfkr+CBTRdmJ9kXmlqiYQSjE/a8nK9z5fNaYQJpscW
-         BRw9hi4KZbv4PCiPmMcip0nDL3dDEvs3l+BmGzvkcFRhqK4lZaCLk+LdBrthCrwy0DCh
-         mMTrsdgsqdMPqyu2BkXX54ONWmnWNvH/hyLR0ni0CNCc08fQShwZUKK/d4eG8oEYsI5k
-         nbVQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781256202; x=1781861002; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nuI5bR1iu7ixrP8tODt5ims/R4kRWQmPNBCPO/mnqsc=;
-        b=IDtgcxoy0LB4WbUkaUofColTc/DhzR7Kx8Xeq5vYJYSnrkxFr614jZ4QEsnwper/Ns
-         414ADr9CYhI1f52roPqNvCI12QnJmBm0vfbmowoEBkFb2DMJUe/yl9JzsA3HsfG1Uw+M
-         83L+Wac4Bw8DF7UTbiGvYqPMeZc+Oiiu4Qfr16AX2n6kQqfQWwLuiwBcdBMZhs7BSysJ
-         DizYIy7XMfKtegAYySDjsF4SrZH0H48aRwx6Np5UdKk2e9GVQKWZM388MwMEfhmMoNGc
-         J27J4yIe+VAb6Aum/DqX9sdpZs+5AiKIDyNPMQdWCjd6ZLsiMCeC45V8EGDE8WgRer7+
-         ZmXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781256202; x=1781861002;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=nuI5bR1iu7ixrP8tODt5ims/R4kRWQmPNBCPO/mnqsc=;
-        b=bbgbFo9dh7F/4m2BKK0TdkvPCkZUoteEDqRr3n+whEHLm/kQGJ5qI7BIKOxU6QIfn0
-         IZYPi1tZriUhWRCPAo5lZoF6+PKmKfsUg4hvU/9S9CFniSdBMEFgY3aReRJBDhaJ6PwY
-         fYcxPNFm/VkM7+5QQ81HkvRpb+6qp4JB81CfVBAz40fhryOsaXpijzkj5oW0E8ORFFM6
-         R/SSTuUgJJqfwF7dR2Lcw08QW3Zf2iat3GFgf/pOe/TMjhJ5WMhJjYYFUttO4yDezVGW
-         NIu6eSSrxio9J4lyCsSAQURFYxhDZAa5efo0ODdCWJfv1diMRyfRZC9Tl4KmuTjcq5M4
-         301A==
-X-Forwarded-Encrypted: i=1; AFNElJ+UuzlHPzp/8DcQxXbe1ECpWFkC3lAw20N03NQkd+Kj4HJkLSLhkATgZMsp5U7yc6tOXudb3ywPYjzN@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9ctbdAobtATEDWH+LZvggC9d03Y12HA43vJ4pBhrAlBihpm93
-	ppDBkOASivs8Zf/oVcB4Ky8efv7g02Myx604amBbBa+sI5SGqiDz34HcFZKxaUQ7ZHVQpH00Tb4
-	r9gmr+21Kq/9dPcpG8yJ/zud9QSpujQQ=
-X-Gm-Gg: Acq92OF780lNRmQRmuuRXnAIKF5bHGwIO1HgOiOF+I7nJQcjz1GAdCDQKQ4hKXRxPF+
-	zp/6PNlFhWNYyaM57mMXaweXlBFArG02VhHm1i4jsRvkPvP50amD3Eedw78wH/YxMLVlhqvFLrs
-	knDBP4PU51MzuoQZMTeQzkC1eX+C+cqI7Oe8XXCQNtxL+haMlK7m7cwgXSgMIqYAf9Cd4fyNyUN
-	dio6hK3kGaWi9UwkRdCJfkhvEBQQa+vhgU92aYIRmtrG0F8o6RtUFmSJHM+/ygAU2ZKdhbmKSU3
-	znPOJQ==
-X-Received: by 2002:a05:6214:c6f:b0:8cc:f159:7b70 with SMTP id
- 6a1803df08f44-8d317c44356mr31903816d6.32.1781256202485; Fri, 12 Jun 2026
- 02:23:22 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mxrEQ/P/";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cqeu32Qb";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="mxrEQ/P/";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cqeu32Qb"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4DAE376ED6;
+	Fri, 12 Jun 2026 10:33:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1781260434; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U5opVELbIP4oDt7dYdHoTJ1FWjwgZGhvCOV69XQiDec=;
+	b=mxrEQ/P/tXP2hoyBXuGcuqPrW3dMVQ/QfcYXZ6b2ZyV+683KseeZriCnot+/01MRuhJT7T
+	h29FGum0c9fnjm5aYHqPR/n/iJrt5wMeD1jYjd30HbOaXJjevQ9YzAOv4ZVv3Km8ftHfQW
+	OoPdYEIFuHMd4ijPXo7ktw0PwO/GHwI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1781260434;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U5opVELbIP4oDt7dYdHoTJ1FWjwgZGhvCOV69XQiDec=;
+	b=cqeu32QbLt3VSbbUXZwslvo0nwmVLcKv8CAQLF2Y/gB0j4x41eFK7F5JTrpsLWAPlbl3Ne
+	TojHkVSD6O/l2UCA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1781260434; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U5opVELbIP4oDt7dYdHoTJ1FWjwgZGhvCOV69XQiDec=;
+	b=mxrEQ/P/tXP2hoyBXuGcuqPrW3dMVQ/QfcYXZ6b2ZyV+683KseeZriCnot+/01MRuhJT7T
+	h29FGum0c9fnjm5aYHqPR/n/iJrt5wMeD1jYjd30HbOaXJjevQ9YzAOv4ZVv3Km8ftHfQW
+	OoPdYEIFuHMd4ijPXo7ktw0PwO/GHwI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1781260434;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=U5opVELbIP4oDt7dYdHoTJ1FWjwgZGhvCOV69XQiDec=;
+	b=cqeu32QbLt3VSbbUXZwslvo0nwmVLcKv8CAQLF2Y/gB0j4x41eFK7F5JTrpsLWAPlbl3Ne
+	TojHkVSD6O/l2UCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 43EB8779A7;
+	Fri, 12 Jun 2026 10:33:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id bVmQEJLgK2ppQAAAD6G6ig
+	(envelope-from <jack@suse.cz>); Fri, 12 Jun 2026 10:33:54 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id B737CA0EB4; Fri, 12 Jun 2026 12:33:53 +0200 (CEST)
+Date: Fri, 12 Jun 2026 12:33:53 +0200
+From: Jan Kara <jack@suse.cz>
+To: Jori Koolstra <jkoolstra@xs4all.nl>
+Cc: Jan Kara <jack@suse.cz>, Christian Brauner <brauner@kernel.org>, 
+	Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>, 
+	Al Viro <viro@zeniv.linux.org.uk>, NeilBrown <neil@brown.name>, Jeff Layton <jlayton@kernel.org>, 
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
+Message-ID: <vt6zmgnwz3n5jc3opm5i3bckkocfmzcysrbivbin52nudayus5@5stfgorwnob7>
+References: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+ <7iocwlr7jg2jiyx53q7lxaccrybu6fpv6ch36u64igdmddafdk@3ejeqvr4e7rh>
+ <987538907.1434294.1781209240897@kpc.webmail.kpnmail.nl>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1779371115.git.rajasimandal@microsoft.com> <1fd3c3b8f04d7794e559f5caa4ea02ba6e4aa721.1779372325.git.rajasimandal@microsoft.com>
-In-Reply-To: <1fd3c3b8f04d7794e559f5caa4ea02ba6e4aa721.1779372325.git.rajasimandal@microsoft.com>
-From: Meetakshi Setiya <meetakshisetiyaoss@gmail.com>
-Date: Fri, 12 Jun 2026 02:23:09 -0700
-X-Gm-Features: AVVi8CcnPVPcTMhjSzpYUBKgvB03qgd8tBxKbARSJhvFvWNIVMqQQRSPtu-CR7M
-Message-ID: <CAFTVevXVTdApfhtU64sR5x2C5E2hft+S9SkfGwjonTiCUNUZYg@mail.gmail.com>
-Subject: Re: [PATCH v3 6/9] smb: client: move struct tcon_list to cifsglob.h
-To: rajasimandalos@gmail.com
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Rajasi Mandal <rajasimandal@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <987538907.1434294.1781209240897@kpc.webmail.kpnmail.nl>
+X-Spam-Flag: NO
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	FREEMAIL_TO(0.00)[xs4all.nl];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com,xs4all.nl];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[suse.cz,kernel.org,samba.org,gmail.com,zeniv.linux.org.uk,brown.name,vger.kernel.org];
+	RCVD_COUNT_THREE(0.00)[3];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email,suse.com:email]
+X-Spam-Level: 
 
-Reviewed-by: Meetakshi Setiya <msetiya@microsoft.com>
+On Thu 11-06-26 22:20:40, Jori Koolstra wrote:
+> Hi Jan,
+> 
+> > Op 11-06-2026 17:33 CEST schreef Jan Kara <jack@suse.cz>:
+> > 
+> > For the filesystems I know this looks sound. Thanks for the cleanup. But
+> > this series should then follow with the removal of now-pointless "|
+> > S_IFDIR" statements.
+> > 
+> 
+> Right, perhaps it should. But wouldn't that be too much churn? I know Al can
+> really be on the brake sometimes with regards to that. But it isn't a lot of
+> effort, so I am fine with it.
 
-On Thu, May 21, 2026 at 7:06=E2=80=AFAM <rajasimandalos@gmail.com> wrote:
->
-> From: Rajasi Mandal <rajasimandal@microsoft.com>
->
-> struct tcon_list is a small list-node wrapper that pairs a list_head
-> with a cifs_tcon pointer, used to safely iterate tcons under a
-> superblock outside tlink_tree_lock.
->
-> It is currently file-static in misc.c, used only by
-> cifs_close_all_deferred_files_sb().  Move it next to the similar
-> struct file_list in cifsglob.h so that other _sb() iteration helpers
-> can reuse it instead of redefining the same shape locally.
->
-> No functional change.
->
-> Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-> ---
->  fs/smb/client/cifsglob.h | 5 +++++
->  fs/smb/client/misc.c     | 5 -----
->  2 files changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index 82e0adc1dabd..2a8b955638e7 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -1807,6 +1807,11 @@ struct file_list {
->         struct cifsFileInfo *cfile;
->  };
->
-> +struct tcon_list {
-> +       struct list_head entry;
-> +       struct cifs_tcon *tcon;
-> +};
-> +
->  struct cifs_mount_ctx {
->         struct cifs_sb_info *cifs_sb;
->         struct smb3_fs_context *fs_ctx;
-> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-> index 0c54b9b79a2c..7ef135dc8268 100644
-> --- a/fs/smb/client/misc.c
-> +++ b/fs/smb/client/misc.c
-> @@ -28,11 +28,6 @@
->  #include "fs_context.h"
->  #include "cached_dir.h"
->
-> -struct tcon_list {
-> -       struct list_head entry;
-> -       struct cifs_tcon *tcon;
-> -};
-> -
->  /* The xid serves as a useful identifier for each incoming vfs request,
->     in a similar way to the mid which is useful to track each sent smb,
->     and CurrentXid can also provide a running counter (although it
-> --
-> 2.43.0
->
+I agree it will be more churn but leaving the now-pointless | S_IFDIR in
+the filesystems is confusing for code readers which isn't good either. So
+at least for filesystems I maintain I would like that cleanup to be done.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
