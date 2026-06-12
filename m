@@ -1,95 +1,95 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B12E3ACEF7
-	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 20:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173C6369D71
+	for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 20:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781294576; cv=pass; b=POmzVKJtjQgJ8ISGNn1ARKrXOf0rOTH0MXh3sOz5vjrGHqbXYnKkVZDtaHyGlYlR7zWqaSsqqAI9Yh4EX5c5BQ9ldnmvL73mkpmpc8uEhtocj0DNWC2JvJpMgVUGbTV0Qr5pzr10COW0n1fZAP18mwAIVNB3ssRbGL06KIeYE3E=
+	t=1781295825; cv=pass; b=fdB4lQKpx1HizJOVKfSHz0D2/Amh7yP9lhakTf7Nb3I4CTTN6fLgOLGD1dhe0iVoZI/lpcHcn0CrpgegZfcLrsMoHm+9cBMYcpgyDnP7VRRfsGW8mYawmCjz7RnTmKNJIFJl5Ygd70EtYY7387qgYMEswZyCRiNSJMCiQ5IhF/0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781294576; c=relaxed/simple;
-	bh=eBM9QSHnNg0yWihYVzLeuUCGsIulxfJM0tYOquM7h3U=;
+	s=arc-20240116; t=1781295825; c=relaxed/simple;
+	bh=j+Tw/DqvrvyTXJQnCqEunpYlqcUp4PdtpY9B1mt+aCo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tcfDxmLzu3zmUPLtB+G3VwgQ2r3W2OWsxnezKT9/XNOjs7Ks2Ze1ChydKTlFxoZKR8Bfy9owPdOdwic4KgH6VKS6nw2Ouep1y/1244aLGPibUSqWFtd/oxqgdGfYQTX3QIshWIwt4zWnAEie1uWh9NjePd5ncbeKMaJBZpy2RcQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RQVFQJ8c; arc=pass smtp.client-ip=209.85.210.174
+	 To:Cc:Content-Type; b=UzHcPVfhz5oYRzCH1jcxUn11Z2g6RfQ/AywgtdPZL+jTAAVolQL2Q8z0EJfGI+mSlblBOgIqErd3szl+OiwxSHaNaHlVYFL2ad9fZqwgdXL1VnkPXaUxEfvlsmOIOIWSR83qWsur3aRjAEFvi/EIPyi0OaKc2nD4wULn9pROqYo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ne5WEkMp; arc=pass smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RQVFQJ8c"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8423f869421so1117646b3a.3
-        for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 13:02:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781294574; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ne5WEkMp"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-842cd900ee0so679546b3a.2
+        for <linux-cifs@vger.kernel.org>; Fri, 12 Jun 2026 13:23:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781295823; cv=none;
         d=google.com; s=arc-20240605;
-        b=hDjWdBdFiUpKIvwyIJuJ+whhVhcaNiinNxH0asAEo7S8qvz2DsR+NZKf3iNWzlgNnF
-         D/dWHKEbil1WYxfdN4I39Nx1V4KkTXTexMU0zvGXhsUJGj9kHZFrEK+L3RYJkwRxx+8z
-         8F1dh7fp/CYbSXDrzYM07ZMA59dBRaX3pgJHCrZL34f4w7cuCWQf8DMj1lz1KdHGmHyz
-         BRa7/jjJ+wuTW3L1/ZppHT0fqjSLzV4HyfXCx34aiMWjRpV/6x4ljVrM+/cbo4KlfUtJ
-         IQRFYmeRxSSOdUo46Rn7/nE1CSU+d88zilRod+aKTDEZ/N7ZqWO2kKRzY64hSIEho3Yf
-         MMeA==
+        b=GmJJALsO1Ferlf+awZchyHzibZbB+cDbQU0NpNhP3jL2SF64W2tVZsndM0obpIbdqj
+         lLUF9xBWh7VIGV0KdEMXmaJCB8UEoBlSBfXZHn+yPcnOtRDbgZK0//g7Ouh2nSTz4tUR
+         rMvLVF+KKUrExP9TogmBzJ54mZsBLih+OShFHc682r7gQN9XpThtS545UgMXiNUekuHA
+         1wDlBw0u6aVdETnVO1fmZGTzLaYCEP2TDh4lTZPBfAk1zO/2uJylq01UWCSESmHgkJok
+         1vgU96x6NSWhgvzLAT8/egZcdghs+dORJHLNNChMAZIYLcGlZ6quPwe6vLPqIrZtO86r
+         7ARA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=/3ckXfoM94ds90NzKWwX8bgBQKTOJG1riGpLfhC5Wz8=;
-        fh=S5Sq1pyctZz3kGgFnkI6wDp2uy1x8QH+MrcvPP3x0FA=;
-        b=WQZtJbJL10Fd+BawR5nCFjQvZKIXZUEl1rasTH/lgxQB8jPCLlVltfZ9YUnDd6r/Zr
-         qARZUp9BcTcVc3vHFybRNb+VYmsDkYx/2Dakx4SbRUgPEOZz/RjJefBuURVr6iDHFWVh
-         C2nfJobsDd5PYlHO81qgNWimMkHNI8BtU9rx5UJuacM2XBLLH7er8aYz08agL9c1vHGO
-         LZE20CJ6rDBIIjbzHEyrOOGuezPfxlzlYcpT+37l5NP4u1Sho71PA0FsxvybKHi4Vr01
-         tEkH4gqjELcpfLVyfSz1j2CvAlVl3wxy5gPlDkm7J37BzMR1JFzbuo4tsaQXGj067nUI
-         rnpQ==;
+        bh=axLJGxYQXY76T7E7LoVtvtvjy73/TjaCst9TPiXrWdM=;
+        fh=RXvYvlNLy/eeskB4HHq4OKIMCpOrq/DzO2bW+QXBQXM=;
+        b=CmCTuwve9Qa4Akv8Wxf+SsxmYZWYO/ikbFW2PXp0hQ/c2oVz1FfnUGYYuJC95nXZbH
+         zWle9nLeuZhFzTdBuAbJXSzZOpgId59HAG+CTNC0fFI7kBXDffBZu2fSDlNGqAZTKog4
+         mAOUSvnLqn8joN2+WhWPIoIN6ap94IG/EfDVQ2BoCEu0+av7LBY6UON3a4P1go5elTyb
+         scx63WkyJ7hoeSQbIxe+cwvA4DUkBmMv4VmysN07ljlI0o/u5rGJ5cvARfEXcwbGf6RK
+         lcJGQ+63iECwhfgCbx8Oj1TTB6gU15c85oShkL2SHNZYOpO7Bd30rBJOmk618fcHDuJJ
+         jpew==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781294574; x=1781899374; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781295823; x=1781900623; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/3ckXfoM94ds90NzKWwX8bgBQKTOJG1riGpLfhC5Wz8=;
-        b=RQVFQJ8cR6wHmJGDVyCbOj3f4dtfewL0GyFg1YiUpDhGs+Y5WhkjJUotSCdnH0txjj
-         Ry6ILU1gB0ZxISjJVsN5aS0jxd9cRMkBXMD/OG1d1Dvq1DBGxFHkV/mBP/Atw+UtbHzg
-         TdZEWxN6GFwhCxaa511lLD/n0Kkl6SaBRjfc0fYhY5pJY6ps/arxdAJSIXN9PPgHzf/Y
-         sqkwfAoLyHzUwUqDjy7aIt0AP6FzkDH2bBWoK/jZoxj751780js8/ATUUyPEwxDhElpE
-         BfzMSmcXiAJebvMpnmzPxDyRDWOwKLL+ivXNBjPVaDJwJZ0+EJMd3QaTVar+vqSHwZID
-         DYww==
+        bh=axLJGxYQXY76T7E7LoVtvtvjy73/TjaCst9TPiXrWdM=;
+        b=ne5WEkMp2kmHIGyDCQEuxCE9iJdd+2PuOpk7+knCPHt/uv11aD007VGhRwP//3d7SG
+         mtcWpN7lUABEK5Mcx56SeTdzR71MEq785NnjESNoWweMHVz1SPPUcPrtgdV71/rIFDrF
+         ddBmGvyz7KvdFXACM7Sg9S32MxsZM44nZMGdyRPy5ngHG1afwKCn5IS4YvUbhYS4yAhD
+         kjnALOAFzZPhsCUvvCR958hxN+MBK8mzBveCdxs242mBFszO7/6M1KOOU3mLeKv+ob0A
+         3lL8as5PYDzhRdDhFUGeic9OCrgUh5JUelItSJDoOz5FA6X8CFyVVgFArOsdRn3zOxrc
+         0y7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781294574; x=1781899374;
+        d=1e100.net; s=20251104; t=1781295823; x=1781900623;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=/3ckXfoM94ds90NzKWwX8bgBQKTOJG1riGpLfhC5Wz8=;
-        b=fvyIOrRZ1lucm7Z/HvFWO34KPGsaQnj2fPsidCuXcP4QHlohyKWdPHmjc33hQsYegX
-         IAYEzYLWb2TKlxC2pYDakAF09+qLYXXRmPM8St2kqrJLFcGPw+DzeAYA9avx5uXzs/i+
-         qjweuhJQf8zCG9wMd/TtYcZjX7SxFsRNsW+COnC7K1waSQxRzfLyIeihevMwH6MsP6BW
-         noi74wuqXyVEOCEtxslC7UzKN0IOffBJ4+p/4g3pEASjP5sr36rSu5sSRrMYi45sPZVI
-         s0NL1s3jfQ7Mb2BFZfbVmiyIa5x9cUDIr88sCZ+Iv5VcfTwkEG2WjtFhU4pbmp5F34fd
-         fyPA==
-X-Forwarded-Encrypted: i=1; AFNElJ/OO3F4nXk0NT2Y8njAKM8yog7bSCKLAzpsfj2zf2rKAz4c9s3c+IPNnFQgpBKDcWnfgN8/Vfx43t7M@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA43Nznycl+hiTZI5u5NtZ93lLJgPQw8TrpQNmDRMoJiPgUeMA
-	8Gy3MJrKHLbX4IiH4WBzFdGJdLvB/RmgtJCepOBvSMZk2tgr29F1JtgmPmyWWb216KfvMyD+osF
-	zA0Zpp1T7z2GS5ALJ7ylOuH4peaw1joo=
-X-Gm-Gg: Acq92OGbPau3Jave3/KiYiUo/KsyMpqDj6e1iMhpJW+rOT8zkP2ckic7LTEbrAbbnDY
-	UVmiMNsOngrbRBsJt64jxglIO+HLwERSoeboK3rCpgSDL8TVxT2Zavof5826r+V0UMws/4JNneO
-	9qPYs0lXBzy02H74vDMOvVrrbDMTLIm3CSVCwdEk7lkY4QPTrtZ/IUwD/HjpS+kTa0ik0JnOLSR
-	srwoCxguCZRuvKkMPQzPQcOWNn0EREzEKhZo5apM3mtgBqNDGZDfM9shV3Nte011/WUjl/0zn4Y
-	PzMaPSnKdfO6FloNqgU6Fsj61reXilH3He6N7KZVCozA3h1oJE9xVdly8RZg5QdUJU3mCPqqmZj
-	Z9ar9IQ==
-X-Received: by 2002:a05:6a00:3e26:b0:82f:3828:a009 with SMTP id
- d2e1a72fcca58-844e1939ff5mr1193301b3a.3.1781294573804; Fri, 12 Jun 2026
- 13:02:53 -0700 (PDT)
+        bh=axLJGxYQXY76T7E7LoVtvtvjy73/TjaCst9TPiXrWdM=;
+        b=rsFgyWQJP8TtgFdTey4zh7vVUnUxIf05fQEdF9Y9c5vjdK9MVyK6JnZvQSDaYlk3Jh
+         a9kL3P6P3o10E9pGsbHgeeeV0SWnkVjddLf3m+vEHXKDhcIJqMIBLt1aufH9WtsDZtIw
+         x8Ipxo02IwFRCyN7jEcQxo2F+1mMZCTFQemn7baC8v2dNdVHLPNBwcx+B3Jq8dW1XV+E
+         O5/xp36NKcbzCKRwMmZxaE6Cr4u0HwazwfwMF/ELIR+h9Yb9nz3TAn+iYH84lyUzuE3J
+         2oEPGNz/Wjo6Sg69OJYk5TkRBeZ2HN24gwY6aIq5eduRdGCw4/L4SmKrLZGNSeWsT5uv
+         m23Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/2+ZQpoGpggLuwec4tr1QrOT6bkHchTCPujdRyWAC3AFKIFPlma/JuXiSUYGZckkz0Dyp2XSW62HBe@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPoy6hk0OFd4nYP6YdxZtY/532TmYbq2lIS+eOAVTraC8CSv3t
+	rn21ckvVWbH44vDkG9nZLk1XllvIaBp27l2Ints0GhzZZfzQcZoz4sIUV9HXKSejoH+ZGkDu438
+	jFzE25UO8+w97eX06SCTQP/WHZ+i+zSM=
+X-Gm-Gg: Acq92OEzNaWe/dVRekydObMa654ZWtiQTIR/3X8N0SNQKug8s5SRo/ljnDzaOzd44fz
+	p+ARiDrVuVnDEeXVcjbtnxRtIr14gHf0u28PFryp64TScAYBpsJo7t5fm5YF5cEPU0m+HYVkZwO
+	vQ2SiiYRGMvcMwEnVmeSLTe9mBeK6NIiqQx27/lNpfqIWQXvZ4TI+TP6mQUqgwuCPNdv4buMPw0
+	b5b0/I69vsrkiWPu0KZobFsKTKD2Szln1dGrOnVipv7U3EaCv4BPE/PxKYN48KzWsDxgROUlmS4
+	msTBx2vmeJaCk+/t36tn3E3l1vHLQk1W3DRhdQuZ1D2REgs6pvOPnGQzby5f+SVkWeZFFiwtQuh
+	YP89RCiJedCofgVua
+X-Received: by 2002:a05:6a00:94c3:b0:842:614e:cc97 with SMTP id
+ d2e1a72fcca58-8434d07afcemr4940308b3a.23.1781295823460; Fri, 12 Jun 2026
+ 13:23:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0565988e6b54dac937fa00cdb3b09adef9650be6.1780855297.git.lucien.xin@gmail.com>
- <20260611081928.137149-1-pabeni@redhat.com>
-In-Reply-To: <20260611081928.137149-1-pabeni@redhat.com>
+References: <287e6b7dd877836e08b9bcb6727f547fe80f6459.1780855297.git.lucien.xin@gmail.com>
+ <20260611081948.137325-1-pabeni@redhat.com>
+In-Reply-To: <20260611081948.137325-1-pabeni@redhat.com>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 12 Jun 2026 16:02:40 -0400
-X-Gm-Features: AVVi8Cfml8mlE4tV34oK4_w8pEjk-qeT6RUnEUAlc7Ph7rvhFYhaxjVtMLJiDiY
-Message-ID: <CADvbK_efGf9t4HxtJtLVo2LBKM_N_mNQS_vLVadwk=o16X3jUA@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 07/15] quic: add connection id management
+Date: Fri, 12 Jun 2026 16:23:31 -0400
+X-Gm-Features: AVVi8CezbNK4UF3r3lp5uUhw4KnTH33E-BGYuPbz2M3O-qwCLN8CyhZyYdcGzpo
+Message-ID: <CADvbK_dAvqBC1j-f4Ft_HkLzVOzP-z9cwVR2B36zbxjSB44atg@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 12/15] quic: add crypto packet encryption and decryption
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, horms@kernel.org, metze@samba.org, 
@@ -105,7 +105,7 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 11, 2026 at 4:19=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+On Thu, Jun 11, 2026 at 4:20=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
 te:
 >
 > From: AI Reviewer <ai@example.com>
@@ -114,239 +114,156 @@ te:
 > email has considered the AI review valid, or at least plausible.
 > Full review at: https://netdev-ai.bots.linux.dev/sashiko/
 > ---
-> Now I have enough information to produce the report.
+> quic: add crypto packet encryption and decryption
 >
-> commit e00266d0eea858a744fd827548eb8ebc6868f92c
-> Author: Xin Long <lucien.xin@gmail.com>
+> This patch adds AEAD-based packet encryption/decryption helpers, QUIC
+> header protection, and Retry/address-validation token generation and
+> verification primitives.
 >
-> quic: add connection id management
+> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
+> > index c68a0b570c72..77e633096c2a 100644
+> > --- a/net/quic/crypto.c
+> > +++ b/net/quic/crypto.c
 >
-> This commit introduces struct quic_conn_id_set for managing QUIC
-> Connection IDs along with helpers to add, remove, and look up source
-> and destination CIDs, including a global hash table for source CID
-> lookup on the RX path.
+> [ ... ]
 >
-> > diff --git a/net/quic/connid.c b/net/quic/connid.c
-> > new file mode 100644
-> > index 000000000000..b1a39feb827e
-> > --- /dev/null
-> > +++ b/net/quic/connid.c
-> > @@ -0,0 +1,256 @@
-> > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > +/* QUIC kernel implementation
-> > + * (C) Copyright Red Hat Corp. 2023
-> > + *
-> > + * This file is part of the QUIC kernel implementation
-> > + *
-> > + * Initialization/cleanup for QUIC protocol support.
-> > + *
-> > + * Written or modified by:
-> > + *    Xin Long <lucien.xin@gmail.com>
-> > + */
-> > +
-> > +#include <linux/quic.h>
-> > +#include <net/sock.h>
-> > +
-> > +#include "common.h"
-> > +#include "connid.h"
-> > +
-> > +/* Lookup a source connection ID (scid) in the global source connectio=
-n ID hash
-> > + * table.
-> > + */
-> > +struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u3=
-2 len)
+> > +/* Retry Packet Integrity. */
+> > +int quic_crypto_get_retry_tag(struct quic_crypto *crypto, struct sk_bu=
+ff *skb,
+> > +                           struct quic_conn_id *odcid, u32 version, u8=
+ *tag)
 > > +{
-> > +     struct quic_shash_head *head =3D quic_source_conn_id_head(net, sc=
-id, len);
-> > +     struct quic_source_conn_id *s_conn_id;
-> > +     struct quic_conn_id *conn_id =3D NULL;
-> > +     struct hlist_nulls_node *node;
+> > +     /* Reuse RX AEAD (phase 1) in Initial crypto. */
+> > +     struct crypto_aead *tfm =3D crypto->rx_tfm[1];
+> > +     u8 *pseudo_retry, *p, *iv, *key;
+> > +     DECLARE_CRYPTO_WAIT(wait);
+> > +     struct aead_request *req;
+> > +     struct scatterlist *sg;
+> > +     u32 plen;
+> > +     int err;
 > > +
-> > +     hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node=
-) {
-> > +             if (net !=3D sock_net(s_conn_id->sk))
-> > +                     continue;
-> > +             if (s_conn_id->common.id.len !=3D len ||
-> > +                 memcmp(scid, &s_conn_id->common.id.data, len))
-> > +                     continue;
-> > +             if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcn=
-t)))
-> > +                     conn_id =3D &s_conn_id->common.id;
-> > +             break;
-> > +     }
+> > +     if (skb->len < QUIC_TAG_LEN)
+> > +             return -EINVAL;
+>
+> [Low]
+> The guard rejects skb->len < QUIC_TAG_LEN, but a later comment in the
+> same function says:
+>
+> > +     /* The caller must ensure skb->len > QUIC_TAG_LEN. */
+> > +     plen =3D 1 + odcid->len + skb->len - QUIC_TAG_LEN;
+>
+> Should the check be <=3D QUIC_TAG_LEN, or should the comment say >=3D to
+> match the strict-less-than test?
+>
+> In the boundary case where skb->len =3D=3D QUIC_TAG_LEN, plen becomes
+> 1 + odcid->len, and quic_put_data(p, skb->data, skb->len - QUIC_TAG_LEN)
+> copies zero bytes, so the integrity tag would be computed over a
+> pseudo-packet containing only the ODCID length and ODCID with no actual
+> Retry header bytes.  Is that intended?
+>
+The callers will make sure skb->len > QUIC_TAG_LEN, and the check
+(skb->len < QUIC_TAG_LEN) was added to make the last AI happy.
+
+I will change (skb->len <=3D QUIC_TAG_LEN) to match the comment.
+
+
+> [ ... ]
+>
+> > +/* Derives a key and IV using HKDF, configures the AEAD transform and =
+performs
+> > + * AEAD encryption/decryption for the provided token.
+> > + */
+> > +static int quic_crypto_token_protect(struct quic_crypto *crypto, u8 *t=
+oken,
+> > +                                  u32 len, u32 adlen, bool enc)
+> > +{
+> > +     u8 key[TLS_CIPHER_AES_GCM_128_KEY_SIZE], iv[QUIC_IV_LEN], *tiv;
+> > +     /* Reuse TX AEAD (phase 1) in Initial crypto. */
+> > +     struct crypto_aead *tfm =3D crypto->tx_tfm[1];
+> > +     u32 extra =3D enc ? QUIC_TAG_LEN : 0;
+> > +     struct quic_data srt =3D {}, k, i;
+> > +     DECLARE_CRYPTO_WAIT(wait);
+> > +     struct aead_request *req;
+> > +     struct scatterlist *sg;
+> > +     void *ctx =3D NULL;
+> > +     int err;
+> > +
+> > +     quic_data(&srt, quic_random_data, QUIC_RANDOM_DATA_LEN);
+> > +     quic_data(&k, key, TLS_CIPHER_AES_GCM_128_KEY_SIZE);
+> > +     quic_data(&i, iv, QUIC_IV_LEN);
+> > +     err =3D quic_crypto_keys_derive(crypto->secret_tfm, &srt, &k, &i,=
+ NULL,
+> > +                                   QUIC_VERSION_V1);
 >
 > [Critical]
-> Can s_conn_id->sk be freed while this RCU walk is running?  The
-> s_conn_id itself is freed via call_rcu() in quic_source_conn_id_free(),
-> but the struct sock it points to does not appear to be RCU-protected.
+> Can this lead to AES-GCM nonce reuse across all generated tokens?
 >
-> A grep across this series for SOCK_RCU_FREE and SLAB_TYPESAFE_BY_RCU
-> under net/quic returns no matches, and quic_init_sock() does not call
-> sock_set_flag(sk, SOCK_RCU_FREE), so sk_destruct() will free the sock
-> synchronously rather than after a grace period.
+> quic_random_data is a module-global buffer initialized once in
+> quic_crypto_init() via get_random_bytes() and never refreshed:
 >
-> Consider this sequence:
+>     static u8 quic_random_data[QUIC_RANDOM_DATA_LEN] __read_mostly;
 >
->   CPU0 (RX path, rcu_read_lock held)        CPU1 (close path)
->   hlist_nulls_for_each_entry_rcu(..)
->     /* sees s_conn_id still linked */
->                                             sk_destruct()
->                                               quic_destroy_sock()
->                                                 quic_conn_id_set_free()
->                                                   /* unhash + call_rcu
->                                                      defers s_conn_id
->                                                      free, but not sk */
->                                               sk_prot_free()  /* sk gone =
-*/
->     sock_net(s_conn_id->sk)         /* UAF read of freed sock */
->     refcount_inc_not_zero(
->         &s_conn_id->sk->sk_refcnt)  /* UAF refcount op */
+> quic_crypto_keys_derive() runs HKDF-Expand-Label over that constant
+> secret with constant labels "quic key" and "quic iv", so both the
+> derived key and the derived IV are deterministic and identical on every
+> invocation of quic_crypto_token_protect().
 >
-> Once quic_packet_get_sock() (in the later 'quic: add packet parser
-> base' patch) wires this lookup into every short- and long-header
-> packet, an incoming packet racing with close() on the matching socket
-> would dereference freed sock memory.
->
-> Would setting SOCK_RCU_FREE on the QUIC sockets, switching the proto
-> slabs to SLAB_TYPESAFE_BY_RCU, taking sock_hold() when the sk pointer
-> is stored in s_conn_id, or otherwise gating the sk free behind an RCU
-> grace period address this?
->
-
-This is not an issue, as sock_set_flag(sk, SOCK_RCU_FREE) will be called
-in quic_hash(), which will be added in the patchset-2.
-
-
-> > +
-> > +/* Check if a given stateless reset token exists in any connection ID =
-in the
-> > + * connection ID set.
-> > + */
-> > +bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *to=
-ken)
-> > +{
-> > +     struct quic_common_conn_id *common;
-> > +     struct quic_dest_conn_id *dcid;
-> > +
-> > +     dcid =3D (struct quic_dest_conn_id *)id_set->active;
-> > +     if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
-> > +         !memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-> > +             return true; /* Fast path. */
-> > +
-> > +     list_for_each_entry(common, &id_set->head, list) {
-> > +             dcid =3D (struct quic_dest_conn_id *)common;
-> > +             if (common =3D=3D id_set->active)
-> > +                     continue;
-> > +             if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
-> > +                 !memcmp(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-> > +                     return true;
+> > +     if (err)
+> > +             goto out;
+> > +     err =3D crypto_aead_setauthsize(tfm, QUIC_TAG_LEN);
+> > +     if (err)
+> > +             goto out;
+> > +     err =3D crypto_aead_setkey(tfm, key, TLS_CIPHER_AES_GCM_128_KEY_S=
+IZE);
+> > +     if (err)
+> > +             goto out;
+> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, 0, &tiv, &req, &sg, 1);
+> > +     if (!ctx) {
+> > +             err =3D -ENOMEM;
+> > +             goto out;
 > > +     }
-> > +     return false;
-> > +}
->
-> [Medium]
-> Is memcmp() the right comparison primitive for the stateless reset
-> token here?  RFC 9000 section 10.3 treats the token as a secret that
-> authorises tearing down a connection, and the commit message states
-> this helper is used during stateless reset processing on incoming
-> packets.
->
-> lib/string.c's memcmp() returns at the first differing byte (and
-> performs unaligned word-sized loads on architectures that allow it),
-> so the time taken to return false leaks how many leading bytes of the
-> supplied token match a stored token.  Would crypto_memneq() from
-> <crypto/algapi.h>, which is constant-time, be more appropriate for
-> comparing the token bytes?
->
-
-OK, will change to crypto_memneq() and replace 4 similar places.
-
+> > +     memcpy(tiv, iv, QUIC_IV_LEN);
 > > +
-> [ ... ]
-> > +/* Add a connection ID with sequence number and associated private dat=
-a to the
-> > + * connection ID set.
-> > + */
-> > +int quic_conn_id_add(struct quic_conn_id_set *id_set,
-> > +                  struct quic_conn_id *conn_id, u32 number, void *data=
-)
-> > +{
-> [ ... ]
-> > +     /* Locate insertion point to keep list ordered by number. */
-> > +     list =3D &id_set->head;
-> > +     list_for_each_entry(common, list, list) {
-> > +             if (number =3D=3D common->number)
-> > +                     return 0; /* Ignore if it already exists on the l=
-ist. */
-> > +             if (number < common->number) {
-> > +                     list =3D &common->list;
-> > +                     break;
-> > +             }
-> > +     }
-> [ ... ]
-> > +     list_add_tail(&common->list, list);
-> > +
-> > +     if (number =3D=3D quic_conn_id_last_number(id_set) + 1) {
-> > +             if (!id_set->active)
-> > +                     id_set->active =3D common;
-> > +             id_set->count++;
-> > +
-> > +             /* Increment count for consecutive following IDs. */
-> > +             list_for_each_entry_continue(common, &id_set->head, list)=
- {
-> > +                     if (common->number !=3D ++number)
-> > +                             break;
-> > +                     id_set->count++;
-> > +             }
-> > +     }
-> > +     return 0;
-> > +}
+> > +     sg_init_one(sg, token, len);
+> > +     aead_request_set_tfm(req, tfm);
+> > +     aead_request_set_ad(req, adlen);
+> > +     aead_request_set_crypt(req, sg, sg, len - adlen - extra, tiv);
 >
-> [Medium]
-> Does this function correctly maintain id_set->count when a CID is
-> inserted before all existing entries?  The loop above explicitly
-> handles the "number < common->number" case, suggesting out-of-order
-> insertion is intended to be supported.
+> Every call ends up using the same (K, N) pair under AES-GCM, with no
+> per-token random prefix and no packet-number XOR like
+> quic_crypto_payload_protect() does via cb->number.
 >
-> Consider starting from list=3D[5], count=3D1 (so first=3D5, last=3D5) and
-> calling quic_conn_id_add(..., number=3D3, ...):
+> NIST SP 800-38D forbids reuse of (K, N) under GCM; from two valid
+> ciphertexts an attacker can recover the GHASH authentication subkey H
+> and forge tokens for arbitrary client addresses, which would defeat
+> the address validation in quic_crypto_verify_token() and the
+> anti-amplification protections in RFC 9000 section 8.
 >
->   - The location loop sets list =3D &common(5)->list and breaks.
->   - list_add_tail() inserts common(3) before common(5),
->     yielding list=3D[3, 5].
->   - The post-insert check evaluates:
->         quic_conn_id_last_number(id_set)
->             =3D quic_conn_id_first_number(id_set) + count - 1
->             =3D 3 + 1 - 1
->             =3D 3
->     so the test "number =3D=3D last + 1" becomes "3 =3D=3D 4" and the cou=
-nt
->     update branch is skipped.
->
-> The end state is list=3D[3, 5] with count still 1, so entry 5 is
-> silently uncounted.
-This is expected, count only count contiguous connection IDs.
-
-> A subsequent quic_conn_id_remove(id_set, 3)
-> then trips the WARN_ON_ONCE(number >=3D last_number) because
-> last_number reads as 3.
+> Could a unique per-token nonce be derived (for example from a random
+> prefix stored in the token itself), or a nonce-misuse-resistant AEAD
+> be used here instead?
 >
 
-This will never happen, the callers will prevent passing the last
-seqno to quic_conn_id_remove().
+I currently don't have a better solution for this. we can't have it in the
+socket, as even after the socket closes, this quic_random_data is still
+needed to validate tokens.
 
 Thanks.
 
-> Should the count adjustment also handle the case where the inserted
-> CID lowers first_number?
->
+> > +     aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > +                               crypto_req_done, &wait);
+> > +     err =3D enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req)=
+;
+> > +     if (err =3D=3D -EINPROGRESS || err =3D=3D -EBUSY)
+> > +             err =3D crypto_wait_req(err, &wait);
 > > +
-> > +/* Remove consecutive connection IDs from the set with sequence number=
-s less
-> > + * than or equal to a number.
-> > + */
-> > +void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number)
+> > +out:
+> > +     memzero_explicit(key, sizeof(key));
+> > +     memzero_explicit(iv, sizeof(iv));
+> > +     kfree_sensitive(ctx);
+> > +     return err;
+> > +}
+>
 > [ ... ]
 > --
 > This is an AI-generated review.
