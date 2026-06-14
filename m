@@ -1,180 +1,117 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDCE271450
-	for <linux-cifs@vger.kernel.org>; Sat, 13 Jun 2026 17:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.181
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781373146; cv=pass; b=cIN8UaaJ9P5UTfOpyzhnVzmKcGdlQH4shIcUiyWMOJoqYrt8YEqEIcDVGz/8IJmS1MDSrGC0Ni4FIsWirOEW9TNEdBzTn7JFIEqy8w3z7MTmaa1Mc6y1JIKbjX0WJgPft4ch+/E1cAFLh48rKTFi7Iu7DfD4GUBXTcXwiK4QAd8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781373146; c=relaxed/simple;
-	bh=oPyb0QIusLKLe1VTEUswUezwdvG8zbMH3cL8AjXEh3A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=URqvD/4ewAgihgVbDGLnSOX8++TyDeM3rXLeI3EJlOv4FLLwwfTjx6NXD4FrcmoUcscwTNLUnUYJgb51Wryt82aHEcA5gn7ZWwjV7iFvg0N5yF9iWzoXwSzUKPvtd3RK3OKmsily3SEV7YK46r/lu1BJuil2Tzg/twJR4R0m/5g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iZGRkovZ; arc=pass smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C0F3A542F
+	for <linux-cifs@vger.kernel.org>; Sun, 14 Jun 2026 16:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.185
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781456331; cv=none; b=L/rAu4xihJ5rrw1DalGH0Kw/6ZOMNvxvUT/zYZejgRZrHxqIEnESJDspllL/0XuKW51xARNEE6AKj21/Iokp3He/fcHeXt3ktUUYfB2TriDbF91AEnimaximkzyT/uN94Hl12zlaLM73uccFlhtVd0I2QmyY91GgORVnLsX8f50=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781456331; c=relaxed/simple;
+	bh=VOXniTR3wXI4Znh06OqzaeFf6jWoOm0HsEDyrV97PWA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=teLvEp0DarvlwVjFx/MmE6YTH0WydNxw08LLkS1KQSz1gpODAqtkHaQ54R/SQNFcrfoh+RXdOmCorzdYtCX+rBdR3vqyfVqqoMbxpRj9AV8/C8rysxQCXy6LjrhayVPlQLAA5SE7yGEM8hOoFPzG1yJd6LCAtVaGnCbBBQFpUNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=gWloa08C; arc=none smtp.client-ip=195.121.94.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iZGRkovZ"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-517b1f2c6adso19539101cf.2
-        for <linux-cifs@vger.kernel.org>; Sat, 13 Jun 2026 10:52:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781373144; cv=none;
-        d=google.com; s=arc-20240605;
-        b=J438FQ+h/F+nKiZ7J1SuQhI6eJtxM/qA8FC9NdNa8HVdumGFco1GnXbM+a5IHYRfQn
-         DJECxK8j/Tbn5HWGzCwTalHKnikN9DdpfyqMxGeH/LRxVQHEu9GvAsnQTcRvwYppwstC
-         zTWYW75kEsJ7naBWqGR1xOWcAwJBp3d9TiX+pGNa/s5gIp98+lh0MKX6/2y/pmDKsLMJ
-         GIgzBH8G9SqdqK34hnPznQxLShlL7o3uyPX/rHxXrqqevqitOb0ZBqUZ9fdMOV+OwuEa
-         7ZlzZO4fpNZ7af3QLYDbZhCAktd61zht0AtRiT9v4eFjbMOj7tQilFeyrdmNKbvAi4TY
-         mf3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=mn+CuNpS8z+VZDajYXqmdYYU31t3iBNBoN1HnRgWcpI=;
-        fh=LoxB1xUDBMOp5bQsmfNQrEHO2zd60vmBCtRr42BZgD4=;
-        b=N4OqogIgmBAKnfqC9lpfmLh5qfMBFLcl3ad7Xuedyz1Bm1TKoBjHUXa5ZVawQ0o717
-         A+KimkM7nUwqSREn8bWJWYwFZXfZnzuWYTj0mthWQ2OAYLnIGPF5YM3a3IwfXMgCAsNB
-         ulGCJmaunMFHcU3yNhf8MJHrUPwm9tR6j+9jEv5EKxKQLBz6Vsuk7V5dqtMnNVyaiTGC
-         /JwhXZYtW7q5Q0kjM9zL0/yyzBHMKFF1PUJvBLaDJifVDLHfhJ7ei9dKL9JwBZgXcMIT
-         Ho9dmYsjZdr+xUFHJn+oPv5Qvxp3EvuCi7NTvoX8EfW/s0Sm0Cv1qGKhMjHOaAMeeLZB
-         mshg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="gWloa08C"
+X-KPN-MessageId: 27584a23-6812-11f1-8ff8-005056999439
+Received: from mta.kpnmail.nl (unknown [10.31.161.188])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 27584a23-6812-11f1-8ff8-005056999439;
+	Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 2756a90a-6812-11f1-8109-00505699693e;
+	Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781373144; x=1781977944; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mn+CuNpS8z+VZDajYXqmdYYU31t3iBNBoN1HnRgWcpI=;
-        b=iZGRkovZyRwfIBY/Z7sOPtmDTdEHLxy61j4a/BJ+ke1dvVH66SF4p0y3Af+K9wIAk7
-         +GvygH4W4fWrxFh/ia5XLLSWKvdGscoW7kI/V7dnuvemW3PvscFrFtsenJjGbL+RHuPl
-         YclOTw5vvfMUY+Jbvo1qdjrP5rx9i30FpoM/OkyMzQ3zQOA5MfWeQK+gX0v4Cn9Nj4xF
-         JkbI9MdS/ziK528YTC/HuUhIV1LHOMDGpi5e3C7+AzGcaoAp7uUWjr3O88v7TE1j0njS
-         Kjouslwl7/BEI4WFgBRdROw72FjX4ShPseaTU62Ggk4BrOmJNM06TZhJAICtniBpkqoW
-         DBUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781373144; x=1781977944;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mn+CuNpS8z+VZDajYXqmdYYU31t3iBNBoN1HnRgWcpI=;
-        b=MkPkBBBimS171KDSLlBhMrhqKyokvXrEB7NLD/M4Y9h2nPP5x0pWa/KdpoPtY5uMe+
-         mEvQ7McQkeahuXUCG1wqPRpr+rLa0vRrxe7lsDbxjr4SAPTePsUl1hx45gxlqevc63HA
-         RcTHyKXFP9oy5BuZM3nQ+s3btcqkYOpIuHLZANsy9Iz5xR8jMLg6E31r5SAQSE2tBKnb
-         8HfzfgQVdXgGTgQi+LRnfeJgzG9arNlhVD2H/AnjC2Sc6+/c0aZsiy52x52r9lHuDk/P
-         ehUHSEAYqb7l9VXrFZIl/30hVV5M7VWz3p/Gwg15Z+uztCfdIz5Jm2qOZEbO4/jtNzVs
-         R6Cw==
-X-Forwarded-Encrypted: i=1; AFNElJ8sJyRdKK4XJk8UZCSJbplKKedfSNZd9CHYpCoBDnYDxQAl1C1BW7Z3Mm1YJ3EKMRF1TqaujhQWUgX7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl7lUffDp8OfGK3g+sND2VQIIoboOSWwoVHjOPYzEiif1tSAHY
-	NiTWoXQFuAqlmuqpowxomeelXYLxo4NP2M/VDYMo+P9GCmN79QZc4e/afqu7g7J9GR414l650C5
-	At/74EJXlFc47xWvzTdxnV9IJy73e21g=
-X-Gm-Gg: Acq92OGMSCrQwP+HYuPaqydOAQs+P3Wi6VzxKR0p8V4yO3YbowIDa2wFffmn7uEycE1
-	2ZjOl77BvYtFupdK59z0dNOFk5X80QZCeh6nLvUEqPgi8VyaDj2XzaKwCD7AaOsT2LBezRO8JIg
-	eOcR7jTxFQYYOp+wsXiwxVFAUUJODZDkMcJsyLJmfvG0vJ0+g8EiE1ogYsmM2wVPQKgfHVVFiB5
-	G5LIfi+aMq6B45RwDuG9qd6Vl6DmQOfmnycwWcNTqrS3E62bSmQM4hVGFeA6JZYmkhs0KCde1Im
-	aOwNjyNYoHhErN6aG+fHAZHvFWJVn5CGRHzcnetWDXVr2VMnEo345gc1Fjv8SKgxvoyAn0CyFtt
-	u1EHVqrTOAZTKTWxdJY/9j+wLoOlylDdRSdkUEyoQQvkz1MhSIdsrRLl21xuCgDI2TFQxqMMrY6
-	BLa6jItnZK9Mu5jEu9JLxFiw==
-X-Received: by 2002:a05:622a:488d:b0:517:9407:5c36 with SMTP id
- d75a77b69052e-517fe578a22mr116819211cf.53.1781373143637; Sat, 13 Jun 2026
- 10:52:23 -0700 (PDT)
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=8QohWqedXEeL1TjwRMSoT2NjvDlan4ueM7ovpK8w9RE=;
+	b=gWloa08C5gaFS9ud2Q0xM2Xsu4VKUpUTA+ufwNuiznXADhjKWfhdOyY9dzmFMjE+qmrnmb0IsXyNS
+	 FCqytTOlKeeqcoMiq05YJEFFc/jRJBtSbcJf3JYg2uV6ydIiiRUJtViXpcxaEnTW2n2MslFZeAEqem
+	 ua7KXMSX7MoNl8VXWsLia6fJy8gAzom9apjB6MwBtpcQ1CGid7tiKYj424juEQ8zmK2+DG8H85KVTD
+	 wFyHKA1mCh+eSZzKGJvllFqkwGTKq0FIY/8ES1Szk+Udb44gfoB9Y6Iy6hIFBBAKS4zK+hcNxqN9KV
+	 6hbxBzAN7YM9OtOMVuXuwF12xMHjPEw==
+X-KPN-MID: 33|WA/m+4GktEN280KBfl3QFsgU6gzhNMkExpta0zjBzacYOw9gn7Zjw6kO2rFvin8
+ X7f7oCEsHTk2T6gLppSQa/e7SUcT/zShMxmenuMfVsmM=
+X-CMASSUN: 33|WxgGnbtgBvFfzMziWWYcQtZAS2NyP2d3HJaExX35KIR9s4FhmWGTiG7u0krSLCz
+ zzvfhzLZWtU8e6few/pLSzQ==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh01 (cpxoxapps-mh01.personalcloud.so.kpn.org [10.128.135.207])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 274b0c4b-6812-11f1-94b1-00505699eff2;
+	Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
+Date: Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: NeilBrown <neil@brown.name>, NeilBrown <neilb@ownmail.net>
+Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>,
+	Al Viro <viro@zeniv.linux.org.uk>, Jeff Layton <jlayton@kernel.org>,
+	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Message-ID: <586018010.1683063.1781456260309@kpc.webmail.kpnmail.nl>
+In-Reply-To: <178131507850.3002522.16819279282508142089@noble.neil.brown.name>
+References: <20260611145733.43776-1-jkoolstra@xs4all.nl>
+ <178131507850.3002522.16819279282508142089@noble.neil.brown.name>
+Subject: Re: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260612024647.656382-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260612024647.656382-1-chenxiaosong@chenxiaosong.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 13 Jun 2026 12:52:12 -0500
-X-Gm-Features: AVVi8CeDah8uh1K7iwfo0O2tx9iL71K-NkH3a2Rdz1YKlxN4XmiTlaKcBhtOvBE
-Message-ID: <CAH2r5muSaeXUVc5MSw-mpse6AaN=6w8PYKO-iU-mqH=3a9basw@mail.gmail.com>
-Subject: Re: [PATCH cifs-utils] smbinfo: update notify subcommand
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>, Pavel Shilovsky <piastryyy@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-added to smb3-utils for-next
-
-On Thu, Jun 11, 2026 at 9:47=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> Add the `notify` subcommand to bash-completion.
->
-> Fix the following warning:
->
->   ./smbinfo:963: SyntaxWarning: 'return' in a 'finally' block
->     return False
->
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  bash-completion/smbinfo | 5 +++--
->  smbinfo                 | 3 +--
->  2 files changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/bash-completion/smbinfo b/bash-completion/smbinfo
-> index 52e6821..3f1f9f6 100644
-> --- a/bash-completion/smbinfo
-> +++ b/bash-completion/smbinfo
-> @@ -24,7 +24,8 @@ smb_info()
->               quota
->               secdesc
->               keys
-> -             gettconinfo"
-> +             gettconinfo
-> +             notify"
->         case $prev in
->                 '-v'|'-h')
->                         return 0
-> @@ -33,7 +34,7 @@ smb_info()
->                 'filefsfullsizeinfo'|'fileinternalinfo'|'filemodeinfo'|'f=
-ilepositioninfo'|\
->                 'filestandardinfo'|'filestreaminfo'|'filecompressioninfo'=
-|'fsctl-getobjid'|\
->                 'getcompression'|'setcompression'|'list-snapshots'|'quota=
-'|'secdesc'|'keys'|\
-> -               'gettconinfo')
-> +               'gettconinfo'|'notify')
->                         local IFS=3D$'\n'
->                         compopt -o filenames
->                         COMPREPLY=3D( $(compgen -f -o dirnames -- ${cur:-=
-""}) )
-> diff --git a/smbinfo b/smbinfo
-> index a6095e1..d6c30f1 100755
-> --- a/smbinfo
-> +++ b/smbinfo
-> @@ -306,7 +306,7 @@ def main():
->      sap.add_argument("file")
->      sap.set_defaults(func=3Dcmd_gettconinfo)
->
-> -    sap =3D subp.add_parser("notify", help=3D"Query a directory for chan=
-ge notifications")
-> +    sap =3D subp.add_parser("notify", help=3D"Query a directory for chan=
-ge notifications. Press Ctrl+C to exit.")
->      sap.add_argument("file")
->      sap.set_defaults(func=3Dcmd_notify)
->
-> @@ -960,7 +960,6 @@ def cmd_notify(args):
->          pass
->      finally:
->          os.close(fd)
-> -        return False
->
->  def notify_thread(fd):
->      fmt =3D "<IBI"
-> --
-> 2.54.0
->
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
 
 
---=20
-Thanks,
+> Op 13-06-2026 03:44 CEST schreef NeilBrown <neilb@ownmail.net>:
+> 
+>  
+> On Fri, 12 Jun 2026, Jori Koolstra wrote:
+> > There is a comment in vfs_prepare_mode() that says:
+> > 
+> >   Note that it's currently valid for @type to be 0 if a directory is
+> >   created. Filesystems raise that flag individually and we need to check
+> >   whether each filesystem can deal with receiving S_IFDIR from the vfs
+> >   before we enforce a non-zero type.
+> > 
+> > This is a bit challenging since there are many filesystems. Claude Opus
+> > 4.8 was used to generate the context for each mkdir implementation from
+> > which it can be judged whether passing S_IFDIR is safe. The result was
+> > then verified by hand by looking at how the mode argument is used in
+> > each case. To check whether all mkdir implementations are convered,
+> > 'rg "\.mkdir" ' was used and checked against the list of uses Claude
+> > found.
+> > 
+> > The only mkdir implementation that I am not as sure of is
+> > cifs_mkdir(). So this goes cc to the cifs people. But of course, I might
+> > have made errors in other places (except probably not for the A list as
+> > those are all just mode | S_IFDIR cases without other uses of mode
+> > besides logging)
+> 
+> I agree that cifs_mkdir() is not obviously safe.
+> I think coda_mkdir() and fuse_mkdir() at also not obviously safe.
+> In all three cases the mode, which now has S_IFDIR included, is sent
+> unchanged to something outside of Linux - either user-space or over at
+> network connection.
 
-Steve
+You are (of course) right. I missed to mention coda. Also, I missed that
+for FUSE inarg.mode = mode; is set, and this is passed, despite the mode
+in create_new_entry(idmap, fm, &args, dir, entry, S_IFDIR); being hardwired
+to S_IFDIR.
+
+> 
+> I think you patch which adds S_IFDIR to mode should mask it back out in
+> those three functions.  Then we could be certain it is safe.
+> The maintainers of those filesystems might then choose to remove the
+> mask if they know it to be safe to do so
+
+That seems like a good idea, agreed.
+
+> 
+> Thanks,
+> NeilBrown
