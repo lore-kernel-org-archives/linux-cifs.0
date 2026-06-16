@@ -1,63 +1,63 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC2B3D75B8
-	for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2026 05:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF0A3D8120
+	for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2026 05:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781589253; cv=none; b=h2jotqG4z7nEVu/sg/17X+k5IES+GZq0d5hDsl/dQ3T6a428rdqjhNAsvCYIdR1wfqDli+8ofNpz6iudKrHR2Dn+uiPO5nBzFAkTIzy0qWQiF2UITBYBJ+j1vCQoYwCazFWH4wWwkCREv4tO1mfau4brumCDn+qHrwgn1sm1USs=
+	t=1781589257; cv=none; b=B3PX6vbN4Zz5TZrdRKYN+J9DRok4Acj4pcliRliX7jGaXeDyLK/eilBbPLQVADKEJkNWQyIYaPam2hieg7WXXMfS+up/I0P/NS3+j6APC9c/uPOxXv4N8i//jBX07BCaK35oJKw3zyRzHa3z2VKdyPVm+q5jf7IyWT/tmK/VPD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781589253; c=relaxed/simple;
-	bh=ClC1uKuiElXSvWmJTOsgGowv+7R1ofjOVTs9KR2qPRE=;
+	s=arc-20240116; t=1781589257; c=relaxed/simple;
+	bh=nhK5erLPMld59NqJFTXEr32ELobTHwtHREBLVNCVBQU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pp3/XPECScCEWduHNGGxqOnDL14TXJehu+BiV2vPsTetH6rUq5M/MuuD6cSNGMIh/6ZnjB5oYUsUF3BepOiBGvP5g5QYmu+ZgQecYfYNgkLWhSKxnAuCqDQpydAg9wTfPfoeaCg1rOMwq2hNJxi2ORsAmKxcn8sN5aYZS0eEb3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uvhok5RP; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=XWytUCxrfESR4xumX9TVKWNsQdEa60TM4yX3UcGCzt3GdHAHS+ZLpW0ygxpBaXH8DU61KX/sgT8UmJVZ3w4Uwwm1KoqCFa1igjgWpsJPdMT4xfe9jo96Oa2TTL3XelvYYYz/dtzxuVP3qzR/gIiWJ0SoBE3sNPnCLRG6Mnd2K+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VF1jOOGS; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uvhok5RP"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c0c2c7d45eso37062165ad.1
-        for <linux-cifs@vger.kernel.org>; Mon, 15 Jun 2026 22:54:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VF1jOOGS"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2c27fc587ebso16174705ad.0
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Jun 2026 22:54:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781589252; x=1782194052; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781589255; x=1782194055; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jbIkUPSQ7BygeeUK1aGO1/3MaHE0rFjkGYWuuq22VXQ=;
-        b=Uvhok5RPgMx9xqPe6sk0PM+eakJoZz8mRNsRdvj/OuvicHsVq9/8Jih1q4g9aUau6g
-         LFcR3FTEgEYkHbYLNaxQR+0RYjNEE3uSf+VCrAEc+sNH8EfJuFDgECAd+0OrM9IYdR9K
-         qy4Ue3GaEbZKBgQtLSzFP7ApZqAIs6N0L9KigJwjGRPGZfZYcNJ1ZguL3WOhxBgdrUlE
-         RsaJRGqjxl4EA6eu6fOW4XUxo34TiuiiJpthhvg8ybOn0s0haT7zciloDS+Ke9q7l4PJ
-         lm40ApslSF4mUta/1wB3u7nNg1iDFmM+2/Z+odGNx86/Rec8souVKtOmBN6SjRqDQ90u
-         uBaw==
+        bh=a2WHE69XCvPsuob7aME3t/R6BnMk/X5IWMhOHC9uOQw=;
+        b=VF1jOOGSIZdWpBUdGaRH1mg5+uzle+N9cI94DENkgIS2HAY501A34n8DPSlpY/qICC
+         Z5Cluxj6uVEq5CRodJ85gtzbvcParHAblyZ+rnLW4vi/RRA7H1oWlC9BEP1UtOQXC1Fh
+         wt5tJoLrU9fZmyGtQbXFrf65LKHT2tytXX2HkD9BsY+X97MqixtqSQ7VqKr+Dg8gk1km
+         sAKNeGDMaJHmygKczwjeVyoLwnUyzCjRNzS5oQxgG+fIl3rGzt8mXJIUYDz/duPUTirA
+         pQV39OQxHNlNSO1k5ZYxoZSBdl63AcSLiMjS2fR09Af66SY12WVx+49Q+/51I5D7i+5X
+         lH+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781589252; x=1782194052;
+        d=1e100.net; s=20251104; t=1781589255; x=1782194055;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=jbIkUPSQ7BygeeUK1aGO1/3MaHE0rFjkGYWuuq22VXQ=;
-        b=JC8Ur46pHOlt6oquXkQnoZlEGCGeEcLfay/DUBKAvXtylugDubNlJVRbT2rd2qilr4
-         48NUbXhk6IsHLR7VixMXLjufOMzHyfZp0x1TTjT27nPPzEPZQFB6x3MKklBdfObl/vI8
-         Dyjf17e2Dmx+ZaBWLyu4cxkvCfKfxBmwa7Da32uTFfZdKx6n2cB1+9BYbFjnx+MWkxBx
-         /W9gY+dmyzKnTnXAHUht9skvdY8SHdf7/s4mPjE4uItlIpBBI8s8qUphTTcrbO7izh8U
-         pUqV2Sy1uNll0uP082c5ZFECamnrSffzCVxtQ1pMZJ1HPwrel+jmV6VrxCfr06WYNCiP
-         EDOQ==
-X-Gm-Message-State: AOJu0YxWA65abrQZNdb8fkQnaKkkt/WcZW3wTMZVZ5RYMuIEovxg1LUP
-	6JWb72JyKSRt11Wg7CrRc0AbyM3QPcNDNkBULOBa+hHn5lcgXGtEZ/GS
-X-Gm-Gg: Acq92OH4Uz9rQgkS8QSgRQ7qZsI2eyZFd3PYh7SpCUGa18F3qVbcXsqYwxZE6whe+8X
-	EoqjSsFUQVRE/Q6g5mvjPqjKqR+U6OiHnk/Y5dqyPJrhi95ODqAOqobaxvj7KxgVt0wqTxw4GK9
-	mprvwfj8j5SQYqYIG5dYk3iNsD1ffc01rZvkqumFaPJN2enKSzrhQxR6eb6H1iOIw7lzUzGINZd
-	PwN5qONIFRFZZH3neUpjUifsSBtz+BspKKuPvpJghNR/KFSs9cdLI6dokCQOr6DyfUk54BwdHnk
-	rZHCOBy6ardQitsFVCoAqwI2BgA0pbMFgpSzdDR95uZQ+VNhi26JCI+lH30k0y639RceG3BoGXV
-	My3D14N5tv1Vx/TC/MkG2YsiR2pYM4+C+eXkr6cQKdLiJF6pZ32z6mvPXScS6RrnlnGMKra87It
-	8Tss/jAA4uMIlxRdAESH7G3dS5T6khDR84aTYyhWJVlamJbWVvIdi3BMQEMgb5ThRrGvuYuTJxK
-	IXtvUE8T0LgYlmjDduXdlg=
-X-Received: by 2002:a17:903:15c7:b0:2c6:8b39:7324 with SMTP id d9443c01a7336-2c69a17a930mr23299565ad.17.1781589251710;
-        Mon, 15 Jun 2026 22:54:11 -0700 (PDT)
+        bh=a2WHE69XCvPsuob7aME3t/R6BnMk/X5IWMhOHC9uOQw=;
+        b=RjBC93mROKIgIDIHWOlx0xwe2nxr5pIdoKFb53JFSGWMsbfYDIJqzAyloF3wmZQQLT
+         At0Mxsg3tRh1KRFfBULM060skRUyNKSjFLMqg3/q9xiuMXwn6VH+Q0juBMPiqUJDED64
+         D/o2mehK6r/EzwdBmq8Lbv9pZwdY+b/xfTTENvndPtopyydZXdmtAr0Qh8ng1Xru6Wwy
+         pwHKyek810tK8xJlHDXG9OWl2OfP/4Ggkb7ct8SO5msRMM7XMEVJh9JtKOeHH7znjuY2
+         7KPtu/JidTomqv/si6zhC5WqOxACf/bEytCpd46t3iOKOJLRVo1Gquy9vZRNVz+8mwbp
+         sDfg==
+X-Gm-Message-State: AOJu0YxePHD9y6wXkU5VqRz2zShiBvxqH4HVqXLZKwTYMgvaF8Jd2WzY
+	i0ylSxw5pYmRUPp1WhWis3hPC4RQrTDtcv0K5Xh9k0V4eIr7XxMFTqKO
+X-Gm-Gg: Acq92OFgkbuYwcthdI9BXssnGOCiLPd9nzqTGWZ4a48kcf7PncmX07maVXXYW6KRZMO
+	Di1J88XBBpF4ddVzGR21hP08FbdX1hjVXHfGjGDxp3ChVSmSHkZu91YF/0XUqbYdx6zegp42yY6
+	kYha9XWSevm5swfAi7XnCV4kKtjk+4nTj9lq2pGTwNC/eNLHtYKoWolb0rIvUGZWPhBATBo9cqk
+	LfJoWR4KCj42u6busv5VuSIBqM4r6TP2jUouf6EpuWXhDT2efXYJi1rJxJ8KA1Gs0d7wfjo0X4i
+	P31bPYBt0jgRZ9yMB5QOesZMCvdMS9GvNFmwznbp1Ki/a3hBe23A/dpSO4LgQfFW/vM3a7H/X+d
+	inTVKxox9o6lau0PMZOxOPn7Vq23Yh6TkP/2Q0nxOIMwdawBqL1vmEK1vdGdUHRczaO7GnbRc3T
+	t2WnKrxEk+QCpGhoL6hbw2JNjWMIUgq23P07eEyn7sZ60gK3od+GPROnfoDpfTq46IXJ6xLZo1/
+	opVSsZCj8j2wUlbcvL1FF0=
+X-Received: by 2002:a17:903:2f44:b0:2c0:cb0e:ac3a with SMTP id d9443c01a7336-2c69a1678c4mr23532235ad.23.1781589255443;
+        Mon, 15 Jun 2026 22:54:15 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c42f2e52b5sm120805275ad.7.2026.06.15.22.54.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c42f2e52b5sm120805275ad.7.2026.06.15.22.54.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jun 2026 22:54:11 -0700 (PDT)
+        Mon, 15 Jun 2026 22:54:15 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.org>,
@@ -70,9 +70,9 @@ Cc: linux-cifs@vger.kernel.org,
 	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
 	Rajasi Mandal <rajasimandal@microsoft.com>,
 	Meetakshi Setiya <msetiya@microsoft.com>
-Subject: [PATCH v4 2/7] smb: client: block non-reconfigurable option changes on remount
-Date: Tue, 16 Jun 2026 05:53:52 +0000
-Message-ID: <20260616055357.3798387-3-rajasimandalos@gmail.com>
+Subject: [PATCH v4 3/7] smb: client: sync retrans on remount
+Date: Tue, 16 Jun 2026 05:53:53 +0000
+Message-ID: <20260616055357.3798387-4-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260616055357.3798387-1-rajasimandalos@gmail.com>
 References: <20260616055357.3798387-1-rajasimandalos@gmail.com>
@@ -86,179 +86,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-Several mount options (seal, sign, vers, ip, rdma, nosharesock,
-persistent/resilient handles, etc.) require tearing down the
-connection to take effect, but smb3_verify_reconfigure_ctx() does
-not reject them.  A remount that changes any of these silently
-ignores the new value, confusing users.
+The retrans mount option controls how many times the client retries
+sending a request before giving up.  Although remount already stored
+the new value in cifs_sb->ctx, it was never propagated to
+server->retrans, so the running connection kept using the old count.
 
-Now that smb3_init_fs_context() duplicates the live context (with
-runtime state synced in) on reconfigure, simple != checks in
-smb3_verify_reconfigure_ctx() are sound -- a difference between
-new_ctx and old_ctx represents a real, intentional change by the
-user rather than a spurious mismatch against init defaults.
+Introduce smb3_sync_server_opts() to push ctx options that live on
+TCP_Server_Info into the live server struct after a successful
+remount.  For now it handles retrans; subsequent patches will extend
+it to other server-level knobs.
 
-Add comprehensive checks for connection-tied options with clear
-error messages so the user sees why the remount failed.
+The previous patch in this series ("smb: client: sync runtime state
+into ctx on reconfigure") duplicates the existing context on remount,
+so a bare 'mount -o remount' carries the old retrans value forward and
+the parser only overwrites it when the user explicitly passes
+retrans=N.  No special-casing for the bare-remount /proc/mounts replay
+is therefore needed; in particular, an explicit retrans=0 from the
+user now correctly resets the value to the compile-time default.
+
+Writes to server->retrans are unsynchronized to match the existing
+convention: every other reader of the field (smb2ops.c retry path,
+cifs_show_options(), the original cifs_get_tcp_session() writer) does
+not take server->srv_lock, and match_server() only reads it under
+srv_lock as part of the larger match function.
+
+Note that retrans lives on TCP_Server_Info and is therefore shared
+across all mounts to the same server; reconfiguring one mount updates
+the value seen by every other mount sharing the connection.  This is
+consistent with the existing semantics: cifs_show_options() already
+reads server->retrans for /proc/mounts on every mount, and the
+runtime retry path always uses the server's value rather than any
+per-mount copy.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
 Reviewed-by: Meetakshi Setiya <msetiya@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 141 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
+ fs/smb/client/fs_context.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 576a78b6d0cb..d5a7d4dd402b 100644
+index d5a7d4dd402b..bfbea0648f6a 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -1070,6 +1070,147 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
- 		cifs_errorf(fc, "can not change nbsessinit during remount\n");
- 		return -EINVAL;
- 	}
-+	if (new_ctx->compress != old_ctx->compress) {
-+		cifs_errorf(fc, "can not change compress during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->noblocksnd != old_ctx->noblocksnd) {
-+		cifs_errorf(fc, "can not change noblocksend during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->noautotune != old_ctx->noautotune) {
-+		cifs_errorf(fc, "can not change noautotune during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->no_sparse != old_ctx->no_sparse) {
-+		cifs_errorf(fc, "can not change nosparse during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->nodelete != old_ctx->nodelete) {
-+		cifs_errorf(fc, "can not change nodelete during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->cruid_specified &&
-+	    !uid_eq(new_ctx->cred_uid, old_ctx->cred_uid)) {
-+		cifs_errorf(fc, "can not change cruid during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->port != old_ctx->port) {
-+		cifs_errorf(fc, "can not change port during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->min_offload != old_ctx->min_offload) {
-+		cifs_errorf(fc, "can not change min_enc_offload during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->echo_interval != old_ctx->echo_interval) {
-+		cifs_errorf(fc, "can not change echo_interval during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->snapshot_time != old_ctx->snapshot_time) {
-+		cifs_errorf(fc, "can not change snapshot during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->max_credits != old_ctx->max_credits) {
-+		cifs_errorf(fc, "can not change max_credits during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->handle_timeout != old_ctx->handle_timeout) {
-+		cifs_errorf(fc, "can not change handletimeout during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->got_ip &&
-+	    !cifs_match_ipaddr((struct sockaddr *)&new_ctx->dstaddr,
-+			       (struct sockaddr *)&old_ctx->dstaddr)) {
-+		cifs_errorf(fc, "can not change ip during remount\n");
-+		return -EINVAL;
-+	}
-+	if (!cifs_match_ipaddr((struct sockaddr *)&new_ctx->srcaddr,
-+			       (struct sockaddr *)&old_ctx->srcaddr)) {
-+		cifs_errorf(fc, "can not change srcaddr during remount\n");
-+		return -EINVAL;
-+	}
-+	if (memcmp(new_ctx->source_rfc1001_name, old_ctx->source_rfc1001_name,
-+		   RFC1001_NAME_LEN)) {
-+		cifs_errorf(fc, "can not change netbiosname during remount\n");
-+		return -EINVAL;
-+	}
-+	if (memcmp(new_ctx->target_rfc1001_name, old_ctx->target_rfc1001_name,
-+		   RFC1001_NAME_LEN)) {
-+		cifs_errorf(fc, "can not change servern during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->got_version &&
-+	    (new_ctx->ops != old_ctx->ops || new_ctx->vals != old_ctx->vals)) {
-+		cifs_errorf(fc, "can not change vers during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->witness != old_ctx->witness) {
-+		cifs_errorf(fc, "can not change witness during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->rootfs != old_ctx->rootfs) {
-+		cifs_errorf(fc, "can not change rootfs during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->linux_ext != old_ctx->linux_ext ||
-+	    new_ctx->no_linux_ext != old_ctx->no_linux_ext) {
-+		cifs_errorf(fc, "can not change unix during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->nocase != old_ctx->nocase) {
-+		cifs_errorf(fc, "can not change nocase during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->intr != old_ctx->intr) {
-+		cifs_errorf(fc, "can not change intr during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->no_psx_acl != old_ctx->no_psx_acl) {
-+		cifs_errorf(fc, "can not change acl during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->local_lease != old_ctx->local_lease) {
-+		cifs_errorf(fc, "can not change locallease during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->sign != old_ctx->sign) {
-+		cifs_errorf(fc, "can not change sign during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->ignore_signature != old_ctx->ignore_signature) {
-+		cifs_errorf(fc, "can not change ignore_signature during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->seal != old_ctx->seal) {
-+		cifs_errorf(fc, "can not change seal during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->nosharesock != old_ctx->nosharesock) {
-+		cifs_errorf(fc, "can not change nosharesock during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->persistent != old_ctx->persistent ||
-+	    new_ctx->nopersistent != old_ctx->nopersistent) {
-+		cifs_errorf(fc, "can not change persistenthandles during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->resilient != old_ctx->resilient) {
-+		cifs_errorf(fc, "can not change resilienthandles during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->sockopt_tcp_nodelay != old_ctx->sockopt_tcp_nodelay) {
-+		cifs_errorf(fc, "can not change tcpnodelay during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->domainauto != old_ctx->domainauto) {
-+		cifs_errorf(fc, "can not change domainauto during remount\n");
-+		return -EINVAL;
-+	}
-+	if (new_ctx->rdma != old_ctx->rdma) {
-+		cifs_errorf(fc, "can not change rdma during remount\n");
-+		return -EINVAL;
-+	}
- 
- 	return 0;
+@@ -1278,6 +1278,24 @@ static void smb3_sync_ses_chan_max(struct cifs_ses *ses, size_t max_channels)
+ 	spin_unlock(&ses->chan_lock);
  }
+ 
++/*
++ * Synchronize server-level options that are stored on TCP_Server_Info
++ * at mount time.  These fields are consulted at runtime (retry logic)
++ * so remount needs to update the live server struct in addition to
++ * cifs_sb->ctx.  Note these live on TCP_Server_Info and are therefore
++ * shared across all mounts to the same server; reconfiguring one mount
++ * updates the value seen by every other mount sharing the connection,
++ * matching how cifs_show_options() and the runtime retry path already
++ * read them unsynchronized from the server struct.
++ */
++static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
++{
++	struct TCP_Server_Info *server = cifs_sb_master_tcon(cifs_sb)->ses->server;
++	struct smb3_fs_context *ctx = cifs_sb->ctx;
++
++	server->retrans = ctx->retrans;
++}
++
+ static int smb3_reconfigure(struct fs_context *fc)
+ {
+ 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+@@ -1447,6 +1465,8 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	if (!rc)
+ 		rc = dfs_cache_remount_fs(cifs_sb);
+ #endif
++	if (!rc)
++		smb3_sync_server_opts(cifs_sb);
+ 
+ 	return rc;
+ 
 -- 
 2.43.0
 
