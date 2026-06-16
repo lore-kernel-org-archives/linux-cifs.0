@@ -1,77 +1,79 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281161FFC59;
-	Tue, 16 Jun 2026 12:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9395D366836
+	for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2026 12:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781613555; cv=none; b=UnAl1u2PNQiR1mFL5RGjsplsM8GwGeyn0ZPWWktLeZkoKBTaSzDNTdAEMVnsQjXdVW/J76QlsIaHAsfd0Jp2ILB7HSebYrux6kLFcMECbhvTyttBhfaJqxSTqXL6JdMR9JSf8kOC+ps7FL89ODwkTCnHa0HkODayQkHKyKZUYlc=
+	t=1781614126; cv=none; b=Fog3rd46mr4MWC63fAmmoxL6ldLOxPMGLnKbrMc2O+2bFz35rR+QMfdL+R5a/SbjCHtq8ftQP0D6UoxEJ3bmhXZoFyqUCmJ90gT6E+ioPbJN0CA7fzZBVl8mEz3OVU8klyNIL4xOcZQWRrIhgvLK3YS1lDNXv5XSzTWJSea9pA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781613555; c=relaxed/simple;
-	bh=jLVmUs0h5h3IaSBoYYaiyzR1phrnWSJ/3wq7JcB45ME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kVqfXxefPTJXO+TAPM/FezLONen5TFZrZc3LROiqvXw1nJnnyLdFLXczeDDnsj/C81rKL8p0x9phpNiHrWD/XtoDnmvEAMswhpjwbZMOK75vtyb3U75RoomeF+ZsTNWRgiqZkHKFOHhFfkpIJU5ltHTa0uLW8xZl4oooPaIaHb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=zCeou/M6; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1781614126; c=relaxed/simple;
+	bh=+BRhsPWDpZjoK0HsveNG5UGVmQHqK2OhhoOq5wslwZg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ta0ztN9cSsnHN/218hESdmEo/ebukv9xGgOTzPzywtsSe3MqK1XDiGlXXEVKcOe4h4F/jblkgz6cWESPVC8TaOwO1WUG4znpOM+jRqAzfuKPS0qt4VWC+03bNwe/a9p6lOC0nhp6NJ9k5xxez7Kw+UWMHrq/D9Cf7GaFmH4BEw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=DXl5YP4w; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="zCeou/M6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5EdZEQr56NngtMqetLIh7uZxlqXA7wuIkjKsBUo8El4=; b=zCeou/M6O+/c/sRe+2gVAa7PYn
-	/KGY5iI9ZorqbKaBi5gXM79A0Hdh87LTj912G443HMxkWrGn0vWchAG3TFECfQnM6v2lC/uSjBqoL
-	unuBQjir0+H5uXtGG+05z7ucyZOR3NZABpZ7FpeNTbGirx4ZEz4FAR6SX5JEPMTJs3QKNHb8IbzXe
-	hJKSVJQ8C87eIs1+oQfvfAYMlUhbS3Kmcvbh4MlMQ0PC+8gj2+I35CR8YcARLds8XWm4PWNEx5RcB
-	qN3CmCnObaGamY5XTxdYAdmKdHlFGMP265JrzvBpMWrwOKmazoOKLhJSUJMFBSoGutNBxFM4b5WQ2
-	bOx5tseA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wZT4C-0000000FlxD-2thP;
-	Tue, 16 Jun 2026 12:38:56 +0000
-Date: Tue, 16 Jun 2026 05:38:56 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Paulo Alcantara <pc@manguebit.org>, Jens Axboe <axboe@kernel.dk>,
-	Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 00/30] netfs: Keep track of folios in a segmented
- bio_vec[] chain
-Message-ID: <ajFD4ELy4yBpu0fb@infradead.org>
-References: <20260616100821.2062304-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="DXl5YP4w"
+Message-ID: <b6b19c84-7734-42ea-b2ec-9ace1f36ad08@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1781614119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wv0+MgqNRvRce0wQH8tzVOBI1JIX52tUPZ58AWe7J8U=;
+	b=DXl5YP4w2nX9zBF/auRW6duXvS9I+LFh6H72wP2z7tgKv4bVq1GepXsY8YwJgiuxk/3GYJ
+	utsvh8oA1hM5Kec1L2eqj7x9jLuM39MuNcqFVWCQlxcbVvJf5UuT7X6eGlgcHbnkR/32DA
+	5PNFdhWzOvpVWaJ/smJLv8N+zcFXXuBpa/tcwnDrn+6tX8vWPV0jrQwPKilpFVlwL6JsyU
+	NgC8RocoDRsvVJelCGWkydzsykPdIiiMd9+HKmhv/CAAb0NJhfq7tp8HQgIgsnKJEnb/FJ
+	zY3lj94Gbuc4hUnVoAKzBsLPkNkrQsg062VkaRzcyMkvx+Oemz6MzQHqkEjodQ==
+Date: Tue, 16 Jun 2026 20:47:29 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260616100821.2062304-1-dhowells@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Subject: Re: [PATCH v4 30/30] CHANGES
+To: David Howells <dhowells@redhat.com>,
+ Christian Brauner <christian@brauner.io>,
+ Matthew Wilcox <willy@infradead.org>, Christoph Hellwig <hch@infradead.org>
+Cc: Paulo Alcantara <pc@manguebit.org>, Jens Axboe <axboe@kernel.dk>,
+ Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
+ Marc Dionne <marc.dionne@auristor.com>,
+ Eric Van Hensbergen <ericvh@kernel.org>,
+ Dominique Martinet <asmadeus@codewreck.org>,
+ Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260616100821.2062304-1-dhowells@redhat.com>
+ <20260616100821.2062304-31-dhowells@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260616100821.2062304-31-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jun 16, 2026 at 11:07:49AM +0100, David Howells wrote:
-> Hi Christian,
-> 
-> Could you add these patches to the VFS tree for next?
+Is this patch missing the subject and commit message?
 
-Really?  Not only are we in the merge window, but this is gigantic
-unreviewable series, which consequently has none of the relevant
-reviews.
+On 6/16/26 18:08, David Howells wrote:
+> ---
+>   fs/netfs/iterator.c    | 22 ++++++++++++++--------
+>   fs/netfs/read_retry.c  | 12 +++++++++---
+>   fs/netfs/write_issue.c | 24 ++++++++++++++++++++++--
+>   fs/netfs/write_retry.c | 23 ++++++++++++++---------
+>   fs/nfs/fscache.c       |  3 ++-
+>   fs/smb/client/file.c   |  2 +-
+>   6 files changed, 62 insertions(+), 24 deletions(-)
 
-Please try to work like everyone else and split out useful parts.  E.g.
-if your new iter type is useful there must be smaller standalone
-candidates for it that can explain the use.  Having to wade through all
-of netfs to try to understand it is not really going to fly.
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
