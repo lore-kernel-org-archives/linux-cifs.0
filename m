@@ -1,61 +1,76 @@
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C0F3A542F
-	for <linux-cifs@vger.kernel.org>; Sun, 14 Jun 2026 16:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961DA3D6695
+	for <linux-cifs@vger.kernel.org>; Tue, 16 Jun 2026 05:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781456331; cv=none; b=L/rAu4xihJ5rrw1DalGH0Kw/6ZOMNvxvUT/zYZejgRZrHxqIEnESJDspllL/0XuKW51xARNEE6AKj21/Iokp3He/fcHeXt3ktUUYfB2TriDbF91AEnimaximkzyT/uN94Hl12zlaLM73uccFlhtVd0I2QmyY91GgORVnLsX8f50=
+	t=1781589245; cv=none; b=UxpMoq5bLw14Gi2N+ZS1/8jw0S+65gpOULTpMrmZgd81Ft8KCnVV9I5sqcTCx0otHdtYc3ivXN7+FiWy/9RDFMwfn5NkL8gUJKEgAj3e3CyaDLqxbkJNziZY5hleu7P3eFsbLB17R2eBlp7uRb8bNDeoyqLYWx6PzX+dp6HjtyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781456331; c=relaxed/simple;
-	bh=VOXniTR3wXI4Znh06OqzaeFf6jWoOm0HsEDyrV97PWA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=teLvEp0DarvlwVjFx/MmE6YTH0WydNxw08LLkS1KQSz1gpODAqtkHaQ54R/SQNFcrfoh+RXdOmCorzdYtCX+rBdR3vqyfVqqoMbxpRj9AV8/C8rysxQCXy6LjrhayVPlQLAA5SE7yGEM8hOoFPzG1yJd6LCAtVaGnCbBBQFpUNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=gWloa08C; arc=none smtp.client-ip=195.121.94.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
+	s=arc-20240116; t=1781589245; c=relaxed/simple;
+	bh=ohlBA6OjGb5sacDjDDv5cwC1UclzdTXG+7md+1MZE68=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pdT5OkxqteBIPz54fuzLqmrNxDu4i3hm4x4P9HYVmHsPNCE7Hlw9WsH6CyBcisdpvgPanm0PuVOqeThxhplCZI+u0+4fK+l0VH9Ue16z7T+tlWstdaliymNa0cFY1og8ICBTCuf3Xv4afaqnoI7bWCqFe2bPAac1nmG85EjdXdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VENt3zQP; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="gWloa08C"
-X-KPN-MessageId: 27584a23-6812-11f1-8ff8-005056999439
-Received: from mta.kpnmail.nl (unknown [10.31.161.188])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 27584a23-6812-11f1-8ff8-005056999439;
-	Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
-Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.189])
-	by mta.kpnmail.nl (Halon) with ESMTP
-	id 2756a90a-6812-11f1-8109-00505699693e;
-	Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VENt3zQP"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c0c2a68d01so26276675ad.1
+        for <linux-cifs@vger.kernel.org>; Mon, 15 Jun 2026 22:54:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=xs4all.nl; s=xs4all01;
-	h=content-type:mime-version:subject:message-id:to:from:date;
-	bh=8QohWqedXEeL1TjwRMSoT2NjvDlan4ueM7ovpK8w9RE=;
-	b=gWloa08C5gaFS9ud2Q0xM2Xsu4VKUpUTA+ufwNuiznXADhjKWfhdOyY9dzmFMjE+qmrnmb0IsXyNS
-	 FCqytTOlKeeqcoMiq05YJEFFc/jRJBtSbcJf3JYg2uV6ydIiiRUJtViXpcxaEnTW2n2MslFZeAEqem
-	 ua7KXMSX7MoNl8VXWsLia6fJy8gAzom9apjB6MwBtpcQ1CGid7tiKYj424juEQ8zmK2+DG8H85KVTD
-	 wFyHKA1mCh+eSZzKGJvllFqkwGTKq0FIY/8ES1Szk+Udb44gfoB9Y6Iy6hIFBBAKS4zK+hcNxqN9KV
-	 6hbxBzAN7YM9OtOMVuXuwF12xMHjPEw==
-X-KPN-MID: 33|WA/m+4GktEN280KBfl3QFsgU6gzhNMkExpta0zjBzacYOw9gn7Zjw6kO2rFvin8
- X7f7oCEsHTk2T6gLppSQa/e7SUcT/zShMxmenuMfVsmM=
-X-CMASSUN: 33|WxgGnbtgBvFfzMziWWYcQtZAS2NyP2d3HJaExX35KIR9s4FhmWGTiG7u0krSLCz
- zzvfhzLZWtU8e6few/pLSzQ==
-X-KPN-VerifiedSender: Yes
-Received: from cpxoxapps-mh01 (cpxoxapps-mh01.personalcloud.so.kpn.org [10.128.135.207])
-	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
-	id 274b0c4b-6812-11f1-94b1-00505699eff2;
-	Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
-Date: Sun, 14 Jun 2026 18:57:40 +0200 (CEST)
-From: Jori Koolstra <jkoolstra@xs4all.nl>
-To: NeilBrown <neil@brown.name>, NeilBrown <neilb@ownmail.net>
-Cc: Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Jeff Layton <jlayton@kernel.org>,
-	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Message-ID: <586018010.1683063.1781456260309@kpc.webmail.kpnmail.nl>
-In-Reply-To: <178131507850.3002522.16819279282508142089@noble.neil.brown.name>
-References: <20260611145733.43776-1-jkoolstra@xs4all.nl>
- <178131507850.3002522.16819279282508142089@noble.neil.brown.name>
-Subject: Re: [RFC PATCH 0/1] vfs: pass S_IFDIR mode to vfs_prepare_mode()
+        d=gmail.com; s=20251104; t=1781589244; x=1782194044; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KJQwR3cAzc2s2HyBgIYrJ6ZfIeFUrWnQYbWiFvZI1I0=;
+        b=VENt3zQPnUeHcXfX41/x0oxo5IBVJWUyoMglWx7lTargXuaj16Ov4u1B2ZJHSkZIDY
+         tjP5Td0lzXKfO3MGJ1LZIKRa5Vbj1XEgHd1IfobQpjxD4hyJFDt4P7g6umcv/BqeJQXy
+         vFoSuwxEi+qEZDeBCme+WY6xFgj89SG0A/fB7sSMhUsyFH1cWep5AeRWETUL6JD1RH0m
+         zVXTawfX1G7UQafNofjRdJSxFFlKaihugWKXtEUCnet9BW9yIsZ6CeS9RB3z0b1dBM2w
+         3enwQiflWVfGJq+Fp+4s0aA4qmP9fy5sCbp0pqhq/GP1BlE6dHaYwnEAIh7BS2jB48tO
+         4/2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781589244; x=1782194044;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KJQwR3cAzc2s2HyBgIYrJ6ZfIeFUrWnQYbWiFvZI1I0=;
+        b=cnCqNur30j2jKeBU5r+euBIEvbeHcAPO6sHeCKbmJksIrAkW6PVwFAQgWn7pgSi91P
+         bSqmsZS73ET5tEzzg4HNoOl/J//sFc7K2aQ5JTaHstHs00+4RDSKetf8UH3S2e1C0x43
+         jUx/VrmvFLQdB3j0ZZPvMah10KS+FunpRyxduV7fC2CFReVDs48ykfVaXgKuBdfszk4P
+         SAZZTqYiksDmKnWXsKde8HzvGlvAMhd7EX+jJmNYqRH0r0gpvu4wKufpASenIgFtxhub
+         x4zxi90aFaLFTxB/WkvovKR6cE2AIuwFjpTeC/3bT2NeV8OhUEGMM2soZVtGgK16oiLO
+         bteA==
+X-Gm-Message-State: AOJu0YxHlgH7+K6GYTMwcRt1k4FyG0vUdyfymA/O09XxDJ5Z9slgLvrB
+	jgDNOmbd5qFZZ+J/BxIS5pqVqGqYhlz4ghi9X+eBpWrlk0/dC0Fta8eX
+X-Gm-Gg: Acq92OGrzmfjp9HXkjtfjfph6aIc6YnbKKl5qB9oeoYe8JBkRY+8YyUCvxhIJOZP/m6
+	32U976ddyeZ03kWvQ5RIflScQp5mkGZbb3RqeH6M0RP21FcnkT2Sp+6eBfzQFzxSxo4MgN3R4JB
+	oIazMypBh5x1aDLXDZ8OZswOueNghaionKhbUQYsvPLsQHS38Rm4vw8ruNUbw0BtvqDercAC1CK
+	myDGOilArivRTQnE+iDVgDpOlqFpRN7NyThiGkbc94fMh1Z5ismpzdaE8p9OAQ97PoOxuBCWPQu
+	t4HAxtbno4kWv122ZXy/7ODVc+yVZf5+GAgbbrSOCxZ8PAt6xc0RzSlOHqEAfBY7REcFNQXPAZ1
+	yFvSFxudc9nYTPtGI657XK7nkyiWovFRQGJl/l9YtkFHW4HDI/TkpkCsm0O17YCgA1ArjHKWABc
+	kc3zJt0ftVN7VZh/Q54lleBZI3EWyi6EPN0VaxbcgdIxUmR0RJAPbX9lfK/wCRZUaNVDuKIsHTb
+	GVJ5tVIx/HHZFnQZeLc8k0=
+X-Received: by 2002:a17:903:2447:b0:2b2:67ca:5ff9 with SMTP id d9443c01a7336-2c699dfc3c0mr21373265ad.0.1781589243909;
+        Mon, 15 Jun 2026 22:54:03 -0700 (PDT)
+Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c42f2e52b5sm120805275ad.7.2026.06.15.22.54.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jun 2026 22:54:03 -0700 (PDT)
+From: rajasimandalos@gmail.com
+To: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Meetakshi Setiya <meetakshisetiyaoss@gmail.com>,
+	Rajasi Mandal <rajasimandal@microsoft.com>
+Subject: [PATCH v4 0/7] smb: client: make more mount options take effect on remount
+Date: Tue, 16 Jun 2026 05:53:50 +0000
+Message-ID: <20260616055357.3798387-1-rajasimandalos@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -63,55 +78,67 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-Importance: Normal
+Content-Transfer-Encoding: 8bit
+
+From: Rajasi Mandal <rajasimandal@microsoft.com>
+
+Several mount options are accepted by the remount (reconfigure) path but
+silently have no effect: the new value is stored in cifs_sb->ctx but never
+propagated to the live server/tcon structures, or the option is simply
+ignored.  This is confusing -- the user passes an option on
+'mount -o remount' and nothing changes, with no error.
+
+This series makes the reconfigure path honest:
+
+  - It first establishes a correct baseline for comparing old vs new
+    options on remount by duplicating the live context (with runtime
+    state synced in) instead of rebuilding from init defaults.
+
+  - Options that are genuinely reconfigurable (retrans, rasize, nolease)
+    are now applied to the running mount.
+
+  - Options that are connection-tied and cannot take effect without
+    tearing down the connection (seal, sign, vers, ip, srcaddr, rdma,
+    cache=ro/singleclient, etc.) are now explicitly rejected with a clear
+    error message instead of being silently dropped.
+
+Patch 1 is preparatory plumbing (duplicate live ctx + sync runtime
+state) that makes the simple != comparisons in the rejection checks
+sound.  Patches 2 and 4 add the rejection checks.  Patches 3, 5 and 7
+apply the reconfigurable options.  Patch 6 is a small no-functional-change
+move of struct tcon_list so the nolease patch can reuse it.
+
+Changes since v3:
+  - nolease: moved tcon->no_lease out of the bitfield word into a plain
+    bool, so propagating it on remount cannot race (via a bitfield
+    read-modify-write) with the lockless need_reconnect/need_reopen_files
+    writers on the reconnect/reopen paths.
+  - srcaddr remount check now uses cifs_match_ipaddr() instead of a raw
+    memcmp over sockaddr_storage, matching the adjacent ip check and
+    avoiding port/padding fragility.
+
+Rajasi Mandal (7):
+  smb: client: sync runtime state into ctx on reconfigure
+  smb: client: block non-reconfigurable option changes on remount
+  smb: client: sync retrans on remount
+  smb: client: block cache=ro and cache=singleclient on remount
+  smb: client: apply rasize on remount
+  smb: client: move struct tcon_list to cifsglob.h
+  smb: client: allow nolease option to be reconfigured on remount
+
+ fs/smb/client/cached_dir.c |  44 +++++
+ fs/smb/client/cached_dir.h |   1 +
+ fs/smb/client/cifs_swn.h   |  14 +-
+ fs/smb/client/cifsglob.h   |   7 +-
+ fs/smb/client/fs_context.c | 332 ++++++++++++++++++++++++++++++++++++-
+ fs/smb/client/misc.c       |   5 -
+ fs/smb/client/smb1ops.c    |   7 +-
+ fs/smb/client/smb2pdu.c    |  11 +-
+ fs/smb/client/trace.h      |   2 +
+ 9 files changed, 411 insertions(+), 12 deletions(-)
 
 
-> Op 13-06-2026 03:44 CEST schreef NeilBrown <neilb@ownmail.net>:
-> 
->  
-> On Fri, 12 Jun 2026, Jori Koolstra wrote:
-> > There is a comment in vfs_prepare_mode() that says:
-> > 
-> >   Note that it's currently valid for @type to be 0 if a directory is
-> >   created. Filesystems raise that flag individually and we need to check
-> >   whether each filesystem can deal with receiving S_IFDIR from the vfs
-> >   before we enforce a non-zero type.
-> > 
-> > This is a bit challenging since there are many filesystems. Claude Opus
-> > 4.8 was used to generate the context for each mkdir implementation from
-> > which it can be judged whether passing S_IFDIR is safe. The result was
-> > then verified by hand by looking at how the mode argument is used in
-> > each case. To check whether all mkdir implementations are convered,
-> > 'rg "\.mkdir" ' was used and checked against the list of uses Claude
-> > found.
-> > 
-> > The only mkdir implementation that I am not as sure of is
-> > cifs_mkdir(). So this goes cc to the cifs people. But of course, I might
-> > have made errors in other places (except probably not for the A list as
-> > those are all just mode | S_IFDIR cases without other uses of mode
-> > besides logging)
-> 
-> I agree that cifs_mkdir() is not obviously safe.
-> I think coda_mkdir() and fuse_mkdir() at also not obviously safe.
-> In all three cases the mode, which now has S_IFDIR included, is sent
-> unchanged to something outside of Linux - either user-space or over at
-> network connection.
+base-commit: 0eb17dea51eff940230b5e562df29ce457124d41
+-- 
+2.43.0
 
-You are (of course) right. I missed to mention coda. Also, I missed that
-for FUSE inarg.mode = mode; is set, and this is passed, despite the mode
-in create_new_entry(idmap, fm, &args, dir, entry, S_IFDIR); being hardwired
-to S_IFDIR.
-
-> 
-> I think you patch which adds S_IFDIR to mode should mask it back out in
-> those three functions.  Then we could be certain it is safe.
-> The maintainers of those filesystems might then choose to remove the
-> mask if they know it to be safe to do so
-
-That seems like a good idea, agreed.
-
-> 
-> Thanks,
-> NeilBrown
