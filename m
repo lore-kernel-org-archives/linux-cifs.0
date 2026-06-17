@@ -1,50 +1,49 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B487738C437;
-	Tue, 16 Jun 2026 18:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392982E7F25
+	for <linux-cifs@vger.kernel.org>; Wed, 17 Jun 2026 02:38:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781635414; cv=none; b=d23FA0E3/W3PalL/v9BrCHtCysSMcPyGWQGvs1qIaq0YBqomon+fmvaz8sDyhEJZA6oAJk0E2EpvfLPh/Y7CdvpZaw7DdPZ2D/2KZNrLBPbErhbA0CKRd8BrErxD7kdqp0f3SNhhCWyt0QeS8irUVQ7ZqbzNfq74z1mB5EUsPtw=
+	t=1781663894; cv=none; b=PcjTF0Axw/+HxSkCDJ6XWsEDBvBpOixg+xoyLlx/AgLo8qBuFg1SF9PfLZDN4aGAXqdFdytuffCb0SocPw6vI8OjthaoTFeTsp+cNO5FE9BsEavRiTBynhcCa8chgDl1JiCh0vJYecghcIr8WJvxaBsa59gAkbA7cnAV2UROEp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781635414; c=relaxed/simple;
-	bh=dUdMb8Ap8P2TAxFA86d/1QjUmfEm+nVlHWokXYqfymI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZKGhkj8Tv/hOZnVHstKHFdxDvJMbw9FuiCZySUMMlPOV6PdsHn964elp8vmARf4aZ/Kr5uf5tnPyTzjijWCnmrFPBEYafYdGDZblrLcKd4zB3H14j7J2JP7DamnBiJGmFtaAumitOy5/h8UEjoOAjmBHaPvEqrCrMrpjlm2xbVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PMLV/PIu; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781663894; c=relaxed/simple;
+	bh=KZBEppmyGVvT72hBYFPBB9Q4v8YH1polMReAJA2fZFw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jv2FsizDMhdqOMO3+vTCYChYRsm7/pJ7DzowT087kdsBULJd1L068oL7r0f5GwTNkCvUD+zZP0xRXBa4nD7Nt4E+z+7K5QUuAhnVBhPIV6OuFGMHI+oQe6fOaw1qAgFKH9ynC8j6dyh87BBic1CSW9i6Rj9+00os+HmrijYL4u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=h5QiIpLO; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PMLV/PIu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5B971F000E9;
-	Tue, 16 Jun 2026 18:43:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1781635413;
-	bh=V9wMoyQqU1WViNCRjFa5pY+TxWwmNJSm+yJM/bcidhI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PMLV/PIug2IG9g3UbSDfpAo5DcPjBb1hzwWQ+pYzzzhZM12UPNpBkLKEk66i9DXag
-	 DubzofQbp6KwnCg4buZ0WQm33bYMzJRcp6SVu4MAWJvw5odxDgv+sk6k9HhXzTwJxV
-	 bXwtSOwT60izeabe0xF72grCKBPPVNN8ViPdlf2E=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	linux-cifs@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="h5QiIpLO"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1781663887;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=g6hylRYbGtxM9p8XQpOabvI9cMsR2RwUrN2BxEZWCDQ=;
+	b=h5QiIpLOckQ7YY0layQ8nRSbHfLnIOAgbDLRla/TZeiFYEr4mvcNuBfQkMyWRy0NYFkFjW
+	SKjqRQj0SptM04Lh2Y4C/YDWmxnF1zvY+C4TxzQLOFbYr7aPHFprc3N1jsFSk+FS8YBo8V
+	X1VulYYzeQVwKgZMhCYU+ht/J3l70TD4YRcxA5VR6XksCauHlx4YZfJ1pDAEyFtogXSnhA
+	SpcjYeNghAmrssRZO/QLUkSIp0wQM0ZXwmAeXprfnM8e4uO8aYKknv0+rWmDpZmMqQyEvV
+	FIApF2JP7IqBVceWzOBc30fDzkJiRX7JAB6gVBb2/CWwXy0OaM/K74taqqClcQ==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10 043/342] smb: client: fix smbdirect_recv_io leak in smbd_negotiate() error path
-Date: Tue, 16 Jun 2026 20:25:39 +0530
-Message-ID: <20260616145050.263486060@linuxfoundation.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260616145048.348037099@linuxfoundation.org>
-References: <20260616145048.348037099@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] smb/server: fix debug log endianness in smb2_cancel()
+Date: Wed, 17 Jun 2026 02:36:32 +0000
+Message-ID: <20260617023632.122384-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,50 +51,32 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-5.10-stable review patch.  If anyone has any objections, please let me know.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-------------------
+Convert to CPU byte order to avoid incorrect debug log
+on big-endian architectures.
 
-From: Stefan Metzmacher <metze@samba.org>
-
-[ Upstream commit daac51c7032036a0ca5f1aa419ad1b0471d1c6e0 ]
-
-During tests of another unrelated patch I was able to trigger this
-error: Objects remaining on __kmem_cache_shutdown()
-
-Cc: Steve French <smfrench@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/cifs/smbdirect.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/cifs/smbdirect.c b/fs/cifs/smbdirect.c
-index ae332f3771f634..e273f3b9efcb63 100644
---- a/fs/cifs/smbdirect.c
-+++ b/fs/cifs/smbdirect.c
-@@ -1083,8 +1083,10 @@ static int smbd_negotiate(struct smbd_connection *info)
- 	log_rdma_event(INFO, "smbd_post_recv rc=%d iov.addr=%llx iov.length=%x iov.lkey=%x\n",
- 		       rc, response->sge.addr,
- 		       response->sge.length, response->sge.lkey);
--	if (rc)
-+	if (rc) {
-+		put_receive_buffer(info, response);
- 		return rc;
-+	}
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 852236043bc6..13c5b0c6e65c 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -7435,7 +7435,8 @@ int smb2_cancel(struct ksmbd_work *work)
+ 		hdr = ksmbd_resp_buf_next(work);
  
- 	init_completion(&info->negotiate_completion);
- 	info->negotiate_done = false;
+ 	ksmbd_debug(SMB, "smb2 cancel called on mid %llu, async flags 0x%x\n",
+-		    hdr->MessageId, hdr->Flags);
++		    le64_to_cpu(hdr->MessageId),
++		    le32_to_cpu(hdr->Flags));
+ 
+ 	if (hdr->Flags & SMB2_FLAGS_ASYNC_COMMAND) {
+ 		command_list = &conn->async_requests;
 -- 
-2.53.0
-
-
+2.54.0
 
