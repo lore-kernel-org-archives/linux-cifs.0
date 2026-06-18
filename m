@@ -1,32 +1,34 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0506F31E820
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 17:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7C32D738F
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 17:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781802186; cv=none; b=b+eH9sEltMbRiovc6FbSX5slTehlo0gNe8wIuSK0kIxP/bYjHtEIDmbr7rQQzOsCffXCvvpq0EFZ2ewdKUw1u6oZITF4obfo2cMS93wSjQSa2QOxUIzkMNqtc01zfiIDDUsay3taoKCDmt2SbPgHHKd2Zir8Wrn0HKK2eQOzEkM=
+	t=1781802188; cv=none; b=DruO0B7o08Jke5hLF8HZ2SysSDd2G/tIFErbERpYA45VJffgcMyfLk/g7G6vkHAe6zM539Zadg75xJzRYkcEDw5lEJZ0bAvj37mLsj5oyg/xXGRc04T/jwLpDf3PzNrZnhf+Q53Eoh++beqiAu9ALbVP8pJLSOXQMXmZIYOXaj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781802186; c=relaxed/simple;
-	bh=F77SZg/sZ/piD5kUQ2SFfI8zOo4fCi9+OfCQLMftEEc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p1mvG3ciDOCHm5WYfulVRyoextzR+6qEvXzc0/eNF4Jaz/5qSA9Dnm66ZTOIgmpPbAJksZtIWigrvhYsE/bWxx+R33zIIQw3eyoICus0JbFTabhqj6ZZG5HMf0Ss5gclfoeNVdhHEHfPpFAQQUyflM/NYW6104eK3IDjCjJawPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=ifrBlWAZ; arc=none smtp.client-ip=91.218.175.181
+	s=arc-20240116; t=1781802188; c=relaxed/simple;
+	bh=d46mM8jv7QdxAzH3t6lWgaQWjhLFT5efV5kE8L5HdoQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PU9Bf/IEO7rqELyha7hnEwhOE0ROGpN0LMEtcKkvfs/N0PoC1i0zjqrHKsRm7yRnLNMhpuBVUbIbA3CtG1wUlaRxTkSjX7jZVlEkrsJZTtRC/9nnXhdRudG+g0kSbJC80GObTQSkegs7fYUwweSwOF99IqB5h0hizdl+Yjmbujg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=D3ek8xWE; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="ifrBlWAZ"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="D3ek8xWE"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1781802179;
+	s=key1; t=1781802183;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=UdU9SurTQu/FuBd2O1l/zrKVszrxAtIFrDjX4R6Tlp0=;
-	b=ifrBlWAZvZhFoDAq6Z7B86G0bIvq6Z3OyyTcc7qTVQqDlirIwyRXbD3q1YhLHBbk521SRP
-	GSYBLHRk9QEC4TqlG53fOuVKE2Q+s8evYRVokDkAUSkWRUCKOJo30aX9EhJagkA2WzCw93
-	mOFvubzk2dY61KbG7/hMMXuNyhY4n+uVSI/v88EYugCivByI3Xts2WqiSrZXZFJDiNraEV
-	iR9qpvItI4e+nmbSka12u+fFDxqFAYW5z5bAVmmHiKxGm556qfynOttmlVGEN/aUT8HNiB
-	2QCy4Kq7qmbU9dZsOAdlFTeikR3pbDHIRx5tc3p7vl1Bo+WxH/wCIcGIvJG7dw==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/Oe2qpOdtMUsjX6L40Ow0AZW2jBHWKVqS4bHIyPz1mg=;
+	b=D3ek8xWE0Frm08dga8XYbRE2oTVg+agiVRVIqFlh3MoK2NDSbn7xYWdBEhyxCR4m6HwY3y
+	WIhuzwDP9KEBSwWombn3Qoqduo87N9www4i4CTRGHnaqlhmg03VXNfAdNCs5p5zmhx9Dyb
+	wprPXPnacVjDI4H1QsMkJ91pkw5wADxwu1cnqNWk2hHs/+CWdJc/K/QAZlhNQG0tnrWb4F
+	BMoc2qjYBT81WgnmIMUkVjtuFamc1GyWv1Vk2klhk01tgdPKQk7HLEf407/17I8bN4pIFN
+	lQr7ehx7PLDdGEtYVaEBtFvfajLK4niAwBmwc/A0itaHajmBV/lsC0mfgU2C3Q==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -41,9 +43,11 @@ To: smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [RFC PATCH 0/2] smb/client: improve change notify support
-Date: Thu, 18 Jun 2026 17:02:00 +0000
-Message-ID: <20260618170202.244402-1-chenxiaosong@chenxiaosong.com>
+Subject: [RFC PATCH 1/2] smb/client: introduce smb3_notify_open()
+Date: Thu, 18 Jun 2026 17:02:01 +0000
+Message-ID: <20260618170202.244402-2-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260618170202.244402-1-chenxiaosong@chenxiaosong.com>
+References: <20260618170202.244402-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -55,42 +59,120 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-I still need to do more debugging on this patchset, for example to check
-whether there is any race between `ioctl(CIFS_IOC_NOTIFY_INFO)` and
-`readdir()`. Maybe I can send this patchset to the mailing list first
-to get more suggestions from others.
+Introduce this helper function to reduce the diff in the next patch and
+make the actual changes easier to review. No functional changes.
 
-Before this patchset, when an operation on the server triggered multiple
-actions, the client received only one action notification.
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/smb2ops.c | 71 ++++++++++++++++++++++++++---------------
+ 1 file changed, 45 insertions(+), 26 deletions(-)
 
-After this patchset, the client can receive all action notifications.
-
-Example:
-
-  smbinfo notify /mnt
-  
-  # server: touch /export/file1
-  Notifications received, returned data_len is 24
-  Action: 0x00000001, FileName: file1
-  Notifications received, returned data_len is 24
-  Action: 0x00000003, FileName: file1
-  
-  # server: mv /export/file1 /export/file2
-  Notifications received, returned data_len is 48
-  Action: 0x00000004, FileName: file1
-  Action: 0x00000005, FileName: file2
-  Notifications received, returned data_len is 24
-  Action: 0x00000003, FileName: file2
-  Notifications received, returned data_len is 24
-  Action: 0x00000002, FileName: file1
-
-ChenXiaoSong (2):
-  smb/client: introduce smb3_notify_open()
-  smb/client: do not call SMB2_close() in smb3_notify()
-
- fs/smb/client/smb2ops.c | 120 ++++++++++++++++++++++++++++------------
- 1 file changed, 86 insertions(+), 34 deletions(-)
-
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index a8f8feeeccb5..b50d3b8a9252 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2364,7 +2364,50 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
+ 	return rc;
+ }
+ 
++static int
++smb3_notify_open(const unsigned int xid, struct dentry *dentry,
++		 struct cifs_sb_info *cifs_sb, void *page,
++		 struct cifs_fid *fid, const unsigned char **pathp,
++		 __le16 **utf16_pathp, struct cifs_tcon **tconp)
++{
++	struct cifs_tcon *tcon;
++	const unsigned char *path;
++	__le16 *utf16_path = NULL;
++	struct cifs_open_parms oparms;
++	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
++	int rc;
++
++	path = build_path_from_dentry(dentry, page);
++	if (IS_ERR(path)) {
++		rc = PTR_ERR(path);
++		goto out;
++	}
++	*pathp = path;
++
++	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
++	if (utf16_path == NULL) {
++		rc = -ENOMEM;
++		goto out;
++	}
++	*utf16_pathp = utf16_path;
++
++	tcon = cifs_sb_master_tcon(cifs_sb);
++	*tconp = tcon;
++	oparms = (struct cifs_open_parms) {
++		.tcon = tcon,
++		.path = path,
++		.desired_access = FILE_READ_ATTRIBUTES | FILE_READ_DATA,
++		.disposition = FILE_OPEN,
++		.create_options = cifs_create_options(cifs_sb, 0),
++		.fid = fid,
++	};
++
++	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL,
++		       NULL);
+ 
++out:
++	return rc;
++}
+ 
+ static int
+ smb3_notify(const unsigned int xid, struct file *pfile,
+@@ -2375,29 +2418,15 @@ smb3_notify(const unsigned int xid, struct file *pfile,
+ 	struct dentry *dentry = pfile->f_path.dentry;
+ 	struct inode *inode = file_inode(pfile);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+-	struct cifs_open_parms oparms;
+ 	struct cifs_fid fid;
+ 	struct cifs_tcon *tcon;
+ 	const unsigned char *path;
+ 	char *returned_ioctl_info = NULL;
+ 	void *page = alloc_dentry_path();
+ 	__le16 *utf16_path = NULL;
+-	u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
+ 	int rc = 0;
+ 	__u32 ret_len = 0;
+ 
+-	path = build_path_from_dentry(dentry, page);
+-	if (IS_ERR(path)) {
+-		rc = PTR_ERR(path);
+-		goto notify_exit;
+-	}
+-
+-	utf16_path = cifs_convert_path_to_utf16(path, cifs_sb);
+-	if (utf16_path == NULL) {
+-		rc = -ENOMEM;
+-		goto notify_exit;
+-	}
+-
+ 	if (return_changes) {
+ 		if (copy_from_user(&notify, ioc_buf, sizeof(struct smb3_notify_info))) {
+ 			rc = -EFAULT;
+@@ -2411,18 +2440,8 @@ smb3_notify(const unsigned int xid, struct file *pfile,
+ 		notify.data_len = 0;
+ 	}
+ 
+-	tcon = cifs_sb_master_tcon(cifs_sb);
+-	oparms = (struct cifs_open_parms) {
+-		.tcon = tcon,
+-		.path = path,
+-		.desired_access = FILE_READ_ATTRIBUTES | FILE_READ_DATA,
+-		.disposition = FILE_OPEN,
+-		.create_options = cifs_create_options(cifs_sb, 0),
+-		.fid = &fid,
+-	};
+-
+-	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, NULL, NULL, NULL,
+-		       NULL);
++	rc = smb3_notify_open(xid, dentry, cifs_sb, page, &fid,
++			      &path, &utf16_path, &tcon);
+ 	if (rc)
+ 		goto notify_exit;
+ 
 -- 
 2.54.0
 
