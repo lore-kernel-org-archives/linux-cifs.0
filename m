@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AED93451B3
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 14:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA592F1FC7
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 14:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792279; cv=none; b=J3QrFxbMvf3/3Aed6kkkfRNe6vvfq3af2fdkM4Qh8/4kh3BypPFXzxzryw3WXe89pTGkIj6bPU2IboKOeqqptVGUptRkmPrfFqDMAbOPI30o6FKsK58yWYUi60DrsafWV9owv+cQB8bKdOzC8Iw5ll2Bn5xU75ApqIe4dE56x4M=
+	t=1781792282; cv=none; b=uQTOFoE5HLaYuZ6Z7tgKNB2clSQlzhSAV0mzGdcS8Azz2yI3JJySn85x/lf/eDjIYQ6/ejiXyz3irqJXcnQijJpU+qCEWxtxy47JxnjRjQenHIpD43ujNXrihHxBC9bC84SzRvu6609WPLDwZCB3Mrwu69FQOIhHUxcuCCZDjb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792279; c=relaxed/simple;
-	bh=dSYLD04dhwWQHbts6riy6n+AgOQ0qj3aQ7QK7t+WFwM=;
+	s=arc-20240116; t=1781792282; c=relaxed/simple;
+	bh=pX4DkmttiY1QfWMQNRKOoo+9OsEK1kfaQKsHcf+5oWE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=d7Ppp8ESz2H4ZwC9QYFJCEzRQG5fcWZrg1t/jRsDMJNDeFcijerYSzMT6Dcc3iPQD9mSn6FOl8edXrBXoRX4l90HYaRZwJDxjUAfntrIGJ2N78xCO1zGpuePnQ4m5UyF6yzAQVn+fPZgDZtSose3zViqiUV1oQJcZEXC4VsoyKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeACALbT; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=AevENL1hbk2+UfZv1NE24NPKMJjdZ1tp90aLnMY0RNb3ycJ50zLFhwv06Gs8oW+j+X1rjOt04KK23Kq+M+rZShwtXMw+yBlW/nvKAFgyMlFRkXLzxRrONFsUmwxT0Zx+0N32/cuAMPFajUuknb15+MVF1hGY1VmqhXvViN7UZzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uf6srseH; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeACALbT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07C601F000E9;
-	Thu, 18 Jun 2026 14:17:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uf6srseH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CAF21F00A3D;
+	Thu, 18 Jun 2026 14:17:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781792278;
-	bh=aPVNiqo6lmo30xhbadirZceoK+0Id9BFBCpX4a01DnQ=;
+	s=k20260515; t=1781792280;
+	bh=p0wKmSa/g3I0e9ZPiD+k+Dh/udDZu4/z9CHWo2Kg2As=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=LeACALbTv9oso7IakWV3c3WpXV7oP3U10ZT52jJPt5lqu/O2T9mqk4EK4uIlCMIjN
-	 e2UnAFtcEOccxyLbMrG8Q5swxVh2BxJO0A1po3L9gVqF7Wo8E6Kmi7p8agHqBJsl0k
-	 MlXz8kScGUrA0yots9afMED1/Xx3EYY2N8l6SG7clQXuloLbP+j7vy3aPf+nMYSL2c
-	 ibY57Rhce4q0X+cbT5WOzUhrXK7x3D0MVll37Wh/yXGNxyBiV4/TYTIqM/2Z/y5Fma
-	 jaPTsgEzQCUjY+WswLbF53py6hSOWvCb6asLCnYLM9WIZFfiCDLhIM2fSOiEph1k7B
-	 z+9p4A7BHLACg==
+	b=Uf6srseHZ5apxI/LoYcLnvb0cheKPi343z7TFS9ds7/Nackx3yladhHUsSnp27Wdt
+	 lVdND8U7+WchD4hP6IAnFt1rJXLRmrR2G2K8/jQXgs8XS+V/B/0Eld82l3amcW6EbT
+	 q7l26juYWEo7lkku5u2SJO7JdMx3twZlOIE2qrNJLVx4618Kbf3lx40dSwUdbtqM6M
+	 EgLDmjQdVFdJfiUC/moGJeYFtrIeprKlSXSKKxd/3U6baVcI8zwKpdYM3OQ8w2sQ6D
+	 D4Eh25TBxxncm1vMDwzEW/6WU5/aOV+0b+Lx54/2LHZ9Jdp+qbrXM/i//iQcjU6ikY
+	 NCH9dAuzzNJWw==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -34,9 +34,9 @@ Cc: smfrench@gmail.com,
 	metze@samba.org,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 07/14] ksmbd: treat unnamed DATA stream as base file
-Date: Thu, 18 Jun 2026 23:17:32 +0900
-Message-Id: <20260618141739.9029-7-linkinjeon@kernel.org>
+Subject: [PATCH 08/14] ksmbd: compute lease break-in-progress flag on response
+Date: Thu, 18 Jun 2026 23:17:33 +0900
+Message-Id: <20260618141739.9029-8-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260618141739.9029-1-linkinjeon@kernel.org>
 References: <20260618141739.9029-1-linkinjeon@kernel.org>
@@ -48,57 +48,102 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The SMB path suffix :: names the unnamed data stream of the base
-file, not an alternate data stream backed by a DosStream xattr.
+SMB2_LEASE_FLAG_BREAK_IN_PROGRESS is a transient create response flag,
+not persistent lease state.
 
-Canonicalize an empty stream name with an explicit  type to a NULL
-stream name after parsing. This keeps the base filename produced by
-strsep() and lets open continue through the normal base-file path instead
-of looking for a non-existent empty stream xattr.
+Do not store the flag in lease->flags when a same-key open is granted
+during a pending break. Instead, derive it from lease opens that are still
+waiting for a break ACK while building the lease create response, and keep
+lease->flags for persistent lease flags such as the parent lease key.
+
+This clears the flag naturally after the break ACK completes and fixes
+reopen responses that report BREAK_IN_PROGRESS after the lease is no
+longer breaking.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/misc.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ fs/smb/server/oplock.c | 41 +++++++++++++++++++++++++++++------------
+ 1 file changed, 29 insertions(+), 12 deletions(-)
 
-diff --git a/fs/smb/server/misc.c b/fs/smb/server/misc.c
-index 966004c414a8..2dd91c9e956a 100644
---- a/fs/smb/server/misc.c
-+++ b/fs/smb/server/misc.c
-@@ -121,7 +121,9 @@ int parse_stream_name(char *filename, char **stream_name, int *s_type)
- 	char *stream_type;
- 	char *s_name;
- 	int rc = 0;
-+	bool has_stream_type = false;
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 81716317bb61..b1740fe988e6 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -39,6 +39,23 @@ static bool lease_has_parent_key(struct lease *lease)
+ 	return lease->flags & SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
+ }
  
-+	*stream_name = NULL;
- 	s_name = filename;
- 	filename = strsep(&s_name, ":");
- 	ksmbd_debug(SMB, "filename : %s, streams : %s\n", filename, s_name);
-@@ -137,14 +139,20 @@ int parse_stream_name(char *filename, char **stream_name, int *s_type)
- 
- 		ksmbd_debug(SMB, "stream name : %s, stream type : %s\n", s_name,
- 			    stream_type);
--		if (!strncasecmp("$data", stream_type, 5))
-+		if (!strncasecmp("$data", stream_type, 5)) {
- 			*s_type = DATA_STREAM;
--		else if (!strncasecmp("$index_allocation", stream_type, 17))
-+			has_stream_type = true;
-+		} else if (!strncasecmp("$index_allocation", stream_type, 17)) {
- 			*s_type = DIR_STREAM;
--		else
-+			has_stream_type = true;
-+		} else {
- 			rc = -ENOENT;
-+		}
- 	}
- 
-+	if (has_stream_type && !s_name[0] && *s_type == DATA_STREAM)
-+		goto out;
++static bool lease_break_in_progress(struct lease *lease)
++{
++	struct oplock_info *opinfo;
++	bool ret = false;
 +
- 	*stream_name = s_name;
- out:
- 	return rc;
++	spin_lock(&lease->lock);
++	list_for_each_entry(opinfo, &lease->open_list, lease_entry) {
++		if (opinfo->op_state == OPLOCK_ACK_WAIT) {
++			ret = true;
++			break;
++		}
++	}
++	spin_unlock(&lease->lock);
++
++	return ret;
++}
++
+ /**
+  * alloc_opinfo() - allocate a new opinfo object for oplock info
+  * @work:	smb work
+@@ -1292,15 +1309,12 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 		if (m_opinfo) {
+ 			lease_put(opinfo->o_lease);
+ 			lease_get(m_opinfo->o_lease);
+-			opinfo->o_lease = m_opinfo->o_lease;
+-			opinfo->level = m_opinfo->level;
+-			new_lease = false;
+-			if (atomic_read(&m_opinfo->breaking_cnt))
+-				opinfo->o_lease->flags |=
+-					SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
+-			opinfo_put(m_opinfo);
+-			goto out;
+-		}
++				opinfo->o_lease = m_opinfo->o_lease;
++				opinfo->level = m_opinfo->level;
++				new_lease = false;
++				opinfo_put(m_opinfo);
++				goto out;
++			}
+ 	}
+ 	prev_opinfo = opinfo_get_list(ci);
+ 	if (!prev_opinfo ||
+@@ -1521,13 +1535,15 @@ void create_lease_buf(u8 *rbuf, struct lease *lease)
+ {
+ 	if (lease->version == 2) {
+ 		struct create_lease_v2 *buf = (struct create_lease_v2 *)rbuf;
+-		__le32 flags = lease->flags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
++		__le32 flags = 0;
+ 
+ 		memset(buf, 0, sizeof(struct create_lease_v2));
+ 		memcpy(buf->lcontext.LeaseKey, lease->lease_key,
+ 		       SMB2_LEASE_KEY_SIZE);
+ 		if (lease_has_parent_key(lease))
+ 			flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
++		if (lease_break_in_progress(lease))
++			flags |= SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
+ 		buf->lcontext.LeaseFlags = flags;
+ 		buf->lcontext.Epoch = cpu_to_le16(lease->epoch);
+ 		buf->lcontext.LeaseState = lease->state;
+@@ -1549,8 +1565,9 @@ void create_lease_buf(u8 *rbuf, struct lease *lease)
+ 
+ 		memset(buf, 0, sizeof(struct create_lease));
+ 		memcpy(buf->lcontext.LeaseKey, lease->lease_key, SMB2_LEASE_KEY_SIZE);
+-		buf->lcontext.LeaseFlags =
+-			lease->flags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
++		if (lease_break_in_progress(lease))
++			buf->lcontext.LeaseFlags =
++				SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
+ 		buf->lcontext.LeaseState = lease->state;
+ 		buf->ccontext.DataOffset = cpu_to_le16(offsetof
+ 				(struct create_lease, lcontext));
 -- 
 2.25.1
 
