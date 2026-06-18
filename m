@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893B02F1FC7
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 14:18:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125CE2609DC
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 14:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792294; cv=none; b=qevWxUBIM8hm06dvt0S7iRs0CIxs3xWAzVO8fPtLmefdRtw3ml3FFE16wbd3SHAWrODQpuX/vDV0W8U3wqvDljrlZPPBgleGunXhj5BBRuIkqY0r74jK1xmfQdtfYjk8hcBNh9YXwgFuKTm4aTT8dm6MhStvLDXI4JPXEY866+A=
+	t=1781792297; cv=none; b=VHY60UOQ4QvmxgtBFtpMHx5MGAbGCXXphnU5ZN0tKB6s/oyKGpVJEG3QNlkLb8T/skWpfavaWl5j15WdArJO12XDHs9V7aBBXuF3rvTTSPHBd40OXNksYo49/vJ21CnvT2ozCP+5y1M0ie2MGlISs0zZPstkuvA2XaNLvM6y1vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792294; c=relaxed/simple;
-	bh=pDlfnQkuYOphkHpXmcI1wQvWjnpRiz6l12P/mZKP+SU=;
+	s=arc-20240116; t=1781792297; c=relaxed/simple;
+	bh=2aN3faIBm5MuVGgcXdGwCXHqQDg1gAp5H04B9z9afQw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Rf60gPoDWVWXrRN3ymDHZiiniyyTTp2TXadtLWU1ov87QbDcPcURzu4xxMTKE68Iectuca8t5Yft+l8pA6ReyO94OyX7un4dduwlbHAUxop5xbCsOzsR8VKQIlkWCpBgR/QL3SLD18hjGAxM3WS7Q0YSqRvG9jWhnH8Xnf5372U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwXp86p9; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=shrPmaf34OLlinC6Qg/NH7PGqpGzbTWZtAifs0h4S3ySQInW8VdfgND4aoBMIFtl93Bp92lS4pO7wbojvAP348UabmoaO6Z4XZvuR2Ro2jChrhRTKZkE/r4aJAmn/Zga+lspc94rVtxjaZgpdBpN74lYGPCU97JMzleGbf/xyog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D72mNQrn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwXp86p9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276171F00A3D;
-	Thu, 18 Jun 2026 14:18:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D72mNQrn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C4081F000E9;
+	Thu, 18 Jun 2026 14:18:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781792293;
-	bh=A+vByUjnegAMv7Gmt16DHxFOF5SVDxH5mhPPpCweo68=;
+	s=k20260515; t=1781792295;
+	bh=N5wYmBALR4wb7u4vvtsbp7D4dfOLQ9M8108F6XwgxcA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cwXp86p9N6IfnZAeUeG4FKngXxmL2I+F9g0PT7jj/UB6PB7MWdbGdUzmWIs2iIDkK
-	 7VhDpvEB9HhJs1SrSays45oJgsNyMjK34vtXZFfnlyCC77f0iJhmXtLWLE5+jspnjV
-	 Jv1SS5XV3OkU6JwGFNxpPTcdW+Rji+XapuGZT5wqO8ryL2V9bt9nuaF8/e6NcBCz5l
-	 xpRfjdLhlPn14DsI9Bgs/gA/O/9AoJxr3ULZmtEYJdaKB1uZCWz//bwN6/jgvUg53d
-	 r4WDb0dRdgWsMhFoJkRmgEuqaBxUQ0BCS/uKZGEguUli934B/BQvgowoUN+RtkC0wh
-	 KIyqO82n1qL5A==
+	b=D72mNQrnyoRmR43R1Zq2aNoYsH/Z771+n7JxbBeJXRl9gpwCDkWwO48aN06BO4c62
+	 jwKkBsKjPTT/8ZJDnNDQVYX8WYWoTn+uVaYVEEVilvI9RPeCi2qs4KgWG1jkRFimqr
+	 u/sv1oBT2/GP6dCekl/Wt8hrcEuTR9yIp8sMfLcwjgLuIUGTiVEqNxV6T65rmxOMlb
+	 VIaqgeKc5P3skUzObsA0OAFpis2//HpdxZHbqw23DY7GYX4yjqPVarm/HstXeOAIrX
+	 kUHeyFzc3IB+6kdaCVkGOBExYt3RvLxwPsfUuFQKG4vJ5l0eA3S2SDV3ASNoSl8yTZ
+	 rbKqjMSUW4EnA==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -34,9 +34,9 @@ Cc: smfrench@gmail.com,
 	metze@samba.org,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 13/14] ksmbd: route v2 lease breaks on the client lease channel
-Date: Thu, 18 Jun 2026 23:17:38 +0900
-Message-Id: <20260618141739.9029-13-linkinjeon@kernel.org>
+Subject: [PATCH 14/14] ksmbd: keep common response iovecs in the work item
+Date: Thu, 18 Jun 2026 23:17:39 +0900
+Message-Id: <20260618141739.9029-14-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260618141739.9029-1-linkinjeon@kernel.org>
 References: <20260618141739.9029-1-linkinjeon@kernel.org>
@@ -48,87 +48,132 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-v2 leases are scoped by ClientGuid.  When the same client uses multiple
-connections, smbtorture expects lease break notifications to be sent on
-the connection associated with the client lease table, not necessarily
-on the connection that owns the individual open being broken.
+Most SMB responses need no more than four kvec entries, but every work
+item currently allocates a separate four-entry array and frees it after
+the response is sent.
 
-Keep a referenced connection in the lease table and use it for v2 lease
-break notifications while it is still active.  Fall back to the open's
-connection if the table connection is being released.
+Embed the common array in struct ksmbd_work and allocate a larger array
+only when a response exceeds the inline capacity. This removes one
+allocation and one free from the common request path while preserving
+support for larger compound and read responses.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/oplock.c | 17 +++++++++++++++--
- fs/smb/server/oplock.h |  1 +
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ fs/smb/server/ksmbd_work.c | 58 ++++++++++++++++++++++++--------------
+ fs/smb/server/ksmbd_work.h |  3 ++
+ 2 files changed, 40 insertions(+), 21 deletions(-)
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 9efc66fef2e6..400a3f2f8489 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -141,11 +141,21 @@ static struct lease_table *alloc_lease_table(struct oplock_info *opinfo)
+diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
+index a5ab6799a65c..e2c2f45264be 100644
+--- a/fs/smb/server/ksmbd_work.c
++++ b/fs/smb/server/ksmbd_work.c
+@@ -16,6 +16,36 @@
+ static struct kmem_cache *work_cache;
+ static struct workqueue_struct *ksmbd_wq;
  
- 	memcpy(lb->client_guid, opinfo->conn->ClientGUID,
- 	       SMB2_CLIENT_GUID_SIZE);
-+	lb->conn = ksmbd_conn_get(opinfo->conn);
- 	INIT_LIST_HEAD(&lb->lease_list);
- 	spin_lock_init(&lb->lb_lock);
- 	return lb;
- }
- 
-+static void free_lease_table(struct lease_table *lb)
++static int ksmbd_reserve_iov(struct ksmbd_work *work, int need_iov_cnt)
 +{
-+	if (!lb)
-+		return;
++	struct kvec *new;
++	int new_alloc_cnt = work->iov_alloc_cnt;
 +
-+	ksmbd_conn_put(lb->conn);
-+	kfree(lb);
++	if (work->iov_alloc_cnt >= work->iov_cnt + need_iov_cnt)
++		return 0;
++
++	do {
++		new_alloc_cnt += KSMBD_WORK_INLINE_IOVS;
++	} while (new_alloc_cnt < work->iov_cnt + need_iov_cnt);
++
++	if (work->iov == work->iov_inline) {
++		new = kcalloc(new_alloc_cnt, sizeof(*new), KSMBD_DEFAULT_GFP);
++		if (!new)
++			return -ENOMEM;
++
++		memcpy(new, work->iov_inline, sizeof(work->iov_inline));
++	} else {
++		new = krealloc(work->iov, sizeof(*new) * new_alloc_cnt,
++			       KSMBD_DEFAULT_GFP | __GFP_ZERO);
++		if (!new)
++			return -ENOMEM;
++	}
++
++	work->iov = new;
++	work->iov_alloc_cnt = new_alloc_cnt;
++	return 0;
 +}
 +
- static struct lease *alloc_lease(struct lease_ctx_info *lctx,
- 				 struct ksmbd_inode *ci)
+ struct ksmbd_work *ksmbd_alloc_work_struct(void)
  {
-@@ -942,6 +952,9 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo, bool wait_ack,
- 	struct lease *lease = opinfo->o_lease;
- 
- 	conn = READ_ONCE(opinfo->conn);
-+	if (lease->version == 2 && lease->l_lb && lease->l_lb->conn &&
-+	    !ksmbd_conn_releasing(lease->l_lb->conn))
-+		conn = lease->l_lb->conn;
- 	if (!conn)
- 		return 0;
- 
-@@ -1134,7 +1147,7 @@ void destroy_lease_table(struct ksmbd_conn *conn)
- 		list_for_each_entry_safe(lease, ltmp, &lb->lease_list, l_entry)
- 			lease_del_table(lease);
- 		list_del(&lb->l_entry);
--		kfree(lb);
-+		free_lease_table(lb);
+ 	struct ksmbd_work *work = kmem_cache_zalloc(work_cache, KSMBD_DEFAULT_GFP);
+@@ -27,13 +57,8 @@ struct ksmbd_work *ksmbd_alloc_work_struct(void)
+ 		INIT_LIST_HEAD(&work->async_request_entry);
+ 		INIT_LIST_HEAD(&work->fp_entry);
+ 		INIT_LIST_HEAD(&work->aux_read_list);
+-		work->iov_alloc_cnt = 4;
+-		work->iov = kzalloc_objs(struct kvec, work->iov_alloc_cnt,
+-					 KSMBD_DEFAULT_GFP);
+-		if (!work->iov) {
+-			kmem_cache_free(work_cache, work);
+-			work = NULL;
+-		}
++		work->iov_alloc_cnt = ARRAY_SIZE(work->iov_inline);
++		work->iov = work->iov_inline;
  	}
- 	write_unlock(&lease_list_lock);
+ 	return work;
  }
-@@ -1193,7 +1206,7 @@ static void add_lease_global_list(struct lease *lease, struct ksmbd_conn *conn,
- 			    SMB2_CLIENT_GUID_SIZE)) {
- 			lease_add_table(lease, lb);
- 			write_unlock(&lease_list_lock);
--			kfree(new_lb);
-+			free_lease_table(new_lb);
- 			return;
- 		}
- 	}
-diff --git a/fs/smb/server/oplock.h b/fs/smb/server/oplock.h
-index 1dd52b44557f..8d1943586246 100644
---- a/fs/smb/server/oplock.h
-+++ b/fs/smb/server/oplock.h
-@@ -34,6 +34,7 @@ struct lease_ctx_info {
+@@ -55,7 +80,8 @@ void ksmbd_free_work_struct(struct ksmbd_work *work)
+ 	kfree(work->tr_buf);
+ 	kvfree(work->compress_buf);
+ 	kvfree(work->request_buf);
+-	kfree(work->iov);
++	if (work->iov != work->iov_inline)
++		kfree(work->iov);
  
- struct lease_table {
- 	char			client_guid[SMB2_CLIENT_GUID_SIZE];
-+	struct ksmbd_conn	*conn;
- 	struct list_head	lease_list;
- 	struct list_head	l_entry;
- 	spinlock_t		lb_lock;
+ 	if (work->async_id)
+ 		ksmbd_release_id(&work->conn->async_ida, work->async_id);
+@@ -117,19 +143,9 @@ static int __ksmbd_iov_pin_rsp(struct ksmbd_work *work, void *ib, int len,
+ 			return -ENOMEM;
+ 	}
+ 
+-	if (work->iov_alloc_cnt < work->iov_cnt + need_iov_cnt) {
+-		struct kvec *new;
+-
+-		work->iov_alloc_cnt += 4;
+-		new = krealloc(work->iov,
+-			       sizeof(struct kvec) * work->iov_alloc_cnt,
+-			       KSMBD_DEFAULT_GFP | __GFP_ZERO);
+-		if (!new) {
+-			kfree(ar);
+-			work->iov_alloc_cnt -= 4;
+-			return -ENOMEM;
+-		}
+-		work->iov = new;
++	if (ksmbd_reserve_iov(work, need_iov_cnt)) {
++		kfree(ar);
++		return -ENOMEM;
+ 	}
+ 
+ 	/* Plus rfc_length size on first iov */
+diff --git a/fs/smb/server/ksmbd_work.h b/fs/smb/server/ksmbd_work.h
+index 0da8cc0972d6..5368430561fb 100644
+--- a/fs/smb/server/ksmbd_work.h
++++ b/fs/smb/server/ksmbd_work.h
+@@ -13,6 +13,8 @@ struct ksmbd_conn;
+ struct ksmbd_session;
+ struct ksmbd_tree_connect;
+ 
++#define KSMBD_WORK_INLINE_IOVS	4
++
+ enum {
+ 	KSMBD_WORK_ACTIVE = 0,
+ 	KSMBD_WORK_CANCELLED,
+@@ -42,6 +44,7 @@ struct ksmbd_work {
+ 	int				iov_alloc_cnt;
+ 	int				iov_cnt;
+ 	int				iov_idx;
++	struct kvec			iov_inline[KSMBD_WORK_INLINE_IOVS];
+ 
+ 	/* Next cmd hdr in compound req buf*/
+ 	int                             next_smb2_rcv_hdr_off;
 -- 
 2.25.1
 
