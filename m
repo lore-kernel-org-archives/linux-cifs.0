@@ -1,40 +1,49 @@
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1A427816C
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 15:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.164.118
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0506F31E820
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 17:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781796530; cv=none; b=ut/S/JXcy5rDaasC3L4Xyg4dErLLrplE1M7qS1XtZYA8MYiSqdW4AR8t6iSjFLeDDFdp2RSRYLe6Cf0IbnNZ69+pk1VOrsWGvi8JNMhKqbB8rHhzbyCa48UPMRpj1D0yDG5tmJysvN7y4cvdcIOM25Y2bzIN1BZPuxYzVdLmbVA=
+	t=1781802186; cv=none; b=b+eH9sEltMbRiovc6FbSX5slTehlo0gNe8wIuSK0kIxP/bYjHtEIDmbr7rQQzOsCffXCvvpq0EFZ2ewdKUw1u6oZITF4obfo2cMS93wSjQSa2QOxUIzkMNqtc01zfiIDDUsay3taoKCDmt2SbPgHHKd2Zir8Wrn0HKK2eQOzEkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781796530; c=relaxed/simple;
-	bh=lke/UN6b5fI0sSfVnTaXTGrzoa6dGUNofXKcUbFYbb0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IjFkN5MGIZvMlOOSs5x/493QLZhc5bkCZT4NhaRwy3Jeuegto8Zwm2wUm4S+Q/00reJeNEgqJqc29X0uwCpXtkp9PqNz1f42bw9tPlsjysc56JflrBuWfPiZXWP9u1IHhqoYlcERYpZqQ2jvwZ+Nc3bfWhkOFcWGlrM/LBLxMm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=162.243.164.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowACXs72LDjRqvKWUAA--.44665S3;
-	Thu, 18 Jun 2026 23:28:14 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: sfrench@samba.org,
+	s=arc-20240116; t=1781802186; c=relaxed/simple;
+	bh=F77SZg/sZ/piD5kUQ2SFfI8zOo4fCi9+OfCQLMftEEc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p1mvG3ciDOCHm5WYfulVRyoextzR+6qEvXzc0/eNF4Jaz/5qSA9Dnm66ZTOIgmpPbAJksZtIWigrvhYsE/bWxx+R33zIIQw3eyoICus0JbFTabhqj6ZZG5HMf0Ss5gclfoeNVdhHEHfPpFAQQUyflM/NYW6104eK3IDjCjJawPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=ifrBlWAZ; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="ifrBlWAZ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1781802179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UdU9SurTQu/FuBd2O1l/zrKVszrxAtIFrDjX4R6Tlp0=;
+	b=ifrBlWAZvZhFoDAq6Z7B86G0bIvq6Z3OyyTcc7qTVQqDlirIwyRXbD3q1YhLHBbk521SRP
+	GSYBLHRk9QEC4TqlG53fOuVKE2Q+s8evYRVokDkAUSkWRUCKOJo30aX9EhJagkA2WzCw93
+	mOFvubzk2dY61KbG7/hMMXuNyhY4n+uVSI/v88EYugCivByI3Xts2WqiSrZXZFJDiNraEV
+	iR9qpvItI4e+nmbSka12u+fFDxqFAYW5z5bAVmmHiKxGm556qfynOttmlVGEN/aUT8HNiB
+	2QCy4Kq7qmbU9dZsOAdlFTeikR3pbDHIRx5tc3p7vl1Bo+WxH/wCIcGIvJG7dw==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
 	pc@manguebit.org,
 	ronniesahlberg@gmail.com,
 	sprasad@microsoft.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
-	yuantan098@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	zzhan461@ucr.edu,
-	n05ec@lzu.edu.cn
-Subject: [PATCH smb 1/1] smb: client: fix double-free in SMB2_flush() replay
-Date: Thu, 18 Jun 2026 23:28:05 +0800
-Message-ID: <590ab8fd378a195174f33902b71ffb926b610a46.1781768474.git.zzhan461@ucr.edu>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1781768474.git.zzhan461@ucr.edu>
-References: <cover.1781768474.git.zzhan461@ucr.edu>
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [RFC PATCH 0/2] smb/client: improve change notify support
+Date: Thu, 18 Jun 2026 17:02:00 +0000
+Message-ID: <20260618170202.244402-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -42,62 +51,46 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowACXs72LDjRqvKWUAA--.44665S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFyfXryxGF1DAFy5Kr45Jrb_yoW8Xry7pr
-	s0qFyDGrZxXryIya1kAa47Xa4SyFyDua4akrW3JrnrZa45Xr4Y9F9a9wnxXryUZrW8urWj
-	kF4qyF4qqa98ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
-	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
-	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
-	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
-	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
-	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
-	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQACCWozqlMImwAAs5
+X-Migadu-Flow: FLOW_OUT
 
-From: Zhao Zhang <zzhan461@ucr.edu>
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-SMB2_flush() keeps its response buffer bookkeeping across replay
-attempts. If a replayable flush response is received and the retry then
-fails before cifs_send_recv() stores a replacement response, flush_exit
-will free the stale response pointer a second time.
+I still need to do more debugging on this patchset, for example to check
+whether there is any race between `ioctl(CIFS_IOC_NOTIFY_INFO)` and
+`readdir()`. Maybe I can send this patchset to the mailing list first
+to get more suggestions from others.
 
-Reinitialize resp_buftype and rsp_iov at the top of the replay loop so
-cleanup only acts on response state produced by the current attempt.
-This fixes a double-free without changing replay handling for successful
-requests.
+Before this patchset, when an operation on the server triggered multiple
+actions, the client received only one action notification.
 
-Fixes: 4f1fffa23769 ("cifs: commands that are retried should have replay flag set")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:GPT-5.4
-Signed-off-by: Zhao Zhang <zzhan461@ucr.edu>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- fs/smb/client/smb2pdu.c | 2 ++
- 1 file changed, 2 insertions(+)
+After this patchset, the client can receive all action notifications.
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 958ca0753774..2d7b147f2892 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4433,6 +4433,8 @@ SMB2_flush(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 
- replay_again:
- 	/* reinitialize for possible replay */
-+	resp_buftype = CIFS_NO_BUFFER;
-+	memset(&rsp_iov, 0, sizeof(rsp_iov));
- 	flags = 0;
- 	server = cifs_pick_channel(ses);
- 
+Example:
+
+  smbinfo notify /mnt
+  
+  # server: touch /export/file1
+  Notifications received, returned data_len is 24
+  Action: 0x00000001, FileName: file1
+  Notifications received, returned data_len is 24
+  Action: 0x00000003, FileName: file1
+  
+  # server: mv /export/file1 /export/file2
+  Notifications received, returned data_len is 48
+  Action: 0x00000004, FileName: file1
+  Action: 0x00000005, FileName: file2
+  Notifications received, returned data_len is 24
+  Action: 0x00000003, FileName: file2
+  Notifications received, returned data_len is 24
+  Action: 0x00000002, FileName: file1
+
+ChenXiaoSong (2):
+  smb/client: introduce smb3_notify_open()
+  smb/client: do not call SMB2_close() in smb3_notify()
+
+ fs/smb/client/smb2ops.c | 120 ++++++++++++++++++++++++++++------------
+ 1 file changed, 86 insertions(+), 34 deletions(-)
+
 -- 
-2.47.3
+2.54.0
 
