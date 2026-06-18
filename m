@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B6B2609DC
-	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 14:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893B02F1FC7
+	for <linux-cifs@vger.kernel.org>; Thu, 18 Jun 2026 14:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781792292; cv=none; b=Q/dm+19bZTZwOpcUNQ0JhO5dwON+uKOuNDLuZlHyqsq0gLHMJCholePwRqm7RGI/r9q/JOnZMfmtTVyu14pu1Y8E6nm+97133Pk5MPRia3ln3CCdhQEZKQNqe4T07pnadqH7QXHfjPkdFKKmQCJQyHPPrsKzRgVJZW5R3s2Ef0k=
+	t=1781792294; cv=none; b=qevWxUBIM8hm06dvt0S7iRs0CIxs3xWAzVO8fPtLmefdRtw3ml3FFE16wbd3SHAWrODQpuX/vDV0W8U3wqvDljrlZPPBgleGunXhj5BBRuIkqY0r74jK1xmfQdtfYjk8hcBNh9YXwgFuKTm4aTT8dm6MhStvLDXI4JPXEY866+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781792292; c=relaxed/simple;
-	bh=QGkoshxyufZgN85m5IlPvV2VSRgH0odbQ1U+cofR0kA=;
+	s=arc-20240116; t=1781792294; c=relaxed/simple;
+	bh=pDlfnQkuYOphkHpXmcI1wQvWjnpRiz6l12P/mZKP+SU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mQPCt1bKq7nJh3IFk/+klGK5ljZyfarwuYfN2/cvyysvsaxL55wIUpyNXNyVZKMBivjUEX4PLePiPbmwkUCHtvOgBFdmzQEvYL8Sud8K0Uwc4dMJbLyxYDiY4AD7Ul4WNQVYimm96b8HfVGGqGiwSehasxQNAbbWcy2z91hkeMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QjbPC/iE; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Rf60gPoDWVWXrRN3ymDHZiiniyyTTp2TXadtLWU1ov87QbDcPcURzu4xxMTKE68Iectuca8t5Yft+l8pA6ReyO94OyX7un4dduwlbHAUxop5xbCsOzsR8VKQIlkWCpBgR/QL3SLD18hjGAxM3WS7Q0YSqRvG9jWhnH8Xnf5372U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwXp86p9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QjbPC/iE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8DB91F000E9;
-	Thu, 18 Jun 2026 14:18:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwXp86p9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276171F00A3D;
+	Thu, 18 Jun 2026 14:18:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781792291;
-	bh=1dO+cm3NsqvPGP8rEUM8+hvgPUIS7tydwWt725UqPo0=;
+	s=k20260515; t=1781792293;
+	bh=A+vByUjnegAMv7Gmt16DHxFOF5SVDxH5mhPPpCweo68=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=QjbPC/iErRhPqwJPSLINRSGWXgpisUlInQgx5ZPrk/NCcwVwcyqatyawp+nRN379N
-	 xE3LlJwtaj/jV3A/+jCnRPH1UCwF9HGxuduNBkojBr47/mTda7LkRy8+amM5FByMXv
-	 c4+vTCTUq+5GXAPZpBemX0ZMkDI57q1UYzQm91fIIQyTKYCRHzl+lXSuKUT664HQt7
-	 xuysRsX41SoJWLM/6yj3ChXVc35yqscARQ7gSDr39SXUirt1hV/zvyvD38ws9LGXqm
-	 6twFyydk9AK0rdnb1WXvydBuPkUafYYEfDrBBcfau1hph7p7rrvxxLRFo7lW95Du+k
-	 0a+8c/gyv++0g==
+	b=cwXp86p9N6IfnZAeUeG4FKngXxmL2I+F9g0PT7jj/UB6PB7MWdbGdUzmWIs2iIDkK
+	 7VhDpvEB9HhJs1SrSays45oJgsNyMjK34vtXZFfnlyCC77f0iJhmXtLWLE5+jspnjV
+	 Jv1SS5XV3OkU6JwGFNxpPTcdW+Rji+XapuGZT5wqO8ryL2V9bt9nuaF8/e6NcBCz5l
+	 xpRfjdLhlPn14DsI9Bgs/gA/O/9AoJxr3ULZmtEYJdaKB1uZCWz//bwN6/jgvUg53d
+	 r4WDb0dRdgWsMhFoJkRmgEuqaBxUQ0BCS/uKZGEguUli934B/BQvgowoUN+RtkC0wh
+	 KIyqO82n1qL5A==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -34,9 +34,9 @@ Cc: smfrench@gmail.com,
 	metze@samba.org,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 12/14] ksmbd: break RH leases before delete-on-close
-Date: Thu, 18 Jun 2026 23:17:37 +0900
-Message-Id: <20260618141739.9029-12-linkinjeon@kernel.org>
+Subject: [PATCH 13/14] ksmbd: route v2 lease breaks on the client lease channel
+Date: Thu, 18 Jun 2026 23:17:38 +0900
+Message-Id: <20260618141739.9029-13-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260618141739.9029-1-linkinjeon@kernel.org>
 References: <20260618141739.9029-1-linkinjeon@kernel.org>
@@ -48,66 +48,87 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The delete paths only marked the opened file delete pending or
-delete-on-close.  When another client still held a read/handle lease, no
-lease break was sent before the delete state changed.
+v2 leases are scoped by ClientGuid.  When the same client uses multiple
+connections, smbtorture expects lease break notifications to be sent on
+the connection associated with the client lease table, not necessarily
+on the connection that owns the individual open being broken.
 
-smb2.lease.unlink uses a create request with FILE_DELETE_ON_CLOSE and
-expects the second client's unlink to break the first client's RH lease to
-R with ACK_REQUIRED set.  SetInfo(FileDispositionInformation) has the same
-lease-breaking requirement.
-
-Break level-II/read-handle leases before setting delete pending or
-delete-on-close so clients are notified before the file is removed.
+Keep a referenced connection in the lease table and use it for v2 lease
+break notifications while it is still active.  Fall back to the open's
+connection if the table connection is being released.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ fs/smb/server/oplock.c | 17 +++++++++++++++--
+ fs/smb/server/oplock.h |  1 +
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ef5f7c056b4d..03dc879d2d8b 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3653,8 +3653,10 @@ int smb2_open(struct ksmbd_work *work)
- 			goto err_out1;
- 	}
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 9efc66fef2e6..400a3f2f8489 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -141,11 +141,21 @@ static struct lease_table *alloc_lease_table(struct oplock_info *opinfo)
  
--	if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE)
-+	if (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE) {
-+		smb_break_all_levII_oplock(work, fp, 0);
- 		ksmbd_fd_set_delete_on_close(fp, file_info);
-+	}
- 
- 	if (need_truncate) {
- 		rc = smb2_create_truncate(&fp->filp->f_path);
-@@ -6584,7 +6586,8 @@ static int set_rename_info(struct ksmbd_work *work, struct ksmbd_file *fp,
- 	return smb2_rename(work, fp, rename_info, work->conn->local_nls);
+ 	memcpy(lb->client_guid, opinfo->conn->ClientGUID,
+ 	       SMB2_CLIENT_GUID_SIZE);
++	lb->conn = ksmbd_conn_get(opinfo->conn);
+ 	INIT_LIST_HEAD(&lb->lease_list);
+ 	spin_lock_init(&lb->lb_lock);
+ 	return lb;
  }
  
--static int set_file_disposition_info(struct ksmbd_file *fp,
-+static int set_file_disposition_info(struct ksmbd_work *work,
-+				     struct ksmbd_file *fp,
- 				     struct smb2_file_disposition_info *file_info)
++static void free_lease_table(struct lease_table *lb)
++{
++	if (!lb)
++		return;
++
++	ksmbd_conn_put(lb->conn);
++	kfree(lb);
++}
++
+ static struct lease *alloc_lease(struct lease_ctx_info *lctx,
+ 				 struct ksmbd_inode *ci)
  {
- 	struct inode *inode;
-@@ -6599,6 +6602,7 @@ static int set_file_disposition_info(struct ksmbd_file *fp,
- 		if (S_ISDIR(inode->i_mode) &&
- 		    ksmbd_vfs_empty_dir(fp) == -ENOTEMPTY)
- 			return -EBUSY;
-+		smb_break_all_levII_oplock(work, fp, 0);
- 		ksmbd_set_inode_pending_delete(fp);
- 	} else {
- 		ksmbd_clear_inode_pending_delete(fp);
-@@ -6725,7 +6729,7 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		if (buf_len < sizeof(struct smb2_file_disposition_info))
- 			return -EMSGSIZE;
+@@ -942,6 +952,9 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo, bool wait_ack,
+ 	struct lease *lease = opinfo->o_lease;
  
--		return set_file_disposition_info(fp,
-+		return set_file_disposition_info(work, fp,
- 						 (struct smb2_file_disposition_info *)buffer);
+ 	conn = READ_ONCE(opinfo->conn);
++	if (lease->version == 2 && lease->l_lb && lease->l_lb->conn &&
++	    !ksmbd_conn_releasing(lease->l_lb->conn))
++		conn = lease->l_lb->conn;
+ 	if (!conn)
+ 		return 0;
+ 
+@@ -1134,7 +1147,7 @@ void destroy_lease_table(struct ksmbd_conn *conn)
+ 		list_for_each_entry_safe(lease, ltmp, &lb->lease_list, l_entry)
+ 			lease_del_table(lease);
+ 		list_del(&lb->l_entry);
+-		kfree(lb);
++		free_lease_table(lb);
  	}
- 	case FILE_FULL_EA_INFORMATION:
+ 	write_unlock(&lease_list_lock);
+ }
+@@ -1193,7 +1206,7 @@ static void add_lease_global_list(struct lease *lease, struct ksmbd_conn *conn,
+ 			    SMB2_CLIENT_GUID_SIZE)) {
+ 			lease_add_table(lease, lb);
+ 			write_unlock(&lease_list_lock);
+-			kfree(new_lb);
++			free_lease_table(new_lb);
+ 			return;
+ 		}
+ 	}
+diff --git a/fs/smb/server/oplock.h b/fs/smb/server/oplock.h
+index 1dd52b44557f..8d1943586246 100644
+--- a/fs/smb/server/oplock.h
++++ b/fs/smb/server/oplock.h
+@@ -34,6 +34,7 @@ struct lease_ctx_info {
+ 
+ struct lease_table {
+ 	char			client_guid[SMB2_CLIENT_GUID_SIZE];
++	struct ksmbd_conn	*conn;
+ 	struct list_head	lease_list;
+ 	struct list_head	l_entry;
+ 	spinlock_t		lb_lock;
 -- 
 2.25.1
 
