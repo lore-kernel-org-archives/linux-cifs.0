@@ -1,95 +1,240 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF453976A0
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Jun 2026 14:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD9E349B0D;
+	Fri, 19 Jun 2026 19:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781878076; cv=none; b=tl/turPWbXWE6sW+Mw7Vz4VY3OhbSkkKX97fzG3QsePzRSCbmF51zQ87JL5Qe+9IKxJIgaOLNlvwFNZppx0Mqv6N2ow2Kq6N0YneJCNzysd625Te9hsj5nqPZeNDatsmZMTYQI/j5A9T75Z85kktRQESgpzGb7jLJAt0FPP71d4=
+	t=1781897557; cv=none; b=L640veypqBp/N1f2M7vWjMlU4mqMW0PYffvpNBBxhNYB9Qcz58XkstFWRs9csS5+vfNqmNrOk8cE2VOoCbZDOSqq5HAJcQHaNcI6a5SaegAx02wnACsG7eJq6vyd416qOriJPhFRqy65qNpE4Fh9jyCeCGCF/EhdfLCVUvJOBzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781878076; c=relaxed/simple;
-	bh=SiDpiHDUcDGkcTTZaj5jmTTyyFYfCT7X71HEPxLTt5w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oAkreres3QKQ+sktJhTrZO5o/U0PMcWf/3+JQrYpNfQADb9dwT1rp0K3neCMEjLb13ldvVc1mRi2egj/hMmzFHJ0d5gxpfNswFl/Cj3pGrk/oCXvHe98YaP6u/pPcq2eOHRLXrKNBHMuy82ZrG4IgO6H7YKwAnK6yAanLe9KyuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W5FoTdFR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1781897557; c=relaxed/simple;
+	bh=gHc8zi5miNpM28ukI1VhOAt03eXkjT0Uh8qx72KdouQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i2HHIcoqXGTzR4nef8D7PBzVyVkaf6mmMgvzi9XZaZ8sk0/FTD1WeGO6+ythhKRsgkfg/vxGXN6S0abES9xIgvMJGsqTy9gHSF0euqZ4C4hcogytSnHMSuYHaS9x7tSzeY4sgP/ThafCI+ZLbdYdhWLcqEsceKqT2EzqLJVSQxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=axv1ytRK; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5FoTdFR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781878074;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F6dv38lkMbVidCMwZh3umBzwGuE5b7Ehwa5DFjmWEmE=;
-	b=W5FoTdFRLUJUx6RiDRveYJ1KzDlmaoATMxh0DN3so83sHwcbklBPQVd+4UZq4OpTHtnh7w
-	xm1klBZkJSH4IThHthNfgXZurye92n9j8IxLVD+/aPDTZ57RK8ftpC1HP5A+7bvIZZ/di+
-	31JwQsBVSQTDPMBMXVZ6HZj53Y1b020=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-468-aTBpRM8zPymLxWXwVxd3nA-1; Fri,
- 19 Jun 2026 10:07:51 -0400
-X-MC-Unique: aTBpRM8zPymLxWXwVxd3nA-1
-X-Mimecast-MFC-AGG-ID: aTBpRM8zPymLxWXwVxd3nA_1781878069
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C24A8195DBA4;
-	Fri, 19 Jun 2026 14:07:49 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.44.50.44])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 237B43000238;
-	Fri, 19 Jun 2026 14:07:46 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 11/11] netfs: Fix writethrough to use collection offload
-Date: Fri, 19 Jun 2026 15:06:15 +0100
-Message-ID: <20260619140646.2633762-12-dhowells@redhat.com>
-In-Reply-To: <20260619140646.2633762-1-dhowells@redhat.com>
-References: <20260619140646.2633762-1-dhowells@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="axv1ytRK"
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 3C65C20B7168; Fri, 19 Jun 2026 12:32:34 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3C65C20B7168
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1781897554;
+	bh=m2uMxxexDXuJiyEDGdvQW8jMxy4JG/jFpxhsKw2zxso=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=axv1ytRKW9J9dLaykB85E5RKw778VJTsAnGBgDm54K5ccP6TuM1idVXo84/+eHuA0
+	 rEC8iInJgqFqMKMf6s7++kxm8T936/8OoShGjH6mw/Xl4Bb8B3sMcaXsLnzJw+eHpX
+	 ZxXYnk/scEgxxjar87N3D8G9YDGhrBnCnlT+j+lw=
+Date: Fri, 19 Jun 2026 12:32:34 -0700
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: mkalderon@marvell.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, zyjzyj2000@gmail.com,
+	sagi@grimberg.me, mgurtovoy@nvidia.com, haris.iqbal@ionos.com,
+	jinpu.wang@ionos.com, bvanassche@acm.org, kbusch@kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+	kch@nvidia.com, smfrench@gmail.com, linkinjeon@kernel.org,
+	metze@samba.org, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	achender@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	kees@kernel.org, ebadger@purestorage.com,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	target-devel@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH rdma-next v7] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <ajWZUjSoUCTe0Pb7@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260606070735.2163063-1-ernis@linux.microsoft.com>
+ <aigwONAwxQx6rLef@ashevche-desk.local>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aigwONAwxQx6rLef@ashevche-desk.local>
 
-Fix writethrough write to set NETFS_RREQ_OFFLOAD_COLLECTION on the request
-so that collection is processed asynchronously rather than only right at
-the end - and also so that asynchronous O_SYNC writes get collected at all.
+Hi Andy,
 
-Fixes: 288ace2f57c9 ("netfs: New writeback implementation")
-Closes: https://sashiko.dev/#/patchset/20260616100821.2062304-1-dhowells%40redhat.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/write_issue.c | 1 +
- 1 file changed, 1 insertion(+)
+Sorry for delayed response.
 
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 437bb50ce175..e5d4f9ba3d6b 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -620,6 +620,7 @@ struct netfs_io_request *netfs_begin_writethrough(struct kiocb *iocb, size_t len
- 	}
+> >  	attr->max_qp_init_rd_atom =
+> >  	    1 << (fls(qattr->max_qp_req_rd_atomic_resc) - 1);
+> 
+> FWIW, this one and below looks like reinvention of rounddown_pow_of_two().
+
+Acked.
+> 
+> >  	attr->max_qp_rd_atom =
+> > -	    min(1 << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> > +	    min(1U << (fls(qattr->max_qp_resp_rd_atomic_resc) - 1),
+> >  		attr->max_qp_init_rd_atom);
+> 
+> ...
+> 
+> >  int ipoib_cm_dev_init(struct net_device *dev)
+> >  {
+> >  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
+> > -	int max_srq_sge, i;
+> > +	int i;
+> > +	u32 max_srq_sge;
+> >  	u8 addr;
+> 
+> It seems the order is reversed xmas tree, why not preserving it?
+> 
+Right. I'll fix it in the next version.
+> ...
+> 
+> > --- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+> 
+> >  		max_send_wr =
+> > -			min_t(int, wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
+> > +			min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
+> 
+> Now perfectly a single line
+> 
+> 		max_send_wr = min(wr_limit, SERVICE_CON_QUEUE_DEPTH * 2 + 2);
+> 
+> >  		max_recv_wr = max_send_wr;
+> 
+> ...
+> 
+> > -		max_send_wr = min_t(int, wr_limit,
+> > -			      /* QD * (REQ + RSP + FR REGS or INVS) + drain */
+> > -			      clt_path->queue_depth * 4 + 1);
+> > -		max_recv_wr = min_t(int, wr_limit,
+> > -			      clt_path->queue_depth * 3 + 1);
+> > +		max_send_wr = min_t(u32, wr_limit,
+> > +				    /* QD * (REQ + RSP + FR REGS or INVS) + drain */
+> > +				    clt_path->queue_depth * 4 + 1);
+> > +		max_recv_wr = min_t(u32, wr_limit,
+> > +				    clt_path->queue_depth * 3 + 1);
+> 
+> Can we rather update the type of one of them and use min() instead?
+> 
+I'll remove all the min_t usages in the next version.
+> ...
+> 
+> > --- a/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> > +++ b/drivers/infiniband/ulp/rtrs/rtrs-srv.c
+> 
+> Ditto.
+> 
+> ...
+> 
+> > -static int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
+> > -module_param(srpt_srq_size, int, 0444);
+> > +static unsigned int srpt_srq_size = DEFAULT_SRPT_SRQ_SIZE;
+> > +module_param(srpt_srq_size, uint, 0444);
+> 
+> Theoretically this might break ABI (if somebody uses negative values for
+> anything. I don't think it's the case, but just be informed.
+> 
+Okay. Thankyou for the information. 
+
+> >  MODULE_PARM_DESC(srpt_srq_size,
+> >  		 "Shared receive queue (SRQ) size.");
+> 
+> ...
+> 
+> > --- a/drivers/nvme/target/rdma.c
+> > +++ b/drivers/nvme/target/rdma.c
+> 
+> > -	ndev->srq_size = min(ndev->device->attrs.max_srq_wr,
+> > -			     nvmet_rdma_srq_size);
+> > -	ndev->srq_count = min(ndev->device->num_comp_vectors,
+> > -			      ndev->device->attrs.max_srq);
+> > +	ndev->srq_size = min_t(u32, ndev->device->attrs.max_srq_wr,
+> > +			       nvmet_rdma_srq_size);
+> > +	ndev->srq_count = min_t(u32, ndev->device->num_comp_vectors,
+> > +				ndev->device->attrs.max_srq);
+> 
+> Same question, can we change type type of variables instead?
+>
+Yes. I'll be doing it in the next version.
  
- 	wreq->io_streams[0].avail = true;
-+	__set_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &wreq->flags);
- 	trace_netfs_write(wreq, netfs_write_trace_writethrough);
- 	return wreq;
- }
+> >  	mutex_lock(&device_list_mutex);
+> 
+> ...
+> 
+> >  	inline_page_count = num_pages(nport->inline_data_size);
+> >  	inline_sge_count = max(cm_id->device->attrs.max_sge_rd,
+> > -				cm_id->device->attrs.max_recv_sge) - 1;
+> > +				cm_id->device->attrs.max_recv_sge);
+> > +	inline_sge_count = inline_sge_count ? inline_sge_count - 1 : 0;
+> 
+> Simple conditional might be better
+> 
+> 	if (inline_sge_count)
+> 		inline_sge_count--;
+> 	OR
+> 		inline_sge_count -= 1;
+Okay. I'll update all such instances.
 
+> 
+> ...
+> 
+> > +++ b/include/rdma/ib_verbs.h
+> 
+> > -	int			max_qp;
+> > -	int			max_qp_wr;
+> > +	u32			max_qp;
+> > +	u32			max_qp_wr;
+> 
+> Nice, but please check that none of these (and beyond) were not used in signed
+> multiplication or (which is more disasterous) division. Otherwise it might be
+> subtle issues that will be hard to debug.
+Yes I have checked that for all the variables I updated.
+
+> 
+> ...
+> 
+> >  	conn_param->responder_resources =
+> > -		min_t(u32, rds_ibdev->max_responder_resources, max_responder_resources);
+> > +		min3(rds_ibdev->max_responder_resources,
+> > +		     max_responder_resources, U8_MAX);
+> >  	conn_param->initiator_depth =
+> > -		min_t(u32, rds_ibdev->max_initiator_depth, max_initiator_depth);
+> > +		min3(rds_ibdev->max_initiator_depth,
+> > +		     max_initiator_depth, U8_MAX);
+> 
+> I believe we can go a few characters over and leave them to be single lines.
+> 
+Okay.
+
+> >  	conn_param->retry_count = min_t(unsigned int, rds_ib_retry_count, 7);
+> 
+> What about this one?
+Sorry. I missed this one, I'll update it.
+
+> 
+> >  	conn_param->rnr_retry_count = 7;
+> 
+> ...
+> 
+> >  int frwr_query_device(struct rpcrdma_ep *ep, const struct ib_device *device)
+> >  {
+> >  	const struct ib_device_attr *attrs = &device->attrs;
+> > -	int max_qp_wr, depth, delta;
+> > +	u32 max_qp_wr;
+> > +	int depth, delta;
+> >  	unsigned int max_sge;
+> 
+> Reversed xmas tree order.
+Okay
+
+Thankyou for all your suggestions.
+The next version will be incorporated with all these changes.
+
+- Vennela
+> 
+> -- 
+> With Best Regards,
+> Andy Shevchenko
+> 
