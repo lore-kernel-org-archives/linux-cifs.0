@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF493890F7
-	for <linux-cifs@vger.kernel.org>; Fri, 19 Jun 2026 14:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86419380FF1
+	for <linux-cifs@vger.kernel.org>; Fri, 19 Jun 2026 14:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781878058; cv=none; b=HeuLI2ZLTAaVKxrU4SUHy0FztMEBXbCeZ41rMzqTysO5f2YVaQvSuLCyroHk6G0jSVA+IZwm3wOZ8uwjqMkx8NAPokKRBrObE9vyYp5urbFdzudlI1WhcAgEHsopxspWszm6HsB8Coug7EtEL5toZvYYfa0kN19inkh817W5ZPo=
+	t=1781878066; cv=none; b=kp0JtTJN8ZvSBkMFe7AEIgQ9Lxzlc6Py7qQBCyrKoNCeoEQ1RGbSC3O8xN3vNsHQlS7y3arl6s69nRcqz6nxhTJ7vyEetQgEbVpyG+ivaZCc6uzGWHapOY+nx9W0jtnZEVquqxPciUDRpzlr88ORwy9TWNJDaxKRifmkkgO/SEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781878058; c=relaxed/simple;
-	bh=LlyerzgyX+5L/7rCJl1ktSyZ72E37ZcqdGfNCyxOLPY=;
+	s=arc-20240116; t=1781878066; c=relaxed/simple;
+	bh=VUlgKQRtFcYZkgLggj06uMIrCxezEkk58BuS/5a9eCw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uyKSr8xIWjiTMFsHVoJe4yFZdHaevVug5ERNzEY5XjYYCoYFSX62z86JhzGruUrFFfn5Nm0U1X5E+chxnBHmoajpj0xsIhJZwPeW41v2mO9zlXBvLV8tNnbWQeYxlYdSFJQxxjrj9pJIzuQ7FMnTE/qgyB0J4TbFyuhimKnnqNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RZZMgHJI; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=XsBxfaoxYZHGY1+wa5xoNpLi7VUHZGYLBoe279ETpQvb0HKhcDVbt9Iur/hBYrMnLEjriJKrhvF1ciYDbHBL82bxhG8RLI6f6Bv+k/jBf1nXk5xvMtO/gnrsYxFwhqQ0M9mtLKZvkGESbqr449zKuTNWqJjgUCFgG2EAjQjwvSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C1ckD4Cj; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZZMgHJI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C1ckD4Cj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781878056;
+	s=mimecast20190719; t=1781878064;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tBSa5TnPIcX9KUvKuQ/n5zPtisGuhCJFsXdMJvHXniA=;
-	b=RZZMgHJI7Anipy74o4gdK0zwjtv8pId67pntrAVHIc6OuYK6fvby9MiLHIcYBaep46LQNn
-	jttAuQwvvxT2+SAFRRY8fLdwcmwt8S8hqPAQscq4n91vGiZvxK2kRvqtr3ULOt0Unqah7V
-	dnMlx/fxcbBwutc0kniISdCwUCF+h2M=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=G/liEajtHx9CYrzJvqnOmvWcXVvucaBQw0Nv7dYml2Q=;
+	b=C1ckD4Cjcrfx6lDbf8SD73tsyT23h5sW/rCi4onO7xZ/lqINKawqu/XPisfPD9WzrrNbTm
+	F6f3nTOo61RiDYxL1lSkR0Vlx63eYoST8TmWTbYi1BBfQlgKThrdCXu0y1r2aHKBmAB9ks
+	aQ28dQ53Q2Uho/4LujRE+jY+HA9P/p4=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-675-zP7cPN2UP6qDIGdXyoo3Nw-1; Fri,
- 19 Jun 2026 10:07:32 -0400
-X-MC-Unique: zP7cPN2UP6qDIGdXyoo3Nw-1
-X-Mimecast-MFC-AGG-ID: zP7cPN2UP6qDIGdXyoo3Nw_1781878051
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-156-CCY_34c_OXm1Mi1y4mu7Eg-1; Fri,
+ 19 Jun 2026 10:07:39 -0400
+X-MC-Unique: CCY_34c_OXm1Mi1y4mu7Eg-1
+X-Mimecast-MFC-AGG-ID: CCY_34c_OXm1Mi1y4mu7Eg_1781878057
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BB351955DA6;
-	Fri, 19 Jun 2026 14:07:31 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84C6E185FBF9;
+	Fri, 19 Jun 2026 14:07:36 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.50.44])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CE10736916;
-	Fri, 19 Jun 2026 14:07:26 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 88FFD3000238;
+	Fri, 19 Jun 2026 14:07:32 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -52,13 +52,13 @@ Cc: David Howells <dhowells@redhat.com>,
 	ceph-devel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
 	Matthew Wilcox <willy@infradead.org>,
 	Christoph Hellwig <hch@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 07/11] iov_iter: Remove unused variable in kunit_iov_iter.c
-Date: Fri, 19 Jun 2026 15:06:11 +0100
-Message-ID: <20260619140646.2633762-8-dhowells@redhat.com>
+	Jens Axboe <axboe@kernel.dk>,
+	Mike Marshall <hubcap@omnibond.com>
+Subject: [PATCH 08/11] scatterlist: Fix offset in folio calc in extract_xarray_to_sg()
+Date: Fri, 19 Jun 2026 15:06:12 +0100
+Message-ID: <20260619140646.2633762-9-dhowells@redhat.com>
 In-Reply-To: <20260619140646.2633762-1-dhowells@redhat.com>
 References: <20260619140646.2633762-1-dhowells@redhat.com>
 Precedence: bulk
@@ -68,47 +68,37 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Remove the no longer used variable 'b' from iov_kunit_copy_to_bvec().  The
-variable is initialised and incremented, but nothing now makes use of the
-value.
+Fix the calculation of the offset in the folio being extracted in
+extract_xarray_to_sg().
 
+Note that in the near future, ITER_XARRAY should be removed.
+
+Fixes: f5f82cd18732 ("Move netfs_extract_iter_to_sg() to lib/scatterlist.c")
+Link: https://sashiko.dev/#/patchset/20260608145432.681865-1-dhowells%40redhat.com
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Ming Lei <ming.lei@redhat.com>
 cc: Paulo Alcantara <pc@manguebit.org>
 cc: Matthew Wilcox <willy@infradead.org>
 cc: Christoph Hellwig <hch@infradead.org>
 cc: Jens Axboe <axboe@kernel.dk>
+cc: Mike Marshall <hubcap@omnibond.com>
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- lib/tests/kunit_iov_iter.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ lib/scatterlist.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/lib/tests/kunit_iov_iter.c b/lib/tests/kunit_iov_iter.c
-index f02f7b7aa796..e7e154f94f66 100644
---- a/lib/tests/kunit_iov_iter.c
-+++ b/lib/tests/kunit_iov_iter.c
-@@ -275,7 +275,7 @@ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
- 	struct page **spages, **bpages;
- 	u8 *scratch, *buffer;
- 	size_t bufsize, npages, size, copied;
--	int i, b, patt;
-+	int i, patt;
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index b7fe91ef35b8..6ea40d2e6247 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -1366,6 +1366,7 @@ static ssize_t extract_xarray_to_sg(struct iov_iter *iter,
+ 		sg_max--;
  
- 	bufsize = 0x100000;
- 	npages = bufsize / PAGE_SIZE;
-@@ -298,10 +298,9 @@ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, iter.nr_segs, 0);
- 
- 	/* Build the expected image in the scratch buffer. */
--	b = 0;
- 	patt = 0;
- 	memset(scratch, 0, bufsize);
--	for (pr = bvec_test_ranges; pr->from >= 0; pr++, b++) {
-+	for (pr = bvec_test_ranges; pr->from >= 0; pr++) {
- 		u8 *p = scratch + pr->page * PAGE_SIZE;
- 
- 		for (i = pr->from; i < pr->to; i++)
+ 		maxsize -= len;
++		start += len;
+ 		ret += len;
+ 		if (maxsize <= 0 || sg_max == 0)
+ 			break;
 
