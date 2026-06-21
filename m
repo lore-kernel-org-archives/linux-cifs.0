@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D3472621
-	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36F572621
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782046136; cv=none; b=gT/xMFkdDhhDJD9vDPXJzq2+0GoWXkJGzVVcRgZWzmu1EY/4vsLtnsMgEzjg1zT3AeYphZdIt3wggtbS94ghoKYX9JxTsYZIZeV2qcQT1fS8/I4a5/Iq/7UhBJW5hvlf96We4akuUhB1Q1liD9v/zrkNg6AJHvOHcIuwAiHy2Vs=
+	t=1782046139; cv=none; b=oe0XTBo3ErKsW+YzoCD33WmGSQHrLGZK2zaNpMfrvhu02N2hsfCVI23L9Co4Af8Pq/U3hESEZzMpko0yJsktmKaMJ9jj7mcsOrsb+nvXj09nCjox9Qj1LKCDb+BIC6S4t4QMChCYOy0RXthW8bekBM3v6r3wZpS1pJeWTqc2U28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782046136; c=relaxed/simple;
-	bh=4VMvJMXX3n4zeTGscNYRIXTtd5wOYpXUEbgC9LQRIQM=;
+	s=arc-20240116; t=1782046139; c=relaxed/simple;
+	bh=lkCmmY5UWwcKAX9pbcUXOpLsrRwxo/9Ar2AtKGF+OW8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Vvhu1wuw0MAhpPTMpPZmcLFyoGTT4TLd2ZjYgyEcSEfFIGuw0/K57fh4bCgoxPqzjks7smDqzqstq+SMwZ4HSLvQFjd5o4urG02fKid+2syGpEQRCKE/uBU2gcnQoEH5Hdw3VMBgVEwbdTCR0bLpGrNuZfMFTkoKP6nt0ap1UXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=njrmm0Az; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Fg7/jeCxTtrz359vkg1yz1reGefxp/my+qo9YTDXUgPtR8/7MoNBhCt2SgvfxZjmcLGVfctioPUPp6289ZE6MIoj9LqkcH884a8s4xCJZrmvKbxh5VXUJbGjTzKyYKboe0BqBOgbHz9oUbwqsUtjPMqf7HlQWxzEnAmsmP53e1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RRHVgoz+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njrmm0Az"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80B591F00A3A;
-	Sun, 21 Jun 2026 12:48:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RRHVgoz+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E481F000E9;
+	Sun, 21 Jun 2026 12:48:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782046134;
-	bh=LwwXlgFYQrR2HgVLJLnzeeh+Pj6qZOy8YOOUB2K2Xdk=;
+	s=k20260515; t=1782046136;
+	bh=y3W4uLe3owP89nm3eVdcLwaBVAvrfC/wXfI+I5rijaI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=njrmm0AzT39aegMz53wD9ldox8SXhQVdayHHAGrvg6RsQ/+Tj1dpTfOcNrV1kzN7p
-	 NVPf9nvRHXYfxHO7nJMPhw9RxYY7Gc1OpPf4CpBuKm1GrO3GoEJoQOQphDixtCqekb
-	 M2+89eY/vNAAzHXSdr8xyV++xaOh0aNTlYCwMMbFlPBkFkX2woCzAeG04WQjotET63
-	 kjp9BhUcgt08betxCTqvHPjjDiwwsjQJ4qfkdaQVaSZjiyPR114W5jDh0SeEYUFqv8
-	 TKLw/lHZ8fg/HsMM9Xa+7bVItDAN+iTOY2ZJcl8NrvjoSwvoQSfsnmBqbRozOrLrr0
-	 aOXgtjQN+rZ+Q==
+	b=RRHVgoz+igEBwVSNXSg2x3EXx6VeWbRpilARIOFTrx6oZtUxIdvfVS76zTG77l1US
+	 Fkdmfnl/NoZxk2GQqRXFHndP6zYuAkBMEOp95fxh5Md0Q4I3Cwh9fMhd5FZ911yxzC
+	 ZWFSN9OkbS29LEh3qEla0XUS9cdw3JCJHoGKKDHowt6Iow+d4TlvtR1IUtn93nfHhz
+	 q3brKgoFB1LprUTd6VnMq7IsUF5zWQ0yT2/XLGoKC0lEoFEkHJKBX0eM7RfUW/88Q6
+	 WYNQyhkKkgcoIBVhiQhBTITBg3vfKR42SpHBUPk/XqXtRUBEGYHzYuE/owcLy72e+i
+	 KTZDLU9zduBQQ==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -33,9 +33,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 02/29] ksmbd: supersede disconnected delete-on-close durable handle
-Date: Sun, 21 Jun 2026 21:48:17 +0900
-Message-Id: <20260621124844.6235-2-linkinjeon@kernel.org>
+Subject: [PATCH 03/29] ksmbd: invalidate durable handles on oplock break
+Date: Sun, 21 Jun 2026 21:48:18 +0900
+Message-Id: <20260621124844.6235-3-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260621124844.6235-1-linkinjeon@kernel.org>
 References: <20260621124844.6235-1-linkinjeon@kernel.org>
@@ -47,142 +47,304 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A durable handle opened with FILE_DELETE_ON_CLOSE is preserved across a
-disconnect so it can be reclaimed by a durable reconnect.
-smb2.durable-open.delete_on_close2 disconnects such a handle and then
-reconnects it, expecting the reconnect to succeed.
+When a durable handle is preserved after a disconnect, its oplock state
+can still block later opens. If another client opens the same file and
+the preserved oplock or lease has to be broken, the old durable handle
+must no longer be reconnectable after the break cannot be acknowledged.
 
-When the client does not reconnect but instead opens the same name with a
-new delete-on-close create, the preserved handle keeps the file present
-with delete-on-close set. ksmbd then rejects the new open with
-STATUS_ACCESS_DENIED on the file_present + FILE_DELETE_ON_CLOSE +
-OPEN_IF/OVERWRITE_IF path. smb2.durable-open.delete_on_close1 expects this
-open to create a fresh, empty file instead, i.e. the disconnected handle's
-delete-on-close must take effect first.
+ksmbd was treating a missing connection, or an oplock break timeout, as a
+successful break only by downgrading the oplock state.  The old durable
+handle remained reconnectable, so a later durable reconnect for that
+stale handle could succeed.
 
-Add ksmbd_close_disconnected_durable_delete_on_close(), which closes
-disconnected (conn == NULL) durable handles that keep a delete-on-close
-file present. The final close promotes S_DEL_ON_CLS to S_DEL_PENDING and
-unlinks the file, so a re-resolved path is absent and the new open creates
-it fresh. Call it from smb2_open() before the delete-on-close conflict
-check, only for the conflicting open shapes. A live (connected) handle
-still keeps the file and blocks the open as before.
+The open path can also see a detached durable handle before the break
+notification helpers fully dispose of it. Invalidate such a preserved
+durable handle directly when a competing open has to break its batch or
+exclusive oplock, while leaving ordinary durable reconnects without a
+competing open untouched.
+
+If the old handle still reaches the reconnect path, reject it when the
+same inode already has another active open. This matches the
+smb2.durable-open.open2-lease/open2-oplock sequence where a later open
+replaces the disconnected durable owner and the stale first handle must
+not be reclaimed.
+
+Also, reconnect lookup used only the persistent id. A new durable open
+can get a persistent id that matches the stale reconnect request after
+the old durable state is invalidated. Preserve the disconnected
+handle's old volatile id and require durable reconnect contexts to match
+it, so a stale reconnect cannot attach to a different durable open.
+
+Windows allows the later open to proceed and rejects the old reconnect
+with STATUS_OBJECT_NAME_NOT_FOUND. The smbtorture
+smb2.durable-open.oplock test covers this case.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c   | 17 ++++++++++++
- fs/smb/server/vfs_cache.c | 57 +++++++++++++++++++++++++++++++++++++++
- fs/smb/server/vfs_cache.h |  1 +
- 3 files changed, 75 insertions(+)
+ fs/smb/server/oplock.c    | 40 +++++++++++++++++++++++++------
+ fs/smb/server/smb2pdu.c   | 14 +++++++++++
+ fs/smb/server/vfs_cache.c | 50 ++++++++++++++++++++++++++++++++++++++-
+ fs/smb/server/vfs_cache.h |  4 ++++
+ 4 files changed, 100 insertions(+), 8 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 2bc275ed450a..37a20c5740cd 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3272,6 +3272,23 @@ int smb2_open(struct ksmbd_work *work)
- 
- 	rc = ksmbd_vfs_kern_path(work, name, LOOKUP_NO_SYMLINKS,
- 				 &path, 1);
-+
-+	/*
-+	 * A durable handle opened with delete-on-close is preserved across a
-+	 * disconnect so it can be reclaimed by a durable reconnect.  When a new
-+	 * delete-on-close open for the same name arrives instead, the
-+	 * disconnected handle must give way: close it so its delete-on-close
-+	 * removes the file, then re-resolve so this open can create a fresh one.
-+	 */
-+	if (!rc && (req->CreateOptions & FILE_DELETE_ON_CLOSE_LE) &&
-+	    (req->CreateDisposition == FILE_OVERWRITE_IF_LE ||
-+	     req->CreateDisposition == FILE_OPEN_IF_LE) &&
-+	    ksmbd_close_disconnected_durable_delete_on_close(path.dentry)) {
-+		path_put(&path);
-+		rc = ksmbd_vfs_kern_path(work, name, LOOKUP_NO_SYMLINKS,
-+					 &path, 1);
-+	}
-+
- 	if (!rc) {
- 		file_present = true;
- 
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 39c56942ae44..96fa3f160d5b 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -517,6 +517,63 @@ static void __ksmbd_close_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
- 	kmem_cache_free(filp_cache, fp);
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 0a97d86cabf5..50cc067696d3 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -676,7 +676,7 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
+ 	return m_opinfo;
  }
  
-+/**
-+ * ksmbd_close_disconnected_durable_delete_on_close() - drop a delete-on-close
-+ *	file kept present only by disconnected durable handles
-+ * @dentry:	dentry of the file being opened
-+ *
-+ * A durable handle opened with delete-on-close is preserved across a
-+ * disconnect so it can be reclaimed by a durable reconnect.  When a new
-+ * (non-reconnect) open arrives for the same name instead, the disconnected
-+ * handle has to give way.  Close such handles so their delete-on-close is
-+ * applied and the file is removed once the last handle is gone, letting the
-+ * new open create a fresh file.
-+ *
-+ * The caller's inode reference is dropped before closing so that the final
-+ * close can promote S_DEL_ON_CLS to S_DEL_PENDING and unlink the file.
-+ *
-+ * Return:	true if a disconnected durable handle was closed.
-+ */
-+bool ksmbd_close_disconnected_durable_delete_on_close(struct dentry *dentry)
+-static void wait_for_break_ack(struct oplock_info *opinfo)
++static bool wait_for_break_ack(struct oplock_info *opinfo)
+ {
+ 	int rc = 0;
+ 
+@@ -693,7 +693,10 @@ static void wait_for_break_ack(struct oplock_info *opinfo)
+ 		}
+ 		opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
+ 		opinfo->op_state = OPLOCK_STATE_NONE;
++		return true;
+ 	}
++
++	return false;
+ }
+ 
+ static void wake_up_oplock_break(struct oplock_info *opinfo)
+@@ -843,7 +846,7 @@ static int smb2_oplock_break_noti(struct oplock_info *opinfo)
+ 
+ 	conn = READ_ONCE(opinfo->conn);
+ 	if (!conn)
+-		return 0;
++		return ksmbd_invalidate_durable_fd(opinfo->fid);
+ 
+ 	work = ksmbd_alloc_work_struct();
+ 	if (!work)
+@@ -868,7 +871,8 @@ static int smb2_oplock_break_noti(struct oplock_info *opinfo)
+ 		INIT_WORK(&work->work, __smb2_oplock_break_noti);
+ 		ksmbd_queue_work(work);
+ 
+-		wait_for_break_ack(opinfo);
++		if (wait_for_break_ack(opinfo))
++			ret = ksmbd_invalidate_durable_fd(opinfo->fid);
+ 	} else {
+ 		__smb2_oplock_break_noti(&work->work);
+ 		if (opinfo->level == SMB2_OPLOCK_LEVEL_II)
+@@ -950,13 +954,14 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo, bool wait_ack,
+ 	struct ksmbd_work *work;
+ 	struct lease_break_info *br_info;
+ 	struct lease *lease = opinfo->o_lease;
++	int ret = 0;
+ 
+ 	conn = READ_ONCE(opinfo->conn);
+ 	if (lease->version == 2 && lease->l_lb && lease->l_lb->conn &&
+ 	    !ksmbd_conn_releasing(lease->l_lb->conn))
+ 		conn = lease->l_lb->conn;
+ 	if (!conn)
+-		return 0;
++		return ksmbd_invalidate_durable_fd(opinfo->fid);
+ 
+ 	work = ksmbd_alloc_work_struct();
+ 	if (!work)
+@@ -987,8 +992,10 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo, bool wait_ack,
+ 	if (opinfo->op_state == OPLOCK_ACK_WAIT) {
+ 		INIT_WORK(&work->work, __smb2_lease_break_noti);
+ 		ksmbd_queue_work(work);
+-		if (wait_ack)
+-			wait_for_break_ack(opinfo);
++		if (wait_ack) {
++			if (wait_for_break_ack(opinfo))
++				ret = ksmbd_invalidate_durable_fd(opinfo->fid);
++		}
+ 	} else {
+ 		__smb2_lease_break_noti(&work->work);
+ 		if (opinfo->o_lease->new_state == SMB2_LEASE_NONE_LE) {
+@@ -996,7 +1003,7 @@ static int smb2_lease_break_noti(struct oplock_info *opinfo, bool wait_ack,
+ 			lease_update_oplock_levels(opinfo->o_lease);
+ 		}
+ 	}
+-	return 0;
++	return ret;
+ }
+ 
+ static void wait_lease_breaking(struct oplock_info *opinfo)
+@@ -1335,6 +1342,9 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 	struct ksmbd_inode *ci = fp->f_ci;
+ 	struct lease_table *new_lb = NULL;
+ 	bool prev_op_has_lease;
++	bool prev_durable_open = false;
++	bool prev_durable_detached = false;
++	unsigned long long prev_fid = KSMBD_NO_FID;
+ 	bool new_lease = false;
+ 	__le32 prev_op_state = 0;
+ 
+@@ -1412,7 +1422,17 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 		goto op_break_not_needed;
+ 	}
+ 
++	if (prev_opinfo->o_fp && prev_opinfo->o_fp != fp &&
++	    prev_opinfo->o_fp->is_durable) {
++		prev_durable_open = true;
++		prev_durable_detached = !prev_opinfo->o_fp->conn ||
++					!prev_opinfo->o_fp->tcon;
++		prev_fid = prev_opinfo->fid;
++	}
++
+ 	err = oplock_break(prev_opinfo, break_level, work);
++	if (prev_durable_detached || (prev_durable_open && err == -ENOENT))
++		ksmbd_invalidate_durable_fd(prev_fid);
+ 	opinfo_put(prev_opinfo);
+ 	if (err == -ENOENT)
+ 		goto set_lev;
+@@ -2027,6 +2047,12 @@ int smb2_check_durable_oplock(struct ksmbd_conn *conn,
+ 	if (!opinfo)
+ 		return 0;
+ 
++	if (ksmbd_has_other_active_fd(fp)) {
++		ksmbd_debug(SMB, "Durable handle reconnect failed: competing open\n");
++		ret = -EBADF;
++		goto out;
++	}
++
+ 	if (ksmbd_vfs_compare_durable_owner(fp, user) == false) {
+ 		ksmbd_debug(SMB, "Durable handle reconnect failed: owner mismatch\n");
+ 		ret = -EBADF;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 37a20c5740cd..f700f2f94ff2 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2861,6 +2861,13 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
+ 				goto out;
+ 			}
+ 
++			if (dh_info->fp->durable_volatile_id !=
++			    recon_v2->dcontext.Fid.VolatileFileId) {
++				err = -EBADF;
++				ksmbd_put_durable_fd(dh_info->fp);
++				goto out;
++			}
++
+ 			if (memcmp(dh_info->fp->create_guid, recon_v2->dcontext.CreateGuid,
+ 				   SMB2_CREATE_GUID_SIZE)) {
+ 				err = -EBADF;
+@@ -2901,6 +2908,13 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
+ 				goto out;
+ 			}
+ 
++			if (dh_info->fp->durable_volatile_id !=
++			    recon->Data.Fid.VolatileFileId) {
++				err = -EBADF;
++				ksmbd_put_durable_fd(dh_info->fp);
++				goto out;
++			}
++
+ 			dh_info->type = dh_idx;
+ 			dh_info->reconnected = true;
+ 			ksmbd_debug(SMB, "reconnect Persistent-id from reconnect = %llu\n",
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index 96fa3f160d5b..3546d95df76f 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -731,7 +731,8 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id)
+ 	struct ksmbd_file *fp;
+ 
+ 	fp = __ksmbd_lookup_fd(&global_ft, id);
+-	if (fp && (fp->conn ||
++	if (fp && (fp->durable_reconnect_disabled ||
++		   fp->conn ||
+ 		   (fp->durable_scavenger_timeout &&
+ 		    (fp->durable_scavenger_timeout <
+ 		     jiffies_to_msecs(jiffies))))) {
+@@ -750,6 +751,52 @@ void ksmbd_put_durable_fd(struct ksmbd_file *fp)
+ 	__ksmbd_close_fd(NULL, fp);
+ }
+ 
++bool ksmbd_has_other_active_fd(struct ksmbd_file *fp)
 +{
-+	struct ksmbd_inode *ci;
-+	struct ksmbd_file *fp, *tmp;
-+	LIST_HEAD(dispose);
-+	bool closed = false;
++	struct ksmbd_file *lfp;
++	struct ksmbd_inode *ci = fp->f_ci;
++	bool ret = false;
 +
-+	ci = ksmbd_inode_lookup_lock(dentry);
-+	if (!ci)
-+		return false;
++	down_read(&ci->m_lock);
++	list_for_each_entry(lfp, &ci->m_fp_list, node) {
++		if (lfp == fp)
++			continue;
 +
-+	down_write(&ci->m_lock);
-+	if (ci->m_flags & (S_DEL_ON_CLS | S_DEL_ON_CLS_STREAM | S_DEL_PENDING)) {
-+		list_for_each_entry_safe(fp, tmp, &ci->m_fp_list, node) {
-+			if (fp->conn || !fp->is_durable ||
-+			    fp->f_state != FP_INITED)
-+				continue;
-+			list_move_tail(&fp->node, &dispose);
++		if (lfp->f_state == FP_INITED &&
++		    (READ_ONCE(lfp->conn) || READ_ONCE(lfp->tcon))) {
++			ret = true;
++			break;
 +		}
 +	}
-+	up_write(&ci->m_lock);
++	up_read(&ci->m_lock);
 +
-+	/*
-+	 * Drop our lookup reference before closing so the last __ksmbd_close_fd()
-+	 * can drop m_count to zero and unlink the delete-on-close file.  The
-+	 * collected handles still hold references, so ci stays valid until they
-+	 * are closed below.
-+	 */
-+	ksmbd_inode_put(ci);
-+
-+	while (!list_empty(&dispose)) {
-+		fp = list_first_entry(&dispose, struct ksmbd_file, node);
-+		list_del_init(&fp->node);
-+		__ksmbd_close_fd(NULL, fp);
-+		closed = true;
-+	}
-+
-+	return closed;
++	return ret;
 +}
 +
- static struct ksmbd_file *ksmbd_fp_get(struct ksmbd_file *fp)
++int ksmbd_invalidate_durable_fd(unsigned long long id)
++{
++	struct ksmbd_file *fp;
++
++	fp = ksmbd_lookup_global_fd(id);
++	if (!fp)
++		return -ENOENT;
++
++	fp->durable_reconnect_disabled = true;
++
++	if (fp->conn) {
++		ksmbd_put_durable_fd(fp);
++		return -ENOENT;
++	}
++
++	fp->durable_timeout = 1;
++	fp->durable_scavenger_timeout = jiffies_to_msecs(jiffies);
++	ksmbd_put_durable_fd(fp);
++	if (waitqueue_active(&dh_wq))
++		wake_up(&dh_wq);
++
++	return -ENOENT;
++}
++
+ struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid)
  {
- 	if (fp->f_state != FP_INITED)
+ 	struct ksmbd_file	*fp = NULL;
+@@ -990,6 +1037,7 @@ __close_file_table_ids(struct ksmbd_session *sess,
+ 			 * global_ft.
+ 			 */
+ 			idr_remove(ft->idr, id);
++			fp->durable_volatile_id = fp->volatile_id;
+ 			fp->volatile_id = KSMBD_NO_FID;
+ 			write_unlock(&ft->lock);
+ 
 diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index a3a9fda6de91..21c24956c7c2 100644
+index 21c24956c7c2..4803f41a91ef 100644
 --- a/fs/smb/server/vfs_cache.h
 +++ b/fs/smb/server/vfs_cache.h
-@@ -160,6 +160,7 @@ struct ksmbd_file *ksmbd_lookup_fd_slow(struct ksmbd_work *work, u64 id,
- void ksmbd_fd_put(struct ksmbd_work *work, struct ksmbd_file *fp);
- struct ksmbd_inode *ksmbd_inode_lookup_lock(struct dentry *d);
- void ksmbd_inode_put(struct ksmbd_inode *ci);
-+bool ksmbd_close_disconnected_durable_delete_on_close(struct dentry *dentry);
+@@ -81,6 +81,7 @@ struct ksmbd_file {
+ 	struct file			*filp;
+ 	u64				persistent_id;
+ 	u64				volatile_id;
++	u64				durable_volatile_id;
+ 
+ 	spinlock_t			f_lock;
+ 
+@@ -122,6 +123,7 @@ struct ksmbd_file {
+ 	bool				is_durable;
+ 	bool				is_persistent;
+ 	bool				is_resilient;
++	bool				durable_reconnect_disabled;
+ 
+ 	bool                            is_posix_ctxt;
+ 	struct durable_owner		owner;
+@@ -164,6 +166,8 @@ bool ksmbd_close_disconnected_durable_delete_on_close(struct dentry *dentry);
  struct ksmbd_file *ksmbd_lookup_global_fd(unsigned long long id);
  struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id);
  void ksmbd_put_durable_fd(struct ksmbd_file *fp);
++int ksmbd_invalidate_durable_fd(unsigned long long id);
++bool ksmbd_has_other_active_fd(struct ksmbd_file *fp);
+ struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid);
+ struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry);
+ unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp);
 -- 
 2.25.1
 
