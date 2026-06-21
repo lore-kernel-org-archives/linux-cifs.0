@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029BF72621
-	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8F372621
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782046161; cv=none; b=cU+oT1zkxTwlSBzMaOW89IE6tBybqyvUMb9yH/KxM40nYhXsAhL4+VKJpkX64vuWOPpM0M/csgrQUuWSNrCZmGFlJ46T1IDtTkw3j99APE3ITNEEguXGh+gM5mQqqLZ5TzJzMmDHOiYDPqgLFJ/oAR5U3cacV3tVdr65sBlWj/w=
+	t=1782046163; cv=none; b=iYom/04HjE/3Y5g1F3fVkx19NZlDwq5UPPjZ7IDYMhlhBBQ6oeSo41RVnjd3QaleQfXJQa4S2U9lxEH2v8zQfKu9z6P1oT3RfhxFYWavIgcieNHNV6C4q/OHMPORQ/3fBUqloQGyklero/jtLW5F2JRdVux2dRk3ArSbdqHTXDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782046161; c=relaxed/simple;
-	bh=tIK666SCBO24RO9q4D4RpyrNvIy92fuoIK75Qg5ayHQ=;
+	s=arc-20240116; t=1782046163; c=relaxed/simple;
+	bh=+TiCXa68IJqt+tQIR2EWETYigY27ueYqFfGp/LBY2qg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LLfUTf/l7QR8RYs9yefBLLZBY/zkX91wxqe3/XLIL9aoFRg+Jzp0v/Y2LD04Kq/pzGGVlbSOHDmJy4nY5hGHJZcFnv3g3nBU97QFedTfrmy1P4gL4eyDyJTRmyDw9rkJ3X7u+fC+1qbDI2C0f9DNOaaXUcRQlmv8nI6/u1fWfN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UObBxg6F; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=HLAKKzpWv7AGY+eRvkSr/+9IcwAOhS0ktzF0//ECtTj1av8a9XhcspG2hYKJiHu3wcR3fSQ2qiHRN970JSdUd4r0ySQfR1zmwBkJcoFAHOssW6fJS4QL/3iJO7AI6bp7ET3+1/3R9ve2V7VPXugfx/tAp38NrhDK9PEJp7gcRv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AP/TG5oj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UObBxg6F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1BE71F00A3A;
-	Sun, 21 Jun 2026 12:49:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AP/TG5oj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE3851F000E9;
+	Sun, 21 Jun 2026 12:49:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782046160;
-	bh=405nSUOnBdz31ZAjEuXjIS9D2ffdkuixsINEubhd/3g=;
+	s=k20260515; t=1782046162;
+	bh=NRs1diJkVsyeLPVGSF6cKy09nxWtw3NJPRtJtYbeo/I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UObBxg6FkaWxRFadxkbxc2Cg8Sk12oOvnG7QHE8xUteie+rZFXQ69lgjv3J0mkc9A
-	 o9a6EylKkc4/fcX2aEOmLZdRzWNfwz1PukiDWjI3+7cPkADRhx0Kqm/P3oJLU05UDP
-	 c8+lpzHHoes3JuAKh0/p6yCEKotEr7r8UaieP74g8lD0xFqyhHRkvY9XaNfaM74nT1
-	 ax5bXcI4mRpMDHXPXKdgylp8vkexYEqa5hQdx9Y6LkfCfMGPvDh+itgj37S4hEGfbU
-	 iT7kHxUmmE0Lg1KPwqvfK4wGjPuj7FGvUsNHgaCF056NpBVS+yCrvK+MMzWXCch4Pu
-	 77Zs1ZSnKjpkg==
+	b=AP/TG5ojk+VWdlQKzbPl+J3WjpxMqD48PbbOVmrl1hPIvvFzFMvQEEpboCJCbQkTI
+	 DyNebUEvRTKczZB3YKLTes3ugAv3Gfxw62CelRuMhLMGb7sb8nwKh/xBVXl13f/Lt1
+	 e9Pl71GI5Y6x794EctqqkJ9KS7/rudn5GLnHK30Hicph5bEd5fsec8xYbW1sosxOwA
+	 XRDL048QIOYt/83VH/fXo+mmy8G1MOUglERrULYNm+9uzflLa6UkdV6taLUPp+zbqb
+	 xl610xRIBjJ4+SGt2yWv9ssqJI4xI6Wm/BTo555EWNDuTgNraBq4LQJfUqbGGjoTFl
+	 duwMs81CoFIbA==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -33,9 +33,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 15/29] ksmbd: reject empty-attribute synchronize-only create
-Date: Sun, 21 Jun 2026 21:48:30 +0900
-Message-Id: <20260621124844.6235-15-linkinjeon@kernel.org>
+Subject: [PATCH 16/29] ksmbd: tighten create file attribute validation
+Date: Sun, 21 Jun 2026 21:48:31 +0900
+Message-Id: <20260621124844.6235-16-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260621124844.6235-1-linkinjeon@kernel.org>
 References: <20260621124844.6235-1-linkinjeon@kernel.org>
@@ -47,42 +47,48 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb2.create.gentest checks each desired access bit independently and
-expects an open that requests only SYNCHRONIZE with CreateDisposition
-OPEN_IF and FileAttributes 0 to fail with STATUS_ACCESS_DENIED.
+smb2.create.gentest checks each create FileAttributes bit independently and
+expects FILE_ATTRIBUTE_INTEGRITY_STREAM and FILE_ATTRIBUTE_NO_SCRUB_DATA to
+be rejected with STATUS_INVALID_PARAMETER.
 
-Rejecting all SYNCHRONIZE-only opens is too broad: SYNCHRONIZE does not
-imply read, write, or delete data access, and
-smb2.sharemode.sharemode-access expects a SYNCHRONIZE-only open to succeed
-when it does not conflict with the existing share mode.
+ksmbd validates create FileAttributes against FILE_ATTRIBUTE_MASK, which
+includes those bits. It also rejects only requests that have no known
+attribute bit at all, so a request containing both known and unknown bits
+can pass validation.
 
-Limit the rejection to the gentest create shape: SYNCHRONIZE-only access,
-OPEN_IF disposition, and no file attributes. Other synchronize-only opens
-are handled by the normal permission and share-mode checks.
+Use a create-specific attribute mask that excludes INTEGRITY_STREAM and
+NO_SCRUB_DATA, and reject any bit outside that mask.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/smb/server/smb2pdu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index a3ae37e8b24d..9a1308f32f45 100644
+index 9a1308f32f45..d6001cdce085 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -3332,6 +3332,13 @@ int smb2_open(struct ksmbd_work *work)
+@@ -57,6 +57,10 @@ static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
+ 
+ #define WORK_BUFFERS(w, rq, rs)	__wbuf((w), (void **)&(rq), (void **)&(rs))
+ 
++#define SMB2_CREATE_FILE_ATTRIBUTE_MASK \
++	(FILE_ATTRIBUTE_MASK & ~(FILE_ATTRIBUTE_INTEGRITY_STREAM | \
++				 FILE_ATTRIBUTE_NO_SCRUB_DATA))
++
+ /**
+  * check_session_id() - check for valid session id in smb header
+  * @conn:	connection instance
+@@ -3339,7 +3343,8 @@ int smb2_open(struct ksmbd_work *work)
  		goto err_out2;
  	}
  
-+	if (req->DesiredAccess == FILE_SYNCHRONIZE_LE &&
-+	    req->CreateDisposition == FILE_OPEN_IF_LE &&
-+	    !req->FileAttributes) {
-+		rc = -EACCES;
-+		goto err_out2;
-+	}
-+
- 	if (req->FileAttributes && !(req->FileAttributes & FILE_ATTRIBUTE_MASK_LE)) {
+-	if (req->FileAttributes && !(req->FileAttributes & FILE_ATTRIBUTE_MASK_LE)) {
++	if (req->FileAttributes &&
++	    (req->FileAttributes & ~cpu_to_le32(SMB2_CREATE_FILE_ATTRIBUTE_MASK))) {
  		pr_err("Invalid file attribute : 0x%x\n",
  		       le32_to_cpu(req->FileAttributes));
+ 		rc = -EINVAL;
 -- 
 2.25.1
 
