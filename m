@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59A33559F2
-	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67923559F2
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782046143; cv=none; b=gxNpWVb9tScN0tfAikj9D/uy+NP1cZu8Oa5+mVPqfMvW1bmX4D2NmjjlzZOZQII8l1FneNz66cPs7L85ISNxrAhJTOu5u93tGngfLNuZo5yX8vnBHjjR2E+Ipq/rTNUv2D/Vx5dulg03+9nUZViibLUWbSHDNCYn2HrKm6vLyt0=
+	t=1782046145; cv=none; b=dFncCCl+k7i4mqfuKH4l+m7OrTwiGo5LwNBrz6wxaFgZbJ0PJR7n/2lrzj14s0IhHj9lOA80Bmns1UhmjEc283btarZwiBfOXSkNx9HUnNKdW0nXdDEjfJAyYSK0o7TTBzhH8HRmjObRuLItpEdcx8D6rKQ73TyEbZuiWaO4BZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782046143; c=relaxed/simple;
-	bh=CMSo736uQ6T/cVUVx03g5UzFjA7X8JpEtO1YsNbqfH4=;
+	s=arc-20240116; t=1782046145; c=relaxed/simple;
+	bh=/Drk12P15fW5hcdvnDdwQPt0VbXAemKwDCP4F8x02IY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LEkNIA2bCgcCV4T3CefhxAcp7AQ/U2AFQqQjLDCUAtB0TozrW5Df9ogtMiKuMjpNaXQrmqZkrXXIWMY/2TPfsxT6jNX1i4FqUWt6Vxg2hROaowLD+6Au/CQkkxO0y2PsAIU5qNjlEhsKcoa7XqkTR8X9f90yGg4QwB9N62kSudk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdM/m/9N; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=uaE9KTjhXnCHk+D/eIve1kj4BLyiXxewIgGq9PDCCcKNL2ucc1NvSCtnWjNKzqztTSNJJn2kh033hvrp3qrqaj2hR6Q6OVRZMr1L5980oXAcccv+9PtHSmj8EkskXmLxSYtSqlOxm5WflKjxcC96MGuJF6VRrkGqn/zcxYW09k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7qgsqDz; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdM/m/9N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90B2C1F00A3A;
-	Sun, 21 Jun 2026 12:49:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7qgsqDz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 868141F000E9;
+	Sun, 21 Jun 2026 12:49:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782046142;
-	bh=XoM7J/OWgkB9FS9tiUnLHsSxVT+H7R2/LB0eIOKPjuo=;
+	s=k20260515; t=1782046144;
+	bh=oU5aZZiYIAQtqx75EN5+YO9XtK8PZSAy3jsWlP3IApg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jdM/m/9NO4hmSFFxKNMEpQfRCt8ACZ0ODZAs1i8q/Xfot/uOrPaVnEqxBRAabLsud
-	 pu+303l1YBHKkwYBMsiR5orh8EFk9FgzpLoKr6lhRO7mRq7KfWCwUligFdb4+vaZ0v
-	 EaZhR575yDdzlmK1wCBJVp1elajelTbj/18VjPxXWlRt8z9rKaE1SZo6zGLKbTgjKu
-	 OXVNMQNkHuK+/Uei+IWQhJQmcM1JlOe46Sa28z+TABTOZMUeAaOKCqfg4n8ezpFvS7
-	 xLa4lBygmmxyNHOyrNXL7cF8ReUzoapllE0wNiIReIG1v3i7l+0QyuBujNVrgfjSch
-	 GS4G+epTAHPGg==
+	b=I7qgsqDz2OjK2fsSirMH7I/Crz60atPUHXuJkCrasKwNnIw2Fqwqz2gOJPPYHehIO
+	 ujHcbjte4gQpIeeCVP3ZXF3ZO7QHU/IZSOsK2Qs/ikxga63Ld84N42uMY/PArZ8WYw
+	 CuoFvsV32WRCqkpQ6I637ciqemgAgyI2u5uFYGg8yyGKlpH/WFosJ0EfBalYrA9y7E
+	 Y0pGjlW1atsUJ9n2UUb5Rw/q0xe71uvUURPIBBWJz+FYtBCJMaUoyAPCib2QkmKzGR
+	 sgCYDYXsd/RUpZ9PIkCwvdarSjFKrhdlULEF6FeQC5oROWKiMGImlOs3J57s61Hct7
+	 wWpo0hsIOYeSQ==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -33,9 +33,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 06/29] ksmbd: preserve open change time across rename
-Date: Sun, 21 Jun 2026 21:48:21 +0900
-Message-Id: <20260621124844.6235-6-linkinjeon@kernel.org>
+Subject: [PATCH 07/29] ksmbd: check parent directory sharing conflicts on rename
+Date: Sun, 21 Jun 2026 21:48:22 +0900
+Message-Id: <20260621124844.6235-7-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260621124844.6235-1-linkinjeon@kernel.org>
 References: <20260621124844.6235-1-linkinjeon@kernel.org>
@@ -47,124 +47,48 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-inode ctime is updated when a file is renamed. ksmbd returned that
-ctime directly as SMB2 ChangeTime for handle-based query information.
-This makes ChangeTime change after a rename through an already-open
-handle, while Windows keeps the handle's ChangeTime stable for this
-case.
+When renaming a file, some existing opens on the parent directory must
+block the rename with STATUS_SHARING_VIOLATION. This includes parent
+directory handles opened with DELETE access and handles opened without
+FILE_SHARE_DELETE.
 
-Store the SMB ChangeTime in struct ksmbd_file when the handle is opened
-and use that value for create, close, and handle-based query information
-responses.  If a client explicitly sets FILE_BASIC_INFORMATION
-ChangeTime, update the stored value as well.
+ksmbd checked only the parent's desired access for FILE_DELETE.  That
+handled smb2.rename.share_delete_and_delete_access, but missed the case
+where the parent directory was opened without delete access and without
+delete sharing, so smb2.rename.no_share_delete_no_delete_access incorrectly
+succeeded.
 
-This fixes smbtorture smb2.rename.simple_modtime, which expects
-ChangeTime and LastWriteTime to remain unchanged after renaming an
-already-open file.
+Attribute-only parent opens, however, must not block the rename.
+smb2.rename.msword opens the parent directory with only SYNCHRONIZE and
+FILE_READ_ATTRIBUTES, no share access, and then renames an already-open
+child file.  Windows allows this pattern.
+
+Reject parent directory handles that request DELETE access, and reject
+non-attribute-only parent opens that deny FILE_SHARE_DELETE, while allowing
+attribute-only parent opens to coexist with child rename.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c   | 23 ++++++++++-------------
- fs/smb/server/vfs_cache.h |  1 +
- 2 files changed, 11 insertions(+), 13 deletions(-)
+ fs/smb/server/vfs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index a21760394637..f2ba52c7e325 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3783,6 +3783,7 @@ int smb2_open(struct ksmbd_work *work)
- 		fp->create_time = ksmbd_UnixTimeToNT(stat.btime);
- 	else
- 		fp->create_time = ksmbd_UnixTimeToNT(stat.ctime);
-+	fp->change_time = ksmbd_UnixTimeToNT(stat.ctime);
- 	if (req->FileAttributes || fp->f_ci->m_fattr == 0)
- 		fp->f_ci->m_fattr =
- 			cpu_to_le32(smb2_get_dos_mode(&stat, le32_to_cpu(req->FileAttributes)));
-@@ -3832,8 +3833,7 @@ int smb2_open(struct ksmbd_work *work)
- 	rsp->LastAccessTime = cpu_to_le64(time);
- 	time = ksmbd_UnixTimeToNT(stat.mtime);
- 	rsp->LastWriteTime = cpu_to_le64(time);
--	time = ksmbd_UnixTimeToNT(stat.ctime);
--	rsp->ChangeTime = cpu_to_le64(time);
-+	rsp->ChangeTime = cpu_to_le64(fp->change_time);
- 	rsp->AllocationSize = S_ISDIR(stat.mode) ? 0 :
- 		cpu_to_le64(stat.blocks << 9);
- 	rsp->EndofFile = S_ISDIR(stat.mode) ? 0 : cpu_to_le64(stat.size);
-@@ -5102,8 +5102,7 @@ static int get_file_basic_info(struct smb2_query_info_rsp *rsp,
- 	basic_info->LastAccessTime = cpu_to_le64(time);
- 	time = ksmbd_UnixTimeToNT(stat.mtime);
- 	basic_info->LastWriteTime = cpu_to_le64(time);
--	time = ksmbd_UnixTimeToNT(stat.ctime);
--	basic_info->ChangeTime = cpu_to_le64(time);
-+	basic_info->ChangeTime = cpu_to_le64(fp->change_time);
- 	basic_info->Attributes = fp->f_ci->m_fattr;
- 	basic_info->Pad = 0;
- 	rsp->OutputBufferLength =
-@@ -5205,8 +5204,7 @@ static int get_file_all_info(struct ksmbd_work *work,
- 	file_info->LastAccessTime = cpu_to_le64(time);
- 	time = ksmbd_UnixTimeToNT(stat.mtime);
- 	file_info->LastWriteTime = cpu_to_le64(time);
--	time = ksmbd_UnixTimeToNT(stat.ctime);
--	file_info->ChangeTime = cpu_to_le64(time);
-+	file_info->ChangeTime = cpu_to_le64(fp->change_time);
- 	file_info->Attributes = fp->f_ci->m_fattr;
- 	file_info->Pad1 = 0;
- 	if (ksmbd_stream_fd(fp) == false) {
-@@ -5415,8 +5413,7 @@ static int get_file_network_open_info(struct smb2_query_info_rsp *rsp,
- 	file_info->LastAccessTime = cpu_to_le64(time);
- 	time = ksmbd_UnixTimeToNT(stat.mtime);
- 	file_info->LastWriteTime = cpu_to_le64(time);
--	time = ksmbd_UnixTimeToNT(stat.ctime);
--	file_info->ChangeTime = cpu_to_le64(time);
-+	file_info->ChangeTime = cpu_to_le64(fp->change_time);
- 	file_info->Attributes = fp->f_ci->m_fattr;
- 	if (ksmbd_stream_fd(fp) == false) {
- 		file_info->AllocationSize = cpu_to_le64(stat.blocks << 9);
-@@ -5547,8 +5544,7 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
- 	file_info->LastAccessTime = cpu_to_le64(time);
- 	time = ksmbd_UnixTimeToNT(stat.mtime);
- 	file_info->LastWriteTime = cpu_to_le64(time);
--	time = ksmbd_UnixTimeToNT(stat.ctime);
--	file_info->ChangeTime = cpu_to_le64(time);
-+	file_info->ChangeTime = cpu_to_le64(fp->change_time);
- 	file_info->DosAttributes = fp->f_ci->m_fattr;
- 	file_info->Inode = cpu_to_le64(stat.ino);
- 	if (ksmbd_stream_fd(fp) == false) {
-@@ -6271,8 +6267,7 @@ int smb2_close(struct ksmbd_work *work)
- 		rsp->LastAccessTime = cpu_to_le64(time);
- 		time = ksmbd_UnixTimeToNT(stat.mtime);
- 		rsp->LastWriteTime = cpu_to_le64(time);
--		time = ksmbd_UnixTimeToNT(stat.ctime);
--		rsp->ChangeTime = cpu_to_le64(time);
-+		rsp->ChangeTime = cpu_to_le64(fp->change_time);
- 		ksmbd_fd_put(work, fp);
- 	} else {
- 		rsp->Flags = 0;
-@@ -6485,9 +6480,11 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 		attrs.ia_valid |= (ATTR_ATIME | ATTR_ATIME_SET);
- 	}
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 74b0307cb100..80fd27752b2c 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -702,8 +702,10 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, const struct path *old_path,
  
--	if (file_info->ChangeTime)
-+	if (file_info->ChangeTime) {
-+		fp->change_time = le64_to_cpu(file_info->ChangeTime);
- 		inode_set_ctime_to_ts(inode,
- 				ksmbd_NTtimeToUnix(file_info->ChangeTime));
-+	}
- 
- 	if (file_info->LastWriteTime) {
- 		attrs.ia_mtime = ksmbd_NTtimeToUnix(file_info->LastWriteTime);
-diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index ca391d597e2e..8c456484cab2 100644
---- a/fs/smb/server/vfs_cache.h
-+++ b/fs/smb/server/vfs_cache.h
-@@ -97,6 +97,7 @@ struct ksmbd_file {
- 	__le32				coption;
- 	__le32				cdoption;
- 	__u64				create_time;
-+	__u64				change_time;
- 	__u64				itime;
- 
- 	bool				is_nt_open;
+ 	parent_fp = ksmbd_lookup_fd_inode(old_child->d_parent);
+ 	if (parent_fp) {
+-		if (parent_fp->daccess & FILE_DELETE_LE) {
+-			pr_err("parent dir is opened with delete access\n");
++		if ((parent_fp->daccess & FILE_DELETE_LE) ||
++		    (!parent_fp->attrib_only &&
++		     !(parent_fp->saccess & FILE_SHARE_DELETE_LE))) {
++			pr_err("parent dir blocks delete sharing\n");
+ 			err = -ESHARE;
+ 			ksmbd_fd_put(work, parent_fp);
+ 			goto out3;
 -- 
 2.25.1
 
