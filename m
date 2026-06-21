@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7127366049
-	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59A33559F2
+	for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 12:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782046142; cv=none; b=Fg9R5QZZEFi3xht6801Tzm34jJiIt0G00xy4l4tvKNIZfZniaUlG3A5y0NnneOU97Uson62A1judAxxpj6k1oPeD4/01khLC+VfYYeLk3lm3NdFTW+GiGoEh4dWcJaFe/EyzUId6uvPYn3uh52Xf3Bwha559pJVw+MyQkeVCm5k=
+	t=1782046143; cv=none; b=gxNpWVb9tScN0tfAikj9D/uy+NP1cZu8Oa5+mVPqfMvW1bmX4D2NmjjlzZOZQII8l1FneNz66cPs7L85ISNxrAhJTOu5u93tGngfLNuZo5yX8vnBHjjR2E+Ipq/rTNUv2D/Vx5dulg03+9nUZViibLUWbSHDNCYn2HrKm6vLyt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782046142; c=relaxed/simple;
-	bh=NI/fE4vLp2FbbivmaK6Z3vvyNVdJ148ZhCayr65RP9w=;
+	s=arc-20240116; t=1782046143; c=relaxed/simple;
+	bh=CMSo736uQ6T/cVUVx03g5UzFjA7X8JpEtO1YsNbqfH4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HCt67YyaFWpHrJ/Iv4MD/5TvvtaHgtqLpFvVbuA9Rub9htRi7NLy3Uq0u1qyg8WHJ3Eq7dyM2dIDbK0ocCHZWV9v0PXiBZL/o4VDIVYIpe/XYDiUwOWJqJKfIFkQsaKRE9/R/qQ9AVZjt/0K1MnoMTKr/2C7PuH8m0QKeq7RLCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MJ7EmXhe; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=LEkNIA2bCgcCV4T3CefhxAcp7AQ/U2AFQqQjLDCUAtB0TozrW5Df9ogtMiKuMjpNaXQrmqZkrXXIWMY/2TPfsxT6jNX1i4FqUWt6Vxg2hROaowLD+6Au/CQkkxO0y2PsAIU5qNjlEhsKcoa7XqkTR8X9f90yGg4QwB9N62kSudk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdM/m/9N; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MJ7EmXhe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9495A1F000E9;
-	Sun, 21 Jun 2026 12:48:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdM/m/9N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90B2C1F00A3A;
+	Sun, 21 Jun 2026 12:49:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782046140;
-	bh=DuXDjUWoiwnMGR5JxD+H0741ZFRr0RR0iegtglyPtgU=;
+	s=k20260515; t=1782046142;
+	bh=XoM7J/OWgkB9FS9tiUnLHsSxVT+H7R2/LB0eIOKPjuo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MJ7EmXheuq/GVlKbvRzsMZPTUu/UDYbnR8IBvTwETE3frIj3ZLKE7KLkE+wZlKta3
-	 zmj5ojsOcxPz46jTeroFfU8A8lMgQwe2EBYCtC6zCdPMiv/RkkvE3219DbtZmtKRq1
-	 7nt5F+okbO4nd6LCUN7YJd+vdntoqHzJgD7KqXn9aUBR0B6UYMv3SPh1gMRwNJ00uK
-	 5eP/Sr2xTuEDer4pj9axMu2Zs2ibpD5AgxOxurR6xheXkpaSiPDPY657G8iX8uWLBo
-	 +bGM08C/7QLWilaeLxxZxDsRhqriGpIoPpsf0+Bw/kuWB1wh5tUsZ0f9dEKgZqZEJI
-	 JW/soXSv+GXZQ==
+	b=jdM/m/9NO4hmSFFxKNMEpQfRCt8ACZ0ODZAs1i8q/Xfot/uOrPaVnEqxBRAabLsud
+	 pu+303l1YBHKkwYBMsiR5orh8EFk9FgzpLoKr6lhRO7mRq7KfWCwUligFdb4+vaZ0v
+	 EaZhR575yDdzlmK1wCBJVp1elajelTbj/18VjPxXWlRt8z9rKaE1SZo6zGLKbTgjKu
+	 OXVNMQNkHuK+/Uei+IWQhJQmcM1JlOe46Sa28z+TABTOZMUeAaOKCqfg4n8ezpFvS7
+	 xLa4lBygmmxyNHOyrNXL7cF8ReUzoapllE0wNiIReIG1v3i7l+0QyuBujNVrgfjSch
+	 GS4G+epTAHPGg==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -33,9 +33,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 05/29] ksmbd: handle durable v2 app instance id
-Date: Sun, 21 Jun 2026 21:48:20 +0900
-Message-Id: <20260621124844.6235-5-linkinjeon@kernel.org>
+Subject: [PATCH 06/29] ksmbd: preserve open change time across rename
+Date: Sun, 21 Jun 2026 21:48:21 +0900
+Message-Id: <20260621124844.6235-6-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260621124844.6235-1-linkinjeon@kernel.org>
 References: <20260621124844.6235-1-linkinjeon@kernel.org>
@@ -47,209 +47,124 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The SMB2_CREATE_APP_INSTANCE_ID create context is used with durable v2
-opens to identify another open from the same application instance. When
-a new durable v2 open arrives with the same AppInstanceId as an existing
-open, the server should close the previous open without sending an
-oplock break notification.
+inode ctime is updated when a file is renamed. ksmbd returned that
+ctime directly as SMB2 ChangeTime for handle-based query information.
+This makes ChangeTime change after a rename through an already-open
+handle, while Windows keeps the handle's ChangeTime stable for this
+case.
 
-ksmbd ignored this create context. A second durable v2 batch oplock open
-with the same AppInstanceId therefore went through the normal competing
-open path and sent an oplock break to the first opener. smbtorture
-smb2.durable-v2-open.app-instance expects no oplock break and then
-expects the old handle to be closed.
+Store the SMB ChangeTime in struct ksmbd_file when the handle is opened
+and use that value for create, close, and handle-based query information
+responses.  If a client explicitly sets FILE_BASIC_INFORMATION
+ChangeTime, update the stored value as well.
 
-Parse and store AppInstanceId for durable v2 opens. Before creating the
-new open, find an existing file with the same AppInstanceId and close it
-through the normal close teardown path without issuing an oplock break.
+This fixes smbtorture smb2.rename.simple_modtime, which expects
+ChangeTime and LastWriteTime to remain unchanged after renaming an
+already-open file.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c   | 37 ++++++++++++++++++++
- fs/smb/server/vfs_cache.c | 72 +++++++++++++++++++++++++++++++++++++++
+ fs/smb/server/smb2pdu.c   | 23 ++++++++++-------------
  fs/smb/server/vfs_cache.h |  1 +
- 3 files changed, 110 insertions(+)
+ 2 files changed, 11 insertions(+), 13 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 35db86da79d3..a21760394637 100644
+index a21760394637..f2ba52c7e325 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -2807,8 +2807,10 @@ struct durable_info {
- 	unsigned short int type;
- 	bool persistent;
- 	bool reconnected;
-+	bool app_instance_id;
- 	unsigned int timeout;
- 	char *CreateGuid;
-+	char AppInstanceId[SMB2_CREATE_GUID_SIZE];
- };
+@@ -3783,6 +3783,7 @@ int smb2_open(struct ksmbd_work *work)
+ 		fp->create_time = ksmbd_UnixTimeToNT(stat.btime);
+ 	else
+ 		fp->create_time = ksmbd_UnixTimeToNT(stat.ctime);
++	fp->change_time = ksmbd_UnixTimeToNT(stat.ctime);
+ 	if (req->FileAttributes || fp->f_ci->m_fattr == 0)
+ 		fp->f_ci->m_fattr =
+ 			cpu_to_le32(smb2_get_dos_mode(&stat, le32_to_cpu(req->FileAttributes)));
+@@ -3832,8 +3833,7 @@ int smb2_open(struct ksmbd_work *work)
+ 	rsp->LastAccessTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.mtime);
+ 	rsp->LastWriteTime = cpu_to_le64(time);
+-	time = ksmbd_UnixTimeToNT(stat.ctime);
+-	rsp->ChangeTime = cpu_to_le64(time);
++	rsp->ChangeTime = cpu_to_le64(fp->change_time);
+ 	rsp->AllocationSize = S_ISDIR(stat.mode) ? 0 :
+ 		cpu_to_le64(stat.blocks << 9);
+ 	rsp->EndofFile = S_ISDIR(stat.mode) ? 0 : cpu_to_le64(stat.size);
+@@ -5102,8 +5102,7 @@ static int get_file_basic_info(struct smb2_query_info_rsp *rsp,
+ 	basic_info->LastAccessTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.mtime);
+ 	basic_info->LastWriteTime = cpu_to_le64(time);
+-	time = ksmbd_UnixTimeToNT(stat.ctime);
+-	basic_info->ChangeTime = cpu_to_le64(time);
++	basic_info->ChangeTime = cpu_to_le64(fp->change_time);
+ 	basic_info->Attributes = fp->f_ci->m_fattr;
+ 	basic_info->Pad = 0;
+ 	rsp->OutputBufferLength =
+@@ -5205,8 +5204,7 @@ static int get_file_all_info(struct ksmbd_work *work,
+ 	file_info->LastAccessTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.mtime);
+ 	file_info->LastWriteTime = cpu_to_le64(time);
+-	time = ksmbd_UnixTimeToNT(stat.ctime);
+-	file_info->ChangeTime = cpu_to_le64(time);
++	file_info->ChangeTime = cpu_to_le64(fp->change_time);
+ 	file_info->Attributes = fp->f_ci->m_fattr;
+ 	file_info->Pad1 = 0;
+ 	if (ksmbd_stream_fd(fp) == false) {
+@@ -5415,8 +5413,7 @@ static int get_file_network_open_info(struct smb2_query_info_rsp *rsp,
+ 	file_info->LastAccessTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.mtime);
+ 	file_info->LastWriteTime = cpu_to_le64(time);
+-	time = ksmbd_UnixTimeToNT(stat.ctime);
+-	file_info->ChangeTime = cpu_to_le64(time);
++	file_info->ChangeTime = cpu_to_le64(fp->change_time);
+ 	file_info->Attributes = fp->f_ci->m_fattr;
+ 	if (ksmbd_stream_fd(fp) == false) {
+ 		file_info->AllocationSize = cpu_to_le64(stat.blocks << 9);
+@@ -5547,8 +5544,7 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
+ 	file_info->LastAccessTime = cpu_to_le64(time);
+ 	time = ksmbd_UnixTimeToNT(stat.mtime);
+ 	file_info->LastWriteTime = cpu_to_le64(time);
+-	time = ksmbd_UnixTimeToNT(stat.ctime);
+-	file_info->ChangeTime = cpu_to_le64(time);
++	file_info->ChangeTime = cpu_to_le64(fp->change_time);
+ 	file_info->DosAttributes = fp->f_ci->m_fattr;
+ 	file_info->Inode = cpu_to_le64(stat.ino);
+ 	if (ksmbd_stream_fd(fp) == false) {
+@@ -6271,8 +6267,7 @@ int smb2_close(struct ksmbd_work *work)
+ 		rsp->LastAccessTime = cpu_to_le64(time);
+ 		time = ksmbd_UnixTimeToNT(stat.mtime);
+ 		rsp->LastWriteTime = cpu_to_le64(time);
+-		time = ksmbd_UnixTimeToNT(stat.ctime);
+-		rsp->ChangeTime = cpu_to_le64(time);
++		rsp->ChangeTime = cpu_to_le64(fp->change_time);
+ 		ksmbd_fd_put(work, fp);
+ 	} else {
+ 		rsp->Flags = 0;
+@@ -6485,9 +6480,11 @@ static int set_file_basic_info(struct ksmbd_file *fp,
+ 		attrs.ia_valid |= (ATTR_ATIME | ATTR_ATIME_SET);
+ 	}
  
- static int parse_durable_handle_context(struct ksmbd_work *work,
-@@ -2993,6 +2995,31 @@ static int parse_durable_handle_context(struct ksmbd_work *work,
- 	return err;
- }
- 
-+static int parse_app_instance_id(struct smb2_create_req *req,
-+				 struct durable_info *dh_info)
-+{
-+	struct create_context *context;
-+	char *data;
-+
-+	context = smb2_find_context_vals(req, SMB2_CREATE_APP_INSTANCE_ID,
-+					 SMB2_CREATE_GUID_SIZE);
-+	if (IS_ERR(context))
-+		return PTR_ERR(context);
-+	if (!context)
-+		return 0;
-+
-+	if (le32_to_cpu(context->DataLength) < 20)
-+		return -EINVAL;
-+
-+	data = (char *)context + le16_to_cpu(context->DataOffset);
-+	if (data[0] != 20 || data[1])
-+		return -EINVAL;
-+
-+	memcpy(dh_info->AppInstanceId, data + 4, SMB2_CREATE_GUID_SIZE);
-+	dh_info->app_instance_id = true;
-+	return 0;
-+}
-+
- /**
-  * smb2_open() - handler for smb file open request
-  * @work:	smb work containing request buffer
-@@ -3135,6 +3162,9 @@ int smb2_open(struct ksmbd_work *work)
- 			ksmbd_debug(SMB, "error parsing durable handle context\n");
- 			goto err_out2;
- 		}
-+		rc = parse_app_instance_id(req, &dh_info);
-+		if (rc)
-+			goto err_out2;
- 
- 		if (dh_info.reconnected == true) {
- 			rc = smb2_check_durable_oplock(conn, share, dh_info.fp,
-@@ -3161,6 +3191,9 @@ int smb2_open(struct ksmbd_work *work)
- 
- 			goto reconnected_fp;
- 		}
-+
-+		if (dh_info.type == DURABLE_REQ_V2 && dh_info.app_instance_id)
-+			ksmbd_close_fd_app_instance_id(dh_info.AppInstanceId);
- 	} else if (req_op_level == SMB2_OPLOCK_LEVEL_LEASE) {
- 		lc = parse_lease_state(req);
- 		if (IS_ERR(lc)) {
-@@ -3775,6 +3808,10 @@ int smb2_open(struct ksmbd_work *work)
- 		if (dh_info.type == DURABLE_REQ_V2) {
- 			memcpy(fp->create_guid, dh_info.CreateGuid,
- 					SMB2_CREATE_GUID_SIZE);
-+			if (dh_info.app_instance_id)
-+				memcpy(fp->app_instance_id,
-+				       dh_info.AppInstanceId,
-+				       SMB2_CREATE_GUID_SIZE);
- 			if (dh_info.timeout)
- 				fp->durable_timeout =
- 					min_t(unsigned int, dh_info.timeout,
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 3546d95df76f..5a2fddadcddf 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -37,6 +37,8 @@ static struct ksmbd_file_table global_ft;
- static atomic_long_t fd_limit;
- static struct kmem_cache *filp_cache;
- 
-+static int ksmbd_mark_fp_closed(struct ksmbd_file *fp);
-+
- #define OPLOCK_NONE      0
- #define OPLOCK_EXCLUSIVE 1
- #define OPLOCK_BATCH     2
-@@ -773,6 +775,76 @@ bool ksmbd_has_other_active_fd(struct ksmbd_file *fp)
- 	return ret;
- }
- 
-+static struct ksmbd_file *ksmbd_lookup_fd_app_instance_id(char *app_instance_id)
-+{
-+	struct ksmbd_file *fp = NULL;
-+	unsigned int id;
-+
-+	if (!memchr_inv(app_instance_id, 0, SMB2_CREATE_GUID_SIZE))
-+		return NULL;
-+
-+	read_lock(&global_ft.lock);
-+	idr_for_each_entry(global_ft.idr, fp, id) {
-+		if (!memcmp(fp->app_instance_id, app_instance_id,
-+			    SMB2_CREATE_GUID_SIZE)) {
-+			fp = ksmbd_fp_get(fp);
-+			break;
-+		}
+-	if (file_info->ChangeTime)
++	if (file_info->ChangeTime) {
++		fp->change_time = le64_to_cpu(file_info->ChangeTime);
+ 		inode_set_ctime_to_ts(inode,
+ 				ksmbd_NTtimeToUnix(file_info->ChangeTime));
 +	}
-+	read_unlock(&global_ft.lock);
-+
-+	return fp;
-+}
-+
-+int ksmbd_close_fd_app_instance_id(char *app_instance_id)
-+{
-+	struct ksmbd_file_table *ft;
-+	struct ksmbd_file *fp;
-+	struct oplock_info *opinfo;
-+	int n_to_drop = 0;
-+
-+	fp = ksmbd_lookup_fd_app_instance_id(app_instance_id);
-+	if (!fp)
-+		return 0;
-+
-+	opinfo = opinfo_get(fp);
-+	if (!opinfo || !opinfo->sess)
-+		goto out;
-+
-+	ft = &opinfo->sess->file_table;
-+	write_lock(&ft->lock);
-+	if (fp->f_state == FP_INITED) {
-+		if (has_file_id(fp->volatile_id)) {
-+			idr_remove(ft->idr, fp->volatile_id);
-+			fp->volatile_id = KSMBD_NO_FID;
-+		}
-+		n_to_drop = ksmbd_mark_fp_closed(fp);
-+	}
-+	write_unlock(&ft->lock);
-+	opinfo_put(opinfo);
-+	opinfo = NULL;
-+
-+	if (!n_to_drop)
-+		goto out;
-+
-+	down_write(&fp->f_ci->m_lock);
-+	list_del_init(&fp->node);
-+	up_write(&fp->f_ci->m_lock);
-+
-+	if (atomic_sub_and_test(n_to_drop, &fp->refcount)) {
-+		if (fp->conn)
-+			atomic_dec(&fp->conn->stats.open_files_count);
-+		__ksmbd_close_fd(NULL, fp);
-+	}
-+	return 0;
-+
-+out:
-+	if (opinfo)
-+		opinfo_put(opinfo);
-+	ksmbd_put_durable_fd(fp);
-+	return 0;
-+}
-+
- int ksmbd_invalidate_durable_fd(unsigned long long id)
- {
- 	struct ksmbd_file *fp;
+ 
+ 	if (file_info->LastWriteTime) {
+ 		attrs.ia_mtime = ksmbd_NTtimeToUnix(file_info->LastWriteTime);
 diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index 4803f41a91ef..ca391d597e2e 100644
+index ca391d597e2e..8c456484cab2 100644
 --- a/fs/smb/server/vfs_cache.h
 +++ b/fs/smb/server/vfs_cache.h
-@@ -168,6 +168,7 @@ struct ksmbd_file *ksmbd_lookup_durable_fd(unsigned long long id);
- void ksmbd_put_durable_fd(struct ksmbd_file *fp);
- int ksmbd_invalidate_durable_fd(unsigned long long id);
- bool ksmbd_has_other_active_fd(struct ksmbd_file *fp);
-+int ksmbd_close_fd_app_instance_id(char *app_instance_id);
- struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid);
- struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry);
- unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp);
+@@ -97,6 +97,7 @@ struct ksmbd_file {
+ 	__le32				coption;
+ 	__le32				cdoption;
+ 	__u64				create_time;
++	__u64				change_time;
+ 	__u64				itime;
+ 
+ 	bool				is_nt_open;
 -- 
 2.25.1
 
