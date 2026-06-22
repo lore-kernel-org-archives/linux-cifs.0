@@ -1,147 +1,99 @@
-Received: from na1pdmzitismtp02.tibco.com (unknown [160.101.131.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190BE36A340;
-	Mon, 22 Jun 2026 09:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.101.131.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495C721B191
+	for <linux-cifs@vger.kernel.org>; Mon, 22 Jun 2026 23:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782120311; cv=none; b=a6MXsUwppynjYnIOyFESxyGuTtpToe81w+4d/DLRDi0DJ2dA4xN/qTM30AO0pNLzRnR4tG1a0pFdvbAf2ESnyISGQfLYqh0n8WpAgaf/nkvgUSvfiU7O99NoLju5hEm3rgC7I9H6Ob0MCD8YuhFbw4aB2AMnNWkimrh+kF8P0SQ=
+	t=1782169275; cv=none; b=qflokjqKwybiWvy1cQq9RJJz2+BGFKytpCLVS2HWc50zMBBuBzUvBzX8X9zDi5EHdyxpMiCqovX39cBMI+ph4Qx4/GRLR1Zxcc+l1V92ihXBtpzdcLUHpbs0EjtrcVtuuWwbB4+ZX1IbzaTA9mhAWBOFyMwLBS972eyT3MxAioA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782120311; c=relaxed/simple;
-	bh=hgHtiBF9qj+HFF36fS1tMtaMVSziudFs/y1gC5tEk0s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ox8mbAwiAnOqFcZDy05fG8MF/kc2LDAkkLbh+tpsgM2IDU0nWmSLgWgkq7YrBVcWogBpgt/bdGlzRme8e+c80gKAXeqFoR6Rzg5oQ/0G06pqsiKcDa9IXcHJlOsvShR4mQvOP4NFSOB+V2jcwG7AvB7w6+YZCaytb1r/+EqxVds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; arc=none smtp.client-ip=160.101.131.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
-Received: from eddie6.eng.citrite.net (unknown [10.113.40.46])
-	by na1pdmzitismtp02.tibco.com (Postfix) with ESMTP id 497BA81C4306;
-	Mon, 22 Jun 2026 05:13:28 -0400 (EDT)
-From: Chunjie Zhu <chunjie.zhu@citrix.com>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>
-Cc: Chunjie Zhu <chunjie.zhu@citrix.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] fix smb client defer close causes file corruption
-Date: Mon, 22 Jun 2026 09:14:49 +0000
-Message-ID: <20260622091450.2668504-1-chunjie.zhu@citrix.com>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1782169275; c=relaxed/simple;
+	bh=sUEdDSQ0pXRa7UsGddTSLXouovPN1Q1lmCiPM2WZ3hY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EfcOfyO/d1jCoCHxkU/LuwdkfKwQPVnrDj50Ce9Hm3mpwCz6/I5fR/MaIbdWo+U/C6K3LG6lPK9W09P1L6ZrobpymyTpZWH6JlYUvw+rc2kMJfJpknhSWFT7JfXh6/Fdv9hglADmJMTPd+OrypjsUn6k+YSwAByuCacyIRTVFHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyXPBQKA; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyXPBQKA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1961F000E9;
+	Mon, 22 Jun 2026 23:01:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782169274;
+	bh=Vk6UMp1SByzUMrgSlEk6sYWCURR8QL+1K+l3nCW4Css=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=jyXPBQKAVeRWtEIsMsC8lcNJZSofpL4QtqRDwaMSJpz42e5PEtt3EiEHWOndCvDnQ
+	 N1fF67GTs75nT/3B+jYz/6Wupq/rI+/D+NFnn4/KVomfQBHhIcJjZmL4FnxqY/MOEA
+	 JnvnHnJhX09DGBM+RKvP+HgRvol8xAJaRlb3OsHuNyiqKC9hFWmciZBjz40s9PmzuX
+	 kgvBZ6+yLNKsOmfOfEN/0rV8IcGmCkNUi89BPfUX/oi4nsbhABvb7LZgAXNn/Y1WwD
+	 645GzJTj580gBrm3VX8b8ofdVAHfnBCwi7yXkfSK4+SdGMClVB1IOCjqO+rGyF5oyS
+	 e1Er3/euZCDAw==
+Date: Mon, 22 Jun 2026 16:01:09 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com,
+	senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com
+Subject: Re: [PATCH 17/29] ksmbd: return requested create allocation size
+Message-ID: <20260622230109.GA3328@ax162>
+References: <20260621124844.6235-1-linkinjeon@kernel.org>
+ <20260621124844.6235-17-linkinjeon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260621124844.6235-17-linkinjeon@kernel.org>
 
-Test environment
+Hi,
 
- 4 hosts as smb client, 1 host as smb server
- smb client hosts, kernel 6.6.138
- mount options,
-  //10.70.48.15/xxx /run/xxx cifs rw,relatime,vers=3.0,
-  cache=loose,username=xxx,domain=xxx,uid=0,noforceuid,
-  gid=0,noforcegid,addr=10.70.48.15,file_mode=0755,
-  dir_mode=0755,soft,nounix,serverino,mapposix,reparse=nfs,
-  rsize=1048576,wsize=1048576,bsize=1048576,echo_interval=60,
-  actimeo=0,closetimeo=1
+On Sun, Jun 21, 2026 at 09:48:32PM +0900, Namjae Jeon wrote:
+...
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index d6001cdce085..cca04bf84b81 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+...
+> @@ -3926,8 +3927,19 @@ int smb2_open(struct ksmbd_work *work)
+>  	time = ksmbd_UnixTimeToNT(stat.mtime);
+>  	rsp->LastWriteTime = cpu_to_le64(time);
+>  	rsp->ChangeTime = cpu_to_le64(fp->change_time);
+> -	rsp->AllocationSize = S_ISDIR(stat.mode) ? 0 :
+> -		cpu_to_le64(stat.blocks << 9);
+> +	/*
+> +	 * The cached allocation size hides filesystem rounding for the
+> +	 * requested allocation, but it can go stale when the file grows past
+> +	 * it via writes (e.g. across a durable reconnect). Refresh it once the
+> +	 * file exceeds the cached value, rounding the end of file up to the
+> +	 * volume allocation unit (the filesystem block size, matching the
+> +	 * SectorsPerAllocationUnit/BytesPerSector ksmbd advertises) rather than
+> +	 * using the raw on-disk block count, which can include filesystem
+> +	 * preallocation and metadata rounding.
+> +	 */
+> +	if (!S_ISDIR(stat.mode) && stat.size > fp->allocation_size)
+> +		fp->allocation_size = roundup(stat.size, stat.blksize);
 
-Work around
+This patch is in -next as commit 64ab25180b27 ("ksmbd: return requested
+create allocation size"), where it breaks the build for 32-bit
+platforms, as stat.size is a loff_t and roundup() performs a plain
+division:
 
- mount with cache=none or closetimeo=0
+  $ cat allno.config
+  CONFIG_INET=y
+  CONFIG_NET=y
+  CONFIG_NETWORK_FILESYSTEMS=y
+  CONFIG_SMB_SERVER=y
 
-The Race Condition Flow
+  $ make -skj"$(nproc)" ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- KCONFIG_ALLCONFIG=1 mrproper allnoconfig vmlinux
+  arm-linux-gnueabi-ld: fs/smb/server/smb2pdu.o: in function `smb2_open':
+  smb2pdu.c:(.text+0x765a): undefined reference to `__aeabi_ldivmod'
+  arm-linux-gnueabi-ld: (__aeabi_ldivmod): Unknown destination type (ARM/Thumb) in fs/smb/server/smb2pdu.o
+  smb2pdu.c:(.text+0x765a): dangerous relocation: unsupported relocation
+  ...
 
- Step 1: Host-01 closes file
+Is this series intended for 7.2 or 7.3? If it is 7.3, it really
+shouldn't be in -next during the merge window...
 
-  Host-01:
-   file close (eeefe8d0.vhd)
-   -> CIFS defers SMB2 CLOSE
-   -> Handle H1 stored in deferred_closes list
-   -> Lease L1 (RWH or RH) still active on server
-   -> Entry: { path=“eeefe8d0.vhd”, handle=H1, inode=I1 }
-
- Step 2: Host-02 does hardlink and rename
-
-  Host-02:
-   hardlink(eeefe8d0.vhd, 0f11b74e.vhd)
-   -> SMB2: Creates new name for same inode
-   -> Server: inode I1 now has 2 names (link count = 2)
-   -> Host-01 lease L1: NO BREAK (same inode, just added name)
-
-   crate(eeefe8d0.vhd.new)
-   -> Entry { path="eeefe8d0.vhd.new", handle=H2, inode=I2 }
-
-   rename(eeefe8d0.vhd.new, eeefe8d0.vhd)
-   -> SMB2: Replaces “eeefe8d0.vhd” name → points to new inode I2
-   -> Server: old inode I1 now only accessible as “0f11b74e.vhd”
-   -> Server SHOULD send: Lease Break notification to H1 ← KEY!
-
- Step 3: Lease break delivery is not reliable
-
-  strict locking off, level2 oplock
-
-   Host-01:
-   -> Lease break not received or processed
-   -> H1 is in deferred_closes list (not "active")
-
-   Result: Stale entry remains:
-      { path=“eeefe8d0.vhd”, handle=H1, inode=I1_OLD }
-
-   Host-02:
-   -> Open 0f11b74e.vhd in readonly
-
-   Result:
-      { path="0f11b74e.vhd", inode=I1_NEW }
-
- Step 4: Host-01 reopens file
-
-  Host-01:
-   file open (eeefe8d0.vhd)
-   -> Kernel checks deferred_closes for “eeefe8d0.vhd”
-   -> Found H1! (matched by pathname string)
-   -> REUSES H1 without checking
-   -> close or reconnect, flush buffered writes
-      slient corruption?
-
-Signed-off-by: Chunjie Zhu <chunjie.zhu@citrix.com>
----
- fs/smb/client/fs_context.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 0812af001417..4ed33de0a00d 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1300,11 +1300,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 		ctx->acdirmax = ctx->acregmax = HZ * result.uint_32;
- 		break;
- 	case Opt_closetimeo:
--		if (result.uint_32 > SMB3_MAX_DCLOSETIMEO / HZ) {
--			cifs_errorf(fc, "closetimeo too large\n");
-+		if (result.uint_32 != 0) {
-+			cifs_errorf(fc, "closetimeo must be 0, deferred close is disabled\n");
- 			goto cifs_parse_mount_err;
- 		}
--		ctx->closetimeo = HZ * result.uint_32;
-+		ctx->closetimeo = 0;
- 		break;
- 	case Opt_echo_interval:
- 		if (result.uint_32 < SMB_ECHO_INTERVAL_MIN ||
-@@ -1795,7 +1795,7 @@ int smb3_init_fs_context(struct fs_context *fc)
- 
- 	ctx->acregmax = CIFS_DEF_ACTIMEO;
- 	ctx->acdirmax = CIFS_DEF_ACTIMEO;
--	ctx->closetimeo = SMB3_DEF_DCLOSETIMEO;
-+	ctx->closetimeo = 0;
- 	ctx->max_cached_dirs = MAX_CACHED_FIDS;
- 	/* Most clients set timeout to 0, allows server to use its default */
- 	ctx->handle_timeout = 0; /* See MS-SMB2 spec section 2.2.14.2.12 */
 -- 
-2.52.0
-
+Cheers,
+Nathan
