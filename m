@@ -1,77 +1,67 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00F6241C8C
-	for <linux-cifs@vger.kernel.org>; Mon, 22 Jun 2026 01:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64C238BF81
+	for <linux-cifs@vger.kernel.org>; Mon, 22 Jun 2026 08:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782090775; cv=none; b=bz1b9+ndleFBr7b2vzEG2QlTs1/CJNKM8XsdJX8wP0ww0vW/H2eVrk/mfGGy+JxVrxMatm1K5lmEMQrbhNDS3nJdgLrksAVh/cSCQVOk0qfffMZ+We3Ewt3TD57X/oC4aLgq78diMIJ5cYToJwSdKpwY5OvjC9qC2sATk715Izc=
+	t=1782118043; cv=none; b=kBoG5F2VY/OjaUJ4j+D7fxa5TgsbN36xpGxv4SgjQ2pPJORQosKs9OKyoan/nw6jjETPUDdGKL3qXm8YH5DHBSew5AhhFTXcR9eFFJqdAWtO2DI4SlRiUFlMFD/Elt4B1jWnN5xSCYkgXRjwgM81dSqTpZWJ5EH8EfqG4s/XMq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782090775; c=relaxed/simple;
-	bh=j94HQK6oZ0r8NQs9hVhnpkh1dynCNV5NjnR+rHJVplU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WflAHuUhLYz5xrbV28m38G9uE2ozmCg9AvawCisOueGRyyyS72k3esUmzxVWMEfEX2efW9ji0hW2AO81AygLSdkcVvBY2cWUXAQD9WCXv5ITRKtiGdC8IujVhEn7VylGnV5hGJZj8iyseXX+IIkClPl0GQqqVUuyr3EhqGzm4fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l+wPjFOD; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782118043; c=relaxed/simple;
+	bh=UvtOPhmNTz+UOftq/B5KLn4iLsotG39/bHTNhPV3UQc=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=ZqSkDKgjfc23VBkr1vN0jZJC057Up7IYLnpC/YH+83isfbItBIKmqbeTlxkDsfc700hP307Ol3pOT0DwJ7SR0ymu91Y/PpHo1Qu7/Z+BIRovLmwZ9//UoHIS27T8pYl46WR1KA/alUb3u/MTd+kcM8+eV7weQNuebQLP1rK313g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=v7MkG9ar; arc=none smtp.client-ip=162.62.57.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+wPjFOD"
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-440df1c768bso2422078fac.1
-        for <linux-cifs@vger.kernel.org>; Sun, 21 Jun 2026 18:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782090773; x=1782695573; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3a9PPciCr47HimGYz06wh3ROlaOsQ1tPkQ9F4Y9Wec=;
-        b=l+wPjFODwGgs5jlwHXUNR3MWbjzGgF6okEFyWO1Q2k+ByBwVEJla4p+H6wxWjBQ3zz
-         DAK0tP+3pmnGEuw8zlaN+/GO/0lb59qw9bv4Wf0LZ7hVc2GO0d8d1qG0i2dHqaa/Jzcc
-         UdsG0FbGkelsmEdXN6wyBnJs23rCGpuh7xL2U5X2aE77NaFtbl8NEi16M+OEhsoBjf21
-         T9VSjVSxx0xMzOWIEMttKamhErF7sSfbdbkstm/bSsnquX2oU2Vwg6J0hioTOuftVVes
-         7/1CThrzVSvJDtJDTi8qh/wbPDs3tWosd2Qsvfe0Wcngbc9go3E0W5mzQLZkf40FYyRb
-         L+yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782090773; x=1782695573;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=v3a9PPciCr47HimGYz06wh3ROlaOsQ1tPkQ9F4Y9Wec=;
-        b=NYMHG33KTdY4kGvF+S1ORVDCBgVN7D4WamWqxK2/a0kKg6VWKE9wDYJih5ZATQQC6n
-         IeAVDv62C+25WbAzgOhFqJLXmwArlFA4S51tVNuvOJZQhVUiZwPD3SLOoZmnEf7eJLgR
-         dezcN9AHg0Ha8pCyURxKvCCqTAD/a35eqUrNhci8FnMFxGRdwW09L982KJUfYr6mvcYU
-         dONuudf1h21wNfE4FjDGB/sipZ3A2uRVYelYldqm06+u9OZUTnMIb7RpWfggSZlAHaUD
-         B94nKCCkGwnS6manZbr13eXJtdjIx6apkXWb6ta9lzFQTcBkYe8b8Xc6fgDrs1e5npeW
-         IY1g==
-X-Gm-Message-State: AOJu0Yxu8m5YNb6+7oQe6yrCsXSlQBYsxrzLJcYj2dVTESbXi5Az5sOg
-	asbv9kixvQF9s0eL5FzMkXDFWqsuREvldZP+pervY/PMvhqZIUQ7l4Ff37xfdPPj
-X-Gm-Gg: AfdE7ckZDL8eb2QyIwq6qv69/84TRmm7MdDtU8KwrxDCGunZVV0yicP4dyJR9HRzE7e
-	OJnirdYdnKiMrVBBwmgHlQ+ZofbN0itnfhnE7XDNo0U/o0FQ8XnzU7pPt/FoAFxer4XdloThghG
-	hlgn+Rim8hDqB/QQLqUJXScS2kiu3lyYblHmMFs/ZrqxOsygY4puAL+ol89De0e9yW0/5kssV/g
-	/o1M9LJoUlzN35IWsKZ6i82f3w5lITavHqfRZ7+fxCc96VG61R9MwC+/u7gyP6WdUwtFSSuqJTZ
-	NxBAWs0lIrhNIr/FOL4sc6nh34MKaYRJUHKEw/fGmgKNQBVZeM6yLwCVR6J6AvyYTW5OhlU+a89
-	1e/HkrBPbcrmHMA54kI44wZxqSoJrOt3lBHy3VQ4kdeVGazvvzVECyo3cFPIBXFn6zeSneqrsmb
-	R/ZkvDQGlENvYdLqSZw/BfORhFBhz5xqt6K8SMhmpYG2dztIS+m98fQvsBVnmhrby+KIUafJv17
-	Edmsr1vFSCkHMmdtqPDzsoop/T8BjfGXniN+WYZ9C+PjlGaWQXtEHQVBWUeU9iEORawWnlZlVrO
-	hcKJosWvdZ37S2OwiPJ0p9M8mXJfJjJHvkD3EA==
-X-Received: by 2002:a05:6820:905:b0:69e:b788:36e0 with SMTP id 006d021491bc7-6a0d8cd341cmr9696671eaf.34.1782090772772;
-        Sun, 21 Jun 2026 18:12:52 -0700 (PDT)
-Received: from smfrench-ThinkPad-P16s-Gen-2 ([2603:8080:2200:13fc:fe9d:7f65:95c3:3c73])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4472ec52815sm5206853fac.1.2026.06.21.18.12.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Jun 2026 18:12:52 -0700 (PDT)
-From: Steve French <smfrench@gmail.com>
-X-Google-Original-From: Steve French <stfrench@microsoft.com>
-To: linux-cifs@vger.kernel.org
-Cc: Ralph Boehme <slow@samba.org>,
-	stable@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH 3/3] smb/client: fix chown/chgrp with SMB3 POSIX Extensions
-Date: Sun, 21 Jun 2026 20:08:17 -0500
-Message-ID: <20260622010838.107524-3-stfrench@microsoft.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260622010838.107524-1-stfrench@microsoft.com>
-References: <smfrench@gmail.com>
- <20260622010838.107524-1-stfrench@microsoft.com>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="v7MkG9ar"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1782118035; bh=ggU7lf6xYTBXn+h6R+zKEOKBwr8KDc03p0FdkpZw+fg=;
+	h=From:To:Cc:Subject:Date;
+	b=v7MkG9arYmxg5lYy+LTX1sSTJVoogJ8GraIuD89Aj9AnNSWgcX7b1ZDPBiPRo26M8
+	 XAGsAwZuNDxIhq8nTBFseLAdyTVusMLmJgZ6UwHwX9C+MYVw+V+a3mhG2XV7swSWzq
+	 WkB9PnhfohA88E8Fil73Fm+xBdNe5zTXBqJIVAFI=
+Received: from localhost.localdomain ([116.128.244.169])
+	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
+	id BCC3D091; Mon, 22 Jun 2026 16:47:12 +0800
+X-QQ-mid: xmsmtpt1782118032t65limhfn
+Message-ID: <tencent_160379D932900C07E87A916577DA03F73609@qq.com>
+X-QQ-XMAILINFO: N2zgDHximsrq6yVcC3KLzRKMYfT8I0k8ihehkJy0BoN/WBnClZUxn/qax6y+eL
+	 +NKiTrLhQWWo5wPti+CTSDQ2Frote871niGKZyxjB1IkTsDugQz/KOSWqLZv1gRtggcNgy9RPxHr
+	 69imMJt08jfJOd6T7N9iZSTW20iTMey340oppmgkVbkxvwrNako5zoFS/ViHVe6K0ENrhP/URowD
+	 /0YpY4zMIy4T2kAK/huJMSHbOmGDddymcsO8vL1MtwpMMnqhlXGMtCf4OfXaLPaTsRo0u4wU7p7j
+	 2bprLcc3UJsMGbW3HNPv0H7DVMoxx5hw/Dcpnue8Wkss/RYKtz78nZjW5Gs0sEAFwVQjs6MjsACm
+	 mQ5b32FjjNoKCw7GyVwtQHY3CYP1aOfJiJj8pZLRxunAZCBs7DVJFPF8/hCGzn4nAryByVzJpN4S
+	 bacgLvlBwkPqVgUrn/n2POCSpcMBu6rYeKiW/kiUqm9DmPVYvMqOFqz2zSVcsm4hLGsb6iZx9wzQ
+	 2fL4OFhjpe84m5cbho2pB0ewcBeQnxlgr3ME7CnPzf70Ib8KwixMA4cRAtNPjGVDvi6ADquq+qfX
+	 lHXH1qKiXsVHqHPsIzlKXAkOwmRSi7wqXApLripGxPcnECQQxBcixe8saIn1G2ZWZRurOrXBk7r6
+	 6LqISLFwo55CG6th0iE8Yy0PSEsXMmJuLF4PBPjIuYcx4n1fLF9IaowNFkqkwbkf9GCRAelAFb/6
+	 2/NLGZpJgVkiHJ8dOogMil1yxfuWDkPR0aFkgxBI4sS+HqNMAm5E2yMBK7e12QT+zyEA7rRF8LMy
+	 C30CyrukCbeYXpRRQaEhwa0Dx8uXE4O7/x2C7HJW3HxePQ8QtlyNNEvRu4/wxjaW5UUp1jolFbXj
+	 xlmys3TCBpJnbMu6ESYs+YdDlXkcV+K8g1y+7xkQqiioFbKiAccR56imZg8o4xWfjdXT4OplRPLC
+	 FkURyj7dnntnI1W4iHR1gSYvNQnj9PNPtP8jkQ29Vny/xhbqBnz53kMit4Kswi9yiNnOe1+w6pzZ
+	 yZ2nRF9C+G0v21S6uKF+TLzpuXPSBy1+kYAh2+cA==
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+From: Haofeng Li <920484857@qq.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org,
+	chenxiaosong@chenxiaosong.com
+Cc: linux-cifs@vger.kernel.org,
+	Haofeng Li <13266079573@163.com>,
+	Haofeng Li <lihaofeng@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] ksmbd: validate num_subauth when copying ACE in set_ntacl_dacl
+Date: Mon, 22 Jun 2026 16:46:56 +0800
+X-OQ-MSGID: <20260622084656.663701-1-920484857@qq.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -80,37 +70,57 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ralph Boehme <slow@samba.org>
+From: Haofeng Li <lihaofeng@kylinos.cn>
 
-Ownership (chown) and group (chgrp) modifications were being ignored when
-mounting with SMB3 POSIX Extensions unless CIFS_MOUNT_CIFS_ACL or
-CIFS_MOUNT_MODE_FROM_SID were also explicitly set.
+set_ntacl_dacl() copies each ACE from the attacker-controlled stored
+security descriptor verbatim into the response DACL without checking
+sid.num_subauth. The ACE bytes (including an unchecked num_subauth)
+originate from an authenticated SMB2_SET_INFO(SecInfo=DACL) that is
+stored raw via ksmbd_vfs_set_sd_xattr(); parse_dacl() rejects a bad ACE
+with `break` rather than an error, so parse_sec_desc() still returns
+success and the malformed SD reaches the xattr intact.
 
-Fix this by checking for posix_extensions in cifs_setattr_nounix() when
-updating UID and GID, ensuring that id_mode_to_cifs_acl() is called to map
-and set the ownership/group information on the server.
+On a subsequent SMB2_QUERY_INFO(SecInfo=DACL) for an inode carrying a
+POSIX access ACL, build_sec_desc() -> set_ntacl_dacl() ->
+set_posix_acl_entries_dacl() walks the copied ACEs and reads
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Ralph Boehme <slow@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
+    ntace->sid.sub_auth[ntace->sid.num_subauth - 1]
+
+with num_subauth taken straight from the stored SD. Since sub_auth[]
+is fixed at SID_MAX_SUB_AUTHORITIES (15), a crafted num_subauth (e.g.
+255) drives an out-of-bounds heap read of ~1 KB with an offset fully
+controlled by an authenticated client.
+
+The sibling functions already gate this field:
+  parse_dacl()    -- num_subauth == 0 || > SID_MAX_SUB_AUTHORITIES
+  parse_sid()     -- num_subauth > SID_MAX_SUB_AUTHORITIES
+  smb_copy_sid()  -- min_t(u8, num_subauth, SID_MAX_SUB_AUTHORITIES)
+set_ntacl_dacl() is the lone inconsistent path that omits the check.
+
+Add the same num_subauth validation in set_ntacl_dacl() before copying
+the ACE, matching the gate already enforced by parse_dacl().
+
+Signed-off-by: Haofeng Li <lihaofeng@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/inode.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/server/smbacl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 51fb7c418d52..56b0f109e41b 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3376,7 +3376,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	if (attrs->ia_valid & ATTR_GID)
- 		gid = attrs->ia_gid;
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 340ea98fa494..34f0fa43428f 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -740,6 +740,10 @@ static void set_ntacl_dacl(struct mnt_idmap *idmap,
+ 			if (nt_ace_size > aces_size)
+ 				break;
  
--	if (sbflags & (CIFS_MOUNT_CIFS_ACL | CIFS_MOUNT_MODE_FROM_SID)) {
-+	if ((sbflags & (CIFS_MOUNT_CIFS_ACL | CIFS_MOUNT_MODE_FROM_SID)) ||
-+	    cifs_sb_master_tcon(cifs_sb)->posix_extensions) {
- 		if (uid_valid(uid) || gid_valid(gid)) {
- 			mode = NO_CHANGE_64;
- 			rc = id_mode_to_cifs_acl(inode, full_path, &mode,
++			if (ntace->sid.num_subauth == 0 ||
++			    ntace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES)
++				break;
++
+ 			memcpy((char *)pndace + size, ntace, nt_ace_size);
+ 			if (check_add_overflow(size, nt_ace_size, &size))
+ 				break;
 -- 
-2.53.0
+2.25.1
 
