@@ -1,126 +1,147 @@
-Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
+Received: from na1pdmzitismtp02.tibco.com (unknown [160.101.131.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64C238BF81
-	for <linux-cifs@vger.kernel.org>; Mon, 22 Jun 2026 08:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190BE36A340;
+	Mon, 22 Jun 2026 09:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.101.131.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782118043; cv=none; b=kBoG5F2VY/OjaUJ4j+D7fxa5TgsbN36xpGxv4SgjQ2pPJORQosKs9OKyoan/nw6jjETPUDdGKL3qXm8YH5DHBSew5AhhFTXcR9eFFJqdAWtO2DI4SlRiUFlMFD/Elt4B1jWnN5xSCYkgXRjwgM81dSqTpZWJ5EH8EfqG4s/XMq0=
+	t=1782120311; cv=none; b=a6MXsUwppynjYnIOyFESxyGuTtpToe81w+4d/DLRDi0DJ2dA4xN/qTM30AO0pNLzRnR4tG1a0pFdvbAf2ESnyISGQfLYqh0n8WpAgaf/nkvgUSvfiU7O99NoLju5hEm3rgC7I9H6Ob0MCD8YuhFbw4aB2AMnNWkimrh+kF8P0SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782118043; c=relaxed/simple;
-	bh=UvtOPhmNTz+UOftq/B5KLn4iLsotG39/bHTNhPV3UQc=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=ZqSkDKgjfc23VBkr1vN0jZJC057Up7IYLnpC/YH+83isfbItBIKmqbeTlxkDsfc700hP307Ol3pOT0DwJ7SR0ymu91Y/PpHo1Qu7/Z+BIRovLmwZ9//UoHIS27T8pYl46WR1KA/alUb3u/MTd+kcM8+eV7weQNuebQLP1rK313g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=v7MkG9ar; arc=none smtp.client-ip=162.62.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="v7MkG9ar"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1782118035; bh=ggU7lf6xYTBXn+h6R+zKEOKBwr8KDc03p0FdkpZw+fg=;
-	h=From:To:Cc:Subject:Date;
-	b=v7MkG9arYmxg5lYy+LTX1sSTJVoogJ8GraIuD89Aj9AnNSWgcX7b1ZDPBiPRo26M8
-	 XAGsAwZuNDxIhq8nTBFseLAdyTVusMLmJgZ6UwHwX9C+MYVw+V+a3mhG2XV7swSWzq
-	 WkB9PnhfohA88E8Fil73Fm+xBdNe5zTXBqJIVAFI=
-Received: from localhost.localdomain ([116.128.244.169])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id BCC3D091; Mon, 22 Jun 2026 16:47:12 +0800
-X-QQ-mid: xmsmtpt1782118032t65limhfn
-Message-ID: <tencent_160379D932900C07E87A916577DA03F73609@qq.com>
-X-QQ-XMAILINFO: N2zgDHximsrq6yVcC3KLzRKMYfT8I0k8ihehkJy0BoN/WBnClZUxn/qax6y+eL
-	 +NKiTrLhQWWo5wPti+CTSDQ2Frote871niGKZyxjB1IkTsDugQz/KOSWqLZv1gRtggcNgy9RPxHr
-	 69imMJt08jfJOd6T7N9iZSTW20iTMey340oppmgkVbkxvwrNako5zoFS/ViHVe6K0ENrhP/URowD
-	 /0YpY4zMIy4T2kAK/huJMSHbOmGDddymcsO8vL1MtwpMMnqhlXGMtCf4OfXaLPaTsRo0u4wU7p7j
-	 2bprLcc3UJsMGbW3HNPv0H7DVMoxx5hw/Dcpnue8Wkss/RYKtz78nZjW5Gs0sEAFwVQjs6MjsACm
-	 mQ5b32FjjNoKCw7GyVwtQHY3CYP1aOfJiJj8pZLRxunAZCBs7DVJFPF8/hCGzn4nAryByVzJpN4S
-	 bacgLvlBwkPqVgUrn/n2POCSpcMBu6rYeKiW/kiUqm9DmPVYvMqOFqz2zSVcsm4hLGsb6iZx9wzQ
-	 2fL4OFhjpe84m5cbho2pB0ewcBeQnxlgr3ME7CnPzf70Ib8KwixMA4cRAtNPjGVDvi6ADquq+qfX
-	 lHXH1qKiXsVHqHPsIzlKXAkOwmRSi7wqXApLripGxPcnECQQxBcixe8saIn1G2ZWZRurOrXBk7r6
-	 6LqISLFwo55CG6th0iE8Yy0PSEsXMmJuLF4PBPjIuYcx4n1fLF9IaowNFkqkwbkf9GCRAelAFb/6
-	 2/NLGZpJgVkiHJ8dOogMil1yxfuWDkPR0aFkgxBI4sS+HqNMAm5E2yMBK7e12QT+zyEA7rRF8LMy
-	 C30CyrukCbeYXpRRQaEhwa0Dx8uXE4O7/x2C7HJW3HxePQ8QtlyNNEvRu4/wxjaW5UUp1jolFbXj
-	 xlmys3TCBpJnbMu6ESYs+YdDlXkcV+K8g1y+7xkQqiioFbKiAccR56imZg8o4xWfjdXT4OplRPLC
-	 FkURyj7dnntnI1W4iHR1gSYvNQnj9PNPtP8jkQ29Vny/xhbqBnz53kMit4Kswi9yiNnOe1+w6pzZ
-	 yZ2nRF9C+G0v21S6uKF+TLzpuXPSBy1+kYAh2+cA==
-X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
-From: Haofeng Li <920484857@qq.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	chenxiaosong@chenxiaosong.com
-Cc: linux-cifs@vger.kernel.org,
-	Haofeng Li <13266079573@163.com>,
-	Haofeng Li <lihaofeng@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH] ksmbd: validate num_subauth when copying ACE in set_ntacl_dacl
-Date: Mon, 22 Jun 2026 16:46:56 +0800
-X-OQ-MSGID: <20260622084656.663701-1-920484857@qq.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1782120311; c=relaxed/simple;
+	bh=hgHtiBF9qj+HFF36fS1tMtaMVSziudFs/y1gC5tEk0s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ox8mbAwiAnOqFcZDy05fG8MF/kc2LDAkkLbh+tpsgM2IDU0nWmSLgWgkq7YrBVcWogBpgt/bdGlzRme8e+c80gKAXeqFoR6Rzg5oQ/0G06pqsiKcDa9IXcHJlOsvShR4mQvOP4NFSOB+V2jcwG7AvB7w6+YZCaytb1r/+EqxVds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=citrix.com; arc=none smtp.client-ip=160.101.131.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=citrix.com
+Received: from eddie6.eng.citrite.net (unknown [10.113.40.46])
+	by na1pdmzitismtp02.tibco.com (Postfix) with ESMTP id 497BA81C4306;
+	Mon, 22 Jun 2026 05:13:28 -0400 (EDT)
+From: Chunjie Zhu <chunjie.zhu@citrix.com>
+To: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>
+Cc: Chunjie Zhu <chunjie.zhu@citrix.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] fix smb client defer close causes file corruption
+Date: Mon, 22 Jun 2026 09:14:49 +0000
+Message-ID: <20260622091450.2668504-1-chunjie.zhu@citrix.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Haofeng Li <lihaofeng@kylinos.cn>
+Test environment
 
-set_ntacl_dacl() copies each ACE from the attacker-controlled stored
-security descriptor verbatim into the response DACL without checking
-sid.num_subauth. The ACE bytes (including an unchecked num_subauth)
-originate from an authenticated SMB2_SET_INFO(SecInfo=DACL) that is
-stored raw via ksmbd_vfs_set_sd_xattr(); parse_dacl() rejects a bad ACE
-with `break` rather than an error, so parse_sec_desc() still returns
-success and the malformed SD reaches the xattr intact.
+ 4 hosts as smb client, 1 host as smb server
+ smb client hosts, kernel 6.6.138
+ mount options,
+  //10.70.48.15/xxx /run/xxx cifs rw,relatime,vers=3.0,
+  cache=loose,username=xxx,domain=xxx,uid=0,noforceuid,
+  gid=0,noforcegid,addr=10.70.48.15,file_mode=0755,
+  dir_mode=0755,soft,nounix,serverino,mapposix,reparse=nfs,
+  rsize=1048576,wsize=1048576,bsize=1048576,echo_interval=60,
+  actimeo=0,closetimeo=1
 
-On a subsequent SMB2_QUERY_INFO(SecInfo=DACL) for an inode carrying a
-POSIX access ACL, build_sec_desc() -> set_ntacl_dacl() ->
-set_posix_acl_entries_dacl() walks the copied ACEs and reads
+Work around
 
-    ntace->sid.sub_auth[ntace->sid.num_subauth - 1]
+ mount with cache=none or closetimeo=0
 
-with num_subauth taken straight from the stored SD. Since sub_auth[]
-is fixed at SID_MAX_SUB_AUTHORITIES (15), a crafted num_subauth (e.g.
-255) drives an out-of-bounds heap read of ~1 KB with an offset fully
-controlled by an authenticated client.
+The Race Condition Flow
 
-The sibling functions already gate this field:
-  parse_dacl()    -- num_subauth == 0 || > SID_MAX_SUB_AUTHORITIES
-  parse_sid()     -- num_subauth > SID_MAX_SUB_AUTHORITIES
-  smb_copy_sid()  -- min_t(u8, num_subauth, SID_MAX_SUB_AUTHORITIES)
-set_ntacl_dacl() is the lone inconsistent path that omits the check.
+ Step 1: Host-01 closes file
 
-Add the same num_subauth validation in set_ntacl_dacl() before copying
-the ACE, matching the gate already enforced by parse_dacl().
+  Host-01:
+   file close (eeefe8d0.vhd)
+   -> CIFS defers SMB2 CLOSE
+   -> Handle H1 stored in deferred_closes list
+   -> Lease L1 (RWH or RH) still active on server
+   -> Entry: { path=“eeefe8d0.vhd”, handle=H1, inode=I1 }
 
-Signed-off-by: Haofeng Li <lihaofeng@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+ Step 2: Host-02 does hardlink and rename
+
+  Host-02:
+   hardlink(eeefe8d0.vhd, 0f11b74e.vhd)
+   -> SMB2: Creates new name for same inode
+   -> Server: inode I1 now has 2 names (link count = 2)
+   -> Host-01 lease L1: NO BREAK (same inode, just added name)
+
+   crate(eeefe8d0.vhd.new)
+   -> Entry { path="eeefe8d0.vhd.new", handle=H2, inode=I2 }
+
+   rename(eeefe8d0.vhd.new, eeefe8d0.vhd)
+   -> SMB2: Replaces “eeefe8d0.vhd” name → points to new inode I2
+   -> Server: old inode I1 now only accessible as “0f11b74e.vhd”
+   -> Server SHOULD send: Lease Break notification to H1 ← KEY!
+
+ Step 3: Lease break delivery is not reliable
+
+  strict locking off, level2 oplock
+
+   Host-01:
+   -> Lease break not received or processed
+   -> H1 is in deferred_closes list (not "active")
+
+   Result: Stale entry remains:
+      { path=“eeefe8d0.vhd”, handle=H1, inode=I1_OLD }
+
+   Host-02:
+   -> Open 0f11b74e.vhd in readonly
+
+   Result:
+      { path="0f11b74e.vhd", inode=I1_NEW }
+
+ Step 4: Host-01 reopens file
+
+  Host-01:
+   file open (eeefe8d0.vhd)
+   -> Kernel checks deferred_closes for “eeefe8d0.vhd”
+   -> Found H1! (matched by pathname string)
+   -> REUSES H1 without checking
+   -> close or reconnect, flush buffered writes
+      slient corruption?
+
+Signed-off-by: Chunjie Zhu <chunjie.zhu@citrix.com>
 ---
- fs/smb/server/smbacl.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ fs/smb/client/fs_context.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 340ea98fa494..34f0fa43428f 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -740,6 +740,10 @@ static void set_ntacl_dacl(struct mnt_idmap *idmap,
- 			if (nt_ace_size > aces_size)
- 				break;
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 0812af001417..4ed33de0a00d 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -1300,11 +1300,11 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
+ 		ctx->acdirmax = ctx->acregmax = HZ * result.uint_32;
+ 		break;
+ 	case Opt_closetimeo:
+-		if (result.uint_32 > SMB3_MAX_DCLOSETIMEO / HZ) {
+-			cifs_errorf(fc, "closetimeo too large\n");
++		if (result.uint_32 != 0) {
++			cifs_errorf(fc, "closetimeo must be 0, deferred close is disabled\n");
+ 			goto cifs_parse_mount_err;
+ 		}
+-		ctx->closetimeo = HZ * result.uint_32;
++		ctx->closetimeo = 0;
+ 		break;
+ 	case Opt_echo_interval:
+ 		if (result.uint_32 < SMB_ECHO_INTERVAL_MIN ||
+@@ -1795,7 +1795,7 @@ int smb3_init_fs_context(struct fs_context *fc)
  
-+			if (ntace->sid.num_subauth == 0 ||
-+			    ntace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES)
-+				break;
-+
- 			memcpy((char *)pndace + size, ntace, nt_ace_size);
- 			if (check_add_overflow(size, nt_ace_size, &size))
- 				break;
+ 	ctx->acregmax = CIFS_DEF_ACTIMEO;
+ 	ctx->acdirmax = CIFS_DEF_ACTIMEO;
+-	ctx->closetimeo = SMB3_DEF_DCLOSETIMEO;
++	ctx->closetimeo = 0;
+ 	ctx->max_cached_dirs = MAX_CACHED_FIDS;
+ 	/* Most clients set timeout to 0, allows server to use its default */
+ 	ctx->handle_timeout = 0; /* See MS-SMB2 spec section 2.2.14.2.12 */
 -- 
-2.25.1
+2.52.0
 
