@@ -1,97 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6161A3B3BF7
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 08:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88DE38B7D5
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 08:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782201869; cv=none; b=lj76R6NhwRwp3gbTnt814/gq2O64hOj/0b0YF5LCUKRjus9OdlMgc6f99moyWmTAbcnP/xxJtdbAEeZEEAo1LsrJUE0rih/hl47Ei/nIrIvRxX134v5f1XOjsWaA/A/51vdVAqJD7KWjS2X/W1mtDLfTdU78TZ6H6kfTjaYWVns=
+	t=1782201938; cv=none; b=aZYUVr9ld1sX3iJcipqre7MTeIAmZG4E/IdjVEflL2OGiEU5sI8jsVEfONCrJ9rHNJd/t1MIdEowxNE50aVYTTDWXEbxlCi0MMJsD6q+h0l9lq31MYhAKmtxMMXXgrku62QHFK524DK94OYMrBPAX5lBYniLicbrOlHw07HsrGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782201869; c=relaxed/simple;
-	bh=MNXPWIIvfxWd9huKq+y4pmUNQVKAopjevka2TvCheUo=;
+	s=arc-20240116; t=1782201938; c=relaxed/simple;
+	bh=A+IAkisreOub8kZfccS+fPhPhhCJ9W3gszsbY06U2Jg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s9tVqVogQVb/upu/tzUtP3V0MSK/pSCngiqES35aF+nA6ZU01uXYAnSdCu5YwIzWT7aCHoIvGvxsTACe3GB39WaW6LRqwtKdjxuIg8UfpvGR0P4cUeI/NJutq18G3f8R8FJuBLp8FcsB2f8+sgkE8hZ/RspyEKaupzhT1EQ0bvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exEks7pG; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=G/uOkA2W4E6FuToZHpoxBMXjCP3U0jquAF+2nZiZgpfZzMOWmIT+ny+Fgsof0fdS4kxwczti6m4P1CvQPPkvHJdTZb2OgJ0DAYKa56gC4bhWIPI9CoSbItoc/wsd8tnSxkm2nG8/f30iChGDJQamOGGzy4pytaVTkOarE/w5fck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ox6S08pc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exEks7pG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC891F00A3E
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 08:04:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ox6S08pc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF6A1F000E9
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 08:05:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782201868;
-	bh=duqiBybDSj+/ni40yEEsF0AkVu40eQgqwqHqMYQxStw=;
+	s=k20260515; t=1782201936;
+	bh=x5nFbWvZYsL98dmNOQ/GD1LI54Hx0dSFeSNdsceAaAc=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=exEks7pGGmx/QOYLgmREoybZWjudyFd6RHGHhGm+O0qLYHvCt8+NsK85wDMkFGFB7
-	 21g3P1H43YUe4SxXtmoNktU+q9pJyndJf0Uew6ceEKLql3HYCvxglrJ166tnJfKwtj
-	 zSXBGOeInrdlsK8/dm4zOOsZCbHOPdFgl4eGKANFQV63kNBL0YLZ9422KW5RifOuAC
-	 FOjag8dIZZZf07AVSteaiiXrynCwAbGbPUhzlXZy/47Gnil5s7MECgZa5I/ApSETGK
-	 FBIEEpulemyrEBLLgvJ8RdFMCpwKXfBCzWTAqLngZwy6JYOoZ6xOMJb/qxlcQJw2Ge
-	 EYTItil6+VfQg==
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c106f737b5bso51971366b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 01:04:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9fMU4La40jSb/6yWiQPxt9JRADZyCl+nAsJN+6U5UbRNVTgUzEBJPvSt+pYlqzIzu0B/bz2SC+rdrn@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYlvoMo8cBlS+T0oWCK6+exuofEFO/BvcH7rQh6pJVv7jzCu0e
-	m3M2p7YCBQtoQk9RzQtzN0EcpAqmV13PTynWh2th7u+2B0+PTQlu1Wsgn/x8HO4NZvIQdT+RVkb
-	7/kFYKvgYxz3HBH/p2N3dP3rjFUIB3yc=
-X-Received: by 2002:a17:907:9481:b0:bd3:6ec5:f141 with SMTP id
- a640c23a62f3a-c107eec929cmr67194766b.30.1782201866789; Tue, 23 Jun 2026
- 01:04:26 -0700 (PDT)
+	b=Ox6S08pcRvNi3rXYWuVLid0o5OGj/524ruRowceTUl9j1dTmWoNd0eN6Dh5l9O6n/
+	 hQPEy2PUQnCMQQmuiyJUKmrhYopmoFxWUgPMdWiQifG+V73NAd34lyv+fzWzOU0YAJ
+	 D0GJ3TgFMhvDrBb1eQNW3pE2gEG9u2BuLDjjHvZo07dVz5UgyCXWl88WqWmzKnPElj
+	 bLqY2tM5+11kSPt5v3XXa+8s+/gkx2NcyKcD6VL4c1s8SokhuYfAPcD2ALQdKb1etL
+	 apt5wIPxj58LQeKPI5YeuMzxT+tEiSFY4tBK+Et92ar1fEaOVyFxhrkcCHFkUZ8yYv
+	 KvAJd3bBkApdg==
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c07fcdd75d3so647185366b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 01:05:36 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzGWDQgubMj2kUySt0StU2EP4NwgUbz+oEfeRjDvxkZ8tLkVgkp
+	k+ymthkPKokzrUwrb1F5U1c0jx49OEth/q0L+KGjzL4BmnJageWgip6Lucxleii5E753KqFpUAU
+	0a6v4VDI4pTm4jyng5stfRX5MUO6BwfM=
+X-Received: by 2002:a17:907:97cc:b0:bfd:6435:92e with SMTP id
+ a640c23a62f3a-c108cdf8cacmr62817166b.5.1782201935229; Tue, 23 Jun 2026
+ 01:05:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_160379D932900C07E87A916577DA03F73609@qq.com>
- <CAKYAXd9nesneEmhr8pm_=4CtvyC8q7Ac+H7uhtk5R8QPf_VLbg@mail.gmail.com> <4747ff73-f57c-4c8f-9038-ee00c7561817@chenxiaosong.com>
-In-Reply-To: <4747ff73-f57c-4c8f-9038-ee00c7561817@chenxiaosong.com>
+References: <ajozC-8nzNMn_jaK@stanley.mountain>
+In-Reply-To: <ajozC-8nzNMn_jaK@stanley.mountain>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 23 Jun 2026 17:04:14 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_3KmNbaUe5U-mp=vEOJQ0ovmnyxQxezY4fy_egcHJf+A@mail.gmail.com>
-X-Gm-Features: AVVi8CcEbW-NdtzmDYeE-uR7eR-3Bhb79jgVhu2j8Wfoljn7_Vd-Q6e0CfLVM4w
-Message-ID: <CAKYAXd_3KmNbaUe5U-mp=vEOJQ0ovmnyxQxezY4fy_egcHJf+A@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: validate num_subauth when copying ACE in set_ntacl_dacl
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: Haofeng Li <920484857@qq.com>, smfrench@gmail.com, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com, 
-	metze@samba.org, linux-cifs@vger.kernel.org, Haofeng Li <13266079573@163.com>, 
-	Haofeng Li <lihaofeng@kylinos.cn>, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Date: Tue, 23 Jun 2026 17:05:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_xYL-PqLJGH9SXs1EBjQ_fS7wX+EjLJZ6aBNoO1KzOOw@mail.gmail.com>
+X-Gm-Features: AVVi8Cfc3jZKwgLny1qd57OQTscgUZ3yZ7fQa9isE4A2qZKlepBGvJVhq3brPbY
+Message-ID: <CAKYAXd_xYL-PqLJGH9SXs1EBjQ_fS7wX+EjLJZ6aBNoO1KzOOw@mail.gmail.com>
+Subject: Re: [bug report] ksmbd: compute lease break-in-progress flag on response
+To: Dan Carpenter <error27@gmail.com>
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 23, 2026 at 3:53=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
+On Tue, Jun 23, 2026 at 4:17=E2=80=AFPM Dan Carpenter <error27@gmail.com> w=
+rote:
 >
-> Hi Namjae,
-Hi ChenXiaoSong,
+> Hello Namjae Jeon,
+Hi Dan,
 >
-> Thanks for your review.
+> Commit 2b6cbd34ed55 ("ksmbd: compute lease break-in-progress flag on
+> response") from Jun 18, 2026 (linux-next), leads to the following
+> Smatch static checker warning:
 >
-> If we use `continue`, the next iteration may get an invalid `aces_size`
-> and the previous `ntace`.
-We can properly use a goto statement to skip that.
+>         fs/smb/server/oplock.c:1446 smb_grant_oplock()
+>         warn: inconsistent indenting
+Okay, I will fix it. Thanks for the report.
 >
-> ```
-> for (...) {
->         if (offsetof(struct smb_ace, access_req) > aces_size)
->                 break;
->         if (nt_ace_size > aces_size)
->                 break;
->         if (ntace->sid.num_subauth =3D=3D 0 || ntace->sid.num_subauth >
-> SID_MAX_SUB_AUTHORITIES)
->                 continue;
->         aces_size -=3D nt_ace_size;
->         ntace =3D (char *)ntace + nt_ace_size;
-> }
-> ```
+> fs/smb/server/oplock.c
+>     1434                 goto set_lev;
+>     1435         }
+>     1436
+>     1437         if (lctx) {
+>     1438                 struct oplock_info *m_opinfo;
+>     1439
+>     1440                 /* is lease already granted ? */
+>     1441                 m_opinfo =3D same_client_has_lease(ci, work->con=
+n->ClientGUID,
+>     1442                                                  lctx);
+>     1443                 if (m_opinfo) {
+>     1444                         lease_put(opinfo->o_lease);
+>     1445                         lease_get(m_opinfo->o_lease);
+> --> 1446                                 opinfo->o_lease =3D m_opinfo->o_=
+lease;
 >
-> On 6/23/26 13:03, Namjae Jeon wrote:
-> > Instead of using break, would it be better to use continue? Using
-> > continue would allow us to skip only the invalid ACE while still
-> > returning the rest of the valid entries.
+> The commit randomly added an extra tab to these lines...
 >
-> --
-> ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-> Chinese Homepage: https://chenxiaosong.com
-> English Homepage: https://chenxiaosong.com/en
+>     1447                                 opinfo->level =3D m_opinfo->leve=
+l;
+>     1448                                 new_lease =3D false;
+>     1449                                 opinfo_put(m_opinfo);
+>     1450                                 goto out;
+>     1451                         }
+>     1452         }
+>     1453         prev_opinfo =3D opinfo_get_list(ci);
 >
+> This email is a free service from the Smatch-CI project [smatch.sf.net].
+>
+> regards,
+> dan carpenter
