@@ -1,62 +1,62 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8043112DA
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 16:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705963112DA
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 16:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782232173; cv=none; b=f1RrO32JFHGes8NVEmBfbRfKBd4ZQbibRAoGTO1y681pw4TTWiAxn1kdzvJotTZNl0txESXd+iDDKUk5dSyyPWqRyBebUHAbstU2bMcSaD5mve0fI0SfuOyy1tEkX9QXlvOm00wlC5mP3zmkFFhmQxZm0ydm8+e0o3irU0FR/v4=
+	t=1782232175; cv=none; b=DkZDXeMf5+k6YxVH6eozZn5Z5xJ2UJScCk3HgDs6YLAgJnAGWlnJItAlCdkRVOewOKUQusXl8gYaXkTXJ12lJbTIMvETqaUqf7q0GmymMwvcMksaTPwCNhkUKPPck5fMYdHYHx/r9FacAHQbpaRtNYxPC+/y5kmWwtvO87NqSno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782232173; c=relaxed/simple;
-	bh=6zC2PLvkYSVtMM5qKkYfE4SuRCHpdYPdFVt3OF9LbLE=;
+	s=arc-20240116; t=1782232175; c=relaxed/simple;
+	bh=92zOcPSmL7cfJ+fBNAv2Fli6PKboYOamBJBcyUqCQXs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XEkgMGaLD1w8RAGLoT/49jhzdZVGoGNJduMxqDxF9OwjYq3eMBTXH2/SDTHERcpeF8JmboIfeHpceOrKuaAYihm90cRXyREFB0y3Q3qm9sEZLjdgjnU9vCWp9k7XIlYHPr/IjDAQdceZ28of+EBElvqyWyPdVitrpKaFYvWPzI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZjuW4pSt; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=QbmrmmjM6RwrqL+eVRcENVmvR9Ayvvn7PuXzWGSyD/QctCN5vyKWibIX/konZ+5cEzY5Ljv2FRX24eUDVMTqon9V9cdhnXu6X0o4K2N0ROzPd1PIDws68Yokm6SNyY6J3aGqSvSwRmNeoFkhlDST14NRZgN8jl1qM18b0aRMeQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a4dgrO6a; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjuW4pSt"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2c7cfa17fe0so181845ad.3
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 09:29:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a4dgrO6a"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2c6c57c5c07so209265ad.1
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 09:29:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782232171; x=1782836971; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782232173; x=1782836973; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ePHtOOLeoD0fdVN6kmjxtqZtwUhp1t7rUmi6cZAepl8=;
-        b=ZjuW4pStrX6e3sr7ImkEIHdX1ttVHQ/dJvYP6gBlLQS7M0qtiIAlbvK2xGH4YWTpcm
-         zQq/t4kW4Wg4Ve4O6/VehsgWKS1JXvioJHN+2bdoRg+6koODkBOK9NJ4Y7GeC/eIMklz
-         712d3rWVVL0FPE6+LtcqarPWe4GRt+ymgfleAQl1D/LE1KdZR9W/32aLk6qgIWrUtNe5
-         w8yiGlDWRDuJqIWFuviAZOEpjTJXwGp5nZSfw+B1JfWPvxHt5zTw5wl+SCIDZj5EvL5z
-         MIy59TIuL68NI1yexFRF5meG2SqbKkcR8u557yfAc9YzcbrLOiY9isMuqM1HIj8xensG
-         /P2Q==
+        bh=khSwSzWPJab5HMfpSdGK5ebxijmljVSJVgC/ryOMShs=;
+        b=a4dgrO6asQCTW8pjTGxkRaEYTqbv02a8GCCs2uYLtgtCLBK+G/NZcPxnrJfzki268+
+         CdYIbd82LM1Tnam3D3Jm1iLr9gczhMYAMrk9g05WXDqzczMeXaGxrvFMtskGd8tPXnc4
+         lWN5+I0DxZrok6NZzpPrg3l8B05PbRuVmDZL/2H0N9SU/li1TDq/fCnaxCnvRESmQ4Fz
+         1Xly86+7p2NRfyqUhMQbaJ28hQ6rJy5Mgl0egiF8+Pqji1zOKEioMqmCG9JaUzw5SW1U
+         OmP8IpX5I3GFQZ1VcdcoW89+YisGfba6Fdui1MRSyNyOiPUHhp3dw6qcOmxyW3HjkA62
+         knQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782232171; x=1782836971;
+        d=1e100.net; s=20251104; t=1782232173; x=1782836973;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ePHtOOLeoD0fdVN6kmjxtqZtwUhp1t7rUmi6cZAepl8=;
-        b=opAtDeR9wQHmV3Veb+RJQsowLBEbzjZ+WMjVwc+NgLccRxd/PyYSo7KcuCxEa9LrZX
-         Ur7tB5KQSBET1vWTmjzjoE92PdDfG0snCeHFRExJMIbt8PulPRDIj5EjWIHAh5ta1XNT
-         FIvIfWM3Lf1KL4GrQdEoS/Ri8U5WoA/TXIVIU/i3uPE79m7EaUCiXH55MnsRe3DiYMMy
-         g4ayWyv7Li9ENgNKnZcZSd1fHrprVWcRUGb3zYWvQoaJNh2vWNzowhZKh/0CkcxHF/g2
-         qBYcDzw/OV88cFy1kQKUTmrIuln95EFg/ms23bLfxQkPQ1FT12vth/EuKSQVUIwYjrvr
-         GaQQ==
-X-Gm-Message-State: AOJu0Yys9JmVJZHk4Znr7mIjLcK0OICMq0x2uL430ZxXdKfNKcVSmp+o
-	aTxiIr4FOskC992k0YMgqcphOzcovXZQzZC3/17BsqUn0bpVWpN4isbA/gDgYp3JSIY=
-X-Gm-Gg: AfdE7clvvnFyHzlrK1K6IuJAAN4xBYTJi9926KWcQoLK8PKUCVlxB5oYzCY7rAhGwcy
-	u3yeElHnx/acN4+ZhSaEn+u3COOjZCHVE4f5WwyIhufGMiu92rJ8QJi30UCyZjcxvz/y86OnLmx
-	Jjh7zOAcpomMst9Dn0eaLkH0jQVrttahLx7hK5nCQp24Wgs1YB1UPCQhMNn1kEoHTrcEKyJQo3E
-	mom01xuNMuGzA7Zhmb6CiYYvEsH2elgpbFl/JSeMhcKjl4dbO7ozTp6KS+/bAFgP3jkbdGGZKMo
-	melxU6JhQwISMy+vz5v63DluCbuqNOOyKWU61PL586bn+QMHzph0dfTbT2KQk05pTeeBkTS1kEW
-	NioArBcAqaoHQDRz17Tt8NZvkujSN6+AS+e/idmCrGsKnGP3nIn/rdgmazChX00ytMiwFE/l0IJ
-	EI2shNIruWDi4XBblbfo/wH9QqAQeC1gNyYUwgAtHaLPk=
-X-Received: by 2002:a17:902:d503:b0:2c1:c899:1d68 with SMTP id d9443c01a7336-2c7c9a722a9mr30988095ad.33.1782232170568;
-        Tue, 23 Jun 2026 09:29:30 -0700 (PDT)
+        bh=khSwSzWPJab5HMfpSdGK5ebxijmljVSJVgC/ryOMShs=;
+        b=Nb4yJAX05Ww2whPd4OjLE1GaY6Ihe+BAM97qRI9g54OWqkIQvXqYB4gJJ7QzX7uf5k
+         MteplUY52pLVmpyQmL9J9/Mb9JouDloxaJ5tQBoSnj0cYxVtHEOM0KCNsLowrL3zeyMN
+         djcu9sSYFYwIXiQNlIpKk/6sgOX4YZ8RCurkYnxvyxDeZ6r7pIQvBHk793nH6QCr1keS
+         nhP+JUwTxWljEbr6QNsL+HQ/UiSaiugRyUiYDWy3oAG0UgxSO89MSlaSphhW6NZiTmP2
+         ZpeKAkvblpFUdlO5YHdEybGOWig43KS+9myPnUHduK/9gA4/cPziJGY9gjVQLsA9kupE
+         G9tw==
+X-Gm-Message-State: AOJu0YwFELRedVXhjyaqpSkk0sTZ3MG0u4qLmSl4lfJQNX4Tlc4k4BXY
+	PNkJ6qxfi2FRmdP3HdkkjnPz24jQT21gnTQpCjhZOB/s0Jpbk+0BnIctFZckYMu1saU=
+X-Gm-Gg: AfdE7ckieu6BjZxQ3+aZel/ypRhNu+crLazj1/HYBtzKAIss1dKCrS8NhPrOiHFAXV9
+	gvXgd7/2wEBpHkefxLmklmRN3OoNFJNiR5C268pjPqKWmv6K6+GyFbnPtvzCfMXwMmCLzaAbbos
+	/kF1JMDGcM09otvWiKvaxVZfW0boXMzwWBwApOxb9R5coxQIA/pkUUdXX1BGJjWZP8FhqnPUqW0
+	qJhikSR8WgMhigo1nt3DzbyslVP3rzXBQF3EJcwDHniMzcV+WZTR8HoLKw+9a0eF1lTpUB3IW3n
+	Gz4W3ADGHA1F/hROhLUtYYXtVQ8teK7TsRseue45WDzZkz76oP3rcbSGvOiDFErJ+fA61E+AsNa
+	ppz8PKvXsbyV5edJfOn+cG0dS2v6590RwY+2X14tAMih3+1Os8r1IS6ZGtiHufoFypd7QZPZ4t1
+	d5k2TJM92M3d2Fid1jGLm2M+neTyL8Kw5j6EibXT+JQhg=
+X-Received: by 2002:a17:903:178e:b0:2c6:a185:be8b with SMTP id d9443c01a7336-2c718ccaad3mr232337525ad.10.1782232172740;
+        Tue, 23 Jun 2026 09:29:32 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.216])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdc97sm135185485ad.65.2026.06.23.09.29.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdc97sm135185485ad.65.2026.06.23.09.29.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 09:29:30 -0700 (PDT)
+        Tue, 23 Jun 2026 09:29:32 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -67,9 +67,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH v6 07/17] cifs: query dir should reuse cfid even if not fully cached
-Date: Tue, 23 Jun 2026 21:59:00 +0530
-Message-ID: <20260623162910.343930-7-sprasad@microsoft.com>
+Subject: [PATCH v6 09/17] cifs: in place changes to cached_dirents when dir lease is held
+Date: Tue, 23 Jun 2026 21:59:02 +0530
+Message-ID: <20260623162910.343930-9-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260623162910.343930-1-sprasad@microsoft.com>
 References: <20260623162910.343930-1-sprasad@microsoft.com>
@@ -83,297 +83,521 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-When a cached_dirents population is underway but not yet fully populated,
-cifs_readdir does not rely on the local cache, but makes a parallel
-stream of QueryDir calls to the server. However, these calls are made
-without lease key and that ends up breaking our dir lease.
+When a directory lease is held, we do not need to invalidate the
+dirent cache on the cfid when new dentries are added.
 
-This change will reuse the existing lease key for this scenario for the
-parallel QueryDir calls that are made.
+This change allows local adds to directory contents to be made
+in the cached_dirents so that we don't need to fetch again from server.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cached_dir.c | 38 ++++++++++++++++++++++++++++++++++++
- fs/smb/client/cached_dir.h |  6 ++++++
- fs/smb/client/cifsglob.h   |  2 ++
- fs/smb/client/file.c       |  1 +
- fs/smb/client/readdir.c    | 40 ++++++++++++++++++++++++++------------
- fs/smb/client/smb2ops.c    | 19 ++++++++++++++++++
- 6 files changed, 94 insertions(+), 12 deletions(-)
+ fs/smb/client/dir.c   |  97 +++++++++++---------
+ fs/smb/client/inode.c | 209 +++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 238 insertions(+), 68 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index d8e96d8bbc5e9..7aba3d1ae9b35 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -22,6 +22,20 @@ struct cached_dir_dentry {
- 	struct dentry *dentry;
- };
+diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+index 4eb4d7731887b..e8d5d0aa19504 100644
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -218,7 +218,6 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 	struct cached_fid *parent_cfid = NULL;
+ 	int rdwr_for_fscache = 0;
+ 	__le32 lease_flags = 0;
+-	bool found_parent_cfid;
  
-+bool cached_dir_is_valid(struct cached_fid *cfid)
-+{
-+	bool valid;
-+
-+	if (!cfid)
-+		return false;
-+
-+	spin_lock(&cfid->cfid_lock);
-+	valid = is_valid_cached_dir(cfid);
-+	spin_unlock(&cfid->cfid_lock);
-+
-+	return valid;
-+}
-+
- bool cached_dir_copy_lease_key(struct cached_fid *cfid,
- 			      __u8 lease_key[SMB2_LEASE_KEY_SIZE])
- {
-@@ -1133,3 +1147,27 @@ void free_cached_dirs(struct cached_fids *cfids)
+ 	*inode = NULL;
+ 	*oplock = 0;
+@@ -348,33 +347,14 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
  
- 	kfree(cfids);
- }
-+
-+void cifs_set_srch_inf_cfid(struct cifs_search_info *srch_inf,
-+			   struct cached_fid *cfid)
-+{
-+	if (srch_inf->cfid == cfid)
-+		return;
-+
-+	if (cfid)
-+		kref_get(&cfid->refcount);
-+
-+	if (srch_inf->cfid)
-+		close_cached_dir(srch_inf->cfid);
-+
-+	srch_inf->cfid = cfid;
-+}
-+
-+void cifs_put_srch_inf_cfid(struct cifs_search_info *srch_inf)
-+{
-+	if (!srch_inf->cfid)
-+		return;
-+
-+	close_cached_dir(srch_inf->cfid);
-+	srch_inf->cfid = NULL;
-+}
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index 323ebe4f57837..990b3cf70a280 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -8,6 +8,8 @@
- #ifndef _CACHED_DIR_H
- #define _CACHED_DIR_H
- 
-+struct cifs_search_info;
-+
- struct cached_dirent {
- 	struct list_head entry;
- 	char *name;
-@@ -85,6 +87,7 @@ is_valid_cached_dir(struct cached_fid *cfid)
- 	return cfid->time && cfid->has_lease;
- }
- 
-+bool cached_dir_is_valid(struct cached_fid *cfid);
- bool cached_dir_copy_lease_key(struct cached_fid *cfid,
- 			      __u8 lease_key[SMB2_LEASE_KEY_SIZE]);
- 
-@@ -96,6 +99,9 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon, const char *path,
- int open_cached_dir_by_dentry(struct cifs_tcon *tcon, struct dentry *dentry,
- 			      struct cached_fid **ret_cfid);
- void close_cached_dir(struct cached_fid *cfid);
-+void cifs_set_srch_inf_cfid(struct cifs_search_info *srch_inf,
-+			   struct cached_fid *cfid);
-+void cifs_put_srch_inf_cfid(struct cifs_search_info *srch_inf);
- bool emit_cached_dir_if_valid(struct cached_fid *cfid,
- 			      struct file *file,
- 			      struct dir_context *ctx);
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index b2181cceac3ac..aa87421c75c05 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -306,6 +306,7 @@ struct cifs_search_info;
- struct cifsInodeInfo;
- struct cifs_open_parms;
- struct cifs_credits;
-+struct cached_fid;
- 
- struct smb_version_operations {
- 	int (*send_cancel)(struct cifs_ses *ses, struct TCP_Server_Info *server,
-@@ -1393,6 +1394,7 @@ struct cifs_search_info {
- 	bool unicode:1;
- 	bool smallBuf:1; /* so we know which buf_release function to call */
- 	bool is_dynamic_buf:1; /* dynamically allocated buffer - can be variable size */
-+	struct cached_fid *cfid; /* Reference to cached file id for directory enumeration */
- };
- 
- /* Structure for QueryDirectory with multi-credit support */
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index fe862bcc99d1a..ec993924f26f7 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1569,6 +1569,7 @@ int cifs_closedir(struct inode *inode, struct file *file)
- 			cifs_buf_release(buf);
- 	}
- 
-+	cifs_put_srch_inf_cfid(&cfile->srch_inf);
- 	cifs_put_tlink(cfile->tlink);
- 	kfree(file->private_data);
- 	file->private_data = NULL;
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index d463dc057f807..cbebb6f980e96 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -344,7 +344,7 @@ cifs_std_info_to_fattr(struct cifs_fattr *fattr, FIND_FILE_STANDARD_INFO *info,
- 
- static int
- _initiate_cifs_search(const unsigned int xid, struct file *file,
--		     const char *full_path)
-+		     const char *full_path, struct cached_fid *cfid)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(file);
- 	struct tcon_link *tlink = NULL;
-@@ -368,9 +368,11 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
- 		spin_lock_init(&cifsFile->file_info_lock);
- 		file->private_data = cifsFile;
- 		cifsFile->tlink = cifs_get_tlink(tlink);
-+		cifs_set_srch_inf_cfid(&cifsFile->srch_inf, cfid);
- 		tcon = tlink_tcon(tlink);
- 	} else {
- 		cifsFile = file->private_data;
-+		cifs_set_srch_inf_cfid(&cifsFile->srch_inf, cfid);
- 		tcon = tlink_tcon(cifsFile->tlink);
- 	}
- 
-@@ -425,12 +427,12 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
- 
- static int
- initiate_cifs_search(const unsigned int xid, struct file *file,
--		     const char *full_path)
-+		     const char *full_path, struct cached_fid *cfid)
- {
- 	int rc, retry_count = 0;
- 
- 	do {
--		rc = _initiate_cifs_search(xid, file, full_path);
-+		rc = _initiate_cifs_search(xid, file, full_path, cfid);
- 		/*
- 		 * If we don't have enough credits to start reading the
- 		 * directory just try again after short wait.
-@@ -742,7 +744,11 @@ find_cifs_entry(const unsigned int xid, struct cifs_tcon *tcon, loff_t pos,
- 			cfile->srch_inf.srch_entries_start = NULL;
- 			cfile->srch_inf.last_entry = NULL;
+ retry_open:
+ 	if (tcon->cfids && direntry->d_parent && server->dialect >= SMB30_PROT_ID) {
+-		found_parent_cfid = false;
+ 		parent_cfid = NULL;
+-		spin_lock(&tcon->cfids->cfid_list_lock);
+-		list_for_each_entry(parent_cfid, &tcon->cfids->entries, entry) {
+-			spin_lock(&parent_cfid->cfid_lock);
+-			if (parent_cfid->dentry == direntry->d_parent) {
+-				kref_get(&parent_cfid->refcount);
+-				spin_unlock(&parent_cfid->cfid_lock);
+-				spin_unlock(&tcon->cfids->cfid_list_lock);
+-				found_parent_cfid = true;
+-				cifs_dbg(FYI, "found a parent cached file handle\n");
+-				if (cached_dir_copy_lease_key(parent_cfid,
+-						      fid->parent_lease_key)) {
+-					lease_flags
+-						|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
+-					mutex_lock(&parent_cfid->dirents.de_mutex);
+-					parent_cfid->dirents.is_valid = false;
+-					parent_cfid->dirents.is_failed = true;
+-					mutex_unlock(&parent_cfid->dirents.de_mutex);
+-				}
+-				close_cached_dir(parent_cfid);
+-				break;
+-			}
+-			spin_unlock(&parent_cfid->cfid_lock);
++		if (!open_cached_dir_by_dentry(tcon, direntry->d_parent,
++					      &parent_cfid)) {
++			cifs_dbg(FYI, "found a parent cached file handle\n");
++			if (cached_dir_copy_lease_key(parent_cfid,
++					      fid->parent_lease_key))
++				lease_flags |= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
  		}
--		rc = initiate_cifs_search(xid, file, full_path);
-+		/* Pass cfid only if still valid; srch_inf owns the reference. */
-+		struct cached_fid *rewind_cfid =
-+			cached_dir_is_valid(cfile->srch_inf.cfid) ?
-+			cfile->srch_inf.cfid : NULL;
-+		rc = initiate_cifs_search(xid, file, full_path, rewind_cfid);
- 		if (rc) {
- 			cifs_dbg(FYI, "error %d reinitiating a search on rewind\n",
- 				 rc);
-@@ -968,20 +974,31 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
- 	if (emit_cached_dir_if_valid(cfid, file, ctx))
- 		goto rddir2_exit;
+-		if (!found_parent_cfid)
+-			spin_unlock(&tcon->cfids->cfid_list_lock);
+ 	}
  
--	/* Drop the cache while calling initiate_cifs_search and
--	 * find_cifs_entry in case there will be reconnects during
--	 * query_directory.
-+	/*
-+	 * If cfid is valid but cache is invalid and not failed,
-+	 * keep cfid and pass it to initiate_cifs_search to populate.
-+	 * Otherwise (no cfid or cache is failed), close cfid and
-+	 * proceed without cache for this session.
- 	 */
--	close_cached_dir(cfid);
--	cfid = NULL;
-+	if (cfid) {
-+		bool cache_pending;
+ 	oparms = (struct cifs_open_parms) {
+@@ -392,6 +372,10 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 	if (rc) {
+ 		cifs_dbg(FYI, "cifs_create returned 0x%x\n", rc);
+ 		if (rc == -EACCES && rdwr_for_fscache == 1) {
++			if (parent_cfid) {
++				close_cached_dir(parent_cfid);
++				parent_cfid = NULL;
++			}
+ 			desired_access &= ~GENERIC_READ;
+ 			rdwr_for_fscache = 2;
+ 			goto retry_open;
+@@ -486,6 +470,21 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 	}
+ 
+ 	*inode = newinode;
++	if (newinode && parent_cfid) {
++		struct cifs_fattr fattr;
++		bool cache_updated;
 +
-+		mutex_lock(&cfid->dirents.de_mutex);
-+		cache_pending = !cfid->dirents.is_valid && !cfid->dirents.is_failed;
-+		mutex_unlock(&cfid->dirents.de_mutex);
-+		if (!cache_pending) {
-+			close_cached_dir(cfid);
-+			cfid = NULL;
++		cifs_inode_to_fattr(newinode, &fattr);
++		cache_updated = update_dirent_in_cached_dir(parent_cfid,
++						    direntry->d_name.name,
++						    direntry->d_name.len,
++						    &fattr);
++		if (!cache_updated)
++			invalidate_cached_dir_contents(parent_cfid);
++	}
++
++	if (parent_cfid)
++		close_cached_dir(parent_cfid);
+ 	return rc;
+ 
+ out_err:
+@@ -493,6 +492,8 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 		server->ops->close(xid, tcon, fid);
+ 	if (newinode)
+ 		iput(newinode);
++	if (parent_cfid)
++		close_cached_dir(parent_cfid);
+ 	return rc;
+ }
+ 
+@@ -813,27 +814,35 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
+ 
+ 		cifs_dbg(FYI, "NULL inode in lookup\n");
+ 
+-		/*
+-		 * We can only rely on negative dentries having the same
+-		 * spelling as the cached dirent if case insensitivity is
+-		 * forced on mount.
+-		 *
+-		 * XXX: if servers correctly announce Case Sensitivity Search
+-		 * on GetInfo of FileFSAttributeInformation, then we can take
+-		 * correct action even if case insensitive is not forced on
+-		 * mount.
+-		 */
+-		if (pTcon->nocase && !open_cached_dir_by_dentry(pTcon, direntry->d_parent, &cfid)) {
++		if (!open_cached_dir_by_dentry(pTcon, direntry->d_parent, &cfid)) {
++			struct qstr qname = QSTR_INIT(direntry->d_name.name, direntry->d_name.len);
++			struct cached_dirent_lookup_result lookup = {};
++			int rc_lookup;
++			int rc_wait;
++
++			rc_wait = cifs_wait_for_pending_dcache(cfid, qname.name, qname.len);
++			if (rc_wait == -ETIMEDOUT)
++				cifs_dbg(FYI, "Wait for pending dcache entry timed out\n");
++
++			rc_lookup = lookup_cached_dir(cfid, qname.name,
++							       qname.len, &lookup);
++			if (!rc_lookup && lookup.found && lookup.under_active_lease) {
++				newInode = cifs_iget(parent_dir_inode->i_sb, &lookup.fattr);
++				close_cached_dir(cfid);
++				if (!newInode) {
++					de = ERR_PTR(-ENOMEM);
++					goto free_dentry_path;
++				}
++				rc = 0;
++				renew_parental_timestamps(direntry);
++				goto out;
++			}
++
+ 			/*
+ 			 * dentry is negative and parent is fully cached:
+-			 * we can assume file does not exist
++			 * we can assume file does not exist if case sensitive
+ 			 */
+-			bool dirents_valid;
+-
+-			mutex_lock(&cfid->dirents.de_mutex);
+-			dirents_valid = cfid->dirents.is_valid;
+-			mutex_unlock(&cfid->dirents.de_mutex);
+-			if (dirents_valid) {
++			if (pTcon->nocase && cfid->dirents.is_valid) {
+ 				close_cached_dir(cfid);
+ 				goto out;
+ 			}
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 51fb7c418d52a..631f5fae813b7 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -28,19 +28,18 @@
+ #include "cached_dir.h"
+ #include "reparse.h"
+ 
+-static void cifs_invalidate_cached_dir(struct cifs_tcon *tcon,
+-				       struct dentry *parent)
++static void cifs_invalidate_cached_dirent(struct cifs_tcon *tcon,
++						 struct dentry *parent,
++						 const char *name,
++						 unsigned int namelen)
+ {
+ 	struct cached_fid *parent_cfid = NULL;
+ 
+-	if (!tcon || !parent)
++	if (!tcon || !parent || !name || !namelen)
+ 		return;
+ 
+ 	if (!open_cached_dir_by_dentry(tcon, parent, &parent_cfid)) {
+-		mutex_lock(&parent_cfid->dirents.de_mutex);
+-		parent_cfid->dirents.is_valid = false;
+-		parent_cfid->dirents.is_failed = true;
+-		mutex_unlock(&parent_cfid->dirents.de_mutex);
++		invalidate_dirent_in_cached_dir(parent_cfid, name, namelen);
+ 		close_cached_dir(parent_cfid);
+ 	}
+ }
+@@ -177,6 +176,28 @@ cifs_nlink_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
+ 	set_nlink(inode, fattr->cf_nlink);
+ }
+ 
++void cifs_inode_to_fattr(struct inode *inode, struct cifs_fattr *fattr)
++{
++	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
++
++	memset(fattr, 0, sizeof(*fattr));
++	fattr->cf_cifsattrs = cifs_i->cifsAttrs;
++	fattr->cf_uniqueid = cifs_i->uniqueid;
++	fattr->cf_eof = netfs_read_remote_i_size(inode);
++	fattr->cf_bytes = (u64)inode->i_blocks << 9;
++	fattr->cf_createtime = cifs_i->createtime;
++	fattr->cf_uid = inode->i_uid;
++	fattr->cf_gid = inode->i_gid;
++	fattr->cf_mode = inode->i_mode;
++	fattr->cf_rdev = inode->i_rdev;
++	fattr->cf_nlink = inode->i_nlink;
++	fattr->cf_dtype = S_DT(inode->i_mode);
++	fattr->cf_atime = inode_get_atime(inode);
++	fattr->cf_mtime = inode_get_mtime(inode);
++	fattr->cf_ctime = inode_get_ctime(inode);
++	fattr->cf_cifstag = cifs_i->reparse_tag;
++}
++
+ /* populate an inode with info from a cifs_fattr struct */
+ int
+ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
+@@ -1169,6 +1190,24 @@ static inline bool is_inode_cache_good(struct inode *ino)
+ 	return ino && CIFS_CACHE_READ(CIFS_I(ino)) && CIFS_I(ino)->time != 0;
+ }
+ 
++static bool cifs_inode_has_writable_handle(struct inode *inode)
++{
++	struct cifsInodeInfo *cifs_inode = CIFS_I(inode);
++	struct cifsFileInfo *open_file;
++	bool writable = false;
++
++	spin_lock(&cifs_inode->open_file_lock);
++	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
++		if (OPEN_FMODE(open_file->f_flags) & FMODE_WRITE) {
++			writable = true;
++			break;
 +		}
 +	}
++	spin_unlock(&cifs_inode->open_file_lock);
++
++	return writable;
++}
++
+ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
+ 				 struct super_block *sb,
+ 				 const unsigned int xid,
+@@ -2085,7 +2124,9 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
  
-- cache_not_found:
-+cache_not_found:
- 	/*
- 	 * Ensure FindFirst doesn't fail before doing filldir() for '.' and
- 	 * '..'. Otherwise we won't be able to notify VFS in case of failure.
- 	 */
- 	if (file->private_data == NULL) {
--		rc = initiate_cifs_search(xid, file, full_path);
-+		rc = initiate_cifs_search(xid, file, full_path, cfid);
- 		cifs_dbg(FYI, "initiate cifs search rc %d\n", rc);
- 		if (rc)
- 			goto rddir2_exit;
-@@ -1009,7 +1026,6 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
- 	tcon = tlink_tcon(cifsFile->tlink);
- 	rc = find_cifs_entry(xid, tcon, ctx->pos, file, full_path,
- 			     &current_entry, &num_to_fill);
--	open_cached_dir(xid, tcon, full_path, cifs_sb, false, &cfid);
- 	if (rc) {
- 		cifs_dbg(FYI, "fce error %d\n", rc);
- 		goto rddir2_exit;
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index fa83fa5ad0521..e2663c39d347d 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2469,12 +2469,16 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
- 	struct smb2_query_directory_rsp *qd2_rsp = NULL;
- 	struct smb2_create_rsp *op_rsp = NULL;
+ out_reval:
+ 	if (!rc && dentry->d_parent)
+-		cifs_invalidate_cached_dir(tcon, dentry->d_parent);
++		cifs_invalidate_cached_dirent(tcon, dentry->d_parent,
++							    dentry->d_name.name,
++							    dentry->d_name.len);
+ 
+ 	if (inode) {
+ 		cifs_inode = CIFS_I(inode);
+@@ -2276,6 +2317,7 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, struct inode *inode,
+ 	int rc = 0;
+ 	unsigned int xid;
+ 	struct cifs_sb_info *cifs_sb;
++	struct cached_fid *parent_cfid = NULL;
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
  	struct TCP_Server_Info *server;
-+	struct cached_fid *cfid = srch_inf ? srch_inf->cfid : NULL;
- 	int retries = 0, cur_sleep = 0;
- 	unsigned int compound_resp_bufsize;
-+	bool use_cfid_lease = false;
-+	bool cfid_open_locked = false;
+@@ -2337,12 +2379,26 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, struct inode *inode,
+ 	/* TODO: skip this for smb2/smb3 */
+ 	rc = cifs_mkdir_qinfo(inode, direntry, mode, full_path, cifs_sb, tcon,
+ 			      xid);
++	if (!rc && d_inode(direntry) && direntry->d_parent &&
++	    server->dialect >= SMB30_PROT_ID &&
++	    !open_cached_dir_by_dentry(tcon, direntry->d_parent, &parent_cfid)) {
++		struct cifs_fattr fattr;
++
++		cifs_inode_to_fattr(d_inode(direntry), &fattr);
++		if (!update_dirent_in_cached_dir(parent_cfid,
++						  direntry->d_name.name,
++						  direntry->d_name.len,
++						  &fattr))
++			invalidate_cached_dir_contents(parent_cfid);
++	}
+ mkdir_out:
+ 	/*
+ 	 * Force revalidate to get parent dir info when needed since cached
+ 	 * attributes are invalid now.
+ 	 */
+ 	CIFS_I(inode)->time = 0;
++	if (parent_cfid)
++		close_cached_dir(parent_cfid);
+ 	free_dentry_path(page);
+ 	free_xid(xid);
+ 	cifs_put_tlink(tlink);
+@@ -2408,7 +2464,9 @@ int cifs_rmdir(struct inode *inode, struct dentry *direntry)
+ 		clear_nlink(d_inode(direntry));
+ 		spin_unlock(&d_inode(direntry)->i_lock);
+ 		if (direntry->d_parent)
+-			cifs_invalidate_cached_dir(tcon, direntry->d_parent);
++			cifs_invalidate_cached_dirent(tcon, direntry->d_parent,
++							    direntry->d_name.name,
++							    direntry->d_name.len);
+ 	}
  
- replay_again:
- 	/* reinitialize for possible replay */
- 	flags = 0;
-+	use_cfid_lease = false;
- 	oplock = SMB2_OPLOCK_LEVEL_NONE;
- 	server = cifs_pick_channel(tcon->ses);
+ 	/* force revalidate to go get info when needed */
+@@ -2518,15 +2576,18 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 	     struct dentry *target_dentry, unsigned int flags)
+ {
+ 	const char *from_name, *to_name;
++	const char *source_name, *target_name;
+ 	struct TCP_Server_Info *server;
+ 	void *page1, *page2;
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct tcon_link *tlink;
+ 	struct cifs_tcon *tcon;
++	struct inode *source_inode;
+ 	bool rehash = false;
+ 	unsigned int xid;
+ 	int rc, tmprc;
+ 	int retry_count = 0;
++	unsigned int source_namelen, target_namelen;
+ 	FILE_UNIX_BASIC_INFO *info_buf_source = NULL;
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+ 	FILE_UNIX_BASIC_INFO *info_buf_target;
+@@ -2554,6 +2615,11 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 	if (IS_ERR(tlink))
+ 		return PTR_ERR(tlink);
+ 	tcon = tlink_tcon(tlink);
++	source_inode = d_inode(source_dentry);
++	source_name = source_dentry->d_name.name;
++	source_namelen = source_dentry->d_name.len;
++	target_name = target_dentry->d_name.name;
++	target_namelen = target_dentry->d_name.len;
+ 	server = tcon->ses->server;
  
-@@ -2482,6 +2486,15 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
- 	if (!utf16_path)
- 		return -ENOMEM;
+ 	page1 = alloc_dentry_path();
+@@ -2594,6 +2660,33 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
  
-+	if (cfid) {
-+		mutex_lock(&cfid->cfid_open_mutex);
-+		cfid_open_locked = true;
-+		use_cfid_lease = cached_dir_copy_lease_key(cfid,
-+						      fid->lease_key);
-+		oplock = use_cfid_lease ?
-+			SMB2_OPLOCK_LEVEL_II : SMB2_OPLOCK_LEVEL_NONE;
+ 	if (!rc)
+ 		rehash = false;
++
++	/* Update cached dirents after successful rename (before exit checks) */
++	if (!rc) {
++		struct cifs_fattr fattr;
++		struct cached_fid *target_cfid = NULL;
++
++		/* Invalidate source entry (no longer exists at old name) */
++		cifs_invalidate_cached_dirent(tcon, source_dentry->d_parent,
++					      source_name,
++					      source_namelen);
++
++		/* Upsert target entry with the renamed inode's attributes */
++		if (source_inode) {
++			cifs_inode_to_fattr(source_inode, &fattr);
++			if (!open_cached_dir_by_dentry(tcon,
++						       target_dentry->d_parent,
++						       &target_cfid)) {
++				if (!update_dirent_in_cached_dir(target_cfid,
++								  target_name,
++								  target_namelen,
++								  &fattr))
++					invalidate_cached_dir_contents(target_cfid);
++				close_cached_dir(target_cfid);
++			}
++		}
 +	}
 +
- 	if (smb3_encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
+ 	/*
+ 	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
+ 	 */
+@@ -2689,13 +2782,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 		}
+ 	}
  
-@@ -2564,6 +2577,10 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
- 	rc = compound_send_recv(xid, tcon->ses, server,
- 				flags, 3, rqst,
- 				resp_buftype, rsp_iov);
-+	if (cfid_open_locked) {
-+		mutex_unlock(&cfid->cfid_open_mutex);
-+		cfid_open_locked = false;
+-	/* force revalidate to go get info when needed */
+-	if (!rc) {
+-		cifs_invalidate_cached_dir(tcon, source_dentry->d_parent);
+-		if (target_dentry->d_parent != source_dentry->d_parent)
+-			cifs_invalidate_cached_dir(tcon, target_dentry->d_parent);
+-	}
+-
+ 	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
+ 
+ cifs_rename_exit:
+@@ -2715,14 +2801,15 @@ cifs_dentry_needs_reval(struct dentry *dentry)
+ 	struct inode *inode = d_inode(dentry);
+ 	struct cifsInodeInfo *cifs_i = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode);
+-	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
++	struct tcon_link *tlink;
++	struct cifs_tcon *tcon;
+ 	struct cached_fid *cfid = NULL;
++	bool retried_pending = false;
++	bool force_reval = cifs_i->time == 0;
+ 
+ 	if (test_bit(CIFS_INO_DELETE_PENDING, &cifs_i->flags) ||
+ 	    test_bit(CIFS_INO_TMPFILE, &cifs_i->flags))
+ 		return false;
+-	if (cifs_i->time == 0)
+-		return true;
+ 
+ 	if (CIFS_CACHE_READ(cifs_i))
+ 		return false;
+@@ -2730,36 +2817,110 @@ cifs_dentry_needs_reval(struct dentry *dentry)
+ 	if (!lookupCacheEnabled)
+ 		return true;
+ 
++	tlink = cifs_sb_tlink(cifs_sb);
++	if (IS_ERR(tlink))
++		return true;
++	tcon = tlink_tcon(tlink);
++
+ 	if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
+ 		if (cifs_i->time > cfid->time) {
+ 			close_cached_dir(cfid);
++			cifs_put_tlink(tlink);
+ 			return false;
+ 		}
+ 		close_cached_dir(cfid);
+ 	}
++
++	if (dentry->d_parent) {
++		struct cached_dirent_lookup_result lookup = {};
++		int rc;
++		int rc_wait;
++
++	retry_lookup:
++		cfid = NULL;
++		if (!open_cached_dir_by_dentry(tcon, dentry->d_parent, &cfid)) {
++			rc = lookup_cached_dir(cfid, dentry->d_name.name,
++							  dentry->d_name.len,
++							  &lookup);
++			if (rc == -ENOENT && !retried_pending) {
++				rc_wait = cifs_wait_for_pending_dcache(cfid,
++							     dentry->d_name.name,
++							     dentry->d_name.len);
++				if (rc_wait == -ETIMEDOUT)
++					cifs_dbg(FYI,
++						 "Timed out waiting for async dcache population of %pd\n",
++						 dentry);
++				else if (!rc_wait) {
++					close_cached_dir(cfid);
++					retried_pending = true;
++					goto retry_lookup;
++				}
++			}
++			close_cached_dir(cfid);
++			if (!rc && lookup.found && lookup.under_active_lease) {
++				if (cifs_inode_has_writable_handle(inode)) {
++					cifs_set_time(dentry, jiffies);
++					cifs_put_tlink(tlink);
++					return false;
++				}
++				rc = cifs_fattr_to_inode(inode, &lookup.fattr, false);
++				if (!rc) {
++					cifs_set_time(dentry, jiffies);
++					cifs_put_tlink(tlink);
++					return false;
++				}
++				if (rc != -ESTALE) {
++					cifs_put_tlink(tlink);
++					return true;
++				}
++			}
++		}
++	}
++
++	/*
++	 * Even when metadata is marked stale (time == 0), attempt the
++	 * cached-dir fast path above first; only force wire revalidation if
++	 * cache lookup/update did not satisfy this dentry.
++	 */
++	if (force_reval) {
++		cifs_put_tlink(tlink);
++		return true;
++	}
++
+ 	/*
+ 	 * depending on inode type, check if attribute caching disabled for
+ 	 * files or directories
+ 	 */
+ 	if (S_ISDIR(inode->i_mode)) {
+-		if (!cifs_sb->ctx->acdirmax)
++		if (!cifs_sb->ctx->acdirmax) {
++			cifs_put_tlink(tlink);
+ 			return true;
++		}
+ 		if (!time_in_range(jiffies, cifs_i->time,
+-				   cifs_i->time + cifs_sb->ctx->acdirmax))
++				   cifs_i->time + cifs_sb->ctx->acdirmax)) {
++			cifs_put_tlink(tlink);
+ 			return true;
++		}
+ 	} else { /* file */
+-		if (!cifs_sb->ctx->acregmax)
++		if (!cifs_sb->ctx->acregmax) {
++			cifs_put_tlink(tlink);
+ 			return true;
++		}
+ 		if (!time_in_range(jiffies, cifs_i->time,
+-				   cifs_i->time + cifs_sb->ctx->acregmax))
++				   cifs_i->time + cifs_sb->ctx->acregmax)) {
++			cifs_put_tlink(tlink);
+ 			return true;
++		}
+ 	}
+ 
+ 	/* hardlinked files w/ noserverino get "special" treatment */
+ 	if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_SERVER_INUM) &&
+-	    S_ISREG(inode->i_mode) && inode->i_nlink != 1)
++	    S_ISREG(inode->i_mode) && inode->i_nlink != 1) {
++		cifs_put_tlink(tlink);
+ 		return true;
 +	}
  
- 	/* If the open failed there is nothing to do */
- 	op_rsp = (struct smb2_create_rsp *)rsp_iov[0].iov_base;
-@@ -2706,6 +2723,8 @@ smb2_query_dir_first(const unsigned int xid, struct cifs_tcon *tcon,
- 			tcon->ses->Suid, 0, srch_inf->entries_in_buffer);
++	cifs_put_tlink(tlink);
+ 	return false;
+ }
  
-  qdf_free:
-+	if (cfid_open_locked)
-+		mutex_unlock(&cfid->cfid_open_mutex);
- 	kfree(utf16_path);
- 	SMB2_open_free(&rqst[0]);
- 	SMB2_query_directory_free(&rqst[1]);
 -- 
 2.43.0
 
