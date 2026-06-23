@@ -1,62 +1,62 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FC730DEA6
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 16:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2FD315D49
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 16:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782232179; cv=none; b=Wp95KQvAFwLbSdp36tqa4x2dW4ag/AwfQ5uU9Z2xn7LFAyoHPEcUs1fIKk/2OcysqrTUv1GWDfkswSk40hnh1iztJHUMj/vJ3ukJ5LT9YKk+KQeECNk+XrCHYT9AYWa1dbJlLeuCq8++GtGyBcFkZlTmj7WrxTfHFE1RY3V7tII=
+	t=1782232181; cv=none; b=dBRoGqVmKqepychQNIJbjdJTm8TAHJrTD3feK8DZCCX5RpMRZ1Tug9VUj34AKfejrehPDCDcxGbbiEkWZyqK4pama64cxjZ+/mcRa4fL9n7kBm1FCLhtOlEyaSmMYl5PaVgD+1Haar+zDFAzRHEJjGzZ2s6nLeDuGQn35w1b5R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782232179; c=relaxed/simple;
-	bh=tam+rGOeYyC/BL7WRWlBgHCH8garmlh7gDowJR1q+WY=;
+	s=arc-20240116; t=1782232181; c=relaxed/simple;
+	bh=PSQzkm5gqhgFRwSrcsZCj8CTh2BTRZi3rr1wuNU/5bc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nvQwLmVk/pY8xKJhPu1fslqs6JVfEksEoUqU7x7GQCYQB3tqySfWhqOYWN4vpytij+t21jbKqgOq6nHi3OH+w4hlUQBk8Wn1ZVpH7bb9Tgx11PptCVDhlBfksJMzkjsU+7j5+ipFSm4OV/DaNepNndZFkYlX36Z999rriDwVaqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RZjUVAKX; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=lHx5qT0aROShYYH8s5rWjtqAc2z9iYBP54g+c8XyJyATALHz1rDQIwS9zZ+B+VD7cyQp8iXcq223SSbS7ILMGGr9UYs1DyIo6yKx26cValHVJds0bM6lPWA2vt93aYrrGQ9XKlYLPeL0d/7e/dlxuxf2VVsmJ2l1vzAFSunJdB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LThNoSAN; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZjUVAKX"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2bf3781ca51so411615ad.0
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 09:29:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LThNoSAN"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c6b3f71648so268695ad.2
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 09:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782232178; x=1782836978; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782232179; x=1782836979; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QMuegTGYxuOJZUlNFBiVyLDULB9kqY5DAvTB6HygF0s=;
-        b=RZjUVAKXwpWsOwM3BO0KAH68A3MpV2mIydjctiAnLHvi3/HvAhqYeDHLu37AgPXp0+
-         fPBEVI8zq87flDWLg7Cc5DXAYnpAInTPsWhVIgkQjNumWHTuWgsniE8rjQIlO7lo0EqQ
-         W4GX8IZ8LsZs75Q28EZaRC4LH92rRogrrAO2ooGHNMrQ3mI+4GgIyldNbdpmdx1aQCiM
-         UJqsZf9MDpH7KGF/DxN8gnpJ+n0OYJsLD9wSi7K1FWxqsJ7fe3uYs9tnaiYWWuc2eDCo
-         Qkxnmtao7z71Z+yTqLJXrSbkF2imGqSf+uVv5IvvKzEksAccr+LikjJ1RMb4ZprfNVYr
-         nlqQ==
+        bh=ZUV254J5B5TAIMrVst1SN33gUsvf1N/rjxf5VG+dODA=;
+        b=LThNoSANRoqeZp2EKcubxZr38QBmrV1wTqBfVh7L2mWvJ685XHOeObo+nbXZbR1iM1
+         55hHWx/BsAJ0Agm8Db4B7i7ODWZ4kfjfSroLADq/SEvigmq00k/T6A+QaeQyds2wARiL
+         +fnDEYclwJFGNy4ywR/00rg0NgKN6RfZxqo795AEDgyo4a4wfpxUhf2w0Y6z6jUWrQfl
+         MH1/8XU79d+aw20ecjnJ1TdaCEvhwe46g2BonXtsUNggrTwldCFfu4eEPoejfJYoA859
+         NSdPjibxRsvPzr1OJp8/NhNwML2RoiuwWvrv5hXKMYcuRa98FGLIBJnH0RlLzXSgxSko
+         CnhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782232178; x=1782836978;
+        d=1e100.net; s=20251104; t=1782232179; x=1782836979;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QMuegTGYxuOJZUlNFBiVyLDULB9kqY5DAvTB6HygF0s=;
-        b=dvhvY+Bt4YgBTE1wHOE2wFm6jtyex3FHvA92fOZ5sJ4V+cHIiQSkvfeS3KCvQ7jee1
-         gQj64vl1w5yzOp9KwoROp5J9nNwWKZPfhQR6ojW3XOACXZiQKK37xk9UmP/iWeuCoior
-         7qxfM7qCxmdljoiRCvw9/9qIsNJ93WMdJMt+w+6SJqU4stw+bHtnybcYARymXe4ZU1Uz
-         a5ehHJKaOpofzDPxOkctWEwz/TAKN/M/IpAzO2M/077nfROqRQeaLTZ483gA7lBw4sm8
-         HmR7AS9/dVNcrpK9Hlf1qDp5CZbnGTUxW+9akgQLwGSBm6+6p7XQws3XB048SZAH+Uv1
-         1BFw==
-X-Gm-Message-State: AOJu0YxvfyXJ2t1plK8dFtE5R0qJDe4ynG3y+fuaRBWiYfsWzFx0Cuus
-	V5l2u/JdD8fjHB0mB1X3q7Bn/hhsiuQvBe9aApXyQujikUE+5ml/pJuOM3eaPmIoXUU=
-X-Gm-Gg: AfdE7ck1TrAn1WjjH7qhI/Vuz0LtT9ofNNM/a0B/0Aw8ncvjkD9G3q1B8jCv3kJUf0l
-	6JmkrMFWrj3RH0DGDxkfIt+qY86FbROXHxO5VDIAvKq+KSZUdxnS/vJntGZeGdDBwqv9wuEvw9P
-	/ClEE81SH8Cb0lDk5XxzUWH6g06QpgW8cyKZ3pqRXWUNMLqDQM6nv17r0wsT7dRrpnXJhx4cBtG
-	ezLMMp4Vn74Aio7AEiK5g69K7xhYyt7OVdHeNIK9dAyOjnFECzB2+uC9lxTpqrAtAWxmQFBdNMS
-	ATOmUGM2mm+Tts2LBiT5yLrGsjieXgHDOi763xR5DlZAyu1W0NRgkkXZTNC7MzsQAxdHrmnYcja
-	RO1qcZwfayg2kx5w0bi/8zaZvPJSHZxCguocpvF07WG7Rqm1nljBiohXUuwlPWTxEdPBB/TM/zi
-	wheCE0FyD+OhWHkCDYH5F8SP3XNqDo1rTAbOYKuqky4X7DZX8onUEnOg==
-X-Received: by 2002:a17:902:f541:b0:2c0:db23:4c1 with SMTP id d9443c01a7336-2c7c9928dc8mr33426245ad.5.1782232177983;
-        Tue, 23 Jun 2026 09:29:37 -0700 (PDT)
+        bh=ZUV254J5B5TAIMrVst1SN33gUsvf1N/rjxf5VG+dODA=;
+        b=aqNX+2Z0h6r66pj76JXiZCn6dsQ1wNUJPaf5SNcyy1fQc7AmqbeP519MA3rq1fealM
+         GAKj0E+c9Ehue8W9tDCsQ/IRvJ4kZECzuSNUNCMmA7j3UBrqo1mZQQzsBGhBNWpDIHAB
+         kMnpjaJ14bdHgyRzS0GRLLQtZJCatnpjm2GhAkofxvY+1WPoyUjClv1FdUz14I8QMNQK
+         r/fXHF8XCGi1PPu2AL7zVZbbblBeDW0NFcUzaxTmqs4TRfJ1lDvu96YI1asqOjGIMheP
+         16bgRQvOJEfbmboZWJDqJf1J+qTEqbbLL9b6nEQH9pmQ+mAf+CvPyXzOVOCfmAogQdqI
+         zGYQ==
+X-Gm-Message-State: AOJu0YwtehzxsrFFirJdCii1IIBF6NjFtWPvr3UnD5NIw7FiABe5xLRZ
+	91htPtlFjIgVrhTAhrDYFk2cXTkCOH0zeSYjAJXC3q19mH0iGfJYHI5G8AcQhBzvoBA=
+X-Gm-Gg: AfdE7cnEen+G0smg7ob/qemKevA0M2nYbW1ln4h+zk7J9kdV9Mn4+bXC1QhxLOkBYVB
+	yI09eEDI+kgdpwBHgZZdfPYZI7heN/66xo8yHq/q36QRbSlTx/gzBcptJFeMdiKU0zSw+NjA1ud
+	Y1XITnP0AcJ/q5M8wtd6bNYAHUWPa/sJG3cN1UakFizPvN354rFJ70ICLe+HUTDFa8pAP6KgBp/
+	W/42Rj/QySAkxaPLVtv7NzEkeyMRlZvhH6Kpa5JjlFK58/RYqOFQaG/2TiRxqMd9AadfXlqceIT
+	UQS6jdLZzf0iwOIJFoNsklgQfCVgUXfvNBOouZMEzgJscAoF/APm7b7mRIy+U5s4c172OU3t4jM
+	fLeCJRi/ILQXlArGYxDq8IxoTntRTMi4TGUbqTeBSD/n7RaCr9lcrYYGhUJye6YAi49P7N4iSG7
+	tFd8CWtM7iPdUcteFN48HHw6zNPR6J8Q3PJZ3I7l88NZ8=
+X-Received: by 2002:a17:902:f687:b0:2c0:c262:b917 with SMTP id d9443c01a7336-2c718cb05e9mr227427205ad.5.1782232179041;
+        Tue, 23 Jun 2026 09:29:39 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.216])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdc97sm135185485ad.65.2026.06.23.09.29.37
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdc97sm135185485ad.65.2026.06.23.09.29.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 09:29:37 -0700 (PDT)
+        Tue, 23 Jun 2026 09:29:38 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -67,9 +67,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH v6 15/17] cifs: discard functions to ensure that mid callbacks get called
-Date: Tue, 23 Jun 2026 21:59:08 +0530
-Message-ID: <20260623162910.343930-15-sprasad@microsoft.com>
+Subject: [PATCH v6 16/17] cifs: keep cfids in rbtree for efficient lookups
+Date: Tue, 23 Jun 2026 21:59:09 +0530
+Message-ID: <20260623162910.343930-16-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260623162910.343930-1-sprasad@microsoft.com>
 References: <20260623162910.343930-1-sprasad@microsoft.com>
@@ -83,37 +83,476 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-If discard functions for readv and query_dir return error, the
-callback functions can be skipped. This can end up with hung
-syscalls due to the completion functions not getting called.
+Today tcon->cfids are maintained as a linked list. When we do
+not limit the number of cfids (limited by system memory), this
+can be a problem if the mount has a large number of active dir
+accesses. We soon start hitting perf bottlenecks.
 
-This change ensures that both these discard functions call
-the callback function when discard from socket returned error.
-This ensures that at least after the mid for the response is found,
-the callback doesn't get skipped, and we do not leave syscalls
-waiting.
+This change stores cfids in a rbtree instead of a linked list.
+The nodes of this tree are keyed based on the path inside the tcon.
+
+Additionally, for faster lookups by dentry, introducing a hashtable
+to allow lookups of cfids by dentry faster. This is important
+since open_cached_dir_by_dentry is called quite frequently.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/transport.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/smb/client/cached_dir.c | 227 ++++++++++++++++++++++++++-----------
+ fs/smb/client/cached_dir.h |   8 +-
+ fs/smb/client/cifs_debug.c |   4 +-
+ 3 files changed, 172 insertions(+), 67 deletions(-)
 
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 99cb189dd567b..b30e2388a1c55 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -1143,6 +1143,11 @@ __cifs_discard_and_dequeue(struct TCP_Server_Info *server, struct mid_q_entry *m
- 	dequeue_mid(server, mid, malformed);
- 	mid->resp_buf = server->smallbuf;
- 	server->smallbuf = NULL;
-+
-+	/* Once the mid is dequeued, the callback must run to terminate the subreq */
-+	if (length < 0)
-+		mid_execute_callback(server, mid);
-+
- 	return length;
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 389695b203247..3cf4cfa23c377 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -22,6 +22,7 @@ static void smb2_close_cached_fid(struct kref *ref);
+ static void cfids_laundromat_worker(struct work_struct *work);
+ 
+ #define CACHED_DIRENT_HASH_BITS	7
++#define CACHED_DIR_DENTRY_HT_BITS	8
+ 
+ struct cached_dir_dentry {
+ 	struct list_head entry;
+@@ -1239,6 +1240,57 @@ int cifs_wait_for_pending_dcache(struct cached_fid *cfid,
+ 	return ret;
  }
  
++static struct cached_fid *cfid_rb_find(struct rb_root *root, const char *path)
++{
++	struct rb_node *node = root->rb_node;
++
++	while (node) {
++		struct cached_fid *cfid = rb_entry(node, struct cached_fid, node);
++		int cmp = strcmp(path, cfid->path);
++
++		if (cmp < 0)
++			node = node->rb_left;
++		else if (cmp > 0)
++			node = node->rb_right;
++		else
++			return cfid;
++	}
++	return NULL;
++}
++
++static struct cached_fid *cfid_dentry_ht_find(struct cached_fids *cfids,
++					      struct dentry *dentry)
++{
++	struct cached_fid *cfid;
++
++	hlist_for_each_entry(cfid,
++			     &cfids->dentry_ht[hash_ptr(dentry, CACHED_DIR_DENTRY_HT_BITS)],
++			     dentry_node) {
++		if (cfid->dentry == dentry)
++			return cfid;
++	}
++	return NULL;
++}
++
++static void cfid_rb_insert(struct rb_root *root, struct cached_fid *new)
++{
++	struct rb_node **link = &root->rb_node;
++	struct rb_node *parent = NULL;
++
++	while (*link) {
++		struct cached_fid *cfid = rb_entry(*link, struct cached_fid, node);
++		int cmp = strcmp(new->path, cfid->path);
++
++		parent = *link;
++		if (cmp < 0)
++			link = &(*link)->rb_left;
++		else
++			link = &(*link)->rb_right;
++	}
++	rb_link_node(&new->node, parent, link);
++	rb_insert_color(&new->node, root);
++}
++
+ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
+ 						    const char *path,
+ 						    bool lookup_only,
+@@ -1246,22 +1298,21 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
+ {
+ 	struct cached_fid *cfid;
+ 
+-	list_for_each_entry(cfid, &cfids->entries, entry) {
+-		if (!strcmp(cfid->path, path)) {
+-			/*
+-			 * If it doesn't have a lease it is either not yet
+-			 * fully cached or it may be in the process of
+-			 * being deleted due to a lease break.
+-			 */
+-			spin_lock(&cfid->cfid_lock);
+-			if (!is_valid_cached_dir(cfid)) {
+-				spin_unlock(&cfid->cfid_lock);
+-				return NULL;
+-			}
+-			kref_get(&cfid->refcount);
++	cfid = cfid_rb_find(&cfids->entries, path);
++	if (cfid) {
++		/*
++		 * If it doesn't have a lease it is either not yet
++		 * fully cached or it may be in the process of
++		 * being deleted due to a lease break.
++		 */
++		spin_lock(&cfid->cfid_lock);
++		if (!is_valid_cached_dir(cfid)) {
+ 			spin_unlock(&cfid->cfid_lock);
+-			return cfid;
++			return NULL;
+ 		}
++		kref_get(&cfid->refcount);
++		spin_unlock(&cfid->cfid_lock);
++		return cfid;
+ 	}
+ 	if (lookup_only) {
+ 		return NULL;
+@@ -1276,7 +1327,7 @@ static struct cached_fid *find_or_create_cached_dir(struct cached_fids *cfids,
+ 	}
+ 	cfid->cfids = cfids;
+ 	cfids->num_entries++;
+-	list_add(&cfid->entry, &cfids->entries);
++	cfid_rb_insert(&cfids->entries, cfid);
+ 	cfid->on_list = true;
+ 	kref_get(&cfid->refcount);
+ 	/*
+@@ -1458,26 +1509,30 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 			struct cached_fid *parent_cfid;
+ 
+ 			spin_lock(&cfids->cfid_list_lock);
+-			list_for_each_entry(parent_cfid, &cfids->entries, entry) {
++			hlist_for_each_entry(parent_cfid,
++					     &cfids->dentry_ht[hash_ptr(dentry->d_parent,
++								CACHED_DIR_DENTRY_HT_BITS)],
++					     dentry_node) {
++				if (parent_cfid->dentry != dentry->d_parent)
++					continue;
+ 				spin_lock(&parent_cfid->cfid_lock);
+-				if (parent_cfid->dentry == dentry->d_parent) {
+-					cifs_dbg(FYI, "found a parent cached file handle\n");
+-					if (is_valid_cached_dir(parent_cfid)) {
+-						lease_flags
+-							|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
+-						memcpy(pfid->parent_lease_key,
+-						       parent_cfid->fid.lease_key,
+-						       SMB2_LEASE_KEY_SIZE);
+-					}
+-					spin_unlock(&parent_cfid->cfid_lock);
+-					break;
++				cifs_dbg(FYI, "found a parent cached file handle\n");
++				if (is_valid_cached_dir(parent_cfid)) {
++					lease_flags
++						|= SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE;
++					memcpy(pfid->parent_lease_key,
++					       parent_cfid->fid.lease_key,
++					       SMB2_LEASE_KEY_SIZE);
+ 				}
+ 				spin_unlock(&parent_cfid->cfid_lock);
++				break;
+ 			}
+ 			spin_unlock(&cfids->cfid_list_lock);
+ 		}
+ 	}
+ 	cfid->dentry = dentry;
++	hlist_add_head(&cfid->dentry_node,
++		       &cfids->dentry_ht[hash_ptr(dentry, CACHED_DIR_DENTRY_HT_BITS)]);
+ 	cfid->tcon = tcon;
+ 
+ 	/*
+@@ -1630,7 +1685,9 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 		spin_lock(&cfids->cfid_list_lock);
+ 		if (cfid->on_list) {
+-			list_del(&cfid->entry);
++			if (cfid->dentry)
++				hlist_del_init(&cfid->dentry_node);
++			rb_erase(&cfid->node, &cfids->entries);
+ 			cfid->on_list = false;
+ 			cfids->num_entries--;
+ 		}
+@@ -1674,26 +1731,28 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
+ 		return -ENOENT;
+ 
+ 	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry(cfid, &cfids->entries, entry) {
+-		if (cfid->dentry == dentry) {
+-			spin_lock(&cfid->cfid_lock);
+-			if (!is_valid_cached_dir(cfid)) {
+-				spin_unlock(&cfid->cfid_lock);
+-				rc = -ENOENT;
+-				break;
+-			}
+-			cifs_dbg(FYI, "found a cached file handle by dentry\n");
+-			kref_get(&cfid->refcount);
+-			*ret_cfid = cfid;
+-			cfid->last_access_time = jiffies;
+-			rc = 0;
+-			trace_cfid = cfid;
++	cfid = cfid_dentry_ht_find(cfids, dentry);
++	if (cfid) {
++		spin_lock(&cfid->cfid_lock);
++		if (!is_valid_cached_dir(cfid)) {
+ 			spin_unlock(&cfid->cfid_lock);
+ 			spin_unlock(&cfids->cfid_list_lock);
+-			trace_smb3_open_cached_dir_by_dentry(cfid, dentry->d_name.name,
+-							 dentry->d_name.len, 0);
++			trace_smb3_open_cached_dir_by_dentry(cfid,
++					   dentry->d_name.name,
++					   dentry->d_name.len, rc);
+ 			return rc;
+ 		}
++		cifs_dbg(FYI, "found a cached file handle by dentry\n");
++		kref_get(&cfid->refcount);
++		*ret_cfid = cfid;
++		cfid->last_access_time = jiffies;
++		rc = 0;
++		spin_unlock(&cfid->cfid_lock);
++		spin_unlock(&cfids->cfid_list_lock);
++		trace_smb3_open_cached_dir_by_dentry(cfid,
++				   dentry->d_name.name,
++				   dentry->d_name.len, rc);
++		return rc;
+ 	}
+ 	spin_unlock(&cfids->cfid_list_lock);
+ 	trace_smb3_open_cached_dir_by_dentry(NULL, dentry->d_name.name,
+@@ -1715,7 +1774,9 @@ __releases(&cfid->cfids->cfid_list_lock)
+ 	lockdep_assert_held(&cfid->cfids->cfid_list_lock);
+ 
+ 	if (cfid->on_list) {
+-		list_del(&cfid->entry);
++		if (cfid->dentry)
++			hlist_del_init(&cfid->dentry_node);
++		rb_erase(&cfid->node, &cfid->cfids->entries);
+ 		cfid->on_list = false;
+ 		cfid->cfids->num_entries--;
+ 	}
+@@ -1790,6 +1851,7 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+ {
+ 	struct rb_root *root = &cifs_sb->tlink_tree;
+ 	struct rb_node *node;
++	struct rb_node *cfid_node;
+ 	struct cached_fid *cfid;
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink;
+@@ -1807,7 +1869,9 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+ 		if (cfids == NULL)
+ 			continue;
+ 		spin_lock(&cfids->cfid_list_lock);
+-		list_for_each_entry(cfid, &cfids->entries, entry) {
++		for (cfid_node = rb_first(&cfids->entries);
++		     cfid_node; cfid_node = rb_next(cfid_node)) {
++			cfid = rb_entry(cfid_node, struct cached_fid, node);
+ 			tmp_list = kmalloc_obj(*tmp_list, GFP_ATOMIC);
+ 			if (tmp_list == NULL) {
+ 				/*
+@@ -1823,6 +1887,7 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+ 
+ 			spin_lock(&cfid->cfid_lock);
+ 			tmp_list->dentry = cfid->dentry;
++			hlist_del_init(&cfid->dentry_node);
+ 			cfid->dentry = NULL;
+ 			spin_unlock(&cfid->cfid_lock);
+ 
+@@ -1850,7 +1915,8 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
+ void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync)
+ {
+ 	struct cached_fids *cfids = tcon->cfids;
+-	struct cached_fid *cfid, *q;
++	struct cached_fid *cfid;
++	struct rb_node *rb_node = NULL, *next_node = NULL;
+ 
+ 	if (cfids == NULL)
+ 		return;
+@@ -1861,8 +1927,14 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync)
+ 	 * during this process.
+ 	 */
+ 	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
+-		list_move(&cfid->entry, &cfids->dying);
++	for (rb_node = rb_first(&cfids->entries);
++	     rb_node; rb_node = next_node) {
++		next_node = rb_next(rb_node);
++		cfid = rb_entry(rb_node, struct cached_fid, node);
++		if (cfid->dentry)
++			hlist_del_init(&cfid->dentry_node);
++		rb_erase(rb_node, &cfids->entries);
++		list_add(&cfid->dying_entry, &cfids->dying);
+ 		cfids->num_entries--;
+ 		spin_lock(&cfid->cfid_lock);
+ 		cfid->is_open = false;
+@@ -1926,7 +1998,9 @@ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+ 		return false;
+ 
+ 	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry(cfid, &cfids->entries, entry) {
++	for (struct rb_node *rb_node = rb_first(&cfids->entries);
++	     rb_node; rb_node = rb_next(rb_node)) {
++		cfid = rb_entry(rb_node, struct cached_fid, node);
+ 		spin_lock(&cfid->cfid_lock);
+ 		if (cfid->has_lease &&
+ 		    !memcmp(lease_key,
+@@ -1939,7 +2013,9 @@ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+ 			 * We found a lease remove it from the list
+ 			 * so no threads can access it.
+ 			 */
+-			list_del(&cfid->entry);
++			if (cfid->dentry)
++				hlist_del_init(&cfid->dentry_node);
++			rb_erase(rb_node, &cfids->entries);
+ 			cfid->on_list = false;
+ 			cfids->num_entries--;
+ 
+@@ -1971,7 +2047,9 @@ static struct cached_fid *init_cached_dir(const char *path)
+ 
+ 	INIT_WORK(&cfid->close_work, cached_dir_offload_close);
+ 	INIT_WORK(&cfid->put_work, cached_dir_put_work);
+-	INIT_LIST_HEAD(&cfid->entry);
++	RB_CLEAR_NODE(&cfid->node);
++	INIT_HLIST_NODE(&cfid->dentry_node);
++	INIT_LIST_HEAD(&cfid->dying_entry);
+ 	INIT_LIST_HEAD(&cfid->dirents.entry_list);
+ 	mutex_init(&cfid->dirents.de_mutex);
+ 	mutex_init(&cfid->cfid_open_mutex);
+@@ -2026,14 +2104,20 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 
+ 	spin_lock(&cfids->cfid_list_lock);
+ 	/* move cfids->dying to the local list */
+-	list_cut_before(&entry, &cfids->dying, &cfids->dying);
++	list_splice_init(&cfids->dying, &entry);
+ 
+-	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
++	for (struct rb_node *rb_node = rb_first(&cfids->entries), *next_node;
++	     rb_node; rb_node = next_node) {
++		next_node = rb_next(rb_node);
++		cfid = rb_entry(rb_node, struct cached_fid, node);
+ 		spin_lock(&cfid->cfid_lock);
+ 		if (dir_cache_timeout && cfid->last_access_time &&
+ 		    time_after(jiffies, cfid->last_access_time + HZ * dir_cache_timeout)) {
+ 			cfid->on_list = false;
+-			list_move(&cfid->entry, &entry);
++			if (cfid->dentry)
++				hlist_del_init(&cfid->dentry_node);
++			rb_erase(rb_node, &cfids->entries);
++			list_add(&cfid->dying_entry, &entry);
+ 			cfids->num_entries--;
+ 			if (cfid->has_lease) {
+ 				/*
+@@ -2052,8 +2136,8 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 	}
+ 	spin_unlock(&cfids->cfid_list_lock);
+ 
+-	list_for_each_entry_safe(cfid, q, &entry, entry) {
+-		list_del(&cfid->entry);
++	list_for_each_entry_safe(cfid, q, &entry, dying_entry) {
++		list_del(&cfid->dying_entry);
+ 
+ 		dput(cfid->dentry);
+ 		cfid->dentry = NULL;
+@@ -2085,7 +2169,13 @@ struct cached_fids *init_cached_dirs(void)
+ 	if (!cfids)
+ 		return NULL;
+ 	spin_lock_init(&cfids->cfid_list_lock);
+-	INIT_LIST_HEAD(&cfids->entries);
++	cfids->entries = RB_ROOT;
++	cfids->dentry_ht = kcalloc(1 << CACHED_DIR_DENTRY_HT_BITS,
++				   sizeof(*cfids->dentry_ht), GFP_KERNEL);
++	if (!cfids->dentry_ht) {
++		kfree(cfids);
++		return NULL;
++	}
+ 	INIT_LIST_HEAD(&cfids->dying);
+ 
+ 	INIT_DELAYED_WORK(&cfids->laundromat_work, cfids_laundromat_worker);
+@@ -2113,25 +2203,34 @@ void free_cached_dirs(struct cached_fids *cfids)
+ 
+ 	cancel_delayed_work_sync(&cfids->laundromat_work);
+ 
++	kfree(cfids->dentry_ht);
++	cfids->dentry_ht = NULL;
++
+ 	spin_lock(&cfids->cfid_list_lock);
+-	list_for_each_entry_safe(cfid, q, &cfids->entries, entry) {
++	for (struct rb_node *rb_node = rb_first(&cfids->entries), *next_node;
++	     rb_node; rb_node = next_node) {
++		next_node = rb_next(rb_node);
++		cfid = rb_entry(rb_node, struct cached_fid, node);
+ 		cfid->on_list = false;
++		if (cfid->dentry)
++			hlist_del_init(&cfid->dentry_node);
+ 		spin_lock(&cfid->cfid_lock);
+ 		cfid->is_open = false;
+ 		spin_unlock(&cfid->cfid_lock);
+-		list_move(&cfid->entry, &entry);
++		rb_erase(rb_node, &cfids->entries);
++		list_add(&cfid->dying_entry, &entry);
+ 	}
+-	list_for_each_entry_safe(cfid, q, &cfids->dying, entry) {
++	list_for_each_entry_safe(cfid, q, &cfids->dying, dying_entry) {
+ 		cfid->on_list = false;
+ 		spin_lock(&cfid->cfid_lock);
+ 		cfid->is_open = false;
+ 		spin_unlock(&cfid->cfid_lock);
+-		list_move(&cfid->entry, &entry);
++		list_move(&cfid->dying_entry, &entry);
+ 	}
+ 	spin_unlock(&cfids->cfid_list_lock);
+ 
+-	list_for_each_entry_safe(cfid, q, &entry, entry) {
+-		list_del(&cfid->entry);
++	list_for_each_entry_safe(cfid, q, &entry, dying_entry) {
++		list_del(&cfid->dying_entry);
+ 		free_cached_dir(cfid);
+ 	}
+ 
+diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
+index 9226463000499..4091fa7867618 100644
+--- a/fs/smb/client/cached_dir.h
++++ b/fs/smb/client/cached_dir.h
+@@ -11,6 +11,7 @@
+ #include <linux/completion.h>
+ #include <linux/build_bug.h>
+ #include <linux/list.h>
++#include <linux/rbtree.h>
+ #include <linux/netfs.h>
+ 
+ struct cifs_search_info;
+@@ -139,7 +140,9 @@ struct cached_dirents {
+ };
+ 
+ struct cached_fid {
+-	struct list_head entry;
++	struct rb_node node;
++	struct hlist_node dentry_node;
++	struct list_head dying_entry;
+ 	struct cached_fids *cfids;
+ 	const char *path;
+ 	bool has_lease;
+@@ -182,7 +185,8 @@ struct cached_fids {
+ 	 */
+ 	spinlock_t cfid_list_lock;
+ 	int num_entries;
+-	struct list_head entries;
++	struct rb_root entries;
++	struct hlist_head *dentry_ht;
+ 	struct list_head dying;
+ 	struct delayed_work laundromat_work;
+ 	/* aggregate accounting for all cached dirents under this tcon */
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index 131af7333fc58..9240ee6391dd1 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -328,7 +328,9 @@ static int cifs_debug_dirs_proc_show(struct seq_file *m, void *v)
+ 						cfids->num_entries,
+ 						(unsigned long)atomic_long_read(&cfids->total_dirents_entries),
+ 						(unsigned long long)atomic64_read(&cfids->total_dirents_bytes));
+-				list_for_each_entry(cfid, &cfids->entries, entry) {
++				for (struct rb_node *rb_node = rb_first(&cfids->entries);
++				     rb_node; rb_node = rb_next(rb_node)) {
++					cfid = rb_entry(rb_node, struct cached_fid, node);
+ 					spin_lock(&cfid->cfid_lock);
+ 					seq_printf(m, "0x%x 0x%llx 0x%llx ",
+ 						tcon->tid,
 -- 
 2.43.0
 
