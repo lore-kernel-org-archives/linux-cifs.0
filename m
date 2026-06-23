@@ -1,96 +1,89 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F95A12C534
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 02:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABA912C534
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 02:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782182844; cv=none; b=T8C670aDmepSHxYKtq+JLai4QJuxslrBIYKeMUq48xI7b+TvkSkr+K+K5r5PJ7N9BdZN+LkKaq3crOfpFs3yJ6Rv1h5Z/Bf770qF48J4i+Huqd9XIAepXB8wwT0naavdq1E/AH5J8q/IounY0KQTIG/i+0dqE3hyORwxBjtAXXE=
+	t=1782182865; cv=none; b=EuDAnxAtqsD9fUlFqVOFzT1MLOP5neumuSa4eGZm/Uyn0Y8xlU5rUHFrXF9lKJCQnwMPaPtfZo0T+6QOyKtxyHlWf7+XhPpP6/3GkBS1bQdgmzL25A9KDIqnKruMTjtt3qDbnJ4Rfyh1Gs8S6exoJ2XczmUq1y8clN4YnY2tOSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782182844; c=relaxed/simple;
-	bh=sowyx7SPTtnsYWZ4/0uya3iiR2mupb+A7DBVV2ZZXYI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fJfmKpSaJ7p/eUHZLAYZrGydOgEdcBsm7l0JsUgjdm+wYdBT3Q9C5deC+sENtnupZWraC6vEbtu6mON/BsM0SZuapDvIADQDYAjMr+SoyfihDr0rfZNEqiYfBVcnf5vwS85QsHwMFBG6dncNGFb25B3MOvIJHIW/ew51wNwg7W0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dwQyKkUc; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782182865; c=relaxed/simple;
+	bh=HZEE6aOguD1oJUdi6Zg2Fcan/qUxnYO00qi+Ai1eK4U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gNaec+Ol8334j+9fiHXZXFncNE+FSy2zdfr5HS7L219cZMkWtIe9xj2XpBJdnifxRP6KLRWxnkSMQ/dhSqbgm5CHGI7yEQlo1BTdaH4zqekPLvO6HACbPd+yvh+3Cwhe08JoLQfjlMiSkw7iX69e2QahvJj/JoYLLj6rCfI5/nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=T5iO6S+1; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dwQyKkUc"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782182841;
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="T5iO6S+1"
+Message-ID: <eccbd78b-d400-4261-887f-6f21fdc51bd2@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1782182851;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lMNrxddZKkeqXAvHnrWJ7MB4s/bwsDSaCIDN4tuZbv4=;
-	b=dwQyKkUcsXYLgbtZwr2T2Gv/+cRQ7IqDzuRz1ShT9NRSLTJVpQ8E7ejOd7jh9QbvSI5lRK
-	Rc03rqZBMJP2v5Ft/u8MFrQAu+BMJ8wdrt3UevtMNmWfZ5NUm1wWxgtio36YIozU08kSEq
-	gttGaLpBAPYb0buR5cCjsQFt0lgnmoU=
-From: Huiwen He <huiwen.he@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH 0/7] smb/client: fix fallocate allocation handling
-Date: Tue, 23 Jun 2026 10:46:12 +0800
-Message-ID: <20260623024619.1360127-1-huiwen.he@linux.dev>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zMipBRF/Wjd7ai2RMW2ciMR3f9cSZtBRLpfDDT00Fus=;
+	b=T5iO6S+1rF5IA4e5apkRKdsNXUF0FK70ivF9qYXhpw71UJeLRf0+GZhQDPXB8Hwsv76Vwf
+	w1tWyNqdQGmZ95e5Cw8loNkVSkpfDQ5cCIEg3+nPFUBDNLUN7n6ygIxTWGiwvZYMddZfN+
+	eeUWUjps4RZvcujl0Jz9tjDBbkCoaW9AGRZxK9PV01IfKS1Pq8qKNbEJoeSSd2R9SDbInr
+	TLzDIetTFYOdiFerx5Gf2rbL9CMKriHsp6G9gXUBo4L1nBNBcDsT7JAcXp4jesMRq8u7Pr
+	zimmas9SMKo6PPg8Sf/2KcUlgLHpBpAbXCj3soOFftN2vehIvjPwQNeVRewCig==
+Date: Tue, 23 Jun 2026 10:46:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 3/3] ksmbd: fix n.data memory leak in
+ ksmbd_vfs_set_dos_attrib_xattr
+To: liuqiangneo@163.com, linkinjeon@kernel.org, smfrench@gmail.com,
+ senozhatsky@chromium.org, tom@talpey.com
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Qiang Liu <liuqiang@kylinos.cn>
+References: <20260623021240.34722-1-liuqiangneo@163.com>
+ <20260623021240.34722-4-liuqiangneo@163.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260623021240.34722-4-liuqiangneo@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+We can add a label and use `goto` to free n.data
 
-CIFS fallocate can return success without allocating the requested space.
-It can also derive i_blocks from EOF, making sparse files appear fully
-allocated.
-
-This series propagates sparse conversion failures, corrects i_blocks
-accounting, and verifies server allocation after EOF-extending mode 0
-fallocate. It also reduces the memory used by zero-write emulation and
-supports small ranges starting at EOF.
-
-General arbitrary-range preallocation remains unsupported because SMB2
-provides no equivalent operation. Small ranges can be emulated by writing
-zeroes.
-
-Tested against Samba with xfstests. With `strict allocate=yes`,
-generic/496, generic/568 and generic/701 pass with server allocation
-verified. generic/495 was used to verify that EOF extension no longer
-inflates i_blocks.
-
-With `strict allocate=no`, requests whose allocation cannot be verified
-fail instead of reporting false preallocation success.
-
-Huiwen He (7):
-  smb/client: name the default fallocate mode
-  smb/client: handle smb2_set_sparse() failure in EOF-extending
-    fallocate
-  smb/client: handle smb2_set_sparse() failure in non-extending
-    fallocate
-  smb/client: do not account EOF extension as allocation
-  smb/client: verify allocation after EOF-extending fallocate
-  smb/client: reduce fallocate zero buffer allocation
-  smb/client: emulate small fallocate ranges at EOF
-
- fs/smb/client/inode.c     |  13 +++-
- fs/smb/client/smb2ops.c   | 128 +++++++++++++++++++++++++++++++++-----
- fs/smb/client/smb2pdu.c   |  19 ++++++
- fs/smb/client/smb2proto.h |   3 +
- fs/smb/common/fscc.h      |   5 ++
- 5 files changed, 151 insertions(+), 17 deletions(-)
+On 6/23/26 10:12, liuqiangneo@163.com wrote:
+> From: Qiang Liu <liuqiang@kylinos.cn>
+> 
+> Free ndr buffer data when ndr_encode_dos_attr() returns error
+> to avoid memory leak.
+> 
+> Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>
+> ---
+>   fs/smb/server/vfs.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+> index 60b4210d5ab8..18d5412081de 100644
+> --- a/fs/smb/server/vfs.c
+> +++ b/fs/smb/server/vfs.c
+> @@ -1568,8 +1568,10 @@ int ksmbd_vfs_set_dos_attrib_xattr(struct mnt_idmap *idmap,
+>   	int err;
+>   
+>   	err = ndr_encode_dos_attr(&n, da);
+> -	if (err)
+> +	if (err) {
+> +		kfree(n.data);
+>   		return err;
+> +	}
+>   
+>   	err = ksmbd_vfs_setxattr(idmap, path, XATTR_NAME_DOS_ATTRIBUTE,
+>   				 (void *)n.data, n.offset, 0, get_write);
 
 -- 
-2.43.0
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
