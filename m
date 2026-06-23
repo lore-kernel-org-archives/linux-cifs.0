@@ -1,62 +1,62 @@
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77D3306757
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 16:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FC730DEA6
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 16:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782232179; cv=none; b=CwLoC1bWb/FT5tGBQZ721zKIEidLPuii96KI5zauu/1FACQmXLE1E9PZ9FFCiC9iJG5GAt+1U0YgufCXRqgaXMjCO+MVSC7jU2xIHkcKYwRrbBiAz/VShnij8DsNwo3huXpB2OP9mOZ9YgU1VNHwUC2n4xfVA8utzMEX2oViEek=
+	t=1782232179; cv=none; b=Wp95KQvAFwLbSdp36tqa4x2dW4ag/AwfQ5uU9Z2xn7LFAyoHPEcUs1fIKk/2OcysqrTUv1GWDfkswSk40hnh1iztJHUMj/vJ3ukJ5LT9YKk+KQeECNk+XrCHYT9AYWa1dbJlLeuCq8++GtGyBcFkZlTmj7WrxTfHFE1RY3V7tII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782232179; c=relaxed/simple;
-	bh=JQCaQ1XdyfgUr2uMXcDc+nhN5xmm8lKQJ165H+1+oCI=;
+	bh=tam+rGOeYyC/BL7WRWlBgHCH8garmlh7gDowJR1q+WY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WUmxffM6SogsiEiPRoAURZlF8ACluz/K9+30reLf/TSEWES6qjAae7JQERB/JRbxgLAvbqIIJnwWHbJYHWFaV5AeyJdGQ/Ywksri+ZKZKLohem49AuZEQYLjEdsuDmM5819bJDXAmtD7gmxcvUZQlhJ5Xg3Gd4BHLvNvtCXXYL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FKNZme5F; arc=none smtp.client-ip=209.85.216.45
+	 MIME-Version; b=nvQwLmVk/pY8xKJhPu1fslqs6JVfEksEoUqU7x7GQCYQB3tqySfWhqOYWN4vpytij+t21jbKqgOq6nHi3OH+w4hlUQBk8Wn1ZVpH7bb9Tgx11PptCVDhlBfksJMzkjsU+7j5+ipFSm4OV/DaNepNndZFkYlX36Z999rriDwVaqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RZjUVAKX; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FKNZme5F"
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-37c5b9d42efso758176a91.1
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 09:29:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZjUVAKX"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2bf3781ca51so411615ad.0
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 09:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782232177; x=1782836977; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782232178; x=1782836978; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u/7jmGVL/sMRgY/DJaG90IzYGNZg1L8WRe/kLftly94=;
-        b=FKNZme5Fj5svcWTuKl7L8ndjzmuZ3scCrRrjznwKh7TBvVxqQNMPfxq+oLPOriEpf0
-         qFbm8AWFUxNCKkMM+XwyZynumjB2caPtKFkrXnJUopuUoJAbQpgeF87eKodEUlr/mw2o
-         j4y0amA45bFfog4nX3miKFZHcggZBRHB4h++AEkuNFSG9L86tF7MFW4dKSsCbn114O7Z
-         pD29LwvJoc4EV/Caqvu1iInXPmj9mFxVlJxkRUBeyk/kUu/6lRlYjEb8AHtV1bxIBiRQ
-         GkbKE7w2HuaDE0+PjkgiqWKn/s5BnE2Ii95pGaLLh8A4OKYDn8JnALg6pahy+DEGdUFN
-         DvxA==
+        bh=QMuegTGYxuOJZUlNFBiVyLDULB9kqY5DAvTB6HygF0s=;
+        b=RZjUVAKXwpWsOwM3BO0KAH68A3MpV2mIydjctiAnLHvi3/HvAhqYeDHLu37AgPXp0+
+         fPBEVI8zq87flDWLg7Cc5DXAYnpAInTPsWhVIgkQjNumWHTuWgsniE8rjQIlO7lo0EqQ
+         W4GX8IZ8LsZs75Q28EZaRC4LH92rRogrrAO2ooGHNMrQ3mI+4GgIyldNbdpmdx1aQCiM
+         UJqsZf9MDpH7KGF/DxN8gnpJ+n0OYJsLD9wSi7K1FWxqsJ7fe3uYs9tnaiYWWuc2eDCo
+         Qkxnmtao7z71Z+yTqLJXrSbkF2imGqSf+uVv5IvvKzEksAccr+LikjJ1RMb4ZprfNVYr
+         nlqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782232177; x=1782836977;
+        d=1e100.net; s=20251104; t=1782232178; x=1782836978;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=u/7jmGVL/sMRgY/DJaG90IzYGNZg1L8WRe/kLftly94=;
-        b=jKO3VUXzUfC6bTj59tZpphwx0hjT062DOo8rtOA9Ln+6QrDbdo/MeF5es0ilBsJxuM
-         cyXZw+D1e4RPP/lUcwKks3lMPR5QycWcvVAApOorKdLqR1vkT9BBSrURFeqU3kKH+SHK
-         nC9ZOds2ocufRWuR92wHrp8Xd7K1yU0Myv0PxzweMSgl73rSq6MDHPz2eTfdzf3EHOMi
-         5RKiGpm4HmVaejh3NzAH7U2HMzhqx5baF3ggHUiOkMDcYm5aDWogwQjL9ZItdeKeX2a5
-         6pMcTIHsTVhb4lDgy9GaxQ9JsamFFsz5wHL0y+Gf/1xJQUJ+NhumFJE0H1pxdyV2aBFi
-         rEXQ==
-X-Gm-Message-State: AOJu0Yw2/vioZCUWMQhMzCmSaz+MM7Hb3Ikm4X3Y081w4/IyAypdOElN
-	CTv/31r66RXyB2E6tqV5zU7bhgxxl0v/C8b6fwh+Lnz/GzVtiqOhNy8WGb+j3E00zsk=
-X-Gm-Gg: AfdE7cnvL0QeeC5Z0L3fx+JN0kLAxq/A02+NxxEVkEze8u5TeTRFJ1KqGGZ1zpIjO7k
-	rHMx5mBcDCUAIjz5Mc1cxRbw8ziODcyOj2Nj/FgyhpvjVnJxpAxqv313EXPEZUJkIrOKMkHchFX
-	Itx8pAG72Twd0+VCP3kmnjRy9qiHQUd4NzYUXbft0GpRLmc6cmyd6IujeIbkWl65sS17+wKMwJ8
-	DXAsvQ6mrIn1w4msgi4gKHV7dM2RA2lq9R9b0E0ZxRiGUzlGvVHzobOIoY4Y2svDTf8v1EBn6WY
-	PQYcIh1HD5nUca23tz2fDg28Y9htkQQ0iu0VKeghUIoU4NTeNFxCOKOMu6Rf7u/kCYM8sYWW3bs
-	cZg9w39EHCq3tun+QMkISDjlncizwnFSFIFR3iAvOZv+kpbi28ah6SEzX3M4U19L2rKmZx/2elV
-	TqZI1o6KjfN3d0HT/0gANG30iY2mXp8Fb5ejFwhuVNEaE=
-X-Received: by 2002:a17:903:946:b0:2c7:c385:c5a7 with SMTP id d9443c01a7336-2c7c400fd16mr34504485ad.26.1782232177063;
+        bh=QMuegTGYxuOJZUlNFBiVyLDULB9kqY5DAvTB6HygF0s=;
+        b=dvhvY+Bt4YgBTE1wHOE2wFm6jtyex3FHvA92fOZ5sJ4V+cHIiQSkvfeS3KCvQ7jee1
+         gQj64vl1w5yzOp9KwoROp5J9nNwWKZPfhQR6ojW3XOACXZiQKK37xk9UmP/iWeuCoior
+         7qxfM7qCxmdljoiRCvw9/9qIsNJ93WMdJMt+w+6SJqU4stw+bHtnybcYARymXe4ZU1Uz
+         a5ehHJKaOpofzDPxOkctWEwz/TAKN/M/IpAzO2M/077nfROqRQeaLTZ483gA7lBw4sm8
+         HmR7AS9/dVNcrpK9Hlf1qDp5CZbnGTUxW+9akgQLwGSBm6+6p7XQws3XB048SZAH+Uv1
+         1BFw==
+X-Gm-Message-State: AOJu0YxvfyXJ2t1plK8dFtE5R0qJDe4ynG3y+fuaRBWiYfsWzFx0Cuus
+	V5l2u/JdD8fjHB0mB1X3q7Bn/hhsiuQvBe9aApXyQujikUE+5ml/pJuOM3eaPmIoXUU=
+X-Gm-Gg: AfdE7ck1TrAn1WjjH7qhI/Vuz0LtT9ofNNM/a0B/0Aw8ncvjkD9G3q1B8jCv3kJUf0l
+	6JmkrMFWrj3RH0DGDxkfIt+qY86FbROXHxO5VDIAvKq+KSZUdxnS/vJntGZeGdDBwqv9wuEvw9P
+	/ClEE81SH8Cb0lDk5XxzUWH6g06QpgW8cyKZ3pqRXWUNMLqDQM6nv17r0wsT7dRrpnXJhx4cBtG
+	ezLMMp4Vn74Aio7AEiK5g69K7xhYyt7OVdHeNIK9dAyOjnFECzB2+uC9lxTpqrAtAWxmQFBdNMS
+	ATOmUGM2mm+Tts2LBiT5yLrGsjieXgHDOi763xR5DlZAyu1W0NRgkkXZTNC7MzsQAxdHrmnYcja
+	RO1qcZwfayg2kx5w0bi/8zaZvPJSHZxCguocpvF07WG7Rqm1nljBiohXUuwlPWTxEdPBB/TM/zi
+	wheCE0FyD+OhWHkCDYH5F8SP3XNqDo1rTAbOYKuqky4X7DZX8onUEnOg==
+X-Received: by 2002:a17:902:f541:b0:2c0:db23:4c1 with SMTP id d9443c01a7336-2c7c9928dc8mr33426245ad.5.1782232177983;
         Tue, 23 Jun 2026 09:29:37 -0700 (PDT)
 Received: from sprasad-dev1.corp.microsoft.com ([167.220.110.216])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdc97sm135185485ad.65.2026.06.23.09.29.36
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2c743bfdc97sm135185485ad.65.2026.06.23.09.29.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jun 2026 09:29:36 -0700 (PDT)
+        Tue, 23 Jun 2026 09:29:37 -0700 (PDT)
 From: nspmangalore@gmail.com
 X-Google-Original-From: sprasad@microsoft.com
 To: linux-cifs@vger.kernel.org,
@@ -67,9 +67,9 @@ To: linux-cifs@vger.kernel.org,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de
 Cc: Shyam Prasad N <sprasad@microsoft.com>
-Subject: [PATCH v6 14/17] cifs: trace points for cached_dir operations
-Date: Tue, 23 Jun 2026 21:59:07 +0530
-Message-ID: <20260623162910.343930-14-sprasad@microsoft.com>
+Subject: [PATCH v6 15/17] cifs: discard functions to ensure that mid callbacks get called
+Date: Tue, 23 Jun 2026 21:59:08 +0530
+Message-ID: <20260623162910.343930-15-sprasad@microsoft.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260623162910.343930-1-sprasad@microsoft.com>
 References: <20260623162910.343930-1-sprasad@microsoft.com>
@@ -83,271 +83,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Shyam Prasad N <sprasad@microsoft.com>
 
-This change introduces ftrace tracepoints for cached_dir operations.
-Intended to be used for debugging cached_dir.
+If discard functions for readv and query_dir return error, the
+callback functions can be skipped. This can end up with hung
+syscalls due to the completion functions not getting called.
+
+This change ensures that both these discard functions call
+the callback function when discard from socket returned error.
+This ensures that at least after the mid for the response is found,
+the callback doesn't get skipped, and we do not leave syscalls
+waiting.
 
 Signed-off-by: Shyam Prasad N <sprasad@microsoft.com>
 ---
- fs/smb/client/cached_dir.c | 21 ++++++++++-
- fs/smb/client/inode.c      | 13 +++++++
- fs/smb/client/trace.h      | 73 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 106 insertions(+), 1 deletion(-)
+ fs/smb/client/transport.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index ecdc6907cf6d1..389695b203247 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -1010,6 +1010,7 @@ bool add_to_cached_dir(struct cached_fid *cfid,
- 		atomic64_sub(-bytes_diff, &cfid->cfids->total_dirents_bytes);
- 		atomic64_sub(-bytes_diff, &cifs_dircache_bytes_used);
- 	}
-+	trace_smb3_add_to_cached_dir(cfid, name, namelen, added ? 0 : -1);
- 
- 
- 	return added;
-@@ -1040,6 +1041,9 @@ void complete_cached_dir(struct cached_fid *cfid,
- 	cde = &cfid->dirents;
- 	mutex_lock(&cfid->dirents.de_mutex);
- 	finished_cached_dirents_count(cde, ctx, file);
-+	trace_smb3_complete_cached_dir(cfid, ctx->pos, cde->pos,
-+					 cde->is_valid,
-+					 cde->is_failed);
- 	mutex_unlock(&cfid->dirents.de_mutex);
- }
- 
-@@ -1075,12 +1079,14 @@ int lookup_cached_dir(struct cached_fid *cfid,
- 	entry = lookup_cached_dirent_entry_locked(&cfid->dirents, name, namelen);
- 	if (!entry || !entry->dirent) {
- 		mutex_unlock(&cfid->dirents.de_mutex);
-+		trace_smb3_lookup_cached_dir(cfid, name, namelen, -ENOENT);
- 		return -ENOENT;
- 	}
- 
- 	dirent = entry->dirent;
- 	if (dirent->tombstone) {
- 		mutex_unlock(&cfid->dirents.de_mutex);
-+		trace_smb3_lookup_cached_dir(cfid, name, namelen, -ENOENT);
- 		return -ENOENT;
- 	}
- 
-@@ -1088,6 +1094,7 @@ int lookup_cached_dir(struct cached_fid *cfid,
- 	memcpy(&result->fattr, &dirent->fattr, sizeof(result->fattr));
- 
- 	mutex_unlock(&cfid->dirents.de_mutex);
-+	trace_smb3_lookup_cached_dir(cfid, name, namelen, 0);
- 	return 0;
- }
- 
-@@ -1125,6 +1132,8 @@ bool update_dirent_in_cached_dir(struct cached_fid *cfid,
- 	updated = update_cached_dirent_locked(&cfid->dirents, name,
- 						      namelen, fattr);
- 	mutex_unlock(&cfid->dirents.de_mutex);
-+	trace_smb3_update_dirent_in_cached_dir(cfid, name, namelen,
-+					      updated ? 0 : -ENOENT);
- 	return updated;
- }
- 
-@@ -1184,6 +1193,7 @@ void cifs_complete_pending_dcache(struct cached_fid *cfid,
- 	mutex_unlock(&cfid->dirents.de_mutex);
- 	cifs_dbg(FYI, "Dcache population of %.*s. status: %d\n",
- 					namelen, name, ret);
-+	trace_smb3_dcache_complete(cfid, name, namelen, ret);
- }
- 
- /*
-@@ -1225,6 +1235,7 @@ int cifs_wait_for_pending_dcache(struct cached_fid *cfid,
- 		}
- 	}
- 
-+	trace_smb3_dcache_wait(cfid, name, namelen, ret);
- 	return ret;
- }
- 
-@@ -1399,6 +1410,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 	if (cfid == NULL) {
- 		spin_unlock(&cfids->cfid_list_lock);
- 		kfree(utf16_path);
-+		trace_smb3_open_cached_dir(NULL, path, strlen(path), -ENOENT);
- 		return -ENOENT;
- 	}
- 	spin_unlock(&cfids->cfid_list_lock);
-@@ -1637,6 +1649,7 @@ int open_cached_dir(unsigned int xid, struct cifs_tcon *tcon,
- 		*ret_cfid = cfid;
- 		atomic_inc(&tcon->num_remote_opens);
- 	}
-+	trace_smb3_open_cached_dir(cfid, path, strlen(path), rc);
- 	kfree(utf16_path);
- 
- 	if (is_replayable_error(rc) &&
-@@ -1651,7 +1664,6 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
- 			      struct cached_fid **ret_cfid)
- {
- 	struct cached_fid *cfid;
--	struct cached_fid *trace_cfid = NULL;
- 	struct cached_fids *cfids = tcon->cfids;
- 	int rc = -ENOENT;
- 
-@@ -1667,6 +1679,7 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
- 			spin_lock(&cfid->cfid_lock);
- 			if (!is_valid_cached_dir(cfid)) {
- 				spin_unlock(&cfid->cfid_lock);
-+				rc = -ENOENT;
- 				break;
- 			}
- 			cifs_dbg(FYI, "found a cached file handle by dentry\n");
-@@ -1677,10 +1690,15 @@ int open_cached_dir_by_dentry(struct cifs_tcon *tcon,
- 			trace_cfid = cfid;
- 			spin_unlock(&cfid->cfid_lock);
- 			spin_unlock(&cfids->cfid_list_lock);
-+			trace_smb3_open_cached_dir_by_dentry(cfid, dentry->d_name.name,
-+							 dentry->d_name.len, 0);
- 			return rc;
- 		}
- 	}
- 	spin_unlock(&cfids->cfid_list_lock);
-+	trace_smb3_open_cached_dir_by_dentry(NULL, dentry->d_name.name,
-+					     dentry->d_name.len, rc);
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 99cb189dd567b..b30e2388a1c55 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -1143,6 +1143,11 @@ __cifs_discard_and_dequeue(struct TCP_Server_Info *server, struct mid_q_entry *m
+ 	dequeue_mid(server, mid, malformed);
+ 	mid->resp_buf = server->smallbuf;
+ 	server->smallbuf = NULL;
 +
- 	return rc;
++	/* Once the mid is dequeued, the callback must run to terminate the subreq */
++	if (length < 0)
++		mid_execute_callback(server, mid);
++
+ 	return length;
  }
  
-@@ -1969,6 +1987,7 @@ static void free_cached_dir(struct cached_fid *cfid)
- 
- 	WARN_ON(work_pending(&cfid->close_work));
- 	WARN_ON(work_pending(&cfid->put_work));
-+	trace_smb3_free_cached_dir(cfid, cfid->path, strlen(cfid->path), 0);
- 
- 
- 	dput(cfid->dentry);
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 631f5fae813b7..a139af232bf00 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2860,20 +2860,31 @@ cifs_dentry_needs_reval(struct dentry *dentry)
- 			if (!rc && lookup.found && lookup.under_active_lease) {
- 				if (cifs_inode_has_writable_handle(inode)) {
- 					cifs_set_time(dentry, jiffies);
-+					trace_smb3_dcache_revalidate(cfid,
-+							 dentry->d_name.name,
-+							     dentry->d_name.len, 0);
- 					cifs_put_tlink(tlink);
- 					return false;
- 				}
- 				rc = cifs_fattr_to_inode(inode, &lookup.fattr, false);
- 				if (!rc) {
- 					cifs_set_time(dentry, jiffies);
-+					trace_smb3_dcache_revalidate(cfid,
-+							 dentry->d_name.name,
-+							     dentry->d_name.len, 0);
- 					cifs_put_tlink(tlink);
- 					return false;
- 				}
- 				if (rc != -ESTALE) {
-+					trace_smb3_dcache_revalidate(cfid,
-+							 dentry->d_name.name,
-+							     dentry->d_name.len, rc);
- 					cifs_put_tlink(tlink);
- 					return true;
- 				}
- 			}
-+			trace_smb3_dcache_revalidate(cfid, dentry->d_name.name,
-+						     dentry->d_name.len, rc);
- 		}
- 	}
- 
-@@ -2883,6 +2894,8 @@ cifs_dentry_needs_reval(struct dentry *dentry)
- 	 * cache lookup/update did not satisfy this dentry.
- 	 */
- 	if (force_reval) {
-+		trace_smb3_dcache_revalidate(cfid, dentry->d_name.name,
-+					     dentry->d_name.len, -1);
- 		cifs_put_tlink(tlink);
- 		return true;
- 	}
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 9e120d6fe51cf..145d537ed17d5 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -1959,6 +1959,79 @@ TRACE_EVENT(smb3_eio,
- 		      __entry->info, __entry->info2)
- 	    );
- 
-+/*
-+ * Trace events for async directory cache population work
-+ */
-+DECLARE_EVENT_CLASS(smb3_dcache,
-+	TP_PROTO(const void *cfid,
-+		const char *name,
-+		int namelen,
-+		int result),
-+	TP_ARGS(cfid, name, namelen, result),
-+	TP_STRUCT__entry(
-+		__field(const void *, cfid)
-+		__string(name, name)
-+		__field(int, namelen)
-+		__field(int, result)
-+	),
-+	TP_fast_assign(
-+		__entry->cfid = cfid;
-+		__assign_str(name);
-+		__entry->namelen = namelen;
-+		__entry->result = result;
-+	),
-+	TP_printk("cfid=%p name=%.*s result=%d",
-+		__entry->cfid,
-+		__entry->namelen, __get_str(name), __entry->result)
-+);
-+
-+#define DEFINE_SMB3_DCACHE_EVENT(name)          \
-+DEFINE_EVENT(smb3_dcache, smb3_##name,    \
-+	TP_PROTO(const void *cfid,		\
-+		const char *name,		\
-+		int namelen,			\
-+		int result),			\
-+	TP_ARGS(cfid, name, namelen, result))
-+
-+DEFINE_SMB3_DCACHE_EVENT(dcache_complete);
-+DEFINE_SMB3_DCACHE_EVENT(dcache_wait);
-+DEFINE_SMB3_DCACHE_EVENT(dcache_revalidate);
-+DEFINE_SMB3_DCACHE_EVENT(open_cached_dir);
-+DEFINE_SMB3_DCACHE_EVENT(open_cached_dir_by_dentry);
-+DEFINE_SMB3_DCACHE_EVENT(free_cached_dir);
-+DEFINE_SMB3_DCACHE_EVENT(add_to_cached_dir);
-+DEFINE_SMB3_DCACHE_EVENT(lookup_cached_dir);
-+DEFINE_SMB3_DCACHE_EVENT(update_dirent_in_cached_dir);
-+
-+TRACE_EVENT(smb3_complete_cached_dir,
-+	TP_PROTO(const void *cfid,
-+		 loff_t ctx_pos,
-+		 loff_t cached_pos,
-+		 int is_valid,
-+		 int is_failed),
-+	TP_ARGS(cfid, ctx_pos, cached_pos, is_valid, is_failed),
-+	TP_STRUCT__entry(
-+		__field(const void *, cfid)
-+		__field(loff_t, ctx_pos)
-+		__field(loff_t, cached_pos)
-+		__field(int, is_valid)
-+		__field(int, is_failed)
-+	),
-+	TP_fast_assign(
-+		__entry->cfid = cfid;
-+		__entry->ctx_pos = ctx_pos;
-+		__entry->cached_pos = cached_pos;
-+		__entry->is_valid = is_valid;
-+		__entry->is_failed = is_failed;
-+	),
-+	TP_printk("cfid=%p ctx_pos=%lld cached_pos=%lld is_valid=%d is_failed=%d",
-+		__entry->cfid,
-+		(long long)__entry->ctx_pos,
-+		(long long)__entry->cached_pos,
-+		__entry->is_valid,
-+		__entry->is_failed)
-+);
-+
- #undef EM
- #undef E_
- #endif /* _CIFS_TRACE_H */
 -- 
 2.43.0
 
