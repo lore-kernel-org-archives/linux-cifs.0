@@ -1,142 +1,132 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F8B3C0602
-	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 22:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB1A38A706
+	for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 22:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782252090; cv=pass; b=CFduDAMLmPUeIncDrY+4vvNvcNOuAdNa2vYYn+7l6xagoTzo0XCM6Ca5AufWCGAIRARd+mZxROGeWhp04ABMDDPjml1KGfQuYY1HPbvhgkEuAcltqKDpyS/CmDBgOK1ZAyJv+tfPUjBM3RhcacE8Zy1K6DOzL1GTY0X/3bohijY=
+	t=1782252332; cv=pass; b=u+p9cFCm+IPpVnVsfCOkbOdIuvebv9d2JQuBPEfkSD4xYXgltJDsL5r6psMvKD1I+712ylvHOk1ZA0+Tqu4QWMpPSD3HaFKKu1Th+6r74x0NsRUce/uP2Vy/id0iCnNQyXIn+xYq23+cmgGj73e/qi1o9UtN9N/Vg259WLhJqc0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782252090; c=relaxed/simple;
-	bh=Pm1yJnATyFiIvMSxiCbHh2UJX40kGMCmkLF7Y/R1OHo=;
+	s=arc-20240116; t=1782252332; c=relaxed/simple;
+	bh=IXx1fu5GBgKGIpMJu/3rp88LFVfF5jO0VEc/3kOyFY4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dK0dQe5+xxdG5fqgjmnOUbP1VqggoznBU3f1qV3bFfFqzq+CfUXQJtQi6ZjmvDKAVHOrRqhQmRGQ3KdQoH4w7qEyIfKBycw6qrcvapZHlc87/DcRcfJE6FZyKfhQSE0bLHRSSrOOMZPPaZopAfFZWoEHqJ0mR6ri6Q7i6UXUnwQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k5WmK0dF; arc=pass smtp.client-ip=209.85.167.173
+	 To:Cc:Content-Type; b=sXHSdR6g6uxd3n8YDfsXg/nyRJVowjBCYjRmIdIYethDjX+YV74Nc9FzLX9+8GJ0Lv9cVHP4MObydSZSdCABWgUTn7pDHOurna+55BTaBijfiCSFx16Eds04nlsCEPGg5uuznY7PjvBxqftPwUWJSVQ+p9mwJTiFYXVfkPEt1/E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYFSZexs; arc=pass smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k5WmK0dF"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-488b3fd8d0dso235059b6e.1
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 15:01:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782252088; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SYFSZexs"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-727fad2be54so141282137.1
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 15:05:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782252330; cv=none;
         d=google.com; s=arc-20240605;
-        b=VFUzuNzf9+SgaCGTsGwqiaM2oDCXIu5z3448MWVem3imroRiz+IHSuksEumEkrK4TH
-         9Zi0JGKV1LfpCOJC3v22UjpyYNwSP4OJTIc5Pl7vgo+GDAkEzDLfvI3K3fZ7vs3XAig8
-         Kq7oeXkq/Xr0SdbRsUOzkeFAIBcmWhWKPowynwQvSdoO1xXaPtJ8fGhJRHTqRyeQOL/G
-         IjnryyzdVAPbdGJ1VuQC6r7br5ESp6R8c45X7he6aMD0U2Hs9F9wArU1OjMa+eTndqk4
-         tqgQrgPQyKjcluNtE9abUci3XOwYAD0uCzyQLWa+qyupUwipNOYstHsh0TW40fHI4zBm
-         LsGQ==
+        b=NmGnQLxFger4D314zVoH2IOKj4AjH2bbcECtWdupkgdb9jnHLqRdPxDaxl36Vyy8ZF
+         PNuBRWGCDb+hpWeCjQb2aBX8njSNylgu/+e/Gzlq36PHdQee6gZQSvhczXr4AQYa+Kwn
+         XLR3f2FszkXtOP/Ic3CerquLhs7Xu9mL7zHNryOg64zVWVcLzx4IbDWf7mgEX13LBGGJ
+         9CjEnbtp93fd+gHnGgBB7A74Df0MuraAZ+jOfNCdRYHSO96g4HGEJXXb++Irkr83ODdV
+         Nn+nMch7EJ+lNrELHcCAzLinJA9ZnRTRSwYcwNFmXeM1PCo+4aOd9LwO8zjhIoaY1rx1
+         1pSA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=dtDFRvrG1+EC97yQOEMKqneeBmsl8TlWmiO0u8Cavlg=;
-        fh=OmUezSkIuB/Hln41PkS90rN5zykW4fCP56e4eNnCc6I=;
-        b=FST1M/Kp5X+GA4oq8E5n0S+0ZtfUMMfOf/jfeBQ+7IzFNgexapd0yamQPlPaKi4hoX
-         oFOKVGFkJWiqqluHvz4A4fCBMIMBRfHumV90LWykacwaStpzCB1lW0Aao5TC49mxiOvk
-         MgS36eUCSaja+9jN94eAXZZJz/Lb1uJ7bkvFwzoI8YJdjMaDOaB8994bLkDgDNjXSr/c
-         ljdFE3Wm3S7ZrlleCKuSjhcqDT8TjGlFQqDkHU5B+NDhrHZki4851GqFMkKCwj1TWrrd
-         T1o8RcaWiOUJiQdhQM2BHxECHkeAlSAT/KuYHFeTPsgJc0uwheXBLl4Ewwb0yy1Q861I
-         xO9w==;
+        bh=22GH4Y1N75vl5DFCcBY4iJaoKZ/t6keFSyFkFll6qIQ=;
+        fh=Xam56eq/xWWpEliQgJWk5Yu4gyQjm4I5OMVwKartUPY=;
+        b=Vi/mqYw4E5U0H+TzejvMqL4l9dVaqdsFvbu71LLnywPUrGwLogY5hyIrdySrF3pfLL
+         0pq/fS121hPyI92d9sJJLEbztTigHHs9PRekq+249+dIGOwkLIgHp/Cwf3Fe1cXNBtxD
+         t1RJ3WXpNjtAm3xpp1UoSen8A38fKg56Gz8zO6eYYJXUIxXfO8T5J3I7U3TFBBSzrg2y
+         JFgXUb14Rr7yAzi1NoImMcJQEvCIcIhbs25JD558Q1pf5CK/0dPS6nERqKwYzEva4C35
+         ld5auabt1yeJcQfrW051mCOj1uRhPycA2ETCjsvyxlZa0dfebXi2sqLwoCjq9gObVeRv
+         xQsA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782252088; x=1782856888; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782252330; x=1782857130; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dtDFRvrG1+EC97yQOEMKqneeBmsl8TlWmiO0u8Cavlg=;
-        b=k5WmK0dF7/XkB1h3fKV5VvyGx5b/im/M32H7vjF/xeKxtv91cPoJJ+nJIhlcMsv/m5
-         nqencLWOlxZ40z6NU0/lqhMn20LVP1r3zuhahjVyzUYC04qmHipFfK5jSxn3hNXYKbNw
-         ltMutaAIqgEhCwD6ZtbmePeV35Y7wOrMCx47vWTUgNqqa2pYCOpWiCaKLndkX3wKK9Ay
-         GB83I/CJ0chh+o2MJHoqMrzYKHHcke37B7QPoHjYmlsW9VYcCGPxZUnFINKr1cwrYox0
-         igyNxh69hZAZ+BLnofocNz/TLbr+DM/60aj1OZCPE4olZdtY4/mxDU7do+sTIKji4Hjq
-         eWIA==
+        bh=22GH4Y1N75vl5DFCcBY4iJaoKZ/t6keFSyFkFll6qIQ=;
+        b=SYFSZexsw5qznzLbyH9jiv2tH1c5YOxfN9QsimFQ0yfICypQjilDyQRabb3VHc5Kaq
+         A2qHc3w3XMBFG2gIVMXLHGJeJUFDwQe/cXJYXscXrciQ0nzsUxwhKN2h5Kpq7MuZ2CZS
+         HrJt3QsIxBWiKHAu7weBEfCtJjFG1sLH28RHYlgmn0fleIaOdAjMCfau4BGAp6iUCpZh
+         /Vdw5dC9FecrG4hHVNNevEOYhz0f4rOOfkLt30RPTY6bRGT4/MmiPNp5Aik2tBO5qbKH
+         G/50/D2EWqh1xwFJsbS/icAah/EoljzdvyC4H78/JRBrYGpMh2ESRjd0aXNOWGjTxuXZ
+         NVFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782252088; x=1782856888;
+        d=1e100.net; s=20251104; t=1782252330; x=1782857130;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=dtDFRvrG1+EC97yQOEMKqneeBmsl8TlWmiO0u8Cavlg=;
-        b=rRTB7VISJAL0q6rhgrDxJw/Q1VcMIENNytQAKFvHgEu6rHFJf7488Wix1HxDHS4wKK
-         563MUoBmjUVZW+TpAA/2duT2TdynqKI6nihb8C/SqyKYjyl3GacAlC+uKY1WfOKH0YjG
-         kwj1QeIBaJB7u5wub8YOfXKROqAr+YA6ZEBQZ7ykNV0T3WE0g6LAY9Y57kjBG/IktfMQ
-         7gU7gDpgAN7I1GweMWN3z0wnyjeQ3pSKHH4PY8J/sN7dOLsh7fZZRMQg+yNREjsivtS9
-         8Sv5omnEk2uwooXqrlYfdkGU2pWJNd59hR3ikaXtJb/hskGTRxuTwBj/KeqKl9fHtmWc
-         xN1Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8mfDeU5zRDDrjWSm7BSupP1FdZ1czGarMVLfvngEP99CLV6bSgPsjJy8qW8MzZVaRxG0meQMPk3vjU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3DFWnWl90F33+Mph3JJNmOCy/FPlExYVb2hXiKW5R1/1P2RnH
-	xPlGflgmnRgaZG2Zs9aCYQhKMe14I4w0ffb4ky6lp7jQQ3MYBeolXAylBnbQ0xmmoeXfhmtjurv
-	gX8xGCmGrj6BfaJWPVAObCfO33O14mj8=
-X-Gm-Gg: AfdE7cnTs2FNGW0qpZpIzeAsbr8ypVMGP00A0/+1UdDgSZo4N52aIojlrTGFlAxNrtL
-	TJEEnMxeBPuR8m7ZkxddL7qrS/dHDWSfCAZedTIIMRXtNijUtjkGG3BYUE/cDXJrWIrstOCLp3E
-	+ccnOs2uQ5Xl5fOB2leQqy3Hrv6GghhL+Q+kW+ZdnvrORQRSzPCVpBBb48YMQb61QLdrPUZna0d
-	sWH9s45skCGE0w9zimztITzqSgKb+MmHuEmOaMOp1NNXtwwlFq4UQb8SQEKHZQcHtxxIP4MrIJC
-	40j1GE2OuxvGuPLjcJLjh4KemGC9e9aFgzhKQoGs/I3lbf0Rq1A+hKbztOGTT0VnaCt6wtPw4R8
-	FaC+UUHYYWA+BR11+JP3J5OETTYzErjWn6zON03JAejb8335UvFLqEgOB6woInPY2LDKgx8+4xM
-	ixSJ4GYnkIWEQ=
-X-Received: by 2002:a05:6808:1523:b0:489:5d8a:92fc with SMTP id
- 5614622812f47-4907948f85emr532781b6e.28.1782252088173; Tue, 23 Jun 2026
- 15:01:28 -0700 (PDT)
+        bh=22GH4Y1N75vl5DFCcBY4iJaoKZ/t6keFSyFkFll6qIQ=;
+        b=D7dGdIVCm/0Mk9izd8qHkyYOEewY4oo1seMXp6bRqFuRNydAFvZBuyD99BJWWpZGwr
+         qJshLBIiaSyqnmsCLpXa8We9RI66/12aF7sQWRj+zkmen4dElQLNJ0uotTeQ9kpBz3JD
+         8z5iOf0cqaW3jxguR2xUkCvxtevZ50O3qTZOmWPtrwfUgzuqSthGgb7wOMH7SgEsA12l
+         G8PqT+C6UamOLgdLUbaT1DQjZu9DJUodvpM10loNj66Lq2QR1eN8bsEZs/CaNhUL6bDk
+         oKfYilHlP9qj1wsIvN5Q2KIturCOHRn115GN9ltNEwpmDDbGGoYuv/U+x+bIdFQ1bweG
+         9xzw==
+X-Forwarded-Encrypted: i=1; AFNElJ+h68w+Rn9e0NT7Y8zosbn+ICo44bil2OLxeV0hZDMs5A8O++OYnDxcYQsmZjQWWFQOp7JEENMEJA31@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLahpgdq1PRJf+UVG+Grc4MSq12TDnq3FcTn6VFMiYwjzzR/jE
+	WuE6JdijyR0HcR0oFAIQ2vNWSlcQmfM/EujEbAA9XO+jB1Z8kZvC2fDgbP7eIGCCXjzY/01Akvq
+	OjhyHt4PV0vHW8E+JxlAbvujEzDYJaEE=
+X-Gm-Gg: AfdE7cml4+Un4x2sfFG6o7MCKsb+HEnDg29DIMJjzXwUld7y/ei7GwknU3mFcQV9A6g
+	xlFD9PnyHm9Ht27XOG6CpC/vvN5zsWKRg37vRhJAJpoyezuyuTNpayafLtD2YtKQsGGD/UDsqsO
+	fJOABFCkB8QoVHt1kUwqRLuX0cZnvcAyMUPoYciza5jMcFvt8TAs3nw6/TygsFb5CQRdLvYg7Mi
+	zt8s1Tsp9IR3W+jkm69tGFTq7TopXJs8H52CMaWU9TopU9hat1a06ALRRgBmqC0wShXbkDZiixN
+	QDLwsEjLipGSI0m/OKm44Tz92nnx3wjwgsTby/GSK4E+2BIXgL+OSQ9no/2D1mAk3nBU90zbn9d
+	B/nIuIcSw4wbFuOpfldGSw3mHljVRQ/Vf4j6nPI7P+b5Q8fXF5iBnyyzwfxpxpVjxiy7oR0kY3s
+	lwmZL2YykS8Po=
+X-Received: by 2002:a05:6102:32d4:b0:650:aa33:5dd7 with SMTP id
+ ada2fe7eead31-73112fb950fmr333903137.2.1782252330279; Tue, 23 Jun 2026
+ 15:05:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260623180620.373135-1-pc@manguebit.org>
-In-Reply-To: <20260623180620.373135-1-pc@manguebit.org>
+References: <ajEi4CyvM6bcl3bp@a2f8b33cc4be>
+In-Reply-To: <ajEi4CyvM6bcl3bp@a2f8b33cc4be>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 23 Jun 2026 17:01:15 -0500
-X-Gm-Features: AVVi8CdqKQgNzwiEIwKFCy4XVKBIxO8Zk0MG2rc6vEbMkYruK-zzZWcm8D94jt8
-Message-ID: <CAH2r5mvKj25T_5S4OA6ZWKuh+SipBLBd5cMeT_24sA8xhd3rDw@mail.gmail.com>
-Subject: Re: [PATCH] cifs.upcall: fix compiler warning with -Wvla
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: Enzo Matsumiya <ematsumiya@suse.de>, linux-cifs@vger.kernel.org
+Date: Tue, 23 Jun 2026 17:05:18 -0500
+X-Gm-Features: AVVi8Ceh-Qi6Y1VwbFhZNH8zBuMz67irJA5R1rCM9_76BRUN_aotwOCfgmdsfbE
+Message-ID: <CAH2r5mt_7kwggEaE-WZyNwbFfBxGNtWopeWb6mJirSKjCwWQoQ@mail.gmail.com>
+Subject: Re: [PATCH cifs-utils] mount.cifs: fix const correctness in parse_options
+To: Rudi Heitbaum <rudi@heitbaum.com>
+Cc: samba-technical@lists.samba.org, linux-cifs@vger.kernel.org, 
+	pshilovsky@samba.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-FIxed one misleading comment and merged into cifs-utils and smb3-utils for-=
-next
+merged into cifs-utils and smb3-utils for-next
 
-On Tue, Jun 23, 2026 at 1:06=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> =
-wrote:
+On Tue, Jun 16, 2026 at 5:33=E2=80=AFAM Rudi Heitbaum <rudi@heitbaum.com> w=
+rote:
 >
-> The length value for @path array in get_uidgid() needs to be evaluated
-> at compile time, so replace strlen() with sizeof() when defining
-> PROC_PID_PATH_MAXLEN and then fix the following warning:
+> parse_options() modifies the string it receives in-place, temporarily
+> null-terminating keyword and value boundaries. The const qualifier on
+> the data parameter was wrong; remove it so the compiler can verify
+> the pointer assignments are valid.
 >
->  cifs.upcall.c: In function =E2=80=98get_uidgid=E2=80=99:
->  cifs.upcall.c:1400:9: warning: ISO C90 forbids array =E2=80=98path=E2=80=
-=99 whose size
->  cannot be evaluated [-Wvla]
->   1400 |         char path[PROC_PID_PATH_MAXLEN] =3D {}, buf[256];
->        |         ^~~~
->
-> Fixes: 972c5b5ff95e ("cifs.upcall: remove getpwuid() dependency")
-> Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-> Cc: Enzo Matsumiya <ematsumiya@suse.de>
-> Cc: linux-cifs@vger.kernel.org
+> Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
 > ---
->  cifs.upcall.c | 2 +-
+>  mount.cifs.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/cifs.upcall.c b/cifs.upcall.c
-> index 01690dfcade1..5bb3e6881491 100644
-> --- a/cifs.upcall.c
-> +++ b/cifs.upcall.c
-> @@ -1376,7 +1376,7 @@ static int ip_to_fqdn(const char *addrstr, char *ho=
-st, size_t hostlen)
+> diff --git a/mount.cifs.c b/mount.cifs.c
+> index 836a060..b57c7d3 100644
+> --- a/mount.cifs.c
+> +++ b/mount.cifs.c
+> @@ -834,7 +834,7 @@ static int parse_opt_token(const char *token)
 >  }
 >
->  /* cover worst case/impossible scenarios, + 1 for NUL */
-> -#define PROC_PID_PATH_MAXLEN   ((int)strlen("/proc/2147483647/status") +=
- 1)
-> +#define PROC_PID_PATH_MAXLEN   ((int)sizeof("/proc/2147483647/status"))
->  /* max valid UID/GID is (UINT_MAX - 1) */
->  #define INVALID_UIDGID         UINT_MAX
->
+>  static int
+> -parse_options(const char *data, struct parsed_mount_info *parsed_info)
+> +parse_options(char *data, struct parsed_mount_info *parsed_info)
+>  {
+>         char *value =3D NULL;
+>         char *equals =3D NULL;
 > --
-> 2.54.0
+> 2.53.0
+>
 >
 
 
