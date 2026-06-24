@@ -1,124 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out203-205-221-149.mail.qq.com (out203-205-221-149.mail.qq.com [203.205.221.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0033A1A2D;
-	Wed, 24 Jun 2026 08:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1483955EC
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 09:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782291590; cv=none; b=Bc55lRkgWEC+2MKFqS1/SdHVIa+piWj6SWtj0wuOsDrdznck9xlFC5vmCiaz+/Dmr/lpw1QNXe1OdAdFl1rjqv1UDdN9ghkw4R3orlttR/QRbYEsYUtpqXbp+QD479pTbsD9wafOaxnKNubgjkw3BQAH3/QT8I5lMJdrpNApXz0=
+	t=1782294840; cv=none; b=tiFApuTA3sjuMYHujwQVbPYUhdqBZu/Qs1cXObRdcAP4SQNoE+e6LE8ICRTHP51fqkwSkmcKOnREiXKJjXtctncU2T6Owjgp4dOKtQ2qpscVIP1Tv46HUYV1PQdRExMZWJ1LsaQThz0zdstFumPtw98ks7Ow7BozFmGwUYFMn+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782291590; c=relaxed/simple;
-	bh=ETK/3fIWVJgZ66RkvKFMZ1xoiAvUnqVHg8A9UlR6oO4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hHLdk0ycu2OHmAfj13QPiVL5MhORtVtnq3dBCY6ji4ISmSakj7PCEVyY8Nif+7DfaYYQaVMqYSjff0wJ84dQqkDNWUT9JD+XE2BdN8/Eq8Epctp4lfSvKxSnP+FJ6IvFPg7s9x8yxiTuNPkmKGj7I1pDWHkYKIfsq3vGn7t6N5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cmfji3PW; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782294840; c=relaxed/simple;
+	bh=hQYb8WLnpzVrViqiWjKRb/YVxQprfQsYc0357PhZ3eA=;
+	h=Message-ID:Date:From:To:Cc:Subject:Mime-Version:Content-Type; b=BRJ/FKEyqgvALyCAQ+1DmDPZylmuQnXNYkZPt3NM80UX0Us7cd+FAqEQK8hPuL/HJE7SD/POTfAfIGAgUnuOFPBe0DRu45M/tXi3kDS0DW1NORurF6Fa5//62m6n0nt9ZeoLfqA5jMtErD4vo9P1cqz0v2G3X1SXaEwySUCme6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=nh15+ygh; arc=none smtp.client-ip=203.205.221.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cmfji3PW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E931F00A3D;
-	Wed, 24 Jun 2026 08:59:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782291587;
-	bh=DCKt4O2HlnFxHy8Mhm2C2zuPcXHOFrNOinuxD1UUcRc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=Cmfji3PW0AVDGKQ4BufZEBDJWiQm1o8/rQsb7n4IPtwL2Bri4DpGeykggivNXbeKl
-	 bstR8Aj141x+SXVVytHk70wMVpKQ2bDQeC4RGdfuf925UT+hEoMCDYVxscMlqcrn3d
-	 6xnEmkWJdCUcpVMSWDpNGerH9VyGcglmIk/mUCMD0BiEP0cv0fwfWo3JgHR5YPVrnL
-	 Jte9tPT/yzkvqV00w5paETjF56VjF6ALEXGUBYhw0wOJsEeEWA+2CMVQPU75HFlWVo
-	 MQXB30pU37MXc/fscX12cEexVJBV1ND0Xny4mZBk5+ARKMHfjuwtW9baGkR7d+IuXL
-	 XUjSsQ4FUeCjg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 196D839EF964;
-	Wed, 24 Jun 2026 08:59:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="nh15+ygh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1782294829;
+	bh=hQYb8WLnpzVrViqiWjKRb/YVxQprfQsYc0357PhZ3eA=;
+	h=Date:From:To:Cc:Subject;
+	b=nh15+ygh2S9hF7JuNOBjBA7MJKEWZq4t/VV52AslZ1uwx/cZY2FAf12Ix5yDh2SVi
+	 8/Mxo4AzsQuRbdcHYxzpcGHpfKlsv2sbCHU9c9sN7p1QlHq68Xcj0H/fGqKyJh+2/F
+	 58bXa43w3uae2fxAWWKe+6j4ptPg+nkrzUCDFby8=
+Received: from PC-20201120SBOH ([183.205.156.133])
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id D6FA1C6F; Wed, 24 Jun 2026 17:53:47 +0800
+X-QQ-mid: xmsmtpt1782294827t6d4dr1qa
+Message-ID: <tencent_32075C41A32AB2B941A3641C72794B4B6408@qq.com>
+X-QQ-XMAILINFO: NnYhxYSyuBnLefhBwmdCegEy/Dn4b5B2eDR4E1sBsxw+d6v0cOBH4vaFkiWIv2
+	 ApcQ9Tf+PL4Lyd9qaBAUw93WTHg7iZAuP5E2uoOaAhPDnLqsqfhDkRaPXUgXsi91sH7XB62Ncd4c
+	 WHnKdaaEme8JZ07or4eYL79nGkM3PUZr8UyvsKliZWNaP07sOrPjNi2lGb1HYruoC2AfUeB+o7rd
+	 wuqgb7aR+7ur2FREkTIPrWjW+YEufy4Zj/1JTOqsp26efomI7YLautkni5EwKb8DpPlLTfMyVXyW
+	 2cYVlx0pva7lE9aPusN08Pp/xNehIZR/9xDPCkDpyoI8SopdZ1SOpMgksEi1qCgAoWkjvyXAK3D8
+	 30Z2ReQ8Enn/JyrhtXm83WHduwGaxzFnMJCCio6Md88RZ5aH3qG+0MKFHejXShtM8nRDaR/hQElg
+	 jUv0c2eIBj04FuVe0TrNwDmEmxq0t8HnFS9ht3lASW7at9K0QF1jW9zudtsk7SeXy2/G/lKizfrm
+	 OQZVbAqwP+kRwIPtq4vXR+39exHSu8qhrCRt4cr4flBDWXURIm9FDmMoclQCF3KD3f1LayhVdHlE
+	 vxgkYCTulF0l084BEysYqv9SY3YPMX2kJs9pNKObrACL+DRdp89HRuJOFXtlZvVjA4mOe3CO1p8f
+	 AWF9v4vJiyfcv08c3K7Nfnz04SFaS4gc5Wris413s/o277X9dhx0q4x0nhFcV+4rxCTgsQvPqSqU
+	 AhE8tJzbB1VR9ijjzfz2MURwGSpS1sdou1zJHQUVB56k0GqG+FPUZM34cJ4gjEiqbO1i8bdGqM1J
+	 oliyOU56GbIjHc0eBMDTNnZH0ymjYfoLHrOXcl/X4bWriIGzWdIadW7NWrc6yB2IZKvcvdisrz8d
+	 9rWVPjiUQ9sg8KhXKlnJlNLMlUjejHSkBfj9KRpYLxAkP0F+3TGIFh9tyDCtJ+uURT7WpOlBsQ1n
+	 eevsFLcQxYzMSU7CmCFaXNTMPYQd5G8WOtQu1ggxc5TufBwlbXrI9Cw0AAu8drSuQRhAO8ersgor
+	 +P8YAF6s6mFzBkAABESkIqKvViT8689Tq2D6cLWiB0h76rq4hV
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+Date: Wed, 24 Jun 2026 17:53:48 +0800
+From: "grayhat@foxmail.com" <grayhat@foxmail.com>
+To: cve <cve@kernel.org>
+Cc: sfrench <sfrench@samba.org>, 
+	namjae.jeon <namjae.jeon@samsung.com>, 
+	linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Request CVE for ksmbd authenticated permission bypass in FSCTL_SET_SPARSE handle
+X-Priority: 3
+X-GUID: FDD5182A-EB46-4779-AF12-B02A797A07A9
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.542[cn]
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [f2fs-dev] [PATCH v8 00/17] Subject: Exposing case folding
- behavior
-From: patchwork-bot+f2fs@kernel.org
-Message-Id: 
- <178229157577.2577930.354083176752004996.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Jun 2026 08:59:35 +0000
-References: <20260217214741.1928576-1-cel@kernel.org>
-In-Reply-To: <20260217214741.1928576-1-cel@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
- pc@manguebit.org, yuezhang.mo@sony.com, cem@kernel.org,
- almaz.alexandrovich@paragon-software.com, adilger.kernel@dilger.ca,
- linux-cifs@vger.kernel.org, sfrench@samba.org, slava@dubeyko.com,
- linux-ext4@vger.kernel.org, linkinjeon@kernel.org, sprasad@microsoft.com,
- frank.li@vivo.com, ronniesahlberg@gmail.com, glaubitz@physik.fu-berlin.de,
- jaegeuk@kernel.org, hirofumi@mail.parknet.co.jp, linux-nfs@vger.kernel.org,
- tytso@mit.edu, linux-api@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
- senozhatsky@chromium.org, chuck.lever@oracle.com, hansg@kernel.org,
- anna@kernel.org, linux-fsdevel@vger.kernel.org, sj1557.seo@samsung.com,
- trondmy@kernel.org
+Mime-Version: 1.0
+X-OQ-MSGID: <202606241753481794609@foxmail.com>
+Content-Type: text/plain;
+	charset="GB2312"
+Content-Transfer-Encoding: base64
 
-Hello:
-
-This series was applied to jaegeuk/f2fs.git (dev)
-by Christian Brauner <brauner@kernel.org>:
-
-On Tue, 17 Feb 2026 16:47:24 -0500 you wrote:
-> From: Chuck Lever <chuck.lever@oracle.com>
-> 
-> Following on from
-> 
-> https://lore.kernel.org/linux-nfs/20251021-zypressen-bazillus-545a44af57fd@brauner/T/#m0ba197d75b7921d994cf284f3cef3a62abb11aaa
-> 
-> I'm attempting to implement enough support in the Linux VFS to
-> enable file services like NFSD and ksmbd (and user space
-> equivalents) to provide the actual status of case folding support
-> in local file systems. The default behavior for local file systems
-> not explicitly supported in this series is to reflect the usual
-> POSIX behaviors:
-> 
-> [...]
-
-Here is the summary with links:
-  - [f2fs-dev,v8,01/17] fs: Move file_kattr initialization to callers
-    (no matching commit)
-  - [f2fs-dev,v8,02/17] fs: Add case sensitivity flags to file_kattr
-    https://git.kernel.org/jaegeuk/f2fs/c/3035e4454142
-  - [f2fs-dev,v8,03/17] fat: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,04/17] exfat: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,05/17] ntfs3: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,06/17] hfs: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,07/17] hfsplus: Report case sensitivity in fileattr_get
-    (no matching commit)
-  - [f2fs-dev,v8,08/17] ext4: Report case sensitivity in fileattr_get
-    (no matching commit)
-  - [f2fs-dev,v8,09/17] xfs: Report case sensitivity in fileattr_get
-    (no matching commit)
-  - [f2fs-dev,v8,10/17] cifs: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,11/17] nfs: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,12/17] f2fs: Add case sensitivity reporting to fileattr_get
-    (no matching commit)
-  - [f2fs-dev,v8,13/17] vboxsf: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,14/17] isofs: Implement fileattr_get for case sensitivity
-    (no matching commit)
-  - [f2fs-dev,v8,15/17] nfsd: Report export case-folding via NFSv3 PATHCONF
-    (no matching commit)
-  - [f2fs-dev,v8,16/17] nfsd: Implement NFSv4 FATTR4_CASE_INSENSITIVE and FATTR4_CASE_PRESERVING
-    (no matching commit)
-  - [f2fs-dev,v8,17/17] ksmbd: Report filesystem case sensitivity via FS_ATTRIBUTE_INFORMATION
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+SGkgQ05BIHRlYW0sCgpJIGFtIHdyaXRpbmcgdG8gcmVxdWVzdCBhIENWRSBJRCBmb3IgYSBwZXJt
+aXNzaW9uIGJ5cGFzcyB2dWxuZXJhYmlsaXR5IGluIHRoZSBrc21iZCBGU0NUTF9TRVRfU1BBUlNF
+IGhhbmRsZXIuIEEgZml4IGZvciB0aGlzIGlzc3VlIGhhcyBiZWVuIG1lcmdlZCBpbnRvIHRoZSBt
+YWlubGluZSBMaW51eCBrZXJuZWwgYW5kIGJhY2twb3J0ZWQgdG8gc3RhYmxlIGtlcm5lbHMsIGJ1
+dCBubyBjb3JyZXNwb25kaW5nIENWRSBoYXMgeWV0IGJlZW4gYXNzaWduZWQuCgpWdWxuZXJhYmls
+aXR5IGNsYXNzaWZpY2F0aW9uOiBDV0UtMjc0IChJbXByb3BlciBIYW5kbGluZyBvZiBJbnN1ZmZp
+Y2llbnQgUHJpdmlsZWdlcykKQ29tbWl0IHJlZmVyZW5jZXM6Ci0gTWFpbmxpbmUgZml4IGNvbW1p
+dDogY2M1NzIzMmNhZTIzYzBkZjkxYjRhNTlkMGY1MTkxNDFjZTliNWIwMiAoImtzbWJkOiBmaXgg
+RlNDVEwgcGVybWlzc2lvbiBieXBhc3MgYnkgYWRkaW5nIGEgcGVybWlzc2lvbiBjaGVjayBmb3Ig
+RlNDVExfU0VUX1NQQVJTRSIpCi0gU3RhYmxlIGJhY2twb3J0IHJlbGVhc2VzOiB2Ny4wLjEyLCB2
+Ni4xOC4zNSwgdjYuNi4xNDMgTFRTCgpOb3RlOiBrc21iZCBmZWF0dXJlcyBhcmUgZGV2ZWxvcGVk
+IGluIGEgc3RhbmRhbG9uZSBTYW1iYSByZXBvc2l0b3J5IGFuZCBtZXJnZWQgaW50byBtYWlubGlu
+ZSBMaW51eCBpbiBwZXJpb2RpYyBidWxrIHB1bGwgcmVxdWVzdHMuIFRoZSBGU0NUTF9TRVRfU1BB
+UlNFIGhhbmRsZXIgbGFuZGVkIHZpYSBvbmUgc3VjaCBiYXRjaCBtZXJnZSwgc28gdGhlcmUgaXMg
+bm8gZGVkaWNhdGVkIG1haW5saW5lIGNvbW1pdCBzb2xlbHkgaW50cm9kdWNpbmcgdGhpcyBoYW5k
+bGVyLiBDb3JyZXNwb25kaW5nbHksIHRoZSBmaXggY29tbWl0IGRvZXMgbm90IGNhcnJ5IGEgcHJl
+Y2lzZSBGaXhlczogdGFnIHJlZmVyZW5jaW5nIGEgbWFpbmxpbmUgaW50cm9kdWN0aW9uIGNvbW1p
+dC4KClRoZSBrc21iZCBGU0NUTF9TRVRfU1BBUlNFIGhhbmRsZXIgaXMgbWlzc2luZyBib3RoIHNo
+YXJlLWxldmVsIGFuZCBoYW5kbGUtbGV2ZWwgd3JpdGUgcGVybWlzc2lvbiBjaGVja3MgdGhhdCBh
+cmUgZW5mb3JjZWQgZm9yIG90aGVyIHdyaXRlLXNlbnNpdGl2ZSBGU0NUTCBvcGVyYXRpb25zLgoK
+V2l0aGluIHNtYjJfaW9jdGwoKSAoZnMvc21iL3NlcnZlci9zbWIycGR1LmMpLCB0aGUgYnJhbmNo
+IGhhbmRsaW5nIEZTQ1RMX1NFVF9TUEFSU0UgaW52b2tlcyBmc2N0bF9zZXRfc3BhcnNlKCkgd2l0
+aG91dCB2YWxpZGF0aW5nIHR3byBjcml0aWNhbCBhY2Nlc3MgY29uZGl0aW9uczoKMS4gU2hhcmUg
+d3JpdGFibGUgZmxhZzogdGVzdF90cmVlX2Nvbm5fZmxhZyh3b3JrLT50Y29uLCBLU01CRF9UUkVF
+X0NPTk5fRkxBR19XUklUQUJMRSkKMi4gUGVyLWhhbmRsZSB3cml0ZSBhY2Nlc3M6IGZwLT5kYWNj
+ZXNzICYgKEZJTEVfV1JJVEVfREFUQV9MRSB8IEZJTEVfV1JJVEVfQVRUUklCVVRFU19MRSkKCkZv
+ciBjb21wYXJpc29uLCByZWxhdGVkIGRlc3RydWN0aXZlIG9wZXJhdGlvbnMgc3VjaCBhcyBGU0NU
+TF9DT1BZQ0hVTksgYW5kIEZTQ1RMX1NFVF9aRVJPX0RBVEEgYm90aCBleHBsaWNpdGx5IGNoZWNr
+IEtTTUJEX1RSRUVfQ09OTl9GTEFHX1dSSVRBQkxFLCB3aGlsZSBGU0NUTF9TRVRfU1BBUlNFIG9t
+aXRzIHRoaXMgcHJvdGVjdGlvbiBlbnRpcmVseS4KCkludGVybmFsbHksIGZzY3RsX3NldF9zcGFy
+c2UoKSBtb2RpZmllcyB0aGUgaW4tbWVtb3J5IGZpbGUgYXR0cmlidXRlIGZsYWcgZnAtPmZfY2kt
+Pm1fZmF0dHIuIFdoZW4gdGhlIFNhbWJhIHNoYXJlIG9wdGlvbiBgc3RvcmUgZG9zIGF0dHJpYnV0
+ZXMgPSB5ZXNgIGlzIGVuYWJsZWQsIGl0IGFsc28gcGVyc2lzdHMgRE9TIGF0dHJpYnV0ZSBzdGF0
+ZSB2aWEgdmZzX3NldHhhdHRyKCkuIFVubGlrZSB2ZnNfd3JpdGUoKSBvciB2ZnNfZmFsbG9jYXRl
+KCksIHZmc19zZXR4YXR0cigpIGRvZXMgbm90IHZhbGlkYXRlIEZNT0RFX1dSSVRFIGF0IHRoZSBW
+RlMgbGF5ZXIsIG1lYW5pbmcgdGhlcmUgaXMgbm8gdW5kZXJseWluZyBrZXJuZWwgZW5mb3JjZW1l
+bnQgdG8gY29tcGVuc2F0ZSBmb3IgbWlzc2luZyBwZXJtaXNzaW9uIGNoZWNrcyBpbnNpZGUga3Nt
+YmQuCgpBcyBhIHJlc3VsdCwgYW4gYXV0aGVudGljYXRlZCBTTUIgY2xpZW50IHdpdGggcmVhZC1v
+bmx5IGFjY2VzcyB0byBhIHNoYXJlIGlzIGFibGUgdG8gYWx0ZXIgdGhlIHNwYXJzZSBhdHRyaWJ1
+dGUgb2YgYXJiaXRyYXJ5IGZpbGVzLiBUaGlzIGJ5cGFzc2VzIGJvdGggc2hhcmUtbGV2ZWwgcmVh
+ZC1vbmx5IHJlc3RyaWN0aW9ucyBhbmQgZmlsZS1oYW5kbGUgd3JpdGUgYWNjZXNzIHJlcXVpcmVt
+ZW50cy4KClRoaXMgYmVoYXZpb3IgdmlvbGF0ZXMgdGhlIE1TLUZTQSBzcGVjaWZpY2F0aW9uIHNl
+Y3Rpb24goewyLjEuNS4xMC4zODoKIklmIE9wZW4uR3JhbnRlZEFjY2Vzcy5GSUxFX1dSSVRFX0RB
+VEEgaXMgRkFMU0UgYW5kIE9wZW4uR3JhbnRlZEFjY2Vzcy5GSUxFX1dSSVRFX0FUVFJJQlVURVMg
+aXMgRkFMU0UsIHRoZSBvcGVyYXRpb24gTVVTVCBiZSBmYWlsZWQgd2l0aCBTVEFUVVNfQUNDRVNT
+X0RFTklFRC4iCmtzbWJkIGRvZXMgbm90IGltcGxlbWVudCB0aGlzIG1hbmRhdG9yeSBhY2Nlc3Mg
+Y29udHJvbCBjaGVjay4KClRoYW5rcywKU2VhbiBTaGVuCmdyYXloYXRAZm94bWFpbC5jb20K
 
