@@ -1,30 +1,32 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEF81D416C
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 02:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452432F1FE4
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 02:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782267413; cv=none; b=iavRHbDk5poGFuXl5EH/nqNY70zu2IfesPhCuU4ox8hzxaIpLvQbwLX6Mo42PD4fJnk81vOPJa0heeZmRuLiZxRPRtqDbz0R60iAYcIqtwRW9Kvj5Z/3Ve4g6LT9B++9yUkgQyxtAa8tpGbfej9quKPQT3bh4BPHUkBvfwWdvZ4=
+	t=1782267424; cv=none; b=GD2HhZJfhrX/JZ4aUGRjg2Edg5MyR9fR+v9KR5ZExsmPmYPh2F60UsUjWDsqdoYMQQ41/VDisLsEs7jmH4yMr3I9OLUAwSEUQfZ6gsYw9xjD72efEJTa/LwDpURaBV1mqpDh3fLBhDrIFkhElJEQKX3EGUAjWMmYsZJFY1AzEkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782267413; c=relaxed/simple;
-	bh=+jBrI7lY8FrCzSmPojKFWoopy0IHRHjU22XOUX0S4VY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N4Y009vIcQ1MdLjmd/Gvbd7vbeLz+UCKf47GOd770eceWqrjYKhJTYGCV52xdxRifT6h6rizhTA28swNe8xAU2DyasLC4uXXspgD3tUcNKsOspvkDUW0rdOLPeZfQg5gxi6vA/rAVYPIEi0OFU24AlH9yhXZXkYzHMiEbXHIlC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z4947sbV; arc=none smtp.client-ip=91.218.175.179
+	s=arc-20240116; t=1782267424; c=relaxed/simple;
+	bh=cttK5TRfeFGbtbJD9YkmuwbKD+L361sn/s4bvl0H4h0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LZvEin3umvRmgOrICgQZr6f9LrrChhn9FNJEEUZKwieDDRyBl6VOdufzhiI4o4UnYd2gHgQZXdBf049Xl0IumPg0abbQXVvmF2vs06BuDOL156wqcvSxXDoLy02IZYZgXiWkEoz++AyWofxfvqXNAv7OqyyMJ8v0fr5aS1i4cP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=p/IMu//K; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z4947sbV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="p/IMu//K"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782267407;
+	t=1782267421;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jr4Q0CB9EPYPSKb8NNK53bLcQawtRq/g8YFVzeO30zk=;
-	b=Z4947sbV6cSL4hHaN8hVVDEUyL1Nb5ao1TXgielaukw4CvNk73HAH3FqYgxCb+Hejwn1IH
-	dp53hK65knXnZlkXnHbfSmcNyWXRcCXeld8ze5rfjVJMMZMPNlCeOLRLYgiM8qhcoLqzC/
-	yWSlZUP/YR6lzcWmI765g9K8jZi3UFI=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dwfMunD6/jnKVQF7zCul1buOKbXpGCRaC33eBDCxZL8=;
+	b=p/IMu//KLaBRZQsi7pIrrEQhsAoxBFYhGyt5DsId8eHa25w8kxLOi1MDNjDqQ7fkaFXRyb
+	vRW4egufxRicsALQ7xqxlyflPinQNei6B/nEeGRGxpm4MejnouG3nVBWYLAj35nxWaA7JT
+	CUih9oYZL0zjetfXe8wZMpY07vIg7NI=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -38,9 +40,11 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 0/9] smb/client: fix mode 0 fallocate handling
-Date: Wed, 24 Jun 2026 10:15:41 +0800
-Message-ID: <20260624021550.1548952-1-huiwen.he@linux.dev>
+Subject: [PATCH v2 1/9] smb/client: name the default fallocate mode
+Date: Wed, 24 Jun 2026 10:15:42 +0800
+Message-ID: <20260624021550.1548952-2-huiwen.he@linux.dev>
+In-Reply-To: <20260624021550.1548952-1-huiwen.he@linux.dev>
+References: <20260624021550.1548952-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,39 +56,32 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-Changes since v1:
-- Add patch 2 to preserve FSCTL_SET_SPARSE errors and only cache
-  EOPNOTSUPP as missing sparse support.
-- Update patch 6 to allow verified EOF-adjacent fallocate on non-sparse
-  files.
-- Add patch 7 to handle allocated ranges that overlap the requested
-  fallocate range.
-- Update patch 9 to limit zero-write emulation to small EOF-adjacent
-  ranges on sparse files.
+FALLOC_FL_ALLOCATE_RANGE identifies the default fallocate
+allocation mode and is defined as zero.
 
-Link to v1:
-https://lore.kernel.org/linux-cifs/20260623024619.1360127-1-huiwen.he@linux.dev
+Use the symbolic name instead of a literal zero in
+smb3_fallocate() to make the mode dispatch clearer. This
+does not change behavior.
 
-Huiwen He (9):
-  smb/client: name the default fallocate mode
-  smb/client: preserve errors from smb2_set_sparse()
-  smb/client: handle smb2_set_sparse() failure in EOF-extending
-    fallocate
-  smb/client: handle smb2_set_sparse() failure in non-extending
-    fallocate
-  smb/client: do not account EOF extension as allocation
-  smb/client: verify allocation after EOF-extending fallocate
-  smb/client: handle overlapping allocated ranges in fallocate
-  smb/client: reduce fallocate zero buffer allocation
-  smb/client: emulate small sparse fallocate ranges at EOF
+Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/smb2ops.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- fs/smb/client/inode.c     |  13 ++-
- fs/smb/client/smb2ops.c   | 181 ++++++++++++++++++++++++++++++--------
- fs/smb/client/smb2pdu.c   |  19 ++++
- fs/smb/client/smb2proto.h |   3 +
- fs/smb/common/fscc.h      |   5 ++
- 5 files changed, 182 insertions(+), 39 deletions(-)
-
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index a8f8feeeccb5..2964f461fc84 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4071,7 +4071,7 @@ static long smb3_fallocate(struct file *file, struct cifs_tcon *tcon, int mode,
+ 		return smb3_collapse_range(file, tcon, off, len);
+ 	else if (mode == FALLOC_FL_INSERT_RANGE)
+ 		return smb3_insert_range(file, tcon, off, len);
+-	else if (mode == 0)
++	else if (mode == FALLOC_FL_ALLOCATE_RANGE)
+ 		return smb3_simple_falloc(file, tcon, off, len, false);
+ 
+ 	return -EOPNOTSUPP;
 -- 
 2.43.0
 
