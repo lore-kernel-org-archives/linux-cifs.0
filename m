@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93611D416C
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 02:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E231D416C
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 02:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782267447; cv=none; b=VzL7mrhNs0o+0nJHTv9EsHm2g7dzt4tAcbzSXzMm7/TkkwSIiKimyE3+8H+pmUlD5RxUMjt/Jd7Q4Xj8JNx4SpZagu/ahx3wBO8qsoeQr4ZI3rK5fySY+4cB8SXc0rDxOoWlZwbK/5sz4iFI/Sn0oFvbS2cj0PkoFxxqVax8eQM=
+	t=1782267453; cv=none; b=ojuLTq7071Ovxc9JOF66Rmsh5NUB26UrDeXmIVSnw7dEeS4fjOtBejBdAieqf/tL1dQy0FCfxJWCN7mWA3iNm7dpgOR1lso5oElimNN7t9p4h105UF/GvPfSFznvQPNb6zMhGWfoQ0j2xbe8VTI0DFhqo8tKqkCLsb2IUAqIGPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782267447; c=relaxed/simple;
-	bh=gfCDKxy88QDlHAxP99WpiFRyM4FUVIpJ/kFvOf0zg5Y=;
+	s=arc-20240116; t=1782267453; c=relaxed/simple;
+	bh=9C94+gkFMEcGbSwqboWN4Rke/8n60/G+6pmke4qtJrU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xe+sDd3sx14J8KW2lCqy1c4qX9NnXYecd5e/3T8K/nA4vhSxPnnP1Q2BFI07ZfIxtNWWmnhT9vQXvdbybbzhU47y0IJztlSEwdGkkNHYd0ns5QAenCAuLUyCA1efOwkCFw8W2bwdGhwJDZmJOPj2BxD1Lm+AaLXWyEnd35FD9rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CTKBkYNu; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=eQqpPWZvtR4SfAvjtu1QG4iY6SFExIKwSmIXM9/GIDhfRh0M3WBAwODIhnW33wrnVamVYioZW4GtqZ1gqkrfFymMxLdTwLrF27savu7eE04PU/pb+sMoQd5AZ246TMAAe7dxPNs+TdzOcox3PhR0BlKWk7PD6A9B9pgHRS3TZB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=m+Ih52LU; arc=none smtp.client-ip=91.218.175.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CTKBkYNu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="m+Ih52LU"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782267444;
+	t=1782267449;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+MtMqy2fKInmfeyKnrFkSaehaVe03SP0QWXNsmzvhhw=;
-	b=CTKBkYNuna35fb58cLEfycSZnU2Ha2OKHZp5pCtznoFqBGQj0H08PIukp1XEhhYLoYhLQS
-	dqQ4ctrvmS7/u0pR8qS5WmeHyeCCQj0zBTFUdmjiMAT35agR5TYl2gItfpYmMkbBjfHN6Y
-	P1rJjc0ye2Wkvj1lRHB+o/t0I5y63M8=
+	bh=rf4gVaZz7AMwTiaIP/WBhjx8APqGBpw1MZW5dOAGQSY=;
+	b=m+Ih52LUIqQ0F/RRH5yxGWEqw5jWtKRLYdBDkQj5FjHFuBPWL66XoHo3nuJHqNk1BN/s2k
+	/il5bOAXZff15tqP1S32tu6r3xtglF8SV7b1jBFVV2gb1iVHEf4CpwNlc2jzrlLpOKvkZT
+	dV4uibSAhLA9rNsnWeUgJMYc4dyh4zw=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 5/9] smb/client: do not account EOF extension as allocation
-Date: Wed, 24 Jun 2026 10:15:46 +0800
-Message-ID: <20260624021550.1548952-6-huiwen.he@linux.dev>
+Subject: [PATCH v2 6/9] smb/client: verify allocation after EOF-extending fallocate
+Date: Wed, 24 Jun 2026 10:15:47 +0800
+Message-ID: <20260624021550.1548952-7-huiwen.he@linux.dev>
 In-Reply-To: <20260624021550.1548952-1-huiwen.he@linux.dev>
 References: <20260624021550.1548952-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,69 +56,218 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-cifs_setsize() updates the local inode size after SetEOF succeeds. It also
-used the new EOF as a local i_blocks estimate, but extending EOF does not
-prove that the intervening range was allocated.
+EOF-extending fallocate(mode=0) currently returns success after SetEOF
+even if the server has not allocated the requested space. This gives
+userspace a false preallocation guarantee and can cause a later write
+into that range to fail with ENOSPC.
 
-For example, after writing 1 MiB and then extending EOF to 10 MiB, the
-client can report the file as fully allocated even though the server still
-reports a much smaller AllocationSize:
+This happens because SMB2 has no operation that directly matches Linux
+fallocate for an arbitrary byte range. SetEOF changes only the logical
+file size, while FILE_ALLOCATION_INFORMATION can request allocation only
+from offset 0 up to a specified allocation size.
 
-        $ dd if=/dev/zero of=test bs=1M count=1
-        $ truncate -s 10M test && stat -c 'size=%s blocks=%b' test
-        $ stat --cached=never -c 'size=%s blocks=%b' test
+Use FILE_ALLOCATION_INFORMATION only when allocating [0, off + len)
+safely covers the requested range [off, off + len). For example, both
+ranges are identical when the request starts at offset zero:
 
-        client stat:                    size=10485760 blocks=20480
-        server stat:                    size=10485760 blocks=2056
-        client stat after revalidation: size=10485760 blocks=2056
+        xfs_io -f -c "falloc 0 4m" file
 
-A later attribute revalidation may correct i_blocks, but callers such as
-xfstests generic/495 invoke swapon immediately after truncate. The swapfile
-hole check can therefore observe the inflated local i_blocks value and
-accept a sparse file.
+Allocating the additional range before off is also safe for an empty
+file:
 
-Do not grow i_blocks from cifs_setsize() on EOF extension.  Only clamp it
-on shrink; allocation growth must come from write completion or from
-server-reported AllocationSize.
+        truncate -s 0 file
+        xfs_io -c "falloc 1m 4m" file
 
-With this change, EOF extension no longer makes a sparse file appear
-fully allocated before the next attribute revalidation, and xfstests
-generic/495 no longer accepts it through the inflated local i_blocks value.
+An EOF-adjacent request is safe for a non-sparse file because the range
+before EOF is already allocated:
+
+        xfs_io -f -c "pwrite 0 1m" file
+        xfs_io -c "falloc 1m 4m" file
+
+Request and verify the resulting AllocationSize before extending EOF, so
+an allocation failure leaves the file size unchanged. Reject other
+non-zero-offset requests because AllocationSize cannot identify which
+byte ranges were allocated.
+
+With Samba `strict allocate=yes`, this allows generic/496, generic/568 and
+generic/701 to pass after verifying the server allocation. With
+`strict allocate=no`, the requests fail instead of reporting false
+preallocation success.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/inode.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ fs/smb/client/smb2ops.c   | 69 +++++++++++++++++++++++++++++++++++----
+ fs/smb/client/smb2pdu.c   | 19 +++++++++++
+ fs/smb/client/smb2proto.h |  3 ++
+ fs/smb/common/fscc.h      |  5 +++
+ 4 files changed, 90 insertions(+), 6 deletions(-)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 0af93e881608..84d95d2c3ed9 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3038,13 +3038,20 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index b8474ed9af16..20cc66f728a7 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3665,12 +3665,16 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	struct cifsFileInfo *cfile = file->private_data;
+ 	long rc = -EOPNOTSUPP;
+ 	unsigned int xid;
+-	loff_t new_eof;
++	loff_t old_eof, new_eof;
++	struct smb2_file_all_info file_inf;
++	u64 asize = 0;
++	int qrc;
  
- void cifs_setsize(struct inode *inode, loff_t offset)
- {
-+	loff_t old_size;
-+	u64 blocks = CIFS_INO_BLOCKS(offset);
-+
- 	spin_lock(&inode->i_lock);
-+	old_size = i_size_read(inode);
- 	i_size_write(inode, offset);
-+
+ 	xid = get_xid();
+ 
+ 	inode = d_inode(cfile->dentry);
+ 	cifsi = CIFS_I(inode);
++	old_eof = i_size_read(inode);
+ 
+ 	trace_smb3_falloc_enter(xid, cfile->fid.persistent_fid, tcon->tid,
+ 				tcon->ses->Suid, off, len);
+@@ -3686,11 +3690,24 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
  	/*
--	 * Until we can query the server for actual allocation size,
--	 * this is best estimate we have for blocks allocated for a file.
-+	 * Extending EOF does not allocate the intervening range. Only clamp
-+	 * i_blocks on shrink; allocation growth comes from writes or from the
-+	 * server-reported AllocationSize.
+ 	 * Extending the file
  	 */
--	inode->i_blocks = CIFS_INO_BLOCKS(offset);
-+	if (offset < old_size && (u64)inode->i_blocks > blocks)
-+		inode->i_blocks = blocks;
- 	spin_unlock(&inode->i_lock);
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
- 	truncate_pagecache(inode, offset);
+-	if ((keep_size == false) && i_size_read(inode) < off + len) {
++	if (!keep_size && old_eof < off + len) {
+ 		rc = inode_newsize_ok(inode, off + len);
+ 		if (rc)
+ 			goto out;
+ 
++		/*
++		 * FILE_ALLOCATION_INFORMATION sets the allocation size for the whole
++		 * file and cannot allocate an arbitrary byte range. Use it only for
++		 * requests starting at offset zero, requests on an empty file, or
++		 * requests appending to a non-sparse file.
++		 */
++		if (off != 0 && old_eof != 0 &&
++		    (off != old_eof ||
++		     (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE))) {
++			rc = -EOPNOTSUPP;
++			goto out;
++		}
++
+ 		if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) {
+ 			rc = smb2_set_sparse(xid, tcon, cfile, inode, false);
+ 			if (rc)
+@@ -3698,12 +3715,52 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 		}
+ 
+ 		new_eof = off + len;
++
++		qrc = SMB2_query_info(xid, tcon, cfile->fid.persistent_fid,
++				      cfile->fid.volatile_fid, &file_inf);
++		if (qrc == 0)
++			asize = le64_to_cpu(file_inf.AllocationSize);
++
++		if (qrc || asize < new_eof) {
++			rc = SMB2_set_allocation(xid, tcon,
++						 cfile->fid.persistent_fid,
++						 cfile->fid.volatile_fid,
++						 cfile->pid, new_eof);
++			if (rc)
++				goto invalidate_attrs;
++
++			qrc = SMB2_query_info(xid, tcon,
++					      cfile->fid.persistent_fid,
++					      cfile->fid.volatile_fid, &file_inf);
++			if (qrc) {
++				rc = qrc;
++				goto invalidate_attrs;
++			}
++
++			asize = le64_to_cpu(file_inf.AllocationSize);
++			if (asize < new_eof) {
++				rc = -EOPNOTSUPP;
++				goto invalidate_attrs;
++			}
++		}
++
+ 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+ 				  cfile->fid.volatile_fid, cfile->pid, new_eof);
+-		if (rc == 0) {
+-			netfs_resize_file(&cifsi->netfs, new_eof, true);
+-			cifs_setsize(inode, new_eof);
+-		}
++		if (rc)
++			goto invalidate_attrs;
++
++		netfs_resize_file(&cifsi->netfs, new_eof, true);
++		cifs_setsize(inode, new_eof);
++
++		spin_lock(&inode->i_lock);
++		inode->i_blocks = CIFS_INO_BLOCKS(asize);
++		spin_unlock(&inode->i_lock);
++		goto out;
++
++invalidate_attrs:
++		spin_lock(&inode->i_lock);
++		cifsi->time = 0;
++		spin_unlock(&inode->i_lock);
+ 		goto out;
+ 	}
+ 
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 4972cfe249f6..1c6fadb7fbf3 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -5899,6 +5899,25 @@ SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
+ 			0, 1, &data, &size);
+ }
+ 
++int
++SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
++		    u64 persistent_fid, u64 volatile_fid, u32 pid,
++		    loff_t allocation_size)
++{
++	struct smb2_file_alloc_info info;
++	void *data;
++	unsigned int size;
++
++	info.AllocationSize = cpu_to_le64(allocation_size);
++
++	data = &info;
++	size = sizeof(struct smb2_file_alloc_info);
++
++	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
++			pid, FILE_ALLOCATION_INFORMATION, SMB2_O_INFO_FILE,
++			0, 1, &data, &size);
++}
++
+ int
+ SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
+ 		u64 persistent_fid, u64 volatile_fid,
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 78a4e1c340f9..16a02c1eb0a1 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -204,6 +204,9 @@ void SMB2_query_directory_free(struct smb_rqst *rqst);
+ int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 u64 persistent_fid, u64 volatile_fid, u32 pid,
+ 		 loff_t new_eof);
++int SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
++			u64 persistent_fid, u64 volatile_fid, u32 pid,
++			loff_t allocation_size);
+ int SMB2_set_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 		       struct smb_rqst *rqst, u64 persistent_fid,
+ 		       u64 volatile_fid, u32 pid, u8 info_class, u8 info_type,
+diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
+index bc3012cc295d..c9d5aa94727f 100644
+--- a/fs/smb/common/fscc.h
++++ b/fs/smb/common/fscc.h
+@@ -265,6 +265,11 @@ struct smb2_file_eof_info { /* encoding of request for level 10 */
+ 	__le64 EndOfFile; /* new end of file value */
+ } __packed; /* level 20 Set */
+ 
++/* See MS-FSCC 2.4.4 */
++struct smb2_file_alloc_info { /* encoding of request for level 19 */
++	__le64 AllocationSize;
++} __packed;
++
+ /* See MS-FSCC 2.4.15 */
+ typedef struct {
+ 	__le32 NextEntryOffset;
 -- 
 2.43.0
 
