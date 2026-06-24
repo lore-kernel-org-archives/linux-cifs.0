@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C5C351C02
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 11:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BD6364953
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 11:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782302322; cv=none; b=FeGpBhv2QMyfCzK279navppHHXirlJk04ywUvm/jaIYy8ZUC/3Zcctr15eREVItYB9yTw+IF4Z1r/r3MdJzSGjEVRuPmS9qQpI7nDMjKe3/iuTZBQ6oeaxqvvXwzDUD3Dl95/zzyyLjc7a6+/tABVfw14/Wf32cDYR4StZrWYJg=
+	t=1782302327; cv=none; b=BT8WAfwQRJb1q3nYoVFKtEb3vvrqy9YZsoRS0VSakCruFY11V31Idef9diJ3vuaPvUHgr48pGLVHoo+V9yuCTcZi1l0y1+FAkM577DG/bSl9aFAmFENNsBV1y5i7oevTA1lMAVw7/y5wTXwPaTnoXtFVe40k/N5kVCdPmmhCQBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782302322; c=relaxed/simple;
-	bh=ZTP7q8W8ggimp4fkS8Bp4m2KMaDOWPpUQdn/EzPXwAA=;
+	s=arc-20240116; t=1782302327; c=relaxed/simple;
+	bh=sBGENPB7E70acGMUnkmVJKEXd6G0BWeE8rJYIiW2jXQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HgalYCXDyGCOfKsDefGUJAueKGplFnmmM0WeA5kSGYRISPe/Nz7lKmYewIzaYgGiK2Szpy9k0WMgRIK/Fbq34TFgbmQbgSI87yhwf8fRFyzYTzGtSW2BJGifrQ+uzx0iI4O22lD/O2K41P2DFTCFMjWGCqCuxHMlVLeJPVLH1D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bngMbx/T; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=IZy/JWHBVAbDNVWGYNXyKQwEcLmXirwpC1QcSIxBPKqxSU7nVayH/x0yvny9ZkBR49zDZarHLYz1ZiTcFjXhyzmZvJTpsMrIvQsc3NYQjGJ3KuxUZJeS7/+zxV4VF0FjYj93oz8FZtt8JSnc6WM+nO8MihRN/xH/jpNVTYNUn5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nfnr4WO1; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bngMbx/T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nfnr4WO1"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1782302320;
+	s=mimecast20190719; t=1782302325;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Lg3QobSmdRBdCansQlMNMTSeQxNIKRIjET+hDWCLJE0=;
-	b=bngMbx/ThnIaqCocuBdwIqcBemES+Y0AtDtSfH4HVsO/FzyeoGsMTH0bDoLIvk9X8y4e55
-	dsWDK0Z8EWVnBa88Wkrwjchl2Gp+pjJvTUMbB1ioNtsXwoyU0H/tR0ukjKigqSZQY3at0d
-	c21z5yBSQXHX+Mx4mYfnptyZ/sw4JiQ=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=Q/lcrzrqOux+l1oX66njBh0cf3lnjnu439KSZ8aErEk=;
+	b=Nfnr4WO1rs+92FjjqMwENT1e2qwkgCrSQSnI3uINPveoxlFUmNwlAvSGVwkss2VII6CIpT
+	7uDSC4RHFmcoAi8WZY8mQV1q+NExxpWD0FNGUbtgkM6zg5HUKiiJ5uhgxi797vOfpQ/fDW
+	0mmPUJSdQ8BsHe04K6wwCzx/4L9aLc0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-78NlhmLUNHShabjhWdEM3g-1; Wed,
- 24 Jun 2026 07:58:36 -0400
-X-MC-Unique: 78NlhmLUNHShabjhWdEM3g-1
-X-Mimecast-MFC-AGG-ID: 78NlhmLUNHShabjhWdEM3g_1782302314
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-695-533M0bS6OU6moIcEHeDedA-1; Wed,
+ 24 Jun 2026 07:58:40 -0400
+X-MC-Unique: 533M0bS6OU6moIcEHeDedA-1
+X-Mimecast-MFC-AGG-ID: 533M0bS6OU6moIcEHeDedA_1782302318
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7E75D19540C0;
-	Wed, 24 Jun 2026 11:58:34 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B11BA1800845;
+	Wed, 24 Jun 2026 11:58:38 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.49.152])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9DEC81774;
-	Wed, 24 Jun 2026 11:58:31 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1FB1F1956049;
+	Wed, 24 Jun 2026 11:58:35 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -51,11 +51,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	ceph-devel@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH v2 09/14] netfs: Fix kdoc warning
-Date: Wed, 24 Jun 2026 12:57:30 +0100
-Message-ID: <20260624115737.2964520-10-dhowells@redhat.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 10/14] netfs: Replace wb_lock with a bit lock for asynchronicity
+Date: Wed, 24 Jun 2026 12:57:31 +0100
+Message-ID: <20260624115737.2964520-11-dhowells@redhat.com>
 In-Reply-To: <20260624115737.2964520-1-dhowells@redhat.com>
 References: <20260624115737.2964520-1-dhowells@redhat.com>
 Precedence: bulk
@@ -65,30 +64,334 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Fix a kdoc warning due to a misnamed parameter in the description.
+The netfs_inode::wb_lock mutex is used to prevent multiple simultaneous
+writebacks from fighting each other (a writeback thread will write multiple
+discontiguous regions within the same request).  The mutex, however, only
+serialises the issuing of subrequests; it doesn't serialise the collection
+of results, and, in particular, the updating of file size information and
+fscache populatedness data.
 
-Reported-by: Matthew Wilcox <willy@infradead.org>
-cc: David Howells <dhowells@redhat.com>
+Unfortunately, the mutex cannot be held around the entire process as it has
+to be unlocked in the same thread in which it is locked - and we don't want
+to hold up the allocator whilst we complete the writeback.
+
+Fix this by replacing the mutex with a bit flag and a list of lock waiters
+so that the lock can be dropped in the collector thread after collection is
+complete.
+
+Link: https://sashiko.dev/#/patchset/20260608145432.681865-1-dhowells%40redhat.com
+Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Paulo Alcantara <pc@manguebit.org>
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/netfs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/afs/symlink.c         |  4 +-
+ fs/netfs/locking.c       | 95 ++++++++++++++++++++++++++++++++++++++++
+ fs/netfs/write_collect.c | 10 +++++
+ fs/netfs/write_issue.c   | 37 +++++-----------
+ include/linux/netfs.h    | 11 ++++-
+ 5 files changed, 126 insertions(+), 31 deletions(-)
 
+diff --git a/fs/afs/symlink.c b/fs/afs/symlink.c
+index ed5868369f37..16b4823cb7b7 100644
+--- a/fs/afs/symlink.c
++++ b/fs/afs/symlink.c
+@@ -255,11 +255,11 @@ int afs_symlink_writepages(struct address_space *mapping,
+ 	}
+ 
+ 	if (ret == 0) {
+-		mutex_lock(&vnode->netfs.wb_lock);
++		netfs_wb_begin(&vnode->netfs, false);
+ 		netfs_free_folioq_buffer(vnode->directory);
+ 		vnode->directory = NULL;
+ 		vnode->directory_size = 0;
+-		mutex_unlock(&vnode->netfs.wb_lock);
++		netfs_wb_end(&vnode->netfs);
+ 	} else if (ret == 1) {
+ 		ret = 0; /* Skipped write due to lock conflict. */
+ 	}
+diff --git a/fs/netfs/locking.c b/fs/netfs/locking.c
+index 2249ecd09d0a..4e3be2b81504 100644
+--- a/fs/netfs/locking.c
++++ b/fs/netfs/locking.c
+@@ -9,6 +9,11 @@
+ #include <linux/netfs.h>
+ #include "internal.h"
+ 
++struct netfs_wb_waiter {
++	struct list_head	link;		/* Link in ictx->wb_queue */
++	struct task_struct	*waiter;	/* Waiter task; cleared when lock granted */
++};
++
+ /*
+  * inode_dio_wait_interruptible - wait for outstanding DIO requests to finish
+  * @inode: inode to wait for
+@@ -203,3 +208,93 @@ void netfs_end_io_direct(struct inode *inode)
+ 	up_read(&inode->i_rwsem);
+ }
+ EXPORT_SYMBOL(netfs_end_io_direct);
++
++/*
++ * Wait to have exclusive access to writeback.
++ */
++static bool netfs_wb_begin_wait(struct netfs_inode *ictx)
++{
++	struct netfs_wb_waiter waiter = {};
++	struct task_struct *tsk = current;
++	bool got = false;
++
++	spin_lock(&ictx->lock);
++
++	if (test_and_set_bit_lock(NETFS_ICTX_WB_LOCK, &ictx->flags)) {
++		get_task_struct(tsk);
++		waiter.waiter = tsk;
++		list_add_tail(&waiter.link, &ictx->wb_queue);
++	} else {
++		got = true;
++	}
++	spin_unlock(&ictx->lock);
++
++	if (!got) {
++		for (;;) {
++			set_current_state(TASK_UNINTERRUPTIBLE);
++			/* Read waiter before accessing inode state. */
++			if (smp_load_acquire(&waiter.waiter) == NULL)
++				break;
++			schedule();
++		}
++	}
++	__set_current_state(TASK_RUNNING);
++	return true;
++}
++
++/**
++ * netfs_wb_begin - Begin writeback, waiting if need be
++ * @ictx: The inode to get writeback access on
++ * @nowait: Return failure immediately rather than waiting if true
++ *
++ * Begin writeback to an inode, waiting for exclusive access if @nowait is
++ * false.  This prevents collection from being done out of order with respect
++ * to the issuance of write subrequests.
++ *
++ * Note that writeback may be ended in a different process (e.g. the collection
++ * function on a workqueue) than started it.
++ *
++ * Return: True if can proceed, false if denied.
++ */
++bool netfs_wb_begin(struct netfs_inode *ictx, bool nowait)
++{
++	if (!test_and_set_bit_lock(NETFS_ICTX_WB_LOCK, &ictx->flags))
++		return true;
++	if (nowait) {
++		netfs_stat(&netfs_n_wb_lock_skip);
++		return false;
++	}
++	netfs_stat(&netfs_n_wb_lock_wait);
++	return netfs_wb_begin_wait(ictx);
++}
++EXPORT_SYMBOL(netfs_wb_begin);
++
++/* netfs_wb_end - End writeback
++ * @ictx: The inode we have writeback access to
++ *
++ * End writeback access on an inode, waking up the next writeback request.
++ */
++void netfs_wb_end(struct netfs_inode *ictx)
++{
++	struct netfs_wb_waiter *waiter;
++	struct task_struct *tsk;
++
++	WARN_ON_ONCE(!test_bit(NETFS_ICTX_WB_LOCK, &ictx->flags));
++
++	spin_lock(&ictx->lock);
++
++	waiter = list_first_entry_or_null(&ictx->wb_queue, struct netfs_wb_waiter, link);
++	if (waiter) {
++		list_del(&waiter->link);
++		tsk = waiter->waiter;
++		/* Write inode state before clearing waiter. */
++		smp_store_release(&waiter->waiter, NULL);
++		wake_up_process(tsk);
++		put_task_struct(tsk);
++	} else {
++		clear_bit_unlock(NETFS_ICTX_WB_LOCK, &ictx->flags);
++	}
++
++	spin_unlock(&ictx->lock);
++}
++EXPORT_SYMBOL(netfs_wb_end);
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index 24fc2bb2f8a4..210eb8f3958d 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -408,6 +408,16 @@ bool netfs_write_collection(struct netfs_io_request *wreq)
+ 	netfs_wake_rreq_flag(wreq, NETFS_RREQ_IN_PROGRESS, netfs_rreq_trace_wake_ip);
+ 	/* As we cleared NETFS_RREQ_IN_PROGRESS, we acquired its ref. */
+ 
++	switch (wreq->origin) {
++	case NETFS_WRITEBACK:
++	case NETFS_WRITEBACK_SINGLE:
++	case NETFS_WRITETHROUGH:
++		netfs_wb_end(ictx);
++		break;
++	default:
++		break;
++	}
++
+ 	if (wreq->iocb) {
+ 		size_t written = min(wreq->transferred, wreq->len);
+ 		wreq->iocb->ki_pos += written;
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index c03c7cc45e47..437bb50ce175 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -551,14 +551,8 @@ int netfs_writepages(struct address_space *mapping,
+ 	struct folio *folio;
+ 	int error = 0;
+ 
+-	if (!mutex_trylock(&ictx->wb_lock)) {
+-		if (wbc->sync_mode == WB_SYNC_NONE) {
+-			netfs_stat(&netfs_n_wb_lock_skip);
+-			return 0;
+-		}
+-		netfs_stat(&netfs_n_wb_lock_wait);
+-		mutex_lock(&ictx->wb_lock);
+-	}
++	if (!netfs_wb_begin(ictx, wbc->sync_mode == WB_SYNC_NONE))
++		return 0;
+ 
+ 	/* Need the first folio to be able to set up the op. */
+ 	folio = writeback_iter(mapping, wbc, NULL, &error);
+@@ -593,8 +587,6 @@ int netfs_writepages(struct address_space *mapping,
+ 	} while ((folio = writeback_iter(mapping, wbc, folio, &error)));
+ 
+ 	netfs_end_issue_write(wreq);
+-
+-	mutex_unlock(&ictx->wb_lock);
+ 	netfs_wake_collector(wreq);
+ 
+ 	netfs_put_request(wreq, netfs_rreq_trace_put_return);
+@@ -604,7 +596,7 @@ int netfs_writepages(struct address_space *mapping,
+ couldnt_start:
+ 	netfs_kill_dirty_pages(mapping, wbc, folio);
+ out:
+-	mutex_unlock(&ictx->wb_lock);
++	netfs_wb_end(ictx);
+ 	_leave(" = %d", error);
+ 	return error;
+ }
+@@ -618,12 +610,12 @@ struct netfs_io_request *netfs_begin_writethrough(struct kiocb *iocb, size_t len
+ 	struct netfs_io_request *wreq = NULL;
+ 	struct netfs_inode *ictx = netfs_inode(file_inode(iocb->ki_filp));
+ 
+-	mutex_lock(&ictx->wb_lock);
++	netfs_wb_begin(ictx, false);
+ 
+ 	wreq = netfs_create_write_req(iocb->ki_filp->f_mapping, iocb->ki_filp,
+ 				      iocb->ki_pos, NETFS_WRITETHROUGH);
+ 	if (IS_ERR(wreq)) {
+-		mutex_unlock(&ictx->wb_lock);
++		netfs_wb_end(ictx);
+ 		return wreq;
+ 	}
+ 
+@@ -685,7 +677,6 @@ int netfs_advance_writethrough(struct netfs_io_request *wreq, struct writeback_c
+ ssize_t netfs_end_writethrough(struct netfs_io_request *wreq, struct writeback_control *wbc,
+ 			       struct folio *writethrough_cache)
+ {
+-	struct netfs_inode *ictx = netfs_inode(wreq->inode);
+ 	ssize_t ret;
+ 
+ 	_enter("R=%x", wreq->debug_id);
+@@ -699,8 +690,6 @@ ssize_t netfs_end_writethrough(struct netfs_io_request *wreq, struct writeback_c
+ 
+ 	netfs_end_issue_write(wreq);
+ 
+-	mutex_unlock(&ictx->wb_lock);
+-
+ 	if (wreq->iocb)
+ 		ret = -EIOCBQUEUED;
+ 	else
+@@ -847,15 +836,10 @@ int netfs_writeback_single(struct address_space *mapping,
+ 	if (WARN_ON_ONCE(!iov_iter_is_folioq(iter)))
+ 		return -EIO;
+ 
+-	if (!mutex_trylock(&ictx->wb_lock)) {
+-		if (wbc->sync_mode == WB_SYNC_NONE) {
+-			/* The VFS will have undirtied the inode. */
+-			netfs_single_mark_inode_dirty(&ictx->inode);
+-			netfs_stat(&netfs_n_wb_lock_skip);
+-			return 1;
+-		}
+-		netfs_stat(&netfs_n_wb_lock_wait);
+-		mutex_lock(&ictx->wb_lock);
++	if (!netfs_wb_begin(ictx, wbc->sync_mode == WB_SYNC_NONE)) {
++		/* The VFS will have undirtied the inode. */
++		netfs_single_mark_inode_dirty(&ictx->inode);
++		return 1;
+ 	}
+ 
+ 	wreq = netfs_create_write_req(mapping, NULL, 0, NETFS_WRITEBACK_SINGLE);
+@@ -893,7 +877,6 @@ int netfs_writeback_single(struct address_space *mapping,
+ 	smp_wmb(); /* Write lists before ALL_QUEUED. */
+ 	set_bit(NETFS_RREQ_ALL_QUEUED, &wreq->flags);
+ 
+-	mutex_unlock(&ictx->wb_lock);
+ 	netfs_wake_collector(wreq);
+ 
+ 	netfs_put_request(wreq, netfs_rreq_trace_put_return);
+@@ -901,7 +884,7 @@ int netfs_writeback_single(struct address_space *mapping,
+ 	return ret;
+ 
+ couldnt_start:
+-	mutex_unlock(&ictx->wb_lock);
++	netfs_wb_end(ictx);
+ 	_leave(" = %d", ret);
+ 	return ret;
+ }
 diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 243c0f737938..bdc270e84b30 100644
+index bdc270e84b30..1bc120d61c5b 100644
 --- a/include/linux/netfs.h
 +++ b/include/linux/netfs.h
-@@ -753,7 +753,7 @@ static inline void netfs_inode_init(struct netfs_inode *ctx,
+@@ -61,14 +61,16 @@ struct netfs_inode {
+ #if IS_ENABLED(CONFIG_FSCACHE)
+ 	struct fscache_cookie	*cache;
+ #endif
+-	struct mutex		wb_lock;	/* Writeback serialisation */
++	struct list_head	wb_queue;	/* Queue of processes wanting to do writeback */
+ 	loff_t			_remote_i_size;	/* Size of the remote file */
+ 	loff_t			_zero_point;	/* Size after which we assume there's no data
+ 						 * on the server */
++	spinlock_t		lock;		/* Lock covering wb_queue */
+ 	atomic_t		io_count;	/* Number of outstanding reqs */
+ 	unsigned long		flags;
+ #define NETFS_ICTX_ODIRECT	0		/* The file has DIO in progress */
+ #define NETFS_ICTX_UNBUFFERED	1		/* I/O should not use the pagecache */
++#define NETFS_ICTX_WB_LOCK	2		/* Writeback serialisation lock */
+ #define NETFS_ICTX_MODIFIED_ATTR 3		/* Indicate change in mtime/ctime */
+ #define NETFS_ICTX_SINGLE_NO_UPLOAD 4		/* Monolithic payload, cache but no upload */
+ };
+@@ -462,6 +464,10 @@ int netfs_alloc_folioq_buffer(struct address_space *mapping,
+ 			      size_t *_cur_size, ssize_t size, gfp_t gfp);
+ void netfs_free_folioq_buffer(struct folio_queue *fq);
  
++/* Writeback exclusion API. */
++bool netfs_wb_begin(struct netfs_inode *ictx, bool nowait);
++void netfs_wb_end(struct netfs_inode *ictx);
++
  /**
-  * netfs_resize_file - Note that a file got resized
-- * @ctx: The netfs inode being resized
-+ * @ictx: The netfs inode being resized
-  * @new_i_size: The new file size
-  * @changed_on_server: The change was applied to the server
-  *
+  * netfs_inode - Get the netfs inode context from the inode
+  * @inode: The inode to query
+@@ -743,7 +749,8 @@ static inline void netfs_inode_init(struct netfs_inode *ctx,
+ #if IS_ENABLED(CONFIG_FSCACHE)
+ 	ctx->cache = NULL;
+ #endif
+-	mutex_init(&ctx->wb_lock);
++	INIT_LIST_HEAD(&ctx->wb_queue);
++	spin_lock_init(&ctx->lock);
+ 	/* ->releasepage() drives zero_point */
+ 	if (use_zero_point) {
+ 		ctx->_zero_point = ctx->_remote_i_size;
 
