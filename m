@@ -1,115 +1,60 @@
-Received: from out203-205-221-149.mail.qq.com (out203-205-221-149.mail.qq.com [203.205.221.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1483955EC
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 09:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C2F3955EC
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 09:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782294840; cv=none; b=tiFApuTA3sjuMYHujwQVbPYUhdqBZu/Qs1cXObRdcAP4SQNoE+e6LE8ICRTHP51fqkwSkmcKOnREiXKJjXtctncU2T6Owjgp4dOKtQ2qpscVIP1Tv46HUYV1PQdRExMZWJ1LsaQThz0zdstFumPtw98ks7Ow7BozFmGwUYFMn+s=
+	t=1782295144; cv=none; b=Y96lBFmVBwTJepHEqgmZPJ+2+um3Q6lTjs1bEgEFon5ji21uxC2TpSsrPipRiQLqhd/7bBrh+MsciKRL+0sE15c86E8E2CXAzLlETcXGQCwZ5TePABgMRgkEFKncPrs3hoZ8z+GIS6FY6N2HHretVHbYkGYmfTT9B/XBlVf5yo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782294840; c=relaxed/simple;
-	bh=hQYb8WLnpzVrViqiWjKRb/YVxQprfQsYc0357PhZ3eA=;
-	h=Message-ID:Date:From:To:Cc:Subject:Mime-Version:Content-Type; b=BRJ/FKEyqgvALyCAQ+1DmDPZylmuQnXNYkZPt3NM80UX0Us7cd+FAqEQK8hPuL/HJE7SD/POTfAfIGAgUnuOFPBe0DRu45M/tXi3kDS0DW1NORurF6Fa5//62m6n0nt9ZeoLfqA5jMtErD4vo9P1cqz0v2G3X1SXaEwySUCme6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=nh15+ygh; arc=none smtp.client-ip=203.205.221.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1782295144; c=relaxed/simple;
+	bh=MP3QGWTzWMRzL6FiBiu5uGEy4NRw8nZ8yXEmPVyf7R0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pfm/h1OApMbN2JbgP9j9r7z5rRkPUKCCuILWQMqlj0IdKV6GQebN39jei+quuqoHmrA60gK4MLUpIFbfbOABheEL2lK2K44zkfZE/xywGvCZ6sY26oDeyF4ZMXDdIKyYjxQvrcEVTrqQRMGMiwh3Ko/6jV7AeU04qeWovzNR4fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Bc56z3hT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="nh15+ygh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1782294829;
-	bh=hQYb8WLnpzVrViqiWjKRb/YVxQprfQsYc0357PhZ3eA=;
-	h=Date:From:To:Cc:Subject;
-	b=nh15+ygh2S9hF7JuNOBjBA7MJKEWZq4t/VV52AslZ1uwx/cZY2FAf12Ix5yDh2SVi
-	 8/Mxo4AzsQuRbdcHYxzpcGHpfKlsv2sbCHU9c9sN7p1QlHq68Xcj0H/fGqKyJh+2/F
-	 58bXa43w3uae2fxAWWKe+6j4ptPg+nkrzUCDFby8=
-Received: from PC-20201120SBOH ([183.205.156.133])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id D6FA1C6F; Wed, 24 Jun 2026 17:53:47 +0800
-X-QQ-mid: xmsmtpt1782294827t6d4dr1qa
-Message-ID: <tencent_32075C41A32AB2B941A3641C72794B4B6408@qq.com>
-X-QQ-XMAILINFO: NnYhxYSyuBnLefhBwmdCegEy/Dn4b5B2eDR4E1sBsxw+d6v0cOBH4vaFkiWIv2
-	 ApcQ9Tf+PL4Lyd9qaBAUw93WTHg7iZAuP5E2uoOaAhPDnLqsqfhDkRaPXUgXsi91sH7XB62Ncd4c
-	 WHnKdaaEme8JZ07or4eYL79nGkM3PUZr8UyvsKliZWNaP07sOrPjNi2lGb1HYruoC2AfUeB+o7rd
-	 wuqgb7aR+7ur2FREkTIPrWjW+YEufy4Zj/1JTOqsp26efomI7YLautkni5EwKb8DpPlLTfMyVXyW
-	 2cYVlx0pva7lE9aPusN08Pp/xNehIZR/9xDPCkDpyoI8SopdZ1SOpMgksEi1qCgAoWkjvyXAK3D8
-	 30Z2ReQ8Enn/JyrhtXm83WHduwGaxzFnMJCCio6Md88RZ5aH3qG+0MKFHejXShtM8nRDaR/hQElg
-	 jUv0c2eIBj04FuVe0TrNwDmEmxq0t8HnFS9ht3lASW7at9K0QF1jW9zudtsk7SeXy2/G/lKizfrm
-	 OQZVbAqwP+kRwIPtq4vXR+39exHSu8qhrCRt4cr4flBDWXURIm9FDmMoclQCF3KD3f1LayhVdHlE
-	 vxgkYCTulF0l084BEysYqv9SY3YPMX2kJs9pNKObrACL+DRdp89HRuJOFXtlZvVjA4mOe3CO1p8f
-	 AWF9v4vJiyfcv08c3K7Nfnz04SFaS4gc5Wris413s/o277X9dhx0q4x0nhFcV+4rxCTgsQvPqSqU
-	 AhE8tJzbB1VR9ijjzfz2MURwGSpS1sdou1zJHQUVB56k0GqG+FPUZM34cJ4gjEiqbO1i8bdGqM1J
-	 oliyOU56GbIjHc0eBMDTNnZH0ymjYfoLHrOXcl/X4bWriIGzWdIadW7NWrc6yB2IZKvcvdisrz8d
-	 9rWVPjiUQ9sg8KhXKlnJlNLMlUjejHSkBfj9KRpYLxAkP0F+3TGIFh9tyDCtJ+uURT7WpOlBsQ1n
-	 eevsFLcQxYzMSU7CmCFaXNTMPYQd5G8WOtQu1ggxc5TufBwlbXrI9Cw0AAu8drSuQRhAO8ersgor
-	 +P8YAF6s6mFzBkAABESkIqKvViT8689Tq2D6cLWiB0h76rq4hV
-X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
-Date: Wed, 24 Jun 2026 17:53:48 +0800
-From: "grayhat@foxmail.com" <grayhat@foxmail.com>
-To: cve <cve@kernel.org>
-Cc: sfrench <sfrench@samba.org>, 
-	namjae.jeon <namjae.jeon@samsung.com>, 
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Bc56z3hT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86FA21F000E9;
+	Wed, 24 Jun 2026 09:59:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1782295143;
+	bh=HzspchSOSkv/1dfbgfottLytTPLLj6NmdgRhema+Ev4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Bc56z3hTTEb1gZkVchy+k/+VSEYQe5x33au0fCW6KzNlZf85RWVsKT5d5mDbEL4xv
+	 2NI9XMW4ZkyHoYCajAvHjePco18Std9wIKjS92vDq2AUHWflITTk/265FQEDJk2tff
+	 yS/FCFpQu+pY3198tdXI3IjjF9+Hwr36kr/2I4f4=
+Date: Wed, 24 Jun 2026 10:57:51 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: "grayhat@foxmail.com" <grayhat@foxmail.com>
+Cc: cve <cve@kernel.org>, sfrench <sfrench@samba.org>,
+	"namjae.jeon" <namjae.jeon@samsung.com>,
 	linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Request CVE for ksmbd authenticated permission bypass in FSCTL_SET_SPARSE handle
-X-Priority: 3
-X-GUID: FDD5182A-EB46-4779-AF12-B02A797A07A9
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.542[cn]
+Subject: Re: Request CVE for ksmbd authenticated permission bypass in
+ FSCTL_SET_SPARSE handle
+Message-ID: <2026062409-unproven-atypical-20b2@gregkh>
+References: <tencent_32075C41A32AB2B941A3641C72794B4B6408@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-OQ-MSGID: <202606241753481794609@foxmail.com>
-Content-Type: text/plain;
-	charset="GB2312"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_32075C41A32AB2B941A3641C72794B4B6408@qq.com>
 
-SGkgQ05BIHRlYW0sCgpJIGFtIHdyaXRpbmcgdG8gcmVxdWVzdCBhIENWRSBJRCBmb3IgYSBwZXJt
-aXNzaW9uIGJ5cGFzcyB2dWxuZXJhYmlsaXR5IGluIHRoZSBrc21iZCBGU0NUTF9TRVRfU1BBUlNF
-IGhhbmRsZXIuIEEgZml4IGZvciB0aGlzIGlzc3VlIGhhcyBiZWVuIG1lcmdlZCBpbnRvIHRoZSBt
-YWlubGluZSBMaW51eCBrZXJuZWwgYW5kIGJhY2twb3J0ZWQgdG8gc3RhYmxlIGtlcm5lbHMsIGJ1
-dCBubyBjb3JyZXNwb25kaW5nIENWRSBoYXMgeWV0IGJlZW4gYXNzaWduZWQuCgpWdWxuZXJhYmls
-aXR5IGNsYXNzaWZpY2F0aW9uOiBDV0UtMjc0IChJbXByb3BlciBIYW5kbGluZyBvZiBJbnN1ZmZp
-Y2llbnQgUHJpdmlsZWdlcykKQ29tbWl0IHJlZmVyZW5jZXM6Ci0gTWFpbmxpbmUgZml4IGNvbW1p
-dDogY2M1NzIzMmNhZTIzYzBkZjkxYjRhNTlkMGY1MTkxNDFjZTliNWIwMiAoImtzbWJkOiBmaXgg
-RlNDVEwgcGVybWlzc2lvbiBieXBhc3MgYnkgYWRkaW5nIGEgcGVybWlzc2lvbiBjaGVjayBmb3Ig
-RlNDVExfU0VUX1NQQVJTRSIpCi0gU3RhYmxlIGJhY2twb3J0IHJlbGVhc2VzOiB2Ny4wLjEyLCB2
-Ni4xOC4zNSwgdjYuNi4xNDMgTFRTCgpOb3RlOiBrc21iZCBmZWF0dXJlcyBhcmUgZGV2ZWxvcGVk
-IGluIGEgc3RhbmRhbG9uZSBTYW1iYSByZXBvc2l0b3J5IGFuZCBtZXJnZWQgaW50byBtYWlubGlu
-ZSBMaW51eCBpbiBwZXJpb2RpYyBidWxrIHB1bGwgcmVxdWVzdHMuIFRoZSBGU0NUTF9TRVRfU1BB
-UlNFIGhhbmRsZXIgbGFuZGVkIHZpYSBvbmUgc3VjaCBiYXRjaCBtZXJnZSwgc28gdGhlcmUgaXMg
-bm8gZGVkaWNhdGVkIG1haW5saW5lIGNvbW1pdCBzb2xlbHkgaW50cm9kdWNpbmcgdGhpcyBoYW5k
-bGVyLiBDb3JyZXNwb25kaW5nbHksIHRoZSBmaXggY29tbWl0IGRvZXMgbm90IGNhcnJ5IGEgcHJl
-Y2lzZSBGaXhlczogdGFnIHJlZmVyZW5jaW5nIGEgbWFpbmxpbmUgaW50cm9kdWN0aW9uIGNvbW1p
-dC4KClRoZSBrc21iZCBGU0NUTF9TRVRfU1BBUlNFIGhhbmRsZXIgaXMgbWlzc2luZyBib3RoIHNo
-YXJlLWxldmVsIGFuZCBoYW5kbGUtbGV2ZWwgd3JpdGUgcGVybWlzc2lvbiBjaGVja3MgdGhhdCBh
-cmUgZW5mb3JjZWQgZm9yIG90aGVyIHdyaXRlLXNlbnNpdGl2ZSBGU0NUTCBvcGVyYXRpb25zLgoK
-V2l0aGluIHNtYjJfaW9jdGwoKSAoZnMvc21iL3NlcnZlci9zbWIycGR1LmMpLCB0aGUgYnJhbmNo
-IGhhbmRsaW5nIEZTQ1RMX1NFVF9TUEFSU0UgaW52b2tlcyBmc2N0bF9zZXRfc3BhcnNlKCkgd2l0
-aG91dCB2YWxpZGF0aW5nIHR3byBjcml0aWNhbCBhY2Nlc3MgY29uZGl0aW9uczoKMS4gU2hhcmUg
-d3JpdGFibGUgZmxhZzogdGVzdF90cmVlX2Nvbm5fZmxhZyh3b3JrLT50Y29uLCBLU01CRF9UUkVF
-X0NPTk5fRkxBR19XUklUQUJMRSkKMi4gUGVyLWhhbmRsZSB3cml0ZSBhY2Nlc3M6IGZwLT5kYWNj
-ZXNzICYgKEZJTEVfV1JJVEVfREFUQV9MRSB8IEZJTEVfV1JJVEVfQVRUUklCVVRFU19MRSkKCkZv
-ciBjb21wYXJpc29uLCByZWxhdGVkIGRlc3RydWN0aXZlIG9wZXJhdGlvbnMgc3VjaCBhcyBGU0NU
-TF9DT1BZQ0hVTksgYW5kIEZTQ1RMX1NFVF9aRVJPX0RBVEEgYm90aCBleHBsaWNpdGx5IGNoZWNr
-IEtTTUJEX1RSRUVfQ09OTl9GTEFHX1dSSVRBQkxFLCB3aGlsZSBGU0NUTF9TRVRfU1BBUlNFIG9t
-aXRzIHRoaXMgcHJvdGVjdGlvbiBlbnRpcmVseS4KCkludGVybmFsbHksIGZzY3RsX3NldF9zcGFy
-c2UoKSBtb2RpZmllcyB0aGUgaW4tbWVtb3J5IGZpbGUgYXR0cmlidXRlIGZsYWcgZnAtPmZfY2kt
-Pm1fZmF0dHIuIFdoZW4gdGhlIFNhbWJhIHNoYXJlIG9wdGlvbiBgc3RvcmUgZG9zIGF0dHJpYnV0
-ZXMgPSB5ZXNgIGlzIGVuYWJsZWQsIGl0IGFsc28gcGVyc2lzdHMgRE9TIGF0dHJpYnV0ZSBzdGF0
-ZSB2aWEgdmZzX3NldHhhdHRyKCkuIFVubGlrZSB2ZnNfd3JpdGUoKSBvciB2ZnNfZmFsbG9jYXRl
-KCksIHZmc19zZXR4YXR0cigpIGRvZXMgbm90IHZhbGlkYXRlIEZNT0RFX1dSSVRFIGF0IHRoZSBW
-RlMgbGF5ZXIsIG1lYW5pbmcgdGhlcmUgaXMgbm8gdW5kZXJseWluZyBrZXJuZWwgZW5mb3JjZW1l
-bnQgdG8gY29tcGVuc2F0ZSBmb3IgbWlzc2luZyBwZXJtaXNzaW9uIGNoZWNrcyBpbnNpZGUga3Nt
-YmQuCgpBcyBhIHJlc3VsdCwgYW4gYXV0aGVudGljYXRlZCBTTUIgY2xpZW50IHdpdGggcmVhZC1v
-bmx5IGFjY2VzcyB0byBhIHNoYXJlIGlzIGFibGUgdG8gYWx0ZXIgdGhlIHNwYXJzZSBhdHRyaWJ1
-dGUgb2YgYXJiaXRyYXJ5IGZpbGVzLiBUaGlzIGJ5cGFzc2VzIGJvdGggc2hhcmUtbGV2ZWwgcmVh
-ZC1vbmx5IHJlc3RyaWN0aW9ucyBhbmQgZmlsZS1oYW5kbGUgd3JpdGUgYWNjZXNzIHJlcXVpcmVt
-ZW50cy4KClRoaXMgYmVoYXZpb3IgdmlvbGF0ZXMgdGhlIE1TLUZTQSBzcGVjaWZpY2F0aW9uIHNl
-Y3Rpb24goewyLjEuNS4xMC4zODoKIklmIE9wZW4uR3JhbnRlZEFjY2Vzcy5GSUxFX1dSSVRFX0RB
-VEEgaXMgRkFMU0UgYW5kIE9wZW4uR3JhbnRlZEFjY2Vzcy5GSUxFX1dSSVRFX0FUVFJJQlVURVMg
-aXMgRkFMU0UsIHRoZSBvcGVyYXRpb24gTVVTVCBiZSBmYWlsZWQgd2l0aCBTVEFUVVNfQUNDRVNT
-X0RFTklFRC4iCmtzbWJkIGRvZXMgbm90IGltcGxlbWVudCB0aGlzIG1hbmRhdG9yeSBhY2Nlc3Mg
-Y29udHJvbCBjaGVjay4KClRoYW5rcywKU2VhbiBTaGVuCmdyYXloYXRAZm94bWFpbC5jb20K
+On Wed, Jun 24, 2026 at 05:53:48PM +0800, grayhat@foxmail.com wrote:
+> Hi CNA team,
+> 
+> I am writing to request a CVE ID for a permission bypass vulnerability in the ksmbd FSCTL_SET_SPARSE handler. A fix for this issue has been merged into the mainline Linux kernel and backported to stable kernels, but no corresponding CVE has yet been assigned.
+> 
+> Vulnerability classification: CWE-274 (Improper Handling of Insufficient Privileges)
+> Commit references:
+> - Mainline fix commit: cc57232cae23c0df91b4a59d0f519141ce9b5b02 ("ksmbd: fix FSCTL permission bypass by adding a permission check for FSCTL_SET_SPARSE")
+> - Stable backport releases: v7.0.12, v6.18.35, v6.6.143 LTS
 
+Now assigned CVE-2026-52944
+
+Hope this helps,
+
+greg k-h
