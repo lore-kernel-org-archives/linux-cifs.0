@@ -1,162 +1,86 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4942F531B
-	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 02:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782269296; cv=pass; b=I8B7gqAbQlnUyHrpsJM7I4N7YTABg3F7ozKF6J3fCkhzs5PZC29rPUSk+UWSi8aD/oAZPQpWzlSrqY3YURAeDe9vCABoVOA+Bd76ehSuSSFItrMtyDtxLNw3IMdphWA/KS13TzuuHy7+KYx1yKxtzhDr/15I0WuZ7excgTzaiFw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782269296; c=relaxed/simple;
-	bh=wGESYlejTs+NDuuYMoxQeaMvDxNv1pE0RHPgz8Kg1k8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C83AF1D5ABA
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 03:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782270157; cv=none; b=QYimo39OaMcnoktozf5OXJkdqXRLaKkSHfffREPTMsQVGjZuaFCuZ/7W320rYH5w5ARrYOiaTJRXJVFfRO2bVzVrZuGqsmjcUYUAfE05GaziiQw0odoTGhnDhzmscm0pAPsGIztY6hh+8vCZlWgQRmIkHkk/rSQrfffZSnmtd0c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782270157; c=relaxed/simple;
+	bh=pGB6DLcYpvwBAiTph7OpaVGI7S0NY+TeRTWO+ZK0An8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rCbq51PfqJEIq0GdKrVq7j+ir9FFNTKSqDkMNrXNQ/kLRuk5vo/4rH7VAH3STZgfxxk4kQmEhkTPuNbEGOPD1MwHpy4E8xJZdrsavQxQVKiZlsLstfpO8Zc3Le53N9HrSfuTO5Hvmgu3oCRllOgSXtXaeUls9YRFFxtefHj1uOw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CkT2Ef45; arc=pass smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=XFrxhX0MqG/1wCwahd096FAGWWgyfJfcVfzqKGpJOqgSVfCsfCnLxIExrxp04BtCXa5X9HENvP8sKgJwE261KoeBARRwnVLBPEgl9lopW71Cs9prazism1FmH5K6iRdG9uACdxT8lo002UDJA48SAkzWC3DJ1EKCmcBtTbCQi6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GgNW6JFL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CkT2Ef45"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8db35680d0cso15703826d6.1
-        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 19:48:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782269294; cv=none;
-        d=google.com; s=arc-20260327;
-        b=SssscZbgGscZpAPDZUELNhcG2ESzyI/CRshxC2BVcPL/drR/NfCOz9uEcc1qNV+0ZR
-         LS3V0iI6LOJW/ndEwkl2HltArwyRLBMgjt8sgLwpcgyGsZx7ol34gyPzHF7FpSh0uVY/
-         oywKTscNlm1FJzxl7xHu8XrrSUYs+ZFI1Lp9UpdHHMt4HYIynXaoga7RC2EsxPk6Cvcq
-         zFFvrwYh0LC/4YHKQqbk0eE+wklKgMN1T9We2tzg9qFf2yT7Q1ZlH9t1ro8vcnu4OCLZ
-         nfmTQhdYuYkB9ZquzxukS5U9+s1Qj3Bg2KQO4nDFMqoU9+7+7MdE6WZ+p/7RUXJh4RGo
-         prJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=j9R8xrCfMV0d213SBRaLTNm7gGDu9+ZI6ZAy9Gpfpno=;
-        fh=z9RyfzRomPoTxP3Gd2F+0YSvEVbZopTKEopOGttb2RM=;
-        b=FnFD98a+Dt9yWOIT8VHWxU49Vjj/SAsgexYQAGSZ4xtuLkkn57fPFe6ZL/XRnGHuHZ
-         htA7yWVhKm/n0NPalcwmbxtMN/P8bPvaX82pMjnUqarGUAfYH/0CFkN37V+vYBsXe5PC
-         0rQ26MER5B/JWaGlXzCuF8hnvuoHDhQa5hB01CPEGzJLbXydHfrea30YEJ7mpUN1cInt
-         tye4/p9EXSK1xi5js3ikjmlsQVADAUMAKXahruB3Sbw7P64OSs13kjbkIsIr6An/LiEX
-         zdxMwz7FEXDOvCWyq62fnSOrW7nWM4TXNxukdUaKtIDy3dDUlqtpYOzczYv5maeX+LT1
-         ksBw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782269294; x=1782874094; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j9R8xrCfMV0d213SBRaLTNm7gGDu9+ZI6ZAy9Gpfpno=;
-        b=CkT2Ef45LUhVGrpzvfZ+2xfPbdemjyTk3IWv8N+PVxzncpz3xVXvcg/ievRqeABv9A
-         JewrBKAEjjwidrBav+HZfgCNXwaGK7TD8GioQuk3Abb2wjTP7USt70fBPBYMYxIf+FQt
-         ZydrmeAF6jucu2BKP2i+iRzQiq5rIK2TEo++xZ6cUUrQUvMJfPswYbs/5Ai6WJTBvQFF
-         78sKq64VXbtgQiAs+swc4W2nEH1FQqBMGyAChsSpkkPOJ+LZjuEVlTDXAzjUy1suxZsf
-         6+xpP2ZeDem6ZE8neAbw7q/ECA72QrfXxar4fusyATaiAFYDFhmlV9virJ+swg02aABW
-         qvWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782269294; x=1782874094;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=j9R8xrCfMV0d213SBRaLTNm7gGDu9+ZI6ZAy9Gpfpno=;
-        b=LjlcnbUKwGxsRGM5usZOcvWcLFhjjAOg+pU/5mXpJ6p/IjMX8WIEYRNLzLkQler8re
-         hGCyGrR5Kwhj5mNNMiMsJ9S0GCqfaw8FTPcq2zR4wrlYW124W4UP0hg9xd/TjW9WeemY
-         IAYdZkfc7cMRbiJHxpZXYl8WoX6HfYgR5QaXBnMndNRPQ+3cyhsqekBlrbGFcJqivddJ
-         2IYER992TFB4XRBvTklsInlrJP+O++hufBHM/g/DJiPUziHZ+ocX9BHDXWOjGXemG7Cr
-         edSh+t59zyrMgKAaLybiphXN/3pPYz/J6EOK1adz0xoSWCZZs7vCdx6fm1mrvJ+m/sYc
-         Z48g==
-X-Forwarded-Encrypted: i=1; AHgh+RoLBNuFJ15/doQJZD3th9JhwKYhKlV9qibDSyBIPk+QKmTBu91B0wgy0aW3TLxo6X2MocknzIKKlvvv@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvkAvYSqX7zczOsVWh+FG9T0yVFCOwFzbdHok+smFkVUGMlJE0
-	j6BoKxZU3sDN1bSYk9VQGh4XP83h8QSjMzJDbGy/+OoB5EVuMBvPDfgmNbrdqOVxAtMAaXjM8Jq
-	tXj9J/qTbACpYSZ4+ovQXbkcxazOuAJo=
-X-Gm-Gg: AfdE7ckXeOlSe7KKN989fKy1nynyo51VP3+TOmbjMKE9wacaTzLzulhPK8C5hELBntm
-	HxU9ZpMUB7cviwHlmRLZB8tSHzvtyLswIeogH9/q82XhD0qvN5vcGcnvSospbMm/zwXwRdyFBLK
-	to9kD2hR7JPhiRDKZmV+A5FzF91QjwXO+tJelLZOtQq94iaKNLO+p8J3po1rE4uGP+KWRcANdvx
-	KOK2rhCyrfO0WvAtWMDjN8MJCl2W2dwiKuS3x5m8ARixn3H9jOYbSCzNWiV0cPiUCVElbzgIJnB
-	INUTlT0n6yUAFqhOBxoNqiyY/XtKpYsLeJEeyjHFYl696VgS0kfvwJyiaTcHbo4N+SZU8YX6hzK
-	sAsPP0kDua1YTxzMyazXivezLhpv6QhDBR6DmsnbmUiAHHDZeprdZtra8RJfbu5r8PmEUKr9sA8
-	gFcFhnKKKYyFA=
-X-Received: by 2002:a05:6214:8017:b0:8cc:f3a0:209b with SMTP id
- 6a1803df08f44-8e3b664c66dmr99415626d6.17.1782269294373; Tue, 23 Jun 2026
- 19:48:14 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GgNW6JFL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 706661F01559
+	for <linux-cifs@vger.kernel.org>; Wed, 24 Jun 2026 03:02:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782270156;
+	bh=FJU5BFG1NhTyzhLsYaoPqLsRV5xkRU9QC4lOArVPz44=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=GgNW6JFLMtUmeF5nPiXH6MEX1E1PQ6cn9sgTnjQXGm1ter/zqTe8ks9dQdoX6BTw/
+	 s+z7pe6vFSaBR71+w0N8Kq3RZsPcKotOjhEinVRVr1o3fvMWSBBjjcNmUYg9Skm5k/
+	 oN8EFyYimKTN4IIalaFkiN0e8cnNv/2Ui/DRroNZK/N6Q4tP2fQhwqaxTuQ6WkSBAH
+	 PGdK8v2khEN8F77Uf1Lmwi7mKxcH03pptwPaWARDQc6QCEhPnkMV9az7E+3RRpF3Rh
+	 8JI6VZnqzFrgmlq88rRutcJyaH/9zihEIfnmZYUxZFshF/A1tMzV7sgNUoVAbzfRGV
+	 AdJYqYRaeYsXw==
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-695f539fc8cso2704824a12.0
+        for <linux-cifs@vger.kernel.org>; Tue, 23 Jun 2026 20:02:36 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ983SZFJ8iyYmFS8a5fhLV1kMezpQGr6kd7bD77Xvfq+naGzZbn39hkLnbaevYdXgE0iNQzB/vNfnVs@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOwyiXGf41H0KF4jlKVz1UXrBi7MLXW/NFgziYJM8sYArQDdx0
+	boWaMrLLPRWrUpLiGpYaTowgQsyUlG1BRB3+5i0FqRrPgkgvGyya4EQdIB9QChYjmjssymqFtjS
+	RvDDV2T2x9+ziUGZI0nFdmc7gnajjwQI=
+X-Received: by 2002:a17:907:1deb:b0:bfa:9457:b517 with SMTP id
+ a640c23a62f3a-c1030ea2b61mr247046466b.23.1782270155128; Tue, 23 Jun 2026
+ 20:02:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260624021550.1548952-1-huiwen.he@linux.dev> <20260624021550.1548952-4-huiwen.he@linux.dev>
-In-Reply-To: <20260624021550.1548952-4-huiwen.he@linux.dev>
-From: Steve French <smfrench@gmail.com>
-Date: Tue, 23 Jun 2026 21:48:02 -0500
-X-Gm-Features: AVVi8CdIfNbHWNXR6msipGcfyrqe-I0hwWt-gRq20f0I2WpjzaMCm4l6A-_GSa4
-Message-ID: <CAH2r5mtLZTXGcCGy5y24CH_uDRr6tPq21i6wS4SZHhqHn7o13w@mail.gmail.com>
-Subject: Re: [PATCH v2 3/9] smb/client: handle smb2_set_sparse() failure in
- EOF-extending fallocate
-To: Huiwen He <huiwen.he@linux.dev>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+References: <20260624011320.9146-1-liuqiangneo@163.com>
+In-Reply-To: <20260624011320.9146-1-liuqiangneo@163.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 24 Jun 2026 12:02:22 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_6ELLJmX+k1H2OmPP-triUk0N6dh0o5kLm7afCvsGvvA@mail.gmail.com>
+X-Gm-Features: AVVi8Cf-xeRVCPd3NBWGWZi2QAZycFZxTfcWfM51JBEt5zsNx6zf7VR3IZC7M2w
+Message-ID: <CAKYAXd_6ELLJmX+k1H2OmPP-triUk0N6dh0o5kLm7afCvsGvvA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] ksmbd: fix some memory leaks in ksmbd_vfs_* functions
+To: liuqiangneo@163.com
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
 	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	chenxiaosong@kylinos.cn, linux-cifs@vger.kernel.org
+	chenxiaosong@chenxiaosong.com, linux-cifs@vger.kernel.org, 
+	Qiang Liu <liuqiang@kylinos.cn>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Would it be possible in Linux to have a sparse file but still with
-space reserved beyond end of file?  In other words are there cases
-where you could have a file with holes in it in Linux which still
-fallocated beyond end of file.  What happens to ext4, xfs, btrfs if
-you try that?  Does fallocate beyond of file remove all holes in a
-(sparse) file?
-
-On Tue, Jun 23, 2026 at 9:17=E2=80=AFPM Huiwen He <huiwen.he@linux.dev> wro=
-te:
+On Wed, Jun 24, 2026 at 10:13=E2=80=AFAM <liuqiangneo@163.com> wrote:
 >
-> From: Huiwen He <hehuiwen@kylinos.cn>
+> From: Qiang Liu <liuqiang@kylinos.cn>
 >
-> An EOF-extending fallocate(mode=3D0) can return success while the newly
-> extended range remains sparse. A later write into that range may
-> therefore still fail with ENOSPC despite fallocate having succeeded.
+> This series fixes several memory leaks in ksmbd_vfs_* functions,
+> where dynamically allocated buffers were not freed on error paths.
 >
-> CIFS clears the sparse attribute before extending EOF so that the
-> requested range is allocated. However, it ignores failure from
-> smb2_set_sparse() and continues to SetEOF.
->
-> Return the smb2_set_sparse() error without extending EOF. This prevents
-> CIFS from reporting successful preallocation when the server rejected
-> FSCTL_SET_SPARSE.
->
-> Fixes: 8bd0d701445e ("cifs: add support for fallocate mode 0 for non-spar=
-se files")
-> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > ---
->  fs/smb/client/smb2ops.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> v1->v2:
+> - In function ksmbd_vfs_get_sd_xattr, remove the free_n_data branch label=
+ and
+>   uniformly reuse out_free as the resource cleanup exit for all code path=
+s.
+> - Use `goto` to free n.data in ksmbd_vfs_set_dos_attrib_xattr function
 >
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 965a4d21dd43..f68c0df1b66e 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -3691,8 +3691,11 @@ static long smb3_simple_falloc(struct file *file, =
-struct cifs_tcon *tcon,
->                 if (rc)
->                         goto out;
+> Link to v1:
+> https://lore.kernel.org/linux-cifs/20260623021240.34722-1-liuqiangneo@163=
+.com/
+> ---
 >
-> -               if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
-> -                       smb2_set_sparse(xid, tcon, cfile, inode, false);
-> +               if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) {
-> +                       rc =3D smb2_set_sparse(xid, tcon, cfile, inode, f=
-alse);
-> +                       if (rc)
-> +                               goto out;
-> +               }
->
->                 new_eof =3D off + len;
->                 rc =3D SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
-> --
-> 2.43.0
->
-
-
---=20
-Thanks,
-
-Steve
+> Qiang Liu (3):
+>   ksmbd: fix sd_ndr.data memory leak in ksmbd_vfs_set_sd_xattr
+>   ksmbd: Fix acl.sd_buf memory leak and invalid sd_size error handling
+>   ksmbd: fix n.data memory leak in ksmbd_vfs_set_dos_attrib_xattr
+Applied them to #ksmbd-for-next-next.
+Thanks!
