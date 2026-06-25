@@ -1,32 +1,32 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21259348C7C
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 16:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096023AEF47
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 16:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782403435; cv=none; b=FW+OqN7KIQVs6pyerMKtNjQTRgGNQzIRo+iKT++8mdTy0uE1YTlqWV5thCTSF128+5208tm8gNPzLZU/fAzN3foDc53cN0ARfnVnmiwzLlcl+JJsLZBYg5Vga16PMIZRDbaiGSacnZYz4tXz4cVVTrEbaxByEfSC0J/5vSomO8w=
+	t=1782403442; cv=none; b=Ye8ceefbYT/McaCg9oSQ9ABqEx1SIi1r6E7h8a5xBrHN2mGppSLJXCMbAQA/0UUSPJf881emuKyeeYdDUYU4YsVbg6P/8tdG+e282jU+0Eq8DMWilPXZWB4WgyI/d3M7R194zG5ZI+CUzRjqvHQQ/RWQL/KWLrV6jOiQSIMS8Dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782403435; c=relaxed/simple;
-	bh=5j2UGJos7mtXiz/FpKKKO4GkcpI7ozv24PJQSpk5qCA=;
+	s=arc-20240116; t=1782403442; c=relaxed/simple;
+	bh=dkaFwtpfgso/SCGPqZMg16AuwE+RKpcfHl4peWjNbfI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OS9kdmxjtjoaEUy/IL1WFCMHa5X33eLtKoIG7oCMynvUBCaoMH/taxrlnLkpaH/IFMnHHWTUEIneOdW04rltA7HJkxfFuHOOhNj7pQuHp4dpL/AqB/Qx26zuPP9KruMzsPjeCzQ5sl8rPJ4XFoc2mMLzRgmMxbeGcJvsvzIqVyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=n3b5lv2G; arc=none smtp.client-ip=91.218.175.170
+	 MIME-Version; b=LT4g5ywV1PGVLvZSj2qGoUaOC1jWBmUY/vgsCwyugVuo9me9+4yL2ckD/raTg1nvUWq9u+ylgvKV3rpOMTZTTihMXtUMxpunpjAJUk48RRAihDhGmX2x60RTVnIh/a7zQKSMBosN/9ZLEcxyOTlLBeks92amewqTJaOdnKBaPtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pO1Q77zn; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="n3b5lv2G"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pO1Q77zn"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782403425;
+	t=1782403435;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vs7O97Qpk2CTlHrd0KfzqGmqS0hs3dtc9pXoWMfscHQ=;
-	b=n3b5lv2GaoOSik/FC3/KPmd9C2Wn5a7lt0QVpQERUoP3fnxAedKyw3rFhpWgwV2BC+eiHR
-	di0eZRtvBkj2LRi3DNvlByte1Nsy7NhgN2wSNPio+CwGHTPNDVijM3+b7rXEzFfDWme+Tm
-	+LuRwAWgrbpSqLUgJZYXFnqLKkVWUyw=
+	bh=iv8yTdHfG4Kdkj3HOItwRLcEUjghrTsNd56hf6kZ590=;
+	b=pO1Q77znyDJ43tlZogSPkSDhGRBEZaGJpPIBWFbc/l5k7s9Y8QNN8a88Dt368na1AXakxk
+	xSar+Ed6782imO3UTENWiePnhDf8St1OAq+lFWuHr2S91POqEtWe93OLt7bMYpIpwAcRFA
+	sBTYrI8xYgiqKixJe8CZn2Gu537o4KU=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v3 6/9] smb/client: handle overlapping allocated ranges in fallocate
-Date: Fri, 26 Jun 2026 00:01:51 +0800
-Message-ID: <20260625160154.104450-7-huiwen.he@linux.dev>
+Subject: [PATCH v3 7/9] smb/client: reduce fallocate zero buffer allocation
+Date: Fri, 26 Jun 2026 00:01:52 +0800
+Message-ID: <20260625160154.104450-8-huiwen.he@linux.dev>
 In-Reply-To: <20260625160154.104450-1-huiwen.he@linux.dev>
 References: <20260625160154.104450-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,99 +56,59 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-smb3_simple_fallocate_range() can skip holes when an allocated range
-returned by the server starts before the current fallocate offset. The
-skipped hole is not zero-filled, but fallocate still returns success. A
-later write to that hole may therefore fail with ENOSPC.
+The fallocate emulation allocates a 1 MiB zero-filled buffer even though
+each SMB2_write request is limited to SMB2_MAX_BUFFER_SIZE, which is
+64 KiB. A high-order 1 MiB allocation is more likely to fail on a
+fragmented system.
 
-The function queries allocated ranges so that it can preserve existing
-contents and write zeroes only into holes. However, the server may return
-a range that starts before the current fallocate offset.
+Allocate only the smaller of the requested range and
+SMB2_MAX_BUFFER_SIZE, and reuse that zero-filled buffer for every write
+request. Also reject a successful write that makes no progress to avoid
+looping indefinitely.
 
-For example, assume the fallocate request is [100, 400) and the only
-allocated range returned by the server is [0, 200):
+This reduces the contiguous allocation required by fallocate emulation
+without changing the written data or range semantics.
 
-        Request:      [100, 400)
-        Server range: [  0, 200)  allocated
-
-        Correct:
-        [100, 200)    allocated data, skip
-        [200, 400)    hole, zero-fill
-
-        Current:
-        [100, 300)    skipped
-        [300, 400)    zero-filled afterwards
-
-The current code adds the full server range length, 200, to the current
-offset 100 and moves to 300. As a result, the hole in [200, 300) is
-skipped without being zero-filled.
-
-Calculate the end of each allocated range and advance from the current
-offset to that end. Ignore ranges ending before the current offset and
-reject ranges whose end offset overflows.
-
-Fixes: 966a3cb7c7db ("cifs: improve fallocate emulation")
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ fs/smb/client/smb2ops.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index b8474ed9af16..a260e85ad1c8 100644
+index a260e85ad1c8..5f2e4a0722a6 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3581,6 +3581,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 	struct file_allocated_range_buffer in_data, *out_data = NULL, *tmp_data;
- 	u32 out_data_len;
- 	char *buf = NULL;
-+	u64 range_start, range_len, range_end;
- 	loff_t l;
- 	int rc;
+@@ -3543,7 +3543,7 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
+ 					     char *buf)
+ {
+ 	struct cifs_io_parms io_parms = {0};
+-	int nbytes;
++	unsigned int nbytes;
+ 	int rc = 0;
+ 	struct kvec iov[2];
  
-@@ -3617,13 +3618,21 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 			goto out;
- 		}
+@@ -3564,9 +3564,10 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
+ 		rc = SMB2_write(xid, &io_parms, &nbytes, iov, 1);
+ 		if (rc)
+ 			break;
++		if (!nbytes)
++			return -EIO;
+ 		if (nbytes > len)
+ 			return -EINVAL;
+-		buf += nbytes;
+ 		off += nbytes;
+ 		len -= nbytes;
+ 	}
+@@ -3596,7 +3597,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 	if (rc)
+ 		goto out;
  
--		if (off < le64_to_cpu(tmp_data->file_offset)) {
-+		range_start = le64_to_cpu(tmp_data->file_offset);
-+		range_len = le64_to_cpu(tmp_data->length);
-+		if (check_add_overflow(range_start, range_len, &range_end) ||
-+		    range_end > S64_MAX) {
-+			rc = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (off < range_start) {
- 			/*
- 			 * We are at a hole. Write until the end of the region
- 			 * or until the next allocated data,
- 			 * whichever comes next.
- 			 */
--			l = le64_to_cpu(tmp_data->file_offset) - off;
-+			l = range_start - off;
- 			if (len < l)
- 				l = len;
- 			rc = smb3_simple_fallocate_write_range(xid, tcon,
-@@ -3640,11 +3649,13 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 		 * until the end of the data or the end of the region
- 		 * we are supposed to fallocate, whichever comes first.
- 		 */
--		l = le64_to_cpu(tmp_data->length);
--		if (len < l)
--			l = len;
--		off += l;
--		len -= l;
-+		if (off < range_end) {
-+			l = range_end - off;
-+			if (len < l)
-+				l = len;
-+			off += l;
-+			len -= l;
-+		}
- 
- 		tmp_data = &tmp_data[1];
- 		out_data_len -= sizeof(struct file_allocated_range_buffer);
+-	buf = kzalloc(1024 * 1024, GFP_KERNEL);
++	buf = kzalloc(min_t(loff_t, len, SMB2_MAX_BUFFER_SIZE), GFP_KERNEL);
+ 	if (buf == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
 -- 
 2.43.0
 
