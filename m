@@ -1,258 +1,165 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040443E7160
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 16:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782403470; cv=none; b=maKzYBA4JcloY+WNSONzlJ2f4WPqbIGUNR2LiS/qGjx4qneT+/ztYmRhswSbcQ8Fq2JBriWsGhDnOoczXXGjmJM+N71SUsZNAoPw6zNCrQTZ2r7CyfhuE+oUpOqUzUMTPM/1WX8+YWFAQDONO0MrINIGFnR1Yhz85O+DZn579so=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782403470; c=relaxed/simple;
-	bh=h7278gSvKeloRYbeMO+EOA3NqtQfF2pGRDVyy0V4eXc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t5HXyAC74YBUz3ZehQ2LWJ9BNNbit5fYhhyuIdeNGjw3TJGClbkmqqEmlNwc9JTsIyWUApKX+5v30SNPjiN7I39sfGFaiCJHdyOaJ1SFOuOCQw0SB1qoDAFEGh7A3+wbnx8/amV5Q3AG23cYLLnfiZqHhuNhz4RfbiOl1tAP2uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YMSuOxvb; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B64F36F916
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 21:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782422919; cv=pass; b=X1Kc6APgXrD1xJek8pXWT2jt2nxwsLDB0ZtWxPEQkW7EUxXDXNbi1nx3OAxJoJKekcw+jkA7P56L9p9OM76CWSxlHU4mCVvpN9RLOjMTQViClWhfRCDYrvkYa+euzKFCb/BPVKnoPA5tftouDt1WP/bERMKSu5qBS1hHKiEHUTg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782422919; c=relaxed/simple;
+	bh=QCWnBWpNo2TezemxWK6hszdTjxbLoCZBX6dnE1HiQ28=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=H7LfZhmEA4fPEZug5/sYqiYGjrUJQ60pMHdSwR4FM0lsOgiUk8SbiQKNyj4X4Vc75ZimjV7etnQgR2vx8as3f7ml6J7dRhL8nF1lONKsSHMIJhhE/rjQtBlfoMURRIZ8gA1QAvf+WW7wcVZ+K5rvkWJdg25YK07dgOAGHVRGVwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hmjtrPIZ; arc=pass smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YMSuOxvb"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782403454;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V18qKKnDEfCiuQm5a/UE/lQvOvAL+zYLRFa3plUtmpg=;
-	b=YMSuOxvbmB1ICRmNarJ/KqD8e0mYBNmdWqnAtvN0GBEvUIjYMwPNC0pD9BaUSLHpGKl0fC
-	dmKo+kuSAD82L37KlaXGQNKDO2b9iqE/a2Kwq4nKM3khruBrV2oUjCSPT7zjD2pGqujwUy
-	V7isgtodvgSba7uBHo8gJy23gPMcfPo=
-From: Huiwen He <huiwen.he@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v3 9/9] smb/client: verify allocation after EOF-extending fallocate
-Date: Fri, 26 Jun 2026 00:01:54 +0800
-Message-ID: <20260625160154.104450-10-huiwen.he@linux.dev>
-In-Reply-To: <20260625160154.104450-1-huiwen.he@linux.dev>
-References: <20260625160154.104450-1-huiwen.he@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmjtrPIZ"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-8e5be46f663so2632316d6.0
+        for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 14:28:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782422917; cv=none;
+        d=google.com; s=arc-20260327;
+        b=QRLAV00OqzwM4ojTc4Ji1+WNWs3zkkelWfonvqEPqXk86tsELo3WD4FEW5K2dEaeb4
+         6wPMVHVNCIwUhrO9/IxITgTog1cC97Yh0QPv6c9oHWd1x+TEqcoS+BH0dT3G67pMjFym
+         L2oCmmGp3ozjApohmMCMHLNhUy7SzXjDbzM09x4cKSqWPaGNJMOsgTdhCp9tuGWR4a/g
+         vr/QfooSSfFXH+8YyWj58UTDbMe70gNe/6uBDUe09mZp5yfgVpoDULm8i/H+VDAoHhlX
+         kXrdUzsbdW7HN0qUOBOXtN4L/lH2g06Tq/BIwNoOiUdKRH07tsxxiDWMyTsZfRIwqzpO
+         cyVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=QjthfDjwS/ARLjnFtAiUpFoaSpXp18C9kLBceUz66rQ=;
+        fh=Nf1mvuQ9XbZKOmPhacDz1X5aHl0t82a+aHbY+2n4zlg=;
+        b=lYXYFMOe+HCawmAR0sqy9rY7n8c1HpR05Fpeirwcyg731QJ22o8uZKvrInLz1VE9qj
+         7slPVoqvZmoHv+v5tXESStj7SSW0SSOnF76rxPeSF7uhUGeQG3EaM+5diDgJc7Sm6Nbw
+         a/IgVes0ECpodCsY/ah3KwiVzrLlYPdoILmtgMqZL8wF7n3NyRpuIvXsCBRS1b4hOHT6
+         nE78Xlcm637ThImFT7cAvMKFAArJDf3MWnEjZJzXQ0qovX0ntAxLcm8NWNM7v8qZklAI
+         jzkmoTci5ur9jCvV9VfSlK8BK6bO3TT4mFSRU+nlTmR6hE8v52e/1FzsZhVmWeiIJTzt
+         lxHg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782422917; x=1783027717; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QjthfDjwS/ARLjnFtAiUpFoaSpXp18C9kLBceUz66rQ=;
+        b=hmjtrPIZ9Vj9+8r4nbfa58qIvgIF92KWxJWBJbahGEu0upjs1n3jzKt0Qy2UJBCVsW
+         uDJgO9xrDhKILfmgrPR2db76I2zXoL240wYYiuqLrbqRaXsElc4iNQheli85O8LJ95M2
+         KxxeEnLsLud7QxLK4fU/uQcZSC9aGNov9NLdLlrwBbz/enX+eLt2Udfg4Qfj8mOWRNbl
+         mY06ti+C4jqgky79rIgRRLCm4xmzNttJLZxoCGUN69u6UDUeSYCRekQolf573X0r3Lcq
+         rEC9yRufiaduE67aDTVp6fDoyIjxT61zVHV4LEqt32RlaU7sbKeUZ8/RoqJJxaGVfzNs
+         xglQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782422917; x=1783027717;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QjthfDjwS/ARLjnFtAiUpFoaSpXp18C9kLBceUz66rQ=;
+        b=YFwTjuT4NPWDlLoshSQMHFLiSUYMo1srsSHLcSdcpk04dig3AtINTX1/cJgNeCu0c2
+         H8XuDQiFKGL5M2qxx84kBx7/ioxb55d0C3O7c9h/KBa3ppqy9T2FozWFL1WeXwRYkC5N
+         sVNn9KX8hEuSs9ynnb6Ep7yVoEZfTqzvvRnlLr0WANqrRhcN2AkJTjLBROiDE/6Q1X3s
+         9MP2mkZLaQXc5CKHoKydW4ifylv69FI/Rav2GAs0rptSQ6TBvmYYFCQm/LZJFLEGxFif
+         2Z802QvsQg+PpwcoA/GE01FTOgH7vyVoAe44qIgVoQSrJZ3mP2FcCv3NKjiPqndDCAEO
+         9KoQ==
+X-Gm-Message-State: AOJu0Yzu/0DbxgzoiJw3urxNncPRRb4QYeB44V93HBOiS8Zm0OAaXYto
+	ve19jJ9AKS1SlrTNOwNXCnD2ZPXn6C4zJVstigDIRtVJBJiSrD1SbdJCMIc9Ia7ln205HqCJQji
+	ovN7x5sioFsLAktVMeRYJnRJ9OMmzaIijn4C87Ew=
+X-Gm-Gg: AfdE7cmij8PBwjq79LYQ32nP0hca7PVnRESACJ1fokLlsHLISCIaruE8JEJWGxZriX7
+	ehG0L6LJKiA570XXjH8NgXNeavnx3Aj61lBJVeIdoIov/K49HEQ58JBJVIEW7PhpSLmIG4hSp8a
+	/o5ppT8P72tXtKNWEXVbN5nLnlnS02rc+CzpkNBa1HHRVlVEiXCuaL4Dnk5s6dgRlDj/Rbq/tZO
+	9DOPdvz4RYuoToN+yHVms32VmOL2INA1SznonZ17AXCCbGH6wGXBiTwDksEBVYc58kLhdlWKNsN
+	T/fa1ZYa+l1fqhGid4OnE922Q8zlZqLfErsXJgWbaSXCzGA1HobrO8232lGcFS7HAQiommsbRcy
+	IBldsuRlP0oqXQAJZHg3jDvhTC2daBtE/5Qlt7r63C7ajHruo19wRYuP06yYYTPOE52/lg0SC4o
+	d8MWuIA575
+X-Received: by 2002:a05:6214:5403:b0:8e6:1176:91c7 with SMTP id
+ 6a1803df08f44-8e6d687a398mr82410746d6.16.1782422917255; Thu, 25 Jun 2026
+ 14:28:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 25 Jun 2026 16:28:26 -0500
+X-Gm-Features: AVVi8Cc87-li1KiIvfCD1sE72ARFLhkBnNBtuQA3sKUJi4mJNXSFIyF2rTRSisk
+Message-ID: <CAH2r5mvMvo-Lmj+XHHpnGm6_iiJTW=e1N_f+uuFUpN_=3omycA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+Please pull the following changes since commit
+dac3b26eae7bee261fa05f20c3fcc24988a7c233:
 
-EOF-extending fallocate(mode=0) currently returns success after SetEOF
-even if the server has not allocated the requested space. This gives
-userspace a false preallocation guarantee and can cause a later write
-into that range to fail with ENOSPC.
+  Merge tag 'v7.2-rc-part1-ksmbd-fixes' of git://git.samba.org/ksmbd
+(2026-06-18 09:21:50 -0700)
 
-This happens because SMB2 has no operation that directly matches Linux
-fallocate for an arbitrary byte range. SetEOF changes only the logical
-file size, while FILE_ALLOCATION_INFORMATION can request allocation only
-from offset 0 up to a specified allocation size.
+are available in the Git repository at:
 
-Use FILE_ALLOCATION_INFORMATION only when allocating [0, off + len)
-safely covers the requested range [off, off + len). For example, both
-ranges are identical when the request starts at offset zero:
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc-part2-smb3-client-fixes
 
-        xfs_io -f -c "falloc 0 4m" file
+for you to fetch changes up to f53208233b2acaafe2af99c63c02481b2f5bcb39:
 
-Allocating the additional range before off is also safe for an empty
-file:
+  cifs: define variable sized buffer for querydir responses
+(2026-06-24 16:49:02 -0500)
 
-        truncate -s 0 file
-        xfs_io -c "falloc 1m 4m" file
+----------------------------------------------------------------
+17 smb3 client fixes
+- fix seven potential double frees
+- fix potential memory leak in receiving compound response
+- querydir improvement
+- fix chown with smb311 posix extensions
+- two set ACL fixes
+- minor debug improvement and cleanup
+- add some missing protocol defines
+- two sparse file fixes
+----------------------------------------------------------------
+Fredric Cover (1):
+      smb/client: use %pe to print error pointer
 
-An EOF-adjacent request is safe for a non-sparse file because the range
-before EOF is already allocated:
+Haoxiang Li (1):
+      smb: client: Fix next buffer leak in receive_encrypted_standard()
 
-        xfs_io -f -c "pwrite 0 1m" file
-        xfs_io -c "falloc 1m 4m" file
+Henrique Carvalho (6):
+      smb: client: fix double-free in SMB2_open() replay
+      smb: client: fix double-free in SMB2_ioctl() replay
+      smb: client: fix double-free in SMB2_close() replay
+      smb: client: fix query_info() replay double-free
+      smb: client: fix change notify replay double-free
+      smb: client: fix query directory replay double-free
 
-Request and verify the resulting AllocationSize before extending EOF, so
-an allocation failure leaves the file size unchanged. Reject other
-non-zero-offset requests because AllocationSize cannot identify which
-byte ranges were allocated.
+Huiwen He (3):
+      smb/client: name the default fallocate mode
+      smb/client: preserve errors from smb2_set_sparse()
+      smb/client: do not account EOF extension as allocation
 
-With Samba `strict allocate=yes`, this allows generic/496, generic/568 and
-generic/701 to pass after verifying the server allocation. With
-`strict allocate=no`, the requests fail instead of reporting false
-preallocation success.
+Ralph Boehme (3):
+      smb: client: refactor ACL setting control flow in id_mode_to_cifs_acl()
+      smb/client: fix security flag calculation when setting security
+descriptors
+      smb/client: fix chown/chgrp with SMB3 POSIX Extensions
 
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/smb2ops.c   | 63 +++++++++++++++++++++++++++++++++++----
- fs/smb/client/smb2pdu.c   | 19 ++++++++++++
- fs/smb/client/smb2proto.h |  3 ++
- fs/smb/common/fscc.h      |  5 ++++
- 4 files changed, 85 insertions(+), 5 deletions(-)
+Shyam Prasad N (1):
+      cifs: define variable sized buffer for querydir responses
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 73a80671a584..c1d0ee148445 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3679,7 +3679,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 	unsigned int xid;
- 	loff_t old_eof, new_eof;
- 	struct smb2_file_all_info file_inf;
--	u64 asize;
-+	u64 asize = 0;
- 	int qrc;
- 
- 	xid = get_xid();
-@@ -3747,6 +3747,19 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 			goto out;
- 		}
- 
-+		/*
-+		 * FILE_ALLOCATION_INFORMATION sets the allocation size for the whole
-+		 * file and cannot allocate an arbitrary byte range. Use it only for
-+		 * requests starting at offset zero, requests on an empty file, or
-+		 * requests appending to a non-sparse file.
-+		 */
-+		if (off != 0 && old_eof != 0 &&
-+		    (off != old_eof ||
-+		     (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE))) {
-+			rc = -EOPNOTSUPP;
-+			goto out;
-+		}
-+
- 		if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) {
- 			rc = smb2_set_sparse(xid, tcon, cfile, inode, false);
- 			if (rc)
-@@ -3754,12 +3767,52 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 		}
- 
- 		new_eof = off + len;
-+
-+		qrc = SMB2_query_info(xid, tcon, cfile->fid.persistent_fid,
-+				      cfile->fid.volatile_fid, &file_inf);
-+		if (qrc == 0)
-+			asize = le64_to_cpu(file_inf.AllocationSize);
-+
-+		if (qrc || asize < new_eof) {
-+			rc = SMB2_set_allocation(xid, tcon,
-+						 cfile->fid.persistent_fid,
-+						 cfile->fid.volatile_fid,
-+						 cfile->pid, new_eof);
-+			if (rc)
-+				goto invalidate_attrs;
-+
-+			qrc = SMB2_query_info(xid, tcon,
-+					      cfile->fid.persistent_fid,
-+					      cfile->fid.volatile_fid, &file_inf);
-+			if (qrc) {
-+				rc = qrc;
-+				goto invalidate_attrs;
-+			}
-+
-+			asize = le64_to_cpu(file_inf.AllocationSize);
-+			if (asize < new_eof) {
-+				rc = -EOPNOTSUPP;
-+				goto invalidate_attrs;
-+			}
-+		}
-+
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, new_eof);
--		if (rc == 0) {
--			netfs_resize_file(&cifsi->netfs, new_eof, true);
--			cifs_setsize(inode, new_eof);
--		}
-+		if (rc)
-+			goto invalidate_attrs;
-+
-+		netfs_resize_file(&cifsi->netfs, new_eof, true);
-+		cifs_setsize(inode, new_eof);
-+
-+		spin_lock(&inode->i_lock);
-+		inode->i_blocks = CIFS_INO_BLOCKS(asize);
-+		spin_unlock(&inode->i_lock);
-+		goto out;
-+
-+invalidate_attrs:
-+		spin_lock(&inode->i_lock);
-+		cifsi->time = 0;
-+		spin_unlock(&inode->i_lock);
- 		goto out;
- 	}
- 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4972cfe249f6..1c6fadb7fbf3 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5899,6 +5899,25 @@ SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 			0, 1, &data, &size);
- }
- 
-+int
-+SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
-+		    u64 persistent_fid, u64 volatile_fid, u32 pid,
-+		    loff_t allocation_size)
-+{
-+	struct smb2_file_alloc_info info;
-+	void *data;
-+	unsigned int size;
-+
-+	info.AllocationSize = cpu_to_le64(allocation_size);
-+
-+	data = &info;
-+	size = sizeof(struct smb2_file_alloc_info);
-+
-+	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
-+			pid, FILE_ALLOCATION_INFORMATION, SMB2_O_INFO_FILE,
-+			0, 1, &data, &size);
-+}
-+
- int
- SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 		u64 persistent_fid, u64 volatile_fid,
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 78a4e1c340f9..16a02c1eb0a1 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -204,6 +204,9 @@ void SMB2_query_directory_free(struct smb_rqst *rqst);
- int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
- 		 u64 persistent_fid, u64 volatile_fid, u32 pid,
- 		 loff_t new_eof);
-+int SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
-+			u64 persistent_fid, u64 volatile_fid, u32 pid,
-+			loff_t allocation_size);
- int SMB2_set_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 		       struct smb_rqst *rqst, u64 persistent_fid,
- 		       u64 volatile_fid, u32 pid, u8 info_class, u8 info_type,
-diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-index bc3012cc295d..c9d5aa94727f 100644
---- a/fs/smb/common/fscc.h
-+++ b/fs/smb/common/fscc.h
-@@ -265,6 +265,11 @@ struct smb2_file_eof_info { /* encoding of request for level 10 */
- 	__le64 EndOfFile; /* new end of file value */
- } __packed; /* level 20 Set */
- 
-+/* See MS-FSCC 2.4.4 */
-+struct smb2_file_alloc_info { /* encoding of request for level 19 */
-+	__le64 AllocationSize;
-+} __packed;
-+
- /* See MS-FSCC 2.4.15 */
- typedef struct {
- 	__le32 NextEntryOffset;
+Steve French (1):
+      smb common: add missing AAPL defines
+
+Zhao Zhang (1):
+      smb: client: fix double-free in SMB2_flush() replay
+
+ fs/smb/client/cifsacl.c  | 38 ++++++++++++++++++++++++++------------
+ fs/smb/client/cifsglob.h |  2 ++
+ fs/smb/client/connect.c  |  4 ++--
+ fs/smb/client/file.c     |  2 ++
+ fs/smb/client/inode.c    | 16 ++++++++++++----
+ fs/smb/client/readdir.c  |  2 ++
+ fs/smb/client/smb2ops.c  | 42 ++++++++++++++++++++++--------------------
+ fs/smb/client/smb2pdu.c  | 28 +++++++++++++++++++++++++---
+ fs/smb/common/smb2pdu.h  | 24 ++++++++++++++++++++++++
+ 9 files changed, 117 insertions(+), 41 deletions(-)
+
+
 -- 
-2.43.0
+Thanks,
 
+Steve
