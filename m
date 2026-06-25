@@ -1,53 +1,31 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818F136492C
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 14:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321C7328B75
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 16:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782398923; cv=none; b=iB/hUqpguzqA1rDaLWzXxNR2zJerlxXjRT21EphXh7O9mUBLNFTC/+QSFXVh7yVUn4QHkQp7yyUGvh9OVp9hT66otQmX09XIzvmBz3Iyi8yL4TL5L8laGU3jwepzF4n/IamD8+q76wgCsbV/Q9+UaBUP6DNPWLhgx9H6ZakZYKk=
+	t=1782403353; cv=none; b=hhLcjcHrVEqD+kTlJbX0gc2tTLyJw7dxcIrh4bByr9GOIhT/xilDT1K6r0YGVbuuYivB1BzdNXgN3r0AhM7SDfXWRVIwCLoH2fzYpR90HOEwtg5AX90/zTPmAxH2weoxjGv/htMUu4azBvWz2Z9ebFA3gf44pHOJD8mjUKQ/qIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782398923; c=relaxed/simple;
-	bh=frJoAekn4K8WN1lavbtbzGT+EIF5gF/B/3M1mmXo020=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FIL2zpNEOjk4TXXYxZoW3Z5r0CPqV27N8SFoCU8JFoErmMeUGfEIIhA9nBWtS/AZ/8159YGRL+MZGmPfMTe0acst6/rEhwlrWpIfzQ+PP/mOLQlbWbII5KD6omUx5Yn4h1+ADzYYs1BRtXmlXLsMQtzChdr2JTesg/TBAaf0LbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: f224d40c70a411f1aa26b74ffac11d73-20260625
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
-	DN_TRUSTED, SRC_TRUSTED, SA_UNTRUSTED, SA_UNFAMILIAR, SN_TRUSTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF
-	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
-	ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:fc763ab2-c841-42f1-a7f0-8ac42985259b,IP:5,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:5
-X-CID-INFO: VERSION:1.3.12,REQID:fc763ab2-c841-42f1-a7f0-8ac42985259b,IP:5,URL
-	:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:re
-	lease,TS:5
-X-CID-META: VersionHash:e7bac3a,CLOUDID:54e686895bd1fdd515811ba40e63d6f0,BulkI
-	D:260625180602AIG42LQ7,BulkQuantity:4,Recheck:0,SF:10|38|66|78|81|82|102|1
-	27|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:
-	40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BR
-	E:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: f224d40c70a411f1aa26b74ffac11d73-20260625
-X-User: lihaofeng@kylinos.cn
-Received: from workspace-fedora [(216.195.204.48)] by mailgw.kylinos.cn
-	(envelope-from <lihaofeng@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1096525333; Thu, 25 Jun 2026 22:48:36 +0800
-From: Haofeng Li <lihaofeng@kylinos.cn>
+	s=arc-20240116; t=1782403353; c=relaxed/simple;
+	bh=qb2/9eY9/MAGyCsAeVdh9o2VYX4FDJ1S7uGWevimLwA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JIyRpwK/dV8k/wjl9ADINg/Ge6IwEmT70qt3pSJ++KNuAtNy/aMVJmYyQnM5BE2ermXEoVoBn6yjOAMXmZUpbWmzK4RrPM3WL2vRL8t/9vKaHD4sncxuqfHjAfoXv7hcjomWSXba2PRRnEmqe3Po2hRymyXlGfNWs3bcJebycwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fR9z5o28; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fR9z5o28"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782403344;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jMHQEht9XCyEb1X5y9LAW/eDxru88Krw6H5sjjfAuqA=;
+	b=fR9z5o28PtGQZ6ZuO15UXpaTkB5iVzJFTl4M4QUMQXrk6cPEqY6hpMMIQwRRCB4ifTJ0Jf
+	Lkt2jmJqDutKp1HTCHKZbsZTf5+rwAHxCuHWchxXyTDW0dtszaMDEVZXA6nIT2bvlES4Yl
+	0RL6zu/XbVXBbUHpZrQO88Pk7h2ptaQ=
+From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
 	pc@manguebit.org,
@@ -57,17 +35,12 @@ To: smfrench@gmail.com,
 	bharathsm@microsoft.com,
 	senozhatsky@chromium.org,
 	dhowells@redhat.com,
-	metze@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	chenxiaosong@chenxiaosong.com,
-	Haofeng Li <lihaofeng@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 resend 2/2] ksmbd: reject undersized DACLs before parsing ACEs
-Date: Thu, 25 Jun 2026 14:48:07 +0000
-Message-ID: <20260625144807.513701-2-lihaofeng@kylinos.cn>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260625144021.513613-1-lihaofeng@kylinos.cn>
-References: <20260625144021.513613-1-lihaofeng@kylinos.cn>
+	metze@samba.org,
+	chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org
+Subject: [PATCH v3 0/9] smb/client: fix mode 0 fallocate handling
+Date: Fri, 26 Jun 2026 00:01:45 +0800
+Message-ID: <20260625160154.104450-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -75,62 +48,45 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-parse_dacl() limits the attacker-controlled ACE count by comparing it
-with the number of minimal ACEs that fit in the DACL size. The DACL size
-field is 16 bits, but the expression subtracts sizeof(struct smb_acl).
-Because sizeof() is unsigned, a DACL size smaller than the ACL header
-underflows to a large size_t.
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-A malicious client can reach this with:
+Changes in v3:
 
-SMB2_SET_INFO (InfoType=SMB2_O_INFO_SECURITY)
-  -> smb2_set_info_sec()
-  -> set_info_sec()
-  -> parse_sec_desc()
-  -> parse_dacl()
-     -> init_acl_state(..., 0xffff)
-     -> init_acl_state(..., 0xffff)
-     -> kmalloc_objs(..., 0xffff)
+- Move the v2 patch 6 to patch 9, so AllocationSize verification runs after
+  the zero-write emulation fixes.
+- Extend the v2 patch 9 and move it to patch 8.  It now also handles small
+  mode 0 fallocate ranges past EOF, preserving the intervening hole for the
+  generic/213 case.
+- Update the related commit messages and test notes.
 
-Thus a malformed security descriptor can make num_aces pass the guard
-and drive large temporary ACL state and pointer-array allocations.
+Thanks,
+Huiwen He
 
-Reject DACLs smaller than struct smb_acl before doing the subtraction,
-so the ACE count check cannot be bypassed by the underflow.
+Link to v2:
+https://lore.kernel.org/linux-cifs/20260624021550.1548952-1-huiwen.he@linux.dev
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Signed-off-by: Haofeng Li <lihaofeng@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/smbacl.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Huiwen He (9):
+  smb/client: name the default fallocate mode
+  smb/client: preserve errors from smb2_set_sparse()
+  smb/client: handle smb2_set_sparse() failure in EOF-extending
+    fallocate
+  smb/client: handle smb2_set_sparse() failure in non-extending
+    fallocate
+  smb/client: do not account EOF extension as allocation
+  smb/client: handle overlapping allocated ranges in fallocate
+  smb/client: reduce fallocate zero buffer allocation
+  smb/client: emulate small mode 0 fallocate ranges at or past EOF
+  smb/client: verify allocation after EOF-extending fallocate
 
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 693a550fbe34..b135133c2609 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -374,6 +374,7 @@ static void parse_dacl(struct mnt_idmap *idmap,
- {
- 	int i, ret;
- 	u16 num_aces = 0;
-+	u16 dacl_size;
- 	unsigned int acl_size;
- 	char *acl_base;
- 	struct smb_ace **ppace;
-@@ -403,7 +404,11 @@ static void parse_dacl(struct mnt_idmap *idmap,
- 	if (num_aces <= 0)
- 		return;
- 
--	if (num_aces > (le16_to_cpu(pdacl->size) - sizeof(struct smb_acl)) /
-+	dacl_size = le16_to_cpu(pdacl->size);
-+	if (dacl_size < sizeof(struct smb_acl))
-+		return;
-+
-+	if (num_aces > (dacl_size - sizeof(struct smb_acl)) /
- 			(offsetof(struct smb_ace, sid) +
- 			 offsetof(struct smb_sid, sub_auth) + sizeof(__le16)))
- 		return;
+ fs/smb/client/inode.c     |  13 ++-
+ fs/smb/client/smb2ops.c   | 183 ++++++++++++++++++++++++++++++--------
+ fs/smb/client/smb2pdu.c   |  19 ++++
+ fs/smb/client/smb2proto.h |   3 +
+ fs/smb/common/fscc.h      |   5 ++
+ 5 files changed, 184 insertions(+), 39 deletions(-)
+
 -- 
-2.25.1
+2.43.0
 
