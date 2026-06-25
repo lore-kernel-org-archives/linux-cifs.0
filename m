@@ -1,32 +1,32 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BDA239567
-	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 16:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9DF239567
+	for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 16:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782403381; cv=none; b=H4LX6znK/U33vxI7c4zJWqaDKqP/FnZCQbJy3eXPxaQVjaODqPz0crYS6dlxD9Vno+EmGZ5vUy4LLjXaqG7nerZlOTlW/yOshFNveqrvisVuOVf/MFpNVmy+DeAeuNYew7YyhQxRk8Nu+3RpvSe76TNTXr9qcaEGmulY8JPGa7c=
+	t=1782403394; cv=none; b=iNqjpwECblDHrQ3tZUedKhZF9PlOoLibdJoFCdHBMkhlGKZwUdEDNK0K9xlviyznNFDPoOMuLqWVaTpK661uOb97oRJ1Nof+so6na6Y3w52Q64QCmv+Vtt+ddszvRVw47Z6aby2DlDsk3f7e+owcaCHWgIRQbxysxaGeLH+IQVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782403381; c=relaxed/simple;
-	bh=+fwB87bgUbxzPPi3gSbfKrT6p3J8mzdTpjwLDzLK/vw=;
+	s=arc-20240116; t=1782403394; c=relaxed/simple;
+	bh=qzBwMPm44p6DDVqxxFkLNbZw83Un3dpLJuXaXe+yx74=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l9pQvY+Ap81SfhK+LottFoNTkuGT29Sc0RzIlkN6WOA45f8qUGlOo1N0dgy0y1knY0mW55YtCe0XpDobKyAXTynM2xpfPYVW956gduv7N+UWN5HH103byIKEGc6CZNvesvbfbwUxyf+h4iYFWT/hzXNH6397UUmmWP0BXtmW0aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KlhjqWpW; arc=none smtp.client-ip=91.218.175.174
+	 MIME-Version; b=jwiYGxcGVyGqzqcgXX+K29B8x/VUZsCOxgSZO1qWzsqZMazJ2WSTvxxiknoghUI9ULoMisJXYcHyLTDkyySFxcsse6LXQLculZUs26UV4/JjgPw8uB3Fmc1WfvrMAQvVPtuCFwEtkmqev8PngIYLasKZOeaoQUngkDZAeq+lDus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wh57d0A8; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KlhjqWpW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wh57d0A8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782403377;
+	t=1782403390;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RAwHiMsDQyvZFbk1S36QgC7MRQ2lSi+zjeuA/4JdFNc=;
-	b=KlhjqWpWA6HjxNLaDrfj0a3DcLvt9aG8ZZPxMfcRerAtmfInigfGFKUFwkK2wHJQ2qCPuM
-	xGEz0a600KPwGmL2d8V/B3XZ2B4X+ecs+p0J7KiHpajKD32hDkr62DAIXmXqI96P8VeFne
-	/RjoklAJtAwki/vAwx/MokiyZU1EW7s=
+	bh=idJ2NmcTCdlomdjBjJ+GRirzHI61x8jbPJTkj+VdToM=;
+	b=wh57d0A8OJvHxTPYTTxLAp4tz3mjC7QVg2CS8KAJ+ylT39Ep5AC96GBAUu8ObMktme2eoI
+	QHnX7lX2cIioZrjA6hIKfYLhf98xJ5bIjsu9psV3xSZoUJdzz7rKfRLNWOLlFD5Awin4Wg
+	rPlhG5D/5PV7FHXuWJt/J7sSS/XyELQ=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v3 2/9] smb/client: preserve errors from smb2_set_sparse()
-Date: Fri, 26 Jun 2026 00:01:47 +0800
-Message-ID: <20260625160154.104450-3-huiwen.he@linux.dev>
+Subject: [PATCH v3 3/9] smb/client: handle smb2_set_sparse() failure in EOF-extending fallocate
+Date: Fri, 26 Jun 2026 00:01:48 +0800
+Message-ID: <20260625160154.104450-4-huiwen.he@linux.dev>
 In-Reply-To: <20260625160154.104450-1-huiwen.he@linux.dev>
 References: <20260625160154.104450-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,103 +56,43 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-smb2_set_sparse() converts every FSCTL_SET_SPARSE failure to false and
-marks sparse support as broken for the share. Callers therefore report
-EOPNOTSUPP even for errors such as ENOSPC or EACCES, and later sparse
-operations remain disabled until the share is unmounted.
+An EOF-extending fallocate(mode=0) can return success while the newly
+extended range remains sparse. A later write into that range may
+therefore still fail with ENOSPC despite fallocate having succeeded.
 
-Return the SMB2 ioctl error directly. Set broken_sparse_sup only for
-EOPNOTSUPP, which indicates that the server does not support the request.
+CIFS clears the sparse attribute before extending EOF so that the
+requested range is allocated. However, it ignores failure from
+smb2_set_sparse() and continues to SetEOF.
 
-Update smb3_punch_hole() to propagate the error returned by
-smb2_set_sparse().
+Return the smb2_set_sparse() error without extending EOF. This prevents
+CIFS from reporting successful preallocation when the server rejected
+FSCTL_SET_SPARSE.
 
-Fixes: 3d1a3745d8ca ("Add sparse file support to SMB2/SMB3 mounts")
+Fixes: 8bd0d701445e ("cifs: add support for fallocate mode 0 for non-sparse files")
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ fs/smb/client/smb2ops.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 2964f461fc84..965a4d21dd43 100644
+index 965a4d21dd43..f68c0df1b66e 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -2117,8 +2117,9 @@ smb2_sync_write(const unsigned int xid, struct cifs_fid *pfid,
- }
+@@ -3691,8 +3691,11 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 		if (rc)
+ 			goto out;
  
- /* Set or clear the SPARSE_FILE attribute based on value passed in setsparse */
--static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
--		struct cifsFileInfo *cfile, struct inode *inode, __u8 setsparse)
-+static int smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
-+			   struct cifsFileInfo *cfile, struct inode *inode,
-+			   __u8 setsparse)
- {
- 	struct cifsInodeInfo *cifsi;
- 	int rc;
-@@ -2127,31 +2128,31 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
+-		if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
+-			smb2_set_sparse(xid, tcon, cfile, inode, false);
++		if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) {
++			rc = smb2_set_sparse(xid, tcon, cfile, inode, false);
++			if (rc)
++				goto out;
++		}
  
- 	/* if file already sparse don't bother setting sparse again */
- 	if ((cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) && setsparse)
--		return true; /* already sparse */
-+		return 0; /* already sparse */
- 
- 	if (!(cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE) && !setsparse)
--		return true; /* already not sparse */
-+		return 0; /* already not sparse */
- 
- 	/*
- 	 * Can't check for sparse support on share the usual way via the
- 	 * FS attribute info (FILE_SUPPORTS_SPARSE_FILES) on the share
- 	 * since Samba server doesn't set the flag on the share, yet
- 	 * supports the set sparse FSCTL and returns sparse correctly
--	 * in the file attributes. If we fail setting sparse though we
--	 * mark that server does not support sparse files for this share
--	 * to avoid repeatedly sending the unsupported fsctl to server
--	 * if the file is repeatedly extended.
-+	 * in the file attributes. If the server returns EOPNOTSUPP, mark
-+	 * that sparse files are not supported on this share to avoid
-+	 * repeatedly sending the unsupported FSCTL.
- 	 */
- 	if (tcon->broken_sparse_sup)
--		return false;
-+		return -EOPNOTSUPP;
- 
- 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
- 			cfile->fid.volatile_fid, FSCTL_SET_SPARSE,
- 			&setsparse, 1, CIFSMaxBufSize, NULL, NULL);
- 	if (rc) {
--		tcon->broken_sparse_sup = true;
-+		if (rc == -EOPNOTSUPP)
-+			tcon->broken_sparse_sup = true;
- 		cifs_dbg(FYI, "set sparse rc = %d\n", rc);
--		return false;
-+		return rc;
- 	}
- 
- 	if (setsparse)
-@@ -2159,7 +2160,7 @@ static bool smb2_set_sparse(const unsigned int xid, struct cifs_tcon *tcon,
- 	else
- 		cifsi->cifsAttrs &= (~FILE_ATTRIBUTE_SPARSE_FILE);
- 
--	return true;
-+	return 0;
- }
- 
- static int
-@@ -3483,10 +3484,9 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 
- 	/* Need to make file sparse, if not already, before freeing range. */
- 	/* Consider adding equivalent for compressed since it could also work */
--	if (!smb2_set_sparse(xid, tcon, cfile, inode, set_sparse)) {
--		rc = -EOPNOTSUPP;
-+	rc = smb2_set_sparse(xid, tcon, cfile, inode, set_sparse);
-+	if (rc)
- 		goto out;
--	}
- 
- 	filemap_invalidate_lock(inode->i_mapping);
- 	/*
+ 		new_eof = off + len;
+ 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
 -- 
 2.43.0
 
