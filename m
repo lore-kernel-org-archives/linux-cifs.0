@@ -1,99 +1,59 @@
-Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F25D384CE4;
-	Fri, 26 Jun 2026 04:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BBE3CAA25;
+	Fri, 26 Jun 2026 05:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782446986; cv=none; b=bhiuwaMtOoiyRZ8uAd5gEOe82lkQAySNw8KMH+GA1FPSULHXGCQdh66t1xTcVei99KZSWU8R+s2k9IYMZ/tNm/He/CkhvfZnRXhxZh1yHeDLRT10SEHbILOx3HJuedmeAEs0LyovNHHfzQO2dTy9N4f4qjmEiduYbRCIKwG5eA4=
+	t=1782452977; cv=none; b=RliLwvDmBjl0HCRAqcTfE6Xg2vD5ZkLttw8Nhhlt9TzzY6RrKmVqyUcn+1LVj6nucbSADy9W/nx1ZEZfUxVTtRal6mDpmHTQv+94GZQxfjjpZmEi1I2IT4gXt/0WaNYVSUugwHqTL2p/8twfQRS+i6VlRMQeeXommzCSORmRaJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782446986; c=relaxed/simple;
-	bh=HUHt5Iesxh/HFhTTn6FbEYV3bkOJ6T1dwkhzi+80qfo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IgjBo92bxephcWSYfeQoIuebQjPi58izVmPZCBs7+PCBv0QyeXiM/kEIVnUHc9OuSoWejNR98MDbUdEk2Ois4NityMLW+KlemO8VWIq3hQ8OYVsnfcPmRoLQG2LS26kmYn7182zfzWi/y5zSod/MOcwTQAwZ9uwC/vr9kKMQLLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=eO09I3mE; arc=none smtp.client-ip=101.71.155.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+	s=arc-20240116; t=1782452977; c=relaxed/simple;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rJ14yahKRUrLTZA/B8i28hO9+dkNLXF9l2hdqXuN0e3FaI7G3riJyCEVLySA0FQDbiGUx/PAKU/Tvdb0Qp+qzMZEIJ8qGIIqdLKimZMsdlr/gQkL5lxGCvZ0yYVZWsCGqr4j5g3mfd6XHbHVgT5+2e2QbfhAjEKx3c/hGIlA4+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=yPgc2cGE; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="eO09I3mE"
-Received: from PC-202605011814.localdomain (unknown [58.241.16.34])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 43d830c30;
-	Fri, 26 Jun 2026 12:04:29 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: linkinjeon@kernel.org,
-	smfrench@gmail.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	runyu.xiao@seu.edu.cn,
-	jianhao.xu@seu.edu.cn
-Subject: [PATCH] ksmbd: annotate oplock list traversals under m_lock
-Date: Fri, 26 Jun 2026 12:04:22 +0800
-Message-Id: <20260626040422.1631299-1-runyu.xiao@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="yPgc2cGE"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=yPgc2cGELvOZET5vzxbs6+qnES
+	sVPEnos9GQnDV4B7hMB1IBz3ZR1vHa6tqxXZ1kOEbhx29tiVGhZhe/bznnGOFrJWmCjkuDVYv1Z05
+	C8hTGKc4UWRXp/H9gvTAGDY7Z4wG1dWihWWry3jpamycSDp36H/MhyabPkndxA4ou1+EOCDAOQDTt
+	WLxRmbvNSnAlzbyExD9Ip0FP6F1Lbe359fcOX9iscgZFVmFCC8Qml59r1j5Yxmjo1vv+wcGRh0aNZ
+	Lii5Y7jRdCH5dB1UYPycGBqgB5lZBaO+M9RCqzMVvEqnEngSKgYUkc0AA+19sJ93sbloUoNOs9eAy
+	K2PJGidA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wczRR-0000000AXpI-2Kgp;
+	Fri, 26 Jun 2026 05:49:29 +0000
+Date: Thu, 25 Jun 2026 22:49:29 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+	Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>, Mike Marshall <hubcap@omnibond.com>
+Subject: Re: [PATCH v3 05/15] iov_iter: Fix potential underflow in
+ iov_iter_extract_xarray_pages()
+Message-ID: <aj4S6Xyep3JIzokh@infradead.org>
+References: <20260625140640.3116900-1-dhowells@redhat.com>
+ <20260625140640.3116900-6-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9f0219bc7c03a1kunm53b858b687add
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaQk9DVkwdQxlPTk4aGE5PS1YeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUpLSEpPSE
-	xVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=eO09I3mEy5jx/B2d6T4RA6a2YX2Kh/BEGVvLqDjjhB/vBiendalV2jDmoWgYsiZ5B6aHYzFgP98Fk9oukVRgWNGbzWa5BWYsH7lrFDe5qMPgPNx4FH2GlPiPgKn2Ho/URTwMlFgYJn/68VhH3JK1zXqSBx8ERqkboz13Ninb0tU=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=fbK+6HOOWnvbu6Jhjhe2/Ulut57sxvDmrIXMTyCLZjY=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260625140640.3116900-6-dhowells@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-session_fd_check() and ksmbd_reopen_durable_fd() walk ci->m_op_list with
-list_for_each_entry_rcu() while holding ci->m_lock for write. That is
-the local inode/oplock serializer, but the RCU-list iterator does not
-currently tell lockdep about it.
+Looks good:
 
-Pass lockdep_is_held(&ci->m_lock) to these iterators so
-CONFIG_PROVE_RCU_LIST can see the rwsem protection already in place.
-
-This was found by our static analysis tool and then manually reviewed
-against the current tree. The dynamic triage evidence is a
-target-matched CONFIG_PROVE_RCU_LIST warning; the change is limited
-to documenting the existing protection contract.
-
-This is a lockdep annotation cleanup. It does not change oplock list
-lifetime or durable-handle behavior.
-
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
----
- fs/smb/server/vfs_cache.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 6ef116585af6..a3c0bb2a5279 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -909,7 +909,8 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 	conn = fp->conn;
- 	ci = fp->f_ci;
- 	down_write(&ci->m_lock);
--	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
-+	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry,
-+				lockdep_is_held(&ci->m_lock)) {
- 		if (op->conn != conn)
- 			continue;
- 		if (op->conn && atomic_dec_and_test(&op->conn->refcnt))
-@@ -1012,7 +1013,8 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
- 
- 	ci = fp->f_ci;
- 	down_write(&ci->m_lock);
--	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry) {
-+	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry,
-+				lockdep_is_held(&ci->m_lock)) {
- 		if (op->conn)
- 			continue;
- 		op->conn = fp->conn;
--- 
-2.34.1
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
