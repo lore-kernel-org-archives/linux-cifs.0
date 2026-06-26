@@ -1,90 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211BDF507
-	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 00:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748EB219E8
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 00:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782432843; cv=none; b=E/6GMqquw0I59MoGBsvBkpz6laZQ79YsG0LQM8NSq5wDq+XsjGAbOHBrO51JoZjINHF3NR9bpNZyCCQCjn1/rfo27Rm6wOgIO76iL6zM7FH8C2L8D2QDkcLtcTjiGXPvhlprRhRNHI2anf3J0o0vZL0ts8bUqNtcPlxU9V1421A=
+	t=1782435180; cv=none; b=JaGxb9pkowA41Ns+rkJSCYpOBahD8BaoLF6H9rrpNgenYgfPL8iy5KQ91j9gxB14wHyU3RYs3kL0jISyo52fSnDd7Fq6d6RR0KQE6tD6phEldM/DE/3w22131FO6Awv16Z+igc6To5buhMlK4ZjCHirOOVq/V87Glv/irirxeoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782432843; c=relaxed/simple;
-	bh=bGZc9yhechKjQxzvTbpc5XYaqDUvlU16B09qTzti6bM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dIfxCO8r3DK42A4QXPAm3CgLDf6uVJBd4RTeAfVIl+io3Aw3K/8ch+oe82FHWJJAgA66Cqozna93n1ujNVmTQtOm3oMIM2YyEchHx4mpITAtBvG6KgE4kRa/O1081Lqpa4wZvSXd5AWCCrW4r881OY0gUnvHNOd5XY01jGh996o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYd0uQfg; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYd0uQfg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB7781F00ACF
-	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 00:14:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782432841;
-	bh=pAe5Jj84EHdc67x2lt2zecXJbQGLOhgKFxKmip6oMKo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=mYd0uQfgoh4zi7iqCF5SxgapoEiqX677WQmtBhYk9tre1ZlupILwXvKjH/E0WETrX
-	 h+PGAp72SffkrstL7KNpTAWvL0a7OEBgWzIWQUQO1ye2TRU+VMfSyS2WaILHeEZkIQ
-	 ZYBn3QrJsqiUQ7rMkFCWlXnK4wohm8AclxiBTItlNVZODcNg9EHwmOHXoMk4K99JeH
-	 k2B2Xl9U89mni+QNnuGh7eJ+0c31Gl/BS0gV/ZQJxMtbdWRw0fvVoIVSuNem3lldAP
-	 tkexYkld/CvAyWGLZ4JDBLi9vZhjWTe/7gWZdUCnthycQ/AABj0Ic2tKiWOmMkxZNQ
-	 h3o3Kvmvg1B7g==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-697bd41a4ecso424912a12.2
-        for <linux-cifs@vger.kernel.org>; Thu, 25 Jun 2026 17:14:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpTeGmec1migr0ZHo6kRa4pVB5m+j8xnNBPTVcMMXZoXvj1IKDP7ALUYGNuuDL0SBq7wvYqABQndYqy@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuAiurbIjrEMbC5mZKUplMjgdKHyxeCfF/LcnJhlb5/Clm3cnV
-	Prc+XpsYa5kHYLAqt6AdrijLY7y2iCD8m9HIucBAMIG4CA+multpobKMrbMSmtBCG7qsxD6JwxD
-	rvs5wxyzdtR+HiRtmeL5k05vGPLpfOiA=
-X-Received: by 2002:a17:906:6206:b0:c12:db:3062 with SMTP id
- a640c23a62f3a-c1205f15deamr320398366b.35.1782432840299; Thu, 25 Jun 2026
- 17:14:00 -0700 (PDT)
+	s=arc-20240116; t=1782435180; c=relaxed/simple;
+	bh=8tg6y+X8NVm6inppC7TkfCSZ8/ND25Khpw+71PNAXSw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EcMBrerQL7h8/13jq6rSgUwMbhoylaXhp+iuTf6VcobagXJlgkQ8wy7hL7dJ78JQbY3UyMAWgtBI9fZXYDEimZx95/bsS9wVGtjNq9KjjOwbp0zZOgCGcpurbZJ0kWPMmlMwvdf/X2DQBLDCxhkR6YwnqKo4vgnJmcEUPteZaiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 5c6979e070f911f1aa26b74ffac11d73-20260626
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	DN_TRUSTED, SRC_TRUSTED, SA_UNTRUSTED, SA_UNFAMILIAR, SN_TRUSTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD
+	CIE_GOOD_SPF, GTI_FG_BS, GTI_FG_IT, GTI_RG_INFO, GTI_C_BU
+	AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:20483105-5980-462d-94fe-7bcb1f409fbe,IP:5,U
+	RL:0,TC:0,Content:0,EDM:-20,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-15
+X-CID-INFO: VERSION:1.3.12,REQID:20483105-5980-462d-94fe-7bcb1f409fbe,IP:5,URL
+	:0,TC:0,Content:0,EDM:-20,RT:0,SF:0,FILE:0,BULK:0,RULE:EDM_GE969F26,ACTION
+	:release,TS:-15
+X-CID-META: VersionHash:e7bac3a,CLOUDID:3e3538ca53c71e81ce3743315d6ef9cf,BulkI
+	D:260626085253M1NTGV0W,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|865
+	|898,TC:nil,Content:0|15|50,EDM:1,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:nil,
+	QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+	,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_AEC,TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 5c6979e070f911f1aa26b74ffac11d73-20260626
+X-User: lihaofeng@kylinos.cn
+Received: from workspace-fedora [(216.195.204.48)] by mailgw.kylinos.cn
+	(envelope-from <lihaofeng@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1190606433; Fri, 26 Jun 2026 08:52:52 +0800
+From: Haofeng Li <lihaofeng@kylinos.cn>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	chenxiaosong@chenxiaosong.com,
+	Haofeng Li <lihaofeng@kylinos.cn>
+Subject: [PATCH v3 0/1] ksmbd: harden DACL/ACE parsing against malformed SDs
+Date: Fri, 26 Jun 2026 00:52:16 +0000
+Message-ID: <20260626005217.524940-1-lihaofeng@kylinos.cn>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260625144021.513613-1-lihaofeng@kylinos.cn> <20260625144807.513701-1-lihaofeng@kylinos.cn>
-In-Reply-To: <20260625144807.513701-1-lihaofeng@kylinos.cn>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 26 Jun 2026 09:13:47 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9bagjfPZJqsMf7ru_hEHV8EALFDP18_OpP-_iV=OMwXw@mail.gmail.com>
-X-Gm-Features: AVVi8CebRZm5csO0yjRhdLzSyh3LwaAgdEYFuAtDQGminTB_f7I1xQwKLbTlhHQ
-Message-ID: <CAKYAXd9bagjfPZJqsMf7ru_hEHV8EALFDP18_OpP-_iV=OMwXw@mail.gmail.com>
-Subject: Re: [PATCH v2 resend 1/2] ksmbd: validate num_subauth when copying
- ACE in set_ntacl_dacl
-To: Haofeng Li <lihaofeng@kylinos.cn>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	linux-cifs@vger.kernel.org, chenxiaosong@chenxiaosong.com, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-> index 340ea98fa494..693a550fbe34 100644
-> --- a/fs/smb/server/smbacl.c
-> +++ b/fs/smb/server/smbacl.c
-> @@ -740,9 +740,14 @@ static void set_ntacl_dacl(struct mnt_idmap *idmap,
->                         if (nt_ace_size > aces_size)
->                                 break;
->
-> +                       if (ntace->sid.num_subauth == 0 ||
-> +                           ntace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES)
-> +                               goto next;
-> +
->                         memcpy((char *)pndace + size, ntace, nt_ace_size);
->                         if (check_add_overflow(size, nt_ace_size, &size))
->                                 break;
-> +next:
->                         aces_size -= nt_ace_size;
->                         ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
->                         num_aces++;
-This uses goto next after skipping a malformed ACE, which causes
-num_aces to be incremented even for invalid ACEs.
+Changes since v2: move `num_aces++` to before `next_ace` label.
 
-                        if (check_add_overflow(size, nt_ace_size, &size))
-                                break;
+The following patches from v2 have already been merged into ksmbd.git ksmbd-for-next-next:
+  - ksmbd: reject undersized DACLs before parsing ACEs
 
-+                        num_aces++;
+v2: https://lore.kernel.org/linux-cifs/20260625144021.513613-1-lihaofeng@kylinos.cn/
 
-+ next_ace:
-                        aces_size -= nt_ace_size;
-                        ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
+Two ksmbd paths trusted attacker-controlled fields from a stored security
+descriptor and lacked the validation their sibling functions already
+enforce. Both are reachable by an authenticated client via SMB2_SET_INFO /
+SMB2_QUERY_INFO and both are fixed by adding the same gate the surrounding
+code uses. The patches are independent and can be applied in either order
+
+Patch 1 rejects DACLs smaller than struct smb_acl before a size subtraction
+that underflows (sizeof() is unsigned), which otherwise let a malformed SD
+bypass the ACE-count guard and drive oversized allocations.
+
+Patch 2 validates sid.num_subauth in set_ntacl_dacl() before copying each
+ACE verbatim into the response DACL, the lone path missing the check that
+parse_dacl(), parse_sid() and smb_copy_sid() already perform. A crafted
+num_subauth otherwise drove an out-of-bounds heap read in
+set_posix_acl_entries_dacl().
+
+Haofeng Li (1):
+  ksmbd: validate num_subauth when copying ACE in set_ntacl_dacl
+
+ fs/smb/server/smbacl.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+-- 
+2.54.0
+
