@@ -1,60 +1,94 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A8F3CCFD2;
-	Fri, 26 Jun 2026 05:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B854B3F789C
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 13:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782453092; cv=none; b=W5ruqo2fjYO0JaWMZMoa18l2jwioTHnS66pneMS2FigzNcNMDSiCAjIFBnD4NeSt+N/e7ZYl6oKENkSr/j6zwZDyEKFKiUU/PRF0JxL2dmLfoWvjWBRZmvVTboTFVON4Em8UGmTah04nF63SZRUQtC0+rsGq+nEmLMOAK8yXdx4=
+	t=1782481659; cv=none; b=uW/3i9PaFiUb61v/1IamiZ3R+/2shZuQ1xw3FZdcq1FQ1X72BCCSXZdLjNVw8e/kwJihLbN7RflV3jy7S1QJQUgFkGW842uirh+/ayLXxmljPrKo/hpQuicH+8PzTxVJjWB9C5sCq4z/4TrSjW1ngJnqRIg9QlXgF5/4YX2qnD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782453092; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YNAuzVAaTthP665NnkHBP91Y9xXIyjOwpbl0fAZadjaxdRTRoRnwX9yTrlLFG9JXsgdlx1KcX4MkdHW3BBVvFJK0D61cwQwfaMLkLjk3lTMyoFasq8wrZkSnCi2HO9LRGemH/3MLPVsFF0vUbAtTv3ilUBheJfxwGIwh/Vlfi1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=0ZHC0+B+; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1782481659; c=relaxed/simple;
+	bh=xOd6XGG0GSuhtT3QA0Q0pb5X7+QHNMDmOY2ZXT3JGA0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZKxB73k/pG3OkoRPcDz0RK4SsoIrPMiKtwnXf7LQvNwNkNR4tK4J+lxh06NI5zpaDW/XXRhbFK+WSwhF/MjZJ0WpNproDfJrGNfG8vQRI1AMRH7vic7cD2OmVn15G++ypdh8IwGHyaJBiewg0menjuUtomSSuS7AUE+KsIiQzas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kDR3B0cw; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="0ZHC0+B+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=0ZHC0+B+lPjN88YhavswidF6bT
-	NIyI6YBd0C1pRtoNxaGgbOTNnMdVPVvsjikn5dyUz5ADCOjsyCgErIa8W9B5tEp3hpnxgb7Ye/LDl
-	K/OLAJF0rsgFwJ8zN3sUUGIvrf5DxrfQw2kkaXyXSnjy+IXOiXuv3jtt7iW/uGzXb1IiUcF6lpfR2
-	qIEc80y4LyEbgA+ya+/tyZy737Fswi4puDqlGS5ABNtyoi4K6xfBnmUwH6PFQWe1xLAvUqYSMFnAo
-	G7xbAGpXjZcqQ0hmO5oa9lVAqv/wPbius4fFkRwRNKNM6U+lMSANrld8fWdIQsaZaroMRlEv5DPBc
-	PXixwTpw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1wczTN-0000000AYFs-11kz;
-	Fri, 26 Jun 2026 05:51:29 +0000
-Date: Thu, 25 Jun 2026 22:51:29 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>, Mike Marshall <hubcap@omnibond.com>
-Subject: Re: [PATCH v3 09/15] scatterlist: Fix offset in folio calc in
- extract_xarray_to_sg()
-Message-ID: <aj4TYWMW2axUtruM@infradead.org>
-References: <20260625140640.3116900-1-dhowells@redhat.com>
- <20260625140640.3116900-10-dhowells@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kDR3B0cw"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782481654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GOXJq5ca2JtccaGFTmNf9vWsMI+n/MB4tpcE472MO7o=;
+	b=kDR3B0cwUSYLWEAANg6eFsDTjG5txD71w6idq8KX0otqSEf96W9+TsuSU6s9K8N85d51Us
+	7ylsPLFQedLeHsT12u3r/1xaA9yd+wJ9mm4+ME+jRLtC00oFFNiUY2J5wuoPWH932VMz8j
+	t+N6Fw9a7Q8KSS3nX7V3mAjRRnAGFiY=
+From: Huiwen He <huiwen.he@linux.dev>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org,
+	chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org
+Subject: [PATCH v4 0/7] smb/client: fix fallocate and allocation accounting
+Date: Fri, 26 Jun 2026 21:47:12 +0800
+Message-ID: <20260626134719.158270-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260625140640.3116900-10-dhowells@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Looks good:
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Changes in v4:
+
+- Add new patch 1 to refresh i_blocks after successful duplicate-extents.
+  This fixes stale st_blocks after reflink and avoids the generic/370
+  swapon hole-check regression.
+
+The following patches from v2 have already been merged into cifs-2.6.git for-next:
+  - smb/client: do not account EOF extension as allocation
+  - smb/client: preserve errors from smb2_set_sparse()
+  - smb/client: name the default fallocate mode
+
+Link to v3:
+https://lore.kernel.org/linux-cifs/20260625160154.104450-1-huiwen.he@linux.dev
+
+Link to v2:
+https://lore.kernel.org/linux-cifs/20260624021550.1548952-1-huiwen.he@linux.dev
+
+Thanks,
+Huiwen
+
+Huiwen He (7):
+  smb/client: refresh allocation size after duplicate extents
+  smb/client: handle smb2_set_sparse() failure in EOF-extending
+    fallocate
+  smb/client: handle smb2_set_sparse() failure in non-extending
+    fallocate
+  smb/client: handle overlapping allocated ranges in fallocate
+  smb/client: reduce fallocate zero buffer allocation
+  smb/client: emulate small mode 0 fallocate ranges at or past EOF
+  smb/client: verify allocation after EOF-extending fallocate
+
+ fs/smb/client/smb2ops.c   | 169 +++++++++++++++++++++++++++++++++-----
+ fs/smb/client/smb2pdu.c   |  19 +++++
+ fs/smb/client/smb2proto.h |   3 +
+ fs/smb/common/fscc.h      |   5 ++
+ 4 files changed, 175 insertions(+), 21 deletions(-)
+
+-- 
+2.43.0
 
