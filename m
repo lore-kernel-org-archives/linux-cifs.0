@@ -1,223 +1,229 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E1D303CAE
-	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 18:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B003403EC
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 19:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782497568; cv=none; b=rURoaJZqaz7B6f1U9gevmKZF4cvioSKZzpvhgLH5HKfoqx54WoF1ahTBmsRV0v8aKQetnPRnu5aWXSHUtBOY6kGGNeeLB//PeUAQLafdaGzqU4lYaUiOd9MGmyu0jGJq3O64g+v56TiPVsmhLHTRtqxQmfmeP3wiASKbgC2AtdU=
+	t=1782503664; cv=none; b=nIFoa/9CxJGpP+XCxQ3za9Wd+/fdNln4jXpGNTVEdp9EI6nSAAwdZOdxORk4FqEGP4pU5pgS+kjta5spNzotYEwGXe7RT2nMq4ML8mPzlT4x4p0biULKzvxRLuLbBL25lT/1r+avi/gcH/s/Op72bQ7uMf1ksgeMFc0M4es8KCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782497568; c=relaxed/simple;
-	bh=GpHTuQRg/23oIwmAImZBsyEhUmSG/ufnyoSkU20rDRc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=eYZ+OfJ5q+YJvYohthMVTdsylAzYFsrCLLmXttv4GVyV/0LiQnK2lfLCcrmo/x876kQLKtCZ29tMDmge1ySACc/6NBUFlRG/6re4oXPQ0ZEAoDaUcNa+oN9BWU2qvJG+fgRwe8k+d+D/AibQ3Uvu9ZPhryouXGVPoovkMUNRDbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Y6Ul2fRw; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1782503664; c=relaxed/simple;
+	bh=Sy2AF2pmJueWdj4nR9iRVBEq+FcxtPAK6dR1VFaTM6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lhh+SAsPaqXF7S9SbGWrXwYy1OV1jEnNaYMGGJjRNmZHrDAX+HuBLph4QJC9mWd/8D6I3gUIq7UbZBpU1GQXKmAOP/CGjSnVSVqXG7r0Avb5bvFyfyq9+8+e5eBSITrDJIeA6ZDQuUM17RZQeRfwq6Y4dG+QQc2MQRvjniuQhTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tzZUIK+8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nec67Lev; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tzZUIK+8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=nec67Lev; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Y6Ul2fRw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=GpHTuQRg/23oIwmAImZBsyEhUmSG/ufnyoSkU20rDRc=; b=Y6Ul2fRw+Qqrvp54DJI+Fupv2b
-	NKws5TqOI/DEnMkbq9SE06GJ53CWDtslLXr6o5S9fb2p/p3BiQatAdLL0Ql/we+Z/ukgUgIgbqvAW
-	1TFgt78yd18HWML6Sjq0TAUYG1cNPbkOziWkngh8lSaC43K5EV0yThXCuCqcmJX2ku6ijBmgnriRL
-	u4TKInUKLWsL4M52/+fylYfcpLuMyNrbgd+WOeWB/+0kqMxCTXQrI0JMCEVvhZXS4lxe5OFnXdXXv
-	KydwttwvqWX6Oo1wqNzM17BwDl0M4SOVq1unDzSdnj98V3QRr5AOVD/nYK2dHoH19xMhkzrnuLFf8
-	DPz3wFBW8Ft9EM5wcYk8rfVlIr0s1XDehzZMXlkinTgyS5lzz45yXuFrrVvjUkHUwfXk0bURHNJeW
-	HjSU4vAtIbknk3NiUTpKqqLscyBA/IMwx/UxWTp8gkhtf023KzVqVUPOuTG2SZi9GjQyzTTvxNP6S
-	12joBoF6owace+SW0oXHyGdu;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wdB2i-000000001iy-27wK;
-	Fri, 26 Jun 2026 18:12:44 +0000
-Message-ID: <077744e0-ffa3-4ab6-90cc-855fc7adbba3@samba.org>
-Date: Fri, 26 Jun 2026 20:12:43 +0200
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tzZUIK+8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nec67Lev";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tzZUIK+8";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="nec67Lev"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 57B337011A;
+	Fri, 26 Jun 2026 19:54:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1782503661; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AhwRsHZ1bbPdY2NsUegSNNtydbBFnq8I9tpd+1G17SM=;
+	b=tzZUIK+8hCSnVFXAQGcDuzzHpfOe5r+bjaZsLhXMdCz+ImmNIBsyS/S5GWtyEqiUqmRLNq
+	qzMOcteZKvbFCl1yPOb1K3g2iCeCSeiju4GaymL37k4HIhdg2vJ+snZ9fGJaClJTs1tZ7C
+	fx9WIk9qHRjtszvxLi+iVHKWAWkaZMk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1782503661;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AhwRsHZ1bbPdY2NsUegSNNtydbBFnq8I9tpd+1G17SM=;
+	b=nec67LevRUCpTIddtqVVI1d+JMd4r0Vt48SG1lfy7PZqiVs/Ucv1ZwgdrfJf556CbYsLPF
+	/+zyrnohRI65RKAw==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1782503661; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AhwRsHZ1bbPdY2NsUegSNNtydbBFnq8I9tpd+1G17SM=;
+	b=tzZUIK+8hCSnVFXAQGcDuzzHpfOe5r+bjaZsLhXMdCz+ImmNIBsyS/S5GWtyEqiUqmRLNq
+	qzMOcteZKvbFCl1yPOb1K3g2iCeCSeiju4GaymL37k4HIhdg2vJ+snZ9fGJaClJTs1tZ7C
+	fx9WIk9qHRjtszvxLi+iVHKWAWkaZMk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1782503661;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AhwRsHZ1bbPdY2NsUegSNNtydbBFnq8I9tpd+1G17SM=;
+	b=nec67LevRUCpTIddtqVVI1d+JMd4r0Vt48SG1lfy7PZqiVs/Ucv1ZwgdrfJf556CbYsLPF
+	/+zyrnohRI65RKAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D51F3779A8;
+	Fri, 26 Jun 2026 19:54:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id i3FfJuzYPmrlHQAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Fri, 26 Jun 2026 19:54:20 +0000
+Date: Fri, 26 Jun 2026 16:54:14 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Henrique Carvalho <henrique.carvalho@suse.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-cifs@vger.kernel.org
+Subject: Re: [RFC PATCH for-next] smb: client: parallelize multichannel write
+ issue
+Message-ID: <aj7NFpbFWdE1d0UC@suse.de>
+References: <20260626161953.593789-1-henrique.carvalho@suse.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: BUG: SMB3.11 POSIX extensions: Absolute symlinks lose leading
- slash on creation
-From: Ralph Boehme <slow@samba.org>
-To: Max-Ulrich Farber <m.u.farber@freenet.de>, linux-cifs@vger.kernel.org
-Cc: sfrench@samba.org, Jeremy Allison <jra@samba.org>
-References: <4a88b87d-c38d-4248-a3c3-59dd8c1f5095@freenet.de>
- <33ca19f8-6c6e-4738-bfab-25e70f77dcf3@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
- eZWlARe4Ihmry9XV67v/DUa3qXYihV62jmiTgCyEu1HFGhWGzkk99Vahq/2kVgN4vwz8zep1
- uvTAx4sgouL2Ri4HqeOdGveTQKQY4oOnWpEhXZ2qeCAc3fTHEB1FmRrZJp7A7y0C8/NEXnxT
- vfCZc7jsbanZAAUpQCGve+ilqn3px5Xo+1HZPnmfOrDODGo0qS/eJFnZ3aEy9y906I60fW27
- W+y++xX/8a1w76mi1nRGYQX7e8oAWshijPiM0X8hQNs91EW1TvUjvI7SiELEui0/OX/3cvR8
- kEEAmGlths99W+jigK15KbeWOO3OJdyCfY/Rimse4rJfVe41BdEF3J0z6YzaFQoJORXm0M8y
- O5OxpAZFYuhywfx8eCf4Cgzir7jFOKaDaRaFwlVRIOJwXlvidDuiKBfCcMzVafxn5wTyt/qy
- gcmvaHH/2qerqhfMI09kus0NfudYnbSjtpNcskecwJNEpo8BG9HVgwF9H/hiI9oh2BGBng7f
- bcz9sx2tGtQJpxKoBN91zuH0fWj7HYBX6FLnnD+m4ve2Avrg/H0Mk6pnvuTj5FxW5oqz9Dk1
- 1HDrco3/+4hFVaCJezv8THsyU7MLc8V2WmZGYiaRanbEb2CoSQARAQABzR1SYWxwaCBCw7Zo
- bWUgPHNsb3dAc2FtYmEub3JnPsLBlwQTAQgAQQIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIX
- gAIZARYhBPrixgiKJCUgUcVZ5Koem3EmOZ5GBQJo+I8JBQkYXvllAAoJEKoem3EmOZ5GdQoP
- /2BPMBZZCddHoXlJu++OPOf9Rk6TuYN3Pntq2LfhPsFEdNHrMCV0KSNY993cQBRFrn6HbvLD
- NazKxDR9U1kSAXoopKyk2M3qpJ6kRvekqriCY04sOZ/iHk75Vmn5bp/Q3/9f3+40ZC4e0hF1
- XNMLyunGtCoxOWfDViax+qemDVwJvamMNx7kQXYe5SMtH7Gpi2DiGAq41g+93xKj/pS9WEo3
- 5+d5zm2KEofaBQU4iecWA3H8U2OIh3kFJeiV4HDfVxkP5INcPNyP+bckpei4Nd3BczKN6I1q
- dAjdn/wmwGAlGpnSjjrYYKFKO3lHbBwm95Lv2rlpzqiBfIizXn656LsG0PQIslO6e5u9wwiR
- JOMlYBPmE/PwUPJkTiBSup8j1hFmyTqXYMzAjxGJ+MBkJ+QYCRSP8uMRvgiLY5+1h/C3dJBh
- lvRUW97qC/g+nji3CRXJRKHrmxmEy1E7u1HCZsrLhGCIKZqTZxdu3vEsFh/pd9XE9OoXlC9y
- x61umA92rIgOYU93/d4emsAIjvtxDmx/h2kuj5D1moFkAyLp2wnKPLJGeyXQc2WSbBJHlc4k
- iDPAFVWj0a8SlTagXtnmIQ+jG6QLvGdIbotpxnfrXTRKOqxDU5Fb9t40zNA4AnRjV/wYtvm7
- ps1qn9AfKACW6GcCX1jkLJQtLNXfi0WBIXixzsFNBFRbb/sBEADCSnUsQShBPcAPJQH9DMQN
- nCO3tUZ32mx32S/WD5ykiVpeIxpEa2X/QpS8d5c8OUh5ALB4uTUgrQqczXhWUwGHPAV2PW0s
- /S4NUXsCs/Mdry2ANNk/mfSMtQMr6j2ptg/Mb79FZAqSeNbS81KcfsWPwhALgeImYUw3JoyY
- g1KWgROltG+LC32vnDDTotcU8yekg4bKZ3lekVODxk0doZl8mFvDTAiHFK9O5Y1azeJaSMFk
- NE/BNHsI/deDzGkiV9HhRwge7/e4l4uJI0dPtLpGNELPq7fty97OvjxUc9dRfQDQ9CUBzovg
- 3rprpuxVNRktSpKAdaZzbTPLj8IcyKoFLQ+MqdaI7oak2Wr5dTCXldbByB0i4UweEyFs32WP
- NkJoGWq2P8zH9aKmc2wE7CHz7RyR7hE9m7NeGrUyqNKA8QpCEhoXHZvaJ6ko2aaTu1ej8KCs
- yR5xVsvRk90YzKiy+QAQKMg5JuJe92r7/uoRP/xT8yHDrgXLd2cDjeNeR5RLYi1/IrnqXuDi
- UPCs9/E7iTNyh3P0wh43jby8pJEUC5I3w200Do5cdQ4VGad7XeQBc3pEUmFc6FgwF7SVakJZ
- TvxkeL5FcE1On82rJqK6eSOIkV45pxTMvEuNyX8gs01A4BuReF06obg40o5P7bovlsog6NqZ
- oD+JDJWM0kdYZQARAQABwsGQBBgBCAAmAhsMFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmj4
- jwkFCRhe+WUAHgkQqh6bcSY5nkYJEKoem3EmOZ5GCRCqHptxJjmeRq7xEADDqdSBTnLC68Vr
- tq6Qum4LjdXmfsZjVr/JSgUCe89jrOaofycpddHBMP9ORk1UzPLJSZbO5N7gvwJTDK+ZBxtB
- 9yP5DtIhgzJZamb6m8h3cthyn/8RG3h+Fk5pXq6wtH12ZerHJ8XVNd0CCH2GxF8oVB3csGWh
- nrBt8maGYk7x0/wZK2ErylsohEiSCAA9aPJyhM5kafnk/6ov5bbc5bxqbnaI+jpwzZXeGT/v
- ACyWKv6cAmWepuexlQVsH/s9JchzVgasD7YWwGHszZwyMqLZi7XeOTz0pg0JKFGLlfsNYSpc
- LVhBztTc9vg5Uf/lFhObHkhXv/7ootSNOtll98/2Bk1qLW9rKQsnc5IR01AuNGCJNDuaBNfX
- IHd7AHUW6xUVUWOCBtyMCCyOdbOiDFlMzF8GvR4kCUuRh66CUvl+EYCUOnwr551f6rq4sJga
- Wqn2Ta8+lozMNjMkqri6QV7fyJQCryCv2/cI0q5IVUTPIzB0xfFCkgOX4vz8Te7ou7bkS5L2
- PgCGx2XZ0ICO1zdh1OafQXZcI0ZKA/+ZmMt7rFcf8cdjwJ3qRKtScUYhxq2N9wL3fQJNQPvK
- TXc80T2QVqV/yS3gZ4UmqYaBcMIoAyQWu8vbJnt6vCnf33g5sko3H8vbfpFW2TgesM6tyK1W
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <33ca19f8-6c6e-4738-bfab-25e70f77dcf3@samba.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------jLtYZkBNkNvUYVD8B43orLHj"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20260626161953.593789-1-henrique.carvalho@suse.com>
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_CC(0.00)[samba.org,manguebit.org,gmail.com,microsoft.com,talpey.com,vger.kernel.org];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	MISSING_XM_UA(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Level: 
+X-Spam-Score: -4.30
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------jLtYZkBNkNvUYVD8B43orLHj
-Content-Type: multipart/mixed; boundary="------------TxSVewjTA8LPV6ikHHbIYGJy";
- protected-headers="v1"
-Message-ID: <077744e0-ffa3-4ab6-90cc-855fc7adbba3@samba.org>
-Date: Fri, 26 Jun 2026 20:12:43 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: BUG: SMB3.11 POSIX extensions: Absolute symlinks lose leading
- slash on creation
-From: Ralph Boehme <slow@samba.org>
-To: Max-Ulrich Farber <m.u.farber@freenet.de>, linux-cifs@vger.kernel.org
-Cc: sfrench@samba.org, Jeremy Allison <jra@samba.org>
-References: <4a88b87d-c38d-4248-a3c3-59dd8c1f5095@freenet.de>
- <33ca19f8-6c6e-4738-bfab-25e70f77dcf3@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <33ca19f8-6c6e-4738-bfab-25e70f77dcf3@samba.org>
-Autocrypt-Gossip: addr=jra@samba.org; keydata=
- xsDiBDxEcLsRBADMQzpWoVuu4oiq23q5AfZDbakENMP/8ZU+AnzqzGr70lIEJb2jfcudViUT
- 97+RmXptlnDmE4/ILOf6w0udMlQ9Jpm+iqxbr35D/6qvFgrgE+PnNAPlKSlI2fyGuLhpv1QP
- forHV13gB3B6S/ZWHpf/owKnJMwu8ozQpjnMnqOiVwCg8QnSX2AFCMd3HLQsqVaMdlO+jBEE
- AKrMu2Pavmyc/eoNfrjgeRoNRkwHCINWO5u93o92dngWK/hN1QOOCQfAzqZ1JwS5Q+E2gGug
- 4OVaZI1vZGsAzb06TSnS4fmrOfwHqltSDsCHhwd+pyWkIvi96Swx00e1NEwNExEBo5NrGunf
- fONGlfRc+WhMLIk0u2e2V14R+ebDA/42T+cQZtUR6EdBReHVpmckQXXcE8cIqsu6UpZCsdEP
- N6YjxQKgTKWQWoxE2k4lYl9KsDK1BaF6rLNz/yt2RAVb1qZVaOqpITZWwzykzH60dMaX/G1S
- GWuN28by9ghI2LIsxcXHiDhG2CZxyfogBDDXoTPXlVMdk55IwAJny8Wj4s0eSmVyZW15IEFs
- bGlzb24gPGpyYUBzYW1iYS5vcmc+wlcEExECABcFAjxEcLsFCwcKAwQDFQMCAxYCAQIXgAAK
- CRCl3XhJ1sA2rDHZAKDwxfxpGuCOAuDHaN3ULDrIzKw9DQCdHb3Sq5WKfeqeaY2ZKXT3AmXl
- Fq7OwE0EPERwvhAEAIY1K5TICtxmFOeoRMW39jtF8DNSXl/se6HBe3Wy5Cz43lMZ6NvjDATa
- 1w3JlkmjUyIDP29ApqmMu78Tv4UUxAh1PhyTttX1/aorTlIdVYFjey/yW4mSDXUBhPvMpq52
- TncLRmK9HC6mIxJqS0vi6W9IqGOqDRZph3GzVzJN7WvLAAMGA/sGAyg2rVsBzs77WH0jPO+A
- QZDj+Hf/RFHOwmcyG7/XgmV6LOcQP4HfQHH3DGYihu5cZj3BeWKPDJnjOjB2qmr+FTjYEsjw
- LDBNG7rjRye412rUbNwmEtcD2/dw4xNyu5h2u+1++KVBPf4SqG/a10gDqGJXDHA1Os5MmnQl
- 3CTq9sJGBBgRAgAGBQI8RHC+AAoJEKXdeEnWwDasbeIAoL6+EsZKAYrZ2w22A6V67tRNGOIe
- AJ0cV9+pk/vqEgbv8ipKU4iniZclhg==
+On 06/26, Henrique Carvalho wrote:
+>I'm sending this as an RFC PATCH first so the approach and results can
+>be sanity checked more broadly.
+>
+>The netfs writeback path issues write subrequests through the filesystem
+>issue_write() callback. For multichannel, those subrequests may target
+>different channels, but the issue callback is still entered serially by
+>the netfs issuing context.
+>
+>As a result, while one channel is running the write issue path, write
+>subrequests for other channels may be left waiting to be issued. This
+>can limit multichannel writeback throughput because the channels are not
+>kept busy independently.
+>
+>For multichannel sessions, queue the existing write issue path to a
+>workqueue. This lets the netfs issuing context return quickly and
+>continue issuing subsequent write subrequests for other channels.
+>Single-channel sessions keep the existing synchronous issue path.
+>
+>Preliminary fio testing showed improvments in throughput by up to 2.5x
+>in 4MiB writes with larger dirty limits (1g/256m), 1.4x improvement for
+>1GiB writes with larger dirty limits, and is neutral when dirty limits
+>keep the pipeline shallow (4m/1m).
 
---------------TxSVewjTA8LPV6ikHHbIYGJy
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Works great.
 
-T24gNi8yNi8yNiA3OjQxIFBNLCBSYWxwaCBCb2VobWUgd3JvdGU6DQo+IE5vdyB0aGF0IHdl
-IHN0b3JlIGFzIGVtcHR5IGZpbGUgKyB4YXR0ciBvbiB0aGUgc2VydmVyLCBub3QgcmVhbCAN
-Cj4gc3ltbGlua3MsIHRoaXMgZGVzaWduIGRlY2lzaW9uIG1pZ2h0IG5lZWQgdG8gYmUgcmV2
-aXNpdGVkLg0KPiANCj4gSSBkb24ndCByZW1lbWJlciBvZiB0aGUgdG9wIG9mIG15IGhlYWQg
-aWYgdGhpcyBiZWhhdmlvdXIgaXMgaW1wbGVtZW50ZWQgDQo+IGluIHRoZSBjbGllbnQgb3Ig
-dGhlIHNlcnZlci4gRG9lcyBhbnlvbmUgcmVtZW1iZXI/IEknZCBoYXZlIHRvIGNoZWNrLg0K
-DQppdCdzIHRoZSBjbGllbnQ6IGluIGNpZnNfY29udmVydF9wYXRoX3RvX3V0ZjE2KCkgaXQg
-c3RyaXBzIHRoZSBsZWFkaW5nIA0Kc2xhc2ggZm9yIHRoZSBzeW1saW5rIHRhcmdldCB3aGVu
-IGNhbGxlZCBmcm9tIGNyZWF0ZV9uYXRpdmVfc3ltbGluaygpLg0KDQpBcyBzeW1saW5rcyBp
-biBTTUIzIFBPU0lYIG1heSBiZSBjcmVhdGVkIGFueSB3YXkgdGhlIHNlcnZlciB0aGlua3Mg
-aXMgDQpzYWZlIChTYW1iYSBkb2VzIGZpbGUreGF0dHIsIGl0IG5ldmVyIGNyZWF0ZXMgcmVh
-bCBzeW1saW5rcyBvbiB0aGUgDQpzZXJ2ZXIpLCBzbyBzeW1saW5rcyBhcmUganVzdCBhIGNs
-aWVudCBzaWRlIHRoaW5nIGFuZCB3ZSBzaG91bGQgYWxsb3cgDQpjcmVhdGluZyBhYnNvbHV0
-ZSBzeW1saW5rcy4gUE9TSVggYWxsb3dzIGl0IChhbmQgdXNlcnMgdXNlIGl0KSwgc28gd2Ug
-DQpzaG91bGQgKHNhZmVseSkgYWxzbyBhbGxvdyBpdCBpbiBTTUIzIFBPU0lYLg0K
+A few concerns for a next version inlined below.
 
---------------TxSVewjTA8LPV6ikHHbIYGJy--
+>+	destroy_workqueue(cifs_write_issue_wq);
 
---------------jLtYZkBNkNvUYVD8B43orLHj
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+Make sure to flush the workqueue at the appropriate time for a clean
+destroy.
 
------BEGIN PGP SIGNATURE-----
+>+static void __cifs_issue_write(struct netfs_io_subrequest *subreq);
+>+
+>+struct cifs_issue_write_work {
+>+	struct work_struct work;
+>+	struct netfs_io_subrequest *subreq;
+>+};
+>+
+>+static bool cifs_write_is_mchan(struct cifs_ses *ses)
+>+{
+>+	bool is_mchan;
+>+
+>+	spin_lock(&ses->chan_lock);
+>+	is_mchan = ses->chan_count > 1;
+>+	spin_unlock(&ses->chan_lock);
+>+
+>+	return is_mchan;
+>+}
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmo+wRsFAwAAAAAACgkQqh6bcSY5nkZF
-Mw//Sx2zkrCnG607809x0KdsypvA7plaqWUTWlnazhljHtxA09XkpTb2MN0AYYohnGqNt0up2OXV
-TLt8+XifBpqlyj/UMB76wTKnREnumWynd+BJDfxyPi2UgsZI7kIZ/ZrTzgbj7hZnLzpSlw5ZjRsx
-1l5Lj6LGyKzN4mM+ZGPmTYiOwtW7L6xt4RtGTUk6FRPWPavmaQHCEL3M/LjRJU7+DUYCoGR3NUeo
-ImxBCm3ZXZF2ntB+3354XrBtB3Q0rHTRkU3zX6kyYlEiRV82I10ME30Az6Z8bEeNNAy+BtLyHv5g
-IPWN7hHlSkbJq4zVS5HmD7Bts1+7qKfM/LBz7N/e14jOnSrc6euKIOO/PEkSdhHyDcWQZabDFq1I
-nBpcTXjVmF3gs5K7aIEyRwvZqCezUGsDJ21qn+ushjFYg+Ej2alFg5omBYafMGiyZCB+3Nm9TyWl
-nksBDILLJrUDeaE9kEROZgAPtohsiwV736+uCug5gIHhrTGUcneVFFBGEwj4RRHUs9jU7K90QT8N
-OmHmWIvyAoPkiPWLhn+bCGvKSTWJslQnVw9V0JDkldzoiGZRhvjg2bOtAxjTbfRldji0SxBZucES
-HKSwhGsdpzc2vpakAqKLs+QAZ1gA6UpHWWbowoScpSFSV48YMOXPaYiKaO8Y/53Q38LAdDKADQOZ
-YcA=
-=qtXM
------END PGP SIGNATURE-----
+Not really a concern here, but why limit it to multichannel?
+AFAICS single channel mounts would also benefit from this, no?
 
---------------jLtYZkBNkNvUYVD8B43orLHj--
+>+static void cifs_issue_write_work_fn(struct work_struct *work)
+>+{
+>+	struct cifs_issue_write_work *w = container_of(work, struct cifs_issue_write_work, work);
+>+
+>+	__cifs_issue_write(w->subreq);
+>+	kfree(w);
+>+}
+>+
+>+static int cifs_issue_parallel_write(struct cifs_ses *ses,
+>+				      struct netfs_io_subrequest *subreq)
+>+{
+>+	struct cifs_issue_write_work *w = kmalloc_obj(*w, GFP_NOFS);
+>+
+>+	if (!w)
+>+		return -ENOMEM;
+>+
+>+	w->subreq = subreq;
+>+	INIT_WORK(&w->work, cifs_issue_write_work_fn);
+>+	queue_work(cifs_write_issue_wq, &w->work);
+>+
+>+	return 0;
+>+}
+
+I think you need to find a way to track these works somehow, so you can
+e.g.:
+- capture/propagate -ERESTARTSYS/-EINTR
+- (and thus) properly cancel_work() when needed
+
+I tested the patch with 4 channels and thousands of writer processes and
+it worked great on a healthy scenario.
+
+Dropping the network mid-operation shows that, after reconnect is
+successful, if I kill my writers and try to umount, there are several
+cifs_write_issue kworkers hanging (didn't investigate further).
+
+>+static void cifs_issue_write(struct netfs_io_subrequest *subreq)
+>+{
+>+	struct cifs_io_subrequest *wdata = container_of(subreq, struct cifs_io_subrequest, subreq);
+>+	struct cifs_ses *ses = tlink_tcon(wdata->req->cfile->tlink)->ses;
+>+
+>+	if (cifs_write_is_mchan(ses)) {
+>+		int err = cifs_issue_parallel_write(ses, subreq);
+>+
+>+		if (!err)
+>+			return;
+>+	}
+>+
+>+	__cifs_issue_write(subreq);
+>+}
+
+cifs_issue_parallel_write() returns -ENOMEM or 0.  If it returns
+-ENOMEM you really shouldn't fallback to __cifs_issue_write(), but
+rather follow __cifs_issue_write() "fail" case (to make netfs aware
+of the error).
+
+
+Cheers,
+
+Enzo
