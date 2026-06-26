@@ -1,30 +1,32 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B854B3F789C
-	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 13:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D1730D3FA
+	for <linux-cifs@vger.kernel.org>; Fri, 26 Jun 2026 13:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782481659; cv=none; b=uW/3i9PaFiUb61v/1IamiZ3R+/2shZuQ1xw3FZdcq1FQ1X72BCCSXZdLjNVw8e/kwJihLbN7RflV3jy7S1QJQUgFkGW842uirh+/ayLXxmljPrKo/hpQuicH+8PzTxVJjWB9C5sCq4z/4TrSjW1ngJnqRIg9QlXgF5/4YX2qnD4=
+	t=1782481662; cv=none; b=D4mJ5ZY74GhI8pdeAy0dOnYtBoojMQEl2Qe3M+U1kJFs3mF3sb60rdeFqU6s49wsOpZPgmPVmt79V87PKdrDTMKH7iAkVHX7bjQSCoqu1KVLos3EvO63bLLbzeyWm+yp1Kg5lSlMTWre7b7Qboygu1BnyfBWwi8jsENmcokAB2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782481659; c=relaxed/simple;
-	bh=xOd6XGG0GSuhtT3QA0Q0pb5X7+QHNMDmOY2ZXT3JGA0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZKxB73k/pG3OkoRPcDz0RK4SsoIrPMiKtwnXf7LQvNwNkNR4tK4J+lxh06NI5zpaDW/XXRhbFK+WSwhF/MjZJ0WpNproDfJrGNfG8vQRI1AMRH7vic7cD2OmVn15G++ypdh8IwGHyaJBiewg0menjuUtomSSuS7AUE+KsIiQzas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kDR3B0cw; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1782481662; c=relaxed/simple;
+	bh=rj77aVpwYA6l34T+TiuXauxlM3MmN9ZMPFQUDLpxkvg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SKg2/0Xyuj9t6bcfkb1+kMI1eAjs/B8U0Oc4+ckN5KPa33aSdsFN4a4TR0dXBqGVVKfdCZplZiiwbtkA8uH8U0wg/t8BnTXJ7BZ319HMDoff7gHIV+qP7YRTTj2BFY5YFk+kATAhd9CY+n2x32WJNNMMSrIyvtjqZp8bOQW3SYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=harOy/lT; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kDR3B0cw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="harOy/lT"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782481654;
+	t=1782481659;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GOXJq5ca2JtccaGFTmNf9vWsMI+n/MB4tpcE472MO7o=;
-	b=kDR3B0cwUSYLWEAANg6eFsDTjG5txD71w6idq8KX0otqSEf96W9+TsuSU6s9K8N85d51Us
-	7ylsPLFQedLeHsT12u3r/1xaA9yd+wJ9mm4+ME+jRLtC00oFFNiUY2J5wuoPWH932VMz8j
-	t+N6Fw9a7Q8KSS3nX7V3mAjRRnAGFiY=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nbpfQ3pTR0WM4xOtuuaUvn1NYQkeW1x/u728njq2dWU=;
+	b=harOy/lTA0mXdM2So3bIloDuj1SHJ0B9Wz67MxpHzTFoB0MbhIDiuTt6VFT03z8u7cVm3X
+	WvTrqhNmAZl8A/8raoPun5lhNBPdFGSP80zE0AimyYzdH7q9bntXvMCqi8n//hhcyMXC8A
+	c6Upg9ad3c8WNT46zH8252ntT+qlbgE=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -38,9 +40,11 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v4 0/7] smb/client: fix fallocate and allocation accounting
-Date: Fri, 26 Jun 2026 21:47:12 +0800
-Message-ID: <20260626134719.158270-1-huiwen.he@linux.dev>
+Subject: [PATCH v4 1/7] smb/client: refresh allocation size after duplicate extents
+Date: Fri, 26 Jun 2026 21:47:13 +0800
+Message-ID: <20260626134719.158270-2-huiwen.he@linux.dev>
+In-Reply-To: <20260626134719.158270-1-huiwen.he@linux.dev>
+References: <20260626134719.158270-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,43 +56,92 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-Changes in v4:
+FSCTL_DUPLICATE_EXTENTS_TO_FILE changes the target file extents on the
+server, but the client does not refresh the target AllocationSize/i_blocks.
+Callers can observe or use the wrong st_blocks value immediately after the
+clone, before a later attribute revalidation corrects it.
 
-- Add new patch 1 to refresh i_blocks after successful duplicate-extents.
-  This fixes stale st_blocks after reflink and avoids the generic/370
-  swapon hole-check regression.
+For example, create a reflinked file with a leading hole:
 
-The following patches from v2 have already been merged into cifs-2.6.git for-next:
-  - smb/client: do not account EOF extension as allocation
-  - smb/client: preserve errors from smb2_set_sparse()
-  - smb/client: name the default fallocate mode
+        xfs_io -f -c "pwrite -S 0x61 0 64k" src
+        touch dst
+        chmod 600 dst
+        xfs_io -c "reflink src 0 1m 64k" dst
+        mkswap dst
+        swapon dst
 
-Link to v3:
-https://lore.kernel.org/linux-cifs/20260625160154.104450-1-huiwen.he@linux.dev
+The file still has a hole after mkswap:
 
-Link to v2:
-https://lore.kernel.org/linux-cifs/20260624021550.1548952-1-huiwen.he@linux.dev
+        /mnt/scratch/dst:
+          [0..7]:       allocated
+          [8..2047]:    hole
+          [2048..2175]: allocated
 
-Thanks,
-Huiwen
+The server also reports only the allocated ranges:
 
-Huiwen He (7):
-  smb/client: refresh allocation size after duplicate extents
-  smb/client: handle smb2_set_sparse() failure in EOF-extending
-    fallocate
-  smb/client: handle smb2_set_sparse() failure in non-extending
-    fallocate
-  smb/client: handle overlapping allocated ranges in fallocate
-  smb/client: reduce fallocate zero buffer allocation
-  smb/client: emulate small mode 0 fallocate ranges at or past EOF
-  smb/client: verify allocation after EOF-extending fallocate
+        server dst size=1114112 blocks=144
 
- fs/smb/client/smb2ops.c   | 169 +++++++++++++++++++++++++++++++++-----
- fs/smb/client/smb2pdu.c   |  19 +++++
- fs/smb/client/smb2proto.h |   3 +
- fs/smb/common/fscc.h      |   5 ++
- 4 files changed, 175 insertions(+), 21 deletions(-)
+but the client reported EOF-derived blocks:
 
+        client dst size=1114112 blocks=2176
+
+and swapon succeeded:
+
+        swapon_result=success
+        /mnt/scratch/dst 1.1M 0B -1
+
+So EOF-derived i_blocks can let a sparse reflinked file pass the CIFS
+swapfile hole check.
+
+Fix this by querying FILE_ALL_INFORMATION on the target handle after a
+successful duplicate extents request and updating i_blocks from the
+returned AllocationSize. If the query fails, invalidate the cached
+inode attributes so a later getattr can refresh them.
+
+Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/smb2ops.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 965a4d21dd43..f13e5d902244 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2193,10 +2193,13 @@ smb2_duplicate_extents(const unsigned int xid,
+ 			u64 len, u64 dest_off)
+ {
+ 	int rc;
++	int qrc;
+ 	unsigned int ret_data_len;
+ 	struct inode *inode;
++	struct smb2_file_all_info file_inf;
+ 	struct duplicate_extents_to_file dup_ext_buf;
+ 	struct cifs_tcon *tcon = tlink_tcon(trgtfile->tlink);
++	u64 asize;
+ 
+ 	/* server fileays advertise duplicate extent support with this flag */
+ 	if ((le32_to_cpu(tcon->fsAttrInfo.Attributes) &
+@@ -2232,6 +2235,19 @@ smb2_duplicate_extents(const unsigned int xid,
+ 	if (ret_data_len > 0)
+ 		cifs_dbg(FYI, "Non-zero response length in duplicate extents\n");
+ 
++	if (rc == 0) {
++		qrc = SMB2_query_info(xid, tcon, trgtfile->fid.persistent_fid,
++				      trgtfile->fid.volatile_fid, &file_inf);
++		spin_lock(&inode->i_lock);
++		if (qrc == 0) {
++			asize = le64_to_cpu(file_inf.AllocationSize);
++			inode->i_blocks = CIFS_INO_BLOCKS(asize);
++		} else {
++			CIFS_I(inode)->time = 0; /* force reval */
++		}
++		spin_unlock(&inode->i_lock);
++	}
++
+ duplicate_extents_out:
+ 	if (rc)
+ 		trace_smb3_clone_err(xid, srcfile->fid.volatile_fid,
 -- 
 2.43.0
 
