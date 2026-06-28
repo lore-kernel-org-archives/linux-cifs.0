@@ -1,40 +1,49 @@
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3A8340D561;
-	Sun, 28 Jun 2026 07:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B745A1632DD
+	for <linux-cifs@vger.kernel.org>; Sun, 28 Jun 2026 07:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782630277; cv=none; b=smiVGRlPOcZeQbkQlSDfI3DCxDWyBm29pJ/Q650HpSN5GUhsJ8Xiw52WzsAWyf/MlpUo3VqjyOA/ntoJSR/4snoUikSMRk+vFRnd8fA9yYcTf/Ot3OMkPtRwaZvB6Hjt0lQhx2aNK75Sauw0XLkDYUEDAFC+ZsclDsosB9UBlxg=
+	t=1782632599; cv=none; b=QQ3U2L6OxxyRdD9fvZGynNRRcdKxcxL0+uwajP4eq2IUUeVu+vSAjFnnaSfWUowbiXaPDUrv0YUcyw1tgyw3pOeowa5KVvzHOxhFyfwxRXJWSQsZCAncct18qwG/dHJ8JkblOihGjzatKFFKPuUCkcz9omLPaGShZL8WM6QR1W8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782630277; c=relaxed/simple;
-	bh=U91wANWtwmBV4t9/7XOrHHvGG7lONNGcLKnM0lbyy1w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B/cCnjFcxs5b4maJxPG/i/YrmymVi6OoqPZwTqtaGXLED/twDeU82bjaL1SZ68HxtuW9jM6+lWX/jWKNlt2+7iKBlB45LsdScrxmirJgNJdyqINROF2a1x5g63J41NRa4R1vxsDCTeWYiuALu38MuGvCQW946ZLKKR/wnfkBq04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=Lx3dSd9D; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+	s=arc-20240116; t=1782632599; c=relaxed/simple;
+	bh=i5CgBVtWKAWoD38X4fXX+bQ6nqvrE/YZp5mGApIHbTs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m5uJbzjRHl2iNCxmNVEkpfPxq8cEAdm7fIQx2KX0wqlLOTAoC32HDK4zKX6re8oNwM798ZqUDB7pJ8lEfT06+iFmpo7tG2bLraAHNCoWf94aBDTxhJYzcZ7gr7nK7RWzs257U6SOr4LJZNf0PckbT2RslTgueAkTWu9uLhi1aWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=ZyuThpLu; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="Lx3dSd9D"
-Received: from DESKTOP-SUEFNF9.taila7e912.ts.net (unknown [221.228.238.82])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 4408a6f29;
-	Sun, 28 Jun 2026 14:59:11 +0800 (GMT+08:00)
-From: Dawei Feng <dawei.feng@seu.edu.cn>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="ZyuThpLu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1782632584;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pjGABgNPVjaNKjIE/S3mwWMX6HndcGe2takmIDDRUzA=;
+	b=ZyuThpLuNqgAcuQDt3qUH+ynLTZzD0lalWT52nA0/eMM36j551Ml/cUaHYqDGKW/wwRyhF
+	PBI++QxX1UCu+rnPmVLxvG6QxPy3vhdRL/r0MkBUbNZGzu3SC/FFTd8bpE62SDx8LaYKaM
+	DPL/MY34rBhkpZ22py+nScIctHN9zLKfassMdau0GHi7xRS+j+oQx7hHzsBoATlQZ/YMcC
+	6Jcs9HET3nuJlv7ubzkT6ry6Wv8fZttCEw60Ing0w9MqwGUTrirAeAFvvwBkqebdguH51a
+	cRo3C8NLVj+bS/UpXqCmQlwPpB+M6gzfkerCPKhztNNs0g1YuDIxnajN1c4k5g==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
 	ronniesahlberg@gmail.com,
 	sprasad@microsoft.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	zilin@seu.edu.cn,
-	Dawei Feng <dawei.feng@seu.edu.cn>
-Subject: [PATCH] smb: client: fix buffer leaks in SMB1 read and write
-Date: Sun, 28 Jun 2026 14:59:09 +0800
-Message-Id: <20260628065909.3194121-1-dawei.feng@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb/server: do not require delete access for non-replacing links
+Date: Sun, 28 Jun 2026 07:42:43 +0000
+Message-ID: <20260628074243.629589-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -42,88 +51,54 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9f0d06661303a2kunm50e272f912919c
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZH0pCVhhCHU4aTU8fQh5OT1YeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUpVSUlDVUlIQ1VDSVlXWRYaDxIVHRRZQVlPS0hVSktISk
-	9ITFVKS0tVSkJLS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=Lx3dSd9DsWCroZZyiBTipWCpY5e4dEiDS8ywvNzNnXNHNFa1RkSaw7mV6wDHaFGaAyX5Y0JJpeBYGsBLtVP2COUyYvLaxauxcVyap5sqZmWWJEl7dRFLk+XFlEOOhLbS4JuqDeGDNCGxJ2Gx5Dol8+v5luwBNcFhUgKQiKwDqVs=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=cv/LS8FndkUaqSCWCyX5ERgUgoYHmnxyOKFv4jUH42o=;
-	h=date:mime-version:subject:message-id:from;
+X-Migadu-Flow: FLOW_OUT
 
-CIFSSMBRead(), CIFSSMBWrite() and CIFSSMBWrite2() allocate a request
-buffer before checking whether tcon->ses->server is NULL. If that
-defensive check ever fails, the helper returns -ECONNABORTED without
-releasing the request buffer.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Fix these leaks by releasing the allocated request buffer before
-returning from these error paths. Use cifs_small_buf_release() for the
-buffers allocated by small_smb_init() and cifs_buf_release() for the
-buffer allocated by smb_init().
+Reproducer:
 
-The bug was first flagged by an experimental analysis tool we are
-developing for kernel memory-management bugs while analyzing
-v6.13-rc1. The tool is still under development and is not yet publicly
-available. Manual inspection confirms that the bug is still
-present in v7.1.1.
+  1. server: systemctl start ksmbd
+  2. client: mount -t cifs //${server_ip}/export /mnt
+  3. client: touch /mnt/file; ln /mnt/file /mnt/hardlink
+  4. client err log: ln: failed to create hard link 'hardlink' => 'file': Permission denied
+  5. server err log: ksmbd: no right to delete : 0x80
 
-An x86_64 allyesconfig build showed no new warnings.
-
-Runtime validation used a temporary fault-injection hook to force
-tcon->ses->server to NULL after request-buffer initialization. On the
-unfixed kernel, the harness observed two leaked small request buffers and
-one leaked large request buffer, with directed kmemleak dumps confirming
-the CIFS buffer allocation stacks. After the fix, no CIFS request-buffer
-deltas remained.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
+Fixes: 13f3942f2bf4 ("ksmbd: add per-handle permission check to FILE_LINK_INFORMATION")
+Cc: stable@vger.kernel.org
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifssmb.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ fs/smb/server/smb2pdu.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 9e27bfa7376b..024c5d462424 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1681,8 +1681,10 @@ CIFSSMBRead(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	pSMB->hdr.PidHigh = cpu_to_le16((__u16)(pid >> 16));
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 727ba86ede36..097f51fc7ed6 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6921,16 +6921,18 @@ static int smb2_set_info_file(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 	}
+ 	case FILE_LINK_INFORMATION:
+ 	{
+-		if (!(fp->daccess & FILE_DELETE_LE)) {
+-			pr_err("no right to delete : 0x%x\n", fp->daccess);
+-			return -EACCES;
+-		}
++		struct smb2_file_link_info *file_info;
  
- 	/* tcon and ses pointer are checked in smb_init */
--	if (tcon->ses->server == NULL)
-+	if (!tcon->ses->server) {
-+		cifs_small_buf_release(pSMB);
- 		return -ECONNABORTED;
-+	}
+ 		if (buf_len < sizeof(struct smb2_file_link_info))
+ 			return -EMSGSIZE;
  
- 	pSMB->AndXCommand = 0xFF;       /* none */
- 	pSMB->Fid = netfid;
-@@ -1796,8 +1798,10 @@ CIFSSMBWrite(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	pSMB->hdr.PidHigh = cpu_to_le16((__u16)(pid >> 16));
- 
- 	/* tcon and ses pointer are checked in smb_init */
--	if (tcon->ses->server == NULL)
-+	if (!tcon->ses->server) {
-+		cifs_buf_release(pSMB);
- 		return -ECONNABORTED;
-+	}
- 
- 	pSMB->AndXCommand = 0xFF;	/* none */
- 	pSMB->Fid = netfid;
-@@ -2077,8 +2081,10 @@ CIFSSMBWrite2(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	pSMB->hdr.PidHigh = cpu_to_le16((__u16)(pid >> 16));
- 
- 	/* tcon and ses pointer are checked in smb_init */
--	if (tcon->ses->server == NULL)
-+	if (!tcon->ses->server) {
-+		cifs_small_buf_release(pSMB);
- 		return -ECONNABORTED;
-+	}
- 
- 	pSMB->AndXCommand = 0xFF;	/* none */
- 	pSMB->Fid = netfid;
+-		return smb2_create_link(work, work->tcon->share_conf,
+-					(struct smb2_file_link_info *)buffer,
++		file_info = (struct smb2_file_link_info *)buffer;
++		if (file_info->ReplaceIfExists && !(fp->daccess & FILE_DELETE_LE)) {
++			pr_err("no right to delete : 0x%x\n", fp->daccess);
++			return -EACCES;
++		}
++
++		return smb2_create_link(work, work->tcon->share_conf, file_info,
+ 					buf_len, fp->filp,
+ 					work->conn->local_nls);
+ 	}
 -- 
-2.34.1
+2.54.0
 
