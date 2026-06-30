@@ -1,135 +1,208 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83AFD27816C
-	for <linux-cifs@vger.kernel.org>; Tue, 30 Jun 2026 21:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57E733ADB2
+	for <linux-cifs@vger.kernel.org>; Tue, 30 Jun 2026 23:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782853307; cv=pass; b=L9/fuiuMxHkmcDjSj++krV1cL3i4xPIC9yZFKmkdVRqMK6KObfK745oMLSiCohLp0vAXL4c+9QGBom+TQyLskh4WhbPFAn35Qv8Ox1s3kONeZlG4+/Juv5vIC5cuHjq6SJ3VTOgracQYcBP5K3J+mlc1ztVsgsScu113f2St+jg=
+	t=1782863701; cv=pass; b=gBlSoNc11sAtCZgAH0KDoZUyRPqAfJ4a1UO4mhP3RrXA0aoeslbSXF5jHWdqBlh3QfszOfcR+jZmV6JmYrCN2YII7ir6a0OHxTMMX1mireYfMwDxp1ySFz1K13QyrnC5bvfDvtCePk/hySbFCCK3Ki+1On+zJ2YunV2JkRlowzw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782853307; c=relaxed/simple;
-	bh=ZvxW29+NadKM7GaAw42DZuCFjnpHd8lW+eHx1b5x6ac=;
+	s=arc-20240116; t=1782863701; c=relaxed/simple;
+	bh=VFKTazKxgYnEB/K/9ppbBrgbpsras6tcl/iKBqAt7a4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oMURGPhkMsqmHpVX3b6lNLBSMD67vgBgh+wpKs864SYvJI4rgaWLXaf1w4HZIXH7Bbpwfi02JfGFoUvVXhJHt+nysov+8zY1aBSpMby3WvJkGlwPzXzSykS5D0Hr4AA+TZqhpZG0NMDGQU/iP+34gWO+SF5JHtro+YGMLzAb2i4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L0K49Apl; arc=pass smtp.client-ip=209.85.219.41
+	 To:Cc:Content-Type; b=Uomw0nWymDj2IuF+e8KmaUDTAonno3K/Yynd3NOmKYm1v3bu53MSO2jaZjcogwvs/q5sEUYeHIqSu4F/WdNml529Pu4dBFYnOWjMp0IBR/+STR9jo03vUk0x35FmvJUVhom0hIs7s4E8RgFIAgXtKy/4fGbtLfoj7h94+hN0tL8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LwIV4Jnp; arc=pass smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0K49Apl"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-8eabb1a9378so34490226d6.1
-        for <linux-cifs@vger.kernel.org>; Tue, 30 Jun 2026 14:01:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782853305; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LwIV4Jnp"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8eaa7b5e31eso10309746d6.0
+        for <linux-cifs@vger.kernel.org>; Tue, 30 Jun 2026 16:54:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782863699; cv=none;
         d=google.com; s=arc-20260327;
-        b=iW/mQHPrHMezZyCl4m+P5wspZEDTBV/QhxWhYRxP2CAWaGPkWuWtjzNDtE0zBXthB8
-         WBDapgzrcgojeoWZpY+POcTk6gw+3vsfWISoXMIpFBi5QZtgiFZvm4Db3Oj29IOqYVgQ
-         XRc5LWGeA/gDuy+QLLuq3+jKjdq+lMnWB1010k5Lm28hqCTm8/UOn0A+N6IMnc3J0usW
-         JzczI0bTj7rFQCXk4ncFIyreDWfhOMU37CiEZwCWipSPgsBq1zEi3UY+oYArBFlbZPOR
-         GhLtk3i4z0okel+R5IZpKXu52qJhnVby7Q/TEBFuo1vFYe9ecudmvp2KDS43VEeQtAbV
-         ic8g==
+        b=nQkll81XnkIZ2Rh1hRG1J3hn1nbpmdILMMvUJRZjBvjIudL8yBFCXdCxHYp7ieyr/p
+         EuEzqs8toKkl5T1ag0hvudTHhwD0SIRUWUyjfC5AOvdslasstCfHvwVYTcSO7Q6QuYxR
+         OJB7x+akKBCtFxU/tTmjTKLr2FyH9X/4LQZ2WF5uGtCagiTlMh+dhDbLG3oK4iVrMrr1
+         IFcLiVdha0qWTtBjD6NHyZmzLS9L2yafDEgBcQvO5BpopgVkBuEjRiFLCCjJ8El9dH86
+         sz6qwCnK8WgrwcXJMo1/VIo/hc8StosnInsBw4G3EINp01rRAN4qswllRiuE61U+lw1t
+         8yMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=fDgqPJ9TiYfhoCyUr4vDDHUCYFJ9XHy3O7vUIMeKeEs=;
-        fh=4i/2BMMZobHtt3qUlR8rTn7gEkEPv7yKnjBjtC9IS6o=;
-        b=c49M2DhVWwg+cvsCTbCFrRSACVd0Xd5V9kFeyC1LX8hjuD4iy0DHHZxOAouFeoFP+G
-         Oi9pSgoVjjyVZ3VcnJs4hw2Zo5WzHj6XyzxvmxK2BodznjX3+/XJmCK5VUAGrGYkYell
-         JBX4ccXhfQIb4h/+5NEUIYepUUhM6Cfj5toB6cxxl5xRdB4/48ckB1wxdzImTPXHZOew
-         e2wpaIQeZcNxRQMMOE2LygGGkkeUfxBid6YaKpaVBPADowBiWfroL8K7Y8jbB7bD7lZv
-         463CFUzetEwWtPvwj9Vll6LUO6vXta1dc196S6uhxYrpU2rNJJSQo1QoYp9NYkzNEVy0
-         wt8A==;
+        bh=kC3bxahuis5xWq9GT1+0gRbbixZiOHD7l7KOGR9ctnc=;
+        fh=jswW0zAyzh2mnEgFFeUOHEYoxTDtP7NkmW3ZQPiJu8o=;
+        b=FBaYfknzjz3nfoJtVjoOiTzKgsyQDubMcHK93xUXExApFu/nzz8jl+wjRYRYHjgkwm
+         XrJNH7WaHFWV4cmGdvaOmxKK4qGpNE4+NuBn4q3+EyYUF0r2Zjvj+63b9S4lh8i7HbkK
+         9cfrpAps2d53OE9l3TQT455/ctNOVu5e1WJxpio7d84JlFK6+IafD/AU0LWV28vxl+rq
+         jE91JA4HFI5xihCwZPZjAqeD8gztDxCtXyWEUWJBSF3HL78GJ5rtvCVb33jyGfdFMa44
+         3lqdRVQFBX6T0kzA4opZ3/j7uBveSnrnAbcDysL+jmOCefsW875QLFahjVaK6MB1kjWH
+         GaUQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782853305; x=1783458105; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782863699; x=1783468499; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fDgqPJ9TiYfhoCyUr4vDDHUCYFJ9XHy3O7vUIMeKeEs=;
-        b=L0K49Apl9l2MyyvnAybT85e51wRXYN27kALfuaxz7qNNiz23j4gJYtAYSqRPkW5EY8
-         LffCvaNzYuIHXkfWuyWO/z64b1ut8FgT5Jy4RH3iVkcjw6qyZimsS4kYh1hYjKpXdUJm
-         pu+6bqULxSgAuoKUDSvqFpJJt7+G5mxCGSH7IWa9RmfLPq2DPH6f+SVV/a8wzbNTlwyU
-         UrAkDdNSsyX9dlf/z+TEx/T0rk8J5Fmg7trVwjYcCRLlXVXGNDroPxGd69Gv2F/cPeYc
-         0zy6PKVP/dcd5uXf8kZXId2/etiCHFp81uuZMTcpja22P2TfuaB1RSigZMo9JSDIFuo1
-         w25g==
+        bh=kC3bxahuis5xWq9GT1+0gRbbixZiOHD7l7KOGR9ctnc=;
+        b=LwIV4JnpTNCO97cnRROWcfTGRZZDCQBxv7a852vK+CF+oJ5WZ9QIPrzvzq7mh2N0/Y
+         gYo0JfSsHcYyXHTSVKoMpkQfoOgcmoAjPJsIFvoZXvNWhaZ7Jxu2Z+vPsKzu9Z3aasqE
+         elxjSAZR270XuUdCMm5cFJRm3wYAXFEHpVXKNy110FM4R6NjK+tJwu47s4+9E38CrRG3
+         axOtFTAk8RRWEvNbhr9Q/AmrgaeSWLB4AnB6A6zgNGDisoHjRUk746n+nfXq1YLsaCYN
+         z8JGiAwTyxi462X+Y8EzzPjG9GStwbTwMZe8ZZ6pdnA+J644s3ClNI+NNAazZIiHwWQw
+         alTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782853305; x=1783458105;
+        d=1e100.net; s=20251104; t=1782863699; x=1783468499;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=fDgqPJ9TiYfhoCyUr4vDDHUCYFJ9XHy3O7vUIMeKeEs=;
-        b=YqfqhVkewPN8A6YiRmtIap/++G2WUX2zg6Vd0mkk1TV3W0Q5dh9d/psu2Xwtt9JYDx
-         mz56xTKJWWUqZIO+NxbO8bpLl5uf/aHA297WNMnebvvpOi8the5tpQ2yIIjGfBb5+J8B
-         7d3irHwvCqFfq1HRPmzjO9WJcdLE3P82cg33RznwaP0hVP8l54X/kAw+tUdH+pX7ROzA
-         8vCcoZZyghkfoi5qRyaFV5vkDMDntbmuwrZhO3DkDHKUoREo5V1nI2lHA3lXam8fjC2L
-         ueATTLmG1W+Ls4Ugy6ckOJTTbe6P5KiLjSnuJEJaE85rXwzjtvxYbCM8VDascHNjb4D/
-         EUbg==
-X-Forwarded-Encrypted: i=1; AHgh+Rr52bQsi8BZNsHoXCRyt5U+0x3lwtapzxuNHIRXr1172HsPzNzhzXKLQqJQFtwx+gNL0Z9w0UuYwlEh@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMQH1IPLKCDJLGKNv18j5TJI+mjTftMxvtg7wHLZ+YAPLD5Phk
-	mUSekZtqk1MtLbAdIVUEpdke0NDHBgk/yjxn1nN7SpX1UOI5Wmcjf9tmAxcoEjl+Jzln9grRAMn
-	SnhgviwzURfTi1DIjGI9e7ZwyQjGy/8o=
-X-Gm-Gg: AfdE7cmX/1x6vTkKoxuM3gGlXHVQEgFw1cIkuy06Mxf2APDsSTgvG48LPpRd6FIgxxJ
-	OR8FlvmLbNn8XxXFAuGBDZ4M95K2Ab163/7GtLcWZEJlAcfQIz7MzU+lUTsd50CgbK0PwUzO+Ao
-	2PWvGHvMgNoxM5vl9d/AA3Uxj5cqIkUrW44v0siypum8Z1RHTGUD6kYf6vI6Vj4OzLCbNf4Dme4
-	n93cQdRkrcXDtG3ZcseJGVIGgIQlj4Uu+LmrQvBwsvkUIbKjm1TeLNmVzLRwTq3frmw+X2C8Oj8
-	PnlC26SMQmlhK6OnE32A59ZkaK4Uv9lmLOZVaOI63TNj+k1PT9xZyWofix9C8Hy4+on+djFHyy9
-	hC+f92OkIcuzAMSsPo3QGbOw+g9DoiC4+8QmJ6oFIYwGp67CnjiDzuWxqcLB38TcQYpQETXhahE
-	jCQe8NQXPdwUo7onKvMpuoaQ==
-X-Received: by 2002:a05:6214:3f82:b0:8cc:d588:4523 with SMTP id
- 6a1803df08f44-8f1b9dd6485mr86219166d6.13.1782853305232; Tue, 30 Jun 2026
- 14:01:45 -0700 (PDT)
+        bh=kC3bxahuis5xWq9GT1+0gRbbixZiOHD7l7KOGR9ctnc=;
+        b=Y9TBhVDcTGQ3TAdxW7yplmqxQpeTeXkMSW5UTX55tGQ1winEKUXHPMteTxBmFAQ7Zf
+         VeIw6Bgg2EkEXUgbfB63RNgfjsnINtiGK2zJJh3W69X3uA+8cPAH/RWePPUFdUsDGz9T
+         YuvreD/DwG57UHRR40yygN6bPnRUZd9QRZDz35yHzZZfWQRNcAKq/Hp/o7dUOs7k+bDG
+         uZg2HIEfnnJcFE+HDkzPYR3+ogBJjpVQD6u2C5nwOO/UbJK5CkzvXcMR7ekQMGrCTkI/
+         +n1bI0f3JF10nkFJ/0oZCy67RYWCWh/LxFMnbv5XIVDdVB4RaryzqBiyW4EMYhSEvhFR
+         KBAw==
+X-Gm-Message-State: AOJu0Yx2wxwWm7g1ysC6qGLLU0K/UOieLjEjOXXNM3hodmOarzY+2a+Q
+	an9x0ZDYVN33Of0gq2uuWviVA6MN02jhcH7I+jqc8wQCqhR+iGvsJr8jM3ZfXpjsfJQ+SXK+sNJ
+	BxdCtfFv2H1tmMufouHTuSePDFmoYTk4=
+X-Gm-Gg: AfdE7cllrDIYwMYaH/Kbdu/O3Ia8BCDdH1k+vycUxKRBvF4XUFYiwZrnJVxRRahy3Gr
+	WL/bNZ3LwSh+kaBKSR2536UFFpiCo7xr5bPWYlj96lRSKO5My7+whp2fuUP0Azosn0CprvPmov0
+	fenPT25sLvkCcbqMPGkTLlPiPyVsahVMAOW60l9QrCCoI8GPsVTE81acQZT6TIYCjr57wjERsXW
+	7+7M7p2qMiaux6ZEXArqpCxfvnT7yVh9fUwJ4J4Bq9tROj0vMdTEN0Ov8svEcIFUgzBuAu0wMVm
+	yTLP8Z1/i8k6ysKuc37L2S+2WpDHTvnEJckMoRp9MztBjfs3iQwrYsuDVPl8IfBs4JqwjZwdidx
+	DCFO7HbUMWgCDmPijVE2ZwTJjcHVpVrCFLBsNg4vzaeJ52Kd29nF72COiP9t2AUC+VOMQacVtnT
+	dKIPylrFqWuBI=
+X-Received: by 2002:a05:6214:55c1:b0:8e0:c0f3:a2cb with SMTP id
+ 6a1803df08f44-8f24ead200amr52257496d6.0.1782863698871; Tue, 30 Jun 2026
+ 16:54:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260630195521.1188778-1-henrique.carvalho@suse.com> <DJMNLR4D4KSX.2GHLCM6B2NH3K@suse.com>
-In-Reply-To: <DJMNLR4D4KSX.2GHLCM6B2NH3K@suse.com>
+References: <cover.1782579149.git.xizh2024@lzu.edu.cn> <eb1bc35611f91bd10a4772400b37fac26f660956.1782579150.git.xizh2024@lzu.edu.cn>
+In-Reply-To: <eb1bc35611f91bd10a4772400b37fac26f660956.1782579150.git.xizh2024@lzu.edu.cn>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 30 Jun 2026 16:01:33 -0500
-X-Gm-Features: AVVi8Cc8MuOVpSiGk8dRknV9zwPVS2uW1lCWfTRmkKkFo-s11L5ZEEBHdJ_LuqI
-Message-ID: <CAH2r5ms-2R2Fuv=NRZdAzEqq3hL=+0Y-gc18VrO792RrgjSpSg@mail.gmail.com>
-Subject: Re: [PATCH] cifs.upcall: Avoid int overflow after year 2038
-To: Henrique Carvalho <henrique.carvalho@suse.com>
-Cc: sfrench@samba.org, pshilovsky@samba.org, linux-cifs@vger.kernel.org, 
-	"Bernhard M. Wiedemann" <bwiedemann+git@suse.de>
+Date: Tue, 30 Jun 2026 18:54:47 -0500
+X-Gm-Features: AVVi8CcuBeMrNXb0-XgqgYKkYBbsJyadiNW7THAj8x5pXANqM9UhfApZiz5jxUE
+Message-ID: <CAH2r5mvzR7npgJirx9e4GAKdbva9YAJBj6P71bSxJ3SbpF9dGw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] smb: client: fix create context out-of-bounds reads
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	pshilov@microsoft.com, aaptel@suse.com, yuantan098@gmail.com, 
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, bird@lzu.edu.cn, 
+	xizh2024@lzu.edu.cn
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Applied to smb3-utils for-next
+This regresses all xfstests when I tried it.   Looks like a bug in the
+patch so have not merged this one (although have merged
+smb-client-harden-POSIX-SID-length-parsing pending more testing).
+Let me know if you update it.
 
-On Tue, Jun 30, 2026 at 3:07=E2=80=AFPM Henrique Carvalho
-<henrique.carvalho@suse.com> wrote:
+On Sun, Jun 28, 2026 at 4:20=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
 >
-> Reviewed-by: Henrique Carvalho <henrique.carvalho@suse.com>
+> From: Zihan Xi <xizh2024@lzu.edu.cn>
 >
-> On Tue Jun 30, 2026 at 4:55 PM -03, Henrique Carvalho wrote:
-> > See https://en.wikipedia.org/wiki/Year_2038_problem
-> >
-> > This patch was done while reviewing potential year-2038 issues in openS=
-USE.
-> >
-> > https://web.mit.edu/kerberos/krb5-devel/doc/appdev/refs/types/krb5_time=
-stamp.html
-> >
-> > Signed-off-by: Bernhard M. Wiedemann <bwiedemann+git@suse.de>
-> > ---
-> >  cifs.upcall.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/cifs.upcall.c b/cifs.upcall.c
-> > index 01690df..1cc9767 100644
-> > --- a/cifs.upcall.c
-> > +++ b/cifs.upcall.c
-> > @@ -247,7 +247,7 @@ static time_t get_tgt_time(krb5_ccache ccache)
-> >                   !strncasecmp(name + KRB5_TGS_NAME_SIZE + 1, realm,
-> >                                strlen(realm))
-> >                   && creds.times.endtime > time(NULL))
-> > -                     credtime =3D creds.times.endtime;
-> > +                     credtime =3D (unsigned)creds.times.endtime;
-> >               krb5_free_cred_contents(context, &creds);
-> >               krb5_free_unparsed_name(context, name);
-> >       }
+> smb2_parse_contexts() validates generic create-context layout but does
+> not ensure each handler's minimum size before parsing. A malicious
+> server can supply a truncated QFid (Query On Disk ID) context with
+> DataLength zero; parse_query_id_ctxt() then reads fixed offsets past
+> the context boundary and triggers a slab out-of-bounds read.
+>
+> Bound each context by its Next field and reject lease, QFid, and POSIX
+> contexts that are shorter than their parsers require.
+>
+> Fixes: 89a5bfa350fa ("smb3: optimize open to not send query file internal=
+ info")
+> Cc: stable@vger.kernel.org
+> Reported-by: Yuan Tan <yuantan098@gmail.com>
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Reported-by: Xin Liu <bird@lzu.edu.cn>
+> Assisted-by: Codex:gpt-5.4
+> Signed-off-by: Zihan Xi <xizh2024@lzu.edu.cn>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> ---
+>  fs/smb/client/smb2pdu.c | 21 +++++++++++++++++++--
+>  1 file changed, 19 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index 3bd300347f16..840bc81718da 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -2405,6 +2405,7 @@ int smb2_parse_contexts(struct TCP_Server_Info *ser=
+ver,
+>         struct smb2_create_rsp *rsp =3D rsp_iov->iov_base;
+>         struct create_context *cc;
+>         size_t rem, off, len;
+> +       size_t cc_len;
+>         size_t doff, dlen;
+>         size_t noff, nlen;
+>         char *name;
+> @@ -2427,9 +2428,18 @@ int smb2_parse_contexts(struct TCP_Server_Info *se=
+rver,
+>                 buf->IndexNumber =3D 0;
+>
+>         while (rem >=3D sizeof(*cc)) {
+> +               off =3D le32_to_cpu(cc->Next);
+> +               if (off) {
+> +                       if ((off & 0x7) || off > rem)
+> +                               return -EINVAL;
+> +                       cc_len =3D off;
+> +               } else {
+> +                       cc_len =3D rem;
+> +               }
+> +
+>                 doff =3D le16_to_cpu(cc->DataOffset);
+>                 dlen =3D le32_to_cpu(cc->DataLength);
+> -               if (check_add_overflow(doff, dlen, &len) || len > rem)
+> +               if (check_add_overflow(doff, dlen, &len) || len > cc_len)
+>                         return -EINVAL;
+>
+>                 noff =3D le16_to_cpu(cc->NameOffset);
+> @@ -2441,16 +2451,23 @@ int smb2_parse_contexts(struct TCP_Server_Info *s=
+erver,
+>                 switch (nlen) {
+>                 case 4:
+>                         if (!strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4))=
+ {
+> +                               if (cc_len < server->vals->create_lease_s=
+ize)
+> +                                       return -EINVAL;
+>                                 *oplock =3D server->ops->parse_lease_buf(=
+cc, epoch,
+>                                                                        le=
+ase_key);
+>                         } else if (buf &&
+>                                    !strncmp(name, SMB2_CREATE_QUERY_ON_DI=
+SK_ID, 4)) {
+> +                               if (cc_len < sizeof(struct create_disk_id=
+_rsp))
+> +                                       return -EINVAL;
+>                                 parse_query_id_ctxt(cc, buf);
+>                         }
+>                         break;
+>                 case 16:
+> -                       if (posix && !memcmp(name, smb3_create_tag_posix,=
+ 16))
+> +                       if (posix && !memcmp(name, smb3_create_tag_posix,=
+ 16)) {
+> +                               if (dlen < 3 * sizeof(__le32) + MIN_SID_L=
+EN + 2)
+> +                                       return -EINVAL;
+>                                 parse_posix_ctxt(cc, buf, posix);
+> +                       }
+>                         break;
+>                 default:
+>                         cifs_dbg(FYI, "%s: unhandled context (nlen=3D%zu =
+dlen=3D%zu)\n",
+> --
+> 2.43.0
 >
 >
 
