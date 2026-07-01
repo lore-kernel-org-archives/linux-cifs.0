@@ -1,163 +1,322 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2EC370AD8
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 16:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72F0393DF0
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 21:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782924841; cv=pass; b=ZA+DgwxK8nlXR6p2GZhmxFfuQWxydDQ6s+jd6XY2o374iECTuZK5tPV5ILWvOK6nZ9LnWd+k6Ijz/GhaDK33mmnF3dMNxCr/uNEjuhV1dh3KsITlnS9I9tiKfM526N5Kz6RyDa8WBjtGzoGmDrwoZXOcWie/d3ob3zbQf/X3GtU=
+	t=1782940806; cv=pass; b=HwWDk00/qfLhLbebHh+DGjwJ8Zz2I5fHCH7JPnUloUcGJdwg38+WFVLuEwny5gfx4AGwkFyk5sv7qY+u+BBHYCrx+8IMEuegKOPFySrDGoZHXTR2Y02i9glr4cbwvk7lCwWXfHCgnksARx1zdoMp24gYoBae4On3yk2m1DaxR7s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782924841; c=relaxed/simple;
-	bh=/zOjjc42EakNoyDjDVh8gkia55+68gY8XTD9YLvq72k=;
+	s=arc-20240116; t=1782940806; c=relaxed/simple;
+	bh=/Ux83zg1PqYcZH5iLzb43vgGjkCV2+L95I+nyyH9Z9A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mhb/y7JHl9J+9eSDaFYg/MbVdi5Cs3hjad3WpaOU8XO7vilAmNAnhulBnLrSHtTNX02LzdLuWn9lLvisLkdM3WNfYdjMsEjgzILXG1vFdzfHjYdkxMtqlLNh8fRuQLpN99mtnzaOn/Q2FdDdFjxGTdFzdTBPgv8k69cVleceUqs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOSdz99l; arc=pass smtp.client-ip=209.85.219.49
+	 To:Cc:Content-Type; b=TG6jEOSrXjZkT+yIJH5CGRElbRe0mYHXuP00qyK86tGOX1DijgK8J6yOq0BMu8QQ7DZ6wzRT3OYwm8srxMzL67CTi8/xbHlzSlQuIosWsJBqnDxKmV3mUeuMRS/wc76YBQhlqGZfu01m2aIMwWUbJFjZ0lT1qHIe3k9BeWBe63Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtENuR+8; arc=pass smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOSdz99l"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8f3cbaef818so5179076d6.3
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Jul 2026 09:53:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782924839; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtENuR+8"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8f2509d6becso10967916d6.2
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Jul 2026 14:20:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782940803; cv=none;
         d=google.com; s=arc-20260327;
-        b=eWbh/P+O8N5utM7dsjwrYpDYVaVNkkdViewOro+dDewEjg5u+bysveDSpYLCnHuW0s
-         mymhz8qPQWJxHJ4HKNfZ9mf1/ljhryWdoVhGnBd7NTy+7d0ZE4sjM0btc9S4ZqPdqMM2
-         DaxHwIkW01ugcBJ+tk0hLIDjLYiVKR9/bLht7gdinx54qNfKuUKK7K4fLZpMFGQWddFs
-         OGdFSLDOlVfBuJga8SOtnEpMuzF5i/8fvVkdifNPZKZwSfn9n2v6rmSuJKpM7Pq/htWB
-         LVW6TjIn8Vf4WL6qqBZfbMS8qkRF2WSBYyMLCUzLW7Xf0NZgxx4nLQGz1wBn/qKlJAzJ
-         I8Yw==
+        b=KBQBBqB0aAQHHk4rrw3xxRGf1E0Se7e0uRrIgSqSW/mCKgkaUtFOBvddEptiF3/xzb
+         7Oq/CCDJpPZL4jH7f7LBHTxPIbMopvyRvwIRdVqiGAVlKVxx5ZB+ESvj3LeVK+GN6Vwq
+         /zTsZlcno1w8Oa5320ZFo/jvHL0MZBLjDdAl8Hil4F3gN0/F9nLIzrCmdgffmWKWS4ZR
+         DYD09KfD7G5D1xlCqhGGRI/ZL+pXBy7VJ6HSNUsZDAFkuJeGjJs4YhczCdsmkHMUF7gZ
+         V74A093lweLfA9hDf44mff78tD5iS+BsU7cYudiO5sSTVrIYuD9bTFBuLmA2yUAZheU5
+         CWOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=qsT7Aucdo3WB1/6wu36t1SsQsjdxfjkNbvdDVuWW4Xc=;
-        fh=QLwhZa/DH9XJT/cGPdtevNKN5L07PBEhyt6AVsIEV14=;
-        b=NgG7BpF4rk4WfvWfJrwlSR+7JBHNAP2hrojor62OXMAQjCm++OnVLv289lLWU+05JH
-         0ncftoMCWFZWno5t1EtkQgGEsFcHZrjU2QyFXIy5U0DHK8tNCH4+bDRgOg0zvGgoCkOo
-         M6Lkyl0eD55dNcSD5y2GM6JQlIid2juqubFO7p09hzT5d2whO/ZC891z/UGZYYIm2ix8
-         arIr5mpGaB3X4cawxCwyF0XZSwQIo42ytyBSkB6JZdPUv3CH1Kw+wBvGLhJgUwZ4yhDV
-         kOP3KlsOkboHCGWKQPypoo70FDB/zVL/5Ktj9XpBibGFjMVYVjxhSEVPyVL4GW8Dl94v
-         tbIQ==;
+        bh=OBhEpWJUv0KmQZwPOc1kYdeMY/SvDxTnIv9UExFbdcY=;
+        fh=Hhoag2Q4XQJSvENOQAv4gXqA+AceMD2p5eLIc9NWRyI=;
+        b=bBBSB+pN1nIw47hdpfiaj+OKUHgL22ouiUz3fj4eMlvGt8pN1362//A7QgymDUJeIx
+         aIYuEF2hmsWPTnCmVoIXPckBUPEP9bKtMaF780T/QJZkEobFh3bxh4/UM7JC9k5lOkQ5
+         tPISfzHvvPqpULlva5GFR3c3JzJsWHl7fHZBou28BsVQrEEtoD6eVeUuKx+gIX/G6SnO
+         nwPmKvTIvEjHH3gd5bzCAfQLUVmPcTgBCRSQry+xXT25VLjDEu6Sq3sMCEeJC/gcn8MB
+         u9jYX0f+LvWgClY1MJbuyUD5R2+01+T8vS/VEMaks7A/3dMnsJMdFcaFeneN0JbbpH+e
+         XHUA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782924839; x=1783529639; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782940803; x=1783545603; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qsT7Aucdo3WB1/6wu36t1SsQsjdxfjkNbvdDVuWW4Xc=;
-        b=dOSdz99lNVVTnoE0fFLtUuiWd4YkifXGXr7H+d92/bM2tiyQri6QntaCL+ZRX37lGZ
-         15pOpGvlSYEmuLtmTiPrJArzp8yYvn0tnp+doRbRYkbqipA50F/5LyEjns4gYjUKPlhw
-         lBv7PWOyuxAMq48To1j/9GjrJHeX17zhSeS+XjktzTnwrYSWkYHjdpygns0R81NZrtrl
-         zrpFXlf1p5HsMT6VAVSSmg/UiYCmA+3kv+WNmhg3hmYBfws67a6EOE35eCzOf9WISEin
-         R3WrnA11MS9A5gy7EvQdeYaNqEcjtBqZn6fh0e/NdZeVE5DlzKre6allrALl62r793oz
-         EVMQ==
+        bh=OBhEpWJUv0KmQZwPOc1kYdeMY/SvDxTnIv9UExFbdcY=;
+        b=GtENuR+8s+n46O1jJCSuCKR0XSzfVwKfLqygWs43NIiykMPgeQqlwwcPhU3xgJbvOB
+         EjJiR+PFygWgETGjtJUG65YAaSVU6RB7DPoqAUhYMtN9iHsnerb/3254tHZJPkmFyTYY
+         6fIpE7nH7LH48B0zZveRQ6iXEsFGr6z6uUQmix8j/iWMjWJQCmDMfX5WaKOb3P2KhN9w
+         6x7/MYXRu+PAWkTPysbSREL3Pk8nM/MB4L2HnzQXuIW0fN+9iiaQVJPys8yiv2pGdY5U
+         T98t/pnN7NbKPx7guvtx0TvuylIaf3SYc9Dr0jVD9aNRRLOvnAr1I3K1OmXNMgVrJtEU
+         4HLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782924839; x=1783529639;
+        d=1e100.net; s=20251104; t=1782940803; x=1783545603;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=qsT7Aucdo3WB1/6wu36t1SsQsjdxfjkNbvdDVuWW4Xc=;
-        b=Q7165sigkMs4lGHseMzp7AueP0IoTV+T0HHqG12apJCteBYI7Q5kF6uuh1Wf8Eqw0O
-         Bwo+IkSNXqPMcoXc6+gDdJon9yutuZ2dZ6UMCWmiLXRx4mXR7oK89DSpyijUkhVZ/gtz
-         0gOpEUSMTWVT2eZeliX97Y+8fzjClsLHEfyW5+w8++sX63Gx67kD4QwHFhIQvgLJk3bF
-         aCVu5SHnXj0xIL+asDmq9aRF/KC/9rXcwF9+9dPSSeC/HpQj1IUdjGqS95wssVB25JNz
-         +b5wt1LtTWK27O6I7nIubc0c950j9pnPYGpsgV1djOva3mCICAvSS938q34oC8fQaIqx
-         KVLw==
-X-Gm-Message-State: AOJu0YxPwp/dqAWR0wJ36XbyI8jqNuD3hBqSs7lqLCrU//5ryq7OWIO8
-	s0M0IhKeZGnJACMUNj0PpC53QL2P0OFVUAGCwG1NsaX5VhjLTy1tNB2xZYZ+pBSyx4xX4SPL2sz
-	rT8w1n07v9VCrfmXlCNlvYupzYFqq1qQ=
-X-Gm-Gg: AfdE7cnz5N2KyKpc+1O6Q/gPtjsIjkp4DL1OmOAS8As0m+Z8vqSe6NTWUWEy6OPA606
-	+vjE5fh+qDE7erp53+JOrpcY4fIkh1wogWePrFD0eZ1pWuoRHSuCJU5GrGXcrAhItAzFrbtCqz5
-	4y7OyNJ8xUpaAqqI5BPLbOkwKLFxhgOErPdeHFgjna42SL764ApXKYYv+ZQULEWZJ0VJ9SdfY72
-	FULy1loZY6hdCFOAqAsJGTmgltSYDJcg7v+91/AcxV75KxfXUV/86jLlUSZ7lsuWu7P2vFPAmI4
-	5ovU3aGa7IKdxOOz0tYYFOGzKlY7imWLQv4/odwDqauZFqApQTT9DMv6yqZAPBmzfgonNt/dRRJ
-	FlCcOot9bhsJjlLFNpXVtVJ1UcG17GSuJ8Aw5FjiwZKw4c8UAL0QJR1uauptE43+f2EN7ICUtVo
-	sQbM1FT0Hv6Qg=
-X-Received: by 2002:a05:6214:470f:b0:8de:25f7:98bc with SMTP id
- 6a1803df08f44-8f3c76a6861mr30338866d6.22.1782924838802; Wed, 01 Jul 2026
- 09:53:58 -0700 (PDT)
+        bh=OBhEpWJUv0KmQZwPOc1kYdeMY/SvDxTnIv9UExFbdcY=;
+        b=Jpei61sZgByLxdlzjl/cLXsAdC4Y6QDVESrlUEkfKY/qYg0gkmMWU2N7yGncYgug3K
+         UowzJ0yiVLVXF39FSR7Y+wVmPQ1jh69aLLM3TZm25Tv6gpHSO+PpZZiG5yrwX+Gw6xi/
+         hCzssDVK4QObaYL+i403fDuwhqpBbzKF8BRWlFHXGVL9xbarecZ2rOqQEgPgKAzxm5JD
+         wxayxe3URM/DFSrtO5DPb3qhr6iro4VRJPeltLRf8HIi0K0MQtwenvbIRWh5ypTTqf4O
+         rJtgULR4UE70cbbCqZsxYVB9sbeBSfPT1LlNCUgDvVfMtfFRYiBP7kvnKAt5dHZa+oEx
+         /TyA==
+X-Forwarded-Encrypted: i=1; AHgh+Rp9iw+MFQCU/AcFnXG7f23/CnaPPuq8dZoXBqo2LT1wqRtiYz3g23NYMENSa2f7XtIoPnSP00QM6e+x@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLAkD77ppQTRNxMKdWUkoO5sIlymlIePeicSr4kGKh8zZ8ZOR9
+	1kpWGbh+LCLMbI5YUu7MLYgRmwjVubkPWUFA6SdoYWQunSpJ7gzyVQLlavlu+iGWeadFAjEpQPh
+	kEir5aQOtelqCHDg5h2vatuHftXzv5kc=
+X-Gm-Gg: AfdE7ckB54nuFDX2YZ/u1vHpNBVyZDrVjTGQw/5rC8aywvauzLlfH9Zaf3KH1jn35Ez
+	JqI+p0+7Axva+KqyHdhlb/IJu3qSre0j6tR6VZjjP6Cieuns8JME++DSgLoXXVPIAFb+tTwZN/z
+	CfkDcmxU/r+R1g0wmnIy8XXcreYf9k63b2QBBsx+qO17ZWjR6WXOehSsN1PRuE/IM2LzBNpEP4s
+	YSAKEWs70wnv801aT3iJGFnOktiP9vRe32S6ZR5Bq2RyrLasPHNTFslwGizkv6ZFegS5qH1aQY7
+	E/262BJARosPnH4ooFoQVKuBHJtSwBNIUCh680WctGnxfJYQamdMCQWV4AL0g2X4WGssAxbPVmK
+	3Q+WpO1I+F9VWLmCqVARWYXO4sRRiHQq1/tWelEOL7iJRh7Z1VeoNyUkhmDonmwQLgzh+6aIlda
+	2dEBhsUIW66v8=
+X-Received: by 2002:ad4:43ca:0:b0:8f2:e9a1:923a with SMTP id
+ 6a1803df08f44-8f3c9da7f59mr35612246d6.54.1782940803441; Wed, 01 Jul 2026
+ 14:20:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1782898568.git.xizh2024@lzu.edu.cn> <60461bf5482d51ebd950fc84fd19ece9ac1917fb.1782898568.git.xizh2024@lzu.edu.cn>
-In-Reply-To: <60461bf5482d51ebd950fc84fd19ece9ac1917fb.1782898568.git.xizh2024@lzu.edu.cn>
+References: <20260701152157.822207-1-huiwen.he@linux.dev> <20260701152157.822207-5-huiwen.he@linux.dev>
+In-Reply-To: <20260701152157.822207-5-huiwen.he@linux.dev>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 1 Jul 2026 11:53:47 -0500
-X-Gm-Features: AVVi8CeP-uYebO_940PnvqKmRxHZJ91p4BVXyipkQta1aLMLRiTtTwvpSlt6XZA
-Message-ID: <CAH2r5mtndSB-94YqcfNJMxJ2jDYbVdsBxeRvPhj6EeJqjdpFng@mail.gmail.com>
-Subject: Re: [PATCH 2/3] smb: client: check posix_info_parse() in cifs_posix_to_fattr()
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
-	tom@talpey.com, bharathsm@microsoft.com, xizh2024@lzu.edu.cn
+Date: Wed, 1 Jul 2026 16:19:52 -0500
+X-Gm-Features: AVVi8CcguP9jaL_tAjvCtDAXOsy4HdmUwOZ6FQhzXzwZDTbSBAiH_Mi8pdYlzwo
+Message-ID: <CAH2r5mvX5qdWyEszD2reWMHOaUYrqtMmk0RK9xgkrx+Wc-RdWA@mail.gmail.com>
+Subject: Re: [PATCH v6 4/5] smb/client: refresh allocation after EOF-extending fallocate
+To: Huiwen He <huiwen.he@linux.dev>
+Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn, 
+	linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Ren and Zihan,
+With this patch I do see a difference in generic/103 which with the
+patch returns
 
-Thank you for the patch.
+generic/103  0s ... - output mismatch (see
+/home/smfrench/xfstests-dev/results//sambamfs/generic/103.out.bad)
+    --- tests/generic/103.out 2025-08-22 09:54:32.266754366 -0500
+    +++ /home/smfrench/xfstests-dev/results//sambamfs/generic/103.out.bad
+2026-07-01 16:13:02.220130644 -0500
+    @@ -1,2 +1,3 @@
+     QA output created by 103
+    +fallocate: No space left on device
+     Silence is golden.
 
-I have a concern regarding the placement of the error check. It seems
-like the check for posix_info_parse() should occur later in the
-function, specifically before the two lines that utilize the parsed
-output:
+but without that patch works.  Also is puzzling why the error changes
+for generic/539 with the four fallocate patches from:
 
-sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
-sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
+generic/539  0s ... [failed, exit status 1]- output mismatch (see
+/home/smfrench/xfstests-dev/results//sambamfs/generic/539.out.bad)
+    --- tests/generic/539.out 2025-08-22 09:54:32.329794445 -0500
+    +++ /home/smfrench/xfstests-dev/results//sambamfs/generic/539.out.bad
+2026-06-30 20:27:26.739245628 -0500
+    @@ -1,2 +1,4 @@
+     QA output created by 539
+     Silence is golden
+    +seek sanity check failed!
+    +(see /home/smfrench/xfstests-dev/results//sambamfs/generic/539.full
+for details)
+    ...
 
-Perhaps we should use something like:
+to
+   generic/539  0s ... [not run] File system does not support
+llseek(2) SEEK_DATA/HOLE
 
-if (!posix_info_parse(info, NULL, &parsed)) {
-      sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
-      sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
-}
+Samba supports SEEK_DATA/SEEK_HOLE right?
 
-Could you please take a look and let me know your thoughts?
-
-Thanks,
-Steve French
-
-On Wed, Jul 1, 2026 at 5:26=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
+On Wed, Jul 1, 2026 at 10:22=E2=80=AFAM Huiwen He <huiwen.he@linux.dev> wro=
+te:
 >
-> From: Zihan Xi <xizh2024@lzu.edu.cn>
+> From: Huiwen He <hehuiwen@kylinos.cn>
 >
-> posix_info_parse() returns an error without filling the output structure.
-> Check the return value before calling sid_to_id() to avoid using
-> uninitialized owner/group SID data.
+> Before this change, xfstests generic/496 was not supported on ksmbd:
 >
-> Fixes: 9934430e2178 ("SMB3.1.1: Fix ids returned in POSIX query dir")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Zihan Xi <xizh2024@lzu.edu.cn>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+>         generic/496 ... [not run] fallocated swap not supported here
+>
+> ksmbd handles SetEOF as truncate, so EOF extension alone does not
+> allocate backing blocks. A fallocated swapfile can therefore still
+> look sparse to swapon.
+>
+> Request allocation for EOF-extending fallocate ranges that can be
+> represented by FILE_ALLOCATION_INFORMATION, and refresh the allocation
+> state afterwards.
+>
+> With this change, xfstests generic/496 and generic/701 pass on ksmbd.
+>
+> However, Samba "strict allocate =3D no" now exposes the real generic/701
+> failure: the old pass came from inflated local i_blocks, not from
+> server allocation. generic/213 also fails in that case because an
+> oversized allocation request may not return ENOSPC.
+>
+> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > ---
->  fs/smb/client/readdir.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  fs/smb/client/smb2ops.c   | 43 ++++++++++++++++++++++++++++++++++++---
+>  fs/smb/client/smb2pdu.c   | 19 +++++++++++++++++
+>  fs/smb/client/smb2proto.h |  3 +++
+>  fs/smb/common/fscc.h      |  5 +++++
+>  fs/smb/server/smb2pdu.h   |  4 ----
+>  5 files changed, 67 insertions(+), 7 deletions(-)
 >
-> diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-> index 1ff77f3d1de0..df46aa919c27 100644
-> --- a/fs/smb/client/readdir.c
-> +++ b/fs/smb/client/readdir.c
-> @@ -244,9 +244,11 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct=
- smb2_posix_info *info,
->  {
->         struct smb2_posix_info_parsed parsed;
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index c75f55935b9b..698fce6feea3 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -3756,12 +3756,49 @@ static long smb3_simple_falloc(struct file *file,=
+ struct cifs_tcon *tcon,
+>                         smb2_set_sparse(xid, tcon, cfile, inode, false);
 >
-> -       posix_info_parse(info, NULL, &parsed);
+>                 new_eof =3D off + len;
+> +
+> +               qrc =3D SMB2_query_info(xid, tcon,
+> +                                     cfile->fid.persistent_fid,
+> +                                     cfile->fid.volatile_fid, &file_inf)=
+;
+> +               if (qrc =3D=3D 0)
+> +                       asize =3D le64_to_cpu(file_inf.AllocationSize);
+> +
+> +               /*
+> +                * FILE_ALLOCATION_INFORMATION can only describe allocati=
+on up to
+> +                * new_eof. Some servers may accept it without allocating=
+ blocks,
+> +                * so refresh AllocationSize before updating i_blocks.
+> +                */
+> +               if (off =3D=3D 0 || off =3D=3D old_eof) {
+> +                       if (qrc || asize < new_eof) {
+> +                               rc =3D SMB2_set_allocation(xid, tcon,
+> +                                                        cfile->fid.persi=
+stent_fid,
+> +                                                        cfile->fid.volat=
+ile_fid,
+> +                                                        cfile->pid, new_=
+eof);
+> +                               if (rc)
+> +                                       goto out;
+> +                       }
+> +               }
+> +
+>                 rc =3D SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+>                                   cfile->fid.volatile_fid, cfile->pid, ne=
+w_eof);
+> -               if (rc =3D=3D 0) {
+> -                       netfs_resize_file(&cifsi->netfs, new_eof, true);
+> -                       cifs_setsize(inode, new_eof);
+> +               if (rc)
+> +                       goto out;
+> +
+> +               netfs_resize_file(&cifsi->netfs, new_eof, true);
+> +               cifs_setsize(inode, new_eof);
+> +
+> +               qrc =3D SMB2_query_info(xid, tcon,
+> +                                     cfile->fid.persistent_fid,
+> +                                     cfile->fid.volatile_fid, &file_inf)=
+;
+> +               spin_lock(&inode->i_lock);
+> +               if (qrc =3D=3D 0) {
+> +                       asize =3D le64_to_cpu(file_inf.AllocationSize);
+> +                       if (asize >=3D new_eof)
+> +                               inode->i_blocks =3D CIFS_INO_BLOCKS(asize=
+);
+> +               } else {
+> +                       cifsi->time =3D 0;
+>                 }
+> +               spin_unlock(&inode->i_lock);
+>                 goto out;
+>         }
+>
+> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+> index d058584b8f05..1374bbae627f 100644
+> --- a/fs/smb/client/smb2pdu.c
+> +++ b/fs/smb/client/smb2pdu.c
+> @@ -5947,6 +5947,25 @@ SMB2_set_eof(const unsigned int xid, struct cifs_t=
+con *tcon, u64 persistent_fid,
+>                         0, 1, &data, &size);
+>  }
+>
+> +int
+> +SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
+> +                   u64 persistent_fid, u64 volatile_fid, u32 pid,
+> +                   loff_t allocation_size)
+> +{
+> +       struct smb2_file_alloc_info info;
+> +       void *data;
+> +       unsigned int size;
+> +
+> +       info.AllocationSize =3D cpu_to_le64(allocation_size);
+> +
+> +       data =3D &info;
+> +       size =3D sizeof(struct smb2_file_alloc_info);
+> +
+> +       return send_set_info(xid, tcon, persistent_fid, volatile_fid,
+> +                       pid, FILE_ALLOCATION_INFORMATION, SMB2_O_INFO_FIL=
+E,
+> +                       0, 1, &data, &size);
+> +}
+> +
+>  int
+>  SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
+>                 u64 persistent_fid, u64 volatile_fid,
+> diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+> index 78a4e1c340f9..16a02c1eb0a1 100644
+> --- a/fs/smb/client/smb2proto.h
+> +++ b/fs/smb/client/smb2proto.h
+> @@ -204,6 +204,9 @@ void SMB2_query_directory_free(struct smb_rqst *rqst)=
+;
+>  int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
+>                  u64 persistent_fid, u64 volatile_fid, u32 pid,
+>                  loff_t new_eof);
+> +int SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
+> +                       u64 persistent_fid, u64 volatile_fid, u32 pid,
+> +                       loff_t allocation_size);
+>  int SMB2_set_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *s=
+erver,
+>                        struct smb_rqst *rqst, u64 persistent_fid,
+>                        u64 volatile_fid, u32 pid, u8 info_class, u8 info_=
+type,
+> diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
+> index 859849a42fec..941db5a95564 100644
+> --- a/fs/smb/common/fscc.h
+> +++ b/fs/smb/common/fscc.h
+> @@ -283,6 +283,11 @@ struct smb2_file_eof_info { /* encoding of request f=
+or level 10 */
+>         __le64 EndOfFile; /* new end of file value */
+>  } __packed; /* level 20 Set */
+>
+> +/* See MS-FSCC 2.4.4 */
+> +struct smb2_file_alloc_info { /* encoding of request for level 19 */
+> +       __le64 AllocationSize;
+> +} __packed;
+> +
+>  /* See MS-FSCC 2.4.15 */
+>  typedef struct {
+>         __le32 NextEntryOffset;
+> diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+> index c2512dbcdec8..aa06c8c905f1 100644
+> --- a/fs/smb/server/smb2pdu.h
+> +++ b/fs/smb/server/smb2pdu.h
+> @@ -212,10 +212,6 @@ struct smb2_file_ea_info {
+>         __le32 EASize;
+>  } __packed;
+>
+> -struct smb2_file_alloc_info {
+> -       __le64 AllocationSize;
+> -} __packed;
 > -
->         memset(fattr, 0, sizeof(*fattr));
-> +       if (posix_info_parse(info, NULL, &parsed) < 0) {
-> +               cifs_dbg(VFS, "Invalid POSIX info payload\n");
-> +               return;
-> +       }
->         fattr->cf_uniqueid =3D le64_to_cpu(info->Inode);
->         fattr->cf_bytes =3D le64_to_cpu(info->AllocationSize);
->         fattr->cf_eof =3D le64_to_cpu(info->EndOfFile);
+>  struct smb2_file_disposition_info {
+>         __u8 DeletePending;
+>  } __packed;
 > --
 > 2.43.0
->
 >
 
 
