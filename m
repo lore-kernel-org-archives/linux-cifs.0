@@ -1,170 +1,210 @@
 Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36CB5395D86
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 21:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10934386450
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 21:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782942310; cv=pass; b=TALjbi6hN3BH3Cre4HJvIbPgnBhvw/cGZREk4fSKgK8uu1SfNg7zmCw/Nkxo7P83xy2giQYMJ1Ky4Qqetacn1NlDhV2z5YhOz9YzNAi2dsB3iIKGDPPdGCE3s0Y2uRaWKglRm6suwkMozua25aFHLyWU5gIjiSfMYvjRirhhzKE=
+	t=1782942476; cv=pass; b=Wixv+14lRAmPdgfgMxU40W3m3P+1MvAFWkqifzevBeyIOmCpyLqnwcKyd0r07hiVcGRXFqFxYYFTmfzTDF52owATYxLhGAi9Ebu2B53ZLMWJ+H8kXXVcqx4LHDNIkkOtsRsvgoYKe0hRX9MS34x4ML1F+wzKqik1005SEFOdvWY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782942310; c=relaxed/simple;
-	bh=ePO9CJQvigbJp4mYdLFff3Gx9iwPELq/2F1wYyKt6wQ=;
+	s=arc-20240116; t=1782942476; c=relaxed/simple;
+	bh=H0rmLNHY5Q0EfmTTWT7iXJbIhGOdnFi8GKOcHg4c5E8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VlZb62Qns8kudXeEwl9iL9TbkKY1uxq4e6ZC+plwlN/bfQu06XvRCB7l+pW6w0SyW6BXVBK4UNGu8Thkr56w250z/kbqUPujR4W6K+K8o5fsqfTk34YgYIvgHaY7CSm4gpYtHe4dRm3gXjFLdc14OqWdGdF8l74YDMCZsPKBOs8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YuIa+zbo; arc=pass smtp.client-ip=209.85.219.44
+	 To:Cc:Content-Type; b=hnd3oO+46QFLvLcK9bSJLu9PyHfM5Ih2cOcQPST7F/l1U2NCfyKN6JyANcs7SneMzsiqd6LK/oLChwOEzHu8C7uXaodTdZOHhX5ZOxgw/kR5OQ169a6EkLTcn3d0mAcLvH0frK8IaCTeRQSuAhgO+G2iXmWm40YOkxlOpavPSN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ciiDIgkR; arc=pass smtp.client-ip=209.85.219.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YuIa+zbo"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8ee88fce476so9846996d6.0
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Jul 2026 14:45:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782942308; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ciiDIgkR"
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-8ee88fce476so9859076d6.0
+        for <linux-cifs@vger.kernel.org>; Wed, 01 Jul 2026 14:47:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782942474; cv=none;
         d=google.com; s=arc-20260327;
-        b=DvECQWhRxFnWjnFP2sVp3SECW1l2wFdED0eIOf4OzVZx8SbR6muMVBh/5iTE7n0HW8
-         c3juwnCkS/d39OsFCbhV1GvBKbGP7624BRO2rCV5AA+xUsQ39hXXcCHBxe6piHPkkG+x
-         8W0v26hiI3GgD7I7VgcHo0KaBmMP0ey2jpfuwPgzSM6XGgdww3iKPAI4PX+Dypo6iNBD
-         YolCxkpFFBGv/2Z7dyzDVbNKlkTne2bkq90LBckBW7j+Rf9AWp18QvkutUkXFiuotxgk
-         5e0YE8vY4mpeMFWT8iWVliQ5wjQPQRZ1j4yjrkai2QGLHJggaGiH+Q9U1/PJKB8E0ID0
-         QFQQ==
+        b=VnbzomiiUf2C27RwOE9Z9uKzEddQIHw9CdC8kSGi9Zic4yyPM+meC0yrunjjDkP+b4
+         tAddczK+/Pw7IZHCHNd+kyZdQ5e9Eu1xnMSJX/uh2wTj073sRO9+CRpvEjy7FwtRvwu+
+         keCOgvm1zyVFUPSqDPXosVnByVRH/vQYeofwJkfI2TbM6rSQdmGdRCj2SLs9TvqjYsQd
+         qEfT6Nxyu+jkiw5on0F1kLfVWZosLxuaARDPy7eg7nGtk8E7mw/vTMZ/JYcl9mJ26bX8
+         UPBXLCmdUa3lpdfWW7HpOPXoz1c6XAik12yyU7MmKjDx4Vj7u2gB+YJjSqhwe14isf7z
+         2InQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=bfdhlblgc0eQOUVL6ZW5i2tRBFOyNljYG8ekW+U7CS0=;
-        fh=v4Pyf7MUJDs3cJsOsh35zBdwkRaYiN0BYG1bGEcUPng=;
-        b=RKnsq/4wnLZOwEDd3oypKNkd+fI4sC5PSBgFZQlOXnFSCXnb+79pJuuLOJXQmK7m0F
-         UAB2UXvj1A/0lY4sZWr1X1LlgN1LQCmN5/qYHP3P3I5xKXeLoHxrfrO/uHslpUbKaf23
-         sjIw/+qB8e/oeygDf/vl78T48Fr+sDDoDCWJMoaAVqrBi8wLmeVriUQFVUJhCIjfuJ9z
-         YMcLdfuWHe6yfG/YAGB1glYaYSX+VFVaSjzWueMlbGbDUbe7i56ygUe8CaXqvacfBEGR
-         HtG9auUzKTabb7N2RBnAcCAGdcG0xFhd4bwk+9wdnON0wtigascac3q7WMXu23HrMukS
-         kMwg==;
+        bh=5DMsUg7D3URDvxNrOwtGfF+HxS2ydq2gWLRjvWllS2c=;
+        fh=exiCK+K2qjphmn7GZDZ4nyoAFsrPOKYoLcWNrq1jIFw=;
+        b=nB4ZGO8mSuPsoBEaT2a1rPEZfXt4vh4vJ/lMXI7RiJJUJKbsk8fXo3NLIprXd3vP09
+         oy0Fm/v8xcTeFzeJTaUCbpL/teC8E52iyg386SFv+5g9rpEnmcBJYRJaTvWGcIZQ++U/
+         Cdr7qQf6+WuOTxyg1lOQgV50wfbJhtYAOcor732flm8I6kXFDkW9dZ0yrpiXnFjtdDYD
+         Jrm4b7fEpL4lbWF9NduY5aNwg7u8CDKH+wMRUoBv2fK4zn/WPZ35SOKIbu55DkxHuHXx
+         7VyhqA3pfDpm+R8/oe1exTWL0/asiT+dX2wIEkg6air6yPqVOykBNPJtyodzF2QbUqQm
+         r7SA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782942308; x=1783547108; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782942474; x=1783547274; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bfdhlblgc0eQOUVL6ZW5i2tRBFOyNljYG8ekW+U7CS0=;
-        b=YuIa+zbom2zyvb+l1BPkpprTiMfQHoyReAkrsmv6S0PmKnvWuQFqHfd7O5N1ZL1MZk
-         LFOZxaWkpGq1Q9Lx7lKqtkKI/B5YcO6aDobl5OtKn2DSDu+lRKs8Li38jYuXnuYjO3kV
-         Z9mcxX9Jfu2VJ4dqo6qYZTMTULTQz4j4F31CygL+9KwisFv+cBqYXa/3dqAmyxchp51p
-         PA4q93boU1Nt1KpYKvYXkM3zfRVu89h4jog4GYp8jljDuUm5uhyDKlB+TcIrAFWg/lTu
-         86mn5u4xI7suqAdE1C46NdSuTCZi89h7RFmsg975MeP6FaFcWCTUBYeWY/AglGAMY8Q4
-         EmnA==
+        bh=5DMsUg7D3URDvxNrOwtGfF+HxS2ydq2gWLRjvWllS2c=;
+        b=ciiDIgkRiKq85W8P01Wm5IUDwVZst1GdYvLev+z22HWK3j7e3i+cNtvTgSYDE8eVKP
+         xrsW+M7dPI7LoZ+rMxtkaq80b5qDAb+4WWOGgh0EZo/C5hdOJlNIZTDTGGKuGGRXvWl8
+         9ZlCY8P6hGotwE6HDCTTqKx/XUcwhA3HBnlfq37+GrWto5w4Zk8wa/xxTbMaKDZXnnce
+         3jFUyOYunKpPT9C5UHCkTLXN1al3zZpaKjGzA/cXJdPXWa5oi84wY3y+9PtTLHKhFPtT
+         Qhg9VmLYH4CE4SPmGZeRBkf4wDtYP4Zw6fBTuNabbMBBbtujxwUj6ar9lf26fyp8qHzs
+         5wdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782942308; x=1783547108;
+        d=1e100.net; s=20251104; t=1782942474; x=1783547274;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=bfdhlblgc0eQOUVL6ZW5i2tRBFOyNljYG8ekW+U7CS0=;
-        b=SpEjscbHloB8druvH8BNmn7GxP2TBNDyF61hSslX1ZupbHKj3RM8ldrSVNVCe4qIlV
-         ur+vpgQs1Nae8i72YbuvfyDsTA1seNbzrVzNewD1Dan0uxjPiDs+F8yOGz9K19mYG8NB
-         2j29KJwE4INe9srquTiYH05v4rN6fqSDCFa1A3h7GqnAMJ00Vyg2VgTeNtoc6mnIBN5Q
-         UHBg5TG2/RhQskVpgV3JbOIFXtKIEQtsOYtFwQ+4zJxFXIqrTUoFIRNNtGGanSgfwxBj
-         eElovR9Qx/FkbcCThVY4Y4fMPmWVx1XZeJ7hKKsypXJ0MtFCeNirdZvO6cNO+WOZJhKJ
-         CcYA==
-X-Forwarded-Encrypted: i=1; AHgh+Rqemo3TnSfbDvIbiplXl5uMb2M5zzt/fwqUw9il9IjqI/+WYtyrOeGqJoLpETY+mXD2zLwPUoSq5k13@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzjp7hXYBjqhk8wWTU8dtoyGbgnimrLxcywyADxHv9Sq57sGnSy
-	8Rukug/MBZY/RQK9pr1H9vuU8miUmkuQ0029vaTM/1XfBZf8Yi7XN3F8vJPkZSt49MT5NCXp4JE
-	uspTwxR0liUd9a35n0BsY/587AffB36Y=
-X-Gm-Gg: AfdE7cmbhqJuQ3+jQvPIxnMTEjfHUTubxoaMBJ1osvRyauTcOJRj+5iScyXWUN1G0X9
-	3bsYUBrthqrkV+j9xErBg1cci6vUBj4DOO0hsGLSg4VGwxYHAyzzocak8vS1QwMBnlFXQ5K2zyp
-	wF34Y/bOJE/+B1pSLmg+iI/MciIGhk0iIqHgvdS4DYZKSlboW3huqDCU+8CGSfAVBMCnlqaDKVr
-	67jcBHFw1C4mPBV8GQMRBV+0q2KhfHsEnwI05AJDFvUaH0PFR6bov5RWsCdtVN7OVZOCIrnfFe9
-	t8dlPPy0AwyBH8kAOfqlCdM+WsR9fFOzA1tyP2aS5fIoe5yHqjT7s9Txcc9jFZOf1mjB5rpVpN/
-	CNW22BsEKs+aTgz/t6o1lHik8quI52k9rZDnnI6tvycb8/2c5Y3ENufLdnFUILwhfHyifaGg2Ti
-	rDZoQAEpWRfWw=
-X-Received: by 2002:a05:6214:4e15:b0:8ee:fbc5:8110 with SMTP id
- 6a1803df08f44-8f3c8b168c0mr47999036d6.32.1782942308123; Wed, 01 Jul 2026
- 14:45:08 -0700 (PDT)
+        bh=5DMsUg7D3URDvxNrOwtGfF+HxS2ydq2gWLRjvWllS2c=;
+        b=caQ4aZrLIRk9sCHS0dGId8bLc+16zA/rbIUwVbtsNnAsMBCODVhLPso8O3tj3D6n+0
+         DnDnlQmXo8wERZY432iVv8eg98k9UfBZonAHzSffyr9W1Wch0z6fdA4fwNBPsluhlaH5
+         h1Eo9ULZmXfBpu5zswDghESqpkymPB0Pz1/ng7fladsDRGWFFQo/qO2RZfl1f0OpSXkB
+         lEk47F0QFB0RAP3w0hz7IY2wqmcgvBSDX4sNvRLGnscV5rIpq0SZWi0vUtBN7X5EJ7H1
+         28MJHzHL/x+fJm2VK41quhygSAwSekQbtypeAr++RSefvNoLY4UWveo6PHdR04ymTZIJ
+         zEIg==
+X-Forwarded-Encrypted: i=1; AHgh+RrIfgCX+gQDZo0l8kGtQZsI5ZaYXBWbV/VZ9Pn2oGL/EbKPRG6+BJmnv+kDiNjnJu3tl5cEIx9CcEob@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7T+jvj4REwo2jy90bnz6FEaVkNj6KdE3Dy0MKzS4DEr+ccr+O
+	qGGv8jgCftUkuC/99BsL60BJENNEKL9Ri+425bEBVrNAN0JPCOcce36GL2V1zQu34m0wL8Pu5+y
+	VxFoBcsXd2xwDKxf1qxB36w5bnQX/io0=
+X-Gm-Gg: AfdE7cnrF2nLHPPyS3y9+NIPqngvLmIZpNO1IVOxp7mtyV1GD5qP3w4n4qpD9QZgaGg
+	DwRFf0RsK4lY2SZe9N2pJA1ZqUXtaD5jRBG29gu9wAeouubfj+ol4Ma7oYGEai/+u07sFqbNN0e
+	HLMw8a41ng4rBL/v9pwS4zxX6So+pODeyqwTMXE2f/ZrKuiM1IMW+VoRN9aIUWJSprpZJr/PqGp
+	S9gkBNFY7I0EJbhUebzULSOvkspFL1I5EpABYSYZ+oiXCz//0L+LwxBGPRuAEGsQFWZQdFyIyCL
+	dZyVBG188FbsV/YgVggMojWpAhJ7cZnrswzzbVcWI0u6Qogs/atTKpO5HUvzchOrp9CMnIfxg38
+	yDJ+ABkDbtSr2m+QsM/WUwfSnkW+dWzGQWHJ4pvICBXh/xJS04Es4E3m8/3iSOJLguhJYNQP9co
+	d39hCQbJwa/UY=
+X-Received: by 2002:a0c:cdcc:0:b0:8db:dd:4d85 with SMTP id 6a1803df08f44-8f3c8b17e1cmr33919926d6.26.1782942473952;
+ Wed, 01 Jul 2026 14:47:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260701152157.822207-1-huiwen.he@linux.dev> <20260701152157.822207-3-huiwen.he@linux.dev>
-In-Reply-To: <20260701152157.822207-3-huiwen.he@linux.dev>
+References: <20260701152157.822207-1-huiwen.he@linux.dev> <20260701152157.822207-2-huiwen.he@linux.dev>
+In-Reply-To: <20260701152157.822207-2-huiwen.he@linux.dev>
 From: Steve French <smfrench@gmail.com>
-Date: Wed, 1 Jul 2026 16:44:56 -0500
-X-Gm-Features: AVVi8CcDpUofZnDpqNdVok6QjGv0hOX2jF1vFm7tMSfSql7IOwoL0MKPxCNsPRo
-Message-ID: <CAH2r5msyi5nvObkx+JUP78DKdthQLR4p+sg61SEW0RXATorcLg@mail.gmail.com>
-Subject: Re: [PATCH v6 2/5] smb/client: reduce fallocate zero buffer allocation
+Date: Wed, 1 Jul 2026 16:47:42 -0500
+X-Gm-Features: AVVi8CeRByc-Tywq4FeOc_yCvXB6Rg8UTI-6xAgnzuLQFSHq3wn_plYIch8Dreg
+Message-ID: <CAH2r5mudB4xBQnPvuSZo5SiYkRn0UEs9YZi9rbUGBh3G3GBqZg@mail.gmail.com>
+Subject: Re: [PATCH v6 1/5] smb/client: refresh allocation size after
+ duplicate extents
 To: Huiwen He <huiwen.he@linux.dev>
 Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
 	dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn, 
-	linux-cifs@vger.kernel.org
+	linux-cifs@vger.kernel.org, Sergey Senozhatsky <senozhatsky@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Won't this hurt performance since for most servers the default max
-write size is 4MB (e.g. Samba or Windows) or 1MB?  I did a quick
-experiment with
-"dd" and I see the 4MB writes over the wire not 64K
+This does lead to an extra roundtrip (common operations like cp will
+use duplicate extents in some Samba and Windows server
+configurations).  Any worries about performance hit?
 
 On Wed, Jul 1, 2026 at 10:22=E2=80=AFAM Huiwen He <huiwen.he@linux.dev> wro=
 te:
 >
 > From: Huiwen He <hehuiwen@kylinos.cn>
 >
-> The fallocate emulation allocates a 1 MiB zero-filled buffer even
-> though each SMB2_write request is limited to SMB2_MAX_BUFFER_SIZE,
-> which is 64 KiB. A high-order 1 MiB allocation is more likely to
-> fail on a fragmented system.
+> FSCTL_DUPLICATE_EXTENTS_TO_FILE changes the target file extents on the
+> server, but the client does not refresh the target AllocationSize/i_block=
+s.
+> Callers can observe or use the wrong st_blocks value immediately after th=
+e
+> clone, before a later attribute revalidation corrects it.
 >
-> Allocate only the smaller of the requested range and SMB2_MAX_BUFFER_SIZE=
-,
-> and reuse that zero-filled buffer for every write request. Also reject
-> a successful write that makes no progress to avoid looping indefinitely.
+> For example, create a reflinked file with a leading hole:
 >
-> This reduces the contiguous allocation required by fallocate emulation
-> without changing the written data or range semantics.
+>         xfs_io -f -c "pwrite -S 0x61 0 64k" src
+>         touch dst
+>         chmod 600 dst
+>         xfs_io -c "reflink src 0 1m 64k" dst
+>         mkswap dst
+>         swapon dst
 >
+> The file still has a hole after mkswap:
+>
+>         /mnt/scratch/dst:
+>           [0..7]:       allocated
+>           [8..2047]:    hole
+>           [2048..2175]: allocated
+>
+> The server also reports only the allocated ranges:
+>
+>         server dst size=3D1114112 blocks=3D144
+>
+> but the client reported EOF-derived blocks:
+>
+>         client dst size=3D1114112 blocks=3D2176
+>
+> and swapon succeeded:
+>
+>         swapon_result=3Dsuccess
+>         /mnt/scratch/dst 1.1M 0B -1
+>
+> So EOF-derived i_blocks can let a sparse reflinked file pass the CIFS
+> swapfile hole check.
+>
+> Fix this by querying FILE_ALL_INFORMATION on the target handle after a
+> successful duplicate extents request and updating i_blocks from the
+> returned AllocationSize. If the query fails, invalidate the cached
+> inode attributes so a later getattr can refresh them.
+>
+> This also fixes the xfstests generic/370 regression introduced by the
+> i_blocks accounting change, as tested on a Samba "vfs objects =3D btrfs"
+> share.
+>
+> Fixes: 99cd0a6eeb6c ("smb/client: do not account EOF extension as allocat=
+ion")
 > Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 > Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > ---
->  fs/smb/client/smb2ops.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  fs/smb/client/smb2ops.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 >
 > diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index cc8e0595e504..23505ae9bd81 100644
+> index 06e9322a762a..cc8e0595e504 100644
 > --- a/fs/smb/client/smb2ops.c
 > +++ b/fs/smb/client/smb2ops.c
-> @@ -3559,7 +3559,7 @@ static int smb3_simple_fallocate_write_range(unsign=
-ed int xid,
->                                              char *buf)
+> @@ -2193,10 +2193,13 @@ smb2_duplicate_extents(const unsigned int xid,
+>                         u64 len, u64 dest_off)
 >  {
->         struct cifs_io_parms io_parms =3D {0};
-> -       int nbytes;
-> +       unsigned int nbytes;
->         int rc =3D 0;
->         struct kvec iov[2];
+>         int rc;
+> +       int qrc;
+>         unsigned int ret_data_len;
+>         struct inode *inode;
+> +       struct smb2_file_all_info file_inf;
+>         struct duplicate_extents_to_file dup_ext_buf;
+>         struct cifs_tcon *tcon =3D tlink_tcon(trgtfile->tlink);
+> +       u64 asize;
 >
-> @@ -3580,9 +3580,10 @@ static int smb3_simple_fallocate_write_range(unsig=
-ned int xid,
->                 rc =3D SMB2_write(xid, &io_parms, &nbytes, iov, 1);
->                 if (rc)
->                         break;
-> +               if (!nbytes)
-> +                       return -EIO;
->                 if (nbytes > len)
->                         return -EINVAL;
-> -               buf +=3D nbytes;
->                 off +=3D nbytes;
->                 len -=3D nbytes;
->         }
-> @@ -3611,7 +3612,7 @@ static int smb3_simple_fallocate_range(unsigned int=
- xid,
+>         /* server fileays advertise duplicate extent support with this fl=
+ag */
+>         if ((le32_to_cpu(tcon->fsAttrInfo.Attributes) &
+> @@ -2232,6 +2235,19 @@ smb2_duplicate_extents(const unsigned int xid,
+>         if (ret_data_len > 0)
+>                 cifs_dbg(FYI, "Non-zero response length in duplicate exte=
+nts\n");
+>
+> +       if (rc =3D=3D 0) {
+> +               qrc =3D SMB2_query_info(xid, tcon, trgtfile->fid.persiste=
+nt_fid,
+> +                                     trgtfile->fid.volatile_fid, &file_i=
+nf);
+> +               spin_lock(&inode->i_lock);
+> +               if (qrc =3D=3D 0) {
+> +                       asize =3D le64_to_cpu(file_inf.AllocationSize);
+> +                       inode->i_blocks =3D CIFS_INO_BLOCKS(asize);
+> +               } else {
+> +                       CIFS_I(inode)->time =3D 0; /* force reval */
+> +               }
+> +               spin_unlock(&inode->i_lock);
+> +       }
+> +
+>  duplicate_extents_out:
 >         if (rc)
->                 goto out;
->
-> -       buf =3D kzalloc(1024 * 1024, GFP_KERNEL);
-> +       buf =3D kzalloc(min_t(loff_t, len, SMB2_MAX_BUFFER_SIZE), GFP_KER=
-NEL);
->         if (buf =3D=3D NULL) {
->                 rc =3D -ENOMEM;
->                 goto out;
+>                 trace_smb3_clone_err(xid, srcfile->fid.volatile_fid,
 > --
 > 2.43.0
 >
