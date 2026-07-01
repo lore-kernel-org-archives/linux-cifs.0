@@ -1,32 +1,34 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BE625A2C6
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 08:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E343C25A2C6
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 08:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782894344; cv=none; b=tIEu6uGZuveN/k5RuLKLlP0d2t/KiUvjO3Prz+ubZeuBAe15fRK8LEFMjHzIBILVtqYY2B7fC60lT4jGW6/ZU8YdGWkiGGGRlSUOaoF9wgy8HaflB1BQE9rYJbvDYQE/Gy+gFCAtMADOZKbgHBebTKq890bGywifdvdVaP9nCuw=
+	t=1782894348; cv=none; b=U35nV9zMpcDDH1HiKPDIv6cCW8gJgEdfsZ1u4JEojL+ztHnb1lAzeF6KuYOKDNVRCIodK601etWzcVjXBKnI2KR+fs6WMBEtexok2SV6mHZKS/xA5lSiz9hN8ZCbLLBbATt6aJgbIZ7VHcV2qPh9UbR5+R/1JTB2LUHf58JjotM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782894344; c=relaxed/simple;
-	bh=JN9udTp00gYsMoFdOOcTRd+vq4Fs7yMWGm+DhLp5WTk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gr6nrUHn6eDqGjNXF4s37kpID3eswTNmKwfsvmUDaBpflP3rO+QKNqiu8iNdLXDrlG6PI4NYEfAyJHhlmQQn5f0uBDYobb3ohIZ4c2QU0vemdMNIPmVXpTVNgsVLaQG3mzLW4ph1T021Yk3niDIcCxYfGh15K8hdFsEs9tyrf7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=FaTjLAdl; arc=none smtp.client-ip=91.218.175.170
+	s=arc-20240116; t=1782894348; c=relaxed/simple;
+	bh=dXfQHc66WUUZIif0YqT1RSOuLvi8mgTS74s3eUebqCk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kJ9YLuTeiEZ45yIQEX2u9LhOH0InpIFLfflUJyfcxSX9z3/QfFPmXfBV0QbvI95Pz1Gv5/YTTtk9v1ayZIUNUXBtDDrQEdNIBSWTR1UEzB8m2SbY5IFbsSJpyVxaKppKR/QxpZVIsBZLbGjJvKx0TtPC7Lmm1MiMVXsZEWwwG/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=hVUdwh1q; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="FaTjLAdl"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="hVUdwh1q"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1782894338;
+	s=key1; t=1782894343;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6IXvICZiqdW7qruMlAUk6O7AyPlFQiZSNaFTvJ4GVx4=;
-	b=FaTjLAdl7CNx4hJmQt+YuRuEciTTeJLvXWKv93fAU0MSEBIRPX2O3B9vrqdof1ulFZI1v/
-	qS/8qTUmxvHb4iIqDwwzW1Lrt+z6Vf4wjFD3Yku703UmtG2eoyaFFy3Niv8F1kpPuB4dU6
-	2e5zwDwz4u5NxeccT9mpydka48dHn0lu3/BwHq9dLR2iEnqHQwVg6QLOJ+wvaTHSxdhH1F
-	ON5cysQ745elt788+vToFJb1l7YQV/NeVgutjRktgC8c+JtlgiBiWw+F3Y7kCfcM6XogiC
-	odHOl7/Yp3CLggiuhli5KUUQKR6pwAyZPYYlWCxTnbY4mqGWCeSEVxHmzz73cg==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LbJT21G1NVbQbIT8V91xWEHmmXgpuCgBPQdWxpuqzMA=;
+	b=hVUdwh1qWEsoOK7qqTWD5xqLCSztPyXnaEZ8rMax71/bjbZWofDQSpgE3tcbYM8Kljaqup
+	zOmA8mcvxCcUKq5pBOVB/EYUN7x9VmjnGrKdWO9OKL+Q118+cwvPzA/FCKmpcc6eMGnqbi
+	7wHS3k3cC5rgUjt9yuSGrf8o+UWaQuSd7g8UMH3n2KRtPd/Bc5iiHc8V0PHUzgbCzlcFtF
+	uM3cM0XP85WWS+HRoqs0muCzwuuVT3oUBgrqE/EkE79VHpvUs09FiitESt/3i61dKq+s9/
+	GXXxBYToG9CU37VkTXJ3hpfc3JdiaKsPfzvDhzjdEVMnFTPFQzjH4bsMrPQO4g==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +42,11 @@ To: smfrench@gmail.com,
 	metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 0/9] smb/client: improve change notify support
-Date: Wed,  1 Jul 2026 08:24:58 +0000
-Message-ID: <20260701082507.786487-1-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 1/9] smb/client: factor out cifs_new_dir_fileinfo()
+Date: Wed,  1 Jul 2026 08:24:59 +0000
+Message-ID: <20260701082507.786487-2-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260701082507.786487-1-chenxiaosong@chenxiaosong.com>
+References: <20260701082507.786487-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,62 +58,106 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-This patchset improves support for SMB client's notify feature,
-including the following two improvements:
+This patch was split out to make it easier to review.
 
-  1. Support for notify cancellation.
-  2. Support for receiving all action notifications from the server.
-     2.1. Before this patchset, when an operation on the server triggered
-          multiple actions, the client received only one action notification.
-     2.2. After this patchset, the client can receive all action notifications.
+Both readdir and notify can need directory private data before a
+search handle exists. Move the common cifsFileInfo allocation and
+initialization into a helper so those paths share the same setup.
 
-Example:
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/client/cifsproto.h |  2 ++
+ fs/smb/client/file.c      | 24 ++++++++++++++++++++++++
+ fs/smb/client/readdir.c   | 14 ++++++--------
+ 3 files changed, 32 insertions(+), 8 deletions(-)
 
-  smbinfo notify /mnt
-  
-  # server: touch /export/file1
-  Notifications received, returned data_len is 24
-  Action: 0x00000001, FileName: file1
-  Notifications received, returned data_len is 24
-  Action: 0x00000003, FileName: file1
-  
-  # server: mv /export/file1 /export/file2
-  Notifications received, returned data_len is 48
-  Action: 0x00000004, FileName: file1
-  Action: 0x00000005, FileName: file2
-  Notifications received, returned data_len is 24
-  Action: 0x00000003, FileName: file2
-  Notifications received, returned data_len is 24
-  Action: 0x00000002, FileName: file1
-
-Then press `Ctrl+C` to exit `smbinfo notify` command.
-The following packets can be captured using tcpdump:
-
-  - client: Cancel Request
-  - server: Notify Response, Error: STATUS_CANCELLED
-
-ChenXiaoSong (9):
-  smb/client: factor out cifs_new_dir_fileinfo()
-  smb/client: close cached notify handles on closedir
-  smb/client: prepare notify ioctl per-open state
-  smb/client: cache SMB3 change notify handles
-  smb/client: retry change notify after invalid cached handle
-  smb/client: add helpers for sending cancel requests
-  smb/client: remember async ids from SMB2 pending responses
-  smb/client: send SMB2 cancel requests
-  smb/client: make SMB2 change notify interruptible
-
- fs/smb/client/cifsglob.h      |   6 ++
- fs/smb/client/cifsproto.h     |   4 +
- fs/smb/client/file.c          |  54 +++++++++++++
- fs/smb/client/readdir.c       |  14 ++--
- fs/smb/client/smb2ops.c       | 148 ++++++++++++++++++++++++++--------
- fs/smb/client/smb2pdu.c       |   1 +
- fs/smb/client/smb2proto.h     |   3 +
- fs/smb/client/smb2transport.c | 105 ++++++++++++++++++++++++
- fs/smb/client/transport.c     |  49 ++++++++---
- 9 files changed, 332 insertions(+), 52 deletions(-)
-
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index c4ababcb51a3..dfbad6bc0a9b 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -267,6 +267,8 @@ void cifs_close_all_deferred_files(struct cifs_tcon *tcon);
+ void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb);
+ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+ 					   struct dentry *dentry);
++struct cifsFileInfo *cifs_new_dir_fileinfo(struct file *file,
++					   struct tcon_link *tlink);
+ 
+ void cifs_mark_open_handles_for_deleted_file(struct inode *inode,
+ 					     const char *path);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 8b25d6c9ec5e..f1e854f381d9 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -660,6 +660,30 @@ cifs_down_write(struct rw_semaphore *sem)
+ static void cifsFileInfo_put_work(struct work_struct *work);
+ void serverclose_work(struct work_struct *work);
+ 
++struct cifsFileInfo *cifs_new_dir_fileinfo(struct file *file,
++					   struct tcon_link *tlink)
++{
++	struct cifsFileInfo *cfile, *old;
++
++	cfile = kzalloc_obj(struct cifsFileInfo);
++	if (!cfile)
++		return NULL;
++
++	spin_lock_init(&cfile->file_info_lock);
++	mutex_init(&cfile->fh_mutex);
++	cfile->invalidHandle = true;
++	cfile->tlink = cifs_get_tlink(tlink);
++
++	old = cmpxchg(&file->private_data, NULL, cfile);
++	if (old) {
++		cifs_put_tlink(cfile->tlink);
++		kfree(cfile);
++		return old;
++	}
++
++	return cfile;
++}
++
+ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
+ 				       struct tcon_link *tlink, __u32 oplock,
+ 				       const char *symlink_target)
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index a50c86bbe60f..f108e719e683 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -355,20 +355,17 @@ _initiate_cifs_search(const unsigned int xid, struct file *file,
+ 	__u16 search_flags;
+ 	int rc = 0;
+ 
+-	if (file->private_data == NULL) {
++	if (!file->private_data) {
+ 		tlink = cifs_sb_tlink(cifs_sb);
+ 		if (IS_ERR(tlink))
+ 			return PTR_ERR(tlink);
+ 
+-		cifsFile = kzalloc_obj(struct cifsFileInfo);
+-		if (cifsFile == NULL) {
++		cifsFile = cifs_new_dir_fileinfo(file, tlink);
++		if (!cifsFile) {
+ 			rc = -ENOMEM;
+ 			goto error_exit;
+ 		}
+-		spin_lock_init(&cifsFile->file_info_lock);
+-		file->private_data = cifsFile;
+-		cifsFile->tlink = cifs_get_tlink(tlink);
+-		tcon = tlink_tcon(tlink);
++		tcon = tlink_tcon(cifsFile->tlink);
+ 	} else {
+ 		cifsFile = file->private_data;
+ 		tcon = tlink_tcon(cifsFile->tlink);
+@@ -1125,7 +1122,8 @@ int cifs_readdir(struct file *file, struct dir_context *ctx)
+ 	 * Ensure FindFirst doesn't fail before doing filldir() for '.' and
+ 	 * '..'. Otherwise we won't be able to notify VFS in case of failure.
+ 	 */
+-	if (file->private_data == NULL) {
++	cifsFile = file->private_data;
++	if (!cifsFile || cifsFile->invalidHandle) {
+ 		rc = initiate_cifs_search(xid, file, full_path);
+ 		cifs_dbg(FYI, "initiate cifs search rc %d\n", rc);
+ 		if (rc)
 -- 
 2.54.0
 
