@@ -1,87 +1,68 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063613009F6
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 08:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A183F0AA8
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 09:48:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782894397; cv=none; b=NuXXBG3Phk+xiw8Wk9zyqPD4MCI9S1C846UTZVhxyYmvKDZ/fAl4I2Ls1TzNTI4MnDcPosRBKImjOak19IzOaBJrYtjVkIN44rkeLsZXvONsCXVfa1f040cZ5/Croz0TeggQ4XGgRZR4zn5eQhNEtBJNDTcUEVm7p0nbZ2w4QKc=
+	t=1782899317; cv=none; b=qBsWkeoRgMGiesViCHmwB22GDfzysShQ0VC/0VIEQhjkt9frkvZfsnAGZwQLccWk/3WTiUAdACbr4fa3MaEeBodDlhIXXkIq35nesF2vjYnUp06Bf+hsZLnjVK1X7lJpVEKGgmCs2WTRF/asCWK9CXUFNHdscpAdBrmXBxms8yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782894397; c=relaxed/simple;
-	bh=wFwCvQbpYg1oq9xOfFfa0O9bxUHSIeHUXfkYJEhGshA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FPKmPX8Rl7WJ7D2vj0q1AvgjDJlvaqwVlUw0s6gtNoo2sQRBosq2u6iV6DH1uTMSVKuR0VvNfl7SrOVlxa7Us6ek70Pq7d/9KRNodSDaYnQPiSY8io7atGvxsXI6n7KAf0HXhR/LxPnusgKCHJB81V5ZYvRbAsbDMXWhwrgd74A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=GNZiKwh5; arc=none smtp.client-ip=91.218.175.180
+	s=arc-20240116; t=1782899317; c=relaxed/simple;
+	bh=qWZDsommoiU0TXGd/kowr08CJtkiOCT4s0M0mVr/3bM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TsodeQtpNNvoSeMYsQSTcxV60PLhUPe2V7NK0ZZ+praJOUsqHXHlxEJdcpxMA1yna4JCuhHtJpYwY/SL6MVJnd0B65A1iCtGLLRB2j+M8lq/Cmlu8fAr4xpZ080ADGrLeOHv0uIhN9WYG2C5mzeTSq48BeF5zrI9s1q5rIMmlak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=SgSDh3tn; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="GNZiKwh5"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="SgSDh3tn"
+Message-ID: <b3fa548e-fd2f-4f66-b6d0-cce759e99068@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1782894393;
+	s=key1; t=1782899310;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2ih6Zw/QRYSoxquXlML+dt/r/wfObwgdEWNHfKHh+SA=;
-	b=GNZiKwh5W6kzn4ocMneAMKHLxZ28PeXm4WoSb3YZXY8GojNtH+mpK/iXL89bof584mHt1W
-	fiNZRmrbbAUlQnTmXOGsV/D2FQP0GMYpPlf85PbKzDBaubfHo6nbJO30wHuLrJPl0grbTS
-	cTaOXX1CcLA7p629PC/lav44u4FD+KVIwVOLcJV3e6nyAjE3aVoJZQ9Jj8gHe7b8+ZSVYl
-	///vteJQjvgvhXFnScsolbDBuOvyKsMzcyi8TXOfD/F31+v+9g7BoGmd7Izr8uCkDMLFhv
-	yFghSN9WIpSO014EXxgOwHYsYg1mG2dYxcj8BwBiuE/uQsbQ7IaxJqK2fNRLow==
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 9/9] smb/client: make SMB2 change notify interruptible
-Date: Wed,  1 Jul 2026 08:25:07 +0000
-Message-ID: <20260701082507.786487-10-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260701082507.786487-1-chenxiaosong@chenxiaosong.com>
-References: <20260701082507.786487-1-chenxiaosong@chenxiaosong.com>
+	bh=XqS5gNBCFXJn/el9JdXoq7cQ939rnIYGOsp0vt89xBY=;
+	b=SgSDh3tn2vMqn1ZnNUapChiOL/p9IpCgLww2iLGz5XbMVXsetErUV5zxjjFwksAxNMVB7v
+	gQvi5GDSByfcIDBnWSEajuye2t82qUqXXa/6dvsDS19DndS0MDgLD75UC87JpvtNHMxrPn
+	/sy5gYxwjlSJuTxipb7hYidgFySXhlTV6/COesPAF/EZcyG58ED6uVYHXhZFN/YiAkL13f
+	K6Xi4oIHXm4XsDYYKjxQTeSuk98zmOhLRdTzFlTGZfF6JkOwegq/xwqZhuEhUIjvuby0NZ
+	cXejksao5izHisfmmVyY1ZfXewRGeqLXKdl0++Myd8NzxzfD2ew6NC6Vjl8DmQ==
+Date: Wed, 1 Jul 2026 17:48:15 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] smb/client: fix incorrect nlink returned by fstat()
+To: Steve French <smfrench@gmail.com>,
+ ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
+ linux-cifs@vger.kernel.org
+References: <20260629152659.703943-1-chenxiaosong@chenxiaosong.com>
+ <CAH2r5mt2Jonpx-YZ9ea0icKtGTCHFcEF77F0nJdFXRn97eUC=w@mail.gmail.com>
+ <243d6eda-796d-45d9-8c26-6372af5efe20@chenxiaosong.com>
+ <CAH2r5mufBWn7P-iRhHN5xs6d2E2--hFPwVY4sZ3QRm=wXJup4Q@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAH2r5mufBWn7P-iRhHN5xs6d2E2--hFPwVY4sZ3QRm=wXJup4Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Sashiko has a better idea:
+https://sashiko.dev/#/patchset/20260629152659.703943-1-chenxiaosong%40chenxiaosong.com
 
-SMB2 change notify can block indefinitely while waiting for directory
-changes. Mark the request as interruptible so userspace can stop the wait
-with a normal signal.
+在 2026/6/29 23:44, Steve French 写道:
+> Not really, was hoping that there was a way to cache the link count
+> locally as additional hardlinks are done
 
-The interrupted wait now uses the SMB2 cancel callback added earlier in
-the series to notify the server about the abandoned request.
-
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/smb2pdu.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index d058584b8f05..56caf8cbdb0b 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4127,6 +4127,7 @@ SMB2_change_notify(const unsigned int xid, struct cifs_tcon *tcon,
- 
- 	if (smb3_encryption_required(tcon))
- 		flags |= CIFS_TRANSFORM_REQ;
-+	flags |= CIFS_INTERRUPTIBLE_WAIT;
- 
- 	memset(&rqst, 0, sizeof(struct smb_rqst));
- 	memset(&iov, 0, sizeof(iov));
 -- 
-2.54.0
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
