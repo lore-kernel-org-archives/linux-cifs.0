@@ -1,32 +1,32 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501ED48A2C3
-	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 15:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9AF339B41
+	for <linux-cifs@vger.kernel.org>; Wed,  1 Jul 2026 15:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782919368; cv=none; b=F62owmBhRIcEq4RdM7JpLErT3SOJvDlzg5whM11PU2+VJwO3e8F1HUH0lHCXyyAWjdrAbY7IRa2tA80j0E8Glz1YkHPAXcHu0MmIeja5IJSyC/pDNSKb7DngaboypbdF1sJDcF9GTPKb8K+93bshFqX2AloJwHyOMH5432DR/gY=
+	t=1782919372; cv=none; b=Og8ncgh4WMAY2l4KCos826S7k1mvTC6wj0NsEOTV8CVg+WBhBwgckmWIHl1rZMFoEiFDdsUelcuKDZAytAXNSt9JOpgH6apE0vn02xV7+G7gRQI/mrUp1AG35Urj0yaIHThJ14vpaoHnKX1bjmyEH6DI63tKPVeJiiMK0PvzmEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782919368; c=relaxed/simple;
-	bh=PJeuIBVyHEUB9iEtpBqd5iUDfkHhsFzodLbTo0Uzfv0=;
+	s=arc-20240116; t=1782919372; c=relaxed/simple;
+	bh=vFRlSsX4gbpAjizhzC7lTsBFSIQoRZUVTm8gP6GDVBM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F1araScHuL+wsNCRJxQChSsKIBQ9PVzCoK/UJFLRr9/tBEELGdNawG1hOi6+3yc7Bj06nby8p5i76jHTqDU4VGYUBO/I0L12Gg9xGaZ3S5imsoehUUv7/jX5nCTa2TubJYLlZruTygEyT+ovEG69WbqdkhmTXyeFG6ZyB/+egVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gNBIOwXe; arc=none smtp.client-ip=91.218.175.188
+	 MIME-Version; b=ngjVt6wZ7IqJTm3NaC4TeOTsfCiJpzrJ+RXRF+/2zdyctgQet9HIlOHRbcjwQvPtBi24jIy0DLqN7iayZLVxzdXKqQW1/Une6Zafes4UHq+8Yvz2K+7tQ7NuUeWn0+YMBtpLUgw2CxR4tobRBWfIbW43x+KJ8qVxCrcBvlxXzuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s6x1eodk; arc=none smtp.client-ip=91.218.175.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gNBIOwXe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s6x1eodk"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782919365;
+	t=1782919368;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DdrPFOM9ZnxBG1aKBzq415lF8gBqBb64jDm9SlnGFHU=;
-	b=gNBIOwXeR7N7+a/MwvwQnj6CA5Vddtx7Y8qITcpvuEjlYgaV+Hp8FG80cVPxKOKkvv6WNl
-	O/1RgZ/MEJD1BoJQVgMYGMUmNXXA4PPAVZMJqFd4fHORi0hzPccZOfoUSDOLw4bIZB6f98
-	+lRFUqM5+a2uwtLKrp6+D/faCLJJEVI=
+	bh=77NfIH8PBMF9qrNfokFrpyF2vuZmOwkQaSgAy7t4zKo=;
+	b=s6x1eodkPUWAYPsuB8sJkDLiPIiNrziC0AA6LQJ8/+K6YcD/ob9oJRvjhugql4y+tdpLiU
+	bD6gmBdCthm2A5q3wXguZFLZ51uX8jQXFL7ALm+uXkcu7OMgGD8JFWYblglfJ6GkgP/b5m
+	kHSQa5iPLsGgu+8sjlyf00HKYJUx6J4=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	metze@samba.org,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v6 2/5] smb/client: reduce fallocate zero buffer allocation
-Date: Wed,  1 Jul 2026 23:21:54 +0800
-Message-ID: <20260701152157.822207-3-huiwen.he@linux.dev>
+Subject: [PATCH v6 3/5] smb/client: emulate small EOF-extending mode 0 fallocate ranges
+Date: Wed,  1 Jul 2026 23:21:55 +0800
+Message-ID: <20260701152157.822207-4-huiwen.he@linux.dev>
 In-Reply-To: <20260701152157.822207-1-huiwen.he@linux.dev>
 References: <20260701152157.822207-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,58 +56,132 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-The fallocate emulation allocates a 1 MiB zero-filled buffer even
-though each SMB2_write request is limited to SMB2_MAX_BUFFER_SIZE,
-which is 64 KiB. A high-order 1 MiB allocation is more likely to
-fail on a fragmented system.
+When a mode 0 fallocate extends EOF from 1G to 2G + 1M, the client
+currently sends SetEOF for 2G + 1M. This can make fallocate return
+success without allocating the requested range, or allocate extra
+space before that range.
 
-Allocate only the smaller of the requested range and SMB2_MAX_BUFFER_SIZE,
-and reuse that zero-filled buffer for every write request. Also reject
-a successful write that makes no progress to avoid looping indefinitely.
+For example, on a fresh file:
 
-This reduces the contiguous allocation required by fallocate emulation
-without changing the written data or range semantics.
+        xfs_io -f \
+          -c "falloc 0 1G" \
+          -c "falloc 2G 1M" \
+          -c "truncate 3G" test
+
+The second fallocate should allocate [2G, 2G + 1M), leaving [1G, 2G)
+as a hole.
+
+Before this change, the result depended on the server allocation policy.
+With Samba "strict allocate = no", SetEOF could return success without
+allocating [2G, 2G + 1M). With "strict allocate = yes":
+
+	# filefrag -v test
+        [0, 1G)             allocated
+        [1G, 2G)            allocated unexpectedly
+        [2G, 2G + 1M)       allocated
+
+SMB cannot allocate that arbitrary range, so write zeroes to small
+EOF-extending ranges instead. Limit this to 1 MiB to bound the
+client-side I/O cost.
+
+With "strict allocate = no", the requested range [2G, 2G + 1M) is
+allocated by the writes. With "strict allocate = yes":
+
+	# filefrag -v test
+        [0, 1G)             allocated
+        [1G, 2G)            hole
+        [2G, 2G + 1M)       allocated
+
+This fixes the small EOF-extending range case exercised by generic/213.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/smb/client/smb2ops.c | 50 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 47 insertions(+), 3 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index cc8e0595e504..23505ae9bd81 100644
+index 23505ae9bd81..c75f55935b9b 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3559,7 +3559,7 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
- 					     char *buf)
- {
- 	struct cifs_io_parms io_parms = {0};
--	int nbytes;
-+	unsigned int nbytes;
- 	int rc = 0;
- 	struct kvec iov[2];
+@@ -3682,18 +3682,22 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	struct cifsFileInfo *cfile = file->private_data;
+ 	long rc = -EOPNOTSUPP;
+ 	unsigned int xid;
+-	loff_t new_eof;
++	loff_t old_eof, new_eof;
++	struct smb2_file_all_info file_inf;
++	u64 asize;
++	int qrc;
  
-@@ -3580,9 +3580,10 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
- 		rc = SMB2_write(xid, &io_parms, &nbytes, iov, 1);
+ 	xid = get_xid();
+ 
+ 	inode = d_inode(cfile->dentry);
+ 	cifsi = CIFS_I(inode);
++	old_eof = i_size_read(inode);
+ 
+ 	trace_smb3_falloc_enter(xid, cfile->fid.persistent_fid, tcon->tid,
+ 				tcon->ses->Suid, off, len);
+ 	/* if file not oplocked can't be sure whether asking to extend size */
+ 	if (!CIFS_CACHE_READ(cifsi))
+-		if (keep_size == false) {
++		if (!keep_size) {
+ 			trace_smb3_falloc_err(xid, cfile->fid.persistent_fid,
+ 				tcon->tid, tcon->ses->Suid, off, len, rc);
+ 			free_xid(xid);
+@@ -3703,11 +3707,51 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
+ 	/*
+ 	 * Extending the file
+ 	 */
+-	if ((keep_size == false) && i_size_read(inode) < off + len) {
++	if (!keep_size && old_eof < off + len) {
+ 		rc = inode_newsize_ok(inode, off + len);
  		if (rc)
- 			break;
-+		if (!nbytes)
-+			return -EIO;
- 		if (nbytes > len)
- 			return -EINVAL;
--		buf += nbytes;
- 		off += nbytes;
- 		len -= nbytes;
- 	}
-@@ -3611,7 +3612,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 	if (rc)
- 		goto out;
+ 			goto out;
  
--	buf = kzalloc(1024 * 1024, GFP_KERNEL);
-+	buf = kzalloc(min_t(loff_t, len, SMB2_MAX_BUFFER_SIZE), GFP_KERNEL);
- 	if (buf == NULL) {
- 		rc = -ENOMEM;
- 		goto out;
++		/*
++		 * A small range at or beyond EOF can be allocated by writing
++		 * zeroes.  For off > old_eof, this preserves the intervening
++		 * hole instead of allocating from offset 0.
++		 */
++		if (off > old_eof ||
++		    (off == old_eof && old_eof != 0 &&
++		     (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE))) {
++			if (len > 1024 * 1024) {
++				rc = -EOPNOTSUPP;
++				goto out;
++			}
++
++			rc = smb3_simple_fallocate_range(xid, tcon, cfile,
++							 off, len);
++			if (rc) {
++				spin_lock(&inode->i_lock);
++				cifsi->time = 0;
++				spin_unlock(&inode->i_lock);
++				goto out;
++			}
++
++			new_eof = off + len;
++			netfs_resize_file(&cifsi->netfs, new_eof, true);
++			cifs_setsize(inode, new_eof);
++
++			qrc = SMB2_query_info(xid, tcon,
++					      cfile->fid.persistent_fid,
++					      cfile->fid.volatile_fid, &file_inf);
++			spin_lock(&inode->i_lock);
++			if (qrc == 0) {
++				asize = le64_to_cpu(file_inf.AllocationSize);
++				inode->i_blocks = CIFS_INO_BLOCKS(asize);
++			} else {
++				cifsi->time = 0;
++			}
++			spin_unlock(&inode->i_lock);
++			goto out;
++		}
++
+ 		if (cifsi->cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)
+ 			smb2_set_sparse(xid, tcon, cfile, inode, false);
+ 
 -- 
 2.43.0
 
