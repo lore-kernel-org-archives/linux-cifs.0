@@ -1,34 +1,34 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058AB431E7D
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBE6431E7D
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782990363; cv=none; b=Kzv4C7ambeXRpsc06q3PCuHIMT7H50HCz5/EsNogq0xv/ufFW7ly4HDMwzufIijXzyeCrBZpu2qS2Xa7h9XeN4CvJ75FoyWb1MZH2o9aJSglqUbq+2cARZZLm854V4VgoJn/SbwD0NQ6odQp0YWzc8CggfSR+IWBSZ91jBz2GVU=
+	t=1782990369; cv=none; b=lbelKxarm9H31Dir8JuJ7it5JZRhrz7NaOre8sFQlt9t6KAP38Mv9hFJHVJ/nvk+3l/ENp6MSrXerrn3nLyiIbuWYsDatQO/xk32lSJINsAxJ2z/Qydx1UXVF43au7SJUZ/w3EFN4UtEtNkRTo7f8nXBw7pJafLEebhaUSUGlEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782990363; c=relaxed/simple;
-	bh=xB+IqcgQR4vdi4ZgQ751reoC1yfidcVzvR1Qv8VqLY8=;
+	s=arc-20240116; t=1782990369; c=relaxed/simple;
+	bh=oIGQ5ImdhGoWVTSdzSLAiqtr7oNMIml9av8IPruQAjo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=B8hQhpML5RrwD5n0+IB9L/qyKNP0uaJ3Y3YhDx1uu/D2/mmld4NCuw7QNbygO30Nptr4RRWt6ypChp5rHK1iAFvvBVa0x0vHqemC5trr5pPDq0UoD1hit42nCn975qjszaV72nnAElEZQbtbGeuVnAF7QXoilKLVfHneweubHU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=TpcJ52C4; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=UCts6sVllFTgR73Skv8DCmWSyjHrvzutAB90Ql3iekPYfEInb0TRkUTp/32zGima+Wb6AcJCG2a1GvMUAAKTv9lDVT6GX+9ZzhmmHSquZ8iKAlDtCc49jWQlm4l7Y2ug4yWxCB8w77uRj10T+/8/BJ57gYhaewhY9pH/9OgMVo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=W9ZvFH7o; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="TpcJ52C4"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="W9ZvFH7o"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1782990359;
+	s=key1; t=1782990364;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jfn7mSdW2PC4szD/nFBW0uVj+uPQm3WUZZOfnwX6GZI=;
-	b=TpcJ52C4tUqk4Jcd/6yLRawycQjxRU04ZP+gTtJ/59afb0G8o2lCiyL3xZKnjN1h20UIzO
-	dsm94kckkAFbX/kS2wMA+1+Wp8iOoum8EQBWtS43FgEwO0GEGhD5LV6cDObP50dDUTDNLg
-	rJ53scAksS3rXzsCxBuPLx8AorEliXlDkOEmQUDwTFuC9ET75w6kKAU2PWI9BwUdhVbCzg
-	a/BMzqe8Z3eaMCjWZjlBvSzmopm81QerauCRZqomynBgeAVuqJKvOLpm8jZLM382S35RsF
-	F3TebyoGvZ+un2HNwzms1BdVWtqSoDhtVdQuaXpEJ6CpaA0O7Qg1eDMxfc1N6g==
+	bh=lgOV/3jTOEqeLnR+sqHLR226r7ivfU02eYZdkbIgilc=;
+	b=W9ZvFH7oPznBmPu0+lX7GyUnYz2KDMcCghxZJnCHO5wA+wZ8BbR287ThBdC0mHj722gi70
+	nRaTY22WsqfujfyDOuBvouMKw8U4ARTcNPsUig7fRXBpBsrHram+kDiYAwa/FyZtoat3pt
+	d6dzLpUDfKeGaVGYJFb2WrnngT751io2I/GqybCsKjb1lfrSsy6TRgXfaeC8Wg2rBfphVY
+	P2bq/nnEYJ8+klvwUcPU/+TbT1DJKndfILlOt9xreexjMCDEaEDMbRzwe4Pwd9kKBSrhsf
+	AN1SVA02zSM+NU0D8Ly0b5UVlEr1e/n0/lrxFrlmF7zlpKR2Gm4D/k2e98K69A==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 1/2] smb/server: factor out smb2_init_err_rsp()
-Date: Thu,  2 Jul 2026 11:05:21 +0000
-Message-ID: <20260702110522.911411-2-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 2/2] smb/server: preserve compound prefix for async interim responses
+Date: Thu,  2 Jul 2026 11:05:22 +0000
+Message-ID: <20260702110522.911411-3-chenxiaosong@chenxiaosong.com>
 In-Reply-To: <20260702110522.911411-1-chenxiaosong@chenxiaosong.com>
 References: <20260702110522.911411-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
@@ -58,64 +58,88 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Factor out SMB2 error response body initialization into a helper.
-Use a named length for the SMB2 error response.
+Windows clients can issue a related compound request such as CREATE
+followed by CHANGE_NOTIFY. ksmbd defers CHANGE_NOTIFY and sends
+STATUS_PENDING through the async interim response path. That path only
+built a response for the current command, so responses generated for
+earlier commands in the compound chain were dropped.
 
-This prepares the async interim response path to build an error response
-without calling smb2_set_err_rsp(), which also pins the response iov.
+This means the client never receives the CREATE response that contains
+the file id used by the pending notify request. Windows Explorer can
+then stall when navigating away from the directory until the connection
+is torn down and the pending notify requests are cleaned up.
+
+When sending STATUS_PENDING for an async command, copy the completed
+compound response prefix before appending the async interim error
+response. Final async completions such as STATUS_CANCELLED and
+STATUS_NOTIFY_CLEANUP remain standalone async responses.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/smb2pdu.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ fs/smb/server/smb2pdu.c | 38 ++++++++++++++++++++++++++++++++++----
+ 1 file changed, 34 insertions(+), 4 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 540b4affa9fb..43d0dacc7907 100644
+index 43d0dacc7907..0a3997502732 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -58,6 +58,9 @@ static void __wbuf(struct ksmbd_work *work, void **req, void **rsp)
+@@ -847,7 +847,11 @@ void release_async_work(struct ksmbd_work *work)
+ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
+ {
+ 	struct smb2_hdr *rsp_hdr;
++	struct smb2_err_rsp *err_rsp;
+ 	struct ksmbd_work *in_work = ksmbd_alloc_work_struct();
++	char *rsp_buf;
++	unsigned int compound_len = 0;
++	unsigned int msg_len;
  
- #define WORK_BUFFERS(w, rq, rs)	__wbuf((w), (void **)&(rq), (void **)&(rs))
- 
-+#define SMB2_ERROR_RSP_LEN	(__SMB2_HEADER_STRUCTURE_SIZE + \
-+				 SMB2_ERROR_STRUCTURE_SIZE2)
-+
- #define SMB2_CREATE_FILE_ATTRIBUTE_MASK \
- 	(FILE_ATTRIBUTE_MASK & ~(FILE_ATTRIBUTE_INTEGRITY_STREAM | \
- 				 FILE_ATTRIBUTE_NO_SCRUB_DATA))
-@@ -195,6 +198,15 @@ int smb2_get_ksmbd_tcon(struct ksmbd_work *work)
- 	return 1;
- }
- 
-+static void smb2_init_err_rsp(struct smb2_err_rsp *err_rsp)
-+{
-+	err_rsp->StructureSize = SMB2_ERROR_STRUCTURE_SIZE2_LE;
-+	err_rsp->ErrorContextCount = 0;
-+	err_rsp->Reserved = 0;
-+	err_rsp->ByteCount = 0;
-+	err_rsp->ErrorData[0] = 0;
-+}
-+
- /**
-  * smb2_set_err_rsp() - set error response code on smb response
-  * @work:	smb work containing response buffer
-@@ -211,14 +223,9 @@ void smb2_set_err_rsp(struct ksmbd_work *work)
- 	if (err_rsp->hdr.Status != STATUS_STOPPED_ON_SYMLINK) {
- 		int err;
- 
--		err_rsp->StructureSize = SMB2_ERROR_STRUCTURE_SIZE2_LE;
--		err_rsp->ErrorContextCount = 0;
--		err_rsp->Reserved = 0;
--		err_rsp->ByteCount = 0;
--		err_rsp->ErrorData[0] = 0;
-+		smb2_init_err_rsp(err_rsp);
- 		err = ksmbd_iov_pin_rsp(work, (void *)err_rsp,
--					__SMB2_HEADER_STRUCTURE_SIZE +
--						SMB2_ERROR_STRUCTURE_SIZE2);
-+					SMB2_ERROR_RSP_LEN);
- 		if (err)
- 			work->send_no_response = 1;
+ 	if (!in_work)
+ 		return;
+@@ -859,14 +863,40 @@ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
  	}
+ 
+ 	in_work->conn = work->conn;
+-	memcpy(smb_get_msg(in_work->response_buf), ksmbd_resp_buf_next(work),
+-	       __SMB2_HEADER_STRUCTURE_SIZE);
++	rsp_buf = smb_get_msg(in_work->response_buf);
++
++	/*
++	 * STATUS_PENDING can complete the last command in a compound chain.
++	 * Preserve the completed prefix before appending the async interim
++	 * response so the client can consume every response in the chain.
++	 */
++	if (status == STATUS_PENDING)
++		compound_len = work->next_smb2_rsp_hdr_off;
++
++	msg_len = compound_len + SMB2_ERROR_RSP_LEN;
++	if (msg_len > MAX_CIFS_SMALL_BUFFER_SIZE) {
++		pr_err("compound interim response too large: %u\n", msg_len);
++		ksmbd_free_work_struct(in_work);
++		return;
++	}
++
++	if (compound_len) {
++		memcpy(rsp_buf, smb_get_msg(work->response_buf),
++		       compound_len);
++	}
++
++	rsp_hdr = (struct smb2_hdr *)(rsp_buf + compound_len);
++	memcpy(rsp_hdr, ksmbd_resp_buf_next(work), __SMB2_HEADER_STRUCTURE_SIZE);
+ 
+-	rsp_hdr = smb_get_msg(in_work->response_buf);
+ 	rsp_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+ 	rsp_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+-	smb2_set_err_rsp(in_work);
+ 	rsp_hdr->Status = status;
++	err_rsp = (struct smb2_err_rsp *)rsp_hdr;
++	smb2_init_err_rsp(err_rsp);
++	if (ksmbd_iov_pin_rsp(in_work, rsp_buf, msg_len)) {
++		ksmbd_free_work_struct(in_work);
++		return;
++	}
+ 
+ 	ksmbd_conn_write(in_work);
+ 	ksmbd_free_work_struct(in_work);
 -- 
 2.54.0
 
