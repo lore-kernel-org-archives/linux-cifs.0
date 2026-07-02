@@ -1,63 +1,63 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFF93CAA59
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FD64252AC
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782992167; cv=none; b=JBKOprcROUeHZz0cEmW6v5R8lxiB8XMd7iyZaWM8cQEFSxgWa62aOV2VNpuWzSECNon8eqpEks1nf9Ssr7O9uYGI5kwKaTzX8qmP8jmUMwRi8MNgi1QW8eujmD0cEHFwm5wdLwEfuc2myGNA5stCEu7vzwTAxKXvIyBAKozNsxs=
+	t=1782992171; cv=none; b=jhKaWt1pFeFbUL8n3McnWKnNBK6ixi/wWW3dzi8M27EU7F2X5SkMvxW1EK281cHMkZbZsMgz2KYQ0n7sMtn4+WeUkIHV1BKOabLx/n4UcyBX8T9+5ZAUwdZtbxCbF5Aor0G8JSJXxu73G52r4j6jHbR1Vb7rvyyUHyhWuodrEOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782992167; c=relaxed/simple;
-	bh=2lLZw3ZMQ6leErzWsEMZwn/IHKRDkqbTuQQVYqrRPLU=;
+	s=arc-20240116; t=1782992171; c=relaxed/simple;
+	bh=upbPLLUfFGnuH1ErOUQTeMwpvOnVKBTyuMf/H1Ud55o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HQo9u8YaQT+iBkQzjKR3s+fI0VhoGGBGUY/Kli8xQtuzm3yBDrYoOJgrKFmTk10av+e/bsIPkMbOAK9tk2o9HLeP85r12IjuPXM8a1C9Y56XEKcnQIREoD7FkCB+ubrz2wDsjZrvMqGirkMtpd9hupQuqPvUnHOc7qPVeIuv6P8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ae4gEdkK; arc=none smtp.client-ip=209.85.216.41
+	 MIME-Version; b=EFsFtXmDyhUdTaicEMACl9HQyoyH0o6Ipcn4oUQ5md7HdwV+9+FpNBRucaTktmXxm47fyrzOBQNBP3NaPEi9Ba/wFYmzo7njk0R5mKfHh4J0lplkTV+U0pg3/p5Zy2VHn+6g7OqRRgbQnBnkqf2N7Wa3Xl8VkTy0hy8sgEw9L5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oGTXm2i7; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ae4gEdkK"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-37dedd62b90so538681a91.1
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 04:36:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oGTXm2i7"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-37e4098e920so1264318a91.3
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 04:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782992163; x=1783596963; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782992166; x=1783596966; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v8MgEgbtktAXxF9HGVthzpmm0Tdgj1AOffPOw08ZBgQ=;
-        b=Ae4gEdkKhe1HEqijG8c9zoS8sKyOntPouVruq/p/4TVOH63d7OY/KgeeA9282bs8dC
-         xzPwXjv1xlwMYao5k0qPPAMU8JoDiPQrHbH1GVbO7GZhZzXghNKnTI6k9djlWQgROdOW
-         MgEcJHmRlXjFPoscH0APlAB1uqv+QjQCFeQO9CKBfJpzp8xh/x4gE7ZHAy2ViS56Q48C
-         wmnMK4EPhDKNI2cEa/0/C6b34+bz2U31Y/CnoJ+XqmqPasOwB0/TrVatVt02mV9ahtGP
-         ifz0/FfQx0G1rhfa/5YKyViARYWyKUyXoLoWCAA7KdTiQDZ/ipHus42er+4XApmpRDLm
-         2yog==
+        bh=yN8UAzlM+QAI/w8pUDaBiyUBIP6fCdKXAC7QxX/6piU=;
+        b=oGTXm2i7HzV7DBkm589L4EP5/sZxG4kC29mW7hRumtU873DJzdV+YlsN6E534Ppq1P
+         +6E1PdNMi/AWBsCihwWqRNKlNCrgqZ2CV9tJLj6IuqUQLqFOEXsBSzU2KYfMRZPVmU1G
+         Vt4dEF+JYZO3DA9BrSR6hb23M8Vwq6sdsxJxEo7py6ewkGBfii8bERYuDgAcuAr4uOUI
+         jfe1lyEy8py5sH/kO7i5ernnhuHyB7h/I+iiBL+EcEG/svf9ENRYvGmuw4+4sZTSNjEE
+         sju+imI7uoWVMbT2DkuBczhmmiWvgGdqbL0ZreO3JB6LkB1k4UtpfwCf8/DAMH7nG9Ex
+         t3LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782992163; x=1783596963;
+        d=1e100.net; s=20251104; t=1782992166; x=1783596966;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=v8MgEgbtktAXxF9HGVthzpmm0Tdgj1AOffPOw08ZBgQ=;
-        b=V43BNSCtsGKn94EiwyvnRFiLZpfC6v27+YJoVasPuh18HgYS1ISt+FgqV3JgrE1j1V
-         iOR7H03fsodDL2cGxoMo8hogYcJItsJUxy4pbpLaaoGDegrwPIPRSR1QaRGzXtgWwXKg
-         IuB7rSj9Pd2uHe64nG9v/JdWEqvJyU51faI/NavLpzF4Rv+cZFovxGJSzsfE6JgKSjiX
-         UK4R6aIytwpE2QbnB0dtpwSNEjhu9Wq93M5c3TLQbCVDKAbilZ3REDaJ6hKnyhUUSK29
-         TXNvpuYctBEGzUYjCMGZuf9UxI6VYwGmvkGwmq8y9yGO3lCdqBRdcAcSECHA5BIat2Yl
-         8G8w==
-X-Gm-Message-State: AOJu0YwiCQOfuB1ACMCWOtNTsxl6/6hH3zTJQpC6WVYqvaVIRzwZxykl
-	DnjYIxII070nCT8HpZkv86GOXP2nU+4jW/sQLEztxxSp7qKVYDV0M+STufV5lQ==
-X-Gm-Gg: AfdE7cnQT7QBt+DfJgMxa8gMlvKcwFfw7ySZ+9QLUuKkjjJUL1JfXmosyQrhAVJOWKM
-	HqC+Ja6IcJFs4y1wYOnFECu7BR4iTbtNHcbEAd7ISHlyNe1EBKAtbl+N8xC5shBfJhay8sos7kh
-	Bpw0ysDmuMpNaG8d+cWe9ZKqGUI7vWbfZiFJ1zVDl7Cr9dfHE6UfGPZql2oNFujFUibNiH+A550
-	8KDzjdf5loCJQMqiT7CksRNu31HbRMxLEbEZlAknOD0131s2f/G93G2ottPvOn1hsmu1gx/3xoH
-	kfKB7BRTEljs4wvwXHVuaPM8HceatMhICBssQ7vQ6S9owxGxm/WtPUi81J8LlfI9dUq+sWwVJ1a
-	VnIX5LHn8L6voXoMSInV4h25zehN3LbbVvBqZrbDLCTyOU2J5wrHdq7n8teTDvfjOaOR0bWDY/G
-	4Czg4ETibrIh53NAzUOO0bYgN6/EMguQOb1GtHfmdCujIK/6wJDhF1VoeSk1K2pzKAddF21W6lQ
-	5md5KEQZ5rhY4qOF+uBZuM=
-X-Received: by 2002:a17:90b:3dcc:b0:380:9699:ae98 with SMTP id 98e67ed59e1d1-3809699bb0bmr7334770a91.8.1782992162574;
-        Thu, 02 Jul 2026 04:36:02 -0700 (PDT)
+        bh=yN8UAzlM+QAI/w8pUDaBiyUBIP6fCdKXAC7QxX/6piU=;
+        b=VHl5BAVLE7bt27i+32YK/+ZjuESB9eOLsn6LajFbkcwqvnLsHsFUEMX1/lzOnNSGt3
+         D8laDzeHt3PdxsHfTxt8KPK7GBQdNqrSCwSaDARaKk6czuHAhYGg1GCoQwMasLpmsHnD
+         S0a3Eo27Ip1eo3/E1tcti39lbArCVC9fjx52TtibdFIXNXyVb0U17JczEBcuvGjKSRfA
+         APjn5jFeNVNqLFRFWdIihPw9V976M6HWayfv6xUU6XOl5CSPvYcSK8EepNkTJ3JeGHxC
+         hgSfSUxnNXybSneBhMc3zgtR2guvzW4bfU1GE30qBkTNIesSqSSDKl7JwkrpSy4kq22p
+         cczg==
+X-Gm-Message-State: AOJu0YxBP8NBuaqjxm4ZKgL0ZPvdmVvFC/Ig3iTEgzd9n8kWwJNzlSEX
+	YscHfjL3WT0XN0LSs/yvXQlouCmflo/DfZsh0c3krGqE33euILKkLfZXZw7rFQ==
+X-Gm-Gg: AfdE7clWU5S/arYIrPZ8w0QA3LdDE6nAgJXJECN6eeJP+oio8jpZxlkk6qF68/0Ongj
+	KLUvLdCFax3i/EhjyElzm2WQ++8HJEHU/waD4MihVvPCTnn6AQHYtsL+JSRz3psADftezyVSiUn
+	Ved/6w68/+m9O/tb3yexlVgKuQsyXDVRFkvUnb1bHlPM1f5tPPffPDysl3Qrl3GzXZgt59J4q0F
+	2l0UQeRVyH/HlMh+prEgewBzfMG/60/rLMG5+VK6qq2FMu1zg4ykFrSxib5d3alSOIwcyHmD8PK
+	lt0n7cDCb0KCWKR25l5m36+agZvXzwvGNpn8xyztrSM51QOIqwbCTvc3nTEkps82tlYxsTFGn9P
+	h0xhWYObzDUgZjcJF1aLeTi2ykzlwrB3/iigWTSivSri03MqxyspMaCrSzxdXlkOTobIEnL3MP0
+	nmOXcS7LrENWyS8OODqaAcNXuf8X5vNISDHeDawdIMkecOMbBZOoanFKDT5LdQx79zZvz9SmPle
+	VgXPmNJNvBL6Dh8BKdrl4U=
+X-Received: by 2002:a17:90b:2ecc:b0:380:ced0:ecf9 with SMTP id 98e67ed59e1d1-380ced0f4aemr3967790a91.4.1782992165893;
+        Thu, 02 Jul 2026 04:36:05 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb7fd75sm9444824eec.19.2026.07.02.04.35.59
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb7fd75sm9444824eec.19.2026.07.02.04.36.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 04:36:02 -0700 (PDT)
+        Thu, 02 Jul 2026 04:36:05 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: linux-cifs@vger.kernel.org
 Cc: bharathsm@microsoft.com,
@@ -66,9 +66,9 @@ Cc: bharathsm@microsoft.com,
 	sfrench@samba.org,
 	stfrench@microsoft.com,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH 7/9] smb: client: allow nolease option to be reconfigured on remount
-Date: Thu,  2 Jul 2026 11:35:33 +0000
-Message-ID: <20260702113535.4044308-8-rajasimandalos@gmail.com>
+Subject: [PATCH 8/9] smb: client: review fixes for remount ctx/retrans sync (patches 1-4)
+Date: Thu,  2 Jul 2026 11:35:34 +0000
+Message-ID: <20260702113535.4044308-9-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260702113535.4044308-1-rajasimandalos@gmail.com>
 References: <20260702113535.4044308-1-rajasimandalos@gmail.com>
@@ -82,216 +82,314 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-Changing nolease via remount is silently accepted but has no effect:
-the value is not propagated to the live tcons, and stale lease-bearing
-state from before the switch keeps using the old behavior.
+Fold the review feedback for the first four remount patches into one
+change.  Each fix, in two lines:
 
-Make nolease take effect on remount:
-
- - Add smb3_sync_tcon_opts() which walks the tlink_tree under
-   tlink_tree_lock and propagates ctx->no_lease to tcon->no_lease for
-   every tcon under this superblock so future opens honor the new
-   setting.  Call it from smb3_reconfigure() after the context has
-   been updated.
-
- - On switch to nolease, drop deferred file handles via
-   cifs_close_all_deferred_files_sb() (each holds an active lease).
-
- - On switch to nolease, evict cached directory fids via the new
-   invalidate_all_cached_dirs_sb() helper (each holds a directory
-   lease).
-
-invalidate_all_cached_dirs_sb() mirrors cifs_close_all_deferred_files_sb():
-take tc_count refs on every tcon under tlink_tree_lock, drop the lock,
-then call invalidate_all_cached_dirs() per tcon (it can sleep).  Two
-new tcon_ref trace tags are added for the audit trail.
-
-Move tcon->no_lease out of the bitfield word into a plain bool.  As a
-runtime writer it now shares storage with need_reconnect/need_reopen_files,
-which the reconnect/reopen paths update locklessly; a bitfield write is a
-read-modify-write of the whole word and could clobber a concurrent
-need_reconnect update.  Its own memory location removes that race.
-
-Existing open handles keep their leases until the server breaks them
-or userspace closes the file -- nolease only governs new opens.
+- ctx sync (patch 1): sync runtime state into a private reconfigure
+  context, never the shared cifs_sb->ctx, to avoid racing concurrent
+  fspick/remount and /proc/mounts readers.
+- ctx sync (patch 1): compare the new context against a runtime-synced
+  private base_ctx (dup + sync), freed before commit, instead of the raw
+  cifs_sb->ctx.
+- ctx sync (patch 1): drop the fabricated "nopersistent = !use_persistent"
+  derivation; nopersistent is an independent user option and must keep the
+  dup'd value.
+- block options (patch 2): mention "(signloosely)" in the ignore_signature
+  remount rejection so the message names the user-facing option.
+- retrans (patch 3): read/write server->retrans with READ_ONCE/WRITE_ONCE
+  to pair the new remount writer with the lockless retry-path reader.
+- retrans (patch 3): seed the baseline from READ_ONCE(server->retrans) so a
+  bare remount carries the live value forward instead of clobbering it.
+- block cache (patch 4): reword the cache-mode comment to state that
+  cache=ro sets cache_ro and cache=singleclient sets cache_rw.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-Reviewed-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/cached_dir.c | 44 ++++++++++++++++++++++++++++++++++++++
- fs/smb/client/cached_dir.h |  1 +
- fs/smb/client/cifsglob.h   |  2 +-
- fs/smb/client/fs_context.c | 40 ++++++++++++++++++++++++++++++++++
- fs/smb/client/trace.h      |  2 ++
- 5 files changed, 88 insertions(+), 1 deletion(-)
+ fs/smb/client/cifsfs.c     |   6 +-
+ fs/smb/client/connect.c    |   4 +-
+ fs/smb/client/fs_context.c | 122 +++++++++++++++++++++++++++++--------
+ fs/smb/client/smb2ops.c    |   2 +-
+ 4 files changed, 104 insertions(+), 30 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 88d5e9a32f28..58d68a8f4d41 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -637,6 +637,50 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync)
- 		flush_delayed_work(&cfids->laundromat_work);
- }
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 6b97f7a91235..e99d427fb2c5 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -612,6 +612,7 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+ 	struct sockaddr *srcaddr;
+ 	unsigned int sbflags;
++	unsigned int retrans;
  
-+/*
-+ * Invalidate cached directory entries across all tcons under a
-+ * superblock.  Collect references on each tcon under tlink_tree_lock,
-+ * then call invalidate_all_cached_dirs() outside the spinlock since it
-+ * can sleep.  Holding a tc_count reference prevents the tcon from being
-+ * freed by tlink_expire_delayed() between dropping the spinlock and
-+ * the call.
-+ */
-+void invalidate_all_cached_dirs_sb(struct cifs_sb_info *cifs_sb)
-+{
-+	struct rb_root *root = &cifs_sb->tlink_tree;
-+	struct rb_node *node;
-+	struct cifs_tcon *tcon;
-+	struct tcon_link *tlink;
-+	struct tcon_list *tmp_list, *q;
-+	LIST_HEAD(tcon_head);
-+
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	for (node = rb_first(root); node; node = rb_next(node)) {
-+		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-+		tcon = tlink_tcon(tlink);
-+		if (IS_ERR(tcon))
-+			continue;
-+		tmp_list = kmalloc_obj(struct tcon_list, GFP_ATOMIC);
-+		if (!tmp_list)
-+			break;
-+		tmp_list->tcon = tcon;
-+		spin_lock(&tcon->tc_lock);
-+		++tcon->tc_count;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_get_cached_inval_sb);
-+		spin_unlock(&tcon->tc_lock);
-+		list_add_tail(&tmp_list->entry, &tcon_head);
-+	}
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
-+
-+	list_for_each_entry_safe(tmp_list, q, &tcon_head, entry) {
-+		invalidate_all_cached_dirs(tmp_list->tcon, true);
-+		list_del(&tmp_list->entry);
-+		cifs_put_tcon(tmp_list->tcon, netfs_trace_tcon_ref_put_cached_inval_sb);
-+		kfree(tmp_list);
-+	}
-+}
-+
- static void
- cached_dir_offload_close(struct work_struct *work)
- {
-diff --git a/fs/smb/client/cached_dir.h b/fs/smb/client/cached_dir.h
-index fc756836da95..606ba2a0b64f 100644
---- a/fs/smb/client/cached_dir.h
-+++ b/fs/smb/client/cached_dir.h
-@@ -90,6 +90,7 @@ void close_cached_dir(struct cached_fid *cfid);
- void drop_cached_dir_by_name(const unsigned int xid, struct cifs_tcon *tcon,
- 			     const char *name, struct cifs_sb_info *cifs_sb);
- void close_all_cached_dirs(struct cifs_sb_info *cifs_sb);
-+void invalidate_all_cached_dirs_sb(struct cifs_sb_info *cifs_sb);
- void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync);
- bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16]);
+ 	srcaddr = (struct sockaddr *)&tcon->ses->server->srcaddr;
  
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 38e27ba6d8f6..713ca152b0ea 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1262,9 +1262,9 @@ struct cifs_tcon {
- 	bool need_reopen_files:1; /* need to reopen tcon file handles */
- 	bool use_resilient:1; /* use resilient instead of durable handles */
- 	bool use_persistent:1; /* use persistent instead of durable handles */
--	bool no_lease:1;    /* Do not request leases on files or directories */
- 	bool use_witness:1; /* use witness protocol */
- 	bool dummy:1; /* dummy tcon used for reconnecting channels */
-+	bool no_lease;    /* Do not request leases on files or directories */
- 	__le32 capabilities;
- 	__u32 share_flags;
- 	__u32 maximal_access;
+@@ -765,8 +766,9 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
+ 		seq_printf(s, ",rasize=%u", cifs_sb->ctx->rasize);
+ 	if (tcon->ses->server->min_offload)
+ 		seq_printf(s, ",esize=%u", tcon->ses->server->min_offload);
+-	if (tcon->ses->server->retrans)
+-		seq_printf(s, ",retrans=%u", tcon->ses->server->retrans);
++	retrans = READ_ONCE(tcon->ses->server->retrans);
++	if (retrans)
++		seq_printf(s, ",retrans=%u", retrans);
+ 	seq_printf(s, ",echo_interval=%lu",
+ 			tcon->ses->server->echo_interval / HZ);
+ 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 104658e318b6..14dd472c2b0f 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -1657,7 +1657,7 @@ static int match_server(struct TCP_Server_Info *server,
+ 	if (server->min_offload != ctx->min_offload)
+ 		return 0;
+ 
+-	if (server->retrans != ctx->retrans)
++	if (READ_ONCE(server->retrans) != ctx->retrans)
+ 		return 0;
+ 
+ 	return 1;
+@@ -1872,7 +1872,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 	 */
+ 	__module_get(THIS_MODULE);
+ 	tcp_ses->min_offload = ctx->min_offload;
+-	tcp_ses->retrans = ctx->retrans;
++	WRITE_ONCE(tcp_ses->retrans, ctx->retrans);
+ 	/*
+ 	 * at this point we are the only ones with the pointer
+ 	 * to the struct since the kernel thread not created yet
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 0a72e1089ff7..53f986d8e9e0 100644
+index 53f986d8e9e0..89bf6f4604b3 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -35,6 +35,7 @@
- #include "nterr.h"
- #include "rfc1002pdu.h"
- #include "fs_context.h"
-+#include "cached_dir.h"
- 
- DEFINE_MUTEX(cifs_mount_mutex);
- 
-@@ -1287,6 +1288,43 @@ static void smb3_sync_ses_chan_max(struct cifs_ses *ses, size_t max_channels)
- 	spin_unlock(&ses->chan_lock);
+@@ -928,18 +928,22 @@ static void smb3_fs_context_free(struct fs_context *fc)
  }
  
-+/*
-+ * Propagate ctx->no_lease to every tcon under this superblock so future
-+ * opens honor the new setting after a remount.  When switching to nolease,
-+ * also drop deferred file handles and invalidate cached directory fids,
-+ * since each holds an active lease from before the switch.
-+ *
-+ * Existing open handles keep their leases until the server breaks them
-+ * or userspace closes the file -- nolease only governs new opens.
-+ */
-+static void smb3_sync_tcon_opts(struct cifs_sb_info *cifs_sb,
-+				struct smb3_fs_context *ctx)
-+{
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	struct rb_node *node;
-+
-+	spin_lock(&cifs_sb->tlink_tree_lock);
-+	for (node = rb_first(&cifs_sb->tlink_tree); node; node = rb_next(node)) {
-+		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-+		tcon = tlink_tcon(tlink);
-+		if (IS_ERR(tcon))
-+			continue;
-+		tcon->no_lease = ctx->no_lease;
-+	}
-+	spin_unlock(&cifs_sb->tlink_tree_lock);
-+
-+	/*
-+	 * Both _sb() helpers iterate all tcons internally and handle
-+	 * their own locking.  They can sleep, so they must be called
-+	 * outside tlink_tree_lock.
-+	 */
-+	if (ctx->no_lease) {
-+		cifs_close_all_deferred_files_sb(cifs_sb);
-+		invalidate_all_cached_dirs_sb(cifs_sb);
-+	}
-+}
-+
  /*
-  * Synchronize server-level options that are stored on TCP_Server_Info
-  * at mount time.  These fields are consulted at runtime (retry logic)
-@@ -1483,6 +1521,8 @@ static int smb3_reconfigure(struct fs_context *fc)
- #endif
- 	if (!rc)
- 		smb3_sync_server_opts(cifs_sb);
-+	if (!rc)
-+		smb3_sync_tcon_opts(cifs_sb, cifs_sb->ctx);
+- * Sync cifs_sb->ctx with runtime state from tcon/server/ses so the
+- * baseline matches what cifs_show_options() displays.  Wide fields
+- * (dstaddr, ops/vals) are protected by the matching server/tcon lock;
+- * the remaining word-sized scalars rely on the same unsynchronized-read
+- * pattern already used by cifs_show_options().
++ * Sync a private reconfigure context with runtime state from
++ * tcon/server/ses so the baseline matches what cifs_show_options()
++ * displays.  @ctx must be the caller's freshly-duplicated context, not
++ * the live cifs_sb->ctx: this function writes into @ctx, and mutating
++ * the shared cifs_sb->ctx here would race with concurrent fspick/remount
++ * and /proc/mounts readers.  Wide fields (dstaddr, ops/vals) are read
++ * under the matching server/tcon lock; the remaining word-sized scalars
++ * rely on the same unsynchronized-read pattern already used by
++ * cifs_show_options().
+  */
+-static int smb3_sync_ctx_from_runtime(struct cifs_sb_info *cifs_sb)
++static int smb3_sync_ctx_from_runtime(struct cifs_sb_info *cifs_sb,
++				      struct smb3_fs_context *ctx)
+ {
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	struct cifs_ses *ses = tcon->ses;
+-	struct smb3_fs_context *ctx = cifs_sb->ctx;
+ 	const char *domain;
+ 	int unicode;
  
+@@ -961,6 +965,16 @@ static int smb3_sync_ctx_from_runtime(struct cifs_sb_info *cifs_sb)
+ 	ctx->nosharesock = server->nosharesock;
+ 	spin_unlock(&server->srv_lock);
+ 
++	/*
++	 * retrans lives on the shared TCP_Server_Info and can be updated by
++	 * a remount of any mount sharing the connection.  Sync it from the
++	 * live server so a bare remount carries the current value forward
++	 * instead of writing a stale per-mount copy back in
++	 * smb3_sync_server_opts().  Read with READ_ONCE to pair with the
++	 * lockless WRITE_ONCE writers and the runtime retry-path reader.
++	 */
++	ctx->retrans = READ_ONCE(server->retrans);
++
+ 	/*
+ 	 * tcon->unix_ext can be flipped post-mount by reset_cifs_unix_caps()
+ 	 * on SMB1 reconnect (smb1_reconnect path). Read under tc_lock to pair
+@@ -978,15 +992,27 @@ static int smb3_sync_ctx_from_runtime(struct cifs_sb_info *cifs_sb)
+ 	}
+ 	spin_unlock(&tcon->tc_lock);
+ 	ctx->seal	  = tcon->seal;
++	/*
++	 * persistent reflects the live tcon->use_persistent so the baseline
++	 * matches what cifs_show_options() reports (persistenthandles).  Do
++	 * NOT derive nopersistent from use_persistent: persistent and
++	 * nopersistent are independent user options and use_persistent is a
++	 * derived runtime result.  nopersistent is not reported by
++	 * cifs_show_options(), so it must keep the user's original value
++	 * (carried by the dup); fabricating it here would, after the
++	 * reconfigure commits the ctx, wrongly suppress persistent-handle
++	 * auto-enable on continuous-availability shares at reconnect.
++	 */
+ 	ctx->persistent	  = tcon->use_persistent;
+-	ctx->nopersistent = !tcon->use_persistent;
+ 	ctx->resilient	  = tcon->use_resilient;
+ 	ctx->witness	  = tcon->use_witness;
+ 
+ 	/*
+ 	 * Session fields: domainName and unicode are effectively
+ 	 * write-once (set during session setup, never freed/replaced
+-	 * while the session exists), so plain reads are safe.
++	 * while the session exists), so plain reads are safe.  @ctx is
++	 * the caller's private copy, so filling in a missing domainname
++	 * here cannot leak or race.
+ 	 */
+ 	domain = ses->domainName;
+ 	unicode = ses->unicode;
+@@ -1180,7 +1206,7 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
+ 		return -EINVAL;
+ 	}
+ 	if (new_ctx->ignore_signature != old_ctx->ignore_signature) {
+-		cifs_errorf(fc, "can not change ignore_signature during remount\n");
++		cifs_errorf(fc, "can not change ignore_signature (signloosely) during remount\n");
+ 		return -EINVAL;
+ 	}
+ 	if (new_ctx->seal != old_ctx->seal) {
+@@ -1212,7 +1238,11 @@ static int smb3_verify_reconfigure_ctx(struct fs_context *fc,
+ 		cifs_errorf(fc, "can not change rdma during remount\n");
+ 		return -EINVAL;
+ 	}
+-	/* init default: cache_ro = false, cache_rw = false (i.e. cache=strict) */
++	/*
++	 * cache=ro sets cache_ro and cache=singleclient sets cache_rw; the
++	 * other cache modes (strict/loose/none) leave both clear and are
++	 * handled separately in smb3_update_mnt_flags().
++	 */
+ 	if (new_ctx->cache_ro != old_ctx->cache_ro) {
+ 		cifs_errorf(fc, "can not change cache=ro during remount\n");
+ 		return -EINVAL;
+@@ -1340,7 +1370,7 @@ static void smb3_sync_server_opts(struct cifs_sb_info *cifs_sb)
+ 	struct TCP_Server_Info *server = cifs_sb_master_tcon(cifs_sb)->ses->server;
+ 	struct smb3_fs_context *ctx = cifs_sb->ctx;
+ 
+-	server->retrans = ctx->retrans;
++	WRITE_ONCE(server->retrans, ctx->retrans);
+ }
+ 
+ static int smb3_reconfigure(struct fs_context *fc)
+@@ -1348,6 +1378,7 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	struct smb3_fs_context *ctx = smb3_fc2context(fc);
+ 	struct smb3_fs_context *new_ctx = NULL;
+ 	struct smb3_fs_context *old_ctx = NULL;
++	struct smb3_fs_context *base_ctx = NULL;
+ 	struct dentry *root = fc->root;
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
+ 	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
+@@ -1360,9 +1391,37 @@ static int smb3_reconfigure(struct fs_context *fc)
+ 	if (ses->expired_pwd)
+ 		need_recon = true;
+ 
+-	rc = smb3_verify_reconfigure_ctx(fc, ctx, cifs_sb->ctx, need_recon);
++	/*
++	 * Compare the new context against a runtime-synced baseline, not the
++	 * raw cifs_sb->ctx.  smb3_init_fs_context() syncs the new context
++	 * (fc->fs_private) from runtime state, so the comparison baseline must
++	 * be synced the same way; otherwise a field that drifted at runtime
++	 * (e.g. dstaddr after witness failover, or use_persistent auto-enabled
++	 * on a continuous-availability share) would look like a user-requested
++	 * change and be rejected on an otherwise bare remount.  Sync a private
++	 * copy rather than cifs_sb->ctx: s_umount serializes reconfigures, but
++	 * not the fspick/fsconfig init path, which dup()s cifs_sb->ctx in
++	 * smb3_init_fs_context() before reconfigure_super() takes s_umount.  An
++	 * in-place sync would therefore race that lockless dup (e.g. a torn
++	 * read of the 128-byte dstaddr).
++	 */
++	base_ctx = kzalloc_obj(*base_ctx);
++	if (!base_ctx)
++		return -ENOMEM;
++	rc = smb3_fs_context_dup(base_ctx, cifs_sb->ctx);
+ 	if (rc)
+-		return rc;
++		goto free_base_ctx;
++	rc = smb3_sync_ctx_from_runtime(cifs_sb, base_ctx);
++	if (rc)
++		goto cleanup_base_ctx;
++
++	rc = smb3_verify_reconfigure_ctx(fc, ctx, base_ctx, need_recon);
++	if (rc)
++		goto cleanup_base_ctx;
++
++	smb3_cleanup_fs_context_contents(base_ctx);
++	kfree(base_ctx);
++	base_ctx = NULL;
+ 
+ 	rc = smb3_handle_conflicting_options(fc);
+ 	if (rc)
+@@ -1537,6 +1596,13 @@ static int smb3_reconfigure(struct fs_context *fc)
+ free_old_ctx:
+ 	kfree(old_ctx);
+ 
++	return rc;
++
++cleanup_base_ctx:
++	smb3_cleanup_fs_context_contents(base_ctx);
++free_base_ctx:
++	kfree(base_ctx);
++
  	return rc;
+ }
  
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 5b21ad3c15fb..1e61a36759ed 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -173,6 +173,7 @@
- 	EM(netfs_trace_tcon_ref_free_ipc,		"FRE Ipc   ") \
- 	EM(netfs_trace_tcon_ref_free_ipc_fail,		"FRE Ipc-F ") \
- 	EM(netfs_trace_tcon_ref_free_reconnect_server,	"FRE Reconn") \
-+	EM(netfs_trace_tcon_ref_get_cached_inval_sb,	"GET Ch-IvS") \
- 	EM(netfs_trace_tcon_ref_get_cached_laundromat,	"GET Ch-Lau") \
- 	EM(netfs_trace_tcon_ref_get_cached_lease_break,	"GET Ch-Lea") \
- 	EM(netfs_trace_tcon_ref_get_cancelled_close,	"GET Cn-Cls") \
-@@ -186,6 +187,7 @@
- 	EM(netfs_trace_tcon_ref_new_ipc,		"NEW Ipc   ") \
- 	EM(netfs_trace_tcon_ref_new_reconnect_server,	"NEW Reconn") \
- 	EM(netfs_trace_tcon_ref_put_cached_close,	"PUT Ch-Cls") \
-+	EM(netfs_trace_tcon_ref_put_cached_inval_sb,	"PUT Ch-IvS") \
- 	EM(netfs_trace_tcon_ref_put_cancelled_close,	"PUT Cn-Cls") \
- 	EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
- 	EM(netfs_trace_tcon_ref_put_cancelled_mid,	"PUT Cn-Mid") \
+@@ -2258,28 +2324,34 @@ int smb3_init_fs_context(struct fs_context *fc)
+ 	 * instead of building one from scratch with init defaults.
+ 	 *
+ 	 * VFS sets fc->root before calling init_fs_context for reconfigure,
+-	 * so we can access the existing superblock's context.  We first sync
+-	 * cifs_sb->ctx with runtime state (tcon/server/ses) so that ctx
+-	 * matches what cifs_show_options() displays.  Then we dup old_ctx
+-	 * into new_ctx.  The parser will overwrite only the options
+-	 * explicitly passed on remount, so any difference between new_ctx
+-	 * and old_ctx in smb3_verify_reconfigure_ctx() represents a real,
+-	 * intentional change by the user.
++	 * so we can access the existing superblock's context.  We dup the
++	 * live cifs_sb->ctx into a private new_ctx, then sync new_ctx with
++	 * runtime state (tcon/server/ses) so it matches what
++	 * cifs_show_options() displays.  Syncing into the private copy (not
++	 * the shared cifs_sb->ctx) avoids racing with concurrent
++	 * fspick/remount and /proc/mounts readers.  The parser will overwrite
++	 * only the options explicitly passed on remount, so any difference
++	 * between new_ctx and old_ctx in smb3_verify_reconfigure_ctx()
++	 * represents a real, intentional change by the user.
+ 	 */
+ 	if (fc->purpose == FS_CONTEXT_FOR_RECONFIGURE) {
+ 		struct cifs_sb_info *cifs_sb = CIFS_SB(fc->root->d_sb);
+ 		int rc;
+ 
+-		rc = smb3_sync_ctx_from_runtime(cifs_sb);
+-		if (rc)
+-			return rc;
+-
+ 		ctx = kzalloc_obj(struct smb3_fs_context);
+ 		if (!ctx)
+ 			return -ENOMEM;
+ 
+ 		rc = smb3_fs_context_dup(ctx, cifs_sb->ctx);
+ 		if (rc) {
++			smb3_cleanup_fs_context_contents(ctx);
++			kfree(ctx);
++			return rc;
++		}
++
++		rc = smb3_sync_ctx_from_runtime(cifs_sb, ctx);
++		if (rc) {
++			smb3_cleanup_fs_context_contents(ctx);
+ 			kfree(ctx);
+ 			return rc;
+ 		}
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index a8f8feeeccb5..b30c16b0d157 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2806,7 +2806,7 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
+ 	if (!pretries || !pcur_sleep)
+ 		return false;
+ 
+-	if (tcon->retry || (*pretries)++ < tcon->ses->server->retrans) {
++	if (tcon->retry || (*pretries)++ < READ_ONCE(tcon->ses->server->retrans)) {
+ 		/* Update sleep time for exponential backoff */
+ 		if (!(*pcur_sleep))
+ 			(*pcur_sleep) = 1;
 -- 
 2.43.0
 
