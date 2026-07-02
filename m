@@ -1,222 +1,191 @@
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C69353A7A
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 15:13:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E686B213E9C
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 15:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783005227; cv=none; b=Jl42Vly78MTrhY70dUOVzdVcFoM0wRE/5jzFje9r60DSSfNxnOavfQrTc1gEH3WK+YWn4h9hhuxj2cgw4CyhMek5fQ4sHHonzKUVbAqOa9/UMLNRgcjzdQICeiowzRBKoOsC3sPKf2kpI4YEW6A6UHJ03p7ZrnTXoN71x2rjsi8=
+	t=1783005647; cv=none; b=UQ8U/eK8TZVjDU2qLGjcmL9tAAiz8MjgVHEDlhzM7YQJgNoy2Rw0y9QRFS9Y0w9sqSpMaYQF1uSBGL8ofpQKImdOsEpXKBaaMJAfgvF1E4v8zSYP1u02k5KnXeE3zdZTyAygIhBJ1+RbS7K7sebje2ED6UshGFHwEq9LkYD9r6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783005227; c=relaxed/simple;
-	bh=Q+3A0te6bc1kxoH17LzRKvShmqVYEY7tFoh6zbhFoFI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lTQ4s6JGw0LeqmKB5AhMmorXlgm8Wt9e0LjBg4QjFX/UkBTT+ypGj5hkKspKqPtMG9h474gCrwBW1YD8a2Xy/xXI6YqipQKh9vji27yqXKANKNV9m9CTGfeex840XnO3ewVHEDCIrhaC0TqnRkNc3MS2By5PbGlP0qp5yFe1kJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JXsUw5kZ; arc=none smtp.client-ip=95.215.58.189
+	s=arc-20240116; t=1783005647; c=relaxed/simple;
+	bh=7egwWkm+FwYAAMQ4LDtnQqPzAWZQb/jfxtgyOUtIFRo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l1pBZtqiR9h6QiLx6muoHtBUZe4iwmP5sV44GYRrFVVeYZtNA63LFNPuBRY9Pmo9c1fHt4PpFwOmyk/WsHKbqJpD10NSGeKzNsQGLKyIyj1d3c+F28DEIe0X3Rq5o4+quNqWAB8t4jf2IvlstQvt6jHJNd4jjCES9CK8dG4cEg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bvoCB5c+; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JXsUw5kZ"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bvoCB5c+"
+Message-ID: <da8a7d66-a97c-4d81-8e92-20a810fd2dde@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783005223;
+	t=1783005642;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CfwH2xvfTwW3U2HEKKjAJsI19p0qVYuMp3+JpOIOul8=;
-	b=JXsUw5kZ4rJUMSL6rNbC4zOR9fXijpVVE2rSS7/YUWX8wzmU3LCWsw19S6QuSJcCzWJjql
-	rm4vit0BRIvhY7O1UcHJcsKIcjesa2Q1InFigG2sLbbAtg/fj04+jDUBebi8q3VjpYV7Bs
-	C6RVKAxDkTmnl5y5TFWlzSaHwQhRHZ4=
-From: Huiwen He <huiwen.he@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v7 4/4] smb/client: refresh allocation after EOF-extending fallocate
-Date: Thu,  2 Jul 2026 23:12:55 +0800
-Message-ID: <20260702151255.886945-5-huiwen.he@linux.dev>
-In-Reply-To: <20260702151255.886945-1-huiwen.he@linux.dev>
-References: <20260702151255.886945-1-huiwen.he@linux.dev>
+	bh=3+vEywivr0Kc9e7MwxAOsY1QEBMuWqRP+PodNjweESg=;
+	b=bvoCB5c+7jbkhNuH3EtFFU8WYezdwUrjg7lCzNEpH63p+CzSgv59+AI9p5jnci/YszC3pR
+	6fDJq/N8X6af9gqVq3EJ37MeC/KYoHYzolgSx1n4qvXO0sFSrylcR/Ajk/dYYmsQGKscd1
+	ZAYvy2SaEq2I5JIZ9DtBzVlkJ8mDIoo=
+Date: Thu, 2 Jul 2026 23:20:30 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH v6 1/5] smb/client: refresh allocation size after
+ duplicate extents
+To: Steve French <smfrench@gmail.com>
+Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn,
+ linux-cifs@vger.kernel.org, Sergey Senozhatsky <senozhatsky@chromium.org>
+References: <20260701152157.822207-1-huiwen.he@linux.dev>
+ <20260701152157.822207-2-huiwen.he@linux.dev>
+ <CAH2r5mudB4xBQnPvuSZo5SiYkRn0UEs9YZi9rbUGBh3G3GBqZg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: hehuiwen <huiwen.he@linux.dev>
+In-Reply-To: <CAH2r5mudB4xBQnPvuSZo5SiYkRn0UEs9YZi9rbUGBh3G3GBqZg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+Hi Steve,
 
-Before this change, xfstests generic/496 was not supported on ksmbd:
+Yes, patch 1 adds one extra roundtrip after each successful 
+duplicate-extents request.
 
-        generic/496 ... [not run] fallocated swap not supported here
+I think that query is needed if we want i_blocks to be correct 
+immediately after the server-side clone. The client only knows the byte 
+range that was cloned. It does not know how many blocks the server 
+actually allocated for that range, especially when the cloned range 
+contains holes.
 
-ksmbd handles SetEOF as truncate, so EOF extension alone does not
-allocate backing blocks. A fallocated swapfile can therefore still
-look sparse to swapon.
+I agree this may affect workloads that use cp/reflink heavily, but it is
+still one metadata query per successful server-side clone, not extra 
+work in the SMB2_READ/SMB2_WRITE path. So I think the cost is acceptable 
+for the correctness fix.
 
-Request allocation for EOF-extending fallocate ranges that can be
-represented by FILE_ALLOCATION_INFORMATION, and refresh the allocation
-state afterwards.
+I found that the v6 version could cause duplicate revalidation after
+the AllocationSize refresh. I updated patch 1 in v7 to keep the 
+QueryInfo result valid in the inode cache, so a following stat does not 
+immediately query the same attributes again.
 
-With this change, xfstests generic/496 and generic/701 pass on ksmbd.
+I also updated patch 3 based on Shashiko's comment. Small fallocate 
+ranges at or beyond EOF are now zero-written directly instead of first 
+querying
+FSCTL_QUERY_ALLOCATED_RANGES.
 
-However, Samba "strict allocate = no" now exposes the real generic/701
-failure: the old pass came from inflated local i_blocks, not from
-server allocation. generic/213 also fails in that case because an
-oversized allocation request may not return ENOSPC.
+Thanks,
+Huiwen
 
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/smb2ops.c   | 43 ++++++++++++++++++++++++++++++++++++---
- fs/smb/client/smb2pdu.c   | 19 +++++++++++++++++
- fs/smb/client/smb2proto.h |  3 +++
- fs/smb/common/fscc.h      |  5 +++++
- fs/smb/server/smb2pdu.h   |  4 ----
- 5 files changed, 67 insertions(+), 7 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 9ccc7eb52899..a57367a03d0b 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3777,12 +3777,49 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 			smb2_set_sparse(xid, tcon, cfile, inode, false);
- 
- 		new_eof = off + len;
-+
-+		qrc = SMB2_query_info(xid, tcon,
-+				      cfile->fid.persistent_fid,
-+				      cfile->fid.volatile_fid, &file_inf);
-+		if (qrc == 0)
-+			asize = le64_to_cpu(file_inf.AllocationSize);
-+
-+		/*
-+		 * FILE_ALLOCATION_INFORMATION can only describe allocation up to
-+		 * new_eof. Some servers may accept it without allocating blocks,
-+		 * so refresh AllocationSize before updating i_blocks.
-+		 */
-+		if (off == 0 || off == old_eof) {
-+			if (qrc || asize < new_eof) {
-+				rc = SMB2_set_allocation(xid, tcon,
-+							 cfile->fid.persistent_fid,
-+							 cfile->fid.volatile_fid,
-+							 cfile->pid, new_eof);
-+				if (rc)
-+					goto out;
-+			}
-+		}
-+
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, new_eof);
--		if (rc == 0) {
--			netfs_resize_file(&cifsi->netfs, new_eof, true);
--			cifs_setsize(inode, new_eof);
-+		if (rc)
-+			goto out;
-+
-+		netfs_resize_file(&cifsi->netfs, new_eof, true);
-+		cifs_setsize(inode, new_eof);
-+
-+		qrc = SMB2_query_info(xid, tcon,
-+				      cfile->fid.persistent_fid,
-+				      cfile->fid.volatile_fid, &file_inf);
-+		spin_lock(&inode->i_lock);
-+		if (qrc == 0) {
-+			asize = le64_to_cpu(file_inf.AllocationSize);
-+			if (asize >= new_eof)
-+				inode->i_blocks = CIFS_INO_BLOCKS(asize);
-+		} else {
-+			cifsi->time = 0;
- 		}
-+		spin_unlock(&inode->i_lock);
- 		goto out;
- 	}
- 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index d058584b8f05..1374bbae627f 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5947,6 +5947,25 @@ SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon, u64 persistent_fid,
- 			0, 1, &data, &size);
- }
- 
-+int
-+SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
-+		    u64 persistent_fid, u64 volatile_fid, u32 pid,
-+		    loff_t allocation_size)
-+{
-+	struct smb2_file_alloc_info info;
-+	void *data;
-+	unsigned int size;
-+
-+	info.AllocationSize = cpu_to_le64(allocation_size);
-+
-+	data = &info;
-+	size = sizeof(struct smb2_file_alloc_info);
-+
-+	return send_set_info(xid, tcon, persistent_fid, volatile_fid,
-+			pid, FILE_ALLOCATION_INFORMATION, SMB2_O_INFO_FILE,
-+			0, 1, &data, &size);
-+}
-+
- int
- SMB2_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
- 		u64 persistent_fid, u64 volatile_fid,
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 78a4e1c340f9..16a02c1eb0a1 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -204,6 +204,9 @@ void SMB2_query_directory_free(struct smb_rqst *rqst);
- int SMB2_set_eof(const unsigned int xid, struct cifs_tcon *tcon,
- 		 u64 persistent_fid, u64 volatile_fid, u32 pid,
- 		 loff_t new_eof);
-+int SMB2_set_allocation(const unsigned int xid, struct cifs_tcon *tcon,
-+			u64 persistent_fid, u64 volatile_fid, u32 pid,
-+			loff_t allocation_size);
- int SMB2_set_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 		       struct smb_rqst *rqst, u64 persistent_fid,
- 		       u64 volatile_fid, u32 pid, u8 info_class, u8 info_type,
-diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-index 859849a42fec..941db5a95564 100644
---- a/fs/smb/common/fscc.h
-+++ b/fs/smb/common/fscc.h
-@@ -283,6 +283,11 @@ struct smb2_file_eof_info { /* encoding of request for level 10 */
- 	__le64 EndOfFile; /* new end of file value */
- } __packed; /* level 20 Set */
- 
-+/* See MS-FSCC 2.4.4 */
-+struct smb2_file_alloc_info { /* encoding of request for level 19 */
-+	__le64 AllocationSize;
-+} __packed;
-+
- /* See MS-FSCC 2.4.15 */
- typedef struct {
- 	__le32 NextEntryOffset;
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index c2512dbcdec8..aa06c8c905f1 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -212,10 +212,6 @@ struct smb2_file_ea_info {
- 	__le32 EASize;
- } __packed;
- 
--struct smb2_file_alloc_info {
--	__le64 AllocationSize;
--} __packed;
--
- struct smb2_file_disposition_info {
- 	__u8 DeletePending;
- } __packed;
--- 
-2.43.0
+
+在 2026/7/2 05:47, Steve French 写道:
+> This does lead to an extra roundtrip (common operations like cp will
+> use duplicate extents in some Samba and Windows server
+> configurations).  Any worries about performance hit?
+> 
+> On Wed, Jul 1, 2026 at 10:22 AM Huiwen He <huiwen.he@linux.dev> wrote:
+>>
+>> From: Huiwen He <hehuiwen@kylinos.cn>
+>>
+>> FSCTL_DUPLICATE_EXTENTS_TO_FILE changes the target file extents on the
+>> server, but the client does not refresh the target AllocationSize/i_blocks.
+>> Callers can observe or use the wrong st_blocks value immediately after the
+>> clone, before a later attribute revalidation corrects it.
+>>
+>> For example, create a reflinked file with a leading hole:
+>>
+>>          xfs_io -f -c "pwrite -S 0x61 0 64k" src
+>>          touch dst
+>>          chmod 600 dst
+>>          xfs_io -c "reflink src 0 1m 64k" dst
+>>          mkswap dst
+>>          swapon dst
+>>
+>> The file still has a hole after mkswap:
+>>
+>>          /mnt/scratch/dst:
+>>            [0..7]:       allocated
+>>            [8..2047]:    hole
+>>            [2048..2175]: allocated
+>>
+>> The server also reports only the allocated ranges:
+>>
+>>          server dst size=1114112 blocks=144
+>>
+>> but the client reported EOF-derived blocks:
+>>
+>>          client dst size=1114112 blocks=2176
+>>
+>> and swapon succeeded:
+>>
+>>          swapon_result=success
+>>          /mnt/scratch/dst 1.1M 0B -1
+>>
+>> So EOF-derived i_blocks can let a sparse reflinked file pass the CIFS
+>> swapfile hole check.
+>>
+>> Fix this by querying FILE_ALL_INFORMATION on the target handle after a
+>> successful duplicate extents request and updating i_blocks from the
+>> returned AllocationSize. If the query fails, invalidate the cached
+>> inode attributes so a later getattr can refresh them.
+>>
+>> This also fixes the xfstests generic/370 regression introduced by the
+>> i_blocks accounting change, as tested on a Samba "vfs objects = btrfs"
+>> share.
+>>
+>> Fixes: 99cd0a6eeb6c ("smb/client: do not account EOF extension as allocation")
+>> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+>> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>> ---
+>>   fs/smb/client/smb2ops.c | 16 ++++++++++++++++
+>>   1 file changed, 16 insertions(+)
+>>
+>> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+>> index 06e9322a762a..cc8e0595e504 100644
+>> --- a/fs/smb/client/smb2ops.c
+>> +++ b/fs/smb/client/smb2ops.c
+>> @@ -2193,10 +2193,13 @@ smb2_duplicate_extents(const unsigned int xid,
+>>                          u64 len, u64 dest_off)
+>>   {
+>>          int rc;
+>> +       int qrc;
+>>          unsigned int ret_data_len;
+>>          struct inode *inode;
+>> +       struct smb2_file_all_info file_inf;
+>>          struct duplicate_extents_to_file dup_ext_buf;
+>>          struct cifs_tcon *tcon = tlink_tcon(trgtfile->tlink);
+>> +       u64 asize;
+>>
+>>          /* server fileays advertise duplicate extent support with this flag */
+>>          if ((le32_to_cpu(tcon->fsAttrInfo.Attributes) &
+>> @@ -2232,6 +2235,19 @@ smb2_duplicate_extents(const unsigned int xid,
+>>          if (ret_data_len > 0)
+>>                  cifs_dbg(FYI, "Non-zero response length in duplicate extents\n");
+>>
+>> +       if (rc == 0) {
+>> +               qrc = SMB2_query_info(xid, tcon, trgtfile->fid.persistent_fid,
+>> +                                     trgtfile->fid.volatile_fid, &file_inf);
+>> +               spin_lock(&inode->i_lock);
+>> +               if (qrc == 0) {
+>> +                       asize = le64_to_cpu(file_inf.AllocationSize);
+>> +                       inode->i_blocks = CIFS_INO_BLOCKS(asize);
+>> +               } else {
+>> +                       CIFS_I(inode)->time = 0; /* force reval */
+>> +               }
+>> +               spin_unlock(&inode->i_lock);
+>> +       }
+>> +
+>>   duplicate_extents_out:
+>>          if (rc)
+>>                  trace_smb3_clone_err(xid, srcfile->fid.volatile_fid,
+>> --
+>> 2.43.0
+>>
+> 
+> 
 
