@@ -1,145 +1,127 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C7529D26B
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 01:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4F6533D6;
+	Thu,  2 Jul 2026 02:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782957323; cv=none; b=r+7WpAzIsFIoveHilKYGe97+1Hd1sDviPl2s6jqU7i1fMrjDzwAzdJH/1rcyKG5vE0C3cu2Qe7vAmYraUQ5CDuqoI1h8VfYKXTduh4H7nTcUeki7m4+ItK/mRPbKOGusojzg5pswOijACYgmfTLYVVVFeAeGwFAhtEayNeWP7Qo=
+	t=1782958279; cv=none; b=tm2UDJhB1hSHGvnzHFmE27hX2ERhSati0VcVBmEdHBpAcCK+aALvPfvoLqg+1EHgnJGpvWM0eObKYSGwLkj/4hBye0bqCIheuqPv4wMeLZmhJenU0zbuuFl5qt3jq6u8gWO19bM035n4Nscz0b91XE8by0beK8rJAUZz39BEo+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782957323; c=relaxed/simple;
-	bh=QWO4NdOmmo6fMXuKdc1YflyHtxuW0VXLATsI1zFyejs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ofNLqbbXvkJrAd653OD99dzYEowdc/SyoHk7QzgJqfIgAlcvhU9OtHdRhPymKfrUgf+gt97DrFhzj8+PVIVQuiB0WZZcM9RySvkS+qDJBmJgtwL2uHUfg2OTBYFQLrZleyXf347kUTn9GddDiYCwTAhw82BtQzqXPQeR1oabE18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wcp4d/1y; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1782958279; c=relaxed/simple;
+	bh=Dhbh7gjceadtrqFDlWZ7DeZ2KaA97vTQ+3uekH0PMQA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FARt/zfJTriFwn7PXAxzM8Hh2vypxiH6AYXN6OsAo8DYL2kzQvbwN/dFW0NRZRE+FzdagLGDznugBCtUt8wY20+xfU0wXvB4ZbqFqEAIAS/v38V97Fd2COzZheQam/ZwqlmYwg0r1eVqAAGUP1x6APRPgckVNQbi0Q8Vzpfz8Rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=eTU4CbX8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eJVwUu3Y; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wcp4d/1y"
-Message-ID: <ec6b4552-618d-41cf-a262-0c14ebd354df@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782957319;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WHgmDEreUpdkHrS4TsC6R/3AWJTw+NKZPTX+nbDh8yo=;
-	b=Wcp4d/1yPen7/H2Btpsp6QTCoQp3Hx2KkOwlRPvMmlKruY23QLG/J8f2RbKtfu9cgRs2ia
-	huk7KtSVtsU0ISF5WOsmi4Xxf3RDrobPvbGppUZef859DKq+V1iJ8v3EHof3+dvH6n0vWc
-	xbl5g6fsST/4QTGPEZibjHtznSRWJvU=
-Date: Thu, 2 Jul 2026 09:54:25 +0800
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="eTU4CbX8";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eJVwUu3Y"
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 18878EC019D;
+	Wed,  1 Jul 2026 22:11:17 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 01 Jul 2026 22:11:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
+	:subject:to:to; s=fm1; t=1782958277; x=1783044677; bh=FizzRwBYPO
+	PSLI2oH11RtoDSpM0zjUEBWMFtCoMin0k=; b=eTU4CbX8L0CtgpKqghEZPhGkMn
+	7KtP43SRn5os33ZmVW/xcx3f18DNhbYBydyk8LYONruwK4t8yVJASD+LUOAzRXna
+	692wABT/hlGJ5QX8eJmzvTNjnSGNx81gML6hHJzmxD7X3KNSXC0IaiqwrwVsiucW
+	hwtW9/xBCPzm/TZOKB3PdPefGWZu+wQNgHTMZX9vaydfUw8GMRl+MFPMXofibnzZ
+	8WhlxLMxJBVA6yxI/39rBcEXDjfvz75uiw9RLtTCHDgQmJ7Q9N2L22lK9uBaygcx
+	tI+36llhSszeOCtLutGrw1OrPZPETUsqf/SoERFi3+/FyqUt3y7avVF9FUGQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1782958277; x=1783044677; bh=FizzRwBYPOPSLI2oH11RtoDSpM0z
+	jUEBWMFtCoMin0k=; b=eJVwUu3YzCXoYHzKbcpIKLPOjos1oP4FeWrFsA2by/KL
+	eV5Dn3QLl3Wm/DBQ+8evM8o2nJQI83ZmvbGMY/LTxmhc8fZ0BeqIgKK+gRdGpF4Z
+	aZ3d5F2s8He9E06jiw/QdCpiuPF+zNkuycVI1b/P3oOYTtr+3KHh5BksC4yGbmJv
+	vTLD54NSAnrLIW1k4le3o9hR+QiK5/bWNZJU+m7u8TWDsphpB5H7ZqrEJwLdEGZw
+	p0oNidYPf49cvGpOsqIB41kVTFpQBJ+nODaT9GpdNDGiQCJAqiSYx2FUzg3ifxbA
+	r9MBnDR3CfXx5Fv264IDSfNoWFL0h/EWYTNyehiXQQ==
+X-ME-Sender: <xms:xMhFagD1iUCv51bgNaD7lUWyxzHIn7R8X304bWJhP7Mw6wijatBrrA>
+    <xme:xMhFakB7fM6Dk0tSjTHegXZ6V4kF3LN-LpxrlxCqiZwuaaruKDPJ7jYIXI2ujXOVF
+    eCKC6oDTSEaUhW3QGBomwMjkXI4bXVxA89ciFaCYyKpaPVvxQ>
+X-ME-Received: <xmr:xMhFajq30RVSOT3W5k4BEUDY20_Tt6txSkR3h9Jp6SvXYqIZAcMhbp7QgsGqOJhBjbs45Q-kTgt2BLmYM6jt_SvDsdZKj40>
+X-ME-Proxy-Cause: dmFkZTFwu9aEd6rs81LwydTf6HdbwbDacYlHUcG90LgwQSIlDVzBWp7BMpp7ngplDIjnc8
+    3Hb1rW4d3SFhxPjuUFtvzdQWF43Wnh6fpZohL0RD8kb3/KpB2xOQp2EI1B1d7+mjQ0W06f
+    zzuMh75uQ5bOK/ws6vUcvYB+NTOLK+YHsPo8OG8Bfvg59C+tOWQrdy0MUXjVkZ4De0Nc/0
+    CxvaVqNfgnLNFLKAEe05TT01jKvXUev7NOqYtIn1ABFEp59P55wXNWjDMcDtjksX5ortLQ
+    qNKhVX3Q3C7bcHWp+f0ck4Tv+h8i3EuJG0CeMJwWeT8hl9obYKtIBXQUiLpkvIqQ6TLJKD
+    YcKRbEZMEOZvIHwFm5dTEOJjjuoRZEP05RBAFHr+2ZXH7yzzdS+YCjFbN5bL+mRw4DsPEB
+    BWMpHa3V5PhJcAvHQBDXLAmg+CN30rKaiJa5HxFA7JmEi4D+fOE2EA4fYVfmF0akEPQZxu
+    brrQ4e03BoegbFTS+FizefAMbgcIEiO04dhbe2NoQz2itmgSL4dBBOWC1Ic7LVNfOvXzKQ
+    jH97/SJ+dOwhWaTyt3GFGtzXSk+uaBlQW3WH7+nlSbJ/ODrpDi/5z5J2sgZf8fZQL5gh9t
+    gD1/xC8yxyXzxis44w4Ssn6IasMyOc1KIV2ITzY8hN10azjCda9XnSei5urA
+X-ME-Proxy: <xmx:xMhFaml5Xe7I2kJUbEBfgBP0fJ-Ndsm-AXJb9cSx6lPdWjpgrsQZIQ>
+    <xmx:xMhFarxP5smsbg9TlxJrQ-piKvKh7MH6CqBzeL_9kFX-6P21dcS8sw>
+    <xmx:xMhFam8cdGN-5wvk43mxTdJD5DYcRulKe4ea9OmJeFJPBJwyaG89Tw>
+    <xmx:xMhFavIvE2vEEE2D5Ovl3wieeVTVdNKmLIF6Mo3fiBDVlGyZN-SBPQ>
+    <xmx:xchFaiazUxJ0XWw81JaLp8nykF0Zzshttlqn0ynWoL8juvj0eAMtuBrA>
+Feedback-ID: i9d664b8f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 1 Jul 2026 22:11:14 -0400 (EDT)
+From: NeilBrown <neilb@ownmail.net>
+To: Steve French <sfrench@samba.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Miklos Szeredi <miklos@szeredi.hu>,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org
+Subject: 
+Date: Thu,  2 Jul 2026 12:07:36 +1000
+Message-ID: <20260702021105.3406439-1-neilb@ownmail.net>
+X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
+Reply-To: NeilBrown <neil@brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 2/5] smb/client: reduce fallocate zero buffer
- allocation
-To: Steve French <smfrench@gmail.com>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn,
- linux-cifs@vger.kernel.org
-References: <20260701152157.822207-1-huiwen.he@linux.dev>
- <20260701152157.822207-3-huiwen.he@linux.dev>
- <CAH2r5msyi5nvObkx+JUP78DKdthQLR4p+sg61SEW0RXATorcLg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: hehuiwen <huiwen.he@linux.dev>
-In-Reply-To: <CAH2r5msyi5nvObkx+JUP78DKdthQLR4p+sg61SEW0RXATorcLg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Hi steve,
+From: NeilBrown <neilb@ownmail.net>
+To: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>
+Cc: linux-afs@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH 0/2] afs: avoid unhash/rehash
+Date: Thu,  2 Jul 2026 11:58:28 +1000
+Message-ID: <20260702020350.3403907-1-neilb@ownmail.net>
+X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
+Reply-To: NeilBrown <neil@brown.name>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The normal write path can use larger writes, and dd is a good example of
-that. But this patch is only changing the fallocate zero-write emulation
-helper.
+cifs (like nfs and afs) needs to block "open" requests while
+processing an unlink or rename because if the target is to be unlinked
+on the server, then the open must fail or create a new file, which needs
+to wait for the unlink to complete.
 
-That helper already capped each SMB2_write to SMB2_MAX_BUFFER_SIZE 
-before this patch:
+It does this by unhashing the dentry and later rehashing it.  This will
+cause problems for proposed changes to locking which will lock the
+dentry rather than the parent directory.  Unhashing will effectively
+unlock the name.
 
-        if (io_parms.length > SMB2_MAX_BUFFER_SIZE)
-                io_parms.length = SMB2_MAX_BUFFER_SIZE;
+The second patch here addresses this by using ->d_fsdata to mark a
+dentry as being busy in unlink/rename and waiting in d_revalidate for
+that mark to be removed.  This is the same approach that NFS has used
+for a while.
 
-So this patch does not reduce the write size on the wire. It only avoids
-allocating a 1 MiB zero buffer when the current helper sends at most 64 
-KiB per write.
+The first patch frees up ->d_fsdata which is currently otherwised used.
+It is being used for a purpose that ->d_time is more suitable for so the
+first patch switches to use d_time.
 
-Using the negotiated wsize here could be a useful performance 
-optimization, but it needs more care to make sure the larger
-write path is handled safely.
+10 years ago cifs *did* use ->d_time but was changed to use ->d_fsdata
+by Miklos with no justification (a00be0e31f8d).  Miklos: do you have any
+memory of why that was done?
 
 Thanks,
-Huiwen
+NeilBrown
 
-在 2026/7/2 05:44, Steve French 写道:
-> Won't this hurt performance since for most servers the default max
-> write size is 4MB (e.g. Samba or Windows) or 1MB?  I did a quick
-> experiment with
-> "dd" and I see the 4MB writes over the wire not 64K
-> 
-> On Wed, Jul 1, 2026 at 10:22 AM Huiwen He <huiwen.he@linux.dev> wrote:
->>
->> From: Huiwen He <hehuiwen@kylinos.cn>
->>
->> The fallocate emulation allocates a 1 MiB zero-filled buffer even
->> though each SMB2_write request is limited to SMB2_MAX_BUFFER_SIZE,
->> which is 64 KiB. A high-order 1 MiB allocation is more likely to
->> fail on a fragmented system.
->>
->> Allocate only the smaller of the requested range and SMB2_MAX_BUFFER_SIZE,
->> and reuse that zero-filled buffer for every write request. Also reject
->> a successful write that makes no progress to avoid looping indefinitely.
->>
->> This reduces the contiguous allocation required by fallocate emulation
->> without changing the written data or range semantics.
->>
->> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
->> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
->> ---
->>   fs/smb/client/smb2ops.c | 7 ++++---
->>   1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->> index cc8e0595e504..23505ae9bd81 100644
->> --- a/fs/smb/client/smb2ops.c
->> +++ b/fs/smb/client/smb2ops.c
->> @@ -3559,7 +3559,7 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
->>                                               char *buf)
->>   {
->>          struct cifs_io_parms io_parms = {0};
->> -       int nbytes;
->> +       unsigned int nbytes;
->>          int rc = 0;
->>          struct kvec iov[2];
->>
->> @@ -3580,9 +3580,10 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
->>                  rc = SMB2_write(xid, &io_parms, &nbytes, iov, 1);
->>                  if (rc)
->>                          break;
->> +               if (!nbytes)
->> +                       return -EIO;
->>                  if (nbytes > len)
->>                          return -EINVAL;
->> -               buf += nbytes;
->>                  off += nbytes;
->>                  len -= nbytes;
->>          }
->> @@ -3611,7 +3612,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
->>          if (rc)
->>                  goto out;
->>
->> -       buf = kzalloc(1024 * 1024, GFP_KERNEL);
->> +       buf = kzalloc(min_t(loff_t, len, SMB2_MAX_BUFFER_SIZE), GFP_KERNEL);
->>          if (buf == NULL) {
->>                  rc = -ENOMEM;
->>                  goto out;
->> --
->> 2.43.0
->>
-> 
-> 
-
+ [PATCH 1/2] smb/client: use d_time to store a timestamp in dentry,
+ [PATCH 2/2] smb/client: don't unhashed and rehash to prevent new
