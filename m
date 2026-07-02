@@ -1,39 +1,48 @@
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4CB38E8B7
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 10:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED54923EA94
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782987898; cv=none; b=XWGgwxEmFRgs3w9I2G451zW3oY7MQbxH/FqzITc2TmQTE5lVPnnk7wqtrz9zNMEk2s+1Iq7Mn5acqUA6iIjia/ZQsUJY0fv8A1PxrExC7d7LrOzsMcUNKJ/GmsKjLaPp3iewhLiS5YDf9Vbj0zC0UCbium4pV6zomC9+HwE6+OY=
+	t=1782990360; cv=none; b=mqqYy8hrT7YbeIDIr7MMnREjtj/ux9SjO+SBiiCISmoNcvIX0ED+zMoHzSktdpEXYgnmKEhIyqwQIlUSqedLKCW79ifayJQ4mcEEbi5Eao3X/yhQPo1+jfwCfVhLBk5mJblrEQfMotch4ASZaWOSBTEWnQzgTu36eySgyOj4HnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782987898; c=relaxed/simple;
-	bh=9db5oDxyLhET0pGQqLTUPBibyzK+Scne6yKzowN9d8Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h0oxJ2fkape6fYm4+c1IH0rnvNRxcXK3Z7Pvt+PifI1wtVwB7CQI+s62Tq/H5iDV29SxGtefCCaJoUfFX77Wj9Ngssdu7V4KQk/b7PU/0pH4YNHHbZKcaN4bIXsTE+CsYyTKo194vwiAzeAdFgJliPF4MmFdtDxD4dPFlM6z9Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=206.189.21.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019 (unknown [123.114.53.210])
-	by app1 (Coremail) with SMTP id ygmowABnicMSPEZqFdDSAA--.39404S2;
-	Thu, 02 Jul 2026 18:23:15 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Cc: sfrench@samba.org,
+	s=arc-20240116; t=1782990360; c=relaxed/simple;
+	bh=mV41vDkFr341gqQoZqn1oqmYQLnvSaSYL1/fD8VBIs0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ALWWADWZ7/bJDTrsf2VA7gMz/jpvQnXIchsqpPVNReFen3ju5XI1PoSQNlK6Ct70IY6C4koWawNHNDi4j0gQ4Qm1zBl/HZ7r64/Wl8o7Gg2YVm+tQOMyIWRyEpf6is8gMwVXz1E2MsdUC3E22l1Hy2oWt1urfsvxyBOUoEdKQgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=lewfsgxu; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="lewfsgxu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1782990353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=O9qGcfHsw8a9WOMcfgJUDU1LLNwEfbOxqY/cSaT7Osw=;
+	b=lewfsgxuhGfCSHrGi6oEkXbtjjobEHamlAds/XrVoOY8kQuNmAJCrF0DycsNio0hVYOhFc
+	COm/JoclECoOolpcJF3eataJLgwwYeFkRuu4m0OMyVPasZVnkYD9cewt2HJb+OV4I1WMy+
+	M17ICMJVb2I6sXGhyOjJ8+ZRkIy1lVV9syebKumpI3aqmwOPF9H9X4jmjfExT+YXVH2r3h
+	k1Gz2ESspBXOWJFHQrcVpf6yg1C1aXJNMfINhWkrzdxEtL/Gnym2/q/04eGdozQ4domav5
+	LKz7N06skoDjd4tupxNoLxiQ5lwYiYmtnXsHx4y27LTal4NlCkQ0i4axf4Vs7A==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
 	pc@manguebit.org,
 	ronniesahlberg@gmail.com,
 	sprasad@microsoft.com,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
-	aaptel@suse.com,
-	yuantan098@gmail.com,
-	yifanwucs@gmail.com,
-	tomapufckgml@gmail.com,
-	bird@lzu.edu.cn,
-	xizh2024@lzu.edu.cn,
-	n05ec@lzu.edu.cn
-Subject: [PATCH v2 1/1] smb: client: check posix_info_parse() in cifs_posix_to_fattr()
-Date: Thu,  2 Jul 2026 18:23:09 +0800
-Message-ID: <061cc31baf926e6c981268a629fdd72f3eee7410.1782933403.git.xizh2024@lzu.edu.cn>
-X-Mailer: git-send-email 2.51.0
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH 0/2] smb/server: improve async interim response handling for compound requests
+Date: Thu,  2 Jul 2026 11:05:20 +0000
+Message-ID: <20260702110522.911411-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,82 +50,35 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowABnicMSPEZqFdDSAA--.39404S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFWxCw4kJr4rKr1UZF18Xwb_yoW5Jr15pF
-	ZxW3WfurZrXr18ua1xGa409w43tr15Gr1SqFnxG34S93Z3W392vFy8KrZ09w1fKr4UGFWr
-	tFn0vFWDtFn0krDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBF1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
-	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
-	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
-	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
-	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
-	e7AKxVWUtVW8ZwCY02Avz4vE14v_Gw1l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaV
-	Av8VW8WwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
-	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcV
-	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
-	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7
-	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdOz3UUUUU=
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEQCWpGH1cCbQAAsS
+X-Migadu-Flow: FLOW_OUT
 
-From: Zihan Xi <xizh2024@lzu.edu.cn>
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-cifs_posix_to_fattr() always called sid_to_id() with parsed owner/group
-SIDs even when posix_info_parse() failed, allowing use of uninitialized
-stack data for ID mapping on malformed SMB_FIND_FILE_POSIX_INFO entries.
+I am currently implementing the ksmbd change notify feature (I will send it out soon),
+and I have encountered the following issue.
 
-Only call sid_to_id() after a successful parse. Fill the fixed
-smb2_posix_info fields first so a malformed trailing payload still
-yields usable inode metadata.
+Before this patchset, no CREATE response:
 
-Fixes: 9934430e2178 ("SMB3.1.1: Fix ids returned in POSIX query dir")
-Cc: stable@vger.kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Yifan Wu <yifanwucs@gmail.com>
-Reported-by: Juefei Pu <tomapufckgml@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Zihan Xi <xizh2024@lzu.edu.cn>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
-changes in v2:
-  - Only call sid_to_id() after posix_info_parse() >= 0; still populate
-    fixed smb2_posix_info fields when trailing SID payload is malformed
-    (Steve French review)
-  - v1 Link: https://lore.kernel.org/all/60461bf5482d51ebd950fc84fd19ece9ac1917fb.1782898568.git.xizh2024@lzu.edu.cn/
+  Windows client request:
+    CREATE dir
+    CHANGE_NOTIFY, fid = compound fid
 
- fs/smb/client/readdir.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+  Server response:
+    CHANGE_NOTIFY STATUS_PENDING, AsyncId = N
 
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index e860fa08b5e3..91182dce7248 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -245,8 +245,6 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- {
- 	struct smb2_posix_info_parsed parsed;
- 
--	posix_info_parse(info, NULL, &parsed);
--
- 	memset(fattr, 0, sizeof(*fattr));
- 	fattr->cf_uniqueid = le64_to_cpu(info->Inode);
- 	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
-@@ -282,8 +280,12 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- 		 le32_to_cpu(info->ReparseTag),
- 		 le32_to_cpu(info->Mode));
- 
--	sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
--	sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
-+	if (posix_info_parse(info, NULL, &parsed) >= 0) {
-+		sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
-+		sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
-+	} else {
-+		cifs_dbg(VFS, "Invalid POSIX info payload\n");
-+	}
- }
- 
- static void __dir_info_to_fattr(struct cifs_fattr *fattr, const void *info)
+After this patchset:
+
+  Server response:
+    CREATE dir SUCCESS, fid = X
+    CHANGE_NOTIFY STATUS_PENDING, AsyncId = N
+
+ChenXiaoSong (2):
+  smb/server: factor out smb2_init_err_rsp()
+  smb/server: preserve compound prefix for async interim responses
+
+ fs/smb/server/smb2pdu.c | 59 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 48 insertions(+), 11 deletions(-)
+
 -- 
-2.43.0
+2.54.0
 
