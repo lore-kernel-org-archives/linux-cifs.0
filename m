@@ -1,80 +1,85 @@
 Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4F6533D6;
-	Thu,  2 Jul 2026 02:11:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4BB533D6;
+	Thu,  2 Jul 2026 02:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782958279; cv=none; b=tm2UDJhB1hSHGvnzHFmE27hX2ERhSati0VcVBmEdHBpAcCK+aALvPfvoLqg+1EHgnJGpvWM0eObKYSGwLkj/4hBye0bqCIheuqPv4wMeLZmhJenU0zbuuFl5qt3jq6u8gWO19bM035n4Nscz0b91XE8by0beK8rJAUZz39BEo+Q=
+	t=1782958283; cv=none; b=SGgUVXDXcdQPSsoGH/kbDiWGRZIb2WEm372uQBTziFLcyDKIKfJvW/mRJ1ObXgT0PV9ETFPo33bCDzbYCJB0wYJoN8a+OfpmORWRvRw7CFexhVu9w4Xq+gyVr4WHc87Jjic3WvxWr92fOZBct9qPWGHRE3gGTJMJCmVkVwbMrlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782958279; c=relaxed/simple;
-	bh=Dhbh7gjceadtrqFDlWZ7DeZ2KaA97vTQ+3uekH0PMQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FARt/zfJTriFwn7PXAxzM8Hh2vypxiH6AYXN6OsAo8DYL2kzQvbwN/dFW0NRZRE+FzdagLGDznugBCtUt8wY20+xfU0wXvB4ZbqFqEAIAS/v38V97Fd2COzZheQam/ZwqlmYwg0r1eVqAAGUP1x6APRPgckVNQbi0Q8Vzpfz8Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=eTU4CbX8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eJVwUu3Y; arc=none smtp.client-ip=103.168.172.147
+	s=arc-20240116; t=1782958283; c=relaxed/simple;
+	bh=Xud14DYBCk1wd21y8w+PCV99wB5BxqdU/mZyaeR2wfg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BYpJLajQ0KRnGpIP6gAa/4BoXGKxMJ/iiobKkyB34wxY86CVMsiXj3fRmgMS6JOYh7fTFh+I5vW7Cw3vkJ6dbrQMCAzIRI4LP+TPLNIjJuwIe7yox37OMp9eI/e7iow+hqWe9Rhj5V+7ON5IJxRWZdT9h4gXwCVggHkBbCfgeak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=cmpgBv36; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UbCBBQuz; arc=none smtp.client-ip=103.168.172.147
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="eTU4CbX8";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eJVwUu3Y"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 18878EC019D;
-	Wed,  1 Jul 2026 22:11:17 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Wed, 01 Jul 2026 22:11:17 -0400
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="cmpgBv36";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UbCBBQuz"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id BB086EC01B3;
+	Wed,  1 Jul 2026 22:11:21 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Wed, 01 Jul 2026 22:11:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
-	:subject:to:to; s=fm1; t=1782958277; x=1783044677; bh=FizzRwBYPO
-	PSLI2oH11RtoDSpM0zjUEBWMFtCoMin0k=; b=eTU4CbX8L0CtgpKqghEZPhGkMn
-	7KtP43SRn5os33ZmVW/xcx3f18DNhbYBydyk8LYONruwK4t8yVJASD+LUOAzRXna
-	692wABT/hlGJ5QX8eJmzvTNjnSGNx81gML6hHJzmxD7X3KNSXC0IaiqwrwVsiucW
-	hwtW9/xBCPzm/TZOKB3PdPefGWZu+wQNgHTMZX9vaydfUw8GMRl+MFPMXofibnzZ
-	8WhlxLMxJBVA6yxI/39rBcEXDjfvz75uiw9RLtTCHDgQmJ7Q9N2L22lK9uBaygcx
-	tI+36llhSszeOCtLutGrw1OrPZPETUsqf/SoERFi3+/FyqUt3y7avVF9FUGQ==
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:reply-to:subject:subject:to:to; s=fm1; t=1782958281;
+	 x=1783044681; bh=AT6Cul/vUxGYT/Yt4jRhnZrw1YPEX10/Zz3okXUB29o=; b=
+	cmpgBv36aL6nRCVnUE7lcaoYbm1FxTSTPzgXxxMQtGbXTU0abCXp58m5uYIji3NQ
+	20CjhSXlHds0i4pL79kOKipj0aieI0l0/BRtoomGO5A5uKzccet8FuVzDLfEpEQC
+	akzne24BLipSZlakfPvw2qSMY9HlDi1A8niRTIVRcQvx+cJQJQE9zT3/GCw4PhGp
+	92B4I/E1LVxYQ2Br9nivPzSR6X5pEspjL2YOhRS5ssleQSwizCSXmGuXszOTPCc0
+	HRnSnr+2NxwQPpGfsfwUvI86AOYnqUBgtx2bGUxfCYKIu6y7aSmDP6REsUuGDrCT
+	Q5/jPMc0K8CmxpsbwDOJDA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1782958277; x=1783044677; bh=FizzRwBYPOPSLI2oH11RtoDSpM0z
-	jUEBWMFtCoMin0k=; b=eJVwUu3YzCXoYHzKbcpIKLPOjos1oP4FeWrFsA2by/KL
-	eV5Dn3QLl3Wm/DBQ+8evM8o2nJQI83ZmvbGMY/LTxmhc8fZ0BeqIgKK+gRdGpF4Z
-	aZ3d5F2s8He9E06jiw/QdCpiuPF+zNkuycVI1b/P3oOYTtr+3KHh5BksC4yGbmJv
-	vTLD54NSAnrLIW1k4le3o9hR+QiK5/bWNZJU+m7u8TWDsphpB5H7ZqrEJwLdEGZw
-	p0oNidYPf49cvGpOsqIB41kVTFpQBJ+nODaT9GpdNDGiQCJAqiSYx2FUzg3ifxbA
-	r9MBnDR3CfXx5Fv264IDSfNoWFL0h/EWYTNyehiXQQ==
-X-ME-Sender: <xms:xMhFagD1iUCv51bgNaD7lUWyxzHIn7R8X304bWJhP7Mw6wijatBrrA>
-    <xme:xMhFakB7fM6Dk0tSjTHegXZ6V4kF3LN-LpxrlxCqiZwuaaruKDPJ7jYIXI2ujXOVF
-    eCKC6oDTSEaUhW3QGBomwMjkXI4bXVxA89ciFaCYyKpaPVvxQ>
-X-ME-Received: <xmr:xMhFajq30RVSOT3W5k4BEUDY20_Tt6txSkR3h9Jp6SvXYqIZAcMhbp7QgsGqOJhBjbs45Q-kTgt2BLmYM6jt_SvDsdZKj40>
-X-ME-Proxy-Cause: dmFkZTFwu9aEd6rs81LwydTf6HdbwbDacYlHUcG90LgwQSIlDVzBWp7BMpp7ngplDIjnc8
-    3Hb1rW4d3SFhxPjuUFtvzdQWF43Wnh6fpZohL0RD8kb3/KpB2xOQp2EI1B1d7+mjQ0W06f
-    zzuMh75uQ5bOK/ws6vUcvYB+NTOLK+YHsPo8OG8Bfvg59C+tOWQrdy0MUXjVkZ4De0Nc/0
-    CxvaVqNfgnLNFLKAEe05TT01jKvXUev7NOqYtIn1ABFEp59P55wXNWjDMcDtjksX5ortLQ
-    qNKhVX3Q3C7bcHWp+f0ck4Tv+h8i3EuJG0CeMJwWeT8hl9obYKtIBXQUiLpkvIqQ6TLJKD
-    YcKRbEZMEOZvIHwFm5dTEOJjjuoRZEP05RBAFHr+2ZXH7yzzdS+YCjFbN5bL+mRw4DsPEB
-    BWMpHa3V5PhJcAvHQBDXLAmg+CN30rKaiJa5HxFA7JmEi4D+fOE2EA4fYVfmF0akEPQZxu
-    brrQ4e03BoegbFTS+FizefAMbgcIEiO04dhbe2NoQz2itmgSL4dBBOWC1Ic7LVNfOvXzKQ
-    jH97/SJ+dOwhWaTyt3GFGtzXSk+uaBlQW3WH7+nlSbJ/ODrpDi/5z5J2sgZf8fZQL5gh9t
-    gD1/xC8yxyXzxis44w4Ssn6IasMyOc1KIV2ITzY8hN10azjCda9XnSei5urA
-X-ME-Proxy: <xmx:xMhFaml5Xe7I2kJUbEBfgBP0fJ-Ndsm-AXJb9cSx6lPdWjpgrsQZIQ>
-    <xmx:xMhFarxP5smsbg9TlxJrQ-piKvKh7MH6CqBzeL_9kFX-6P21dcS8sw>
-    <xmx:xMhFam8cdGN-5wvk43mxTdJD5DYcRulKe4ea9OmJeFJPBJwyaG89Tw>
-    <xmx:xMhFavIvE2vEEE2D5Ovl3wieeVTVdNKmLIF6Mo3fiBDVlGyZN-SBPQ>
-    <xmx:xchFaiazUxJ0XWw81JaLp8nykF0Zzshttlqn0ynWoL8juvj0eAMtuBrA>
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1782958281; x=1783044681; bh=A
+	T6Cul/vUxGYT/Yt4jRhnZrw1YPEX10/Zz3okXUB29o=; b=UbCBBQuzAEJRzP+p3
+	GifUdGr8/grNpz/0UbIvOxuC2P8A1hYB1rEml4VDvQkRJMd1FnSj4Ci2qksMqij5
+	bF0H3cAoaXKXu8GqUZq2cw0h+nxdpcfIAMtRF8f79rdKxl2P8S1iLIZ3Os0QfXfQ
+	j22DI7CDjPbOtGff7TUChSg64L0YOP/SvpCQNEnJ6PsdRDEbWtUjJ2AoBPXGy0vj
+	OBgxULZSFrQUpJS+c3DR5MUa8MJKZvZ9gbqn7HHDwGbkPHPd2URjGtOOWJubak55
+	93KAJ5kUOR+o+uUkbOuFvcF65Yohm1DsdVDSRJQSzhileuuskVlc/rno286lK/lM
+	asy4g==
+X-ME-Sender: <xms:ychFaghpfB5z5bK50v3YMoKj7588uhB7liI3AQ_quu3BVa1GXWShZw>
+    <xme:ychFaqgSVwr9LZCwOGki7CzoZh8PensmPbNP2gRa7jqWkzkqLPJpGuziMy7Qg84jc
+    06qEyoM_-vmQO1_fqW9nO1ZWFhFDLYFmd3gfWjcDLtSFO9H7Q>
+X-ME-Received: <xmr:ychFaoKey7nMD-gYmBi6jVBDbSVbfBrk2PUIoz436s0dguGDzRGqOWXgtD_F6EMsBHPcg_W5KUs3QXmC4BfMWjtOfEegyK8>
+X-ME-Proxy-Cause: dmFkZTGAEOo5W6aeAz1EvVDq/cXpxQX9egqo4dJxaChguspbG3Yjd001v/oZjrDEc7l98n
+    Jqw1+jou6fhFN/fRgBLFTaap8p/VCgeL65FGU1u+k/+LDmlAw+K+UAzugHjBqFdD+VAMLZ
+    tE7A1KjbPztAI7WemYbU040niq24UuiPbgF+5HsJ0+jZKmLswAxMMNJQckCDS3cyj0MB1Z
+    OkfUmXWKhULOonU2BzfbKFt36BZbQ9fE+lNlR8fDjkY/5mujHfqsaCWKZDVjEjK17xVxKs
+    hOPOmx6HZhmioQknllsKTgXZERidWuU3WKhLvMsA1nJr6hj3duzPEiDnn+ZHyeafGxv7Dt
+    n9z3MaIriFulWhP+XRc2KjVdaiQwYDnzltwqpYQ+Giu3NBcPvC2Ap7PAE2LDhXLsVikP4G
+    qQGN51cHeS8/BNtPBLwgzyyNK57axKbgaqqRiDHrjKwXsM3t1dZITkkacHcf9SWCTKA+Xi
+    Z/p8fTkO0c9C3U8pcTkqy7ctn6ZPet1p7c0tlDfQAm0Psa4vK9eHoo96bUptvfjXRmqDvk
+    ZiSSrPHZLPHJg7VvlMBQm2onXHKWJTbtBm/v04MjsWI7CNF1VfZVaW2c+F2XNkXOwjnpRz
+    GCyn5h+GOqEUKwEQFVo5f69NCtf1Kfow2z008H4OLUKzcSyajjNYwX7oOfCw
+X-ME-Proxy: <xmx:ychFahGj7-tZbWmsPwfTLa4UWSs_KghEHTtb170N7G9C2E2V765M7g>
+    <xmx:ychFakT8bimqHx-Zb0SQ4bbcFPcBFejbe7h0RqbOTW2QdkQuZ6hX8w>
+    <xmx:ychFalfCB9kpV8oDPEDs1P9zlN9G8eTmo_eFIxENRRfdgWQ_XK-HIw>
+    <xmx:ychFarpD30O7BSP52FAY8ZvfzHQ1xl5lHp5oBZMejiIYVL1L7CQgIQ>
+    <xmx:ychFak6ffiBW8LShejwHrAXelTPxjoE2i5_vwk81oF9v2LCjGVl2SwNh>
 Feedback-ID: i9d664b8f:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 1 Jul 2026 22:11:14 -0400 (EDT)
+ 1 Jul 2026 22:11:19 -0400 (EDT)
 From: NeilBrown <neilb@ownmail.net>
 To: Steve French <sfrench@samba.org>,
 	Steve French <smfrench@gmail.com>
 Cc: Miklos Szeredi <miklos@szeredi.hu>,
 	linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org
-Subject: 
-Date: Thu,  2 Jul 2026 12:07:36 +1000
-Message-ID: <20260702021105.3406439-1-neilb@ownmail.net>
+Subject: [PATCH 1/2] smb/client: use d_time to store a timestamp in dentry, not d_fsdata
+Date: Thu,  2 Jul 2026 12:07:37 +1000
+Message-ID: <20260702021105.3406439-2-neilb@ownmail.net>
 X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
+In-Reply-To: <20260702021105.3406439-1-neilb@ownmail.net>
+References: <20260702021105.3406439-1-neilb@ownmail.net>
 Reply-To: NeilBrown <neil@brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -84,44 +89,41 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: NeilBrown <neilb@ownmail.net>
-To: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>
-Cc: linux-afs@lists.infradead.org,
-	linux-fsdevel@vger.kernel.org
-Subject: [PATCH 0/2] afs: avoid unhash/rehash
-Date: Thu,  2 Jul 2026 11:58:28 +1000
-Message-ID: <20260702020350.3403907-1-neilb@ownmail.net>
-X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
-Reply-To: NeilBrown <neil@brown.name>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: NeilBrown <neil@brown.name>
 
-cifs (like nfs and afs) needs to block "open" requests while
-processing an unlink or rename because if the target is to be unlinked
-on the server, then the open must fail or create a new file, which needs
-to wait for the unlink to complete.
+smb/client uses d_fsdata is exactly the way that d_time is intended to
+be used.  It previous used d_time but this was changed in
+  Commit: a00be0e31f8d ("cifs: don't use ->d_time")
+without any reason being given.
 
-It does this by unhashing the dentry and later rehashing it.  This will
-cause problems for proposed changes to locking which will lock the
-dentry rather than the parent directory.  Unhashing will effectively
-unlock the name.
+This patch effectively reverts that patch (though it doesn't remove the
+helpers) so that d_fsdata can be used for something more generic.
 
-The second patch here addresses this by using ->d_fsdata to mark a
-dentry as being busy in unlink/rename and waiting in d_revalidate for
-that mark to be removed.  This is the same approach that NFS has used
-for a while.
+Cc: Miklos Szeredi <miklos@szeredi.hu>
+Signed-off-by: NeilBrown <neil@brown.name>
+---
+ fs/smb/client/cifsfs.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The first patch frees up ->d_fsdata which is currently otherwised used.
-It is being used for a purpose that ->d_time is more suitable for so the
-first patch switches to use d_time.
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index 901e1340c986..e489aaf206b2 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -34,12 +34,12 @@ cifs_uniqueid_to_ino_t(u64 fileid)
+ 
+ static inline void cifs_set_time(struct dentry *dentry, unsigned long time)
+ {
+-	dentry->d_fsdata = (void *) time;
++	dentry->d_time = time;
+ }
+ 
+ static inline unsigned long cifs_get_time(struct dentry *dentry)
+ {
+-	return (unsigned long) dentry->d_fsdata;
++	return dentry->d_time;
+ }
+ 
+ extern struct file_system_type cifs_fs_type, smb3_fs_type;
+-- 
+2.50.0.107.gf914562f5916.dirty
 
-10 years ago cifs *did* use ->d_time but was changed to use ->d_fsdata
-by Miklos with no justification (a00be0e31f8d).  Miklos: do you have any
-memory of why that was done?
-
-Thanks,
-NeilBrown
-
- [PATCH 1/2] smb/client: use d_time to store a timestamp in dentry,
- [PATCH 2/2] smb/client: don't unhashed and rehash to prevent new
