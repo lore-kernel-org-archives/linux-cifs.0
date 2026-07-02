@@ -1,153 +1,122 @@
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0BB35E1A9;
-	Thu,  2 Jul 2026 11:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F8F3F787E
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782992008; cv=none; b=Ngb9FJRjMuCUZ86zCq1TE608Icwc2Ql9VZy+3evRRC2aIB0oaqiyqNOOWrQMnBVLkkF+/TWYjzNGK7WVfAqunisuXpsRYovXiIOavlcQjiq/EfQwEOsPPdDw+OhlwkGC1m9K539p9PdC/Ajx5ICGee8S4C9YDvvn6FLPSq/kMIQ=
+	t=1782992148; cv=none; b=DSBbpXbKqqt6DwfOAmh20GkNpqnziVGFgaXhhn6VS0/ZQRkTTNqOvDvHH2qAIcZQ4MuY0OPPcjKYVFsJsXlnfMSPtX67X2flhwVI21Yo67jpR2hSN8xPeLR5jN6XfJ/XLmfZ7gkjjKAtH2AtxxeBLOBt6YmxQgxslADXDa+1+Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782992008; c=relaxed/simple;
-	bh=DSiLEAn5xPmd6cvduTjLn/orcK4idVtMJbh8dY0obRI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ct9iUuF/Gdax7tzt/YNlzG7G4hGe4DEjFg3JwBxTseulIWMt2LNGXeLFdgYnbiw3p7QZviK7NPXFOA9Ez1xshIRRT04DymMPj0FWW4ZVEv52HGjqGQ/VbP7xoYo4SIdXrzELE9FPKq4djokjuEqksbi/WbdNlXffZMXuYSZZiD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=ZAw1jAUh; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1782992148; c=relaxed/simple;
+	bh=O6FvDtWU0F7hPefdEbubr+oUVTA7AmZHsIiHbgO52pQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dgia6OPDVZi0KnIsq1VMesAK+CGoULhx7iAac+KI1Geh9p+2w+zFpy3FWPsD1HzQp5f+r3JD4Ok+9+K/t17nFrliTG8cRgH8spj8DbwZn23pjXLjHWrtw0UCPC+sb5YjvpUkJdVrxdLeAOeCHOp1iA/hK2zr3RRjekRpHb/o3Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izgoa/AF; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="ZAw1jAUh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1782991976;
-	bh=vcTdDoubVIbYNczx1/biUey51SEWq1ldwdWLBW13qs8=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=ZAw1jAUhXhrwxMQiAdRx/X1N41lH8H35oaOgZszN1XTXsWcDJsQaVWq0XBUlS29YR
-	 +sEMv5HMgHGSLJbILOZFXaUlRSBbRXmFq/monvdOZQ2CqOW/1gd6XWZevfACC7H6tP
-	 3WZTDw8k2opURkEQ7SeHxdSWiRCRsoxp6OPcEodY=
-X-QQ-mid: zesmtpsz9t1782991970ta665f6a2
-X-QQ-Originating-IP: NOClrfKYjb16CBrXfyUYZuIokmrndgP0NGeZvFRimTo=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 02 Jul 2026 19:32:27 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 4999534152803471521
-EX-QQ-RecipientCnt: 7
-From: Wentao Guan <guanwentao@uniontech.com>
-To: linkinjeon@kernel.org
-Cc: smfrench@gmail.com,
-	tristan@talencesecurity.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Guan <guanwentao@uniontech.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: restore DACL size on check_add_overflow() to avoid malformed ACL
-Date: Thu,  2 Jul 2026 19:32:22 +0800
-Message-Id: <20260702113222.228413-1-guanwentao@uniontech.com>
-X-Mailer: git-send-email 2.30.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izgoa/AF"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-380cda7f00cso897087a91.0
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 04:35:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782992141; x=1783596941; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JnFg1iP58Ku8RilWowkB486iLdB6QCCKhKMsD9HZN3o=;
+        b=izgoa/AFfz3N9gPOJRSiCMCmuw6Brlbr11qQ1fizMFmjlaKsbBGkxTQOspYoQJM9IG
+         ZE6kh00ipQ/ZySdkNhzKW9mkFmfyE+3G+j3Tp72xwk76hkFGdjxImdCWdn2hBLWr/SqC
+         iCQYQr0hEgPXSCP/2DWmgAICuSPeU5TkEL9Oogvg+e2aVnmU/nvRqa4A0VGsaRTb9DNF
+         +tlB4X7R77cY5U1orMIyy4xEn9Rl2iTLOXSj0HZk2WNr7EwUSbid7jZ9kGd7Ja9Bmjt+
+         uDXA9aXgFzWWmVKQg05xwlCT4oFvLichnLCOecOFwQ2nTi4+O1TTBshSd/F2yCA6h7Ng
+         2n8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782992141; x=1783596941;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JnFg1iP58Ku8RilWowkB486iLdB6QCCKhKMsD9HZN3o=;
+        b=TlRRb/mfn7j41Zhz0hmxNXLF6vM6ZyPICpsJEFRC3FOT3LbwyjslnCyt5u6UYwmPat
+         wpqFyl7dbGcyosnqs98z7Zd2rfwsGohpMaHXt3W9e7MTOlRQ88KHPPQd8N1q4nknU+p1
+         Jz1t3SGW8WvAbesodHRklcHy7hly2FvORjiMqNza9uE2gXeqmtGrQRv/LpA1vywtEOSR
+         BqkD05t9B4s+mA11SPdB9KhzB8Eotdeluk3OGqcwF1/f/61CTsiz4g9PM5PJ8J44lSHF
+         FQb1kIE7znq1oUTpO5dKwSAu62RFlqdY6EpefI5eT7HOxFbNGItGQ8U6ic97iuNYWWrQ
+         J3xg==
+X-Gm-Message-State: AOJu0YxtdSuIMUBrsA9rGDv7MF5RMi3+LVPM8VWs4oFpDQ7Y/qBr7VTU
+	yoxnTxwt9IIO2OKInwWYPx7xpUQG8L0vsBz/gWg8zTOrt9tPZ9UKqsabenNc7w==
+X-Gm-Gg: AfdE7cmj5VBaEyXgma8FYEomibq4CQEZ13dKJ4dXyf7G+nVTcFC/idIELIdHlq0+HgL
+	yWttfV6XjQCxY3jsQVRPa8OozdFWlqy0Hc2XOjd/7MnTiXgmkkzfCPEKF/2xbH/TnPnZYVEZ5fM
+	/DuYrYUM/RNcwYP73IMrHfwjFOTFpLKLA4JSO/4M4hq0bqCt5PY0OVtXMoCFxuMRLyGbWVims98
+	BnQcsOMZLHzpWvScq3VUxNMJdIDe3/LTv4GlPl5DFsD1KKFe3yGsVrU//ot7x2lwAIbEZn9lwVJ
+	E+xNnVqJ8eKwc5wzY3Bm5HavDBJt7Aw4lDOT+iWs5+AWAN08v7p2FAruU4cltihmKoB9yA0aXTW
+	X8RiEkKQ9M5Yz/TjGgVpp3PRMLbafjEbyihkfqE6/R2k/0buLgXwEYGFD7Nd8XfY8ffM4P7+ByM
+	xxDZSDD0Ut9ffijrA59RKOJoRCuqPp7SaPtgFyFaA5Gvq3UrKnUFNMFuoOlqaa2vrMh28+FuMJ8
+	BM64epVc2gENbOtzhyYrKQ=
+X-Received: by 2002:a17:90b:4b85:b0:36b:b4a1:2939 with SMTP id 98e67ed59e1d1-380ba8d533cmr5216507a91.15.1782992140834;
+        Thu, 02 Jul 2026 04:35:40 -0700 (PDT)
+Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb7fd75sm9444824eec.19.2026.07.02.04.35.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jul 2026 04:35:40 -0700 (PDT)
+From: rajasimandalos@gmail.com
+To: linux-cifs@vger.kernel.org
+Cc: bharathsm@microsoft.com,
+	msetiya@microsoft.com,
+	smfrench@gmail.com,
+	sfrench@samba.org,
+	stfrench@microsoft.com,
+	Rajasi Mandal <rajasimandal@microsoft.com>
+Subject: [PATCH RESEND 0/9] smb: client: remount reconfigure option fixes
+Date: Thu,  2 Jul 2026 11:35:26 +0000
+Message-ID: <20260702113535.4044308-1-rajasimandalos@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: OcJU98wqb2KeoOV3oMoLJR0sj3W88Gawa9ODU6AJi/b/TytwkM1igxSV
-	vvBDhg0b1Z50EBL33n0lPc1J6wIwOWM0vn2UhFl2ozJt+bMrSFWb5fSZINGoBvoWBrZ6MUp
-	L2PQLLXcN4alKP4dmUVm6417x0wrBm83wZwNQxQCAIbd5WE+ynUcYR9sc/Ay/xGAzi3Ssfz
-	i8yhZgllcRbAXcM+S+lToh1qnjCpLo+I+mdsrm39zULOzoMFbEEc+jDpPsxnCgDyw1TVLI4
-	2xbBF42+3kdUzfuP/ZdLlfaoWA6Ym1nWfXAVekpJr/Q8w+Wp8QTVnOZFmX5iRrIUqV7QHik
-	G0Syg4iHs0nf6RNevCY7uInAI+5PcPYGxqUlmXGXeaqFT/+RFGlLgUnrmpgRBRWDiP6G40j
-	OHanLe9Lr1zhaqJonCMtXAUtl8m4bE/mmu4lZnuSrJnvpYlKTuHO7N9P7i+iNXu8yW0ZYwl
-	tlYXppUDp6t5mkAcBlhhxFewPJ9x7a3t6Lzw/3rBEzqcJ5Qzktka2rvKsPT0CUGAGXu4/jj
-	mLX3UrGVczni8g4AEpHA3/3cj0HPEX2XU7Bv0ySwRulQPAP0Hl4GNjdhOV72mWG1C8BLFhx
-	1SHlkENPFO24GpPNXSh9puYOP7wWyTJ2wdrRg8izv9m9RfdhgigVPHFCtqAq/xMFQbpp8e/
-	Zi6+1JxCAm4nWPGRnukrlNf0AQtvTfE9EcYRNqA4XSJGu6ufFS6QlB9vnHcE4yxAo4BVVFx
-	JL91bOKCN/PSpDce3ldNVOmF1E5nnvBbgDMe/s1lqhDle7EwJHi/pK9wQNbO7fGrI5rxkKm
-	sSVHuXzcxAMnN4rQRxfBKCSqKZDeq1sT/DCbu72BotXbuYWf03ZwJm76ArHDc6TYUAJL1zh
-	hmygS81RH9vZ9GxKQ8H8xulLQ5x33nYzQSPycpJwxJGfx0zvLzBNrPRoP1WUvlXa6QxkkMv
-	qgaE1a7wDFOmcxhN8ZRNBH/bbRePbQYvCYNMZ2LjwWpno3e6AKovnNj0664f9FGeG7TC8XY
-	1kMyvIqRSKH0AIkaR6Qb3ZrEZzLK8MoSVwXlc2O+J4qwwOeyF1b7dWSpQ6EphNYrDpphtm6
-	rS05172Hxjg
-X-QQ-XMRINFO: MSVp+SPm3vtSI1QTLgDHQqIV1w2oNKDqfg==
-X-QQ-RECHKSPAM: 0
 
-check_add_overflow() unconditionally writes the truncated sum into *d
-even on overflow, per its contract in include/linux/overflow.h.
-The four check_add_overflow() guards in set_posix_acl_entries_dacl()
-and set_ntacl_dacl() break out of the ACE-building loops on overflow,
-but the truncated *size is then consumed downstream at the end of
-set_ntacl_dacl():
+From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-    pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
+Resending the full remount reconfigure series with review fixes included.
 
-This produces an on-wire NT ACL whose pndacl->size under-reports the
-bytes actually written by the preceding fill_ace_for_sid()/memcpy()
-calls, yielding a malformed ACL that can trigger out-of-bounds reads
-when re-parsed by clients or ksmbd itself.
+This resend includes:
+- review fixes for patches 1-4
+- nolease remount follow-up fix (patch 7)
 
-Restore *size to its pre-addition value on each overflow branch (via
-`*size -= ace_sz` / `size -= nt_ace_size`) so that after the break,
-*size once again holds the cumulative size of the successfully-written
-ACEs. The committed ACL is then truncated-but-self-consistent rather
-than malformed.
+Cc: Steve French <smfrench@gmail.com>
+Cc: Steve French <sfrench@samba.org>
+Cc: Bharath SM <bharathsm@microsoft.com>
+Cc: Meetakshi Setiya <msetiya@microsoft.com>
 
-The ksmbd DACL builders are the only check_add_overflow() sites found
-where an overflow path breaks out of a loop and the destination value
-is consumed afterward. The other nearby break-style cases either
-return -EINVAL on overflow (transport_ipc.c) or break without
-consuming the overflowed destination value afterward (buildid.c).
+Rajasi Mandal (9):
+  smb: client: sync runtime state into ctx on reconfigure
+  smb: client: block non-reconfigurable option changes on remount
+  smb: client: sync retrans on remount
+  smb: client: block cache=ro and cache=singleclient on remount
+  smb: client: apply rasize on remount
+  smb: client: move struct tcon_list to cifsglob.h
+  smb: client: allow nolease option to be reconfigured on remount
+  smb: client: review fixes for remount ctx/retrans sync (patches 1-4)
+  smb: client: review fixes for nolease remount (patch 7)
 
-Assisted-by: atomcode:glm-5.2
-Assisted-by: Codex:gpt-5.5
+ fs/smb/client/cached_dir.c |  70 +++++-
+ fs/smb/client/cached_dir.h |   4 +-
+ fs/smb/client/cifs_debug.c |   2 +-
+ fs/smb/client/cifs_swn.h   |  14 +-
+ fs/smb/client/cifsfs.c     |   6 +-
+ fs/smb/client/cifsglob.h   |   7 +-
+ fs/smb/client/connect.c    |   4 +-
+ fs/smb/client/file.c       |   2 +-
+ fs/smb/client/fs_context.c | 422 ++++++++++++++++++++++++++++++++++++-
+ fs/smb/client/misc.c       |   5 -
+ fs/smb/client/smb1ops.c    |   7 +-
+ fs/smb/client/smb2ops.c    |   2 +-
+ fs/smb/client/smb2pdu.c    |  13 +-
+ fs/smb/client/trace.h      |   2 +
+ 14 files changed, 530 insertions(+), 30 deletions(-)
 
-Fixes: 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16 DACL size overflow")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
----
- fs/smb/server/smbacl.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 664b1b4a3233d..943fde8300a01 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -644,6 +644,7 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
- 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
- 				pace->e_perm, 0777);
- 		if (check_add_overflow(*size, ace_sz, size)) {
-+			*size -= ace_sz;
- 			kfree(sid);
- 			break;
- 		}
-@@ -658,6 +659,7 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
- 			ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
- 					0x03, pace->e_perm, 0777);
- 			if (check_add_overflow(*size, ace_sz, size)) {
-+				*size -= ace_sz;
- 				kfree(sid);
- 				break;
- 			}
-@@ -703,6 +705,7 @@ static void set_posix_acl_entries_dacl(struct mnt_idmap *idmap,
- 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
- 				pace->e_perm, 0777);
- 		if (check_add_overflow(*size, ace_sz, size)) {
-+			*size -= ace_sz;
- 			kfree(sid);
- 			break;
- 		}
-@@ -741,8 +744,10 @@ static void set_ntacl_dacl(struct mnt_idmap *idmap,
- 				break;
- 
- 			memcpy((char *)pndace + size, ntace, nt_ace_size);
--			if (check_add_overflow(size, nt_ace_size, &size))
-+			if (check_add_overflow(size, nt_ace_size, &size)) {
-+				size -= nt_ace_size;
- 				break;
-+			}
- 			aces_size -= nt_ace_size;
- 			ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
- 			num_aces++;
 -- 
-2.30.2
+2.43.0
 
