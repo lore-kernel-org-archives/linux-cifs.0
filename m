@@ -1,80 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4825F2B9BA
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 00:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C7529D26B
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 01:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782951682; cv=none; b=VbBSSgQAScx1kP9QM7+tIuDHio4m1fK+47YPUzWCmTSjXbQhIGPE4ahwSzAVSIwhn+YnwIu3AEiSdt2oJe7RSuffHWvdjyNseBfoolh9nHGMgnjM+V2jpfvwuBtsAxBFBqAaleGfN25mlAlZmwkkfrfe1pEIhjiCz+g/58DR0iQ=
+	t=1782957323; cv=none; b=r+7WpAzIsFIoveHilKYGe97+1Hd1sDviPl2s6jqU7i1fMrjDzwAzdJH/1rcyKG5vE0C3cu2Qe7vAmYraUQ5CDuqoI1h8VfYKXTduh4H7nTcUeki7m4+ItK/mRPbKOGusojzg5pswOijACYgmfTLYVVVFeAeGwFAhtEayNeWP7Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782951682; c=relaxed/simple;
-	bh=tkZmPRDjrEj+e1CuTfJBxwJg8vtFtn0ku5s5YMmmAGA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C/KiKDCoT7ix03MGM1hJKG6DCA+v5tlo4hvKWdwGsqaWbaJYgfVcH+UYa5aIIGQJHCLwGdF8xsZpTn22ZDQLEH7CRKu4f7F67WKxXcA7o6ckUUZh3BDVv7F3OErTOS/qbp7T7A9V8U0o+PaqOdZsp89igPYHTLJy5fjErzbVoHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KGUzCGmT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782957323; c=relaxed/simple;
+	bh=QWO4NdOmmo6fMXuKdc1YflyHtxuW0VXLATsI1zFyejs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ofNLqbbXvkJrAd653OD99dzYEowdc/SyoHk7QzgJqfIgAlcvhU9OtHdRhPymKfrUgf+gt97DrFhzj8+PVIVQuiB0WZZcM9RySvkS+qDJBmJgtwL2uHUfg2OTBYFQLrZleyXf347kUTn9GddDiYCwTAhw82BtQzqXPQeR1oabE18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wcp4d/1y; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KGUzCGmT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE04D1F00A3A
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 00:21:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782951680;
-	bh=tkZmPRDjrEj+e1CuTfJBxwJg8vtFtn0ku5s5YMmmAGA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=KGUzCGmTuy+UqrB0M2PmpegNCL6STR6JhP/VcPFIQbuggAodq148rAOdPn0y4Qh/f
-	 hf5Pz29fBXoNbtdeW/w4SiaAImPJ/kZ5QXY1ffCyb5oP8cobal88RJbgLeR9KIl0Qv
-	 BfTCrTi464pG22BWAjuLvzPGanRPUbr7Cdm79gHPRExbgPkXBAquLFfctZpIu0cd1P
-	 olKBCU6IpUJZYFnZDEEjttDvw4UCoMH/n4A2vtuuv4YkBPpDIpm77mUuHe8sBNbVeX
-	 FLm3xIcXiPYYwXgMuq7q+xd/ItyMlznBVkeK5TtAlnCE/dsmpvay2eaPxwWT2FJXZk
-	 K1DfjCoZW6lgQ==
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c12788a75abso241875966b.2
-        for <linux-cifs@vger.kernel.org>; Wed, 01 Jul 2026 17:21:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrAfJiadQ4qzHN+awfsBeBM6arW/6QnXP9GFjrwVmS72q/RbRIi1fm33ZNU43kQ5dpaMVuSm26AP/kh@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPXVb9G06ZUCMKpIRd57+m/papE0YuhZ2lsgBFsZsgDTG0aZNA
-	+ezknUGzJkvoMhKf2vwbSj7JYMdBH6VtW0tRKmB+GCJKfM27PMengV58ZbWnRWGREQUoAqJWUcP
-	pxCizdXssQLcrGpeBCn4G95qfZjLZQg0=
-X-Received: by 2002:a17:907:e102:b0:c12:5bf7:4ac2 with SMTP id
- a640c23a62f3a-c12ae3ac3c1mr111814866b.8.1782951679501; Wed, 01 Jul 2026
- 17:21:19 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wcp4d/1y"
+Message-ID: <ec6b4552-618d-41cf-a262-0c14ebd354df@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1782957319;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WHgmDEreUpdkHrS4TsC6R/3AWJTw+NKZPTX+nbDh8yo=;
+	b=Wcp4d/1yPen7/H2Btpsp6QTCoQp3Hx2KkOwlRPvMmlKruY23QLG/J8f2RbKtfu9cgRs2ia
+	huk7KtSVtsU0ISF5WOsmi4Xxf3RDrobPvbGppUZef859DKq+V1iJ8v3EHof3+dvH6n0vWc
+	xbl5g6fsST/4QTGPEZibjHtznSRWJvU=
+Date: Thu, 2 Jul 2026 09:54:25 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260701152157.822207-1-huiwen.he@linux.dev> <20260701152157.822207-6-huiwen.he@linux.dev>
-In-Reply-To: <20260701152157.822207-6-huiwen.he@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 2 Jul 2026 09:21:07 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_KXELiqFDZ=Q5jJBOWgHOzXtxZyLSxrjh_qPFMNsEJ6g@mail.gmail.com>
-X-Gm-Features: AVVi8CeNWvEPkenguG_aC706iNStdOgH6Tit0ayORFszMuIiEwVfn139cvMow0o
-Message-ID: <CAKYAXd_KXELiqFDZ=Q5jJBOWgHOzXtxZyLSxrjh_qPFMNsEJ6g@mail.gmail.com>
-Subject: Re: [PATCH v6 5/5] smb/server: map SET_INFO ENOSPC to disk full
-To: Huiwen He <huiwen.he@linux.dev>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	chenxiaosong@kylinos.cn, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v6 2/5] smb/client: reduce fallocate zero buffer
+ allocation
+To: Steve French <smfrench@gmail.com>
+Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn,
+ linux-cifs@vger.kernel.org
+References: <20260701152157.822207-1-huiwen.he@linux.dev>
+ <20260701152157.822207-3-huiwen.he@linux.dev>
+ <CAH2r5msyi5nvObkx+JUP78DKdthQLR4p+sg61SEW0RXATorcLg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: hehuiwen <huiwen.he@linux.dev>
+In-Reply-To: <CAH2r5msyi5nvObkx+JUP78DKdthQLR4p+sg61SEW0RXATorcLg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 2, 2026 at 12:23=E2=80=AFAM Huiwen He <huiwen.he@linux.dev> wro=
-te:
->
-> From: Huiwen He <hehuiwen@kylinos.cn>
->
-> FILE_ALLOCATION_INFORMATION can call vfs_fallocate(). If the allocation
-> cannot be satisfied, vfs_fallocate() returns -ENOSPC.
->
-> smb2_set_info() did not map -ENOSPC, so ksmbd returned a generic SMB erro=
-r
-> and the client reported EIO instead of ENOSPC. This makes the ENOSPC step
-> in xfstests generic/213 fail.
->
-> Map -ENOSPC and -EFBIG to STATUS_DISK_FULL in the SET_INFO error path.
->
-> Tested with xfstests generic/213 on ksmbd.
->
-> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+Hi steve,
+
+The normal write path can use larger writes, and dd is a good example of
+that. But this patch is only changing the fallocate zero-write emulation
+helper.
+
+That helper already capped each SMB2_write to SMB2_MAX_BUFFER_SIZE 
+before this patch:
+
+        if (io_parms.length > SMB2_MAX_BUFFER_SIZE)
+                io_parms.length = SMB2_MAX_BUFFER_SIZE;
+
+So this patch does not reduce the write size on the wire. It only avoids
+allocating a 1 MiB zero buffer when the current helper sends at most 64 
+KiB per write.
+
+Using the negotiated wsize here could be a useful performance 
+optimization, but it needs more care to make sure the larger
+write path is handled safely.
+
+Thanks,
+Huiwen
+
+在 2026/7/2 05:44, Steve French 写道:
+> Won't this hurt performance since for most servers the default max
+> write size is 4MB (e.g. Samba or Windows) or 1MB?  I did a quick
+> experiment with
+> "dd" and I see the 4MB writes over the wire not 64K
+> 
+> On Wed, Jul 1, 2026 at 10:22 AM Huiwen He <huiwen.he@linux.dev> wrote:
+>>
+>> From: Huiwen He <hehuiwen@kylinos.cn>
+>>
+>> The fallocate emulation allocates a 1 MiB zero-filled buffer even
+>> though each SMB2_write request is limited to SMB2_MAX_BUFFER_SIZE,
+>> which is 64 KiB. A high-order 1 MiB allocation is more likely to
+>> fail on a fragmented system.
+>>
+>> Allocate only the smaller of the requested range and SMB2_MAX_BUFFER_SIZE,
+>> and reuse that zero-filled buffer for every write request. Also reject
+>> a successful write that makes no progress to avoid looping indefinitely.
+>>
+>> This reduces the contiguous allocation required by fallocate emulation
+>> without changing the written data or range semantics.
+>>
+>> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+>> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>> ---
+>>   fs/smb/client/smb2ops.c | 7 ++++---
+>>   1 file changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+>> index cc8e0595e504..23505ae9bd81 100644
+>> --- a/fs/smb/client/smb2ops.c
+>> +++ b/fs/smb/client/smb2ops.c
+>> @@ -3559,7 +3559,7 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
+>>                                               char *buf)
+>>   {
+>>          struct cifs_io_parms io_parms = {0};
+>> -       int nbytes;
+>> +       unsigned int nbytes;
+>>          int rc = 0;
+>>          struct kvec iov[2];
+>>
+>> @@ -3580,9 +3580,10 @@ static int smb3_simple_fallocate_write_range(unsigned int xid,
+>>                  rc = SMB2_write(xid, &io_parms, &nbytes, iov, 1);
+>>                  if (rc)
+>>                          break;
+>> +               if (!nbytes)
+>> +                       return -EIO;
+>>                  if (nbytes > len)
+>>                          return -EINVAL;
+>> -               buf += nbytes;
+>>                  off += nbytes;
+>>                  len -= nbytes;
+>>          }
+>> @@ -3611,7 +3612,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+>>          if (rc)
+>>                  goto out;
+>>
+>> -       buf = kzalloc(1024 * 1024, GFP_KERNEL);
+>> +       buf = kzalloc(min_t(loff_t, len, SMB2_MAX_BUFFER_SIZE), GFP_KERNEL);
+>>          if (buf == NULL) {
+>>                  rc = -ENOMEM;
+>>                  goto out;
+>> --
+>> 2.43.0
+>>
+> 
+> 
+
