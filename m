@@ -1,63 +1,63 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AA03C1F54
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720693A5E87
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 11:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782992161; cv=none; b=a8uoromt5Qvg2mULrT8VezJ8eTThO/oKcKjswCcpxYL5y+QCboRXeYbOyG6Jy2nn3XoivcDnpFrGuHEHewZHjyjHXijF2tKzOz1v9mOnYupv/oJVLg5sY66Lv8Xyo0XAMnH6HDWbeqwn+usTnCDI1j0EcqU9TaXgpgbTgDu3qmw=
+	t=1782992163; cv=none; b=m44gecxpduv+ZkV4IIeRkuCcfpYKhWZz4v+k6wXY9Ow2qGuO0sEVzGb0y0UR4QcNlKYD99i3RTECNktS+TGYGns2zM9Zd8jYa1oDxm/n98f9ztSdsRvxMnzPQQWPgKk82EfJXPCKReOzKXZQShDiF2dTs9K98NbtOGENMhmMhPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782992161; c=relaxed/simple;
-	bh=toEDa8c8Bw1Ro5e+rhuh7ud8Sa//Wl/ICccogwCsZVg=;
+	s=arc-20240116; t=1782992163; c=relaxed/simple;
+	bh=awqTlgpDXXNPiMddpl6/icRCFqOKguUA0X8IxUTpvO8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fcit3DPRLAyxC/pvOf/3CAv5ppbU6xrGPT/kodtIHIvLXzDkDdNsItTbkg8n13wt3gsWJiBVm8z0AGoehsUegUiU63ll3kEnMVwnptFY16dxgD+L0JdMgKUM81LbVSCqqsQWTF1NHbQYMJzCCVh7hFVdQvEa/pjR+XQu4s59lXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KpCE7cgj; arc=none smtp.client-ip=209.85.216.49
+	 MIME-Version; b=SuxVb1vGuypSbbPzzfINRnyr+1zUzVWdB5K9yF8gN+Kq+AL4T+nCj0HJqZe/33AG8JXSAwZtCUbpnOMi60LWfQ6SvE4ft1EQ7QINb5xWmap9+513gigi6NSb3UArDLd/PnfTocc4Zllj56/5M+Arayosim3J5SCY6QMW7oGgN+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RNY2najJ; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KpCE7cgj"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-380d9481551so758708a91.0
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 04:35:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNY2najJ"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-c88973b6965so395833a12.1
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 04:36:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782992156; x=1783596956; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782992159; x=1783596959; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bNRVcjrSmFHfVTPq3R+9IcQ/n8NpuhmUFL1A95VvlLE=;
-        b=KpCE7cgjOD5eTmcjHfkMQWz0p0c/jqVBptmI7bGdbXsfEkIzRNMEVABnEd+T9Ny3fW
-         9L6Uz6HeIXpwlO85pT2qKKtj1cICw5jdik/V+e7ozLFIJbob71/vQKxlk78IfPBV3gG3
-         EiGRzvB6HVz4f8+O2I+uSdSwhyzAErThZ8jPkzTb/G7Ht7V0TinFTZjPWkO6/JwpkTtT
-         isgqpTyiDOFAPF/+VsZxwzfQ2sP/M586xVFvnf4za8tlor/QFjiAAiMIDwWIYtFHbgJy
-         rHTP98K4IKMSYERVFzwEhVN566M/iMsUf54cFsfJVQn9jp/ttYEmD4j0QdkctqIeGkT+
-         leBA==
+        bh=azgFA9QsjHUCJwWt4I+HuOmbFV1W60h2+aAACqXgEZY=;
+        b=RNY2najJMPuhlSuyEp1tEGF8S5zh3sgp/woOidqL2fpNonnR5ZracuWGWV0j338+sj
+         /rP2eybtVmm3mXnFuCvT4qPCrIOcacUdgstSCaKgPMk2Wibr1sDYPqfUAHy1o5LfBKF+
+         MOp+vKDRSFQq9Trhc3wjqE9XJslhfaIUmQdhfNPz+/HB3DqRBYf1LUS1r5/vNg2Vs9J7
+         b+JLOZazANmWszpba1JlsgIEM3h7rbBDLDxXqow8vS54ehg686O38xGcgNgOZLmVyrXV
+         D1rScScuejGABtg0L3Swz81LujMvdQlEdbEcVx6VpIlrwGy5FHDwh84ZyTB30tRFJfB8
+         fCfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782992156; x=1783596956;
+        d=1e100.net; s=20251104; t=1782992159; x=1783596959;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=bNRVcjrSmFHfVTPq3R+9IcQ/n8NpuhmUFL1A95VvlLE=;
-        b=rnr6fgaWyxW9viTqKpy8B+dhGdE5zWtXGfMc4oDNuXTq1fvQvh2tatkWVeunahlUDs
-         5PU0TVFeqNG+uOS8/rzWmN/VAlLciEhg6/PFSKOu2C4K1z4IeJUWtLUPoZ0LWSJvFMTY
-         1ympcAn7CNuviEnJkEnX8oejrs18vBI0HRs+JzJQ3REZdCWfY8i79Ue9OBYpnpDiT2cK
-         AASghC2a+2ZOJwBOslyhSACt8vx2x5KQh2CyXC2sRCCWjbnofu5okvcNcTMMPNHoX01J
-         S8BxA6oP0v0N9yOQhzz7w0kBgMyzeC3HvJ6pzF/Ujz6zetk6wn67GLVPMhu7zbPFLjWZ
-         7WEQ==
-X-Gm-Message-State: AOJu0Yyj8ygZ/i5StFMK918JlWhffCxsZ0TlJZCQ8eVHDWgkBzwDHILN
-	2sbwPLyln7YqBAebuX94cwWDRBJbjZ/hFh0+TatLWstlTctm1E+kmcY0/PGuug==
-X-Gm-Gg: AfdE7cmkqvY9RuAaYTTEqCkv5ewmh5RanPPwtHrrwF1kP2u+qAxwMAqEJfRr1frAbse
-	hoeJ+ZGugY09PL9t+cp00M9JISdBNwm1RcSNJkK33u6vLpTuTn7LZ3Ts7aPkLrm/9j8iF34Ixw5
-	vWwPboU+L1Ai2ONjy0G/nrofjpBgtS7JURmqjNGdyHe8eandrWJefmdUDjc6SaqsGmuefnAjRZX
-	dqptCR/nzNcIQoAYrPE7u+j9qH+FqyED4abGsvTHe9xrYkbkps+LTkiXNaRqCA8pqtOdyhJGwrE
-	co8rQOZg+sgybl4l49aUUgll5/sHK7/lLIJCZB0mteEA8Q3mt/x410YkFrUzA57MOBo/7DqM/DN
-	/Y1JQMwxjzvqphYLYXjragkbFIbpPcSJUZEh3fGmRMzWVZlu+utOd0CJfgKmtik0RW5TIUJSZ3g
-	Uc7XTmvowc4NLBTLg9329eLjnPRNkqTpTbfX+CQFHpOd1+KoNZ/TXMCxY/DSaYL4NpmrPlk+S97
-	aNBIsO2uNJR
-X-Received: by 2002:a17:90b:1647:b0:37f:d70a:9605 with SMTP id 98e67ed59e1d1-380ba868155mr5287679a91.9.1782992156270;
-        Thu, 02 Jul 2026 04:35:56 -0700 (PDT)
+        bh=azgFA9QsjHUCJwWt4I+HuOmbFV1W60h2+aAACqXgEZY=;
+        b=NgbdbvVwm8DXN6mZqYZ95B9OYeNeb7asI7E5uh7Bmq1ZIjhhbYEMBNMVVbTcH/ba0l
+         NoJTvtO/nMPlCwUyVwtA1PePyDimcTw//Xh8PQoFxjSioq4dJErU2DE2Ph5pPChm/n58
+         8foih1rkWSujWpvxVGf2LS9qjwp0q5mqNrlDuVrKupGXDJ0Q+FIUK0+oz0bhELuXWoxs
+         A9zP8MeUMHNFFEB0es5XvZgN3hjYS24pcIAN/B1q7zeLkuPCSSEMWe8f4oZ31pfocevW
+         mkI3BM/oAAD3IRpvABbZnCxiRnHYeasH401wK7/lCH95AcqjOdZh9y177LB/sKY3xggg
+         9Ntw==
+X-Gm-Message-State: AOJu0Yw7z00kXrVUwJooCXjutTKxv9XRpxynsPY3qArFut+ENEvS+LAJ
+	qJqA2+nwZ8jPcglHz5iUQdJxEFb8Glpa1V6/I1b7tq8OfmNTC5+io91s0Wmh0w==
+X-Gm-Gg: AfdE7cmzcddGPA8fehX2TSgU5WeCDtNV/vvmbgosakinscAsx/TVVM5ooRYpPrMMwN4
+	s2Y7uBfeK+DVJ4X8mgT7EFfLXlefpZvPT5ukCzzsQf8C7SuGySRsZlzIZY7rZQm3x6h5mGi+Lyk
+	8va9wB2SbSETmWPIYhlYmS8sOUCJ3y0qiVGhnJFMCh/jluh1O0rf7etDlIxWSN9Xs/Z7eEXvUD6
+	UpydR1tVxJwbtEdi9poXtU/xQRaNWuz4G8F9wgRBClleD45L8emYb07ui4F5AFpv1T0DDEbZ1Oq
+	1G35CoNMlOFDjOCPbNm4W0+bB/sa+FtUZQyH8IK0Kxuj5HgZAGZbJtux2awao1outQH0QBNhRzC
+	lly++B1Nc55gd4fGzZPozmlTK5ONGk2FcxO3uDDxRyaK+IjIu4rgXsaVMhtojvnKymJr1K//B40
+	EBFtWM3M1RJM7cboUtGjIjGlnjoQOWToS6J4ogO8gHJg3ujmnDVKJHz7MMsY7+u1x1KZoMn12IA
+	ISd+SdxeVak
+X-Received: by 2002:a05:6a20:d508:b0:398:76d4:c7e9 with SMTP id adf61e73a8af0-3bfd28b5ec6mr9752039637.35.1782992159368;
+        Thu, 02 Jul 2026 04:35:59 -0700 (PDT)
 Received: from dev-vm-rm.hzz4ddxqtfeetjrh00qlbgyytb.rx.internal.cloudapp.net ([20.197.52.255])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb7fd75sm9444824eec.19.2026.07.02.04.35.53
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0bb7fd75sm9444824eec.19.2026.07.02.04.35.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 04:35:55 -0700 (PDT)
+        Thu, 02 Jul 2026 04:35:59 -0700 (PDT)
 From: rajasimandalos@gmail.com
 To: linux-cifs@vger.kernel.org
 Cc: bharathsm@microsoft.com,
@@ -66,9 +66,9 @@ Cc: bharathsm@microsoft.com,
 	sfrench@samba.org,
 	stfrench@microsoft.com,
 	Rajasi Mandal <rajasimandal@microsoft.com>
-Subject: [PATCH 5/9] smb: client: apply rasize on remount
-Date: Thu,  2 Jul 2026 11:35:31 +0000
-Message-ID: <20260702113535.4044308-6-rajasimandalos@gmail.com>
+Subject: [PATCH 6/9] smb: client: move struct tcon_list to cifsglob.h
+Date: Thu,  2 Jul 2026 11:35:32 +0000
+Message-ID: <20260702113535.4044308-7-rajasimandalos@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260702113535.4044308-1-rajasimandalos@gmail.com>
 References: <20260702113535.4044308-1-rajasimandalos@gmail.com>
@@ -82,58 +82,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Rajasi Mandal <rajasimandal@microsoft.com>
 
-rasize is accepted during remount parsing but sb->s_bdi->ra_pages is
-only set in cifs_read_super() at mount time. A remount with a new
-rasize value silently has no effect on the readahead window.
+struct tcon_list is a small list-node wrapper that pairs a list_head
+with a cifs_tcon pointer, used to safely iterate tcons under a
+superblock outside tlink_tree_lock.
 
-Update ra_pages in smb3_reconfigure() after the context has been
-duplicated, using the same logic as cifs_read_super(): if rasize is
-set, use it directly; otherwise fall back to 2 * rsize.
+It is currently file-static in misc.c, used only by
+cifs_close_all_deferred_files_sb().  Move it next to the similar
+struct file_list in cifsglob.h so that other _sb() iteration helpers
+can reuse it instead of redefining the same shape locally.
+
+No functional change.
 
 Signed-off-by: Rajasi Mandal <rajasimandal@microsoft.com>
-Reviewed-by: Meetakshi Setiya <msetiya@microsoft.com>
+Reviewed-by: Bharath SM <bharathsm@microsoft.com>
 ---
- fs/smb/client/fs_context.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsglob.h | 5 +++++
+ fs/smb/client/misc.c     | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 659fb0adb528..0a72e1089ff7 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -1313,7 +1313,7 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	struct dentry *root = fc->root;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(root->d_sb);
- 	struct cifs_ses *ses = cifs_sb_master_tcon(cifs_sb)->ses;
--	unsigned int rsize = ctx->rsize, wsize = ctx->wsize;
-+	unsigned int rsize = ctx->rsize, wsize = ctx->wsize, rasize = ctx->rasize;
- 	char *new_password = NULL, *new_password2 = NULL;
- 	bool need_recon = false;
- 	bool need_mchan_update;
-@@ -1379,9 +1379,10 @@ static int smb3_reconfigure(struct fs_context *fc)
- 		STEAL_STRING_SENSITIVE(cifs_sb, ctx, password2);
- 	}
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index a462c1590a9e..38e27ba6d8f6 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1807,6 +1807,11 @@ struct file_list {
+ 	struct cifsFileInfo *cfile;
+ };
  
--	/* if rsize or wsize not passed in on remount, use previous values */
-+	/* if rsize, wsize, or rasize not passed in on remount, use previous values */
- 	ctx->rsize = rsize ? CIFS_ALIGN_RSIZE(fc, rsize) : cifs_sb->ctx->rsize;
- 	ctx->wsize = wsize ? CIFS_ALIGN_WSIZE(fc, wsize) : cifs_sb->ctx->wsize;
-+	ctx->rasize = rasize ? rasize : cifs_sb->ctx->rasize;
++struct tcon_list {
++	struct list_head entry;
++	struct cifs_tcon *tcon;
++};
++
+ struct cifs_mount_ctx {
+ 	struct cifs_sb_info *cifs_sb;
+ 	struct smb3_fs_context *fs_ctx;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 0c54b9b79a2c..7ef135dc8268 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -28,11 +28,6 @@
+ #include "fs_context.h"
+ #include "cached_dir.h"
  
- 	new_ctx = kzalloc_obj(*new_ctx);
- 	if (!new_ctx) {
-@@ -1470,6 +1471,12 @@ static int smb3_reconfigure(struct fs_context *fc)
- 	smb3_cleanup_fs_context(old_ctx);
- 	old_ctx = NULL;
- 	smb3_update_mnt_flags(cifs_sb);
-+
-+	if (cifs_sb->ctx->rasize)
-+		root->d_sb->s_bdi->ra_pages = cifs_sb->ctx->rasize / PAGE_SIZE;
-+	else
-+		root->d_sb->s_bdi->ra_pages = 2 * (cifs_sb->ctx->rsize / PAGE_SIZE);
-+
- #ifdef CONFIG_CIFS_DFS_UPCALL
- 	if (!rc)
- 		rc = dfs_cache_remount_fs(cifs_sb);
+-struct tcon_list {
+-	struct list_head entry;
+-	struct cifs_tcon *tcon;
+-};
+-
+ /* The xid serves as a useful identifier for each incoming vfs request,
+    in a similar way to the mid which is useful to track each sent smb,
+    and CurrentXid can also provide a running counter (although it
 -- 
 2.43.0
 
