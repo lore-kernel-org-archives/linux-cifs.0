@@ -1,191 +1,144 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11020141.outbound.protection.outlook.com [52.101.56.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E686B213E9C
-	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 15:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783005647; cv=none; b=UQ8U/eK8TZVjDU2qLGjcmL9tAAiz8MjgVHEDlhzM7YQJgNoy2Rw0y9QRFS9Y0w9sqSpMaYQF1uSBGL8ofpQKImdOsEpXKBaaMJAfgvF1E4v8zSYP1u02k5KnXeE3zdZTyAygIhBJ1+RbS7K7sebje2ED6UshGFHwEq9LkYD9r6c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783005647; c=relaxed/simple;
-	bh=7egwWkm+FwYAAMQ4LDtnQqPzAWZQb/jfxtgyOUtIFRo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l1pBZtqiR9h6QiLx6muoHtBUZe4iwmP5sV44GYRrFVVeYZtNA63LFNPuBRY9Pmo9c1fHt4PpFwOmyk/WsHKbqJpD10NSGeKzNsQGLKyIyj1d3c+F28DEIe0X3Rq5o4+quNqWAB8t4jf2IvlstQvt6jHJNd4jjCES9CK8dG4cEg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bvoCB5c+; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bvoCB5c+"
-Message-ID: <da8a7d66-a97c-4d81-8e92-20a810fd2dde@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1783005642;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3+vEywivr0Kc9e7MwxAOsY1QEBMuWqRP+PodNjweESg=;
-	b=bvoCB5c+7jbkhNuH3EtFFU8WYezdwUrjg7lCzNEpH63p+CzSgv59+AI9p5jnci/YszC3pR
-	6fDJq/N8X6af9gqVq3EJ37MeC/KYoHYzolgSx1n4qvXO0sFSrylcR/Ajk/dYYmsQGKscd1
-	ZAYvy2SaEq2I5JIZ9DtBzVlkJ8mDIoo=
-Date: Thu, 2 Jul 2026 23:20:30 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C74381EA5
+	for <linux-cifs@vger.kernel.org>; Thu,  2 Jul 2026 15:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.141
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783007080; cv=fail; b=MQk4H7fs9yXuBfphmYcLGlkz5CHb8fBs8XYyLyBXKdGxURwhe/FDyCpVsslgRg155NHk8FBNC1imo0Sz76gp4wIKqj6MdqK1LzPrmR25Zbo0aiquRrAUglYWpApMP8l59AVglsp7XaycacDGO8A2O4ryJ+3EPFMzhTqfRgfIz44=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783007080; c=relaxed/simple;
+	bh=Y4KnTEaPUwUBAvBFy2Pku3okCDsTzaVbwvGiJlFxkfM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=hlLeLRofykIi7cuYbDH8qXJYaRT+XXBxGeCcZjEvVzAekB7F9QmPH8k8HAiPRoK9Md1qnHwIvjBT+ziaFE/vSG+0FPU3DEACOY03rV/s7rMWcsRjQ+xgeblkhyFU546YYsqmhIWedrrchKAVuYNA6Zl3mhBhYmB590PkU2N0mSI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=52.101.56.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yvaht2GTXq2t5/qXRi91d45jrjqiXHGbS6PIJMOT6kAYdAINGYrLPWJn8329hKdqAZUXGO4xti6OqekX4KHzGee6mohH1dONDX4EN2VqVndiOT5P9fnR0B1hQF9Yr5n6akJVEoKrKIYPWvjKtIPgYTGlWjqY17Z0+PPRC16sfIvdAK57NgRj79UXgDa2V1YoNvUS26IQPzHY1VWQuHE+jTYHadYO7C2NUwNH9QoZMjdRxs5pqDreoxULgrFtoluH76MQDZt/1tL3hzUZgYVBAxwcggAQglgnkdwL3Q2ni7uTyvDdh5EU17qljSR9qKaG1vhGxRxmf04wUkYReoKKPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M0MAJhJNMMQR77JraaiQKtY8tHLAOcSbqAX1/ZwMm5Y=;
+ b=shvgYhYdZg5wtAyE3UPPgitZ624pICf+4nbwfpDsO8oBnC6zrpqCsAJZFQrDqrE509dcaY301/bosiu13ffD2otsbO+n5paTsJpUp95dWkhkD/qJ3vQLnq89KSrgCxM1ciaaekQRDrZsaq5np/+UNQVXVzxVxPxI8q3a4+hlpvUdMjNAXWaHwt6aqblCXgHR/68h0W9ZxMFizWLdZHW24yh58/cYnEzMGYXMtgiD/bzWdyFXbKIeslMrZBH0qRT6RMfzGpW2wTfR9vJJeX6yJECmQUBx/UZkSsPan12VXr0uo8N/8rinnlBsh2c5xkuoJ5zEEI0ZaC4c2hxDhLbzDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from MW4PR01MB6338.prod.exchangelabs.com (2603:10b6:303:7b::15) by
+ CH9PR01MB994745.prod.exchangelabs.com (2603:10b6:610:344::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.10; Thu, 2 Jul 2026 15:44:32 +0000
+Received: from MW4PR01MB6338.prod.exchangelabs.com
+ ([fe80::e7ad:d8fa:59db:4761]) by MW4PR01MB6338.prod.exchangelabs.com
+ ([fe80::e7ad:d8fa:59db:4761%6]) with mapi id 15.21.0181.008; Thu, 2 Jul 2026
+ 15:44:31 +0000
+Message-ID: <3a2cff89-2ad3-4b52-9357-b11fa643b789@talpey.com>
+Date: Thu, 2 Jul 2026 11:44:30 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: Additional SMB3.1.1 FSCTLs
+To: Steve French <smfrench@gmail.com>, Huiwen He <hehuiwen@kylinos.cn>
+Cc: ChenXiaoSong <chenxiaosong@kylinos.cn>, CIFS
+ <linux-cifs@vger.kernel.org>,
+ samba-technical <samba-technical@lists.samba.org>
+References: <CAH2r5msQ7V9juC8nh2QMA+m=MD=u6Nb62j60Xx1EEDuRdkLr3A@mail.gmail.com>
+From: Tom Talpey <tom@talpey.com>
+Content-Language: en-US
+In-Reply-To: <CAH2r5msQ7V9juC8nh2QMA+m=MD=u6Nb62j60Xx1EEDuRdkLr3A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1P221CA0024.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c5::31) To MW4PR01MB6338.prod.exchangelabs.com
+ (2603:10b6:303:7b::15)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 1/5] smb/client: refresh allocation size after
- duplicate extents
-To: Steve French <smfrench@gmail.com>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn,
- linux-cifs@vger.kernel.org, Sergey Senozhatsky <senozhatsky@chromium.org>
-References: <20260701152157.822207-1-huiwen.he@linux.dev>
- <20260701152157.822207-2-huiwen.he@linux.dev>
- <CAH2r5mudB4xBQnPvuSZo5SiYkRn0UEs9YZi9rbUGBh3G3GBqZg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: hehuiwen <huiwen.he@linux.dev>
-In-Reply-To: <CAH2r5mudB4xBQnPvuSZo5SiYkRn0UEs9YZi9rbUGBh3G3GBqZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR01MB6338:EE_|CH9PR01MB994745:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a0d56d1-2c85-4efc-3726-08ded850cee9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|23010399003|366016|22082099003|18002099003|56012099006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	PmzvJ+gAWvzVBS/l0vb+CyN3K5AkKn0ZVYcnOfnVcttFvmeT1SavHq2PW963ikoWoTyp499HCQp5q/QSp6u7UrDjR8vuMNsYBOu9YjiCUj7Wy5MhJ/Hg7Oz+FMNeeuwvZi2IqkBehxzSelfOU0BvtMOGN7TenyqKgafut27ZAFvAmd21iBnlSPztQcHiEq4IZpCtPHe6gC5WCPAFI3YB2eaUCDOwBz7KMObxpQ2Ycyn3JHLrwR/7jaJv7eVMqVfsHJbZ7ZT5zxD2jRDrczsxMn/1FlKb/+DQuc38roExFpS2h0rOYcLWjGGUVeiqmoCjIOgK+a/+q1XewPEXvsVA63Cd+IrdVCVPNKc3aJEsSg7+jAsFa5sE87KBEnIdkwdSk8zT9ZdXnUgFEJIwNTTFrjDVolclFoua7G2gXKom0yLY//hdbxgq/jm2HJWir6yAUU1Y9Zr5wHlfZfgG3svlk5DheiSAg4lm70EHAmi6unFrT+OH8sWIOLIb0cf7olsEOc+Y1jmVj5BHVbh9KZXotDzV8uAcCNaAJQsYxEqYL6mVHrDFjtH7hk2/lahorN9lHYdVsxGON+OJ2nxbsagJGsYKy8rvRm7kwbo0RKP3L0s8JQx0M2ZleNTOxWOpstKtom/ze+J48p/glRFqnaPnawMwMPBdMH9GF9aw1ANuhKU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR01MB6338.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(23010399003)(366016)(22082099003)(18002099003)(56012099006)(6133799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NnYzbzZXaGN3K25lVkRaa1BMYzVMM1ByY29EN0t2dm12SHpnY2JScFZEUS9M?=
+ =?utf-8?B?dFpYMjlNa3prV05QSVRDbFN0MUR4aEJ3c0NCU3NZcXZSTjRYL3hPdWFTQ3Fs?=
+ =?utf-8?B?TjJyaWtwYzMxL3BtRzRVZzJDcm5Pa3NOczRYZFdVUWRpcDhneUJxTnRMdnEx?=
+ =?utf-8?B?U0VQcC9XSVcxWExvUTNjaWZ5ZjR0Q1JmZjhQbmplajNRNGhBeFovSktod3kr?=
+ =?utf-8?B?Ulk0QmtUbG1wbUtaaDdMcVF3ZUNKMnR6ZlVqY0FJR0RJWlpuQ3VYRW9nMC9V?=
+ =?utf-8?B?MzE3bUp5UmlrK3JKbEFQNWpjYWZWUWJKYlp1bWNLMWhaWEd4M1JoZHVLN2Jw?=
+ =?utf-8?B?ZHVBOFRjVnRGd2E5MDAzajNxamFYeXVFM3FjT2p6cmFTMHJuQmtUbFpQakxD?=
+ =?utf-8?B?SG9YeW5tQjFiajVPbjRWdXZFcVU1VS9OUFlSYm5MT0QrWkdRZEVyVk5OY1VT?=
+ =?utf-8?B?dk52L3U1Nk5qNVVWL3Y4SDdjanUxQmgwR2FGYTBYQ0FqSjlpZkdQWksxYVFR?=
+ =?utf-8?B?RFZjbHNRU0JvVFNSYnpIZnZ3aGgzdEtpYVp6RUFiaXhmTlBMVEk3ekFOR2pX?=
+ =?utf-8?B?RHBjTVhneno2cWdOaG4vcmx6UkcvMjhXWmdkdWdsVThIZGFwbExUTXlKbGhZ?=
+ =?utf-8?B?Rk9BQVRYRmRkajlpUWZzcXFzcDVlakZvOE9wZmRmc3haMXpJeUJmU0VpMW9s?=
+ =?utf-8?B?bFBpVmZva2F2M0RvVEQzT2ZMY0VRdFp5Q2lsRHdkQ3lUeDBSVUxqRm5PR0F2?=
+ =?utf-8?B?eEwwMkRPeE1FaW1HV0x2MXByZkpmRG5RK1VKMncyQ2lnVDZIcFpDa0JpVUZG?=
+ =?utf-8?B?QXcwOEsvNWtVb0lBRDZWcW95YVdjcVdOOGllTWozVklTc2djZitsQmZEdTV1?=
+ =?utf-8?B?dW93dFdhWTdQLzRpY1g5c3RtLzVNQ0Jpa1BXZXdVeWdsWStFZUlHQUhzL1cy?=
+ =?utf-8?B?VXEwYjB3VUpDbzJLSUtBUmR3bXpFanA5T2IycGdKaFplVmlFTFJVTFZRRUNs?=
+ =?utf-8?B?V0JpY2lmOEhwN2hWSEdWbFArZUQ5UVRmTXFIN09VcEJCSmFwRnlTTm5HSC9s?=
+ =?utf-8?B?cW9GMGUrbmZxK29RNXNtSjB5NExwRCtDWUtGazBzMDMvT0cySUl1WTc1ZDJm?=
+ =?utf-8?B?RVAvNm5FZ0ZTZnE0WEJHNy8vczNlYWltbGxMMFJVVkJxeUVlUVZxSjB5TXlI?=
+ =?utf-8?B?bW0vRTNtT2FkYzdOS0xrd1dwR0RDNlJ6NEtKVjhpWWZNTnFVQXNjL0xvRWhk?=
+ =?utf-8?B?NVJvZDJwSWVSc04zcW5ZUEREbklDc2pidi9nMFo0Q3Ntb1VYS24rMDFSYVNs?=
+ =?utf-8?B?VTVsWndVK0ZUK2x3a0FFSUNWS2VrRHdIZjkrdkxYcjJKL2orQktxZElEYk1F?=
+ =?utf-8?B?WGxiRGlXTUg3bFgxVGxGMTk0RVlTTXRKRm96MVd2dVFSbE1zYVA1SEU5M2Rk?=
+ =?utf-8?B?UEZUdHZHYThMK0hsaEpzKzZjZ3J3QWcvbjVPUjdXZnMrdzdld2JtdmtmQUho?=
+ =?utf-8?B?d2ZDU2lLQVoxakhLZkxvOUhoZWJtZmxvYVIzbWxuNU50SXBVUkNZTU90WlR2?=
+ =?utf-8?B?aHVoS2o3bGJyUEVReEk4dWRtZGxJUThyUSthTjZZaGo3NFMxUDhiaDU2UjVy?=
+ =?utf-8?B?TUx0dTkyMTFpQ3dJYS9oY2hlSmtLU2lkUWk4WGJ6ZExYMm90TStGMGxmNTAy?=
+ =?utf-8?B?RDE1aWJnbk10NHdMdmdzYUhaK1lFWEJ5eDU2cFFXRGFGT284Nk9tS1Nray8z?=
+ =?utf-8?B?NHJvMXFQZk5YQlBkVkRrT3NVU2E5ZWtUenR0cHFldmVQN2JmbTdCR01zNFF0?=
+ =?utf-8?B?Z21HaDQ4TTVGYmhwN1dUaU95cWZqcnV1bFgyQVNrQ3pnRGVYdmlGTUhPYjJD?=
+ =?utf-8?B?WTJuZTB2dDdoajJHa2dHOTg1VTRVdmN5M3Y1cU11V2RFYmdLS2RmQlphVUVV?=
+ =?utf-8?B?cFIreEp3eXpZbFJCR0pJaDM5dXhSNm1nYkhvMXdLOTFoak91UnpvekVFM0M4?=
+ =?utf-8?B?ZlY5SlpPTVpZT2R3VzRoeFBjOTZmMkwrWCtCNmtTU2VHMmRGYVN1SjN2MEZq?=
+ =?utf-8?B?aWhVMzdQRXpzbnhIMXpaNEFqNTJNdnhVS21ZR1VlbCtmcjhCREFDTTBLVkxG?=
+ =?utf-8?B?ampaaUo2SlJ6bFkwUDVyWW9sclFtdGhUVXFqeW5SY2pVMDM0VHdZeXJlcTJI?=
+ =?utf-8?B?ZThnVk02NWNoRzg4eEtvcnlFYmZrQjQweVI1cmEwTDljbGVkQUZjcUJaQlRa?=
+ =?utf-8?B?SStlSFJoUThvSEZrUXhyelZEaUZKZWlnSjN4V3NwMkF5c3ZHY0hBd0l5Rm15?=
+ =?utf-8?Q?q3YoWfwVoYrWLEIo0v?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a0d56d1-2c85-4efc-3726-08ded850cee9
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR01MB6338.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2026 15:44:31.5025
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wU73wCjID5l92sn53QEqLLnCHCNJC+dRKPcLRLOHHVDZU/88r+NEFu7x9tYJ736M
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH9PR01MB994745
 
-Hi Steve,
-
-Yes, patch 1 adds one extra roundtrip after each successful 
-duplicate-extents request.
-
-I think that query is needed if we want i_blocks to be correct 
-immediately after the server-side clone. The client only knows the byte 
-range that was cloned. It does not know how many blocks the server 
-actually allocated for that range, especially when the cloned range 
-contains holes.
-
-I agree this may affect workloads that use cp/reflink heavily, but it is
-still one metadata query per successful server-side clone, not extra 
-work in the SMB2_READ/SMB2_WRITE path. So I think the cost is acceptable 
-for the correctness fix.
-
-I found that the v6 version could cause duplicate revalidation after
-the AllocationSize refresh. I updated patch 1 in v7 to keep the 
-QueryInfo result valid in the inode cache, so a following stat does not 
-immediately query the same attributes again.
-
-I also updated patch 3 based on Shashiko's comment. Small fallocate 
-ranges at or beyond EOF are now zero-written directly instead of first 
-querying
-FSCTL_QUERY_ALLOCATED_RANGES.
-
-Thanks,
-Huiwen
-
-
-
-在 2026/7/2 05:47, Steve French 写道:
-> This does lead to an extra roundtrip (common operations like cp will
-> use duplicate extents in some Samba and Windows server
-> configurations).  Any worries about performance hit?
+On 7/1/2026 6:41 PM, Steve French wrote:
+> Looking at MS-FSCC, I noticed some FSCTLs we don't use in current
+> cifs.ko but Windows supports:
+> 2.3.13 FSCTL_FILE_LEVEL_TRIM
+> 2.3.29 FSCTL_GET_RETRIEVAL_POINTER_COUNT
+> 2.3.41 FSCTL_OFFLOAD_READ Request
+> 2.3.43 FSCTL_OFFLOAD_WRITE
+> 2.3.55 FSCTL_QUERY_FILE_REGIONS
+> 2.3.63 FSCTL_RECALL_FILE (maybe add an smbinfo command for this?)
+> 2.3.87 FSCTL_SET_ZERO_ON_DEALLOCATION (maybe add an smbinfo command for this?)
 > 
-> On Wed, Jul 1, 2026 at 10:22 AM Huiwen He <huiwen.he@linux.dev> wrote:
->>
->> From: Huiwen He <hehuiwen@kylinos.cn>
->>
->> FSCTL_DUPLICATE_EXTENTS_TO_FILE changes the target file extents on the
->> server, but the client does not refresh the target AllocationSize/i_blocks.
->> Callers can observe or use the wrong st_blocks value immediately after the
->> clone, before a later attribute revalidation corrects it.
->>
->> For example, create a reflinked file with a leading hole:
->>
->>          xfs_io -f -c "pwrite -S 0x61 0 64k" src
->>          touch dst
->>          chmod 600 dst
->>          xfs_io -c "reflink src 0 1m 64k" dst
->>          mkswap dst
->>          swapon dst
->>
->> The file still has a hole after mkswap:
->>
->>          /mnt/scratch/dst:
->>            [0..7]:       allocated
->>            [8..2047]:    hole
->>            [2048..2175]: allocated
->>
->> The server also reports only the allocated ranges:
->>
->>          server dst size=1114112 blocks=144
->>
->> but the client reported EOF-derived blocks:
->>
->>          client dst size=1114112 blocks=2176
->>
->> and swapon succeeded:
->>
->>          swapon_result=success
->>          /mnt/scratch/dst 1.1M 0B -1
->>
->> So EOF-derived i_blocks can let a sparse reflinked file pass the CIFS
->> swapfile hole check.
->>
->> Fix this by querying FILE_ALL_INFORMATION on the target handle after a
->> successful duplicate extents request and updating i_blocks from the
->> returned AllocationSize. If the query fails, invalidate the cached
->> inode attributes so a later getattr can refresh them.
->>
->> This also fixes the xfstests generic/370 regression introduced by the
->> i_blocks accounting change, as tested on a Samba "vfs objects = btrfs"
->> share.
->>
->> Fixes: 99cd0a6eeb6c ("smb/client: do not account EOF extension as allocation")
->> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
->> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
->> ---
->>   fs/smb/client/smb2ops.c | 16 ++++++++++++++++
->>   1 file changed, 16 insertions(+)
->>
->> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->> index 06e9322a762a..cc8e0595e504 100644
->> --- a/fs/smb/client/smb2ops.c
->> +++ b/fs/smb/client/smb2ops.c
->> @@ -2193,10 +2193,13 @@ smb2_duplicate_extents(const unsigned int xid,
->>                          u64 len, u64 dest_off)
->>   {
->>          int rc;
->> +       int qrc;
->>          unsigned int ret_data_len;
->>          struct inode *inode;
->> +       struct smb2_file_all_info file_inf;
->>          struct duplicate_extents_to_file dup_ext_buf;
->>          struct cifs_tcon *tcon = tlink_tcon(trgtfile->tlink);
->> +       u64 asize;
->>
->>          /* server fileays advertise duplicate extent support with this flag */
->>          if ((le32_to_cpu(tcon->fsAttrInfo.Attributes) &
->> @@ -2232,6 +2235,19 @@ smb2_duplicate_extents(const unsigned int xid,
->>          if (ret_data_len > 0)
->>                  cifs_dbg(FYI, "Non-zero response length in duplicate extents\n");
->>
->> +       if (rc == 0) {
->> +               qrc = SMB2_query_info(xid, tcon, trgtfile->fid.persistent_fid,
->> +                                     trgtfile->fid.volatile_fid, &file_inf);
->> +               spin_lock(&inode->i_lock);
->> +               if (qrc == 0) {
->> +                       asize = le64_to_cpu(file_inf.AllocationSize);
->> +                       inode->i_blocks = CIFS_INO_BLOCKS(asize);
->> +               } else {
->> +                       CIFS_I(inode)->time = 0; /* force reval */
->> +               }
->> +               spin_unlock(&inode->i_lock);
->> +       }
->> +
->>   duplicate_extents_out:
->>          if (rc)
->>                  trace_smb3_clone_err(xid, srcfile->fid.volatile_fid,
->> --
->> 2.43.0
->>
-> 
+> Do you see any of these that we should be using in cifs.ko or userspace tools?
 > 
 
+I'd be careful with these. They're whitelisted by SMB3.1.1 but they
+are implemented by the server's backend filesystem and storage. I would
+not expect third-party servers to support them routinely. Also they
+are somewhat exotic, that is, specific to narrow scenarios and apps.
+What Linux API would we expect to use/support them?
+
+Tom.
