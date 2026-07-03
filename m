@@ -1,109 +1,59 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053123093CF
-	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 12:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B5632938D;
+	Fri,  3 Jul 2026 19:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783081293; cv=none; b=ZRAnHRtQXQ5hJ0SZP1EJUYsmFhXOfeheIra8LVU3UlZMJFPC4Z5CaL++Gs4bjsXodW/KA1/xE/sKtPjfPZ+y/pD41ruHVSKp+m7zK2A4PgMw898czI/oqX71dlrfzl+DmW2m90rXbwn5EUEQOcn2BlRm5ctInuDx2Pf/fPapLP4=
+	t=1783106801; cv=none; b=IffEWF5tDDi5dQnVFWW9imKpFJyn3376GHVG1P4HLwFLpIBd0mKtA64ezFHxNS5iaO9bEtu/xKg2UjN+PEMJlOTC4jUanDvIs2j2Xlz4Vm6YgTJX74r2s9MwFXavJhGBgqubXpyfj+9kRhvjhbbwe7cE6/ABgG0+pJvpwllwTFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783081293; c=relaxed/simple;
-	bh=NM0qdi/U1SW17ipI8zJAG47GqlYWil/CAlavCXQuq84=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCjHYjDOFqdO20xrR+5hzVTwbI416ZArFfFb7MQ+B+ysLnkCD2C0V6io0B45Z8lihyTLvsnwv/rqm0tZypsCwtd/oW1s8wA1y+duZR9/z66N/kmm96j2uin9ILHUgQxkr4WKOO/koH6QfJ4iqpSKz/UD0lCLYaVqHShTahnnMwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NCuXOgT1; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783106801; c=relaxed/simple;
+	bh=ydqalqyQh+mKDoFmmN1exhADpgn5t7Yf2pyIeu3wseA=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mll93wMCNqsnoCQrz8mGPqbjauJYyByV46y+Vw83IvZr0zCA82XoFGXO4I7AhFZTgg53sQs1r2SvODi70XRQc7J6Av03gPvPOH0ztx+oYNLr5RMR+OK9cwLDsCNxes7+BOgJ86mz1IDf9ZJAtncOHSmyRygJRddz5vZoLoSgURQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=L7xmfduJ; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCuXOgT1"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-380cda7f00cso470054a91.0
-        for <linux-cifs@vger.kernel.org>; Fri, 03 Jul 2026 05:21:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783081291; x=1783686091; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=37rS3S15ZKgHXdlCeYBDdqpX9m5LHn58JhbTp1kkqUw=;
-        b=NCuXOgT10lDmaeirjVzb2kCkJowz2ERgNPdHuPS6/ENPWxxd6bdil0QWspUtm6R5//
-         t5u1Z1wWg+01dmW1YHpxRA8ayKoO7MHfnw8lVrwowosblCs0JcApqLLRetwvGhS72ptu
-         SbXHsc83JQ7SPrzkWn07wikv4sxf92fj4FnoXQa8DxkWoYv1v98oIO9OPkUlTDAwOUG5
-         Bb6IIQsZpyWaGkVcppS76tCD0RUB6m/G3gefzvyJYf6Rm4sZGdgT71e6iNO7YlxRprE7
-         9DC0L4ZYFbITod6m+JSjCC/6cPdQffAmfEdeWQ2WbLuyowo/ilErNJG/kKVfh2s8u7UR
-         uzLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783081291; x=1783686091;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=37rS3S15ZKgHXdlCeYBDdqpX9m5LHn58JhbTp1kkqUw=;
-        b=hNCAqOSiB2UBVdi6LFBO1uLcN78MDgo1Gg4/rTl3dpOhPBlDX68uhHzuXvQXQiqsyt
-         +4XMISmTPb3hhPB7YqqRRO5+L1kW+VnC32+F1MFuVS7Zt8ZijKS1HALO9tW3c/9uXcgq
-         SbLmQz6JJQae1yWoOUt5gfvKm09oej36H1m1SW9GOtZ7pVaUEIQJ7jQeFFIpLY/hUdjr
-         +XR5yCH2UCl2DwChvSqSp4XPc6PMmgD7j1PFh76sm7b5lISDP190os3xEng0dlu1s2Hg
-         vWCXIdhcTslmbokCjCExyjeOyTCg3Y5ejlcPKVjiBFKmwdB6AU8E5gyWTNoxgp49t3ae
-         hqsA==
-X-Gm-Message-State: AOJu0YyfKQeE15Emp40a74D7NKZLJxoAbq/0xeBb0ooCsmhjA2gxEpdO
-	APXQs2RYdcj+8y7N8Df3ILU51YIhhnbGTVGxeJEaiDJ9LcFXxPUV1Sb5
-X-Gm-Gg: AfdE7cmmLUHzMOaQi1h7mPnFvNkzyEZEnK4uGPMJ97c7fVL3MCkqVEHMvaNBSxKqKAK
-	kFG9i8N9NVU2T7uTRLghAAYQon6V1AA6g4tS0s42yn33SM6Mo1CmMXTE4O+LpO1i6iG6E6LUHqy
-	N9ygdrWCAr03VN6NkCr5VKaAkGkC0RU+neE6bAFDHO3RJzCc6s5gOmgkrVhbj/8LQ4+XLwIC/AK
-	GML2+zY8Win7VQxe9GC6/VMxpSbc5C5IsTNzJdbf3wV438gS9NTLDZCdRtWfAG7EiQI0xWfyrll
-	pg98U+SDAyc4ZLMwUYkqLUt2ReKkIo5a6ELJgHe8f0y/XF/KuCneO3v7Wmob6VUkFnXh5wTBK8z
-	8iYl3UtADLdxtc7x+ebLEgoXPZxRDxBmkq0B5xy8MorMFFGhOepdH/WJVLRqCSjl7RWahlmoQGh
-	N9ppO5LNEGSw4=
-X-Received: by 2002:a17:90b:5547:b0:37f:fd1f:d30f with SMTP id 98e67ed59e1d1-380ba8d00eamr9530789a91.12.1783081291046;
-        Fri, 03 Jul 2026 05:21:31 -0700 (PDT)
-Received: from ubuntu.. ([2405:201:8026:213e:185d:def2:c823:8e8c])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30f0b816a42sm34656381eec.9.2026.07.03.05.21.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jul 2026 05:21:30 -0700 (PDT)
-From: mdshahid03@gmail.com
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	Mohammad Shahid <mdshahid03@gmail.com>
-Subject: [PATCH] smb: client: remove redundant NULL check before kfree()
-Date: Fri,  3 Jul 2026 17:51:04 +0530
-Message-ID: <20260703122104.69788-1-mdshahid03@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="L7xmfduJ"
+Received: from mail01.layka.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 5DF318441E;
+	Fri, 03 Jul 2026 21:26:36 +0200 (CEST)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id Y6F9XYlPl9xX; Fri,  3 Jul 2026 21:26:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1783106795; bh=ydqalqyQh+mKDoFmmN1exhADpgn5t7Yf2pyIeu3wseA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=L7xmfduJCedJaCJRl4pnGrucoP/2NDrpklA11mGW7vWOcmm4Rxo5gXH3zAr06BCmB
+	 j6n/3vSUx5VtmDShrBXTf0niOYXZwl/KWlSE3y3ecEHCKLEz3nuoN21oA1g/CyEXa6
+	 ZxWVwJWHzqks/pNhCR2LgXV6jgrMqlhl9xAI8LV43kd4YFTflbel+qpfWnRuQndP2Y
+	 GBnrWeeojfI1VpH7Blm780/VSF7vIqJfUnVl9w8CV9WS5d9dHMr0QYxyiNWpKz5uGD
+	 TjgHTeCAltAITkSbZtmt2pv4dGxzxuQj4ao2D/KllmZglCOZ90xbv0bzRS1Pgd8oSv
+	 G/X09S9i3fJfw==
+Date: Fri, 03 Jul 2026 15:26:32 -0400
+Message-ID: <66a2f0233be32a443d8c6ed2eb662f7e@disroot.org>
+From: James Montgomery <james_montgomery@disroot.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ksmbd: defer destroy_previous_session() until after NTLM authentication
+In-Reply-To: <CAKYAXd-t2Oz4ZM8BWkJ7uKciaGo=akTMPUEFy2_Z3cx0abHptQ@mail.gmail.com>
+References: <20260702155449.3639773-1-james_montgomery@disroot.org> <CAKYAXd-t2Oz4ZM8BWkJ7uKciaGo=akTMPUEFy2_Z3cx0abHptQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
 
-From: Mohammad Shahid <mdshahid03@gmail.com>
+On Fri, 3 Jul 2026, Namjae Jeon wrote:
+> Is there any specific reason for not moving this line together?
 
-kfree() safely handles NULL pointers, so the explicit NULL check
-before calling kfree() is unnecessary.
+No, there is no specific reason. You are right. I'll send a v2 with
+both the assignment and the condition moved together after auth.
 
-This issue was reported by ifnullfree.cocci.
+Thanks for the review.
 
-Signed-off-by: Mohammad Shahid <mdshahid03@gmail.com>
----
- fs/smb/client/ioctl.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index 9fa743be3652..2f152d76be7d 100644
---- a/fs/smb/client/ioctl.c
-+++ b/fs/smb/client/ioctl.c
-@@ -133,8 +133,7 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
- 
- close:
- 	server->ops->close(xid, tcon, &fid);
--	if (tmp_cfile)
--		kfree(tmp_cfile);
-+	kfree(tmp_cfile);
- 	cifs_free_open_info(&data);
- out:
- 	free_dentry_path(page);
--- 
-2.43.0
-
+James
