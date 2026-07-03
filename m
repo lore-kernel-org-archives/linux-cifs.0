@@ -1,59 +1,118 @@
 Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B5632938D;
-	Fri,  3 Jul 2026 19:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948C5311969;
+	Fri,  3 Jul 2026 19:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783106801; cv=none; b=IffEWF5tDDi5dQnVFWW9imKpFJyn3376GHVG1P4HLwFLpIBd0mKtA64ezFHxNS5iaO9bEtu/xKg2UjN+PEMJlOTC4jUanDvIs2j2Xlz4Vm6YgTJX74r2s9MwFXavJhGBgqubXpyfj+9kRhvjhbbwe7cE6/ABgG0+pJvpwllwTFc=
+	t=1783106809; cv=none; b=fvtx8Fw9OEFLI/C7U6tAj5RRqRIhfwSixAOhtJjwqipM3xOwHliWYVxThTEI8E4yHNQhwzcLj8lZkpUCn2cqgAwZu3FMEipvpyiFGXXweNHd2FpoUluQALDA98YmhjLbHNpYPsdYaUulG9fd+/u+C0USeEb+EvsvsGkD8geLQg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783106801; c=relaxed/simple;
-	bh=ydqalqyQh+mKDoFmmN1exhADpgn5t7Yf2pyIeu3wseA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mll93wMCNqsnoCQrz8mGPqbjauJYyByV46y+Vw83IvZr0zCA82XoFGXO4I7AhFZTgg53sQs1r2SvODi70XRQc7J6Av03gPvPOH0ztx+oYNLr5RMR+OK9cwLDsCNxes7+BOgJ86mz1IDf9ZJAtncOHSmyRygJRddz5vZoLoSgURQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=L7xmfduJ; arc=none smtp.client-ip=178.21.23.139
+	s=arc-20240116; t=1783106809; c=relaxed/simple;
+	bh=0wUBRz8PeeSHYMu7dO0Bbf4V+kf/LeI6tBmN69U2xNc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gjimYuYMdonpHkthcEb1YPbzy5CJfcwlxv0f0znfYV1iExFQ8AoLRHfS7+U2XRIQo4x+odzNx/hVsqDrP9WMME0MugTemeBMNGUHwwpBdmyumISxxsYxqvgE3nLO7Ib5N5rDQs2yFkc+wuJ4BY4nm+utCtFr/XQlO4WAgRmgIME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=IR3vFP5+; arc=none smtp.client-ip=178.21.23.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="L7xmfduJ"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="IR3vFP5+"
 Received: from mail01.layka.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 5DF318441E;
-	Fri, 03 Jul 2026 21:26:36 +0200 (CEST)
+	by disroot.org (Postfix) with ESMTP id 7E36B8441E;
+	Fri, 03 Jul 2026 21:26:45 +0200 (CEST)
 X-Virus-Scanned: SPAM Filter at disroot.org
 Received: from layka.disroot.org ([127.0.0.1])
  by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id Y6F9XYlPl9xX; Fri,  3 Jul 2026 21:26:35 +0200 (CEST)
+ id 6Gvl7gjQGwmy; Fri,  3 Jul 2026 21:26:44 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1783106795; bh=ydqalqyQh+mKDoFmmN1exhADpgn5t7Yf2pyIeu3wseA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References;
-	b=L7xmfduJCedJaCJRl4pnGrucoP/2NDrpklA11mGW7vWOcmm4Rxo5gXH3zAr06BCmB
-	 j6n/3vSUx5VtmDShrBXTf0niOYXZwl/KWlSE3y3ecEHCKLEz3nuoN21oA1g/CyEXa6
-	 ZxWVwJWHzqks/pNhCR2LgXV6jgrMqlhl9xAI8LV43kd4YFTflbel+qpfWnRuQndP2Y
-	 GBnrWeeojfI1VpH7Blm780/VSF7vIqJfUnVl9w8CV9WS5d9dHMr0QYxyiNWpKz5uGD
-	 TjgHTeCAltAITkSbZtmt2pv4dGxzxuQj4ao2D/KllmZglCOZ90xbv0bzRS1Pgd8oSv
-	 G/X09S9i3fJfw==
-Date: Fri, 03 Jul 2026 15:26:32 -0400
-Message-ID: <66a2f0233be32a443d8c6ed2eb662f7e@disroot.org>
+	t=1783106804; bh=0wUBRz8PeeSHYMu7dO0Bbf4V+kf/LeI6tBmN69U2xNc=;
+	h=From:To:Cc:Subject:Date;
+	b=IR3vFP5+ptDwn5Mnx8nzf9VmwGY+EOFS4VS5QdYzI69Mzmzfs6f+nYt5BNt/f1f7G
+	 84AJQ19F9mEVJFmOpplbH7tmLjTcj2mNyzAXb1pXlmPTlI5vhnpj531c5qBAftZs57
+	 x5Q1XSGvM1SKa9EOn6SQ9ZTywhqtSEkWtMDznw9FeVwFwCOknEvkdveUV9N5dHPJZG
+	 hXPk+qvcoD7X5/ldVdCTyB3w4IWJly7Q3wmN1QaW6jI7R9IlXj9Tr92LxMasEEY67k
+	 trHo4+rcdDOyCgmtgvB+jhJZosQTt/x69GCr5O9HmsbigVCjlVIsrTDerRLXQ5OX6Y
+	 8IalxLIYFkGHw==
 From: James Montgomery <james_montgomery@disroot.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ksmbd: defer destroy_previous_session() until after NTLM authentication
-In-Reply-To: <CAKYAXd-t2Oz4ZM8BWkJ7uKciaGo=akTMPUEFy2_Z3cx0abHptQ@mail.gmail.com>
-References: <20260702155449.3639773-1-james_montgomery@disroot.org> <CAKYAXd-t2Oz4ZM8BWkJ7uKciaGo=akTMPUEFy2_Z3cx0abHptQ@mail.gmail.com>
+To: linux-cifs@vger.kernel.org
+Cc: linkinjeon@kernel.org,
+	smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	linux-kernel@vger.kernel.org,
+	James Montgomery <james_montgomery@disroot.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] ksmbd: defer destroy_previous_session() until after NTLM authentication
+Date: Fri,  3 Jul 2026 15:26:41 -0400
+Message-ID: <20260703192641.46121-1-james_montgomery@disroot.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 3 Jul 2026, Namjae Jeon wrote:
-> Is there any specific reason for not moving this line together?
+In ntlm_authenticate(), destroy_previous_session() is called using a
+user pointer resolved from the client-supplied NTLM blob username field
+before the NTLMv2 response is validated. An authenticated attacker can
+set the NTLM blob username to match a victim account and set
+PreviousSessionId to the victim's session ID; destroy_previous_session()
+destroys the victim's session while ksmbd_decode_ntlmssp_auth_blob()
+subsequently rejects the request with -EPERM.
 
-No, there is no specific reason. You are right. I'll send a v2 with
-both the assignment and the condition moved together after auth.
+Move destroy_previous_session() and the prev_id assignment to after
+ksmbd_decode_ntlmssp_auth_blob() returns success and use sess->user
+rather than the pre-authentication lookup result. This matches the
+ordering already used by krb5_authenticate(), where
+destroy_previous_session() is called only after
+ksmbd_krb5_authenticate() returns success.
 
-Thanks for the review.
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Link: https://lore.kernel.org/linux-cifs/20260702155449.3639773-1-james_montgomery@disroot.org/
+Signed-off-by: James Montgomery <james_montgomery@disroot.org>
+---
+Note: portions of this patch were suggested by an AI coding assistant
+(Claude Code / Anthropic). The ordering issue was identified via static
+analysis of ntlm_authenticate() and validated empirically using a PoC
+against ksmbd running Linux 7.1.0 in QEMU. The fix was verified by:
+checkpatch.pl --strict (0 errors, 0 warnings), sparse (HEAD, 0 warnings),
+and build test (make fs/smb/server/, clean). The assistant was prompted
+to identify and fix the destroy_previous_session() ordering issue relative
+to NTLMv2 validation, matching the pattern already used in krb5_authenticate().
 
-James
+Changes in v2:
+  - Move prev_id assignment together with the condition (Namjae Jeon)
+
+ fs/smb/server/smb2pdu.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 5859fa68bb84..b17ceabfd562 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -1670,11 +1670,6 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+ 		return -EPERM;
+ 	}
+ 
+-	/* Check for previous session */
+-	prev_id = le64_to_cpu(req->PreviousSessionId);
+-	if (prev_id && prev_id != sess->id)
+-		destroy_previous_session(conn, user, prev_id);
+-
+ 	if (sess->state == SMB2_SESSION_VALID) {
+ 		/*
+ 		 * Reuse session if anonymous try to connect
+@@ -1712,6 +1707,10 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+ 		}
+ 	}
+ 
++	prev_id = le64_to_cpu(req->PreviousSessionId);
++	if (prev_id && prev_id != sess->id)
++		destroy_previous_session(conn, sess->user, prev_id);
++
+ 	/*
+ 	 * If session state is SMB2_SESSION_VALID, We can assume
+ 	 * that it is reauthentication. And the user/password
+-- 
+2.47.3
+
