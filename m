@@ -1,111 +1,97 @@
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67992BEC2B;
-	Thu,  2 Jul 2026 15:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AE51DDC3F
+	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 02:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783007697; cv=none; b=OCMeT6vKupjMDU1Tm2figIqmm1ZmCyhZpVO/WMQOzPinf4OWpZznMePzW0o6vks3uvehCdg1oyR3ZYr03EVIzD3rsIL1qwNDaETp960paCkz6MLSv7s3lwkyFOj9SHcGOaBW0akX58HK/0XNyJRExIdy7bXDOPH9tiQcFRDgqoE=
+	t=1783045871; cv=none; b=Xog2Vpz/gdbZNuRH3pwww8tJsOuEjbN5zS3QzwTxL6JGUQ5yDXUccpJlHULs/OcJUi+hvfuPy4zn1tneQk8rRZ63CayhmB00Gq+2liEdFVEETP9aaX4Ugvts/xiFKft1lo0a4iVcFdkVK/znVZVZpn8ZzNaSux5kukwT556bvr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783007697; c=relaxed/simple;
-	bh=cmwFWdIMyxI6lDEfiRQcFFlaEYgTBil4SusP2BvEsOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SZ2LjxJ+D1loNA+i4ltZpFxaMl8Q75978YJsHA76Rg6xMEvO1xYmD4SAQ5vZfumdRAVfWWTtS/ZCsFDtKog8neBBRf4T8DO2XobCmfVTy6DGwQ7DpfACUxEK9kTbawHph1pvawZ8Y2urOx7jSPJ6gfccTtU8epQNsXk0psyi1Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=A2+Asl2Y; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+	s=arc-20240116; t=1783045871; c=relaxed/simple;
+	bh=jAnzaF5txNxYvh5Ma0GDN/WDcyKooTOAe/AQK9xAcpc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hrXDvyl4LaMqgqW396B24O56lcRUnCc6+3CirxYilgunIgebwY53eBf3cJjnGZ3OB38ySWPmzAyl7kSKdUVgxOMtDoHwK+0cfKCLytsVXRKJr0MrvLKJqnkemeilV0jGulL3RiCfoRH/MGlKuk2vFxWl84Fyb7faI11EsUpzwTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2G9Rsgn; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="A2+Asl2Y"
-Received: from mail01.layka.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id DFB65842E5;
-	Thu, 02 Jul 2026 17:54:52 +0200 (CEST)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id wDVd5znCqEJH; Thu,  2 Jul 2026 17:54:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1783007692; bh=cmwFWdIMyxI6lDEfiRQcFFlaEYgTBil4SusP2BvEsOI=;
-	h=From:To:Cc:Subject:Date;
-	b=A2+Asl2YrSEPdiSk+v00g9FdmOrlQl3WuCk7MLIgxMeNaZRUpK1xA4zs81V6n8MtL
-	 1zYDZt+Oril2gKWx8ihyHrhSFaGaOGaiB2QDJLHz7CoNQPb1Ez9htehdj6kTXVMWeS
-	 gOrN00SmPSC5X/42SoBhsNqVdzcXQ/BPZE7YgCltZ1qOnbumV3z6OGB06gIJwAzmcL
-	 m7rphyDIVjWS0NIzoiOkVjyUSskPzy/bF/Km6J0chbNX+xH2oovBXMa5ItE2DjR6l1
-	 yQzRWGU7QiYZnn6uksXgonsmuEfehDGL6JdIP6MmVBxU5HVebYrZYRkZyCZeGg4lnJ
-	 QY46oLsFzrmTg==
-From: James Montgomery <james_montgomery@disroot.org>
-To: linux-cifs@vger.kernel.org
-Cc: linkinjeon@kernel.org,
-	smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	linux-kernel@vger.kernel.org,
-	James Montgomery <james_montgomery@disroot.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: defer destroy_previous_session() until after NTLM authentication
-Date: Thu,  2 Jul 2026 11:54:49 -0400
-Message-ID: <20260702155449.3639773-1-james_montgomery@disroot.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2G9Rsgn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67FDC1F00A3A
+	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 02:31:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783045870;
+	bh=WJhCa2sNygMOIyt0Y7+tuK6Oih42DNSuTmTC37p/FKU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=e2G9Rsgnn9m9P8o9ZeMFi2cmjYRzBo31GsPL95Jg0T7qn0sVG78FvoHXgtRI/ZxIe
+	 04Oil0ssfKKgfA1AHXhFBn+xS/F6VU77Bn3aJk6n2Nbjl8suTynAAL2upFdfUpWkbb
+	 gGDCKinzglIuxyPzK3ikkLAOX4x8f3qZT+oOLW1/FnR0tUORZbS0zw+3zPLVdEolS8
+	 3RJtaNzTSQ0c6UzZCZMJEwubtc0IAhNJW45RTiD1/WNbHEyFJzoqrZIycEu5Uhn3J2
+	 T6xEpSj5DJmMSH7EMgFOxR/MRZnQoZOyK4+tWmum6qoJLmeQjxXPl+kx6qAzIyJAtX
+	 EWUa9pJhdqyVQ==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c128cc012b4so11900866b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 19:31:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoLU/ts+nEJmZaUpt4A8AqS08IbE0Snk0B9Deikq3xhlSonYoQgpnqNKHqtK1+uHUC+gZqDPixpjJlb@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUabv8ixpEuZ0ZtbjWCJ0amkQnMyPzL/eqcLhqSuN3MK8c77TP
+	8Mv2/j8Mh+WFIUR/FEUZ1UpSyOf05OM6wo+mKBZu4x5hWGjDAtwFTJ3UnoP77/bAvfBKFyjtzc6
+	plI4hHMq5meU1V1VyW9cL1DiOsMePkn0=
+X-Received: by 2002:a17:907:9307:b0:c12:686d:f673 with SMTP id
+ a640c23a62f3a-c12c9f71a74mr115649866b.30.1783045869051; Thu, 02 Jul 2026
+ 19:31:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260702113222.228413-1-guanwentao@uniontech.com>
+In-Reply-To: <20260702113222.228413-1-guanwentao@uniontech.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 3 Jul 2026 11:30:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9dgEhagjzofg_H4mx1kYg=tFEE49RrwU9WY-xPMoEVZw@mail.gmail.com>
+X-Gm-Features: AVVi8CcL5Nl7f5tcgx7ActxW8WSbdBD0NvGR2Idjtv5I9_5dVLUOLq6VW-mFQ4g
+Message-ID: <CAKYAXd9dgEhagjzofg_H4mx1kYg=tFEE49RrwU9WY-xPMoEVZw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: restore DACL size on check_add_overflow() to avoid
+ malformed ACL
+To: Wentao Guan <guanwentao@uniontech.com>
+Cc: smfrench@gmail.com, tristan@talencesecurity.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In ntlm_authenticate(), destroy_previous_session() is called using a
-user pointer resolved from the client-supplied NTLM blob username field
-before the NTLMv2 response is validated. An authenticated attacker can
-set the NTLM blob username to match a victim account and set
-PreviousSessionId to the victim's session ID; destroy_previous_session()
-destroys the victim's session while ksmbd_decode_ntlmssp_auth_blob()
-subsequently rejects the request with -EPERM.
-
-Move destroy_previous_session() to after ksmbd_decode_ntlmssp_auth_blob()
-returns success and use sess->user rather than the pre-authentication
-lookup result. This matches the ordering already used by
-krb5_authenticate(), where destroy_previous_session() is called only
-after ksmbd_krb5_authenticate() returns success.
-
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Signed-off-by: James Montgomery <james_montgomery@disroot.org>
----
-Note: portions of this patch were suggested by an AI coding assistant
-(Claude Code / Anthropic). The ordering issue was identified via static
-analysis of ntlm_authenticate() and validated empirically using a PoC
-against ksmbd running Linux 7.1.0 in QEMU. The fix was verified by:
-checkpatch.pl --strict (0 errors, 0 warnings), sparse (HEAD, 0 warnings),
-and build test (make fs/smb/server/, clean). The assistant was prompted
-to identify and fix the destroy_previous_session() ordering issue relative
-to NTLMv2 validation, matching the pattern already used in krb5_authenticate().
-
- fs/smb/server/smb2pdu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 5859fa68bb84..1ce13b23cf6c 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1670,10 +1670,7 @@ static int ntlm_authenticate(struct ksmbd_work *work,
- 		return -EPERM;
- 	}
- 
--	/* Check for previous session */
- 	prev_id = le64_to_cpu(req->PreviousSessionId);
--	if (prev_id && prev_id != sess->id)
--		destroy_previous_session(conn, user, prev_id);
- 
- 	if (sess->state == SMB2_SESSION_VALID) {
- 		/*
-@@ -1712,6 +1709,9 @@ static int ntlm_authenticate(struct ksmbd_work *work,
- 		}
- 	}
- 
-+	if (prev_id && prev_id != sess->id)
-+		destroy_previous_session(conn, sess->user, prev_id);
-+
- 	/*
- 	 * If session state is SMB2_SESSION_VALID, We can assume
- 	 * that it is reauthentication. And the user/password
--- 
-2.47.3
-
+On Thu, Jul 2, 2026 at 8:33=E2=80=AFPM Wentao Guan <guanwentao@uniontech.co=
+m> wrote:
+>
+> check_add_overflow() unconditionally writes the truncated sum into *d
+> even on overflow, per its contract in include/linux/overflow.h.
+> The four check_add_overflow() guards in set_posix_acl_entries_dacl()
+> and set_ntacl_dacl() break out of the ACE-building loops on overflow,
+> but the truncated *size is then consumed downstream at the end of
+> set_ntacl_dacl():
+>
+>     pndacl->size =3D cpu_to_le16(le16_to_cpu(pndacl->size) + size);
+>
+> This produces an on-wire NT ACL whose pndacl->size under-reports the
+> bytes actually written by the preceding fill_ace_for_sid()/memcpy()
+> calls, yielding a malformed ACL that can trigger out-of-bounds reads
+> when re-parsed by clients or ksmbd itself.
+>
+> Restore *size to its pre-addition value on each overflow branch (via
+> `*size -=3D ace_sz` / `size -=3D nt_ace_size`) so that after the break,
+> *size once again holds the cumulative size of the successfully-written
+> ACEs. The committed ACL is then truncated-but-self-consistent rather
+> than malformed.
+>
+> The ksmbd DACL builders are the only check_add_overflow() sites found
+> where an overflow path breaks out of a loop and the destination value
+> is consumed afterward. The other nearby break-style cases either
+> return -EINVAL on overflow (transport_ipc.c) or break without
+> consuming the overflowed destination value afterward (buildid.c).
+>
+> Assisted-by: atomcode:glm-5.2
+> Assisted-by: Codex:gpt-5.5
+>
+> Fixes: 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16 DACL=
+ size overflow")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
