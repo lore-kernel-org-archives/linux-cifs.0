@@ -1,85 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6E033987E
-	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 05:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23243630B0
+	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 05:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783054899; cv=none; b=fP0MFz1ZLBht3jumJksDLkt7ZDuc8GA848EQm+Z18CSu2hXqvwZZPPsDAtLMuFRxIrOa05Yvc+/OH6Nv5shNOf0Z8ZolY9Ljz1nMgUWHUYCiK+iSQ9wpIqYz8+efd9GKARf6ElHXplbHAEu5vNMX1aLpr1+JQW5Rqq8s7PJ+e/g=
+	t=1783056842; cv=none; b=QpfWLDX1/Df8XUoLHZzX/REux+UcMjD/Q5ZcyJ//kM2VZ8wA6p5SyVXV+KZUyKodfOOr5/g4WptdapXZUKKOuEatIW+SiR3RC4mMKLjWMGBR/j+3RqyjvhyoeIhes6wpu7hG3dkYymoHdEznspymJv/4Y6ADoFazXmB4Kmu8AhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783054899; c=relaxed/simple;
-	bh=NP+ToeMxN9dFqUvkgmn2huJhs7f9v4z3zgln/xTkm8Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tQqukaZrGyH2HPAdy8KGWyZ/RUq3X2HaUaixedCq43fRGDUeltKmr3OigBIAYBQE9wWduDLcfK7irlwJdsmq2vrJu7hsJ22Um7thDsUW7l98kPRnYvLsmw/GgaVr9SJjrHZVLdXzL2+onNfBKZVbTZoMEvQL6EF6FSEdeiIAQFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfdWotNU; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783056842; c=relaxed/simple;
+	bh=aH/tTZbYmkIqJhCyCKsAnILbTFsxbE9Gv1SZ5WVt2dg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=opPmq7YF+bKffC4DMmM7JYKi0sxK2pnsJEvgpdqI8cwKrLbzo5PhiLSXz6Yd8jHP76H8EzYCs3y9HmRpK5o9HjNKB9UdxWfGqFd2I5xHuIKc4PvD4DeOBGKH2C9z+vqb9diBaZiS2wTFSQ6c2SO+3EYQbLr3KeRuIaKmpIv5Xzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uDo83A5M; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfdWotNU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A3491F000E9
-	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 05:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783054885;
-	bh=E3lnbLtFRY15TP8d2t4wH4z8cbErkkUwA2Hhh8TL7lI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=NfdWotNUSs3+u08dCaGqHaPZ0NJvi752ZQ43xrsKHERxb1BwFi68wRYChE0EhafgD
-	 kaFMgitqN3oDQVWju92H4MjmpOGNgr/WdqO1VZUFFuPc2ugF4r9Urno0fI4srVJSyd
-	 IwgTmvqO7RtEP3jAXtwbycRMLAmjrmyYDijhbjFcjsChbYSi35lajWZN9kWt4Yza1I
-	 OW315Vif4T9Tu5COtVX46TdFfKK8ibfk7i4rFIpsF60Lwnb/c1TUfXfB63xJ77j9YJ
-	 zWxEn2z/ZcI4l01ZvQ4Vu/QytfQ+UATKj+z/8C8n7EplaZD7b1kZ6O+Iobz7+nUq8f
-	 oh3siiXxygGcg==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-698c0ff45b5so1178208a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 02 Jul 2026 22:01:25 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxxK4UHjxAq7mO21Z71STNKbBg6jcNERkCBjvvFYpwIZCdtI/rQ
-	uOSkwvpBpsDPPi3kFUIOzCdYXzUeVmXOP6iM3K8uwl0bKeXk2yV60orz6FuMbLRkFhWFMtOyiwB
-	sOL//4hVd7zmAxZxtu4q/UcohDaEZqBI=
-X-Received: by 2002:a17:907:d303:b0:c12:a7c5:e638 with SMTP id
- a640c23a62f3a-c12c9d3c84cmr108555266b.7.1783054883783; Thu, 02 Jul 2026
- 22:01:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uDo83A5M"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783056835;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3SAO8rpaNKA4OegAsTKxRQZNaOEu+sakZXCmxYFgHuU=;
+	b=uDo83A5M9dcW9DoHjmdrArv8g6UZJVpOKz0iUkSMsj0J9g69HTTIuXwV0mwHCVVs2Q1M6t
+	ndSielsjh2cvq1kmiztBKiKidaB35QoTAdyN6osE5BrEukpd4ooPlZLJLIAfCRAE2Bf6Gk
+	vCxF6uFBrnTwsds6AJG9v3fWXRsb/V8=
+From: Huiwen He <huiwen.he@linux.dev>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org,
+	chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org
+Subject: [PATCH v8 0/5] smb: fix fallocate and allocation accounting
+Date: Fri,  3 Jul 2026 13:32:54 +0800
+Message-ID: <20260703053300.913371-1-huiwen.he@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260702155449.3639773-1-james_montgomery@disroot.org>
-In-Reply-To: <20260702155449.3639773-1-james_montgomery@disroot.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 3 Jul 2026 14:01:09 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-t2Oz4ZM8BWkJ7uKciaGo=akTMPUEFy2_Z3cx0abHptQ@mail.gmail.com>
-X-Gm-Features: AVVi8CcxqVCqx8iIhiuyphANWpKtxkmZkevRDJ7Z67TDeji4pRJdn8lmun10N1Q
-Message-ID: <CAKYAXd-t2Oz4ZM8BWkJ7uKciaGo=akTMPUEFy2_Z3cx0abHptQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: defer destroy_previous_session() until after NTLM authentication
-To: James Montgomery <james_montgomery@disroot.org>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org, 
-	tom@talpey.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index 5859fa68bb84..1ce13b23cf6c 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -1670,10 +1670,7 @@ static int ntlm_authenticate(struct ksmbd_work *work,
->                 return -EPERM;
->         }
->
-> -       /* Check for previous session */
->         prev_id = le64_to_cpu(req->PreviousSessionId);
-Is there any specific reason for not moving this line together?
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-> -       if (prev_id && prev_id != sess->id)
-> -               destroy_previous_session(conn, user, prev_id);
->
->         if (sess->state == SMB2_SESSION_VALID) {
->                 /*
-> @@ -1712,6 +1709,9 @@ static int ntlm_authenticate(struct ksmbd_work *work,
->                 }
->         }
->
-> +       if (prev_id && prev_id != sess->id)
-> +               destroy_previous_session(conn, sess->user, prev_id);
-> +
->         /*
->          * If session state is SMB2_SESSION_VALID, We can assume
->          * that it is reauthentication. And the user/password
-> --
-> 2.47.3
->
+Changes in v8:
+
+- Add back the overlapping allocated-range fix as patch 2. This patch
+  was dropped after v5, but it addresses Shashiko's review comments
+  about overlapping allocated ranges and malformed range lengths.
+
+  Although I could not reproduce this locally, a malicious or unusualserver
+  could theoretically return such a range.
+
+- Rebase the later patches on top of the restored patch 2. No other
+  behavior change is intended.
+
+The following patch merged into #ksmbd-for-next-next is not resent:
+  - smb/server: map SET_INFO ENOSPC to disk full
+
+The following patches are already in upstream and are not resent:
+  - 898d280f4e4d smb/client: name the default fallocate mode
+  - 2a4b3d2db5c6 smb/client: preserve errors from smb2_set_sparse()
+  - 99cd0a6eeb6c smb/client: do not account EOF extension as allocation
+
+Link to v7:
+https://lore.kernel.org/linux-cifs/20260702151255.886945-1-huiwen.he@linux.dev
+
+Thanks,
+Huiwen
+
+Huiwen He (5):
+  smb/client: refresh allocation size after duplicate extents
+  smb/client: handle overlapping allocated ranges in fallocate
+  smb/client: reduce fallocate zero buffer allocation
+  smb/client: emulate small EOF-extending mode 0 fallocate ranges
+  smb/client: refresh allocation after EOF-extending fallocate
+
+ fs/smb/client/cifsfs.c    |  10 ++-
+ fs/smb/client/smb2ops.c   | 172 +++++++++++++++++++++++++++++++++-----
+ fs/smb/client/smb2pdu.c   |  19 +++++
+ fs/smb/client/smb2proto.h |   3 +
+ fs/smb/common/fscc.h      |   5 ++
+ fs/smb/server/smb2pdu.h   |   4 -
+ 6 files changed, 185 insertions(+), 28 deletions(-)
+
+-- 
+2.43.0
+
