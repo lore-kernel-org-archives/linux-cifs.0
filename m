@@ -1,78 +1,78 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8313126BF
-	for <linux-cifs@vger.kernel.org>; Fri,  3 Jul 2026 20:47:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376B325B098
+	for <linux-cifs@vger.kernel.org>; Sat,  4 Jul 2026 01:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783111643; cv=pass; b=AiXIz/1OjlJ6qbaSUhwoWpZrj5fzpqHZBbimRxjyHZx5FkutVnTy4fQTC24Z6LdyMOkWxgsEloDtNahhAikzLovbHNUwH2YcaigDGIU+GX2qRqwXlDee1Fo95ro0/DBKCmGUdEvgYOsEnBI5YFZj/mj2GAtb8B9rHFqG7lNfbV4=
+	t=1783128025; cv=pass; b=dO8qTarQpNHXQH1shuTaPJwBHRxFZZ1l3L8hZJh6XJA51vOOFLUw8BjbeJHRT3iyv6UkVS36ESOcFTqZe+9Xo47pFPtoVYiEoSgpUamvlxbL92ouM1XVvHIRP3h1h2kAuscADFnruZ0227w5B3mlBWBITSTVyPKoXfyap3tdduM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783111643; c=relaxed/simple;
-	bh=im25RQCB+T3BLn9WCRZnv+bXYA/iEa2Jpv3RcK2yRMk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Vn/BQhyE6uE/aa5goVh3vtsKXpuGuFYEhZwUmh8ZezRqzvhoL1l1e3w4/GpV7JSbsKGUeA/PvBhhAzmoVk1zDSk2aPhaN37YO2/b4+iz7otFWKt3VUahVg2cMm45JzyBAJyKwvdQY3E6F+C1D1tEGJlajem3e4ltR06mmHtf+fc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bmmXukis; arc=pass smtp.client-ip=209.85.219.46
+	s=arc-20240116; t=1783128025; c=relaxed/simple;
+	bh=bRX1Y+sRSjQD6w33SiQ2h7rckwmAZPw6ZEMOiJO4MRw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Cw7oZN2Ji6EppgTd1cu28+MY2I0SAPclJwMfmaiCvsXolTjoAmjZPYV2Jpz4Kua7atxEzKDS8xSrjgey4RYVXpZ0l/5038rW2k3PvTgCNBllRzPq5FFiLXXoJBxvaN0SQJ1FpuWuZIOPV6yoZ/DTS0UpWwhpmx+v2NlS8qbpjbE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iw8x7ozY; arc=pass smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmmXukis"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-8eec5dfdb65so3316956d6.0
-        for <linux-cifs@vger.kernel.org>; Fri, 03 Jul 2026 13:47:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783111630; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iw8x7ozY"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8ea70ca4fc8so8515686d6.1
+        for <linux-cifs@vger.kernel.org>; Fri, 03 Jul 2026 18:20:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783128023; cv=none;
         d=google.com; s=arc-20260327;
-        b=rKI/sW/Yrzyh3G7Q7Ty6ysQFcZlUsP7OhN9OtQ7C69gU73Vl1wcURD44QVPv61fXFP
-         +V4G40aBTii96p45N2XBdQF6xyMfdr/4VAwjdOPx5Kz8qlbvss9QM7CXOoT9NM3fLLZy
-         ce1Z/Fx+q3bxktMdWrlRvTvaf3qz1mUNWxVNG/lRvFNFKDKP7lZoo1j0YajlcebxM+O8
-         OFKMxweFHfNFssTJuTmnfPwdhEonBIjsEXQFdVSpcJukVLmXHcSBtgkBXvKaiByo7T4u
-         0XYExdgKbTgXv8WG1S1UvHkgrW6Fc1jcJIbDbdIkidoEViz5WFgIoaHiishtF02JZkQM
-         eHgA==
+        b=jzN9jJF2BoLvNd9DMK5kwEH7YYteSjvCqxzXslsSk+cKIoudMx7HP6quW25HKJLOv0
+         ggHO3grOLNcRyMD986M79BQmRZpAXWxIqasMyus6GRmYBm2azEWH4jJkMlgkcQMQaQDT
+         7kkPlJZ3+KD1ep51Xp9zJP4SmkLIyVr4tru0WlL3LaqxWBWEA6q4R58iA2N06fuTaRtg
+         H5Eit+mhhf5ekJHa2BdN0syF61KSb+LFALIzBdtVs6aIQ5w6zEGJPbN3+Nf5qkK2If5U
+         Gy+UFS85+PILBhopqK14yGzo9n6TX1Gjt1U449qwJ0MTatOLO5JAd+aResbF/FWdVp11
+         1Y7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=eNkhfBBpa6qxaQoPn2vbDMLQIpi0aj/+bgkcBKVpGzE=;
-        fh=bR62hPsuqGWTBYZG9cvUMeDbzmKyhbk7J9AuZfEtFCM=;
-        b=pLDxi43cR5XY5l+tu0+6IAIcmpsA/td5wcRO/n5UFco4be5AxJDrUSXfxS3XIjS1/A
-         Yk50+yh/s5I2GaAiJc353tz+NB78mNQ5GmprMrV5rfWyN1Rd1CODREPbSrxmTzvF0mkK
-         fuXk2isN9QelurwRvizkmRju/DQEEOdGvUc2WEF0zaLhVyLlHXv9nu0SAuq/rwgBo2HG
-         4EKPT2q9AkpDUjdZDtoWTu9Rnwnl6MJYCPixoCJQymkGkt2ZQGsoqr121ayY+EuNffb1
-         WCrcoXVGQikdrldsyrujijXd7fbBEx7QXh+YWhhhhOahwh+F5y9Y6QEt2N39ZjbJnMTZ
-         h0BQ==;
+        bh=UFp9rUcCAoT8X7CfTLttSToyFVHLAabUXidbnhSZFoY=;
+        fh=O5F5DSS7l6KckG2deZLvu0zGG6M7msyFmmq4izhV/Zg=;
+        b=h0umUblTODKQwaljm8FgK0vFaFeznSk/x0kh2P9Bd2Lyu8m1iCXjTOGL4gGrS+P4qf
+         q9nV8p/UvLdoCpgmHeACR9G5me7tnTtpZViW2KfM3TfCPezsCRmD/kSwJpKu9xoHdmr5
+         oioYRd3k3SkybQDx0+82GzcTNL1+v5lMTZd7DnR5Q4B+QI4G9/k5TB5MjlkxysnEk7rS
+         NJwvMFS7R9ONNt2Bv1BolqDP1dr9Nlpg4Xj0rV6x7db266ArkwpdBRLuhPBNDFD8CsZd
+         YS3QOnqkBiPDfPrSkn+fKpF9olADkF8JpBh21qvOHZVZ/OYEvQW3b+DCxHipuM4FA/G3
+         rM3g==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783111630; x=1783716430; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783128023; x=1783732823; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=eNkhfBBpa6qxaQoPn2vbDMLQIpi0aj/+bgkcBKVpGzE=;
-        b=bmmXukisUluJn81LQi6gPlWDPTB+WqtFcEkqo/IxtsItc76LU06Cukm0WpeTOcEnkA
-         SygZwQaa7MJPN+EwjlfNwGSLFZ4NOdUK8x/RuX8qMFhkAQ/E9HkC1vkbtyY2fpSmNQg5
-         x0f/CVbFBSCPy9iq5xGRh0w5rdqFLu9ix++QCKbrfozYyPHb749XcrxlF+T7DUV4QQ6R
-         rk7TVNjcA2zdKn+BZME9kgTrTipX++JBZwERv0ONHMymbWcP80T6uju+tT/yd5lwqyFo
-         s1RyOSVoUFpsW4BE0X9rEJdircRAeBDz8R0EI+q1xTNSX/Gsz/4wffqj75G9TkoNl3CJ
-         uUvQ==
+        bh=UFp9rUcCAoT8X7CfTLttSToyFVHLAabUXidbnhSZFoY=;
+        b=Iw8x7ozYqbEdW4FnnuOvl/o+rt1cYxX5Aw02YhFtp1d8GXixs4Qqps0b3HLsG2fe2v
+         3gJa/gME/n5zZKjq8+2CwzCEdhvF/3zJ6REvMWUVW4GaUGfoSshEU3wwF250+HhRRT9A
+         iRYsSPjkcW8IzAaiDwcSlZy+fxkkdkGsltoq4t6v4A1smnanR8qUJwC+CexqauxWPsm0
+         3kvxmQMPm1cp11fzzzoR9FWn9X426lRrdXkL4XTHrwfRbJ7J2dPGos2RHm/jTQH8tneJ
+         hWJx1Rer7hMMUK9ZmpkI/qSznvWT0c4l84wI0b0VGF6MiGtgc4N2EfuTlahNOZzwu0cx
+         qkrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783111630; x=1783716430;
+        d=1e100.net; s=20251104; t=1783128023; x=1783732823;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eNkhfBBpa6qxaQoPn2vbDMLQIpi0aj/+bgkcBKVpGzE=;
-        b=ilga6vwjiztgQnMw/4v611+7MY83K5HX5pxCgsLxwejjbLfJJA8JWz5G+UvfyiCwcV
-         Fk4+92q+O4m2SddtjRjhx+2UzCYcRFdSuKRXNFFrT8MLPdvPOtZHJySLApXbkAW1hW95
-         YIkOJl4wpufHDVEdSsWxJqGZo1pO7r09lFX9uGpSj9ndmHqYR1mCOoxB2cYfUqWFld9g
-         XVaa0SkI3OREHODhdg/zqvlbdjSuwobMkJFE8o0lCOx/2+UK5xhxYQiObIfHpxtqqe3U
-         osmYVCHMZej3metsBh7NdW+K1ltbwab821FoTRcK2D/p0qc6LXKgLvNuZA6gp6gmOl92
-         PBxw==
-X-Forwarded-Encrypted: i=1; AHgh+Rr5/zurg7xqLu1ymSgZd9YqPjF9LPTDaZ1XRtWtlJdsDBpz0zM/R0L7LudQZoCx6LO0WPKswRhtN+4x@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxrzw6w9eIeGkLCimVk3vQkKHc38l3g3VtCuFsiHYPRyqYtDKds
-	/XLJo2cGAFO/UPXffNQnj9/DuSolT7eChJJkDyi6Tb7Q+CEWBZwmTicZYnusEwd0yUo8pYN7h7D
-	fStDEk2yQq749I51x/7uzKLLp0HO0Dns=
-X-Gm-Gg: AfdE7clDKrsVjjq+AGIFurqLUB8y5zqOqK3nk0Jo1mh/fX+urk6nv2nQ3o1iAKcXmDN
-	ApVyVNzUU3RzML+UQE4+n8ZJ82MJH6FNJXkq82abomr+ILkOifGwERvomKN/Z7guKSu4jBbsuhn
-	vT36r91RHYTHA7iS556Ktu7+1H/MXA/Nmw39AaQ+4fVDYGxBRpAwFq46KeocOe9pYrbiwGbdjJR
-	0tmmqYV0dcat6rYzwYik5O7JHKwGL3nikutwdx4LfFVQCyLpEZnIvMMifQrq0jejsJOyDunN9eD
-	v9TO4vqP7l68mf3jBU2UT424lgddIi3ao95JHd4IHQRAHjb5BlreJ7rLMnAjFOjI6qeJCylwqp2
-	s9HPH7XBOGlsgyEoNUoMnGfz6gv/g12YwCBxMCplM0ESktgflKw4UCgUKvLbtAS7Kqsqlwre+SE
-	6hRZ2wVNTE2Go=
-X-Received: by 2002:ad4:5aaf:0:b0:8de:a916:6226 with SMTP id
- 6a1803df08f44-8f749a75051mr13251796d6.6.1783111630178; Fri, 03 Jul 2026
- 13:47:10 -0700 (PDT)
+        bh=UFp9rUcCAoT8X7CfTLttSToyFVHLAabUXidbnhSZFoY=;
+        b=QLCIf9pKlOsZ65q3YCnsv8pokNfXCu8uH1SxzG5Sv9LVipjKqDRQiR2R4lGe450Uzp
+         L88/6vmSyDvXKs0G4DBHnEAKRqaZsAxtoAJMLjjMUjPtZ+0fhPufZYiHVlOdqr85TPhM
+         LzwbjwxZiAcZ+eGi+w2+0NWsVxR5JvERQAlhSlwAwkzOhawggL2Tt7rzMo8N9+bPqPJQ
+         SXknKB1+K5mqepH+6ejLkdACK8A/4afbNQ7lor8t9IVmbMhSDkjZ7/0r+H2W0XhBsEe4
+         UyZvfwIVCNyHrB8Wh2rBzvsA4uprYPZMJqHevVj6WLCn3/cpLtaXmvZfx0z6qzEmpuVk
+         7FBw==
+X-Forwarded-Encrypted: i=1; AHgh+RpWf8vaWel5EkLHNThduk+lhCCvfnQlVqsbwSRrpL23R8XKJ/FBzJ4xXd5RZLpi4H8AzQcxM3x2rwuM@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBaCKuJL3nc2gZw7b493f+4UYPCNX7xUBAmLqty2aY/CJhM4PW
+	eT3h6XQlz2q9jYZjD9k7dwgmQiBwd2HEtDbKW/3vS+3nuhvxIUdycsiZlniNC+oqrAZw5ZzLQEE
+	H0LhHAyyDqbgb63epGLS0BtxDr7rhbe28XTglsqg=
+X-Gm-Gg: AfdE7cnwEHF8AWItjp7j+gh26AO+ipFhBsDZRQGznTzWHhK6RbU2zj5WqoGNBmzF7DZ
+	qI7NkOBeM5JEqBeovVVFy8zrB9nqqZYTJZiNRApPdU57DxqKSANTH7LbS2aku9u3o0RCEVhg20d
+	vwGMpjcqFomQQ4f2TkX951CWtKwMC/V81PwWbWRvojxJeVReVeqyq5t8GPxtpCQtx1MDksfbeCg
+	YdyrGgqFj0T6afoKpeZDjQSz6MicmotLQxBGmdoxcnY3gk7wzX4WHF+5TLP8bF5U/GBfWdkumeO
+	hv0am21HtuniE0RyRqbFWy81jrHePRKAV8oltyvoq1qRPuJNNcxkC0YeL8mttCdAxGfKP6nEdnf
+	z25b8ff4oefYTdkxFZIy8LHoXChAZQ3dgjhnat0m99vyClF4CIQ0+ANNW9kLypbSTMP45cvkPCX
+	ojsSDj0QV728I=
+X-Received: by 2002:a0c:e08a:0:b0:8d0:3950:aa0f with SMTP id
+ 6a1803df08f44-8f5bdffbcb1mr80625626d6.22.1783128023052; Fri, 03 Jul 2026
+ 18:20:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -80,12 +80,13 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Steve French <smfrench@gmail.com>
-Date: Fri, 3 Jul 2026 15:46:58 -0500
-X-Gm-Features: AVVi8Cdl8mPBzhJEy3wkHQJmbNtGPm9HYYzQFK2ehn16r1ZaqninznXADbVl27w
-Message-ID: <CAH2r5mt596rpemKQBEQx_7SO0ZteTBiA=ud5VvycFgkLrQmA6Q@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
+Date: Fri, 3 Jul 2026 20:20:11 -0500
+X-Gm-Features: AVVi8CeYpYkS_-mwdJ3KNv_mNZ4c7rRh40fMV7UWOftM_zCcBgdUkCp52P1UWf4
+Message-ID: <CAH2r5muk1fnO80SZWJpmt8_Q7uhRw=2-GcKYs1WppF32nfjo7w@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
 Please pull the following changes since commit
@@ -95,33 +96,77 @@ dc59e4fea9d83f03bad6bddf3fa2e52491777482:
 
 are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc1-smb3-client-fixes
+  git://git.samba.org/ksmbd.git tags/v7.2-rc1-smb3-server-fixes
 
-for you to fetch changes up to c16b8c4cfb4fe2244cc33e469a93c1ab8684146b:
+for you to fetch changes up to f363a0fb134a3eb9e47368b1edbd251fd76be84b:
 
-  cifs: Fix missing credit release on failure in cifs_issue_read()
-(2026-07-02 09:16:03 -0500)
+  ksmbd: fix app-instance durable supersede session UAF (2026-06-30
+21:29:46 -0500)
 
 ----------------------------------------------------------------
-4 smb client fixes
-- Credit fix
-- Fix alignment issue in parse_posix_ctxt
-- SID parsing fix
+16 ksmbd server fixes
+
+  - Fix several use-after-free races in durable handle reconnect,
+    supersede, and oplock handling.
+  - Avoid holding the inode oplock lock while waiting for a lease break
+    acknowledgement. This removes delays of up to 35 seconds when
+    cifs.ko closes a deferred handle in response to a lease break.
+  - Fix malformed security descriptor handling, including an undersized
+    DACL allocation issue and an out-of-bounds ACE SID read.
+  - Fix memory leaks in security descriptor and DOS attribute xattr
+    encoding/decoding error paths.
+  - Fix outstanding SMB2 credit leaks on aborted requests and correct
+    the QUERY_INFO credit charge calculation.
+  - Fix hard-link creation without replacement being incorrectly rejected
+    when the handle lacks DELETE access.
+  - Avoid unnecessary zeroing of large SMB2 read buffers.
+  - Add an oplock list lockdep annotation and update the documented
+    support status for durable handles and SMB3.1.1 compression.
+  - Durable handle fixes to address ownership and lifetime races during
+    reconnect, session teardown, oplock handling, and superseding
+    opens, preventing stale session and file references from being used
+    by concurrent operations.
+
 ----------------------------------------------------------------
-David Howells (1):
-      cifs: Fix missing credit release on failure in cifs_issue_read()
+ChenXiaoSong (1):
+      smb/server: do not require delete access for non-replacing links
 
-Steve French (1):
-      cifs: update internal module version number
+Gil Portnoy (2):
+      ksmbd: fix use-after-free of fp->owner.name in durable handle owner check
+      ksmbd: close superseded durable handles through refcount handoff
 
-Zihan Xi (2):
-      smb: client: harden POSIX SID length parsing
-      smb: client: use unaligned reads in parse_posix_ctxt()
+Haofeng Li (2):
+      ksmbd: reject undersized DACLs before parsing ACEs
+      ksmbd: validate num_subauth when copying ACE in set_ntacl_dacl
 
- fs/smb/client/cifsfs.h  | 4 ++--
- fs/smb/client/file.c    | 1 +
- fs/smb/client/smb2pdu.c | 8 ++++----
- 3 files changed, 7 insertions(+), 6 deletions(-)
+Namjae Jeon (7):
+      ksmbd: avoid zeroing the read buffer in smb2_read()
+      ksmbd: fix credit charge calculation for SMB2 QUERY_INFO
+      ksmbd: fix outstanding credit leak on abort and error paths
+      ksmbd: doc: update feature support status for durable handles
+and compression
+      ksmbd: don't hold ci->m_lock while waiting for a lease break ack
+      ksmbd: snapshot previous oplock state before durable checks
+      ksmbd: fix app-instance durable supersede session UAF
+
+Qiang Liu (3):
+      ksmbd: fix sd_ndr.data memory leak in ksmbd_vfs_set_sd_xattr
+      ksmbd: Fix acl.sd_buf memory leak and invalid sd_size error handling
+      ksmbd: fix n.data memory leak in ksmbd_vfs_set_dos_attrib_xattr
+
+Runyu Xiao (1):
+      ksmbd: annotate oplock list traversals under m_lock
+
+ Documentation/filesystems/smb/ksmbd.rst |   4 +-
+ fs/smb/server/ksmbd_work.h              |   7 ++
+ fs/smb/server/oplock.c                  | 109 +++++++++++++++++++++++++++-----
+ fs/smb/server/server.c                  |  14 ++++
+ fs/smb/server/smb2misc.c                |  18 ++++--
+ fs/smb/server/smb2pdu.c                 |  17 +++--
+ fs/smb/server/smbacl.c                  |  15 ++++-
+ fs/smb/server/vfs.c                     |  14 ++--
+ fs/smb/server/vfs_cache.c               |  79 +++++++++++++++++------
+ 9 files changed, 216 insertions(+), 61 deletions(-)
 
 -- 
 Thanks,
