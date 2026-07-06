@@ -1,80 +1,72 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE4938238A
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 15:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA516346E56
+	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 15:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783351942; cv=none; b=ia0mIPFy/t+3aSOh0bTCO2QDoFcJV8mgJh8auoiSFuqlMTnP27NyV7pOPymSuv0oN3Yh59aOSAOrskxX5JKqHkk6oyRUgS+9xSFnssjPfdWWZiSt+kAbb/bEMMILsux8X6WMFGyNDx17KewsLoIdjERp9Vmhh3V0koYOznz8Ka0=
+	t=1783352070; cv=none; b=uArv1BEFxaYd1TlW4lrHe2n6JZHEKWX5VoZWBVpPui68gWaX3gN2asjzvaajRBf2V58isSLWMeMtjAwOstLx/WRx4bk3tN7mjHZ15bpVXSyHLlzCDbcnX30MUGq20+R04sTnYTvaylfYp+LEU3mFBF0v2TjqXk6Ao6YpUwRrktc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783351942; c=relaxed/simple;
-	bh=MykPx35h1Xhip2EcE9vUK0mgW1rF9OQSiTX5JuE0RfA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FYVueT9eZUUjpU/EZMAORtO9Dz8xaCQHqX3WhBaN50p99gCheSzejl321sbDx614yb9TZ6yA5YiLsU/N/sO0AV05QkCApCQ48oPgsdhezjldkl3BklBVwNajtkchaGHTChkLfmDdt+UXZFrF314nb/+P6gtSBo5j7OiljRJW9mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wIJiPdI7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8y9i5aCM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wIJiPdI7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8y9i5aCM; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1783352070; c=relaxed/simple;
+	bh=YMYMvTJqPQ4Fbs+w7z6WLF+d+XmNDtWZbfC0Bw3opCU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OxA80KfwH1P3ikmt/41NVBEkTyqEKwZLbwVWpl18IFedQn+SrPVjFBEnmVVlTDuHGYw50c5JQfP0XcFxLEZBfv5LsDnukxBOxmA1iXhPrJj3WS5OfQHiKIxW/Jrv1Cz0JeLQrxVQIkUJgqo2PkOsWB58mApcJZO+2KMF4mbuJDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AvbJ2MP5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wIJiPdI7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8y9i5aCM";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wIJiPdI7";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8y9i5aCM"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AvbJ2MP5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783352067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fJgudNbA+jqSC6IQkevTiVxycA2ilRQtfmBrSyeMALc=;
+	b=AvbJ2MP5vHH7pl/lenmGtncJcVwsdXxJ28pvVueoVihX4tTtrteJ6jLgXruGsSuJ/Rs3vZ
+	o8O5QbbhH+6OlwA8KYpvdceExPNzJ8ZHI0VWNsOomGqdtQqZn9ZcxHigujHK6HUrkia7pA
+	vdPD7CXfYzfWWY1qGAbGMBV+QOvSCGU=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-52-Sbr2cRBtMlKHGPv5jeXyww-1; Mon,
+ 06 Jul 2026 11:34:23 -0400
+X-MC-Unique: Sbr2cRBtMlKHGPv5jeXyww-1
+X-Mimecast-MFC-AGG-ID: Sbr2cRBtMlKHGPv5jeXyww_1783352058
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7923E73C29;
-	Mon,  6 Jul 2026 15:32:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783351938; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
-	b=wIJiPdI7RxofbDRS4n5XFHdG45rr1kT9jmRs1znP5UX3n3jtElsn07C9WgrTFZAlX6kgvK
-	LvWmeBU/7fBSt9wbCgi5lkC4O4YcxisP6m5sBCoK8VffqiLTfraKqcqnyX9xVebBXIEhU5
-	ZZ4uyAwO5z3k+ng/0gSovCsFCrfpiOE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783351938;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
-	b=8y9i5aCMEDrKzjudddP0vP70JIIm//02A8FdCSOLElzKRQ6xe+KyEVWyqDf80KLFCv10aK
-	W90+/lh/xuElfNAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wIJiPdI7;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=8y9i5aCM
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783351938; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
-	b=wIJiPdI7RxofbDRS4n5XFHdG45rr1kT9jmRs1znP5UX3n3jtElsn07C9WgrTFZAlX6kgvK
-	LvWmeBU/7fBSt9wbCgi5lkC4O4YcxisP6m5sBCoK8VffqiLTfraKqcqnyX9xVebBXIEhU5
-	ZZ4uyAwO5z3k+ng/0gSovCsFCrfpiOE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783351938;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
-	b=8y9i5aCMEDrKzjudddP0vP70JIIm//02A8FdCSOLElzKRQ6xe+KyEVWyqDf80KLFCv10aK
-	W90+/lh/xuElfNAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 02340779AA;
-	Mon,  6 Jul 2026 15:32:17 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id A9AhLoHKS2qAQwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 06 Jul 2026 15:32:17 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org,
-	pc@manguebit.org,
-	smfrench@gmail.com
-Cc: Enzo Matsumiya <ematsumiya@suse.de>,
-	Steve French <stfrench@microsoft.com>
-Subject: [PATCH v2] cifs.upcall: fix regression with krb5 + creduid
-Date: Mon,  6 Jul 2026 12:32:12 -0300
-Message-ID: <20260706153212.839012-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.54.0
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 391A51955D8F;
+	Mon,  6 Jul 2026 15:34:18 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.33.159])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7D72D1956096;
+	Mon,  6 Jul 2026 15:34:11 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 00/21] netfs: Keep track of folios in a segmented bio_vec[] chain
+Date: Mon,  6 Jul 2026 16:33:46 +0100
+Message-ID: <20260706153408.1231650-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -82,435 +74,417 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 7923E73C29
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-0.990];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FREEMAIL_TO(0.00)[vger.kernel.org,manguebit.org,gmail.com];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,manguebit.org:email];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Commit 972c5b5ff95e ("cifs.upcall: remove getpwuid() dependency")
-introduced a regression when using creduid != uid (e.g.
-"mount.cifs -o sec=krb5,cruid=X"), so 'uid' local var is replaced
-with procfs "Uid" value (in the example, the one from mount.cifs).
+Hi Christian,
 
-That commit ignored the fact that:
-  mount UID can be different from creds UID, and that calling-app
-  process (post-mount) can be different from both
+Could you add these patches to the VFS tree for next?
 
-This patch "reverts" 972c5b5ff95e ("cifs.upcall: remove getpwuid()
-dependency"); transform the "emergency"-added function get_uidgid()
-into map_uidgid(), now only used to do NS UID/GID mapping.
+The patches get rid of folio_queue, rolling_buffer and ITER_FOLIOQ,
+replacing the folio queue construct used to manage buffers in netfslib with
+one based around a segmented chain of bio_vec arrays instead.  There are
+three main aims here:
 
-Also add getpwuid() back, but this time called while still on host
-namespace, so any possible custom NSS module is ran as allowed by
-sysadmin.
+ (1) The kernel file I/O subsystem seems to be moving towards consolidating
+     on the use of bio_vec arrays, so embrace this by moving netfslib to
+     keep track of its buffers for buffered I/O in bio_vec[] form.
 
-Any scenario involving unmapped UIDs or GIDs is unsupported; this
-means that any UID:GID in a child user namespace _must_ map back to
-a valid and existing host UID:GID.
+ (2) Netfslib already uses a bio_vec[] to handle unbuffered/DIO, so the
+     number of different buffering schemes used can be reduced to just a
+     single one.
 
-Fixes: 972c5b5ff95e ("cifs.upcall: remove getpwuid() dependency")
-Reported-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
----
-v2:
-- map_id(): moved 'errno = EINVAL' to the failure blocks and 'errno = 0'
-  explicitly into success block, because apparently fscanf() only resets
-  errno on glibc
-- change range checks and NS mapping to use *idp instead of 'id' (so
-  further possible duplicates are found correctly)
-- fix errno save/restore on fclose()
-- log correct errno if getpwuid() returns NULL; but leaves it as is,
-  even if it's 0 (we're exiting anyway)
+ (3) Always send an entire filesystem RPC request message to a TCP socket
+     with single kernel_sendmsg() call as this is faster, more efficient
+     and doesn't require the use of corking as it puts the entire
+     transmission loop inside of a single tcp_sendmsg().
+
+For the replacement of folio_queue, a segmented chain of bio_vec arrays
+rather than a single monolithic array is provided:
+
+	struct bvecq {
+		struct bvecq		*next;
+		struct bvecq		*prev;
+		unsigned long long	fpos;
+		refcount_t		ref;
+		u32			priv;
+		u16			nr_slots;
+		u16			max_slots;
+		enum bvecq_mem		mem_type:2;
+		bool			inline_bv:1;
+		bool			discontig:1;
+		struct bio_vec		*bv;
+		struct bio_vec		__bv[];
+	};
+
+The fields are:
+
+ (1) next, prev - Link segments together in a list.  I want this to be
+     NULL-terminated linear rather than circular to make it possible to
+     arbitrarily glue bits on the front.
+
+ (2) fpos, discontig - Note the current file position of the first byte of
+     the segment and whether this bvecq is discontiguous with the previous.
+     When accessing the pagecache to clear flags/locks, the fpos can be
+     used to look up folios by file position rather than by finding those
+     folios from the info stored in the bio_vecs.
+
+     When the file position is relevant, the model I'm working with is that
+     all the segments pointed to by a single bvecq must represent
+     contiguous data, but adjacent bvecqs within a chain need not be
+     contiguous.  This allows a bvecq chain to be used to provide bufferage
+     for a sparse read or write RPC such as can be done with Ceph.
+
+     If a bvecq segment is not contiguous with the previous one,
+     ->discontig should be set (this is technically redundant if one keeps
+     track of the fpos as a bvecq chain is processed).
+
+     Note that the beginning and end file positions in a segment need not
+     be aligned to any filesystem block size.
+
+ (3) ref - Refcount.  Each bvecq keeps a ref on the next.  I'm not sure
+     this is entirely necessary, but it makes sharing slices easier.
+
+ (4) priv - Private data for the owner.  Dispensible; currently only used
+     for storing a debug ID for tracing in a patch not included here.
+
+ (5) max_slots, nr_slots.  The size of bv[] and the number of slots used.
+     I've assumed a maximum of 65535 bio_vecs in the array (which would
+     represent a ~1MiB allocation).
+
+ (6) bv, __bv, inline_bv.  bv points to the bio_vec[] array handled by
+     this segment.  This may begin at __bv and if it does inline_bv should
+     be set (otherwise it's impossible to distinguish a separately
+     allocated bio_vec[] that follows immediately by coincidence).
+
+ (7) mem_type.  Indicates how the memory attached to the bio_vecs should be
+     disposed of when the bvecq is destroyed.  It can be one of:
+
+	BVECQ_MEM_EXTERNAL	- Externally tracked ref; don't put
+	BVECQ_MEM_PAGECACHE	- Pagecache; must be put
+	BVECQ_MEM_GUP		- Pinned by from GUP; needs unpin
+	BVECQ_MEM_ALLOCED	- Plain alloc'd pages; can be mempooled
+
+     [!] I'm not sure that this is a good name for this member or for the
+     	 enum values.
+
+I've also defined an iov_iter iterator type ITER_BVECQ to walk this sort of
+construct so that it can be passed directly to sendmsg() or block-based DIO
+(as cachefiles does).
 
 
- cifs.upcall.c | 279 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 177 insertions(+), 102 deletions(-)
+This series makes the following changes to netfslib:
 
-diff --git a/cifs.upcall.c b/cifs.upcall.c
-index 11dbc6186a74..ff5f68f55692 100644
---- a/cifs.upcall.c
-+++ b/cifs.upcall.c
-@@ -52,6 +52,7 @@
- #include <arpa/inet.h>
- #include <ctype.h>
- #include <grp.h>
-+#include <pwd.h>
- #include <stdbool.h>
- #include <errno.h>
- #include <sched.h>
-@@ -1375,118 +1376,170 @@ static int ip_to_fqdn(const char *addrstr, char *host, size_t hostlen)
- 	return 0;
- }
- 
--/* cover worst case/impossible scenarios */
--#define PROC_PID_PATH_MAXLEN	((int)sizeof("/proc/2147483647/status"))
--/* max valid UID/GID is (UINT_MAX - 1) */
--#define INVALID_UIDGID		UINT_MAX
-+#define ID_MAP_PATH_MAX ((int)sizeof("/proc/2147483647/uid_map"))
- 
--/*
-- * get_uidgid - Get @pid's (real) UID and/or GID.
-- * @pid: process to get UID/GID from
-- * @uidp: pointer to store @pid's UID (can be NULL)
-- * @gidp: pointer to store @pid's GID (can be NULL)
-- *
-- * Extract "Uid:" and "Gid:" fields from /proc/@pid/status.
-- * Do so based on whether @uidp or @gidp are NULL.
-- *
-- * This function assumes we're on the same namespace as @pid.
-- *
-- * Return: 0 on success, -1 otherwise (errno set).
-- *
-- * On errors, *@uidp and *@gidp are set to INVALID_UIDGID.
-- */
--static int get_uidgid(pid_t pid, uid_t *uidp, gid_t *gidp)
-+static int map_id(pid_t pid, const char *map, unsigned int *idp)
- {
--	char path[PROC_PID_PATH_MAXLEN] = {}, buf[256];
-+	unsigned long long ns_start, host_start, range;
-+	char map_path[ID_MAP_PATH_MAX];
-+	int map_path_size = sizeof(map_path);
-+	unsigned int id;
- 	FILE *fp = NULL;
--	int ret;
--
--	errno = 0;
--	if (pid < 0 || (!uidp && !gidp)) {
--		errno = EINVAL;
--		return -1;
--	}
--
--	if (uidp)
--		*uidp = INVALID_UIDGID;
-+	int ret = 1;
- 
--	if (gidp)
--		*gidp = INVALID_UIDGID;
-+	errno = EINVAL;
-+	if (pid < 0 || !map || !idp || *idp == UINT_MAX)
-+		goto out;
- 
--	ret = snprintf(path, PROC_PID_PATH_MAXLEN, "/proc/%d/status", pid);
--	if (ret < 0 || ret >= PROC_PID_PATH_MAXLEN) {
--		if (!errno)
-+	ret = snprintf(map_path, map_path_size, "/proc/%d/%s", pid, map);
-+	if (ret < 0 || ret >= map_path_size) {
-+		if (ret >= map_path_size)
- 			errno = ENAMETOOLONG;
--		return -1;
-+		ret = 1;
-+		goto out;
- 	}
- 
--	fp = fopen(path, "r");
--	if (!fp) {
--		ret = -1;
-+	ret = 1;
-+	fp = fopen(map_path, "r");
-+	if (!fp)
- 		goto out;
--	}
- 
--	/* Parse /proc/pid/status fields */
--	errno = 0;
--	ret = -1;
--	while (fgets(buf, 256, fp)) {
--		unsigned long long val;
-+	/*
-+	 * The map files have the same format:
-+	 *   <NS ID start> <host ID start> <range>
-+	 *   ... (<multiple entries are supported) ...
-+	 *
-+	 * Formula and validation:
-+	 *   <final NS ID> = (*@idp - <host ID start>) + <NS ID start>
-+	 *
-+	 * - IDs: [0, UINT_MAX - 1]
-+	 * - range: [1, UINT_MAX], where range == UINT_MAX requires both ID ranges to start at 0,
-+	 *   which then means this is an init host NS mapping (and that's ok)
-+	 *
-+	 * The formula itself would be enough to "validate" a matching NS ID, but we don't want to
-+	 * keep parsing a malformed map file, no matter how unlikely/impossible it is to happen.
-+	 * Same reason values are parsed as 'unsigned long long', so we can check for bogus data.
-+	 */
-+	id = UINT_MAX;
-+	errno = ENODATA;
-+	while (fscanf(fp, "%llu %llu %llu", &ns_start, &host_start, &range) == 3) {
-+		if (ns_start >= UINT_MAX || host_start >= UINT_MAX ||
-+		    range > UINT_MAX || range == 0) {
-+			errno = EINVAL;
-+			ret = 1;
-+			break;
-+		}
- 
--		errno = ENODATA;
--		if ((!uidp || strncmp(buf, "Uid:", 4)) && (!gidp || strncmp(buf, "Gid:", 4)))
--			continue;
-+		if (range == UINT_MAX && (ns_start != 0 || host_start != 0)) {
-+			errno = EINVAL;
-+			ret = 1;
-+			break;
-+		}
- 
--		errno = 0;
-+		if (host_start + range > UINT_MAX) {
-+			errno = EINVAL;
-+			ret = 1;
-+			break;
-+		}
- 
- 		/*
--		 * Example line format (same for both Uid/Gid):
--		 * "Uid:\t%u\t%u\%u\%u"
-+		 * Check if host ID fits this line.
-+		 * Our desired NS ID may be in any line of the file.
- 		 *
--		 * Where the numbers represents:
--		 * <real> <effective> <saved> <fsuid>
-+		 * Note: new{uid,gid}map tools (that creates the map files) don't allow multiple
-+		 * maps (NS IDs) to the same host ID.
- 		 *
--		 * We're only interested in the <real> value.
-+		 * If we get a match here, we'll save it, but we continue parsing the file.
-+		 * If we happen to find a duplicate, it's possible this is a rogue file trying to
-+		 * bypass these checks.
- 		 *
--		 * (field names "Uid:"/"Gid:" parsed above, skip it)
-+		 * In such cases, discard the match and return EOPNOTSUPP, as returning a
-+		 * successful match could lead to disastrous results.
- 		 */
--		ret = sscanf(&buf[0] + 4, "%llu", &val);
--		if (ret != 1) {
--			ret = -1;
--			if (errno)
-+		if (*idp >= host_start && *idp < host_start + range) {
-+			/* This means we found a duplicate */
-+			if (!ret) {
-+				ret = 1;
-+				errno = EOPNOTSUPP;
-+				syslog(LOG_ERR, "%s has multiple mapped IDs for %u (unsupported)",
-+				       map, *idp);
- 				break;
--			continue;
--		}
--
--		ret = -1;
--		if (val >= UINT_MAX) {
--			errno = EINVAL;
--			break;
--		}
--
--		if (uidp && !strncmp(buf, "Uid:", 4))
--			*uidp = (uid_t)val;
--		else
--			*gidp = (gid_t)val;
-+			}
- 
--		if ((!uidp || *uidp != INVALID_UIDGID) && (!gidp || *gidp != INVALID_UIDGID)) {
--			errno = 0;
-+			id = (*idp - host_start) + ns_start;
- 			ret = 0;
--			break;
-+			errno = 0;
- 		}
- 	}
-+
-+	/* This means errno was reset by fscanf() without finding anything */
-+	if (ret && errno == 0)
-+		errno = ENODATA;
- out:
--	if (fp)
-+	if (fp) {
-+		int err = errno;
-+
- 		fclose(fp);
-+		/* Ignore fclose() errors */
-+		errno = err;
-+	}
- 
--	if (ret) {
--		syslog(LOG_DEBUG, "%s(pid=%d): %s", __func__, pid, strerror(errno));
--		if (uidp)
--			*uidp = INVALID_UIDGID;
-+	if (!ret) {
-+		*idp = id;
-+		errno = 0;
-+	} else {
-+		syslog(LOG_DEBUG, "%s(pid=%d, map=%s, id=%u): %s", __func__, pid, map, *idp,
-+		       strerror(errno));
-+	}
- 
--		if (gidp)
--			*gidp = INVALID_UIDGID;
-+	return ret;
-+}
-+
-+/*
-+ * map_uidgid() - Map (real) UID/GID from init host NS to user NS.
-+ * @pid: host NS PID
-+ * @uidp: (in) host UID, (out) NS UID
-+ * @gidp: (in) host GID, (out) NS GID
-+ *
-+ * Parse /proc/@pid/{uid,gid}_map files to get NS UID/GID values.
-+ * Since @pid is expected to be a host NS PID, this must be called before switching namespaces.
-+ *
-+ * Note: we can't use /proc/self here because we haven't switched NS yet, so {uid,gid}_map files
-+ * would contain host NS values.
-+ *
-+ * Return: 0 on success, 1 otherwise (errno set).
-+ */
-+static int map_uidgid(pid_t pid, uid_t *uidp, gid_t *gidp)
-+{
-+	uid_t orig_uid;
-+	gid_t orig_gid;
-+	int ret = 1;
-+
-+	errno = EINVAL;
-+	if (!uidp || !gidp)
-+		goto out;
-+
-+	orig_uid = *uidp;
-+	orig_gid = *gidp;
-+
-+	ret = map_id(pid, "uid_map", uidp);
-+	if (ret) {
-+		if (errno == ENODATA)
-+			syslog(LOG_ERR, "UID %u not mapped in this namespace (unsupported)",
-+			       orig_uid);
-+		goto out;
- 	}
- 
-+	ret = map_id(pid, "gid_map", gidp);
-+	if (ret && errno == ENODATA)
-+		syslog(LOG_ERR, "GID %u not mapped in this namespace (unsupported)",
-+		       orig_gid);
-+out:
-+	if (ret && errno != ENODATA)
-+		syslog(LOG_ERR, "%s: %s", __func__, strerror(errno));
-+	else if (!ret)
-+		syslog(LOG_DEBUG, "host %u:%u -> NS %u:%u", orig_uid, orig_gid, *uidp, *gidp);
-+
- 	return ret;
- }
- 
-@@ -1534,6 +1587,7 @@ int main(const int argc, char *const argv[])
- 	const char *oid;
- 	uid_t uid;
- 	gid_t gid;
-+	struct passwd *pw;
- 	char *keytab_name = NULL;
- 	char *env_cachename = NULL;
- 	krb5_ccache ccache = NULL;
-@@ -1680,12 +1734,52 @@ int main(const int argc, char *const argv[])
- 		goto out;
- 	}
- 
-+	/*
-+	 * 'uid' always points to a host UID, so we must get the corresponding host GID.
-+	 * It's safe to call getpwuid() here because we're still on host NS, i.e. caller
-+	 * application has no control over custom NSS modules.
-+	 *
-+	 * FIXME: if UID is from another NS, or a subuid, this will fail on mount.
-+	 */
-+	errno = 0;
-+	pw = getpwuid(uid);
-+	if (!pw) {
-+		syslog(LOG_ERR, "failed to retrieve GID from UID %u: %s", uid,
-+		       strerror(errno ?: ENOENT));
-+		rc = 1;
-+		goto out;
-+	}
-+
-+	gid = pw->pw_gid;
-+
-+	/*
-+	 * We can't reasonably do this for root. When mounting a DFS share,
-+	 * for instance we can end up with creds being overridden, but the env
-+	 * variable left intact.
-+	 *
-+	 * Always check this before NS UID mapping.
-+	 */
-+	if (uid == 0)
-+		env_probe = false;
-+
- 	/*
- 	 * Change to the process's namespace. This means that things will work
- 	 * acceptably in containers, because we'll be looking at the correct
- 	 * filesystem and have the correct network configuration.
- 	 */
- 	if (arg->upcall_target == UPTARGET_APP || arg->upcall_target == UPTARGET_UNSPECIFIED) {
-+		/*
-+		 * Map host 'uid' and 'gid' to the target user NS.
-+		 *
-+		 * Any scenario that involves unmapped UIDs or primary GIDs is not supported -- we
-+		 * don't have, and can't find, all the info that would be necessary to find a
-+		 * UID/GID within all the possible NS combinations.
-+		 */
-+		if (!in_same_user_ns(arg->pid, getpid())) {
-+			rc = map_uidgid(arg->pid, &uid, &gid);
-+			if (rc)
-+				goto out;
-+		}
- 		syslog(LOG_INFO, "upcall_target=app, switching namespaces to application thread");
- 		arg->upcall_target = UPTARGET_APP;
- 		rc = switch_to_process_ns(arg->pid);
-@@ -1700,25 +1794,6 @@ int main(const int argc, char *const argv[])
- 		syslog(LOG_INFO, "upcall_target=mount, not switching namespaces to application thread");
- 	}
- 
--	/*
--	 * We can't reasonably do this for root. When mounting a DFS share,
--	 * for instance we can end up with creds being overridden, but the env
--	 * variable left intact.
--	 */
--	if (uid == 0)
--		env_probe = false;
--
--	/*
--	 * FIXME: this only works if we haven't switched PID namespaces.
--	 * If we did, /proc/arg->pid/ might not exist, or worse, point to something else.
--	 */
--	rc = get_uidgid(arg->pid, &uid, &gid);
--	if (rc) {
--		syslog(LOG_ERR, "get_uidgid (NS): %s", strerror(errno));
--		rc = 1;
--		goto out;
--	}
--
- 	rc = setgid(gid);
- 	if (rc) {
- 		syslog(LOG_ERR, "setgid: %s", strerror(errno));
--- 
-2.54.0
+ (1) The folio_queue chain used to hold folios for buffered I/O is replaced
+     with a bvecq chain.  Each bio_vec then holds (a portion of) one folio.
+     Each bvecq holds a contiguous sequence of folios, but adjacent bvecqs
+     in a chain may be discontiguous.
+
+ (2) For unbuffered/DIO, the source iov_iter is extracted into a bvecq
+     chain.
+
+ (3) An abstract position representation ('bvecq_pos') is created that can
+     used to hold a position in a bvecq chain.  For the moment, this takes
+     a ref on the bvecq it points to, but that may be excessive.
+
+ (4) Buffer tracking is managed with three cursors:  The load_cursor, at
+     which new folios are added as we go; the dispatch_cursor, at which new
+     subrequests' buffers start when they're created; and the
+     collect_cursor, the point at which folios are being unlocked.
+
+     Not all cursors are necessarily needed in all situations and during
+     buffered writeback, we need a dispatch cursor per stream (one for the
+     network filesystem and one for the cache).
+
+ (5) ->prepare_read(), buffer setting up and ->issue_read() are merged, as
+     are the write variants, with the filesystem calling back up to
+     netfslib to prepare its buffer.  This simplifies the process of
+     setting up a subrequest.  It may even make sense to have the
+     filesystem allocate the subrequest.
+
+ (6) Retry dispatch tracking is added to netfs_io_request so that the
+     buffer preparation functions can find it.  Retry requires an
+     additional buffer cursor.
+
+ (7) Netfslib dispatches I/O by accumulating enough bufferage to dispatch
+     at least one subrequest, then looping to generate as many as the
+     filesystem wants to (they may be limited by other constraints,
+     e.g. max RDMA segment count or negotiated max size).  This loop could
+     be moved down into the filesystem.  A new method is provided by which
+     netfslib can ask the filesystem to provide an estimate of the data
+     that should be accumulated before dispatch begins.
+
+ (8) Reading from the cache is now managed by querying the cache to provide
+     a list of the next two data extents within the cache.
+
+ (9) AFS directories are switched to using a bvecq rather than a
+     folio_queue to hold their contents.
+
+(10) CIFS is switch to using a bvecq rather than a folio_queue for holding
+     a temporary encryption buffer.
+
+(11) CIFS RDMA is given the ability to extract ITER_BVECQ and support for
+     extracting ITER_FOLIOQ is removed.
+
+(12) All the folio_queue and rolling_buffer code is removed.
+
+Cachefiles is also modified:
+
+ (1) The object type in the cachefiles file xattr is now correctly set to
+     CACHEFILES_CONTENT_{SINGLE,ALL,BACKFS_MAP} rather than just being 0,
+     to indicate whether we have a single monolithic blob, all the data up
+     to cache i_size with no holes or a sparse file with the data mapped by
+     the backing file system (as currently upstream).
+
+ (2) For "ALL" type files, the cache's i_size is used to track how much
+     data is saved in the cache and no longer bears any relation to the
+     netfs i_size.  The actual object size is stored in the xattr.
+
+ (3) For most typical files which are contiguous and written progressively,
+     the object type is now set to "ALL".  For anything else, cachefiles
+     uses SEEK_DATA/HOLE to find extent outlines at before (this is the
+     current behaviour and needs to be fixed, but in a separate set of
+     patches as it's not trivial).
+
+Two further things that I'm working on (but not in this branch) are:
+
+ (1) Make it so that a filesystem can be given a copy of a subchain which
+     it can then tack header and trailer protocol elements upon to form a
+     single message (I have this working for cifs) and even join copies
+     together with intervening protocol elements to form compounds.
+
+ (2) Make it so that a filesystem can 'splice' out the contents of the TCP
+     receive queue into a bvecq chain.  This allows the socket lock to be
+     dropped much more quickly and the copying of data read to the
+     destination buffers to happen without the lock.  I have this working
+     for cifs too.  Kernel recvmsg() doesn't then block kernel sendmsg()
+     for anywhere near as long.
+
+There are also some things I want to consider for the future:
+
+ (1) Create one or more batched iteration functions to 'unlock' all the
+     folios in a bio_vec[], where 'unlock' is the appropriate action for
+     ending a read or a write.  Batching should hopefully also improve the
+     efficiency of wrangling the marks on the xarray.  Very often these
+     marks are going to be represented by contiguous bits, so there may be
+     a way to change them in bulk.
+
+ (2) Rather than walking the bvecq chain to get each individual folio out
+     via bv_page, use the file position stored on the bvecq and the sum of
+     bv_len to iterate over the appropriate range in i_pages.
+
+ (3) Change iov_iter to store the initial starting point and for
+     iov_iter_revert() to reset to that and advance.  This would (a) help
+     prevent over-reversion and (b) dispense with the need for a prev
+     pointer.
+
+ (4) Use bvecq to replace scatterlist.  One problem with replacing
+     scatterlist is that crypto drivers like to glue bits on the front of
+     the scatterlists they're given (something trivial with that API) - and
+     this is one way to achieve it.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next
+
+Thanks,
+David
+
+Changes
+=======
+ver #5)
+- Rebase on v7.2-rc2 as that has a bunch of outstanding netfs and afs
+  bugfixes included.
+
+ver #4)
+- Fixed a number of bugs reported by Sashiko[3].
+  - Added a patch to fix an underflow in iov_iter_extract_xarray_pages().
+  - Added a patch to fix alloc failure in iov_iter_extract_bvec_pages().
+  - Added a patch to remove an unused var in kunit code.
+  - Added a patch to fix the folio offset in extract_xarray_to_sg().
+  - Added a patch to fix the exclusion over writeback to make it cover
+    collection too.
+  - Fixed double fput() in cachefiles.
+  - Fixed the collection of cache writes to handle cancellation better.
+  - Fixed iterate_bvecq() to skip bvecq structs with nr_slots==0.
+  - Add a comment into iterate_bvecq() that a slot with bv_len>0 must have a
+    valid bv_page.
+  - Fixed iov_iter_bvecq_advance(), iov_iter_bvecq_revert(),
+    iter_count_bvecq_pages(), iov_iter_extract_bvecq_pages() and
+    extract_bvecq_to_sg() to correctly handle empty bvecqs.
+  - Fixed extract_bvecq_to_sg() to be limited by iter->count.
+  - Fixed bvecq_expand_buffer() to take an unsigned size param.
+  - Fixed bvecq_expand_buffer() to not mix memory types in alloc'd bvecqs.
+  - Fixed bvecq_shorten_buffer() occasional retention of zero-length slots.
+  - Fixed slot validity check polarity in bvecq_pos_advance(); also don't use
+    inner loop otherwise break then exits the wrong loop.
+  - Fixed bvecq_zero(), bvecq_slice() and bvecq_extract to use a barrier when
+    checking bq->nr_slots.
+  - Restructured bvecq_zero() to be similar to bvecq_pos_advance().
+  - Fixed an off-by-one error in bvecq_pos_step() and added a missing slot
+    reset.
+  - Fixed a break in netfs_extract_iter() that should have been a goto.
+  - Fixed netfs_extract_iter() to limit number of pages extracted to remnant
+    of max_pages.
+  - Fixed an uninit var in afs_do_read_symlink().
+  - Fixed netfs_read_gaps() to fill a multipart bvecq chain correctly.
+  - Fixed netfs_dispatch_unbuffered_reads() to initialise collect_cursor as
+    netfs_rreq_assess_dio() uses it to flush the data read.
+  - Fixed netfs_extract_iter() to init the slot counter outside the extract
+    loop to avoid overwriting already loaded slots.
+  - Fixed callers of bvecq_delete_spent() to update bvecq_pos::slot before
+    calling.
+  - Fixed netfs_reissue_write() to make sure subreq->content is unset before
+    setting.
+  - Altered netfs_extract_iter() to free any allocated bvecq chain if no pages
+    were extracted and an error occurred  (and to initialise the return
+    pointer to NULL).  Also, made it return an empty bvecq if nothing was
+    extracted, but no error occurred.
+  - Fixed ceph_netfs_issue_read() to just return if
+    ceph_netfs_issue_op_inline() returns anything other than 1 to avoid a
+    double termination.
+  - Fixed ceph_netfs_issue_read() to do the size calculation in the right
+    order to avoid the op expanding to larger than the buffer.
+  - Fixed netfs_issue_read(), in the NETFS_FILL_WITH_ZEROES case, to deduct
+    subreq->len from stream->buffered rather than just setting it to 0.
+  - Fixed netfs_perform_write() to put the folio if netfs_advance_writethrough()
+    fails.
+  - Restored the old ->prepare_write op specifically for
+    fscache_write_to_cache() which is still used by Ceph.
+  - Fixed undefined return in netfs_pgpriv2_issue_stream().
+  - Fixed netfs_collect_write_results() to try to make sure a request isn't
+    left paused if there are no further server-bound subreqs.
+  - Fixed netfs_queue_wb_folio() to redirty the folio before unlocking it if
+    it can't allocate a bvecq.
+  - Fixed netfs_writepages() to cancel the pagecache iteration after ENOMEM.
+  - Fixed netfs_advance/end_writethrough() to advance the dispatch cursor.
+  - Fixed netfs_retry_read_subrequests() to use barriers when walking
+    stream->subrequests as the app may add another subreq before pausing.
+  - Fixed netfs_prepare_write_retry_buffer() to use ->retry_start and
+    ->retry_buffered rather than ->issue_from and ->buffered.
+  - Fixed netfs_retry_write_stream() to use barriers when walking
+    stream->subrequests as the app may add another subreq before pausing.
+  - Fixed netfs_retry_write_stream() to check the correct length when adding
+    additional subreqs.
+  - Fixed nfs_netfs_issue_read() to set -ENOMEM, not 0, on alloc failure.
+  - Fixed nfs_netfs_issue_read() to only terminate the subreq once.
+  - Fixed cifs_issue_read() to release the credits if cifs_reopen_file()
+    fails.
+- Rebased on v7.1.
+
+ver #3)
+- Rebased to -rc7 as the patches wouldn't apply for Christian.
+- Prepended a fix for a warning from generic/464 (the problem also exists
+  upstream, just not the warning).
+- Renamed kmap_local_bvec() to bvec_kmap_partial() as requested by
+  Christoph.
+- Adjusted smbdirect patch descriptions as requested by Stefan Metzmacher.
+
+ver #2)
+- Fixed a number of bugs reported by Sashiko[1].
+- Split a bunch of fixes out and posted them separately[2].
+
+[1] https://sashiko.dev/#/patchset/20260326104544.509518-1-dhowells%40redhat.com
+[2] https://lore.kernel.org/linux-fsdevel/20260512-infozentrum-becher-7f86c47c96c8@brauner/T/#t
+[3] https://sashiko.dev/#/patchset/20260608145432.681865-1-dhowells%40redhat.com
+
+David Howells (21):
+  mm: Make readahead store folio count in readahead_control
+  netfs: Bulk load the readahead-provided folios up front
+  Add a function to kmap one page of a multipage bio_vec
+  iov_iter: Make iov_iter_get_pages*() wrap iov_iter_extract_pages()
+  iov_iter: Add a segmented queue of bio_vec[]
+  netfs: Add some tools for managing bvecq chains
+  netfs: Add a function to extract from an iter into a bvecq
+  afs: Use a bvecq to hold dir content rather than folioq
+  cifs: Use a bvecq for buffering instead of a folioq
+  smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
+  cachefiles: Don't rely on backing fs storage map for most use cases
+  netfs: Add the cache object ID to netfs_read/write tracepoints
+  netfs: Switch to using bvecq rather than folio_queue and
+    rolling_buffer
+  smbdirect: Remove support for ITER_FOLIOQ from
+    smbdirect_map_sges_from_iter()
+  netfs: Remove netfs_alloc/free_folioq_buffer()
+  netfs: Remove netfs_extract_user_iter()
+  iov_iter: Remove ITER_FOLIOQ
+  netfs: Remove folio_queue and rolling_buffer
+  netfs: Check for too much data being read
+  netfs: Limit the minimum trigger for progress reporting
+  netfs: Combine prepare and issue ops and grab the buffers on request
+
+ Documentation/core-api/folio_queue.rst      |  209 ----
+ Documentation/core-api/index.rst            |    1 -
+ Documentation/filesystems/netfs_library.rst |    2 +-
+ fs/9p/vfs_addr.c                            |   59 +-
+ fs/afs/dir.c                                |   40 +-
+ fs/afs/dir_edit.c                           |   43 +-
+ fs/afs/dir_search.c                         |   33 +-
+ fs/afs/file.c                               |   28 +-
+ fs/afs/fsclient.c                           |    8 +-
+ fs/afs/inode.c                              |    2 +-
+ fs/afs/internal.h                           |   12 +-
+ fs/afs/symlink.c                            |   35 +-
+ fs/afs/write.c                              |   32 +-
+ fs/afs/yfsclient.c                          |    6 +-
+ fs/cachefiles/interface.c                   |   82 +-
+ fs/cachefiles/internal.h                    |   13 +-
+ fs/cachefiles/io.c                          |  523 +++++++---
+ fs/cachefiles/namei.c                       |   19 +-
+ fs/cachefiles/xattr.c                       |   24 +-
+ fs/ceph/Kconfig                             |    1 +
+ fs/ceph/addr.c                              |  125 ++-
+ fs/netfs/Kconfig                            |    3 +
+ fs/netfs/Makefile                           |    4 +-
+ fs/netfs/buffered_read.c                    |  514 +++++----
+ fs/netfs/buffered_write.c                   |   31 +-
+ fs/netfs/bvecq.c                            |  763 ++++++++++++++
+ fs/netfs/direct_read.c                      |  108 +-
+ fs/netfs/direct_write.c                     |  157 +--
+ fs/netfs/fscache_io.c                       |    4 +-
+ fs/netfs/internal.h                         |  112 +-
+ fs/netfs/iterator.c                         |  391 +++----
+ fs/netfs/misc.c                             |  168 +--
+ fs/netfs/objects.c                          |   22 +-
+ fs/netfs/read_collect.c                     |  160 +--
+ fs/netfs/read_pgpriv2.c                     |  187 ++--
+ fs/netfs/read_retry.c                       |  246 +++--
+ fs/netfs/read_single.c                      |  169 +--
+ fs/netfs/rolling_buffer.c                   |  222 ----
+ fs/netfs/stats.c                            |    6 +-
+ fs/netfs/write_collect.c                    |  240 +++--
+ fs/netfs/write_issue.c                      | 1042 +++++++++++--------
+ fs/netfs/write_retry.c                      |  150 +--
+ fs/nfs/Kconfig                              |    1 +
+ fs/nfs/fscache.c                            |   17 +-
+ fs/smb/client/cifsglob.h                    |    2 +-
+ fs/smb/client/cifssmb.c                     |   13 +-
+ fs/smb/client/file.c                        |  139 +--
+ fs/smb/client/smb2ops.c                     |   82 +-
+ fs/smb/client/smb2pdu.c                     |   28 +-
+ fs/smb/client/transport.c                   |   15 +-
+ fs/smb/smbdirect/connection.c               |  134 ++-
+ include/linux/bvec.h                        |   18 +
+ include/linux/bvecq.h                       |  326 ++++++
+ include/linux/folio_queue.h                 |  282 -----
+ include/linux/fscache.h                     |   17 +
+ include/linux/iov_iter.h                    |   87 +-
+ include/linux/netfs.h                       |  165 +--
+ include/linux/pagemap.h                     |   10 +
+ include/linux/rolling_buffer.h              |   61 --
+ include/linux/uio.h                         |   17 +-
+ include/trace/events/cachefiles.h           |   17 +-
+ include/trace/events/netfs.h                |  155 ++-
+ kernel/bpf/btf.c                            |    2 -
+ lib/iov_iter.c                              |  547 +++++-----
+ lib/scatterlist.c                           |   82 +-
+ lib/tests/kunit_iov_iter.c                  |  135 ++-
+ mm/readahead.c                              |    5 +
+ net/9p/client.c                             |    8 +-
+ 68 files changed, 4764 insertions(+), 3597 deletions(-)
+ delete mode 100644 Documentation/core-api/folio_queue.rst
+ create mode 100644 fs/netfs/bvecq.c
+ delete mode 100644 fs/netfs/rolling_buffer.c
+ create mode 100644 include/linux/bvecq.h
+ delete mode 100644 include/linux/folio_queue.h
+ delete mode 100644 include/linux/rolling_buffer.h
 
