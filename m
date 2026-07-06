@@ -1,249 +1,210 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06721C5D72
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 05:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE5C348866;
+	Mon,  6 Jul 2026 08:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783315046; cv=none; b=heiWsxndHBM8fWo89+N5D2ZiPx19HpwVk9V4V4rSpKJVNlXLG4/5Be6Tq4y1jWbxq+ei1uUK/A92ZBJd9WmTXOpdV4Lk84l2SSPnlCXPLbl9FwthlvM7hsKSw1SrtORC2iLoCcwaRxkwz9yuQDqcHm2pYT1KpGCMfQILD9f74pc=
+	t=1783327810; cv=none; b=PmPhE/I0H5XFU+WUY/4i1VzEnYMlSmG/LkNh5KPPWpqoKM7CLcoTCny+wQYECzsErKF5cjurP6WS21bqpbh5HQG8euMQvUUsvsNnbtt2evm7w4SE157SLqvptQm4uARF8bQ61vxqRC+5W4gcVRW2r9Z+RP1A2aViaBmI9+MUok4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783315046; c=relaxed/simple;
-	bh=IpMvQj3GdAP3jhcixMH+DUUGbWifdZqJbRocb4SlQMg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YkJiaaeLsLp1GTBevXKxR71DbWzzTO+/mq3ChzMcLvtsfe2umJPoIRkHcnRPsXJg8nNf6XrUaClt384va1Yg13VBe+GPYqtmX8VVcpYMD79Re1TSpAnvYCKs8axNnf3pAAvfeRra+4Q7Aww9+PIL4Vggii11S09xXcQA+vhxf/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=agjm+F4u; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1783327810; c=relaxed/simple;
+	bh=0x7pTVBQM/oo8cB6MYqUQ77YVRX8Kqn9XyTS7jKO4kI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NLuR3d3sq0017UEfGqb5GZxyTeETEIS7YGNmz1meaeCoE+XhreVYnDtvMrFGNX+4+7KEbbzNOvP3VA85jURtDSV3WBXe5ZzlFq9dRypBMlJQu7GD+iv38UL36mG5SBOQe5SVqhPtv4LKDdxl0F6XxB9qhzquTS4MEfnyFSfGqqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQADDgAf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="agjm+F4u"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=IpMvQj3GdAP3jhcixMH+DUUGbWifdZqJbRocb4SlQMg=; b=agjm+F4ux74oRwIYyDW8w4W73U
-	4Cki8RKkWHs9poxkhOB7Xzv7/Pg0bVnWAVfnw36JOXDjBCR4Sqrfb/pTJsNtBnR3AVR/fZSb7ciKv
-	oISi07Su7jqGFiZdAKBuC3+VxTG0/zWlecxPzK5pLwDW1yNL8y4fUAxrB4bp4KkcDbLHemBehOxTQ
-	0rQ8GwOe0ObiMuXnUPZdHpw0DNiZQZ6CrIAbw89lYn5dmnGg6bUVvVtny/RH8qzqNZpsBVW1S5eLg
-	6yNV1NEYkPjAnYsNw6V/JFIYzpG6fIF0ddejcmCNNfO+yPzyrT2E48nrGjkGOaIWkYWk5Mjnxre2V
-	aKEJyTqWl8HwF+mPZ5hdL0BdqU16jIxgktILghOVp/C9/ycHN9O+DL9vCqUACByS9YGRwx5AVaDee
-	96I9GwZ+loR/kFWtErltB6GYpFDfWPbSzS/g4/gweSP9i4dEji4X+mu+Mj4JXVa4UA7Vb8Jw4nc8w
-	NAc/ihrl5ryZVNmBLg3gAlW2;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wgbhl-00000002Rcq-0IGd;
-	Mon, 06 Jul 2026 05:17:17 +0000
-Message-ID: <bf8b5737-723e-438c-8937-ecb2bc892b9c@samba.org>
-Date: Mon, 6 Jul 2026 07:17:16 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQADDgAf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 978CA1F000E9;
+	Mon,  6 Jul 2026 08:49:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783327795;
+	bh=9jiSSkCBnbVD7ihxmuDYCTOJSaEPHEl7wjng44WMYRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=HQADDgAfKOb+QRTcxlAPYJxUo81CV+X2k0sH4dqu4MXUhUvI8d0gKIn3fSYrA1PX/
+	 tkL8EscUhizGPIAmstyC+IcGi0Bpq2pmvmlHX04vH8BLW7siC04DcmJ3HXxv8hq27U
+	 Cm3VdQdVL+4wwVwhFK7HQmPqA48e10qpeEhHd7fFACoRgnafr1d4FUho7fCK2UTrgb
+	 YogOm5FOfD941STn0/3UYZu0szCwziMiufd32dSLEBhvVT9dg6Be1JIoRbfI00bgNA
+	 1oij26/UKxOAPFBnCcX21MUoXrF/X4CgR3ssY2W31wgMyjX/YgrYc2fFtMVYhbR2Xe
+	 VpXfNmIUilBiw==
+Date: Mon, 6 Jul 2026 11:49:50 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, mkalderon@marvell.com,
+	zyjzyj2000@gmail.com, sagi@grimberg.me, mgurtovoy@nvidia.com,
+	haris.iqbal@ionos.com, jinpu.wang@ionos.com, bvanassche@acm.org,
+	kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
+	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
+	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
+	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
+	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, kees@kernel.org,
+	andriy.shevchenko@linux.intel.com, clm@meta.com,
+	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH rdma-next v9] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <20260706084950.GK15188@unreal>
+References: <20260703060329.896125-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] smb: client: preserve leading slash for POSIX absolute
- symlink targets
-To: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
-Cc: Steve French <stfrench@microsoft.com>
-References: <20260705211757.60659-1-stfrench@microsoft.com>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <20260705211757.60659-1-stfrench@microsoft.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------UEITvlHnEVUW0ixpbnaK3Yu0"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260703060329.896125-1-ernis@linux.microsoft.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------UEITvlHnEVUW0ixpbnaK3Yu0
-Content-Type: multipart/mixed; boundary="------------ajSoIV0iAOr00cTGRNNS5ij0";
- protected-headers="v1"; hp="clear"
-Message-ID: <bf8b5737-723e-438c-8937-ecb2bc892b9c@samba.org>
-Date: Mon, 6 Jul 2026 07:17:16 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] smb: client: preserve leading slash for POSIX absolute
- symlink targets
-To: Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org
-Cc: Steve French <stfrench@microsoft.com>
-References: <20260705211757.60659-1-stfrench@microsoft.com>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <20260705211757.60659-1-stfrench@microsoft.com>
+On Thu, Jul 02, 2026 at 11:02:57PM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
+> 
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Acked-by: Stefan Metzmacher <metze@samba.org> # smbdirect
+> ---
+> Changes in v9:
+> * Switch the srq_size module parameter accessors to param_get_uint and
+>   kstrtouint()/param_set_uint() so they match the now-unsigned
+>   nvmet_rdma_srq_size variable.
+> Changes in v8:
+> * Convert the remaining non-negative counter fields max_ee_rd_atom,
+>   max_ee_init_rd_atom, max_ee, max_rdd, max_raw_ipv6_qp and max_srq_wr
+>   to u32; keep max_srq as int (its consumer compares it against
+>   ib_device.num_comp_vectors, still int).
+> * Drop all remaining min_t() where plain min() now works.
+> * Make the srq_size module parameters unsigned int so the srq_size min()
+>   stays a plain min().
+> * Replace the ternary-inside-min() with the simpler "if (x) x--;".
+> * Reorder the send_queue_depth min() to min(value, CONST) to match the
+>   sibling site.
+> * Restore reverse xmas-tree declaration order.
+> * Collapse the min()/min3() assignments that now fit onto a single line
+>   within 100 columns.
+> * Print the now-u32 fields with %u instead of %d.
+> Changes in v7:
+> * Drop min_t() in all sites where a plain min() (or min3()) works
+>   cleanly
+> * Guard nvme/host/rdma.c num_inline_segments computation against a
+>   device reporting max_send_sge == 0, so the u32 subtract
+>   cannot wrap to UINT_MAX.
+> * Use %u when printing the newly-u32 capability fields
+>   in diagnostic messages.
+> Changes in v6:
+> * Fix subject prefix: net-next -> rdma-next.
+> Changes in v5:
+> * Add U8_MAX clamps in iser_verbs, nvme/host, nvme/target, isert,
+> * rds/ib_cm, smbdirect/connect and smbdirect/accept where u32 capability
+>   fields were directly narrowed into u8 rdma_conn_param fields without
+>   clamping.
+> * Guard the inline_sge_count calculation in nvmet_rdma_find_get_device()
+>   to prevent u32 underflow when both max_sge_rd and max_recv_sge are
+> zero.
+> * Expand type migration to 9 additional fields (max_mw, max_raw_ethy_qp,
+>   max_mcast_grp, max_mcast_qp_attach, max_total_mcast_qp_attach, max_ah,
+>   max_srq, max_srq_wr, max_srq_sge)
+> * Fix min_t(int,...) in svc_rdma_transport; min_t(u32,...) in ipoib,
+>   srpt, nvme/target, rds/ib, rtrs-clt, rtrs-srv, xprtrdma/verbsdd.
+> * Fix frwr_ops.c u32 underflow guard (reorder check before subtraction)
+> * Change sc_max_send_sges to unsigned int, inline_sge_count to u32
+> * Fix %d -> %u in rxe_qp, rxe_srq, ipoib_cm, ib_isert,
+> * svc_rdma_transport
+> * Update commit message.
+> Changes in v4:
+> * Drop clamping the values in mana_ib_query_device, instead update
+>   the props values from int to u32.
+> Changes in v3:
+> * Drop clamping from mana_ib_gd_query_adapter_caps(). The internal u32
+>   caps cache does not need to be clamped.
+> * Move all clamping exclusively to mana_ib_query_device(), which is the
+>   only place the cached u32 values are narrowed into the signed int
+>   fields of struct ib_device_attr.
+> * Reframe commit message: this is a u32-to-int type boundary fix, not a
+>   CVM/untrusted-hardware hardening patch.
+> Changes in v2:
+> * Update patch title.
+> ---
+>  drivers/infiniband/core/cq.c               |  3 +-
+>  drivers/infiniband/hw/qedr/verbs.c         |  2 +-
+>  drivers/infiniband/sw/rxe/rxe_qp.c         | 22 +++++-----
+>  drivers/infiniband/sw/rxe/rxe_srq.c        | 16 +++----
+>  drivers/infiniband/ulp/ipoib/ipoib_cm.c    | 10 ++---
+>  drivers/infiniband/ulp/ipoib/ipoib_verbs.c |  3 +-
+>  drivers/infiniband/ulp/iser/iser_verbs.c   |  5 +--
+>  drivers/infiniband/ulp/isert/ib_isert.c    |  7 ++-
+>  drivers/infiniband/ulp/rtrs/rtrs-clt.c     | 11 ++---
+>  drivers/infiniband/ulp/rtrs/rtrs-srv.c     | 11 ++---
+>  drivers/infiniband/ulp/srp/ib_srp.c        |  2 +-
+>  drivers/infiniband/ulp/srpt/ib_srpt.c      | 21 +++++----
+>  drivers/nvme/host/rdma.c                   |  8 ++--
+>  drivers/nvme/target/rdma.c                 | 22 ++++++----
+>  fs/smb/smbdirect/accept.c                  |  5 ++-
+>  fs/smb/smbdirect/connect.c                 |  5 ++-
+>  fs/smb/smbdirect/connection.c              |  8 ++--
+>  include/linux/sunrpc/svc_rdma.h            |  4 +-
+>  include/rdma/ib_verbs.h                    | 50 +++++++++++-----------
+>  net/rds/ib.c                               | 10 ++---
+>  net/rds/ib_cm.c                            | 10 ++---
+>  net/sunrpc/xprtrdma/frwr_ops.c             |  7 +--
+>  net/sunrpc/xprtrdma/svc_rdma_transport.c   |  5 +--
+>  net/sunrpc/xprtrdma/verbs.c                |  2 +-
+>  24 files changed, 122 insertions(+), 127 deletions(-)
 
---------------ajSoIV0iAOr00cTGRNNS5ij0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+The following code is still missing. Also, what about mxa_srq?
+Why wasn't it converted as well?
 
-YWNrZWQNCg0KT24gNy81LzI2IDExOjE3IFBNLCBTdGV2ZSBGcmVuY2ggd3JvdGU6DQo+IFdo
-ZW4gY3JlYXRpbmcgYSBuYXRpdmUgU01CIHN5bWJvbGljIGxpbmsgKENJRlNfU1lNTElOS19U
-WVBFX05BVElWRSkgd2hvc2UNCj4gdGFyZ2V0IGlzIGFuIGFic29sdXRlIHBhdGggb24gYSBt
-b3VudCB0aGF0IHVzZXMgUE9TSVggcGF0aHMsIHRoZSBsZWFkaW5nDQo+IHBhdGggc2VwYXJh
-dG9yIHdhcyBzaWxlbnRseSBkcm9wcGVkIGZyb20gdGhlIHN0b3JlZCBzeW1saW5rIHRhcmdl
-dC4NCj4gDQo+IGNyZWF0ZV9uYXRpdmVfc3ltbGluaygpIGNvbnZlcnRlZCB0aGUgdGFyZ2V0
-IHRvIFVURi0xNiB3aXRoDQo+IGNpZnNfY29udmVydF9wYXRoX3RvX3V0ZjE2KCkuICBUaGF0
-IGhlbHBlciBpcyBpbnRlbmRlZCBmb3Igc2hhcmUtcmVsYXRpdmUNCj4gU01CIHBhdGhzIGFu
-ZCB0aGVyZWZvcmUgdW5jb25kaXRpb25hbGx5IHN0cmlwcyBhIGxlYWRpbmcgcGF0aCBzZXBh
-cmF0b3IuDQo+IEZvciBhbiBhYnNvbHV0ZSBQT1NJWCBzeW1saW5rIHRhcmdldCB0aGUgbGVh
-ZGluZyAnLycgaXMgc2lnbmlmaWNhbnQsIHNvIGENCj4gdGFyZ2V0IG9mICIvZm9vL2JhciIg
-d2FzIHN0b3JlZCAtIGFuZCByZWFkIGJhY2sgLSBhcyAiZm9vL2JhciIsIGV2ZW4NCj4gdGhv
-dWdoIHRoZSByZXBhcnNlIHBvaW50IHdhcyBzdGlsbCBmbGFnZ2VkIGFzIGFic29sdXRlDQo+
-IChTWU1MSU5LX0ZMQUdfUkVMQVRJVkUgY2xlYXJlZCkuDQo+IA0KPiBPbiBhIFBPU0lYIHBh
-dGhzIG1vdW50IHRoZSBzeW1saW5rIHRhcmdldCBpcyBzdG9yZWQgdmVyYmF0aW0sIHNvIGNv
-bnZlcnQNCj4gaXQgZGlyZWN0bHkgd2l0aCBjaWZzX3N0cm5kdXBfdG9fdXRmMTYoKSBpbnN0
-ZWFkLiAgVGhpcyBwcmVzZXJ2ZXMgdGhlDQo+IGxlYWRpbmcgc2VwYXJhdG9yLCBhdm9pZHMg
-dGhlIGxlYWRpbmctYmFja3NsYXNoIHN0cmlwcGluZyB0aGF0DQo+IGNpZnNfY29udmVydF9w
-YXRoX3RvX3V0ZjE2KCkgYWxzbyBwZXJmb3JtcyAoYSBiYWNrc2xhc2ggaXMgYSB2YWxpZCBQ
-T1NJWA0KPiBmaWxlbmFtZSBjaGFyYWN0ZXIpLCBhbmQgdXNlcyBOT19NQVBfVU5JX1JTVkQg
-dG8gbWF0Y2ggdGhlIHJlYWRiYWNrIHBhdGgNCj4gaW4gc21iMl9wYXJzZV9uYXRpdmVfc3lt
-bGluaygpLCB3aGljaCBhbHdheXMgY29udmVydHMgdGhlIHRhcmdldCB3aXRoDQo+IGNpZnNf
-c3RybmR1cF9mcm9tX3V0ZjE2KCkgLyBOT19NQVBfVU5JX1JTVkQuICBUaGlzIG1pcnJvcnMg
-aG93IHRoZSBORlMgYW5kDQo+IFdTTCByZXBhcnNlIHN5bWxpbmsgY3JlYXRvcnMgY29udmVy
-dCB0aGVpciB0YXJnZXRzLg0KPiANCj4gVGhlIE5ULXN0eWxlIGFic29sdXRlIHN5bWxpbmsg
-aGFuZGxpbmcsIHdoaWNoIG5lZWRzIHRoZSAiXD8/XCIgcHJlZml4IGFuZA0KPiBkcml2ZS1s
-ZXR0ZXIgY29sb24gcHJlc2VydmVkLCBjb250aW51ZXMgdG8gdXNlIGNpZnNfY29udmVydF9w
-YXRoX3RvX3V0ZjE2KCkNCj4gdG9nZXRoZXIgd2l0aCB0aGUgZXhpc3RpbmcgbWFza2luZyBv
-ZiB0aG9zZSBieXRlcy4NCj4gDQo+IEZpeGVzOiAxMmI0NjZlYjUyZDkgKCJjaWZzOiBGaXgg
-Y3JlYXRpbmcgYW5kIHJlc29sdmluZyBhYnNvbHV0ZSBOVC1zdHlsZSBzeW1saW5rcyIpDQo+
-IFNpZ25lZC1vZmYtYnk6IFN0ZXZlIEZyZW5jaCA8c3RmcmVuY2hAbWljcm9zb2Z0LmNvbT4N
-Cj4gLS0tDQo+ICAgZnMvc21iL2NsaWVudC9yZXBhcnNlLmMgfCAxNyArKysrKysrKysrKysr
-KysrLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9u
-KC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZnMvc21iL2NsaWVudC9yZXBhcnNlLmMgYi9mcy9z
-bWIvY2xpZW50L3JlcGFyc2UuYw0KPiBpbmRleCBjZDFlMWVhZWU2N2EuLjVjYzViMDQxMGQ0
-OCAxMDA2NDQNCj4gLS0tIGEvZnMvc21iL2NsaWVudC9yZXBhcnNlLmMNCj4gKysrIGIvZnMv
-c21iL2NsaWVudC9yZXBhcnNlLmMNCj4gQEAgLTY3LDYgKzY3LDcgQEAgc3RhdGljIGludCBj
-cmVhdGVfbmF0aXZlX3N5bWxpbmsoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGlu
-b2RlICppbm9kZSwNCj4gICAJY2hhciAqc3ltID0gTlVMTDsNCj4gICAJc3RydWN0IGt2ZWMg
-aW92Ow0KPiAgIAlib29sIGRpcmVjdG9yeTsNCj4gKwlpbnQgcGF0aF9sZW47DQo+ICAgCWlu
-dCByYyA9IDA7DQo+ICAgDQo+ICAgCWlmIChzdHJsZW4oc3ltbmFtZSkgPiBSRVBBUlNFX1NZ
-TV9QQVRIX01BWCkNCj4gQEAgLTE2OCw3ICsxNjksMjEgQEAgc3RhdGljIGludCBjcmVhdGVf
-bmF0aXZlX3N5bWxpbmsoY29uc3QgdW5zaWduZWQgaW50IHhpZCwgc3RydWN0IGlub2RlICpp
-bm9kZSwNCj4gICAJaWYgKCEoc2JmbGFncyAmIENJRlNfTU9VTlRfUE9TSVhfUEFUSFMpICYm
-IHN5bW5hbWVbMF0gPT0gJy8nKQ0KPiAgIAkJc3ltWzBdID0gc3ltWzFdID0gc3ltWzJdID0g
-c3ltWzVdID0gJ18nOw0KPiAgIA0KPiAtCXBhdGggPSBjaWZzX2NvbnZlcnRfcGF0aF90b191
-dGYxNihzeW0sIGNpZnNfc2IpOw0KPiArCS8qDQo+ICsJICogT24gYSBQT1NJWCBwYXRocyBt
-b3VudCB0aGUgc3ltbGluayB0YXJnZXQgaXMgc3RvcmVkIHZlcmJhdGltLCBzbw0KPiArCSAq
-IGNvbnZlcnQgaXQgd2l0aCBjaWZzX3N0cm5kdXBfdG9fdXRmMTYoKS4gIGNpZnNfY29udmVy
-dF9wYXRoX3RvX3V0ZjE2KCkNCj4gKwkgKiBtdXN0IG5vdCBiZSB1c2VkIGhlcmU6IGl0IHN0
-cmlwcyBhIGxlYWRpbmcgcGF0aCBzZXBhcmF0b3IgKGl0IGlzDQo+ICsJICogbWVhbnQgZm9y
-IHNoYXJlLXJlbGF0aXZlIFNNQiBwYXRocyksIHdoaWNoIHdvdWxkIGNvcnJ1cHQgYW4gYWJz
-b2x1dGUNCj4gKwkgKiBQT1NJWCBzeW1saW5rIHRhcmdldCBzdWNoIGFzICIvZm9vL2JhciIu
-ICBVc2luZyBOT19NQVBfVU5JX1JTVkQgYWxzbw0KPiArCSAqIG1hdGNoZXMgdGhlIHJlYWRi
-YWNrIHBhdGggaW4gc21iMl9wYXJzZV9uYXRpdmVfc3ltbGluaygpLg0KPiArCSAqLw0KPiAr
-CWlmIChzYmZsYWdzICYgQ0lGU19NT1VOVF9QT1NJWF9QQVRIUykNCj4gKwkJcGF0aCA9IGNp
-ZnNfc3RybmR1cF90b191dGYxNihzeW0sIHN0cmxlbihzeW0pLCAmcGF0aF9sZW4sDQo+ICsJ
-CQkJCSAgICAgY2lmc19zYi0+bG9jYWxfbmxzLA0KPiArCQkJCQkgICAgIE5PX01BUF9VTklf
-UlNWRCk7DQo+ICsJZWxzZQ0KPiArCQlwYXRoID0gY2lmc19jb252ZXJ0X3BhdGhfdG9fdXRm
-MTYoc3ltLCBjaWZzX3NiKTsNCj4gKw0KPiAgIAlpZiAoIXBhdGgpIHsNCj4gICAJCXJjID0g
-LUVOT01FTTsNCj4gICAJCWdvdG8gb3V0Ow0KDQo=
+diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
+index f599c24b34e8..aae4f3f6bcba 100644
+--- a/drivers/infiniband/core/nldev.c
++++ b/drivers/infiniband/core/nldev.c
+@@ -454,7 +454,8 @@ static int fill_res_info(struct sk_buff *msg, struct ib_device *device,
+        };
 
---------------ajSoIV0iAOr00cTGRNNS5ij0--
+        struct nlattr *table_attr;
+-       int ret, i, curr, max;
++       u64 curr, max;
++       int ret, i;
 
---------------UEITvlHnEVUW0ixpbnaK3Yu0
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+        if (fill_nldev_handle(msg, device))
+                return -EMSGSIZE;
+diff --git a/drivers/infiniband/core/restrack.c b/drivers/infiniband/core/restrack.c
+index cfee2071586c..1b2f9df49e28 100644
+--- a/drivers/infiniband/core/restrack.c
++++ b/drivers/infiniband/core/restrack.c
+@@ -61,7 +61,7 @@ void rdma_restrack_clean(struct ib_device *dev)
+  * @type: actual type of object to operate
+  * @show_details: count driver specific objects
+  */
+-int rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
++u32 rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
+                        bool show_details)
+ {
+        struct rdma_restrack_root *rt = &dev->res[type];
+diff --git a/include/rdma/restrack.h b/include/rdma/restrack.h
+index 451f99e3717d..c081384740ce 100644
+--- a/include/rdma/restrack.h
++++ b/include/rdma/restrack.h
+@@ -123,7 +123,7 @@ struct rdma_restrack_entry {
+        u32 id;
+ };
 
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmpLOlwFAwAAAAAACgkQqh6bcSY5nkZH
-aA//QcuR9EfUxuuL+BoO/SsCVYM49mJFGsNVELT5UmrbY+5Td7MFbIJ5qys7cbK8GPMc2e/rG3EH
-tdTbjQsTpGNIq83RQQ8isi/tlMBbREzOCC9ASD6fqpw0DAz/5kGkY9jvZJFzkWaL3UNAJ2BQ8HBg
-/G/smHzaSVmnGQqQNEBnIeCEISZW+OFH93BrxxF9pZBHGMzW2RcQXuAZCDigLWXtPAp3f5jeC8EI
-q2QZVy8VuEsy5I53IM6dIn8HuwXk7oOtEwURzNoLkpMI0sSNcUCYAa6UcPl0b+IInAOOaWh2iPj2
-8qPN0u6GEnVM21eX6HBBMGm1DBAOkG+ppn6Dgp6PTmcNwpYHsc29IqwBRsiuPb96HOGpcBJzLuWY
-6HPMZEDsYPz0v6gdkMhiO7iBdWwip5DN0Rs9/1HqxEECroUXUNuqfG/9RHH8V4CA/gDmasHAeBIl
-ISzUY/hlgpZ28hGXqVgKwGjUsY25EMgGojBBCJQMdEpKPs4+QzNnxUFmt0m4WLoiQdAZcNcP9AW7
-IqQOiUlcjmUN2AtTaLKtW4jrHymJMoqTF1bVL2r1BeKnK0I8gFNL77qW8IXtfbdFgI883+79IdiK
-nEiviZjI5ERM8tsnGcMlPv4x6y2SYEfHhQFwrWZdbOmUCkaeL6Ox76Frdf9SaxCZMW0jSYE61jRT
-1kc=
-=ZVrV
------END PGP SIGNATURE-----
-
---------------UEITvlHnEVUW0ixpbnaK3Yu0--
+-int rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
++u32 rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
+                        bool show_details);
+ /**
+  * rdma_is_kernel_res() - check the owner of resource
