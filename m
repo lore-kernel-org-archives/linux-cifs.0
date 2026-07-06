@@ -1,76 +1,80 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0F93E0C4C
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 15:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE4938238A
+	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 15:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783351742; cv=none; b=fUTfJZIz3g7sK7CMpkac9NdRGWXTvUgpDS0HhW4R670jsS/YEp7VDup979PweZqqdsOT3nWrZwBr532kYYNlrKqWhBRCJL31ZQdHTMNtvB/Ehj/1EBJVev1FrNzpQOuLiAdfknW7zRwS0TjxWK48KbCm8CC+luwQ1ufwl8Ztp8Q=
+	t=1783351942; cv=none; b=ia0mIPFy/t+3aSOh0bTCO2QDoFcJV8mgJh8auoiSFuqlMTnP27NyV7pOPymSuv0oN3Yh59aOSAOrskxX5JKqHkk6oyRUgS+9xSFnssjPfdWWZiSt+kAbb/bEMMILsux8X6WMFGyNDx17KewsLoIdjERp9Vmhh3V0koYOznz8Ka0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783351742; c=relaxed/simple;
-	bh=cpPCtORRiAX6AaW2x1iFAhbF0y/b8+n9WP2Jgrwoskc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VOpHbC5QKT3bC0YcmMnmrAEriIbQ/b6GRLeVN61QaGqzDW3bmAqF1fiulIp800p+q0xygf60MlqRovG+mjtejMd7JCxhfRlJ//fkQ14hNMfaMxesgk+cMDXQFUsWekX/FUUSqyp4qSvtEVKrp+z+jGG5nAfVnCFwkIHbKFsxquw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EedpkF9n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1783351942; c=relaxed/simple;
+	bh=MykPx35h1Xhip2EcE9vUK0mgW1rF9OQSiTX5JuE0RfA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FYVueT9eZUUjpU/EZMAORtO9Dz8xaCQHqX3WhBaN50p99gCheSzejl321sbDx614yb9TZ6yA5YiLsU/N/sO0AV05QkCApCQ48oPgsdhezjldkl3BklBVwNajtkchaGHTChkLfmDdt+UXZFrF314nb/+P6gtSBo5j7OiljRJW9mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wIJiPdI7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8y9i5aCM; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wIJiPdI7; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8y9i5aCM; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EedpkF9n"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783351739;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cmkh/8lLK1jZ4C+z8yxT+guDlzv8wKx1996Nlx+mLJo=;
-	b=EedpkF9n20WKqDrEYN8S0UMCVLTzGlXJROlGyzSv9gPNN+fYuXqfHIgyi8vzgj9ICwmjyu
-	EtxNbSwt0Ig/Bg2P4B8amsGyi7hBNKAEs3WwtlJeVh8LBOAycEHUbsRsz80oKi4KEUYfoP
-	L6dstQuCqYronnlbVHPSNv0HQW/tFMs=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-gJhDEOWGNGKMJMLS2mW_zA-1; Mon,
- 06 Jul 2026 11:28:54 -0400
-X-MC-Unique: gJhDEOWGNGKMJMLS2mW_zA-1
-X-Mimecast-MFC-AGG-ID: gJhDEOWGNGKMJMLS2mW_zA_1783351730
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wIJiPdI7";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8y9i5aCM";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wIJiPdI7";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8y9i5aCM"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60F3B1805A28;
-	Mon,  6 Jul 2026 15:28:50 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7E3F319560A0;
-	Mon,  6 Jul 2026 15:28:43 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Leon Romanovsky <leon@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 06/21] netfs: Add some tools for managing bvecq chains
-Date: Mon,  6 Jul 2026 16:27:21 +0100
-Message-ID: <20260706152737.1231312-7-dhowells@redhat.com>
-In-Reply-To: <20260706152737.1231312-1-dhowells@redhat.com>
-References: <20260706152737.1231312-1-dhowells@redhat.com>
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 7923E73C29;
+	Mon,  6 Jul 2026 15:32:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783351938; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
+	b=wIJiPdI7RxofbDRS4n5XFHdG45rr1kT9jmRs1znP5UX3n3jtElsn07C9WgrTFZAlX6kgvK
+	LvWmeBU/7fBSt9wbCgi5lkC4O4YcxisP6m5sBCoK8VffqiLTfraKqcqnyX9xVebBXIEhU5
+	ZZ4uyAwO5z3k+ng/0gSovCsFCrfpiOE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783351938;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
+	b=8y9i5aCMEDrKzjudddP0vP70JIIm//02A8FdCSOLElzKRQ6xe+KyEVWyqDf80KLFCv10aK
+	W90+/lh/xuElfNAw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wIJiPdI7;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=8y9i5aCM
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783351938; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
+	b=wIJiPdI7RxofbDRS4n5XFHdG45rr1kT9jmRs1znP5UX3n3jtElsn07C9WgrTFZAlX6kgvK
+	LvWmeBU/7fBSt9wbCgi5lkC4O4YcxisP6m5sBCoK8VffqiLTfraKqcqnyX9xVebBXIEhU5
+	ZZ4uyAwO5z3k+ng/0gSovCsFCrfpiOE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783351938;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=lKQO0UnNznkeSLfUbTjpWkNB56Q0mHHEbnN7ixyL+rM=;
+	b=8y9i5aCMEDrKzjudddP0vP70JIIm//02A8FdCSOLElzKRQ6xe+KyEVWyqDf80KLFCv10aK
+	W90+/lh/xuElfNAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 02340779AA;
+	Mon,  6 Jul 2026 15:32:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id A9AhLoHKS2qAQwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 06 Jul 2026 15:32:17 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org,
+	pc@manguebit.org,
+	smfrench@gmail.com
+Cc: Enzo Matsumiya <ematsumiya@suse.de>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH v2] cifs.upcall: fix regression with krb5 + creduid
+Date: Mon,  6 Jul 2026 12:32:12 -0300
+Message-ID: <20260706153212.839012-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,1182 +82,435 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 7923E73C29
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.990];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_TO(0.00)[vger.kernel.org,manguebit.org,gmail.com];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,manguebit.org:email];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCPT_COUNT_FIVE(0.00)[5];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-Provide a selection of tools for managing bvec queue chains.  This
-includes:
+Commit 972c5b5ff95e ("cifs.upcall: remove getpwuid() dependency")
+introduced a regression when using creduid != uid (e.g.
+"mount.cifs -o sec=krb5,cruid=X"), so 'uid' local var is replaced
+with procfs "Uid" value (in the example, the one from mount.cifs).
 
- (1) Allocation, prepopulation, expansion, shortening and refcounting of
-     bvecqs and bvecq chains.
+That commit ignored the fact that:
+  mount UID can be different from creds UID, and that calling-app
+  process (post-mount) can be different from both
 
-     This can be used to do things like creating an encryption buffer in
-     cifs or a directory content buffer in afs.  The memory segments will
-     be appropriate disposed off according to the flags on the bvecq.
+This patch "reverts" 972c5b5ff95e ("cifs.upcall: remove getpwuid()
+dependency"); transform the "emergency"-added function get_uidgid()
+into map_uidgid(), now only used to do NS UID/GID mapping.
 
- (2) Management of a bvecq chain as a rolling buffer and the management of
-     positions within it.
+Also add getpwuid() back, but this time called while still on host
+namespace, so any possible custom NSS module is ran as allowed by
+sysadmin.
 
- (3) Loading folios, slicing chains and clearing content.
+Any scenario involving unmapped UIDs or GIDs is unsupported; this
+means that any UID:GID in a child user namespace _must_ map back to
+a valid and existing host UID:GID.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
+Fixes: 972c5b5ff95e ("cifs.upcall: remove getpwuid() dependency")
+Reported-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
 ---
- fs/netfs/Makefile            |   1 +
- fs/netfs/bvecq.c             | 763 +++++++++++++++++++++++++++++++++++
- fs/netfs/internal.h          |   1 +
- fs/netfs/stats.c             |   4 +-
- include/linux/bvecq.h        | 270 +++++++++++++
- include/linux/netfs.h        |   1 +
- include/trace/events/netfs.h |  24 ++
- 7 files changed, 1063 insertions(+), 1 deletion(-)
- create mode 100644 fs/netfs/bvecq.c
+v2:
+- map_id(): moved 'errno = EINVAL' to the failure blocks and 'errno = 0'
+  explicitly into success block, because apparently fscanf() only resets
+  errno on glibc
+- change range checks and NS mapping to use *idp instead of 'id' (so
+  further possible duplicates are found correctly)
+- fix errno save/restore on fclose()
+- log correct errno if getpwuid() returns NULL; but leaves it as is,
+  even if it's 0 (we're exiting anyway)
 
-diff --git a/fs/netfs/Makefile b/fs/netfs/Makefile
-index b43188d64bd8..e1f12ecb5abf 100644
---- a/fs/netfs/Makefile
-+++ b/fs/netfs/Makefile
-@@ -3,6 +3,7 @@
- netfs-y := \
- 	buffered_read.o \
- 	buffered_write.o \
-+	bvecq.o \
- 	direct_read.o \
- 	direct_write.o \
- 	iterator.o \
-diff --git a/fs/netfs/bvecq.c b/fs/netfs/bvecq.c
-new file mode 100644
-index 000000000000..f9b2087616fa
---- /dev/null
-+++ b/fs/netfs/bvecq.c
-@@ -0,0 +1,763 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Buffering helpers for bvec queues
-+ *
-+ * Copyright (C) 2026 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#include <linux/bvecq.h>
-+#include "internal.h"
-+
-+void bvecq_dump(const struct bvecq *bq)
-+{
-+	int b = 0;
-+
-+	for (; bq; bq = bq->next, b++) {
-+		int skipz = 0;
-+
-+		pr_notice("BQ[%u] %u/%u fp=%llx%s\n",
-+			  b, bq->nr_slots, bq->max_slots, bq->fpos,
-+			  bq->discontig ? " discontig" : "");
-+		for (int s = 0; s < bq->nr_slots; s++) {
-+			const struct bio_vec *bv = &bq->bv[s];
-+
-+			if (!bv->bv_page && !bv->bv_len && skipz < 2) {
-+				skipz = 1;
-+				continue;
-+			}
-+			if (skipz == 1)
-+				pr_notice("BQ[%u:00-%02u] ...\n", b, s - 1);
-+			skipz = 2;
-+			pr_notice("BQ[%u:%02u] %10lx %04x %04x %u\n",
-+				  b, s,
-+				  bv->bv_page ? page_to_pfn(bv->bv_page) : 0,
-+				  bv->bv_offset, bv->bv_len,
-+				  bv->bv_page ? page_count(bv->bv_page) : 0);
-+		}
-+	}
-+}
-+EXPORT_SYMBOL(bvecq_dump);
-+
-+/**
-+ * bvecq_alloc_one - Allocate a single bvecq node with unpopulated slots
-+ * @nr_slots: Number of slots to allocate
-+ * @gfp: The allocation constraints.
-+ *
-+ * Allocate a single bvecq node and initialise the header.  A number of inline
-+ * slots are also allocated, rounded up to fit after the header in a power-of-2
-+ * slab object of up to 512 bytes (up to 29 slots on a 64-bit cpu).  The slot
-+ * array is not initialised.
-+ *
-+ * Return: The node pointer or NULL on allocation failure.
-+ */
-+struct bvecq *bvecq_alloc_one(size_t nr_slots, gfp_t gfp)
-+{
-+	struct bvecq *bq;
-+	const size_t max_size = 512;
-+	const size_t max_slots = (max_size - sizeof(*bq)) / sizeof(bq->__bv[0]);
-+	size_t part = umin(nr_slots, max_slots);
-+	size_t size = roundup_pow_of_two(struct_size(bq, __bv, part));
-+
-+	bq = kmalloc(size, gfp & ~GFP_ZONEMASK);
-+	if (bq) {
-+		*bq = (struct bvecq) {
-+			.ref		= REFCOUNT_INIT(1),
-+			.bv		= bq->__bv,
-+			.inline_bv	= true,
-+			.max_slots	= (size - sizeof(*bq)) / sizeof(bq->__bv[0]),
-+		};
-+		netfs_stat(&netfs_n_bvecq);
-+	}
-+	return bq;
-+}
-+EXPORT_SYMBOL(bvecq_alloc_one);
-+
-+/**
-+ * bvecq_alloc_chain - Allocate an unpopulated bvecq chain
-+ * @nr_slots: Number of slots to allocate
-+ * @gfp: The allocation constraints.
-+ *
-+ * Allocate a chain of bvecq nodes providing at least the requested cumulative
-+ * number of slots.
-+ *
-+ * Return: The first node pointer or NULL on allocation failure.
-+ */
-+struct bvecq *bvecq_alloc_chain(size_t nr_slots, gfp_t gfp)
-+{
-+	struct bvecq *head = NULL, *tail = NULL;
-+
-+	_enter("%zu", nr_slots);
-+
-+	for (;;) {
-+		struct bvecq *bq;
-+
-+		bq = bvecq_alloc_one(nr_slots, gfp);
-+		if (!bq)
-+			goto oom;
-+
-+		if (tail) {
-+			tail->next = bq;
-+			bq->prev = tail;
-+		} else {
-+			head = bq;
-+		}
-+		tail = bq;
-+		if (tail->max_slots >= nr_slots)
-+			break;
-+		nr_slots -= tail->max_slots;
-+	}
-+
-+	return head;
-+oom:
-+	bvecq_put(head);
-+	return NULL;
-+}
-+EXPORT_SYMBOL(bvecq_alloc_chain);
-+
-+/**
-+ * bvecq_alloc_buffer2 - Allocate a bvecq chain and populate with buffers
-+ * @size: Target size of the buffer (can be 0 for an empty buffer)
-+ * @pre_slots: Number of preamble slots to set aside
-+ * @gfp: The allocation constraints.
-+ *
-+ * Allocate a chain of bvecq nodes and populate the slots with sufficient pages
-+ * to provide at least the requested amount of space, leaving the first
-+ * @pre_slots slots unset.  The pre-slots must all fit into the the first
-+ * bvecq.
-+ *
-+ * The pages allocated may be compound pages larger than PAGE_SIZE and thus
-+ * occupy fewer slots.  The pages have their refcounts set to 1 and can be
-+ * passed to MSG_SPLICE_PAGES.
-+ *
-+ * Return: The first node pointer or NULL on allocation failure.
-+ */
-+struct bvecq *bvecq_alloc_buffer2(size_t size, unsigned int pre_slots, gfp_t gfp)
-+{
-+	struct bvecq *head = NULL, *tail = NULL, *p = NULL;
-+	size_t nr_per_bq = BVECQ_STD_SLOTS;
-+	size_t count = DIV_ROUND_UP(size, PAGE_SIZE);
-+
-+	_enter("%zx,%zx,%u", size, count, pre_slots);
-+
-+	if (WARN_ON_ONCE(pre_slots > nr_per_bq))
-+		return NULL;
-+
-+	do {
-+		struct page **pages;
-+		int want, got;
-+
-+		p = bvecq_alloc_one(min(pre_slots + count, nr_per_bq), gfp);
-+		if (!p)
-+			goto oom;
-+
-+		p->mem_type = BVECQ_MEM_ALLOCED;
-+
-+		if (tail) {
-+			tail->next = p;
-+			p->prev = tail;
-+		} else {
-+			head = p;
-+		}
-+		tail = p;
-+		if (!count)
-+			break;
-+
-+		/* Need to clear pre slots and pages[], so just clear all. */
-+		memset(p->bv, 0, p->max_slots * sizeof(p->bv[0]));
-+
-+		pages = (struct page **)&p->bv[p->max_slots];
-+		pages -= p->max_slots - pre_slots;
-+
-+		want = min(count, p->max_slots - pre_slots);
-+		got = alloc_pages_bulk(gfp, want, pages);
-+		if (got < want) {
-+			for (int i = 0; i < got; i++) {
-+				__free_page(pages[i]);
-+				pages[i] = NULL;
-+			}
-+			goto oom;
-+		}
-+
-+		tail->nr_slots = pre_slots + got;
-+		for (int i = 0; i < got; i++) {
-+			int j = pre_slots + i;
-+
-+			set_page_count(pages[i], 1);
-+			bvec_set_page(&tail->bv[j], pages[i], PAGE_SIZE, 0);
-+		}
-+
-+		count -= got;
-+		pre_slots = 0;
-+	} while (count > 0);
-+
-+	return head;
-+oom:
-+	bvecq_put(head);
-+	return NULL;
-+}
-+EXPORT_SYMBOL(bvecq_alloc_buffer2);
-+
-+/*
-+ * Free the page pointed to by a slot as necessary.
-+ */
-+static void bvecq_free_slot(struct bvecq *bq, unsigned int slot)
-+{
-+	struct page *page = bq->bv[slot].bv_page;
-+
-+	if (!page)
-+		return;
-+
-+	switch (bq->mem_type) {
-+	case BVECQ_MEM_EXTERNAL:
-+		break;
-+	case BVECQ_MEM_PAGECACHE:
-+		put_page(page);
-+		break;
-+	case BVECQ_MEM_GUP:
-+		unpin_user_page(page);
-+		break;
-+	case BVECQ_MEM_ALLOCED:
-+		__free_pages(page, compound_order(page));
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		break;
-+	}
-+}
-+
-+/**
-+ * bvecq_put - Put a ref on a bvec queue
-+ * @bq: The start of the folio queue to free
-+ *
-+ * Put the ref(s) on the nodes in a bvec queue, freeing up the node and the
-+ * page fragments it points to as the refcounts become zero.
-+ */
-+void bvecq_put(struct bvecq *bq)
-+{
-+	struct bvecq *next;
-+
-+	for (; bq; bq = next) {
-+		if (!refcount_dec_and_test(&bq->ref))
-+			break;
-+		for (int slot = 0; slot < bq->nr_slots; slot++)
-+			bvecq_free_slot(bq, slot);
-+		next = bq->next;
-+		netfs_stat_d(&netfs_n_bvecq);
-+		kfree(bq);
-+	}
-+}
-+EXPORT_SYMBOL(bvecq_put);
-+
-+/**
-+ * bvecq_expand_buffer - Allocate buffer space into a bvec queue
-+ * @_buffer: Pointer to the bvecq chain to expand (may point to a NULL; updated).
-+ * @_cur_size: Current size of the buffer (updated).
-+ * @size: Target size of the buffer.
-+ * @gfp: The allocation constraints.
-+ *
-+ * Append extra pages to a buffer to increase its capacity to the @size
-+ * specified.  If the current tail has space, but is not of the
-+ * BVECQ_MEM_ALLOCED memory type, a separate bvecq will be allocated to hold
-+ * the new memory.
-+ */
-+int bvecq_expand_buffer(struct bvecq **_buffer, size_t *_cur_size, size_t size, gfp_t gfp)
-+{
-+	struct bvecq *tail = *_buffer;
-+
-+	size = round_up(size, PAGE_SIZE);
-+	if (tail)
-+		while (tail->next)
-+			tail = tail->next;
-+
-+	while (*_cur_size < size) {
-+		struct page *page;
-+		size_t need = size - *_cur_size;
-+		int order = 0;
-+
-+		if (!tail || bvecq_is_full(tail) || tail->mem_type != BVECQ_MEM_ALLOCED) {
-+			struct bvecq *p;
-+
-+			p = bvecq_alloc_one(BVECQ_STD_SLOTS, gfp);
-+			if (!p)
-+				return -ENOMEM;
-+			if (tail) {
-+				tail->next = p;
-+				p->prev = tail;
-+			} else {
-+				*_buffer = p;
-+			}
-+			tail = p;
-+			p->mem_type = BVECQ_MEM_ALLOCED;
-+		}
-+
-+		if (need > PAGE_SIZE)
-+			order = umin(ilog2(need) - PAGE_SHIFT, MAX_PAGECACHE_ORDER);
-+
-+		page = alloc_pages(gfp | __GFP_COMP, order);
-+		if (!page && order > 0) {
-+			page = alloc_pages(gfp | __GFP_COMP, 0);
-+			order = 0;
-+		}
-+		if (!page)
-+			return -ENOMEM;
-+
-+		bvec_set_page(&tail->bv[tail->nr_slots++], page, PAGE_SIZE << order, 0);
-+		*_cur_size += PAGE_SIZE << order;
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(bvecq_expand_buffer);
-+
-+/**
-+ * bvecq_shorten_buffer - Shorten a bvec queue buffer
-+ * @bq: The start of the buffer to shorten
-+ * @slot: The slot to start from
-+ * @size: The size to retain
-+ *
-+ * Shorten the content of a bvec queue down to the minimum number of slots,
-+ * starting at the specified slot, to retain the specified size.
-+ *
-+ * Return: 0 if successful; -EMSGSIZE if there is insufficient content.
-+ */
-+int bvecq_shorten_buffer(struct bvecq *bq, unsigned int slot, size_t size)
-+{
-+	/* Skip through the segments we want to keep. */
-+	for (; bq; bq = bq->next) {
-+		for (; slot < bq->nr_slots; slot++) {
-+			if (size < bq->bv[slot].bv_len)
-+				goto found;
-+			size -= bq->bv[slot].bv_len;
-+		}
-+		slot = 0;
-+	}
-+	if (WARN_ON_ONCE(size > 0))
-+		return -EMSGSIZE;
-+	return 0;
-+
-+found:
-+	/* Shorten any partial entry and clean the rest of this bvecq. */
-+	if (size > 0) {
-+		bq->bv[slot].bv_len = size;
-+		slot++;
-+	}
-+	for (int i = slot; i < bq->nr_slots; i++)
-+		bvecq_free_slot(bq, i);
-+	bq->nr_slots = slot;
-+
-+	/* Free the queue tail. */
-+	bvecq_put(bq->next);
-+	bq->next = NULL;
-+	return 0;
-+}
-+EXPORT_SYMBOL(bvecq_shorten_buffer);
-+
-+/**
-+ * bvecq_buffer_init - Initialise a buffer and set position
-+ * @pos: The position to point at the new buffer.
-+ * @gfp: The allocation constraints.
-+ *
-+ * Initialise a rolling buffer.  We allocate an unpopulated bvecq node to so
-+ * that the pointers can be independently driven by the producer and the
-+ * consumer.
-+ *
-+ * Return 0 if successful; -ENOMEM on allocation failure.
-+ */
-+int bvecq_buffer_init(struct bvecq_pos *pos, gfp_t gfp)
-+{
-+	struct bvecq *bq;
-+
-+	bq = bvecq_alloc_one(BVECQ_STD_SLOTS, gfp);
-+	if (!bq)
-+		return -ENOMEM;
-+
-+	pos->bvecq  = bq; /* Comes with a ref. */
-+	pos->slot   = 0;
-+	pos->offset = 0;
-+	return 0;
-+}
-+
-+/**
-+ * bvecq_buffer_append - Append a new bvecq node to a buffer
-+ * @pos: The position of the last node.
-+ * @bq: The buffer to add.
-+ *
-+ * Add a new node on to the buffer chain at the specified position, either
-+ * because the previous one is full or because we have a discontiguity to
-+ * contend with, and update @pos to point to it.
-+ */
-+void bvecq_buffer_append(struct bvecq_pos *pos, struct bvecq *bq)
-+{
-+	struct bvecq *head = pos->bvecq;
-+
-+	bq->prev = head;
-+
-+	pos->bvecq = bvecq_get(bq);
-+	pos->slot = 0;
-+	pos->offset = 0;
-+
-+	/* Make sure the initialisation is stored before the next pointer.
-+	 *
-+	 * [!] NOTE: After we set head->next, the consumer is at liberty to
-+	 * immediately delete the old head.
-+	 */
-+	smp_store_release(&head->next, bq);
-+	bvecq_put(head);
-+}
-+
-+/**
-+ * bvecq_pos_advance - Advance a bvecq position
-+ * @pos: The position to advance.
-+ * @amount: The amount of bytes to advance by.
-+ *
-+ * Advance the specified bvecq position by @amount bytes.  @pos is updated and
-+ * bvecq ref counts may have been manipulated.  If the position hits the end of
-+ * the queue, then it is left pointing beyond the last slot of the last bvecq
-+ * so that it doesn't break the chain.
-+ */
-+void bvecq_pos_advance(struct bvecq_pos *pos, size_t amount)
-+{
-+	struct bvecq *bq = pos->bvecq;
-+	unsigned int slot = pos->slot;
-+	size_t offset = pos->offset;
-+
-+	while (amount) {
-+		size_t part;
-+
-+		if (!bvecq_acquire_slot(bq, slot)) {
-+			if (!bq->next) {
-+				WARN_ON_ONCE(amount > 0);
-+				break;
-+			}
-+			bq = bq->next;
-+			slot = 0;
-+			offset = 0;
-+			continue;
-+		}
-+
-+		part = bq->bv[slot].bv_len - offset;
-+
-+		if (part > amount) {
-+			offset += amount;
-+			break;
-+		}
-+		amount -= part;
-+		offset = 0;
-+		slot++;
-+	}
-+
-+	pos->slot   = slot;
-+	pos->offset = offset;
-+	bvecq_pos_move(pos, bq);
-+}
-+
-+/*
-+ * Clear part of the memory pointed to by a bio_vec.
-+ */
-+static void bvec_zero(const struct bio_vec *bv, size_t offset, size_t len)
-+{
-+	struct page *page = bv->bv_page;
-+
-+	offset += bv->bv_offset;
-+
-+	page  += offset / PAGE_SIZE;
-+	offset = offset % PAGE_SIZE;
-+
-+	while (len) {
-+		size_t part = umin(len, PAGE_SIZE - offset);
-+		char *p = kmap_local_page(page);
-+
-+		memset(p + offset, 0, part);
-+		kunmap_local(p);
-+
-+		len -= part;
-+		offset = 0;
-+		page++;
-+	}
-+}
-+
-+/**
-+ * bvecq_zero - Clear memory starting at the bvecq position.
-+ * @pos: The position in the bvecq chain to start clearing.
-+ * @amount: The number of bytes to clear.
-+ *
-+ * Clear memory fragments pointed to by a bvec queue.  @pos is updated and
-+ * bvecq ref counts may have been manipulated.  If the position hits the end of
-+ * the queue, then it is left pointing beyond the last slot of the last bvecq
-+ * so that it doesn't break the chain.
-+ *
-+ * Return: The number of bytes cleared.
-+ */
-+ssize_t bvecq_zero(struct bvecq_pos *pos, size_t amount)
-+{
-+	struct bvecq *bq = pos->bvecq;
-+	unsigned int slot = pos->slot;
-+	ssize_t cleared = 0;
-+	size_t offset = pos->offset;
-+
-+	while (amount) {
-+		const struct bio_vec *bv;
-+		size_t part;
-+
-+		if (!bvecq_acquire_slot(bq, slot)) {
-+			if (!bq->next) {
-+				WARN_ON_ONCE(amount > 0);
-+				break;
-+			}
-+			bq = bq->next;
-+			slot = 0;
-+			offset = 0;
-+			continue;
-+		}
-+
-+		bv = &bq->bv[slot];
-+		if (offset >= bv->bv_len) {
-+			slot++;
-+			offset = 0;
-+			continue;
-+		}
-+
-+		part = min(bv->bv_len - offset, amount);
-+		bvec_zero(bv, offset, part);
-+		cleared += part;
-+		offset += part;
-+		amount -= part;
-+	}
-+
-+	pos->slot   = slot;
-+	pos->offset = offset;
-+	bvecq_pos_move(pos, bq);
-+	return cleared;
-+}
-+
-+/**
-+ * bvecq_slice - Find a slice of a bvecq queue
-+ * @pos: The position to start at.
-+ * @max_size: The maximum size of the slice (or ULONG_MAX).
-+ * @max_slots: The maximum number of slots in the slice (or INT_MAX).
-+ * @_nr_slots: Where to put the number of slots (updated).
-+ *
-+ * Determine the size and number of slots that can be obtained the next slice
-+ * of bvec queue up to the maximum size and slot count specified.  The slice is
-+ * also limited if a discontiguity is found.
-+ *
-+ * @pos is updated to the end of the slice.  If the position hits the end of
-+ * the queue, then it is left pointing beyond the last slot of the last bvecq
-+ * so that it doesn't break the chain.
-+ *
-+ * Return: The number of bytes in the slice.
-+ */
-+size_t bvecq_slice(struct bvecq_pos *pos, size_t max_size,
-+		   unsigned int max_slots, unsigned int *_nr_slots)
-+{
-+	struct bvecq *bq;
-+	unsigned int slot = pos->slot, nslots = 0;
-+	size_t size = 0, offset = pos->offset;
-+
-+	bq = pos->bvecq;
-+	for (;;) {
-+		for (; slot < bvecq_nr_slots_acquire(bq); slot++) {
-+			const struct bio_vec *bvec = &bq->bv[slot];
-+
-+			if (offset < bvec->bv_len && bvec->bv_page) {
-+				size_t part = umin(bvec->bv_len - offset, max_size);
-+
-+				size += part;
-+				offset += part;
-+				max_size -= part;
-+				nslots++;
-+				if (!max_size || nslots >= max_slots)
-+					goto out;
-+			}
-+			offset = 0;
-+		}
-+
-+		/* pos->bvecq isn't allowed to go NULL as the queue may get
-+		 * extended and we would lose our place.
-+		 */
-+		if (!bq->next)
-+			break;
-+		slot = 0;
-+		bq = bq->next;
-+		if (bq->discontig && size > 0)
-+			break;
-+	}
-+
-+out:
-+	*_nr_slots = nslots;
-+	if (slot == bvecq_nr_slots_acquire(bq) && bq->next) {
-+		bq = bq->next;
-+		slot = 0;
-+		offset = 0;
-+	}
-+	bvecq_pos_move(pos, bq);
-+	pos->slot = slot;
-+	pos->offset = offset;
-+	return size;
-+}
-+
-+/**
-+ * bvecq_extract - Extract a slice of a bvecq queue into a new bvecq queue
-+ * @pos: The position to start at.
-+ * @max_size: The maximum size of the slice (or ULONG_MAX).
-+ * @max_slots: The maximum number of slots in the slice (or INT_MAX).
-+ * @to: Where to put the extraction bvecq chain head (updated).
-+ *
-+ * Allocate a new bvecq and extract into it memory fragments from a slice of
-+ * bvec queue, starting at @pos.  The slice is also limited if a discontiguity
-+ * is found.  No refs are taken on the page.
-+ *
-+ * @pos is updated to the end of the slice.  If the position hits the end of
-+ * the queue, then it is left pointing beyond the last slot of the last bvecq
-+ * so that it doesn't break the chain.
-+ *
-+ * If successful, *@to is set to point to the head of the newly allocated chain
-+ * and the caller inherits a ref to it.
-+ *
-+ * Return: The number of bytes extracted; -ENOMEM on allocation failure or -EIO
-+ * if no slots were available to extract.
-+ */
-+ssize_t bvecq_extract(struct bvecq_pos *pos, size_t max_size,
-+		      unsigned int max_slots, struct bvecq **to)
-+{
-+	struct bvecq_pos tmp_pos;
-+	struct bvecq *src, *dst = NULL;
-+	unsigned int slot = pos->slot, dslot = 0, nslots;
-+	ssize_t extracted = 0;
-+	size_t offset = pos->offset, amount;
-+
-+	*to = NULL;
-+	if (WARN_ON_ONCE(!max_slots))
-+		max_slots = INT_MAX;
-+
-+	bvecq_pos_set(&tmp_pos, pos);
-+	amount = bvecq_slice(&tmp_pos, max_size, max_slots, &nslots);
-+	bvecq_pos_unset(&tmp_pos);
-+	if (nslots == 0)
-+		return -EIO;
-+
-+	dst = bvecq_alloc_chain(nslots, GFP_KERNEL);
-+	if (!dst)
-+		return -ENOMEM;
-+	*to = dst;
-+	max_slots = nslots;
-+	nslots = 0;
-+
-+	/* Transcribe the slots */
-+	src = pos->bvecq;
-+	for (;;) {
-+		for (; slot < bvecq_nr_slots_acquire(src); slot++) {
-+			const struct bio_vec *sv = &src->bv[slot];
-+			struct bio_vec *dv = &dst->bv[dslot];
-+
-+			_debug("EXTR BQ=%x[%x] off=%zx am=%zx p=%lx",
-+			       src->priv, slot, offset, amount, page_to_pfn(sv->bv_page));
-+
-+			if (offset < sv->bv_len && sv->bv_page) {
-+				size_t part = umin(sv->bv_len - offset, amount);
-+
-+				bvec_set_page(dv, sv->bv_page, part,
-+					      sv->bv_offset + offset);
-+				extracted += part;
-+				amount -= part;
-+				offset += part;
-+				trace_netfs_bv_slot(dst, dslot);
-+				dslot++;
-+				nslots++;
-+				if (dslot >= dst->max_slots) {
-+					bvecq_filled_to(dst, dslot);
-+					dst = dst->next;
-+					dslot = 0;
-+				}
-+				if (nslots >= max_slots)
-+					goto out;
-+				if (amount == 0)
-+					goto out;
-+			}
-+			offset = 0;
-+		}
-+
-+		/* pos->bvecq isn't allowed to go NULL as the queue may get
-+		 * extended and we would lose our place.
-+		 */
-+		if (!src->next)
-+			break;
-+		slot = 0;
-+		src = src->next;
-+		if (src->discontig && extracted > 0)
-+			break;
-+	}
-+
-+out:
-+	if (dst)
-+		bvecq_filled_to(dst, dslot);
-+	if (slot == bvecq_nr_slots_acquire(src) && src->next) {
-+		src = src->next;
-+		slot = 0;
-+		offset = 0;
-+	}
-+	bvecq_pos_move(pos, src);
-+	pos->slot = slot;
-+	pos->offset = offset;
-+	return extracted;
-+}
-+
-+/**
-+ * bvecq_load_from_ra - Allocate a bvecq chain and load from readahead
-+ * @pos: Blank position object to attach the new chain to.
-+ * @ractl: The readahead control context.
-+ *
-+ * Decant the set of folios to be read from the readahead context into a bvecq
-+ * chain.  Each folio occupies one bio_vec element.
-+ *
-+ * Return: Amount of data loaded or -ENOMEM on allocation failure.
-+ */
-+ssize_t bvecq_load_from_ra(struct bvecq_pos *pos, struct readahead_control *ractl)
-+{
-+	XA_STATE(xas, &ractl->mapping->i_pages, ractl->_index);
-+	struct folio *folio;
-+	struct bvecq *bq;
-+	unsigned int slot = 0;
-+	size_t loaded = 0;
-+
-+	bq = bvecq_alloc_chain(ractl->_nr_folios, GFP_NOFS);
-+	if (!bq)
-+		return -ENOMEM;
-+
-+	pos->bvecq  = bq;
-+	pos->slot   = 0;
-+	pos->offset = 0;
-+
-+	rcu_read_lock();
-+
-+	xas_for_each(&xas, folio, ractl->_index + ractl->_nr_pages - 1) {
-+		size_t len;
-+
-+		if (xas_retry(&xas, folio))
-+			continue;
-+		VM_BUG_ON_FOLIO(!folio_test_locked(folio), folio);
-+
-+		len = folio_size(folio);
-+		bvec_set_folio(&bq->bv[slot], folio, len, 0);
-+		loaded += len;
-+		slot++;
-+		trace_netfs_folio(folio, netfs_folio_trace_read);
-+
-+		if (slot >= bq->max_slots) {
-+			bvecq_filled_to(bq, slot);
-+			bq = bq->next;
-+			if (!bq)
-+				break;
-+			slot = 0;
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	if (bq)
-+		bvecq_filled_to(bq, slot);
-+
-+	ractl->_index += ractl->_nr_pages;
-+	ractl->_nr_pages = 0;
-+	return loaded;
-+}
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 5e86417c88d4..8cb74cb8242a 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -170,6 +170,7 @@ extern atomic_t netfs_n_wh_retry_write_subreq;
- extern atomic_t netfs_n_wb_lock_skip;
- extern atomic_t netfs_n_wb_lock_wait;
- extern atomic_t netfs_n_folioq;
-+extern atomic_t netfs_n_bvecq;
+
+ cifs.upcall.c | 279 ++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 177 insertions(+), 102 deletions(-)
+
+diff --git a/cifs.upcall.c b/cifs.upcall.c
+index 11dbc6186a74..ff5f68f55692 100644
+--- a/cifs.upcall.c
++++ b/cifs.upcall.c
+@@ -52,6 +52,7 @@
+ #include <arpa/inet.h>
+ #include <ctype.h>
+ #include <grp.h>
++#include <pwd.h>
+ #include <stdbool.h>
+ #include <errno.h>
+ #include <sched.h>
+@@ -1375,118 +1376,170 @@ static int ip_to_fqdn(const char *addrstr, char *host, size_t hostlen)
+ 	return 0;
+ }
  
- int netfs_stats_show(struct seq_file *m, void *v);
+-/* cover worst case/impossible scenarios */
+-#define PROC_PID_PATH_MAXLEN	((int)sizeof("/proc/2147483647/status"))
+-/* max valid UID/GID is (UINT_MAX - 1) */
+-#define INVALID_UIDGID		UINT_MAX
++#define ID_MAP_PATH_MAX ((int)sizeof("/proc/2147483647/uid_map"))
  
-diff --git a/fs/netfs/stats.c b/fs/netfs/stats.c
-index ab6b916addc4..84c2a4bcc762 100644
---- a/fs/netfs/stats.c
-+++ b/fs/netfs/stats.c
-@@ -48,6 +48,7 @@ atomic_t netfs_n_wh_retry_write_subreq;
- atomic_t netfs_n_wb_lock_skip;
- atomic_t netfs_n_wb_lock_wait;
- atomic_t netfs_n_folioq;
-+atomic_t netfs_n_bvecq;
- 
- int netfs_stats_show(struct seq_file *m, void *v)
+-/*
+- * get_uidgid - Get @pid's (real) UID and/or GID.
+- * @pid: process to get UID/GID from
+- * @uidp: pointer to store @pid's UID (can be NULL)
+- * @gidp: pointer to store @pid's GID (can be NULL)
+- *
+- * Extract "Uid:" and "Gid:" fields from /proc/@pid/status.
+- * Do so based on whether @uidp or @gidp are NULL.
+- *
+- * This function assumes we're on the same namespace as @pid.
+- *
+- * Return: 0 on success, -1 otherwise (errno set).
+- *
+- * On errors, *@uidp and *@gidp are set to INVALID_UIDGID.
+- */
+-static int get_uidgid(pid_t pid, uid_t *uidp, gid_t *gidp)
++static int map_id(pid_t pid, const char *map, unsigned int *idp)
  {
-@@ -90,9 +91,10 @@ int netfs_stats_show(struct seq_file *m, void *v)
- 		   atomic_read(&netfs_n_rh_retry_read_subreq),
- 		   atomic_read(&netfs_n_wh_retry_write_req),
- 		   atomic_read(&netfs_n_wh_retry_write_subreq));
--	seq_printf(m, "Objs   : rr=%u sr=%u foq=%u wsc=%u\n",
-+	seq_printf(m, "Objs   : rr=%u sr=%u bq=%u foq=%u wsc=%u\n",
- 		   atomic_read(&netfs_n_rh_rreq),
- 		   atomic_read(&netfs_n_rh_sreq),
-+		   atomic_read(&netfs_n_bvecq),
- 		   atomic_read(&netfs_n_folioq),
- 		   atomic_read(&netfs_n_wh_wstream_conflict));
- 	seq_printf(m, "WbLock : skip=%u wait=%u\n",
-diff --git a/include/linux/bvecq.h b/include/linux/bvecq.h
-index 15f16f905877..01335ccb3871 100644
---- a/include/linux/bvecq.h
-+++ b/include/linux/bvecq.h
-@@ -53,4 +53,274 @@ struct bvecq {
- 	struct bio_vec	__bv[];		/* Default array (if ->inline_bv) */
- };
+-	char path[PROC_PID_PATH_MAXLEN] = {}, buf[256];
++	unsigned long long ns_start, host_start, range;
++	char map_path[ID_MAP_PATH_MAX];
++	int map_path_size = sizeof(map_path);
++	unsigned int id;
+ 	FILE *fp = NULL;
+-	int ret;
+-
+-	errno = 0;
+-	if (pid < 0 || (!uidp && !gidp)) {
+-		errno = EINVAL;
+-		return -1;
+-	}
+-
+-	if (uidp)
+-		*uidp = INVALID_UIDGID;
++	int ret = 1;
  
-+#if BITS_PER_LONG == 64
-+/* Number of slots in __bv[] for a bvecq in a 512-byte kmalloc block. */
-+#define BVECQ_STD_SLOTS		29	/* 2 words/slot; 32 slots; bvecq is 6 words (3 slots) */
-+#elif  BITS_PER_LONG == 32
-+/* Number of slots in __bv[] for a bvecq in a 256-byte kmalloc block. */
-+#define BVECQ_STD_SLOTS		18	/* 3 words/slot; 21 slots; bvecq is 9 words (3 slots) */
-+#else
-+#error BVECQ_STD_SLOTS undetermined
-+#endif
+-	if (gidp)
+-		*gidp = INVALID_UIDGID;
++	errno = EINVAL;
++	if (pid < 0 || !map || !idp || *idp == UINT_MAX)
++		goto out;
+ 
+-	ret = snprintf(path, PROC_PID_PATH_MAXLEN, "/proc/%d/status", pid);
+-	if (ret < 0 || ret >= PROC_PID_PATH_MAXLEN) {
+-		if (!errno)
++	ret = snprintf(map_path, map_path_size, "/proc/%d/%s", pid, map);
++	if (ret < 0 || ret >= map_path_size) {
++		if (ret >= map_path_size)
+ 			errno = ENAMETOOLONG;
+-		return -1;
++		ret = 1;
++		goto out;
+ 	}
+ 
+-	fp = fopen(path, "r");
+-	if (!fp) {
+-		ret = -1;
++	ret = 1;
++	fp = fopen(map_path, "r");
++	if (!fp)
+ 		goto out;
+-	}
+ 
+-	/* Parse /proc/pid/status fields */
+-	errno = 0;
+-	ret = -1;
+-	while (fgets(buf, 256, fp)) {
+-		unsigned long long val;
++	/*
++	 * The map files have the same format:
++	 *   <NS ID start> <host ID start> <range>
++	 *   ... (<multiple entries are supported) ...
++	 *
++	 * Formula and validation:
++	 *   <final NS ID> = (*@idp - <host ID start>) + <NS ID start>
++	 *
++	 * - IDs: [0, UINT_MAX - 1]
++	 * - range: [1, UINT_MAX], where range == UINT_MAX requires both ID ranges to start at 0,
++	 *   which then means this is an init host NS mapping (and that's ok)
++	 *
++	 * The formula itself would be enough to "validate" a matching NS ID, but we don't want to
++	 * keep parsing a malformed map file, no matter how unlikely/impossible it is to happen.
++	 * Same reason values are parsed as 'unsigned long long', so we can check for bogus data.
++	 */
++	id = UINT_MAX;
++	errno = ENODATA;
++	while (fscanf(fp, "%llu %llu %llu", &ns_start, &host_start, &range) == 3) {
++		if (ns_start >= UINT_MAX || host_start >= UINT_MAX ||
++		    range > UINT_MAX || range == 0) {
++			errno = EINVAL;
++			ret = 1;
++			break;
++		}
+ 
+-		errno = ENODATA;
+-		if ((!uidp || strncmp(buf, "Uid:", 4)) && (!gidp || strncmp(buf, "Gid:", 4)))
+-			continue;
++		if (range == UINT_MAX && (ns_start != 0 || host_start != 0)) {
++			errno = EINVAL;
++			ret = 1;
++			break;
++		}
+ 
+-		errno = 0;
++		if (host_start + range > UINT_MAX) {
++			errno = EINVAL;
++			ret = 1;
++			break;
++		}
+ 
+ 		/*
+-		 * Example line format (same for both Uid/Gid):
+-		 * "Uid:\t%u\t%u\%u\%u"
++		 * Check if host ID fits this line.
++		 * Our desired NS ID may be in any line of the file.
+ 		 *
+-		 * Where the numbers represents:
+-		 * <real> <effective> <saved> <fsuid>
++		 * Note: new{uid,gid}map tools (that creates the map files) don't allow multiple
++		 * maps (NS IDs) to the same host ID.
+ 		 *
+-		 * We're only interested in the <real> value.
++		 * If we get a match here, we'll save it, but we continue parsing the file.
++		 * If we happen to find a duplicate, it's possible this is a rogue file trying to
++		 * bypass these checks.
+ 		 *
+-		 * (field names "Uid:"/"Gid:" parsed above, skip it)
++		 * In such cases, discard the match and return EOPNOTSUPP, as returning a
++		 * successful match could lead to disastrous results.
+ 		 */
+-		ret = sscanf(&buf[0] + 4, "%llu", &val);
+-		if (ret != 1) {
+-			ret = -1;
+-			if (errno)
++		if (*idp >= host_start && *idp < host_start + range) {
++			/* This means we found a duplicate */
++			if (!ret) {
++				ret = 1;
++				errno = EOPNOTSUPP;
++				syslog(LOG_ERR, "%s has multiple mapped IDs for %u (unsupported)",
++				       map, *idp);
+ 				break;
+-			continue;
+-		}
+-
+-		ret = -1;
+-		if (val >= UINT_MAX) {
+-			errno = EINVAL;
+-			break;
+-		}
+-
+-		if (uidp && !strncmp(buf, "Uid:", 4))
+-			*uidp = (uid_t)val;
+-		else
+-			*gidp = (gid_t)val;
++			}
+ 
+-		if ((!uidp || *uidp != INVALID_UIDGID) && (!gidp || *gidp != INVALID_UIDGID)) {
+-			errno = 0;
++			id = (*idp - host_start) + ns_start;
+ 			ret = 0;
+-			break;
++			errno = 0;
+ 		}
+ 	}
++
++	/* This means errno was reset by fscanf() without finding anything */
++	if (ret && errno == 0)
++		errno = ENODATA;
+ out:
+-	if (fp)
++	if (fp) {
++		int err = errno;
++
+ 		fclose(fp);
++		/* Ignore fclose() errors */
++		errno = err;
++	}
+ 
+-	if (ret) {
+-		syslog(LOG_DEBUG, "%s(pid=%d): %s", __func__, pid, strerror(errno));
+-		if (uidp)
+-			*uidp = INVALID_UIDGID;
++	if (!ret) {
++		*idp = id;
++		errno = 0;
++	} else {
++		syslog(LOG_DEBUG, "%s(pid=%d, map=%s, id=%u): %s", __func__, pid, map, *idp,
++		       strerror(errno));
++	}
+ 
+-		if (gidp)
+-			*gidp = INVALID_UIDGID;
++	return ret;
++}
 +
 +/*
-+ * Position in a bio_vec queue.  The bvecq holds a ref on the queue segment it
-+ * points to.
-+ */
-+struct bvecq_pos {
-+	struct bvecq		*bvecq;		/* The first bvecq */
-+	unsigned int		offset;		/* The offset within the starting slot */
-+	u16			slot;		/* The starting slot */
-+};
-+
-+void bvecq_dump(const struct bvecq *bq);
-+struct bvecq *bvecq_alloc_one(size_t nr_slots, gfp_t gfp);
-+struct bvecq *bvecq_alloc_chain(size_t nr_slots, gfp_t gfp);
-+struct bvecq *bvecq_alloc_buffer2(size_t size, unsigned int pre_slots, gfp_t gfp);
-+void bvecq_put(struct bvecq *bq);
-+int bvecq_expand_buffer(struct bvecq **_buffer, size_t *_cur_size, size_t size, gfp_t gfp);
-+int bvecq_shorten_buffer(struct bvecq *bq, unsigned int slot, size_t size);
-+int bvecq_buffer_init(struct bvecq_pos *pos, gfp_t gfp);
-+void bvecq_buffer_append(struct bvecq_pos *pos, struct bvecq *bq);
-+void bvecq_pos_advance(struct bvecq_pos *pos, size_t amount);
-+ssize_t bvecq_zero(struct bvecq_pos *pos, size_t amount);
-+size_t bvecq_slice(struct bvecq_pos *pos, size_t max_size,
-+		   unsigned int max_slots, unsigned int *_nr_slots);
-+ssize_t bvecq_extract(struct bvecq_pos *pos, size_t max_size,
-+		      unsigned int max_slots, struct bvecq **to);
-+ssize_t bvecq_load_from_ra(struct bvecq_pos *pos, struct readahead_control *ractl);
-+
-+/**
-+ * bvecq_alloc_buffer - Allocate a bvecq chain and populate with buffers
-+ * @size: Target size of the buffer (can be 0 for an empty buffer)
-+ * @gfp: The allocation constraints.
++ * map_uidgid() - Map (real) UID/GID from init host NS to user NS.
++ * @pid: host NS PID
++ * @uidp: (in) host UID, (out) NS UID
++ * @gidp: (in) host GID, (out) NS GID
 + *
-+ * Wrapper around %bvecq_alloc_buffer2().
++ * Parse /proc/@pid/{uid,gid}_map files to get NS UID/GID values.
++ * Since @pid is expected to be a host NS PID, this must be called before switching namespaces.
++ *
++ * Note: we can't use /proc/self here because we haven't switched NS yet, so {uid,gid}_map files
++ * would contain host NS values.
++ *
++ * Return: 0 on success, 1 otherwise (errno set).
 + */
-+static inline struct bvecq *bvecq_alloc_buffer(size_t size, gfp_t gfp)
++static int map_uidgid(pid_t pid, uid_t *uidp, gid_t *gidp)
 +{
-+	return bvecq_alloc_buffer2(size, 0, gfp);
-+}
++	uid_t orig_uid;
++	gid_t orig_gid;
++	int ret = 1;
 +
-+/**
-+ * bvecq_get - Get a ref on a bvecq
-+ * @bq: The bvecq to get a ref on
-+ */
-+static inline struct bvecq *bvecq_get(struct bvecq *bq)
-+{
-+	refcount_inc(&bq->ref);
-+	return bq;
-+}
++	errno = EINVAL;
++	if (!uidp || !gidp)
++		goto out;
 +
-+/**
-+ * bvecq_is_full - Determine if a bvecq is full
-+ * @bvecq: The object to query
-+ *
-+ * Return: true if full; false if not.
-+ */
-+static inline bool bvecq_is_full(const struct bvecq *bvecq)
-+{
-+	return bvecq->nr_slots >= bvecq->max_slots;
-+}
++	orig_uid = *uidp;
++	orig_gid = *gidp;
 +
-+/**
-+ * bvecq_filled_to - Release filled slots with release barrier
-+ * @bvecq: The object modified
-+ * @to: The latest slot filled + 1
-+ */
-+static inline void bvecq_filled_to(struct bvecq *bvecq, unsigned int to)
-+{
-+	/* Set the slot counter after filling the slot */
-+	smp_store_release(&bvecq->nr_slots, to);
-+}
-+
-+/**
-+ * bvecq_nr_slots_acquire - Get the number of filled slots with acquire barrier
-+ * @bvecq: The object to query
-+ *
-+ * Return: The number of filled slots
-+ */
-+static inline unsigned int bvecq_nr_slots_acquire(const struct bvecq *bvecq)
-+{
-+	/* Read the slot counter before looking at the slot */
-+	return smp_load_acquire(&bvecq->nr_slots);
-+}
-+
-+/**
-+ * bvecq_acquire_slot - Determine if a slot is valid with acquire barrier
-+ * @bvecq: The object to query
-+ * @slot: The next slot
-+ *
-+ * Return: true if valid; false if might not be valid
-+ */
-+static inline bool bvecq_acquire_slot(const struct bvecq *bvecq, unsigned int slot)
-+{
-+	/* Read the slot counter before looking at the slot */
-+	return slot < bvecq_nr_slots_acquire(bvecq);
-+}
-+
-+/**
-+ * bvecq_pos_set - Set one position to be the same as another
-+ * @pos: The position object to set
-+ * @at: The source position.
-+ *
-+ * Set @pos to have the same position as @at.  This may take a ref on the
-+ * bvecq pointed to.
-+ */
-+static inline void bvecq_pos_set(struct bvecq_pos *pos, const struct bvecq_pos *at)
-+{
-+	*pos = *at;
-+	bvecq_get(pos->bvecq);
-+}
-+
-+/**
-+ * bvecq_pos_unset - Unset a position
-+ * @pos: The position object to unset
-+ *
-+ * Unset @pos.  This does any needed ref cleanup.
-+ */
-+static inline void bvecq_pos_unset(struct bvecq_pos *pos)
-+{
-+	bvecq_put(pos->bvecq);
-+	pos->bvecq = NULL;
-+	pos->slot = 0;
-+	pos->offset = 0;
-+}
-+
-+/**
-+ * bvecq_pos_transfer - Transfer one position to another, clearing the first
-+ * @pos: The position object to set
-+ * @from: The source position to clear.
-+ *
-+ * Set @pos to have the same position as @from and then clear @from.  This may
-+ * transfer a ref on the bvecq pointed to.
-+ */
-+static inline void bvecq_pos_transfer(struct bvecq_pos *pos, struct bvecq_pos *from)
-+{
-+	*pos = *from;
-+	from->bvecq = NULL;
-+	from->slot = 0;
-+	from->offset = 0;
-+}
-+
-+/**
-+ * bvecq_pos_move - Update a position to a new bvecq
-+ * @pos: The position object to update.
-+ * @to: The new bvecq to point at.
-+ *
-+ * Update @pos to point to @to if it doesn't already do so.  This may
-+ * manipulate refs on the bvecqs pointed to.
-+ */
-+static inline void bvecq_pos_move(struct bvecq_pos *pos, struct bvecq *to)
-+{
-+	struct bvecq *old = pos->bvecq;
-+
-+	if (old != to) {
-+		pos->bvecq = bvecq_get(to);
-+		bvecq_put(old);
-+	}
-+}
-+
-+/**
-+ * bvecq_pos_nudge - Nudge a position onto the next segment if current used up
-+ * @pos: The position object to nudge.
-+ *
-+ * Update @pos to point to the next segment in the chain if we've used up the
-+ * current segment.  This may manipulate refs on the bvecqs pointed to.
-+ *
-+ * Return: true if found a new segment, false if hit the end.
-+ */
-+static inline bool bvecq_pos_nudge(struct bvecq_pos *pos)
-+{
-+	struct bvecq *bq = pos->bvecq;
-+
-+	for (;;) {
-+		if (!bvecq_acquire_slot(bq, pos->slot)) {
-+			bq = bq->next;
-+			if (!bq)
-+				return false;
-+			bvecq_pos_move(pos, bq);
-+			pos->slot = 0;
-+			pos->offset = 0;
-+			continue;
-+		}
-+		if (pos->offset >= bq->bv[pos->slot].bv_len) {
-+			pos->slot++;
-+			pos->offset = 0;
-+			continue;
-+		}
-+		return true;
-+	}
-+}
-+
-+/**
-+ * bvecq_pos_step - Step a position to the next slot if possible
-+ * @pos: The position object to step.
-+ *
-+ * Update @pos to point to the next slot in the queue if not at the end.  This
-+ * may manipulate refs on the bvecqs pointed to.
-+ *
-+ * Return: true if successful, false if was at the end.
-+ */
-+static inline bool bvecq_pos_step(struct bvecq_pos *pos)
-+{
-+	struct bvecq *bq = pos->bvecq;
-+
-+	pos->slot++;
-+	pos->offset = 0;
-+	if (pos->slot < bq->nr_slots)
-+		return true;
-+	if (!bq->next)
-+		return false;
-+	bvecq_pos_move(pos, bq->next);
-+	pos->slot = 0;
-+	return true;
-+}
-+
-+/**
-+ * bvecq_delete_spent - Delete the bvecq at the front if possible
-+ * @pos: The position object to update.
-+ *
-+ * Delete the used up bvecq at the front of the queue that @pos points to if it
-+ * is not the last node in the queue; if it is the last node in the queue, it
-+ * is kept so that the queue doesn't become detached from the other end.  This
-+ * may manipulate refs on the bvecqs pointed to.  It is also possible that the
-+ * producer will fill more slots in the current bvecq.
-+ *
-+ * Also, we have to be very careful: the consumer can catch the producer, which
-+ * could lead to us having nothing left in the queue, causing the front and
-+ * back pointers to end up on different tracks.  To avoid this, we must always
-+ * keep at least one segment in the queue.
-+ *
-+ * The caller must reload from @pos after calling this.
-+ *
-+ * Return: true if there's more available; false if not.
-+ */
-+static inline bool bvecq_delete_spent(struct bvecq_pos *pos)
-+{
-+	struct bvecq *spent = pos->bvecq;
-+	struct bvecq *next;
-+	unsigned int slot = pos->slot;
-+
-+again:
-+	/* Read the contents of the queue node after the pointer to it. */
-+	next = smp_load_acquire(&spent->next);
-+	if (!next)
-+		return false; /* Nothing more to consume at the moment. */
-+	if (slot < bvecq_nr_slots_acquire(spent))
-+		return true; /* The producer added more. */
-+	next->prev = NULL;
-+	spent->next = NULL;
-+	bvecq_put(spent);
-+	pos->bvecq = next; /* We take spent's ref. */
-+	pos->slot = 0;
-+	pos->offset = 0;
-+	if (!bvecq_acquire_slot(next, 0)) {
-+		spent = next;
-+		slot = 0;
-+		goto again;
-+	}
-+	return true;
-+}
-+
- #endif /* _LINUX_BVECQ_H */
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index 4f7571ea49bd..2999c4b7e6a9 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -17,6 +17,7 @@
- #include <linux/workqueue.h>
- #include <linux/fs.h>
- #include <linux/pagemap.h>
-+#include <linux/bvecq.h>
- #include <linux/uio.h>
- #include <linux/rolling_buffer.h>
++	ret = map_id(pid, "uid_map", uidp);
++	if (ret) {
++		if (errno == ENODATA)
++			syslog(LOG_ERR, "UID %u not mapped in this namespace (unsupported)",
++			       orig_uid);
++		goto out;
+ 	}
  
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index 9bda9302be90..5354a0439324 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -789,6 +789,30 @@ TRACE_EVENT(netfs_folioq,
- 		      __print_symbolic(__entry->trace, netfs_folioq_traces))
- 	    );
++	ret = map_id(pid, "gid_map", gidp);
++	if (ret && errno == ENODATA)
++		syslog(LOG_ERR, "GID %u not mapped in this namespace (unsupported)",
++		       orig_gid);
++out:
++	if (ret && errno != ENODATA)
++		syslog(LOG_ERR, "%s: %s", __func__, strerror(errno));
++	else if (!ret)
++		syslog(LOG_DEBUG, "host %u:%u -> NS %u:%u", orig_uid, orig_gid, *uidp, *gidp);
++
+ 	return ret;
+ }
  
-+TRACE_EVENT(netfs_bv_slot,
-+	    TP_PROTO(const struct bvecq *bq, int slot),
+@@ -1534,6 +1587,7 @@ int main(const int argc, char *const argv[])
+ 	const char *oid;
+ 	uid_t uid;
+ 	gid_t gid;
++	struct passwd *pw;
+ 	char *keytab_name = NULL;
+ 	char *env_cachename = NULL;
+ 	krb5_ccache ccache = NULL;
+@@ -1680,12 +1734,52 @@ int main(const int argc, char *const argv[])
+ 		goto out;
+ 	}
+ 
++	/*
++	 * 'uid' always points to a host UID, so we must get the corresponding host GID.
++	 * It's safe to call getpwuid() here because we're still on host NS, i.e. caller
++	 * application has no control over custom NSS modules.
++	 *
++	 * FIXME: if UID is from another NS, or a subuid, this will fail on mount.
++	 */
++	errno = 0;
++	pw = getpwuid(uid);
++	if (!pw) {
++		syslog(LOG_ERR, "failed to retrieve GID from UID %u: %s", uid,
++		       strerror(errno ?: ENOENT));
++		rc = 1;
++		goto out;
++	}
 +
-+	    TP_ARGS(bq, slot),
++	gid = pw->pw_gid;
 +
-+	    TP_STRUCT__entry(
-+		    __field(unsigned long,		pfn)
-+		    __field(unsigned int,		offset)
-+		    __field(unsigned int,		len)
-+		    __field(unsigned int,		slot)
-+			     ),
++	/*
++	 * We can't reasonably do this for root. When mounting a DFS share,
++	 * for instance we can end up with creds being overridden, but the env
++	 * variable left intact.
++	 *
++	 * Always check this before NS UID mapping.
++	 */
++	if (uid == 0)
++		env_probe = false;
 +
-+	    TP_fast_assign(
-+		    __entry->slot = slot;
-+		    __entry->pfn = page_to_pfn(bq->bv[slot].bv_page);
-+		    __entry->offset = bq->bv[slot].bv_offset;
-+		    __entry->len = bq->bv[slot].bv_len;
-+			   ),
-+
-+	    TP_printk("bq[%x] p=%lx %x-%x",
-+		      __entry->slot,
-+		      __entry->pfn, __entry->offset, __entry->offset + __entry->len)
-+	    );
-+
- #undef EM
- #undef E_
- #endif /* _TRACE_NETFS_H */
+ 	/*
+ 	 * Change to the process's namespace. This means that things will work
+ 	 * acceptably in containers, because we'll be looking at the correct
+ 	 * filesystem and have the correct network configuration.
+ 	 */
+ 	if (arg->upcall_target == UPTARGET_APP || arg->upcall_target == UPTARGET_UNSPECIFIED) {
++		/*
++		 * Map host 'uid' and 'gid' to the target user NS.
++		 *
++		 * Any scenario that involves unmapped UIDs or primary GIDs is not supported -- we
++		 * don't have, and can't find, all the info that would be necessary to find a
++		 * UID/GID within all the possible NS combinations.
++		 */
++		if (!in_same_user_ns(arg->pid, getpid())) {
++			rc = map_uidgid(arg->pid, &uid, &gid);
++			if (rc)
++				goto out;
++		}
+ 		syslog(LOG_INFO, "upcall_target=app, switching namespaces to application thread");
+ 		arg->upcall_target = UPTARGET_APP;
+ 		rc = switch_to_process_ns(arg->pid);
+@@ -1700,25 +1794,6 @@ int main(const int argc, char *const argv[])
+ 		syslog(LOG_INFO, "upcall_target=mount, not switching namespaces to application thread");
+ 	}
+ 
+-	/*
+-	 * We can't reasonably do this for root. When mounting a DFS share,
+-	 * for instance we can end up with creds being overridden, but the env
+-	 * variable left intact.
+-	 */
+-	if (uid == 0)
+-		env_probe = false;
+-
+-	/*
+-	 * FIXME: this only works if we haven't switched PID namespaces.
+-	 * If we did, /proc/arg->pid/ might not exist, or worse, point to something else.
+-	 */
+-	rc = get_uidgid(arg->pid, &uid, &gid);
+-	if (rc) {
+-		syslog(LOG_ERR, "get_uidgid (NS): %s", strerror(errno));
+-		rc = 1;
+-		goto out;
+-	}
+-
+ 	rc = setgid(gid);
+ 	if (rc) {
+ 		syslog(LOG_ERR, "setgid: %s", strerror(errno));
+-- 
+2.54.0
 
