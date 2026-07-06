@@ -1,48 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD922EBDDE;
-	Mon,  6 Jul 2026 22:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BF81B4223
+	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 23:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783378701; cv=none; b=K5CtsNOFF1WSSRqVDYeP4XMCyeqxY2Jme+P838kLbOWS1NhwsEPQS6oDHhY3aJ7kLPsFZegdL2p9Hvd7pacM+KxDG3pF7fdhjND/VkFfqqw/wL2g90TKMZbmVWrW2LsC7Q2dYnmv9h6axp8SMaKF8T7YfLtJ7iopD8/whMqi+60=
+	t=1783378952; cv=none; b=uBMjo6bN7heV6FpGxkURz96YOZvH0pAUkqWDZMCI+CY9svRDZGCPI7LH3ofJtaB50mbJi6IaXx1S4rO9337uh7yHVuZW6iVjWFDvndzSCgd9h5pYTSj7BXsI5yWY6BJ3l+h5IhO3+FQoasm7CXxYjkJ2RIPiGNHIrlnTvBBB/Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783378701; c=relaxed/simple;
-	bh=419TmRsSOeoesDr1aIF/fvIGTd64Jpop2TshXNML6tk=;
+	s=arc-20240116; t=1783378952; c=relaxed/simple;
+	bh=BH1E5/4QfF8OxZALIejI89+1+M3y6Q6yYIvFiTREhtU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hT1NKzCija1J4WmEtbdZsMCQLLbjdHQAo0wrSnZSaj64HOff1uQ9d9OQ+/QWbKNLCYEnBRMQN+BOP2jOrc98rh2/8aLdMuHF7eRaQ7KX1XPHp0Cegne3g/Itq0yWM6w5Euz2wq710tr/JVKQqadzLavsWGmx4+gX6LvxTw7HqKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L3Jxtea1; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=amJHdnmrPdRudbvW9Q1d6K0LIYjkkH2IqNE8vaYpoDArO+gX0XZQL8xKqnr8X+7eSEi3PAZ7NCTG8xDu7CHCAaOTSmq3If0yDKvkfUmEWQNyUbMYEa7hYMNQvr1Xt7ghPIPyNKGbqA0AS89FT3CrV3MAxDXWuORZeWjyoU9zmoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyDmUBc7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L3Jxtea1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1488A1F000E9;
-	Mon,  6 Jul 2026 22:58:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyDmUBc7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE23E1F00A3A;
+	Mon,  6 Jul 2026 23:02:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783378700;
-	bh=a1lvud7FZviX9knGtFQuVvSpeAHUeQeqgWfRN+CjGV8=;
+	s=k20260515; t=1783378951;
+	bh=ROace6Z7g1naMmzYooQ4frRXZnO5WZetYqkmDmh1cJo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=L3Jxtea1GG6ryBEJM6Ms45J2iXeiDMZZ59l58YTTJGssYu/MYBvUXYeoK/E9oke/q
-	 jk4z3tHuUO7S5W11EMf2dl13oAP0kwPonhA89bRj/L39fk8YMrLWlvOpAPLsu+6T25
-	 e7wIz3EpAX/wQXX/IPntJbNURDrvHA19mgVQ7HXgVjO7OrUOUup6f+kh1qyzsDRmOd
-	 j9gT/bzts+LljT2UcppCYHP91TqJhdetXns/lOcTQ0wVgJSwjFz1JCaFm6Q7qukoVY
-	 urwr2ZXfKoavKbemS/cqcXRKgJkBu2SJ/CZzEtlAXWuGBLoNwizYA4IhNoNML2nuFS
-	 lz2Ihel2OAG/Q==
+	b=jyDmUBc7oYZWWl4/NxUdJxbcTblbFQPa7tkSGcv0kOonshb+EPyMLPd8slDV6UqF4
+	 UMnZjdZqjzCjwPmxU2ny28ILpOoL/nwAhZt16hqKzmE8oHKLP/MStdYG/bT9ux01G1
+	 81BfxS8Y1xFZud/4nqs+pCqr0GZ0VIBe0hNKAtL0D5UMcNntP3r4CdGMwES5S4swID
+	 8tIoS9rGqxv+lYFMhoD4wp9jx+UclXtKXWn/sYnKX/iiQ7QdoTwChYlfyNYHqcqHTW
+	 XfMgPQwIcAIG3QW1iOV8ck9WfsbdZzBEAcwOwXa9fX8Oe+sDWslYqdxhE4E/dmupv7
+	 6trHomXauH3jg==
 Received: by pali.im (Postfix)
-	id 3BE985D7; Tue,  7 Jul 2026 00:58:17 +0200 (CEST)
-Date: Tue, 7 Jul 2026 00:58:17 +0200
+	id 1F03C5D7; Tue,  7 Jul 2026 01:02:28 +0200 (CEST)
+Date: Tue, 7 Jul 2026 01:02:28 +0200
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
 To: Steve French <smfrench@gmail.com>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	CIFS <linux-cifs@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND 07/11] cifs: Check if server supports EAs before
- trying to set it for WSL
-Message-ID: <20260706225817.hideosulpvoelww5@pali>
+Cc: CIFS <linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH RESEND 06/11] cifs: Validate presence of EA $LXMOD for
+ WSL reparse points
+Message-ID: <20260706230228.a574wmdy2kdigobh@pali>
 References: <20260706184819.22124-1-pali@kernel.org>
- <20260706184819.22124-8-pali@kernel.org>
- <CAH2r5mvHgpVP=CxcBd6iygLzDr5cvvvh9_W7DbxzRJTN6H4FKA@mail.gmail.com>
- <20260706224236.4fm5ypvbq3z3fsqi@pali>
- <CAH2r5mvDGM7i8EsdPkW681a_AnXOAsHkg38eJqegO7g2gV8qAw@mail.gmail.com>
+ <20260706184819.22124-7-pali@kernel.org>
+ <CAH2r5mue0UYq0--B-6uUVg5zryhxuS82RKFfhMZ0_dJR0gVs4Q@mail.gmail.com>
+ <20260706223948.5tmkeq7tu5dk7uuv@pali>
+ <CAH2r5mu4LK8cgWHDb_EUpUHkZdD1EtoJcp_c7Zv0KGmibW+=2Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -52,71 +49,79 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mvDGM7i8EsdPkW681a_AnXOAsHkg38eJqegO7g2gV8qAw@mail.gmail.com>
+In-Reply-To: <CAH2r5mu4LK8cgWHDb_EUpUHkZdD1EtoJcp_c7Zv0KGmibW+=2Q@mail.gmail.com>
 User-Agent: NeoMutt/20180716
 
-It is not working even without this my patch.
+Without this change, Linux recognize some nodes as special files which
+are not special at all (for WSL). With this change, the recognition is
+aligned with the WSL. Those nodes which are special for WSL are
+recognized as special also by Linux client. And those nodes which
+regular files for WSL are also regular for Linux client.
 
-mknod_wsl() is already setting the EAs and at the later stage,
-mknod_wsl() will report an error if the EAs cannot be set. In EA is
-present also the type of special file, and it is done for all types.
+So this is mostly alignment between MS WSL client and Linux client, to
+ensure interoperability.
 
-So this patch is not breaking it.
-
-On Monday 06 July 2026 17:49:27 Steve French wrote:
-> It should work for sockets (and symlink) without EAs right? So would the
-> patch break that?
+On Monday 06 July 2026 17:55:50 Steve French wrote:
+> Without this change would Linux client recognize it more accurately?
 > 
-> Thanks,
-> 
-> Steve
-> 
-> On Mon, Jul 6, 2026, 5:42 PM Pali Rohár <pali@kernel.org> wrote:
-> 
-> > If the server does not support EAs then setting the EAs (which is part
-> > of the creating WSL special file) would fail and so WSL special file
-> > would not be created. Major and minor numbers of char and block devices
-> > is stored in the EAs and therefore without EAs support, it is not
-> > possible to create and store char and block device nodes.
+> On Mon, Jul 6, 2026 at 5:39 PM Pali Rohár <pali@kernel.org> wrote:
 > >
-> > On Monday 06 July 2026 17:33:42 Steve French wrote:
-> > > If this were purely Linux, without this patch what would happen with
-> > > creating special files if the server didn't support EAs.  Would some
-> > > special files still work?
+> > With this change applied, such nodes are recognized as "regular files" same as in WSL.
+> >
+> > On Monday 06 July 2026 17:30:35 Steve French wrote:
+> > > If this EA is missing, does Linux client still recognize it (not
+> > > talking about WSL just what Linux client would see)?
 > > >
-> > > On Mon, Jul 6, 2026 at 1:52 PM Pali Rohár <pali@kernel.org> wrote:
+> > > On Mon, Jul 6, 2026 at 1:51 PM Pali Rohár <pali@kernel.org> wrote:
 > > > >
-> > > > WSL special files store information into EAs. When EAs are not
-> > supported
-> > > > on the server filesystem then fast fail in mknod_wsl() function.
+> > > > S_DT part of xattr $LXMOD is mandatory for all WSL reparse points except the
+> > > > WSL symlink and Win32 socket. Microsoft WSL subsystem does not recognize
+> > > > them without xattr $LXMOD too, and treat such inodes as regular files.
 > > > >
+> > > > Fixes: ef201e8759d2 ("cifs: Validate EAs for WSL reparse points")
+> > > > Fixes: 78e26bec4d6d ("smb: client: parse uid, gid, mode and dev from WSL reparse points")
 > > > > Signed-off-by: Pali Rohár <pali@kernel.org>
 > > > > ---
-> > > >  fs/smb/client/reparse.c | 7 +++++++
-> > > >  1 file changed, 7 insertions(+)
+> > > >  fs/smb/client/reparse.c | 12 ++++++++++++
+> > > >  1 file changed, 12 insertions(+)
 > > > >
 > > > > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> > > > index 99e93b56374f..e2ea59a17c9c 100644
+> > > > index 49a6a0cc2b61..99e93b56374f 100644
 > > > > --- a/fs/smb/client/reparse.c
 > > > > +++ b/fs/smb/client/reparse.c
-> > > > @@ -668,6 +668,13 @@ static int mknod_wsl(unsigned int xid, struct
-> > inode *inode,
-> > > >         struct kvec reparse_iov, xattr_iov;
-> > > >         int rc;
+> > > > @@ -1124,6 +1124,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+> > > >  {
+> > > >         struct smb2_file_full_ea_info *ea;
+> > > >         bool ignore_missing_eas = false;
+> > > > +       bool have_xattr_mode = false;
+> > > >         bool have_xattr_dev = false;
+> > > >         umode_t reparse_mode_type = 0;
+> > > >         u32 next = 0;
+> > > > @@ -1183,6 +1184,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+> > > >                         if (S_DT(reparse_mode_type) != S_DT(le32_to_cpu(*(__le32 *)v)))
+> > > >                                 return false;
+> > > >                         fattr->cf_mode = (umode_t)le32_to_cpu(*(__le32 *)v);
+> > > > +                       have_xattr_mode = true;
+> > > >                 } else if (!strncmp(name, SMB2_WSL_XATTR_DEV, nlen)) {
+> > > >                         fattr->cf_rdev = reparse_mkdev(v);
+> > > >                         have_xattr_dev = true;
+> > > > @@ -1194,6 +1196,16 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+> > > >         if (!have_xattr_dev && (tag == IO_REPARSE_TAG_LX_CHR || tag == IO_REPARSE_TAG_LX_BLK))
+> > > >                 return ignore_missing_eas;
 > > > >
 > > > > +       /*
-> > > > +        * WSL special files store information into EAs. When EAs are
-> > not
-> > > > +        * supported on the server filesystem then fast fail.
+> > > > +        * S_DT part of xattr MODE is mandatory for all WSL reparse points except the WSL symlink.
+> > > > +        * Microsoft WSL does not recognize them without xattr MODE too (except the WSL symlink).
+> > > > +        * IO_REPARSE_TAG_AF_UNIX is here an exception because this reparse point is used by both
+> > > > +        * WSL subsystem and native NT/WinAPI subsystems. And NT/WinAPI creates AF UNIX socket
+> > > > +        * without the xattr MODE and recognize it also without the xattr MODE.
 > > > > +        */
-> > > > +       if (!(le32_to_cpu(tcon->fsAttrInfo.Attributes) &
-> > FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
-> > > > +               return -EOPNOTSUPP;
+> > > > +       if (!have_xattr_mode && (tag != IO_REPARSE_TAG_AF_UNIX && tag != IO_REPARSE_TAG_LX_SYMLINK))
+> > > > +               return ignore_missing_eas;
 > > > > +
-> > > >         rc = wsl_set_reparse_buf(&buf, mode, symname, cifs_sb,
-> > &reparse_iov);
-> > > >         if (rc)
-> > > >                 return rc;
+> > > >         fattr->cf_mode |= reparse_mode_type;
+> > > >         return true;
+> > > >  }
 > > > > --
 > > > > 2.20.1
 > > > >
@@ -127,4 +132,10 @@ On Monday 06 July 2026 17:49:27 Steve French wrote:
 > > > Thanks,
 > > >
 > > > Steve
-> >
+> 
+> 
+> 
+> -- 
+> Thanks,
+> 
+> Steve
