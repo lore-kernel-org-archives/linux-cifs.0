@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEAC387375;
-	Mon,  6 Jul 2026 18:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62043D3D01;
+	Mon,  6 Jul 2026 18:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783363736; cv=none; b=LcKCMdepG6CtvsSyFTWLIQr/jCa++LWLnaHrb7q8ARtKvgWcZ6kn4mtETRwBnp+xR7TvsJrzJCtgCSPEunESFGK57LAVkxqwAx/T+dGw2DGSnz/GJgLdMnQ/fswCVbq5Vvrz0sM8G21PJYmp8B9lSDU1Nl8m8dsOSRJF/hq7U+k=
+	t=1783363738; cv=none; b=MYH/zjEdwuF0a6n56brUU1Zpe0bKZae1ZohhAs9wo6OCDdvdYprZ54ocrSk7NcHwC3/2qmn69vvmrMBn5aiQQMyntXGmVxfavCh8bJxWkN4MY14SU7n2FMtW9Ao72ghkg4sg9HX10GLItP/qHp1pBOyqRlE+XzHG4xNTogRZO+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783363736; c=relaxed/simple;
-	bh=HuHIzS8wRpRkmy/T7oSTPKtMT5819tU+oHlp8qf9t04=;
+	s=arc-20240116; t=1783363738; c=relaxed/simple;
+	bh=D8WpqHRxxiV7OTrV7/dV3wADdXy95HkBUJDrldNtfrA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PSg8TK9uNsUKtTgM8VPNH23rZw4bjr7qUWc7vIDJnneuficW/Ce3adPPKWqPZ8VimqTS+g7NKAmxuR+QGpTEm/fWOQzJ10cZJHlKv462JIpLPMkIaxNxm7ebll8IU+96/2gtzQ8uwpT37JToEMW/JbhdQCFjiE+82h9BxGDizew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SJrzkYhU; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=AUVN2MV7ARSHaplvlPWeCyFVHvmvqOuwU05cK/4QLu/u9btnvdUZxv7sbsc/0esqFLxYkvUIQxnOEh7bziBXqDQ5hJf0k1aNGfhK0ddvJdni4cxsoGvkLV/brFpnU6XgVgnEKvBSZU55q1xNJY+SA3YEq0sHsbXgSbcKIzzD11w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7F/doin; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SJrzkYhU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47B771F00ACA;
-	Mon,  6 Jul 2026 18:48:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7F/doin"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE4491F00ADB;
+	Mon,  6 Jul 2026 18:48:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1783363719;
-	bh=dYGGVStpzqupAymWEd71GCKeQVM7we0SU/j0yOjCi2I=;
+	bh=qPXP98Q76Ws0kZmMs094sKpxd/ePbp6bzS3TlRqGYDg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=SJrzkYhUWx9x55o3zwCXGZeqW6zsnS6ioxfpwiNn7lkCmLVh02yGM59STlxSR6gGD
-	 AtGAND2anqHlLO5LRhAZ6SWRSmpJC1KhfWUbDY+zz7GGMubAuMFOSas6bvQorRqsXL
-	 d260GXP2sfLBWW9Ee12HlxNn0sZf+3m787ke5fMbVTnG3DOEyvVw1mONZQeI1dDbFd
-	 +iO9h6R/vmkw8l7B0+TYXdpT6d5VbLA7MbRgWqzAQ0SmGD8tSAZdgLI9LNEkYsgQtc
-	 HEx+WNK3AlzrBF1HfZUHifnRh0JUX/adgB6pEtuHOze3lVX6hd3jNe3nqYWhmFQgUl
-	 uQSXLW7VMCXCw==
+	b=V7F/doinTCZJH0ixr+zpKs5y5mJn4obIEnpb1aKaSqhulWUPSm0DnGp1IaX7hi3in
+	 eoUzvh77v6gnkzVFanA+1v+/NpnR7C/YZqvW53amjQrlQzGLc8+jeaCDZ0sOLa/kH1
+	 IVBtoeDaHJlVC8AQt9cdd/4Y8keOm5GJWqaA/2qs+qfwPRhXppxDWbnYpclBFZTXmS
+	 btCBmx/eEaG8yZ8ZhebUdmobPB85GpF5UVm3lqYGgfu/df4NbPSurRpV1T3uBQUJOq
+	 qo478Xzb2wOf8Sp78nhHr/2FxH0cUx3XQ72jwGbRNMnouv+T6RsBIQ5R8NEyp6Lmt1
+	 rY2whlO0bXUIA==
 Received: by pali.im (Postfix)
-	id A7920E7E; Mon,  6 Jul 2026 20:48:34 +0200 (CEST)
+	id 7E55210C4; Mon,  6 Jul 2026 20:48:35 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND 04/11] cifs: Remove cifs_backup_query_path_info() and replace it by cifs_query_path_info()
-Date: Mon,  6 Jul 2026 20:48:12 +0200
-Message-Id: <20260706184819.22124-5-pali@kernel.org>
+Subject: [PATCH RESEND 09/11] cifs: Create native Window socket file compatible also with WSL subsystem
+Date: Mon,  6 Jul 2026 20:48:17 +0200
+Message-Id: <20260706184819.22124-10-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260706184819.22124-1-pali@kernel.org>
 References: <20260706184819.22124-1-pali@kernel.org>
@@ -49,175 +49,81 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Response handling of cifs_backup_query_path_info() function in
-cifs_get_fattr() is broken and can cause buffer overflows because
-cifs_backup_query_path_info() prepares request with different info levels
-but the response parser in cifs_get_fattr() always expects response
-structure FILE_DIRECTORY_INFO.
+After creating a native socket via the IO_REPARSE_TAG_AF_UNIX reparse
+point, try to set also the WSL EA $LXMOD.
 
-Code which queries file/dir attributes via CIFSFindFirst() is already
-implemented in cifs_query_path_info() function, so extend it for
-backup_cred(), which is the only missing functionality compared to
-cifs_backup_query_path_info().
+This makes the native Win32 / NT socket file recognized also under
+WSL subsystem. WSL subsystem uses same reparse point tag but requires also
+to be EA $LXMOD set.
 
-With this change the cifs_query_path_info() would do everything which is
-open-coded in cifs_set_fattr_ino() and cifs_backup_query_path_info()
-functions for SMB1. So remove that SMB1 code from cifs_set_fattr_ino() and
-also remove whole cifs_backup_query_path_info() function.
-
+Fixes: 45a99d5d1173 ("cifs: Add support for creating native Windows sockets")
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/inode.c   | 97 -----------------------------------------
- fs/smb/client/smb1ops.c |  7 ++-
- 2 files changed, 5 insertions(+), 99 deletions(-)
+ fs/smb/client/reparse.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 1dbcfd163ff0..6f82aa9bd033 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -1059,61 +1059,6 @@ static __u64 simple_hashstr(const char *str)
- 	return hash;
- }
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index e2ea59a17c9c..50eeea127a42 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -384,7 +384,7 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
  
--#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--/**
-- * cifs_backup_query_path_info - SMB1 fallback code to get ino
-- *
-- * Fallback code to get file metadata when we don't have access to
-- * full_path (EACCES) and have backup creds.
-- *
-- * @xid:	transaction id used to identify original request in logs
-- * @tcon:	information about the server share we have mounted
-- * @sb:	the superblock stores info such as disk space available
-- * @full_path:	name of the file we are getting the metadata for
-- * @resp_buf:	will be set to cifs resp buf and needs to be freed with
-- * 		cifs_buf_release() when done with @data
-- * @data:	will be set to search info result buffer
-- */
--static int
--cifs_backup_query_path_info(int xid,
--			    struct cifs_tcon *tcon,
--			    struct super_block *sb,
--			    const char *full_path,
--			    void **resp_buf,
--			    FILE_ALL_INFO **data)
--{
--	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
--	struct cifs_search_info info = {0};
--	u16 flags;
--	int rc;
--
--	*resp_buf = NULL;
--	info.endOfSearch = false;
--	if (tcon->unix_ext)
--		info.info_level = SMB_FIND_FILE_UNIX;
--	else if ((tcon->ses->capabilities &
--		  tcon->ses->server->vals->cap_nt_find) == 0)
--		info.info_level = SMB_FIND_FILE_INFO_STANDARD;
--	else if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_SERVER_INUM)
--		info.info_level = SMB_FIND_FILE_ID_FULL_DIR_INFO;
--	else /* no srvino useful for fallback to some netapp */
--		info.info_level = SMB_FIND_FILE_DIRECTORY_INFO;
--
--	flags = CIFS_SEARCH_CLOSE_ALWAYS |
--		CIFS_SEARCH_CLOSE_AT_END |
--		CIFS_SEARCH_BACKUP_SEARCH;
--
--	rc = CIFSFindFirst(xid, tcon, full_path,
--			   cifs_sb, NULL, flags, &info, false);
--	if (rc)
--		return rc;
--
--	*resp_buf = (void *)info.ntwrk_buf_start;
--	*data = (FILE_ALL_INFO *)info.srch_entries_start;
--	return 0;
--}
--#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--
- static void cifs_set_fattr_ino(int xid, struct cifs_tcon *tcon, struct super_block *sb,
- 			       struct inode **inode, const char *full_path,
- 			       struct cifs_open_info_data *data, struct cifs_fattr *fattr)
-@@ -1328,45 +1273,6 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
- 		cifs_create_junction_fattr(fattr, sb);
- 		rc = 0;
- 		break;
--	case -EACCES:
--#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--		/*
--		 * perm errors, try again with backup flags if possible
--		 *
--		 * For SMB2 and later the backup intent flag
--		 * is already sent if needed on open and there
--		 * is no path based FindFirst operation to use
--		 * to retry with
--		 */
--		if (backup_cred(cifs_sb) && is_smb1_server(server)) {
--			/* for easier reading */
--			FILE_ALL_INFO *fi;
--			FILE_DIRECTORY_INFO *fdi;
--			FILE_ID_FULL_DIR_INFO *si;
--
--			rc = cifs_backup_query_path_info(xid, tcon, sb,
--							 full_path,
--							 &smb1_backup_rsp_buf,
--							 &fi);
--			if (rc)
--				goto out;
--
--			move_cifs_info_to_smb2(&data->fi, fi);
--			fdi = (FILE_DIRECTORY_INFO *)fi;
--			si = (FILE_ID_FULL_DIR_INFO *)fi;
--
--			cifs_dir_info_to_fattr(fattr, fdi, cifs_sb);
--			fattr->cf_uniqueid = le64_to_cpu(si->UniqueId);
--			/* uniqueid set, skip get inum step */
--			goto handle_mnt_opt;
--		} else {
--			/* nothing we can do, bail out */
--			goto out;
--		}
--#else
--		goto out;
--#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--		break;
- 	default:
- 		cifs_dbg(FYI, "%s: unhandled err rc %d\n", __func__, rc);
- 		goto out;
-@@ -1381,9 +1287,6 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
- 	/*
- 	 * 4. Tweak fattr based on mount options
- 	 */
--#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--handle_mnt_opt:
--#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
- 	sbflags = cifs_sb_flags(cifs_sb);
- 	/* query for SFU type info if supported and needed */
- 	if ((fattr->cf_cifsattrs & ATTR_SYSTEM) &&
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index e14ab5449943..8bacbcad8858 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -568,15 +568,18 @@ static int cifs_query_path_info(const unsigned int xid,
- 	/*
- 	 * Then fallback to CIFSFindFirst() which works also with non-NT servers
- 	 * but does not does not provide NumberOfLinks.
-+	 * Can be used with backup intent flag to overcome -EACCES error.
- 	 */
--	if ((rc == -EOPNOTSUPP || rc == -EINVAL) &&
-+	if ((rc == -EOPNOTSUPP || rc == -EINVAL ||
-+	     (backup_cred(cifs_sb) && rc == -EACCES)) &&
- 	    !non_unicode_wildcard) {
- 		if (!(tcon->ses->capabilities & tcon->ses->server->vals->cap_nt_find))
- 			search_info.info_level = SMB_FIND_FILE_INFO_STANDARD;
- 		else
- 			search_info.info_level = SMB_FIND_FILE_FULL_DIRECTORY_INFO;
- 		rc = CIFSFindFirst(xid, tcon, full_path, cifs_sb, NULL,
--				   CIFS_SEARCH_CLOSE_ALWAYS | CIFS_SEARCH_CLOSE_AT_END,
-+				   CIFS_SEARCH_CLOSE_ALWAYS | CIFS_SEARCH_CLOSE_AT_END |
-+				    (backup_cred(cifs_sb) ? CIFS_SEARCH_BACKUP_SEARCH : 0),
- 				   &search_info, false);
- 		if (rc == 0) {
- 			if (!(tcon->ses->capabilities & tcon->ses->server->vals->cap_nt_find)) {
+ static int create_native_socket(const unsigned int xid, struct inode *inode,
+ 				struct dentry *dentry, struct cifs_tcon *tcon,
+-				const char *full_path)
++				const char *full_path, umode_t mode)
+ {
+ 	struct reparse_data_buffer buf = {
+ 		.ReparseTag = cpu_to_le32(IO_REPARSE_TAG_AF_UNIX),
+@@ -398,6 +398,10 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+ 		.iov_base = &buf,
+ 		.iov_len = sizeof(buf),
+ 	};
++#ifdef CONFIG_CIFS_XATTR
++	const __le64 xattr_mode_val = cpu_to_le64(mode);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
++#endif
+ 	struct inode *new;
+ 	int rc = 0;
+ 
+@@ -408,6 +412,28 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+ 		d_instantiate(dentry, new);
+ 	else
+ 		rc = PTR_ERR(new);
++
++	/*
++	 * Try to set also optional WSL EA $LXMOD but ignore errors.
++	 * WSL socket and native Win32/NT sockets uses same reparse point
++	 * tag IO_REPARSE_TAG_AF_UNIX. WSL subsystem additionally requires
++	 * EA $LXMOD to be set with the S_IFSOCK value. So setting this EA
++	 * allows native socket to be recognized also by WSL subsystem.
++	 * Note that setting of both EAs and reparse points is not supported
++	 * by NTFS filesystem on Windows 8 / Windows Server 2012 and always
++	 * fails. So ignore failures from this set_EA call.
++	 */
++#ifdef CONFIG_CIFS_XATTR
++	if (!rc && tcon->ses->server->ops->set_EA &&
++	    (le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
++		tcon->ses->server->ops->set_EA(xid, tcon, full_path,
++					       true /* open reparse point */,
++					       SMB2_WSL_XATTR_MODE,
++					       &xattr_mode_val,
++					       SMB2_WSL_XATTR_MODE_SIZE,
++					       cifs_sb->local_nls, cifs_sb);
++#endif
++
+ 	cifs_free_open_info(&data);
+ 	return rc;
+ }
+@@ -717,7 +743,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
+ 	struct smb3_fs_context *ctx = CIFS_SB(inode->i_sb)->ctx;
+ 
+ 	if (S_ISSOCK(mode) && !ctx->nonativesocket && ctx->reparse_type != CIFS_REPARSE_TYPE_NONE)
+-		return create_native_socket(xid, inode, dentry, tcon, full_path);
++		return create_native_socket(xid, inode, dentry, tcon, full_path, mode);
+ 
+ 	switch (ctx->reparse_type) {
+ 	case CIFS_REPARSE_TYPE_NFS:
 -- 
 2.20.1
 
