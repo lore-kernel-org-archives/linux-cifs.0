@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62043D3D01;
-	Mon,  6 Jul 2026 18:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB55B3C553C;
+	Mon,  6 Jul 2026 18:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783363738; cv=none; b=MYH/zjEdwuF0a6n56brUU1Zpe0bKZae1ZohhAs9wo6OCDdvdYprZ54ocrSk7NcHwC3/2qmn69vvmrMBn5aiQQMyntXGmVxfavCh8bJxWkN4MY14SU7n2FMtW9Ao72ghkg4sg9HX10GLItP/qHp1pBOyqRlE+XzHG4xNTogRZO+Q=
+	t=1783363737; cv=none; b=YNmelC5l6q8SQYkYz0LV0IYbuot1mGv796HFYInYsGce4cFV66Dyh1b76lF2k3gxVHYat7A9u3XMF6YsDKVttG424jhfoFq8B6gUowi0YxUt2t1dr2IXo7oURyqFzRzyt0yo/PF0U1KHGyXDFlcS4z6rmKvsJFyI7pTt5ObC0O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783363738; c=relaxed/simple;
-	bh=D8WpqHRxxiV7OTrV7/dV3wADdXy95HkBUJDrldNtfrA=;
+	s=arc-20240116; t=1783363737; c=relaxed/simple;
+	bh=9IfxgVrH+En7a8AcDP36XYZ+D0qf8RF3PyEDzvqOZaA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AUVN2MV7ARSHaplvlPWeCyFVHvmvqOuwU05cK/4QLu/u9btnvdUZxv7sbsc/0esqFLxYkvUIQxnOEh7bziBXqDQ5hJf0k1aNGfhK0ddvJdni4cxsoGvkLV/brFpnU6XgVgnEKvBSZU55q1xNJY+SA3YEq0sHsbXgSbcKIzzD11w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7F/doin; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=JNhuRmfdG2Q6NW9z6zQyZFrl2UFLk3bUldpFul0Tgj2flLyV7F0dxcBnBhis1ey1aD4vnd4fevdwuBh3JJNF5gf57nFGIj4n+ZVedcKCLFbcY0TUTPZsFXspJhYDEg6LJnVNa9ZUozjDjm4VN01wTB4N9L2hQQlZ2R/8H1uNRFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ICuP+g7H; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7F/doin"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE4491F00ADB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICuP+g7H"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C83451F00A3A;
 	Mon,  6 Jul 2026 18:48:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1783363719;
-	bh=qPXP98Q76Ws0kZmMs094sKpxd/ePbp6bzS3TlRqGYDg=;
+	bh=Vxn+vS1k9jNleOA7QdgLCqCI0o/R6HJ5ycnSoPgwtss=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=V7F/doinTCZJH0ixr+zpKs5y5mJn4obIEnpb1aKaSqhulWUPSm0DnGp1IaX7hi3in
-	 eoUzvh77v6gnkzVFanA+1v+/NpnR7C/YZqvW53amjQrlQzGLc8+jeaCDZ0sOLa/kH1
-	 IVBtoeDaHJlVC8AQt9cdd/4Y8keOm5GJWqaA/2qs+qfwPRhXppxDWbnYpclBFZTXmS
-	 btCBmx/eEaG8yZ8ZhebUdmobPB85GpF5UVm3lqYGgfu/df4NbPSurRpV1T3uBQUJOq
-	 qo478Xzb2wOf8Sp78nhHr/2FxH0cUx3XQ72jwGbRNMnouv+T6RsBIQ5R8NEyp6Lmt1
-	 rY2whlO0bXUIA==
+	b=ICuP+g7H/q3il7twvCkXK2alRfzUbTi3iCgqFfmY15SESTqSyNG1ngJmWFmzAmLjw
+	 rjDkMg/PgCRD0Ay5wt+a0VyOYahVbRiCBpgN80Mz7kzR/RNLyOQYA63NPqzVXOOeUP
+	 QqkWKI2ehI6pPn1Q7nW/9pnW8SlqTYXkZSiOpr4SjxvLNbem8pxrNzia8p8/hPR39y
+	 zuayai8b9oj8drCRPRPKQV1dpJcElFHGSTgxzXyJUYwxO0S88Tj/ETlDuIXtfidvAG
+	 lvJeyckSMsSymvf1TJ/ZZeumA0FBwXryloYwdwt/oPMRAsm8igbyI8wZv3X7kH8Jna
+	 IQHEKzjI74Iaw==
 Received: by pali.im (Postfix)
-	id 7E55210C4; Mon,  6 Jul 2026 20:48:35 +0200 (CEST)
+	id 82F03C8E; Mon,  6 Jul 2026 20:48:34 +0200 (CEST)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND 09/11] cifs: Create native Window socket file compatible also with WSL subsystem
-Date: Mon,  6 Jul 2026 20:48:17 +0200
-Message-Id: <20260706184819.22124-10-pali@kernel.org>
+Subject: [PATCH RESEND 03/11] cifs: Remove CIFSSMBSetPathInfoFB() fallback function
+Date: Mon,  6 Jul 2026 20:48:11 +0200
+Message-Id: <20260706184819.22124-4-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260706184819.22124-1-pali@kernel.org>
 References: <20260706184819.22124-1-pali@kernel.org>
@@ -49,81 +49,75 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-After creating a native socket via the IO_REPARSE_TAG_AF_UNIX reparse
-point, try to set also the WSL EA $LXMOD.
+This fallback function CIFSSMBSetPathInfoFB() is called only from
+CIFSSMBSetPathInfo() function. CIFSSMBSetPathInfo() is used in
+smb_set_file_info() which contains all required fallback code, including
+fallback via filehandle, since commit f122121796f9 ("cifs: Fix changing
+times and read-only attr over SMB1 smb_set_file_info() function") and
+commit 92210ccd877b ("cifs: Add fallback code path for cifs_mkdir_setinfo()").
 
-This makes the native Win32 / NT socket file recognized also under
-WSL subsystem. WSL subsystem uses same reparse point tag but requires also
-to be EA $LXMOD set.
+So the CIFSSMBSetPathInfoFB() is just code duplication, which is not needed
+anymore. Therefore remove it.
 
-Fixes: 45a99d5d1173 ("cifs: Add support for creating native Windows sockets")
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/reparse.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ fs/smb/client/cifssmb.c | 36 ------------------------------------
+ 1 file changed, 36 deletions(-)
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index e2ea59a17c9c..50eeea127a42 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -384,7 +384,7 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
- 
- static int create_native_socket(const unsigned int xid, struct inode *inode,
- 				struct dentry *dentry, struct cifs_tcon *tcon,
--				const char *full_path)
-+				const char *full_path, umode_t mode)
- {
- 	struct reparse_data_buffer buf = {
- 		.ReparseTag = cpu_to_le32(IO_REPARSE_TAG_AF_UNIX),
-@@ -398,6 +398,10 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
- 		.iov_base = &buf,
- 		.iov_len = sizeof(buf),
- 	};
-+#ifdef CONFIG_CIFS_XATTR
-+	const __le64 xattr_mode_val = cpu_to_le64(mode);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+#endif
- 	struct inode *new;
- 	int rc = 0;
- 
-@@ -408,6 +412,28 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
- 		d_instantiate(dentry, new);
- 	else
- 		rc = PTR_ERR(new);
-+
-+	/*
-+	 * Try to set also optional WSL EA $LXMOD but ignore errors.
-+	 * WSL socket and native Win32/NT sockets uses same reparse point
-+	 * tag IO_REPARSE_TAG_AF_UNIX. WSL subsystem additionally requires
-+	 * EA $LXMOD to be set with the S_IFSOCK value. So setting this EA
-+	 * allows native socket to be recognized also by WSL subsystem.
-+	 * Note that setting of both EAs and reparse points is not supported
-+	 * by NTFS filesystem on Windows 8 / Windows Server 2012 and always
-+	 * fails. So ignore failures from this set_EA call.
-+	 */
-+#ifdef CONFIG_CIFS_XATTR
-+	if (!rc && tcon->ses->server->ops->set_EA &&
-+	    (le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
-+		tcon->ses->server->ops->set_EA(xid, tcon, full_path,
-+					       true /* open reparse point */,
-+					       SMB2_WSL_XATTR_MODE,
-+					       &xattr_mode_val,
-+					       SMB2_WSL_XATTR_MODE_SIZE,
-+					       cifs_sb->local_nls, cifs_sb);
-+#endif
-+
- 	cifs_free_open_info(&data);
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index d7a6955d904e..a2f3a1582cee 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -5812,38 +5812,6 @@ CIFSSMBSetFileDisposition(const unsigned int xid, struct cifs_tcon *tcon,
  	return rc;
  }
-@@ -717,7 +743,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
- 	struct smb3_fs_context *ctx = CIFS_SB(inode->i_sb)->ctx;
  
- 	if (S_ISSOCK(mode) && !ctx->nonativesocket && ctx->reparse_type != CIFS_REPARSE_TYPE_NONE)
--		return create_native_socket(xid, inode, dentry, tcon, full_path);
-+		return create_native_socket(xid, inode, dentry, tcon, full_path, mode);
+-static int
+-CIFSSMBSetPathInfoFB(const unsigned int xid, struct cifs_tcon *tcon,
+-		     const char *fileName, const FILE_BASIC_INFO *data,
+-		     const struct nls_table *nls_codepage,
+-		     struct cifs_sb_info *cifs_sb)
+-{
+-	int oplock = 0;
+-	struct cifs_open_parms oparms;
+-	struct cifs_fid fid;
+-	int rc;
+-
+-	oparms = (struct cifs_open_parms) {
+-		.tcon = tcon,
+-		.cifs_sb = cifs_sb,
+-		.desired_access = GENERIC_WRITE,
+-		.create_options = cifs_create_options(cifs_sb, 0),
+-		.disposition = FILE_OPEN,
+-		.path = fileName,
+-		.fid = &fid,
+-	};
+-
+-	rc = CIFS_open(xid, &oparms, &oplock, NULL);
+-	if (rc)
+-		goto out;
+-
+-	rc = CIFSSMBSetFileInfo(xid, tcon, data, fid.netfid, current->tgid);
+-	CIFSSMBClose(xid, tcon, fid.netfid);
+-out:
+-
+-	return rc;
+-}
+-
+ int
+ CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 		   const char *fileName, const FILE_BASIC_INFO *data,
+@@ -5922,10 +5890,6 @@ CIFSSMBSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 	if (rc == -EAGAIN)
+ 		goto SetTimesRetry;
  
- 	switch (ctx->reparse_type) {
- 	case CIFS_REPARSE_TYPE_NFS:
+-	if (rc == -EOPNOTSUPP)
+-		return CIFSSMBSetPathInfoFB(xid, tcon, fileName, data,
+-					    nls_codepage, cifs_sb);
+-
+ 	return rc;
+ }
+ 
 -- 
 2.20.1
 
