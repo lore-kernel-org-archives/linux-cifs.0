@@ -1,210 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE5C348866;
-	Mon,  6 Jul 2026 08:49:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783327810; cv=none; b=PmPhE/I0H5XFU+WUY/4i1VzEnYMlSmG/LkNh5KPPWpqoKM7CLcoTCny+wQYECzsErKF5cjurP6WS21bqpbh5HQG8euMQvUUsvsNnbtt2evm7w4SE157SLqvptQm4uARF8bQ61vxqRC+5W4gcVRW2r9Z+RP1A2aViaBmI9+MUok4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783327810; c=relaxed/simple;
-	bh=0x7pTVBQM/oo8cB6MYqUQ77YVRX8Kqn9XyTS7jKO4kI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NLuR3d3sq0017UEfGqb5GZxyTeETEIS7YGNmz1meaeCoE+XhreVYnDtvMrFGNX+4+7KEbbzNOvP3VA85jURtDSV3WBXe5ZzlFq9dRypBMlJQu7GD+iv38UL36mG5SBOQe5SVqhPtv4LKDdxl0F6XxB9qhzquTS4MEfnyFSfGqqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQADDgAf; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3222A3EFFB4
+	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 11:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.171
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783335939; cv=pass; b=HrLwDtQYcuGYSXVCYBreTbIYebEHgVZLyh39KRVHT8Bdp5XKDLEcpnGO1CduN/a2Alen1JjztoXdvzEDd9TXjTW1QNqV2SPKPiEeBU9GlUys1h+imA/Cj0W4+/7X/CQX/5FdV1+ym/W7T+GjOxi8nBWPNGxTYCq/pnGhPv9Ac8g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783335939; c=relaxed/simple;
+	bh=/hNkRgqeQVbmzvlwRmP3/2RYGVe1oSFSJkX3H5Zcdt8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MtHcZORGZyIQp5kgxbeoVwUHTgwqrMtemvZJ3Cd5tk/gFWNHZNf51msaBIM8YShvtwDVXVuQD8nkKHMkqUgc67VEYabtb0okuyrGgT0D4DJf/C2KDTeHOcvRl2qcr7R7+zVA0VOT2LDSTwJrInj3BeYx+ObG0Phq7POOdoc0cts=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu; spf=pass smtp.mailfrom=szeredi.hu; dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b=L7kbB6Wc; arc=pass smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=szeredi.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=szeredi.hu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQADDgAf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 978CA1F000E9;
-	Mon,  6 Jul 2026 08:49:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783327795;
-	bh=9jiSSkCBnbVD7ihxmuDYCTOJSaEPHEl7wjng44WMYRs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=HQADDgAfKOb+QRTcxlAPYJxUo81CV+X2k0sH4dqu4MXUhUvI8d0gKIn3fSYrA1PX/
-	 tkL8EscUhizGPIAmstyC+IcGi0Bpq2pmvmlHX04vH8BLW7siC04DcmJ3HXxv8hq27U
-	 Cm3VdQdVL+4wwVwhFK7HQmPqA48e10qpeEhHd7fFACoRgnafr1d4FUho7fCK2UTrgb
-	 YogOm5FOfD941STn0/3UYZu0szCwziMiufd32dSLEBhvVT9dg6Be1JIoRbfI00bgNA
-	 1oij26/UKxOAPFBnCcX21MUoXrF/X4CgR3ssY2W31wgMyjX/YgrYc2fFtMVYhbR2Xe
-	 VpXfNmIUilBiw==
-Date: Mon, 6 Jul 2026 11:49:50 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, mkalderon@marvell.com,
-	zyjzyj2000@gmail.com, sagi@grimberg.me, mgurtovoy@nvidia.com,
-	haris.iqbal@ionos.com, jinpu.wang@ionos.com, bvanassche@acm.org,
-	kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
-	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
-	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
-	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, kees@kernel.org,
-	andriy.shevchenko@linux.intel.com, clm@meta.com,
-	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH rdma-next v9] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <20260706084950.GK15188@unreal>
-References: <20260703060329.896125-1-ernis@linux.microsoft.com>
+	dkim=pass (1024-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="L7kbB6Wc"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-51bfb91795eso16828691cf.1
+        for <linux-cifs@vger.kernel.org>; Mon, 06 Jul 2026 04:05:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783335936; cv=none;
+        d=google.com; s=arc-20260327;
+        b=lEiM7fyfnPI4Dt11jkIhdPnVYBOQ5K7h+kp/AxaFLmhIpRpAcobWt019Zzmtrzqdjx
+         0bO2n8RzZ4+UhIdpkee9BnZX1WfSuab5yTxbIshH+z2mXAQdjdmBVKIkUrT9k63W/YkD
+         tC/cpNOnezETvFzDVUXgXl/ru1apT2FnH65WqeFIjBy3PTHMbgWFyGjIZrrkj1uXpOJm
+         B8e8SB/CA1kGKcWJv+pUnu8pHRXJaXQEZRKeT1fKCEoCUesRAfJUk3o1LnRmo+DSoKhT
+         bzV8n4cp2oZU6j7Oq6cN6YRKtZNaCC4flPnkGFVv3mV4goIhb4VTLUZjP/WRXcO+UbTI
+         GWPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=5N9xOz7IuFoWi/YP9UdZnMaOav6tflAjjK/V30R04Xw=;
+        fh=UziU2Kw9eMb0RiwwGph3QRbwOVGsPsskCVcFQiC4e1k=;
+        b=JvLq8KvJeQl7DihvW4gk4TmZ41A6YumWWxI4rpUFsCohUtBhOI3dzjEhvIPcdsYsRC
+         h+nTGLssAnyw2ND3qUE4FC9RfwEZlbJiHZmNMjSv8MlzjBhf2t26H4aqwu3OxnmRQrPB
+         K7au4k8rirnJEEI/y/avWkrqDODTUvv6ZOAIHBtfJNN6GXDlRLUFVwZrd00S6l7W+onb
+         S9D2v3/HeXKfEQ6sUmeSGKdyU7yDbqWectv7ayF43ab65o3pjWIiTSy9r36E5Mld6hvK
+         4cZzZYyBgEeH14/qRDTjpWWPyYCSonUqXrfLmDr0qyCt1hSTddOQkVenFMEzzbrAbkaa
+         f3Ag==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=szeredi.hu; s=google; t=1783335936; x=1783940736; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5N9xOz7IuFoWi/YP9UdZnMaOav6tflAjjK/V30R04Xw=;
+        b=L7kbB6WcHUV6HryxojFgeaun/MQ6kjrsBcAqV+yFpS2C9zHYxYE0AnI/mL+PM9VF44
+         ur6rJteTLgKQNtRVXVv7dkrf8+W6qeFnqKNbE+nA/plr7sNWyKKOikW7n1UyVJ9+fttA
+         W9tqDW2bVZXB4GuHXBbwsX1eIYoBWEokArOQs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783335936; x=1783940736;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5N9xOz7IuFoWi/YP9UdZnMaOav6tflAjjK/V30R04Xw=;
+        b=W5vX0qMyM4hWwSbp1vHA3aTjxP7pyE3MHoiDHt4huRQs1iteoutlDUmqyTQ47JRSDy
+         k/JnaMKUhrKh3fRwQZ6/fdFkTwg40R9KVOSVxQclYPDaX/Gg13zYGeGcqm7f+eZ9nOk0
+         1CrvftYEKvd8UpuRLKIxzQTRsQLPLKpwKmOlq/NVuuYmuORti1D8iYxt1pY0Iyhz6PGE
+         nX3anQwMmBiUfHRE97ROWl/SC+maZH/4E55VVd64vAavKLyAhWkSEoEbFypl3YeUle+d
+         FAfqzpEjHYhhiVBia+VX1FcOHaGL0mMjtp8WrgwLQugjRI9nEiRpaftf/ZCL0ifPjEAW
+         YAJQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpi7d6KPqEiQTuYrHh7EFdGsHMgr9XdsX2EOk2OVPppjrzJfTTVbuCYECnctKoPPPdmSgH0xYDcG0FL@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3xSqydmgREF1WRewq5Ycm6crig3CcBqmluT6c99lEeXut1wak
+	7kVG6zBxNr1EvKYnuvKDUX7MnC23vJL1MMkcju/t1+/Ze4iULIAb9CLZSoGm/rGeiKAWQwF9TmN
+	q68ARRYP0LugWB0alFymb+OZQVGXW2jSRVPhndSPVFA==
+X-Gm-Gg: AfdE7clj7Zi3lm9/4N+WbvKseMJJkAmF9nmwQEtI09rTJtgCreCZ4hNt+660us2pYq9
+	fsklen2YQEe4jlAkA53iL2iDmvMCEQ0d9tt7nWKfndjrAIOKDb4Uom+BXPyb82zuxd9U69rfzIn
+	xEyS+66UhSb0x1XhYv0VnKxhWCCTtNiLebrno+mkcuQQg3FjuhZxlAoV/fyvjTuogGTGda7O7HV
+	oYsmoo5Ct3B1rNpFEJDjQ31dWwCH4LMbM/OxjZkcXfIV69h8ie2b44KUzPX5rK1C7SwmMJvZQcz
+	lA5WE1EiUMBbtVI9K+QCBHbFPrA=
+X-Received: by 2002:a05:622a:1453:b0:517:7e26:36a4 with SMTP id
+ d75a77b69052e-51c4c2c14b9mr140647271cf.34.1783335935865; Mon, 06 Jul 2026
+ 04:05:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260703060329.896125-1-ernis@linux.microsoft.com>
+References: <20260702021105.3406439-1-neilb@ownmail.net>
+In-Reply-To: <20260702021105.3406439-1-neilb@ownmail.net>
+From: Miklos Szeredi <miklos@szeredi.hu>
+Date: Mon, 6 Jul 2026 13:05:23 +0200
+X-Gm-Features: AVVi8CffNWtFbcBvs13jifF0StaOc8_tnG8CKCFcb9gVjjy93J7qwqRMN2Yb6cc
+Message-ID: <CAJfpegtCL8S=zjv-pwxrX-9YXL0HLGb8Dsw_XWFF_H4Ui3MTZA@mail.gmail.com>
+Subject: Re:
+To: NeilBrown <neil@brown.name>
+Cc: Steve French <sfrench@samba.org>, Steve French <smfrench@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 02, 2026 at 11:02:57PM -0700, Erni Sri Satya Vennela wrote:
-> The capability counter fields in struct ib_device_attr are declared
-> as signed int, but these values are inherently non-negative. Drivers
-> maintain their cached caps as u32 and assign them directly into these
-> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
-> negative value visible to the IB core.
-> 
-> Change the signed int capability fields to u32 to match the
-> underlying nature of the data. Also update consumers across the IB
-> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
-> are not forced back through signed int or u8 via min()/min_t() or
-> narrowing local variables.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Acked-by: Stefan Metzmacher <metze@samba.org> # smbdirect
-> ---
-> Changes in v9:
-> * Switch the srq_size module parameter accessors to param_get_uint and
->   kstrtouint()/param_set_uint() so they match the now-unsigned
->   nvmet_rdma_srq_size variable.
-> Changes in v8:
-> * Convert the remaining non-negative counter fields max_ee_rd_atom,
->   max_ee_init_rd_atom, max_ee, max_rdd, max_raw_ipv6_qp and max_srq_wr
->   to u32; keep max_srq as int (its consumer compares it against
->   ib_device.num_comp_vectors, still int).
-> * Drop all remaining min_t() where plain min() now works.
-> * Make the srq_size module parameters unsigned int so the srq_size min()
->   stays a plain min().
-> * Replace the ternary-inside-min() with the simpler "if (x) x--;".
-> * Reorder the send_queue_depth min() to min(value, CONST) to match the
->   sibling site.
-> * Restore reverse xmas-tree declaration order.
-> * Collapse the min()/min3() assignments that now fit onto a single line
->   within 100 columns.
-> * Print the now-u32 fields with %u instead of %d.
-> Changes in v7:
-> * Drop min_t() in all sites where a plain min() (or min3()) works
->   cleanly
-> * Guard nvme/host/rdma.c num_inline_segments computation against a
->   device reporting max_send_sge == 0, so the u32 subtract
->   cannot wrap to UINT_MAX.
-> * Use %u when printing the newly-u32 capability fields
->   in diagnostic messages.
-> Changes in v6:
-> * Fix subject prefix: net-next -> rdma-next.
-> Changes in v5:
-> * Add U8_MAX clamps in iser_verbs, nvme/host, nvme/target, isert,
-> * rds/ib_cm, smbdirect/connect and smbdirect/accept where u32 capability
->   fields were directly narrowed into u8 rdma_conn_param fields without
->   clamping.
-> * Guard the inline_sge_count calculation in nvmet_rdma_find_get_device()
->   to prevent u32 underflow when both max_sge_rd and max_recv_sge are
-> zero.
-> * Expand type migration to 9 additional fields (max_mw, max_raw_ethy_qp,
->   max_mcast_grp, max_mcast_qp_attach, max_total_mcast_qp_attach, max_ah,
->   max_srq, max_srq_wr, max_srq_sge)
-> * Fix min_t(int,...) in svc_rdma_transport; min_t(u32,...) in ipoib,
->   srpt, nvme/target, rds/ib, rtrs-clt, rtrs-srv, xprtrdma/verbsdd.
-> * Fix frwr_ops.c u32 underflow guard (reorder check before subtraction)
-> * Change sc_max_send_sges to unsigned int, inline_sge_count to u32
-> * Fix %d -> %u in rxe_qp, rxe_srq, ipoib_cm, ib_isert,
-> * svc_rdma_transport
-> * Update commit message.
-> Changes in v4:
-> * Drop clamping the values in mana_ib_query_device, instead update
->   the props values from int to u32.
-> Changes in v3:
-> * Drop clamping from mana_ib_gd_query_adapter_caps(). The internal u32
->   caps cache does not need to be clamped.
-> * Move all clamping exclusively to mana_ib_query_device(), which is the
->   only place the cached u32 values are narrowed into the signed int
->   fields of struct ib_device_attr.
-> * Reframe commit message: this is a u32-to-int type boundary fix, not a
->   CVM/untrusted-hardware hardening patch.
-> Changes in v2:
-> * Update patch title.
-> ---
->  drivers/infiniband/core/cq.c               |  3 +-
->  drivers/infiniband/hw/qedr/verbs.c         |  2 +-
->  drivers/infiniband/sw/rxe/rxe_qp.c         | 22 +++++-----
->  drivers/infiniband/sw/rxe/rxe_srq.c        | 16 +++----
->  drivers/infiniband/ulp/ipoib/ipoib_cm.c    | 10 ++---
->  drivers/infiniband/ulp/ipoib/ipoib_verbs.c |  3 +-
->  drivers/infiniband/ulp/iser/iser_verbs.c   |  5 +--
->  drivers/infiniband/ulp/isert/ib_isert.c    |  7 ++-
->  drivers/infiniband/ulp/rtrs/rtrs-clt.c     | 11 ++---
->  drivers/infiniband/ulp/rtrs/rtrs-srv.c     | 11 ++---
->  drivers/infiniband/ulp/srp/ib_srp.c        |  2 +-
->  drivers/infiniband/ulp/srpt/ib_srpt.c      | 21 +++++----
->  drivers/nvme/host/rdma.c                   |  8 ++--
->  drivers/nvme/target/rdma.c                 | 22 ++++++----
->  fs/smb/smbdirect/accept.c                  |  5 ++-
->  fs/smb/smbdirect/connect.c                 |  5 ++-
->  fs/smb/smbdirect/connection.c              |  8 ++--
->  include/linux/sunrpc/svc_rdma.h            |  4 +-
->  include/rdma/ib_verbs.h                    | 50 +++++++++++-----------
->  net/rds/ib.c                               | 10 ++---
->  net/rds/ib_cm.c                            | 10 ++---
->  net/sunrpc/xprtrdma/frwr_ops.c             |  7 +--
->  net/sunrpc/xprtrdma/svc_rdma_transport.c   |  5 +--
->  net/sunrpc/xprtrdma/verbs.c                |  2 +-
->  24 files changed, 122 insertions(+), 127 deletions(-)
+On Thu, 2 Jul 2026 at 04:11, NeilBrown <neilb@ownmail.net> wrote:
 
-The following code is still missing. Also, what about mxa_srq?
-Why wasn't it converted as well?
+> 10 years ago cifs *did* use ->d_time but was changed to use ->d_fsdata
+> by Miklos with no justification (a00be0e31f8d).  Miklos: do you have any
+> memory of why that was done?
 
-diff --git a/drivers/infiniband/core/nldev.c b/drivers/infiniband/core/nldev.c
-index f599c24b34e8..aae4f3f6bcba 100644
---- a/drivers/infiniband/core/nldev.c
-+++ b/drivers/infiniband/core/nldev.c
-@@ -454,7 +454,8 @@ static int fill_res_info(struct sk_buff *msg, struct ib_device *device,
-        };
+Wanted to get rid of d_time, as it is no longer used by VFS, only a
+handful of filesystems.   Still a worthwhile goal, IMO.
 
-        struct nlattr *table_attr;
--       int ret, i, curr, max;
-+       u64 curr, max;
-+       int ret, i;
-
-        if (fill_nldev_handle(msg, device))
-                return -EMSGSIZE;
-diff --git a/drivers/infiniband/core/restrack.c b/drivers/infiniband/core/restrack.c
-index cfee2071586c..1b2f9df49e28 100644
---- a/drivers/infiniband/core/restrack.c
-+++ b/drivers/infiniband/core/restrack.c
-@@ -61,7 +61,7 @@ void rdma_restrack_clean(struct ib_device *dev)
-  * @type: actual type of object to operate
-  * @show_details: count driver specific objects
-  */
--int rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-+u32 rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-                        bool show_details)
- {
-        struct rdma_restrack_root *rt = &dev->res[type];
-diff --git a/include/rdma/restrack.h b/include/rdma/restrack.h
-index 451f99e3717d..c081384740ce 100644
---- a/include/rdma/restrack.h
-+++ b/include/rdma/restrack.h
-@@ -123,7 +123,7 @@ struct rdma_restrack_entry {
-        u32 id;
- };
-
--int rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-+u32 rdma_restrack_count(struct ib_device *dev, enum rdma_restrack_type type,
-                        bool show_details);
- /**
-  * rdma_is_kernel_res() - check the owner of resource
+Thanks,
+Miklos
