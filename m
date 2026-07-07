@@ -1,71 +1,71 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71B0227BB9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311262E764D
 	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783418498; cv=none; b=RRBvldN3hDBxxSyWSCtqpsFHn9yGeEQeyrATyQS9FFxPTpMLsZSxF+qA1s1bs5BCClyNp3IBSZRVSmWqZyNZy/vY3/I6Aw2BvJItSdUflZIJcLkkqi3/lymVNRYvy+f1TEDmm8E3XNb3sADLphPh/M81BdQuFcW+EWmKq4ZvCxI=
+	t=1783418499; cv=none; b=A335GLWZJJjsssMalYFa9qeBP+xARTEMk/65DkdG+nGv2DoA4zRCw0q5+AyfDQVJYJXvNJm+FLPFq47ztL45wC4NUFKiExtLKLtjHlgyjt+nlBXL8xwgbL6w+gI37sLFN/I89dtuM17FTrh0W+yUQJokL1pHmjyxd1vtzi/XK0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783418498; c=relaxed/simple;
-	bh=Wq5smhmaSs9FQqjnlX9PVXUuRhDBNGs+kzESsV1u43A=;
+	s=arc-20240116; t=1783418499; c=relaxed/simple;
+	bh=AeDvA6UVIqBVFmtHShegy3+tonHaUnunAWoA1Hkb/2g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b0eUufG6A36wRN3qqneWE74ofr8wXHMYrPrlsMepvgvbEDVjFXa/srQ6tO2xsU4nv+FZTfrXRGdyHJBhU+3w9dT1kyM8LCT1N78eFp/GeVqzmGelG1FDHkrb0oTzdUX7rswYgO79TvGZE3wNK9onoHjl+h6C50mM9QxubihINVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUdilNRN; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version; b=YODG73tEHKTK0j1f8iZmEpQBZS5gW78KKIG9qW/ra7IFtd90LvbB31vJlbCaeDnkfwzTSAkX2ivHrw9WOHfKufUaLkLlT3STFvP1bbvFsnczRAlncWicFQNhiTapn/M2iAPze9kiwQzIfxUuSh50nmPHglq5MmCe7n8wuEOqlFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8E+yRgw; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUdilNRN"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-4703bc0a99aso2191830f8f.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8E+yRgw"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-493ce08a75bso17010055e9.1
         for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1783418495; x=1784023295; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+j8d2ocGrvYrq0XcmzBQ4o0mLWqeRieIU+AXOYTGpEc=;
-        b=FUdilNRNWtTNg2MPjLbOAOp83J36zYSonEVGGHaNnYC02AzzTNjCSR7rK4+zAT24YY
-         NRAqBngUEBYZvkzCyeChrpkiAiylPjK2INNq0vhagpTmZA9Alr4aLpiOlqYXZWEbbCvz
-         HF9gt3Hc7kJcM/o60zC4Z7XBo/kJtO1Z7VjONdU94iO6auzFSoFAQMx9JHfdur/BhIIm
-         4kSPosf6KA6R3Hv/EnKr9UrHm+lJjcea+MdRGnCIwsnQySck3duSL/TdTb7ysCaZ7Wib
-         MhrhREctT+RV9dhIsKavXjwSQxixjFoR3WABlY2TRMgebRK9MZIxJY91ADG9ougZr7Re
-         /NYw==
+        bh=9N7hVHgLM2h+TWr6O9hK5ZIJpO/lTuMmJZbOU7RmLgM=;
+        b=T8E+yRgwftvCRj6SHzTXC5frmk9UKVYHvSDIel66Sk8TE81JVHAxOVytZ97pv5TtlI
+         VqQfXkT3FiJHKwcY7EcWe1bbTAPKCpyADYTcgQNoRQ86pq26jQm3N8rAchuNPcw+1U6G
+         tWfxat1FCeI1MFnnWrh46Aknkv8+dOcrAENx0BvyPocHAckCvMuO3LEr3tGMBfF9OwXv
+         Mthuav5+fRrU/kNJ3Nt1/Mn3eDfE/hpRlzwz89ol86vXdzN5tpDa2N9PkoSREFM1FE7z
+         kexPdRQmOvlGyqOs+FBxg6sfw4XOoctjH1qkX45pHtaHV7/Whm+XpLdqS8DecLAc+2P/
+         LZ1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1783418495; x=1784023295;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=+j8d2ocGrvYrq0XcmzBQ4o0mLWqeRieIU+AXOYTGpEc=;
-        b=khoV0FX6JU99n5cTu4dOcE3rT0xoRhMuhdeQ0gPno/XWl5pd0nSWOQ1L/osmowHWjQ
-         F89xDp06Lw1xdo7NtgsiQYem0d0S4pkt7BDgblbo+S7JhT55ZDhparXGnMbjxen0Comn
-         oWw29Vs0DH8N6QTJ+WpdH2JsNizN/y47NsA4lJfsS3g6whEIMyRT8m8UpQTOVIojyR4N
-         M7GCzXRz3PlPcOK/+VsJ0h80zkWJxLhUuZswNdMLSVgLC82dwYNg6fSsbaBTr6TPL9y5
-         GpgiPX4tSsfO4uBpSwEZxvHpb/SgorpwsiwqZeqstZGpmJsS8zo8kvoxNejAwE3Nenat
-         Dr0g==
-X-Forwarded-Encrypted: i=1; AHgh+Rod0ugnSTvTLXSRkdTU15xMQGVqVqmpVLavEMGzGlao83wfGx/RmiMM7QZAOn4O6XUf5PJuBp2w6/cO@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywti++/Af0p1nLUTeFiRHZ5WnbR253IpDAYAjVvS5SA4gkzNift
-	+jBHszoTo6ZID7dydwkSocqr0txm3cc05NtVY5T59bhAum3Wga1jSZzM
-X-Gm-Gg: AfdE7ckww3kCqXTc6nZYHDmYjRX8F3ebrsrno4rTjW7VE9OlPUpwI6Ja1AuO2CIRBSG
-	gzw0BLYFn0ntBsL+KIcj8wDmVGawfoFcomqc1Y2aHluEcrfhjmveFxP8GQWl98WybKnWJ/DerY7
-	EQ1r9vTQGzpRiNwqjPR4ZPS0D2ptSIqLWSRATK0o44x66l56PHmPLSb5prE+glQm3PCz820I94f
-	VeRkQVuHqjkfTrog4jkSsVMsHg5MDGX1eX2Oq5+rjK8xf9fKP+VI0z/GZM2HqDa0lMSIze9BnJ+
-	xD+FA4varZAREYM+EXnjTe+47UULDqHNn6ITPTyUbBA2RnyW35ug7d54eO7uKtsk5VlcVGUXlDD
-	155g4dFSMMfiEPz+kQ1C187zUnugKkBy4XyT+lGW4MYmkon8ZoV1VZ6yIXjrn5RfaiNSTy9OWf+
-	DSZLltgwryVDNtTAzDqrh+qQYJj9ggvSQSPsk=
-X-Received: by 2002:a5d:4801:0:b0:473:53b7:e390 with SMTP id ffacd0b85a97d-47de666b175mr3923584f8f.11.1783418495132;
-        Tue, 07 Jul 2026 03:01:35 -0700 (PDT)
+        bh=9N7hVHgLM2h+TWr6O9hK5ZIJpO/lTuMmJZbOU7RmLgM=;
+        b=fp3l0jtPIz5l9wAQ9AqLqygl+UpIP8BfwCh0i+EZyoZ/eUiJJ8F1hXrSWCdh9KFtXm
+         UiLsllWR4oLTDXtkUhTNCdfS6S5Jr3dOuWjVJ4BGUHSHrkR8uhgmLshQ9Fmj4PRa5/wd
+         BKQhO9PLJa1uRPUd5cUY+4UQI0QwoLvLhUidObSX5AMRxeQ7/zH1k0BQVjbVVegFTqkR
+         Mct2MHQWjX9XX60SNEGcmdKjDBfLTeRprmtpdcovpBfgrRgVKqb3BYVxTPPJsQvFOuN/
+         j3WMYZ9aaqCTmzjGJLLR7VDFgflH2FGBHeK45RhHjqJt+ZJezpcAicTh6Fadw7S0iGgU
+         oeiQ==
+X-Forwarded-Encrypted: i=1; AHgh+Roeqtu5uvjpPoOL/VuI/OSQgZwpVjrXPUEeTSWNE9/GiRMN+spgtg9E61VA8SQhstnhpkakY5OmLLoM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7j4puK/5d6Wt2aXbZSY9ZRufXrsnKUxFV8qRsQ8klh0cKdyfA
+	wZaqqhq0986zlSnChmgWTpRC+yPK9/dtFpS4mS90pbBKTiBEmF5wMqvI
+X-Gm-Gg: AfdE7cko1u2Ss+hRAeBo6+vJOxzrW4+lO1EPwsmPw5tktfeps2aODMBU28pFC7la1p6
+	od/1Wfm/jjh/LsXzf8YS2s8tc/a2k62KfpDZFKIBT18TdRIQzpubpMxKbeBgvaNFdkr4SIOE458
+	Ua+ozPFIyHnXZQRZpTkk/seHzC739b1TGt4zmiekouf0Ouc8nYjfVPCgjpHbDffmPLlyeeyH+sD
+	HF/7U463KXyz75BTN5wn5qGKGQ+zg83nnUpFsmJEj0BEgxeYI68tdmD1xbAKq1MmTwOf4Ov/new
+	akHfHPQYxV4UZQdGOuHBQxiAYv9Jpp68D2xrZIU4QGJ8t38hlyxZqkuoZ/jbq+G2kmKPnZH6mmd
+	bdhHazVi5IC0MMVar8bstriDONbq4TXtAgNcZz6MEqs6BMqqA+zhnpOc8uU3D3U9urgpX+kBHil
+	ZJq+HxuNUab3928ND1CLFRzSiKNS6jXRW19+Q=
+X-Received: by 2002:a05:6000:d0a:b0:477:80fa:f474 with SMTP id ffacd0b85a97d-47de66a31ddmr3581630f8f.38.1783418493948;
+        Tue, 07 Jul 2026 03:01:33 -0700 (PDT)
 Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e785sm32203122f8f.8.2026.07.07.03.01.34
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e785sm32203122f8f.8.2026.07.07.03.01.33
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 03:01:34 -0700 (PDT)
+        Tue, 07 Jul 2026 03:01:33 -0700 (PDT)
 From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Gael Blivet <gael.blivet@gmail.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 3/5] ksmbd: send inline FinderInfo in FIND responses when READDIR_ATTR negotiated
-Date: Tue,  7 Jul 2026 12:01:26 +0200
-Message-ID: <20260707100129.47563-4-g.blivet@me.com>
+Subject: [PATCH 1/5] ksmbd: add Apple AAPL kAAPL_SERVER_QUERY create context support
+Date: Tue,  7 Jul 2026 12:01:24 +0200
+Message-ID: <20260707100129.47563-2-g.blivet@me.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260707100129.47563-1-g.blivet@me.com>
 References: <20260707100129.47563-1-g.blivet@me.com>
@@ -79,120 +79,430 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-Without READDIR_ATTR, macOS Finder resolves type/creator/icon for
-every file in a directory listing by opening its AFP_AfpInfo stream
-individually -- one extra CREATE+QUERY_INFO+CLOSE round trip per file,
-which is the dominant cost of browsing a large directory over SMB from
-a Mac.
+macOS clients (Finder, and specifically Time Machine's backupd) send
+an "AAPL" SMB2 create context on CREATE to negotiate Apple-specific
+server capabilities (server_caps/vol_caps/model string). Without a
+response to this context, macOS Time Machine over SMB does not work
+at all.
 
-When the client negotiates READDIR_ATTR (conn->aapl_readdir_attr, set
-during CREATE's AAPL context exchange), inline the same information
-directly into each FILEID_BOTH_DIRECTORY_INFORMATION FIND entry:
-  EaSize           = max_access, expanded specific rights
-                      (GENERIC_ALL_FLAGS), not the raw FILE_GENERIC_ALL_LE
-                      "generic" meta-bit -- that bit has none of the
-                      specific FILE_* rights macOS's smbfs.kext checks
-                      bit-by-bit, so reporting it directly would fail
-                      every access check and show Finder's "no entry"
-                      badge on every file/folder.
-  ShortNameLength  = 24 (fixed; the spec says 0 when there's no short
-                      name, but real macOS clients expect 24 here)
-  ShortName[0..7]  = resource fork size (0 -- no resource forks)
-  ShortName[8..23] = compressed FinderInfo (all zero: type/creator
-                      unset, client falls back to extension-based
-                      icon/type detection, consistent with the
-                      AFP_AfpInfo synthesis this mirrors)
-  Reserved2        = Unix mode bits
-Reparse-point status is still carried via ExtFileAttributes rather
-than EaSize once READDIR_ATTR is active, since EaSize is repurposed
-for max_access.
+Add the AAPL create context structs (create_aapl_rsp,
+aapl_server_query_req) and create_aapl_rsp_buf(), which builds the
+kAAPL_SERVER_QUERY response mirroring the layout observed from macOS's
+own smbd, including the model string workaround: omitting the model
+string when the client requested it causes smbfs.kext to enter a
+broken disconnect path requiring a full macOS reboot to recover from.
+Command codes and bitmap values reuse the existing SMB2_CRTCTX_AAPL_*
+constants in fs/smb/common/smb2pdu.h.
 
-This wire format was reverse-engineered from macOS smbfs.kext network
-behavior (Apple has not published it) and cross-checked against
-Samba's vfs_fruit marshalling (source3/smbd/smb2_trans2.c,
-SMB_FIND_ID_BOTH_DIRECTORY_INFO), which implements the same extension
-for the same reason and confirms both the max_access expansion and the
-ShortNameLength=24 behavior.
+Hook the request parsing and response into smb2_open()'s existing
+create-context handling, following the same DataOffset+DataLength
+bounds-checking convention already used by every other context parser
+in this file. The AAPL model string is configurable via the existing
+netlink startup path (server_conf.aapl_model, default "Xserve").
+
+This is scoped to shares with the new KSMBD_SHARE_FLAG_TIME_MACHINE
+flag only, not enabled globally -- Apple's AAPL extension is
+undocumented and reverse-engineered from observed client/server
+behavior, so containing its blast radius to shares that explicitly
+opt in limits risk to ordinary SMB shares.
+
+conn->aapl_readdir_attr is set here when the client also advertises
+READDIR_ATTR support, but the actual inline-FinderInfo wire format
+(the feature that flag gates) is not implemented yet -- follow-up
+commit.
 
 Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
 ---
- fs/smb/server/smb2pdu.c | 57 +++++++++++++++++++++++++++++++++++++----
- 1 file changed, 52 insertions(+), 5 deletions(-)
+ fs/smb/common/smbglob.h       |  1 +
+ fs/smb/server/connection.h    |  1 +
+ fs/smb/server/ksmbd_netlink.h |  4 +-
+ fs/smb/server/oplock.c        | 73 +++++++++++++++++++++++++++++++++++
+ fs/smb/server/oplock.h        |  1 +
+ fs/smb/server/server.h        |  2 +
+ fs/smb/server/smb2ops.c       |  4 ++
+ fs/smb/server/smb2pdu.c       | 57 ++++++++++++++++++++++++++-
+ fs/smb/server/smb2pdu.h       | 60 ++++++++++++++++++++++++++++
+ fs/smb/server/transport_ipc.c |  9 +++++
+ 10 files changed, 210 insertions(+), 2 deletions(-)
 
+diff --git a/fs/smb/common/smbglob.h b/fs/smb/common/smbglob.h
+index 4e33d91cd..d9c7e6e7a 100644
+--- a/fs/smb/common/smbglob.h
++++ b/fs/smb/common/smbglob.h
+@@ -39,6 +39,7 @@ struct smb_version_values {
+ 	size_t		create_mxac_size;
+ 	size_t		create_disk_id_size;
+ 	size_t		create_posix_size;
++	size_t		create_aapl_size;
+ };
+ 
+ static inline unsigned int get_rfc1002_len(void *buf)
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index ec75633b7..011a00b1b 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -124,6 +124,7 @@ struct ksmbd_conn {
+ 	bool				binding;
+ 	atomic_t			refcnt;
+ 	bool				is_aapl;
++	bool				aapl_readdir_attr; /* READDIR_ATTR negotiated */
+ 	struct work_struct		release_work;
+ };
+ 
+diff --git a/fs/smb/server/ksmbd_netlink.h b/fs/smb/server/ksmbd_netlink.h
+index c9e1b0b68..1ea0a367b 100644
+--- a/fs/smb/server/ksmbd_netlink.h
++++ b/fs/smb/server/ksmbd_netlink.h
+@@ -113,7 +113,8 @@ struct ksmbd_startup_request {
+ 	__u32	max_connections;	/* Number of maximum simultaneous connections */
+ 	__s8	bind_interfaces_only;
+ 	__u32	max_ip_connections;	/* Number of maximum connection per ip address */
+-	__s8	reserved[499];		/* Reserved room */
++	__s8	aapl_model[32];		/* AAPL model string for Finder icon, e.g. "Xserve" */
++	__s8	reserved[467];		/* Reserved room */
+ 	__u32	ifc_list_sz;		/* interfaces list size */
+ 	__s8	____payload[];
+ } __packed;
+@@ -378,6 +379,7 @@ enum KSMBD_TREE_CONN_STATUS {
+ #define KSMBD_SHARE_FLAG_CROSSMNT			BIT(15)
+ #define KSMBD_SHARE_FLAG_CONTINUOUS_AVAILABILITY	BIT(16)
+ #define KSMBD_SHARE_FLAG_HIDE_UNREADABLE		BIT(17)
++#define KSMBD_SHARE_FLAG_TIME_MACHINE			BIT(18)
+ 
+ /*
+  * Tree connect request flags.
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 3c55ae5d6..0c10c9951 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -16,6 +16,7 @@
+ #include "mgmt/user_session.h"
+ #include "mgmt/share_config.h"
+ #include "mgmt/tree_connect.h"
++#include "server.h"
+ 
+ static LIST_HEAD(lease_table_list);
+ static DEFINE_RWLOCK(lease_list_lock);
+@@ -2136,6 +2137,78 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 		  SIDUNIX_GROUP, (struct smb_sid *)&buf->SidBuffer[28]);
+ }
+ 
++/**
++ * create_aapl_rsp_buf() - build Apple AAPL kAAPL_SERVER_QUERY response
++ * @cc:         buffer to write the create context into (AAPL_RSP_MAX_SIZE bytes)
++ * @vol_caps:   volume capability flags (SMB2_CRTCTX_AAPL_* volume bits)
++ * @req_bitmap: the client's request bitmap, echoed back in reply_bitmap
++ *
++ * Response format follows the layout observed from macOS's own smbd:
++ *   reply_bitmap = req_bitmap masked to the fields we support
++ *   server_caps  = AAPL_SERVER_CAPS_KSMBD when requested
++ *   vol_caps     = caller-supplied
++ *   model string = server_conf.aapl_model (default "Xserve") in UTF-16LE,
++ *                  when SMB2_CRTCTX_AAPL_MODEL_INFO requested
++ *
++ * Sending reply_bitmap with MODEL_INFO set but no model string causes
++ * smbfs.kext to enter a broken disconnect path requiring a macOS reboot.
++ */
++void create_aapl_rsp_buf(char *cc, __u64 vol_caps, __u64 req_bitmap)
++{
++	struct create_aapl_rsp *buf;
++	u64 reply_bitmap;
++	u32 data_len;
++
++	buf = (struct create_aapl_rsp *)cc;
++	memset(buf, 0, AAPL_RSP_MAX_SIZE);
++
++	reply_bitmap = req_bitmap & (SMB2_CRTCTX_AAPL_SERVER_CAPS |
++				     SMB2_CRTCTX_AAPL_VOLUME_CAPS |
++				     SMB2_CRTCTX_AAPL_MODEL_INFO);
++
++	/* base data: cmd(4)+reserved(4)+reply_bitmap(8)+server_caps(8)+vol_caps(8) */
++	data_len = 32;
++	if (reply_bitmap & SMB2_CRTCTX_AAPL_MODEL_INFO)
++		data_len += 4 + 4 + AAPL_MODEL_UTF16_BYTES; /* pad2+model_bytes+string */
++
++	buf->ccontext.DataOffset = cpu_to_le16(offsetof(struct create_aapl_rsp, cmd));
++	buf->ccontext.DataLength = cpu_to_le32(data_len);
++	buf->ccontext.NameOffset = cpu_to_le16(offsetof(struct create_aapl_rsp, Name));
++	buf->ccontext.NameLength = cpu_to_le16(SMB2_CREATE_AAPL_LEN);
++	buf->Name[0] = 'A';
++	buf->Name[1] = 'A';
++	buf->Name[2] = 'P';
++	buf->Name[3] = 'L';
++
++	buf->cmd = cpu_to_le32(SMB2_CRTCTX_AAPL_SERVER_QUERY);
++	buf->reply_bitmap = cpu_to_le64(reply_bitmap);
++	buf->server_caps = (reply_bitmap & SMB2_CRTCTX_AAPL_SERVER_CAPS) ?
++			   cpu_to_le64(AAPL_SERVER_CAPS_KSMBD) : 0;
++	buf->vol_caps = (reply_bitmap & SMB2_CRTCTX_AAPL_VOLUME_CAPS) ?
++			cpu_to_le64(vol_caps) : 0;
++
++	if (reply_bitmap & SMB2_CRTCTX_AAPL_MODEL_INFO) {
++		__le32 *p = (__le32 *)((u8 *)buf + sizeof(*buf));
++		__le16 *model_str = (__le16 *)(p + 2);
++		const char *src = server_conf.aapl_model[0] ?
++				  server_conf.aapl_model : "Xserve";
++		int i, model_bytes = 0;
++
++		/* Convert ASCII model string to UTF-16LE in-place */
++		for (i = 0; src[i] && i < AAPL_MODEL_MAX_CHARS; i++) {
++			model_str[i] = cpu_to_le16((unsigned char)src[i]);
++			model_bytes += 2;
++		}
++
++		p[0] = 0; /* pad2 */
++		p[1] = cpu_to_le32(model_bytes);
++
++		/* Update DataLength to reflect actual model string size */
++		buf->ccontext.DataLength =
++			cpu_to_le32(data_len - AAPL_MODEL_UTF16_BYTES + model_bytes);
++	}
++}
++
+ /*
+  * Find lease object(opinfo) for given lease key/fid from lease
+  * break/file close path.
+diff --git a/fs/smb/server/oplock.h b/fs/smb/server/oplock.h
+index 3f581d22b..f7f6afcc5 100644
+--- a/fs/smb/server/oplock.h
++++ b/fs/smb/server/oplock.h
+@@ -125,6 +125,7 @@ void create_durable_v2_rsp_buf(char *cc, struct ksmbd_file *fp);
+ void create_mxac_rsp_buf(char *cc, int maximal_access);
+ void create_disk_id_rsp_buf(char *cc, __u64 file_id, __u64 vol_id);
+ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp);
++void create_aapl_rsp_buf(char *cc, __u64 vol_caps, __u64 req_bitmap);
+ struct create_context *smb2_find_context_vals(void *open_req, const char *tag, int tag_len);
+ struct oplock_info *lookup_lease_in_table(struct ksmbd_conn *conn,
+ 					  char *lease_key);
+diff --git a/fs/smb/server/server.h b/fs/smb/server/server.h
+index b8a7317be..4d4d268b5 100644
+--- a/fs/smb/server/server.h
++++ b/fs/smb/server/server.h
+@@ -48,6 +48,8 @@ struct ksmbd_server_config {
+ 	char			*conf[SERVER_CONF_WORK_GROUP + 1];
+ 	struct task_struct	*dh_task;
+ 	bool			bind_interfaces_only;
++	/* AAPL model string for Finder icon, e.g. "Xserve" */
++	char			aapl_model[32];
+ };
+ 
+ extern struct ksmbd_server_config server_conf;
+diff --git a/fs/smb/server/smb2ops.c b/fs/smb/server/smb2ops.c
+index c9a32ee09..97938150d 100644
+--- a/fs/smb/server/smb2ops.c
++++ b/fs/smb/server/smb2ops.c
+@@ -37,6 +37,7 @@ static struct smb_version_values smb21_server_values = {
+ 	.create_mxac_size = sizeof(struct create_mxac_rsp),
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
++	.create_aapl_size = AAPL_RSP_MAX_SIZE,
+ };
+ 
+ static struct smb_version_values smb30_server_values = {
+@@ -64,6 +65,7 @@ static struct smb_version_values smb30_server_values = {
+ 	.create_mxac_size = sizeof(struct create_mxac_rsp),
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
++	.create_aapl_size = AAPL_RSP_MAX_SIZE,
+ };
+ 
+ static struct smb_version_values smb302_server_values = {
+@@ -91,6 +93,7 @@ static struct smb_version_values smb302_server_values = {
+ 	.create_mxac_size = sizeof(struct create_mxac_rsp),
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
++	.create_aapl_size = AAPL_RSP_MAX_SIZE,
+ };
+ 
+ static struct smb_version_values smb311_server_values = {
+@@ -118,6 +121,7 @@ static struct smb_version_values smb311_server_values = {
+ 	.create_mxac_size = sizeof(struct create_mxac_rsp),
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
++	.create_aapl_size = AAPL_RSP_MAX_SIZE,
+ };
+ 
+ static struct smb_version_ops smb2_0_server_ops = {
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 8b81c712e..b1be4df04 100644
+index d5d88d023..dce2a1088 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -4649,17 +4649,64 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+@@ -3296,6 +3296,8 @@ int smb2_open(struct ksmbd_work *work)
+ 	int rc = 0;
+ 	int contxt_cnt = 0, query_disk_id = 0;
+ 	bool maximal_access_ctxt = false, posix_ctxt = false;
++	bool aapl_ctxt = false;
++	__u64 aapl_req_bitmap = 0, aapl_client_caps = 0;
+ 	int s_type = 0;
+ 	int next_off = 0;
+ 	char *name = NULL;
+@@ -4062,7 +4064,33 @@ int smb2_open(struct ksmbd_work *work)
+ 			query_disk_id = 1;
+ 		}
  
- 		fibdinfo = (struct file_id_both_directory_info *)kstat;
- 		fibdinfo->FileNameLength = cpu_to_le32(conv_len);
--		fibdinfo->EaSize =
--			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
--		if (fibdinfo->EaSize)
--			fibdinfo->ExtFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT_LE;
- 		if (conn->is_aapl)
- 			fibdinfo->UniqueId = 0;
- 		else
- 			fibdinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
- 		fibdinfo->ShortNameLength = 0;
- 		fibdinfo->Reserved = 0;
--		fibdinfo->Reserved2 = cpu_to_le16(0);
-+		if (conn->aapl_readdir_attr) {
-+			/*
-+			 * READDIR_ATTR wire format, confirmed against Samba's
-+			 * vfs_fruit marshalling (source3/smbd/smb2_trans2.c):
-+			 *   EaSize           = max_access (expanded specific
-+			 *                      rights, simplified to "grant all")
-+			 *   ShortNameLength  = 24 (fixed; not 0, despite the spec)
-+			 *   ShortName[0..7]  = resource fork size (uint64 LE, 0 = no rfork)
-+			 *   ShortName[8..23] = compressed FinderInfo (type+creator+flags+
-+			 *                      ext_flags+date_added, 16 bytes LE; all
-+			 *                      zeros means type=0/creator=0, i.e. use
-+			 *                      the file extension for icon lookup)
-+			 *   Reserved2        = Unix mode bits (uint16 LE)
-+			 * Reparse-point tag is indicated via ExtFileAttributes, not EaSize.
-+			 */
-+			__le32 reparse_tag =
-+				smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+-		if (conn->is_aapl == false) {
++		if (test_share_config_flag(share, KSMBD_SHARE_FLAG_TIME_MACHINE)) {
++			context = smb2_find_context_vals(req, SMB2_CREATE_AAPL, 4);
++			if (IS_ERR(context)) {
++				rc = PTR_ERR(context);
++				goto err_out1;
++			} else if (context) {
++				struct aapl_server_query_req *aapl_req;
 +
-+			if (reparse_tag)
-+				fibdinfo->ExtFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT_LE;
-+			/*
-+			 * FILE_GENERIC_ALL_LE (0x10000000) is the raw
-+			 * "generic all" meta-bit -- valid only in a
-+			 * client's requested access mask, for the server
-+			 * to expand. It has none of the specific FILE_*
-+			 * rights bits set (FILE_LIST_DIRECTORY, FILE_TRAVERSE,
-+			 * etc.), so reporting it here as max_access would make
-+			 * macOS's bit-by-bit access checks fail on every
-+			 * entry -> permanent "no entry" badges in Finder.
-+			 * Report the actual expanded rights instead, same
-+			 * as smb_map_generic_desired_access() does when
-+			 * translating a client's GENERIC_ALL request.
-+			 */
-+			fibdinfo->EaSize = cpu_to_le32(GENERIC_ALL_FLAGS);
-+			/*
-+			 * The spec says ShortNameLength should be 0 when
-+			 * there's no short name, but real macOS clients
-+			 * expect it set to 24 for READDIR_ATTR entries --
-+			 * confirmed in Samba's vfs_fruit marshalling
-+			 * (smb2_trans2.c): "on the wire behaviour shows
-+			 * its set to 24 by clients."
-+			 */
-+			fibdinfo->ShortNameLength = 24;
-+			memset(fibdinfo->ShortName, 0, sizeof(fibdinfo->ShortName));
-+			fibdinfo->Reserved2 = cpu_to_le16(ksmbd_kstat->kstat->mode & 0xffff);
-+		} else {
-+			fibdinfo->EaSize =
-+				smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
-+			if (fibdinfo->EaSize)
-+				fibdinfo->ExtFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT_LE;
-+			fibdinfo->Reserved2 = cpu_to_le16(0);
-+		}
- 		if (d_info->hide_dot_file && d_info->name[0] == '.')
- 			fibdinfo->ExtFileAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
- 		memcpy(fibdinfo->FileName, conv_name, conv_len);
++				if (le16_to_cpu(context->DataOffset) +
++				    le32_to_cpu(context->DataLength) <
++				    sizeof(struct aapl_server_query_req)) {
++					rc = -EINVAL;
++					goto err_out1;
++				}
++
++				aapl_req = (struct aapl_server_query_req *)
++					((char *)context +
++					 le16_to_cpu(context->DataOffset));
++				if (le32_to_cpu(aapl_req->cmd) ==
++				    SMB2_CRTCTX_AAPL_SERVER_QUERY) {
++					conn->is_aapl = true;
++					aapl_ctxt = true;
++					aapl_req_bitmap = le64_to_cpu(aapl_req->req_bitmap);
++					aapl_client_caps = le64_to_cpu(aapl_req->client_caps);
++				}
++			}
++		} else if (conn->is_aapl == false) {
+ 			context = smb2_find_context_vals(req, SMB2_CREATE_AAPL, 4);
+ 			if (IS_ERR(context)) {
+ 				rc = PTR_ERR(context);
+@@ -4253,6 +4281,10 @@ int smb2_open(struct ksmbd_work *work)
+ 	}
+ 
+ 	if (posix_ctxt) {
++		struct create_context *posix_ccontext;
++
++		posix_ccontext = (struct create_context *)(rsp->Buffer +
++				le32_to_cpu(rsp->CreateContextsLength));
+ 		contxt_cnt++;
+ 		create_posix_rsp_buf(rsp->Buffer +
+ 				le32_to_cpu(rsp->CreateContextsLength),
+@@ -4262,6 +4294,29 @@ int smb2_open(struct ksmbd_work *work)
+ 		iov_len += conn->vals->create_posix_size;
+ 		if (next_ptr)
+ 			*next_ptr = cpu_to_le32(next_off);
++		next_ptr = &posix_ccontext->Next;
++		next_off = conn->vals->create_posix_size;
++	}
++
++	/*
++	 * AAPL create context response: see smb2pdu.h for the capability
++	 * rationale. Scoped to TIME_MACHINE shares only.
++	 */
++	if (aapl_ctxt) {
++		if (aapl_client_caps & SMB2_CRTCTX_AAPL_SUPPORTS_READ_DIR_ATTR)
++			conn->aapl_readdir_attr = true;
++
++		contxt_cnt++;
++		create_aapl_rsp_buf(rsp->Buffer +
++				le32_to_cpu(rsp->CreateContextsLength),
++				SMB2_CRTCTX_AAPL_FULL_SYNC,
++				aapl_req_bitmap);
++		le32_add_cpu(&rsp->CreateContextsLength,
++			     conn->vals->create_aapl_size);
++		iov_len += conn->vals->create_aapl_size;
++		if (next_ptr)
++			*next_ptr = cpu_to_le32(next_off);
++		/* AAPL is last; next_ptr need not be updated */
+ 	}
+ 
+ 	if (contxt_cnt > 0) {
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index 70b1f630e..740358a2b 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -66,6 +66,66 @@ struct preauth_integrity_info {
+ /* Apple Defined Contexts */
+ #define SMB2_CREATE_AAPL		"AAPL"
+ 
++/*
++ * Apple AAPL SMB2 extension -- kAAPL_SERVER_QUERY create context.
++ *
++ * Command code and bitmap values are the existing
++ * SMB2_CRTCTX_AAPL_* constants in fs/smb/common/smb2pdu.h (see Samba's
++ * libcli/smb/smb2_create_ctx.h, cited there).
++ *
++ * Omitting the model string when reply_bitmap includes
++ * SMB2_CRTCTX_AAPL_MODEL_INFO causes smbfs.kext to enter a broken
++ * disconnect path requiring a reboot.
++ *
++ * Layout: ccontext(16) + Name[4] + Pad[4] + cmd(4) + reserved(4) +
++ *         reply_bitmap(8) + server_caps(8) + vol_caps(8)
++ * When MODEL_INFO requested, appended: pad2(4) + model_bytes(4) + UTF-16LE
++ */
++#define SMB2_CREATE_AAPL_LEN	4
++
++/*
++ * Server capability flags (server_caps field) -- SMB2_CRTCTX_AAPL_UNIX_BASED:
++ * prevents macOS Windows-compat mode (question-mark icons).
++ * SMB2_CRTCTX_AAPL_SUPPORTS_OSX_COPYFILE: enables server-side file copy via
++ * FSCTL_SRV_COPYCHUNK. SMB2_CRTCTX_AAPL_SUPPORTS_READ_DIR_ATTR: inline
++ * FinderInfo per FIND entry, set when client also advertises the bit;
++ * format: EaSize=max_access, ShortName[0..7]=rfork_size,
++ * ShortName[8..23]=FinderInfo(16B), Reserved2=unix_mode.
++ */
++#define AAPL_SERVER_CAPS_KSMBD	(SMB2_CRTCTX_AAPL_UNIX_BASED | \
++				 SMB2_CRTCTX_AAPL_SUPPORTS_OSX_COPYFILE | \
++				 SMB2_CRTCTX_AAPL_SUPPORTS_READ_DIR_ATTR)
++
++/* Model string: up to 31 ASCII chars */
++#define AAPL_MODEL_MAX_CHARS	31
++#define AAPL_MODEL_UTF16_BYTES	(AAPL_MODEL_MAX_CHARS * 2)
++
++/*
++ * Max AAPL response: header(24) + base data(32) + pad2(4) + model_bytes(4)
++ * + model(62), 8-byte aligned: ALIGN(126, 8) = 128 bytes.
++ */
++#define AAPL_RSP_MAX_SIZE	128
++
++/* AAPL server query request (client->server) */
++struct aapl_server_query_req {
++	__le32 cmd;
++	__le32 reserved;
++	__le64 req_bitmap;
++	__le64 client_caps;
++} __packed;
++
++struct create_aapl_rsp {
++	struct create_context_hdr ccontext;
++	__u8   Name[4];
++	__u8   Pad[4];
++	__le32 cmd;
++	__le32 reserved;
++	__le64 reply_bitmap;
++	__le64 server_caps;
++	__le64 vol_caps;
++	/* when MODEL_INFO requested: __le32 pad2; __le32 model_bytes; __le16 model[] */
++} __packed;
++
+ #define DURABLE_HANDLE_MAX_TIMEOUT	300000
+ 
+ struct create_alloc_size_req {
+diff --git a/fs/smb/server/transport_ipc.c b/fs/smb/server/transport_ipc.c
+index 0c581b962..bd58d3d0b 100644
+--- a/fs/smb/server/transport_ipc.c
++++ b/fs/smb/server/transport_ipc.c
+@@ -322,6 +322,15 @@ static int ipc_server_config_on_startup(struct ksmbd_startup_request *req)
+ 		goto out;
+ 	}
+ 	server_conf.share_fake_fscaps = req->share_fake_fscaps;
++
++	/* AAPL model string for Finder icon */
++	if (req->aapl_model[0])
++		strscpy(server_conf.aapl_model, req->aapl_model,
++			sizeof(server_conf.aapl_model));
++	else
++		strscpy(server_conf.aapl_model, "Xserve",
++			sizeof(server_conf.aapl_model));
++
+ 	ksmbd_init_domain(req->sub_auth);
+ 
+ 	if (req->smb2_max_read)
 -- 
 2.43.0
 
