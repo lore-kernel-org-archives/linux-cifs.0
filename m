@@ -1,74 +1,70 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0856F3DA7DD
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA283D952F
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783418484; cv=none; b=iuM8+ubl3yRyN/WE5jvHzmhONkgdaPfaLE54AkdV1XS3DEbwyXtLltK2NejnGxB9Il3M81q5yESJwMlEpDaketfDpOOUpZqQKevhL78M4kdeGNmjMafDFfq+PwO2T49Jzi0POPjShdH3o0oUUzXzi1ZEICjXVvVkw6DZTZl2QNw=
+	t=1783418496; cv=none; b=SHlZITjZN1Nnv6mVBUNl+mGcY1g1geKZ/KHS7ISjKzRis7FhHtM5WnF6RZ2Tb4e5VlYUOSs6uxDL9Nzg6azUR1PorOf4MmVgqhlIKzt9G/FirMFH5CKS/Az/3dbhiQANOWQ3ziOq+bGqL8w5FGYq54osql27h4t6bhDqHqhdeiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783418484; c=relaxed/simple;
-	bh=zHZGcT4PsJtFQGuRDtfqs7NnDJGtX2nCD7LoDbDln8I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IXELMbGnBDiPDCKNv8kUv54R7ebUryMxfy59jxpbRthR5KWKOQhxZ0M6mloGfAz/QkdxDwsfphbv+quQYBMm8AfaW3B9vbrvqpsZaYeNB+Wh6OT6YGdDcINbP4xe4hM+WBe52k7xN6XTHguORwM1wUmtkw2hnleOvGN1kyvH0Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOGKFwQg; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1783418496; c=relaxed/simple;
+	bh=cgAqG/O12gwsG6gQHqKkMbScT9OlQXiTUZp5X21CxQ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bli80z+oDyBlCBRHUiLEJFoXvaW9Draj4Vs0BbkzwPlufTX1OqnpsTfyd0ARYMIfUv2hEzzoj8cyVMqlM8/kg4NvNIgOTfGWPt6Kzq681b00JunzVB6DmnjjLdnwWuoZtZY1/jkC8mTwq1B1zKJp1r558QIRo8sQQ6m1Pl9XAHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jsA+QCPy; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOGKFwQg"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-493b7612475so37260605e9.3
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsA+QCPy"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-47d70879764so1554509f8f.2
+        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783418481; x=1784023281; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NqyD7s8v59rZqpS2HHNgjzbP8UKr69GLNeJxoO1akUA=;
-        b=dOGKFwQgUDPSW0q/YDrE1zO+l//v8NB6PGIdmOM3fnqvUMe8uXo6EcOMm+nyptCL3k
-         YagwTGHUyJpO7VXiaYbmkiv+ZY7/GT0w5UKZNpgN+xF2FnO331VkzCzfrZgfQ9eyvukH
-         D6GPrvJgmXphedf8f/knu15DDDQr7fW4yzV2nfeDIsucgLaRP9bPB7Qr53J6VhJtrl6E
-         6G2fiZyXVKPJRERith4aaq3QJoc4PCAJiRfD1Aj4MFO3WI5ViToILtPV3S00AWJdBRyj
-         p1Po4Gm7/48gNvqWTMjQU0ee3Qo2NzDG4FCYOvHc693h8MFmbA5Wef6O+p1I6rKWMblI
-         5xEQ==
+        d=gmail.com; s=20251104; t=1783418493; x=1784023293; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=XTy5yBP1InRpkYk7HmMoBzJwmnoxpbvuaqpUbTqjmYk=;
+        b=jsA+QCPyrJglMpmkVBCbhVxWgx5cHkP8Ym5uhyW3Jy45m/7UNpvQLKbEPFfDAZOMHZ
+         CekvaEF4gWfhY5cHdmb/zXWOp3mv0oovS9bnClF2JPM8rJACdkbeJbR8enpcwg5bzfZg
+         Wg7aB5WzBeR7FunkjyJoHbjDGiU2FQ5EP8Ca7e3a347QC7+m0V8mZGDHG0Vwje2XKiV5
+         OyP8/tBWvk1fX8YgU+cp9ZgiyxUWOFsZqbv3U4SfIId81jQqCBqXthPBkmkA/JL+gqWX
+         FcRiju2VxZ6Wt3I5se1A5sKY7hPQZ/qNxu651Le7ubW0SH77WdHRmpwJGvFY/eP5jXvn
+         fKcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783418481; x=1784023281;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NqyD7s8v59rZqpS2HHNgjzbP8UKr69GLNeJxoO1akUA=;
-        b=Gk5giOBOJy9IBjRfeFMM+AjT8Z3ER9vHMA/zvRMhric2+Ex0XLAL9rdqFLBsn18fmE
-         Ivh4t1dCQ4AZoZN3yYnt7ML1T0iF+0V6PjGMkqwo+qzLrnWnUI868yyG2oK/us3IutZa
-         +aIdrwl3AdNqk89HuRp//JhVqvbMUKhi56AcYrHKQO+SmYjzgeG1PsI2+aBVnfbhIdht
-         LvCIC8dtBz9DVjR90uGVEoWeJJIQtq4Lk4nDYf8Xf0d1s2H0bIqLHb9ojxt1xIR391CZ
-         fx8DNXni9PW9cm2h/JvlCTiyZJNpMtuO4wkM3RAp8Tnf3sttUgNp0YDfkfLoSCUV4+ou
-         SFQw==
-X-Forwarded-Encrypted: i=1; AHgh+RqpIqqTUCLGu0aWXeNCJVyGGlCXZmjMWZVZPjR2ciOKRDHCeiXSRpjXhBu/zS3o2Jbtrlajsn6itTCG@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9ObCaKA+w9MiKLPCzwgVw25e/4csd1LErW/jSuofC/yw6Lhch
-	rls/e7Rr2sdLnjmyMOdkn84RxFdbicDJ+qMIHOXct8abdKQ4GTDNv0F9
-X-Gm-Gg: AfdE7cmIGKieEqDT8pUJGBNKnktjS4la1hPOkBb1xgzti0lQjBlBwPlcd02M28u53zG
-	+siBQKsLf4jw71sLf53JbqtQc/jU66/KrJ2gDSNmTsnJ0+kQnVTkreG/i+h6TvoFcP5KfPgpUSX
-	TZv3CT1bZljhdFARnhlMLCsFMJYJt1TkO19Y95Rbe0IifsXs1arN77OjPpP/bjyg8iPFwcBiiOd
-	rebxmr0NsHL/6I1m4hCGVLVKvf2XlEAshVE+X1K2kW9F4GI48c+QjPRWs9AzIRCqy2w8GjyLJr0
-	0udEV2nNx/sL8n2TfTJNKEH+TRs36y+1z1OdzAMlZR7SVo2jRPO7Nt6J6d8ItL1tHCRcTRM9GJz
-	ne5oNxE91dhE1OBjbLbwcpqwf4NYdUPuCVXlLDFsTjznwzK9o+bzntgPXrl+7Mml+KNlEcxIAir
-	HwaP8Fka57ys3mPSnZrg1I1Rs+s44sRVEpxFI=
-X-Received: by 2002:a05:600c:55d5:b0:493:bb0e:2832 with SMTP id 5b1f17b1804b1-493df0a0266mr34298845e9.37.1783418481213;
-        Tue, 07 Jul 2026 03:01:21 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783418493; x=1784023293;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=XTy5yBP1InRpkYk7HmMoBzJwmnoxpbvuaqpUbTqjmYk=;
+        b=P30sJKzuKhH2IAL4HFkIUYE8kZonpVQmro881OPb6lYF9bsYu71vG31geVFJfcd2bt
+         9uWPV8I3mh1KdspsH4wRi3FMAf4CSJUSvocYTLFYp16+T78y+dZPkw0KGU71frhUtigM
+         KO6kXg3837nMczL9gd4wB0PZ47LLkMhz9oyiDf8ug9l8GZ3+VPI4IUukhSpyx2y+u3Lx
+         39/Ng7sDKmynjaq3lwceuM0RQFTJtTq1lHwUc2Diq56KAMtAR6NOOd6T+bUBhmCawL0E
+         TokaVAdJ5/8Sg5uqLzAi1EIQRj5tQjN3tK+mXHzQJjmbagL7RnUpSIOOe4kskFwqSLfG
+         X//Q==
+X-Forwarded-Encrypted: i=1; AHgh+Rrm1u3wsR3dnqI1EzjvDQHMJ92v5PUhq7PB0q+MdHsJyKPHI7fY6YdwuJlPAcU43zRx9YGEhUuwtwYO@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyyp5uT9O3nJZ/zE7ttKogbeFNRZb1NSBpiSIj8uAV1PMBArpAo
+	hajCCnv00+W01SKe9lAMXblI0apClKVp4VsiA/9FgbyHGRtijS8JKFJ3dbCDJseN
+X-Gm-Gg: AfdE7cm8N9et6CehkaXinTdgO6C0cg+YmeOBEyewnCdnKw+gozVXob+ZUa5DxEc8vTI
+	cPTsBOfIEPmt3IMJ8tQ5o7xu71sziUBqJ9cbkhdOEExsDcKCrIgHnjAyEa61DfEG808I08unpeL
+	p9mMj+vtl8t/oemugonN/QFWaTsTT5QOFjfTGrF8BeTpa1051lPFuuihN8wr0R0SbDymZKZWlMb
+	jpIU7Ktsj3M6q70ZrFx0PIP28asw4Sji4Zsa8m6D6vVFiVWovmBr44cxccUJy9tUIUxoSSHZUbC
+	H9yTkZXlT7yW8EmMOjL9ltzPkfrS89zklvj2+KLPTDIoR2GfQyWWnOE6Onxeb2xq5hClJOTO84z
+	5qYbSOWSok/fO8WWccxFry3WDpKGXTJD50jXI8gXuvOyaRN2A8WhHGyR8LyoOmqM9sJPCQ7rP8Y
+	GYJtyVUYYTAurlAR1x0XKAaVGTMDpftyjkm0A=
+X-Received: by 2002:a05:6000:136e:b0:46e:98a7:232b with SMTP id ffacd0b85a97d-47de6650421mr3632640f8f.10.1783418493183;
+        Tue, 07 Jul 2026 03:01:33 -0700 (PDT)
 Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960634sm33908295f8f.26.2026.07.07.03.01.20
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e785sm32203122f8f.8.2026.07.07.03.01.32
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 03:01:20 -0700 (PDT)
+        Tue, 07 Jul 2026 03:01:32 -0700 (PDT)
 From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Gael Blivet <gael.blivet@gmail.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 7/7] ksmbd: fix COPYCHUNK for ADS streams
-Date: Tue,  7 Jul 2026 11:55:07 +0200
-Message-ID: <20260707100033.47512-8-g.blivet@me.com>
+Subject: [PATCH 0/5] ksmbd: add macOS Time Machine / AAPL SMB2 extension support
+Date: Tue,  7 Jul 2026 12:01:23 +0200
+Message-ID: <20260707100129.47563-1-g.blivet@me.com>
 X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20260707100033.47512-1-g.blivet@me.com>
-References: <20260707100033.47512-1-g.blivet@me.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -79,82 +75,63 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-ksmbd_vfs_copy_file_ranges() unconditionally returned -EBADF whenever
-either the source or destination of a server-side COPYCHUNK was a
-stream handle. This breaks copying files that carry alternate data
-streams (e.g. duplicating a file with a resource fork, or an
-AFP_AfpInfo stream) via COPYCHUNK, since vfs_copy_file_range() doesn't
-work on xattr-backed streams to begin with -- the copy needs to read
-the source xattr's value and write it to the destination directly.
-Implement that path instead of failing outright, and echo back
-TotalBytesWritten as the sum of the chunk lengths the client sent
-(macOS reuses the main file's chunk list for stream copies, so the
-requested total reflects the file size rather than the stream size,
-and returning the stream's actual size would look like a mismatch to
-the client).
+ksmbd currently doesn't implement any of the Apple "AAPL" SMB2
+extensions. Without them, macOS Time Machine backups over SMB do not
+work at all. This series adds enough of the extension to fix that.
 
-Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
----
- fs/smb/server/vfs.c | 46 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+The underlying logic was built and live-tested against a real Time
+Machine backup and everyday Finder use over several days on an
+earlier baseline. This series is a careful re-derivation against
+ksmbd-for-next-next -- verified to build cleanly and pass
+checkpatch.pl --strict, but not independently re-tested against this
+exact tree.
 
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index c491574d5..be93a8ec9 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1821,8 +1821,50 @@ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
- 		return -EACCES;
- 	}
- 
--	if (ksmbd_stream_fd(src_fp) || ksmbd_stream_fd(dst_fp))
--		return -EBADF;
-+	if (ksmbd_stream_fd(src_fp) || ksmbd_stream_fd(dst_fp)) {
-+		/*
-+		 * ADS stream copychunk: copy xattr from src to dst directly.
-+		 * vfs_copy_file_range doesn't work on xattr-backed streams.
-+		 */
-+		char *buf = NULL;
-+		ssize_t buf_len;
-+		int sret;
-+
-+		if (!ksmbd_stream_fd(src_fp) || !ksmbd_stream_fd(dst_fp))
-+			return -EINVAL;
-+
-+		buf_len = ksmbd_vfs_getxattr(file_mnt_idmap(src_fp->filp),
-+					     file_dentry(src_fp->filp),
-+					     src_fp->stream.name, &buf);
-+		if (buf_len < 0)
-+			return buf_len;
-+
-+		if (buf_len > 0) {
-+			/*
-+			 * vfs_setxattr(NULL, 0) removes the xattr on Linux, so
-+			 * skip it for empty streams: the Open already created
-+			 * the empty xattr via smb2_set_stream_name_xattr.
-+			 */
-+			sret = ksmbd_vfs_setxattr(file_mnt_idmap(dst_fp->filp),
-+						  &dst_fp->filp->f_path,
-+						  dst_fp->stream.name,
-+						  buf, buf_len, 0, false);
-+			kfree(buf);
-+			if (sret < 0)
-+				return sret;
-+		}
-+
-+		/*
-+		 * macOS reuses the main file's chunk list for stream copies,
-+		 * so req_total equals the file size, not the stream size.
-+		 * Echo back TotalBytesWritten = sum(chunks) so macOS doesn't
-+		 * treat the size mismatch as an error.
-+		 */
-+		*chunk_count_written = chunk_count;
-+		for (i = 0; i < chunk_count; i++)
-+			*total_size_written += le32_to_cpu(chunks[i].Length);
-+		return 0;
-+	}
- 
- 	smb_break_all_levII_oplock(work, dst_fp, 1);
- 
+Everything here is scoped to shares with the new
+KSMBD_SHARE_FLAG_TIME_MACHINE flag, not enabled globally: the AAPL
+extension is undocumented and reverse-engineered from observed
+client/server behavior (cross-checked against Samba's vfs_fruit
+module and the Apple Time Machine over SMB spec[1] where possible),
+so this keeps the blast radius contained to shares that explicitly
+opt in.
+
+Patch 1 builds on top of the AAPL groundwork already in this tree:
+`fs/smb/common/smb2pdu.h` already has the SMB2_CRTCTX_AAPL_* constant
+definitions (added recently, currently unused anywhere), and
+`conn->is_aapl` detection already exists for an unrelated narrow
+purpose (reporting UniqueId=0 to Mac clients). This series reuses
+both rather than introducing a parallel/competing implementation.
+
+Patch order matters: 2-5 depend on the AAPL negotiation and
+conn->aapl_readdir_attr flag added in patch 1.
+
+[1] https://developer.apple.com/library/archive/releasenotes/NetworkingInternetWeb/Time_Machine_SMB_Spec/
+
+Gael Blivet (5):
+  ksmbd: add Apple AAPL kAAPL_SERVER_QUERY create context support
+  ksmbd: synthesize empty AFP_AfpInfo xattr on first probe
+  ksmbd: send inline FinderInfo in FIND responses when READDIR_ATTR
+    negotiated
+  ksmbd: defer CHANGE_NOTIFY completion instead of
+    STATUS_NOT_IMPLEMENTED
+  ksmbd: implement full-file copy for AAPL ChunkCount=0 COPYCHUNK
+
+ fs/smb/common/smbglob.h       |   1 +
+ fs/smb/server/connection.h    |   1 +
+ fs/smb/server/ksmbd_netlink.h |   4 +-
+ fs/smb/server/ksmbd_work.c    |   1 +
+ fs/smb/server/ksmbd_work.h    |   2 +
+ fs/smb/server/oplock.c        |  73 +++++++++
+ fs/smb/server/oplock.h        |   1 +
+ fs/smb/server/server.h        |   2 +
+ fs/smb/server/smb2ops.c       |   4 +
+ fs/smb/server/smb2pdu.c       | 275 +++++++++++++++++++++++++++++++---
+ fs/smb/server/smb2pdu.h       |  60 ++++++++
+ fs/smb/server/transport_ipc.c |   9 ++
+ fs/smb/server/vfs.c           |  41 +++++
+ fs/smb/server/vfs_cache.c     |  30 ++++
+ fs/smb/server/vfs_cache.h     |   6 +
+ 15 files changed, 487 insertions(+), 23 deletions(-)
+
 -- 
 2.43.0
 
