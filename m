@@ -1,76 +1,80 @@
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A1012B94
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 20:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778C43BC69C
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 20:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783455367; cv=none; b=B8PPFhC6VmbEaob3UpI1fhaDF/h0VKLf8GP4Ao7BqH+xfNx65IXVHxWpb8LJaTKNK3BjPpMhRjHc6Ql9OYGkGtLXHEAIHTDCm03SpOZqutBBfZfxcv/tDiXwTzjfIS63s1cJy+xgpo7C9ZhvhhxGri8wrU6G+nUaDsGpmxafPTY=
+	t=1783456439; cv=none; b=rMqWLy8Efn0Xkzema8ZzJdvfAu1a2QHH7aHdTkbkYf8UjmVN3kQHYlSR4UePsgq/4tkCT1CfUj8uCiKf64gFJXaIpHVnHSi/bQm4Z3aX2C8ZYb+EHINJP9Mjxsou4fkCIlqDAAyixmRmHTaeNcXkjFZ71QC3zz0cE6C/hQMhnfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783455367; c=relaxed/simple;
-	bh=GUu1CcwnyZXwBDxzXDD4wgD2y2O3kU3By9aHPIwlNjE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RFGNGQ+53io03SA1QY7vZu7SOmJl8lPdhKlMf60njdsc3jV202JKE86m4NFAeQPfvALSiut/qcYHCpZpLknTSlByjac068eee4rbluigl83Sx285RILCDPFPAXM6KEdB4msvd6dZ88icc3SJZDPSFbbLf1VPF7XeHLHYvsNBemg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBpcS0z5; arc=none smtp.client-ip=74.125.82.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783456439; c=relaxed/simple;
+	bh=XBhrL4eKKeN61H41DRoiP0TSHWxeeDT9iCac2JHi1lE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DfzYRODK0iosmUNc6HU6x1DZ+qhE3Qs82GRjaI6X7P0qXG0bDdE8kIE1dNoDi49eSQv3RAUp0nrMjQvu7t+fbNlrvEXwMV50zErq+msSC5X+MI88bMczHv1qvC2ETtgSqh5TFXPAKYXdnt7x2s2QqKPRRYGs9/FmjpVpUEHhx+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ix26tRX2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jiydXQQP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ix26tRX2; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jiydXQQP; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBpcS0z5"
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-30c965eab27so28136eec.0
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 13:16:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783455365; x=1784060165; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1xC/vjWp5VOBev2gGqHZAevHveHtDjkFqaNJAttQCvo=;
-        b=aBpcS0z56f/F3OxgeqATYydOXUYvi/MhTBGPQBqVL298xRkkwrwo75HEOlCeg7zjyw
-         kN2KdBPnirWMAbkWtKJkik8Hzgzae2ehuSjjF8uWpmAD5JqJiV65GezgysBw3OfnBt5Z
-         G0kUrGcvU7TTDXF0/zXDEz0bgE1xKl/jOWoK8GfVX7QQ9TWwBrfxPrNCGpnyjqtry6OB
-         21QnK5lE4ZRUkk3wTuNt5AKkjhQPyUBL3bpRecHX4Tdv5Hl9ueLk0NKbIrQhDmn6miTK
-         mpi1f/U23tN1fcFnUS/DitpTnjopw7ipsR7GwOIPcrWkE6IwtNpMmwBgdSoaDr8UiEmp
-         GobQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783455365; x=1784060165;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1xC/vjWp5VOBev2gGqHZAevHveHtDjkFqaNJAttQCvo=;
-        b=NR/VNPt/+810K+WnseV5qIF+djIrtypXgb1pByp6KIxfWk3CDdDx/IXlrgS6x0FKOJ
-         b7lvUK7cqvTOFCl3TujOXYlJ3gsrgxA7Wfnj7FptIa336dI0dRT7MIWQGIstXau7qAhc
-         +QlTdRzo1SXL2m7fLI7PoZ1FTTXrReePPvjmREBwNojJ3QmtgKt2wHRNeiO3Nth3Ex+1
-         77r39NK8V29rcUaX7+3rvHya7o3YNpQtqenSEFudMcunfLDFI9ay9O4F91GipVqojwEd
-         TwBWTZlUFONM3YtIBbxlzmtqIzMyRbfLY1qUPma1nNYA28H5TAiSK0TioUQSq0jkPB3Q
-         Yfmg==
-X-Forwarded-Encrypted: i=1; AHgh+Rou7ZmRSnT3hcbEIs3L5GRH6BMHoDdpefCsxCCB8EYLb7CYZAFmZiKRy31Ah7IpP00njC+i5hP+wCPG@vger.kernel.org
-X-Gm-Message-State: AOJu0YwufyqF5BADS4iVR6XcxfPs88A3IOlasYXvw8rP43dVgxlM3Q1x
-	lFQxFc5n8XmkfLBktuZ0ix7JH33Omy2iwg1Hc+QF4GHRicH4vUZFUcrOJrkovA==
-X-Gm-Gg: AfdE7ckMMEoi4kOdaPiLqpakJD+mKvZ6TMN/SPbGPVEdN/P4jDrWHdeyAccVeg7d/s3
-	ck+GkHix2fG/8xMtsjFx25TdP7i3X+0MzMTCi9iaR30Pl9K+9jKhDqV4XZUiT/4rS+8g+l0ZKDx
-	Eqqlp85w/hx4Vvy7MFUv49JPD/DEpxHdG/ca4ThRJW0UTGYpuxVvtfZfRQCNWxQ+wiZvX9l8pQo
-	rcGhNjS0AVbeheY1FwTAfYk28ykhDjDM9sj8K4TE6OLIu7Ia+u/3OZzSTv+W0/fVECs4FTWjjxP
-	m7tUl7VOtVBQ7OSUOHABPEhFU+71g3/hYC9z3zXSHL4HklmtHZrTeL28bP/EI/yAZtUwNqFb9eO
-	3Op3ZvxlkeTVTwEc49sz7kT+yXB7j0GdE8Lav8m7Yim79mtnJUvacns6mjN64RHFUKXgVeKcQzE
-	Q7h/OEIHmzgMo=
-X-Received: by 2002:a05:7300:a507:b0:30e:be3f:e7f4 with SMTP id 5a478bee46e88-3116b968ad5mr56470eec.9.1783455364889;
-        Tue, 07 Jul 2026 13:16:04 -0700 (PDT)
-Received: from FredPC ([2600:380:8034:4833:1820:b099:c590:4c7])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-311748394acsm11742196eec.8.2026.07.07.13.16.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2026 13:16:04 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-X-Google-Original-From: Fredric Cover <FredTheDude@proton.me>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ix26tRX2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jiydXQQP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ix26tRX2";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jiydXQQP"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 78B56743E9;
+	Tue,  7 Jul 2026 20:33:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783456436; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=etqDneNUDFiv0Dz767zbhDVqNqDfnHZcOP82UjDxOdA=;
+	b=ix26tRX2pJ5XJ8vBBq2piHpSkpMuTsfBzJJb5kKFCA9vBdTFR90t3MZaC1He1uuePvFKzb
+	gW3jFrISwFv88pAWzXmjl2Fq2B9KtMxsjJHHT7MxPYNsc77eRC0lfAHUrC4/NhoEeqyKzu
+	4npuXv+gQ7oBCxsytkfP4iIo5GxFHWg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783456436;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=etqDneNUDFiv0Dz767zbhDVqNqDfnHZcOP82UjDxOdA=;
+	b=jiydXQQPday3EVSySgqQGbq2zP+uclIfF+LmEIY6UgTso4VAjnYxRh8A7w9CUmDcnuPhl7
+	tlxHC0KT8v+C3eAA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783456436; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=etqDneNUDFiv0Dz767zbhDVqNqDfnHZcOP82UjDxOdA=;
+	b=ix26tRX2pJ5XJ8vBBq2piHpSkpMuTsfBzJJb5kKFCA9vBdTFR90t3MZaC1He1uuePvFKzb
+	gW3jFrISwFv88pAWzXmjl2Fq2B9KtMxsjJHHT7MxPYNsc77eRC0lfAHUrC4/NhoEeqyKzu
+	4npuXv+gQ7oBCxsytkfP4iIo5GxFHWg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783456436;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=etqDneNUDFiv0Dz767zbhDVqNqDfnHZcOP82UjDxOdA=;
+	b=jiydXQQPday3EVSySgqQGbq2zP+uclIfF+LmEIY6UgTso4VAjnYxRh8A7w9CUmDcnuPhl7
+	tlxHC0KT8v+C3eAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 02F71779AE;
+	Tue,  7 Jul 2026 20:33:55 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id qbBiLrNiTWrhSwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 07 Jul 2026 20:33:55 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: linkinjeon@kernel.org,
+	smfrench@gmail.com,
 	tom@talpey.com,
-	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH] smb: client: use GFP_KERNEL for DFS cache allocations
-Date: Tue,  7 Jul 2026 13:15:26 -0700
-Message-ID: <20260707201526.33733-1-FredTheDude@proton.me>
-X-Mailer: git-send-email 2.53.0
+	senozhatsky@chromium.org,
+	Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH] smb: server: fix leak of ksmbd_ipc_login_request_ext() returned buffer
+Date: Tue,  7 Jul 2026 17:33:34 -0300
+Message-ID: <20260707203334.1164183-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,65 +82,80 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.996];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,talpey.com,chromium.org,suse.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Level: 
+X-Spam-Score: -2.80
 
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Free it in ksmbd_alloc_user() (the only function that uses it).
 
-In dfs_cache.c, the helper functions alloc_target(), setup_referral(),
-and update_cache_entry_locked() currently utilize GFP_ATOMIC to
-allocate memory.
+kmemleak splat:
+  unreferenced object 0xffff888103b83540 (size 192):
+    comm "pool-0", pid 16970, jiffies 4377290937
+    hex dump (first 32 bytes):
+      00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    backtrace (crc 408ccc66):
+      __kvmalloc_node_noprof+0x730/0x920
+      handle_generic_event+0xec/0x1a0 [ksmbd]
+      genl_family_rcv_msg_doit+0xe0/0x130
+      genl_rcv_msg+0x181/0x290
+      netlink_rcv_skb+0x4f/0x100
+      genl_rcv+0x28/0x40
+      netlink_unicast+0x1e6/0x2c0
+      netlink_sendmsg+0x20a/0x450
+      ____sys_sendmsg+0x2e8/0x310
+      ___sys_sendmsg+0x78/0xc0
+      __sys_sendmsg+0x63/0xc0
+      do_syscall_64+0xa1/0x670
+      entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-However, all of these functions are executed in sleepable conditions.
-Use GFP_KERNEL instead, to reduce the risk of allocation failure and
-stop putting unnecessary pressure on emergency memory pools in
-low-memory scenarios.
-
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Fixes: a77e0e02af1c ("ksmbd: add support for supplementary groups")
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
-Compile-tested only. I don't have any way to test DFS code.
----
- fs/smb/client/dfs_cache.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/smb/server/mgmt/user_config.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index 83f8cf2f8d2b..44409ba44e1d 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -363,10 +363,10 @@ static struct cache_dfs_tgt *alloc_target(const char *name, int path_consumed)
- {
- 	struct cache_dfs_tgt *t;
- 
--	t = kmalloc_obj(*t, GFP_ATOMIC);
-+	t = kmalloc_obj(*t, GFP_KERNEL);
- 	if (!t)
- 		return ERR_PTR(-ENOMEM);
--	t->name = kstrdup(name, GFP_ATOMIC);
-+	t->name = kstrdup(name, GFP_KERNEL);
- 	if (!t->name) {
- 		kfree(t);
- 		return ERR_PTR(-ENOMEM);
-@@ -626,7 +626,7 @@ static int update_cache_entry_locked(struct cache_entry *ce, const struct dfs_in
- 
- 	target = READ_ONCE(ce->tgthint);
- 	if (target) {
--		th = kstrdup(target->name, GFP_ATOMIC);
-+		th = kstrdup(target->name, GFP_KERNEL);
- 		if (!th)
- 			return -ENOMEM;
+diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
+index cf45841d9d1b..2319c6cc67da 100644
+--- a/fs/smb/server/mgmt/user_config.c
++++ b/fs/smb/server/mgmt/user_config.c
+@@ -66,12 +66,14 @@ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp,
+ 		ksmbd_debug(SMB, "supplementary groups : %d\n", user->ngroups);
  	}
-@@ -760,11 +760,11 @@ static int setup_referral(const char *path, struct cache_entry *ce,
  
- 	memset(ref, 0, sizeof(*ref));
++	kfree(resp_ext);
+ 	return user;
  
--	ref->path_name = kstrdup(path, GFP_ATOMIC);
-+	ref->path_name = kstrdup(path, GFP_KERNEL);
- 	if (!ref->path_name)
- 		return -ENOMEM;
+ err_free:
+ 	kfree(user->name);
+ 	kfree(user->passkey);
+ 	kfree(user);
++	kfree(resp_ext);
+ 	return NULL;
+ }
  
--	ref->node_name = kstrdup(target, GFP_ATOMIC);
-+	ref->node_name = kstrdup(target, GFP_KERNEL);
- 	if (!ref->node_name) {
- 		rc = -ENOMEM;
- 		goto err_free_path;
 -- 
-2.53.0
+2.54.0
 
