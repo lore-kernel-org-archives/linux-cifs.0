@@ -1,93 +1,294 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A0D5396D2C;
-	Tue,  7 Jul 2026 09:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783415047; cv=none; b=JAzcl+qalhiEbNOu3MxLX3hsLbeY90VhQBgdSn6zeK92L/C6Auda74cjUnCbnzW+nNTRWlCW5lPaagLS7sQMqlE5DkMbobLp0tItpfmWKJDQwf84uhQo68pSqBinEibSABmaHjXBLoljTuxutLHnqMaBJrFshJACuhFdZA/DhI8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783415047; c=relaxed/simple;
-	bh=gqr6P8wwAWVcRdX7g3vWHuctkMA6BJdfW11xrylprX8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=hKB0cida0pStNgNbu+hB/J3/+H92L4PrPg35ju28hoLsQKtIq/RT0GBI64bP1gac2QalSSN9Rcw00e+lmclRLGefItrSARyYHktGvuLjVmnsjqXdFd99aSVROz95XnooEMho4CLC10rZg9mHpKAju3TiM1tMwHFYzq4BKqPHJis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WSYOE9yj; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2F7332918
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 09:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783415943; cv=pass; b=jETx6z1gPlCERcRCIiK4IIjciHvGL+mMtUyy6Ook1zb9vYCAomv5eIBy7HFZoeywu1vKPcbKXyEHeDCNOdG9/rbZbK74OWZjX0m3rUn+9xAUqAo2fTbkoeGFwLXWTmCICMiq/M8f0RkwKIfyyNrIoSYEO+WGsoAcOI2r8PY/mEA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783415943; c=relaxed/simple;
+	bh=pSd64mFkETPz/MmkpP145EUsLdJKzqKxGCoke+zlCKE=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pm0n25sz7AKrevcjIGi2gc5/4FqV7JF0hbt438PpjPJ991xbwXcGs8B5fQ5Q9MX8t8Z/UG1nwJVYxmzECyaSMsrqi1uh4cbGfN2FWl19GrIBvfDF+c8TNBMzp0hfJMjgr/zYkYdjczXkpKtaIvyHkg5mPrxhZkHCzNQM4wio8S0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KjeJbs0m; arc=pass smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WSYOE9yj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A5E61F000E9;
-	Tue,  7 Jul 2026 09:04:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783415045;
-	bh=7Ss8IJ7OFBgFwjahPIdzSJ2SPPJpfVxtSmp5m4LUF14=;
-	h=From:To:Cc:Subject:Date;
-	b=WSYOE9yjsJrELIqj9nGuLeaP+6bePHhULQnLMtVrlCgTwqR/02snUqReW1S9dtOZo
-	 Rwy9PpOoTssPdGnINOTiNpTQRh8BCuWFXrLxjOmJ8/s/+rAtPRbVVsQYWN/sUfGwDj
-	 WdtrNh2TYt9/BntN2gYJ2hOf/AqekuIKiuqw94J4TEWhlK53d+0YpcFxgoUffQ4Vcc
-	 vBqPyXAAnqzWRlJoUe7EOrK4PhNKGPMb/oq8NN9I70mYFafwgtGEryCPu4p33jUIMr
-	 n7FLg5ibYukDgfiXq4A2qegFN9QC84i6qs7SePW/550MKQoVd9nIinJto/29oPJbOo
-	 uhbN38cpAsbrQ==
-Received: by pali.im (Postfix)
-	id 66B7171B; Tue,  7 Jul 2026 11:04:03 +0200 (CEST)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] cifs: Fix support for creating SFU fifo
-Date: Tue,  7 Jul 2026 11:03:56 +0200
-Message-Id: <20260707090356.26163-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KjeJbs0m"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-8453427d3f4so3710530b3a.3
+        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 02:19:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783415941; cv=none;
+        d=google.com; s=arc-20260327;
+        b=MqACcaZxG6t9p52LPefCU1StyQFOAL1jXf0sYZC2Y7wMQ8+/ZxvFOYQ0iGWoLN9Opq
+         x10WYoExXQAWnDzAUsqRDImkMCYr0qiyIPLw9lO62x9J62zgWAISwLICqLaPw7oGrXvJ
+         wArh6+rMWGLpkoQhajBGDyUMMm9MRutoG7iNGqWWCX4OXofkzn5R6MmhvfFFdF7bn9NT
+         pKY8fOUyuXGbFXgL1cpZRSEUiTzL3TmOCNpSoTsrGODsQjvcmPmlkHb4XjkImM2HGokq
+         bbgzBkT1N9xWAgmoWH9xqFF8pduGYL78b1427TCZ3yPFKLUBW7GEDMv15rcWcZQQQ+ph
+         MFDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=Mk7sCV2lRX8Z9CZB8ugodH0VtxCF5gMmq7qCUu2fuEE=;
+        fh=1zLUNiGXG6N/AKdP/R4K2Vq40jkIrlJBHgt5Llyhgto=;
+        b=Knmd8VvcCYJZMtCLPssf3Y0yu5DAKfUgXrckHGZV1sEnmAmxpArfILQiwHgUw2vkMp
+         qnR8SAhErXPmaLY4BrMKl3j9XzVIO93e4nYf7K+exMiUpVkUFqfehHwEFTnFotMGNXcW
+         pEbfMJDQIpw7HenoRF489coa9eOgTk5qyP+aneJf2G21BHK61RY4I9gL/Vh8oHnve2W2
+         R50ukC8koKOjYo6x0ehIUKmwj8w1sSQAZS6pJ1rKhzwJlZlPDZmLSQCP+s1P7+WCykZZ
+         7i4xgoYcuoAg9qmDntwoq7dkuV8cC9O5z5rGbCuCUs0bmb04TRwOK96PJy4E6QbuGHmZ
+         6BJA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783415941; x=1784020741; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Mk7sCV2lRX8Z9CZB8ugodH0VtxCF5gMmq7qCUu2fuEE=;
+        b=KjeJbs0mX/SwQC2RPFpPYfRYgZYroFvbuotvbx5ettiOWFyno6u8J42MMm7KoKRJgk
+         +6YW1ucpqShjmI7mGjhGtxq8Ahfol2WwOCG8lqNbAX8e3B9fRxK4BroofyVWVodDw0Y9
+         msvSV15K74+oozYi6mqVVl7uEAFeeN67aFtJlaYImLI+4dwTYaToHtlgDue9ZJ5+CQjN
+         2ob70DfpK/2bXagzf1mW+B0OcsGqgS4TkYxjp9/FEpMwdFECu2hrFvX0RiGtII2axvg/
+         TYhoZi1z9ffbQ+EHqAoLceA//OZ93b6BmPWWIR3qHelv6//qwxdo1+qoV7e1HhZi2X0R
+         kH4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783415941; x=1784020741;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mk7sCV2lRX8Z9CZB8ugodH0VtxCF5gMmq7qCUu2fuEE=;
+        b=fM9NUygR/1qXz15DtR0Mz1b6h4dacY9K3KL5iWRdLZf4Bl0kLZ6tddQDOAXyPwbQ/Y
+         FnMf2c3eDL7SnCBNZ1mQNn5Kx77Thlu9a2nZmuqITtC6FNyiKDtCVI+VK7nIxNmfCqf3
+         bSiVY8jm/NQTO/ZzdLxc0Zj+gIOYShzPsXXu8tZ+oU0AhxBeQfB44f+L6geXxaB4UrTR
+         1/ov8VkwzlXVrjsElT8H6TgmmyjvlUp5dgxkvbUZykkeYnyn8BDDXuxyvHxCPtISSQ8x
+         jLu8sOCfLXlfIeURuC3o9lxhWSftZtqPcc0o/zs+OEKIFEBXpx3Zb4CfWHYRWUGt9z5r
+         dD3g==
+X-Forwarded-Encrypted: i=1; AHgh+RqSl80Msp6F2fhUYxw+COjtuUA3HrN3AtQIzYRozt+jcWwfpi56O0jpoi9K90veh/SPMFcc9ebKFNEM@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwCPRq2IxfUPD/ZiAkqMuVCPY/Y88rfR03I1vvxaHnjHsB0V9u
+	D6g2KAlzPn7CweOAYEM662OqfAdM+aG4+kKXORqvgejxZD0luSFZVFeKgonMvqhjGTgR0JrQ8YD
+	CwZJQG+UkBeYm1vRqt57hH0rYadULZy8=
+X-Gm-Gg: AfdE7cnuFrIkFSHQ+EBmAfcEJl+Q3L/lMQAQiU8lv0vvs0v5akVb6Ak7JmTYVn55uHp
+	pG9u3jMwVcg0j9UdPUY56kmG/Wo0S4twS7U4pMTXt/U45Sm2++rMEOIJwGNOnumyI8bnKuuWLkK
+	ZCwvvCUXZfJMYNpt0E2ej9q29XWjx4R5WBEtqeBPA5CNPPCOW6nGga3VrBsC5FEkVrw8r8pcc1o
+	EnvJXSUtTeKq21bV0U4q3FfyW6FdKeZuQ87kyhoWvd6K/HSzHK7eBMnEKkFibW/gczZGo7OVw==
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6a21:3987:b0:3c0:9c19:65a8 with SMTP id
+ adf61e73a8af0-3c09c19675emr2371138637.64.1783415941055; Tue, 07 Jul 2026
+ 02:19:01 -0700 (PDT)
+Received: from 1092881822491 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 7 Jul 2026 02:18:59 -0700
+Received: from 1092881822491 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 7 Jul 2026 02:18:59 -0700
+From: Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
+Date: Tue, 7 Jul 2026 02:18:59 -0700
+X-Gm-Features: AVVi8CcFUPi6-5Q9lBA6uBGTYSWzDkVZQwYpWeNmDNhKSigRtRUQofRTtavL-v8
+Message-ID: <CADAuDAPSq+BUcB1SkHqkZsF364mShyE6jsaB+vk9zm=5Q+LHFw@mail.gmail.com>
+Subject: [PATCH] smb: client: restrict implied bcc[0] exemption to responses
+ without data area
+To: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org
+Cc: Paulo Alcantara <pc@manguebit.org>, Pavel Shilovsky <piastryyy@gmail.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-SFU fifos are natively supported (created and recognized) at least by:
-- Microsoft POSIX subsystem
-- OpenNT/Interix subsystem
-- Microsoft SFU (Windows Services for UNIX)
-- Microsoft SUA (Subsystem for UNIX-based Applications)
-- Windows NFS server (up to the Windows Server 2008 R2)
+smb2_check_message() has a long-standing quirk that accepts a response
+whose calculated length is one byte larger than the bytes actually
+received ("server can return one byte more due to implied bcc[0]").
+This was introduced to accommodate servers that omit the trailing bcc[0]
+overlap byte when no data area is present.
 
-Windows NFS server since Windows Server 2012 uses new reparse point format
-for storing new fifos, but still can recognize this old format (also in the
-latest Windows Server 2022 version).
+However, the exemption is applied unconditionally, regardless of whether
+the command actually carries a data area (has_smb2_data_area[]).  When a
+response with a data area is subject to the +1 exemption, the reported
+data can extend one byte beyond the bytes actually received, yet
+smb2_check_message() still accepts it.  The subsequent decoder then reads
+past the end of the receive buffer.  This is reachable during NEGOTIATE
+and SESSION_SETUP, before the session is established.
 
-SFU-style fifo is empty regular file which has system attribute set.
+The resulting out-of-bounds reads are visible under KASAN when mounting
+against a non-conforming server; both the SPNEGO/negTokenInit and the
+NTLMSSP challenge decoders are affected:
 
-These SFU-style fifos are already recognized by Linux SMB client.
+  BUG: KASAN: slab-out-of-bounds in asn1_ber_decoder+0x16a7/0x1b00
+  Read of size 1 at addr ffff8880084d67c0 by task mount.cifs/81
+  CPU: 1 UID: 0 PID: 81 Comm: mount.cifs Not tainted 7.1.0-rc6 #1
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x4e/0x70
+   print_report+0x157/0x4c9
+   kasan_report+0xce/0x100
+   asn1_ber_decoder+0x16a7/0x1b00
+   decode_negTokenInit+0x19/0x30
+   SMB2_negotiate+0x31d9/0x4c90
+   cifs_negotiate_protocol+0x1f2/0x3f0
+   cifs_get_smb_ses+0x93f/0x17e0
+   cifs_mount_get_session+0x7f/0x3a0
+   cifs_mount+0xb4/0xcf0
+   cifs_smb3_do_mount+0x23a/0x1500
+   smb3_get_tree+0x3b0/0x630
+   vfs_get_tree+0x82/0x2d0
+   fc_mount+0x10/0x1b0
+   path_mount+0x50d/0x1de0
+   __x64_sys_mount+0x20b/0x270
+   do_syscall_64+0xee/0x590
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+  Allocated by task 85:
+   kmem_cache_alloc_noprof+0x106/0x380
+   mempool_alloc_noprof+0x116/0x1e0
+   cifs_small_buf_get+0x31/0x80
+   allocate_buffers+0x10d/0x2b0
+   cifs_demultiplex_thread+0x1d5/0x1d50
+   kthread+0x2c6/0x390
+   ret_from_fork+0x36e/0x5a0
+   ret_from_fork_asm+0x1a/0x30
+  The buggy address is located 0 bytes to the right of
+   allocated 448-byte region [ffff8880084d6600, ffff8880084d67c0)
+   which belongs to the cache cifs_small_rq of size 448
 
-But Linux SMB client is currently creating new SFU fifos in different
-format which is not compatible with all those SFU-style consumers. Fix this
-by creating new fifos in correct SFU format which would be recognized by
-all those applications and also by existing Linux SMB clients.
+  BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x36/0x50
+  Read of size 329 at addr ffff88800726c678 by task mount.cifs/89
+  CPU: 0 UID: 0 PID: 89 Comm: mount.cifs Tainted: G    B      7.1.0-rc6 #1
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x4e/0x70
+   print_report+0x157/0x4c9
+   kasan_report+0xce/0x100
+   kasan_check_range+0x10f/0x1e0
+   __asan_memcpy+0x23/0x60
+   kmemdup_noprof+0x36/0x50
+   decode_ntlmssp_challenge+0x457/0x680
+   SMB2_sess_auth_rawntlmssp_negotiate+0x6f0/0xcb0
+   SMB2_sess_setup+0x219/0x4f0
+   cifs_setup_session+0x248/0xaf0
+   cifs_get_smb_ses+0xf79/0x17e0
+   cifs_mount_get_session+0x7f/0x3a0
+   cifs_mount+0xb4/0xcf0
+   cifs_smb3_do_mount+0x23a/0x1500
+   smb3_get_tree+0x3b0/0x630
+   vfs_get_tree+0x82/0x2d0
+   fc_mount+0x10/0x1b0
+   path_mount+0x50d/0x1de0
+   __x64_sys_mount+0x20b/0x270
+   do_syscall_64+0xee/0x590
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+  Allocated by task 93:
+   kmem_cache_alloc_noprof+0x106/0x380
+   mempool_alloc_noprof+0x116/0x1e0
+   cifs_small_buf_get+0x31/0x80
+   allocate_buffers+0x10d/0x2b0
+   cifs_demultiplex_thread+0x1d5/0x1d50
+   kthread+0x2c6/0x390
+   ret_from_fork+0x36e/0x5a0
+   ret_from_fork_asm+0x1a/0x30
+  The buggy address is located 120 bytes inside of
+   allocated 448-byte region [ffff88800726c600, ffff88800726c7c0)
+   which belongs to the cache cifs_small_rq of size 448
 
-This change affects only creating new fifos when mount option -o sfu is used.
+Restrict the +1 exemption to responses that have no data area, so that
+it still covers the bcc[0] omission it was meant for.  When a data area
+is present, the +1 discrepancy instead means the reported data length
+overruns the received buffer, so the response must be rejected.
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
+Fixes: 093b2bdad322 ("CIFS: Make demultiplex_thread work with SMB2 code")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
 ---
- fs/smb/client/smb2ops.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ fs/smb/client/smb2misc.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index e59fda1b2230..1261b928edee 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -5293,10 +5293,8 @@ int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
- 		type[0] = '\0';
- 		break;
- 	case S_IFIFO:
--		type_len = 8;
--		strscpy(type, "LnxFIFO");
--		data = (u8 *)&pdev;
--		data_len = sizeof(pdev);
-+		/* SFU fifo is system file which is empty */
-+		type_len = 0;
- 		break;
- 	default:
- 		rc = -EPERM;
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index 2a7355ce1a07..6270b33147d2 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -19,6 +19,8 @@
+ #include "nterr.h"
+ #include "cached_dir.h"
+
++static unsigned int __smb2_calc_size(void *buf, bool *have_data);
++
+ static int
+ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
+ {
+@@ -145,6 +147,7 @@ smb2_check_message(char *buf, unsigned int
+pdu_len, unsigned int len,
+ 	int command;
+ 	__u32 calc_len; /* calculated length */
+ 	__u64 mid;
++	bool have_data;
+
+ 	/* If server is a channel, select the primary channel */
+ 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
+@@ -228,7 +231,8 @@ smb2_check_message(char *buf, unsigned int
+pdu_len, unsigned int len,
+ 		}
+ 	}
+
+-	calc_len = smb2_calc_size(buf);
++	have_data = false;
++	calc_len = __smb2_calc_size(buf, &have_data);
+
+ 	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
+ 	 * be 0, and not a real miscalculation */
+@@ -247,8 +251,13 @@ smb2_check_message(char *buf, unsigned int
+pdu_len, unsigned int len,
+ 		/* Windows 7 server returns 24 bytes more */
+ 		if (calc_len + 24 == len && command == SMB2_OPLOCK_BREAK_HE)
+ 			return 0;
+-		/* server can return one byte more due to implied bcc[0] */
+-		if (calc_len == len + 1)
++		/*
++		 * Server can return one byte more due to implied bcc[0].
++		 * Allow it only when there is no data area; if data_length > 0
++		 * the +1 gap indicates an overreported data length rather than
++		 * the bcc[0] omission.
++		 */
++		if (calc_len == len + 1 && !have_data)
+ 			return 0;
+
+ 		/*
+@@ -409,14 +418,17 @@ smb2_get_data_area_len(int *off, int *len,
+struct smb2_hdr *shdr)
+ /*
+  * Calculate the size of the SMB message based on the fixed header
+  * portion, the number of word parameters and the data portion of the message.
++ * If have_data is non-NULL, it is set to true when a non-empty data area was
++ * found (data_length > 0), allowing callers to distinguish the implied bcc[0]
++ * case (no data area) from an overreported data length.
+  */
+-unsigned int
+-smb2_calc_size(void *buf)
++static unsigned int
++__smb2_calc_size(void *buf, bool *have_data)
+ {
+ 	struct smb2_pdu *pdu = buf;
+ 	struct smb2_hdr *shdr = &pdu->hdr;
+ 	int offset; /* the offset from the beginning of SMB to data area */
+-	int data_length; /* the length of the variable length data area */
++	int data_length = 0; /* the length of the variable length data area */
+ 	/* Structure Size has already been checked to make sure it is 64 */
+ 	int len = le16_to_cpu(shdr->StructureSize);
+
+@@ -449,9 +461,17 @@ smb2_calc_size(void *buf)
+ 	}
+ calc_size_exit:
+ 	cifs_dbg(FYI, "SMB2 len %d\n", len);
++	if (have_data)
++		*have_data = (data_length > 0);
+ 	return len;
+ }
+
++unsigned int
++smb2_calc_size(void *buf)
++{
++	return __smb2_calc_size(buf, NULL);
++}
++
+ /* Note: caller must free return buffer */
+ __le16 *
+ cifs_convert_path_to_utf16(const char *from, struct cifs_sb_info *cifs_sb)
 -- 
-2.20.1
-
+2.52.0
