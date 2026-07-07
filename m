@@ -1,141 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BF81B4223
-	for <linux-cifs@vger.kernel.org>; Mon,  6 Jul 2026 23:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90E63905EC;
+	Tue,  7 Jul 2026 09:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783378952; cv=none; b=uBMjo6bN7heV6FpGxkURz96YOZvH0pAUkqWDZMCI+CY9svRDZGCPI7LH3ofJtaB50mbJi6IaXx1S4rO9337uh7yHVuZW6iVjWFDvndzSCgd9h5pYTSj7BXsI5yWY6BJ3l+h5IhO3+FQoasm7CXxYjkJ2RIPiGNHIrlnTvBBB/Ro=
+	t=1783415032; cv=none; b=cSxH9MSbfCtpYJArLlTDXyMrr24/9ZBvzs9QNzC0G/6IZVshsrR6Ps1WVAXqO4vkKJFPcS6UHz5RW6/OwFb/Kir8+OLpstmY/AEDGQtpioZVfY7tbUschR1v8O8CW+2y77DzQHSfj2EpenbaiUbLJYFShefoxt/+onDDhSPaJqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783378952; c=relaxed/simple;
-	bh=BH1E5/4QfF8OxZALIejI89+1+M3y6Q6yYIvFiTREhtU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=amJHdnmrPdRudbvW9Q1d6K0LIYjkkH2IqNE8vaYpoDArO+gX0XZQL8xKqnr8X+7eSEi3PAZ7NCTG8xDu7CHCAaOTSmq3If0yDKvkfUmEWQNyUbMYEa7hYMNQvr1Xt7ghPIPyNKGbqA0AS89FT3CrV3MAxDXWuORZeWjyoU9zmoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyDmUBc7; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783415032; c=relaxed/simple;
+	bh=wWHZPAyY3+AwFSX6n7W/UK66Ikp/9C3S+2sgImyPkCQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=n7h5aH+DDR6fzkgESIKD+RLdLaJNPUlcP8uzpOLsse6HivQyE4vqay2nzFJQaUc20uARAL5k/Hw8ElzjhkOTIAlcFzmcfHzR4IGhJab0WaakRIk/gQa45NCBX4gkIzWZBFzQSha8JvICs+f95a4E2BnH9hRV91NzH++VIAM9bHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8CGZ9ah; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyDmUBc7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE23E1F00A3A;
-	Mon,  6 Jul 2026 23:02:30 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8CGZ9ah"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5434A1F000E9;
+	Tue,  7 Jul 2026 09:03:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783378951;
-	bh=ROace6Z7g1naMmzYooQ4frRXZnO5WZetYqkmDmh1cJo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jyDmUBc7oYZWWl4/NxUdJxbcTblbFQPa7tkSGcv0kOonshb+EPyMLPd8slDV6UqF4
-	 UMnZjdZqjzCjwPmxU2ny28ILpOoL/nwAhZt16hqKzmE8oHKLP/MStdYG/bT9ux01G1
-	 81BfxS8Y1xFZud/4nqs+pCqr0GZ0VIBe0hNKAtL0D5UMcNntP3r4CdGMwES5S4swID
-	 8tIoS9rGqxv+lYFMhoD4wp9jx+UclXtKXWn/sYnKX/iiQ7QdoTwChYlfyNYHqcqHTW
-	 XfMgPQwIcAIG3QW1iOV8ck9WfsbdZzBEAcwOwXa9fX8Oe+sDWslYqdxhE4E/dmupv7
-	 6trHomXauH3jg==
+	s=k20260515; t=1783415031;
+	bh=0Yw5f2+gRxiI5vnn/9pnZOj56EeqQvolLn1Zn2QBVhM=;
+	h=From:To:Cc:Subject:Date;
+	b=J8CGZ9ahuc2aFdOsI7Wcb8vImNwX0t7Omhg6pk2GL79HVH3kJGBVDw+uFSnlm8gi4
+	 gBdqI/EZzu1SAIcHL9SjZ4EdU2d71aBZo6GEwa87jy6bw4/DpPktm+1nz9UYR+/JFW
+	 ouws2oUl0XHxggs6lU2l5jDEl00ry84jF1ZPjzplTmDHR7t1CaYU5abrIcb/tMH3Cb
+	 RQFduuQvthijLNII2qtUzy8f8kY5OEJfTNWeq/0vSEtwgGkXIkuvqnc9g6lqxQIEln
+	 OT1Oa6y9EKN+kW1zmxRDLmgljmGRRckFpSBr2b/iSGyESGmqcZv8gYBvwHYoNc8XjG
+	 ZNtUTLBzQDmoA==
 Received: by pali.im (Postfix)
-	id 1F03C5D7; Tue,  7 Jul 2026 01:02:28 +0200 (CEST)
-Date: Tue, 7 Jul 2026 01:02:28 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: [PATCH RESEND 06/11] cifs: Validate presence of EA $LXMOD for
- WSL reparse points
-Message-ID: <20260706230228.a574wmdy2kdigobh@pali>
-References: <20260706184819.22124-1-pali@kernel.org>
- <20260706184819.22124-7-pali@kernel.org>
- <CAH2r5mue0UYq0--B-6uUVg5zryhxuS82RKFfhMZ0_dJR0gVs4Q@mail.gmail.com>
- <20260706223948.5tmkeq7tu5dk7uuv@pali>
- <CAH2r5mu4LK8cgWHDb_EUpUHkZdD1EtoJcp_c7Zv0KGmibW+=2Q@mail.gmail.com>
+	id 737EA71B; Tue,  7 Jul 2026 11:03:48 +0200 (CEST)
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] cifs: Fix support for creating SFU socket
+Date: Tue,  7 Jul 2026 11:03:18 +0200
+Message-Id: <20260707090318.26130-1-pali@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH2r5mu4LK8cgWHDb_EUpUHkZdD1EtoJcp_c7Zv0KGmibW+=2Q@mail.gmail.com>
-User-Agent: NeoMutt/20180716
 
-Without this change, Linux recognize some nodes as special files which
-are not special at all (for WSL). With this change, the recognition is
-aligned with the WSL. Those nodes which are special for WSL are
-recognized as special also by Linux client. And those nodes which
-regular files for WSL are also regular for Linux client.
+SFU sockets are natively supported by Interix 3.0 subsystem and also by
+later versions. It is part of Microsoft SFU (Windows Services for UNIX) and
+Microsoft SUA (Subsystem for UNIX-based Applications). They can be created
+and existing (stored on local disk or remote SMB share) can be recognized.
 
-So this is mostly alignment between MS WSL client and Linux client, to
-ensure interoperability.
+SFU sockets are recognized also by NFS server included in Windows Server.
+Windows NFS server versions since Windows Server 2012 uses new reparse
+point format for storing new sockets, but still can recognize this old
+format (also in the latest Windows Server 2022 version).
 
-On Monday 06 July 2026 17:55:50 Steve French wrote:
-> Without this change would Linux client recognize it more accurately?
-> 
-> On Mon, Jul 6, 2026 at 5:39 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> > With this change applied, such nodes are recognized as "regular files" same as in WSL.
-> >
-> > On Monday 06 July 2026 17:30:35 Steve French wrote:
-> > > If this EA is missing, does Linux client still recognize it (not
-> > > talking about WSL just what Linux client would see)?
-> > >
-> > > On Mon, Jul 6, 2026 at 1:51 PM Pali Rohár <pali@kernel.org> wrote:
-> > > >
-> > > > S_DT part of xattr $LXMOD is mandatory for all WSL reparse points except the
-> > > > WSL symlink and Win32 socket. Microsoft WSL subsystem does not recognize
-> > > > them without xattr $LXMOD too, and treat such inodes as regular files.
-> > > >
-> > > > Fixes: ef201e8759d2 ("cifs: Validate EAs for WSL reparse points")
-> > > > Fixes: 78e26bec4d6d ("smb: client: parse uid, gid, mode and dev from WSL reparse points")
-> > > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > > ---
-> > > >  fs/smb/client/reparse.c | 12 ++++++++++++
-> > > >  1 file changed, 12 insertions(+)
-> > > >
-> > > > diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> > > > index 49a6a0cc2b61..99e93b56374f 100644
-> > > > --- a/fs/smb/client/reparse.c
-> > > > +++ b/fs/smb/client/reparse.c
-> > > > @@ -1124,6 +1124,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
-> > > >  {
-> > > >         struct smb2_file_full_ea_info *ea;
-> > > >         bool ignore_missing_eas = false;
-> > > > +       bool have_xattr_mode = false;
-> > > >         bool have_xattr_dev = false;
-> > > >         umode_t reparse_mode_type = 0;
-> > > >         u32 next = 0;
-> > > > @@ -1183,6 +1184,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
-> > > >                         if (S_DT(reparse_mode_type) != S_DT(le32_to_cpu(*(__le32 *)v)))
-> > > >                                 return false;
-> > > >                         fattr->cf_mode = (umode_t)le32_to_cpu(*(__le32 *)v);
-> > > > +                       have_xattr_mode = true;
-> > > >                 } else if (!strncmp(name, SMB2_WSL_XATTR_DEV, nlen)) {
-> > > >                         fattr->cf_rdev = reparse_mkdev(v);
-> > > >                         have_xattr_dev = true;
-> > > > @@ -1194,6 +1196,16 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
-> > > >         if (!have_xattr_dev && (tag == IO_REPARSE_TAG_LX_CHR || tag == IO_REPARSE_TAG_LX_BLK))
-> > > >                 return ignore_missing_eas;
-> > > >
-> > > > +       /*
-> > > > +        * S_DT part of xattr MODE is mandatory for all WSL reparse points except the WSL symlink.
-> > > > +        * Microsoft WSL does not recognize them without xattr MODE too (except the WSL symlink).
-> > > > +        * IO_REPARSE_TAG_AF_UNIX is here an exception because this reparse point is used by both
-> > > > +        * WSL subsystem and native NT/WinAPI subsystems. And NT/WinAPI creates AF UNIX socket
-> > > > +        * without the xattr MODE and recognize it also without the xattr MODE.
-> > > > +        */
-> > > > +       if (!have_xattr_mode && (tag != IO_REPARSE_TAG_AF_UNIX && tag != IO_REPARSE_TAG_LX_SYMLINK))
-> > > > +               return ignore_missing_eas;
-> > > > +
-> > > >         fattr->cf_mode |= reparse_mode_type;
-> > > >         return true;
-> > > >  }
-> > > > --
-> > > > 2.20.1
-> > > >
-> > > >
-> > >
-> > >
-> > > --
-> > > Thanks,
-> > >
-> > > Steve
-> 
-> 
-> 
-> -- 
-> Thanks,
-> 
-> Steve
+SFU-style socket is a regular file which has system attribute set and
+content of the file is one zero byte.
+
+These SFU-style sockets are already recognized by Linux SMB client.
+
+But Linux SMB client is currently creating new SFU socket in different
+format which is not compatible with all those SFU applications. Fix this by
+creating new sockets in correct SFU format which would be recognized by all
+SFU, SUA, NFS and existing Linux SMB clients.
+
+This change affects only creating new sockets when mount option -o sfu is used.
+
+Signed-off-by: Pali Rohár <pali@kernel.org>
+---
+ fs/smb/client/smb2ops.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 4f7eefa7a683..e59fda1b2230 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -5288,10 +5288,9 @@ int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
+ 		data = (u8 *)symname_utf16;
+ 		break;
+ 	case S_IFSOCK:
+-		type_len = 8;
+-		strscpy(type, "LnxSOCK");
+-		data = (u8 *)&pdev;
+-		data_len = sizeof(pdev);
++		/* SFU socket is system file with one zero byte */
++		type_len = 1;
++		type[0] = '\0';
+ 		break;
+ 	case S_IFIFO:
+ 		type_len = 8;
+-- 
+2.20.1
+
