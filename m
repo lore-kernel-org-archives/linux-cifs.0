@@ -1,71 +1,71 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D2B3D9DCD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0856F3DA7DD
 	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783418483; cv=none; b=QOVB+y/M/0Mmg/VI1REm35pnqga8a+4O9WRjIUntlEis+KH+xPcNUuiyQAMidHyFgxBgKn1loJIkVp77a/qp8fGP4x7Q9s9vXoq/ZnzTU6Y+7qykeb36vGxO/HnmaEs516Kn/JBfs7J92iNhlTum7Pcr3uELTHtt85Xg34G4V7o=
+	t=1783418484; cv=none; b=iuM8+ubl3yRyN/WE5jvHzmhONkgdaPfaLE54AkdV1XS3DEbwyXtLltK2NejnGxB9Il3M81q5yESJwMlEpDaketfDpOOUpZqQKevhL78M4kdeGNmjMafDFfq+PwO2T49Jzi0POPjShdH3o0oUUzXzi1ZEICjXVvVkw6DZTZl2QNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783418483; c=relaxed/simple;
-	bh=ucCyWyla5jTUxTuzQITBGV+yWLyiZ/uttThIMc24Fdg=;
+	s=arc-20240116; t=1783418484; c=relaxed/simple;
+	bh=zHZGcT4PsJtFQGuRDtfqs7NnDJGtX2nCD7LoDbDln8I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XCPIoRgJDJqcT1fJAp85g3zlvgqOoovO6UCQ4htVaqi7hNZX8hTAwAXkrcepVdB66fANJA6Sql+zCrP1DVyTBg3SBrMTVmpSjU6VU0J+c6NQGppfImz2FVnAMZTf5iWKlP8lClwjZxLmAupHqLR3UTmcQIRxTD1mC/m3KKmkMf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V65z2LZB; arc=none smtp.client-ip=209.85.221.54
+	 MIME-Version; b=IXELMbGnBDiPDCKNv8kUv54R7ebUryMxfy59jxpbRthR5KWKOQhxZ0M6mloGfAz/QkdxDwsfphbv+quQYBMm8AfaW3B9vbrvqpsZaYeNB+Wh6OT6YGdDcINbP4xe4hM+WBe52k7xN6XTHguORwM1wUmtkw2hnleOvGN1kyvH0Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOGKFwQg; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V65z2LZB"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4703bc0a99aso2191674f8f.3
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOGKFwQg"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-493b7612475so37260605e9.3
+        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783418480; x=1784023280; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783418481; x=1784023281; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ILzTEGpo2ht7KKHhllqj3hCcwvlr0qj3it5MAqhgdA4=;
-        b=V65z2LZBcuOK8gF8EKeSVyPoOMe3oar9noQPceLiTFop2dehO64cpI3q6E6d3moTOq
-         v5NrHbupcFxyafEIk2fyn+1WZ3Xxpja9dLnzKLXAg07C3EV6WiihQq9K9WfuU3lL+jUO
-         fQMaDAZ53cjlN4SXZyj0LuO4b7/CBKKdiIRYuPUO+CsKcHbAw/S40oI+HTGTUljkPZa+
-         2o4Lo9UGLNUZXHemrP7G8jyOwI7YWrRTf6PRPnX8O1PjKYQh2R0vk83Qr1OjZYaVnGbT
-         lEIAYgWhvzurwEYG+w+zRqa6fKBtJbNFWUGa4Cj4AWG/UKzJLhLy8JddGXQMGySze3PQ
-         ivbQ==
+        bh=NqyD7s8v59rZqpS2HHNgjzbP8UKr69GLNeJxoO1akUA=;
+        b=dOGKFwQgUDPSW0q/YDrE1zO+l//v8NB6PGIdmOM3fnqvUMe8uXo6EcOMm+nyptCL3k
+         YagwTGHUyJpO7VXiaYbmkiv+ZY7/GT0w5UKZNpgN+xF2FnO331VkzCzfrZgfQ9eyvukH
+         D6GPrvJgmXphedf8f/knu15DDDQr7fW4yzV2nfeDIsucgLaRP9bPB7Qr53J6VhJtrl6E
+         6G2fiZyXVKPJRERith4aaq3QJoc4PCAJiRfD1Aj4MFO3WI5ViToILtPV3S00AWJdBRyj
+         p1Po4Gm7/48gNvqWTMjQU0ee3Qo2NzDG4FCYOvHc693h8MFmbA5Wef6O+p1I6rKWMblI
+         5xEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783418480; x=1784023280;
+        d=1e100.net; s=20251104; t=1783418481; x=1784023281;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ILzTEGpo2ht7KKHhllqj3hCcwvlr0qj3it5MAqhgdA4=;
-        b=RZfi0wd0+6hMn5MZ2yjNZD5oY5LGro2BABzvpdUB3lgVNYkoXYqMSMyjr2Y7/ApxAJ
-         kjznOtYMWyPWwo3YSBVAhGqo7UXeezVkrxaZKjGW72fM6Yy59X0TahokiFcARwIizlZD
-         avY2ple7olNdR6rpormWnbKaSugwA8t7yO8qp3kji1oLhI2TAwJ9FG2g+c/4dpt4ifPk
-         wEjIzEnGm8NXQwIBLfN3aHpLF9R8AG3dKopZc4/ydIt+L5wTorJIYk1HO+jj469R/sEV
-         txrcFB962Ol+iAJtFwpEOplXj7iN6Txhr6ta6YaKkbe4O2CaT64cldy9gMLHpd9LsbSf
-         3J7g==
-X-Forwarded-Encrypted: i=1; AHgh+Rr4KcUwK+qOJKfDurwqRLEfZ+9ZYsQEA7Ja3p025vELY8aEf+XMAeaUgt8x7MAIGU66tqHGX8tZ5HGC@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwB7JslH8zHhTFWt3HCgT4IHxZ0BD6H0SXuKzX00cdktbdfGvp
-	tzfxCppXhkSoJ3Q+dhAqLip+JRLfrD4XWb/RjJnqkfOwKDxnbax/y+f+
-X-Gm-Gg: AfdE7ck1sBQQeG1orhFOwS5oS5JLThpEgDW9xfXMN6jSZFG31jxY/yeZ5JhILY8doOF
-	DtUfmn+tiSvU74QTIirajdfNCCiMbDl/zixpm3AUYgS1j4srY62482PWOJ3nzC2zPNexVOCca2L
-	rFcFS0B8SC1AP4CWyEl2w1nUqqZcBj9RPVOfRS6/OKa2EQgBL4wSOf5JTBZbyIrujjd0fS5xMtv
-	KIxI659KAJu5Ge4JlmTBkODZAstbDEijYFnk3QBNyCOpZZHiXgT1oDMwiUPg6feGIUuRZ60/SSl
-	8EOxm8irFz0B4NaMZifeVWWLH2qGwMClwon7f6cgtOl8517YNLMaRhzPnXFm8k0S28rUUkj8FKD
-	prfW+ChOPxatsw8x0REQRjC+VQH15hXSeCiXUyxzlL9ASovV/a3Xr5q6LU0Tc1Cem69DeDhYY8g
-	DTQnODQtLnaUItJkzjMYZ7ZeYAq5FQSYkX3Cs=
-X-Received: by 2002:adf:e34d:0:b0:472:c426:2ce9 with SMTP id ffacd0b85a97d-47de666b0d0mr4059215f8f.12.1783418480333;
-        Tue, 07 Jul 2026 03:01:20 -0700 (PDT)
+        bh=NqyD7s8v59rZqpS2HHNgjzbP8UKr69GLNeJxoO1akUA=;
+        b=Gk5giOBOJy9IBjRfeFMM+AjT8Z3ER9vHMA/zvRMhric2+Ex0XLAL9rdqFLBsn18fmE
+         Ivh4t1dCQ4AZoZN3yYnt7ML1T0iF+0V6PjGMkqwo+qzLrnWnUI868yyG2oK/us3IutZa
+         +aIdrwl3AdNqk89HuRp//JhVqvbMUKhi56AcYrHKQO+SmYjzgeG1PsI2+aBVnfbhIdht
+         LvCIC8dtBz9DVjR90uGVEoWeJJIQtq4Lk4nDYf8Xf0d1s2H0bIqLHb9ojxt1xIR391CZ
+         fx8DNXni9PW9cm2h/JvlCTiyZJNpMtuO4wkM3RAp8Tnf3sttUgNp0YDfkfLoSCUV4+ou
+         SFQw==
+X-Forwarded-Encrypted: i=1; AHgh+RqpIqqTUCLGu0aWXeNCJVyGGlCXZmjMWZVZPjR2ciOKRDHCeiXSRpjXhBu/zS3o2Jbtrlajsn6itTCG@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9ObCaKA+w9MiKLPCzwgVw25e/4csd1LErW/jSuofC/yw6Lhch
+	rls/e7Rr2sdLnjmyMOdkn84RxFdbicDJ+qMIHOXct8abdKQ4GTDNv0F9
+X-Gm-Gg: AfdE7cmIGKieEqDT8pUJGBNKnktjS4la1hPOkBb1xgzti0lQjBlBwPlcd02M28u53zG
+	+siBQKsLf4jw71sLf53JbqtQc/jU66/KrJ2gDSNmTsnJ0+kQnVTkreG/i+h6TvoFcP5KfPgpUSX
+	TZv3CT1bZljhdFARnhlMLCsFMJYJt1TkO19Y95Rbe0IifsXs1arN77OjPpP/bjyg8iPFwcBiiOd
+	rebxmr0NsHL/6I1m4hCGVLVKvf2XlEAshVE+X1K2kW9F4GI48c+QjPRWs9AzIRCqy2w8GjyLJr0
+	0udEV2nNx/sL8n2TfTJNKEH+TRs36y+1z1OdzAMlZR7SVo2jRPO7Nt6J6d8ItL1tHCRcTRM9GJz
+	ne5oNxE91dhE1OBjbLbwcpqwf4NYdUPuCVXlLDFsTjznwzK9o+bzntgPXrl+7Mml+KNlEcxIAir
+	HwaP8Fka57ys3mPSnZrg1I1Rs+s44sRVEpxFI=
+X-Received: by 2002:a05:600c:55d5:b0:493:bb0e:2832 with SMTP id 5b1f17b1804b1-493df0a0266mr34298845e9.37.1783418481213;
+        Tue, 07 Jul 2026 03:01:21 -0700 (PDT)
 Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960634sm33908295f8f.26.2026.07.07.03.01.19
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960634sm33908295f8f.26.2026.07.07.03.01.20
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 03:01:19 -0700 (PDT)
+        Tue, 07 Jul 2026 03:01:20 -0700 (PDT)
 From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Gael Blivet <gael.blivet@gmail.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 6/7] ksmbd: fix stale sparse-file attribute after share reconfiguration
-Date: Tue,  7 Jul 2026 11:55:06 +0200
-Message-ID: <20260707100033.47512-7-g.blivet@me.com>
+Subject: [PATCH 7/7] ksmbd: fix COPYCHUNK for ADS streams
+Date: Tue,  7 Jul 2026 11:55:07 +0200
+Message-ID: <20260707100033.47512-8-g.blivet@me.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260707100033.47512-1-g.blivet@me.com>
 References: <20260707100033.47512-1-g.blivet@me.com>
@@ -79,43 +79,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-smb2_update_xattrs() copies the DOS SPARSE attribute bit verbatim from
-the stored xattr into the in-memory file attributes, without checking
-whether the share is currently advertising FILE_SUPPORTS_SPARSE_FILES.
-A file whose xattr has a stale SPARSE bit (set by a previous client,
-or from before the share was reconfigured) would keep reporting as
-sparse even after sparse-file support is turned off for the share.
-This matters for Time Machine: sparsebundle band files rely on
-accurate sparse-file status being reported, since macOS decides
-whether to issue FSCTL_SET_SPARSE based on it. Mask the bit out when
-the share doesn't currently advertise sparse-file support.
+ksmbd_vfs_copy_file_ranges() unconditionally returned -EBADF whenever
+either the source or destination of a server-side COPYCHUNK was a
+stream handle. This breaks copying files that carry alternate data
+streams (e.g. duplicating a file with a resource fork, or an
+AFP_AfpInfo stream) via COPYCHUNK, since vfs_copy_file_range() doesn't
+work on xattr-backed streams to begin with -- the copy needs to read
+the source xattr's value and write it to the destination directly.
+Implement that path instead of failing outright, and echo back
+TotalBytesWritten as the sum of the chunk lengths the client sent
+(macOS reuses the main file's chunk list for stream copies, so the
+requested total reflects the file size rather than the stream size,
+and returning the stream's actual size would look like a mismatch to
+the client).
 
 Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
 ---
- fs/smb/server/smb2pdu.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ fs/smb/server/vfs.c | 46 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index af957d013..d5d88d023 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2940,6 +2940,16 @@ static void smb2_update_xattrs(struct ksmbd_tree_connect *tcon,
- 	rc = ksmbd_vfs_get_dos_attrib_xattr(mnt_idmap(path->mnt),
- 					    path->dentry, &da);
- 	if (rc > 0) {
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index c491574d5..be93a8ec9 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1821,8 +1821,50 @@ int ksmbd_vfs_copy_file_ranges(struct ksmbd_work *work,
+ 		return -EACCES;
+ 	}
+ 
+-	if (ksmbd_stream_fd(src_fp) || ksmbd_stream_fd(dst_fp))
+-		return -EBADF;
++	if (ksmbd_stream_fd(src_fp) || ksmbd_stream_fd(dst_fp)) {
 +		/*
-+		 * Don't report a stale SPARSE bit (e.g. left over from a
-+		 * previous client, or from before the share was reconfigured)
-+		 * when the share isn't currently advertising sparse-file
-+		 * support. Time Machine sparsebundle band files rely on
-+		 * sparse status being accurate, since macOS decides whether
-+		 * to use FSCTL_SET_SPARSE based on it.
++		 * ADS stream copychunk: copy xattr from src to dst directly.
++		 * vfs_copy_file_range doesn't work on xattr-backed streams.
 +		 */
-+		if (!(server_conf.share_fake_fscaps & FILE_SUPPORTS_SPARSE_FILES))
-+			da.attr &= ~FILE_ATTRIBUTE_SPARSE_FILE;
- 		fp->f_ci->m_fattr = cpu_to_le32(da.attr);
- 		fp->create_time = da.create_time;
- 		fp->itime = da.itime;
++		char *buf = NULL;
++		ssize_t buf_len;
++		int sret;
++
++		if (!ksmbd_stream_fd(src_fp) || !ksmbd_stream_fd(dst_fp))
++			return -EINVAL;
++
++		buf_len = ksmbd_vfs_getxattr(file_mnt_idmap(src_fp->filp),
++					     file_dentry(src_fp->filp),
++					     src_fp->stream.name, &buf);
++		if (buf_len < 0)
++			return buf_len;
++
++		if (buf_len > 0) {
++			/*
++			 * vfs_setxattr(NULL, 0) removes the xattr on Linux, so
++			 * skip it for empty streams: the Open already created
++			 * the empty xattr via smb2_set_stream_name_xattr.
++			 */
++			sret = ksmbd_vfs_setxattr(file_mnt_idmap(dst_fp->filp),
++						  &dst_fp->filp->f_path,
++						  dst_fp->stream.name,
++						  buf, buf_len, 0, false);
++			kfree(buf);
++			if (sret < 0)
++				return sret;
++		}
++
++		/*
++		 * macOS reuses the main file's chunk list for stream copies,
++		 * so req_total equals the file size, not the stream size.
++		 * Echo back TotalBytesWritten = sum(chunks) so macOS doesn't
++		 * treat the size mismatch as an error.
++		 */
++		*chunk_count_written = chunk_count;
++		for (i = 0; i < chunk_count; i++)
++			*total_size_written += le32_to_cpu(chunks[i].Length);
++		return 0;
++	}
+ 
+ 	smb_break_all_levII_oplock(work, dst_fp, 1);
+ 
 -- 
 2.43.0
 
