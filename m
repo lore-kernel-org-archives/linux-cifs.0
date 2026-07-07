@@ -1,70 +1,74 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA283D952F
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71B0227BB9
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783418496; cv=none; b=SHlZITjZN1Nnv6mVBUNl+mGcY1g1geKZ/KHS7ISjKzRis7FhHtM5WnF6RZ2Tb4e5VlYUOSs6uxDL9Nzg6azUR1PorOf4MmVgqhlIKzt9G/FirMFH5CKS/Az/3dbhiQANOWQ3ziOq+bGqL8w5FGYq54osql27h4t6bhDqHqhdeiI=
+	t=1783418498; cv=none; b=RRBvldN3hDBxxSyWSCtqpsFHn9yGeEQeyrATyQS9FFxPTpMLsZSxF+qA1s1bs5BCClyNp3IBSZRVSmWqZyNZy/vY3/I6Aw2BvJItSdUflZIJcLkkqi3/lymVNRYvy+f1TEDmm8E3XNb3sADLphPh/M81BdQuFcW+EWmKq4ZvCxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783418496; c=relaxed/simple;
-	bh=cgAqG/O12gwsG6gQHqKkMbScT9OlQXiTUZp5X21CxQ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bli80z+oDyBlCBRHUiLEJFoXvaW9Draj4Vs0BbkzwPlufTX1OqnpsTfyd0ARYMIfUv2hEzzoj8cyVMqlM8/kg4NvNIgOTfGWPt6Kzq681b00JunzVB6DmnjjLdnwWuoZtZY1/jkC8mTwq1B1zKJp1r558QIRo8sQQ6m1Pl9XAHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jsA+QCPy; arc=none smtp.client-ip=209.85.221.47
+	s=arc-20240116; t=1783418498; c=relaxed/simple;
+	bh=Wq5smhmaSs9FQqjnlX9PVXUuRhDBNGs+kzESsV1u43A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=b0eUufG6A36wRN3qqneWE74ofr8wXHMYrPrlsMepvgvbEDVjFXa/srQ6tO2xsU4nv+FZTfrXRGdyHJBhU+3w9dT1kyM8LCT1N78eFp/GeVqzmGelG1FDHkrb0oTzdUX7rswYgO79TvGZE3wNK9onoHjl+h6C50mM9QxubihINVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FUdilNRN; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsA+QCPy"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-47d70879764so1554509f8f.2
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FUdilNRN"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-4703bc0a99aso2191830f8f.3
+        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783418493; x=1784023293; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=XTy5yBP1InRpkYk7HmMoBzJwmnoxpbvuaqpUbTqjmYk=;
-        b=jsA+QCPyrJglMpmkVBCbhVxWgx5cHkP8Ym5uhyW3Jy45m/7UNpvQLKbEPFfDAZOMHZ
-         CekvaEF4gWfhY5cHdmb/zXWOp3mv0oovS9bnClF2JPM8rJACdkbeJbR8enpcwg5bzfZg
-         Wg7aB5WzBeR7FunkjyJoHbjDGiU2FQ5EP8Ca7e3a347QC7+m0V8mZGDHG0Vwje2XKiV5
-         OyP8/tBWvk1fX8YgU+cp9ZgiyxUWOFsZqbv3U4SfIId81jQqCBqXthPBkmkA/JL+gqWX
-         FcRiju2VxZ6Wt3I5se1A5sKY7hPQZ/qNxu651Le7ubW0SH77WdHRmpwJGvFY/eP5jXvn
-         fKcw==
+        d=gmail.com; s=20251104; t=1783418495; x=1784023295; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+j8d2ocGrvYrq0XcmzBQ4o0mLWqeRieIU+AXOYTGpEc=;
+        b=FUdilNRNWtTNg2MPjLbOAOp83J36zYSonEVGGHaNnYC02AzzTNjCSR7rK4+zAT24YY
+         NRAqBngUEBYZvkzCyeChrpkiAiylPjK2INNq0vhagpTmZA9Alr4aLpiOlqYXZWEbbCvz
+         HF9gt3Hc7kJcM/o60zC4Z7XBo/kJtO1Z7VjONdU94iO6auzFSoFAQMx9JHfdur/BhIIm
+         4kSPosf6KA6R3Hv/EnKr9UrHm+lJjcea+MdRGnCIwsnQySck3duSL/TdTb7ysCaZ7Wib
+         MhrhREctT+RV9dhIsKavXjwSQxixjFoR3WABlY2TRMgebRK9MZIxJY91ADG9ougZr7Re
+         /NYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783418493; x=1784023293;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=XTy5yBP1InRpkYk7HmMoBzJwmnoxpbvuaqpUbTqjmYk=;
-        b=P30sJKzuKhH2IAL4HFkIUYE8kZonpVQmro881OPb6lYF9bsYu71vG31geVFJfcd2bt
-         9uWPV8I3mh1KdspsH4wRi3FMAf4CSJUSvocYTLFYp16+T78y+dZPkw0KGU71frhUtigM
-         KO6kXg3837nMczL9gd4wB0PZ47LLkMhz9oyiDf8ug9l8GZ3+VPI4IUukhSpyx2y+u3Lx
-         39/Ng7sDKmynjaq3lwceuM0RQFTJtTq1lHwUc2Diq56KAMtAR6NOOd6T+bUBhmCawL0E
-         TokaVAdJ5/8Sg5uqLzAi1EIQRj5tQjN3tK+mXHzQJjmbagL7RnUpSIOOe4kskFwqSLfG
-         X//Q==
-X-Forwarded-Encrypted: i=1; AHgh+Rrm1u3wsR3dnqI1EzjvDQHMJ92v5PUhq7PB0q+MdHsJyKPHI7fY6YdwuJlPAcU43zRx9YGEhUuwtwYO@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyyp5uT9O3nJZ/zE7ttKogbeFNRZb1NSBpiSIj8uAV1PMBArpAo
-	hajCCnv00+W01SKe9lAMXblI0apClKVp4VsiA/9FgbyHGRtijS8JKFJ3dbCDJseN
-X-Gm-Gg: AfdE7cm8N9et6CehkaXinTdgO6C0cg+YmeOBEyewnCdnKw+gozVXob+ZUa5DxEc8vTI
-	cPTsBOfIEPmt3IMJ8tQ5o7xu71sziUBqJ9cbkhdOEExsDcKCrIgHnjAyEa61DfEG808I08unpeL
-	p9mMj+vtl8t/oemugonN/QFWaTsTT5QOFjfTGrF8BeTpa1051lPFuuihN8wr0R0SbDymZKZWlMb
-	jpIU7Ktsj3M6q70ZrFx0PIP28asw4Sji4Zsa8m6D6vVFiVWovmBr44cxccUJy9tUIUxoSSHZUbC
-	H9yTkZXlT7yW8EmMOjL9ltzPkfrS89zklvj2+KLPTDIoR2GfQyWWnOE6Onxeb2xq5hClJOTO84z
-	5qYbSOWSok/fO8WWccxFry3WDpKGXTJD50jXI8gXuvOyaRN2A8WhHGyR8LyoOmqM9sJPCQ7rP8Y
-	GYJtyVUYYTAurlAR1x0XKAaVGTMDpftyjkm0A=
-X-Received: by 2002:a05:6000:136e:b0:46e:98a7:232b with SMTP id ffacd0b85a97d-47de6650421mr3632640f8f.10.1783418493183;
-        Tue, 07 Jul 2026 03:01:33 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783418495; x=1784023295;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=+j8d2ocGrvYrq0XcmzBQ4o0mLWqeRieIU+AXOYTGpEc=;
+        b=khoV0FX6JU99n5cTu4dOcE3rT0xoRhMuhdeQ0gPno/XWl5pd0nSWOQ1L/osmowHWjQ
+         F89xDp06Lw1xdo7NtgsiQYem0d0S4pkt7BDgblbo+S7JhT55ZDhparXGnMbjxen0Comn
+         oWw29Vs0DH8N6QTJ+WpdH2JsNizN/y47NsA4lJfsS3g6whEIMyRT8m8UpQTOVIojyR4N
+         M7GCzXRz3PlPcOK/+VsJ0h80zkWJxLhUuZswNdMLSVgLC82dwYNg6fSsbaBTr6TPL9y5
+         GpgiPX4tSsfO4uBpSwEZxvHpb/SgorpwsiwqZeqstZGpmJsS8zo8kvoxNejAwE3Nenat
+         Dr0g==
+X-Forwarded-Encrypted: i=1; AHgh+Rod0ugnSTvTLXSRkdTU15xMQGVqVqmpVLavEMGzGlao83wfGx/RmiMM7QZAOn4O6XUf5PJuBp2w6/cO@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywti++/Af0p1nLUTeFiRHZ5WnbR253IpDAYAjVvS5SA4gkzNift
+	+jBHszoTo6ZID7dydwkSocqr0txm3cc05NtVY5T59bhAum3Wga1jSZzM
+X-Gm-Gg: AfdE7ckww3kCqXTc6nZYHDmYjRX8F3ebrsrno4rTjW7VE9OlPUpwI6Ja1AuO2CIRBSG
+	gzw0BLYFn0ntBsL+KIcj8wDmVGawfoFcomqc1Y2aHluEcrfhjmveFxP8GQWl98WybKnWJ/DerY7
+	EQ1r9vTQGzpRiNwqjPR4ZPS0D2ptSIqLWSRATK0o44x66l56PHmPLSb5prE+glQm3PCz820I94f
+	VeRkQVuHqjkfTrog4jkSsVMsHg5MDGX1eX2Oq5+rjK8xf9fKP+VI0z/GZM2HqDa0lMSIze9BnJ+
+	xD+FA4varZAREYM+EXnjTe+47UULDqHNn6ITPTyUbBA2RnyW35ug7d54eO7uKtsk5VlcVGUXlDD
+	155g4dFSMMfiEPz+kQ1C187zUnugKkBy4XyT+lGW4MYmkon8ZoV1VZ6yIXjrn5RfaiNSTy9OWf+
+	DSZLltgwryVDNtTAzDqrh+qQYJj9ggvSQSPsk=
+X-Received: by 2002:a5d:4801:0:b0:473:53b7:e390 with SMTP id ffacd0b85a97d-47de666b175mr3923584f8f.11.1783418495132;
+        Tue, 07 Jul 2026 03:01:35 -0700 (PDT)
 Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e785sm32203122f8f.8.2026.07.07.03.01.32
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9de1e785sm32203122f8f.8.2026.07.07.03.01.34
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 03:01:32 -0700 (PDT)
+        Tue, 07 Jul 2026 03:01:34 -0700 (PDT)
 From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Gael Blivet <gael.blivet@gmail.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 0/5] ksmbd: add macOS Time Machine / AAPL SMB2 extension support
-Date: Tue,  7 Jul 2026 12:01:23 +0200
-Message-ID: <20260707100129.47563-1-g.blivet@me.com>
+Subject: [PATCH 3/5] ksmbd: send inline FinderInfo in FIND responses when READDIR_ATTR negotiated
+Date: Tue,  7 Jul 2026 12:01:26 +0200
+Message-ID: <20260707100129.47563-4-g.blivet@me.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260707100129.47563-1-g.blivet@me.com>
+References: <20260707100129.47563-1-g.blivet@me.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -75,63 +79,120 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-ksmbd currently doesn't implement any of the Apple "AAPL" SMB2
-extensions. Without them, macOS Time Machine backups over SMB do not
-work at all. This series adds enough of the extension to fix that.
+Without READDIR_ATTR, macOS Finder resolves type/creator/icon for
+every file in a directory listing by opening its AFP_AfpInfo stream
+individually -- one extra CREATE+QUERY_INFO+CLOSE round trip per file,
+which is the dominant cost of browsing a large directory over SMB from
+a Mac.
 
-The underlying logic was built and live-tested against a real Time
-Machine backup and everyday Finder use over several days on an
-earlier baseline. This series is a careful re-derivation against
-ksmbd-for-next-next -- verified to build cleanly and pass
-checkpatch.pl --strict, but not independently re-tested against this
-exact tree.
+When the client negotiates READDIR_ATTR (conn->aapl_readdir_attr, set
+during CREATE's AAPL context exchange), inline the same information
+directly into each FILEID_BOTH_DIRECTORY_INFORMATION FIND entry:
+  EaSize           = max_access, expanded specific rights
+                      (GENERIC_ALL_FLAGS), not the raw FILE_GENERIC_ALL_LE
+                      "generic" meta-bit -- that bit has none of the
+                      specific FILE_* rights macOS's smbfs.kext checks
+                      bit-by-bit, so reporting it directly would fail
+                      every access check and show Finder's "no entry"
+                      badge on every file/folder.
+  ShortNameLength  = 24 (fixed; the spec says 0 when there's no short
+                      name, but real macOS clients expect 24 here)
+  ShortName[0..7]  = resource fork size (0 -- no resource forks)
+  ShortName[8..23] = compressed FinderInfo (all zero: type/creator
+                      unset, client falls back to extension-based
+                      icon/type detection, consistent with the
+                      AFP_AfpInfo synthesis this mirrors)
+  Reserved2        = Unix mode bits
+Reparse-point status is still carried via ExtFileAttributes rather
+than EaSize once READDIR_ATTR is active, since EaSize is repurposed
+for max_access.
 
-Everything here is scoped to shares with the new
-KSMBD_SHARE_FLAG_TIME_MACHINE flag, not enabled globally: the AAPL
-extension is undocumented and reverse-engineered from observed
-client/server behavior (cross-checked against Samba's vfs_fruit
-module and the Apple Time Machine over SMB spec[1] where possible),
-so this keeps the blast radius contained to shares that explicitly
-opt in.
+This wire format was reverse-engineered from macOS smbfs.kext network
+behavior (Apple has not published it) and cross-checked against
+Samba's vfs_fruit marshalling (source3/smbd/smb2_trans2.c,
+SMB_FIND_ID_BOTH_DIRECTORY_INFO), which implements the same extension
+for the same reason and confirms both the max_access expansion and the
+ShortNameLength=24 behavior.
 
-Patch 1 builds on top of the AAPL groundwork already in this tree:
-`fs/smb/common/smb2pdu.h` already has the SMB2_CRTCTX_AAPL_* constant
-definitions (added recently, currently unused anywhere), and
-`conn->is_aapl` detection already exists for an unrelated narrow
-purpose (reporting UniqueId=0 to Mac clients). This series reuses
-both rather than introducing a parallel/competing implementation.
+Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
+---
+ fs/smb/server/smb2pdu.c | 57 +++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 52 insertions(+), 5 deletions(-)
 
-Patch order matters: 2-5 depend on the AAPL negotiation and
-conn->aapl_readdir_attr flag added in patch 1.
-
-[1] https://developer.apple.com/library/archive/releasenotes/NetworkingInternetWeb/Time_Machine_SMB_Spec/
-
-Gael Blivet (5):
-  ksmbd: add Apple AAPL kAAPL_SERVER_QUERY create context support
-  ksmbd: synthesize empty AFP_AfpInfo xattr on first probe
-  ksmbd: send inline FinderInfo in FIND responses when READDIR_ATTR
-    negotiated
-  ksmbd: defer CHANGE_NOTIFY completion instead of
-    STATUS_NOT_IMPLEMENTED
-  ksmbd: implement full-file copy for AAPL ChunkCount=0 COPYCHUNK
-
- fs/smb/common/smbglob.h       |   1 +
- fs/smb/server/connection.h    |   1 +
- fs/smb/server/ksmbd_netlink.h |   4 +-
- fs/smb/server/ksmbd_work.c    |   1 +
- fs/smb/server/ksmbd_work.h    |   2 +
- fs/smb/server/oplock.c        |  73 +++++++++
- fs/smb/server/oplock.h        |   1 +
- fs/smb/server/server.h        |   2 +
- fs/smb/server/smb2ops.c       |   4 +
- fs/smb/server/smb2pdu.c       | 275 +++++++++++++++++++++++++++++++---
- fs/smb/server/smb2pdu.h       |  60 ++++++++
- fs/smb/server/transport_ipc.c |   9 ++
- fs/smb/server/vfs.c           |  41 +++++
- fs/smb/server/vfs_cache.c     |  30 ++++
- fs/smb/server/vfs_cache.h     |   6 +
- 15 files changed, 487 insertions(+), 23 deletions(-)
-
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 8b81c712e..b1be4df04 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4649,17 +4649,64 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 
+ 		fibdinfo = (struct file_id_both_directory_info *)kstat;
+ 		fibdinfo->FileNameLength = cpu_to_le32(conv_len);
+-		fibdinfo->EaSize =
+-			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
+-		if (fibdinfo->EaSize)
+-			fibdinfo->ExtFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT_LE;
+ 		if (conn->is_aapl)
+ 			fibdinfo->UniqueId = 0;
+ 		else
+ 			fibdinfo->UniqueId = cpu_to_le64(ksmbd_kstat->kstat->ino);
+ 		fibdinfo->ShortNameLength = 0;
+ 		fibdinfo->Reserved = 0;
+-		fibdinfo->Reserved2 = cpu_to_le16(0);
++		if (conn->aapl_readdir_attr) {
++			/*
++			 * READDIR_ATTR wire format, confirmed against Samba's
++			 * vfs_fruit marshalling (source3/smbd/smb2_trans2.c):
++			 *   EaSize           = max_access (expanded specific
++			 *                      rights, simplified to "grant all")
++			 *   ShortNameLength  = 24 (fixed; not 0, despite the spec)
++			 *   ShortName[0..7]  = resource fork size (uint64 LE, 0 = no rfork)
++			 *   ShortName[8..23] = compressed FinderInfo (type+creator+flags+
++			 *                      ext_flags+date_added, 16 bytes LE; all
++			 *                      zeros means type=0/creator=0, i.e. use
++			 *                      the file extension for icon lookup)
++			 *   Reserved2        = Unix mode bits (uint16 LE)
++			 * Reparse-point tag is indicated via ExtFileAttributes, not EaSize.
++			 */
++			__le32 reparse_tag =
++				smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
++
++			if (reparse_tag)
++				fibdinfo->ExtFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT_LE;
++			/*
++			 * FILE_GENERIC_ALL_LE (0x10000000) is the raw
++			 * "generic all" meta-bit -- valid only in a
++			 * client's requested access mask, for the server
++			 * to expand. It has none of the specific FILE_*
++			 * rights bits set (FILE_LIST_DIRECTORY, FILE_TRAVERSE,
++			 * etc.), so reporting it here as max_access would make
++			 * macOS's bit-by-bit access checks fail on every
++			 * entry -> permanent "no entry" badges in Finder.
++			 * Report the actual expanded rights instead, same
++			 * as smb_map_generic_desired_access() does when
++			 * translating a client's GENERIC_ALL request.
++			 */
++			fibdinfo->EaSize = cpu_to_le32(GENERIC_ALL_FLAGS);
++			/*
++			 * The spec says ShortNameLength should be 0 when
++			 * there's no short name, but real macOS clients
++			 * expect it set to 24 for READDIR_ATTR entries --
++			 * confirmed in Samba's vfs_fruit marshalling
++			 * (smb2_trans2.c): "on the wire behaviour shows
++			 * its set to 24 by clients."
++			 */
++			fibdinfo->ShortNameLength = 24;
++			memset(fibdinfo->ShortName, 0, sizeof(fibdinfo->ShortName));
++			fibdinfo->Reserved2 = cpu_to_le16(ksmbd_kstat->kstat->mode & 0xffff);
++		} else {
++			fibdinfo->EaSize =
++				smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
++			if (fibdinfo->EaSize)
++				fibdinfo->ExtFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT_LE;
++			fibdinfo->Reserved2 = cpu_to_le16(0);
++		}
+ 		if (d_info->hide_dot_file && d_info->name[0] == '.')
+ 			fibdinfo->ExtFileAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
+ 		memcpy(fibdinfo->FileName, conv_name, conv_len);
 -- 
 2.43.0
 
