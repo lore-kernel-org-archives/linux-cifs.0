@@ -1,71 +1,71 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B65A36655C
-	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFED53DA7F5
+	for <linux-cifs@vger.kernel.org>; Tue,  7 Jul 2026 10:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783418482; cv=none; b=bPBPyJqd9tY8JeC0pMhPM5sh+2GT5zyYZTzWFpIaCUdNNCK44/To5lvJFdZ7fLnij4d1h/jY/Dk4ImFvFwiCFxM6V7FpzuA91AHfYPs1VX20xhggAb+IvuJwfEJp712QCs2KE8AstjQpSmhCmLTrE+n7h56ZoHjxAqlUdz9U6KU=
+	t=1783418482; cv=none; b=LSlM7czyvPmfp2dY0tUG6EfS3qpFNuvAKzpvmPQbgVz7c/07LHFok646j2Cwt4pjAyk5k45hLm6qbUo9VRIKFRsRIedR9a65J280+5ZE+MO9GgnLE47+6AAgruIju9GeaJ0/pElG3T9MeQ0jhDbWM9UNX9ZuJy3YyuhM7U6ESEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783418482; c=relaxed/simple;
-	bh=kgfauQuFNlO5We3TMkTbcvmbnULFh13bIX9688rbKUU=;
+	bh=+bgCSMZGWGzbmIXXF96xKLL3+sUUv8YdqQCLIlTPPC4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Io300Kh54gaVksQ58yj4cHR6sa4lcErKR3Hpn1MeIB1u+bBaPDgNqOG7hzxf9kJtNYUFNXWDycy554m22I0s8Z1QCjqBnmpRIYIhJG/RbMSfYFuqV4khlyKg7XjmbDSzDkdvlvZebVjz7gYVtXvvg6r6/l0O6TZNoN+h6O0At58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LGO0CMlk; arc=none smtp.client-ip=209.85.221.42
+	 MIME-Version; b=IJyY0l4QCtC8MIWivXbKQDGcyKnddRozd5iShrTRSYtbYrdRuxoZc3zEmKFHHeNXZpNMP+wU19q0ig70jN5cKfPagGETBOmaTpah/AXFlWES5mjkg7ZPeslEZa1ZrSyxnojO8vQ/NyycVrlZhBNCEspz0tDxxvQApZOV8N/XeLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pslYBkgr; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LGO0CMlk"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-47ddf7b09e5so1958571f8f.1
-        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pslYBkgr"
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-476a130c138so4142333f8f.0
+        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 03:01:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783418477; x=1784023277; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783418479; x=1784023279; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ivSoZbV7cSgQtMCmPa64P5ecliJPFKjL0bylQloWrCg=;
-        b=LGO0CMlksrwvQ4feExtaTjIsdTTG8vfu7isnurtCkTtzkNaeOMAVKuPEyCQXpGUg5L
-         ru+da3JFRlLCBFzPq4QAtWi9/MJKg5DzvVrysa/moe6hsWxk0Q4D/orCH1XUcUCMng3+
-         XbIBY/4hfcnyfcKCGWqGSQWqnLbblUXgu/clMDcHvq6TFAsd531JQwqfqZa7RYyxhZI3
-         L4Ukgo9BJkGxYg3fmVKUJUJXxvtY9ihnt8hhYHum4uy6kJvz+uv+PopB6jgHhhrPbdwg
-         G1ugwRH3RKaOEs329gsZQhpNC4U0vlcUyYQP64DM3efVVK8pWc0wn0ym80Hm2GHmeHO8
-         /GnA==
+        bh=BVyrbpqy88C1bSi9d2yTbk60lQ3mt3im/Lr9ElVHnPc=;
+        b=pslYBkgrLus3YB4kpBDDZC/C1N/ZSG1+uZ0c9STj+wZs8C9yhVHF9zaRXu1fQjipOh
+         cpw3TKBC6/le2IIxikPEiL6DHG8CpMO9eOwwVyoUCq+gqonf+EncD/8w6bruEZO0huTQ
+         3FczliDAuJ+HFdrgf45npN9MRqTCPDaT/9oev+jOCI6x0AV5wdEoIegTJQkZLyZF0GAL
+         iRJqn3DDyvuczI8YqBvrOARI1rZdJeV7aZ8jrWwNr2O5Yaq+7Q9SX5I18pdkkpm7SNz7
+         B9NbukbIZ915aQ/m/Fc1eMfkuZrQb/2/DFg3O6zCgYHt81O7ckdMYD6H3CgCevHx7rZK
+         fROA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783418477; x=1784023277;
+        d=1e100.net; s=20251104; t=1783418479; x=1784023279;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ivSoZbV7cSgQtMCmPa64P5ecliJPFKjL0bylQloWrCg=;
-        b=pVUSSRABHiW3MrJBD7haYYQBJai6WiUO31peQdRgppHj1+UMLzaJkDgUOuJBpn1iGU
-         BKKxqW3Yh+eJc4bzGGKNtjEz4LbqCK3alIojBXVbpW+dMBkHgN8+ZeihopwA/DwD2Gbz
-         RuYRgfHABt+Jwshxeam6Y2gONg//uUDtj8wjm62kdKXRtZESrdC02wI0nuK0TH1JNpHB
-         +4i3O90AkoDp2amreX9U3t+6sUzrVkLSaKqNttzBDGcKGl5h5rKOT4I9ikXo4jzFuW2x
-         yhTeSSWDX6LXqFqElbEL5eGQ7hfQ/3iIOmwSPXMqAE/TYDy5qLKBEsWTxReyiDx9CMwQ
-         7LEw==
-X-Forwarded-Encrypted: i=1; AHgh+RrZO2sUSxr9uBvr3vABo+OsEVUDfI0g3/iVh0F8X1iHIruW+IbaUZFDNdoLo9aoas0GdsTNPrGfsl+I@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiW2ZQSIZ9AQJvtIjCxWdn4dxV8P9xyACCdIMSMaCrSnJrGRLr
-	y/f7wH4lHEATZOmjDvZFH2u5bFUTCn0EyDSi0Q0qTCoRO8snC7DgEoOi
-X-Gm-Gg: AfdE7cl0U8hdESnOntzJ6XfcYRqD4itLoQVWTE2cFGbDGBlSllpke2Z2HSbEeBa6W88
-	RCUxxJiIXBjq0Ogo8D0fOufpWfCvIjNpGRwk70AFAmaBvC5eLOTrhZFbBPe+ghXDoFxviwz+Ofc
-	LDln7npt8urBga1XvWGba0rX1ZQJn5UblVhJpBQGQiCmxS3yCKa1n3Kh3tEMZHHMcfT8Yar2AuU
-	Eksn9Hk1I8Ks+NELz24ilHzn/wtAYltr936tR7+PV8i/J+VxFRn/gGpWSSlM3J86gCjPGefMY/x
-	YiH4vAUAZYao3VpNq+dZjRnr5dE9e8ySSWbLa2rFqWDj9p/ydR8VIqaKjTU7Nf0iWr3Y3XIT2XW
-	tZsb+9Rm58wehBahYH5KTGSBGeVpJUIzeWfAkPoeeyWmmV3Db0Fd43cxzKhUIP5WakK2y6N+LU/
-	3BrM+r4jqkMPFL6kWHfI4qZ0cOhAtFNo3/p1U=
-X-Received: by 2002:adf:fd86:0:b0:474:6a5b:85f5 with SMTP id ffacd0b85a97d-47de6697cbcmr3669045f8f.3.1783418476741;
-        Tue, 07 Jul 2026 03:01:16 -0700 (PDT)
+        bh=BVyrbpqy88C1bSi9d2yTbk60lQ3mt3im/Lr9ElVHnPc=;
+        b=iuPVpBjVs/x5HAOK5Y1/fHhaZeA0v9ReLBzOK3MItAr86QmJtbJxB0E4RlBcoXAiyJ
+         zWixFWdybce2F4kOPqVP7JPbR3J+xTE1N6yuqIcbpJNjHEIexgGePWzsaHyHHrye+cJn
+         EvheUvBdTAnAFY8hPm8fYKU52vjDI1bhJC1opnsqQzaNxdti9We5Zvc8Ib5DLKULMNF/
+         fppdQEy8/LdCTv8yO0Ba+F9oHQJr9nUEmEWt/7tj8rOESDmFvF7EOgizdWa2NsJYb9OY
+         x/QHEHlwswC/2NSpgq++FAGmJrSgNo6JQCrFyzqIhtKa2ao8RfIKOk/xAWvVQVK6/dkz
+         6vgw==
+X-Forwarded-Encrypted: i=1; AHgh+RqX2VVfZsWDvvSkEwe6RLhZInbFIUfcJkNSc/kXQ3WWZ8eKZu3bNSAvc/229nLoax+k7dnpjOpEguNY@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQAagaSFkOiMI74tM3XSY11M9ulbh4smdI0YBpjE2wL+JpMASG
+	qkrFh2qOvV0+rMvT5kBHxzcS+IjFL0y5Slf4ckyeG0waGeXGonOcNmfN
+X-Gm-Gg: AfdE7cnzgcfjvf20WQDK+6WVj8L4JQ0oj1V3LDhrBDN+WWqC/THNWHKfFhvWzlPBqZY
+	AOY+GafIWzkO4r8CntXS8rBI1SfcByv51uydNIh3Wi+EtP7dSO39GMbJZu6mjxIY+7otO4M0X38
+	EsQP2QCswX5xHjVWtICqftm3oEam3RBoc+gVoW0+tJMrzXZSm9dRjjDLSPxmu4L6gYKu6Ru5QAQ
+	T78vQH3JmSawGWKYcqMq7HMKHpoNZDzD7UzzsN0qRTM8GLLzupdYrHXCzL3qbWFGGHOdUu+2ZLx
+	oF5bx5DWrCEQ72xN9193i79smyYB1e+sdQ4ps+dIlxQMuwcB54cDuCsbEACe/o3XYHzB1hI8QWV
+	1ja0Pg1SDrknL7e90GjxOnK63dCpnyllOdjoWz4aPr7rD98v+e6GNBPjXfJb3wpfoEP9M0w0AX0
+	miRhf9niZRFrFPMPaaWTFPtwQaMw8ipHprUoE=
+X-Received: by 2002:adf:fc4d:0:b0:475:2171:add with SMTP id ffacd0b85a97d-47de66b1f97mr3565297f8f.22.1783418478571;
+        Tue, 07 Jul 2026 03:01:18 -0700 (PDT)
 Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960634sm33908295f8f.26.2026.07.07.03.01.15
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0960634sm33908295f8f.26.2026.07.07.03.01.17
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 07 Jul 2026 03:01:16 -0700 (PDT)
+        Tue, 07 Jul 2026 03:01:17 -0700 (PDT)
 From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Gael Blivet <gael.blivet@gmail.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 2/7] ksmbd: route stream FileDispositionInformation through stream delete flag
-Date: Tue,  7 Jul 2026 11:55:02 +0200
-Message-ID: <20260707100033.47512-3-g.blivet@me.com>
+Subject: [PATCH 4/7] ksmbd: return STATUS_OBJECT_NAME_NOT_FOUND for unknown IPC pipe names
+Date: Tue,  7 Jul 2026 11:55:04 +0200
+Message-ID: <20260707100033.47512-5-g.blivet@me.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20260707100033.47512-1-g.blivet@me.com>
 References: <20260707100033.47512-1-g.blivet@me.com>
@@ -79,100 +79,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-set_file_disposition_info() calls ksmbd_set_inode_pending_delete() /
-ksmbd_clear_inode_pending_delete() unconditionally, which always sets
-S_DEL_PENDING on the whole inode (ci->m_flags), regardless of whether
-the handle being closed is a regular file or an alternate data stream.
+create_smb2_pipe() maps ksmbd_session_rpc_open() failing with -EINVAL
+(pipe name not recognized/supported) to STATUS_INVALID_PARAMETER.
+macOS Time Machine's backupd treats STATUS_INVALID_PARAMETER on a
+pipe open as a fatal error and aborts the backup immediately, whereas
+STATUS_OBJECT_NAME_NOT_FOUND is handled gracefully -- the client just
+treats that particular pipe as unavailable and continues.
 
-Requesting delete-pending on a single stream handle (e.g. deleting
-just an alternate data stream some clients keep alongside a file)
-would therefore incorrectly schedule deletion of the entire file's
-data, not just the stream.
-
-Add ksmbd_fd_set_delete_pending()/ksmbd_fd_clear_delete_pending(),
-following the same stream-vs-whole-file routing pattern already used
-by ksmbd_fd_set_delete_on_close() for the CREATE-time DeleteOnClose
-option, and switch set_file_disposition_info() to use them.
+Link: https://github.com/namjaejeon/ksmbd/issues/502
 
 Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
 ---
- fs/smb/server/smb2pdu.c   |  4 ++--
- fs/smb/server/vfs_cache.c | 32 ++++++++++++++++++++++++++++++++
- fs/smb/server/vfs_cache.h |  2 ++
- 3 files changed, 36 insertions(+), 2 deletions(-)
+ fs/smb/server/smb2pdu.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 39188bb84..e6d0f58d2 100644
+index 735c3eb72..af957d013 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -7117,9 +7117,9 @@ static int set_file_disposition_info(struct ksmbd_work *work,
- 		    ksmbd_vfs_empty_dir(fp) == -ENOTEMPTY)
- 			return -EBUSY;
- 		smb_break_all_levII_oplock_for_delete(work, fp);
--		ksmbd_set_inode_pending_delete(fp);
-+		ksmbd_fd_set_delete_pending(fp);
- 	} else {
--		ksmbd_clear_inode_pending_delete(fp);
-+		ksmbd_fd_clear_delete_pending(fp);
- 	}
- 	return 0;
- }
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index d95c405ea..2543dd7e8 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -294,6 +294,38 @@ void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
- 	up_write(&ci->m_lock);
- }
- 
-+/*
-+ * FileDispositionInformation (SET_INFO) on a stream handle must only
-+ * mark the stream for deletion, not the whole file -- otherwise
-+ * deleting a single alternate data stream (e.g. AFP_AfpInfo) deletes
-+ * the entire file's data along with it.
-+ */
-+void ksmbd_fd_set_delete_pending(struct ksmbd_file *fp)
-+{
-+	struct ksmbd_inode *ci = fp->f_ci;
-+
-+	if (ksmbd_stream_fd(fp)) {
-+		down_write(&ci->m_lock);
-+		ci->m_flags |= S_DEL_ON_CLS_STREAM;
-+		up_write(&ci->m_lock);
-+	} else {
-+		ksmbd_set_inode_pending_delete(fp);
-+	}
-+}
-+
-+void ksmbd_fd_clear_delete_pending(struct ksmbd_file *fp)
-+{
-+	struct ksmbd_inode *ci = fp->f_ci;
-+
-+	if (ksmbd_stream_fd(fp)) {
-+		down_write(&ci->m_lock);
-+		ci->m_flags &= ~S_DEL_ON_CLS_STREAM;
-+		up_write(&ci->m_lock);
-+	} else {
-+		ksmbd_clear_inode_pending_delete(fp);
-+	}
-+}
-+
- static void ksmbd_inode_hash(struct ksmbd_inode *ci)
- {
- 	struct hlist_head *b = inode_hashtable +
-diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index b9e27307a..111a4e315 100644
---- a/fs/smb/server/vfs_cache.h
-+++ b/fs/smb/server/vfs_cache.h
-@@ -214,6 +214,8 @@ void ksmbd_set_inode_pending_delete(struct ksmbd_file *fp);
- void ksmbd_clear_inode_pending_delete(struct ksmbd_file *fp);
- void ksmbd_fd_set_delete_on_close(struct ksmbd_file *fp,
- 				  int file_info);
-+void ksmbd_fd_set_delete_pending(struct ksmbd_file *fp);
-+void ksmbd_fd_clear_delete_pending(struct ksmbd_file *fp);
- int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp);
- int ksmbd_validate_name_reconnect(struct ksmbd_share_config *share,
- 				  struct ksmbd_file *fp, char *name);
+@@ -2646,7 +2646,13 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
+ out:
+ 	switch (err) {
+ 	case -EINVAL:
+-		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++		/*
++		 * Unknown pipe name: return STATUS_OBJECT_NAME_NOT_FOUND so
++		 * macOS clients skip it gracefully. STATUS_INVALID_PARAMETER
++		 * causes macOS Time Machine to abort the backup immediately
++		 * (confirmed in ksmbd issue #502 / namjaejeon/ksmbd).
++		 */
++		rsp->hdr.Status = STATUS_OBJECT_NAME_NOT_FOUND;
+ 		break;
+ 	case -ENOSPC:
+ 	case -ENOMEM:
 -- 
 2.43.0
 
