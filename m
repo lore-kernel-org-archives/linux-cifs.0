@@ -1,34 +1,34 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF6F1F1932
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 02:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3791F1932
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 02:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783479407; cv=none; b=bMOjJYUdfelUYigkjZMVlRDMxFW3+VMuKnwAUhxyS/x5OHTOI8qB6Uv0sMdUvfhSSABJkfRUj3Q8HGT4VTw5SUObNNrI0LkqoLWtHfGCEs4Wew+u2Pq22nEX36OXsPG/PUhrkbZGYqELuLH51Are8qEQnWQiixSACtOaRxnUDho=
+	t=1783479412; cv=none; b=rpesbshXQj1SX/jaD5WQmK+RlW8aChg+AuDHowlJxpl2F/1QTN6FVbQwACv0MWEI6z1r9/4SU1Xwz3sltS6smh6WZsV0S9/Y98JHiUYQLcSTcwGue46FW7wBxSlu8pXV/EWaiQGwajTky6hc3sAODDaKBHso2rLeaU95e05abkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783479407; c=relaxed/simple;
-	bh=K6r02tFtSkvNac6uI19dj/l6WLGOKbiq/3Qocq9TjcI=;
+	s=arc-20240116; t=1783479412; c=relaxed/simple;
+	bh=CNIukMpdTiNLSTiMXhB3A6zW8Z9imnOMb3ke4GZKv3w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qprKqAI3lZN0lMT2Mo1EDklnAkJvaqeSS5MfCgc46W9+c/oTNXv7mIj8b2zlpGgd6UA/wNxM+u1zgtl1JSoB18BYDsWm18Vzhx/eOs/sRngV3AD6i/dY72K6e/HUlRIsFtq2FgD9rCLPWBdVyF6ST5YTi8OXxa15Zg2kjedzeHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=blEIJnUg; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=gal0cOrB9HUbU5ESknjDynd3Hj5uXTOWUtu1ohTsvy6EUlwFU8SSh1jPfazKqy0sZJS/wWmNVAk3PExuivFlgtK93HV6CovIE4kYJmgOJYMOhU5SHAP6ejjVx6AdFqKON9edJqpxeNWG5U/XKGIHsehJLmY7Z6+eCJo2Eue5LVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=fYODPGv8; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="blEIJnUg"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="fYODPGv8"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1783479401;
+	s=key1; t=1783479406;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7QImQ0FX64csu6+wZdZMvdxu980lEIWjQwLCS5KlRjM=;
-	b=blEIJnUgcn/HWKzJ1wG/AP/HCP0QSyOEFdSlaer5g6hTfu4muMRWH6dGP9Se8t42h7XhXE
-	AaegVNawczigOU0F83jGz/UAcCJ3f3bgGAJ04yANi8+vEP6us3uVwkusk2a6Rvp8he7Otq
-	cT7MqId9wDkA2xTgpErlgGfLRiOSiwwMzHvnI+m3hUwFv7QpWXxcNBDpOQ55s0DVoPkAck
-	hQnQGNqiOsSmzv0YCmy3HOz38v1zR39iFucTR/HBxJit9eavQiQHS5Uq2/WXbrgAoQV1FV
-	xanlRe7Esao+uS1ygafQqXKcF6p0JxSVeT9JTxNL/pHUouQB0P9FkoyrF6ijrg==
+	bh=6AqPxQ77GdGUucieCCzehT4pPvbtClam9tGtyspQ3TQ=;
+	b=fYODPGv8es/ZuZIMtEhku7RCWMKtE14ISri7K6RZg+EsdR3oPsoN8kwxuTke/jvL4ofvW1
+	v530CaY83VfmnkcxzDpoyx8TjAWB79af+QlgFqDKEwI2gOMDXO2OMqg37uSy/rLN04BeLr
+	7rff6IA+dhpQhijYsl0j1Bltj6y4eq2Myx5b2jGxcZhkekFkpuH6yevxQpifJKn6GZvYWg
+	ETbeGGbk2oysmxsRgEbhUGlq2dWteXjK8p7iMs4LHV4NeC4EmH8DBQyr1DiTu2uejZzzk4
+	NHM0hMRCO1/KJZ1TTlTWCrSF1IE+bijD0LGREMb7hgG9IVtorZvrUEyVuLaPxA==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -43,9 +43,9 @@ To: smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 1/3] smb/server: send compound prefix before async pending response
-Date: Wed,  8 Jul 2026 02:56:13 +0000
-Message-ID: <20260708025615.145390-2-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v2 2/3] smb/server: introduce struct ksmbd_transport_write
+Date: Wed,  8 Jul 2026 02:56:14 +0000
+Message-ID: <20260708025615.145390-3-chenxiaosong@chenxiaosong.com>
 In-Reply-To: <20260708025615.145390-1-chenxiaosong@chenxiaosong.com>
 References: <20260708025615.145390-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
@@ -59,105 +59,152 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-When the last request in a compound request becomes async, ksmbd sends a
-STATUS_PENDING response for it. But the responses for previous requests in
-the same compound request are still kept in the same response buffer.
+Put the arguments of ksmbd_transport_ops ->writev() into a struct. This makes the
+function call shorter and easier to read.
 
-Send these previous responses first. Clear NextCommand for the last
-response in this part, sign it again if needed, and reset the iov state.
-After that, the async request sends STATUS_PENDING first, and sends the
-real response later. Both are separate responses.
+Add __ksmbd_conn_write() for the common write code. A later patch will use
+it for another write helper.
 
-Example:
-
-  smbtorture //${server_ip}/export -U${username}%${password} smb2.compound_async.write_write
-
-  Client request:
-
-    Write Request Len:64 Off:0, File: compound_async_write_write; Write Request Len:64 Off:64
-
-  Before this patch, STATUS_PENDING Write Response is the first of
-  several responses:
-
-    Write Response, Error: STATUS_PENDING
-    Write Response, File: compound_async_write_write; Write Response
-
-  But STATUS_PENDING Write Response should be in the middle of several
-  responses, after this patch:
-
-    Write Response, File: compound_async_write_write
-    Write Response
-      SMB2, STATUS_PENDING, Write Response, MessageId 7
-      SMB2, Write Response, MessageId 7
+No functional change.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/smb2pdu.c | 45 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+ fs/smb/server/connection.c     | 22 ++++++++++++++++------
+ fs/smb/server/connection.h     | 13 ++++++++++---
+ fs/smb/server/transport_rdma.c |  9 +++++----
+ fs/smb/server/transport_tcp.c  | 13 +++++++------
+ 4 files changed, 38 insertions(+), 19 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 0ab05a8e575e..35f8476bbb6d 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -839,6 +839,48 @@ void release_async_work(struct ksmbd_work *work)
- 	}
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index dee8e4aced99..d5b35087556e 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -350,7 +350,8 @@ int ksmbd_conn_wait_idle_sess_id(struct ksmbd_conn *curr_conn, u64 sess_id)
+ 	return 0;
  }
  
-+static void smb2_send_interim_compound_prefix(struct ksmbd_work *work)
+-int ksmbd_conn_write(struct ksmbd_work *work)
++static int __ksmbd_conn_write(struct ksmbd_work *work,
++			      struct ksmbd_transport_write *write)
+ {
+ 	struct ksmbd_conn *conn = work->conn;
+ 	int sent;
+@@ -366,12 +367,14 @@ int ksmbd_conn_write(struct ksmbd_work *work)
+ 	if (!work->iov_idx)
+ 		return -EINVAL;
+ 
++	write->iov = work->iov;
++	write->iov_cnt = work->iov_cnt;
++	write->size = get_rfc1002_len(work->iov[0].iov_base) + 4;
++	write->need_invalidate_rkey = work->need_invalidate_rkey;
++	write->remote_key = work->remote_key;
++
+ 	ksmbd_conn_lock(conn);
+-	sent = conn->transport->ops->writev(conn->transport, work->iov,
+-			work->iov_cnt,
+-			get_rfc1002_len(work->iov[0].iov_base) + 4,
+-			work->need_invalidate_rkey,
+-			work->remote_key);
++	sent = conn->transport->ops->writev(conn->transport, write);
+ 	ksmbd_conn_unlock(conn);
+ 
+ 	if (sent < 0) {
+@@ -382,6 +385,13 @@ int ksmbd_conn_write(struct ksmbd_work *work)
+ 	return 0;
+ }
+ 
++int ksmbd_conn_write(struct ksmbd_work *work)
 +{
-+	struct smb2_hdr *req_hdr;
-+	struct smb2_hdr *rsp_hdr;
-+	int err;
++	struct ksmbd_transport_write write = {};
 +
-+	if (!work->next_smb2_rcv_hdr_off ||
-+	    !work->next_smb2_rsp_hdr_off ||
-+	    work->curr_smb2_rsp_hdr_off == work->next_smb2_rsp_hdr_off ||
-+	    !work->iov_idx)
-+		return;
-+
-+	req_hdr = ksmbd_req_buf_next(work);
-+	/* Detach only the final async command from the completed prefix. */
-+	if (req_hdr->NextCommand)
-+		return;
-+
-+	/*
-+	 * The responses before the async command are sent as a standalone
-+	 * compound response. The last response in this prefix must terminate
-+	 * the chain.
-+	 */
-+	rsp_hdr = ksmbd_resp_buf_curr(work);
-+	rsp_hdr->NextCommand = 0;
-+	if ((rsp_hdr->Flags & SMB2_FLAGS_SIGNED) && work->sess &&
-+	    work->conn->ops->set_sign_rsp)
-+		work->conn->ops->set_sign_rsp(work);
-+
-+	err = ksmbd_conn_write(work);
-+	if (err)
-+		ksmbd_debug(SMB, "failed to send compound interim prefix: %d\n",
-+			    err);
-+
-+	work->iov_idx = 0;
-+	work->iov_cnt = 0;
-+	work->curr_smb2_rsp_hdr_off = work->next_smb2_rsp_hdr_off;
-+	*(__be32 *)work->response_buf = 0;
-+
-+	rsp_hdr = ksmbd_resp_buf_next(work);
-+	rsp_hdr->Flags &= ~SMB2_FLAGS_RELATED_OPERATIONS;
++	return __ksmbd_conn_write(work, &write);
 +}
 +
- void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
- {
- 	struct smb2_hdr *rsp_hdr;
-@@ -853,6 +895,9 @@ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
- 		return;
- 	}
+ int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
+ 			 void *buf, unsigned int buflen,
+ 			 struct smbdirect_buffer_descriptor_v1 *desc,
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index ec75633b7da0..62df151ca554 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -132,14 +132,21 @@ struct ksmbd_conn_ops {
+ 	int	(*terminate_fn)(struct ksmbd_conn *conn);
+ };
  
-+	if (status == STATUS_PENDING)
-+		smb2_send_interim_compound_prefix(work);
++struct ksmbd_transport_write {
++	struct kvec	*iov;
++	int		iov_cnt;
++	int		size;
++	bool		need_invalidate_rkey;
++	unsigned int	remote_key;
++};
 +
- 	in_work->conn = work->conn;
- 	memcpy(smb_get_msg(in_work->response_buf), ksmbd_resp_buf_next(work),
- 	       __SMB2_HEADER_STRUCTURE_SIZE);
+ struct ksmbd_transport_ops {
+ 	void (*disconnect)(struct ksmbd_transport *t);
+ 	void (*shutdown)(struct ksmbd_transport *t);
+ 	int (*read)(struct ksmbd_transport *t, char *buf,
+ 		    unsigned int size, int max_retries);
+-	int (*writev)(struct ksmbd_transport *t, struct kvec *iovs, int niov,
+-		      int size, bool need_invalidate_rkey,
+-		      unsigned int remote_key);
++	int (*writev)(struct ksmbd_transport *t,
++		      const struct ksmbd_transport_write *write);
+ 	int (*rdma_read)(struct ksmbd_transport *t,
+ 			 void *buf, unsigned int len,
+ 			 struct smbdirect_buffer_descriptor_v1 *desc,
+diff --git a/fs/smb/server/transport_rdma.c b/fs/smb/server/transport_rdma.c
+index b6d63ff8a8a3..b2a882421823 100644
+--- a/fs/smb/server/transport_rdma.c
++++ b/fs/smb/server/transport_rdma.c
+@@ -239,17 +239,18 @@ static int smb_direct_read(struct ksmbd_transport *t, char *buf,
+ }
+ 
+ static int smb_direct_writev(struct ksmbd_transport *t,
+-			     struct kvec *iov, int niovs, int buflen,
+-			     bool need_invalidate, unsigned int remote_key)
++			     const struct ksmbd_transport_write *write)
+ {
+ 	struct smb_direct_transport *st = SMBD_TRANS(t);
+ 	struct smbdirect_socket *sc = st->socket;
+ 	struct iov_iter iter;
+ 
+-	iov_iter_kvec(&iter, ITER_SOURCE, iov, niovs, buflen);
++	iov_iter_kvec(&iter, ITER_SOURCE, write->iov, write->iov_cnt,
++		      write->size);
+ 
+ 	return smbdirect_connection_send_iter(sc, &iter, 0,
+-					      need_invalidate, remote_key);
++					      write->need_invalidate_rkey,
++					      write->remote_key);
+ }
+ 
+ static int smb_direct_rdma_write(struct ksmbd_transport *t,
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 13b711ea575d..448f24d44b6b 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -417,14 +417,15 @@ static int ksmbd_tcp_read(struct ksmbd_transport *t, char *buf,
+ 	return ksmbd_tcp_readv(TCP_TRANS(t), &iov, 1, to_read, max_retries);
+ }
+ 
+-static int ksmbd_tcp_writev(struct ksmbd_transport *t, struct kvec *iov,
+-			    int nvecs, int size, bool need_invalidate,
+-			    unsigned int remote_key)
+-
++static int ksmbd_tcp_writev(struct ksmbd_transport *t,
++			    const struct ksmbd_transport_write *write)
+ {
+-	struct msghdr smb_msg = {.msg_flags = MSG_NOSIGNAL};
++	struct msghdr smb_msg = {
++		.msg_flags = MSG_NOSIGNAL,
++	};
+ 
+-	return kernel_sendmsg(TCP_TRANS(t)->sock, &smb_msg, iov, nvecs, size);
++	return kernel_sendmsg(TCP_TRANS(t)->sock, &smb_msg, write->iov,
++			      write->iov_cnt, write->size);
+ }
+ 
+ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
 -- 
 2.54.0
 
