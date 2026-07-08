@@ -1,170 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C315A2853E9;
-	Wed,  8 Jul 2026 19:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783540258; cv=none; b=J7/8XMRdtbvMx28c6ySn+8qQu70tn1dc8xPaJN45U4CKF3X62eddyBRf5aZSqefIgP677WPOICyO8F1UzV2AtWezYIMa87XeNMBOh7LDN7FoqXIXGse1WCuRJIzi9NDx2fVWMOe4buDYxs4HUoYHOQiDV5XFrFyC6eWEfzmrJG0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783540258; c=relaxed/simple;
-	bh=9PIK6goA7ZEXQ/PPcj+UYG17K1dE6wDmTsu/NcxJLoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bs0LROzn7oq7Far36D23q7OwUF5Vn/wvWetVA00Q/+Kq9HQvDqFo5qnae4mi5GumwHWxMOQOw1YHaBl5coTBoTWnszaxn7/HNLBv6YRCHGDPNV4VN+Z0O+YfjU0uXFhJh5T86gqBzkikBATGVinjKR5lwSewU5ydqM1+Zxqhc5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=beq9nPYS; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6790C2BEC2E
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 23:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783554377; cv=pass; b=JIB+xMU0khP4w1VTDX495wFIUd6MVUsod49Hnf/XpUkfW31yLkQTuOV2lfbcQH8jUdGpHXF5IhpR9wAAZ2KqWuB0P2z2qornOFVGXKRiavxScrpWi2ISB3RmefHLa4qVTReRNJ9HhxxPvBlyHAdEgBBbOErjnPFDTSdJtUOn0OY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783554377; c=relaxed/simple;
+	bh=bogTf9sKA309KZfQOo05YPNzqJJEanTlOfbP/mni1YA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sxcbzNrK6RFTuncvRz4You7TBc1ATsJfpaBOc71LvuS8cTQkVsbs8yJpBxI6hwpGmihQH992IhQRLFWAYzXTYVTDeayhUMjyeZtxRFdA3LSP4NCOY4+3Dke8gxz98Ymjpz4B5CAjDv5aJtnjYzobwa1CEzII3aXir9DvRybn+Q4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dv8MrqW2; arc=pass smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="beq9nPYS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 209D01F000E9;
-	Wed,  8 Jul 2026 19:50:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783540256;
-	bh=FOzK0+WduRZzI5kknacVJDAFNNcmh45qRb1Ypyf1Eko=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=beq9nPYSxQ1wvWKZ1VTbwdJK4dT5a9X/D6L4o5ZMqO8BbxZBxzrn/ne/LgENLBc35
-	 Xkk5eqiH4StIY1T1iO6eYtBsXt+fJihZIe4b6JDCmMp3Z1pHawfGuHWT6HVc9bJ7j+
-	 hbeseGyjf0GEp2TfGqgTCOwRpPkOW/fQmYhM/SL7vP6MA1WNqCp4geFeYupmhRWDXV
-	 JBqh9nBI7Sx5ZJAqjUqR2ybJ+jE8x0llBWM0T4BDB1Uh/Kkfe0/RjteHMwTuOOvVIO
-	 zhhxPIv6KYGwkrJlQ9WMr178ZthDGdCNzjoGrsBvlp6OBOf8H6tnXVf5P1BBJ1iMx4
-	 skHiM3lbFYz/Q==
-Received: by pali.im (Postfix)
-	id 13F64BA9; Wed,  8 Jul 2026 21:50:53 +0200 (CEST)
-Date: Wed, 8 Jul 2026 21:50:52 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Steve French <smfrench@gmail.com>
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cifs: Fix support for creating SFU socket
-Message-ID: <20260708195052.lppgfsvgxwhjlivu@pali>
-References: <20260707090318.26130-1-pali@kernel.org>
- <CAH2r5muHZ5+znNZv4rsLFsVEW-z1XHB3U2N2FWaYRC6vS+ijgw@mail.gmail.com>
- <20260708183523.3pmgda746zphiva3@pali>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dv8MrqW2"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5aeb91c003eso1311424e87.3
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Jul 2026 16:46:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783554374; cv=none;
+        d=google.com; s=arc-20260327;
+        b=sr4+amTWJH81mTFCrvpTlXn/qmMgBFlfOkLBYlxTJj5rnFAlYlPfx7+NvsVSuji+q9
+         YMtRb82wo0X+WVy224iAJ4GSgUQJ2OQTWYpePIimjNGzP0sVOjDInIy6Y/NuwTHtgWc9
+         YY5tUkvLQN0kvTkM5oGjZwl4lyyscGO2PqgWVtJvIJhpCB5sQm3v3q4Hbc3YbnVl3ex5
+         G2KvwZXpIs3MCoMzizBRyCUiCtzmMMtfZpbs6Xwu6JrPZnAMl259RzUS/E5V+COy7zYl
+         eWYY/eQBuSwLfcvBnK9njvvzqQI+DecPjLME21e8Y+tVVkLi1VbtmaxBTDuit3u5GEa9
+         Y7IQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=CcUMwXmEbA6CGGG/L3J6rC9uyengfo9qTR4Iv0cdbrw=;
+        fh=X8hSpa99KKiLyGbYuwkbFGyi4ceGCyGC6pUF+5adBY8=;
+        b=iWj/vcrfIhHcDERsulqZrdn9Fgj3X27NVhelIrabLt2cm85PZNj2SbxeIKvgFZjegq
+         DJYaDhjOzdNNzVndgb4NawGrA6Lm6tnyPGHoXO7hAFIa9JJJ8kC+exgRfh0e6HVGxzKj
+         D8qhUPeBMr4QlQcpIG6UI98MAeqDW7kZfPVTU/VTXpUJBhJt8Y7+aYHf1pu3WqbQnNvc
+         fh6hOJ0xbyVTy4AISjS9O3sLsg/ZmCtSKLB7+nJLDJY1z6cpJNrFZqt14ZE1SplJ1r3A
+         CiSQUmKQ5HoV0A/F0lVwr15AIbMAGwjq4fhRkiRdUt5nmc00NopzdCAeMM1FohVHIR+e
+         QSCg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783554374; x=1784159174; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=CcUMwXmEbA6CGGG/L3J6rC9uyengfo9qTR4Iv0cdbrw=;
+        b=Dv8MrqW25nSn6qvw+z+c0ryeqwkovHWxSFqqFmEeJqlEZ2Vh/kE1s641LyvLb+jflR
+         GsNJ6pH/rxm+Fhmd+dPM20MzfRphWFK7AjeMemiaZ/kBIrNgwc5k2m4HOXBHC17Pik66
+         dahc21h2hgg/BmSyU5YZt1oP4t5k/+V/5wAnREdNiByGF81X73oQ+FheuifaU3jB9foi
+         KwGw1ztMcd4WLB2l/5KYRLlDx20GLLJSTs8MgHoJpoK1t8xYBkbtH9J4wUFExjDXKzwX
+         BjOcrH3r6N3U3id3YRV0M2PAuXBIPhm2pSyMEUKx+GZ1J7BQUsRcfO0qYn+O9pC6xO4o
+         FjRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783554374; x=1784159174;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CcUMwXmEbA6CGGG/L3J6rC9uyengfo9qTR4Iv0cdbrw=;
+        b=jh4lSiTWNVWA6jZr2fhYJfDizzEUdm9hTm+f/ztfYPMBNUpbidaU9gvO8Qr5xR5X0G
+         K+FpX3vExssSrLldKcG833V+PnITl6GPPwcHciUqn4SGQ+9tnOLdETwWYdWWtvvV9LgA
+         6o7RDhOoKLVpCE1hPRrhdvQFXtDrpC3VOJaE3rr7C7Z8KAqsxj2T1hoxUI5yR4CdfpBA
+         z8t6RGOxIbyXNSmL7xzZxlUTewq4Omfd/wefUI6+WhedLsc7sSmXa+TuPXEYcJKIfABq
+         z922OqxM9JOQEw0W43szLIf2XkHlIZmyZN5ZwNG/rawa37EtgEXOwGljctziMbobI8Wo
+         oF+w==
+X-Forwarded-Encrypted: i=1; AHgh+RrSIyVoUCHNAYjkZ/QXCSPjW5vtEBf+0424IZYjcaly+wZWKr29sX6j9opTJcxdgpJbZ6DqPWIdTaSB@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4YikmkoqVhqZxhCZV5kMZ9mVWWfTTqmaoqzWNvZAcDpFCuuqN
+	6VHWY1jtcKGQz9fOpQ4RixJrxvtDFiNiqfdLYbjpiU3azQEDKR8dScocaxDM/6f9qMzsPA92m0B
+	pd5tzXVAwPfK9xmtZENghlaCLrcZiPPBFP1Xw
+X-Gm-Gg: AfdE7cnZuDSywc+kmIPm57G8cMHhKxjJANG3gyvjg6LhHVzIBVm61kvrSnJnM5RMPfV
+	TiQ8/9u+Le4hMda2tJIW9F6vc67lAUPn5wmSCgrAR//ojE12F28TyGroBT7/2IXVelQBmEHWq6x
+	pXiQLcy0s51IB4Q2AXQCifB+FWyMSvDGUrBD1dTfgjYWkB5iuLf8+Yy+LQrHeWOOnJ7cE52CNq2
+	MNXmYuER+tNaZzeiF6ArSIOo0AsMqxDVNlM1XTQzGXnyLYVntWABhzkEdoTfIGLgUyIqBYaoPSC
+	CKMVYj1x1Pq29TSah30ypTjSqw6PcV94BtNU5telALJwEORhughroQjwHBrhB5CaRI4lAT6k5vf
+	eBKQBlzl3nwKJZOekhGhKA5RApiUi3O5sHkNOEAQf9H7N+oxvFp9V0JL9yl+E9mQmESe1CpKK/p
+	7JmIoRrZE/o44=
+X-Received: by 2002:a05:6512:641c:b0:5b0:eda:de2b with SMTP id
+ 2adb3069b0e04-5b0114906e4mr980344e87.50.1783554373413; Wed, 08 Jul 2026
+ 16:46:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260708183523.3pmgda746zphiva3@pali>
-User-Agent: NeoMutt/20180716
+References: <527C2DB5ABAE200F+20260707133017.1740557-1-raoxu@uniontech.com>
+In-Reply-To: <527C2DB5ABAE200F+20260707133017.1740557-1-raoxu@uniontech.com>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 8 Jul 2026 18:45:37 -0500
+X-Gm-Features: AVVi8CdYvG_0J3hTjQC5XD4i5qJ62VPNYGj58VfdHkF8ve7UCf11kH2BklMa7W8
+Message-ID: <CAH2r5mvfhcz3iDmRmgyQHpPeVtdfHdX_Ah1KT_+TQtLECqgaHw@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix atime clamp check in read completion
+To: raoxu <raoxu@uniontech.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I have asked Google Gemini AI:
+merged into cifs-2.6.git for-next
 
-"Is WSL using "LnxSOCK" for storing AF_UNIX socket on NTFS?"
+On Tue, Jul 7, 2026 at 8:43=E2=80=AFAM raoxu <raoxu@uniontech.com> wrote:
+>
+> From: Xu Rao <raoxu@uniontech.com>
+>
+> cifs_rreq_done() updates the inode atime to current_time(inode) after a
+> netfs read.  It then preserves the CIFS rule that atime should not be
+> older than mtime, because some applications break if atime is less than
+> mtime.  That rule only requires clamping when atime < mtime.
+>
+> The current check uses the raw non-zero result of timespec64_compare().
+> It therefore takes the clamp path for both atime < mtime and
+> atime > mtime.  The latter is the normal case when reading an older file:
+> the newly recorded atime is newer than the file mtime.  The completion
+> handler then immediately moves atime back to mtime, losing the access
+> time that was just recorded.  Userspace tools that rely on atime, such as
+> stat, find -atime, backup tools or cold-data classifiers, can therefore
+> see a recently read CIFS file as not recently accessed.
+>
+> This is easy to miss because the bug is silent: read I/O still succeeds,
+> no error is reported, and many systems either do not check atime after
+> reads or mount with policies such as relatime/noatime.  It becomes
+> visible when a CIFS file has an mtime older than the current time, the
+> file is read, and the local inode atime is inspected before a later
+> revalidation replaces the cached timestamps.
+>
+> Clamp only when atime is actually older than mtime.  This matches the
+> same atime/mtime rule used when applying CIFS inode attributes.
+>
+> Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Xu Rao <raoxu@uniontech.com>
+> ---
+>  fs/smb/client/file.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index 58430ba51b10..62605928d2b8 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -301,7 +301,7 @@ static void cifs_rreq_done(struct netfs_io_request *r=
+req)
+>         /* we do not want atime to be less than mtime, it broke some apps=
+ */
+>         atime =3D inode_set_atime_to_ts(inode, current_time(inode));
+>         mtime =3D inode_get_mtime(inode);
+> -       if (timespec64_compare(&atime, &mtime))
+> +       if (timespec64_compare(&atime, &mtime) < 0)
+>                 inode_set_atime_to_ts(inode, inode_get_mtime(inode));
+>  }
+>
+> --
+> 2.50.1
+>
+>
 
-and I got answer:
 
-"No, WSL does not use the tag LnxSOCK to store AF_UNIX sockets on NTFS.
-Instead, WSL relies on native Windows features and specific metadata
-attributes to handle AF_UNIX sockets on NTFS:
-1. The Native Windows afunix.sys Reparse Point
-[... longer explanation of reparse points ...]
-2. WSL Metadata Extended Attributes
-[... longer explanation of $LXMOD and $LXDEV EAs ...]"
+--=20
+Thanks,
 
-This is just an experiment.
-
-I have feeling that with longer AI discussion or formed questions it is
-possible to receive from AI everything... from AI hallucination and
-wrong answers, or semi-correct answer to fully correct answers.
-Sometimes AI answers what people wants to hear...
-
-On Wednesday 08 July 2026 20:35:23 Pali Rohár wrote:
-> WSL does not use "LnxSOCK". This looks like an AI hallucination.
-> 
-> WSL stores data in NTFS reparse points:
->  IO_REPARSE_TAG_AF_UNIX    - 0x80000023
->  IO_REPARSE_TAG_LX_FIFO    - 0x80000024
->  IO_REPARSE_TAG_LX_CHR     - 0x80000025
->  IO_REPARSE_TAG_LX_BLK     - 0x80000026
->  IO_REPARSE_TAG_LX_SYMLINK - 0xA000001D
-> And also in NTFS EAs:
->  "$LXUID"
->  "$LXGID"
->  "$LXMOD"
->  "$LXDEV"
-> 
-> All tests which I have done with WSL's DrvFs resulted in above reparse
-> points (or in native Windows symlinks).
-> 
-> Some sources which confirms those my testing:
-> https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/c8e77b37-3909-4fe6-a4ea-2b9d423b1ee4
-> https://learn.microsoft.com/en-us/windows/wsl/file-permissions
-> 
-> WSL does not recognize "-o sfu" things at all.
-> 
-> So here I bet that AI "mixed" SFU and WSL formats and parts together and
-> created that hallucinated answer.
-> 
-> On Wednesday 08 July 2026 08:51:40 Steve French wrote:
-> > AI query made it sound like "LnxSOCK" is still used by WSL.  Is this
-> > change safe?
-> > 
-> > "Yes. WSL (particularly WSL 1 and WSL 2 when interacting with NTFS via
-> > DrvFs) uses the Lnx* metadata family to represent Linux special file
-> > types, including:
-> > 
-> > LnxSOCK
-> > LnxFIFO
-> > LnxCHR
-> > LnxBLK"
-> > 
-> > On Tue, Jul 7, 2026 at 4:13 AM Pali Rohár <pali@kernel.org> wrote:
-> > >
-> > > SFU sockets are natively supported by Interix 3.0 subsystem and also by
-> > > later versions. It is part of Microsoft SFU (Windows Services for UNIX) and
-> > > Microsoft SUA (Subsystem for UNIX-based Applications). They can be created
-> > > and existing (stored on local disk or remote SMB share) can be recognized.
-> > >
-> > > SFU sockets are recognized also by NFS server included in Windows Server.
-> > > Windows NFS server versions since Windows Server 2012 uses new reparse
-> > > point format for storing new sockets, but still can recognize this old
-> > > format (also in the latest Windows Server 2022 version).
-> > >
-> > > SFU-style socket is a regular file which has system attribute set and
-> > > content of the file is one zero byte.
-> > >
-> > > These SFU-style sockets are already recognized by Linux SMB client.
-> > >
-> > > But Linux SMB client is currently creating new SFU socket in different
-> > > format which is not compatible with all those SFU applications. Fix this by
-> > > creating new sockets in correct SFU format which would be recognized by all
-> > > SFU, SUA, NFS and existing Linux SMB clients.
-> > >
-> > > This change affects only creating new sockets when mount option -o sfu is used.
-> > >
-> > > Signed-off-by: Pali Rohár <pali@kernel.org>
-> > > ---
-> > >  fs/smb/client/smb2ops.c | 7 +++----
-> > >  1 file changed, 3 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> > > index 4f7eefa7a683..e59fda1b2230 100644
-> > > --- a/fs/smb/client/smb2ops.c
-> > > +++ b/fs/smb/client/smb2ops.c
-> > > @@ -5288,10 +5288,9 @@ int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
-> > >                 data = (u8 *)symname_utf16;
-> > >                 break;
-> > >         case S_IFSOCK:
-> > > -               type_len = 8;
-> > > -               strscpy(type, "LnxSOCK");
-> > > -               data = (u8 *)&pdev;
-> > > -               data_len = sizeof(pdev);
-> > > +               /* SFU socket is system file with one zero byte */
-> > > +               type_len = 1;
-> > > +               type[0] = '\0';
-> > >                 break;
-> > >         case S_IFIFO:
-> > >                 type_len = 8;
-> > > --
-> > > 2.20.1
-> > >
-> > >
-> > 
-> > 
-> > -- 
-> > Thanks,
-> > 
-> > Steve
+Steve
