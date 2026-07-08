@@ -1,181 +1,174 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113B6426ECA
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 12:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783515562; cv=none; b=AMAYNAuvbHb6xiI/9pXxjO1hxepXxA5ReQiiNnpfGquffV9wBLafL2k7JuoO4DHTtJhwAT2ITj/JDINo4VxM2P7DYDm8A1FExgMYFzEWXj6qBi1UKBlNXNUdxDELamnMC6KLONZyl4Gz3aiyT5BY9C6xvmf0AiuAsI5i87xVu3g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783515562; c=relaxed/simple;
-	bh=luEjh2s90OYy4i79HDDnTId75lNGpKBGW7W0TWw2jBM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y38fis+YIMJIspE2nJH4iHbrWkSV0t7F6a52h7e+sJKLBStuT7uX67HusggaQRyUqE8fr8xPbOpcFaLSTcFlOfT1DO6Di4CHUpf4GwL2stLo6JZ6z/J3c81cXtsKxbBVbqVTNcOJYh930Pdg5u4HrX04VpzaM460aU8BCpsCIw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=epjFHDia; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b1nhPzym; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=epjFHDia; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b1nhPzym; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5337E399CFC
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 13:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783518726; cv=pass; b=QJNU0iWr8PbG938A4j4rXbPCT0oYH1ZD2eIABV647zC+bzP4jaNewv2dClY5y1+2jR4C5shdU4EAtGeGxJNltTopdqwMJKBqDAUogrZi3m3MWuZN/Og9aIYFYXtgn5W52S4z6WJOqMfphBuIuqtW+dFHhSrAywh+p3GC9BdPKSo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783518726; c=relaxed/simple;
+	bh=D23WgVmpLf2fbD/XF205+PPyVDniYblTWJSF0KdX8a0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nQIJFSnZ5fAnaxlo0kjVcgeLndCwnfJtm6YYD6y44LtF9lK1koL8ClgJcGMMdYFNuXlc3oXGBZIajiZjbibsFkP3OHlmwxNK3pnSE2W75sGHrXM6NAWL5SQQB0UVG7IcvcKparjNJ+gKtK0MjWO4KlHiSFtBgOlxfL02Gto480I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kAo8/iKB; arc=pass smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="epjFHDia";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b1nhPzym";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="epjFHDia";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b1nhPzym"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 3BEFE75E14;
-	Wed,  8 Jul 2026 12:59:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783515559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
-	b=epjFHDiatgk+kSEtqDqoguqJh09buRFCCW25NddjH+AZGnGyi8CQpVLGWlSadAOIKA/eSc
-	WD9EvlXYkuQAl8QKPBISC6rPC5jWGXNBwkSrfMWuxWoP+xM3YotLRRBMV4WnMhm5M2QIRc
-	B/K9RBXwLGsVql2oXqZrOmeaH6GxqnM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783515559;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
-	b=b1nhPzymCvqjwThkDYO9UGv6p+MEn3ztXGZb0U/cmme2IYzUcAgktCZ15fAY0m1hVjuSPw
-	i5zOGzzCB0ZDIXAg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=epjFHDia;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=b1nhPzym
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783515559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
-	b=epjFHDiatgk+kSEtqDqoguqJh09buRFCCW25NddjH+AZGnGyi8CQpVLGWlSadAOIKA/eSc
-	WD9EvlXYkuQAl8QKPBISC6rPC5jWGXNBwkSrfMWuxWoP+xM3YotLRRBMV4WnMhm5M2QIRc
-	B/K9RBXwLGsVql2oXqZrOmeaH6GxqnM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783515559;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
-	b=b1nhPzymCvqjwThkDYO9UGv6p+MEn3ztXGZb0U/cmme2IYzUcAgktCZ15fAY0m1hVjuSPw
-	i5zOGzzCB0ZDIXAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BC101779AF;
-	Wed,  8 Jul 2026 12:59:18 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Qz+SIKZJTmrsJwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Wed, 08 Jul 2026 12:59:18 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: linux-cifs@vger.kernel.org
-Cc: linkinjeon@kernel.org,
-	smfrench@gmail.com,
-	tom@talpey.com,
-	senozhatsky@chromium.org,
-	Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH v2] smb: server: fix leak of ksmbd_ipc_login_request_ext() returned buffer
-Date: Wed,  8 Jul 2026 09:59:12 -0300
-Message-ID: <20260708125912.1223345-1-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kAo8/iKB"
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-8ee43b3e5abso5021476d6.3
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Jul 2026 06:51:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783518713; cv=none;
+        d=google.com; s=arc-20260327;
+        b=hKlpVk+h34LONjpveyfDVEpqgmqDpVWr6kK/4RNJXlURhDj20VN4dlgw4eQELCtZqy
+         zGzxAIkkwOdDQkShuOW/ygGknxXGQuu7c9Wwz6f+abFIhRK4rzOJCb+fFWdfAVQGZ/1l
+         xrVh2jmdum2J7Jr+NEgu0FyEQ27eQWW8Rsk+hRcbGvB74Ha1GrxsdU8dHWSZ+1+k2ghe
+         GFYm4A4hQ0NI3xJVAo/jsVhrfgHF42sDQQEvOW1nBc8VdkxxnUp3Z9W9hodt7P+fuTyj
+         v2EKHoemijlwGYVnpmfNFJKnhMNCKUdrvfZpDG9/B7TugzvnRqzbHGCGO/kKZcBW/ixf
+         6r5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=jf5UGuVyGWqvht5C/twvGZWChKN93r8KBbR8d3NiRaQ=;
+        fh=u5FPapvsg5w3JIYy97TRsfIuNRrSW9/3tQN/8qxREk4=;
+        b=pK0Yfn4iajVM9ENw2/qoZ4V47qpEunoDvYx3n+hznWqFJTYP9XXQgesG388u6p0i7c
+         8Lp0suBvfz2I65xfvtUpQwf4fyzt8jqzO96mOQnOo2kNNB43rBHQ5Q9KAi1Lt7m6crnx
+         /JSXM9KNRE+ELHTrAyfVSw+R71Y9kPb4jp5ltWJu7bfg2vTsNliVjnEo07Hl1YTxB1LD
+         9dNcTx+zWHaH85fRjWSRaKv7cbMApTfCEcxwSMC41YAfIBNRJxVlVmwKQIs6eenGXDXf
+         hQuDZa2JjJK+433fYMyR6sOpjAB7N6jWegNG8JrF94gHqW8Fl3XZun25suU5ptzQ5ZzQ
+         4D3w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783518713; x=1784123513; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jf5UGuVyGWqvht5C/twvGZWChKN93r8KBbR8d3NiRaQ=;
+        b=kAo8/iKBKnt9XqXrStRDfEADbcWDARtnY9mH8sAqiL4IjLyJ4wOnBmc6jLcr7t9NPg
+         LhJKw1rUVTb/NqKKddyrI4hIUZF/A0o+99LGHvVtwEWrMycr/MJovDC5X7XOIjLtyaYa
+         c7+YuhxpSGfc/p8P6PQd+M+4DnkgbxDwRxAD5a7wDwjwP6ZeRBkqIMfd3LsjO4dpP+as
+         /NFW84Mvlkv6R151SMzHQ1vy89I1ilp4anDl6h69LpSrRCSw/PnUWMPSZ0ZQmDANWiQj
+         MyJTqWxQ1ry7oSXVKQaS0qkF1aYpSeN3dY3rP4RmdvugjgiKIskD1Ljf29QInEOztbFK
+         pM9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783518713; x=1784123513;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jf5UGuVyGWqvht5C/twvGZWChKN93r8KBbR8d3NiRaQ=;
+        b=HFUTaXDg6yj8daLLPvCG4kzL5WflHoaR5XhngR7p0Y78tWdjdl710lFucq0VfFDolB
+         PUy8m9b1E0G2pR5JmBOOFqJAI/L1lIYY0dFmdlEGT8NHEBfTnObzmECUnF5GOWrJGYay
+         YQ6aiqOmQPJspf2e2ucOkVuJIveGueuUW/WdXLmNBbv1u6D91K2VslcClSF+N3S+Wqrr
+         GjlcxBCfntfJd91aXddH47ETNGJGK3lR9aq8QAhfj1j1/mE5k5/fxMz/zDoSxu6fuSy6
+         z3dAMFcaWxFjrC2VK1LgkABewADoKt0Na6Aw2f59uaPV5Wfd8bKt2usmnEgnjW0saGea
+         /fWA==
+X-Forwarded-Encrypted: i=1; AHgh+RoEkrQJqwGhc64cut+xODSX7BnUNIZ0O/9S7LjYBttFgSLE+T0jb8YXd8nZOhQFPK6lfGh+IitclvDH@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaN+XxNDeDBgSbE8xUMNNPtcXQdw3slGrzo6U0wp5Ew4Dt3INM
+	gNADsMECrazebSh4lUtedWrky+DNap+to+HUaT8+HRH1qBC5qeNel1mA+tJwH3JD6RaQfRG5qAG
+	Ecz8FqOpJLhDSOdjTbVsJvXSOc2pndNBzk4r3Xs4=
+X-Gm-Gg: AfdE7ckqvmUrTNU+tFd8+Fmfos0IvyQ+G6xerZFYI7xt3wZ4q6PIO7yKMyqgvOJ9trO
+	nK/PV5Fd36tHpzyEW2+8/nwU/EbgkZY/eUDqF0S7aqWmuajNoI2mNnepYjVMvNPTP+5I2kT4pon
+	GbPLwCIncRwNapuhT9kAsUb6UPuXE0wVPmBB4o5JQqcpbcZWkIIE3PeH77SqUZjVgtAO1W03mAL
+	rVL3dd+U3Ocb/Z1Ikv5QriEntFVQ0HEr9KMWhGB6jSzYNdonYvigq9BbyU3Jh0uAsE2jbVtYGQR
+	1vbkbpIECSzN8oF7dce64mv/WJhSo0NKgomKSPtqiHYfcCahbWhOBBHX8TJ6j5PlmsfnyRmkrrs
+	r4p7Hs5PjQXEjBIzjlwF6DBAG0cN4hwCyNeOe9PcQeunY4j/2myL5
+X-Received: by 2002:a05:6214:8097:b0:8ff:6bbc:2a98 with SMTP id
+ 6a1803df08f44-8ff6bbc2e94mr4144206d6.46.1783518712853; Wed, 08 Jul 2026
+ 06:51:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 3BEFE75E14
-X-Spam-Flag: NO
-X-Spam-Score: -3.01
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_CC(0.00)[kernel.org,gmail.com,talpey.com,chromium.org,suse.de];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email,suse.de:mid];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+References: <20260707090318.26130-1-pali@kernel.org>
+In-Reply-To: <20260707090318.26130-1-pali@kernel.org>
+From: Steve French <smfrench@gmail.com>
+Date: Wed, 8 Jul 2026 08:51:40 -0500
+X-Gm-Features: AVVi8CeWguqrXF9zhTwlB_qmp_LCwSrjo1BvozvP6q4KoFqOBqLPIW0wPt33bWY
+Message-ID: <CAH2r5muHZ5+znNZv4rsLFsVEW-z1XHB3U2N2FWaYRC6vS+ijgw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: Fix support for creating SFU socket
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Free it unconditionally after ksmbd_alloc_user() calls.
+AI query made it sound like "LnxSOCK" is still used by WSL.  Is this
+change safe?
 
-kmemleak splat:
-  unreferenced object 0xffff888103b83540 (size 192):
-    comm "pool-0", pid 16970, jiffies 4377290937
-    hex dump (first 32 bytes):
-      00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    backtrace (crc 408ccc66):
-      __kvmalloc_node_noprof+0x730/0x920
-      handle_generic_event+0xec/0x1a0 [ksmbd]
-      genl_family_rcv_msg_doit+0xe0/0x130
-      genl_rcv_msg+0x181/0x290
-      netlink_rcv_skb+0x4f/0x100
-      genl_rcv+0x28/0x40
-      netlink_unicast+0x1e6/0x2c0
-      netlink_sendmsg+0x20a/0x450
-      ____sys_sendmsg+0x2e8/0x310
-      ___sys_sendmsg+0x78/0xc0
-      __sys_sendmsg+0x63/0xc0
-      do_syscall_64+0xa1/0x670
-      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+"Yes. WSL (particularly WSL 1 and WSL 2 when interacting with NTFS via
+DrvFs) uses the Lnx* metadata family to represent Linux special file
+types, including:
 
-Fixes: a77e0e02af1c ("ksmbd: add support for supplementary groups")
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
----
-v2:
-- use kvfree()
-- move free to ksmbd_alloc_user() callers
+LnxSOCK
+LnxFIFO
+LnxCHR
+LnxBLK"
 
- fs/smb/server/auth.c             | 1 +
- fs/smb/server/mgmt/user_config.c | 1 +
- 2 files changed, 2 insertions(+)
+On Tue, Jul 7, 2026 at 4:13=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> wr=
+ote:
+>
+> SFU sockets are natively supported by Interix 3.0 subsystem and also by
+> later versions. It is part of Microsoft SFU (Windows Services for UNIX) a=
+nd
+> Microsoft SUA (Subsystem for UNIX-based Applications). They can be create=
+d
+> and existing (stored on local disk or remote SMB share) can be recognized=
+.
+>
+> SFU sockets are recognized also by NFS server included in Windows Server.
+> Windows NFS server versions since Windows Server 2012 uses new reparse
+> point format for storing new sockets, but still can recognize this old
+> format (also in the latest Windows Server 2022 version).
+>
+> SFU-style socket is a regular file which has system attribute set and
+> content of the file is one zero byte.
+>
+> These SFU-style sockets are already recognized by Linux SMB client.
+>
+> But Linux SMB client is currently creating new SFU socket in different
+> format which is not compatible with all those SFU applications. Fix this =
+by
+> creating new sockets in correct SFU format which would be recognized by a=
+ll
+> SFU, SUA, NFS and existing Linux SMB clients.
+>
+> This change affects only creating new sockets when mount option -o sfu is=
+ used.
+>
+> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
+> ---
+>  fs/smb/client/smb2ops.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index 4f7eefa7a683..e59fda1b2230 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -5288,10 +5288,9 @@ int __cifs_sfu_make_node(unsigned int xid, struct =
+inode *inode,
+>                 data =3D (u8 *)symname_utf16;
+>                 break;
+>         case S_IFSOCK:
+> -               type_len =3D 8;
+> -               strscpy(type, "LnxSOCK");
+> -               data =3D (u8 *)&pdev;
+> -               data_len =3D sizeof(pdev);
+> +               /* SFU socket is system file with one zero byte */
+> +               type_len =3D 1;
+> +               type[0] =3D '\0';
+>                 break;
+>         case S_IFIFO:
+>                 type_len =3D 8;
+> --
+> 2.20.1
+>
+>
 
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 86f521e849d5..ffc4e1c8b287 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -436,6 +436,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
- 		resp_ext = ksmbd_ipc_login_request_ext(resp->login_response.account);
- 
- 	user = ksmbd_alloc_user(&resp->login_response, resp_ext);
-+	kvfree(resp_ext);
- 	if (!user) {
- 		ksmbd_debug(AUTH, "login failure\n");
- 		retval = -ENOMEM;
-diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
-index cf45841d9d1b..03184a3303b9 100644
---- a/fs/smb/server/mgmt/user_config.c
-+++ b/fs/smb/server/mgmt/user_config.c
-@@ -26,6 +26,7 @@ struct ksmbd_user *ksmbd_login_user(const char *account)
- 		resp_ext = ksmbd_ipc_login_request_ext(account);
- 
- 	user = ksmbd_alloc_user(resp, resp_ext);
-+	kvfree(resp_ext);
- out:
- 	kvfree(resp);
- 	return user;
--- 
-2.54.0
 
+--=20
+Thanks,
+
+Steve
