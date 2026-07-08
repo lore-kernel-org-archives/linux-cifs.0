@@ -1,61 +1,60 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B463B1008
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 11:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4029544D6AC
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 12:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783510044; cv=none; b=oQ0mniGXcjLphEhQfO0GzrB1yRDkL5Xe7h7YUlG/GRsIFEmMqd0jUxvf9hQm7Nvuz6neYlimI18n/a45Eg2yetkbJwmzepeTWricHKIWNXRWIn6NDEH+LfnHLJT4vNkeS2oaIrnGvvulUP3gqCgZpzMRw0io9T0C6/WzspFjoS0=
+	t=1783514255; cv=none; b=GDQpFgnPrcP5b2EotOH6oziXPW9YpOaUy01Oke2KHK7BHedL68keit0SgGeyto6AsSPkDn1jDu3BY5BR9BH0BdD073kLKPtfryzntEiHgYFwjmxXKxY4Yu7FCZ+MNXizygX7IqoTYgPuVVREQGMSa1rFCGbVEGP4+GElwDa31Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783510044; c=relaxed/simple;
-	bh=AxPPwN90iP4l+b27JWSMmWlcNQW2IIDOnihx1QGleN0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LpsqVW1YRnHlyJ7UHKhawzSbLnrROacVQhCGrHfPtLWGG5eZ6XVKn31cb7fhgTQQ3nN2fDQqFbCfve0E+Gf3jPGfZAmVL1J29jxadYEk4ztp6v3CTgXZga1ybFaY5Nb2D1j+kD2Zfmf6wHm/mHwBp1NEeUEIclgqr1Cjax1ME18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IksYdI9K; arc=none smtp.client-ip=209.85.216.43
+	s=arc-20240116; t=1783514255; c=relaxed/simple;
+	bh=04uYqpWZQ/plXMmcyu7t94cu7k6D3kzwu3oIbsQumfk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uQk8r2EzMMKOPV4oZHzxDPcqsrfr5rWiziCsfn5Cb5ipm4VZO+hh9S4nDYotjo3oGMu7bNZw+jEpA/jcH9UPROVNotbKmujWkjjCpfS3q+lB5pW/aqXlHBtK6+v+0AogO3CUknGsWK4GEP320lmoDCdVrUFxB/Oqtk2O2clbRH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hFVG+Qtx; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IksYdI9K"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3804e42ad5fso555209a91.2
-        for <linux-cifs@vger.kernel.org>; Wed, 08 Jul 2026 04:27:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hFVG+Qtx"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2cc97653887so6894785ad.1
+        for <linux-cifs@vger.kernel.org>; Wed, 08 Jul 2026 05:37:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783510042; x=1784114842; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783514252; x=1784119052; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=T6LLPYPxF/rwL0UhQNWTO3hdR4wnXs81/2/TPdtR2qo=;
-        b=IksYdI9KZs0ZOWuEd+VVLTfd+uIx6X4Mfo+q/aJ2Nqji8n5O7S1X3EZ/47VV2icque
-         uk2Hq6egwduAhtn5hoI0zhxaviVQsLIXXUKcDee0oZZuePvksa/jzoIUaWHf6HIA1b3y
-         cH/5w9IvOvu/qMU5dw9VBsYIzVwexXjJq6SHz9wq1Ybp4WV3Usn5KAuhG4283KxHrwKL
-         WyLu6bRIglzcNZJAtYCgIhHdZ3oHL8dm3giW8QF8xnkEZNTFxIniyHIbgE60tpNosMLN
-         NyfHrHnvrvcmCemjgBWPBRPzFuybnWmyhOmeMP0FG5pgGHsiZCqBwvXRnIiE8Pqs36WJ
-         aQHA==
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8PAS6PBBdlQD0VB+aSPh5lpk2Y8XtUDXkF4ggRU1JMc=;
+        b=hFVG+QtxPWOZLG6c3pjDZSoplmTskK4BnkmQmU6hqcsRHu/CFt9v8FvJpOaLvd5awF
+         em8N+2CTdRdno+a0xvhrAjMN+2sE63p+fWLsBaQOdp9FdHFU+c73PRGu1/Kk/Hjr9Jf5
+         lBrImB++JczyThCVJqe60zT/VwT+yZ4eO5AmIlWcmxOZXUyWpaeEvD/xVXRyBZpWAgMa
+         oQuXg5piT2Yl4uBpP3ZpQtvr90BjQQ8v2jox7ueU2JedaaphYr/BoSTXhDw1Kd1dQozJ
+         pQPj+YeBNTX8RhAfidwaDcDe1pLoE7xDPPE4BIiUpqaBpm/4LT32JT/gNg5+hHpCZKkO
+         8Usw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783510042; x=1784114842;
+        d=1e100.net; s=20251104; t=1783514252; x=1784119052;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=T6LLPYPxF/rwL0UhQNWTO3hdR4wnXs81/2/TPdtR2qo=;
-        b=jDbhs7MVW2n/YC7SXrd7Z7k9ziy9WzxR2cThKEYUoDGvtewrY96w0c8Cbi94zUn19Y
-         tB8IgyiIIy0xT5sRErBR66v5bbZ3el74DI84vBretOYggmAZU4nzTGGYaRbJRcLdPoRZ
-         nKEJRhzGFEaLecGsMZgqHPcnsUprrx0/RYax8aHIip9uAkSmq/0OFVCLxIsNJNa5v9vF
-         KQCOyn1lpbtW32DJdMYaPSNR3OXmcMTPWU0dD4xI27FpXgdlQHu+g03HRgLldGYkIif6
-         4imG6PvUKKDfmRF51Kf5Zkm2hvZeacJVvoaRHyDNcVkaTy6iTDTnaPITqCrDf1OZfSTG
-         8zRA==
-X-Forwarded-Encrypted: i=1; AHgh+Rru3cmN4K/hPXXVZJhdHnsEsiVYPw4FwAQQSE/otT41RAFwfMGwP2TO4NQolbM1ee/8VLRzNFxheRfE@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlIhR8PztfD8Y40A/k/3tIwTLBkkkwG1DXuYCwqQB7hkA6pSAY
-	cbOBSCOWZD6/TDmFqyzaD70e7/sZKeBvWfS/k/n3jI1gkInloTK1uomq
-X-Gm-Gg: AfdE7cl7HQx17gheKEefsNzDM0ukQgh0bd01NbUHjuaEkvENJyH65pInBkuhLHzvftq
-	aQWJGBQewHai6YMbouywy+B4je3Jk+eA/1TL8Xa1oCRSrK+JQ5uxkEBPufc8rJku6Hb2ZVXkPky
-	FzOfgkiNxXFbKYjK6kFNiTK3TSv+97k/h9wRCBn8EZc1Jp7TMPdGATWj1fWzlcY/5zSIkiSlBfn
-	yMRlFq11axGasZuYHZ5LG+rdkxqfZ7AwoPUIWd+RTkvGLCzUfs08N0aZiJTSZzPsXcbCXFB72ps
-	BJE2JiYRJta9L2peEmrParOaMtW18hGO7HPXzIY0seUYFk/LkWiPkbRtca1/3Ugs9AaO1JRVzlS
-	l6LIDWGLXfph6m8sZ4J/+uaf3E3Ada7f4nCsmeOkmFDX9xVwxNummG0k6Q1vJU/KhYd0UpX+CYQ
-	dn9VXWe5CddOzK
-X-Received: by 2002:a17:90a:da8b:b0:381:e74f:8a6a with SMTP id 98e67ed59e1d1-3894053d0b1mr2145294a91.16.1783510042402;
-        Wed, 08 Jul 2026 04:27:22 -0700 (PDT)
-Received: from lgs.. ([118.193.39.55])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d3d57bsm26334255ad.59.2026.07.08.04.27.18
+         :message-id:reply-to;
+        bh=8PAS6PBBdlQD0VB+aSPh5lpk2Y8XtUDXkF4ggRU1JMc=;
+        b=qUTWQPkv/6+mLuTkgLt20BD+sQDqPMdwoPLI6a+Mr7iu7D1rVO2yemC7SmudqA55uj
+         /bqfLJX6r8gFCaS0G7HEtmxKKdJHqzQ5skYPDLddjQRstHTvS0hX+2jmTjNrMd3Ojnov
+         5DFMpFHIX1UCwzi5hv5qEUTJRAbilWY8C68zdwnCp3CBGjD5DOpFSAeyLfqof80wYi9J
+         n3Kex9MUZycJJycBNsCUFrxEZwC49dMe7gQvaq9XJjs+UI+bAK/Wg8avtoFUU67brGKM
+         XY7BOV5h41iccPTZImga4EJzMtBt5RX5JpMQho9D5ibmbGcs0uIMUNXtKldHIiV48fqs
+         xUzA==
+X-Forwarded-Encrypted: i=1; AHgh+Rr9B5Do4ALqki9q2Xlb+YKRsMDz5jR5F2fBeb1/GmKsjWjzXvoZg+DBYpM3OZHJ6sr5lVCYUhw8t0r/@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7FOxZPS+uYDYT25jeTAadCofyeR/ThlwPfrbH2K0obikWUQYn
+	lBBnrC+EMSBIs5tjP1uy+FIc0hW53YdlZpMbod2+ns8OUmQXrfKwYIR2
+X-Gm-Gg: AfdE7ckP15XaHXRwL/cQdUy0GXQWAqBnJjBBC19rvm0A9TyS9tsbW9UkOQrhwsYsK53
+	LHO0/giZBZUcN/+S7c3l7ybATsV8ljV4FNkO/cG0NgxUUjSx7xNG0HhMP5QpWhMzfVZVLzo8eLX
+	biUHWWW4B+9HqFY2Uo6R+30IFLeQdKoy6NzgScMHb90RRrQzLo0GXSMtr0Ww63uzkWVjoRsz2R2
+	zzEG7eHC2O2TjXZ9ei2jJ4oS/wlMJus/OCt3D//x0X1WcpPCH2naLfBV0IPxu8PQjgOzET70FAM
+	/7Ot7J3pS7wqavC+TPw/tI1BfKbayGRBMaJLn7CNus3PvdbSbegQjHIGNgeWI+GdBPhJJkXx468
+	ajbG8SUA3Bv7V0tWTr1edlxP6KFucsfke7rRwCLDYGL/T9PziTnaTzVC1PSii6Cpa8qO9xsU=
+X-Received: by 2002:a17:903:1247:b0:2ca:ecf6:910e with SMTP id d9443c01a7336-2ccea1d220amr26916725ad.0.1783514251703;
+        Wed, 08 Jul 2026 05:37:31 -0700 (PDT)
+Received: from lgs.. ([2001:250:5800:1000::f280])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d5bd2fsm27285895ad.78.2026.07.08.05.37.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 04:27:21 -0700 (PDT)
+        Wed, 08 Jul 2026 05:37:31 -0700 (PDT)
 From: Guangshuo Li <lgs201920130244@gmail.com>
 To: Steve French <sfrench@samba.org>,
 	Paulo Alcantara <pc@manguebit.org>,
@@ -63,15 +62,14 @@ To: Steve French <sfrench@samba.org>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
-	Aurelien Aptel <aaptel@suse.com>,
-	Pavel Shilovsky <pshilov@microsoft.com>,
+	Markus Elfring <elfring@users.sourceforge.net>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
 Cc: Guangshuo Li <lgs201920130244@gmail.com>
-Subject: [PATCH] cifs: validate DFS referral string offsets
-Date: Wed,  8 Jul 2026 19:27:10 +0800
-Message-ID: <20260708112710.752136-1-lgs201920130244@gmail.com>
+Subject: [PATCH] smb: client: fix overflow in passthrough ioctl bounds check
+Date: Wed,  8 Jul 2026 20:35:20 +0800
+Message-ID: <20260708123520.761116-1-lgs201920130244@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -81,51 +79,42 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-parse_dfs_referrals() validates that the response header and referral
-array fit in the received buffer, but each referral also contains string
-offsets supplied by the server.
+smb2_ioctl_query_info() validates the PASSTHRU_FSCTL response payload
+before copying it to userspace.
 
-Those offsets are used to compute the DfsPath and NetworkAddress string
-pointers without checking whether they still point inside the response
-buffer. A malformed referral can therefore make the computed pointer
-exceed the end of the buffer. The resulting negative max_len is then
-passed to cifs_strndup_from_utf16(), and the non-Unicode path forwards it
-to kstrndup() as a size_t, allowing strnlen() to read out of bounds.
+The payload offset and length both come from 32-bit fields. The bounds
+check currently adds OutputOffset and qi.input_buffer_length directly, so
+the addition can wrap in 32-bit arithmetic before the result is compared
+against the response buffer length.
 
-Validate each string offset before deriving the string pointer.
+A malicious server can use a large OutputOffset and a small OutputCount
+to make the wrapped sum pass the bounds check. The later copy_to_user()
+then reads from io_rsp + OutputOffset, outside the response buffer.
 
-Fixes: 4ecce920e13a ("CIFS: move DFS response parsing out of SMB1 code")
+Use size_add() for the offset plus length check so overflow is treated as
+out of bounds.
+
+Fixes: 2b1116bbe898 ("CIFS: Use common error handling code in smb2_ioctl_query_info()")
 Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 ---
- fs/smb/client/misc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ fs/smb/client/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 0c54b9b79a2c..ee1728eec8aa 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -752,6 +752,10 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
- 		node->ref_flag = le16_to_cpu(ref->ReferralEntryFlags);
- 
- 		/* copy DfsPath */
-+		if (le16_to_cpu(ref->DfsPathOffset) > data_end - (char *)ref) {
-+			rc = -EINVAL;
-+			goto parse_DFS_referrals_exit;
-+		}
- 		temp = (char *)ref + le16_to_cpu(ref->DfsPathOffset);
- 		max_len = data_end - temp;
- 		node->path_name = cifs_strndup_from_utf16(temp, max_len,
-@@ -762,6 +766,10 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 06e9322a762a..fd2d55df2c86 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -1772,8 +1772,8 @@ smb2_ioctl_query_info(const unsigned int xid,
+ 		if (le32_to_cpu(io_rsp->OutputCount) < qi.input_buffer_length)
+ 			qi.input_buffer_length = le32_to_cpu(io_rsp->OutputCount);
+ 		if (qi.input_buffer_length > 0 &&
+-		    le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length
+-		    > rsp_iov[1].iov_len) {
++		     size_add(le32_to_cpu(io_rsp->OutputOffset),
++			     qi.input_buffer_length) > rsp_iov[1].iov_len) {
+ 			rc = -EFAULT;
+ 			goto out;
  		}
- 
- 		/* copy link target UNC */
-+		if (le16_to_cpu(ref->NetworkAddressOffset) > data_end - (char *)ref) {
-+			rc = -EINVAL;
-+			goto parse_DFS_referrals_exit;
-+		}
- 		temp = (char *)ref + le16_to_cpu(ref->NetworkAddressOffset);
- 		max_len = data_end - temp;
- 		node->node_name = cifs_strndup_from_utf16(temp, max_len,
 -- 
 2.43.0
 
