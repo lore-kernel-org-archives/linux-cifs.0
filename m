@@ -1,177 +1,102 @@
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DF41F1932
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 02:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9573175A8F
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 04:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783479418; cv=none; b=EuWiDpRt5ozUbGh04h97FzvoVCkze78Ly2ev4uuCMaIeaPGOTrEjrvfn59WnF0gI0iCoMuZhmnG6zW+Qb04ShTjbxIaXViWbmJ6FckSdjWHTvmZuVuhJX1Y09wXFKYtK8svu4MXioxX8DJqZ+13mV22/K0tFk9uxom5Jv5MTEp8=
+	t=1783483311; cv=none; b=C+nCnfDIArg8qmIN55jIMm26A2WlSMZNMs2PUBWgDGu3tmnKcAKDgDjlXSIP/rlix9Hob373DF5WRU8tPKX43pZ5oJsaPlniZp+vJtBGuwQ8/y9+yLxK09p1ebapNVvpztoC9pasIZYknJUEdlbwepnE7G8ozlsHunjwgHXrTXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783479418; c=relaxed/simple;
-	bh=4vgQasOaifXl4ygxUDUchMpUD6VsN2AGERIBtelXD60=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R5xbfEKXXDbq+kr5NRTJfwOm71r8oAZoxIY2GoTeMg1+aI+gZ77ze2m8FDm4qOpYhFpzwSVVRHPmj8lJ2KOVncc8Ed7aLBRx2Fvmto5KaQ1P/wYo24sZ4Y4zClVSILZJl81obKoFd/FFSp+WdVzAIpn67LbukjR/MtuGk6dBrTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=sBFIpThI; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1783483311; c=relaxed/simple;
+	bh=oFUJm1n996+vOPSGEdnoOi1UEgZkR+CilLwsVr1YQvs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ent+GCrQVYJnZJi/PTsuNIaXZ6hN/8Dr7aZIxtEGjbB9rd+G1O8GS4sqyCTzitUnFijIzTnumHHdKMyyjRhUg0I5yslM7PwJ5O6u4PCm8r80q6KPoKcncOPbC/2GqTpVTOjNx1QjpExDQwcJm1K/9vcCMr2DVngLR81tjPZnEjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C/PE8ONx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="sBFIpThI"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1783479414;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=272OOld/E5dmQe35awJvyLWQ3hE4pezDYvXMN5XXvME=;
-	b=sBFIpThIU2odnHJXeNvqscUmorp+8j8iNiQy7pCXwkutl26zjWb8aVsn6QO080ePBvF0d1
-	igN6V8kFwrexYelUHCqQXogxyECBVacCXgIr7zQtyxvFWc/q19M4eTMeejM2wFVKJN1mYy
-	RESTB5tNs3e6KinHUleHrxNAfyhps+oYOiJpRBT0PEFul5eKhe0G15SNHmUUnsKT7WpnUO
-	RX3M85+hz3+kg5xI91PM9ebZfxQwuMqT4WxooWYj9qtntgLW2w+s4m878/rCgf5RxKKFfW
-	ebI4JApGDNp1KU1ExyPjt3VtckG9cHNdUoi5yGlSvf4ohigzuRqdKgQ9vXDsfQ==
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 3/3] smb/server: use MSG_EOR for async interim response
-Date: Wed,  8 Jul 2026 02:56:15 +0000
-Message-ID: <20260708025615.145390-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260708025615.145390-1-chenxiaosong@chenxiaosong.com>
-References: <20260708025615.145390-1-chenxiaosong@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/PE8ONx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22E921F00A3A
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 04:01:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783483310;
+	bh=b2hVhlB9xAFe3YG/NqA2YfAXHeb5jiCYY8is2BoQPBM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=C/PE8ONxBRGJw3yx/pXFGqj9wX8Ldtlxo97mmN+Xt5+gtGz7If1WU1ff4z0aBvyek
+	 jWsSs4BTp2DFZIMA2CQ8rvoebT5zgVXXSMXxU9t2VaFI8lATrzsTLqv6xnuQJfWEHx
+	 nLdNSCZdkssKC79jjsfnJtuWDEUy5FBjdDDk53/rr3Kpgf9xbEuaQcdF3hWYT09iYq
+	 jUHEF7YIfaKDVHHkjI+6U6CJBVJvv61+Z6As/Naq+d2N+1XTKfW5Brk6lfQ1RboFnP
+	 IyKchEEEN5S81I61+WczYNrM+rv4c8JUWuK1VTMK/ywyeOurNzT6THMBEsgELrmRqa
+	 fvGIoeBc2Lezw==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c029505b389so195406066b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 07 Jul 2026 21:01:50 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxMz76K7rIQba+9jtR7Rbo4/wmVasFg1vnd3jm99nWy+cC6BFpG
+	z8DhzGvvi4YRAi8ffv4z0cWYOjV9JNTcT7HF9rGovE4kUawTnRLoe8aL9JaHgvADmCCFNkmNuL2
+	kBIXAgI2/FQgM5W1G5x0rSW7NbuU2NiE=
+X-Received: by 2002:a17:906:8d89:b0:c08:5bdb:e904 with SMTP id
+ a640c23a62f3a-c15cdd00c2fmr39576866b.9.1783483308762; Tue, 07 Jul 2026
+ 21:01:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260707100033.47512-1-g.blivet@me.com>
+In-Reply-To: <20260707100033.47512-1-g.blivet@me.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 8 Jul 2026 13:01:37 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-fZu5oFELRcDxuOHMpLrepyH0kSwOZVySKXyorza-0gQ@mail.gmail.com>
+X-Gm-Features: AVVi8Cfh0kxdnt3OADQImpvDGrJAJvmgHpfkVcrTi_q-WyXQUsklAL2_I13yIoI
+Message-ID: <CAKYAXd-fZu5oFELRcDxuOHMpLrepyH0kSwOZVySKXyorza-0gQ@mail.gmail.com>
+Subject: Re: [PATCH 0/7] ksmbd: assorted fixes found while adding macOS/Time
+ Machine support
+To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+On Tue, Jul 7, 2026 at 7:01=E2=80=AFPM Ga=C3=ABl Blivet-Bailly <gael.blivet=
+@gmail.com> wrote:
+>
+> From: Gael Blivet <gael.blivet@gmail.com>
+>
+> These 7 fixes are independent of each other and of any Apple-specific
+> behavior -- they affect any SMB2/SMB3 client. Found while developing
+> and live-testing macOS Time Machine support against ksmbd (that series
+> is being sent separately, based on the same tree).
+>
+> Two are worth flagging specifically:
+>
+> - "fix COPYCHUNK for ADS streams" and "report actual xattr value length
+>   for stream EndOfFile/AllocationSize" affect any client using alternate
+>   data streams, not just macOS.
+>
+> - "fix off-by-one rejecting minimal COPYCHUNK query-limits request"
+>   affects any client probing server copy limits with a minimal
+>   FSCTL_SRV_COPYCHUNK request (ChunkCount=3D0).
+>
+> Each commit builds standalone against ksmbd-for-next-next and has been
+> checked with checkpatch.pl --strict. The underlying bugs and fixes
+> were found and verified during live Time Machine/Finder testing on an
+> earlier baseline; this re-derivation against ksmbd-for-next-next has
+> been verified to build cleanly but not independently re-tested at
+> runtime.
+>
+> Gael Blivet (7):
+>   ksmbd: fix off-by-one rejecting minimal COPYCHUNK query-limits request
+>   ksmbd: route stream FileDispositionInformation through stream delete
+>     flag
+>   ksmbd: report actual xattr value length for stream
+>     EndOfFile/AllocationSize
+>   ksmbd: return STATUS_OBJECT_NAME_NOT_FOUND for unknown IPC pipe names
+>   ksmbd: quiet mdssvc RPC log spam
+>   ksmbd: fix stale sparse-file attribute after share reconfiguration
+>   ksmbd: fix COPYCHUNK for ADS streams
+Applied them to #ksmbd-for-next-next except 0007 patch.
 
-Two kernel_sendmsg() calls can still use the same TCP skb if the first skb
-can take more data. This can happen when ksmbd sends two SMB2 responses
-very close to each other.
+I have applied the following patches instead of 0007 patch.
+https://github.com/smfrench/smb3-kernel/commit/165e5b86fd2c5894c9d81ebb3dc8=
+98a82e55c440
+https://github.com/smfrench/smb3-kernel/commit/8afe741dbd67df46274434a83de7=
+67f6dc3ef247
 
-Without MSG_EOR, TCP can append the next sendmsg data to the previous skb.
-Then STATUS_PENDING and the later response can be put into the same TCP
-skb. MSG_EOR marks the skb as end of record, so TCP will not collapse the
-next sendmsg data into it.
-
-Example:
-
-  smbtorture //${server_ip}/export -U${username}%${password} smb2.compound_async.write_write
-
-  Client request:
-
-    Write Request Len:64 Off:0, File: compound_async_write_write; Write Request Len:64 Off:64
-
-  Before this patch, server responses:
-
-    Write Response, File: compound_async_write_write
-    Write Response
-      SMB2, STATUS_PENDING, Write Response, MessageId 7
-      SMB2, Write Response, MessageId 7
-
-  After this patch:
-
-    Write Response, File: compound_async_write_write
-    Write Response, Error: STATUS_PENDING
-    Write Response
-
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/connection.c    | 9 +++++++++
- fs/smb/server/connection.h    | 2 ++
- fs/smb/server/smb2pdu.c       | 4 ++--
- fs/smb/server/transport_tcp.c | 2 +-
- 4 files changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index d5b35087556e..89746284fd7b 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -392,6 +392,15 @@ int ksmbd_conn_write(struct ksmbd_work *work)
- 	return __ksmbd_conn_write(work, &write);
- }
- 
-+int ksmbd_conn_write_eor(struct ksmbd_work *work)
-+{
-+	struct ksmbd_transport_write write = {
-+		.msg_flags = MSG_EOR,
-+	};
-+
-+	return __ksmbd_conn_write(work, &write);
-+}
-+
- int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
- 			 void *buf, unsigned int buflen,
- 			 struct smbdirect_buffer_descriptor_v1 *desc,
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 62df151ca554..fa09d37d5745 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -138,6 +138,7 @@ struct ksmbd_transport_write {
- 	int		size;
- 	bool		need_invalidate_rkey;
- 	unsigned int	remote_key;
-+	int		msg_flags;
- };
- 
- struct ksmbd_transport_ops {
-@@ -182,6 +183,7 @@ int ksmbd_conn_wq_init(void);
- void ksmbd_conn_wq_destroy(void);
- bool ksmbd_conn_lookup_dialect(struct ksmbd_conn *c);
- int ksmbd_conn_write(struct ksmbd_work *work);
-+int ksmbd_conn_write_eor(struct ksmbd_work *work);
- int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
- 			 void *buf, unsigned int buflen,
- 			 struct smbdirect_buffer_descriptor_v1 *desc,
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 35f8476bbb6d..d644134d50f0 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -867,7 +867,7 @@ static void smb2_send_interim_compound_prefix(struct ksmbd_work *work)
- 	    work->conn->ops->set_sign_rsp)
- 		work->conn->ops->set_sign_rsp(work);
- 
--	err = ksmbd_conn_write(work);
-+	err = ksmbd_conn_write_eor(work);
- 	if (err)
- 		ksmbd_debug(SMB, "failed to send compound interim prefix: %d\n",
- 			    err);
-@@ -908,7 +908,7 @@ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
- 	smb2_set_err_rsp(in_work);
- 	rsp_hdr->Status = status;
- 
--	ksmbd_conn_write(in_work);
-+	ksmbd_conn_write_eor(in_work);
- 	ksmbd_free_work_struct(in_work);
- }
- 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 448f24d44b6b..cf81585d6861 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -421,7 +421,7 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t,
- 			    const struct ksmbd_transport_write *write)
- {
- 	struct msghdr smb_msg = {
--		.msg_flags = MSG_NOSIGNAL,
-+		.msg_flags = MSG_NOSIGNAL | write->msg_flags,
- 	};
- 
- 	return kernel_sendmsg(TCP_TRANS(t)->sock, &smb_msg, write->iov,
--- 
-2.54.0
-
+Thanks.
