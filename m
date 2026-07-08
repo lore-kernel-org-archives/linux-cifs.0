@@ -1,76 +1,81 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4029544D6AC
-	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 12:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 113B6426ECA
+	for <linux-cifs@vger.kernel.org>; Wed,  8 Jul 2026 12:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783514255; cv=none; b=GDQpFgnPrcP5b2EotOH6oziXPW9YpOaUy01Oke2KHK7BHedL68keit0SgGeyto6AsSPkDn1jDu3BY5BR9BH0BdD073kLKPtfryzntEiHgYFwjmxXKxY4Yu7FCZ+MNXizygX7IqoTYgPuVVREQGMSa1rFCGbVEGP4+GElwDa31Do=
+	t=1783515562; cv=none; b=AMAYNAuvbHb6xiI/9pXxjO1hxepXxA5ReQiiNnpfGquffV9wBLafL2k7JuoO4DHTtJhwAT2ITj/JDINo4VxM2P7DYDm8A1FExgMYFzEWXj6qBi1UKBlNXNUdxDELamnMC6KLONZyl4Gz3aiyT5BY9C6xvmf0AiuAsI5i87xVu3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783514255; c=relaxed/simple;
-	bh=04uYqpWZQ/plXMmcyu7t94cu7k6D3kzwu3oIbsQumfk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uQk8r2EzMMKOPV4oZHzxDPcqsrfr5rWiziCsfn5Cb5ipm4VZO+hh9S4nDYotjo3oGMu7bNZw+jEpA/jcH9UPROVNotbKmujWkjjCpfS3q+lB5pW/aqXlHBtK6+v+0AogO3CUknGsWK4GEP320lmoDCdVrUFxB/Oqtk2O2clbRH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hFVG+Qtx; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783515562; c=relaxed/simple;
+	bh=luEjh2s90OYy4i79HDDnTId75lNGpKBGW7W0TWw2jBM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y38fis+YIMJIspE2nJH4iHbrWkSV0t7F6a52h7e+sJKLBStuT7uX67HusggaQRyUqE8fr8xPbOpcFaLSTcFlOfT1DO6Di4CHUpf4GwL2stLo6JZ6z/J3c81cXtsKxbBVbqVTNcOJYh930Pdg5u4HrX04VpzaM460aU8BCpsCIw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=epjFHDia; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b1nhPzym; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=epjFHDia; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=b1nhPzym; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hFVG+Qtx"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2cc97653887so6894785ad.1
-        for <linux-cifs@vger.kernel.org>; Wed, 08 Jul 2026 05:37:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783514252; x=1784119052; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8PAS6PBBdlQD0VB+aSPh5lpk2Y8XtUDXkF4ggRU1JMc=;
-        b=hFVG+QtxPWOZLG6c3pjDZSoplmTskK4BnkmQmU6hqcsRHu/CFt9v8FvJpOaLvd5awF
-         em8N+2CTdRdno+a0xvhrAjMN+2sE63p+fWLsBaQOdp9FdHFU+c73PRGu1/Kk/Hjr9Jf5
-         lBrImB++JczyThCVJqe60zT/VwT+yZ4eO5AmIlWcmxOZXUyWpaeEvD/xVXRyBZpWAgMa
-         oQuXg5piT2Yl4uBpP3ZpQtvr90BjQQ8v2jox7ueU2JedaaphYr/BoSTXhDw1Kd1dQozJ
-         pQPj+YeBNTX8RhAfidwaDcDe1pLoE7xDPPE4BIiUpqaBpm/4LT32JT/gNg5+hHpCZKkO
-         8Usw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783514252; x=1784119052;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8PAS6PBBdlQD0VB+aSPh5lpk2Y8XtUDXkF4ggRU1JMc=;
-        b=qUTWQPkv/6+mLuTkgLt20BD+sQDqPMdwoPLI6a+Mr7iu7D1rVO2yemC7SmudqA55uj
-         /bqfLJX6r8gFCaS0G7HEtmxKKdJHqzQ5skYPDLddjQRstHTvS0hX+2jmTjNrMd3Ojnov
-         5DFMpFHIX1UCwzi5hv5qEUTJRAbilWY8C68zdwnCp3CBGjD5DOpFSAeyLfqof80wYi9J
-         n3Kex9MUZycJJycBNsCUFrxEZwC49dMe7gQvaq9XJjs+UI+bAK/Wg8avtoFUU67brGKM
-         XY7BOV5h41iccPTZImga4EJzMtBt5RX5JpMQho9D5ibmbGcs0uIMUNXtKldHIiV48fqs
-         xUzA==
-X-Forwarded-Encrypted: i=1; AHgh+Rr9B5Do4ALqki9q2Xlb+YKRsMDz5jR5F2fBeb1/GmKsjWjzXvoZg+DBYpM3OZHJ6sr5lVCYUhw8t0r/@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7FOxZPS+uYDYT25jeTAadCofyeR/ThlwPfrbH2K0obikWUQYn
-	lBBnrC+EMSBIs5tjP1uy+FIc0hW53YdlZpMbod2+ns8OUmQXrfKwYIR2
-X-Gm-Gg: AfdE7ckP15XaHXRwL/cQdUy0GXQWAqBnJjBBC19rvm0A9TyS9tsbW9UkOQrhwsYsK53
-	LHO0/giZBZUcN/+S7c3l7ybATsV8ljV4FNkO/cG0NgxUUjSx7xNG0HhMP5QpWhMzfVZVLzo8eLX
-	biUHWWW4B+9HqFY2Uo6R+30IFLeQdKoy6NzgScMHb90RRrQzLo0GXSMtr0Ww63uzkWVjoRsz2R2
-	zzEG7eHC2O2TjXZ9ei2jJ4oS/wlMJus/OCt3D//x0X1WcpPCH2naLfBV0IPxu8PQjgOzET70FAM
-	/7Ot7J3pS7wqavC+TPw/tI1BfKbayGRBMaJLn7CNus3PvdbSbegQjHIGNgeWI+GdBPhJJkXx468
-	ajbG8SUA3Bv7V0tWTr1edlxP6KFucsfke7rRwCLDYGL/T9PziTnaTzVC1PSii6Cpa8qO9xsU=
-X-Received: by 2002:a17:903:1247:b0:2ca:ecf6:910e with SMTP id d9443c01a7336-2ccea1d220amr26916725ad.0.1783514251703;
-        Wed, 08 Jul 2026 05:37:31 -0700 (PDT)
-Received: from lgs.. ([2001:250:5800:1000::f280])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9d5bd2fsm27285895ad.78.2026.07.08.05.37.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 05:37:31 -0700 (PDT)
-From: Guangshuo Li <lgs201920130244@gmail.com>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Markus Elfring <elfring@users.sourceforge.net>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>
-Subject: [PATCH] smb: client: fix overflow in passthrough ioctl bounds check
-Date: Wed,  8 Jul 2026 20:35:20 +0800
-Message-ID: <20260708123520.761116-1-lgs201920130244@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="epjFHDia";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b1nhPzym";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="epjFHDia";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="b1nhPzym"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3BEFE75E14;
+	Wed,  8 Jul 2026 12:59:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783515559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
+	b=epjFHDiatgk+kSEtqDqoguqJh09buRFCCW25NddjH+AZGnGyi8CQpVLGWlSadAOIKA/eSc
+	WD9EvlXYkuQAl8QKPBISC6rPC5jWGXNBwkSrfMWuxWoP+xM3YotLRRBMV4WnMhm5M2QIRc
+	B/K9RBXwLGsVql2oXqZrOmeaH6GxqnM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783515559;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
+	b=b1nhPzymCvqjwThkDYO9UGv6p+MEn3ztXGZb0U/cmme2IYzUcAgktCZ15fAY0m1hVjuSPw
+	i5zOGzzCB0ZDIXAg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=epjFHDia;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=b1nhPzym
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1783515559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
+	b=epjFHDiatgk+kSEtqDqoguqJh09buRFCCW25NddjH+AZGnGyi8CQpVLGWlSadAOIKA/eSc
+	WD9EvlXYkuQAl8QKPBISC6rPC5jWGXNBwkSrfMWuxWoP+xM3YotLRRBMV4WnMhm5M2QIRc
+	B/K9RBXwLGsVql2oXqZrOmeaH6GxqnM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1783515559;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=RNr8UnFdrfH5bBBKEdngxADYDr9vb1+qBjT0noo836s=;
+	b=b1nhPzymCvqjwThkDYO9UGv6p+MEn3ztXGZb0U/cmme2IYzUcAgktCZ15fAY0m1hVjuSPw
+	i5zOGzzCB0ZDIXAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BC101779AF;
+	Wed,  8 Jul 2026 12:59:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Qz+SIKZJTmrsJwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Wed, 08 Jul 2026 12:59:18 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: linkinjeon@kernel.org,
+	smfrench@gmail.com,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH v2] smb: server: fix leak of ksmbd_ipc_login_request_ext() returned buffer
+Date: Wed,  8 Jul 2026 09:59:12 -0300
+Message-ID: <20260708125912.1223345-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -78,43 +83,99 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: 3BEFE75E14
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,gmail.com,talpey.com,chromium.org,suse.de];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email,suse.de:mid];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
-smb2_ioctl_query_info() validates the PASSTHRU_FSCTL response payload
-before copying it to userspace.
+Free it unconditionally after ksmbd_alloc_user() calls.
 
-The payload offset and length both come from 32-bit fields. The bounds
-check currently adds OutputOffset and qi.input_buffer_length directly, so
-the addition can wrap in 32-bit arithmetic before the result is compared
-against the response buffer length.
+kmemleak splat:
+  unreferenced object 0xffff888103b83540 (size 192):
+    comm "pool-0", pid 16970, jiffies 4377290937
+    hex dump (first 32 bytes):
+      00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00  ................
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    backtrace (crc 408ccc66):
+      __kvmalloc_node_noprof+0x730/0x920
+      handle_generic_event+0xec/0x1a0 [ksmbd]
+      genl_family_rcv_msg_doit+0xe0/0x130
+      genl_rcv_msg+0x181/0x290
+      netlink_rcv_skb+0x4f/0x100
+      genl_rcv+0x28/0x40
+      netlink_unicast+0x1e6/0x2c0
+      netlink_sendmsg+0x20a/0x450
+      ____sys_sendmsg+0x2e8/0x310
+      ___sys_sendmsg+0x78/0xc0
+      __sys_sendmsg+0x63/0xc0
+      do_syscall_64+0xa1/0x670
+      entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-A malicious server can use a large OutputOffset and a small OutputCount
-to make the wrapped sum pass the bounds check. The later copy_to_user()
-then reads from io_rsp + OutputOffset, outside the response buffer.
-
-Use size_add() for the offset plus length check so overflow is treated as
-out of bounds.
-
-Fixes: 2b1116bbe898 ("CIFS: Use common error handling code in smb2_ioctl_query_info()")
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+Fixes: a77e0e02af1c ("ksmbd: add support for supplementary groups")
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/smb2ops.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+v2:
+- use kvfree()
+- move free to ksmbd_alloc_user() callers
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 06e9322a762a..fd2d55df2c86 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1772,8 +1772,8 @@ smb2_ioctl_query_info(const unsigned int xid,
- 		if (le32_to_cpu(io_rsp->OutputCount) < qi.input_buffer_length)
- 			qi.input_buffer_length = le32_to_cpu(io_rsp->OutputCount);
- 		if (qi.input_buffer_length > 0 &&
--		    le32_to_cpu(io_rsp->OutputOffset) + qi.input_buffer_length
--		    > rsp_iov[1].iov_len) {
-+		     size_add(le32_to_cpu(io_rsp->OutputOffset),
-+			     qi.input_buffer_length) > rsp_iov[1].iov_len) {
- 			rc = -EFAULT;
- 			goto out;
- 		}
+ fs/smb/server/auth.c             | 1 +
+ fs/smb/server/mgmt/user_config.c | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
+index 86f521e849d5..ffc4e1c8b287 100644
+--- a/fs/smb/server/auth.c
++++ b/fs/smb/server/auth.c
+@@ -436,6 +436,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
+ 		resp_ext = ksmbd_ipc_login_request_ext(resp->login_response.account);
+ 
+ 	user = ksmbd_alloc_user(&resp->login_response, resp_ext);
++	kvfree(resp_ext);
+ 	if (!user) {
+ 		ksmbd_debug(AUTH, "login failure\n");
+ 		retval = -ENOMEM;
+diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
+index cf45841d9d1b..03184a3303b9 100644
+--- a/fs/smb/server/mgmt/user_config.c
++++ b/fs/smb/server/mgmt/user_config.c
+@@ -26,6 +26,7 @@ struct ksmbd_user *ksmbd_login_user(const char *account)
+ 		resp_ext = ksmbd_ipc_login_request_ext(account);
+ 
+ 	user = ksmbd_alloc_user(resp, resp_ext);
++	kvfree(resp_ext);
+ out:
+ 	kvfree(resp);
+ 	return user;
 -- 
-2.43.0
+2.54.0
 
