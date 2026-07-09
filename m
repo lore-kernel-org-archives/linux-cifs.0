@@ -1,124 +1,108 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45BE244661
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B492673AA
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602820; cv=none; b=PQBcVEu8m0R5VRPeq+XEOaPm7/OUVRhKkf+RWRfNYHvhsmExG1gK+pUyGHDPLoSgjLkeRftA6UPGLCpMepqZhNgzTRy3/X4KvrSrqdsz9iMFoE3T7sD9VgVEUR6nsOZZN0AC5BzCJhrXcY9s/vds+P+sahGIHB8H4ND6JC2UxDo=
+	t=1783602964; cv=none; b=oeJ1LMTfiqy8jTanT8OFrAv/GlacCIECddgqFuoP0c49iCKK8vvVVdUMQLANFyVuN4mpEQgTwvrs9tsXaBDoaxj5CRBC5xOgAZ4ZX9y4/z1npdMEfKic5Ogib33fkNDcaSvZGmWXehl/4sWoLOHAjT4HMRoaLImecWBO/epFu5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602820; c=relaxed/simple;
-	bh=W05j3Ev9nopMG3YdEeox21V3+1EAz6wTDAXGX2ELwqM=;
+	s=arc-20240116; t=1783602964; c=relaxed/simple;
+	bh=S9oCMvrdgwloIYiOwCw8xw5ICTYkdd7OBlqGZA/ewvM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uJej9Scc90Y7JE8a1nAsl9zaqtu4YLGQf9YE/l7PEuhcH4bJ9KLx5nCkB2jA6cF+YIl5jwkzInXOQQmrDGZ8qOYCa8vS7IznlzCfRsA2e3VPpe5nVRt1JJwShyP8aMlsw8FqMgmknpT8wUz71GXUvXOG+GeMmmVa4QrQOoyB8pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKXJMJ/A; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=TJZ0gX3D2mD+67ek54ox3litwFu/MqSIvivGcFdMx52ajH6UYdC/mpN8Zi2BoNozZ6XznJfOxgjz+B/rPr0S39fU2dIlqYjjJtxETkXB1aQj6187mPaiDZ4FITYqHDjAqLfn9vPg4r8jtDR/bVeruB99TEytZl7DO4npqPMnS1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1ViObND; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKXJMJ/A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C1161F000E9
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:13:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1ViObND"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C7FA1F000E9
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783602818;
-	bh=eo7zIrVDqUtjB6594qXxSaPkktpafk8pk362HGKiHcc=;
+	s=k20260515; t=1783602963;
+	bh=H67r6m6M5Q9uRHI47lh4R/IR8ERu9h2FLP3XKD+lXOs=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=bKXJMJ/A9Qa5EII0eWKMY85S9qMMmVEa+c8qwXqmvWT01Wq1s0iMeiYt4O0Bc+Bmx
-	 SEXbQiRXORooW0BfJk5T5ybZGNPcYYrF3HdivA+AXUtj88plNQEAiegsfgS9DmE8tQ
-	 ovCBoldNgKlPEP7n67HpVxoiH8mPYt3+DHUyNnYBfdrTvDFXyAErfMCYXyYewUwaZD
-	 K7cYWAzkPLcfk2x8hUhkomRiu6ew8Xr9RLlzr+JNJZ+78s7epRTfyy3QVIrORZA3oz
-	 gwOBe1O5xiTNhTJv2i5xkExaIohLEAo8uLkqddnywnKbYYlzTyWL+3R54wNcNxFxrq
-	 gbwTQM+w5w9rQ==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15f360851aso36501766b.2
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:13:38 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzCY00/gH94ri0Sl29zbOPKdxCSN6yHJ28+ffFfORkPZu77encc
-	Gxe7zm6LOlqXyd5f2YBtMs9REZeOXKzLXqvax6Iu+LZ40VDPsMP2fLXA5NxvKUqZ60BWtIyheTE
-	KthVmcKw1481YEQhC+xh8/PDzPk0Xm8I=
-X-Received: by 2002:a17:907:a286:b0:c12:f81:661f with SMTP id
- a640c23a62f3a-c15ce130541mr305094766b.51.1783602817038; Thu, 09 Jul 2026
- 06:13:37 -0700 (PDT)
+	b=Q1ViObNDIuCq6mVhZwJzg/6S4UKFuXBkYMJ1OpStb0glWdINIjLuhAvtfM0ZWe+jh
+	 pjbmt2Ynof5skeoVllamkrCcvFrg+VNyTBvoxy2TtK4pUFxDjsd/0CT5zLd+WPneFw
+	 Re9P7EicYVyAmP5LEgyuC1TE1Ji5t7DXKBG5e8zaW86afEinFG04REoMBuwPQ8yGX2
+	 Hx36JZJjtquI//GVKBmtSdhw8PBvRE56TDk1vVzxyBLO0BYTBNGbwfwpiBgC6T9JIX
+	 DAFsg/whJxjXCT/HXHWCZp/dvoj0GWkQH7lQQ9e5R23YgSg9IMpsqpRk1t490kFQxD
+	 MVOlAQV4iZo2A==
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6983d3dae7aso1490350a12.0
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:16:03 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwgnEi3jDBemRBW6/ZEBlo+K4Fz6FaX2rxMxb2TRpq0qy7HFaR4
+	UyD1pqyFZa6ZMKtl34QY2/7s4BdozZcfSK/3n/GmpaRvInI66+cgLcxJrf46yF+VWFWS2NtcVDt
+	U8ANUOfWJrWCiyB93b7ck4FRmnDJ0UFg=
+X-Received: by 2002:a17:907:8997:b0:c12:6389:9085 with SMTP id
+ a640c23a62f3a-c15e741480emr132107466b.6.1783602961861; Thu, 09 Jul 2026
+ 06:16:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709000548.66445-1-g.blivet@me.com>
-In-Reply-To: <20260709000548.66445-1-g.blivet@me.com>
+References: <20260709000618.66534-1-g.blivet@me.com>
+In-Reply-To: <20260709000618.66534-1-g.blivet@me.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 9 Jul 2026 22:13:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9rtrHOWD01==RHnzm0L=t5ULL41BN9XGejuZ5bg07vyg@mail.gmail.com>
-X-Gm-Features: AUfX_myKGgiXZlq00Wr8N6PYKlVsEOWZRBCAu4tpaV8KS7XCHf6fw0H97JXRwrY
-Message-ID: <CAKYAXd9rtrHOWD01==RHnzm0L=t5ULL41BN9XGejuZ5bg07vyg@mail.gmail.com>
-Subject: Re: [PATCH 0/8] ksmbd: follow-up fixes to previously-merged patches
+Date: Thu, 9 Jul 2026 22:15:48 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-+wT6db2vAQZsrdcDep=RVbF8oKhzC9f5mEfo+THPzOg@mail.gmail.com>
+X-Gm-Features: AUfX_myqi7V3-Ot7IPkgMbnj84Ezo2j7k5cK9l_JXqv7vUqcQKlVjZROIh13y-A
+Message-ID: <CAKYAXd-+wT6db2vAQZsrdcDep=RVbF8oKhzC9f5mEfo+THPzOg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/6] ksmbd: add macOS Time Machine / AAPL SMB2
+ extension support
 To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
 Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 9, 2026 at 9:06=E2=80=AFAM Ga=C3=ABl Blivet-Bailly <gael.blivet=
+On Thu, Jul 9, 2026 at 9:07=E2=80=AFAM Ga=C3=ABl Blivet-Bailly <gael.blivet=
 @gmail.com> wrote:
 >
 > From: Gael Blivet <gael.blivet@gmail.com>
 >
-> Follow-ups to bugs found in patches from an earlier series ("ksmbd: fix
-> several independent bugs found while adding Time Machine/AAPL support",
-> already applied to this tree), plus a few additional issues found while
-> re-reviewing that same area of code. None of this depends on or touches
-> the AAPL/Time Machine feature series (sent separately as "ksmbd: add
-> macOS Time Machine / AAPL SMB2 extension support").
+> Link to v1:
+> https://lore.kernel.org/linux-cifs/20260707100129.47563-1-g.blivet@me.com=
+/
 >
-> Patches 1, 2, and 4-8 are Sashiko (automated LLM-based patch review)
-> findings against the original series -- two triaged and fixed
-> already, the rest found on a closer re-read of that same review this
-> session:
->  - Patch 1: commit 78380c12125a ("ksmbd: route stream
->    FileDispositionInformation through stream delete flag") used an
->    inode-wide flag to track a per-handle delete-pending state, so
->    closing one stream handle could delete a different, unrelated
->    stream on the same file.
->  - Patch 2: commit bb682f1496f7 ("ksmbd: quiet mdssvc RPC log spam")
->    silenced one of two log sites for the same rejected RPC pipe,
->    missing a second, separate pr_err() in the caller.
->  - Patch 4: two IOCTL response handlers (FSCTL_CREATE_OR_GET_OBJECT_ID,
->    FSCTL_GET_REPARSE_POINT) write a fixed-size response without
->    checking the actual remaining output buffer space first, unlike
->    every comparable case in the same switch statement -- a compound
->    SMB2 request that leaves little space for a trailing one of these
->    IOCTLs can overflow past the end of the response buffer.
->  - Patch 5: stream enumeration (FileStreamInformation) reports each
->    stream's name length as its data size, the same bug class already
->    fixed for EndOfFile/AllocationSize on an open stream handle, just
->    missed at this second site.
->  - Patch 6: a DOS attribute struct is used without zero-initializing
->    it first; one of its fields is only populated by the on-disk NDR
->    decoder for one xattr version, so an older-format xattr leaves
->    uninitialized kernel stack memory copied into server state that's
->    later exposed to clients via QUERY_INFO.
->  - Patch 7: deleting a stream (not the file itself) on a directory
->    incorrectly fails with -EBUSY if the directory happens to be
->    non-empty, since the emptiness check doesn't distinguish a stream
->    handle from the directory handle it's attached to.
->  - Patch 8: opening a stream with an AllocationSize create context
->    fallocates storage on the underlying base file's actual data,
->    since streams don't have their own file and fallocate doesn't
->    apply to them.
+> v2 addresses the CHANGE_NOTIFY CANCEL concern raised on v1:
+> smb2_cancel() calls each async request's cancel_fn() while holding
+> conn->request_lock, so cancel_fn must not sleep. Patch 4 now splits
+> this into inline lock-protected list/state manipulation (matching
+> every other cancel_fn in this file) plus a workqueue-deferred send of
+> the actual STATUS_CANCELLED response, which is the one part that
+> sleeps.
 >
-> Patch 3 is unrelated to Sashiko: a 1000x units bug in the default
-> durable-handle-v2 timeout (60 instead of 60000 milliseconds) that
-> would make any client relying on the server's default timeout lose
-> the reconnect race after even a brief disconnect, found during a
-> separate investigation into durable-handle-v2 reconnect reliability.
+> Separately: the corresponding ksmbd-tools userspace patch (aapl_model
+> field, "time machine"/"aapl model" config options) has been sent to
+> that project directly, since it's a different repository from this
+> kernel series.
 >
-> Gael Blivet (8):
->   ksmbd: route stream FileDispositionInformation through stream delete
->     flag
->   ksmbd: quiet mdssvc RPC log spam in create_smb2_pipe
->   ksmbd: fix durable handle v2 default timeout units (60 -> 60000)
->   ksmbd: validate out_buf_len before FSCTL_CREATE_OR_GET_OBJECT_ID and
->     FSCTL_GET_REPARSE_POINT writes
->   ksmbd: report actual xattr value length in stream enumeration
->   ksmbd: zero-initialize xattr_dos_attrib in smb2_update_xattrs()
->   ksmbd: don't check directory emptiness when deleting a stream
->   ksmbd: skip fallocate for SMB2_CREATE_ALLOCATION_SIZE on a stream
->     handle
-Applied them except 0002, 0005 patch to #ksmbd-for-next-next.
-You can send the updated two patches to me and the list next time.
+> New since v1: patch 6, AAPL READDIR_ATTR V2 support -- real macOS
+> clients negotiate V2 over V1 when both are offered, so v1-only left a
+> gap for current macOS versions.
+>
+> Also new: patches 1, 3, and 6 are now additionally cross-checked
+> against Apple's published SMBClient kernel source
+> (apple-oss-distributions/SMBClient, smb_smb_2.c) -- everything matched
+> the network-derived understanding v1 was built on, except one
+> inaccurate assumption in patch 3, now corrected.
+>
+> Patch 5 also gets a correctness fix: the synthesized ChunkCount=3D0
+> full-copy response was reporting ChunksWritten=3D1/ChunkBytesWritten=3D
+> <file size>, describing a chunk the client never actually sent (it
+> sent zero). Now reports 0/0, matching what's actually been validated
+> against a real client; only TotalBytesWritten carries a value.
+>
+> Patches 1-4 are otherwise unchanged in substance from v1, re-derived
+> against the current tree (this branch has moved since v1).
+>
+> Gael Blivet (6):
+>   ksmbd: add Apple AAPL kAAPL_SERVER_QUERY create context support
+>   ksmbd: synthesize empty AFP_AfpInfo xattr on first probe
+>   ksmbd: send inline FinderInfo in FIND responses when READDIR_ATTR
+>     negotiated
+>   ksmbd: defer CHANGE_NOTIFY completion instead of
+>     STATUS_NOT_IMPLEMENTED
+>   ksmbd: implement full-file copy for AAPL ChunkCount=3D0 COPYCHUNK
+>   ksmbd: add AAPL READDIR_ATTR V2 support
+Applied them to #ksmbd-for-next-next.
 Thanks!
