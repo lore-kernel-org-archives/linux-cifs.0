@@ -1,92 +1,124 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C369242D88
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45BE244661
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602720; cv=none; b=dgmzWsKVsWFkBEfatpD3ZTR78kAmR+9ciIDpV4VjkB94JS8HpeU9f8I4zXBnHjGOaz69SE4M9P6RlhrfBv0Ed6nHRRKDk6x0P6YqRS+uoqm3SDh78iHFKtHGR+1UG5WMtk5NZIw/lcpKQZBsqmb2QgeJjIsPtB7TTYL9g/hNuG4=
+	t=1783602820; cv=none; b=PQBcVEu8m0R5VRPeq+XEOaPm7/OUVRhKkf+RWRfNYHvhsmExG1gK+pUyGHDPLoSgjLkeRftA6UPGLCpMepqZhNgzTRy3/X4KvrSrqdsz9iMFoE3T7sD9VgVEUR6nsOZZN0AC5BzCJhrXcY9s/vds+P+sahGIHB8H4ND6JC2UxDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602720; c=relaxed/simple;
-	bh=EsvryVd9nv8bCsRvfZGiPpqKwAVGQnn9PpzZyzwYYGw=;
+	s=arc-20240116; t=1783602820; c=relaxed/simple;
+	bh=W05j3Ev9nopMG3YdEeox21V3+1EAz6wTDAXGX2ELwqM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nMgML3zEMRXghSKBePWckQLrR8R2J6X4kWvig1B/3P0d8GzVxOuKTI0RjpTk55hB4b2xMA0CFZ1zX/4FUNCNqeY4eitT0eE4JBCbgYWlZQxOVw8myZ52wlhc/TBtADbJBnlvdUEQBKZbza2WUvZeurdwvOr14ybCQS+CCT7DrG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcEF0SBn; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=uJej9Scc90Y7JE8a1nAsl9zaqtu4YLGQf9YE/l7PEuhcH4bJ9KLx5nCkB2jA6cF+YIl5jwkzInXOQQmrDGZ8qOYCa8vS7IznlzCfRsA2e3VPpe5nVRt1JJwShyP8aMlsw8FqMgmknpT8wUz71GXUvXOG+GeMmmVa4QrQOoyB8pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKXJMJ/A; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jcEF0SBn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8C121F00A3D
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:11:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKXJMJ/A"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C1161F000E9
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:13:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783602711;
-	bh=orGmfzJTlSy/BsrApon0mqUdNKMi9RuXHob1SkODx58=;
+	s=k20260515; t=1783602818;
+	bh=eo7zIrVDqUtjB6594qXxSaPkktpafk8pk362HGKiHcc=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=jcEF0SBniUJZlhKIfZJyZQwnf8BHKMdIspMYNxhrU8NVai9x7tidxMQPpxs3lu0pc
-	 MISpnuYHs16fv/DlRZ5w6+msGO4rdK0dJhavn4HdNEDDpXzK4sW9DGFoPyPZDjB1N7
-	 Se8MY46lg6yAu8l0spuZk9yTrpHfWpOGEt1GcWNQcZ4LDDKtE91aG7nD9v0N+/s+Vl
-	 J8jkj4rVpctO5tAgklc+tsn87pPViled9WD1yNsK8JVRc8DFUqft+ty8UGQvJWJRrs
-	 93/tgijoJlyk0j1EXrWjwKtmkonpx4hR6JWZ2IocYrd7Da38QUyRwexORNQnwpGRKZ
-	 Acn/7U5mw78JQ==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c15f020a223so55078766b.1
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:11:51 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxHk9L9axK4qzx/LO0KwAxJj7msb7W63uIFLPR3H7PsWtuhurCS
-	08ZDYuXe2wEXV6kwANAq8ENiw5nIrc+wkIX37EBMTMA7exPcXwYHpz3qzm/7k9dhYdaHRODEudw
-	urHODJgIZ6DBs4uivc+K9KMteHSu08TU=
-X-Received: by 2002:a17:907:d15:b0:c15:ce72:9350 with SMTP id
- a640c23a62f3a-c15ce729453mr289548266b.41.1783602710306; Thu, 09 Jul 2026
- 06:11:50 -0700 (PDT)
+	b=bKXJMJ/A9Qa5EII0eWKMY85S9qMMmVEa+c8qwXqmvWT01Wq1s0iMeiYt4O0Bc+Bmx
+	 SEXbQiRXORooW0BfJk5T5ybZGNPcYYrF3HdivA+AXUtj88plNQEAiegsfgS9DmE8tQ
+	 ovCBoldNgKlPEP7n67HpVxoiH8mPYt3+DHUyNnYBfdrTvDFXyAErfMCYXyYewUwaZD
+	 K7cYWAzkPLcfk2x8hUhkomRiu6ew8Xr9RLlzr+JNJZ+78s7epRTfyy3QVIrORZA3oz
+	 gwOBe1O5xiTNhTJv2i5xkExaIohLEAo8uLkqddnywnKbYYlzTyWL+3R54wNcNxFxrq
+	 gbwTQM+w5w9rQ==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15f360851aso36501766b.2
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:13:38 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzCY00/gH94ri0Sl29zbOPKdxCSN6yHJ28+ffFfORkPZu77encc
+	Gxe7zm6LOlqXyd5f2YBtMs9REZeOXKzLXqvax6Iu+LZ40VDPsMP2fLXA5NxvKUqZ60BWtIyheTE
+	KthVmcKw1481YEQhC+xh8/PDzPk0Xm8I=
+X-Received: by 2002:a17:907:a286:b0:c12:f81:661f with SMTP id
+ a640c23a62f3a-c15ce130541mr305094766b.51.1783602817038; Thu, 09 Jul 2026
+ 06:13:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709000548.66445-1-g.blivet@me.com> <20260709000548.66445-6-g.blivet@me.com>
-In-Reply-To: <20260709000548.66445-6-g.blivet@me.com>
+References: <20260709000548.66445-1-g.blivet@me.com>
+In-Reply-To: <20260709000548.66445-1-g.blivet@me.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 9 Jul 2026 22:11:36 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_nNSGuzzm8dF9GvK5tGqsOwE8LiXXdUCg1XQ67e2N8hA@mail.gmail.com>
-X-Gm-Features: AUfX_mxrK1tFJXaT_OuAMdFM8N7uqx_b2NPCrsyne57XW0IWlTkabZhs2Hd0C7o
-Message-ID: <CAKYAXd_nNSGuzzm8dF9GvK5tGqsOwE8LiXXdUCg1XQ67e2N8hA@mail.gmail.com>
-Subject: Re: [PATCH 5/8] ksmbd: report actual xattr value length in stream enumeration
+Date: Thu, 9 Jul 2026 22:13:24 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9rtrHOWD01==RHnzm0L=t5ULL41BN9XGejuZ5bg07vyg@mail.gmail.com>
+X-Gm-Features: AUfX_myKGgiXZlq00Wr8N6PYKlVsEOWZRBCAu4tpaV8KS7XCHf6fw0H97JXRwrY
+Message-ID: <CAKYAXd9rtrHOWD01==RHnzm0L=t5ULL41BN9XGejuZ5bg07vyg@mail.gmail.com>
+Subject: Re: [PATCH 0/8] ksmbd: follow-up fixes to previously-merged patches
 To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
 Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index ffdae74b6..ca3d4985a 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -5865,8 +5865,24 @@ static int get_file_stream_info(struct ksmbd_work *work,
->                 streamlen *= 2;
->                 kfree(stream_buf);
->                 file_info->StreamNameLength = cpu_to_le32(streamlen);
-> -               file_info->StreamSize = cpu_to_le64(stream_name_len);
-> -               file_info->StreamAllocationSize = cpu_to_le64(stream_name_len);
-> +               {
-Please avoid introducing an extra scoped block({ ... }) in the middle
-of the function.
-Thanks.
-
-> +                       /*
-> +                        * stream_name_len is the byte length of the xattr's
-> +                        * *name*, not its value -- same class of bug
-> +                        * ksmbd_stream_eof() (smb2pdu.c) already fixes for
-> +                        * EndOfFile/AllocationSize on a stream handle; this
-> +                        * enumeration path needs the same real xattr value
-> +                        * length, not the name length reused as a size.
-> +                        */
-> +                       ssize_t slen = ksmbd_vfs_casexattr_len(file_mnt_idmap(fp->filp),
-> +                                                              path->dentry,
-> +                                                              stream_name,
-> +                                                              strlen(stream_name));
-> +                       loff_t ssize = slen < 0 ? 0 : (loff_t)slen;
-> +
-> +                       file_info->StreamSize = cpu_to_le64(ssize);
-> +                       file_info->StreamAllocationSize = cpu_to_le64(ssize);
-> +               }
+On Thu, Jul 9, 2026 at 9:06=E2=80=AFAM Ga=C3=ABl Blivet-Bailly <gael.blivet=
+@gmail.com> wrote:
 >
->                 nbytes += next;
->                 buf_free_len -= next;
-> --
-> 2.43.0
+> From: Gael Blivet <gael.blivet@gmail.com>
 >
+> Follow-ups to bugs found in patches from an earlier series ("ksmbd: fix
+> several independent bugs found while adding Time Machine/AAPL support",
+> already applied to this tree), plus a few additional issues found while
+> re-reviewing that same area of code. None of this depends on or touches
+> the AAPL/Time Machine feature series (sent separately as "ksmbd: add
+> macOS Time Machine / AAPL SMB2 extension support").
+>
+> Patches 1, 2, and 4-8 are Sashiko (automated LLM-based patch review)
+> findings against the original series -- two triaged and fixed
+> already, the rest found on a closer re-read of that same review this
+> session:
+>  - Patch 1: commit 78380c12125a ("ksmbd: route stream
+>    FileDispositionInformation through stream delete flag") used an
+>    inode-wide flag to track a per-handle delete-pending state, so
+>    closing one stream handle could delete a different, unrelated
+>    stream on the same file.
+>  - Patch 2: commit bb682f1496f7 ("ksmbd: quiet mdssvc RPC log spam")
+>    silenced one of two log sites for the same rejected RPC pipe,
+>    missing a second, separate pr_err() in the caller.
+>  - Patch 4: two IOCTL response handlers (FSCTL_CREATE_OR_GET_OBJECT_ID,
+>    FSCTL_GET_REPARSE_POINT) write a fixed-size response without
+>    checking the actual remaining output buffer space first, unlike
+>    every comparable case in the same switch statement -- a compound
+>    SMB2 request that leaves little space for a trailing one of these
+>    IOCTLs can overflow past the end of the response buffer.
+>  - Patch 5: stream enumeration (FileStreamInformation) reports each
+>    stream's name length as its data size, the same bug class already
+>    fixed for EndOfFile/AllocationSize on an open stream handle, just
+>    missed at this second site.
+>  - Patch 6: a DOS attribute struct is used without zero-initializing
+>    it first; one of its fields is only populated by the on-disk NDR
+>    decoder for one xattr version, so an older-format xattr leaves
+>    uninitialized kernel stack memory copied into server state that's
+>    later exposed to clients via QUERY_INFO.
+>  - Patch 7: deleting a stream (not the file itself) on a directory
+>    incorrectly fails with -EBUSY if the directory happens to be
+>    non-empty, since the emptiness check doesn't distinguish a stream
+>    handle from the directory handle it's attached to.
+>  - Patch 8: opening a stream with an AllocationSize create context
+>    fallocates storage on the underlying base file's actual data,
+>    since streams don't have their own file and fallocate doesn't
+>    apply to them.
+>
+> Patch 3 is unrelated to Sashiko: a 1000x units bug in the default
+> durable-handle-v2 timeout (60 instead of 60000 milliseconds) that
+> would make any client relying on the server's default timeout lose
+> the reconnect race after even a brief disconnect, found during a
+> separate investigation into durable-handle-v2 reconnect reliability.
+>
+> Gael Blivet (8):
+>   ksmbd: route stream FileDispositionInformation through stream delete
+>     flag
+>   ksmbd: quiet mdssvc RPC log spam in create_smb2_pipe
+>   ksmbd: fix durable handle v2 default timeout units (60 -> 60000)
+>   ksmbd: validate out_buf_len before FSCTL_CREATE_OR_GET_OBJECT_ID and
+>     FSCTL_GET_REPARSE_POINT writes
+>   ksmbd: report actual xattr value length in stream enumeration
+>   ksmbd: zero-initialize xattr_dos_attrib in smb2_update_xattrs()
+>   ksmbd: don't check directory emptiness when deleting a stream
+>   ksmbd: skip fallocate for SMB2_CREATE_ALLOCATION_SIZE on a stream
+>     handle
+Applied them except 0002, 0005 patch to #ksmbd-for-next-next.
+You can send the updated two patches to me and the list next time.
+Thanks!
