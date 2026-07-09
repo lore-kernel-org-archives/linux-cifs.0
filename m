@@ -1,51 +1,51 @@
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.13.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E157742DA3F;
-	Thu,  9 Jul 2026 15:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE38642F6FF;
+	Thu,  9 Jul 2026 15:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.13.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783612504; cv=none; b=rkeqFw/b3rFU7tXZwC/j5m9Bytb5hFf+L5YwBjVuHvt03Y1/NX5dEwHNR0YjoilR901s5MoghP//3rWoNYDOzsI2Ch8YqSnNhP4iNFkIsKvVeRmlZ/b3XcYey+7MQx+KS9JkbGz+fBy6YlzC5r6dHM9WHOYvr7ODzgMds3zrnoc=
+	t=1783612506; cv=none; b=irjTaoZPNw4577aa1xLCovBn69Vd8+5/foe/YHW0EuL74zkkJ540xLGGtDT2Q8BnVrFlsegWnC0YGOYZaRXv9rs7BKcxxoKawCVBB3KlLXaTg92cCMPsgHCwxAJ4yf9QQXvlrThx/RtrSsq5ieewpDN+ktTodhKCCapV+BfWkDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783612504; c=relaxed/simple;
-	bh=2UY2hwRLYLB8e7f2GFLkUci/X38S6EIiBO8keiN69do=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ag4B9feWmCcdt5Q/5rkXlWWGkHzHz51KB9AFyJ5jInWc4crw4b00XyInY6/4ahPtsk48GQpki5bFvz6MvnsEhBhkE9vP0UlNW1HgG5Av96yrUhm3OjNJsr2pYzpy7aHZTKV1SfihoBimbs65JC+Giq/PtPgUv1nhI7ws66zQnYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=jRjuQk4i; arc=none smtp.client-ip=52.35.192.45
+	s=arc-20240116; t=1783612506; c=relaxed/simple;
+	bh=UQMNLf5pUz+gEnbUY8PbpD7gCW8qa0clJYZeKo4VVOs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ly31vLqFcDPPTDuvNPg/m2nPesJLCI5ei0hYNjgUU9uncLN6nRILUk/RtGHAD/qdptanUe8rRRaYDHqDz4b7vv3C53hdwIWpCh6JqeRR/FV2SHjbp4IAlKtkmKa1mcGLS9WbXeBQRh2bFJj2f+TLXRAtFBW8KYiMl24ievRLcts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=kiysJFvo; arc=none smtp.client-ip=52.13.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="jRjuQk4i"
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="kiysJFvo"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1783612502; x=1815148502;
+  t=1783612505; x=1815148505;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=vE946ASmE2lxBNc96IRvRBu3IlQiGEZOj0kMnret4Sc=;
-  b=jRjuQk4iTprYMBXgmyBtS0qxUCEg4ZKzGNoPu+s4NPhFLxpL+bb1mqlt
-   cs7SlaVNoeKtiby584u7Yv6J1d0ZF6XdIQDEQVhTFnr/TamdxmKTTDlpN
-   gsaNgdXeWEmBsRUOdaxLxdBDo6lxXUJQ/Cm+9+3M3WOK6isU6cn+sHXeY
-   Hk82icOG6xgNPZQ3Z2TPTzhILUCTNEOSQZjmifY9t/QSPqUoUhjNsx8e0
-   6hHywuimhbun0v/f9Z0eYLI4MafG1zrSl+Bql5oxKTHUFXd5YD0fJMZnt
-   lxhMx5G6QsUJEeWqAccs43wJaW3vtz0yLPUmHkucadOAtKnNBGFjwgQ/g
+  bh=KpsSYm0NQHbrBccVG4kK8wVYLPm1aRgnUuanForo09Q=;
+  b=kiysJFvouRnRT+Urmr/GDXGxqLpskwCvawHqmdH/ThYJIouNpQnq13Xr
+   cMZUKK+NxCL0Ob16Y+jPyH1pDOkiQ+UPGv2p+653OFaXU67mH56riB1aS
+   uAR64ax2kR9VzlxWzNecFJ9JOAaSV6QkMgC0Y5ScuCGr9VfbL8JGr6a/b
+   EYIZ7zDyG3/C4ezdHWGS3oPf6FZ2hDLvm+lIqv295iyJLHnHj30VjLszJ
+   3g5cpNnYUIXmj2Q9s7xQzuvWrOEfSVUq8rfzvgeQtClNHtMapiRmLEer5
+   NLfO+pF1SBdsP7WYqRkrFeQCh+x/MTLWA5jUvbO2oRm9ZpWgFMzar9sCC
    w==;
-X-CSE-ConnectionGUID: nDKJE0QKQxSZE7qfHZmrVA==
-X-CSE-MsgGUID: KLHiNLcqRX6rcpT1ULBUwA==
+X-CSE-ConnectionGUID: 3Ffw+E5gTEWk6CuCwrbLeQ==
+X-CSE-MsgGUID: 2lrhdtYDQS67dp4iaqAZPg==
 X-IronPort-AV: E=Sophos;i="6.25,154,1779148800"; 
-   d="scan'208";a="23149231"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 15:54:59 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:9716]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.68:2525] with esmtp (Farcaster)
- id eeb7f2e3-3e92-4c26-aca1-9580d5f33a8f; Thu, 9 Jul 2026 15:54:59 +0000 (UTC)
-X-Farcaster-Flow-ID: eeb7f2e3-3e92-4c26-aca1-9580d5f33a8f
+   d="scan'208";a="23358795"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 15:55:01 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:17990]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.33:2525] with esmtp (Farcaster)
+ id 846c0b8b-2925-4351-abfa-2f765fd40457; Thu, 9 Jul 2026 15:55:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 846c0b8b-2925-4351-abfa-2f765fd40457
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 9 Jul 2026 15:54:59 +0000
+ Thu, 9 Jul 2026 15:55:00 +0000
 Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 9 Jul 2026 15:54:58 +0000
+ Thu, 9 Jul 2026 15:54:59 +0000
 From: Bjoern Doebel <doebel@amazon.de>
 To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
@@ -53,9 +53,9 @@ To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
 	<bharathsm@microsoft.com>, <linux-cifs@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <samba-technical@lists.samba.org>
 CC: <stable@vger.kernel.org>, <doebel@amazon.de>, <nmanthey@amazon.de>
-Subject: [PATCH] smb: client: mask server-provided mode to 07777 in modefromsid
-Date: Thu, 9 Jul 2026 15:54:39 +0000
-Message-ID: <20260709155440.2132459-2-doebel@amazon.de>
+Subject: [PATCH] smb: client: set SB_I_NODEV to prevent device node injection
+Date: Thu, 9 Jul 2026 15:54:40 +0000
+Message-ID: <20260709155440.2132459-3-doebel@amazon.de>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -70,31 +70,32 @@ X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
 
 From: Norbert Manthey <nmanthey@amazon.de>
 
-When modefromsid is active, parse_dacl() applies the server-provided
-sub_auth[2] value from the NFS mode SID to cf_mode without masking to
-07777. Apply the correct masking, same as in the read path.
+Set SB_I_NODEV on the superblock by default for CIFS mounts. This is
+consistent with how other filesystems handle untrusted remote content
+and prevents the server side from injecting device nodes on the client.
 
-Fixes: e2f8fbfb8d09c ("cifs: get mode bits from special sid on stat")
+Fixes: 2e4564b31b645 ("smb3: add support for stat of WSL reparse points for special file types")
 Signed-off-by: Norbert Manthey <nmanthey@amazon.de>
 Assisted-by: Kiro:claude-opus-4.6
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsacl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/client/cifsfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 6d572dd995d79..a0a68404fbff7 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -962,7 +962,7 @@ static void parse_dacl(struct smb_acl *pdacl, char *end_of_acl,
- 				 */
- 				fattr->cf_mode &= ~07777;
- 				fattr->cf_mode |=
--					le32_to_cpu(ppace[i]->sid.sub_auth[2]);
-+					le32_to_cpu(ppace[i]->sid.sub_auth[2]) & 07777;
- 				break;
- 			} else {
- 				if (compare_sids(&(ppace[i]->sid), pownersid) == 0) {
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index ea4fc0fa68cac..35eee2f9899d5 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -208,6 +208,9 @@ cifs_read_super(struct super_block *sb)
+ 	if (sbflags & CIFS_MOUNT_POSIXACL)
+ 		sb->s_flags |= SB_POSIXACL;
+ 
++	/* Prevent device node opens from remote filesystem by default */
++	sb->s_iflags |= SB_I_NODEV;
++
+ 	if (tcon->snapshot_time)
+ 		sb->s_flags |= SB_RDONLY;
+ 
 -- 
 2.50.1
 
