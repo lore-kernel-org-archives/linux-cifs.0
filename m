@@ -1,101 +1,142 @@
-Received: from pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.13.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE38642F6FF;
-	Thu,  9 Jul 2026 15:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.13.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91996390CA9
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 16:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783612506; cv=none; b=irjTaoZPNw4577aa1xLCovBn69Vd8+5/foe/YHW0EuL74zkkJ540xLGGtDT2Q8BnVrFlsegWnC0YGOYZaRXv9rs7BKcxxoKawCVBB3KlLXaTg92cCMPsgHCwxAJ4yf9QQXvlrThx/RtrSsq5ieewpDN+ktTodhKCCapV+BfWkDY=
+	t=1783614995; cv=none; b=cLD3Dd0l3QjunyXpigRD+XOa5REMk8BEioRBka9q9gdEpI6iu1p/c+XDTmIsShPShkweUKTg2812FCJsvREYIcNQxXmVgiFOXvaxRLPvmHaXSTzc8/fc439Qrymlypy2/6+ZPLTrvF98tCeeaZzXl+mUkuWWJeOruk0oPTQ/tnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783612506; c=relaxed/simple;
-	bh=UQMNLf5pUz+gEnbUY8PbpD7gCW8qa0clJYZeKo4VVOs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ly31vLqFcDPPTDuvNPg/m2nPesJLCI5ei0hYNjgUU9uncLN6nRILUk/RtGHAD/qdptanUe8rRRaYDHqDz4b7vv3C53hdwIWpCh6JqeRR/FV2SHjbp4IAlKtkmKa1mcGLS9WbXeBQRh2bFJj2f+TLXRAtFBW8KYiMl24ievRLcts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=kiysJFvo; arc=none smtp.client-ip=52.13.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1783614995; c=relaxed/simple;
+	bh=UsbaNrmIn63ARuAebfUPXUmtATO3t4qV3jGnIvUWHz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p2ceRUtk3Sb/L8FGoRFT7vD227msqEUyL0aeIwZKP2Z5E4GHi5EP5ScYaUO1MN+p/JexczVL9SUhFHSKkk2EzFY+ZKcDUTdLPeqiMkDO5VcBMWxujHSPrL9QF4p63SaE3RfAyYHoG5I/aK1WUgyc+DXQ1P/vn06bfJMSUB8YPts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rQ6zC61f; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="kiysJFvo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rQ6zC61f"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-493e4ccccc2so1065e9.2
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 09:36:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1783612505; x=1815148505;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KpsSYm0NQHbrBccVG4kK8wVYLPm1aRgnUuanForo09Q=;
-  b=kiysJFvouRnRT+Urmr/GDXGxqLpskwCvawHqmdH/ThYJIouNpQnq13Xr
-   cMZUKK+NxCL0Ob16Y+jPyH1pDOkiQ+UPGv2p+653OFaXU67mH56riB1aS
-   uAR64ax2kR9VzlxWzNecFJ9JOAaSV6QkMgC0Y5ScuCGr9VfbL8JGr6a/b
-   EYIZ7zDyG3/C4ezdHWGS3oPf6FZ2hDLvm+lIqv295iyJLHnHj30VjLszJ
-   3g5cpNnYUIXmj2Q9s7xQzuvWrOEfSVUq8rfzvgeQtClNHtMapiRmLEer5
-   NLfO+pF1SBdsP7WYqRkrFeQCh+x/MTLWA5jUvbO2oRm9ZpWgFMzar9sCC
-   w==;
-X-CSE-ConnectionGUID: 3Ffw+E5gTEWk6CuCwrbLeQ==
-X-CSE-MsgGUID: 2lrhdtYDQS67dp4iaqAZPg==
-X-IronPort-AV: E=Sophos;i="6.25,154,1779148800"; 
-   d="scan'208";a="23358795"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-005.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 15:55:01 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.51:17990]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.33:2525] with esmtp (Farcaster)
- id 846c0b8b-2925-4351-abfa-2f765fd40457; Thu, 9 Jul 2026 15:55:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 846c0b8b-2925-4351-abfa-2f765fd40457
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 9 Jul 2026 15:55:00 +0000
-Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Thu, 9 Jul 2026 15:54:59 +0000
-From: Bjoern Doebel <doebel@amazon.de>
-To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
-	<sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
-	<bharathsm@microsoft.com>, <linux-cifs@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <samba-technical@lists.samba.org>
-CC: <stable@vger.kernel.org>, <doebel@amazon.de>, <nmanthey@amazon.de>
-Subject: [PATCH] smb: client: set SB_I_NODEV to prevent device node injection
-Date: Thu, 9 Jul 2026 15:54:40 +0000
-Message-ID: <20260709155440.2132459-3-doebel@amazon.de>
-X-Mailer: git-send-email 2.50.1
+        d=gmail.com; s=20251104; t=1783614991; x=1784219791; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=XpHK7z6dsHMMY8QknSXEZPqq3A8a/T0iO7+AZZEhDvk=;
+        b=rQ6zC61fV7LeVAKVwVH9oG2GLeUbHYDTIP94zEfcNbV0ZSbLscsrapE+FtOAyokL49
+         vQD0VcRe3nfiSFMG/eWYbRk6DFMZK7ckZ62KWHUI0XTFxS2SxL7GMHh3jJKC1+6INCQ1
+         XUryu8rDCHgNOZk3sXemNeyh1+w0+sMHZZ4ribsblXP4LUroDqS3JLesSDL1voUZoUra
+         8NiAUIR5xVIW/aEajV0Hr21bQzErLNDqf0e7RTnTZ6kBQFJ3KAhpxTxHdghBNplMQny5
+         LX2k+HtUvgvIU0YRa8IaJEqKj7pkudn2gD3tl5nk3yhg8pN2r5dhXYuC9JkgCIUap6op
+         eE6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783614991; x=1784219791;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XpHK7z6dsHMMY8QknSXEZPqq3A8a/T0iO7+AZZEhDvk=;
+        b=Wqj5L7VM6EnfVcwz+2rD4mPD4dUUSVngPo6PKuzBnSbvHe/KAMezHAieMUArZzUQQ+
+         MYY+lQHGHIK9H8VrRwifZqsFtr4UKWo3kwdja43pAt+tMzBInHQaUpxiLCpBpRITpAu2
+         8ql9DQnhJOPgU2BKvNZWU4eJkWHba8RrFpz82QMYPvL5CHwrClm1MOFFYFn0zU/77Da3
+         ZxQtL1dGTFM55aN5l4Kj3PtVIk9PSM6Zv8Ay6Xa2t6KCBoi6QppsAHBXfuE2W5Op3aEN
+         +qO0QDCLhRbJmNY2ukpZoa9nB7qFiTwHP7cHIwyORCeNbOwZwDReSR8EB11fOHAvARlO
+         8ruA==
+X-Forwarded-Encrypted: i=1; AHgh+Rr5Bhm6tXOJblt6otW3CulxyYIRWh64ctOfeQjapMXIDdhnD5xNgLBhCgqsFwxQ8eWpmeWJBuP94tuD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yya+U3BF3VD0NeD3KxmhCAHxgH2lD/DWSXmXNpKrQmbFeFQ1kxI
+	OEYB3A6u0SIo7CAzJT1ys708ytlrAEtPEfX87QbEh1mNPZ406abgbaVU
+X-Gm-Gg: AfdE7clj/vYa1yCLJNcnm6tTc3aKzI70yiOAcsXLRwtBTlhZgLAiXTQ39vS8w9vgF0j
+	VBYebvBeOIMG+bJi6F+ZdewbZdtsX3JhmgN54sxAWke3nP46kAwzhzJPXqmf22HiUBJ5tq1GuqS
+	/DVTIUK5qnUWRYnOCgOpAfLHwPa5dT5iAUJ8P1XtFH8AJhKR7Do5f5yOkg4gQOvjTFw6dGY7F7V
+	UR0mgpq2XMOmspI9ejsBx9A6PuVpO9yi9kAt1wIk4MDD9lrp3mvBEeeDKmJIBBPSBIzvSutA/xM
+	F8GAyfw8ZxOCwUWkTOgwXurWQ1LvFs4m5ytC06EESvaLmCzo7l09SkdX79NGjgIvD1g66tXXPTT
+	krKn9Y6KZkVdlK54TuUwb79vhn6pQad2x3wno3g08IBK5Yr3FlLbJOBVf+pDr+sNSd6f5wbRdo5
+	ztGbBOQzUp+Gi/fxsTigJB9PtFkKal3TKP6A5eukJ9juCQ/Q==
+X-Received: by 2002:a05:600c:310f:b0:493:d1e0:a4f1 with SMTP id 5b1f17b1804b1-493e6c05de0mr72385005e9.0.1783614990763;
+        Thu, 09 Jul 2026 09:36:30 -0700 (PDT)
+Received: from pumpkin (host-92-21-50-228.as13285.net. [92.21.50.228])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493e5a5d174sm174062095e9.2.2026.07.09.09.36.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jul 2026 09:36:30 -0700 (PDT)
+Date: Thu, 9 Jul 2026 17:36:28 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: raoxu <raoxu@uniontech.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] smb: client: fix atime clamp check in read completion
+Message-ID: <20260709173628.22eeb7f7@pumpkin>
+In-Reply-To: <527C2DB5ABAE200F+20260707133017.1740557-1-raoxu@uniontech.com>
+References: <527C2DB5ABAE200F+20260707133017.1740557-1-raoxu@uniontech.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Norbert Manthey <nmanthey@amazon.de>
+On Tue,  7 Jul 2026 21:30:17 +0800
+raoxu <raoxu@uniontech.com> wrote:
 
-Set SB_I_NODEV on the superblock by default for CIFS mounts. This is
-consistent with how other filesystems handle untrusted remote content
-and prevents the server side from injecting device nodes on the client.
+> From: Xu Rao <raoxu@uniontech.com>
+> 
+> cifs_rreq_done() updates the inode atime to current_time(inode) after a
+> netfs read.  It then preserves the CIFS rule that atime should not be
+> older than mtime, because some applications break if atime is less than
+> mtime.  That rule only requires clamping when atime < mtime.
+> 
+> The current check uses the raw non-zero result of timespec64_compare().
+> It therefore takes the clamp path for both atime < mtime and
+> atime > mtime.  The latter is the normal case when reading an older file:
+> the newly recorded atime is newer than the file mtime.  The completion
+> handler then immediately moves atime back to mtime, losing the access
+> time that was just recorded.  Userspace tools that rely on atime, such as
+> stat, find -atime, backup tools or cold-data classifiers, can therefore
+> see a recently read CIFS file as not recently accessed.
+> 
+> This is easy to miss because the bug is silent: read I/O still succeeds,
+> no error is reported, and many systems either do not check atime after
+> reads or mount with policies such as relatime/noatime.  It becomes
+> visible when a CIFS file has an mtime older than the current time, the
+> file is read, and the local inode atime is inspected before a later
+> revalidation replaces the cached timestamps.
+> 
+> Clamp only when atime is actually older than mtime.  This matches the
+> same atime/mtime rule used when applying CIFS inode attributes.
+> 
+> Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Xu Rao <raoxu@uniontech.com>
+> ---
+>  fs/smb/client/file.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+> index 58430ba51b10..62605928d2b8 100644
+> --- a/fs/smb/client/file.c
+> +++ b/fs/smb/client/file.c
+> @@ -301,7 +301,7 @@ static void cifs_rreq_done(struct netfs_io_request *rreq)
+>  	/* we do not want atime to be less than mtime, it broke some apps */
+>  	atime = inode_set_atime_to_ts(inode, current_time(inode));
+>  	mtime = inode_get_mtime(inode);
+> -	if (timespec64_compare(&atime, &mtime))
+> +	if (timespec64_compare(&atime, &mtime) < 0)
+>  		inode_set_atime_to_ts(inode, inode_get_mtime(inode));
 
-Fixes: 2e4564b31b645 ("smb3: add support for stat of WSL reparse points for special file types")
-Signed-off-by: Norbert Manthey <nmanthey@amazon.de>
-Assisted-by: Kiro:claude-opus-4.6
-Cc: stable@vger.kernel.org
----
- fs/smb/client/cifsfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+Should that be calling inode_get_mtime() again?
+It seems to have the value cached.
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index ea4fc0fa68cac..35eee2f9899d5 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -208,6 +208,9 @@ cifs_read_super(struct super_block *sb)
- 	if (sbflags & CIFS_MOUNT_POSIXACL)
- 		sb->s_flags |= SB_POSIXACL;
- 
-+	/* Prevent device node opens from remote filesystem by default */
-+	sb->s_iflags |= SB_I_NODEV;
-+
- 	if (tcon->snapshot_time)
- 		sb->s_flags |= SB_RDONLY;
- 
--- 
-2.50.1
+	David
+
+>  }
+> 
+> --
+> 2.50.1
+> 
+> 
 
