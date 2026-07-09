@@ -1,34 +1,34 @@
 Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFE436DA0F
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 02:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C3A371868
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 02:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783565906; cv=none; b=qoeMVK8fuDPtixtfJEp7b18N0lftPItk9Ku79Yb/EaWfhw3ZfcFGlrRc/xjED6DUViQxaWQChjPinyLnxsR6PjTKg+98tY4bJWtvAYp9lbVQpYQ43ofCDFpQ1RWfF0wEQgSum/RcPX9psxYjU7o//zXkOLAWO620Lv8YsRs4ce4=
+	t=1783565909; cv=none; b=JgfLRSJWL7HKsTyvEYfsXLhqD7S/VFwvhK+cry8JCOj+1lWhqTOf82wOzaqipOW3ragUhAyxuHdbGwkeGezG9geo2SixfUZPFgAogxmnppVteXwakoYNaNesPTwjsNRjPykVx81uMLpwjpBRyMA3t7WSQcxfLvd9iVgZlVcrlIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783565906; c=relaxed/simple;
-	bh=EqzBKnvDJB3LmiI17p0uyFu3HMkeVKsXsqFjuQxkd6I=;
+	s=arc-20240116; t=1783565909; c=relaxed/simple;
+	bh=7ZBsPTnwyuC25yr17MI9pfb8NcpZ7wUJmd0zIAFYZec=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SxxdZdq2rxm14mPRAidZlCmR8D4SyhrghwFIw1WgE1/vYsUmzcrcgF+4mhu/FdJSunTBUSRuLX+cbHV5Kw/calLqr8Mv3c2cpkB2heuL3p5oNpPbLHqhB3NGz4yayM74JSJBCk9pEkqCLYW6pIJEQrLefShrohIrVE5chsvIBgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=U1riZi4o; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=QKbCxXUZyu2sHmDvu05thluoWosOM/ovSgGuFVvjbGHVv6D6mKWgZ2JquU7U9P/pDj4/9ZUaBO3uS3rdMjSstwJc176tDY2R00PoWNQfN6vAUAkrP587Wxxb330PFgYX34nW62oJA555iDZIkQGZlg7X+2DWvf1QNfSb1C1kyOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Xqom8OVu; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="U1riZi4o"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Xqom8OVu"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1783565902;
+	s=key1; t=1783565905;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=pvmrIc6Cp/uhWRYU9hjPXW0Rv9GIf3cH+rum9nWX38A=;
-	b=U1riZi4ooW5UhWM3N//A2sW37OjFmDRmCJVQ58gmSBuTfQ+gDdrpEnK1YmLVSryHzCs3bA
-	2VuFGszlR5RPZGwTtBXtGG3vn6hVwgSXiJnhXx09rgcSejf4Y76k0t/baltms0lfxXMQ+S
-	nJ0qfvQIT1NxkCcnjVRxYFXS47SbVnL7DYnc08Z/G45Ddm61OIiPEno6ZJk817jpsLabbp
-	VcGRPAaujyUhEIckiDlYeH5Aa19LgqWd9cRmHp00sSa2XCX5tHwnf6BRxbxK2PZu46QEci
-	1+lovYhF54Ybl3kp6oJ+Wx6XFWit/CUN7zB7LCXnwzmHx/s5oJ9Uue/yPzfazw==
+	bh=9jZAn5y7iORNr9urWvEn7gvNt2zWHHSKNEUNZgpxbQc=;
+	b=Xqom8OVuEZ+bQ7ygakDc7u5NRJOypkwFTv9Q7C9G+X+6kKGZQH/S0VttOIYq9iwAsGdyBD
+	IUCZF/d5ygxhj/eAoPnkyRJHaHQ7JSsYqD3N9VGZ6RRyxqNY/JgPl3C4Ny1oXOEsJkemVQ
+	2XH+7gmg5MSAJ2ky9w24cfiaYvEpyRAuMbBSZnoIeZHqUABrEQDIJa7tFHbljF0mwh3L7N
+	/bjpGsWgOo+4cf4gGlV6j3+Y7/fAglMzQPvvjhYYM4tqQwfEWefmGJMdX/9BlhuX2TQkkO
+	U+Sp2OSaH1uPeQAxFjx5trIrMfLXTkclAPnm2hbB++6Zh99VUwW7gkzpO58EHA==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v5 2/4] smb/client: pass cifs_open_info_data to SMB2_open()
-Date: Thu,  9 Jul 2026 10:57:01 +0800
-Message-ID: <20260709025703.3715326-3-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v5 3/4] smb/client: zero-initialize stack-allocated cifs_open_info_data
+Date: Thu,  9 Jul 2026 10:57:02 +0800
+Message-ID: <20260709025703.3715326-4-chenxiaosong@chenxiaosong.com>
 In-Reply-To: <20260709025703.3715326-1-chenxiaosong@chenxiaosong.com>
 References: <20260709025703.3715326-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
@@ -58,183 +58,55 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Let SMB2_open() fill the smb2_file_all_info embedded in cifs_open_info_data
-directly. This removes the temporary smb2_file_all_info copy in
-smb2_open_file().
+Stack-allocated cifs_open_info_data may contain random data.
+This can make some fields have wrong value if they are not set later.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/link.c      |  6 +++---
- fs/smb/client/smb2file.c  | 19 ++++++++-----------
- fs/smb/client/smb2pdu.c   | 25 +++++++++++++------------
- fs/smb/client/smb2proto.h |  2 +-
- 4 files changed, 25 insertions(+), 27 deletions(-)
+ fs/smb/client/link.c    | 2 +-
+ fs/smb/client/smb1ops.c | 2 +-
+ fs/smb/client/smb2ops.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index 0014523d6511..b60dc407815d 100644
+index b60dc407815d..8d5d6aca742a 100644
 --- a/fs/smb/client/link.c
 +++ b/fs/smb/client/link.c
-@@ -320,7 +320,7 @@ smb3_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+@@ -234,7 +234,7 @@ cifs_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+ 	struct cifs_open_parms oparms;
+ 	struct cifs_io_parms io_parms = {0};
  	int buf_type = CIFS_NO_BUFFER;
- 	__le16 *utf16_path;
- 	__u8 oplock = SMB2_OPLOCK_LEVEL_NONE;
--	struct smb2_file_all_info file_info = {};
-+	struct cifs_open_info_data data = {};
+-	struct cifs_open_info_data query_data;
++	struct cifs_open_info_data query_data = {};
  
  	oparms = (struct cifs_open_parms) {
  		.tcon = tcon,
-@@ -336,12 +336,12 @@ smb3_query_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
- 	if (utf16_path == NULL)
- 		return -ENOMEM;
- 
--	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, &file_info, NULL,
-+	rc = SMB2_open(xid, &oparms, utf16_path, &oplock, &data, NULL,
- 		       NULL, NULL);
- 	if (rc)
- 		goto qmf_out_open_fail;
- 
--	if (file_info.EndOfFile != cpu_to_le64(CIFS_MF_SYMLINK_FILE_SIZE)) {
-+	if (data.fi.EndOfFile != cpu_to_le64(CIFS_MF_SYMLINK_FILE_SIZE)) {
- 		/* it's not a symlink */
- 		rc = -ENOENT; /* Is there a better rc to return? */
- 		goto qmf_out;
-diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
-index 6860eff31693..5ef919bce52d 100644
---- a/fs/smb/client/smb2file.c
-+++ b/fs/smb/client/smb2file.c
-@@ -154,8 +154,6 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 	__le16 *smb2_path;
- 	__u8 smb2_oplock;
- 	struct cifs_open_info_data *data = buf;
--	struct smb2_file_all_info file_info = {};
--	struct smb2_file_all_info *smb2_data = data ? &file_info : NULL;
- 	struct kvec err_iov = {};
- 	int err_buftype = CIFS_NO_BUFFER;
- 	struct cifs_fid *fid = oparms->fid;
-@@ -182,14 +180,14 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 	}
- 	smb2_oplock = SMB2_OPLOCK_LEVEL_BATCH;
- 
--	rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL, &err_iov,
-+	rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, data, NULL, &err_iov,
- 		       &err_buftype);
- 	if (rc == -EACCES && retry_without_read_attributes) {
- 		free_rsp_buf(err_buftype, err_iov.iov_base);
- 		memset(&err_iov, 0, sizeof(err_iov));
- 		err_buftype = CIFS_NO_BUFFER;
- 		oparms->desired_access &= ~FILE_READ_ATTRIBUTES;
--		rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data, NULL, &err_iov,
-+		rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, data, NULL, &err_iov,
- 			       &err_buftype);
- 	}
- 	if (rc && data) {
-@@ -202,9 +200,9 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 							 oparms->path,
- 							 &data->symlink_target);
- 			if (!rc) {
--				memset(smb2_data, 0, sizeof(*smb2_data));
-+				memset(&data->fi, 0, sizeof(data->fi));
- 				oparms->create_options |= OPEN_REPARSE_POINT;
--				rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, smb2_data,
-+				rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, data,
- 					       NULL, NULL, NULL);
- 				oparms->create_options &= ~OPEN_REPARSE_POINT;
- 			}
-@@ -238,23 +236,22 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
- 		rc = 0;
- 	}
- 
--	if (smb2_data) {
-+	if (data) {
- 		/* if open response does not have IndexNumber field - get it */
--		if (smb2_data->IndexNumber == 0) {
-+		if (data->fi.IndexNumber == 0) {
- 			rc = SMB2_get_srv_num(xid, oparms->tcon,
- 				      fid->persistent_fid,
- 				      fid->volatile_fid,
--				      &smb2_data->IndexNumber);
-+				      &data->fi.IndexNumber);
- 			if (rc) {
- 				/*
- 				 * let get_inode_info disable server inode
- 				 * numbers
- 				 */
--				smb2_data->IndexNumber = 0;
-+				data->fi.IndexNumber = 0;
- 				rc = 0;
- 			}
- 		}
--		memcpy(&data->fi, smb2_data, sizeof(data->fi));
- 	}
- 
- 	*oplock = smb2_oplock;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index ec79acd328b4..5707d76a8647 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3287,7 +3287,7 @@ SMB2_open_free(struct smb_rqst *rqst)
- 
- int
- SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
--	  __u8 *oplock, struct smb2_file_all_info *buf,
-+	  __u8 *oplock, struct cifs_open_info_data *buf,
- 	  struct create_posix_rsp *posix,
- 	  struct kvec *err_iov, int *buftype)
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index d34b3d99f6ed..f72879af12c9 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -949,7 +949,7 @@ smb_set_file_info(struct inode *inode, const char *full_path,
+ 	struct cifs_open_parms oparms;
+ 	struct cifsFileInfo *open_file;
+ 	FILE_BASIC_INFO new_buf;
+-	struct cifs_open_info_data query_data;
++	struct cifs_open_info_data query_data = {};
+ 	__le64 write_time = buf->LastWriteTime;
+ 	struct cifsInodeInfo *cinode = CIFS_I(inode);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 1f5dc1d9897f..b6aadea6b780 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -5317,7 +5317,7 @@ int __cifs_sfu_make_node(unsigned int xid, struct inode *inode,
  {
-@@ -3302,6 +3302,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	int rc = 0;
- 	int flags = 0;
- 	int retries = 0, cur_sleep = 0;
-+	struct smb2_file_all_info *file_info = buf ? &buf->fi : NULL;
- 
- replay_again:
- 	/* reinitialize for possible replay */
-@@ -3370,21 +3371,21 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
- 	oparms->fid->mid = le64_to_cpu(rsp->hdr.MessageId);
- #endif /* CIFS_DEBUG2 */
- 
--	if (buf) {
--		buf->CreationTime = rsp->CreationTime;
--		buf->LastAccessTime = rsp->LastAccessTime;
--		buf->LastWriteTime = rsp->LastWriteTime;
--		buf->ChangeTime = rsp->ChangeTime;
--		buf->AllocationSize = rsp->AllocationSize;
--		buf->EndOfFile = rsp->EndofFile;
--		buf->Attributes = rsp->FileAttributes;
--		buf->NumberOfLinks = cpu_to_le32(1);
--		buf->DeletePending = 0; /* successful open = not delete pending */
-+	if (file_info) {
-+		file_info->CreationTime = rsp->CreationTime;
-+		file_info->LastAccessTime = rsp->LastAccessTime;
-+		file_info->LastWriteTime = rsp->LastWriteTime;
-+		file_info->ChangeTime = rsp->ChangeTime;
-+		file_info->AllocationSize = rsp->AllocationSize;
-+		file_info->EndOfFile = rsp->EndofFile;
-+		file_info->Attributes = rsp->FileAttributes;
-+		file_info->NumberOfLinks = cpu_to_le32(1);
-+		file_info->DeletePending = 0; /* successful open = not delete pending */
- 	}
- 
- 
- 	rc = smb2_parse_contexts(server, &rsp_iov, &oparms->fid->epoch,
--				 oparms->fid->lease_key, oplock, buf, posix);
-+				 oparms->fid->lease_key, oplock, file_info, posix);
- 
- 	trace_smb3_open_done(xid, rsp->PersistentFileId, tcon->tid, ses->Suid,
- 			     oparms->create_options, oparms->desired_access,
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 855d5c4637f0..11f22eea8900 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -139,7 +139,7 @@ int SMB2_tcon(const unsigned int xid, struct cifs_ses *ses, const char *tree,
- 	      struct cifs_tcon *tcon, const struct nls_table *cp);
- int SMB2_tdis(const unsigned int xid, struct cifs_tcon *tcon);
- int SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms,
--	      __le16 *path, __u8 *oplock, struct smb2_file_all_info *buf,
-+	      __le16 *path, __u8 *oplock, struct cifs_open_info_data *buf,
- 	      struct create_posix_rsp *posix, struct kvec *err_iov,
- 	      int *buftype);
- int SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 	struct TCP_Server_Info *server = tcon->ses->server;
+ 	struct cifs_open_parms oparms;
+-	struct cifs_open_info_data idata;
++	struct cifs_open_info_data idata = {};
+ 	struct cifs_io_parms io_parms = {};
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+ 	struct cifs_fid fid;
 -- 
 2.54.0
 
