@@ -1,150 +1,84 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2726E3F0AA2;
-	Thu,  9 Jul 2026 08:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FD937AA7A
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 09:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783585929; cv=none; b=HQU+JByDWN0ZUxM2hpFxjTTy6xy3UFRi3ocgG7VLL85N9qhmgKVz5IFKPCFAHx+o45DPAok/DSr8lbOPOMV1foCxZUykeSNYptFu+G90Vyie94bWmg9gVFEC2NtTJ8P0yvlAT7GccBKJs2FM1mFfRwnZfPT8pDEX2l8ULNaDRx8=
+	t=1783589125; cv=none; b=MFlRj9+eNDVwc8h3h6IFXd1L7YGSZZ0XIlxAgzfT44VSvcY9aHea+3d5Ry3U3qdWeP1t1lHcrupNRlm/3JsuJutXvXxOJYBw2h5899W3CL+UfJ7nRgr55yUXBtd67GOivYKPGKmB+R/W3HRnaodnqbBFbMQxJHXU2/7iQWIQuYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783585929; c=relaxed/simple;
-	bh=tesK+oxJqsB49auQK1mjbbrkVhdKYiJrkTlVS/W/lOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QUlGTkLU892zJ5Qa+yiQZDRttOPY2a1+3aqzbioimmj1xxIEFb/OWBK1+IDhbHj1iv1BELPevDC1MWUFpWXJ+8gpj2Ek1sItm1tr+KupLysW8IRdG3H83tf6KL2c5+IcUu9j4H5LVww1VDUjVwmTGic/XnmdAlScmrIe1nTEmB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aqOnfrwo; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1783589125; c=relaxed/simple;
+	bh=VWUIdim85fi1PxHXZ8qSGPX3/KnAWpQc+3g7sDv4lbY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dHR8ux/oLSZ6VP41EpsURAJ96Mdw8Drblsyb4mQ7m/VPTgZwyOj0et45doNZLV6Mpe9v8xXZoUo21CDcG5ePwVXySw5QKaNYaSjxBlLv1rid/MQXGYM6OSICUJaa6fDPMNCU1hMd9wwx4T/nU6unLTrVkGCJ60b5m1LN56x+fmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=POysK3Nj; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aqOnfrwo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1783585928; x=1815121928;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tesK+oxJqsB49auQK1mjbbrkVhdKYiJrkTlVS/W/lOU=;
-  b=aqOnfrwohYy6CTM21w0/xYpfju7bldEWmMf6w21+t4qqXOqOE4CQYOxT
-   mtCUZvh/AFq8A94AwTISTwKfI9iHSYgsMIDrG/9m77Zue8ztpIJg6dcKn
-   pNSeRVAnb7VHQwXVtBLt397GRbJIoky8Q5r66zJzUmii0MJGPlskUeat+
-   GzJIgEZ2XiYZekzgvV14D3wbuSxw7efEmLOlPkMerDYf7xsXVcd8fMrZ6
-   +Q9Uos46xhv/KA3yxY0agP5RssREnPhcVpviJQkFrG+huLVKtzhzQ+9e2
-   7PVrzzCfuXm2EeRyKHcevH0SUkD8fJtyxEUo4NrJwhIiSp6cVAGNS7K+P
-   g==;
-X-CSE-ConnectionGUID: S70fGcBKRVCq58yHvozo/g==
-X-CSE-MsgGUID: M+a8V2EeSFmcx3HSXaTIfw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="83373170"
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="83373170"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 01:32:07 -0700
-X-CSE-ConnectionGUID: EEXzGbqiQH+fSuwG0kIRwg==
-X-CSE-MsgGUID: Ubkrz2plSRGEjKFky/y1TA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="250537941"
-Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.235])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 01:31:57 -0700
-Date: Thu, 9 Jul 2026 11:31:55 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	mkalderon@marvell.com, zyjzyj2000@gmail.com, sagi@grimberg.me,
-	mgurtovoy@nvidia.com, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-	bvanassche@acm.org, kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
-	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
-	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
-	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, kees@kernel.org, michaelgur@nvidia.com,
-	edwards@nvidia.com, phaddad@nvidia.com, eadavis@qq.com,
-	yishaih@nvidia.com, kalesh-anakkur.purayil@broadcom.com,
-	clm@meta.com, ebadger@purestorage.com, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH v10 rdma-next] RDMA: Change capability fields in
- ib_device_attr from int to u32
-Message-ID: <ak9ce4PaJ5n89zW9@ashevche-desk.local>
-References: <20260709055211.2498307-1-ernis@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="POysK3Nj"
+Message-ID: <cb3e2376-88ae-4020-9417-ff925cadd8c0@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1783589119;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vbiupaFa+B4f6Tq91B+zMmpXr56BZs3WEo7EBAVnIjE=;
+	b=POysK3NjnUYFU9bR1GR4SlUxO66bPxJncCc/KFQWUuyMQwUbZZPGnu/vFSbtr6qWW/dbkL
+	jaD+ZPFfi8F8hFSLdSU8zBWEstgO5egU/eiLbbUacOpReOR2lS9wd6XWX7x2xzIL6laZ8T
+	/C2Ci/TrFODOX7XdrSFoCpJ83QmlO+j7PcrjD3DmA2LSbGGhVMuU+cnwBPWDvI6SgCaSpW
+	OU6MPWgk0q8rIBp5HMyDjmdlRLx2XiGCu2N1GrN8TERiqXRFF/L5+ru0TLLtcmYPrrSiVN
+	53kmUmA1GV/+8pULujnMHaXNy5eHbOKNQ1hukZ0F7OPt8ejIkpLS4s/tNT07BA==
+Date: Thu, 9 Jul 2026 17:24:47 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709055211.2498307-1-ernis@linux.microsoft.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Subject: Re: [PATCH v2 4/6] ksmbd: defer CHANGE_NOTIFY completion instead of
+ STATUS_NOT_IMPLEMENTED
+To: =?UTF-8?Q?Ga=C3=ABl_Blivet-Bailly?= <gael.blivet@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+References: <20260709000618.66534-1-g.blivet@me.com>
+ <20260709000618.66534-5-g.blivet@me.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260709000618.66534-5-g.blivet@me.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 08, 2026 at 10:51:29PM -0700, Erni Sri Satya Vennela wrote:
-> The capability counter fields in struct ib_device_attr are declared
-> as signed int, but these values are inherently non-negative. Drivers
-> maintain their cached caps as u32 and assign them directly into these
-> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
-> negative value visible to the IB core.
-> 
-> Change the signed int capability fields to u32 to match the
-> underlying nature of the data. Also update consumers across the IB
-> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
-> are not forced back through signed int or u8 via min()/min_t() or
-> narrowing local variables.
-> 
-> The nvmet-rdma consumer of max_srq clamps it against
-> ib_device.num_comp_vectors, which stays a signed int, so that site
-> uses min_t() instead of min() to handle the signed/unsigned mismatch.
+Hi Gaël and Namjae,
 
-Assuming the functionality is left untouched, from code perspective LGTM,
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Do you think it would be better to send STATUS_CANCELLED in smb2_notify()?
 
-...
-
->  int ipoib_cm_dev_init(struct net_device *dev)
->  {
->  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
-> -	int max_srq_sge, i;
-> +	u32 max_srq_sge;
-> +	int i;
->  	u8 addr;
-
-This can keep the reversed xmas tree ordering.
-
-...
-
->  static int srq_size_set(const char *val, const struct kernel_param *kp)
->  {
-> -	int n = 0, ret;
-> +	unsigned int n;
-> +	int ret;
->  
-> -	ret = kstrtoint(val, 10, &n);
-> +	ret = kstrtouint(val, 10, &n);
->  	if (ret != 0 || n < 256)
->  		return -EINVAL;
-
-Side note (perhaps another patch?)
-
-	ret = kstrtouint(val, 10, &n);
-	if (ret)
-		return ret;
-	if (n < 256)
-		return -ERANGE,
-
-> -	return param_set_int(val, kp);
-> +	return param_set_uint(val, kp);
->  }
-
-...
-
-Have you considered also replacing min_not_zero() or do some refactoring
-around there?
+On 7/9/26 08:06, Gaël Blivet-Bailly wrote:
+> +static void smb2_notify_cancel_deferred(struct work_struct *w)
+> +{
+> +	struct notify_cancel_ctx *ctx =
+> +		container_of(w, struct notify_cancel_ctx, work);
+> +	struct ksmbd_work *in_work = ctx->in_work;
+> +	struct smb2_hdr *in_hdr;
+> +
+> +	in_hdr = smb_get_msg(in_work->response_buf);
+> +	in_hdr->Status = STATUS_CANCELLED;
+> +	ksmbd_conn_write(in_work);
+> +	ksmbd_free_work_struct(in_work);
+> +	kfree(ctx);
+> +}
+> +
+> +static void smb2_notify_cancel_fn(void **argv)
+> +{
+> +	...
+> +	INIT_WORK(&ctx->work, smb2_notify_cancel_deferred);
+> +	schedule_work(&ctx->work);
+> +}
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
