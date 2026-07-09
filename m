@@ -1,108 +1,155 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from sender-op-o17.zoho.eu (sender-op-o17.zoho.eu [136.143.169.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B492673AA
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602964; cv=none; b=oeJ1LMTfiqy8jTanT8OFrAv/GlacCIECddgqFuoP0c49iCKK8vvVVdUMQLANFyVuN4mpEQgTwvrs9tsXaBDoaxj5CRBC5xOgAZ4ZX9y4/z1npdMEfKic5Ogib33fkNDcaSvZGmWXehl/4sWoLOHAjT4HMRoaLImecWBO/epFu5c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602964; c=relaxed/simple;
-	bh=S9oCMvrdgwloIYiOwCw8xw5ICTYkdd7OBlqGZA/ewvM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TJZ0gX3D2mD+67ek54ox3litwFu/MqSIvivGcFdMx52ajH6UYdC/mpN8Zi2BoNozZ6XznJfOxgjz+B/rPr0S39fU2dIlqYjjJtxETkXB1aQj6187mPaiDZ4FITYqHDjAqLfn9vPg4r8jtDR/bVeruB99TEytZl7DO4npqPMnS1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1ViObND; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88777303A37;
+	Thu,  9 Jul 2026 15:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.169.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783609555; cv=pass; b=ATKDbsfIWYEv00XILpqkz0u5tLMtYeeZA0bivrpO+G6cgEFrB+X787R5v0UYKDFAKYqIVAOwjqVhghr2ph1xymhYHeddPrV0T6dkMUdN0lQ4vU7dt4hArUfbAi/y0riY9EDh6YBPMN7/pioSRNp/sByAmWVdyGUWqq7jDiH+8RU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783609555; c=relaxed/simple;
+	bh=lW5w4rJ6lJfUVdUKIE3nxgsB1rp02op0xBZtBbQFAf8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qR/9ZUknuAqcrROvtNj7RtezRj9NaL/gaHkSS/JdwwSbbZDagCnqVE0kofg1dVCXHTYPta07kbC4JSC0hJkPX3u8EDeFtrqS/20tZ0MjJWq7fRRKX1Z/T9fSDTUsytivKPLWZehiZKVGLSfUVliaW6EnIym99Snn3LSs7uvrAy4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai; spf=pass smtp.mailfrom=auditcode.ai; dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b=rfji3g6V; arc=pass smtp.client-ip=136.143.169.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=auditcode.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auditcode.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1ViObND"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C7FA1F000E9
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:16:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783602963;
-	bh=H67r6m6M5Q9uRHI47lh4R/IR8ERu9h2FLP3XKD+lXOs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Q1ViObNDIuCq6mVhZwJzg/6S4UKFuXBkYMJ1OpStb0glWdINIjLuhAvtfM0ZWe+jh
-	 pjbmt2Ynof5skeoVllamkrCcvFrg+VNyTBvoxy2TtK4pUFxDjsd/0CT5zLd+WPneFw
-	 Re9P7EicYVyAmP5LEgyuC1TE1Ji5t7DXKBG5e8zaW86afEinFG04REoMBuwPQ8yGX2
-	 Hx36JZJjtquI//GVKBmtSdhw8PBvRE56TDk1vVzxyBLO0BYTBNGbwfwpiBgC6T9JIX
-	 DAFsg/whJxjXCT/HXHWCZp/dvoj0GWkQH7lQQ9e5R23YgSg9IMpsqpRk1t490kFQxD
-	 MVOlAQV4iZo2A==
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6983d3dae7aso1490350a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:16:03 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwgnEi3jDBemRBW6/ZEBlo+K4Fz6FaX2rxMxb2TRpq0qy7HFaR4
-	UyD1pqyFZa6ZMKtl34QY2/7s4BdozZcfSK/3n/GmpaRvInI66+cgLcxJrf46yF+VWFWS2NtcVDt
-	U8ANUOfWJrWCiyB93b7ck4FRmnDJ0UFg=
-X-Received: by 2002:a17:907:8997:b0:c12:6389:9085 with SMTP id
- a640c23a62f3a-c15e741480emr132107466b.6.1783602961861; Thu, 09 Jul 2026
- 06:16:01 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=auditcode.ai header.i=security@auditcode.ai header.b="rfji3g6V"
+ARC-Seal: i=1; a=rsa-sha256; t=1783609538; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=S0b7rZSJ+Jlt4tDf9s8BoSFiHnx4sKNXWp5mvLB/GXIn1TJVzOyRYg5unGXPgjc6FfX38gOeJOtCevKaG1uJ27dl73troFk0ZFhFEkP7ScBg0xRjEtwaZfwZ13lKgQPY6byC69YKwnTqyxrSC/f+b/NUjPFV14ti280OuVgKFx8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1783609538; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=EXmsW/RhYhGtF833Y5co0f1Tuuz3iA9wVlDONP/0ExM=; 
+	b=f1jCib59yeDC9Y1KxRN512AoJmWJHWqV2a0MqPvEryPLBs6hXWBQu0zUw53kracK3m879xDL3J+ia7u3vJeXdv71NDLfHctSqDvYIvd4cT4oEBWkMg1UiUUIBB3eIRdZrUs9+I0z5Nfc7TwqWx8k0zfGOJT4IdTkbUulYctV35Y=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=auditcode.ai;
+	spf=pass  smtp.mailfrom=security@auditcode.ai;
+	dmarc=pass header.from=<security@auditcode.ai>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783609538;
+	s=zmail; d=auditcode.ai; i=security@auditcode.ai;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=EXmsW/RhYhGtF833Y5co0f1Tuuz3iA9wVlDONP/0ExM=;
+	b=rfji3g6VLjbqn9Nf+KYThCJhm0JhbijYXr5GTKI4WH1BHkwUee5VzoEtAVU7Lz0i
+	jUWDqErhwspme/K55RfxG7UkOBXTLBfQkZtE+FGGacAPKlZIqOVFzQoPMpYVGlWNNco
+	YYvLqhZYGZhoP/m8h5Gi6DURwZEFik3ofqmmNUdE=
+Received: by mx.zoho.eu with SMTPS id 1783609535703103.42874894345334;
+	Thu, 9 Jul 2026 17:05:35 +0200 (CEST)
+From: Ibrahim Hashimov <security@auditcode.ai>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fix integer overflow in set_file_allocation_info()
+Date: Thu,  9 Jul 2026 17:05:30 +0200
+Message-ID: <20260709150530.44979-1-security@auditcode.ai>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709000618.66534-1-g.blivet@me.com>
-In-Reply-To: <20260709000618.66534-1-g.blivet@me.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 9 Jul 2026 22:15:48 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-+wT6db2vAQZsrdcDep=RVbF8oKhzC9f5mEfo+THPzOg@mail.gmail.com>
-X-Gm-Features: AUfX_myqi7V3-Ot7IPkgMbnj84Ezo2j7k5cK9l_JXqv7vUqcQKlVjZROIh13y-A
-Message-ID: <CAKYAXd-+wT6db2vAQZsrdcDep=RVbF8oKhzC9f5mEfo+THPzOg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/6] ksmbd: add macOS Time Machine / AAPL SMB2
- extension support
-To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
-Cc: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Thu, Jul 9, 2026 at 9:07=E2=80=AFAM Ga=C3=ABl Blivet-Bailly <gael.blivet=
-@gmail.com> wrote:
->
-> From: Gael Blivet <gael.blivet@gmail.com>
->
-> Link to v1:
-> https://lore.kernel.org/linux-cifs/20260707100129.47563-1-g.blivet@me.com=
-/
->
-> v2 addresses the CHANGE_NOTIFY CANCEL concern raised on v1:
-> smb2_cancel() calls each async request's cancel_fn() while holding
-> conn->request_lock, so cancel_fn must not sleep. Patch 4 now splits
-> this into inline lock-protected list/state manipulation (matching
-> every other cancel_fn in this file) plus a workqueue-deferred send of
-> the actual STATUS_CANCELLED response, which is the one part that
-> sleeps.
->
-> Separately: the corresponding ksmbd-tools userspace patch (aapl_model
-> field, "time machine"/"aapl model" config options) has been sent to
-> that project directly, since it's a different repository from this
-> kernel series.
->
-> New since v1: patch 6, AAPL READDIR_ATTR V2 support -- real macOS
-> clients negotiate V2 over V1 when both are offered, so v1-only left a
-> gap for current macOS versions.
->
-> Also new: patches 1, 3, and 6 are now additionally cross-checked
-> against Apple's published SMBClient kernel source
-> (apple-oss-distributions/SMBClient, smb_smb_2.c) -- everything matched
-> the network-derived understanding v1 was built on, except one
-> inaccurate assumption in patch 3, now corrected.
->
-> Patch 5 also gets a correctness fix: the synthesized ChunkCount=3D0
-> full-copy response was reporting ChunksWritten=3D1/ChunkBytesWritten=3D
-> <file size>, describing a chunk the client never actually sent (it
-> sent zero). Now reports 0/0, matching what's actually been validated
-> against a real client; only TotalBytesWritten carries a value.
->
-> Patches 1-4 are otherwise unchanged in substance from v1, re-derived
-> against the current tree (this branch has moved since v1).
->
-> Gael Blivet (6):
->   ksmbd: add Apple AAPL kAAPL_SERVER_QUERY create context support
->   ksmbd: synthesize empty AFP_AfpInfo xattr on first probe
->   ksmbd: send inline FinderInfo in FIND responses when READDIR_ATTR
->     negotiated
->   ksmbd: defer CHANGE_NOTIFY completion instead of
->     STATUS_NOT_IMPLEMENTED
->   ksmbd: implement full-file copy for AAPL ChunkCount=3D0 COPYCHUNK
->   ksmbd: add AAPL READDIR_ATTR V2 support
-Applied them to #ksmbd-for-next-next.
-Thanks!
+set_file_allocation_info() converts the client-supplied
+FILE_ALLOCATION_INFORMATION::AllocationSize into a 512-byte block
+count with:
+
+	alloc_blks = (le64_to_cpu(file_alloc_info->AllocationSize) + 511) >> 9;
+
+AllocationSize is a fully client-controlled __le64 field; the only
+validation performed by the caller (smb2_set_info_file(), case
+FILE_ALLOCATION_INFORMATION) is that the fixed buffer is at least
+sizeof(struct smb2_file_alloc_info) == 8 bytes. The value itself is
+never range-checked before this arithmetic.
+
+When AllocationSize is close to U64_MAX (e.g. 0xffffffffffffffff),
+"AllocationSize + 511" wraps around mod 2^64 to a small number
+(0xffffffffffffffff + 511 = 510), so alloc_blks becomes 0. Since any
+existing regular file has stat.blocks > 0, the function then takes
+the "shrink" branch and calls:
+
+	ksmbd_vfs_truncate(work, fp, alloc_blks * 512);   /* == 0 */
+
+silently truncating the file to size 0, even though the client asked
+to grow the allocation to (what looks like) the maximum possible
+size. The trailing "if (size < alloc_blks * 512) i_size_write(inode,
+size);" restore is guarded by a comparison that is never true once
+alloc_blks == 0, so the truncation is not undone. This lets an
+authenticated SMB client that already holds an open handle with
+FILE_WRITE_DATA on a file silently truncate that same file to size 0
+via a single crafted SET_INFO(FILE_ALLOCATION_INFORMATION) request
+advertising a near-U64_MAX AllocationSize, even though the request
+asks to grow the file's allocation rather than shrink it. This is a
+functional/data-loss bug, not a privilege-boundary
+violation: the same client could already truncate the file via
+FILE_END_OF_FILE_INFORMATION or a plain write.
+
+Fix it by validating AllocationSize against MAX_LFS_FILESIZE, the
+same upper bound the VFS itself uses to reject unrepresentable file
+sizes, before doing the "+511" rounding, and rejecting oversized
+values with -EINVAL. Bounding AllocationSize to
+MAX_LFS_FILESIZE - 511 guarantees the "+511" addition cannot wrap,
+and that the subsequent "alloc_blks * 512" values passed to
+vfs_fallocate() and ksmbd_vfs_truncate() stay within a representable
+loff_t as well.
+
+No legitimate SMB client asks for an allocation size anywhere near
+2^64 bytes, so this only rejects a value that was previously
+silently misinterpreted as zero.
+
+Runtime-verified on a v6.19 KASAN test stand: sending SET_INFO
+(FILE_ALLOCATION_INFORMATION) with AllocationSize = 0xffffffffffffffff
+against ksmbd now returns -EINVAL and leaves the target file's size
+unchanged, where the unpatched kernel truncated it from 4096 to 0
+bytes.
+
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ibrahim Hashimov <security@auditcode.ai>
+Assisted-by: AuditCode-AI:2026.07
+---
+ fs/smb/server/smb2pdu.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 097f51fc7ed6..324916533669 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6690,6 +6690,7 @@ static int set_file_allocation_info(struct ksmbd_work *work,
+ 	 */
+ 
+ 	loff_t alloc_blks;
++	u64 alloc_size;
+ 	struct inode *inode;
+ 	struct kstat stat;
+ 	int rc;
+@@ -6705,7 +6706,19 @@ static int set_file_allocation_info(struct ksmbd_work *work,
+ 	if (rc)
+ 		return rc;
+ 
+-	alloc_blks = (le64_to_cpu(file_alloc_info->AllocationSize) + 511) >> 9;
++	/*
++	 * AllocationSize is fully client-controlled (the caller only
++	 * validates the fixed 8-byte buffer length). Reject values that
++	 * would overflow the "round up to 512-byte blocks" conversion
++	 * below instead of silently wrapping it to a tiny block count,
++	 * which would truncate the file to a size the client never
++	 * asked for.
++	 */
++	alloc_size = le64_to_cpu(file_alloc_info->AllocationSize);
++	if (alloc_size > MAX_LFS_FILESIZE - 511)
++		return -EINVAL;
++
++	alloc_blks = (alloc_size + 511) >> 9;
+ 	inode = file_inode(fp->filp);
+ 
+ 	if (alloc_blks > stat.blocks) {
+-- 
+2.50.1 (Apple Git-155)
+
