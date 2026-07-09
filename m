@@ -1,93 +1,150 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04AC3DC850
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 07:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2726E3F0AA2;
+	Thu,  9 Jul 2026 08:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783580665; cv=none; b=thbWS11om0do9iekTPyL9Qj60Wl8JJ+DOVzXI/iN4FxQpwO97dG4f7uK5frq1/URn9p4zcgCOo+7VemWHmI2RYUqHjxSdWgkKqwU3NLiHRWrms2ScoW4jK1WgzrCynu1O2W6J/Sahcs2kT4gBXtYEeRunZNR1vktB+tNQnsjWBg=
+	t=1783585929; cv=none; b=HQU+JByDWN0ZUxM2hpFxjTTy6xy3UFRi3ocgG7VLL85N9qhmgKVz5IFKPCFAHx+o45DPAok/DSr8lbOPOMV1foCxZUykeSNYptFu+G90Vyie94bWmg9gVFEC2NtTJ8P0yvlAT7GccBKJs2FM1mFfRwnZfPT8pDEX2l8ULNaDRx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783580665; c=relaxed/simple;
-	bh=0qaGup6mrcRK8QafA2Ie4DTDq+qi2iiyp8otUT5uIRk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q71ferJkG3jmjMJl5tVd6rVzYpfua6YIDSbX/kZ3VEgM4QTCz6VOoZxXW9MXzID96svxij9EQ1Q8FFF5aWr/rCF7bXyTN0gOLttwDjjde/++7OLql0hyziPRSPygXgCINSnjwOVd97JJHnqKxJOypPBvf6VUNhF75lpwMJ4abK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=hY9dlgvT; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1783585929; c=relaxed/simple;
+	bh=tesK+oxJqsB49auQK1mjbbrkVhdKYiJrkTlVS/W/lOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QUlGTkLU892zJ5Qa+yiQZDRttOPY2a1+3aqzbioimmj1xxIEFb/OWBK1+IDhbHj1iv1BELPevDC1MWUFpWXJ+8gpj2Ek1sItm1tr+KupLysW8IRdG3H83tf6KL2c5+IcUu9j4H5LVww1VDUjVwmTGic/XnmdAlScmrIe1nTEmB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aqOnfrwo; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="hY9dlgvT"
-Message-ID: <276aedb5-dc9c-42f6-8e49-4dde6e253761@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1783580659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m7BFnfQKj7FoY4xCNO7X//r/R80GQPbVo/u4kdcamCE=;
-	b=hY9dlgvT3h9D8eG7ZuqchUjd2EizBKIqmN8Nus9oh+Ro822Ns0fjCbabQepwVxhoULn2yQ
-	q2b/DgYtvJhcbuBxSmTRw69AeEX+JVK+HKLkqpYh5LOk9VPlTGLTAxf/GhTXvhCNDd4XbC
-	UkHMuCYAayNAtjUyyVgd8vb+6Lid54p1cre0f/QM0aV5DnlIdRAOu9FtCufe96kvZvGmL6
-	JFZeccQJR0757Vlh29k/Gefrfk4l2nk5Ny4Tq9BLjtrNEidJQZMH+y1wHi/ZVvhJLkdiFC
-	X1PsnbEly1kBifxFM4URYhggUsyp5ktrY4Yr2LSGQZ65LEbLpVaKFrOAF38+Nw==
-Date: Thu, 9 Jul 2026 15:03:27 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aqOnfrwo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1783585928; x=1815121928;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tesK+oxJqsB49auQK1mjbbrkVhdKYiJrkTlVS/W/lOU=;
+  b=aqOnfrwohYy6CTM21w0/xYpfju7bldEWmMf6w21+t4qqXOqOE4CQYOxT
+   mtCUZvh/AFq8A94AwTISTwKfI9iHSYgsMIDrG/9m77Zue8ztpIJg6dcKn
+   pNSeRVAnb7VHQwXVtBLt397GRbJIoky8Q5r66zJzUmii0MJGPlskUeat+
+   GzJIgEZ2XiYZekzgvV14D3wbuSxw7efEmLOlPkMerDYf7xsXVcd8fMrZ6
+   +Q9Uos46xhv/KA3yxY0agP5RssREnPhcVpviJQkFrG+huLVKtzhzQ+9e2
+   7PVrzzCfuXm2EeRyKHcevH0SUkD8fJtyxEUo4NrJwhIiSp6cVAGNS7K+P
+   g==;
+X-CSE-ConnectionGUID: S70fGcBKRVCq58yHvozo/g==
+X-CSE-MsgGUID: M+a8V2EeSFmcx3HSXaTIfw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="83373170"
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="83373170"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 01:32:07 -0700
+X-CSE-ConnectionGUID: EEXzGbqiQH+fSuwG0kIRwg==
+X-CSE-MsgGUID: Ubkrz2plSRGEjKFky/y1TA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="250537941"
+Received: from ettammin-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.235])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2026 01:31:57 -0700
+Date: Thu, 9 Jul 2026 11:31:55 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	mkalderon@marvell.com, zyjzyj2000@gmail.com, sagi@grimberg.me,
+	mgurtovoy@nvidia.com, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
+	bvanassche@acm.org, kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
+	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
+	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
+	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
+	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, kees@kernel.org, michaelgur@nvidia.com,
+	edwards@nvidia.com, phaddad@nvidia.com, eadavis@qq.com,
+	yishaih@nvidia.com, kalesh-anakkur.purayil@broadcom.com,
+	clm@meta.com, ebadger@purestorage.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v10 rdma-next] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <ak9ce4PaJ5n89zW9@ashevche-desk.local>
+References: <20260709055211.2498307-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 4/6] ksmbd: defer CHANGE_NOTIFY completion instead of
- STATUS_NOT_IMPLEMENTED
-To: =?UTF-8?Q?Ga=C3=ABl_Blivet-Bailly?= <gael.blivet@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org
-References: <20260709000618.66534-1-g.blivet@me.com>
- <20260709000618.66534-5-g.blivet@me.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260709000618.66534-5-g.blivet@me.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709055211.2498307-1-ernis@linux.microsoft.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-It looks like this patch from Gaël has already implemented notify 
-pending and cancel support. I will rebase on this patch.
+On Wed, Jul 08, 2026 at 10:51:29PM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
+> 
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
+> 
+> The nvmet-rdma consumer of max_srq clamps it against
+> ib_device.num_comp_vectors, which stays a signed int, so that site
+> uses min_t() instead of min() to handle the signed/unsigned mismatch.
 
-I will send the remaining ksmbd notify patches soon.
+Assuming the functionality is left untouched, from code perspective LGTM,
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-On 7/9/26 08:06, Gaël Blivet-Bailly wrote:
-> From: Gael Blivet<gael.blivet@gmail.com>
-> 
-> smb2_notify() currently returns STATUS_NOT_IMPLEMENTED synchronously
-> for every CHANGE_NOTIFY request. Genuine SMB2 servers never complete a
-> CHANGE_NOTIFY spontaneously -- it's satisfied only by a real directory
-> change or with STATUS_NOTIFY_CLEANUP when the watched handle is
-> closed. macOS smbfs.kext depends on this deferred-completion contract:
-> receiving STATUS_NOT_IMPLEMENTED instead makes it hard-freeze on
-> unmount, since it never sees the cleanup it's waiting for.
-> 
-> Add a notify_pendings list on struct ksmbd_file (protected by the
-> existing f_lock) and a notify_entry list_head on struct ksmbd_work to
-> link onto it. smb2_notify() now replies STATUS_PENDING immediately and
-> queues a deferred STATUS_NOTIFY_CLEANUP response on the watched
-> handle; __ksmbd_close_fd() drains and sends any pending notifications
-> when the handle is actually closed. The drain splices the list out
-> under fp->f_lock first, then processes the detached copy without the
-> lock -- smb2_notify() on another connection can be adding to the same
-> list at the same time a close happens on this one, and
-> ksmbd_conn_write() can sleep (it takes the connection's write mutex),
-> so it must not be called while the spinlock is held.
-> 
-> Also handle the FileId=FFFF...FFFF share-root sentinel that macOS
-> backupd sends to watch for changes without holding an open handle --
-> without an immediate STATUS_PENDING/STATUS_NOTIFY_CLEANUP reply here,
-> backupd aborts Time Machine setup with STATUS_FILE_CLOSED.
-> 
-> Signed-off-by: Gael Blivet<gael.blivet@gmail.com>
+...
+
+>  int ipoib_cm_dev_init(struct net_device *dev)
+>  {
+>  	struct ipoib_dev_priv *priv = ipoib_priv(dev);
+> -	int max_srq_sge, i;
+> +	u32 max_srq_sge;
+> +	int i;
+>  	u8 addr;
+
+This can keep the reversed xmas tree ordering.
+
+...
+
+>  static int srq_size_set(const char *val, const struct kernel_param *kp)
+>  {
+> -	int n = 0, ret;
+> +	unsigned int n;
+> +	int ret;
+>  
+> -	ret = kstrtoint(val, 10, &n);
+> +	ret = kstrtouint(val, 10, &n);
+>  	if (ret != 0 || n < 256)
+>  		return -EINVAL;
+
+Side note (perhaps another patch?)
+
+	ret = kstrtouint(val, 10, &n);
+	if (ret)
+		return ret;
+	if (n < 256)
+		return -ERANGE,
+
+> -	return param_set_int(val, kp);
+> +	return param_set_uint(val, kp);
+>  }
+
+...
+
+Have you considered also replacing min_not_zero() or do some refactoring
+around there?
 
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+With Best Regards,
+Andy Shevchenko
+
 
