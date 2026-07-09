@@ -1,165 +1,154 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72A7346AD5
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 22:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9362D26E71F
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 23:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783635354; cv=pass; b=Xtd+JrG4WArdUO9h2oZ/vXtHwsOm1Horo07DqF6NNkox+PzEvXwDqEllxOjizo5EvpAIkpwBv+ACn+Cmul1N8E+XzHln2cHKPqrDQGZryQlT0voC6EjdTJJUjXQqMP9PSEQirVVOcT5oA8ewlnuqgDn2hbUs9UoIrri1kUuG6e4=
+	t=1783639689; cv=pass; b=WOUXUI7n6hrznfdiPH3z1IrI1BEM5vryyELKMGae7ICuB/c+m4HcKvFMOjHvMioAg/Bq1qbkxCZJXlhx0N2JZ5B1iQbMvhhvOqky558WFcx1jdKBazdUTzkZz/9Lu3SgFE8oJAjqJH9FJbLZpNYchqgxuAABSNX2yyxwBWZsaa8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783635354; c=relaxed/simple;
-	bh=jWjYzkNsjJZH5yGWvGBiZ+VdzbjgCvhdfeVBWM3yb1c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dtffKb6TIKZa0tlUXrO5yJzJ1UTYRXRLKUTEeabvMjU+ofeKn+Lr344e/wiHsmBby8eCvSH8+IChy2vEgyVGjIx/I98LTJ13hmPZ1ApVQEoSHotZai9R8EeXXxg3jT5b1fkX38zq85DTwBjiCI+9gGmpqQQ6yp7hPXWaJ6sWFG8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WRZO5o6B; arc=pass smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1783639689; c=relaxed/simple;
+	bh=DMxQSJOfZvRUQV4rNAFKsDLNaBqTmLDuQVWoPgiaqP0=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=gXOWKtmVM/ZmkZcJWRggwAWd0mvgB70H7YQ22VZ3gl6whVP0Ey2/961kpGHy462e5DHxgkHSci6gUQvOR1qbsZNbiVCm6PnyquPT1wqyUvXR/Yb+vGxivBm0On/g3/mTZzWT8VjFl4srnNUW9Ljg0q7tDmkWZQj300hme2iCtPU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhCXC96h; arc=pass smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRZO5o6B"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8ff88549786so3329396d6.3
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 15:15:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783635352; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhCXC96h"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8eeb4508f29so3333226d6.0
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 16:28:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783639686; cv=none;
         d=google.com; s=arc-20260327;
-        b=VFnb+VTL+ZctVjNzdLVttnY80uP/YHfXHcyN/sl/TpjwTMLcX/2RZO0ZFS+3gghFH/
-         1dPVlGbYsSgJD1V4dfyrHtB5dA1vPliqc3SjIaDqZaVK3XSBGt17rUhlI5jKtjGWSTqn
-         X91uW6c9ubY+Eq0LkIdUl1by1fz6X2WMMa9KtCJMQa/SIffyyTyyibbfMyLOcnRxUeLc
-         gBJ81tbIweSKr2wUb+bgn4GVvB5gyqte013nwXSoOVv8ioty0wRy7gpnjOqHTc/VD4zh
-         uxlojyTkUfucCYrAR5DmGXifvHVU3T1WhbYbSoqoOZDQ5iZ9xSEkZB4fiYsV6KjOUNd5
-         GPkg==
+        b=eyxT26/WxKCLuHay+VwTiqQ+bMKO4meGs9SC/JaF7Zgm2OWcODXOeF+EVmHetOyQWD
+         9eQJ2oHA3XC8sKK16TjPM8bwXfrWH2u5Tu1sIWZe56XUmbRQkVKZjYBtegqiKcuczcmj
+         8spDcOGdzSFFHGBPcko2gokput4zP6CyXXsB6zfbIfZJj7Xn62KHkZcheNAW+fvnUKIX
+         X8c9y1eOWaJQL8xdNORheUqGcEs8VX0VwS+lAbUTWj3k5cCeNW0dC8XT9RTvH98tvv4g
+         tBXZqDZwZpSLd+awLx+EC9vppQuh9pBQrpl6LClYyRIoBY4NLt5MpvAFa8ZslkrNHrZI
+         xsQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=/DCoOGjB3t2yqI8PL2v0s5UjSbFRMsQqTYSs+Ahyr1M=;
-        fh=cJF4VuGbtb+1JhIyDy1lyJgaBun+of5wByR4/2lUwm8=;
-        b=Tk4ScBRcDnJArKTbBANBqLVNaqJd4BbZ0bhC/dHLrZrFzFZYPrJk5RMesbr/iQeW+y
-         QNyBUOGQdEgikOC2Ksh4PaiWvLzx9P5deRgQe6OPomv1ZGIcW0Fkzsn60gx0rfLYl0Io
-         SKK/rajLlvxCvcWJ5NhjOvM0NW0waAFxs+jXLpRjn/uU1ytYgksM8jRuC5YDGMcenk8H
-         ZmSDICutsyacTk4Pi+rzOy/M97m/iyshthQ6TtttU0IWSKqNiV7cg+7TcGsJwQae0uoo
-         1zYUlQGP2tEKcTfe8+DPyJ7OJK968tyei6dQcqD3bUJVU5zp4igL9xDqzWVhE+YtXrs9
-         E8xw==;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=8kNlCR9tmsOWmOq+doWWUrLta1QpUzmaAQPYdfT7rAE=;
+        fh=TJL+rVN8QRfVv8fdH57A5I9Enf5FIGg1hnib5S2Ddu0=;
+        b=LI5AolM3DPs8bpRC7TLTw9YyuS1QyqVLmkQ6coD0Ed4fB10urjVdSrh6Ipuwxy/Lm6
+         0vgc/zZMNfQFQn1NfhNMOooeANPKjpYgbadRTGDlqPqC7nUtjpB8M6ZIFJfHHo7Qlkpn
+         FDj7Kwm/vXMQtAKMVqd8NeOJy/IwvL9rMpIzOi+G2sIS50LzvjkOVFcF6BGOhySonp45
+         Y74nVteat/C57X2MJlbTgOqPbrIJPIO8PUKii6OFzjloDefBc6+FVZb+VS4jN8IoFOi3
+         neOZAt00yK01sqfbWphNFNsPT0tkfk740ebcJ3oive9s3/GtG4SO4R54rS9gdlMazmrg
+         cc/Q==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783635352; x=1784240152; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=/DCoOGjB3t2yqI8PL2v0s5UjSbFRMsQqTYSs+Ahyr1M=;
-        b=WRZO5o6BySSdSS+OUVab5zEBMfpdLUFH6XELkOsYBvkNAdctvOlxatdqVsYsXBB3Yw
-         Wgy/wKCnMOQdO1OvURaNezwAmhXYLa01JgdafwxDN5izAiXK+Zfvva4Nw4Nnct5gHGZT
-         wowHvIuUQGqafaVxEbcW3Awwa2dv3JDppX82qB9+uZU4ap7Y9Je0GGp9gulM4wQiE//y
-         Io/4VGng39XDWOgj2oO5NuNpbHbcYil6fflukPMMhhAOrEkWNKVdZy51n1KQ66USbd17
-         fDUv33H2QFkNH6TR7fVsa/sjFw5/TyjRU5WFbcqclIQJWikA7+Mobfkaba3nQSxz9lxW
-         LYjg==
+        d=gmail.com; s=20251104; t=1783639686; x=1784244486; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8kNlCR9tmsOWmOq+doWWUrLta1QpUzmaAQPYdfT7rAE=;
+        b=OhCXC96hHj9AkdZRYfaSQl8OoxtynHB7/K+tp9IDo4/xop0XcqTSw45eZ4+mCu+SEt
+         KVHff+m7L8IeZvl3wiruG2vHKjKS+o43Cfj+ayfTkmuoJ9wrlcu/gHgcsdMchNKoweYK
+         5j+rerAHPq4i9uEiwy4ABPoGBGjMhdPB4g4SqTCR8d5hTjrMo+/Sjn0VD9d5Hc8GGmTP
+         0b7NBybSHG5H9AMbQZKV7kYAjEl8h5vaLx6nQE0MYNcot6Y2ZG1a9I9ocFApIe3u1323
+         j3tmTJuxEYc4imQqo6tBu45CvUL19rQD1t99fOILEUqTa27aYH9B28AGALon4BUiaEOk
+         CbOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783635352; x=1784240152;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/DCoOGjB3t2yqI8PL2v0s5UjSbFRMsQqTYSs+Ahyr1M=;
-        b=aWd/DWhz0w8naDDNSFIQhYzu2TSCcCW5dTotVJwFrI+JjdiXE0ym1Gpd5AMrl2JGd5
-         M8HPANDJnT7iwLcu/kZfWkTKrYtiQBztdxA3HVcXlkrW6QSct3Igqv3M2qUTqrTAZwo5
-         EDt9LUHtEc5FjHpQ1OKbpeP2RYjj/o2e31QHQWbPVqbzHz/8AgAAyYEz/VlcREO0b049
-         eYEgjKXDVcYFr0eAKpJs3hA5uImMJpl6cqJMIoMoP7lK6uLUqbDVK5Fl01KN3XtlaUGU
-         kzpQT+CLw9BG+geuazKvcfOpkbu+JY36a2dLukFQPXvo7RTKWyVdKB8fBAHx/Q/PNHrz
-         newA==
-X-Forwarded-Encrypted: i=1; AHgh+RouZyTIr5xW8WNc2YXxqJAqtLs4LWTarqnJqj+frtpo16AepoPpPeGfElGreEGz1fjGqs3VDSfltii1@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk1tcTOFaQcL9w4AS+nFuBwI7BPBXnhZh/shEuMBbDjoHXBrpK
-	MUoJ+Ifn5NhnroLY9W2TBtwyn7lLKl3GSnWv2eryxV7QRUZKNVloTexP6h9WIggdqr7CAO288Wa
-	n/3w/KZWu5N1NGrkyp8M7sK6EHP0SMQM=
-X-Gm-Gg: AfdE7cnJLFRCs4qnF61IhE/cSDBu0fD3HXw0T/AQRHEXpFefYTr4XtvurqrQyh99pKq
-	jDswVd/8EE5/apA3t38t6bKsi3Wjq++Oyc1ImJE8JvJxBO2a0QY723v2Ny6cmSE7HcvnWTsg0wL
-	3ySGcqIibm7RJgYvx+G1sfZNiYc5DHxOLD613gMBSqhQ3qRIFMj0jRHmo82TVnMUzaRAc6GnUE0
-	2A0dA5jpMhl4n0aIFVkx6C6ud8KSv6wUe2o1t36iclpFikNEILR8rP9FDlyI99T8PXU4YLCmlw0
-	ijNbzNyGXfHehacWHfkz6ex73XqWcMkWhhNleCZQ5ztHDuEJnUEdmrPdnKaSbfMI/HjkF03WQ3p
-	vJwjgUPktsPVrPGC3uCdMNkFgJg8yg5KjYag7XufjdB5Etu27KlJEvd1wnx5jT/SyBOfqB9/jL6
-	Fkywnfd/8RWQ==
-X-Received: by 2002:a05:6214:410:b0:8ee:d9e7:be2d with SMTP id
- 6a1803df08f44-8fec04e89f8mr112612426d6.7.1783635351816; Thu, 09 Jul 2026
- 15:15:51 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783639686; x=1784244486;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=8kNlCR9tmsOWmOq+doWWUrLta1QpUzmaAQPYdfT7rAE=;
+        b=Syggeq1Xvb8Da+l76NbHnFLKA4W3F3clySZpVaQoBzHo7MU7iFyANDyvZ988F6KMmW
+         XImasyY3qtlhsf5g5KN3jQUiLQ9Hjz6Cet/+eUn8ADwHmBQrGIZ/UBMN0Cxfjla9uKG4
+         9FpxdGe2qDHrW1HlYneuCgUgEa9gxJrUVD46eaSV0d64G3aBwoProXaGE9tIkGL22JxN
+         O7rFtcVkXz7/QBXSefTumVQUjyUlBLtMAaULjNmwra4JZmVm2HZWGAhE6z+ILHuWPJuP
+         rU+s8ae7Ca1ldvBL+C40/YP/E0WYEN0F2J+bS6mZ09qKmXnkd4aogtGvj0SoVjZGSXSp
+         4RzQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp+jQR1jpZkdSVzs43HPR0/sfBtZs8jezciatId5b11G6T9R3jgy2UJMxhcgPFnbiVI6pw/bZ1JVMZO@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFfCzZkD2qTJipshBnTQ4Y3NF0dKnthINfJLs9Pl4GK+h5Kn6c
+	YYnb8ui19Tg1LbNsfXhd5MBV3gC0YM5ZSQnbwBMD2EdQ7F97uS36zfRilMGP8s7y09MVAdANVPp
+	4P3PwuYlf9KujHupUsDCBC+X9BpoCqUqmw0NBxn8=
+X-Gm-Gg: AfdE7ckZ5ZoyD7dhgrtMIzeCgJwvrCRh3eTnl4mv3lke1oBGvQIGMOeiRI3dJQeb0y0
+	CV6FaiZREhRKhgyj+NfjajK4aHPLUICJpT2PhqTNVI8ai6xWGp3zEwixDh/EtwpRcTsjZshyLS9
+	wJ7eaY9lYVj5rtZxzXltsmv/YVtj+8XJXgGUtshpN0UQI0uNb9UhlqgV9HDHlGn61D+GPAbNdfP
+	SGCxeki7HFJnDgaQmWH8lRgAXlVs9q4fSDLkKt+S9CfyPZgjmucH82XCtDhTBa+So3zbMrhUSWs
+	leu/ok682dhhCsTwsJLGF5ACgpcyEiWnjnCVBPrO5CJ21pWHaIY7zgq1jWnUM3K+4nYRYGImbfw
+	VY6VldIJgXNvbiwENAIViefa7f0jklIobtHMcXfO8Df0okRU/meldFPpIyE/6JMytJAF1euSHek
+	TB3g75IVH7Jw==
+X-Received: by 2002:a05:6214:e8f:b0:8dd:69a7:d60 with SMTP id
+ 6a1803df08f44-8febd5f96bbmr103802136d6.0.1783639686529; Thu, 09 Jul 2026
+ 16:28:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709155440.2132459-1-doebel@amazon.de>
-In-Reply-To: <20260709155440.2132459-1-doebel@amazon.de>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 9 Jul 2026 17:15:40 -0500
-X-Gm-Features: AUfX_myw31UoHX4SuoiHG9s00c7k_AK6flUf0AJ6VGinZ_8FPM7X0vQl2j6Y5eU
-Message-ID: <CAH2r5mt_Pd=wd-pXdaYkNpWE9NfeM0bhnEy-LKuhgOZchVPTJA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix DACL-rewrite heap overflow in id_mode_to_cifs_acl()
-To: Bjoern Doebel <doebel@amazon.de>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, samba-technical@lists.samba.org, 
-	stable@vger.kernel.org, nmanthey@amazon.de
+Date: Thu, 9 Jul 2026 18:27:55 -0500
+X-Gm-Features: AUfX_mxnY_dlXIrTbNxIvWtpE5zl81B1TlG-l1bJv_M0QOMqXKmX8zXEa1ZAjZk
+Message-ID: <CAH2r5muX5fYTtxMvj9DrdMmMEU2Oi+_nk2oK0zH+J4fRctrJLQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-When I tried this it changed the length used (for chown with cifsacl
-mount option) from 88 bytes to 236 bytes
-which seems suspicious.  Have you been able to reproduce the bug this
-patch is supposed to fix?
+Please pull the following changes since commit
+8cdeaa50eae8dad34885515f62559ee83e7e8dda:
 
-On Thu, Jul 9, 2026 at 10:55=E2=80=AFAM Bjoern Doebel <doebel@amazon.de> wr=
-ote:
->
-> Budget the destination buffer for the worst case in both branches:
-> every rewritten ACE may take sizeof(struct smb_ace) bytes (which
-> already accounts for an smb_sid with SID_MAX_SUB_AUTHORITIES
-> sub-authorities), plus the smb_acl header that
-> replace_sids_and_copy_aces() emits.
->
-> Fixes: bc3e9dd9d104 ("cifs: Change SIDs in ACEs while transferring file o=
-wnership.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bjoern Doebel <doebel@amazon.de>
-> Assisted-by: Kiro:claude-opus-4.6
-> ---
->  fs/smb/client/cifsacl.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->
-> diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-> index 07cf0e5782337..6d572dd995d79 100644
-> --- a/fs/smb/client/cifsacl.c
-> +++ b/fs/smb/client/cifsacl.c
-> @@ -1812,11 +1812,13 @@ id_mode_to_cifs_acl(struct inode *inode, const ch=
-ar *path, __u64 *pnmode,
->                                 cifs_put_tlink(tlink);
->                                 return rc;
->                         }
-> -                       if (mode_from_sid)
-> -                               nsecdesclen +=3D
-> -                                       le16_to_cpu(dacl_ptr->num_aces) *=
- sizeof(struct smb_ace);
-> -                       else /* cifsacl */
-> -                               nsecdesclen +=3D le16_to_cpu(dacl_ptr->si=
-ze);
-> +                       /*
-> +                        * Worst case: every ACE is rewritten with a new =
-SID of
-> +                        * SID_MAX_SUB_AUTHORITIES sub-auths -> sizeof(sm=
-b_ace) each,
-> +                        * plus the smb_acl header replace_sids_and_copy_=
-aces() emits.
-> +                        */
-> +                       nsecdesclen +=3D sizeof(struct smb_acl) +
-> +                               le16_to_cpu(dacl_ptr->num_aces) * sizeof(=
-struct smb_ace);
->                 }
->         }
->
-> --
-> 2.50.1
->
->
+  Linux 7.2-rc2 (2026-07-05 14:44:06 -1000)
 
+are available in the Git repository at:
 
---=20
+  git://git.samba.org/ksmbd.git tags/v7.2-rc2-smb3-server-fixes
+
+for you to fetch changes up to f49bca41c12f9f79d39dbf0779d0c672d74b09fe:
+
+  ksmbd: use the session dialect for rejected binding signatures
+(2026-07-06 07:55:41 -0500)
+
+----------------------------------------------------------------
+This contains a set of ten SMB server fixes mostly around session setup,
+multichannel/session binding, and protocol-compatible error reporting.
+
+- Fix SID-to-id mapping so only SIDs with a valid local Unix representation
+  are translated, while preserving other Windows SIDs in NT ACL xattrs.
+- Fix SMB3 multichannel binding across multi-round authentication, keep the
+  derived channel key separate from the established session key, and enforce
+  the 32-channel session limit.
+- Match Windows-compatible close timestamp behavior by coalescing automatic
+  write time updates smaller than 15ms.
+- Return STATUS_DISK_FULL for SET_INFO allocation failures caused by
+ ENOSPC or EFBIG.
+- Fix several signed SESSION_SETUP error paths so clients see the intended
+  server status instead of replacing it with STATUS_ACCESS_DENIED.
+- Fix reauthentication on bound channels and reject different-user channel
+  binding with STATUS_ACCESS_DENIED.
+- Use the referenced session dialect/signing algorithm when validating and
+  signing rejected cross-dialect binding requests.
+----------------------------------------------------------------
+Huiwen He (1):
+      smb/server: map SET_INFO ENOSPC to disk full
+
+Namjae Jeon (9):
+      ksmbd: validate SID namespace before mapping IDs
+      ksmbd: fix multichannel binding and enforce channel limit
+      ksmbd: coalesce sub-15ms write time updates on close
+      ksmbd: mark invalid session responses as signed
+      ksmbd: find bound sessions during reauthentication
+      ksmbd: handle channel binding with a different user
+      ksmbd: sign rejected SMB2.1 session binding responses
+      ksmbd: mark rejected cross-dialect bindings as signed
+      ksmbd: use the session dialect for rejected binding signatures
+
+ fs/smb/server/auth.c              |  49 +++++----
+ fs/smb/server/auth.h              |   7 +-
+ fs/smb/server/mgmt/user_session.c |   4 +-
+ fs/smb/server/mgmt/user_session.h |   1 +
+ fs/smb/server/server.c            |  16 ++-
+ fs/smb/server/smb2pdu.c           | 205 ++++++++++++++++++++++++++++----------
+ fs/smb/server/smbacl.c            |  21 +++-
+ fs/smb/server/vfs_cache.h         |   1 +
+ 8 files changed, 218 insertions(+), 86 deletions(-)
+
+-- 
 Thanks,
 
 Steve
