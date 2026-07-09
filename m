@@ -1,286 +1,85 @@
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D847244661
-	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783602281; cv=pass; b=TT0iB1Mf1DBuuTT0il9Wo/LPAw/5LW1NSUsgIjCt4t52uQZFu+WZ1bgUCqIVchfpkdM1vmMbnfSwDYzSMdDByK63OKE5vLgN+CbI3lqLqRmK3nu/dLc+bnMuDnZGOTAF1ZLtLI3ehPSYviOBeJFixjuv4rh7CR/RWO4l3DqJ0Ro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783602281; c=relaxed/simple;
-	bh=XFTQinFBXxVB8xLgGYUTOcRgA8wSnnOUKdGuDP4dIKQ=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA6C2701C4
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783602644; cv=none; b=NA39FtsL8OmGkojijuqByqR+1lgoyctMGKTlvPWF2m7aPsFIKQxpx9J/sdSkgesWm9xDt9QT6BIaPFEpebTxsoJYGSEXrUv0lMr171vRiyYUF4aVwgSukrq2Fiit3xick4vTHV/5lN1if5fkedNdzH4osdbrKN8LCzP11FquxBs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783602644; c=relaxed/simple;
+	bh=jJmL86mc4TuGA1QUMRG4IM+rpkpZ9i6hnTjkQKv7sXY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SFiU1jcDQiHrC56ILis+GzV/w5l3Yr66BtimKCMAMA7B8TUkmtEX7YCDBiwKQUhTQPLYlHWObavK87NarHkryLCXckRsrRARFwxDNKjqyq33WJ1kx1DZeiPsMviwhN5BZqM3TuJjfbAfUWV+KKrK7W0Xm4Yf1LdLW4jiYz4t5V4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KWH3lYuB; arc=pass smtp.client-ip=74.125.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=PvTeCTFLMesimjqQQ96nzdPSAQhpw8j4ccism5H8mKKX10EObY4w39cZPK6hXI57yHlasza5CjP8XLKfJSQkv1dmue/O6/SwPaeqRRjbfsMeNJqghwj4TLz4+IGR4jJtpOjD5usflGqK4J32BqkD/ioXS5+cVtTniQj4+INBFLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bh602egZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KWH3lYuB"
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-6611669cd16so2236025d50.0
-        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:04:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783602278; cv=none;
-        d=google.com; s=arc-20260327;
-        b=SIWedtBAKiXhlYi7gkjVQDX4sq1xqfDHzTuIgNRaEnbqMnHBHPUPTjXzL3LkQqNOSJ
-         io/MmjsvvsXy26nUEE/WxfwQ6NYvWttC4aPx0g6yjf/zj68cUpGNW5JMtT1kf8TkNpUE
-         YtwmZKLv1fTWREMtaeFFp/Fq3N8oz6BDvNMTOqCN4sIQ/bBDM8NUYu0SD7Zhe39gn2Up
-         r8Ir9wW7/qPzRnJFs91SAGxj+n8oshvvYKoCH88XrKh2xP36B+UUiKDGuSFnPVyonKGM
-         tuvFQ7K7ydSE1zgpv46rGqJh/4piVkqJz+j3wNKYrK7XpMYqmVLQVK2A/y2dr/Ri3DCX
-         mOXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=rHRUhLV9H4buT/j0yw3aRJSZT0sqIFWKcf3OiYJu03E=;
-        fh=2zNLWgFl9zg+/cipcGmknOnuhJ3qe50mTrIa/DcLLbY=;
-        b=KuG5JuTeZI5R6mDU6owDltHOwhyo47vpydjiyK8LMQ9uHoBksNNI5sjj8lXTB/8FXo
-         t4HxZKObx79CdxAgbktueissf5Ofs+WPwLwbnDi+5mVakz+sCEMYJdWnd/sDX4Bb3yJp
-         Z0pCcZ7ZSCrsFso7Xa6VGOgRGSY22Gs5xs3ug3o5O29UpEm0kXHigEUfP5O7JkQNFG3l
-         3pXQUFGC2vHbAyUKJYRFwJ450//Qmaod1KHulMWUC6/P2Pv4adkVnFWo7/NgpgnEFoij
-         4PQiaX/5UoItutAN4j43I8dhZH4VdoX2KJON1aAe71R1qaOc0Xwl+g/OGgrXIv9JI+Bc
-         Obkw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783602278; x=1784207078; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=rHRUhLV9H4buT/j0yw3aRJSZT0sqIFWKcf3OiYJu03E=;
-        b=KWH3lYuBfJutXaXFLzLXSQ1faqDcwH51YIHgtlXWjBOntB2lfwnxXDriz2O4PVyZ1i
-         P/N5hOkRNW1vwIKgV+h6fbym7nbLve6hQytJ9FJSGT6O4BPXWS0iFDkKW+8DdWpORKBH
-         h2+lFRu697/wplZUk3Zx6JHdDFCnCpUH2kYmy4tcu6jQQgmGSJvPRMWrEzKrIYiETv1h
-         0AQbqssLXs2+dr4kNY2ZpiwUUoFcdG8VHMBzv6Mz+gapwoaQfNypYRVUMsao/EYTjd+k
-         X0MXfLuc+WLfylQQCNYfPK7CJklp/CdHHwNEi5Am2ycc6rXWpl8zxcV9YFzlS4GnuHoe
-         ClQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783602278; x=1784207078;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=rHRUhLV9H4buT/j0yw3aRJSZT0sqIFWKcf3OiYJu03E=;
-        b=F1JVAlis8P1lOfKIG2jwWt9QTIUaE20ZXYuzuFYyzfxoGW1z83Cy4135ra7ULOjjL3
-         loir7K6lB7lxVa13KK/WxM3Du4FQZazVSxcW3IhESwqDpEij5m1famt8eM3J/+QEWL+C
-         fUQxfdDG7e8D2+hmISkcQiZCfgNXTDJOme9PmgAUlosC3/4OCw4vBieiZAAxfQIrFV88
-         V56RxJSySSgeREXRi0EcLwglB4xDHznZbWl5HsvuusnFSaxTQ5v4u6Yl7ECEcF6Wyt3R
-         ndERHb39Q/iXuMZZf4LDPK9k2TKjQxCbiddi+td5Gkq6nDVQhcDmYcS8TZh6nbCTyIFx
-         OFCQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoEF562eZjB/SYomlt2riSI6m7fweZe22ZlJcj3Bgt6lFN0RV9UJj/jSoRV3T38HM/H7Nk1yiIUfYjE@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywlm7zlX9hv+GdnOKQUe6kNHgYEz76mdTWHKRqNCA2sBcmp9J5j
-	PKFFmb9oIKdcg+A7db8Xl0LxKX6Kjhdb+kfHXB9nSq91sVzX7WEPddARk8uvnySdOEVfS2l5D8f
-	4Opycv62I/AftDB3105mc9axgbmcWodI=
-X-Gm-Gg: AfdE7clpYywXhlOHZIj0TVU5ZWwEFEBORg00uIflKbTqX5OWH7NtR+dj55XITXYuAfM
-	tYV4Qte7yfmYjvIufDzlawuJaJlRu9GrUAofADx9kgCRo1G0FOdCoVjy3YbDaBUjTRlw142fXvW
-	QBRQosWO5hWuOHFU95P3jEOjQMWwqdebP3CQqQJnY7fyY7KmMNK4s5jAKGozdEqawILqurtx9NQ
-	vXupO9I5SM1TPYfuuHQM2Aq/Zd+OjwU4esQBdJoxyKiio+fhAK3Wo08JJK16NBcaLOGY3UAG6Ev
-	LU482Dc1WFeZZ13/bkFAJdCVMTreXbZ5KlVbxHa7u518nURd9P1EqIDBXuDYeQJriwGbrPtZKCG
-	Ua2jussty+ogETMB4pgzt938BeRBY2/i3p7unXIyAhGrbfU6+y0s8hk+xgVGU1FuFCrJRYV38mZ
-	DKAW5WuI6Jyfk=
-X-Received: by 2002:a05:690e:190d:b0:667:963f:eba5 with SMTP id
- 956f58d0204a3-6679f2f1945mr5384886d50.106.1783602277849; Thu, 09 Jul 2026
- 06:04:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bh602egZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 803A21F00A3A
+	for <linux-cifs@vger.kernel.org>; Thu,  9 Jul 2026 13:10:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783602642;
+	bh=8kuvHCI2zu7ocW63Zh8YakaB2ba+Nt2SM3+PQ215lnQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Bh602egZkb2970/8D7tVGxSleBwNdheiLSX84kCqTxOxqHTdkXhgqlj96FSjBUCIH
+	 p1n6src9SUC4jfmCmV1hCHNoMdbXz2/TATj+XJ8tdS84HrbT4vuQLpyyCVhdTOghO5
+	 yorHuX1ze1ZrS5WnCESS3EHAdiceYQvfj4eXR4qoX6iTCJ2W7iqKHmp7XTvW/MrlWp
+	 FALitnu6ifaY4xYwqY8Fc/uHZDBzgMMZaYrOWVRWywrqA7jdbEU2RKjDtqI7FyTqH4
+	 PfWNNGm+MVv0M9utysTYbPVvUWLelRckrZgsGAZB4JT5j52N5Sp+TDZ9hULf2DY9tj
+	 chwqUktBQ4AKg==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c15c257a488so244366566b.3
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 06:10:42 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yzvc5dYh4zopdGRly49UTe52Ok0g+YcC3eWe7PFmCuD6dE2MFfT
+	BD8JTA3KdTUFk/r+S9C6BGddH68efjXht0l4dFrIxQh28d7WXHRCAJeuFuv+ShRSB0ETU4rXwJb
+	91JQ3NXfXZWYZ+NQkOp0tVn5zBzAm6QI=
+X-Received: by 2002:a17:907:9709:b0:c15:dc92:5df with SMTP id
+ a640c23a62f3a-c15dc9207cfmr221842666b.49.1783602641197; Thu, 09 Jul 2026
+ 06:10:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6dd60d4365ed96f472c9b59dc8fca6bf@manguebit.org> <20260706182936.22007-1-pali@kernel.org>
-In-Reply-To: <20260706182936.22007-1-pali@kernel.org>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 9 Jul 2026 08:04:25 -0500
-X-Gm-Features: AUfX_mzeqK1kZoz40vXWhqkRCSFaq9Tf-R-3EJ7qqWaNl-7UlZf966Is0Qt4TtM
-Message-ID: <CAH2r5msn6kfGt6bNcuxEjXvmTCpEu6V1MWWi1EeT9MnLLeKGCg@mail.gmail.com>
-Subject: Re: [PATCH v3] cifs: Show reason why autodisabling serverino support
-To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
-Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, Tom Talpey <tom@talpey.com>, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260709000548.66445-1-g.blivet@me.com> <20260709000548.66445-3-g.blivet@me.com>
+In-Reply-To: <20260709000548.66445-3-g.blivet@me.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 9 Jul 2026 22:10:28 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-7eVwMcmE14Wv45UQ_-q+k_Xzn8mEpd41CwcBmOE5-Cw@mail.gmail.com>
+X-Gm-Features: AUfX_mzeftfiww1i56adI7mE9vKU9B0AcCGj3y8p_LDEN07FTtkyjcVv9vVxxjs
+Message-ID: <CAKYAXd-7eVwMcmE14Wv45UQ_-q+k_Xzn8mEpd41CwcBmOE5-Cw@mail.gmail.com>
+Subject: Re: [PATCH 2/8] ksmbd: quiet mdssvc RPC log spam in create_smb2_pipe
+To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index 81f4af614..2e87139d0 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+> @@ -2656,7 +2656,16 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
+>
+>         id = ksmbd_session_rpc_open(work->sess, name);
+>         if (id < 0) {
+> -               pr_err("Unable to open RPC pipe: %d\n", id);
+> +               /*
+> +                * mdssvc (Spotlight) is a routine, expected probe from macOS
+> +                * that we deliberately don't support -- it's disabled at the
+> +                * __rpc_method() level (mgmt/user_session.c), but this
+> +                * generic failure log would otherwise still fire on every
+> +                * single probe regardless.
+> +                */
+> +               if (!(id == -EINVAL && (!strcmp(name, "\\mdssvc") ||
+I think this patch may not have been tested against the latest
+ksmbd-for-next-next tree.
+In the current ksmbd-for-next-next code, the mdssvc path returns
+-ENOENT (not -EINVAL), so the check added in this patch should be
+updated from -EINVAL to -ENOENT.
 
-On Mon, Jul 6, 2026 at 1:31=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> wr=
-ote:
->
-> Extend cifs_autodisable_serverino() function to print also text message w=
-hy
-> the function was called.
->
-> The text message is printed just once for mount then autodisabling
-> serverino support. Once the serverino support is disabled for mount it wi=
-ll
-> not be re-enabled. So those text messages do not cause flooding logs.
->
-> This change allows to debug issues why cifs.ko decide to turn off server
-> inode number support and hence disable support for detection of hardlinks=
-.
->
-> Signed-off-by: Pali Roh=C3=A1r <pali@kernel.org>
-> ---
->  fs/smb/client/cifsproto.h | 2 +-
->  fs/smb/client/connect.c   | 2 +-
->  fs/smb/client/dfs_cache.c | 2 +-
->  fs/smb/client/inode.c     | 7 ++++---
->  fs/smb/client/misc.c      | 6 +++++-
->  fs/smb/client/readdir.c   | 4 ++--
->  6 files changed, 14 insertions(+), 9 deletions(-)
->
-> diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-> index 1ed97957038f..1202934d7b94 100644
-> --- a/fs/smb/client/cifsproto.h
-> +++ b/fs/smb/client/cifsproto.h
-> @@ -317,7 +317,7 @@ int generate_smb311signingkey(struct cifs_ses *ses,
->
->  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
->  #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-> -void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
-> +void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb, const char=
- *reason, int rc);
->  bool couldbe_mf_symlink(const struct cifs_fattr *fattr);
->  int check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
->                      struct cifs_sb_info *cifs_sb, struct cifs_fattr *fat=
-tr,
-> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 85aec302c89e..522c2abd930c 100644
-> --- a/fs/smb/client/connect.c
-> +++ b/fs/smb/client/connect.c
-> @@ -3875,7 +3875,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct=
- smb3_fs_context *ctx)
->          * After reconnecting to a different server, unique ids won't mat=
-ch anymore, so we disable
->          * serverino. This prevents dentry revalidation to think the dent=
-ry are stale (ESTALE).
->          */
-> -       cifs_autodisable_serverino(cifs_sb);
-> +       cifs_autodisable_serverino(cifs_sb, "DFS failover may potentially=
- connect to a different server, inode numbers won't match anymore", 0);
->         /*
->          * Force the use of prefix path to support failover on DFS paths =
-that resolve to targets
->          * that have different prefix paths.
-> diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-> index 83f8cf2f8d2b..42eee0de8895 100644
-> --- a/fs/smb/client/dfs_cache.c
-> +++ b/fs/smb/client/dfs_cache.c
-> @@ -1328,7 +1328,7 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_=
-sb)
->          * After reconnecting to a different server, unique ids won't mat=
-ch anymore, so we disable
->          * serverino. This prevents dentry revalidation to think the dent=
-ry are stale (ESTALE).
->          */
-> -       cifs_autodisable_serverino(cifs_sb);
-> +       cifs_autodisable_serverino(cifs_sb, "DFS failover may potentially=
- connect to a different server, inode numbers won't match anymore", 0);
->         /*
->          * Force the use of prefix path to support failover on DFS paths =
-that resolve to targets
->          * that have different prefix paths.
-> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> index 002a2ec85db5..945a34f3d830 100644
-> --- a/fs/smb/client/inode.c
-> +++ b/fs/smb/client/inode.c
-> @@ -1090,7 +1090,7 @@ static void cifs_set_fattr_ino(int xid, struct cifs=
-_tcon *tcon, struct super_blo
->                         fattr->cf_uniqueid =3D CIFS_I(*inode)->uniqueid;
->                 else {
->                         fattr->cf_uniqueid =3D iunique(sb, ROOT_I);
-> -                       cifs_autodisable_serverino(cifs_sb);
-> +                       cifs_autodisable_serverino(cifs_sb, "Cannot retri=
-eve inode number via get_srv_inum", rc);
->                 }
->                 return;
+> +                                       !strcmp(name, "mdssvc"))))
+> +                       pr_err("Unable to open RPC pipe: %d\n", id);
+>                 err = id;
+>                 goto out;
 >         }
-> @@ -1546,7 +1546,7 @@ cifs_iget(struct super_block *sb, struct cifs_fattr=
- *fattr)
->                         fattr->cf_flags &=3D ~CIFS_FATTR_INO_COLLISION;
->
->                         if (inode_has_hashed_dentries(inode)) {
-> -                               cifs_autodisable_serverino(CIFS_SB(sb));
-> +                               cifs_autodisable_serverino(CIFS_SB(sb), "=
-Inode number collision detected", 0);
->                                 iput(inode);
->                                 fattr->cf_uniqueid =3D iunique(sb, ROOT_I=
-);
->                                 goto retry_iget5_locked;
-> @@ -1612,8 +1612,9 @@ struct inode *cifs_root_iget(struct super_block *sb=
-)
->  iget_root:
->         if (!rc) {
->                 if (fattr.cf_flags & CIFS_FATTR_JUNCTION) {
-> +                       cifs_dbg(VFS, "Removing junction mark and disabli=
-ng 'serverino' to prevent inode collisions\n");
->                         fattr.cf_flags &=3D ~CIFS_FATTR_JUNCTION;
-> -                       cifs_autodisable_serverino(cifs_sb);
-> +                       cifs_autodisable_serverino(cifs_sb, "Cannot retri=
-eve attributes for junction point", rc);
->                 }
->                 inode =3D cifs_iget(sb, &fattr);
->         }
-> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-> index 0c54b9b79a2c..f47874734248 100644
-> --- a/fs/smb/client/misc.c
-> +++ b/fs/smb/client/misc.c
-> @@ -278,7 +278,7 @@ dump_smb(void *buf, int smb_buf_length)
->  }
->
->  void
-> -cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb)
-> +cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb, const char *rea=
-son, int rc)
->  {
->         unsigned int sbflags =3D cifs_sb_flags(cifs_sb);
->
-> @@ -290,6 +290,10 @@ cifs_autodisable_serverino(struct cifs_sb_info *cifs=
-_sb)
->
->                 atomic_andnot(CIFS_MOUNT_SERVER_INUM, &cifs_sb->mnt_cifs_=
-flags);
->                 cifs_sb->mnt_cifs_serverino_autodisabled =3D true;
-> +               if (rc)
-> +                       cifs_dbg(VFS, "%s: %d\n", reason, rc);
-> +               else
-> +                       cifs_dbg(VFS, "%s\n", reason);
->                 cifs_dbg(VFS, "Autodisabling the use of server inode numb=
-ers on %s\n",
->                          tcon ? tcon->tree_name : "new server");
->                 cifs_dbg(VFS, "The server doesn't seem to support them pr=
-operly or the files might be on different servers (DFS)\n");
-> diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-> index a50c86bbe60f..ee5996e6d7d8 100644
-> --- a/fs/smb/client/readdir.c
-> +++ b/fs/smb/client/readdir.c
-> @@ -415,7 +415,7 @@ _initiate_cifs_search(const unsigned int xid, struct =
-file *file,
->         if (rc =3D=3D 0) {
->                 cifsFile->invalidHandle =3D false;
->         } else if (rc =3D=3D -EOPNOTSUPP && (sbflags & CIFS_MOUNT_SERVER_=
-INUM)) {
-> -               cifs_autodisable_serverino(cifs_sb);
-> +               cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inod=
-e number via query_dir_first", rc);
->                 goto ffirst_retry;
->         }
->  error_exit:
-> @@ -1029,7 +1029,7 @@ static int cifs_filldir(char *find_entry, struct fi=
-le *file,
->                 fattr.cf_uniqueid =3D de.ino;
->         } else {
->                 fattr.cf_uniqueid =3D iunique(sb, ROOT_I);
-> -               cifs_autodisable_serverino(cifs_sb);
-> +               cifs_autodisable_serverino(cifs_sb, "Cannot retrieve inod=
-e number from readdir", 0);
->         }
->
->         if ((sbflags & CIFS_MOUNT_MF_SYMLINKS) && couldbe_mf_symlink(&fat=
-tr))
 > --
-> 2.20.1
+> 2.43.0
 >
->
-
-
---=20
-Thanks,
-
-Steve
