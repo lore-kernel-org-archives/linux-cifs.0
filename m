@@ -1,175 +1,192 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE895345CCD
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 14:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783693004; cv=none; b=jOsfgfPB7UnoZw/Bb524a+ZEB2h68zywJWIo3PPNJJy8IfOReaF01dfyj3IA+ljvAtJUqplPbMDkH9NbuWwrH/g5aTv77BHgfSIYBoDvzJNVZ+2pm2zck8rWBcj5gS6W/FeZlMZuA24pteaLCiHM+c4MGfURiwTAMXEcFfOzZ3Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783693004; c=relaxed/simple;
-	bh=WJMTnr1XzPdAa6Wpw2RW8P1yPWsr+257lgV7cvVmXPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fj4JTWwQW1gY1ClCBilqUhdYkJveZdrLmCDgL45teGvF/oLnsgLGBX54lutCctjpyLcdi3drP7kyk+eUEKqF26zuEoSU5dAo1/2kE5//13/4rIHlOAh2+hUoI+iTRqODCaCChywFo+tsjsiBLcmeiqqR6ffp1tNnaA0kTu3/fsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jCmvt5fq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=4fctQgde; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Mv+Zq3NF; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=df67Nt7y; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856DF261B71
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 18:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783706678; cv=pass; b=nbPG5PYHRTs9o18qJnHRIXUMFm2dLHPctzmD4V4m4hA6CK/cudQBXO4EZ/qyI+QUdBkSoruai6wOmdwPLRm5u1BETanKTlBoIjOpx2DaS6WKBY4gdcX8Pd/PDQqVbJkBG+Ayf9eoRgABQXfJw34lZhwtQTqr421HaReIbxaOlpM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783706678; c=relaxed/simple;
+	bh=fDpzHS870/ll2H6bL+4XZZ4l7iF4BMQMLvLordmcfKc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=E3vtXXoZ+Wc+UW3j2kepbme8bBSu05ZoA1e6pkrozozX/PBGvNg4jBgPFKYes9jzny7Afvwflcp9fPf4LfrwgXSHGs8V0z+DrpHL+tG1rTw90ZZESzuwqYkC1f4MV1CiQ7t4Is2Jid0Y3rgnoRUw7za5KwaqNKFb6VbjAb7JgqY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEiFdEqh; arc=pass smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jCmvt5fq";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="4fctQgde";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Mv+Zq3NF";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="df67Nt7y"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id ED8D57646B;
-	Fri, 10 Jul 2026 14:16:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783693001; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K6jpA6NLvWFPc6w0vBOkB6Mg+7+/KXLBnWyi0okspBE=;
-	b=jCmvt5fq/RG+dUfqxSU0fsQbWIkbUrYRSZVTRuc2FMT0oT+frvsqLlpTQG27c79MzYtJzm
-	qvNzM35dn6RHiyZqEPqV6D5OuC7sx7Z3yblb9NV64CMtKJcqZUO3HhJ6o/iO8WdzDvbAjT
-	fxJtlVXMwCQxP+aF6sa1bMbA10F6YgE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783693001;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K6jpA6NLvWFPc6w0vBOkB6Mg+7+/KXLBnWyi0okspBE=;
-	b=4fctQgde0rnYtp3iLvipuajdpdeg6YReOS/XFD6EoieqzTUE+nLJfHFInAZsQapgF+q1mb
-	I42FwjLLKZfTmRBA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783693000; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K6jpA6NLvWFPc6w0vBOkB6Mg+7+/KXLBnWyi0okspBE=;
-	b=Mv+Zq3NFb6msJerMNWwBEKNWTx0bWYkllvPdxlCGfSSpGVnphDAIXVrGFtOZTmUIyiW4FQ
-	VECcM/uqc9278YTJv2u8pJR0YRbFqf3TDmJ6yh7RXy63dkbZmyYIvtkBXzulbPXoQV4ub/
-	9K+08faB6kN/VmMzB0ey8zdlM3Mw6zA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783693000;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K6jpA6NLvWFPc6w0vBOkB6Mg+7+/KXLBnWyi0okspBE=;
-	b=df67Nt7y2LJfJ0DJ3ffxsP2QRdCHCfV0F0tAp+f3KgpRq7Z9jlKq+XcG4ac35kHOna61Pq
-	ayHfYdPnZP6YjtDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 763BC779BD;
-	Fri, 10 Jul 2026 14:16:40 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CpBLD8j+UGptOwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Fri, 10 Jul 2026 14:16:40 +0000
-Date: Fri, 10 Jul 2026 11:16:30 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Samuel Cabrero <scabrero@suse.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.com, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Subject: Re: [PATCH 00/18] SWN: Decouple witness registrations and tcons
-Message-ID: <alD99AD9miVVui6Q@suse.de>
-References: <20260710091637.58873-1-scabrero@suse.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEiFdEqh"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c2808dbc3so7307441cf.1
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 11:04:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783706675; cv=none;
+        d=google.com; s=arc-20260327;
+        b=bIKt6WvWkieDoP1QiFLVh6ENTGLOHtcXrPGsTnJV2n0cSAOHwUgSYBzVeLbp51Zr0u
+         /3c0BzQlfpn/zvTMFsZu9HeiYpt1rCfiaYIlBaOPRV9k+cxfsy9XztdTLTa6GvaUmNrL
+         uLNM7bfr9C4DAGiOdzgFCJhXLv9BoVRaMao30IzXLGEo3Xn3tjWaTFdVdZ6rFJDzahpc
+         /NaFOldZTEkBFy51JvD1nQ7BQZgS26xPjSGfdBmLFmtdIOiP3il/Zr8JFJ6x6wEgCCW+
+         kmv0O2bcW1Wdo2vgxT4kMZ/xLSSTQvMhlX9XD6jIFBRqkfzuoaTh+DSweAd0RkY9gPL6
+         KBFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:dkim-signature;
+        bh=aWuoIiTWd6CKC5WT2iLgbFPnY5SCLuI23SoYZKVMgjw=;
+        fh=19qWtpzjazHwpc/rfO6Eqx9AAT1u0rwQfwoQY0l6Q+c=;
+        b=g+mqNmWtDZlTbsWbPIcWFxJ5omvJ32DTZxZ7epIGmgCesEbJi3ESVK7Ql6ODMtHbrL
+         uSJEszCyfaSDf1glKBM6lJsR9ZwzFhXsc6zUEYrvLYNPqxvKMFL2mhVMSsM7dJ+h7SmK
+         B+fBxDQIEVgkviMnwVk9p6Mm+Xa1a3kkh4SMNSy4s/xgGM1UY2dSag9EqVdLrBobBmJd
+         oylr4LHV53918SXLVZ2Pa5eSIPlQdY9mASKMyzHyYblTsouD62ny+00XMLo9Ej00l6+j
+         8a73a5iLhdD5fznWld0j9C2cKVoHA5iZy9TwNwamWUp/bPBr2uYoolwKlwwQGaw0LVvF
+         8PqQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783706675; x=1784311475; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=aWuoIiTWd6CKC5WT2iLgbFPnY5SCLuI23SoYZKVMgjw=;
+        b=hEiFdEqhhtfmUOt+FWUk8HOaoBPP+KJol+Orx28IEwopTILx8CNB7AOXnNicAWkOu8
+         Rf3BormmuS4pb2MyzZRX/IU60SSyMnAN/igrmGu2LrUE3YvGPQAOJofWHu74sxMVbSMN
+         RsHtphi9uxk3whKet+FntuydIn003NmDc/kRcWm3V/F++lgn9P2wSMy0tjbmJ170ctwk
+         Q1zQiQCnjE55ipSvK11Um/8IcVA+Od+xYnIn22eXJI6zKcM8Pfuk3/mBLVeD2KHO9du+
+         ZqgLUxWfN4W5yWNysvCxO+wLQce96G06Huh8uXAHgu25D8ToLo0yZJ+5ZdZIvlzgs6de
+         mBgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783706675; x=1784311475;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=aWuoIiTWd6CKC5WT2iLgbFPnY5SCLuI23SoYZKVMgjw=;
+        b=U5RN0w8Df5/Es3TIIe52Ev9je2r3YPmFHppTfIJMqLPIezWgOwKGOJwCwFQq6+YldK
+         PpFHHNHYe8hX24WQyEzIItqFSKmZ3dU2Ee8+Ota6alOrWgtv/gHZ+/V5MaA1DCQSFg0U
+         IHTqUQbuJDAbuuO+SUlZgCKJqlnVmO2wkIqNWmCmrhBwRww4MqpZUwU35qPGq++LAtPp
+         c5xLtPaFJqbP1Bo5Ra5jrvevJhn1Z4poOEBokn68HPkHCrQdlT86HGTWiLaStm3OtA7r
+         3JRS/nvQ4QgcEfo81DPmBNEtZ90YPqLPjR4oLXzjEBGJz9VQC1mcDWBScYJgyKKEXJ+9
+         sRGQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoPnrO1Ni3SpwG2Tg/V34nTDabcjpU1a4cTJdWL/0TVgwusX8h655UtoeBbuut9nWdgbqruheuFM1Np@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmrmP0QvMjif0x7BhWydyokj66kf3SjgSYR1xwiz5ZyWAK3EL6
+	FY39iPTgkJCM/cvVT29Ceq1IuKPgF0QAIxBfj+DhRxNsH6vhStZJG9bL4E+F8dbbb5TJGDYOR4v
+	440cNSUaZSnLB5h2UssxMwJdLu+QlKr0=
+X-Gm-Gg: AfdE7ckrTaUSE1QVrOrL+vmi6sUekvd+SsUiKII29SJxcVcCW5mQy3nYtEjwHfc+GnY
+	sxd1K3T823gFcmGQMyPpT9GbKALe8DYynQjCeByhFPr+KD09bJoDQf3aRrFYGTb3XflOWx18Fv6
+	W6o9GMqS29ImxKRdIaprJDCmR8kGBin4OIgonqbPpTzlzoGVnZ8Jmt1GxSFitAHUC70+jZNJnCa
+	tsO+56zJUERL3LDeYeBMnUjv9z2XKhA6Ps//WTOOXhXUgvpb4ehpjCgontswPCegkPzDeT8K4z4
+	K4NRaQlYEqwXTgYPxB8JegCtGSplGRNy6VOLbpJjX8iqWNLAPZT0jSCx6WDEpHhAcG8NfBWPQG2
+	qsdEwmrFr16WyP94ZhRJMjNN284rZgDfBpENrZb0rD68XHQbhJE+qY/jxKACQv4yyq8eLrtt/t5
+	JkwT+lk9VIkQ==
+X-Received: by 2002:a05:6214:cc7:b0:8f0:12e8:f453 with SMTP id
+ 6a1803df08f44-90400d84760mr1427856d6.33.1783706674975; Fri, 10 Jul 2026
+ 11:04:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20260710091637.58873-1-scabrero@suse.com>
-X-Spam-Flag: NO
-X-Spam-Score: -8.30
-X-Spamd-Result: default: False [-8.30 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MISSING_XM_UA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid]
-X-Spam-Level: 
+From: Steve French <smfrench@gmail.com>
+Date: Fri, 10 Jul 2026 13:04:22 -0500
+X-Gm-Features: AUfX_mwsI22d5BXgX9b7Vm60oOlQgV7EFL79fBn_zpvbksW8WfKYoH57L3iVrjY
+Message-ID: <CAH2r5msowam2AVfazUvVxhkoQ+PH=-Lx=u_U-nyArAnzUGrF8g@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 07/10, Samuel Cabrero wrote:
->This patches removes the cached tcon pointers from the witness
->registrations.
->
->First patch in the serie reverts the current approach based on snapshots
->that fixes a race while processing a received notification. This
->patchset implements a different approach based on reference counting and
->fixes other races that could occur with concurrent
->register/unregister/notification processing.
->
->The witness registration stores now all required information to issue
->register/unregister DCERPC calls (like auth info and target address),
->and when a notification is received it applies it to all matching
->witness-enabled tcons.
->
->Each witness registration has its own task to enforce the registration
->in case the userspace daemon is started after mounting the share,
->instead of overload the echo task for this purpose.
+Please pull the following changes since commit
+8cdeaa50eae8dad34885515f62559ee83e7e8dda:
 
-@Steve you may add my Rb to the whole series.
+  Linux 7.2-rc2 (2026-07-05 14:44:06 -1000)
 
->Samuel Cabrero (18):
->  Revert "smb: client: resolve SWN tcon from live registrations"
->  smb:client: Adjust witness notification request
->  smb:client: Rename variable to match the rest of the code
->  smb:client: Split idr remove and release functions
->  smb:client: Add a specific task to refresh witness registrations
->  smb:client: Store the tcon dstaddr in the witness registration
->  smb:client: Fix printf format string
->  smb:client: Save memory allocations
->  smb:client: Use the correct return code
->  smb:client: Improve tcon matching logic
->  smb:client: Pass the tcon to cifs_swn_send_register_message
->  smb:client: Pass the tcon to notification handlers
->  smb:client: Introduce swn_notification struct
->  smb:client: Cache auth info
+are available in the Git repository at:
 
-@Samuel just a small observation in this patch (14/18):
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc2-smb3-client-fixes
 
-It's better practice to use kfree_sensitive() when freeing
-passwords (swnreg->authinfo.ntlm.password).
+for you to fetch changes up to d2c46c9f7a9baf80a322eb1d4494a70e535b637c:
 
-IMHO this can be done in a follow up patch instead of a v2.
+  cifs: Remove CIFSSMBSetPathInfoFB() fallback function (2026-07-09
+18:24:30 -0500)
 
->  smb:client: Do not store the tcon reference, find a matching one
->  smb:client: Simplify registration creation
->  smb:client: Improve registration network and share names handling
->  smb:client: Avoid witness re-register if the address did not change
->
-> fs/smb/client/cifs_swn.c | 1179 ++++++++++++++++++++++----------------
-> fs/smb/client/cifs_swn.h |    3 -
-> fs/smb/client/connect.c  |    3 -
-> fs/smb/client/trace.h    |    4 +-
-> 4 files changed, 682 insertions(+), 507 deletions(-)
+----------------------------------------------------------------
+EIghteen client fixes
+- DFS cache allocation fix
+- DFS referral bounds check fix
+- Fix absolute symlinks when mounting with POSIX extensions
+- Fixes for incorrect nlink returned by fstat
+- Fix atime in read completion
+- Fix busy dentry on umount
+- ioctl_query_info buffer overflow fix
+- Two fixes for creating special files with SFU
+- Fix mode mask in parse_dacl
+- SMB1 is_path_accessible wildcard fix and minor SMB1 cleanup
+- smb2_check_message fix
+- Debug message improvement
+- Minor cleanup
+----------------------------------------------------------------
+ChenXiaoSong (4):
+      smb/client: use stack-allocated smb2_file_all_info in
+smb3_query_mf_symlink()
+      smb/client: pass cifs_open_info_data to SMB2_open()
+      smb/client: zero-initialize stack-allocated cifs_open_info_data
+      smb/client: fix incorrect nlink returned by fstat()
 
+Fredric Cover (1):
+      smb: client: use GFP_KERNEL for DFS cache allocations
 
-Cheers,
+Guangshuo Li (2):
+      cifs: validate DFS referral string offsets
+      smb: client: fix overflow in passthrough ioctl bounds check
 
-Enzo
+Mehdi Hassan (1):
+      smb: client: refactor cifs_revalidate_mapping() to use
+clear_and_wake_up_bit()
+
+Norbert Manthey (1):
+      smb: client: mask server-provided mode to 07777 in modefromsid
+
+Pali Roh=C3=A1r (5):
+      cifs: Fix support for creating SFU socket
+      cifs: Fix support for creating SFU fifo
+      cifs: Show reason why autodisabling serverino support
+      cifs: Fix and improve cifs_is_path_accessible() function
+      cifs: Remove CIFSSMBSetPathInfoFB() fallback function
+
+Shoichiro Miyamoto (1):
+      smb: client: restrict implied bcc[0] exemption to responses
+without data area
+
+Steve French (1):
+      smb: client: preserve leading slash for POSIX absolute symlink target=
+s
+
+Xu Rao (1):
+      smb: client: fix atime clamp check in read completion
+
+Zizhi Wo (1):
+      smb: client: fix busy dentry warning on unmount after DIO
+
+ fs/smb/client/cifs_fs_sb.h |  1 +
+ fs/smb/client/cifsacl.c    |  2 +-
+ fs/smb/client/cifsfs.c     | 12 ++++++++++++
+ fs/smb/client/cifsglob.h   |  1 +
+ fs/smb/client/cifsproto.h  |  2 +-
+ fs/smb/client/cifssmb.c    | 36 ------------------------------------
+ fs/smb/client/connect.c    |  3 ++-
+ fs/smb/client/dfs_cache.c  | 12 ++++++------
+ fs/smb/client/file.c       |  7 ++++++-
+ fs/smb/client/inode.c      | 13 +++++++------
+ fs/smb/client/link.c       | 17 ++++-------------
+ fs/smb/client/misc.c       | 14 +++++++++++++-
+ fs/smb/client/readdir.c    |  4 ++--
+ fs/smb/client/reparse.c    | 17 ++++++++++++++++-
+ fs/smb/client/smb1ops.c    | 28 +++++++++++++++++-----------
+ fs/smb/client/smb2file.c   | 19 ++++++++-----------
+ fs/smb/client/smb2misc.c   | 32 ++++++++++++++++++++++++++------
+ fs/smb/client/smb2ops.c    | 19 ++++++++-----------
+ fs/smb/client/smb2pdu.c    | 26 ++++++++++++++------------
+ fs/smb/client/smb2proto.h  |  2 +-
+ 20 files changed, 146 insertions(+), 121 deletions(-)
+
+--=20
+Thanks,
+
+Steve
