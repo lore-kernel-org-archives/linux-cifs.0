@@ -1,119 +1,145 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538833AB498
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 08:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187903A1A58
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 09:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783673666; cv=none; b=ZeREV/4EJ7/+bfp/pes23gzkHc0NLNMxextWwx6k1bnOZ197sC5pzjTgaQ7iBpf1F4UB6uJLk94bNUdmF7uyuM2YfD0zxGUxJWrEIwjRhZI+KLjoSxauqnDUMeFMTDQz51iYiLTJ1jygXCF7UFHygdDAL++Txu9dU/irUTJSmWo=
+	t=1783675020; cv=none; b=dcl2WuV46RP2S+Qf2IuJhS/6JAlpeGTSUSgYNX6mv04m1nYjluj97OtFJDmbdEXfaPRqj36LIgdPEBJWvyfOieBPgWL5joPBZYc8oXiQPTwCpl/azCmVqgbO0sjr5yzNJUXF+Dly98qmzQgF8LiULDtRg89ko50/z1gEikzkBx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783673666; c=relaxed/simple;
-	bh=ikFzRmJdvvB9xT/Pby2r2lpQO997Kyt/bUOVdXRXtAI=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=QIKtkS40WPwdulo8fnB0EtSy9WLst/NWV2w7VoV8MKz9y3XsurwenUyozSyLyHZ2khAOTU25pT/yaBw4t+pAO6sYjHocxyIRpxulIwAdoZkMhKN2rE6Y90aQruV0rccWapxqG2Ojm+Ll5LElZC1R3ZMKcfojGH/JTLuXnI+Csj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GeFlDnWL; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783675020; c=relaxed/simple;
+	bh=byISMcqXKuxYVndjY/uCTt906RZUFC0feV7cY8dvB8c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QwbKBs89QvPYPlcjRqs8u10RCwod0tHy0equUAyrM3aoc8C7760QPJJiCK19fOiB9cRPxxklY5dABu1ZHUPTS8FHGpdpKh6yC3bFRPQ/LVrdtYx/0LonPkt7ZKjgR+MqSwkcwG1croe7M9JnVv3Irs2Cu/9fi3Sn2lx5YLNBJrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ATa2/qha; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ATa2/qha; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GeFlDnWL"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4921eed3fa2so5453195e9.0
-        for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 01:54:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783673664; x=1784278464; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:content-type:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=onszkBXLVPfaBGvAcSP6rYb15NiYr6s/VHada9pQsBM=;
-        b=GeFlDnWLBLRsucoR3zcwGMb7cqCQadkcVM330FxPqtH8zn6HT1DR4fh6/aZdLfSFsi
-         wTKC9jfBavoBiJdnSVQC9XlY8G7CsqHTgLegiwcZJA3EvjUMZbPUAimATgPxLT4m+cPq
-         E+vtOjVCOoXd051wkfsRPxr2dlasIQMXZPhLIYMJk7b8lg6nRQtqGD71v1PGM3+dFqAX
-         DqosGyiVxeKuG2fVnzV+Wr7CcpVkBO2kJ5ckpu9lyLB7dGoRKkVBup1jCwHPF8T8Ff8k
-         BRtWE9so6lzsZwEE/doAIN7ImXYqDaFdAafL56vt7MtSMYx7WzfxoPDHLjfoPIUi2e6s
-         +61g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783673664; x=1784278464;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:content-type:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=onszkBXLVPfaBGvAcSP6rYb15NiYr6s/VHada9pQsBM=;
-        b=Ok6yL12ausnSWgDMW7lFETHayF/eNQcHulhuW2HDI3HzUHw9Auig5awBQzfsM47rs2
-         l7JPTjatU6/4py1SBM4QiFdTxqNyynfnMU0FlldNJRpnVc6/UDuZmxO7gNqC8Fw2JyAZ
-         UH2tLQ4mpEMwq0TM0MDzu/t7iG8D/I4m6TjXx2gGJCJgTJpmeHHCIQbLRP1T/nEGDXk3
-         gr4MihUokSVB/8hEUAz64mgsdAYEOdxef9h9H2X6YIBl4NCNDRYHQaMgJDbh1ayYYB2f
-         BtfLGcf6LTvgIocWs6gES0hOfqOudnXhYJiEpENqNUWC5bpXsvnxm66nVms24qf7WlW3
-         wkWQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqaGxFCOuFiuvmowjhpg3fVjne/ciMObnUab6vPocwB1LcHe296iaw1s7a4OdNHZzNWsRbkdF/jra+V@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHgEW3Mlqyt6hPaM5X8xQCT7Q3yprlwCgnqUe1VkUupvJtuZaK
-	kaQanJp5u8UwkiZt+RgqP0O0cXh8yhDMdKPBMVcSeeWZ1SGFbk8H3d+N
-X-Gm-Gg: AfdE7cmK9HPPqD5VcRer19YuGd5k7DaYOTNMIhQASecFJr2Go/OYucWkAZ+jEK1Y8BA
-	5zLoGFaVxGvumftZBcJgRkKYjULr7uDjTnVkZPG5GQxAKFuFqasNSbvsZYWxnC0BKtJpf+tmqbU
-	2cU7N8ipIY3Bil/3HLwq+DXexGLcvDnIsmksch8rOyvyLFjxWjLpNQT5wAxZIq4Win5XfFxAnTR
-	U53kIq6j2s3hvEXpDHdV+NE3lmoHy70iTvdATQpdVlrnlYGqE6o0hHNkBQHO9soaqIBI3bkd2Wn
-	+IYBK/vzZyBBBJ5pdWuqGjCcwALs/uIyeqneO/7cd6e9odtVhN6HftuYwEVSuDAla0K2wZhw15m
-	Oy395Vv1hmxGRPbSjUwBaVhVBqisHDdpv1dFMUwSYekk/Y1ZPKUm8l4zM3YiRb2JcPYvMTncFmP
-	HD6ptjm2GnKDBpID+c+2MSamIpEhTU
-X-Received: by 2002:a05:600c:4d98:b0:493:e583:7053 with SMTP id 5b1f17b1804b1-493e68f5905mr63030805e9.35.1783673663570;
-        Fri, 10 Jul 2026 01:54:23 -0700 (PDT)
-Received: from smtpclient.apple ([82.67.171.69])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb74b3edsm146379395e9.15.2026.07.10.01.54.22
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Jul 2026 01:54:23 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ATa2/qha";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ATa2/qha"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 70096766EA;
+	Fri, 10 Jul 2026 09:16:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1783675017; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=oNgEkDJIpVIoVNUnKS9Cy/3JB2amOKbt952TsQuEmSg=;
+	b=ATa2/qha+BxpJUKVmpIIn53fGmFdowC9WP1GJSLeyR9gxMV6d0fuSnJ4nJT7qltHhui3NM
+	2dWQBiab82UyXZHW+qHREDBz4JN+0VeXoLKeZVrlNQk+fH37O7dRRM3DOuIEYN2u+kthOI
+	9kbZZsWuhW9SnBSlNFmKEQ1hf08RUYQ=
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1783675017; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=oNgEkDJIpVIoVNUnKS9Cy/3JB2amOKbt952TsQuEmSg=;
+	b=ATa2/qha+BxpJUKVmpIIn53fGmFdowC9WP1GJSLeyR9gxMV6d0fuSnJ4nJT7qltHhui3NM
+	2dWQBiab82UyXZHW+qHREDBz4JN+0VeXoLKeZVrlNQk+fH37O7dRRM3DOuIEYN2u+kthOI
+	9kbZZsWuhW9SnBSlNFmKEQ1hf08RUYQ=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CF04D779BD;
+	Fri, 10 Jul 2026 09:16:56 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id JB6eL4i4UGqnEQAAD6G6ig
+	(envelope-from <scabrero@suse.com>); Fri, 10 Jul 2026 09:16:56 +0000
+From: Samuel Cabrero <scabrero@suse.com>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	pc@manguebit.com,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com,
+	ematsumiya@suse.de,
+	Samuel Cabrero <scabrero@suse.com>
+Subject: [PATCH 00/18] SWN: Decouple witness registrations and tcons
+Date: Fri, 10 Jul 2026 11:16:19 +0200
+Message-ID: <20260710091637.58873-1-scabrero@suse.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
-Subject: Re: [PATCH v2 4/6] ksmbd: defer CHANGE_NOTIFY completion instead of
- STATUS_NOT_IMPLEMENTED
-From: =?utf-8?Q?Ga=C3=ABl_Blivet?= <gael.blivet@gmail.com>
-In-Reply-To: <c9a3fe37-c999-4d0d-8ee8-a34157c8a09e@chenxiaosong.com>
-Date: Fri, 10 Jul 2026 10:54:11 +0200
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
- linux-cifs@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <12AF7BDE-BF1C-40FA-81CD-93DD3AB666AC@gmail.com>
-References: <20260709000618.66534-1-g.blivet@me.com>
- <20260709000618.66534-5-g.blivet@me.com>
- <cb3e2376-88ae-4020-9417-ff925cadd8c0@chenxiaosong.com>
- <36FFCEFB-8E41-4EB6-B835-0B440C9F4A52@gmail.com>
- <882a42e8-bf41-4f7c-a30f-e9d2fe44c49d@chenxiaosong.com>
- <c9a3fe37-c999-4d0d-8ee8-a34157c8a09e@chenxiaosong.com>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com,suse.de];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.com:mid];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Level: 
+X-Spam-Score: -2.80
 
-Hi ChenXiaoSong,
+This patches removes the cached tcon pointers from the witness
+registrations.
 
-Makes sense, sorry for the misunderstanding. Could be cleaner, but =
-doesn't wait_for_completion_interruptible() still block a worker thread =
-from ksmbd_wq for as long as the watch stays open?=20
+First patch in the serie reverts the current approach based on snapshots
+that fixes a race while processing a received notification. This
+patchset implements a different approach based on reference counting and
+fixes other races that could occur with concurrent
+register/unregister/notification processing.
 
-Happy to help align the merged patch with your series once it's up.
+The witness registration stores now all required information to issue
+register/unregister DCERPC calls (like auth info and target address),
+and when a notification is received it applies it to all matching
+witness-enabled tcons.
 
-> Le 10 juil. 2026 =C3=A0 09:04, ChenXiaoSong =
-<chenxiaosong@chenxiaosong.com> a =C3=A9crit :
->=20
-> Would it be better to do it like the following?
->=20
-> ```
-> int smb2_notify()
-> {
->    setup_async_work(..., smb2_notify_cancel_fn, ...);
->=20
->    smb2_send_interim_resp(work, STATUS_PENDING);
->    wait_for_completion_interruptible(); // woken up by =
-smb2_notify_cancel_fn()
->=20
->    if (work->state =3D=3D KSMBD_WORK_CANCELLED) {
->        smb2_send_interim_resp(work, STATUS_CANCELLED);
->        work->send_no_response =3D 1;
->        goto out;
->    }
->=20
->    // Add my implementation of notification events here.
-> }
+Each witness registration has its own task to enforce the registration
+in case the userspace daemon is started after mounting the share,
+instead of overload the echo task for this purpose.
 
+Samuel Cabrero (18):
+  Revert "smb: client: resolve SWN tcon from live registrations"
+  smb:client: Adjust witness notification request
+  smb:client: Rename variable to match the rest of the code
+  smb:client: Split idr remove and release functions
+  smb:client: Add a specific task to refresh witness registrations
+  smb:client: Store the tcon dstaddr in the witness registration
+  smb:client: Fix printf format string
+  smb:client: Save memory allocations
+  smb:client: Use the correct return code
+  smb:client: Improve tcon matching logic
+  smb:client: Pass the tcon to cifs_swn_send_register_message
+  smb:client: Pass the tcon to notification handlers
+  smb:client: Introduce swn_notification struct
+  smb:client: Cache auth info
+  smb:client: Do not store the tcon reference, find a matching one
+  smb:client: Simplify registration creation
+  smb:client: Improve registration network and share names handling
+  smb:client: Avoid witness re-register if the address did not change
+
+ fs/smb/client/cifs_swn.c | 1179 ++++++++++++++++++++++----------------
+ fs/smb/client/cifs_swn.h |    3 -
+ fs/smb/client/connect.c  |    3 -
+ fs/smb/client/trace.h    |    4 +-
+ 4 files changed, 682 insertions(+), 507 deletions(-)
+
+-- 
+2.54.0
 
