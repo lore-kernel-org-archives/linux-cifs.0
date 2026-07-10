@@ -1,16 +1,16 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189E73DB651
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 09:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304A43D5252
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 09:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783675082; cv=none; b=ZvtRKK85sK7aF86RWlxH5lM5Euout6WmZBKhFcjRSjZS9yL7APyNQZ8FXVvG+iYgXCBFBSvz4Ub/NC5SgsbRzjRH8V57SIOcLpxNU7vLGY50BZeMmoznD01QJNY3JOzGjlauMr0pf8NRFzHNsX+CE4zKkIYXa97KpDRPeItCcyo=
+	t=1783675088; cv=none; b=uCjy6fZD+u0JjV+G8q5bq3FIEaauTJf7CpLT8wb+rdNqlrz1BgqUf7538BhBDfYY5/+hYGHA+mxtJICYqJbkK4sUX23U6KbKjXegW7PTnWdrkyQDi775BeoUhwJB12YIs5jcb8l0yfxzmfjo7rADEX6hpdGg3YhlTGHDBPsg39Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783675082; c=relaxed/simple;
-	bh=2WDMC84fDHtM+W88BEn30k2VZ3S3RmXFiafcob5FjSQ=;
+	s=arc-20240116; t=1783675088; c=relaxed/simple;
+	bh=6+pZYHsHs/QfWLFuIekhz0357b7BoYrAbQKVEehbojM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h095jrGPa2jbWpGsTBWxx8/oDZqIIrxVVuh3srm09RBkZ9ABJAX4SMjtFgFMmk5uXFvKgnlY43rjfzadwdVMnoTGBmV2uq6QquZRRvZOLcBgO7fCO7F1usz1v4vVZIAZhOkPqT6orGXuYYgO3+tk0wOjAaX61xJsRX0qY+0cL7A=
+	 MIME-Version; b=XMpSVhTkNGR3ykIQwL4ZT4Rp1u/5ln4lOQQ40FOdFNMmv5Z7gcjpDRZzMF3sF28P5eDqESQNXKl/A3tZVW4Xm3+DPKbLh6+MurrfCDl/HvLbAwR1hLeh0FOi8w5HoQMBuNyMMn8XReKxNf2BKhUKlff93pz0IN4QgQnzFKYepy0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
@@ -18,20 +18,20 @@ Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 8D64876402;
-	Fri, 10 Jul 2026 09:17:08 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4460A76404;
+	Fri, 10 Jul 2026 09:17:09 +0000 (UTC)
 Authentication-Results: smtp-out2.suse.de;
 	none
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ECD6B779BE;
-	Fri, 10 Jul 2026 09:17:07 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A2844779BD;
+	Fri, 10 Jul 2026 09:17:08 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id MPXuNpO4UGqnEQAAD6G6ig
-	(envelope-from <scabrero@suse.com>); Fri, 10 Jul 2026 09:17:07 +0000
+	id sL3HJJS4UGqnEQAAD6G6ig
+	(envelope-from <scabrero@suse.com>); Fri, 10 Jul 2026 09:17:08 +0000
 From: Samuel Cabrero <scabrero@suse.com>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -43,9 +43,9 @@ Cc: smfrench@gmail.com,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de,
 	Samuel Cabrero <scabrero@suse.com>
-Subject: [PATCH 16/18] smb:client: Simplify registration creation
-Date: Fri, 10 Jul 2026 11:16:35 +0200
-Message-ID: <20260710091637.58873-17-scabrero@suse.com>
+Subject: [PATCH 17/18] smb:client: Improve registration network and share names handling
+Date: Fri, 10 Jul 2026 11:16:36 +0200
+Message-ID: <20260710091637.58873-18-scabrero@suse.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260710091637.58873-1-scabrero@suse.com>
 References: <20260710091637.58873-1-scabrero@suse.com>
@@ -59,284 +59,233 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Pre-Result: action=no action;
 	module=replies;
 	Message is reply to one we originated
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
+X-Rspamd-Queue-Id: 4460A76404
 X-Spam-Flag: NO
 X-Spam-Score: -4.00
 X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
 X-Spamd-Result: default: False [-4.00 / 50.00];
 	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: 8D64876402
-X-Rspamd-Action: no action
 
-And switch to GFP_KERNEL since the code path can sleep.
+Store the names and add them to the netlink messages only if required.
+
+The network name notification is always enabled. The share name
+notification is only enabled for asymmetric shares.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.com>
 ---
- fs/smb/client/cifs_swn.c | 209 ++++++++++++++++++++-------------------
- 1 file changed, 106 insertions(+), 103 deletions(-)
+ fs/smb/client/cifs_swn.c | 111 +++++++++++++++++++++------------------
+ 1 file changed, 61 insertions(+), 50 deletions(-)
 
 diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
-index 97e415e441e4..3375a65ec32e 100644
+index 3375a65ec32e..a196b06c4b8c 100644
 --- a/fs/smb/client/cifs_swn.c
 +++ b/fs/smb/client/cifs_swn.c
-@@ -323,7 +323,8 @@ cifs_swn_reg_get_tcon(const struct cifs_swn_reg *swnreg)
- /*
-  * Sends a register message to the userspace daemon based on the registration.
-  * The authentication information to connect to the witness service is bundled
-- * into the message.
-+ * into the message. This function can sleep while allocating the genlmsg so
-+ * it must be called after taking a swnreg reference and release the lock.
-  */
- static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
- {
-@@ -414,7 +415,9 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
- }
+@@ -212,7 +212,7 @@ static bool cifs_swn_reg_net_name_matches(const struct cifs_swn_reg *swnreg,
+ 		return false;
  
- /*
-- * Sends an uregister message to the userspace daemon based on the registration
-+ * Sends an unregister message to the userspace daemon based on the registration.
-+ * This function can sleep while allocating the genlmsg so it must be called after
-+ * taking a swnreg reference and release the lock.
-  */
- static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
- {
-@@ -481,6 +484,11 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
- 	return ret;
- }
+ 	host_len = delim - host;
+-	if (strlen(swnreg->net_name) == host_len &&
++	if (swnreg->net_name != NULL && strlen(swnreg->net_name) == host_len &&
+ 	    !strncasecmp(swnreg->net_name, host, host_len)) {
+ 		return true;
+ 	}
+@@ -269,7 +269,7 @@ static bool cifs_swn_reg_tcon_matches(const struct cifs_swn_reg *swnreg,
+ 		return false;
  
-+/*
-+ * Release a registration. Must be called with the last reference dropped (the
-+ * refcount has reached zero) and with the registration already removed from the
-+ * IDR under cifs_swnreg_idr_mutex, so it is no longer discoverable.
-+ */
- static void cifs_swn_reg_release(struct cifs_swn_reg *swnreg)
- {
- 	int ret;
-@@ -614,99 +622,6 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
- 	return ERR_PTR(-ENOENT);
- }
+ 	/* The network name notification is always enabled */
+-	if (!cifs_swn_reg_net_name_matches(swnreg, tcon))
++	if (swnreg->net_name_notify && !cifs_swn_reg_net_name_matches(swnreg, tcon))
+ 		return false;
  
--/*
-- * Get a registration for the tcon's server and share name, allocating a new one if it does not
-- * exists
-- */
--static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
--{
--	struct cifs_swn_reg *swnreg = NULL;
--	int ret;
+ 	/*
+@@ -346,26 +346,28 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+-	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME, swnreg->net_name);
+-	if (ret < 0)
+-		goto nlmsg_fail;
 -
--	mutex_lock(&cifs_swnreg_idr_mutex);
+-	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME, swnreg->share_name);
+-	if (ret < 0)
+-		goto nlmsg_fail;
 -
--	/* Check if we are already registered for this network and share names */
--	swnreg = cifs_find_swn_reg(tcon);
--	if (!IS_ERR(swnreg)) {
--		kref_get(&swnreg->ref_count);
--		goto unlock;
--	} else if (PTR_ERR(swnreg) != -ENOENT) {
--		goto unlock;
--	}
+ 	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP,
+ 		      sizeof(struct sockaddr_storage), &swnreg->addr);
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+ 	if (swnreg->net_name_notify) {
++		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME,
++				     swnreg->net_name);
++		if (ret < 0)
++			goto nlmsg_fail;
++
+ 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_NET_NAME_NOTIFY);
+ 		if (ret < 0)
+ 			goto nlmsg_fail;
+ 	}
+ 
+ 	if (swnreg->share_name_notify) {
++		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME,
++				     swnreg->share_name);
++		if (ret < 0)
++			goto nlmsg_fail;
++
+ 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME_NOTIFY);
+ 		if (ret < 0)
+ 			goto nlmsg_fail;
+@@ -403,8 +405,8 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
+ 	genlmsg_end(skb, hdr);
+ 	genlmsg_multicast(&cifs_genl_family, skb, 0, CIFS_GENL_MCGRP_SWN, GFP_ATOMIC);
+ 
+-	cifs_dbg(FYI, "%s: Message to register for network name %s with id %d sent\n", __func__,
+-			swnreg->net_name, swnreg->id);
++	cifs_dbg(FYI, "%s: Message to register for network name '%s' with id %d sent\n", __func__,
++			swnreg->net_name ? swnreg->net_name : "", swnreg->id);
+ 
+ 	return 0;
+ 
+@@ -439,26 +441,28 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+-	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME, swnreg->net_name);
+-	if (ret < 0)
+-		goto nlmsg_fail;
 -
--	swnreg = kmalloc_obj(struct cifs_swn_reg, GFP_ATOMIC);
--	if (swnreg == NULL) {
--		ret = -ENOMEM;
--		goto fail_unlock;
--	}
+-	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME, swnreg->share_name);
+-	if (ret < 0)
+-		goto nlmsg_fail;
 -
--	kref_init(&swnreg->ref_count);
--
--	swnreg->id = idr_alloc(&cifs_swnreg_idr, swnreg, 1, 0, GFP_ATOMIC);
--	if (swnreg->id < 0) {
--		cifs_dbg(FYI, "%s: failed to allocate registration id\n", __func__);
--		ret = swnreg->id;
--		goto fail;
--	}
--
+ 	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP,
+ 		      sizeof(struct sockaddr_storage), &swnreg->addr);
+ 	if (ret < 0)
+ 		goto nlmsg_fail;
+ 
+ 	if (swnreg->net_name_notify) {
++		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME,
++				     swnreg->net_name);
++		if (ret < 0)
++			goto nlmsg_fail;
++
+ 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_NET_NAME_NOTIFY);
+ 		if (ret < 0)
+ 			goto nlmsg_fail;
+ 	}
+ 
+ 	if (swnreg->share_name_notify) {
++		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME,
++				     swnreg->share_name);
++		if (ret < 0)
++			goto nlmsg_fail;
++
+ 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME_NOTIFY);
+ 		if (ret < 0)
+ 			goto nlmsg_fail;
+@@ -473,8 +477,8 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
+ 	genlmsg_end(skb, hdr);
+ 	genlmsg_multicast(&cifs_genl_family, skb, 0, CIFS_GENL_MCGRP_SWN, GFP_ATOMIC);
+ 
+-	cifs_dbg(FYI, "%s: Message to unregister for network name %s with id %d sent\n", __func__,
+-			swnreg->net_name, swnreg->id);
++	cifs_dbg(FYI, "%s: Message to unregister for network name '%s' with id %d sent\n", __func__,
++			swnreg->net_name ? swnreg->net_name : "", swnreg->id);
+ 
+ 	return 0;
+ 
+@@ -938,29 +942,40 @@ int cifs_swn_register(struct cifs_tcon *tcon)
+ 		return ret;
+ 	}
+ 
 -	swnreg->net_name = extract_hostname(tcon->tree_name);
 -	if (IS_ERR(swnreg->net_name)) {
 -		ret = PTR_ERR(swnreg->net_name);
--		cifs_dbg(VFS, "%s: failed to extract host name from target: %d\n", __func__, ret);
--		goto fail_idr;
--	}
--
--	swnreg->share_name = extract_sharename(tcon->tree_name);
--	if (IS_ERR(swnreg->share_name)) {
--		ret = PTR_ERR(swnreg->share_name);
--		cifs_dbg(VFS, "%s: failed to extract share name from target: %d\n", __func__, ret);
--		goto fail_net_name;
--	}
--
--	ret = cifs_swn_reg_set_auth(swnreg, tcon);
--	if (ret != 0) {
--		cifs_dbg(VFS, "%s: failed to set auth info: %d\n", __func__,
--			 ret);
--		goto fail_share_name;
--	}
--
--	/*
--	 * If there is an address stored use it instead of the server address, because we are
--	 * in the process of reconnecting to it after a share has been moved or we have been
--	 * told to switch to it (client move message). In these cases we unregister from the
--	 * server address and register to the new address when we receive the notification.
--	 */
--	if (tcon->ses->server->use_swn_dstaddr)
--		swnreg->addr = tcon->ses->server->swn_dstaddr;
--	else
--		swnreg->addr = tcon->ses->server->dstaddr;
--
--	swnreg->net_name_notify = true;
--	swnreg->share_name_notify =
--		(tcon->capabilities & SMB2_SHARE_CAP_ASYMMETRIC);
--	swnreg->ip_notify = false;
--
--	swnreg->check_interval = tcon->ses->server->echo_interval;
--	INIT_DELAYED_WORK(&swnreg->check, cifs_swn_reg_check);
--
--	queue_delayed_work(cifsiod_wq, &swnreg->check, swnreg->check_interval);
--unlock:
--	mutex_unlock(&cifs_swnreg_idr_mutex);
--
--	return swnreg;
--fail_share_name:
--	kfree(swnreg->share_name);
--fail_net_name:
--	kfree(swnreg->net_name);
--fail_idr:
--	idr_remove(&cifs_swnreg_idr, swnreg->id);
--fail:
--	kfree(swnreg);
--fail_unlock:
--	mutex_unlock(&cifs_swnreg_idr_mutex);
--	return ERR_PTR(ret);
--}
--
- static void cifs_swn_resource_state_changed(struct cifs_tcon *tcon,
- 					    const char *name, int state)
- {
-@@ -816,8 +731,8 @@ cifs_swn_handle_notification_tcon(const struct cifs_swn_notification *not,
- 
- /*
-  * This function process a notification received for a registration. It
-- * searches all matching tcons to deliver it and then unregisters/registers
-- * as necessary if the address has changed.
-+ * unregisters/registers as necessary and applies the notification to all
-+ * matching tcons.
-  */
- static int cifs_swn_handle_notification(const struct cifs_swn_notification *not)
- {
-@@ -986,16 +901,104 @@ int cifs_swn_register(struct cifs_tcon *tcon)
- 	struct cifs_swn_reg *swnreg;
- 	int ret;
- 
--	swnreg = cifs_get_swn_reg(tcon);
--	if (IS_ERR(swnreg))
-+	mutex_lock(&cifs_swnreg_idr_mutex);
-+
-+	swnreg = cifs_find_swn_reg(tcon);
-+	if (!IS_ERR(swnreg)) {
-+		/*
-+		 * There is a registration matching this tcon, could be a second mount of
-+		 * the same share, increment the refcount.
-+		 */
-+		if (kref_get_unless_zero(&swnreg->ref_count)) {
-+			mutex_unlock(&cifs_swnreg_idr_mutex);
-+			return 0;
-+		}
-+		/* Else it is being released, allocate new one */
-+	} else if (PTR_ERR(swnreg) != -ENOENT) {
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
- 		return PTR_ERR(swnreg);
-+	}
- 
--	ret = cifs_swn_send_register_message(swnreg);
--	if (ret < 0) {
--		cifs_dbg(VFS, "%s: Failed to send swn register message: %d\n", __func__, ret);
--		/* Do not put the swnreg or return error, the check task will retry */
-+	/* Allocate new registration */
-+	swnreg = kzalloc_obj(struct cifs_swn_reg, GFP_KERNEL);
-+	if (swnreg == NULL) {
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		return -ENOMEM;
- 	}
- 
-+	kref_init(&swnreg->ref_count);
-+
-+	swnreg->id = idr_alloc(&cifs_swnreg_idr, swnreg, 1, 0, GFP_KERNEL);
-+	if (swnreg->id < 0) {
-+		ret = swnreg->id;
-+		cifs_dbg(FYI, "%s: failed to allocate registration id\n",
-+			 __func__);
-+		kfree(swnreg);
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		return ret;
-+	}
-+
-+	swnreg->net_name = extract_hostname(tcon->tree_name);
-+	if (IS_ERR(swnreg->net_name)) {
-+		ret = PTR_ERR(swnreg->net_name);
-+		cifs_dbg(VFS,
-+			 "%s: failed to extract host name from target: %d\n",
-+			 __func__, ret);
-+		idr_remove(&cifs_swnreg_idr, swnreg->id);
-+		kfree(swnreg);
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		return ret;
-+	}
-+
-+	swnreg->share_name = extract_sharename(tcon->tree_name);
-+	if (IS_ERR(swnreg->share_name)) {
-+		ret = PTR_ERR(swnreg->share_name);
-+		cifs_dbg(VFS,
-+			 "%s: failed to extract share name from target: %d\n",
-+			 __func__, ret);
-+		kfree(swnreg->net_name);
-+		idr_remove(&cifs_swnreg_idr, swnreg->id);
-+		kfree(swnreg);
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		return ret;
-+	}
-+
-+	ret = cifs_swn_reg_set_auth(swnreg, tcon);
-+	if (ret != 0) {
-+		cifs_dbg(VFS, "%s: failed to set auth info: %d\n", __func__,
-+			 ret);
-+		kfree(swnreg->net_name);
-+		kfree(swnreg->share_name);
-+		idr_remove(&cifs_swnreg_idr, swnreg->id);
-+		kfree(swnreg);
-+		mutex_unlock(&cifs_swnreg_idr_mutex);
-+		return ret;
-+	}
-+
-+	/*
-+	 * If there is an address stored use it instead of the server address, because we are
-+	 * in the process of reconnecting to it after a share has been moved or we have been
-+	 * told to switch to it (client move message). In these cases we unregister from the
-+	 * server address and register to the new address when we receive the notification.
-+	 */
-+	if (tcon->ses->server->use_swn_dstaddr)
-+		swnreg->addr = tcon->ses->server->swn_dstaddr;
-+	else
-+		swnreg->addr = tcon->ses->server->dstaddr;
-+
+-		cifs_dbg(VFS,
+-			 "%s: failed to extract host name from target: %d\n",
+-			 __func__, ret);
+-		idr_remove(&cifs_swnreg_idr, swnreg->id);
+-		kfree(swnreg);
+-		mutex_unlock(&cifs_swnreg_idr_mutex);
+-		return ret;
 +	swnreg->net_name_notify = true;
 +	swnreg->share_name_notify =
 +		(tcon->capabilities & SMB2_SHARE_CAP_ASYMMETRIC);
 +	swnreg->ip_notify = false;
 +
-+	swnreg->check_interval = tcon->ses->server->echo_interval;
-+	INIT_DELAYED_WORK(&swnreg->check, cifs_swn_reg_check);
-+
-+	/* Queue a immediate run to send the netlink message */
-+	queue_delayed_work(cifsiod_wq, &swnreg->check, 0);
-+
-+	mutex_unlock(&cifs_swnreg_idr_mutex);
-+
- 	return 0;
- }
++	if (swnreg->net_name_notify) {
++		swnreg->net_name = extract_hostname(tcon->tree_name);
++		if (IS_ERR(swnreg->net_name)) {
++			ret = PTR_ERR(swnreg->net_name);
++			cifs_dbg(
++				VFS,
++				"%s: failed to extract host name from target: %d\n",
++				__func__, ret);
++			idr_remove(&cifs_swnreg_idr, swnreg->id);
++			kfree(swnreg);
++			mutex_unlock(&cifs_swnreg_idr_mutex);
++			return ret;
++		}
+ 	}
  
+-	swnreg->share_name = extract_sharename(tcon->tree_name);
+-	if (IS_ERR(swnreg->share_name)) {
+-		ret = PTR_ERR(swnreg->share_name);
+-		cifs_dbg(VFS,
+-			 "%s: failed to extract share name from target: %d\n",
+-			 __func__, ret);
+-		kfree(swnreg->net_name);
+-		idr_remove(&cifs_swnreg_idr, swnreg->id);
+-		kfree(swnreg);
+-		mutex_unlock(&cifs_swnreg_idr_mutex);
+-		return ret;
++	if (swnreg->share_name_notify) {
++		swnreg->share_name = extract_sharename(tcon->tree_name);
++		if (IS_ERR(swnreg->share_name)) {
++			ret = PTR_ERR(swnreg->share_name);
++			cifs_dbg(
++				VFS,
++				"%s: failed to extract share name from target: %d\n",
++				__func__, ret);
++			kfree(swnreg->net_name);
++			idr_remove(&cifs_swnreg_idr, swnreg->id);
++			kfree(swnreg);
++			mutex_unlock(&cifs_swnreg_idr_mutex);
++			return ret;
++		}
+ 	}
+ 
+ 	ret = cifs_swn_reg_set_auth(swnreg, tcon);
+@@ -986,11 +1001,6 @@ int cifs_swn_register(struct cifs_tcon *tcon)
+ 	else
+ 		swnreg->addr = tcon->ses->server->dstaddr;
+ 
+-	swnreg->net_name_notify = true;
+-	swnreg->share_name_notify =
+-		(tcon->capabilities & SMB2_SHARE_CAP_ASYMMETRIC);
+-	swnreg->ip_notify = false;
+-
+ 	swnreg->check_interval = tcon->ses->server->echo_interval;
+ 	INIT_DELAYED_WORK(&swnreg->check, cifs_swn_reg_check);
+ 
+@@ -1036,9 +1046,10 @@ void cifs_swn_dump(struct seq_file *m)
+ 		seq_printf(
+ 			m,
+ 			"\nId: %d Refs: %u Network name: '%s'%s Share name: '%s'%s Ip address: '%pISc'%s",
+-			id, kref_read(&swnreg->ref_count), swnreg->net_name,
++			id, kref_read(&swnreg->ref_count),
++			swnreg->net_name ? swnreg->net_name : "",
+ 			swnreg->net_name_notify ? "(y)" : "(n)",
+-			swnreg->share_name,
++			swnreg->share_name ? swnreg->share_name : "",
+ 			swnreg->share_name_notify ? "(y)" : "(n)",
+ 			&swnreg->addr, swnreg->ip_notify ? "(y)" : "(n)");
+ 	}
 -- 
 2.54.0
 
