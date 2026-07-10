@@ -1,291 +1,102 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304A43D5252
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 09:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAAF4229C3
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 13:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783675088; cv=none; b=uCjy6fZD+u0JjV+G8q5bq3FIEaauTJf7CpLT8wb+rdNqlrz1BgqUf7538BhBDfYY5/+hYGHA+mxtJICYqJbkK4sUX23U6KbKjXegW7PTnWdrkyQDi775BeoUhwJB12YIs5jcb8l0yfxzmfjo7rADEX6hpdGg3YhlTGHDBPsg39Y=
+	t=1783690098; cv=none; b=nZ3Y7DWnVeox/2/1uDBnc4wizN+r/LxhSiQblDmQWT4/5ve9aMtbLCv7RH99VfRx3XFMXGz/BdsAz48Aw555ALRrNYAGCCaeRwiLokT1e6Djz+KkWML0gziKz5u9Qhrh+x/BohYYvxrlTBzErywVMnY/8vtFLHD2FK3V4LnvM04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783675088; c=relaxed/simple;
-	bh=6+pZYHsHs/QfWLFuIekhz0357b7BoYrAbQKVEehbojM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XMpSVhTkNGR3ykIQwL4ZT4Rp1u/5ln4lOQQ40FOdFNMmv5Z7gcjpDRZzMF3sF28P5eDqESQNXKl/A3tZVW4Xm3+DPKbLh6+MurrfCDl/HvLbAwR1hLeh0FOi8w5HoQMBuNyMMn8XReKxNf2BKhUKlff93pz0IN4QgQnzFKYepy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 4460A76404;
-	Fri, 10 Jul 2026 09:17:09 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
-	none
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A2844779BD;
-	Fri, 10 Jul 2026 09:17:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sL3HJJS4UGqnEQAAD6G6ig
-	(envelope-from <scabrero@suse.com>); Fri, 10 Jul 2026 09:17:08 +0000
-From: Samuel Cabrero <scabrero@suse.com>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	pc@manguebit.com,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com,
-	ematsumiya@suse.de,
-	Samuel Cabrero <scabrero@suse.com>
-Subject: [PATCH 17/18] smb:client: Improve registration network and share names handling
-Date: Fri, 10 Jul 2026 11:16:36 +0200
-Message-ID: <20260710091637.58873-18-scabrero@suse.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260710091637.58873-1-scabrero@suse.com>
-References: <20260710091637.58873-1-scabrero@suse.com>
+	s=arc-20240116; t=1783690098; c=relaxed/simple;
+	bh=JdAKTYcUzColWk5DegpqpME52ckDiXbCHPCysNDVjE4=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=Nwww6q3JdUfkH+sZc6K2r1PsTl4f+d92mABYtFgfI90a5dQPOd7MAps0oplUFgWz0Z497L5Df+sS6TI8OUEKwrwn3ZQGZ2V85i3HszLZkHdxIBXSrUyykP8xY0kQQyALW2gFX3fJHlBGiHi1dN5M3RbVVCMveqtaPC1kuyhkzWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KO0yJ6OI; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KO0yJ6OI"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-698bf7a1a2dso1272849a12.0
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 06:28:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783690095; x=1784294895; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:content-type:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=JdAKTYcUzColWk5DegpqpME52ckDiXbCHPCysNDVjE4=;
+        b=KO0yJ6OIukQYZnRsY5vPTJ/du/tQQsCM9LWBiAC1Wr9Y2lmJcAePiEliegvt/t6J3Q
+         TnXLjN8ym70pO4SZnD4zakInCXUMzTdbt8Zv864vJ8l5YjxmfzKKdy7XUMqRZJmU66Qe
+         lLiIu+hY/igTEnGUT9g4SJA2QnAlE9AxlTRaCyhlPz/wmIB0Cig5nihSuuqpeE9jPolB
+         TOVgllmQiQ/4ipWk4xJ1YLaTS7406QfNoRASn+1ys+id+YjFCB4P8a+vSZcBfy840Pbo
+         rO3ssK2tOfF6omR5B1sIazXLrV+3eLL7llQgLD59eRSzp2+HHcTq6kbQeogkwNO6kFZ+
+         3cEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783690095; x=1784294895;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:content-type:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=JdAKTYcUzColWk5DegpqpME52ckDiXbCHPCysNDVjE4=;
+        b=Q57yHbG2EFq9sBoBOFYLYmQz6eqJh8+kS8jJU8j6ktxJhNCKV3fuGTpXzXphDDQoXQ
+         fGZfLo4kDWJY9+cvn0Doh+tsI3gkcVUKTk8PxEruN8LSvzWiPvP6qV3i26PNnsHglYAI
+         Ws/iu67JwuiID48KSNQPxkBZpKrjenEg3xJD73F0Fgr1+e7jvOTNlND+/dGxa03f5p4W
+         UYdldW+P2nIGKlTX9o7boAOcu5FEcSod5nKaWlqLSxoFfnqQ9F3cpzQttelIvOceb5nd
+         qaSlT0y0nFFygsaoi41wNF5f/6Tjez4t9y3sR0vlH/21SE1Rn9hK0IudAoTTPcKxEW+q
+         Doyg==
+X-Forwarded-Encrypted: i=1; AHgh+Rq8Y1rGdccBKsNzboDOynAas6tWmFAp/ul3AUe9mH7yygxDJ9ADJ7tWTeVpbLS93vH3+CIpQetX1bDX@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYnbY7yD64Ki8oam2ETJi1bTyGLHh4mH+eQw5I+oBpJobHzs/s
+	os+NuRGsovDuDgeiL1NVCuitWUR4Jpl9TMv0rhH4KHMGBR34UyEsTTKcXNEGcA==
+X-Gm-Gg: AfdE7ckcNg9tp/U7QLJZ+EHCvXxWrhOJi7atQ0GJZia9Nk8vJ7K8YbeSLTqBcpioOT8
+	IJ0lxgl4pcwxDurZ0e2/VHHjcrx72w+/fmTOgZv7lTMZSyz7wi7i/vYZES2/vXzNcZyXdk1o8dT
+	qLA1GmgsqpzchTtUzAFSqpmqvV6PjYq7ZDoGjHm3zVMENUVfjzZwxGSm0ndTSVcAE6/sWVOukFT
+	yL6QiysUf0hhQiqw1zUAT7SbgQBIoU5wlrSPLifXbx/7ihTUp6CY15dkhZYKnWO18hPRgzvUHzA
+	TVvLLeHDHrkUPKp3HRKBCsyLg3Wa2J16get3/vmWYcPXKV8rpF8tTm/KehsIzHuCju7ury3M5dy
+	F2h873/VQqk5jGNoiiQ4PMwt5taCilQQ52C1F6YgM+suaufg8PcgtbL8RcxoGVa6W16BOzMMPI3
+	SeOMIqw/6epIwob1GFAj5hxgCm2UuWpCEB8A==
+X-Received: by 2002:a05:6402:378b:b0:695:822c:1083 with SMTP id 4fb4d7f45d1cf-69ab44ae37bmr4863899a12.28.1783690094648;
+        Fri, 10 Jul 2026 06:28:14 -0700 (PDT)
+Received: from smtpclient.apple ([82.67.171.69])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69a19d786e7sm11734652a12.16.2026.07.10.06.28.13
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 10 Jul 2026 06:28:14 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Queue-Id: 4460A76404
-X-Spam-Flag: NO
-X-Spam-Score: -4.00
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
+Subject: Re: [PATCH v2 4/6] ksmbd: defer CHANGE_NOTIFY completion instead of
+ STATUS_NOT_IMPLEMENTED
+From: =?utf-8?Q?Ga=C3=ABl_Blivet?= <gael.blivet@gmail.com>
+In-Reply-To: <58326ff4-02d7-4db5-8352-dc53a0ef1d09@chenxiaosong.com>
+Date: Fri, 10 Jul 2026 15:28:03 +0200
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ linux-cifs@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <EEEAF8FF-E421-49D2-B778-06C405B1AF2C@gmail.com>
+References: <20260709000618.66534-1-g.blivet@me.com>
+ <20260709000618.66534-5-g.blivet@me.com>
+ <cb3e2376-88ae-4020-9417-ff925cadd8c0@chenxiaosong.com>
+ <36FFCEFB-8E41-4EB6-B835-0B440C9F4A52@gmail.com>
+ <882a42e8-bf41-4f7c-a30f-e9d2fe44c49d@chenxiaosong.com>
+ <c9a3fe37-c999-4d0d-8ee8-a34157c8a09e@chenxiaosong.com>
+ <12AF7BDE-BF1C-40FA-81CD-93DD3AB666AC@gmail.com>
+ <58326ff4-02d7-4db5-8352-dc53a0ef1d09@chenxiaosong.com>
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+X-Mailer: Apple Mail (2.3864.600.51.1.1)
 
-Store the names and add them to the netlink messages only if required.
+We can keep that in mind and see in practice how it performs (for =
+example with Time Machine, that can open long-running watches).
 
-The network name notification is always enabled. The share name
-notification is only enabled for asymmetric shares.
-
-Signed-off-by: Samuel Cabrero <scabrero@suse.com>
----
- fs/smb/client/cifs_swn.c | 111 +++++++++++++++++++++------------------
- 1 file changed, 61 insertions(+), 50 deletions(-)
-
-diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
-index 3375a65ec32e..a196b06c4b8c 100644
---- a/fs/smb/client/cifs_swn.c
-+++ b/fs/smb/client/cifs_swn.c
-@@ -212,7 +212,7 @@ static bool cifs_swn_reg_net_name_matches(const struct cifs_swn_reg *swnreg,
- 		return false;
- 
- 	host_len = delim - host;
--	if (strlen(swnreg->net_name) == host_len &&
-+	if (swnreg->net_name != NULL && strlen(swnreg->net_name) == host_len &&
- 	    !strncasecmp(swnreg->net_name, host, host_len)) {
- 		return true;
- 	}
-@@ -269,7 +269,7 @@ static bool cifs_swn_reg_tcon_matches(const struct cifs_swn_reg *swnreg,
- 		return false;
- 
- 	/* The network name notification is always enabled */
--	if (!cifs_swn_reg_net_name_matches(swnreg, tcon))
-+	if (swnreg->net_name_notify && !cifs_swn_reg_net_name_matches(swnreg, tcon))
- 		return false;
- 
- 	/*
-@@ -346,26 +346,28 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
- 	if (ret < 0)
- 		goto nlmsg_fail;
- 
--	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME, swnreg->net_name);
--	if (ret < 0)
--		goto nlmsg_fail;
--
--	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME, swnreg->share_name);
--	if (ret < 0)
--		goto nlmsg_fail;
--
- 	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP,
- 		      sizeof(struct sockaddr_storage), &swnreg->addr);
- 	if (ret < 0)
- 		goto nlmsg_fail;
- 
- 	if (swnreg->net_name_notify) {
-+		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME,
-+				     swnreg->net_name);
-+		if (ret < 0)
-+			goto nlmsg_fail;
-+
- 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_NET_NAME_NOTIFY);
- 		if (ret < 0)
- 			goto nlmsg_fail;
- 	}
- 
- 	if (swnreg->share_name_notify) {
-+		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME,
-+				     swnreg->share_name);
-+		if (ret < 0)
-+			goto nlmsg_fail;
-+
- 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME_NOTIFY);
- 		if (ret < 0)
- 			goto nlmsg_fail;
-@@ -403,8 +405,8 @@ static int cifs_swn_send_register_message(struct cifs_swn_reg *swnreg)
- 	genlmsg_end(skb, hdr);
- 	genlmsg_multicast(&cifs_genl_family, skb, 0, CIFS_GENL_MCGRP_SWN, GFP_ATOMIC);
- 
--	cifs_dbg(FYI, "%s: Message to register for network name %s with id %d sent\n", __func__,
--			swnreg->net_name, swnreg->id);
-+	cifs_dbg(FYI, "%s: Message to register for network name '%s' with id %d sent\n", __func__,
-+			swnreg->net_name ? swnreg->net_name : "", swnreg->id);
- 
- 	return 0;
- 
-@@ -439,26 +441,28 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
- 	if (ret < 0)
- 		goto nlmsg_fail;
- 
--	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME, swnreg->net_name);
--	if (ret < 0)
--		goto nlmsg_fail;
--
--	ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME, swnreg->share_name);
--	if (ret < 0)
--		goto nlmsg_fail;
--
- 	ret = nla_put(skb, CIFS_GENL_ATTR_SWN_IP,
- 		      sizeof(struct sockaddr_storage), &swnreg->addr);
- 	if (ret < 0)
- 		goto nlmsg_fail;
- 
- 	if (swnreg->net_name_notify) {
-+		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_NET_NAME,
-+				     swnreg->net_name);
-+		if (ret < 0)
-+			goto nlmsg_fail;
-+
- 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_NET_NAME_NOTIFY);
- 		if (ret < 0)
- 			goto nlmsg_fail;
- 	}
- 
- 	if (swnreg->share_name_notify) {
-+		ret = nla_put_string(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME,
-+				     swnreg->share_name);
-+		if (ret < 0)
-+			goto nlmsg_fail;
-+
- 		ret = nla_put_flag(skb, CIFS_GENL_ATTR_SWN_SHARE_NAME_NOTIFY);
- 		if (ret < 0)
- 			goto nlmsg_fail;
-@@ -473,8 +477,8 @@ static int cifs_swn_send_unregister_message(struct cifs_swn_reg *swnreg)
- 	genlmsg_end(skb, hdr);
- 	genlmsg_multicast(&cifs_genl_family, skb, 0, CIFS_GENL_MCGRP_SWN, GFP_ATOMIC);
- 
--	cifs_dbg(FYI, "%s: Message to unregister for network name %s with id %d sent\n", __func__,
--			swnreg->net_name, swnreg->id);
-+	cifs_dbg(FYI, "%s: Message to unregister for network name '%s' with id %d sent\n", __func__,
-+			swnreg->net_name ? swnreg->net_name : "", swnreg->id);
- 
- 	return 0;
- 
-@@ -938,29 +942,40 @@ int cifs_swn_register(struct cifs_tcon *tcon)
- 		return ret;
- 	}
- 
--	swnreg->net_name = extract_hostname(tcon->tree_name);
--	if (IS_ERR(swnreg->net_name)) {
--		ret = PTR_ERR(swnreg->net_name);
--		cifs_dbg(VFS,
--			 "%s: failed to extract host name from target: %d\n",
--			 __func__, ret);
--		idr_remove(&cifs_swnreg_idr, swnreg->id);
--		kfree(swnreg);
--		mutex_unlock(&cifs_swnreg_idr_mutex);
--		return ret;
-+	swnreg->net_name_notify = true;
-+	swnreg->share_name_notify =
-+		(tcon->capabilities & SMB2_SHARE_CAP_ASYMMETRIC);
-+	swnreg->ip_notify = false;
-+
-+	if (swnreg->net_name_notify) {
-+		swnreg->net_name = extract_hostname(tcon->tree_name);
-+		if (IS_ERR(swnreg->net_name)) {
-+			ret = PTR_ERR(swnreg->net_name);
-+			cifs_dbg(
-+				VFS,
-+				"%s: failed to extract host name from target: %d\n",
-+				__func__, ret);
-+			idr_remove(&cifs_swnreg_idr, swnreg->id);
-+			kfree(swnreg);
-+			mutex_unlock(&cifs_swnreg_idr_mutex);
-+			return ret;
-+		}
- 	}
- 
--	swnreg->share_name = extract_sharename(tcon->tree_name);
--	if (IS_ERR(swnreg->share_name)) {
--		ret = PTR_ERR(swnreg->share_name);
--		cifs_dbg(VFS,
--			 "%s: failed to extract share name from target: %d\n",
--			 __func__, ret);
--		kfree(swnreg->net_name);
--		idr_remove(&cifs_swnreg_idr, swnreg->id);
--		kfree(swnreg);
--		mutex_unlock(&cifs_swnreg_idr_mutex);
--		return ret;
-+	if (swnreg->share_name_notify) {
-+		swnreg->share_name = extract_sharename(tcon->tree_name);
-+		if (IS_ERR(swnreg->share_name)) {
-+			ret = PTR_ERR(swnreg->share_name);
-+			cifs_dbg(
-+				VFS,
-+				"%s: failed to extract share name from target: %d\n",
-+				__func__, ret);
-+			kfree(swnreg->net_name);
-+			idr_remove(&cifs_swnreg_idr, swnreg->id);
-+			kfree(swnreg);
-+			mutex_unlock(&cifs_swnreg_idr_mutex);
-+			return ret;
-+		}
- 	}
- 
- 	ret = cifs_swn_reg_set_auth(swnreg, tcon);
-@@ -986,11 +1001,6 @@ int cifs_swn_register(struct cifs_tcon *tcon)
- 	else
- 		swnreg->addr = tcon->ses->server->dstaddr;
- 
--	swnreg->net_name_notify = true;
--	swnreg->share_name_notify =
--		(tcon->capabilities & SMB2_SHARE_CAP_ASYMMETRIC);
--	swnreg->ip_notify = false;
--
- 	swnreg->check_interval = tcon->ses->server->echo_interval;
- 	INIT_DELAYED_WORK(&swnreg->check, cifs_swn_reg_check);
- 
-@@ -1036,9 +1046,10 @@ void cifs_swn_dump(struct seq_file *m)
- 		seq_printf(
- 			m,
- 			"\nId: %d Refs: %u Network name: '%s'%s Share name: '%s'%s Ip address: '%pISc'%s",
--			id, kref_read(&swnreg->ref_count), swnreg->net_name,
-+			id, kref_read(&swnreg->ref_count),
-+			swnreg->net_name ? swnreg->net_name : "",
- 			swnreg->net_name_notify ? "(y)" : "(n)",
--			swnreg->share_name,
-+			swnreg->share_name ? swnreg->share_name : "",
- 			swnreg->share_name_notify ? "(y)" : "(n)",
- 			&swnreg->addr, swnreg->ip_notify ? "(y)" : "(n)");
- 	}
--- 
-2.54.0
+> Le 10 juil. 2026 =C3=A0 11:15, ChenXiaoSong =
+<chenxiaosong@chenxiaosong.com> a =C3=A9crit :
+>=20
+> Yes, before the cancel response or event notification response is =
+sent, the notify request has not completed yet, so the worker will =
+remain waiting.
+>=20
+> If you find that this approach causes any issues, we can refactor it =
+and use a better solution.
 
