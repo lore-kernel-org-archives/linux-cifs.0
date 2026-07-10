@@ -1,192 +1,325 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856DF261B71
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 18:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783706678; cv=pass; b=nbPG5PYHRTs9o18qJnHRIXUMFm2dLHPctzmD4V4m4hA6CK/cudQBXO4EZ/qyI+QUdBkSoruai6wOmdwPLRm5u1BETanKTlBoIjOpx2DaS6WKBY4gdcX8Pd/PDQqVbJkBG+Ayf9eoRgABQXfJw34lZhwtQTqr421HaReIbxaOlpM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783706678; c=relaxed/simple;
-	bh=fDpzHS870/ll2H6bL+4XZZ4l7iF4BMQMLvLordmcfKc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=E3vtXXoZ+Wc+UW3j2kepbme8bBSu05ZoA1e6pkrozozX/PBGvNg4jBgPFKYes9jzny7Afvwflcp9fPf4LfrwgXSHGs8V0z+DrpHL+tG1rTw90ZZESzuwqYkC1f4MV1CiQ7t4Is2Jid0Y3rgnoRUw7za5KwaqNKFb6VbjAb7JgqY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEiFdEqh; arc=pass smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15065343881
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 19:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783712000; cv=none; b=jvRb+Kz1BLbaxkci4+UUcdW4BQgl9iyjlL81RBMHcIAq+63sGwN4Sd0g/d+VGCUkVx6EU8ckFo4XJ6khZIai2BqfBCc+QDVqGTF8mCA6JNAUHb9wJzZGiBkDdFz+h6IDJUGnvvnQ/Uhyi9PPIwECeXkTJfLPXecsHwE/lJD5H+E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783712000; c=relaxed/simple;
+	bh=l6UU8TEe6v/tGIxxhz4rWfT6LTe5NVZdKP6Yb0onB+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=feZ8r+VdbJx/n+7mLhgBL99WBTsgxDEntNKn/NkqOzup4/Irw+2Ua5ZEK9cIFKxaHrv8R6SgZfmmcayp+WAC3/0rPKODZ1u31Ra5lnLzs27jdz10lFzpOKIYJxn4IvWJlNKY0GimPngXwCUqFmzfFYnuK25ymF3qIKbKhftk1II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YK2rBzLV; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEiFdEqh"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c2808dbc3so7307441cf.1
-        for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 11:04:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783706675; cv=none;
-        d=google.com; s=arc-20260327;
-        b=bIKt6WvWkieDoP1QiFLVh6ENTGLOHtcXrPGsTnJV2n0cSAOHwUgSYBzVeLbp51Zr0u
-         /3c0BzQlfpn/zvTMFsZu9HeiYpt1rCfiaYIlBaOPRV9k+cxfsy9XztdTLTa6GvaUmNrL
-         uLNM7bfr9C4DAGiOdzgFCJhXLv9BoVRaMao30IzXLGEo3Xn3tjWaTFdVdZ6rFJDzahpc
-         /NaFOldZTEkBFy51JvD1nQ7BQZgS26xPjSGfdBmLFmtdIOiP3il/Zr8JFJ6x6wEgCCW+
-         kmv0O2bcW1Wdo2vgxT4kMZ/xLSSTQvMhlX9XD6jIFBRqkfzuoaTh+DSweAd0RkY9gPL6
-         KBFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:dkim-signature;
-        bh=aWuoIiTWd6CKC5WT2iLgbFPnY5SCLuI23SoYZKVMgjw=;
-        fh=19qWtpzjazHwpc/rfO6Eqx9AAT1u0rwQfwoQY0l6Q+c=;
-        b=g+mqNmWtDZlTbsWbPIcWFxJ5omvJ32DTZxZ7epIGmgCesEbJi3ESVK7Ql6ODMtHbrL
-         uSJEszCyfaSDf1glKBM6lJsR9ZwzFhXsc6zUEYrvLYNPqxvKMFL2mhVMSsM7dJ+h7SmK
-         B+fBxDQIEVgkviMnwVk9p6Mm+Xa1a3kkh4SMNSy4s/xgGM1UY2dSag9EqVdLrBobBmJd
-         oylr4LHV53918SXLVZ2Pa5eSIPlQdY9mASKMyzHyYblTsouD62ny+00XMLo9Ej00l6+j
-         8a73a5iLhdD5fznWld0j9C2cKVoHA5iZy9TwNwamWUp/bPBr2uYoolwKlwwQGaw0LVvF
-         8PqQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YK2rBzLV"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-383cb94f742so1192365a91.3
+        for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 12:33:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783706675; x=1784311475; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=aWuoIiTWd6CKC5WT2iLgbFPnY5SCLuI23SoYZKVMgjw=;
-        b=hEiFdEqhhtfmUOt+FWUk8HOaoBPP+KJol+Orx28IEwopTILx8CNB7AOXnNicAWkOu8
-         Rf3BormmuS4pb2MyzZRX/IU60SSyMnAN/igrmGu2LrUE3YvGPQAOJofWHu74sxMVbSMN
-         RsHtphi9uxk3whKet+FntuydIn003NmDc/kRcWm3V/F++lgn9P2wSMy0tjbmJ170ctwk
-         Q1zQiQCnjE55ipSvK11Um/8IcVA+Od+xYnIn22eXJI6zKcM8Pfuk3/mBLVeD2KHO9du+
-         ZqgLUxWfN4W5yWNysvCxO+wLQce96G06Huh8uXAHgu25D8ToLo0yZJ+5ZdZIvlzgs6de
-         mBgQ==
+        d=gmail.com; s=20251104; t=1783711998; x=1784316798; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=TssTRJO0fXBThfgUrtYHXO20oypHBi4O7ZKAdkQip+U=;
+        b=YK2rBzLViedpVd2EbBdRPr3cHe987h89exTxft/yXtEZSgaqx+tU8DJOW+CsAzkT8s
+         wrX3+D6Lve+/TU2Lj38M/oJR6K92xacbRPofi/dCInFrKihx1tblZK1b09zhU3wdT6g/
+         zN8n6CqAwOKqkjGpkhozaV6pxXdjxkHcoDmUo1JyqYKcuN7G9kxEzFOzyLF7gn5bNonL
+         R18Zb3hM84LZWprc9hgh6J+o+h2v5t9JK8EjE13BuTsswhPvHVWacR5TzHLIcN11CeKl
+         1tXLCsr+tfdn3ayV5Z7+BGSIXSykBTysgrh7xfWIJHk9iSKIkRrEU1x3b4bVBU/rkB+u
+         UT0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783706675; x=1784311475;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=aWuoIiTWd6CKC5WT2iLgbFPnY5SCLuI23SoYZKVMgjw=;
-        b=U5RN0w8Df5/Es3TIIe52Ev9je2r3YPmFHppTfIJMqLPIezWgOwKGOJwCwFQq6+YldK
-         PpFHHNHYe8hX24WQyEzIItqFSKmZ3dU2Ee8+Ota6alOrWgtv/gHZ+/V5MaA1DCQSFg0U
-         IHTqUQbuJDAbuuO+SUlZgCKJqlnVmO2wkIqNWmCmrhBwRww4MqpZUwU35qPGq++LAtPp
-         c5xLtPaFJqbP1Bo5Ra5jrvevJhn1Z4poOEBokn68HPkHCrQdlT86HGTWiLaStm3OtA7r
-         3JRS/nvQ4QgcEfo81DPmBNEtZ90YPqLPjR4oLXzjEBGJz9VQC1mcDWBScYJgyKKEXJ+9
-         sRGQ==
-X-Forwarded-Encrypted: i=1; AHgh+RoPnrO1Ni3SpwG2Tg/V34nTDabcjpU1a4cTJdWL/0TVgwusX8h655UtoeBbuut9nWdgbqruheuFM1Np@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmrmP0QvMjif0x7BhWydyokj66kf3SjgSYR1xwiz5ZyWAK3EL6
-	FY39iPTgkJCM/cvVT29Ceq1IuKPgF0QAIxBfj+DhRxNsH6vhStZJG9bL4E+F8dbbb5TJGDYOR4v
-	440cNSUaZSnLB5h2UssxMwJdLu+QlKr0=
-X-Gm-Gg: AfdE7ckrTaUSE1QVrOrL+vmi6sUekvd+SsUiKII29SJxcVcCW5mQy3nYtEjwHfc+GnY
-	sxd1K3T823gFcmGQMyPpT9GbKALe8DYynQjCeByhFPr+KD09bJoDQf3aRrFYGTb3XflOWx18Fv6
-	W6o9GMqS29ImxKRdIaprJDCmR8kGBin4OIgonqbPpTzlzoGVnZ8Jmt1GxSFitAHUC70+jZNJnCa
-	tsO+56zJUERL3LDeYeBMnUjv9z2XKhA6Ps//WTOOXhXUgvpb4ehpjCgontswPCegkPzDeT8K4z4
-	K4NRaQlYEqwXTgYPxB8JegCtGSplGRNy6VOLbpJjX8iqWNLAPZT0jSCx6WDEpHhAcG8NfBWPQG2
-	qsdEwmrFr16WyP94ZhRJMjNN284rZgDfBpENrZb0rD68XHQbhJE+qY/jxKACQv4yyq8eLrtt/t5
-	JkwT+lk9VIkQ==
-X-Received: by 2002:a05:6214:cc7:b0:8f0:12e8:f453 with SMTP id
- 6a1803df08f44-90400d84760mr1427856d6.33.1783706674975; Fri, 10 Jul 2026
- 11:04:34 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1783711998; x=1784316798;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=TssTRJO0fXBThfgUrtYHXO20oypHBi4O7ZKAdkQip+U=;
+        b=AQa1SZQzwpiNYfi4mpS2lWJU63C3bpFcwzZ1mANwkhvvmUP8CJVnBicclDWpR7u6lF
+         vl4XUWt/XV3AVMKPn7SFk4UQ5ZeJ2835jJuJXG/GMs3MZKedaO13aMX2feB6wD6ILTqn
+         Dt6IDknCl57IOUCFPweN5LF2v3msGf5qGNPnoe2ElXwGIoJjzkWDSnfpfCVsEaHYOPEk
+         el1NdwC5LoXQ8SvaRVJHRPuqHav6phZorJ32LFmn4uZq1QNq/pBvd+UiDV5t7OUGLB7d
+         QjlnOANEWqh/J9A+OdRLjb1pPr4hPpS41iwEgb1ahC+fV+vUK9iC0f1y3mdnwLY/UDKy
+         1t+g==
+X-Forwarded-Encrypted: i=1; AHgh+RrO12gjdxfwRYwftDo8VuX5YF3trHEpq3NkXSdcovIkx6GPEcNZCUv6ltvuTPe6P6fDV2a8hCZ97kyO@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAOhgP63ujdeLOMt8zHGox4f3tdd1i6Vuct9nMYASBHAXUuyPJ
+	9FNrtWIVot8OQDfhOk0/5oC1c0eigbk6lsk1lzO5/CBz8RQP0yjJhQ8v
+X-Gm-Gg: AfdE7cnLbLUg5sOhKw++yOjutgZjGBRCiOuU2/jvQrQIimNGCh2AYBszC9sejhewk+i
+	RqrIQy2CiV3oqxpmQQpzdQwl6G3MnlF2z024pv2uwyco+ewhEF3H0QKZy7nln2W9tTdEMCPBlWx
+	tNRZKTG2CbRU0HZRi8T9qlLQqKLLj2EKmGYdApYQ0HnV4Ul9R6MaJEquOIvtuqrfrwrrZaaAYPj
+	fjuufBjTVBbyzNV9HwVzKsV6Vo/kx9tTZtybTaLbY04uqxO7Sgst/EOJFmMGyJNz6CR89rb8tWM
+	LCjg0PsHcM1rDHDWs8+0x0H50u4cdvZnbDQ7MtZtCfO4r2XO6oWpIM7h3H0GPkcjIZJPSmhW9Vn
+	Umo6wEgqlzlygfBUj7jHVcIdZQC6v/1RwJmKkKHnypsxYSnqJuqckhffWFUOrK7rzZ7H/YqKAx3
+	YS40aTzm8jNG62Spq16xTn5FEXHO7B640d+qG8ccrjxCavGpr3ITpKMf2DInZuYhzTSv+B6uq9l
+	rMcJa40tNxtgPM0
+X-Received: by 2002:a17:90b:58cc:b0:380:540:d499 with SMTP id 98e67ed59e1d1-38dc78224a5mr252693a91.6.1783711998273;
+        Fri, 10 Jul 2026 12:33:18 -0700 (PDT)
+Received: from localhost.localdomain (116-91-131-11.east.dxpn.ucom.ne.jp. [116.91.131.11])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38a55b413e6sm3186273a91.8.2026.07.10.12.33.15
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 10 Jul 2026 12:33:16 -0700 (PDT)
+From: Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
+To: Steve French <sfrench@samba.org>,
+	linux-cifs@vger.kernel.org
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Pavel Shilovsky <piastryyy@gmail.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-kernel@vger.kernel.org,
+	Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v5] smb: client: restrict implied bcc[0] exemption to responses without data area
+Date: Sat, 11 Jul 2026 04:32:02 +0900
+Message-ID: <20260710193202.76314-1-shoichiro.miyamoto@gmail.com>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20260707112358.2375494-1-shoichiro.miyamoto@gmail.com>
+References: <20260707112358.2375494-1-shoichiro.miyamoto@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Fri, 10 Jul 2026 13:04:22 -0500
-X-Gm-Features: AUfX_mwsI22d5BXgX9b7Vm60oOlQgV7EFL79fBn_zpvbksW8WfKYoH57L3iVrjY
-Message-ID: <CAH2r5msowam2AVfazUvVxhkoQ+PH=-Lx=u_U-nyArAnzUGrF8g@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Please pull the following changes since commit
-8cdeaa50eae8dad34885515f62559ee83e7e8dda:
+smb2_check_message() has a long-standing quirk that accepts a response
+whose calculated length is one byte larger than the bytes actually
+received ("server can return one byte more due to implied bcc[0]").
+This was introduced to accommodate servers that omit the trailing bcc[0]
+overlap byte when no data area is present.
 
-  Linux 7.2-rc2 (2026-07-05 14:44:06 -1000)
+However, the exemption is applied unconditionally, regardless of whether
+the command actually carries a data area (has_smb2_data_area[]).  When a
+response with a data area is subject to the +1 exemption, the reported
+data can extend one byte beyond the bytes actually received, yet
+smb2_check_message() still accepts it.  The subsequent decoder then reads
+past the end of the receive buffer.  This is reachable during NEGOTIATE
+and SESSION_SETUP, before the session is established.
 
-are available in the Git repository at:
+The resulting out-of-bounds reads are visible under KASAN when mounting
+against a non-conforming server; both the SPNEGO/negTokenInit and the
+NTLMSSP challenge decoders are affected:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc2-smb3-client-fixes
+  BUG: KASAN: slab-out-of-bounds in asn1_ber_decoder+0x16a7/0x1b00
+  Read of size 1 at addr ffff8880084d67c0 by task mount.cifs/81
+  CPU: 1 UID: 0 PID: 81 Comm: mount.cifs Not tainted 7.1.0-rc6 #1
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x4e/0x70
+   print_report+0x157/0x4c9
+   kasan_report+0xce/0x100
+   asn1_ber_decoder+0x16a7/0x1b00
+   decode_negTokenInit+0x19/0x30
+   SMB2_negotiate+0x31d9/0x4c90
+   cifs_negotiate_protocol+0x1f2/0x3f0
+   cifs_get_smb_ses+0x93f/0x17e0
+   cifs_mount_get_session+0x7f/0x3a0
+   cifs_mount+0xb4/0xcf0
+   cifs_smb3_do_mount+0x23a/0x1500
+   smb3_get_tree+0x3b0/0x630
+   vfs_get_tree+0x82/0x2d0
+   fc_mount+0x10/0x1b0
+   path_mount+0x50d/0x1de0
+   __x64_sys_mount+0x20b/0x270
+   do_syscall_64+0xee/0x590
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+  Allocated by task 85:
+   kmem_cache_alloc_noprof+0x106/0x380
+   mempool_alloc_noprof+0x116/0x1e0
+   cifs_small_buf_get+0x31/0x80
+   allocate_buffers+0x10d/0x2b0
+   cifs_demultiplex_thread+0x1d5/0x1d50
+   kthread+0x2c6/0x390
+   ret_from_fork+0x36e/0x5a0
+   ret_from_fork_asm+0x1a/0x30
+  The buggy address is located 0 bytes to the right of
+   allocated 448-byte region [ffff8880084d6600, ffff8880084d67c0)
+   which belongs to the cache cifs_small_rq of size 448
 
-for you to fetch changes up to d2c46c9f7a9baf80a322eb1d4494a70e535b637c:
+  BUG: KASAN: slab-out-of-bounds in kmemdup_noprof+0x36/0x50
+  Read of size 329 at addr ffff88800726c678 by task mount.cifs/89
+  CPU: 0 UID: 0 PID: 89 Comm: mount.cifs Tainted: G    B      7.1.0-rc6 #1
+  Call Trace:
+   <TASK>
+   dump_stack_lvl+0x4e/0x70
+   print_report+0x157/0x4c9
+   kasan_report+0xce/0x100
+   kasan_check_range+0x10f/0x1e0
+   __asan_memcpy+0x23/0x60
+   kmemdup_noprof+0x36/0x50
+   decode_ntlmssp_challenge+0x457/0x680
+   SMB2_sess_auth_rawntlmssp_negotiate+0x6f0/0xcb0
+   SMB2_sess_setup+0x219/0x4f0
+   cifs_setup_session+0x248/0xaf0
+   cifs_get_smb_ses+0xf79/0x17e0
+   cifs_mount_get_session+0x7f/0x3a0
+   cifs_mount+0xb4/0xcf0
+   cifs_smb3_do_mount+0x23a/0x1500
+   smb3_get_tree+0x3b0/0x630
+   vfs_get_tree+0x82/0x2d0
+   fc_mount+0x10/0x1b0
+   path_mount+0x50d/0x1de0
+   __x64_sys_mount+0x20b/0x270
+   do_syscall_64+0xee/0x590
+   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+   </TASK>
+  Allocated by task 93:
+   kmem_cache_alloc_noprof+0x106/0x380
+   mempool_alloc_noprof+0x116/0x1e0
+   cifs_small_buf_get+0x31/0x80
+   allocate_buffers+0x10d/0x2b0
+   cifs_demultiplex_thread+0x1d5/0x1d50
+   kthread+0x2c6/0x390
+   ret_from_fork+0x36e/0x5a0
+   ret_from_fork_asm+0x1a/0x30
+  The buggy address is located 120 bytes inside of
+   allocated 448-byte region [ffff88800726c600, ffff88800726c7c0)
+   which belongs to the cache cifs_small_rq of size 448
 
-  cifs: Remove CIFSSMBSetPathInfoFB() fallback function (2026-07-09
-18:24:30 -0500)
+Restrict the +1 exemption to responses that have no data area, so that
+it still covers the bcc[0] omission it was meant for.  When a data area
+is present, the +1 discrepancy instead means the reported data length
+overruns the received buffer, so the response must be rejected.
 
-----------------------------------------------------------------
-EIghteen client fixes
-- DFS cache allocation fix
-- DFS referral bounds check fix
-- Fix absolute symlinks when mounting with POSIX extensions
-- Fixes for incorrect nlink returned by fstat
-- Fix atime in read completion
-- Fix busy dentry on umount
-- ioctl_query_info buffer overflow fix
-- Two fixes for creating special files with SFU
-- Fix mode mask in parse_dacl
-- SMB1 is_path_accessible wildcard fix and minor SMB1 cleanup
-- smb2_check_message fix
-- Debug message improvement
-- Minor cleanup
-----------------------------------------------------------------
-ChenXiaoSong (4):
-      smb/client: use stack-allocated smb2_file_all_info in
-smb3_query_mf_symlink()
-      smb/client: pass cifs_open_info_data to SMB2_open()
-      smb/client: zero-initialize stack-allocated cifs_open_info_data
-      smb/client: fix incorrect nlink returned by fstat()
+Handle data area overlap separately from data presence.  Since the
+existing overlap handling clears data_length, retain the overlap state
+so that such responses are not treated as having no data area when
+applying the +1 compatibility exemption.
 
-Fredric Cover (1):
-      smb: client: use GFP_KERNEL for DFS cache allocations
+Fixes: 093b2bdad322 ("CIFS: Make demultiplex_thread work with SMB2 code")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
+---
+v5: Track data area overlap separately from data presence when evaluating
+    the +1 compatibility exemption.
 
-Guangshuo Li (2):
-      cifs: validate DFS referral string offsets
-      smb: client: fix overflow in passthrough ioctl bounds check
+v4: https://lore.kernel.org/linux-cifs/20260707112358.2375494-1-shoichiro.miyamoto%40gmail.com/
 
-Mehdi Hassan (1):
-      smb: client: refactor cifs_revalidate_mapping() to use
-clear_and_wake_up_bit()
+v1: https://lore.kernel.org/linux-cifs/CADAuDAPSq+BUcB1SkHqkZsF364mShyE6jsaB+vk9zm=5Q+LHFw@mail.gmail.com/
 
-Norbert Manthey (1):
-      smb: client: mask server-provided mode to 07777 in modefromsid
+ fs/smb/client/smb2misc.c | 52 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 44 insertions(+), 8 deletions(-)
 
-Pali Roh=C3=A1r (5):
-      cifs: Fix support for creating SFU socket
-      cifs: Fix support for creating SFU fifo
-      cifs: Show reason why autodisabling serverino support
-      cifs: Fix and improve cifs_is_path_accessible() function
-      cifs: Remove CIFSSMBSetPathInfoFB() fallback function
+diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+index 2a7355ce1a07..5c1ec38a28d0 100644
+--- a/fs/smb/client/smb2misc.c
++++ b/fs/smb/client/smb2misc.c
+@@ -19,6 +19,9 @@
+ #include "nterr.h"
+ #include "cached_dir.h"
+ 
++static unsigned int __smb2_calc_size(void *buf, bool *have_data,
++				    bool *data_area_overlap);
++
+ static int
+ check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
+ {
+@@ -145,6 +148,8 @@ smb2_check_message(char *buf, unsigned int pdu_len, unsigned int len,
+ 	int command;
+ 	__u32 calc_len; /* calculated length */
+ 	__u64 mid;
++	bool have_data;
++	bool data_area_overlap;
+ 
+ 	/* If server is a channel, select the primary channel */
+ 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
+@@ -228,7 +233,13 @@ smb2_check_message(char *buf, unsigned int pdu_len, unsigned int len,
+ 		}
+ 	}
+ 
+-	calc_len = smb2_calc_size(buf);
++	have_data = false;
++	data_area_overlap = false;
++	calc_len = __smb2_calc_size(buf, &have_data, &data_area_overlap);
++
++	/* Reject responses whose data area overlaps the fixed area. */
++	if (data_area_overlap)
++		return 1;
+ 
+ 	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
+ 	 * be 0, and not a real miscalculation */
+@@ -247,8 +258,13 @@ smb2_check_message(char *buf, unsigned int pdu_len, unsigned int len,
+ 		/* Windows 7 server returns 24 bytes more */
+ 		if (calc_len + 24 == len && command == SMB2_OPLOCK_BREAK_HE)
+ 			return 0;
+-		/* server can return one byte more due to implied bcc[0] */
+-		if (calc_len == len + 1)
++		/*
++		 * Server can return one byte more due to implied bcc[0].
++		 * Allow it only when there is no data area; if data_length > 0
++		 * the +1 gap indicates an overreported data length rather than
++		 * the bcc[0] omission.
++		 */
++		if (calc_len == len + 1 && !have_data)
+ 			return 0;
+ 
+ 		/*
+@@ -407,19 +423,28 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
+ }
+ 
+ /*
+- * Calculate the size of the SMB message based on the fixed header
+- * portion, the number of word parameters and the data portion of the message.
++ * Calculate the size of the SMB message based on the fixed header, fixed
++ * parameter area, and variable data area.
++ *
++ * If have_data is not NULL, it is set when a non-empty data area is found.
++ * If data_area_overlap is not NULL, it is set when the data area overlaps
++ * the fixed area.
+  */
+-unsigned int
+-smb2_calc_size(void *buf)
++static unsigned int
++__smb2_calc_size(void *buf, bool *have_data, bool *data_area_overlap)
+ {
+ 	struct smb2_pdu *pdu = buf;
+ 	struct smb2_hdr *shdr = &pdu->hdr;
+ 	int offset; /* the offset from the beginning of SMB to data area */
+-	int data_length; /* the length of the variable length data area */
++	int data_length = 0; /* the length of the variable length data area */
+ 	/* Structure Size has already been checked to make sure it is 64 */
+ 	int len = le16_to_cpu(shdr->StructureSize);
+ 
++	if (have_data)
++		*have_data = false;
++	if (data_area_overlap)
++		*data_area_overlap = false;
++
+ 	/*
+ 	 * StructureSize2, ie length of fixed parameter area has already
+ 	 * been checked to make sure it is the correct length.
+@@ -442,16 +467,27 @@ smb2_calc_size(void *buf)
+ 		if (offset + 1 < len) {
+ 			cifs_dbg(VFS, "data area offset %d overlaps SMB2 header %d\n",
+ 				 offset + 1, len);
++			if (data_area_overlap)
++				*data_area_overlap = true;
+ 			data_length = 0;
++			goto calc_size_exit;
+ 		} else {
+ 			len = offset + data_length;
+ 		}
+ 	}
+ calc_size_exit:
+ 	cifs_dbg(FYI, "SMB2 len %d\n", len);
++	if (have_data)
++		*have_data = (data_length > 0);
+ 	return len;
+ }
+ 
++unsigned int
++smb2_calc_size(void *buf)
++{
++	return __smb2_calc_size(buf, NULL, NULL);
++}
++
+ /* Note: caller must free return buffer */
+ __le16 *
+ cifs_convert_path_to_utf16(const char *from, struct cifs_sb_info *cifs_sb)
+-- 
+2.50.1 (Apple Git-155)
 
-Shoichiro Miyamoto (1):
-      smb: client: restrict implied bcc[0] exemption to responses
-without data area
-
-Steve French (1):
-      smb: client: preserve leading slash for POSIX absolute symlink target=
-s
-
-Xu Rao (1):
-      smb: client: fix atime clamp check in read completion
-
-Zizhi Wo (1):
-      smb: client: fix busy dentry warning on unmount after DIO
-
- fs/smb/client/cifs_fs_sb.h |  1 +
- fs/smb/client/cifsacl.c    |  2 +-
- fs/smb/client/cifsfs.c     | 12 ++++++++++++
- fs/smb/client/cifsglob.h   |  1 +
- fs/smb/client/cifsproto.h  |  2 +-
- fs/smb/client/cifssmb.c    | 36 ------------------------------------
- fs/smb/client/connect.c    |  3 ++-
- fs/smb/client/dfs_cache.c  | 12 ++++++------
- fs/smb/client/file.c       |  7 ++++++-
- fs/smb/client/inode.c      | 13 +++++++------
- fs/smb/client/link.c       | 17 ++++-------------
- fs/smb/client/misc.c       | 14 +++++++++++++-
- fs/smb/client/readdir.c    |  4 ++--
- fs/smb/client/reparse.c    | 17 ++++++++++++++++-
- fs/smb/client/smb1ops.c    | 28 +++++++++++++++++-----------
- fs/smb/client/smb2file.c   | 19 ++++++++-----------
- fs/smb/client/smb2misc.c   | 32 ++++++++++++++++++++++++++------
- fs/smb/client/smb2ops.c    | 19 ++++++++-----------
- fs/smb/client/smb2pdu.c    | 26 ++++++++++++++------------
- fs/smb/client/smb2proto.h  |  2 +-
- 20 files changed, 146 insertions(+), 121 deletions(-)
-
---=20
-Thanks,
-
-Steve
