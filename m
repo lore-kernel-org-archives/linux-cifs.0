@@ -1,37 +1,58 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24FF3DB325
-	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 09:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115073A1A58
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 09:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783675038; cv=none; b=YN8UNzgRaGnZcu6/ElMNwscq4KYJAJ02yM4eZ3YSbwE/IPcufuGnhe8dhqSIw1c+bPE6o3FsyXJfOsodBHnrvYUnZOD8blSwTXyqFMyIKEGDp4WR7i1tEP/09OgD5Py7yFB+SCcldRVuHst2hC7e159/KgNHIBRTAxctF+HrXMI=
+	t=1783675039; cv=none; b=tYKu9aCC/EMiIODcytaye/d2m85QGgmnxC/wblavjsjvS4h3il5qmXMBk4osQA40t4DhLh4KJJBsxwaYyyGsn4bpa6x+5Dn2qAGy79EXItZezNUAxm0oALIggTB5c6po3nbzJdXNzc6Un7EcGDF6dxYW4mHEOMzGM8z1X4w5S0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783675038; c=relaxed/simple;
-	bh=UQIGrXouwWozqzkt/AuNHb54t7bTnKCBJEO8/AvtXiE=;
+	s=arc-20240116; t=1783675039; c=relaxed/simple;
+	bh=uYsaWgdrNJVWhM7ehBy98k7rbs3GRo7iTtB5MVz8ez0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fWUks7iojaMEyWOHykYT72LIQxVy7+XyCedxGFa0f9S8iWiQKMWQtY3Lvl5gIRHvv4nr0LLNN7KO61SOiZsEP26Mj9jFMlYn/ocOTTiwDKTl8/SHSpodVEKEfSHo/cnfNB0cXpurZwCBRIzOiZff52Cywj5d4O2jyPGfSOl7h+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; arc=none smtp.client-ip=195.135.223.130
+	 MIME-Version; b=jrM8b3AINf/BNlAbr4xpcuZFFjneVMAG9IT75W/9wZ7CusQN651WbmtmlcoSHOwESzscfBKV7Qces88L6zM1mTRicfehBA66z+/tDjP9RbiZRNF1shd7xQARQ2bfCZyY8FY58VuO50aezsKWDBHraCTTzyI2YdNhaK2Oi/bDtL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=WCoNR+jS; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=WCoNR+jS; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="WCoNR+jS";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="WCoNR+jS"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AB70376706;
-	Fri, 10 Jul 2026 09:17:03 +0000 (UTC)
-Authentication-Results: smtp-out1.suse.de;
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 31D87763F5;
+	Fri, 10 Jul 2026 09:17:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1783675020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=98DMsuQMvXvR01UD0K/0J52niOolG3qdjjmn5sJP3aM=;
+	b=WCoNR+jSNPXzNj3MaOkFYzRHOtPA+m+dCNtFI7rkQy+j+ZIS9HqA6aAsWFR3xDYATqSFBK
+	z27nfkbuTZD5Sl45xx9yW0z5CF0N3sn/0Ri3fdwqUDu+NgcahJZ+46DgUvWBFxW7COlS2Z
+	6+2IPHDSUvtWG4N/j/lfQsDW23jiWDw=
+Authentication-Results: smtp-out2.suse.de;
 	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1783675020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=98DMsuQMvXvR01UD0K/0J52niOolG3qdjjmn5sJP3aM=;
+	b=WCoNR+jSNPXzNj3MaOkFYzRHOtPA+m+dCNtFI7rkQy+j+ZIS9HqA6aAsWFR3xDYATqSFBK
+	z27nfkbuTZD5Sl45xx9yW0z5CF0N3sn/0Ri3fdwqUDu+NgcahJZ+46DgUvWBFxW7COlS2Z
+	6+2IPHDSUvtWG4N/j/lfQsDW23jiWDw=
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 167F0779BD;
-	Fri, 10 Jul 2026 09:17:03 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 92D87779BD;
+	Fri, 10 Jul 2026 09:16:59 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id WFuQAo+4UGqnEQAAD6G6ig
-	(envelope-from <scabrero@suse.com>); Fri, 10 Jul 2026 09:17:03 +0000
+	id sBX7IIu4UGqnEQAAD6G6ig
+	(envelope-from <scabrero@suse.com>); Fri, 10 Jul 2026 09:16:59 +0000
 From: Samuel Cabrero <scabrero@suse.com>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -43,9 +64,9 @@ Cc: smfrench@gmail.com,
 	henrique.carvalho@suse.com,
 	ematsumiya@suse.de,
 	Samuel Cabrero <scabrero@suse.com>
-Subject: [PATCH 09/18] smb:client: Use the correct return code
-Date: Fri, 10 Jul 2026 11:16:28 +0200
-Message-ID: <20260710091637.58873-10-scabrero@suse.com>
+Subject: [PATCH 04/18] smb:client: Split idr remove and release functions
+Date: Fri, 10 Jul 2026 11:16:23 +0200
+Message-ID: <20260710091637.58873-5-scabrero@suse.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260710091637.58873-1-scabrero@suse.com>
 References: <20260710091637.58873-1-scabrero@suse.com>
@@ -56,49 +77,93 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
 X-Spam-Flag: NO
-X-Spam-Score: -4.00
+X-Spam-Score: -6.80
+X-Spamd-Result: default: False [-6.80 / 50.00];
+	REPLY(-4.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_COUNT_TWO(0.00)[2];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,manguebit.com,microsoft.com,talpey.com,suse.com,suse.de];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	R_RATELIMIT(0.00)[to_ip_from(RLsmepzun9ugcn3tumbc3b9wxd)];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.00 / 50.00];
-	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: AB70376706
-X-Rspamd-Action: no action
 
-Return ENOENT instead of EEXIST when a registration does not exist.
+Sending the unregister netlink message can sleep, send it after releasing
+the mutex.
 
 Signed-off-by: Samuel Cabrero <scabrero@suse.com>
 ---
- fs/smb/client/cifs_swn.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifs_swn.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
 diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
-index b823a496cba7..0d7e99203281 100644
+index 0afb69b2eed2..fe032ae9c413 100644
 --- a/fs/smb/client/cifs_swn.c
 +++ b/fs/smb/client/cifs_swn.c
-@@ -382,7 +382,7 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
- 			return swnreg;
- 	}
- 
--	return ERR_PTR(-EEXIST);
-+	return ERR_PTR(-ENOENT);
+@@ -366,26 +366,24 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
+ 	return ERR_PTR(ret);
  }
  
- /*
-@@ -401,7 +401,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
- 	if (!IS_ERR(swnreg)) {
- 		kref_get(&swnreg->ref_count);
- 		goto unlock;
--	} else if (PTR_ERR(swnreg) != -EEXIST) {
-+	} else if (PTR_ERR(swnreg) != -ENOENT) {
- 		goto unlock;
+-static void cifs_swn_reg_release(struct kref *ref)
++static void cifs_swn_reg_release(struct cifs_swn_reg *swnreg)
+ {
+-	struct cifs_swn_reg *swnreg = container_of(ref, struct cifs_swn_reg, ref_count);
+ 	int ret;
+ 
+ 	ret = cifs_swn_send_unregister_message(swnreg);
+ 	if (ret < 0)
+ 		cifs_dbg(VFS, "%s: Failed to send unregister message: %d\n", __func__, ret);
+ 
+-	idr_remove(&cifs_swnreg_idr, swnreg->id);
+ 	kfree(swnreg->net_name);
+ 	kfree(swnreg->share_name);
+ 	kfree(swnreg);
+ }
+ 
+-static void cifs_put_swn_reg(struct cifs_swn_reg *swnreg)
++static void cifs_swn_reg_idr_remove(struct kref *ref)
+ {
+-	mutex_lock(&cifs_swnreg_idr_mutex);
+-	kref_put(&swnreg->ref_count, cifs_swn_reg_release);
+-	mutex_unlock(&cifs_swnreg_idr_mutex);
++	struct cifs_swn_reg *swnreg = container_of(ref, struct cifs_swn_reg, ref_count);
++
++	idr_remove(&cifs_swnreg_idr, swnreg->id);
+ }
+ 
+ static int cifs_swn_resource_state_changed(struct cifs_swn_reg *swnreg, const char *name, int state)
+@@ -612,11 +610,14 @@ int cifs_swn_unregister(struct cifs_tcon *tcon)
+ 		mutex_unlock(&cifs_swnreg_idr_mutex);
+ 		return PTR_ERR(swnreg);
  	}
++	if (kref_put(&swnreg->ref_count, cifs_swn_reg_idr_remove)) {
++		mutex_unlock(&cifs_swnreg_idr_mutex);
++		cifs_swn_reg_release(swnreg);
++		return 0;
++	}
+ 
+ 	mutex_unlock(&cifs_swnreg_idr_mutex);
+ 
+-	cifs_put_swn_reg(swnreg);
+-
+ 	return 0;
+ }
  
 -- 
 2.54.0
