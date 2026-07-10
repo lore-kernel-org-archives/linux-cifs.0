@@ -1,63 +1,78 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B840831327F;
-	Thu,  9 Jul 2026 23:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A29199949
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 00:22:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783640769; cv=none; b=heiXN5MEWKUHbkkEVO1cCpeZmaAmLBwptzkxH0u1cNQigQZ1t1K/JslUOhwAhsqObcPpg8bv2B/NwImYKd4xm8gQYxxN7X6yLb27PB9+3EE1cMnX4AoAX5MRWUufDlyZryCqTZ+MhLPFIb2f9VO3c5nMdp/8W2D1234VTKOtrLo=
+	t=1783642960; cv=none; b=KdSq0yHjLD4DRl02cfeoB9kiKn6hSd9fHtbuDHuupv0ainNPfDkxNB/MuyOYHZFLXGIuqmSsdFwJ87nWuBTJhVR8TeyGe9BF9AQzpY55ndfwKqACDf+PqpJHTwU6EL+av+02eGKN/1SKBIc/BZujVs7mz2BCqtO1pc+dkCOG1MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783640769; c=relaxed/simple;
-	bh=xT2ZnIAaRx0EUMD6BUNzNvvu7OjPNpL6+EicJcEMUqI=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=SdCvrKKW6/b+GB1+N3wyDfITZxabTXx6JuT1+eQB/QV6HbqdBroXy7NekE2JwFHMxkDGR+Fj5PV5TmdSdlTezduYMQlELXRfU6ueqVP8k895m49jxvuUsCvulcZzjOM2ewLNuufxGKT0x66t2C0+3oUc3bWsvY9ISDMUqNsMn4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMcC3C1K; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783642960; c=relaxed/simple;
+	bh=z8ut3tka8zgh8fThbsEhCCgBt2v4kr/mqupRpNBWJIU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WHOSLZMXISVmMHLmgdTwGHEExoVnBI6pQytFo7b2/E5DH4Qt+Xbe6509V8msIfg5pjS4lN080XDqImv7TjqCQxJ7hPhumOJSEQnQ9se3VsmkEJpluX4RSsI7vVuXyiobAOvm5FL8AdhIgcBre+XHgD/yQAzniyzA//o0nSl1jh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LiOmgVxr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMcC3C1K"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585D41F000E9;
-	Thu,  9 Jul 2026 23:46:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LiOmgVxr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84BFD1F00A3A
+	for <linux-cifs@vger.kernel.org>; Fri, 10 Jul 2026 00:22:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783640768;
-	bh=/Km+399shYHSu9In2jZ8cHwcko7obK05gqI7eUCtLjQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=RMcC3C1KFHSo4mZbSEgsJd7kW21KJNc/hRXSM7lLISZ/v5nQ015N9cMzXc2Y0NcEj
-	 lXvjyVvZ+ibE3Sl1rbnaKqnUuxGaSkD/GwMLYTYS5IphiZWwr++YQRewwc/k5bQ4JT
-	 bk0u4SWYUi3Lh/PO4bu7h93kIxhZCmV325fWW1SVnY1gnOclsiTM7UdWN0S1J+IULH
-	 zEC0+c6kdfkVPvij+ni48uOa1Ig1KZspTXMdGmS1CVw/yATquBDjpDdaMPCo4heSCk
-	 VUEGvzi39wq4TPz8gL+EPKM3u153fNB5RvQhq8/qlNxs12KRTONT21ZwL+DdirN75s
-	 eRijCxdaTZXng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0D673924FFE;
-	Thu,  9 Jul 2026 23:45:47 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAH2r5muX5fYTtxMvj9DrdMmMEU2Oi+_nk2oK0zH+J4fRctrJLQ@mail.gmail.com>
-References: <CAH2r5muX5fYTtxMvj9DrdMmMEU2Oi+_nk2oK0zH+J4fRctrJLQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAH2r5muX5fYTtxMvj9DrdMmMEU2Oi+_nk2oK0zH+J4fRctrJLQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.samba.org/ksmbd.git tags/v7.2-rc2-smb3-server-fixes
-X-PR-Tracked-Commit-Id: f49bca41c12f9f79d39dbf0779d0c672d74b09fe
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a635d6748234582ea287c5ffeae28b9b23f91c7e
-Message-Id: <178364074640.4164809.3100273739839053193.pr-tracker-bot@kernel.org>
-Date: Thu, 09 Jul 2026 23:45:46 +0000
-To: Steve French <smfrench@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>, Namjae Jeon <linkinjeon@kernel.org>
+	s=k20260515; t=1783642958;
+	bh=z8ut3tka8zgh8fThbsEhCCgBt2v4kr/mqupRpNBWJIU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=LiOmgVxrNEAX6ediIZcEOHY0rrfeQ3LDmL0xNahdgx0thrIHd5+1V7RiLILhqQxPr
+	 dIPs/QIx/V3c8i6UOXLh2BmS1E84djY0B2UctWSbRvgQ5jUC5l5BQDEPHtvRSKG7W1
+	 g7xyaiDr3qx9wSwnrxiXH9HpDB5IJUGlnftt4TtVkLykob2ZMLDk9KnJ0SGwuqFvZl
+	 hHueB2zCk539aorz8891ndmys4yOp2+rAY8nXzOkgyC5G5XU9sUoNtz4Mem1BEu+WR
+	 lcfykrOtI+caY+BaBUn/893GBMgGYOrC0tQJCkubS0RghThnPV5yWv7noNC7xylD67
+	 QxeFfuLrBMZSA==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c15b509c323so64718466b.0
+        for <linux-cifs@vger.kernel.org>; Thu, 09 Jul 2026 17:22:38 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwVmt0zHjbCUu0yDTF5V1BNpfCDtmRzleGxi0JMyPliUAILCcLx
+	eUUB3woBlomF86joeQuPh2P2tTj3inatVtge8oqn0eDgWX26+EfbqxAVjUyqOIrhoi76BDOQOy4
+	fTWumQRO6Za/rjCFNEz9XDwJ4CihkVtY=
+X-Received: by 2002:a17:906:180a:b0:c12:389f:e765 with SMTP id
+ a640c23a62f3a-c15ce007770mr340923866b.17.1783642957237; Thu, 09 Jul 2026
+ 17:22:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20260709165141.2111-1-g.blivet@me.com> <20260709165141.2111-2-g.blivet@me.com>
+In-Reply-To: <20260709165141.2111-2-g.blivet@me.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 10 Jul 2026 09:22:24 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8Hr2EaeoPm_wq0GZ_tEMP9Ntou+3S-90gXSCTngtYcSA@mail.gmail.com>
+X-Gm-Features: AUfX_mwf4-S4ZSBPB2kN_ULHQ0mrySHACewh-yLBwPBlxqPy1VeEGQURTASJNmU
+Message-ID: <CAKYAXd8Hr2EaeoPm_wq0GZ_tEMP9Ntou+3S-90gXSCTngtYcSA@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: quiet mdssvc RPC log spam in create_smb2_pipe
+To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Thu, 9 Jul 2026 18:27:55 -0500:
-
-> git://git.samba.org/ksmbd.git tags/v7.2-rc2-smb3-server-fixes
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a635d6748234582ea287c5ffeae28b9b23f91c7e
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+On Fri, Jul 10, 2026 at 1:51=E2=80=AFAM Ga=C3=ABl Blivet-Bailly
+<gael.blivet@gmail.com> wrote:
+>
+> From: Gael Blivet <gael.blivet@gmail.com>
+>
+> Follow-up to
+> commit bb682f1496f7 ("ksmbd: quiet mdssvc RPC log spam"),
+> which silenced __rpc_method()'s own "Unsupported RPC: mdssvc" log line
+> but missed that ksmbd_session_rpc_open() failing for that same,
+> now-still-rejected pipe also trips a second, separate pr_err() here in
+> its caller. macOS's routine mdssvc (Spotlight) probes still spam the
+> kernel log via this second site on every single probe, defeating the
+> original commit's stated purpose.
+>
+> Suppress this specific case the same way the other site does; behavior
+> is unchanged for every other RPC failure.
+>
+> __rpc_method() (mgmt/user_session.c) returns -ENOENT for mdssvc, not
+> -EINVAL.
+>
+> Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
