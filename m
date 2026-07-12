@@ -1,153 +1,184 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3D9CA6F
-	for <linux-cifs@vger.kernel.org>; Sun, 12 Jul 2026 02:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05573749ED;
+	Sun, 12 Jul 2026 08:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783824923; cv=none; b=VcjiehRDQ4tODH8k6o2NNY3GAq0X19Mv6fCBxawiMi6LHh+4R0WPRODXalwGZ7pF/aJnX8x+IqYfvLmviQqVm03RArmeT5BvLV2SYbdQqIT+AWMr88LflbcBLAOQoGNqm00J3ajxmdLp+9hAaVrDN9fqdwx8+IUBGHqJfn72Lsg=
+	t=1783846213; cv=none; b=ALanhynf/bJOG+/JrzwtjNIQvR/Kps6qi2HKgqMjmmCl6Ve/VxgMveUkKRjxTEF1RD3dhanNEE4ZAKXLsz8ywKV/mGzjOcV2rbB5u3jhNgVm0ccWnaX4jU93Rq75YzgY6DvZ0rw69PyzcXQwjHhXtvn6Zxw5yQ8gOlUrBA1a+iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783824923; c=relaxed/simple;
-	bh=COjfZ2lSHPonCdOxldVPyvI4eQWZhDbzsLF0mrGtwU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WkKdDV+P2nPkxFXhtLKDDXnoL9IIstvMECRu36zH1V+MDzGW5wllGq3jUocrRpbH6VnXHFPLBstsbA/TP+06Kxvb5kIvzmuCv2URjcl/EPH/+GK3VBYdAe5U0ZeJXc7kqssbSwHoLC+OgE2IP15vJs/rnpSNTwvOslD/Z38TqvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7CbJi5A; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783846213; c=relaxed/simple;
+	bh=uIIfZjlpmIYUKgbV/gdQ5KaZ4+f5OBXWaH+NZ9I5MWo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RR8oNRdEwZ/5eKNntC42IOE1cCE2R92ycsiKMKyyRLEjRa2miw1yaI1sZamY3F7fgCBH7RL0YryzTkgFY3H6fVieBtRdH7CPjcX00V4aGuwrkPATXsM6/bJVux/oorMJTZB6yxo1zC2UBGFCyXNZl/BP578ZmWdZkF/vkKzfsZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e9uXBDi5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7CbJi5A"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3811e59df58so1350904a91.1
-        for <linux-cifs@vger.kernel.org>; Sat, 11 Jul 2026 19:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783824922; x=1784429722; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=k7LgNwxuoWBLJ8SbEmrF+q/5b6oVtW1AjKvLyEOzJLc=;
-        b=i7CbJi5AxoAFkvDytRR/rMxCufz6MGvx4U+M7UpdYNziclXEI+HsxW3vTXkWhhw/ly
-         d7uEVii8WqQV1fxyLodsvGcePaKhcrvzFWtKL0rAvLourkuDXCHrLM5+DZF1zF3tqUUs
-         Kc3tcDF6HYabLOeuDFq+PNR7m9eHlwJuLD6nFGSfv82JjVqd8aNiuVn2EpA94zI1a4Yk
-         KxBrhZcjbLID1M3cfnQ/bO4NG4pVgNXYN7C4/OZsIMhTtR0UGpNWyaJ6LoKmHAPA58/F
-         2f7GgSekwsK65X6H+nN4nH2METvjikU0IdAz+970pXuwyoHhCR1u5kUzvNZ0MhOGNLwH
-         VrMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783824922; x=1784429722;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=k7LgNwxuoWBLJ8SbEmrF+q/5b6oVtW1AjKvLyEOzJLc=;
-        b=FOS0cn/4nJ5q2/07/V42X/3nfVaxq0QFwgwdeamSd0KGwonpxo8lve4BVI7UQiXLV3
-         YjBnHCb8Y3+XAkwXMcUCAWW7S88ddJd98Ug4tHE1Kuc1WcYNMu517IOIGkkTZcoUZAvF
-         tDx6RnYZC5tWHTAKxT/2f7mciYGOfhv7yDxnQ5jZxLGtlU9a4Kt011w/y6mnaiAOifGB
-         zBrc4yzSXwoLjdDEVzYr8+s/xVDPg+VpMZtt5KooBos5WLn4F+KRITaOBvFS5/Z8/avn
-         p1TbQYDsjizooRhrQafqckUQ4qNKyeM5WCkoUOwrfGbO0+FNrM4L9PdVSX1NzdjxcAVg
-         Sn3g==
-X-Forwarded-Encrypted: i=1; AHgh+RoziYPzfJly0tqqzJGe58GXTvVr9na2sideM1vtY041uabgogmZQB88R1dbj9mtDLXAOwMgaSW5LMuy@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBKRbtvhO0dfbexboRfQu27yNjrA/96iyiIUWxDYP/q7Q+tQOz
-	pR9afqbnRImbPe1BlGMqTDXzSYu5lGzD0eoYqaPACG0zx6bJf9l+wll/
-X-Gm-Gg: AfdE7cki7+V137xSxpTeGggKIyhqNiFtm+UIVap3Wf6BB/u2ZlTTL+gWok5P2/OaSKj
-	8lVLbZVIA+96IoTsCu3mPaomX/957abCMYru5VQqKnaMBZYGxJLLMWvl6KKqOltSOLViW8xub1M
-	aIg1A6lXkXqcH+VYinE8AdN8D5voZmcEhy5oNJwAr7rKJNf/fab8j8UziPXdp5WflwdV6VNnx3+
-	gQXjblKIjxi08uhObyva0JQd8DS6aoXyv64n97B+irjgstVF9+n1kGxxMDdB4EHmqfFG2KxtziI
-	o84PR2VfX4OqW8C1+d1QkIwSi3XyfUXpH8MogrFuDalPMAFUxA9AkwcSvelUgRp1dcO5qD9+gsl
-	8nRMFCme8Qi5BWpd2F4hqvjj4sOFDIe+qsVYQy1HncKt3GcVKXEiICGsINgPU81x3TcTezcTk6V
-	JfIHvaUYRiT2FRoB/YU9aY/Q==
-X-Received: by 2002:a17:90b:2783:b0:387:e0bb:5802 with SMTP id 98e67ed59e1d1-38dc7bad0aamr4405786a91.41.1783824921873;
-        Sat, 11 Jul 2026 19:55:21 -0700 (PDT)
-Received: from FredPC ([2600:380:805f:5cb5:2256:566b:b74d:6f4e])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-311a6115e61sm36804748eec.22.2026.07.11.19.55.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jul 2026 19:55:21 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-X-Google-Original-From: Fredric Cover <FredTheDude@proton.me>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: client: use kvzalloc() for megabyte buffer in simple fallocate
-Date: Sat, 11 Jul 2026 19:54:02 -0700
-Message-ID: <20260712025402.1804211-1-FredTheDude@proton.me>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e9uXBDi5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 927001F000E9;
+	Sun, 12 Jul 2026 08:50:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783846210;
+	bh=3/WQDuqK/NjChhbBxD3JTeFauC+f/uWS/uyRXi7bvcA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=e9uXBDi5t/Gg6bKf6bIWllf5kORgw+CsndL1cYQve78SVa/u4E+4W6PQh+wiIIDfF
+	 HdQ90R/K5XGn2MxrLR26hp+2ogq51C53RFkdnbRBI/IysdiTo7mZ1galQHJPe/qpg2
+	 St/PmancZXHAe7eEllyoKCUDpTxfGEA1lAj8vzfZOEwODq4tPMCO38o/JVDtGKonDN
+	 RbSBunSXd1ifaECsK+KY93bmateqV7gfwJXJuFRYzhSO451APa5GhGT88+OAEVTVr2
+	 SuYvRd+gveLivi6QRyOt+1ClObAW9U8xA+DbU1sQnwGm+Wq+Ehcjj264X/qycRr9Sz
+	 H0uaVmkwnxqpw==
+Date: Sun, 12 Jul 2026 11:50:03 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, mkalderon@marvell.com,
+	zyjzyj2000@gmail.com, sagi@grimberg.me, mgurtovoy@nvidia.com,
+	haris.iqbal@ionos.com, jinpu.wang@ionos.com, bvanassche@acm.org,
+	kbusch@kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, kch@nvidia.com, smfrench@gmail.com,
+	linkinjeon@kernel.org, metze@samba.org, tom@talpey.com,
+	cel@kernel.org, jlayton@kernel.org, neil@brown.name,
+	okorniev@redhat.com, Dai.Ngo@oracle.com, trondmy@kernel.org,
+	anna@kernel.org, achender@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, kees@kernel.org, michaelgur@nvidia.com,
+	edwards@nvidia.com, phaddad@nvidia.com, eadavis@qq.com,
+	yishaih@nvidia.com, kalesh-anakkur.purayil@broadcom.com,
+	andriy.shevchenko@linux.intel.com, clm@meta.com,
+	ebadger@purestorage.com, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+	linux-nvme@lists.infradead.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH v10 rdma-next] RDMA: Change capability fields in
+ ib_device_attr from int to u32
+Message-ID: <20260712085003.GC33197@unreal>
+References: <20260709055211.2498307-1-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260709055211.2498307-1-ernis@linux.microsoft.com>
 
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+On Wed, Jul 08, 2026 at 10:51:29PM -0700, Erni Sri Satya Vennela wrote:
+> The capability counter fields in struct ib_device_attr are declared
+> as signed int, but these values are inherently non-negative. Drivers
+> maintain their cached caps as u32 and assign them directly into these
+> int fields; if a cap exceeds INT_MAX the implicit narrowing yields a
+> negative value visible to the IB core.
+> 
+> Change the signed int capability fields to u32 to match the
+> underlying nature of the data. Also update consumers across the IB
+> core, ULPs, NVMe-oF target, RDS, and NFS/RDMA so the new u32 values
+> are not forced back through signed int or u8 via min()/min_t() or
+> narrowing local variables.
+> 
+> The nvmet-rdma consumer of max_srq clamps it against
+> ib_device.num_comp_vectors, which stays a signed int, so that site
+> uses min_t() instead of min() to handle the signed/unsigned mismatch.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Acked-by: Stefan Metzmacher <metze@samba.org> # smbdirect
+> ---
+> Changes in v10:
+> * Convert max_srq to u32. Use min_t() against the still-signed ib_device.num_comp_vectors.
+> * Update commit message.
+> * Change rdma_restrack_count() to return u32 and make fill_res_info()'s curr and max u64.
+> Changes in v9:
+> * Switch the srq_size module parameter accessors to param_get_uint and
+>   kstrtouint()/param_set_uint() so they match the now-unsigned
+>   nvmet_rdma_srq_size variable.
+> Changes in v8:
+> * Convert the remaining non-negative counter fields max_ee_rd_atom,
+>   max_ee_init_rd_atom, max_ee, max_rdd, max_raw_ipv6_qp and max_srq_wr
+>   to u32; keep max_srq as int (its consumer compares it against
+>   ib_device.num_comp_vectors, still int).
+> * Drop all remaining min_t() where plain min() now works.
+> * Make the srq_size module parameters unsigned int so the srq_size min()
+>   stays a plain min().
+> * Replace the ternary-inside-min() with the simpler "if (x) x--;".
+> * Reorder the send_queue_depth min() to min(value, CONST) to match the
+>   sibling site.
+> * Restore reverse xmas-tree declaration order.
+> * Collapse the min()/min3() assignments that now fit onto a single line
+>   within 100 columns.
+> * Print the now-u32 fields with %u instead of %d.
+> Changes in v7:
+> * Drop min_t() in all sites where a plain min() (or min3()) works
+>   cleanly
+> * Guard nvme/host/rdma.c num_inline_segments computation against a
+>   device reporting max_send_sge == 0, so the u32 subtract
+>   cannot wrap to UINT_MAX.
+> * Use %u when printing the newly-u32 capability fields
+>   in diagnostic messages.
+> Changes in v6:
+> * Fix subject prefix: net-next -> rdma-next.
+> Changes in v5:
+> * Add U8_MAX clamps in iser_verbs, nvme/host, nvme/target, isert,
+> * rds/ib_cm, smbdirect/connect and smbdirect/accept where u32 capability
+>   fields were directly narrowed into u8 rdma_conn_param fields without
+>   clamping.
+> * Guard the inline_sge_count calculation in nvmet_rdma_find_get_device()
+>   to prevent u32 underflow when both max_sge_rd and max_recv_sge are
+> zero.
+> * Expand type migration to 9 additional fields (max_mw, max_raw_ethy_qp,
+>   max_mcast_grp, max_mcast_qp_attach, max_total_mcast_qp_attach, max_ah,
+>   max_srq, max_srq_wr, max_srq_sge)
+> * Fix min_t(int,...) in svc_rdma_transport; min_t(u32,...) in ipoib,
+>   srpt, nvme/target, rds/ib, rtrs-clt, rtrs-srv, xprtrdma/verbsdd.
+> * Fix frwr_ops.c u32 underflow guard (reorder check before subtraction)
+> * Change sc_max_send_sges to unsigned int, inline_sge_count to u32
+> * Fix %d -> %u in rxe_qp, rxe_srq, ipoib_cm, ib_isert,
+> * svc_rdma_transport
+> * Update commit message.
+> Changes in v4:
+> * Drop clamping the values in mana_ib_query_device, instead update
+>   the props values from int to u32.
+> Changes in v3:
+> * Drop clamping from mana_ib_gd_query_adapter_caps(). The internal u32
+>   caps cache does not need to be clamped.
+> * Move all clamping exclusively to mana_ib_query_device(), which is the
+>   only place the cached u32 values are narrowed into the signed int
+>   fields of struct ib_device_attr.
+> * Reframe commit message: this is a u32-to-int type boundary fix, not a
+>   CVM/untrusted-hardware hardening patch.
+> Changes in v2:
+> * Update patch title.
+> ---
+>  drivers/infiniband/core/cq.c               |  3 +-
+>  drivers/infiniband/core/nldev.c            |  3 +-
+>  drivers/infiniband/core/restrack.c         |  2 +-
+>  drivers/infiniband/hw/qedr/verbs.c         |  2 +-
+>  drivers/infiniband/sw/rxe/rxe_qp.c         | 22 ++++-----
+>  drivers/infiniband/sw/rxe/rxe_srq.c        | 16 +++----
+>  drivers/infiniband/ulp/ipoib/ipoib_cm.c    | 10 ++---
+>  drivers/infiniband/ulp/ipoib/ipoib_verbs.c |  3 +-
+>  drivers/infiniband/ulp/iser/iser_verbs.c   |  5 +--
+>  drivers/infiniband/ulp/isert/ib_isert.c    |  7 ++-
+>  drivers/infiniband/ulp/rtrs/rtrs-clt.c     | 11 ++---
+>  drivers/infiniband/ulp/rtrs/rtrs-srv.c     | 11 ++---
+>  drivers/infiniband/ulp/srp/ib_srp.c        |  2 +-
+>  drivers/infiniband/ulp/srpt/ib_srpt.c      | 21 +++++----
+>  drivers/nvme/host/rdma.c                   |  8 ++--
+>  drivers/nvme/target/rdma.c                 | 26 ++++++-----
+>  fs/smb/smbdirect/accept.c                  |  5 ++-
+>  fs/smb/smbdirect/connect.c                 |  5 ++-
+>  fs/smb/smbdirect/connection.c              |  8 ++--
+>  include/linux/sunrpc/svc_rdma.h            |  4 +-
+>  include/rdma/ib_verbs.h                    | 52 +++++++++++-----------
+>  include/rdma/restrack.h                    |  2 +-
+>  net/rds/ib.c                               | 10 ++---
+>  net/rds/ib_cm.c                            | 10 ++---
+>  net/sunrpc/xprtrdma/frwr_ops.c             |  7 +--
+>  net/sunrpc/xprtrdma/svc_rdma_transport.c   |  5 +--
+>  net/sunrpc/xprtrdma/verbs.c                |  2 +-
+>  27 files changed, 129 insertions(+), 133 deletions(-)
 
-Currently in smb3_simple_fallocate_range(), a 1 MB buffer is allocated
-using kzalloc(). Under heavy memory fragmentation, a contiguous 1 MB block
-of physical memory (an order-8 allocation) may not be available,
-causing the allocation to fail.
+This patch touches too many areas to delay it further. Let's merge it
+now and improve it later, if needed.
 
-This failure was observed during xfstests generic/013 on a 4GB RAM
-test machine running fsstress:
-
-fsstress: page allocation failure: order:8,
-mode:0x40dc0(GFP_KERNEL|__GFP_ZERO|__GFP_COMP),
-nodemask=(null),cpuset=/,mems_allowed=0
-
-Call Trace:
- <TASK>
- dump_stack_lvl+0x5d/0x80
- warn_alloc+0x163/0x190
- __alloc_pages_slowpath.constprop.0+0x71b/0x12f0
- __alloc_frozen_pages_noprof+0x2f6/0x340
- alloc_pages_mpol+0xb6/0x170
- ___kmalloc_large_node+0xb3/0xd0
- __kmalloc_large_noprof+0x1e/0xc0
- smb3_simple_falloc.isra.0+0x62b/0x960
- cifs_fallocate+0xed/0x180
- vfs_fallocate+0x165/0x3c0
- __x64_sys_fallocate+0x48/0xa0
- do_syscall_64+0xe1/0x640
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
- </TASK>
-
-Node 0 Normal: 3375*4kB ... 7*128kB 0*256kB 0*512kB 0*1024kB 0*2048kB 0*4096kB
-
-Since this scratch buffer does not require physically contiguous memory,
-switch the allocation to kvzalloc(). This retains the performance
-benefits of kmalloc() under normal conditions, while gracefully falling
-back to virtually contiguous memory when physical allocation fails.
-
-Fixes: 966a3cb7c7db ("cifs: improve fallocate emulation")
-Cc: stable@vger.kernel.org
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
-Tested-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
----
- fs/smb/client/smb2ops.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index d4875f9532b4..55b53bb9e3fd 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3595,7 +3595,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 	if (rc)
- 		goto out;
- 
--	buf = kzalloc(1024 * 1024, GFP_KERNEL);
-+	buf = kvzalloc(1024 * 1024, GFP_KERNEL);
- 	if (buf == NULL) {
- 		rc = -ENOMEM;
- 		goto out;
-@@ -3652,7 +3652,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
- 
-  out:
- 	kfree(out_data);
--	kfree(buf);
-+	kvfree(buf);
- 	return rc;
- }
- 
--- 
-2.53.0
-
+Thanks
