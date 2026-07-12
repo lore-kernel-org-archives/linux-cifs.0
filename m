@@ -1,79 +1,77 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6B5284690
-	for <linux-cifs@vger.kernel.org>; Sat, 11 Jul 2026 13:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3D9CA6F
+	for <linux-cifs@vger.kernel.org>; Sun, 12 Jul 2026 02:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783776829; cv=none; b=SCsddmr+vdZgKJRoGhntjfvd9SWjHFn6/wkMFVolhawOhUpEZBdoNYpw0eVfl7cqDjsqMFS3+Lu8oyv/+kyd0l8CtSlH0QPA7RBnxZt1nwnvQjViUWCsiwd2/A/dppfDHSFY5VmLzORdI6JC4Qch9tAlU1CEqVArAfHrErttT3k=
+	t=1783824923; cv=none; b=VcjiehRDQ4tODH8k6o2NNY3GAq0X19Mv6fCBxawiMi6LHh+4R0WPRODXalwGZ7pF/aJnX8x+IqYfvLmviQqVm03RArmeT5BvLV2SYbdQqIT+AWMr88LflbcBLAOQoGNqm00J3ajxmdLp+9hAaVrDN9fqdwx8+IUBGHqJfn72Lsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783776829; c=relaxed/simple;
-	bh=ZnX556/SgTs5R4D8I5uTvWRq0Qb0EKx6Zma/xbvdxNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IPidVgfK16Amb5MHBO/ERm2NHRr4HTk2F33gphkMIPzy/W5SVFLnaAogjeAk+sQ8FUHV2S2C1sV41wweoPaKa40yRS2fSMcYW1LI8vm6ItRdpnl7/RsUIwaQRiw8jyQWJs6xpvybijNr0/3tZKPZQCtTSVuhVlYEcCmW8waYkd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dclwXbuf; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1783824923; c=relaxed/simple;
+	bh=COjfZ2lSHPonCdOxldVPyvI4eQWZhDbzsLF0mrGtwU0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WkKdDV+P2nPkxFXhtLKDDXnoL9IIstvMECRu36zH1V+MDzGW5wllGq3jUocrRpbH6VnXHFPLBstsbA/TP+06Kxvb5kIvzmuCv2URjcl/EPH/+GK3VBYdAe5U0ZeJXc7kqssbSwHoLC+OgE2IP15vJs/rnpSNTwvOslD/Z38TqvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7CbJi5A; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dclwXbuf"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2caea3f742bso19917625ad.0
-        for <linux-cifs@vger.kernel.org>; Sat, 11 Jul 2026 06:33:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7CbJi5A"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3811e59df58so1350904a91.1
+        for <linux-cifs@vger.kernel.org>; Sat, 11 Jul 2026 19:55:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783776828; x=1784381628; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783824922; x=1784429722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6KR19s9LTdwg8fzyf+W0+BdWpTP82F88oIsv5vsjL+8=;
-        b=dclwXbufeOSPF4/r2U3MIOJbsVJlatFu0NI2xfyMpRoyUk1GPZoLcwcXgxkaLoJVTr
-         OY2nnzJMk6xYysLf31jGPDXzFozFmJyqn+/TNfoGd4Yo151JxdYF9Bm28Ta+XYUfuFn6
-         KepQRmiBwxd1EZrZVmigE9IkNEb10Vptbx4HyxyITdFQQ0W9epUVN3g5AdV9liOCvDYb
-         85INCZyOAs6ZK2TfMiJMSq3R1mfq5q416HlGtRTcMT5TYnXFFcXsq6yhv/bsDVv6QLog
-         HVy5V6waSsBxjpLcr9hgdYoFqBbOGitYzYI+aiIrqUSaSWV8x2bXxApuKVjop5k+HQq9
-         tMFw==
+        bh=k7LgNwxuoWBLJ8SbEmrF+q/5b6oVtW1AjKvLyEOzJLc=;
+        b=i7CbJi5AxoAFkvDytRR/rMxCufz6MGvx4U+M7UpdYNziclXEI+HsxW3vTXkWhhw/ly
+         d7uEVii8WqQV1fxyLodsvGcePaKhcrvzFWtKL0rAvLourkuDXCHrLM5+DZF1zF3tqUUs
+         Kc3tcDF6HYabLOeuDFq+PNR7m9eHlwJuLD6nFGSfv82JjVqd8aNiuVn2EpA94zI1a4Yk
+         KxBrhZcjbLID1M3cfnQ/bO4NG4pVgNXYN7C4/OZsIMhTtR0UGpNWyaJ6LoKmHAPA58/F
+         2f7GgSekwsK65X6H+nN4nH2METvjikU0IdAz+970pXuwyoHhCR1u5kUzvNZ0MhOGNLwH
+         VrMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783776828; x=1784381628;
+        d=1e100.net; s=20251104; t=1783824922; x=1784429722;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=6KR19s9LTdwg8fzyf+W0+BdWpTP82F88oIsv5vsjL+8=;
-        b=jg7+akKp7Fl4uC2kKBM1D6w2NH0C/ylcTxbzsAHbWyZEaSZjlGazyLCnawBL76Y9XM
-         AwuGDnOX5LsKD/YZIC8DKXgN0QCV3oNJ0/uiKJO5tIjscWzVeFkopW9+fMFMQKC6KE3/
-         uxY86mjR/Ym/fM2WeZ/DAkc49UcxtFS+bzhB//FyBJd8hVHucT+hFTGsfxN3D1khjMdW
-         iN+5Xi9+YuI3uX7pOskNMkjUfhVnYVx95kh/lElPUZcEnLr+ZrRrkFltC6H2XJrmre6d
-         XTbALSiEoFt63V10u4UCy3PsFBXrjePonsbxj99nduDeVvIT5rOjeDhL9Px0MyBndsde
-         ryyQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rqa93hy85fAExxHBwFgg4e0h7vLrdO7jRXXHXCyhmD2br+kuUszckyZUs5SB4DHZW/HYHwhu+fs9EsX@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw37OKjejyUEt96vzp7CMOO6+JvfV5oUSBpuJqftKd3+OtdnZle
-	aZ0sOo40Qz+CgIE6DKz36E123CZ1eC87K2g5Q75QvT9zG2qU7AlEEuCW
-X-Gm-Gg: AfdE7ckG6FwGciZGWFiu1oRfdyxyZFRSTuy3Nh7wjkafIIN7+hvshCIldigsPetUbHb
-	Zi0RXiREs/aKE+EoLGMNB//A1oxInsHg/2PZcOXv3GiKkrOnTWJWVWNs2MNfaYnp8ZS5cnktpln
-	wfOj8m5usn0qVg5dU5ueowrAQjhkMv+8aG9maMtp7f6mAeqXcCYwf2hAqzANxRomSg4xYSwVzS7
-	juL8LaFpvkCwRC81Ls2rFOIVDyrF6vVoLbsoM2yzq6NNkD+bbMcHq1z8zbUhFj+riXaxmv0buPF
-	ytNyTbvOlL6jyLEPWmG+HDJF0qM9hZuicYmWxjvgtayPYEmB4FG7L7FwVB13tMMa6EMFOOl1knI
-	yjJwuDzLBafTPTUjKHOHg+6zfcEPQERrE5pHdxHAZNYi+swSOxkeE9XSyEs1N09n3iNlm41v7zs
-	ElCo0n+v7guNT2sdNE4FjCGmobcuEx1W22gvR70a3gbtTQ1oB8dF0YEx4tjPFdrFRDTqIlrKa1T
-	mN17Mr69OjlPImA
-X-Received: by 2002:a17:903:292:b0:2c9:97a8:8c17 with SMTP id d9443c01a7336-2ce9f28802fmr29334865ad.42.1783776827559;
-        Sat, 11 Jul 2026 06:33:47 -0700 (PDT)
-Received: from localhost.localdomain (116-91-131-11.east.dxpn.ucom.ne.jp. [116.91.131.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2ccc9bdb76asm76179555ad.12.2026.07.11.06.33.43
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 11 Jul 2026 06:33:46 -0700 (PDT)
-From: Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
-To: Steve French <sfrench@samba.org>,
-	linux-cifs@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Steve French <stfrench@microsoft.com>,
-	samba-technical@lists.samba.org,
+        bh=k7LgNwxuoWBLJ8SbEmrF+q/5b6oVtW1AjKvLyEOzJLc=;
+        b=FOS0cn/4nJ5q2/07/V42X/3nfVaxq0QFwgwdeamSd0KGwonpxo8lve4BVI7UQiXLV3
+         YjBnHCb8Y3+XAkwXMcUCAWW7S88ddJd98Ug4tHE1Kuc1WcYNMu517IOIGkkTZcoUZAvF
+         tDx6RnYZC5tWHTAKxT/2f7mciYGOfhv7yDxnQ5jZxLGtlU9a4Kt011w/y6mnaiAOifGB
+         zBrc4yzSXwoLjdDEVzYr8+s/xVDPg+VpMZtt5KooBos5WLn4F+KRITaOBvFS5/Z8/avn
+         p1TbQYDsjizooRhrQafqckUQ4qNKyeM5WCkoUOwrfGbO0+FNrM4L9PdVSX1NzdjxcAVg
+         Sn3g==
+X-Forwarded-Encrypted: i=1; AHgh+RoziYPzfJly0tqqzJGe58GXTvVr9na2sideM1vtY041uabgogmZQB88R1dbj9mtDLXAOwMgaSW5LMuy@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBKRbtvhO0dfbexboRfQu27yNjrA/96iyiIUWxDYP/q7Q+tQOz
+	pR9afqbnRImbPe1BlGMqTDXzSYu5lGzD0eoYqaPACG0zx6bJf9l+wll/
+X-Gm-Gg: AfdE7cki7+V137xSxpTeGggKIyhqNiFtm+UIVap3Wf6BB/u2ZlTTL+gWok5P2/OaSKj
+	8lVLbZVIA+96IoTsCu3mPaomX/957abCMYru5VQqKnaMBZYGxJLLMWvl6KKqOltSOLViW8xub1M
+	aIg1A6lXkXqcH+VYinE8AdN8D5voZmcEhy5oNJwAr7rKJNf/fab8j8UziPXdp5WflwdV6VNnx3+
+	gQXjblKIjxi08uhObyva0JQd8DS6aoXyv64n97B+irjgstVF9+n1kGxxMDdB4EHmqfFG2KxtziI
+	o84PR2VfX4OqW8C1+d1QkIwSi3XyfUXpH8MogrFuDalPMAFUxA9AkwcSvelUgRp1dcO5qD9+gsl
+	8nRMFCme8Qi5BWpd2F4hqvjj4sOFDIe+qsVYQy1HncKt3GcVKXEiICGsINgPU81x3TcTezcTk6V
+	JfIHvaUYRiT2FRoB/YU9aY/Q==
+X-Received: by 2002:a17:90b:2783:b0:387:e0bb:5802 with SMTP id 98e67ed59e1d1-38dc7bad0aamr4405786a91.41.1783824921873;
+        Sat, 11 Jul 2026 19:55:21 -0700 (PDT)
+Received: from FredPC ([2600:380:805f:5cb5:2256:566b:b74d:6f4e])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-311a6115e61sm36804748eec.22.2026.07.11.19.55.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jul 2026 19:55:21 -0700 (PDT)
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+X-Google-Original-From: Fredric Cover <FredTheDude@proton.me>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
-Subject: [PATCH] smb: client: reject overlapping data areas in SMB2 responses
-Date: Sat, 11 Jul 2026 22:33:26 +0900
-Message-ID: <20260711133326.94832-1-shoichiro.miyamoto@gmail.com>
-X-Mailer: git-send-email 2.50.1
+	Fredric Cover <fredric.cover.lkernel@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: use kvzalloc() for megabyte buffer in simple fallocate
+Date: Sat, 11 Jul 2026 19:54:02 -0700
+Message-ID: <20260712025402.1804211-1-FredTheDude@proton.me>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -82,113 +80,74 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 53b7c271f06b ("smb: client: restrict implied bcc[0] exemption to
-responses without data area") restricted the implied bcc[0] length
-exception to responses without a data area. However, the overlap
-handling in __smb2_calc_size() clears data_length, which can make an
-invalid response appear to have no data area and so qualify for the
-exception.
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
 
-Track data area overlap separately and reject such responses before
-applying the length compatibility exceptions.
+Currently in smb3_simple_fallocate_range(), a 1 MB buffer is allocated
+using kzalloc(). Under heavy memory fragmentation, a contiguous 1 MB block
+of physical memory (an order-8 allocation) may not be available,
+causing the allocation to fail.
 
-Fixes: 53b7c271f06b ("smb: client: restrict implied bcc[0] exemption to responses without data area")
+This failure was observed during xfstests generic/013 on a 4GB RAM
+test machine running fsstress:
+
+fsstress: page allocation failure: order:8,
+mode:0x40dc0(GFP_KERNEL|__GFP_ZERO|__GFP_COMP),
+nodemask=(null),cpuset=/,mems_allowed=0
+
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x5d/0x80
+ warn_alloc+0x163/0x190
+ __alloc_pages_slowpath.constprop.0+0x71b/0x12f0
+ __alloc_frozen_pages_noprof+0x2f6/0x340
+ alloc_pages_mpol+0xb6/0x170
+ ___kmalloc_large_node+0xb3/0xd0
+ __kmalloc_large_noprof+0x1e/0xc0
+ smb3_simple_falloc.isra.0+0x62b/0x960
+ cifs_fallocate+0xed/0x180
+ vfs_fallocate+0x165/0x3c0
+ __x64_sys_fallocate+0x48/0xa0
+ do_syscall_64+0xe1/0x640
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ </TASK>
+
+Node 0 Normal: 3375*4kB ... 7*128kB 0*256kB 0*512kB 0*1024kB 0*2048kB 0*4096kB
+
+Since this scratch buffer does not require physically contiguous memory,
+switch the allocation to kvzalloc(). This retains the performance
+benefits of kmalloc() under normal conditions, while gracefully falling
+back to virtually contiguous memory when physical allocation fails.
+
+Fixes: 966a3cb7c7db ("cifs: improve fallocate emulation")
 Cc: stable@vger.kernel.org
-Signed-off-by: Shoichiro Miyamoto <shoichiro.miyamoto@gmail.com>
+Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Tested-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
 ---
- fs/smb/client/smb2misc.c | 34 +++++++++++++++++++++++++---------
- 1 file changed, 25 insertions(+), 9 deletions(-)
+ fs/smb/client/smb2ops.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index 6270b33147d2..9068175e57cd 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -19,7 +19,8 @@
- #include "nterr.h"
- #include "cached_dir.h"
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index d4875f9532b4..55b53bb9e3fd 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -3595,7 +3595,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 	if (rc)
+ 		goto out;
  
--static unsigned int __smb2_calc_size(void *buf, bool *have_data);
-+static unsigned int __smb2_calc_size(void *buf, bool *have_data,
-+				     bool *data_area_overlap);
+-	buf = kzalloc(1024 * 1024, GFP_KERNEL);
++	buf = kvzalloc(1024 * 1024, GFP_KERNEL);
+ 	if (buf == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
+@@ -3652,7 +3652,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
  
- static int
- check_smb2_hdr(struct smb2_hdr *shdr, __u64 mid)
-@@ -148,6 +149,7 @@ smb2_check_message(char *buf, unsigned int pdu_len, unsigned int len,
- 	__u32 calc_len; /* calculated length */
- 	__u64 mid;
- 	bool have_data;
-+	bool data_area_overlap;
- 
- 	/* If server is a channel, select the primary channel */
- 	pserver = SERVER_IS_CHAN(server) ? server->primary_server : server;
-@@ -232,7 +234,12 @@ smb2_check_message(char *buf, unsigned int pdu_len, unsigned int len,
- 	}
- 
- 	have_data = false;
--	calc_len = __smb2_calc_size(buf, &have_data);
-+	data_area_overlap = false;
-+	calc_len = __smb2_calc_size(buf, &have_data, &data_area_overlap);
-+
-+	/* Reject responses whose data area overlaps the fixed area. */
-+	if (data_area_overlap)
-+		return 1;
- 
- 	/* For SMB2_IOCTL, OutputOffset and OutputLength are optional, so might
- 	 * be 0, and not a real miscalculation */
-@@ -416,14 +423,15 @@ smb2_get_data_area_len(int *off, int *len, struct smb2_hdr *shdr)
+  out:
+ 	kfree(out_data);
+-	kfree(buf);
++	kvfree(buf);
+ 	return rc;
  }
  
- /*
-- * Calculate the size of the SMB message based on the fixed header
-- * portion, the number of word parameters and the data portion of the message.
-- * If have_data is non-NULL, it is set to true when a non-empty data area was
-- * found (data_length > 0), allowing callers to distinguish the implied bcc[0]
-- * case (no data area) from an overreported data length.
-+ * Calculate the size of the SMB message based on the fixed header, fixed
-+ * parameter area, and variable data area.
-+ *
-+ * If have_data is not NULL, it is set when a non-empty data area is found.
-+ * If data_area_overlap is not NULL, it is set when the data area overlaps
-+ * the fixed area.
-  */
- static unsigned int
--__smb2_calc_size(void *buf, bool *have_data)
-+__smb2_calc_size(void *buf, bool *have_data, bool *data_area_overlap)
- {
- 	struct smb2_pdu *pdu = buf;
- 	struct smb2_hdr *shdr = &pdu->hdr;
-@@ -432,6 +440,11 @@ __smb2_calc_size(void *buf, bool *have_data)
- 	/* Structure Size has already been checked to make sure it is 64 */
- 	int len = le16_to_cpu(shdr->StructureSize);
- 
-+	if (have_data)
-+		*have_data = false;
-+	if (data_area_overlap)
-+		*data_area_overlap = false;
-+
- 	/*
- 	 * StructureSize2, ie length of fixed parameter area has already
- 	 * been checked to make sure it is the correct length.
-@@ -454,7 +467,10 @@ __smb2_calc_size(void *buf, bool *have_data)
- 		if (offset + 1 < len) {
- 			cifs_dbg(VFS, "data area offset %d overlaps SMB2 header %d\n",
- 				 offset + 1, len);
-+			if (data_area_overlap)
-+				*data_area_overlap = true;
- 			data_length = 0;
-+			goto calc_size_exit;
- 		} else {
- 			len = offset + data_length;
- 		}
-@@ -469,7 +485,7 @@ __smb2_calc_size(void *buf, bool *have_data)
- unsigned int
- smb2_calc_size(void *buf)
- {
--	return __smb2_calc_size(buf, NULL);
-+	return __smb2_calc_size(buf, NULL, NULL);
- }
- 
- /* Note: caller must free return buffer */
 -- 
-2.50.1 (Apple Git-155)
+2.53.0
 
