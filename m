@@ -1,78 +1,78 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEF92ED870
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 21:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D342356771
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 21:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783979240; cv=none; b=eOef6bOeWBg3e6VZ83Vlvf/SWT31QIVt5RGNaja01NBZYF69gvyTYkjBXLx0lY+w/Qm2Q/Y07Jz8zCNuG/YpH6//WwIekMvky/StjjTfRWkNIrMJePlwduWX9AngDi+yvOXV3QmZagaXkjsDYp2TVGmUoceZ9srDd9Irs7RBG4o=
+	t=1783979243; cv=none; b=AYquZMcepKqFQMp9TQq/Vkpr+LjiNO8mSP+h8WNav1YT7zMdyCMVSfn7UlLsAK9uAeAaccGLTKSbBWXKNxlcb4XAybZhCQ6RAWHPFY+mVxs5C5cH+SUME9qalxIb1BTfZBc0vv3gl28OB9xNIGfRZcxl2uDwaCACuTIzSawcbyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783979240; c=relaxed/simple;
-	bh=y/hbcvYiz8GcP3HGGj/WbXvSLsSseXAw/grFl0HLqKI=;
+	s=arc-20240116; t=1783979243; c=relaxed/simple;
+	bh=Z05y0Rb7tRXIerCqR4XEMxnuH5aYkbIoT2Y3MAGgzJ4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R2ycjoVEntaaBDuSARxQO2XdhRVn+/hPd2aKD46e8JFbK7R2g8mAz723S6xmT8kVgryinGcb+WFSTWNKXbqybOBAaaUMGAP3Fu4O97H5lxOkDYnVcNSbQ44qHUXVmjcS3w85FK45TYlDgKDrOzqj4WUiYkeABm5mVA65bTHpEmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tldAj8ho; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2KTOBWU6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=tldAj8ho; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=2KTOBWU6; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=izlZzrxd8TsHICi75fdNsimXHKQ7hS6qWw+yyM/BON0ugnzFNpyjGv5mjNIK3HiSCTC17M4CR3yYbaAug5Sp5sYUrMLNdBxxdVYMPYaPVaR8xg7JSKskRKbK4g6YTVL/oYxEIWKKi2tzOJdY3qoNTuvA+DaMf2ePuTsd8rsweFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ON+Viwak; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c7rXhpxG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ON+Viwak; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=c7rXhpxG; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tldAj8ho";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2KTOBWU6";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="tldAj8ho";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="2KTOBWU6"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ON+Viwak";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c7rXhpxG";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ON+Viwak";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="c7rXhpxG"
 Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 181363E13;
-	Mon, 13 Jul 2026 21:47:17 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 3975A77AD2;
+	Mon, 13 Jul 2026 21:47:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783979237; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1783979240; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jyVAWfpi+6sm4TfG9nB9hC63Rz9TtSjW2yaLprNH5Ng=;
-	b=tldAj8hoxIt9b112Fp+08VQ8qVEiLSAxty+78vDlecKp2x1WS33ACrb725s0LqMVxOVBnp
-	pwMMza5vx/Fgxq29fkrer2DXl7CNNaqIWQMW0xtpDCn4MjEdgQlLP0Qn70PXeNKOBF/vyu
-	SfeagTHLMszIKGmO5n5Z2c2x3LS2h+8=
+	bh=noc7WfGU1zZhaNhg2i9cCL9Ww2eSIEpExpggOWJPkcc=;
+	b=ON+Viwakn7HsYH31zYgrbXFEXAQ5eGcjXQsZVRdojnF0A1ijToNGrB9qSPl1QzHsw3nRIS
+	LNTnhrf0y+sjmNn01N7mC51p0GUp92gjJEKSsMfxhi04lnShfXiYpEuLqG1I3oqgWKwo/a
+	IHx9fcvL5rb/m0Z2aVzrFRI4Yd05HVA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783979237;
+	s=susede2_ed25519; t=1783979240;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jyVAWfpi+6sm4TfG9nB9hC63Rz9TtSjW2yaLprNH5Ng=;
-	b=2KTOBWU6PbZw6Udu5KJDrZzDZW0SswEv/e7Fx4iLGYpRDsdtyS9ZGi2Gserw91oso4BrYz
-	4KEAxgWVUP9EcQBQ==
-Authentication-Results: smtp-out2.suse.de;
+	bh=noc7WfGU1zZhaNhg2i9cCL9Ww2eSIEpExpggOWJPkcc=;
+	b=c7rXhpxGAGQYB/sIhZY7gb3lu7+PrIws0+O2bPuzmZVz5mtOgzYB/7St4xr8LTY3ZmV5Re
+	GzuUXzVNVx9BkfAQ==
+Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1783979237; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1783979240; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jyVAWfpi+6sm4TfG9nB9hC63Rz9TtSjW2yaLprNH5Ng=;
-	b=tldAj8hoxIt9b112Fp+08VQ8qVEiLSAxty+78vDlecKp2x1WS33ACrb725s0LqMVxOVBnp
-	pwMMza5vx/Fgxq29fkrer2DXl7CNNaqIWQMW0xtpDCn4MjEdgQlLP0Qn70PXeNKOBF/vyu
-	SfeagTHLMszIKGmO5n5Z2c2x3LS2h+8=
+	bh=noc7WfGU1zZhaNhg2i9cCL9Ww2eSIEpExpggOWJPkcc=;
+	b=ON+Viwakn7HsYH31zYgrbXFEXAQ5eGcjXQsZVRdojnF0A1ijToNGrB9qSPl1QzHsw3nRIS
+	LNTnhrf0y+sjmNn01N7mC51p0GUp92gjJEKSsMfxhi04lnShfXiYpEuLqG1I3oqgWKwo/a
+	IHx9fcvL5rb/m0Z2aVzrFRI4Yd05HVA=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1783979237;
+	s=susede2_ed25519; t=1783979240;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jyVAWfpi+6sm4TfG9nB9hC63Rz9TtSjW2yaLprNH5Ng=;
-	b=2KTOBWU6PbZw6Udu5KJDrZzDZW0SswEv/e7Fx4iLGYpRDsdtyS9ZGi2Gserw91oso4BrYz
-	4KEAxgWVUP9EcQBQ==
+	bh=noc7WfGU1zZhaNhg2i9cCL9Ww2eSIEpExpggOWJPkcc=;
+	b=c7rXhpxGAGQYB/sIhZY7gb3lu7+PrIws0+O2bPuzmZVz5mtOgzYB/7St4xr8LTY3ZmV5Re
+	GzuUXzVNVx9BkfAQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 97EED779AE;
-	Mon, 13 Jul 2026 21:47:16 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B8D95779AE;
+	Mon, 13 Jul 2026 21:47:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id X9/YF+RcVWqdUQAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 13 Jul 2026 21:47:16 +0000
+	id DrXEH+dcVWqhUQAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 13 Jul 2026 21:47:19 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -85,9 +85,9 @@ Cc: smfrench@gmail.com,
 	linkinjeon@kernel.org,
 	senozhatsky@chromium.org,
 	Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH 05/10] smb: client: compress: enable Pattern_V1 + chained compression
-Date: Mon, 13 Jul 2026 18:46:40 -0300
-Message-ID: <20260713214645.550580-5-ematsumiya@suse.de>
+Subject: [PATCH 06/10] smb: common: compress: allow smb_lz77_compress() to overcompress
+Date: Mon, 13 Jul 2026 18:46:41 -0300
+Message-ID: <20260713214645.550580-6-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260713214645.550580-1-ematsumiya@suse.de>
 References: <20260713214645.550580-1-ematsumiya@suse.de>
@@ -99,12 +99,13 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Flag: NO
+X-Spam-Score: -2.80
 X-Spamd-Result: default: False [-2.80 / 50.00];
 	BAYES_HAM(-3.00)[100.00%];
 	MID_CONTAINS_FROM(1.00)[];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
 	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
 	MIME_GOOD(-0.10)[text/plain];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	ARC_NA(0.00)[];
@@ -113,7 +114,7 @@ X-Spamd-Result: default: False [-2.80 / 50.00];
 	FREEMAIL_CC(0.00)[gmail.com,manguebit.org,microsoft.com,talpey.com,suse.com,kernel.org,chromium.org,suse.de];
 	TO_DN_SOME(0.00)[];
 	MIME_TRACE(0.00)[0:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:mid];
 	FROM_HAS_DN(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[11];
 	RCVD_COUNT_TWO(0.00)[2];
@@ -123,274 +124,108 @@ X-Spamd-Result: default: False [-2.80 / 50.00];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	FREEMAIL_ENVRCPT(0.00)[gmail.com]
 X-Spam-Level: 
-X-Spam-Score: -2.80
 
-Negotiate Pattern_V1 and LZ77 compression algorithms by default (if
-'compress' mount option is set).
+Change smb_lz77_compress() to return 0 on successful compression,
+leaving it up to callers to decide if @dlen >= @slen is an error
+(currently returns -EMSGSIZE on such cases).
 
-Changes:
-- drop TCP_Server_Info::compression::requested, rely on ::enabled only
-- add smb_compress_alloc_size() helper to compute compressed buffer
-  size, to account for Pattern_V1 payloads as well
-- call smb_compression_compress() with SMB2 header as @uncomp
+This allows better compression in certain cases where Pattern_V1 got a
+good compression already, but LZ77 chunk was overcompressed (which
+usually yields good compressed data as a whole)
+
+Other changes:
+- adjust client and server callers to correctly interpret the
+  new return value
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/cifs_debug.c        | 18 ++++++++++------
- fs/smb/client/cifsglob.h          |  1 -
- fs/smb/client/compress.c          | 36 ++++++++++++++-----------------
- fs/smb/client/connect.c           |  2 +-
- fs/smb/client/sess.c              |  2 +-
- fs/smb/client/smb2pdu.c           | 25 ++++++++++++++-------
- fs/smb/common/compress/compress.h | 28 ++++++++++++++++++++++++
- fs/smb/server/compress.c          |  5 +----
- 8 files changed, 75 insertions(+), 42 deletions(-)
+ fs/smb/client/compress.c      |  4 ++--
+ fs/smb/common/compress/lz77.c |  7 ++-----
+ fs/smb/server/compress.c      | 15 ++++-----------
+ 3 files changed, 8 insertions(+), 18 deletions(-)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 4ed4f55a0bb7..36b4b7345c04 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -552,14 +552,18 @@ static int cifs_debug_data_proc_show(struct seq_file *m, void *v)
- 		}
- 
- 		seq_puts(m, "\nCompression: ");
--		if (!IS_ENABLED(CONFIG_CIFS_COMPRESSION))
-+		if (!IS_ENABLED(CONFIG_CIFS_COMPRESSION)) {
- 			seq_puts(m, "no built-in support");
--		else if (!server->compression.requested)
--			seq_puts(m, "disabled on mount");
--		else if (server->compression.enabled)
--			seq_printf(m, "enabled (%s)", compression_alg_str(server->compression.alg));
--		else
--			seq_puts(m, "disabled (not supported by this server)");
-+		} else if (!server->compression.enabled) {
-+			seq_puts(m, "disabled"); /* XXX: reason? */
-+		} else {
-+			seq_printf(m, "enabled, chained: %s, algs: ",
-+				   str_yes_no(server->compression.chained));
-+
-+			seq_printf(m, "%s ", compression_alg_str(server->compression.alg));
-+			if (server->compression.pattern)
-+				seq_printf(m, "%s ", compression_alg_str(SMB3_COMPRESS_PATTERN));
-+		}
- 
- 		/* Show negotiated encryption cipher, even if not required */
- 		seq_puts(m, "\nEncryption: ");
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 99f9e6dca62b..a08aa7fc84f4 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -787,7 +787,6 @@ struct TCP_Server_Info {
- 	unsigned int	rdma_readwrite_threshold;
- 	unsigned int	retrans;
- 	struct {
--		bool requested; /* "compress" mount option set*/
- 		bool enabled; /* actually negotiated with server */
- 		bool chained; /* chained transforms were negotiated */
- 		bool pattern; /* Pattern_V1 chained payloads were negotiated */
 diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
-index 7c08e2b843c2..72ac727250f6 100644
+index 72ac727250f6..d94bacf3edbd 100644
 --- a/fs/smb/client/compress.c
 +++ b/fs/smb/client/compress.c
-@@ -338,8 +338,9 @@ bool should_compress(const struct cifs_tcon *tcon, const struct smb_rqst *rq)
- int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_send_fn send_fn)
- {
- 	struct iov_iter iter;
--	u32 slen, dlen;
-+	u32 slen, dlen, shdr_len;
- 	void *src, *dst = NULL;
-+	bool use_pattern;
- 	int ret;
+@@ -392,7 +392,7 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
  
- 	if (!server || !rq || !rq->rq_iov || !rq->rq_iov->iov_base)
-@@ -380,32 +381,27 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
- 		goto err_free;
- 	}
- 
--	dlen = smb_lz77_compressed_alloc_size(slen);
-+	use_pattern = server->compression.pattern;
-+	shdr_len = rq->rq_iov[0].iov_len;
-+	dlen = smb_compress_alloc_size(slen, use_pattern) + shdr_len;
- 	dst = kvzalloc(dlen, GFP_KERNEL);
- 	if (!dst) {
- 		ret = -ENOMEM;
- 		goto err_free;
- 	}
- 
--	ret = smb_lz77_compress(src, slen, dst, &dlen);
-+	ret = smb_compression_compress(SMB3_COMPRESS_LZ77, server->compression.chained, use_pattern,
-+				       src, slen, dst, &dlen, rq->rq_iov[0].iov_base, shdr_len);
- 	if (!ret) {
--		struct smb2_compression_hdr hdr = { 0 };
--		struct smb_rqst comp_rq = { .rq_nvec = 3, };
--		struct kvec iov[3];
--
--		hdr.ProtocolId = SMB2_COMPRESSION_TRANSFORM_ID;
--		hdr.OriginalCompressedSegmentSize = cpu_to_le32(slen);
--		hdr.CompressionAlgorithm = SMB3_COMPRESS_LZ77;
--		hdr.Flags = SMB2_COMPRESSION_FLAG_NONE;
--		hdr.Offset = cpu_to_le32(rq->rq_iov[0].iov_len);
--
--		iov[0].iov_base = &hdr;
--		iov[0].iov_len = sizeof(hdr);
--		iov[1] = rq->rq_iov[0];
--		iov[2].iov_base = dst;
--		iov[2].iov_len = dlen;
--
--		comp_rq.rq_iov = iov;
-+		struct smb_rqst comp_rq = { .rq_nvec = 1, };
-+		struct kvec iov = {
-+			.iov_base = dst,
-+			.iov_len = dlen,
-+		};
-+
-+		iov.iov_base = dst;
-+		iov.iov_len = dlen;
-+		comp_rq.rq_iov = &iov;
+ 	ret = smb_compression_compress(SMB3_COMPRESS_LZ77, server->compression.chained, use_pattern,
+ 				       src, slen, dst, &dlen, rq->rq_iov[0].iov_base, shdr_len);
+-	if (!ret) {
++	if (!ret && dlen < slen) {
+ 		struct smb_rqst comp_rq = { .rq_nvec = 1, };
+ 		struct kvec iov = {
+ 			.iov_base = dst,
+@@ -404,7 +404,7 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
+ 		comp_rq.rq_iov = &iov;
  
  		ret = send_fn(server, 1, &comp_rq);
- 	} else if (ret == -EMSGSIZE || dlen >= slen) {
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 324452bc0437..dd35abdac334 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1830,7 +1830,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	tcp_ses->channel_sequence_num = 0; /* only tracked for primary channel */
- 	tcp_ses->reconnect_instance = 1;
- 	tcp_ses->lstrp = jiffies;
--	tcp_ses->compression.requested = ctx->compress;
-+	tcp_ses->compression.enabled = ctx->compress;
- 	spin_lock_init(&tcp_ses->req_lock);
- 	spin_lock_init(&tcp_ses->srv_lock);
- 	spin_lock_init(&tcp_ses->mid_queue_lock);
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index de2012cc9cf3..83f4b5d107f6 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -552,7 +552,7 @@ cifs_ses_add_channel(struct cifs_ses *ses,
- 	ctx->echo_interval = ses->server->echo_interval / HZ;
- 	ctx->max_credits = ses->server->max_credits;
- 	ctx->min_offload = ses->server->min_offload;
--	ctx->compress = ses->server->compression.requested;
-+	ctx->compress = ses->server->compression.enabled;
- 	ctx->dfs_conn = ses->server->dfs_conn;
- 	ctx->ignore_signature = ses->server->ignore_signature;
- 	ctx->leaf_fullpath = ses->server->leaf_fullpath;
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index d058584b8f05..41cdc9f5e692 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -785,7 +785,7 @@ assemble_neg_contexts(struct smb2_negotiate_req *req,
- 	pneg_ctxt += sizeof(struct smb2_posix_neg_context);
- 	neg_context_count++;
- 
--	if (server->compression.requested) {
-+	if (server->compression.enabled) {
- 		build_compression_ctxt((struct smb2_compression_capabilities_context *)
- 				pneg_ctxt);
- 		ctxt_len = ALIGN(sizeof(struct smb2_compression_capabilities_context), 8);
-@@ -835,11 +835,6 @@ static void decode_compress_ctx(struct TCP_Server_Info *server,
- 	unsigned int len = le16_to_cpu(ctxt->DataLength);
- 	unsigned int count, i;
- 
--	server->compression.enabled = false;
--	server->compression.chained = false;
--	server->compression.pattern = false;
--	server->compression.alg = SMB3_COMPRESS_NONE;
+-	} else if (ret == -EMSGSIZE || dlen >= slen) {
++	} else if (!ret) {
+ 		ret = send_fn(server, 1, rq);
+ 	}
+ err_free:
+diff --git a/fs/smb/common/compress/lz77.c b/fs/smb/common/compress/lz77.c
+index e32e2f3040d8..f88f49e01629 100644
+--- a/fs/smb/common/compress/lz77.c
++++ b/fs/smb/common/compress/lz77.c
+@@ -248,19 +248,16 @@ noinline int smb_lz77_compress(const void *src, const u32 slen, void *dst, u32 *
+ 	} while (srcp < end);
+ out:
+ 	dstp = lz77_encode_literals(anchor, end, dstp, &flag, &flag_count, &flag_pos);
 -
- 	/*
- 	 * Caller checked that DataLength remains within SMB boundary. We still
- 	 * need to confirm that one CompressionAlgorithms member is accounted
-@@ -876,6 +871,12 @@ static void decode_compress_ctx(struct TCP_Server_Info *server,
- 	/*
- 	 * Pattern_V1 cannot appear in an unchained transform even if a broken
- 	 * peer lists it in the algorithm array.
-+	 *
-+	 * OTOH, the chained flag might have been negotiated without either/both peers having not
-+	 * advertised Pattern_V1 algorithm support.
-+	 *
-+	 * (which doesn't make much sense, but we'll still have to send compressed payloads with
-+	 * the chained flag set in "chained && !pattern_v1" cases)
- 	 */
- 	server->compression.chained =
- 		ctxt->Flags == SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED;
-@@ -1336,11 +1337,19 @@ SMB2_negotiate(const unsigned int xid,
- 	}
+ 	flag_count = LZ77_FLAG_MAX - flag_count;
+ 	flag <<= flag_count;
+ 	flag |= (1UL << flag_count) - 1;
+ 	mem_write32(flag_pos, flag);
  
- 	if (server->dialect == SMB311_PROT_ID) {
--		if (rsp->NegotiateContextCount)
-+		bool compression_enabled = server->compression.enabled;
-+
-+		/* Reset compression settings in case of server not supporting it */
-+		memset(&server->compression, 0, sizeof(server->compression));
-+
-+		if (rsp->NegotiateContextCount) {
- 			rc = smb311_decode_neg_context(rsp, server,
- 						       rsp_iov.iov_len);
--		else
-+			if (!rc && compression_enabled && !server->compression.enabled)
-+				cifs_server_dbg(VFS, "Server doesn't support compression, disabling\n");
-+		} else {
- 			cifs_server_dbg(VFS, "Missing expected negotiate contexts\n");
-+		}
- 	}
++	/* Compression is successful from our POV -- let caller decide if @dlen suits them. */
+ 	*dlen = dstp - dst;
+ 	kvfree(htable);
  
- 	if (server->cipher_type && !rc)
-diff --git a/fs/smb/common/compress/compress.h b/fs/smb/common/compress/compress.h
-index 6760862de04c..e1fad498d567 100644
---- a/fs/smb/common/compress/compress.h
-+++ b/fs/smb/common/compress/compress.h
-@@ -145,6 +145,34 @@ static __always_inline bool smb_compress_alg_valid(__le16 alg, bool valid_none)
- 	return alg == SMB3_COMPRESS_LZ77 || alg == SMB3_COMPRESS_PATTERN;
+-	if (*dlen < slen)
+-		return 0;
+-
+-	return -EMSGSIZE;
++	return 0;
  }
+ EXPORT_SYMBOL_GPL(smb_lz77_compress);
  
-+/**
-+ * smb_compress_alloc_size() - Compute total allocation size required for compressed (dst) buffer.
-+ * @size:		uncompressed size
-+ * @use_pattern:	if Pattern_V1 is enabled
-+ *
-+ * For any case:
-+ * - SMB2 compression hdr
-+ * - LZ* payload
-+ *
-+ * If @use_pattern, also account for:
-+ * - 2x payload hdr for Pattern_V1
-+ * - 2x Pattern_V1 payloads
-+ * - 1x NONE payload hdr
-+ *
-+ * (possible uncompressed leftovers are included in LZ alloc size)
-+ */
-+static __always_inline u32 smb_compress_alloc_size(const u32 size, const bool use_pattern)
-+{
-+	u32 alloc_size;
-+
-+	alloc_size = sizeof(struct smb2_compression_hdr) + smb_lz77_compressed_alloc_size(size);
-+	if (use_pattern)
-+		alloc_size += (SMB2_COMPRESSION_PAYLOAD_BASE_LEN * 3) +
-+			(sizeof(struct smb2_compression_pattern_v1) * 2);
-+
-+	return alloc_size;
-+}
-+
- int smb_compression_decompress(__le16 alg, bool allow_chained,
- 			       const void *src, u32 slen, void *dst, u32 dlen);
- int smb_compression_compress(__le16 alg, bool chained, bool allow_pattern,
 diff --git a/fs/smb/server/compress.c b/fs/smb/server/compress.c
-index 32027a15f7ab..e5851d603469 100644
+index e5851d603469..648660f8bfab 100644
 --- a/fs/smb/server/compress.c
 +++ b/fs/smb/server/compress.c
-@@ -132,10 +132,7 @@ int ksmbd_compress_response(struct ksmbd_work *work)
- 		goto out;
- 	}
+@@ -148,12 +148,10 @@ int ksmbd_compress_response(struct ksmbd_work *work)
+ 					      src, src_len,
+ 					      out + sizeof(__be32), &dst_len,
+ 					      NULL, 0);
+-		if (rc == -EMSGSIZE || dst_len >= src_len) {
+-			rc = 0;
+-			goto out;
+-		}
+-		if (rc)
++		/* if dst_len >= src_len, rc is 0 */
++		if (rc || dst_len >= src_len)
+ 			goto out;
++
+ 		compressed_pdu_len = dst_len;
+ 	} else {
+ 		/*
+@@ -164,12 +162,7 @@ int ksmbd_compress_response(struct ksmbd_work *work)
+ 		rc = smb_lz77_compress(src, src_len,
+ 				       out + sizeof(__be32) + sizeof(*chdr),
+ 				       &dst_len);
+-		if (rc == -EMSGSIZE ||
+-		    dst_len + sizeof(*chdr) >= src_len) {
+-			rc = 0;
+-			goto out;
+-		}
+-		if (rc)
++		if (rc || dst_len + sizeof(*chdr) >= src_len)
+ 			goto out;
  
--	max_dst_len = smb_lz77_compressed_alloc_size(src_len) +
--		sizeof(struct smb2_compression_hdr) +
--		3 * sizeof(struct smb2_compression_payload_hdr) +
--		2 * sizeof(struct smb2_compression_pattern_v1);
-+	max_dst_len = smb_compress_alloc_size(src_len, work->conn->compress_pattern);
- 	out = kvzalloc(sizeof(__be32) + max_dst_len,
- 		       KSMBD_DEFAULT_GFP);
- 	if (!out) {
+ 		compressed_pdu_len = sizeof(*chdr) + dst_len;
 -- 
 2.54.0
 
