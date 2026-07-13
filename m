@@ -1,137 +1,370 @@
-Received: from va-2-28.ptr.blmpb.com (va-2-28.ptr.blmpb.com [209.127.231.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B8736B07E
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 09:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D943C2848A7
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 15:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783935406; cv=none; b=qM5nu9YvGnHiqZxDmpZPDA/R+yK9VbZ1EqK/01PvelSC4dS6nJFWXQuj188GJCldJESVTN/QV+6p143qdt/NQJEpMrCCZzSIFa5WZMW3cntR2j8fQfuL86/BYLqp7gm4YYc8DDaJ8gZKPe/Z8IF6cxUeU2JSZwGc/buy7/DCNCo=
+	t=1783955875; cv=none; b=SbTavU6HQG3zzjWtgqPeoPGdettNLlZcOk8PoBe0t8AZTvccohKlCK9vtWHJP9YCgbMb6tfATln2E4Jo/yD5qHYzhxzEhwoQIRYMjmtP/Cf3ibt+mfbbDCkcjbT/DW68SprBeT/vGH4zh3/H74xTW+Gp5X4Ko2cIuBNyInVEIQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783935406; c=relaxed/simple;
-	bh=9AHAq4ADgEY7x0gebo+0UmF+sPpveeSRLqt9ygz6aHM=;
-	h=Content-Type:To:Cc:Mime-Version:References:In-Reply-To:Date:
-	 Message-Id:Subject:From; b=ovrt+YloTmDat/M9LLuJamcZWdWAiJxB+TB++tbGI53NbDGUxGsV6KvOcJBvP7t4dKMdx9rdes39cyFk4tENnWK/scrQSTjQElpDRw1Gm1ZxAHSuOJx5If8tDPjoTRYT9+2bn4CtyAqUwfnSU9LzwdWIqqS0yxDxFbRk/1TKHBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=brcbWvJ3; arc=none smtp.client-ip=209.127.231.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
+	s=arc-20240116; t=1783955875; c=relaxed/simple;
+	bh=jz9VFy58Dfp+Y8bOSvI+MDlPub16FHxA93xMd5pQY4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GfCP/3VdkXyGHtq3sfH0XSVFpHcWvZhDSXR8J5evBUdSHfkuNlAHKuVlSob2orpbc/1yTpoG5IMnas2EHrwNvFdYhtwFzTCwpeM955qGhg4n5WXYDnhPDDjlc8M4NmDWt/iFn16Jlw/difcdxFtIJfZEvekZvJ4h2Vi9+w5RuWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=tqzr+sG5; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="brcbWvJ3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1783935399;
-  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
- reply-to:content-type:mime-version:in-reply-to:message-id;
- bh=9AHAq4ADgEY7x0gebo+0UmF+sPpveeSRLqt9ygz6aHM=;
- b=brcbWvJ3Yk3X1SJveges63dg8DXDG7Gl9orEQWk0LXHv/LAbyBg3KJL46pUcyyVYPugJrF
- OEZV6nSZFg6M0iTWnrcZvFdFuhDoSqrN1IPS1POnFRm3rsi8wsseSv+ALjZT7V4ncOSHd0
- ZZ9sd+0UUSbPoFc3YZgh+DYedMAjsiDIsTx314KB/u0XUJcb33GFilHcl9U/Y+aZilHK1G
- JEzJ5QsFgvayNQVF5QvN1tTdLtvH0+W0xYfjPhfZF0cKUAVztauujz9RfSzCMecVdbDGaA
- eAHkrx6wf89I6pHHJUdQU7AAs6voYTX2gc5ln6uz1MM/Qr2gK4vDQzRshUrFLg==
-X-Lms-Return-Path: <lba+16a54b1a5+034051+vger.kernel.org+wangzhaolong@fnnas.com>
-Content-Type: text/plain; charset=UTF-8
-To: "Namjae Jeon" <linkinjeon@kernel.org>
-Cc: <linux-cifs@vger.kernel.org>, <smfrench@gmail.com>, 
-	<senozhatsky@chromium.org>, <tom@talpey.com>, 
-	<linux-kernel@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="tqzr+sG5"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1783955867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=W38ek2MmpfJQKKz0a29El6XxLKQkAw5TYzx94D6GvSQ=;
+	b=tqzr+sG5dyZIPJ0iSg5W4eD8u/2nGV0WYCXblYTUE+gHfdB/9XDeK7BULNCFUAA7K7f9cE
+	Tp0NyggTxDovgRwPCIgfhB5Yt5YP8OP+ac1a/hQogLPm5IMDESL6OqgIgJLntyRSuik7vL
+	mxFLOGwjufkxRIBKyUPyWsZUksGFPp5u9SyBHce4Rz7FHTryQbDvvfYqH8bB8QRoLvPQn/
+	eipxHPk0M8mqKc/41NxqcUg/5cfWSxPxfipW0KMzI4N+DfYGeBiWvcomCUAmHmE+uo/N7+
+	AYOddflMYH4hnDb1El/riw9FVXlvgChQN9hhDUYiricLxaoMT/CvAkg7pSN3eA==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: lukas@herbolt.com,
+	smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	fstests@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] cifs/002: check nlink returned by fstat()
+Date: Mon, 13 Jul 2026 15:16:58 +0000
+Message-ID: <20260713151658.533155-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260713071141.3909087-1-wangzhaolong@fnnas.com> <20260713071141.3909087-4-wangzhaolong@fnnas.com>
-	<CAKYAXd-ymPFFLwW+a6_88LHL_tZXEuffUW8NymbSp3t+OZHosw@mail.gmail.com>
-In-Reply-To: <CAKYAXd-ymPFFLwW+a6_88LHL_tZXEuffUW8NymbSp3t+OZHosw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 13 Jul 2026 17:36:35 +0800
-Message-Id: <5cf37150673ea4d5c28f94db91cdf68504b50522.bcc0e7a0.69db.419d.9f76.9089ceffc788@feishu.cn>
-Subject: Re: [RFC 3/3] ksmbd: use splice payloads for simple SMB2 READ
-From: "Wang Zhaolong" <wangzhaolong@fnnas.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Namjae,
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Thank you for the quick review.
+Add a CIFS test to verify that fstat(2) returns the expected
+st_nlink value as hardlinks are created and removed.
 
-> From: "Namjae Jeon"<linkinjeon@kernel.org>
-> Date:=C2=A0 Mon, Jul 13, 2026, 4:59 PM
-> Subject:=C2=A0 Re: [RFC 3/3] ksmbd: use splice payloads for simple SMB2 R=
-EAD
-> To: "wang zhaolong"<wangzhaolong@fnnas.com>
-> Cc: <linux-cifs@vger.kernel.org>, <smfrench@gmail.com>, <senozhatsky@chro=
-mium.org>, <tom@talpey.com>, <linux-kernel@vger.kernel.org>
-> On Mon, Jul 13, 2026 at 4:18=E2=80=AFPM wang zhaolong <wangzhaolong@fnnas=
-.com> wrote:
-> >
-> > From: Wang Zhaolong <wangzhaolong@fnnas.com>
-> Hi Wang,
->=C2=A0
-> Could you rebase the series on the current #ksmbd-for-next-next branch
-> to test this ?
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ src/Makefile       |   2 +-
+ src/fstat.c        | 200 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/cifs/002     |  62 ++++++++++++++
+ tests/cifs/002.out |   2 +
+ 4 files changed, 265 insertions(+), 1 deletion(-)
+ create mode 100644 src/fstat.c
+ create mode 100755 tests/cifs/002
+ create mode 100644 tests/cifs/002.out
 
-Okay, I will rebase the series onto the current ksmbd-for-next-next branch =
-and rerun
-the functional and performance tests.
+diff --git a/src/Makefile b/src/Makefile
+index 31ac43b2..b0886279 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -6,7 +6,7 @@
+ TOPDIR = ..
+ include $(TOPDIR)/include/builddefs
+ 
+-TARGETS = dirstress fill fill2 getpagesize holes lstat64 \
++TARGETS = dirstress fill fill2 getpagesize holes lstat64 fstat \
+ 	nametest permname randholes runas truncfile usemem \
+ 	mmapcat append_reader append_writer dirperf metaperf \
+ 	devzero feature alloc fault fstest t_access_root \
+diff --git a/src/fstat.c b/src/fstat.c
+new file mode 100644
+index 00000000..59221186
+--- /dev/null
++++ b/src/fstat.c
+@@ -0,0 +1,200 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
++ * Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
++ *
++ *  from
++ *  src/lstat64.c
++ *  Copyright (c) 2000-2002 Silicon Graphics, Inc.
++ *  All Rights Reserved.
++ */
++
++#include <fcntl.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <sys/stat.h>
++#include <sys/sysmacros.h>
++
++long	timebuf;
++
++void
++timesince(long timesec)
++{
++	long	d_since;	/* days */
++	long	h_since;	/* hours */
++	long	m_since;	/* minutes */
++	long	s_since;	/* seconds */
++
++	s_since = timebuf - timesec;
++	d_since = s_since / 86400l ;
++	s_since -= d_since * 86400l ;
++	h_since = s_since / 3600l ;
++	s_since -= h_since * 3600l ;
++	m_since = s_since / 60l ;
++	s_since -= m_since * 60l ;
++
++	printf("(%05ld.%02ld:%02ld:%02ld)\n",
++			d_since, h_since, m_since, s_since);
++}
++
++void
++usage(void)
++{
++	fprintf(stderr, "Usage: fstat [-t] filename ...\n");
++	exit(1);
++}
++
++int
++main(int argc, char **argv)
++{
++	struct stat	sbuf;
++	int		i, c;
++	int		terse_flag = 0;
++
++	while ((c = getopt(argc, argv, "t")) != EOF) {
++		switch (c) {
++			case 't':
++				terse_flag = 1;
++				break;
++
++			case '?':
++				usage();
++		}
++	}
++	if (optind == argc) {
++		usage();
++	}
++
++	time(&timebuf);
++
++	for (i = optind; i < argc; i++) {
++		char mode[] = "----------";
++		int fd;
++
++		fd = open(argv[i], O_RDONLY | O_NONBLOCK);
++		if (fd < 0) {
++			perror(argv[i]);
++			continue;
++		}
++
++		if (fstat(fd, &sbuf) < 0) {
++			perror(argv[i]);
++			close(fd);
++			continue;
++		}
++
++		if (terse_flag) {
++			printf("%s %llu ", argv[i], (unsigned long long)sbuf.st_size);
++		}
++		else {
++			printf("  File: \"%s\"\n", argv[i]);
++			printf("  Size: %-10llu", (unsigned long long)sbuf.st_size);
++		}
++
++		if (sbuf.st_mode & S_IXOTH)
++			mode[9] = 'x';
++		if (sbuf.st_mode & S_IWOTH)
++			mode[8] = 'w';
++		if (sbuf.st_mode & S_IROTH)
++			mode[7] = 'r';
++		if (sbuf.st_mode & S_IXGRP)
++			mode[6] = 'x';
++		if (sbuf.st_mode & S_IWGRP)
++			mode[5] = 'w';
++		if (sbuf.st_mode & S_IRGRP)
++			mode[4] = 'r';
++		if (sbuf.st_mode & S_IXUSR)
++			mode[3] = 'x';
++		if (sbuf.st_mode & S_IWUSR)
++			mode[2] = 'w';
++		if (sbuf.st_mode & S_IRUSR)
++			mode[1] = 'r';
++		if (sbuf.st_mode & S_ISVTX)
++			mode[9] = 't';
++		if (sbuf.st_mode & S_ISGID)
++			mode[6] = 's';
++		if (sbuf.st_mode & S_ISUID)
++			mode[3] = 's';
++
++		if (!terse_flag)
++			printf("   Filetype: ");
++		switch (sbuf.st_mode & S_IFMT) {
++		case S_IFSOCK:
++			if (!terse_flag)
++				puts("Socket");
++			mode[0] = 's';
++			break;
++		case S_IFDIR:
++			if (!terse_flag)
++				puts("Directory");
++			mode[0] = 'd';
++			break;
++		case S_IFCHR:
++			if (!terse_flag)
++				puts("Character Device");
++			mode[0] = 'c';
++			break;
++		case S_IFBLK:
++			if (!terse_flag)
++				puts("Block Device");
++			mode[0] = 'b';
++			break;
++		case S_IFREG:
++			if (!terse_flag)
++				puts("Regular File");
++			mode[0] = '-';
++			break;
++		case S_IFLNK:
++			if (!terse_flag)
++				puts("Symbolic Link");
++			mode[0] = 'l';
++			break;
++		case S_IFIFO:
++			if (!terse_flag)
++				puts("Fifo File");
++			mode[0] = 'f';
++			break;
++		default:
++			if (!terse_flag)
++				puts("Unknown");
++			mode[0] = '?';
++		}
++
++		if (terse_flag) {
++			printf("%s %d,%d\n", mode, (int)sbuf.st_uid, (int)sbuf.st_gid);
++			close(fd);
++			continue;
++		}
++
++		printf("  Mode: (%04o/%s)", (unsigned int)(sbuf.st_mode & 07777), mode);
++		printf("         Uid: (%d)", (int)sbuf.st_uid);
++		printf("  Gid: (%d)\n", (int)sbuf.st_gid);
++		printf("Device: %2d,%-2d", major(sbuf.st_dev),
++				minor(sbuf.st_dev));
++		printf("  Inode: %-9llu", (unsigned long long)sbuf.st_ino);
++		printf(" Links: %-5ld", (long)sbuf.st_nlink);
++
++		if ( ((sbuf.st_mode & S_IFMT) == S_IFCHR)
++		    || ((sbuf.st_mode & S_IFMT) == S_IFBLK) )
++			printf("     Device type: %2d,%-2d\n",
++				major(sbuf.st_rdev), minor(sbuf.st_rdev));
++		else
++			printf("\n");
++
++		printf("Access: %.24s",ctime(&sbuf.st_atime));
++		timesince(sbuf.st_atime);
++		printf("Modify: %.24s",ctime(&sbuf.st_mtime));
++		timesince(sbuf.st_mtime);
++		printf("Change: %.24s",ctime(&sbuf.st_ctime));
++		timesince(sbuf.st_ctime);
++
++		if (i+1 < argc)
++			printf("\n");
++
++		close(fd);
++	}
++	exit(0);
++}
+diff --git a/tests/cifs/002 b/tests/cifs/002
+new file mode 100755
+index 00000000..5f1eaffc
+--- /dev/null
++++ b/tests/cifs/002
+@@ -0,0 +1,62 @@
++#! /bin/bash
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
++# Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
++#
++# FS QA Test No. cifs/002
++#
++# Check that fstat(2) returns the correct hard link count for a regular file.
++# Regression test for kernel commit:
++# 9dd1964ac59d ("smb/client: fix incorrect nlink returned by fstat()")
++#
++#  from
++#  tests/generic/002
++#  Copyright (c) 2000-2001 Silicon Graphics, Inc.  All Rights Reserved.
++#
++. ./common/preamble
++_begin_fstest metadata auto quick
++
++# Override the default cleanup function.
++_cleanup()
++{
++	rm -f $tmp.*
++	rm -rf $TEST_DIR/$$
++}
++
++status=0	# success is the default!
++
++_require_test
++_require_hardlinks
++_require_test_program fstat
++
++echo "Silence is goodness ..."
++
++testdir=$TEST_DIR/$$
++mkdir -p $testdir
++
++touch $testdir/tmp.1
++for l in 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
++do
++	ln $testdir/tmp.1 $testdir/tmp.$l
++	x=`$here/src/fstat $testdir/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
++	if [ "$l" -ne $x ]
++	then
++		echo "Arrgh, created link #$l and fstat looks like ..."
++		$here/src/fstat $testdir/tmp.1
++		status=1
++	fi
++done
++
++for l in 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
++do
++	x=`$here/src/fstat $testdir/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
++	if [ "$l" -ne $x ]
++	then
++		echo "Arrgh, about to remove link #$l and fstat looks like ..."
++		$here/src/fstat $testdir/tmp.1
++		status=1
++	fi
++	rm -f $testdir/tmp.$l
++done
++
++exit
+diff --git a/tests/cifs/002.out b/tests/cifs/002.out
+new file mode 100644
+index 00000000..11426b54
+--- /dev/null
++++ b/tests/cifs/002.out
+@@ -0,0 +1,2 @@
++QA output created by 002
++Silence is goodness ...
+-- 
+2.43.0
 
-> >
-> > Use the page-backed payload path for plain TCP SMB2 READ requests of at
-> > least 64 KiB.
-> Could you provide benchmark results ? and requests smaller than 64 KiB
-> are unlikely to benefit from this optimization? Theoretically, it
-> seems like it would improve, but I am wondering how much performance
-> improvement there actually is.
-
-Regarding the 64 KiB threshold, it is currently a conservative value rather=
- than
-a conclusion based on complete measurements. As noted in the cover letter,
-I have already included initial results based on 1 MiB sequential reads, wh=
-ere
-the splice path showed a clear improvement:
-
-=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0=C2=A0 baseline =C2=A0=C2=A0 patched =C2=A0 =C2=A0 del=
-ta
-=C2=A0 bandwidth =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1.=
-728 GB/s=C2=A0 2.246 GB/s=C2=A0 +30.0%
-=C2=A0 mean completion latency =C2=A0 604.1 us =C2=A0=C2=A0 464.5 us =C2=A0=
-=C2=A0 -23.1%
-=C2=A0 median sample P99 latency 794.6 us =C2=A0=C2=A0 606.2 us =C2=A0=C2=
-=A0 -23.7%
-
-These results were obtained in a QEMU environment with ksmbd and the SMB
-client in the same guest, using a warm 4 GiB file, SMB 3.1.1, cache=3Dnone,=
- 1 MiB
-synchronous reads, and one job.
-
-I agree that smaller requests may also benefit. However, for small reads, t=
-he
-overhead of managing pages and pipes might cancel out some of the gains
-from reducing copies, so I chose 64 KiB as a conservative starting threshol=
-d.
-
-I will add benchmarks for a range of request sizes, for example 4 KiB, 16 K=
-iB, 32 KiB,
-64 KiB, 128 KiB, 256 KiB, and 1 MiB. Based on those results, I can either a=
-djust the
-threshold or remove it if the splice path remains beneficial for smaller re=
-quests.
-
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;
-> > + =C2=A0 =C2=A0 =C2=A0 if (ksmbd_stream_fd(fp) || !S_ISREG(file_inode(f=
-ilp)->i_mode) ||
-> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (filp->f_flags & O_DIRECT) || IS_D=
-AX(file_inode(filp)))
-> Since ksmbd does not currently open files with O_DIRECT, is the
-> O_DIRECT check needed here, or is it only intended as a defensive
-> guard for future support?
->=C2=A0
-
-The O_DIRECT check is currently only a defensive guard. I added it
-to ensure that the page-cache-backed payload path is not accidentally
-used if direct-I/O support or another file-opening mode is introduced later=
-.
-
-I can remove the check if you prefer to avoid guarding an unsupported
-configuration, or keep it with a comment explaining that it is intended for
-future-proofing.
-
-Best regards,
-Wang Zhaolong
