@@ -1,128 +1,137 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-28.ptr.blmpb.com (va-2-28.ptr.blmpb.com [209.127.231.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF793D565F
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 08:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B8736B07E
+	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 09:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783933143; cv=none; b=Ds/RRG4c+ekqBlUiE+jGWdvpJBt+jqty0bCtf5mk2PBTujYhunRSfngLZiNt1vmYL0e7D5qvFglWc8PIFIxNGbqrUZmwIknDDOGX+wpsGNykjJVJ8+7MViknmW+TWf8MI/BB8PILW0/uNfmKpPJRsf3dE6LskNB71VEBttIo0Ag=
+	t=1783935406; cv=none; b=qM5nu9YvGnHiqZxDmpZPDA/R+yK9VbZ1EqK/01PvelSC4dS6nJFWXQuj188GJCldJESVTN/QV+6p143qdt/NQJEpMrCCZzSIFa5WZMW3cntR2j8fQfuL86/BYLqp7gm4YYc8DDaJ8gZKPe/Z8IF6cxUeU2JSZwGc/buy7/DCNCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783933143; c=relaxed/simple;
-	bh=02RgzUA6Aphy31UxX62Fk5g5U66JoFRi2vZcmHy8gcM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nz1WoBLrfvAW5qpiB3oQ9c5CLO20BIaS0o5scKAk1xAt1ZjAF+8LUwTVxj7N2+ApMpZHy9ngr8ScXyAU/VMy1qP4h6lyrLFaRB7auEe8htGfqi4OQMuHbjES82wrUBDNbOdJqYZeZnHB7niBSLYFH+hIiaeE1vdPJ67AcvrJFdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I6cdq2qe; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783935406; c=relaxed/simple;
+	bh=9AHAq4ADgEY7x0gebo+0UmF+sPpveeSRLqt9ygz6aHM=;
+	h=Content-Type:To:Cc:Mime-Version:References:In-Reply-To:Date:
+	 Message-Id:Subject:From; b=ovrt+YloTmDat/M9LLuJamcZWdWAiJxB+TB++tbGI53NbDGUxGsV6KvOcJBvP7t4dKMdx9rdes39cyFk4tENnWK/scrQSTjQElpDRw1Gm1ZxAHSuOJx5If8tDPjoTRYT9+2bn4CtyAqUwfnSU9LzwdWIqqS0yxDxFbRk/1TKHBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com; spf=pass smtp.mailfrom=fnnas.com; dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b=brcbWvJ3; arc=none smtp.client-ip=209.127.231.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fnnas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fnnas.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I6cdq2qe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 122661F00A3D
-	for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 08:59:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783933142;
-	bh=MPhl5m5mM6ss/nIsTLC8FGh4YSRh/4jlhvg0ZnUD6xE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=I6cdq2qe+fXSt1c3i0jIszpyDFzxkznWdc6rIPQp2proETeGTtSNIyrKzqe/9iWPt
-	 aN0/txjn2KBkrMqIobII5RgJJvWK9IvCe+O0iVsJ4MPyAmDq96ScT3TVF2ibayp2Tm
-	 toJJXVxfh4sWcA1uNeTmavOWAghdJelcgEcc0k9yokAzhkLv38LdvOyhkc8xgJiSDk
-	 u42b7Kqavjehl29EOg8ZRCsMrzTHoxxHjISrysk7uLVS7Py+1GOdV/rTfkbi5ss+lv
-	 cWp3oKSC3LOiVjytslduqhA4z5Wnoa1Ffzf4b91jOBWQLNvzsefDrXy0/mJZX2wnoT
-	 8FUAhQ79ILdyQ==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c15bf399d3bso343032266b.2
-        for <linux-cifs@vger.kernel.org>; Mon, 13 Jul 2026 01:59:01 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yz1LJHj8o0VgBxucUWlnR7CaNYHlNUXXuV00UyGiLsPf9/FS2mk
-	pZI+UVltBqU9hV86+LmwrIwdTaJQZgUjKtWC/n9w5XjMFKe6ePL9dAhYOadnrXRabKBSyGQEuIC
-	z0YTZD03MAKt8Q+cFsyKzZM6ANXjzoAg=
-X-Received: by 2002:a17:907:e1c3:20b0:c15:fc73:65b7 with SMTP id
- a640c23a62f3a-c161e90f834mr206379266b.29.1783933140687; Mon, 13 Jul 2026
- 01:59:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fnnas-com.20200927.dkim.feishu.cn header.i=@fnnas-com.20200927.dkim.feishu.cn header.b="brcbWvJ3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=s1; d=fnnas-com.20200927.dkim.feishu.cn; t=1783935399;
+  h=from:subject:mime-version:from:date:message-id:subject:to:cc:
+ reply-to:content-type:mime-version:in-reply-to:message-id;
+ bh=9AHAq4ADgEY7x0gebo+0UmF+sPpveeSRLqt9ygz6aHM=;
+ b=brcbWvJ3Yk3X1SJveges63dg8DXDG7Gl9orEQWk0LXHv/LAbyBg3KJL46pUcyyVYPugJrF
+ OEZV6nSZFg6M0iTWnrcZvFdFuhDoSqrN1IPS1POnFRm3rsi8wsseSv+ALjZT7V4ncOSHd0
+ ZZ9sd+0UUSbPoFc3YZgh+DYedMAjsiDIsTx314KB/u0XUJcb33GFilHcl9U/Y+aZilHK1G
+ JEzJ5QsFgvayNQVF5QvN1tTdLtvH0+W0xYfjPhfZF0cKUAVztauujz9RfSzCMecVdbDGaA
+ eAHkrx6wf89I6pHHJUdQU7AAs6voYTX2gc5ln6uz1MM/Qr2gK4vDQzRshUrFLg==
+X-Lms-Return-Path: <lba+16a54b1a5+034051+vger.kernel.org+wangzhaolong@fnnas.com>
+Content-Type: text/plain; charset=UTF-8
+To: "Namjae Jeon" <linkinjeon@kernel.org>
+Cc: <linux-cifs@vger.kernel.org>, <smfrench@gmail.com>, 
+	<senozhatsky@chromium.org>, <tom@talpey.com>, 
+	<linux-kernel@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 References: <20260713071141.3909087-1-wangzhaolong@fnnas.com> <20260713071141.3909087-4-wangzhaolong@fnnas.com>
-In-Reply-To: <20260713071141.3909087-4-wangzhaolong@fnnas.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 13 Jul 2026 17:58:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-ymPFFLwW+a6_88LHL_tZXEuffUW8NymbSp3t+OZHosw@mail.gmail.com>
-X-Gm-Features: AUfX_mz3DGcpCz_T3vDzA_LdktHSvqekh9HlF4PKIey3dGTSlGBqJ6X9gVXiz4I
-Message-ID: <CAKYAXd-ymPFFLwW+a6_88LHL_tZXEuffUW8NymbSp3t+OZHosw@mail.gmail.com>
-Subject: Re: [RFC 3/3] ksmbd: use splice payloads for simple SMB2 READ
-To: wang zhaolong <wangzhaolong@fnnas.com>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org, 
-	tom@talpey.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+	<CAKYAXd-ymPFFLwW+a6_88LHL_tZXEuffUW8NymbSp3t+OZHosw@mail.gmail.com>
+In-Reply-To: <CAKYAXd-ymPFFLwW+a6_88LHL_tZXEuffUW8NymbSp3t+OZHosw@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 13 Jul 2026 17:36:35 +0800
+Message-Id: <5cf37150673ea4d5c28f94db91cdf68504b50522.bcc0e7a0.69db.419d.9f76.9089ceffc788@feishu.cn>
+Subject: Re: [RFC 3/3] ksmbd: use splice payloads for simple SMB2 READ
+From: "Wang Zhaolong" <wangzhaolong@fnnas.com>
 
-On Mon, Jul 13, 2026 at 4:18=E2=80=AFPM wang zhaolong <wangzhaolong@fnnas.c=
-om> wrote:
->
-> From: Wang Zhaolong <wangzhaolong@fnnas.com>
-Hi Wang,
+Hi Namjae,
 
-Could you rebase the series on the current #ksmbd-for-next-next branch
-to test this ?
->
-> Use the page-backed payload path for plain TCP SMB2 READ requests of at
-> least 64 KiB.
-Could you provide benchmark results ? and requests smaller than 64 KiB
-are unlikely to benefit from this optimization? Theoretically, it
-seems like it would improve, but I am wondering how much performance
-improvement there actually is.
+Thank you for the quick review.
 
-> Unsupported collection results fall back before response
-> ownership is committed; permission, locking and allocation failures retai=
-n
-> the existing error handling.
->
-> Keep signed, encrypted, compressed, compound and RDMA requests on the
-> buffered path because they require signing, response transforms, compound
-> response layout, or alternate transport handling. Streams, non-regular
-> files, O_DIRECT and DAX reads also remain on the buffered path.
->
-> Signed-off-by: Wang Zhaolong <wangzhaolong@fnnas.com>
-> ---
->  fs/smb/server/smb2pdu.c | 67 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 67 insertions(+)
->
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index b73167785e87..a4a80ecc6d2f 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -7304,10 +7304,38 @@ static ssize_t smb2_read_rdma_channel(struct ksmb=
-d_work *work,
->                 return err;
->
->         return length;
->  }
->
-> +#define KSMBD_READ_PAYLOAD_MIN_IO_SIZE SZ_64K
-> +
-> +static bool smb2_read_payload_allowed(struct ksmbd_work *work,
-> +                                     struct smb2_read_req *req,
-> +                                     struct ksmbd_file *fp,
-> +                                     size_t length, bool is_rdma_channel=
-)
-> +{
-> +       struct ksmbd_conn *conn =3D work->conn;
-> +       struct file *filp =3D fp->filp;
-> +
-> +       if (is_rdma_channel || length < KSMBD_READ_PAYLOAD_MIN_IO_SIZE ||
-> +           !conn->transport->ops->write_read_payload)
-> +               return false;
-> +       if (req->Flags & SMB2_READFLAG_REQUEST_COMPRESSED)
-> +               return false;
-> +       if (work->next_smb2_rcv_hdr_off || le32_to_cpu(req->hdr.NextComma=
-nd))
-> +               return false;
-> +       if (work->encrypted)
-> +               return false;
-> +       if (work->sess &&
-> +           (work->sess->sign || conn->ops->is_sign_req(work, SMB2_READ_H=
-E)))
-> +               return false;
-> +       if (ksmbd_stream_fd(fp) || !S_ISREG(file_inode(filp)->i_mode) ||
-> +           (filp->f_flags & O_DIRECT) || IS_DAX(file_inode(filp)))
-Since ksmbd does not currently open files with O_DIRECT, is the
-O_DIRECT check needed here, or is it only intended as a defensive
-guard for future support?
+> From: "Namjae Jeon"<linkinjeon@kernel.org>
+> Date:=C2=A0 Mon, Jul 13, 2026, 4:59 PM
+> Subject:=C2=A0 Re: [RFC 3/3] ksmbd: use splice payloads for simple SMB2 R=
+EAD
+> To: "wang zhaolong"<wangzhaolong@fnnas.com>
+> Cc: <linux-cifs@vger.kernel.org>, <smfrench@gmail.com>, <senozhatsky@chro=
+mium.org>, <tom@talpey.com>, <linux-kernel@vger.kernel.org>
+> On Mon, Jul 13, 2026 at 4:18=E2=80=AFPM wang zhaolong <wangzhaolong@fnnas=
+.com> wrote:
+> >
+> > From: Wang Zhaolong <wangzhaolong@fnnas.com>
+> Hi Wang,
+>=C2=A0
+> Could you rebase the series on the current #ksmbd-for-next-next branch
+> to test this ?
+
+Okay, I will rebase the series onto the current ksmbd-for-next-next branch =
+and rerun
+the functional and performance tests.
+
+> >
+> > Use the page-backed payload path for plain TCP SMB2 READ requests of at
+> > least 64 KiB.
+> Could you provide benchmark results ? and requests smaller than 64 KiB
+> are unlikely to benefit from this optimization? Theoretically, it
+> seems like it would improve, but I am wondering how much performance
+> improvement there actually is.
+
+Regarding the 64 KiB threshold, it is currently a conservative value rather=
+ than
+a conclusion based on complete measurements. As noted in the cover letter,
+I have already included initial results based on 1 MiB sequential reads, wh=
+ere
+the splice path showed a clear improvement:
+
+=C2=A0=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0=C2=A0 baseline =C2=A0=C2=A0 patched =C2=A0 =C2=A0 del=
+ta
+=C2=A0 bandwidth =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1.=
+728 GB/s=C2=A0 2.246 GB/s=C2=A0 +30.0%
+=C2=A0 mean completion latency =C2=A0 604.1 us =C2=A0=C2=A0 464.5 us =C2=A0=
+=C2=A0 -23.1%
+=C2=A0 median sample P99 latency 794.6 us =C2=A0=C2=A0 606.2 us =C2=A0=C2=
+=A0 -23.7%
+
+These results were obtained in a QEMU environment with ksmbd and the SMB
+client in the same guest, using a warm 4 GiB file, SMB 3.1.1, cache=3Dnone,=
+ 1 MiB
+synchronous reads, and one job.
+
+I agree that smaller requests may also benefit. However, for small reads, t=
+he
+overhead of managing pages and pipes might cancel out some of the gains
+from reducing copies, so I chose 64 KiB as a conservative starting threshol=
+d.
+
+I will add benchmarks for a range of request sizes, for example 4 KiB, 16 K=
+iB, 32 KiB,
+64 KiB, 128 KiB, 256 KiB, and 1 MiB. Based on those results, I can either a=
+djust the
+threshold or remove it if the splice path remains beneficial for smaller re=
+quests.
+
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return false;
+> > + =C2=A0 =C2=A0 =C2=A0 if (ksmbd_stream_fd(fp) || !S_ISREG(file_inode(f=
+ilp)->i_mode) ||
+> > + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (filp->f_flags & O_DIRECT) || IS_D=
+AX(file_inode(filp)))
+> Since ksmbd does not currently open files with O_DIRECT, is the
+> O_DIRECT check needed here, or is it only intended as a defensive
+> guard for future support?
+>=C2=A0
+
+The O_DIRECT check is currently only a defensive guard. I added it
+to ensure that the page-cache-backed payload path is not accidentally
+used if direct-I/O support or another file-opening mode is introduced later=
+.
+
+I can remove the check if you prefer to avoid guarding an unsupported
+configuration, or keep it with a comment explaining that it is intended for
+future-proofing.
+
+Best regards,
+Wang Zhaolong
