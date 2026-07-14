@@ -1,52 +1,67 @@
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CADD43E48A;
-	Tue, 14 Jul 2026 09:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A7C37CD5A;
+	Tue, 14 Jul 2026 12:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784021383; cv=none; b=XsehWi0ZyMe9Jg0Qzzk1LJDu+MfQL6kNF95HHGhOPCHSZttCQiMSEXn4/a1FHRJ//eXSxxfYOGD0+vscLm7mUV+O9Z91NJYtIAOMGLjZrywVR97OFZpuNjcRnrxZjTEiIVGZZaED0cFNrqRjo4GxnKIMTFFY+TgeEwCRQ0TkyZ8=
+	t=1784031710; cv=none; b=XOsynH+55nFSReS5z5gEY2kA8GeGAopdRb20lAa7o6rdDEYuVnDV5+XB2GcHrF2w39Oj0hl2topeY5+fz8KLB0LRWiGcK8H3bmd1YJyw9xAria+9geUPnmSRL+N/za0mqDhUYn2MpNTOLVrQHRfyTEXGYsvqbzt0zuNEB4Uilbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784021383; c=relaxed/simple;
-	bh=cCDY3akBv7/501LYZZGqSoRvzSr5eMZfStF5vZk58R4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZKazio2fM3+QmZHt596CqGQrQ0D8BNvoH1Bhn/TlCZCvNsCCshbjts5LlHObwq2hhjkQdTRgWT07KFTe3nGPaUKHIAWXCj978/8ppJulVFSdS3rQdAjPNq7H6UAqWgzPOzuzUzZnKY6oitX1VpyHItBnJiKFcZ3j7LNkX9ZLn00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=LVpLLynt; arc=none smtp.client-ip=52.59.177.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1784031710; c=relaxed/simple;
+	bh=WETq6X5lcDIM/HgqLsarLoGh3NjI/Mvisg2rCiWss10=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ez9CfufAzBWdzVAfczNDR9Qd0zSQqCjxnvkV0pT1v9EM+REzNWehelJ4RsnHMdOT5t5d2shGJPywnzyV3wc8x0zp0m6uUVOBnIXDVNYbMEk/JjZV283OclRA4IBcyj3Z/Yc7TY1N+iI5wwKvYD/PJiOWZ9RfORTuOVUn6trk5Fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h/tvlkAe; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="LVpLLynt"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1784021195;
-	bh=IAa6Kqy15zp25vlqCr0XB7iKjOAzuVDj52r/pNe20qQ=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=LVpLLyntXd3QBx/9gJeAVII1Am0aDWGgApkS72vFLIofANuRhDQAfIuGvVpzf3O24
-	 8wXFW5MpgoTl9EG+FTLI92b8QZ8d5sdwocftMUrcaYz97rnQpc0RzOw/iMJNMsfbPR
-	 XoX4sCNG+QZM3SbFGcs8f2W7dX7CNUxThttyRnHo=
-X-QQ-mid: zesmtpsz3t1784021176t79a314c2
-X-QQ-Originating-IP: t0naW89qkMbvML/n66hLkJdv1DXkqG3bIILJjZO5XP4=
-Received: from uniontech.com ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 14 Jul 2026 17:26:10 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 1337859893869426288
-EX-QQ-RecipientCnt: 11
-From: Yichong Chen <chenyichong@uniontech.com>
-To: Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@manguebit.org>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h/tvlkAe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1784031704; x=1815567704;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WETq6X5lcDIM/HgqLsarLoGh3NjI/Mvisg2rCiWss10=;
+  b=h/tvlkAexaFJRYAXKVaIhPyjmmspE4+a0klgWZ7o71XjBcYoDRvaDnpR
+   o4kXg9ManD7KosUU+JZFCZ1Ezcxs13PNvTrwhHkH8cID/FhkVde0IN2pI
+   O+H3IEbn6KWvD6IVyyWsz4CUpkm+Av3Rjwg7IynnNxv6NirCEztk4DvIP
+   2+EeOgrAoyLjJhUVDp/oUy+fULy10lxa8I1VIup4T3X4GVXBKZRYdGmZT
+   6jIazqthch7CxH2sPupIak0O4sbJs7PbNna8+pr7ZQHt2nmcDTKMFB+JM
+   Bn20kbDJmyQXEKqd7FTilsEvXP9XpjEjGlty8rB04wLQUyR3iRwPA4tfI
+   A==;
+X-CSE-ConnectionGUID: h2OYYN1XQweMrgu7k+PDvA==
+X-CSE-MsgGUID: uwWqVpoVR5OiyzE43UxAwQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11846"; a="88551103"
+X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
+   d="scan'208";a="88551103"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 05:21:38 -0700
+X-CSE-ConnectionGUID: 61vnQfHaTy2EnXsVlkv21g==
+X-CSE-MsgGUID: m5FCnM3aQOSzykVHo7WHDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,163,1779174000"; 
+   d="scan'208";a="252455959"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa007.fm.intel.com with ESMTP; 14 Jul 2026 05:21:35 -0700
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id 8A77495; Tue, 14 Jul 2026 14:21:34 +0200 (CEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Steve French <stfrench@microsoft.com>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	Youling Tang <tangyouling@kylinos.cn>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
-	Eugene Korenevsky <ekorenevsky@aliyun.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	Yichong Chen <chenyichong@uniontech.com>
-Subject: [PATCH] smb: client: validate DFS referral offsets
-Date: Tue, 14 Jul 2026 17:26:07 +0800
-Message-Id: <20260714092607.1057963-1-chenyichong@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 1/1] smb/client: Use EXPORT_SYMBOL_IF_KUNIT() to export symbols
+Date: Tue, 14 Jul 2026 14:21:20 +0200
+Message-ID: <20260714122120.743185-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,203 +69,101 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: OO87pPbfd04f6g8/MAEhSPtYYhPFKGFsqJUcVECPTVDRnRPNmtIApkPI
-	VtRL/Ha54I1whRG4PgQ4jSEzkU/6pTsd/BrxUQOLJhM4rB02RbClA87dVGpAK58eM4il6Z9
-	4v3s7CjbWmcWsY0l1K/JSLLIKbIqFtrAKXEHFxx9os3GJ+twt4NRiQ1T0BFHRIdFsah3+St
-	eC7okPGUrYP+a669Pjd0P170dxP/1xhP4kkCPyig5sl5JZzT1b1zrg9PhrgghEDEvlwbZCl
-	1rYM7PbgrLpagYz8lnwKfZWtGaII2pW+de+XPCC4DHBv/sEEWYijmlJr/qaE5NB69s8oxdC
-	fOMYsPYld00w5dURhbQhp502l27AEd0AkSYMzUCYfK3lMhxTUodVUaMDgJcIWR4it+m29oc
-	7EHgaeZZhfayNfmawdJK3SUO2826Z1DId6gyk2uVCPxrKiO/reyuUTNXzMm/31MngVLRdTI
-	5ZJhMvAvWPjKhmuUO/WScZAoF420HTxqqvSyQhu1t9h3nPt86ycEe8cn2C9YZY+88Wvy7Do
-	wegN671yxw5CYM1iLbtzPYByerXEOkka+FVvQvQ5hXQTG+Co5zqqaKgtOw51lumkZXVirrF
-	tI3Vacie4fm/rvz3lwM9Yk5E4cRnZDxSBLNLUGa6fWq9RkdBxTQmbbFRlLwPcR2tlJq8ZUD
-	eVRNBNCTZy8qSpwFiqHXhgMbQkJmiEZm09GHy1jOFmQ8+CpgQJSdFYycoi+8e/6qHJMlolC
-	sh4iq94CPhB8Ha0Cq5QX4SkZgfTTUdGUtJcTtjkYWWgiWnIK/ebKZ7vJcXPS4VQ0P/ZgFvV
-	IZT17CFKf7bNmD+Jq744LWwYt6wPnWiJpcbly9wY43oBLUiqrAQPyyk+rPUCFhwZcZNAn98
-	eaDzPmOTPbEFYVu7T/LIb+3qC9q/OnV9FpH+HqEDMAjRGmLBoE39VBQGBBEYfwHAhnx5arX
-	V9+xcWQDwaXsXQp/CwEHyPeu7/9pqlHkYwDxZAXaYoA4a/zfG5v0UibSPXtEJp2jfaruT53
-	vNtFRugrc3ef6aG5PiqWmLmgErhkg=
-X-QQ-XMRINFO: OWPUhxQsoeAVwkVaQIEGSKwwgKCxK/fD5g==
-X-QQ-RECHKSPAM: 0
 
-parse_dfs_referrals() checks that the response contains the fixed
-referral entries, but it still trusts offsets stored inside each referral.
-A malformed server response can set DfsPathOffset or NetworkAddressOffset
-past the end of the received buffer.  The resulting pointer is then used
-to derive a remaining length and passed to cifs_strndup_from_utf16().
+Replace EXPORT_SYMBOL_FOR_MODULES() with EXPORT_SYMBOL_IF_KUNIT()
+to mark the symbols as visible only if CONFIG_KUNIT is enabled.
 
-Validate the per-referral offsets before using them.  Also validate the
-Unicode PathConsumed value against the converted search name length before
-passing it to cifs_utf16_bytes(), and only publish the parsed referral
-array to the caller after the number of referrals has been validated.
+Kunit test should import the namespace EXPORTED_FOR_KUNIT_TESTING to
+use these marked symbols. This is the standard way for all KUnit
+tests.
 
-Fixes: 6447b0e35556 ("cifs: parse_dfs_referrals: prevent oob on malformed input")
-Signed-off-by: Yichong Chen <chenyichong@uniontech.com>
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- fs/smb/client/misc.c | 94 +++++++++++++++++++++++++++++---------------
- 1 file changed, 63 insertions(+), 31 deletions(-)
+ fs/smb/client/smb1maperror.c      | 24 ++++++++++++------------
+ fs/smb/client/smb1maperror_test.c |  1 +
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 0c54b9b..73676d2 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -678,6 +678,11 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
- 	int i, rc = 0;
- 	char *data_end;
- 	struct dfs_referral_level_3 *ref;
-+	unsigned int num_refs, path_consumed;
-+	size_t search_name_len;
+diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
+index 74530088d17d..ab3d09613c91 100644
+--- a/fs/smb/client/smb1maperror.c
++++ b/fs/smb/client/smb1maperror.c
+@@ -10,6 +10,9 @@
+  */
+ 
+ #include <linux/bsearch.h>
 +
-+	*target_nodes = NULL;
-+	*num_of_nodes = 0;
- 
- 	if (rsp_size < sizeof(*rsp)) {
- 		cifs_dbg(VFS | ONCE,
-@@ -687,85 +692,112 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
- 		goto parse_DFS_referrals_exit;
- 	}
- 
--	*num_of_nodes = le16_to_cpu(rsp->NumberOfReferrals);
-+	num_refs = le16_to_cpu(rsp->NumberOfReferrals);
- 
--	if (*num_of_nodes < 1) {
-+	if (num_refs < 1) {
- 		cifs_dbg(VFS | ONCE, "%s: [path=%s] num_referrals must be at least > 0, but we got %d\n",
--			 __func__, searchName, *num_of_nodes);
-+			 __func__, searchName, num_refs);
- 		rc = -ENOENT;
- 		goto parse_DFS_referrals_exit;
- 	}
- 
--	if (sizeof(*rsp) + *num_of_nodes * sizeof(REFERRAL3) > rsp_size) {
-+	if (sizeof(*rsp) + num_refs * sizeof(REFERRAL3) > rsp_size) {
- 		cifs_dbg(VFS | ONCE,
- 			 "%s: malformed buffer (size is %u, must be at least %zu)\n",
- 			 __func__, rsp_size,
--			 sizeof(*rsp) + *num_of_nodes * sizeof(REFERRAL3));
-+			 sizeof(*rsp) + num_refs * sizeof(REFERRAL3));
- 		rc = -EINVAL;
- 		goto parse_DFS_referrals_exit;
- 	}
- 
- 	ref = (struct dfs_referral_level_3 *) &(rsp->referrals);
--	if (ref->VersionNumber != cpu_to_le16(3)) {
--		cifs_dbg(VFS, "Referrals of V%d version are not supported, should be V3\n",
--			 le16_to_cpu(ref->VersionNumber));
--		rc = -EINVAL;
--		goto parse_DFS_referrals_exit;
--	}
- 
- 	/* get the upper boundary of the resp buffer */
- 	data_end = (char *)rsp + rsp_size;
- 
- 	cifs_dbg(FYI, "num_referrals: %d dfs flags: 0x%x ...\n",
--		 *num_of_nodes, le32_to_cpu(rsp->DFSFlags));
-+		 num_refs, le32_to_cpu(rsp->DFSFlags));
- 
--	*target_nodes = kzalloc_objs(struct dfs_info3_param, *num_of_nodes);
--	if (*target_nodes == NULL) {
-+	*target_nodes = kzalloc_objs(struct dfs_info3_param, num_refs);
-+	if (!*target_nodes) {
- 		rc = -ENOMEM;
- 		goto parse_DFS_referrals_exit;
- 	}
-+	*num_of_nodes = num_refs;
-+	search_name_len = strlen(searchName);
- 
- 	/* collect necessary data from referrals */
--	for (i = 0; i < *num_of_nodes; i++) {
-+	for (i = 0; i < num_refs; i++) {
- 		char *temp;
- 		int max_len;
--		struct dfs_info3_param *node = (*target_nodes)+i;
-+		unsigned int offset, remaining;
-+		struct dfs_info3_param *node = (*target_nodes) + i;
++#include <kunit/visibility.h>
 +
-+		if (ref->VersionNumber != cpu_to_le16(3)) {
-+			cifs_dbg(VFS,
-+				 "Referrals of V%d version are not supported, should be V3\n",
-+				 le16_to_cpu(ref->VersionNumber));
-+			rc = -EINVAL;
-+			goto parse_DFS_referrals_exit;
-+		}
+ #include "cifsproto.h"
+ #include "smb1proto.h"
+ #include "smberr.h"
+@@ -239,48 +242,45 @@ int __init smb1_init_maperror(void)
+ }
  
- 		node->flags = le32_to_cpu(rsp->DFSFlags);
-+		path_consumed = le16_to_cpu(rsp->PathConsumed);
- 		if (is_unicode) {
--			__le16 *tmp = kmalloc(strlen(searchName)*2 + 2,
--						GFP_KERNEL);
--			if (tmp == NULL) {
-+			size_t search_name_utf16_len = search_name_len * 2 + 2;
-+			__le16 *tmp;
-+
-+			if (path_consumed > search_name_utf16_len) {
-+				rc = -EINVAL;
-+				goto parse_DFS_referrals_exit;
-+			}
-+
-+			tmp = kmalloc(search_name_utf16_len, GFP_KERNEL);
-+			if (!tmp) {
- 				rc = -ENOMEM;
- 				goto parse_DFS_referrals_exit;
- 			}
--			cifsConvertToUTF16((__le16 *) tmp, searchName,
-+			cifsConvertToUTF16((__le16 *)tmp, searchName,
- 					   PATH_MAX, nls_codepage, remap);
--			node->path_consumed = cifs_utf16_bytes(tmp,
--					le16_to_cpu(rsp->PathConsumed),
--					nls_codepage);
-+			node->path_consumed = cifs_utf16_bytes(tmp, path_consumed,
-+							       nls_codepage);
- 			kfree(tmp);
--		} else
--			node->path_consumed = le16_to_cpu(rsp->PathConsumed);
-+		} else {
-+			node->path_consumed = path_consumed;
-+		}
+ #if IS_ENABLED(CONFIG_SMB1_KUNIT_TESTS)
+-#define EXPORT_SYMBOL_FOR_SMB_TEST(sym) \
+-	EXPORT_SYMBOL_FOR_MODULES(sym, "smb1maperror_test")
+-
+ const struct ntstatus_to_dos_err *
+ search_ntstatus_to_dos_map_test(__u32 ntstatus)
+ {
+ 	return search_ntstatus_to_dos_map(ntstatus);
+ }
+-EXPORT_SYMBOL_FOR_SMB_TEST(search_ntstatus_to_dos_map_test);
++EXPORT_SYMBOL_IF_KUNIT(search_ntstatus_to_dos_map_test);
  
- 		node->server_type = le16_to_cpu(ref->ServerType);
- 		node->ref_flag = le16_to_cpu(ref->ReferralEntryFlags);
+ const struct ntstatus_to_dos_err *
+ ntstatus_to_dos_map_test = ntstatus_to_dos_map;
+-EXPORT_SYMBOL_FOR_SMB_TEST(ntstatus_to_dos_map_test);
++EXPORT_SYMBOL_IF_KUNIT(ntstatus_to_dos_map_test);
  
-+		remaining = data_end - (char *)ref;
-+
- 		/* copy DfsPath */
--		temp = (char *)ref + le16_to_cpu(ref->DfsPathOffset);
--		max_len = data_end - temp;
-+		offset = le16_to_cpu(ref->DfsPathOffset);
-+		if (offset > remaining) {
-+			rc = -EINVAL;
-+			goto parse_DFS_referrals_exit;
-+		}
-+		temp = (char *)ref + offset;
-+		max_len = remaining - offset;
- 		node->path_name = cifs_strndup_from_utf16(temp, max_len,
--						is_unicode, nls_codepage);
-+							  is_unicode,
-+							  nls_codepage);
- 		if (!node->path_name) {
- 			rc = -ENOMEM;
- 			goto parse_DFS_referrals_exit;
- 		}
+ unsigned int ntstatus_to_dos_num = ARRAY_SIZE(ntstatus_to_dos_map);
+-EXPORT_SYMBOL_FOR_SMB_TEST(ntstatus_to_dos_num);
++EXPORT_SYMBOL_IF_KUNIT(ntstatus_to_dos_num);
  
- 		/* copy link target UNC */
--		temp = (char *)ref + le16_to_cpu(ref->NetworkAddressOffset);
--		max_len = data_end - temp;
-+		offset = le16_to_cpu(ref->NetworkAddressOffset);
-+		if (offset > remaining) {
-+			rc = -EINVAL;
-+			goto parse_DFS_referrals_exit;
-+		}
-+		temp = (char *)ref + offset;
-+		max_len = remaining - offset;
- 		node->node_name = cifs_strndup_from_utf16(temp, max_len,
--						is_unicode, nls_codepage);
-+							  is_unicode,
-+							  nls_codepage);
- 		if (!node->node_name) {
- 			rc = -ENOMEM;
- 			goto parse_DFS_referrals_exit;
+ const struct smb_to_posix_error *
+ search_mapping_table_ERRDOS_test(__u16 smb_err)
+ {
+ 	return search_mapping_table_ERRDOS(smb_err);
+ }
+-EXPORT_SYMBOL_FOR_SMB_TEST(search_mapping_table_ERRDOS_test);
++EXPORT_SYMBOL_IF_KUNIT(search_mapping_table_ERRDOS_test);
+ 
+ const struct smb_to_posix_error *
+ mapping_table_ERRDOS_test = mapping_table_ERRDOS;
+-EXPORT_SYMBOL_FOR_SMB_TEST(mapping_table_ERRDOS_test);
++EXPORT_SYMBOL_IF_KUNIT(mapping_table_ERRDOS_test);
+ 
+ unsigned int mapping_table_ERRDOS_num = ARRAY_SIZE(mapping_table_ERRDOS);
+-EXPORT_SYMBOL_FOR_SMB_TEST(mapping_table_ERRDOS_num);
++EXPORT_SYMBOL_IF_KUNIT(mapping_table_ERRDOS_num);
+ 
+ const struct smb_to_posix_error *
+ search_mapping_table_ERRSRV_test(__u16 smb_err)
+ {
+ 	return search_mapping_table_ERRSRV(smb_err);
+ }
+-EXPORT_SYMBOL_FOR_SMB_TEST(search_mapping_table_ERRSRV_test);
++EXPORT_SYMBOL_IF_KUNIT(search_mapping_table_ERRSRV_test);
+ 
+ const struct smb_to_posix_error *
+ mapping_table_ERRSRV_test = mapping_table_ERRSRV;
+-EXPORT_SYMBOL_FOR_SMB_TEST(mapping_table_ERRSRV_test);
++EXPORT_SYMBOL_IF_KUNIT(mapping_table_ERRSRV_test);
+ 
+ unsigned int mapping_table_ERRSRV_num = ARRAY_SIZE(mapping_table_ERRSRV);
+-EXPORT_SYMBOL_FOR_SMB_TEST(mapping_table_ERRSRV_num);
++EXPORT_SYMBOL_IF_KUNIT(mapping_table_ERRSRV_num);
+ #endif
+diff --git a/fs/smb/client/smb1maperror_test.c b/fs/smb/client/smb1maperror_test.c
+index 2caaf11228ef..903c46f71291 100644
+--- a/fs/smb/client/smb1maperror_test.c
++++ b/fs/smb/client/smb1maperror_test.c
+@@ -75,3 +75,4 @@ kunit_test_suite(maperror_suite);
+ 
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("KUnit tests of SMB1 maperror");
++MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
 -- 
-2.51.0
+2.50.1
+
