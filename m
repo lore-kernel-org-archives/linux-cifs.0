@@ -1,220 +1,135 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BDC41E6BE
-	for <linux-cifs@vger.kernel.org>; Tue, 14 Jul 2026 21:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4218E42BC4F
+	for <linux-cifs@vger.kernel.org>; Tue, 14 Jul 2026 22:02:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784065406; cv=pass; b=j45tCFSKhVDvcpa4sP1WQGMvV4880nd3s46RAKXhMMtG25wTooucWIBWgo7VvVk8Q9a64O2mE36ZkFN2ZPJAze3xXeKFjdhlw8VaEIMCcStNZGh6h7lzePb3Mz33QrfQey9Z24DJzrAdYIg2UaR/Uv4dN/5psXaacYpqra/f8zg=
+	t=1784066562; cv=pass; b=g7hWwgiTSvO0rD3LpYexHMqsdu/T7KAThiGEx2+Rgn5iwMIolOigbjY3KnSsn1aAglJxrhuBR10NvC1Td+BWoekCZ8E5aK5uvAYKR6kSfTqd6fBr9BSUM7KGo9+jxhKJqn63ZgGozV+EkVwE42+ykSSB7q98lL8iC/83x9CzkDI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784065406; c=relaxed/simple;
-	bh=4aQTdtO8KYad2za5eRHJV5vDJ+EA563EbVWpaDplWy0=;
+	s=arc-20240116; t=1784066562; c=relaxed/simple;
+	bh=s2NMO01f+U+VuXw1DWKroiHAOOn2fndEfN+PdDeg4kg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DnXTJv7GO7d3iTl2xj5+m2pw5iEae63+izT9PKL8y1r4A8Ng9BHdYPwl+8kZd6buZL2au3Tp8CrZN7e1rHn2lNu+hRS4hmddzCrJKBLp5+VnR6+31TSiGxlE2l7ive146uFPl4yBerpp5jIh6bIRil0dY+mqpq83oOskQ22HOyM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ck2XzSsp; arc=pass smtp.client-ip=209.85.219.50
+	 To:Cc:Content-Type; b=kIQ2Fn17P0EetfKYGAkSw8XMIsSLEjq1n8RJyuGmuP4XoZUQ+dYO38rzg6zTqndNzoS4FFFpUhCilDE/0bUSSbayib8wl25kWjyEV6JerPrc8Q4WM0Wt/bXiEP9K2ucmoc2Djm33ELiRlklloVyQpRupO5Y0ezhzgL6BOjzNIZw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FmIbRRk8; arc=pass smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ck2XzSsp"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8efbafa1bacso40492696d6.1
-        for <linux-cifs@vger.kernel.org>; Tue, 14 Jul 2026 14:43:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784065402; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FmIbRRk8"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8eeb4508f29so48846756d6.0
+        for <linux-cifs@vger.kernel.org>; Tue, 14 Jul 2026 15:02:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784066559; cv=none;
         d=google.com; s=arc-20260327;
-        b=e3bxiBSCJRy/Lude92qbq+KejchskzN4h7BJog1EK22/mxO4mCAFVz4fgu3N/w46zp
-         tFuJJ/HKhI5uTpDJOmIWPznqgcowEn+ERZzF91D3TT8iHLdzpZrDpY+na83J6pE53th4
-         TJnFg/DCyI5QrC2boyOTV0q5IqEowgQzVuXRKROT82WYA+0GdyZjoFtRbewi48yuq91z
-         P7FKjAMCn2s+ISIMPV5IEEvoOO8E4DyMj7RChurZKEoEdfh/6IzeEEqWuVELPeTeyHie
-         Sf7t69Lj5tCERl9rXNVkbYggTUzO15fS6UaDJNN0NQcEvn+/7BE0l+Mxmpf1Yq6XEMq+
-         12MA==
+        b=GUDoETy86SgwyncFk4hJOThHAiAqEwBqVmY+HojqTczEi+qqry10L/mexTYK08P96T
+         XVgtA1HG9BnJE6VYqhqkkBQVncFxB78niN434ndAe9VSN96wP6TvoUAPGS31axPQpZEb
+         rXZsQPLYRc89AgbopRnH3Dx/jh2SVJQGTqD7WEb/PEALxW4aysEiOAO9KSIOwXjUJrjl
+         PluGGVDfPVAypc4LIEjktqobfEi6CQCULUAjeOarxh6896yJjQuShbWoW6uLg8+QHJ99
+         q7qxwE98CBtK60ODYagAhxc/e1xMSxN+OjFo4qhbVokP7JMcY8pOpZDyqB1xFk6p0AvV
+         UqmA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=Ce642oQbZs1xv2ArVXz4HBvznk2bFGiA93O2rqosIw8=;
-        fh=AGgSXgqSwbLT+OgQKlmvjkOiEBp7oG/I7ynIHbw8z6s=;
-        b=V3LpqRfinDMg6rwWQzokMNUaiUB53q1TFLvZtKZfEirZh6w2Zem5GG7noufcQOTLzM
-         N0YTbL7zfTgxgOGG4qhe9wcmpRcQNERT7qrOacTyeKTaKtCRXdiCppFiXJ5LFrT1hdBn
-         VOZ63IDuyyS8v3IZX8NA2E7gNZ0+L5G6k7eEIYWnlGgcoYKFfCGWiR3/F39EKfXi6nvI
-         wLdJpNTSLyAeRC2TtIRFZTgYspbA5cbRe2mWf16+cI2oFbCKiK5w7MCA7R/5FN4QsZb4
-         tW8lvUWWRCufKj5xTMZ3w5CLqlbo8K4COiB3/YInmt6QvGnBlu2tGXqIF9ZblcdqFt+L
-         4hHQ==;
+        bh=/ikoJBiZBLYxmU/Kg9j2nbqMDjaV4djVH2AeLg4FmOc=;
+        fh=OXecSOWe7ahS9RkTowC9huQaFW17MpU2My2VLNp/ZtQ=;
+        b=Tnd655FQ6KIxKh+Y8y9IUWiOPcNoR65PxYSSpaaULDjHjPxgwNDWWF+vcjksooP8f0
+         cBH+CLUwNCTmFk/ujtVoi3wdCZw6YozXOWqrIy9vEmmZLTOIxcaNhPKdlGKscphoN+VP
+         VQOfRzlwjMwzmWa7oNRvS/Sh35IbO7ZwUZ2W7e6R+BD+d6B+4MrDdJCoMaH3B0Yhm17/
+         zgSsnwp89XiJULmf+dM2zbBKN5yWSdtVymmPpcLyeg2uGeCm4fiH7HAQakhGN8It9gIQ
+         xek/2fCGI9yWiqQj4C/POoxze0KeeE8NWhge+zA+36ExJQkm2H2tTKtj/q2GkXeFs0QC
+         Q0bw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784065402; x=1784670202; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1784066559; x=1784671359; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Ce642oQbZs1xv2ArVXz4HBvznk2bFGiA93O2rqosIw8=;
-        b=ck2XzSspYwNM4eJ51SHo7NHV2Amqvp6V9bFrF5+WZ5eUqOQGc9qk62BrVhjp6QAyQ0
-         rn7U7Qd42bjIgQnLLpiaD0k9tvch8qhJYixCe+KnzQtc0Ve4ba8tVCsGd83PJT8091eL
-         1tjEbJJ54/SJUjIAEqL8WaC0ljzKB5IUxwQbsZeRS7LE169DR87rvTYHHaJ41AMxDOeI
-         Xz2lZ95Y5i5hj83OxF6Gc7OBXlKthbgw2FAy0eWFPEQu4NeXAg2R9FuJduRBI5wUX+Yo
-         NJ1P68lVbQJKGoCkP805LvZUWcEaKvzB+NhFJykqKj/FEVzc1fq7qaa4V+RPDnHg0FUt
-         ZX8g==
+        bh=/ikoJBiZBLYxmU/Kg9j2nbqMDjaV4djVH2AeLg4FmOc=;
+        b=FmIbRRk8rv9ad8LG5/xkpfhv946nyDiHbX+inZTWEy0gnaeb61I8SAalyjVx9HKqjt
+         zVLUksZFu0Ztrc1jHVAtG6SXpKF5aGmXTcOIga7H5GPPeIxjZXxnfp3uNNInBsyTckMR
+         hXAgyVYwG/maXk3VbP2MQztO4O+PAtmvryMj2g15pl/YDE+RRhfmMzCqoddDBihcMAj7
+         xuQtoTtgsoiVwezH3FoG7WgGcCAOYH/f2y3y9YOHQEuXOCg+3o9o0DqZw1v1TQmp+wVe
+         oA3KoeTV3OK8VqLDFUaM0xk4yCnkiOWS/Da3EbJcLaMg0vhF0K2/ZeXXYt1oW1tN+64n
+         PM6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784065402; x=1784670202;
+        d=1e100.net; s=20251104; t=1784066559; x=1784671359;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Ce642oQbZs1xv2ArVXz4HBvznk2bFGiA93O2rqosIw8=;
-        b=tPtyInYW6SZADawZ+aJs+FuTiNH4tY2Jzw3/wleriiuf+KFS23RoLC5Wuzlg/Btc5Z
-         jzLIsNTzQEDH8JypjHlevwyNwJHou5MNwlEyRp0cQMMqRNlRcDG94k7I3+Ra9L2qEWm6
-         QR3yovyizC7SK9lY9QyD0de9dgiPDmPR43hzJJLuzVLvtXCevIxqbfyXRvDulaKQTlKl
-         hcM4aPhRiWIF1BEiVaNCf41tYxLbwLVwKSl3ohkw/YXcMUrq3LVdvFsoKd1IJaMAySDM
-         FZdF64bRCVpYaj4SxByS3tq0EFUwD88aOrEWpvQc4UF2sE0lq4HQrFHQ24C0+0uRR9qQ
-         d/Sw==
-X-Forwarded-Encrypted: i=1; AHgh+RossKsbIuLGXfJ0H3RQ1im5uf13fROurxLL18ZRYfAfFVtrEM2a8kttP0A+xbEzmbG1CxDZ2ibhBQop@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxZaOs9e+qu+uhwQppy2zt6Y1UjHQJCaphXTTCy387et8Op9LQ
-	aCbmd5sNBH1qmZOjaXRH8yNO+sDPjpukKEdfZgNr0Y9W63DmRAdDBxhhYwKdH7i17c2KpshKF9z
-	K8vEuQmB11pkAJ3175sGxBTheaEn57Ko=
-X-Gm-Gg: AfdE7cn6r00CEHCLVEfkCvr0YdrT64LrbW67xWFrtKhoxypQzt6myI7cFoW8G2bntBl
-	seF9MhKn9SUhKH9sSKtGIfvHicA4QZbyJ9LLxcAmw0rOvOfsrzpVi4X/VfsPL/mLiGbSb4BZoHo
-	ZFoQWUAP5d1fqa5fcqXxJsGhzeL0pMPhDCOeNgLXT97KGA+6o5+WpX6zskFJAI25g2aWC3v4C97
-	XCcyE1v++4MTaD9pY1VfY8B3EIBPq8jYB5ahUhD+dbAnLUB6uGnot15+lxTfIrbAd4A5hOL1KQG
-	7EWWMLDyQAb/qOdwY670HumLW2n8tfh1DGgzYLVB3CGVGAZ6CCpREVfRI8qmfRYbKpIU6LiDwli
-	TMTKeSC6vwUcP1lUrfmHQdDQ+giq7Kxgz6fj7ocMsMO6MRfKLMvfUIJ1ImZ9HmATkPSYHRjcdsd
-	/eCZw2TrqzrQ==
-X-Received: by 2002:a05:6214:5c0a:b0:907:5613:96ba with SMTP id
- 6a1803df08f44-90758cbeefamr4194226d6.1.1784065402390; Tue, 14 Jul 2026
- 14:43:22 -0700 (PDT)
+        bh=/ikoJBiZBLYxmU/Kg9j2nbqMDjaV4djVH2AeLg4FmOc=;
+        b=nhOCxr7BONiWxp1XoEOeIaT2BNt+qLe8ql9J2ZtXMIb0HQYeCu8xVibSmnbo+SYnZi
+         ms3E94EEg/1eQ/YU1RBJH6ujwnKGZNiEOfmfN2CpTdm0huW/G0nplrIiLXa4Y+Dgh5Mp
+         /dOxYVlrCOatwJwtOuM7wjeX40nz9L9tWzs/g2Y6HQYNJFhI/QeBcFiw86g3//zsGyrl
+         TiiUQdpCV/e8aTyaeR7S2+3PjXdF5S5cWWhZmFbVsnBvO8yGVvxGtSaiZiqUC+2Q7WW0
+         IwYffT4YahqzKn+jH+sk1zaeuFdor6cd6S9GpTQvidsROmZHLXxi28jvCiHFBSBuMZZR
+         Ho5Q==
+X-Forwarded-Encrypted: i=1; AHgh+RoShhcsReMzEAV5wL30LS+Jk8WTwur+B+rxXnrGqu63HZKT2syFB9z1mEqs/fcT+DT8kuMUMRFZCLHd@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc9ci/SzXBZFziUoDj/DcUTHVMOt0wLYtzgPR3AGTFgYeBiBCY
+	2axWcUYom7j8cPjzoZst8oWhSxlp5w9GfO1H2gLmocmnYGFcVkhm5bwCG2mqc981Gu4czkmkdjl
+	Tf8M0PLP4qvUGK5dPxRYf+EV/V9VshXM=
+X-Gm-Gg: AfdE7clqTsm3PCjIdV1k0FnrM7goM/4RirD+lVPa8uMsEt9f6JeiAZ4iK1lPM0VSjSz
+	XIMboGDxgSAl5V7M16RoXoNTQY8qy7ZUmvrMEVS/5prZ5eiO3FJXuMbjT5IzlMeM38DAaurUPPm
+	mu305lsOQywShVZKssdIQ59xlitxgq+0RJBTLKwsN3vL4Gpo0AygJKbpSejLO+3m6yuWk4nVIbT
+	CIkNDdqQWY+NlSneF65c/cS/TkfJj1FVrBxvQ7MPGFFXwtgRSmpQVYqrRNB8b0WVkyMvTuKeDLC
+	BF1qZ6SWNqHQNlAA/foqPSU139oIMlFC6MRrvnXEz50UnemOqORuvJG2fuMu8LROBGEM18F01CX
+	iNo0bJZezCGVra3KR9gHliOktI/WQ6nGKwOCbWyl11KVnmp07zySfPPX5pjDji2Ci5L5EfZbWLx
+	hOGOeCys8Y
+X-Received: by 2002:a05:6214:3210:b0:8f0:367c:eb80 with SMTP id
+ 6a1803df08f44-90758d0d294mr4557116d6.25.1784066558928; Tue, 14 Jul 2026
+ 15:02:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260709155440.2132459-3-doebel@amazon.de> <CAH2r5msvEGdEJvyV5sWcZjQ0SjMOwXP_Ad4eKN7etHtXS1vwbA@mail.gmail.com>
- <FR5P281MB509177A7DE157E6D72EC05B3CFFD2@FR5P281MB5091.DEUP281.PROD.OUTLOOK.COM>
-In-Reply-To: <FR5P281MB509177A7DE157E6D72EC05B3CFFD2@FR5P281MB5091.DEUP281.PROD.OUTLOOK.COM>
+References: <20260714135333.813314-1-andriy.shevchenko@linux.intel.com> <d9053c4a-e7a3-48a6-a806-56d6c05290ab@chenxiaosong.com>
+In-Reply-To: <d9053c4a-e7a3-48a6-a806-56d6c05290ab@chenxiaosong.com>
 From: Steve French <smfrench@gmail.com>
-Date: Tue, 14 Jul 2026 16:43:11 -0500
-X-Gm-Features: AUfX_mxGET6Hzdo3BRy4X2zGh1cwSMHd2R3p0A5ZfqRGr6sFuXPsooE4k766PEY
-Message-ID: <CAH2r5ms-_Z1c3twqt8i_syyXpi1jtBJm15GuvRhUXEk8BVwAQw@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: set SB_I_NODEV to prevent device node injection
-To: "Manthey, Norbert" <nmanthey@amazon.de>
-Cc: "Doebel, Bjoern" <doebel@amazon.de>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"samba-technical@lists.samba.org" <samba-technical@lists.samba.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, linux-fsdevel <linux-fsdevel@vger.kernel.org>, 
-	David Howells <dhowells@redhat.com>
+Date: Tue, 14 Jul 2026 17:02:26 -0500
+X-Gm-Features: AUfX_my8HNIjglX4Dn-7IAfopVyMH0GoeMZk7rTfaX14MgwFuchE7wuD_3mAohA
+Message-ID: <CAH2r5mvv0+q9wFDbuChWYfMzj-3tqK__XbbSk2fsdPfNbD_ASQ@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] smb/client: Use EXPORT_SYMBOL_IF_KUNIT() to export
+ symbols in SMB2
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Steve French <stfrench@microsoft.com>, ChenXiaoSong <chenxiaosong@kylinos.cn>, 
+	David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
+	Tom Talpey <tom@talpey.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Paulo Alcantara <pc@manguebit.org>, Steve French <sfrench@samba.org>, 
+	Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-If this is needed for cifs.ko wouldn't this also be needed for AFS,
-NFS, CEPH and others?
+merged into cifs-2.6.git for-next
 
-On Tue, Jul 14, 2026 at 11:23=E2=80=AFAM Manthey, Norbert <nmanthey@amazon.=
-de> wrote:
+On Tue, Jul 14, 2026 at 9:22=E2=80=AFAM ChenXiaoSong via samba-technical
+<samba-technical@lists.samba.org> wrote:
 >
-> Hi Steve,
+> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 >
-> The issue is that the client takes the device node's mode straight
-> from the server. So a malicious/compromised SMB server can define a
-> device node (type + major/minor + permissions) on the client that the
-> admin never created and cannot otherwise constrain -- the only knob
-> left to block it is the "nodev" mount option. That's why we introduce
-> the change using SB_I_NODEV here.
->
-> We did analyze the CIFS code, and found this missing security checks.
-> We have a reproducer that allows a malicious server and local user to
-> elevate privileges by introducing a new device in the mount.
->
-> Best,
-> Norbert
->
-> ________________________________________
-> From: Steve French <smfrench@gmail.com>
-> Sent: Thursday, July 9, 2026 7:20 PM
-> To: Doebel, Bjoern <doebel@amazon.de>
-> Cc: Paulo Alcantara <pc@manguebit.org>; Ronnie Sahlberg <ronniesahlberg@g=
-mail.com>; Shyam Prasad N <sprasad@microsoft.com>; Tom Talpey <tom@talpey.c=
-om>; Bharath SM <bharathsm@microsoft.com>; linux-cifs@vger.kernel.org <linu=
-x-cifs@vger.kernel.org>; linux-kernel@vger.kernel.org <linux-kernel@vger.ke=
-rnel.org>; samba-technical@lists.samba.org <samba-technical@lists.samba.org=
->; stable@vger.kernel.org <stable@vger.kernel.org>; Manthey, Norbert <nmant=
-hey@amazon.de>; linux-fsdevel <linux-fsdevel@vger.kernel.org>
-> Subject: RE: [EXTERNAL] [PATCH] smb: client: set SB_I_NODEV to prevent de=
-vice node injection
->
-> CAUTION: This email originated from outside of the organization. Do not c=
-lick links or open attachments unless you can confirm the sender and know t=
-he content is safe.
->
->
->
-> Setting SB_I_NODEV is apparently not done for any remote filesystems,
-> and AI search confirmed that it probably isn't a good idea to set it
-> for remote fs.  It is more of a thing in pseudofilesystems and not
-> needed for network filesystems.
->
-> e.g.
->
-> "Is there any benefit to setting SB_I_NODEV?
->
-> Today, probably not.If you grep the kernel, you'll find SB_I_NODEV is
-> used in only a handful of places, and those places generally involve
-> pseudo-filesystems or internal VFS assumptions rather than remote
-> storage.  Setting it on CIFS or NFS is unlikely to change behavior,
-> because those filesystems have worked correctly for decades without
-> it. Most remote filesystems don't set s_iflags because almost none of
-> the SB_I_* flags are intended as generic filesystem capability flags.
-> They're mostly internal VFS state, and SB_I_NODEV in particular has a
-> very specific purpose.  SB_I_NODEV does not mean "this filesystem
-> contains no device nodes." It means something closer to:  This
-> superblock is not associated with a block device.
-> or more precisely: The VFS should not expect a backing struct
-> block_device for this superblock."
->
-> Has something changed?  How did this question about SB_I_NODEV come up?
->
-> On Thu, Jul 9, 2026 at 11:05=E2=80=AFAM Bjoern Doebel <doebel@amazon.de> =
-wrote:
+> =E5=9C=A8 2026/7/14 21:53, Andy Shevchenko =E5=86=99=E9=81=93:
+> > Replace EXPORT_SYMBOL_FOR_MODULES() with EXPORT_SYMBOL_IF_KUNIT()
+> > to mark the symbols as visible only if CONFIG_KUNIT is enabled.
 > >
-> > From: Norbert Manthey <nmanthey@amazon.de>
+> > Kunit test should import the namespace EXPORTED_FOR_KUNIT_TESTING to
+> > use these marked symbols. This is the standard way for all KUnit
+> > tests.
 > >
-> > Set SB_I_NODEV on the superblock by default for CIFS mounts. This is
-> > consistent with how other filesystems handle untrusted remote content
-> > and prevents the server side from injecting device nodes on the client.
-> >
-> > Fixes: 2e4564b31b645 ("smb3: add support for stat of WSL reparse points=
- for special file types")
-> > Signed-off-by: Norbert Manthey <nmanthey@amazon.de>
-> > Assisted-by: Kiro:claude-opus-4.6
-> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Andy Shevchenko<andriy.shevchenko@linux.intel.com>
 > > ---
-> >  fs/smb/client/cifsfs.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-> > index ea4fc0fa68cac..35eee2f9899d5 100644
-> > --- a/fs/smb/client/cifsfs.c
-> > +++ b/fs/smb/client/cifsfs.c
-> > @@ -208,6 +208,9 @@ cifs_read_super(struct super_block *sb)
-> >         if (sbflags & CIFS_MOUNT_POSIXACL)
-> >                 sb->s_flags |=3D SB_POSIXACL;
-> >
-> > +       /* Prevent device node opens from remote filesystem by default =
-*/
-> > +       sb->s_iflags |=3D SB_I_NODEV;
-> > +
-> >         if (tcon->snapshot_time)
-> >                 sb->s_flags |=3D SB_RDONLY;
-> >
-> > --
-> > 2.50.1
-> >
-> >
->
+> >   fs/smb/client/smb2maperror.c      | 12 ++++++------
+> >   fs/smb/client/smb2maperror_test.c |  1 +
+> >   2 files changed, 7 insertions(+), 6 deletions(-)
 >
 > --
-> Thanks,
+> ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+> Chinese Homepage: https://chenxiaosong.com
+> English Homepage: https://chenxiaosong.com/en
 >
-> Steve
-
+>
 
 
 --=20
