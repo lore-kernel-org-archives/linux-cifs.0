@@ -1,109 +1,75 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6598D37F00A
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2026 14:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFD9478E53
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2026 15:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784125626; cv=none; b=Zn+3FCDyaAfaxAwIUPg2G6vDF3TwJymJrRqav3usvrvBhKlazBERXwPbm0VK/oymOlRmS4JSghKspeGOXWnWhz5yVciey9Qg75Kn1SXNdn5z3siBZ4F1AAkx/q/9L+Qhv1y1smTrq6cV5dWp+3iyOaIENCM+oXr1nx82nAgeJIg=
+	t=1784127861; cv=none; b=XawFJnO7dd6sTO5FoUr66LSawV29NzRujz6TMKMqg0Pp1z61ah8jK80rBKY4lud/tzggcDOivabmuX23LVYxe9tSO8maxfSUT4yJkuW21pSY8r/fLMlJ24PjWDW5bb/N9a1Z/k6+jKq9rLK+xq19UPjaUl2+YvoSk1QhH9DY1Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784125626; c=relaxed/simple;
-	bh=L9Dczkb0mAYvE1jAmUs6Ae9DFXEroYEEY6hMZ9fnRBM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a9AaSlJWtoQM+90WiISYyD7n4nYTw0OVRIELdh/TNZm8934QFJaatZQe6PlsCCSbBRnzBysldzq/6h3FhYHAC6cejNruX9DM/BGllm13A6PwUR4arEo5P4HAhAUz0onpH33ACloUbCeQFXgQVMBSYsIhJfvw1h71tvAxVL5jZn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hsMM6xdw; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1784127861; c=relaxed/simple;
+	bh=ZfZMEnNXhLwGuzbK+eLafIuBnryIekAym5P4E7pxOUo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tXnUwp0YsT0qXl1GEm3i2c+5xIUxFMzzVdFrykrf87x9k8Ej4BmD+tOQjWsjQTvo3eGDL58JrYwGGqw3RoOWIAzW0bboiyCMH5w6lHotrdRUc8MTdIWGAv7IVCa2oQ3MH99O7JrFNpBqRxlDd8UwFYWSrf9jBPnia4YVqa45DB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=WyYdXEGW; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hsMM6xdw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784125625; x=1815661625;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=L9Dczkb0mAYvE1jAmUs6Ae9DFXEroYEEY6hMZ9fnRBM=;
-  b=hsMM6xdwx9tEfe5ENmDvYp/uB4zalCefPycR/Qp1VgVUcqL6jsY5BN/c
-   sZVLr+mqL+TohvDBfBBCw+xXmfpXAic9rR/5f9F3w5nG0NhWyHolIhgtT
-   V5rTst1jiJdn0LOS+8GzV17kV283a42pMLEA1x/4LhZ5D2IyBw3Zx0by0
-   QQEVPi03yVgJjy34Pm3AbK/u2Bn7tLjID2Poun/Kqs7kr/JknbPE+YGE+
-   nBWYF4hWeHRK+90WEZAy/SeFCpb2LJHV3eEUqX7x5DE8+4uOwXZek9M1q
-   wyG54aQw01A89N8LGJDkmE5KIYJS0mvg36dvP/I6oBipANORcg7mLeuJB
-   A==;
-X-CSE-ConnectionGUID: I68tCFJrSU+2EQurDOlvZQ==
-X-CSE-MsgGUID: mRioTibiQQmP36Y3a/ZWfw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11847"; a="88592158"
-X-IronPort-AV: E=Sophos;i="6.25,165,1779174000"; 
-   d="scan'208";a="88592158"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2026 07:27:05 -0700
-X-CSE-ConnectionGUID: qlfiLvjVQequMd68ftprrA==
-X-CSE-MsgGUID: l+qBwBPHTtqhbkl5I3fyWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,165,1779174000"; 
-   d="scan'208";a="260505821"
-Received: from mkosciow-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.129])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2026 07:27:01 -0700
-Date: Wed, 15 Jul 2026 17:26:59 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	bharathsm@microsoft.com, senozhatsky@chromium.org,
-	dhowells@redhat.com, metze@samba.org, linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH 2/3] smb/server: cancel async requests when closing
- connection
-Message-ID: <aleYs2SlElRCfEMO@ashevche-desk.local>
-References: <20260715135513.667260-1-chenxiaosong@chenxiaosong.com>
- <20260715135513.667260-3-chenxiaosong@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="WyYdXEGW"
+Message-ID: <665142dc-bf1d-44da-99c2-08cf0209b39b@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1784127849;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=50Ddf+rFuhMrsJiKOLDZHyIfLvRD2QdBOD0XezMcPlk=;
+	b=WyYdXEGWMNF3R82drT715ucUc9BVy7E0BYWv6KgCMUTwipMe+Tq67B92t0E2i9yeKpTM2f
+	x2cllGY+5LD4cdJUKEOMfuE8mVUbzltobVNGU2vrBZE/124WuV+tNCiUdAHOlZc4CYjfia
+	qhMDbT5q0EHUefY5I02GCfMR3guAXvpjTDJS8jl0bBui+oSyO5Lrs8ujosufYwOVzRJqZP
+	ISWAJrqinR+knGBGtIZiB891bUv79SyhmO1mE5iT/DRRMx6k2OXo0pcrMyiyM6EVXzWsMg
+	Z2qlF49zwjt1LjXZYKdx5KQ2+/3QKioEWXuhq4FinM5Cu3AY0xmutRk3aY/T2g==
+Date: Wed, 15 Jul 2026 23:04:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260715135513.667260-3-chenxiaosong@chenxiaosong.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Subject: Re: [PATCH 1/3] smb/server: fix signing when a response uses more
+ than one iov
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
+ ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+ bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
+ metze@samba.org, linux-cifs@vger.kernel.org
+References: <20260715135513.667260-1-chenxiaosong@chenxiaosong.com>
+ <20260715135513.667260-2-chenxiaosong@chenxiaosong.com>
+ <aleYRhKFI_cdGkC2@ashevche-desk.local>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <aleYRhKFI_cdGkC2@ashevche-desk.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 15, 2026 at 01:55:12PM +0000, ChenXiaoSong wrote:
+Got it, thanks.
 
-> An async request may still be waiting when a connection is closed.
-> This can stop the connection from closing.
+Andy, could you update your patch "ksmbd: defer CHANGE_NOTIFY completion 
+instead of STATUS_NOT_IMPLEMENTED" so that my remaining notify feature 
+patches can be rebased on top of it?
+
+https://github.com/chenxiaosonggithub/linux/commits/ksmbd-change-notify/
+
+在 2026/7/15 22:25, Andy Shevchenko 写道:
+> 	for (int i = 1; i <= work->iov_idx; i++) {
 > 
-> Cancel active async requests before waiting for them to finish.
-
-...
-
-> +static void ksmbd_conn_cancel_async_requests(struct ksmbd_conn *conn)
-> +{
-> +	struct ksmbd_work *work;
-> +
-> +	ksmbd_debug(CONN, "Cancel pending async requests on releasing connection\n");
-> +	spin_lock(&conn->request_lock);
-
-> +	list_for_each_entry(work, &conn->async_requests,
-> +			    async_request_entry) {
-
-It's perfectly a single line. Note, the strict mode is 80 characters
-(inclusive), this line even one less, id est 79 characters.
-
-> +		if (work->state != KSMBD_WORK_ACTIVE)
-> +			continue;
-> +
-> +		ksmbd_debug(CONN, "Cancel async request id %d\n",
-> +			    work->async_id);
-> +		work->state = KSMBD_WORK_CANCELLED;
-> +		if (work->cancel_fn)
-> +			work->cancel_fn(work->cancel_argv);
-> +	}
-> +	spin_unlock(&conn->request_lock);
-> +}
+> (or even unsigned int). This style is preferred as long as iterator is local
+> to the loop.
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
