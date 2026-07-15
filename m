@@ -1,34 +1,34 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAC82AE8D
-	for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2026 13:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA7632C94A
+	for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2026 13:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784123761; cv=none; b=nxHjOA88McNBwsLjCNv1PmFNCtC/XdhugK24rbhIttdiFfG/rESgYJHdCFJhpzJ1o5hT0rK/sPgnB/jjFPiI6Na0HQPOKYXppc3vfXjSHHCiXJFIgKiIHIyipTFfQc6qn/p0UhKE/5dd+8bCH6r5TS1OqVnR7/MgJOd1lYGOiC0=
+	t=1784123774; cv=none; b=e6LOoWXAq+iZBWg+rUyTmTq/tC43W8KW869ohDfrmJAeBXzw4ab9D5MaoGLUfwQpmTLRc2YTYePb5yetD4ETBXYLZtXUOmxx6ha42OkIpG2F3cJaYU8l2j410JDZ4w3Lqc8Z6o0o0SdBZ77u0w1h7PfUGtrRQB8J+1S+2WYkcVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784123761; c=relaxed/simple;
-	bh=HJivYit1Lv4n0I13GmN8q6wV8nFPyhuijpYoDO9Z1T4=;
+	s=arc-20240116; t=1784123774; c=relaxed/simple;
+	bh=g8u5rJv6jpS863xpaHDRfSwyc4RyZssJRP6Mb0KsN3I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GeQVVdgVtUEBxc/h5aaALNxd8Q5ewXWuNMqz9k68LrIcWlzHpLkEdE7pmZVfrGv2Szug1UWDpIy0COAtz5p2F+MNA4eb3VSTVYzDPFKEhAa9OEgTlqgkVdOf1U1ZYaVF3lwM0nqfyEUko/pvzhJhJJBy9fybaSpna4cKb4NMXcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=AmCPf95n; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=egwwG3VlqgqoThseZaWREy3oLc9yC3129V54V/h2J4Rh5ZHuM/nuMPA8DcAX7F23iOIM2u8MWuEItmT6Vq8AJlhEXjE2+ilfhZMQyJHzaHx0wY8Ybba5DxgsCK0JUbT2Gn7ug465EV3GLZPCRTp7dH0AlhSZ8ThX9tf11t+fj60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=sOKt3JkJ; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="AmCPf95n"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="sOKt3JkJ"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784123756;
+	s=key1; t=1784123763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7zspCCKoyd0TUlo0lEKZ7T/k1z9Vg8T6edP2rUkGCSc=;
-	b=AmCPf95nrz7XUT4R4Zq/+LvI7TBOXW1MUeI2zKVXkl2qehAFxBZeN/2s/UNAkGfLvm9v3r
-	g1/gIzilOk2SSYx9Kq00DBwxNSkzTfiMROTYdo9MP6qwCuf2uT0yFXbgyAYc8gqCPe3uRC
-	h/dAJEjd5DDQPICUZBmMm1cYh7GTRXYbnkT73lB5TarmaKIwpjFpIutmac8cljPFHsfy/5
-	H/CWqy7BRZVovQuuKUaF12it27Vd0mT/kFAyIzY1VT40ZTFS941awuFYymjXOKXR7lqans
-	t/yQ5tKERYquWDHA2IiO3LA2UX/6cTBQtUz8VOiIgdzqdpANpywOA7D6O9BO2w==
+	bh=xjfpfmjCrx0sfu2tTqAXkKWmTg8GQuzQUxpp6MbSxHo=;
+	b=sOKt3JkJnFDC58wjWmIVv64CcS4yAcuijX828op1LPuLNuyWdaXfcxd7FC5XDtSDMbx61c
+	UlEZGnORwQKdKSQP5EeXrNnumLdYJgxYMLAmvnXe8CGEPqEwDmudx4X+/TXiadVWm2fGfo
+	dnACY/pA/SEwwQlLU8gz5mGHC2qlJM0RB/4bw/i3Is3wvlY6nbIR3Vt2EYTndE70+Vktta
+	q/kiHqB3WN1UwIyR4nyl6g2E5JhOCrQtB3HUDpounQSppr3Sp22rYL+U/2cXGrMXWXdwsf
+	gBQv+EBCy3r1yhZJ+75/F+D6na4BxYWHuoVtWxE2JcllcwVn8vejazpRWRudcw==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -43,9 +43,9 @@ To: smfrench@gmail.com,
 	andriy.shevchenko@linux.intel.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 1/3] smb/server: fix signing when a response uses more than one iov
-Date: Wed, 15 Jul 2026 13:55:11 +0000
-Message-ID: <20260715135513.667260-2-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 2/3] smb/server: cancel async requests when closing connection
+Date: Wed, 15 Jul 2026 13:55:12 +0000
+Message-ID: <20260715135513.667260-3-chenxiaosong@chenxiaosong.com>
 In-Reply-To: <20260715135513.667260-1-chenxiaosong@chenxiaosong.com>
 References: <20260715135513.667260-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
@@ -59,111 +59,55 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Some SMB responses keep their data in another buffer. The SMB header
-and the data are then in different iovs.
+An async request may still be waiting when a connection is closed.
+This can stop the connection from closing.
 
-The old code only handled this for SMB2 READ. For other commands, it
-signed only the last iov. QUERY_INFO and CHANGE_NOTIFY can also use
-another iov for their data. Their SMB header was not signed, so Windows
-will client rejected the response.
-
-Find the iov that starts with the current SMB header. Sign this iov and
-all iovs after it.
+Cancel active async requests before waiting for them to finish.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/smb2pdu.c | 52 ++++++++++++++++++++++++++++++-----------
- 1 file changed, 38 insertions(+), 14 deletions(-)
+ fs/smb/server/connection.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b73167785e87..72e1b2b0a6fe 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -9625,6 +9625,40 @@ int smb2_check_sign_req(struct ksmbd_work *work)
- 	return 1;
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 9e8fdb39e5a2..54b9672d7c70 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -291,6 +291,26 @@ void ksmbd_conn_try_dequeue_request(struct ksmbd_work *work)
+ 	wake_up_all(&conn->req_running_q);
  }
  
-+/**
-+ * smb2_get_sign_rsp_iov() - get the iovecs used to sign a response
-+ * @work: work that has the response iovecs
-+ * @hdr: SMB2 header of the response
-+ * @n_vec: set to the number of iovecs to sign
-+ *
-+ * Response data may be in another buffer. In this case, the response uses
-+ * more than one iovec. Find the iovec that starts with @hdr. Sign this
-+ * iovec and all iovecs after it.
-+ *
-+ * Return: The first iovec to sign.
-+ */
-+static struct kvec *smb2_get_sign_rsp_iov(struct ksmbd_work *work,
-+					   struct smb2_hdr *hdr, int *n_vec)
++static void ksmbd_conn_cancel_async_requests(struct ksmbd_conn *conn)
 +{
-+	int i;
++	struct ksmbd_work *work;
 +
-+	/*
-+	 * iov[0] has the RFC1002 message length. It is not part of the SMB2
-+	 * message, so do not sign it.
-+	 */
-+	for (i = 1; i <= work->iov_idx; i++) {
-+		if (work->iov[i].iov_base == hdr) {
-+			*n_vec = work->iov_idx - i + 1;
-+			return &work->iov[i];
-+		}
++	ksmbd_debug(CONN, "Cancel pending async requests on releasing connection\n");
++	spin_lock(&conn->request_lock);
++	list_for_each_entry(work, &conn->async_requests,
++			    async_request_entry) {
++		if (work->state != KSMBD_WORK_ACTIVE)
++			continue;
++
++		ksmbd_debug(CONN, "Cancel async request id %d\n",
++			    work->async_id);
++		work->state = KSMBD_WORK_CANCELLED;
++		if (work->cancel_fn)
++			work->cancel_fn(work->cancel_argv);
 +	}
-+
-+	WARN_ON_ONCE(work->iov_idx < 1 ||
-+		     work->iov[work->iov_idx].iov_base != hdr);
-+	*n_vec = 1;
-+	return &work->iov[work->iov_idx];
++	spin_unlock(&conn->request_lock);
 +}
 +
- /**
-  * smb2_set_sign_rsp() - handler for rsp packet sign processing
-  * @work:   smb work containing notify command buffer
-@@ -9635,18 +9669,13 @@ void smb2_set_sign_rsp(struct ksmbd_work *work)
- 	struct smb2_hdr *hdr;
- 	char signature[SMB2_HMACSHA256_SIZE];
- 	struct kvec *iov;
--	int n_vec = 1;
-+	int n_vec;
+ void ksmbd_conn_lock(struct ksmbd_conn *conn)
+ {
+ 	mutex_lock(&conn->srv_mutex);
+@@ -564,6 +584,7 @@ int ksmbd_conn_handler_loop(void *p)
+ 	}
  
- 	hdr = ksmbd_resp_buf_curr(work);
- 	hdr->Flags |= SMB2_FLAGS_SIGNED;
- 	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);
- 
--	if (hdr->Command == SMB2_READ) {
--		iov = &work->iov[work->iov_idx - 1];
--		n_vec++;
--	} else {
--		iov = &work->iov[work->iov_idx];
--	}
-+	iov = smb2_get_sign_rsp_iov(work, hdr, &n_vec);
- 
- 	ksmbd_sign_smb2_pdu(work->conn, work->sess->sess_key, iov, n_vec,
- 			    signature);
-@@ -9729,7 +9758,7 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
- 	char signature[SMB2_CMACAES_SIZE];
- 	struct kvec *iov;
- 	u16 command = conn->ops->get_cmd_val(work);
--	int n_vec = 1;
-+	int n_vec;
- 	char *signing_key;
- 
- 	hdr = ksmbd_resp_buf_curr(work);
-@@ -9751,12 +9780,7 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
- 	hdr->Flags |= SMB2_FLAGS_SIGNED;
- 	memset(hdr->Signature, 0, SMB2_SIGNATURE_SIZE);
- 
--	if (hdr->Command == SMB2_READ) {
--		iov = &work->iov[work->iov_idx - 1];
--		n_vec++;
--	} else {
--		iov = &work->iov[work->iov_idx];
--	}
-+	iov = smb2_get_sign_rsp_iov(work, hdr, &n_vec);
- 
- 	ksmbd_sign_smb3_pdu(conn, signing_key, iov, n_vec, signature);
- 	memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
+ 	ksmbd_conn_set_releasing(conn);
++	ksmbd_conn_cancel_async_requests(conn);
+ 	/* Wait till all reference dropped to the Server object*/
+ 	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));
+ 	wait_event(conn->r_count_q, atomic_read(&conn->r_count) == 0);
 -- 
 2.54.0
 
