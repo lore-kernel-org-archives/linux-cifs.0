@@ -1,208 +1,147 @@
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C2439CD03
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 22:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352913D9678
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 23:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784240116; cv=pass; b=d5uC2U3wlWfmkhM2DKylv4Nu9Auv8fm9iollvKqx9bE93XhVHc8I4kaX5MWXJYQA3/NZ9C/X7/jo2/aX5VT5518H1+xNRrisdlg30vUHNnnjVtcZzT67Iv+cGglFsYHwEFNPa5LUQtr4GSYCLl6AwLK0yXsy/kId0CWjSqIEP6g=
+	t=1784244148; cv=pass; b=Gf6yuilWIHSRWwhGfrpKNUZO5WcGt7ktiFNnMDiOO5JUqb5v384Yl95hAmjE9lzj1KrpG9/GCbZ83IMN0967k3m4WRD/4ePdLUm6rXYD8IOdEX0QTcxEg3ByQqkTXaOm+hhEcVTslkIb6Chgvho8fG0OVoXvJHL5msxycV4ZmT0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784240116; c=relaxed/simple;
-	bh=/fKHr50xsHXgcjvfiP44D8F0PAPFDHQXXS9giRpDk24=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=f/1c/1tlzsG8xAXuNtX0CxhHmjdwRjmZ8JVQM/BRRDFB/9I/ny7cnHDm52iXUAZ4kWq54/S3kWyKUJtWsV/yK4bE0ayIZswU64FrbsChf6dbWFtdR5c3QWTmnBWL2D5ThS2tPEQqrHL20e36EhSdXwBlwCbVI+n4BNsVHFdkvyw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRRhsEKu; arc=pass smtp.client-ip=74.125.224.47
+	s=arc-20240116; t=1784244148; c=relaxed/simple;
+	bh=EWN6gDuKG0YyEw+orb/T7ojVyEAGLDOUVQpq19IONdM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AYChM4gj5fKUIvFyiv8TBt56/mXFRT8/Zw3v3Ku36IxZCCaRmyvNzUdYxNn6923ewC/u0GI+/rHWdTOE7pxR+Hpum9nOUmyrOMbl7EIKVmrIvUrlrqb/iuadr0t8TxFi4pLYoeOsJHPeGnkf82pGiJ3yGHqoPK5htG+nnqy0cr0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RosCnX+R; arc=pass smtp.client-ip=209.85.167.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRRhsEKu"
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-668296d0ff3so1548699d50.0
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 15:15:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784240113; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RosCnX+R"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b0f19bea2fso3455528e87.1
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 16:22:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784244145; cv=none;
         d=google.com; s=arc-20260327;
-        b=reAX6oQdw+lkr/zCIa14y6P65KLWHbVgZE6OAoiQJ/7wNL+pVEeNmVqFM14IoYJitu
-         JSSWGcRdnbg1x3D5RSoo4bfwbs3SNkiJ4di0Ma2OO4RSW5MK7BeR9/MFl5ZuBjePMwLP
-         ZPzEQh/W1L4kjC89LrZE26ci2a9EyT/wGjUnBTejX1E/hr0ks7uHp0tSyofoL82zctPz
-         WKUe5nI/bzXwMFgumbzkLCnsrExoDwA7unzo8UDfvflvBCKa6bLbh0fZW1IV/+OmWo/1
-         NLXZsNRDIm4wicCUfplE73zhDYHdlOfmj6lEO7zfViBG+oMctUYMzPantnJefcxsfmfq
-         JhHA==
+        b=Cz7j5Td6RZwnqcL4BfjOMnafNSsn3D8d/zYkwUxJDLSbSlbgPbAHDzzDjDaRBlZizn
+         eHnKLaw7Z5LCbR3+pwCmd1jhCFboAPfjDGo+olnKI9O87i/UVO622aQWKi3rc4ymtIfI
+         QVqRDrR7zZZYW7X1nEZxKNl3kgp9/F0IBE9i9EfrnPuFkuAAUsb9eo0I2UrhqD4Zig9O
+         zerLka6HS8K8bAefByfEQo+Gnb1SO/XLReZwM6q12akT4O/ZXOWa656xsjMYu9+qi7ZO
+         UqGRCHr3uWBaYTvOR7N16V1ZZGeUElglZNGf0kFikBqHFi1WpmHeVluDgRSjZ/+mTenB
+         OYug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=/fKHr50xsHXgcjvfiP44D8F0PAPFDHQXXS9giRpDk24=;
-        fh=qPdn3nxQgygyQjJTDEl9+ZhpBtTWrqIbsZA12qELXjI=;
-        b=QBP2a1FQ2cUXfGRPsRmXlNcNVUM7tjmhFn4poIqYEE2NByGeox8lO2u3R/SQduvSmX
-         nQu7ptOZbaaYDHTOkUpdKsTohjU/2/SgSv5VbKaNueB02HnedlQsvNFCulCCdfdkrMrj
-         4vHlJAG460Kvep6FWINy9b/djFchyYGCSWk2YXLfYjMHxuqjY7SGTDkr2nBk2gPqmYFd
-         AQ1OunUVkRwstwoegWVVi8/YNJFxVNwaLu7GLEXVG1usVmagFeC3AGuxD1b0LDwMGEr4
-         ZA1C2s49xeqF7qJAL/hJcdDFDiNb2ZhmTbQcUBPjNobJ/x0QuwzYbzY9thfkGA4oA9gm
-         gQzg==;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=tcuWXuD1fDuDpMMOcnT567qxr0fli6HxjsqLv38lk+0=;
+        fh=zUSNYzDANoKfNRCxl5RFYOGgmaHzF9yQ43+yCSxHu4k=;
+        b=jxxgyBYqTnlgw4dhzdCKYJGzTRnk7EMqbngeIEk6WPhXN7nfxVe5f71KuxD+dJ7Ozp
+         RPeT3CXSv8D+1bdbQ3wRFB2rwuOgbbRLKhOAhzeBdRw25t9P35aHg5B59lHhgCHK+t/5
+         /rXmQDA5PFTbYormAGdtvqkCVjrN8sFWbZ7peGCRFfuMb5Nc4ba71XAKb7zRmMFPpmmH
+         5LAShxBY2vrCV0QCz4DWrieLWvnMwbb4FIIbLxLKw/Zy2HJ6o79IPiRulgXZYPC+v8cj
+         ocUEEpVgasU+YQGQNo0XTnNdJBCP+dRbTIMxprGbTrOgN2KDFrPgEenXmfik/K/lAqrc
+         kaCg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784240113; x=1784844913; darn=vger.kernel.org;
-        h=content-type:to:subject:message-id:date:from:mime-version:from:to
-         :cc:subject:date:message-id:reply-to:content-type;
-        bh=/fKHr50xsHXgcjvfiP44D8F0PAPFDHQXXS9giRpDk24=;
-        b=eRRhsEKuREXG/Y12mPl95lYg7rJ47ZsO2VPEGCgW2ECFL7yTN051ybDRTmp8DxtAfI
-         qkuMNs8futMgbYObmHF7BqrA8DsJbN+jGw9r4a2d7E9CBEDnyxnGnHg1fVZVe0vwlf8M
-         CF8ixj26UPCzKHmEK6XjbibnzhH8p85HSpZCUqFlgQMRxtRzsbjxpsDBIePt7iDmjV6S
-         pQJPArAO4FhGHT/6hJXsmrk80LEy8yX1M3zmPBcRsCHRza+mYORijaRamVytnGpTyBCS
-         G+52SOogloeUJ0Srfmni+TI1gyF/tIxYukRf7S3DgumFxrw4HENnTV2rU4szc3zzkYnF
-         085w==
+        d=gmail.com; s=20251104; t=1784244145; x=1784848945; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=tcuWXuD1fDuDpMMOcnT567qxr0fli6HxjsqLv38lk+0=;
+        b=RosCnX+RqAYTV+PlFHt42NMhQ9vGjcukrfgYj/E2gkVcVqDdotCnrltMfN1DBM+QAS
+         phf8SHWbRVE5zAgqh9ofPBqieY2wp1uR/gm/06GZL72eaVZmbsLJOwI6pqsrA20F2xzq
+         YLVTrXUq+adrIzwKFKwFE+QnjRGgAvnpFHCDM1HAdmcHeWkXuHksJgYJHM3lIXB5dN1g
+         ADL4Equ+dd07QpXytbB+JcyoWufIeFJE+sclvp3akZkh3/EyGA8Wnsz8/Wj6jTp4yupI
+         zALZqaj0HP6sxJ4bBkodjWjk05GJ37o9zgK179tBURtPF0Q/Raeg/qL5m5Z4M0g2hXAa
+         olOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784240113; x=1784844913;
-        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=/fKHr50xsHXgcjvfiP44D8F0PAPFDHQXXS9giRpDk24=;
-        b=Dl8bZvgK7Os1dx/r1jlnrWuWA8c7Qy2wlxExTPx5LWMRrIznjEfNb/jSTTsZhqCwWi
-         6GUjrMOOZ/6Dp+hB7d9jeWusW3ju6ntVn5TxQ1s3Ict31kfRaZR6/NBqaJAfrAJynMcu
-         mYrHfu9ObvZlWirECTI5fQfvIa9Omb/VyQKT95sFPwsmi69IJyQK5C0NERSZkXP0WMe+
-         8zMu1cBXfdLJRP2jayjdtcC0+thAD9YcIjkQUm6UeuxcCdh52PN0uvp401JBUKBCsODj
-         doYGd1Z1UlMQY2u0J2e4SKgTtAONyWaK2TlHxkQcP6KfDbd0G9lXpdLTsepYVO24gCR0
-         TvTw==
-X-Gm-Message-State: AOJu0YyxxbnYyVVnyyIZUmQTL0ZUzfro9A2gHJfvkJ+va4BHPR5jRCHw
-	itXWRM+Yzwyy6RbIn7evWmsu77L8/vE7fL6EbOlB5an8SqPlxCIP7SH80bPUFOmI1W/HLGHlCOc
-	zMMFdC7eIAhwpe6pKKe1GzKN/wZr4GZAAplwfRJCwxQ==
-X-Gm-Gg: AfdE7cms/oJoYehqRYxUt60zrG656Gcb9pHAourooyFAYe8HTz/Qc4KWdrk/ZRjhMuV
-	K4UDKMdUEAgU5zCEaN+xFzlF71zDd2xJNQSjKOoarK5iPEm0Ep02Nj4GT0B7Kl6nrbhvsn/MFaR
-	XA3TCS1y7L3yqIOPwwR+NBFgszQCRTJndv0uylVksCpL/RaZR1VVylKZVXhjnAxn311CaehwXo0
-	71g3bs/dR5lnIXyUK0LUZoiXQzvMm4akFsyxuJqOXNKULJ3cI/XE4cGxcp2pfrvR4xZCrn39X/R
-	6uv6+vJrkvtmi9KsryiiZ/2g00fttdz0kn2VlXpZUk8=
-X-Received: by 2002:a05:690c:6888:b0:80e:1ad2:afc3 with SMTP id
- 00721157ae682-81ecf7af68amr66200537b3.15.1784240113507; Thu, 16 Jul 2026
- 15:15:13 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784244145; x=1784848945;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=tcuWXuD1fDuDpMMOcnT567qxr0fli6HxjsqLv38lk+0=;
+        b=ixtTUJ0AumFPjS9zE4jkwGR46J1UZkdLoPm73ajsDvt/hVS0X2idrQ6peZ3wG9jrTu
+         KS3c8m0n1G52ait6XFHbGinJeGXotR45uGWpAUJtTdVi2tRZRlAqmMrVTHYN9KvdBIz+
+         xVOOVXcP6A0vAf95GFeLk51Ik4Y3jwuUK4T33Mo0mFuASMK9vO9erd+5da7DspYwCxkO
+         ZLl2/IjK/F5NMB/3WRPXUu3m0O9rbceBSNYmggDI3Kwc50hF0qbNnb7LEr2BBsy2bFs5
+         oKsrS2FGxsN9juS7t2zwnLaeyuLooeEYmahLDbmlYGhH8m+t0dXQWjs3i+wQ1XoOshbW
+         QOIA==
+X-Forwarded-Encrypted: i=1; AHgh+Rr5CmZzyUiAj60qGpax/qahjejbDjxUMBOl23RezIRmItGXjXTcSyI6hf+DpaFRLbgKG6CS8dwfhWix@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ9fnsIUPVBwhYX2Rb0nANR9RebzGT+i3lRongA9Iekie8fZkf
+	N+hYrUxXk09vaT4n29wwZnCxRowNFjlhvQ6SO8dRE4h/eSocuaTmtCfabVJ9LA3VYYgzBbav6/0
+	AihGmy5aLLboU/x3DICUuBCf5RpDgENHPqvAdHcQ=
+X-Gm-Gg: AfdE7clXGpj8Z1GwgoHXXyOkcvtiTiV7JQSt+pGvQ8N/T7yeUm4YYrcvfAY+Xx4uZ+h
+	EPRDiSYoj3o6copKPzjMpUJsWwZ7o3hid7aL0c7ryGlxxoj75zHLaEs8okFfUGEJNsdGpROGXNf
+	KG7GK3h+KUAaVzWA8EA4rpUFlkCE7NMB9PXk8UnO8xa03ZoB/I6ZsaB4DWDq2yF09n8tNVLOkuA
+	E9kFVyxC7pCtzRZCSfFlryFLm8koB/wnpp0/L6RKk/Dn4Q3Z65bo/Xunskmkt2CfCpnPTT+5rMj
+	Bh8BDkylvnyYuYCr3d/AMbqo0LlP62llyxMwDWqQNGHnLeQTqveJ4QYsqlfu8o+woPdB7TWEFBH
+	/Wp5JrbZkehiovLZfmaWCubzliOuPk0k22guEv4XH8sqI2iPwnQaedG02UX76J0Vt2p92yOZrIs
+	p5
+X-Received: by 2002:a05:6512:607:10b0:5ae:ba28:a56e with SMTP id
+ 2adb3069b0e04-5b28f9aa422mr20563e87.35.1784244144879; Thu, 16 Jul 2026
+ 16:22:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Charles Research <trilobyte777@gmail.com>
-Date: Thu, 16 Jul 2026 18:15:01 -0400
-X-Gm-Features: AUfX_mx4pgQ_2qye8jklRjODVnV_HkllpIHwO9X8i1PExnDP-RRwMuq73HqyRF8
-Message-ID: <CAPS2u-V+MxCXWUNnXt_MbAHZa4uQfen4grtD3JNsw5AJKsWY1A@mail.gmail.com>
-Subject: [SECURITY] ksmbd: SMB CREATE widens inherited POSIX ACL masks
-To: linux-cifs@vger.kernel.org
+From: Steve French <smfrench@gmail.com>
+Date: Thu, 16 Jul 2026 18:22:11 -0500
+X-Gm-Features: AUfX_mzuwqfyAYqb1BF1f2YADFZfGUvrdCDB7nKeR9VPHkdOl9tcogUusqYYnV4
+Message-ID: <CAH2r5mvYSLOu72Nv68a1uSNSPY-0j-jYtTDMe7JufX4FL3vCRA@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello KSMBD maintainers,
+Please pull the following changes since commit
+a13c140cc289c0b7b3770bce5b3ad42ab35074aa:
 
-KSMBD widens an inherited POSIX ACL mask to rwx when an SMB client
-creates a file or directory. A named user or group entry that an
-administrator intentionally made ineffective with a restrictive mask
-can therefore become effective on the new object. For a new directory,
-KSMBD also installs the widened ACL as the default ACL, so the
-exposure propagates to descendants.
+  Linux 7.2-rc3 (2026-07-12 14:16:39 -0700)
 
-Affected Versions
+are available in the Git repository at:
 
-The vulnerable code is present in the initial in-tree KSMBD merge:
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc3-smb3-client-fixes
 
-Commit: e24c567b7ecff1c8b6023a10d7f78256cef742c4 (Linux 5.15)
+for you to fetch changes up to d7d2adcd022baade5cab65ca492ce63421ce3a6e:
 
-The issue remains present in Linux 7.2-rc3:
+  smb/client: flush dirty data before punching a hole (2026-07-14
+21:51:52 -0500)
 
-Commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
+----------------------------------------------------------------
+Ten client fixes
+- six fallocate fixes
+- two unit test fixes
+- fix allocation size after duplicate extents
+- fix check for overlapping data areas
+----------------------------------------------------------------
+Andy Shevchenko (2):
+      smb/client: Use EXPORT_SYMBOL_IF_KUNIT() to export symbols
+      smb/client: Use EXPORT_SYMBOL_IF_KUNIT() to export symbols in SMB2
 
-I therefore assess the source-level affected range as Linux 5.15
-through Linux 7.2-rc3.
+Fredric Cover (1):
+      smb: client: use kvzalloc() for megabyte buffer in simple fallocate
 
-I dynamically reproduced the issue on Linux 7.1.3:
+Huiwen He (6):
+      smb/client: refresh allocation size after duplicate extents
+      smb/client: handle overlapping allocated ranges in fallocate
+      smb/client: reduce fallocate zero buffer allocation
+      smb/client: emulate small EOF-extending mode 0 fallocate ranges
+      smb/client: refresh allocation after EOF-extending fallocate
+      smb/client: flush dirty data before punching a hole
 
-Commit: 199c9959d3a9b53f346c221757fc7ac507fbac50
+Shoichiro Miyamoto (1):
+      smb: client: reject overlapping data areas in SMB2 responses
 
-I did not dynamically test every intervening stable branch.
+ fs/smb/client/cifsfs.c            |  10 ++-
+ fs/smb/client/smb1maperror.c      |  24 ++---
+ fs/smb/client/smb1maperror_test.c |   1 +
+ fs/smb/client/smb2maperror.c      |  12 +--
+ fs/smb/client/smb2maperror_test.c |   1 +
+ fs/smb/client/smb2misc.c          |  34 +++++--
+ fs/smb/client/smb2ops.c           | 183 +++++++++++++++++++++++++++++++++-----
+ fs/smb/client/smb2pdu.c           |  19 ++++
+ fs/smb/client/smb2proto.h         |   3 +
+ fs/smb/common/fscc.h              |   5 ++
+ fs/smb/server/smb2pdu.h           |   4 -
+ 11 files changed, 240 insertions(+), 56 deletions(-)
 
-Required Conditions
+-- 
+Thanks,
 
-CONFIG_FS_POSIX_ACL is enabled.
-The backing filesystem supports POSIX ACLs.
-A parent default ACL contains a named user or group entry that grants
-broader permissions than the ACL mask permits.
-An authenticated SMB principal creates a new object beneath that parent.
-A second principal maps to the named ACL identity.
-
-Observed Impact
-
-In an owned disposable VM, I used two distinct SMB and Unix principals.
-
-The parent default ACL granted the secondary principal rwx but used
-mask::---, making that named entry intentionally ineffective. A
-locally created VFS child preserved mask::--- and correctly denied the
-secondary principal read and write access.
-
-A child created through SMB instead received mask::rwx. The secondary
-principal successfully read the creator's canary and overwrote the
-file. An SMB-created directory likewise received widened access and
-default ACLs, allowing a grandchild created beneath it to inherit the
-widened permissions. The widened ACL state persisted across reboot.
-
-This is a persistent cross-principal confidentiality and integrity
-failure affecting newly created SMB objects.
-
-I am not claiming:
-
-Access to pre-existing objects.
-Code execution.
-Memory corruption.
-Privilege beyond the affected ACL identity.
-
-Root Cause
-
-fs/smb/server/vfs.c:ksmbd_vfs_inherit_posix_acl() obtains the parent's
-default ACL, changes ACL_MASK to 0x07, and installs it as the child's
-access ACL.
-
-For directories, it also installs the widened ACL as the child's default ACL.
-
-The SMB CREATE path in fs/smb/server/smb2pdu.c invokes this helper
-after object creation.
-
-Reproducer
-
-I have a tested Python source reproducer using Impacket.
-
-The reproducer:
-
-Creates matched local and SMB children.
-Records their resulting ACLs.
-Verifies denial on the locally created control object.
-Verifies successful read and overwrite access on the SMB-created object.
-
-It contains no binary-only components.
-
-Because AI assistance was used to review and package this report, I am
-treating the report as public and am not attaching the reproducer to
-this public message. I can provide the Python source and retained
-evidence privately upon request.
-
-Suggested Fix
-
-Preserve the VFS-computed inherited ACL and inherited mask.
-Do not force ACL_MASK to rwx.
-Do not modify a referenced parent ACL object in place.
-If KSMBD must transform an ACL, clone it first and ensure that the
-resulting effective permissions never exceed normal POSIX inheritance
-or the requested object creation mode.
-
-A regression test should compare local and SMB object creation using
-two principals and verify both file inheritance and directory default
-ACL propagation.
-
-Temporary Mitigation
-
-Until a fix is available, avoid KSMBD shares whose parent default ACLs
-rely on a restrictive mask to suppress broader named user or group
-entries.
-
-Where possible:
-
-Remove dormant broader ACL entries, or
-Use another SMB server implementation for the affected share.
-
-I am available to retest a proposed fix using the same disposable
-two-principal test environment.
-
-Regards,
-
-Charles Vosburgh
+Steve
