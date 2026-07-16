@@ -1,118 +1,221 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF0F330D34
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 20:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784233473; cv=none; b=KCdzSgaTTZNbMw1VO//KlfSiXPwYKf9umxD6t2we0cGA7nzg22+1US6l3tpvFmigsnuEzU0DK5jzqGL2kiHB/O02ZVAKlMPVJ7gaqDYYBMpJNEmisaTxjGZP9VBaKMeV63WyMK5ZP7l/MF37n8TNiJkd1dCacxzD4nzJCuFY7M0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784233473; c=relaxed/simple;
-	bh=08CGPI/5kIcllDq0Kq72++xeicSn1hZcZgUCquRhsEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DdeSoF7V8rrp/NbZE2QcAcRia/RCjTW/1sVz2imSOE+nQlkB1QUg4785fSO9MjgCnh2gfdXePNGnD29EkZQ94oKML047coUW9++uq7kqoUWl3G95fXOs1KbJCmK2mBM6Fg/1e/Vd/C8O6CuzAAHilsdjQB9NtdEdhgL7B46pp6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RcB19yfn; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FDC3D301D
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 22:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784240070; cv=pass; b=gkKY4diy8rj5Ol7EOmCPbFYwTz6iY+IceAFMKNDPslqbiI4Ko8wjhjLsFEiUzCc71LFara0X6hugzhxf6M5akH8Qja66bi8RDA66+63slPrzqRt7pptsyVyynMDvPc594XXttfdiFrNOHEYJ+XSqhg+EWhZc4U6lhZ9JMtduGkc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784240070; c=relaxed/simple;
+	bh=myhKaUMIB/SAY9LWOk9DGB2++bgQB3tvRvN2YEGzvpk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=nuZaDvVYjwxCnNPQUqMBQdr+sAzzZJ1sLBaj6mbHhOj46VPXT1qHl5oTWV3vCMK+iETWmdbz+BHZ5xFCzMhFt8Yq0ve9yLsXVyz7i/EopdUD9MWEl5fpC0L/FfPQDBdW7E4l2gCQDrwgUlja+5dpVI6XDZbIVmngsKmnvP7m2ds=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V+Ht0oXe; arc=pass smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RcB19yfn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784233472; x=1815769472;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=08CGPI/5kIcllDq0Kq72++xeicSn1hZcZgUCquRhsEY=;
-  b=RcB19yfnLzLOQru7VexsNDc5ES+1bSxZ/5HieekZmdh8YNND/Mdr3XMe
-   YwiUq9WmZC/AhZ25HhBuhEgEzLxG515jPGlU424hJYPj6BMAGoevMiBSi
-   /U15qEqxXlO7Nrngyil8KNIS2V/pBdFModcrFeSQH+ig9Vp1UIur5n6/R
-   Z2cHklA6KMntGPmzpW+iguvzcjMxQF8rlODnrgpQfXL9urPNC81OmlcQH
-   aov6nctuBqBC7HYRMs6S1/VZ5aT9umd/PUX7l3uXEwWIt7SxuF4iuG00s
-   OkS/rcakW4gk2BBOE/9f5WiWw0y7A8oT7xSpKhnsonWgXWDwVzmDotgJ0
-   g==;
-X-CSE-ConnectionGUID: LyppIYvOSqSTNN9BCLstnw==
-X-CSE-MsgGUID: QeyGhiN3SP6CuFgVb2S0vA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11848"; a="84949299"
-X-IronPort-AV: E=Sophos;i="6.25,168,1779174000"; 
-   d="scan'208";a="84949299"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2026 13:24:31 -0700
-X-CSE-ConnectionGUID: fWtSydooR+WhQ2NttFxGmw==
-X-CSE-MsgGUID: YsHZs7F7TCWyjx9ZNKY6mw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,168,1779174000"; 
-   d="scan'208";a="260895121"
-Received: from conormcd-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.245.26])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2026 13:24:28 -0700
-Date: Thu, 16 Jul 2026 23:24:25 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	bharathsm@microsoft.com, senozhatsky@chromium.org,
-	dhowells@redhat.com, metze@samba.org, gael.blivet@gmail.com,
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH v2 1/3] smb/server: fix signing when a response uses more
- than one iov
-Message-ID: <alk9-WOWQeHaq0wV@ashevche-desk.local>
-References: <20260716001156.671587-1-chenxiaosong@chenxiaosong.com>
- <20260716001156.671587-2-chenxiaosong@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+Ht0oXe"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-81eb41c1f1aso52531347b3.2
+        for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 15:14:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784240068; cv=none;
+        d=google.com; s=arc-20260327;
+        b=pSGaEqhQM9y3if5utPUseSxHKEtnFJJbkrHECRn5AHBEqimmhbJOQflk/rBHf2C3Sk
+         J9AQmGWncx+MbHZ0fCIzZJSsr8bIeecNDoEEqPNhAIhjuF6nzuKUdrYcBRaslpXXyQ2p
+         BI0xtts4xHZ8uo2unzkJy2a7FPhKa4PnjZ2uYcuFco19KtwBulAPqdgu1zTpoPQVhxQM
+         qTfZHtQXHr7p7VOG75BjumNNxRBAvq2fQ4bgAFCq7XjQ1OCLQPE3+YD8C2bZqFRyIXtx
+         O4B/36d04Tsrq79qs5J1r8s+JblB08UJw2DYnp1O2/KAr4sGWv+TX4jkz7HzgV6+gjRs
+         3BMw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=myhKaUMIB/SAY9LWOk9DGB2++bgQB3tvRvN2YEGzvpk=;
+        fh=qPdn3nxQgygyQjJTDEl9+ZhpBtTWrqIbsZA12qELXjI=;
+        b=jMA5bkgSKWoS+VaC5jV0qbxVuv1XJMtv9xmu6rDYu1arb/tLKbPsEmFMihlr0jlPAX
+         sZGj4D/sRcZr7UfNg70hLCTlnQUWbGUMTDlQzDd87gWIX5L4m1BOBgNYSqbS9GEdKYB+
+         B1yo0CBjR8l04kLYf0z+6Ga3SMzR4B/MiEcFVnyyfYkWfQDX7HLepe0BMmBy0h11QDLl
+         /SFxDJZaJn1iaB0Eqhw+uyqWBoaAtGH77z4vBXi1OJbAXcnGOx4kEpefpTKqRq964JtA
+         OA/emZX6kE4MEt6OIz5Nf1z+mxkUtOI4hSdwXFq1nQ/nJzog0n4VqxgN8koyG+ggvBLf
+         HrQg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784240068; x=1784844868; darn=vger.kernel.org;
+        h=content-type:to:subject:message-id:date:from:mime-version:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=myhKaUMIB/SAY9LWOk9DGB2++bgQB3tvRvN2YEGzvpk=;
+        b=V+Ht0oXefNC+y30mT+NNnh+H54Seb1cO2SeyrwGd7uAI8MBvDM78q1vA0IzrAgidWJ
+         KCjnkZcMFVWhdoypMIk66TYfgXwrWtk8DUP0WB1mZe2rIWJ/zcVLh6eOvb2kU4prMKlN
+         loqm975XI7/TT/+KOUtK/l7aHGx595FGx+51ypgeHGxvN4Z40ZRO2qJopP+43QLQOja4
+         F9KsdfiJ+/aR2ebVh1YfqFFZ/syNA0YdcrQN2/5lRCoX0t2qM0KnTeMIidb8svG04bwQ
+         QRoJMxmRyFn7wN5Zy0G2RliFKqzlHvzePtMMpUOT69eJhSG7zvRfSrRnH20DvAZpC21K
+         0bkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784240068; x=1784844868;
+        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=myhKaUMIB/SAY9LWOk9DGB2++bgQB3tvRvN2YEGzvpk=;
+        b=TenWesZPsZob2irZX5oJQWjsh1WjtJ63OYRwpr9tz7m/bocIHp7hw3wb9u2KDfstr3
+         EuzuyJvPSM6prgv8W/GeWOdY6gGte3EEs2u/7u3PVpX/CykzfnmIsBQDvN7EQdInGRqL
+         DT3gCwCNQrmmhp/vsvSDvtiwn3f21xQDbQEUAAzzjcSahSZNJdhAggrlQQ1o7gG7orFx
+         Fae08Why3lHUhlA4dkQR5xshLA15B0Y9wYdpHJK68gk3CUMnMgjXrEZQrOCcYK6fa+bR
+         MufVW6f+1gsBjBgPt6mKNlGnnGrh2UPTIUrAUXW3Ycw/85goi9h+JmwTh6Z/1oN2hMQB
+         cP2Q==
+X-Gm-Message-State: AOJu0Yzsn1ef59UdlpAYG3oQxMdifghR/4nJ1T9gjDtXE9u8zxYcMu/3
+	QTOv2ONASXfTbO/rpNl0aF7fHZfPVtaGx9VAgQySdYpsXpkhJDY9SP7MVJP94AOx7KvTQ9Rd9Tw
+	XkQA6vFUg9jw49jJVBJP2XmnvzXtybXjCNj2U/Gi6sQ==
+X-Gm-Gg: AfdE7cnPMy5ccv4CBwIg2UwWIMPC8lkgi+WEC5yTFe3VAL9DpIUohpLCAuDgVOFpS01
+	/eeyfPhMWxMBpdFUiHI3TGcaPk8CDH5kz0j31PFe55ZcSswatJNCfGRVFuiOgnhIU8lPVDwTNBG
+	bnH0Up0arSw5fyMXmWWcy436c8LzQ+6Ad7jf/qhR29RY9Yjz2rJGZLysyeAMWJ2RKRz3LA2PP6F
+	hj7oG5WT8GCAxTImU6AmyAgwtfoFGY8wtxU16u90jKk6RUUoIcwt9cJKhG0ThPVoRkcDU5MndXY
+	wQIR52NmTxSTU0b2Gekv/VYTyS7pNNrmBTT+uBv535c=
+X-Received: by 2002:a05:690c:6806:b0:81e:8985:e10 with SMTP id
+ 00721157ae682-81ec00bef61mr101676987b3.68.1784240068157; Thu, 16 Jul 2026
+ 15:14:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260716001156.671587-2-chenxiaosong@chenxiaosong.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+From: Charles Research <trilobyte777@gmail.com>
+Date: Thu, 16 Jul 2026 18:14:16 -0400
+X-Gm-Features: AUfX_mypoePVW_V9QEiNQmkROFTAHb_Qou2Cg1fczmyjiuu3ym2vKwtlkHGCPzs
+Message-ID: <CAPS2u-U8ac6JfgFGyWLruCCe5f_Dvk_BRu64jd9Lue8LiOsZbw@mail.gmail.com>
+Subject: [SECURITY] ksmbd: unsigned request bypasses mandatory SMB signing
+To: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 16, 2026 at 12:11:54AM +0000, ChenXiaoSong wrote:
+Hello KSMBD maintainers,
 
-> Some SMB responses keep their data in another buffer. The SMB header
-> and the data are then in different iovs.
-> 
-> The old code only handled this for SMB2 READ. For other commands, it
-> signed only the last iov. QUERY_INFO and CHANGE_NOTIFY can also use
-> another iov for their data. Their SMB header was not signed, so Windows
-> will client rejected the response.
-> 
-> Find the iov that starts with the current SMB header. Sign this iov and
-> all iovs after it.
+KSMBD decides whether to verify an incoming SMB signature based on the
+request-controlled SMB2_FLAGS_SIGNED bit. An unsigned ordinary request
+can therefore skip signature verification even when trusted session
+state requires signing.
 
-...
+Affected Versions
 
-> +static struct kvec *smb2_get_sign_rsp_iov(struct ksmbd_work *work,
-> +					   struct smb2_hdr *hdr, int *n_vec)
-> +{
+The vulnerable gate is present in the initial in-tree KSMBD merge:
 
-> +	int i;
+Commit: e24c567b7ecff1c8b6023a10d7f78256cef742c4
+Release: Linux 5.15
 
-This is not addressed, why?
+The issue remains present in Linux 7.2-rc3:
 
-> +	/*
-> +	 * iov[0] has the RFC1002 message length. It is not part of the SMB2
-> +	 * message, so do not sign it.
-> +	 */
-> +	for (i = 1; i <= work->iov_idx; i++) {
-> +		if (work->iov[i].iov_base == hdr) {
-> +			*n_vec = work->iov_idx - i + 1;
-> +			return &work->iov[i];
-> +		}
-> +	}
-> +
-> +	WARN_ON_ONCE(work->iov_idx < 1 ||
-> +		     work->iov[work->iov_idx].iov_base != hdr);
+Commit: a13c140cc289c0b7b3770bce5b3ad42ab35074aa
 
-The second part of this check is basically always true. What's the point?
+I therefore assess the source-level affected range as Linux 5.15
+through Linux 7.2-rc3.
 
-> +	*n_vec = 1;
-> +	return &work->iov[work->iov_idx];
-> +}
+I dynamically reproduced the issue on Linux 7.1.3:
 
--- 
-With Best Regards,
-Andy Shevchenko
+Commit: 199c9959d3a9b53f346c221757fc7ac507fbac50
 
+I did not dynamically test every intervening stable branch.
 
+Required Conditions
+
+An authenticated plaintext SMB2 or SMB3 session that requires signing.
+An on-path actor able to modify bytes in that transport flow.
+A victim request already authorized for the target operation.
+A session that is not protected by SMB encryption.
+
+Observed Impact
+
+In an owned disposable KSMBD test environment, SMB 3.1.1 negotiated
+server security mode 3, and the client session had signing enabled.
+
+A WRITE request carrying SMB2_FLAGS_SIGNED with a deliberately corrupt
+signature was rejected with STATUS_ACCESS_DENIED.
+
+A WRITE request on the same authenticated context with
+SMB2_FLAGS_SIGNED cleared and no signature returned STATUS_SUCCESS. A
+subsequent signed read and a direct backend check returned exactly:
+
+UNSIGNED_CANARY
+
+The server also signed its response to the accepted unsigned request.
+
+This demonstrates that signature verification works when invoked, but
+an unsigned request bypasses that verification path and is processed
+using the victim session's existing authorization.
+
+The demonstrated impact is same-flow integrity loss.
+
+I am not claiming:
+
+An off-path attack.
+Recovery of the signing key.
+Authority beyond the victim session.
+Code execution.
+A bypass of SMB encryption.
+
+Root Cause
+
+fs/smb/server/smb2pdu.c:smb2_is_sign_req() returns true only when the
+incoming SMB header already contains SMB2_FLAGS_SIGNED.
+
+fs/smb/server/server.c:__process_request() calls check_sign_req() only
+when that predicate returns true. Otherwise, it dispatches the command
+without signature verification.
+
+The requirement to verify a request is therefore derived from
+attacker-controlled message state rather than trusted session or
+channel policy, such as work->sess->sign.
+
+Reproducer and Retained Sequencing Detail
+
+I have a tested Python source reproducer using Impacket.
+
+The reproducer:
+
+Performs a corrupt-signed rejection control.
+Sends an unsigned WRITE request.
+Verifies the resulting backend canary.
+Contains no binary-only components.
+
+The retained test result records MessageId 6 for both crafted requests
+because the harness uses Impacket private internals on a single
+authenticated context.
+
+The accepted unsigned write and the source-level defect provide direct
+evidence of the issue. However, I am preserving this sequencing detail
+rather than overstating the result. A fresh-session or
+transparent-relay rerun would remove that ambiguity, and I can provide
+one if needed.
+
+Because AI assistance was used to review and package this report, I am
+treating the report as public and am not attaching the reproducer to
+this public message. I can provide the Python source and retained
+evidence privately upon request.
+
+Suggested Fix
+
+For every non-exempt command received on a signing-required plaintext
+session, use trusted session or channel state to reject the request
+before handler dispatch if SMB2_FLAGS_SIGNED is absent.
+If SMB2_FLAGS_SIGNED is present, verify the signature before dispatch.
+Preserve protocol-defined signing exceptions.
+Preserve compound-request behavior.
+Preserve multichannel signing-key selection.
+Preserve encrypted-session handling.
+
+Regression tests should cover:
+
+A correctly signed request.
+A request with a corrupt signature.
+An unsigned request on a signing-required session.
+
+Temporary Mitigation
+
+Require SMB encryption for sensitive shares, or place KSMBD traffic
+inside a protected network or VPN until the issue is fixed.
+
+Mandatory SMB signing alone should not be relied upon to provide
+integrity on affected KSMBD versions.
+
+I am available to perform the fresh-session rerun and test a proposed
+fix in the disposable environment.
+
+Regards,
+
+Charles Vosburgh
