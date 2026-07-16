@@ -1,54 +1,41 @@
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B83C273D8D;
-	Thu, 16 Jul 2026 05:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD4031716D
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 09:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784179543; cv=none; b=pAi+LceAr3XXuHgJUZ7sTqhuDVJvByX01Bjm1JVmUB9i/BJQxoOC1dwnyM61N0BKFuSEjZaoI3b6txcUyAx8dHggk/J6o/v3uelVqw5EzNeUPPYezUMSouHEHmjU1LogxNMhJJ7+EYC6jqvwrzxWNRMM0FC1xmNL6xjcAbjDpLM=
+	t=1784195836; cv=none; b=tBPWP0XvDzeTRpNFUaL5i9ZECnuEG4xSH1HLeqZAQNrb1vvL819mgtEKU0dF1lWqb7+kV3UfdBCRy4nAikiBhIefADd65erDBoYp6sfhKEIXYsgN1DHRNnv4XMhwHrQruGIobC45Bgb8MKafLMir/IyCbL8flY4H2TWNb2gA+oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784179543; c=relaxed/simple;
-	bh=Eg4rs88Pvs97dZrxC8Uhs2lELhman4wIA8YuP3rvSLE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hq4qEeyiQCvigrKFWyP+tjLvzaIM2MsFmHCX0mjrFt+i34YzngVJ6MsZUfGI5TwUjl+77MJYRR1TKR5F6Y18+fLfFDdA7Q6a9kXqAElcFEO1ZbeDcfuhzaACun+DTWTapzFRB20DsngyPPyPYG96gy1l2I8wUFCKTUHl8QEaSTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=CikEi481; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1784195836; c=relaxed/simple;
+	bh=OkFgctVZzvqWht8sV3MIXh1UDVnq6j6iWGEBIaF+4tk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QW5h0h2XUJcwgXMq1ewdZb75dhKA1pqTQdZxSbZTZjtAYu97p7MyDmD9NSgU2TpLi+QwO4XRZoVR+bs32bspWgtwk5YTh4ifk5QBbuuMxuDNa7yCrpFta493rNm44AGUIq7SYWZET/kNousBPmnPlNreCzaqZGgVIje/gL/F7Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YT5Wr49V; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="CikEi481"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1784179532;
-	bh=aPD9rbRNLvaQykrfBzm9byOJM2AMPbtidS7K12itR/U=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version;
-	b=CikEi481yjfvdGuFvVBcJQgXEZSn/mAcSn41xbLa6swThqpKZfQM49DDtGc12mxwc
-	 NQ97yxMzER7gUpXEsf0qkJFZOD+AuHoH44XriJDcvJSrAl5TLKLWpSJERliL6h38mA
-	 hY5WYf/ZJ+dlt44YnfymjgHrX/a+AtVH1KO3z1xs=
-X-QQ-mid: esmtpsz20t1784179527td28ff0b5
-X-QQ-Originating-IP: mQL1zNIW6T2XEH3+cBUN1vvkt5rd14wZIBMz7g2v3Lw=
-Received: from uniontech.com ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 16 Jul 2026 13:25:25 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16989616786992538532
-EX-QQ-RecipientCnt: 13
-From: Yichong Chen <chenyichong@uniontech.com>
-To: Steve French <sfrench@samba.org>
-Cc: Steve French <smfrench@gmail.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Pavel Shilovsky <pshilov@microsoft.com>,
-	Aurelien Aptel <aaptel@suse.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	Yichong Chen <chenyichong@uniontech.com>
-Subject: [PATCH v3] smb: client: validate DFS referral PathConsumed
-Date: Thu, 16 Jul 2026 13:25:23 +0800
-Message-Id: <20260716052523.1159415-1-chenyichong@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YT5Wr49V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D82AC1F000E9;
+	Thu, 16 Jul 2026 09:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784195834;
+	bh=dQocDXTCjNTfhaeq2pjocP0fO+h/73SjoxKcf6mModA=;
+	h=From:To:Cc:Subject:Date;
+	b=YT5Wr49V45NN+CtZRumPjn19zDP5/EUbKU3YjQjzxxv7ByZupoDIjsoDHqNSjAQCL
+	 AOfUeugscJlEeeeYjVHmnwsdfaUpRW4Wn+fKh3Esz4NSJ3hGeFuAKJ/Sbyb3r7hvDV
+	 e813j0rJK+LzgqDTm9vWXFa6jaawVcKpLHGHQQLY54HdpVB/vPgjzAFA+qTM0tzhie
+	 C5wEU1eGdQbGsftVpiCLvb5hTg4CgJGc2k4XskuXJS0Om4FJTFH2kYDb8shp71iNYu
+	 GRmDN6aTrbbp9uqbCoyYLxyQ4i3AWsGDfTb1SiNZ8t1L2ue5hCBfwb2ZlPb9a34PKx
+	 Cnf04BYO+OIeg==
+From: Namjae Jeon <linkinjeon@kernel.org>
+To: linux-cifs@vger.kernel.org
+Cc: smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	atteh.mailbox@gmail.com,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH 1/7] ksmbd: implement the command sequence window
+Date: Thu, 16 Jul 2026 18:57:04 +0900
+Message-Id: <20260716095711.6228-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -56,127 +43,297 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: NjLCcymN2JBy85Ke+e5H9OIpE1CY3E3rknVG22g0bUUL4Ft63MER0Nfi
-	vRdPhQzRfDkzxAkH18jvdSN8AtrKLnqoi3aZwbQyvg+Zv3amES5VN0P4Z5BySxHPZpK0eyq
-	u9tU8CfECUChHHW1PPBWazc6C4Go+XOcKOzijPQqEsM9QpJzVbKoIIwPhfrgkTNcbDkiQXS
-	2rXTgv4fBPIxl1zntAqFD016FiudvHbWFiwCdNjW3X12YL8xGIZO9cIFmSJSoiOoBtk7Xjr
-	7a3bq0ARBGMMpAewt3Yjudpn9gvBZLBByF+X7/hB7labM9ckSc9h9W4eMLCuIJNlJgkEDvc
-	GhQ6exf77JY+A8uBBBOMkTygB1AkCGitKqS+wSjkkHfUYLZSNAUkYB64ZhdopFCZdn/FfI0
-	5DOJLE+ece2zswTcgKspM5QYSd3ogpSvOpr8DHZcZBB+EUHBISrxB1Y2OHO7WRxGygvr9da
-	ozG1P16qplIvMoJb75x70nVDOHayQS5HqofV2ps7fX33NqItworixpg9ER9EpSeRC0NQ724
-	pqdWow+be1puN5X+M01439MhtVDI0y6yS8efqjBDSmP+EDfRO/lknpEJhuN8kH0Lr8cJvQy
-	A5kGST+FaqfSdcB/OVWxCi+Rd6ue1+fzREu41RfAYCB2NbEPG5cMiKKYxfGy22nlmYI/2TY
-	n9E+Vu04w8gD5PpROic7+mDR3AIeyuebhaARuAlAI/UUxKc6yVxcjOL/luNLynKwXfE9OE0
-	6ysLtf+GdAA92L7FlVkTIxRd6apBMXKDtO95/h8j60aJPlaPRpFTF8s/j3qBCyetMUchdCP
-	vJfGK/2KLNNNODa54sC1NkMhkoaUZ0OUAyzCnl2YJFilNSMOnieiyemeaPM1hrwzjmiWUYQ
-	GTNy6kZZGaIo20LThceCuwBewPiiLjRSOhDsvQbRJZLPYggJHtMdg3/aAMBEmIg9c/vgXYI
-	DEkLut0aMOSuV/aOQzm1Nomu7La3Ujfkw63pG+JRY4lMW9W6bfH1S5HTlMw4+UTdjnhbAzn
-	qmbx4AZJsWaCZ+IQqLMshsTR7/3Pe3UmhifofFUw==
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
-X-QQ-RECHKSPAM: 0
 
-parse_dfs_referrals() validates that the response contains the fixed
-referral entry array and, on for-next, the per-referral string offsets.
-However, the response also contains a PathConsumed value that is later
-used for DFS path parsing.
+ksmbd tracked only credit counts (total_credits/outstanding_credits) and
+never validated the MessageId of an incoming request. As a result a
+request carrying a MessageId outside the granted range was accepted, a
+MessageId could be replayed, and a 64-bit sequence wrap was not detected.
 
-If a malformed response provides a PathConsumed value larger than the
-search name, later DFS parsing can advance beyond the end of the path.
+Maintain a command sequence window per connection:
 
-Validate PathConsumed against the search name length before storing it in
-the parsed referral.
+  - [seq_low, seq_high) is the range of granted sequence numbers and
+    seq_bitmap records which of them have been granted but not yet
+    consumed. The window starts as { 0 } at connection setup.
+  - smb2_set_rsp_credits() extends seq_high by the number of credits it
+    grants (setting the corresponding bits), capped so the window never
+    spans more than KSMBD_CMD_SEQ_WINDOW (== SMB2_MAX_CREDITS) sequence
+    numbers. This implements the "limit the range of acceptable
+    sequence numbers" allowance and keeps seq_bitmap usable as a ring.
+  - smb2_check_sequence_number(), run for every SMB2 request from
+    ksmbd_smb2_check_message(), verifies that the CreditCharge
+    consecutive sequence numbers starting at MessageId lie within the
+    window and have not already been consumed, then removes them and
+    slides seq_low forward. CANCEL consumes nothing. A violation
+    (out of window, replay, or wrap) tears the connection down.
 
-Fixes: 4ecce920e13a ("CIFS: move DFS response parsing out of SMB1 code")
-Signed-off-by: Yichong Chen <chenyichong@uniontech.com>
+The legacy SMB1 multi-protocol negotiate occupies sequence number 0 but
+does not pass through ksmbd_smb2_check_message(), so it consumes that
+sequence number explicitly; otherwise seq_low would stay pinned at 0
+after the upgrade to SMB2 and eventually stall credit grants.
+
+For an in-order client seq_high - seq_low equals total_credits, so the
+window-room cap never reduces the number of credits granted. it only
+engages for a client that withholds low sequence numbers.
+init_smb2_max_credits() now clamps the configured maximum to
+SMB2_MAX_CREDITS so the window (and its bitmap) can always represent
+every outstanding sequence number.
+
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
-Base:
-- Tree: git://git.samba.org/sfrench/cifs-2.6.git
-- Branch: for-next
-- Commit: d7d2adcd022b ("smb/client: flush dirty data before punching a hole")
+ fs/smb/server/connection.c |  8 ++++
+ fs/smb/server/connection.h | 20 ++++++++++
+ fs/smb/server/smb2misc.c   | 79 ++++++++++++++++++++++++++++++++++++++
+ fs/smb/server/smb2ops.c    |  7 ++++
+ fs/smb/server/smb2pdu.c    | 16 ++++++++
+ fs/smb/server/smb_common.c | 17 +++++++-
+ 6 files changed, 146 insertions(+), 1 deletion(-)
 
-Changes in v3:
-- Rebase on cifs-2.6.git for-next.
-- Keep the string offset checks already present in for-next and only add
-  the remaining PathConsumed validation.
-- Rename the subject to describe the remaining PathConsumed fix.
-
-Changes in v2:
-- Validate non-Unicode PathConsumed against strlen(searchName), as pointed
-  out by Sashiko and Steve.
-
-Changes in v1:
-- Validate DFS referral string offsets and Unicode PathConsumed.
-
- fs/smb/client/misc.c | 34 +++++++++++++++++++++++++---------
- 1 file changed, 25 insertions(+), 9 deletions(-)
-
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index e4bac2a0b85d..b9c59b2cf76a 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -682,6 +682,8 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
- 	int i, rc = 0;
- 	char *data_end;
- 	struct dfs_referral_level_3 *ref;
-+	unsigned int path_consumed;
-+	size_t search_name_len;
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 2de1413ba64e..3d2b8f243a22 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -219,6 +219,14 @@ struct ksmbd_conn *ksmbd_conn_alloc(void)
+ 	conn->total_credits = 1;
+ 	conn->outstanding_credits = 0;
  
- 	if (rsp_size < sizeof(*rsp)) {
- 		cifs_dbg(VFS | ONCE,
-@@ -728,6 +730,7 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
- 		rc = -ENOMEM;
- 		goto parse_DFS_referrals_exit;
- 	}
-+	search_name_len = strlen(searchName);
++	/*
++	 * The command sequence window starts as the set { 0 } when the
++	 * connection is established.
++	 */
++	conn->seq_low = 0;
++	conn->seq_high = 1;
++	__set_bit(0, conn->seq_bitmap);
++
+ 	init_waitqueue_head(&conn->req_running_q);
+ 	init_waitqueue_head(&conn->r_count_q);
+ 	INIT_LIST_HEAD(&conn->requests);
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index 3ecfe4a7e045..8af6e19cc775 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -17,6 +17,7 @@
+ #include <linux/nls.h>
+ #include <linux/unicode.h>
+ #include <linux/workqueue.h>
++#include <linux/bitmap.h>
  
- 	/* collect necessary data from referrals */
- 	for (i = 0; i < *num_of_nodes; i++) {
-@@ -736,21 +739,34 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
- 		struct dfs_info3_param *node = (*target_nodes)+i;
+ #include "smb_common.h"
+ #include "ksmbd_work.h"
+@@ -25,6 +26,15 @@ struct smbdirect_buffer_descriptor_v1;
  
- 		node->flags = le32_to_cpu(rsp->DFSFlags);
-+		path_consumed = le16_to_cpu(rsp->PathConsumed);
- 		if (is_unicode) {
--			__le16 *tmp = kmalloc(strlen(searchName)*2 + 2,
--						GFP_KERNEL);
--			if (tmp == NULL) {
-+			size_t search_name_utf16_len = search_name_len * 2 + 2;
-+			__le16 *tmp;
+ #define KSMBD_SOCKET_BACKLOG		16
+ 
++/*
++ * Size of the per-connection SMB2 command sequence window. This mirrors
++ * SMB2_MAX_CREDITS, the maximum number of credits (and therefore the
++ * maximum number of outstanding sequence numbers) that can be granted on
++ * a connection. It must be a power of two so the window can be indexed as
++ * a ring.
++ */
++#define KSMBD_CMD_SEQ_WINDOW		8192
 +
-+			if (path_consumed > search_name_utf16_len) {
-+				rc = -EINVAL;
-+				goto parse_DFS_referrals_exit;
-+			}
+ enum {
+ 	KSMBD_SESS_NEW = 0,
+ 	KSMBD_SESS_GOOD,
+@@ -74,6 +84,16 @@ struct ksmbd_conn {
+ 	unsigned int			total_credits;
+ 	unsigned int			outstanding_credits;
+ 	spinlock_t			credits_lock;
++	/*
++	 * Connection command sequence window. [seq_low, seq_high) is the
++	 * range of granted sequence numbers (message IDs). seq_bitmap marks
++	 * the ones in that range that have been granted but
++	 * not yet consumed by a received request.  All three are protected by
++	 * credits_lock.
++	 */
++	u64				seq_low;
++	u64				seq_high;
++	DECLARE_BITMAP(seq_bitmap, KSMBD_CMD_SEQ_WINDOW);
+ 	wait_queue_head_t		req_running_q;
+ 	wait_queue_head_t		r_count_q;
+ 	/* Lock to protect requests list*/
+diff --git a/fs/smb/server/smb2misc.c b/fs/smb/server/smb2misc.c
+index 9f3629c86291..532dea7be0b3 100644
+--- a/fs/smb/server/smb2misc.c
++++ b/fs/smb/server/smb2misc.c
+@@ -372,6 +372,75 @@ static int smb2_validate_credit_charge(struct ksmbd_work *work,
+ 	return ret;
+ }
+ 
++/*
++ * Verify that the sequence number(s) consumed by an incoming request fall
++ * within the connection's command sequence window and are not a replay, then
++ * remove them from the window. Returns 0 if the request
++ * may proceed, or 1 if it is invalid and the connection must be torn down.
++ */
++static int smb2_check_sequence_number(struct ksmbd_work *work,
++				      struct smb2_hdr *hdr)
++{
++	struct ksmbd_conn *conn = work->conn;
++	u64 mid = le64_to_cpu(hdr->MessageId);
++	unsigned short charge;
++	u64 i;
++	int ret = 0;
 +
-+			tmp = kmalloc(search_name_utf16_len, GFP_KERNEL);
-+			if (!tmp) {
- 				rc = -ENOMEM;
- 				goto parse_DFS_referrals_exit;
- 			}
--			cifsConvertToUTF16((__le16 *) tmp, searchName,
-+			cifsConvertToUTF16((__le16 *)tmp, searchName,
- 					   PATH_MAX, nls_codepage, remap);
--			node->path_consumed = cifs_utf16_bytes(tmp,
--					le16_to_cpu(rsp->PathConsumed),
--					nls_codepage);
-+			node->path_consumed = cifs_utf16_bytes(tmp, path_consumed,
-+							       nls_codepage);
- 			kfree(tmp);
--		} else
--			node->path_consumed = le16_to_cpu(rsp->PathConsumed);
-+		} else {
-+			if (path_consumed > search_name_len) {
-+				rc = -EINVAL;
-+				goto parse_DFS_referrals_exit;
-+			}
++	/* An SMB2 CANCEL consumes no sequence number. */
++	if (hdr->Command == SMB2_CANCEL)
++		return 0;
 +
-+			node->path_consumed = path_consumed;
++	/*
++	 * A multi-credit request consumes CreditCharge consecutive sequence
++	 * numbers; every other request consumes exactly one.
++	 */
++	charge = le16_to_cpu(hdr->CreditCharge);
++	if (!(conn->vals->req_capabilities & SMB2_GLOBAL_CAP_LARGE_MTU) ||
++	    charge == 0)
++		charge = 1;
++
++	/* The 64-bit sequence number space must not wrap. */
++	if (mid + charge < mid) {
++		pr_err("SMB2 sequence number wrapped (mid %llu charge %u)\n",
++		       mid, charge);
++		return 1;
++	}
++
++	spin_lock(&conn->credits_lock);
++
++	/* The whole range must lie within the granted window... */
++	if (mid < conn->seq_low || mid + charge > conn->seq_high) {
++		ksmbd_debug(SMB,
++			    "MessageId %llu (charge %u) outside command window [%llu, %llu)\n",
++			    mid, charge, conn->seq_low, conn->seq_high);
++		ret = 1;
++		goto out;
++	}
++
++	/* ...and none of it may have been consumed already (replay). */
++	for (i = mid; i < mid + charge; i++) {
++		if (!test_bit(i & (KSMBD_CMD_SEQ_WINDOW - 1), conn->seq_bitmap)) {
++			ksmbd_debug(SMB,
++				    "replayed sequence number %llu (mid %llu charge %u)\n",
++				    i, mid, charge);
++			ret = 1;
++			goto out;
 +		}
++	}
++
++	/* Consume the sequence numbers and slide the low edge forward. */
++	for (i = mid; i < mid + charge; i++)
++		__clear_bit(i & (KSMBD_CMD_SEQ_WINDOW - 1), conn->seq_bitmap);
++	while (conn->seq_low < conn->seq_high &&
++	       !test_bit(conn->seq_low & (KSMBD_CMD_SEQ_WINDOW - 1),
++			 conn->seq_bitmap))
++		conn->seq_low++;
++out:
++	spin_unlock(&conn->credits_lock);
++	return ret;
++}
++
+ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+ {
+ 	struct smb2_pdu *pdu = ksmbd_req_buf_next(work);
+@@ -476,6 +545,16 @@ int ksmbd_smb2_check_message(struct ksmbd_work *work)
+ 	    smb2_validate_credit_charge(work, hdr))
+ 		return 1;
  
- 		node->server_type = le16_to_cpu(ref->ServerType);
- 		node->ref_flag = le16_to_cpu(ref->ReferralEntryFlags);
++	/*
++	 * A sequence number violation (out of window or a replay) is a
++	 * protocol error. tear the connection down rather than
++	 * keep accepting requests on it.
++	 */
++	if (smb2_check_sequence_number(work, hdr)) {
++		ksmbd_conn_set_exiting(work->conn);
++		return 1;
++	}
++
+ 	return 0;
+ }
+ 
+diff --git a/fs/smb/server/smb2ops.c b/fs/smb/server/smb2ops.c
+index 97938150d2d9..761db8d59448 100644
+--- a/fs/smb/server/smb2ops.c
++++ b/fs/smb/server/smb2ops.c
+@@ -330,6 +330,13 @@ void init_smb2_max_trans_size(unsigned int sz)
+ 
+ void init_smb2_max_credits(unsigned int sz)
+ {
++	/*
++	 * The command sequence window (and its backing bitmap) can track at
++	 * most SMB2_MAX_CREDITS outstanding sequence numbers, so the number of
++	 * credits granted on a connection must not exceed that.
++	 */
++	if (sz > SMB2_MAX_CREDITS)
++		sz = SMB2_MAX_CREDITS;
+ 	smb21_server_values.max_credits = sz;
+ 	smb30_server_values.max_credits = sz;
+ 	smb302_server_values.max_credits = sz;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 295cca6cf3ae..e09c60191dc2 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -388,6 +388,7 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
+ 	struct ksmbd_conn *conn = work->conn;
+ 	unsigned short credits_requested, aux_max;
+ 	unsigned short credit_charge, credits_granted = 0;
++	u64 window_room, i;
+ 
+ 	if (work->send_no_response)
+ 		return 0;
+@@ -424,11 +425,26 @@ int smb2_set_rsp_credits(struct ksmbd_work *work)
+ 		aux_max = 1;
+ 	else
+ 		aux_max = conn->vals->max_credits - conn->total_credits;
++
++	/*
++	 * The command sequence window must not grow beyond
++	 * KSMBD_CMD_SEQ_WINDOW sequence numbers ahead of the oldest one still
++	 * outstanding. Cap the grant by the room left in the window so that
++	 * credits are withheld until the client consumes the low end (and so
++	 * that seq_bitmap stays usable as a ring).
++	 */
++	window_room = conn->seq_low + KSMBD_CMD_SEQ_WINDOW - conn->seq_high;
++	aux_max = min_t(unsigned short, aux_max, window_room);
+ 	credits_granted = min_t(unsigned short, credits_requested, aux_max);
+ 
+ 	conn->total_credits += credits_granted;
+ 	work->credits_granted += credits_granted;
+ 
++	/* Extend the sequence window to cover the newly granted credits. */
++	for (i = conn->seq_high; i < conn->seq_high + credits_granted; i++)
++		__set_bit(i & (KSMBD_CMD_SEQ_WINDOW - 1), conn->seq_bitmap);
++	conn->seq_high += credits_granted;
++
+ 	if (!req_hdr->NextCommand) {
+ 		/* Update CreditRequest in last request */
+ 		hdr->CreditRequest = cpu_to_le16(work->credits_granted);
+diff --git a/fs/smb/server/smb_common.c b/fs/smb/server/smb_common.c
+index 7de73223189a..e41bdd1bbffa 100644
+--- a/fs/smb/server/smb_common.c
++++ b/fs/smb/server/smb_common.c
+@@ -164,7 +164,22 @@ int ksmbd_verify_smb_message(struct ksmbd_work *work)
+ 	hdr = smb_get_msg(work->request_buf);
+ 	if (*(__le32 *)hdr->Protocol == SMB1_PROTO_NUMBER &&
+ 	    hdr->Command == SMB_COM_NEGOTIATE) {
+-		work->conn->outstanding_credits++;
++		struct ksmbd_conn *conn = work->conn;
++
++		conn->outstanding_credits++;
++		/*
++		 * A legacy SMB1 multi-protocol negotiate occupies sequence
++		 * number 0 but does not pass through
++		 * ksmbd_smb2_check_message(). Consume it here so that, after
++		 * the connection is upgraded to SMB2, the command sequence
++		 * window can advance instead of staying pinned at 0.
++		 */
++		spin_lock(&conn->credits_lock);
++		if (conn->seq_low == 0) {
++			__clear_bit(0, conn->seq_bitmap);
++			conn->seq_low = 1;
++		}
++		spin_unlock(&conn->credits_lock);
+ 		return 0;
+ 	}
+ 
 -- 
-2.51.0
+2.25.1
 
