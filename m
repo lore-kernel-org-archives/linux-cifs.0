@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CC340862A
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 10:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE33409617
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 10:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784197864; cv=none; b=PJCBYD3Iyn04mUHxANchH6DClmh/eQkv7UtRrRm+6s9IScbMoZc+4TxVVLbQ6LS+iEx6h304ndgBXYJHUeKtcR7/ahxbBj3ax5dQymzTKfetCOoIqmA+nmHiLxcaetDNEObii3W2hWqFwm/6T5rAzfJ37qOPkY/lBdElyJ21ZHg=
+	t=1784197884; cv=none; b=MDzBCWNFi13kE09AsPEgtSYNXbkBxSaizlnSSWA1rwGDayfgZEoF/waTeIy/IpHkOSktOK02Gdu7TYY/zLbMBxPKDkRsjqcJy1Xr0d1PCUl0vKzWxuPNXHYusyCDCySrTKcIeUFagrpeVypUrEgT9H94cVXZVOAGCx+8IFGgrpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784197864; c=relaxed/simple;
-	bh=WnUrIoFsPW78MzYAVx0FrQKBJh5ob5aqpScAtxwFRGA=;
+	s=arc-20240116; t=1784197884; c=relaxed/simple;
+	bh=W2r34cI+XaaQUdqCi3aOgKHvzlTyAT8XuHNk4YjX+HU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aHYc+8dSlDMeVEEpR0j/dX4Vtc7++3zjJ94QzB0/JPcStrEXE8AM/JlgIRDsU5lN7QUZbXhAqjKLz/8y02qMaCDeKa0i9zG/YLWJQH5BJ8VJdS8pT6Evmbkl92EnOQ3Qo9saUk+wqcKjlH/S4bfNxRVXwHg7gUFpKkFqGorp+B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BHhNCGn8; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=sGYxle/JaX+WlocVr4ko3zbjdryGe7JZt60qwimB3bxTRuBZvBU5/9EUwtPli5q27a6Ehuch9jk9SOynr2DnE8tU5b0AUn8XvtO4QxxyJcy3TSnDWZQbKL8EWR+rvtKU0ywJxdvUQeb4lN2flOCU+K6KWC5wSU5rQRmHh92x0As=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ds1D9Qtb; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BHhNCGn8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ds1D9Qtb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784197861;
+	s=mimecast20190719; t=1784197881;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oAh3PBs47lZUHcwbeGXM5gS5ZzePV60tR0gQfqSs8Ac=;
-	b=BHhNCGn8J5Mv7Jz2h4VGubxbuIktb5qZC7zzO7zqfH7F1Mad2634rww053cJ76W89Eittu
-	dL3x5Egc2nmT3XmIifRHOvH4eJBsNAhdejFEu72jNlCAyVTWyUYdnqBL2wPTrI8M+f7fpf
-	al1gKS9H4LkAf8ISb3l/Gid9sLfbQ3g=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+	bh=forfFVNHXdcKUrAO6tYWFvQxC3xkWQUr9XOJVlaCNVg=;
+	b=ds1D9QtbY2GpJh8F6rxbzZfIoTZs4qMF/ZajkxbFMbdlQ4Gn/xUKRaWRmZMQU57uVFUcwX
+	J6nxfiu/tC3PCiw3ZykHsBfXz2jhN//ugOUWJe1/tOYOnVGFF5MH2Fk8eUhOW6TARamriW
+	AgkOeacQ4NXnEyIcEZ4RfS4NY+OQ3Gs=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-217-t8HdhapWPiGaIYNsjldZrA-1; Thu,
- 16 Jul 2026 06:30:58 -0400
-X-MC-Unique: t8HdhapWPiGaIYNsjldZrA-1
-X-Mimecast-MFC-AGG-ID: t8HdhapWPiGaIYNsjldZrA_1784197855
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-572-CRMZ5cTANlyRJrFFM9ec3g-1; Thu,
+ 16 Jul 2026 06:31:18 -0400
+X-MC-Unique: CRMZ5cTANlyRJrFFM9ec3g-1
+X-Mimecast-MFC-AGG-ID: CRMZ5cTANlyRJrFFM9ec3g_1784197875
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 25FA11800663;
-	Thu, 16 Jul 2026 10:30:54 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0BCA11800610;
+	Thu, 16 Jul 2026 10:31:13 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 44DE830040BE;
-	Thu, 16 Jul 2026 10:30:45 +0000 (UTC)
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 96F2C42C;
+	Thu, 16 Jul 2026 10:31:05 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Matthew Wilcox <willy@infradead.org>,
@@ -66,10 +66,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH v6 01/24] mm: Make readahead store folio count in readahead_control
-Date: Thu, 16 Jul 2026 11:30:00 +0100
-Message-ID: <20260716103030.3065561-2-dhowells@redhat.com>
+	linux-block@vger.kernel.org
+Subject: [PATCH v6 03/24] Add a function to kmap one page of a multipage bio_vec
+Date: Thu, 16 Jul 2026 11:30:02 +0100
+Message-ID: <20260716103030.3065561-4-dhowells@redhat.com>
 In-Reply-To: <20260716103030.3065561-1-dhowells@redhat.com>
 References: <20260716103030.3065561-1-dhowells@redhat.com>
 Precedence: bulk
@@ -79,96 +79,49 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-Make readahead store folio count in readahead_control so that the
-filesystem can know in advance how many folios it needs to keep track of.
-
-This is cleared by read_pages() in case it is called from a loop.
-
-The count is accessed by the filesystem with readahead_folio_count().
+Add a function to kmap one page of a multipage bio_vec by offset (which is
+added to the offset in the bio_vec internally).  The caller is responsible
+for calculating how much of the page is then available.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 cc: Matthew Wilcox <willy@infradead.org>
+cc: Christoph Hellwig <hch@infradead.org>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
 cc: netfs@lists.linux.dev
-cc: linux-mm@kvack.org
 cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/pagemap.h | 10 ++++++++++
- mm/readahead.c          |  5 +++++
- 2 files changed, 15 insertions(+)
+ include/linux/bvec.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index 2c3718d592d6..e1e51bace388 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -1348,6 +1348,7 @@ struct readahead_control {
- 	struct file_ra_state *ra;
- /* private: use the readahead_* accessors instead */
- 	pgoff_t _index;
-+	unsigned int _nr_folios;
- 	unsigned int _nr_pages;
- 	unsigned int _batch_count;
- 	bool dropbehind;
-@@ -1527,6 +1528,15 @@ static inline size_t readahead_batch_length(const struct readahead_control *rac)
- 	return rac->_batch_count * PAGE_SIZE;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 92837e2743f1..53cf36e73967 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
+ 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
  }
  
 +/**
-+ * readahead_folio_count - Get the number of folios in this readahead request.
-+ * @rac: The readahead request.
++ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
++ * @bvec: bvec to map
++ * @offset: Offset into bvec
++ *
++ * Map the page containing the byte at @offset into the kernel virtual address
++ * space.  The caller is responsible for making sure this doesn't overrun.
++ *
++ * Call kunmap_local on the returned address to unmap.
 + */
-+static inline unsigned int readahead_folio_count(const struct readahead_control *rac)
++static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
 +{
-+	return rac->_nr_folios;
++	offset += bvec->bv_offset;
++
++	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
++		(offset & ~PAGE_MASK);
 +}
 +
- static inline unsigned long dir_pages(const struct inode *inode)
- {
- 	return (unsigned long)(inode->i_size + PAGE_SIZE - 1) >>
-diff --git a/mm/readahead.c b/mm/readahead.c
-index 558c92957518..069ded56fd80 100644
---- a/mm/readahead.c
-+++ b/mm/readahead.c
-@@ -188,6 +188,7 @@ static void read_pages(struct readahead_control *rac)
- 	if (unlikely(rac->_workingset))
- 		psi_memstall_leave(&rac->_pflags);
- 	rac->_workingset = false;
-+	rac->_nr_folios = 0;
- 
- 	BUG_ON(readahead_count(rac));
- }
-@@ -303,6 +304,7 @@ void page_cache_ra_unbounded(struct readahead_control *ractl,
- 		if (i == mark)
- 			folio_set_readahead(folio);
- 		ractl->_workingset |= folio_test_workingset(folio);
-+		ractl->_nr_folios++;
- 		ractl->_nr_pages += min_nrpages;
- 		i += min_nrpages;
- 	}
-@@ -473,6 +475,7 @@ static inline int ra_alloc_folio(struct readahead_control *ractl, pgoff_t index,
- 		return err;
- 	}
- 
-+	ractl->_nr_folios++;
- 	ractl->_nr_pages += 1UL << order;
- 	ractl->_workingset |= folio_test_workingset(folio);
- 	return 0;
-@@ -822,6 +825,7 @@ void readahead_expand(struct readahead_control *ractl,
- 			ractl->_workingset = true;
- 			psi_memstall_enter(&ractl->_pflags);
- 		}
-+		ractl->_nr_folios++;
- 		ractl->_nr_pages += min_nrpages;
- 		ractl->_index = folio->index;
- 	}
-@@ -851,6 +855,7 @@ void readahead_expand(struct readahead_control *ractl,
- 			ractl->_workingset = true;
- 			psi_memstall_enter(&ractl->_pflags);
- 		}
-+		ractl->_nr_folios++;
- 		ractl->_nr_pages += min_nrpages;
- 		if (ra) {
- 			ra->size += min_nrpages;
+ #endif /* __LINUX_BVEC_H */
 
