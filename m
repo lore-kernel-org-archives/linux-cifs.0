@@ -1,47 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0474A40A93A;
-	Thu, 16 Jul 2026 10:18:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86253932FF
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 10:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784197113; cv=none; b=LXK+wizg/vUigk29oKR4jWChV2u00D7hifUd56DyLKORlzu8OeFzF2kHc6jQjCQglMUInYwKsXRZkGMcR3IYmHMNLDaw1LRNzyq8qOt+BwFzLh2S8tdAEQUsqgWwJ16pagG1TOpIUal/3CxUJ3+UYvoRcgDUJjfmV9a/ufx7DHc=
+	t=1784197858; cv=none; b=bM1+kzr7oMgC/ht9CdUpnHgwz/inpHB1F/BqvXvtavX/LmPDi2T3FpCA4hyk4fzrRnJZkmnhQVhLdAE96J9HFL6hrahWpaEUmMRgXKJyG4mKfaL3KIBwvVIyS59TfiL3aNgv9RMTPVntAGrX6XTc9gcgkS74RX0/UyszNFZZYis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784197113; c=relaxed/simple;
-	bh=O+loincgkBi6FKRv4EWYkomnMvbYoP13tiNxXu/fpIs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RwLuRQto78TQoijfOoVIsG4Dsy/AJXoIOzE7qGLdYgMQp5x0wUcaByOqBuIwGxRUqfctt7BkjUlZ3jWmfKryqCFsk0xK4cteYplwP9hesfd3ySc95OI1Mx2qUzM3PTbdEmUxzaq7aZgmGRvcs3O9T6F4TdQuX34dkpW8xMPPcLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hMDXGShy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784197858; c=relaxed/simple;
+	bh=ORDooges1OgtewRUuE1qynoPWShLCsHEy9otIyeM6pk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ONQL/nqWN+lOLcvHPtqtjE7vPLs9SAdFLncTBq1jyU3Fu9wSwdKFp5U+UXJiD/+C2WDJJG8h6I6ENKlO2EnXmRgDQiuXvUY0VecE0ofOOGh8BAssTbaqZIvl2rOktTQJUaE1rcXWqbq8jqFl2YAsfmzMNMhqgHXCeNBuheEqxOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hUFhlM46; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hMDXGShy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D45F81F000E9;
-	Thu, 16 Jul 2026 10:18:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784197111;
-	bh=ClLEuZ29J/hqerKq0i+dkPQNdBMJlSxBbjim/R8xEDc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=hMDXGShy4lfbRQ7KYs5rKEMOZfSThVH+Ip8qzZCxsvGujXc7oRv3GcLy89wTiD/7e
-	 ql4Y4LAI0VGL/78TP3BKuangXDsP6h1m3kArsvR6ZRL4xYClc3O5sb9bAev9f7kCGQ
-	 gftN++5S4J4XAZ11zK8Vlce5k7hUU9qk8ZQzOkEvQ7xHyCE4lDYplgeWPimmODucja
-	 6RKdE1zPUcd8v5J05u8JPfO/8WcH5w1VD1vXlpXjAtwobWRE9ZUdceoTM6pqoG7hbL
-	 +vhppsnXOzmBB3fMaqQhy7pTGXQ/v+GZ1VDrKPS4dKUktnOgkcvbslQAO8A5J6AwcM
-	 nId+Qnrq3oq/Q==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUFhlM46"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1784197855;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=LCD1QH8tShzLQLk8deUswfjQP7JWBdJETWFpsQLOZ7Y=;
+	b=hUFhlM46qfwJUMFRf2f/4fhUtlhTbSouknJ4viFKVa4c2u1arpEQDWKqigKX9QEqbiwGKn
+	gVfRLZxF7rb3w7QlAtinYKdKhGy5EaOedEWc8DXVYIR/re38YMAG4+ICGHG13LRwDLoxaT
+	XJkwEYNgwPM9PwhtJ8hedsR/SIDiVnI=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-HIkNFeM_N3CXAh_qGFvagQ-1; Thu,
+ 16 Jul 2026 06:30:49 -0400
+X-MC-Unique: HIkNFeM_N3CXAh_qGFvagQ-1
+X-Mimecast-MFC-AGG-ID: HIkNFeM_N3CXAh_qGFvagQ_1784197846
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84AC91955D9C;
+	Thu, 16 Jul 2026 10:30:44 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.33.159])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id ED73D180034C;
+	Thu, 16 Jul 2026 10:30:34 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>
 Cc: David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.com>,
-	Shyam Prasad N <nspmangalore@gmail.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1.y 4/5] cifs: Add tracing for the cifs_tcon struct refcounting
-Date: Thu, 16 Jul 2026 06:18:23 -0400
-Message-ID: <20260716101824.1461870-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260716101824.1461870-1-sashal@kernel.org>
-References: <2026071415-visiting-rise-04bc@gregkh>
- <20260716101824.1461870-1-sashal@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 00/24] netfs: Keep track of folios in a segmented bio_vec[] chain
+Date: Thu, 16 Jul 2026 11:29:59 +0100
+Message-ID: <20260716103030.3065561-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -49,583 +74,477 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-From: David Howells <dhowells@redhat.com>
+Hi Christian,
 
-[ Upstream commit afc23febd51c7e24361e3a9c09f3e892eb0a41ea ]
+Could you add these patches to the VFS tree for next?
 
-Add tracing for the refcounting/lifecycle of the cifs_tcon struct, marking
-different events with different labels and giving each tcon its own debug
-ID so that the tracelines corresponding to individual tcons can be
-distinguished.  This can be enabled with:
+The patches get rid of folio_queue, rolling_buffer and ITER_FOLIOQ,
+replacing the folio queue construct used to manage buffers in netfslib with
+one based around a segmented chain of bio_vec arrays instead.  There are
+three main aims here:
 
-	echo 1 >/sys/kernel/debug/tracing/events/cifs/smb3_tcon_ref/enable
+ (1) The kernel file I/O subsystem seems to be moving towards consolidating
+     on the use of bio_vec arrays, so embrace this by moving netfslib to
+     keep track of its buffers for buffered I/O in bio_vec[] form.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.com>
-cc: Shyam Prasad N <nspmangalore@gmail.com>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Stable-dep-of: ec457f9afe5a ("smb: client: resolve SWN tcon from live registrations")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/cifs_swn.c      | 13 +++--
- fs/smb/client/cifsfs.c        |  2 +
- fs/smb/client/cifsglob.h      |  1 +
- fs/smb/client/cifsproto.h     |  8 ++-
- fs/smb/client/connect.c       | 21 ++++----
- fs/smb/client/dfs_cache.c     |  2 +-
- fs/smb/client/fscache.c       |  7 +++
- fs/smb/client/misc.c          | 12 +++--
- fs/smb/client/smb2misc.c      | 10 ++--
- fs/smb/client/smb2ops.c       |  7 ++-
- fs/smb/client/smb2pdu.c       |  8 +--
- fs/smb/client/smb2transport.c |  2 +
- fs/smb/client/trace.h         | 93 ++++++++++++++++++++++++++++++++++-
- 13 files changed, 151 insertions(+), 35 deletions(-)
+ (2) Netfslib already uses a bio_vec[] to handle unbuffered/DIO, so the
+     number of different buffering schemes used can be reduced to just a
+     single one.
 
-diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
-index 7233c6a7e6d70b..35a3e73c195806 100644
---- a/fs/smb/client/cifs_swn.c
-+++ b/fs/smb/client/cifs_swn.c
-@@ -313,17 +313,15 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
- 	reg = cifs_find_swn_reg(tcon);
- 	if (!IS_ERR(reg)) {
- 		kref_get(&reg->ref_count);
--		mutex_unlock(&cifs_swnreg_idr_mutex);
--		return reg;
-+		goto unlock;
- 	} else if (PTR_ERR(reg) != -EEXIST) {
--		mutex_unlock(&cifs_swnreg_idr_mutex);
--		return reg;
-+		goto unlock;
- 	}
- 
- 	reg = kmalloc(sizeof(struct cifs_swn_reg), GFP_ATOMIC);
- 	if (reg == NULL) {
--		mutex_unlock(&cifs_swnreg_idr_mutex);
--		return ERR_PTR(-ENOMEM);
-+		ret = -ENOMEM;
-+		goto fail_unlock;
- 	}
- 
- 	kref_init(&reg->ref_count);
-@@ -354,7 +352,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
- 	reg->ip_notify = (tcon->capabilities & SMB2_SHARE_CAP_SCALEOUT);
- 
- 	reg->tcon = tcon;
--
-+unlock:
- 	mutex_unlock(&cifs_swnreg_idr_mutex);
- 
- 	return reg;
-@@ -365,6 +363,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
- 	idr_remove(&cifs_swnreg_idr, reg->id);
- fail:
- 	kfree(reg);
-+fail_unlock:
- 	mutex_unlock(&cifs_swnreg_idr_mutex);
- 	return ERR_PTR(ret);
- }
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index c2a9d7004ff598..b76997b1188444 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -747,6 +747,8 @@ static void cifs_umount_begin(struct super_block *sb)
- 
- 	spin_lock(&cifs_tcp_ses_lock);
- 	spin_lock(&tcon->tc_lock);
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+			    netfs_trace_tcon_ref_see_umount);
- 	if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
- 		/* we have other mounts to same share or we have
- 		   already tried to umount this and woken up
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index a63de0ee134108..0f404625c2f4ae 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1121,6 +1121,7 @@ struct cifs_fattr {
-  */
- struct cifs_tcon {
- 	struct list_head tcon_list;
-+	int debug_id;		/* Debugging for tracing */
- 	int tc_count;
- 	struct list_head rlist; /* reconnect list */
- 	spinlock_t tc_lock;  /* protect anything here that is not protected */
-diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 7734e7ea5f4d8e..8cfa504e6bd837 100644
---- a/fs/smb/client/cifsproto.h
-+++ b/fs/smb/client/cifsproto.h
-@@ -305,7 +305,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 		     struct TCP_Server_Info *primary_server);
- extern void cifs_put_tcp_session(struct TCP_Server_Info *server,
- 				 int from_reconnect);
--extern void cifs_put_tcon(struct cifs_tcon *tcon);
-+extern void cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
- 
- #if IS_ENABLED(CONFIG_CIFS_DFS_UPCALL)
- extern void cifs_dfs_release_automount_timer(void);
-@@ -525,8 +525,8 @@ extern int CIFSSMBLogoff(const unsigned int xid, struct cifs_ses *ses);
- 
- extern struct cifs_ses *sesInfoAlloc(void);
- extern void sesInfoFree(struct cifs_ses *);
--extern struct cifs_tcon *tconInfoAlloc(void);
--extern void tconInfoFree(struct cifs_tcon *);
-+extern struct cifs_tcon *tconInfoAlloc(enum smb3_tcon_ref_trace trace);
-+extern void tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace);
- 
- extern int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
- 		   __u32 *pexpected_response_sequence_number);
-@@ -719,8 +719,6 @@ static inline int cifs_create_options(struct cifs_sb_info *cifs_sb, int options)
- 		return options;
- }
- 
--struct super_block *cifs_get_tcon_super(struct cifs_tcon *tcon);
--void cifs_put_tcon_super(struct super_block *sb);
- int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry);
- 
- static inline void release_mid(struct mid_q_entry *mid)
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 605476fac102b4..e7426896449ea9 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1985,7 +1985,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 		}
- 	}
- 
--	tcon = tconInfoAlloc();
-+	tcon = tconInfoAlloc(netfs_trace_tcon_ref_new_ipc);
- 	if (tcon == NULL)
- 		return -ENOMEM;
- 
-@@ -2002,7 +2002,7 @@ cifs_setup_ipc(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 
- 	if (rc) {
- 		cifs_server_dbg(VFS, "failed to connect to IPC (rc=%d)\n", rc);
--		tconInfoFree(tcon);
-+		tconInfoFree(tcon, netfs_trace_tcon_ref_free_ipc_fail);
- 		goto out;
- 	}
- 
-@@ -2085,7 +2085,7 @@ void cifs_put_smb_ses(struct cifs_ses *ses)
- 	 * files on session close, as specified in MS-SMB2 3.3.5.6 Receiving an
- 	 * SMB2 LOGOFF Request.
- 	 */
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free_ipc);
- 	if (do_logoff) {
- 		xid = get_xid();
- 		rc = server->ops->logoff(xid, ses);
-@@ -2459,6 +2459,8 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 			continue;
- 		}
- 		++tcon->tc_count;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_get_find);
- 		spin_unlock(&tcon->tc_lock);
- 		spin_unlock(&cifs_tcp_ses_lock);
- 		return tcon;
-@@ -2468,7 +2470,7 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- }
- 
- void
--cifs_put_tcon(struct cifs_tcon *tcon)
-+cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- {
- 	unsigned int xid;
- 	struct cifs_ses *ses;
-@@ -2484,6 +2486,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	cifs_dbg(FYI, "%s: tc_count=%d\n", __func__, tcon->tc_count);
- 	spin_lock(&cifs_tcp_ses_lock);
- 	spin_lock(&tcon->tc_lock);
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count - 1, trace);
- 	if (--tcon->tc_count > 0) {
- 		spin_unlock(&tcon->tc_lock);
- 		spin_unlock(&cifs_tcp_ses_lock);
-@@ -2517,7 +2520,7 @@ cifs_put_tcon(struct cifs_tcon *tcon)
- 	_free_xid(xid);
- 
- 	cifs_fscache_release_super_cookie(tcon);
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free);
- 	cifs_put_smb_ses(ses);
- }
- 
-@@ -2565,7 +2568,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 		goto out_fail;
- 	}
- 
--	tcon = tconInfoAlloc();
-+	tcon = tconInfoAlloc(netfs_trace_tcon_ref_new);
- 	if (tcon == NULL) {
- 		rc = -ENOMEM;
- 		goto out_fail;
-@@ -2762,7 +2765,7 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 	return tcon;
- 
- out_fail:
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free_fail);
- 	return ERR_PTR(rc);
- }
- 
-@@ -2779,7 +2782,7 @@ cifs_put_tlink(struct tcon_link *tlink)
- 	}
- 
- 	if (!IS_ERR(tlink_tcon(tlink)))
--		cifs_put_tcon(tlink_tcon(tlink));
-+		cifs_put_tcon(tlink_tcon(tlink), netfs_trace_tcon_ref_put_tlink);
- 	kfree(tlink);
- 	return;
- }
-@@ -3338,7 +3341,7 @@ static inline void mount_put_conns(struct mount_ctx *mnt_ctx)
- 	int rc = 0;
- 
- 	if (mnt_ctx->tcon)
--		cifs_put_tcon(mnt_ctx->tcon);
-+		cifs_put_tcon(mnt_ctx->tcon, netfs_trace_tcon_ref_put_mnt_ctx);
- 	else if (mnt_ctx->ses)
- 		cifs_put_smb_ses(mnt_ctx->ses);
- 	else if (mnt_ctx->server)
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index 3bc1d3494be3a5..0c88408d369aa4 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -1564,7 +1564,7 @@ static void refresh_mounts(struct cifs_ses **sessions)
- 		}
- 		mutex_unlock(&server->refpath_lock);
- 
--		cifs_put_tcon(tcon);
-+		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_dfs_refer);
- 	}
- }
- 
-diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
-index fb47da1d96168f..0ebf144ea825fe 100644
---- a/fs/smb/client/fscache.c
-+++ b/fs/smb/client/fscache.c
-@@ -94,6 +94,11 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 		}
- 		pr_err("Cache volume key already in use (%s)\n", key);
- 		vcookie = NULL;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_fscache_collision);
-+	} else {
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_fscache_okay);
- 	}
- 
- 	tcon->fscache = vcookie;
-@@ -115,6 +120,8 @@ void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon)
- 	cifs_fscache_fill_volume_coherency(tcon, &cd);
- 	fscache_relinquish_volume(tcon->fscache, &cd, false);
- 	tcon->fscache = NULL;
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+			    netfs_trace_tcon_ref_see_fscache_relinq);
- }
- 
- void cifs_fscache_get_inode_cookie(struct inode *inode)
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index db897c38970312..5d44e951bde085 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -116,9 +116,10 @@ sesInfoFree(struct cifs_ses *buf_to_free)
- }
- 
- struct cifs_tcon *
--tconInfoAlloc(void)
-+tconInfoAlloc(enum smb3_tcon_ref_trace trace)
- {
- 	struct cifs_tcon *ret_buf;
-+	static atomic_t tcon_debug_id;
- 
- 	ret_buf = kzalloc(sizeof(*ret_buf), GFP_KERNEL);
- 	if (!ret_buf)
-@@ -131,7 +132,8 @@ tconInfoAlloc(void)
- 
- 	atomic_inc(&tconInfoAllocCount);
- 	ret_buf->status = TID_NEW;
--	++ret_buf->tc_count;
-+	ret_buf->debug_id = atomic_inc_return(&tcon_debug_id);
-+	ret_buf->tc_count = 1;
- 	spin_lock_init(&ret_buf->tc_lock);
- 	INIT_LIST_HEAD(&ret_buf->openFileList);
- 	INIT_LIST_HEAD(&ret_buf->tcon_list);
-@@ -142,17 +144,19 @@ tconInfoAlloc(void)
- #ifdef CONFIG_CIFS_FSCACHE
- 	mutex_init(&ret_buf->fscache_lock);
- #endif
-+	trace_smb3_tcon_ref(ret_buf->debug_id, ret_buf->tc_count, trace);
- 
- 	return ret_buf;
- }
- 
- void
--tconInfoFree(struct cifs_tcon *tcon)
-+tconInfoFree(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- {
- 	if (tcon == NULL) {
- 		cifs_dbg(FYI, "Null buffer passed to tconInfoFree\n");
- 		return;
- 	}
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count, trace);
- 	free_cached_dirs(tcon->cfids);
- 	atomic_dec(&tconInfoAllocCount);
- 	kfree(tcon->nativeFileSystem);
-@@ -848,7 +852,7 @@ void cifs_close_all_deferred_files_sb(struct cifs_sb_info *cifs_sb)
- 	list_for_each_entry_safe(tmp_list, q, &tcon_head, entry) {
- 		cifs_close_all_deferred_files(tmp_list->tcon);
- 		list_del(&tmp_list->entry);
--		cifs_put_tcon(tmp_list->tcon);
-+		cifs_put_tcon(tmp_list->tcon, netfs_trace_tcon_ref_put_tlink);
- 		kfree(tmp_list);
- 	}
- }
-diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
-index cc6fa92a39eeb5..acecba5c5f4848 100644
---- a/fs/smb/client/smb2misc.c
-+++ b/fs/smb/client/smb2misc.c
-@@ -768,7 +768,7 @@ smb2_cancelled_close_fid(struct work_struct *work)
- 	if (rc)
- 		cifs_tcon_dbg(VFS, "Close cancelled mid failed rc:%d\n", rc);
- 
--	cifs_put_tcon(tcon);
-+	cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cancelled_close_fid);
- 	kfree(cancelled);
- }
- 
-@@ -812,6 +812,8 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
- 	if (tcon->tc_count <= 0) {
- 		struct TCP_Server_Info *server = NULL;
- 
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_cancelled_close);
- 		WARN_ONCE(tcon->tc_count < 0, "tcon refcount is negative");
- 		spin_unlock(&cifs_tcp_ses_lock);
- 
-@@ -825,12 +827,14 @@ smb2_handle_cancelled_close(struct cifs_tcon *tcon, __u64 persistent_fid,
- 		return 0;
- 	}
- 	tcon->tc_count++;
-+	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+			    netfs_trace_tcon_ref_get_cancelled_close);
- 	spin_unlock(&cifs_tcp_ses_lock);
- 
- 	rc = __smb2_handle_cancelled_cmd(tcon, SMB2_CLOSE_HE, 0,
- 					 persistent_fid, volatile_fid);
- 	if (rc)
--		cifs_put_tcon(tcon);
-+		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cancelled_close);
- 
- 	return rc;
- }
-@@ -858,7 +862,7 @@ smb2_handle_cancelled_mid(struct mid_q_entry *mid, struct TCP_Server_Info *serve
- 					 rsp->PersistentFileId,
- 					 rsp->VolatileFileId);
- 	if (rc)
--		cifs_put_tcon(tcon);
-+		cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_cancelled_mid);
- 
- 	return rc;
- }
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 8bcecd19e901c9..842465eff5824c 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2847,8 +2847,11 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 		tcon = list_first_entry_or_null(&ses->tcon_list,
- 						struct cifs_tcon,
- 						tcon_list);
--		if (tcon)
-+		if (tcon) {
- 			tcon->tc_count++;
-+			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+					    netfs_trace_tcon_ref_get_dfs_refer);
-+		}
- 		spin_unlock(&cifs_tcp_ses_lock);
- 	}
- 
-@@ -2912,6 +2915,8 @@ smb2_get_dfs_refer(const unsigned int xid, struct cifs_ses *ses,
- 		/* ipc tcons are not refcounted */
- 		spin_lock(&cifs_tcp_ses_lock);
- 		tcon->tc_count--;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_dec_dfs_refer);
- 		/* tc_count can never go negative */
- 		WARN_ON(tcon->tc_count < 0);
- 		spin_unlock(&cifs_tcp_ses_lock);
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 961d37daf154df..c911a7db66ebc5 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -3995,6 +3995,8 @@ void smb2_reconnect_server(struct work_struct *work)
- 		list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
- 			if (tcon->need_reconnect || tcon->need_reopen_files) {
- 				tcon->tc_count++;
-+				trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+						    netfs_trace_tcon_ref_get_reconnect_server);
- 				list_add_tail(&tcon->rlist, &tmp_list);
- 				tcon_selected = tcon_exist = true;
- 			}
-@@ -4040,14 +4042,14 @@ void smb2_reconnect_server(struct work_struct *work)
- 		if (tcon->ipc)
- 			cifs_put_smb_ses(tcon->ses);
- 		else
--			cifs_put_tcon(tcon);
-+			cifs_put_tcon(tcon, netfs_trace_tcon_ref_put_reconnect_server);
- 	}
- 
- 	if (!ses_exist)
- 		goto done;
- 
- 	/* allocate a dummy tcon struct used for reconnect */
--	tcon = tconInfoAlloc();
-+	tcon = tconInfoAlloc(netfs_trace_tcon_ref_new_reconnect_server);
- 	if (!tcon) {
- 		resched = true;
- 		list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
-@@ -4070,7 +4072,7 @@ void smb2_reconnect_server(struct work_struct *work)
- 		list_del_init(&ses->rlist);
- 		cifs_put_smb_ses(ses);
- 	}
--	tconInfoFree(tcon);
-+	tconInfoFree(tcon, netfs_trace_tcon_ref_free_reconnect_server);
- 
- done:
- 	cifs_dbg(FYI, "Reconnecting tcons and channels finished\n");
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 92eea7ba75c080..3a69f3500acdea 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -189,6 +189,8 @@ smb2_find_smb_sess_tcon_unlocked(struct cifs_ses *ses, __u32  tid)
- 		if (tcon->tid != tid)
- 			continue;
- 		++tcon->tc_count;
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_get_find_sess_tcon);
- 		return tcon;
- 	}
- 
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index d3053bd8ae7312..fb80bb28fdcffc 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -3,6 +3,9 @@
-  *   Copyright (C) 2018, Microsoft Corporation.
-  *
-  *   Author(s): Steve French <stfrench@microsoft.com>
-+ *
-+ * Please use this 3-part article as a reference for writing new tracepoints:
-+ * https://lwn.net/Articles/379903/
-  */
- #undef TRACE_SYSTEM
- #define TRACE_SYSTEM cifs
-@@ -15,9 +18,71 @@
- #include <linux/inet.h>
- 
- /*
-- * Please use this 3-part article as a reference for writing new tracepoints:
-- * https://lwn.net/Articles/379903/
-+ * Specify enums for tracing information.
-+ */
-+#define smb3_tcon_ref_traces					      \
-+	EM(netfs_trace_tcon_ref_dec_dfs_refer,		"DEC DfsRef") \
-+	EM(netfs_trace_tcon_ref_free,			"FRE       ") \
-+	EM(netfs_trace_tcon_ref_free_fail,		"FRE Fail  ") \
-+	EM(netfs_trace_tcon_ref_free_ipc,		"FRE Ipc   ") \
-+	EM(netfs_trace_tcon_ref_free_ipc_fail,		"FRE Ipc-F ") \
-+	EM(netfs_trace_tcon_ref_free_reconnect_server,	"FRE Reconn") \
-+	EM(netfs_trace_tcon_ref_get_cancelled_close,	"GET Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_get_dfs_refer,		"GET DfsRef") \
-+	EM(netfs_trace_tcon_ref_get_find,		"GET Find  ") \
-+	EM(netfs_trace_tcon_ref_get_find_sess_tcon,	"GET FndSes") \
-+	EM(netfs_trace_tcon_ref_get_reconnect_server,	"GET Reconn") \
-+	EM(netfs_trace_tcon_ref_new,			"NEW       ") \
-+	EM(netfs_trace_tcon_ref_new_ipc,		"NEW Ipc   ") \
-+	EM(netfs_trace_tcon_ref_new_reconnect_server,	"NEW Reconn") \
-+	EM(netfs_trace_tcon_ref_put_cancelled_close,	"PUT Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_put_cancelled_close_fid, "PUT Cn-Fid") \
-+	EM(netfs_trace_tcon_ref_put_cancelled_mid,	"PUT Cn-Mid") \
-+	EM(netfs_trace_tcon_ref_put_mnt_ctx,		"PUT MntCtx") \
-+	EM(netfs_trace_tcon_ref_put_dfs_refer,		"PUT DfsRfr") \
-+	EM(netfs_trace_tcon_ref_put_reconnect_server,	"PUT Reconn") \
-+	EM(netfs_trace_tcon_ref_put_tlink,		"PUT Tlink ") \
-+	EM(netfs_trace_tcon_ref_see_cancelled_close,	"SEE Cn-Cls") \
-+	EM(netfs_trace_tcon_ref_see_fscache_collision,	"SEE FV-CO!") \
-+	EM(netfs_trace_tcon_ref_see_fscache_okay,	"SEE FV-Ok ") \
-+	EM(netfs_trace_tcon_ref_see_fscache_relinq,	"SEE FV-Rlq") \
-+	E_(netfs_trace_tcon_ref_see_umount,		"SEE Umount")
-+
-+#undef EM
-+#undef E_
-+
-+/*
-+ * Define those tracing enums.
-+ */
-+#ifndef __SMB3_DECLARE_TRACE_ENUMS_ONCE_ONLY
-+#define __SMB3_DECLARE_TRACE_ENUMS_ONCE_ONLY
-+
-+#define EM(a, b) a,
-+#define E_(a, b) a
-+
-+enum smb3_tcon_ref_trace { smb3_tcon_ref_traces } __mode(byte);
-+
-+#undef EM
-+#undef E_
-+#endif
-+
-+/*
-+ * Export enum symbols via userspace.
-+ */
-+#define EM(a, b) TRACE_DEFINE_ENUM(a);
-+#define E_(a, b) TRACE_DEFINE_ENUM(a);
-+
-+smb3_tcon_ref_traces;
-+
-+#undef EM
-+#undef E_
-+
-+/*
-+ * Now redefine the EM() and E_() macros to map the enums to the strings that
-+ * will be printed in the output.
-  */
-+#define EM(a, b)	{ a, b },
-+#define E_(a, b)	{ a, b }
- 
- /* For logging errors in read or write */
- DECLARE_EVENT_CLASS(smb3_rw_err_class,
-@@ -1062,6 +1127,30 @@ DEFINE_SMB3_CREDIT_EVENT(waitff_credits);
- DEFINE_SMB3_CREDIT_EVENT(overflow_credits);
- DEFINE_SMB3_CREDIT_EVENT(set_credits);
- 
-+
-+TRACE_EVENT(smb3_tcon_ref,
-+	    TP_PROTO(unsigned int tcon_debug_id, int ref,
-+		     enum smb3_tcon_ref_trace trace),
-+	    TP_ARGS(tcon_debug_id, ref, trace),
-+	    TP_STRUCT__entry(
-+		    __field(unsigned int,		tcon)
-+		    __field(int,			ref)
-+		    __field(enum smb3_tcon_ref_trace,	trace)
-+			     ),
-+	    TP_fast_assign(
-+		    __entry->tcon	= tcon_debug_id;
-+		    __entry->ref	= ref;
-+		    __entry->trace	= trace;
-+			   ),
-+	    TP_printk("TC=%08x %s r=%u",
-+		      __entry->tcon,
-+		      __print_symbolic(__entry->trace, smb3_tcon_ref_traces),
-+		      __entry->ref)
-+	    );
-+
-+
-+#undef EM
-+#undef E_
- #endif /* _CIFS_TRACE_H */
- 
- #undef TRACE_INCLUDE_PATH
--- 
-2.53.0
+ (3) Always send an entire filesystem RPC request message to a TCP socket
+     with single kernel_sendmsg() call as this is faster, more efficient
+     and doesn't require the use of corking as it puts the entire
+     transmission loop inside of a single tcp_sendmsg().
+
+For the replacement of folio_queue, a segmented chain of bio_vec arrays
+rather than a single monolithic array is provided:
+
+	struct bvecq {
+		struct bvecq		*next;
+		struct bvecq		*prev;
+		unsigned long long	fpos;
+		refcount_t		ref;
+		u32			priv;
+		u16			nr_slots;
+		u16			max_slots;
+		enum bvecq_mem		mem_type:2;
+		bool			inline_bv:1;
+		bool			discontig:1;
+		struct bio_vec		*bv;
+		struct bio_vec		__bv[];
+	};
+
+The fields are:
+
+ (1) next, prev - Link segments together in a list.  I want this to be
+     NULL-terminated linear rather than circular to make it possible to
+     arbitrarily glue bits on the front.
+
+ (2) fpos, discontig - Note the current file position of the first byte of
+     the segment and whether this bvecq is discontiguous with the previous.
+     When accessing the pagecache to clear flags/locks, the fpos can be
+     used to look up folios by file position rather than by finding those
+     folios from the info stored in the bio_vecs.
+
+     When the file position is relevant, the model I'm working with is that
+     all the segments pointed to by a single bvecq must represent
+     contiguous data, but adjacent bvecqs within a chain need not be
+     contiguous.  This allows a bvecq chain to be used to provide bufferage
+     for a sparse read or write RPC such as can be done with Ceph.
+
+     If a bvecq segment is not contiguous with the previous one,
+     ->discontig should be set (this is technically redundant if one keeps
+     track of the fpos as a bvecq chain is processed).
+
+     Note that the beginning and end file positions in a segment need not
+     be aligned to any filesystem block size.
+
+ (3) ref - Refcount.  Each bvecq keeps a ref on the next.  I'm not sure
+     this is entirely necessary, but it makes sharing slices easier.
+
+ (4) priv - Private data for the owner.  Dispensible; currently only used
+     for storing a debug ID for tracing in a patch not included here.
+
+ (5) max_slots, nr_slots.  The size of bv[] and the number of slots used.
+     I've assumed a maximum of 65535 bio_vecs in the array (which would
+     represent a ~1MiB allocation).
+
+ (6) bv, __bv, inline_bv.  bv points to the bio_vec[] array handled by
+     this segment.  This may begin at __bv and if it does inline_bv should
+     be set (otherwise it's impossible to distinguish a separately
+     allocated bio_vec[] that follows immediately by coincidence).
+
+ (7) mem_type.  Indicates how the memory attached to the bio_vecs should be
+     disposed of when the bvecq is destroyed.  It can be one of:
+
+	BVECQ_MEM_EXTERNAL	- Externally tracked ref; don't put
+	BVECQ_MEM_PAGECACHE	- Pagecache; must be put
+	BVECQ_MEM_GUP		- Pinned by from GUP; needs unpin
+	BVECQ_MEM_ALLOCED	- Plain alloc'd pages; can be mempooled
+
+     [!] I'm not sure that this is a good name for this member or for the
+     	 enum values.
+
+I've also defined an iov_iter iterator type ITER_BVECQ to walk this sort of
+construct so that it can be passed directly to sendmsg() or block-based DIO
+(as cachefiles does).
+
+
+This series makes the following changes to netfslib:
+
+ (1) Remove the writethrough code as the locking is really tricky to get
+     right and it looks like it could deadlock with Ceph if snapshots are
+     used.
+
+ (2) The folio_queue chain used to hold folios for buffered I/O is replaced
+     with a bvecq chain.  Each bio_vec then holds (a portion of) one folio.
+     Each bvecq holds a contiguous sequence of folios, but adjacent bvecqs
+     in a chain may be discontiguous.
+
+ (3) For unbuffered/DIO, the source iov_iter is extracted into a bvecq
+     chain.
+
+ (4) An abstract position representation ('bvecq_pos') is created that can
+     used to hold a position in a bvecq chain.  For the moment, this takes
+     a ref on the bvecq it points to, but that may be excessive.
+
+ (5) Buffer tracking is managed with three cursors:  The load_cursor, at
+     which new folios are added as we go; the dispatch_cursor, at which new
+     subrequests' buffers start when they're created; and the
+     collect_cursor, the point at which folios are being unlocked.
+
+     Not all cursors are necessarily needed in all situations and during
+     buffered writeback, we need a dispatch cursor per stream (one for the
+     network filesystem and one for the cache).
+
+ (6) ->prepare_read(), buffer setting up and ->issue_read() are merged, as
+     are the write variants, with the filesystem calling back up to
+     netfslib to prepare its buffer.  This simplifies the process of
+     setting up a subrequest.  It may even make sense to have the
+     filesystem allocate the subrequest.
+
+ (7) Retry dispatch tracking is added to netfs_io_request so that the
+     buffer preparation functions can find it.  Retry requires an
+     additional buffer cursor.
+
+ (8) Netfslib dispatches I/O by accumulating enough bufferage to dispatch
+     at least one subrequest, then looping to generate as many as the
+     filesystem wants to (they may be limited by other constraints,
+     e.g. max RDMA segment count or negotiated max size).  This loop could
+     be moved down into the filesystem.  A new method is provided by which
+     netfslib can ask the filesystem to provide an estimate of the data
+     that should be accumulated before dispatch begins.
+
+ (9) Reading from the cache is now managed by querying the cache to provide
+     a list of the next two data extents within the cache.
+
+(10) AFS directories are switched to using a bvecq rather than a
+     folio_queue to hold their contents.
+
+(11) CIFS is switch to using a bvecq rather than a folio_queue for holding
+     a temporary encryption buffer.
+
+(12) CIFS RDMA is given the ability to extract ITER_BVECQ and support for
+     extracting ITER_FOLIOQ is removed.
+
+(13) All the folio_queue and rolling_buffer code is removed.
+
+Cachefiles is also modified:
+
+ (1) On-demand mode for Erofs is removed.
+
+ (2) The object type in the cachefiles file xattr is now correctly set to
+     CACHEFILES_CONTENT_{SINGLE,ALL,BACKFS_MAP} rather than just being 0,
+     to indicate whether we have a single monolithic blob, all the data up
+     to cache i_size with no holes or a sparse file with the data mapped by
+     the backing file system (as currently upstream).
+
+ (3) For "ALL" type files, the cache's i_size is used to track how much
+     data is saved in the cache and no longer bears any relation to the
+     netfs i_size.  The actual object size is stored in the xattr.
+
+ (4) For most typical files which are contiguous and written progressively,
+     the object type is now set to "ALL".  For anything else, cachefiles
+     uses SEEK_DATA/HOLE to find extent outlines at before (this is the
+     current behaviour and needs to be fixed, but in a separate set of
+     patches as it's not trivial).
+
+Two further things that I'm working on (but not in this branch) are:
+
+ (1) Make it so that a filesystem can be given a copy of a subchain which
+     it can then tack header and trailer protocol elements upon to form a
+     single message (I have this working for cifs) and even join copies
+     together with intervening protocol elements to form compounds.
+
+ (2) Make it so that a filesystem can 'splice' out the contents of the TCP
+     receive queue into a bvecq chain.  This allows the socket lock to be
+     dropped much more quickly and the copying of data read to the
+     destination buffers to happen without the lock.  I have this working
+     for cifs too.  Kernel recvmsg() doesn't then block kernel sendmsg()
+     for anywhere near as long.
+
+There are also some things I want to consider for the future:
+
+ (1) Create one or more batched iteration functions to 'unlock' all the
+     folios in a bio_vec[], where 'unlock' is the appropriate action for
+     ending a read or a write.  Batching should hopefully also improve the
+     efficiency of wrangling the marks on the xarray.  Very often these
+     marks are going to be represented by contiguous bits, so there may be
+     a way to change them in bulk.
+
+ (2) Rather than walking the bvecq chain to get each individual folio out
+     via bv_page, use the file position stored on the bvecq and the sum of
+     bv_len to iterate over the appropriate range in i_pages.
+
+ (3) Change iov_iter to store the initial starting point and for
+     iov_iter_revert() to reset to that and advance.  This would (a) help
+     prevent over-reversion and (b) dispense with the need for a prev
+     pointer.
+
+ (4) Use bvecq to replace scatterlist.  One problem with replacing
+     scatterlist is that crypto drivers like to glue bits on the front of
+     the scatterlists they're given (something trivial with that API) - and
+     this is one way to achieve it.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next
+
+Thanks,
+David
+
+Changes
+=======
+ver #6)
+- Rebased on v7.2-rc3.
+- Added a patch to remove erofs on-demand support from cachefiles.
+- Added a patch to remove the writethrough code as it's really tricky to
+  get the locking right and it looks like can deadlock itself with Ceph.
+- Fixed a number of bugs reported by Sashiko[4].
+  - Fixed iov_iter_single_seg_count(), iov_iter_alignment_bvecq() and
+    iov_npages_bvecq() to handle zero-length segments and segments with no
+    stuff remaining.
+  - Fixed bvecq_extract() to use GFP_NOFS rather than GFP_KERNEL.
+  - Fixed bvecq_alloc_buffer2()'s use of alloc_pages_bulk().
+  - Fixed netfs_extract_iter() to break out of the inner loop if max_pages
+    hits zero.
+  - Added a patch to fix meta block mapping in afs_edit_dir_remove().
+  - Fixed afs_init_new_symlink() to clear the tail of the symlink page.
+  - Fixed cachefiles_begin_operation() to deal with a NULL file.
+  - Fixed slot check in netfs_read_gaps() to be >=, not >.
+  - Fixed netfs_pgpriv2_copy_folio() to update creq->last_end.
+  - Fixed netfs_read_single() to return -EIO if the buffer isn't big
+    enough.
+  - Add a comment to netfs_write_folio() to indicate that truncate must
+    not run concurrently with writeback and must exclude/wait for it.
+  - In netfs_read_subreq_terminated(), move the netfs_sreq_trace_too_much
+    trace line earlier before ->transferred is clobbered.
+  - In netfs_read_subreq_terminated(), make the transfer-too-long case
+    avoid retrying and just end with EIO (in case data further along in the
+    buffer got corrupted).
+  - Fixed netfs_collect_read_results() if it sees front->transferred >
+    front->len, to just use front->len instead.
+  - Fixed ceph_netfs_issue_op_inline() to prep the buffer before setting
+    NETFS_SREQ_HIT_EOF so that subreq->content is set.
+  - Alter netfs_read_to_pagecache() to not round up reading from
+    zero-containing cache granules as no I/O is required.
+  - Made ->issue_write() return an error so that errors before any buffer
+    is sliced off don't result in an infinite loop in netfs_issue_writes().
+  - Made ->issue_read() return an error also for similiar reasons.
+  - In netfs_writepages(), handle -ENOMEM from bvecq prealloc before
+    caling netfs_queue_wb_folio() rather than doing it on the combined
+    error return of that and netfs_issue_streams() which can result in a
+    double unlock.
+  - Fix netfs_writeback_single() to write nothing if len == 0.
+
+ver #5)
+- Rebased on v7.2-rc2 as that has a bunch of outstanding netfs and afs
+  bugfixes included.
+
+ver #4)
+- Fixed a number of bugs reported by Sashiko[3].
+  - Added a patch to fix an underflow in iov_iter_extract_xarray_pages().
+  - Added a patch to fix alloc failure in iov_iter_extract_bvec_pages().
+  - Added a patch to remove an unused var in kunit code.
+  - Added a patch to fix the folio offset in extract_xarray_to_sg().
+  - Added a patch to fix the exclusion over writeback to make it cover
+    collection too.
+  - Fixed double fput() in cachefiles.
+  - Fixed the collection of cache writes to handle cancellation better.
+  - Fixed iterate_bvecq() to skip bvecq structs with nr_slots==0.
+  - Add a comment into iterate_bvecq() that a slot with bv_len>0 must have a
+    valid bv_page.
+  - Fixed iov_iter_bvecq_advance(), iov_iter_bvecq_revert(),
+    iter_count_bvecq_pages(), iov_iter_extract_bvecq_pages() and
+    extract_bvecq_to_sg() to correctly handle empty bvecqs.
+  - Fixed extract_bvecq_to_sg() to be limited by iter->count.
+  - Fixed bvecq_expand_buffer() to take an unsigned size param.
+  - Fixed bvecq_expand_buffer() to not mix memory types in alloc'd bvecqs.
+  - Fixed bvecq_shorten_buffer() occasional retention of zero-length slots.
+  - Fixed slot validity check polarity in bvecq_pos_advance(); also don't use
+    inner loop otherwise break then exits the wrong loop.
+  - Fixed bvecq_zero(), bvecq_slice() and bvecq_extract to use a barrier when
+    checking bq->nr_slots.
+  - Restructured bvecq_zero() to be similar to bvecq_pos_advance().
+  - Fixed an off-by-one error in bvecq_pos_step() and added a missing slot
+    reset.
+  - Fixed a break in netfs_extract_iter() that should have been a goto.
+  - Fixed netfs_extract_iter() to limit number of pages extracted to remnant
+    of max_pages.
+  - Fixed an uninit var in afs_do_read_symlink().
+  - Fixed netfs_read_gaps() to fill a multipart bvecq chain correctly.
+  - Fixed netfs_dispatch_unbuffered_reads() to initialise collect_cursor as
+    netfs_rreq_assess_dio() uses it to flush the data read.
+  - Fixed netfs_extract_iter() to init the slot counter outside the extract
+    loop to avoid overwriting already loaded slots.
+  - Fixed callers of bvecq_delete_spent() to update bvecq_pos::slot before
+    calling.
+  - Fixed netfs_reissue_write() to make sure subreq->content is unset before
+    setting.
+  - Altered netfs_extract_iter() to free any allocated bvecq chain if no pages
+    were extracted and an error occurred  (and to initialise the return
+    pointer to NULL).  Also, made it return an empty bvecq if nothing was
+    extracted, but no error occurred.
+  - Fixed ceph_netfs_issue_read() to just return if
+    ceph_netfs_issue_op_inline() returns anything other than 1 to avoid a
+    double termination.
+  - Fixed ceph_netfs_issue_read() to do the size calculation in the right
+    order to avoid the op expanding to larger than the buffer.
+  - Fixed netfs_issue_read(), in the NETFS_FILL_WITH_ZEROES case, to deduct
+    subreq->len from stream->buffered rather than just setting it to 0.
+  - Fixed netfs_perform_write() to put the folio if netfs_advance_writethrough()
+    fails.
+  - Restored the old ->prepare_write op specifically for
+    fscache_write_to_cache() which is still used by Ceph.
+  - Fixed undefined return in netfs_pgpriv2_issue_stream().
+  - Fixed netfs_collect_write_results() to try to make sure a request isn't
+    left paused if there are no further server-bound subreqs.
+  - Fixed netfs_queue_wb_folio() to redirty the folio before unlocking it if
+    it can't allocate a bvecq.
+  - Fixed netfs_writepages() to cancel the pagecache iteration after ENOMEM.
+  - Fixed netfs_advance/end_writethrough() to advance the dispatch cursor.
+  - Fixed netfs_retry_read_subrequests() to use barriers when walking
+    stream->subrequests as the app may add another subreq before pausing.
+  - Fixed netfs_prepare_write_retry_buffer() to use ->retry_start and
+    ->retry_buffered rather than ->issue_from and ->buffered.
+  - Fixed netfs_retry_write_stream() to use barriers when walking
+    stream->subrequests as the app may add another subreq before pausing.
+  - Fixed netfs_retry_write_stream() to check the correct length when adding
+    additional subreqs.
+  - Fixed nfs_netfs_issue_read() to set -ENOMEM, not 0, on alloc failure.
+  - Fixed nfs_netfs_issue_read() to only terminate the subreq once.
+  - Fixed cifs_issue_read() to release the credits if cifs_reopen_file()
+    fails.
+- Rebased on v7.1.
+
+ver #3)
+- Rebased to -rc7 as the patches wouldn't apply for Christian.
+- Prepended a fix for a warning from generic/464 (the problem also exists
+  upstream, just not the warning).
+- Renamed kmap_local_bvec() to bvec_kmap_partial() as requested by
+  Christoph.
+- Adjusted smbdirect patch descriptions as requested by Stefan Metzmacher.
+
+ver #2)
+- Fixed a number of bugs reported by Sashiko[1].
+- Split a bunch of fixes out and posted them separately[2].
+
+[1] https://sashiko.dev/#/patchset/20260326104544.509518-1-dhowells%40redhat.com
+[2] https://lore.kernel.org/linux-fsdevel/20260512-infozentrum-becher-7f86c47c96c8@brauner/T/#t
+[3] https://sashiko.dev/#/patchset/20260608145432.681865-1-dhowells%40redhat.com
+[4] https://sashiko.dev/#/patchset/20260706153408.1231650-1-dhowells%40redhat.com
+
+David Howells (23):
+  mm: Make readahead store folio count in readahead_control
+  netfs: Bulk load the readahead-provided folios up front
+  Add a function to kmap one page of a multipage bio_vec
+  iov_iter: Make iov_iter_get_pages*() wrap iov_iter_extract_pages()
+  iov_iter: Add a segmented queue of bio_vec[]
+  netfs: Add some tools for managing bvecq chains
+  netfs: Add a function to extract from an iter into a bvecq
+  afs: Fix afs_edit_dir_remove() to get, not find, block 0
+  afs: Use a bvecq to hold dir content rather than folioq
+  cifs: Use a bvecq for buffering instead of a folioq
+  smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
+  netfs: Remove the writethrough code
+  cachefiles: Don't rely on backing fs storage map for most use cases
+  netfs: Add the cache object ID to netfs_read/write tracepoints
+  netfs: Switch to using bvecq rather than folio_queue and
+    rolling_buffer
+  smbdirect: Remove support for ITER_FOLIOQ from
+    smbdirect_map_sges_from_iter()
+  netfs: Remove netfs_alloc/free_folioq_buffer()
+  netfs: Remove netfs_extract_user_iter()
+  iov_iter: Remove ITER_FOLIOQ
+  netfs: Remove folio_queue and rolling_buffer
+  netfs: Check for too much data being read
+  netfs: Limit the minimum trigger for progress reporting
+  netfs: Combine prepare and issue ops and grab the buffers on request
+
+Gao Xiang (1):
+  cachefiles,netfs: sunset ondemand mode
+
+ Documentation/core-api/folio_queue.rst      |  209 ----
+ Documentation/core-api/index.rst            |    1 -
+ Documentation/filesystems/netfs_library.rst |    2 +-
+ fs/9p/vfs_addr.c                            |   61 +-
+ fs/afs/dir.c                                |   40 +-
+ fs/afs/dir_edit.c                           |   45 +-
+ fs/afs/dir_search.c                         |   33 +-
+ fs/afs/file.c                               |   33 +-
+ fs/afs/fsclient.c                           |    8 +-
+ fs/afs/inode.c                              |    2 +-
+ fs/afs/internal.h                           |   14 +-
+ fs/afs/symlink.c                            |   37 +-
+ fs/afs/write.c                              |   36 +-
+ fs/afs/yfsclient.c                          |    6 +-
+ fs/cachefiles/Kconfig                       |   12 -
+ fs/cachefiles/Makefile                      |    1 -
+ fs/cachefiles/daemon.c                      |   76 +-
+ fs/cachefiles/interface.c                   |   90 +-
+ fs/cachefiles/internal.h                    |  141 +--
+ fs/cachefiles/io.c                          |  557 +++++++---
+ fs/cachefiles/namei.c                       |   27 +-
+ fs/cachefiles/ondemand.c                    |  761 -------------
+ fs/cachefiles/xattr.c                       |   24 +-
+ fs/ceph/Kconfig                             |    1 +
+ fs/ceph/addr.c                              |  129 ++-
+ fs/netfs/Kconfig                            |    3 +
+ fs/netfs/Makefile                           |    4 +-
+ fs/netfs/buffered_read.c                    |  525 +++++----
+ fs/netfs/buffered_write.c                   |   59 +-
+ fs/netfs/bvecq.c                            |  761 +++++++++++++
+ fs/netfs/direct_read.c                      |  108 +-
+ fs/netfs/direct_write.c                     |  162 +--
+ fs/netfs/fscache_io.c                       |    4 +-
+ fs/netfs/internal.h                         |  107 +-
+ fs/netfs/iterator.c                         |  391 +++----
+ fs/netfs/main.c                             |    1 -
+ fs/netfs/misc.c                             |  168 +--
+ fs/netfs/objects.c                          |   22 +-
+ fs/netfs/read_collect.c                     |  170 +--
+ fs/netfs/read_pgpriv2.c                     |  203 ++--
+ fs/netfs/read_retry.c                       |  246 ++---
+ fs/netfs/read_single.c                      |  173 +--
+ fs/netfs/rolling_buffer.c                   |  222 ----
+ fs/netfs/stats.c                            |    6 +-
+ fs/netfs/write_collect.c                    |  242 +++--
+ fs/netfs/write_issue.c                      | 1074 ++++++++++---------
+ fs/netfs/write_retry.c                      |  170 +--
+ fs/nfs/Kconfig                              |    1 +
+ fs/nfs/fscache.c                            |   17 +-
+ fs/smb/client/cifsglob.h                    |    2 +-
+ fs/smb/client/cifssmb.c                     |   13 +-
+ fs/smb/client/file.c                        |  152 +--
+ fs/smb/client/smb2ops.c                     |   82 +-
+ fs/smb/client/smb2pdu.c                     |   28 +-
+ fs/smb/client/transport.c                   |   15 +-
+ fs/smb/smbdirect/connection.c               |  134 ++-
+ include/linux/bvec.h                        |   18 +
+ include/linux/bvecq.h                       |  326 ++++++
+ include/linux/folio_queue.h                 |  282 -----
+ include/linux/fscache.h                     |   17 +
+ include/linux/iov_iter.h                    |   87 +-
+ include/linux/netfs.h                       |  183 ++--
+ include/linux/pagemap.h                     |   10 +
+ include/linux/rolling_buffer.h              |   61 --
+ include/linux/uio.h                         |   17 +-
+ include/trace/events/cachefiles.h           |   17 +-
+ include/trace/events/netfs.h                |  159 ++-
+ kernel/bpf/btf.c                            |    2 -
+ lib/iov_iter.c                              |  557 +++++-----
+ lib/scatterlist.c                           |   82 +-
+ lib/tests/kunit_iov_iter.c                  |  135 ++-
+ mm/readahead.c                              |    5 +
+ net/9p/client.c                             |    8 +-
+ 73 files changed, 4805 insertions(+), 4772 deletions(-)
+ delete mode 100644 Documentation/core-api/folio_queue.rst
+ delete mode 100644 fs/cachefiles/ondemand.c
+ create mode 100644 fs/netfs/bvecq.c
+ delete mode 100644 fs/netfs/rolling_buffer.c
+ create mode 100644 include/linux/bvecq.h
+ delete mode 100644 include/linux/folio_queue.h
+ delete mode 100644 include/linux/rolling_buffer.h
 
