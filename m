@@ -1,131 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FCD446072;
-	Thu, 16 Jul 2026 18:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF0F330D34
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 20:24:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784226139; cv=none; b=ouqEqDtU/be35/uTdowrnDE9uBCKHX3EoGDUAHjPQPmUjd8U/IELDd++6Qk2rpyUU15aS3VMcTnDxyUGGvXLqnyv8jYqmSgWHwNco17mC92RZ9rsWJCTrqnGoU446TQLsnrUxi5cfcqi6WpCKoI8+c/SRBzdieIE1IV+/yx9yFM=
+	t=1784233473; cv=none; b=KCdzSgaTTZNbMw1VO//KlfSiXPwYKf9umxD6t2we0cGA7nzg22+1US6l3tpvFmigsnuEzU0DK5jzqGL2kiHB/O02ZVAKlMPVJ7gaqDYYBMpJNEmisaTxjGZP9VBaKMeV63WyMK5ZP7l/MF37n8TNiJkd1dCacxzD4nzJCuFY7M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784226139; c=relaxed/simple;
-	bh=kNPi6pA+SRJTGfGulqUHyhvPI3unB2m0lySgnyzDc9k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ba5dWBdSxIO0lBauN8UA6XwNyPuO4EgxkVd+ZDsKFiwTWwyxPQnxCOko0BNwE8zPiJH4CZHY3XVE3rOdLKqg5TP4+PcrIZMXoJYuIAqFBfQ1GGcghdOyE5Bmpx6tTGe/DzjQ7CxrsnfJ6WSV/HkJpT3jZaNeRpblQGDnTXNqw14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImDq0oFL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784233473; c=relaxed/simple;
+	bh=08CGPI/5kIcllDq0Kq72++xeicSn1hZcZgUCquRhsEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DdeSoF7V8rrp/NbZE2QcAcRia/RCjTW/1sVz2imSOE+nQlkB1QUg4785fSO9MjgCnh2gfdXePNGnD29EkZQ94oKML047coUW9++uq7kqoUWl3G95fXOs1KbJCmK2mBM6Fg/1e/Vd/C8O6CuzAAHilsdjQB9NtdEdhgL7B46pp6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RcB19yfn; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImDq0oFL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D17D51F00ACF;
-	Thu, 16 Jul 2026 18:22:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784226130;
-	bh=Cw1/b6JLbNyPN4ogntGJaoqzdeHTObSMsULLRlJB8Z4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ImDq0oFL2XnUrXjlrzGzkeKd3xuUWLwU1k+D13OjLxGq0tZe8G4FteCqoHXp/iJLE
-	 E/tmT20QVkcMa7OIi67boWC61/2QDDMbVrQ+UTu230Ljfw1RZAGm8EYkMbtwn+h2bk
-	 yA4AO7Ks61JGvvHAM/iAR9SZTTL3/btBXCJjry/zZI7kFfT/ia/GC+Tfcd8FesYbmr
-	 sJ8OdaUFlJe3Ro4ZzLGWhCYqiLIQw79seWj8wHfuwWRdxKoH9J+KtoHix8s2lkNEX/
-	 7fPIhVpTik3fPCs520/OrCJMB4bpJ/4sIifRJxkW4S5fiAW6SwSms331Q/EhybwPRy
-	 TyQgkR5GL79EA==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	stable@kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15.y 4/7] ksmbd: fix mechToken leak when SPNEGO decode fails after token alloc
-Date: Thu, 16 Jul 2026 14:22:02 -0400
-Message-ID: <20260716182205.921233-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260716182205.921233-1-sashal@kernel.org>
-References: <2026071415-rambling-chooser-b760@gregkh>
- <20260716182205.921233-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RcB19yfn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1784233472; x=1815769472;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=08CGPI/5kIcllDq0Kq72++xeicSn1hZcZgUCquRhsEY=;
+  b=RcB19yfnLzLOQru7VexsNDc5ES+1bSxZ/5HieekZmdh8YNND/Mdr3XMe
+   YwiUq9WmZC/AhZ25HhBuhEgEzLxG515jPGlU424hJYPj6BMAGoevMiBSi
+   /U15qEqxXlO7Nrngyil8KNIS2V/pBdFModcrFeSQH+ig9Vp1UIur5n6/R
+   Z2cHklA6KMntGPmzpW+iguvzcjMxQF8rlODnrgpQfXL9urPNC81OmlcQH
+   aov6nctuBqBC7HYRMs6S1/VZ5aT9umd/PUX7l3uXEwWIt7SxuF4iuG00s
+   OkS/rcakW4gk2BBOE/9f5WiWw0y7A8oT7xSpKhnsonWgXWDwVzmDotgJ0
+   g==;
+X-CSE-ConnectionGUID: LyppIYvOSqSTNN9BCLstnw==
+X-CSE-MsgGUID: QeyGhiN3SP6CuFgVb2S0vA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11848"; a="84949299"
+X-IronPort-AV: E=Sophos;i="6.25,168,1779174000"; 
+   d="scan'208";a="84949299"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2026 13:24:31 -0700
+X-CSE-ConnectionGUID: fWtSydooR+WhQ2NttFxGmw==
+X-CSE-MsgGUID: YsHZs7F7TCWyjx9ZNKY6mw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,168,1779174000"; 
+   d="scan'208";a="260895121"
+Received: from conormcd-mobl2.ger.corp.intel.com (HELO localhost) ([10.245.245.26])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2026 13:24:28 -0700
+Date: Thu, 16 Jul 2026 23:24:25 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	bharathsm@microsoft.com, senozhatsky@chromium.org,
+	dhowells@redhat.com, metze@samba.org, gael.blivet@gmail.com,
+	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re: [PATCH v2 1/3] smb/server: fix signing when a response uses more
+ than one iov
+Message-ID: <alk9-WOWQeHaq0wV@ashevche-desk.local>
+References: <20260716001156.671587-1-chenxiaosong@chenxiaosong.com>
+ <20260716001156.671587-2-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260716001156.671587-2-chenxiaosong@chenxiaosong.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+On Thu, Jul 16, 2026 at 12:11:54AM +0000, ChenXiaoSong wrote:
 
-[ Upstream commit ad0057fb91218914d6c98268718ceb9d59b388e1 ]
+> Some SMB responses keep their data in another buffer. The SMB header
+> and the data are then in different iovs.
+> 
+> The old code only handled this for SMB2 READ. For other commands, it
+> signed only the last iov. QUERY_INFO and CHANGE_NOTIFY can also use
+> another iov for their data. Their SMB header was not signed, so Windows
+> will client rejected the response.
+> 
+> Find the iov that starts with the current SMB header. Sign this iov and
+> all iovs after it.
 
-The kernel ASN.1 BER decoder calls action callbacks incrementally as it
-walks the input.  When ksmbd_decode_negTokenInit() reaches the mechToken
-[2] OCTET STRING element, ksmbd_neg_token_alloc() allocates
-conn->mechToken immediately via kmemdup_nul().  If a later element in
-the same blob is malformed, then the decoder will return nonzero after
-the allocation is already live.  This could happen if mechListMIC [3]
-overrunse the enclosing SEQUENCE.
+...
 
-decode_negotiation_token() then sets conn->use_spnego = false because
-both the negTokenInit and negTokenTarg grammars failed.  The cleanup at
-the bottom of smb2_sess_setup() is gated on use_spnego:
+> +static struct kvec *smb2_get_sign_rsp_iov(struct ksmbd_work *work,
+> +					   struct smb2_hdr *hdr, int *n_vec)
+> +{
 
-	if (conn->use_spnego && conn->mechToken) {
-		kfree(conn->mechToken);
-		conn->mechToken = NULL;
-	}
+> +	int i;
 
-so the kfree is skipped, causing the mechToken to never be freed.
+This is not addressed, why?
 
-This codepath is reachable pre-authentication, so untrusted clients can
-cause slow memory leaks on a server without even being properly
-authenticated.
+> +	/*
+> +	 * iov[0] has the RFC1002 message length. It is not part of the SMB2
+> +	 * message, so do not sign it.
+> +	 */
+> +	for (i = 1; i <= work->iov_idx; i++) {
+> +		if (work->iov[i].iov_base == hdr) {
+> +			*n_vec = work->iov_idx - i + 1;
+> +			return &work->iov[i];
+> +		}
+> +	}
+> +
+> +	WARN_ON_ONCE(work->iov_idx < 1 ||
+> +		     work->iov[work->iov_idx].iov_base != hdr);
 
-Fix this up by not checking check for use_spnego, as it's not required,
-so the memory will always be properly freed.  At the same time, always
-free the memory in ksmbd_conn_free() incase some other failure path
-forgot to free it.
+The second part of this check is basically always true. What's the point?
 
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: <stable@kernel.org>
-Assisted-by: gregkh_clanker_t1000
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Stable-dep-of: c1016dd1d8b2 ("ksmbd: track the connection owning a byte-range lock")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/ksmbd/connection.c | 1 +
- fs/ksmbd/smb2pdu.c    | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+> +	*n_vec = 1;
+> +	return &work->iov[work->iov_idx];
+> +}
 
-diff --git a/fs/ksmbd/connection.c b/fs/ksmbd/connection.c
-index 63815c4df1333e..524caba512e79a 100644
---- a/fs/ksmbd/connection.c
-+++ b/fs/ksmbd/connection.c
-@@ -39,6 +39,7 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
- 	xa_destroy(&conn->sessions);
- 	kvfree(conn->request_buf);
- 	kfree(conn->preauth_info);
-+	kfree(conn->mechToken);
- 	kfree(conn);
- }
- 
-diff --git a/fs/ksmbd/smb2pdu.c b/fs/ksmbd/smb2pdu.c
-index a31a1561540960..af1e386cedb43b 100644
---- a/fs/ksmbd/smb2pdu.c
-+++ b/fs/ksmbd/smb2pdu.c
-@@ -1920,7 +1920,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
- 	else if (rc)
- 		rsp->hdr.Status = STATUS_LOGON_FAILURE;
- 
--	if (conn->use_spnego && conn->mechToken) {
-+	if (conn->mechToken) {
- 		kfree(conn->mechToken);
- 		conn->mechToken = NULL;
- 	}
 -- 
-2.53.0
+With Best Regards,
+Andy Shevchenko
+
 
