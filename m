@@ -1,80 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A3262FFFA5
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 02:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AAB1A6803
+	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 02:28:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784168764; cv=none; b=sFA+SxdA5S3BteeACK/JuXH88BIrGQ4gKaMXvWL9m5mpfQFpiiam/acM127xYWBO8u3jYDnPh6I0+LrL5tcsEQPaIuNxMqIxH6YV6eIxmX1MbNtEuQrfLSKcjdQ9X16fONJTyV6Y/M9CUF4r8iRFu/xwkl0zGar7GWPVl3mU0Dk=
+	t=1784168906; cv=none; b=JLSqdQsjBMumQ3frUEoh0q/bGXjaUoeZC9Qn7U6YLnwcodwUwfe7R98P6x2VQ72Ol1DXapbg+ks4t1t3Q5q+O44nIioLrV5eBxTNd4Dx8M/+MogKLB+LjB9t6G73SN3gNfCJruu3T0A5/2RTYkf8xE4xP9DfsVp9RfV//avFBBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784168764; c=relaxed/simple;
-	bh=6noZXBnx7p68SqwG0kC87JZUFtACicYarkzgg+q9U7s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aTJEYWb3ZFtkIto7q/qy+Km4qB+oEAL67/v9YEuqUJ/iQFpd4tfvf8NVB3Wq63xNujx4PpJNZXzOFp9FQgzLQKigmu4torcLGWikImtgsh5y54MWNCHNFie2YG4k+jG/AaGNNtckTGfHRfVoBzT9TLSr8uwMyD0lmpssBJ5yrJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a0CkPhAR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784168906; c=relaxed/simple;
+	bh=Cb0wpb5T0HfYdNhT0siIsagvwjr+BfBMf9V820wCFTk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W8LX7ujQM5XcB34Fi5N8adZsRqUFHaOzVxjKJVw2LiwPEvsJrAWG7PX8F06uyZjunooG6RXmnKE3Flw0AzZ5+i1QYljTSh0ZqBT6+uwd05poKtGqpnO1JiOEilUOEzsf4zo5Ev2WMF3q5LhNsVFb2bqO3ASVyAv/98HcrYgSF0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=RH3tQJhB; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a0CkPhAR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05EE71F01558
-	for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 02:26:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784168763;
-	bh=6noZXBnx7p68SqwG0kC87JZUFtACicYarkzgg+q9U7s=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=a0CkPhARdWhpAe9XhQKQXunNkThoEPy2XlpeigZ9P/gJbEEgQZgo9fO6c0XGugLNK
-	 W9V10R967vV4JikAFdsjKRqUaMc8tAuIzYo9CW6km218IlBZFXMM+PruQfhqCpSiKe
-	 5eil6rt/VhHoArSzZs2UAMZQB3ujkP/3Z7RG87WbVtc4RvppTdXDjhRy5SMw0IJIgF
-	 eYgoR8JmohpKmCBZaqvEcrikzy6Ef28ScGVdpBYbGhokpJxH8+PEK6WHyrC+YKKwUt
-	 XX6vRUJNFt7cHFTZf6Sk9WFpiySO0nYZdtPxMt0Yx3N5hgtLxLA3HpLtwVDwRCzNZr
-	 q+x7btCvjtV1A==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c1601d552a8so635893566b.2
-        for <linux-cifs@vger.kernel.org>; Wed, 15 Jul 2026 19:26:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RqyfUCXABLHWSDWlNZCqKnK/6x9C0VmTWgi2G6kPQSu4Nv+oeojqbLRPL98nIl8lSTBOAPAyNFFnB2S@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlsoRKoc6S3lEBOWnTqJECejm05ilxjcOXdxqRakf9Ry8JyO46
-	2CPENATRq28ixtQCSQCDpCr6xWiITc9BlXzfNRbIVrgtAhAKP4MG+wtsqzbT5Kg5xI/2RRyt8+u
-	/jpENqA8NDi4TZWUwAQ+YavlrzDlrUJM=
-X-Received: by 2002:a17:906:9fcd:b0:c16:6669:a4aa with SMTP id
- a640c23a62f3a-c1667b31c6dmr616958466b.48.1784168761512; Wed, 15 Jul 2026
- 19:26:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="RH3tQJhB"
+Message-ID: <e1587c2a-63da-42a0-8393-ff48ab095267@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1784168898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GPLY5eAan92muSRnCX2juzZJjKlZF3jh9+RX9EjtAZY=;
+	b=RH3tQJhBeotxhnTrEfxKCMgJZqgQKh3CpkuUZu+ZngwsV90Y5sJ8mQwE+q99Bh57VFc17M
+	FM+zCvUAd4tnVULCtja/jJknY51rvBKy4P0EOTG2nFhROXqc1BPThKgHtO5TeU1H58+pty
+	rVvEkwjFx1JWYso+2jdPBzIktKDsLsj6Kk9ey/c9t0VBEPGBM/kqPW8170n1sV7/rVvNBY
+	nt4nQ7AP/vtvMam2PTsEFHc1vR8WHC0np04kqUTBDn/mh37h44kZb9UQtUfhX6WvF7SeFj
+	OOWQ903Ro7BrHROS5I8gA2FMl9RwdkCZapByy/xWdm3hjwKk1gTrZTLx0+x+TA==
+Date: Thu, 16 Jul 2026 10:27:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260716001156.671587-1-chenxiaosong@chenxiaosong.com> <20260716001156.671587-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260716001156.671587-4-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 16 Jul 2026 11:25:49 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-UsvUOK6A_8k8pdtYXANKeve+yDpVwXyRFa0wpyQ=nRw@mail.gmail.com>
-X-Gm-Features: AUfX_myx3MSG7IE1V0rN6p4s7I7kdkblwTWzvOgCitTmXek7zmGPoc8n8KbbcrY
-Message-ID: <CAKYAXd-UsvUOK6A_8k8pdtYXANKeve+yDpVwXyRFa0wpyQ=nRw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] smb/server: stop new async work when closing connection
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	gael.blivet@gmail.com, andriy.shevchenko@linux.intel.com, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2 2/3] smb/server: cancel async requests when closing
+ connection
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
+ gael.blivet@gmail.com, andriy.shevchenko@linux.intel.com,
+ linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260716001156.671587-1-chenxiaosong@chenxiaosong.com>
+ <20260716001156.671587-3-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd80TEVZB2GYeYCfhhyN99HyD89ZP_9NjON6caoXuMWTDg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd80TEVZB2GYeYCfhhyN99HyD89ZP_9NjON6caoXuMWTDg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 16, 2026 at 9:12=E2=80=AFAM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> A new async request may be added while a connection is closing.
-> The close code may miss this request and wait forever.
->
-> Check the connection state before adding the request. Return an error
-> and release the async ID if the connection is closing.
-setup_async_work() protects only work items registered through that
-helper. However, smb2_notify() later creates a synthetic in_work and
-adds it directly to conn->async_requests. Therefore, the
-connection-close path can finish scanning and cancelling the existing
-async requests before in_work is added. in_work is then registered
-after the connection enters the releasing state and is not cancelled.
-So, we need to protect this direct registration with the same
-connection-state check, or use a common helper for all async request
-registrations.
-Thanks!
+Ok, list_for_each_entry_safe() would indeed be safer. I will use 
+list_for_each_entry_safe() in the next version.
+
+On 7/16/26 10:13, Namjae Jeon wrote:
+>> +       list_for_each_entry(work, &conn->async_requests, async_request_entry) {
+> smb2_notify_cancel_fn() calls list_del_init() on async_request_entry.
+> With list_for_each_entry(), the loop increment then follows the
+> self-linked entry again, causing an infinite loop while holding
+> request_lock ? So, should we use list_for_each_entry_safe() ?
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
