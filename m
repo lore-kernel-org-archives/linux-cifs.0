@@ -1,124 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85192369D48
-	for <linux-cifs@vger.kernel.org>; Fri, 17 Jul 2026 03:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE52334C2E;
+	Fri, 17 Jul 2026 03:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784258106; cv=none; b=TvtbX/4cHjnkaj8PUqMJLWm6LsWDr5UVqpl/m5kw/um9rvnSmW4sx1d1twzZNOSKZpw5/hKMdn2qh2uzzvuesWWHz7FR8vb3gTBzY0DlSfWngoRF4rECvsmWlX/nPbdPTLnfnTebQbH9mD1HEf5AxEF/cWXLQC/em7NPCDUEcY0=
+	t=1784259619; cv=none; b=Ek8h1sLdxRHhEZ/wKguAEOw9eqFlWR/8A3EsHeAH4VbqP2IlylRP7NrkQVGK3s643S5LIbTQqc4V3UnTStPVtDSrZQsI6s1Z08DY1y42qI0aHIsOEZQZfI1Q4BnErcxx9tR8aWfzvVfW7qMHwIzYsLw9Z326yEd5/HFvZrDqOUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784258106; c=relaxed/simple;
-	bh=BJuS0YYPZyHflU3DPVe+FBfxFuTVEH6ELY/xGfl6VYw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YUo7lh2J630vB5yXLdmwhOabUpfnMkLxZ8r9dCpDQsQtyGM5V2OqiJYhhUY5gs+iz1IPBs12/0i0eZNRGwMXtIQlqBhUNA8nKWegpLAwP9VOM80XV0vPHjyUXXBBY/dmL80WxYbxge3GuzXs5o8+u3/zfTmquGpN36aFtJwJ914=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CC2dOrFV; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CC2dOrFV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 292F81F000E9
-	for <linux-cifs@vger.kernel.org>; Fri, 17 Jul 2026 03:15:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784258105;
-	bh=nAeWg4Nk5xYpBIiu8qeFFLmJy7FREjcWqgxuh4ato40=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=CC2dOrFV+D/S2LRVWbcyaDl7oez9k3ga/qVmIaZRGgzo0wWAWjmxJBKMUgzCrrmlm
-	 0o6KlRw4AE+DJ5KY1YsVdCglquB3NNCPKuOvkpiaGlJWmTCmEajnpuVlwJI6GnzeG3
-	 4KTzN7wUenjOF8PRwHZr8l+ykNPcFfeR5oJNvyl2LlbgOh95VZXDpNNAUyKGaTmb4f
-	 sq7+XAH6gAenQLefg7tIrb7y1pxYAc+bjKK0a/rGuALwXrOXMDYugfiD1n4oJPQBJu
-	 A0V/RZFPxhNL+p9AC/vuQls57USsdqYMnJugamKIDOAUbSOcj3bIw4J4jvR8JIdB1G
-	 2rWlg/fIg8xhQ==
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-698562f10e7so10358549a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 16 Jul 2026 20:15:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpLq6uKGOLRbGPezz28TqsdXrMFmDaaKfIsrrBli0PXJWu7+T+vn/xxA7F/40mjMwP3DHxTa//LjHLf@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy3Ry+8eTfnXgBta0dWgqYsgJkETCI4TAVTwm52VekfXMTxRNR
-	B3dj823tRT9qgbwoaAO08Xrb02b256bnz1b5J/J0DkV/rVltuqT0GT2G4eBwPKpAbO5LfHHahsw
-	cu1rG18WOb15/YLLRFF1Ed4EsVItHE4c=
-X-Received: by 2002:a17:906:f58b:b0:c15:fd85:c5f7 with SMTP id
- a640c23a62f3a-c16b46abcefmr21730366b.4.1784258103774; Thu, 16 Jul 2026
- 20:15:03 -0700 (PDT)
+	s=arc-20240116; t=1784259619; c=relaxed/simple;
+	bh=0mvRohl4L7i0V4rblS6Wm4dwSD0JtzaW/cLUhgyQzt4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dcxjeXl8VAle4lAxxETrDz9MolfNm96rG/QOfSKQpWi6GBH3WTqLxAvYRtpAxeM6r06fTCSP0LGyanw6EYpmDOidoXhu8nuxTtzJ/mTuwF6M9Zy/Jp5HE5tz5Gn/vkcjQP591VsOcV3J0qivXn07MFtZJhcnYaKFOzSynLp2zGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 35e41ac0819111f1aa26b74ffac11d73-20260717
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED, SN_UNTRUSTED
+	SN_LOWREP, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
+	AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:34e07e5a-96d4-4a86-913f-74cbb282a296,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:10
+X-CID-INFO: VERSION:1.3.12,REQID:34e07e5a-96d4-4a86-913f-74cbb282a296,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:10
+X-CID-META: VersionHash:e7bac3a,CLOUDID:35a0e98418da0d6fd706d08939447f7a,BulkI
+	D:2607171140116RUJT3C4,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|136
+	|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,Bulk
+	:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,
+	BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 35e41ac0819111f1aa26b74ffac11d73-20260717
+X-User: tanze@kylinos.cn
+Received: from desktop-od00ebi.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <tanze@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 686136851; Fri, 17 Jul 2026 11:40:09 +0800
+From: Ze Tan <tanze@kylinos.cn>
+To: sfrench@samba.org,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	sprasad@microsoft.com,
+	tom@talpey.comm,
+	senozhatsky@chromium.org,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	tanze@kylinos.cn
+Subject: [RFC PATCH v2 0/9] smb: support security and trusted xattrs over EAs
+Date: Fri, 17 Jul 2026 11:39:18 +0800
+Message-ID: <cover.1784258165.git.tanze@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAPS2u-U9=kiKmL6oebRApGnp6jUMxSQ+zGW1px+A7r1QQny3iA@mail.gmail.com>
-In-Reply-To: <CAPS2u-U9=kiKmL6oebRApGnp6jUMxSQ+zGW1px+A7r1QQny3iA@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 17 Jul 2026 12:14:51 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-4MuqT49GwTO2meR0Lt338vTygzTrQ+6xBNpVW7kE0Xg@mail.gmail.com>
-X-Gm-Features: AUfX_mxyZJryiR51rz55WYQX7nKUbJYq8OMAk1i8taY6uUG_aLSaJo1R4NC0Xf0
-Message-ID: <CAKYAXd-4MuqT49GwTO2meR0Lt338vTygzTrQ+6xBNpVW7kE0Xg@mail.gmail.com>
-Subject: Re: [SECURITY] ksmbd: SMB CREATE widens inherited POSIX ACL masks
-To: Charles Research <trilobyte777@gmail.com>
-Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, security@kernel.org
-Content-Type: multipart/mixed; boundary="00000000000076c2a00656c5f690"
+Content-Transfer-Encoding: 8bit
 
---00000000000076c2a00656c5f690
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The CIFS client and ksmbd currently expose SMB extended attributes
+mainly through the Linux user.* namespace. This causes security and
+trusted xattr names carried through SMB EAs to be stored with an
+additional user. prefix on the server.
 
-On Fri, Jul 17, 2026 at 6:58=E2=80=AFAM Charles Research <trilobyte777@gmai=
-l.com> wrote:
->
-> Hello KSMBD maintainers,
-Hi Charles,
->
-> KSMBD widens an inherited POSIX ACL mask to rwx when an SMB client create=
-s a file or directory. A named user or group entry that an administrator in=
-tentionally made ineffective with a restrictive mask can therefore become e=
-ffective on the new object. For a new directory, KSMBD also installs the wi=
-dened ACL as the default ACL, so the exposure propagates to descendants.
+For example, security.xfstests can be stored as
+user.security.xfstests instead of security.xfstests. This also prevents
+security.capability from being handled as a file capability.
 
-Can you confirm if this patch fixes this issue?
+generic/093 exercises these namespaces through several commands:
 
-Thanks for the report.
+  - setcap and getcap use security.capability;
+  - _require_attrs security uses security.xfstests;
+  - setfattr and getfattr use trusted.name.
 
---00000000000076c2a00656c5f690
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-ksmbd-preserve-VFS-inherited-POSIX-ACL-mask.patch"
-Content-Disposition: attachment; 
-	filename="0001-ksmbd-preserve-VFS-inherited-POSIX-ACL-mask.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mrod72kj0>
-X-Attachment-Id: f_mrod72kj0
+This RFC adds end-to-end handling for the xattrs required by those
+operations. The client passes security.capability,
+security.xfstests and trusted.* names through SMB EAs without adding
+the user. prefix. When SMB3 POSIX extensions are available, ksmbd maps
+the same names to their native backing filesystem xattr namespaces for
+set, get and list operations.
 
-RnJvbSA3ZmM2YTcyN2M2NjU4N2I4MjZiYmRjYmFjOWQ3MWJlZWY1NDE3MTYxIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOYW1qYWUgSmVvbiA8bGlua2luamVvbkBrZXJuZWwub3JnPgpE
-YXRlOiBGcmksIDE3IEp1bCAyMDI2IDExOjA2OjQ1ICswOTAwClN1YmplY3Q6IFtQQVRDSCAxLzNd
-IGtzbWJkOiBwcmVzZXJ2ZSBWRlMgaW5oZXJpdGVkIFBPU0lYIEFDTCBtYXNrCgpUaGUgVkZTIGlu
-aXRpYWxpemVzIGEgY2hpbGQncyBQT1NJWCBBQ0wgZnJvbSB0aGUgcGFyZW50J3MgZGVmYXVsdCBB
-Q0wgYW5kCnRoZSByZXF1ZXN0ZWQgY3JlYXRpb24gbW9kZS4gRG8gbm90IG11dGF0ZSB0aGUgcGFy
-ZW50IEFDTCBvciBvdmVyd3JpdGUgdGhlCmNoaWxkJ3MgVkZTLWNvbXB1dGVkIGFjY2VzcyBhbmQg
-ZGVmYXVsdCBBQ0xzIGFmdGVyd2FyZHMuCgpUaGlzIHByZXNlcnZlcyByZXN0cmljdGl2ZSBBQ0xf
-TUFTSyBlbnRyaWVzIGFuZCBwcmV2ZW50cyBTTUIgb2JqZWN0IGNyZWF0aW9uCmZyb20gd2lkZW5p
-bmcgZWZmZWN0aXZlIHBlcm1pc3Npb25zLgoKUmVwb3J0ZWQtYnk6IENoYXJsZXMgUmVzZWFyY2gg
-PHRyaWxvYnl0ZTc3N0BnbWFpbC5jb20+ClNpZ25lZC1vZmYtYnk6IE5hbWphZSBKZW9uIDxsaW5r
-aW5qZW9uQGtlcm5lbC5vcmc+Ci0tLQogZnMvc21iL3NlcnZlci92ZnMuYyB8IDI2ICstLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDI1IGRl
-bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2ZzL3NtYi9zZXJ2ZXIvdmZzLmMgYi9mcy9zbWIvc2Vy
-dmVyL3Zmcy5jCmluZGV4IGRiYWE4Mzg4Nzc3NS4uODU0YTA5MDIwYTk3IDEwMDY0NAotLS0gYS9m
-cy9zbWIvc2VydmVyL3Zmcy5jCisrKyBiL2ZzL3NtYi9zZXJ2ZXIvdmZzLmMKQEAgLTIxNTAsMTAg
-KzIxNTAsNiBAQCBpbnQga3NtYmRfdmZzX2luaGVyaXRfcG9zaXhfYWNsKHN0cnVjdCBtbnRfaWRt
-YXAgKmlkbWFwLAogCQkJCWNvbnN0IHN0cnVjdCBwYXRoICpwYXRoLCBzdHJ1Y3QgaW5vZGUgKnBh
-cmVudF9pbm9kZSkKIHsKIAlzdHJ1Y3QgcG9zaXhfYWNsICphY2xzOwotCXN0cnVjdCBwb3NpeF9h
-Y2xfZW50cnkgKnBhY2U7Ci0Jc3RydWN0IGRlbnRyeSAqZGVudHJ5ID0gcGF0aC0+ZGVudHJ5Owot
-CXN0cnVjdCBpbm9kZSAqaW5vZGUgPSBkX2lub2RlKGRlbnRyeSk7Ci0JaW50IHJjLCBpOwogCiAJ
-aWYgKCFJU19FTkFCTEVEKENPTkZJR19GU19QT1NJWF9BQ0wpKQogCQlyZXR1cm4gLUVPUE5PVFNV
-UFA7CkBAIC0yMTYxLDI5ICsyMTU3LDkgQEAgaW50IGtzbWJkX3Zmc19pbmhlcml0X3Bvc2l4X2Fj
-bChzdHJ1Y3QgbW50X2lkbWFwICppZG1hcCwKIAlhY2xzID0gZ2V0X2lub2RlX2FjbChwYXJlbnRf
-aW5vZGUsIEFDTF9UWVBFX0RFRkFVTFQpOwogCWlmIChJU19FUlJfT1JfTlVMTChhY2xzKSkKIAkJ
-cmV0dXJuIC1FTk9FTlQ7Ci0JcGFjZSA9IGFjbHMtPmFfZW50cmllczsKLQotCWZvciAoaSA9IDA7
-IGkgPCBhY2xzLT5hX2NvdW50OyBpKyssIHBhY2UrKykgewotCQlpZiAocGFjZS0+ZV90YWcgPT0g
-QUNMX01BU0spIHsKLQkJCXBhY2UtPmVfcGVybSA9IDB4MDc7Ci0JCQlicmVhazsKLQkJfQotCX0K
-LQotCXJjID0gc2V0X3Bvc2l4X2FjbChpZG1hcCwgZGVudHJ5LCBBQ0xfVFlQRV9BQ0NFU1MsIGFj
-bHMpOwotCWlmIChyYyA8IDApCi0JCWtzbWJkX2RlYnVnKFNNQiwgIlNldCBwb3NpeCBhY2woQUNM
-X1RZUEVfQUNDRVNTKSBmYWlsZWQsIHJjIDogJWRcbiIsCi0JCQkgICAgcmMpOwotCWlmIChTX0lT
-RElSKGlub2RlLT5pX21vZGUpKSB7Ci0JCXJjID0gc2V0X3Bvc2l4X2FjbChpZG1hcCwgZGVudHJ5
-LCBBQ0xfVFlQRV9ERUZBVUxULAotCQkJCSAgIGFjbHMpOwotCQlpZiAocmMgPCAwKQotCQkJa3Nt
-YmRfZGVidWcoU01CLCAiU2V0IHBvc2l4IGFjbChBQ0xfVFlQRV9ERUZBVUxUKSBmYWlsZWQsIHJj
-IDogJWRcbiIsCi0JCQkJICAgIHJjKTsKLQl9CiAKIAlwb3NpeF9hY2xfcmVsZWFzZShhY2xzKTsK
-LQlyZXR1cm4gcmM7CisJcmV0dXJuIDA7CiB9CiAKIHZvaWQga3NtYmRfdmZzX3VwZGF0ZV9jb21w
-cmVzc2VkX2ZhdHRyKHN0cnVjdCBkZW50cnkgKmRlbnRyeSwgX19sZTMyICpmYXR0cikKLS0gCjIu
-MjUuMQoK
---00000000000076c2a00656c5f690--
+The security namespace is deliberately restricted to
+security.capability and security.xfstests. Other security.* xattrs are
+not exposed by this series. trusted.* names are supported while
+internal POSIX ACL xattrs remain filtered.
+
+The series also avoids an oplock self-deadlock found while running
+generic/093. An EA or metadata-only reopen from the same SMB session
+can otherwise break an oplock held by that session and wait for the
+same client. Oplock breaks from other sessions and opens with share
+conflicts continue to use the normal break path.
+
+Patches 1-3 add the CIFS client support. Patches 4-5 refactor the ksmbd
+EA name conversion paths without changing behavior. Patches 6-8 add
+the corresponding ksmbd mappings. Patch 9 handles the same-session
+oplock case.
+
+The series touches both the CIFS client and ksmbd. It is sent as one
+RFC so that the end-to-end name mapping and protocol behavior can be
+reviewed together. It can be split into client and server patchsets
+for merging after the approach is agreed.
+
+Testing:
+
+generic/093 was run with the CIFS test mount mapped to the fsgqa uid
+and gid. Both xfstests mount option variables were configured as
+follows:
+
+  export CIFS_OPTS="-o username=fsgqa,password=<password>"
+  export CIFS_OPTS="${CIFS_OPTS},uid=1001,gid=1001"
+  export TEST_FS_MOUNT_OPTS="${CIFS_OPTS}"
+  export MOUNT_OPTIONS="${CIFS_OPTS}"
+  cd ~/xfstests/
+  ./check -d generic/093
+
+generic/093 passed.
+
+Changelog
+---------------
+
+rfc v2: Rebase the patch series onto the for-next branch and resubmit it to avoid "Failed to apply" errors.
+
+rfc: https://lore.kernel.org/all/20260715074908.641940-1-tanze@kylinos.cn/
+
+Ze Tan (9):
+  smb: client: support security.capability over EAs
+  smb: client: support security.xfstests over EAs
+  smb: client: support trusted xattrs over EAs
+  ksmbd: extract SMB EA backing xattr name mapping
+  ksmbd: extract SMB EA response name handling
+  ksmbd: support security.capability EAs
+  ksmbd: support security.xfstests EAs
+  ksmbd: support trusted EAs
+  ksmbd: avoid self oplock breaks for EA opens
+
+ fs/smb/client/smb2ops.c |  34 ++++++++-
+ fs/smb/client/xattr.c   | 109 ++++++++++++++++++++++++--
+ fs/smb/server/oplock.c  |  49 ++++++++++++
+ fs/smb/server/smb2pdu.c | 165 +++++++++++++++++++++++++++++++---------
+ 4 files changed, 311 insertions(+), 46 deletions(-)
+
+
+base-commit: fce2dfa773ced15f27dd27cd0b482a7473cdcf2a
+-- 
+2.43.0
+
