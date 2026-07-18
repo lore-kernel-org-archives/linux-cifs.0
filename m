@@ -1,178 +1,96 @@
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B72B33EB10
-	for <linux-cifs@vger.kernel.org>; Sat, 18 Jul 2026 15:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BC33672B5;
+	Sat, 18 Jul 2026 16:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784387295; cv=none; b=Pu5PhTNS/oEKv7N8GA2abidp0hRRXXv+MQ7p5B6/HXSCSS03TGystGyBbIUEQYLXg7VY0y7NRcC4UcWXGgyN7JFh2milfNiQ1iPjVBIZhgW0AH7SoihBuMgtv5E1+qVZwMtTNq4GB0rfXdfpiABXXjyehyWh1z89j8fduMYdfMQ=
+	t=1784391772; cv=none; b=erZ8QM/uiXiTeeeEo7f6XKmrKtHK9Wc77AnLKZehhkbKkM1LQ9j6vGUldtt+MBZr50MLQ5j+1kPxjXyL2u/w2TBF6M0ITy1l2UvZvRxu45JCmg6BjLFHVXxXpYlhp6RaKTwuJTxsMusJnIobGjoaBmCO+n4ZRAKzR5AEvMz9eSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784387295; c=relaxed/simple;
-	bh=pwJvRj2ZV1inTK2aAj9Ev1S/qsQRzZ4AApYB5eoy0DU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=XhfZk4u99dAprv7cS5oGokWW9cDOf+yUHCo9pDXsmjJkp99KpifkdGb+qUJ7yf5d9Z/GUeLwtyOEG6H6mumPNxRH/ZVUaEABsFa0r6QzMAzVgYgE5hX2DLz42B2K/cJIkh6D1539s8wCLcqIdB6zCz6wDzsFEKmAOI+iSl0iVBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=o/wPaaV8; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="o/wPaaV8"
-Message-ID: <a8771f15-7cb6-44a1-a592-8055818f57f1@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784387284;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jN50fVN6+o5HI8KCUIVOS5BrLYtZgCx068FNYYU3Ocs=;
-	b=o/wPaaV8yt3QeafHmXgo3tH3LRyAerVeQS6rtakoxGaqGXA0MZU7+OnsDo83BrCo6j/sDH
-	4bBlexu/Y/DSnq6Ipk8amcwhO9bMqBJJMpV/Wbl6auoVyI1wjyVDVb7ta+s35UxyBWY7vR
-	OMSTpq8v3MHfFuAT36FvDJqGo4r1xZyGcBEhjDor/FRV8AGSys5MvFk5QKhHBYWrNV9qMH
-	8S4FIuXFqbV/ljYWofzJtkV2K2u3+Hfl4OoKGJuCx4CUSbItW/fUJJIhoyWQpP/hnAmS6e
-	uY/Oci9OlwGWsPUxkDHWaQLgx5Ng11kZMQ95yUAVcDONCffqHiTWeEqXzQNWAw==
-Date: Sat, 18 Jul 2026 23:08:05 +0800
+	s=arc-20240116; t=1784391772; c=relaxed/simple;
+	bh=yCH+i4+5rsIhK/AHGMnf4EB9Ce18QyrBgeRKof8MdMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Nkj5reIhZK66THpbywY33Ely3hSvOcrDcD41DJasa53qd9+R+D9CT2804ulA1n6VARG5EAxhgb6gd2HIGaEUebDOow3PbVpWYZJgTQVHpjTmxC2HNSBtZ/7LdVjEyjIHuO9XwH+f0m54bs/wETeprSuBHth6bU8gSUXntnKgDT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: e5627b7082c411f1aa26b74ffac11d73-20260719
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_DIGIT_LEN
+	HR_FROM_NAME, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_UNTRUSTED, SRC_UNTRUSTED, IP_UNFAMILIAR, SRC_UNFAMILIAR
+	DN_TRUSTED, SRC_TRUSTED, SA_TRUSTED, SA_EXISTED, SN_TRUSTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD_SPF
+	CIE_UNKNOWN, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
+	ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:ac7574a2-6cb7-4c4a-af36-49633c7d4801,IP:10,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:35
+X-CID-INFO: VERSION:1.3.12,REQID:ac7574a2-6cb7-4c4a-af36-49633c7d4801,IP:10,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:35
+X-CID-META: VersionHash:e7bac3a,CLOUDID:1aa5aa4feb08d70b2bef6259f6400187,BulkI
+	D:2607190022408S6OPDZG,BulkQuantity:0,Recheck:0,SF:10|66|78|102|127|865|89
+	8,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil
+	,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: e5627b7082c411f1aa26b74ffac11d73-20260719
+X-User: liqiang01@kylinos.cn
+Received: from cvdaxia.localdomain [(104.194.206.225)] by mailgw.kylinos.cn
+	(envelope-from <liqiang01@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 240361366; Sun, 19 Jul 2026 00:22:39 +0800
+From: Li Qiang <liqiang01@kylinos.cn>
+To: Steve French <sfrench@samba.org>
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Li Qiang <liqiang01@kylinos.cn>
+Subject: [PATCH] cifs: validate idmap key payload length
+Date: Sun, 19 Jul 2026 00:22:27 +0800
+Message-ID: <20260718162228.193366-1-liqiang01@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] cifs/002: check nlink returned by fstat()
-To: Zorro Lang <zlang@kernel.org>
-References: <20260713151658.533155-1-chenxiaosong@chenxiaosong.com>
- <alpZg9nrDzS3T9cL@zlang-mailbox>
-Cc: lukas@herbolt.com, smfrench@gmail.com, linkinjeon@kernel.org,
- pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- dhowells@redhat.com, metze@samba.org, linux-cifs@vger.kernel.org,
- fstests@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <alpZg9nrDzS3T9cL@zlang-mailbox>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Thanks for your suggestions. I will send the next version soon.
+The cifs.idmap key type stores its payload length in key->datalen, which
+is limited to U16_MAX.  Accepting a larger key payload truncates the
+recorded length and can make later users interpret the payload using
+inconsistent bounds.
 
-在 2026/7/18 1:07, Zorro Lang 写道:
->> +# FS QA Test No. cifs/002
-> 
-> Although we are considering removing this specific line in the future, it is
-> currently still required to follow the standard format. Therefore, it should
-> be formatted as: FS QA Test 002
-> 
->> +#  from
->> +#  tests/generic/002
-> 
-> The original test case is a generic test case, this one looks similar, doesn't
-> has any cifs specific test steps. So I think this can be a generic test case too
-> 
->> +#  Copyright (c) 2000-2001 Silicon Graphics, Inc.  All Rights Reserved.
->> +#
->> +. ./common/preamble
->> +_begin_fstest metadata auto quick
-> 
-> I think it also belong to "hardlink" group.
-> 
->> +
->> +# Override the default cleanup function.
->> +_cleanup()
->> +{
->> +	rm -f $tmp.*
->> +	rm -rf $TEST_DIR/$$
-> 
->          cd /
->          rm -r -f $tmp.*
->          [ -d "$testdir" ] && rm -rf $testdir
-> 
->> +}
->> +
->> +status=0	# success is the default!
->> +
->> +_require_test
->> +_require_hardlinks
->> +_require_test_program fstat
-> 
-> _fixed_by_fs_commit cifs 9dd1964ac59d \
-> 	"smb/client: fix incorrect nlink returned by fstat()"
-> 
->> +
->> +echo "Silence is goodness ..."
-> 
-> If no specical reason, please keep the "Silence is golden".
-> 
->> +
->> +testdir=$TEST_DIR/$$
->> +mkdir -p $testdir
->> +
->> +touch $testdir/tmp.1
->> +for l in 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
->> +do
-> 
-> for l in $(seq 2 20);do
-> 
-> or
-> 
-> for ((l=2; l<=20; l++))
-> 
->> +	ln $testdir/tmp.1 $testdir/tmp.$l
->> +	x=`$here/src/fstat $testdir/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
-> 
-> I'm wondering if a specific src/fstat.c is needed. Can we replace the whole
-> src/fstat.c with `xfs_io -c stat ` ? Can you give it a try?
-> 
->> +	if [ "$l" -ne $x ]
->> +	then
-> 
-> if [ "$l" -ne $x ];then
-> 
->> +		echo "Arrgh, created link #$l and fstat looks like ..."
->> +		$here/src/fstat $testdir/tmp.1
->> +		status=1
->> +	fi
->> +done
->> +
->> +for l in 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
->> +do
-> 
-> for l in $(seq 20 -1 1);do
-> 
-> or
-> 
-> for ((l=20; l>=1; l--))
-> 
->> +	x=`$here/src/fstat $testdir/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
->> +	if [ "$l" -ne $x ]
->> +	then
->> +		echo "Arrgh, about to remove link #$l and fstat looks like ..."
->> +		$here/src/fstat $testdir/tmp.1
->> +		status=1
->> +	fi
->> +	rm -f $testdir/tmp.$l
->> +done
->> +
->> +exit
-> 
-> _exit 0
-> 
-> Thanks,
-> Zorro
-> 
->> diff --git a/tests/cifs/002.out b/tests/cifs/002.out
->> new file mode 100644
->> index 00000000..11426b54
->> --- /dev/null
->> +++ b/tests/cifs/002.out
->> @@ -0,0 +1,2 @@
->> +QA output created by 002
->> +Silence is goodness ...
->> -- 
->> 2.43.0
->>
->>
+Reject oversized preparsed payloads before allocating or copying them.
+This keeps key->datalen consistent with the stored data for both inline
+and separately allocated idmap payloads.
 
+Signed-off-by: Li Qiang <liqiang01@kylinos.cn>
+---
+ fs/smb/client/cifsacl.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index 07cf0e578233..d6c38989170f 100644
+--- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -68,6 +68,9 @@ cifs_idmap_key_instantiate(struct key *key, struct key_preparsed_payload *prep)
+ {
+ 	char *payload;
+ 
++	if (prep->datalen > U16_MAX)
++		return -EINVAL;
++
+ 	/*
+ 	 * If the payload is less than or equal to the size of a pointer, then
+ 	 * an allocation here is wasteful. Just copy the data directly to the
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+2.43.0
 
