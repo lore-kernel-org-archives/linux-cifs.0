@@ -1,110 +1,232 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3386D37883C
-	for <linux-cifs@vger.kernel.org>; Sat, 18 Jul 2026 23:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07DD72628D
+	for <linux-cifs@vger.kernel.org>; Sun, 19 Jul 2026 00:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784418045; cv=none; b=qJa19/7UbIWlVU0gMAIG4xzpeqmcGlbvy7a11tdDbRWyncUz6rPfH+0uD9+kgNStJQXCDah0XISLGuuVXb6+FumjommTf/p4rHZnovu9/HZrWask0PNVizrTz2AE4FiXhaasFKsVWp5I6IGiA5CU0GIFoeCLczbmm0EXpLfR/bo=
+	t=1784422266; cv=none; b=GY4DrQjd8fu/lV1GQKI6y3cVHoFbrY8t9x7EgObh8WR0OdMRdF3nTAUyllVrd0dDP7qPXyW3H0NkZYW0/jzny/bjfUtV6BS8ibOf30WwfZzGHrddDW5Eeqy/KO4Ht5ty/ssWnITby8qAoRhVjM99w8vbK5tppbfC2/+PEvZ1ea0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784418045; c=relaxed/simple;
-	bh=6tTaMeQFD7u2U43Y56raK5ishGDEQNy1sGMn6YzHJjA=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=Sau16q5ytfs9/hAEOpAEr/x/m9BJ/TIGJOfZtPaSgIBfamq+DgplrLwVzb2dAB8m64YAPG7OSPs+JRjUT2abz4EI4t8cjrvz/gOcA4+1wafAOXARo3xiYQk3TCvMQpSbyYiIkMS39unLqr5/k/BY91wHRH46RfECC3YDOJQevu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHTnYQXb; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784422266; c=relaxed/simple;
+	bh=DwI3k1qYelCNgC8B8tVCTE7ap4gFa8ahnO7X2iI4jR4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CFFqrjLy2b4lBHrkekHlWWXpmDgA8SK0XCi6F3DQZXloCoz3wiXswz6C2vpNxkPB11qYSyNLWmi1gh8GBR80tr5yJSXz5ej+nv2rY+ykcuFMaKhUQJShKHCy7ANu50WDC9j4EfyjSZxIsm401jQ23Vvl6a5kiqWKRvJsuwwQNls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jpartners.org; spf=pass smtp.mailfrom=jpartners.org; dkim=pass (2048-bit key) header.d=jpartners-org.20251104.gappssmtp.com header.i=@jpartners-org.20251104.gappssmtp.com header.b=p0XTBz7L; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jpartners.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jpartners.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHTnYQXb"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-47f7027ca11so203661f8f.3
-        for <linux-cifs@vger.kernel.org>; Sat, 18 Jul 2026 16:40:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=jpartners-org.20251104.gappssmtp.com header.i=@jpartners-org.20251104.gappssmtp.com header.b="p0XTBz7L"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-92b21f65b60so245481485a.1
+        for <linux-cifs@vger.kernel.org>; Sat, 18 Jul 2026 17:51:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784418042; x=1785022842; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:content-type:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=6tTaMeQFD7u2U43Y56raK5ishGDEQNy1sGMn6YzHJjA=;
-        b=kHTnYQXbOuqLJ6DpwhLjIpnGIoqTX+dCf6Fn1oao8M12OlAV2Tdr5pKzAdPVsWtfdb
-         8Fkx+Z7UsekddGq9rlfusZ/IjBvcf5YIJp4BDtdgsDywwdGh9iJMcUtowZuow2ZUZ/S1
-         UahfW6UTVsVI0wA9+0cH7DxmvMZpAY2AV/uvOJUjTUnLCZTmkntIM8YS4aOYMHfc7R7D
-         5d0+O6gLZisL0Q3rPV8zTgYhLYqHJehqM3DJD5kAQYx4P5k2BEXn0RBdc4bcu4hYvv4a
-         sKlB6PSnFpqvuW5H+jcZ7ipnTUSEibWqWrelHx2UaOiPnrRqOqhzzPG+mJhNVg8rf8rW
-         SFxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784418042; x=1785022842;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:content-type:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=jpartners-org.20251104.gappssmtp.com; s=20251104; t=1784422264; x=1785027064; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=6tTaMeQFD7u2U43Y56raK5ishGDEQNy1sGMn6YzHJjA=;
-        b=nh73PZl9OtHg5VVSBSL7akE9h/vizOXQAGtA5Ff+h8hiqRX1Eni4XnjBFzI+XyxyWZ
-         TR8GW++dZYmwC8tQ9xSvmBRdWrH3A8mBFnjOjhywbnchKg3Cqc8Kc09H3PkqdCHVAWH1
-         GkUry+sVLw7+1j6yuPeIIDkvzLqtuEw5c8j7IagvCuDvLYBpL5joCpIow96MreTk8DGd
-         Dh+RaT5laWhANIDrEoXcBCmGEWL2VueIK33zrk4cE9nrUiuYi+dysePkFL/+UMuu1RII
-         aEpwyyCIiV0mXnL7Z7zvN4lANG2AP68Ee7UBr4DovV2LF27QdMNWsFg27QMCXQj5Z9zT
-         SGsg==
-X-Forwarded-Encrypted: i=1; AHgh+Ro8I19aT26RJNG3I0XXg1/lNn7eiwB6uens6EKwTS2+95pQvzOpLgrE2BBdJrng/9U5Pc5I0xloQeYP@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGM7V7fqOnYrwX1Sm1lPAYCNRqNOkEuPnIj241lvDuqXQBf2tq
-	hunEUhruZeNj1QZLjbC4JnnUUnvPhmmjj7e7bacBWHQRVNGH5SeFV5Bo
-X-Gm-Gg: AfdE7cmWMEKVs+TwOse8+mpMEV+EYYuW8TJHfd5NQF1I6FpuA7MZmOScrEWX4DX8oy9
-	jY0plT0jcq8JN9Defh3JyhnmhW5P2qzpaekNTAFdnxrt/y4WBLZzdbWxdyhaPZK2hMq+PNWVvkA
-	6zbCqnwJRP5Qc/dmC89+4xQoFMyjKwuOduHcpVxjKpNSxfpAdAoDkHWMqUbox13DpehCxsZJKQR
-	dkOkHzTqwLMsLFsceXDqRI64KfSYFNrWTQn/babcfgABjmQxqXQCwOSWsTu8aa5mVMlsWwGzLHF
-	RRMxs7/qkiUe6P1nsy+y+xX9JhLp/HGR6ztwVuHW52EUhlvxqMpNy9Y5dlbaG5Ggb57qwxaHdQu
-	X12WbSIfedi4WtNr6TD2vM1KYJHkie1pAv11o1ZZWrqQ+df8dt+IDv+gJq4SbnBzHePqN4sfVIX
-	1qRQRq7l+x669M9bl+ahSwmILFJrRgC3XnHQ==
-X-Received: by 2002:a05:600c:630e:b0:493:e6f7:ad75 with SMTP id 5b1f17b1804b1-4954a3dc687mr91408505e9.11.1784418042290;
-        Sat, 18 Jul 2026 16:40:42 -0700 (PDT)
-Received: from smtpclient.apple ([82.67.171.69])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e519f4sm15546887f8f.14.2026.07.18.16.40.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 18 Jul 2026 16:40:41 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+        bh=FuPoKX80iSa8+vqkUxb6tpNNuxB7x3ly8/lB/7SMUK4=;
+        b=p0XTBz7LupGtxcoaOURQaNyspITYsLNvxkyYB2keO88X4cZ4eRMO9fBotDe2hpKwLK
+         LT5fyytzmDiRQgyu2KnyGbmTUYecuwNwreEjc/fWv4rojASxi134qkMiRhrlsNyr4K5u
+         uTdeFTXv4Ez8hfcszgi4cVdvPNAZoVgYieW5M9L5b6jRnkZGRFcO9PY1nM73GWvxFxZq
+         ddOKhR8ni7lMWB4zQyyeQFzjcCc6Dini6uiFhxtnOMPZu0Knh02a1+f5E7a++Hhh+h4m
+         /gujpaGrf4W3Re6cuTAFPv3cmPFZ7JkEhyGKoT05/3E+O2tYaa49KAXnCZDXddBcPl01
+         2VBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784422264; x=1785027064;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=FuPoKX80iSa8+vqkUxb6tpNNuxB7x3ly8/lB/7SMUK4=;
+        b=pO4yuNGYhJnpo9iEBMFVAdAm0WtsRc+UOLm5wQqq9Li+eA1jSTLGxXQcYg5dXeHl8t
+         hVOoAHi6h5pDp5pZ3sMGo9mtoJg8vCUUGluEdIDTyLbhwV1lJLZQjKGC609TFEgd+T3Y
+         TQgdTmt3b8fKXVWdCNbVRFR5NZCPQYQJBUe78AqwNOeW6TNezD4uteIcMH1bflYdIXa4
+         w+IyDq4eTDN4ryv/H/y4kCJ6Ys0L0D7ZfhmsKD85e378KHua02Cr2tHDoWNxPNuBOq+N
+         41MBucr3VBvFIpRLdpZozFxwE2Vy1tvN7s23s3pwruLkiRUXsru+e5eVXyU7jJtTMma3
+         U1WA==
+X-Gm-Message-State: AOJu0YwObqafaXmzlY/ov6hwNxS3I8xpTrYGdMJjNrEdkMJkW0i9YvFa
+	u4wyv/CME48VkF1bBTECEhXpKsEb00MscVZDP2xPlbMHyXmmGrQjX7hyfmoPqOe2prTxt14un0w
+	+jN39ga/v
+X-Gm-Gg: AfdE7cmlCuhxRxDpL4cQCT6F0qHbCMW3LLoOotZoDJLs7Xcjm6xfhLa5mtrNCSvXYgo
+	Z01bfEPwUpl0cSk3be3w5ZkBScjbxquG9s86YOjJcBsl/zba1cAJ23Bmp7lg9MgwjBWy9KQpktH
+	nzMDkTby0uAohOMSv6KUErlmdm5FH1HNrs5LH4LWTcWjOc4y8AK8DPo+vxd/gBlX5wDqX3o8J36
+	cjxpro3hlIiqkb/+ps43xiMp6PZpDiLJzuRr/uNb1S4cilMNEDHqetKuxbYsqvavoz5F19xqSCO
+	5/z6FwOg96cTdV8VebL+fj67JXHvs2K2pxXmK5Y+H2p14+vo4aJr3r2qCz2Y43v6XVbXf2mVZ2K
+	pLo0z+Pwwdm7nSQdmOc04tR9RbDpFQ9oB6418oTSIq90xkDDQMETfJr7ZVwUyACVZ8cF3decsts
+	S+y3MU1DGPo+pTTDLgCdaEpjBXlu9eZTSw+oSwDqM6raonI1/nGq5MJOlYnF2cxA==
+X-Received: by 2002:a05:620a:6606:b0:929:f78f:6bf9 with SMTP id af79cd13be357-930b4865dc9mr772927885a.16.1784422263497;
+        Sat, 18 Jul 2026 17:51:03 -0700 (PDT)
+Received: from localhost.localdomain (dsl-sb4-27.greenmountainaccess.net. [65.19.73.27])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-930b5494c02sm524575385a.45.2026.07.18.17.51.01
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 18 Jul 2026 17:51:02 -0700 (PDT)
+From: Carl Johnson <carl@jpartners.org>
+To: linux-cifs@vger.kernel.org
+Cc: Steve French <sfrench@samba.org>,
+	=?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>,
+	Carl Johnson <carl@jpartners.org>
+Subject: [PATCH] smb: client: handle STATUS_STOPPED_ON_SYMLINK responses without a symlink target
+Date: Sat, 18 Jul 2026 20:50:45 -0400
+Message-ID: <20260719005045.13125-1-carl@jpartners.org>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
-Subject: Re: [PATCH 0/3] smb/server: fix some bugs in preparation for change
- notify support
-From: =?utf-8?Q?Ga=C3=ABl_Blivet?= <gael.blivet@gmail.com>
-In-Reply-To: <CAKYAXd8-ZSbyU8NPCBYCVrExRJiRdn=y0mYbc71sSRqD4LoYAw@mail.gmail.com>
-Date: Sun, 19 Jul 2026 01:40:26 +0200
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- linux-cifs@vger.kernel.org,
- smfrench@gmail.com,
- pc@manguebit.org,
- ronniesahlberg@gmail.com,
- sprasad@microsoft.com,
- tom@talpey.com,
- bharathsm@microsoft.com,
- senozhatsky@chromium.org,
- dhowells@redhat.com,
- metze@samba.org,
- andriy.shevchenko@linux.intel.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <70B82D7E-4699-4C9F-A1F3-2B51C61BFD20@gmail.com>
-References: <20260715135513.667260-1-chenxiaosong@chenxiaosong.com>
- <73f4bc4e-3bdc-4bf2-b145-c9b6fc480451@chenxiaosong.com>
- <CAKYAXd8-ZSbyU8NPCBYCVrExRJiRdn=y0mYbc71sSRqD4LoYAw@mail.gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-X-Mailer: Apple Mail (2.3864.600.51.1.1)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-I have a draft for the follow-up patch that I am testing but I am not =
-yet satisfied with it as live tests currently show workers being =
-permanently wedged in smb2_notify().
-I'll need a bit more time before sending it.
-Thanks!
+The macOS built-in SMB server returns STATUS_STOPPED_ON_SYMLINK for a
+CREATE on a path whose final component is a symlink, but it does not
+include a Symbolic Link Error Response in the error data: both
+ErrorContextCount and ByteCount are zero, so the symlink target is not
+present in the response at all.  Per [MS-SMB2] section 2.2.2 such a
+response should carry a valid Symbolic Link Error Response, so this is a
+server bug, but the target can still be retrieved with
+FSCTL_GET_REPARSE_POINT.
 
-> Le 18 juil. 2026 =C3=A0 06:51, Namjae Jeon <linkinjeon@kernel.org> a =
-=C3=A9crit :
->=20
-> I have already merged your patch ("ksmbd: defer CHANGE_NOTIFY
-> completion instead of STATUS_NOT_IMPLEMENTED") into the
-> ksmbd-for-next-next branch. Please use that as the base and send a
-> follow-up patches to update the implementation using the
-> approach you and ChenXiaoSong discussed.
+Frame from a capture against macOS 26.5.2 (build 25F84):
 
+    SMB2 hdr : Status=0x8000002d STATUS_STOPPED_ON_SYMLINK, Cmd=Create
+    Error Rsp: StructureSize=0x0009
+               Error Context Count: 0
+               Byte Count: 0
+               Error Data: 00
+
+symlink_data() cannot find a struct smb2_symlink_err_rsp in such a
+response and returns -EINVAL, which parse_create_response() propagates,
+so smb2_query_path_info() bails out at
+
+	if (rc || !data->reparse_point)
+		goto out;
+
+before it can retry with SMB2_OP_GET_REPARSE.  stat(), readlink() and ls
+of any server-side symlink then fail with -EINVAL:
+
+  $ ls -la Config
+  l????????? ? ? ? ? ? Config.json
+  $ stat Config/Config.json
+  stat: cannot statx 'Config/Config.json': Invalid argument
+
+A 5.10 client resolves these symlinks correctly against the same server
+and share, so this is a regression for Apple SMB servers.
+
+Handle it in several places:
+
+ - symlink_data() detects the empty response (ErrorContextCount and
+   ByteCount both zero) and returns a distinct -ENODATA, so that "server
+   did not send the target" can be told apart from a genuinely malformed
+   response and only this case is worked around.
+
+ - parse_create_response() treats -ENODATA like
+   STATUS_IO_REPARSE_TAG_NOT_HANDLED, which does not carry the target
+   either: leave the reparse tag unset and clear rc, so the existing
+   SMB2_OP_GET_REPARSE path retrieves the target.
+
+ - smb2_query_path_info() only fixes up the symlink target type when the
+   target is already known.  SMB2_OP_GET_REPARSE sets data->reparse.tag
+   but does not parse the target out of the reparse buffer; that happens
+   later, in reparse_info_to_fattr().  Without this check
+   smb2_fix_symlink_target_type() is called with a NULL target and
+   returns -EIO.  This could not happen with servers that send the target
+   inline and therefore skip SMB2_OP_GET_REPARSE.
+
+ - smb2_open_file() maps -ENODATA to -EIO, matching
+   STATUS_IO_REPARSE_TAG_NOT_HANDLED, so its callers retrieve the target
+   with SMB2_OP_GET_REPARSE as well.
+
+Tested on Debian 13, kernel 6.18.38 (armv7), against macOS 26.5.2:
+symlinks now resolve, including relative, parent-traversing and directory
+symlinks, and reads through symlinks succeed.
+
+Co-developed-by: Pali Rohár <pali@kernel.org>
+Signed-off-by: Pali Rohár <pali@kernel.org>
+Signed-off-by: Carl Johnson <carl@jpartners.org>
+---
+ fs/smb/client/smb2file.c  | 21 +++++++++++++++++++++
+ fs/smb/client/smb2inode.c | 23 ++++++++++++++++++++---
+ 2 files changed, 41 insertions(+), 3 deletions(-)
+
+diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+index cc1ff24..9bab3c5 100644
+--- a/fs/smb/client/smb2file.c
++++ b/fs/smb/client/smb2file.c
+@@ -30,6 +30,19 @@ static struct smb2_symlink_err_rsp *symlink_data(const struct kvec *iov)
+ 	u8 *end = (u8 *)err + iov->iov_len;
+ 	u32 len;
+ 
++	/*
++	 * Per [MS-SMB2] section 2.2.2, a STATUS_STOPPED_ON_SYMLINK response has to
++	 * carry a Symbolic Link Error Response, so ByteCount cannot be zero.  Some
++	 * servers (e.g. the macOS built-in SMB server) violate this and return an
++	 * empty error response, with both ErrorContextCount and ByteCount set to
++	 * zero, i.e. without the symlink target.  Detect this and return -ENODATA
++	 * so that callers can tell "server did not send the target" apart from a
++	 * malformed response, and retrieve the target with FSCTL_GET_REPARSE_POINT
++	 * instead.
++	 */
++	if (!err->ErrorContextCount && !le32_to_cpu(err->ByteCount))
++		return ERR_PTR(-ENODATA);
++
+ 	if (err->ErrorContextCount) {
+ 		struct smb2_error_context_rsp *p;
+ 
+@@ -200,6 +213,14 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32
+ 			rc = smb2_parse_symlink_response(oparms->cifs_sb, &err_iov,
+ 							 oparms->path,
+ 							 &data->symlink_target);
++			/*
++			 * If smb2_parse_symlink_response returned -ENODATA then the
++			 * symlink_target was not sent. Treat this as if the SMB2_open()
++			 * failed with STATUS_IO_REPARSE_TAG_NOT_HANDLED status, which is
++			 * indicated by the -EIO errno.
++			 */
++			if (rc == -ENODATA)
++				rc = -EIO;
+ 			if (!rc) {
+ 				memset(smb2_data, 0, sizeof(*smb2_data));
+ 				oparms->create_options |= OPEN_REPARSE_POINT;
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index e13bc8a..f1de849 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -896,9 +896,19 @@ static int parse_create_response(struct cifs_open_info_data *data,
+ 		rc = smb2_parse_symlink_response(cifs_sb, iov,
+ 						 full_path,
+ 						 &data->symlink_target);
+-		if (rc)
++		if (rc != 0 && rc != -ENODATA)
+ 			return rc;
+-		tag = IO_REPARSE_TAG_SYMLINK;
++		/*
++		 * -ENODATA means that the response was parsed but did not contain
++		 * the symlink target at all (see symlink_data()).  Treat it like
++		 * STATUS_IO_REPARSE_TAG_NOT_HANDLED, which does not contain it
++		 * either: leave the tag unset and clear rc, so that the caller
++		 * retrieves the target with SMB2_OP_GET_REPARSE.
++		 */
++		if (rc == -ENODATA)
++			rc = 0;
++		else
++			tag = IO_REPARSE_TAG_SYMLINK;
+ 		reparse_point = true;
+ 		break;
+ 	case STATUS_SUCCESS:
+@@ -1091,7 +1101,14 @@ int smb2_query_path_info(const unsigned int xid,
+ 				rc = -EOPNOTSUPP;
+ 		}
+ 
+-		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc) {
++		/*
++		 * If the symlink was already parsed in create response then it is needed to fix
++		 * its type now (after the second call with OPEN_REPARSE_POINT which filled the
++		 * data->fi.Attributes). If the symlink was not parsed in create response then
++		 * the data->symlink_target was not filled yet and then the type will be fixed
++		 * later after data->symlink_target is filled.
++		 */
++		if (data->reparse.tag == IO_REPARSE_TAG_SYMLINK && !rc && data->symlink_target) {
+ 			bool directory = le32_to_cpu(data->fi.Attributes) & ATTR_DIRECTORY;
+ 			rc = smb2_fix_symlink_target_type(&data->symlink_target, directory, cifs_sb);
+ 		}
+-- 
+2.50.1 (Apple Git-155)
 
