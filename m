@@ -1,120 +1,108 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB98F42086A;
-	Mon, 20 Jul 2026 13:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5B728641E
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 15:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784552838; cv=none; b=gdNWleqYFaDQL1R+dpSmVOHjoYLz5GD2TiSWmUprCoa+SzzXPGraQhZebQsRDUWEcBeaNGyEG+vsl4W1IyZocGuV1fd8SBoj0EyJmRWWyoRyYiXi1dyqovs6POeNf5jsvhXJD4tUinJjolYRCxTTIHvPcYFty20eMFo0+lqsJgc=
+	t=1784560891; cv=none; b=aeV5AaJQ0xk6DmwfzWjSztkCTXig+dEjc+btvMgkJaKNkQH05hi34ZPTwG9Mqud3zacXe27TsDRCvsfvF7YYlUL7gcrwdbxLeER0fvNDwXvua9+TuNic9xg9CLOpii4Sz3SO0lBfM6KCR6GnTQKspC+w/eh0FiPEafd/wheWTsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784552838; c=relaxed/simple;
-	bh=Bg/MxqYkceHrlCdZVrf+I5hbhGLHZFb2bNd4+Uir3Z8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jLlsJdS3pIm3OO0tiwxwc17zXOyGM8/dcJ83QXqeugX0pkQ168UxABW1nK+zLUVyuHky3ULiEz5k4J8xNv5qlyWFE3IF3DboGNE7rGYLbY6k8DrrHut5Gb9KidGN81xpH7N6T+3L8zXiRZj3FSwwnongl27pfnj5G4EHOFJpMcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: e69e3470843b11f1aa26b74ffac11d73-20260720
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:4531dc52-7d48-42f2-9d16-cba26d02663f,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:10
-X-CID-INFO: VERSION:1.3.12,REQID:4531dc52-7d48-42f2-9d16-cba26d02663f,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:10
-X-CID-META: VersionHash:e7bac3a,CLOUDID:5ed39ddf064058a5bd781f37c65b5f01,BulkI
-	D:260720145755RHFN35RA,BulkQuantity:1,Recheck:0,SF:10|38|64|66|78|80|81|82
-	|83|102|127|136|841|850|865|898,TC:nil,Content:0|15|52,EDM:-3,IP:-2,URL:0,
-	File:nil,RT:nil,Bulk:40,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO
-	,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: e69e3470843b11f1aa26b74ffac11d73-20260720
-X-User: tanze@kylinos.cn
-Received: from [127.0.0.1] [(116.128.244.169)] by mailgw.kylinos.cn
-	(envelope-from <tanze@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 237866722; Mon, 20 Jul 2026 21:07:03 +0800
-Message-ID: <5fa257a4-456e-4917-9249-bb3457952335@kylinos.cn>
-Date: Mon, 20 Jul 2026 21:06:43 +0800
+	s=arc-20240116; t=1784560891; c=relaxed/simple;
+	bh=msNzJ0dNoP1BnNCl1QiOlbMVlrYw6OoIbmpWkxm6Mdw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e0qaexw+/wow7K3qxrm4mu4/+iOD8L28jmAL0Su2BPoZ3aTWWsEvECDWBcov3e652JYTPb0gqK2eu5wgP152OooscyAfnqjibvZbztURJghpyKCVG63QHp611/wObfCVh2xr0hW8k33Tm+n/ljC4kyBv/F2Vo5MJ/w8jD4Ilb3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pXvS1F0r; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pXvS1F0r"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-6a1160a2c42so6935156eaf.0
+        for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 08:21:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784560889; x=1785165689; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=QaExHYBMbO4BVV9bYsc1HQwQVCvBojAwVc9mYoydE2Y=;
+        b=pXvS1F0rw6X2PjC2Ed3/wClGhe+Xa84qgcEOl/sFl4QqnUGWMVSH5t9sXJh9H8faf/
+         vJBprPaoxOYf+LIFq2Wx3XwVOrsyHqSNQCTK0TCjq1ZiMWjpEY30oZ0ibXiuLAlrdC3n
+         2NC70bUPSd2qEBJbDXPUAtDR12MiNcL+tOxOj+BRSeeo4L4frcFKWpmul9YNtmEch/eX
+         dcZw9gI64FggHzpE9xmGS5csTfuD/xyD1bs9z1duZxnlQXtpW9N0dnEcoT+GSnKi300p
+         FFmIa/C288xiCslN1AOsq3zaVYGNfs+bFZyX8eNpKG1v4FgjU8PsKSkLkNswlWfscUD8
+         0M7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784560889; x=1785165689;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=QaExHYBMbO4BVV9bYsc1HQwQVCvBojAwVc9mYoydE2Y=;
+        b=Znl5vPTzrv9a6W/VhsJgNaIPTOVoW1rjzPmYIgo10BWh4Sn9IsBidrDRzrvdp9AfMI
+         /dgbacD9rm2lXk1UNKCfXxmj0rybOSo58ohbe5fE6htCHjLr8Vbt1/FXCGN3LFNUze7E
+         aBjQM6/x0ehkjXy7JSYPEcGhl4RyYeDr3tHfDrfQbP+UIUBJST1bZUtq4ezniQp9Puk6
+         oupnM9SbO8IEfAIrKDpQpNaXlViUWh96F77LlDlHhmWm31y891jVkRqrBCT/W2UL26il
+         Czd8Os6j6Q/U/FosVv3SwNfdE//YSAQYc3cPn/EtbAB3LDIGUcQTBPGnG11dCqLsK2jv
+         0yTw==
+X-Gm-Message-State: AOJu0Yy3l8RmOx6iv6hoABJnzRFMMyBULxdN10j6mcQSdS/NfMuiyLu+
+	LMr+hOqJ10M8qE9vV8w3GtaAifgU6svcDiO8ywdiXbqV5BO84kac3LgW3UQnHfHV
+X-Gm-Gg: AfdE7ck3hN22kjYYwc2KNKXi6NK8ZPI7rAIJtj9yLOrMWuvSpiWjZmF4lk9G1/LjhKf
+	1oY7hEha9LNTkINDQPko2xsFX3q3todz2kXubmObnI/69kGN8BMtFn5JdREPMWaLaQTWHBljrXy
+	EqWMBHWSmhwLM6554BDyhdo57w4brqBWEzA6C940DvZFxyhBgguRZdZWssaT3j8AvWhOom5bHp3
+	g86B+A+FyuExcbl62Xlv5kbMUi1UqbgUeGzk3KWeQg724Fgozeai4O1Q56NrB9HD88deNPEMYtS
+	0qIlldZazWDvXRZUBDeyZwQRPzhg2Yz2hVkg1032fcu6Q9wMti4fGu/rmhOlAqmHL8hxQevOWor
+	HoXwZuytk780j/a+8pQ6mUyEUGApT/logE8unWGg6Mamhu/ctR1d60kMEnb+lX0cJA54imJauSh
+	WuypbfyLP8Cg46dSXfaEOd+DrlUgav42wybL1VEd6AcUDc9eXELEKRq5PqEkKZ6nH2J2eTbyLe3
+	GXRfRihhK86RxpWulk7Ih8CmAfNe1iFSqOeSy9KiqOQMiq5vM3xp7hnqG3/rHxqkY2TEmoNnUbH
+	cNNiBVkxZyOc/dbb
+X-Received: by 2002:a05:6820:1386:b0:6a1:7fa0:114e with SMTP id 006d021491bc7-6a53689359amr7479358eaf.64.1784560888775;
+        Mon, 20 Jul 2026 08:21:28 -0700 (PDT)
+Received: from smfrench-ThinkPad-P16s-Gen-2 ([2603:8080:2200:13fc:5acc:d14a:12e3:afd2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4568e6a91eesm9104774fac.13.2026.07.20.08.21.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jul 2026 08:21:27 -0700 (PDT)
+From: Steve French <smfrench@gmail.com>
+X-Google-Original-From: Steve French <stfrench@microsoft.com>
+To: linux-cifs@vger.kernel.org
+Cc: Steve French <stfrench@microsoft.com>
+Subject: [PATCH] Add missing git branch info for cifs and ksmbd to MAINTAINERS file
+Date: Mon, 20 Jul 2026 10:20:51 -0500
+Message-ID: <20260720152051.1966581-1-stfrench@microsoft.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 6/9] ksmbd: support security.capability EAs
-To: Ralph Boehme <slow@samba.org>, sfrench@samba.org, linkinjeon@kernel.org,
- pc@manguebit.org, sprasad@microsoft.com, tom@talpey.comm,
- senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com,
- linux-cifs@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-References: <cover.1784258165.git.tanze@kylinos.cn>
- <846fec356d359126e64ea64cd5f6e80ce7de4b61.1784258165.git.tanze@kylinos.cn>
- <48439a79-aa0c-4f0d-b079-3b85de715226@samba.org>
-Content-Language: en-US
-From: tanze <tanze@kylinos.cn>
-In-Reply-To: <48439a79-aa0c-4f0d-b079-3b85de715226@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Thanks for your question. When the CIFS client accesses user.EA, the 
-name transmitted over the SMB protocol is simply EA instead of user.EA. 
-ksmbd then prepends user. to convert it back to user.EA. If we pass 
-every attribute name directly to the VFS unmodified, other types of 
-extended attributes will return -EOPNOTSUPP due to missing handlers.
+cifs client and ksmbd server were missing the git branch info in the
+MAINTAINERS file. They just were showing the git tree.
 
-The current workflow works as follows:
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Client request                                 --user.EA
-↓ CIFS client strips off the "user."
-prefix SMB EA layer receives:          --EA
-↓ ksmbd adds back the "user."
-prefix Server filesystem layer:         --user.EA
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a674e36529f7..276abc0ad458 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6478,7 +6478,7 @@ L:	linux-cifs@vger.kernel.org
+ L:	samba-technical@lists.samba.org (moderated for non-subscribers)
+ S:	Supported
+ W:	https://wiki.samba.org/index.php/LinuxCIFS
+-T:	git https://git.samba.org/sfrench/cifs-2.6.git
++T:	git https://git.samba.org/sfrench/cifs-2.6.git for-next
+ F:	Documentation/admin-guide/cifs/
+ F:	fs/smb/client/
+ F:	fs/smb/common/
+@@ -14142,7 +14142,7 @@ R:	Sergey Senozhatsky <senozhatsky@chromium.org>
+ R:	Tom Talpey <tom@talpey.com>
+ L:	linux-cifs@vger.kernel.org
+ S:	Maintained
+-T:	git https://git.samba.org/ksmbd.git
++T:	git https://git.samba.org/ksmbd.git ksmbd-for-next
+ F:	Documentation/filesystems/smb/ksmbd.rst
+ F:	fs/smb/common/
+ F:	fs/smb/server/
+-- 
+2.53.0
 
-After ksmbd finishes mapping to the underlying extended attribute name, 
-filesystem compatibility checks, value validation and all related 
-operations should be delegated uniformly to |vfs_setxattr()|. This 
-mapping logic is not meant to duplicate the full set of xattr namespaces 
-supported by the VFS. Instead, it filters which SMB extended attribute 
-names get parsed as native Linux xattr names.
-
-I will revise the patch to enable native namespace mapping only when 
-both of the following two conditions are satisfied:
-
-   1.The request is sent with POSIX extended attribute parameters;
-   2. The mapped server-side user account is root or an account with 
-administrative privileges.
-
-Thanks!
-
-
-在 2026/7/20 14:57, Ralph Boehme 写道:
-> On 7/17/26 5:39 AM, Ze Tan wrote:
->> +static bool ksmbd_is_posix_ea_name(const char *name, size_t name_len)
->> +{
->> +    if (ksmbd_is_security_capability_ea_name(name, name_len))
->> +        return true;
->> +
->> +    return false;
->> +}
->> +
->> +static int ksmbd_map_ea_name_to_xattr(bool posix_extensions,
->> +                      const char *ea_name, size_t ea_name_len,
->> +                      char *attr_name)
->> +{
->> +    if (posix_extensions &&
->> +        ksmbd_is_posix_ea_name(ea_name, ea_name_len)) {
->
-> why the check for allowed namespaces via ksmbd_is_posix_ea_name() at 
-> all and not just pass through whatever the client sends us, pass it 
-> down and let the xattr subsystem deal with it?
->
-> Still wrapping my head around this so I might be missing something 
-> obvious. :)
->
-> Thanks!
-> -slow
