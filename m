@@ -1,37 +1,37 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AC03859F5
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 19:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680603A380A
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 19:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784577017; cv=none; b=OtcvZEPcdgiwWBEnG9EjV9Yk8iqMmopNuBYZJB+fsPfAL5BYmeNxssGvvcz+OBSQeWeDUwDw4w+3+lk4yQjNwkGa9DfYGLcFNsJJDYwbjr3sj14lzLn2wmPmNXDz9HjH1KO/VcOniYxkRuOKlYTWRfsqeXLePzucD6yFlRxJSlI=
+	t=1784577022; cv=none; b=frfMKHNCY8RDC0+FkXcGg6h71cfUrYdZ6Jq5X1dbyxln7bKB8slDOmbgaHItClK9t41bvi5B2mlohMYQ5CM61duYQ8Mbk6SF0n2OvRp5O4EZ5Vtpy8oZI0AxRb9nyHvqEJfPP/uOXX99KS/ENz0AImpz7Rk9hr9CuD9512F/9v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784577017; c=relaxed/simple;
-	bh=xcdMoyHiggEz4ijVKntjora0vKpsrhB/i8+2KjyIWgw=;
+	s=arc-20240116; t=1784577022; c=relaxed/simple;
+	bh=WnYqOW+xC7X6ZQOUYENoKaS6+oyWijyEjRq/2gNfZa8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tFgO0th8ELYQUyX5LsYpl/Li+uOU4Bpzrz3ss4wtutpKzuYtlbv9yBiAcuHwpCAY8pjAfVNLgzA64BlahY2S7g4l2hzGiR7fEeqMNtjC8yyTCKdpxPJtF3whhxqnKNcX5iJpD4UVV9QhjjgUkvoXfbMYr1xVJR3ow/5BBUr2F7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.131
+	 MIME-Version; b=dYeKkbGPdgGpvLV7qh22dHlGy8x31372xCrkKf0748WhHAHAQijwQRxUfVQesh8DzOrvy/8XM8tQHMBXZ25lBbk80b8/u1boZjGu2uq9tWgvGXnJXCaicYjTvxkQ9KocXnqr0z5+pmoIbZTdwuFlufKx5RAraGtxTQsjuh7OB5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1CF603E93;
-	Mon, 20 Jul 2026 19:50:14 +0000 (UTC)
-Authentication-Results: smtp-out2.suse.de;
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 01E5E7A186;
+	Mon, 20 Jul 2026 19:50:11 +0000 (UTC)
+Authentication-Results: smtp-out1.suse.de;
 	none
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9DADB779AA;
-	Mon, 20 Jul 2026 19:50:13 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 47CF2779AA;
+	Mon, 20 Jul 2026 19:50:10 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id LfESGfV7XmrQCAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 20 Jul 2026 19:50:13 +0000
+	id dXbuA/J7XmrJCAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 20 Jul 2026 19:50:10 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -44,9 +44,9 @@ Cc: smfrench@gmail.com,
 	linkinjeon@kernel.org,
 	senozhatsky@chromium.org,
 	Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH v2 12/14] smb: client: add support for decompressing READs
-Date: Mon, 20 Jul 2026 16:49:23 -0300
-Message-ID: <20260720194925.2108840-12-ematsumiya@suse.de>
+Subject: [PATCH v2 11/14] smb: common: compress: implement LZ77-Huffman
+Date: Mon, 20 Jul 2026 16:49:22 -0300
+Message-ID: <20260720194925.2108840-11-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260720194925.2108840-1-ematsumiya@suse.de>
 References: <20260720194925.2108840-1-ematsumiya@suse.de>
@@ -60,347 +60,1465 @@ Content-Transfer-Encoding: 8bit
 X-Rspamd-Pre-Result: action=no action;
 	module=replies;
 	Message is reply to one we originated
-X-Rspamd-Pre-Result: action=no action;
-	module=replies;
-	Message is reply to one we originated
+X-Rspamd-Queue-Id: 01E5E7A186
 X-Spam-Flag: NO
 X-Spam-Score: -4.00
 X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
 X-Spamd-Result: default: False [-4.00 / 50.00];
 	REPLY(-4.00)[]
-X-Rspamd-Queue-Id: 1CF603E93
-X-Rspamd-Action: no action
 
-Implement decompression support for SMB2 READ messages.
+Implement LZ77-Huffman compression algorithm as per MS-XCA.
+
+Huffman encoding adds a few extra passes on top of LZ77-style encoding
+in order to provide better compression ratio (at bit level rather than
+byte level).
+
+Refer to MS-XCA spec or code/comments in huffman.* for details.
 
 Changes:
-- smb2ops.c: add receive_compressed() and check_decompressed_smb2()
-  - check for compress header in smb3_is_transform_hdr() as well so we
-    fall into the same path handling offloaded READ decryption
-- common/compress/compress.h: add is_compress_hdr() and
-  smb_decompress_alloc_size() helpers
+- add huffman.{h,c} with implementation
+- adjust server/ and client/ code to support new alg
+- rename smb_compression_add_lz77() to smb_compression_add_lz() and
+  smb_decompress_lz77_payload() to smb_decompress_lz_payload(), and
+  add an @alg arg to both, so they handle LZ77 and LZ77-Huffman
+  (which are handled the same way in that regard)
+- add @lzalg arg to smb_compress_alloc_size() to account for
+  LZ77-Huffman allocation requirements
+- add LZ77-Huffman to smb_compress_alg_valid()
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
- fs/smb/client/smb2ops.c           | 160 +++++++++++++++++++++++++++++-
- fs/smb/client/smb2pdu.c           |   6 ++
- fs/smb/common/compress/compress.h |  86 ++++++++++++++++
- 3 files changed, 251 insertions(+), 1 deletion(-)
+ fs/smb/client/compress.c          |  21 +-
+ fs/smb/client/smb2pdu.c           |  20 +-
+ fs/smb/common/Makefile            |   2 +-
+ fs/smb/common/compress/compress.c |  46 +-
+ fs/smb/common/compress/compress.h |  22 +-
+ fs/smb/common/compress/huffman.c  | 983 ++++++++++++++++++++++++++++++
+ fs/smb/common/compress/huffman.h  |  31 +
+ fs/smb/server/compress.c          |   9 +-
+ fs/smb/server/smb2pdu.c           |  27 +-
+ 9 files changed, 1117 insertions(+), 44 deletions(-)
+ create mode 100644 fs/smb/common/compress/huffman.c
+ create mode 100644 fs/smb/common/compress/huffman.h
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index d60bc537ecf1..09cbc00e83b0 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -30,6 +30,8 @@
- #include "fs_context.h"
- #include "cached_dir.h"
- #include "reparse.h"
-+#include "../common/compress/compress.h"
-+#include "compress.h"
- 
- /* Change credits for different ops and return the total number of credits */
- static int
-@@ -4714,7 +4716,7 @@ smb3_is_transform_hdr(void *buf)
+diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
+index 363ad58ad798..bc8f67dc2e95 100644
+--- a/fs/smb/client/compress.c
++++ b/fs/smb/client/compress.c
+@@ -225,14 +225,16 @@ static int check_compressible_chunks(const u8 *buf, const u32 len, u32 *freqs)
+ /*
+  * Check @buf heuristics (entropy/distribution) to determine its compressibility level.
+  *
++ * If @maybe_ok is false, alias MAYBE_COMPRESSIBLE to UNCOMPRESSIBLE.
++ *
+  * Tests shows that this function is quite reliable in predicting data compressibility, matching
+- * very close with the behaviour of LZ77 compression success and failures.
++ * very close with the behaviour of LZ* compression success and failures.
+  *
+  * This function allocates memory, callers must check for -ENOMEM.
+  *
+  * Return: one of the *COMPRESSIBLE values on success, -errno otherwise.
+  */
+-static __must_check int check_compressible(const u8 *buf, u32 len)
++static __must_check int check_compressible(const u8 *buf, u32 len, bool maybe_ok)
  {
- 	struct smb2_transform_hdr *trhdr = buf;
+ 	u32 entropy, *freqs, rle = 0, rle_boost = 0;
+ 	const u32 min_reps = (len / 100); /* ~1% of @len */
+@@ -310,6 +312,9 @@ static __must_check int check_compressible(const u8 *buf, u32 len)
  
--	return trhdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM;
-+	return (trhdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM) || is_compress_hdr(buf);
- }
+ 	kfree(freqs);
  
- static int
-@@ -5246,6 +5248,153 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
++	if (!maybe_ok && ret == MAYBE_COMPRESSIBLE)
++		ret = UNCOMPRESSIBLE;
++
  	return ret;
  }
  
-+static __always_inline bool check_decompressed_smb2(const void *buf, const u32 len)
+@@ -355,6 +360,7 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
+ 	bool chained, use_pattern;
+ 	void *src, *dst = NULL;
+ 	u32 slen, dlen;
++	__le16 lzalg;
+ 	int ret;
+ 
+ 	if (!server || !rq || !rq->rq_iov || !rq->rq_iov->iov_base)
+@@ -363,6 +369,10 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
+ 	if (rq->rq_iov->iov_len != sizeof(struct smb2_write_req))
+ 		return -EINVAL;
+ 
++	lzalg = server->compression.alg;
++	if (unlikely(!smb_compress_alg_valid(lzalg, false)))
++		return -EINVAL;
++
+ 	slen = iov_iter_count(&rq->rq_iter);
+ 	src = kvzalloc(slen, GFP_KERNEL);
+ 	if (!src) {
+@@ -386,7 +396,7 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
+ 	 * uncompressible low-hanging fruits here and let smb_lz77_compress() handle the
+ 	 * exceptions/rare cases.
+ 	 */
+-	ret = check_compressible(src, slen);
++	ret = check_compressible(src, slen, lzalg == SMB3_COMPRESS_LZ77_HUFF);
+ 
+ 	/* XXX: do something with MAYBE_COMPRESSIBLE */
+ 	if (ret != COMPRESSIBLE) {
+@@ -397,15 +407,14 @@ int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_s
+ 
+ 	chained = server->compression.chained;
+ 	use_pattern = server->compression.pattern;
+-	dlen = smb_compress_alloc_size(slen, chained, use_pattern);
++	dlen = smb_compress_alloc_size(slen, chained, use_pattern, lzalg);
+ 	dst = kvzalloc(dlen, GFP_KERNEL);
+ 	if (!dst) {
+ 		ret = -ENOMEM;
+ 		goto err_free;
+ 	}
+ 
+-	ret = smb_compression_compress(SMB3_COMPRESS_LZ77, chained, use_pattern,
+-				       src, slen, dst, &dlen);
++	ret = smb_compression_compress(lzalg, chained, use_pattern, src, slen, dst, &dlen);
+ 	if (!ret && dlen < slen) {
+ 		struct smb2_compression_hdr *hdrp = dst, hdr = {};
+ 		struct smb_rqst comp_rq = { .rq_nvec = 3, };
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index cc20d9b6638f..e58ac7be30a3 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -44,6 +44,7 @@
+ #include "cached_dir.h"
+ #include "compress.h"
+ #include "fs_context.h"
++#include "../common/compress/compress.h"
+ 
+ /*
+  *  The following table defines the expected "StructureSize" of SMB2 requests
+@@ -877,14 +878,23 @@ static void decode_compress_ctx(struct TCP_Server_Info *server,
+ 	pattern = false;
+ 
+ 	for (i = 0; i < count; i++) {
+-		/* Record the intersection supported by the shared SMB codec. */
+-		if (ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_LZ77)
+-			alg = SMB3_COMPRESS_LZ77;
+-		else if (ctxt->CompressionAlgorithms[i] == SMB3_COMPRESS_PATTERN)
++		__le16 rsp_alg = ctxt->CompressionAlgorithms[i];
++
++		/*
++		 * Servers only return 1 LZ* algorithm, or + Pattern_V1 if chained.
++		 * server->compression.alg only tracks LZ* algs.
++		 */
++		if (rsp_alg == SMB3_COMPRESS_PATTERN)
+ 			pattern = true;
++		else if (smb_compress_alg_valid(rsp_alg, false))
++			alg = rsp_alg;
++		else
++			pr_warn_once("invalid compression algorithm '0x%04x'\n",
++				     le16_to_cpu(rsp_alg));
+ 	}
+ 
+-	if (unlikely(alg != SMB3_COMPRESS_LZ77)) {
++	/* We explicitly checked for SMB3_COMPRESS_PATTERN above, so this works fine */
++	if (unlikely(!smb_compress_alg_valid(alg, false))) {
+ 		cifs_dbg(VFS, "invalid LZ algorithm negotiated 0x%x\n", alg);
+ 		goto out;
+ 	}
+diff --git a/fs/smb/common/Makefile b/fs/smb/common/Makefile
+index f2c6e09d4e77..35368807da76 100644
+--- a/fs/smb/common/Makefile
++++ b/fs/smb/common/Makefile
+@@ -6,4 +6,4 @@
+ obj-$(CONFIG_SMBFS) += cifs_md4.o
+ obj-$(CONFIG_SMBFS) += smb_compress.o
+ 
+-smb_compress-y := compress/compress.o compress/lz77.o
++smb_compress-y := compress/compress.o compress/lz77.o compress/huffman.o
+diff --git a/fs/smb/common/compress/compress.c b/fs/smb/common/compress/compress.c
+index 64c33af95877..3b2690acb93a 100644
+--- a/fs/smb/common/compress/compress.c
++++ b/fs/smb/common/compress/compress.c
+@@ -56,11 +56,11 @@ static int smb_decompress_pattern(const u8 **src, u32 *slen, u8 **dst,
+ }
+ 
+ /*
+- * LZ77 payload Length includes the four-byte OriginalPayloadSize field.
++ * LZ* payload Length includes the four-byte OriginalPayloadSize field.
+  * Consume that field before passing the compressed stream to the raw codec.
+  */
+-static int smb_decompress_lz77_payload(const u8 **src, u32 *slen, u8 **dst,
+-				       u32 *dlen, u32 len)
++static int smb_decompress_lz_payload(const u8 **src, u32 *slen, u8 **dst,
++				     u32 *dlen, u32 len, __le16 alg)
+ {
+ 	u32 orig_size;
+ 	int rc;
+@@ -76,7 +76,11 @@ static int smb_decompress_lz77_payload(const u8 **src, u32 *slen, u8 **dst,
+ 	*slen -= sizeof(__le32);
+ 	len -= sizeof(__le32);
+ 
+-	rc = smb_lz77_decompress(*src, len, *dst, orig_size);
++	if (alg == SMB3_COMPRESS_LZ77)
++		rc = smb_lz77_decompress(*src, len, *dst, orig_size);
++	else /* SMB3_COMPRESS_LZ77_HUFF, assumes others were checked by caller */
++		rc = smb_huff_decompress(*src, len, *dst, orig_size);
++
+ 	if (rc)
+ 		return rc;
+ 
+@@ -135,8 +139,9 @@ static int smb_decompress_chained(__le16 alg, const struct smb2_compression_hdr
+ 			rc = smb_decompress_none(&src, &remaining, &out, &out_remaining, len);
+ 			break;
+ 		case SMB3_COMPRESS_LZ77:
+-			rc = smb_decompress_lz77_payload(&src, &remaining, &out,
+-							 &out_remaining, len);
++		case SMB3_COMPRESS_LZ77_HUFF:
++			rc = smb_decompress_lz_payload(&src, &remaining, &out,
++						       &out_remaining, len, payload_alg);
+ 			break;
+ 		case SMB3_COMPRESS_PATTERN:
+ 			rc = smb_decompress_pattern(&src, &remaining, &out, &out_remaining, len);
+@@ -173,7 +178,15 @@ static int smb_decompress_unchained(__le16 alg,
+ 
+ 	memcpy(dst, (const u8 *)hdr + sizeof(*hdr), offset);
+ 	comp_size = slen - sizeof(*hdr) - offset;
+-	return smb_lz77_decompress((const u8 *)hdr + sizeof(*hdr) + offset,
++
++	if (alg == SMB3_COMPRESS_LZ77)
++		return smb_lz77_decompress((const u8 *)hdr + sizeof(*hdr) + offset,
++					   comp_size, (u8 *)dst + offset, orig_size);
++
++	if (WARN_ON_ONCE(alg != SMB3_COMPRESS_LZ77_HUFF))
++		return -EINVAL;
++
++	return smb_huff_decompress((const u8 *)hdr + sizeof(*hdr) + offset,
+ 				   comp_size, (u8 *)dst + offset, orig_size);
+ }
+ 
+@@ -280,8 +293,8 @@ static int smb_compression_add_none(struct smb_compression_builder *builder,
+ 	return 0;
+ }
+ 
+-static int smb_compression_add_lz77(struct smb_compression_builder *builder,
+-				    const u8 *src, u32 len, bool chained)
++static int smb_compression_add_lz(struct smb_compression_builder *builder, const u8 *src, u32 len,
++				  __le16 alg, bool chained)
+ {
+ 	struct smb2_compression_payload_hdr *payload;
+ 	u32 comp_len, offset = chained ? sizeof(payload->OriginalPayloadSize) : 0;
+@@ -296,14 +309,19 @@ static int smb_compression_add_lz77(struct smb_compression_builder *builder,
+ 	 * accounted for.
+ 	 * Also, use @payload_len == 0 as we don't know compressed size yet.
+ 	 */
+-	payload = smb_compression_add_payload(builder, SMB3_COMPRESS_LZ77, 0);
++	payload = smb_compression_add_payload(builder, alg, 0);
+ 	if (!payload)
+ 		return -ENOSPC;
+ 
+ 	builder->pos += offset;
+ 	builder->remaining -= offset;
+ 	comp_len = builder->remaining;
+-	rc = smb_lz77_compress(src, len, builder->pos, &comp_len);
++
++	rc = -EIO;
++	if (alg == SMB3_COMPRESS_LZ77)
++		rc = smb_lz77_compress(src, len, builder->pos, &comp_len);
++	else /* SMB3_COMPRESS_LZ77_HUFF, assumes others were checked by caller */
++		rc = smb_huff_compress(src, len, builder->pos, &comp_len);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -348,8 +366,8 @@ int smb_compression_compress(__le16 alg, bool chained, bool allow_pattern,
+ 	u32 forward = 0, backward = 0, middle_len;
+ 	int rc;
+ 
+-	if (!src || !dst || !dlen || alg != SMB3_COMPRESS_LZ77 ||
+-	    *dlen <= SMB2_COMPRESSION_CHAINED_HDR_LEN || !slen)
++	if (!src || !dst || !dlen || *dlen <= SMB2_COMPRESSION_CHAINED_HDR_LEN || !slen ||
++	    !smb_compress_alg_valid(alg, false))
+ 		return -EINVAL;
+ 
+ 	/* Note that the below is a bug, but (chained && !allow_pattern) is a valid combination */
+@@ -391,7 +409,7 @@ int smb_compression_compress(__le16 alg, bool chained, bool allow_pattern,
+ 	rc = -ENODATA;
+ 	middle_len = slen - forward - backward;
+ 	if (middle_len > 1024 || !chained)
+-		rc = smb_compression_add_lz77(&builder, input + forward, middle_len, chained);
++		rc = smb_compression_add_lz(&builder, input + forward, middle_len, alg, chained);
+ 	else if (middle_len && allow_pattern)
+ 		rc = smb_compression_add_none(&builder, input + forward, middle_len);
+ 
+diff --git a/fs/smb/common/compress/compress.h b/fs/smb/common/compress/compress.h
+index 601ccb789fa4..43dba4bb1176 100644
+--- a/fs/smb/common/compress/compress.h
++++ b/fs/smb/common/compress/compress.h
+@@ -15,6 +15,7 @@
+ #include <linux/slab.h>
+ 
+ #include "../smb2pdu.h"
++#include "huffman.h"
+ #include "lz77.h"
+ 
+ #define SMB2_COMPRESSION_CHAINED_HDR_LEN \
+@@ -139,10 +140,16 @@ static __always_inline u32 smb_compress_hash_ptr(const void *ptr)
+  */
+ static __always_inline bool smb_compress_alg_valid(__le16 alg, bool valid_none)
+ {
+-	if (alg == SMB3_COMPRESS_NONE)
++	switch (alg) {
++	case SMB3_COMPRESS_NONE:
+ 		return valid_none;
++	case SMB3_COMPRESS_LZ77:
++	case SMB3_COMPRESS_LZ77_HUFF:
++	case SMB3_COMPRESS_PATTERN:
++		return true;
++	}
+ 
+-	return alg == SMB3_COMPRESS_LZ77 || alg == SMB3_COMPRESS_PATTERN;
++	return false;
+ }
+ 
+ /**
+@@ -150,6 +157,7 @@ static __always_inline bool smb_compress_alg_valid(__le16 alg, bool valid_none)
+  * @size:		uncompressed size
+  * @chained:		if chained compression is enabled
+  * @use_pattern:	if Pattern_V1 is enabled
++ * @lzalg:		LZ* algorithm that will be used
+  *
+  * For any case:
+  * - SMB2 compression hdr
+@@ -168,11 +176,15 @@ static __always_inline bool smb_compress_alg_valid(__le16 alg, bool valid_none)
+  * checked by the caller.
+  */
+ static __always_inline u32 smb_compress_alloc_size(const u32 size, const bool chained,
+-						   const bool use_pattern)
++						   const bool use_pattern, const __le16 lzalg)
+ {
+-	u32 alloc_size;
++	u32 alloc_size = sizeof(struct smb2_compression_hdr);
++
++	if (lzalg == SMB3_COMPRESS_LZ77)
++		alloc_size += smb_lz77_compressed_alloc_size(size);
++	else if (lzalg == SMB3_COMPRESS_LZ77_HUFF)
++		alloc_size += smb_huff_compressed_alloc_size(size);
+ 
+-	alloc_size = sizeof(struct smb2_compression_hdr) + smb_lz77_compressed_alloc_size(size);
+ 	if (chained) {
+ 		alloc_size += SMB2_COMPRESSION_PAYLOAD_BASE_LEN;
+ 		if (use_pattern)
+diff --git a/fs/smb/common/compress/huffman.c b/fs/smb/common/compress/huffman.c
+new file mode 100644
+index 000000000000..654f42a5a6b9
+--- /dev/null
++++ b/fs/smb/common/compress/huffman.c
+@@ -0,0 +1,983 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2026, SUSE LLC
++ *
++ * Authors: Enzo Matsumiya <ematsumiya@suse.de>
++ *
++ * Implementation of the LZ77+Huffman compression algorithm, as per MS-XCA spec.
++ */
++#include <linux/slab.h>
++#include <linux/count_zeros.h>
++#include <linux/sort.h>
++#include <linux/list_sort.h>
++#include <linux/uio.h>
++
++#include "compress.h"
++
++#define HUFF_MIN_MATCH_LEN	3
++#define HUFF_MAX_SEQUENCES	((HUFF_BLOCK_SIZE / HUFF_MIN_MATCH_LEN) + 1)
++#define HUFF_MAX_SYMS		512
++#define HUFF_SYM_MARKER		256
++
++struct huff_sym {
++	union {
++		u16 freq;
++		u16 len;
++	};
++
++	union {
++		u16 sym;
++		u16 code;
++	};
++} __packed;
++
++struct huff_sequence {
++	const u8 *lits_start;
++	const u8 *lits_end;
++
++	u16 match_sym;
++	u16 match_dist;
++	u16 match_len;
++};
++
++struct bitstream {
++	u32 bits;
++	s32 extra;
++
++	union {
++		const void *src;
++		void *dst;
++	};
++	const void *end;
++	void *cur;
++	void *next;
++};
++
++#define huff_sym_ptr(ptr)	((struct huff_sym *)(ptr))
++
++static int cmp_freq(const void *a, const void *b)
 +{
-+	const struct smb2_read_rsp *rsp = buf;
++	const u16 freq_a = huff_sym_ptr(a)->freq;
++	const u16 freq_b = huff_sym_ptr(b)->freq;
 +
-+	if (unlikely(rsp->hdr.ProtocolId != SMB2_PROTO_NUMBER)) {
-+		cifs_dbg(VFS, "decompressed message is not an SMB2 message (got ProtocolId 0x%x)\n",
-+			 rsp->hdr.ProtocolId);
-+		return false;
-+	}
++	if (freq_a <= freq_b)
++		return -1;
 +
-+	if (unlikely(rsp->hdr.Command != SMB2_READ)) {
-+		cifs_dbg(VFS, "decompressed message is not an SMB2 READ (got %u)\n",
-+			 le16_to_cpu(rsp->hdr.Command));
-+		return false;
-+	}
++	/*
++	 * MS-XCA says we should compare symbol values in case of equal frequencies, but we never
++	 * have duplicate symbols in an array, at any time.
++	 */
++	return 1;
++}
 +
-+	if (unlikely(le32_to_cpu(rsp->DataLength) != len)) {
-+		cifs_dbg(VFS, "invalid decompressed length for SMB2 READ (got %u, expected %u)\n",
-+			 le32_to_cpu(rsp->DataLength), len);
++static __always_inline int cmp_sym(const void *a, const void *b)
++{
++	const u16 sym_a = huff_sym_ptr(a)->sym;
++	const u16 sym_b = huff_sym_ptr(b)->sym;
++
++	if (sym_a <= sym_b)
++		return -1;
++
++	/* There are no duplicate symbols ever, no need to check. */
++	return 1;
++}
++
++static __always_inline int cmp_len(const void *a, const void *b)
++{
++	const u16 len_a = huff_sym_ptr(a)->len;
++	const u16 len_b = huff_sym_ptr(b)->len;
++
++	if (len_a < len_b)
++		return -1;
++
++	if (len_a > len_b)
++		return 1;
++
++	/* Same depth, choose smallest symbol. */
++	return cmp_sym(a, b);
++}
++
++/*
++ * Bitstream ops.
++ */
++
++/*
++ * Read 1, 2, or 4 bytes directly from @st->src and advance it.
++ * Store read value in *@varp.
++ * Don't update bitstream state!
++ */
++#define bitstream_read_bytes(st, t, varp)			\
++({								\
++	const size_t __ts = sizeof(t);				\
++	bool __ret = false;					\
++	BUILD_BUG_ON(__ts == 3 || __ts > 4);			\
++	if (likely((st)->src + __ts <= (st)->end)) {		\
++		const t __v = MEM_UNALIGNED_READ((st)->src, t);	\
++		(st)->src += sizeof(t);				\
++		MEM_UNALIGNED_WRITE((varp), __v, t);		\
++		__ret = true;					\
++	}							\
++	(__ret);						\
++})
++
++static __always_inline bool bitstream_decompress_init(struct bitstream *stream, const void *src,
++						      const void *end)
++{
++	u16 bits;
++
++	stream->src = src;
++	stream->end = end;
++
++	/* There must be at least 32 bits of data available at start */
++	if (unlikely(!bitstream_read_bytes(stream, u16, &bits)))
 +		return false;
++
++	stream->bits = bits << 16;
++	if (unlikely(!bitstream_read_bytes(stream, u16, &bits)))
++		return false;
++
++	stream->bits |= bits;
++	stream->extra = 16;
++
++	/* Unused on decompress. */
++	stream->cur = NULL;
++	stream->next = NULL;
++
++	return true;
++}
++
++static __always_inline bool bitstream_read_advance(struct bitstream *stream, const u8 bits)
++{
++	stream->bits <<= bits;
++	stream->extra -= bits;
++	if (stream->extra < 0) {
++		u16 bits;
++
++		if (unlikely(!bitstream_read_bytes(stream, u16, &bits)))
++			return false;
++
++		stream->bits |= bits << (-stream->extra);
++		stream->extra += 16;
 +	}
 +
 +	return true;
 +}
 +
-+static int receive_compressed(struct TCP_Server_Info *server)
++static __always_inline void bitstream_compress_init(struct bitstream *stream, void *dst,
++						    const void *end)
 +{
-+	struct mid_q_entry *mid;
-+	void *src = NULL, *dst = NULL;
-+	u32 slen, dlen;
-+	int read, ret;
++	stream->bits = 0;
++	stream->extra = 16;
++	stream->dst = dst;
++	stream->end = end;
++	stream->cur = dst + 2;
++	stream->next = dst + 4;
++}
 +
-+	/* smb2_compression_pattern_v1 is the smallest compressed data we can have. */
-+	slen = server->pdu_size;
-+	if (unlikely(slen < sizeof(struct smb2_compression_hdr) +
-+			    sizeof(struct smb2_compression_pattern_v1))) {
-+		ret = -EINVAL;
-+		goto err_free;
-+	}
-+
-+	src = kvzalloc(slen, GFP_KERNEL);
-+	if (unlikely(!src)) {
-+		ret = -ENOMEM;
-+		goto err_free;
-+	}
-+
-+	read = server->total_read;
-+	if (unlikely(read > slen)) {
-+		ret = -EINVAL;
-+		goto err_free;
-+	}
-+
-+	memcpy(src, server->smallbuf, read);
-+	ret = cifs_read_from_socket(server, src + read, slen - read);
-+	if (ret < 0)
-+		goto err_free;
-+
-+	server->total_read += ret;
-+	if (unlikely(slen - ret != read)) {
-+		ret = -EINVAL;
-+		goto err_free;
-+	}
-+
-+	ret = -EINVAL;
-+	read = server->vals->read_rsp_size;
-+	dlen = smb_decompress_alloc_size(src, slen, read, read + 256 +
-+					 SMB2_COMPRESSION_PAYLOAD_BASE_LEN + server->max_read,
-+					 server->compression.chained);
-+	if (unlikely(dlen == 0))
-+		goto err_free;
-+
-+	dst = kvzalloc(dlen, GFP_KERNEL);
-+	if (unlikely(!dst)) {
-+		ret = -ENOMEM;
-+		goto err_free;
-+	}
-+
-+	ret = smb_compression_decompress(server->compression.alg, server->compression.chained,
-+					 src, slen, dst, dlen);
-+	if (unlikely(ret))
-+		goto err_free;
-+
-+	if (unlikely(!check_decompressed_smb2(dst, dlen - server->vals->read_rsp_size))) {
-+		ret = -EINVAL;
-+		goto err_free;
-+	}
-+
-+	mid = smb2_find_dequeue_mid(server, dst);
-+	if (!mid) {
-+		ret = -EIO;
-+		goto err_free;
-+	}
-+
-+	ret = handle_read_data(server, mid, dst, dlen, NULL, 0, true);
-+	if (!ret) {
-+		struct cifs_io_subrequest *rdata = mid->callback_data;
-+#ifdef CONFIG_CIFS_STATS2
-+		mid->when_received = jiffies;
-+#endif
-+		if (server->ops->is_network_name_deleted)
-+			server->ops->is_network_name_deleted(dst, server);
-+
-+		rdata->iov[0].iov_base = dst;
-+		rdata->iov[0].iov_len = server->vals->read_rsp_size;
-+		mid_execute_callback(server, mid);
++static __always_inline int bitstream_write(struct bitstream *stream, const u16 bits, const u8 n)
++{
++	if (n <= stream->extra) {
++		stream->extra -= n;
++		stream->bits <<= n;
++		stream->bits |= bits;
 +	} else {
-+		spin_lock(&server->srv_lock);
-+		if (server->tcpStatus == CifsNeedReconnect) {
-+			spin_lock(&server->mid_queue_lock);
-+			mid->mid_state = MID_RETRY_NEEDED;
-+			spin_unlock(&server->mid_queue_lock);
-+			spin_unlock(&server->srv_lock);
++		stream->bits <<= stream->extra;
++		stream->bits |= (bits >> (n - stream->extra));
++		stream->extra -= n;
 +
-+			mid_execute_callback(server, mid);
-+		} else {
-+			spin_lock(&server->mid_queue_lock);
-+			mid->mid_state = MID_REQUEST_SUBMITTED;
-+			mid->deleted_from_q = false;
-+			list_add_tail(&mid->qhead, &server->pending_mid_q);
-+			spin_unlock(&server->mid_queue_lock);
-+			spin_unlock(&server->srv_lock);
-+		}
++		if (unlikely(stream->dst + 1 >= stream->end))
++			return false;
++
++		mem_write8(stream->dst, stream->bits & 0xff);
++		mem_write8(stream->dst + 1, (stream->bits >> 8) & 0xff);
++
++		stream->dst = stream->cur;
++		stream->cur = stream->next;
++		stream->next += 2;
++		stream->extra += 16;
++		stream->bits = bits;
 +	}
 +
-+	release_mid(server, mid);
-+err_free:
-+	kvfree(src);
-+	kvfree(dst);
++	return true;
++}
++
++static __always_inline bool bitstream_write_byte(struct bitstream *stream, const u8 bits)
++{
++	if (unlikely(stream->next >= stream->end))
++		return false;
++
++	mem_write8(stream->next, bits);
++	stream->next++;
++	return true;
++}
++
++static __always_inline bool bitstream_write_2bytes(struct bitstream *stream, const u16 bits)
++{
++	if (unlikely(stream->next + sizeof(u16) > stream->end))
++		return false;
++
++	mem_write16(stream->next, bits);
++	stream->next += sizeof(u16);
++	return true;
++}
++
++static __always_inline bool bitstream_flush(struct bitstream *stream)
++{
++	stream->bits <<= stream->extra;
++
++	if (unlikely(stream->dst + 1 >= stream->end || stream->cur + sizeof(u16) > stream->end))
++		return false;
++
++	mem_write8(stream->dst, (stream->bits & 0xff));
++	mem_write8(stream->dst + 1, ((stream->bits >> 8) & 0xff));
++	mem_write16(stream->cur, 0);
++
++	return true;
++}
++
++static int huff_build_histogram(struct huff_sequence *seqs, const int nseqs, struct huff_sym *syms)
++{
++	u16 nsyms = 0;
++	int i;
++
++	for (i = 0; i < nseqs; i++) {
++		struct huff_sequence *seq = &seqs[i];
++
++		if (seq->lits_start && seq->lits_end) {
++			const u8 *p = seq->lits_start;
++
++			while (p < seq->lits_end)
++				if (!syms[mem_read8(p++)].freq++)
++					nsyms++;
++		}
++
++		if (likely(seq->match_sym >= HUFF_SYM_MARKER))
++			if (!syms[seq->match_sym].freq++)
++				nsyms++;
++	}
++
++	/* Bug in huff_scan_sequences() */
++	if (unlikely(nsyms == 0 || nsyms > HUFF_MAX_SYMS))
++		return -EIO;
++
++	return nsyms;
++}
++
++static __always_inline void init_nodes(struct huff_sym *syms, const int nsyms,
++				       struct huff_sym *nodes, const int rebalances)
++{
++	u16 i, n = 0;
++
++	for (i = 0; i < HUFF_MAX_SYMS; i++) {
++		u16 freq = syms[i].freq;
++
++		if (!freq)
++			continue;
++		/*
++		 * When rebalancing, half symbols frequencies on each retry, which will generate a
++		 * shallower "tree".
++		 * Rebalancing doesn't affect original symbol count.
++		 */
++		if (unlikely(rebalances)) {
++			freq /= (2 * rebalances);
++			freq++;
++		}
++
++		nodes[n].sym = i;
++		nodes[n].freq = freq;
++		n++;
++	}
++
++	sort(nodes, nsyms, sizeof(*nodes), cmp_freq, NULL);
++}
++
++static __always_inline int select_node(int *ap, const int amax, int *bp, const int bmax,
++				       const struct huff_sym *nodes)
++{
++	const int a = *ap;
++	const int b = *bp;
++
++	if (a < amax && b >= bmax)
++		return (*ap)++;
++
++	if (a >= amax && b < bmax)
++		return (*bp)++;
++
++	if (nodes[a].freq <= nodes[b].freq)
++		return (*ap)++;
++
++	return (*bp)++;
++}
++
++/*
++ * Compute the depth (code length) of each Huffman symbol in @nodes.
++ *
++ * A full-fledged Huffman tree would be built something like:
++ *	qa = syms
++ *	qb = nodes
++ *	while (qa not empty || qb not singular) {
++ *		left = select_node(qa, qb)
++ *		right = select_node(qa, qb)
++ *		new_node->freq = left->freq + right->freq
++ *		queue_node(new_node, qb)
++ *	}
++ *	root = queue_first(qb)
++ *
++ * Then traverse the tree from root to compute each leaf (i.e. syms elements) depth.
++ *
++ * This implementation instead simulates those merges, and store frequencies and parents in a
++ * separate array, and traverse the "tree" by chasing parents in a more linear manner.
++ *
++ * Also, the Huffman tree is a full binary tree, so, given its properties, we know exactly how many
++ * merges should be done, and not rely on more complex checks.
++ *
++ * This saves memory and computing resources.
++ */
++static bool compute_code_lengths(struct huff_sym *nodes, const int nsyms, int *parents)
++{
++	int root, l = 0, n = nsyms, next = nsyms, merges = nsyms - 1;
++
++	do {
++		const int a = select_node(&l, nsyms, &n, next, nodes);
++		const int b = select_node(&l, nsyms, &n, next, nodes);
++
++		nodes[next].freq = nodes[a].freq + nodes[b].freq;
++		parents[a] = next;
++		parents[b] = next;
++
++		next++;
++	} while (--merges);
++
++	root = next - 1;
++
++	for (l = 0; l < nsyms; l++) {
++		int d = 0, p = l;
++
++		/* Chase parent's indices up until root to compute this symbol code length. */
++		while (p != root) {
++			p = parents[p];
++			d++;
++		}
++
++		if (unlikely(d > 14))
++			return false;
++
++		nodes[l].len = d;
++	}
++
++	return true;
++}
++
++static __always_inline int write_codes(struct huff_sym *nodes, struct huff_sym *syms,
++				       const int nsyms, u8 *dst)
++{
++	u16 nextcode = 0, clen = 0;
++	int i;
++
++	MEM_PREFETCH(nodes);
++
++	memset(dst, 0, HUFF_TABLE_SIZE);
++	sort(nodes, nsyms, sizeof(*nodes), cmp_len, NULL);
++
++	for (i = 0; i < nsyms; i++) {
++		struct huff_sym *node = &nodes[i];
++		const u16 len = node->len;
++		const u16 s = node->sym;
++		const u16 pos = (s >> 1);
++		const u8 shift = (s & 1) ? 4 : 0;
++
++		/* Generate symbol code. */
++		nextcode <<= len - clen;
++		clen = len;
++
++		/* Make @syms indexed by symbol value, so we can access it directly later. */
++		syms[s].code = nextcode++;
++		syms[s].len = len;
++
++		/*
++		 * Write symbol depth/code length of Huffman symbols to the table header.
++		 * There can be up to 512 Huffman symbols, but code lengths are stored on nibs
++		 * (4 bits) so the final table will be 256 bytes long.
++		 * (odd symbols go in the upper 4 bits, even symbols on lower 4 bits)
++		 *
++		 * @pos >= HUFF_TABLE_SIZE means there's a bug in huff_encode_syms().
++		 */
++		if (WARN_ON_ONCE(pos >= HUFF_TABLE_SIZE))
++			return -EFAULT;
++
++		dst[pos] |= (len << shift);
++	}
++
++	return 0;
++}
++
++static __always_inline int write_single_code(struct huff_sym *syms, u8 *dst)
++{
++	u16 i;
++
++	memset(dst, 0, HUFF_TABLE_SIZE);
++
++	/* @syms is unsorted here, so @i == symbol */
++	for (i = 0; i < HUFF_MAX_SYMS; i++) {
++		u16 pos;
++		u8 shift;
++
++		if (!syms[i].freq)
++			continue;
++
++		pos = (i >> 1);
++		shift = (i & 1) ? 4 : 0;
++		if (WARN_ON_ONCE(pos >= HUFF_TABLE_SIZE))
++			return -EFAULT;
++
++		syms[i].code = 0;
++		/* len is 1 as it would be the only child in the tree */
++		syms[i].len = 1;
++		dst[pos] |= (1 << shift);
++
++		return 0;
++	}
++
++	return -EFAULT;
++}
++
++static noinline void *huff_encode_syms(struct huff_sym *syms, const int nsyms, void *dst)
++{
++	const int max_nodes = 2 * nsyms - 1;
++	int ret, rebalances = 0, *parents = NULL;
++	struct huff_sym *nodes = NULL;
 +
 +	/*
-+	 * We _must_ disconnect on any failed decompression.
-+	 * Actually, there's not much we can do to handle different decompression errors here, so
-+	 * forcing a reconnect (which will disable compression) is our best option as the request
-+	 * should be retried.
++	 * Skip the whole allocations and computations if @nsyms == 1 (very unlikely case).
++	 * (assumes @nsyms == 0 was previously discarded (cf. huff_build_histogram()))
 +	 */
-+	if (unlikely(ret)) {
-+		/* Alias only if not -ENOMEM */
-+		if (ret != -ENOMEM)
-+			ret = -ECONNRESET;
-+		spin_lock(&server->srv_lock);
-+		server->tcpStatus = CifsNeedReconnect;
-+		spin_unlock(&server->srv_lock);
++	if (unlikely(nsyms == 1)) {
++		ret = write_single_code(syms, dst);
++		goto out;
 +	}
++
++	nodes = kzalloc_objs(*nodes, max_nodes);
++	parents = kzalloc_objs(*parents, max_nodes);
++	if (unlikely(!nodes || !parents)) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	ret = -EOVERFLOW;
++	do {
++		MEM_PREFETCH(nodes);
++
++		init_nodes(syms, nsyms, nodes, rebalances++);
++
++		if (likely(compute_code_lengths(nodes, nsyms, parents))) {
++			ret = write_codes(nodes, syms, nsyms, dst);
++			break;
++		}
++
++		/* Max code length is too large ("tree" too deep); reset, rebalance, and retry. */
++		memset(parents, 0, max_nodes * sizeof(parents[0]));
++		memset(nodes, 0, max_nodes * sizeof(*nodes));
++
++		 /* XXX: should this be increased/decreased? */
++	} while (rebalances < 5);
++out:
++	kfree(nodes);
++	kfree(parents);
++
++	return (!ret ? dst + HUFF_TABLE_SIZE : ERR_PTR(ret));
++}
++
++static noinline void *huff_encode_final(const void *src, void *dst, const void *dst_end,
++					struct huff_sequence *seqs, const int max_seqs,
++					struct huff_sym *syms)
++{
++	const struct huff_sequence *seq;
++	struct bitstream stream;
++	int i = 0;
++
++	bitstream_compress_init(&stream, dst, dst_end);
++
++	do {
++		u16 len, sym;
++		u8 distbit;
++
++		/* Assumes @max_seqs >= 1 was checked by caller. */
++		seq = &seqs[i++];
++		if (seq->lits_start && seq->lits_end) {
++			const u8 *p = seq->lits_start;
++
++			while (p < seq->lits_end) {
++				sym = *p++;
++				if (unlikely(!bitstream_write(&stream, syms[sym].code,
++							      syms[sym].len)))
++					return ERR_PTR(-EFAULT);
++			}
++		}
++
++		/* Done, we just wrote leftover literals */
++		if (unlikely(!seq->match_len))
++			break;
++
++		sym = seq->match_sym;
++		len = seq->match_len;
++		distbit = (sym - HUFF_SYM_MARKER) / 16;
++
++		if (unlikely(!bitstream_write(&stream, syms[sym].code, syms[sym].len)))
++			return ERR_PTR(-EFAULT);
++
++		len -= 3;
++		if (len >= 15) {
++			if (unlikely(!bitstream_write_byte(&stream, (u8)umin(len - 15, 255))))
++				return ERR_PTR(-EFAULT);
++
++			if (len - 15 >= 255)
++				/*
++				 * Match length is < 64k.
++				 * No current support for longer matches.
++				 */
++				if (unlikely(!bitstream_write_2bytes(&stream, (u16)len)))
++					return ERR_PTR(-EFAULT);
++		}
++
++		if (unlikely(!bitstream_write(&stream, seq->match_dist - (1U << distbit),
++					      (u8)distbit)))
++			return ERR_PTR(-EFAULT);
++	} while (i < max_seqs);
++
++	if (unlikely(!bitstream_flush(&stream)))
++		return ERR_PTR(-EFAULT);
++
++	return stream.next;
++}
++
++static __always_inline u16 huff_encode_match(const u16 dist, const u16 len)
++{
++	const u8 distbit = dist < 256 ? __fls(dist) : 8 + __fls(dist >> 8);
++
++	return (u16)(HUFF_SYM_MARKER + umin(len - 3, 15) + (16 * distbit));
++}
++
++static __always_inline u32 hash3(const void *ptr)
++{
++	return smb_compress_hash(mem_read32(ptr) & 0xffffff);
++}
++
++static const void *store_seq(struct huff_sequence *seq, const void *literals,
++			     const void *match, const void *cur, const void *end)
++{
++	if (cur > literals) {
++		seq->lits_start = literals;
++		seq->lits_end = cur;
++	}
++
++	if (likely(match)) {
++		seq->match_len = mem_match_len(match, cur, end);
++		seq->match_dist = cur - match;
++		seq->match_sym = huff_encode_match(seq->match_dist, seq->match_len);
++
++		cur += seq->match_len;
++	}
++
++	return cur;
++}
++
++/*
++ * Scan sequences on @src.
++ *
++ * Sequences are defined as:
++ * - literals chunk (start and end)
++ * - match data (symbol, distance, and length)
++ *
++ * A sequence is stored when a match is found, or at the end, if there are literal leftovers.
++ *
++ * Aside from that, the whole function structure and match finding algorithm are the same as the
++ * one found in lz77.c::smb_lz77_compress(), the only difference is that here we don't do adaptive
++ * skipping, but actually parse every @src byte (for better compression).
++ */
++static noinline int huff_scan_sequences(const void *src, const u32 slen,
++					struct huff_sequence *seqs, int *nseqs)
++{
++	const void *srcp, *rlim, *end, *anchor;
++	const int max_seqs = *nseqs;
++	u32 *htable, hash, s = 0;
++	int ret = 0;
++
++	*nseqs = 0;
++
++	srcp = anchor = src;
++	end = src + slen;
++	rlim = end - SMB_COMPRESS_MSTEP_SIZE; /* read limit for match finding */
++
++	htable = kvcalloc(SMB_COMPRESS_HASH_SIZE, sizeof(*htable), GFP_KERNEL);
++	if (!htable)
++		return -ENOMEM;
++
++	MEM_PREFETCH(srcp + SMB_COMPRESS_RSTEP_SIZE);
++
++	hash = hash3(srcp++);
++	htable[hash] = 0;
++	hash = hash3(srcp);
++
++	do {
++		const void *match, *next = srcp;
++
++		do {
++			const u32 cur_hash = hash;
++
++			srcp = next;
++			next++;
++			if (unlikely(next >= rlim))
++				goto out;
++
++			hash = hash3(next);
++			match = src + htable[cur_hash];
++			htable[cur_hash] = srcp - src;
++
++			/*
++			 * Scans are done in blocks up to HUFF_BLOCK_SIZE (64k) bytes long.
++			 * Due to encoding limitations, Huffman can only find matches that are
++			 * (64k - 1) bytes back, which is impossible, because:
++			 * - we're only reading up to 'rlim' (i.e. end - 8)
++			 * - even if going further, that would mean a match len of 1 (min is 3)
++			 *
++			 * So, IOW, with our window < block size and window < max distance, we're
++			 * always within our window, so all we need to check is 'match' == 'srcp'
++			 * (i.e. htable entry was not filled yet).
++			 */
++		} while (match == srcp || memcmp(match, srcp, HUFF_MIN_MATCH_LEN));
++
++		if (unlikely(s >= max_seqs)) {
++			ret = -EIO;
++			break;
++		}
++
++		srcp = store_seq(&seqs[s++], anchor, match, srcp, end);
++		anchor = srcp;
++		MEM_PREFETCH(srcp);
++
++		if (unlikely(srcp >= rlim))
++			break;
++
++		hash = hash3(srcp);
++	} while (srcp < end);
++out:
++	kvfree(htable);
++
++	if (!ret) {
++		if (unlikely(s >= max_seqs))
++			return -EIO;
++
++		/* Add sequence for leftover literals */
++		end = store_seq(&seqs[s++], anchor, NULL, end, NULL);
++		if (IS_ERR(end))
++			ret = PTR_ERR(end);
++	}
++
++	*nseqs = s;
 +
 +	return ret;
 +}
 +
- static int
- smb3_receive_transform(struct TCP_Server_Info *server,
- 		       struct mid_q_entry **mids, char **bufs, int *num_mids)
-@@ -5255,6 +5404,13 @@ smb3_receive_transform(struct TCP_Server_Info *server,
- 	struct smb2_transform_hdr *tr_hdr = (struct smb2_transform_hdr *)buf;
- 	unsigned int orig_len = le32_to_cpu(tr_hdr->OriginalMessageSize);
- 
-+	if (is_compress_hdr(buf))
-+		return receive_compressed(server);
-+
-+	/*
-+	 * @buf is either a compress or transform (encrypt) header, previously checked by cifsd
-+	 * (or we wouldn't reach here), so no need to check again.
-+	 */
- 	if (pdu_length < sizeof(struct smb2_transform_hdr) +
- 						sizeof(struct smb2_hdr)) {
- 		cifs_server_dbg(VFS, "Transform message is too small (%u)\n",
-@@ -5296,6 +5452,8 @@ static int smb2_next_header(struct TCP_Server_Info *server, char *buf,
- 		*noff = le32_to_cpu(t_hdr->OriginalMessageSize);
- 		if (unlikely(check_add_overflow(*noff, sizeof(*t_hdr), noff)))
- 			return -EINVAL;
-+	} else if (hdr->ProtocolId == SMB2_COMPRESSION_TRANSFORM_ID) {
-+		*noff = 0;
- 	} else {
- 		*noff = le32_to_cpu(hdr->NextCommand);
- 	}
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index e58ac7be30a3..bf2b3c7fa4b8 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4933,6 +4933,12 @@ smb2_async_readv(struct cifs_io_subrequest *rdata)
- 		flags |= CIFS_HAS_CREDITS;
- 	}
- 
-+	if (should_compress(io_parms.tcon, &rqst)) {
-+		struct smb2_read_req *req = (struct smb2_read_req *)buf;
-+
-+		req->Flags |= SMB2_READFLAG_REQUEST_COMPRESSED;
-+	}
-+
- 	rc = cifs_call_async(server, &rqst,
- 			     cifs_readv_receive, smb2_readv_callback,
- 			     smb3_handle_read_data, rdata, flags,
-diff --git a/fs/smb/common/compress/compress.h b/fs/smb/common/compress/compress.h
-index 43dba4bb1176..e0ec41a21505 100644
---- a/fs/smb/common/compress/compress.h
-+++ b/fs/smb/common/compress/compress.h
-@@ -152,6 +152,92 @@ static __always_inline bool smb_compress_alg_valid(__le16 alg, bool valid_none)
- 	return false;
- }
- 
-+static __always_inline bool is_compress_hdr(const void *buf)
-+{
-+	const struct smb2_compression_hdr *hdr = buf;
-+
-+	return likely(hdr) && hdr->ProtocolId == SMB2_COMPRESSION_TRANSFORM_ID;
-+}
-+
-+/**
-+ * smb_decompress_alloc_size() - Validate received SMB2 compression header + return allocation size
-+ *				 for the decompressed buffer.
-+ * @buf: received buffer
-+ * @pdu_size: size of @buf
-+ * @dmin: minimum decompressed size allowed (inclusive)
-+ * @dmax: maximum decompressed size allowed (inclusive)
-+ * @chained: if chaining was negotiated
++/*
++ * Huffman encoding performs extra steps on top of a LZ77-style encoded buffer so it can further
++ * compress the symbols at bit level, offering a much better compression (vs. e.g. LZ77 plain).
 + *
-+ * Return: decompressed size, or 0 if invalid.
++ * The uncompressed buffer @src is parsed in 64k blocks, and each block goes through 4 main steps
++ * as described below.
++ *
++ * Expectations (compared to LZ77 plain):
++ * - compression ratio should be about 10-20% better
++ * - performance should be around 2-3x worse
 + */
-+static __always_inline u32 smb_decompress_alloc_size(const void *buf, const u32 pdu_size,
-+						     const u32 dmin, const u32 dmax, bool chained)
++int smb_huff_compress(const void *src, const u32 slen, void *dst, u32 *dlen)
 +{
-+	const struct smb2_compression_hdr *hdr = buf;
-+	__le16 alg, flags;
-+	u32 len;
++	struct huff_sequence *seqs;
++	ssize_t ret, remaining = slen;
++	struct huff_sym *syms;
++	const void *srcp = src, *dst_end = dst + *dlen;
++	int nseqs, nsyms;
++	void *dstp = dst;
 +
-+	if (unlikely(!is_compress_hdr(buf) || pdu_size < sizeof(*hdr))) {
-+		pr_warn("invalid SMB2 compressed buffer/header\n");
-+		return 0;
++	seqs = kvzalloc_objs(*seqs, HUFF_MAX_SEQUENCES);
++	if (unlikely(!seqs))
++		return -ENOMEM;
++
++	syms = kzalloc_objs(*syms, HUFF_MAX_SYMS);
++	if (unlikely(!syms)) {
++		kvfree(seqs);
++		return -ENOMEM;
 +	}
 +
-+	len = le32_to_cpu(hdr->OriginalCompressedSegmentSize);
-+	alg = le16_to_cpu(hdr->CompressionAlgorithm);
-+	flags = le16_to_cpu(hdr->Flags);
++	do {
++		const u32 block_slen = umin(HUFF_BLOCK_SIZE, remaining);
 +
-+	if (flags == SMB2_COMPRESSION_FLAG_CHAINED) {
-+		if (unlikely(!chained)) {
-+			pr_warn("chained payload but chaining wasn't negotiated\n");
-+			return 0;
-+		}
-+
-+		if (unlikely(!smb_compress_alg_valid(alg, true))) {
-+			pr_warn("invalid chained compression algorithm (%u)\n", alg);
-+			return 0;
-+		}
-+
-+		/* This is the first payload_hdr->Length field, so it can never be 0 */
-+		if (unlikely(le32_to_cpu(hdr->Offset) == 0)) {
-+			pr_warn("invalid chained compression payload length 0\n");
-+			return 0;
-+		}
-+	} else if (flags == SMB2_COMPRESSION_FLAG_NONE) {
 +		/*
-+		 * When unchained, we must account for the offset (uncompressed) part as well
-+		 * (usually SMB2 header, but can be anything).
++		 * Step 1. LZ77 encoding
++		 *
++		 * As per the spec, we should first compress @src with smb_lz77_compress() and then
++		 * use @dst as our input for step 2.
++		 * This implementation decided to NOT do the full LZ77 encoding in order to save
++		 * processing time, as it would be required to implement a smb_lz77_decompress-like
++		 * function to proceed.
++		 * Instead it stores "sequence" tokens to aggregate literals and matches data
++		 * (which are then used on step 2).
++		 *
++		 * This step is implementation specific anyway, as it only builds up intermediate
++		 * data that won't affect the final format.
++		 *
++		 * Even though the bit- vs byte-level compression does an amazing job, match
++		 * finding here still counts a lot.
 +		 */
-+		u32 res, offset = le32_to_cpu(hdr->Offset);
++		nseqs = HUFF_MAX_SEQUENCES;
++		ret = huff_scan_sequences(srcp, block_slen, seqs, &nseqs);
++		if (unlikely(ret))
++			break;
 +
-+		if (unlikely(chained)) {
-+			pr_warn("unchained payload but chaining negotiated\n");
-+			return 0;
++		/*
++		 * Step 2. Symbol histogram
++		 *
++		 * Build a histogram of Huffman symbols; each literal (individual byte) is a symbol
++		 * (i.e. 0 - 255), and each match is encoded as a symbol too (256 - 511).
++		 *
++		 * Count the frequencies of each symbol occurrence, along with the number of unique
++		 * symbols in the block.
++		 */
++		nsyms = huff_build_histogram(seqs, nseqs, syms);
++		if (unlikely(nsyms < 0)) {
++			ret = nsyms;
++			break;
 +		}
 +
-+		if (unlikely(offset > pdu_size - sizeof(*hdr) ||
-+			     check_add_overflow(len, offset, &res))) {
-+			pr_warn("invalid unchained compression offset (%u, len=%u)\n", offset, len);
-+			return 0;
++		/*
++		 * Step 3. Encode symbols
++		 *
++		 * Canonically, this step builds up the Huffman tree in order to compute the code
++		 * and depth (or length) of each symbol.
++		 * This implementation also decided to not do it this way, but instead use a faster
++		 * approach (cf. compute_code_lengths()).
++		 *
++		 * After computing those, code lengths are written to the Huffman table (the first
++		 * 256 bytes of the compressed block).
++		 */
++		dstp = huff_encode_syms(syms, nsyms, dstp);
++		if (IS_ERR(dstp)) {
++			ret = PTR_ERR(dstp);
++			break;
 +		}
 +
-+		len = res;
-+		if (unlikely(!smb_compress_alg_valid(alg, false) || alg == SMB3_COMPRESS_PATTERN)) {
-+			pr_warn("invalid unchained compression algorithm (%u)\n", alg);
-+			return 0;
++		/*
++		 * Step 4. Final encoding
++		 *
++		 * Now we have all symbols' codes and lengths, write those out to @dstp as a
++		 * bitstream (for bit-level compression).
++		 */
++		dstp = huff_encode_final(srcp, dstp, dst_end, seqs, nseqs, syms);
++		if (IS_ERR(dstp)) {
++			ret = PTR_ERR(dstp);
++			break;
 +		}
-+	} else {
-+		pr_warn("invalid SMB2 compression flags (0x%x)\n", flags);
-+		return 0;
-+	}
 +
-+	if (unlikely(len < dmin || len > dmax)) {
-+		pr_warn("decompressed size %u out of range (min=%u, max=%u)\n", len, dmin, dmax);
-+		return 0;
-+	}
++		srcp += block_slen;
++		remaining -= block_slen;
 +
-+	return len;
++		if (likely(remaining > 0)) {
++			int i;
++
++			memset(syms, 0, sizeof(*syms) * HUFF_MAX_SYMS);
++
++			for (i = 0; i < HUFF_MAX_SEQUENCES; i++)
++				memset(&seqs[i], 0, sizeof(*seqs));
++		}
++	} while (remaining > 0);
++
++	kvfree(seqs);
++	kfree(syms);
++
++	if (!ret)
++		*dlen = dstp - dst;
++
++	return ret;
 +}
 +
- /**
-  * smb_compress_alloc_size() - Compute total allocation size required for compressed (dst) buffer.
-  * @size:		uncompressed size
++static __always_inline const void *fill_table(const u8 *header, u16 *table, u8 *clens)
++{
++	const u8 *end = header + HUFF_TABLE_SIZE;
++	int len, i = 0;
++	u8 *plens = clens;
++	u16 sym;
++
++	/* read code lenghts from Huffman table on compressed buffer */
++	while (header < end) {
++		const u8 b = mem_read8(header++);
++
++		mem_write8(plens++, (b & 0x0f));
++		mem_write8(plens++, (b & 0xf0) >> 4);
++	}
++
++	for (len = 1; len < 16; len++) {
++		for (sym = 0; sym < HUFF_MAX_SYMS; sym++) {
++			if (clens[sym] == len) {
++				int n = (1U << (SMB_COMPRESS_HASH_LOG - len));
++
++				while (n-- > 0) {
++					if (unlikely(i >= SMB_COMPRESS_HASH_SIZE))
++						return ERR_PTR(-EIO);
++
++					table[i++] = sym;
++				}
++			}
++		}
++	}
++
++	if (unlikely(i != SMB_COMPRESS_HASH_SIZE))
++		return ERR_PTR(-EIO);
++
++	return header;
++}
++
++static __always_inline int huff_decode_match(struct bitstream *stream, u32 *len)
++{
++	u32 mlen = *len & 15;
++
++	if (mlen == 15) {
++		if (unlikely(!bitstream_read_bytes(stream, u8, &mlen)))
++			return -EFAULT;
++
++		if (mlen == 255) {
++			if (unlikely(!bitstream_read_bytes(stream, u16, &mlen)))
++				return -EFAULT;
++
++			if (mlen == 0) {
++				if (unlikely(!bitstream_read_bytes(stream, u32, &mlen)))
++					return -EFAULT;
++
++				if (unlikely(mlen + 15 < HUFF_BLOCK_SIZE))
++					return -EIO;
++			} else if (unlikely(mlen < 15)) {
++				return -EIO;
++			}
++			mlen -= 15;
++		}
++		mlen += 15;
++	}
++	mlen += 3;
++	*len = mlen;
++
++	return 0;
++}
++
++int smb_huff_decompress(const void *src, const u32 slen, void *dst, const u32 dlen)
++{
++	const void *srcp = src, *end = src + slen;
++	void *dstp = dst, *dst_end = dst + dlen;
++	int ret = 0;
++
++	do {
++		struct bitstream stream;
++		const void *block_end = dstp + umin(SZ_64K, dst_end - dstp);
++		u16 *table = NULL;
++		u8 *clens = NULL;
++
++		ret = -ENOMEM;
++		table = kvzalloc_objs(*table, SMB_COMPRESS_HASH_SIZE);
++		if (unlikely(!table))
++			goto err_free;
++
++		clens = kzalloc_objs(*clens, HUFF_MAX_SYMS);
++		if (unlikely(!clens))
++			goto err_free;
++
++		if (unlikely(srcp + HUFF_TABLE_SIZE > end)) {
++			ret = -EFAULT;
++			goto err_free;
++		}
++
++		srcp = fill_table(srcp, table, clens);
++		if (IS_ERR(srcp)) {
++			ret = PTR_ERR(srcp);
++			goto err_free;
++		}
++
++		if (unlikely(!bitstream_decompress_init(&stream, srcp, end))) {
++			ret = -EFAULT;
++			goto err_free;
++		}
++
++		do {
++			const u16 sym = table[stream.bits >> (32 - 15)];
++			const u32 clen = clens[sym];
++			u16 dist, distbit;
++			const void *match;
++			u32 len;
++
++			ret = -EIO;
++			if (unlikely(sym >= HUFF_MAX_SYMS))
++				break;
++
++			if (unlikely(clen >= 16))
++				break;
++
++			/* Advance bitstream before checking sym */
++			if (unlikely(!bitstream_read_advance(&stream, clen))) {
++				ret = -EFAULT;
++				break;
++			}
++
++			if (sym < HUFF_SYM_MARKER) {
++				mem_write8(dstp++, sym);
++				ret = 0;
++				continue;
++			}
++
++			if (unlikely(sym == HUFF_SYM_MARKER && stream.src >= end)) {
++				ret = 0;
++				break;
++			}
++
++			len = sym - HUFF_SYM_MARKER;
++			distbit = len >> 4;
++			if (unlikely(distbit >= 16))
++				break;
++
++			ret = huff_decode_match(&stream, &len);
++			if (unlikely(ret))
++				break;
++
++			ret = -EFAULT;
++			dist = (u32)((u64)stream.bits >> (32 - distbit));
++			dist += (1U << distbit);
++			if (unlikely(dist > dstp - dst))
++				break;
++
++			if (unlikely(len > dst_end - dstp))
++				break;
++
++			/* Advance bitstream only after checking match len */
++			if (unlikely(!bitstream_read_advance(&stream, distbit)))
++				break;
++
++			match = dstp - dist;
++			if (len < dist) {
++				memcpy(dstp, match, len);
++				dstp += len;
++			} else {
++				const void *match_end = dstp + len;
++
++				while (dstp < match_end)
++					mem_write8(dstp++, mem_read8(match++));
++			}
++
++			ret = 0;
++		} while (dstp < block_end);
++err_free:
++		kvfree(table);
++		kfree(clens);
++
++		if (unlikely(ret))
++			break;
++
++		srcp = stream.src;
++	} while (srcp < end && dstp < dst_end);
++
++	return ret;
++}
+diff --git a/fs/smb/common/compress/huffman.h b/fs/smb/common/compress/huffman.h
+new file mode 100644
+index 000000000000..0106e596f9e1
+--- /dev/null
++++ b/fs/smb/common/compress/huffman.h
+@@ -0,0 +1,31 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (C) 2026, SUSE LLC
++ *
++ * Authors: Enzo Matsumiya <ematsumiya@suse.de>
++ *
++ * Implementation of the LZ77+Huffman compression algorithm, as per MS-XCA spec.
++ */
++#ifndef _SMB_COMPRESS_LZ77_HUFF_H
++#define _SMB_COMPRESS_LZ77_HUFF_H
++
++#include <linux/kernel.h>
++#include <linux/sizes.h>
++
++#define HUFF_TABLE_SIZE		256
++#define HUFF_BLOCK_SIZE		SZ_64K
++
++/*
++ * LZ77-Huffman metadata is Huffman table (256 bytes) at the beginning of every 64k block, so
++ * compute allocation size considering the worst-case scenarios (fully uncompressible blocks).
++ */
++static __always_inline u32 smb_huff_compressed_alloc_size(const u32 size)
++{
++	const u32 nblocks = DIV_ROUND_UP(size, HUFF_BLOCK_SIZE);
++
++	return nblocks * (HUFF_TABLE_SIZE + HUFF_BLOCK_SIZE);
++}
++
++int smb_huff_compress(const void *src, const u32 slen, void *dst, u32 *dlen);
++int smb_huff_decompress(const void *src, const u32 slen, void *dst, const u32 dlen);
++#endif /* _SMB_COMPRESS_LZ77_HUFF_H */
+diff --git a/fs/smb/server/compress.c b/fs/smb/server/compress.c
+index 59e78c3b042c..46974499dddf 100644
+--- a/fs/smb/server/compress.c
++++ b/fs/smb/server/compress.c
+@@ -35,7 +35,7 @@ int ksmbd_decompress_request(struct ksmbd_conn *conn)
+ 		return -EINVAL;
+ 
+ 	if (conn->dialect != SMB311_PROT_ID ||
+-	    conn->compress_algorithm == SMB3_COMPRESS_NONE)
++	    !smb_compress_alg_valid(conn->compress_algorithm, false))
+ 		return -EINVAL;
+ 
+ 	hdr = smb_get_msg(conn->request_buf);
+@@ -98,10 +98,11 @@ int ksmbd_compress_response(struct ksmbd_work *work)
+ 	u8 *src = NULL, *out = NULL, *p;
+ 	bool chained, pattern;
+ 	u32 src_len, dst_len;
++	__le16 alg = work->conn->compress_algorithm;
+ 	int i, rc;
+ 
+ 	if (!work->compress_response || work->encrypted ||
+-	    work->conn->compress_algorithm != SMB3_COMPRESS_LZ77)
++	    !smb_compress_alg_valid(alg, false))
+ 		return 0;
+ 
+ 	req_hdr = smb_get_msg(work->request_buf);
+@@ -139,7 +140,7 @@ int ksmbd_compress_response(struct ksmbd_work *work)
+ 		goto out;
+ 	}
+ 
+-	dst_len = smb_compress_alloc_size(src_len, chained, pattern);
++	dst_len = smb_compress_alloc_size(src_len, chained, pattern, alg);
+ 	out = kvzalloc(sizeof(__be32) + dst_len,
+ 		       KSMBD_DEFAULT_GFP);
+ 	if (!out) {
+@@ -147,7 +148,7 @@ int ksmbd_compress_response(struct ksmbd_work *work)
+ 		goto out;
+ 	}
+ 
+-	rc = smb_compression_compress(SMB3_COMPRESS_LZ77, chained, pattern,
++	rc = smb_compression_compress(alg, chained, pattern,
+ 				      src, src_len,
+ 				      out + sizeof(__be32),
+ 				      &dst_len);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 5859fa68bb84..3bd62c16ae49 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -1130,18 +1130,27 @@ static __le32 decode_compress_ctxt(struct ksmbd_conn *conn,
+ 		__le16 alg = algs[i];
+ 
+ 		/*
+-		 * LZ77 is the required general-purpose codec. Pattern_V1 is an
++		 * LZ* are the required general-purpose codecs. Pattern_V1 is an
+ 		 * optional chained payload type and cannot stand alone.
++		 *
++		 * Use the first LZ algorithm found in the request array.  It's sorted by
++		 * client-preferred order, so don't overwrite it if already set.
+ 		 */
+-		if (alg == SMB3_COMPRESS_LZ77) {
+-			conn->compress_algorithm = alg;
+-			conn->compress_chained =
+-				pneg_ctxt->Flags ==
+-				SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED;
+-			ksmbd_debug(SMB, "Compression Algorithm ID = 0x%x\n",
+-				    le16_to_cpu(alg));
+-		} else if (alg == SMB3_COMPRESS_PATTERN) {
++		switch (alg) {
++		case SMB3_COMPRESS_LZ77:
++		case SMB3_COMPRESS_LZ77_HUFF:
++			if (conn->compress_algorithm == SMB3_COMPRESS_NONE) {
++				conn->compress_algorithm = alg;
++				conn->compress_chained =
++					pneg_ctxt->Flags ==
++					SMB2_COMPRESSION_CAPABILITIES_FLAG_CHAINED;
++				ksmbd_debug(SMB, "Compression Algorithm ID = 0x%x\n",
++					    le16_to_cpu(alg));
++			}
++			break;
++		case SMB3_COMPRESS_PATTERN:
+ 			conn->compress_pattern = true;
++			break;
+ 		}
+ 	}
+ 
 -- 
 2.54.0
 
