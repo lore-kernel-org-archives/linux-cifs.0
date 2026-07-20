@@ -1,225 +1,151 @@
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E8544210A;
-	Mon, 20 Jul 2026 16:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5D6370AD4
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 17:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784565794; cv=none; b=auUO0ci7bQz13P2869Nl4h9iqtegDQkADWiSO64cNqxANMNwMRwMtg753NDYKzzGCCJUztRuzxJm6QG15W7t1TKxV3zwkiYCpUC7siFjE4BShP6qFVXbJ49v2bYzZIGSoDQBdIRxsoqtvu0QBxUDgf7qMyVKdRDoNqwSK/McKBY=
+	t=1784567982; cv=none; b=FkBWrYAuaXAJH4fXgmGBrobDctK3xXIbLBP2jvt8xYUffssRBkwul19vvK/ncRgrBlR1g2LkcM3Cdxv/DiWBcPUBTrGRpRyreUCDZPlef/xKHNOmRHr2k3rO7KC+TGcJUl1UparzOtQSteskkJWGKVy7wC1DjPHUApAnB73a4s0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784565794; c=relaxed/simple;
-	bh=hHtxf/lIqO2ZRvyRlXj0+JLSxQv2bRaz/Vg+c14XjGU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NfMwodDsgPaqh0rPOh4ancRR9t7IoC4dJNNvVY0bU1bMDtLUjyAvwg5SS4sezcEFqpN10wL+8yztb4g/vZfiM6vbB34cXnbZCxOuabRq1D4LPx6zOYMG8+NM6l9K+p/CRSYDbHm+Ot3NL0YZKR5avlqZHYxCzKQ8ieAuZTQwHns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=mDeA1zSf; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1784567982; c=relaxed/simple;
+	bh=wM51+wm/Pnz7nLV8Cihn7FWZPN6PhJJq8Z6jf7Vo5p8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=ugvEzScGjt3Q+H0XONTzC1UVen2ycPyyJjxrSIYc8S4PT95clUMIo1V77dsGowDdEtrtf9s5eVfLeZXzCcNA1tCMleBQWLAEeqRcuCXJMM/ErOii5/6fiug4fXJXR3ZSZ094Yvxuxfe+kHufBHQMTAO//9WH77BOmXg67kHqDMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=he9t6w9M; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="mDeA1zSf"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784565789;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="he9t6w9M"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1784567978;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PuGKEYhiVlfOcyIvG191ZqxErZC4tp63ydbY2/P8S5c=;
-	b=mDeA1zSfO/jNTJ5emtWxpna1kY6UKwKZNubFDuRpKI8M+py5ioP8TQogOmBmPq8fWSWSlh
-	lJY8WuCDOj2ndg6Te+v/WqwzjsB9X13IV3OPObcd8x7KNbS5II/Cu2hQF3YS2lC2xu8Ne1
-	35+M+w0GmHie0yW+Q2MYkellaWJecmhJzHS6DR4fIM8cqam0P/IMNiG4oUPE7MFG9oj1af
-	Pk14Jh49zG0Al4RD04b2l5Ac4IvGS2zacv8zGZWf5a+W2kJu1V5RMbMAnn44H1uFsrf0Hp
-	Xh9BRsDUsDLhO81/FDcHW4fi55BqMCo7jpUzchb9hzVFYKrkHuyci9+o1gRxVw==
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	zlang@kernel.org,
-	lukas@herbolt.com
-Cc: linux-cifs@vger.kernel.org,
-	fstests@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 xfstests resend 3/3] generic/795: check nlink returned by fstat()
-Date: Mon, 20 Jul 2026 16:42:07 +0000
-Message-ID: <20260720164207.732522-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260720164207.732522-1-chenxiaosong@chenxiaosong.com>
-References: <20260720164207.732522-1-chenxiaosong@chenxiaosong.com>
+	bh=S1rbuc0RIfMk2UFrtvYrUE/qnw8rbUlycERmTi9F9rw=;
+	b=he9t6w9M/KBCUI1RYtpc/lXHYxJtFH+k9wg083RoSBtyrHyKO/2CSGLuVLH5w6XlEc84zD
+	YeExNqkMDp6AY0Zl4eLrEa7npDYbHHxUUJgiUGDeKGlcGyavtB/c3pF19z7OrIFwyYIvq5
+	C1GVx6QDkBw4bmNO0v7pA2hBxxGILUk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-65-U7-84CPQMSycVmmf7hrLXQ-1; Mon,
+ 20 Jul 2026 13:19:34 -0400
+X-MC-Unique: U7-84CPQMSycVmmf7hrLXQ-1
+X-Mimecast-MFC-AGG-ID: U7-84CPQMSycVmmf7hrLXQ_1784567974
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C42DE1806D32;
+	Mon, 20 Jul 2026 17:19:33 +0000 (UTC)
+Received: from [10.22.76.6] (unknown [10.22.76.6])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DD8DE1955F78;
+	Mon, 20 Jul 2026 17:19:32 +0000 (UTC)
+Message-ID: <8e0060e7-8579-4ccb-a2e3-a4df93db07f3@redhat.com>
+Date: Mon, 20 Jul 2026 12:19:30 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/2] cifs: fix attribute cache corruption from
+ concurrent directory operations
+From: Frank Sorenson <sorenson@redhat.com>
+To: linux-cifs@vger.kernel.org, pc@manguebit.org, stfrench@microsoft.com
+References: <20260720163541.1428872-1-sorenson@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260720163541.1428872-1-sorenson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Sashiko doesn't appear very happy with either patch.  Looks like I'll 
+need to rethink the approaches.
 
-Add a test to verify that fstat(2) returns the expected
-st_nlink value as hardlinks are created and removed.
+Frank
 
-Suggested-by: Zorro Lang <zlang@kernel.org>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- src/Makefile          |  4 +--
- src/fstat.c           | 42 ++++++++++++++++++++++++++++++
- tests/generic/795     | 60 +++++++++++++++++++++++++++++++++++++++++++
- tests/generic/795.out |  2 ++
- 4 files changed, 106 insertions(+), 2 deletions(-)
- create mode 100644 src/fstat.c
- create mode 100755 tests/generic/795
- create mode 100644 tests/generic/795.out
 
-diff --git a/src/Makefile b/src/Makefile
-index 7fab5d05..fd2622e8 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -6,7 +6,7 @@
- TOPDIR = ..
- include $(TOPDIR)/include/builddefs
- 
--TARGETS = dirstress fill fill2 getpagesize holes lstat64 \
-+TARGETS = dirstress fill fill2 getpagesize holes lstat64 fstat \
- 	nametest permname randholes runas truncfile usemem \
- 	mmapcat append_reader append_writer dirperf metaperf \
- 	devzero feature alloc fault fstest t_access_root \
-@@ -130,7 +130,7 @@ fssum: fssum.c md5.c
- 	@echo "    [CC]    $@"
- 	$(Q)$(LTLINK) fssum.c md5.c -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
- 
--STAT_TARGETS = lstat64
-+STAT_TARGETS = lstat64 fstat
- 
- $(STAT_TARGETS): %: %.c stat_common.c stat_common.h $(LIBTEST)
- 	@echo "    [CC]    $@"
-diff --git a/src/fstat.c b/src/fstat.c
-new file mode 100644
-index 00000000..fb878f77
---- /dev/null
-+++ b/src/fstat.c
-@@ -0,0 +1,42 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
-+ * Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
-+ *
-+ *  from
-+ *  src/lstat64.c
-+ *  Copyright (c) 2000-2002 Silicon Graphics, Inc.
-+ *  All Rights Reserved.
-+ */
-+
-+#include <errno.h>
-+#include <fcntl.h>
-+#include <sys/stat.h>
-+#include <unistd.h>
-+
-+#include "stat_common.h"
-+
-+static int
-+get_fstat(const char *path, struct stat64 *sbuf)
-+{
-+	int	fd;
-+	int	ret;
-+	int	saved_errno;
-+
-+	fd = open(path, O_RDONLY | O_NONBLOCK);
-+	if (fd < 0)
-+		return -1;
-+
-+	ret = fstat64(fd, sbuf);
-+	saved_errno = errno;
-+	close(fd);
-+	errno = saved_errno;
-+
-+	return ret;
-+}
-+
-+int
-+main(int argc, char **argv)
-+{
-+	return handle_stat(argc, argv, "fstat", get_fstat);
-+}
-diff --git a/tests/generic/795 b/tests/generic/795
-new file mode 100755
-index 00000000..0fc9a9bc
---- /dev/null
-+++ b/tests/generic/795
-@@ -0,0 +1,60 @@
-+#! /bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
-+# Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
-+#
-+# FS QA Test 795
-+#
-+# Check that fstat(2) returns the correct hard link count for a regular file.
-+# Regression test for kernel commit:
-+# 9dd1964ac59d ("smb/client: fix incorrect nlink returned by fstat()")
-+#
-+#  from
-+#  tests/generic/002
-+#  Copyright (c) 2000-2001 Silicon Graphics, Inc.  All Rights Reserved.
-+#
-+. ./common/preamble
-+_begin_fstest metadata auto quick hardlink
-+
-+# Override the default cleanup function.
-+_cleanup()
-+{
-+	cd /
-+	[ -d "$testdir" ] && rm -rf $testdir
-+}
-+
-+status=0	# success is the default!
-+
-+_require_test
-+_require_hardlinks
-+_require_test_program fstat
-+
-+_fixed_by_fs_commit cifs 9dd1964ac59d \
-+	"smb/client: fix incorrect nlink returned by fstat()"
-+
-+testdir=$TEST_DIR/$$
-+mkdir -p $testdir
-+
-+touch $testdir/tmp.1
-+for ((l = 2; l <= 20; l++)); do
-+	ln $testdir/tmp.1 $testdir/tmp.$l
-+	x=`$here/src/fstat $testdir/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
-+	if [ "$l" -ne $x ]; then
-+		echo "Arrgh, created link #$l and fstat looks like ..."
-+		$here/src/fstat $testdir/tmp.1
-+		status=1
-+	fi
-+done
-+
-+for ((l = 20; l >= 1; l--)); do
-+	x=`$here/src/fstat $testdir/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
-+	if [ "$l" -ne $x ]; then
-+		echo "Arrgh, about to remove link #$l and fstat looks like ..."
-+		$here/src/fstat $testdir/tmp.1
-+		status=1
-+	fi
-+	rm -f $testdir/tmp.$l
-+done
-+
-+echo "Silence is golden"
-+exit $status
-diff --git a/tests/generic/795.out b/tests/generic/795.out
-new file mode 100644
-index 00000000..cb357003
---- /dev/null
-+++ b/tests/generic/795.out
-@@ -0,0 +1,2 @@
-+QA output created by 795
-+Silence is golden
--- 
-2.43.0
+On 7/20/26 11:35 AM, Frank Sorenson wrote:
+> This series fixes two distinct but related race conditions in the
+> cifs/smb3 client where directory operations (lease breaks and readdir)
+> can corrupt the attribute cache of recently modified files, causing
+> subsequent stat() calls to return incorrect file sizes or fail with EIO.
+>
+> Both issues stem from the fundamental problem that directory-level
+> metadata -- whether from a lease break notification or a readdir
+> enumeration -- is not strictly synchronized with the authoritative state
+> of open or recently closed files.
+>
+> Both bugs require as few as 2 concurrent threads performing directory
+> and file operations simultaneously.  They only reproduce against Windows
+> Server (where directory lease breaks occur and directory enumeration
+> metadata lags behind file state); they do not reproduce against Samba.
+> The workaround for both is to mount with actimeo=0, which forces every
+> stat() to query the server directly rather than trusting the cache.
+>
+>
+> Patch 1: cifs: serialize readdir with directory cache invalidation from lease breaks
+> -------------------------------------------------------------------------------------
+> When a directory lease break occurs while readdir is actively traversing
+> the directory cache, the lease break handler calls cifs_revalidate_mapping()
+> -> cifs_zap_mapping() while holding CIFS_INO_LOCK, racing with
+> cifs_readdir() which traverses the same cache without that lock.  The
+> resulting corruption causes subsequent stat() calls to return wrong file
+> sizes or EIO errors.
+>
+> Fix: acquire CIFS_INO_LOCK at the start of cifs_readdir() so that lease
+> break cache invalidation and readdir traversal are mutually exclusive.
+>
+>
+> Patch 2: cifs: prevent readdir from changing file size due to stale directory metadata
+> ---------------------------------------------------------------------------------------
+> After writing to a file and closing it, concurrent readdir() can fetch
+> stale directory metadata from the server (EndOfFile=0 for a recently
+> written file) and overwrite the correct cached i_size.  The race window
+> is between cifsFileInfo_put() removing the handle from openFileList
+> (after which is_inode_writable() returns false) and stat() being called.
+> The existing is_size_safe_to_change() check only blocks this when an
+> active RW lease was held -- not after the last writable handle is closed.
+>
+> Fix: track the time of the last writable close or truncate in a new
+> cifsInodeInfo->time_last_write field.  If readdir attempts to change
+> i_size within acregmax jiffies of that timestamp, the update is
+> suppressed.  When the suppressed size differs from the cached value,
+> cifs_i->time is set to zero, forcing the next stat() to issue a fresh
+> QUERY_INFO RPC.  QUERY_INFO returns the authoritative size from the
+> server's open-file table rather than stale directory enumeration metadata,
+> which is the same path taken by actimeo=0.
+>
+>
+> Testing
+> -------
+> Both bugs reproduce against Windows Server 2022 with SMB 3.1.1 and
+> at least 2 concurrent threads.  A reproducer program exercising
+> concurrent rename+readdir (bug 1) and write+close+stat with concurrent
+> readdir (bug 2) was run for 400000 iterations with both patches applied
+> without hitting either bug.
+>
+> A reproducer is available at https://github.com/fsorenson/cifs_cache_race_repro/
+>
+>
+> v2: fix malformed patch 2
+>
+>
+> Frank Sorenson (2):
+>    cifs: serialize readdir with directory cache invalidation from lease breaks
+>    cifs: prevent readdir from changing file size due to stale directory metadata
+>
+>   fs/smb/client/cifsfs.c   |  1 +
+>   fs/smb/client/cifsglob.h |  1 +
+>   fs/smb/client/cifsproto.h |  1 +
+>   fs/smb/client/file.c     | 24 +++++++++++++++++++++---
+>   fs/smb/client/inode.c    |  6 +++++-
+>   fs/smb/client/readdir.c  | 12 ++++++++++++
+>   6 files changed, 45 insertions(+), 4 deletions(-)
+>
+> --
+> 2.55.0
 
