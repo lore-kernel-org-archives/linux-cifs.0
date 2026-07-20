@@ -1,73 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mta1.formilux.org (mta1.formilux.org [51.159.59.229])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6787404E
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 05:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32103932C0
+	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 06:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.59.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784525712; cv=none; b=f/BidHusX7H/34bJukkJCMF5tfiXwwBz4uDftcrEoVpeLT0AxY2Y582n0Zg2eGEJUIFeKDb2XwlaTj9RYzfdALupjusXPXio3vSqoNxvFU2x6uU9Y6fHVjJ9uyNktdpOUK0EamUePgiFR/oHbBq9VzWrq9u6L8qk6eMxC213bU8=
+	t=1784527876; cv=none; b=NMxm63R5UmOW+/Rg3j6E75s+0TwTMrMF3J3KHWpeQxUnrYdJfLQZZGSFRYa8Y6eEeiIsoqikndRtbNUmeOv+paZLWN2RlB7R3qYjxtK4kxD9xRqOA5aWYvwNT/HG6EXYNIK0PX8YI67ZwiSFkbhwTXia8tlL4jffLhj2lqYfTVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784525712; c=relaxed/simple;
-	bh=X1yNjo21hd40UWKIaso4SuX/hfpyY6ewSxwTaibJ6MY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ozvuo/RMsKgAhNY9AJ5RbyMqJm53jGAuT5fXlEjjBXwAm0iYnOPeuS332aBu7zk7EkSz753Cd9C8ktXp6ul7EzpLL7ml7rA7e73hg1s2MYs2Wy2XljnqIpD905FOHFNTWcbdLwz+WBPFq5HE8oFzI4aRIky0CZE8UOh5MAXpJcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESOuLo1g; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784527876; c=relaxed/simple;
+	bh=VECZP0x0u6ze34Adru2zWW4JDOQqLFGvY+uakuUjKH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hVPBnPKRZy95h3IyhiZtVWnTdEbX5z1Co6JWyIRXIWNP8UqZLnLJJBIMolXvITPo6y+/uoEKejWyGfpHu2ymeiYOBobjygKJKBO5aoyI3FCJ6OB7VIbiuLc1RhGK41mHRDl3MxYcKbrbJn+KpVLyCspV7fgcB+jDduqBDTFub4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=1wt.eu; spf=pass smtp.mailfrom=1wt.eu; dkim=pass (1024-bit key) header.d=1wt.eu header.i=@1wt.eu header.b=p6lALpVn; arc=none smtp.client-ip=51.159.59.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=1wt.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=1wt.eu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESOuLo1g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B878A1F00A3F
-	for <linux-cifs@vger.kernel.org>; Mon, 20 Jul 2026 05:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784525710;
-	bh=X1yNjo21hd40UWKIaso4SuX/hfpyY6ewSxwTaibJ6MY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=ESOuLo1gtRSTdxkNeRw3ySfXowQdDtgYiWdWyWm2TFAgoyMMjMwdpCMcfHc3shmue
-	 9cuSZeId+tPuTaMF3IWRdwL5Y/eTUdvKnaptKcypfhxCY4WHoRIRjRyF1GKpcA4BZK
-	 vpwK+ugL6smlaVyEnUQi1h71vZ5xMEZ0XGZpmfGJfXE5TczURu+diemDG9sJFdJMIH
-	 Z3bMHLY6aN6yOxI33jCXT6H1pdQ3wsRhrqYcIGYpmh7FLBAPBRPwqE+hK5ei3UAMyN
-	 rq+FFReDHxp7r0baskPmlGOH+Y/+ynhq9LnUchNaCrA8aQqifu92eSnPQFO+LjmV2m
-	 SCVdsvHWBgfwQ==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c1601d552a8so1020008866b.2
-        for <linux-cifs@vger.kernel.org>; Sun, 19 Jul 2026 22:35:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RokN5PUn5WOgmzq6/CRuji4Z78XKYGUO2PzEkf5Whcap6/glQk65EqcskvGA6DQWYCw9D9FniF0Ug1J@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTvJraw9CLEEICfyXeKJaf2hyVBw4wr6kmGU0UHXO+9U5Pjvq7
-	9YGsoVQIGeogc4/mLQTCcau9X/R+s7yfrfqtexTnLWw/EJ2DBoM1dY6Gfp1JO3tHYM1dyXZIiQ5
-	1yRJUXEzhoEcRMFPuIJz/r0bLLcLntuk=
-X-Received: by 2002:a17:907:3c85:b0:c15:fc59:cdf3 with SMTP id
- a640c23a62f3a-c16b46abda6mr520098466b.12.1784525709334; Sun, 19 Jul 2026
- 22:35:09 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=1wt.eu header.i=@1wt.eu header.b="p6lALpVn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1wt.eu; s=mail;
+	t=1784527856; bh=VECZP0x0u6ze34Adru2zWW4JDOQqLFGvY+uakuUjKH4=;
+	h=From:Message-ID:From;
+	b=p6lALpVnxzp96AG04FIlnb8y2D9wgPwzk88UJ42HU4+gHqKKk0dNNqAilTRxRWopM
+	 G60qJYsk7bMPjDAAQ5dM8bD7y0EH1u9afi1Gtzh57Mqe3eACBLIoY2V9JbKXtjkWjO
+	 TXIxlNhQH+H2QPwR74uI3QPdqXnatvUZ73rsmUMA=
+Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
+	by mta1.formilux.org (Postfix) with ESMTP id D9AACC09C4;
+	Mon, 20 Jul 2026 08:10:56 +0200 (CEST)
+Date: Mon, 20 Jul 2026 08:10:56 +0200
+From: Willy Tarreau <w@1wt.eu>
+To: "Birtwhistle, Daniel" <daniel.birtwhistle@gehealthcare.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "security@kernel.org" <security@kernel.org>
+Subject: Re: [BUG 1/3] smb: client: SMB2/3 signature failures are logged but
+ the response is accepted
+Message-ID: <al278NTFHuO3GaNj@1wt.eu>
+References: <SN4PR22MB28883DAF57E0B4D4BFB1C22AEEC42@SN4PR22MB2888.namprd22.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1784258165.git.tanze@kylinos.cn> <37f280818ac592b7e641d08325b4c10ae6bb7c99.1784258165.git.tanze@kylinos.cn>
-In-Reply-To: <37f280818ac592b7e641d08325b4c10ae6bb7c99.1784258165.git.tanze@kylinos.cn>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 20 Jul 2026 14:34:57 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8A+A2OqOqgVVOdaTqC+hvu6kjQzgOtD40s55F9cwGJbQ@mail.gmail.com>
-X-Gm-Features: AUfX_myEI9N3urJEfnD6kLHlMx2RYm0ZxjA3RiGBFPSXbQh-4wtuf9NcUnOvrLw
-Message-ID: <CAKYAXd8A+A2OqOqgVVOdaTqC+hvu6kjQzgOtD40s55F9cwGJbQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 9/9] ksmbd: avoid self oplock breaks for EA opens
-To: Ze Tan <tanze@kylinos.cn>
-Cc: sfrench@samba.org, pc@manguebit.org, sprasad@microsoft.com, 
-	tom@talpey.comm, senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN4PR22MB28883DAF57E0B4D4BFB1C22AEEC42@SN4PR22MB2888.namprd22.prod.outlook.com>
 
-On Fri, Jul 17, 2026 at 12:40=E2=80=AFPM Ze Tan <tanze@kylinos.cn> wrote:
->
-> generic/093 writes to a file after setcap sets security.capability. The
-> CIFS client can reopen the file to query or update EAs while the same
-> session holds an oplock. ksmbd breaks this oplock and waits for the same
-> client, so the write can block.
->
-> Skip the oplock break for same-session EA or metadata opens. Keep the
-> normal break when another session holds an oplock.
-A session can own multiple independent opens. Why is session identity
-sufficient to conclude that an EA/metadata-only open may bypass the
-existing exclusive or batch oplock break? Oplock state and break
-notifications are associated with an individual open, rather
-than the session as a whole. Could you point to the SMB specification text =
-?
+Hello,
+
+Thanks for your reports. Given that you sent this to a public list
+(linux-cifs), there's no need to Cc security@ since our role is to
+route non-public issues to the relevant maintainers and help them
+coordinate a fix with the reporter.
+
+With that said, for your 3 reports, it would certainly help and save
+maintainers' time if you could propose a fix that can be applied. If
+accepted it would give you credit for finding and fixing these bugs.
+For guidance on how to write patches, please see
+Documentation/process/submitting-patches.rst.
+
+Regarding any reproducer, usually maintainers appreciate them, but
+please send them privately only (i.e. not to a public list).
+
+thanks,
+Willy
