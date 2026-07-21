@@ -1,82 +1,266 @@
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ED33BBFAA
-	for <linux-cifs@vger.kernel.org>; Tue, 21 Jul 2026 08:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69A236AB6B;
+	Tue, 21 Jul 2026 13:38:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784622782; cv=none; b=glF5oqSz9C4j332J/x5LmTUZOS4purlaP23m385TrLCqI9Klbe5aeEa4qEbPmCz4BvxIkyDL2ohEqU6OmgrB1Rg3uJw1Xk60ajWJ5+EW3KIwBf85WEqhNyylaswem8ZY8ZCadeKJDKodzhYbaRpSlav+F4aXTstE4F/besnUQz8=
+	t=1784641140; cv=none; b=j8YKPYfK9KqOILYGxbj0vJOD5JmflmvLPwbEZ1Dj4Qh3CSz0OelPFxMHwM7JSGVwfvY0LoL8yWMvgwA3WMoY3b7NCxmgiC6D5C6PTR0Zmoyq8oLNbLt4iF6y2PqyYTJWWiP5pMp3FiayG6Kv4eOMi/dDaVeLK4eI9Rk84ck9Kcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784622782; c=relaxed/simple;
-	bh=TtjBUHNNwSE9/fiRO8cLBF8C7GBUqhAoYMhryOUhpfg=;
+	s=arc-20240116; t=1784641140; c=relaxed/simple;
+	bh=BUXlCDtq6Z1JOFCp3RnqZuaHahdAZY319uaNGtb6Cug=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RAn84mTgTyKpynp78SC74k4hafgb5K/dkUHbvo2zXhbgMSwE2p4oy13dZyZygW76A7sC1M6U0uUBAjGHwhH+WjyTXmdg1s9WUMkfNL4ZuzANLUHSEnovpUsrZdHHuZ1D4nAFUOoyPezLqpBryGhXB+p2MdSm7CYsxSTGSqiunoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Cq7+yOmv; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	 In-Reply-To:Content-Type; b=DHnR2qvSQ0WNs/cLDo3R8k+UXeXIT3T103g5YNaE6kci0S9Lkr86bmUVifJkEA1exZTG0mxKclFUYDXMBBDFhEfoLw59dgBXoUOAV28bbBiWn//GSB0fjbGNFStjOb3s9z8fV7iPujACCsl/I2hn9BVHLL1xLoTdnlywCAjv+1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=2ZAQawy+; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Cq7+yOmv"
-Message-ID: <4021e03f-6d80-4a26-9112-1dc20abeed12@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784622774;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JWxhNcJB/mBof8h9MaExEEg0zRaJgKb0GDl06d6/LVE=;
-	b=Cq7+yOmvBIq46301s4pWm/fECz5Yq6hTf/IbHe499jNYj8DuWHqIwsGS4TGsTut027hQI8
-	Rr/GIZ23ESfDiStA8SRP1Wnrae+e1DldZUO4DABEk2JvSGy6YblBkcaQxxYpKR431fAaxG
-	rk7/FEniGNfnxr0dj/zwYYAvHyJ+g8JojbS+34wiLD55Cb7jbCevloxldyW3b4Yb7zmHOv
-	Nv/knOn+j8SYpx0vL1ZAuESbU83mJpqUN4KKcCzcnhV6IsuEH38wfHyOGb4KXij1jq7CFo
-	FtoP7QdRJXxqBmk6XNehq+TdUJLrzO6J7IfGZ117KGgQcx/OWmmKBmxDJeMeLw==
-Date: Tue, 21 Jul 2026 16:31:59 +0800
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="2ZAQawy+"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=BUXlCDtq6Z1JOFCp3RnqZuaHahdAZY319uaNGtb6Cug=; b=2ZAQawy+Kqw4SZJeTj4/oWWPO1
+	ZGAwbQL/8DO3DTHTZ4+zwOCpgOnJNzz0UmKNNDZySVOQGyzjAUqBZxIArWi4VuRmiJs5CN+/sIaik
+	egLXFzuljzM9cRye916Sh8xlQ8Z783xL11OAKbj8ZiqqEWb+L1oIC/ue/y+DXmIXuzPa8uLt4PECO
+	jSZ5wxDq6/axMAvouHF8+X4oNF2nnX+kO6V7U9I7DbbMryOnA43JFdBFmw/iyIDb+MToWzHKJWPAO
+	vldGekGesVPyZUEBbIaoIRhfJ9hR2xVcWrMNfm5GmlMqH81es3F6BoGCGyF8d3YTwHDDAXaIGlG6P
+	qpckUAp75HH3AUWqR3AOHc5Gbl2e0lWZds3wT/A0ulJM1itWzqi39hCxa8//if2hAUBjvE34p/7hZ
+	wQKHErxE9+qJyJG4MYOXdaD88E7twD7PHjAvQ4oGHi/7uD37lzEYB1QsucHJBCx7ZI3FoICLc+Ujl
+	/paFoZCKJCAt+znbqskKqo4S;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wmAgJ-00000006NKC-3zIN;
+	Tue, 21 Jul 2026 13:38:48 +0000
+Message-ID: <3cef100e-48e6-4fdd-b7e3-a7f2ac2c02ce@samba.org>
+Date: Tue, 21 Jul 2026 15:38:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 xfstests 0/3] add generic/795
-To: Zorro Lang <zlang@kernel.org>,
- ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
- metze@samba.org, linux-cifs@vger.kernel.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260720163502.732454-1-chenxiaosong@chenxiaosong.com>
- <al8nX7MnPDzmUA5W@zlang-mailbox>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <al8nX7MnPDzmUA5W@zlang-mailbox>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 6/9] ksmbd: support security.capability EAs
+To: tanze <tanze@kylinos.cn>, sfrench@samba.org, linkinjeon@kernel.org,
+ pc@manguebit.org, sprasad@microsoft.com, tom@talpey.com,
+ senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com,
+ linux-cifs@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Jeremy Allison <jra@samba.org>,
+ Stefan Metzmacher <metze@samba.org>
+References: <cover.1784258165.git.tanze@kylinos.cn>
+ <846fec356d359126e64ea64cd5f6e80ce7de4b61.1784258165.git.tanze@kylinos.cn>
+ <48439a79-aa0c-4f0d-b079-3b85de715226@samba.org>
+ <5fa257a4-456e-4917-9249-bb3457952335@kylinos.cn>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <5fa257a4-456e-4917-9249-bb3457952335@kylinos.cn>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------k0X05LYU4SZPnohYPGHbkEeG"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------k0X05LYU4SZPnohYPGHbkEeG
+Content-Type: multipart/mixed; boundary="------------E3nVR8D8NuUkfoY6gjQhiEH5";
+ protected-headers="v1"; hp="clear"
+Message-ID: <3cef100e-48e6-4fdd-b7e3-a7f2ac2c02ce@samba.org>
+Date: Tue, 21 Jul 2026 15:38:41 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 6/9] ksmbd: support security.capability EAs
+To: tanze <tanze@kylinos.cn>, sfrench@samba.org, linkinjeon@kernel.org,
+ pc@manguebit.org, sprasad@microsoft.com, tom@talpey.com,
+ senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com,
+ linux-cifs@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Jeremy Allison <jra@samba.org>,
+ Stefan Metzmacher <metze@samba.org>
+References: <cover.1784258165.git.tanze@kylinos.cn>
+ <846fec356d359126e64ea64cd5f6e80ce7de4b61.1784258165.git.tanze@kylinos.cn>
+ <48439a79-aa0c-4f0d-b079-3b85de715226@samba.org>
+ <5fa257a4-456e-4917-9249-bb3457952335@kylinos.cn>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <5fa257a4-456e-4917-9249-bb3457952335@kylinos.cn>
+
+--------------E3nVR8D8NuUkfoY6gjQhiEH5
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: base64
 
-Hi Zorro,
+T24gNy8yMC8yNiAzOjA2IFBNLCB0YW56ZSB3cm90ZToNCj4gVGhhbmtzIGZvciB5b3VyIHF1
+ZXN0aW9uLiBXaGVuIHRoZSBDSUZTIGNsaWVudCBhY2Nlc3NlcyB1c2VyLkVBLCB0aGUgDQo+
+IG5hbWUgdHJhbnNtaXR0ZWQgb3ZlciB0aGUgU01CIHByb3RvY29sIGlzIHNpbXBseSBFQSBp
+bnN0ZWFkIG9mIHVzZXIuRUEuDQo+IGtzbWJkIHRoZW4gcHJlcGVuZHMgdXNlci4gdG8gY29u
+dmVydCBpdCBiYWNrIHRvIHVzZXIuRUEuIElmIHdlIHBhc3MgDQo+IGV2ZXJ5IGF0dHJpYnV0
+ZSBuYW1lIGRpcmVjdGx5IHRvIHRoZSBWRlMgdW5tb2RpZmllZCwgb3RoZXIgdHlwZXMgb2Yg
+DQo+IGV4dGVuZGVkIGF0dHJpYnV0ZXMgd2lsbCByZXR1cm4gLUVPUE5PVFNVUFAgZHVlIHRv
+IG1pc3NpbmcgaGFuZGxlcnMuDQoNCnl1cCwgYnV0IEkgZ3Vlc3MgdGhhdCdzIGV4YWN0bHkg
+d2hhdCB3ZSB3YW50Lg0KDQpJZiBJIGdldCB0aGF0IHJpZ2h0IHlvdXIgcHJvcG9zYWwgaXMN
+Cg0KQ2xpZW50ICAgICAgICBOZXR3b3JrICAgICAgIFNlcnZlcg0KLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KdXNlci5mb28gICAgICBmb28g
+ICAgICAgICAgIHVzZXIuZm9vDQpzeXN0ZW0uYmFyICAgIHN5c3RlbS5iYXIgICAgc3lzdGVt
+LmJhcg0KDQpUaGlzIHNlZW1zIHdyb25nICh1c2VyIG5hbWVzcGFjZSBub3QgcHJlZml4ZWQs
+IG90aGVycyBwcmVmaXhlZCkuDQoNCldoYXQgd2UgbWlnaHQgd2FudCB0byBkbyBpbnN0ZWFk
+IGlzIHNlbmQgdGhlIG5hbWVzcGFjZSBvdmVyIHRoZSB3aXJlIGluIA0KYWxsIGNhc2VzLCBi
+dXQgaW4gYSBzZXBhcmF0ZSBwcm90b2NvbCBmaWVsZCAoZXhwcmVzc2VkIGJ5IHNwbGl0dGlu
+ZyB0aGUgDQpkb3R0ZWQgc3RyaW5nIGludG8gdHdvIHdvcmRzIHNlcGVyYXRlZCBieSBhIGNv
+bW1hKToNCg0KQ2xpZW50ICAgICAgICBOZXR3b3JrICAgICAgICBTZXJ2ZXINCj09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0N
+CkxpbnV4OiAgICAgICAgICAgICAgICAgICAgICAgTGludXg6DQp1c2VyLmZvbyAgICAgIHVz
+ZXIsIGZvbyAgICAgIHVzZXIuZm9vDQpzeXN0ZW0uYmFyICAgIHN5c3RlbSwgYmFyICAgIHN5
+c3RlbS5iYXINCg0KRnJlZUJTRDogICAgICAgICAgICAgICAgICAgICBMaW51eDoNCioxLCBm
+b28gICAgICAgdXNlciwgZm9vICAgICAgdXNlci5mb28NCioyLCBiYXIgICAgICAgc3lzdGVt
+LCBiYXIgICAgc3lzdGVtLmJhcg0KDQoqMTogRVhUQVRUUl9OQU1FU1BBQ0VfVVNFUg0KKjI6
+IEVYVEFUVFJfTkFNRVNQQUNFX1NZU1RFTQ0KDQpUaGlzIHdheSB3ZSBoYXZlIGEgY2xlYXIg
+d2F5IGhvdyBpbXBsZW1lbnRhdGlvbnMgY2FuIG1hcCB0aGVpciBuYW1lc3BhY2UgDQp0byB0
+aGUgcHJvdG9jb2wsIGFuZCBzZXJ2ZXIgYW5kIGNsaWVudCBrbm93IGV4YWN0bHkgd2hhdCB0
+byBkby4NCg0KVGhvdWdodHM/DQotc2xvdw0KDQo+IA0KPiBUaGUgY3VycmVudCB3b3JrZmxv
+dyB3b3JrcyBhcyBmb2xsb3dzOg0KPiANCj4gQ2xpZW50IHJlcXVlc3TCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoC0tdXNlci5FQQ0KPiDihpMg
+Q0lGUyBjbGllbnQgc3RyaXBzIG9mZiB0aGUgInVzZXIuIg0KPiBwcmVmaXggU01CIEVBIGxh
+eWVyIHJlY2VpdmVzOsKgIMKgIMKgIMKgIMKgIC0tRUENCj4g4oaTIGtzbWJkIGFkZHMgYmFj
+ayB0aGUgInVzZXIuIg0KPiBwcmVmaXggU2VydmVyIGZpbGVzeXN0ZW0gbGF5ZXI6wqAgwqAg
+wqAgwqAgwqAtLXVzZXIuRUENCj4gDQo+IEFmdGVyIGtzbWJkIGZpbmlzaGVzIG1hcHBpbmcg
+dG8gdGhlIHVuZGVybHlpbmcgZXh0ZW5kZWQgYXR0cmlidXRlIG5hbWUsIA0KPiBmaWxlc3lz
+dGVtIGNvbXBhdGliaWxpdHkgY2hlY2tzLCB2YWx1ZSB2YWxpZGF0aW9uIGFuZCBhbGwgcmVs
+YXRlZCANCj4gb3BlcmF0aW9ucyBzaG91bGQgYmUgZGVsZWdhdGVkIHVuaWZvcm1seSB0byB8
+dmZzX3NldHhhdHRyKCl8LiBUaGlzIA0KPiBtYXBwaW5nIGxvZ2ljIGlzIG5vdCBtZWFudCB0
+byBkdXBsaWNhdGUgdGhlIGZ1bGwgc2V0IG9mIHhhdHRyIG5hbWVzcGFjZXMgDQo+IHN1cHBv
+cnRlZCBieSB0aGUgVkZTLiBJbnN0ZWFkLCBpdCBmaWx0ZXJzIHdoaWNoIFNNQiBleHRlbmRl
+ZCBhdHRyaWJ1dGUgDQo+IG5hbWVzIGdldCBwYXJzZWQgYXMgbmF0aXZlIExpbnV4IHhhdHRy
+IG5hbWVzLg0KPiANCj4gSSB3aWxsIHJldmlzZSB0aGUgcGF0Y2ggdG8gZW5hYmxlIG5hdGl2
+ZSBuYW1lc3BhY2UgbWFwcGluZyBvbmx5IHdoZW4gDQo+IGJvdGggb2YgdGhlIGZvbGxvd2lu
+ZyB0d28gY29uZGl0aW9ucyBhcmUgc2F0aXNmaWVkOg0KPiANCj4gIMKgIDEuVGhlIHJlcXVl
+c3QgaXMgc2VudCB3aXRoIFBPU0lYIGV4dGVuZGVkIGF0dHJpYnV0ZSBwYXJhbWV0ZXJzOw0K
+PiAgwqAgMi4gVGhlIG1hcHBlZCBzZXJ2ZXItc2lkZSB1c2VyIGFjY291bnQgaXMgcm9vdCBv
+ciBhbiBhY2NvdW50IHdpdGggDQo+IGFkbWluaXN0cmF0aXZlIHByaXZpbGVnZXMuDQo+IA0K
+PiBUaGFua3MhDQo+IA0KPiANCj4g5ZyoIDIwMjYvNy8yMCAxNDo1NywgUmFscGggQm9laG1l
+IOWGmemBkzoNCj4+IE9uIDcvMTcvMjYgNTozOSBBTSwgWmUgVGFuIHdyb3RlOg0KPj4+ICtz
+dGF0aWMgYm9vbCBrc21iZF9pc19wb3NpeF9lYV9uYW1lKGNvbnN0IGNoYXIgKm5hbWUsIHNp
+emVfdCBuYW1lX2xlbikNCj4+PiArew0KPj4+ICvCoMKgwqAgaWYgKGtzbWJkX2lzX3NlY3Vy
+aXR5X2NhcGFiaWxpdHlfZWFfbmFtZShuYW1lLCBuYW1lX2xlbikpDQo+Pj4gK8KgwqDCoMKg
+wqDCoMKgIHJldHVybiB0cnVlOw0KPj4+ICsNCj4+PiArwqDCoMKgIHJldHVybiBmYWxzZTsN
+Cj4+PiArfQ0KPj4+ICsNCj4+PiArc3RhdGljIGludCBrc21iZF9tYXBfZWFfbmFtZV90b194
+YXR0cihib29sIHBvc2l4X2V4dGVuc2lvbnMsDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBjb25zdCBjaGFyICplYV9uYW1lLCBzaXplX3QgZWFf
+bmFtZV9sZW4sDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBjaGFyICphdHRyX25hbWUpDQo+Pj4gK3sNCj4+PiArwqDCoMKgIGlmIChwb3NpeF9l
+eHRlbnNpb25zICYmDQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGtzbWJkX2lzX3Bvc2l4X2VhX25h
+bWUoZWFfbmFtZSwgZWFfbmFtZV9sZW4pKSB7DQo+Pg0KPj4gd2h5IHRoZSBjaGVjayBmb3Ig
+YWxsb3dlZCBuYW1lc3BhY2VzIHZpYSBrc21iZF9pc19wb3NpeF9lYV9uYW1lKCkgYXQgDQo+
+PiBhbGwgYW5kIG5vdCBqdXN0IHBhc3MgdGhyb3VnaCB3aGF0ZXZlciB0aGUgY2xpZW50IHNl
+bmRzIHVzLCBwYXNzIGl0IA0KPj4gZG93biBhbmQgbGV0IHRoZSB4YXR0ciBzdWJzeXN0ZW0g
+ZGVhbCB3aXRoIGl0Pw0KPj4NCj4+IFN0aWxsIHdyYXBwaW5nIG15IGhlYWQgYXJvdW5kIHRo
+aXMgc28gSSBtaWdodCBiZSBtaXNzaW5nIHNvbWV0aGluZyANCj4+IG9idmlvdXMuIDopDQo+
+Pg0KPj4gVGhhbmtzIQ0KPj4gLXNsb3cNCg0K
 
-The stat command uses the statx() syscall rather than fstat(), so we 
-have to use a C program to call fstat().
+--------------E3nVR8D8NuUkfoY6gjQhiEH5--
 
-On 7/21/26 16:25, Zorro Lang wrote:
-> I might not have explained clearly during the review. I wasn't asking you to
-> rewrite g/002 and lstat64.c. I was suggesting checking whether src/fstat.c in
-> your previous patch could be replaced by the stat command in xfs_io [1]. Check
-> `man xfs_io` for the "stat" command to see if it can fulfill your test
-> requirement.
-> 
-> Due to I noticed you need information like st_nlink from struct stat, so
-> `xfs_io -c "stat -r" ...` should meet your requirements. Please
-> give it a try, if it works, it will make the whole patch much cleaner.
-> 
-> P.S. For a new test case, please don't use a specific case number (like
-> generic/795) in the subject or commit log, as it might get assigned a
-> different number when merged. You can just use something like:
-> "[PATCH] generic: new test to ..."
+--------------k0X05LYU4SZPnohYPGHbkEeG
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+-----BEGIN PGP SIGNATURE-----
 
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmpfdmEFAwAAAAAACgkQqh6bcSY5nka2
+pg/+NgHZDnbqNrDbRJspdngVNC2k17L6cO1oKcD7G3whBQgrVzvZyQSJUtUpuhPR0q+/nhS1L7GL
+t/HsOyHEn7VzmX6zBYS9q6ve5hgr7YMOsRe5vjk4OpnGLrjsNOYq1y9VSbFbppro4lW5pP/DiDRG
+Gk7INsT2gTEDIfFp6iOHxAtKMPTQp91e9ln64lrdUtm7BF7Js/hAQUrNwBxBmjlIpbPGdXWGbk/R
+pdgjjbVr52uE2p+4BPjeBhjfw1u8DmWeNaD5CQAwjA7LfLrRWCAhZbRu8mnMT3m/Pj46G0HF7ljC
+CRY80Tr4vVstVFUo+bHwgGZWeoob/z4lHo+kw3SXkZhsyPnZFQXjfUIRgy0tQg4XhABr4ES21/kX
+7ym24Ma50tuEr+x4XcfDYDeBpscNAxVfGXm1EFjw9TBoIJEizRSgAcGYxXgb+E3KxPavcQqhCBNU
+Kx8VNZZ1TkELTssdycknPpGwBfFTzTe7iMD+6WJZO6cX+hipRVforE7pVMWCvX/GNS57Breqa/q5
+fm2mtSB36SfocDQUyAbI5DhxwKCN3Yutu1tWlFijzzPT+x1NFw6Sc1uf2LivsYZQfKKe9z2Jfx1R
+BG5642f+zN1OAymxcPaRI2Eb3J5S03NLXpWT9umlUpMRRuozw2izJuDT5u6hz8Od37Y6S0+eeW88
+p7o=
+=4GKJ
+-----END PGP SIGNATURE-----
+
+--------------k0X05LYU4SZPnohYPGHbkEeG--
