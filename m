@@ -1,110 +1,182 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EBD2BD58A
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 00:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784681232; cv=none; b=tadSfjsanmqI+LKLtDxqKx5gspZ4gMiXJHhgzuMAxcIBvcxPgP5VeI6BHTSggBcI8z3TTxJ/Ez3TtvVXvr+jM96UoqBbeBnLh3U51CT6tWzNKg2/YA74lprI7kvWx1nuge1kMQdL6kR2lWJWE6NVUtHbxt3IjyWqNaH2ZN1n9pY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784681232; c=relaxed/simple;
-	bh=hSwC6swKbkFW1RjXs4kP6fj6bTVuYOz2n5/pw3kkreE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=F7dskzFd8V4+CuLO/vVNGvvylWAa9Z/NWWdTqLFBAx2NtiRn6nIoejpfacOn32kiELYAqFZ+61+Y5WuD+/M+gFtoNSWZF3YigPlOfvXaUH2kFlYUAjHd9XfiJfXNhi8j2TPyAnqj3zGcb9/deCHCIxAGUasNRcNltCkIzeJKKpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Bn2QaN4W; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEA6238171
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 01:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784683718; cv=pass; b=NsoIncGSX6txLqg4Dz7fy/3VDhTM4wJpXX3MK+IYtdY6D0RdGRhQ07sd6a52aen+WDi2cuWDNoPBuIBSOdtCRFJflMzY7yaQ+M9S80EGwG6Kp2Gf2X3QFlWThDb+5GgVLF07xQwKpFqUlr3DMPoB+ND+SDxtpHUHAX3N2AW44/c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784683718; c=relaxed/simple;
+	bh=P7X0nNOqNHJWssqEbwn7YD7lUemRgxFbvO7ehXaG4K8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mnecR7l9wUszQc60/ZgQoaHSAFoqsJgF9c0whU1LnYdlEQmYDXbN5zL/8tLgcgW1h+CZHM00xbEKHcWtxhWIYw4jyqso8yfg55g9BvaI25HxG2I/jpid4ypEv5j/H+GXOpHTsBvuHS+9pBBr+gmgIETOVkacaRNHMqUmKn97YbA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GaOyGWk2; arc=pass smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Bn2QaN4W"
-Message-ID: <1de1e19c-bd57-403c-b91f-70b2d3b51fe7@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784681223;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=sKgrLlUzUQ5oP/GSe2pnEm6K710xfRwztY1wMkv5cQ4=;
-	b=Bn2QaN4WdIew3rXqQGtp4VxdB2FOqGylZGUVViVbWnJ2TnrgG2P+QSD0ao9Y0xQ2MRAckE
-	8VEnTMBOpG5EgaeDrMUpWEIcxoWUb7RKoFN7jNAwFXwr6eK7THLr1wkbuZaMPN6+8mxf9t
-	OKobU/tWsAx9tp/wtjqU3GHvGEsobLI/XVMsxEYeODxkAaWdnqkIb0bA5+4T9qEfEwsGvB
-	KTEqQwSKZEp9yIHJ2oYkusNMA0DCqy+gCyOkTWRBL3axNT5aN+WMEUPohBFFlYks+AZeNS
-	zx6RBHXSGsphyRnw1+YD+3DrmLSKwt0cF46qvCUL814FPc5KPGHvuK3tzarAbA==
-Date: Wed, 22 Jul 2026 08:47:23 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GaOyGWk2"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-902e4af2d9dso59514436d6.0
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Jul 2026 18:28:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784683715; cv=none;
+        d=google.com; s=arc-20260327;
+        b=FS7OOvCoGV096mVzL25bbbcPtkqGABRBzPPy5P4rfdoYFaso7UChU7TFzXWdBKsS+a
+         KkBbZUKMXE9scRJ+BLiRtzAiGRVx/XXEVfEl2V5e8EwBhtylMFGhhO3SB/hnHAzaBX3M
+         GcSIX/A4RJPb6kr6j84x3rUb+0lY1klDyuZeZEDdxaeW6XZEYprAOXOEfd8WFMYVLUhO
+         oPkqhU8+B4lgEb9LsQLffo1iJ51P2VKmPH0RK9InQ+6N6ZrxajfZIZRccBMHqVBO3Nz6
+         2OxJpFRjKNnvrEb6rjewKz3UbrEqJkyYUYN6GxWPLHeHioiSDZkRYW3bT5+DvttY6Uta
+         tHjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=cc+H7x15d6b7z4zTF7m3gupjIX7TzfHxlD6KLbrDcC8=;
+        fh=X/tRp+EVM9Zkpblyc+5O5SDSK1U3jjktf5a89XnPo9w=;
+        b=BCZ9uozuQP9haubkljfeF3CoSHBgGg/KdmapwXqHhj0s3mMCIeqML0kKvvhKVuFP0m
+         KDpnU9CzWDALiKyMjzxU8JAg+sHzzFPymiso2hmJclDqePj+bUx4cLP/O6tDVdfTjUjZ
+         X1ymTQeInC4qqcWqoCUWIzB/1pVlHhxmqvXHuJ7vVxLp3BGYHZVyxJwhaLwVjnTlVPM9
+         sQb5Al04czGaXhCgF1k06+6pT1EHkHwc7onNZEUoGN6SlbVH8/ttO53RnifwWwEGUTyG
+         QiSitbYC+b69fNxmLXC2fAbKOmcPtQQynG54mdUJRRcBvjX8DPY/V1P2Nzc/e+hbsVsa
+         2gUA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784683715; x=1785288515; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=cc+H7x15d6b7z4zTF7m3gupjIX7TzfHxlD6KLbrDcC8=;
+        b=GaOyGWk2gUOX5AxGF4AWrl9fuprR3xKJFeIpH1w1nsJK/7g3WoePSXoXTH6N8PrOLF
+         GY2CxjxbvblhMf4g8/m4WYK9uXVqA01Q33yJZjnBy5tP3dyJ8T/roQkX/bz4N1JlmIM5
+         9GWeJK5k9YAuNiN4yQ4Af3/fzuwIALtpyQJsJNMtjintO1ZYYugtpxM5BQVf+zlYIk6z
+         t/KUhaLNxVuVybD5MDeWsF0t98c4kpYbEnk9SeVgSPhhH2b+qrcAnIFGbM/BDhyJl9Ch
+         VInu9iYUCeyYnY+30tfWs+ZqsgfbvUQxTwAT4PToPVDZwM4I86AW8gBP0vbStVeCObk2
+         w3iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784683715; x=1785288515;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=cc+H7x15d6b7z4zTF7m3gupjIX7TzfHxlD6KLbrDcC8=;
+        b=Mg+TW4yDknar99X55oG4X6toacsWSiDD/7lzmWaVYgjTQYJ1pOeIU8UnTckFHYqPKU
+         oju06i7NrH0r7Z9+CpXnGVtcOGbe5EnWCY+/382RQy890+vcWzydwm8zkHAqp4TFkz1H
+         dGX29s1OVGowcpCJgaD/dfdNDA6Hk99bz9CAhLwW71/+Snih4AY3NdX95AwbuUcSb8so
+         YJORcLlNlCvCVxNDoT16MulFJtpMI9b9t8cLCs1qf65sDmZ7QnVQRfyTlLCEhITnoH9u
+         jBvMYdXtCQ2+YqAlOuy9q/qXJvq49bqOgX225m/ucJI8ce0fK2cvCzGnk6v9i+p/N6yM
+         q2dw==
+X-Gm-Message-State: AOJu0Yx3kWrUIUyCCUqSeHNSvnJFE9wLBr+KQKAeu3ntQxt2GkEK3QQx
+	+/BEnnxboKot2d9nAeaJC8z3EkWh0Yr4i3eOG4UiUDBO3YBdYkeVScAEzbPzNanx8C3Yq4nxaBu
+	seo3n0lqetP123aCav/rRldF7BUZVIqg=
+X-Gm-Gg: AR+sD11cyLZnwlAC162r6LBuB22N7Bd4gth+YGlFDQi8NtXsIjSKWwgkHNOf4go4msn
+	JFlbiiK2Gk844snvyEEzDO3UK/HVeBAhwQzIuy2DoFgHg5cqrKTJDfqhluEynuqekBd3veutuUf
+	xTgEiI2TKM3sZlrbDZEZlbz+vIACRHhmmwBbNacv26cyTIly9TnKiRRSej/jMCjCr8pSy7mSkvC
+	aDppBXFbzvLvWoG7cUOgHCCKLNmqF5LOTOL70fT4j+Q7s2zXNAsIxey7//psEoFXArMKlJL348O
+	uFQuz5XoRXBP9FIxiqAN87e7BOCeoC8TLTZWjmL5NG/nWGVxsFQgXvHvA7k+vZntTWmRTIzeR7+
+	zFT2uPESUofKchAT4/S6nvb9bCBBmld7sTOUM21QgaLbObbJHI6bozZRxLCJPXHCx7Qbbounpt1
+	Jt
+X-Received: by 2002:ad4:5c8e:0:b0:904:2439:cc73 with SMTP id
+ 6a1803df08f44-907b9c23fc3mr24224366d6.30.1784683715591; Tue, 21 Jul 2026
+ 18:28:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Subject: [BUG] null-ptr-deref on ksmbd-for-next-next branch
-To: linkinjeon@kernel.org
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
- CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260721235552.1839780-1-sorenson@redhat.com>
+In-Reply-To: <20260721235552.1839780-1-sorenson@redhat.com>
+From: Steve French <smfrench@gmail.com>
+Date: Tue, 21 Jul 2026 20:28:24 -0500
+X-Gm-Features: AUfX_my-cg_NF3ISLOIudmPgU7LWv-Fe6j72gYPYcWIYTc3PtlRgpJo5acXHoB0
+Message-ID: <CAH2r5murna29cwOYicOf-=-QPBDssgbwu8sYyogGTe_TS40d0g@mail.gmail.com>
+Subject: Re: [PATCH v4 0/2] cifs: fix readdir stale size bug and
+ deferred-close reference leak
+To: Frank Sorenson <sorenson@redhat.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Namjae,
+tentatively merged into cifs-2.6.git for-next pending more reviews and test=
+ing
 
-While testing ksmbd-for-next-next branch with a Windows client, I hit 
-the following kernel panic:
+On Tue, Jul 21, 2026 at 7:16=E2=80=AFPM Frank Sorenson <sorenson@redhat.com=
+> wrote:
+>
+> This series fixes two bugs in the cifs/smb3 client: a race where
+> readdir overwrites cached file sizes with stale server directory
+> metadata, and a pre-existing reference leak in the deferred-close
+> drain paths.
+>
+> Patch 1 fixes a bug where stat() returns the wrong file size after a
+> write+close or rename against Windows Server.  Windows Server's directory
+> enumeration metadata (EndOfFile) lags behind the actual file state
+> immediately after a modification.  If a concurrent readdir() runs during
+> that lag, it overwrites the correctly cached i_size with the stale server
+> value; a subsequent stat() within the actimeo window then returns the
+> wrong size.  Both the write+close and rename cases share the same root
+> cause.  The bug does not reproduce against Samba or with actimeo=3D0.
+>
+> The fix adds cifsInodeInfo->time_last_write, stamped at writable close
+> and at truncate.  is_size_safe_to_change() blocks readdir from updating
+> i_size within acregmax jiffies of that timestamp.  When a size update is
+> blocked and the server value differs from the cached one, the attribute
+> cache is invalidated, forcing a fresh QUERY_INFO on the next stat().
+> time_last_write is refreshed at the actual server close in
+> smb2_deferred_work_close() and the cifs_close_deferred_file*() drain
+> paths to ensure the protection window is anchored to the real close time
+> when closetimeo > 0.
+>
+> Testing
+> -------
+> Reproduces against Windows Server 2022 with SMB 3.1.1 with multiple
+> concurrent threads; does not reproduce against Samba or with actimeo=3D0.
+> A reproducer exercising concurrent write+close+stat and rename+stat with
+> concurrent readdir was run for 50,000+ iterations without hitting the bug=
+.
+>
+> A reproducer is available at https://github.com/fsorenson/cifs_cache_race=
+_repro/
+>
+>
+> Patch 2 addresses a pre-existing reference leak in the deferred-close
+> drain paths; when cancel_delayed_work() succeeds but the subsequent
+> kmalloc_obj() for the processing list fails, the cancelled work's
+> cifsFileInfo reference is silently dropped without calling
+> _cifsFileInfo_put(), leaking the reference and the open server handle.
+>
+> The fix saves the affected cfile and calls _cifsFileInfo_put() after
+> releasing the lock.
+>
+>
+> v4: add memory barrier comments required by checkpatch; fix pre-existing
+>     cifsFileInfo reference leak on kmalloc failure in deferred-close
+>     drain paths (patch 2)
+> v3: replace CIFS_INO_LOCK serialization approach with time_last_write
+>     tracking; single patch covered both observed symptoms
+> v2: fix malformed patch
+>
+> Frank Sorenson (2):
+>   cifs: prevent readdir from changing file size due to stale directory me=
+tadata
+>   cifs: fix cifsFileInfo leak on kmalloc failure in deferred close drain =
+paths
+>
+>  fs/smb/client/cifsfs.c   |  1 +
+>  fs/smb/client/cifsglob.h |  1 +
+>  fs/smb/client/file.c     | 69 ++++++++++++++++++++++++++++++++++++++++++=
++----
+>  fs/smb/client/inode.c    |  6 ++++
+>  fs/smb/client/misc.c     | 72 ++++++++++++++++++++++++++++++++++++++++++=
++------
+>  5 files changed, 135 insertions(+), 14 deletions(-)
+>
+> --
+> 2.55.0
+>
+>
 
-[  118.738007] BUG: kernel NULL pointer dereference, address: 
-0000000000000000
-...
-[  118.751396] Workqueue: ksmbd-io handle_ksmbd_work [ksmbd]
-...
-[  118.775059] Call Trace:
-[  118.775761]  <TASK>
-[  118.776419]  handle_ksmbd_work+0x269/0x550 [ksmbd]
-[  118.777795]  process_scheduled_works+0x206/0x450
-[  118.779164]  worker_thread+0x20a/0x2f0
-[  118.780253]  ? _raw_spin_unlock_irqrestore+0x12/0x40
-[  118.781652]  ? __kthread_parkme+0x49/0xb0
-[  118.782885]  kthread+0x104/0x130
-[  118.783880]  ? __pfx_worker_thread+0x10/0x10
-[  118.785204]  ? __pfx_kthread+0x10/0x10
-[  118.786540]  ret_from_fork+0xb0/0x220
-[  118.787858]  ? __pfx_kthread+0x10/0x10
-[  118.789260]  ret_from_fork_asm+0x1a/0x30
-[  118.790721]  </TASK>
-[  118.791593] Modules linked in: ksmbd smb_compress smbdirect rdma_cm 
-ib_cm iw_cm ib_core libarc4 nls_ucs2_utils
-[  118.794721] CR2: 0000000000000000
-[  118.795529] ---[ end trace 0000000000000000 ]---
 
+--=20
+Thanks,
 
-After debugging, I found that patch ("ksmbd: enforce signing required by 
-the session") introduced the issue:
-https://git.samba.org/?p=ksmbd.git;a=commitdiff;h=7e5a34a4c91621c5315a725531c8d00336b09227;hp=5b1cf1316f83dd2e4c8908addc69877d444bd77b
-
-It also needs the following additional changes:
-
-```
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -140,7 +140,8 @@ static int __process_request(struct ksmbd_work 
-*work, struct ksmbd_conn *conn,
-                 return SERVER_HANDLER_ABORT;
-         }
-
--       signed_req = conn->ops->is_sign_req(work, command);
-+       signed_req = work->sess &&
-+                    conn->ops->is_sign_req(work, command);
-         if (work->sess && work->sess->sign && !work->encrypted &&
-             !signed_req) {
-                 conn->ops->set_rsp_status(work, STATUS_ACCESS_DENIED);
-```
-
-If you want, you can add:
-
-Tested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+Steve
