@@ -1,69 +1,94 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAE42CCC5
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 04:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2713EA962;
+	Wed, 22 Jul 2026 04:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784692934; cv=none; b=s5y4228hgvE3O5MTInyvHSfHOkb2/mc7O+d2TKRIdxsHE5ci2+HBNlssRk28UxFdE62eD9dW7hfXwxRI28norudJS6OpQlxtIGhBpqpnH1sg9HDW1OaXBgbYrD7AGxu/HK66MwnXNAvs67m+8GoYTy0+Mc3/zL5vD24wzI0DE88=
+	t=1784693469; cv=none; b=ONjbMaER+U0/6xyTVA7aUcb8ziye8G1gHzihWvvIvxgKOzv3F+3WUwiLNaEcTTYknaG+FyV6DC0Oh4ETjUK9JFB8eG9H8++/yEV+mA0b/z0WsfxcK2OsyzKlR0gP9fSivIMXU6z/wkGSOPy7EsVsVhyKhtgmxXedZh36Q3U6QXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784692934; c=relaxed/simple;
-	bh=aAtgGHGgce56fzy+XEh2zavJ9uCwnEEK1ZQehzOjk7E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PpLBZfBaM/2oN/r8qey8QU9JGfVuWyCARhUZzG0Qzo3aZnX9M2TvGjRpVNq4y+9W2SRkC9p2QLBrR4KwrekcW0n3j4qC29Lm7KttxM/hGzXwbTTWgLI1LnEDlYC5+YUSWPyLGAKaQv8mKx3dJG5yC1NjP/EEhe+H+Y6SGLOlEco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfRwpVmI; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfRwpVmI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7831F00ADB
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 04:02:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784692933;
-	bh=aAtgGHGgce56fzy+XEh2zavJ9uCwnEEK1ZQehzOjk7E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=VfRwpVmIVLY/Lbw6q53yInWVYu4Kgv8xIlYEGhoLAlqPUz+IBdYWcbd0iE4kd4R3D
-	 8QJf4pO0Kd9af16QuHV70mYTtC52ul/AHm+9BtEdRcMeJTVC6frTMCkxyOEiZ5Uk9J
-	 MlcUPLa/mS7+Mg8uPhUle7lXX/oMbxaRevizQ4GheNJd6JSLOlSdnAM5Qd47Qcu5bi
-	 mqbn7PmC9WUVGS5J/oS8RxBe0gKwe02hGzGx026BUTGkHGqusLWlmehS6KZGAZS7a4
-	 6PSp88uJx5rR+JbeYRFVp/b/GTECdBQECj0coTJBesh23IUrpEzW34F6FQOc1S6Xha
-	 Ru3NYVORZ8HUw==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c1740c36c5cso679376966b.2
-        for <linux-cifs@vger.kernel.org>; Tue, 21 Jul 2026 21:02:13 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rr4pW9RhvMw3rLZVOe6vzJfj69i2d/qDy+96fNJKO/7vG486kiPbmVTcFC80s6q1WCb6hhTjJNvEjeo@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyo/Ar5loHBVLmNBa9jBWe7Tpg0IoO7VmVTF4wEl3+EvI2h8qLH
-	ZNXdwH0vHp7FfS5T0zRWM9PMVRKSeicmDHou0klMYg6pD4BlTcYEFRG91PrnQYQ/Jpfqt6mJqwn
-	i2BTkgOMZ6veiWSQQOVO/Bm7vkilISDs=
-X-Received: by 2002:a17:907:ba07:b0:c05:abc0:dc7c with SMTP id
- a640c23a62f3a-c16b48533f3mr763855066b.40.1784692931860; Tue, 21 Jul 2026
- 21:02:11 -0700 (PDT)
+	s=arc-20240116; t=1784693469; c=relaxed/simple;
+	bh=B9NdxqKzZg9QVwOErNBbVUnT9LeZgonQFmH+36oHkys=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wxi8kWSVsmZXot9pHPhqWCdLTjZMDGI857Vrtxm5N6cNgPKY5Z27WdDiFo7qJaeO896Bhb0bbQO3yB730rFYoun6xUfgsl3KqCNyG2bLEt667XydN7CnWahu1KxKmLY6kOY+UQqB8h7ZUGgPIqKF5lkKwidIKcmtqx1NIO1LWIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.196.245.140])
+	by APP-05 (Coremail) with SMTP id zQCowAAXhT_DQmBq1xC7AA--.23588S2;
+	Wed, 22 Jul 2026 12:10:44 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Henrique Carvalho <henrique.carvalho@suse.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Pengpeng Hou <pengpeng@iscas.ac.cn>
+Subject: [RFC] smb: client: define async channel update serialization
+Date: Wed, 22 Jul 2026 12:10:43 +0800
+Message-ID: <20260722041043.90682-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1de1e19c-bd57-403c-b91f-70b2d3b51fe7@chenxiaosong.com>
- <CAKYAXd-p=8p6c4HTfH9Su1bRAUwZsxpU=PXtRm0Y+ycge81Zaw@mail.gmail.com> <2fb95851-8416-4c74-a0b3-4b682cff472a@chenxiaosong.com>
-In-Reply-To: <2fb95851-8416-4c74-a0b3-4b682cff472a@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 22 Jul 2026 13:01:59 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_74L_w+7YZN2D54wAieJHWTgE_xzRd-QM70VGbRXXiRg@mail.gmail.com>
-X-Gm-Features: AUfX_my57CFCkMb8Ijgf2T5m21-F8ZBPiG8ICnqC6ngWd1ffVXMumEMYs0pNEp0
-Message-ID: <CAKYAXd_74L_w+7YZN2D54wAieJHWTgE_xzRd-QM70VGbRXXiRg@mail.gmail.com>
-Subject: Re: [BUG] null-ptr-deref on ksmbd-for-next-next branch
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAAXhT_DQmBq1xC7AA--.23588S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tr4DAryrKr1rXFWfXry7KFg_yoW8Zw47pF
+	WSg3y8Gr1kJrWfA3WkZw40grW8urZ5CF4UJrn8J348Aw45trnFvFW3tw4j9F9rCrs3X3yj
+	9r1Ygw4qka1qyaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
+	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
+	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
+	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
+	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
+	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
+	sGvfC2KfnxnUUI43ZEXa7VUb_Ma5UUUUU==
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 
-On Wed, Jul 22, 2026 at 11:14=E2=80=AFAM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> Yes, you are correct. Checking conn->ops->is_sign_req is OK.
->
-> I checked work->sess because signed_req is only used by the
-> session-dependent signing checks below.
-I have updated and added the tags the patch in #ksmbd-for-next-next.
-Thanks!
+Commit 556bb341f9f2 ("smb: client: introduce multichannel async work
+during mount") moved multichannel setup out of the mount path and into
+independent work items. Mounts can share an existing session, so more than
+one worker can update the same channel array concurrently.
+
+cifs_try_adding_channels() snapshots chan_count and the number of missing
+channels under chan_lock, but drops that lock while each channel is opened.
+Two workers can therefore act on the same initial count. More importantly,
+cifs_ses_add_channel() publishes a new slot before taking session_mutex, and
+its failure path later decrements the current chan_count. If another worker
+has appended a slot in between, that rollback can remove the wrong tail.
+At the array limit, a stale worker can also index chans[chan_count] after
+another worker has filled the last slot.
+
+I considered making the mount worker use
+CIFS_SES_FLAG_SCALE_CHANNELS, but that flag is not a blocking lock. A worker
+that fails to acquire it has no retry or completion to wait on. In addition,
+smb2_reconnect() currently clears the flag on a shared exit path even when it
+only observed another updater owning it, and an early channel-disable path
+runs before the existing flag acquisition.
+
+Extending session_mutex around slot publication and rollback would serialize
+concurrent additions, but it does not by itself serialize the reconfigure
+decrease path. Conversely, a new mutex around all of
+smb3_update_ses_channels() needs an explicit lock order because reconnect can
+call channel removal while already holding session_mutex, whereas channel
+addition later acquires session_mutex for session setup.
+
+Would you prefer this to be fixed by coalescing mount requests onto one
+per-session work item, or by introducing a dedicated channel-update
+serialization primitive with an agreed lock order? Once that lifetime and
+locking contract is clear, I can prepare a narrow patch and keep the capacity
+check at the actual chans[] append as a final invariant.
+
