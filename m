@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54779353A6F
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 13:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DB233ADBF
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 13:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784725446; cv=none; b=qOYsGIL8uoohwVxb7UY0qd5c1CGd2ATiUQ1QVcwkqNcnfaCsds4taFuUGy0p8rSAufJ5IzQKIxSRlKhE+AQwcjRBvJRtcTSNwzFBIGU8LZ/JPRoYWp4FYTiTVceKhZlhpIlR7avXWmw1XnAA6/BD/b1TOeblSoPcFmKDMMDWYNg=
+	t=1784725447; cv=none; b=UWF5kXGvaU/AIvNLGfhZZJ0DAzMEC8w0FyzZxxLhFS82ug5krcMkwFnj8VtxqDmyEj0hcPBkxp+OIFIqYY3mwKNYIibf0mtUAyneCfiYF2/0RUbQrJo9hyg1s4rld0CvbEqCaWS3DWnyAcWYpxpk5sNrBpOn7FNfbg/fvzR3SG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784725446; c=relaxed/simple;
-	bh=W2r34cI+XaaQUdqCi3aOgKHvzlTyAT8XuHNk4YjX+HU=;
+	s=arc-20240116; t=1784725447; c=relaxed/simple;
+	bh=9QSB2VcYohSkUGe3vsdtMud4lVx7Qo+LdiRdtpNDZYs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DBILIRf/eTYk3DMdP7zjJJH5Hr4TLsZVH58l8H8Qor9TqHx3S9CcwaPAsLvbx00LrfZyZWD9sir4to9ORxuk9mZRopaxJ2LLwSPeySUFPfVPHM8vU0/2GgWdzP7jcfgcGz8lril15i6ApBRZ2iVBosAKndxlWWl23PgsweAXCaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cFywd+9F; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=e8TG6UQHQkgv9pom9EVsDjn0bKobehsPN9vsy/T9gytQzcz413O2Kt49aTi+viURYSG2OkMequBoQWv1FYxWIFcYLVRrSgExItogSjoAMxi4CS7wnf6upcSZMjPJMQ2KE15gYzwLlAskygNuucerRp3K+ct8ziuysi6Y3k09hSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X2KZ/3H8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cFywd+9F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2KZ/3H8"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784725436;
+	s=mimecast20190719; t=1784725437;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=forfFVNHXdcKUrAO6tYWFvQxC3xkWQUr9XOJVlaCNVg=;
-	b=cFywd+9F4aCHdIT9FuKc5MQ+sqo6vxhamc7jADlHKyYE0nbCKsL/HaCQGUhuroZAw4nQnn
-	CL1xuZhRczOUpz2YjwiWpPtjSlIH+uAn6c8NmIHyqyi06IRBg+f5g38wDNLUzhUSCwmNl/
-	l4PZVM5LW4w4d33cp580iqOscHdyVDM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=vprsViKY72rawZWltum/UMfZGzgPWXZ8iTQuEYnb2yU=;
+	b=X2KZ/3H8yi8Z/ZrDE4adSrjfagbXrzS76l6TX6w1c7G0AFCdtIaJwsWp3UyRuiNSXrScaN
+	Z1/TCDv2uZnzl7WpsLxlSeN+2dP7ocBcT4WDDRCEkz4pBRDfqKn59VxHcYKL+Q3XEJDcxt
+	BdMoj810ulPIXpPk5RT8zOaRPwazI0Q=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-73-H_oeY_ZgO5SV5KucMeI5DQ-1; Wed,
- 22 Jul 2026 09:03:52 -0400
-X-MC-Unique: H_oeY_ZgO5SV5KucMeI5DQ-1
-X-Mimecast-MFC-AGG-ID: H_oeY_ZgO5SV5KucMeI5DQ_1784725428
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-649-GphHkRAXMoOOxTVmcFV2PA-1; Wed,
+ 22 Jul 2026 09:02:47 -0400
+X-MC-Unique: GphHkRAXMoOOxTVmcFV2PA-1
+X-Mimecast-MFC-AGG-ID: GphHkRAXMoOOxTVmcFV2PA_1784725364
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D986718E6A5B;
-	Wed, 22 Jul 2026 13:03:47 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC9E71800756;
+	Wed, 22 Jul 2026 13:02:41 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.44.33.159])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CEAB8763;
-	Wed, 22 Jul 2026 13:03:41 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3EF5F1955D88;
+	Wed, 22 Jul 2026 13:02:32 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>,
 	Matthew Wilcox <willy@infradead.org>,
@@ -66,10 +66,10 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org
-Subject: [PATCH v7 09/29] Add a function to kmap one page of a multipage bio_vec
-Date: Wed, 22 Jul 2026 14:01:56 +0100
-Message-ID: <20260722130218.78958-10-dhowells@redhat.com>
+	Yichong Chen <chenyichong@uniontech.com>
+Subject: [PATCH v7 01/29] netfs: clear PG_private_2 on copy-to-cache append failure
+Date: Wed, 22 Jul 2026 14:01:48 +0100
+Message-ID: <20260722130218.78958-2-dhowells@redhat.com>
 In-Reply-To: <20260722130218.78958-1-dhowells@redhat.com>
 References: <20260722130218.78958-1-dhowells@redhat.com>
 Precedence: bulk
@@ -79,49 +79,37 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Add a function to kmap one page of a multipage bio_vec by offset (which is
-added to the offset in the bio_vec internally).  The caller is responsible
-for calculating how much of the page is then available.
+From: Yichong Chen <chenyichong@uniontech.com>
 
+netfs_pgpriv2_copy_to_cache() marks the folio with PG_private_2 before
+netfs_pgpriv2_copy_folio() appends it to the copy-to-cache rolling
+buffer.
+
+If the append fails, the folio is not queued for cache writeback, so
+the PG_private_2 state and its reference must be released immediately.
+
+Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
+Signed-off-by: Yichong Chen <chenyichong@uniontech.com>
 Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: linux-block@vger.kernel.org
+cc: Paulo Alcantara <pc@manguebit.org>
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- include/linux/bvec.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ fs/netfs/read_pgpriv2.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 92837e2743f1..53cf36e73967 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -343,4 +343,22 @@ static inline phys_addr_t bvec_phys(const struct bio_vec *bvec)
- 	return page_to_phys(bvec->bv_page) + bvec->bv_offset;
- }
+diff --git a/fs/netfs/read_pgpriv2.c b/fs/netfs/read_pgpriv2.c
+index a1489aa29f78..7eacc58abadb 100644
+--- a/fs/netfs/read_pgpriv2.c
++++ b/fs/netfs/read_pgpriv2.c
+@@ -54,6 +54,7 @@ static void netfs_pgpriv2_copy_folio(struct netfs_io_request *creq, struct folio
  
-+/**
-+ * bvec_kmap_partial - Map part of a bvec into the kernel virtual address space
-+ * @bvec: bvec to map
-+ * @offset: Offset into bvec
-+ *
-+ * Map the page containing the byte at @offset into the kernel virtual address
-+ * space.  The caller is responsible for making sure this doesn't overrun.
-+ *
-+ * Call kunmap_local on the returned address to unmap.
-+ */
-+static inline void *bvec_kmap_partial(struct bio_vec *bvec, size_t offset)
-+{
-+	offset += bvec->bv_offset;
-+
-+	return kmap_local_page(bvec->bv_page + (offset >> PAGE_SHIFT)) +
-+		(offset & ~PAGE_MASK);
-+}
-+
- #endif /* __LINUX_BVEC_H */
+ 	/* Attach the folio to the rolling buffer. */
+ 	if (rolling_buffer_append(&creq->buffer, folio, 0) < 0) {
++		folio_end_private_2(folio);
+ 		clear_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &creq->flags);
+ 		return;
+ 	}
 
