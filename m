@@ -1,79 +1,69 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E9238E8DA
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 02:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAE42CCC5
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 04:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784688594; cv=none; b=Bzv9XndLiyW76f+6qe4TlOsSb5RypJWq9DHpomfAlTq/RHGaJDLG9CwS1aArfdVcOW37hhIwxqc3r01jkgxLCFtHvmAvQbNn287F0+kSdm88VZDP/cenLjXfvh+3Elkx+wbg9UqzQczxY/nmV2iIBb0y1LV5xbUP+4cKe/xyFSg=
+	t=1784692934; cv=none; b=s5y4228hgvE3O5MTInyvHSfHOkb2/mc7O+d2TKRIdxsHE5ci2+HBNlssRk28UxFdE62eD9dW7hfXwxRI28norudJS6OpQlxtIGhBpqpnH1sg9HDW1OaXBgbYrD7AGxu/HK66MwnXNAvs67m+8GoYTy0+Mc3/zL5vD24wzI0DE88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784688594; c=relaxed/simple;
-	bh=SHY3opjHnuRagYcUhN9K9wCo4lS3QwJc5qVE5nkxbvk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=A2L/xI4tJ/t4F1+5LoyC2wSE7ZPXQeBnkS3YxB1sSjtfTGM4XRuuOcQ4PfzbS/uTec/4aavCD8SreZwJgZNZsafBvY4BsuriTabeCxA2l6B5muip0yJgBTUB0fm7q2LUdd7fZ0P5WdUJqSNHNRW3+8sGlsMd1iVC39g8avuPg1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=tIhEe/sN; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1784692934; c=relaxed/simple;
+	bh=aAtgGHGgce56fzy+XEh2zavJ9uCwnEEK1ZQehzOjk7E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PpLBZfBaM/2oN/r8qey8QU9JGfVuWyCARhUZzG0Qzo3aZnX9M2TvGjRpVNq4y+9W2SRkC9p2QLBrR4KwrekcW0n3j4qC29Lm7KttxM/hGzXwbTTWgLI1LnEDlYC5+YUSWPyLGAKaQv8mKx3dJG5yC1NjP/EEhe+H+Y6SGLOlEco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfRwpVmI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="tIhEe/sN"
-Message-ID: <7ac56d75-1033-4039-8485-afdd57e21731@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784688585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gXLYQgPKmrfBOY0YgOKwCzPt2DFoEy1eTW1xaR2k2TY=;
-	b=tIhEe/sNfY6saDUHQ7H9H1vIQ/0LikQuKV8AQeZUwj1PZFblrx6EimqVSNgl00e95uBmTS
-	O8Q5WqTEXhIjyomZVJ+5Bu2u0d88Jr0wqA8zbSMLmY0W9tEXgiYCa52+ySAPmasKz0hwfp
-	KEkO6upTM2tpwOWh5KsRWBVHSaQYd5sOCu85s1uVnCGr6CF81BeGbneuU962SW5XF4XkBa
-	JwTXxh7OwrLbhD5OICzsQJxx33cILhd81K11STDgN8BZhObRWnkCqYdFarrdot3B4Hh+sV
-	5JWg4huzquhIrSGMdMgT2ghawXHk6q/OlVQKGLfIee/ze0H8qtoniCdYviBZ6A==
-Date: Wed, 22 Jul 2026 10:50:00 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfRwpVmI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B7831F00ADB
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 04:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784692933;
+	bh=aAtgGHGgce56fzy+XEh2zavJ9uCwnEEK1ZQehzOjk7E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=VfRwpVmIVLY/Lbw6q53yInWVYu4Kgv8xIlYEGhoLAlqPUz+IBdYWcbd0iE4kd4R3D
+	 8QJf4pO0Kd9af16QuHV70mYTtC52ul/AHm+9BtEdRcMeJTVC6frTMCkxyOEiZ5Uk9J
+	 MlcUPLa/mS7+Mg8uPhUle7lXX/oMbxaRevizQ4GheNJd6JSLOlSdnAM5Qd47Qcu5bi
+	 mqbn7PmC9WUVGS5J/oS8RxBe0gKwe02hGzGx026BUTGkHGqusLWlmehS6KZGAZS7a4
+	 6PSp88uJx5rR+JbeYRFVp/b/GTECdBQECj0coTJBesh23IUrpEzW34F6FQOc1S6Xha
+	 Ru3NYVORZ8HUw==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c1740c36c5cso679376966b.2
+        for <linux-cifs@vger.kernel.org>; Tue, 21 Jul 2026 21:02:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rr4pW9RhvMw3rLZVOe6vzJfj69i2d/qDy+96fNJKO/7vG486kiPbmVTcFC80s6q1WCb6hhTjJNvEjeo@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyo/Ar5loHBVLmNBa9jBWe7Tpg0IoO7VmVTF4wEl3+EvI2h8qLH
+	ZNXdwH0vHp7FfS5T0zRWM9PMVRKSeicmDHou0klMYg6pD4BlTcYEFRG91PrnQYQ/Jpfqt6mJqwn
+	i2BTkgOMZ6veiWSQQOVO/Bm7vkilISDs=
+X-Received: by 2002:a17:907:ba07:b0:c05:abc0:dc7c with SMTP id
+ a640c23a62f3a-c16b48533f3mr763855066b.40.1784692931860; Tue, 21 Jul 2026
+ 21:02:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 xfstests 0/3] add generic/795
-To: Zorro Lang <zlang@kernel.org>
-References: <20260720163502.732454-1-chenxiaosong@chenxiaosong.com>
- <al8nX7MnPDzmUA5W@zlang-mailbox>
- <4021e03f-6d80-4a26-9112-1dc20abeed12@chenxiaosong.com>
- <al_e-tLidEugZyY2@zlang-mailbox>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
- linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
- linux-cifs@vger.kernel.org, fstests@vger.kernel.org
-In-Reply-To: <al_e-tLidEugZyY2@zlang-mailbox>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <1de1e19c-bd57-403c-b91f-70b2d3b51fe7@chenxiaosong.com>
+ <CAKYAXd-p=8p6c4HTfH9Su1bRAUwZsxpU=PXtRm0Y+ycge81Zaw@mail.gmail.com> <2fb95851-8416-4c74-a0b3-4b682cff472a@chenxiaosong.com>
+In-Reply-To: <2fb95851-8416-4c74-a0b3-4b682cff472a@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 22 Jul 2026 13:01:59 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_74L_w+7YZN2D54wAieJHWTgE_xzRd-QM70VGbRXXiRg@mail.gmail.com>
+X-Gm-Features: AUfX_my57CFCkMb8Ijgf2T5m21-F8ZBPiG8ICnqC6ngWd1ffVXMumEMYs0pNEp0
+Message-ID: <CAKYAXd_74L_w+7YZN2D54wAieJHWTgE_xzRd-QM70VGbRXXiRg@mail.gmail.com>
+Subject: Re: [BUG] null-ptr-deref on ksmbd-for-next-next branch
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Yes, I checked the xfs_io source code, and it does indeed call the 
-fstat() system call. Thanks for your suggestion! I will send the next 
-version soon.
-
-https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/tree/io/stat.c#n552
-https://git.kernel.org/pub/scm/fs/xfs/xfsprogs-dev.git/tree/io/stat.c#n166
-
-在 2026/7/22 5:21, Zorro Lang 写道:
-> Please note that I have been talking about xfs_io stat subcommand all along, rather
-> than the coreutils' stat command. I suspect there might be a misunderstanding here.
-> 
-> xfstests inherently depends on xfsprogs, particularly the xfs_io command.
-> I just checked this for you, the stat subcommand in xfs_io does indeed use
-> the fstat system call [1][2], not statx, and its -r option will print out fields
-> like st_nlink.
-> 
-> Please double-check this on your end, make sure it works for you.
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+On Wed, Jul 22, 2026 at 11:14=E2=80=AFAM ChenXiaoSong
+<chenxiaosong@chenxiaosong.com> wrote:
+>
+> Yes, you are correct. Checking conn->ops->is_sign_req is OK.
+>
+> I checked work->sess because signed_req is only used by the
+> session-dependent signing checks below.
+I have updated and added the tags the patch in #ksmbd-for-next-next.
+Thanks!
