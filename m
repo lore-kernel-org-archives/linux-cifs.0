@@ -1,559 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35D643CE42
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 17:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AAA38888E
+	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 21:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784740075; cv=none; b=noc7RkLHB0zu0Y5A7z/wk/Ph9DAtD0Xd5F63/Evxn1EZTyKKtFxXZsFYgpQuTYmm1Xeab9fceU3pZ62LcjnZpHvQGipMAhBjrJmg3p9PJF9wT93HFRCSvAruDzP+HNjpH6rHWGkLGWZ5T6vMUL18H/OUYWPHUTFHaZIhayALicI=
+	t=1784755167; cv=none; b=NgXL+I75a1wEsuE+mnGtGQis/klKy5briquEKJOSlAhPeaYej+JXUqxe4F8f6qNFIv58BxJ1PHRtFko6+1d3yM1BLQrPSSYXkspLZgpA1nFPetksqv+XtC3GKOedDJyukCuBlWXZJXZkabtMRA8py7HnHlaG3I2uM/iJwqPXSN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784740075; c=relaxed/simple;
-	bh=58x+rQ+VpYLNwgWWZvE9IJn/8/RLM1/gEFAdvEdIYW0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uStvJRjKNcz4samgRrKnrslWHrDva8flCdOf/L7VMNJChamlQUCdMWoPLmHZKf3YLQ9otVC3/al83Iv0cwj9MFl3Aio0H24mUiCGrl7gk5U8CJ7E5ghKTK+mQT0V5x7dUHYVdW94KsOQNpKiOO/NH7zbd79zppehVqJIpnoEd4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IXC1qnoc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784755167; c=relaxed/simple;
+	bh=ITzolcpIMBuzUOPvnVF4ZBfqeKqYJQMCDmsuVt5zkH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qk9OhXeIcPQSBec0VyAUhD6iXi0/siOq3ye2Bud9VMjYE5yc8ovXJxU4Xac9MYtLFvxYn87GhpB6mUCJAE63dO+yObkgH82PDDZ4UQk/4laWydTskVGjrWoFQOohsiq8uz2tehyNs+Xd6jSbiGCFS6/H0+fxzlJsJcuAb+AwGSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsC9mumT; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IXC1qnoc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48DB71F00A3A
-	for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 17:07:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784740073;
-	bh=rBJOHpxdVSNjjkAFIABZox4Bk7ELXy14OrIxYOp/SAc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=IXC1qnocy3i9ZfWuyuQzjJK9DvfLwLu8CLk5ryolMoR41RC6/O0HRyoih5rFP0Vqs
-	 MUzoWe5i1UFkE5G0enAanIY3mQgQtMcFxRpRvjbSJI5sCyNhJWOI+LqTH+DpqM2Hse
-	 D0mLOVvSgIaxbJsETWOyfCcOboPazdBpsdbko3uWiN3Ek2jPD+Q0GYhvHRQow0YRzJ
-	 S0Fco2LBg9o/az1y7znXdUQT1HcShdLyEf33Od3u5uRJzF0a/1iPCb+2ZPlexyEF6f
-	 yvE7uHdbafRlmwVk9oJgt8Y26xlsQd+/R5royGAS6LmcGRvfxJ3jKLT3hEhk8aV6X3
-	 upbRX12Lv3y/A==
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-8114a4542b2so77950947b3.1
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 10:07:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rq1aa8YX4zOfFcjuejblI36f8ypiYnh1d6abyw8fdOb72fXRQqz8VYTdBMSaAYJVBMjr844AqzAkEZe@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhGSgUQyjtABp+ePqO/ykORHA/iYaBMAcezatGNCPUIo0QuBxY
-	iwDn76FvqppJ9zn3zkpO4fOB6UbB20SAEMw5Ld7v5A5PLQvJziOPWlOgdWLJHP3npdfrSkuvrgz
-	4RxluKnkMguw0W5QX7yOU+WWQPhgev0C5M6Cdpp5UVQ==
-X-Received: by 2002:a05:690c:6d10:b0:81e:67e8:6b9f with SMTP id
- 00721157ae682-81ef2858b83mr77901317b3.41.1784740071560; Wed, 22 Jul 2026
- 10:07:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsC9mumT"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-5276d598b96so14491981cf.3
+        for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 14:19:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784755165; x=1785359965; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=TdcUSi1b3fYRxK7MI3OBkktNKaCV6JTuFcRzmXe076w=;
+        b=OsC9mumTV54CGpc7mU4ubDrR7s9FOwAxwTN3bwFCLm1IOMQVgwEqzz7dT/YnmNs7q6
+         vktnxSjLKB71Cyp4lzysL3LaBxAVqB5D9uyu/moZcuN5K6dK1Ww18/L106yBmNAS9su5
+         FZrSVRkPsu1QS5qQXdLnfi4wS9IiDKeZfaL2GigEpfG9orn8DPnVw3k52gRbpHMhfm/e
+         xy1wqzI+Gmem41YVODrbJ/8OoctbsgbR39W4iUbmjHAzPYB38g7wkrVgBG3E0XdzS0d0
+         mPINlp2iwaKul+K1G7bTd+JPdtVB9Wt6Km5B2XJ+O0d3xpWI6WjxyeBFSsaDOxEufASF
+         3hAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784755165; x=1785359965;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=TdcUSi1b3fYRxK7MI3OBkktNKaCV6JTuFcRzmXe076w=;
+        b=kd3ceWrLaSHFKTUIH5FopDUbRAUgdACivDJczLz0QoPYhrS5qe2pYfWeKw3aNts8Vh
+         EvhFA8/zLLNRDRP/591O0y9KhLiMRFQWx406uIx1Eev77BbQfclWehOm6EweCLG9Tkq2
+         7+eTRHOK1h6MDZTbuq/LypEl0kRaj+7Vm6AwXhWHQL6UThF4oH2Z9ykTqRLz6S6jO42j
+         /oqbY25af6+MrF4Yj7cedGDn2wMOaiFBnf1Uo/mYzTrcrX0/6RVIiP+7w4isqfEAKv5Z
+         NqVTZUmdc6aF8HbxPwHWcn7c725bZH57nnG4KcWDtIpIcfBgpxTsC60yxbj0jj0z7Heu
+         sXmQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp9+I2VJYxEOPdIShvroAyP6rYpMYVrdz0pAdh9MehKfjvLDULf8nQG4U9g+z0PcZEi51BMF0yIJYk7@vger.kernel.org
+X-Gm-Message-State: AOJu0YweHJItSR6myL2bhm9c1xCzPp4MNukA04X4ueGPS07o1fEvMDbb
+	RP3RvOT/6Fe492FikVTOW3SfJpgDIo9m+24xAowyN1qRpRPRK8CbliKJ
+X-Gm-Gg: AR+sD120EKM58bRY1zH/i9MyB7NS3gy8l0WGu8m2WQKPH7E3hd4k3lP27SSiqigPZuG
+	ZtL6GC0oB0Cx5aUDWwJcavWWzz9qMZvrYa0K5PazWfoyQzFdbJSSPO/ATBAQ+OHLY0Qvf2BsOiL
+	Fion9JuwALZkoI8yTPelBxBHzGTf0Ej9OdFpywc01Wy7SfObJ3YFoaDEN0W10Tczd4OxlX/ih+Q
+	YNOOoQrSQs6yKE+0E73vkZvjjom/9jIe6krpdyZRfk5IhbObsSsfG0TxH0oRoSunP7e8ZCK5Rh+
+	Ewthc7zaZUgZaB791UFFZmrq7th6w79QlXsfnl8staZNHtmj56hyzMmyZsbmJCM0FwVsyicUZEd
+	RQPK4JauLQDEpBDCe1WWYDjTO8k3JXHM+h81ANJEX+xTOJSr+OKWLg1DR2SQ0DBM29FQ39gFm0u
+	x+RA==
+X-Received: by 2002:a05:622a:5145:b0:51a:8c9c:7f41 with SMTP id d75a77b69052e-5283df50a2fmr2223291cf.68.1784755165368;
+        Wed, 22 Jul 2026 14:19:25 -0700 (PDT)
+Received: from FredPC.lan ([2600:382:311b:26:6a8f:2e2e:9fb1:8d6d])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-527d2e7662bsm22663001cf.18.2026.07.22.14.19.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jul 2026 14:19:24 -0700 (PDT)
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+X-Google-Original-From: Fredric Cover <FredTheDude@proton.me>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fredric Cover <fredric.cover.lkernel@gmail.com>
+Subject: [PATCH] smb: client: use GFP_KERNEL for registry allocation
+Date: Wed, 22 Jul 2026 14:18:44 -0700
+Message-ID: <20260722211844.123697-1-FredTheDude@proton.me>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260722130615.3163560-1-hch@lst.de> <20260722130615.3163560-4-hch@lst.de>
-In-Reply-To: <20260722130615.3163560-4-hch@lst.de>
-From: Chris Li <chrisl@kernel.org>
-Date: Wed, 22 Jul 2026 10:07:40 -0700
-X-Gmail-Original-Message-ID: <CACePvbVFw6hzEHkaDPA2y4=kTweiKCiBmrD5pL3cFJ3AEUQ8rQ@mail.gmail.com>
-X-Gm-Features: AUfX_mxZwu9kzWVMqPUy0dGoBvDDN8c8hl7fgvjYUxzLZEvl8AxRhoOZJvBznrs
-Message-ID: <CACePvbVFw6hzEHkaDPA2y4=kTweiKCiBmrD5pL3cFJ3AEUQ8rQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] mm/swap: move swap_ops into file systems for file
- system-based swap
-To: Christoph Hellwig <hch@lst.de>
-Cc: baoquan.he@linux.dev, akpm@linux-foundation.org, usama.arif@linux.dev, 
-	kasong@tencent.com, nphamcs@gmail.com, shikemeng@huaweicloud.com, 
-	youngjun.park@lge.com, ryncsn@gmail.com, trondmy@kernel.org, anna@kernel.org, 
-	sfrench@samba.org, linux-mm@kvack.org, linux-cifs@vger.kernel.org, 
-	linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 22, 2026 at 6:07=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
->
-> Currently swap to and from file systems goes through two indirect calls
-> between the swap ops and the swap_rw method.  Reduce this by directly
-> providing the swap_ops from the file system.
->
-> For this refactor swap_fs_submit into a swap_fs_prepare_rw helper that
-> initializes the iov_iter on the callers stack so that file systems can
-> call it directly, and use that to initialize file system specific ops
-> in NFS and the SMB client, which then get passed to swap_fs_activate.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
 
-I am very happy to see the direction this patch is going. Now I see
-how to get rid of the double indirection.
+Currently, cifs_get_swn_reg() allocates new registry entries using
+GFP_ATOMIC. Since we lock a mutex here, this is clearly not an atomic
+context. Use GFP_KERNEL instead.
 
-You convinced me with flying colors.
+Also, fix a minor grammatical error in the comment above the function.
 
-Acked-by: Chris Li <chrisl@kernel.org>
+Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+---
+ fs/smb/client/cifs_swn.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Chris
+diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
+index 9951817d0d7f..fe10719e627e 100644
+--- a/fs/smb/client/cifs_swn.c
++++ b/fs/smb/client/cifs_swn.c
+@@ -425,7 +425,7 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct cifs_tcon *tcon)
+ 
+ /*
+  * Get a registration for the tcon's server and share name, allocating a new one if it does not
+- * exists
++ * exist.
+  */
+ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
+ {
+@@ -443,7 +443,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
+ 		goto unlock;
+ 	}
+ 
+-	reg = kmalloc_obj(struct cifs_swn_reg, GFP_ATOMIC);
++	reg = kmalloc_obj(struct cifs_swn_reg, GFP_KERNEL);
+ 	if (reg == NULL) {
+ 		ret = -ENOMEM;
+ 		goto fail_unlock;
+@@ -451,7 +451,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
+ 
+ 	kref_init(&reg->ref_count);
+ 
+-	reg->id = idr_alloc(&cifs_swnreg_idr, reg, 1, 0, GFP_ATOMIC);
++	reg->id = idr_alloc(&cifs_swnreg_idr, reg, 1, 0, GFP_KERNEL);
+ 	if (reg->id < 0) {
+ 		cifs_dbg(FYI, "%s: failed to allocate registration id\n", __func__);
+ 		ret = reg->id;
+-- 
+2.53.0
 
-
-> ---
->  Documentation/filesystems/locking.rst |  9 +---
->  Documentation/filesystems/vfs.rst     |  8 +---
->  fs/nfs/direct.c                       | 20 ---------
->  fs/nfs/file.c                         | 42 ++++++++++++++++--
->  fs/smb/client/file.c                  | 63 +++++++++++++++++----------
->  include/linux/fs.h                    |  1 -
->  include/linux/nfs_fs.h                |  1 -
->  include/linux/swap.h                  |  6 ---
->  include/linux/swap_ops.h              |  5 +++
->  mm/page_io.c                          | 34 +++------------
->  10 files changed, 93 insertions(+), 96 deletions(-)
->
-> diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesy=
-stems/locking.rst
-> index 1a50d41a39a1..f58a8d7d5897 100644
-> --- a/Documentation/filesystems/locking.rst
-> +++ b/Documentation/filesystems/locking.rst
-> @@ -266,7 +266,6 @@ prototypes::
->         int (*error_remove_folio)(struct address_space *, struct folio *)=
-;
->         int (*swap_activate)(struct swap_info_struct *sis, struct file *f=
-, sector_t *span)
->         int (*swap_deactivate)(struct file *);
-> -       int (*swap_rw)(struct kiocb *iocb, struct iov_iter *iter);
->
->  locking rules:
->         All except dirty_folio and free_folio may block
-> @@ -291,7 +290,6 @@ is_partially_uptodate:      yes
->  error_remove_folio:    yes
->  swap_activate:         no
->  swap_deactivate:       no
-> -swap_rw:               yes, unlocks
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D      =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->  ->write_begin(), ->write_end() and ->read_folio() may be called from
-> @@ -355,15 +353,12 @@ should perform any validation and preparation neces=
-sary to ensure that
->  writes can be performed with minimal memory allocation.  It should call
->  add_swap_extent(), or the helper iomap_swapfile_activate(), and return
->  the number of extents added.  If IO should be submitted through
-> -->swap_rw(), it should call swap_fs_activate, otherwise IO will be submi=
-tted
-> -directly to the block device ``sis->bdev``.
-> +the file system it should call swap_fs_activate, otherwise IO will be
-> +submitted directly to the block device ``sis->bdev``.
->
->  ->swap_deactivate() will be called in the sys_swapoff()
->  path after ->swap_activate() returned success.
->
-> -->swap_rw will be called for swap IO if swap_fs_activate was called by
-> -->swap_activate().
-> -
->  file_lock_operations
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystem=
-s/vfs.rst
-> index e7677423a20f..c437a342d4f3 100644
-> --- a/Documentation/filesystems/vfs.rst
-> +++ b/Documentation/filesystems/vfs.rst
-> @@ -776,7 +776,6 @@ cache in your filesystem.  The following members are =
-defined:
->                 int (*error_remove_folio)(struct mapping *mapping, struct=
- folio *);
->                 int (*swap_activate)(struct swap_info_struct *sis, struct=
- file *f, sector_t *span)
->                 int (*swap_deactivate)(struct file *);
-> -               int (*swap_rw)(struct kiocb *iocb, struct iov_iter *iter)=
-;
->         };
->
->  ``read_folio``
-> @@ -977,16 +976,13 @@ cache in your filesystem.  The following members ar=
-e defined:
->         can be performed with minimal memory allocation.  It should call
->         add_swap_extent(), or the helper iomap_swapfile_activate(), and
->         return the number of extents added.  If IO should be submitted
-> -       through ->swap_rw(), it should call swap_fs_activate, otherwise I=
-O will
-> -       be submitted directly to the block device ``sis->bdev``.
-> +       through the file system it should call swap_fs_activate, otherwis=
-e IO
-> +       will be submitted directly to the block device ``sis->bdev``.
->
->  ``swap_deactivate``
->         Called during swapoff on files where swap_activate was
->         successful.
->
-> -``swap_rw``
-> -       Called to read or write swap pages when swap_fs_activate was call=
-ed.
-> -
->  The File Object
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> diff --git a/fs/nfs/direct.c b/fs/nfs/direct.c
-> index e626c72495e6..ccafdc1ce64d 100644
-> --- a/fs/nfs/direct.c
-> +++ b/fs/nfs/direct.c
-> @@ -145,26 +145,6 @@ static void nfs_direct_file_adjust_size_locked(struc=
-t inode *inode,
->         }
->  }
->
-> -/**
-> - * nfs_swap_rw - NFS address space operation for swap I/O
-> - * @iocb: target I/O control block
-> - * @iter: I/O buffer
-> - *
-> - * Perform IO to the swap-file.  This is much like direct IO.
-> - */
-> -int nfs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
-> -{
-> -       ssize_t ret;
-> -
-> -       if (iov_iter_rw(iter) =3D=3D READ)
-> -               ret =3D nfs_file_direct_read(iocb, iter, true);
-> -       else
-> -               ret =3D nfs_file_direct_write(iocb, iter, true);
-> -       if (ret < 0)
-> -               return ret;
-> -       return 0;
-> -}
-> -
->  static void nfs_direct_release_pages(struct page **pages, unsigned int n=
-pages)
->  {
->         unsigned int i;
-> diff --git a/fs/nfs/file.c b/fs/nfs/file.c
-> index 851d93a09988..e1bdd10b35f1 100644
-> --- a/fs/nfs/file.c
-> +++ b/fs/nfs/file.c
-> @@ -29,9 +29,8 @@
->  #include <linux/pagemap.h>
->  #include <linux/gfp.h>
->  #include <linux/rmap.h>
-> -#include <linux/swap.h>
->  #include <linux/compaction.h>
-> -
-> +#include <linux/swap_ops.h>
->  #include <linux/uaccess.h>
->  #include <linux/filelock.h>
->
-> @@ -575,6 +574,38 @@ static int nfs_launder_folio(struct folio *folio)
->         return ret;
->  }
->
-> +#ifdef CONFIG_SWAP
-> +static void nfs_swap_submit_write(struct swap_io_ctx *ctx)
-> +{
-> +       struct swap_iocb *sio =3D ctx->sio;
-> +       struct iov_iter iter;
-> +       int ret;
-> +
-> +       swap_fs_prepare_rw(ctx, WRITE, &iter);
-> +       ret =3D nfs_file_direct_write(&sio->iocb, &iter, true);
-> +       if (ret !=3D -EIOCBQUEUED)
-> +               sio->iocb.ki_complete(&sio->iocb, ret);
-> +}
-> +
-> +static void nfs_swap_submit_read(struct swap_io_ctx *ctx)
-> +{
-> +       struct swap_iocb *sio =3D ctx->sio;
-> +       struct iov_iter iter;
-> +       int ret;
-> +
-> +       swap_fs_prepare_rw(ctx, READ, &iter);
-> +       ret =3D nfs_file_direct_read(&sio->iocb, &iter, true);
-> +       if (ret !=3D -EIOCBQUEUED)
-> +               sio->iocb.ki_complete(&sio->iocb, ret);
-> +}
-> +
-> +static const struct swap_ops nfs_swap_ops =3D {
-> +       .flags                  =3D SWAP_OPS_F_REQUIRE_NOFS,
-> +       .submit_write           =3D nfs_swap_submit_write,
-> +       .submit_read            =3D nfs_swap_submit_read,
-> +       .can_merge              =3D swap_fs_can_merge,
-> +};
-> +
->  static int nfs_swap_activate(struct swap_info_struct *sis, struct file *=
-file,
->                                                 sector_t *span)
->  {
-> @@ -597,7 +628,7 @@ static int nfs_swap_activate(struct swap_info_struct =
-*sis, struct file *file,
->         ret =3D rpc_clnt_swap_activate(clnt);
->         if (ret)
->                 return ret;
-> -       ret =3D swap_fs_activate(sis);
-> +       ret =3D swap_fs_activate(sis, &nfs_swap_ops);
->         if (ret < 0) {
->                 rpc_clnt_swap_deactivate(clnt);
->                 return ret;
-> @@ -620,6 +651,10 @@ static void nfs_swap_deactivate(struct file *file)
->         if (cl->rpc_ops->disable_swap)
->                 cl->rpc_ops->disable_swap(file_inode(file));
->  }
-> +#else
-> +#define nfs_swap_activate      NULL
-> +#define nfs_swap_deactivate    NULL
-> +#endif /* CONFIG_SWAP */
->
->  const struct address_space_operations nfs_file_aops =3D {
->         .read_folio =3D nfs_read_folio,
-> @@ -636,7 +671,6 @@ const struct address_space_operations nfs_file_aops =
-=3D {
->         .error_remove_folio =3D generic_error_remove_folio,
->         .swap_activate =3D nfs_swap_activate,
->         .swap_deactivate =3D nfs_swap_deactivate,
-> -       .swap_rw =3D nfs_swap_rw,
->  };
->
->  /*
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index 081bb16abeb4..190e24199fa1 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -20,7 +20,7 @@
->  #include <linux/delay.h>
->  #include <linux/mount.h>
->  #include <linux/slab.h>
-> -#include <linux/swap.h>
-> +#include <linux/swap_ops.h>
->  #include <linux/mm.h>
->  #include <asm/div64.h>
->  #include "cifsfs.h"
-> @@ -3351,6 +3351,38 @@ void cifs_oplock_break(struct work_struct *work)
->         cifs_done_oplock_break(cinode);
->  }
->
-> +#ifdef CONFIG_SWAP
-> +static void cifs_swap_submit_write(struct swap_io_ctx *ctx)
-> +{
-> +       struct swap_iocb *sio =3D ctx->sio;
-> +       struct iov_iter iter;
-> +       int ret;
-> +
-> +       swap_fs_prepare_rw(ctx, WRITE, &iter);
-> +       ret =3D netfs_unbuffered_write_iter_locked(&sio->iocb, &iter, NUL=
-L);
-> +       if (ret !=3D -EIOCBQUEUED)
-> +               sio->iocb.ki_complete(&sio->iocb, ret);
-> +}
-> +
-> +static void cifs_swap_submit_read(struct swap_io_ctx *ctx)
-> +{
-> +       struct swap_iocb *sio =3D ctx->sio;
-> +       struct iov_iter iter;
-> +       int ret;
-> +
-> +       swap_fs_prepare_rw(ctx, READ, &iter);
-> +       ret =3D netfs_unbuffered_read_iter_locked(&sio->iocb, &iter);
-> +       if (ret !=3D -EIOCBQUEUED)
-> +               sio->iocb.ki_complete(&sio->iocb, ret);
-> +}
-> +
-> +static const struct swap_ops cifs_swap_ops =3D {
-> +       .flags                  =3D SWAP_OPS_F_REQUIRE_NOFS,
-> +       .submit_write           =3D cifs_swap_submit_write,
-> +       .submit_read            =3D cifs_swap_submit_read,
-> +       .can_merge              =3D swap_fs_can_merge,
-> +};
-> +
->  static int cifs_swap_activate(struct swap_info_struct *sis,
->                               struct file *swap_file, sector_t *span)
->  {
-> @@ -3361,7 +3393,7 @@ static int cifs_swap_activate(struct swap_info_stru=
-ct *sis,
->
->         cifs_dbg(FYI, "swap activate\n");
->
-> -       if (!swap_file->f_mapping->a_ops->swap_rw)
-> +       if (swap_file->f_mapping->a_ops !=3D &cifs_addr_ops)
->                 /* Cannot support swap */
->                 return -EINVAL;
->
-> @@ -3392,7 +3424,7 @@ static int cifs_swap_activate(struct swap_info_stru=
-ct *sis,
->          * but we could add call to grab a byte range lock to prevent oth=
-ers
->          * from reading or writing the file
->          */
-> -       return swap_fs_activate(sis);
-> +       return swap_fs_activate(sis, &cifs_swap_ops);
->  }
->
->  static void cifs_swap_deactivate(struct file *file)
-> @@ -3408,26 +3440,10 @@ static void cifs_swap_deactivate(struct file *fil=
-e)
->
->         /* do we need to unpin (or unlock) the file */
->  }
-> -
-> -/**
-> - * cifs_swap_rw - SMB3 address space operation for swap I/O
-> - * @iocb: target I/O control block
-> - * @iter: I/O buffer
-> - *
-> - * Perform IO to the swap-file.  This is much like direct IO.
-> - */
-> -static int cifs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
-> -{
-> -       ssize_t ret;
-> -
-> -       if (iov_iter_rw(iter) =3D=3D READ)
-> -               ret =3D netfs_unbuffered_read_iter_locked(iocb, iter);
-> -       else
-> -               ret =3D netfs_unbuffered_write_iter_locked(iocb, iter, NU=
-LL);
-> -       if (ret < 0)
-> -               return ret;
-> -       return 0;
-> -}
-> +#else
-> +#define cifs_swap_activate     NULL
-> +#define cifs_swap_deactivate   NULL
-> +#endif /* CONFIG_SWAP */
->
->  const struct address_space_operations cifs_addr_ops =3D {
->         .read_folio     =3D netfs_read_folio,
-> @@ -3444,7 +3460,6 @@ const struct address_space_operations cifs_addr_ops=
- =3D {
->          */
->         .swap_activate  =3D cifs_swap_activate,
->         .swap_deactivate =3D cifs_swap_deactivate,
-> -       .swap_rw =3D cifs_swap_rw,
->  };
->
->  /*
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 50ce731a2b78..87b5e9957c00 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -438,7 +438,6 @@ struct address_space_operations {
->         int (*swap_activate)(struct swap_info_struct *sis, struct file *f=
-ile,
->                                 sector_t *span);
->         void (*swap_deactivate)(struct file *file);
-> -       int (*swap_rw)(struct kiocb *iocb, struct iov_iter *iter);
->  };
->
->  extern const struct address_space_operations empty_aops;
-> diff --git a/include/linux/nfs_fs.h b/include/linux/nfs_fs.h
-> index ec17e602c979..764056498eba 100644
-> --- a/include/linux/nfs_fs.h
-> +++ b/include/linux/nfs_fs.h
-> @@ -548,7 +548,6 @@ static inline const struct cred *nfs_file_cred(struct=
- file *file)
->  /*
->   * linux/fs/nfs/direct.c
->   */
-> -int nfs_swap_rw(struct kiocb *iocb, struct iov_iter *iter);
->  ssize_t nfs_file_direct_read(struct kiocb *iocb,
->                              struct iov_iter *iter, bool swap);
->  ssize_t nfs_file_direct_write(struct kiocb *iocb,
-> diff --git a/include/linux/swap.h b/include/linux/swap.h
-> index 0544b2ec4c56..d8584f53a6e4 100644
-> --- a/include/linux/swap.h
-> +++ b/include/linux/swap.h
-> @@ -334,8 +334,6 @@ extern void __meminit kswapd_run(int nid);
->  extern void __meminit kswapd_stop(int nid);
->
->  #ifdef CONFIG_SWAP
-> -
-> -int swap_fs_activate(struct swap_info_struct *sis);
->  int add_swap_extent(struct swap_info_struct *sis, unsigned long start_pa=
-ge,
->                 unsigned long nr_pages, sector_t start_block);
->  int generic_swapfile_activate(struct swap_info_struct *, struct file *,
-> @@ -461,10 +459,6 @@ static inline bool folio_free_swap(struct folio *fol=
-io)
->         return false;
->  }
->
-> -static inline int swap_fs_activate(struct swap_info_struct *sis)
-> -{
-> -       return -EINVAL;
-> -}
->  static inline int add_swap_extent(struct swap_info_struct *sis,
->                                   unsigned long start_page,
->                                   unsigned long nr_pages, sector_t start_=
-block)
-> diff --git a/include/linux/swap_ops.h b/include/linux/swap_ops.h
-> index e92b4f532604..57ac6c703f68 100644
-> --- a/include/linux/swap_ops.h
-> +++ b/include/linux/swap_ops.h
-> @@ -36,4 +36,9 @@ struct swap_ops {
->         void (*submit_read)(struct swap_io_ctx *ctx);
->  };
->
-> +void swap_fs_prepare_rw(struct swap_io_ctx *ctx, int rw, struct iov_iter=
- *iter);
-> +bool swap_fs_can_merge(struct folio *folio, struct folio *prev_folio,
-> +               size_t prev_folio_size, int rw);
-> +int swap_fs_activate(struct swap_info_struct *sis, const struct swap_ops=
- *ops);
-> +
->  #endif /* _MM_SWAP_OPS_H */
-> diff --git a/mm/page_io.c b/mm/page_io.c
-> index e741e67d6592..88962571cb93 100644
-> --- a/mm/page_io.c
-> +++ b/mm/page_io.c
-> @@ -650,11 +650,9 @@ const struct swap_ops swap_bdev_ops =3D {
->         .can_merge              =3D swap_bdev_can_merge,
->  };
->
-> -static void swap_fs_submit(struct swap_io_ctx *ctx, int rw)
-> +void swap_fs_prepare_rw(struct swap_io_ctx *ctx, int rw, struct iov_iter=
- *iter)
->  {
->         struct swap_iocb *sio =3D ctx->sio;
-> -       struct iov_iter iter;
-> -       int ret;
->
->         init_sync_kiocb(&sio->iocb, ctx->sis->swap_file);
->         sio->iocb.ki_pos =3D swap_dev_pos(bvec_folio(&sio->bvecs[0])->swa=
-p);
-> @@ -663,40 +661,22 @@ static void swap_fs_submit(struct swap_io_ctx *ctx,=
- int rw)
->         else
->                 sio->iocb.ki_complete =3D swap_fs_read_complete;
->
-> -       iov_iter_bvec(&iter, rw =3D=3D WRITE ? ITER_SOURCE : ITER_DEST,
-> +       iov_iter_bvec(iter, rw =3D=3D WRITE ? ITER_SOURCE : ITER_DEST,
->                         sio->bvecs, sio->nr_bvecs, sio->len);
-> -       ret =3D sio->iocb.ki_filp->f_mapping->a_ops->swap_rw(&sio->iocb, =
-&iter);
-> -       if (ret !=3D -EIOCBQUEUED)
-> -               sio->iocb.ki_complete(&sio->iocb, ret);
->  }
-> +EXPORT_SYMBOL_GPL(swap_fs_prepare_rw);
->
-> -static void swap_fs_submit_write(struct swap_io_ctx *ctx)
-> -{
-> -       swap_fs_submit(ctx, WRITE);
-> -}
-> -
-> -static void swap_fs_submit_read(struct swap_io_ctx *ctx)
-> -{
-> -       swap_fs_submit(ctx, READ);
-> -}
-> -
-> -static bool swap_fs_can_merge(struct folio *folio, struct folio *prev_fo=
-lio,
-> +bool swap_fs_can_merge(struct folio *folio, struct folio *prev_folio,
->                 size_t prev_folio_size, int rw)
->  {
->         return swap_dev_pos(folio->swap) =3D=3D
->                 swap_dev_pos(prev_folio->swap) + prev_folio_size;
->  }
-> +EXPORT_SYMBOL_GPL(swap_fs_can_merge);
->
-> -static const struct swap_ops swap_fs_ops =3D {
-> -       .flags                  =3D SWAP_OPS_F_REQUIRE_NOFS,
-> -       .submit_write           =3D swap_fs_submit_write,
-> -       .submit_read            =3D swap_fs_submit_read,
-> -       .can_merge              =3D swap_fs_can_merge,
-> -};
-> -
-> -int swap_fs_activate(struct swap_info_struct *sis)
-> +int swap_fs_activate(struct swap_info_struct *sis, const struct swap_ops=
- *ops)
->  {
-> -       sis->ops =3D &swap_fs_ops;
-> +       sis->ops =3D ops;
->         return add_swap_extent(sis, 0, sis->max, 0);
->  }
->  EXPORT_SYMBOL_GPL(swap_fs_activate);
-> --
-> 2.53.0
->
