@@ -1,147 +1,139 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E167841A4E4
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36A244C50B
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784838482; cv=pass; b=lc2lnogNVeDTrprMcBtYTbAFEYdv3ZOr1n4714VNaJQeuHCaWtJMrhpCMEMo+yE/WMoDgAeAaizHWJEXGBOwLZuW1HfSHiHYM9FB769i6RkaxuHM0YhI7t0obcrdERTNrpcfnlOpbeHGmE9tTFaU+sVSVdc5qD2EIM5pTf0DeC8=
+	t=1784839494; cv=pass; b=f4kRP6CM9eN4Uj2ucmpRt4KkKuLMrYdzp3gsCfApf5Em0pSXRrKNv6mXxMVktjOvJkpbID5vwSIVfoskkGA46UAUiV/uSgjZEZ+4+RlP0WOyojosGFVqVFGdzrXQ4SuDHInL5kAy+VUbC8crSKZhPWX7SQPADleaLL9gAJeWWhw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784838482; c=relaxed/simple;
-	bh=kb3KxBMHHxCZZ076s3J6OaSh/aa08vKVEphPTeMXBeQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GqqxfVK3fNTT9TGe2BQCG0mp6JDz7pN9DPlhY+rwO+jjM+AcknRzo031T9BL2kSdKRzyvsL96fXQzU/Ph4ppENQQamsHullqmtpaHyWNH1EJeAnMjDnI85lZpYARi2QgmhIB+VqhS0N6f6VKnaTbgWf0ylZKMna9ZeAB5e6hQE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TzrqkJZq; arc=pass smtp.client-ip=209.85.219.44
+	s=arc-20240116; t=1784839494; c=relaxed/simple;
+	bh=4h/Rf7jmgBKlxfGQ2Y+qvpJ4DaieJeBuYuPU0q8Jqcg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=k0QqSjwYlDgMr8gjU3tN3NyYHHWuiRBhbQC3D4MpvViNzKdFzRiEiQp/cRAHEy+ilHdqfzlH1gdzDcIgggjhW9cxgDsj69rZmAeQl1I4pHfRDGEni1ABv7w+77lZ10xxv0DeLBYupAgOPu+aG0pJRBgLmH9OIyAp1UVKaQQw7kE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mloaTZn0; arc=pass smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TzrqkJZq"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-9034b6b7674so11614936d6.0
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:27:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784838467; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mloaTZn0"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8ff20870ac7so10738446d6.1
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:44:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784839490; cv=none;
         d=google.com; s=arc-20260327;
-        b=ShnzoZI5YJQCX62mhxQpwx0h8JlsPJS2exRpmZexRPo7VbXox6fHrJQ0V1GedCPOgs
-         7L53rMghjZIUNh5rN0KQpLYBkyEsR4EX6YZ5znjlc4Om3SiJBfpqVRh4SyxCNn05Iai0
-         ADtcnygIANVQuAZki74X2vZEexoN9uGgEEL1mw2LxoI5usZQIy9wVw74tbZG3/3L9u9A
-         yl5FrjFQD+IxXnsk/WyBV/BKC2C9NinPImVuWz1LPoehLxFvD8zkCBAoja70IkD7fO6B
-         koQ/y5t9ZBWio0jezxWcXHL10+GVbUyZSiY0Mw6UthtJZvDceKvQTAiWLcg9qspryzRD
-         F2OA==
+        b=WXvpmhY3eRrk97JepGi5y7icVJHqCiFUSf1yfV/I7vjf5cjtpKEpyQL1uQiYgKqc/W
+         +mn5Wqgfd0sSET+G+oOgGND2JtGjnGnr5Hf+f39W3LishYvbrtaEv9P5YYfqGVQ8O3ub
+         pkxW2844zjNC1hfpUzJlw6kqXZlCSUfHCOjmymbDcv1FdljPNa+DIAPBYUqHSgb8XlUi
+         o41bSD/442oNew7LCc1ADPhiu5wb01pouiBsVD4p/ja+JQQVRXfJVDlVN97AWudmep+M
+         xs1qs9Q7tZ4ZxWwKfzR6F6s9vntYjYRSqnwdNDwNRx8n8d3pB63+XoKEnFSAG27WRj/l
+         yVPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=p/qIoU8Za5orhZcX78RRvB80P5yuArnqpPKEdRCSBmk=;
-        fh=gwg4yiYv+t1m5aTa5A8n71jryNOjgfjdY7QFhCcDZMk=;
-        b=Id+MyTyt6mEK4wHPsly6D/sEQPB3Uoctga3vZx9HKDpLhcf5KSnxiFqyAxU+1C8VNM
-         1KuXQZLDhXQV8BstfCxKf22Yn+X/nHWtevNpHM08OPubnV9qq1Bp7Sejs1MC49Dji0he
-         sZw0BPmUxrQ93a3x3yK4V8AX0fYUeUpXZ7hnzp5rW9A3n9lDASy/PC5lsmAmaZiA4S51
-         HUM965u63soSoIvlqGzfOyWHFIL08Mu7v2Y6UKtMfdIbUqBR4ytM51A790n+2ZFqOMAc
-         JRlnCzCA8kdgJXaSzkOPTq2pcDlXV31PWLecqUkUGSx2cVFzI+MRju0kNlT4NfaVg6rh
-         NJ2g==;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=CDopvOj4k9WArHgo2doJqHaZGmsJBI+a+mdyRi5Y/H4=;
+        fh=461vqIZoOg6NIbk+pdwtgJzufnhC0zIzeuKytqfZhTk=;
+        b=beFLGvZxYerqhMZVMkra/ITW0SG0wzmCB4BYxj/hgC7EJk8tHmwWTgCoTTQiUT2ghU
+         k/pytgIK8+Ycl6FIm+VF2YMJBm6hvu53X3pjWmvm7CNTpAh3sHV6ZGEfUKBTL/IcLboK
+         a7JLIS/C0CNsUw8vdQi4qwWRG0Nfx6gC/MnQOJfA70r8bjUp8ozML5gcpDCeiBdixS2w
+         Olf4v3FyyyeemW/5UXtUBKE2bPE1/IXvVRx7snP2fH8Z2pLxHkmNy/vaToXaf3Wcf4Nl
+         oLMAD1O5U/PGPrl03cneiglEb0j112L/5+gnHP+KqgJPebTk1xtQLm8VeIjmTIp1DHL+
+         vxig==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784838467; x=1785443267; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=p/qIoU8Za5orhZcX78RRvB80P5yuArnqpPKEdRCSBmk=;
-        b=TzrqkJZqPai1d2iinqx/OsPRUlS9pV4WjB7p0gkpi5UE6pyKTOgVwOuY2ErWMe/t+t
-         i23HvDBkCR4y0GNiNeWzoPZwC/L4WmD4+vQx5fFkzdf0qE2VQBgAnHA4unVbjBF3UgOO
-         h8yoCyVTrbSdx/TMe840y7u499O9Nx32/6nnh0B6GzZ/v+hzDBCGAv7mL39FMDzomlyw
-         KENdyVNklxdM/TLH6WdFSt/6BWDk5TtyivQMXyFHMK/LMDZ5QHE7xDXGWTfVxU61kXH5
-         UT9giRMmHGt1IYNnkWkAUyLBRO9ug7qkvQmccTHoGbPulby5whXeyrWjmcOEqerdtZAk
-         qJxw==
+        d=gmail.com; s=20251104; t=1784839490; x=1785444290; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=CDopvOj4k9WArHgo2doJqHaZGmsJBI+a+mdyRi5Y/H4=;
+        b=mloaTZn0NwRIl7UzKNx+hygpLTO+pTvwCk5jA6TW4Fm7XSY9a2z3WiRRLUM+yOwnqy
+         vfcC0Qjm1rM1x0/5GnLwkyyC6TSuFLCIRfXMmSaV+wnK3qxC1Fu7XUAeJuho3PkehGyF
+         zVTd2zhR+SGOsPgDJJhqEf/jagUjJlSOU+KwDniaMfQfWk+hmCJD/Xh2FW9HiVac+pX6
+         qdwPGp78wNtLm3WAKFUzVQmIxiY/Exi0CsrwNQhCXEToUUojqPxnbCn2UBxUixWdfCBi
+         A46YtqPKqst1Lzz7DDkFkaliQipKmJ9WZ6zWy3VfXRSpiXG65iT6JS7wPx/H7sLu24Sf
+         gPbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784838467; x=1785443267;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=p/qIoU8Za5orhZcX78RRvB80P5yuArnqpPKEdRCSBmk=;
-        b=WgW02woJXHHMdzB5QUHu2ljw9M36eOfdPOwVlf+QJ2fIYxT85kHp/ZbXt78ioiGWPL
-         nVg/edOzCxXPLSmMogU6EMsnXcv8xKYAgoW2L7w2UzgZUssYZ4+2V8yclsbfakDyjWdR
-         DIM1wP6+5tnsA8ZqSXgCVBm7J4DwwrVaIU3LBkmnx3XyZamfxWH/4AgAuGlW/j3AJRfq
-         4hMgP7bqsx7cujBOGTwFzTaEc9ifhgB4wi+FQaW4+sjrIRi3QzOU/JuEdhWdCHTpxoPm
-         +g/fRS0qWUkJmIT4DW9cHVA7nWXAVQMFPtis5oOK5zs0zGkXZT8ZjnysfsiA5L0xDWNI
-         phHA==
-X-Forwarded-Encrypted: i=1; AHgh+Rq08XU984d/T4xGkLoozxet3GXOgR7E/1w25hmAWk7vTjy/+KBrKVnq9NaKJqCulGV+ktVnitEzO/pu@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvIqVgisMIXQlYBj2zPLUkc7XOhBvrF/iMfnI+hXryTrcuhQgW
-	oDh5UZVIHFR9oqT6cUQ12GUGDWAIRW9tCyUynZ7Nhj5MEBEz4xO8lNms6MmBAbxudd6bkYEu7zI
-	fRS1uRtxEOjEpXchDuP50mCB0c03SM9g=
-X-Gm-Gg: AR+sD13e1HXyJKao5riI85m6CSBcvmbH+XDK7tUr2ivIep0QGr1ay1SQmXOe+qLHUt3
-	JzN3HyLa+tQm5R/MRPLTwMdzp0e37e+Abcpi3d1qhNq87X1qqugxl2bn/UXyrmzLNLYbvKISlkM
-	PUh1g/FetOCBEAX/cRnisOBDLHgyGu/E2Icp/FcYcu8KVpA5P+b5Saor+nUN89IwyVxWdQxFuCo
-	7EFKkNSq/VY4Gck2WdV/BMGNp24cIYM0OpLxpsRn0+rhuIwdKhwWs9mCzs4GoUEXRMBY3q5Co5v
-	2QtP8s+Rw1dOjoa9C8I0Ieb8GSADVnmDP9eZIyNn0511Rxdv+gWRkMHzEsCym6W3ihH7+jz+VEI
-	q5CCRo7NB9NFfOXBzjwk0XLsr6v99kbjoM3hl6fWDXGQKyxsPEwS608HAGPV2bMLpisq9g8zrsm
-	A=
-X-Received: by 2002:a05:6214:1309:b0:8e7:8d53:2417 with SMTP id
- 6a1803df08f44-907ca58b1d4mr58955846d6.27.1784838466656; Thu, 23 Jul 2026
- 13:27:46 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784839490; x=1785444290;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=CDopvOj4k9WArHgo2doJqHaZGmsJBI+a+mdyRi5Y/H4=;
+        b=HknGHTLycHeDPjN4LiDeNbiq545RzOFH5bNDg3UrcEanMchSnQTSIBW9MamPGN2f4u
+         HjS8wg+zdCc/wbuZHjEDwd9Xs6f4LpmljaQM5oaPPY3Yem0SBOCEhYRUrxpyrJpfYH3e
+         826eqOSz++kyFr3FTySn3EGP8f3s33km1KtXhpbqgshjRnWP404adf4M5sfroLhKMRFw
+         /wJcPPHDW9y4HEDL49P8A6Nc15mP2ESWAmiUFvOQjqSo4fCI1DkT7U9A4L0mp6If23Ls
+         Hm7fcxe534LaWYGobac5fqhGNmI0UoTUm74ykVx01zqZ5zPBHf6R5EikI6Uqkqnc0WDT
+         +2CA==
+X-Forwarded-Encrypted: i=1; AHgh+Rpb/ILJ7PjLU7SWRDMPsLqZNdKmunOwjgRJS72UPSVsrix0Ra5tgyQst6EFSUdxF58YIKPtKXA3O6L5@vger.kernel.org
+X-Gm-Message-State: AOJu0YwahI2cZrYtIEXPFJPgCdZqvfSNMSYrP+/LhuO6bsqfzBhHa3at
+	nvA75TmGMxf1Wh/M4RZYACd83t/w0YGLjwt7LDDUxTa0e/5HFPIsnncI0uDG72ZN4EanVd+gWXx
+	X8r3Xz4v8d2TQi6OYBCFNwfhVFlsYT2vsPnR1z/U=
+X-Gm-Gg: AR+sD11+PnsK/mh+tKq8spuQVeTsXc+daJ5sSNkWn9JrvTfmiFNSSVfBL9KWQFfva3k
+	i175QREACznrdIPW/NkUJUicPVWaDVrLWX+ciU1/wh/L8OZRDpXgljIKl8NrajSsvMrD4QOOAz/
+	uwrJ/DqD6/05I6Ac+/CZxG8ArDLpQSuIGNd6zqIuN1ZyP5QrA2nBfbl536kXBHfDmTsxSnYJ4VS
+	Es0X3X7xsZohzB7u8pZQyZCs2dLoj1FK3WkBYeh00y/Xl3IXMQ/GvQT2ZHmSF8h+wsy1eh2Pxgr
+	93KzTvoBGWl4k9uNj+zo/lL+V0x30tJPYXNAYSlWWTzhyk2ROkarmihxKeN1NZp5lxznCJKtDy0
+	XhQ3O8XMIrYVfNWjCjxadCyEZRSB+9f7dFd/XgbEMRXgnQTxmUWEf1S9eDunJhdi7itiRIu2i/d
+	g=
+X-Received: by 2002:a05:6214:5bc7:b0:8f1:4bff:3a55 with SMTP id
+ 6a1803df08f44-907ca5e760dmr53578546d6.38.1784839490227; Thu, 23 Jul 2026
+ 13:44:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260723184538.3888637-1-ekffu200098@gmail.com> <20260723184538.3888637-35-ekffu200098@gmail.com>
-In-Reply-To: <20260723184538.3888637-35-ekffu200098@gmail.com>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 Jul 2026 15:27:35 -0500
-X-Gm-Features: AUfX_mxnuBmU386xHCrO9KVt4FbuF22Bv2uMtB3Rok005YRa9Pud7LorDFd8BFc
-Message-ID: <CAH2r5muT20HXUANLnXQc1dAAvs+N=jFneSsV9gUqS8GE-wWNPQ@mail.gmail.com>
-Subject: Re: [PATCH 34/36] smb: client: remove conditional return with no effect
-To: Sang-Heon Jeon <ekffu200098@gmail.com>
-Cc: Julia.Lawall@inria.fr, Steve French <sfrench@samba.org>, cocci@inria.fr, 
-	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, samba-technical@lists.samba.org, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>
+Date: Thu, 23 Jul 2026 15:44:39 -0500
+X-Gm-Features: AUfX_mzfFqukVPGDCP9jvquxAf-EgJ1FdiCj6sx3fsVM68YyRNDCHJo7X-XzB5c
+Message-ID: <CAH2r5mu0Qi4c8NprbnviCv5whzqGuzriVT6qShQ91=Kx4=T3Zg@mail.gmail.com>
+Subject: [GIT PULL] smb3 client fixes
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-You can add my Reviewed-by if it is not going through my tree.
+Please pull the following changes since commit
+1590cf0329716306e948a8fc29f1d3ee87d3989f:
 
-Which tree do you want this changeset to go through?
+  Linux 7.2-rc4 (2026-07-19 13:54:41 -0700)
 
-On Thu, Jul 23, 2026 at 2:04=E2=80=AFPM Sang-Heon Jeon <ekffu200098@gmail.c=
-om> wrote:
->
-> Both branches of the check return the same value, so the check has
-> no effect. Remove it and return the value directly.
->
-> This is the result of running the Coccinelle script from
-> scripts/coccinelle/misc/cond_return_no_effect.cocci.
->
-> Signed-off-by: Sang-Heon Jeon <ekffu200098@gmail.com>
-> ---
->  fs/smb/client/smb1maperror.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperror.c
-> index ab3d09613c91..395299f9121b 100644
-> --- a/fs/smb/client/smb1maperror.c
-> +++ b/fs/smb/client/smb1maperror.c
-> @@ -234,11 +234,7 @@ int __init smb1_init_maperror(void)
->         if (rc)
->                 return rc;
->
-> -       rc =3D mapping_table_ERRSRV_is_sorted();
-> -       if (rc)
-> -               return rc;
-> -
-> -       return rc;
-> +       return mapping_table_ERRSRV_is_sorted();
->  }
->
->  #if IS_ENABLED(CONFIG_SMB1_KUNIT_TESTS)
-> --
-> 2.43.0
->
->
+are available in the Git repository at:
+
+  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc4-smb3-client-fixes
+
+for you to fetch changes up to c2f2e83e3bbc5483730fd4ee903182761f1ae50f:
+
+  cifs: fix cifsFileInfo leak on kmalloc failure in deferred close
+drain paths (2026-07-21 20:19:11 -0500)
+
+----------------------------------------------------------------
+Six client fixes
+- Fix leak in cifs_close_deferred_file()
+- Fix resolving MacOS symlinks
+- Fix stale file size in readdir
+- Update git branches in MAINTAINERS file
+- Fix bounds check in cifs_filldir
+- Fix checks in parse_dfs_referrals()
+- Fix DFS referral checks for malformed packet
+----------------------------------------------------------------
+Carl Johnson (1):
+      smb: client: handle STATUS_STOPPED_ON_SYMLINK responses without
+a symlink target
+
+Frank Sorenson (2):
+      cifs: prevent readdir from changing file size due to stale
+directory metadata
+      cifs: fix cifsFileInfo leak on kmalloc failure in deferred close
+drain paths
+
+Jay Vadayath (1):
+      smb: client: bound dirent name against end of SMB response in cifs_filldir
+
+Steve French (1):
+      Add missing git branch info for cifs and ksmbd to MAINTAINERS file
+
+Yichong Chen (1):
+      smb: client: validate DFS referral PathConsumed
 
 
---=20
+-- 
 Thanks,
 
 Steve
