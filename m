@@ -1,139 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0663D1AAA
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 06:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8008B33FE15
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 06:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784789404; cv=none; b=EJ0KrCoVS1LKQbMcUDu2ltj4w6cRKIv9gTVUi0AQE/0d/1b0bkrumtWCROpY0Hn3b3xl5eb9A/i+xz03Xos9Mt6ynUlcYBYqljzcbzNW/bc8CwsatRjdzPCOgcJuY0GW+SKdE9Cbr5huE3nbB7wXr9z2AGdxsDjSjF10KEmjB0k=
+	t=1784789902; cv=none; b=i0MfaP5FY2LiNI6hrvrKgdcwc0urxZYVCTwgh9MiAUARMs++LDn3Li8k0nM6nLFG8Q9r3fVvZsw1h09li2KnWOb3l29ssHIY0PMQVxHo0IYxqyq4A4qccFaO61nUc7N7bWfxkdj2Cxtbc13PwkXeKpQTqMAnggIQXfFZC/wLBds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784789404; c=relaxed/simple;
-	bh=37+SJcg+IriLtuOTth/i5ABu3snQoZFBfY2FfcdB3bc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nedwnqsRaLrsP6qME3wlYhoHE1T8PeWemiQs5bfu90pVpzKCCyKyv9z8T/ovY0WnumzFrY2G2Cmi1zpZHXfQb8GqMnzIPjBkIlqBwqN2z2kJOnN2Yb9+iZt/EiBCLmkySpUsXZkrPU8GUgoOhRwQC41xlqjC84TiZUPt+vyxFZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37C9C1F000E9
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 06:50:02 +0000 (UTC)
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c1c50c1e29bso41066366b.3
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 23:50:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rp2or+uEvsGjC806isjbF9NSoIewWWejE4d6Ji7Lg9uSUAzORvCKXy06WBYpt6ugC6Aw06xM9Vi8lSg@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1BQ2ujXOZkBaCwvQjPMknbg/slzucGTDQoqJqxq499HCecsdH
-	ow3oCNe5zzc06UXXuuXwF/01W7ZqZ+gVOBj5jH/YBdfjG0nwDvUtCS2G89IzZ2mUqvCSxsoI+Sa
-	tK8wsh6nccm01+AcNUPlJxbHE5oLibhk=
-X-Received: by 2002:a17:907:a682:b0:c16:5dbd:820c with SMTP id
- a640c23a62f3a-c1c508f5f39mr64347666b.33.1784789375220; Wed, 22 Jul 2026
- 23:49:35 -0700 (PDT)
+	s=arc-20240116; t=1784789902; c=relaxed/simple;
+	bh=91suFDs/7ipFMc2H2FpcpQv+ljKEIENt3uMacTaZ7mM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bj9m4yk1YCmdsdQ7QZIgkJWYGPHmDVNmwr5eUHPlD1psWqK95LqOwbOfdYyPwCRoBp3F8hpw+7byuJ5Iv3bOV0gv4BzyJzYiDvR+IGLXtN8CDSDzTbTNkBQlsI2Pa8RH054wByUOcUCZbU0IIHEPla43c5f3MJBNmyN52/aipcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Y5Jj8oJT; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Y5Jj8oJT"
+Message-ID: <ce461389-2b54-4097-9f7d-409107e08e1d@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1784789896;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XJkAKkdjNB5TAExBUm2WSGA2oeuQ//QZepstYsocF28=;
+	b=Y5Jj8oJT7cG/DKwEFXySTd3dID0GV5ZK7G2QK16E5Fv9CMMz1gHBOAecYwHGApXTIQVkS4
+	5PxwwO3d0RWEyotH5QPPw+iq/VKyPNY8nFFNXaBFLCqIQyCQaxDWYkZUoO9lxw8n62FIBy
+	+KowFPcMaTTgyDqMUVWFAqZSp+RcFpECjZMFyh9JaxyW4qRGQTdkGjIjVKKhTm6I+h+SAI
+	mN7SN82B72Iq3Zw0IrH4D5xDgPQiOjA90kkUlB5HhtAs5tUiiNBrtpzzWiFX9CgUiulprF
+	VAyP5hEWVzDKyIOIy/YWEQ1lZ/BW1KW2wOA7QYuTl1ES+zse0prafaLU6dtDDA==
+Date: Thu, 23 Jul 2026 14:57:46 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260723041131.313321-1-chenxiaosong@chenxiaosong.com> <20260723041131.313321-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260723041131.313321-4-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 23 Jul 2026 15:49:22 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_X5JSh8YGk5Z8-gx2A=PDcmW74jKK8co=z=9Zxty5xSg@mail.gmail.com>
-X-Gm-Features: AUfX_mxJxobxkS24E9KjeDfe4t8vOrcQ4mhJKvZn3KZSQ_JsQg_Wfvb7oDQd9eI
-Message-ID: <CAKYAXd_X5JSh8YGk5Z8-gx2A=PDcmW74jKK8co=z=9Zxty5xSg@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] smb/server: stop new async work when closing connection
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	gael.blivet@gmail.com, andriy.shevchenko@linux.intel.com, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: multipart/mixed; boundary="000000000000b5c6e6065741a8e7"
+Subject: Re: [PATCH v3 3/3] smb/server: stop new async work when closing
+ connection
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
+ gael.blivet@gmail.com, andriy.shevchenko@linux.intel.com,
+ linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260723041131.313321-1-chenxiaosong@chenxiaosong.com>
+ <20260723041131.313321-4-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd_X5JSh8YGk5Z8-gx2A=PDcmW74jKK8co=z=9Zxty5xSg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd_X5JSh8YGk5Z8-gx2A=PDcmW74jKK8co=z=9Zxty5xSg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
---000000000000b5c6e6065741a8e7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I agree with your patch. However, could you split the changes in 
+smb2_notify into a separate patch? We don't yet know how Gaël will 
+update his patch, so keeping those changes separate would make things 
+easier to rebase or adjust later.
 
-On Thu, Jul 23, 2026 at 1:12=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> A new async request may be added while a connection is closing.
-> The close code may miss this request and wait forever.
->
-> Check the connection state before adding the request. Return an error
-> and release the async ID if the connection is closing.
->
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-I would like to apply the attached patch instead of this one, so
-please check it.
+Does that make sense to you?
 
-Thanks!
+On 7/23/26 14:49, Namjae Jeon wrote:
+> I would like to apply the attached patch instead of this one, so
+> please check it.
 
---000000000000b5c6e6065741a8e7
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-smb-server-avoid-registering-async-requests-during-c.patch"
-Content-Disposition: attachment; 
-	filename="0001-smb-server-avoid-registering-async-requests-during-c.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mrx5hsec0>
-X-Attachment-Id: f_mrx5hsec0
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
-RnJvbSBjZjc4MDJiMDlkNjY0NDhmMmZkOGM1Zjg5YWIxYTM5OTRiMGY3MTkwIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBOYW1qYWUgSmVvbiA8bGlua2luamVvbkBrZXJuZWwub3JnPgpE
-YXRlOiBUaHUsIDIzIEp1bCAyMDI2IDE1OjI0OjEwICswOTAwClN1YmplY3Q6IFtQQVRDSF0gc21i
-L3NlcnZlcjogYXZvaWQgcmVnaXN0ZXJpbmcgYXN5bmMgcmVxdWVzdHMgZHVyaW5nCiBjb25uZWN0
-aW9uIGNsb3NlCgpBIGNvbm5lY3Rpb24tY2xvc2Ugc2NhbiBjYW4gbWlzcyB0aGUgc3ludGhldGlj
-IENIQU5HRV9OT1RJRlkgd29yayBpdGVtCmJlY2F1c2Ugc21iMl9ub3RpZnkoKSByZWdpc3RlcnMg
-aXQgZGlyZWN0bHkgYWZ0ZXIgc2V0dXBfYXN5bmNfd29yaygpCmhhcyByZXR1cm5lZC4gTGluayBi
-b3RoIHJlZ3VsYXIgYW5kIHN5bnRoZXRpYyBhc3luYyB3b3JrIHRocm91Z2ggb25lCmhlbHBlciB0
-aGF0IGNoZWNrcyB0aGUgY29ubmVjdGlvbiBzdGF0ZSB1bmRlciByZXF1ZXN0X2xvY2suCgpJZiB0
-aGUgY29ubmVjdGlvbiBpcyBhbHJlYWR5IGNsb3NpbmcsIHJlbGVhc2UgYSBuZXdseSBhbGxvY2F0
-ZWQgYXN5bmMKSUQgb3IgY29tcGxldGUgdGhlIHN5bnRoZXRpYyBub3RpZnkgd29yayBpbW1lZGlh
-dGVseS4KCkNvLWRldmVsb3BlZC1ieTogQ2hlblhpYW9Tb25nIDxjaGVueGlhb3NvbmdAa3lsaW5v
-cy5jbj4KU2lnbmVkLW9mZi1ieTogQ2hlblhpYW9Tb25nIDxjaGVueGlhb3NvbmdAa3lsaW5vcy5j
-bj4KU2lnbmVkLW9mZi1ieTogTmFtamFlIEplb24gPGxpbmtpbmplb25Aa2VybmVsLm9yZz4KLS0t
-CiBmcy9zbWIvc2VydmVyL3NtYjJwZHUuYyB8IDUzICsrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKystLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgNDEgaW5zZXJ0aW9ucygrKSwgMTIgZGVs
-ZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZnMvc21iL3NlcnZlci9zbWIycGR1LmMgYi9mcy9zbWIv
-c2VydmVyL3NtYjJwZHUuYwppbmRleCA5YzkzYTM5ZjM1ODguLjIwMzhkZTMxNWZiYyAxMDA2NDQK
-LS0tIGEvZnMvc21iL3NlcnZlci9zbWIycGR1LmMKKysrIGIvZnMvc21iL3NlcnZlci9zbWIycGR1
-LmMKQEAgLTk5MSw2ICs5OTEsMjQgQEAgc21iMl9nZXRfbmFtZShjb25zdCBjaGFyICpzcmMsIGNv
-bnN0IGludCBtYXhsZW4sIHN0cnVjdCBubHNfdGFibGUgKmxvY2FsX25scykKIAlyZXR1cm4gbmFt
-ZTsKIH0KIAorLyogTGluayBhIGZ1bGx5IGluaXRpYWxpemVkIGFzeW5jIHdvcmsgaXRlbSB1bmxl
-c3MgdGhlIGNvbm5lY3Rpb24gaXMgY2xvc2luZy4gKi8KK3N0YXRpYyBib29sIGtzbWJkX2Nvbm5f
-bGlua19hc3luY19yZXF1ZXN0KHN0cnVjdCBrc21iZF9jb25uICpjb25uLAorCQkJCQkgIHN0cnVj
-dCBrc21iZF93b3JrICp3b3JrKQoreworCWJvb2wgbGlua2VkID0gZmFsc2U7CisKKwlzcGluX2xv
-Y2soJmNvbm4tPnJlcXVlc3RfbG9jayk7CisJaWYgKCFrc21iZF9jb25uX2V4aXRpbmcoY29ubikg
-JiYgIWtzbWJkX2Nvbm5fcmVsZWFzaW5nKGNvbm4pKSB7CisJCWlmIChsaXN0X2VtcHR5KCZ3b3Jr
-LT5hc3luY19yZXF1ZXN0X2VudHJ5KSkKKwkJCWxpc3RfYWRkX3RhaWwoJndvcmstPmFzeW5jX3Jl
-cXVlc3RfZW50cnksCisJCQkJICAgICAgJmNvbm4tPmFzeW5jX3JlcXVlc3RzKTsKKwkJbGlua2Vk
-ID0gdHJ1ZTsKKwl9CisJc3Bpbl91bmxvY2soJmNvbm4tPnJlcXVlc3RfbG9jayk7CisKKwlyZXR1
-cm4gbGlua2VkOworfQorCiBpbnQgc2V0dXBfYXN5bmNfd29yayhzdHJ1Y3Qga3NtYmRfd29yayAq
-d29yaywgdm9pZCAoKmZuKSh2b2lkICoqKSwgdm9pZCAqKmFyZykKIHsKIAlzdHJ1Y3Qga3NtYmRf
-Y29ubiAqY29ubiA9IHdvcmstPmNvbm47CkBAIC0xMDAzLDIwICsxMDIxLDIyIEBAIGludCBzZXR1
-cF9hc3luY193b3JrKHN0cnVjdCBrc21iZF93b3JrICp3b3JrLCB2b2lkICgqZm4pKHZvaWQgKiop
-LCB2b2lkICoqYXJnKQogCX0KIAl3b3JrLT5hc3luY2hyb25vdXMgPSB0cnVlOwogCXdvcmstPmFz
-eW5jX2lkID0gaWQ7Ci0KLQlrc21iZF9kZWJ1ZyhTTUIsCi0JCSAgICAiU2VuZCBpbnRlcmltIFJl
-c3BvbnNlIHRvIGluZm9ybSBhc3luYyByZXF1ZXN0IGlkIDogJWRcbiIsCi0JCSAgICB3b3JrLT5h
-c3luY19pZCk7Ci0KIAl3b3JrLT5jYW5jZWxfZm4gPSBmbjsKIAl3b3JrLT5jYW5jZWxfYXJndiA9
-IGFyZzsKIAotCWlmIChsaXN0X2VtcHR5KCZ3b3JrLT5hc3luY19yZXF1ZXN0X2VudHJ5KSkgewot
-CQlzcGluX2xvY2soJmNvbm4tPnJlcXVlc3RfbG9jayk7Ci0JCWxpc3RfYWRkX3RhaWwoJndvcmst
-PmFzeW5jX3JlcXVlc3RfZW50cnksICZjb25uLT5hc3luY19yZXF1ZXN0cyk7Ci0JCXNwaW5fdW5s
-b2NrKCZjb25uLT5yZXF1ZXN0X2xvY2spOworCWlmICgha3NtYmRfY29ubl9saW5rX2FzeW5jX3Jl
-cXVlc3QoY29ubiwgd29yaykpIHsKKwkJd29yay0+YXN5bmNocm9ub3VzID0gZmFsc2U7CisJCXdv
-cmstPmFzeW5jX2lkID0gMDsKKwkJd29yay0+Y2FuY2VsX2ZuID0gTlVMTDsKKwkJd29yay0+Y2Fu
-Y2VsX2FyZ3YgPSBOVUxMOworCQlrc21iZF9yZWxlYXNlX2lkKCZjb25uLT5hc3luY19pZGEsIGlk
-KTsKKwkJcmV0dXJuIC1FU0hVVERPV047CiAJfQogCisJa3NtYmRfZGVidWcoU01CLAorCQkgICAg
-IlNlbmQgaW50ZXJpbSBSZXNwb25zZSB0byBpbmZvcm0gYXN5bmMgcmVxdWVzdCBpZCA6ICVkXG4i
-LAorCQkgICAgd29yay0+YXN5bmNfaWQpOworCiAJcmV0dXJuIDA7CiB9CiAKQEAgLTExMDc1LDkg
-KzExMDk1LDE4IEBAIGludCBzbWIyX25vdGlmeShzdHJ1Y3Qga3NtYmRfd29yayAqd29yaykKIAkJ
-aW5fd29yay0+Y2FuY2VsX2FyZ3ZbMV0gPSBmcDsKIAkJaW5fd29yay0+Y2FuY2VsX2ZuID0gc21i
-Ml9ub3RpZnlfY2FuY2VsX2ZuOwogCX0KLQlzcGluX2xvY2soJndvcmstPmNvbm4tPnJlcXVlc3Rf
-bG9jayk7Ci0JbGlzdF9hZGRfdGFpbCgmaW5fd29yay0+YXN5bmNfcmVxdWVzdF9lbnRyeSwgJndv
-cmstPmNvbm4tPmFzeW5jX3JlcXVlc3RzKTsKLQlzcGluX3VubG9jaygmd29yay0+Y29ubi0+cmVx
-dWVzdF9sb2NrKTsKKworCWlmICgha3NtYmRfY29ubl9saW5rX2FzeW5jX3JlcXVlc3Qod29yay0+
-Y29ubiwgaW5fd29yaykpIHsKKwkJa2ZyZWUoaW5fd29yay0+Y2FuY2VsX2FyZ3YpOworCQlpbl93
-b3JrLT5jYW5jZWxfYXJndiA9IE5VTEw7CisJCWluX3dvcmstPmNhbmNlbF9mbiA9IE5VTEw7CisJ
-CWluX3dvcmstPmFzeW5jaHJvbm91cyA9IGZhbHNlOworCQlrc21iZF9mZF9wdXQod29yaywgZnAp
-OworCQlrc21iZF9jb25uX3dyaXRlKGluX3dvcmspOworCQlrc21iZF9mcmVlX3dvcmtfc3RydWN0
-KGluX3dvcmspOworCQl3b3JrLT5zZW5kX25vX3Jlc3BvbnNlID0gMTsKKwkJcmV0dXJuIDA7CisJ
-fQogCiAJc3Bpbl9sb2NrKCZmcC0+Zl9sb2NrKTsKIAlsaXN0X2FkZF90YWlsKCZpbl93b3JrLT5u
-b3RpZnlfZW50cnksICZmcC0+bm90aWZ5X3BlbmRpbmdzKTsKLS0gCjIuMzQuMQoK
---000000000000b5c6e6065741a8e7--
