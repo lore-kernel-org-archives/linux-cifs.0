@@ -1,181 +1,156 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813C230D41E
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 21:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6D83603F7
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 23:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784842113; cv=none; b=nPFh93ygJKy60nkQdmBxwWDsnhqVuknvEVXGK838enF1SVdNE7rLmKqQhcgBQ15jCibfZDWRA1ld0v9U8umFBvilNBHKaD/6MH7SWPmbxH92Ps9aWbuOdhg3j+jzeBU0s/K5BR7mdCqC2pjDxJjJnoViXQZ1GL0Xn+SaeqQi4kM=
+	t=1784847672; cv=none; b=t9O0sxMB983hstpzzTGTyShpon5Xw3WeLp58KwD+50Qo1R8qMBnzuRO/pIWdxZDz7q13oVpDrv7OWyukq+9Xog7+GzIjxV/CsGNDnBT7lgZCyUVyaottyA4qAsXI+h13v1al1YOYdY6GkDCsTG3hHJkAmGriWfN3PYyN9f5acgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784842113; c=relaxed/simple;
-	bh=G9l9yrHRU8RIPj3q/bEU/y6USdqkYeWcb3FQPqXO8Po=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:Cc:To; b=N0s00ZppcrH0weYKeHxOhZzoB1Cr7keeiFsaF6HNxfkNXBkPBvVokbnLfOscm5/TYdjIaPqnJHYYlG0tDfJc4dMyX9Zf+6W1sSB8sdBq7+dsB52ABeuZ7/zPwVZ06fubKnLU3guhxLD+sqWr6JWYmPqJm0NUg8XHlJWqPiNVIug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Kl9L+Zmi; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1784847672; c=relaxed/simple;
+	bh=wnkam4gARZPimI6t3q6/gi53lYyin+NicZ/A9htdCU8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k+dl1CXbKdMmx7fn9on7sD/U9CQeh6Yo3iiVFoOoysToiSm/311Bm4gMdqJ+Y79KddsPxBX90QTB0nckNWoSu9DCRbQlPcwuod+wUj5inzXP2CgzgBWxX8qiL2Luh/1nvjvQDHBvfw6AnOMclCeGsboLApS4Xfwb4JvPuWlA1Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y19sT8fE; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Kl9L+Zmi"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4954f5e8020so5565255e9.2
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 14:28:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y19sT8fE"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c15d3cd51b2so148826566b.3
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 16:01:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1784842110; x=1785446910; darn=vger.kernel.org;
-        h=to:cc:from:subject:message-id:date:content-type
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=glSIW7v0xrw8eyDkdSCCW5mmpVQtFuMr6hihXCd3/sM=;
-        b=Kl9L+ZmiscGFOlRbNoBfoLQWwqfZ9pSPah0u+yBum33zfdgk6BcD1O4KC0P3pBJask
-         Efauwmpo7pIlOiQz5tqLAAldPk0Q+as4ILCBN0U+jXTPcJBij0oxDziptmXPGksQhoct
-         IHC6uw6nfKvHhYiuA1nzkWsrevJonHNOoVCS6Y4AQE5d+2Nwbt2ujG/gHr6ZR2hTan+O
-         Wt+hx3FQ3XyiZEqUl9imIG4KxIPHstdZ1esBNhrJnlQ0nXbQhICHHt7SE9luEY7aKhv+
-         Eu1rPnJVSnC9L9NI8MHzD39nVjlcsi1SsCRR+oUB/B4Jrrk0J+oYHHvkCSOxJJhLOqir
-         avFw==
+        d=gmail.com; s=20251104; t=1784847668; x=1785452468; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NkiiwKU0NKOWW0DOqWdWOWQ7VLeFhZ7u/mJhBXHCR5o=;
+        b=Y19sT8fEkOIsL8IrKnzfW6BE0AvFo2eY9ikmiKCU3ZHRpEr08rDc5E4xUOAR4XbIl8
+         yzN9Eu52MnwaHm1mQ2Rl0xs8uTVy/2GJu6Vglq3fz7zwK/y1snJCh+cJkyuMbtLizMNT
+         DuWAQM7S50332ckydxQHsY63k67WG/EHKG4bXRgqxws/M/vkgZ0Wa8mvklyznKQYkyIJ
+         4WdYtm5bqpbTKFS+0CTiL4PpYWvPXFS04b1+KTh3pjdsDeAwNK5NSPOZZCanledXDMMK
+         n8rl9N2D1RB05ZtjJJbA/WYHcd0b4gRxpIG0hb5Njuyq77f3BX4W9Avw/zihEKG0tMxE
+         zr6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784842110; x=1785446910;
-        h=to:cc:from:subject:message-id:date:content-type
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=glSIW7v0xrw8eyDkdSCCW5mmpVQtFuMr6hihXCd3/sM=;
-        b=hQez7U8KOLd7Zc4UFFZLH+wCV42rF6R9CpBD2x4Fn74hl0fEdXB1Wgyise6+lhgQrm
-         2ScIpKrSCNP/uXy5z1bL2JebxZ54bE6TPnlmXEdrJorbvQgNQI6vGW9MBl+AhicD9h+s
-         ad2pzILUVKqpqZldS/ko47i4u1lTsIUHm8hr5pWIOiPWyZCdc+ZJNcLHFE0rQga++9Jk
-         M+mYOu142DgaLOed7gNtY61w0TlWP/qpjJSufJVJiBY4D6zSOiSqU92Hp8pAXCDoz7gg
-         53EK5qpMu/zTaTugCpG8gPHmxVBb3LSZ4Zlw/RG7SfhPNyH8S9/ITa3QmOcILeEWppdk
-         ewew==
-X-Forwarded-Encrypted: i=1; AHgh+RqXft82hWUpSjhisVqznVQ5BGe159BDM8H8TZPfCMZHkoUjVGB22Dm6LXFD+KPA1lfS5E6pIu1zWASl@vger.kernel.org
-X-Gm-Message-State: AOJu0YyycVBj+MI9EXCf5BiV3tMYWJDOpyk36urLbTlDluajyjGP7s9d
-	3Fg7uIRNYlDOgy6Mk7MO3O+WLlglTjm4escY46MFS+S/jxI0Vxivdj08AQtMy/tWhUI=
-X-Gm-Gg: AR+sD12AkwuNDfVyxqq6xurw2vfRbPLXGRGko3I9q6Kg2TO85VWZ4kIWbC5MzAk3mkN
-	m+gFRZlWFlSZ4j70VOcGDpi7LexVj4nGhhG+HN9s79iyDyt32wdPKSAPWg2B3iULX5JYf8aYBAl
-	9udKtle0SfJX7Fo/sS8rCTlUF8BuzHuttWGxFpuxET2IFcPSIPK+ZUJyG6FCPTj34dfxPoAwC1q
-	Lm8VeQS50XqPZDABB0OsGa3ZY7Xb+K1t8kjnpgjvo+LBe/l/j6cf1P7bc1zB8UqOawYO7jDNHgt
-	t/KNvb2YJCSIP7J6M3w8C7SqLHAgMySgunr10DmecronkH2f06vK4MEnpBKiHmyRWZJ95o1HNbH
-	ojQdRbhAl5v+K7SJn3Pd26Ix2fn+qvSJVVYKNM5z9EzfgQ3uFPpnack/Xbe6folmxts297GCY40
-	uX+CfmxRZ9
-X-Received: by 2002:a05:600c:4f86:b0:495:6a24:a92d with SMTP id 5b1f17b1804b1-49573cd8af8mr52814295e9.22.1784842109551;
-        Thu, 23 Jul 2026 14:28:29 -0700 (PDT)
-Received: from localhost ([2804:1b2:1845:f014:8b06:2b8:298a:5312])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3147df0686fsm22941554eec.14.2026.07.23.14.28.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jul 2026 14:28:28 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784847668; x=1785452468;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NkiiwKU0NKOWW0DOqWdWOWQ7VLeFhZ7u/mJhBXHCR5o=;
+        b=mWrv70/pt3SDNHC6tnkKFaA8NzX2p6UBAisXrfso74wnjZi5j9RyDWEIdM+OrYwqV+
+         6lQupT21GX6DAcKKPbto9e+gwJyfg1R2MpR559oo5B0qvFwcx3n4jh+CjBWKFNLbp4Vx
+         m3h2YKuZX85+m3LCm5RvZIais+IoAQLKQW/S/NZHnzYwfegK/BO+A4AlQ4nzMItQT1x0
+         NxXl3fHuK/pyYm2wZxSYhfYtwjBEl0TR7RkABdqxhDYF1Zh7miARuUVSy43uygpcqsnC
+         wGRP2Thti0s3L6wJ1N5HmawAjSyRWsIL4tfdO9j128H4kbMN6oSb3CcQLtdsF5ZV5XKF
+         CGew==
+X-Gm-Message-State: AOJu0YzzKtpxTaq4CIgBJWBItXl3nVs0eGbX5wHTC7ulha/3zeFcu9jZ
+	PKf8UwUQZUHdi4AEFmQQfV4a1pDOuxTf6xDP8YS5cxvcfIOOPAapcj2LLXOJJBG/CNU=
+X-Gm-Gg: AR+sD12UhfJxfEGfOfYepAK3SigFHf0wYvbayG+x08yqa27iaU6SzqmDWPOorcnWhq9
+	tFe57/SXMFT73HceAbGul02myipc0SmxX0QJxd9DQcu6y4jOV8scGYvRYAg0prABrB5PoVtNAFz
+	LoQKPQ/+6mzJK+ojmGAVqflNwvlWUQkiaSMipt1mrqoOlL5TOx6dbDxQaHTD+dAfuipDNT9LTe4
+	c2xB6WSFlTmKn/5L29PWhe7a5n9yPoEq9sPBlRQ0FXfsEaZ5ff0uRlVq0dz3lq36Hk6EUMyqrHZ
+	UegCA3WjdwceWcsGKhzw3cUKVJdGTxgAEN/XxdAy0V9lvKhoHqwZrjEKo0SxTS4oFjxNFk24TYu
+	OkgHesyWk5waQAmium7psYkVx52bQQdHv/pxRLlRUK4ccpUC6BS647nhgDmCNTcX3eBxX+g==
+X-Received: by 2002:a17:907:72d4:b0:c1c:4858:c19c with SMTP id a640c23a62f3a-c1c5098acf8mr214121066b.23.1784847667654;
+        Thu, 23 Jul 2026 16:01:07 -0700 (PDT)
+Received: from beelink.. ([186.247.163.143])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c1c32a78e0fsm277534766b.2.2026.07.23.16.01.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2026 16:01:06 -0700 (PDT)
+From: Your Name <qwe.aldo@gmail.com>
+X-Google-Original-From: Your Name <you@example.com>
+To: linux-cifs@vger.kernel.org
+Cc: linkinjeon@kernel.org,
+	smfrench@gmail.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	linux-kernel@vger.kernel.org,
+	Aldo Ariel Panzardo <qwe.aldo@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: only rebind the reopened file's own oplock on durable reconnect
+Date: Thu, 23 Jul 2026 20:00:53 -0300
+Message-ID: <20260723230053.684176-1-you@example.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 23 Jul 2026 18:28:25 -0300
-Message-Id: <DK69PZKFFBA3.K1SE3ARGE0K2@suse.com>
-Subject: [BUG netfs] folio changes during io results in CIFS send failures
-From: "Henrique Carvalho" <henrique.carvalho@suse.com>
-Cc: "Paulo Alcantara" <pc@manguebit.org>, "Shyam Prasad N"
- <nspmangalore@gmail.com>, "Bharath SM" <bharathsm.hsk@gmail.com>, "Enzo
- Matsumiya" <ematsumiya@suse.de>, <linux-cifs@vger.kernel.org>
-To: "David Howells" <dhowells@redhat.com>, "Steve French"
- <smfrench@gmail.com>
-X-Mailer: aerc 0.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi David and Steve,
+From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
 
-When running the fio write workload
+ksmbd_reopen_durable_fd() walks the inode's m_op_list and rebinds every
+detached oplock to the reconnecting session:
 
-	fio --name=3Dsmb-fio \
-	--directory=3D/mnt \
-	--rw=3Dwrite \
-	--bs=3D4k \
-	--size=3D4k \
-	--ioengine=3Dio_uring \
-	--direct=3D0 \
-	--numjobs=3D1 \
-	--iodepth=3D1 \
-	--time_based=3D1 \
-	--runtime=3D500 \
-	--unlink=3D0 \
-	--group_reporting=3D1 \
-	--filename_format=3D"$file_fmt" \
-	--output-format=3Djson \
-	--output=3Dsmb-fio.json
+	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry,
+				lockdep_is_held(&ci->m_lock)) {
+		if (op->conn)
+			continue;
+		op->conn = ksmbd_conn_get(fp->conn);
+		op->sess = work->sess;
+	}
 
-on a mounted CIFS share I saw the messages
+The only key is op->conn == NULL, which every detached durable handle on
+that inode matches, not just the one owned by fp.  When two sessions hold
+durable handles on the same file and both disconnect, reconnecting one of
+them adopts the other session's oplock: op->sess is overwritten with the
+reconnecting session without taking a reference on it, while op->conn
+pins the connection.
 
-	CIFS: VFS: sign fail cmd 0x9 message id 0x49127
-	CIFS: VFS: \\win22.bira.test SMB signature verification returned error =3D=
- -13
+The sibling teardown path, session_fd_check(), keys on the identity of
+the connection being torn down (op->conn == conn) rather than on shared
+state, and so does not have this problem.
 
-After debugging the signed request, sent request, signature and
-recalculated signature on sent request I found out that a folio content
-change is happening between signature and sending the data, while the
-signature is not changing. Some debug messages for reference:
+Once the adopting session is destroyed, ksmbd_session_destroy() frees it
+while the foreign oplock still points at it.  The reader in
+ksmbd_close_fd_app_instance_id() validates only opinfo->conn, which is
+still live thanks to the reference taken above, and then dereferences the
+stale session:
 
-	CIFS: sign-write-req-sig-changed conn=3D1 mid=3D0x49127 hdr_mid=3D0x49127
-	flags=3D0x8 cc=3D64 cr=3D72 tid=3D0x5 sid=3D0x2880074000071 iter_1=3D41943=
-04 iter_2=3D4194304
-	sig_1=3D92eeb2b661423fc65c86401a4c14888f
-	sig_2=3D8e53f3f500d42122183c8c74227520e7
+	if (!opinfo->conn) {
+		up_read(&fp->f_ci->m_lock);
+		goto out;
+	}
 
-	CIFS: sign-write-req-delta conn=3D3 mid=3D0xccb4 first_diff=3D168
-	last_diff=3D3754 diff_bytes=3D24 diff_ranges=3D8 len_1=3D4208
-	len_2=3D4208 iter_1=3D4096 iter_2=3D4096
+	ft = &opinfo->sess->file_table;
+	write_lock(&ft->lock);
 
-	CIFS: sign-write-req-delta-range conn=3D3 mid=3D0xccb4 range=3D0 off=3D168
-	len=3D3
-	buf_1=3D1d5e730f000000000000000000000000b62c7d9d5f374dcc11c33b6c0fd37332
-	buf_2=3D9db87c0f000000000000000000000000b62c7d9d5f374dcc11c33b6c0fd37332
-	      ^^^^^^
+  BUG: KASAN: slab-use-after-free in _raw_write_lock+0x74/0xd0
+  Write of size 4 at addr ffff88810a970528 by task kworker/0:0/9
+  Workqueue: ksmbd-io handle_ksmbd_work
+  Call Trace:
+   _raw_write_lock+0x74/0xd0
+   ksmbd_close_fd_app_instance_id+0x183/0x410
+   smb2_open+0x1346/0x4430
+   handle_ksmbd_work+0x2bb/0x7b0
 
-`first_diff` above shows the first changed byte is payload offset 56
-(112 byte header) and we can see a 3-byte change there. This same 3-byte
-change repeats every 512 bytes in the payload.
+Reached from an authenticated session against a share with the default
+durable-handle and oplock configuration: two sessions open the same file
+with a durable-v2 handle and an RH lease under distinct AppInstanceIds,
+both log off, one reconnects with DH2C, and a later durable-v2 create
+carrying the other AppInstanceId walks into the freed session.
 
-After digging into netfs code, I noticed the folios are not kept locked
-while a subrequest is being filled, and maybe this allows changes to
-this folio even though it has not been marked as ended writeback.
+Constrain the loop to the oplock owned by the file being reopened.
 
-In my case, the subrequest can be much larger than a single folio, so
-netfs accumulates several 4k folios before issuing the network write.
+Fixes: f363a0fb134a ("ksmbd: fix app-instance durable supersede session UAF")
+Cc: stable@vger.kernel.org
+Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+---
+ fs/smb/server/vfs_cache.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So a minimal change that prevented this unwanted change during write is
-the following -- *although I'm likely missing something*.
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index d95c405eab11..1e9d13344825 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -1720,7 +1720,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
+ 	down_write(&ci->m_lock);
+ 	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry,
+ 				lockdep_is_held(&ci->m_lock)) {
+-		if (op->conn)
++		if (op->conn || op->o_fp != fp)
+ 			continue;
+ 		op->conn = ksmbd_conn_get(fp->conn);
+ 		op->sess = work->sess;
+-- 
+2.43.0
 
-If you think this makes sense I can send a formal patch.
-
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index 210eb8f3958d..bce1f2b80a9c 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -63,6 +63,8 @@ int netfs_folio_written_back(struct folio *folio)
- 	struct netfs_group *group =3D NULL;
- 	int gcount =3D 0;
-=20
-+	folio_unlock(folio);
-+
- 	if ((finfo =3D netfs_folio_info(folio))) {
- 		/* Streaming writes cannot be redirtied whilst under writeback,
- 		 * so discard the streaming record.
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index f2761c99795a..cf4e39d593ce 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -347,7 +347,6 @@ static int netfs_write_folio(struct netfs_io_request *w=
-req,
- 		/* mmap beyond eof. */
- 		_debug("beyond eof");
- 		folio_start_writeback(folio);
--		folio_unlock(folio);
- 		wreq->nr_group_rel +=3D netfs_folio_written_back(folio);
- 		netfs_put_group_many(wreq->group, wreq->nr_group_rel);
- 		wreq->nr_group_rel =3D 0;
-@@ -415,7 +414,6 @@ static int netfs_write_folio(struct netfs_io_request *w=
-req,
- 		netfs_issue_write(wreq, cache);
-=20
- 	folio_start_writeback(folio);
--	folio_unlock(folio);
-=20
- 	if (fgroup =3D=3D NETFS_FOLIO_COPY_TO_CACHE) {
- 		if (!cache->avail) {
-
-
---=20
-Henrique
