@@ -1,134 +1,181 @@
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BFD331A41
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784840063; cv=pass; b=mWNKvl+AMEi5VvpHpMpLEoLfZ4CtGfQBou9OSGvdskSVV35gA4obo8KJ+ofSKNeoeMvyNyLpPZ7YW73/Sn+XhkrcUC30kjnFpkfIZ0TzF/kcJuMrCeqIqOMgkHLiSdFN/dqM0k0843K6VfxWY8Emtoyiyjc598eQW4sseIJUEWs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784840063; c=relaxed/simple;
-	bh=80vRoB4fzgwK+g4kHzhkoFXh4perI8ZUdSbuBhq87v8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G86qTs8q+p+QOsJedbgIuXE9QzeaHAomOt8jOOGuM8DMv4lw5ubIAIEcFPUMFovDoCSGCpbgnoSyEWH9OUtusxMcVB4nMG3nqv0STCAM7ITpfjSMy5XLLS6h7QAnxmmaTECq9H7VgBFNW8d2XNn/u1kQF1ij4exDptdRo1Ql5ck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hfX5QgaN; arc=pass smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813C230D41E
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 21:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784842113; cv=none; b=nPFh93ygJKy60nkQdmBxwWDsnhqVuknvEVXGK838enF1SVdNE7rLmKqQhcgBQ15jCibfZDWRA1ld0v9U8umFBvilNBHKaD/6MH7SWPmbxH92Ps9aWbuOdhg3j+jzeBU0s/K5BR7mdCqC2pjDxJjJnoViXQZ1GL0Xn+SaeqQi4kM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784842113; c=relaxed/simple;
+	bh=G9l9yrHRU8RIPj3q/bEU/y6USdqkYeWcb3FQPqXO8Po=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:Cc:To; b=N0s00ZppcrH0weYKeHxOhZzoB1Cr7keeiFsaF6HNxfkNXBkPBvVokbnLfOscm5/TYdjIaPqnJHYYlG0tDfJc4dMyX9Zf+6W1sSB8sdBq7+dsB52ABeuZ7/zPwVZ06fubKnLU3guhxLD+sqWr6JWYmPqJm0NUg8XHlJWqPiNVIug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Kl9L+Zmi; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfX5QgaN"
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-902e4af2d9dso10619756d6.0
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:54:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784840061; cv=none;
-        d=google.com; s=arc-20260327;
-        b=DaMoX3Bn7U/5s24vUFPjP99QGw9UE7SEQ/FuhdkBjMGZBxUKiGlUScBTd5122diyWP
-         vaNOtTHuqj2YxSBPzK68tQ2/bv+lsyxjvbV6B9cvYrax6hwRf9Cf9bZgYRA7cC2mr+wM
-         tF3+0W7iAVZ0RQ8bygHmvnF3cXtwYqyYUQ1XvRnJ/iAqrBu2MLNpHAX82dTPsKNZM2iD
-         zvMzQn2ge1OMhTxdPl3qZqfDzY+6NbZMYnZyt0xU8/C540E0mkDbtmTmf25lElhrnNeX
-         cglAkL33zm2uRitTM+GTymhVAy4HLjEJBIkxOc9k2nqCtodoj5jnaTQ6Nhe7PEF/MrBy
-         CqoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=v1XxKkxydP+gmPUoFLYvGTbtdjO5YMG4JDZhVlcmQ+E=;
-        fh=GhYM31r8v/Kd1f9dNSikvF/W0v7ZgaF8uU/5+bjH6vc=;
-        b=rmw3+CKLqqmm7y/X1gyr+zvu65DIOqWATFK+N3iBVKcY+uiLNl0iS6fa9RF7TNE00G
-         St4TJqL5Zw/ECRqCq2xLTbYja/Fxj4NKnnxF+QeRuKZJxfJRc9URWTbTusZS0cvyeBkj
-         GZxpvRKKjSXnpiPcoJoEgrlxhGpCmPhV/yCGkj7rDRmJPc8O6r7yR6JNnflHRAWu/q8d
-         mAcoeCe8qIH/P8b51S/8Ba6iNvcbvvH+vaGha2fdbY7BFTn0dhHNH8SUMPU3zD7PVyhC
-         PLTxwoUEJZMZOVbHhdHCx3hJ319pmjmISZkIWXd/+W/yiqJGqnsK+2OglIGsb3HNc9p9
-         UktA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Kl9L+Zmi"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4954f5e8020so5565255e9.2
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 14:28:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784840061; x=1785444861; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=v1XxKkxydP+gmPUoFLYvGTbtdjO5YMG4JDZhVlcmQ+E=;
-        b=hfX5QgaNRP5gj0Dn8m2Ghb5gZ3BQc7tnsAqaGKTpgrT3CrN3HDEUo3ovvs6lB2KatI
-         TKa8dq9rUeOT/K2EkHHtDkJHMlgTmu2KPuJxlGpmm2OgpwfI9n6DHd8YjvKaVXV2hXyo
-         NVmXFQ7MID9m3dop0OU90u/LE6rlbaU+drQ5SUOAOFuec5DzXS24CniDC9B6eIL8mFmE
-         7JoX6I151+FJOpVE4pqjCiQYt4XkOQTV03jYCR29n/hWdvpA4EljfpPPYh5yth2FMGp0
-         673RWNNFNezyWL+Gp7+3gBqbNMBPcpjVlkhvmawubc5ho1/1CxPd/p2hzgXbl/sJcNmR
-         hoxw==
+        d=suse.com; s=google; t=1784842110; x=1785446910; darn=vger.kernel.org;
+        h=to:cc:from:subject:message-id:date:content-type
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=glSIW7v0xrw8eyDkdSCCW5mmpVQtFuMr6hihXCd3/sM=;
+        b=Kl9L+ZmiscGFOlRbNoBfoLQWwqfZ9pSPah0u+yBum33zfdgk6BcD1O4KC0P3pBJask
+         Efauwmpo7pIlOiQz5tqLAAldPk0Q+as4ILCBN0U+jXTPcJBij0oxDziptmXPGksQhoct
+         IHC6uw6nfKvHhYiuA1nzkWsrevJonHNOoVCS6Y4AQE5d+2Nwbt2ujG/gHr6ZR2hTan+O
+         Wt+hx3FQ3XyiZEqUl9imIG4KxIPHstdZ1esBNhrJnlQ0nXbQhICHHt7SE9luEY7aKhv+
+         Eu1rPnJVSnC9L9NI8MHzD39nVjlcsi1SsCRR+oUB/B4Jrrk0J+oYHHvkCSOxJJhLOqir
+         avFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784840061; x=1785444861;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=v1XxKkxydP+gmPUoFLYvGTbtdjO5YMG4JDZhVlcmQ+E=;
-        b=IeuV7ZG9JR2t/iJPL6a2Nk5efFpX7RniRoMiML76K+49TQpcfkEKVvJNIK+8AH1QLr
-         3uh6xPYc3SfZLmtcO1FIKMgXkXSYGkdvGNBXqDtBzdY18BPvlmbPEGaQZOQuF0cNzWeI
-         YEXFroxJCnn5AC1DV0uTcNzL4fmt5+vaJY0sykhQo6SQ6twcHIaVJk+2AiS0RAyS8jN0
-         F9Gd4JH7LSq0hvc7Vuf4N+gTt3ivE4Fh9xV+KQwz3uLh3DyJ27ZH1cN0bj5or4/GwD5n
-         +kKx+goPNvKQNaxvJ5Qjsfn4F9S6Eeq9RGv7ClY+6dIKu+Zzm8uW9W0qtFkt7CaghXdf
-         VCNA==
-X-Forwarded-Encrypted: i=1; AHgh+Rq6+iOLp9+jxNW7ui+K0InS9OROUJh1v9WJpfFau9neX/ZmtHQaJCmCrNyEIyUUO4F2C3g95NU5OavH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy0b6oTiPbKmcm0cJpZaMmxmTfRkFElpXljkYCZVVOHdlOCEaN
-	+w5dWklmpWJSv8+g0YPSIpkQByQpeOeRQjYc4E/Vy0dbs17jk1iTLEd2PSIOC9CU6SwUfy8D3sw
-	c+D3l/FGV/qnUK9oHLElNfM8KXsLOMSo=
-X-Gm-Gg: AR+sD11OK1W+GZAbST4EITSbK8Cp+Yjv6CjV0ssGffDMxJeQFAyuzb0Y5ZxbcV5aAOc
-	EWa5NSQ1fb/xijHG2jnrgqOokKH20iwekWf42AawfSRBQLPQrsTrKkHsmvg1iik6UCLLap1JKmL
-	IdJZwcM8vps9TQqasjDAfwH2BbLd1HHttQOgp40RWB/9FFfw4qJtXm6xtbdoK0J7eQslcAYdovI
-	EVIZaFqd86OVVb3iiuAhkmgXba4ZqauBBpNM67el6p5SxfmIl7ZlLFN/5KQ1Zqs8vx/9+2YKl9i
-	BwUjQ5yOV/zpSqrevSPo+qcDNFoKTrdlqvGqvDsUENWVONzyIFZJdje0wS3tAljT+dW0tPQoTw2
-	c2WE6gVqXyKW+PqfjWtUSU+xJP/UOqtYTpxzLi3Ws2OAKgSpqvQGMzq0ZlpiBWL+Qcm0Es8RGK/
-	zj
-X-Received: by 2002:a05:6214:2427:b0:907:be64:6b76 with SMTP id
- 6a1803df08f44-907cd03ec7fmr45943556d6.12.1784840061161; Thu, 23 Jul 2026
- 13:54:21 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784842110; x=1785446910;
+        h=to:cc:from:subject:message-id:date:content-type
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=glSIW7v0xrw8eyDkdSCCW5mmpVQtFuMr6hihXCd3/sM=;
+        b=hQez7U8KOLd7Zc4UFFZLH+wCV42rF6R9CpBD2x4Fn74hl0fEdXB1Wgyise6+lhgQrm
+         2ScIpKrSCNP/uXy5z1bL2JebxZ54bE6TPnlmXEdrJorbvQgNQI6vGW9MBl+AhicD9h+s
+         ad2pzILUVKqpqZldS/ko47i4u1lTsIUHm8hr5pWIOiPWyZCdc+ZJNcLHFE0rQga++9Jk
+         M+mYOu142DgaLOed7gNtY61w0TlWP/qpjJSufJVJiBY4D6zSOiSqU92Hp8pAXCDoz7gg
+         53EK5qpMu/zTaTugCpG8gPHmxVBb3LSZ4Zlw/RG7SfhPNyH8S9/ITa3QmOcILeEWppdk
+         ewew==
+X-Forwarded-Encrypted: i=1; AHgh+RqXft82hWUpSjhisVqznVQ5BGe159BDM8H8TZPfCMZHkoUjVGB22Dm6LXFD+KPA1lfS5E6pIu1zWASl@vger.kernel.org
+X-Gm-Message-State: AOJu0YyycVBj+MI9EXCf5BiV3tMYWJDOpyk36urLbTlDluajyjGP7s9d
+	3Fg7uIRNYlDOgy6Mk7MO3O+WLlglTjm4escY46MFS+S/jxI0Vxivdj08AQtMy/tWhUI=
+X-Gm-Gg: AR+sD12AkwuNDfVyxqq6xurw2vfRbPLXGRGko3I9q6Kg2TO85VWZ4kIWbC5MzAk3mkN
+	m+gFRZlWFlSZ4j70VOcGDpi7LexVj4nGhhG+HN9s79iyDyt32wdPKSAPWg2B3iULX5JYf8aYBAl
+	9udKtle0SfJX7Fo/sS8rCTlUF8BuzHuttWGxFpuxET2IFcPSIPK+ZUJyG6FCPTj34dfxPoAwC1q
+	Lm8VeQS50XqPZDABB0OsGa3ZY7Xb+K1t8kjnpgjvo+LBe/l/j6cf1P7bc1zB8UqOawYO7jDNHgt
+	t/KNvb2YJCSIP7J6M3w8C7SqLHAgMySgunr10DmecronkH2f06vK4MEnpBKiHmyRWZJ95o1HNbH
+	ojQdRbhAl5v+K7SJn3Pd26Ix2fn+qvSJVVYKNM5z9EzfgQ3uFPpnack/Xbe6folmxts297GCY40
+	uX+CfmxRZ9
+X-Received: by 2002:a05:600c:4f86:b0:495:6a24:a92d with SMTP id 5b1f17b1804b1-49573cd8af8mr52814295e9.22.1784842109551;
+        Thu, 23 Jul 2026 14:28:29 -0700 (PDT)
+Received: from localhost ([2804:1b2:1845:f014:8b06:2b8:298a:5312])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3147df0686fsm22941554eec.14.2026.07.23.14.28.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jul 2026 14:28:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAH2r5mu0Qi4c8NprbnviCv5whzqGuzriVT6qShQ91=Kx4=T3Zg@mail.gmail.com>
- <CAHk-=wivHxCcsL=MRRjgVptm1KD=gf7qYnCRfnCWj3YnFUU1_Q@mail.gmail.com>
-In-Reply-To: <CAHk-=wivHxCcsL=MRRjgVptm1KD=gf7qYnCRfnCWj3YnFUU1_Q@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 Jul 2026 15:54:08 -0500
-X-Gm-Features: AUfX_mwvdITxUQT9BxcbWY4QtbKjQIBCXWzOCmTPJsFAKSFhOgfmkXvN2QXWYss
-Message-ID: <CAH2r5muPcE35EKy_+crKHJ_hJoFGf+XKfO=-5-zvstFawxZSMw@mail.gmail.com>
-Subject: Re: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 23 Jul 2026 18:28:25 -0300
+Message-Id: <DK69PZKFFBA3.K1SE3ARGE0K2@suse.com>
+Subject: [BUG netfs] folio changes during io results in CIFS send failures
+From: "Henrique Carvalho" <henrique.carvalho@suse.com>
+Cc: "Paulo Alcantara" <pc@manguebit.org>, "Shyam Prasad N"
+ <nspmangalore@gmail.com>, "Bharath SM" <bharathsm.hsk@gmail.com>, "Enzo
+ Matsumiya" <ematsumiya@suse.de>, <linux-cifs@vger.kernel.org>
+To: "David Howells" <dhowells@redhat.com>, "Steve French"
+ <smfrench@gmail.com>
+X-Mailer: aerc 0.21.0
 
-Sorry about the cut-n-paste error (leaving out the diffstat) - attached bel=
-ow:
+Hi David and Steve,
 
- MAINTAINERS               |  4 ++--
- fs/smb/client/cifsfs.c    |  1 +
- fs/smb/client/cifsglob.h  |  1 +
- fs/smb/client/file.c      | 69
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- fs/smb/client/inode.c     |  6 ++++++
- fs/smb/client/misc.c      | 72
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++--------
- fs/smb/client/readdir.c   |  9 ++++++--
- fs/smb/client/smb2file.c  | 21 +++++++++++++++++++
- fs/smb/client/smb2inode.c | 23 +++++++++++++++++---
- 9 files changed, 185 insertions(+), 21 deletions(-)
+When running the fio write workload
 
-On Thu, Jul 23, 2026 at 3:52=E2=80=AFPM Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> On Thu, 23 Jul 2026 at 13:44, Steve French <smfrench@gmail.com> wrote:
-> >
-> >   git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc4-smb3-client-fi=
-xes
->
-> This pull request was missing a diffstat. I've pulled it, but I really
-> want to see that draft of what I'm pulling before I do...
->
->           Linus
+	fio --name=3Dsmb-fio \
+	--directory=3D/mnt \
+	--rw=3Dwrite \
+	--bs=3D4k \
+	--size=3D4k \
+	--ioengine=3Dio_uring \
+	--direct=3D0 \
+	--numjobs=3D1 \
+	--iodepth=3D1 \
+	--time_based=3D1 \
+	--runtime=3D500 \
+	--unlink=3D0 \
+	--group_reporting=3D1 \
+	--filename_format=3D"$file_fmt" \
+	--output-format=3Djson \
+	--output=3Dsmb-fio.json
 
+on a mounted CIFS share I saw the messages
+
+	CIFS: VFS: sign fail cmd 0x9 message id 0x49127
+	CIFS: VFS: \\win22.bira.test SMB signature verification returned error =3D=
+ -13
+
+After debugging the signed request, sent request, signature and
+recalculated signature on sent request I found out that a folio content
+change is happening between signature and sending the data, while the
+signature is not changing. Some debug messages for reference:
+
+	CIFS: sign-write-req-sig-changed conn=3D1 mid=3D0x49127 hdr_mid=3D0x49127
+	flags=3D0x8 cc=3D64 cr=3D72 tid=3D0x5 sid=3D0x2880074000071 iter_1=3D41943=
+04 iter_2=3D4194304
+	sig_1=3D92eeb2b661423fc65c86401a4c14888f
+	sig_2=3D8e53f3f500d42122183c8c74227520e7
+
+	CIFS: sign-write-req-delta conn=3D3 mid=3D0xccb4 first_diff=3D168
+	last_diff=3D3754 diff_bytes=3D24 diff_ranges=3D8 len_1=3D4208
+	len_2=3D4208 iter_1=3D4096 iter_2=3D4096
+
+	CIFS: sign-write-req-delta-range conn=3D3 mid=3D0xccb4 range=3D0 off=3D168
+	len=3D3
+	buf_1=3D1d5e730f000000000000000000000000b62c7d9d5f374dcc11c33b6c0fd37332
+	buf_2=3D9db87c0f000000000000000000000000b62c7d9d5f374dcc11c33b6c0fd37332
+	      ^^^^^^
+
+`first_diff` above shows the first changed byte is payload offset 56
+(112 byte header) and we can see a 3-byte change there. This same 3-byte
+change repeats every 512 bytes in the payload.
+
+After digging into netfs code, I noticed the folios are not kept locked
+while a subrequest is being filled, and maybe this allows changes to
+this folio even though it has not been marked as ended writeback.
+
+In my case, the subrequest can be much larger than a single folio, so
+netfs accumulates several 4k folios before issuing the network write.
+
+So a minimal change that prevented this unwanted change during write is
+the following -- *although I'm likely missing something*.
+
+If you think this makes sense I can send a formal patch.
+
+diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
+index 210eb8f3958d..bce1f2b80a9c 100644
+--- a/fs/netfs/write_collect.c
++++ b/fs/netfs/write_collect.c
+@@ -63,6 +63,8 @@ int netfs_folio_written_back(struct folio *folio)
+ 	struct netfs_group *group =3D NULL;
+ 	int gcount =3D 0;
+=20
++	folio_unlock(folio);
++
+ 	if ((finfo =3D netfs_folio_info(folio))) {
+ 		/* Streaming writes cannot be redirtied whilst under writeback,
+ 		 * so discard the streaming record.
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index f2761c99795a..cf4e39d593ce 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -347,7 +347,6 @@ static int netfs_write_folio(struct netfs_io_request *w=
+req,
+ 		/* mmap beyond eof. */
+ 		_debug("beyond eof");
+ 		folio_start_writeback(folio);
+-		folio_unlock(folio);
+ 		wreq->nr_group_rel +=3D netfs_folio_written_back(folio);
+ 		netfs_put_group_many(wreq->group, wreq->nr_group_rel);
+ 		wreq->nr_group_rel =3D 0;
+@@ -415,7 +414,6 @@ static int netfs_write_folio(struct netfs_io_request *w=
+req,
+ 		netfs_issue_write(wreq, cache);
+=20
+ 	folio_start_writeback(folio);
+-	folio_unlock(folio);
+=20
+ 	if (fgroup =3D=3D NETFS_FOLIO_COPY_TO_CACHE) {
+ 		if (!cache->avail) {
 
 
 --=20
-Thanks,
-
-Steve
+Henrique
