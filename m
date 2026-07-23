@@ -1,95 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DD11DFDA1
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 00:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E28E30DD22
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 03:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784765960; cv=none; b=aidQXQBUVnCtSHM77edw0QIKU3njfiAMU5M7GA10w4i5xnUqoLfe/aeGQT4/wAGGyNJnhiwx4/sQPgSGAjtFLhBvnqzQIj4qRdFfAVJM7ujFdD+6Th8z6aq9VjTlZDb6xZ9Yh2zQRbqq7zgMwUhSb2tki9VUx00z6uTfasyRRHE=
+	t=1784776664; cv=none; b=SjuvBANLakpKqqjymbfndO4suNAr6mbYh9EXX7PnyKBXJMcqCVC3SNaQq5WyakuNqNAsDgL0xCpbRoAlwb96D4a0gErL5BxVMTfBYvEJeVUy6w+qgKGco2oLzvDBKz61GPyTGEwC3CJyWgARkHKPVJ1ojpAqoZu5zIBP3l/sR4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784765960; c=relaxed/simple;
-	bh=lRoYBN+TxZk9yePHwJjx1fAoXKkUQhu5fZuONLfLj+4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hscQoGE/HiJx6EfELiMO3WxQmlBQxjwQASQyFKZTQ5BHywtL+Pdl1M1o7LfNcb7WeDtrBI8xtTHpOq4h8x7OvzDnmDwqFu3rZ+xg/x3sENNGXcNYVJudaWVTM25R0/JQ3VSCrpVXjXzemme6XY+bol6V32uYmD6rDNob63gcTPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g5SFbReQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784776664; c=relaxed/simple;
+	bh=FRp8S6qzgANY4Oy352WxDj+8zsDwhYqOsjEGzpVQXPg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j+EHIgFpAdypzuRTMjrRof8lGggkqokR4ya2thXe12oCsbTss7qwq0BP+naJ21e5pu042c4QInjTRgwSgHzhK1YYYTPCNBy0af6nP7eQz+UFYEBsc9t9UfCIkijnjBzCdbaLiejEbvTnYGVUw4HAeTyldwrDwqazQM5j/v2eyfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=tc3rXSOr; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g5SFbReQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A9471F00ACA
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 00:19:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784765959;
-	bh=kEMjQns1Y83Joq2sQu0IMYlzpE9WIBdm+SjU5PdDmM4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=g5SFbReQ+3rExs/bG74xieJjUenKys3Ns10TzcmhVXTanLF3RhGtTrkesCxdGae8w
-	 HtTZ99Bijv7j3sx+5+FfpJldhiKNWF+FwxD/JDCJoPHvRt7NkGa5gLjbyNdL8AW73Y
-	 4pV3YZWvIm5TmhrOskyjfvYCXFJY27ShS7RQoAPEadVGJ2tSmzQuHeJqipJw298UbM
-	 K/js31SWtm3XgD8UvK6fnXFX6r18IFv67+0Yz8MrQrYhf/d4Pnsc3fG5ZfxgdHhD7q
-	 +qX6YwU6M+g29ayizyTuAoqeV3RV83bhsw9yvqrYXm9Yty6kIWT4WkXifr9w+46PgJ
-	 wFN0hXq5MkvCw==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c15d111ca99so11659866b.0
-        for <linux-cifs@vger.kernel.org>; Wed, 22 Jul 2026 17:19:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rqh321Bghl/V8So/KVMbP+OJyMu2dE4aZjk1tNQsth5PbLfaV1DasBKXAc312V2CQHg8ZhDbllfqI/y@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjahcUXAExZ0IzA59aP99hDihqJwBmbd6WC6YRJVZi3qROJzFO
-	FwdyH/WBnqSUHGmECsrALgMiADWOyG6/4NWSvJjXZJxt3u9HfCFhP5KN4EFKfk8abNBOakoGbJ5
-	QiXkHPinytLnOBvXwaBManuHMh9jGZY8=
-X-Received: by 2002:a17:906:8f15:b0:c12:979c:5a5e with SMTP id
- a640c23a62f3a-c1c5062db06mr38895866b.0.1784765957650; Wed, 22 Jul 2026
- 17:19:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="tc3rXSOr"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1784776658;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EHHJd+VP49O10L2xwMaYM6af1lZGE7nZcjNIXTQ6JbM=;
+	b=tc3rXSOrmw1zCt1o99VrRHX6zMxidyZ7NdE9RUoSb1e9CoQGI/ASRUO/3zz1NlXhl7xw0Z
+	R8NB4z2xZtcAsFb2trmy0+PZKZj0QytHfaPt92x3PepCfEwpc6tc/r5qfGgR7GbBvoI95Q
+	lPpP8lUy9+/UE17tpdL0p6kmxMh1TTKjlSXre+sodcuunQhh2cC9EoEgpG5/4W5WJCkBK2
+	QNZ17c+QpcaI0Yy/4GpXF7KokWEUCPabfhqfjg7fGvCDrqNbIsSwC6UYdywwbG3SDFoLX2
+	kdSCMaQWMqEkk0xLdng3uVlS18D3lLXyxY6m8P6eS0bXoCcokAaotKO8aCAA+g==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org,
+	gael.blivet@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [RFC PATCH 00/11] smb/server: change notify support
+Date: Thu, 23 Jul 2026 03:16:28 +0000
+Message-ID: <20260723031644.312866-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260722235908.3564560-1-xmei5@asu.edu>
-In-Reply-To: <20260722235908.3564560-1-xmei5@asu.edu>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 23 Jul 2026 09:19:05 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_iJjEWhFQ7tJSDVaK66Lo8TOazAG+798ty5JUPj+bBDg@mail.gmail.com>
-X-Gm-Features: AUfX_myFAFLG4QuyGHrwwIENN2-4jVmMrTDMwnGqrmWexjlti5-D8LE_ilQBANg
-Message-ID: <CAKYAXd_iJjEWhFQ7tJSDVaK66Lo8TOazAG+798ty5JUPj+bBDg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: use copied ACE count when walking DACL in set_ntacl_dacl
-To: "Xiang Mei (Microsoft)" <xmei5@asu.edu>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Hyunchul Lee <hyc.lee@gmail.com>, Ronnie Sahlberg <lsahlber@redhat.com>, 
-	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com, 
-	kys@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 23, 2026 at 8:59=E2=80=AFAM Xiang Mei (Microsoft) <xmei5@asu.ed=
-u> wrote:
->
-> set_ntacl_dacl() copies ACEs from the stored, attacker-controlled DACL
-> into pndace but may copy fewer than nt_num_aces (it skips ACEs with a bad
-> sid.num_subauth and breaks on size overflow). It still passes the raw
-> nt_num_aces to set_posix_acl_entries_dacl(), whose dedup loop then walks
-> that many ACEs and, past the last one actually copied, reads
-> sub_auth[num_subauth - 1] from uninitialized buffer memory - an
-> out-of-bounds read whose offset comes from that stale byte.
->
-> Pass num_aces, the count actually copied, instead. For well-formed DACLs
-> num_aces equals nt_num_aces, so behavior is unchanged.
->
->   UBSAN: array-index-out-of-bounds in fs/smb/server/smbacl.c:651:27
->   index -1 is out of range for type '__le32 [15]'
->   Workqueue: ksmbd-io handle_ksmbd_work
->   Call Trace:
->    __ubsan_handle_out_of_bounds (lib/ubsan.c:455)
->    set_posix_acl_entries_dacl (fs/smb/server/smbacl.c:651)
->    build_sec_desc (fs/smb/server/smbacl.c:776 fs/smb/server/smbacl.c:1078=
-)
->    smb2_query_info (fs/smb/server/smb2pdu.c:6269 fs/smb/server/smb2pdu.c:=
-6339)
->    handle_ksmbd_work (fs/smb/server/server.c:308)
->    process_one_work (kernel/workqueue.c:3322)
->    worker_thread (kernel/workqueue.c:3486)
->    kthread (kernel/kthread.c:436)
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Reported-by: AutonomousCodeSecurity@microsoft.com
-> Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
-Thanks for the patch.
-Could you please check whether this issue is still present in the
-current ksmbd-for-next-next tree?
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+Sorry for taking such a long time to complete the ksmbd change notify feature.
+Over the past few months, I have been busy with the birth of my daughter and
+my PhD-related tasks, which left me with limited time to work on it.
+
+Once Gaël updates his patch ("ksmbd: defer CHANGE_NOTIFY completion instead of STATUS_NOT_IMPLEMENTED"),
+I will rebase my patchset on top of it.
+
+To test this feature, the following patches need to be applied to cifs-utils and kernel smb client:
+  - cifs-utils: https://chenxiaosong.com/lkml/cifs-utils-parse-notify
+  - kernel smb client: https://chenxiaosong.com/lkml/cifs-improve-notify
+
+The complete kernel client and server patches are also available at the following link:
+https://chenxiaosong.com/repo/linux/ksmbd-change-notify
+
+ChenXiaoSong (11):
+  smb/server: add debug type for change notify
+  smb/server: validate notify requests
+  smb/server: support canceling notify requests
+  smb/server: watch directories for changes
+  smb/server: keep notify watches on file handles
+  smb/server: save simple notify events
+  smb/server: save old names for rename notify events
+  smb/server: match rename notify events
+  smb/server: encode notify events
+  smb/server: send notify events to the client
+  smb/server: break directory leases before sending notify events
+
+ fs/smb/server/Kconfig     |    1 +
+ fs/smb/server/Makefile    |    2 +-
+ fs/smb/server/glob.h      |    3 +-
+ fs/smb/server/notify.c    | 1011 +++++++++++++++++++++++++++++++++++++
+ fs/smb/server/notify.h    |   24 +
+ fs/smb/server/oplock.c    |   40 ++
+ fs/smb/server/oplock.h    |    1 +
+ fs/smb/server/server.c    |    2 +-
+ fs/smb/server/smb2pdu.c   |   12 +-
+ fs/smb/server/vfs_cache.c |    3 +
+ fs/smb/server/vfs_cache.h |    4 +
+ 11 files changed, 1095 insertions(+), 8 deletions(-)
+ create mode 100644 fs/smb/server/notify.c
+ create mode 100644 fs/smb/server/notify.h
+
+-- 
+2.54.0
+
