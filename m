@@ -1,32 +1,34 @@
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDC5370D43
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 04:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF983537CD
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 04:12:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784779953; cv=none; b=YNhkz6XYu2qY8Ri+/c5WFB6HDpXr8hq255nMCtZ4BybMjrrKG0u/Qu9hdR2H+nWYUcm/FXjIUD9A4PQ4ximv4ehhBV99sBeflYrCPXsme1W+DcWD0m2sCRjpnnCeTzPvBXzOyz3OfwCIl1eDpKBbe2fUY8m1fnHcPWDYmRXQwUg=
+	t=1784779954; cv=none; b=UHQ1KbDhVfAnsnbxtm3EtLk3iOd/xNJb/nmHfLweNYnuhY6j66pAT9s6XgJTzBiRtYIfwMDGTh8pGhZ7qI2YB8SJNNA37/kh0eEgG3bBDTvTrYwOOI1H0NDHGryWJToc4MomgMB13WSOIW1+lA6PTo6PFlMkixDs2uAAFOEY8+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784779953; c=relaxed/simple;
-	bh=B3XAlMsed83LmvvvqsTH7X963zfUJTrCb0UR1fn8GhI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CUU0yq3Hv6e+PgondTtpJkWLCLw9dLLfzXYU5A70XozbomDwJjpXA8yZcz9Vdhw0k4cjZgESjZae3LVczCpsYIs4TZAsU6TQ23gbvEM85ryJi9TH0uGotdoAX9TymkneB3eQ6J2R1JOAnKWSU5wjgeGumKMNl1xFf+j5maBv7Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=QQZbYeNb; arc=none smtp.client-ip=91.218.175.179
+	s=arc-20240116; t=1784779954; c=relaxed/simple;
+	bh=gmrogdQbicZMN45sMOq1TtBRAbr0ZRkmQoO0Z5QZInw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VeByv3iU36YRfooZdbpPyJ4AwfhOEFiWbuVw2r/gnfBLxixZLXuOzcB0YHcWo6TjQ3tl7iELyTzPiyNbnQqtzMOR5II7xv3tlSf2UN6on9ShNkx2waNPJHHV1qvEs9Z3bo3KHrR8TYFTpLHWZ8jc3SVLCT8chPSDy0ugvZlytQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=uhMFnM5D; arc=none smtp.client-ip=91.218.175.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="QQZbYeNb"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="uhMFnM5D"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784779913;
+	s=key1; t=1784779929;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qmsB+Lu10SkM7Sq1mpkbWP9UNPJcsnPrmZghiq5T/Zw=;
-	b=QQZbYeNb5kGffzKwHCXUDgF66VwClvFhOqelugc2PuiIZfUS0FEZ9ugdBeFjmIc17+vK1P
-	NCzSn0vK0TI64/vTCdSIZhcsQrIIbqPld62fJOgr/KC81PLokAt6cMX4DhZboPetZs9df5
-	MJgvAkLf3NI4O6/RFRG7YqP5pSBpWPYlAH9VZFe452WzDOaPlPc//jt8CUmgeBnNABm6dP
-	wMyTY3WvA6dtnQaGpDzH0dtT3DqqC8bvbXuv71LXZEMQtiqWNlt9egkRbZLMu63b0BBbxC
-	CuFAxo+sXNuAm172nsvx+luoKLji6GR3GK3YI2+bl5FghLjsG3UTHBzQiAbQvA==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VGx6UV6+gA9xd8hoZVw9lgweWesBd4atmQllqKlNq98=;
+	b=uhMFnM5DoITJFXp/oR6g0oeQ22VYg+xSnvVLfB96vkbYiE8WIfiEVYSFNgjEL2crqqZRzw
+	LpyTxsiCmeR3nnFasRSD7M7v3WVkrbQoeb04FGCAGoDOielpNV548mzfxQUp4yemKIAXbo
+	DwdYMTgkJg6jIjAI1O1aDdH7mSwJDjm6rsjXkJiGvmcsqBhu+JEQ5mQpG4zvMBlU9ahiy6
+	SI/1Eli6E8xl5FdbBa8ik3YMGMa2mdfPhl9FK7L3YVjR2B3wAp/OCsW9UWeKJzvIcnzXnw
+	bhYpcygk07Afkk7eJahCymEmp933/pXNQwmBuZJPk7EGGXf5rnicF3EPD4MWVw==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -42,9 +44,11 @@ To: smfrench@gmail.com,
 	andriy.shevchenko@linux.intel.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 0/3] smb/server: fix some bugs in preparation for change notify support
-Date: Thu, 23 Jul 2026 04:11:28 +0000
-Message-ID: <20260723041131.313321-1-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v3 3/3] smb/server: stop new async work when closing connection
+Date: Thu, 23 Jul 2026 04:11:31 +0000
+Message-ID: <20260723041131.313321-4-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260723041131.313321-1-chenxiaosong@chenxiaosong.com>
+References: <20260723041131.313321-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -56,26 +60,58 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-v2->v3:
-  - Patch#01: use WARN_ON_ONCE(1).
-  - Patch#02: use list_for_each_entry_safe().
+A new async request may be added while a connection is closing.
+The close code may miss this request and wait forever.
 
-v2: https://lore.kernel.org/linux-cifs/20260716001156.671587-1-chenxiaosong@chenxiaosong.com/
+Check the connection state before adding the request. Return an error
+and release the async ID if the connection is closing.
 
-I have implemented the ksmbd change notify feature, please see the following link:
-https://chenxiaosong.com/lkml/ksmbd-notify
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/server/smb2pdu.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
-However, to make this feature work properly, some pre-existing bugs need to be fixed first.
-
-ChenXiaoSong (3):
-  smb/server: fix signing when a response uses more than one iov
-  smb/server: cancel async requests when closing connection
-  smb/server: stop new async work when closing connection
-
- fs/smb/server/connection.c | 21 +++++++++++
- fs/smb/server/smb2pdu.c    | 75 ++++++++++++++++++++++++++------------
- 2 files changed, 73 insertions(+), 23 deletions(-)
-
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 54327f8362db..0680222a8da4 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -1001,21 +1001,27 @@ int setup_async_work(struct ksmbd_work *work, void (*fn)(void **), void **arg)
+ 		pr_err("Failed to alloc async message id\n");
+ 		return id;
+ 	}
+-	work->asynchronous = true;
+-	work->async_id = id;
+ 
+-	ksmbd_debug(SMB,
+-		    "Send interim Response to inform async request id : %d\n",
+-		    work->async_id);
++	spin_lock(&conn->request_lock);
++	if (ksmbd_conn_exiting(conn) || ksmbd_conn_releasing(conn)) {
++		spin_unlock(&conn->request_lock);
++		pr_err_ratelimited("Failed to setup async work: connection is exiting\n");
++		ksmbd_release_id(&conn->async_ida, id);
++		return -ESHUTDOWN;
++	}
+ 
++	work->asynchronous = true;
++	work->async_id = id;
+ 	work->cancel_fn = fn;
+ 	work->cancel_argv = arg;
+ 
+-	if (list_empty(&work->async_request_entry)) {
+-		spin_lock(&conn->request_lock);
++	if (list_empty(&work->async_request_entry))
+ 		list_add_tail(&work->async_request_entry, &conn->async_requests);
+-		spin_unlock(&conn->request_lock);
+-	}
++	spin_unlock(&conn->request_lock);
++
++	ksmbd_debug(SMB,
++		    "Send interim Response to inform async request id : %d\n",
++		    work->async_id);
+ 
+ 	return 0;
+ }
 -- 
 2.54.0
 
