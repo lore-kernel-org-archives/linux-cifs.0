@@ -1,164 +1,91 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8A0345EDF
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784839607; cv=pass; b=rAkI6mn43rWNWhn2hZDoQ08svWj45nAUMT5kWV+AGjVcudMxlg4yAVZUTJJrfHtB4tO9VviTTiVar+Mit0mLPlKwhGMBG/NcQhPtIurGfyIqZHPyt94AUwxr2v9E+lC9h+PJhCR+I+wzFBPtBm42ivFGRHKIcvaMRrqs9l7r1Oc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784839607; c=relaxed/simple;
-	bh=KUvOsNmzNI+Z/LrxJo5SAo8Wujzvq7eTFR9R2/hDNzw=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D7D331A41
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784839929; cv=none; b=bjaql4ysuYi18zhcgg0DVyQt4FMoH712F+sJ7V5uJNSxxTonvNi2Z5kPKuWEfLNERtHDfIs0QyPQVxjVk2b0nL5oUfOq2Pq6evUU31cECaU+0cvDiecEy7nJzvi/K+Daak7DueNo/fyPOEvT4elWe0aE9UU8dQbQOTymNw2x8+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784839929; c=relaxed/simple;
+	bh=u++yPO6YlIVuBQPjkd/9269C31X2LLHEbNePSWjTCU8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mq0Af1Zw5Sgsu2nK9ZtAc93LyfEzW1kxanlNz3SA8OqQM+FGS2ELuZHTx8zUf+0OgUK/87ewj5zwtZHOCMKMx/wVhXKEL5dnGVYngqgv/yShFiEyHgGsF3caiPa3zk+S24Ueaq5BpS+C+iIdwh/YxfzaBk930fO4QE7cMpf3lOs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p4zI7vSt; arc=pass smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=SN2pqlHo92eWgn6qoWVFj7DfQHl+1sp/ajLQ30vg0NI/McHE0dbmYGZMHYcVGrtCx2HyLw038v/4/2xPG1bRjUe3d5h4CHV0HLA3yKEDjazGmByFcnp+wxrlBda6rgaOTkXBgMpgGBZeWZCG/zC6Edq9Ek8uWAOaTJky7NXixRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=QFJiIAqj; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4zI7vSt"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8fcc43c48f7so12688766d6.2
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:46:44 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784839602; cv=none;
-        d=google.com; s=arc-20260327;
-        b=blF/wOt1ZHGNk2tDv8230zzA5nsClG3DJdXbcPsqykg3TtGlC/r06fsM43L+1r15xf
-         PfyrdFhsI894Z0cJeuHnKFNoYiWYa+ukjMH7dqMaU9AwlZEem33CvZDY1/V7kYVT9BEm
-         jeS90r6BfxjWgm69K7MfnHjefT5gdGmIx7rTqIfYIk43Hl41ODSrb1TZ+0H0OztYSt9c
-         /sI9GTV/MLMdS7rnoViR8mYZbOGjsZ7xtJXDj5qfZLjxznSFfyshuq4S10xO46GaM82G
-         fDspnvoVhdWJzOSNjyLAU/2Pvb24+xI0LfB5lVuWupIdhG7eXXB/c3mHJpNRZOY5ljYp
-         qwKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=RO1ALo6rGvkRZzMPDR0dwgnWLVZ7z7ClwqPFL+Bi9NM=;
-        fh=YeDnXYw2yJuFkO/zmtuGlENCFPudUGECmIg1gsW/Qds=;
-        b=RCAvK5zlkiBvZ3TK4ZJHlBHPS+v3QVRFzWMinPko/H2d1J722XH1bqzKN+K6A0/wvi
-         wEDgesubLetOEs2Fmguki81QU2G2hgsAuaBPbCt+AvX8MY/vj5ZtwZsTasHYHcom0H/U
-         61Ftf+81rebK+p+A7v4oyHwCu2iL1YAMC1jGkbc/d0+cAdKB9Ts+fbKbsozxuO5V0jD4
-         nsOG7mRnxBK4DLQJQl+HHlagsmFyXMCw8nTqzbdgIekii7du8dF4b3ge4EF7ElkeOOgh
-         NFu796Ia31QClpvKPg+CNrrPObY+7U/HXRHoeM8jpsSMwCowsEhg9/BLe40TXYN2x7aS
-         ef5A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="QFJiIAqj"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-69c1220bd51so1831806a12.3
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:52:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784839602; x=1785444402; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=RO1ALo6rGvkRZzMPDR0dwgnWLVZ7z7ClwqPFL+Bi9NM=;
-        b=p4zI7vStlkZe4g0KCiW+kho9IEYqXsAvecUPtQ+q8bK0nX/oFh2wvQB9kLr61YAPoQ
-         q9CptxmZLrxfMs80jd8Nq/18QviEB+XyMs0weWi4oW3g+rkFHar5smId3lzxpWC93egS
-         DexnLGznfVnnnz1DOBYBdtmpbLto5NwBZTbl2EoDCU/o6bVjDeqdkwVloJrfXWiqN8Ep
-         R3G65lqz83ZGEpweVhzlt0y4sXrdlZ9rZKPE8Q3RZmzWw8xTYGYrE8nih3dBBLjg9rpc
-         Bm6LoYffvGv7bJGo+4jkuyCQa2vmeL5/Tx20+VhvBCHqfetSB+2S/slX7gQD4OsTHpdZ
-         lD3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784839602; x=1785444402;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=linux-foundation.org; s=google; t=1784839926; x=1785444726; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=RO1ALo6rGvkRZzMPDR0dwgnWLVZ7z7ClwqPFL+Bi9NM=;
-        b=Wg6OQqDc2cA4VGxMr8ChnHzJBDc6h5ilpHTlny+af+NfQZowyYITGLpikKIl1bwuZW
-         DUEOiBW7ywUBufeUcE2mEqTLc3gLwePfbtyoz04b/p/UVySnodsT84yVvziHdurzit1X
-         PErh4VUWynR3mqxo/OgC16s9c/gUdFFukh7k7gtSQgZX/6az/Gw9j9L/5e9THTYUmjQ3
-         JN2EX6+MdLvl3ug1hZ8S00ho5t3foxkJRPlRIjHSFEBDd0m5iM2FlKF99vOn6lG+JxDt
-         xNWdaE8HLECl+8591hVw832HvcmBoPQTqVkxLoTm2q/deibJzUlYheEWEPrUFs7qNVZn
-         wJrQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrGhRuNzK3G7QRX9UqvXpGCYhVgnQpy9zxlfvyIG4OUmmQO/h9bGeFannaMiSXjsFUqyg3jmVA61PuG@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0ADWhJMTGBu8LbFrSSvcweh++ZuG6cgcGcNaf6skYj5c5Us8j
-	/yesCk/0eMhUm88p7gzRjvtrmZGD0YXct7dQu48/eEoe6S5WmcizCYK940Q58yKcd3RQyhQU5Qf
-	Gf4iVInf1d0cZEQdMeqoiA4fnqZf580g=
-X-Gm-Gg: AR+sD13bvRt6HwjNAawrBmlpioYt8N8tAz6SCBIstryGusc0nWiWw7zocVZbxk4V+rj
-	cuGQdvPuHigW75kVQc5sjW3MS8xNJHzGsxKRPjyBHn4hDB9eMKaZcVowg/Xe1KIDzpV2paOmvfR
-	8gAI60IbN7wwRuUzD9qQmLWRtFuEnwcm6buIu9TsaeyCyB3SIA2+kwsMcmh+8C1+X7VvCRVUQiV
-	YeOZn0pg5BhDQ1oB9+C1IWiSndnb/kGxf5ZUAWH9HcRxxdi+zgVkuCG/5pe2vO2PypFowZXxf81
-	sy2K7uk++5stHmUYLcQuMefKvcSrvnxPYF4taR5wKfR/WPw9Q2oJfoLNPsI+VOCgflgOz92Thn7
-	JfLnlEJXvDYQa43v+FjLDZPfKa6jirUzSsLeuq7Js+YOTYGzEEhWR1Kh4fRWHRoyB9aqOsfzICB
-	Y=
-X-Received: by 2002:a05:6214:4382:b0:8e0:16f0:28ab with SMTP id
- 6a1803df08f44-907ca24fe91mr57082006d6.11.1784839602163; Thu, 23 Jul 2026
- 13:46:42 -0700 (PDT)
+        bh=wEYGw+CgSbhLcefnxlBQYKksB6rpZbF93UL27O3lGWw=;
+        b=QFJiIAqjo9ec2aJ+pKiemb74AGJi8WzzWw7pot8Ye319x5y1XL0FlH1vlUSNw3SHNg
+         FkENFCvj9Pr7sFemIntqJ75k3CYRwORI4dsIy9bRySEhaXb9E5xRvSqEJLLq9+hdPNYN
+         0dtNtDwPf56rKMveCcd5hR9CoZTyUI1siYS8U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784839926; x=1785444726;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=wEYGw+CgSbhLcefnxlBQYKksB6rpZbF93UL27O3lGWw=;
+        b=FWYu8QpWvS4aLxrjfQibGEy/L7GttyPsOrWH/7pENEV7ga2gB26N4O39Ly7OdQOmGg
+         RsaI/ff/PMnBOh/Ei5Csk3j5gaX/1ZkEWqYm79Uqw4xrSvLjTYo9mPs/+UHq3t5mIWZM
+         /L3lrBy8HnXX6wyzLT8gX0xWefkJ2zkn2vibNehbriMuVMB5vtSrjPmw2VK/CZX/Be7+
+         v4B4JhKs83bfPMdbHUtHJvJ3tNHuRejTQbbQCc8wKYibOBb/vecExLYq2ZiIl/koGiyP
+         fd0/wStxPpiu7riDN+qs7dMhVM3Fvm0+Z3YiePAXLbuh6NhVmYZTjDwJAOAaDPaLcUMS
+         IRjg==
+X-Forwarded-Encrypted: i=1; AHgh+RpDxGMnsDC5/9tVwQNmbkSYSObCFzx+Uaw3bHcmQZRah3NFl8WCCwFNG7PDnMg6onpDCyRQrIqrGK/o@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN2BgPzX/+XrAIYwknj1kQD3O6M//HEXBu19tWKQvoGKt81vxR
+	IhOaaub4cVckjoEzWTFR7w7Gk6tRzbUN8zm0hgYg/BAI2bi0g+C9AQUH/h79OOMBM2pOUaThrwO
+	emI4934w=
+X-Gm-Gg: AR+sD10+tZQ1BNGID6XrjXFpcqBMhimLOQ60PXOyAFnGUCkCmnlRs/Z1IWuH1SyYqF/
+	RH+DPPFmLNMbGyIHOyN2wi8Wf6d0+8KvRjb47+2PA/9XJV+iLRYP89miUo4aEF2AgSV6sWrpwHe
+	q83J0oI/hzZ3eGUztdyAKEus/pE8XWI0Nhov/w7/EoOcsq/2H4RextQ+RuqiQDrHx98JDDOzm9w
+	W/UsPKArrlif8FvR1hKfs2Uz0F/FvXojpuFVQ42pqwoJ7CYDWT4BeJtLgSBlLdu1PAkaL5JzeZK
+	mk+eWVq/kCBBXpO/DFs66AdY+ktRC3XbGTcZZx9NZwvkhnQJlTQae8TrrRmebFaabVqk+CVganb
+	tb8qKAUgXqQrfsKcE0exyWJga6rPkLIL0R6bE4prsahOnzlpUuZM4Nd+Puwqtff3HSRq6NGgIpM
+	beaBDfOmCemqcfS8e/DnkZU3QlHFBupK5dNpsqTkjBjPw4JW3gBvM=
+X-Received: by 2002:a05:6402:4555:b0:698:99be:29d6 with SMTP id 4fb4d7f45d1cf-69f6c4ef29dmr1344899a12.29.1784839926166;
+        Thu, 23 Jul 2026 13:52:06 -0700 (PDT)
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com. [209.85.218.53])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-69f34f1c824sm2563738a12.19.2026.07.23.13.52.05
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jul 2026 13:52:05 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c1c52d920b8so152173766b.2
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:52:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoO+lRqwggY2YgClN21fnWwZeRT5HsKM7j83nSvUhlPP8jaqiMFQlNYJvm1B5AKOYBz1AwAdixcQu17@vger.kernel.org
+X-Received: by 2002:a17:907:98d:b0:c15:bea2:d209 with SMTP id
+ a640c23a62f3a-c1c506e8a4cmr182834566b.4.1784839924942; Thu, 23 Jul 2026
+ 13:52:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260722211844.123697-1-FredTheDude@proton.me>
-In-Reply-To: <20260722211844.123697-1-FredTheDude@proton.me>
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 Jul 2026 15:46:30 -0500
-X-Gm-Features: AUfX_mxl2KecmmKACnrpTXiw6GL0t8wes6MChB0-ufnUqzm6_qBP2n26Pxb1ulk
-Message-ID: <CAH2r5mujqOXko8yWpBM=DTr=arSBGEUd0HqGETRd+kiX8DVMgQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: use GFP_KERNEL for registry allocation
-To: Fredric Cover <fredric.cover.lkernel@gmail.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAH2r5mu0Qi4c8NprbnviCv5whzqGuzriVT6qShQ91=Kx4=T3Zg@mail.gmail.com>
+In-Reply-To: <CAH2r5mu0Qi4c8NprbnviCv5whzqGuzriVT6qShQ91=Kx4=T3Zg@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 23 Jul 2026 13:51:48 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wivHxCcsL=MRRjgVptm1KD=gf7qYnCRfnCWj3YnFUU1_Q@mail.gmail.com>
+X-Gm-Features: AUfX_mxoW-6rmt3L7jwgMSBO36G04Dz8j7e4l-Q3w0gjZPuGq0IO1MwIL4gANnc
+Message-ID: <CAHk-=wivHxCcsL=MRRjgVptm1KD=gf7qYnCRfnCWj3YnFUU1_Q@mail.gmail.com>
+Subject: Re: [GIT PULL] smb3 client fixes
+To: Steve French <smfrench@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
+On Thu, 23 Jul 2026 at 13:44, Steve French <smfrench@gmail.com> wrote:
+>
+>   git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc4-smb3-client-fixes
 
-On Wed, Jul 22, 2026 at 4:24=E2=80=AFPM Fredric Cover
-<fredric.cover.lkernel@gmail.com> wrote:
->
-> From: Fredric Cover <fredric.cover.lkernel@gmail.com>
->
-> Currently, cifs_get_swn_reg() allocates new registry entries using
-> GFP_ATOMIC. Since we lock a mutex here, this is clearly not an atomic
-> context. Use GFP_KERNEL instead.
->
-> Also, fix a minor grammatical error in the comment above the function.
->
-> Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
-> ---
->  fs/smb/client/cifs_swn.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
-> index 9951817d0d7f..fe10719e627e 100644
-> --- a/fs/smb/client/cifs_swn.c
-> +++ b/fs/smb/client/cifs_swn.c
-> @@ -425,7 +425,7 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct =
-cifs_tcon *tcon)
->
->  /*
->   * Get a registration for the tcon's server and share name, allocating a=
- new one if it does not
-> - * exists
-> + * exist.
->   */
->  static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
->  {
-> @@ -443,7 +443,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct c=
-ifs_tcon *tcon)
->                 goto unlock;
->         }
->
-> -       reg =3D kmalloc_obj(struct cifs_swn_reg, GFP_ATOMIC);
-> +       reg =3D kmalloc_obj(struct cifs_swn_reg, GFP_KERNEL);
->         if (reg =3D=3D NULL) {
->                 ret =3D -ENOMEM;
->                 goto fail_unlock;
-> @@ -451,7 +451,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct c=
-ifs_tcon *tcon)
->
->         kref_init(&reg->ref_count);
->
-> -       reg->id =3D idr_alloc(&cifs_swnreg_idr, reg, 1, 0, GFP_ATOMIC);
-> +       reg->id =3D idr_alloc(&cifs_swnreg_idr, reg, 1, 0, GFP_KERNEL);
->         if (reg->id < 0) {
->                 cifs_dbg(FYI, "%s: failed to allocate registration id\n",=
- __func__);
->                 ret =3D reg->id;
-> --
-> 2.53.0
->
->
+This pull request was missing a diffstat. I've pulled it, but I really
+want to see that draft of what I'm pulling before I do...
 
-
---=20
-Thanks,
-
-Steve
+          Linus
