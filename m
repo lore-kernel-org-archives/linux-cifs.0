@@ -1,139 +1,164 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36A244C50B
-	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8A0345EDF
+	for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 20:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784839494; cv=pass; b=f4kRP6CM9eN4Uj2ucmpRt4KkKuLMrYdzp3gsCfApf5Em0pSXRrKNv6mXxMVktjOvJkpbID5vwSIVfoskkGA46UAUiV/uSgjZEZ+4+RlP0WOyojosGFVqVFGdzrXQ4SuDHInL5kAy+VUbC8crSKZhPWX7SQPADleaLL9gAJeWWhw=
+	t=1784839607; cv=pass; b=rAkI6mn43rWNWhn2hZDoQ08svWj45nAUMT5kWV+AGjVcudMxlg4yAVZUTJJrfHtB4tO9VviTTiVar+Mit0mLPlKwhGMBG/NcQhPtIurGfyIqZHPyt94AUwxr2v9E+lC9h+PJhCR+I+wzFBPtBm42ivFGRHKIcvaMRrqs9l7r1Oc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784839494; c=relaxed/simple;
-	bh=4h/Rf7jmgBKlxfGQ2Y+qvpJ4DaieJeBuYuPU0q8Jqcg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=k0QqSjwYlDgMr8gjU3tN3NyYHHWuiRBhbQC3D4MpvViNzKdFzRiEiQp/cRAHEy+ilHdqfzlH1gdzDcIgggjhW9cxgDsj69rZmAeQl1I4pHfRDGEni1ABv7w+77lZ10xxv0DeLBYupAgOPu+aG0pJRBgLmH9OIyAp1UVKaQQw7kE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mloaTZn0; arc=pass smtp.client-ip=209.85.219.49
+	s=arc-20240116; t=1784839607; c=relaxed/simple;
+	bh=KUvOsNmzNI+Z/LrxJo5SAo8Wujzvq7eTFR9R2/hDNzw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mq0Af1Zw5Sgsu2nK9ZtAc93LyfEzW1kxanlNz3SA8OqQM+FGS2ELuZHTx8zUf+0OgUK/87ewj5zwtZHOCMKMx/wVhXKEL5dnGVYngqgv/yShFiEyHgGsF3caiPa3zk+S24Ueaq5BpS+C+iIdwh/YxfzaBk930fO4QE7cMpf3lOs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p4zI7vSt; arc=pass smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mloaTZn0"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8ff20870ac7so10738446d6.1
-        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:44:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784839490; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p4zI7vSt"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8fcc43c48f7so12688766d6.2
+        for <linux-cifs@vger.kernel.org>; Thu, 23 Jul 2026 13:46:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1784839602; cv=none;
         d=google.com; s=arc-20260327;
-        b=WXvpmhY3eRrk97JepGi5y7icVJHqCiFUSf1yfV/I7vjf5cjtpKEpyQL1uQiYgKqc/W
-         +mn5Wqgfd0sSET+G+oOgGND2JtGjnGnr5Hf+f39W3LishYvbrtaEv9P5YYfqGVQ8O3ub
-         pkxW2844zjNC1hfpUzJlw6kqXZlCSUfHCOjmymbDcv1FdljPNa+DIAPBYUqHSgb8XlUi
-         o41bSD/442oNew7LCc1ADPhiu5wb01pouiBsVD4p/ja+JQQVRXfJVDlVN97AWudmep+M
-         xs1qs9Q7tZ4ZxWwKfzR6F6s9vntYjYRSqnwdNDwNRx8n8d3pB63+XoKEnFSAG27WRj/l
-         yVPw==
+        b=blF/wOt1ZHGNk2tDv8230zzA5nsClG3DJdXbcPsqykg3TtGlC/r06fsM43L+1r15xf
+         PfyrdFhsI894Z0cJeuHnKFNoYiWYa+ukjMH7dqMaU9AwlZEem33CvZDY1/V7kYVT9BEm
+         jeS90r6BfxjWgm69K7MfnHjefT5gdGmIx7rTqIfYIk43Hl41ODSrb1TZ+0H0OztYSt9c
+         /sI9GTV/MLMdS7rnoViR8mYZbOGjsZ7xtJXDj5qfZLjxznSFfyshuq4S10xO46GaM82G
+         fDspnvoVhdWJzOSNjyLAU/2Pvb24+xI0LfB5lVuWupIdhG7eXXB/c3mHJpNRZOY5ljYp
+         qwKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=CDopvOj4k9WArHgo2doJqHaZGmsJBI+a+mdyRi5Y/H4=;
-        fh=461vqIZoOg6NIbk+pdwtgJzufnhC0zIzeuKytqfZhTk=;
-        b=beFLGvZxYerqhMZVMkra/ITW0SG0wzmCB4BYxj/hgC7EJk8tHmwWTgCoTTQiUT2ghU
-         k/pytgIK8+Ycl6FIm+VF2YMJBm6hvu53X3pjWmvm7CNTpAh3sHV6ZGEfUKBTL/IcLboK
-         a7JLIS/C0CNsUw8vdQi4qwWRG0Nfx6gC/MnQOJfA70r8bjUp8ozML5gcpDCeiBdixS2w
-         Olf4v3FyyyeemW/5UXtUBKE2bPE1/IXvVRx7snP2fH8Z2pLxHkmNy/vaToXaf3Wcf4Nl
-         oLMAD1O5U/PGPrl03cneiglEb0j112L/5+gnHP+KqgJPebTk1xtQLm8VeIjmTIp1DHL+
-         vxig==;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=RO1ALo6rGvkRZzMPDR0dwgnWLVZ7z7ClwqPFL+Bi9NM=;
+        fh=YeDnXYw2yJuFkO/zmtuGlENCFPudUGECmIg1gsW/Qds=;
+        b=RCAvK5zlkiBvZ3TK4ZJHlBHPS+v3QVRFzWMinPko/H2d1J722XH1bqzKN+K6A0/wvi
+         wEDgesubLetOEs2Fmguki81QU2G2hgsAuaBPbCt+AvX8MY/vj5ZtwZsTasHYHcom0H/U
+         61Ftf+81rebK+p+A7v4oyHwCu2iL1YAMC1jGkbc/d0+cAdKB9Ts+fbKbsozxuO5V0jD4
+         nsOG7mRnxBK4DLQJQl+HHlagsmFyXMCw8nTqzbdgIekii7du8dF4b3ge4EF7ElkeOOgh
+         NFu796Ia31QClpvKPg+CNrrPObY+7U/HXRHoeM8jpsSMwCowsEhg9/BLe40TXYN2x7aS
+         ef5A==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784839490; x=1785444290; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=CDopvOj4k9WArHgo2doJqHaZGmsJBI+a+mdyRi5Y/H4=;
-        b=mloaTZn0NwRIl7UzKNx+hygpLTO+pTvwCk5jA6TW4Fm7XSY9a2z3WiRRLUM+yOwnqy
-         vfcC0Qjm1rM1x0/5GnLwkyyC6TSuFLCIRfXMmSaV+wnK3qxC1Fu7XUAeJuho3PkehGyF
-         zVTd2zhR+SGOsPgDJJhqEf/jagUjJlSOU+KwDniaMfQfWk+hmCJD/Xh2FW9HiVac+pX6
-         qdwPGp78wNtLm3WAKFUzVQmIxiY/Exi0CsrwNQhCXEToUUojqPxnbCn2UBxUixWdfCBi
-         A46YtqPKqst1Lzz7DDkFkaliQipKmJ9WZ6zWy3VfXRSpiXG65iT6JS7wPx/H7sLu24Sf
-         gPbw==
+        d=gmail.com; s=20251104; t=1784839602; x=1785444402; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=RO1ALo6rGvkRZzMPDR0dwgnWLVZ7z7ClwqPFL+Bi9NM=;
+        b=p4zI7vStlkZe4g0KCiW+kho9IEYqXsAvecUPtQ+q8bK0nX/oFh2wvQB9kLr61YAPoQ
+         q9CptxmZLrxfMs80jd8Nq/18QviEB+XyMs0weWi4oW3g+rkFHar5smId3lzxpWC93egS
+         DexnLGznfVnnnz1DOBYBdtmpbLto5NwBZTbl2EoDCU/o6bVjDeqdkwVloJrfXWiqN8Ep
+         R3G65lqz83ZGEpweVhzlt0y4sXrdlZ9rZKPE8Q3RZmzWw8xTYGYrE8nih3dBBLjg9rpc
+         Bm6LoYffvGv7bJGo+4jkuyCQa2vmeL5/Tx20+VhvBCHqfetSB+2S/slX7gQD4OsTHpdZ
+         lD3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784839490; x=1785444290;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=CDopvOj4k9WArHgo2doJqHaZGmsJBI+a+mdyRi5Y/H4=;
-        b=HknGHTLycHeDPjN4LiDeNbiq545RzOFH5bNDg3UrcEanMchSnQTSIBW9MamPGN2f4u
-         HjS8wg+zdCc/wbuZHjEDwd9Xs6f4LpmljaQM5oaPPY3Yem0SBOCEhYRUrxpyrJpfYH3e
-         826eqOSz++kyFr3FTySn3EGP8f3s33km1KtXhpbqgshjRnWP404adf4M5sfroLhKMRFw
-         /wJcPPHDW9y4HEDL49P8A6Nc15mP2ESWAmiUFvOQjqSo4fCI1DkT7U9A4L0mp6If23Ls
-         Hm7fcxe534LaWYGobac5fqhGNmI0UoTUm74ykVx01zqZ5zPBHf6R5EikI6Uqkqnc0WDT
-         +2CA==
-X-Forwarded-Encrypted: i=1; AHgh+Rpb/ILJ7PjLU7SWRDMPsLqZNdKmunOwjgRJS72UPSVsrix0Ra5tgyQst6EFSUdxF58YIKPtKXA3O6L5@vger.kernel.org
-X-Gm-Message-State: AOJu0YwahI2cZrYtIEXPFJPgCdZqvfSNMSYrP+/LhuO6bsqfzBhHa3at
-	nvA75TmGMxf1Wh/M4RZYACd83t/w0YGLjwt7LDDUxTa0e/5HFPIsnncI0uDG72ZN4EanVd+gWXx
-	X8r3Xz4v8d2TQi6OYBCFNwfhVFlsYT2vsPnR1z/U=
-X-Gm-Gg: AR+sD11+PnsK/mh+tKq8spuQVeTsXc+daJ5sSNkWn9JrvTfmiFNSSVfBL9KWQFfva3k
-	i175QREACznrdIPW/NkUJUicPVWaDVrLWX+ciU1/wh/L8OZRDpXgljIKl8NrajSsvMrD4QOOAz/
-	uwrJ/DqD6/05I6Ac+/CZxG8ArDLpQSuIGNd6zqIuN1ZyP5QrA2nBfbl536kXBHfDmTsxSnYJ4VS
-	Es0X3X7xsZohzB7u8pZQyZCs2dLoj1FK3WkBYeh00y/Xl3IXMQ/GvQT2ZHmSF8h+wsy1eh2Pxgr
-	93KzTvoBGWl4k9uNj+zo/lL+V0x30tJPYXNAYSlWWTzhyk2ROkarmihxKeN1NZp5lxznCJKtDy0
-	XhQ3O8XMIrYVfNWjCjxadCyEZRSB+9f7dFd/XgbEMRXgnQTxmUWEf1S9eDunJhdi7itiRIu2i/d
-	g=
-X-Received: by 2002:a05:6214:5bc7:b0:8f1:4bff:3a55 with SMTP id
- 6a1803df08f44-907ca5e760dmr53578546d6.38.1784839490227; Thu, 23 Jul 2026
- 13:44:50 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784839602; x=1785444402;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=RO1ALo6rGvkRZzMPDR0dwgnWLVZ7z7ClwqPFL+Bi9NM=;
+        b=Wg6OQqDc2cA4VGxMr8ChnHzJBDc6h5ilpHTlny+af+NfQZowyYITGLpikKIl1bwuZW
+         DUEOiBW7ywUBufeUcE2mEqTLc3gLwePfbtyoz04b/p/UVySnodsT84yVvziHdurzit1X
+         PErh4VUWynR3mqxo/OgC16s9c/gUdFFukh7k7gtSQgZX/6az/Gw9j9L/5e9THTYUmjQ3
+         JN2EX6+MdLvl3ug1hZ8S00ho5t3foxkJRPlRIjHSFEBDd0m5iM2FlKF99vOn6lG+JxDt
+         xNWdaE8HLECl+8591hVw832HvcmBoPQTqVkxLoTm2q/deibJzUlYheEWEPrUFs7qNVZn
+         wJrQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrGhRuNzK3G7QRX9UqvXpGCYhVgnQpy9zxlfvyIG4OUmmQO/h9bGeFannaMiSXjsFUqyg3jmVA61PuG@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0ADWhJMTGBu8LbFrSSvcweh++ZuG6cgcGcNaf6skYj5c5Us8j
+	/yesCk/0eMhUm88p7gzRjvtrmZGD0YXct7dQu48/eEoe6S5WmcizCYK940Q58yKcd3RQyhQU5Qf
+	Gf4iVInf1d0cZEQdMeqoiA4fnqZf580g=
+X-Gm-Gg: AR+sD13bvRt6HwjNAawrBmlpioYt8N8tAz6SCBIstryGusc0nWiWw7zocVZbxk4V+rj
+	cuGQdvPuHigW75kVQc5sjW3MS8xNJHzGsxKRPjyBHn4hDB9eMKaZcVowg/Xe1KIDzpV2paOmvfR
+	8gAI60IbN7wwRuUzD9qQmLWRtFuEnwcm6buIu9TsaeyCyB3SIA2+kwsMcmh+8C1+X7VvCRVUQiV
+	YeOZn0pg5BhDQ1oB9+C1IWiSndnb/kGxf5ZUAWH9HcRxxdi+zgVkuCG/5pe2vO2PypFowZXxf81
+	sy2K7uk++5stHmUYLcQuMefKvcSrvnxPYF4taR5wKfR/WPw9Q2oJfoLNPsI+VOCgflgOz92Thn7
+	JfLnlEJXvDYQa43v+FjLDZPfKa6jirUzSsLeuq7Js+YOTYGzEEhWR1Kh4fRWHRoyB9aqOsfzICB
+	Y=
+X-Received: by 2002:a05:6214:4382:b0:8e0:16f0:28ab with SMTP id
+ 6a1803df08f44-907ca24fe91mr57082006d6.11.1784839602163; Thu, 23 Jul 2026
+ 13:46:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260722211844.123697-1-FredTheDude@proton.me>
+In-Reply-To: <20260722211844.123697-1-FredTheDude@proton.me>
 From: Steve French <smfrench@gmail.com>
-Date: Thu, 23 Jul 2026 15:44:39 -0500
-X-Gm-Features: AUfX_mzfFqukVPGDCP9jvquxAf-EgJ1FdiCj6sx3fsVM68YyRNDCHJo7X-XzB5c
-Message-ID: <CAH2r5mu0Qi4c8NprbnviCv5whzqGuzriVT6qShQ91=Kx4=T3Zg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Date: Thu, 23 Jul 2026 15:46:30 -0500
+X-Gm-Features: AUfX_mxl2KecmmKACnrpTXiw6GL0t8wes6MChB0-ufnUqzm6_qBP2n26Pxb1ulk
+Message-ID: <CAH2r5mujqOXko8yWpBM=DTr=arSBGEUd0HqGETRd+kiX8DVMgQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: use GFP_KERNEL for registry allocation
+To: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Please pull the following changes since commit
-1590cf0329716306e948a8fc29f1d3ee87d3989f:
+merged into cifs-2.6.git for-next
 
-  Linux 7.2-rc4 (2026-07-19 13:54:41 -0700)
+On Wed, Jul 22, 2026 at 4:24=E2=80=AFPM Fredric Cover
+<fredric.cover.lkernel@gmail.com> wrote:
+>
+> From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+>
+> Currently, cifs_get_swn_reg() allocates new registry entries using
+> GFP_ATOMIC. Since we lock a mutex here, this is clearly not an atomic
+> context. Use GFP_KERNEL instead.
+>
+> Also, fix a minor grammatical error in the comment above the function.
+>
+> Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+> ---
+>  fs/smb/client/cifs_swn.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/fs/smb/client/cifs_swn.c b/fs/smb/client/cifs_swn.c
+> index 9951817d0d7f..fe10719e627e 100644
+> --- a/fs/smb/client/cifs_swn.c
+> +++ b/fs/smb/client/cifs_swn.c
+> @@ -425,7 +425,7 @@ static struct cifs_swn_reg *cifs_find_swn_reg(struct =
+cifs_tcon *tcon)
+>
+>  /*
+>   * Get a registration for the tcon's server and share name, allocating a=
+ new one if it does not
+> - * exists
+> + * exist.
+>   */
+>  static struct cifs_swn_reg *cifs_get_swn_reg(struct cifs_tcon *tcon)
+>  {
+> @@ -443,7 +443,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct c=
+ifs_tcon *tcon)
+>                 goto unlock;
+>         }
+>
+> -       reg =3D kmalloc_obj(struct cifs_swn_reg, GFP_ATOMIC);
+> +       reg =3D kmalloc_obj(struct cifs_swn_reg, GFP_KERNEL);
+>         if (reg =3D=3D NULL) {
+>                 ret =3D -ENOMEM;
+>                 goto fail_unlock;
+> @@ -451,7 +451,7 @@ static struct cifs_swn_reg *cifs_get_swn_reg(struct c=
+ifs_tcon *tcon)
+>
+>         kref_init(&reg->ref_count);
+>
+> -       reg->id =3D idr_alloc(&cifs_swnreg_idr, reg, 1, 0, GFP_ATOMIC);
+> +       reg->id =3D idr_alloc(&cifs_swnreg_idr, reg, 1, 0, GFP_KERNEL);
+>         if (reg->id < 0) {
+>                 cifs_dbg(FYI, "%s: failed to allocate registration id\n",=
+ __func__);
+>                 ret =3D reg->id;
+> --
+> 2.53.0
+>
+>
 
-are available in the Git repository at:
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc4-smb3-client-fixes
-
-for you to fetch changes up to c2f2e83e3bbc5483730fd4ee903182761f1ae50f:
-
-  cifs: fix cifsFileInfo leak on kmalloc failure in deferred close
-drain paths (2026-07-21 20:19:11 -0500)
-
-----------------------------------------------------------------
-Six client fixes
-- Fix leak in cifs_close_deferred_file()
-- Fix resolving MacOS symlinks
-- Fix stale file size in readdir
-- Update git branches in MAINTAINERS file
-- Fix bounds check in cifs_filldir
-- Fix checks in parse_dfs_referrals()
-- Fix DFS referral checks for malformed packet
-----------------------------------------------------------------
-Carl Johnson (1):
-      smb: client: handle STATUS_STOPPED_ON_SYMLINK responses without
-a symlink target
-
-Frank Sorenson (2):
-      cifs: prevent readdir from changing file size due to stale
-directory metadata
-      cifs: fix cifsFileInfo leak on kmalloc failure in deferred close
-drain paths
-
-Jay Vadayath (1):
-      smb: client: bound dirent name against end of SMB response in cifs_filldir
-
-Steve French (1):
-      Add missing git branch info for cifs and ksmbd to MAINTAINERS file
-
-Yichong Chen (1):
-      smb: client: validate DFS referral PathConsumed
-
-
--- 
+--=20
 Thanks,
 
 Steve
