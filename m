@@ -1,118 +1,113 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E30E37EFEC
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 21:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCBC392803;
+	Fri, 24 Jul 2026 21:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784929629; cv=none; b=ZwHGm+/O+6gAfTlWlaCf3hbP0RQgkv7vVCA4/8R17t5FDtaTWex/bYftvDqmm+SbTo4GA4hybbp8GXXusljdQz5w2wwUrQxmjVqr0QV3pSzGMkfmhjRrkHfZ7igeeUPiDz503WOgXxZAQjPThFKS21qQ44Wn1umaahOl2h0pPcM=
+	t=1784929717; cv=none; b=lmE59OT/cc2rq/lI2LdfzBtVYT4hzbls+hc/puzRBhJuGm5j3xEmP2kIvVItV5pC2Rbi4lxgGHbhKrDYEeTMrCN1eC8XOcA3xGjJrP+l+yZU9CCMN/DkacPClBgHbF7NqUdmEDbAb+4Nfiq1T1e5DIcnUFOO5ofjo7aK41epYhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784929629; c=relaxed/simple;
-	bh=JOTMTHvNXNnDMv8cbytpWkBwOfL6IylIUcituYRfXKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f/IDg5uuIHsv3ypYwH6diotQZDbq9KIHqmuqYN1L61p9gbonq4h+ZPfVPEa0OHzCktjVB4CPispt4daXO8gmXYgt0RT2aOnn9tBUG3UAR33mgb/9m7105iYHbaeMsR2gvLQN+InYrU80gSqjo0BMk+bKgvUFMB+SkBTHtWqW3wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FhG50KbA; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784929717; c=relaxed/simple;
+	bh=GTdZSgSwBlfAlIxva5M6ZU/kD9VYoe26BBxVBJ5WdPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f0dWPJXuJkkHlQ5NLOuD9Ax5Gho1OuqyiVb7t0nd5oWleu8UvKWZ0I9ZwliB4KZE49TmmB6QFpuZUZCvhsdQzWUJFHk39L78Jrb5jzWdYLl7N97uSjvi3jiv7Dfm4rIqq0HGBt3VlUk4FDbtEfdYIBkLNyeZ2WbbL7Xj7V2F1Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bhpTuvSZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhG50KbA"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-51c5382806fso9281001cf.2
-        for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 14:47:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784929624; x=1785534424; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=P1VNwYcQpb9WDj6KVSyLpNd/oPBMCMFNw+HEtq66+P0=;
-        b=FhG50KbAES9Xcz+clA+Gb9RhVhvutwyqW+sG20+rANtAZHRZ21l37d4BPqx4BYMd9p
-         77RGJ112PgEFIhUV9jqB3JtfTBgNH4QAXGkTIAcY0312ualNEcPsI1KxYD6QNX9i+0D+
-         moLDoCB8Gu4r6qHDGX7d/7HAkuubeHSjD+VwnZI6ihr3ebjcZu2+05LVZ9e4kSGxDKRH
-         MwK1JkcYU0hTDx0pWWR0B6JVTKzFmM3g/uLrr1+O0WNaN0na0zju/p1c1gaaVppgCBii
-         zt7+/lBBKxkzyljSFeHFlFiathPwxVdFtAE/MIsMa8XP5bKYj9ufHHM8LkdwcW28NBBy
-         O9rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784929624; x=1785534424;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=P1VNwYcQpb9WDj6KVSyLpNd/oPBMCMFNw+HEtq66+P0=;
-        b=D+HFdwDCSzsE/XYYXgmxm9ICZlBsHgCILXw9/EudHlh+Ks9AO7BoDKkHI1+oaGBzOl
-         Ez9SQfKTr/gB/8zg68TVXEpDPlh8dN2bqXkqR1Tfo6I1ZfHDbfYXXE/RPz8O1L5Aa7KW
-         ykBJwWO1zr59D+L4i+j7gUR1Zt9igQtCHSvjn97K8sIsRXM95uJ/Hzpt2WmFabLZL90x
-         CmyGwVmWi9+3IDw5pdUhnDgV8PD8f4p2yq+zmhWsfnB8IeCe9qq/J7jINgsyI+mc+/Yu
-         sVg3JJ6a4MUYwuMv/dCX10Kuy5PQDLLz5Cl8y8nRPdsqpQpoU+8XpwA8ALUp2p++b0GP
-         P0sQ==
-X-Forwarded-Encrypted: i=1; AHgh+RreaV1YB2VyJ5yx/2WdTSYDO9iSjeuGhkc90bblh7bYG/FGIm1Uz6cwsfRc/YF6YfKzNbGS7hjB77VD@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx87THgeajF4CVKyhnw1NMLVzDXxPojYyBRPwKv1NNSRMgtp4/t
-	DFS4KAj4Uxh5xKbeCSAfttlqq90LYGgPC3MyBJBYmYEP/DXwsExjIRYf
-X-Gm-Gg: AR+sD11qQcLn2YaRUsjWyll/PhNaoHYoJoacTfb0OKGsC59ON1dNHIQ6LTUOAbdOswf
-	8v4Fe8ZXHxfPAhU1cp2DV4uShybdLoU9F6TzI0mqRXAuVaGnMnGTncdliw2uOUGSaGyu8FGrKwi
-	f8V8XGWobJY4oXEImaLqoxA7m+S+s4E1n6Oh6PcsdOanRM8Gnc14pRRlu3vMklX/JaY8cJ8Rbnj
-	D9tWyiAtH9KHneDwMZBihmerXzL+29HFwybA3jl8VO6/5xKAkkrVXwIz07mWcOonbfdxB/dcwnv
-	pWqIASin21ii9/dVgwSAC5c+rFqMeOPm3FIuW9myBCTTtayamDtP1RhsW1u9tipnF7+PK4UuBom
-	xZoE0/A/NYjVvPoPQm9k5hoePTVP24crIDCBHKNKPIhz0bl3gw/3UMmRlUdXEOy0S8Q+iDTVbh/
-	6B6FpEcs6w2cIjgArtqz3R+irS2A==
-X-Received: by 2002:ac8:5e51:0:b0:51c:1568:3a53 with SMTP id d75a77b69052e-529a8337825mr1442741cf.16.1784929624076;
-        Fri, 24 Jul 2026 14:47:04 -0700 (PDT)
-Received: from FredPC.lan ([2600:382:311b:26:c204:8bd0:9563:8b5f])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529a29cf785sm7916771cf.21.2026.07.24.14.47.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jul 2026 14:47:03 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 2/2] smb: client: clear ce->tgthint in free_tgts()
-Date: Fri, 24 Jul 2026 14:44:35 -0700
-Message-ID: <20260724214435.1850384-3-fredric.cover.lkernel@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260724214435.1850384-1-fredric.cover.lkernel@gmail.com>
-References: <20260724023539.1596955-1-fredric.cover.lkernel@gmail.com>
- <20260724214435.1850384-1-fredric.cover.lkernel@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bhpTuvSZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A6FC1F000E9;
+	Fri, 24 Jul 2026 21:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784929705;
+	bh=GTdZSgSwBlfAlIxva5M6ZU/kD9VYoe26BBxVBJ5WdPE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=bhpTuvSZWBV7iq9keKc8+pixk18qLEuyMz3ZTlqKcB81KF/CnyeLGI6JSyvHGt9tA
+	 E+SxQVBXcXsXsZgtn3HAr+6nPULrU5HRAYu13tTfnL5ffRJr3w0sXxS3y6FSy3SRlS
+	 Qe3XQkADPgbjY9nioQHCBPR4pvKP4dL5d3HxM/ORX/63JYStNE+wqJy61XHcdbEpWF
+	 xaZAuoqTpynwYjXBJP4BY73AhLP471MMWjcWFGi91teQEabAfmboMZJJ2AI9mVl919
+	 5Vj52Ap+SYxCLa6sCvz56w/tCisRBng0kD6I+yiTKpyHAoJV1VexiywmsHK9mBuUsB
+	 8QLvkwcrgPftA==
+Date: Fri, 24 Jul 2026 14:48:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sang-Heon Jeon <ekffu200098@gmail.com>
+Cc: Julia.Lawall@inria.fr, Alex Deucher <alexander.deucher@amd.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Andrew
+ Morton <akpm@linux-foundation.org>, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, Borislav Petkov <bp@alien8.de>, Christian
+ =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Daniel Lezcano
+ <daniel.lezcano@kernel.org>, David Airlie <airlied@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Hans de Goede
+ <hansg@kernel.org>, Hans Verkuil <hverkuil@kernel.org>, Heikki Krogerus
+ <heikki.krogerus@linux.intel.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Ilpo =?UTF-8?B?SsOkcnZpbmVu?=
+ <ilpo.jarvinen@linux.intel.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Jani Nikula
+ <jani.nikula@linux.intel.com>, Jaroslav Kysela <perex@perex.cz>, Jason
+ Gunthorpe <jgg@ziepe.ca>, Jiri Pirko <jiri@resnulli.us>, "Joerg Roedel
+ (AMD)" <joro@8bytes.org>, Johan Hovold <johan@kernel.org>, Jonathan Cameron
+ <jic23@kernel.org>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, Liam
+ Girdwood <lgirdwood@gmail.com>, Linus Walleij <linusw@kernel.org>, Maarten
+ Lankhorst <maarten.lankhorst@linux.intel.com>, Mark Brown
+ <broonie@kernel.org>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Matthew Sakai <msakai@redhat.com>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, Maxime Ripard <mripard@kernel.org>, Michael Turquette
+ <mturquette@baylibre.com>, Mike Rapoport <rppt@kernel.org>, Miri Korenblit
+ <miriam.rachel.korenblit@intel.com>, Nicolas Palix <nicolas.palix@imag.fr>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ping-Ke Shih <pkshih@realtek.com>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, Sebastian Reichel <sre@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Simona Vetter <simona@ffwll.ch>, Simon
+ Horman <horms@verge.net.au>, Stephen Boyd <sboyd@kernel.org>, Steve French
+ <sfrench@samba.org>, Takashi Iwai <tiwai@suse.com>, Thomas Renninger
+ <trenn@suse.com>, Thomas Zimmermann <tzimmermann@suse.de>, Tony Luck
+ <tony.luck@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, Vadim
+ Fedorenko <vadim.fedorenko@linux.dev>, Vinod Koul <vkoul@kernel.org>, Will
+ Deacon <will@kernel.org>, Yazen Ghannam <Yazen.Ghannam@amd.com>,
+ cocci@inria.fr, amd-gfx@lists.freedesktop.org, dmaengine@vger.kernel.org,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+ iommu@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-rtc@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+ lvs-devel@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+ platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 00/36] treewide: remove conditional returns with no
+ effect
+Message-ID: <20260724144822.6af8213f@kernel.org>
+In-Reply-To: <20260723184538.3888637-1-ekffu200098@gmail.com>
+References: <20260723184538.3888637-1-ekffu200098@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-When free_tgts() frees all structures in ce->tlist, ce->tgthint
-is left pointing to one of the freed cache_dfs_tgt structures.
+On Fri, 24 Jul 2026 03:45:02 +0900 Sang-Heon Jeon wrote:
+> Patch 1 adds a Coccinelle script that matches the pattern, including
+> negation and constant-comparison variants. Where a local variable is
+> assigned right before the check, the assignment and the two returns
+> turn into a single return of the assigned expression.
 
-If ce->tgthint is not reset before it is used later, it results
-in a use-after-free.
+Huh, I thought we already had such script. Various script children have
+been sending such "cleanups" in the past.
 
-Set ce->tgthint to NULL in free_tgts() after the elements are
-freed to reflect that no elements remain.
+> Patches 2-36 are generated by the script, with hand fixes to restore
+> unexpectedly removed comments and to fix the formatting checkpatch.pl
+> complained about.
 
-Fixes: 54be1f6c1c37 ("cifs: Add DFS cache routines")
-Cc: stable@vger.kernel.org # depends on: smb: client: harden DFS cache against invalid target hints
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
----
- fs/smb/client/dfs_cache.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index c9ace4326a35..86dba25b7a5a 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -122,6 +122,8 @@ static inline void free_tgts(struct cache_entry *ce)
- 		kfree(t->name);
- 		kfree(t);
- 	}
-+
-+	WRITE_ONCE(ce->tgthint, NULL);
- }
- 
- static inline void flush_cache_ent(struct cache_entry *ce)
--- 
-2.53.0
-
+Please post patches 4,7,8,9 as a separate series. Since you only CCed
+netdev on subset of the series patchwork thinks there are patches
+missing and doesn't kick off any CI.
