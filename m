@@ -1,34 +1,32 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838CC3655D8
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 03:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6597A373BF4
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 03:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784862761; cv=none; b=Ya9ZFfOiHzYnpsK0o4x6gtt8aNiveJBZG7y86lHJ1VE2j41I7/l1tIPSVxiNq0nbYTyVB38ilflNd9Y/mf+O8YiTXF6wOu8uf5RF9CiHvq5JwlX8vZgzv9vMrZJBnPbBHkIie9Ns9mrsaqknfXvybjHFapDg6SDep8Mvt8EdaPI=
+	t=1784862765; cv=none; b=t3/r2jf1xzyKu/y+8CWTHI0Wz7YrvIOwm/T4jN2UXWz43vMOCT02FsGg8grssxJMg35U7dmHRnYDpQ4rSPNO9rWnkrvHeYm3U+RXmQY1zbaHHPqWIyOmpvRmeOI+WIocKYD/msZSZslIki/2kOHUvZHx/XkmrLkElp97AE3X9iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784862761; c=relaxed/simple;
-	bh=aqWYy4XHl3Uk9dnzohMfed5zvqMLLmOBOwj3KGLNJaE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F5LxAocBwFAxFc4csWkRdKZAZR/66l24FTUd520/5ZDGZ6cfjLv5VHR37aM/mjIU6X3zpmG2dqkWk4vltTiv5TEpgFo7737mfxgl8G5UQIPWhANJ+rAMSKakemBDXGn615bpBjXvEcalKKF7VxDakdECoE68QaO2axKnVV2xhjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=awqYv1TS; arc=none smtp.client-ip=91.218.175.183
+	s=arc-20240116; t=1784862765; c=relaxed/simple;
+	bh=kT8fXw48GA90xYFzXC6PVtJSsjx1Ljxdu/pcwjMrORE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qNic4UoJuxiwOOxdHpX/f5P8CnnmA6buRvxeH3i2Xsi2QlfRE5Nlhg/Zh6Ynrh0bp+YzxKv4yVtPHCsrd+qzG8KDPQVAJGCiBjacsoXsu43jhKcgXiTsXZsRpJxBLzhTsg/T6onvdPrQoVUJAkY4cDe480EC13kxOhPrpeOAiNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=iF27km2e; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="awqYv1TS"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="iF27km2e"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784862756;
+	s=key1; t=1784862750;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7hxgXDG9yiqAUQ82oK2oHSAM7Qb+ekWttcrYUHtUpc0=;
-	b=awqYv1TSM9HSAj6vxMdnefNqczhj+CJDUFs9QX4HaBst3mQMKgScHM942O8aXs7KLdVoBY
-	MRB9opL1TwJxfJdfA6mNLUKo8yErCmApAR1UAdY8CjhXJAre3GQx7mg2g5BIZAyguxn3zz
-	Fc6mhF7prEo11tq4io1p8tLuPE0HhUmrMp7EXyivXPVWafFDi4+i5KYxKquL9W18sqIVP3
-	hS9iXxVjUaTkFIfU3q4iutjxcGZ1By0fP/Tl5ViImsD3ceyyH81q/BVGk1jCEBb4pMLyMi
-	d5WYIIcmxWNTDt7mmCXDYX7ISoMwfB27hJfX63j1MC3jT/Whavcgiz8b517HmA==
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zV7EcMguRzNIbr6K1is2ZOzospwqJItfpqXu67VyszI=;
+	b=iF27km2eavhAGPLodyOD6pFEE0hDC1dvXzIRvAsqSm7bTJoekfZ1pwVxH85uqWdwBXcMwQ
+	YFh7CdbhV4mHGopVR5JMnXFLqDU4UjtA3tmh2JW2PLAbid1J3FT+Yhp2GrZ7L/+IEdmO35
+	fV1iNcMneL05T3xLPNOnYckMkp1Ww87lrAup6B4PaSYkdpHlBhYAycvBQFSqyDYCciN9n2
+	Uwv9TXW7QswdYsAMzKufx3oRjE51fWVxe1qvel3CvuA/y929u5ibk3V37fdokhWiDnZ/Mx
+	KLuagWtwsTKKHevsAEAsqZ6cXULLz3PArIhqm6hjtFpbGqFoOYatRkfHpLdCvw==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -44,11 +42,9 @@ To: smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org,
 	fstests@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 xfstests 1/2] generic/002: simplify the hardlink count test
-Date: Fri, 24 Jul 2026 03:12:09 +0000
-Message-ID: <20260724031210.332153-2-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260724031210.332153-1-chenxiaosong@chenxiaosong.com>
-References: <20260724031210.332153-1-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v3 xfstests 0/2] generic: new test to check nlink returned by fstat()
+Date: Fri, 24 Jul 2026 03:12:08 +0000
+Message-ID: <20260724031210.332153-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -60,80 +56,22 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Add the test to the hardlink group and replace the enumerated link
-counts with arithmetic loops.
+v2->v3: use `xfs_io -c 'stat -r'` to call fstat().
 
-Clean up the test header, use "Silence is golden" success message,
-and return the test status explicitly.
+v2: https://lore.kernel.org/linux-cifs/20260720163502.732454-1-chenxiaosong@chenxiaosong.com/
 
-Suggested-by: Zorro Lang <zlang@kernel.org>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- tests/generic/002     | 16 ++++++----------
+ChenXiaoSong (2):
+  generic/002: simplify the hardlink count test
+  generic: new test to check nlink returned by fstat()
+
+ tests/generic/002     | 16 +++++-------
  tests/generic/002.out |  2 +-
- 2 files changed, 7 insertions(+), 11 deletions(-)
+ tests/generic/798     | 60 +++++++++++++++++++++++++++++++++++++++++++
+ tests/generic/798.out |  2 ++
+ 4 files changed, 69 insertions(+), 11 deletions(-)
+ create mode 100755 tests/generic/798
+ create mode 100644 tests/generic/798.out
 
-diff --git a/tests/generic/002 b/tests/generic/002
-index 6df57a7a..9b210705 100755
---- a/tests/generic/002
-+++ b/tests/generic/002
-@@ -2,12 +2,12 @@
- # SPDX-License-Identifier: GPL-2.0
- # Copyright (c) 2000-2001 Silicon Graphics, Inc.  All Rights Reserved.
- #
--# FS QA Test No. 002
-+# FS QA Test 002
- #
- # simple inode link count test for a regular file
- #
- . ./common/preamble
--_begin_fstest metadata udf auto quick
-+_begin_fstest metadata udf auto quick hardlink
- 
- # Import common functions.
- . ./common/filter
-@@ -17,14 +17,11 @@ status=0	# success is the default!
- _require_test
- _require_hardlinks
- 
--echo "Silence is goodness ..."
--
- # ensure target directory exists
- mkdir `dirname $TEST_DIR/tmp` 2>/dev/null
- 
- touch $TEST_DIR/tmp.1
--for l in 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
--do
-+for ((l = 2; l <= 20; l++)); do
-     ln $TEST_DIR/tmp.1 $TEST_DIR/tmp.$l
-     x=`$here/src/lstat64 $TEST_DIR/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
-     if [ "$l" -ne $x ]
-@@ -35,8 +32,7 @@ do
-     fi
- done
- 
--for l in 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1
--do
-+for ((l = 20; l >= 1; l--)); do
-     x=`$here/src/lstat64 $TEST_DIR/tmp.1 | sed -n -e '/ Links: /s/.*Links: *//p'`
-     if [ "$l" -ne $x ]
-     then
-@@ -47,5 +43,5 @@ do
-     rm -f $TEST_DIR/tmp.$l
- done
- 
--# success, all done
--exit
-+echo "Silence is golden"
-+exit $status
-diff --git a/tests/generic/002.out b/tests/generic/002.out
-index 11426b54..61705c7c 100644
---- a/tests/generic/002.out
-+++ b/tests/generic/002.out
-@@ -1,2 +1,2 @@
- QA output created by 002
--Silence is goodness ...
-+Silence is golden
 -- 
 2.43.0
 
