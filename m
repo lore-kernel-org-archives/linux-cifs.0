@@ -1,112 +1,123 @@
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BD92D3A93
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 13:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B10A31D366
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 14:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784900138; cv=none; b=Hpz77NGEim4ee4VkDzFNlbQjjf18DF+J+NrgrMteyRk8G8VpalZOxzBTNU1atXzusBP3Byq3uEbW214lxpSi9lXy6Dw6oOPrHOgbi9gYO19FrDveB+fEjUL+xJHfKh+P4srOfAz8GfJ/bfcJ4SHSI4X4Y6yNThhWp9KQEAvXXD4=
+	t=1784905134; cv=none; b=e9WvffyHfKgfC4smuuV8z+K2LKpJYNWvPSYTU7uKWxYYw6Y0ayfTnXwn7EJ36Vxk394xiiVU+E9EYipnO3MaTbrZoIRG+DM5LZGEfAAQ//oHYHMI261XEe25fSbNk4T9yvJZ1bXXLBqdXew9fOV4i0T24bksCf2+zqyIvWKgq94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784900138; c=relaxed/simple;
-	bh=+fPu8vElWnLdmTpjMOkPrYtwDN12zu1lh22vzM7u9uc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r0Glbm+4kLzbIMDGwI52cKFnfbnnO4fX8KXxIBrgt5TD1RRJ66RTd4UGOXwcpks13GRduKaQ6FqGkh1jKV7MHihT+h+fQ9ahO+B6FFg8X+KsXiRoZ3vOQWwQM3vvgJEwle04mnLRVem2aOnOndCXbf9y0u7NBxu49XFE38J0hyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=RnbN39io; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1784905134; c=relaxed/simple;
+	bh=5ovfIpmVXFvr/oeeGQCU99vBPdoxb3I/jtMbF63CU7M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G2ADc5md+yS46PBsAupuqHvxhhtFhgLWfMk7hZsuFPOn/N0AGgqNHdqjxJZYEXdJoXBJHt2sSB10axWB1OQBg4ebqq5M8ZTDFo+9XSymYZ8QKtKEBMCK7BIiHqnfm+Z2i6dIEQRTBEH2djO6JR+x4qqsxD9GgqviVvEpmR2b02k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=He5WRA6g; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="RnbN39io"
-Message-ID: <2f4e2edf-5aa5-447b-89b9-09d1b19ce14e@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784900131;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MVqNzyLmES05l/0J4S3kCsg10AtQ6RGQtuU+KVaQOZ8=;
-	b=RnbN39ioR4pPEmw9gsNPABvQWhjXTaZi5qhSAOWXKAuIPmTAJO1bx4YUjjXk+XAogOIvZE
-	J6IZ96b+P4Y8O1fxxDJULTGgqd8Xxa7WhPDULfAdrn8fpE0+MR9bTE831MOOvKOTO3Xo13
-	6qqWgusw+HK1meQknh5VtcJQLfI8+BAMdlJ8qtormRzPw7uyDj4BTgfMe8Q315h0O9icIA
-	i4IT6aZ8tEyKDzhGOf5BxpnQn7C+1gpmZj9gmsxBt80LPQf0VBDWZ3tLb7TEofgQAH9tuL
-	xZ1+bwhIIlOBrbIL7CN2WMMJzL1FvCMIEW0L9bmpyee03TtbXQyXvEFv/lOB9w==
-Date: Fri, 24 Jul 2026 21:35:20 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="He5WRA6g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA521F00A3F
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 14:58:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784905133;
+	bh=e/BnxahU3KJS4xokcGJzjL1NXw3X2KZRSFnd0/5C8Zc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=He5WRA6gsG0wXYVBoUAVlu2CYajp57KxtTj5OLHy+mlGBi1MTgNAJM2i3J2aSg9g2
+	 8RR5FtF9ah7PdeZCL6IGlPVXSd2bU5a1HKtDbKxCtYHKNMs0VS7qs1K2UyfXQZT922
+	 kqAZs6olfjnqmd4J83aE30rlieQxw7tD/c7Ly8jyjHnB7FiEqUVZzdC8GrOC75/HqC
+	 lmJJSrB9ng7KY+zRE21Oq7TnGDHVqMPZ4k/Yo9VbM5socLIzPms7pz7h19HXG6WbtD
+	 SjPjhjLtv+RdnoTKbrRzHNW36suboCsbYvYhUoylrtrhkS8d8whbsDb+irfEgRQ5KK
+	 m2ysRMlOryC9g==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-698ae09e356so627836a12.2
+        for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 07:58:53 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxyokU/P+eMY6vit48NkrcdamzrykbV8ZbnyLEUDs8q9zJRTmOJ
+	/j4kjKSg0Yzbh49BqEWJfx7LaMvaeRchOm6DbVQrHDv3mVA3WzZN36jRsPQJaoRR5HW4Vk3EU1Z
+	fv1JY5aXhVp3EcI9POae10/3q+3ZcNIg=
+X-Received: by 2002:a17:907:97c4:b0:c16:5b3f:52e0 with SMTP id
+ a640c23a62f3a-c1c50d1c4e6mr325351766b.38.1784905131734; Fri, 24 Jul 2026
+ 07:58:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH 00/11] smb/server: change notify support
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
- linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
- gael.blivet@gmail.com
-Cc: linux-cifs@vger.kernel.org
-References: <20260723031644.312866-1-chenxiaosong@chenxiaosong.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260723031644.312866-1-chenxiaosong@chenxiaosong.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260723230053.684176-1-you@example.com>
+In-Reply-To: <20260723230053.684176-1-you@example.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 24 Jul 2026 23:58:39 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-WdPK66FFaTMub8MC6SUX0R9YJ+miVvA8uOwkKioVPuA@mail.gmail.com>
+X-Gm-Features: AUfX_mwD4Cgj5zCLCVBGR7H68DXPk61uYvU4305Ojr1OU_lxugjrBrSMlapbGJM
+Message-ID: <CAKYAXd-WdPK66FFaTMub8MC6SUX0R9YJ+miVvA8uOwkKioVPuA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: only rebind the reopened file's own oplock on
+ durable reconnect
+To: Your Name <qwe.aldo@gmail.com>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, senozhatsky@chromium.org, 
+	tom@talpey.com, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Do you have any suggestions for this patchset? I plan to send the 
-non-RFC version in the next few days.
-
-On 7/23/26 15:20, Namjae Jeon wrote:
-> He needs to submit a patch aligned with the current base. We can't
-> just wait since we don't know when Gaël will send the patch.
-
-On 7/23/26 11:16, ChenXiaoSong wrote:
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> 
-> Sorry for taking such a long time to complete the ksmbd change notify feature.
-> Over the past few months, I have been busy with the birth of my daughter and
-> my PhD-related tasks, which left me with limited time to work on it.
-> 
-> Once Gaël updates his patch ("ksmbd: defer CHANGE_NOTIFY completion instead of STATUS_NOT_IMPLEMENTED"),
-> I will rebase my patchset on top of it.
-> 
-> To test this feature, the following patches need to be applied to cifs-utils and kernel smb client:
->    - cifs-utils: https://chenxiaosong.com/lkml/cifs-utils-parse-notify
->    - kernel smb client: https://chenxiaosong.com/lkml/cifs-improve-notify
-> 
-> The complete kernel client and server patches are also available at the following link:
-> https://chenxiaosong.com/repo/linux/ksmbd-change-notify
-> 
-> ChenXiaoSong (11):
->    smb/server: add debug type for change notify
->    smb/server: validate notify requests
->    smb/server: support canceling notify requests
->    smb/server: watch directories for changes
->    smb/server: keep notify watches on file handles
->    smb/server: save simple notify events
->    smb/server: save old names for rename notify events
->    smb/server: match rename notify events
->    smb/server: encode notify events
->    smb/server: send notify events to the client
->    smb/server: break directory leases before sending notify events
-> 
->   fs/smb/server/Kconfig     |    1 +
->   fs/smb/server/Makefile    |    2 +-
->   fs/smb/server/glob.h      |    3 +-
->   fs/smb/server/notify.c    | 1011 +++++++++++++++++++++++++++++++++++++
->   fs/smb/server/notify.h    |   24 +
->   fs/smb/server/oplock.c    |   40 ++
->   fs/smb/server/oplock.h    |    1 +
->   fs/smb/server/server.c    |    2 +-
->   fs/smb/server/smb2pdu.c   |   12 +-
->   fs/smb/server/vfs_cache.c |    3 +
->   fs/smb/server/vfs_cache.h |    4 +
->   11 files changed, 1095 insertions(+), 8 deletions(-)
->   create mode 100644 fs/smb/server/notify.c
->   create mode 100644 fs/smb/server/notify.h
-> 
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+On Fri, Jul 24, 2026 at 8:01=E2=80=AFAM Your Name <qwe.aldo@gmail.com> wrot=
+e:
+>
+> From: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+>
+> ksmbd_reopen_durable_fd() walks the inode's m_op_list and rebinds every
+> detached oplock to the reconnecting session:
+>
+>         list_for_each_entry_rcu(op, &ci->m_op_list, op_entry,
+>                                 lockdep_is_held(&ci->m_lock)) {
+>                 if (op->conn)
+>                         continue;
+>                 op->conn =3D ksmbd_conn_get(fp->conn);
+>                 op->sess =3D work->sess;
+>         }
+>
+> The only key is op->conn =3D=3D NULL, which every detached durable handle=
+ on
+> that inode matches, not just the one owned by fp.  When two sessions hold
+> durable handles on the same file and both disconnect, reconnecting one of
+> them adopts the other session's oplock: op->sess is overwritten with the
+> reconnecting session without taking a reference on it, while op->conn
+> pins the connection.
+>
+> The sibling teardown path, session_fd_check(), keys on the identity of
+> the connection being torn down (op->conn =3D=3D conn) rather than on shar=
+ed
+> state, and so does not have this problem.
+>
+> Once the adopting session is destroyed, ksmbd_session_destroy() frees it
+> while the foreign oplock still points at it.  The reader in
+> ksmbd_close_fd_app_instance_id() validates only opinfo->conn, which is
+> still live thanks to the reference taken above, and then dereferences the
+> stale session:
+>
+>         if (!opinfo->conn) {
+>                 up_read(&fp->f_ci->m_lock);
+>                 goto out;
+>         }
+>
+>         ft =3D &opinfo->sess->file_table;
+>         write_lock(&ft->lock);
+>
+>   BUG: KASAN: slab-use-after-free in _raw_write_lock+0x74/0xd0
+>   Write of size 4 at addr ffff88810a970528 by task kworker/0:0/9
+>   Workqueue: ksmbd-io handle_ksmbd_work
+>   Call Trace:
+>    _raw_write_lock+0x74/0xd0
+>    ksmbd_close_fd_app_instance_id+0x183/0x410
+>    smb2_open+0x1346/0x4430
+>    handle_ksmbd_work+0x2bb/0x7b0
+>
+> Reached from an authenticated session against a share with the default
+> durable-handle and oplock configuration: two sessions open the same file
+> with a durable-v2 handle and an RH lease under distinct AppInstanceIds,
+> both log off, one reconnects with DH2C, and a later durable-v2 create
+> carrying the other AppInstanceId walks into the freed session.
+>
+> Constrain the loop to the oplock owned by the file being reopened.
+>
+> Fixes: f363a0fb134a ("ksmbd: fix app-instance durable supersede session U=
+AF")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aldo Ariel Panzardo <qwe.aldo@gmail.com>
+Applied it to #ksmbd-for-next-next.
+Thanks!
