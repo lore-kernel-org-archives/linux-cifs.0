@@ -1,20 +1,20 @@
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF8F421239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C71248893
 	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 10:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784889689; cv=none; b=Fy/Yc2q34CxHSg+XB+c7tFxFrjzhCMuIOM+yOPBU68I7G2Daa0SH/0UJeZhuuczQtuHk5F4VWe2e0hoE3mXzxVSbMKeBuLKNA4OZ9ZLmsND8C//E08DFvXcv4ZSxzXRYgFqWj+bXLQwnAOD63jraCAu0RV+xwFamRdkd7eWO0fM=
+	t=1784889690; cv=none; b=FaBgkNofcr0u3KPVNYQ0SPq5SKmz6K14R5CUSFcQtCQ2tKw4Wip/gCtRcjJAprG9746pWCaBgWTNJtc2mPm77RY1vrJ+96OnUsDOPoncKchRvEZaaGokGX7GFQv04wq/YP47YUY7lKvV3pLODkku9NCDPBwNljAScKmQHJhgS20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784889689; c=relaxed/simple;
-	bh=QLPyajcsSCOZoVoYBqXd+vYGCXOfOyraTg+BOgN3PJ8=;
+	s=arc-20240116; t=1784889690; c=relaxed/simple;
+	bh=d7Qm9Y263p7hN5bGMBl/lfEzBcpgCEwfjjl9zJY5YyQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ugewn667c6EeIXfKgcIApBJZ6M/qB9WQTT14BYhezfqW3ROeFDlNtwJeE9givyOCdtcgJ4JtgDHXIYMfdB0BDHGTxI99TvgI1HI5I3QlpwYEtyBu08xCX79wHJxK7SfYuXnkB++yhZT/hKPJ0LNT76EJB0YfX3MHF+k/VDqiKn4=
+	 MIME-Version; b=dV3LWbOzZE3rtee434VKDMyTZjsnLphafz9pUqj6sqTA+2oKdBlU+T0q7OuOYyzZk0bdPDEbXKtmdRnrMVJbOJqfukU00B19h9S8qxumbaARe+VKygYnU7ewvHK9tqsqC7H7FkWSkZ3ve/MRSzgkKTSE66WHcXPziIuvmSjzFto=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 3399d4d8874c11f1aa26b74ffac11d73-20260724
+X-UUID: 34443d1a874c11f1aa26b74ffac11d73-20260724
 X-CTIC-Tags:
 	HR_CC_AS_FROM, HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B
 	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
@@ -25,27 +25,27 @@ X-CTIC-Tags:
 	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
 	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:8adcbb1d-501c-4bb3-bdb3-c9c6d7c30c96,IP:10,
-	URL:0,TC:0,Content:-25,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:10
-X-CID-INFO: VERSION:1.3.12,REQID:8adcbb1d-501c-4bb3-bdb3-c9c6d7c30c96,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:10
-X-CID-META: VersionHash:e7bac3a,CLOUDID:2b807937d51b525299f173929269ca04,BulkI
-	D:260724184119UY7IY9MV,BulkQuantity:0,Recheck:0,SF:10|38|66|78|81|82|102|1
-	27|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:n
-	il,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BR
-	E:0,ARC:0
+X-CID-O-INFO: VERSION:1.3.12,REQID:4921c607-c133-42d9-bfc7-471edd1589ff,IP:10,
+	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:5
+X-CID-INFO: VERSION:1.3.12,REQID:4921c607-c133-42d9-bfc7-471edd1589ff,IP:10,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:5
+X-CID-META: VersionHash:e7bac3a,CLOUDID:f2fd86b34136e924bd3e6d3c9fbf9ffe,BulkI
+	D:260724184121QII20UBZ,BulkQuantity:0,Recheck:0,SF:10|38|66|78|81|82|102|1
+	27|136|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,B
+	ulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR
+	:0,BRE:0,ARC:0
 X-CID-BVR: 2,SSN|SDN
 X-CID-BAS: 2,SSN|SDN,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR
 X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 3399d4d8874c11f1aa26b74ffac11d73-20260724
+X-UUID: 34443d1a874c11f1aa26b74ffac11d73-20260724
 X-User: tanze@kylinos.cn
 Received: from desktop-od00ebi.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
 	(envelope-from <tanze@kylinos.cn>)
 	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 461057685; Fri, 24 Jul 2026 18:41:17 +0800
+	with ESMTP id 929504896; Fri, 24 Jul 2026 18:41:18 +0800
 From: Ze Tan <tanze@kylinos.cn>
 To: sfrench@samba.org,
 	linkinjeon@kernel.org,
@@ -56,9 +56,9 @@ To: sfrench@samba.org,
 	chenxiaosong@chenxiaosong.com,
 	linux-cifs@vger.kernel.org
 Cc: tanze@kylinos.cn
-Subject: [PATCH 11/15] smb: client: prepare EA opens for inode lease reuse
-Date: Fri, 24 Jul 2026 18:40:05 +0800
-Message-ID: <b770d67c4cd3e17c553439d63430335f64b2eaa0.1784888897.git.tanze@kylinos.cn>
+Subject: [PATCH 13/15] smb: client: gate security.capability EA on POSIX mounts
+Date: Fri, 24 Jul 2026 18:40:07 +0800
+Message-ID: <2d0f64ba1e8f0fa18b67696281b39eec93e908e2.1784888897.git.tanze@kylinos.cn>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1784888897.git.tanze@kylinos.cn>
 References: <cover.1784888897.git.tanze@kylinos.cn>
@@ -70,278 +70,298 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extend the query_all_EAs and set_EA callbacks, and
-smb2_query_info_compound(), with an optional inode. For SMB2 and SMB3,
-smb2_reuse_inode_lease() can use that inode to attach an existing lease
-key to temporary QUERY_INFO and SET_INFO opens.
+Register the security xattr handler, but allow security.capability to
+use its native SMB EA name only after SMB3 POSIX extensions have been
+requested and negotiated. Non-POSIX mounts retain the existing user EA
+mapping.
+
+On a POSIX mount, reject the colliding user.security.capability spelling
+and preserve security.capability in listxattr output.
+
+The native xattr and killpriv behavior can be checked as root:
+
+  $ CIFS_MNT=/path/to/cifs-mount
+  $ file="$CIFS_MNT/capability"
+  $ touch "$file"
+  $ setcap cap_chown+ep "$file"
+  $ getcap "$file" | grep -q 'cap_chown=ep'
+  $ printf 'data\n' >> "$file"
+  $ test -z "$(getcap "$file")"
 
 Signed-off-by: Ze Tan <tanze@kylinos.cn>
 ---
- fs/smb/client/cifsglob.h  |  5 +++--
- fs/smb/client/cifssmb.c   |  7 ++++---
- fs/smb/client/inode.c     |  2 +-
- fs/smb/client/smb1ops.c   |  4 ++--
- fs/smb/client/smb1proto.h |  5 +++--
- fs/smb/client/smb2ops.c   | 31 ++++++++++++++++++++++++-------
- fs/smb/client/smb2proto.h |  3 ++-
- fs/smb/client/xattr.c     |  6 +++---
- 8 files changed, 42 insertions(+), 21 deletions(-)
+ fs/smb/client/cifsfs.h  |   7 +++
+ fs/smb/client/smb2ops.c |  22 +++++---
+ fs/smb/client/xattr.c   | 112 +++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 129 insertions(+), 12 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 79e4e84f8985..5e752d8731a9 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -568,10 +568,11 @@ struct smb_version_operations {
- 	int (*validate_negotiate)(const unsigned int, struct cifs_tcon *);
- 	ssize_t (*query_all_EAs)(const unsigned int, struct cifs_tcon *,
- 			const unsigned char *, const unsigned char *, char *,
--			size_t, struct cifs_sb_info *);
-+			size_t, struct cifs_sb_info *, struct inode *);
- 	int (*set_EA)(const unsigned int, struct cifs_tcon *, const char *,
- 			const char *, const void *, const __u16,
--			const struct nls_table *, struct cifs_sb_info *);
-+			const struct nls_table *, struct cifs_sb_info *,
-+			struct inode *);
- 	struct smb_ntsd * (*get_acl)(struct cifs_sb_info *cifssb, struct inode *ino,
- 			const char *patch, u32 *plen, u32 info);
- 	struct smb_ntsd * (*get_acl_by_fid)(struct cifs_sb_info *cifssmb,
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 40162d5554ea..82dfb024b6bf 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -3142,7 +3142,8 @@ struct inode *cifs_create_reparse_inode(struct cifs_open_info_data *data,
- 					  &ea->ea_data[ea->ea_name_length+1],
- 					  le16_to_cpu(ea->ea_value_length),
- 					  cifs_sb->local_nls,
--					  cifs_sb);
-+					  cifs_sb,
-+					  NULL);
- 			if (rc)
- 				goto out_close;
- 			if (le32_to_cpu(ea->next_entry_offset) == 0)
-@@ -6113,7 +6114,7 @@ ssize_t
- CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
- 		const unsigned char *searchName, const unsigned char *ea_name,
- 		char *EAData, size_t buf_size,
--		struct cifs_sb_info *cifs_sb)
-+		struct cifs_sb_info *cifs_sb, struct inode *inode)
- {
- 		/* BB assumes one setup word */
- 	TRANSACTION2_QPI_REQ *pSMB = NULL;
-@@ -6304,7 +6305,7 @@ int
- CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
- 	     const char *fileName, const char *ea_name, const void *ea_value,
- 	     const __u16 ea_value_len, const struct nls_table *nls_codepage,
--	     struct cifs_sb_info *cifs_sb)
-+	     struct cifs_sb_info *cifs_sb, struct inode *inode)
- {
- 	struct smb_com_transaction2_spi_req *pSMB = NULL;
- 	struct smb_com_transaction2_spi_rsp *pSMBr = NULL;
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index b2806371bfde..a18c327afe03 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -742,7 +742,7 @@ static int cifs_sfu_mode(struct cifs_fattr *fattr, const unsigned char *path,
+diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
+index 854e672a4e37..4ab1a203be3e 100644
+--- a/fs/smb/client/cifsfs.h
++++ b/fs/smb/client/cifsfs.h
+@@ -133,6 +133,13 @@ int cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
+ 		 struct dentry *direntry, const char *symname);
  
- 	rc = tcon->ses->server->ops->query_all_EAs(xid, tcon, path,
- 			"SETFILEBITS", ea_value, 4 /* size of buf */,
--			cifs_sb);
-+			cifs_sb, NULL);
- 	cifs_put_tlink(tlink);
- 	if (rc < 0)
- 		return (int)rc;
-diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
-index dc5a8c1da623..cbe1f4cc00e0 100644
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -663,7 +663,7 @@ static int cifs_query_path_info(const unsigned int xid,
- 
- 		rc = CIFSSMBQAllEAs(xid, tcon, full_path, SMB2_WSL_XATTR_MODE,
- 				    &ea->ea_data[SMB2_WSL_XATTR_NAME_LEN + 1],
--				    SMB2_WSL_XATTR_MODE_SIZE, cifs_sb);
-+				    SMB2_WSL_XATTR_MODE_SIZE, cifs_sb, NULL);
- 		if (rc == SMB2_WSL_XATTR_MODE_SIZE) {
- 			ea->next_entry_offset = cpu_to_le32(0);
- 			ea->flags = 0;
-@@ -709,7 +709,7 @@ static int cifs_query_path_info(const unsigned int xid,
- 
- 		rc = CIFSSMBQAllEAs(xid, tcon, full_path, SMB2_WSL_XATTR_DEV,
- 				    &ea->ea_data[SMB2_WSL_XATTR_NAME_LEN + 1],
--				    SMB2_WSL_XATTR_DEV_SIZE, cifs_sb);
-+				    SMB2_WSL_XATTR_DEV_SIZE, cifs_sb, NULL);
- 		if (rc == SMB2_WSL_XATTR_DEV_SIZE) {
- 			ea->next_entry_offset = cpu_to_le32(0);
- 			ea->flags = 0;
-diff --git a/fs/smb/client/smb1proto.h b/fs/smb/client/smb1proto.h
-index 80eaeb3dd2ec..cc3fb7370ab4 100644
---- a/fs/smb/client/smb1proto.h
-+++ b/fs/smb/client/smb1proto.h
-@@ -208,12 +208,13 @@ int CIFSSMBUnixSetPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
- ssize_t CIFSSMBQAllEAs(const unsigned int xid, struct cifs_tcon *tcon,
- 		       const unsigned char *searchName,
- 		       const unsigned char *ea_name, char *EAData,
--		       size_t buf_size, struct cifs_sb_info *cifs_sb);
-+		       size_t buf_size, struct cifs_sb_info *cifs_sb,
-+		       struct inode *inode);
- int CIFSSMBSetEA(const unsigned int xid, struct cifs_tcon *tcon,
- 		 const char *fileName, const char *ea_name,
- 		 const void *ea_value, const __u16 ea_value_len,
- 		 const struct nls_table *nls_codepage,
--		 struct cifs_sb_info *cifs_sb);
-+		 struct cifs_sb_info *cifs_sb, struct inode *inode);
- 
- /*
-  * smb1debug.c
+ #ifdef CONFIG_CIFS_XATTR
++enum cifs_ea_name_type {
++	CIFS_EA_USER,
++	CIFS_EA_NATIVE,
++};
++
++enum cifs_ea_name_type
++cifs_ea_name_type(const char *name, size_t name_len, bool posix_extensions);
+ extern const struct xattr_handler * const cifs_xattr_handlers[];
+ ssize_t cifs_listxattr(struct dentry *direntry, char *data, size_t buf_size);
+ #else
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index cbd51a08e97e..e85d6b5a4564 100644
+index e85d6b5a4564..fd778d903e93 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -1042,6 +1042,20 @@ static int smb2_query_file_info(const unsigned int xid, struct cifs_tcon *tcon,
- 	return SMB2_query_info(xid, tcon, fid->persistent_fid, fid->volatile_fid, &data->fi);
- }
- 
-+static void smb2_reuse_inode_lease(struct cifs_tcon *tcon,
-+				   struct TCP_Server_Info *server,
-+				   struct inode *inode, struct cifs_fid *fid,
-+				   u8 *oplock)
-+{
-+	if (!inode || !tcon->posix_extensions ||
-+	    !(server->capabilities & SMB2_GLOBAL_CAP_LEASING) ||
-+	    !CIFS_I(inode)->lease_granted || !server->ops->get_lease_key)
-+		return;
-+
-+	*oplock = SMB2_OPLOCK_LEVEL_LEASE;
-+	server->ops->get_lease_key(inode, fid);
-+}
-+
- #ifdef CONFIG_CIFS_XATTR
+@@ -1060,7 +1060,7 @@ static void smb2_reuse_inode_lease(struct cifs_tcon *tcon,
  static ssize_t
  move_smb2_ea_to_cifs(char *dst, size_t dst_size,
-@@ -1132,7 +1146,7 @@ static ssize_t
- smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
- 	       const unsigned char *path, const unsigned char *ea_name,
- 	       char *ea_data, size_t buf_size,
--	       struct cifs_sb_info *cifs_sb)
-+	       struct cifs_sb_info *cifs_sb, struct inode *inode)
+ 		     struct smb2_file_full_ea_info *src, size_t src_size,
+-		     const unsigned char *ea_name)
++		     const unsigned char *ea_name, bool posix_extensions)
  {
- 	int rc;
- 	struct kvec rsp_iov = {NULL, 0};
-@@ -1147,7 +1161,7 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
- 				      CIFSMaxBufSize -
- 				      MAX_SMB2_CREATE_RESPONSE_SIZE -
- 				      MAX_SMB2_CLOSE_RESPONSE_SIZE,
--				      &rsp_iov, &buftype, cifs_sb);
-+				      &rsp_iov, &buftype, cifs_sb, inode);
- 	if (rc) {
- 		/*
- 		 * If ea_name is NULL (listxattr) and there are no EAs,
-@@ -1181,7 +1195,7 @@ static int
- smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 	    const char *path, const char *ea_name, const void *ea_value,
- 	    const __u16 ea_value_len, const struct nls_table *nls_codepage,
--	    struct cifs_sb_info *cifs_sb)
-+	    struct cifs_sb_info *cifs_sb, struct inode *inode)
- {
- 	struct smb2_compound_vars *vars;
- 	struct cifs_ses *ses = tcon->ses;
-@@ -1234,7 +1248,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 		if (!ea_value) {
- 			rc = ses->server->ops->query_all_EAs(xid, tcon, path,
- 							     ea_name, NULL, 0,
--							     cifs_sb);
-+							     cifs_sb, inode);
- 			if (rc == -ENODATA)
- 				goto sea_exit;
+ 	int rc = 0;
+ 	unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
+@@ -1099,16 +1099,25 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
+ 				goto out;
+ 			}
  		} else {
-@@ -1250,7 +1264,8 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 				      CIFSMaxBufSize -
- 				      MAX_SMB2_CREATE_RESPONSE_SIZE -
- 				      MAX_SMB2_CLOSE_RESPONSE_SIZE,
--				      &rsp_iov[1], &resp_buftype[1], cifs_sb);
-+				      &rsp_iov[1], &resp_buftype[1], cifs_sb,
-+				      inode);
- 			if (rc == 0) {
- 				rsp = (struct smb2_query_info_rsp *)rsp_iov[1].iov_base;
- 				used_len = le32_to_cpu(rsp->OutputBufferLength);
-@@ -1286,6 +1301,7 @@ smb2_set_ea(const unsigned int xid, struct cifs_tcon *tcon,
- 		.replay = !!(retries),
- 	};
+-			/* 'user.' plus a terminating null */
+-			user_name_len = 5 + 1 + name_len;
++			enum cifs_ea_name_type name_type;
++
++			name_type = cifs_ea_name_type(name, name_len,
++						     posix_extensions);
++			if (name_type == CIFS_EA_NATIVE)
++				user_name_len = name_len + 1;
++			else
++				/* 'user.' plus a terminating null */
++				user_name_len = 5 + 1 + name_len;
  
-+	smb2_reuse_inode_lease(tcon, server, inode, &fid, &oplock);
- 	rc = SMB2_open_init(tcon, server,
- 			    &rqst[0], &oplock, &oparms, utf16_path);
- 	if (rc)
-@@ -2861,7 +2877,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
- 			 const char *path, u32 desired_access,
- 			 u32 class, u32 type, u32 output_len,
- 			 struct kvec *rsp, int *buftype,
--			 struct cifs_sb_info *cifs_sb)
-+			 struct cifs_sb_info *cifs_sb, struct inode *inode)
- {
- 	struct smb2_compound_vars *vars;
- 	struct cifs_ses *ses = tcon->ses;
-@@ -2923,6 +2939,7 @@ smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
- 		.replay = !!(retries),
- 	};
+ 			if (buf_size == 0) {
+ 				/* skip copy - calc size only */
+ 				rc += user_name_len;
+ 			} else if (dst_size >= user_name_len) {
+ 				dst_size -= user_name_len;
+-				memcpy(dst, "user.", 5);
+-				dst += 5;
++				if (name_type == CIFS_EA_USER) {
++					memcpy(dst, "user.", 5);
++					dst += 5;
++				}
+ 				memcpy(dst, src->ea_data, name_len);
+ 				dst += name_len;
+ 				*dst = 0;
+@@ -1184,7 +1193,8 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
+ 	info = (struct smb2_file_full_ea_info *)(
+ 			le16_to_cpu(rsp->OutputBufferOffset) + (char *)rsp);
+ 	rc = move_smb2_ea_to_cifs(ea_data, buf_size, info,
+-			le32_to_cpu(rsp->OutputBufferLength), ea_name);
++			le32_to_cpu(rsp->OutputBufferLength), ea_name,
++			tcon->posix_extensions);
  
-+	smb2_reuse_inode_lease(tcon, server, inode, &fid, &oplock);
- 	rc = SMB2_open_init(tcon, server,
- 			    &rqst[0], &oplock, &oparms, utf16_path);
- 	if (rc)
-@@ -3032,7 +3049,7 @@ smb2_queryfs(const unsigned int xid, struct cifs_tcon *tcon,
- 				      FS_FULL_SIZE_INFORMATION,
- 				      SMB2_O_INFO_FILESYSTEM,
- 				      sizeof(struct smb2_fs_full_size_info),
--				      &rsp_iov, &buftype, cifs_sb);
-+				      &rsp_iov, &buftype, cifs_sb, NULL);
- 	if (rc)
- 		goto qfs_exit;
- 
-diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
-index 2e9f70096825..99978e63df68 100644
---- a/fs/smb/client/smb2proto.h
-+++ b/fs/smb/client/smb2proto.h
-@@ -267,7 +267,8 @@ void smb311_update_preauth_hash(struct cifs_ses *ses,
- int smb2_query_info_compound(const unsigned int xid, struct cifs_tcon *tcon,
- 			     const char *path, u32 desired_access, u32 class,
- 			     u32 type, u32 output_len, struct kvec *rsp,
--			     int *buftype, struct cifs_sb_info *cifs_sb);
-+			     int *buftype, struct cifs_sb_info *cifs_sb,
-+			     struct inode *inode);
- /* query path info from the server using SMB311 POSIX extensions*/
- int posix_info_parse(const void *beg, const void *end,
- 		     struct smb2_posix_info_parsed *out);
+  qeas_exit:
+ 	free_rsp_buf(buftype, rsp_iov.iov_base);
 diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
-index 5091f6c0d7fe..d52c52866651 100644
+index d52c52866651..f975bccf98a5 100644
 --- a/fs/smb/client/xattr.c
 +++ b/fs/smb/client/xattr.c
-@@ -155,7 +155,7 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+@@ -36,12 +36,63 @@
+ #define SMB3_XATTR_CIFS_NTSD_FULL "system.smb3_ntsd_full" /* owner/DACL/SACL */
+ #define SMB3_XATTR_ATTRIB "smb3.dosattrib"  /* full name: user.smb3.dosattrib */
+ #define SMB3_XATTR_CREATETIME "smb3.creationtime"  /* user.smb3.creationtime */
+-/* BB need to add server (Samba e.g) support for security and trusted prefix */
+-
+-enum { XATTR_USER, XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT,
++enum { XATTR_USER, XATTR_SECURITY,
++	XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT,
+ 	XATTR_CIFS_NTSD_SACL, XATTR_CIFS_NTSD_OWNER,
+ 	XATTR_CIFS_NTSD, XATTR_CIFS_NTSD_FULL };
+ 
++static const char * const cifs_native_xattr_names[] = {
++	XATTR_NAME_CAPS,
++};
++
++enum cifs_ea_name_type
++cifs_ea_name_type(const char *name, size_t name_len, bool posix_extensions)
++{
++	size_t i;
++
++	if (!posix_extensions)
++		return CIFS_EA_USER;
++
++	for (i = 0; i < ARRAY_SIZE(cifs_native_xattr_names); i++) {
++		size_t xattr_len = strlen(cifs_native_xattr_names[i]);
++
++		if (name_len == xattr_len &&
++		    !memcmp(name, cifs_native_xattr_names[i], name_len))
++			return CIFS_EA_NATIVE;
++	}
++
++	return CIFS_EA_USER;
++}
++
++static int cifs_build_ea_name(int xattr_flag, const char *name, char *ea_name,
++			      size_t ea_name_size)
++{
++	const char *prefix;
++	size_t name_len, prefix_len;
++
++	switch (xattr_flag) {
++	case XATTR_SECURITY:
++		prefix = XATTR_SECURITY_PREFIX;
++		prefix_len = XATTR_SECURITY_PREFIX_LEN;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	name_len = strlen(name);
++	if (ea_name_size <= prefix_len ||
++	    name_len > ea_name_size - prefix_len - 1)
++		return -ERANGE;
++
++	memcpy(ea_name, prefix, prefix_len);
++	memcpy(ea_name + prefix_len, name, name_len + 1);
++
++	if (cifs_ea_name_type(ea_name, prefix_len + name_len, true) !=
++	    CIFS_EA_NATIVE)
++		return -EOPNOTSUPP;
++	return 0;
++}
++
+ static int cifs_attrib_set(unsigned int xid, struct cifs_tcon *pTcon,
+ 			   struct inode *inode, const char *full_path,
+ 			   const void *value, size_t size)
+@@ -104,6 +155,9 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 	struct cifs_tcon *pTcon;
+ 	const char *full_path;
+ 	void *page;
++	char ea_name[XATTR_NAME_MAX + 1];
++	const char *server_ea_name = name;
++	struct inode *lease_inode = NULL;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -131,8 +185,24 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 	}
+ 
+ 	switch (handler->flags) {
++	case XATTR_SECURITY:
++		if (!pTcon->posix_extensions)
++			goto out;
++		rc = cifs_build_ea_name(handler->flags, name, ea_name,
++					sizeof(ea_name));
++		if (rc < 0)
++			goto out;
++		server_ea_name = ea_name;
++		lease_inode = inode;
++		cifs_dbg(FYI, "%s: setting security xattr %s\n",
++			 __func__, name);
++		goto set_ea;
++
+ 	case XATTR_USER:
+ 		cifs_dbg(FYI, "%s:setting user xattr %s\n", __func__, name);
++		if (cifs_ea_name_type(name, strlen(name),
++				      pTcon->posix_extensions) != CIFS_EA_USER)
++			goto out;
+ 		if ((strcmp(name, CIFS_XATTR_ATTRIB) == 0) ||
+ 		    (strcmp(name, SMB3_XATTR_ATTRIB) == 0)) {
+ 			rc = cifs_attrib_set(xid, pTcon, inode, full_path,
+@@ -149,13 +219,14 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
+ 			break;
+ 		}
+ 
++set_ea:
+ 		if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_NO_XATTR)
+ 			goto out;
+ 
  		if (pTcon->ses->server->ops->set_EA) {
  			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
- 				full_path, name, value, (__u16)size,
--				cifs_sb->local_nls, cifs_sb);
-+				cifs_sb->local_nls, cifs_sb, NULL);
+-				full_path, name, value, (__u16)size,
+-				cifs_sb->local_nls, cifs_sb, NULL);
++				full_path, server_ea_name, value, (__u16)size,
++				cifs_sb->local_nls, cifs_sb, lease_inode);
  			if (rc == 0)
  				inode_set_ctime_current(inode);
  		}
-@@ -314,7 +314,7 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+@@ -280,6 +351,9 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 	struct cifs_tcon *pTcon;
+ 	const char *full_path;
+ 	void *page;
++	char ea_name[XATTR_NAME_MAX + 1];
++	const char *server_ea_name = name;
++	struct inode *lease_inode = NULL;
+ 
+ 	tlink = cifs_sb_tlink(cifs_sb);
+ 	if (IS_ERR(tlink))
+@@ -297,8 +371,24 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 
+ 	/* return alt name if available as pseudo attr */
+ 	switch (handler->flags) {
++	case XATTR_SECURITY:
++		if (!pTcon->posix_extensions)
++			goto out;
++		rc = cifs_build_ea_name(handler->flags, name, ea_name,
++					sizeof(ea_name));
++		if (rc < 0)
++			goto out;
++		server_ea_name = ea_name;
++		lease_inode = inode;
++		cifs_dbg(FYI, "%s: querying security xattr %s\n",
++			 __func__, name);
++		goto query_ea;
++
+ 	case XATTR_USER:
+ 		cifs_dbg(FYI, "%s:querying user xattr %s\n", __func__, name);
++		if (cifs_ea_name_type(name, strlen(name),
++				      pTcon->posix_extensions) != CIFS_EA_USER)
++			goto out;
+ 		if ((strcmp(name, CIFS_XATTR_ATTRIB) == 0) ||
+ 		    (strcmp(name, SMB3_XATTR_ATTRIB) == 0)) {
+ 			rc = cifs_attrib_get(dentry, inode, value, size);
+@@ -309,12 +399,14 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
+ 			break;
+ 		}
+ 
++query_ea:
+ 		if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_NO_XATTR)
+ 			goto out;
  
  		if (pTcon->ses->server->ops->query_all_EAs)
  			rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
--				full_path, name, value, size, cifs_sb);
-+				full_path, name, value, size, cifs_sb, NULL);
+-				full_path, name, value, size, cifs_sb, NULL);
++				full_path, server_ea_name, value, size, cifs_sb,
++				lease_inode);
  		break;
  
  	case XATTR_CIFS_ACL:
-@@ -423,7 +423,7 @@ ssize_t cifs_listxattr(struct dentry *direntry, char *data, size_t buf_size)
+@@ -438,6 +530,13 @@ static const struct xattr_handler cifs_user_xattr_handler = {
+ 	.set = cifs_xattr_set,
+ };
  
- 	if (pTcon->ses->server->ops->query_all_EAs)
- 		rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
--				full_path, NULL, data, buf_size, cifs_sb);
-+				full_path, NULL, data, buf_size, cifs_sb, NULL);
- list_ea_exit:
- 	free_dentry_path(page);
- 	free_xid(xid);
++static const struct xattr_handler cifs_security_xattr_handler = {
++	.prefix = XATTR_SECURITY_PREFIX,
++	.flags = XATTR_SECURITY,
++	.get = cifs_xattr_get,
++	.set = cifs_xattr_set,
++};
++
+ /* os2.* attributes are treated like user.* attributes */
+ static const struct xattr_handler cifs_os2_xattr_handler = {
+ 	.prefix = XATTR_OS2_PREFIX,
+@@ -522,6 +621,7 @@ static const struct xattr_handler smb3_ntsd_full_xattr_handler = {
+ 
+ const struct xattr_handler * const cifs_xattr_handlers[] = {
+ 	&cifs_user_xattr_handler,
++	&cifs_security_xattr_handler,
+ 	&cifs_os2_xattr_handler,
+ 	&cifs_cifs_acl_xattr_handler,
+ 	&smb3_acl_xattr_handler, /* alias for above since avoiding "cifs" */
 -- 
 2.43.0
 
