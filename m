@@ -1,367 +1,198 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C71248893
-	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 10:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD3C311969
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 11:50:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784889690; cv=none; b=FaBgkNofcr0u3KPVNYQ0SPq5SKmz6K14R5CUSFcQtCQ2tKw4Wip/gCtRcjJAprG9746pWCaBgWTNJtc2mPm77RY1vrJ+96OnUsDOPoncKchRvEZaaGokGX7GFQv04wq/YP47YUY7lKvV3pLODkku9NCDPBwNljAScKmQHJhgS20=
+	t=1784893807; cv=none; b=XF/PRq85MncwO/jKTFcHQEZKUDBml2z+Nm/we3flZYJ8ob1R9xFE/Ji2B2NFcPP35wz3e/Dd96tM0ezqSTjLyXqpmifWJB6Wz1HpdbWUTm8BRZQK6PBfVmTjm8WfTT25vT8wtCkxnKO32retJwmqQqy0WeN0WcK7zkQ9obUJfbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784889690; c=relaxed/simple;
-	bh=d7Qm9Y263p7hN5bGMBl/lfEzBcpgCEwfjjl9zJY5YyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dV3LWbOzZE3rtee434VKDMyTZjsnLphafz9pUqj6sqTA+2oKdBlU+T0q7OuOYyzZk0bdPDEbXKtmdRnrMVJbOJqfukU00B19h9S8qxumbaARe+VKygYnU7ewvHK9tqsqC7H7FkWSkZ3ve/MRSzgkKTSE66WHcXPziIuvmSjzFto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 34443d1a874c11f1aa26b74ffac11d73-20260724
-X-CTIC-Tags:
-	HR_CC_AS_FROM, HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:4921c607-c133-42d9-bfc7-471edd1589ff,IP:10,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:5
-X-CID-INFO: VERSION:1.3.12,REQID:4921c607-c133-42d9-bfc7-471edd1589ff,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:5
-X-CID-META: VersionHash:e7bac3a,CLOUDID:f2fd86b34136e924bd3e6d3c9fbf9ffe,BulkI
-	D:260724184121QII20UBZ,BulkQuantity:0,Recheck:0,SF:10|38|66|78|81|82|102|1
-	27|136|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,B
-	ulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR
-	:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 34443d1a874c11f1aa26b74ffac11d73-20260724
-X-User: tanze@kylinos.cn
-Received: from desktop-od00ebi.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
-	(envelope-from <tanze@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 929504896; Fri, 24 Jul 2026 18:41:18 +0800
-From: Ze Tan <tanze@kylinos.cn>
-To: sfrench@samba.org,
-	linkinjeon@kernel.org,
-	slow@samba.org,
-	pc@manguebit.org,
-	jra@samba.org,
-	tom@talpey.comm,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org
-Cc: tanze@kylinos.cn
-Subject: [PATCH 13/15] smb: client: gate security.capability EA on POSIX mounts
-Date: Fri, 24 Jul 2026 18:40:07 +0800
-Message-ID: <2d0f64ba1e8f0fa18b67696281b39eec93e908e2.1784888897.git.tanze@kylinos.cn>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1784888897.git.tanze@kylinos.cn>
-References: <cover.1784888897.git.tanze@kylinos.cn>
+	s=arc-20240116; t=1784893807; c=relaxed/simple;
+	bh=ltgiJ3I8hVMxuwXqDL3tfh5XlJBCdz7Xp4yEq+zXBuo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uspq/mYJZ+Bbli0rBK/Uj+3TGj8GLiTN86uBmm9XKpYGxtdwVcoYJ5C6/aaPyLJlz66NH93kjXUH4OXLNMJxCALGmxipL49oIk/ZIEh9xmdaWSBxeQELgSlahVOB2DUxZq9+RROoIDOusgYpaYgejLj01rvIRXkhCdslV1GVnAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=n+rn9jed; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="n+rn9jed"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:To:Date:Message-ID:CC;
+	bh=ltgiJ3I8hVMxuwXqDL3tfh5XlJBCdz7Xp4yEq+zXBuo=; b=n+rn9jed+1BbHvS6s/46apggda
+	h388QtbGIUExIuN8EujHF04mB7KRVJREKemS2MDg/Yvj/kdQ2opguYhXA429ClzNNmpQ+b2AcrCih
+	gvg6nUytpSar7JYxHTK8PmVO1SZWe3d3QzfZ9Vo2kUj4fdwfVG7anJV43qqRwvcZCtqvRYFIOSFyD
+	kT5s7n0ho1C/atVbAUypiLF4EQXqbCj4ddFANjm4/4u0uppAzw9FibIEhcDdmfXxGVuaPBWJkYvkO
+	oRCGsIE4JvqV6tr4yeF/jjkcitCOSp640oNBWm3Tp/LXJaTetX8H4Skw2pkVHvRvEVP5SCiEOa4ut
+	g9fcV9/VnavIzefY9JuLfPbdzeoMGEpAeScWSpcYYUreDekegvYBxuQnfwpiigW4/4qAkiaRZoaHV
+	fmqhPBlV9IxWZomsW2S5zLRNvebTBl808WLIguG4yPSLkraom2J/Vd5ZqWltNBb1dyCunwn/m/VS5
+	lK11KbeXUoa7OM75YfFRejo9;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wnEPX-0000000096I-0hAA;
+	Fri, 24 Jul 2026 11:49:51 +0000
+Message-ID: <23f16c23-6221-4fcf-8cea-20eb36f47b9e@samba.org>
+Date: Fri, 24 Jul 2026 13:49:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/15] smb: add native security and trusted xattrs
+To: Ze Tan <tanze@kylinos.cn>, sfrench@samba.org, linkinjeon@kernel.org,
+ pc@manguebit.org, jra@samba.org, tom@talpey.comm,
+ chenxiaosong@chenxiaosong.com, linux-cifs@vger.kernel.org
+References: <cover.1784888897.git.tanze@kylinos.cn>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
+ eZWlARe4Ihmry9XV67v/DUa3qXYihV62jmiTgCyEu1HFGhWGzkk99Vahq/2kVgN4vwz8zep1
+ uvTAx4sgouL2Ri4HqeOdGveTQKQY4oOnWpEhXZ2qeCAc3fTHEB1FmRrZJp7A7y0C8/NEXnxT
+ vfCZc7jsbanZAAUpQCGve+ilqn3px5Xo+1HZPnmfOrDODGo0qS/eJFnZ3aEy9y906I60fW27
+ W+y++xX/8a1w76mi1nRGYQX7e8oAWshijPiM0X8hQNs91EW1TvUjvI7SiELEui0/OX/3cvR8
+ kEEAmGlths99W+jigK15KbeWOO3OJdyCfY/Rimse4rJfVe41BdEF3J0z6YzaFQoJORXm0M8y
+ O5OxpAZFYuhywfx8eCf4Cgzir7jFOKaDaRaFwlVRIOJwXlvidDuiKBfCcMzVafxn5wTyt/qy
+ gcmvaHH/2qerqhfMI09kus0NfudYnbSjtpNcskecwJNEpo8BG9HVgwF9H/hiI9oh2BGBng7f
+ bcz9sx2tGtQJpxKoBN91zuH0fWj7HYBX6FLnnD+m4ve2Avrg/H0Mk6pnvuTj5FxW5oqz9Dk1
+ 1HDrco3/+4hFVaCJezv8THsyU7MLc8V2WmZGYiaRanbEb2CoSQARAQABzR1SYWxwaCBCw7Zo
+ bWUgPHNsb3dAc2FtYmEub3JnPsLBlwQTAQgAQQIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIX
+ gAIZARYhBPrixgiKJCUgUcVZ5Koem3EmOZ5GBQJo+I8JBQkYXvllAAoJEKoem3EmOZ5GdQoP
+ /2BPMBZZCddHoXlJu++OPOf9Rk6TuYN3Pntq2LfhPsFEdNHrMCV0KSNY993cQBRFrn6HbvLD
+ NazKxDR9U1kSAXoopKyk2M3qpJ6kRvekqriCY04sOZ/iHk75Vmn5bp/Q3/9f3+40ZC4e0hF1
+ XNMLyunGtCoxOWfDViax+qemDVwJvamMNx7kQXYe5SMtH7Gpi2DiGAq41g+93xKj/pS9WEo3
+ 5+d5zm2KEofaBQU4iecWA3H8U2OIh3kFJeiV4HDfVxkP5INcPNyP+bckpei4Nd3BczKN6I1q
+ dAjdn/wmwGAlGpnSjjrYYKFKO3lHbBwm95Lv2rlpzqiBfIizXn656LsG0PQIslO6e5u9wwiR
+ JOMlYBPmE/PwUPJkTiBSup8j1hFmyTqXYMzAjxGJ+MBkJ+QYCRSP8uMRvgiLY5+1h/C3dJBh
+ lvRUW97qC/g+nji3CRXJRKHrmxmEy1E7u1HCZsrLhGCIKZqTZxdu3vEsFh/pd9XE9OoXlC9y
+ x61umA92rIgOYU93/d4emsAIjvtxDmx/h2kuj5D1moFkAyLp2wnKPLJGeyXQc2WSbBJHlc4k
+ iDPAFVWj0a8SlTagXtnmIQ+jG6QLvGdIbotpxnfrXTRKOqxDU5Fb9t40zNA4AnRjV/wYtvm7
+ ps1qn9AfKACW6GcCX1jkLJQtLNXfi0WBIXixzsFNBFRbb/sBEADCSnUsQShBPcAPJQH9DMQN
+ nCO3tUZ32mx32S/WD5ykiVpeIxpEa2X/QpS8d5c8OUh5ALB4uTUgrQqczXhWUwGHPAV2PW0s
+ /S4NUXsCs/Mdry2ANNk/mfSMtQMr6j2ptg/Mb79FZAqSeNbS81KcfsWPwhALgeImYUw3JoyY
+ g1KWgROltG+LC32vnDDTotcU8yekg4bKZ3lekVODxk0doZl8mFvDTAiHFK9O5Y1azeJaSMFk
+ NE/BNHsI/deDzGkiV9HhRwge7/e4l4uJI0dPtLpGNELPq7fty97OvjxUc9dRfQDQ9CUBzovg
+ 3rprpuxVNRktSpKAdaZzbTPLj8IcyKoFLQ+MqdaI7oak2Wr5dTCXldbByB0i4UweEyFs32WP
+ NkJoGWq2P8zH9aKmc2wE7CHz7RyR7hE9m7NeGrUyqNKA8QpCEhoXHZvaJ6ko2aaTu1ej8KCs
+ yR5xVsvRk90YzKiy+QAQKMg5JuJe92r7/uoRP/xT8yHDrgXLd2cDjeNeR5RLYi1/IrnqXuDi
+ UPCs9/E7iTNyh3P0wh43jby8pJEUC5I3w200Do5cdQ4VGad7XeQBc3pEUmFc6FgwF7SVakJZ
+ TvxkeL5FcE1On82rJqK6eSOIkV45pxTMvEuNyX8gs01A4BuReF06obg40o5P7bovlsog6NqZ
+ oD+JDJWM0kdYZQARAQABwsGQBBgBCAAmAhsMFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmj4
+ jwkFCRhe+WUAHgkQqh6bcSY5nkYJEKoem3EmOZ5GCRCqHptxJjmeRq7xEADDqdSBTnLC68Vr
+ tq6Qum4LjdXmfsZjVr/JSgUCe89jrOaofycpddHBMP9ORk1UzPLJSZbO5N7gvwJTDK+ZBxtB
+ 9yP5DtIhgzJZamb6m8h3cthyn/8RG3h+Fk5pXq6wtH12ZerHJ8XVNd0CCH2GxF8oVB3csGWh
+ nrBt8maGYk7x0/wZK2ErylsohEiSCAA9aPJyhM5kafnk/6ov5bbc5bxqbnaI+jpwzZXeGT/v
+ ACyWKv6cAmWepuexlQVsH/s9JchzVgasD7YWwGHszZwyMqLZi7XeOTz0pg0JKFGLlfsNYSpc
+ LVhBztTc9vg5Uf/lFhObHkhXv/7ootSNOtll98/2Bk1qLW9rKQsnc5IR01AuNGCJNDuaBNfX
+ IHd7AHUW6xUVUWOCBtyMCCyOdbOiDFlMzF8GvR4kCUuRh66CUvl+EYCUOnwr551f6rq4sJga
+ Wqn2Ta8+lozMNjMkqri6QV7fyJQCryCv2/cI0q5IVUTPIzB0xfFCkgOX4vz8Te7ou7bkS5L2
+ PgCGx2XZ0ICO1zdh1OafQXZcI0ZKA/+ZmMt7rFcf8cdjwJ3qRKtScUYhxq2N9wL3fQJNQPvK
+ TXc80T2QVqV/yS3gZ4UmqYaBcMIoAyQWu8vbJnt6vCnf33g5sko3H8vbfpFW2TgesM6tyK1W
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <cover.1784888897.git.tanze@kylinos.cn>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------8fUOjiAygWTcPpTz35A3LVjG"
 
-Register the security xattr handler, but allow security.capability to
-use its native SMB EA name only after SMB3 POSIX extensions have been
-requested and negotiated. Non-POSIX mounts retain the existing user EA
-mapping.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------8fUOjiAygWTcPpTz35A3LVjG
+Content-Type: multipart/mixed; boundary="------------y2uKadEz8eA8kAto7Djbljm4";
+ protected-headers="v1"; hp="clear"
+Message-ID: <23f16c23-6221-4fcf-8cea-20eb36f47b9e@samba.org>
+Date: Fri, 24 Jul 2026 13:49:51 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/15] smb: add native security and trusted xattrs
+To: Ze Tan <tanze@kylinos.cn>, sfrench@samba.org, linkinjeon@kernel.org,
+ pc@manguebit.org, jra@samba.org, tom@talpey.comm,
+ chenxiaosong@chenxiaosong.com, linux-cifs@vger.kernel.org
+References: <cover.1784888897.git.tanze@kylinos.cn>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <cover.1784888897.git.tanze@kylinos.cn>
 
-On a POSIX mount, reject the colliding user.security.capability spelling
-and preserve security.capability in listxattr output.
+--------------y2uKadEz8eA8kAto7Djbljm4
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-The native xattr and killpriv behavior can be checked as root:
+T24gNy8yNC8yNiAxMjozOSBQTSwgWmUgVGFuIHdyb3RlOg0KPiBOYXRpdmUgeGF0dHJzIGFy
+ZSByZXR1cm5lZCB3aXRob3V0IGEgcHJlZml4IHdoZW4gRUFzIGFyZSBsaXN0ZWQuIFRoZWly
+DQo+IGNvcnJlc3BvbmRpbmcgdXNlci4qIGJhY2tpbmcgeGF0dHJzIGFyZSBoaWRkZW4gaW4g
+bmF0aXZlIG1vZGUuDQpzb3JyeSwgYnV0IEkgZG9uJ3QgcmVhbGx5IHVuZGVyc3RhbmQgaG93
+IHRoaXMgaXMgc3VwcG9zZWQgdG8gd29yay4uLiA6KQ0KDQpNYXliZSB5b3UgY2FuIHByb3Zp
+ZGUgYSBzaW1wbGUgdGFibGUgdGhhdCBzaG93cyB0aGUgcmVwcmVzZW50YXRpb24gb24gDQpz
+ZXJ2ZXIsIGNsaWVudCBhbmQgcHJvdG9jb2wgZm9yIHRoZSByZWxldmFudCBuYW1lc3BhY2Vz
+Pw0KDQogRnJvbSB5b3VyIGNvbW1pdCBtZXNzYWdlIGFsb25lLCBJIGNvdWxkbid0IHRlbGwg
+aG93IHRoZSB1c2VyIG5hbWVzcGFjZSANCmlzIGludGVuZGVkIHRvIGJlIGhhbmRsZWQuDQoN
+ClRoYW5rcyENCg0KDQo=
 
-  $ CIFS_MNT=/path/to/cifs-mount
-  $ file="$CIFS_MNT/capability"
-  $ touch "$file"
-  $ setcap cap_chown+ep "$file"
-  $ getcap "$file" | grep -q 'cap_chown=ep'
-  $ printf 'data\n' >> "$file"
-  $ test -z "$(getcap "$file")"
+--------------y2uKadEz8eA8kAto7Djbljm4--
 
-Signed-off-by: Ze Tan <tanze@kylinos.cn>
----
- fs/smb/client/cifsfs.h  |   7 +++
- fs/smb/client/smb2ops.c |  22 +++++---
- fs/smb/client/xattr.c   | 112 +++++++++++++++++++++++++++++++++++++---
- 3 files changed, 129 insertions(+), 12 deletions(-)
+--------------8fUOjiAygWTcPpTz35A3LVjG
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-index 854e672a4e37..4ab1a203be3e 100644
---- a/fs/smb/client/cifsfs.h
-+++ b/fs/smb/client/cifsfs.h
-@@ -133,6 +133,13 @@ int cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
- 		 struct dentry *direntry, const char *symname);
- 
- #ifdef CONFIG_CIFS_XATTR
-+enum cifs_ea_name_type {
-+	CIFS_EA_USER,
-+	CIFS_EA_NATIVE,
-+};
-+
-+enum cifs_ea_name_type
-+cifs_ea_name_type(const char *name, size_t name_len, bool posix_extensions);
- extern const struct xattr_handler * const cifs_xattr_handlers[];
- ssize_t cifs_listxattr(struct dentry *direntry, char *data, size_t buf_size);
- #else
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index e85d6b5a4564..fd778d903e93 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1060,7 +1060,7 @@ static void smb2_reuse_inode_lease(struct cifs_tcon *tcon,
- static ssize_t
- move_smb2_ea_to_cifs(char *dst, size_t dst_size,
- 		     struct smb2_file_full_ea_info *src, size_t src_size,
--		     const unsigned char *ea_name)
-+		     const unsigned char *ea_name, bool posix_extensions)
- {
- 	int rc = 0;
- 	unsigned int ea_name_len = ea_name ? strlen(ea_name) : 0;
-@@ -1099,16 +1099,25 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
- 				goto out;
- 			}
- 		} else {
--			/* 'user.' plus a terminating null */
--			user_name_len = 5 + 1 + name_len;
-+			enum cifs_ea_name_type name_type;
-+
-+			name_type = cifs_ea_name_type(name, name_len,
-+						     posix_extensions);
-+			if (name_type == CIFS_EA_NATIVE)
-+				user_name_len = name_len + 1;
-+			else
-+				/* 'user.' plus a terminating null */
-+				user_name_len = 5 + 1 + name_len;
- 
- 			if (buf_size == 0) {
- 				/* skip copy - calc size only */
- 				rc += user_name_len;
- 			} else if (dst_size >= user_name_len) {
- 				dst_size -= user_name_len;
--				memcpy(dst, "user.", 5);
--				dst += 5;
-+				if (name_type == CIFS_EA_USER) {
-+					memcpy(dst, "user.", 5);
-+					dst += 5;
-+				}
- 				memcpy(dst, src->ea_data, name_len);
- 				dst += name_len;
- 				*dst = 0;
-@@ -1184,7 +1193,8 @@ smb2_query_eas(const unsigned int xid, struct cifs_tcon *tcon,
- 	info = (struct smb2_file_full_ea_info *)(
- 			le16_to_cpu(rsp->OutputBufferOffset) + (char *)rsp);
- 	rc = move_smb2_ea_to_cifs(ea_data, buf_size, info,
--			le32_to_cpu(rsp->OutputBufferLength), ea_name);
-+			le32_to_cpu(rsp->OutputBufferLength), ea_name,
-+			tcon->posix_extensions);
- 
-  qeas_exit:
- 	free_rsp_buf(buftype, rsp_iov.iov_base);
-diff --git a/fs/smb/client/xattr.c b/fs/smb/client/xattr.c
-index d52c52866651..f975bccf98a5 100644
---- a/fs/smb/client/xattr.c
-+++ b/fs/smb/client/xattr.c
-@@ -36,12 +36,63 @@
- #define SMB3_XATTR_CIFS_NTSD_FULL "system.smb3_ntsd_full" /* owner/DACL/SACL */
- #define SMB3_XATTR_ATTRIB "smb3.dosattrib"  /* full name: user.smb3.dosattrib */
- #define SMB3_XATTR_CREATETIME "smb3.creationtime"  /* user.smb3.creationtime */
--/* BB need to add server (Samba e.g) support for security and trusted prefix */
--
--enum { XATTR_USER, XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT,
-+enum { XATTR_USER, XATTR_SECURITY,
-+	XATTR_CIFS_ACL, XATTR_ACL_ACCESS, XATTR_ACL_DEFAULT,
- 	XATTR_CIFS_NTSD_SACL, XATTR_CIFS_NTSD_OWNER,
- 	XATTR_CIFS_NTSD, XATTR_CIFS_NTSD_FULL };
- 
-+static const char * const cifs_native_xattr_names[] = {
-+	XATTR_NAME_CAPS,
-+};
-+
-+enum cifs_ea_name_type
-+cifs_ea_name_type(const char *name, size_t name_len, bool posix_extensions)
-+{
-+	size_t i;
-+
-+	if (!posix_extensions)
-+		return CIFS_EA_USER;
-+
-+	for (i = 0; i < ARRAY_SIZE(cifs_native_xattr_names); i++) {
-+		size_t xattr_len = strlen(cifs_native_xattr_names[i]);
-+
-+		if (name_len == xattr_len &&
-+		    !memcmp(name, cifs_native_xattr_names[i], name_len))
-+			return CIFS_EA_NATIVE;
-+	}
-+
-+	return CIFS_EA_USER;
-+}
-+
-+static int cifs_build_ea_name(int xattr_flag, const char *name, char *ea_name,
-+			      size_t ea_name_size)
-+{
-+	const char *prefix;
-+	size_t name_len, prefix_len;
-+
-+	switch (xattr_flag) {
-+	case XATTR_SECURITY:
-+		prefix = XATTR_SECURITY_PREFIX;
-+		prefix_len = XATTR_SECURITY_PREFIX_LEN;
-+		break;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	name_len = strlen(name);
-+	if (ea_name_size <= prefix_len ||
-+	    name_len > ea_name_size - prefix_len - 1)
-+		return -ERANGE;
-+
-+	memcpy(ea_name, prefix, prefix_len);
-+	memcpy(ea_name + prefix_len, name, name_len + 1);
-+
-+	if (cifs_ea_name_type(ea_name, prefix_len + name_len, true) !=
-+	    CIFS_EA_NATIVE)
-+		return -EOPNOTSUPP;
-+	return 0;
-+}
-+
- static int cifs_attrib_set(unsigned int xid, struct cifs_tcon *pTcon,
- 			   struct inode *inode, const char *full_path,
- 			   const void *value, size_t size)
-@@ -104,6 +155,9 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
- 	struct cifs_tcon *pTcon;
- 	const char *full_path;
- 	void *page;
-+	char ea_name[XATTR_NAME_MAX + 1];
-+	const char *server_ea_name = name;
-+	struct inode *lease_inode = NULL;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
-@@ -131,8 +185,24 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
- 	}
- 
- 	switch (handler->flags) {
-+	case XATTR_SECURITY:
-+		if (!pTcon->posix_extensions)
-+			goto out;
-+		rc = cifs_build_ea_name(handler->flags, name, ea_name,
-+					sizeof(ea_name));
-+		if (rc < 0)
-+			goto out;
-+		server_ea_name = ea_name;
-+		lease_inode = inode;
-+		cifs_dbg(FYI, "%s: setting security xattr %s\n",
-+			 __func__, name);
-+		goto set_ea;
-+
- 	case XATTR_USER:
- 		cifs_dbg(FYI, "%s:setting user xattr %s\n", __func__, name);
-+		if (cifs_ea_name_type(name, strlen(name),
-+				      pTcon->posix_extensions) != CIFS_EA_USER)
-+			goto out;
- 		if ((strcmp(name, CIFS_XATTR_ATTRIB) == 0) ||
- 		    (strcmp(name, SMB3_XATTR_ATTRIB) == 0)) {
- 			rc = cifs_attrib_set(xid, pTcon, inode, full_path,
-@@ -149,13 +219,14 @@ static int cifs_xattr_set(const struct xattr_handler *handler,
- 			break;
- 		}
- 
-+set_ea:
- 		if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_NO_XATTR)
- 			goto out;
- 
- 		if (pTcon->ses->server->ops->set_EA) {
- 			rc = pTcon->ses->server->ops->set_EA(xid, pTcon,
--				full_path, name, value, (__u16)size,
--				cifs_sb->local_nls, cifs_sb, NULL);
-+				full_path, server_ea_name, value, (__u16)size,
-+				cifs_sb->local_nls, cifs_sb, lease_inode);
- 			if (rc == 0)
- 				inode_set_ctime_current(inode);
- 		}
-@@ -280,6 +351,9 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
- 	struct cifs_tcon *pTcon;
- 	const char *full_path;
- 	void *page;
-+	char ea_name[XATTR_NAME_MAX + 1];
-+	const char *server_ea_name = name;
-+	struct inode *lease_inode = NULL;
- 
- 	tlink = cifs_sb_tlink(cifs_sb);
- 	if (IS_ERR(tlink))
-@@ -297,8 +371,24 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
- 
- 	/* return alt name if available as pseudo attr */
- 	switch (handler->flags) {
-+	case XATTR_SECURITY:
-+		if (!pTcon->posix_extensions)
-+			goto out;
-+		rc = cifs_build_ea_name(handler->flags, name, ea_name,
-+					sizeof(ea_name));
-+		if (rc < 0)
-+			goto out;
-+		server_ea_name = ea_name;
-+		lease_inode = inode;
-+		cifs_dbg(FYI, "%s: querying security xattr %s\n",
-+			 __func__, name);
-+		goto query_ea;
-+
- 	case XATTR_USER:
- 		cifs_dbg(FYI, "%s:querying user xattr %s\n", __func__, name);
-+		if (cifs_ea_name_type(name, strlen(name),
-+				      pTcon->posix_extensions) != CIFS_EA_USER)
-+			goto out;
- 		if ((strcmp(name, CIFS_XATTR_ATTRIB) == 0) ||
- 		    (strcmp(name, SMB3_XATTR_ATTRIB) == 0)) {
- 			rc = cifs_attrib_get(dentry, inode, value, size);
-@@ -309,12 +399,14 @@ static int cifs_xattr_get(const struct xattr_handler *handler,
- 			break;
- 		}
- 
-+query_ea:
- 		if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_NO_XATTR)
- 			goto out;
- 
- 		if (pTcon->ses->server->ops->query_all_EAs)
- 			rc = pTcon->ses->server->ops->query_all_EAs(xid, pTcon,
--				full_path, name, value, size, cifs_sb, NULL);
-+				full_path, server_ea_name, value, size, cifs_sb,
-+				lease_inode);
- 		break;
- 
- 	case XATTR_CIFS_ACL:
-@@ -438,6 +530,13 @@ static const struct xattr_handler cifs_user_xattr_handler = {
- 	.set = cifs_xattr_set,
- };
- 
-+static const struct xattr_handler cifs_security_xattr_handler = {
-+	.prefix = XATTR_SECURITY_PREFIX,
-+	.flags = XATTR_SECURITY,
-+	.get = cifs_xattr_get,
-+	.set = cifs_xattr_set,
-+};
-+
- /* os2.* attributes are treated like user.* attributes */
- static const struct xattr_handler cifs_os2_xattr_handler = {
- 	.prefix = XATTR_OS2_PREFIX,
-@@ -522,6 +621,7 @@ static const struct xattr_handler smb3_ntsd_full_xattr_handler = {
- 
- const struct xattr_handler * const cifs_xattr_handlers[] = {
- 	&cifs_user_xattr_handler,
-+	&cifs_security_xattr_handler,
- 	&cifs_os2_xattr_handler,
- 	&cifs_cifs_acl_xattr_handler,
- 	&smb3_acl_xattr_handler, /* alias for above since avoiding "cifs" */
--- 
-2.43.0
+-----BEGIN PGP SIGNATURE-----
 
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmpjUV8FAwAAAAAACgkQqh6bcSY5nkbn
+mRAAotSQ0SNplozFsDoJERHMQ9NFX/Flvv1ehj3CALntExWo+zui2PfHVnrksG5kxg1H35tYtQcF
+DHTwx5FgenQfJmvEDkMd3cH6BmXGNMRpSqjxpjzd79+2Ft/lFMQPPFQyJ11iEKJ8YIk0fCA0S8ax
+2NXDQ5U82FceHsMrbXBOijmxYJYoqUFdRQWPGkOHzJ6ut8CGw82pOqplzf4qETHaJdVA3FzOwfg9
+7+W79AN8qjsWXA8bTnOxibIuKRIV7vbmvejopeDvsM5pzsvRLgoBw/oylB1BZqVcO2PbAgLBF8wz
+H1KBAFuFrH0jmtvCs38dR5ZnGvQ0JWtMiKN3X6mQW90PISM2C9SE6dv7awCG5SN/HNbeVrRWxuwf
+X6sSboTMLzpJKsj1/sMDY9hyXN2+HhiXfMgG3GfqzCkA9lne6UFNtAN8O/a+t8esWmVH2hLMQqw3
+KVXyS8CxVc9GMHBGsA4KR7GciwJb5l05H+q5h1EZAwa1SUujl2B/UROtOhtMA0thEhgpJqTFVVUY
+PFXfRx+b2uL3fiV0dM3F/IOQtbrH3p1Ds41pdPojlGdbEKeT4MsSbReAzCBshnrRnbncXA1l5glb
+j3fFh9GUJ4EBJ9h582mdmE0GACM+zVMqMms/DL5TGXZToMV/vgw5JF0aMqkmvifcymMuYKpv4l9R
+8ZI=
+=o4gq
+-----END PGP SIGNATURE-----
+
+--------------8fUOjiAygWTcPpTz35A3LVjG--
