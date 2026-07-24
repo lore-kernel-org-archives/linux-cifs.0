@@ -1,154 +1,65 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365683164C5;
-	Fri, 24 Jul 2026 03:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234882FF65F
+	for <linux-cifs@vger.kernel.org>; Fri, 24 Jul 2026 04:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784862766; cv=none; b=LZ52Y0pLHVANt7nLX0MzryJlFZMJDaI0VhnkH1SwtxzFu18ZLfQUvf58XlG7pz1b72LzoD5LJarb8mlkgrKqtKP7W8QcoR7+oiQ5jMjJhwA84NUHSTbbD2tJF/jW95Em2DAO08H1VM5BrRzo/gTNkSvRQkhdh1pPX7a/eeAtw7E=
+	t=1784867900; cv=none; b=VQpBGt3eCYH5uQqtnqz3eQsHeao13SpmS72HTQsvUe2f0nlOUBZSQJztLPl2xmNlPoPPICHcLrlwIovwNVn837ctBUjxFP3/2TpjTZX0SdRJf2BqxT9HL/zWsNrUDnUYQ8zeY+1jp5k12za125BrxWBK6BhBmy9mib1SsujoPVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784862766; c=relaxed/simple;
-	bh=RQMubjKZkTsejZnLziSTe88KgkkAQodpxpo6uR7cAFg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jbMHC7K4NcWKug0WNlhACv+WnQa8pzlcbqyt7uk6HjrcXJWNZECqkzSGWIubYX8a3oMBbwhYIqv9j8guDFEL2sf4eBnAAnjB6ZA4npEQsVfZ3SGI35cOcv7JLqc0XXRAvhFH8b7hUbXQadSOpj1ArKYrAOSHPawFY9Mx+v9DUBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=hRNJ5P5v; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1784867900; c=relaxed/simple;
+	bh=nS+P3N+rcf0TGNHFy0eYQtXP9PPbze5VN3bdVv42MLg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L7D6/7nYRNpoeG+YSbcDjJzEx9K8HIoQ2iUCzvfMHkAo85Uu3WVHx+/GIxUX5iaLEx6J2koJ5F/NArBR4Ry04aiBbNq3V72nr5YFB6QHSl29eG6PuXIc4mCOYAEOmO/Pugub+VUbVCJNP28T4HX9o1nKlpa0kX54mVgwwxhjwO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=QqMpcLC/; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="hRNJ5P5v"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="QqMpcLC/"
+Message-ID: <7ad99c95-d1bc-4cab-9632-d00d8e7a1d1d@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784862761;
+	s=key1; t=1784867885;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Bqy1X5+ryMJ6fr25+393REkQ+0kmg05MJ7n2S010gZ8=;
-	b=hRNJ5P5vTLwHvPpccsgHmoRAydx1vv6q7ahREMu0zeIV9Fj+KlCat/qljls7c9mb3POx7O
-	cJat6mQaPIlhb/NUa/Yt9VZkvVNDRLlI3XRT/GLoRKVKJ0mJI1a4l5cPhoA3RPpUwhzjVT
-	MI/1XoNLQMBh4Uf/bTT0XQBdn7R0uRbnXHcXscgcGBE2Ok4ziMeYADoUMdnk6OQFohhDlk
-	4Ptcp5dQy7FuAP5TFkhaPTuMOzBng+ny5S2KljcvnNX+TWqsQ12Z9cE9B2vQy0TDaXBHBP
-	A/JQLK9Us6UeSz8B12f8Vl71Rpe1+Ee1nPr8i2x8/LwiiVOGOTmSF+RsH8OKsQ==
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org,
-	zlang@kernel.org
-Cc: linux-cifs@vger.kernel.org,
-	fstests@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 xfstests 2/2] generic: new test to check nlink returned by fstat()
-Date: Fri, 24 Jul 2026 03:12:10 +0000
-Message-ID: <20260724031210.332153-3-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260724031210.332153-1-chenxiaosong@chenxiaosong.com>
-References: <20260724031210.332153-1-chenxiaosong@chenxiaosong.com>
+	bh=1/t/UTZdlOqD7cZXTkMQ1x55KkkLhq2BUy1D6QELJQk=;
+	b=QqMpcLC/t/mwaGn2qc1+1mTtFw48QpZdj5Lza39fUOfiooTSZ+JLFSVTErbptict2fOUpk
+	a8wYbvnGIlepDP9HvaMMQqCiS6rXnR3CaKZcQsZZCvhI5XBRdsRM8D6vO20TFkxp9VyNQN
+	HsMEeSG7ijxldPvLbz4fh5gS4RlQJY2nJDuVwaC691xPAW8Y/iCnmZ0U/RkPEz1QzACxi9
+	5GzaKepu6ZcJMwa50rIRNj/iYCBVRIQ4/TUC3WbCC4F21NJo2K4EYL0hGHpTGxYhGWG6sn
+	dGwNPIlEzGkwuhcxuhE4Jwn/8t8dL/J9IRQ1NzN5Q9XfyG9l03th2cozX5/qwQ==
+Date: Fri, 24 Jul 2026 12:37:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] ksmbd: remove extra byte from ipc_msg_alloc() size
+ calculations
+To: Rosen Penev <rosenp@gmail.com>, linux-cifs@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
+ Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20260724013841.1345481-1-rosenp@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260724013841.1345481-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+No `Fixes` tag is needed. While the extra byte allocation is indeed 
+unnecessary, strictly speaking this isn't a bug.
 
-Add a test to verify that fstat(2) returns the expected
-st_nlink value as hardlinks are created and removed.
+On 7/24/26 09:38, Rosen Penev wrote:
+> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
 
-Regression test for kernel commit:
-9dd1964ac59d ("smb/client: fix incorrect nlink returned by fstat()")
-
-Suggested-by: Zorro Lang <zlang@kernel.org>
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- tests/generic/798     | 60 +++++++++++++++++++++++++++++++++++++++++++
- tests/generic/798.out |  2 ++
- 2 files changed, 62 insertions(+)
- create mode 100755 tests/generic/798
- create mode 100644 tests/generic/798.out
-
-diff --git a/tests/generic/798 b/tests/generic/798
-new file mode 100755
-index 00000000..e44bb10a
---- /dev/null
-+++ b/tests/generic/798
-@@ -0,0 +1,60 @@
-+#! /bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2026 KylinSoft Co., Ltd. All rights reserved.
-+# Author(s): ChenXiaoSong <chenxiaosong@kylinos.cn>
-+#
-+# FS QA Test 798
-+#
-+# Check that fstat(2) returns the correct hard link count for a regular file.
-+#
-+#  from
-+#  tests/generic/002
-+#  Copyright (c) 2000-2001 Silicon Graphics, Inc.  All Rights Reserved.
-+#
-+. ./common/preamble
-+_begin_fstest metadata auto quick hardlink
-+
-+_cleanup()
-+{
-+	cd /
-+	rm -rf "$tmp".* "$testdir"
-+}
-+
-+_require_test
-+_require_hardlinks
-+
-+_fixed_by_fs_commit cifs 9dd1964ac59d \
-+	"smb/client: fix incorrect nlink returned by fstat()"
-+
-+_get_nlink()
-+{
-+	$XFS_IO_PROG -c 'stat -r' "$1" |
-+		sed -n 's/^stat\.nlink = //p'
-+}
-+
-+status=0
-+testdir=$TEST_DIR/$seq
-+rm -rf "$testdir"
-+mkdir "$testdir"
-+
-+touch "$testdir/tmp.1"
-+for ((l = 2; l <= 20; l++)); do
-+	ln "$testdir/tmp.1" "$testdir/tmp.$l"
-+	nlink=$(_get_nlink "$testdir/tmp.1")
-+	if [ "$nlink" != "$l" ]; then
-+		echo "Expected nlink $l after creating link $l, got ${nlink:-nothing}"
-+		status=1
-+	fi
-+done
-+
-+for ((l = 20; l >= 1; l--)); do
-+	nlink=$(_get_nlink "$testdir/tmp.1")
-+	if [ "$nlink" != "$l" ]; then
-+		echo "Expected nlink $l before removing link $l, got ${nlink:-nothing}"
-+		status=1
-+	fi
-+	rm -f "$testdir/tmp.$l"
-+done
-+
-+echo "Silence is golden"
-+exit $status
-diff --git a/tests/generic/798.out b/tests/generic/798.out
-new file mode 100644
-index 00000000..216d6e93
---- /dev/null
-+++ b/tests/generic/798.out
-@@ -0,0 +1,2 @@
-+QA output created by 798
-+Silence is golden
 -- 
-2.43.0
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
