@@ -1,91 +1,68 @@
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5B9306B31
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 13:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2E22749ED
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 13:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784986046; cv=none; b=ZDTLJhwaA+83Zwz2AjS5Fl5+xyGVl+HIVXuL8JpMqNIOlazqlmV86bhlyNmx6Ycz6b8vcpIYkT93xdZMBj/FAhRkHaqm91s4L29HSNhQNAZa9n9N9gA6X/XGK3xOUHE6aRv5f2Bs7a5SND4iBD92V0ywt/wmZayp1HAKiyF78Qc=
+	t=1784986319; cv=none; b=FFvHGV2dcBnaLDblDC5EC53po2sBp7eqR7gP99b0ewKpY9oBGL/Jgn6i/NzplFmqhNZyAzpGBFW9Wo8xK3dbmPMIKnAue1rNBioMQkWZ79qOFaCnehAvFeEdwfB7CdSdnYtcrNsVdmpmy++iA/kNowzTsn7dm6QNaZ0blosKALw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784986046; c=relaxed/simple;
-	bh=MbwOlW8RSrFzQOt1/eTbAyivMA+synKW5OySy4K0Tnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q6viQ0ZTF099ohBDpDEq+bRFG6RfcSUQu1lgq1PaIOjzRe/jFaSPceTvS7rFBOK7eo36oo/dN+/mCNZ8IG5wRFABqfStMHQU7tT3KDBw/IuKWQ1SguT3WPxYWFqv9jmiYxVzZKRtuXDKiKesbcu/SzxpSNQv+gKULPj+9TkFiiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=mH4U1Hbw; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1784986319; c=relaxed/simple;
+	bh=z03Tb+4Mqp3z73/IJZwpEHZpRocncQjnle8ynbfqWMo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OHsuk16y+bjHxAskQKdtsxzwu4d/diP5n4uHiRD4iFEUJCwjbUS/g0SNPBgXLzuYqMM5iVs80RmHF0rVDDe8RQbDxm5Pvft/S5YRxUVINuU3ArV6ZO4Qs/yb7XIizbRKTGiQ2aAuQYAD0dkeIRuEklBzGK81pywNtofvedYaMS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QGK6PDT8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="mH4U1Hbw"
-Message-ID: <f36dc0fa-260f-493d-a91e-1092acb5f430@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1784986036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=t0PrhGhx20v7hSucuAcTIB2XX//mf8IBBjCpLX6ErfI=;
-	b=mH4U1HbwdtPK9ycquwOc8LYLRpm7TRFly0HDqpM2sshFC41iFxp736iQbWYIQoY/1w+Muv
-	hqFPBIOh4QgM+CzH3OSuVJ/oG3sR+jPlC/2HrF/DDV7jlky3dGLSmn87cHHj67Z+UkZbeQ
-	4xm0jUomymwOJ86ldOIDkG7i9XZs0NuhTxtrGifie0bOCAe2eojrzwuYRbyFL+W4DNot06
-	3GCyfxNLAmnnBk+wjo36ISAUa/lq5jnoOH0l8WyZHyD+P87tOhnNmg6Jp7LKd6REVhKgAC
-	R1r1KvZgnUGq75T9Rj6sMSv4Ohh9OixoPKPC3X3PhaDAEi/NieUNk2ZGAVD4JA==
-Date: Sat, 25 Jul 2026 21:27:09 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGK6PDT8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18A841F00A3E
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 13:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784986318;
+	bh=WTyNcKTM7PChpxhhdXxef6U+U/bNurxVi9nzS1hKw4E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=QGK6PDT8pE15OMsE7994GTqcz4Kojr6aZFFILuUvFocFmIcHj11d2BfHFN367Rpts
+	 sK2uRPnjNU1+sIYr45fA2juOm4E12SDj9Fm/44LAkllbmH9LkvgynLoAIsT0C2vanh
+	 JttjTvkhpeUxBB8WsVQwI+LAvq6+IwF7VdQk4kBEafnB7YpB/dcoVONUvYOctMxMjh
+	 7hdas0Kt/VoYAW0KIYHZ5D3DW3WKe37zciQemU8choJhizeHy5uLKFu+jVuMG2HB1Z
+	 ZQJb4gn8XSjvDh4g/dykcSy/fp+bypgY/ZILNY55scRW/9Xn0TzwEVBFiSdZtG9gG/
+	 uZidnAq9jhr4A==
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-69c7c8accffso2034509a12.2
+        for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 06:31:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RpT12Dlw/f58tYhilOTvicVCIg6+Yiga6hLQckefR/iDUTXNXY3dwX9HcIlZU+6YGXuYNWldKR5oOpa@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF/AuEbKeFi74V7x4BDbW2NVr+d02rrC2w6ihpINF8bwo/HF+f
+	AKh0zCDfnAEB7eFsQ0ZGOCzUNDYXogZvU3p7Da+UIPgALkEwm1BkV+WiyeF6nascC8EwmGb7nw1
+	/GPSGmFV5iLQEo+MhDKXxhUnAfefSwzo=
+X-Received: by 2002:a17:906:6a27:b0:c15:f598:60c0 with SMTP id
+ a640c23a62f3a-c1f1eab62demr93724566b.4.1784986316718; Sat, 25 Jul 2026
+ 06:31:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] ksmbd: refactor smb2_notify() to a blocking wait,
- matching smb2_lock()
-To: =?UTF-8?Q?Ga=C3=ABl_Blivet-Bailly?= <gael.blivet@gmail.com>
-Cc: linux-cifs@vger.kernel.org, chenxiaosong@kylinos.cn,
- Steve French <smfrench@gmail.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
- linkinjeon@kernel.org
-References: <20260725102737.33616-1-g.blivet@me.com>
- <6813f121-5fe0-4542-85fa-7f06e093c24a@chenxiaosong.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <6813f121-5fe0-4542-85fa-7f06e093c24a@chenxiaosong.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260723031644.312866-1-chenxiaosong@chenxiaosong.com> <20260723031644.312866-3-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260723031644.312866-3-chenxiaosong@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 25 Jul 2026 22:31:45 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_TNmTA=78JcWvHkZT-RagzmJXoFhNdPbQ6dhTVQnzqPg@mail.gmail.com>
+X-Gm-Features: AUfX_mw55iUrzAA6Vj2AxYGDFahYxiFIzy0mT7Byr8Sg3okWIqBpAwn57cYXrrA
+Message-ID: <CAKYAXd_TNmTA=78JcWvHkZT-RagzmJXoFhNdPbQ6dhTVQnzqPg@mail.gmail.com>
+Subject: Re: [RFC PATCH 02/11] smb/server: validate notify requests
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	gael.blivet@gmail.com, linux-cifs@vger.kernel.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Gaël,
-
-Would you mind if I include your patch in my new version of the change 
-notify feature patchset? I may make some changes to this patch, but I 
-will ask for your approval on the final version.
-
-在 2026/7/25 21:12, ChenXiaoSong 写道:
-> When Windows is used as the client, this check must be removed because 
-> Windows sends a compound request:
->    CREATE dir; CHANGE_NOTIFY, fid = compound fid (FFFF...FFFF)
-> 
-> However, I am not yet sure whether skipping this check could cause any 
-> issues when macOS is used as the client. I will test it with a macOS 
-> client tomorrow.
-> 
-> 在 2026/7/25 18:26, Gaël Blivet-Bailly 写道:
->> @@ -10967,56 +10908,17 @@ int smb2_notify(struct ksmbd_work *work)
->>       }
->> ...
->> +     * macOS backupd sends CHANGE_NOTIFY with FileId=FFFF...FFFF
->> +     * (share-root sentinel) to watch for changes on the share root
->> +     * without holding an open handle.
->>        */
->>       if (req->VolatileFileId == SMB2_NO_FID &&
->>           req->PersistentFileId == SMB2_NO_FID) {
->> ...
->> +        rsp->hdr.Status = STATUS_INVALID_PARAMETER;
->> +        smb2_set_err_rsp(work);
->>           return 0;
->>       }
-> 
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+> +       if (!S_ISDIR(file_inode(fp->filp)->i_mode)) {
+> +               pr_err("Notify file id is not a directory, fid %llu:%llu\n",
+> +                      fp->persistent_id, fp->volatile_id);
+> +               rsp->hdr.Status = STATUS_NOT_A_DIRECTORY;
+CHANGE_NOTIFY request on a non-directory open to fail with
+STATUS_INVALID_PARAMETER. Please check [MS-SMB2] section 3.3.5.19.
+> +               err = -ENOTDIR;
+> +               goto err_put_fp;
+> +       }
