@@ -1,179 +1,150 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD164908A9
-	for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 16:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1075329C40
+	for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 20:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.172
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784998744; cv=pass; b=WzjU8Juib86PfQRIMhgUJyI6hsY1WB2pYOnS4Z5I5OztR5GaVL5/Z96ZNmvBN5O/uUhtBYZNtrEgsXXIk4CwPhIpswlei7H92mJwy/Anr4wlOlSNv21dtMRb6Lb9Z1E48UD1Cou3UXduqLB5xruJTflEh0mVr27TEIjC4P+OS8U=
+	t=1785012288; cv=pass; b=rP9uwfUGUnZ9JAGVefQh4By8MTgQOpURJUgB+LPpp9g37wlybL6OpidL3B6m0YzutqJ3M8PwS0Q0kFP05v6C2Whje294vVL1Ku/qo+RqZsCsSEGCIlinldYWOJfgxFQdUUPqv5Nn12N1kP7vag5yOUFnSwLWU4eEf3Z/TgGo4Wc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784998744; c=relaxed/simple;
-	bh=wxsdSNLj9uNq17XeynGeEXG77PuCSE3AxYNOgfygTeg=;
+	s=arc-20240116; t=1785012288; c=relaxed/simple;
+	bh=E8HiBdeH1TULEvTN9o99m6WGx9IBKM8vOt8mMzonGyc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uC5sCexVNYDYS6wH3bAVZ0C7lOw2N5miQ3HoR9TOIRryYr48PnO+sQGL9PDWO/kOcge0h57Bd+OfSathbo6kty21OmEFvE/AsEYXNlXUaEyj+DjdadJNnop5rmnEIL1bY71ndvqDVmUALfWfEYRfJMamCrf0BoVslJ8DyxMPCXQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MdYbZGRC; arc=pass smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=MVVeMCWF5qAk3iNdRYBg7zWutv05zLUIXXKxcj5d0nEePR2UiKtEoIHgKRt17MNtdrzUPf06lTYGUZXrBScCa3YpCxgdzdsRz4DkMN8D++/gAAAX4TnhCyQnjDfJRiSsoUW3jQCVtv1sDho1w4Wsv4bBVswQLT7NmxNc+Z5BEto=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=nZVWBG0n; arc=pass smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MdYbZGRC"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92e5c92c389so98378885a.3
-        for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 09:59:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1784998742; cv=none;
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="nZVWBG0n"
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2cc891373e0so15859335ad.2
+        for <linux-cifs@vger.kernel.org>; Sat, 25 Jul 2026 13:44:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785012285; cv=none;
         d=google.com; s=arc-20260327;
-        b=nHuYcovwyoICuypl9wpPzREX8+h9HFBoMl3iQtPFoqV6ulaptK0ZXLurF0S2Tc+Wrj
-         ghRaXgBdEet0gi7j6T7kAgeqYFudPSFlgRNaSKv8x4u2ocUW442TcAKALw3ZHzQvTx3I
-         aGcZvoApliifhqgVSmKrIXYfU8rqKfdLFjbg8PyVaWXKLuKJfmMYQDiHDk6lCEFicc10
-         MsFpK4bPSfJXsmzOY3sk4BjlFcdGti7jd9GB+GJzd7c2zwoN5vffk9D6j27VVnBPJmFx
-         T9JS/BPji4DjvOdOJD2hwYAlA0COKCEC5I49ZlU8b+vstCcVIb1Vm767kVkUkH9Njq/w
-         y5pA==
+        b=CTdyDQi5FeC9YW2ClYF9T8h2gu8dF6dvzwXvfA2CMD/d3PLiKMg6RbpQJtmm0nI2aW
+         x0B5favzhAFdK3AXLRG5tMUTU6aOveoT9mx+mlgojQObC254HPBSSBD2DrWuDSXWFwYV
+         Ve1Pepdq3TU32aIy1FvQesrUjhqoRshCF3DdHHFcl8+AOP+GivZiuEdWP5iiM4YphipE
+         3yewAR3eIvOrE0XKl9ESlNUNMkMg6AwJbPsi2wIlHWndSfsnOcfk5lB71UDlj6KpjaBt
+         rbtNUZxkGAscPl9DLoL8pim86HRudCspnnnqHt1RYGZ7yaJk9ULWRWyAIn2U9dr4hJgp
+         gm1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=hC+CxRQqKmkyBIafqt/yge3L3p2Zduxcv89Phke4qH0=;
-        fh=12lw8uTIBkj60pUPF3yB9AiYrXBOuM+42N0+xhPzUWM=;
-        b=ZpHoH2SGSoWNTqRDo1jPgyFTdnoL/LwygvHrZ7Q+kKEkxIeA43ZBXL+AOId8ykmdSN
-         nDwn7jl792i0QHzkmUiZ5xzqsH8hlZWyA9q+r9RHz5isRfB0HxnYCgU6UbuYPC29arjC
-         rhotab121Gb+FfKfz9MG3DgrxzNkCtqMtEmlBrcJOULF8poSCnmJos/omv8QIF0Z6hF/
-         RBnlZSG+fRjuVQGghYCIK1vmxc5RV8O7Mn2E2vjSkzu+zTU86azI580o30RlZl9Qp6ps
-         9LtE34ni78BOy+Y4hCc2cF1t3R41dRuH74i8LgEpVBbXxEGkWWhglHn8RrSA0kxqTyPP
-         NyaQ==;
+        bh=9QXi8THUDIOtvH3CogRZaDuKMdrdjmcdfQ8HIBdrED4=;
+        fh=NLIex/qpZrDi3minAIxC/T/jVWGaJYCnqFquOt0F+XA=;
+        b=UGK0nwbUL8KpYFznvWQ054ZNtfKqyL3oSRDGQWi69ZwHX3NpBimJfkZG5ZPFSV3zkz
+         lkMxn5kP1RnV0n7XRyu08sE0jHUlsvU4lZvzhN03WnKhmsq1B80koEyTyy8pMUrqrNK4
+         H9IWVuCaUH4/h3AVl8GUABhiHPf8UzTF3BwhZH5z6D1DrhFZKuHmX9AqBiUp5QFS1YyH
+         4jlpzp0c/ElB5/P3SFqbBau82eP5SU08wV4p3x1EMixFmf9b9tCSleji1XSNu2uIjEOD
+         WwVPEm6yrVs7oDr2m//1OiK0xQR2YfwTxZqfMSgiFy/4sKJIoIdXUo6Ak431eOlCERFu
+         ZvdQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784998742; x=1785603542; darn=vger.kernel.org;
+        d=asu.edu; s=google; t=1785012285; x=1785617085; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=hC+CxRQqKmkyBIafqt/yge3L3p2Zduxcv89Phke4qH0=;
-        b=MdYbZGRCKIexZSiz6K0CCIE4bMQWt1BZlbHW8WvE1bHz0anMRz40YqmEmO2reHcyCS
-         7Ni3iMBfwSU7gsATdqsaACShNLC/kuIt7inQ8qc6MhmDx4EiBBpHfxlDz5kSA6eRCQfx
-         1XCOPO1eLvu5eaRNGAolSH8mqrcgwTDO4xl9Ct5l/AAtb9zS/PbXiZMFXcwJ95glJnZN
-         EcRi4lqMwNri28CwQpNfIW8cmav7QjyvARMP4n5uEGDYe64ILdYp4sYX/zvas5P6oC8R
-         0LqdLOEy4au3N3cTBtvJHo+5aZq8BbBRIRPzGog+q+C/ZADWXlUqU3Z5/ZBp4wyxo7nc
-         wxbw==
+        bh=9QXi8THUDIOtvH3CogRZaDuKMdrdjmcdfQ8HIBdrED4=;
+        b=nZVWBG0ngkuqVmEjw8N34ENJkXHIrJwkzjXiOI22iotNpXpQPW+6ZeoZcDKJslNR7D
+         Yd3xn62mgT92WMwaPSOydIseqzg6mcUJTOAJfcAl4HmVTIffrdSw0DTSPCYMUMmIn8NL
+         E5ik1n7j16XWl6L3vSoLvTenB3AzdKXVZJwHF098GNPqsbYvZzKJV8N0jbRwdpgNHVr4
+         zLfdNpWmjYlXHM7iQs4h57MvyzE2xG1AOojicCM9Me8TO4AUBWi98eIUec4/SV1h5UED
+         YWeXzDN7xjO72qvRKbZWj3vnUEPmMZmzTqSMGpksu03fEXIoiq2uV45+XCiAxn0ykm86
+         k/8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784998742; x=1785603542;
+        d=1e100.net; s=20251104; t=1785012285; x=1785617085;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=hC+CxRQqKmkyBIafqt/yge3L3p2Zduxcv89Phke4qH0=;
-        b=iAI9E1lyCE1Z8DwmlNBO3VOX1MRTPbHBRONSHB2RpbaKvXC9ox/moA3bhjRymeSvlP
-         4MK3Wfih6fb6BVQ0f+27oiamUpeYdNJYJn3G0HE4yGe6f4WA6OV2WIP+bomEgnsc9Xxp
-         aGlE3NdcV/dMxZE2bFW/7auN8TOU3a1VoQvn84TKNjIViSJew337jEkg2oBXnW8ZkLsr
-         lbM1+rKc5Bo57+csV85/v0lGnzEfyf6qk+N5SrhVPeLh8Qvppgxxe22vZ72DwHQ/o05r
-         xiabJ0dnttioMJMMgr6Vc42v/VNWdhrEq18IylorhqfAz31FevMlvENgYR2MqwwZDf1s
-         JCXw==
-X-Forwarded-Encrypted: i=1; AHgh+Rou1u1IyEskm0OuOkFvb50JchJkbquczgpNq8WkYjRFwbh+rngvp+kkalygo1G0rEcXB8NXwsmiPpLK@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTfv7XfohBHiVkLzeejXqKAIZ93HufJbC7a/I1OJP7/7d7t7cO
-	5yAHjHo1pSAlyrHPvEjZw9TcbLQL5DpKZEoFCqsaoF3W1DGTfwVUjHBF5oRpuSxL05Zznt/pXMi
-	3CUJJFi+Fraa/GUlSUN/owgG9T7JHNmw=
-X-Gm-Gg: AR+sD10olR31p9EEhi9u1ecwm4W0loPs78eLOnObOZnlgonzKuxN8qJS5s87B871hfX
-	kEdvkXCp9Lu3VdlUWnwrrpHKoYYvCDmr4TOvc3Tyk8pyalCSg26XtyT5FJqh/vIk1WZVRlL83hA
-	ENoY5BRkudCY9Edq6kQRv30BeGiRd9LaPrLZHv/r1kMkUC1yEgGB8Vjno5yjw82l7MXjb7lIIzz
-	9g0y9gqAha9AZVxxMF8UcSIFduHGq7Gwec77IFSuTQmWUpTkUNe1yJAy3gx/EOIes8DLWClrsHX
-	UTXA44zu71FE5zdNHIONxXx1JCdPQmqI4BquF4vNq8JnQ30IFpeNBIXXQpBBm7QAXZ1SRsEdWXq
-	76v9Ut/80vvS8Lg2Lm4aBaGMtpqP80HuMj5Ba880tuqnHD8U3JJXSW+foop7wSBqgpUntGVvHoP
-	Hu
-X-Received: by 2002:a05:620a:45a2:b0:92e:7467:fea0 with SMTP id
- af79cd13be357-932df5ea63dmr234159385a.34.1784998741647; Sat, 25 Jul 2026
- 09:59:01 -0700 (PDT)
+        bh=9QXi8THUDIOtvH3CogRZaDuKMdrdjmcdfQ8HIBdrED4=;
+        b=sVnQ96Rx113OKIQL8WtwAAHTlcliIotaXiGiNyEDvokX5Xt534Z+bPqgoLFCXURfUn
+         vM/uGN3RDxyMN8k6mP3jIyI4lJHTO9Kt8yLop+Ou5IWECV73HADlQHD2cr7B4Dlyj4De
+         OXAymPV7Z6TytInPR1wnH7/5PM5cHiFkiuB2kmUnbo51EoAX2x+pNX81UL7fFRJ2govd
+         B+HpMbjqj8g+Q4aB/DmuQgrrph2L61OHOM2NL7t2Ds6wC35ILXJi8dtfAB4l04L/2/m7
+         dk3YLb5ySuqAeExYPBq4KemwCRCj4zA1Nj/W/4H5VjDQUvECq15jjVQgE6ciUk3Uqcuh
+         TtJw==
+X-Forwarded-Encrypted: i=1; AHgh+RrrvItKXgHGdKiU4B0ygw6sPjYIqdHF3PrkhA8kCweshTnAqvsogUiIMdnM80LaVpMxD0v0C56bx5IF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzpi2b24r8PiRA5Kk+JX5+1sskk9DBRsgfUbdBwR8BmyilijavQ
+	lf4HQhzdaug2bUenQiidqiusJb4IZ6N9CKDXfQeDmfU6pMRXFCKy/LgqWgq7Jiw99zxIZkGDNBl
+	jqpN6E7tdF7tB04a6Rud32fnQSP7PL86aIkpEGVG7
+X-Gm-Gg: AR+sD10cf8IsbASEG/+NjJ6tSmMJEJQ5K1jTFIkLJs3cCNJaaCX5xge0e1Nm/KPqcqx
+	AEe8NXjahVzT3OIFoLa2le0d61cOA3MLd5Ia5sB9JyAgC+B5iVXE20Z5RCkJxLz/7a2TQFltXF4
+	BtVsxeysmTmNQXitH2xEgER4234TY8vGz+ZEA2A8m8qbBgj9VzrD8UoLe0v73sg2TGhN8WuxVht
+	fSrlmSG2lsLPx8eIkDa+K0NefZzrxZSWgC3fQTpcwdzc/8EaIoKW7MkjpJgrVTWV/KTdFtfsdOh
+	/cr/Ezf3liGyqtEepw==
+X-Received: by 2002:a17:903:11c3:b0:2cc:f7c6:8353 with SMTP id
+ d9443c01a7336-2cfde888581mr32492505ad.41.1785012285296; Sat, 25 Jul 2026
+ 13:44:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260723184538.3888637-1-ekffu200098@gmail.com>
- <20260723184538.3888637-35-ekffu200098@gmail.com> <CAH2r5muT20HXUANLnXQc1dAAvs+N=jFneSsV9gUqS8GE-wWNPQ@mail.gmail.com>
- <CABFDxMH=1M2m8tyyHZHwpJ9OUmMRBCftfq2SiMxTyKUr7a9FNA@mail.gmail.com>
-In-Reply-To: <CABFDxMH=1M2m8tyyHZHwpJ9OUmMRBCftfq2SiMxTyKUr7a9FNA@mail.gmail.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sat, 25 Jul 2026 11:58:50 -0500
-X-Gm-Features: AUfX_mznLxsQSQK11_ML4Ufp_HWhKibUgDDaN0QujkG3r0EurREKl3rfXZhFIu4
-Message-ID: <CAH2r5msjuXudJCGR2pbduKiV3Vv8g3VWEo1BesPA9NLTt4Qc+w@mail.gmail.com>
-Subject: Re: [PATCH 34/36] smb: client: remove conditional return with no effect
-To: Sang-Heon Jeon <ekffu200098@gmail.com>
-Cc: Julia.Lawall@inria.fr, Steve French <sfrench@samba.org>, cocci@inria.fr, 
-	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, samba-technical@lists.samba.org, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>
+References: <20260722235908.3564560-1-xmei5@asu.edu> <CAKYAXd_iJjEWhFQ7tJSDVaK66Lo8TOazAG+798ty5JUPj+bBDg@mail.gmail.com>
+In-Reply-To: <CAKYAXd_iJjEWhFQ7tJSDVaK66Lo8TOazAG+798ty5JUPj+bBDg@mail.gmail.com>
+From: Xiang Mei <xmei5@asu.edu>
+Date: Sat, 25 Jul 2026 13:44:34 -0700
+X-Gm-Features: AUfX_mwGYb4jeMMLUhwM_ISkSIl-ks6ZlsPZ7d3jkW5VSLiaPAZjuibj66pS_Iw
+Message-ID: <CAPpSM+TLJPvb=3NUQZ0fStTVy983KNcGDt-oTTbGXoTJ60A=Uw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: use copied ACE count when walking DACL in set_ntacl_dacl
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Hyunchul Lee <hyc.lee@gmail.com>, Ronnie Sahlberg <lsahlber@redhat.com>, 
+	AutonomousCodeSecurity@microsoft.com, tgopinath@linux.microsoft.com, 
+	kys@microsoft.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I have now merged it into my tree (cifs-2.6.git for-next)
-
-On Fri, Jul 24, 2026 at 12:12=E2=80=AFPM Sang-Heon Jeon <ekffu200098@gmail.=
-com> wrote:
->
-> Hello,
->
-> On Fri, Jul 24, 2026 at 5:27=E2=80=AFAM Steve French <smfrench@gmail.com>=
+On Wed, Jul 22, 2026 at 5:19=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
  wrote:
-> >
-> > You can add my Reviewed-by if it is not going through my tree.
-> >
-> > Which tree do you want this changeset to go through?
 >
-> I don't have a strong preference. But some patches in this series have
-> already been picked up by their subsystem trees, and I'm planning to
-> send v2 that fixes several issues and addresses feedback.
->
-> So could you take this patch through the cifs tree? Then I will
-> happily drop this patch from v2.
->
-> > On Thu, Jul 23, 2026 at 2:04=E2=80=AFPM Sang-Heon Jeon <ekffu200098@gma=
-il.com> wrote:
-> > >
-> > > Both branches of the check return the same value, so the check has
-> > > no effect. Remove it and return the value directly.
-> > >
-> > > This is the result of running the Coccinelle script from
-> > > scripts/coccinelle/misc/cond_return_no_effect.cocci.
-> > >
-> > > Signed-off-by: Sang-Heon Jeon <ekffu200098@gmail.com>
-> > > ---
-> > >  fs/smb/client/smb1maperror.c | 6 +-----
-> > >  1 file changed, 1 insertion(+), 5 deletions(-)
-> > >
-> > > diff --git a/fs/smb/client/smb1maperror.c b/fs/smb/client/smb1maperro=
-r.c
-> > > index ab3d09613c91..395299f9121b 100644
-> > > --- a/fs/smb/client/smb1maperror.c
-> > > +++ b/fs/smb/client/smb1maperror.c
-> > > @@ -234,11 +234,7 @@ int __init smb1_init_maperror(void)
-> > >         if (rc)
-> > >                 return rc;
-> > >
-> > > -       rc =3D mapping_table_ERRSRV_is_sorted();
-> > > -       if (rc)
-> > > -               return rc;
-> > > -
-> > > -       return rc;
-> > > +       return mapping_table_ERRSRV_is_sorted();
-> > >  }
-> > >
-> > >  #if IS_ENABLED(CONFIG_SMB1_KUNIT_TESTS)
-> > > --
-> > > 2.43.0
-> > >
-> > >
+> On Thu, Jul 23, 2026 at 8:59=E2=80=AFAM Xiang Mei (Microsoft) <xmei5@asu.=
+edu> wrote:
 > >
+> > set_ntacl_dacl() copies ACEs from the stored, attacker-controlled DACL
+> > into pndace but may copy fewer than nt_num_aces (it skips ACEs with a b=
+ad
+> > sid.num_subauth and breaks on size overflow). It still passes the raw
+> > nt_num_aces to set_posix_acl_entries_dacl(), whose dedup loop then walk=
+s
+> > that many ACEs and, past the last one actually copied, reads
+> > sub_auth[num_subauth - 1] from uninitialized buffer memory - an
+> > out-of-bounds read whose offset comes from that stale byte.
 > >
-> > --
-> > Thanks,
+> > Pass num_aces, the count actually copied, instead. For well-formed DACL=
+s
+> > num_aces equals nt_num_aces, so behavior is unchanged.
 > >
-> > Steve
->
-> Thanks for reviewing.
->
-> Best Regards,
-> Sang-Heon Jeon
+> >   UBSAN: array-index-out-of-bounds in fs/smb/server/smbacl.c:651:27
+> >   index -1 is out of range for type '__le32 [15]'
+> >   Workqueue: ksmbd-io handle_ksmbd_work
+> >   Call Trace:
+> >    __ubsan_handle_out_of_bounds (lib/ubsan.c:455)
+> >    set_posix_acl_entries_dacl (fs/smb/server/smbacl.c:651)
+> >    build_sec_desc (fs/smb/server/smbacl.c:776 fs/smb/server/smbacl.c:10=
+78)
+> >    smb2_query_info (fs/smb/server/smb2pdu.c:6269 fs/smb/server/smb2pdu.=
+c:6339)
+> >    handle_ksmbd_work (fs/smb/server/server.c:308)
+> >    process_one_work (kernel/workqueue.c:3322)
+> >    worker_thread (kernel/workqueue.c:3486)
+> >    kthread (kernel/kthread.c:436)
+> >
+> > Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> > Reported-by: AutonomousCodeSecurity@microsoft.com
+> > Signed-off-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+> Thanks for the patch.
+> Could you please check whether this issue is still present in the
+> current ksmbd-for-next-next tree?
 
+Thanks for pointing me to ksmbd-for-next-next. I am sorry I didn't
+find the correct branch to test on. I'll improve my workflow to avoid
+this kind of duplication.
 
+The bug is actually fixed by 065148205b48.
+The patch is complete for this issue.
 
---=20
-Thanks,
-
-Steve
+-Xiang
