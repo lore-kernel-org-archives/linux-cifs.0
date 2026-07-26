@@ -1,207 +1,104 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD2B2868AB
-	for <linux-cifs@vger.kernel.org>; Sun, 26 Jul 2026 13:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAAC28751B
+	for <linux-cifs@vger.kernel.org>; Sun, 26 Jul 2026 16:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785074371; cv=none; b=quxGputC16k3cyfqT15qXyBKH4juq50UfdBiVonhAn8cPUjT1HHYyGHjXhx+zj1g7O6P+47HPEDIK8UeEUo7IBDT4vrtuL8h8DZIK/7E+45Ez+kIL4lus9pUgkBnqltUXwxttK7Nvj9SAjyY0SvZWDZFdLSUduIb+iL1geparCs=
+	t=1785081960; cv=none; b=PXycJwe6iHCX3gEyn4OBDicpbG6SVdt4HWSwU2wn3spAqzKBmyPiP0zsJUIincRtBvglaejus2DQo+AZIDRUwsavMqxUzG4fLJPo1RMgh0gf3hIhgKjeS0sJaLcxRTp2PAKr2JV+Y3DhYdAsfujfsLRk5nthxtfdVDDu7hnnHTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785074371; c=relaxed/simple;
-	bh=hivISCGaRFdnAupaSSmr+YWtC/tBMxTRrtYq8eOwZKc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=osB10EuifM0/U4CsEq75STkqLAhjEtQZwyUusfLEqZURzn2jqqzP6HVbqKBHx74oIHSpqJ2lcps/93cUcvvVNkqtjrJENVsmFDLC4aWkvACOdYKE3gdPT4oi+WZIs5O01mAvkTq9/v3QXt6ZkynsnIR+ElX08fQN5hh2CYkdMvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=x9GCM5hy; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1785081960; c=relaxed/simple;
+	bh=A9TlZbCCHJr/Xb29DtVGW4JZQdWMnn6sIVMAxmt22Bg=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=KQGUdrPiMk7Nu+r6uZv2iFNRRXPatytYsO2Po4dzBxANGBcoABzPdPDU3cjQwCPaediHc9xIGVKYHhozSYNyLaqFPWkYRv2yqSw+qxcxeWO/DmZ2xJ5+kEEj3SBB8gF7CT2KQKIDSxdtR+PjaLfeBpeYxxdNp13vnmkR2YnnEjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g8hWtpJ5; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="x9GCM5hy"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=hivISCGaRFdnAupaSSmr+YWtC/tBMxTRrtYq8eOwZKc=; b=x9GCM5hy6vzNmR/qJkhW9uPT+M
-	q/iLHMMwY36tgEA1W77oNF/3wE1JdR94YW83q5P8Z/cLjsZN1hGl4F9A2MdErw0sDLfm2OIOON8Ft
-	lKuGduwlrE3SGxNtICWHp0OdcjSRvs7I2CUU7EfUBdnzEFLGxIaNC2zYZllngRGPdMEHBVsm9JB2O
-	M2N0Qd7iqJlIoEH9+8M8C+m9U4WCHs7c1k2YShGXYB9fk7PZJQd90S+xQge9PUdPXcXyAJY+0j7/U
-	ZGECMDpXCFTBDB8gtbVEQu4SkDWve7uBBdpzTXAEkK11nQqA8yMzkmyNso/pxHGEz2YFrhhy0g1Hb
-	sMEf/ep6KhfYg86ken0IzWSGvW8Dl33nf1gK1h+UA2oYa1RtcqOh34NHME41VUAD5RrbnOf85J5wI
-	Y6SCW0TNYxbrtjqFxz2opf2UJIy0TpTls+NyOQD2GujwwYYGENL6yRnXw/BOt/jzB02MU5vxpKKD8
-	M7cROuxDsFcSvCUtCQ29LaHr;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wnzNu-00000000W5I-2rj8;
-	Sun, 26 Jul 2026 13:59:19 +0000
-Message-ID: <8356a15c-5ad7-4f98-a8fd-01d6aa4e2dec@samba.org>
-Date: Sun, 26 Jul 2026 15:59:14 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8hWtpJ5"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4921eed3fa2so13217565e9.0
+        for <linux-cifs@vger.kernel.org>; Sun, 26 Jul 2026 09:05:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785081957; x=1785686757; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:content-type:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=A9TlZbCCHJr/Xb29DtVGW4JZQdWMnn6sIVMAxmt22Bg=;
+        b=g8hWtpJ5I+YBkqBXc87iDlCBv7wYhoqzKdainnauCtDD+/jMCsQJCZp0SKutwQIxJp
+         C+DqRHAk8g4OFoGV//aef4rXgVpiWC1UmgojF4B3bBYVdcMvWnJR1yQMbdk1oPbfc3eG
+         Yn7jtBB7YZsh5KOGqlC1DCaGlShgUIVP9b8UUYw2if07EPVrfK5KWZR76R1dn5PzpNue
+         H1YQHcGRpMotkviH4zrow+xlG1TynnH7PQ1wXmgIU8M1x7tJdMvTsytfb+nZWomnBBRw
+         e/15Nir2NYsCMeMId+btj2VU/AIg+WuLTeXT+3/bM2VXxDg6gmaOEkvb+drY5H8YK765
+         6c3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785081957; x=1785686757;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:content-type:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=A9TlZbCCHJr/Xb29DtVGW4JZQdWMnn6sIVMAxmt22Bg=;
+        b=NddcuwLD1Z/I7+gI2H1FPuzPbeLfMImq1picnz0A5/xEqnm0U0ch7XnD+bkropcHmh
+         LulCbb5H6Qn5pvJlpE95kaRrU2fJyyQD2xMoKRJfSBdrlH3CQHJHvU6YxNJlEhNqOdeZ
+         ZfFkHaJgrr1NqOMw/+i30WIytTHSzE7YBNJuST81MgPfzCfM8vX2n1PnPJbnps4zxZM1
+         ePxbdbqvd36MiDcv/54IFt/uvIQ77jHH0G0XTRlkcUsJ54762+mMVI+3atjgJuiAd2w9
+         ic5uqDB3sxilC75tOOnslj7wKpxWunT+Xg+SQzCuXyDNgAHdzk5lPDZONAKnOihe1sRz
+         0rDw==
+X-Forwarded-Encrypted: i=1; AHgh+RovhCa7iM4PgCc4FkcY6n9/dkEvurEcaKK6IrhhVguC4u0+dIeouAVxrQVx3PYF4oeUBHTmNb0zttxx@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsUQfo3Ts05WYH1wnq+CbYrEjU7uaGD7EL/g3axOEu8k6uEhtf
+	f1sCWRFYwPBPDOTxquefEwVfUhKC1zz7kDnrFPXRvmB5GgNhKi6vrA3HVPidoYsp
+X-Gm-Gg: AR+sD10F7VjmEyBery2OfF8C2pHqLa/XPTWQHlN1vGMND2DEND6juRSfnCSMa3xhGr6
+	59icFmfSwmU9hHn7/kB/HhmxsG6kMvpeDW20F/VzC0jnM3DzOF7J141IebF3pU9m7aMOgC18c0F
+	X0lzl8u7DDiGaQBQ31ZKXVKvhKYth23qvMGDBfJx9jOq1IC2oD3p8SWtC/DIx5n8aqBybukuvl0
+	LCdlE933ghlhkamwy69ItpANWujfieAF4COgftR2iteWaNPagckkEN4wG3alObppExV8a3oloYl
+	15ax9/YGjecgLyXQo6xRt6rGMV7ILMrujUYC/1EQhhhzGbCBwtEu9yTH9FYzU2exZ2lewG8OgW/
+	zrcl/MStf3Qupw5fuqfZ47mj+xAfzEaLrIoZ60aSVcdD296MQec51vxAYwGjueyRzRE3eAoGXrO
+	thM4xzJLS1BVKo0pg4Z8TCCkVvQ4nIXDT5WWm5mJepLMU=
+X-Received: by 2002:a05:600c:8485:b0:495:5943:b76c with SMTP id 5b1f17b1804b1-496b57281a2mr71746415e9.34.1785081956497;
+        Sun, 26 Jul 2026 09:05:56 -0700 (PDT)
+Received: from smtpclient.apple ([2a01:e0a:821:3a80::37ba:9a3e])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-496b49a8547sm149055715e9.14.2026.07.26.09.05.55
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 26 Jul 2026 09:05:55 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/15] smb: add native security and trusted xattrs
-To: tanze <tanze@kylinos.cn>
-Cc: Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.org>, Jeremy Allison <jra@samba.org>,
- tom@talpey.com, ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- linux-cifs@vger.kernel.org, Stefan Metzmacher <metze@samba.org>,
- "vl@samba.org" <vl@samba.org>
-References: <cover.1784888897.git.tanze@kylinos.cn>
- <23f16c23-6221-4fcf-8cea-20eb36f47b9e@samba.org>
- <767aee26-2d03-4558-b473-70c3267dfdaa@kylinos.cn>
- <5ec4703f-12ca-4cce-9801-3f8a1a1ceabb@samba.org>
- <d680a27a-49f2-4214-8ad1-5718c95ed4f6@kylinos.cn>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <d680a27a-49f2-4214-8ad1-5718c95ed4f6@kylinos.cn>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------TCA3D5iI9O0YydcvQZYYTS0U"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.600.51.1.1\))
+Subject: Re: [PATCH v2] ksmbd: refactor smb2_notify() to a blocking wait,
+ matching smb2_lock()
+From: =?utf-8?Q?Ga=C3=ABl_Blivet?= <gael.blivet@gmail.com>
+In-Reply-To: <627eb275-ca13-468c-87fa-f40c4e887145@chenxiaosong.com>
+Date: Sun, 26 Jul 2026 18:05:44 +0200
+Cc: linkinjeon@kernel.org,
+ linux-cifs@vger.kernel.org,
+ chenxiaosong@kylinos.cn,
+ Steve French <smfrench@gmail.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Tom Talpey <tom@talpey.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C65108ED-0865-418A-B2DE-F8079369A142@gmail.com>
+References: <20260725102737.33616-1-g.blivet@me.com>
+ <6813f121-5fe0-4542-85fa-7f06e093c24a@chenxiaosong.com>
+ <627eb275-ca13-468c-87fa-f40c4e887145@chenxiaosong.com>
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+X-Mailer: Apple Mail (2.3864.600.51.1.1)
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------TCA3D5iI9O0YydcvQZYYTS0U
-Content-Type: multipart/mixed; boundary="------------YMaORxDbfPW3L1D8b12s2Ifl";
- protected-headers="v1"; hp="clear"
-Message-ID: <8356a15c-5ad7-4f98-a8fd-01d6aa4e2dec@samba.org>
-Date: Sun, 26 Jul 2026 15:59:14 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/15] smb: add native security and trusted xattrs
-To: tanze <tanze@kylinos.cn>
-Cc: Steve French <sfrench@samba.org>, Namjae Jeon <linkinjeon@kernel.org>,
- Paulo Alcantara <pc@manguebit.org>, Jeremy Allison <jra@samba.org>,
- tom@talpey.com, ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- linux-cifs@vger.kernel.org, Stefan Metzmacher <metze@samba.org>,
- "vl@samba.org" <vl@samba.org>
-References: <cover.1784888897.git.tanze@kylinos.cn>
- <23f16c23-6221-4fcf-8cea-20eb36f47b9e@samba.org>
- <767aee26-2d03-4558-b473-70c3267dfdaa@kylinos.cn>
- <5ec4703f-12ca-4cce-9801-3f8a1a1ceabb@samba.org>
- <d680a27a-49f2-4214-8ad1-5718c95ed4f6@kylinos.cn>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <d680a27a-49f2-4214-8ad1-5718c95ed4f6@kylinos.cn>
+Hello ChenXiaoSong,
 
---------------YMaORxDbfPW3L1D8b12s2Ifl
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Good catch. I also confirmed after testing that it is not needed. The =
+initial analysis was based on packet capture and I mistook it as a macOS =
+requirement. My apologies for the noise. Could you remove it in your new =
+version of the patch, or do you want me to update it?
 
-T24gNy8yNS8yNiAxMDo0NyBBTSwgdGFuemUgd3JvdGU6DQo+IEkgY29tcGxldGVseSBhZ3Jl
-ZSB3aXRoIHlvdS4gVXBkYXRpbmcgdGhlIHByb3RvY29sIHdvdWxkIG1ha2UgdGhlIHJ1bGVz
-IA0KPiBjbGVhcmVyIGFuZCB0aGUgY29kZSBzaW1wbGVyLg0KDQpkcmFmdDoNCg0KPGh0dHBz
-Oi8vZ2l0bGFiLmNvbS9zbWIzLXBvc2l4LWV4dGVuc2lvbnMvc21iMy1wb3NpeC1leHRlbnNp
-b25zLy0vbWVyZ2VfcmVxdWVzdHMvMTA+DQoNCi1zbG93DQo=
+> Le 26 juil. 2026 =C3=A0 10:24, ChenXiaoSong =
+<chenxiaosong@chenxiaosong.com> a =C3=A9crit :
+>=20
+> Hi Ga=C3=ABl,
+>=20
+> I tested the macOS client, and it seems that this check is not needed =
+either. What issue did you add this check to fix?
 
---------------YMaORxDbfPW3L1D8b12s2Ifl--
 
---------------TCA3D5iI9O0YydcvQZYYTS0U
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmpmErIFAwAAAAAACgkQqh6bcSY5nkaz
-IhAAvy8yG6TdtVpqtszVHpFGfM1N4MOvfsn+pOxM7cfkTk+gN0A+q4/zjTHxPauy5yNkIaSq8Gn3
-4/w+GJf8SfxRK9SwA7XYquVRTSToX9aMaALbEGamWiQcw0qwgPLvT5xGiMm4dSUjEykuyK2laoB+
-nYrS4WB/zjBjT+tkf5sTGzHO1He1vciGQShNtzqplaUOpqoo8nxu1Q/G0e9dfEwAImL8pzXCm8vV
-tIDp+/TpFm/fvDsSi5mtHJIp5l4lUypS4VXO/AJ/j0x7U24j7jSxLgzVR4qTgfP7CAgwL7dlfh/U
-M1kAcZM6YCEbKgxuuZ1YdvQaO/5rOtXX2ok2mQSJOMMYv4yR7pyUBNJJtNBKF5Gy9IGKKseZZnO5
-G3NaE92K3ECx5n3S844xvXoquTift9EVDrZSm6O5yP5REg+dLuuHQlmLayIXsiuQ5LaRJJSrLJK7
-JCQCXQvQQIMIse7i5gUPojL6Vb2oJ76KieJ8rlNDR0Xh+CHnSdVknWEimqg7DbSiWXw7ye32Z+42
-wnl1EEFw/3rKQFTPpjNicwq2gm880jez5t72XmztRVADW9BP19ei/iS0qnAxTG9Vp8D1RobL3f9v
-3+ZM+eO9S23apdr6ZZ41FsyL/7E2PPuZFxiWI8vpuOwvBvaYDdAxyWyqCoKVeQ1PqOy/0hV3DpDR
-sX0=
-=ZBZc
------END PGP SIGNATURE-----
-
---------------TCA3D5iI9O0YydcvQZYYTS0U--
