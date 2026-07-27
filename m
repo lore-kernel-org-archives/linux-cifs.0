@@ -1,161 +1,106 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6969140A941
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 12:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785157187; cv=pass; b=DVdbWMhxN+RXR6VdtfdD8/mBIosT0wEhw+ZFiTYmvw+cZ5RUHwOPICjWkNTny7FZ4wwYMapN6hKMLL6j3IoSTc7UxaVwrn/dcZW7RDIAfkLfTWuV99NLam1zUxs5oLLahdqeNJw1S7on/X8yHohdUfwQYhRIZxBrPU0zFLhvCLY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785157187; c=relaxed/simple;
-	bh=luUc9ZQFmCjynsr/029wplBmFfuONlqLQlNMir6ffmc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qJGhdhjnzBT4jotwlYa6iRYeP0FXFmD+YbGTBdkEzMszfzFWDpgOzp9GkROctnVWbhNGA7PIuRKcTIn8V4HRMm0MjsMMRRcq4yGb5B23mzSRsiF1tVimKc8Sn1HHnSxYR5qjkpQNcPERFiGgfM6rg0b0ulIpMkca64729tuuj+8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jq+uwgTQ; arc=pass smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91B321A6832
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 13:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785157678; cv=none; b=mwmyfAjjZt7uWSzckNH8eYOv57xVG9RRA3u9MbCJPNGp7Z3KFQ8Jhv/tB/po/lfeFgd32Zr2O+Q1n+D+Cwgt6Bm77oybzfwc6iIGNm/UxmkdvVGdnfh8EoWAWmy2TVnCg2uxriQoP4zBMb6ZAg4Yk+YZU9sONXOqkxgYoa3igZA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785157678; c=relaxed/simple;
+	bh=PixeBS1hh3BZX0SkZZcTCfrASeyD4fHEVusdBAlcel0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WVenlcTGd9SQ3VJHqhYEVpYdD2xqLU/BwDm+FfZEWtUfFcd0H9F7oXUUK9/FKukeom5yPwGK3vTGtIkb25GLCBvaIP4OBGFqfRUWiGryx9Ux6uw/GXgQ9ybEkqQlRbM/PsZAu+TZvPupx1WeQXHTzhV7Pg7yZ0RsI/nap2rTRCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QiOlrL5m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jq+uwgTQ"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-81e9d8f3289so31449037b3.1
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 05:59:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785157182; cv=none;
-        d=google.com; s=arc-20260327;
-        b=MBcw2fAqfOrAg75zPoiWqT5qtEe/PHY58+SAhzBE34rajTcH8kAe51YfB2lieiaqLV
-         NoomuWzQJv/vOjgviCImickdESWCE1Dq8wZUeW36mnE92MOenh9Hca/jOJ7A75G7k1EX
-         2FK75tuBgGwa6v8jNNIQ39FnLuVJX7KUHniUiVMYQyDWT5z10Wj8bJ4l9STwlC/oysPA
-         pMFZRKL7ozLL2JuMXUnwHmGgro2yDKXL2uFpgh1iR5NiJ/+Af70drp816OBxQNislOHP
-         vOU/hWbMwWRXL423kCIlpaLV8GEGS3xcYcWbv+aAw1j+tjxH5laeFRs+dCO4JekBv5ka
-         tAiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ix29oOBbLOf7nlyiJN1FbRfyq7KaaHwmDtcPHELsDuI=;
-        fh=SkFABxbA0bbEyaD+nHAoAhVjvEczKLTnlNokA/iSu/M=;
-        b=jsrdcCB/pI4oM5NGAp5iuFgz9Z+D0n1avOv5x0mMxS//MoPhFLzccUgBS9OGJxORrQ
-         4Zxi9dluwgArA5wl4p6dL0ATUYZnm6QzWmFOx7nlXJ+lfW20CM3YFixzl2qy7p6vCwJh
-         NH3effxmenWA1i+2/CMnGVsAf5qfg3WDG5A58F2D0JzLaEs5k1aog1M6vnc1lB4Q6Hjz
-         EamyWIPVjnjKR7O3sfF32Xvu89CSr5cIBFzIqU63eY8jJXxruj1ZKnTkbNkI2hXyhxAu
-         t21ejzDvzykPc/xUP2NbxGFWcyMh4tFD4APoO0LWHd5rIiIm8uzGZAu6VjRyvKa7/D+V
-         lMTw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785157182; x=1785761982; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=ix29oOBbLOf7nlyiJN1FbRfyq7KaaHwmDtcPHELsDuI=;
-        b=Jq+uwgTQ0O1mmHxnBGxWcL+kdE/a9RtHdIP1tjT7Ei9n+xl4gDgXDSpklqMXUWUDZJ
-         ac+GrumYYzSuNYK88A3/T4fkN6MG4wQqkhyc+crip1OV9Ijk+VP1IqgTH+CDfXD7MNfK
-         izYR0QrNtnZH5422kCYtXpZUgaLbeTRubkLzot33FEHtm/0zOCL+zY/SYXVb/YZMHfi9
-         1UT3syyMpKMiD5iEheioIjGtc40Mtnrnje0QPSkcU+JF6Fi7cbHX042hz4Kxs0mUOVq5
-         ese1af/Z/IOALMSRWCj+UGhUzDc90HKs6jlW61M0+1P4+BJjqXHXw0K6Q6tEdTQomu6E
-         hxMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785157182; x=1785761982;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=ix29oOBbLOf7nlyiJN1FbRfyq7KaaHwmDtcPHELsDuI=;
-        b=CdAXMQM7un/25ikKdrSyFBOSzVn1FcBnmbsAt2iPNRiQlfMajXEXZT5l3zMAQ1FHFH
-         j5FKNq5LZ4Q8RmvgUDjcbdNLuWB8iwO9b7ChtDD4WWPCGoQ3MrfhW4DFS4qvKCN5GbIu
-         m5Q/F89jO799PQAF7eZTd7lN9sAQWvF2aJi8VgkiUKz8Q7wgYZzdMUQl76jLZtIc2iVX
-         RLQnUNqDC988Gu4E7BcCmh7qIQ+rBL19rsF20917QyXiTHHQ0z4mwQx7AeeWdQf6ZOJw
-         +cgzvHPMgbt6J5/TgvGvOd0jbEMzH3HhejWEvgXUkWr4qg6jBi8/+M4wd2/ltS9RX0LM
-         FhLg==
-X-Forwarded-Encrypted: i=1; AHgh+Rr/KQZifCCOzgcqOY+shyigGI2j+VG9j21R9hJAt4Rs4a6BjnVPF1hbftNKqkmDbCQUVKwdii2EBUyo@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDXTJsFtwtjMpbfWbUw+hvx3wiNQCr2yPCGS1tUE3hDrrBlvtZ
-	ga6Y+pU3G2uHUoAAjFVaHD6YebmgXPP3OIMFT76tZ9hmzz9NtupqRgWjFy26OD2nMws+Gr+1lZy
-	LygvBL98QF004+FOANxshUY1oNUAjVlw=
-X-Gm-Gg: AR+sD12xC1U7prdBAvu2OKYkWNqD46g9VVJmRVhQniK+6fDHCLWRJQ5dv+jJA6DenvL
-	oQioScMobHZyOebEt0ozOQvtmFaOcTnhwK7YAjZXgX6hXYlX9L9b12QYZkZSOKwz/ofIm9Bzsjj
-	WydxT8KD7peU7gdMxyM4tYL32fBu3UlwydRUkwCV7Ydxm2GFIfh4r5aw/c8RbI4N3rbaBidLZy4
-	07kx5bOKJUFDDn4xu/KybdKHsSECC1ljPH5MLx30O+avwaoxcMN2iEkorbohGi5+n82Bw==
-X-Received: by 2002:a05:690c:6f02:b0:81e:97e2:2210 with SMTP id
- 00721157ae682-81f69ebac17mr31274727b3.69.1785157182142; Mon, 27 Jul 2026
- 05:59:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QiOlrL5m"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1785157676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3EKPzNHczmFLavrL8Aq2DDXkrcGDtNuGqWVxKjxzUYU=;
+	b=QiOlrL5mhyNbBobx0U6mYtK0qoLf8HR205NRt6xwMQHuOgB7G7iMzL+psl/a6zguDvARry
+	/PqJoG2znCR3gyvbC1BlmCSGik41kFv1YfNUJMkZ3S1FbmsIwsbtX0ox1Hi75SLyLKSDPC
+	/xT3Ts85QuN4R8LacyBd2u9bIqs2m3w=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-310-Ar4alRKcPJii6Czk98UdMQ-1; Mon,
+ 27 Jul 2026 09:07:52 -0400
+X-MC-Unique: Ar4alRKcPJii6Czk98UdMQ-1
+X-Mimecast-MFC-AGG-ID: Ar4alRKcPJii6Czk98UdMQ_1785157671
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA786180136C;
+	Mon, 27 Jul 2026 13:07:50 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.44.33.159])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CF63519560A3;
+	Mon, 27 Jul 2026 13:07:46 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] netfs: Miscellaneous fixes
+Date: Mon, 27 Jul 2026 14:07:11 +0100
+Message-ID: <20260727130716.1099906-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260723184538.3888637-1-ekffu200098@gmail.com> <adcfc6f2-3309-4496-8331-1ae31e85d363@sirena.org.uk>
-In-Reply-To: <adcfc6f2-3309-4496-8331-1ae31e85d363@sirena.org.uk>
-From: Sang-Heon Jeon <ekffu200098@gmail.com>
-Date: Mon, 27 Jul 2026 21:59:30 +0900
-X-Gm-Features: AUfX_mxOitBR08KsPWHGWKTOhvBmlqBsOevQYdsbBN1kI3uyZROYcZJFQfRk1pk
-Message-ID: <CABFDxMEmB=5UZx6RZgFNZyB5sg-+e2hgx_T1QjV0JzqP+auTFQ@mail.gmail.com>
-Subject: Re: [PATCH 00/36] treewide: remove conditional returns with no effect
-To: Mark Brown <broonie@kernel.org>
-Cc: Julia.Lawall@inria.fr, Alex Deucher <alexander.deucher@amd.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Andrew Morton <akpm@linux-foundation.org>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Borislav Petkov <bp@alien8.de>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Daniel Lezcano <daniel.lezcano@kernel.org>, David Airlie <airlied@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Hans de Goede <hansg@kernel.org>, 
-	Hans Verkuil <hverkuil@kernel.org>, Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, 
-	=?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Jakub Kicinski <kuba@kernel.org>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	Jani Nikula <jani.nikula@linux.intel.com>, Jaroslav Kysela <perex@perex.cz>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jiri Pirko <jiri@resnulli.us>, "Joerg Roedel (AMD)" <joro@8bytes.org>, 
-	Johan Hovold <johan@kernel.org>, Jonathan Cameron <jic23@kernel.org>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Julian Anastasov <ja@ssi.bg>, 
-	Leon Romanovsky <leon@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>, Linus Walleij <linusw@kernel.org>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Matthew Sakai <msakai@redhat.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Maxime Ripard <mripard@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Mike Rapoport <rppt@kernel.org>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Nicolas Palix <nicolas.palix@imag.fr>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ping-Ke Shih <pkshih@realtek.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, Sebastian Reichel <sre@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	Simona Vetter <simona@ffwll.ch>, Simon Horman <horms@verge.net.au>, Stephen Boyd <sboyd@kernel.org>, 
-	Steve French <sfrench@samba.org>, Takashi Iwai <tiwai@suse.com>, Thomas Renninger <trenn@suse.com>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Tony Luck <tony.luck@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Vinod Koul <vkoul@kernel.org>, Will Deacon <will@kernel.org>, 
-	Yazen Ghannam <Yazen.Ghannam@amd.com>, cocci@inria.fr, amd-gfx@lists.freedesktop.org, 
-	dmaengine@vger.kernel.org, dm-devel@lists.linux.dev, 
-	dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
-	intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
-	linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pm@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, lvs-devel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	nouveau@lists.freedesktop.org, platform-driver-x86@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Jul 27, 2026 at 9:12=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
-te:
->
-> On Fri, Jul 24, 2026 at 03:45:02AM +0900, Sang-Heon Jeon wrote:
->
-> > All patches are independent and can be applied separately, but for
-> > everyone's convenience, it would be nice if they were merged through
-> > a single tree.
->
-> Please don't do this, it does not make anything more convenient - it
-> results in huge CC lists and makes it more difficult to work out who
-> will actually apply things.  If there's no dependencies just send to
-> each subsystem independently.
+Hi Christian,
 
-Thanks for letting me know. I'll keep that in mind. In v2, I will send
-the cleanup patches to each subsystem independently.
+Here are some miscellaneous fixes for netfslib.
 
-Best Regards,
-Sang-Heon Jeon
+ (1) Clear PG_private_2 on copy-to-cache append failure.
+
+ (2) Fix handling of rolling buffer allocation failure in single-object
+     writeback.  This is probably unnecessary with (4), but if we're only
+     writing to the cache, we can skip the write.
+
+ (3) Fix cleanup of readeahead folios if iterator preparation fails.
+
+ (4) Fix folio_queue allocation failure in writeback by adding a mempool.
+     This also improves request and subrequest allocation.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-fixes
+
+Thanks,
+David
+
+David Howells (1):
+  netfs: Fix folio_queue ENOMEM in writeback by adding a mempool
+
+Yichong Chen (3):
+  netfs: clear PG_private_2 on copy-to-cache append failure
+  netfs: handle single writeback rolling buffer allocation failure
+  netfs: release readahead folios on iterator preparation failure
+
+ fs/netfs/buffered_read.c       | 10 ++++++----
+ fs/netfs/internal.h            |  1 +
+ fs/netfs/main.c                |  7 +++++++
+ fs/netfs/objects.c             | 31 +++++++++++++++++++------------
+ fs/netfs/read_pgpriv2.c        |  3 ++-
+ fs/netfs/rolling_buffer.c      | 21 ++++++++++++---------
+ fs/netfs/write_issue.c         | 15 ++++++++++-----
+ include/linux/netfs.h          |  1 +
+ include/linux/rolling_buffer.h |  6 +++---
+ 9 files changed, 61 insertions(+), 34 deletions(-)
+
