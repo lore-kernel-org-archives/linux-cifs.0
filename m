@@ -1,70 +1,224 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA4B2BEC23
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 13:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606CB42D768;
+	Mon, 27 Jul 2026 16:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785160212; cv=none; b=PoXI0DifQkc5PtW8sktdeBDoZdknd+zwpWlxsoDn7YJPROdPrgyIFtOUuXX2EpTHCj/9mR1VyiXayPyjPYxQKBk7Covu98oomomR7e+VlO9OhghTdustGToo2DV96YOlIxFI8Twr+jMaxcUI/ZtJKUUMfI+xbcpAAIB4HdZPV1g=
+	t=1785171036; cv=none; b=XPX6A4X9ytkgTyW7+x0ow5m3u8tBGbqogqlIs6fX6zdMR7bTzaPbgL8863W/ZmhcEkVl77jZzwaFIkDTft+Kge09KZXWeNlsS68AO4sApF/9JC6iBY1pfBmsH2t13+UNSj23k0sm7Imp3AVj3Tm4UN6qPNG7Svmc9DZe2nVruU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785160212; c=relaxed/simple;
-	bh=9bO65FtpSJBZeKIubM7G+FWUIPApKUfTBHkVdtFGrz0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BLkGxGIQDc3ZYjBKjHRK7IG/3klURjrVQpnaiIlT2MT3BZdNPLqBAozjIWOKxe7X8SLKi3iGhI4A/OSRVCyPDq5GXvVsbxa/+xz0Crbjckmy5iPr88qWOfaWvp+qM57zNw7KpXRBH36usPoAm/QLDC0jOgNnMbwpygVaCFiLY94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyQHbN5Q; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785171036; c=relaxed/simple;
+	bh=ENSwaGbEo3WYn+FmsQihQe8KW4/GMr/cAhW2dptBN58=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=P+JZB726cInZmaFneglwtfuIrZ5+eapTY51CwI+GlwtHrNBWWnC1qgi6b/NUwJEBfcEAV+2JGi/woaYx6CUdKulVsjmVQ7e/r3y0FBoDqU+0NdtzZl5UJRvoKOoe3kcSVRUdp1MRof+J8V2ELoeRe+GvPXGvl8dPWa5l1HkkCIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ejCMrF1v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyQHbN5Q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A38B81F00AC4
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 13:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785160211;
-	bh=9bO65FtpSJBZeKIubM7G+FWUIPApKUfTBHkVdtFGrz0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=HyQHbN5Q3IuQD2oqZMvmqiwEN3xQF+JTfcvpNEWcKQwteQUMDB9eW/dtwPErsZH73
-	 WoQJ0UaWZ9bU5xk2GqKGvkG39hStbvBG48w0PSFfgd4MarPJFAcHiGp1y2BRuceX48
-	 Yukttb2Z805Lqo8w1iFQzk8rZqsLRht/9DVsKQXfwDww3NBgwdzWp+/QlO1NKBR8I/
-	 iDm1vdOTzE6t3EpfQauCaopT2CDMz3ViXpEfJAmsVYXIyYADcQNKeDrNu6eTiYfVsV
-	 Ji/BvJWqQuIhdoBOFmxG7P0Wr2mKHa9IFY9TisxE5s98n8+jrxsnRpy4k21btP/rL2
-	 vX/1mvyMfGCPQ==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c1670dad7a8so418768766b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 06:50:11 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rp6VJV9TmeekCPjmrzhcTewbV6gIW4IPOdSlzIi/QfbcrCoDUjzJr5Pzvu/t3/mWp+Z0ld5FYiYZjDJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCyQNXMCzgrx296FzxPsNDLvS/3HMveMjSqZhtfqtvDGch84Xr
-	TlZomZuezwUllfM4tsstyCO4qStiWO1BAnDYYCBWS5nKiKQeKHBk3s1462rE7AiNK+73fD7yvyi
-	UpFrL6BrMqFTnpalINo1GyV/KJXOzsow=
-X-Received: by 2002:a17:906:7951:b0:c15:d6c8:2816 with SMTP id
- a640c23a62f3a-c1f1f039145mr349032766b.27.1785160210299; Mon, 27 Jul 2026
- 06:50:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ejCMrF1v"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F384C19425;
+	Mon, 27 Jul 2026 16:50:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1785171035;
+	bh=ENSwaGbEo3WYn+FmsQihQe8KW4/GMr/cAhW2dptBN58=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=ejCMrF1vLiFzXo1xBRh/+0HQ6Ej0+RJujYSsu8/tZkICssz8O5YG5Y8h2b686Y6PW
+	 FKht/acM4A+/Tf6QAQE2y09XuhYZB4StnnCkBfVEepxjXEgP5UH05iYLG8y0wuIM2k
+	 kKngYa5CRe1wRumksz8Ydxz2JgYgKs+xH4TclEy9FC6RzQM+YrHNr8VtMIwAVkH3zR
+	 bWfcydCVdAe++VTb8gNBzNwEoCU+SuoCfF3a+rYOHJgKD3ZhAS8nxYXQdUjkrQ5ZEQ
+	 C9XAemOQSoJF+qLsLMc3y7wQYgqyKmjaPlyU0YEJJLstnAYpJAXRv3XiNSxgKhbrMg
+	 kzIACc5T7RXsw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD89C531D0;
+	Mon, 27 Jul 2026 16:50:34 +0000 (UTC)
+From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
+Date: Mon, 27 Jul 2026 11:50:34 -0500
+Subject: [PATCH] smb: client: bound the NTLMv2 blob to the SMB1
+ session-setup byte area
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260726090108.20938-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260726090108.20938-1-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 27 Jul 2026 22:49:57 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9kKWrMbrz49q8V79oPv=pWETE5r2gLRYV0_n3ok4yF6A@mail.gmail.com>
-X-Gm-Features: AUfX_mwURz_L_fOQTnK6GPTf8G-UXWei1UXSyLvmmmGkWTTJ79qhTmSnkiG0zX4
-Message-ID: <CAKYAXd9kKWrMbrz49q8V79oPv=pWETE5r2gLRYV0_n3ok4yF6A@mail.gmail.com>
-Subject: Re: [PATCH] smb/server: fix unbuffered file position alignment check
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260727-b4-disp-f5a64b1f-v1-1-e7320e14c47e@proton.me>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMMQ7CMAxA0atUnrGUhDQRvQpiaBynmKGt4oKQq
+ t6dAOMb/t9BuQorDN0OlV+isswN9tQB3cd5YpTcDM64YKKLmDxm0RVLPwafbMFIZ/KXHIwlDy1
+ bKxd5/5bX29/6TA+m7fuB4/gATkLyH3QAAAA=
+X-Change-ID: 20260727-b4-disp-f5a64b1f-7c3c49d601c4
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>
+Cc: samba-technical@lists.samba.org, Bharath SM <bharathsm@microsoft.com>, 
+ linux-kernel@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, linux-cifs@vger.kernel.org, 
+ Tom Talpey <tom@talpey.com>, David Howells <dhowells@redhat.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1785171034; l=6740;
+ i=hexlabsecurity@proton.me; s=default; h=from:subject:message-id;
+ bh=iHowz74G+7jmAUYIwY9J5wUVN2lV0FgycIRv/ocYJA8=;
+ b=t3MIoHckQzkvRYBwHFFaAgfTk3213yBl61E21wpCKSTr6KsjRlBp+0eBQe2tQOZHuh/T6asSC
+ IAt+Zg1WH9HAjt7CXzZqbGAF298ep1LPf9gNboJDejQHZf6oCBAhBql
+X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
+ pk=xw1AhCtQdvuoQc+bOQIYy9o8G++cp4/VniI2G/tc3G8=
+X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/default with
+ auth_id=893
+X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
+Reply-To: hexlabsecurity@proton.me
 
-On Sun, Jul 26, 2026 at 6:01=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> FILE_NO_INTERMEDIATE_BUFFERING is a CreateOptions flag and can be
-> combined with other flags, such as FILE_NON_DIRECTORY_FILE.
->
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+From: Bryam Vargas <hexlabsecurity@proton.me>
+
+sess_auth_ntlmv2() copies the NTLMv2 response blob into the fixed
+2000-byte byte area that sess_alloc_buffer() allocates, without checking
+that it fits.  Since commit 33cfdd726381 ("smb: client: fix session setup
+against servers that require SPN") ses->auth_key.len carries the SPN, so
+it grows with strlen(server->hostname), and extract_hostname() does not
+cap that.  A hostname of a few hundred bytes overflows the byte area, and
+server->hostname can come from a DFS referral target by way of
+__reconnect_target_locked(), i.e. from the server.
+
+Reject the session setup when the blob does not fit.  The SMB2/3 consumer
+of auth_key.len is unaffected: size_of_ntlmssp_blob() sizes its allocation
+from it.  A hostname at the 253-byte DNS limit needs 590 of the 775
+available.
+
+Fixes: 33cfdd726381 ("smb: client: fix session setup against servers that require SPN")
+Cc: stable@kernel.org
+Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+---
+Reproduced on v7.2-rc1 with KASAN and CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y,
+against a fake SMB1 server whose only job is to answer negprot with
+EncryptionKeyLength == 8 and no CAP_EXTENDED_SECURITY.  That picks
+CIFS_NEGFLAVOR_UNENCAP, which routes the session setup through
+sess_auth_ntlmv2().  The server never has to answer the session setup itself:
+the copy happens while the client builds the request, before
+sess_sendreceive().
+
+Reproducer.  A UNC whose hostname is long enough that the SPN pushes
+auth_key.len past the byte area:
+
+  mount(2)("//<2000 x 'h'>/share", "/mnt", "cifs", 0,
+           "vers=1.0,sec=ntlmv2,user=u,password=p,ip=127.0.0.1,port=4445")
+
+mount(8) will not deliver that.  It prefers the new mount API, where
+fsconfig(FSCONFIG_SET_STRING) truncates the source at 255 bytes
+(strndup_user(_value, 256)).  copy_mount_string() takes PATH_MAX, so the
+reproducer calls mount(2) directly.
+
+A/B on v7.2-rc1, all three arms in one boot with kasan.fault=report, the clean
+ones first since KASAN only reports once per boot:
+
+  3-char hostname, unpatched:     memcpy of 90 bytes, clean
+  2000-char hostname, patched:    "NTLMv2 response blob too long (4084)",
+                                  mount fails -EIO, clean
+  2000-char hostname, unpatched:
+
+    BUG: KASAN: slab-out-of-bounds in sess_auth_ntlmv2+0x3d1/0xee0 [cifs]
+    Write of size 4084 at addr ffff88810d921000 by task smb1_mount/1121
+     __asan_memcpy+0x3c/0x60
+     sess_auth_ntlmv2+0x3d1/0xee0 [cifs]
+     CIFS_SessSetup+0x1bf/0x350 [cifs]
+     cifs_setup_session+0x248/0xaf0 [cifs]
+     cifs_get_smb_ses+0xf46/0x17b0 [cifs]
+     dfs_mount_share+0x1e5/0x21f0 [cifs]
+    Allocated by task 1121:
+     __kmalloc_cache_noprof+0x153/0x360
+     sess_alloc_buffer+0x176/0x2e0 [cifs]
+     sess_auth_ntlmv2+0xc1/0xee0 [cifs]
+    The buggy address is located 0 bytes inside of
+     allocated 2000-byte region [ffff88810d921000, ffff88810d9217d0)
+
+auth_key.len there is CIFS_SESS_KEY_SIZE + sizeof(struct ntlmv2_resp) + the
+AV-pair blob + 2 * (5 + strlen(hostname)) + the two trailing AV pairs, so 4100
+for that hostname and the default WORKGROUP domain, and a copy of 4084: 2084
+past the end.  It does not stop at the blob either.  The strings that
+unicode_ssetup_strings() appends afterwards land on the next object, and the
+following _raw_spin_lock() takes a GP fault on 0x2000530046005630, which is
+UTF-16 from that tail.
+
+The other two writers of that byte area stay inside it.  sess_auth_kerberos()
+and _sess_auth_rawntlmssp_assemble_req() put only the OS and domain strings
+there -- the SPNEGO blob travels in iov[1] by pointer, uncopied -- which caps
+them near 711 bytes.  Every other consumer of auth_key.len sizes its allocation
+from it: size_of_ntlmssp_blob() on the SMB2/3 side, and the kmemdup() in
+sess_establish_session().
+
+Nothing that works today stops working.  The other way to reach the limit is a
+256-byte domain next to a 253-byte hostname, needing 1084 bytes; but that pair
+already writes 2309 into the 2000-byte area on current mainline, so it is
+broken before this patch rather than by it.
+
+The DFS route is by inspection, not reproduced.  __reconnect_target_locked()
+replaces server->hostname with extract_hostname(<referral target>), and the
+reconn_set_ipaddr_from_hostname() return value is logged and then overwritten
+by generic_ip_connect(), so a hostname that does not resolve still reaches
+session setup.
+
+33cfdd726381 first appeared in v6.17-rc1.
+
+Growing the byte area instead would also work, but put_bcc() puts that count on
+the wire as a __u16, so it only moves the ceiling.  Happy to switch if you'd
+rather not fail the mount.
+---
+ fs/smb/client/smb1session.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
+
+diff --git a/fs/smb/client/smb1session.c b/fs/smb/client/smb1session.c
+index 83bfbf0c068e..d610a32cc4f0 100644
+--- a/fs/smb/client/smb1session.c
++++ b/fs/smb/client/smb1session.c
+@@ -16,6 +16,22 @@
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+ 
++/* byte area sess_alloc_buffer() hands to a session setup request */
++#define SESS_SETUP_BYTE_AREA	2000
++
++/* what unicode_ssetup_strings() appends after the blob: alignment pad,
++ * user, domain, and three cifs_strtoUTF16() calls capped at 32 characters
++ */
++#define SESS_SETUP_STRINGS_MAX					\
++	(1							\
++	 + 2 * CIFS_MAX_USERNAME_LEN + 2			\
++	 + 2 * CIFS_MAX_DOMAINNAME_LEN + 2			\
++	 + 2 * 32 + 2 * 32 + 2					\
++	 + 2 * 32 + 2)
++
++#define SESS_SETUP_BLOB_MAX					\
++	(SESS_SETUP_BYTE_AREA - SESS_SETUP_STRINGS_MAX)
++
+ struct sess_data {
+ 	unsigned int xid;
+ 	struct cifs_ses *ses;
+@@ -330,8 +346,7 @@ sess_alloc_buffer(struct sess_data *sess_data, int wct)
+ 	 */
+ 	sess_data->buf0_type = CIFS_SMALL_BUFFER;
+ 
+-	/* 2000 big enough to fit max user, domain, NOS name etc. */
+-	sess_data->iov[2].iov_base = kmalloc(2000, GFP_KERNEL);
++	sess_data->iov[2].iov_base = kmalloc(SESS_SETUP_BYTE_AREA, GFP_KERNEL);
+ 	if (!sess_data->iov[2].iov_base) {
+ 		rc = -ENOMEM;
+ 		goto out_free_smb_buf;
+@@ -449,6 +464,14 @@ sess_auth_ntlmv2(struct sess_data *sess_data)
+ 			goto out;
+ 		}
+ 
++		if (ses->auth_key.len - CIFS_SESS_KEY_SIZE >
++		    SESS_SETUP_BLOB_MAX) {
++			cifs_dbg(VFS, "NTLMv2 response blob too long (%u)\n",
++				 ses->auth_key.len - CIFS_SESS_KEY_SIZE);
++			rc = -EIO;
++			goto out;
++		}
++
+ 		memcpy(bcc_ptr, ses->auth_key.response + CIFS_SESS_KEY_SIZE,
+ 				ses->auth_key.len - CIFS_SESS_KEY_SIZE);
+ 		bcc_ptr += ses->auth_key.len - CIFS_SESS_KEY_SIZE;
+
+---
+base-commit: 4235cb24ec1e8e96843f3671ba4da2a6ccca2c7b
+change-id: 20260727-b4-disp-f5a64b1f-7c3c49d601c4
+
+Best regards,
+--  
+Bryam Vargas <hexlabsecurity@proton.me>
+
+
