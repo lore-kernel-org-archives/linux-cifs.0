@@ -1,86 +1,87 @@
-Received: from forward102b.mail.yandex.net (forward102b.mail.yandex.net [178.154.239.149])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9DE42AF93
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 17:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58962338910
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 18:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785172876; cv=none; b=gK1BulH6OkAxZrE8ECUhQfmhkbBz8wqWnUgdC/MEUVWj0fNohpHShwhDcj4lXNKb5R0n7525Oh3cyfLEa5DyMbgF5jN4LxCwKGBZKDg3NylRUY3iLdvtkc+vipyLs+HmWcTgD/F1RUhBBNk00YOZo/CLWSxg8uBuBG8uHG98MJI=
+	t=1785176321; cv=none; b=qqsp73rCRTwifBQYLXYksoEqoTNzNYBcHrm35qewyFvCy3Iz5/MQ+cEh/3IAcBof+4MRvepMnaAoBZSJp7WfLsulEGUY+As12xCJykdC9dLmXwnK6qumkQePge8CV83ZDnie1RGzahsR1jLN79KGtn1Le1FQX8kiM9NiX0ro12I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785172876; c=relaxed/simple;
-	bh=+o1+6EycefGK90p/hNogQBe0FJ+DmImFPP5S9cIujvY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kZPW4u+jiloVqECcaye6EMOYiz8oYgTc/xz5FFO5HbRe8HWGrt3+UudDELR5COyZy1Wc/uTwJuaGBqQAbvctw+k7EKhBjzbm0fd5wYQFVsR5HE+SnoUJWCAX1dshOgwGFfC6owIFEUvNSC1x/lx0Hx3D5XA83ZisKWgC79SUzXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=ju8p1ROm; arc=none smtp.client-ip=178.154.239.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1785176321; c=relaxed/simple;
+	bh=iPZXiWJxfplbr/eUXAGfIPqtKGMl33vrCxegLxUvFKI=;
+	h=Message-ID:From:To:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=MKSiJcji23OXHn9if688KD4HM+5sBFge9u8UyEDw+HTwknkNRF9h8K7z+bGtFkmwYhD266QQKZEvNVmyrJ7wSI2JzBDqxAhRDQHxy6vcMfAZj+Qi6QeZ1f48aIR52aNWT8RKQsEOpP4259rlwGZWin2YrsXmlMTtlBTpE9YU/P4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=rj0d6Up6; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="ju8p1ROm"
-Received: from mail-nwsmtp-smtp-production-main-74.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-74.sas.yp-c.yandex.net [IPv6:2a02:6b8:c24:1698:0:640:befc:0])
-	by forward102b.mail.yandex.net (postfix) with ESMTPS id D454EC00E3;
-	Mon, 27 Jul 2026 20:20:52 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-74.sas.yp-c.yandex.net (smtp) with ESMTPSA id oKguf1xg6a60-aRRNJ4l7;
-	Mon, 27 Jul 2026 20:20:52 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1785172852; bh=0WXr+S/AYfnhdAFfpdhti8AG+06VFvtFUaUKyS3yheY=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=ju8p1ROmpAUKKdZAk6l2EogVH5Yrz0cJIqLkX5T01/T3XSflNF0QBIamuutZplnDC
-	 liMmc9PM0z4GOxlTXldZiQRmDjgtIRfzJ58WTR17P5Ji128O/0dqlJLotlgVximSkF
-	 0HZyLe9Pi3aQRsDuOffMHxI/Xm/VGodWmuSrFLiU=
-Authentication-Results: mail-nwsmtp-smtp-production-main-74.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH] smb: client: simplify cifs_fscache_get_super_cookie()
-Date: Mon, 27 Jul 2026 20:20:35 +0300
-Message-ID: <20260727172035.397713-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="rj0d6Up6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:To:From:Message-ID:Sender:Cc:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=bf5D/tQxGS997w2P7wKnM9VARqbvG5eps0EHkowqKXk=; b=rj0d6Up6lPvSpXTgz0B+iHCd6D
+	b32Lx5JOiEAeaS9CpWOGq7pv5owBHFj1nJYoyp5lSvKB+TocE8P5Ny5JwIS0srr3UMx5B/mNmP8Zr
+	yHBjK8F2CDjL/rvV6iHvCAT9BRNcAGAgHBGSLOAgKoUXaZXaHQUnEuQwlpiVqE0Kl2CH22AckFhWv
+	WYnGHUHKqb1xsJOTCj6WfvGsfTaXg7jutpRVib1gd0HMbCHFNElohaaLVP2saBYHrCrtbzIxhIZNg
+	q8+y4FntopE64x/5clx2Op/zByKXJaf3YLVb9zvoeiEqhCzjfhdBM/vm47HRy+1IQgF6XfRVQkRCw
+	7JVy6fUw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.4)
+	id 1woPuH-000000006mn-2pCs;
+	Mon, 27 Jul 2026 15:18:29 -0300
+Message-ID: <2ff7ecbb966ccaa5dd3768b0fdf38d39@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Frank Sorenson <sorenson@redhat.com>, linux-cifs@vger.kernel.org,
+ stfrench@microsoft.com
+Subject: Re: [PATCH 0/2] cifs: follow-on fixes to time_last_write mechanism
+In-Reply-To: <20260724163036.2670328-1-sorenson@redhat.com>
+References: <20260724163036.2670328-1-sorenson@redhat.com>
+Date: Mon, 27 Jul 2026 15:18:29 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Avoid redundant 'strlen()' and use the convenient 'strreplace()'
-to simplify 'cifs_fscache_get_super_cookie()'.
+Frank Sorenson <sorenson@redhat.com> writes:
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- fs/smb/client/fscache.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+> This series addresses two correctness issues in commit e8a8d54c2d50
+> ("cifs: prevent readdir from changing file size due to stale directory
+> metadata"), which introduced the time_last_write field to protect cached
+> file sizes from stale Windows Server directory enumeration metadata.
+>
+> Patch 1 consolidates the time_last_write stamp into _cifsFileInfo_put().
+> The original commit scattered the stamp across cifs_close(),
+> smb2_deferred_work_close(), and three deferred-close drain functions in
+> misc.c.  This missed the case where background I/O holds the final file
+> reference after userspace close() returns -- the stamp was anchored to
+> the earlier userspace-close time rather than the actual server close,
+> allowing the protection window to expire before the handle was removed
+> from openFileList.  Moving the stamp into _cifsFileInfo_put() under
+> open_file_lock provides a single canonical location that covers all close
+> paths and uses the spinlock's store-release/load-acquire pairing with
+> is_inode_writable() for correct memory ordering.
+>
+> Patch 2 fixes the stamp placement in the setattr/truncate paths.
+> cifs_file_set_size() calls cifs_setsize() on success, which calls
+> i_size_write() and updates i_size.  The subsequent check
+> attrs->ia_size != i_size_read() therefore always evaluates false after a
+> successful cifs_file_set_size(), making the stamp dead code -- the
+> truncate path was completely unprotected.  The fix moves the stamp to
+> before the RPC call, guarded by attrs->ia_size != i_size_read() to
+> exclude no-op same-size ftruncate(2) calls.  On failure the stamp is
+> left in place rather than restored: restoring a stale snapshot (prev_tlw)
+> could silently erase a concurrent _cifsFileInfo_put() close stamp if that
+> close arrived between the READ_ONCE and the smp_store_release.  readdir
+> is suppressed until the stamp expires; stat() is unaffected because
+> cifs_revalidate_dentry_attr() uses from_readdir=false, bypassing the
+> time_last_write check entirely and always returning an authoritative
+> QUERY_INFO result.
+>
+> Frank Sorenson (2):
+>   cifs: consolidate time_last_write stamp into _cifsFileInfo_put()
+>   cifs: fix time_last_write stamp placement in setattr/truncate paths
 
-diff --git a/fs/smb/client/fscache.c b/fs/smb/client/fscache.c
-index 01424a5cdb99..9f66bbcd3801 100644
---- a/fs/smb/client/fscache.c
-+++ b/fs/smb/client/fscache.c
-@@ -38,7 +38,6 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct fscache_volume *vcookie;
- 	const struct sockaddr *sa = (struct sockaddr *)&server->dstaddr;
--	size_t slen, i;
- 	char *sharename;
- 	char *key;
- 	int ret = -ENOMEM;
-@@ -73,10 +72,7 @@ int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon)
- 		return PTR_ERR(sharename);
- 	}
- 
--	slen = strlen(sharename);
--	for (i = 0; i < slen; i++)
--		if (sharename[i] == '/')
--			sharename[i] = ';';
-+	strreplace(sharename, '/', ';');
- 
- 	key = kasprintf(GFP_KERNEL, "cifs,%pISpc,%s", sa, sharename);
- 	if (!key)
--- 
-2.55.0
-
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
