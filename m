@@ -1,92 +1,70 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC45270540
-	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 13:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA4B2BEC23
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 13:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785159042; cv=none; b=m5CGz/qpOJWd5WzIc42LIWftfe2mgZkUBQ2Qne1vx7iwk/uvkgme/oRMBxC+C6lcuBWrGC5h4Gw7S003LrATuLKZHX7tJY0yK32FeRWMngKmwrGumDBF0WrSnWnjgR/VKzPg7e0mrC0hWuCpTyRZNJ8ZthlTxitFAMFy8d/FDeg=
+	t=1785160212; cv=none; b=PoXI0DifQkc5PtW8sktdeBDoZdknd+zwpWlxsoDn7YJPROdPrgyIFtOUuXX2EpTHCj/9mR1VyiXayPyjPYxQKBk7Covu98oomomR7e+VlO9OhghTdustGToo2DV96YOlIxFI8Twr+jMaxcUI/ZtJKUUMfI+xbcpAAIB4HdZPV1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785159042; c=relaxed/simple;
-	bh=tw8mWDAdFoS6B5c1gd9DQWUBypy+ZmSSsSwcfuQk42A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d4EJV97vNyvfmn1jCAlwFa4npRQpJLDbc85A6gvHYbnBbwNqtHUVixvLywQodOSlxEsrAtOzXt875K/u8x2afXLXTHmReIHIF0qzj8C53Z5byI5Uc5GpzSBKINLyhw++/JY8sl4E3ZLoxUrBjBpIDx1QgduR6mHaMTr3mDwMzyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=UoP2/gY8; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1785160212; c=relaxed/simple;
+	bh=9bO65FtpSJBZeKIubM7G+FWUIPApKUfTBHkVdtFGrz0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BLkGxGIQDc3ZYjBKjHRK7IG/3klURjrVQpnaiIlT2MT3BZdNPLqBAozjIWOKxe7X8SLKi3iGhI4A/OSRVCyPDq5GXvVsbxa/+xz0Crbjckmy5iPr88qWOfaWvp+qM57zNw7KpXRBH36usPoAm/QLDC0jOgNnMbwpygVaCFiLY94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyQHbN5Q; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="UoP2/gY8"
-Message-ID: <02e13173-b4b1-4de2-a58a-b5627799b94d@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785159026;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cn3U9SUi7cQpdQpK0cbUf6QZl6pCgdH3mtPucanWDXI=;
-	b=UoP2/gY8Olm4YKhbfadDIBYSxGE/Ah3xJauYLJ80LffJg+HZxcv2+suW4Lem1gAABnV7Ru
-	ExlwjG+uTvlLZLPoH6+6NjDHhs25F82BbEIKCFvkcWar17fU5SK2gF9SqPoGDB7cqjirsB
-	V1DuBr/FKYaBStS9/vOovTBOrk4fT6NnpxdJRiNKRHLJ3vbifFWlfJSeW3hegafOiU0lv7
-	X7KyVTWDPFzRcf/zNIxUeG4u06sLZ3TqC2v7mS3cbciTDCWEnPJEBU5YRr4vpIRBve2Zj0
-	R3sjkgEq1YhOEap2ZGL7mzNf1bzXsg4JtRfbY7zxhiubl+ECuIXQ/TGkOunbYg==
-Date: Mon, 27 Jul 2026 21:30:25 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyQHbN5Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A38B81F00AC4
+	for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 13:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785160211;
+	bh=9bO65FtpSJBZeKIubM7G+FWUIPApKUfTBHkVdtFGrz0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=HyQHbN5Q3IuQD2oqZMvmqiwEN3xQF+JTfcvpNEWcKQwteQUMDB9eW/dtwPErsZH73
+	 WoQJ0UaWZ9bU5xk2GqKGvkG39hStbvBG48w0PSFfgd4MarPJFAcHiGp1y2BRuceX48
+	 Yukttb2Z805Lqo8w1iFQzk8rZqsLRht/9DVsKQXfwDww3NBgwdzWp+/QlO1NKBR8I/
+	 iDm1vdOTzE6t3EpfQauCaopT2CDMz3ViXpEfJAmsVYXIyYADcQNKeDrNu6eTiYfVsV
+	 Ji/BvJWqQuIhdoBOFmxG7P0Wr2mKHa9IFY9TisxE5s98n8+jrxsnRpy4k21btP/rL2
+	 vX/1mvyMfGCPQ==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c1670dad7a8so418768766b.3
+        for <linux-cifs@vger.kernel.org>; Mon, 27 Jul 2026 06:50:11 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rp6VJV9TmeekCPjmrzhcTewbV6gIW4IPOdSlzIi/QfbcrCoDUjzJr5Pzvu/t3/mWp+Z0ld5FYiYZjDJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCyQNXMCzgrx296FzxPsNDLvS/3HMveMjSqZhtfqtvDGch84Xr
+	TlZomZuezwUllfM4tsstyCO4qStiWO1BAnDYYCBWS5nKiKQeKHBk3s1462rE7AiNK+73fD7yvyi
+	UpFrL6BrMqFTnpalINo1GyV/KJXOzsow=
+X-Received: by 2002:a17:906:7951:b0:c15:d6c8:2816 with SMTP id
+ a640c23a62f3a-c1f1f039145mr349032766b.27.1785160210299; Mon, 27 Jul 2026
+ 06:50:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] smb: client: free partially allocated transform folio
- queue
-To: Yichong Chen <chenyichong@uniontech.com>, Steve French <sfrench@samba.org>
-Cc: Paulo Alcantara <pc@manguebit.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
-References: <20260704052714.428561-1-chenyichong@uniontech.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260704052714.428561-1-chenyichong@uniontech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260726090108.20938-1-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260726090108.20938-1-chenxiaosong@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 27 Jul 2026 22:49:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9kKWrMbrz49q8V79oPv=pWETE5r2gLRYV0_n3ok4yF6A@mail.gmail.com>
+X-Gm-Features: AUfX_mwURz_L_fOQTnK6GPTf8G-UXWei1UXSyLvmmmGkWTTJ79qhTmSnkiG0zX4
+Message-ID: <CAKYAXd9kKWrMbrz49q8V79oPv=pWETE5r2gLRYV0_n3ok4yF6A@mail.gmail.com>
+Subject: Re: [PATCH] smb/server: fix unbuffered file position alignment check
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-
-在 2026/7/4 13:27, Yichong Chen 写道:
-> netfs_alloc_folioq_buffer() may leave a partially allocated folio
-> queue attached to the caller's buffer pointer when it returns an error.
-> 
-> smb3_init_transform_rq() stores the buffer in the request only after
-> allocation succeeds, so the common error path cannot free a partial
-> allocation. Store the buffer pointer before checking the return value so
-> err_free releases it.
-> 
-> Signed-off-by: Yichong Chen <chenyichong@uniontech.com>
-> ---
->   fs/smb/client/smb2ops.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 199f6aeb7b33..3fe9f0534e42 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -4882,10 +4882,10 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
->   			size_t cur_size = 0;
->   			rc = netfs_alloc_folioq_buffer(NULL, &buffer, &cur_size,
->   						       size, GFP_NOFS);
-> +			new->rq_buffer = buffer;
->   			if (rc < 0)
->   				goto err_free;
->   
-> -			new->rq_buffer = buffer;
->   			iov_iter_folio_queue(&new->rq_iter, ITER_SOURCE,
->   					     buffer, 0, 0, size);
->   
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+On Sun, Jul 26, 2026 at 6:01=E2=80=AFPM ChenXiaoSong
+<chenxiaosong@chenxiaosong.com> wrote:
+>
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>
+> FILE_NO_INTERMEDIATE_BUFFERING is a CreateOptions flag and can be
+> combined with other flags, such as FILE_NON_DIRECTORY_FILE.
+>
+> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Applied it to #ksmbd-for-next-next.
+Thanks!
