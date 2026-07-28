@@ -1,58 +1,72 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1721D61BC;
-	Tue, 28 Jul 2026 03:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA8F3624CF
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 03:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785209322; cv=none; b=lVACT3v+cq78lGaxumPW39BJIMWFn1ObDfqwyueF8gRfF3igs52hATmJjeJV/ma9MzThjTCDqDWhyCMWk0KQxzSec93qtrtojj1nhrHb2n83ZZDQdMBAHMU4pljqXvM1gtEb9qAYT5T3XGpUM11iRggyv6L00Q1mZ61DNg3wxIo=
+	t=1785209791; cv=none; b=Uur1SKJWKb16GagCYtbJ+T7baCLE50CgNm2E8Ia88jJghW+eewzKIs+8Zmsg7dLISiX1KW8xtWVrpnXIlercpvlnadoPhe75ez5skWTj+P2b35vZ/WiyEPomyNEoFbEpBsZCGMEnm9OdySOdb1EqZE9XyeOQTDHZGTm1EdM/Xto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785209322; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lgqsUmbA39ryBf1JPwdVCgaw3SxIqAlBv2CwW2FaYWZxz0SdegYrQxLGgam1BdoJ6j0UeCOTu5tcqo7Pgih3lNEP3UycEVOvSN+8Obmn5VEgvynb3xjdqVLBcgloz6WNYkbfY5js67yQ7PG7LxX6OOZo0bkcQnGKtsReJADOwFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=haJb8Wif; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1785209791; c=relaxed/simple;
+	bh=OTD7wv7FeR8GLOEaT6IZGRuGhp4u0xCHxWR1ZHFXpS0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J1pnMtgU80UoAFLnoC4Dq//s8/0aMh1H8BJXRTVioRdidD8Jv6BHld3m1IH+9UkIv29JJup6gwc0yfInRjIX4DH7iEPRD1nYzuAJlgGw0Zt7S+wXPptsFJVKbvua1295qMcUu/FAJrLqF7gOyMQsj9cxxKowYth3uGZUeSjkoH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=unQS38Bl; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="haJb8Wif"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=haJb8Wifbc4a6ZQFsdDarcGwLs
-	PvSTdbwy2+ovrCgYUb/iAdHRqGzlDQBDwWt60jPG4tIFbt6wMBjnrPW993UIp9Gv4yDe2aH8xNhov
-	cU9/Z80lJChGlYCynAF30NFQ30tpe7he8i/lsteMyKYA5Ms3IzmLDDB+3wadu0UZ50YsJiJbZ2jia
-	YenNd/LDBVOgUYNA0OhhMgLXb5Ig0Smutfrjy1ENXI4+HAS720lFw8OMDcqLn7EorBJPAdbt4hr9A
-	sUt3S6/16/x2zmYCr3JQO5R5Pbem8pzUQZahURg9WmKvQsMepjJeXmmxZsxRTfYtostpcUSfRoDC5
-	mhjN/M4A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1woYUb-00000004KLn-1HvR;
-	Tue, 28 Jul 2026 03:28:33 +0000
-Date: Mon, 27 Jul 2026 20:28:33 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	bharathsm@microsoft.com, senozhatsky@chromium.org,
-	dhowells@redhat.com, metze@samba.org, zlang@kernel.org,
-	lukas@herbolt.com, linux-cifs@vger.kernel.org,
-	fstests@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: Re: [PATCH v2 xfstests resend 0/3] add generic/795
-Message-ID: <amgh4bf-m25TSMSy@infradead.org>
-References: <20260720164207.732522-1-chenxiaosong@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="unQS38Bl"
+Message-ID: <31e5d003-9062-4654-b860-2a77f5d5c5c5@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1785209784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C4VjiNn+v5Ei4R+0mAbqthGjy5UxJTlVrw6N/5aa1+U=;
+	b=unQS38BlxkeA9SFci8lLtKmtnm+tsZIGC6t6+hISFRqtlva8lZHfYswsoVj/5SalHLjPML
+	IkSDpEDE26YK27izBULhjJ2VhMEV7t2DgNYsM5fJK9swh/ZuMdEqrCEh7IGJhrwcx+JjKp
+	1izhf8thpptB/IOMYe9LlegtkzyDaPJyP7XebJ5W5hFrCIxfIqzFnx8SvcayA7h1sVLItA
+	Sde3+6z0GBYDpV0HlwNHKD4iwJ/4lbfRg8CL5zFHQEHEraz52aE+Szu4StUGdzF4pDI5y6
+	japS6dmu02cQfBVXN6AXFEZf0cSUQv0BIP2jXD1QL3Xty7eEFZbD9EfBd8dYOw==
+Date: Tue, 28 Jul 2026 11:35:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260720164207.732522-1-chenxiaosong@chenxiaosong.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Subject: Re: [PATCH v2 xfstests resend 0/3] add generic/795
+To: Christoph Hellwig <hch@infradead.org>
+Cc: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
+ ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+ bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
+ metze@samba.org, zlang@kernel.org, lukas@herbolt.com,
+ linux-cifs@vger.kernel.org, fstests@vger.kernel.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260720164207.732522-1-chenxiaosong@chenxiaosong.com>
+ <amgh4bf-m25TSMSy@infradead.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <amgh4bf-m25TSMSy@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Looks good:
+Hi Christoph,
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Thanks for your review. There is new version:
+https://lore.kernel.org/linux-cifs/20260724031210.332153-1-chenxiaosong@chenxiaosong.com/
+
+On 7/28/26 11:28, Christoph Hellwig wrote:
+> Looks good:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
