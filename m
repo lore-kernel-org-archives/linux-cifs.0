@@ -1,196 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3350230D401;
-	Tue, 28 Jul 2026 18:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C033FCB0C
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 21:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785261983; cv=none; b=VLzN5K5ICNQy6vBcxkCPkeSIY2N92r59eVJXtlRYxrYBJ5ZLJjnpLpD7t90bY6/5WYN6/XhdW29loSjpeLJiPE9peQkD1EtsHvjSHJPYprvRyziUky+rsIu+F0IZxnA8eSUn0NxtOR1tqWCPC4j1uSHYHDOAE4s+bBKGQ6ZSVNU=
+	t=1785273286; cv=none; b=KRftE/5Su9QuUN8wAgaVxLkMJW8tscUeo7XH6kK3c/6oRZH6eOAlZlc2fjCQh1Fs/gyzW45swrDY3B/De/tNAOWAzuMgnU0Z79XlVMMDgY8xpVJE3D2apJqDNSrGOq+yAZdKUWnwZaSYPLz8Ac0DYfox8VUKQUcSRdBYifKEmlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785261983; c=relaxed/simple;
-	bh=gRJ88yiLo4dZjFNN2r7rG7O0H06F0Xzr738313NtupI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RnvgjnjY69foOUuVd87eT26svcDVnRCCXKkW6ewwYcCI/vjVkeRw4NhpfNlUOVfHRo2+XoNm5foyV84UBLWyRY11hxdAhTt+XboEFOeasZ+cepGRRx94YrqmgKYmv892zOQOg5KF0eAlhSFW1hN+dkuit3ouW3KSCczEPf/8274=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kEST+Qoe; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1785273286; c=relaxed/simple;
+	bh=DqAqRnbUNlTORrhBs/lWNFctAiTZF4VUpHwYY6un5rU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=cInpUwz7lCS+BvN/X7f7WQUL9lxvIseoBpPiXTC8whrPZvZq26ZYjy6A+wXNVgz9AdoYdMIMSO2srLozp+7zk7LR5LW71u8+aylW1lePiyN83GfvrHXbbJAQmGvTSPFeKjXMPPdfXwtRd9Wvhv5iRSrc+YxPvofqhtazoA8MZgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMJDBRT4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kmf3mQH2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kEST+Qoe"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 05E01C2BCF6;
-	Tue, 28 Jul 2026 18:06:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1785261983;
-	bh=gRJ88yiLo4dZjFNN2r7rG7O0H06F0Xzr738313NtupI=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=kEST+Qoelc8lvosQyC/+fyZTfoNIrt2X6puLyMEzGaVZhDCzSBTNPmL8KoYiqwJAE
-	 1CrUtDRcM1mfR7I9lVaGFEEocH/FAUEhple1ZM2i59kWYN88jcxpf0EFvwF42t1b3s
-	 ViYFM7ebkGDgl0gRjDfikhlW80GG2fbEfDt2P5zz3AzJR6fqR3+jspiT37/3e8iKPD
-	 YH2Fbd50NlcezYzj/c/vXEJ6zoTrqnHGFM9Yn9M4sf2aTJyGH04WMeeEV9Bo5AW3HC
-	 fp3An+MgMeDutDAYiGwf6IY9h7ULKjZCeDd5PtJIUR85epEL0tvWTuVTDzAWvNJQqn
-	 c429tmDLiSuwA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E528DC53219;
-	Tue, 28 Jul 2026 18:06:22 +0000 (UTC)
-From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
-Date: Tue, 28 Jul 2026 13:06:22 -0500
-Subject: [PATCH] smb: client: reject a tree connect response whose byte
- count is too small
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMJDBRT4";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kmf3mQH2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1785273284;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JW6UwkCOTxl1ZHt6YtPnR1cDJEXYWIjbKtaRS2hmp1w=;
+	b=WMJDBRT4tztvnyzFWTA7PjaTgD78ORVbRX1IPbdkzddvSaFo/hujkMADI6Xa5GNan8K7G0
+	YfKTC2wMXvs1n0oRGKDTgJy9dQvB9E8UBgk87obQOKy90XOHjYRolXKnSvjroiP1wKU349
+	RIGSxHvWNlws9mEnP7WWpOYQBL0D+w4=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-2h8SEn3aNiafJjfdHV2IpA-1; Tue, 28 Jul 2026 17:14:42 -0400
+X-MC-Unique: 2h8SEn3aNiafJjfdHV2IpA-1
+X-Mimecast-MFC-AGG-ID: 2h8SEn3aNiafJjfdHV2IpA_1785273282
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-495b0cf250dso143376b6e.3
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 14:14:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1785273282; x=1785878082; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=JW6UwkCOTxl1ZHt6YtPnR1cDJEXYWIjbKtaRS2hmp1w=;
+        b=Kmf3mQH2gAY3eYl2onLQM0XKoH7VyZmZGjBlblmmJ+1n4iF1GcMDrZnuPBUhPPn5ZW
+         Mhark88kY4wU97hwuAVDEAvsEQ4+X9kJWJkYNkAWZZr4JIxlaEEHcWjerEBOK6KkWaJ1
+         GuJOFLUoXFIxpFae8dMiyvxbSZesfWoNJ8E33Qc2g1hYB2+vGLox06UXN65/xIeBhECT
+         kk7TzbXuEhhPHUODYs5m2ZQm1CGgXasnOZpovBzLiBSPpb47rcylvXBU2Th5jgD5AHRh
+         BzydKqk80yMbhpyolxqY346ban8iNzSqZbzb8b7S4Lyna5GFhKtsFzFBPaHZOG11Fxgc
+         5FAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785273282; x=1785878082;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=JW6UwkCOTxl1ZHt6YtPnR1cDJEXYWIjbKtaRS2hmp1w=;
+        b=lUb/5jYzrsRUuIGfmsxoPK/2YOVeofDl/J3OzOcKcfsFbVjNqW85Mf0h23tCq6TUGi
+         r6giWqw4OjLQ1eu5S/ti+HF7bzfWJgosSHzCDdqwUPOuCEtCZ5xaWhaDG7jMkUCS7jnp
+         0vPQKynQC57b5fcPipxC8Lxsam53G2nRPp4sF13x0v/6VwjCuguTkrzAWZNQenVw3MOp
+         OscmdT9NCDHE9jcRxQ4pVNxHlbKfEBSQ8KJdHrzVbDE9c8+epxM6zSSYG8bxI2Zzd6wv
+         o6CZtLBsAv9apsfaSX99Ch7yXD7vrud0iPew/2R91k9k1bRXjogmHant0YFJF/XzVL2p
+         LNgw==
+X-Gm-Message-State: AOJu0Yyb9LhaTzeO+sYGM7UvCQ942FVJn5AFI40HxZbD4pfv1eKMceVK
+	Aq/t2JjnICQgXN75uauR6DmfcjbMul3DXOpJp3LTa6IRz4/onGCaWS3zqH2lE1q1OjsV2UMMHBy
+	lIbwwutkQGK9D78VRrlOM9q+/Gz18nBlufvW7DkHDjDB6GbgllhWxCzJ/0H+v+Zi4bcA4zEGRGP
+	K8/TByervBHZOjQNCNBXU8c9J8TkXAkwyOkI66cSMSDUzykY0=
+X-Gm-Gg: AR+sD12TeLZqab4SlKAYL/yxY7QAf2bVeq2LorH2xUJ0dqdcAW3NnpZ4nvqOuVXAyJp
+	BM7UXovqeWC8QpgJGRC5i1RiYHE2CJpjFjZH4OrzjZHUwTR4FtQL04SDuyH9Na4tMvyhY4qDuJ9
+	ozprj2ipBD7BopjIVHGJAD36T1ilPwm6OaiKgixxZ29q8KD+NTdhgjSQlXtE2v4YGnyJVU6eokj
+	0ee2URVYPsFh+/fexSWMyF0KpKwpaq3CL72sPAcIqrE4DyjxenuOWRVz9RraPW0apQ5/VGiOTe7
+	CfPiLYUhUjey4QjDTPWbCiJqdObQk2JY1mgnC+KT9lj7Yo9WKthtx1gKKuSQGLC1KWE0RTrLvEn
+	X3n4qQxLFzmsClNugcplBBEOx+ebxJV6JmTBKUjyRxun89vojiYzwV4EOuIU+
+X-Received: by 2002:a05:6808:3190:b0:495:eb86:6e8f with SMTP id 5614622812f47-4ad5b878bb7mr2215277b6e.14.1785273281925;
+        Tue, 28 Jul 2026 14:14:41 -0700 (PDT)
+X-Received: by 2002:a05:6808:3190:b0:495:eb86:6e8f with SMTP id 5614622812f47-4ad5b878bb7mr2215256b6e.14.1785273281235;
+        Tue, 28 Jul 2026 14:14:41 -0700 (PDT)
+Received: from bearskin.sorenson.redhat.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4ad6ed2dedasm231357b6e.7.2026.07.28.14.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2026 14:14:40 -0700 (PDT)
+From: Frank Sorenson <sorenson@redhat.com>
+To: linux-cifs@vger.kernel.org,
+	pc@manguebit.org,
+	stfrench@microsoft.com
+Subject: [PATCH 0/3] cifs: follow-on fixes and cleanup after fscache_resize_cookie() consolidation
+Date: Tue, 28 Jul 2026 16:14:35 -0500
+Message-ID: <20260728211438.3859107-1-sorenson@redhat.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260728-b4-disp-6b8e68d4-v1-1-e69277237297@proton.me>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQ6CMBBG4auQWTtJmWAtXsW4oO2PjgskHTUkh
- LtTdfkt3lvJUBRG52algo+aPqeK9tBQug/TDay5msSJdycJHDvOajP7GOBD7ngc5IjW9akXUM3
- mglGX3/Jy/dve8YH0+n5o23aNeWrPdAAAAA==
-X-Change-ID: 20260728-b4-disp-6b8e68d4-fa25e109c92e
-To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>
-Cc: Shyam Prasad N <sprasad@microsoft.com>, samba-technical@lists.samba.org, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Jeff Layton <jlayton@kernel.org>, linux-cifs@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Tom Talpey <tom@talpey.com>, 
- Bharath SM <bharathsm@microsoft.com>, David Howells <dhowells@redhat.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1785261982; l=5750;
- i=hexlabsecurity@proton.me; s=default; h=from:subject:message-id;
- bh=YzRfqZvj0aJC/y20MOZHMhGiMroFFO9U4X3LsCu9Yio=;
- b=MxJZ5dJ5dAyqVAzFg+t2YOA2ECQDVce2ugODhhOoVvhtwUmXMI73hQgDvp5VWj1pA8XY3xx0S
- B3Sj9FkExdoDRhMcmGZn5IjfVlJv+2lt62C0SNwJh4wp3YsBgs7vlGF
-X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
- pk=xw1AhCtQdvuoQc+bOQIYy9o8G++cp4/VniI2G/tc3G8=
-X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/default with
- auth_id=893
-X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
-Reply-To: hexlabsecurity@proton.me
+Content-Transfer-Encoding: 8bit
 
-From: Bryam Vargas <hexlabsecurity@proton.me>
+After commit fa724e235cfd ("cifs: add fscache_resize_cookie() to
+cifs_setsize()") consolidated fscache cookie resizing into cifs_setsize(),
+two paths needed follow-on fixes and two dead-code blocks became removable.
 
-CIFSTCon() bounds its strnlen() over the byte area with the server's
-ByteCount minus two, which for ByteCount 0 or 1 goes negative as an int
-and converts to a huge size_t.  The later subtraction then wraps __u16
-bytes_left, and that is what bounds cifs_strndup_from_utf16().
+Patch 1 fixes cifs_do_truncate() (O_TRUNC via cifs_open()).  The fscache
+cookie is still quiescent at that point--fscache_use_cookie() is called
+later in the same function--so fscache_begin_operation() returns failure
+and fscache_resize_cookie() is a null operation.  The correct fix is
+cifs_invalidate_cache(), which works on quiescent cookies: it
+unconditionally increments inval_counter and sets
+FSCACHE_COOKIE_NO_DATA_TO_READ, preventing stale cached data from being
+served once the cookie is later activated.
 
-pByteArea() scales with the response's WordCount, also server-chosen, so
-the walk can start past everything the request itself wrote, of which
-cifs_buf_get() clears only the first 67 bytes.  KMSAN reports the read of
-uninitialised heap, and the bytes reach userspace through
-tcon->nativeFileSystem in /proc/fs/cifs/DebugData.
+Patches 2 and 3 remove dead code.  Patch 2 removes a caller-side
+truncate_setsize() + fscache_resize_cookie() block from
+cifs_remap_file_range() that became redundant once smb2_duplicate_extents()
+started performing the full size update via cifs_setsize() under the
+i_rwsem held by lock_two_nondirectories().  Patch 3 removes equivalent
+dead blocks from cifs_setattr_unix() and cifs_setattr_nounix(): since
+cifs_file_set_size() calls cifs_setsize() on success, i_size always equals
+attrs->ia_size on the success path, making the subsequent size-inequality
+blocks unreachable.
 
-Reject a byte area too small for what the parser consumes.  A response
-carrying a service string has at least two bytes there, so nothing valid
-is rejected, and both subtractions are then safe.
+Frank Sorenson (3):
+  cifs: use cifs_invalidate_cache() in cifs_do_truncate() for O_TRUNC
+  cifs: remove redundant size-update block in cifs_remap_file_range()
+  cifs: remove dead size-update blocks in cifs_setattr_unix/nounix
 
-Fixes: cc20c031bb06 ("cifs: convert CIFSTCon to use new unicode helper functions")
-Cc: stable@kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
----
-Found with KMSAN.  KASAN cannot see this one: the read never leaves the allocation.
+ fs/smb/client/cifsfs.c |  6 +-----
+ fs/smb/client/file.c   |  1 +
+ fs/smb/client/inode.c  | 14 --------------
+ 3 files changed, 2 insertions(+), 19 deletions(-)
 
-The server picks both ends of the walk.  pByteArea() is buf + 33 + 2*WordCount + 2 and
-CIFSTCon() does not check WordCount, so WordCount 128 puts bcc_ptr at 291 -- past the 67 bytes
-cifs_buf_get() clears, past the 256 header_assemble() clears, and past everything the request
-itself wrote.  checkSMB() is satisfied, since clc_len = 33 + 2*128 + 2 + 0 = 291 and the
-response is exactly 291 bytes.  ByteCount 0 then removes the bound.
-
-Reproducer.  A fake SMB1 server that answers negprot, completes SESSION_SETUP_ANDX, and replies
-to TREE_CONNECT_ANDX with WordCount 128 and ByteCount 0.
-
-A/B on v7.2-rc1 with KMSAN, the module rebuilt between arms and the previous session torn down
-each time:
-
-  wct 3,   BCC 8, unpatched:   0 reports
-  wct 128, BCC 0, patched:     0 reports
-  wct 128, BCC 0, unpatched:   110 reports, 28 of them in cifs_utf16_bytes
-
-    BUG: KMSAN: uninit-value in cifs_utf16_bytes+0x37e/0x400 [cifs]
-     cifs_utf16_bytes+0x37e/0x400 [cifs]
-     cifs_strndup_from_utf16+0x5c/0x210 [cifs]
-     CIFSTCon+0x1102/0x1510 [cifs]
-     cifs_setup_ipc+0x3b9/0xcf0 [cifs]
-     cifs_get_smb_ses+0x16e7/0x2cf0 [cifs]
-     cifs_mount_get_session+0x2b2/0x730 [cifs]
-     dfs_mount_share+0x43c/0x3510 [cifs]
-     cifs_mount+0xcc/0x1140 [cifs]
-     __se_sys_fsconfig+0x6e5/0xb10
-
-    Uninit was created at:
-     kmem_cache_alloc_noprof+0x556/0xf40
-     mempool_alloc_noprof+0x104/0x240
-     cifs_buf_get+0x45/0xc0 [cifs]
-     CIFSTCon+0x77/0x1510 [cifs]
-     cifs_setup_ipc+0x3b9/0xcf0 [cifs]
-
-The uninitialised buffer is allocated by the same CIFSTCon() call that reads it, and the path is
-cifs_setup_ipc(), so this fires on the IPC$ tree connect every SMB1 mount performs.  A separate
-run caught it through smb2_reconnect_server() as well, i.e. with nobody at the keyboard.
-
-A KMSAN positive control ran first on the same kernel and the same out-of-tree build -- a module
-branching on an OPTIMIZER_HIDE_VAR'd uninitialised local -- and reported.  Without that the two
-zeros above wouldn't mean anything, since clang folds a plain undef to a defined value.
-
-DebugData is created with proc_create_single("DebugData", 0, ...), and mode 0 is promoted to
-S_IRUGO; ls -l confirms -r--r--r--.  open_files, created on the next line, asks for 0400.
-
-690c522fa5a6 ("cifs: use get/put_unaligned functions to access ByteCount") is what made
-bytes_left a __u16, so the second subtraction wraps rather than going negative.  The strnlen()
-underflow predates it.
-
-I did not add a WordCount check.  checkSMB() rejects a frame shorter than its calculated size,
-so once bytes_left is honest the byte area is always inside what was received.
-
-The field this fills is only informational, and failing the whole tree connect over it is a
-choice -- but a response with fewer than two bytes of byte area carries no service string, so
-there is nothing left to parse.  Happy to make it skip the field and keep the mount if you'd
-rather.
----
- fs/smb/client/cifssmb.c | 6 ++++++
- fs/smb/client/trace.h   | 1 +
- 2 files changed, 7 insertions(+)
-
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 40162d5554ea..bb835fdae296 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -615,6 +615,11 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 		tcon->tid = smb_buffer_response->Tid;
- 		bcc_ptr = pByteArea(smb_buffer_response);
- 		bytes_left = get_bcc(smb_buffer_response);
-+		if (bytes_left < 2) {
-+			rc = smb_EIO2(smb_eio_trace_tcon_bcc_too_small,
-+				      bytes_left, 2);
-+			goto out;
-+		}
- 		length = strnlen(bcc_ptr, bytes_left - 2);
- 		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
- 			is_unicode = true;
-@@ -670,6 +675,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 			reset_cifs_unix_caps(xid, tcon, NULL, NULL);
- 		}
- 	}
-+out:
- 	cifs_buf_release(smb_buffer);
- 	return rc;
- }
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 5b21ad3c15fb..94de11d1c490 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -133,6 +133,7 @@
- 	EM(smb_eio_trace_sym_slash,			"sym_slash") \
- 	EM(smb_eio_trace_sym_target_len,		"sym_target_len") \
- 	EM(smb_eio_trace_symlink_file_size,		"symlink_file_size") \
-+	EM(smb_eio_trace_tcon_bcc_too_small,		"tcon_bcc_too_small") \
- 	EM(smb_eio_trace_tdis_in_reconnect,		"tdis_in_reconnect") \
- 	EM(smb_eio_trace_tx_chained_async,		"tx_chained_async") \
- 	EM(smb_eio_trace_tx_compress_failed,		"tx_compress_failed") \
-
----
-base-commit: 4235cb24ec1e8e96843f3671ba4da2a6ccca2c7b
-change-id: 20260728-b4-disp-6b8e68d4-fa25e109c92e
-
-Best regards,
---  
-Bryam Vargas <hexlabsecurity@proton.me>
-
+-- 
+2.55.0
 
