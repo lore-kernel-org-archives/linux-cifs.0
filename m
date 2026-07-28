@@ -1,93 +1,89 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2832B414A13
-	for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 21:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2627B3FCB0C
+	for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 21:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785273287; cv=none; b=KUXlq3gvx1xuB7y9deZjs2W5HDX+VgGkGqaXQFfTduiZL4OAcY3Vn2bilGiTSy0pZexz6bPSwSsMExzy8qkyfusrw0lzU5+cDIcYMnaU3O0Vmh17kSqMXYp44RM83QHI9a/Ef0mGauSwTT6tn53KTmOTuiLZW4qjN8KZZ5Z4xmk=
+	t=1785273292; cv=none; b=fEk0ytQdzLI1PHqNmPfwkz/jaKgSIOyXrCBBr97v/3rANnIKZdXfTK+v0r37BbdOAn73JophhVj3EahIfLqRSgrg1NIM8tAUp18hDP1zLRIka60GBIcY05XPlMIfGhYn0tnkwh9V6ISJa20PEjFR/wyZy9S8FF4vShPsqOc3Ls8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785273287; c=relaxed/simple;
-	bh=z4cF7TbY37uHVjWLLdrBJ2Lqn1H/bH20qNEEbmWIRx8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uSKHU0c8YV8t4u14djwX6sF7lILgWx4Enb53/CMLpPB/rwgAOBs71/hFai6MtZuod8StuzKmHh5lsVyDWnSH3lMhowiyAb4qAdfPWhvxNzNwmhkBEY0XuhmfCRVQ0yEEpHkRdEPlXJ/ZZey8PEEFLtc5vMXaGvCFKTJO2NK+NF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H73APM8J; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VzUbBG9u; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1785273292; c=relaxed/simple;
+	bh=Q4KLRF+1k0JkMasKRe9+BpH3z91vIGZiJohqgkqGtgU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=J4e+Jnn+gQmhqwr/owXrS/2fF7HwaqgOsHJldtVVGzmvJIIBNOvSuoXQ8BCp/E+SDNHSBEyaY3nUl8e4BpEYNT5qzVOG0CJHP7CLWzTI8ny8IEJ7+jFdxF1fKvzaQPbfT8d6Fyo8Ai3SIlZdI6vBs7L3EJHtZlLZK2Av/EFI7QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QDRw+5kT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VvQH1lGp; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H73APM8J";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VzUbBG9u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QDRw+5kT";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VvQH1lGp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785273285;
+	s=mimecast20190719; t=1785273290;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/y8X7sWmDRbdgNDLWYrb/Qp1hUasoR1gEA4uFTODfQ0=;
-	b=H73APM8JDv62iZENZ0OmfHHlcdO9hx0hgE3m0usP7CZu9AxZGFuOCrBLeBkK6VtgBCBsUl
-	dVASxJvPC0fYMFj0m7HRGG0rg6eqFcTRzyIKEYEXSs8OixWUviAXyg00vbgEUaaRuRFpsy
-	z5DkOZROCh9xYkj+oprR/HHc4AX6gPg=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=JAQnNvjTovbeYztyN6U2x3fslKhYUjZvXjusSIShA7U=;
+	b=QDRw+5kTspQeVb3VjfA9tFrlmB7wqz0qw2Akkir/XhyENNgaJhk/36xhfLjLk5nM4zxrha
+	PGw3aXtAix0AZQfv1ffAHfl9/ynDGjzOJSIBd5G9TDdcdXqSWo3g8f4qsXIxKLLlZEPgM3
+	RTDTCAPmrROacH3S+7yfKpLZt4yGEWQ=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-101-CT5JWDiXO5WvFWQRiYFfgA-1; Tue, 28 Jul 2026 17:14:43 -0400
-X-MC-Unique: CT5JWDiXO5WvFWQRiYFfgA-1
-X-Mimecast-MFC-AGG-ID: CT5JWDiXO5WvFWQRiYFfgA_1785273283
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-49ce04870f8so338067b6e.0
-        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 14:14:43 -0700 (PDT)
+ us-mta-437-7RZy2m0CPfWzx7GpvipSww-1; Tue, 28 Jul 2026 17:14:47 -0400
+X-MC-Unique: 7RZy2m0CPfWzx7GpvipSww-1
+X-Mimecast-MFC-AGG-ID: 7RZy2m0CPfWzx7GpvipSww_1785273286
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4a41e3d6fe9so292025b6e.2
+        for <linux-cifs@vger.kernel.org>; Tue, 28 Jul 2026 14:14:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1785273283; x=1785878083; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1785273286; x=1785878086; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/y8X7sWmDRbdgNDLWYrb/Qp1hUasoR1gEA4uFTODfQ0=;
-        b=VzUbBG9u7swYZEGdWs2FsOkjAmeBWMyiO8ItwHbrvY0alPQP8qgZkkVkYhlUl8jFCz
-         UCSHlDHe1ln4EfGNX+zWJQ8ffIuB/7vnP4F6sqmEwz0GUY38UkD/M9iG4OElbS8Li0iy
-         eQ5AShTuaE7teyX8FlR/s0kgRdQnfu6qFZvrvW7VakjpL8Ki7gxRBQ2/0rRtHvznXW/p
-         VrXJK6QdBNhF+QMimVCo2NW0nTBUEDVfaX9iKE/HcwC2+sxmMQAm7tcjhB+CeYr0VQDG
-         EIIo/MLq4HYJOXPbAONKU9uhoEEaJZwidxXJWUAVNgt+Ws+N0eRIAle8aAcehIFacryN
-         Hzbw==
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=JAQnNvjTovbeYztyN6U2x3fslKhYUjZvXjusSIShA7U=;
+        b=VvQH1lGpFGYGgYMn7KPmcdkyGudw/SiaJ1WeUPpDjOGJ1RNxPji/Lafl+uDmy8pCOO
+         eECrGTNB5qI4qBpAfzfug5hpcfgTUQ4gW1FCV5YkqB0YYfdaJtDaOlygq/sbRC/MWZP/
+         kiZ5IJg8mHHkivA05uxRVVJE0ZrEJAj1n3q9tpYICHr6xPGOWgvpHFz0iw0JRL/K2hSI
+         lonjL8O6IzEdT9HrrCKyfORK/tLLz3QC3HEGkUtPnv8lhdmWl75jB3s8PC4x/eUGKM75
+         5A42sDLxwv9FUji+iPE+79G7sH+lZk1kFLGGEnoLQqet7gLN8qjNpnSgoK4hr31XpOJ8
+         qX+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785273283; x=1785878083;
+        d=1e100.net; s=20251104; t=1785273286; x=1785878086;
         h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/y8X7sWmDRbdgNDLWYrb/Qp1hUasoR1gEA4uFTODfQ0=;
-        b=I6uS+xYKHtw/3FbHfYNTS30EKJpVwzjkv9CSa5AHa6GE3DGykru7vjF4Lv+X1+pKpR
-         QpgPr392nkXzE+AAfLZn2CpBeaobFCeCejxLPfGbIzMEjEC4XAENUc0p5wVG0LnBIytz
-         LXLzUxuS1kPWm2tSiyD7+351L+s13/2Tr+PEuIaDqYOo75DO0FacfCJUDd6J/vwADq1Y
-         ceFxvPqnuVQxroA+oIKODzFr3IqyNmD0pfF6ItxQACoJbQwYHxJrv/b69IMMwk2+GTPN
-         ZGwAS6jDCR9ZxQQIaJWYUCu64Ri5JN8YCJjCe0QQ0h6OkS2cvNOmZvna1AmosvU+Xo/P
-         kn1w==
-X-Gm-Message-State: AOJu0YwbXpsPPpIDPLQrSRZ65uWH1UzDVUngqfr2G2BuXwJEse0ERYR+
-	qGN9Nkpt7aP4aHd473aJQdISgfyWhNdeLOvOINUcJzQIaHQZnepYzSyOEe7Fh9CmSOci4Wr7Bhd
-	ehvtY+cSoTlhTK0N+1a+z4Nzh7addtpcmI1V32zbBYhc6ao9PW4DJZuxGIbEThe8knc9nyhRqXO
-	iZAMO87FZb8P6+nIM9H1CzeyRp+2lqexyoHafN0AbJKnhyZ8vtGw==
-X-Gm-Gg: AR+sD13N/iMWlQdZIIMel+WiWa/s6Y+ckgASHRG9ml6K9Wf8RroBiPfCDjnMUI3htRE
-	r5DtKMbuQD1MdMt2s2gWyiyXg6cpqvRWvaqtNkMExvN2VIaJOhL6R5LQikwOPunm4tNFfTKsbS6
-	+MQwRZvCVdVJmAxMJch6ItND/AOuiR/soMF/LItviyDM/cXgPUWHRPw0FHv7w2xjrwRtH6UzKtl
-	Bl7z/qPmzW89HSsaXXOwbkZHYfs5rCL7CxhjfbZU9pYhbAQE1AzWX+iu01b3RE02SInTPXPjh6S
-	6B1wSMS+/IRglcdkwRMR6g7dD0dZQ6MSeT61RkMDV1n8DQTdRaVvUclb3U1lpPOHwlULOBjEcSe
-	8G4EoUg+UnVHBuhg08osDpa33J8U7QpBcbj8IniJI6Nj6oc68p38zVTZzuMPx
-X-Received: by 2002:a05:6808:1210:b0:4a4:989:bb20 with SMTP id 5614622812f47-4ad5bb44154mr2596597b6e.24.1785273283181;
-        Tue, 28 Jul 2026 14:14:43 -0700 (PDT)
-X-Received: by 2002:a05:6808:1210:b0:4a4:989:bb20 with SMTP id 5614622812f47-4ad5bb44154mr2596580b6e.24.1785273282708;
-        Tue, 28 Jul 2026 14:14:42 -0700 (PDT)
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=JAQnNvjTovbeYztyN6U2x3fslKhYUjZvXjusSIShA7U=;
+        b=mKamTBof9oSRvQdrevjdua+UujJylvcA8YYi4G6av3zLK+EnUq6MLBFPDgyzG6DB7V
+         2pNui6+pKvnvF5B9EHKhgXoDU0lsBV34b9WqUfH56t0znLOR1oZ0uP691+YFmMz7iCrR
+         atM5NnNNkBVSKtrfT3jZSS21BlsVFUtuPYGuchFy18QeCUyThWa2kPK1RIA5ggrdImX5
+         NH51lVa1++ApxDWK5Q7mI5kEMuQBUD0N6TaP0jgo6TWr+amrIVQ5TvVbjtyTO3ic+yY3
+         LaHwJecPVSa6Y7tIyz+RLWqEzWqaqhV6shJooxGvDWZ1WS7d1RSuPulBtFVQThAQ+UC1
+         iwPQ==
+X-Gm-Message-State: AOJu0YyLw/1kI4R58ICI28s6FlTjmYJvgVlXKh9Tz/lDjXdh3GieFDMY
+	Z1u7ZKHc5q87Y4Q8gDF6mgZAU61bg37EdpyQRYdSpw7sAwcFZ0ZzlRP8JoPbT1uUsLzoAxNQZPv
+	5ZFbKzah2ROS0oYfw/ZuxPDFRBJAOrNjmKLPKJYSKrTl9mbS0KYas4crT8tKxm6toL+Uo224vn+
+	wj4o/4rS2Pyv3Oe5xjLil0lZdbH7oy90SUD2blAsgfaGj6bkw=
+X-Gm-Gg: AR+sD12aiqCNcU1UE9A3KjTxrVhA2AKSC+FcHLQCIPD6s3i7ycc/qI7nlnhTM6TwvDV
+	/33GShZDdkpkzXm3FAiDpoiGYfquVZtb2pVP1KTDJD0XTIo2wUmyDqxia+tXnqY4NVZKIVEIEqS
+	111gnus8qFTWQzOiWSRbSIyJUpQsi3z/zpbxmjZ+R/F5Po/jdnSovsYwX2aZx675legnGnH+uP6
+	t8qatjhC1m3SQRJuaWPVoEan7BOft0VM4iEwCWxaXC19tgoE6JLjx5wSyLxHNEdRxqbUw9YOSOm
+	Rv4TBTOJddVWZ3XC4AjWPZwpBAlFm7eU1w7FAo0BrGEYRRZlWaezSBmPK8wk9vPMi/mdyY14XxG
+	jKeycVvhTcsDa0mFHecPH1am0ANMpZ4qtxv15mD2hvHeApTxBp/f4fpayc76j
+X-Received: by 2002:a05:6808:1905:b0:496:1009:ec5a with SMTP id 5614622812f47-4ad5b965e64mr2457876b6e.1.1785273286583;
+        Tue, 28 Jul 2026 14:14:46 -0700 (PDT)
+X-Received: by 2002:a05:6808:1905:b0:496:1009:ec5a with SMTP id 5614622812f47-4ad5b965e64mr2457856b6e.1.1785273286026;
+        Tue, 28 Jul 2026 14:14:46 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4ad6ed2dedasm231357b6e.7.2026.07.28.14.14.41
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4ad6ed2dedasm231357b6e.7.2026.07.28.14.14.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2026 14:14:41 -0700 (PDT)
+        Tue, 28 Jul 2026 14:14:43 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org,
 	pc@manguebit.org,
 	stfrench@microsoft.com
-Cc: stable@vger.kernel.org,
-	Huiwen He <hehuiwen@kylinos.cn>,
-	David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.com>
-Subject: [PATCH 1/3] cifs: use cifs_invalidate_cache() in cifs_do_truncate() for O_TRUNC
-Date: Tue, 28 Jul 2026 16:14:36 -0500
-Message-ID: <20260728211438.3859107-2-sorenson@redhat.com>
+Subject: [PATCH 2/3] cifs: remove redundant size-update block in cifs_remap_file_range()
+Date: Tue, 28 Jul 2026 16:14:37 -0500
+Message-ID: <20260728211438.3859107-3-sorenson@redhat.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260728211438.3859107-1-sorenson@redhat.com>
 References: <20260728211438.3859107-1-sorenson@redhat.com>
@@ -99,45 +95,47 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cifs_setsize() now calls fscache_resize_cookie() since commit
-fa724e235cfd ("cifs: add fscache_resize_cookie() to cifs_setsize()").
-However, cifs_do_truncate() is called from cifs_open() before
-fscache_use_cookie() activates the cookie, so the fscache cookie is
-still quiescent at this point.  fscache_begin_operation() requires
-FSCACHE_COOKIE_IS_CACHING to be set and returns failure for a quiescent
-cookie, making fscache_resize_cookie() a null operation in this path.
+cifs_remap_file_range() acquires i_rwsem on both inodes via
+lock_two_nondirectories() before calling smb2_duplicate_extents().
+cifs_setsize() (called inside smb2_duplicate_extents() when the clone
+extends the file) therefore already runs under the lock, meaning the
+fscache_resize_cookie() added to cifs_setsize() by commit fa724e235cfd
+("cifs: add fscache_resize_cookie() to cifs_setsize()") is correctly
+serialised for this path without further changes.
 
-The correct fix for this path is cifs_invalidate_cache(), which calls
-fscache_invalidate().  Unlike fscache_resize_cookie(), fscache_invalidate()
-works on quiescent cookies: it unconditionally increments inval_counter
-and sets FSCACHE_COOKIE_NO_DATA_TO_READ, ensuring that stale cached data
-is not served once the cookie is later activated by fscache_use_cookie().
+That same commit made the caller-side block:
 
-Truncation to zero leaves no valid cached data, making invalidation the
-correct semantic.  No inode lock is required for cifs_invalidate_cache().
+    if (rc == 0 && new_size > i_size) {
+        truncate_setsize(target_inode, new_size);
+        fscache_resize_cookie(cifs_inode_cookie(target_inode), new_size);
+    }
 
-Fixes: fa724e235cfd ("cifs: add fscache_resize_cookie() to cifs_setsize()")
-Cc: stable@vger.kernel.org
-Cc: Huiwen He <hehuiwen@kylinos.cn>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Paulo Alcantara <pc@manguebit.com>
+redundant: smb2_duplicate_extents() already performs the full size update
+via cifs_setsize() when the operation extends the file.  Remove the
+now-dead block.
+
 Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 ---
- fs/smb/client/file.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/smb/client/cifsfs.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index ac89c1ba56b1..389083f9ce00 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1016,6 +1016,7 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
- 		if (!rc) {
- 			netfs_resize_file(&cinode->netfs, 0, true);
- 			cifs_setsize(inode, 0);
-+			cifs_invalidate_cache(inode, 0);
- 		}
- 	}
- 	if (cfile)
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 1788d93a2522..1060ac5f9fff 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -1464,11 +1464,7 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+ 	if (target_tcon->ses->server->ops->duplicate_extents) {
+ 		rc = target_tcon->ses->server->ops->duplicate_extents(xid,
+ 			smb_file_src, smb_file_target, off, len, destoff);
+-		if (rc == 0 && new_size > i_size) {
+-			truncate_setsize(target_inode, new_size);
+-			fscache_resize_cookie(cifs_inode_cookie(target_inode),
+-					      new_size);
+-		} else if (rc == -EOPNOTSUPP) {
++		if (rc == -EOPNOTSUPP) {
+ 			/*
+ 			 * copy_file_range syscall man page indicates EINVAL
+ 			 * is returned e.g when "fd_in and fd_out refer to the
 -- 
 2.55.0
 
