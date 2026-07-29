@@ -1,91 +1,94 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A015431A42
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 22:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1973DE45C
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 23:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785365676; cv=none; b=XfASigVim2vO4UjKWN6PoBkSjZhT8Dz6xIhlreClNCG8M9O7uSTkrgR34DkcWB6ypng3e+x1rqi2YICEfCLN3fd+laDjHaIVuHSVLGmhmSuqWRBtj1IplWtzxLwSSlkTdXuMnhnx0U/J8QtTdvi0MJzA5tRxHA1AYdUslVgLxBc=
+	t=1785367328; cv=none; b=tCAmxKQrKFm8EbAoIW/4NNuB9d0Z+3DzwloTXvZfzOU+PCgtmXpAwbh/OBzfKjOCZKLJQaLgHeUMB4ReWniZBrkm5sgRaa9sVo+9/lEeGH3FW9yu8E7U6AzPwuerRCMEKnr9FtbaH4kuJxcRolSdZYoUBSWqBFceuu+3VBTkVQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785365676; c=relaxed/simple;
-	bh=n0qrZjvCCD9dMsYnS/NG6PVYesgyk/QmmhxF6Guqgt4=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=ekQbeWSBmOkdxd7nwGvuB/IoNoPN2SebunOsFiqSk8UkwF9KwZJnsrpesIyz1tNMl751hyL5oEMA//krNG9fZXP4Y8ld5QaO2Qb379+rWN21eUiIKVTGyDFHEdfB2EedB5cwC6WiiqQKyCtO/DSmqJOTBKdGUf1bqdlaQucwPOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=DNkTXsGY; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1785367328; c=relaxed/simple;
+	bh=t/p7i2s0+EkDdU/pGdz4xcdLWwho6DIWr9TwDjaS2v0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QeokWZXubRO7SOajARHjW6tQK+VPhuLAwq7Pm+gqGXZUv9z1TpWSZ5RpeDcKqAOKhw+PmPYu9gFjD+KwuRJP5lhBXwWwQOzshWF73KJYZ5stAlm1rESW9OWN19Ntl9oV/VVj2PJMC5vQTZ2mxvePUqDpVXrP/ZhAvc36PJY1F1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaM14Iei; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="DNkTXsGY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Kzh5aMeh0wR5mXcmQOkoItEWHTYnKiQ3GANz9lr1J0w=; b=DNkTXsGYuuxcJmDIw3vN8wJH7t
-	oYkodkzGcwJxa+LP8t5wWVbl6Rmpheli0OvREORvJR/Mj1FFgayVF76R5aad2MqcDlfFyp2/MflLz
-	j7kQ3lpoHoToOS8CKoqW9cQq+TmdrJdUH0GcRcKFnVFop+9FOmOVzLbnhpM43jIZC7qQYXdsoHSts
-	l443k3NVcf+mWJQ1F2I5N0iGfb0nSUOfetH/NLSE53qAxHxiVB59n5fCo1uNSeOVy1FZgnIlRhbgp
-	vNaAXFTUATmj91toIKD4LUuhHlMPobgBAhQByxxAWqQ3xu4ayTojPOzMxZKZfXJ+TNfVnWIPecfTF
-	bDE+3RiA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.4)
-	id 1wpDAP-00000000GzN-3YR2;
-	Wed, 29 Jul 2026 19:54:25 -0300
-Message-ID: <97c0ca61c2bed2d2559b32b7ed967121@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Huiwen He <huiwen.he@linux.dev>, smfrench@gmail.com,
- linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
- tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
- dhowells@redhat.com, metze@samba.org, chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org, Roberto Bergantinos Corpas
- <rbergant@redhat.com>
-Subject: Re: [PATCH v8 5/5] smb/client: refresh allocation after
- EOF-extending fallocate
-In-Reply-To: <20260703053300.913371-6-huiwen.he@linux.dev>
-References: <20260703053300.913371-1-huiwen.he@linux.dev>
- <20260703053300.913371-6-huiwen.he@linux.dev>
-Date: Wed, 29 Jul 2026 19:54:25 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaM14Iei"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF1711F00ACA
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 23:22:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785367326;
+	bh=r9mvrMAjFtQPWl/4xrWCbi8W8Rt0p8EN58Vi3L5Dj9E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=VaM14IeijML2GLKlkWX8DYe5SXGZ+LFq4AMOB9wCs4BpIv83FNFbdC+9DNmiNY84i
+	 /VAgsfrRO7vtbvXOjHTYgzKtPp60Q8D525jWmmVna2VqxQk2lWS/CHarXKqTETOb5v
+	 eODx7PuMV5gUvnRqSAAch/MgmYngj8nAIiy9vc+V8+yzj924kLTExriiV8zqhgZb0W
+	 9hwD9cR4JxpiUgkzykCFxymu7rs0gY85BNJgF/rPuq7VgenUs+pYTh2A4w9/GsuJIL
+	 432BhKNDIHDgA3DrZPv7Oj9myWanMiI9O9AUbAUT0Muh22/dmgteYPDmpq5rGR685N
+	 cQQ3K6E0fgewQ==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-698acd36d67so2662570a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 16:22:06 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxYHsOozJ/p7OuC1EatCXUMdWS0I0Zfsvfv7dGIl7yEs+XW5iyh
+	D/PXI0IT19MBu1PkPWh1G4TFAtHt1LzI5du3KGP4D1a37CifdB4KCJcCq4XBY8ZLse3vDiey7dJ
+	RUJQ5NEtsI9VAEUWo38qqoTD8f8QEHEI=
+X-Received: by 2002:a17:907:c08d:b0:c1f:a370:7c2e with SMTP id
+ a640c23a62f3a-c1fa571e0c8mr17124966b.23.1785367325376; Wed, 29 Jul 2026
+ 16:22:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260720194925.2108840-1-ematsumiya@suse.de> <20260720194925.2108840-13-ematsumiya@suse.de>
+ <CAKYAXd_mkSR_=krs0idmhR_uYxUTzHAFK1cB7tZRtNfMJUSsRw@mail.gmail.com>
+In-Reply-To: <CAKYAXd_mkSR_=krs0idmhR_uYxUTzHAFK1cB7tZRtNfMJUSsRw@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 30 Jul 2026 08:21:53 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9-DNGr61h9A-npJrT2Dh-G5h=6fnMbqW=5NayTr7ym2Q@mail.gmail.com>
+X-Gm-Features: AUfX_my2GonJhrbgzykj3vjTc9T7hM1-me5hoPKa5xVwnCtF76yOL_SurF55LoI
+Message-ID: <CAKYAXd9-DNGr61h9A-npJrT2Dh-G5h=6fnMbqW=5NayTr7ym2Q@mail.gmail.com>
+Subject: Re: [PATCH v2 13/14] smb: server: use smb_decompress_alloc_size() in ksmbd_decompress_request()
+To: Enzo Matsumiya <ematsumiya@suse.de>
+Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.org, 
+	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+	bharathsm@microsoft.com, henrique.carvalho@suse.com, senozhatsky@chromium.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Huiwen He <huiwen.he@linux.dev> writes:
-
-> From: Huiwen He <hehuiwen@kylinos.cn>
+On Sat, Jul 25, 2026 at 10:08=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org=
+> wrote:
 >
-> Before this change, xfstests generic/496 was not supported on ksmbd:
+> On Tue, Jul 21, 2026 at 4:50=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.d=
+e> wrote:
+> >
+> > Use common helper to validate compress header and get decompressed size=
+.
+> >
+> > Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> I can not apply this patch to #ksmbd-for-next-next.
+> Can you create this patch based on #ksmbd-for-next-next ?
 >
->         generic/496 ... [not run] fallocated swap not supported here
+> > -       max_allowed_pdu_size =3D SMB3_MAX_MSGSIZE + conn->vals->max_wri=
+te_size;
+> > -       if (out_size > max_allowed_pdu_size ||
+> > -           out_size > MAX_STREAM_PROT_LEN)
+> > +       buf =3D smb_get_msg(conn->request_buf);
+> > +       out_size =3D smb_decompress_alloc_size(buf, pdu_size, 0,
+> > +                                            SMB3_MAX_MSGSIZE + conn->v=
+als->max_write_size,
+> > +                                            conn->compress_chained);
+> In ksmbd_decompress_request(), the old code rejected decompressed
+> messages smaller than sizeof(struct smb2_pdu).  The new helper call
+> passes 0 as dmin.
+> So you need to pass sizeof(struct smb2_pdu) as dmin :
+> out_size =3D smb_decompress_alloc_size(buf, pdu_size,
+>                                            sizeof(struct smb2_pdu),
+>                                            SMB3_MAX_MSGSIZE +
+>                                            conn->vals->max_write_size,
+>                                            conn->compress_chained);
 >
-> ksmbd handles SetEOF as truncate, so EOF extension alone does not
-> allocate backing blocks. A fallocated swapfile can therefore still
-> look sparse to swapon.
->
-> Request allocation for EOF-extending fallocate ranges that can be
-> represented by FILE_ALLOCATION_INFORMATION, and refresh the allocation
-> state afterwards.
->
-> With this change, xfstests generic/496 and generic/701 pass on ksmbd.
->
-> However, Samba "strict allocate = no" now exposes the real generic/701
-> failure: the old pass came from inflated local i_blocks, not from
-> server allocation. generic/213 also fails in that case because an
-> oversized allocation request may not return ENOSPC.
->
-> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-
-This patch regressed fstests generic/103 and generic/590 against samba
-4.24 (strict allocate = yes) with a 15G xfs partition for both test and
-scratch shares.  The tests now fail with -ENOSPC.
-
-A simple reproducer
-
-	$ mount.cifs //samba-fs0/scratch2 /mnt/1 -o username=xxx,password=yyy
-        $ df -h /mnt/1
-	Filesystem            Size  Used Avail Use% Mounted on
-	//samba-fs0/scratch2   15G  326M   15G   3% /mnt/1
-	$ xfs_io -c "falloc 0 8G" -f /mnt/1/file
-	fallocate: No space left on device
+> Except this, The other server and common patches look good to me. I'll
+> leave the client patches to the cifs.ko developers.
+If you do not send the v3 patchset by next week, It will be difficult
+to merge into the 7.3 kernel.
