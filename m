@@ -1,200 +1,204 @@
-Received: from mail-yx2-f3.google.com (mail-yx2-f3.google.com [74.125.224.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012023.outbound.protection.outlook.com [40.107.200.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F1E33B7767
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 19:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785352827; cv=none; b=uwCnMBOFk9KxaQrHH8hEwmvAerT6uBjw5qH6RlSGGvXWerWVY+bS2BIH0ze3qO+l08wHC27z8eCsVFZXscjI6tcudffytaP8hyp+kyia/181QCwSnm2bmacql7rwEPkEtkoJfFWMEN+wNxrSKrIDjQ9/Xml17lCb/vFLWjXS8Qs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785352827; c=relaxed/simple;
-	bh=/D42fnyjXlWPLe4z6N51wGEr7INuEDKR9LleuOCi1H0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A/4VAe9AZhtXRC3AsZkhc7XCS0N0taGi/GVQC8Q9FXdCmoCZvSWSsv5rKtuz5cGlh8AMxzHfOSq+xJ4gZoiHshoYzZ/SeQ9TduIY2cH/G3pTL9T8mIaU3sd+tNVKgByj1wEH3fP/hXTmhDt4OBwlj80CI7blVTu4tKX7VVtXwUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=northecho.dev; spf=none smtp.mailfrom=northecho.dev; dkim=pass (2048-bit key) header.d=northecho-dev.20251104.gappssmtp.com header.i=@northecho-dev.20251104.gappssmtp.com header.b=KOqAUzFA; arc=none smtp.client-ip=74.125.224.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=northecho.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=northecho.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481362D838E
+	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 19:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785353531; cv=fail; b=GV80rTYcV1t9/46Ce/JarlNJfyANiAO0tvy3NCzZVHhnEwvkSGrK1SOYzVuabqaIO99oRrXNA8agEIBT8zcQwjTXBimJ20NEAL+00OtP/Bc79chNqpTNRhQblEC3Rw3wQYObc9mnwPM1sH+Sccx+Oj5Ducy+1lpGSy4TvMTIHM8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785353531; c=relaxed/simple;
+	bh=UeGG4m76VSQrydaAwmC66slWMcBl2QKEiLsP9VAbKbQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kNeEdPpQ5NFDlP0OSilIcTtn3GYs5+x9ltM7RYGR+B9daoegACbgx7saVioGYKjQnOFalNRJtVPjgpcMvk3Esz1GoeLJV0nKhnf6eKzLxIMs9ez2OwsqO+7Nz1krYypJkgrNvuAZEUQNCe0rwa3nj+iIxsmtyjprwMweD3DqGk4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=sNMNrm5u; arc=fail smtp.client-ip=40.107.200.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=northecho-dev.20251104.gappssmtp.com header.i=@northecho-dev.20251104.gappssmtp.com header.b="KOqAUzFA"
-Received: by mail-yx2-f3.google.com with SMTP id 00721157ae682-81dd189c50fso298887b3.1
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 12:20:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=northecho-dev.20251104.gappssmtp.com; s=20251104; t=1785352819; x=1785957619; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=acwLwgXNlL7fSykrj8gBRXc1ymnL+0zYtWGnv03vX0I=;
-        b=KOqAUzFAjJEyosK4R1BDzdm5krmH+dfmkJsTF5ffFJDuWi56IaE8gkENtIKw+IeVT/
-         YagQqlXkpzusfepNM87X2MXYGEb/TH/jVVysKGZ4NfwsnhMzspdof0SfKp/KI4niARzD
-         9WebQsYV5FvZ7+8sYdUFCk/Ls+PexuAjPPyoVcOL8frXET7kdEg2A61bYiv0Us9FPM4p
-         wdtaLIq43EU2Zdi48GPtyWrmPggFcjsB0BcIRdjpyGR9Wa8O9tR95pzmLiY1Xl49AskB
-         h+hk/QNrHK6fPmp6cjMbaRjv2qm0G1X4YqVskUPdn34zZGVpdaRy26T61vVmGk3bcInD
-         R5bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785352819; x=1785957619;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=acwLwgXNlL7fSykrj8gBRXc1ymnL+0zYtWGnv03vX0I=;
-        b=TC/I5vYko119Do1imlZn8kjFPkijsdGlAm5l+N28A2vw2ZfCFXTq8fk40XpMuY3wJF
-         QOY4MMyh+a7+l7Idrsh0SUqU8kErvP4cQWH3sKtjTxWKk8AXcQUua/LxAf/VnYb+nGC6
-         IJfMDavLJmHHuZw4hY5XFIGEWUSCLUhBvdVkWeUe44Go4cCJRHfZ+RQJv2+3hp6eshtC
-         GHENPrDl89oPYmI99u+LBfAvSugBmWJopHfpFTSBcl/t7IokKOozDEavizbeETpjjw3O
-         rsxfXaajjPoQAfAMD6ipRqHlbBS2NOTybjgV/cXr+gOp5LxHBhplDTFTFiZychMZ5aim
-         wq0g==
-X-Gm-Message-State: AOJu0YyMwvu8hdEFKibGo+UOQDvEP5AbNFCmuaOyI2kF62IJiM0HZjKx
-	CEmlbrMGv4JYqMNKPoHDhXxmY+t3n1RyJB3cZg7VpZd7gnahAzrJ2ZF4FOlg+vEmsZOW
-X-Gm-Gg: AR+sD13i8e4jXpUVAPIbVMAtq3qmTh3LlgFH7x8cy5MhFZN00zbh35ab+2me4crrI1i
-	MwKlI/LozrTH+2EBlHUZM7Gk8NpJAM1452Lkpe7McMCbmi6Cr9TS9+b0amrcb8aMxQdm6GQKbxS
-	Mv1MPBUqcNaRxSdf1d6aEjR2bn9Hfr1oK18upJ8XuTkU4+T5HxNIN7bDome8LlAiJFvI/f8vj0a
-	4WisJNzEJFZSbviWaaMzvVaPwmNQEFuma9oKI/9vbRHHkIcKBhQ4VnXLf0ZZIgw8+jHbG5EpPEU
-	x6+2LsdcxRZigVYtbgVuHgNOGatCYppO8MlkCeerKR8YXg2/XQcGY6LTANx1AdprpkMiunQyfvh
-	P9bpOpAnV6vSxh6NGGGs039A8wxck82l1z84cHiTZAyQkgsd2JQObSltHaRiOKDt1d49NRu4Uj8
-	OK3GnLU1pHS3aB5AW8bfX/nmE+ed5vNIQhwj0tHD8fWT+cprwUJVGi6x/CFN7nQvcfQhhO+5Q4j
-	uSJBhQKynfZ/FW1l2sOR9rPUeztXymtWyjhUdyiXdWlPLG352fm
-X-Received: by 2002:a05:690c:e3c8:b0:81d:bb95:9f84 with SMTP id 00721157ae682-81fb5ee74f7mr1759787b3.3.1785352818965;
-        Wed, 29 Jul 2026 12:20:18 -0700 (PDT)
-Received: from kelso.tail8e61da.ts.net (99-10-92-174.lightspeed.rlghnc.sbcglobal.net. [99.10.92.174])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fa278d1ebsm24117127b3.12.2026.07.29.12.20.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 12:20:18 -0700 (PDT)
-From: Christopher Lusk <clusk@northecho.dev>
-To: sfrench@samba.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	dhowells@redhat.com
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	netfs@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb: client: set replay flag on the read send-error retry path
-Date: Wed, 29 Jul 2026 15:20:02 -0400
-Message-ID: <20260729192002.876156-1-clusk@northecho.dev>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="sNMNrm5u"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=j1S61XYxNwtpYvRCyCBBgG3qdMYvwh0mgzW0WCNwA2FXzzm6UnwW5WMy35MI3CfvQqoPrbsmQsvZRb/1ElPMRFB1NOhBhht9HXk5OC9LAjrbmkro7oBDkVIxjs7PdS2/9PmMgvghobraw6flUB6XP3dPPLYUOzX4vzp3UCZC2TFMPvkrF+FLwryFsLc9PYxJBLelRNqAHA1THskK3ccqI3wxiGrcGelqGEDCjwEJJiJfK7XnZ6gQd1TjQqJXC5H1I2SNd018VtyrEWB93DMog9+Eog1rVE6q3IHly3m1vUUqGB7n6jrIC7jtgfmFsi4qqQn7UGG3gpCevgHfQ3t8jA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J/yYxN++eUVbgk4UUIH8qkyiPra6J0VPjBocGjYPRvU=;
+ b=aJFzgqum4anzrMVgTpsAaUxSbVO1BsidyFZZVLzdLr8PlbI23ff4Gn7LGlW8XY+dR948E3gRcVR2UXlRxANMQbtLLndHnFBysuE8opaDshxCE53i/z7vDWtO6IyN03GoGSLomBYEwdZUQMXKU5WbMp3QKw0Y4iiPbJlI+HwXIg1r+ZIWSvZDwb9psYSy4dLpeGNf+vdQps2PB3Twg0cTFPIKkUPEtX/LzxGyQI8znTgcL2riOxBk+Eh16KLRbjewGnlzJo3QgNqWVgDU51z4ntfR0P0NHvNM0lFSoq5aEjybusREygKzXj4DpQU75T1zrtEehsW1IABE1zd64Tn9zQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=gehealthcare.com; dmarc=pass action=none
+ header.from=gehealthcare.com; dkim=pass header.d=gehealthcare.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J/yYxN++eUVbgk4UUIH8qkyiPra6J0VPjBocGjYPRvU=;
+ b=sNMNrm5uS+Hm7b4sMV2bPFE/ClQvuMPSHVGD47NBdmskUzEGBO962oU9nfRLc/YeUrh9HJaJSZA8DZkl7JaF/adTYBGwXQMAY3qK/X4UzCCfhczVWIiIct3UcpuBUrITez5moWvBoTgI9C80JFVFisY8bBi1L2GY0MZdJfow8T5Ord7Y7G7kBBOEnMoOq3o8NNwOlERcM3Ps3aKhI+FFCMKpSEb7zb0VezzgT/wuAFe81dhgTzpSYlNZP5Cuia4quNx2AqZEQO57g6zF1eKpp4ntxZyRUlj8mRa2KIsjNI9UBBiCcwZE3LhyuIaDomQeFg35HUfdv2ObG0lb5od1Ug==
+Received: from SJ4PPFA6E5D1011.namprd22.prod.outlook.com
+ (2603:10b6:a0f:fc02::fc2) by PH7PR22MB4720.namprd22.prod.outlook.com
+ (2603:10b6:510:316::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.13; Wed, 29 Jul
+ 2026 19:32:00 +0000
+Received: from SJ4PPFA6E5D1011.namprd22.prod.outlook.com
+ ([fe80::f30:a74d:5ed1:1a4a]) by SJ4PPFA6E5D1011.namprd22.prod.outlook.com
+ ([fe80::f30:a74d:5ed1:1a4a%7]) with mapi id 15.21.0270.009; Wed, 29 Jul 2026
+ 19:31:59 +0000
+From: "Birtwhistle, Daniel" <daniel.birtwhistle@gehealthcare.com>
+To: Paulo Alcantara <pc@manguebit.org>, Pavel Shilovsky <piastryyy@gmail.com>
+CC: Steve French <smfrench@gmail.com>, "linux-cifs@vger.kernel.org"
+	<linux-cifs@vger.kernel.org>
+Subject: Re: [PATCH] mount.cifs: prevent stolen creds through SUDO_UID
+Thread-Topic: [PATCH] mount.cifs: prevent stolen creds through SUDO_UID
+Thread-Index: AQHdHunNP0S87yE4bUy/WcVY3alJQ7aE4+CJ
+Date: Wed, 29 Jul 2026 19:31:59 +0000
+Message-ID:
+ <SJ4PPFA6E5D1011B2AB6751329AF683DF0BEECA2@SJ4PPFA6E5D1011.namprd22.prod.outlook.com>
+References: <20260728233532.3022799-1-pc@manguebit.org>
+In-Reply-To: <20260728233532.3022799-1-pc@manguebit.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=gehealthcare.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ4PPFA6E5D1011:EE_|PH7PR22MB4720:EE_
+x-ms-office365-filtering-correlation-id: c9ad2996-50c0-42e4-dcfa-08deeda80ede
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|1800799024|23010399003|38070700021|6133799003|11063799006|56012099006|10067099003|5023799004|18002099003|22082099003;
+x-microsoft-antispam-message-info:
+ 1/wHGMHKuR+Qd6CTuAAKmdLqFL+FTgN8OkswlkXCFwxbcyhVb37MRf7Pangz56H9FLWSBoRh58h17u8W332eLFsukYs3vjtPh5oDt2kjj3FD2gwuFs/5gqYVZ+7H+bFnseQRZdjsWzX2WRxCRq/uwjIsh12wEKc4WWKdoI7+/NZGSZR4LMkJb8nuvPiDHxe8cYuTZ4FhU+JbpQ9C1xpvkGDyYWhflVCXovWsZxrHNCaRrkEOD1A5mbvbwRCylKMM66c4nbXTlGpXrhtp+vJ4j7d87cObFNrMsy3EN45pzx6DbHbzjoS/f0m6o5ubPOXn1gQwdAJ9/i6n4HVRRSMFmmv05oPw28A2xoV7GCF06j9OskVVmGfLNM3HtViehKgNhf/MdrzvLyqDrRvB3RaoXfu2ysyqRfttErbD4zppVD1zVlhJ5SAvT/jm+MTpx42M4EfVJFLySSB5NIkJPo+YBiXiI9SZrFmg2Z8jShczwXNYztDewN2PAPiF+Gakb60rYcals4KJmfK6cdr8bkKLP66syI/C2XzxvQzO32ZRFeM4xzyxD15m68h9t5DEgKww0CTtptaZrmb3RrOzIx6VG5Ma0N724IKymeOIxCp1XXqGs3ETMvO3Cp36uI80xcFGZCiieq6hOwp8qpDs+YVNm1hFQqwDHlg7s3QbYh95qMVaHy+GjQZuGT3/fJArxnj29bI4g79C8w1wcjTKEE2uQyCdX5IXoFFTrBq2TeBVr/M=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ4PPFA6E5D1011.namprd22.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(23010399003)(38070700021)(6133799003)(11063799006)(56012099006)(10067099003)(5023799004)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?Windows-1252?Q?kMa/NMxbshHOVLkWJnvDmmYBKccyODT1qWE7ToscCiYRa68AmqNHDlXi?=
+ =?Windows-1252?Q?ykb3AEZK+Zpf1+IMI0Q6WxJoXdFiCqybzCfU66Nk4fcx6EmH74ToRH7/?=
+ =?Windows-1252?Q?rIlPRXApZhR/i0TtN58WUJTwZHVtDqEJ4omg1JbeRfWdCz+Lwvpyf4dY?=
+ =?Windows-1252?Q?Q99MRiccgwLVOp1gAIZnN0RA+Bk1MPoeNgyKwY+QX3YhR2CPtMo0ocVl?=
+ =?Windows-1252?Q?Pr06FQaSi1epcxhR9/mjUJo0T/HdsMy222P06etR4E8Yz43OLUPGfnCZ?=
+ =?Windows-1252?Q?FdX5Zh1y1AlZFgzWL3r7sQoiiFfcAdXRJ0UT1Lv0r6epg/DNW0uwi169?=
+ =?Windows-1252?Q?eujADYIPFVyuAzVgJ+KcSHhrGqw/gKsxJqgYXI57iazjXRMwHr8dZvVY?=
+ =?Windows-1252?Q?xKC0/LdQxpb2AuqbbPRmQKd45T6j4xyjASkt0+EmHW6CBIZH+uOG3nMN?=
+ =?Windows-1252?Q?uqjt5iwpl88Y3NXsev54Zf/exOvtEA03Qi8L2wQjDJS/1HNPXrlnxDeY?=
+ =?Windows-1252?Q?w7zGlnwzhX/nsZxq4FWCEVl60KJu38MiKaMElDH7iE9vPGOV1H+YWRUM?=
+ =?Windows-1252?Q?0juKhIaihPHdtBikf7lo9kKU7dp7GQ755OIkeHdN7Q5nTemtCcRB0Hha?=
+ =?Windows-1252?Q?HefZo3iMYv9iatqWOxKlEmrAgg6Excme7VcE5FsJXsr17kTVqNe/SGLt?=
+ =?Windows-1252?Q?DZ1vUxnDx6IUIDoP/NDhNp1S/BAbWCDDZc4usECNDPnLcdxCoxN+Cts7?=
+ =?Windows-1252?Q?DGh66pfFMzOx/6JmvI4Mm+uOmIVh3DePZnV8AEij54Vvu4huQ3vPtfMK?=
+ =?Windows-1252?Q?I6OwNPxInGAI16dH2FXTcVupxuYZVjbUOHdrlkcxBV1rjJrD6cBXy//C?=
+ =?Windows-1252?Q?xMY7U6GIf6qrLc22fJdgHbGvLkaTxjdiv8cIgu98AqHGzSOOflUwwAiF?=
+ =?Windows-1252?Q?jSqA1MdBF/l/c/5GpJsI6I1Kf9nFtmE/ko+dGJwQ+ehU39eqhpYfpwPp?=
+ =?Windows-1252?Q?UuzlOM6hpkNwa7eHfnGQbQ1rcU0ZJd5hNxAVHztg906lnlPdDom6DZ4v?=
+ =?Windows-1252?Q?wg42mmFSFb1QXK4xvDOKgGY0RCXexBnX+3/EYcfVJaurAfIeaMJQwzjB?=
+ =?Windows-1252?Q?lO6rJGd8qLWIHI3Ya3yOWKNiArmjNnXGdFp+O2aY448EP8V6CxmngM9H?=
+ =?Windows-1252?Q?ZOBFFNZD+uJxXbTxpHPNBjKjCfOa85s8iwBz44Kbxa9/xYHA3MdWkxJ8?=
+ =?Windows-1252?Q?CgT6vJN6Z7DfpYcyNEp1A3QgwPs9vSMbut6aZVnNxpdX01fwC7fNbtAt?=
+ =?Windows-1252?Q?uR74jBveA4ueq216zieweH6aMahf9htiDsYvAsaNSaxI53Ccr7kGU9Ui?=
+ =?Windows-1252?Q?hP6bay3CgFscSih5IDv4O8sQmp3SEWeoQ8nNuVuh54Fr/pN/xBaxNdRd?=
+ =?Windows-1252?Q?RyMa/F7XZPxXea2U+NN//XO4uAd44k0DIkqvNCsM6/5HcS2MI604etXX?=
+ =?Windows-1252?Q?Xkz8XW+zA1PdOru8KfH14c5fia2nK+SG/dNmEpX1qWz0G2U8ywLmhKGg?=
+ =?Windows-1252?Q?itfz54yr+af7hwoFmtKVZWLF3W/SOl0EhlHOQLzv7otxGug0m8cjOzV4?=
+ =?Windows-1252?Q?98D5/adCnsAvqyIHgVATHO5wHHb2TZ4iQO/LAjXV48IVcfFrWkuOYkTH?=
+ =?Windows-1252?Q?Q05PTrgj1WwXc2Hx11/+iDwsl1i0yqOQ0pchOIyJOZePCr4nGUm9HO4Z?=
+ =?Windows-1252?Q?UxaknndgPm4r3vg8Eju8V/VUz4TryBO2LNjNnQa9CjMFvTCzNrY52XdK?=
+ =?Windows-1252?Q?EtCaJF2fLv5sJ9LC32nrGsaByjpDmQREuQpKUVFHprzJnnYF2iIcn/7I?=
+ =?Windows-1252?Q?Kg/utcWR0rtLnA=3D=3D?=
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: gehealthcare.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ4PPFA6E5D1011.namprd22.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c9ad2996-50c0-42e4-dcfa-08deeda80ede
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jul 2026 19:31:59.2437
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 9a309606-d6ec-4188-a28a-298812b4bbbf
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: anxWMCu265Q9l/X/RPPptBSkppYgtjpLI+UQpPbxFbXkxbVbmJ4v5VbijwNOlA8K3e/0HWmyl/LVk0eqLHa78hCcLAhu+aWzWVHY7rF4LbM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR22MB4720
 
-smb2_async_readv() and smb2_async_writev() end with the same
-send-error block: if the error is replayable and smb2_should_replay()
-agrees, tell netfs to retry the subrequest. The write path also sets
-wdata->replay. The read path does not set rdata->replay.
+Hello Steve and Paulo,
 
-smb2_should_replay() is not a pure predicate. It consumes the retry
-budget and computes the exponential back-off, doubling cur_sleep up to
-CIFS_MAX_SLEEP. That back-off is only applied where the replay flag is
-tested at the top of the reissued request:
+Yes. I applied the exact patch to cifs-utils 7.7 at
+3a7dc396306654aa225c35767e56ac1fb239922e, built it successfully, and tested=
+ the ENOKEY retry decision using matched unpatched and patched setuid binar=
+ies.
 
-	if (rdata->replay) {
-		/* Back-off before retry */
-		if (rdata->cur_sleep)
-			msleep(rdata->cur_sleep);
-		smb2_set_replay(server, &rqst);
-	}
+The results were:
 
-So on the read path the back-off is recomputed on every send-error
-retry and then discarded, and SMB2_FLAGS_REPLAY_OPERATION is not set
-on the reissued request.
+- Unpatched direct setuid invocation (ruid=3D1000, euid=3D0, caller-control=
+led SUDO_UID=3D4242): the ENOKEY retry added cruid=3D4242.
+- Patched with the same identity and environment: no retry occurred and no =
+cruid option was constructed.
+- Patched root/sudo invocation (ruid=3D0, euid=3D0, SUDO_UID=3D4242): the r=
+etry retained cruid=3D4242, preserving the intended sudo behavior.
 
-netfs does not pace the retry either. netfs_reissue_read() calls
-->issue_read() directly, and fs/netfs/read_retry.c contains no delay
-of its own, so read send-error retries reissue immediately while the
-equivalent write retries back off.
+My conclusion is that the patch closes the demonstrated SUDO_UID-to-cruid c=
+redential-selection issue. I am also happy to test the final committed vers=
+ion.
 
-The read response callback already sets rdata->replay under the same
-conditions, so the read path does use the replay mechanism. Only this
-send-error path omits it.
+For clarity, this validation is specific to the SUDO_UID issue. The separat=
+e credential-file TOCTOU/privilege-drop case and the remaining Low parse_un=
+c hardening item are independent and are not addressed by this change.
 
-Where the back-off belongs was settled while the commit below was
-under review. David Howells asked whether netfslib should be doing the
-back-off [1], and objected to sleeping inside the response callback
-because that runs in the cifsd thread and would stall the socket [2].
-The sleep was therefore taken out of smb2_should_replay() and moved to
-just before the replay in smb2_async_readv() and smb2_async_writev()
-[3]. Setting the flag here preserves that arrangement: the sleep still
-happens at the top of the reissued request, not in a callback.
+Thank you for the quick fix and for including the credit.
 
-Set rdata->replay here, matching smb2_async_writev().
 
-Fixes: 2c1238a7477a ("cifs: make retry logic in read/write path consistent with other paths")
-Link: https://lore.kernel.org/all/1652858.1769038134@warthog.procyon.org.uk/ [1]
-Link: https://lore.kernel.org/all/1653031.1769038583@warthog.procyon.org.uk/ [2]
-Link: https://lore.kernel.org/all/CANT5p=pXP3+CywpmK-on2uTvxO3S=31_B85_UDR7RoK1dQVtMA@mail.gmail.com/ [3]
-Assisted-by: Codex:gpt-5.5
-Assisted-by: Claude:claude-opus-5
-Signed-off-by: Christopher Lusk <clusk@northecho.dev>
+
+Best Regards,
+
+Daniel Birtwhistle
+Senior Director Product Security & Assessment
+
+________________________________________
+From: Paulo Alcantara <pc@manguebit.org>
+Sent: Tuesday, July 28, 2026 7:35 PM
+To: Pavel Shilovsky
+Cc: Birtwhistle, Daniel; Paulo Alcantara (Red Hat); Steve French; linux-cif=
+s@vger.kernel.org
+Subject: [PATCH] mount.cifs: prevent stolen creds through SUDO_UID
+
+CAUTION: This email originated from outside of GE HealthCare. Only open lin=
+ks or attachments if you trust the sender. Report suspicious emails using O=
+utlook=92s =93Report=94 button.
+
+When mount.cifs is invoked with setuid, a non-root user may set
+SUDO_UID to be used on the retry kerberos authentication path,
+therefore allowing it to mount shares by using credential caches from
+different users in the system.
+
+Fix this by trusting the value of SUDO_UID only when mount.cifs is
+being executed by sudo or root.
+
+Fixes: 1a1507654c5f ("mount.cifs: use SUDO_UID env variable for cruid")
+Reported-by: Daniel Birtwhistle <daniel.birtwhistle@gehealthcare.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Cc: Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org
 ---
+ mount.cifs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Tooling and testing, per Documentation/process/generated-content.rst:
-
-- The site was surfaced by a static audit sweeping recent merge windows
-  for state and contract defects, then resolved by reading the two
-  paths and smb2_should_replay() directly. The audit had left it
-  undecided because it framed the question as whether a synchronous
-  send failure leaves transmission ambiguous. That question governs
-  only the smb2_set_replay() half; the discarded back-off does not
-  depend on it.
-- The patch and changelog were drafted with LLM assistance, see the
-  Assisted-by trailers, and reviewed line by line by me. I am
-  responsible for all of it.
-- The behavioural description above is derived from reading the code,
-  not from measurement. I have not observed the retry timing against a
-  live server.
-- Deliberately not marked for stable. The change looks correct to me on
-  a reading of the two paths, but I have no user report and no measured
-  impact, and that seemed too thin a basis to ask for a backport. If
-  you think it warrants one, please add the tag.
-- Testing: compile-tested only. x86_64, CONFIG_CIFS=m, gcc 15.2.1,
-  W=1, clean. Base is cifs-2.6 for-next fa724e235cfd ("cifs: add
-  fscache_resize_cookie() to cifs_setsize()"). I have no SMB server
-  test rig here, so the retry pacing change is not verified at runtime
-  and a test from someone with one would be welcome.
-
-One question I could not settle, raised separately because I did not
-want to put it in the changelog without evidence:
-
-smb2_should_replay() short-circuits as
-
-	if (tcon->retry || (*pretries)++ < tcon->ses->server->retrans)
-
-so on a hard mount the retry counter is never incremented and the
-function always returns true. netfs does not bound the loop either;
-subreq->retry_count is incremented in fs/netfs/read_retry.c but never
-compared against anything. That suggests a persistent replayable send
-error on a hard mount could retry without a bound, which this patch
-would at least pace rather than fix. I may well be missing a
-terminating condition elsewhere, for example adjust_credits() blocking
-in cifs_issue_read() or the reconnect path breaking the loop, so I have
-not made any claim about it above. For what it is worth, the ->retries
-counter was described on-list as tracking client retransmissions "when
-soft mounts are used", which is at least consistent with the hard-mount
-path being unbounded by design:
-https://lore.kernel.org/all/CANT5p=oL+tP5_SFNRabROCqDMjriXj5osnyyAjrMeq6BiJcr1Q@mail.gmail.com/
-
-I read the full review history of 2c1238a7477a (v1 through v4) before
-sending. The read/write asymmetry in the send-error blocks was not
-raised by any reviewer or bot at the time, so as far as I can tell this
-is an oversight rather than a deliberate choice.
- fs/smb/client/smb2pdu.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4ce165e40657..06ab6eeb4f13 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -4885,6 +4885,7 @@ smb2_async_readv(struct cifs_io_subrequest *rdata)
- 	    smb2_should_replay(tcon,
- 			       &rdata->retries,
- 			       &rdata->cur_sleep)) {
-+		rdata->replay = true;
- 		trace_netfs_sreq(&rdata->subreq, netfs_sreq_trace_io_retry_needed);
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &rdata->subreq.flags);
- 	}
--- 
-2.54.0
+diff --git a/mount.cifs.c b/mount.cifs.c
+index b57c7d346f42..f0e9bc7beae2 100644
+--- a/mount.cifs.c
++++ b/mount.cifs.c
+@@ -2145,7 +2145,7 @@ int main(int argc, char **argv)
+        int rc =3D 0;
+        int already_uppercased =3D 0;
+        int sloppy =3D 0;
+-       int fallback_sudo_uid =3D 0;
++       int fallback_sudo_uid =3D geteuid() || getuid();
+        size_t options_size =3D MAX_OPTIONS_LEN;
+        struct parsed_mount_info *parsed_info =3D NULL;
+        struct parsed_mount_info *reinit_parsed_info =3D NULL;
+--
+2.55.0
 
