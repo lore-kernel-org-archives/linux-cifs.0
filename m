@@ -1,94 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1973DE45C
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 23:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213DF32470F
+	for <linux-cifs@vger.kernel.org>; Thu, 30 Jul 2026 02:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785367328; cv=none; b=tCAmxKQrKFm8EbAoIW/4NNuB9d0Z+3DzwloTXvZfzOU+PCgtmXpAwbh/OBzfKjOCZKLJQaLgHeUMB4ReWniZBrkm5sgRaa9sVo+9/lEeGH3FW9yu8E7U6AzPwuerRCMEKnr9FtbaH4kuJxcRolSdZYoUBSWqBFceuu+3VBTkVQ0=
+	t=1785377583; cv=none; b=EYM3LvNCsh/VmJxYGardJlt1mrOPNIYJDYIY1EX4FAHgaDMqHCgSClzeJPKpOUjm4qgn1tkC4Kz1Xq7utsRJ2dc+3/lSkGAj/mGUooiI+txiztvaCPOStenX/dbFLgS0aVAz/gM/HrVC1txWJmImhUIbaQ4jPoaDI77JALwR+SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785367328; c=relaxed/simple;
-	bh=t/p7i2s0+EkDdU/pGdz4xcdLWwho6DIWr9TwDjaS2v0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QeokWZXubRO7SOajARHjW6tQK+VPhuLAwq7Pm+gqGXZUv9z1TpWSZ5RpeDcKqAOKhw+PmPYu9gFjD+KwuRJP5lhBXwWwQOzshWF73KJYZ5stAlm1rESW9OWN19Ntl9oV/VVj2PJMC5vQTZ2mxvePUqDpVXrP/ZhAvc36PJY1F1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaM14Iei; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785377583; c=relaxed/simple;
+	bh=XhVmt94+PIsNXzn6Nj05RXiMtw3CtJsdwQdyFAJSwxE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gFcpIo2BMNY3+UHUfOVVYYLfUuDQWVTj2czZQFRQoj1ijmzfSVvRB9MbcF2wM+g4mXvkHw/w8r83hg/qge1znvBoqI8iXmlVPVjSN1h/wc3tg8UESGUbNCcl7s8AUg7RXpGFHxTsoMeqPUT39RTWsb7JI1044EpG3MmXhfIJQFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=KctSUFga; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaM14Iei"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF1711F00ACA
-	for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 23:22:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785367326;
-	bh=r9mvrMAjFtQPWl/4xrWCbi8W8Rt0p8EN58Vi3L5Dj9E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=VaM14IeijML2GLKlkWX8DYe5SXGZ+LFq4AMOB9wCs4BpIv83FNFbdC+9DNmiNY84i
-	 /VAgsfrRO7vtbvXOjHTYgzKtPp60Q8D525jWmmVna2VqxQk2lWS/CHarXKqTETOb5v
-	 eODx7PuMV5gUvnRqSAAch/MgmYngj8nAIiy9vc+V8+yzj924kLTExriiV8zqhgZb0W
-	 9hwD9cR4JxpiUgkzykCFxymu7rs0gY85BNJgF/rPuq7VgenUs+pYTh2A4w9/GsuJIL
-	 432BhKNDIHDgA3DrZPv7Oj9myWanMiI9O9AUbAUT0Muh22/dmgteYPDmpq5rGR685N
-	 cQQ3K6E0fgewQ==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-698acd36d67so2662570a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 29 Jul 2026 16:22:06 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxYHsOozJ/p7OuC1EatCXUMdWS0I0Zfsvfv7dGIl7yEs+XW5iyh
-	D/PXI0IT19MBu1PkPWh1G4TFAtHt1LzI5du3KGP4D1a37CifdB4KCJcCq4XBY8ZLse3vDiey7dJ
-	RUJQ5NEtsI9VAEUWo38qqoTD8f8QEHEI=
-X-Received: by 2002:a17:907:c08d:b0:c1f:a370:7c2e with SMTP id
- a640c23a62f3a-c1fa571e0c8mr17124966b.23.1785367325376; Wed, 29 Jul 2026
- 16:22:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="KctSUFga"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1785377577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ivX56sO3cKniAPxAAoa9Xy8J2lTiJFNeVOs+2TAN/vI=;
+	b=KctSUFga4QUyfF0Ovx5XvoLT+G0dR6wnQ7dCt5ieFNG+caIEFeuxUDwNbyIudRwZeW+50h
+	VWXwaQcxYR8TkueOBtUFHvpAAXIuXt1ySGCcEHzQAzBmaUHIC/A7glWikxtlY/ylTkEvY8
+	NRgt8rUYCuo5BuDE7Ewfj3LSGtJxF2QHfvvrrTwP8eiBQXMnbBWK3JHOBG5rJYlxR5voMh
+	rZ0soVjjTN8U0873UEtgvlnkfWE5pvuT/YSA75569f1hYVonm3pwb8mZfaVBUoVWchK+p8
+	aTdAsegwYFxiyQ0KWq3MNCjemvnPiVcBbCCarE3m85JJ4mMATmwq7l1a0zfXoA==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	metze@samba.org,
+	hch@infradead.org,
+	zlang@kernel.org
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v4 0/2] generic: new test to check nlink returned by fstat()
+Date: Thu, 30 Jul 2026 02:12:36 +0000
+Message-ID: <20260730021238.51634-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260720194925.2108840-1-ematsumiya@suse.de> <20260720194925.2108840-13-ematsumiya@suse.de>
- <CAKYAXd_mkSR_=krs0idmhR_uYxUTzHAFK1cB7tZRtNfMJUSsRw@mail.gmail.com>
-In-Reply-To: <CAKYAXd_mkSR_=krs0idmhR_uYxUTzHAFK1cB7tZRtNfMJUSsRw@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 30 Jul 2026 08:21:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9-DNGr61h9A-npJrT2Dh-G5h=6fnMbqW=5NayTr7ym2Q@mail.gmail.com>
-X-Gm-Features: AUfX_my2GonJhrbgzykj3vjTc9T7hM1-me5hoPKa5xVwnCtF76yOL_SurF55LoI
-Message-ID: <CAKYAXd9-DNGr61h9A-npJrT2Dh-G5h=6fnMbqW=5NayTr7ym2Q@mail.gmail.com>
-Subject: Re: [PATCH v2 13/14] smb: server: use smb_decompress_alloc_size() in ksmbd_decompress_request()
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: linux-cifs@vger.kernel.org, smfrench@gmail.com, pc@manguebit.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, henrique.carvalho@suse.com, senozhatsky@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Jul 25, 2026 at 10:08=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org=
-> wrote:
->
-> On Tue, Jul 21, 2026 at 4:50=E2=80=AFAM Enzo Matsumiya <ematsumiya@suse.d=
-e> wrote:
-> >
-> > Use common helper to validate compress header and get decompressed size=
-.
-> >
-> > Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
-> I can not apply this patch to #ksmbd-for-next-next.
-> Can you create this patch based on #ksmbd-for-next-next ?
->
-> > -       max_allowed_pdu_size =3D SMB3_MAX_MSGSIZE + conn->vals->max_wri=
-te_size;
-> > -       if (out_size > max_allowed_pdu_size ||
-> > -           out_size > MAX_STREAM_PROT_LEN)
-> > +       buf =3D smb_get_msg(conn->request_buf);
-> > +       out_size =3D smb_decompress_alloc_size(buf, pdu_size, 0,
-> > +                                            SMB3_MAX_MSGSIZE + conn->v=
-als->max_write_size,
-> > +                                            conn->compress_chained);
-> In ksmbd_decompress_request(), the old code rejected decompressed
-> messages smaller than sizeof(struct smb2_pdu).  The new helper call
-> passes 0 as dmin.
-> So you need to pass sizeof(struct smb2_pdu) as dmin :
-> out_size =3D smb_decompress_alloc_size(buf, pdu_size,
->                                            sizeof(struct smb2_pdu),
->                                            SMB3_MAX_MSGSIZE +
->                                            conn->vals->max_write_size,
->                                            conn->compress_chained);
->
-> Except this, The other server and common patches look good to me. I'll
-> leave the client patches to the cifs.ko developers.
-If you do not send the v3 patchset by next week, It will be difficult
-to merge into the 7.3 kernel.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+v3->v4:
+  - Patch#01: only add generic/002 to the "hardlink" group.
+  - Patch#02: use `_fail` and `_exit`.
+
+v3: https://lore.kernel.org/linux-cifs/20260724031210.332153-1-chenxiaosong@chenxiaosong.com/
+
+ChenXiaoSong (2):
+  generic/002: add test to hardlink group
+  generic: new test to check nlink returned by fstat()
+
+ tests/generic/002     |  2 +-
+ tests/generic/798     | 59 +++++++++++++++++++++++++++++++++++++++++++
+ tests/generic/798.out |  2 ++
+ 3 files changed, 62 insertions(+), 1 deletion(-)
+ create mode 100755 tests/generic/798
+ create mode 100644 tests/generic/798.out
+
+-- 
+2.43.0
+
