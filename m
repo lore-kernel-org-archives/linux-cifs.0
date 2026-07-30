@@ -1,156 +1,131 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C420246F4A0
-	for <linux-cifs@vger.kernel.org>; Thu, 30 Jul 2026 23:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785453108; cv=pass; b=mYUqlx9BrigXtacH67ZuqR4IxDl4Uym6nBPBhqnTxWn7lU2lYB74RlO1RLePwv25eLlXxuMCB1eYsrt4GdV1r3os9EM4AhJkbgTk3QxfQQKv6b4lU/abciS9FWcJd6CT6U8rHwNTLiXzWYJZTl91MJASXd2ss+UfYhrGQvGgYB0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785453108; c=relaxed/simple;
-	bh=bSqU/dXoTHTMlyhXvP2JatwhpAVeJ9qndgstzv85e1Y=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hldOqtE2E7N+AgAhZgOua8gazSq2CepxX5B68CL6pYvSoX4+LZE/F5IXMO0U40g0M6btyT1ICEQY1Lj08CwR03K4/xz/QAjPz7w0dxmmU4/EZl0afgOU3vlqZXI1hXvzky1OStfP2jDA5cqWfei+XeeW6H4oVMOYk1OyyVeg9O0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=miB9qtT8; arc=pass smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072D21D5CFE;
+	Thu, 30 Jul 2026 23:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785454562; cv=none; b=n40bTFGPD3C0W9tXV11I/Ov6/FmARV8XF83cKxhC7Bz5P1W4P6fyECg5bV97R5PymJqerEaekZ41AABFt/OYg7QsrJCaNpAGOoejNgb+h6WyeVk7BKL/4EV3ZqrP31Y8O3zzytXHtEaF6GG/c4Q5yb9iGMMI+zztmjbVkb6JKZI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785454562; c=relaxed/simple;
+	bh=KltlIWHQdy55FF2fcgocO5dc5uXirh7+FQkI4dQ3OHA=;
+	h=Message-ID:Subject:From:To:Cc:In-Reply-To:References:Content-Type:
+	 Date:MIME-Version; b=F8hoRsNK0o2IgnmhW19QQROUbNA4cEpWfbGYZdi8+fHYN6Xw8vfzZpthJeda325fEq+Cx4yNHIYcC5y4LV8A9kdFd7imLecd7XQ1EmxwD7rep5Gv4mb5IiIl3fmakna+Ikk+ajwOYLWi8dC2J4MtBdhyke3TkXTxKxHIX+78P8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=porBPOmO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miB9qtT8"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-529a1ee0e62so1842621cf.2
-        for <linux-cifs@vger.kernel.org>; Thu, 30 Jul 2026 16:11:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785453105; cv=none;
-        d=google.com; s=arc-20260327;
-        b=RSWhDEVWCM9o+iTuMT64IMYePtNHEyxW5RPyLqtyzOuF6bLreZh2WbAWU4yqPuXhCY
-         NtW0GdUbMHYVZJ2Oiqxzp3W/kLaYAxtIf9cK9lp6W+HxqynhK0psvKE+30ua51tHuUff
-         l8mstcjc+4ndjeYu/jwz0Zk1V6235b4vs2Ke6uN8lwhlXnR6b7lkxwQwBwQyzkUjWtIM
-         WCNKpBHGc3IUAxjnFFtY0XnnwAlCVhQ011p2w6WvpYaHJ8iN1SeAGe/t91WWzswAzoX3
-         6S8GtWOeu0Jm7TVCPDDJBYK9ULM+HCsHHLrVrheoM+ffyrmKgDTwL2SikbC1iBxN0WTO
-         Hx3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=xHCZlqOBHhADTSbQPixB9XxeeskHRQmallahj6f8+Qk=;
-        fh=ArnBIT3WOtRI3yUJ0D/UgzXDXRK0DQJhFwoWBXcuzlM=;
-        b=HDe9bgGGR8GhGoUZ5Xbhjc0v/YMZqcW1OzUjMSPQ/Hh+wtKi1UcQvezB7I26bI+MJM
-         2MpZAZfxpvJwEU10K+H+sghGWx8QSWAeMC/Xog/APWLrUf/EZ5mfqrievbpEGXbY6Yxv
-         Sf7fFeS+Ry09bm+ih7cKWi+xgWmFKCvYFMDsExDo/jYGR3cKslgCnCbL10dgc2HJLKwK
-         JHswZs5da+aYnpWj6c2i3aQ5DNIXhtz9mSDExcTotu46FkfS1tck/lKxkAEjP1ie2Y54
-         rWBqPsMHYbadajlZ/ENi26SXCOW8xszCptTD3bqwZTpD9I1o7t+kr72zj5VrjUV/vpYZ
-         ho3A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785453105; x=1786057905; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xHCZlqOBHhADTSbQPixB9XxeeskHRQmallahj6f8+Qk=;
-        b=miB9qtT8IaXq+R5FZVx5Wg4UtqznLDJ2+LEPNXQAiMAX/tAhXtumf/G/75P6/tPg2Z
-         GMlCcVQf9qaaNMWLKIDzVjM5MG67EJberU2RQ9TTHa0LVuEYBl0bj8FALpmQ03JN7iPc
-         ll7P13WQlhy3S2NvAFtKPQVF9RNvoADlSEupGJErmrec4fOrmJ0sVbbaMqWb4EIKljLz
-         Nsbx8i5PmDDqFEX57gG2AHAiuEtNeM08eYEVp/sxeRboNEmAeOpoBbWxAaZO7QJ745G6
-         PHY+wd4RXWa/urS0Abdo39ki62GZB6F4jaymqaYIcrY8GiMAWRh6JjdMUJrdzMWXLhz6
-         MOog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785453105; x=1786057905;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=xHCZlqOBHhADTSbQPixB9XxeeskHRQmallahj6f8+Qk=;
-        b=NhyK/4ZmZ4etODL7LNJnJbQ2WJBiGKdcaQN7R4iXRbIvpVvGpE5r8+JYDavZekJL8f
-         5YUyNCLqOhaM/AlJg+eEYfHBExF+ZbJzy0Nf6boA0gGSevdtzxP7GPRfnaFcc+DeBS4e
-         WwBgAvRNmFLOXDf0FJvpSAXVCTCg79BN8XOIFnC+libaVOFLPYE8IK0dEJUMnVFijFbg
-         Cfs+oWR0jMSgwtjLBhSM6OrvaHKPjATDHnau9RP1rMk/Wc7y2RK4ni5PtxJgZinLknKV
-         R7ZgqoUTuCs45jzbcm7PH+FvIYOCDHpx+LsBYlZLomzk1tfsFkw7ke3McPKrtbehwHSg
-         u5Fg==
-X-Forwarded-Encrypted: i=1; AHgh+RphpIsvuBWxn5t9s+DI9xmWPLiOa/r4R4DmMbsH9t/9YSbBeieNOQlCC6B4SUQ1JBmxErE0VhjTRWBB@vger.kernel.org
-X-Gm-Message-State: AOJu0YygFN3dIQcdWKN7wB6g6v0yNjTsEIEzyvbtZD3KoIoCDmQ/pqTu
-	ilLKhd/tsfZ0oR7RAHk3TTrcxfTwHgXawqVnktXy5FsBuCfpJto5K0qOqY/5Q2MBcRmLawaFLRJ
-	P3pXP+VV/Pgh5IqTgHvkvwysytCe8qu4=
-X-Gm-Gg: AR+sD10Gj1BIEFBnx6lTkaTJ6oZK/ka02dTpC0n2dvG4x8ry8RZ6/i105+xiHlQMmc5
-	NNRjepeAEtvDCgagoylEdZgec05UV91RxdlWK8p7oEHK5tPsAFdZMnFk8/8O2Dgzc8VaVTxM4qU
-	/pGmqpytGG6HXWgDrVHqfHghjUOMhYhhs7sDQOoYa5BQSR9vYBTuTWX9iVrKuU+DQGZL4fLcs/b
-	/Ank0uK8uPf80nkrW76gspb+9/RoBwQql9QGeDTOhL4gtg2/gCJtl6newupVnJSyTglzAke5Bt5
-	OX2jJcJfPY8tS/AmiXQBYt7IbZAoConkq83K1ntPaQ2wPZ56Eqjv9hqMZZvLf19/tucb8pmZueg
-	ZdGb7npb+49eprcX/tiyrfpXEsRheHOcfmJhVrdY7AGRtJaUHkBANw7vmxtuVYjYZw9CwAEZlJp
-	GncjDWVZR4N5InD+isH3TVPJhwM3kWXS9ckqi6UEzKTXHmrgm81hx2Uo3cCms=
-X-Received: by 2002:a05:622a:40a:b0:51b:fdbc:86ce with SMTP id
- d75a77b69052e-52b38673fbamr50375331cf.52.1785453105246; Thu, 30 Jul 2026
- 16:11:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="porBPOmO"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66UNHeEq2518103;
+	Thu, 30 Jul 2026 23:35:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=qP3GW3
+	TbOzydv2cSkXUiDsmS7TkqwMXL69Zn2Hpq834=; b=porBPOmOJx4o2a1PILUNvO
+	v5Cx/Z5F5zpO2BPZvztZluD+z93NTkxaZcN7XcXhc8jgqjhRyshotIqH+y3ScvZ8
+	lol8xR5fPlWx8xNawM6Zwrviwy1ryjLsRsQoXjfEQzMhjM5zcHIXdenVKdqLGlW2
+	GzV+PjzEsCf6k/b+LkMhlZs9e7KeoJ3+6HRk9JNdV+8oBq+JAsLNLGph8eSQuDwN
+	x2Eux/qX6/N3w/eimwfj1RHhKD1PFnmIf5pXgkFydZ388oCA9PTiiSQGtA996fpM
+	7zptBFfcf3akIOrgi4mQD11EmyO5jMlZbvtJV/+T70VdGbKoDzPqjimRTtTxEt9w
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuyctaf7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jul 2026 23:35:27 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66UNQKBa009388;
+	Thu, 30 Jul 2026 23:35:26 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fn9pgnf4m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jul 2026 23:35:26 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66UNZQmF17433292
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 Jul 2026 23:35:26 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 53F3558056;
+	Thu, 30 Jul 2026 23:35:26 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5897C58052;
+	Thu, 30 Jul 2026 23:35:25 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.66.203])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 30 Jul 2026 23:35:25 +0000 (GMT)
+Message-ID: <4bdf58bd593d9a54aa20760fd49aaa1df57ef216.camel@linux.ibm.com>
+Subject: Re: [PATCH v3 1/2] vfs: Allow filesystems with foreign owner IDs
+ to override UID checks
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: David Howells <dhowells@redhat.com>, Al Viro <viro@zeniv.linux.org.uk>,
+        Christian Brauner <christian@brauner.io>
+Cc: Marc Dionne <marc.dionne@auristor.com>,
+        Jeffrey Altman	
+ <jaltman@auristor.com>,
+        Steve French <sfrench@samba.org>, linux-afs@lists.infradead.org,
+        openafs-devel@openafs.org, linux-cifs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Etienne
+ Champetier	 <champetier.etienne@gmail.com>,
+        Chet Ramey
+ <chet.ramey@case.edu>,
+        Cheyenne Wills <cwills@sinenomine.net>,
+        Christian
+ Brauner <brauner@kernel.org>,
+        linux-integrity@vger.kernel.org
+In-Reply-To: <20260728141344.1811120-2-dhowells@redhat.com>
+References: <20260728141344.1811120-1-dhowells@redhat.com>
+	 <20260728141344.1811120-2-dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 30 Jul 2026 19:35:24 -0400
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Steve French <smfrench@gmail.com>
-Date: Thu, 30 Jul 2026 18:11:34 -0500
-X-Gm-Features: AUfX_myT67oDftcj157MKT1qPE61R0HOjtokkd8xLhKRyuPPbRsKvqeQV8iqV0I
-Message-ID: <CAH2r5ms9nKwhH4uv0C0wKvmcu4F3AoPzvmGw8Xqr_pk2U9bUfg@mail.gmail.com>
-Subject: [GIT PULL] smb3 client fixes
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-Reinject: loops=2 maxloops=12
+X-Proofpoint-ORIG-GUID: lcGThnKMZT8UYbD7373ywCh4ibsccC3z
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDE2NiBTYWx0ZWRfX+x2/6K46F/EV
+ gjpwLQaAo6chWT7bKEU+8evGFJpAo6zrehwYKSASkJUIQf2eylmEzxpkuTunfJxxs5hUTFgfsk0
+ swsKXkMU8snbhqqmjy2Sf6WuQews6yXQLa6+A/+2UYkL/b6zOMW1GxtzcjNGrgAgMj7XOyqaQYi
+ l1UdbD79E5Sj+Y0w2kw//4fqiNOVv/4UIsl5CvTE8J7aj6alYyFwIKFETILVQzx/YSWMyDcgqY5
+ +U5mspmVTU46lsirJYw0Oiip3hyygPPWjOsyysepyWW3ypfjo+z/cO75vamUcUteHTVxUMIuqO/
+ OBN2cLDRiCGem+abARewNbR12LJ24387wXbkMKbO21qEMsFZMfqloIGIbezWGztljqyGHanmpBm
+ ZxXT+Kr4oPy7fx0xIjBwL3r6QI4DDDLq/NnIooQf8LbxRdaWlNM/iJRY3ZUNBALSTRS6OE8ntVy
+ wYjqqFE1wNmdXg1ch7A==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDE2NiBTYWx0ZWRfXxx/LofNCpxFd
+ Qyt6vsbR7yXIXEWdRbQIW06/QbzZZNUCdAs9sx6zZrU8FgGaIAwrD+zh3WQ3XEf2fY9qivXJQnD
+ WyK6UGHxX/413KHJOpXW5V3I7EH6f5A=
+X-Authority-Analysis: v=2.4 cv=AZeB2XXG c=1 sm=1 tr=0 ts=6a6bdfc0 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=hS9qXHsXj7WBoA4L2p0A:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: w0I0ySVcKgzse6q7Ns7VItQIsoQobE1S
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-30_07,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0
+ clxscore=1011 malwarescore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300166
 
-Please pull the following changes since commit
-f5098b6bae761e346ebcd9da7f95622c04733cff:
+Hi David,
 
-  Linux 7.2-rc5 (2026-07-26 14:45:48 -0700)
+On Tue, 2026-07-28 at 15:13 +0100, David Howells wrote:
+>=20
+>  (*) IMA policy ops.
+>=20
+>      Unchanged for now.  I'm not sure what the best way to deal with this
+>      is - if, indeed, it needs any changes.
 
-are available in the Git repository at:
+IMA policy rules may be written in terms of the uid, euid and fowner.  Any
+changes, if necessary, would need to be made to ima_match_rules().
 
-  git://git.samba.org/sfrench/cifs-2.6.git tags/v7.2-rc5-smb3-client-fixes
-
-for you to fetch changes up to fa724e235cfdb0fb0bb427d0f9dfe864ae27403e:
-
-  cifs: add fscache_resize_cookie() to cifs_setsize() (2026-07-27
-20:46:03 -0500)
-
-----------------------------------------------------------------
-Nine client fixes
-- fix SMB1 read and write potential buffer leaks
-- netfs error handling fix
-- fix check for last write time in truncate and setattr and cleanup
-use of smb_store_release()
-- fscache fix and fscache cleanup
-- validate idmap key payload length
-- minor SMB1 error mapping cleanup
-- witness protocol memory allocation fix
-
-----------------------------------------------------------------
-Dawei Feng (1):
-      smb: client: fix buffer leaks in SMB1 read and write
-
-Dmitry Antipov (1):
-      smb: client: simplify cifs_fscache_get_super_cookie()
-
-Frank Sorenson (3):
-      cifs: consolidate time_last_write stamp into _cifsFileInfo_put()
-      cifs: fix time_last_write stamp placement in setattr/truncate paths
-      cifs: add fscache_resize_cookie() to cifs_setsize()
-
-Fredric Cover (1):
-      smb: client: use GFP_KERNEL for registry allocation
-
-Li Qiang (1):
-      cifs: validate idmap key payload length
-
-Sang-Heon Jeon (1):
-      smb: client: remove conditional return with no effect
-
-Yichong Chen (1):
-      smb: client: free partially allocated transform folio queue
-
- fs/smb/client/cifs_swn.c     |  6 +++---
- fs/smb/client/cifsacl.c      |  3 +++
- fs/smb/client/cifssmb.c      | 12 ++++++++---
- fs/smb/client/file.c         | 37 ++++++++++++++------------------
- fs/smb/client/fscache.c      |  6 +-----
- fs/smb/client/inode.c        | 27 +++++++++++++++++++----
- fs/smb/client/misc.c         | 51 ++++++--------------------------------------
- fs/smb/client/smb1maperror.c |  6 +-----
- fs/smb/client/smb2ops.c      |  2 +-
- 9 files changed, 63 insertions(+), 87 deletions(-)
-
-
--- 
-Thanks,
-
-Steve
+Mimi
