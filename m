@@ -1,32 +1,32 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC5E3EC824
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 11:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24693EC824
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 11:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785498682; cv=none; b=EJXdtQz87T4649LemNS5ZhuzqmChL20BJNRKVcAP/dJuxbIAAdr5X/B5VvIc8ClHX9mbY0tqnpsWm4jpEhVZofpOlfiq9AVrHTFWWIci3X6KKINNA2fiDDIX3AHVcDuOcGyEK0Uh9kn90AM9tBZYcxJ1lp2k5Y6IeF5JKRjG8nk=
+	t=1785498687; cv=none; b=npbSXNY4zh0f1kXeIn+0Kb9cDc+nXsn8c2X91BsA2wf40M3YT58IAlOtlFJXGfmPTIzkZktaH6GaA1VPCfTr/3L2WQUu4uYQ3XTWNyjhu1zwxVDcgqJ6/hajfdOBv/8AeYATHBaE/XlOef42irjf6lFzYGV1XoD+0jqdm2l6mQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785498682; c=relaxed/simple;
-	bh=pzFFa6s9ow1fkblytmN37U7jx3dbfA+yQrQ8iEpbVII=;
+	s=arc-20240116; t=1785498687; c=relaxed/simple;
+	bh=CKZWt5jyPIQqLZjyXZZt0zO4JsWowHNpOwOmOLEUJpM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TxvzgPvoK0Rnm9AvqF2EyD+S1cwLOGcslyel61WteBTwHPK1qXixmFiaQTAANtXDSRfBTFtrPEb06lu3EUG9UH1/BrdF2dWWddADhyqnGGscqfNgHoIuPZ6AgKAX+w45A3FSvY84tpjcGZ6bzrvTxzfuw3HSAtfJPuzdzMNrPuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rby0Y6fc; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=Ek6RI3ZmxNond/1pg6O3bP4jcNosnkrp43kqbm+N0eq6VzLJoKIWsY0fTlzAYRFucOkcGHbztbVoAIdSzbGEFBItm5+JsVLUdKMABJkqpDGOUZagffJ6yHeMpLknHfjKm0bwto8YUd/fNz9Lqr7yXdhPq4LH3wPIEsnkkxCem4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v5z5dAby; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rby0Y6fc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v5z5dAby"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785498678;
+	t=1785498683;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jWCw5Zd8uJa6/v1Shc0lXaJxLM+mHTESN2jeOjTRQQk=;
-	b=rby0Y6fcu1JmEYggrBXAM9L/xcOlAeCieCHMKPPq63PmygPqFOuqPbCVCHKEVJoaOQ68nH
-	UT030x407Wm0Io8oEY7M19zDYDa47tdVM+YZqjTVOtQqpFa964atojpKtYqjWamtUp25xT
-	G8Zvg85OCIo3bbA3MIpU9OjPYyUlC3g=
+	bh=NT2a2DC16QV78szZFV0YiOymX+BArOf+J7Vg7GUrkdk=;
+	b=v5z5dAbyABWK9c9/DloY3Fh4H7u28SjDE8QxHjLnmFjc14XlNA5Zg0N+yEi9Bv6DH+qghz
+	pWi6t8WRILKCgaQtz5ZK7chS3eSvIBD2IKnyTBzItolAlyyBcy31OKGk2W2bkAkIr0ta2Y
+	MtAWuSP0DQ54u0ox9m35pMt9tqN73mI=
 From: ZhangGuoDong <zhang.guodong@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -41,9 +41,9 @@ To: smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org,
 	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 4/6] smb/server: abort initialization when proc setup fails
-Date: Fri, 31 Jul 2026 11:50:06 +0000
-Message-ID: <20260731115008.111211-5-zhang.guodong@linux.dev>
+Subject: [PATCH 5/6] smb/server: call ksmbd_proc_cleanup() on module init failure
+Date: Fri, 31 Jul 2026 11:50:07 +0000
+Message-ID: <20260731115008.111211-6-zhang.guodong@linux.dev>
 In-Reply-To: <20260731115008.111211-1-zhang.guodong@linux.dev>
 References: <20260731115008.111211-1-zhang.guodong@linux.dev>
 Precedence: bulk
@@ -57,103 +57,44 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-ksmbd_server_init() calls ksmbd_proc_init() before creating the
-remaining proc entries and server subsystems. ksmbd_proc_init() tears
-down partial state on a procfs or percpu_counter allocation failure,
-but returns void, so ksmbd_server_init() continues as if the counters
-were usable.
-
-Once userspace starts the server, server_ctrl_handle_init() calls
-ksmbd_proc_reset(), which reaches percpu_counter_set() with a NULL
-per-CPU counters pointer on SMP systems. The later ksmbd_proc_create()
-calls also receive a NULL parent and may create entries in the /proc
-root; ksmbd_proc_cleanup() cannot remove those entries because
-ksmbd_proc_fs is NULL.
+When a later initializer fails, the unwind chain releases resources
+created after procfs and then jumps directly to class_unregister().
+Returning an error from module_init() leaves the proc tree and its
+per-CPU counters allocated.
 
 Fixes: b38f99c1217a ("ksmbd: add procfs interface for runtime monitoring and statistics")
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/misc.h   |  4 ++--
- fs/smb/server/proc.c   | 13 ++++++++-----
- fs/smb/server/server.c |  4 +++-
- 3 files changed, 13 insertions(+), 8 deletions(-)
+ fs/smb/server/server.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/misc.h b/fs/smb/server/misc.h
-index 680375a966c5..1faaddd0f5f7 100644
---- a/fs/smb/server/misc.h
-+++ b/fs/smb/server/misc.h
-@@ -43,7 +43,7 @@ struct ksmbd_const_name {
- 	const char *name;
- };
- 
--void ksmbd_proc_init(void);
-+int ksmbd_proc_init(void);
- void ksmbd_proc_cleanup(void);
- void ksmbd_proc_reset(void);
- struct proc_dir_entry *ksmbd_proc_create(const char *name,
-@@ -56,7 +56,7 @@ void ksmbd_proc_show_flag_names(struct seq_file *m,
- const char *ksmbd_proc_const_name(const struct ksmbd_const_name *table,
- 				  int count, unsigned int const_value);
- #else
--static inline void ksmbd_proc_init(void) {}
-+static inline int ksmbd_proc_init(void) { return 0; }
- static inline void ksmbd_proc_cleanup(void) {}
- static inline void ksmbd_proc_reset(void) {}
- #endif
-diff --git a/fs/smb/server/proc.c b/fs/smb/server/proc.c
-index 1bf4e00dee34..826353ed0553 100644
---- a/fs/smb/server/proc.c
-+++ b/fs/smb/server/proc.c
-@@ -239,14 +239,14 @@ void ksmbd_proc_reset(void)
- 		percpu_counter_set(&ksmbd_counters.counters[i], 0);
- }
- 
--void ksmbd_proc_init(void)
-+int ksmbd_proc_init(void)
- {
- 	int i;
--	int retval;
-+	int retval = -ENOMEM;
- 
- 	ksmbd_proc_fs = proc_mkdir("fs/ksmbd", NULL);
- 	if (!ksmbd_proc_fs)
--		return;
-+		return retval;
- 
- 	if (!proc_mkdir_mode("sessions", 0400, ksmbd_proc_fs))
- 		goto err_out;
-@@ -257,11 +257,14 @@ void ksmbd_proc_init(void)
- 			goto err_out;
- 	}
- 
--	if (!ksmbd_proc_create("server", proc_show_ksmbd_stats, NULL))
-+	if (!ksmbd_proc_create("server", proc_show_ksmbd_stats, NULL)) {
-+		retval = -ENOMEM;
- 		goto err_out;
-+	}
- 
- 	ksmbd_proc_reset();
--	return;
-+	return 0;
- err_out:
- 	ksmbd_proc_cleanup();
-+	return retval;
- }
 diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 18c20a669307..19630ac53235 100644
+index 19630ac53235..0ccd123ba418 100644
 --- a/fs/smb/server/server.c
 +++ b/fs/smb/server/server.c
-@@ -620,7 +620,9 @@ static int __init ksmbd_server_init(void)
- 		return ret;
- 	}
+@@ -630,11 +630,11 @@ static int __init ksmbd_server_init(void)
  
--	ksmbd_proc_init();
-+	ret = ksmbd_proc_init();
-+	if (ret)
-+		goto err_unregister;
- 	create_proc_sessions();
- 	create_proc_shares();
+ 	ret = server_conf_init();
+ 	if (ret)
+-		goto err_unregister;
++		goto err_proc_cleanup;
+ 
+ 	ret = ksmbd_work_pool_init();
+ 	if (ret)
+-		goto err_unregister;
++		goto err_proc_cleanup;
+ 
+ 	ret = ksmbd_init_file_cache();
+ 	if (ret)
+@@ -680,6 +680,8 @@ static int __init ksmbd_server_init(void)
+ 	ksmbd_exit_file_cache();
+ err_destroy_work_pools:
+ 	ksmbd_work_pool_destroy();
++err_proc_cleanup:
++	ksmbd_proc_cleanup();
+ err_unregister:
+ 	class_unregister(&ksmbd_control_class);
  
 -- 
 2.54.0
