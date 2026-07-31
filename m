@@ -1,87 +1,82 @@
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45045339384
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 02:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3CE3203B6
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 02:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785465803; cv=none; b=ix9NsimK3uzwLL0qOte3qvUFifuzNiE1KzrAn8uBweV71vCLN08osiNU+vWuyUD/2P+qzBc+Z0TkABCD02k6YaKCwkiKMQC3qlJ5e9wj9mzkWZ96ibliR/22/v8XPpqf3v7eoRTVln+ZHN9coIJi7hgP19Wqv9E6w8HtaRzoROE=
+	t=1785466150; cv=none; b=I4v6WnH9HS2B2NJhMUcbD/c1BhUJAvcQFsNXGhNqRDP7QEIj9LzMPoqnRdV7eNM9fGH5Rhc1GoQw4+oDvgHHpJbSYnTsCY+QplfUG1R1IyNva0pxVpVUrAM7hiMt8S2llLcAaLc8zXWO01YE7DDYTm/rfbCZAvikdJbrIdoYnvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785465803; c=relaxed/simple;
-	bh=31yCz3vPZO81Gn1lWlC9hS5ZYu42gFOE/zuY8NAdjPc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=byfXS2gs6pUJ8lNUhgpK7MZUcVLZWUgMSX/yBdfOAANeBOjh9FOuuYOb1a1Tj8ETaHIc6APCarqHs01PE6Rwmg2BxUQmpkFqa6N/DtLXmRH1VjbDyV+Jl0mbvkP/u3AyEi/IgFuTvAdzDwJJd0yzQQoMTDOFz3fRw2BOxSvLdbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=V3ZdWyg2; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785466150; c=relaxed/simple;
+	bh=KK/hJrQcZSuF9t1dAhn8FkaPGv6S4RzGFcnZbRKjDlk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bCSbxHN1ttSUINh2UFJbvVxcifWhabEYCFFJkFV6KqldELwi3G6IF225E0Q6Mrp+x6THrNhpzCgU3pUtn85w/Vo9DKSLeDIhtQruquSQZ2vHw3NVJ86xbtb+Sf7EYSaeOcHopjhSZ+9ONg3o0AJidihIixEYh3fooH8akfl2opY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3ajHOOG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="V3ZdWyg2"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785465800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h5A9WPpK/3W/eBVJ7RHH0eNh40RrO56nXlwXsAd8/sA=;
-	b=V3ZdWyg22gWZDvNPKEaNXcfdrcx4h0WTx4mF/OSVDFeyr1q3uJixXrWarkwnZ1464r+QJp
-	j0dZbdv7A/4iPqtZKyUdEj9zj4c8xCsRZ2wrb0kUdXuWxGhtgIst+6Z/r0Z/8RUsWPpg0U
-	Y+uSaFIZoobXjp9DDPTDI5DbNEwlCkc=
-From: ZhangGuoDong <zhang.guodong@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	metze@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	ZhangGuoDong <zhangguodong@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 2/2] smb/server: fix memory leak in ksmbd_login_user()
-Date: Fri, 31 Jul 2026 10:42:53 +0800
-Message-ID: <20260731024253.148107-3-zhang.guodong@linux.dev>
-In-Reply-To: <20260731024253.148107-1-zhang.guodong@linux.dev>
-References: <20260731024253.148107-1-zhang.guodong@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3ajHOOG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84C7A1F00ADB
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 02:49:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785466149;
+	bh=WwFTxVopmz6n65eo4+T7UQNvidfMo8W+Tsb89DMB0sA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=g3ajHOOGfzp7enQ0xCYIW42OoWaLlhuV21b9xF4hGiwEUlif8A8FaWmNKSBlUBUmL
+	 WqYfOFj5PMpGyXb1lKGdB8+dAfoRFpg6TpRQ1Z/jVlDeDfWQNQtpydl3lyPh1DBXzj
+	 z980jgJoIvWzg0XxG03Lo1MkekQGzHeE5m6iRFWTDtIcGq8qLqp/HravFgRGW5gDYr
+	 OvF0hwztWh2rpwzMCgkE0ghFFbcu/7jtYW1MqBFSyQBShKfkS7AF7cZi/9UtE6XmWD
+	 oI27g28e5mvDsVrY57/5rbzThVsnqduvY3D0rtrzz0P6i9TgsII9NabESyKu6UqX+9
+	 FNcmhmnfJfUiA==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c160420289bso58249466b.0
+        for <linux-cifs@vger.kernel.org>; Thu, 30 Jul 2026 19:49:09 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RprrpK36GUStsl4Sxy+AcGCWSeFbJuI2w/VGo8WKjMhX/rcBIcfRzuQWCcTJUleXbELr2yG0lT3bUny@vger.kernel.org
+X-Gm-Message-State: AOJu0YyB/8xrGjeCw/32RaStMri6OVQJEEmGA5DW+c6NV85ITwEC0qg0
+	m+DnPykSTOs8OnH1tyT/++v1oSVuJZmKNId68Uzk6Qyjb3gRC/TMxNDHi0s7mWmiR6DwwYGJTbD
+	e2cQP+AdnLjZmQ6naCAqILtopf/4MH5g=
+X-Received: by 2002:a17:906:9f92:b0:c15:e8c8:340 with SMTP id
+ a640c23a62f3a-c1fd1ed56d5mr12651366b.23.1785466148067; Thu, 30 Jul 2026
+ 19:49:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260731024253.148107-1-zhang.guodong@linux.dev>
+In-Reply-To: <20260731024253.148107-1-zhang.guodong@linux.dev>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 31 Jul 2026 11:48:56 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9rR521h5goFmVOS4Z7Kh4LZJQXw3XTCxf1U9xnKeHUEw@mail.gmail.com>
+X-Gm-Features: AUfX_mw0PP-CMKoRIgqxhf7q3uDZHfSAZr3K_gWeoPaEBRkGt_Z3GAd1tFx8Fgw
+Message-ID: <CAKYAXd9rR521h5goFmVOS4Z7Kh4LZJQXw3XTCxf1U9xnKeHUEw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] smb/server: fix memory leak bugs
+To: ZhangGuoDong <zhang.guodong@linux.dev>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: ZhangGuoDong <zhangguodong@kylinos.cn>
+On Fri, Jul 31, 2026 at 11:43=E2=80=AFAM ZhangGuoDong <zhang.guodong@linux.=
+dev> wrote:
+>
+> From: ZhangGuoDong <zhangguodong@kylinos.cn>
+>
+> ZhangGuoDong (2):
+>   smb/server: fix memory leak in ksmbd_krb5_authenticate()
+>   smb/server: fix memory leak in ksmbd_login_user()
+Enzo previously sent the same patch, and it is currently applied to
+ksmbd-for-next-next.
 
-ksmbd_ipc_login_request_ext() returns an independently allocated
-response. ksmbd_alloc_user() copies the supplementary group IDs from
-the response, but ksmbd_login_user() does not release it.
+https://github.com/smfrench/smb3-kernel/commit/151d00564ce5b643ed8e9e9343bd=
+21f1073386eb
 
-Free the extended response after ksmbd_alloc_user() has finished with
-it.
-
-Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/mgmt/user_config.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
-index cf45841d9d1b..21b1d51d918b 100644
---- a/fs/smb/server/mgmt/user_config.c
-+++ b/fs/smb/server/mgmt/user_config.c
-@@ -27,6 +27,7 @@ struct ksmbd_user *ksmbd_login_user(const char *account)
- 
- 	user = ksmbd_alloc_user(resp, resp_ext);
- out:
-+	kvfree(resp_ext);
- 	kvfree(resp);
- 	return user;
- }
--- 
-2.43.0
-
+Thanks.
+>
+>  fs/smb/server/auth.c             | 1 +
+>  fs/smb/server/mgmt/user_config.c | 1 +
+>  2 files changed, 2 insertions(+)
+>
+> --
+> 2.43.0
+>
