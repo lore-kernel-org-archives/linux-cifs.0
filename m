@@ -1,35 +1,35 @@
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE093AEF3A
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 08:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF313128D7
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 08:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785485511; cv=none; b=gtcRGdkYxTIzGsF9DKKSuLavf1SPUnwjZ+RKet8x4RPtOmXp/BrH7AmpqApr/KCmI8zy/PUty2aTezwc5EnnP3UmmABf9+L/9wrJmHJx+rSueUvhcbI44/OPc818qiYliUEgKThoWiL4qzWm/S31hC4GAU/Z1T30WKxBTENYhgY=
+	t=1785485848; cv=none; b=koCv3grZ6ZfprJqDjhTnDR6mUvgsLB5EqyUA4+DVPx9Va4CLo3VOve9SZTfCHXZZuKsmgeor9gibAh/nNIjeOKsTgg97c1eie3E7h4f3FS86X9CdPN6DdObACFtTLjz3U7eDIcMbZiUXX6jmv3zwrrXQgZ93sOMrB67qvjm/Sk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785485511; c=relaxed/simple;
-	bh=PAhTspuxARsiFdMDzY1HhwSSfPM9vfrBUNFDBPt6bAg=;
+	s=arc-20240116; t=1785485848; c=relaxed/simple;
+	bh=9HkJu16Qqme057qDmoBv9OKkWN/cksyuO4OQj9OkXZE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a9EH3Aqy1PExHcRXlwZoixgowVZuAZy9Gn5+W0RwZwYfUC4+UZbpI4pLhoDCakIvaLq7oN4E9E/+iwGbnW0GDGSqrSx8JyI6Xb/qJBNtioa0+XCy0Uy/wWsf/8C9SGjR+H3/EDeiYXhKSD6G0uf57gUXjYwgzVAKz5EC8AyxQ0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Qb9LvaX5; arc=none smtp.client-ip=95.215.58.170
+	 In-Reply-To:Content-Type; b=UNsNEB6+JYqjzbi/XZUBpq5I/tqxVoEOMcM/3AkfJM9r9b8+KPiqZSUdQPFOvwrzkVwQiguPD8J7ktXhDZKJe/0h4sIQmna3PYOfN/eYxEmDx5Dk95bvpO4Tp0Q/1V8X844PxuXznBUO61khVO+XNvSwdCGVGgQXaCbvpTFHBpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=rbhOpobG; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Qb9LvaX5"
-Message-ID: <45781734-3c48-46be-9505-23e4e7580a85@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="rbhOpobG"
+Message-ID: <b6bba308-d5f9-4477-8ad6-a20d8dea1035@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785485496;
+	s=key1; t=1785485831;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lwWCHq+ivWtpMhnOZYHGtprulMhWyq3kqN0Db8XUKDA=;
-	b=Qb9LvaX5R9FnqYC3zdo0EA+ftd0JSfNhvYsECWORosK+rkHTs8dB6KK14OV7itHpIh/IvG
-	IgrZCZ0hhMcx9VDEuphQYL13OieuMGa7ckQw59qXLssRQiWtRk1w8BJonhPND3LQ5IGHl3
-	2mEtWKWkZ7We61oJZSWjVOQ4vG48UELQjCle124eCZ/cS92INjvj1Q4/SNl+ckUAUiFYhe
-	NdwrgQ1CBcPea8+0m0L/vo+FLV32FfJOL8XjymuCos0AB9RthKaVKOO8WZFr9QtCiWULg3
-	xhzDtiZoveDJwXoI43ywi7KrA5YSvtd0ZT0hHUwTbwzINxZle3WqXJS09TPQUg==
-Date: Fri, 31 Jul 2026 16:10:30 +0800
+	bh=+0eF+VRa661pICkMt7IXuV/9YFZKNTGER5IeUQ7iSrg=;
+	b=rbhOpobGblVU4yvlsbem4CfjuhqD7jETNUarDCkbgHEYA1WWajBwuKYu2Qsqd1WbqWnkZN
+	Jqq7jM5JduY9aNwbSDjosAViORSkR6faE91XHP3SFuWC0nX3ON6Ozjs4Xn19F8ZiVe6FNZ
+	g2hXu4NGSEZi45fdGWlOtFNiEd5LZGKAPubeSIAv+LKs+aXfu7UAP3q8dp3LOEmx8wfqwR
+	2STehkGHr21UmHizvh1mqH5b27ehWttH6I0qEok5/+Ku3aW0M8712M2j4ev9UzXZh+MRQ0
+	wpM572jRCXGCvT/k9SeWdaVm2f32PrJH0lDRlvhiH1yNgAvEEv813Mya/xbL3g==
+Date: Fri, 31 Jul 2026 16:16:09 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,7 +50,9 @@ Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Thanks for your patch. This bug has already been fixed in the 
+ksmbd-for-next-next branch:
+https://github.com/smfrench/smb3-kernel/commit/35e11e324a2f97d2974ef08d308063c9c5f9e9d8
 
 On 7/31/26 15:20, raoxu wrote:
 > From: Xu Rao <raoxu@uniontech.com>
