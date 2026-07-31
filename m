@@ -1,32 +1,32 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24693EC824
-	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 11:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA4C3624D4
+	for <linux-cifs@vger.kernel.org>; Fri, 31 Jul 2026 11:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785498687; cv=none; b=npbSXNY4zh0f1kXeIn+0Kb9cDc+nXsn8c2X91BsA2wf40M3YT58IAlOtlFJXGfmPTIzkZktaH6GaA1VPCfTr/3L2WQUu4uYQ3XTWNyjhu1zwxVDcgqJ6/hajfdOBv/8AeYATHBaE/XlOef42irjf6lFzYGV1XoD+0jqdm2l6mQo=
+	t=1785498693; cv=none; b=LudYOi06SwftZu96DTU4ai5CW7b1uCojSg/tzX6yyDTUHaGgDmrxKFR2xu1on3xm9BsLNlVrxSLEBHrMJWwSzX/TBjhOe6GeIcaFlsz1dIHqsseaWUnZ1ZL2EsdB57/4ircBAdZAd7bVaajrbNtFq07hMjYuZvd/YI9mR/dmiuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785498687; c=relaxed/simple;
-	bh=CKZWt5jyPIQqLZjyXZZt0zO4JsWowHNpOwOmOLEUJpM=;
+	s=arc-20240116; t=1785498693; c=relaxed/simple;
+	bh=5Ukx3TtLPMVqlyL5YrfmUSrEv1gpSeE8d9eyIPCmkBA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ek6RI3ZmxNond/1pg6O3bP4jcNosnkrp43kqbm+N0eq6VzLJoKIWsY0fTlzAYRFucOkcGHbztbVoAIdSzbGEFBItm5+JsVLUdKMABJkqpDGOUZagffJ6yHeMpLknHfjKm0bwto8YUd/fNz9Lqr7yXdhPq4LH3wPIEsnkkxCem4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v5z5dAby; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=mICUJi0mXaj24jbRvl84GsNfEljhOUc6b0tk/q/hAeFS4OLeH8lAFe6iw2rAKFjYPvDQP2qFVtUVGFBV1MfQCIDQHuzCUq9HUz/M2HP66hWGfKLoqOnbMG5h3PLwNZwKxPVFeMuC/NkYyNkpkjubfBm3bn3H5Ead88Rk+OJP/d4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oMqN2GEb; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v5z5dAby"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oMqN2GEb"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785498683;
+	t=1785498689;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NT2a2DC16QV78szZFV0YiOymX+BArOf+J7Vg7GUrkdk=;
-	b=v5z5dAbyABWK9c9/DloY3Fh4H7u28SjDE8QxHjLnmFjc14XlNA5Zg0N+yEi9Bv6DH+qghz
-	pWi6t8WRILKCgaQtz5ZK7chS3eSvIBD2IKnyTBzItolAlyyBcy31OKGk2W2bkAkIr0ta2Y
-	MtAWuSP0DQ54u0ox9m35pMt9tqN73mI=
+	bh=OiuSIrWDDDXZo4FWxUoAJNYjYw9pLmR5+xT2K6asNwc=;
+	b=oMqN2GEbw5Cd8vw5BsNYSb/O7nVoCV+ukNVU18sEdQX29Ivm1BH+iM9F+4OA6TmGB0Q1re
+	oMenaoOaiWfJwnwQbVX1+dDCwKZC1W9R+Zti0c6wkSEr4VJux2otcAFMeL5WB1AtZAB/Ao
+	ZO5iXBHiALgtqyn1OsuTzDhhZmfCXEY=
 From: ZhangGuoDong <zhang.guodong@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -41,9 +41,9 @@ To: smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org,
 	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 5/6] smb/server: call ksmbd_proc_cleanup() on module init failure
-Date: Fri, 31 Jul 2026 11:50:07 +0000
-Message-ID: <20260731115008.111211-6-zhang.guodong@linux.dev>
+Subject: [PATCH 6/6] smb/server: preserve error status in smb2_handle_negotiate()
+Date: Fri, 31 Jul 2026 11:50:08 +0000
+Message-ID: <20260731115008.111211-7-zhang.guodong@linux.dev>
 In-Reply-To: <20260731115008.111211-1-zhang.guodong@linux.dev>
 References: <20260731115008.111211-1-zhang.guodong@linux.dev>
 Precedence: bulk
@@ -57,45 +57,38 @@ X-Migadu-Flow: FLOW_OUT
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-When a later initializer fails, the unwind chain releases resources
-created after procfs and then jumps directly to class_unregister().
-Returning an error from module_init() leaves the proc tree and its
-per-CPU counters allocated.
+smb2_handle_negotiate() records specific failures such as
+STATUS_INVALID_PARAMETER or STATUS_NOT_SUPPORTED.
 
-Fixes: b38f99c1217a ("ksmbd: add procfs interface for runtime monitoring and statistics")
+Fixes: e2b76ab8b5c9 ("ksmbd: add support for read compound")
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/server.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ fs/smb/server/smb2pdu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 19630ac53235..0ccd123ba418 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -630,11 +630,11 @@ static int __init ksmbd_server_init(void)
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 4bde5ab2c881..9b64e28b5d56 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -1722,7 +1722,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 				    KSMBD_DEFAULT_GFP);
+ 		if (!conn->preauth_info) {
+ 			rc = -ENOMEM;
+-			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+ 			goto err_out;
+ 		}
  
- 	ret = server_conf_init();
- 	if (ret)
--		goto err_unregister;
-+		goto err_proc_cleanup;
+@@ -1817,7 +1817,7 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
+ 	ksmbd_conn_set_need_setup(conn);
  
- 	ret = ksmbd_work_pool_init();
- 	if (ret)
--		goto err_unregister;
-+		goto err_proc_cleanup;
+ err_out:
+-	if (rc)
++	if (rc && rsp->hdr.Status == STATUS_SUCCESS)
+ 		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
  
- 	ret = ksmbd_init_file_cache();
- 	if (ret)
-@@ -680,6 +680,8 @@ static int __init ksmbd_server_init(void)
- 	ksmbd_exit_file_cache();
- err_destroy_work_pools:
- 	ksmbd_work_pool_destroy();
-+err_proc_cleanup:
-+	ksmbd_proc_cleanup();
- err_unregister:
- 	class_unregister(&ksmbd_control_class);
- 
+ 	if (!rc)
 -- 
 2.54.0
 
