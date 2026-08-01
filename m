@@ -1,103 +1,76 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813864334AC
-	for <linux-cifs@vger.kernel.org>; Sat,  1 Aug 2026 10:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2917929D291
+	for <linux-cifs@vger.kernel.org>; Sat,  1 Aug 2026 14:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785578461; cv=none; b=by+MbL6lkGMbdHhsd5yGSKSMtNDeJJdTgy0SoaJGyLKZiDI0+8dbNQIKh9fph9Sn9nCeVev+FshmXNsOar1DDg6tVvOULlhT08D3HbOcaMym6dk/VLaJ/Yzes/ITufADMnv95X8wGwdx1DhbzIXgIgFm5RmLr8wIooVTsrSTBp4=
+	t=1785595151; cv=none; b=u1TZm4KmA6lJdKvyYKlhdPSxMvqlw/Iko7M3fPRDtLnkTePRcBgFComxZJeCB0sScTtr1+kUYOzCRGMZdCMLFDz9kcBgSOgi+qR9uzjY1yKfFps8Hj0ktOZT1wSCe6QD456Ar7qwuUaIN3AVkSrybW5QrftDwTw5qfskPnKyjDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785578461; c=relaxed/simple;
-	bh=84sFYpWQohbdOxYAKl2x077gQ6yCA/HHyyV2Jlieqmc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MJeK1h8GwE/9qT4XdBSDGITLTRkvwXvNRTRBNBlJthG32xbt4B3cK7HbckxnBQvE7lzQcDHIXga3xXjVkgKFh13u08UWeGr07dn695Sa2Ud76fxmKppvo4vNED+1eZMR3W/UfZcanHnfyavi2Ame55NC877J7nD8FU3mTYGH/sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=LaJU7OvU; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1785595151; c=relaxed/simple;
+	bh=0wIdHO2KKlqQbHv/U925krSvecRhBLJj9mTUO4kZP7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EIQOjeP62WgScF1k+NFSUXwlngJcn5ySCMWHC9Vbbi/qC4VKAlhf0pmhY/HBuitsLSxvZQbWHayP/HMaCEFGEiK5Uhmq+hsnkCiIFtoVfRK37wVNcR5K9HewQu9ykKivrK7kiVAyt3v3RE/Al2FXNIrUTJeRTvwe3UqDLjz+8KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuaT6hFI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="LaJU7OvU"
-Message-ID: <e467c520-a2a6-47f0-8b82-626ef1cad26b@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785578454;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ePVhJxZCOPwOORxFsyBf+B9mCI3Q7NZfAL69S47na/o=;
-	b=LaJU7OvUwfzMJpbX43Mif0KAHohlQCotnrkmYmvoutgZzZ91H80+A7J7Cam0MobpKgRpO2
-	+iuUyi84zptzcR4Df6AAgfciLgclwo21PHLA2HvkQMar8gc2B/PplmjvhcSlAd4Bpnhk9W
-	/hVcJwidyJoRt4si1VOjAouG+Rnq03n6J+OhsWqaUVHOVQhHDHu9bcJCQPAR2OpmMOyvDP
-	1kQUR6TTkdDZC4DtYrsDlFyCwE1NZJLU29Skoyg1gnH5XF+6z4oKI45yxgKxLeHeny1V6X
-	nsH4dR+8dVzSTCz3V/w1GBQlXj8+qQlSL+0ZAuwzL3dGwb0EWZvjzgS3bFvY+Q==
-Date: Sat, 1 Aug 2026 18:00:54 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuaT6hFI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F7B1F00AC4
+	for <linux-cifs@vger.kernel.org>; Sat,  1 Aug 2026 14:39:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785595147;
+	bh=DlXrAqZhx7YtEPMTf+Wj82LYchJ2YfNEWO9CuOFxC9c=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=MuaT6hFIlXAZKsae4PqMTowwCAelmEHcGP5YYFDVrk/Tn3i/O5FNK1WGNj3BFRpRJ
+	 Ax2yZtBWbe+Z23Hric1JKS4zPuMtjlcdfz7IwDtN2diju+iCIbfzoTZiTRMBSmxtnS
+	 og1tZ3g5n/i5k/WqTS4clW+CC3YrwbDurU+NbjRjJiHg7V0YfrzuCRVgquEx37Qa6L
+	 SkfXPI2siEeQvTYS9MjNC0mkFTz6wKKao4EoCHOhKG5upjxOVt3fVEG8Of7qZj+Als
+	 rD3Om56/QEEPgVG3MgVenII6JsuUaWoTsO1cdygpTIMJl97THxgOAx2oqNnvhJ+4m2
+	 8xcQ+uR85Avlg==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6a0794669a6so3010500a12.2
+        for <linux-cifs@vger.kernel.org>; Sat, 01 Aug 2026 07:39:07 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzWsJHM4OlCQO6ZMiTHNGdqAEF/uc8mdC8FV+68k2Co0YIX0b6s
+	nLRZEEwUM2f6FmP3TPtZSg0WlmpoLGo9R2A00uZUCak793+s0HZQvCudu4es7DDdUfMDulyM64j
+	aq4Gwfts80D7Q9ZbKydhfLYQ1M7O6/4s=
+X-Received: by 2002:a05:6402:455b:b0:69c:76c6:9bef with SMTP id
+ 4fb4d7f45d1cf-6a0a7c88f90mr1962748a12.10.1785595146347; Sat, 01 Aug 2026
+ 07:39:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] ksmbd: validate compression Flags before kvmalloc
-To: Anatolii Shumak <anatoliy.shumak@gmail.com>, linkinjeon@kernel.org
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Tom Talpey <tom@talpey.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
 References: <20260801051953.74245-1-anatoliy.shumak@gmail.com>
- <20260801051953.74245-3-anatoliy.shumak@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260801051953.74245-3-anatoliy.shumak@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20260801051953.74245-1-anatoliy.shumak@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 1 Aug 2026 23:38:54 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_V0d7bheRZQVCprcSOKUx=r-YxEB8TxP8UOcnjuGk5ig@mail.gmail.com>
+X-Gm-Features: AUfX_mzqGrjcFSoDcZvVuH6XqMonTgJjOV1Edyib9URB0alXF7NdAhrgltyExsQ
+Message-ID: <CAKYAXd_V0d7bheRZQVCprcSOKUx=r-YxEB8TxP8UOcnjuGk5ig@mail.gmail.com>
+Subject: Re: [PATCH 0/2] ksmbd: harden SMB 3.1.1 compression receive path
+To: Anatolii Shumak <anatoliy.shumak@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Fixes: a08de24c2b85 ("ksmbd: negotiate and decode SMB2 compression")
-
-在 2026/8/1 13:19, Anatolii Shumak 写道:
-> ksmbd_decompress_request() allocated the decompressed request buffer
-> before smb_compression_decompress() rejected unknown transform Flags or
-> chained mode when it was not negotiated. A remote peer could force a
-> transient multi-megabyte allocation that was immediately freed on
-> -EINVAL.
-> 
-> Validate CHAINED/NONE Flags and compress_chained before kvmalloc.
-> 
-> Link: https://github.com/namjaejeon/ksmbd/issues/529
-> Signed-off-by: Anatolii Shumak <anatoliy.shumak@gmail.com>
-> ---
->   fs/smb/server/compress.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/smb/server/compress.c b/fs/smb/server/compress.c
-> index 821299888ad3..7e13cae705e2 100644
-> --- a/fs/smb/server/compress.c
-> +++ b/fs/smb/server/compress.c
-> @@ -46,13 +46,22 @@ int ksmbd_decompress_request(struct ksmbd_conn *conn)
->   		return -EINVAL;
->   
->   	orig_size = le32_to_cpu(hdr->OriginalCompressedSegmentSize);
-> +	/*
-> +	 * For chained transforms the top-level header is only eight bytes; the
-> +	 * Flags field overlays the first payload header. Reject unknown Flags
-> +	 * and unnegotiated chained mode before allocating the output buffer.
-> +	 */
->   	if (hdr->Flags == cpu_to_le16(SMB2_COMPRESSION_FLAG_CHAINED)) {
-> +		if (!conn->compress_chained)
-> +			return -EINVAL;
->   		out_size = orig_size;
-> -	} else {
-> +	} else if (hdr->Flags == cpu_to_le16(SMB2_COMPRESSION_FLAG_NONE)) {
->   		offset = le32_to_cpu(hdr->Offset);
->   		if (offset > pdu_size - sizeof(*hdr) ||
->   		    check_add_overflow(orig_size, offset, &out_size))
->   			return -EINVAL;
-> +	} else {
-> +		return -EINVAL;
->   	}
->   
->   	max_allowed_pdu_size = SMB3_MAX_MSGSIZE + conn->vals->max_write_size;
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+On Sat, Aug 1, 2026 at 2:20=E2=80=AFPM Anatolii Shumak
+<anatoliy.shumak@gmail.com> wrote:
+>
+> Hi Namjae,
+>
+> As requested in https://github.com/namjaejeon/ksmbd/issues/529,
+> please find two patches:
+>
+> 1) Reject Pattern_V1 on decompress when it was not negotiated.
+> 2) Validate compression Flags before kvmalloc.
+>
+> Tested on 7.2.0-070200rc5-generic.
+>
+> Thanks,
+> Anatolii Shumak
+>
+> Anatolii Shumak (2):
+>   smb: compress: reject Pattern_V1 when not negotiated
+>   ksmbd: validate compression Flags before kvmalloc
+Applied it to #ksmbd-for-next-next.
+Thanks!
