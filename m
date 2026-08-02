@@ -1,76 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2917929D291
-	for <linux-cifs@vger.kernel.org>; Sat,  1 Aug 2026 14:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FF21F4181
+	for <linux-cifs@vger.kernel.org>; Sun,  2 Aug 2026 00:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785595151; cv=none; b=u1TZm4KmA6lJdKvyYKlhdPSxMvqlw/Iko7M3fPRDtLnkTePRcBgFComxZJeCB0sScTtr1+kUYOzCRGMZdCMLFDz9kcBgSOgi+qR9uzjY1yKfFps8Hj0ktOZT1wSCe6QD456Ar7qwuUaIN3AVkSrybW5QrftDwTw5qfskPnKyjDs=
+	t=1785631715; cv=none; b=i/MXQcZSTXYJjRAoYLEtabyQHkk7um+7jIhpdCD9cf36s9hT8JhyhRvabir56gFHgXOw0mjHXHW002jANNPuHFWF6sSoqoFu2kQBOcRpdXcu/FUzd2+ZoqKnnDyidYyFNtL7KmHc794Z5MSVbxxD7jetI+JF1r59uyyuJxHLgYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785595151; c=relaxed/simple;
-	bh=0wIdHO2KKlqQbHv/U925krSvecRhBLJj9mTUO4kZP7w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EIQOjeP62WgScF1k+NFSUXwlngJcn5ySCMWHC9Vbbi/qC4VKAlhf0pmhY/HBuitsLSxvZQbWHayP/HMaCEFGEiK5Uhmq+hsnkCiIFtoVfRK37wVNcR5K9HewQu9ykKivrK7kiVAyt3v3RE/Al2FXNIrUTJeRTvwe3UqDLjz+8KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MuaT6hFI; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785631715; c=relaxed/simple;
+	bh=x49mLrLcbwjonBMEevtx+uckIENW2jagrGAFTjCOiGk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k0ZyLqcSg1My26N8sNZ7cYkO0oK1T+JYwq8M/QIRZxCbULRTRoa1mwHA6/R7+B3iUZVLLF6W5gIm3MPb94AjzimdcYXo4l3Vtqffl/BqryuwV5lAuMhcoBJH6HzZhZ2OtqhfibYVGY4iuPbmM4z/Guv+qj42KsBztIWeXSpgnH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7AG11IU; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MuaT6hFI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1F7B1F00AC4
-	for <linux-cifs@vger.kernel.org>; Sat,  1 Aug 2026 14:39:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785595147;
-	bh=DlXrAqZhx7YtEPMTf+Wj82LYchJ2YfNEWO9CuOFxC9c=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=MuaT6hFIlXAZKsae4PqMTowwCAelmEHcGP5YYFDVrk/Tn3i/O5FNK1WGNj3BFRpRJ
-	 Ax2yZtBWbe+Z23Hric1JKS4zPuMtjlcdfz7IwDtN2diju+iCIbfzoTZiTRMBSmxtnS
-	 og1tZ3g5n/i5k/WqTS4clW+CC3YrwbDurU+NbjRjJiHg7V0YfrzuCRVgquEx37Qa6L
-	 SkfXPI2siEeQvTYS9MjNC0mkFTz6wKKao4EoCHOhKG5upjxOVt3fVEG8Of7qZj+Als
-	 rD3Om56/QEEPgVG3MgVenII6JsuUaWoTsO1cdygpTIMJl97THxgOAx2oqNnvhJ+4m2
-	 8xcQ+uR85Avlg==
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6a0794669a6so3010500a12.2
-        for <linux-cifs@vger.kernel.org>; Sat, 01 Aug 2026 07:39:07 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzWsJHM4OlCQO6ZMiTHNGdqAEF/uc8mdC8FV+68k2Co0YIX0b6s
-	nLRZEEwUM2f6FmP3TPtZSg0WlmpoLGo9R2A00uZUCak793+s0HZQvCudu4es7DDdUfMDulyM64j
-	aq4Gwfts80D7Q9ZbKydhfLYQ1M7O6/4s=
-X-Received: by 2002:a05:6402:455b:b0:69c:76c6:9bef with SMTP id
- 4fb4d7f45d1cf-6a0a7c88f90mr1962748a12.10.1785595146347; Sat, 01 Aug 2026
- 07:39:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7AG11IU"
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8edda5d56a5so23082876d6.3
+        for <linux-cifs@vger.kernel.org>; Sat, 01 Aug 2026 17:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785631712; x=1786236512; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=NB5pk2K65CtPzU2Dl5H9xSCf9VcViIIeQF2ExWS/gJ0=;
+        b=T7AG11IUeei41LTv2ELF4gcYi9oH2PcnAmLcv6hV8xIU6aTPllpVEjqBaXfVplTwVF
+         ShRkysCWEsCBhVNoGDV2cKwwdY2YT4QoN/tFMMXY9f58HeTTkBZuwLQEMkFfUDym2rzx
+         fA7eQDiNOJst8EAVUqJyHXWvSNfvn4i+zuQYsbfc3M2iFrrGy264xIyBcLkCS4dP0b3j
+         KtOBElibAqtuH0PCoihQATnIKb9DG43T4GxxYAvwbaPC/Wrv02EdbxNEW9EHAig72PID
+         bzxt6aLhwzH8CEpvcNn7ut9oHwTAhsLRLwsL4tD2LK3LdWGofCLDAONyYu+bw93JybPF
+         tgmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785631712; x=1786236512;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=NB5pk2K65CtPzU2Dl5H9xSCf9VcViIIeQF2ExWS/gJ0=;
+        b=MY5sjZzXYflhXKIeqZfCMR1bW0nxyXe+4Ap2yQruVgRAQ29WbGo4EG3SzycgvXZXfL
+         NPyVVbCVFbuWRrC34qLGACZpUFtYgFUHq2m4Da1/7stE7wfhVQoOfmsJEh9oNXBvp0W7
+         Qgh5LV0aCIQZvh4AkmecvnitCR64Q8giA/4rZ7CGLFFAVUPvzYUnv4QIl8i4wWBcyU5I
+         BZxU4S3lxj1SR/yDnv1HabanXjGWFQUv4GqQm+gzwy5n/yPJUUFDTG62/yY7TVvC3Mnf
+         mf3c3pVkFrjLHdUeiMxxtHnjzsNIUZ9JzsnAec8u0VbAyiQbqHyGRShAWwSmURIcc1WD
+         D3cg==
+X-Forwarded-Encrypted: i=1; AHgh+Rpa0hPVOGJzYkEAEsHts3kH/WuAdC7bNXPlUy/k5OLoNYzBWkRABupI0XjApwtv5auIztuq/RTmWO6Z@vger.kernel.org
+X-Gm-Message-State: AOJu0Yym8VuG+1vuX2pyy5ArJhagk0Zx5Sbc30gj3ta9mGBWmZxKY6n+
+	sqCAMy2ABryNbZXfpRFFwK8pRmfhwD+z8KFkzx6MSG7lRZDMhF6g6d9e
+X-Gm-Gg: AR+sD13aQPaCF3W1N+SWfQCj5TuCfroZ9FkbMZK1vU5gDgXngWe2A7vycrNjPbrxacv
+	yNYJXIJRytpl9nm/gnpecWRzorYbCEh+dUUDUe7yvH/F+/yyS4QMIpDagJ+Me40wMLWJ2eU3k5P
+	VV/TF2VG7mQJnyOG7jU+Xh2sHn1gHsukfhxCUYzcYVKMYLltcnftbIwI04qBemrUBhwMRslR4Vl
+	OqQyjaouthwdQ6ETIWHGFRUZTxMqoBrr9fN/KR8rGKfoyBp0nipJagFtCtG2Rwaoy612yY0cLHl
+	+FmW04n7kg4zXkZcVviIqV1RqXgZVxJtAe2he0/TuWR5dEEUx+ULIj7JeI0nciaNd1jT8a0wksN
+	izohC0S1V7ZdJT3gV/fNZ6dWrBZe2dSj5nDXJKw/MojIUb7Z6DUbItT7u8obYtJU26bd6FIleRW
+	QhfeaWAnzd7lyeGwJqv/L/WujWN0Tmb2dp5KT0JvB1w2IEzb4I6GhwjXFlZSLZ/YdPWFyCdzOLT
+	e/oRgdajRd4A1eObA==
+X-Received: by 2002:a05:6214:53c8:b0:8ef:867c:b8be with SMTP id 6a1803df08f44-90849566facmr113811536d6.8.1785631712494;
+        Sat, 01 Aug 2026 17:48:32 -0700 (PDT)
+Received: from i4-l-hqh5357-03.ad.psu.edu ([130.203.139.71])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-908435ed43esm44027136d6.40.2026.08.01.17.48.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Aug 2026 17:48:32 -0700 (PDT)
+From: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+To: sfrench@samba.org
+Cc: pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	Shuangpeng Bai <shuangpeng.kernel@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: Fix use-after-free in cifs_try_adding_channels()
+Date: Sat,  1 Aug 2026 20:48:09 -0400
+Message-ID: <20260802004809.1301715-1-shuangpeng.kernel@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260801051953.74245-1-anatoliy.shumak@gmail.com>
-In-Reply-To: <20260801051953.74245-1-anatoliy.shumak@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 1 Aug 2026 23:38:54 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_V0d7bheRZQVCprcSOKUx=r-YxEB8TxP8UOcnjuGk5ig@mail.gmail.com>
-X-Gm-Features: AUfX_mzqGrjcFSoDcZvVuH6XqMonTgJjOV1Edyib9URB0alXF7NdAhrgltyExsQ
-Message-ID: <CAKYAXd_V0d7bheRZQVCprcSOKUx=r-YxEB8TxP8UOcnjuGk5ig@mail.gmail.com>
-Subject: Re: [PATCH 0/2] ksmbd: harden SMB 3.1.1 compression receive path
-To: Anatolii Shumak <anatoliy.shumak@gmail.com>
-Cc: linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 1, 2026 at 2:20=E2=80=AFPM Anatolii Shumak
-<anatoliy.shumak@gmail.com> wrote:
->
-> Hi Namjae,
->
-> As requested in https://github.com/namjaejeon/ksmbd/issues/529,
-> please find two patches:
->
-> 1) Reject Pattern_V1 on decompress when it was not negotiated.
-> 2) Validate compression Flags before kvmalloc.
->
-> Tested on 7.2.0-070200rc5-generic.
->
-> Thanks,
-> Anatolii Shumak
->
-> Anatolii Shumak (2):
->   smb: compress: reject Pattern_V1 when not negotiated
->   ksmbd: validate compression Flags before kvmalloc
-Applied it to #ksmbd-for-next-next.
-Thanks!
+cifs_try_adding_channels() takes a temporary reference to an interface
+before dropping iface_lock. If cifs_ses_add_channel() fails, it drops
+that reference and then increments iface->weight_fulfilled.
+
+A concurrent interface list refresh can remove the list reference while
+channel creation is in progress. In that case, the failure-path
+kref_put() releases the last reference and frees iface. Updating
+weight_fulfilled afterward then accesses freed memory.
+
+Increment weight_fulfilled before dropping the temporary reference,
+keeping iface alive for the final access.
+
+Fixes: 6aac002bcfd5 ("cifs: failure to add channel on iface should bump up weight")
+Cc: stable@vger.kernel.org
+Signed-off-by: Shuangpeng Bai <shuangpeng.kernel@gmail.com>
+---
+ fs/smb/client/sess.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index de2012cc9cf3..7cf7dd104f7c 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -233,9 +233,9 @@ int cifs_try_adding_channels(struct cifs_ses *ses)
+ 				cifs_dbg(VFS, "failed to open extra channel on iface:%pIS rc=%d\n",
+ 					 &iface->sockaddr,
+ 					 rc);
+-				kref_put(&iface->refcount, release_iface);
+ 				/* failure to add chan should increase weight */
+ 				iface->weight_fulfilled++;
++				kref_put(&iface->refcount, release_iface);
+ 				continue;
+ 			}
+ 
+-- 
+2.43.0
+
