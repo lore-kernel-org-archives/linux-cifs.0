@@ -1,142 +1,78 @@
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85583093DD
-	for <linux-cifs@vger.kernel.org>; Sun,  2 Aug 2026 18:24:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785695083; cv=pass; b=WOsKTFbwggVh0tPSeHBZMUDthZGF5cpwHkmVbEOogdAR/Ay3rv45Gyzxjs94Ps4Tmpj7XA6gf7fvwUr7ZxckGOZbRHvuAZA1nIfCZBRBNx5S/1KHj7wE5c/tDmDZ9IVMBVobFB1H4goBRuCOkT8CpUPsdu2+j1md0DNq42R813A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785695083; c=relaxed/simple;
-	bh=S3hGAi3pbyOkEQqEsCsHkGp4kTIe/5H1Igrb53l70QY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DD539CCF3
+	for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2026 07:01:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785740464; cv=none; b=sYTK9D6/aoRDANeHT4WZTEatjGYVBFJ1Ymtk8JIvZYku6oVZN9FLS60fsqjqv6MjIXsm9wMeMJpXXQJprrPrqPIjYfuLtt54WBCVbvbxnopTPJvdhVYHyV5T+FQ0u0Sxn2bcfJpLrrlH91wAxWjGKaYhw7udbIAfF/1Rpu4TGPc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785740464; c=relaxed/simple;
+	bh=dEHSWkHDEYYFqS0EQnRe9AddR75tIlHWZhiCe2Kmeeo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cs0tNab06Aq5vt0tc8CELom13N9rfW6/G9lwYfbbXkHeJFSBLCxPGAVM69WkLUFJZVVjayWWEekca7jbLcxhFDhk2Ubt+ZVwwR7Jom++4iNLU0JJrpGSaKtSpRvFi0gK638juBIDbwH//wVqEX0czDPBAFQn7m1Y6RR85GxXfP0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qYzgsTgK; arc=pass smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=bKa/9REANB/FjtMMJDckw5Weo0VhvmxyXaTWbOpWnGQrmO6uWW/2l3NkJWr+1vzxU4mz1jWfJQvDJ5No+L5vG+I3LT1CuQc9KDXMMgQ3C2PGeDKKAWnMw4N95lXYOR4exNNHi0Dipei/9pQXYlBrODWLkusz78D/3zTmk0TdG1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FjHHhf4E; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYzgsTgK"
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51c1372f84dso14586821cf.2
-        for <linux-cifs@vger.kernel.org>; Sun, 02 Aug 2026 11:24:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785695080; cv=none;
-        d=google.com; s=arc-20260327;
-        b=k0DCYsBJTVrNorg/n2DpBNsdmUXdoqLFDaMs/yDkJ+UIBi6aaV2YgtZs3c6L52Eeow
-         26dvkoLmhlwteQF5t+zWkTSsQkVKpfYUSutMN1fXCsEwQUfztTHym/WVTYFQNLkwnGeL
-         Nl/ZT5scZCIZni4hpL12ItbSw+pbov8qrbZAj4OFY4npBbyYK3REme6bSk2GjO4/35Qb
-         abEeLlKI1vg/OMu3r78vfh6e3cRW3qGEtueM3/5X4G8iSFbILZWnD4eb8R9Gt554RRz8
-         EYX3X1XYtVE03Lmc5PwCeRiasS0uDqaWZH0DP7dl2PMzIrCuqaK5ITaMV/JOv/1OvoBV
-         lt4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=qzuqHjhcdUgLDDxnbPa7JUIcXrZvYqrd5LXpYqrxwNg=;
-        fh=szN9/maq/p/Sc7PaJx3odEacn9erdayd+YQaalp4InA=;
-        b=chiY4Z7G8l90vmxIWL/9m+OmWyHjL0ZSGlJmFdEqy2T4PxGe8lqfYSHTjWn26/wGwo
-         C/yH1O8WlUYRBN/vzmvudSqVqOZ76gvGRetRHxmGybSeoetSWkJdTIKI22YdPXDSGMJg
-         oZcivwKgDIRObRPyueywyLtNBESofBhpe1JXOYtjZ7FfPyJBHQTSs/ER2E75P91nF1Td
-         nmHMqDZhdNotRHncbu1iGXHOCNuSdYnsWT0mp7wMs/TVPU//aqOHeU1xlolYP5O8ICxm
-         iGpFusYkmw79aDxVKERieMd9oVq1cnEsGYbn8NaQdRXAtIkz8s2iuyqyo0EgfEasVW/Z
-         DC3g==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785695080; x=1786299880; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=qzuqHjhcdUgLDDxnbPa7JUIcXrZvYqrd5LXpYqrxwNg=;
-        b=qYzgsTgKJkJW423SKcGPgmqpmkEIqcXk2JphWUL53rce4bX9GDNIEJQcU8pu2CWzxk
-         ggQ0PfG6tn5NSYulP41lXPMbVbyL0tjp2lBb7ukXY91TBmz4gBS8ni5VmaerLSNj1j+h
-         WNi6a1OJdYT4znTv+Ki5V9C/K2V5L5OSbDcf76qS6BlviyHsxlJteW/F5HVe24ehy3Ke
-         tyHDC6n2e4Kt++C9KiFVKB5AMkKXdzdLOWXIwYBV8LSnF+sksoFwu0eTywyhNM5N5TLl
-         7imN+KeiGS7V7owe98UYwyp+krPNX+baCEaoeJcAnV+P9/ZIcaaHAGfOd2hAvfmRKcW1
-         3nyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785695080; x=1786299880;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=qzuqHjhcdUgLDDxnbPa7JUIcXrZvYqrd5LXpYqrxwNg=;
-        b=Jq4LCjUQioGOP7DMiYk6mmVAicKh6PQLqMwb93aOMDdAWTkIFV9L24ANSY/kzE+JVT
-         QAq77KBi2w757W1gEYdwsAVeOLpByENRswz61YHYPwBByzQukyLut8iU79gkfu9uoFYa
-         kyTNf9o3UMQBYkUl55o3s8vmF2CaggRc0apO05fjFYgAwildnR2c8tudegz2q7m7mf3f
-         6vV4wkQWvoEXzPIi2mTGbDmtt/pmfk8EZ2KFt7iMXuygZJHfwz6Y5p8jp7U1oEKvCeF5
-         PttK64jnfpgaZN7UlHrGS+J5cM3ErrWE5n492j6ME+VkqxYruOY7JIl3WHOkRmbgkFYQ
-         Yuew==
-X-Forwarded-Encrypted: i=1; AHgh+RohFFxe8pfq93ukm080PZ2f9m3avmSHAexmtPe4JqZ1m+Pq4wuXsTvZtzHwcjmXOQU65GEicXtQA96V@vger.kernel.org
-X-Gm-Message-State: AOJu0YygH/B0MpQGLf/MQ5McVvjplFVqLuaqD1IBqyYZeeZ/OOA02GPo
-	9+mBRUugcow4Qps2ZiH3Uw9DVP1/T3aWxaJH54YZTJXXNPAR998oI6CO9ZbkLfTQlhd39LwznIn
-	zAYw/YtJmBycTWADpypWM6LUoxGdQTgM=
-X-Gm-Gg: AR+sD12ueSjTYXXueOsay+MOft0544MxWgnUgGGv5XYI7AMxV1/48xRiMOuVubAOfOm
-	am7UV5uu0DoULwKsW5QesRSH/rzoSTOhxb+GDkH+RFPKa8BBueKEOBnfgvNahN6hsVDbTwoknns
-	ShoT06HBP6n9C/Q0vUc8mc1asqDJJHvXIk6S1l5esSQUxJnRbEICtikkH8Pm7Y9BkRizanoUW31
-	CCPeIR0eXIEHGn3mhy+qgzuIS/CbXx73lQNzt+UYVS8zTmhWn8w2dNqnSdWt6KRpFRzR6fNAyiI
-	AGuzKI+BkTRRy2QAvsmeDxI3AUNZh/gfcWsy9R5xjhER1vq4R7bZLa96oGhkfipgsBSuhX8cmeC
-	JP3X/r4n7GlH5paI+GBec1h1s8xVef2AlavAcCVGRzO8m27O1WRbi6SE8HuCyi7tQ3WK7gUHZhR
-	MoL8AjYnr5JywJspLTSFtc4KgiNVO51KT9mzwKD4BZYV8RwlM0Wr2vsDgf3bA=
-X-Received: by 2002:a05:622a:2cf:b0:51c:805:1be3 with SMTP id
- d75a77b69052e-52b56795c2amr146778511cf.31.1785695080560; Sun, 02 Aug 2026
- 11:24:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FjHHhf4E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 927FF1F00A3D
+	for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2026 07:01:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785740463;
+	bh=dEHSWkHDEYYFqS0EQnRe9AddR75tIlHWZhiCe2Kmeeo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=FjHHhf4EnjbLPtknDRWd6G4CHFpejAEPEVXceEQrQi2HxHZPvF1QMixSb8oytdaUj
+	 oxySLf9pOe60qoLcBfX7UeAdPNpgOIirsSvY3gMYhZJRpGQrDs0/SkpC8naBke+YFY
+	 p3KVD4CqCymNVyJQc7xeXmoU6BittEuIcZ38A+rbi9cHdm11Uk8raKq555ZHAoooOA
+	 IssEzGEYCF1c+PMMCt9HhEHDx0LnIJB73AbPQtm+3k6kQOyISNEYWzCjwU/QETs8Mk
+	 GeRqpXJBMYqi605dvYxkekcAK0V1nqIN6TqGD4aQYxfINJ+rHZEyWzyvMwDzyoGd09
+	 Wf47rJCDJGWdA==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c167bda216fso450817566b.2
+        for <linux-cifs@vger.kernel.org>; Mon, 03 Aug 2026 00:01:03 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yx7DVsXrGghRbXEHzkqJBYxDnc6h3Rjui0Ihgv11cGdduW7QJ7o
+	NqAwyVn78ry6rjrICWOSWmMRG7SqrqAfYxU5wDWkQiA1+h9L73s2hf5iiAznO6+GDIm7rrRt6Cm
+	m/F8yrS72m1RQAhGNIH1vIyFjuuroCAc=
+X-Received: by 2002:a17:907:7248:b0:c12:695b:8876 with SMTP id
+ a640c23a62f3a-c1fe8167532mr622340166b.5.1785740462210; Mon, 03 Aug 2026
+ 00:01:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260801075515.140004-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260801075515.140004-1-chenxiaosong@chenxiaosong.com>
-From: Steve French <smfrench@gmail.com>
-Date: Sun, 2 Aug 2026 13:24:28 -0500
-X-Gm-Features: AUfX_my2zfRfjhv3_LB7PcaNcZR_GyI_dKc1HJSlwarK5OVCBXKGN1HEP9Tv6Jo
-Message-ID: <CAH2r5mt+trRma4YjjBf8uDs=T_D_r-vSfdpKWak0cn=PMCqP3g@mail.gmail.com>
-Subject: Re: [PATCH] smb/client: show compress mount option
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260731115424.9892-1-g.blivet@me.com>
+In-Reply-To: <20260731115424.9892-1-g.blivet@me.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 3 Aug 2026 16:00:49 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-C8Nr537u7rm531FyWncoA=ZnnZHHai_37-xEup17N3w@mail.gmail.com>
+X-Gm-Features: AUfX_mwe9io23Pm6MI7YrSVdSj-aZ54Hw81TrMpjXhfwOZfymZGfMtnFJJsg5_k
+Message-ID: <CAKYAXd-C8Nr537u7rm531FyWncoA=ZnnZHHai_37-xEup17N3w@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: exempt FSCTL_PIPE_TRANSCEIVE from the generic
+ file-id lookup
+To: =?UTF-8?Q?Ga=C3=ABl_Blivet=2DBailly?= <gael.blivet@gmail.com>
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-merged into cifs-2.6.git for-next
-
-On Sat, Aug 1, 2026 at 2:56=E2=80=AFAM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
+On Fri, Jul 31, 2026 at 8:56=E2=80=AFPM Ga=C3=ABl Blivet-Bailly
+<gael.blivet@gmail.com> wrote:
 >
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> From: Gael Blivet <gael.blivet@gmail.com>
 >
-> Example:
+> smb2_ioctl() rejects FSCTL_PIPE_TRANSCEIVE with
+> STATUS_OBJECT_NAME_NOT_FOUND before fsctl_pipe_transceive() runs. RPC
+> pipe IDs live in sess->rpc_handle_list, a separate namespace from the
+> ksmbd_file table the generic ksmbd_lookup_fd_slow() gate searches, so
+> the lookup always misses.
 >
->   1. mount -t cifs -o compress //localhost/test /mnt
->   2. mount | grep cifs
->      //localhost/test on /mnt type cifs (..., compress, ...)
+> Found while testing generic SMB browsing (Finder's "Connect to
+> Server"): every DCE/RPC bind over a named pipe (SRVSVC, WKSSVC, SAMR,
+> LSARPC) failed right after CREATE. Adding FSCTL_PIPE_TRANSCEIVE to the
+> same no_fileid_ioctl exemption as FSCTL_PIPE_WAIT fixes it, confirmed
+> by testing a build with and without the change.
 >
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->  fs/smb/client/cifsfs.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-> index 1788d93a2522..a1dacc7d8f74 100644
-> --- a/fs/smb/client/cifsfs.c
-> +++ b/fs/smb/client/cifsfs.c
-> @@ -692,6 +692,8 @@ cifs_show_options(struct seq_file *s, struct dentry *=
-root)
->                 seq_puts(s, ",seal");
->         else if (tcon->ses->server->ignore_signature)
->                 seq_puts(s, ",signloosely");
-> +       if (cifs_sb->ctx->compress)
-> +               seq_puts(s, ",compress");
->         if (tcon->nocase)
->                 seq_puts(s, ",nocase");
->         if (tcon->nodelete)
-> --
-> 2.54.0
->
-
-
---=20
-Thanks,
-
-Steve
+> Fixes: 0726814421c2 ("ksmbd: add SMB3 request replay support")
+> Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
+> Assisted-by: Claude:claude-sonnet-5
+Applied it to #ksmbd-for-next-next with ChenXiaoSong's reviewed/tested-by t=
+ags.
