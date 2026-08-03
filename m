@@ -1,76 +1,73 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D038B283C83
-	for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2026 08:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE043ACEFE
+	for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2026 09:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785746896; cv=none; b=re6vFhuqZz0skk0d3jwqkkgn10LefSG3MnAcsglfPipRTWtzPzRPjULzAKgR5r1zT5gXAXbrJKjK+ek2vxhRIcuZ0A28QRe5J5CheEyYwIccFGV1O6DlLPgkfNHPx4roTH3cw1WR0/UbqKK6UIttJu53A9GlQ0ZHxMuuKEYCErQ=
+	t=1785747959; cv=none; b=Rj8NisYEI7x7SMsD4HpUoR0mL5WBpkqjX6g8vRIxoVqHUS1veK/SF/YS/yAHCu/yJMRLON8Nv/cK9tpuqCNpoRX06bj5dr4ve46ZnEJPJTxWroG2capRFGOeN7DIXpOKQmGkJ6fodQ0STu3BX3GotFEdBaBq0pTNs9SfzuxfTek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785746896; c=relaxed/simple;
-	bh=vmQIwZ78xLcr+m4GRvF0L3rqlL4HUbzKoLAzPb0dXT4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Adv+DMx80GHezHVEk/4R32NMp02hpY1yZ54cgx/ohaFk6mPXISsFPWt4Wd5dPqrD5qaKOxcYn75Ej4/1QrOIEvvR4Qy4SyFMUg8nPo3o7RdsLp+QqWcJfOXIfElAXrdOJoyk72hEdJD+WCxBIG5pRG5QS6XhK1gYjuCIesq3WTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BlNbRVPe; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785747959; c=relaxed/simple;
+	bh=mxET1xrYS2V1tsV5C07D2rtWgXJVsz7uu9yO6hKIP7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ab9+oGqBsn3563RfglReBXZNXSgzSvBCPKZk9UoazIePurkSk8HLkGB17JBxUvW4pc4u+m062PsZrpaOINfnIt3DQCs4zT+RpsY3OceniFm1VBINkQQLgBOnIcQPux/6ON+hY7sEkxOfgUxExCcbLwOWmBXcB97vaqpb+yNoTGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=MhKRhtvp; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BlNbRVPe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 633BD1F00A3E
-	for <linux-cifs@vger.kernel.org>; Mon,  3 Aug 2026 08:48:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785746894;
-	bh=9cy3OgJNhxGUKelGxftv9Ml2jZM9PDKUGlLGLz1zbfM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=BlNbRVPedd1i0Ml77qFNdwbyjsUEPlRqruaDpROwoU5HYI4L6lZqI7KCsogQK7S1e
-	 wJKVZS/LSa+sJIzRc2nsdbqRd0kxmiRkeqCwKoMNlas7FTrkoGKoU9Znsnmi3TLQAw
-	 5VNjml+tG1MChl9HPJa6OioFX26WW9vXapwL/Vwoq5zzrqBXvoX73cSxdyqifopeKy
-	 an471Sor38Pqb3wipDchCkeNYN1XzzMZ4s3A363WemPLeSfCDeAley57/7of3XXoAp
-	 ecnI9LBlXVJ5Jgrkkc3/5g3f14BfGRufmiwkdDm7TZEZi33FRgy2zL4DA/T46Pd6oW
-	 RPKloofvfRoaA==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c15ba3a2b4bso371337466b.1
-        for <linux-cifs@vger.kernel.org>; Mon, 03 Aug 2026 01:48:14 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rq0NmqK+hzYVpjbVmywmtRIN+IRkN3KX437E2VKtP5eRtQN6H6YNprPcx8tXKWD0uNsLIjxbdj4p3xQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+9QAdZpIqcvZTHSIsY1zbBBxJad6dcaMCokc37wAffatIG/G4
-	qXWmBe/NZRP1BrfTEZ0KeOIS+z+98n+3jHyohbgwuK3g/10tveOTcpHHv4BiGEQthZ3r/kUouby
-	tqcxvc9osT3SHvs/kKQuSJHMw91JzFq8=
-X-Received: by 2002:a17:907:3cc2:b0:c16:3074:6593 with SMTP id
- a640c23a62f3a-c1fe7ec89f6mr764356566b.12.1785746892948; Mon, 03 Aug 2026
- 01:48:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="MhKRhtvp"
+Message-ID: <84836592-a0c0-4073-8f66-f101b65b21c0@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1785747952;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lkRQesTcBW2G0Ke6PE+JVVmq5U8Zz0J2A1s2YDUMF0M=;
+	b=MhKRhtvpJ1C+/AzVWHdrnQRAKm9VIsei8TZrb1HRb/+/natHYxigxnyaMOLrIZOQqLy8iC
+	OOJxpuSuzNpzXJTb1i1WU9hz/r/dAP2SUCixm6rleTOc9D1/qq2eHL8qlRxPeGMxYL79Ex
+	ZnT9ZTHKORW9PXz6NnEeQ4owbk3ZYjC5THIYtFaYwSLMHnkz+Klj5rvoUEp/8yzsN4CSqq
+	ufgS4dZzLup7i8HGHQTuB+Le8UPy6bVVZljRz3FMw/kkoAzfEIsgmmem7on88NYCwHLLzm
+	aNayt7jkDxwyYZUWYZyy68ipoWGUBPPUiGgCaTsyec2cQmkLIOIR4pbCpeC8iA==
+Date: Mon, 3 Aug 2026 17:05:00 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH 0/2] smb/server: fix posix state check for directory
+ rename
+To: Namjae Jeon <linkinjeon@kernel.org>,
+ ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
+ slow@samba.org, linux-cifs@vger.kernel.org
 References: <20260802170757.220862-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260802170757.220862-1-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 3 Aug 2026 17:48:01 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-aWSnucKnhX=AkGu=4VJVNQuwy0xjXAFCb_SriAtOz8w@mail.gmail.com>
-X-Gm-Features: AUfX_mz42yileiMNXaa4Z9eO1NZ3S9ve7E0EV0I5kfEKeawHz6sj5oAlQWpUHIw
-Message-ID: <CAKYAXd-aWSnucKnhX=AkGu=4VJVNQuwy0xjXAFCb_SriAtOz8w@mail.gmail.com>
-Subject: Re: [PATCH 0/2] smb/server: fix posix state check for directory rename
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
-	slow@samba.org, linux-cifs@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CAKYAXd-aWSnucKnhX=AkGu=4VJVNQuwy0xjXAFCb_SriAtOz8w@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd-aWSnucKnhX=AkGu=4VJVNQuwy0xjXAFCb_SriAtOz8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Aug 3, 2026 at 2:09=E2=80=AFAM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> ChenXiaoSong (2):
->   smb/server: pass source ksmbd_file to rename helpers
->   smb/server: fix posix state check for directory rename
-The argument-only change in 0002 patch has no standalone functional
-purpose, so there is no reason to keep it as a separate patch.
-Additionally, 0002 patch must be applied first, and applying only 0001
-patch can result in a build failure. This is another source of error
-caused by unnecessarily splitting the change. Therefore, I squashed
-the two patches into a single patch and applied it to
-#ksmbd-for-next-next.
-Thanks!
+Agreed. Squashing them into a single patch is fine.
+
+On 8/3/26 16:48, Namjae Jeon wrote:
+> The argument-only change in 0002 patch has no standalone functional
+> purpose, so there is no reason to keep it as a separate patch.
+> Additionally, 0002 patch must be applied first, and applying only 0001
+> patch can result in a build failure. This is another source of error
+> caused by unnecessarily splitting the change. Therefore, I squashed
+> the two patches into a single patch and applied it to
+> #ksmbd-for-next-next.
+> Thanks!
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
