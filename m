@@ -1,83 +1,130 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6C23DDB01
-	for <linux-cifs@vger.kernel.org>; Tue,  4 Aug 2026 19:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1BD39DBC0
+	for <linux-cifs@vger.kernel.org>; Tue,  4 Aug 2026 23:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785872372; cv=none; b=NEbedibqhxgdkYr0nq0U7nJOtk3tE8grRuz1iENvSY3PhpLKmeAFIsLCJbAzID/2E7QfLyO6bG5QlDMWX463H8JVvPC0xHUOqXwdNgbmWbTZu4ASKb0aTw3iQEfzA9YWkb/LWKtvTWS/L8gcsDcQ6MCRYVgArHn5wOcLmkGLAGY=
+	t=1785886981; cv=none; b=UzkhkC48E83uaKDbDT4qz3q6KkhJdSNZEHCwB66noda129GL4LlJeh0Hi4aKhCU9KC08pRpOWZdCNoxiQ36iITLm5mitb6xkEBXGfmqW8JWA1FKWERcOjIgIxlPEmvZD5Bwd0c/yzF7HJwAlPzqbr1Www21Z0KBjbSIR8qep8GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785872372; c=relaxed/simple;
-	bh=kjUYBV6ZD9s5Or1c35Th2edTxe77eO1Zy206Vcgp1G0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=krokM6jL3+u3sYq4hy+IH/ViRx2iQ+usdb/voAexU7yN/oo5SMNaHh1r6xRpCNaa7vfoe3aVp+W0DjDDQJYTKO0jwM+aMrWSdBwvWgxZTlQSh7wR2x6/qu0/nQymRyNbi+gbbN9PDNk4N9B4AXHsWeNkLG8XTAp5+GQP+N9HvAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=WmDm6GeD; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1785886981; c=relaxed/simple;
+	bh=WuQVmx2YnUI4XvhVejvYUutWQl5B/NxiBuax2awOuhM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gon8vJGwRd9Gq4GuHX5RokTqMaqeKKCJyhWVQzBt7ZsyijLu9H/3sJCB8B0SfjqxZzkQ9girFT/9oYQf1jMdHjtxp2NY4jwA+QnlDO2DGAuubMYR8s+JQ6z4B3hsq9ltGVRDird0IXPC9QR2+m44lRkkw77CjptkZoQAYOdQAuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFPw0BO/; arc=none smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="WmDm6GeD"
-Message-ID: <56857873-dfb4-49c3-8627-e7674bde8ac6@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785872365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JeQpkWFQijBBFqebWhT/CDAP7J+hITVVaQ2tkRnLMBA=;
-	b=WmDm6GeDV/j/qmrqK3rLG+Dne6Om41i/5WaoYfctG7dG/skexdluR5yciB03DcUmNSabsq
-	MTd1tbHJoE/o6sKzwNrE/ltGk78TIAeqxkw6fmu1A+tK+e9U9547wtPumGAF8LZQvI7wvq
-	h1x29ARd2mBKyCJvXguJibnb3AsBNX+TJNIjLu0wrB4vozTQobWTmEBM7uij2+EPMHq/a+
-	kKxjhq4qIM+Ji3JgZzrjG8kG1MwUssUI3FbHKeh0IfL03pdJeQOqgIJal5HLdEkZuUqJf/
-	hf13ylic7g1ROMPiWK4tlTO2twpHfFm4/HvKKOrfjNY2wLVMFCsfhk8A2pPVCg==
-Date: Wed, 5 Aug 2026 03:38:55 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFPw0BO/"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-6ae50ba83efso808963eaf.0
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Aug 2026 16:42:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785886978; x=1786491778; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=U+3ZwEjHNgAhP32u/xYJ8H0EA8bkhzbEo28sF+uqMsM=;
+        b=mFPw0BO/sLzGl4M4HTBpMDjFnXKFXzUe/rK5wLzIpu7kzkA2P4cXzCcF9wuiqclnow
+         YVz6pe4PjdPJ4XOf99W+s8uSQcs4AtJVyGuODV4JgemhXNbBTb+GSuhHnlmlGEqvgark
+         Bt1JAMH9sPWL3igdZF/21M+FXlSHQ0nZiYQJ02mf6B+muvwUizrePm27T3vRfs6NGTgp
+         9ajSsOzzd17W70P9M/BrAjGgKX4cGjz4+55P/2LScg0AkQ5EQkolUzRfpJu5Odupz6Ov
+         IOZ54quCI0gqOno9ekujqyeoBRsiU7mIXZvFU9nUhhASTAhO0iqpC85E3vbr42TY1b3N
+         ZvIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785886978; x=1786491778;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=U+3ZwEjHNgAhP32u/xYJ8H0EA8bkhzbEo28sF+uqMsM=;
+        b=DvhRgPd+35cjfhy2TWXCBB8GWMANxiP9A2OHw3198gwBlZhrnlqpnPe7lsKUpA11I4
+         TKdK0vaNXqNYx/62HPEX5RyAccT4aDT25RaTiMOgbgxhREv/tUBeqzI99SvTeegi5smk
+         qbgQo09Vvv3pweG5rAa1OvHrH24mCde8K5m/0KY81sqLAtcblbERo/zuJ+l1KUNBl9Wx
+         WboygsGzwuk74WvYDcK6dSHLSx35kQe7hbx6sM7sop9rV8Rdk7rYkmYJuN8xe/nj/Em2
+         mcCByRrcBrtLfrfLjT4PN5LHJjbOA8rwTiLhGkB7OpFvPwd/cX0t/RX8RlZA6KUBseB4
+         gwVw==
+X-Gm-Message-State: AOJu0YxsQCRzRuYZIHxzHXPKpm/mOlefghxw1CL27bzxJnIoaAbw48PI
+	sJbw4xR7MMv7zsSk/TbjpImerNnNpobred2Hg2vFTtHP4KSlYDGpU4o3LH+8ew==
+X-Gm-Gg: AR+sD12kL8LvDp4gvfxSMSAnISYaGYnd2GiGDplJ6nqPL8kxsetwcTRh28qx/7XCN8z
+	q2Bz61xIgnkApbnLxqaKsN+QyNv9qqdniPudnobXXoz/x9xH/0MhB5MrSHHo9vM17H8w21VNTTT
+	kmSq0npGSOX4L5szdFRCtdCW8GO2E0iGFrPMLOXLDWOyPjF+H3qNhnHOj39n/xvsBTIoUIpL2fc
+	vF2v1zIg4YRGMBowhg0+VL41kTT5r1YsZIBXX31+QouiOrZIzRKvzMn6/Banzn91016eA2YwVFY
+	ZF85Ak0Mh7l0f1A/KzNOcg2B4jJCJPdckd9hCNLN9r1EJWWrFla1/byA0TTrWdmgY4+5OuT3plc
+	DC7LX/Lqea2micwj3/m5m7pj8PTQ7Oom8+8OPiP2b5OZjsAh1NeGroU0mfu14dVoue9JIQ5xw81
+	5qoSXoQ7/HhzexurBvmCbP2fj/eZK0zekPcWYA0fAuSPKZq/jh1c1AFjkbxwYJHy8awiDW6jn8x
+	v0fWYvt/t7NKdG0aKq7xOcIed5lOy0Olv9Pd79l462UlEdbOJ9DbqAIVgwW2FTifPx/hLYasyEf
+	eLvNrlgDr8DuccHPHRuaa4Sd0HxvvTDual25M7TF5cyPblJPnfruDVI5ABHof+rfBg44xBJbIw=
+	=
+X-Received: by 2002:a05:6820:4d53:20b0:6ae:960e:d285 with SMTP id 006d021491bc7-6ae960f1087mr1537431eaf.15.1785886978314;
+        Tue, 04 Aug 2026 16:42:58 -0700 (PDT)
+Received: from smfrench-ThinkPad-P16s-Gen-2 ([2603:8080:2200:13fc:7204:d1ab:7afe:a6b])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-4599e647973sm880971fac.16.2026.08.04.16.42.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 16:42:57 -0700 (PDT)
+From: Steve French <smfrench@gmail.com>
+X-Google-Original-From: Steve French <stfrench@microsoft.com>
+To: linux-cifs@vger.kernel.org
+Cc: ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	Steve French <stfrench@microsoft.com>
+Subject: [PATCH] smb/client: fix nlink of an overwritten open file
+Date: Tue,  4 Aug 2026 18:42:05 -0500
+Message-ID: <20260804234205.72986-1-stfrench@microsoft.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 3/3] smb/client: fix nlink of an overwritten open file
-To: Steve French <smfrench@gmail.com>
-Cc: linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
- slow@samba.org, linux-cifs@vger.kernel.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260804123301.285434-1-chenxiaosong@chenxiaosong.com>
- <20260804123301.285434-4-chenxiaosong@chenxiaosong.com>
- <CAH2r5mu0rQKQDHgcF7jTBUk6zHitWinP5pzNUQ6+MxqP7j6w=g@mail.gmail.com>
- <36cdfc79-e586-48d1-a821-a1c86760cf19@chenxiaosong.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <36cdfc79-e586-48d1-a821-a1c86760cf19@chenxiaosong.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-As Ralph said,
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-- if there are one or more non-POSIX opens on the destination, MUST fail 
-with STATUS_ACCESS_DENIED
-- if there are only POSIX opens, the operation can proceed
+Reproducer:
 
-Samba should allow the rename to succeed so that the silly-rename is not 
-triggered.
+  1. server: systemctl start ksmbd
+  2. client: mount with `posix` option
+     mount -t cifs -o posix //${server_ip}/export /mnt
+  3. client: touch /mnt/file1 /mnt/file2
+  4. client: C program: int fd = open("/mnt/file2", O_RDONLY);
+  5. client: C program: rename("/mnt/file1", "/mnt/file2");
+  6. client: C program: struct stat stbuf; fstat(fd, &stbuf);
+                        stbuf.st_nlink is 1, should be 0
 
-We should fix this bug in Samba so that the Linux client should call 
-cifs_drop_nlink(). Since silly-rename will not be triggered, 
-__cifs_unlink() will not be called either.
+This patch fixes xfstests generic/035 when mounted with `posix` option.
 
-在 2026/8/5 2:53, ChenXiaoSong 写道:
-> Samba has a bug, please check the email: https://lore.kernel.org/linux- 
-> cifs/0f6a5c9c-2c65-480e-aa44-facdf11fecc0@samba.org/
-> 
-> 在 2026/8/5 1:08, Steve French 写道:
->> generic/035 passes to Samba with posix mount option without the patch.
->> Any idea why this patch was needed for ksmbd but not for Samba
-> 
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+---
+ fs/smb/client/inode.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index b2806371bfde..1dc511272f2a 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -2648,11 +2648,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 	if (d_really_is_positive(target_dentry)) {
+ 		if (!rc) {
+ 			struct inode *inode = d_inode(target_dentry);
+-			/*
+-			 * Samba and ksmbd servers allow renaming a target
+-			 * directory that is open, so make sure to update
+-			 * ->i_nlink and then mark it as delete pending.
+-			 */
++
++			/* Update the target link count after rename. */
+ 			if (S_ISDIR(inode->i_mode)) {
+ 				drop_cached_dir_by_name(xid, tcon, to_name, cifs_sb);
+ 				spin_lock(&inode->i_lock);
+@@ -2663,6 +2660,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 				CIFS_I(inode)->time = 0; /* force reval */
+ 				inode_set_ctime_current(inode);
+ 				inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
++			} else {
++				cifs_mark_open_handles_for_deleted_file(inode, to_name);
++				cifs_drop_nlink(inode);
++				inode_set_ctime_current(inode);
+ 			}
+ 		} else if (rc == -EACCES || rc == -EEXIST) {
+ 			/*
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+2.53.0
 
