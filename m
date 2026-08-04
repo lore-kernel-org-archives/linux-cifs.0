@@ -1,34 +1,34 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECDA377A8D
-	for <linux-cifs@vger.kernel.org>; Tue,  4 Aug 2026 12:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9AA37E5DB
+	for <linux-cifs@vger.kernel.org>; Tue,  4 Aug 2026 12:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785846861; cv=none; b=kf0tpkU3UrOMsbe0xMtsa9O2PlN0xNlDKPbJrjbnTLnmtmNrAzc0x0prRDGEaNUmQl5+6Buqw4CW3su+cidkl4hcyePN6InJvsm8iPBLY45Z1JnZBXDoNlusKausHHORKV34cqeyzuv/dAaRdi25cNlcoJzMGeApGr8TszMix+c=
+	t=1785846864; cv=none; b=NKifRYQDFXnodkAyqxjVdWSPjrofocKiyfVumjDiZYt9oROzvjpJjSCdRSG0KDbAfzkX0HMWTtK2TDsarww6ytBF9Vd0RXHsDupYB4xeyZn6IZpShArP2nTgPi4cRtqSZgXjwzLjWg7AADC7P7+jhesyGLRjFIv4VI96qSVH4sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785846861; c=relaxed/simple;
-	bh=MTrC/vyMClzGy4/GlV8edH0M0of/qGmgKdshnsta9zY=;
+	s=arc-20240116; t=1785846864; c=relaxed/simple;
+	bh=MREyjqQaU4IkohFlOxaAXmeLs+tcKDQe+jBKSRY7FqA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oEGDyNCBAdsKy5wvOGHaD8KK9Z4EkZoE5e0HrUxjebhDlfkseNPaoG3qxG5P51QhFsUijm8PTcHO+n5xXyjrFf0RMdvNUgq3ocZD0JUq9fvpho27n7tT2NHoFJjggxThypFrlAaioKq2L7ElCXUP/EM4ftxPy/c4dhKAFB8FE9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=eAeW42DS; arc=none smtp.client-ip=91.218.175.172
+	 MIME-Version; b=teXIfxHpXuBVyKoOBudG6jJE0LOASjwOl4Wkus0vPQvEOTXhSxnv9SMNszPiJ2Rxo5vGDCiNqIQapVnEcutaidmsu2UrPh6b8+phWALq2d3e5P/5dwZFjP3IqH+naEauGoxW1bb+D6bi0lRmzUhwuRDUYZi5CsDJ6iw0WA17NpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=jtfGojwu; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="eAeW42DS"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="jtfGojwu"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785846856;
+	s=key1; t=1785846859;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=yNprZeSEOLbkw/9cv2A/TyqB93irDK0a7pKGaKiJBGk=;
-	b=eAeW42DS2NVqs0i9P4wwLrWIuWIIexwPzEMLoHPi6Ft2DckqpqpoNapIkFsmu7Xqoeld8u
-	H+kc87eunmcDGUuzTIe4bVbAhY8A096OZisJdKLGxJxsX18hxHDlRwcLmRnNZq0Yoy2WSZ
-	bOfo/orZcooJCD0YY2B8d/RSgCmO1WXZvD51puWtIrHlAcKf1tMQBwCmN4t95XHxj9txTB
-	4ujOZy8IcOEyFm2ngNdeNWROKHuyPcMrTj4Kb1dbS+Uj5IITsDWEbscJrniuUspT5D2e9D
-	/Y4ai9vmfD2rwIqV1ADOHPp6gIlAOxPUM9v60++g49Imm0L5FUt9eOmXbJWotQ==
+	bh=7J6JPrtYnZJVMxelnglRKAmNmK9iKnnkldW/2uK9FwE=;
+	b=jtfGojwuhNZWoc+q9AYkNEt2tMjFFVkwu3p+qvZXOjMgU+nHnEoK60wmNFlV7anNrzy1sT
+	9y1g5LjHeh9yPgQP9YdTJjccpR0ewcRS+vevjIcMl6jXgSJ8H0WW39llYymwpgwvp7nJT0
+	46RA4UmqkwISeqN4LM4AAvVUeogKHvIcN3UlgItWca5z1HtcIs3IOZjM7QF5PR3JXCXKJL
+	/nc5KnYZUzjfYLAvhEvtVPtZ8Qngtc/BsJv61Dd1KABvuB6YROhSmhQFVh0fnceBC0veWE
+	uzsc3kS8k7w8jifHdHHPAO3RbrCX7cCJx9r1nug9SKE0MZKqp7m6O0QrGWU54g==
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -43,9 +43,9 @@ To: smfrench@gmail.com,
 	slow@samba.org
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 2/3] smb/server: deny overwriting targets with non-POSIX opens
-Date: Tue,  4 Aug 2026 12:33:00 +0000
-Message-ID: <20260804123301.285434-3-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v2 3/3] smb/client: fix nlink of an overwritten open file
+Date: Tue,  4 Aug 2026 12:33:01 +0000
+Message-ID: <20260804123301.285434-4-chenxiaosong@chenxiaosong.com>
 In-Reply-To: <20260804123301.285434-1-chenxiaosong@chenxiaosong.com>
 References: <20260804123301.285434-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
@@ -62,102 +62,50 @@ From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Reproducer:
 
   1. server: systemctl start ksmbd
-  2. client: mount without `posix` option
-     mount -t cifs //${server_ip}/export /mnt
+  2. client: mount with `posix` option
+     mount -t cifs -o posix //${server_ip}/export /mnt
   3. client: touch /mnt/file1 /mnt/file2
   4. client: C program: int fd = open("/mnt/file2", O_RDONLY);
   5. client: C program: rename("/mnt/file1", "/mnt/file2");
   6. client: C program: struct stat stbuf; fstat(fd, &stbuf);
                         stbuf.st_nlink is 1, should be 0
 
-This patch fixes xfstests generic/035 when mounted without `posix` option.
+This patch fixes xfstests generic/035 when mounted with `posix` option.
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/vfs.c       | 13 +++++++++++++
- fs/smb/server/vfs_cache.c | 32 ++++++++++++++++++++++++++++++++
- fs/smb/server/vfs_cache.h |  1 +
- 3 files changed, 46 insertions(+)
+ fs/smb/client/inode.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 16ef8d051b18..9102ab47a3aa 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -726,6 +726,19 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, struct ksmbd_file *old_fp,
- 		goto out3;
- 	}
- 
-+	/*
-+	 * See MS-FSA 2.1.5.15.12.
-+	 * An overwrite rename must fail with STATUS_ACCESS_DENIED if the
-+	 * existing target still has a non-POSIX open.
-+	 */
-+	if (!(flags & (RENAME_NOREPLACE | RENAME_EXCHANGE)) &&
-+	    d_inode(rd.new_dentry) &&
-+	    d_inode(rd.new_dentry) != d_inode(old_child) &&
-+	    ksmbd_has_other_nonposix_open(rd.new_dentry)) {
-+		err = -EACCES;
-+		goto out3;
-+	}
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 0afff761aab9..0b6273ce01a8 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -2648,11 +2648,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 	if (d_really_is_positive(target_dentry)) {
+ 		if (!rc) {
+ 			struct inode *inode = d_inode(target_dentry);
+-			/*
+-			 * Samba and ksmbd servers allow renaming a target
+-			 * directory that is open, so make sure to update
+-			 * ->i_nlink and then mark it as delete pending.
+-			 */
 +
- 	err = ksmbd_vfs_check_rename_share(work, old_path);
- 	if (err)
- 		goto out3;
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 028bc1b0f652..94b2b5e48d3d 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -1137,6 +1137,38 @@ struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry)
- 	return NULL;
- }
- 
-+bool ksmbd_has_other_nonposix_open(struct dentry *dentry)
-+{
-+	struct ksmbd_file *fp;
-+	struct ksmbd_inode *ci;
-+	struct inode *inode = d_inode(dentry);
-+	bool ret = false;
-+
-+	if (!inode)
-+		return false;
-+
-+	ci = ksmbd_inode_lookup_lock(dentry);
-+	if (!ci)
-+		return false;
-+
-+	down_read(&ci->m_lock);
-+	list_for_each_entry(fp, &ci->m_fp_list, node) {
-+		if (READ_ONCE(fp->f_state) != FP_INITED)
-+			continue;
-+		if (inode != file_inode(fp->filp))
-+			continue;
-+		if (fp->is_posix_ctxt)
-+			continue;
-+
-+		ret = true;
-+		break;
-+	}
-+	up_read(&ci->m_lock);
-+	ksmbd_inode_put(ci);
-+
-+	return ret;
-+}
-+
- bool ksmbd_has_nonposix_open_child(struct ksmbd_file *old_fp)
- {
- 	struct dentry *dentry = old_fp->filp->f_path.dentry;
-diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index 9dca617bc429..5cac022b540b 100644
---- a/fs/smb/server/vfs_cache.h
-+++ b/fs/smb/server/vfs_cache.h
-@@ -212,6 +212,7 @@ bool ksmbd_has_stream_without_delete_share(struct ksmbd_file *fp);
- int ksmbd_close_fd_app_instance_id(char *app_instance_id);
- struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid);
- struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry);
-+bool ksmbd_has_other_nonposix_open(struct dentry *dentry);
- bool ksmbd_has_nonposix_open_child(struct ksmbd_file *old_fp);
- unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp);
- struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp);
++			/* Update the target link count after rename. */
+ 			if (S_ISDIR(inode->i_mode)) {
+ 				drop_cached_dir_by_name(xid, tcon, to_name, cifs_sb);
+ 				spin_lock(&inode->i_lock);
+@@ -2663,6 +2660,10 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
+ 				CIFS_I(inode)->time = 0; /* force reval */
+ 				inode_set_ctime_current(inode);
+ 				inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
++			} else {
++				cifs_mark_open_handles_for_deleted_file(inode, to_name);
++				cifs_drop_nlink(inode);
++				inode_set_ctime_current(inode);
+ 			}
+ 		} else if (rc == -EACCES || rc == -EEXIST) {
+ 			/*
 -- 
 2.54.0
 
