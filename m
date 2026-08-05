@@ -1,64 +1,139 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D6C3E3DBD
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 08:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E0647253B
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 13:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785919234; cv=none; b=tfOY+6nYJ2oHM3M8t1MyMm/wpAgnkZvRA45V9YwX3XR+jfxR9JjScKlIRtro5dyHcnqQPh8FXCsYMO/8mFVD/AUAC+rPTetOLKUTTR48YEE87Rx9amj+BMPn4h6V3FaGLyp3txvDWzHl4JOuc6fzG4c0U70Y+oZxbhBjSiLRRuM=
+	t=1785936774; cv=none; b=bfawwHzoqlRT7H8fYwU3mzAK66yIkmUSpWRo/KotslZXIhxkg7pNuQrBecBQLFAYVCxRhdgecm41u1t/QjUoammajhZ+TD9ZgebIJUVUtdRDw/qrSil+tzi3MY0j/DJx1zQL3LZe+apnjc0qq1g5ZIng+I2/uO9ZpRE61xcg6gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785919234; c=relaxed/simple;
-	bh=uWmNuYOBvzvgiuQBlNjheG5mz4MaB27+CEhMH8jKfWU=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=apte6g6EdxEK+pVCciYQ+k3Mz+Zrsr32ugX49fyAq4UyKRQCgNwS7N7Uu6YulQOmekelTzoufYjCB3mIW/2tlCGGYtq+KUUWu4C3Y+gvN2LQSEuMaiExRGwSKADDs3ULNovTwglJk1qa2mHg53gtygNwVRMiZNEwWlyZGud8p8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=M2yDAwHM; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1785936774; c=relaxed/simple;
+	bh=Y10kD92uCEgz3+CeFDavIb8vClhjskL0axyoxgw1fco=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p9ZuNO3ibCA4MSw+qdrupBmOPgFec9jQv57u0rDXai55j5OtnTNdt49TiVufVYIE5SHESkkUee3DYFnifjYa2TCqJ5yhauXD0zGEValkJVACrly0vIgl3HMRT7voobpe4t0AiiDLvclorvAJmY7gFxSFk5+OPc7l/VxC1xLzCgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=E+qCN1kg; arc=none smtp.client-ip=91.218.175.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="M2yDAwHM"
-Message-ID: <47938248-0b4d-49c3-83b1-88b657f93543@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="E+qCN1kg"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785919226;
+	s=key1; t=1785936767;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R87Fgf++9VsRwrG8GrRMjxeQOZlI5X5nr9uwzPfXO9Y=;
-	b=M2yDAwHMNn0dKd/f5UvAUagO/2koHjYtwoqLVJjmWjjV3oi4WSAuVWA+xN5VStNDQuutV5
-	B3kFrMx2faGvQDmJcxXiXZ4eAaXj4KxPlxL8fejbQiBwAj1FBN1clRhHhJHOfj1xV7NGsF
-	jri9Tud1Vw/z3FjKi57EAZT8Rnx8AIfMyD3yZ11FmPoDzKhzkXoB0NfhTI+ZD9qXoaqntL
-	B1KXB0w943cyBn0UbFYsNkTsdj0lnDd9TTyulcpuZexxP41eRfsJrBtcqxoX65sHxQ7q4I
-	X3DGDoIQQ05ADm6gFtq39L1zfd9qg/0Pd+5RJQmz7+1IbMuV1+g23r/p04kb8w==
-Date: Wed, 5 Aug 2026 16:40:26 +0800
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MFWlHBQdFkx0V1GufiY9tEO9IiyeKTxwfZBN6yPQ9Kk=;
+	b=E+qCN1kgis8OE8YThd/eOiKoqF4x77BHmBAOYl9MHY9j3JdjC39ulTOm0twGv5iaGNhwsm
+	CZAGz/lDO//FSw1kBbuuabUCUK5HKte6YdBZy5+wCk1XA/DMJ+Lx1BnB3kp2D7pU7qfB1B
+	IQZUscRGaqqaWPKWE7iW8b7n9mhtqol94R3cbVmS6fg5zvHNunVF+rijjNmayoUmiMroF3
+	UHNpHwj+2OvScwnv47ZoBMJ5gJzv0LKlWY9hZeg399xA8+p/Ff73Lrg8khP74P8Nme+kir
+	t50uUVCtxy/apprQwHNYYNgY6eXg0mh2dZ7y+vBxfojTGi8Q1naFQyYJqN5V2Q==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	slow@samba.org,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [RFC PATCH samba] smbd: deny rename if the destination has non-POSIX opens
+Date: Wed,  5 Aug 2026 13:31:45 +0000
+Message-ID: <20260805133145.312198-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Subject: Re: [PATCH smb3-posix-extensions] FSA: allow rename over files with
- only POSIX opens
-To: Ralph Boehme <slow@samba.org>, smfrench@gmail.com, linkinjeon@kernel.org,
- pc@manguebit.org, tom@talpey.com, senozhatsky@chromium.org
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260805082018.309542-1-chenxiaosong@chenxiaosong.com>
- <20390239-0e72-40ee-95d5-1f6235ff8c46@samba.org>
-In-Reply-To: <20390239-0e72-40ee-95d5-1f6235ff8c46@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-I have created the MR:
-https://gitlab.com/smb3-posix-extensions/smb3-posix-extensions/-/merge_requests/11/diffs
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-On 8/5/26 16:30, Ralph Boehme wrote:
-> Can you please create a MR on gitlab?
+Check the destination share mode entries with
+has_other_nonposix_opens() before replacing it, and return
+NT_STATUS_ACCESS_DENIED if a non-POSIX open exists.
 
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ source3/smbd/smb2_reply.c | 48 +++++++++------------------------------
+ 1 file changed, 11 insertions(+), 37 deletions(-)
+
+diff --git a/source3/smbd/smb2_reply.c b/source3/smbd/smb2_reply.c
+index 6bdc02c2374..c3da096205e 100644
+--- a/source3/smbd/smb2_reply.c
++++ b/source3/smbd/smb2_reply.c
+@@ -1312,31 +1312,6 @@ static void notify_rename(struct connection_struct *conn,
+ 	TALLOC_FREE(parent_dir_dst);
+ }
+ 
+-struct rename_check_open_state {
+-	struct files_struct *dst_fsp;
+-	struct file_id fileid;
+-};
+-
+-static struct files_struct *rename_check_open_fn(struct files_struct *fsp,
+-						 void *private_data)
+-{
+-	struct rename_check_open_state *state = private_data;
+-
+-	if (fsp == state->dst_fsp) {
+-		return NULL;
+-	}
+-
+-	if (!fsp->fsp_flags.is_fsa) {
+-		return NULL;
+-	}
+-
+-	if (!file_id_equal(&fsp->file_id, &state->fileid)) {
+-		return NULL;
+-	}
+-
+-	return fsp;
+-}
+-
+ /****************************************************************************
+  Rename an open file - given an fsp.
+ ****************************************************************************/
+@@ -1483,11 +1458,9 @@ NTSTATUS rename_internals_fsp(connection_struct *conn,
+ 	}
+ 
+ 	if (VALID_STAT(smb_fname_dst->st)) {
+-
+-		struct rename_check_open_state check_state = {
+-			.dst_fsp = smb_fname_dst->fsp,
+-		};
+-		struct files_struct *found_open = NULL;
++		struct file_id fileid;
++		struct share_mode_lock *dst_lck = NULL;
++		bool has_other_open = false;
+ 
+ 		if (!replace_if_exists) {
+ 			DBG_NOTICE("dest exists doing rename "
+@@ -1498,13 +1471,14 @@ NTSTATUS rename_internals_fsp(connection_struct *conn,
+ 			goto out;
+ 		}
+ 
+-		check_state.fileid = vfs_file_id_from_sbuf(conn,
+-							   &smb_fname_dst->st);
+-
+-		found_open = files_forall(conn->sconn,
+-					  rename_check_open_fn,
+-					  &check_state);
+-		if (found_open != NULL) {
++		fileid = vfs_file_id_from_sbuf(conn, &smb_fname_dst->st);
++		dst_lck = fetch_share_mode_unlocked(ctx, fileid);
++		if (dst_lck != NULL) {
++			has_other_open = has_other_nonposix_opens(
++				dst_lck, smb_fname_dst->fsp);
++			TALLOC_FREE(dst_lck);
++		}
++		if (has_other_open) {
+ 			DBG_NOTICE("Target file open\n");
+ 			status = NT_STATUS_ACCESS_DENIED;
+ 			goto out;
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+2.54.0
 
