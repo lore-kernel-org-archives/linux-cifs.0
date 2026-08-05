@@ -1,69 +1,71 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-160.mta1.migadu.com (out-160.mta1.migadu.com [95.215.58.160])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BAA3C1088
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 02:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D3B30C156
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 04:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.160
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785896775; cv=none; b=Ovas7P/xheiAjfzTiS7KrH8xDNu1OQtOtoWG8VcCoz1a2HINxzGow7rdjDUe1h52OBMrLVqtGF40D2VQo+yOBvbXrszrtM9Nv1Ixa7G+3ZQHdcihmqBJpQyFoEUP3QS+Fn2Cf4DB8JXBxnmZD2vIbeUB11wr1Zj1Z6ySFsaM6a4=
+	t=1785904713; cv=none; b=tT9VuXmPJwFsUSj32ZyoJ8gMPQcOWcGBqo45dFrxuM+MoIxtTdt1lqZQPPb54F/ZXavXUPe5ZUcBoe/y1BIlYKH1WGZbnzwNo5xOqDnh4CT0ITuclVftia/X1U77tmMPtrc8TVZAh5tmLoVPPJOZUbvL1/Y7pbCzj4JcN3tRqMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785896775; c=relaxed/simple;
-	bh=v1Cynh3kijK4BXb0NXeTv8l5winuPK9zGNMXaHqx104=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rlua89nSfplVgCiEK2hKeIuaoPbFoeI7JUX8gGvh0VFdUSJ2KLhGZSiJxyWJ9mkz21dcegc6FPOIcATSVGSzIs33Ls3poFz1FckTsXoBe4WeAbtGedpZcYZOlmJmD3Vm1oJf/GIbCfsTMm0V1wlDpIYnnCtXuzQ1IJHKqQniH8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=GGOqRFWD; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1785904713; c=relaxed/simple;
+	bh=xV3ZMLJ9M50cXb8gbeHKTwn+u1wxVM0hwRqsExUteiQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FD+RwBXrNGvGGf8E5db//hN4Caw8pbr3zAs3xJvTRJR+D6xd0wOMpgxQE8BMhGTofjcziUmnigDYRJiY5YLM+3pawQgqQWfD657DDhzzxG0fyJ0MA7mpnPYecZxOZj1RBY9Spvs+20YITKW3Y4fKAwJsjldqkETSOzV56cz05ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=i9cTSs8S; arc=none smtp.client-ip=95.215.58.160
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="GGOqRFWD"
-Message-ID: <0d0743a2-76f0-4931-a346-6a7ac9a8284c@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="i9cTSs8S"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785896767;
+	s=key1; t=1785904706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mYC3PFm8NJ2tBHLS4aG6oitodTPegmYmurXZr8BE6lU=;
-	b=GGOqRFWDt+ImU+151UuGqgGw4DDzwv5uG6BJUJp6lU7bXAN6vkhKGc7ewa5zmoiIL93aoD
-	ozxuOimU7ZDpomAT3tQjnxrEGw0U1OZPGv6iCXwiA4p3Yk7DfMGEAlEpy40rbxKx4ackWD
-	7MYQK2XZKJtJcUzyAMOAYi5SPhqjznY0cjBUl++arZBOFeDyi9lTyqkLixd32x73aQ+MT5
-	RzXxU1fZ6cW9QZnkjEoqSyoPVGe5MuuxjdvC+HlouQzQaKn6t2+pYWPZRlX0FD5k6KzO9M
-	JnqouXMz6e2IjPmgKgC015KZ+UjCZfyRtVKXl5I54MTC8pU6ENVN9hByXoPTNg==
-Date: Wed, 5 Aug 2026 10:25:03 +0800
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kAmxebxIKNK4u+3+CrSCvi3QXoT6DdTam/1yaGbKlG4=;
+	b=i9cTSs8SIXCOm8fB7lGH8M2bMiSewybO5aX3hVVquoT6nWY6AvL2hOqrDgWDCWudEPaaL9
+	VkPRsi29Q7cdpN9CPLXJWwMWWiAk3ZR83WzlJr9cebN1grb2z89w9cW5aW4gnDevu2uzTw
+	+IyFfwPhcgr52W035JGqYAT9067yMA7iBIec3lxCVRzz+Gdbki8GEpn2jhYghIpWc+1E5t
+	nG/PTkjKAlfi/1S0pP74ufTGLct0SApqbUaDj/tm/8GGnXrRchBEXED3UZ+Zpg3lwMBBpI
+	7irsg6Uu0l0/CKJtr51N5dfHK1PX66eVsYUxXLSKc51BXLk5tbXUXIxYWj2APQ==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	slow@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v3 0/3] smb: fix xfstests generic/035
+Date: Wed,  5 Aug 2026 04:37:01 +0000
+Message-ID: <20260805043704.304533-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/3] smb/server: deny overwriting targets with
- non-POSIX opens
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org,
- slow@samba.org, linux-cifs@vger.kernel.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260804123301.285434-1-chenxiaosong@chenxiaosong.com>
- <20260804123301.285434-3-chenxiaosong@chenxiaosong.com>
- <CAKYAXd-A2hup+WnYZj+AaVTzgZ9hHQgg8zKswtw=-VqStE6VFw@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <CAKYAXd-A2hup+WnYZj+AaVTzgZ9hHQgg8zKswtw=-VqStE6VFw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Got it, I will add it to my todo list, and submit a separate patch to 
-fix this pre-existing issue.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-On 8/5/26 10:17, Namjae Jeon wrote:
-> This appears to be an existing limitation rather than a regression
-> introduced by this patch
+v2->v3:
+  - Patch #02: iterate over `global_ft.idr`.
+
+v2: https://lore.kernel.org/linux-cifs/20260804123301.285434-1-chenxiaosong@chenxiaosong.com/
+
+ChenXiaoSong (3):
+  smb/server: rename to ksmbd_has_nonposix_open_child()
+  smb/server: deny overwriting targets with non-POSIX opens
+  smb/client: fix nlink of an overwritten open file
+
+ fs/smb/client/inode.c     | 11 ++++++-----
+ fs/smb/server/vfs.c       | 15 ++++++++++++++-
+ fs/smb/server/vfs_cache.c | 29 ++++++++++++++++++++++++++++-
+ fs/smb/server/vfs_cache.h |  3 ++-
+ 4 files changed, 50 insertions(+), 8 deletions(-)
 
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+2.54.0
 
