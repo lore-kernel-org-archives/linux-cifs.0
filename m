@@ -1,202 +1,114 @@
-Received: from out-173.mta1.migadu.com (mta1.migadu.com [37.59.57.117])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317583E0092
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 06:41:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.59.57.117
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785912113; cv=none; b=GJozPTYGvHCDgtcSesdMR6D4dmH+Iwa7213TS7WFATK1Q6d5IunkUh+7kfYknH9Lb48mLQ2kLk17FYXPuh6k682FiTaO7edmgu9lAZEdyrt/QRIhNUKmHwwt3/gHiPMbIMeziMt00G6t/874IFQAHEewwhlxDLSMP8oAn+wH2uI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785912113; c=relaxed/simple;
-	bh=ZIn+meFlda1HXxad+HTF5Dy4MFmmWbiBWpl/d2p3zu4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Rw1qLt4boyhLbBtk5zehY13+R9sm0Tzj8Wn9CHL7z0dUkkeFADBRSOHoG+L0qz2r7v5dhPDLrS5tJIG1u+Qeu6nVPrCY96TrdX9mdW2qvSHJQEunQnCM07efvw3FF3mmusgaD1WVaON2eejZxbcLS8EEVSUYCNJYyzbHhOKnyCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=gBK8Lbb0; arc=none smtp.client-ip=37.59.57.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1DE3E3151
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 07:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785915028; cv=pass; b=KUMHLK5RugUs1JywIdT+6UX6pZNbdW59jWORAGohySZ9S270A6s+OvRRjwdOMTDxXHEd4or6a9+8W/FOzxN1y7BcLXCV7KmM2o1F9Jg2Qltc5dwUY4A59OoasSHYs3MmzUl2KhW6G+SMPflrBMrBajPkHP+oPTRA0L+sg3fS20U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785915028; c=relaxed/simple;
+	bh=X1ufRRgK2plwrPqPXEvcAY/uskA0Re2iFrcMKCYLpQc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=Qhii7jXqzqcc9Sc1zmX8Rg6M/tuHyoGX9jgVRQRC6DqEE4mpfDHqyez0P/YFTGoO+/rHkM5QBy4UO/0fkw8DziGU3UrsjdEDek0ZEntPzTRgfFNDpTrXhmnOSxhZ0qP6UBzUehyacrPKkq3GObWUZQYQmncEGnKBQY5UegpDRa8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gs9HIJjx; arc=pass smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="gBK8Lbb0"
-Message-ID: <2ffe4d18-fcfe-4481-bb2a-08b879d42494@chenxiaosong.com>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785912105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6Li3ncIrgZyWmfZn/IRiwkWEUelTmEeGrsdTpQWeCKg=;
-	b=gBK8Lbb0XoQhTRVh5mjYIS8wFXlIObCivre5ofAQqtTn5K7IvRUb1kGmno+YgWN5Kl4ze1
-	sc43064qOUUqBD9nNtPMzeOzdaybZkh6DjYeVHhF6L4pn08u9q/AzE5IguAbnMci4pZ0i6
-	SVoIXREFmNhknLp9QpJCGV2AK5ECc4HmeRDfjN3JeKHjTcMYTn0GqhoV9QmSmhAgiPwllc
-	ZG0g8EXj4WovGZOZ0H0GYvLw9Pd2DKqcS5/+NonQuzGrLGXOkj4qguyEP+2LXqSK5zYzPU
-	z2qXj8Vzhkm+BqCTNQpu7cMvWmcfqL0T6b1WfK3NUZ/npjHCvpQTV111qEEJsg==
-Date: Wed, 5 Aug 2026 14:40:52 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gs9HIJjx"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-cbb85186d43so331558a12.3
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Aug 2026 00:30:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785915027; cv=none;
+        d=google.com; s=arc-20260327;
+        b=ad9I/RWHloedoBJKwlLvaad2dx8/C3nbZ8dl6d2Ds5E4gpvZbxFw3XFuKvwnUz09Wg
+         WMdnYz7G2EQ5Iia09FDldImbYEGFeYo8gmxfmp854voVIeiv5DxflX8ORm26bsBgf5wM
+         Iu5ucnBAh2EUBddhHjTUsU6BPr4LQU2mZJMFxA4cA0FuQ3Gm0LHDMRmY7QqrIwHf8PSr
+         /cGLoMKJTzfdhyig6rV1yOsKpOOCQdrrVf7Y1DZF8uzf48UzOsg6Gr/LOs4snAaQiZNO
+         EcOT+CAv8n/YmzeF8OffNiWtL57M1U7nYJnGzEzNDDhBtJWcbNaOz0nhWcb68foocV1T
+         ze7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=X1ufRRgK2plwrPqPXEvcAY/uskA0Re2iFrcMKCYLpQc=;
+        fh=KObKM3Q6Yr1/+wZIcjdUfDifrrk54PSVoAKl6qa1QA4=;
+        b=Lb40r4biRV84/I0pRk6YYmduyKYfY2GG7bZknTJ+2WRVEA5u/yv57jI65U397nplcY
+         NBN2uh8VU3QSEo0ZDyEIJTfAK6E7/3ay9MBdU0PNrThmx9cvH61UaOyWVoFkwBUzvdQa
+         gZ7J0NJb2JFv9mcjDanwM7rqYAwtXoySv/eChToGwdXqZQU2go5w//oI6v3uBbYvGscy
+         dKhvVEF03sNZtMK/6WMXZSDTtICx+BfqcDklIwueZ7uLNfkBV57QCd22JlI0StZFVtBw
+         7G1DMoI6aGJR7cQm3Xv1Ilnv9ITHiWLGzBMMTefVZrxvOa/5A6YKGgvd9wjRXVME44D8
+         9myQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785915027; x=1786519827; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=X1ufRRgK2plwrPqPXEvcAY/uskA0Re2iFrcMKCYLpQc=;
+        b=gs9HIJjx49LNVvF2WRLciCi3ir1QUI+/MFaWUGWs7/xXda/LaiZxwYHcL1aiZRR/zv
+         wKvQQUcmjYmm0UV5vtTQ2knWZcDE5/EGT8t5bdwy4U/z11SA+PSEgNXgjoPapnxnwalo
+         ghkd7uYCMvo+EoCkfjj343WGRaFjiu99y9kBiD0QQJ37E9usQjdr05DdOwYqpNz8rKXH
+         Zp+gOfchcY6hR5aGDXsPJGFHIK6Sm1PfpAz1G5r+y9xRj9CTzQ9Xjz2UtPBTLCCQDD33
+         uONzvHoviYptdHUaOjLIRtKvYPYcnlyQeTRX/kK9Xr0kH+gRwIjHy/BwdElWTWMXB1/v
+         eoeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785915027; x=1786519827;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=X1ufRRgK2plwrPqPXEvcAY/uskA0Re2iFrcMKCYLpQc=;
+        b=eU1gqir7nU07/m2M4iNu8KX3BSWzjQMO9yLtqrU6c8mbb3P6DWtlX17hvlu3wc9cNo
+         xTV85HyYXP/aHIUdY4hniQOeAS6M8flBuQsILI9vV/fOA/4tHWc/DRDN/oaHPOs9zMss
+         EAMzxkxFOPzZRjhiy4yK3O7pL/jwo5fxkKuT1TeHvyvy57mVhc+Yie1ooEraGmqHdzIS
+         R1sJKqwfVoBYp43aRbuOC1eJ2TVbMkWtIsB7WRIjRqt04I00yXgrfW9IvGLwgSg/f/10
+         MyyC81JKzWbCFJb5Pc2/1G69F8iuEl2QCqKIL4VK2Df1QoNOk5FHWZ1F0SfoB6KXnPHQ
+         AYaA==
+X-Gm-Message-State: AOJu0YwC9SfmkX44QMJUETPFRSkoQb7V2lK2/o58XnznhHN0Rqf8pF3X
+	u7/S1sv7j/BLcCJc7Z7aQzv1tA3VrZt7M+nAYpdYWGYP/UH+Y6UYFxcpsUlbE8SG68DWgyBhQB/
+	BSMtVkp2cSMfCT3DdKyv7ChB3W8OLmMM=
+X-Gm-Gg: AR+sD11038aOlRQWuCyQw7W55Vp6dEl/zfCXzCFM9stPyRXggZwDc10gt5Y+tiXG1g9
+	8yu2/OgELFWJ74qjXlLSlyFgP2tz31b4S2u0EQxiFMe3I2R0k6Sfa+RocEnVMqvcdYq71bdtmij
+	LCdjyTcmmS9kg/tBwCfnLJ2K8qEYux/jVENk67/DabZwSkWoGfaI/ekkBjaRpK9nGHB+W27Zxa0
+	Q8/3Zy150jVMlgCbMKZBe9NV19Fzie4mYAZyQvkDf1U7Hnf/C+sltC3g+R6OlBEbPz3u3oWCN3i
+	7LbqwOwTqz6e5SarhMM851Dc1OfQDF/+FHo4BPx8J43qjfzPq9/mxaBKAffAIGbBM7nOoFmByK4
+	o+vS9p30iN7M5
+X-Received: by 2002:a05:6a21:6e43:b0:3c3:7762:5d5f with SMTP id
+ adf61e73a8af0-3cb85e6afe9mr5657770637.19.1785915026644; Wed, 05 Aug 2026
+ 00:30:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Subject: Re: [PATCH v3 resend 2/3] smb/server: deny overwriting targets with
- non-POSIX opens
-To: smfrench@gmail.com, linkinjeon@kernel.org, pc@manguebit.org,
- tom@talpey.com, senozhatsky@chromium.org, slow@samba.org
-Cc: linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260805051112.305078-1-chenxiaosong@chenxiaosong.com>
- <20260805051112.305078-3-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260805051112.305078-3-chenxiaosong@chenxiaosong.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+From: khj <hj351016@gmail.com>
+Date: Wed, 5 Aug 2026 16:30:15 +0900
+X-Gm-Features: AUfX_myZYgcXotlNwWzZL7SG3HE2E5KqufWMNFUWpkpKnuNAXuy8klWq_isVk18
+Message-ID: <CAGr5VtPLAy_N0N4kE5TDndMr3zYukVXDHD49AfToGoa-vMk24A@mail.gmail.com>
+Subject: CVE-2025-38728: Request to add Bugzilla 218602 as a reference
+To: CVE Request <CVE-Request@mitre.org>, cve@kernel.org
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The following are my test steps for the hardlink case mentioned by Namjae.
+Hello Linux Kernel CVE Team,
 
-```
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -1156,6 +1156,7 @@ bool ksmbd_has_other_nonposix_open(struct dentry 
-*dentry)
-                 if (fp->is_posix_ctxt)
-                         continue;
+I would like to request a reference update for CVE-2025-38728.
 
-+               printk("%s:%d\n", __func__, __LINE__);
-                 ret = true;
-                 break;
-         }
-```
+I am not requesting a new CVE ID, reassignment, or reporter
+attribution. I am only requesting that the following public Linux
+Kernel Bugzilla report be added to the References section of the CVE
+record:
 
-1. Add the above debug log.
-2. server: systemctl start ksmbd
-3. client: mount without `posix` option:
-            mount -t cifs //${server_ip}/export /mnt
-4. client: touch /mnt/file1 /mnt/file2
-5. client: ln /mnt/file2 /mnt/link1; sleep 3
-6. client: tail -f /mnt/link1 # open link1
-7. tcpdump -i any tcp port 445 -w test-open-hardlink.pcap
-8. client: mv /mnt/file1 /mnt/file2
-9. server log:
-    [102256.516146] ksmbd_has_other_nonposix_open:1159
-    [102256.518393] ksmbd_has_other_nonposix_open:1159
-    [102256.520443] ksmbd_has_other_nonposix_open:1159
-    [102256.522616] ksmbd_has_other_nonposix_open:1159
-10. Packets captured by tcpdump:
-     SetInfo Response, Error: STATUS_ACCESS_DENIED
+https://bugzilla.kernel.org/show_bug.cgi?id=218602
 
-On 8/5/26 10:17, Namjae Jeon wrote:
-> The new check is limited to the target dentry's
-> ksmbd_inode->m_fp_list. Therefore, it does not cover a struct
-> ksmbd_file opened through another hardlink dentry, even though
-> file_inode(fp->filp) == d_inode(dentry). For example, if file2.link is
-> a hardlink to file2 and file2.link is opened with a non-POSIX context,
-> an overwrite rename of another file to file2 can miss that open
-> handle.
-> This appears to be an existing limitation rather than a regression
-> introduced by this patch. However, since this patch is intended to
-> reject overwrites when the target has a non-POSIX ksmbd_file...
+Bugzilla 218602 was reported on March 15, 2024. It describes the
+missing bounds validation in parse_server_interfaces(), specifically
+that the server-controlled Next value can exceed bytes_left before the
+pointer is advanced and the value is subtracted.
 
+The fix associated with CVE-2025-38728 adds the corresponding
+validation that rejects a Next value larger than bytes_left:
 
-On 8/5/26 13:11, ChenXiaoSong wrote:
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> 
-> Reproducer:
-> 
->    1. server: systemctl start ksmbd
->    2. client: mount without `posix` option
->       mount -t cifs //${server_ip}/export /mnt
->    3. client: touch /mnt/file1 /mnt/file2
->    4. client: C program: int fd = open("/mnt/file2", O_RDONLY);
->    5. client: C program: rename("/mnt/file1", "/mnt/file2");
->    6. client: C program: struct stat stbuf; fstat(fd, &stbuf);
->                          stbuf.st_nlink is 1, should be 0
-> 
-> This patch fixes xfstests generic/035 when mounted without `posix` option.
-> 
-> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
-> Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> ---
->   fs/smb/server/vfs.c       | 13 +++++++++++++
->   fs/smb/server/vfs_cache.c | 27 +++++++++++++++++++++++++++
->   fs/smb/server/vfs_cache.h |  1 +
->   3 files changed, 41 insertions(+)
-> 
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index 16ef8d051b18..9102ab47a3aa 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -726,6 +726,19 @@ int ksmbd_vfs_rename(struct ksmbd_work *work, struct ksmbd_file *old_fp,
->   		goto out3;
->   	}
->   
-> +	/*
-> +	 * See MS-FSA 2.1.5.15.12.
-> +	 * An overwrite rename must fail with STATUS_ACCESS_DENIED if the
-> +	 * existing target still has a non-POSIX open.
-> +	 */
-> +	if (!(flags & (RENAME_NOREPLACE | RENAME_EXCHANGE)) &&
-> +	    d_inode(rd.new_dentry) &&
-> +	    d_inode(rd.new_dentry) != d_inode(old_child) &&
-> +	    ksmbd_has_other_nonposix_open(rd.new_dentry)) {
-> +		err = -EACCES;
-> +		goto out3;
-> +	}
-> +
->   	err = ksmbd_vfs_check_rename_share(work, old_path);
->   	if (err)
->   		goto out3;
-> diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-> index 028bc1b0f652..90348a409162 100644
-> --- a/fs/smb/server/vfs_cache.c
-> +++ b/fs/smb/server/vfs_cache.c
-> @@ -1137,6 +1137,33 @@ struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry)
->   	return NULL;
->   }
->   
-> +bool ksmbd_has_other_nonposix_open(struct dentry *dentry)
-> +{
-> +	struct ksmbd_file *fp;
-> +	struct inode *inode = d_inode(dentry);
-> +	unsigned int id;
-> +	bool ret = false;
-> +
-> +	if (!inode)
-> +		return false;
-> +
-> +	read_lock(&global_ft.lock);
-> +	idr_for_each_entry(global_ft.idr, fp, id) {
-> +		if (READ_ONCE(fp->f_state) != FP_INITED)
-> +			continue;
-> +		if (inode != file_inode(fp->filp))
-> +			continue;
-> +		if (fp->is_posix_ctxt)
-> +			continue;
-> +
-> +		ret = true;
-> +		break;
-> +	}
-> +	read_unlock(&global_ft.lock);
-> +
-> +	return ret;
-> +}
-> +
->   bool ksmbd_has_nonposix_open_child(struct ksmbd_file *old_fp)
->   {
->   	struct dentry *dentry = old_fp->filp->f_path.dentry;
-> diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-> index 9dca617bc429..5cac022b540b 100644
-> --- a/fs/smb/server/vfs_cache.h
-> +++ b/fs/smb/server/vfs_cache.h
-> @@ -212,6 +212,7 @@ bool ksmbd_has_stream_without_delete_share(struct ksmbd_file *fp);
->   int ksmbd_close_fd_app_instance_id(char *app_instance_id);
->   struct ksmbd_file *ksmbd_lookup_fd_cguid(char *cguid);
->   struct ksmbd_file *ksmbd_lookup_fd_inode(struct dentry *dentry);
-> +bool ksmbd_has_other_nonposix_open(struct dentry *dentry);
->   bool ksmbd_has_nonposix_open_child(struct ksmbd_file *old_fp);
->   unsigned int ksmbd_open_durable_fd(struct ksmbd_file *fp);
->   struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp);
+https://git.kernel.org/stable/c/7d34ec36abb84fdfb6632a0f2cbda90379ae21fc
 
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+Could you please review whether Bugzilla 218602 can be added as a
+reference to CVE-2025-38728?
 
+Thank you. Regards
