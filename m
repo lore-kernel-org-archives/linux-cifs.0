@@ -1,46 +1,68 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E0647253B
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 13:32:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D5138836C
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 14:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785936774; cv=none; b=bfawwHzoqlRT7H8fYwU3mzAK66yIkmUSpWRo/KotslZXIhxkg7pNuQrBecBQLFAYVCxRhdgecm41u1t/QjUoammajhZ+TD9ZgebIJUVUtdRDw/qrSil+tzi3MY0j/DJx1zQL3LZe+apnjc0qq1g5ZIng+I2/uO9ZpRE61xcg6gA=
+	t=1785940597; cv=none; b=eijiN5Rhu4LQVt9BxDv3wVuONVgeorjcLPX90BnxPjoVCOsCUbLPXI1y3tMVz/HhODlHYzO0hwyywsM6iC6/HQGO6fnMRTjyfklOw/ryXoqDeIUGdQM1sMKj06/JQNC5iXJm1l94E2yqFXOavQR5//9h+U3yfQ5l3osk6aJRYiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785936774; c=relaxed/simple;
-	bh=Y10kD92uCEgz3+CeFDavIb8vClhjskL0axyoxgw1fco=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p9ZuNO3ibCA4MSw+qdrupBmOPgFec9jQv57u0rDXai55j5OtnTNdt49TiVufVYIE5SHESkkUee3DYFnifjYa2TCqJ5yhauXD0zGEValkJVACrly0vIgl3HMRT7voobpe4t0AiiDLvclorvAJmY7gFxSFk5+OPc7l/VxC1xLzCgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=E+qCN1kg; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1785940597; c=relaxed/simple;
+	bh=4rCgqeuHEy9E5A8LTGid6IlJZItGQ4fk034XPhbIATk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rGdw7Vchbh7aVX8jcwzvLyUo6brJPZRfkpsz6Mw3364UR93SfUZmEXx6QgGP8okhmESPJOjpwKQJMHz4S2xs7/TA4Mp/Gg23ABUEr3ID2IR4hIPIeCd3QpLtKPRVIPH4UL4rSErpdZfOvHtPJtEfsmlBXu9Rp47jUM24b2VOvxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WJBN5W9L; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="E+qCN1kg"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1785936767;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJBN5W9L"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1785940589;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MFWlHBQdFkx0V1GufiY9tEO9IiyeKTxwfZBN6yPQ9Kk=;
-	b=E+qCN1kgis8OE8YThd/eOiKoqF4x77BHmBAOYl9MHY9j3JdjC39ulTOm0twGv5iaGNhwsm
-	CZAGz/lDO//FSw1kBbuuabUCUK5HKte6YdBZy5+wCk1XA/DMJ+Lx1BnB3kp2D7pU7qfB1B
-	IQZUscRGaqqaWPKWE7iW8b7n9mhtqol94R3cbVmS6fg5zvHNunVF+rijjNmayoUmiMroF3
-	UHNpHwj+2OvScwnv47ZoBMJ5gJzv0LKlWY9hZeg399xA8+p/Ff73Lrg8khP74P8Nme+kir
-	t50uUVCtxy/apprQwHNYYNgY6eXg0mh2dZ7y+vBxfojTGi8Q1naFQyYJqN5V2Q==
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	tom@talpey.com,
-	senozhatsky@chromium.org,
-	slow@samba.org,
-	metze@samba.org
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [RFC PATCH samba] smbd: deny rename if the destination has non-POSIX opens
-Date: Wed,  5 Aug 2026 13:31:45 +0000
-Message-ID: <20260805133145.312198-1-chenxiaosong@chenxiaosong.com>
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SdbllWlXb3ri7lSNaZ11zlDq0wjdTEQ2mDG3hzZ4lUk=;
+	b=WJBN5W9LEYLi5qhO8GR5vSZw/hxTvftqG3AtnoEk+SjQKHMA7NsKYHwoZbhj7FMjgbmhE7
+	oscvHYCsZJIxhEYh2w/R5i09vo6Dx3Ov/Khq3lc+k7t1nwt5PFTWmcTxA/QO3dqjhx2C5n
+	fP9v3rmvQ71EEuJco3fegsywrYHJk6s=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-230-YV8rJ0xiOzGhfOWY9BrAnw-1; Wed,
+ 05 Aug 2026 10:36:26 -0400
+X-MC-Unique: YV8rJ0xiOzGhfOWY9BrAnw-1
+X-Mimecast-MFC-AGG-ID: YV8rJ0xiOzGhfOWY9BrAnw_1785940584
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 28E0B1955F7A;
+	Wed,  5 Aug 2026 14:36:24 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.48.209])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 49AFB1800598;
+	Wed,  5 Aug 2026 14:36:19 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when done
+Date: Wed,  5 Aug 2026 16:36:05 +0200
+Message-ID: <20260805143611.818559-3-thuth@redhat.com>
+In-Reply-To: <20260805143611.818559-1-thuth@redhat.com>
+References: <20260805143611.818559-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,92 +70,51 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: Thomas Huth <thuth@redhat.com>
 
-Check the destination share mode entries with
-has_other_nonposix_opens() before replacing it, and return
-NT_STATUS_ACCESS_DENIED if a non-POSIX open exists.
+Clear the local crypto-related structures via __cleanup() functions
+when we're done with them to avoid that sensitive data could leak on
+the stack.
 
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Note: cmac_ctx in ksmbd_sign_smb3_pdu() gets cleared in aes_cmac_final()
+already, so this does not need a __cleanup() marker.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- source3/smbd/smb2_reply.c | 48 +++++++++------------------------------
- 1 file changed, 11 insertions(+), 37 deletions(-)
+ fs/smb/client/smb2transport.c | 4 ++--
+ fs/smb/server/auth.c          | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/source3/smbd/smb2_reply.c b/source3/smbd/smb2_reply.c
-index 6bdc02c2374..c3da096205e 100644
---- a/source3/smbd/smb2_reply.c
-+++ b/source3/smbd/smb2_reply.c
-@@ -1312,31 +1312,6 @@ static void notify_rename(struct connection_struct *conn,
- 	TALLOC_FREE(parent_dir_dst);
- }
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index 1143ee52470a7..d23566da2ac81 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+-	struct aes_cmac_key cmac_key;
+-	struct aes_cmac_ctx cmac_ctx;
++	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
++	struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
+ 	struct smb_rqst drqst;
+ 	u8 key[SMB3_SIGN_KEY_SIZE];
  
--struct rename_check_open_state {
--	struct files_struct *dst_fsp;
--	struct file_id fileid;
--};
--
--static struct files_struct *rename_check_open_fn(struct files_struct *fsp,
--						 void *private_data)
--{
--	struct rename_check_open_state *state = private_data;
--
--	if (fsp == state->dst_fsp) {
--		return NULL;
--	}
--
--	if (!fsp->fsp_flags.is_fsa) {
--		return NULL;
--	}
--
--	if (!file_id_equal(&fsp->file_id, &state->fileid)) {
--		return NULL;
--	}
--
--	return fsp;
--}
--
- /****************************************************************************
-  Rename an open file - given an fsp.
- ****************************************************************************/
-@@ -1483,11 +1458,9 @@ NTSTATUS rename_internals_fsp(connection_struct *conn,
- 	}
+diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
+index 86f521e849d5e..f123e6cf9c424 100644
+--- a/fs/smb/server/auth.c
++++ b/fs/smb/server/auth.c
+@@ -505,7 +505,7 @@ void ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
+ void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
+ 			 int n_vec, char *sig)
+ {
+-	struct aes_cmac_key cmac_key;
++	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
+ 	struct aes_cmac_ctx cmac_ctx;
+ 	int i;
  
- 	if (VALID_STAT(smb_fname_dst->st)) {
--
--		struct rename_check_open_state check_state = {
--			.dst_fsp = smb_fname_dst->fsp,
--		};
--		struct files_struct *found_open = NULL;
-+		struct file_id fileid;
-+		struct share_mode_lock *dst_lck = NULL;
-+		bool has_other_open = false;
- 
- 		if (!replace_if_exists) {
- 			DBG_NOTICE("dest exists doing rename "
-@@ -1498,13 +1471,14 @@ NTSTATUS rename_internals_fsp(connection_struct *conn,
- 			goto out;
- 		}
- 
--		check_state.fileid = vfs_file_id_from_sbuf(conn,
--							   &smb_fname_dst->st);
--
--		found_open = files_forall(conn->sconn,
--					  rename_check_open_fn,
--					  &check_state);
--		if (found_open != NULL) {
-+		fileid = vfs_file_id_from_sbuf(conn, &smb_fname_dst->st);
-+		dst_lck = fetch_share_mode_unlocked(ctx, fileid);
-+		if (dst_lck != NULL) {
-+			has_other_open = has_other_nonposix_opens(
-+				dst_lck, smb_fname_dst->fsp);
-+			TALLOC_FREE(dst_lck);
-+		}
-+		if (has_other_open) {
- 			DBG_NOTICE("Target file open\n");
- 			status = NT_STATUS_ACCESS_DENIED;
- 			goto out;
 -- 
-2.54.0
+2.55.0
 
