@@ -1,185 +1,99 @@
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD907377AA3
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 01:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55FD248881
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 02:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785894987; cv=none; b=nytm8pQiHwao5hPtk9acAc3WP5MeSadPDyY7gLugVQmB6EHVk860y/54xAI2zoTfyZ+Y4SXpv0tTteZ64FruNbmPusvKxwJWd4F9Q/FgmyjuLNLDxDRs2kN+QZSmXqLr04sanTHue64kNkWU3DgvZF5Eyr4oz8/agGRCkLzUTIs=
+	t=1785896250; cv=none; b=e1gAsbmO8GAlfIdbOdqEkkL8UOArFvu1yb6Rx3uKk/TuNwIt6UfExJYxq9jcv/6rFWV3iciSqPPIGxBK0yweOmuO9Xngmv8VY7gYmnwbZMgf9KB8qL54nvpO+frq63odNyDiy7aHKL2FEEB//vwpdynWceyAjNQtP9B+wkuRUoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785894987; c=relaxed/simple;
-	bh=PqCZKCoG+wkGLabvL7ZmVHD4darNh8gXYXMPI0q2wCc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z/0ZY7cResfAhCdk6ygbtN/g/A37LppTDkI6rqpHdm33uxSnMmTm8EauSrKvJgwgrEnODzW36h9ofkLp5isdHnOerOTxtK2kqFl9h2g0TAh1PsScQrFblIcQjEvGAZXZTYjQgrrR1VyWKJhOY2hV5ml/mYO6Thwf0XDkgHZtFhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s4CVEA/B; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1785896250; c=relaxed/simple;
+	bh=Ag7hkB7mLXAdPPYdaXe9Dt/KQRWjtptmZA/8HNpKOJo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XkL39nut8NlAnMnQ8xNPJ+lv4OJsk3Qdv4ekqI3iOU64OAL7vZKWsV113KBL+ECmFY1H7miuSa33AgokB36nIvL3AN3YN3ZIXrShS6eP5ZSDFDLzSY/IgSDVU7MCd6N33Mnw1qpzN3b221nbIT6sipvGMCrtcVSEJaeH5GmRfTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SSE5kH6L; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s4CVEA/B"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785894983;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fcXxW7fxjLZiUzBiMzlfHXZGtMtQw6KnKnAvHLofAFo=;
-	b=s4CVEA/ByOw/4Kxy4+rv11pM8ySzCqE9gM2xwgj/q4pGApyqwHwOjNoM3uIu+X9xVmunRv
-	dS4Ul3QZ9x+EXgj3wQY4XvhXMS+1cPVeB+5Au7gCBAUB7voOsHbedPXSJ1seun0h5RwymA
-	EIR1B9u3RsH4ymHFXbhw14Q1l0gqAQ8=
-From: Huiwen He <huiwen.he@linux.dev>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	senozhatsky@chromium.org,
-	dhowells@redhat.com,
-	chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Subject: [PATCH RESEND 2/2] smb/client: remove unused file flags ioctl handlers
-Date: Wed,  5 Aug 2026 09:54:47 +0800
-Message-ID: <20260805015447.15488-3-huiwen.he@linux.dev>
-In-Reply-To: <20260805015447.15488-1-huiwen.he@linux.dev>
-References: <20260805015447.15488-1-huiwen.he@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SSE5kH6L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D72E1F00A3D
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 02:17:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785896249;
+	bh=TlXW4rIY5AYV859ELd0bJH9YIPBYVM5B7tqz1iTmGbg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=SSE5kH6LgKqjHBxHUKoBUvXTaVyGH9ZnPTfns0Gaz08sCYxqBGazlZ2XCfYuqpPBM
+	 xBeyRWldeQiFIGWbIybuSzynPoB7x3fR31iuO0/SRB5JKEt5TSDQEdXBh+7/nQ1XJi
+	 Tfl7iKqg7iEigcSvX+hKeuGUte4XgYfBS/jdzWp5HeXzZ3KFjH1gWyXlEsWRamWLCA
+	 MLUVuaIftjamAsacHJ4JoXCZy/u1Uic1r10GgLWHPiKvs6EpMeP2gvrYJ71mVVb9FG
+	 7+YXtCRtl/UJBEnzpSXBE2v51N1MVNjU/TpvoJlYp450zaoT59S/Mek9DwVMn/0iov
+	 u5F2bSUYHqhLQ==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c15cd3fd760so62563766b.2
+        for <linux-cifs@vger.kernel.org>; Tue, 04 Aug 2026 19:17:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rrym8o2AGgLL/IRGAUeHBhT3+efHlOLMJRUWHx/HkbIlWhqSJkHJdq3t+KDxNtUd4Yc4equKFbITZve@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHxAB5p/qLFEgCRgWhqgzgmeq6hlEt3qUWF2LJHx1yRQ9P278j
+	zXHNoIPNbbuLSjiCCTi9xYuWzLheEkWQKGMAwsiUdgESCgufzwlNSsw5slQwCi3NZLILnyMitPI
+	1QIElYGVPELyV7uStPdFsZdc0ecdLy1E=
+X-Received: by 2002:a17:907:1c86:b0:c16:b05c:b9cf with SMTP id
+ a640c23a62f3a-c2039cdc721mr154034366b.26.1785896247916; Tue, 04 Aug 2026
+ 19:17:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260804123301.285434-1-chenxiaosong@chenxiaosong.com> <20260804123301.285434-3-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260804123301.285434-3-chenxiaosong@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 5 Aug 2026 11:17:16 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-A2hup+WnYZj+AaVTzgZ9hHQgg8zKswtw=-VqStE6VFw@mail.gmail.com>
+X-Gm-Features: AUfX_mxK_Owyxu3xATLs17cXI_ajKncAdUfzMJ8EQq3lw51yo9ve6JUDO0xNnqE
+Message-ID: <CAKYAXd-A2hup+WnYZj+AaVTzgZ9hHQgg8zKswtw=-VqStE6VFw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] smb/server: deny overwriting targets with
+ non-POSIX opens
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, metze@samba.org, 
+	slow@samba.org, linux-cifs@vger.kernel.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Huiwen He <hehuiwen@kylinos.cn>
+> +bool ksmbd_has_other_nonposix_open(struct dentry *dentry)
+> +{
+> +       struct ksmbd_file *fp;
+> +       struct ksmbd_inode *ci;
+> +       struct inode *inode = d_inode(dentry);
+> +       bool ret = false;
+> +
+> +       if (!inode)
+> +               return false;
+> +
+> +       ci = ksmbd_inode_lookup_lock(dentry);
+The new check is limited to the target dentry's
+ksmbd_inode->m_fp_list. Therefore, it does not cover a struct
+ksmbd_file opened through another hardlink dentry, even though
+file_inode(fp->filp) == d_inode(dentry). For example, if file2.link is
+a hardlink to file2 and file2.link is opened with a non-POSIX context,
+an overwrite rename of another file to file2 can miss that open
+handle.
+This appears to be an existing limitation rather than a regression
+introduced by this patch. However, since this patch is intended to
+reject overwrites when the target has a non-POSIX ksmbd_file...
 
-FS_IOC_GETFLAGS and FS_IOC_SETFLAGS are now handled by the generic VFS
-fileattr path, so their cifs_ioctl() handlers are unreachable. Remove
-the handlers and associated state.
-
-Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/client/cifsfs.c |  2 +-
- fs/smb/client/ioctl.c  | 82 ------------------------------------------
- 2 files changed, 1 insertion(+), 83 deletions(-)
-
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 0a1135602697..603b177f1b09 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -1194,7 +1194,7 @@ int cifs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
- 	struct inode *inode = d_inode(dentry);
- 	u32 attrs;
- 
--	/* Preserve FS_COMPR_FL previously reported by cifs_ioctl(). */
-+	/* Report the cached SMB compressed attribute as FS_COMPR_FL. */
- 	if (READ_ONCE(CIFS_I(inode)->cifsAttrs) & ATTR_COMPRESSED)
- 		fa->flags |= FS_COMPR_FL;
- 
-diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index 8b2ca0c7c06c..1279e215ecd2 100644
---- a/fs/smb/client/ioctl.c
-+++ b/fs/smb/client/ioctl.c
-@@ -528,14 +528,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 	struct cifs_tcon *tcon;
- 	struct tcon_link *tlink;
- 	struct cifs_sb_info *cifs_sb;
--	__u64	ExtAttrBits = 0;
--	bool enable_compression;
--	__u16 compression_state;
--#ifdef CONFIG_CIFS_POSIX
--#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--	__u64   caps;
--#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--#endif /* CONFIG_CIFS_POSIX */
- 
- 	xid = get_xid();
- 
-@@ -546,80 +538,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 		trace_smb3_ioctl(xid, pSMBFile->fid.persistent_fid, command);
- 
- 	switch (command) {
--		case FS_IOC_GETFLAGS:
--			if (pSMBFile == NULL)
--				break;
--			tcon = tlink_tcon(pSMBFile->tlink);
--#ifdef CONFIG_CIFS_POSIX
--#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
--			caps = le64_to_cpu(tcon->fsUnixInfo.Capability);
--			if (CIFS_UNIX_EXTATTR_CAP & caps) {
--				__u64	ExtAttrMask = 0;
--				rc = CIFSGetExtAttr(xid, tcon,
--						    pSMBFile->fid.netfid,
--						    &ExtAttrBits, &ExtAttrMask);
--				if (rc == 0)
--					rc = put_user(ExtAttrBits &
--						FS_FL_USER_VISIBLE,
--						(int __user *)arg);
--				if (rc != -EOPNOTSUPP)
--					break;
--			}
--#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
--#endif /* CONFIG_CIFS_POSIX */
--			if (CIFS_I(inode)->cifsAttrs & FILE_ATTRIBUTE_COMPRESSED)
--				ExtAttrBits |= FS_COMPR_FL;
--
--			rc = put_user(ExtAttrBits & FS_FL_USER_VISIBLE,
--				      (int __user *)arg);
--			break;
--		case FS_IOC_SETFLAGS:
--			if (pSMBFile == NULL)
--				break;
--			tcon = tlink_tcon(pSMBFile->tlink);
--			/* caps = le64_to_cpu(tcon->fsUnixInfo.Capability); */
--
--			if (get_user(ExtAttrBits, (int __user *)arg)) {
--				rc = -EFAULT;
--				break;
--			}
--
--			/*
--			 * if (CIFS_UNIX_EXTATTR_CAP & caps)
--			 *	rc = CIFSSetExtAttr(xid, tcon,
--			 *		       pSMBFile->fid.netfid,
--			 *		       extAttrBits,
--			 *		       &ExtAttrMask);
--			 * if (rc != -EOPNOTSUPP)
--			 *	break;
--			 */
--
--			/* Currently only flag we can set or clear is compressed. */
--			if (ExtAttrBits & ~FS_COMPR_FL) {
--				rc = -EOPNOTSUPP;
--				break;
--			}
--
--			enable_compression = ExtAttrBits & FS_COMPR_FL;
--			compression_state = enable_compression ?
--				COMPRESSION_FORMAT_DEFAULT :
--				COMPRESSION_FORMAT_NONE;
--
--			rc = cifs_set_compression(xid, filep->f_path.dentry,
--						  tcon, pSMBFile,
--						  compression_state);
--			if (rc == 0) {
--				spin_lock(&inode->i_lock);
--				if (enable_compression)
--					CIFS_I(inode)->cifsAttrs |=
--						FILE_ATTRIBUTE_COMPRESSED;
--				else
--					CIFS_I(inode)->cifsAttrs &=
--						~FILE_ATTRIBUTE_COMPRESSED;
--				spin_unlock(&inode->i_lock);
--			}
--			cifs_dbg(FYI, "set compress flag rc %d\n", rc);
--			break;
- 		case CIFS_IOC_COPYCHUNK_FILE:
- 			rc = cifs_ioctl_copychunk(xid, filep, arg);
- 			break;
--- 
-2.43.0
-
+> +       if (!ci)
+> +               return false;
+> +
+> +       down_read(&ci->m_lock);
+> +       list_for_each_entry(fp, &ci->m_fp_list, node) {
+> +               if (READ_ONCE(fp->f_state) != FP_INITED)
+> +                       continue;
+> +               if (inode != file_inode(fp->filp))
+> +                       continue;
+> +               if (fp->is_posix_ctxt)
+> +                       continue;
+> +
+> +               ret = true;
+> +               break;
+> +       }
+> +       up_read(&ci->m_lock);
+> +       ksmbd_inode_put(ci);
