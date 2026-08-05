@@ -1,120 +1,178 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D5138836C
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 14:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311A436F8EA
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 18:05:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785940597; cv=none; b=eijiN5Rhu4LQVt9BxDv3wVuONVgeorjcLPX90BnxPjoVCOsCUbLPXI1y3tMVz/HhODlHYzO0hwyywsM6iC6/HQGO6fnMRTjyfklOw/ryXoqDeIUGdQM1sMKj06/JQNC5iXJm1l94E2yqFXOavQR5//9h+U3yfQ5l3osk6aJRYiU=
+	t=1785953140; cv=none; b=uyDA9E/G0ncCbJneGGvcowoBEQYL3r3wW3qe/+k2WraOXHRSAAFlv7z0U0aLErmqMV9rUoeLxHhtO+66g2mHTSkSypb9SizVX371I6XA3XOwvaqDPBX7VYoA9oX7YodFnJHvNjLVlho1kJOn5DDUI2xQ9/uYabVKTA2El/DFI/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785940597; c=relaxed/simple;
-	bh=4rCgqeuHEy9E5A8LTGid6IlJZItGQ4fk034XPhbIATk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rGdw7Vchbh7aVX8jcwzvLyUo6brJPZRfkpsz6Mw3364UR93SfUZmEXx6QgGP8okhmESPJOjpwKQJMHz4S2xs7/TA4Mp/Gg23ABUEr3ID2IR4hIPIeCd3QpLtKPRVIPH4UL4rSErpdZfOvHtPJtEfsmlBXu9Rp47jUM24b2VOvxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WJBN5W9L; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1785953140; c=relaxed/simple;
+	bh=DW9yyV0YW4K7ITId9k/H+TK5L4C3ALvWZ49D9nbQr7Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sf7WiiLAZxZBVhPjIuBtMT99+4odmR0oi/xFbRw2oz+ceEgFnb8TFu7rM6RUvrhFlzUZQ2NcpCUf+m8cnBfzhvWClmEE2dPcg6f/MOxdhin8lBGJLlpHKGJwBVjriT318RAoX5IM+3rnMXnKmssJ/CicUey74tMoRySOmxHRh3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBBl1Nen; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJBN5W9L"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785940589;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SdbllWlXb3ri7lSNaZ11zlDq0wjdTEQ2mDG3hzZ4lUk=;
-	b=WJBN5W9LEYLi5qhO8GR5vSZw/hxTvftqG3AtnoEk+SjQKHMA7NsKYHwoZbhj7FMjgbmhE7
-	oscvHYCsZJIxhEYh2w/R5i09vo6Dx3Ov/Khq3lc+k7t1nwt5PFTWmcTxA/QO3dqjhx2C5n
-	fP9v3rmvQ71EEuJco3fegsywrYHJk6s=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-230-YV8rJ0xiOzGhfOWY9BrAnw-1; Wed,
- 05 Aug 2026 10:36:26 -0400
-X-MC-Unique: YV8rJ0xiOzGhfOWY9BrAnw-1
-X-Mimecast-MFC-AGG-ID: YV8rJ0xiOzGhfOWY9BrAnw_1785940584
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 28E0B1955F7A;
-	Wed,  5 Aug 2026 14:36:24 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.44.48.209])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 49AFB1800598;
-	Wed,  5 Aug 2026 14:36:19 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when done
-Date: Wed,  5 Aug 2026 16:36:05 +0200
-Message-ID: <20260805143611.818559-3-thuth@redhat.com>
-In-Reply-To: <20260805143611.818559-1-thuth@redhat.com>
-References: <20260805143611.818559-1-thuth@redhat.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBBl1Nen"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-848761b5897so1020469b3a.3
+        for <linux-cifs@vger.kernel.org>; Wed, 05 Aug 2026 11:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785953138; x=1786557938; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=WpaDgwWMnqY4lhvXrcB+QWEYFlki4Y+NO5ZQwCLRbhM=;
+        b=QBBl1NenudvDBIfmiUjlNpf6ad7N85Q9sN9JzftGg9xvAUBzceXi8pTDUNxEDungPV
+         hBMetXcWthOQmgZ/rInJ5Vkd+pwEVv33wB3PVfaRXFCrVPTMRYOiwxNGNtyQXobTpE1V
+         Td3lUv1D0gZbbZbM314XelAjHnImIjiKcJjzOe7Rx+w6zg1hDStqpUHxcJIqBwk4W5Yx
+         7jHNgZnumEMNssgMOsiCrOSqeGlwKU0n0qx8Br2WgoOOhcovDJLYpfWfJfk9IN9zefSr
+         sqNMu/aRqueXv5X4t+vZU1g2ShI0meYnnM4mRsjAnNUdgyEFUc0IRxL96yEzo68ej7jh
+         IG6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785953138; x=1786557938;
+        h=in-reply-to:content-disposition:content-type:mime-version
+         :references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=WpaDgwWMnqY4lhvXrcB+QWEYFlki4Y+NO5ZQwCLRbhM=;
+        b=Oj4mDdC1ZtBP5EfCsT366OwSuo54xpYHU/JWmDYxy9FCj+1aNhBhld2UzIxCDecho7
+         1KHNjQlsjKv+u1lFLtGReRfOkHawIoYWCYyJ0HSrLoIudaD3+CMKVQQ4lgLuI1/ey5VY
+         HHFMP9dpM/H2FWxImP/AxrFg+15PNjZwUbXf4S2KvXFdIZGbiQXUjdovTv2A7yMAhqJD
+         rNdjyUA6f42eLSlBjp5FIIp5afPX2dXsbmMdFBC13BHp7FuzNKC8z/+wu54e++iP0LZL
+         5GSJ70kLZu/0FgbKlyaHAgnT6hk/JAzFYWrnWMxqcv/ib//oBTVT8yVaKhJQmnI4RcAq
+         plIQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq7VNmOmSKoC0Fkbqy90vqAlaqicpI4NG+3v1GQ9u0wgfkXfC1hVNsop6JhzMJrTOr6QSTDsgyuhYPT@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrAs0EUIBN56OtTa8OhvHqCjqgyrmP+01vKQS15XsrFLQCX6Hu
+	LlsViwCCxnSn3XHJkW2Wg8rVNJb1GfsK38d8hiRc25BjjSrat9VQIZ8J
+X-Gm-Gg: AR+sD11mupC5PPVBcVYlrZEV0rGQXpzL1NB/7qXMIEOsTXk4fF7TelPOrdHK1FipbiK
+	cet+rsk5wIf9yTR030TTqajZhRoztCXjvkzvF5yHkVUeD58vMhpz0AYxBgK0YdiClbzEe3DQKBW
+	7dud5mkcUbkOVq6NeeGNdx0Oru+Wuj+mI19x54l4uQD37TakDHJHTaedkPZGrxh+o9wQWIH5fW9
+	8aHh39twL3GcO4kVURkJ2lSOON8RC5ijfJHk1xVsvgPCrcVnBhaeQcivd0ZWTOP4BgxdEgim/1n
+	CLdEkQmSqC/j99PCtG8QXG3DyDwS1Dhvb6GA8yudGiX9Tu9GWjFNbEOs48M+QEF7UjY3CQO0qFn
+	xA2sKdcBZCxB17f9SOrPXRME2HNraDMHTM6Nix8sd412b/ZzDBzUYvmTH7KpJowjC1NOtpm3npC
+	aDXLtSROa73DetCGelzcX6H0njzTfogjt37ACRuLbEHllie1dGIwLLkBuE4G4xt4IgJiNPj0NNS
+	HejPdmFVZWjH5HrFcRid9+DvBvg8XQ4p8JZii2aEg==
+X-Received: by 2002:a05:6a00:4482:b0:848:42d0:bc91 with SMTP id d2e1a72fcca58-84f2dfc89bemr10533575b3a.12.1785953138226;
+        Wed, 05 Aug 2026 11:05:38 -0700 (PDT)
+Received: from skinsburskii (c-98-225-44-182.hsd1.wa.comcast.net. [98.225.44.182])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84f2e2e3089sm1288826b3a.19.2026.08.05.11.05.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Aug 2026 11:05:37 -0700 (PDT)
+Date: Wed, 5 Aug 2026 11:05:35 -0700
+From: Stanislav Kinsburskii <skinsburskii@gmail.com>
+To: rafael@kernel.org, pavel@kernel.org, lenb@kernel.org, mingo@redhat.com,
+	peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, kprateek.nayak@amd.com
+Cc: linux-pm@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] freezer: Restrict unsafe freezable tasks to system
+ sleep
+Message-ID: <anN7b-WbFvqAsO4l@skinsburskii>
+References: <178404715617.1031850.16243528040694432110.stgit@skinsburskii>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178404715617.1031850.16243528040694432110.stgit@skinsburskii>
 
-From: Thomas Huth <thuth@redhat.com>
+On Tue, Jul 14, 2026 at 09:39:51AM -0700, Stanislav Kinsburskii wrote:
+> TASK_FREEZABLE_UNSAFE is used by network filesystems for sleeps that may
+> happen while a task holds locks or transport resources needed by other
+> tasks. Allowing the freezer to park such tasks for administrative freezer
+> requests can therefore block unrelated users of the same mount until the
+> task is thawed.
+> 
+> The original purpose of these unsafe freezable sleeps is to keep system
+> sleep from being blocked indefinitely by RPC or filesystem waits. Preserve
+> that behavior for suspend and hibernation, but do not freeze
+> TASK_FREEZABLE_UNSAFE tasks for non-PM freezer requests.
+> 
+> Make __TASK_FREEZABLE_UNSAFE independent of CONFIG_LOCKDEP so the freezer
+> can test the unsafe state in all builds. The lockdep check still uses the
+> same bit to suppress the locks-held warning for these known unsafe waits.
+> 
+> Document the PM-only freezer semantics for TASK_FREEZABLE_UNSAFE.
+> 
 
-Clear the local crypto-related structures via __cleanup() functions
-when we're done with them to avoid that sensitive data could leak on
-the stack.
+A gentle ping on this one.
 
-Note: cmac_ctx in ksmbd_sign_smb3_pdu() gets cleared in aes_cmac_final()
-already, so this does not need a __cleanup() marker.
+I understand that this change may not look like a pressing matter, but
+allowing a process to be frozen in the middle of a request, while
+holding a lot of locked state and without any guarantee that it will be
+thawed, does not look right.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- fs/smb/client/smb2transport.c | 4 ++--
- fs/smb/server/auth.c          | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Some applications, such as Mesos, use the freezer to quiesce processes,
+and if they are killed, they may leave those processes frozen. If the
+frozen process leaves access to the NFS server locked, other
+applications cannot access it, which may lead to an inability to log in
+to the host.
 
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 1143ee52470a7..d23566da2ac81 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
- 	struct kvec *iov = rqst->rq_iov;
- 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
--	struct aes_cmac_key cmac_key;
--	struct aes_cmac_ctx cmac_ctx;
-+	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
-+	struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
- 	struct smb_rqst drqst;
- 	u8 key[SMB3_SIGN_KEY_SIZE];
- 
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 86f521e849d5e..f123e6cf9c424 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -505,7 +505,7 @@ void ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
- void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
- 			 int n_vec, char *sig)
- {
--	struct aes_cmac_key cmac_key;
-+	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
- 	struct aes_cmac_ctx cmac_ctx;
- 	int i;
- 
--- 
-2.55.0
+Thanks,
+Stanislav
 
+> Signed-off-by: Stanislav Kinsburskii <skinsburskii@gmail.com>
+> ---
+>  Documentation/power/freezing-of-tasks.rst |    3 +++
+>  include/linux/sched.h                     |    2 +-
+>  kernel/freezer.c                          |   10 ++++++++++
+>  3 files changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/power/freezing-of-tasks.rst b/Documentation/power/freezing-of-tasks.rst
+> index df9755bfbd94..0ccf2ea041cf 100644
+> --- a/Documentation/power/freezing-of-tasks.rst
+> +++ b/Documentation/power/freezing-of-tasks.rst
+> @@ -16,6 +16,9 @@ II. How does it work?
+>  
+>  There is one per-task flag (PF_NOFREEZE) and three per-task states
+>  (TASK_FROZEN, TASK_FREEZABLE and __TASK_FREEZABLE_UNSAFE) used for that.
+> +Tasks sleeping in TASK_FREEZABLE_UNSAFE may hold locks or other resources
+> +that make them unsafe to freeze for administrative freezer requests, so the
+> +freezer only freezes them during system-wide suspend or hibernation.
+>  The tasks that have PF_NOFREEZE unset (all user space tasks and some kernel
+>  threads) are regarded as 'freezable' and treated in a special way before the
+>  system enters a sleep state as well as before a hibernation image is created
+> diff --git a/include/linux/sched.h b/include/linux/sched.h
+> index 908aff695ef8..67e052dee1c4 100644
+> --- a/include/linux/sched.h
+> +++ b/include/linux/sched.h
+> @@ -122,7 +122,7 @@ struct user_event_mm;
+>  #define TASK_NEW			0x00000800
+>  #define TASK_RTLOCK_WAIT		0x00001000
+>  #define TASK_FREEZABLE			0x00002000
+> -#define __TASK_FREEZABLE_UNSAFE	       (0x00004000 * IS_ENABLED(CONFIG_LOCKDEP))
+> +#define __TASK_FREEZABLE_UNSAFE		0x00004000
+>  #define TASK_FROZEN			0x00008000
+>  #define TASK_STATE_MAX			0x00010000
+>  
+> diff --git a/kernel/freezer.c b/kernel/freezer.c
+> index a76bf957fb32..bf7bb15c144f 100644
+> --- a/kernel/freezer.c
+> +++ b/kernel/freezer.c
+> @@ -124,6 +124,16 @@ static int __set_task_frozen(struct task_struct *p, void *arg)
+>  	if (!(state & (TASK_FREEZABLE | __TASK_STOPPED | __TASK_TRACED)))
+>  		return 0;
+>  
+> +	/*
+> +	 * TASK_FREEZABLE_UNSAFE waiters may hold locks or other resources that
+> +	 * other tasks need in order to make forward progress.  Only freeze
+> +	 * them for system-wide suspend or hibernation, where failing to freeze
+> +	 * them can prevent the sleep transition from making progress.
+> +	 */
+> +	if ((state & __TASK_FREEZABLE_UNSAFE) &&
+> +	    !pm_freezing && !pm_nosig_freezing)
+> +		return 0;
+> +
+>  	/*
+>  	 * Only TASK_NORMAL can be augmented with TASK_FREEZABLE, since they
+>  	 * can suffer spurious wakeups.
+> 
+> 
