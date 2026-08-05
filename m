@@ -1,178 +1,228 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311A436F8EA
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 18:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C832399003
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 19:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785953140; cv=none; b=uyDA9E/G0ncCbJneGGvcowoBEQYL3r3wW3qe/+k2WraOXHRSAAFlv7z0U0aLErmqMV9rUoeLxHhtO+66g2mHTSkSypb9SizVX371I6XA3XOwvaqDPBX7VYoA9oX7YodFnJHvNjLVlho1kJOn5DDUI2xQ9/uYabVKTA2El/DFI/g=
+	t=1785958529; cv=none; b=qdhgO7G1/RuZTB/Kg7JwHLQ3q6Zel/wHlIEyCa54Qu8SnH6t2LVMdWYFjTomaTRGORDmUDELnHHtwYpse1nps1zEFidJ7DoodFkHq+XyQ8t7gpZVrTh36IHBlXZtXTyU99z67afC1GCGnGokWRpfrvOux+6fkFLKBDo7qrg6LOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785953140; c=relaxed/simple;
-	bh=DW9yyV0YW4K7ITId9k/H+TK5L4C3ALvWZ49D9nbQr7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sf7WiiLAZxZBVhPjIuBtMT99+4odmR0oi/xFbRw2oz+ceEgFnb8TFu7rM6RUvrhFlzUZQ2NcpCUf+m8cnBfzhvWClmEE2dPcg6f/MOxdhin8lBGJLlpHKGJwBVjriT318RAoX5IM+3rnMXnKmssJ/CicUey74tMoRySOmxHRh3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBBl1Nen; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785958529; c=relaxed/simple;
+	bh=Ng9g+sZm68B3eedUCA65Ga6DDofgkQx8PzcZUCyYa+4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I6VjdMPEc7qUvunuh6YFXkv8y6B/v1ci7JtX/iAvPLd2DocuStghGuhScv0zEbD6Vzoh0JcpJ9+gm4MOp312ttrfr8G0/6Arytr74KbNbiAcA6EgKZWdwL9JFYzl4x1R+8NewNjAxmxiIUVbFVlVesSIZy0XWKtaikpgZEQ+oQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=R5Ifr2k/; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBBl1Nen"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-848761b5897so1020469b3a.3
-        for <linux-cifs@vger.kernel.org>; Wed, 05 Aug 2026 11:05:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785953138; x=1786557938; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=WpaDgwWMnqY4lhvXrcB+QWEYFlki4Y+NO5ZQwCLRbhM=;
-        b=QBBl1NenudvDBIfmiUjlNpf6ad7N85Q9sN9JzftGg9xvAUBzceXi8pTDUNxEDungPV
-         hBMetXcWthOQmgZ/rInJ5Vkd+pwEVv33wB3PVfaRXFCrVPTMRYOiwxNGNtyQXobTpE1V
-         Td3lUv1D0gZbbZbM314XelAjHnImIjiKcJjzOe7Rx+w6zg1hDStqpUHxcJIqBwk4W5Yx
-         7jHNgZnumEMNssgMOsiCrOSqeGlwKU0n0qx8Br2WgoOOhcovDJLYpfWfJfk9IN9zefSr
-         sqNMu/aRqueXv5X4t+vZU1g2ShI0meYnnM4mRsjAnNUdgyEFUc0IRxL96yEzo68ej7jh
-         IG6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785953138; x=1786557938;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WpaDgwWMnqY4lhvXrcB+QWEYFlki4Y+NO5ZQwCLRbhM=;
-        b=Oj4mDdC1ZtBP5EfCsT366OwSuo54xpYHU/JWmDYxy9FCj+1aNhBhld2UzIxCDecho7
-         1KHNjQlsjKv+u1lFLtGReRfOkHawIoYWCYyJ0HSrLoIudaD3+CMKVQQ4lgLuI1/ey5VY
-         HHFMP9dpM/H2FWxImP/AxrFg+15PNjZwUbXf4S2KvXFdIZGbiQXUjdovTv2A7yMAhqJD
-         rNdjyUA6f42eLSlBjp5FIIp5afPX2dXsbmMdFBC13BHp7FuzNKC8z/+wu54e++iP0LZL
-         5GSJ70kLZu/0FgbKlyaHAgnT6hk/JAzFYWrnWMxqcv/ib//oBTVT8yVaKhJQmnI4RcAq
-         plIQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rq7VNmOmSKoC0Fkbqy90vqAlaqicpI4NG+3v1GQ9u0wgfkXfC1hVNsop6JhzMJrTOr6QSTDsgyuhYPT@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrAs0EUIBN56OtTa8OhvHqCjqgyrmP+01vKQS15XsrFLQCX6Hu
-	LlsViwCCxnSn3XHJkW2Wg8rVNJb1GfsK38d8hiRc25BjjSrat9VQIZ8J
-X-Gm-Gg: AR+sD11mupC5PPVBcVYlrZEV0rGQXpzL1NB/7qXMIEOsTXk4fF7TelPOrdHK1FipbiK
-	cet+rsk5wIf9yTR030TTqajZhRoztCXjvkzvF5yHkVUeD58vMhpz0AYxBgK0YdiClbzEe3DQKBW
-	7dud5mkcUbkOVq6NeeGNdx0Oru+Wuj+mI19x54l4uQD37TakDHJHTaedkPZGrxh+o9wQWIH5fW9
-	8aHh39twL3GcO4kVURkJ2lSOON8RC5ijfJHk1xVsvgPCrcVnBhaeQcivd0ZWTOP4BgxdEgim/1n
-	CLdEkQmSqC/j99PCtG8QXG3DyDwS1Dhvb6GA8yudGiX9Tu9GWjFNbEOs48M+QEF7UjY3CQO0qFn
-	xA2sKdcBZCxB17f9SOrPXRME2HNraDMHTM6Nix8sd412b/ZzDBzUYvmTH7KpJowjC1NOtpm3npC
-	aDXLtSROa73DetCGelzcX6H0njzTfogjt37ACRuLbEHllie1dGIwLLkBuE4G4xt4IgJiNPj0NNS
-	HejPdmFVZWjH5HrFcRid9+DvBvg8XQ4p8JZii2aEg==
-X-Received: by 2002:a05:6a00:4482:b0:848:42d0:bc91 with SMTP id d2e1a72fcca58-84f2dfc89bemr10533575b3a.12.1785953138226;
-        Wed, 05 Aug 2026 11:05:38 -0700 (PDT)
-Received: from skinsburskii (c-98-225-44-182.hsd1.wa.comcast.net. [98.225.44.182])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84f2e2e3089sm1288826b3a.19.2026.08.05.11.05.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Aug 2026 11:05:37 -0700 (PDT)
-Date: Wed, 5 Aug 2026 11:05:35 -0700
-From: Stanislav Kinsburskii <skinsburskii@gmail.com>
-To: rafael@kernel.org, pavel@kernel.org, lenb@kernel.org, mingo@redhat.com,
-	peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	vschneid@redhat.com, kprateek.nayak@amd.com
-Cc: linux-pm@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] freezer: Restrict unsafe freezable tasks to system
- sleep
-Message-ID: <anN7b-WbFvqAsO4l@skinsburskii>
-References: <178404715617.1031850.16243528040694432110.stgit@skinsburskii>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="R5Ifr2k/"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=Ng9g+sZm68B3eedUCA65Ga6DDofgkQx8PzcZUCyYa+4=; b=R5Ifr2k/WYrbg76J+RQ1IrYYRG
+	q4okelKy7zqIBs/jCDBPo47g3ZV6DRz6iLPiMHlIhoBUNB0Gk6TOdx6LqVgwg1I8QitMCbWZDMmiT
+	3u57GBXghYvBD6/Hi72cGp+dYAkJd76LQG+41cOZuDYIR9Z1zvVULRYV9asKfzkM3siPUtzAneTAm
+	v1uToRHNH+KoMtXSdukPQjXoR+j9bBn9SrrzmORxH/vKYgGvWQT9Ny20CsfPwmv32fj1euACUt5GJ
+	gHW2G9clp52Ic1az6pXvYPuSBMA7LXGhKBIW1J4EeYUaNQY0KdI070AYqgV7rBK2py8mcGS2ryV4J
+	ozNPz1oge37aiGK6CyQ/SFK4irzNNGFgIYOeWlm7UfIiqExOi5wyKJW0aK63jJ/lrGjrEGXrBGcYz
+	tebUk51Ap7CcxedMeG1AFK8LLuUynYcF6+6q6xUH246EDWi4bn6I8ov1OTDjoMI69lVSbVKwqqLU4
+	95RQovNO8ZUvSyJ8f2XbXiIG;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1wrhOQ-00000002yXz-2yZS;
+	Wed, 05 Aug 2026 19:35:12 +0000
+Message-ID: <75b978b8-65dd-43ad-b98d-10ec11f5cff6@samba.org>
+Date: Wed, 5 Aug 2026 21:35:08 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <178404715617.1031850.16243528040694432110.stgit@skinsburskii>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH samba] smbd: deny rename if the destination has
+ non-POSIX opens
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
+ linkinjeon@kernel.org, pc@manguebit.org, tom@talpey.com,
+ senozhatsky@chromium.org, metze@samba.org
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260805133145.312198-1-chenxiaosong@chenxiaosong.com>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <20260805133145.312198-1-chenxiaosong@chenxiaosong.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------KBuEL7OfYkXKLfpgC0Uk0rX0"
 
-On Tue, Jul 14, 2026 at 09:39:51AM -0700, Stanislav Kinsburskii wrote:
-> TASK_FREEZABLE_UNSAFE is used by network filesystems for sleeps that may
-> happen while a task holds locks or transport resources needed by other
-> tasks. Allowing the freezer to park such tasks for administrative freezer
-> requests can therefore block unrelated users of the same mount until the
-> task is thawed.
-> 
-> The original purpose of these unsafe freezable sleeps is to keep system
-> sleep from being blocked indefinitely by RPC or filesystem waits. Preserve
-> that behavior for suspend and hibernation, but do not freeze
-> TASK_FREEZABLE_UNSAFE tasks for non-PM freezer requests.
-> 
-> Make __TASK_FREEZABLE_UNSAFE independent of CONFIG_LOCKDEP so the freezer
-> can test the unsafe state in all builds. The lockdep check still uses the
-> same bit to suppress the locks-held warning for these known unsafe waits.
-> 
-> Document the PM-only freezer semantics for TASK_FREEZABLE_UNSAFE.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------KBuEL7OfYkXKLfpgC0Uk0rX0
+Content-Type: multipart/mixed; boundary="------------1ObTU5dguczR6trRa1loX070";
+ protected-headers="v1"; hp="clear"
+Message-ID: <75b978b8-65dd-43ad-b98d-10ec11f5cff6@samba.org>
+Date: Wed, 5 Aug 2026 21:35:08 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH samba] smbd: deny rename if the destination has
+ non-POSIX opens
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
+ linkinjeon@kernel.org, pc@manguebit.org, tom@talpey.com,
+ senozhatsky@chromium.org, metze@samba.org
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260805133145.312198-1-chenxiaosong@chenxiaosong.com>
+From: Ralph Boehme <slow@samba.org>
+Content-Language: en-US, de-DE
+Autocrypt: addr=slow@samba.org; keydata=
+ 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
+ rb9LanmjmJltdkLDwbd58Q==
+In-Reply-To: <20260805133145.312198-1-chenxiaosong@chenxiaosong.com>
 
-A gentle ping on this one.
+--------------1ObTU5dguczR6trRa1loX070
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-I understand that this change may not look like a pressing matter, but
-allowing a process to be frozen in the middle of a request, while
-holding a lot of locked state and without any guarantee that it will be
-thawed, does not look right.
+T24gOC81LzI2IDM6MzEgUE0sIENoZW5YaWFvU29uZyB3cm90ZToNCj4gRnJvbTogQ2hlblhp
+YW9Tb25nIDxjaGVueGlhb3NvbmdAa3lsaW5vcy5jbj4NCj4gDQo+IENoZWNrIHRoZSBkZXN0
+aW5hdGlvbiBzaGFyZSBtb2RlIGVudHJpZXMgd2l0aA0KPiBoYXNfb3RoZXJfbm9ucG9zaXhf
+b3BlbnMoKSBiZWZvcmUgcmVwbGFjaW5nIGl0LCBhbmQgcmV0dXJuDQo+IE5UX1NUQVRVU19B
+Q0NFU1NfREVOSUVEIGlmIGEgbm9uLVBPU0lYIG9wZW4gZXhpc3RzLg0KdGhhbmtzIGZvciBs
+b29raW5nIGludG8gdGhpcyENCg0KSSdtIGFmcmFpZCB0aG91Z2ggdGhhdCB0aGUgaXNzdWUg
+aXMgbW9yZSBzdWJ0bGUgdGhlbiBqdXN0IGFkanVzdGluZyB0aGUgDQpjaGVjayBpbiB0aGF0
+IHBsYWNlLg0KDQpJbiBmYWN0LCBiYWNrIHdoZW4gSSBpbXBsZW1lbnRlZCBEaXJlY3Rvcnkg
+TGVhc2VzLCBJIGFkZGVkIHRoZSBmdWxsIA0KbG9naWMgdG8gY2hlY2sgZm9yIG9wZW4gZmls
+ZXMgYW5kIHBvc3NpYmxlIEgtbGVhc2VzIG9uIHRoZW0gb24NCi0gdGhlIHNyYyBvZiB0aGUg
+cmVuYW1lDQotIGlpcmMgYWxzbyB0aGUgcGFyZW50IG9mIHRoZSBzcmMgb2YgdGhlIHJlbmFt
+ZQ0KLSB0aGUgcGFyZW50IG9mIHRoZSBkc3QNCi0gYW5kIHRoZSBkc3QNCg0KQWxsIHRoYXQg
+bG9naWMgbGl2ZXMgaW4gYSBmZXcgbGV2ZWxzIGF2b3ZlIHJlbmFtZV9pbnRlcm5hbHNfZnNw
+KCkgaW5zaWRlIA0Kc21iZF9zbWIyX3NldGluZm9fbGVhc2VfYnJlYWtfY2hlY2soKS4NCg0K
+VGhlIGZ1bmN0aW9uIHRoYXQgZGVhbHMgd2l0aCB0aGUgZHN0IGlzIA0Kc21iZF9zbWIyX3Nl
+dGluZm9fcmVuYW1lX2RzdF9jaGVjaygpLiBUaGF0IG9uZSBhbHJlYWR5IGNvcnJlY3RseSB1
+c2VzIA0KaGFzX290aGVyX25vbnBvc2l4X29wZW5zKCkgd2hpbGUgaG9sZGluZyBhIGxvY2sg
+b24gdGhlIGxvY2tpbmcudGRiIA0KcmVjb3JkIG9mIHRoZSBkZXN0aW5hdGlvbi4NCg0KVGhl
+IGNoZWNrIHdpdGggZmlsZXNfZm9yYWxsKCkgaW5zaWRlIHJlbmFtZV9pbnRlcm5hbHNfZnNw
+KCkgaXMgYSBjbHV0Y2ggDQp0aGF0IGFscmVhZHkgY2hlY2sgZm9yIG9wZW5zIGluIHRoZSBz
+YW1lIHByb2Nlc3MsIG5vdCBnbG9iYWxseS4gQW5kIHdlIA0KY2FuJ3QgZXhwYW5kIGl0IHRv
+IGJlIGdsb2JhbCwgYXMgdGhhdCByZXF1aXJlcyB0YWtpbmcgdGhlIGxvY2sgb24gdGhlIA0K
+bG9ja2luZy50ZGIgcmVjb3JkIHdoaWNoIGlzIHByb2hpYml0dGVkIGJ5IHRoZSBmYWN0IHRo
+YXQgd2UgYWxyZWFkeSBoYXZlIA0KdGhlIGxjayBvbiB0aGUgc3JjIHdoZW4gcmVuYW1lX2lu
+dGVybmFsc19mc3AoKSBpcyBjYWxsZWQuIExvY2tpbmcgdHdvIA0KcmVjb3JkcyBzaW11bHRh
+bmVvdXNseSBpcyBub3QgYWxsb3dlZCBpbiBTYW1iYSwgYXMgaXQgY291bGQgbGVhZCB0byAN
+CmRlYWRsb2Nrcy4NCg0KU28gSSBndWVzcyB0aGUgYmVzdCB3ZSBjYW4gZG8gaXMgcmVtb3Zl
+IHRoZSByZWR1bmRhbnQgY2hlY2sgYWx0b2dldGhlciANCmZyb20gcmVuYW1lX2ludGVybmFs
+c19mc3AoKSBhbmQgcmVseSBvbiB0aGUgY29ycmVjdCBsb2dpYyBmcm9tIA0Kc21iZF9zbWIy
+X3NldGluZm9fbGVhc2VfYnJlYWtfY2hlY2soKS4gV2UgaGF2ZSB0byBsaXZlIHdpdGggdGhl
+IHRvY3RvdSANCnJhY2Ugd2luZG93IGFueXdheSwgaXQganVzdCBlbmxhcmdlcyB0aGUgd2lu
+ZG93IGEgYml0LCBidXQgb25seSBmb3IgdGhlIA0KY2FzZSBvZiBvcGVuIGZpbGVzIGJ5IHRo
+ZSBzYW1lIGNsaWVudC4gT3BlbnMgZnJvbSBvdGhlciBjbGllbnRzLCBhcmUgbm90IA0KZGV0
+ZWN0ZWQgYW55d2F5IGJ5IHRoZSBmaWxlc19mb3JhbGwoKSBhcyBzYWlkIGFib3ZlLg0K
 
-Some applications, such as Mesos, use the freezer to quiesce processes,
-and if they are killed, they may leave those processes frozen. If the
-frozen process leaves access to the NFS server locked, other
-applications cannot access it, which may lead to an inability to log in
-to the host.
+--------------1ObTU5dguczR6trRa1loX070--
 
-Thanks,
-Stanislav
+--------------KBuEL7OfYkXKLfpgC0Uk0rX0
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-> Signed-off-by: Stanislav Kinsburskii <skinsburskii@gmail.com>
-> ---
->  Documentation/power/freezing-of-tasks.rst |    3 +++
->  include/linux/sched.h                     |    2 +-
->  kernel/freezer.c                          |   10 ++++++++++
->  3 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/power/freezing-of-tasks.rst b/Documentation/power/freezing-of-tasks.rst
-> index df9755bfbd94..0ccf2ea041cf 100644
-> --- a/Documentation/power/freezing-of-tasks.rst
-> +++ b/Documentation/power/freezing-of-tasks.rst
-> @@ -16,6 +16,9 @@ II. How does it work?
->  
->  There is one per-task flag (PF_NOFREEZE) and three per-task states
->  (TASK_FROZEN, TASK_FREEZABLE and __TASK_FREEZABLE_UNSAFE) used for that.
-> +Tasks sleeping in TASK_FREEZABLE_UNSAFE may hold locks or other resources
-> +that make them unsafe to freeze for administrative freezer requests, so the
-> +freezer only freezes them during system-wide suspend or hibernation.
->  The tasks that have PF_NOFREEZE unset (all user space tasks and some kernel
->  threads) are regarded as 'freezable' and treated in a special way before the
->  system enters a sleep state as well as before a hibernation image is created
-> diff --git a/include/linux/sched.h b/include/linux/sched.h
-> index 908aff695ef8..67e052dee1c4 100644
-> --- a/include/linux/sched.h
-> +++ b/include/linux/sched.h
-> @@ -122,7 +122,7 @@ struct user_event_mm;
->  #define TASK_NEW			0x00000800
->  #define TASK_RTLOCK_WAIT		0x00001000
->  #define TASK_FREEZABLE			0x00002000
-> -#define __TASK_FREEZABLE_UNSAFE	       (0x00004000 * IS_ENABLED(CONFIG_LOCKDEP))
-> +#define __TASK_FREEZABLE_UNSAFE		0x00004000
->  #define TASK_FROZEN			0x00008000
->  #define TASK_STATE_MAX			0x00010000
->  
-> diff --git a/kernel/freezer.c b/kernel/freezer.c
-> index a76bf957fb32..bf7bb15c144f 100644
-> --- a/kernel/freezer.c
-> +++ b/kernel/freezer.c
-> @@ -124,6 +124,16 @@ static int __set_task_frozen(struct task_struct *p, void *arg)
->  	if (!(state & (TASK_FREEZABLE | __TASK_STOPPED | __TASK_TRACED)))
->  		return 0;
->  
-> +	/*
-> +	 * TASK_FREEZABLE_UNSAFE waiters may hold locks or other resources that
-> +	 * other tasks need in order to make forward progress.  Only freeze
-> +	 * them for system-wide suspend or hibernation, where failing to freeze
-> +	 * them can prevent the sleep transition from making progress.
-> +	 */
-> +	if ((state & __TASK_FREEZABLE_UNSAFE) &&
-> +	    !pm_freezing && !pm_nosig_freezing)
-> +		return 0;
-> +
->  	/*
->  	 * Only TASK_NORMAL can be augmented with TASK_FREEZABLE, since they
->  	 * can suffer spurious wakeups.
-> 
-> 
+-----BEGIN PGP SIGNATURE-----
+
+wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmpzkGwFAwAAAAAACgkQqh6bcSY5nkZK
+hw//TkIhoVgz6LSB31TWpPqYtp2HDMwHLXyWCavU1oaACTPdLA9R+zoyLDdTVKPP9piJsjXC8/Cl
+62rtbqWTIc4QngPlyomASS2fnbTTuc9Twk2Q04A4a5Cypz7OQtkbYIWtyD6LBZMMEIfv5+OZ+nQH
+LVMRHjeASxZ5ySayERo0ReEu4IIG+bJqKMr/mxmJmD+X+iG+DvHV/U8EY+JS0vRAq54tTd4Yv0Xq
+Yqs0SIj4+iAI/8TzMJ41gMfzzGSLxe78mhHDBshUbNSi9Z0ZWWQ5/1g8/jyQ5U1HdaWvTUrqFw8A
+aDF0xV8TnK30pb1jxUyLWxL7UJNqItkdv/c+H6nY2JZF4J9WybJSL+FrUZRUsciQhOgbmb+JjReQ
+/i67RO+fKVg0qoYPhv2eb/5VJKCiqC7MXOFcWX2H9qOR7n+3yVC3sLwxQ5XhKD8SUrZMp9omTkJY
+BeLchKx0+h9qwNMqQEBjat9vxucAgzLebEaHd3MVivlnwqm1LzhTByAj25+0bxbEOCqXVb/PN8qK
+bSHrqei3IKcFkl36laVd81cxCmm9wCT99pyfoir+TQAbSpjTSnlikTaAlvR2owrk/HK2HAc3csdq
+TIET4eeKs+wLIa4HskTJ21f+ki/EKXgBf8up9UXJrx2KGA7lLhRcJuC05Jdr5zjEkWjXyGelRSQ7
+O3o=
+=2+j2
+-----END PGP SIGNATURE-----
+
+--------------KBuEL7OfYkXKLfpgC0Uk0rX0--
