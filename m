@@ -1,32 +1,32 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0118D2F8E99
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 01:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD907377AA3
+	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 01:56:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785894983; cv=none; b=nYq4ikPOQSWo76TgQAQjN9vwIhKDK1ycmORoyQrAHlV6oCZgb76yBPa/wkaXB8HxWr20AHn1YoT2B1iIAyr0RkTfiySlZvi9TMegQmsFWKclcn9vpohm8+u/+hS4SiAzI5vFDpO68TmwHEB1y27bgt9isxs4pSawZT7wfBwmmAg=
+	t=1785894987; cv=none; b=nytm8pQiHwao5hPtk9acAc3WP5MeSadPDyY7gLugVQmB6EHVk860y/54xAI2zoTfyZ+Y4SXpv0tTteZ64FruNbmPusvKxwJWd4F9Q/FgmyjuLNLDxDRs2kN+QZSmXqLr04sanTHue64kNkWU3DgvZF5Eyr4oz8/agGRCkLzUTIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785894983; c=relaxed/simple;
-	bh=Z8iOsxx9ozYxSO0fzsphTgnl+xEF0AtKlRwiu7GVpjc=;
+	s=arc-20240116; t=1785894987; c=relaxed/simple;
+	bh=PqCZKCoG+wkGLabvL7ZmVHD4darNh8gXYXMPI0q2wCc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O4mzyWK43BJCMIRrvVA1Gs0zqXULPlFki6Xq/6Qj4N9aX2NorhuTdWOjCUREIWVSx/2VxP+uJMWKS2tcAJbgtVmxFejtSFXr/50AxudZx4LFIQNLKku14NyCZ/Ev5uolVJfHznJ/zsxg/E8ihKT9BpBwZVaBtXWtlZdl4gmTsS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pzSnZ08c; arc=none smtp.client-ip=91.218.175.177
+	 MIME-Version; b=Z/0ZY7cResfAhCdk6ygbtN/g/A37LppTDkI6rqpHdm33uxSnMmTm8EauSrKvJgwgrEnODzW36h9ofkLp5isdHnOerOTxtK2kqFl9h2g0TAh1PsScQrFblIcQjEvGAZXZTYjQgrrR1VyWKJhOY2hV5ml/mYO6Thwf0XDkgHZtFhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s4CVEA/B; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pzSnZ08c"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s4CVEA/B"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1785894979;
+	t=1785894983;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ehZPG50oGlTnBdfgmS1WKk/VTGlUqyEbIHtZE3Htj/U=;
-	b=pzSnZ08cwqlC5in+BPZpiQrmpD7PPNEw0WhVeIEYSOGjorbTUGlk3WNvpXTPjT3+Xh+V92
-	nrZgDLgyBEOSAwAqmcCOKL+n9O5KQ1Qco99J+5bAaxzJTaPFVM+YiHZiDkjXDEgKapfiJa
-	48fQoB3v63nkyrXOFcLIImTxBrW2DU0=
+	bh=fcXxW7fxjLZiUzBiMzlfHXZGtMtQw6KnKnAvHLofAFo=;
+	b=s4CVEA/ByOw/4Kxy4+rv11pM8ySzCqE9gM2xwgj/q4pGApyqwHwOjNoM3uIu+X9xVmunRv
+	dS4Ul3QZ9x+EXgj3wQY4XvhXMS+1cPVeB+5Au7gCBAUB7voOsHbedPXSJ1seun0h5RwymA
+	EIR1B9u3RsH4ymHFXbhw14Q1l0gqAQ8=
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: smfrench@gmail.com,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org
-Subject: [PATCH RESEND 1/2] smb/client: implement fileattr_set for compression flags
-Date: Wed,  5 Aug 2026 09:54:46 +0800
-Message-ID: <20260805015447.15488-2-huiwen.he@linux.dev>
+Subject: [PATCH RESEND 2/2] smb/client: remove unused file flags ioctl handlers
+Date: Wed,  5 Aug 2026 09:54:47 +0800
+Message-ID: <20260805015447.15488-3-huiwen.he@linux.dev>
 In-Reply-To: <20260805015447.15488-1-huiwen.he@linux.dev>
 References: <20260805015447.15488-1-huiwen.he@linux.dev>
 Precedence: bulk
@@ -56,222 +56,130 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-CIFS handles FS_IOC_SETFLAGS in cifs_ioctl() because it does not
-implement ->fileattr_set. This causes the request to fall back from the
-generic fileattr path and bypass its permission and serialization checks.
-
-Implement ->fileattr_set for regular files and directories and use the
-existing compression helper for FS_COMPR_FL. Accept an unchanged
-FS_CASEFOLD_FL reported by fileattr_get so chattr can update compression
-on case-insensitive shares.
-
-Tested chattr +c and -c on files and directories against Samba. Non-owner
-and read-only mount requests were rejected by the VFS checks.
+FS_IOC_GETFLAGS and FS_IOC_SETFLAGS are now handled by the generic VFS
+fileattr path, so their cifs_ioctl() handlers are unreachable. Remove
+the handlers and associated state.
 
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifsfs.c |  4 +-
- fs/smb/client/cifsfs.h |  2 +
- fs/smb/client/ioctl.c  | 89 ++++++++++++++++++++++++++++++++++++------
- 3 files changed, 81 insertions(+), 14 deletions(-)
+ fs/smb/client/cifsfs.c |  2 +-
+ fs/smb/client/ioctl.c  | 82 ------------------------------------------
+ 2 files changed, 1 insertion(+), 83 deletions(-)
 
 diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 66b9104e7ca2..0a1135602697 100644
+index 0a1135602697..603b177f1b09 100644
 --- a/fs/smb/client/cifsfs.c
 +++ b/fs/smb/client/cifsfs.c
-@@ -1195,7 +1195,7 @@ int cifs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
+@@ -1194,7 +1194,7 @@ int cifs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
+ 	struct inode *inode = d_inode(dentry);
  	u32 attrs;
  
- 	/* Preserve FS_COMPR_FL previously reported by cifs_ioctl(). */
--	if (CIFS_I(inode)->cifsAttrs & ATTR_COMPRESSED)
-+	if (READ_ONCE(CIFS_I(inode)->cifsAttrs) & ATTR_COMPRESSED)
+-	/* Preserve FS_COMPR_FL previously reported by cifs_ioctl(). */
++	/* Report the cached SMB compressed attribute as FS_COMPR_FL. */
+ 	if (READ_ONCE(CIFS_I(inode)->cifsAttrs) & ATTR_COMPRESSED)
  		fa->flags |= FS_COMPR_FL;
  
- 	/*
-@@ -1256,6 +1256,7 @@ const struct inode_operations cifs_dir_inode_ops = {
- 	.get_acl = cifs_get_acl,
- 	.set_acl = cifs_set_acl,
- 	.fileattr_get = cifs_fileattr_get,
-+	.fileattr_set = cifs_fileattr_set,
- };
- 
- const struct inode_operations cifs_file_inode_ops = {
-@@ -1267,6 +1268,7 @@ const struct inode_operations cifs_file_inode_ops = {
- 	.get_acl = cifs_get_acl,
- 	.set_acl = cifs_set_acl,
- 	.fileattr_get = cifs_fileattr_get,
-+	.fileattr_set = cifs_fileattr_set,
- };
- 
- const char *cifs_get_link(struct dentry *dentry, struct inode *inode,
-diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-index 854e672a4e37..10dcf51378d3 100644
---- a/fs/smb/client/cifsfs.h
-+++ b/fs/smb/client/cifsfs.h
-@@ -91,6 +91,8 @@ extern const struct inode_operations cifs_namespace_inode_operations;
- 
- struct file_kattr;
- int cifs_fileattr_get(struct dentry *dentry, struct file_kattr *fa);
-+int cifs_fileattr_set(struct mnt_idmap *idmap, struct dentry *dentry,
-+		      struct file_kattr *fa);
- 
- 
- /* Functions related to files and directories */
 diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
-index 9fa743be3652..8b2ca0c7c06c 100644
+index 8b2ca0c7c06c..1279e215ecd2 100644
 --- a/fs/smb/client/ioctl.c
 +++ b/fs/smb/client/ioctl.c
-@@ -10,6 +10,7 @@
+@@ -528,14 +528,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 	struct cifs_tcon *tcon;
+ 	struct tcon_link *tlink;
+ 	struct cifs_sb_info *cifs_sb;
+-	__u64	ExtAttrBits = 0;
+-	bool enable_compression;
+-	__u16 compression_state;
+-#ifdef CONFIG_CIFS_POSIX
+-#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+-	__u64   caps;
+-#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+-#endif /* CONFIG_CIFS_POSIX */
  
- #include <linux/fs.h>
- #include <linux/file.h>
-+#include <linux/fileattr.h>
- #include <linux/mount.h>
- #include <linux/mm.h>
- #include <linux/pagemap.h>
-@@ -67,11 +68,11 @@ static long cifs_ioctl_query_info(unsigned int xid, struct file *filep,
- 	return rc;
- }
+ 	xid = get_xid();
  
--static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
-+static int cifs_set_compression_by_path(unsigned int xid, struct dentry *dentry,
- 					struct cifs_tcon *tcon,
- 					__u16 compression_state)
- {
--	struct inode *inode = file_inode(filep);
-+	struct inode *inode = d_inode(dentry);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct TCP_Server_Info *server = tcon->ses->server;
- 	struct cifs_open_parms oparms;
-@@ -92,11 +93,11 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
- 	    cifs_sb->mnt_cifs_serverino_autodisabled)
- 		return -EOPNOTSUPP;
+@@ -546,80 +538,6 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
+ 		trace_smb3_ioctl(xid, pSMBFile->fid.persistent_fid, command);
  
--	if (d_unhashed(filep->f_path.dentry))
-+	if (d_unhashed(dentry))
- 		return -ESTALE;
- 
- 	page = alloc_dentry_path();
--	full_path = build_path_from_dentry(filep->f_path.dentry, page);
-+	full_path = build_path_from_dentry(dentry, page);
- 	if (IS_ERR(full_path)) {
- 		free_dentry_path(page);
- 		return PTR_ERR(full_path);
-@@ -123,6 +124,10 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
- 		goto close;
- 
- 	uniqueid = le64_to_cpu(data.fi.IndexNumber);
-+	if (!uniqueid) {
-+		rc = -EOPNOTSUPP;
-+		goto close;
-+	}
- 	if (uniqueid != CIFS_I(inode)->uniqueid) {
- 		rc = -ESTALE;
- 		goto close;
-@@ -141,14 +146,14 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
- 	return rc;
- }
- 
--static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
--				      struct cifs_tcon *tcon,
--				      struct cifsFileInfo *cfile,
--				      __u16 compression_state)
-+static int cifs_set_compression(unsigned int xid, struct dentry *dentry,
-+				struct cifs_tcon *tcon,
-+				struct cifsFileInfo *cfile,
-+				__u16 compression_state)
- {
- 	struct cifsFileInfo *wfile;
- 	struct cifs_tcon *wtcon;
--	struct inode *inode = file_inode(filep);
-+	struct inode *inode = d_inode(dentry);
- 	int rc;
- 
- 	if (!tcon->ses->server->ops->set_compression)
-@@ -173,10 +178,68 @@ static int cifs_ioctl_set_compression(unsigned int xid, struct file *filep,
- 		return rc;
- 	}
- 
--	return cifs_set_compression_by_path(xid, filep, tcon,
-+	return cifs_set_compression_by_path(xid, dentry, tcon,
- 					    compression_state);
- }
- 
-+int cifs_fileattr_set(struct mnt_idmap *idmap, struct dentry *dentry,
-+		      struct file_kattr *fa)
-+{
-+	struct inode *inode = d_inode(dentry);
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	struct file_kattr current_fa = {};
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	__u16 compression_state;
-+	bool enable_compression;
-+	u32 allowed = FS_COMPR_FL;
-+	unsigned int xid;
-+	int rc;
-+
-+	if (!fa->flags_valid)
-+		return -EOPNOTSUPP;
-+
-+	/*
-+	 * chattr writes back all flags returned by fileattr_get(). Accept
-+	 * FS_CASEFOLD_FL only when it reflects the share's casefold state.
-+	 */
-+	if (fa->flags & FS_CASEFOLD_FL) {
-+		rc = cifs_fileattr_get(dentry, &current_fa);
-+		if (rc)
-+			return rc;
-+		if (current_fa.flags & FS_CASEFOLD_FL)
-+			allowed |= FS_CASEFOLD_FL;
-+	}
-+	if (fa->flags & ~allowed)
-+		return -EOPNOTSUPP;
-+
-+	enable_compression = fa->flags & FS_COMPR_FL;
-+	compression_state = enable_compression ? COMPRESSION_FORMAT_DEFAULT :
-+						 COMPRESSION_FORMAT_NONE;
-+
-+	tlink = cifs_sb_tlink(cifs_sb);
-+	if (IS_ERR(tlink))
-+		return PTR_ERR(tlink);
-+	tcon = tlink_tcon(tlink);
-+
-+	xid = get_xid();
-+	rc = cifs_set_compression(xid, dentry, tcon, NULL, compression_state);
-+	free_xid(xid);
-+	cifs_put_tlink(tlink);
-+
-+	if (!rc) {
-+		spin_lock(&inode->i_lock);
-+		if (enable_compression)
-+			CIFS_I(inode)->cifsAttrs |= FILE_ATTRIBUTE_COMPRESSED;
-+		else
-+			CIFS_I(inode)->cifsAttrs &= ~FILE_ATTRIBUTE_COMPRESSED;
-+		spin_unlock(&inode->i_lock);
-+	}
-+
-+	cifs_dbg(FYI, "set compress flag rc %d\n", rc);
-+	return rc;
-+}
-+
- static long cifs_ioctl_copychunk(unsigned int xid, struct file *dst_file,
- 			unsigned long srcfd)
- {
-@@ -542,9 +605,9 @@ long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg)
- 				COMPRESSION_FORMAT_DEFAULT :
- 				COMPRESSION_FORMAT_NONE;
- 
--			rc = cifs_ioctl_set_compression(xid, filep, tcon,
--						pSMBFile,
--						compression_state);
-+			rc = cifs_set_compression(xid, filep->f_path.dentry,
-+						  tcon, pSMBFile,
-+						  compression_state);
- 			if (rc == 0) {
- 				spin_lock(&inode->i_lock);
- 				if (enable_compression)
+ 	switch (command) {
+-		case FS_IOC_GETFLAGS:
+-			if (pSMBFile == NULL)
+-				break;
+-			tcon = tlink_tcon(pSMBFile->tlink);
+-#ifdef CONFIG_CIFS_POSIX
+-#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+-			caps = le64_to_cpu(tcon->fsUnixInfo.Capability);
+-			if (CIFS_UNIX_EXTATTR_CAP & caps) {
+-				__u64	ExtAttrMask = 0;
+-				rc = CIFSGetExtAttr(xid, tcon,
+-						    pSMBFile->fid.netfid,
+-						    &ExtAttrBits, &ExtAttrMask);
+-				if (rc == 0)
+-					rc = put_user(ExtAttrBits &
+-						FS_FL_USER_VISIBLE,
+-						(int __user *)arg);
+-				if (rc != -EOPNOTSUPP)
+-					break;
+-			}
+-#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+-#endif /* CONFIG_CIFS_POSIX */
+-			if (CIFS_I(inode)->cifsAttrs & FILE_ATTRIBUTE_COMPRESSED)
+-				ExtAttrBits |= FS_COMPR_FL;
+-
+-			rc = put_user(ExtAttrBits & FS_FL_USER_VISIBLE,
+-				      (int __user *)arg);
+-			break;
+-		case FS_IOC_SETFLAGS:
+-			if (pSMBFile == NULL)
+-				break;
+-			tcon = tlink_tcon(pSMBFile->tlink);
+-			/* caps = le64_to_cpu(tcon->fsUnixInfo.Capability); */
+-
+-			if (get_user(ExtAttrBits, (int __user *)arg)) {
+-				rc = -EFAULT;
+-				break;
+-			}
+-
+-			/*
+-			 * if (CIFS_UNIX_EXTATTR_CAP & caps)
+-			 *	rc = CIFSSetExtAttr(xid, tcon,
+-			 *		       pSMBFile->fid.netfid,
+-			 *		       extAttrBits,
+-			 *		       &ExtAttrMask);
+-			 * if (rc != -EOPNOTSUPP)
+-			 *	break;
+-			 */
+-
+-			/* Currently only flag we can set or clear is compressed. */
+-			if (ExtAttrBits & ~FS_COMPR_FL) {
+-				rc = -EOPNOTSUPP;
+-				break;
+-			}
+-
+-			enable_compression = ExtAttrBits & FS_COMPR_FL;
+-			compression_state = enable_compression ?
+-				COMPRESSION_FORMAT_DEFAULT :
+-				COMPRESSION_FORMAT_NONE;
+-
+-			rc = cifs_set_compression(xid, filep->f_path.dentry,
+-						  tcon, pSMBFile,
+-						  compression_state);
+-			if (rc == 0) {
+-				spin_lock(&inode->i_lock);
+-				if (enable_compression)
+-					CIFS_I(inode)->cifsAttrs |=
+-						FILE_ATTRIBUTE_COMPRESSED;
+-				else
+-					CIFS_I(inode)->cifsAttrs &=
+-						~FILE_ATTRIBUTE_COMPRESSED;
+-				spin_unlock(&inode->i_lock);
+-			}
+-			cifs_dbg(FYI, "set compress flag rc %d\n", rc);
+-			break;
+ 		case CIFS_IOC_COPYCHUNK_FILE:
+ 			rc = cifs_ioctl_copychunk(xid, filep, arg);
+ 			break;
 -- 
 2.43.0
 
