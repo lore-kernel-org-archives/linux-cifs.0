@@ -1,76 +1,65 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4151D5CFE
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 23:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727B9357D00
+	for <linux-cifs@vger.kernel.org>; Thu,  6 Aug 2026 00:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785972370; cv=none; b=pOG6fN3KlP60Z4CEEBJ3OVBI52SXO9N8FGVaRnDQLRmUsVurw1BU/Fl1LzRPIRbugJoXnryaHlUCH0iE/+T+PrCw9x7ItahlwYVX+/emeX4YBiFS0utKiTBkiJpFYRqTW+CexByowNkWlny8mEpnV83Kpu5xlbnzQgLVbJZ+f3U=
+	t=1785977221; cv=none; b=RCCuYwq3T77RChRHt7eG6Riv8zKC+ysk7JsCyYAOS1KF99z9qlEA6DaawUX8PwC9N1AJUdy7QchwPkmvzX2yIgPHroF9YsNDsuqIGUFG3dtu+EuV/f2byWgW6BeZ95USUzUY9/Os7C/sC130lmtLrw/2Q748rqdpg7f/REwchx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785972370; c=relaxed/simple;
-	bh=NBQjhB81Gdnc9QxyA3kFvIYUfrKDvm8G1l42oQUycXI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vm0C/kvUkShfyrQcFaRiMVbUCACuGwKMep8YMGPJsxW/et2c2nnqp9OD8ShmyMdUJSJp5f1KMWARCY2yMYLu+zUfRTy/CNIPxTYgFW9DV8QSkv/nmaAh6BspTv7jch5S+WwB51LyqepfDg53BpY7uaClskxHILrBVD9ivoIDfRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QwcxlOpr; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785977221; c=relaxed/simple;
+	bh=Q/7l5UII2u3yUFjQqWDSQmFm5zrxXfm28uBE4rz9+vo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A1TctvbfwHJH+5cRVTanRz6gm9U9YlS/DKi52woquEyCmjdDAM5UUpWr5vlYH1KXJbe+yS+w/Bd+WV0gAcwKKaN88G82DDbuBmVP6yjmeVdJ8V1Fc4jrOv6okEZfspaU2Uh8nhSGMlkQIzmTnu4ntGS7/WSbPRy7GZoqOcTqg8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=hoGORbHA; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QwcxlOpr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF0681F00A3F
-	for <linux-cifs@vger.kernel.org>; Wed,  5 Aug 2026 23:26:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785972369;
-	bh=t4Qpz943OS/jIxGmiboZuf3Jo//izHI722K1XEESgD4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=QwcxlOprZMlRvWuovIBiygjotBD24WlzpBk8NwHSp4wgc/tgbUXhc7zGXDU+xj05e
-	 fe72GzW+/8DRNtTgRlpcPmHV3osDlWk6hnhozP448v5Fgnt5o0ctwN4Hv7U/W3et1A
-	 jH9hR1947KnqCXarQTPwz+0bciuqYoSMwuYdLVJ+N7pjVQNQeFPpiKtvkfQbBLzmId
-	 p5BOJDk1BJMcFSrs1kP7QMrD3RXmRNfxqLOxi+s0We3vx6b+0EhDX9nGS22K/0uE7K
-	 uqo6CtZJvtyQ5XLP2G+721SouWBd4aSVHQVlkcagi5n2J6anjkkxkFZwxp7IazVSGj
-	 0V/u50P49/nEg==
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c1677c91969so184904866b.1
-        for <linux-cifs@vger.kernel.org>; Wed, 05 Aug 2026 16:26:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoIT2lJXCGNfqJx+R3KT9FoFy4uEIG3IFeAV3Gn+hBDeC9dRwdrhOjSEttMEJfSMiXqcBqdRlZp2w80@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIXsDEmPhJL7idwbolK/S2Kz4XCTb1p2Uv1+YidpEYK1WZoyXf
-	iGvWPS9/nDuPZ8RTl+WPRg0KO+pLXtCxq8S0cKsWNw1UzQVOmi37JwNr5uw3OjPAZK5aQyZMu4B
-	5vWpMcv8SzyOilyF5/maynWoUIddn3dY=
-X-Received: by 2002:a17:906:ee88:b0:c20:3042:3887 with SMTP id
- a640c23a62f3a-c2039ca7e50mr463736466b.22.1785972367655; Wed, 05 Aug 2026
- 16:26:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="hoGORbHA"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1785977214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=GLaB2SDC0sWG1AequVNIXe9xf93diI+HqL9gFfnbhkE=;
+	b=hoGORbHADWBvszOl088PIyFEVOHZePfu7Pn6ncO+aS3SuWNsziGqw8SFj3ngFTzUO54MhX
+	Ac39PSE/7oLrsb77K2bBaRU/t5PpdN6ikZPtD4GZZ3K/lCeOp3CQlaXpAonuYXZnvIgxtw
+	P97Qqy/K9hPbdld0rwyLhOjRoowQmd/coptz0Hfw+F7+oLVWDrwGhUlDMP2y37HlI6qVTt
+	W3hqBVgkng437n5SNRHaX9UcL8Y0RR4x4gzAERnb25pSxHrfS/kyYy6GBfdjsgnNCOBnzv
+	cvwcI2ye/e95RmWtKlC0F03KpoD+LlNuufsfu8CeoZ3euEQTKGS0RxGB9jOfoA==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	slow@samba.org,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH samba 0/1] smbd: remove redundant rename destination open check
+Date: Thu,  6 Aug 2026 00:46:00 +0000
+Message-ID: <20260806004601.314121-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260805051112.305078-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260805051112.305078-1-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 6 Aug 2026 08:25:55 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd91pPDcSHgJs-_MdBbs0_22Tzb6LL6udVfFMGOYSx9Pbw@mail.gmail.com>
-X-Gm-Features: AUfX_mzB5nFg33Ow7kqh7x_9EFMb3RlWffz3eX37ii2KriZc2ZnILQhuaJPCmpY
-Message-ID: <CAKYAXd91pPDcSHgJs-_MdBbs0_22Tzb6LL6udVfFMGOYSx9Pbw@mail.gmail.com>
-Subject: Re: [PATCH v3 resend 0/3] smb: fix xfstests generic/035
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com, 
-	senozhatsky@chromium.org, slow@samba.org, linux-cifs@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Aug 5, 2026 at 2:12=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> Resending patchset due to mail server issue.
->
-> v2->v3:
->   - Patch #02: iterate over `global_ft.idr`.
->
-> v2: https://lore.kernel.org/linux-cifs/20260804123301.285434-1-chenxiaoso=
-ng@chenxiaosong.com/
->
-> ChenXiaoSong (3):
->   smb/server: rename to ksmbd_has_nonposix_open_child()
->   smb/server: deny overwriting targets with non-POSIX opens
-Applied ksmbd's patches to #ksmbd-for-next-next.
-Thanks!
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+RFC v1: https://lore.kernel.org/linux-cifs/20260805133145.312198-1-chenxiaosong@chenxiaosong.com/
+
+ChenXiaoSong (1):
+  smbd: remove redundant rename destination open check
+
+ source3/smbd/smb2_reply.c | 43 ---------------------------------------
+ 1 file changed, 43 deletions(-)
+
+-- 
+2.54.0
+
