@@ -1,145 +1,139 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19DB30BF6B
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 17:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5035A2848A7
+	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 17:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786122646; cv=none; b=lFr+Ibq0kIvNhzXuZMoS3xkr1xzMm6FC/TNuRVK7hfX3HSDx2U5091AnCGxGgH9Lz/9Mal9tdNwwMmkyznKOnR/803ocoBwVeJFb1NJSWP+6PLg6syVoqxbQJ8KWytZCs6I1RCVuUajZJf/exMH+WhXbQS1JaK4I01JVFHQFC8w=
+	t=1786122948; cv=none; b=JyWxY12DsbyxAs0QtDKjvg5QvDDhoSzQEInMSqL9zAG9EIZxaROYamggCEQwVJZPfHy6+XU7ty4LTKyzwu8WbhnikP22g9123I5FCOjXRpgJLOmiKLIwQdWjJZPsKQiXv4rG9Mc5wyoaqnL8Y1/rcRqfxArWE0TXqxn8kManeN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786122646; c=relaxed/simple;
-	bh=hhBqAYcryluxrC/9AzCe5JEdlxEqjRUJt7UEL1B+pmM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YL90d8tdYTwkclRp1uOwfXLWqp6lAc0aaNCbbGEsJB+fcJABw+tE6QyiETwi5z1xQcnf6sveT7d3/v5YW7pZIHLyQnsoTm+w0P1Sh0JMm+aQtV0gReC/OIXMPoW8DYh2D7b0/X2u7WROf6ylL9JTfuTkyvLUJsSwlbvxsMIdW1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XT6fPRKX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786122948; c=relaxed/simple;
+	bh=BV35DpPMvCTBX00oluqLm0xUBVyuUnc/1OZ8M3NMtvE=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=ZKnumw8YOEjWJvRydrDa6WBYGoXKlLp2NheQqx6HPenrFHkSW1e42l8TfJ8tcZ1o3dGYCj80NxZhXWY2fA3TnqGsWQ+qJD/4vsB560+HTP2fnefPKIoh8XqdE/mZ7QWJvYMlaARm0BASN8/g7ZHgdWHiPlIV1pLyFtC7X5sEpHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mstefan99.com; spf=pass smtp.mailfrom=mstefan99.com; dkim=pass (2048-bit key) header.d=mstefan99.com header.i=@mstefan99.com header.b=ANxYa2HP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lwM1/lyx; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mstefan99.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mstefan99.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XT6fPRKX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786122643;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=I8Iiu2nwWIJEFUeMkYZYd+XPwaRbkQwO7rwHvokknRk=;
-	b=XT6fPRKXrJxuWtO4aZfutoDn1/oTRaMC7iy48LBdGZQ5gEk8IDDukBq8pcrd6XO023OVcd
-	KaGYGHGvmQ2rS5QaTtHOLaWz1N8BYE1c7B+L8ZrguPqtwryEiaHoA+XCFC0Ds3OgM7LSJ6
-	YiviBJZdK0DiXEJCDq0Ot78+3+LWMSU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-59-9xB09XCVOqOv6hT7N-lBtw-1; Fri,
- 07 Aug 2026 13:10:29 -0400
-X-MC-Unique: 9xB09XCVOqOv6hT7N-lBtw-1
-X-Mimecast-MFC-AGG-ID: 9xB09XCVOqOv6hT7N-lBtw_1786122628
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C72781800747;
-	Fri,  7 Aug 2026 17:10:27 +0000 (UTC)
-Received: from thuth-p1g4.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BD47C18005BB;
-	Fri,  7 Aug 2026 17:10:25 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb: server: Clear sensitive stack and heap data in auth.c
-Date: Fri,  7 Aug 2026 19:10:23 +0200
-Message-ID: <20260807171024.1529513-1-thuth@redhat.com>
+	dkim=pass (2048-bit key) header.d=mstefan99.com header.i=@mstefan99.com header.b="ANxYa2HP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lwM1/lyx"
+Received: from ams-compute-01.internal (ams-compute-01.internal [10.64.2.61])
+	by mailfout.stl.internal (Postfix) with ESMTP id 0D4D21D000B3;
+	Fri,  7 Aug 2026 13:15:44 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-01.internal (MEProxy); Fri, 07 Aug 2026 13:15:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mstefan99.com;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm2;
+	 t=1786122944; x=1786209344; bh=PmjYsESVn/MALyEV65UlrjSE7BuyKZSt
+	JN3zR6ppM/o=; b=ANxYa2HP6p4HQtg/yp8HMQ/u/zbdBa8izHBSX9vfWhtO7+kd
+	PXX54Wpu/M0Ure7qqazBD6r3Dozu8MqQkNYr15tRpbnfouFkWdPrJaRI5werTDCp
+	K16O5df4s9fm85emIupGa3AbX6R7imA5l2Sxwf/XCIPNSyKFug2jlH5KspDhD8yO
+	6bRJS7qOMbXW7s28M17Xn3MvRdeKHikLiCfvQbWvfM8QN3+lbUpCar2mjVmedL+M
+	JDbjqv4M8puiUqxw3xvAyooLEM6H/xImREJY+xIXtR1ssSxtgYtaf7rF1wnm8NRn
+	c59aDSHwCYVTOdcYztN6Hz5IRv7RxFY/wMbr4g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786122944; x=
+	1786209344; bh=PmjYsESVn/MALyEV65UlrjSE7BuyKZStJN3zR6ppM/o=; b=l
+	wM1/lyxDEFH6d4IgPvDGPvNbOzB38F2TGPmYcL1vUUYVa9vbBAPOencLdlj6X44v
+	p0BEdh6XPUlgJ8fBstB0lzkLGcabQ16arPfhZyEsrFMljgXOh8eYaumX/1vKfPIZ
+	Vg2nrHoqU8pCwKASDZjPGautW2FUhatyHwLWv6mNwkJEYTBVOhcDjARjS9yPs39X
+	trQu0I3Y4vbwqStXYw5TyKpEtsTHWS3b8sCSCQB1vbHxoERgWg10T4s+y1uOfpEj
+	zAbWuvv88yOIqt3dlfu4Bu3GuqfPnQ4FEV7U+Tyo773RWE5fyRfcqsssyIOLrRo2
+	hRLjPX/HLIdKSFsKaqkNQ==
+X-ME-Sender: <xms:uxJ2akBhwkCWbmP1Nu-pzU42F7d9Rm--ZzEcEvYlEvh0EkWE-3U3bQ>
+    <xme:uxJ2ahW8sTjF27kQX5F0mBIOCzH9ZB3TlD5-JfjwDqww1w-RELU7l2KMmzt-f3UB4
+    1R3Rn4p3gb9HBeY3biFGINAzZl6rLTEQGvRZz6fXJRc64PTkAXpyqk>
+X-ME-Proxy-Cause: dmFkZTFgkW4aJ/9dWIpVHRY163vhkHIAGvUL9vseAIlMpTntBfH5PutFgVb+8pVQc0vWly
+    jNbcWvZbHjT2gcQxOyugBLi3P1ndAEsm5//Fnzldcz4YStf4r+qGfz7F3PYrRBPlDiN6Jw
+    CNwVaHaqDMEqF3I3xP/UNLnnh2QR9IDOXczgKnelASADkpujsKESf+slyHYyu5Z+tRCp6s
+    aWip3doWePMuBZ9lKdBOCMkFwdsWTVjepLrfY8k6zg0iV+shrJOSTRNSt06qvMcsUw8qH2
+    oIczhXaa22mBdcT4Bw6roYcKHQOWHJPAZyytjGHJQNfmq8L+aqn1YA1EBhGNNcfApYtrZ/
+    ULqwXPnGQgT2z1McrfWylLUUB4vo54qHCj2tbX0ny4xso+JphejvCtd2Iz81ZAD8gQIJHN
+    T4wpocDLBSRPjZemv/GAIKWcTOh3g0Ts/ym0hodc0KhyivjnMsk1AiBZKel0kwmPG8PbWG
+    Nj+l+hx7IlcjZz4SzOx6UHGNo+YX5hjOxMMQMxjn4RxJHMB9cZvtJR27oOcsCJZFa4R2T6
+    txsv5QMuQVi7bGWcvRWJBMvoK0heLdIVOq5OL917fkbR8GKXH2sgbt9qteqMh6QGylHJSk
+    7/v6U8KilMZTKhza04cFsduV2J9w3/eeJ+OO41H0EBLDiJmxTYLwG/BbRf0g
+X-ME-Proxy: <xmx:vBJ2arM2e9g4VjdDkc7MjE1KcfvEciMFeUjwxwtaatYl6D9UxkEjLg>
+    <xmx:vBJ2au51m4oNbolmEKR8LIGWWyXaUr3AtleLmBVk1A8SfL3Iq-rqhg>
+    <xmx:vBJ2al1SxiG23ihW6eEcWHFdHpVUQKKUCUDPzFcgvjfc1EkeSLCFHg>
+    <xmx:vBJ2avzgnRpknxaqJRvYoEav0oEh1lFxkjy_4ndvCIrD0aBwun5jCw>
+    <xmx:wBJ2aqTMTDus9hyC1cVeXEOy2EJkBMOsp8jv6ZzQS94wx7o6iPC0iYLH>
+Feedback-ID: ie31c46c3:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 24D5232A0065; Fri,  7 Aug 2026 13:15:39 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Date: Fri, 07 Aug 2026 19:15:38 +0200
+From: "Mikhail Stefantsev" <mikhail@mstefan99.com>
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org
+Cc: regressions@lists.linux.dev, sfrench@samba.org, jforbes@redhat.com
+Message-Id: <61a34e6d-df1e-4a0f-93ce-ef79ef8170a7@app.fastmail.com>
+In-Reply-To: <f875564a-a000-40a3-a43a-888d7c6649ab@chenxiaosong.com>
+References: <75fb5359-b268-492d-8d4a-504d1af60f2a@app.fastmail.com>
+ <f875564a-a000-40a3-a43a-888d7c6649ab@chenxiaosong.com>
+Subject: Re: [REGRESSION] cifs: openat with O_TMPFILE returns -1 ENOENT
+ (STATUS_OBJECT_NAME_NOT_FOUND)
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-From: Thomas Huth <thuth@redhat.com>
+Hi ChenXiaoSong,
 
-Sensitive data like keys that are stored in stack-local arrays could be
-leaked via the stack to the calling functions, or via the heap when using
-only normal kfree() functions. There is no known vulnaribility for this in
-this code right now, but it's good security style to explicitly zeroize this
-sensitive material as soon as possible to avoid that it could be exploited
-together with other bugs later.
+I have tested the patch, it works on my machine. EOPNOTSUPP is returned and apps fall back to saving without relying on O_TMPFILE.
 
-In calc_ntlmv2_hash(), the struct hmac_md5_ctx is normally cleared during
-hmac_md5_final() already, but in case of errors, this function is skipped
-and ctx is never zeroized, so add a memzero_explicit(&ctx, sizeof(ctx))
-there to fix the problem.
+Thank you
+Regards, Mikhail
 
-In ksmbd_krb5_authenticate(), the ksmbd_spnego_authen_response contains
-the session key in the payload. It's currently freed with plain kvfree().
-Let's better use kvfree_sensitive() instead.
-
-In generate_key(), the prfhash[] array is used to calculate the key,
-but it's never cleared, so it leaks on the stack. Thus clear this with
-a memzero_explicit(), too.
-
-In ksmbd_crypt_message(), the sign[] and key[] arrays are leaked via
-the stack, too. Make sure to clear them via memzero_explicit() at the
-end.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- fs/smb/server/auth.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 4e7b6f0e6b8cd..acdac40bee813 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -122,6 +122,8 @@ static int calc_ntlmv2_hash(struct ksmbd_conn *conn, struct ksmbd_session *sess,
- out:
- 	kfree(uniname);
- 	kfree(domain);
-+	if (ret)	/* Done by hmac_md5_final() already if ret == 0 */
-+		memzero_explicit(&ctx, sizeof(ctx));
- 	return ret;
- }
- 
-@@ -464,7 +466,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
- 	*out_len = resp->spnego_blob_len;
- 	retval = 0;
- out:
--	kvfree(resp);
-+	kvfree_sensitive(resp);
- 	return retval;
- }
- #else
-@@ -556,6 +558,7 @@ static void generate_key(struct ksmbd_conn *conn, const char *sess_key,
- 
- 	hmac_sha256_final(&ctx, prfhash);
- 	memcpy(key, prfhash, key_size);
-+	memzero_explicit(prfhash, sizeof(prfhash));
- }
- 
- static int generate_smb3signingkey(struct ksmbd_session *sess,
-@@ -848,7 +851,8 @@ int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
- 		ctx = ksmbd_crypto_ctx_find_ccm();
- 	if (!ctx) {
- 		pr_err("crypto alloc failed\n");
--		return -ENOMEM;
-+		rc = -ENOMEM;
-+		goto zeroize_key;
- 	}
- 
- 	if (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-@@ -928,5 +932,8 @@ int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
- 	aead_request_free(req);
- free_ctx:
- 	ksmbd_release_crypto_ctx(ctx);
-+zeroize_key:
-+	memzero_explicit(key, sizeof(key));
-+	memzero_explicit(sign, sizeof(sign));
- 	return rc;
- }
--- 
-2.55.0
-
+On Fri, Aug 7, 2026, at 11:01, ChenXiaoSong wrote:
+> Hi Mikhail,
+>
+> I have submitted a fix patch, please test it and check whether it fixes 
+> the issue you encountered:
+> https://lore.kernel.org/linux-cifs/20260807085806.725742-1-chenxiaosong@chenxiaosong.com/
+>
+> On 8/7/26 14:00, Mikhail Stefantsev wrote:
+>> Hello,
+>> 
+>> I have run into a kernel regression where openat() with O_TMPFILE fails with ENOENT on CIFS/SMB3 mounts, breaking atomic file saving in applications like Krita. According to the open() manual page, the ENOENT error is supposed to be returned when the path (a target directory in this case) does not exist, while a lack of support of O_TMPFILE by the target file system should be indicated by EOPNOTSUPP. Applications receiving ENOENT wrongly assume that the parent directory of an unnamed temporary file is itself missing or inaccessible, aborting the save process.
+>> 
+>> Downstream bug report: https://bugzilla.redhat.com/show_bug.cgi?id=2499750
+>> 
+>> [REGRESSION DETAILS]
+>> - Broken in: v7.1.3-200.fc44.x86_64 / upstream v7.2.0-rc2
+>> - Servers: Synology (Samba 4.15.13), Windows 11 Pro (25H2)
+>> 
+>> [STRACE EVIDENCE]
+>> openat(AT_FDCWD, "/mnt/vault/home/Drive/Sketchbook/Studies/6.07.26.kra", O_RDONLY|O_CLOEXEC) = 37
+>> openat(AT_FDCWD, "/mnt/vault/home/Drive/Sketchbook/Studies", O_RDWR|O_CLOEXEC|O_TMPFILE, 0600) = -1 ENOENT (No such file or directory)
+>> 
+>> [DETAILED LOGS]
+>> [  106.251673] CIFS: fs/smb/client/dir.c: VFS: in cifs_tmpfile as Xid: 2886 with uid: 1000
+>> [  106.252152] CIFS: Status code returned 0xc0000034 STATUS_OBJECT_NAME_NOT_FOUND
+>> [  106.252154] CIFS: fs/smb/client/smb2maperror.c: Mapping SMB2 status code 0xc0000034 to POSIX err -2
+>> [  106.252157] CIFS: fs/smb/client/dir.c: cifs_create returned 0xfffffffe
+>> [  106.252159] CIFS: fs/smb/client/dir.c: VFS: leaving cifs_tmpfile (xid = 2886) rc = -2
+>> 
+>> [MOUNT OPTIONS]
+>> //vault/home on /mnt/vault/home type cifs (rw,relatime,vers=3.1.1,cache=strict,upcall_target=app,username=MStefan99,uid=1000,forceuid,gid=1000,forcegid,addr=192.168.1.10,file_mode=0755,dir_mode=0755,iocharset=utf8,soft,nounix,serverino,mapposix,reparse=nfs,nativesocket,symlink=native,rsize=4194304,wsize=4194304,bsize=1048576,echo_interval=60,actimeo=1,closetimeo=1,_netdev)
+>> 
+>> Please let me know if you need any additional information.
+>> 
+>> 
+>> Regards,
+>> Mikhail
+>> 
+>
+> -- 
+> ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+> Chinese Homepage: https://chenxiaosong.com
+> English Homepage: https://chenxiaosong.com/en
