@@ -1,87 +1,93 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B241F272E6D
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 02:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61A4272E6D
+	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 02:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786070526; cv=none; b=Q7CoSJBEhF9k6eDbleh7RRb8r1+dOOnEc46uAVzDLgbNWksu0JfnHt9GkkM9Gs3KR5qUdCorXwgaNngEKG4uVx7oPc476F5ymYTBr78ovTYzEXnGsmATuKKFe7bgIIjjxu0p0J/pEBsUuB4SO7R5UbYULrEknD7fkniMQNB419Y=
+	t=1786070532; cv=none; b=PkguYpxLZBRCRKpfJ5f2whT5ekGdGaQni331ShyVR6BOkKcvYNHIE+czM9bckQywwNRDeghORNOK9V+J+wc0+GUFPwZcN0Adw6SA4ifBDGIlQxDL0uTrA6TUnh753jHmhayhpPEusFwDRwT3csqiMNc8dOYS5NSVztrCrNm7wjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786070526; c=relaxed/simple;
-	bh=YRDgiNcNyeZKegfyQ4gc5p1zkXfcWqtbsERKjmSZSrg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=U9eeZXhhRB9XEZ8eT9XBlgJPYka55oxZStVebP9+9+PESDIUBVaNDRLsWiYzI4jpWm2RD+uAoTbZVZdmdVYyK4QFGC6KK11ynpD2htz7N4QEy4zxXfJhpGsJePHaIDeuI77rHmswk+KfYd+yH1gxC+OwSiKJe6Uiu61BPWIqUXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fiG4uAoT; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZcPj00iy; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1786070532; c=relaxed/simple;
+	bh=kgxsvT+DuMSi29x7SRx4HaGBZ3ybkYKALfE/F+NbPz0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Fu0NQlI1HwUiV5nli79zAncCvd0pdND2b0ynzR0gP3FIEABb5NAsPPZkdFCkOojapoOV+2GNZe3JCorqYnrqVOIZ/8DtDkMK+BWzKUnbzlFhsXJk95Knj0n1UJCJTHmS8Z0iPEevIlP/vPU1yR3wnUyxlz9nQilgJpTnkSTOgJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TPyGBSle; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UfnZgiwA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fiG4uAoT";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZcPj00iy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TPyGBSle";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="UfnZgiwA"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786070523;
+	s=mimecast20190719; t=1786070530;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=G1kiUVQNvrUNp4oISMJ1Z/iUQdm09U4ERIEKmh6o2sA=;
-	b=fiG4uAoTIsXT/tgta0lxuKprcbY1xfuLXsimjBS2nWhUgGC88U7FohyEm5jDUFrA8H0hpU
-	8zB1SqepDV+oKEbXYFy14S+oGeN/H/ZKpY/gAr65B9hGGVFSipw7jDY2UkzTsKs0KonJNp
-	ph0ygt7XRsfoaCptGmuwZWXrAwJlq6Q=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=upLfN1zf/6q/h0s/Qp6bFvb8YmQpGLWatarZ7u1O79Q=;
+	b=TPyGBSleZ8RTu7c0RBLLio09P1QAzmVMhlu7dH2Mw0h11B6Y366BlQTQUEYl3sD+4pZTyu
+	JNZwm4H2h20veLtVTptCJH45xLYd/uzxAXljsTArBMms6rKXUK67B2Qqu4Kljc0ycDPPcY
+	Za5dvO7nuD2OGeO/CJypA0pauy6HAxY=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-516-vkSqVU1FP3O9RehhEt2-bQ-1; Thu, 06 Aug 2026 22:42:02 -0400
-X-MC-Unique: vkSqVU1FP3O9RehhEt2-bQ-1
-X-Mimecast-MFC-AGG-ID: vkSqVU1FP3O9RehhEt2-bQ_1786070521
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7eb650e79adso2606965a34.3
-        for <linux-cifs@vger.kernel.org>; Thu, 06 Aug 2026 19:42:02 -0700 (PDT)
+ us-mta-634-ANglC0_HN_uDzuppjgavzQ-1; Thu, 06 Aug 2026 22:42:08 -0400
+X-MC-Unique: ANglC0_HN_uDzuppjgavzQ-1
+X-Mimecast-MFC-AGG-ID: ANglC0_HN_uDzuppjgavzQ_1786070528
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7e9e741693bso1604375a34.0
+        for <linux-cifs@vger.kernel.org>; Thu, 06 Aug 2026 19:42:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786070521; x=1786675321; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=G1kiUVQNvrUNp4oISMJ1Z/iUQdm09U4ERIEKmh6o2sA=;
-        b=ZcPj00iym3Pd6XdIr32Nq5wiwTrU00j9Eg7gbLi34gIFjVqPfg+hvWnYY/uqwywsbe
-         ndSUvUhQa/PQ6VEyBgTi2/4+d+B12nQCHIbVVFTABbO5MBWfXYK4pqfOP0bzk3b7kMG2
-         zcCYQsJZBkdIzRBnjDOl4OvokdJnU+Xq1kRMoxRxwGnE9q4UnwzgEXPGuVUhaXFFo+kc
-         sKu39Kyo6Jix+VebD2hR9xs7ECQgxOwlH9C9iqBNi7kxvhYPb68n1lsT50v3HDM0bd1U
-         86EywTciLW6qyYj07DDy/pmlnKlpzuM20BA4SG7IOWqpBLIDZUQYymTDr8C9olvIJSub
-         1bHg==
+        d=redhat.com; s=google; t=1786070528; x=1786675328; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=upLfN1zf/6q/h0s/Qp6bFvb8YmQpGLWatarZ7u1O79Q=;
+        b=UfnZgiwASr+ZjtJMOCR/zpztOoNJAhNNdcSqzaeQLfC30F7P9xrirXfdtXbyP24v+Y
+         sYT1SbiH8O8aaJ6io946PU7RCOzf3SyyvtxTx9m8DljUXtNdv4aUKx91XkqW34Z1LLWF
+         3Hg8sP0tLEf5KvNx39KcXxwNPipCrJo1S0FxhqLwAQw2AamhgUvUpKqYb1RApOQ8JvGU
+         i0WXSOooe4IEF6eeYQM0naaGQnm47aUcf0keDrlN+AQbGICELpsSHVLdesD585Hp5qrR
+         qE1LKkS+e/eYqp96QHq9zRT3CIpQ2ph2kF5Ff0MFHDpNccNYvcsTfH176CO02qSUyi0I
+         Tn5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786070521; x=1786675321;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=G1kiUVQNvrUNp4oISMJ1Z/iUQdm09U4ERIEKmh6o2sA=;
-        b=B00uz3QtLzGsM+9fKV+yYCCMSgmOcrp+4mmz+rW/aPYWfsEcR/5NcJgpM3SIvkLMG5
-         4Sirbo1hjH5JbQAZ9wD3wwfiUMJkevLmDdgHGzVXFiiPXCY6gOLZ5qOwBlEh02dCNkZe
-         TzA8cmBYgX4axqZ1hQ7DXQ3WZs5WdbUEEa3cDtyK/vRGw9PMUXiiAmwVYmKRzPEa+NiC
-         lCCYDKZFRkWtoNGPtP+Fg7I57tzybmn+M4K/QYlyStnu3O2ihuzNfGWfj1+kbRGZXAUf
-         mLEtCZaJh+O3MjnQPDFtZ4mRYCT7bEpyUhncrld4+4P0qwZ5ThFQGRonw0e6/WoYgcDD
-         3Xbg==
-X-Gm-Message-State: AOJu0Yw4aRzd25GAJhQ7tWXpVxav3YpZwPMDBaG9+Huwbdw2W3a9iLil
-	AeLCyfCNvAy+mta4ASITQBuuETHjC7rzkWNMJN3M3Sa79bZagVirRhgC890wAzcgTb0Y7t3CuFs
-	gPFFMuyGS2c0ev/GOq3NXmZ5VOnke409VKWVL62c8Yd+pmr7857XXkwRSvaDw5EB89b0zs7hgz/
-	UK+Rew+cGli5UR3n4GKrrsmRmRBVntj0T0g67Tij5kMDfoAPE=
-X-Gm-Gg: AR+sD10Kl8jV7cNaJdqNSKKuXv2OtNoRwOngrVf8j0EcAeOX/Uzk/QNQrZb96FUF6WL
-	5Uxx235qxz1a9mMdbPOXsm3wEdlsVWKLK1iN6PcMkS2dMjqfZ2OZMWMHh5jXotrO+rcWblpWf+9
-	jm9Yi5hMrn39cq6TpmKv7+RH9lb7Khf/WqGZcMAnfel8XzavjkDcTpytzyhCWLtMF+qzXqzd8F+
-	IcSJuEjLS99LCwkHdzKBro91aQ8aTZupWt0vUWuU5Wg0M4YpXoNJhXJY+QmFThQzeWmppolio+E
-	DCetTaXF6UU0rVI+Zj1QJ1FGwKUQ62JnGTlsXLMKMhSlN+LQwBoVrdudYg73VbqibR1C5Teh5N5
-	exQPQ5j6cUDPwROGChdmZI3fHL9Lsn2tsltuT4cwWWfPXVlqBa+b70bO6GC9mI9KALA==
-X-Received: by 2002:a05:6830:398c:b0:7ee:41ca:e7b0 with SMTP id 46e09a7af769-7f34df0d626mr4214708a34.14.1786070521537;
-        Thu, 06 Aug 2026 19:42:01 -0700 (PDT)
-X-Received: by 2002:a05:6830:398c:b0:7ee:41ca:e7b0 with SMTP id 46e09a7af769-7f34df0d626mr4214682a34.14.1786070521035;
-        Thu, 06 Aug 2026 19:42:01 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1786070528; x=1786675328;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=upLfN1zf/6q/h0s/Qp6bFvb8YmQpGLWatarZ7u1O79Q=;
+        b=MkqjSH3BYt+wWwiOpmsJz+Oss0xVOjzjwUSWk/3krEz+8Nc6BTz5wL2nBdLU92dpa8
+         8ubrZqWkw3sHdoDTssyndbPbXQ2tsAPw0nSjP/UMBAhn2qpYdfBddTuv4YJfQyGJv9RS
+         yf0Tzey9LGLJROnkT+IoYwG1abCq2v4m7oeRwK6zdFg6mYBeFZTQlkozzD1Mhl7EMyhd
+         QGLgYoXWrIGhbrcsq/I8p/ZqhcVKv6xERjHYA9SOtZGMO2MVb7U2JHW7bus9unWoP8Fm
+         PoK1wubSYd+di7pVX2hZaqa62LD2OwPO1c3D8NyOQgH7qbAhakJ0g/ddXZAhpimtvxzY
+         sIrA==
+X-Gm-Message-State: AOJu0YxtXFCdhb/dbbN0VEDMKBvYyE8TYplwVisNpMZbl3ofubdHSr/5
+	MDyPC7Bz5R0DPOD4ZBxjFzHY3X2Bt6/L3SEm4L2WsPUsMulYmmrmBsJK5eOXMOyRVbYvvItPSya
+	PSRqp7/zoN3ey+PLJBIHso+iHhxsQm/2LHbCbP4RopM6Kw1QR4bEGDUT1q3A+PSQXKDLRuVABxP
+	LBtAfiB5wVa0blta4XD/bxC8NLvlMv28Q7M3fkFgfMBwRuGe0=
+X-Gm-Gg: AR+sD10BdxmmdDqEA5QWNpON3jMlwQGf6BkIeJeDSQrpLlP1jEHtUyZJRsQVD7KZh9l
+	ZH3Ib7h3s4HnVSPVCG29T/p1bNNI1Wl3V6suufK6Nw+Vc9A3Xv4iFWjmqgQRTSCz+9i0sVxYZwC
+	pQSsVwi1AHiXFzaXwBdu2ZoqmQDE1ChXNcdnf1KXSAG4GkYv+QVcEQ+zH6NeFbNLeMxSzqRvYEq
+	/XoHg/MdzT/vLt01KcXAEF9/yEef8uYv4ifQdORFNchXBHNj+DKsX666S6h2p6A6WT8N4YHmEOa
+	1EQESuk2hkvHOM75y1Mij0CY+QI4XkcJLOwzvn2GyZ7VR2Gmz0VcR7rsFjlibHQ947aXXehw5hT
+	5MghcY9y9KuhoCfObZ2Tn3A/SK19003tv4u50YKjLPHpRz8Hz4+JEhbRff406XpUudA==
+X-Received: by 2002:a05:6830:6189:b0:7ee:347b:679 with SMTP id 46e09a7af769-7f1e5ecf12emr12242888a34.13.1786070527993;
+        Thu, 06 Aug 2026 19:42:07 -0700 (PDT)
+X-Received: by 2002:a05:6830:6189:b0:7ee:347b:679 with SMTP id 46e09a7af769-7f1e5ecf12emr12242850a34.13.1786070527453;
+        Thu, 06 Aug 2026 19:42:07 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f35b563887sm356182a34.3.2026.08.06.19.42.00
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f35b563887sm356182a34.3.2026.08.06.19.42.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Aug 2026 19:42:00 -0700 (PDT)
+        Thu, 06 Aug 2026 19:42:06 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org,
 	stfrench@microsoft.com,
 	pc@manguebit.org
-Subject: [PATCH v2 0/3] cifs: three size-management bug fixes
-Date: Thu,  6 Aug 2026 21:41:55 -0500
-Message-ID: <20260807024158.3707995-1-sorenson@redhat.com>
+Cc: stable@vger.kernel.org
+Subject: [PATCH v2 3/3] cifs: fix loff_t underflow in cifs_remap_file_range() when len == 0
+Date: Thu,  6 Aug 2026 21:41:58 -0500
+Message-ID: <20260807024158.3707995-4-sorenson@redhat.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260807024158.3707995-1-sorenson@redhat.com>
+References: <20260807024158.3707995-1-sorenson@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -90,44 +96,52 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These patches fix three independent bugs in cifs file size and handle
-management.
+When cifs_remap_file_range() is called with len == 0 (the clone-to-EOF
+semantic), it computes the effective length as:
 
-Patch 1 fixes a use-after-free in cifs_file_set_size(): when the
-handle-based set_file_size() call fails and falls through to the
-path-based fallback, tcon is reused from the cifsFileInfo that was
-already released by cifsFileInfo_put().  If that put drops the last
-reference on a tlink that has been removed from the tlink tree, the
-subsequent set_path_size() call is a use-after-free.
+    len = src_inode->i_size - off;
 
-Patch 2 fixes a premature i_size update in cifs_do_truncate(): when
-no cached writable handle is available, the server truncation happens
-implicitly via the O_TRUNC flag in the following cifs_open() request,
-but the current code sets i_size to 0 locally beforehand.  If the
-subsequent open fails, other processes sharing the inode observe a
-spuriously zero-sized file.
+If off >= src_inode->i_size, this produces a negative loff_t that
+corrupts all downstream arithmetic: filemap_write_and_wait_range() is
+called with a wrapped range, and the ByteCount in the
+FSCTL_DUPLICATE_EXTENTS_TO_FILE buffer receives a huge value, potentially
+causing the server to attempt a multi-terabyte clone.
 
-Patch 3 fixes a loff_t underflow in cifs_remap_file_range() when
-len == 0 and off >= i_size.  The computed length is negative, which
-corrupts downstream arithmetic and sends a huge ByteCount in the
-FSCTL_DUPLICATE_EXTENTS_TO_FILE request.
+There is already a check for off >= src_inode->i_size at the point
+where -EOPNOTSUPP is remapped to -EINVAL, but that is reached only
+after the ioctl has already been sent with the corrupted length.
 
-Patches 1 and 2 fix regressions introduced by commit 110fee6b9bb5
-("smb: client: fix missing timestamp updates with O_TRUNC").
+lock_two_nondirectories() is held at this point (i_rwsem write on both
+inodes), so i_size_read() is stable.  Add an early bounds check inside
+the len == 0 branch and return -EINVAL via the unlock path if off is at
+or beyond EOF.
 
-v2: rebased
+Fixes: 04b38d601239 ("vfs: pull btrfs clone API to vfs layer")
+Cc: stable@vger.kernel.org
+Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+---
+ fs/smb/client/cifsfs.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Frank Sorenson (3):
-  cifs: clear tcon after cifsFileInfo_put() in cifs_file_set_size()
-  cifs: don't update i_size in cifs_do_truncate() without a cached
-    handle
-  cifs: fix loff_t underflow in cifs_remap_file_range() when len == 0
-
- fs/smb/client/cifsfs.c |  7 ++++++-
- fs/smb/client/file.c   | 17 +++++++++++++----
- fs/smb/client/inode.c  |  1 +
- 3 files changed, 20 insertions(+), 5 deletions(-)
-
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index a1dacc7d8f74..c8e2347aba5d 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -1413,8 +1413,13 @@ static loff_t cifs_remap_file_range(struct file *src_file, loff_t off,
+ 	 */
+ 	lock_two_nondirectories(target_inode, src_inode);
+ 
+-	if (len == 0)
++	if (len == 0) {
++		if (off >= i_size_read(src_inode)) {
++			rc = -EINVAL;
++			goto unlock;
++		}
+ 		len = src_inode->i_size - off;
++	}
+ 
+ 	cifs_dbg(FYI, "clone range\n");
+ 
 -- 
 2.55.0
 
