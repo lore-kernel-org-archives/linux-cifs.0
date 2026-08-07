@@ -1,339 +1,144 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430D04734F5
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 12:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74002FBE1F
+	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 12:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786105321; cv=none; b=nwuehUDq7F00M5ZpD00gnEMxgn0eRrL1lvckQBEa5fA83KxSGhbGjl3js2vtCvbuLZDnNJkaSkTCyzFH7kdUWR6TPGO/pipXTXDunt8ug679dtvbHk1xSnbgQAyk4WBzHT+7yHW1vcNglUyE7kEJuMcFtLiZqfSHxVQw1RUXAYI=
+	t=1786105521; cv=none; b=dD3rqOnmg1FDRvkAcC/RfT5unK5u/mYNyTKsa/qyHJEkqMjJm81cbBTptZO0M4G4M7V+bz7Dyl5ka3gtLTa+UlwnSfN7oRUbuBv6Hlk9boUxshCuTxVgOnpOYJhORQEFzJV9nnCLfCD462tLX4lArYLKwEpQc0vD9vZPtnhewYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786105321; c=relaxed/simple;
-	bh=DBHrIt3vR0qiB7popMBWRjJyFe6j0VkPsGjCQdZ+fys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A8dYB9mPNcl4TkeO7VcJj//hh2Q1h782MILl7mdV5X/L5E7973hkJ5HrQQzflAuhbainSkgAUYdgpluHOuZyX7PCF3l4XZ4DzMESeCezsCGXTC8/A8dr1PCfExJ8EB+LCXTliklo107+IHrEB+gE1gk4ikcFKi27u6oMfIW5CqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qNs5PkTq; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1Fh4x3vf; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=v2pJG3mw; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=FELNO0Ow; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1786105521; c=relaxed/simple;
+	bh=I2dGuc5lqM8srFqFQVTHagVKG21e0bC0+QKM4IIraJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DsMoM5w0cnJ9lmzfTw5eJIpZpO2nf89NgFR1kw5VE9C3p4qQrqRtveBtV3ZfTT69sT1Z5n6BqImWh3cxiE0+TWsRJ99L+X97t+cSc1t4Qr4CsFeCcqtycexsC3B3XS5YjidBwwOgOjwT64VMkyi0cutyypPV7wGSiCtEE+zcDHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=eJ0VGc6O; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qNs5PkTq";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1Fh4x3vf";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="v2pJG3mw";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="FELNO0Ow"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 5A4DA805E9;
-	Fri,  7 Aug 2026 12:21:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1786105300; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="eJ0VGc6O"
+Message-ID: <8231ce4e-2a6f-4177-a7e3-5c210ae9a44a@chenxiaosong.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1786105507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sjmeVLBbYMlbhqwFgwL4zaiBHOqm1IxwLytr3rwX5Ao=;
-	b=qNs5PkTqXwX8bave4us1A2cH3eBnX9uBejU5kyI5xbJPIZxW0qCPWVrGn0I/gHjTJAJbRu
-	PMEOpaGx27k6t6olGBQHrglqMRm6iXBktNbEWZ8tbzw3easLz/8DVQ2otaEoDQN5jbZxEO
-	GWmDoDBZckkDI42Su45pfryCHjydWKI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1786105300;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sjmeVLBbYMlbhqwFgwL4zaiBHOqm1IxwLytr3rwX5Ao=;
-	b=1Fh4x3vfMmAccXcolcdQEiAJsvgeNJjr4DvYs/XINN+tvF35ULnhzZtxEQh4ig+AvpNNZa
-	QZsxvjZ2u7Em+ZBg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=v2pJG3mw;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=FELNO0Ow
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1786105296; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sjmeVLBbYMlbhqwFgwL4zaiBHOqm1IxwLytr3rwX5Ao=;
-	b=v2pJG3mwwpKw8RRnvGTqLAGP4IQjq09XCvnBQamSSB8xl9S5EX4yu4sVS3D3n543K4VJGD
-	tC8cKsTlPGLXpys5QEr238cfcic/dJRIitKOIZBdItfWaMWBnXVEkfPTsg+nc0z06BZG8b
-	qcvcb8iah5+JLHAn29PkletJUx6VBIY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1786105296;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sjmeVLBbYMlbhqwFgwL4zaiBHOqm1IxwLytr3rwX5Ao=;
-	b=FELNO0OwHn5kr5ExWOSXn0I2evfhESUdMeCRLtepCC0SaX41VzBwTFZJEyhdI4dfbRkj4O
-	LdkpIolWfaLxvGCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C39F779B6;
-	Fri,  7 Aug 2026 12:21:35 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id SonkA8/NdWrGMwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Fri, 07 Aug 2026 12:21:35 +0000
-Date: Fri, 7 Aug 2026 09:21:32 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Subject: Re: [PATCH] smb: client: require CONFIG_CIFS_DEBUG2=y for accounting
- tcon bytes stats
-Message-ID: <anXLZxgBXIYcfkTT@suse.de>
-References: <20260806190540.332207-1-ematsumiya@suse.de>
- <CAH2r5muNkfU9LyfvKhQjHUqTF-y=GX1BSXMgyVSR9tHoJYHQvQ@mail.gmail.com>
+	bh=zY3Wb2ykZjQJCbFlthjZxGshlIVv4gCa+mT7GjgLYCc=;
+	b=eJ0VGc6OwDKmosqkn2iQIfTs/ohtlnNKIUICGxxePa33+6EbjTjpbK1TF0uNBmfWPl0uoF
+	JbZE/4/ODvloMrBOrjl3Df8buxsygLeAr4JsavMj4hcGrWv6CkqbxwIidIAAnIZtA1QW6l
+	8FURERFlIntw0480OGRUpSwNRg5VUODWY9cin0jkTSR9rtpT5p4tjH+nMEmUg9L0B/7Rdx
+	KgYRW9n9XdINI4szMKFPe2IlmqOrIagouByr8sXH/s8DI8XuEOJUOj2lGy3OWjaPzwnVGL
+	liklF6MQ0ceaPO2qiuZDxnTYMIBG3FaEVyBgjPaPjtimFyogLrnv0G4gRADXqg==
+Date: Fri, 7 Aug 2026 20:24:18 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAH2r5muNkfU9LyfvKhQjHUqTF-y=GX1BSXMgyVSR9tHoJYHQvQ@mail.gmail.com>
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 5A4DA805E9
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,manguebit.org,gmail.com,microsoft.com,talpey.com,suse.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_TO(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.de:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:email,suse.de:dkim]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
+Subject: Re: Fwd: ksmbd NTLM challenge blob heap buffer overflow (pre-auth)
+To: vova tokarev <vladimirelitokarev@gmail.com>, linkinjeon@kernel.org,
+ stfrench@microsoft.com
+Cc: security@kernel.org, linux-cifs@vger.kernel.org
+References: <CAGBKPgMzL+67L=wrKoCoOq-OQWW1enRLYUtUTHwcPSZ1vt0T8w@mail.gmail.com>
+ <CAGBKPgOX-cc8FkeUfBZvUFEABH6dMmKj28jv1w+xatn4+dvYQg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAGBKPgOX-cc8FkeUfBZvUFEABH6dMmKj28jv1w+xatn4+dvYQg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 08/06, Steve French wrote:
->the problem I see with this is that for customer perf issues, it is
->often asked to look at the bytes read and bytes written stats to
->narrow down what is causing the perf issue, which tcon (and thus which
->server share)?
+Hi vova,
 
-The point is, currently this is a debugging feature that has a perceptible
-impact on non-debugging settings, so IMO it should definitely be disabled
-by default, regardless of the choice on how to enable it.
+I could not reproduce the issue using your poc. I am not sure if I 
+missed any steps.
 
-That's why I suggested, in private to you, a runtime toggling approach by
-writing something to /proc/fs/cifs/Stats to enable this.
+Below is the information about my test environment:
 
->On Thu, Aug 6, 2026 at 2:06=E2=80=AFPM Enzo Matsumiya <ematsumiya@suse.de>=
- wrote:
->>
->> cifs_stats_bytes_{read,written} uses tcon->stat_lock to account for
->> R/W bytes.  This is done unconditionally on every read/write since
->> commit fcabb89299d7 ("cifs: simple stats should always be enabled").
->>
->> On a highly concurrent workload, a spinlock in the middle of the R/W
->> codepaths can become heavily contended, which is absurd given its
->> purpose (protect non-actionable debug/stat data).
->>
->> Make tcon->{bytes_read,bytes_written,stat_lock} usage depend on
->> CONFIG_CIFS_DEBUG2=3Dy.
->>
->> Fixes: fcabb89299d7 ("cifs: simple stats should always be enabled")
->> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
->> ---
->>  fs/smb/client/cifs_debug.c |  4 +++-
->>  fs/smb/client/cifsglob.h   | 24 ++++++++++++++++++++----
->>  fs/smb/client/misc.c       |  2 ++
->>  fs/smb/client/smb1ops.c    | 19 +++++++++++++++----
->>  fs/smb/client/smb2ops.c    |  7 +++++--
->>  5 files changed, 45 insertions(+), 11 deletions(-)
->>
->> diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
->> index 4ed4f55a0bb7..3118174745e0 100644
->> --- a/fs/smb/client/cifs_debug.c
->> +++ b/fs/smb/client/cifs_debug.c
->> @@ -762,11 +762,13 @@ static ssize_t cifs_stats_proc_write(struct file *=
-file,
->>                                         continue;
->>                                 list_for_each_entry(tcon, &ses->tcon_lis=
-t, tcon_list) {
->>                                         atomic_set(&tcon->num_smbs_sent,=
- 0);
->> +#ifdef CONFIG_CIFS_DEBUG2
->>                                         spin_lock(&tcon->stat_lock);
->>                                         tcon->bytes_read =3D 0;
->>                                         tcon->bytes_written =3D 0;
->> -                                       tcon->stats_from_time =3D ktime_=
-get_real_seconds();
->>                                         spin_unlock(&tcon->stat_lock);
->> +#endif /* CONFIG_CIFS_DEBUG2 */
->> +                                       tcon->stats_from_time =3D ktime_=
-get_real_seconds();
->>                                         if (server->ops->clear_stats)
->>                                                 server->ops->clear_stats=
-(tcon);
->>                                 }
->> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
->> index 79e4e84f8985..e0e945c1de0f 100644
->> --- a/fs/smb/client/cifsglob.h
->> +++ b/fs/smb/client/cifsglob.h
->> @@ -1240,9 +1240,11 @@ struct cifs_tcon {
->>                         atomic_t smb2_com_failed[NUMBER_OF_SMB2_COMMANDS=
-];
->>                 } smb2_stats;
->>         } stats;
->> +#ifdef CONFIG_CIFS_DEBUG2
->>         __u64    bytes_read;
->>         __u64    bytes_written;
->>         spinlock_t stat_lock;  /* protects the two fields above */
->> +#endif /* CONFIG_CIFS_DEBUG2 */
->>         time64_t stats_from_time;
->>         FILE_SYSTEM_DEVICE_INFO fsDevInfo;
->>         FILE_SYSTEM_ATTRIBUTE_INFO fsAttrInfo; /* ok if fs name truncate=
-d */
->> @@ -1655,10 +1657,11 @@ convert_delimiter(char *path, char delim)
->>
->>  #define cifs_stats_inc atomic_inc
->>
->> +#ifdef CONFIG_CIFS_DEBUG2
->>  static inline void cifs_stats_bytes_written(struct cifs_tcon *tcon,
->>                                             unsigned int bytes)
->>  {
->> -       if (bytes) {
->> +       if (likely(bytes)) {
->>                 spin_lock(&tcon->stat_lock);
->>                 tcon->bytes_written +=3D bytes;
->>                 spin_unlock(&tcon->stat_lock);
->> @@ -1668,10 +1671,23 @@ static inline void cifs_stats_bytes_written(stru=
-ct cifs_tcon *tcon,
->>  static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
->>                                          unsigned int bytes)
->>  {
->> -       spin_lock(&tcon->stat_lock);
->> -       tcon->bytes_read +=3D bytes;
->> -       spin_unlock(&tcon->stat_lock);
->> +       if (likely(bytes)) {
->> +               spin_lock(&tcon->stat_lock);
->> +               tcon->bytes_read +=3D bytes;
->> +               spin_unlock(&tcon->stat_lock);
->> +       }
->> +}
->> +#else /* CONFIG_CIFS_DEBUG2 */
->> +static inline void cifs_stats_bytes_written(struct cifs_tcon *tcon,
->> +                                           unsigned int bytes)
->> +{
->> +}
->> +
->> +static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
->> +                                        unsigned int bytes)
->> +{
->>  }
->> +#endif /* !CONFIG_CIFS_DEBUG2 */
->>
->>
->>  /*
->> diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
->> index 46e1382e8e04..597dc3c68cd2 100644
->> --- a/fs/smb/client/misc.c
->> +++ b/fs/smb/client/misc.c
->> @@ -145,7 +145,9 @@ tcon_info_alloc(bool dir_leases_enabled, enum smb3_t=
-con_ref_trace trace)
->>         INIT_LIST_HEAD(&ret_buf->tcon_list);
->>         INIT_LIST_HEAD(&ret_buf->cifs_sb_list);
->>         spin_lock_init(&ret_buf->open_file_lock);
->> +#ifdef CONFIG_CIFS_DEBUG2
->>         spin_lock_init(&ret_buf->stat_lock);
->> +#endif /* CONFIG_CIFS_DEBUG2 */
->>         spin_lock_init(&ret_buf->sb_list_lock);
->>         atomic_set(&ret_buf->num_local_opens, 0);
->>         atomic_set(&ret_buf->num_remote_opens, 0);
->> diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
->> index dc5a8c1da623..484e12cb9181 100644
->> --- a/fs/smb/client/smb1ops.c
->> +++ b/fs/smb/client/smb1ops.c
->> @@ -817,14 +817,25 @@ cifs_clear_stats(struct cifs_tcon *tcon)
->>  static void
->>  cifs_print_stats(struct seq_file *m, struct cifs_tcon *tcon)
->>  {
->> +       u64 bytes_read =3D 0, bytes_written =3D 0;
->> +
->> +#ifdef CONFIG_CIFS_DEBUG2
->> +       bytes_read =3D tcon->bytes_read;
->> +       bytes_written =3D tcon->bytes_written;
->> +#endif /* CONFIG_CIFS_DEBUG2 */
->> +
->>         seq_printf(m, " Oplocks breaks: %d",
->>                    atomic_read(&tcon->stats.cifs_stats.num_oplock_brks));
->>         seq_printf(m, "\nReads:  %d Bytes: %llu",
->> -                  atomic_read(&tcon->stats.cifs_stats.num_reads),
->> -                  (long long)(tcon->bytes_read));
->> +                  atomic_read(&tcon->stats.cifs_stats.num_reads), bytes=
-_read);
->> +#ifndef CONFIG_CIFS_DEBUG2
->> +       seq_puts(m, " (CONFIG_CIFS_DEBUG2 is disabled)");
->> +#endif /* !CONFIG_CIFS_DEBUG2 */
->>         seq_printf(m, "\nWrites: %d Bytes: %llu",
->> -                  atomic_read(&tcon->stats.cifs_stats.num_writes),
->> -                  (long long)(tcon->bytes_written));
->> +                  atomic_read(&tcon->stats.cifs_stats.num_writes), byte=
-s_written);
->> +#ifndef CONFIG_CIFS_DEBUG2
->> +       seq_puts(m, " (CONFIG_CIFS_DEBUG2 is disabled)");
->> +#endif /* !CONFIG_CIFS_DEBUG2 */
->>         seq_printf(m, "\nFlushes: %d",
->>                    atomic_read(&tcon->stats.cifs_stats.num_flushes));
->>         seq_printf(m, "\nLocks: %d HardLinks: %d Symlinks: %d",
->> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
->> index 192649fec25d..e1e28f202d0c 100644
->> --- a/fs/smb/client/smb2ops.c
->> +++ b/fs/smb/client/smb2ops.c
->> @@ -1425,9 +1425,12 @@ smb2_print_stats(struct seq_file *m, struct cifs_=
-tcon *tcon)
->>          *  Can't display SMB2_NEGOTIATE, SESSION_SETUP, LOGOFF, CANCEL =
-and ECHO
->>          *  totals (requests sent) since those SMBs are per-session not =
-per tcon
->>          */
->> +#ifdef CONFIG_CIFS_DEBUG2
->>         seq_printf(m, "\nBytes read: %llu  Bytes written: %llu",
->> -                  (long long)(tcon->bytes_read),
->> -                  (long long)(tcon->bytes_written));
->> +                  tcon->bytes_read, tcon->bytes_written);
->> +#else /* CONFIG_CIFS_DEBUG2 */
->> +       seq_puts(m, "\nBytes read: 0 Bytes written: 0 (CONFIG_CIFS_DEBUG=
-2 is disabled)");
->> +#endif /* !CONFIG_CIFS_DEBUG2 */
->>         seq_printf(m, "\nOpen files: %d total (local), %d open on server=
-",
->>                    atomic_read(&tcon->num_local_opens),
->>                    atomic_read(&tcon->num_remote_opens));
->> --
->> 2.55.0
->>
->
->
->--=20
->Thanks,
->
->Steve
->
+- kernel: v7.1, CONFIG_KASAN=y
+- Architecture: aarch64
+- Linux distribution version: Fedora release 40 (Forty)
+
+Below is the log after running the poc (indicating the poc ran 
+successfully), but there are no error messages in the ksmbd dmesg output:
+
+```
+./poc_ksmbd_ntlm_oob 192.168.53.211 445
+=====================================================
+   ksmbd NTLM Challenge Blob Heap Overflow (RV-W1-001)
+   Pre-auth remote: SMB2 SESSION_SETUP, no credentials
+   Overflow: ~1620 bytes past kmalloc-512 boundary
+=====================================================
+
+[+] Connected to 192.168.53.211:445
+[+] NEGOTIATE: status=0x00000000
+[>] Sending SESSION_SETUP with NTLMSSP_NEGOTIATE
+[>] Server will build challenge blob with its long netbios name
+[>] If name > ~47 chars: blob > 448 bytes = heap overflow
+[+] Response: 290 bytes, status=0xc0000016
+[+] STATUS_MORE_PROCESSING_REQUIRED -- server survived
+
+[*] Check dmesg for:
+     BUG: KASAN: slab-out-of-bounds in ksmbd_build_ntlmssp_challenge_blob
+     or: Unable to handle kernel paging request at <name-derived address>
+```
+
+On 8/7/26 18:34, vova tokarev wrote:
+> Hi,
+> 
+> It's been almost two months since I reported this, and I haven't heard
+> back. Reaching out to you directly as the ksmbd maintainers.
+> 
+> The bug: ksmbd_build_ntlmssp_challenge_blob() in fs/smb/server/auth.c
+> copies the netbios name (UTF-16LE) into TargetName + 4 AV_PAIR entries
+> with no check against the 448-byte MAX_CIFS_SMALL_BUFFER_SIZE response
+> buffer. A netbios name > ~47 chars overflows into adjacent kmalloc-512
+> objects (up to ~1620 bytes). Triggered pre-auth by any SMB2 client
+> sending raw NTLMSSP_NEGOTIATE (no SPNEGO).
+> 
+> ksmbd accepts names up to 255 bytes via netlink with no enforcement of
+> the 15-char NetBIOS limit.
+> 
+> Confirmed with KASAN: slab-out-of-bounds in
+> ksmbd_build_ntlmssp_challenge_blob. Full PoC and KASAN output in my
+> original report.
+> 
+> Thanks,
+> Vladimir
+> 
+> ---------- Forwarded message ---------
+> From: *vova tokarev* <vladimirelitokarev@gmail.com 
+> <mailto:vladimirelitokarev@gmail.com>>
+> Date: Fri, Jul 3, 2026 at 6:01 PM
+> Subject: ksmbd NTLM challenge blob heap buffer overflow (pre-auth)
+> To: <security@kernel.org <mailto:security@kernel.org>>
+> 
+> 
+>   Hi,
+> 
+> ksmbd_build_ntlmssp_challenge_blob() in fs/smb/server/auth.c writes the
+> NTLM challenge blob into a 448-byte SESSION_SETUP response buffer without
+> checking the size. With a netbios name longer than ~47 characters, the blob
+> overflows up to ~1620 bytes into adjacent kmalloc-512 objects.
+> 
+> The trigger is a pre-auth SMB2 SESSION_SETUP with NTLM Negotiate. (this 
+> works with No credentials) KASAN confirms slab-out-of-bounds writes; 
+> corrupted adjacent data
+> causes kernel crashes at netbios-name-derived addresses.
+> 
+> Affected: Linux 5.15+. Confirmed on 7.1.0 (aarch64) with KASAN.
+> 
+> Attached ZIP: report, userspace PoC (poc_ksmbd_ntlm_oob.c), KASAN output.
+> 
+> Suggested fix: reject blob_len that exceeds available response buffer space.
+> 
+> Thank you,
+> Vladimir Tokarev
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
