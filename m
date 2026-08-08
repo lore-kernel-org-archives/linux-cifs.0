@@ -1,209 +1,116 @@
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BA0165F1A
-	for <linux-cifs@vger.kernel.org>; Sat,  8 Aug 2026 06:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7615628C037
+	for <linux-cifs@vger.kernel.org>; Sat,  8 Aug 2026 11:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786171388; cv=none; b=DMSL+nZLXa6gGMGriKnVti9wlF8piNSw03Yuyq2BX1kr0TKio6wayOlbTrohkB2KTNGzCb3VnHR9mBzh3PuVgSzQuWxYuQrJCbMbfnX6hQxC7w/gySOzeKv4hRZTSQIUIV76MGL01iajSPqgOawI9hIVYRRc2hM0vkBws9PJq64=
+	t=1786189751; cv=none; b=ir2qL7DLFV2fOE61NcNS9Gg5UhCz/OwCWqBVsD3DajjtIRynikhdxxRDrgyWeXwiXP69yV/8P7RZPTGNoIu2XUeSkFWtNr9vN/UEFoREVdM0Qg2hnts66bJVapHJlEHw/+R2/93uTF8M/1K8TYax7TTumOr8sEQ1KwKp0+ZVLCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786171388; c=relaxed/simple;
-	bh=y0FUcJNRyqCHjtTJhdzS9IGjmzEF5On0IckoS+vOFMQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tPeYOUGNBRNMZXI7VmZ/FuWYw3aOT8KXDmaGcTTmlaMV4voE8bDfhYYyCSTJW3lSVH9R4g2vRILJ22cR+kZESMtTS4lpWwgiC2rCvvSjwZM72a5CQiG+rKxULjbL0p5wAhiYl2c36VN/Auu9XLkaa5LKQHoSZF7ALhECpXV1tqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=UwUqrLty; arc=none smtp.client-ip=91.218.175.172
+	s=arc-20240116; t=1786189751; c=relaxed/simple;
+	bh=Ut4Zg0s7pL0EMuEXaePg0FhucyOGTC7i50A3hr4v67U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=TyxgBU3VWFxIOK5qC8AwFlTBpFZLYvyv/t6+gKawOGCyWDLvW2YK4pYEkD2HXVXGLz22xaFwDEGZy3n8g0uEgCv/IAtY59boDOJA/3fY0l4xHSuQ+JAw6PdxEW2uxJf/TGA3qwJP0pXHFJzxPDSuO0L9gxRqwNZgwymHcUX7qZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=dcslgbrA; arc=none smtp.client-ip=95.215.58.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="UwUqrLty"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="dcslgbrA"
+Message-ID: <fff5c001-6349-40ef-8d8c-5375b03177da@chenxiaosong.com>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1786171383;
+	s=key1; t=1786189745;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kWxj7sj/zf0VqnHra4N+uu7uIFW0IYrpXzBhZGzNIbw=;
-	b=UwUqrLty8MwHBvOzFsKTaC43clnc2+wWO8EL9eQFQNuwDOlZm9kgbczMGxt6eCQafJPZX8
-	98jf+nYMDkb88tkofmAMazNTr4xN7/LMrsQBrbEBxFvo43S9CZ75pAh6WVySwS3+s9ZJ+q
-	hSP4KgzK23/XmBAiJ16MDVLicf0nNHtO8RSNLQFn1hKHt3G7+XFG/7mvHilRbrS8oztOx7
-	yjRPAdGo5dg2ySQS3kYLefr2mXN+pAjlDk1W/7tsa13L/dS+mmvH0+B59zMDzU3yqGZFsT
-	x9mMIVhT2NrXVaPBFg6Tl6+Zn6fjrEeFtUVJdvlHKYGbiByZJTR69ZCGBmSzGg==
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: smfrench@gmail.com,
-	linkinjeon@kernel.org,
-	pc@manguebit.org,
-	tom@talpey.com,
-	senozhatsky@chromium.org,
-	slow@samba.org,
-	gael.blivet@gmail.com
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v3 3/3] ksmbd: refactor smb2_notify() to a blocking wait
-Date: Sat,  8 Aug 2026 06:41:40 +0000
-Message-ID: <20260808064145.1002261-4-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260808064145.1002261-1-chenxiaosong@chenxiaosong.com>
-References: <20260808064145.1002261-1-chenxiaosong@chenxiaosong.com>
+	bh=4K+uHR2GKZTm9nWcAL6KggFwYlUBJ6h6IgtoVLK89Ug=;
+	b=dcslgbrA4skk8Qf786YsKvCmbmdqu/sGc3PON8oYqF2NpuJ7WbtpRxsOSNf4cnHbkHweps
+	joVXVdprr3ABKVx9k1WY5iaeoIjV1o+WXBJa75Tvo9Y3ew59l4sAQi1Oq/FDTBfnnp3w22
+	sI+ex0AvO+BIKAE7xSdjvzGU3LpwUH6NFMzuAvuLqXcLV2dudMRTASgSR1sRqmM6CbM1NK
+	nmvvL0PuzP0ryiIj2/r86WGoB7zfikbCSZZ9PhnJaEbLNodH7ADaYP6ZlO3jHYPvYylHQp
+	yfTRHIIDwECJHfff4bNxjo+i+gwLsMcyL88K2JNDossHBHDRznDj6zWnFaPA/Q==
+Date: Sat, 8 Aug 2026 19:48:18 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Subject: Re: Fwd: ksmbd NTLM challenge blob heap buffer overflow (pre-auth)
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: vova tokarev <vladimirelitokarev@gmail.com>,
+ Steve French <smfrench@gmail.com>, tom@talpey.com, senozhatsky@chromium.org,
+ linux-cifs@vger.kernel.org
+References: <CAGBKPgMzL+67L=wrKoCoOq-OQWW1enRLYUtUTHwcPSZ1vt0T8w@mail.gmail.com>
+ <CAGBKPgOX-cc8FkeUfBZvUFEABH6dMmKj28jv1w+xatn4+dvYQg@mail.gmail.com>
+ <8231ce4e-2a6f-4177-a7e3-5c210ae9a44a@chenxiaosong.com>
+ <CAGBKPgOi8DS7qjgP_MD7_3zUEyikFBK-8mEVwoJS8rDjYznWRw@mail.gmail.com>
+ <a5776b98-7b5d-4c30-bd2a-f690b7ce7323@chenxiaosong.com>
+ <CAGBKPgPm7X4=5Mi_AZOE12vGCZxQR0s_ax5Cmnibqvtc_6V4nA@mail.gmail.com>
+In-Reply-To: <CAGBKPgPm7X4=5Mi_AZOE12vGCZxQR0s_ax5Cmnibqvtc_6V4nA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Gael Blivet <gael.blivet@gmail.com>
+Hi Namjae,
 
-The previous design registered a synthetic work struct (in_work)
-directly on conn->async_requests and deferred the response to a
-workqueue -- a bespoke async/cancel implementation duplicating what
-setup_async_work(), release_async_work(), and smb2_send_interim_resp()
-already provide for smb2_lock()'s pending byte-range lock.
+We have confirmed that this issue does not exist.
 
-Replace it with that same pattern: setup_async_work() on the calling
-work itself, registered on fp->blocked_works, woken by cancel or by
-the handle closing via the existing set_close_state_blocked_works().
-This removes the synthetic work struct, the notify_pendings list and
-its close-time drain, and the deferred workqueue send, leaving
-smb2_notify() sharing the same async/cancel machinery as smb2_lock()
-instead of its own separate copy.
+On 8/8/26 17:34, vova tokarev wrote:
+> Hi ChenXiaoSong,
+> 
+> You are right. I missed that ksmbd_startup_request.netbios_name is
+> char[16], and ksmbd-tools strncpy's to 15 chars max. The kernel code
+> is missing a bounds check, but the name can never be long enough to
+> trigger the overflow through normal operation.
+> 
+> I apologize for wasting your time on this. Thank you for the thorough
+> debugging.
+> 
+> Best,
+> Vova
+> 
+> On Sat, Aug 8, 2026 at 12:42 AM ChenXiaoSong 
+> <chenxiaosong@chenxiaosong.com <mailto:chenxiaosong@chenxiaosong.com>> 
+> wrote:
+> 
+>     Hi vova,
+> 
+>     I am using the same `ksmbd.conf` as you, the length of the netbios name
+>     is 202.
+> 
+>     After debugging, I found that the maximum value of
+>     `strlen(ksmbd_netbios_name())` is 15.
+> 
+>     ```
+>     struct ksmbd_startup_request {
+>              __s8    netbios_name[16];
+>     }
+>     ```
+> 
+>     I also checked the ksmbd-tools source code (Link[1]), and it copies at
+>     most 15 characters:
+>     ```
+>     // ksmbd-tools.git
+>     // mountd/ipc.c
+>     static int ipc_ksmbd_starting_up(void)
+>     {
+>     ...
+>              if (global_conf.netbios_name) {
+>                      strncpy(ev->netbios_name,
+>                              global_conf.netbios_name,
+>                              sizeof(ev->netbios_name) - 1);
+>              }
+>     ...
+>     }
+> 
+>     Link[1]:
+>     https://github.com/cifsd-team/ksmbd-tools/blob/c0ce0753144adab006552ed42e6862758ed6929d/mountd/ipc.c#L162
 
-The worker now blocks on ksmbd_wq for as long as the watch stays
-open, instead of returning immediately. This also makes the skeleton
-ready for a future event-delivery implementation on the same
-blocking wait.
-
-Suggested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
-Assisted-by: Claude:claude-sonnet-5
-Tested-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/ksmbd_work.h |  1 +
- fs/smb/server/smb2pdu.c    | 83 ++++++++++++++++++++++++++++++++++++--
- 2 files changed, 81 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/ksmbd_work.h b/fs/smb/server/ksmbd_work.h
-index 0b55ad457cd3..4c0b7b2535b9 100644
---- a/fs/smb/server/ksmbd_work.h
-+++ b/fs/smb/server/ksmbd_work.h
-@@ -113,6 +113,7 @@ struct ksmbd_work {
- 	struct list_head                request_entry;
- 	/* List head at conn->async_requests */
- 	struct list_head                async_request_entry;
-+	/* List head at ksmbd_file->blocked_works */
- 	struct list_head                fp_entry;
- };
- 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 2150526bbc6e..7aac32a7fadb 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -10977,6 +10977,28 @@ int smb2_oplock_break(struct ksmbd_work *work)
- 	return 0;
- }
- 
-+struct ksmbd_notify_wait {
-+	wait_queue_head_t wait;
-+};
-+
-+/*
-+ * Cancel handler for a pending CHANGE_NOTIFY. Called either by
-+ * smb2_cancel() (conn->request_lock held, work->state already set to
-+ * KSMBD_WORK_CANCELLED by the caller) or by
-+ * set_close_state_blocked_works() (vfs_cache.c, fp->f_lock held,
-+ * work->state already set to KSMBD_WORK_CLOSED by the caller) -- both
-+ * callers hold a spinlock across this call, so it must not sleep.
-+ * wake_up() only wakes the waiter in smb2_notify(); it does not touch
-+ * fp->blocked_works itself, matching smb2_remove_blocked_lock()'s same
-+ * non-mutating style for the equivalent byte-range-lock wait.
-+ */
-+static void smb2_notify_cancel(void **argv)
-+{
-+	struct ksmbd_notify_wait *notify_wait = (struct ksmbd_notify_wait *)argv[0];
-+
-+	wake_up(&notify_wait->wait);
-+}
-+
- /**
-  * smb2_notify() - handler for smb2 notify request
-  * @work:   smb work containing notify command buffer
-@@ -10987,6 +11009,10 @@ int smb2_notify(struct ksmbd_work *work)
- {
- 	struct smb2_change_notify_req *req;
- 	struct smb2_change_notify_rsp *rsp;
-+	struct ksmbd_notify_wait notify_wait;
-+	struct ksmbd_file *fp;
-+	void **argv;
-+	int err;
- 
- 	ksmbd_debug(SMB, "Received smb2 notify\n");
- 
-@@ -11001,9 +11027,60 @@ int smb2_notify(struct ksmbd_work *work)
- 		return -EIO;
- 	}
- 
--	smb2_set_err_rsp(work);
--	rsp->hdr.Status = STATUS_NOT_IMPLEMENTED;
--	return -EOPNOTSUPP;
-+	fp = ksmbd_lookup_fd_slow(work, req->VolatileFileId, req->PersistentFileId);
-+	if (!fp) {
-+		rsp->hdr.Status = STATUS_FILE_CLOSED;
-+		smb2_set_err_rsp(work);
-+		return 0;
-+	}
-+
-+	argv = kmalloc(sizeof(void *), KSMBD_DEFAULT_GFP);
-+	if (!argv) {
-+		ksmbd_fd_put(work, fp);
-+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
-+		smb2_set_err_rsp(work);
-+		return 0;
-+	}
-+	init_waitqueue_head(&notify_wait.wait);
-+	argv[0] = &notify_wait;
-+
-+	if (setup_async_work(work, smb2_notify_cancel, argv)) {
-+		kfree(argv);
-+		ksmbd_fd_put(work, fp);
-+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
-+		smb2_set_err_rsp(work);
-+		return 0;
-+	}
-+
-+	spin_lock(&fp->f_lock);
-+	list_add_tail(&work->fp_entry, &fp->blocked_works);
-+	spin_unlock(&fp->f_lock);
-+
-+	smb2_send_interim_resp(work, STATUS_PENDING);
-+
-+	err = wait_event_interruptible(notify_wait.wait,
-+				       READ_ONCE(work->state) != KSMBD_WORK_ACTIVE);
-+	if (err && READ_ONCE(work->state) == KSMBD_WORK_ACTIVE) {
-+		/*
-+		 * Woken by a signal, not a real cancel/close. There is no
-+		 * notification backend yet to report anything else against,
-+		 * so treat this the same as a client-side cancel.
-+		 */
-+		WRITE_ONCE(work->state, KSMBD_WORK_CANCELLED);
-+	}
-+
-+	spin_lock(&fp->f_lock);
-+	list_del_init(&work->fp_entry);
-+	spin_unlock(&fp->f_lock);
-+
-+	rsp->hdr.Status = work->state == KSMBD_WORK_CLOSED ?
-+			  STATUS_NOTIFY_CLEANUP : STATUS_CANCELLED;
-+	smb2_send_interim_resp(work, rsp->hdr.Status);
-+	release_async_work(work);
-+	work->send_no_response = 1;
-+
-+	ksmbd_fd_put(work, fp);
-+	return 0;
- }
- 
- /**
 -- 
-2.54.0
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
