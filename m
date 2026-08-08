@@ -1,70 +1,83 @@
-Received: from out-171.mta1.migadu.com (mta1.migadu.com [37.59.57.117])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87069459AF8
-	for <linux-cifs@vger.kernel.org>; Fri,  7 Aug 2026 22:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.59.57.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB5B165F1A
+	for <linux-cifs@vger.kernel.org>; Sat,  8 Aug 2026 06:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786140283; cv=none; b=dkR/tAU0ikTNb9p7m8hD8E8xYGnWGmqUqQeIBRpIpehNhNR6cSnxLIGJD0R9beguNJCmEMwb6uFcj9XZX07eFrVhc3M5vuu0Liy07PjcbOl70/FQE4EKg0iBlcrHVNMhSCD5D5nrDyN8NSnC5NWXuBODm5air00hbY+gp2bAJzk=
+	t=1786171381; cv=none; b=unhjFq1GAAag0VgJbESW/e8ZW0GI03CR2EzupUHgTM0COvFiFaNWEDpd8JHCvO2OghDlQmGwhsgS/3faA+syrqNZ4dMsXtUzVWdodJEva8LPBPfaXue8nWNfI4YZUv+yr7IbUXZ7/jjR7SczDY71IW2uq6erezWcwKVNnvAF+BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786140283; c=relaxed/simple;
-	bh=y8pLwhFS2NnZHYiaKMjb4k30VsraZ7rjsX51AGMxpxM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nQkSEGYaAePD6Xl4vZEzMIw+DF0iRlI4hu2WuXYbXbv/uNPuF9AYFbCGFB/cFisJpVdR3hZuQNAJk9RxYGQoLTvrAxqDFjnawgEeGkK1bhTivPHPu9+ekFwWtY+fwUFjHv5B2sx6UZDutusUMjyAq+jKuJIfN8LRTgCEXbhogx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=qe+xvABW; arc=none smtp.client-ip=37.59.57.117
+	s=arc-20240116; t=1786171381; c=relaxed/simple;
+	bh=eCA1iPJPM0GDqJ06NtWYC8MRhzuAjNmlSdfXltIqLZ0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gNIlavrgdNgsR+YySPkRegpNiEWk/hgny/3iOBYPoCVPfFOJ5M2o3MpRKWEpZJI+utKk8SoMwrm6xUS8xQTG7yPVPnZajpob02CB0VjgTzy5Ucpz3LnuZggmKoj97ZWCK9tZMLhsoXNRHWg5wYeqs93XpUYSWAfkbljCXcYaW8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=LCu9Lwrd; arc=none smtp.client-ip=91.218.175.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="qe+xvABW"
-Message-ID: <38db9743-8d3f-4746-abad-2d649e3c1614@chenxiaosong.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="LCu9Lwrd"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
-	s=key1; t=1786140276;
+	s=key1; t=1786171374;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tUyLvZwL9FnmsObGAKF1X+Nk2ZAGLlogOCAhd9gITcQ=;
-	b=qe+xvABWm3xGJGymKJ8GhkCcIIphsOwLN7VGp/FjkL2PJQrMqVOvDhVEJ7OR6iM2CwnDXQ
-	r5C0E4e6zxYxxuh+t3yYbl1jf9Uhtw9fGpkocSi2xw1Oq/b+0BOBlIHtLemStk26fevEeJ
-	+6Dla2BY5le9JabX33Kr+b32eEuCKErxnM8Pji9R2Xl31mT0l2oGYU4DPFjC0yMNCa4Y8u
-	Q9DFJ4ROZCB1CJcvsmRTqVKO9+YtTP9Dpjw/IxIJd+CD+O4o2/TMELwQzckK8PILGf2f6A
-	SptC9n3c9nFfPsubq87aLZVxim7C+EskU0xnjpVl2TyuHn7F9xapWVsF0SItow==
-Date: Sat, 8 Aug 2026 06:04:32 +0800
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VgUmEBnZhS3wM05AtIgydmFG1j4J4ZNuezVf3AuaHyY=;
+	b=LCu9LwrdtTE0TSfQkF0EzzVXbdVKrmuhMLGTj/iiLsIkMoNyFizgW7W3q8AzM31CmuGkHn
+	MVa2WvA0QM2IEPtqO5UGa6G7Og/aXk3++fJyusjV0A9Ij9irPX+vViftXRg16khPlxJwPA
+	i/b4Ru5Y38LNYLlHKjCE4jCpiS1n9U7E9f229PUvbyEFRMnc6fEigQu+Up6xZWKcw5baPn
+	1fuksYzm/47si1cVbUPrFoFlOXZSIKcbZTjZbHd2vaDFVbEXXHugegB/e8gS7IDP0a1uX5
+	fzz4xQHIFbRRFOnKfeRnPdEvIDbQ5Sma7F4Qwbr4NxoqiP219t+TZfArYMasqQ==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	slow@samba.org,
+	gael.blivet@gmail.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v3 0/3] ksmbd: refactor smb2_notify() to a blocking wait
+Date: Sat,  8 Aug 2026 06:41:37 +0000
+Message-ID: <20260808064145.1002261-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] smb: server: Clear sensitive stack and heap data in
- auth.c
-To: Thomas Huth <thuth@redhat.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Steve French <smfrench@gmail.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260807171024.1529513-1-thuth@redhat.com>
- <17fe311c-f47a-424f-8977-81c88d820e80@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <17fe311c-f47a-424f-8977-81c88d820e80@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Thanks for your patch. This patch cannot apply to the 
-`ksmbd-for-next-next` branch. Please rebase the next version on 
-`ksmbd-for-next-next` branch:
-https://github.com/smfrench/smb3-kernel/commits/ksmbd-for-next-next/
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-在 2026/8/8 4:16, Thomas Huth 写道:
-> D'oh, self-nack, I really should not send patches in a hurry on Friday 
-> afternoon, sorry!
-> 
-> I will send a fixed version next week.
+v2->v3:
+  - Add patch #01.
+  - Patch #02 #03:
+    - Rebase on ksmbd-for-next-next branch.
+    - Split Gaël's patch into two patches for easier review.
+
+The next version of my complete notify implementation may still take some time to modify,
+so merging Gael's patch sooner would help avoid repeated rebasing.
+
+Gael's v2: https://lore.kernel.org/linux-cifs/20260725102737.33616-1-g.blivet@me.com/
+Gael's v1: https://lore.kernel.org/linux-cifs/20260724150528.1762-1-g.blivet@me.com/
+
+ChenXiaoSong (1):
+  smb/server: support compound fid in notify requests
+
+Gael Blivet (2):
+  ksmbd: temporarily remove interim-work change notify handling
+  ksmbd: refactor smb2_notify() to a blocking wait
+
+ fs/smb/server/ksmbd_work.c |   3 -
+ fs/smb/server/ksmbd_work.h |   5 +-
+ fs/smb/server/smb2pdu.c    | 305 ++++++-------------------------------
+ fs/smb/server/vfs_cache.c  |  48 ------
+ fs/smb/server/vfs_cache.h  |   6 -
+ 5 files changed, 47 insertions(+), 320 deletions(-)
 
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+2.54.0
 
