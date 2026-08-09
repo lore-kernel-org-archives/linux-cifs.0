@@ -1,118 +1,136 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B472C21F4
-	for <linux-cifs@vger.kernel.org>; Sat,  8 Aug 2026 20:29:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6041E0E14;
+	Sun,  9 Aug 2026 12:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786220958; cv=none; b=Cowrl6fldd2pt/OMzACqUJLH//2RfeJNZz2cAF61LUBLt5rKGHMfMHZ0wzmKmKJRc+ACz6ntn46y6U24OoZ3mNyC7EPcevdBI7VZZLJAjlp7WFtWWt/lbXccOz9yJQnfIeHn3EBqdsjiUKHdH8xvfM2fRVC2Uv27DyMWjrt00xg=
+	t=1786277356; cv=none; b=GUfbOz+MBFde5xF4velj3Sil8/QefgiQ1dWsVho4ZruKZvPwH1dz74+ICY3wHQZKUEb8/u/fT7dMph5Wbwwxaq7FE9mi7MGovzhmmRLma7+xhQm5iEwszLLVHgER5iV1qktk0TivVa9hvM2vSb6lV+dffOr4gk8lC0msEiVAMMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786220958; c=relaxed/simple;
-	bh=vhcmDTY6qjfy8npx7nlxa6iA6oVkAH5PeX6RESA+QD0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=uUdB+JgMce75kyvGud4AOTwemuZWzyAFgvoQuVjPjk29lF6Zlgm14zmCzaQ0id4RMseMmcVd2cifzqnRa3PBm8Qk3XUjgGqYGCGF8gn8EDPAZETpHuYXGUmns2GTM5CQqiCYNZb/Y0heG22hAM0VjgMLqKR6xuUt3yi0bEgFSb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bNhI8iXx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Le/9y/Dn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786277356; c=relaxed/simple;
+	bh=IqPdKGKQyYmNZaylBUAsnOsahOGj2I5gtdG1f7+uRtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GTIVMGFmq+w1itSbYQhieRMeoHN5hyDgskkp0tekMofD/epoFp+tDR1jFfUN80JKs7EZyrr3xUyK9KlG/VR53bnqRr7sZsIEBlDTimQKc5Hq2CObPpuS1JKfpVYwa1EgCSfkGlTn+S32A7OlzYGgQw5KzDBwKpnjIpvK6h+dj4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KTq1DEI1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bNhI8iXx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Le/9y/Dn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786220955;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5gqj2FEl8T1M1QZUvQzrrya3j74szw2oHrcQLRnufC0=;
-	b=bNhI8iXxHxVbVNq+HN3ewOhFIJMYNRlpGF/v1iMEw+NvFpp6sg3KdxQM+Esf/fLnhIHeW6
-	mYsdFqcRIeimhgi8tJtw7vKbIAe+PWBgH5ad0WzynAZjJY2p99CQp3QxbkFK5t7LC3cPbn
-	Q/18qe+pGii8F9zZQfCFX+RSzpCC62w=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-602-5hbfVsFkOrmgSzWasO-kcw-1; Sat, 08 Aug 2026 16:29:09 -0400
-X-MC-Unique: 5hbfVsFkOrmgSzWasO-kcw-1
-X-Mimecast-MFC-AGG-ID: 5hbfVsFkOrmgSzWasO-kcw_1786220948
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-51c20762d21so8524481cf.0
-        for <linux-cifs@vger.kernel.org>; Sat, 08 Aug 2026 13:29:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786220948; x=1786825748; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5gqj2FEl8T1M1QZUvQzrrya3j74szw2oHrcQLRnufC0=;
-        b=Le/9y/DnKb2L/9vnc727V3Cu4uYNWic+IweU7agD+eQ0Pb5NPRgUfvQZw1YMPooBdS
-         9CAtpPK0MywpgyXRWftQ2ZLgK/mVDl7VZzGPpNFbctEKDfH7ff5RYpN/nQtVcYl64wrR
-         qjsFtj9uvqNhx0vWTKcBVQWQTN0gBFDMXtkFrDfUNH2Un6z34Z2muH34wdcF+dgM20wf
-         cEYXNi9m70jW8FCx1Uxdyq/gKk1UuWWQifYPcn5er3srcizA8VyCKvYCf/g33EwjlO/N
-         V5tqCHfdb/5F7NB3e3DFLKVcC9+uQwWQRtGtSNqKbHXgAT8Se64p/Ig+KzIJYOEZNUpG
-         5Lxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786220948; x=1786825748;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=5gqj2FEl8T1M1QZUvQzrrya3j74szw2oHrcQLRnufC0=;
-        b=LjKGPvQoaPXIu49AapWb5jVdxXKEyQbi6vZWBeArAcvMeQsLTbDpJjrb40hfLRD2bK
-         s6Jx8fWNPhm8W0imFyrg+g5KD0f//gMBTqMn0esnlRAOg+GZQfNKvtp5XCA9oLa9nt6i
-         rXR7tFAwZdZUsYKQnErYxRx1i9qar8HQaFNIHgQKSTczgaEgkgFRWJsbMsx6teFuwOsU
-         38J4K3xj8hNZByoAHguAoRebmrdOalSUOPC/WO2MSEFEx/I31t1y7Xo0sYjMmObKjYFK
-         OmW9Xkha4oe6iaGIr66+gRKMYZPM9SeroXlVTGH13Z/8bmuHXiGtYgKQ7KJezw0JaLA2
-         uvZQ==
-X-Gm-Message-State: AOJu0YyJxiKog6H/rwGAseYcQVdWwIxcMtHWrW9hNIGCFGkYoO2IzQTj
-	FGWLi9PNmKPiJzC1NUtv0b8frRi8lmgcTzkHW0/YvUbBHOaOaVEOvlIPYlf53+3ag2hLMhR0tbw
-	AFzPK05Vncmi+d+KD2ue8uENJgOzNNwOvkYFE2RBHGNyFA8QuUW8GRLe7NyPd6sL0jEaVb3Ttkj
-	+yOiQnrACmGJSORE1DpBfl4BlGIcrPGrZyJTzhlj82HtUJAK4=
-X-Gm-Gg: AR+sD10q/IlJlWFpCDVjWULxLQ57Ueua+FLZ9trvRYv10QQGy2fv0TfYEtvf9Oj+GqA
-	Jeimu7RpxidQaGR1DILzWtpEM0vkCcwza4SUQpVP4SlyAPJQyjwJbf9ndB34uYbj/yO7Clm2bVR
-	t3C5wWoFWaxSfqzPA34JLDRWECyDAw2s3sB9cubtP/oTj3DMA2856ITpG037iT//iNl69QwaoPE
-	fKjSQpjUsz4rEiMlnvDMNmXXIMm8GR4+ejeSW+j0G2Z/YgrDDgVOt2BhzcOAcr8wSn7Ib93VaT8
-	QEwajN8uSXpgLbX+9NHTw1X9lOXm/iWaM4RhqRUElwoeTX3RtCJ0SNhm+Pz9BW9ePLMk98nBWtF
-	icMFjx3cRiPSCRblRHpDrpwtCLvlBex7cah0l9quUqweqgQcjGFjEXDCCt2EkKAkhHQ==
-X-Received: by 2002:a05:622a:1ba3:b0:51c:1d67:379 with SMTP id d75a77b69052e-52d18fd354cmr131481821cf.23.1786220948391;
-        Sat, 08 Aug 2026 13:29:08 -0700 (PDT)
-X-Received: by 2002:a05:622a:1ba3:b0:51c:1d67:379 with SMTP id d75a77b69052e-52d18fd354cmr131481401cf.23.1786220947843;
-        Sat, 08 Aug 2026 13:29:07 -0700 (PDT)
-Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-908a91b4a6csm36961106d6.15.2026.08.08.13.29.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Aug 2026 13:29:06 -0700 (PDT)
-From: Frank Sorenson <sorenson@redhat.com>
-To: linux-cifs@vger.kernel.org,
-	pc@manguebit.org,
-	stfrench@microsoft.com
-Subject: [PATCH] cifs: fix clearing stats for fastest execution of each smb2 command
-Date: Sat,  8 Aug 2026 15:29:03 -0500
-Message-ID: <20260808202903.172277-1-sorenson@redhat.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KTq1DEI1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 466B11F000E9;
+	Sun,  9 Aug 2026 12:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786277354;
+	bh=8zSl3hWXbGg/nlZvaYT573A2vU65zYYRnJTK6P1QwZg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KTq1DEI1uC75QqedTDY7FPPmY0QDlYxKWqNj/aZ6wZOoQjzsGgCkfthaEQDMsYoft
+	 Njs2ibVcqkpmVSaS2EWCcueakbzryxPxQwIJzl1yPpZO2+5vLrtMqZKCfh3lMjG8Td
+	 xycHO753b3gOh9SixBz39fSwpR8Or+wY3qndYAx/mMlT/7ZrCzQNv0v7mYgWCAW236
+	 u+5YN/0legtEp46iOoV2K+49LZA7bK3qrRWD09JKo4pR3bOvqf++1ve2oxGW1bAo4f
+	 CL3SR46I2IAC7jjaxxq6fHyy3fgZ5UPSIY60c3EHPVoEuPhaATc5zEPfCKOjd/lELt
+	 ra4CZ2vU6xA0w==
+Received: by pali.im (Postfix)
+	id C016D7C6; Sun,  9 Aug 2026 14:09:13 +0200 (CEST)
+Date: Sun, 9 Aug 2026 14:09:13 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
+To: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RESEND 09/11] cifs: Create native Window socket file
+ compatible also with WSL subsystem
+Message-ID: <20260809120913.ohng2tilnv3dc6wo@pali>
+References: <20260706184819.22124-1-pali@kernel.org>
+ <20260706184819.22124-10-pali@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260706184819.22124-10-pali@kernel.org>
+User-Agent: NeoMutt/20180716
 
-The code to clear the 'fastest_cmd' statistics has a typo that
-repeatedly clears the stat for cmd 0, rather than iterating
-through each cmd.  Fix the typo (0->i).
+Just to note that this change depends on previous change:
+08/11 cifs: Extend ->set_EA() callback to allow operate on reparse point
 
-Fixes: 433b8dd7672be ("SMB3: Track total time spent on roundtrips for each SMB3 command")
-Signed-off-by: Frank Sorenson <sorenson@redhat.com>
----
- fs/smb/client/cifs_debug.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+(without it, compile errors happens)
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 4ed4f55a0bb7..3761d3ad6088 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -754,7 +754,7 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 				atomic_set(&server->smb2slowcmd[i], 0);
- 				server->time_per_cmd[i] = 0;
- 				server->slowest_cmd[i] = 0;
--				server->fastest_cmd[0] = 0;
-+				server->fastest_cmd[i] = 0;
- 			}
- #endif /* CONFIG_CIFS_STATS2 */
- 			list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
--- 
-2.55.0
-
+On Monday 06 July 2026 20:48:17 Pali Rohár wrote:
+> After creating a native socket via the IO_REPARSE_TAG_AF_UNIX reparse
+> point, try to set also the WSL EA $LXMOD.
+> 
+> This makes the native Win32 / NT socket file recognized also under
+> WSL subsystem. WSL subsystem uses same reparse point tag but requires also
+> to be EA $LXMOD set.
+> 
+> Fixes: 45a99d5d1173 ("cifs: Add support for creating native Windows sockets")
+> Signed-off-by: Pali Rohár <pali@kernel.org>
+> ---
+>  fs/smb/client/reparse.c | 30 ++++++++++++++++++++++++++++--
+>  1 file changed, 28 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+> index e2ea59a17c9c..50eeea127a42 100644
+> --- a/fs/smb/client/reparse.c
+> +++ b/fs/smb/client/reparse.c
+> @@ -384,7 +384,7 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
+>  
+>  static int create_native_socket(const unsigned int xid, struct inode *inode,
+>  				struct dentry *dentry, struct cifs_tcon *tcon,
+> -				const char *full_path)
+> +				const char *full_path, umode_t mode)
+>  {
+>  	struct reparse_data_buffer buf = {
+>  		.ReparseTag = cpu_to_le32(IO_REPARSE_TAG_AF_UNIX),
+> @@ -398,6 +398,10 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+>  		.iov_base = &buf,
+>  		.iov_len = sizeof(buf),
+>  	};
+> +#ifdef CONFIG_CIFS_XATTR
+> +	const __le64 xattr_mode_val = cpu_to_le64(mode);
+> +	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
+> +#endif
+>  	struct inode *new;
+>  	int rc = 0;
+>  
+> @@ -408,6 +412,28 @@ static int create_native_socket(const unsigned int xid, struct inode *inode,
+>  		d_instantiate(dentry, new);
+>  	else
+>  		rc = PTR_ERR(new);
+> +
+> +	/*
+> +	 * Try to set also optional WSL EA $LXMOD but ignore errors.
+> +	 * WSL socket and native Win32/NT sockets uses same reparse point
+> +	 * tag IO_REPARSE_TAG_AF_UNIX. WSL subsystem additionally requires
+> +	 * EA $LXMOD to be set with the S_IFSOCK value. So setting this EA
+> +	 * allows native socket to be recognized also by WSL subsystem.
+> +	 * Note that setting of both EAs and reparse points is not supported
+> +	 * by NTFS filesystem on Windows 8 / Windows Server 2012 and always
+> +	 * fails. So ignore failures from this set_EA call.
+> +	 */
+> +#ifdef CONFIG_CIFS_XATTR
+> +	if (!rc && tcon->ses->server->ops->set_EA &&
+> +	    (le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
+> +		tcon->ses->server->ops->set_EA(xid, tcon, full_path,
+> +					       true /* open reparse point */,
+> +					       SMB2_WSL_XATTR_MODE,
+> +					       &xattr_mode_val,
+> +					       SMB2_WSL_XATTR_MODE_SIZE,
+> +					       cifs_sb->local_nls, cifs_sb);
+> +#endif
+> +
+>  	cifs_free_open_info(&data);
+>  	return rc;
+>  }
+> @@ -717,7 +743,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
+>  	struct smb3_fs_context *ctx = CIFS_SB(inode->i_sb)->ctx;
+>  
+>  	if (S_ISSOCK(mode) && !ctx->nonativesocket && ctx->reparse_type != CIFS_REPARSE_TYPE_NONE)
+> -		return create_native_socket(xid, inode, dentry, tcon, full_path);
+> +		return create_native_socket(xid, inode, dentry, tcon, full_path, mode);
+>  
+>  	switch (ctx->reparse_type) {
+>  	case CIFS_REPARSE_TYPE_NFS:
+> -- 
+> 2.20.1
+> 
