@@ -1,303 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-186.mta1.migadu.com (mta1.migadu.com [37.59.57.117])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810343C109C;
-	Sun,  9 Aug 2026 12:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F190A3D333B
+	for <linux-cifs@vger.kernel.org>; Sun,  9 Aug 2026 16:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.59.57.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786277633; cv=none; b=EQWPUScm8BP215zYso/C7pM5Bhqmm5+YpVKycHoqf81oKiXOZlFTJtFXPP8wWjIKJmptDJkcFqdDculQpbr+nMAvT2uyuJ4cx1hQrK5neT/Pj7AmneOgbx7K7E9Zqs7B3emILC2kk/obvtq5NQtRsW56CCu7qRHVxF11D2CfLoM=
+	t=1786292427; cv=none; b=tgkv48cyRwfpW/Vibf2HNKxLnd7XNc07VHTq6r8V3tek9uVAnIKrzsLeADOFr3ST4BGFHayAtZoEXrIwcMS53hB/ZljotIsHkqseM+rDg5RiMa7Afh3EavoRaKX+srYUN2Mz7ENNKhWTKrgXTntQiptLe91/18L3HnedlQvlLCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786277633; c=relaxed/simple;
-	bh=MQ0QztJQKcXEZnZaCZHrZnui2aC6V6JOEi9srv+ivDk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=meqv0xZ2AZFdrs4hQ0GxUwGMf5nTrkIdICN8/DSRAjJEEq7z17H+N6FJTUVJVwPDvDXJCNq8CmjKusRxgzJlf2YowVGI7Jm6vFvhFd8BnlBpu5loA/rggw+/q04DBGa+u2jTrU6gIYZCHF00cdyJjEWVc2S6/9ZQR6/zsh3Mwec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PyBEwp8R; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786292427; c=relaxed/simple;
+	bh=7DX8JUpbMhcawM7dxu1kPKj0ASmeAmZa/pkpOrxGrfg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d/BwUYes7lrWMMv2P+ARcVW5nY4LfD8W8oBCUFY6SD3LfpbxNyhU3Yfsf9kqZIhInOjonLisDqCh9RDCjjxEgCrccG2UGY3KIbH60r86176WJJjWq1m7Cd++wJogLXvxBdKrP0Bop5DhLKa6uWvPVTg+ve8RURlDNeXNc1OEHnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=hrT+gQzq; arc=none smtp.client-ip=37.59.57.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PyBEwp8R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B74A61F000E9;
-	Sun,  9 Aug 2026 12:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786277632;
-	bh=iYH9RDOS1xiYPEjMBM7SosPimRuH8ASCOF+KnqmflMs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PyBEwp8RKWczKhu95YGe0F+TxCPMAe6O5u9iSOsznK0rtb1LLrDR7icr/YLWteEU7
-	 QuVAct9C1TDDiAXKvo14KL/5luLEBNrr4nFLKkiPo3Ch4kjoBI1h8fwpwVfRhaa+Rg
-	 Pf/8mIrN63QmzjRT5aym0cFQXeuGa47TJzML+s9YTF2UdySqvFjzWzXrUqPcS0vYI9
-	 UERzSfARpbQbf6bXhf3iVQ4cJHa1iaMJkoznNsZ25m1u2Vy70+j52IPzjJHEkWjT/7
-	 jUgDGZ7lOC3cDnY6cgEylAlfzEr4RWExmV3jQAYf8Fz4lM+cS6ioKZF1LXrFAdX2sH
-	 7dK/svi5tlFHw==
-Received: by pali.im (Postfix)
-	id B3AA27C6; Sun,  9 Aug 2026 14:13:50 +0200 (CEST)
-From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
-To: Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="hrT+gQzq"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1786292420;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eO2eUvLPu9DOE0W3RcWmjQN0UbK9lEi2zz8QMgS9M6I=;
+	b=hrT+gQzq643bIDLeDjqjDVPscIFtzjmlDOLZbzIQ+ofA7UnGdxjIsIGms7sokDkRpO+hQk
+	fTmonolAicjpnznptJgWilV+Hsiy3oRSTX2A/iuYPe8+ELLIgo/JUN/ScTTn1oGvzwuz4V
+	QKv0TrqSfj2iUZJpdomPaEyLqqD1J/r7zrsqEQByWw38RQOCf604Vm4LBnuARXnivaDG5Z
+	TuCmBdOV/keEsY+T55NKVq4aW0ZsdljTKdm4vcsKbb2zRM4PCWppzylthY+rpHaIR4XI4Z
+	0QSBDRfszNoTmxWZElsiaGJFqgCXq2XsEW2KF2xwz0uzCWgrZgIcB7QfcomvFw==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	slow@samba.org,
+	gael.blivet@gmail.com
 Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] cifs: Add support for creating WSL symlinks in version 1 format
-Date: Sun,  9 Aug 2026 14:13:23 +0200
-Message-Id: <20260809121323.31865-1-pali@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260706184819.22124-12-pali@kernel.org>
-References: <20260706184819.22124-12-pali@kernel.org>
+	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v4 0/3] ksmbd: refactor smb2_notify() to a blocking wait
+Date: Sun,  9 Aug 2026 16:19:13 +0000
+Message-ID: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Add a new mount option -o symlink=wsl1 which cause that all newly created
-symlinks would be of WSL style in layout version 1 format. This type of
-symlinks is supported by all WSL versions.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Existing mount option -o symlink=wsl will be now an alias to -o
-symlink=wsl2 which creates symlinks in layout version 2 format.
+The next version of my complete notify implementation may still take some time to modify,
+so merging Gael's patch sooner would help avoid repeated rebasing.
 
-Signed-off-by: Pali Rohár <pali@kernel.org>
----
-Changes in this v2:
-- Addressed memory leak found by Sashiko
----
- fs/smb/client/cifsglob.h   |  9 +++--
- fs/smb/client/fs_context.c | 11 ++++--
- fs/smb/client/fs_context.h |  3 +-
- fs/smb/client/link.c       |  3 +-
- fs/smb/client/reparse.c    | 74 ++++++++++++++++++++++++++++++++------
- 5 files changed, 82 insertions(+), 18 deletions(-)
+v3->v4:
+  - Patch #03:
+    - Rename: ksmbd_notify_wait -> ksmbd_notify_req.
+    - Return the error code instead of 0 when an error occurs in `smb2_notify()`.
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index c5fdc0138165..66d4370f37dc 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -190,7 +190,8 @@ enum cifs_symlink_type {
- 	CIFS_SYMLINK_TYPE_MFSYMLINKS,
- 	CIFS_SYMLINK_TYPE_SFU,
- 	CIFS_SYMLINK_TYPE_NFS,
--	CIFS_SYMLINK_TYPE_WSL,
-+	CIFS_SYMLINK_TYPE_WSL1,
-+	CIFS_SYMLINK_TYPE_WSL2,
- };
- 
- static inline const char *cifs_symlink_type_str(enum cifs_symlink_type type)
-@@ -208,8 +209,10 @@ static inline const char *cifs_symlink_type_str(enum cifs_symlink_type type)
- 		return "sfu";
- 	case CIFS_SYMLINK_TYPE_NFS:
- 		return "nfs";
--	case CIFS_SYMLINK_TYPE_WSL:
--		return "wsl";
-+	case CIFS_SYMLINK_TYPE_WSL1:
-+		return "wsl1";
-+	case CIFS_SYMLINK_TYPE_WSL2:
-+		return "wsl2";
- 	default:
- 		return "unknown";
- 	}
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index abc29500a664..3e8e4b43690a 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -376,7 +376,9 @@ static const match_table_t symlink_flavor_tokens = {
- 	{ Opt_symlink_mfsymlinks,	"mfsymlinks" },
- 	{ Opt_symlink_sfu,		"sfu" },
- 	{ Opt_symlink_nfs,		"nfs" },
--	{ Opt_symlink_wsl,		"wsl" },
-+	{ Opt_symlink_wsl1,		"wsl1" },
-+	{ Opt_symlink_wsl2,		"wsl2" },
-+	{ Opt_symlink_wsl2,		"wsl" }, /* wsl - alias for wsl2 */
- 	{ Opt_symlink_err,		NULL },
- };
- 
-@@ -407,8 +409,11 @@ static int parse_symlink_flavor(struct fs_context *fc, char *value,
- 	case Opt_symlink_nfs:
- 		ctx->symlink_type = CIFS_SYMLINK_TYPE_NFS;
- 		break;
--	case Opt_symlink_wsl:
--		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL;
-+	case Opt_symlink_wsl1:
-+		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL1;
-+		break;
-+	case Opt_symlink_wsl2:
-+		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL2;
- 		break;
- 	default:
- 		cifs_errorf(fc, "bad symlink= option: %s\n", value);
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index a80a5caff23c..56bbb20a30a3 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -72,7 +72,8 @@ enum cifs_symlink_parm {
- 	Opt_symlink_mfsymlinks,
- 	Opt_symlink_sfu,
- 	Opt_symlink_nfs,
--	Opt_symlink_wsl,
-+	Opt_symlink_wsl1,
-+	Opt_symlink_wsl2,
- 	Opt_symlink_err
- };
- 
-diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-index 8d5d6aca742a..fd7203aa0917 100644
---- a/fs/smb/client/link.c
-+++ b/fs/smb/client/link.c
-@@ -604,7 +604,8 @@ cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
- 
- 	case CIFS_SYMLINK_TYPE_NATIVE:
- 	case CIFS_SYMLINK_TYPE_NFS:
--	case CIFS_SYMLINK_TYPE_WSL:
-+	case CIFS_SYMLINK_TYPE_WSL1:
-+	case CIFS_SYMLINK_TYPE_WSL2:
- 		if (CIFS_REPARSE_SUPPORT(pTcon)) {
- 			rc = create_reparse_symlink(xid, inode, direntry, pTcon,
- 						    full_path, symname);
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index bed6f764c0bc..8db3e4917788 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -22,7 +22,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
- static int mknod_wsl(unsigned int xid, struct inode *inode,
- 		     struct dentry *dentry, struct cifs_tcon *tcon,
- 		     const char *full_path, umode_t mode, dev_t dev,
--		     const char *symname);
-+		     const char *symname, int symver);
- 
- static int create_native_symlink(const unsigned int xid, struct inode *inode,
- 				 struct dentry *dentry, struct cifs_tcon *tcon,
-@@ -43,8 +43,10 @@ int create_reparse_symlink(const unsigned int xid, struct inode *inode,
- 		return create_native_symlink(xid, inode, dentry, tcon, full_path, symname);
- 	case CIFS_SYMLINK_TYPE_NFS:
- 		return mknod_nfs(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname);
--	case CIFS_SYMLINK_TYPE_WSL:
--		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname);
-+	case CIFS_SYMLINK_TYPE_WSL1:
-+		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname, 1);
-+	case CIFS_SYMLINK_TYPE_WSL2:
-+		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname, 2);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -554,6 +556,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
- 
- static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
- 			       mode_t mode, const char *symname,
-+			       int symver,
- 			       struct cifs_sb_info *cifs_sb,
- 			       struct kvec *iov)
- {
-@@ -589,15 +592,20 @@ static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
- 			kfree(symname_utf16);
- 			return -ENOMEM;
- 		}
--		/* Version field must be set to 2 (MS-FSCC 2.1.2.7) */
--		symlink_buf->Version = cpu_to_le32(2);
--		/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
-+		symlink_buf->Version = cpu_to_le32(symver);
-+		/* Target is in UTF-8 but without trailing null-term byte */
- 		symname_utf8_len = utf16s_to_utf8s((wchar_t *)symname_utf16, symname_utf16_len/2,
- 						   UTF16_LITTLE_ENDIAN,
- 						   symlink_buf->Target,
- 						   symname_utf8_maxlen);
- 		*buf = (struct reparse_data_buffer *)symlink_buf;
--		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer) + symname_utf8_len;
-+		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer);
-+		/*
-+		 * Layout version 2 stores the symlink target in the reparse point buffer.
-+		 * Layout version 1 stores the symlink target in the data section of the file.
-+		 */
-+		if (symver == 2)
-+			buf_len += symname_utf8_len;
- 		kfree(symname_utf16);
- 		break;
- 	default:
-@@ -698,7 +706,7 @@ static int wsl_set_xattrs(struct inode *inode, umode_t _mode,
- static int mknod_wsl(unsigned int xid, struct inode *inode,
- 		     struct dentry *dentry, struct cifs_tcon *tcon,
- 		     const char *full_path, umode_t mode, dev_t dev,
--		     const char *symname)
-+		     const char *symname, int symver)
- {
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifs_open_info_data data;
-@@ -707,6 +715,12 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
- 	struct inode *new;
- 	unsigned int len;
- 	struct kvec reparse_iov, xattr_iov;
-+	struct cifs_open_parms oparms;
-+	struct cifs_io_parms io_parms;
-+	unsigned int bytes_written;
-+	struct kvec symv1_iov[2];
-+	struct cifs_fid fid;
-+	__u32 oplock;
- 	int rc;
- 
- 	/*
-@@ -716,7 +730,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
- 	if (!(le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
- 		return -EOPNOTSUPP;
- 
--	rc = wsl_set_reparse_buf(&buf, mode, symname, cifs_sb, &reparse_iov);
-+	rc = wsl_set_reparse_buf(&buf, mode, symname, symver, cifs_sb, &reparse_iov);
- 	if (rc)
- 		return rc;
- 
-@@ -741,6 +755,46 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
- 				     &data, inode->i_sb,
- 				     xid, tcon, full_path, false,
- 				     &reparse_iov, &xattr_iov);
-+	if (!IS_ERR(new) && mode == S_IFLNK && symver == 1) {
-+		/*
-+		 * WSL symlink layout version 1 stores the symlink target
-+		 * location into the data section of the file.
-+		 * Store it now after the reparse point file was created.
-+		 * The target location was allocated into the buf but iov
-+		 * size filled in reparse_iov by wsl_set_reparse_buf() was
-+		 * set to smaller so the created reparse point does not
-+		 * contain it.
-+		 */
-+		oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, FILE_WRITE_DATA,
-+				     FILE_OPEN, CREATE_NOT_DIR | OPEN_REPARSE_POINT,
-+				     ACL_NO_MODE);
-+		oparms.fid = &fid;
-+		oplock = tcon->ses->server->oplocks ? REQ_OPLOCK : 0;
-+		rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
-+		if (!rc) {
-+			symv1_iov[1].iov_base = ((struct reparse_wsl_symlink_data_buffer *)buf)->Target;
-+			symv1_iov[1].iov_len = strlen((const char *)symv1_iov[1].iov_base);
-+			io_parms = (struct cifs_io_parms) {
-+				.netfid = fid.netfid,
-+				.pid = current->tgid,
-+				.tcon = tcon,
-+				.offset = 0,
-+				.length = symv1_iov[1].iov_len,
-+			};
-+			rc = tcon->ses->server->ops->sync_write(xid, &fid, &io_parms,
-+								&bytes_written,
-+								symv1_iov,
-+								ARRAY_SIZE(symv1_iov)-1);
-+			if (bytes_written != symv1_iov[1].iov_len)
-+				rc = -EIO;
-+			tcon->ses->server->ops->close(xid, tcon, &fid);
-+		}
-+		if (rc) {
-+			tcon->ses->server->ops->unlink(xid, tcon, full_path, cifs_sb, NULL);
-+			iput(new);
-+			new = ERR_PTR(rc);
-+		}
-+	}
- 	if (!IS_ERR(new))
- 		d_instantiate(dentry, new);
- 	else
-@@ -764,7 +818,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
- 	case CIFS_REPARSE_TYPE_NFS:
- 		return mknod_nfs(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
- 	case CIFS_REPARSE_TYPE_WSL:
--		return mknod_wsl(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
-+		return mknod_wsl(xid, inode, dentry, tcon, full_path, mode, dev, NULL, 0);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
+v3: https://lore.kernel.org/linux-cifs/20260808064145.1002261-1-chenxiaosong@chenxiaosong.com/
+
+ChenXiaoSong (1):
+  smb/server: support compound fid in notify requests
+
+Gael Blivet (2):
+  ksmbd: temporarily remove interim-work change notify handling
+  ksmbd: refactor smb2_notify() to a blocking wait
+
+ fs/smb/server/ksmbd_work.c |   3 -
+ fs/smb/server/ksmbd_work.h |   5 +-
+ fs/smb/server/smb2pdu.c    | 335 +++++++------------------------------
+ fs/smb/server/vfs_cache.c  |  48 ------
+ fs/smb/server/vfs_cache.h  |   6 -
+ 5 files changed, 65 insertions(+), 332 deletions(-)
+
 -- 
-2.20.1
+2.54.0
 
