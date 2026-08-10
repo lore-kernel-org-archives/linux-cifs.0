@@ -1,178 +1,193 @@
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DAAC245008
-	for <linux-cifs@vger.kernel.org>; Sun,  9 Aug 2026 18:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786298759; cv=pass; b=Rf0B3gsh5eIuOPoYyYuU01ruZDxTgGPYKTUyceJORhL+flonaoPUXoe1L3sTlZF0mFOT9hoUleXibjQE6GyBAOmtUF9SPl1bvTgpckEmMHWW2UvCRs5JoB5/Lujgf+ShEYuK+bqCYDaxRt4Z0i9wvCyCbsgWz3XMXzpV4zrkvYI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786298759; c=relaxed/simple;
-	bh=UK3QFFZKU0EF8BNuslk2eC8BOsF6EsYVa1B1e4vwauo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ttP2/g9u0iHOUxm0lPV9s3dZlFuKXxZQoGRX5bdbEZj78EPHwMNyXc3dNR3vzTnINBJXD4ULS4gm49rFiTt1Hk2l2jYzzJGoUICELp9oHzon96EW98LxVq4pGsReLKAwFu/CPbFUENl/jE0AWNnnS2IYBZnTTQVSP2gAOb2L8yE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ooKxBnI1; arc=pass smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9687E2D781B
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Aug 2026 08:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786350661; cv=none; b=L9X69Say0CPzSKqe5ZQQ6qyPC3EAdHl7ZQGe34Cn89nxv6hU+qPlQKrFCdeM8MJiEYS0wgXB+rHgsHZ5uW2l385cfAOWF9D7hUmDfJU1aVt00f8w+OonbKYtmG8CD8fc2v6K9JWY89jXMuyDibIpqsLK7tmCNXxr6FNpMVRk/1s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786350661; c=relaxed/simple;
+	bh=jkDRyS+QX2EtDVGdbpYGqMMOifEnwi99w2W25ZaeeCQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J/Kpda3VFLXt48LR6qbEYP1AtTMPumucUxyl/j4U4bl1UexrmJUMqJ1/E0EXM/LV+SCL8cqeTa40/zQnPU0kT0b+VPWYSfixezHdD6CreeJBZhbYxHA/gZ3nh9eM5bQHIhR9XkoXrcYEaUhsuzlPQ9kYmPyZIM9bimHXu7NbXHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=mizP+abu; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ooKxBnI1"
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c20363107f4so110608266b.2
-        for <linux-cifs@vger.kernel.org>; Sun, 09 Aug 2026 11:05:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786298756; cv=none;
-        d=google.com; s=arc-20260327;
-        b=kFruSzZJcPH0FXsrmf4rzdtuWpiQa636fuOenZZ6wA6fy42/NT0bSxw/ZGNAp03USJ
-         aoEBaPW0mB82ZF7ejKyWoWYtAKDchjRyIOp72UcH/RU5t8BahaeWBidoRpKMyhRnx+tA
-         azNqBT1rEI0Wjd16qdCQuPhdMn7Zbemg9OmyYsyC6lfTOF7K32ReM5MU9B1SgLw5fwVa
-         XEusgCCJhQMEGI4ra2G2cU5a07FiwQDWH6spjdGRnsu6fdzHes7EC3hfE/O1pwghbzDY
-         r12wk818O9++yTzOvnmGEnKfZxfrHdmdBeZAcJ7yJL86tW1/gPYgRNb2Cu+M58cNRViJ
-         OeXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=5K9ozXqj2RFKdLJ+8AU1E/812U+Nvya00znDP0GNywI=;
-        fh=+fBmkmGz4m05VlloFQzHgdjQo1blN5GWORKLrHwcQ/U=;
-        b=AM/qvsJ6NGxFqme5Fz6Tl1j7HDPwuGQI7dk0iIWUJfuWUR4hTgDRVnnDoEPY7WWk8c
-         On5IoLSWvCgmYbNXza3T96SjRDzZc4UD0jlCf91St/DbZBxiona/dH4YN7SmLDW1rC8w
-         RurOtYvgsgaFXG1QYbEkO4Z5U0Drd+hyYNoNP9ExJjcIy/hbgfEMzeBVo6Wgff9P17gg
-         0jOFIrBo87esd/Yx1S1N1bqTLKNFtgAH0SlXSTYlsnDCeJMp8gj9yoUNQoIU9REkmqq3
-         6Ktxb22U6gc9WoawOTBtlJgHkqkBdMT6/takz0iGv5QCexNvoX1Iy2lLRwN4OGZOYWjY
-         knGg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786298756; x=1786903556; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=5K9ozXqj2RFKdLJ+8AU1E/812U+Nvya00znDP0GNywI=;
-        b=ooKxBnI1KedUJmIDfS4xZuC9lcPV4cMsst3FWdT8BgUmaHNlv3l5zvrb7XdOp1nVJ4
-         ADO0sbQBElkPDKhYLeap46YH36jTlZF7A18TqeKJMr5AFsoZZioDTgYhMr0niq12uikT
-         auWr8xO9SWTjXFZak7ZphTy3Ea0lDlDCZGi06QoI4n71VIS5sMLkBCZ2qrRskubsXW4R
-         WW3Wm5FKe1Afz4bMBG7ySHH/aYhhFQXYkHNsJjLBnXjpceSvYLgQ24xCXZkXave7Vnq2
-         iXHioUxhgVukMmLuo+yv/htoA0em51I7ylSwfQBFnMKJbJ5U2KVfsTF1uDUD7GrIb/wp
-         iCqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786298756; x=1786903556;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=5K9ozXqj2RFKdLJ+8AU1E/812U+Nvya00znDP0GNywI=;
-        b=RTTcrzYQFRHy0UUZkwf7D0NWI82nLBMFw93pymXd0GhRkSciHIzqstU7cEzj5ct97o
-         dSfd4Yp2qVZtsDGMnuGrWDsKmFFSZY5sefBh20WaBiOHOAAugk6Li2aGTIZrNVi/sShm
-         KrrP6VeouvSXC+u/ybAP9I55NeHFDIs6hWR/M6QPSDLvbRTqqgITpDC/R4+McY9ndAxc
-         2YdoWluST2+cRipOMxQRrZVMfgveKDgxyzOP00WB6PC0WWpWlM+FpNnoNxrnGC+prBwe
-         e5X/HUcIlXQycRFeVOEJrYRmjUU0f1y7HTlq6wHWMNO0b9v3xWQMI9IbzBSLVz0Y7/t6
-         eaWw==
-X-Gm-Message-State: AOJu0YzkQiHLyibxCf5oML9CH+oLDr5Flq59Q5csiI3ZKWXkPg12U8tL
-	o2BG5KmtarO8LCU7Tadd5gYt8oMvJ1Ih1g5JZQwRyQEj56qRRk7vjAttO1j/yslJFeONVhkHj5K
-	d1xYDVX6W4HHmXgsq0biM8mankerj2Oo=
-X-Gm-Gg: AR+sD12kCZygH/EZwmZpQMwFY6JdP7pIZipyDkslkkrGMZ82nr9h4JrDpdiiqtIY0dP
-	asyDFsxMjL3tz2zQZBknoH+D9/G5OVc72qTuPEXYFOoivlXuqAW9uXmEA79Ec29MQVw91SdLFKN
-	RgNjM4XYrD/x14UK8esrDG/l0zpj088fVNB1dUsi3diP5Tc15pKASMPiN+FOMOE0uBAMtBJwcMO
-	zUyYHmxMUhREUFVutbQ1gr7N0c0jujXCVQhBpP8lEfqsGjXuwotqX7c0RYO0QP8tjNDqrIKX6FS
-	m8DCJTB2Zhk0FH0DI5DyN/faUttuBtPmyijgiCvobYWRiwx5qYE8r9xE1RzXfgglnLg8GMaN4dj
-	f8CMscikkqjf7Moa88QBFD7o8pbr5ppeNew8dWkCMeLu0QLtP7zeQVGUzPCodFnnE+vr5YhTT36
-	dQejEM8Gdrn67I3zxHWIato46W
-X-Received: by 2002:a17:907:eccc:b0:c1f:97f3:7225 with SMTP id
- a640c23a62f3a-c2039cc4f0bmr2009317566b.6.1786298755779; Sun, 09 Aug 2026
- 11:05:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="mizP+abu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chenxiaosong.com;
+	s=key1; t=1786350654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q0AL3N9OyxDrvOkRIvbO7pjLEkPoSTS8NY56crWOzTc=;
+	b=mizP+abuIC00Ngs0sA0Em6cZsaK+nBcMn4RmwVpmxslx0am7FnAvQwz+faEPtTYioB/4on
+	ZoklqYRQTvZ9ij1XxQOyk+9DFO2IFQtV52mCEwE47ijm1Ij0/F0NvO8HzrmxLmPD6T8WuX
+	w0pqFIzg1wuJhRXSqhqrdSh9vMCojfhYHqSwvuqMgSusqLl02di3LkEYwAayGiN0PtVakE
+	K1y/EVLET12c6MFnqAVOMcFC+GxghB/UxmniduEc0fDxvF8gGRx24I3W55tmwxpoSinUZL
+	q4otFXlyK2TYDrpxzAbd/dmADppQaRsv+CZRJFKjoTMd7pVYfJ7C52XFMiV+Ig==
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	slow@samba.org,
+	metze@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [RFC PATCH samba] smbd: break directory leases before sending notify events
+Date: Mon, 10 Aug 2026 08:29:55 +0000
+Message-ID: <20260810082955.1128900-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260805203900.2930456-1-gustavofn@gmail.com> <dc3725f8e227b1dc7c1bee1189806e3f@manguebit.org>
- <CAJr=uVQ2VGLuHqV2oYsgCxj_EkqdtJAngq8BHUgq_4iU_MNCZg@mail.gmail.com> <d2ee4c33330379ff4a51fa090a551137@manguebit.org>
-In-Reply-To: <d2ee4c33330379ff4a51fa090a551137@manguebit.org>
-From: Gustavo F N <gustavofn@gmail.com>
-Date: Sun, 9 Aug 2026 11:05:43 -0700
-X-Gm-Features: AUfX_myBU42JKYQTjBwp3lXqc4ucCSbCAUm_zMMmj611cbptyD4HYkSTwh_YOnY
-Message-ID: <CAJr=uVTOKnPDnqdzSw9j48gjdXVZ+ZwcSvKNZ=heDRnUsnY1mg@mail.gmail.com>
-Subject: Re: Per-entry WSL EA queries during readdir cause severe ls -la
- slowdown on high-latency links (6.12)
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, stfrench@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Paulo,
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Confirmed, nouser_xattr fixes it completely:
+Reproducer:
 
-  before:  real 0m39.031s
-  after:   real 0m0.367s
+  1. samba: `smb.conf`:
+     [global]
+         smb3 directory leases = yes
+  2. samba:
+     systemctl start smb # fedora
+  3. Windows 11 File Explorer:
+     Mount the share and enter the top-level directory of the mount point.
+  4. samba: touch /export/file
+  5. Windows 11 File Explorer:
+     `file` does not appear in the top-level directory of the mount point.
 
-  QueryInfos: 1 total 0 failed   (was 511)
+Windows can keep directory data in a cache while it has a directory
+lease. A file change made on the server does not use the SMB request
+path, so the lease is not broken.
 
-And strace shows no llistxattr(2) calls at all with that option, so
-`ls` stops asking once the mount reports no xattr support.
+The server sends a notify event, but Windows may still use the old data.
+Some new files are then not shown in File Explorer.
 
-The two hosts:
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ source3/smbd/notify.c           |  7 ++++++-
+ source3/smbd/notifyd/fcn_wait.c |  2 +-
+ source3/smbd/notifyd/notifyd.c  |  2 +-
+ source3/smbd/proto.h            |  1 +
+ source3/smbd/smb2_oplock.c      | 37 +++++++++++++++++++++++++++++++++
+ 5 files changed, 46 insertions(+), 3 deletions(-)
 
-  old:  CentOS Linux 7.9.2009
-        kernel 3.10.0-1160.119.1.el7.x86_64
-        coreutils-8.22-24.el7_9.2
+diff --git a/source3/smbd/notify.c b/source3/smbd/notify.c
+index 5970a7a9220..24dcedb9dba 100644
+--- a/source3/smbd/notify.c
++++ b/source3/smbd/notify.c
+@@ -262,10 +262,15 @@ static struct files_struct *notify_fsp_cb(struct files_struct *fsp,
+ 					  void *private_data)
+ {
+ 	struct notify_fsp_state *state = private_data;
++	uint32_t action = state->e->action;
+ 
+ 	if (fsp == state->notified_fsp) {
+ 		DBG_DEBUG("notify_callback called for %s\n", fsp_str_dbg(fsp));
+-		notify_fsp(fsp, state->when, state->e->action, state->e->path);
++		if (action & NOTIFY_ACTION_DIRLEASE_BREAK) {
++			contend_dirleases_by_fsp(fsp);
++			action &= ~NOTIFY_ACTION_DIRLEASE_BREAK;
++		}
++		notify_fsp(fsp, state->when, action, state->e->path);
+ 		return fsp;
+ 	}
+ 
+diff --git a/source3/smbd/notifyd/fcn_wait.c b/source3/smbd/notifyd/fcn_wait.c
+index e32240d911a..6b5b6e66d43 100644
+--- a/source3/smbd/notifyd/fcn_wait.c
++++ b/source3/smbd/notifyd/fcn_wait.c
+@@ -256,7 +256,7 @@ NTSTATUS fcn_wait_recv(
+ 		*when = evt->msg.when;
+ 	}
+ 	if (action != NULL) {
+-		*action = evt->msg.action;
++		*action = evt->msg.action & ~NOTIFY_ACTION_DIRLEASE_BREAK;
+ 	}
+ 
+ 	DLIST_REMOVE(state->events, evt);
+diff --git a/source3/smbd/notifyd/notifyd.c b/source3/smbd/notifyd/notifyd.c
+index 0b07ab3e435..a42a7a9162e 100644
+--- a/source3/smbd/notifyd/notifyd.c
++++ b/source3/smbd/notifyd/notifyd.c
+@@ -579,7 +579,7 @@ static void notifyd_sys_callback(struct sys_notify_context *ctx,
+ 
+ 	msg = (struct notify_trigger_msg) {
+ 		.when = timespec_current(),
+-		.action = ev->action,
++		.action = ev->action | NOTIFY_ACTION_DIRLEASE_BREAK,
+ 		.filter = filter,
+ 	};
+ 
+diff --git a/source3/smbd/proto.h b/source3/smbd/proto.h
+index 7ced3a3ffd5..012039c7a5f 100644
+--- a/source3/smbd/proto.h
++++ b/source3/smbd/proto.h
+@@ -730,6 +730,7 @@ void smbd_contend_level2_oplocks_end(files_struct *fsp,
+ void contend_dirleases(struct connection_struct *conn,
+ 		       const struct smb_filename *smb_fname,
+ 		       const struct smb2_lease *lease);
++void contend_dirleases_by_fsp(struct files_struct *fsp);
+ bool init_oplocks(struct smbd_server_connection *sconn);
+ void init_kernel_oplocks(struct smbd_server_connection *sconn);
+ 
+diff --git a/source3/smbd/smb2_oplock.c b/source3/smbd/smb2_oplock.c
+index 2489090af55..4de33889eff 100644
+--- a/source3/smbd/smb2_oplock.c
++++ b/source3/smbd/smb2_oplock.c
+@@ -1398,6 +1398,43 @@ void contend_dirleases(struct connection_struct *conn,
+ 	TALLOC_FREE(lck);
+ }
+ 
++void contend_dirleases_by_fsp(struct files_struct *fsp)
++{
++	struct dirlease_break_state state = {
++		.sconn = fsp->conn->sconn,
++		.file_id = fsp->file_id,
++	};
++	struct share_mode_lock *lck = NULL;
++	uint32_t access_mask, share_mode;
++	bool ok;
++
++	if (!lp_smb3_directory_leases() || !fsp->fsp_flags.is_directory) {
++		return;
++	}
++
++	lck = get_existing_share_mode_lock(talloc_tos(), state.file_id);
++	if (lck == NULL) {
++		return;
++	}
++
++	ok = share_mode_forall_leases(lck, do_dirlease_break_to_none, &state);
++	if (!ok) {
++		DBG_WARNING("share_mode_forall_leases failed\n");
++	}
++
++	share_mode_flags_get(lck,
++			     &access_mask,
++			     &share_mode,
++			     NULL);
++	share_mode_flags_set(lck,
++			     access_mask,
++			     share_mode,
++			     state.total_lease_types,
++			     NULL);
++
++	TALLOC_FREE(lck);
++}
++
+ /****************************************************************************
+  This function is called on any file modification or lock request. If a file
+  is level 2 oplocked then it must tell all other level 2 holders to break to
+-- 
+2.54.0
 
-  new:  Rocky Linux 10.2
-        kernel 6.12.0-211.16.1.el10_2.0.1.x86_64
-        coreutils-9.5-7.el10
-
-The tell was in the listing output all along, and I missed it:
-
-  old:  drwxrwxr-x  2 fwservice fwservice ...
-  new:  drwxrwxr-x. 2 fwservice fwservice ...
-
-The trailing dot on the new host is `ls` reporting a security context
-on the files, which is exactly the llistxattr(2) result you found. The
-old host prints no dot and issues no such calls.
-
-I don't know which coreutils change introduced this either, but 8.22 to
-9.5 is a wide enough gap that it could be any of several.
-
-Thanks very much for tracking it down, and apologies for pointing you at
-the WSL EA path, I'd read the STATUS_NO_EAS_ON_FILE responses as the
-cause rather than a consequence.
-
-All the best,
-
-Gustavo
-
-On Sun, Aug 9, 2026 at 10:40=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
-wrote:
->
-> Hi Gustavo,
->
-> I was able to reproduce your problem with coreutils-9.10-5.fc44.x86_64
-> and mainline kernel.
->
-> The `ls -la` command is, in fact, calling llistxattr(2) on every file
-> returned by getdents64(2).  That's why you're seeing those extra
-> requests being sent to the server.  See below
->
->         $ mount.cifs //srv/share /mnt/1 -o ...
->         $ strace -e llistxattr -f ls -la /mnt/1 >/dev/null
->         llistxattr("/mnt/1", "", 152)           =3D 0
->         llistxattr("/mnt/1/.", "", 152)         =3D 0
->         llistxattr("/mnt/1/..", "security.selinux\0", 152) =3D 17
->         llistxattr("/mnt/1/008.174041", "", 152) =3D 0
->         llistxattr("/mnt/1/008.5301", "", 152)  =3D 0
->         llistxattr("/mnt/1/008.5307", "", 152)  =3D 0
->         llistxattr("/mnt/1/008.5313", "", 152)  =3D 0
->         llistxattr("/mnt/1/008.5384", "", 152)  =3D 0
->         llistxattr("/mnt/1/008.6320", "", 152)  =3D 0
->         llistxattr("/mnt/1/009.6781", "", 152)  =3D 0
->         llistxattr("/mnt/1/012.8056", "", 152)  =3D 0
->         ...
->
-> That has nothing to do with the client trying to get WSL EAs on the
-> files.  By using 'reparse=3D' mount option will also not help because it
-> is only used for creating special files and symlinks.
->
-> I don't know why why llistxattr(2) is being called by default when
-> running `ls -la`, sorry.
->
-> One way to prevent the above from happening is by using 'nouser_xattr'
-> mount option, which would disable getfattr/setfattr entirely, so `ls
-> -la` wouldn't attempt to llistxattr(2) each file over directory listing.
