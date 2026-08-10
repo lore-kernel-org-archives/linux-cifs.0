@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D52E3DD523
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Aug 2026 12:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8161A3DB62A
+	for <linux-cifs@vger.kernel.org>; Mon, 10 Aug 2026 12:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786366756; cv=none; b=CimZI0z9KRtTbGgAZQnQQYxQ5ZYB9bYgNZd1lKU41tVZRwl/chguR3yUmxAB+y6QL4vuiOv84e8atHm9Alq5PcrFlANqKja+68ypDKBLC01wgjGh9gCcY8g8j3h1ub0h8WvinPc/HPrXdKiV4ai4Ahcl40Q0hB++ZW/tiKX1kSE=
+	t=1786366757; cv=none; b=n2jrhjvklKQIAZnQIdVxbvfk77E6JaRayJ+jWZP0yTqcljkvjxxnDpcOUoHH5nNdG7Aa438P9IU/B79xrXMYu0RTO3XW/XKWJ7F6fO9uRSSpNtKwWLPvMOMkIYgx/amKH2OyntVfm3jqn7bH249xrau3gqyBlj2iuXzm/99MRfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786366756; c=relaxed/simple;
-	bh=hqOsn2cNMRyVT4MKlsc0XKCWay55quu4DFVjEkbtKfQ=;
+	s=arc-20240116; t=1786366757; c=relaxed/simple;
+	bh=alkQrT/mp6qBDWwuI/IMtkXcvcIMzyUeSo16FQJCm5o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ie/X/xph5qytnVqAXu+oeLhrJorvzNVfwrdlWik0DqE6jjxYH62Fg5dcVGaj7OU2TSXJ2Ch0Vv4lk+RkyA7qxH4018xogWIRHq3RkOF6ZXhXh8EaI6SNJpUzg5OAWAY35dGHnoHVDwdZjx8+rbU6CbSsX3mzpEedNF+ffdxcG2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ohj7EMVH; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=mlt1qD2ez8LoHFlsv2afkYRnQaT7MULJQiL6aJdL7+RIQVzlretuy/EnOnS4EwknZiFITNG1Ve9Elp7yfxh3dCof6Qtu4L1fi1mIJJ2lbIllqPQpTkHHKxmNnUCDXDZhhSgwbXwOT//+Y937+2IYJ2Sg058kEJh2IK4wHOr/0+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iKit2WWR; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ohj7EMVH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKit2WWR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786366752;
+	s=mimecast20190719; t=1786366755;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aM2BoD9AfIWZsdfQ60fb8ro4z7LPM1Ms9bdnD3yXW60=;
-	b=Ohj7EMVHxrc5S3o+iaoihZkaUNZV87lygqw46BBdTwXVEmNx0uaJ9+qUphK4KYF+LLNvsU
-	3IxJQgKLHQrNKY+SqhqamwdtMeXjTBr136oMlY9bpOHtih3Fu2q1ZncvMCQIo0VYq1/miS
-	JtgfwZT+28IwoYnd8AOSslGJMk5htRg=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=gh+3eC2KDdxNiPOue5nNMywvzbbZjC53wM5BXCY+I2U=;
+	b=iKit2WWR4D7lcRKZd2ABzVf0OX+lyW9ATTTjvl89Wd3gSc5Rzz16QPv9wnHDUHTc02pzTb
+	yVCm6JCKrebwSvO8zwsFplaDE2BVOXaqQNmLBipVfFFK7YmciJqJwF5KJk4VmRPDyL8Q1n
+	s13IRwl6Q0xgknvqtpkgECdUVYMHOAk=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-nFyaeFULMPuewdAOlun6uQ-1; Mon,
- 10 Aug 2026 08:59:04 -0400
-X-MC-Unique: nFyaeFULMPuewdAOlun6uQ-1
-X-Mimecast-MFC-AGG-ID: nFyaeFULMPuewdAOlun6uQ_1786366743
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-wrMV2EZaNEmurQace6bTnQ-1; Mon,
+ 10 Aug 2026 08:59:07 -0400
+X-MC-Unique: wrMV2EZaNEmurQace6bTnQ-1
+X-Mimecast-MFC-AGG-ID: wrMV2EZaNEmurQace6bTnQ_1786366745
 Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 32C761955BD0;
-	Mon, 10 Aug 2026 12:59:03 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B506418001E6;
+	Mon, 10 Aug 2026 12:59:05 +0000 (UTC)
 Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3A84C423;
-	Mon, 10 Aug 2026 12:59:01 +0000 (UTC)
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A09DD422;
+	Mon, 10 Aug 2026 12:59:03 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>
@@ -49,9 +49,9 @@ Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] smb: server: Clear sensitive stack and heap data in auth.c
-Date: Mon, 10 Aug 2026 14:58:54 +0200
-Message-ID: <20260810125857.1009618-2-thuth@redhat.com>
+Subject: [PATCH 2/4] smb: server: Make sure that passkey is not leaked on the heap in user_config.c
+Date: Mon, 10 Aug 2026 14:58:55 +0200
+Message-ID: <20260810125857.1009618-3-thuth@redhat.com>
 In-Reply-To: <20260810125857.1009618-1-thuth@redhat.com>
 References: <20260810125857.1009618-1-thuth@redhat.com>
 Precedence: bulk
@@ -65,84 +65,47 @@ X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
 From: Thomas Huth <thuth@redhat.com>
 
-Sensitive data like keys that are stored in stack-local arrays could be
-leaked via the stack to the calling functions, or via the heap when using
-only normal kfree() functions. There is no known vulnaribility for this
-right now, but it's good security style to explicitly zeroize this
-sensitive matieral as soon as possible to avoid that it could be exploited
-together with other bugs later.
-
-In calc_ntlmv2_hash(), the struct hmac_md5_ctx is normally cleared during
-hmac_md5_final() already, but in case of errors, this function is skipped
-and ctx is never zeroized, so add a memzero_explicit(&ctx, sizeof(ctx))
-there to fix the problem.
-
-In ksmbd_krb5_authenticate(), the ksmbd_spnego_authen_response contains
-the session key in the payload. It's currently freed with plain kvfree().
-Let's better use kvfree_sensitive() instead.
-
-In generate_key(), the prfhash[] array is used to calculate the key,
-but it's never cleared, so it leaks on the stack. Thus clear this with
-a memzero_explicit(), too.
-
-In ksmbd_crypt_message(), the sign[] and key[] arrays are leaked via
-the stack, too. Make sure to clear them via memzero_explicit() at the
-end.
+Use kfree_sensitive() to free the user->passkey (and the struct
+ksmbd_login_response in ksmbd_login_user() that contains the same
+information) to avoid that this information could leak somewhere
+else via the heap.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- fs/smb/server/auth.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ fs/smb/server/mgmt/user_config.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 4e7b6f0e6b8cd..998b40c35e97c 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -122,6 +122,8 @@ static int calc_ntlmv2_hash(struct ksmbd_conn *conn, struct ksmbd_session *sess,
- out:
- 	kfree(uniname);
- 	kfree(domain);
-+	if (ret)	/* Done by hmac_md5_final() already if ret == 0 */
-+		memzero_explicit(&ctx, sizeof(ctx));
- 	return ret;
- }
+diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
+index cf45841d9d1b9..76b74d68369d8 100644
+--- a/fs/smb/server/mgmt/user_config.c
++++ b/fs/smb/server/mgmt/user_config.c
+@@ -27,7 +27,7 @@ struct ksmbd_user *ksmbd_login_user(const char *account)
  
-@@ -464,7 +466,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
- 	*out_len = resp->spnego_blob_len;
- 	retval = 0;
+ 	user = ksmbd_alloc_user(resp, resp_ext);
  out:
 -	kvfree(resp);
 +	kvfree_sensitive(resp, sizeof(*resp));
- 	return retval;
- }
- #else
-@@ -556,6 +558,7 @@ static void generate_key(struct ksmbd_conn *conn, const char *sess_key,
- 
- 	hmac_sha256_final(&ctx, prfhash);
- 	memcpy(key, prfhash, key_size);
-+	memzero_explicit(prfhash, sizeof(prfhash));
+ 	return user;
  }
  
- static int generate_smb3signingkey(struct ksmbd_session *sess,
-@@ -848,7 +851,8 @@ int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
- 		ctx = ksmbd_crypto_ctx_find_ccm();
- 	if (!ctx) {
- 		pr_err("crypto alloc failed\n");
--		return -ENOMEM;
-+		rc = -ENOMEM;
-+		goto zeroize_key;
- 	}
+@@ -70,7 +70,7 @@ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp,
  
- 	if (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-@@ -928,5 +932,8 @@ int ksmbd_crypt_message(struct ksmbd_work *work, struct kvec *iov,
- 	aead_request_free(req);
- free_ctx:
- 	ksmbd_release_crypto_ctx(ctx);
-+zeroize_key:
-+	memzero_explicit(key, sizeof(key));
-+	memzero_explicit(sign, sizeof(sign));
- 	return rc;
+ err_free:
+ 	kfree(user->name);
+-	kfree(user->passkey);
++	kfree_sensitive(user->passkey);
+ 	kfree(user);
+ 	return NULL;
  }
+@@ -80,7 +80,7 @@ void ksmbd_free_user(struct ksmbd_user *user)
+ 	ksmbd_ipc_logout_request(user->name, user->flags);
+ 	kfree(user->sgid);
+ 	kfree(user->name);
+-	kfree(user->passkey);
++	kfree_sensitive(user->passkey);
+ 	kfree(user);
+ }
+ 
 -- 
 2.55.0
 
