@@ -1,105 +1,144 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9A23DF000
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Aug 2026 12:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05ADA3C2775;
+	Mon, 10 Aug 2026 13:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786366762; cv=none; b=DaPmHQRyc9+cHfjR4nVTjXuUCVmG4EIVpsNt/MaLyNZ5nYVIVHMDuyhju5CVcyCLmQ3U7ycuyseS52GhfOi3/CJqa9HPIapzC0ivxzBT3teYgbQu5WtIcfE37vgaIMC4fvud7ZdeBLKnepqDtHsL2JdxQxknpV6Eqjpz0YXZ/m8=
+	t=1786367555; cv=none; b=TBCiwlaWkdiE5NDckuag8ZSXj/84oPiOUTZ2jnwI6u0SYjf1ZWvdbQDiwqs2lsKAnkIJsuXm5/fdf8pXZcdpTPd6ijaZya5vkz5kk22BCnKtBcS3JRr3L4qucFeB+/WcSHKu8Yqdo7g4i3fyLgwRfPKwsGNxmwtWNIiSZfFzDMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786366762; c=relaxed/simple;
-	bh=b65RSAh973EBeRrILQ+bC30gE0R2eI0sxLXpsNsAsJ8=;
+	s=arc-20240116; t=1786367555; c=relaxed/simple;
+	bh=H4bkzjyn5PYFF1fjCINLDBhQNmdAHkuGSmghaii28ks=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ak0juSGyolzL5XoPPhAWURzW1KSE5vqZwBOipMgVUKdUdPCZCQ0m/ci85k8K4G5D8myNwmgmDNXmSdmcqm/tee5YfwvcnyQUb5dqzCkHsIO9MVyAqlAvCg+hnmQ6734mR4LmZFmSjbEwtLKEisMPADep3awJTXV2+GCkYBzfRhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=COAG0UnB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 MIME-Version:Content-Type; b=GHHTYLnCjo3LXs2p6f3xXaDdmCjgY1/cTkPZjPm7YW69lhd6STRnEga5eGkXE21cCkTtHNm64VPohS1X70g/Esi6pu9IHF1yoZZvrCGgxBnpYmezW83VU0uXoeQicVaq/GZYYH8PLJdsJKooCwWgRo152BEurVUXDUu1ktuCJiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gD7tKxwY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="COAG0UnB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786366760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MjPZy/DF5PxGdGmbN+m/5NAlaarhrUbd1MfWS27xehM=;
-	b=COAG0UnBnAbcUqC1DzZG+R2PzhCSc5rIG3SBArspT/gHJci/5dVKexPBUAsWgO5JIKt44W
-	IvFV3Oqa1Wj8mTN71wfIZcsTSPRqqOJRzYb/6txAE0YjO31HdFYUWyCAT09T7YEYi8+jH8
-	kj2MHk2VJRZG6yTd0qcDC0gBnWRF/+A=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-669-hfY_s0-9PiO8hsHu7qQBsQ-1; Mon,
- 10 Aug 2026 08:59:11 -0400
-X-MC-Unique: hfY_s0-9PiO8hsHu7qQBsQ-1
-X-Mimecast-MFC-AGG-ID: hfY_s0-9PiO8hsHu7qQBsQ_1786366750
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 655BD19560A5;
-	Mon, 10 Aug 2026 12:59:10 +0000 (UTC)
-Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 91048422;
-	Mon, 10 Aug 2026 12:59:08 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gD7tKxwY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4B801F000E9;
+	Mon, 10 Aug 2026 13:12:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786367553;
+	bh=gzwFhtE0Ek2LlVIsTwETJaTv5SvMI/8Bx08qLe2Vxtc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=gD7tKxwYhcI7DHlrAioW2qhKgIAABui+x7xOWM4yNge/+pxISG8Prmuy7Nw1PWEo8
+	 h0IXKke3j8f3JhEchHd2VYAiFknegfIvqbj3fZvne9Z4HdzC/03nUZtBJ3AOBDzi81
+	 hmRrKeUHFkWBTJtgJ0EWBy5jiJS6xIgAOu56flgrDCUqxAJJ5fc0PbJZSysDPVWS2s
+	 kMoQfcWZGyQuL/xvmYbiBn3teBRTbCUUa9+nLUu3qTZQke/zsjObGWHu7PyyAjg6TY
+	 XPEotAtFQm884B2uRvPVe+xj3Qo8xDW3CUdlrdupZzS2yqdcUNZodAqzXiW3qvf52C
+	 AbGgrCKjIgvcw==
+From: Christian Brauner <brauner@kernel.org>
+To: Matthew Wilcox <willy@infradead.org>,
+	Christoph Hellwig <hch@infradead.org>,
+	Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Leon Romanovsky <leon@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] smb: server: Free sensitive connection data with kfree_sensitive()
-Date: Mon, 10 Aug 2026 14:58:57 +0200
-Message-ID: <20260810125857.1009618-5-thuth@redhat.com>
-In-Reply-To: <20260810125857.1009618-1-thuth@redhat.com>
-References: <20260810125857.1009618-1-thuth@redhat.com>
+Subject: Re: [PATCH v8 00/25] netfs: Keep track of folios in a segmented bio_vec[] chain
+Date: Mon, 10 Aug 2026 15:12:23 +0200
+Message-ID: <20260810-luftdicht-popmusik-hypen-61dd8d9e3c06@brauner>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260804100224.2748935-1-dhowells@redhat.com>
+References: <20260804100224.2748935-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3993; i=brauner@kernel.org; h=from:subject:message-id; bh=H4bkzjyn5PYFF1fjCINLDBhQNmdAHkuGSmghaii28ks=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRVnrN4Erc35H3fhn/clms7GJ4uEZWeJhcuUrNrW+arA JGQ3SaJHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABfhYPinGptzyGzilt/72nwE E3ab2vZrKqdG7hRYYeuScWP2gbQTjAwHlysWdRuZxNts5j2tfWFGkW/arCzbN+KvBaYoVvILruU DAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-From: Thomas Huth <thuth@redhat.com>
+On Tue, 04 Aug 2026 11:01:55 +0100, David Howells wrote:
+> Could you add these patches to the VFS tree for next?
+> 
+> The patches get rid of folio_queue, rolling_buffer and ITER_FOLIOQ,
+> replacing the folio queue construct used to manage buffers in netfslib with
+> one based around a segmented chain of bio_vec arrays instead.  There are
+> three main aims here:
+> 
+> [...]
 
-struct ksmbd_conn contains an embedded struct ntlmssp_auth with the
-ciphertext[] and cryptkey[] arrays, so to avoid leaking this information
-via the heap, it should be freed with kfree_sensitive().
+Applied to the vfs-7.3.netfs branch of the vfs/vfs.git tree.
+Patches in the vfs-7.3.netfs branch should appear in linux-next soon.
 
-While we're at it, also use kfree_sensitive() for freeing preauth_info
-in ksmbd_conn_free() to avoid that the Preauth_HashValue[] could leak
-via the heap here, too.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- fs/smb/server/connection.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index ef6f202f4024c..bcb688c9af918 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -117,7 +117,7 @@ static void __ksmbd_conn_release_work(struct work_struct *work)
- 
- 	ida_destroy(&conn->async_ida);
- 	conn->transport->ops->free_transport(conn->transport);
--	kfree(conn);
-+	kfree_sensitive(conn);
- }
- 
- /**
-@@ -183,7 +183,7 @@ void ksmbd_conn_free(struct ksmbd_conn *conn)
- 	 */
- 	xa_destroy(&conn->sessions);
- 	kvfree(conn->request_buf);
--	kfree(conn->preauth_info);
-+	kfree_sensitive(conn->preauth_info);
- 	kfree(conn->mechToken);
- 	ksmbd_conn_put(conn);
- }
--- 
-2.55.0
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.3.netfs
+
+[01/25] mm: Make readahead store folio count in readahead_control
+        https://git.kernel.org/vfs/vfs/c/bb16bd52f872
+[02/25] netfs: Bulk load the readahead-provided folios up front
+        https://git.kernel.org/vfs/vfs/c/49fe2955409b
+[03/25] Add a function to kmap one page of a multipage bio_vec
+        https://git.kernel.org/vfs/vfs/c/71947db0b6b2
+[04/25] iov_iter: Make iov_iter_get_pages*() wrap iov_iter_extract_pages()
+        https://git.kernel.org/vfs/vfs/c/fc0f8aa28cb0
+[05/25] iov_iter: Add a segmented queue of bio_vec[]
+        https://git.kernel.org/vfs/vfs/c/b7eab1a852c3
+[06/25] netfs: Add some tools for managing bvecq chains
+        https://git.kernel.org/vfs/vfs/c/a8e973126d3f
+[07/25] netfs: Make mempool available for bvecq
+        https://git.kernel.org/vfs/vfs/c/c95787e047bf
+[08/25] netfs: Add a function to extract from an iter into a bvecq
+        https://git.kernel.org/vfs/vfs/c/8854b625d977
+[09/25] afs: Use a bvecq to hold dir content rather than folioq
+        https://git.kernel.org/vfs/vfs/c/acb8eed74013
+[10/25] cifs: Use a bvecq for buffering instead of a folioq
+        https://git.kernel.org/vfs/vfs/c/b0d72aea6001
+[11/25] smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
+        https://git.kernel.org/vfs/vfs/c/27a6832d7b93
+[12/25] netfs: Remove the writethrough code
+        https://git.kernel.org/vfs/vfs/c/de4a0d855ae3
+[13/25] cachefiles,netfs: sunset ondemand mode
+        https://git.kernel.org/vfs/vfs/c/3b09163b7bed
+[14/25] cachefiles: Don't rely on backing fs storage map for most use cases
+        https://git.kernel.org/vfs/vfs/c/f3ac229c89a0
+[15/25] netfs: Add the cache object ID to netfs_read/write tracepoints
+        https://git.kernel.org/vfs/vfs/c/592472ff5a77
+[16/25] netfs: Switch to using bvecq rather than folio_queue and rolling_buffer
+        https://git.kernel.org/vfs/vfs/c/4c9ea0ae64f9
+[17/25] smbdirect: Remove support for ITER_FOLIOQ from smbdirect_map_sges_from_iter()
+        https://git.kernel.org/vfs/vfs/c/c9529300bd22
+[18/25] netfs: Remove netfs_alloc/free_folioq_buffer()
+        https://git.kernel.org/vfs/vfs/c/bc89b7f32adb
+[19/25] netfs: Remove netfs_extract_user_iter()
+        https://git.kernel.org/vfs/vfs/c/e533d0d598c4
+[20/25] iov_iter: Remove ITER_FOLIOQ
+        https://git.kernel.org/vfs/vfs/c/ca929d6a6044
+[21/25] netfs: Remove folio_queue and rolling_buffer
+        https://git.kernel.org/vfs/vfs/c/6440cb5fd08b
+[22/25] netfs: Check for too much data being read
+        https://git.kernel.org/vfs/vfs/c/353f336ead13
+[23/25] netfs: Limit the minimum trigger for progress reporting
+        https://git.kernel.org/vfs/vfs/c/0150b23b0a63
+[24/25] netfs: Combine prepare and issue ops and grab the buffers on request
+        https://git.kernel.org/vfs/vfs/c/473527604b71
+[25/25] cachefiles: Preset the state xattr when creating a new file
+        https://git.kernel.org/vfs/vfs/c/9476c221814c
