@@ -1,84 +1,84 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4E8446C08
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 14:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F60B2AD00
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 14:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786457961; cv=none; b=Lcc5JBlWb3tlJ1Nc2Ibs4lRTVZMMAjMOPFuNlKk9dTHfzcGBdhr1r4csGUitp0mkq3xx0jzFRyifo3tLEcb+tV6VdZ1VjBCZvpXFLCeq4SnnvsamEPbibsX7w8FeeGoGSD7ZLhbGx+kiVUIH3HvaCO65iXs+kpSA3egSrn4mz+8=
+	t=1786458325; cv=none; b=I6rOQno9JFNrvBxvlHoQLIer6l0+knCJQyCUty9LXQHy57SsU9lyhmRZ021j7B3vfr53hejfHlSxzHfPxB3H0zrDQQEC35tZk0LtYVVlajYF6UPYLq8+KhgjbYyl7v7QlnGnmmgBPNUDyupWwdPRVkIJlROQgDYr09MQZ3uYrU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786457961; c=relaxed/simple;
-	bh=5zleF2k56Z9KgeiyNaWkJLGR9c2VRZkI+asDGcsuXU8=;
+	s=arc-20240116; t=1786458325; c=relaxed/simple;
+	bh=vjUgIOzxtLUEqRGd12Zao0T1Qj0iZfGeHnedhIqz3MU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X816UFP2LK3ltYeNaEQy7LQedXhCiU0kD+QmT0uQqB7UsS7QV4hztkREkM8wFveRQ3M3HyE1Qffu5/TPdAxTkNOealGKFwugzibdU/p6j4oNVEOhauWxeXaHUaqZEs2vqEjW0agVCzrJEPbnFLu7EvjYwBN5iW2pvq9ojrBGziw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PSr4XyaU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AmMpEJgL; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=HF7/6aT2f2NmcDuREY4QC6sznZusyrBCaS291x+K6eWafyMsXgSobWSFrBDU2mpv7dPdqJO5RmrNrTHJ7XCIAFkxR4sgamDcKp2dowr7bXNCH/B61jKX8OxjigaM5F2SACEXNhQyqJvYC0YQVFMHBHXbb8Xg5KI1qJ9+6VWOM/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UFRNbaJV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JvqK7W/l; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSr4XyaU";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmMpEJgL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UFRNbaJV";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvqK7W/l"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786457959;
+	s=mimecast20190719; t=1786458323;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/M14Rs49nz/MFkq4obEJEIRruM5aSBskxS6pKDN4fq4=;
-	b=PSr4XyaU6ldNsEBi+he13QkFxSegaofqpEWh1N4AkimrOnIGjjfhHkiguQof3kvfQrSmZl
-	517Kxmi46OrHhkwsJkzKbWvPVRDthQD22FG21YmaPmHSnD5SjPMiDZBTSWaQ7X1Jk3sxA4
-	MYMTqNnzodWm2rFPEPOZY5KPbIDc+YA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mk55lgP+KqMZ/4ByZFmMGZVtOJZLa760GMLOIBHMErM=;
+	b=UFRNbaJVMlCJoJxLlRTXxb5iX3+j4DSXs93AyJSilRQp2CtDzD8vE2Re/nXlIor3o8Ldpl
+	L0z9JpZzlBQwzPX+ghFZ4v/MKAlToAfpdork1TOjBF+TPpjzDk90KmXl+lpvk6iUtErwHR
+	9AYqZyCLXQpgvqrJ21RcZUItXgsA5RE=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-zn7l0leMMmiUwDmt86gUew-1; Tue, 11 Aug 2026 10:19:18 -0400
-X-MC-Unique: zn7l0leMMmiUwDmt86gUew-1
-X-Mimecast-MFC-AGG-ID: zn7l0leMMmiUwDmt86gUew_1786457957
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4954a93c565so17041275e9.2
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 07:19:17 -0700 (PDT)
+ us-mta-94-x-8SXbMnP8CywdnkoTqoQA-1; Tue, 11 Aug 2026 10:25:22 -0400
+X-MC-Unique: x-8SXbMnP8CywdnkoTqoQA-1
+X-Mimecast-MFC-AGG-ID: x-8SXbMnP8CywdnkoTqoQA_1786458321
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-496b6f97676so29782695e9.2
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 07:25:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786457957; x=1787062757; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1786458321; x=1787063121; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=/M14Rs49nz/MFkq4obEJEIRruM5aSBskxS6pKDN4fq4=;
-        b=AmMpEJgLPQId35+omWfpaBxIs8dFZ8rQTFTC8SW2ldGFgpKBNo/lKfjhnRRm8eByTO
-         gzSEXRwaCu2OpOX5ZpiAU7wFdXLyoIFGpNNDaBsd1iDM1jhr4FV9FtplSbFAXlm60vaP
-         nZLG7rph1qjUdYyOe1p2Z3G9l9KhMfHMHsItktVVMznXdYPNU2tTa9aQujH00XKFQ1s0
-         0Q8D6D//pNbAQBVeTqjaGbha3OqDWycIiiM2CRWWpDma7Htmapibdz+ETXBvT+Pidix1
-         kFzNIVcJzFY6GRW1tEQeJojHA94Yyb3DFpl4i1+1hHV0IYSqdAunv5MoVrh56D6tUtfR
-         ro9g==
+        bh=mk55lgP+KqMZ/4ByZFmMGZVtOJZLa760GMLOIBHMErM=;
+        b=JvqK7W/l/6SUx6l9RmDCSeI9hgU4jVBF6NAa40J3NGhNvIV8hJGPmzey+T39mClvZa
+         ihMa40ZjqfmMPwlFanQmjmbbvXxTVbrHNGm3aqMplNHMedR30MY2aIVWr+vIAwe8c/a0
+         KuIbKv3MQ+9mSRHHBSeq0sL+QG9ZKJosaycbHPZ3eTEU0LmBSwDy+StUHSz7tyQ7ZSIv
+         9JvUUCgh1N0WuoQPc7b1k1tCKZ3ltfOFNOuTgdgof96cvyJLj1gMCEkFn/vp1D1bhJvJ
+         JnPwgMCqmj0qKlK1zzexCq9KjY17pNthui6ePf29sKuUhs1H3Wj5pA9zWs/gu2mFDqie
+         Esnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786457957; x=1787062757;
+        d=1e100.net; s=20251104; t=1786458321; x=1787063121;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=/M14Rs49nz/MFkq4obEJEIRruM5aSBskxS6pKDN4fq4=;
-        b=tW3sDal0idGjd8/KmIjjx8o4KTGIBCG2sQ0SnShl/c0fZBu6vYJuMGRXpVI9scBY3X
-         GDh33hP5A2bYS4VomYUETk1eEbqoK3VE/2CI7EIvZ/m0iuG20UvS3fCyuRfjBNqRbVQB
-         I9Gf7aHc87/uEsX3tAKF+1zfaOkl+/6gOHf+1T799KG1ppFFqJkRY4bBdqpN3f+S4iX6
-         5icV3Rzsl5tcF8SQ7eia7JGeik1XjkieY4Q0UhFPRJdYnmKcu2UCNoKxE4vpZbLQVpqW
-         yXhaq1WDI+hvpfUQ3UuhV1IdkeckKVs3DAfv7DPY4E7p8QQTVw6dhkxxff0RLLmmLEvv
-         Dj/g==
-X-Gm-Message-State: AOJu0YxEv+9z8ndYsMi+0FesBoObC6SBkIJ65XuWKKoDL7VKj/XFR81A
-	0O+1AQJan1WvFt6aRmjKsrb2FZG1pCiSLw2V/B6jXMKRgsoJgtkQyjHYPJtAtvqA8tdPEMz4Zmw
-	l3py9SX2u8X6CDxyWC2+tvDEB0pofTiGAE9OMGAeqAa59XpSHfEmvE2Shp3LUELo=
-X-Gm-Gg: AR+sD10JwaN/5xWVkr/2pXygpTQdWsZQuCM+Z8caErS9hFnJLdKOrhC2HT1SkW3SZj1
-	+nFkFx1pZpt7tdYapsGcWUBJsi8sKBtZF7bEo/QxpdcIURSZIUNieEDhR9p4XCgji2LvBCRHwJq
-	yC7ss08AEbFfVgJe5GaAXTDWUmrnT5lg/u/tIEMOqOQp9ctuvHS/X2NJLgGVXDH4AKazaz69wOl
-	6OVJMLPS8nhHjaZQEH2Z8mxPGe1MqYxGDLVa+ThkACr2CPzeXaYnDFVvfbLd14dE9vJJz3EXN/M
-	5WdeP7V1O3GQp1Yhm/uw6zBIOSWYNpbh3Ga7r9TQ4yi19iGy0W3sXrq2X/Q87ict/FSaZPBw
-X-Received: by 2002:a05:600c:3506:b0:499:737c:f24b with SMTP id 5b1f17b1804b1-49978433c06mr51353335e9.5.1786457954531;
-        Tue, 11 Aug 2026 07:19:14 -0700 (PDT)
-X-Received: by 2002:a05:600c:3506:b0:499:737c:f24b with SMTP id 5b1f17b1804b1-49978433c06mr51351845e9.5.1786457953815;
-        Tue, 11 Aug 2026 07:19:13 -0700 (PDT)
+        bh=mk55lgP+KqMZ/4ByZFmMGZVtOJZLa760GMLOIBHMErM=;
+        b=h6not2N9eJxyea3o1h0iaOx3IBqSfkQI0NZojpKlC2Rb4ln6pSj17jR0nProF7ytmn
+         +j0F8vLwQDbYY7ORY4SV1KSbvqblbrbrINJI7K8ldEUN/FkASmh+RVj6Ec09avUFhMLY
+         /32iLrMTWK4uL5z42OxQK8ilz1Ai0XVlTpPPPR72yDuDob8cgoqN/8p10uYhQW87iNjC
+         5Ax2Uof7RhYchp29873CGQOYDf8iqBpcJR0dMhwyg+UHCWJlE/bkdbOgsuLHqZo7vzu3
+         Kqfgf4IvcwEVFb1ilo8rFyuYVqRNJbWmB2/bGfnExAO5yyUHSVCp6OQFDKtUoV3OVGue
+         96pQ==
+X-Gm-Message-State: AOJu0YxD7jN2NDhKxbPOnxuXfQzTQLNpdI4x1iLtmsjRX1GtsDT2mMJG
+	LkTmKN+YpQ92+ZQXVbLKqtpWpsb8B1Kf23j42XC4xudE1uJrhIglV52a4RVel+x1UeTaVw5txd+
+	nSwZnFJJ/IDmGcqq/e7+BW0tnaSBMDnjn2NBxwh5O02BbQ9/WkuaX0AMUmEbkwjc=
+X-Gm-Gg: AR+sD13mBouwX2vgylR4nlXoYBl4gD9j8vf5J6BlZpYVhF/LX4NA9HQc39DAkeCJVXs
+	79+fyeY+kOISZWnc82kS5DdC+szkG1hX5PzTVQ6sD2BAnCG70gqYsvB1LYEr+NY9+eVsINwZHlJ
+	UzaQ2uhZ1Mw6/a7/uedMAbJi4d0eNsGqvvrlmCrjPS/AVJcs4Qjs7HV2P0wCq2Dsh95z1j6N1FI
+	CkIzKtiuXIdACuu+/beQ5msmdj50HIeKCLSMIVbE2gKY860+kW9iHchZbSTXCXGWNtlsXYLoDDB
+	MNV4qptqosCfV9crGuEiT9zI66YlNHGjGgiLU42WMqcS0jWd22r0bQ8Dvf5fAZOd2tGPps9Z
+X-Received: by 2002:a05:600c:3b26:b0:495:4749:16a7 with SMTP id 5b1f17b1804b1-49978463aa0mr57108175e9.14.1786458320658;
+        Tue, 11 Aug 2026 07:25:20 -0700 (PDT)
+X-Received: by 2002:a05:600c:3b26:b0:495:4749:16a7 with SMTP id 5b1f17b1804b1-49978463aa0mr57107045e9.14.1786458320084;
+        Tue, 11 Aug 2026 07:25:20 -0700 (PDT)
 Received: from [192.168.0.9] ([47.64.114.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49977e57696sm36916575e9.2.2026.08.11.07.19.11
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4997889c3adsm37937915e9.2.2026.08.11.07.25.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Aug 2026 07:19:12 -0700 (PDT)
-Message-ID: <da4963f3-1079-4223-8506-b6919c597da6@redhat.com>
-Date: Tue, 11 Aug 2026 16:19:09 +0200
+        Tue, 11 Aug 2026 07:25:19 -0700 (PDT)
+Message-ID: <72e016b0-d7bd-41f7-b17e-dbcd911c5a80@redhat.com>
+Date: Tue, 11 Aug 2026 16:25:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -86,8 +86,7 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] smb/server: fix memory leak in
- ksmbd_krb5_authenticate()
+Subject: Re: [PATCH 2/2] smb/server: fix memory leak in ksmbd_login_user()
 To: ZhangGuoDong <zhang.guodong@linux.dev>, smfrench@gmail.com,
  linkinjeon@kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com,
  sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
@@ -95,7 +94,7 @@ To: ZhangGuoDong <zhang.guodong@linux.dev>, smfrench@gmail.com,
 Cc: linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>,
  ChenXiaoSong <chenxiaosong@kylinos.cn>, stable@vger.kernel.org
 References: <20260731024253.148107-1-zhang.guodong@linux.dev>
- <20260731024253.148107-2-zhang.guodong@linux.dev>
+ <20260731024253.148107-3-zhang.guodong@linux.dev>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -140,7 +139,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260731024253.148107-2-zhang.guodong@linux.dev>
+In-Reply-To: <20260731024253.148107-3-zhang.guodong@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -149,7 +148,7 @@ On 31/07/2026 04.42, ZhangGuoDong wrote:
 > 
 > ksmbd_ipc_login_request_ext() returns an independently allocated
 > response. ksmbd_alloc_user() copies the supplementary group IDs from
-> the response, but ksmbd_krb5_authenticate() does not release it.
+> the response, but ksmbd_login_user() does not release it.
 > 
 > Free the extended response after ksmbd_alloc_user() has finished with
 > it.
@@ -157,20 +156,20 @@ On 31/07/2026 04.42, ZhangGuoDong wrote:
 > Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 > Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > ---
->   fs/smb/server/auth.c | 1 +
+>   fs/smb/server/mgmt/user_config.c | 1 +
 >   1 file changed, 1 insertion(+)
 > 
-> diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-> index 4e7b6f0e6b8c..e886ea5681ca 100644
-> --- a/fs/smb/server/auth.c
-> +++ b/fs/smb/server/auth.c
-> @@ -464,6 +464,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
->   	*out_len = resp->spnego_blob_len;
->   	retval = 0;
+> diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
+> index cf45841d9d1b..21b1d51d918b 100644
+> --- a/fs/smb/server/mgmt/user_config.c
+> +++ b/fs/smb/server/mgmt/user_config.c
+> @@ -27,6 +27,7 @@ struct ksmbd_user *ksmbd_login_user(const char *account)
+>   
+>   	user = ksmbd_alloc_user(resp, resp_ext);
 >   out:
 > +	kvfree(resp_ext);
 >   	kvfree(resp);
->   	return retval;
+>   	return user;
 >   }
 
 Fixes: a77e0e02af1c2 ("ksmbd: add support for supplementary groups")
