@@ -1,94 +1,171 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB334418EC
-	for <linux-cifs@vger.kernel.org>; Mon, 10 Aug 2026 20:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25391F12FB
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 06:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786393885; cv=none; b=LYisBjEj3RxTNXQ4VkBYWSfXw75tgqJ51Lq7ZR+2ZJBhsyvMad2cxrlFnDUUc2QcZQ7D33FHRJrrM6mrZB5u8Sm5WOyqHdGJaqO6b7N4NClxa4pA69Lv1bivPOlhqCWM8zHRNej7/VhZczx7WoTCh7SP/7CrogpC6TenMP3jJMo=
+	t=1786428107; cv=none; b=AvhAHwjtJDI5S/oG1sQlHY+pg/VuOzNhSRy70XXsaJOA/mJsIvw2BDUOxLd3SjyVEDAv8BAaHitIu3S1sL6yplRgJj7Sv8uOslcYLtK+7U/ovLlrisg5aVTcCMNxqFgJSJgiK9QYha9tPdJv9pzgA/Da5kO2+k28XK76OjUPfCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786393885; c=relaxed/simple;
-	bh=SqaRd//dvVr9mB50I7wn+QndPUln3nLYJ57OMJu5Bos=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=ockE8t0uiu+9EgTeB6gAPmkYsU9eikf6cJnU5nR17Fu15oIwoEJ/KgEMGFOaZvrt7EKg1J0Gd9RREoSnISN4v+m2VHMNy85IQ5GCLU52UBS8SByBK5yFbl0Tu2LwgJ2He2wm1EIVqREmks/btV5Cu6Y4bvRzUzyGkTjhb1jtfw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTRMK+lm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTRMK+lm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786393882;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N+nHIX4qndv3AfBXSobDAVXCw7W2PVPh2/yZZQrRWZU=;
-	b=HTRMK+lmhgXZEehnfXOEnc2+LQsHNli4kOjBpsizHaVjIIlpDOyvTeeF36F4oAlJzxphKl
-	64mYTimv+WysyD/EKJlurYczXzjJ3aZwlt1eWF0noUoveKZpyWwnknUL0BuevwvPJ01xkq
-	aGk70bvR4oWQtDMWPLEhxR5nvffOYyc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-278-8366SUk-OtWzAoVznGm_-g-1; Mon,
- 10 Aug 2026 16:31:19 -0400
-X-MC-Unique: 8366SUk-OtWzAoVznGm_-g-1
-X-Mimecast-MFC-AGG-ID: 8366SUk-OtWzAoVznGm_-g_1786393877
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 03F33195608A;
-	Mon, 10 Aug 2026 20:31:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.44])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2A89D1800346;
-	Mon, 10 Aug 2026 20:31:04 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <anooK9-UCNTmoSAq@casper.infradead.org>
-References: <anooK9-UCNTmoSAq@casper.infradead.org> <20260810144746.574036-1-dhowells@redhat.com> <20260810144746.574036-5-dhowells@redhat.com>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Christoph Hellwig <hch@infradead.org>,
-    Paulo Alcantara <pc@manguebit.org>, Jens Axboe <axboe@kernel.dk>,
-    Leon Romanovsky <leon@kernel.org>, Steve French <sfrench@samba.org>,
-    ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    linux-block@vger.kernel.org
-Subject: Re: [PATCH v9 04/26] Add a function to kmap one page of a multipage bio_vec
+	s=arc-20240116; t=1786428107; c=relaxed/simple;
+	bh=VtY2PHj3u/iQTbtMKDxAFnZSE32KFAc8IEVRk+36wJE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sB0m0JnU0XXlRtYj37jaOilcQ/1OiP7TJ1O4lPp3HnLAUcZSpJ1HQm8vp4mxvMcY1pGwqlnA0XdsV8HIjPlQkYdJeUuXMLfloDxPLJPw6a5O4s2gCq7qaugzTBv7t2zpJnink5cjE+2UGb+KQpsdYcgGqc94t+xnk2dw9uIvUto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 1ab67230954a11f1aa26b74ffac11d73-20260811
+X-CTIC-Tags:
+	HR_CC_AS_FROM, HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
+	SA_EXISTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
+	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:464db80c-d054-4866-a43c-fa070548834a,IP:10,
+	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:5
+X-CID-INFO: VERSION:1.3.12,REQID:464db80c-d054-4866-a43c-fa070548834a,IP:10,UR
+	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:5
+X-CID-META: VersionHash:e7bac3a,CLOUDID:5eae2a4eef81251c32e6a53e0f55e35d,BulkI
+	D:2608111401376LRVVHDN,BulkQuantity:0,Recheck:0,SF:10|38|66|78|81|82|102|1
+	27|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2|1,URL:0,File:nil,RT:nil,Bul
+	k:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0
+	,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_IBB
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 1ab67230954a11f1aa26b74ffac11d73-20260811
+X-User: tanze@kylinos.cn
+Received: from desktop-od00ebi.localdomain [(116.128.244.169)] by mailgw.kylinos.cn
+	(envelope-from <tanze@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1756454296; Tue, 11 Aug 2026 14:01:33 +0800
+From: Ze Tan <tanze@kylinos.cn>
+To: sfrench@samba.org,
+	ronniesahlberg@gmail.com,
+	pc@manguebit.org,
+	tom@talpey.comm,
+	chenxiaosong@chenxiaosong.com,
+	hehuiwen@kylinos.cn,
+	linux-cifs@vger.kernel.org
+Cc: tanze@kylinos.cn
+Subject: [PATCH 1/3] smb/client: mark missing nlink values as unknown
+Date: Tue, 11 Aug 2026 14:00:45 +0800
+Message-ID: <d379aa40574b89ecbb0ae6683441b2b422c2ceca.1786427463.git.tanze@kylinos.cn>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1786427463.git.tanze@kylinos.cn>
+References: <cover.1786427463.git.tanze@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <586047.1786393863.1@warthog.procyon.org.uk>
-Date: Mon, 10 Aug 2026 21:31:03 +0100
-Message-ID: <586048.1786393863@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Transfer-Encoding: 8bit
 
-Matthew Wilcox <willy@infradead.org> wrote:
+Several SMB1 fallback and open responses do not provide the hard link
+count. The SMB2 create-only query fallback has the same limitation.
+These paths currently leave a zero link count or synthesize a value of
+one and then expose it as authoritative metadata.
 
-> On Mon, Aug 10, 2026 at 03:47:21PM +0100, David Howells wrote:
-> > Add a function to kmap one page of a multipage bio_vec by offset (which is
-> > added to the offset in the bio_vec internally).  The caller is responsible
-> > for calculating how much of the page is then available.
-> 
-> I think this should be kmap_local_bvec().  Living in bvec.h makes sense,
-> but keeping it in the kmap_local_ namespace is better than putting it in
-> the bvec_ namespace.
+Mark those results with unknown_nlink so existing inodes keep their
+cached link count and new inodes receive the usual sane default.
 
-Christoph disagrees with you:-/
+This was tested against Samba with "server min protocol = NT1". Mount
+the share using SMB1 with Unix extensions disabled:
 
-David
+  mount -t cifs //<server>/<share> /mnt/cifs \
+        -o username=<user>,vers=1.0,nounix
+
+Create three names for the same inode and cache its real link count:
+
+  TESTDIR=/mnt/cifs/nlink-repro-$$
+  mkdir "$TESTDIR"
+  touch "$TESTDIR/file1"
+  ln "$TESTDIR/file1" "$TESTDIR/file2"
+  ln "$TESTDIR/file1" "$TESTDIR/file3"
+  stat -c 'before open: %h' "$TESTDIR/file1"
+
+Open the file and read the link count through the open descriptor:
+
+  exec 3<"$TESTDIR/file1"
+  stat -Lc 'after open: %h' /proc/$$/fd/3
+  exec 3<&-
+
+Clean up the test files:
+
+  rm -f "$TESTDIR/file1" "$TESTDIR/file2" "$TESTDIR/file3"
+  rmdir "$TESTDIR"
+
+Before this change, the two stat commands report 3 and 1 because the
+SMB1 open response overwrites the known link count. With this change,
+both commands report 3.
+
+Signed-off-by: Ze Tan <tanze@kylinos.cn>
+---
+ fs/smb/client/smb1ops.c   | 8 +++++++-
+ fs/smb/client/smb2inode.c | 1 +
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index dc5a8c1da623..7e2b29060f51 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -542,6 +542,7 @@ static int cifs_query_path_info(const unsigned int xid,
+ 
+ 	data->reparse_point = false;
+ 	data->adjust_tz = false;
++	data->unknown_nlink = false;
+ 
+ 	/*
+ 	 * First try CIFSSMBQPathInfo() function which returns more info
+@@ -608,6 +609,7 @@ static int cifs_query_path_info(const unsigned int xid,
+ 				fi.EASize = di->EaSize;
+ 			}
+ 			fi.NumberOfLinks = cpu_to_le32(1);
++			data->unknown_nlink = true;
+ 			fi.DeletePending = 0;
+ 			fi.Directory = !!(le32_to_cpu(fi.Attributes) & ATTR_DIRECTORY);
+ 			cifs_buf_release(search_info.ntwrk_buf_start);
+@@ -630,6 +632,8 @@ static int cifs_query_path_info(const unsigned int xid,
+ 		rc = SMBQueryInformation(xid, tcon, full_path, &fi, cifs_sb->local_nls,
+ 					 cifs_remap(cifs_sb));
+ 		data->adjust_tz = true;
++		if (!rc)
++			data->unknown_nlink = true;
+ 	} else if ((rc == -EOPNOTSUPP || rc == -EINVAL) && non_unicode_wildcard) {
+ 		/* Path with non-UNICODE wildcard character cannot exist. */
+ 		rc = -ENOENT;
+@@ -893,8 +897,10 @@ static int cifs_open_file(const unsigned int xid, struct cifs_open_parms *oparms
+ 	else
+ 		rc = CIFS_open(xid, oparms, oplock, &fi);
+ 
+-	if (!rc && data)
++	if (!rc && data) {
+ 		move_cifs_info_to_smb2(&data->fi, &fi);
++		data->unknown_nlink = true;
++	}
+ 
+ 	return rc;
+ }
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 213bc298cdf2..d4ae8a5ad463 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -576,6 +576,7 @@ static int smb2_compound_op(const unsigned int xid, struct cifs_tcon *tcon,
+ 		idata->fi.EndOfFile = create_rsp->EndofFile;
+ 		if (le32_to_cpu(idata->fi.NumberOfLinks) == 0)
+ 			idata->fi.NumberOfLinks = cpu_to_le32(1); /* dummy value */
++		idata->unknown_nlink = true;
+ 		idata->fi.DeletePending = 0; /* successful open = not delete pending */
+ 		idata->fi.Directory = !!(le32_to_cpu(create_rsp->FileAttributes) & ATTR_DIRECTORY);
+ 
+-- 
+2.43.0
 
