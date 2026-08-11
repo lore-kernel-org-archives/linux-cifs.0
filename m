@@ -1,89 +1,130 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB95641A77C
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9AE429CDC
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 12:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786444327; cv=none; b=D+5TmkDodzK/sGw2PrtOLZPHV6xTdDQd9mpq043wFhoLSeCgGE3DuLk0TJHkKyAKy6OMou3P8sd2fNF0UrpotLzifVRejwOrFsFv6sEgpZ+kgop7KKJgokgX3QSVSDRVYXITMVTfQbFfBD59N3C+351Do/FQlYE7rq226UAe8S0=
+	t=1786452616; cv=none; b=Gf3OLHBFVtze4bEaa/cKPURrDh35dp0OAU4VpG0JoeoBYQLu2fzKu6kbMfqtut2cL6el5lME/AcoFNRB0yt3X4H4qMRBLnXvEpqr47KzgnA8FskDxZuOLCyDKg2LUrc9DxjfVhXO3mXkT3hlK8DP2Hz8UD/F3V0zck1iKwsBK+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786444327; c=relaxed/simple;
-	bh=FdPSroC7ce+kAtD3T7bEB7mVsMeu/ZxDfA2/6aLIlbM=;
+	s=arc-20240116; t=1786452616; c=relaxed/simple;
+	bh=xms1KOihBo+14lGtWLx45Kr+C393u3Ho17vLSkOIE0I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D9TcLedglY9quZ+VkwizKjqG80HgF5M92pjlO528KPSEof0PkyC/xGtjJL4gldAUKUcQ9SOiE8oXWp+NfmOe7LUflYS3c2MWyj7XlumyGX4eEotmed156oJyVvsMdWFiqJWZ0NqyM44qFSZGP2Ntx+n9L7mICuohJjCbED3/Ue0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z51f/OK9; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=dPQe7dAy1MNDTlJijW8hvu/1yr//XRVDMvvLr/nY2lhrivsxTzp/Qr5GvtKbA09e/D4fsGKt6u79G8LCbX5GJT98rNuaMsDyGCHshsZjhRtYVURt7yfvXqKGF/yQb5nNE57mDy+zgZDgxgMAL5y0gzWlX9mlVeOywL4MLFZ5uZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxfng/sj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z51f/OK9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DDE11F00A3D
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:32:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxfng/sj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5165D1F00A3D
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 12:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786444326;
-	bh=tcyjhxwWlllK6qutC+N1y/RvpNtsnXKy2Zqc1iFumV4=;
+	s=k20260515; t=1786452614;
+	bh=xms1KOihBo+14lGtWLx45Kr+C393u3Ho17vLSkOIE0I=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Z51f/OK9xgFLpv/lJ0L+bKMm+upU5P96V1h7CeAQDjjpjMaxHd8U103AA+VzPC3eh
-	 6P5y+dUKtQRON/QtxH8j3rGTe9KIQx1qpB1r5QFafeJBE9oDs29/Kb0R731f97Qqqp
-	 n729WgXRWqMc4orxGztxDYo3hurP6Ysq2daWNf03U9DGLHpk16qEIuj0lKyHKpyeE5
-	 e890D24l0Vih+GKYMFtQK/JiiWjCEJFIyFd7j293LyYjb/nB0nRYSARFHlKwkf/se/
-	 sWt3x/49ccxxqurVI8cWRCA9stGEStmEaFqtJhjixFZlm3hoyLjyUPd4UwcsEd1fXt
-	 HW8sv2YnPSKuQ==
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6a0a4a18180so4402970a12.0
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 03:32:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rq7ZuVPymsfoa+VLgiJlHGOEK8siqeWTdBQ+BMcU738eE1iyhARSXNSRr1DJl1ekBYTwO/GZ/XNZRnD@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVDG8y2cT76h9O8+Td86m1IBpkVn9/oKVpiTNHd23q71HwqypO
-	CHWmUcNd4rEYpUgs/OmW//zbP4/ouWV8nQN9cjprFqzdYfozNB6bAyBdDqGXj9QSxzmnF9z0fHz
-	ZQlzmUUAzcyeuEh08aV6a+Bu82V/eswo=
-X-Received: by 2002:a17:907:d1a:b0:c1f:bda0:a771 with SMTP id
- a640c23a62f3a-c20e60ad48dmr114349766b.13.1786444324874; Tue, 11 Aug 2026
- 03:32:04 -0700 (PDT)
+	b=lxfng/sj7Tp2EZ1qa7DBxDi9tlpIWwFYJ1v+vVziu1oF2MiLA11XN6VqnQ2Z8rCEy
+	 NtY7Z8bf1HcyDbRTf5y804hJ0zao91UxXCcyuOntYRHtVMbJq7rT4+LgXAT23aQqY8
+	 /W1Kc+4GMH15tjOitd/TDWj+xy3U+/RIQtgzpij5dJhlvChEUwZwSZ0WrWfVXh1OI6
+	 pr8y+HD+8TsEit0mQdP0fZuiWFTwHL9wGCbTCNlLzRUpsLsI3RA4TY99wAuI3nX9Jf
+	 2wBGzFbcI5JAWS/ROwugwfLH706Cjc9KrrZ4CD2sybrKquOPhhWpeAXtirEAaMKxPM
+	 1EIpdziU4Z0Ig==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15ca7a7ca9so295886066b.0
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 05:50:14 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoKVskwnvIx8Q2VIlRPmxF7vzwM4GlNcVrmHDiu0QbETxclT/iVFt1O3dxeiLnP9Sk0n/sPZ1mKGDGj@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgeRfxNgDjdxqpVNCmoqWGXlGE2sW+ajvfnXJbUFsQwg/+NutZ
+	BdlbvnLj2DX9kZsgWpJbrBqCZuiQobmGkPFUh/DudQ2LfvAd3EFKFGuFjO0dRBYel8YGdt4D0/L
+	LOFBFaFqv3j9sL7DpX/PI7nvu1PEozs4=
+X-Received: by 2002:a17:907:c0a:b0:c1f:5d05:34e8 with SMTP id
+ a640c23a62f3a-c20e6225e0bmr142934566b.21.1786452612941; Tue, 11 Aug 2026
+ 05:50:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260807125845.1477067-1-thuth@redhat.com> <20260807125845.1477067-3-thuth@redhat.com>
-In-Reply-To: <20260807125845.1477067-3-thuth@redhat.com>
+References: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 11 Aug 2026 19:31:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com>
-X-Gm-Features: AUfX_mx_zSkaoj5nh7WflA2gKP8S9W47Zxrr5Dv4iawiccAXZBlrwDeYNI4JMqo
-Message-ID: <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when done
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Steve French <sfrench@samba.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
+Date: Tue, 11 Aug 2026 21:50:01 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd84UnfdQ6Ef2nqybnhdgURFo9uYpB1mHZpphFyCiMhutA@mail.gmail.com>
+X-Gm-Features: AUfX_mydCX-MqFLT7EWPXMWA3YBhE4x4SETdBnNdaKZ2Y4FpcqhZBpwKVsgNYcY
+Message-ID: <CAKYAXd84UnfdQ6Ef2nqybnhdgURFo9uYpB1mHZpphFyCiMhutA@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] ksmbd: refactor smb2_notify() to a blocking wait
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com, 
+	senozhatsky@chromium.org, slow@samba.org, gael.blivet@gmail.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.=
-c
-> index 1143ee52470a7..d23566da2ac81 100644
-> --- a/fs/smb/client/smb2transport.c
-> +++ b/fs/smb/client/smb2transport.c
-> @@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP=
-_Server_Info *server)
->         unsigned char smb3_signature[SMB2_CMACAES_SIZE];
->         struct kvec *iov =3D rqst->rq_iov;
->         struct smb2_hdr *shdr =3D (struct smb2_hdr *)iov[0].iov_base;
-> -       struct aes_cmac_key cmac_key;
-> -       struct aes_cmac_ctx cmac_ctx;
-> +       struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
-> +       struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
->         struct smb_rqst drqst;
->         u8 key[SMB3_SIGN_KEY_SIZE];
-Shouldn=E2=80=99t we also clear the raw key with memzero_explicit(key,
-sizeof(key)) immediately after aes_cmac_preparekey() ?
+On Mon, Aug 10, 2026 at 1:20=E2=80=AFAM ChenXiaoSong
+<chenxiaosong@chenxiaosong.com> wrote:
+>
+> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+>
+> The next version of my complete notify implementation may still take some=
+ time to modify,
+> so merging Gael's patch sooner would help avoid repeated rebasing.
+Can you check two smbtorture failures from this patch-set ?
 
-        rc =3D aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE);
-+        memzero_explicit(key, sizeof(key));
-        if (rc) {
-                cifs_server_dbg(VFS, "%s: Could not set key for cmac
-aes\n", __func__);
-                return rc;
-        }
+$ ./bin/smbtorture //ksmbd.test/cifsd-test3/
+-Ulinkinjeon@KSMBD.TEST%1234 --use-kerberos=3Drequired
+smb2.session.expire2s
+
+smbtorture 4.18.0
+Using seed 1786452357
+time: 2026-08-11 12:45:57.628809
+test: expire2s
+time: 2026-08-11 12:45:57.629426
+query info =3D> OK
+lock =3D> OK
+1st notify =3D> PENDING
+sleep 10 seconds
+query info =3D> EXPIRED
+set info =3D> EXPIRED
+flush =3D> EXPIRED
+read =3D> EXPIRED
+write =3D> EXPIRED
+ioctl =3D> EXPIRED
+oplock ack =3D> EXPIRED
+lease ack =3D> EXPIRED
+query directory =3D> EXPIRED
+1st notify =3D> CANCEL
+2nd notify =3D> EXPIRED
+time: 2026-08-11 12:46:07.761775
+failure: expire2s [
+../../source4/torture/smb2/session.c:1482: status was
+NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NETWORK_SESSION_EXPIRED:
+smb2_notify returned unexpected status
+]
+
+$ ./bin/smbtorture //ksmbd.test/cifsd-test3/
+-Ulinkinjeon@KSMBD.TEST%1234 --use-kerberos=3Drequired
+smb2.session.expire2e
+
+smbtorture 4.18.0
+Using seed 1786452388
+time: 2026-08-11 12:46:28.839654
+test: expire2e
+time: 2026-08-11 12:46:28.840279
+query info =3D> OK
+lock =3D> OK
+1st notify =3D> PENDING
+sleep 10 seconds
+query info =3D> EXPIRED
+set info =3D> EXPIRED
+flush =3D> EXPIRED
+read =3D> EXPIRED
+write =3D> EXPIRED
+ioctl =3D> EXPIRED
+oplock ack =3D> EXPIRED
+lease ack =3D> EXPIRED
+query directory =3D> EXPIRED
+1st notify =3D> CANCEL
+2nd notify =3D> EXPIRED
+time: 2026-08-11 12:46:38.954222
+failure: expire2e [
+../../source4/torture/smb2/session.c:1482: status was
+NT_STATUS_ACCESS_DENIED, expected NT_STATUS_NETWORK_SESSION_EXPIRED:
+smb2_notify returned unexpected status
+]
