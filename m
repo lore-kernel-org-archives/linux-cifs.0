@@ -1,70 +1,96 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F161B43B6C4
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9096A432E7C
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786443459; cv=none; b=kPvGyYJDKAlCrjzCF55raTtMnuDxt1A49kdDT3wjnlZ7mf3BCA0/Lb/CGiEJ5KHHV3bmfMg6QTFrZeMWIeWdjCsb02gkDlmx4nsNyuPnjWip+aHE0E7SIYrXJmIy4bLyirhXkaMCYSydhSAnYDx3aisUGlcKFk9ZtBXL00Z7MKM=
+	t=1786443643; cv=none; b=g/mE9N5OgZAKxKuKGTcGSWaTIaAyslbRnxMGFV0AEPjxOhmMmlLL+F1tJoPn4HxCGLJQ8qBgl1WQGQwKz7YHAMqkCh5gsiBbk9LWzBdtcQTL0apogaZeL533n+dYO1RtfZ00i6dpoE9SmWE/sFJChrvyocbUG6GWzeTx6t5anT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786443459; c=relaxed/simple;
-	bh=88T+C2sdS34T7X4oVt41r9hRmOWaFN9gIMu0YxT/qpI=;
+	s=arc-20240116; t=1786443643; c=relaxed/simple;
+	bh=tflgnBrymLo6vczClfrwP78LF//ajQKDMxyDzxhVogs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NXXLQ/C5+fZVu3+Sx96ZJrTCByMb/cGhA5+a82PKweuNC+t6n57K0CHXda42IdEvpneI+GTnRPTvGZIMAxpLCDts2B/BAOJww4OVGnq8lwBnRPTHBZ9x1+OMnhuZEZDu4AvUJIdLa5PA5wKN+AKseVya+e/xUIVSx4x/q3BTpq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LfUHDo3D; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=K8A2ZfVicNXN51IUpzRIu8/bAHOzQrXVvkL5iQVWJfbIU6tlD3b/5pB55BtKgWlTWwSexsgt/209AmqPrlIIeTKI4bfPZbgv7SbFRATqHgRgl0VaV9KZzbLpcIHqPVU6/hO7IMgK57Rv3kVofDAMw1tvHmsLhNCb/EE+csKDNFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WLQ8xWpo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfUHDo3D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 562711F00A3D
-	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:17:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WLQ8xWpo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E20001F00A3E
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786443446;
-	bh=blJ8vZ+YXBrsHmk/XqNX3JgLmgmfj7EPXyJTNnx6Zv0=;
+	s=k20260515; t=1786443629;
+	bh=/UBbjqPwegx7fuztVhmWInMc6U8hbFRhgWX64IKPRJE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=LfUHDo3D2I++NzjcDV4N1bqfzl9hWwShV4fzC9yVS9uQUn/PahdSWWvOkMf+WaCHn
-	 mjqLJLKfoGwuHM+3iSDobY/sTT+7PYT1vLDBov0aqzv2tePZsIqD1uKlY4tUdseDOG
-	 l7Bc1aSrGm9dw42YlPTLkEdriP/ZkQlIabSMJg4d+MYadlQBoPvyLUGw0Wc7EIqkVK
-	 1QumF8hLhSkaHfi/ToIwRmQs/aQT7E53NHrVELmXEJ7IVMNVlW/MDfPlA5JFfNKaPT
-	 xB0tAVTYt4ejPjiKlmRsZH0Zjv22tmmHfPxZ9/SrZpcQIz+R5tUx04EDa3URoEcZfq
-	 30WrxpEAUXSjQ==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c20ce3c118aso147430566b.0
-        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 03:17:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrnYmFGMmbO52fRXDxdfhVANQ6UMXV593hbn6nDmp1QzcZ5hAVBdLsa6GTqAjZdg851Xcdt/DkpQ8iz@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsSLiAjJ8e/nT19o3+12Mgypds04uG1HZFihBIe1u9jV0m3xUP
-	6N2qU5cZW6SXznkGbgbLgUE49NCvltHcLAnmd04IuWjog5AUadTr8vdYfHtrtDxTcb/aExWfVJA
-	MQhvwiCicMD2wqeU+d9UIJqeG8NTNLEQ=
-X-Received: by 2002:a17:907:60d5:b0:c20:c23e:2afb with SMTP id
- a640c23a62f3a-c20e5ea9151mr126575066b.12.1786443445023; Tue, 11 Aug 2026
- 03:17:25 -0700 (PDT)
+	b=WLQ8xWpoebEU6aLLhkugJDVX1h4veeraCX9d0vfXRQoM8RQ2lmZwn6YlRtpveHOcD
+	 k15qfflyAk048M+8huOZAHXvDYWiKHZXrpQ6LAXsdodHnHRve1potxa1dGqNWjeWm1
+	 KHl3CpR7nW5dhUtLdAlpOqNhaRE1UlIaYl9pltYKr5ut0YsmX6zCJMT3TIYQDu7+wz
+	 dOxbkFChE/T6eNLNT+bRhaa4578QpI5lnJctoOhY/PmRPsts+B0rFtHw0o5n/wEnc1
+	 FzpAE+XQc6N1tPhzIWxGd9Prh+U4Q8OiqUF3wUeHOBOr83bSRISyHSigPJIimbgR92
+	 77gfKZtN/pqEQ==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6a156627e22so1201433a12.1
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 03:20:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoNFKXTEhAZyJqIEsV2yKqUmansQBJTbIsR2TjRuutHuj6bsLNGuNZFZZ3DpTuN434UBwInppIZCymn@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOp30cYWkQri0reHnLY3YiZIecXY9SsFu5yIjDOCsyvnlZVzcm
+	KDeZush+Z8oizjCFKoaMTdLSTIosB5ULzjBlQ77U8eJPQmeZFJusRJROtXq3i00ZKHt33lQX09e
+	nyzhOI8ZKOLYyY07Cyx6KPZ6TOdt0qUA=
+X-Received: by 2002:a17:907:94c3:b0:c15:a7b9:2ae1 with SMTP id
+ a640c23a62f3a-c20e630fc72mr110160266b.6.1786443628585; Tue, 11 Aug 2026
+ 03:20:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260810125857.1009618-1-thuth@redhat.com> <20260810125857.1009618-2-thuth@redhat.com>
-In-Reply-To: <20260810125857.1009618-2-thuth@redhat.com>
+References: <20260810125857.1009618-1-thuth@redhat.com> <20260810125857.1009618-4-thuth@redhat.com>
+In-Reply-To: <20260810125857.1009618-4-thuth@redhat.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 11 Aug 2026 19:17:12 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-W2D_oMsdEXTB18Evovh7V_1d=TaSpxBtaOyjNb_byxw@mail.gmail.com>
-X-Gm-Features: AUfX_mwCU7Y0D8x8ebSPlhBYEH3wOexMcBqJSdoy7sf9C7OZlSxwKrsnR1_ZT3w
-Message-ID: <CAKYAXd-W2D_oMsdEXTB18Evovh7V_1d=TaSpxBtaOyjNb_byxw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] smb: server: Clear sensitive stack and heap data in auth.c
+Date: Tue, 11 Aug 2026 19:20:16 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-JSmGR-GjFD=Oyw-mYhBH2Di=ApKjj+J5DV1cAO_nJaA@mail.gmail.com>
+X-Gm-Features: AUfX_mzHddJCJ7ZnitSE1W_oM4nGwtJPfcpVYBP-qwkV9NTIEeYIo6RzRwJ0ugI
+Message-ID: <CAKYAXd-JSmGR-GjFD=Oyw-mYhBH2Di=ApKjj+J5DV1cAO_nJaA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] smb: server: Free session data with kfree_sensitive()
+ to avoid leaking of data
 To: Thomas Huth <thuth@redhat.com>
 Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
 	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> @@ -464,7 +466,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
->         *out_len = resp->spnego_blob_len;
->         retval = 0;
->  out:
-> -       kvfree(resp);
-> +       kvfree_sensitive(resp, sizeof(*resp));
-The flexible payload[] array contains the session key and AP-REP data,
-which would remain in memory after the free. Please clear the complete
-allocation:
-
-          kvfree_sensitive(resp, sizeof(*resp) + resp->session_key_len
-+ resp->spnego_blob_len);
+On Mon, Aug 10, 2026 at 9:59=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrot=
+e:
+>
+> From: Thomas Huth <thuth@redhat.com>
+>
+> struct ksmbd_session contains some arrays with sensitive information, lik=
+e
+> sess_key, smb3encryptionkey, smb3decryptionkey and smb3signingkey. Thus
+> let's make sure that this information cannot leak via the heap and use
+> kfree_sensitive() to free it.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  fs/smb/server/mgmt/user_session.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_=
+session.c
+> index f99c86284ba3d..9cb990a22fd56 100644
+> --- a/fs/smb/server/mgmt/user_session.c
+> +++ b/fs/smb/server/mgmt/user_session.c
+> @@ -389,10 +389,10 @@ void ksmbd_session_destroy(struct ksmbd_session *se=
+ss)
+>         ksmbd_launch_ksmbd_durable_scavenger();
+>         ksmbd_session_rpc_clear_list(sess);
+>         free_channel_list(sess);
+> -       kfree(sess->Preauth_HashValue);
+> +       kfree_sensitive(sess->Preauth_HashValue);
+>         ksmbd_release_id(&session_ida, sess->id);
+>         ida_destroy(&sess->tree_conn_ida);
+> -       kfree(sess);
+> +       kfree_sensitive(sess);
+struct preauth_session embeds the sensitive
+Preauth_HashValue[PREAUTH_HASHVALUE_SIZE] field, but it is still
+released with kfree() in ksmbd_preauth_session_destroy(). Please
+include it in this patch or another patch...
 
 Thanks!
