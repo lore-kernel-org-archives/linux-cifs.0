@@ -1,84 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADB3306776;
-	Tue, 11 Aug 2026 07:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F161B43B6C4
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786433227; cv=none; b=GK4ADPMF+aXYIFVTG2TZOFycC2pZI7O0z66AQOtpT/WjV32Zrpvxuyxv/C6beG775tidR0vksfmAA0yM4lyzSoVGcULJIB9hus+jvhZKYZO9Bkqvxf/RI+CjAUZrtBRe01108htADRivZ3il/pBn454Ey9c/HNq79LuHhZo5MPM=
+	t=1786443459; cv=none; b=kPvGyYJDKAlCrjzCF55raTtMnuDxt1A49kdDT3wjnlZ7mf3BCA0/Lb/CGiEJ5KHHV3bmfMg6QTFrZeMWIeWdjCsb02gkDlmx4nsNyuPnjWip+aHE0E7SIYrXJmIy4bLyirhXkaMCYSydhSAnYDx3aisUGlcKFk9ZtBXL00Z7MKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786433227; c=relaxed/simple;
-	bh=SbLo78Cr2HW2DkoM+Zu8uqrpTL6/jkg7YGLG/5Ws134=;
-	h=MIME-Version:Content-Type:Subject:From:To:Cc:In-Reply-To:
-	 References:Date:Message-Id; b=fQraOK32pApFCkl3sNbHYCw47sSuOGjFK5h6iQZqoUdB5BY+YxsyMy3k2psrs1le/s3jHdpqN/MfkOs0k6UKGszHLjfG+fFdlJxYrWr6gqZRs/5NaOXg6reW11Ia7sne7D2SXetxEavbA6whnbbluqCQ6cxANrEXvq++STT3J4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyhX1YFr; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786443459; c=relaxed/simple;
+	bh=88T+C2sdS34T7X4oVt41r9hRmOWaFN9gIMu0YxT/qpI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NXXLQ/C5+fZVu3+Sx96ZJrTCByMb/cGhA5+a82PKweuNC+t6n57K0CHXda42IdEvpneI+GTnRPTvGZIMAxpLCDts2B/BAOJww4OVGnq8lwBnRPTHBZ9x1+OMnhuZEZDu4AvUJIdLa5PA5wKN+AKseVya+e/xUIVSx4x/q3BTpq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LfUHDo3D; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyhX1YFr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 881E11F000E9;
-	Tue, 11 Aug 2026 07:27:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfUHDo3D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 562711F00A3D
+	for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 10:17:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786433226;
-	bh=K66bNXWEf3y6O/2oqZ+5XO0lv/SJwQqJyQa/tQNc0AA=;
-	h=Subject:From:To:Cc:In-Reply-To:References:Date;
-	b=jyhX1YFrrnq1wTxRvMX2adEyfpPN3v/LJ7/qtkjf+TYdWFsYYIcugMNXAPa+bsGb/
-	 K/t7nFn3T7LYAgj/TynmyrcK3PZxbWxXlwHLiiQ/Y4kFCPNuv5IEcYsHUfdEiW+Pxp
-	 2RhUyax+NkA0059s4IyvBX9JhRD7NVUe85TJCyjg2CMsC5MBqQh8WBd5CwGBSBdCdn
-	 GQxT+li/hISZxCSp6HCFTAYrjNCgXdi7JRHv3tHOS34+Nlo8+p2FgK40/y3WWGPwhg
-	 Nkpi9xSZrGb1Uc0q5QOmLvYqQAzyBiUYoHN0fp5YJ46Or6u9LTuAuZTuOub0fsdPN0
-	 xQoweGsA1+/VA==
+	s=k20260515; t=1786443446;
+	bh=blJ8vZ+YXBrsHmk/XqNX3JgLmgmfj7EPXyJTNnx6Zv0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=LfUHDo3D2I++NzjcDV4N1bqfzl9hWwShV4fzC9yVS9uQUn/PahdSWWvOkMf+WaCHn
+	 mjqLJLKfoGwuHM+3iSDobY/sTT+7PYT1vLDBov0aqzv2tePZsIqD1uKlY4tUdseDOG
+	 l7Bc1aSrGm9dw42YlPTLkEdriP/ZkQlIabSMJg4d+MYadlQBoPvyLUGw0Wc7EIqkVK
+	 1QumF8hLhSkaHfi/ToIwRmQs/aQT7E53NHrVELmXEJ7IVMNVlW/MDfPlA5JFfNKaPT
+	 xB0tAVTYt4ejPjiKlmRsZH0Zjv22tmmHfPxZ9/SrZpcQIz+R5tUx04EDa3URoEcZfq
+	 30WrxpEAUXSjQ==
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c20ce3c118aso147430566b.0
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 03:17:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RrnYmFGMmbO52fRXDxdfhVANQ6UMXV593hbn6nDmp1QzcZ5hAVBdLsa6GTqAjZdg851Xcdt/DkpQ8iz@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsSLiAjJ8e/nT19o3+12Mgypds04uG1HZFihBIe1u9jV0m3xUP
+	6N2qU5cZW6SXznkGbgbLgUE49NCvltHcLAnmd04IuWjog5AUadTr8vdYfHtrtDxTcb/aExWfVJA
+	MQhvwiCicMD2wqeU+d9UIJqeG8NTNLEQ=
+X-Received: by 2002:a17:907:60d5:b0:c20:c23e:2afb with SMTP id
+ a640c23a62f3a-c20e5ea9151mr126575066b.12.1786443445023; Tue, 11 Aug 2026
+ 03:17:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v9 00/26] netfs: Keep track of folios in a segmented
- bio_vec[] chain
-From: Christian Brauner <brauner@kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: David Howells <dhowells@redhat.com>, 
- Christian Brauner <christian@brauner.io>, 
- Matthew Wilcox <willy@infradead.org>, Paulo Alcantara <pc@manguebit.org>, 
- Jens Axboe <axboe@kernel.dk>, Leon Romanovsky <leon@kernel.org>, 
- Steve French <sfrench@samba.org>, 
- ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
- Marc Dionne <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, 
- Eric Van Hensbergen <ericvh@kernel.org>, 
- Dominique Martinet <asmadeus@codewreck.org>, 
- Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, 
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <annlWwsCPjNgcKa-@infradead.org>
-References: <20260810144746.574036-1-dhowells@redhat.com>
- <annlWwsCPjNgcKa-@infradead.org>
-Date: Tue, 11 Aug 2026 09:26:58 +0200
-Message-Id: <20260811-wegkommen-unfehlbar-selektiert-547aaf3c775b@brauner>
-X-Mailer: b4 0.17-dev-362b8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=600; i=brauner@kernel.org;
- h=from:subject:message-id; bh=SbLo78Cr2HW2DkoM+Zu8uqrpTL6/jkg7YGLG/5Ws134=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRVnTv6756TAWNwzpYbp6uPrDGo4imQ/fbk+jW7DUsuL
- b71cnIze0cpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEFv5n+KftNFM8KmD21nd8
- 72qdX0/+//vls7jriRGWqee6nD1evXJi+Kef+vzIchGNyFqW00a/fZW2Xk22O79bdrrI22h3iYi
- zz9gA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+References: <20260810125857.1009618-1-thuth@redhat.com> <20260810125857.1009618-2-thuth@redhat.com>
+In-Reply-To: <20260810125857.1009618-2-thuth@redhat.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 11 Aug 2026 19:17:12 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-W2D_oMsdEXTB18Evovh7V_1d=TaSpxBtaOyjNb_byxw@mail.gmail.com>
+X-Gm-Features: AUfX_mwCU7Y0D8x8ebSPlhBYEH3wOexMcBqJSdoy7sf9C7OZlSxwKrsnR1_ZT3w
+Message-ID: <CAKYAXd-W2D_oMsdEXTB18Evovh7V_1d=TaSpxBtaOyjNb_byxw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] smb: server: Clear sensitive stack and heap data in auth.c
+To: Thomas Huth <thuth@redhat.com>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-> this is a bad idea.  This is a giant series that also touches core code
-> with no review whatsoever.  And I repeatedly asked for:
+> @@ -464,7 +466,7 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
+>         *out_len = resp->spnego_blob_len;
+>         retval = 0;
+>  out:
+> -       kvfree(resp);
+> +       kvfree_sensitive(resp, sizeof(*resp));
+The flexible payload[] array contains the session key and AP-REP data,
+which would remain in memory after the free. Please clear the complete
+allocation:
 
-Since it's post the cut off point the series does not make the coming
-merge window. It's also not in -next on purpose. The series was just
-pulled for testing.
+          kvfree_sensitive(resp, sizeof(*resp) + resp->session_key_len
++ resp->spnego_blob_len);
 
-> 
->  1) the core changes to be split out
->  2) come up with users for this very core primitive in the hot path
->     (iov_iter) that are not just for your rather niche use case
-> 
-> There's been absolutely no follow on to this, and we should not treat
-> the absolute core I/O path like this.
-
+Thanks!
