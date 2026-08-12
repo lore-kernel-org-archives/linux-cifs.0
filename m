@@ -1,237 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4998522AE48;
-	Wed, 12 Aug 2026 00:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931035E1AD;
+	Wed, 12 Aug 2026 01:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786493378; cv=none; b=BGhbAQr+QTxqm4krDorkpTsuypDgIleZa8rny7w+rxLByKvZU8jqMmfobVKu97BBaEOaNhVdCJ9ZMIA0/zSNnOFKxDPMwtFeJL7qh8FfDnPoXCqp2nbRUo7RlDyGmIm7qBAVdYw7KQ/0LwgXlnaoisBoa2/xujNll7cLzqQq7b4=
+	t=1786496931; cv=none; b=Bbtm8TrLdbYnmU7JEZjCXDx8rVZN+99/Fj/uJuQeHLeJIMpPQVJFMkL8DstqkorAYjRp0D4T5iaIPmd4cpwr8TenvSrD+FPxbYe22jcSxIwTq0NT3ZrQD1kTSQKS/Bxh/aOXP3AepN2CCBObRdF3cCZVK0uKXKDXpoo2wk7A4TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786493378; c=relaxed/simple;
-	bh=k2oNSdLbop4i+g6sTn0QBsVxbDO0c0xRpSzayTHuOK0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U6uWry6eSXqlceDT0nOjCJxqIF9D7Zjwki4Jl42syph5PC1NoTL0wlv97BB11g/sKN6mFlKgExSzZPdpfThbj4rtAn9wz9cqS66mgaQQIULqmByjoQUNZdwFMyVmbLgu2BvWqw25cSrQpqB8U3YdKkV8l9lFDQBTQhulQ9AhrWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fNFVhUcY; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786496931; c=relaxed/simple;
+	bh=LdOBEKTdkgqDbNLJDbYskHxFAOqVJOonk0Qk8y3J0rw=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:Mime-Version:
+	 Content-Type; b=S3AWz5+0rRHcQ21nCOndUtbtGEMd5Rk2wkvgb4s7SvCWPQ14hoQHcN2OzIDozEf4e8+MIfUKlABgiFWImJ3BU9rjJayoLcuarkugjNa4uarbARgppfnNneggp17jEXTz9jA+jkUTfP8gJURA5UbZ5Rw/IS3RRF04EV6m8k3UONA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=OMgtMqgU; arc=none smtp.client-ip=162.62.57.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fNFVhUcY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BA891F00A3E;
-	Wed, 12 Aug 2026 00:09:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786493377;
-	bh=k4QsTv2hpJ1ZldkLWHdGkcwZuPlehEsAwEcIJ0JxEfM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fNFVhUcYRNPQxe+ExvoNiKY5UbMsAvw7s/88BP24Q3yFh0oaXnghIsUi3X7FK6DeS
-	 9G39y0ec4xyyBYRyFAwkHBj7DUm6xBHJDAgOGGBIaTUaSrBLOYD2ICPRiJ5WQ+unz2
-	 7RA20bf1ZEL6ytaiRJ66W2MfdPp/YrrVT95gSfHsG4D08usxbt/moWVe4uV0QHuMzO
-	 jQ6UCQPEPRQ7DrFTG5JD2RBBk7pRcJvI576mPv3wbbpx8eI/YYTT0vzOX2bdGRr+Tw
-	 8bkwy5SO2Zlf3vepNiDc7N7MNi3Ijc8OcWeNJgj3r2j9SeygCETM8Lhyo2dkPUvEOf
-	 qgIo/ejfJ0KQQ==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	Frank Sorenson <sorenson@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12.y 2/3] smb: client: fix race with fallocate(2) and AIO+DIO
-Date: Tue, 11 Aug 2026 20:09:32 -0400
-Message-ID: <20260812000933.4158055-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260812000933.4158055-1-sashal@kernel.org>
-References: <2026080558-upstream-wooing-96aa@gregkh>
- <20260812000933.4158055-1-sashal@kernel.org>
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="OMgtMqgU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1786496915;
+	bh=LdOBEKTdkgqDbNLJDbYskHxFAOqVJOonk0Qk8y3J0rw=;
+	h=Date:From:To:Cc:Subject:References;
+	b=OMgtMqgUas6H6Cc3vG2PWYMqsAQvlJMfDYIX3gD7x3tGpgMl9bzdK7iYNyCKkJ6Do
+	 mB6IE+d4ZGOHezreIbjpgS9bdFFYDT7Yn/PifCLlXENUsQskxVIF0aMSvssHNt/AfW
+	 SFvIP0QiaRjQqcBCR6/8QDCjEj7w98xOPACnIiZ4=
+Received: from PC-20201120SBOH ([183.205.156.133])
+	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
+	id 2213C648; Wed, 12 Aug 2026 09:08:33 +0800
+X-QQ-mid: xmsmtpt1786496913t6x9emz2d
+Message-ID: <tencent_7C0E8F3CBC25E603FDA0289583DC9BD16B07@qq.com>
+X-QQ-XMAILINFO: NbgegmlEc3Ju1p/+CdclI+OjHNtendqfr7yPSN0vQl03Qz1ImrEEt7dUoFV23M
+	 9MoG4uBdLL1mILGx5vqHRKplNuS4mempxVGcdgCXMBCppTQWgLqpKit54x9oRQG487G+ai3oozw0
+	 r1AYFXFz1aWP8Ol0dgIrTh8yezIwheUelbm8623A+Vml6RqAQi+qHxlUpAIlaPrAFvtV4vh56yPP
+	 1s+vNybxuFQqa349yJ0FwzsDo+MRLn80Pukqwi/xG4ETl2L+Ow3mNPTJobj3riDiIdwaUzA2MFIP
+	 QS38gVu/UR5ZCECCkQEJcyxbprIjAk5aB3xOM30miUZVe85z7n/MQqe62/oQOr45DXs/xeMb8eDd
+	 UPHTPdlII8vQjwjje8DEGaSW3Mi/aRCD0MSZPLH0WdrkvFK4GiIJAeMUWfud6dBKyY+8XlFaEup0
+	 SiXx+Ydvn1VdMnmnqtBSb0vzUX+b7mqd9fB92rAJBi27JEyq4KBrOKdMER+BdWvBydqVuwVznC7j
+	 P4dY8lCPdDCvjhCjH2yL+sOSh8kkQr2iKf2/Zeud6VW3wQ/X2voEaLkBj3L+4lYoBivHSbKG9+08
+	 TW5wY8ubRv5pf9JjcGlQ8Nn/+AuaMg8hQoTvimY1otiJygEiZBUNBEZY1l+hZZo85RVrJB137cLh
+	 2sfeRvp13/nIm81WWSgXPyJFwUcoZfa7SE2vZnHgTwQLF2/XrJzBUiJp2R0OmpUJbsy2OqIuxctf
+	 yzNhm97XuTN/NNChGC5DYBVYgoShpdSpmEtmjpLHDdCvkm6Q47a0UE4MwCYeFp7zJe9wLFQYCuFm
+	 lw1ZAu924sS9DGyqJ/9bM0ajdBHOdFalAmKKNdrYoOswKxRd4YJHp90nIY/MVs+WOGMqoVeAWPN0
+	 GevFhXHmT9oPzcYCJ0cO6wE/ezeW9g8wvkIN1EeNbiogyBgr0469Rrl4SsT+Ibqd4Lg79fJBybVp
+	 PbCm7SXIkkLXfQZeMXhr/p1BYJn+tIV4sAsnVJVcFIFXoM8iNtKUlAfrM/67Gc75LCYSh25cMZBY
+	 Y4jDvCyuI7PxVbJ8di+DgnWgMu6AaEIAYBg/9zEup0QtLVN4k5WpYMYvVTHoc=
+X-QQ-XMRINFO: NHo+0iP/cI22ZgYdVAreg7B8/AHmI4Bv8g==
+Date: Wed, 12 Aug 2026 09:08:33 +0800
+From: "grayhat@foxmail.com" <grayhat@foxmail.com>
+To: "Frank Sorenson" <sorenson@redhat.com>, 
+	linux-cifs <linux-cifs@vger.kernel.org>
+Cc: stable <stable@vger.kernel.org>, 
+	smfrench <smfrench@gmail.com>, 
+	pc <pc@manguebit.org>
+Subject: Re: [PATCH] smb: client: fix OOB read/write from unvalidated DataOffset in coalesce_t2()
+References: <20260811191846.1263281-1-sorenson@redhat.com>
+X-Priority: 3
+X-GUID: 7DC42953-4FDF-4DA0-B60B-CC79BE11F035
+X-Has-Attach: no
+X-Mailer: Foxmail 7.2.25.542[cn]
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-OQ-MSGID: <202608120908328785132@foxmail.com>
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: base64
 
-From: Paulo Alcantara <pc@manguebit.org>
-
-[ Upstream commit dba9f997c9d9a1cade05d006ed0429a63a4eed32 ]
-
-AIO+DIO may extend the file size, hence we need to make sure ->i_size
-is stable across the entire fallocate(2) operation, otherwise it would
-become a truncate and then inode size reduced back down when it
-finishes.
-
-Fix this by calling netfs_wait_for_outstanding_io() right after
-acquiring ->i_rwsem exclusively in cifs_fallocate() and then guarantee
-a stable ->i_size across fallocate(2).
-
-Also call netfs_wait_for_outstanding_io() after truncating pagecache
-to avoid any potential races with writeback.
-
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Fixes: 210627b0aca9 ("smb: client: fix missing timestamp updates with O_TRUNC")
-Cc: Frank Sorenson <sorenson@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Stable-dep-of: fa724e235cfd ("cifs: add fscache_resize_cookie() to cifs_setsize()")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/cifsfs.c  | 22 +++++++++++++++++++---
- fs/smb/client/inode.c   |  1 +
- fs/smb/client/smb2ops.c | 18 ++++++------------
- 3 files changed, 26 insertions(+), 15 deletions(-)
-
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 2f666c92b027b..08e7931cdda2b 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -359,11 +359,27 @@ static long cifs_fallocate(struct file *file, int mode, loff_t off, loff_t len)
- 	struct cifs_sb_info *cifs_sb = CIFS_FILE_SB(file);
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
- 	struct TCP_Server_Info *server = tcon->ses->server;
-+	struct inode *inode = file_inode(file);
-+	int rc;
-+
-+	if (!server->ops->fallocate)
-+		return -EOPNOTSUPP;
-+
-+	rc = inode_lock_killable(inode);
-+	if (rc)
-+		return rc;
-+
-+	netfs_wait_for_outstanding_io(inode);
- 
--	if (server->ops->fallocate)
--		return server->ops->fallocate(file, tcon, mode, off, len);
-+	rc = file_modified(file);
-+	if (rc)
-+		goto out_unlock;
-+
-+	rc = server->ops->fallocate(file, tcon, mode, off, len);
- 
--	return -EOPNOTSUPP;
-+out_unlock:
-+	inode_unlock(inode);
-+	return rc;
- }
- 
- static int cifs_permission(struct mnt_idmap *idmap,
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index e7fc8d0aebee7..453a5df20f8cc 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -2965,6 +2965,7 @@ void cifs_setsize(struct inode *inode, loff_t offset)
- 	/* Cached inode must be refreshed on truncate */
- 	cifs_i->time = 0;
- 	truncate_pagecache(inode, offset);
-+	netfs_wait_for_outstanding_io(inode);
- }
- 
- static int
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 61309fead04e5..e99b8e1f66d4f 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -3315,7 +3315,6 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	trace_smb3_zero_enter(xid, cfile->fid.persistent_fid, tcon->tid,
- 			      ses->Suid, offset, len);
- 
--	inode_lock(inode);
- 	filemap_invalidate_lock(inode->i_mapping);
- 
- 	i_size = i_size_read(inode);
-@@ -3333,6 +3332,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	 * first, otherwise the data may be inconsistent with the server.
- 	 */
- 	truncate_pagecache_range(inode, offset, offset + len - 1);
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	/* if file not oplocked can't be sure whether asking to extend size */
- 	rc = -EOPNOTSUPP;
-@@ -3361,7 +3361,6 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 
-  zero_range_exit:
- 	filemap_invalidate_unlock(inode->i_mapping);
--	inode_unlock(inode);
- 	free_xid(xid);
- 	if (rc)
- 		trace_smb3_zero_err(xid, cfile->fid.persistent_fid, tcon->tid,
-@@ -3385,7 +3384,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 
- 	xid = get_xid();
- 
--	inode_lock(inode);
- 	/* Need to make file sparse, if not already, before freeing range. */
- 	/* Consider adding equivalent for compressed since it could also work */
- 	rc = smb2_set_sparse(xid, tcon, cfile, inode, set_sparse);
-@@ -3398,6 +3396,7 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- 	 * caches first, otherwise the data may be inconsistent with the server.
- 	 */
- 	truncate_pagecache_range(inode, offset, offset + len - 1);
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	cifs_dbg(FYI, "Offset %lld len %lld\n", offset, len);
- 
-@@ -3432,7 +3431,6 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
- unlock:
- 	filemap_invalidate_unlock(inode->i_mapping);
- out:
--	inode_unlock(inode);
- 	free_xid(xid);
- 	return rc;
- }
-@@ -3709,8 +3707,6 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	xid = get_xid();
- 
--	inode_lock(inode);
--
- 	old_eof = i_size_read(inode);
- 	if ((off >= old_eof) ||
- 	    off + len >= old_eof) {
-@@ -3725,6 +3721,7 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	truncate_pagecache_range(inode, off, old_eof);
- 	ictx->zero_point = old_eof;
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	rc = smb2_copychunk_range(xid, cfile, cfile, off + len,
- 				  old_eof - off - len, off);
-@@ -3745,8 +3742,7 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 	fscache_resize_cookie(cifs_inode_cookie(inode), new_eof);
- out_2:
- 	filemap_invalidate_unlock(inode->i_mapping);
-- out:
--	inode_unlock(inode);
-+out:
- 	free_xid(xid);
- 	return rc;
- }
-@@ -3763,8 +3759,6 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 
- 	xid = get_xid();
- 
--	inode_lock(inode);
--
- 	old_eof = i_size_read(inode);
- 	if (off >= old_eof) {
- 		rc = -EINVAL;
-@@ -3779,6 +3773,7 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 	if (rc < 0)
- 		goto out_2;
- 	truncate_pagecache_range(inode, off, old_eof);
-+	netfs_wait_for_outstanding_io(inode);
- 
- 	rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 			  cfile->fid.volatile_fid, cfile->pid, new_eof);
-@@ -3801,8 +3796,7 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 	rc = 0;
- out_2:
- 	filemap_invalidate_unlock(inode->i_mapping);
-- out:
--	inode_unlock(inode);
-+out:
- 	free_xid(xid);
- 	return rc;
- }
--- 
-2.53.0
+T24gVHVlLCAxMSBBdWcgMjAyNiAxNDoxODo0NiAtMDUwMCwgRnJhbmsgU29yZW5zb24gd3JvdGU6
+Cj4gW1BBVENIXSBzbWI6IGNsaWVudDogZml4IE9PQiByZWFkL3dyaXRlIGZyb20gdW52YWxpZGF0
+ZWQgRGF0YU9mZnNldCBpbiBjb2FsZXNjZV90MigpCgpUaGFua3MsIEZyYW5rIC0gdGhpcyBsb29r
+cyBnb29kIHRvIG1lLiBUaGUgbG93ZXItYm91bmQgY2hlY2tzIG9uCmJvdGggcG9pbnRlcnMgYW5k
+IHRoZSBzb3VyY2UgcmFuZ2UgdmFsaWRhdGlvbiBjb3ZlciB0aGUgY2FzZXMgbXkKc2ltcGxlciB1
+cHBlci1ib3VuZC1vbmx5IHBhdGNoIG1pc3NlZCwgYW5kIHRoZSBGaXhlczogdGFnIHRvCmU0ZWIy
+OTVkMzhiNSBjb25maXJtcyB0aGUgcHJlLTIwMTIgb3JpZ2luIHdlIHN1c3BlY3RlZC4KCk9uZSBy
+ZXF1ZXN0OiB0aGUgY3JlZGl0IGN1cnJlbnRseSBzaXRzIGJlbG93IHRoZSAtLS0gbGluZSwgc28g
+aXQKd291bGQgYmUgZHJvcHBlZCB3aGVuIHRoZSBwYXRjaCBpcyBhcHBsaWVkLiBDb3VsZCB5b3Ug
+YWRkIGEKClJlcG9ydGVkLWJ5OiBTaGVuIFlvbmdjaGFvIDxncmF5aGF0QGZveG1haWwuY29tPgoK
+dHJhaWxlciB0byB0aGUgY29tbWl0IG1lc3NhZ2UgcHJvcGVyPwoKU2hlbiBZb25nY2hhbwo=
 
