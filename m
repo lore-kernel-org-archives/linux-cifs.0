@@ -1,101 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5258A348453
-	for <linux-cifs@vger.kernel.org>; Wed, 12 Aug 2026 12:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D01D2F7EFC
+	for <linux-cifs@vger.kernel.org>; Wed, 12 Aug 2026 13:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786538657; cv=none; b=MJW4O515vHAeamMtZWiIriohSrAVFEoRLmxJM3ZyEAy0AsB/9fp8HB8QX0a9AgEdBnU8/ESwIzrctg9TZFMfDa/4eWWoRC7JmihOHe/JUh6FDBew+Vhzy/v/L5uuDSSMLExrWeJrPrj26owsCeiEuFIscpQ5tbTu8H150VzNprg=
+	t=1786539725; cv=none; b=qfoSbWuMYiDg2T9UeKxM/bENL1ltEDi+8QCsJa8BxDw1GnRL9JDElwzPxMFScOXX60sMizAXBNYv5+VecQmd0XJMvZrdKi1yYJfvk/SD1A9ad2pM9Qx7Ptik5eYuzzdD6QcgtWeS+7xmArHx69QVHBtiu6ZHELDEeqE7tE9iVZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786538657; c=relaxed/simple;
-	bh=1YtA5tbGoV4aHe36eHBGP3wLM/YC0g+QQhItedmxNzA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LTQljctk3/c5GZPkKu23vHxUOqzw7bkai8nDj+6tVmzOllCroUIVe5nWZrouSYWZ/tIElWb3AbdtKkiFN5PiZO2vC1zs0hyDAxWpB5SX9Al4f8uMOnUfxWX2m6xzo61MKLYN2N6n4RCUfDUkRVyCDxSVjjriv3cADk1PsdgWuhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l7gjxHlQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786539725; c=relaxed/simple;
+	bh=1ruvPAnx5KbV/+wwJs2p/x34seHDJCzT3A5WoLh7T64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ir8CoDaaK9EBjSf640hjYsNVbsVMbSyCr5YZJBmkoMjvfbZj1j8c+7tvXNxiVCmUrWLr19qxslGDxho1WN9LAn1Kp+W31fEbvQeywlhoAbOES4tkcxPIhmhcobq/uYut0idwM6PSiiU857v+ZarjCIsLxLKSe8TfNMhZiEMfHf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iGYgt71x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l7gjxHlQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 079A41F00AC4
-	for <linux-cifs@vger.kernel.org>; Wed, 12 Aug 2026 12:44:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786538656;
-	bh=njtwWj4aifJ2fdaNHC18DkTXwuJ10H6ExFhkgPenaoY=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=l7gjxHlQXmv7oZ5gFOXfuxIvQdxrOd7tkw9nK5JlfXVcfWiOkTm9EDFK2KCMVQ4sJ
-	 qQQI+9x5iQJfraJECjFcvYnJ6+r49SBF0y6F0WhinqjBrcWI/hl+MOGTh6X9/IomDK
-	 x/vfjCwV7qU5V4dc76ZkUnREh2K+Z7+oDyvQ2ZF6+GQYCn2j/0TuBsAP/5B7xcvZfT
-	 59YT8d23+Iwxt+7krnB5nKcJA9Yh/ysO7+t9tA3/NxkwHYpwQK9xfS4OeVzr41RSa2
-	 cza5a/L9hPiCLHfHHDNUSQIsapkf2w4auReUyKsq3STDzWMIXdTHWUqSiCflF/XL/P
-	 nvlqqGt0xxq1A==
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c20e70a0962so102193166b.2
-        for <linux-cifs@vger.kernel.org>; Wed, 12 Aug 2026 05:44:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoBQi6i9nT46xKvgSW97Tpxry2DG5fjD4Nz3fdVWs8mKYDyvbme/3dkyl7Ntxg8L2go3chjV6o2QiYY@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFCf5AOafSI2InHrzP/UB8vXi+a1OFAoxndkSZ5L5SIvJgdAB2
-	WdeiSqqNtZG9jtbKbm+Q6YXxA4ZECex1CDkrSV3rGRnMwBDT/jMy26NZHxpVI4FgppDyxNWDwOY
-	HsafVUqsisKII9wCDM2q8XehdIysC/MA=
-X-Received: by 2002:a17:906:7305:b0:c20:74db:50c7 with SMTP id
- a640c23a62f3a-c20f2eb73ecmr175680566b.13.1786538654665; Wed, 12 Aug 2026
- 05:44:14 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGYgt71x"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786539723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PPM37YnK3EKqivaHe73jCVmBaOR6lzLdZlVHqHSfQng=;
+	b=iGYgt71xCnE2rzgfL0yZTwmHI12zMi/QVZCVy508jSe3dFEWiIbaFSfD5j0XbqGzTtDqnq
+	h9QSZvSLnJSJDq/CmeRONAxug2NegQt4Bf/YvSYrRwpJYxVvjSFQXyKAjpzioxnOOGVw5U
+	0RxQgv1OvpcZFncYN2+lqDg2WrX5IU0=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-204-9-IZQTH9NdKE-_d2vGzxDg-1; Wed,
+ 12 Aug 2026 09:01:58 -0400
+X-MC-Unique: 9-IZQTH9NdKE-_d2vGzxDg-1
+X-Mimecast-MFC-AGG-ID: 9-IZQTH9NdKE-_d2vGzxDg_1786539717
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2F3961956071;
+	Wed, 12 Aug 2026 13:01:57 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3A53E195DF91;
+	Wed, 12 Aug 2026 13:01:53 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Steve French <sfrench@samba.org>
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/5] smb: client: Avoid leaking of sensitive data to the stack or heap
+Date: Wed, 12 Aug 2026 15:01:47 +0200
+Message-ID: <20260812130152.2861834-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260807125845.1477067-1-thuth@redhat.com> <20260807125845.1477067-3-thuth@redhat.com>
- <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com> <e23dc8fd-67c5-4950-a598-13ff50a40d1c@redhat.com>
-In-Reply-To: <e23dc8fd-67c5-4950-a598-13ff50a40d1c@redhat.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 12 Aug 2026 21:44:02 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-2h5yEj9QbQdg=Ycwci4JuueZVB4cfAX2nXNoXs-2Ebw@mail.gmail.com>
-X-Gm-Features: AUfX_mzukNwB2DoC8tP_9GrVbMAx9Eo2JdU-GGH53bCvMCnGHU_ccDvfyYz0-Zg
-Message-ID: <CAKYAXd-2h5yEj9QbQdg=Ycwci4JuueZVB4cfAX2nXNoXs-2Ebw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when done
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Steve French <sfrench@samba.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Aug 11, 2026 at 9:57=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrot=
-e:
->
-> On 11/08/2026 12.31, Namjae Jeon wrote:
-> >> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transpo=
-rt.c
-> >> index 1143ee52470a7..d23566da2ac81 100644
-> >> --- a/fs/smb/client/smb2transport.c
-> >> +++ b/fs/smb/client/smb2transport.c
-> >> @@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct =
-TCP_Server_Info *server)
-> >>          unsigned char smb3_signature[SMB2_CMACAES_SIZE];
-> >>          struct kvec *iov =3D rqst->rq_iov;
-> >>          struct smb2_hdr *shdr =3D (struct smb2_hdr *)iov[0].iov_base;
-> >> -       struct aes_cmac_key cmac_key;
-> >> -       struct aes_cmac_ctx cmac_ctx;
-> >> +       struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
-> >> +       struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
-> >>          struct smb_rqst drqst;
-> >>          u8 key[SMB3_SIGN_KEY_SIZE];
-> > Shouldn=E2=80=99t we also clear the raw key with memzero_explicit(key,
-> > sizeof(key)) immediately after aes_cmac_preparekey() ?
-> >
-> >          rc =3D aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE);
-> > +        memzero_explicit(key, sizeof(key));
-> >          if (rc) {
-> >                  cifs_server_dbg(VFS, "%s: Could not set key for cmac
-> > aes\n", __func__);
-> >                  return rc;
-> >          }
-> Yes, but I was planning to do all the scrubbing for such other spots in a
-> separate patch series (similar to what I've posted for the smb/server cod=
-e
-> already) ... this patch series here focuses on aes_cmac_zeroize_key and
-> aes_cmac_zeroize_ctx only. I hope that's ok?
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks.
+Similar to the patch series that I sent for the server code recently,
+here's a clean-up series for the client part:
+
+Sensitive data like keys that are stored in stack-local arrays could be
+leaked via the stack to the calling functions, or via the heap when using
+only normal kfree() functions.
+
+It's good security practice to clear sensitive data on the stack first
+with memzero_explicit() before leaving the context, and to use
+kfree_sensitive() for data that is returned to the heap.
+
+Thomas Huth (5):
+  smb: client: Clear sensitive stack data in smb2transport.c
+  smb: client: Clear sensitive stack and heap data in smb2ops.c
+  smb: client: Clear sensitive stack data in cifsencrypt.c
+  smb: client: Clear sensitive stack data in smb1encrypt.c
+  smb: client: Avoid leaking sensitive data to the heap in connect.c
+
+ fs/smb/client/cifsencrypt.c   | 12 +++++++++---
+ fs/smb/client/connect.c       |  2 +-
+ fs/smb/client/smb1encrypt.c   | 19 +++++++++----------
+ fs/smb/client/smb2ops.c       |  4 ++--
+ fs/smb/client/smb2transport.c |  4 ++++
+ 5 files changed, 25 insertions(+), 16 deletions(-)
+
+-- 
+2.55.0
+
