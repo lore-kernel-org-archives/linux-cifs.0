@@ -1,82 +1,166 @@
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931035E1AD;
-	Wed, 12 Aug 2026 01:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4542BD587
+	for <linux-cifs@vger.kernel.org>; Wed, 12 Aug 2026 02:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786496931; cv=none; b=Bbtm8TrLdbYnmU7JEZjCXDx8rVZN+99/Fj/uJuQeHLeJIMpPQVJFMkL8DstqkorAYjRp0D4T5iaIPmd4cpwr8TenvSrD+FPxbYe22jcSxIwTq0NT3ZrQD1kTSQKS/Bxh/aOXP3AepN2CCBObRdF3cCZVK0uKXKDXpoo2wk7A4TA=
+	t=1786502496; cv=none; b=Kg9Zc7ZOIC7FTNp+pORW7HOQRIjJ4StPXMYFvuvyyB4G5L+Wj1bgSMjbtSZqRYAK3jPF8gPbLwK8cW6j+Xz0pgq7zHhFnhV2XB20DDdxpQB+msuAzSrOfVluNFOVAYVcnLbNc2O/VTJApAZTidR1nafO4Nma+P9lAivxBNVB2M4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786496931; c=relaxed/simple;
-	bh=LdOBEKTdkgqDbNLJDbYskHxFAOqVJOonk0Qk8y3J0rw=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:Mime-Version:
-	 Content-Type; b=S3AWz5+0rRHcQ21nCOndUtbtGEMd5Rk2wkvgb4s7SvCWPQ14hoQHcN2OzIDozEf4e8+MIfUKlABgiFWImJ3BU9rjJayoLcuarkugjNa4uarbARgppfnNneggp17jEXTz9jA+jkUTfP8gJURA5UbZ5Rw/IS3RRF04EV6m8k3UONA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=OMgtMqgU; arc=none smtp.client-ip=162.62.57.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+	s=arc-20240116; t=1786502496; c=relaxed/simple;
+	bh=184+wo2MmPfVVSEIrO0XZr+LFjQaZHymk+ewrVt8Dxg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LLsurXyftpssZmwFMUT9KyvYawIrvOoG2Hg2gkTnrI2bmFug5o8dzfB8tkLsB9cyjq7OKBFp+tdnkbRKnbTLj56qfFpiyasYwavS9hLdzIAvBZ6F1GNQfgRpeYI6zxeKCLq1nGg19VsTciXKEgIxMnQoeuvzx1SOf5xl8c4FrH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jAuUfZvj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fSNfzun5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="OMgtMqgU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1786496915;
-	bh=LdOBEKTdkgqDbNLJDbYskHxFAOqVJOonk0Qk8y3J0rw=;
-	h=Date:From:To:Cc:Subject:References;
-	b=OMgtMqgUas6H6Cc3vG2PWYMqsAQvlJMfDYIX3gD7x3tGpgMl9bzdK7iYNyCKkJ6Do
-	 mB6IE+d4ZGOHezreIbjpgS9bdFFYDT7Yn/PifCLlXENUsQskxVIF0aMSvssHNt/AfW
-	 SFvIP0QiaRjQqcBCR6/8QDCjEj7w98xOPACnIiZ4=
-Received: from PC-20201120SBOH ([183.205.156.133])
-	by newxmesmtplogicsvrsza73-0.qq.com (NewEsmtp) with SMTP
-	id 2213C648; Wed, 12 Aug 2026 09:08:33 +0800
-X-QQ-mid: xmsmtpt1786496913t6x9emz2d
-Message-ID: <tencent_7C0E8F3CBC25E603FDA0289583DC9BD16B07@qq.com>
-X-QQ-XMAILINFO: NbgegmlEc3Ju1p/+CdclI+OjHNtendqfr7yPSN0vQl03Qz1ImrEEt7dUoFV23M
-	 9MoG4uBdLL1mILGx5vqHRKplNuS4mempxVGcdgCXMBCppTQWgLqpKit54x9oRQG487G+ai3oozw0
-	 r1AYFXFz1aWP8Ol0dgIrTh8yezIwheUelbm8623A+Vml6RqAQi+qHxlUpAIlaPrAFvtV4vh56yPP
-	 1s+vNybxuFQqa349yJ0FwzsDo+MRLn80Pukqwi/xG4ETl2L+Ow3mNPTJobj3riDiIdwaUzA2MFIP
-	 QS38gVu/UR5ZCECCkQEJcyxbprIjAk5aB3xOM30miUZVe85z7n/MQqe62/oQOr45DXs/xeMb8eDd
-	 UPHTPdlII8vQjwjje8DEGaSW3Mi/aRCD0MSZPLH0WdrkvFK4GiIJAeMUWfud6dBKyY+8XlFaEup0
-	 SiXx+Ydvn1VdMnmnqtBSb0vzUX+b7mqd9fB92rAJBi27JEyq4KBrOKdMER+BdWvBydqVuwVznC7j
-	 P4dY8lCPdDCvjhCjH2yL+sOSh8kkQr2iKf2/Zeud6VW3wQ/X2voEaLkBj3L+4lYoBivHSbKG9+08
-	 TW5wY8ubRv5pf9JjcGlQ8Nn/+AuaMg8hQoTvimY1otiJygEiZBUNBEZY1l+hZZo85RVrJB137cLh
-	 2sfeRvp13/nIm81WWSgXPyJFwUcoZfa7SE2vZnHgTwQLF2/XrJzBUiJp2R0OmpUJbsy2OqIuxctf
-	 yzNhm97XuTN/NNChGC5DYBVYgoShpdSpmEtmjpLHDdCvkm6Q47a0UE4MwCYeFp7zJe9wLFQYCuFm
-	 lw1ZAu924sS9DGyqJ/9bM0ajdBHOdFalAmKKNdrYoOswKxRd4YJHp90nIY/MVs+WOGMqoVeAWPN0
-	 GevFhXHmT9oPzcYCJ0cO6wE/ezeW9g8wvkIN1EeNbiogyBgr0469Rrl4SsT+Ibqd4Lg79fJBybVp
-	 PbCm7SXIkkLXfQZeMXhr/p1BYJn+tIV4sAsnVJVcFIFXoM8iNtKUlAfrM/67Gc75LCYSh25cMZBY
-	 Y4jDvCyuI7PxVbJ8di+DgnWgMu6AaEIAYBg/9zEup0QtLVN4k5WpYMYvVTHoc=
-X-QQ-XMRINFO: NHo+0iP/cI22ZgYdVAreg7B8/AHmI4Bv8g==
-Date: Wed, 12 Aug 2026 09:08:33 +0800
-From: "grayhat@foxmail.com" <grayhat@foxmail.com>
-To: "Frank Sorenson" <sorenson@redhat.com>, 
-	linux-cifs <linux-cifs@vger.kernel.org>
-Cc: stable <stable@vger.kernel.org>, 
-	smfrench <smfrench@gmail.com>, 
-	pc <pc@manguebit.org>
-Subject: Re: [PATCH] smb: client: fix OOB read/write from unvalidated DataOffset in coalesce_t2()
-References: <20260811191846.1263281-1-sorenson@redhat.com>
-X-Priority: 3
-X-GUID: 7DC42953-4FDF-4DA0-B60B-CC79BE11F035
-X-Has-Attach: no
-X-Mailer: Foxmail 7.2.25.542[cn]
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAuUfZvj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSNfzun5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786502493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fkG++BzIFbGGoiUpCqb/8lmKeOjMyVwnECKfoty2BCg=;
+	b=jAuUfZvjUjp4sopxz+lAdCXL6+gOiI+jd2AqqeIJftucsHOIB0jvfuMgdoaMDrTl0JE6P/
+	+xJEIEeXymGMmatX0o242vfiq64dIc6IDR9n9TkdzpDknAg3+QKc8WTzkq7rtInSlk/UX8
+	v1LYYvAaawm+2nGfg6QVAMNF5SRs6iE=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-446-_rdrsnEnMd6RZ5MTTv7nlQ-1; Tue, 11 Aug 2026 22:41:31 -0400
+X-MC-Unique: _rdrsnEnMd6RZ5MTTv7nlQ-1
+X-Mimecast-MFC-AGG-ID: _rdrsnEnMd6RZ5MTTv7nlQ_1786502491
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-4a43d32fa9fso600958b6e.2
+        for <linux-cifs@vger.kernel.org>; Tue, 11 Aug 2026 19:41:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1786502491; x=1787107291; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=fkG++BzIFbGGoiUpCqb/8lmKeOjMyVwnECKfoty2BCg=;
+        b=fSNfzun5CqInc8O50aFPndPeLMK60i3wzKGe+mZ9q/7Yjr/0+mfjN/i757w7a0CCNa
+         5CBElxvvWt7JIS/UthsQwaNTRU0SYmbmx93WsK/GI7wRQtuqWZEyQchHmqF/UOwp6Fsj
+         ZVeJHRLUfu6e4q/l7PFP12db/Vj5Et9jSfmaOBpwZSiP5hq2Xw4rmmB35xPwC+VX4/Kq
+         gQuZcEEwdyyvg2cqd/x+fmTFyRVMVIH7OMBKmGcbL10UGnv8YTDUJbehtiNoBp9lQZ3a
+         9C6mpK2Oj+ek18RPHqmNzzqqz0fkiCmcvf2ihmpDc5/7U/2bkEPUUuFFBodu5AbohqMl
+         7rMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786502491; x=1787107291;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=fkG++BzIFbGGoiUpCqb/8lmKeOjMyVwnECKfoty2BCg=;
+        b=NfM0LJ2BAzoXEGUYthtsmz3ydrOa8yE+BIVbXde+k+w0GWnDPxwuznHXl7xoYRIK4Z
+         12ujQKMU1A4x9AvIzkPivc0bXbJMC8W4ugXlWg+4Jyp6moJSLZnT94k/zfau/h08jFkQ
+         0zpiyQzeGJnpPRw1ozivCh9KiOSABys/zOxDXn01vNxW0t0+XI8jrPtzg+ODgk7HtHYP
+         BPvcsjYlgWzqG06H4d2DuR/IddUfjsytjNJDOPIwS217wdzyb4TOEJ88HHTOQrwCJVgI
+         Edbfa/rDmoUa6u6RAwTVijnqwRXWxoEQ9XZNUmkTFmJEagXl60ptsBv6IY8e8rOERLT2
+         W8PA==
+X-Gm-Message-State: AOJu0YyxtimgMOFra1fO/WexVYghi3vp6fJCADi4f8OcJ+TssFPa3fWp
+	p+IQPLn1fOq1CTIqdCImg4XroPiegIn1bZvnpVHLsyCKZQFukww2Pz6KmzNcqnXNpE7oa5nd2Hv
+	TXl79Zo9Py+BbLqA5Slcv+YEfvELwBsE+/DO5MVw39/P9vBw30YJTY4ka+WivMTtmUmsVxweeHV
+	X7UG0t9oWEfAbGEuerMgNl7Yv8npPgdRfb6u/eYsYHaRGSb+M=
+X-Gm-Gg: AR+sD10ZS1cEc/4gZDRRq9pWpnLuELElQ1cKRAg6A6dIodpmPu2lEpUPmXiRg4V3WDG
+	MgWKGLM0TAHvy4K0WLbkuvNDzZWVbhyixsBMpUTg05gl/NzMqGXbROfKHd7lZYNjMjlhAWO9iYS
+	upOPgFXHG33z5keixTVP20x3i+0mvrt9IIvwizcxQKUI2LvOt+tX5dWckCFZhTHExQYdtMrcJWh
+	hP7AzejFCxLhlEGItHyNWy5Fo3OnWAFlmDW6xunq1zF7ddBeV1jtMGOxIEtRtMwCuK9V62Dv/kK
+	8thCjnWZkLqSI5d7VFBuUVIc/QHoozA1r5zA3IwfHO+hCHaZHstONvaQZ3L1zEQMa+KNBGYywAw
+	6PcoiqiNQCYhiF4pYJogMm+HEkPhnHzYtUcqa1FJ4Hhc86BFCnGunWXEmQ60nyDzWVQ==
+X-Received: by 2002:a05:6808:1a10:b0:4a4:934:b316 with SMTP id 5614622812f47-4b210c77ff6mr1716112b6e.21.1786502490797;
+        Tue, 11 Aug 2026 19:41:30 -0700 (PDT)
+X-Received: by 2002:a05:6808:1a10:b0:4a4:934:b316 with SMTP id 5614622812f47-4b210c77ff6mr1716067b6e.21.1786502490265;
+        Tue, 11 Aug 2026 19:41:30 -0700 (PDT)
+Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-4b1fff5e900sm2220088b6e.7.2026.08.11.19.41.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Aug 2026 19:41:29 -0700 (PDT)
+From: Frank Sorenson <sorenson@redhat.com>
+To: linux-cifs@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	smfrench@gmail.com,
+	Shen Yongchao <grayhat@foxmail.com>
+Subject: [PATCH v2] smb: client: fix OOB read/write from unvalidated DataOffset in coalesce_t2()
+Date: Tue, 11 Aug 2026 21:41:26 -0500
+Message-ID: <20260812024126.1368971-1-sorenson@redhat.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-OQ-MSGID: <202608120908328785132@foxmail.com>
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-T24gVHVlLCAxMSBBdWcgMjAyNiAxNDoxODo0NiAtMDUwMCwgRnJhbmsgU29yZW5zb24gd3JvdGU6
-Cj4gW1BBVENIXSBzbWI6IGNsaWVudDogZml4IE9PQiByZWFkL3dyaXRlIGZyb20gdW52YWxpZGF0
-ZWQgRGF0YU9mZnNldCBpbiBjb2FsZXNjZV90MigpCgpUaGFua3MsIEZyYW5rIC0gdGhpcyBsb29r
-cyBnb29kIHRvIG1lLiBUaGUgbG93ZXItYm91bmQgY2hlY2tzIG9uCmJvdGggcG9pbnRlcnMgYW5k
-IHRoZSBzb3VyY2UgcmFuZ2UgdmFsaWRhdGlvbiBjb3ZlciB0aGUgY2FzZXMgbXkKc2ltcGxlciB1
-cHBlci1ib3VuZC1vbmx5IHBhdGNoIG1pc3NlZCwgYW5kIHRoZSBGaXhlczogdGFnIHRvCmU0ZWIy
-OTVkMzhiNSBjb25maXJtcyB0aGUgcHJlLTIwMTIgb3JpZ2luIHdlIHN1c3BlY3RlZC4KCk9uZSBy
-ZXF1ZXN0OiB0aGUgY3JlZGl0IGN1cnJlbnRseSBzaXRzIGJlbG93IHRoZSAtLS0gbGluZSwgc28g
-aXQKd291bGQgYmUgZHJvcHBlZCB3aGVuIHRoZSBwYXRjaCBpcyBhcHBsaWVkLiBDb3VsZCB5b3Ug
-YWRkIGEKClJlcG9ydGVkLWJ5OiBTaGVuIFlvbmdjaGFvIDxncmF5aGF0QGZveG1haWwuY29tPgoK
-dHJhaWxlciB0byB0aGUgY29tbWl0IG1lc3NhZ2UgcHJvcGVyPwoKU2hlbiBZb25nY2hhbwo=
+coalesce_t2() computes data pointers directly from server-supplied
+DataOffset fields with no validation against buffer bounds:
+
+  data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
+                     get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
+  data_area_of_src = (char *)&pSMBs->hdr.Protocol +
+                     get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
+  data_area_of_tgt += total_in_tgt;
+  ...
+  memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
+
+A small DataOffset can push a pointer below the actual byte area,
+overwriting header fields; a large one can push it past the buffer
+end, causing out-of-bounds heap reads (source) or writes (target).
+The BCC overflow guard does not prevent this: BCC reflects how much
+data is present, while DataOffset controls where in the buffer it
+starts.
+
+The "validate target area" comment present since the function was
+first written in 2005 was a placeholder that was never implemented.
+
+Add lower- and upper-bound checks for both data pointers before the
+memcpy, and before any target header fields are modified.
+
+Fixes: e4eb295d38b5 ("[PATCH] cifs: Handle multiple response transact2 part 1 of 2")
+Cc: stable@vger.kernel.org
+Reported-by: Shen Yongchao <grayhat@foxmail.com>
+Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+---
+
+ fs/smb/client/smb1transport.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/smb1transport.c b/fs/smb/client/smb1transport.c
+index 966f2cf83a51..66daa5a37e4a 100644
+--- a/fs/smb/client/smb1transport.c
++++ b/fs/smb/client/smb1transport.c
+@@ -375,12 +375,31 @@ coalesce_t2(char *second_buf, struct smb_hdr *target_hdr, unsigned int *pdu_len)
+ 	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
+ 				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
+ 
+-	/* validate target area */
+ 	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
+ 				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
+ 
+ 	data_area_of_tgt += total_in_tgt;
+ 
++	/*
++	 * DataOffset fields are server-supplied and not validated against
++	 * buffer bounds; check both data pointers before mutating the
++	 * target header.
++	 */
++	if (data_area_of_tgt < (char *)target_hdr +
++				sizeof(struct smb_t2_rsp) + sizeof(__le16) ||
++	    data_area_of_tgt + total_in_src >
++	    (char *)target_hdr + CIFSMaxBufSize + MAX_CIFS_HDR_SIZE) {
++		cifs_dbg(VFS, "%s: target data area out of bounds\n", __func__);
++		return -EPROTO;
++	}
++	if (data_area_of_src < second_buf +
++				sizeof(struct smb_t2_rsp) + sizeof(__le16) ||
++	    data_area_of_src + total_in_src >
++	    second_buf + smbCalcSize((struct smb_hdr *)second_buf)) {
++		cifs_dbg(VFS, "%s: secondary data area out of bounds\n", __func__);
++		return -EPROTO;
++	}
++
+ 	total_in_tgt += total_in_src;
+ 	/* is the result too big for the field? */
+ 	if (total_in_tgt > USHRT_MAX) {
+-- 
+2.55.0
 
