@@ -1,38 +1,38 @@
-Received: from mta0.migadu.com (out-64.mta0.migadu.com [91.218.175.64])
+Received: from mta1.migadu.com (out-25.mta1.migadu.com [95.215.58.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C26376BC1
-	for <linux-cifs@vger.kernel.org>; Fri, 14 Aug 2026 06:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88023346A04
+	for <linux-cifs@vger.kernel.org>; Fri, 14 Aug 2026 06:54:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786689906; cv=none; b=M9hgM3SUGNsGSGJxjU0FE4ArOr68u6VQ3i7NB62Klx1exGwV2WgfY3a277WTrcWHuaettkNT5/f+S++iei/6gNuuJrfYihb8aFF1QueW+VATW2ACOdLOIXKEDmyk+Xu1J1s0+L0XWz+Uaa2D8hPSjzZw0SCRU2pGApGj6KAk0jg=
+	t=1786690450; cv=none; b=SN/YUogRqIHT4zZ3xI45DTm618ZeZNm6S/4Hv73/LacsbZwwa8BedP5J0y8GhrcJIkB3lG1hYA7Vz+Y3I04ScccgR3wEhhxp7zObkExG99gfZkZO+m9xcxRa/J15lhgcOw6S+VEmDfJnwok2EYzmLqJqetZADxEe0GA7FQfajgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786689906; c=relaxed/simple;
-	bh=0FGXVRwgTWSgbH3+4HgWUbwGip1o2lj0f6uS+eyYqPg=;
+	s=arc-20240116; t=1786690450; c=relaxed/simple;
+	bh=KdlIFbgznjim3/u/SQSk/mZxKLT8y95RNimSlZME7T0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MmY+KalgoEy5xIN64ecZUil0Ibr1RJXAmAUs3bfIis9ZhLX4ziim4rs194asOvmMxeY4ZzpFIZ2+bwLFzEWlDU+dlyN6j9QA0ypqjus0Z0GL5ZAdGt9yThkLNlHni2uZHGI+09bpNAiedL4q0+lrbFrCwi0OUkglAXwpYggPMas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=kEePFy9t; arc=none smtp.client-ip=91.218.175.64
+	 In-Reply-To:Content-Type; b=flLOBOeTobpxZLz2h4KuiQ82LI978DtWUd0TjmUZmDrRQha4WsW6uRYGHURmknh2gypPio9IqAnMXdRUeV/ZYyweTKQpGGzTBu6FBIIQg1+x1ezcH7V1xeVP8GrO/VhHEUfeA1M10B7PcQmTOT8mw2nFxkSy2/APJIdzA+1jQAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=vsBNyZA2; arc=none smtp.client-ip=95.215.58.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="kEePFy9t"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="vsBNyZA2"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=0FGXVRwgTWSgbH3+4HgWUbwGip1o2lj0f6uS+eyYqPg=;
+DKIM-Signature: a=rsa-sha256; bh=KdlIFbgznjim3/u/SQSk/mZxKLT8y95RNimSlZME7T0=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1786689899; v=1; x=1787294699;
- b=kEePFy9tw1D0Ki+H/dco/N6vNPJ/NA07viW8uQzS1lsjqtga+/baoK4z7UsRsqmW1D0lwAhG
- ORo7Ona4kcNN2Jka70hC4tmL9J6d2Lv9JNShj2F8GPKNXF+YY3IRSLqXe3S5MdtqAigNvf1cDzH
- oqu1P6+IIyTE5hnaxxZNnKPlYn1OFo4Rx6aYYf/VQGUjPk76OLYpUOjtBQve6GKGlUYUFw8Rnv/
- OUMU4NT0/m/+naB3bQlYs0Umdf1o7pfdPZA6Daq4fDXh+8NAV/MTF4A+Kec//qN0gHkEpepH4D1
- FHRBzEn0tqu5nX7lxuMMn//xTpUnZIZUbQ9itfUqby4vg==
+ t=1786690445; v=1; x=1787295245;
+ b=vsBNyZA2/69jO8fIVmr1mUdX2zcH4d6JYMANo5/wngeVNedV/q+iNXHUwsuwCx/kkcXXW4GW
+ ty1yDA4Ur+aNJU/NCIShrl+975HXdzqbHmWv6E5kUHw8K9h3/pHfvNct1+gZMa/MCBLs6bvt9oU
+ sZujGHF3au5YyqFGjXijAYmHtHs2iw6yWWUt+526n/CW+zwfc5r77uGOyy+8CBN3P6IX0k5RTmL
+ 7NGb1fOp4fB0WyEOwbW+XDsRbZSgiT3PKoFQACXhNYNfOOjrfP4yqU9lKdBpkhtk3cfa59WnzGb
+ oVE/MzFt7G4hV290MjFo6pb4u5WCaHDkgMOPWrQf5T4XQ==
 X-Envelope-To: linux-cifs@vger.kernel.org
 Received: from [172.21.20.206] (116.128.244.171)
-	by smtp.migadu.com with ESMTPS id fc515a86bebfea45;
-	Fri, 14 Aug 2026 06:44:49 +0000
+	by smtp.migadu.com with ESMTPS id e5cdd6f85c070ce0;
+	Fri, 14 Aug 2026 06:54:05 +0000
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <7829f6cd-c365-4fd6-a45a-b2368db71a76@chenxiaosong.com>
-Date: Fri, 14 Aug 2026 14:44:46 +0800
+Message-ID: <e983cf59-ef97-4ca8-945e-079e8a44b3d4@chenxiaosong.com>
+Date: Fri, 14 Aug 2026 14:53:22 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,26 +40,48 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] smb/server: check create_proc_shares() failure
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Ze Tan <tanze@kylinos.cn>, sfrench@samba.org, senozhatsky@chromium.org,
- constant.lee@samsung.com, tom@talpey.comm, linux-cifs@vger.kernel.org
-References: <cover.1786674373.git.tanze@kylinos.cn>
- <82181632662a23ecc9a3b8b2321982071037a288.1786674373.git.tanze@kylinos.cn>
- <CAKYAXd9-mkdArzM573FPUo0cS8ZuuY21OgMMQ5d9kLOknzy26w@mail.gmail.com>
- <d7cb5234-fd5c-49cf-82ab-590b5a1e902c@chenxiaosong.com>
- <CAKYAXd_tBUao9wk-hkayPpNxVPbJzPRTDRVH4PvmSUu_UxL=Ew@mail.gmail.com>
+Subject: Re: ksmbd: BUG_ON in locks_release_private() - file_lock destroyed
+ while VFS blocked requests are still attached
+To: Blue bird <obnred@gmail.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, smfrench@gmail.com,
+ senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org
+References: <CALT=-85WRdchL0vkA3mkTmFAiS-Ykjku+T-m+0My3_AcP=TJ3w@mail.gmail.com>
+ <CAKYAXd-B1mjT-JONqToLMeQKmV_GRdR1Pogi9VugyCADATpO3g@mail.gmail.com>
+ <930abff2-18f6-4a68-ae07-1e3675c90ae3@chenxiaosong.com>
+ <CALT=-84nzBrQx62WgOkdQeDfB6+75O31uPoN2hAiBO=xO=tnWQ@mail.gmail.com>
 Content-Language: en-US
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <CAKYAXd_tBUao9wk-hkayPpNxVPbJzPRTDRVH4PvmSUu_UxL=Ew@mail.gmail.com>
+In-Reply-To: <CALT=-84nzBrQx62WgOkdQeDfB6+75O31uPoN2hAiBO=xO=tnWQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Okay, tanze will update the patch, and he will send other fix patches 
-together.
+Thanks for updating the poc. I have confirmed that the issue can be 
+reproduced without reverting the patch.
 
-On 8/14/26 14:40, Namjae Jeon wrote:
-> I think it would be sufficient to just print error message using pr_warn().
+On 8/14/26 13:51, Blue bird wrote:
+> The one-line fix on my side is to continue impacket's sequence instead of
+> inventing one:
+> 
+> self.tid = self.c.connectTree(SHARE)
+> - self.mid = 4096
+> + self.mid = int(s3._Connection['SequenceWindow'])
+> 
+> With that, the reproducer works on ksmbd-for-next-next with the sequence window
+> patch in place -- that is how I got the 1.6 s / 142 request figure above, and
+> the test of your patch was run the same way, with nothing reverted.
+> 
+> The other thing that silently zeroes locks_sent is the per-IP connection cap;
+> the harness churns connections from one address and hits
+> "Maximum IP connections exceeded (32/32)". I set
+> 
+> [global]
+> max ip connections = 0
+> 
+> for testing.
+> 
+> So: a non-zero locks_sent is the thing to check before trusting any negative
+> result from this reproducer. Sorry for the detour -- I should have flagged it
+> more loudly when I first hit it.
 
 -- 
 ChenXiaoSong <chenxiaosong@chenxiaosong.com>
