@@ -1,68 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-48.mta1.migadu.com [95.215.58.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858801DFF0
-	for <linux-cifs@vger.kernel.org>; Fri, 14 Aug 2026 05:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DA2357D17
+	for <linux-cifs@vger.kernel.org>; Fri, 14 Aug 2026 06:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786686875; cv=none; b=WiyR3Ay+l6xwbnTgXAcLok0f4x7oCnHqR7F2G3oVINRkaP7irARaoTwiwfKhwIpkK5t1a17GcmwDZDkJFA3ybz6f1l44ocLZyc9VGdP5lzxhuNwQRxwhDbn7I7muM3BUzWPPu0AibGNxvOBi2TyPPfb7v9b0gi7PjzxMHT/dpsA=
+	t=1786688842; cv=none; b=GM6YMapLgzCZLUZZfLkQ1J458V9cwSQkgS5csEV6zUvkOA70i8ZIQbQcV0A9DYIZyt4SrhsaOyS3/EyU6Gtc6ohY9oxm8eg1agY9/hXBmZ1IHxdywNBigKcpAIVYNzb+/hYUC5+Ga83EsKysR58KmyVlLeYp7VWUXEPEG0D/9Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786686875; c=relaxed/simple;
-	bh=LrKbjFwRL5xXz7a4zmThyu0PrqpKPF06VSfelDlpA/4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BByVi/hjkLBceN5mCCXfSQHdKHkVRl5l7jjkK4nk9dwWhC4Ad7QDxR5ba3g0ad1DPEeYizmVWlW49q5Q9BJ7cO73YHNOijCQZhwDbvRYQftRAmBOmJBgDKrxxTLc6jl7bUadQRXQGB6MAPjxrt0lZujWqZ4ptznwdji0UwPdyzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LU9RMq4+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786688842; c=relaxed/simple;
+	bh=LRZpPMDN6u5Jd7Ipt+60oHYOL9AAamgB/nsDZ9afaa0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=isK6XHXaysVB6QhtU+QRYggy7ufedEIsAo9/G2j+fQPserTAgMPWGd1BryTKOnogCTAK1XB79n0bfsNsuGaJLmcySNykK9Zbqi/gfkQ3tc4dU2QhVAh5d5J880Zf2QqAQagpzHRBNsI7dQ376hPguupeDobTuXYHoFu5PMfFyQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=uVruuBMw; arc=none smtp.client-ip=95.215.58.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LU9RMq4+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 564B21F00AC4
-	for <linux-cifs@vger.kernel.org>; Fri, 14 Aug 2026 05:54:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786686874;
-	bh=LrKbjFwRL5xXz7a4zmThyu0PrqpKPF06VSfelDlpA/4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=LU9RMq4+BnK4e7QrvimSZVrhpIAl94qBu5XRRCu0MoA7C3yXWi1l+jgbxhm7Z6ZPv
-	 jfD3AEhZ4v2peXPTGtKCnszNhZ5df4JN1BMWq9JEY+Irq6OIvGh0rfgeUPP749x/jX
-	 6PsCSjGSQFg++vFs4TKE7J9mzOJpfJ8hdaoD9y7wj7tzZR6kM+vBIMB/j6jj+IkyEU
-	 oXYSsShnoqpOJ2fwJKyVHelwYBB9AkiCEgDJrBO9tdbJ6HnV/B1G25YZzY7iPUozOL
-	 mnQMhLud+1zt0THjhrU/7En9qsVB2QTb/TyqOGKzCUv32yUVbKf4Xcd1bZApvS1Mci
-	 OM16mnnCpCe+Q==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c197eaaab00so129615066b.0
-        for <linux-cifs@vger.kernel.org>; Thu, 13 Aug 2026 22:54:34 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rqbco10TaldJs5eT7DW7FvFu/7xDAqpA1qWJXgFPwlnkGNZuADa4doVHV2D3MSBVyHVlngfRxxwcTmZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzenmayFj7H2T+REcRPfwWpysxcISaN6Z/oR5Dt/1X+7maymivh
-	DxjZ3GaiVC4Q9ScKEYsIVSD+V53gyJpsaOB42QwfR94ue03AnKf3cEw/7MHxFOBgQU2mfMQ4Wkr
-	EuRaHd9Z8M2QjJ6cARdVWol79jt6ecu0=
-X-Received: by 2002:a17:906:730f:b0:c1c:2aa5:322b with SMTP id
- a640c23a62f3a-c2129b5b1ccmr148451266b.2.1786686872720; Thu, 13 Aug 2026
- 22:54:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="uVruuBMw"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=LRZpPMDN6u5Jd7Ipt+60oHYOL9AAamgB/nsDZ9afaa0=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786688836; v=1; x=1787293636;
+ b=uVruuBMwtDMl+EYrPlqGqsKUM3IxcAV8pJPGaDh2lgn8Aok9jZaeCoJNmDSI4aEZmRgiVsqI
+ 8Urq1EEvKn37RVnHCgkXJ1Y1WBaPQncxdwwpkTHPrPMZeytW7KC6gbQ8oWal8JRnOGpoN1KBfZJ
+ HW7QNQV+woWnahp5WY3jiCd8GeUNS7nvmC6hvSOfMsiaHDYkV3lGZwPMr8iYKeISlLgZyi5f8qw
+ ulw0KQhQSY2wZzJItfawfk21hSiegBIjY9IyPfANGVDo9G6AqVO4CJ1ywUDhee2hUjOZCresQn2
+ 7pGgHe/p64uZKqJopbOpCgsna59YzD13WtDCemYYzFcdA==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from [172.21.20.206] (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 8bc562be64b96736;
+	Fri, 14 Aug 2026 06:27:06 +0000
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <d7cb5234-fd5c-49cf-82ab-590b5a1e902c@chenxiaosong.com>
+Date: Fri, 14 Aug 2026 14:27:03 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALT=-85WRdchL0vkA3mkTmFAiS-Ykjku+T-m+0My3_AcP=TJ3w@mail.gmail.com>
- <CAKYAXd-B1mjT-JONqToLMeQKmV_GRdR1Pogi9VugyCADATpO3g@mail.gmail.com>
- <930abff2-18f6-4a68-ae07-1e3675c90ae3@chenxiaosong.com> <CALT=-84nzBrQx62WgOkdQeDfB6+75O31uPoN2hAiBO=xO=tnWQ@mail.gmail.com>
-In-Reply-To: <CALT=-84nzBrQx62WgOkdQeDfB6+75O31uPoN2hAiBO=xO=tnWQ@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 14 Aug 2026 14:54:19 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9REpfSFF7Ch-sy=C1zXfEYXuDNK8OaTXtBqN=9J=n=Lw@mail.gmail.com>
-X-Gm-Features: AUfX_mx6JtdNpWYOUY03A-F59AQIRHBla5M6X8ExNMfnd570nxutRz7qmUs51ZE
-Message-ID: <CAKYAXd9REpfSFF7Ch-sy=C1zXfEYXuDNK8OaTXtBqN=9J=n=Lw@mail.gmail.com>
-Subject: Re: ksmbd: BUG_ON in locks_release_private() - file_lock destroyed
- while VFS blocked requests are still attached
-To: Blue bird <obnred@gmail.com>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com, 
-	senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] smb/server: check create_proc_shares() failure
+To: Namjae Jeon <linkinjeon@kernel.org>, Ze Tan <tanze@kylinos.cn>
+Cc: sfrench@samba.org, senozhatsky@chromium.org, constant.lee@samsung.com,
+ tom@talpey.comm, chenxiaosong@chenxiaosong.com, linux-cifs@vger.kernel.org
+References: <cover.1786674373.git.tanze@kylinos.cn>
+ <82181632662a23ecc9a3b8b2321982071037a288.1786674373.git.tanze@kylinos.cn>
+ <CAKYAXd9-mkdArzM573FPUo0cS8ZuuY21OgMMQ5d9kLOknzy26w@mail.gmail.com>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd9-mkdArzM573FPUo0cS8ZuuY21OgMMQ5d9kLOknzy26w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 14, 2026 at 2:51=E2=80=AFPM Blue bird <obnred@gmail.com> wrote:
->
-> > Can you check if an attached patch fixes this issue ?
->
-> Yes, it fixes it. Thank you for the quick turnaround.
->
-> Tested-by: Kyenghwan Hwang <obnred@gmail.com>
-Thanks for the test! Applied your tag to the patch.
+These two procfs monitoring entries are indeed optional, if their 
+creation fails, we should at least print an error message with `pr_err()`.
+
+However, initialization does not happen frequently, would it be better 
+to make sure all features are available when initialization completes?
+
+On 8/14/26 13:44, Namjae Jeon wrote:
+> Do you think we should abort ksmbd
+> initialization when create_proc_sessions() or create_proc_shares()
+> fail ?
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
