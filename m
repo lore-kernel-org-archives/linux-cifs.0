@@ -1,66 +1,50 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-67.mta1.migadu.com [95.215.58.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B14126BE1
-	for <linux-cifs@vger.kernel.org>; Fri, 14 Aug 2026 13:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D171D3BE163
+	for <linux-cifs@vger.kernel.org>; Sun, 16 Aug 2026 15:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786715542; cv=none; b=ZRSjhluTyvQFCHNWuRPtEMKVULji5CzOpH2aWALkuwCTjQpOGhcMGsoawvm3B6J+oFc7T0nqg41RXc4VzsvwaZah+MyRP2Hhp1/xSicOOBWkZZs7rpaAswZ1hSf1N2rvg2DzWexQgtsTlfuf5ropM5aVxLV27js3jI2Bj6bYC1E=
+	t=1786894800; cv=none; b=G/ByO6xQJUaC5ZsuRZQ2Boo844Jbm5IpvRG2+0Nb/FfLroSqA4wUsjpBFETjiEBuJ9yhAs24N6xmRREJi7AIcdfgPpwY1VOgIxC4yUMY+6s21AZATbJIVkIkeB6WGXCzaNFe8Ex5n4ebNLAxekW/LvROm4FXag8Amcy9McASamY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786715542; c=relaxed/simple;
-	bh=DZWluuNOSX5Bsj3VqukTkvfB1pD+8vOPjRHrUd2YbBk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WDMI62E9JyOM4rccRDbKSZUfE9NsISxqf7m1SvjD3mk9kkU+k8cG1y09wOYvmNncurDAn+d772akze9MOj4zDMoz6uAX6W7ZK++G1NNUvxFnRNsOtLBBHHtHf0ZHB+xEfmr/nHxHX1zS/FmIfcBuYNrW6zxV/7f/t3xCt9sLEec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 57f7baba97e711f1aa26b74ffac11d73-20260814
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED
-	SA_EXISTED, SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS
-	DMARC_NOPASS, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:5d2e28e4-f31c-4bc0-8f74-2e3177f66a79,IP:15,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:10
-X-CID-INFO: VERSION:1.3.12,REQID:5d2e28e4-f31c-4bc0-8f74-2e3177f66a79,IP:15,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:10
-X-CID-META: VersionHash:e7bac3a,CLOUDID:f6f68381b9fb1c73611ba40d2a270ef8,BulkI
-	D:260814215213KNFNSL62,BulkQuantity:0,Recheck:0,SF:10|38|66|78|81|82|102|1
-	27|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:
-	nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,B
-	RE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 57f7baba97e711f1aa26b74ffac11d73-20260814
-X-User: tanze@kylinos.cn
-Received: from workspace-fedora [(116.128.244.171)] by mailgw.kylinos.cn
-	(envelope-from <tanze@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 2004323017; Fri, 14 Aug 2026 21:52:09 +0800
-From: Ze Tan <tanze@kylinos.cn>
+	s=arc-20240116; t=1786894800; c=relaxed/simple;
+	bh=fLWxS8pXfu4ahRXI3MpQZE+JUzQzA2SjwT+ytyNx6Eg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TvD+Qu3fg7t6kCSjofhEPvkP08HlUhO8F247nRHz/QeB2daooFvGoQiKpj+F4KBqng408FLkyBeojTPAq1CyXVx8TBxFK6LQPsC9w+GvFhR0WbxQdvwhhBqn/h+8tHd5gQqaNu9jqi1XK7VxxBXbgzOIGQZAHtKIJfXCyZfu0Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N/YPqXoJ; arc=none smtp.client-ip=95.215.58.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N/YPqXoJ"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=fLWxS8pXfu4ahRXI3MpQZE+JUzQzA2SjwT+ytyNx6Eg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786894795; v=1; x=1787499595;
+ b=N/YPqXoJrvepdRmcJJDz7exJ3xBfniG0O+DHaKO0ckFxJcRuaobFqUQnfU16ZkB9a7lBpmrV
+ a0BLBYdiQKo7wRki5sOgdJBnbdSy1VhS6NTVkqjEoNFrXHbtvCV3ru1KR/4RzHOZrl8nF7cH7yD
+ XDi5G2NmNa1VPuoaKJT/itvQ=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from localhost.localdomain (2408:8352:470:9d9:e513:b3b2:52ae:9d43)
+	by smtp.migadu.com with ESMTPS id 942b990b2b247f32;
+	Sun, 16 Aug 2026 15:39:45 +0000
+X-Migadu-Flow: FLOW_OUT
+From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
 	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
 	tom@talpey.com,
-	senozhatsky@chromium.org
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Ze Tan <tanze@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 2/4] smb/server: fix session leak in ksmbd_session_register()
-Date: Fri, 14 Aug 2026 13:51:42 +0000
-Message-ID: <20260814135144.302443-3-tanze@kylinos.cn>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260814135144.302443-1-tanze@kylinos.cn>
-References: <20260814135144.302443-1-tanze@kylinos.cn>
+	lkp@intel.com
+Subject: [PATCH] smb/client: remove redundant NULL check before kfree()
+Date: Sun, 16 Aug 2026 23:39:22 +0800
+Message-ID: <20260816153922.484091-1-huiwen.he@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -69,55 +53,35 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-See the procedure below:
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-  smb2_sess_setup
-    ksmbd_smb2_session_create
-      __session_create
-        atomic_set(&sess->refcnt, 2)
-        hash_add(sessions_table, &sess->hlist, sess->id)
-    ksmbd_session_register
-      xa_store(&conn->sessions, sess->id, sess) // fail
-    ksmbd_user_session_put
-      atomic_dec(&sess->refcnt) // refcnt is 1, session is not freed
+kfree() accepts NULL pointers, so checking tmp_cfile before freeing it
+is unnecessary and triggers a Coccinelle warning.
 
-Remove the session from sessions_table and drop its table reference if
-xa_store() fails.
+Remove the redundant check. This does not change runtime behavior.
 
-Fixes: f5c779b7ddbd ("ksmbd: fix racy issue from session setup and logoff")
-Signed-off-by: Ze Tan <tanze@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Fixes: 5693347de107 ("smb/client: use writable handle for FS_IOC_SETFLAGS compression")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202608160402.0ffQDoCg-lkp@intel.com/
+Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 ---
- fs/smb/server/mgmt/user_session.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ fs/smb/client/ioctl.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index a72dc0211d0d..0fc26012dbbb 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -451,10 +451,21 @@ static void ksmbd_expire_session(struct ksmbd_conn *conn)
- int ksmbd_session_register(struct ksmbd_conn *conn,
- 			   struct ksmbd_session *sess)
- {
-+	int ret;
-+
- 	sess->dialect = conn->dialect;
- 	memcpy(sess->ClientGUID, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
- 	ksmbd_expire_session(conn);
--	return xa_err(xa_store(&conn->sessions, sess->id, sess, KSMBD_DEFAULT_GFP));
-+	ret = xa_err(xa_store(&conn->sessions, sess->id, sess,
-+			      KSMBD_DEFAULT_GFP));
-+	if (ret) {
-+		down_write(&sessions_table_lock);
-+		hash_del(&sess->hlist);
-+		up_write(&sessions_table_lock);
-+		ksmbd_user_session_put(sess);
-+	}
-+
-+	return ret;
- }
+diff --git a/fs/smb/client/ioctl.c b/fs/smb/client/ioctl.c
+index 9fa743be3652..2f152d76be7d 100644
+--- a/fs/smb/client/ioctl.c
++++ b/fs/smb/client/ioctl.c
+@@ -133,8 +133,7 @@ static int cifs_set_compression_by_path(unsigned int xid, struct file *filep,
  
- static int ksmbd_chann_del(struct ksmbd_conn *conn, struct ksmbd_session *sess)
+ close:
+ 	server->ops->close(xid, tcon, &fid);
+-	if (tmp_cfile)
+-		kfree(tmp_cfile);
++	kfree(tmp_cfile);
+ 	cifs_free_open_info(&data);
+ out:
+ 	free_dentry_path(page);
 -- 
-2.55.0
+2.43.0
 
