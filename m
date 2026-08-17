@@ -1,298 +1,66 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9CE40A921
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 12:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BB493D412C
+	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 12:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786968959; cv=none; b=OJCAw2LmnhkXOwF0YjlvtvDgTZLfNNCTDhxILT0QQfRECM5QnJtzVEyBLYnF/hCI0CNREUG4yTRW8XTJaeLZvL9b1z4k1DHvHArObkxRa06EPFz1AuLb1Jv+qPLE8QidTTXVgW6h6Sk0iXyL8OrV8Xj2J1KSyKhq6vqp/jXVzrs=
+	t=1786970016; cv=none; b=jEjSpseLnrMsHvLb8yfxYx9wUGhbwYarkrSBO30th8mOdDHMlJLMrr2RRLcnXxH8OE0/i/lmJHfcozKVk8MgG+B7wVE2XvjNEfMabYu3NSGIYDF29Z0sZ/zLRbyN1JOTl7B1i4YP9yR6NkKeUKfuA6vi/bYN7qNEaqSVDp5r7HE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786968959; c=relaxed/simple;
-	bh=5L6R0sVwT+zppLfLofu18O0C3DmZxg6zJuaVKnah360=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BFREHpKBXOXfJQE9NU7qaRP5iDkxUUbb84HDHX8PyCGsYn6MLc+tiZMkDH0iq/zyMOHBirrOPSRHCCOOzzchKcwa6DILUDCerFes7AlSIUoloyXI9B6A4mJneVnqWXRt1txdMAPwHChjuyHtGQQ8UYQL3loOMLJRl0goo+a+td8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5wVOAhF; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786970016; c=relaxed/simple;
+	bh=PhtdsDLPADwsezdjYp2j5pw+HxKUrVUc4gKwKunIlSY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nwoArUGcksXSFJkD60Po8xKahkejhkwke9JFB8KR+ZmrAcc+wv8XSNE9zhnpH5k9e2RCSo0VmC+Vq3i2hUniZtFTWmjZtKer2Cxm0ns9Mp8PL6IfXPWwiiu75wWTy/XQripKtDtxJT/SnC1vE/3q5l9nDKAreZzAJmfxzbNxytk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQ+x6+sw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5wVOAhF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C7761F000E9;
-	Mon, 17 Aug 2026 12:15:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQ+x6+sw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0CA51F00A3A
+	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 12:33:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786968958;
-	bh=8crObOzNNxTYsdjn2mjbhAkFFsVUie5MrY9fU/QuVoI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=f5wVOAhFS03tCR/keYwMimdGeV7f7IVKDIhDKxJIIBIbEG3iTV9akb7Xqvz9jxIbL
-	 JvbqOotuEW0tUBAxQh53AfDwM5IYlqpM6wrZQCbsw7izcFENIoHH6mopk4/SNferny
-	 ALfZPtcm6pTwg0AWH8sk/HPuzwPJ2ucIZEz4AIxmlgC2Dv318V/gHbtjv0Xo5Lht7A
-	 Mu/6ju753dSNP8YMHzfo+yxSdZjFfeV7/3RTzvV59Y9qEBjlUjLMy4Dh7UPgbgKC8o
-	 ss64+BkIFVdD+aCxnhBEDcODndOz3pNDf7ziCFWZq+SrgYTwqK990RIBY0R36SqOTS
-	 rbdCAD5aZQl7A==
-From: Namjae Jeon <linkinjeon@kernel.org>
-To: linux-cifs@vger.kernel.org
-Cc: smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	atteh.mailbox@gmail.com,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: make RDMA encryption diagnostics conditional
-Date: Mon, 17 Aug 2026 21:15:24 +0900
-Message-Id: <20260817121524.8812-12-linkinjeon@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260817121524.8812-1-linkinjeon@kernel.org>
-References: <20260817121524.8812-1-linkinjeon@kernel.org>
+	s=k20260515; t=1786970014;
+	bh=PhtdsDLPADwsezdjYp2j5pw+HxKUrVUc4gKwKunIlSY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=KQ+x6+swbbkL2z0tAqf3pzHBm8GJ8a4FYawdPK9OOCquKP6p10Om23zMXs9IOnrGg
+	 PeXhXpQscOL21xNSjy9IAGWFcTVQavsd7oOQpCOuMMyx/SFueumcmGDyfrEewCmPCJ
+	 UeI4h9U1PtgBRj54qJVKziuCTZ3Ey9MEOdn2hyvYN8oZMbFDeIYkotAjt4X03nRhSq
+	 yRUrEc86rcTFyBxE33sl0aGiRvWYFpAldQKYPLKkXtkcWdEWBy27f2zx4XJ0XNsBG9
+	 PdTpbtWXyqG5GVkMDIVjbVnuoiOYdsU4thLlT5TYGtfCt53Pmk1OHu/Q5iLAQw/i6D
+	 nj/6cUdtpyqDw==
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-6679d88abdcso4706355d50.2
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 05:33:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RrpXFM2EtK3g0gDU3k09tpkc+xdAiDwqXWmxgp1Go6ZlmjUwSCk80XQQnm/58Kha+Eyh14pAyaphF93@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp0Juz/GLIo/YIjShgBcnOSQjyIzF7rVzHK3b/+Ob3WrxDVOev
+	DewNFjtH+NSCRxKH5cus+ndHsfN02rKjDBR/Y6MGKQbPpvVyy9dE6rnFgrHnYQC5LIrcWLM75L8
+	wt1la9n3+VhgMB/aA5q0ZNlrjueeRzKw=
+X-Received: by 2002:a05:690e:408a:b0:667:770c:f88e with SMTP id
+ 956f58d0204a3-66c72d6ab0dmr9413895d50.45.1786970014189; Mon, 17 Aug 2026
+ 05:33:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260814135144.302443-1-tanze@kylinos.cn> <20260814135144.302443-2-tanze@kylinos.cn>
+In-Reply-To: <20260814135144.302443-2-tanze@kylinos.cn>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 17 Aug 2026 21:33:20 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9xyjfB8SQf_ar0Zd9jEMW-jymGd3xmCj2zHdwGYCGjCQ@mail.gmail.com>
+X-Gm-Features: AcwNN1VU1albs0FT_ezlMfElm8HzB0n8-MOEkWvm2SLL8f_tmtfoSobFJdwAi54
+Message-ID: <CAKYAXd9xyjfB8SQf_ar0Zd9jEMW-jymGd3xmCj2zHdwGYCGjCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] smb/server: warn if ksmbd_proc_create() fails
+To: Ze Tan <tanze@kylinos.cn>
+Cc: smfrench@gmail.com, tom@talpey.com, senozhatsky@chromium.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The temporary RDMA encryption diagnostics logged every SMB3 request
-and successful payload operation with pr_err(), which made normal
-traffic too noisy.
-
-Keep only negotiation, RDMA READ preparation, RDMA WRITE transform
-metadata, crypto completion, and final transfer completion messages as
-KSMBD_DEBUG_RDMA diagnostics. Keep error reports for malformed metadata,
-crypto, RDMA transfer, and file write failures at error level.
-
-This preserves the diagnostics needed to verify RDMA transform
-operation without flooding the kernel error log during normal I/O.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
----
- fs/smb/server/auth.c    | 33 +++++++++++++++---
- fs/smb/server/smb2pdu.c | 75 +++++++++++++++++++++++++++++++++--------
- 2 files changed, 90 insertions(+), 18 deletions(-)
-
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index db362c64af8d..9f3151a9f379 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -911,26 +911,42 @@ int ksmbd_crypt_rdma(struct ksmbd_conn *conn, const u8 *key,
- 	unsigned int iv_len, crypt_len;
- 	u8 auth_tag[SMB2_SIGNATURE_SIZE] = {};
- 	u8 *iv = NULL;
-+	u16 cipher = le16_to_cpu(conn->cipher_type);
- 	int rc;
- 	DECLARE_CRYPTO_WAIT(wait);
- 
--	if (!buflen || !tag_len || tag_len > SMB2_SIGNATURE_SIZE)
-+	if (!buflen || !tag_len || tag_len > SMB2_SIGNATURE_SIZE) {
-+		pr_err("RDMA %s rejected: cipher=0x%04x payload=%u nonce=%u tag=%u\n",
-+		       enc ? "encryption" : "decryption", cipher, buflen,
-+		       nonce_len, tag_len);
- 		return -EINVAL;
-+	}
- 	if (!enc)
- 		memcpy(auth_tag, tag, tag_len);
- 
- 	if (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
- 	    conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) {
--		if (nonce_len != SMB3_AES_GCM_NONCE)
-+		if (nonce_len != SMB3_AES_GCM_NONCE) {
-+			pr_err("RDMA %s rejected: cipher=0x%04x invalid nonce=%u expected=%u\n",
-+			       enc ? "encryption" : "decryption", cipher,
-+			       nonce_len, SMB3_AES_GCM_NONCE);
- 			return -EINVAL;
-+		}
- 		ctx = ksmbd_crypto_ctx_find_gcm();
- 	} else {
--		if (nonce_len != SMB3_AES_CCM_NONCE)
-+		if (nonce_len != SMB3_AES_CCM_NONCE) {
-+			pr_err("RDMA %s rejected: cipher=0x%04x invalid nonce=%u expected=%u\n",
-+			       enc ? "encryption" : "decryption", cipher,
-+			       nonce_len, SMB3_AES_CCM_NONCE);
- 			return -EINVAL;
-+		}
- 		ctx = ksmbd_crypto_ctx_find_ccm();
- 	}
--	if (!ctx)
-+	if (!ctx) {
-+		pr_err("RDMA %s failed: cipher=0x%04x crypto context unavailable\n",
-+		       enc ? "encryption" : "decryption", cipher);
- 		return -ENOMEM;
-+	}
- 
- 	tfm = (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
- 	       conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) ?
-@@ -988,6 +1004,15 @@ int ksmbd_crypt_rdma(struct ksmbd_conn *conn, const u8 *key,
- 	kfree(sg);
- 	aead_request_free(req);
- 	ksmbd_release_crypto_ctx(ctx);
-+	if (rc)
-+		pr_err("RDMA %s failed: cipher=0x%04x payload=%u nonce=%u tag=%u rc=%d\n",
-+		       enc ? "encryption" : "decryption", cipher, buflen,
-+		       nonce_len, tag_len, rc);
-+	else
-+		ksmbd_debug(RDMA,
-+			    "RDMA %s completed: cipher=0x%04x payload=%u nonce=%u tag=%u\n",
-+			    enc ? "encryption" : "decryption", cipher, buflen,
-+			    nonce_len, tag_len);
- 	return rc;
- }
- 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b48eff02dbf8..bd74b45ce0e7 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1904,6 +1904,13 @@ int smb2_handle_negotiate(struct ksmbd_work *work)
- 		if (!conn->cipher_type)
- 			conn->rdma_transform_ids &=
- 				~BIT(SMB2_RDMA_TRANSFORM_ENCRYPTION);
-+		ksmbd_debug(RDMA,
-+			    "RDMA transform negotiation: transport=%s context=%s encryption=%s cipher=0x%04x\n",
-+			    conn->transport->ops->rdma_read ? "rdma" : "tcp",
-+			    conn->rdma_transform_negotiated ? "present" : "absent",
-+			    conn->rdma_transform_ids &
-+			    BIT(SMB2_RDMA_TRANSFORM_ENCRYPTION) ? "enabled" : "disabled",
-+			    le16_to_cpu(conn->cipher_type));
- 
- 		rc = init_smb3_11_server(conn);
- 		if (rc < 0) {
-@@ -8719,15 +8726,14 @@ static int smb2_prep_rdma_read(struct ksmbd_work *work,
- 	u16 transform_type;
- 	int err;
- 
--	if (work->encrypted &&
--	    (conn->rdma_transform_ids & BIT(SMB2_RDMA_TRANSFORM_ENCRYPTION))) {
--		transform_type = SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION;
--		nonce_len = (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
--			     conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) ?
--			SMB3_AES_GCM_NONCE : SMB3_AES_CCM_NONCE;
--	} else {
-+	if (!work->encrypted ||
-+	    !(conn->rdma_transform_ids & BIT(SMB2_RDMA_TRANSFORM_ENCRYPTION)))
- 		return 0;
--	}
-+
-+	transform_type = SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION;
-+	nonce_len = (conn->cipher_type == SMB2_ENCRYPTION_AES128_GCM ||
-+		     conn->cipher_type == SMB2_ENCRYPTION_AES256_GCM) ?
-+		SMB3_AES_GCM_NONCE : SMB3_AES_CCM_NONCE;
- 
- 	transform = (struct smb2_rdma_transform *)rsp->Buffer;
- 	crypto = (struct smb2_rdma_crypto_transform *)(transform + 1);
-@@ -8747,13 +8753,20 @@ static int smb2_prep_rdma_read(struct ksmbd_work *work,
- 			       data, datalen, nonce, nonce_len,
- 			       crypto->Signature,
- 			       SMB2_SIGNATURE_SIZE, true);
--	if (err)
-+	if (err) {
-+		pr_err("RDMA READ encryption failed: session=%llu payload=%u rc=%d\n",
-+		       work->sess->id, datalen, err);
- 		return err;
-+	}
- 
- 	transform_len = sizeof(*transform) + sizeof(*crypto) +
- 		SMB2_SIGNATURE_SIZE + nonce_len;
- 	rsp->Flags = SMB2_READFLAG_RESPONSE_RDMA_TRANSFORM;
- 	rsp->DataLength = cpu_to_le32(transform_len);
-+	ksmbd_debug(RDMA,
-+		    "RDMA READ encryption prepared: session=%llu cipher=0x%04x payload=%u transform=%u nonce=%u tag=%u\n",
-+		    work->sess->id, le16_to_cpu(conn->cipher_type), datalen,
-+		    transform_len, nonce_len, SMB2_SIGNATURE_SIZE);
- 	return transform_len;
- }
- 
-@@ -8830,6 +8843,7 @@ static int smb2_parse_rdma_write_transform(struct ksmbd_work *work,
- 	unsigned int offset = le16_to_cpu(req->WriteChannelInfoOffset);
- 	unsigned int length = le16_to_cpu(req->WriteChannelInfoLength);
- 	unsigned int desc_offset, desc_len, crypto_len, expected_desc_offset;
-+	int err;
- 
- 	if (!work->conn->rdma_transform_ids ||
- 	    offset < offsetof(struct smb2_write_req, Buffer) ||
-@@ -8894,8 +8908,18 @@ static int smb2_parse_rdma_write_transform(struct ksmbd_work *work,
- 	info->crypto = crypto;
- 	info->nonce = crypto->Signature + info->signature_len;
- 	info->channel = transform->Channel;
--	return check_rdma_desc(info->desc, info->desc_len,
--			       le32_to_cpu(req->RemainingBytes));
-+	err = check_rdma_desc(info->desc, info->desc_len,
-+			      le32_to_cpu(req->RemainingBytes));
-+	if (err)
-+		return err;
-+
-+	ksmbd_debug(RDMA,
-+		    "RDMA WRITE encryption metadata: session=%llu cipher=0x%04x payload=%u channel=0x%x descriptors=%zu nonce=%u tag=%u\n",
-+		    work->sess->id, le16_to_cpu(work->conn->cipher_type),
-+		    le32_to_cpu(req->RemainingBytes), le32_to_cpu(info->channel),
-+		    info->desc_len / sizeof(*info->desc), info->nonce_len,
-+		    info->signature_len);
-+	return 0;
- }
- 
- /**
-@@ -9105,6 +9129,15 @@ int smb2_read(struct ksmbd_work *work)
- 		remain_bytes = smb2_read_rdma(work, req,
- 					      aux_payload_buf,
- 					      nbytes);
-+		if (remain_bytes < 0)
-+			pr_err("RDMA READ transfer failed: session=%llu payload=%zu transform=%d rc=%zd\n",
-+			       work->sess ? work->sess->id : 0, nbytes,
-+			       rdma_transform_len, remain_bytes);
-+		else
-+			ksmbd_debug(RDMA,
-+				    "RDMA READ transfer completed: session=%llu payload=%zu transform=%d\n",
-+				    work->sess ? work->sess->id : 0, nbytes,
-+				    rdma_transform_len);
- 		kvfree(aux_payload_buf);
- 		aux_payload_buf = NULL;
- 		nbytes = 0;
-@@ -9269,10 +9302,12 @@ static ssize_t smb2_write_rdma(struct ksmbd_work *work,
- 	ret = ksmbd_conn_rdma_read(work->conn, data_buf, length, desc,
- 				   desc_len);
- 	if (ret < 0) {
-+		if (transform)
-+			pr_err("RDMA WRITE encrypted transfer failed: session=%llu payload=%zu rdma_read_rc=%d\n",
-+			       work->sess->id, length, ret);
- 		kvfree(data_buf);
- 		return ret;
- 	}
--
- 	if (transform &&
- 	    transform->type == SMB2_RDMA_TRANSFORM_TYPE_ENCRYPTION) {
- 		ret = ksmbd_crypt_rdma(work->conn,
-@@ -9282,6 +9317,8 @@ static ssize_t smb2_write_rdma(struct ksmbd_work *work,
- 				       transform->crypto->Signature,
- 				       transform->signature_len, false);
- 		if (ret) {
-+			pr_err("RDMA WRITE decryption failed: session=%llu payload=%zu rc=%d\n",
-+			       work->sess->id, length, ret);
- 			kvfree(data_buf);
- 			return ret == -ENOMEM ? ret : -EBADMSG;
- 		}
-@@ -9289,8 +9326,15 @@ static ssize_t smb2_write_rdma(struct ksmbd_work *work,
- 
- 	ret = ksmbd_vfs_write(work, fp, data_buf, length, &offset, sync, &nbytes);
- 	kvfree(data_buf);
--	if (ret < 0)
-+	if (ret < 0) {
-+		if (transform)
-+			pr_err("RDMA WRITE encrypted file write failed: session=%llu payload=%zu rc=%d\n",
-+			       work->sess->id, length, ret);
- 		return ret;
-+	}
-+	ksmbd_debug(RDMA,
-+		    "RDMA WRITE transfer completed: session=%llu payload=%zu transformed=%u written=%zd\n",
-+		    work->sess ? work->sess->id : 0, length, !!transform, nbytes);
- 
- 	return nbytes;
- }
-@@ -9404,8 +9448,11 @@ int smb2_write(struct ksmbd_work *work)
- 		if (req->Channel == SMB2_CHANNEL_RDMA_TRANSFORM) {
- 			err = smb2_parse_rdma_write_transform(work, req,
- 							      &rdma_transform);
--			if (err)
-+			if (err) {
-+				pr_err("RDMA WRITE encryption metadata rejected: session=%llu rc=%d\n",
-+				       work->sess ? work->sess->id : 0, err);
- 				goto out;
-+			}
- 			rdma_desc = rdma_transform.desc;
- 			rdma_desc_len = rdma_transform.desc_len;
- 			rdma_info = &rdma_transform;
--- 
-2.25.1
-
+On Fri, Aug 14, 2026 at 10:52=E2=80=AFPM Ze Tan <tanze@kylinos.cn> wrote:
+>
+> Print a warning if the sessions procfs entry cannot be created.
+>
+> Signed-off-by: Ze Tan <tanze@kylinos.cn>
+> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Applied 4 patches to #ksmbd-for-next.
+Thanks!
