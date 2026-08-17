@@ -1,38 +1,38 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-229.mta0.migadu.com [91.218.175.229])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BFC5477E
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 08:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B871E3290DB
+	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 09:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786955864; cv=none; b=HK/M4c6/bA3gMZiLlulM4fLBhq4nLYtlsDM+nhvzmSNXyV+VtrZ98aezaztoY0Am7EK0pBX6Um9h1HF6t3d+GJZ8iTNmkVAWHBfEaqLBY7SsF5Dsues/Liz+rVyFYyVF1ZGncz74xfqA1CeDlYxF7NaqWDM0PjI2Cq4BYbufcRs=
+	t=1786957727; cv=none; b=JxVAvsFHIH5cTGSHTaRI23iKDOFz3fE9aXfPGTVVMn/eH39y90+MFCvbu9o6+oLt8NcvY5I9jhmJBR1Jemjhuc4rR5RO1va/IgmVb8fzkYDchVotHtxtW+GvAQlcGJowQnY0fv7J9bIYZxEa3IToaWIoYqvQYf7CaSkPwtVr7MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786955864; c=relaxed/simple;
-	bh=h+WD1VvRr2LXZdc0swp/iHoe5F4ikg60tvKNC/Mwep4=;
+	s=arc-20240116; t=1786957727; c=relaxed/simple;
+	bh=esbCDSLnJSk5ZzDvX+CGnmZ6wNI60+825cnF7d02IYo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W9viedKF4s7fS80ya/qI4vBwQXsXPEBWxmzhAlZb50Qex6NSyUB/doXQHAa+K44i1fsyI41sA65jJxAmLC0FaIxr1aFMwzYQJ3q6du5eFRud5+Ho7XJWS+ZJ2i4YB2GKdor14rqSFFw5oxAD/oAmH0jbPBbMizHwxDuked+i824=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=c7C6NkJe; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	 In-Reply-To:Content-Type; b=ZvH4e5DY57gCfMOj4Ho2pjIuXKsfsdebe87aliPijb4bONCcI1wjl/JtL1armheg5GPq+2Z37zAhSodfdJg+hx8VnvoXM4EOXNivkxbE4lrWvVtjhjd05zL47zRLYIDujDUnqB5dTC5ktri42s7T92tYM+aauIv2bY4Gy+o/yXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=NQ+Mirvb; arc=none smtp.client-ip=91.218.175.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="c7C6NkJe"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=h+WD1VvRr2LXZdc0swp/iHoe5F4ikg60tvKNC/Mwep4=; b=c7C6NkJeZdCTKNy6/+jZON4Xmj
-	8rapssaKQQKMuSdo/BfG9PSNoUCMRjhqEDLLUYeJ0HUrcWKb0u4ZPt8iPNaSENR8mc95egC1EFpcw
-	1Z8WByEyAux6xI+/TiYVgyHXfSyFrGusdl0W/8PSNtTTDLCmmTVMMWI0sX7asbpq83iKy8yv5Au2k
-	cdO5QFrtmM2MtH6HYlF+vINF/7oje4W01bJU/tHoA72UO0LyD0IMvqFRBEzXxk6qIXEs2zefAzzQf
-	/upE9NE4vGieotsXgG1q0VvGUdDSgv7yTtYWtRPPI3CUR8rzIKoMK+4iKhpc/PY2tMwz0G+7y/pb0
-	cH/Zs5gHukR6+hVka1Gd+9cJki95vnv8WUuad0474Gf/GxxlObx5qT2IhWmcOijXIZCbzZRpp2awM
-	nTb+jHXsfk8/Dagiwq9936XXnXkvTQc5/ZZSk0mhyNTrJ0vtJjYma2iBlRkU57wYgA2mhgeaAcJ6v
-	BpyIziTzck8K9/uS2Df4tzh+;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1wvsH8-00000005W3w-2UQ6;
-	Mon, 17 Aug 2026 08:00:54 +0000
-Message-ID: <a30dd591-dd3c-4881-8088-69d2b001c6e3@samba.org>
-Date: Mon, 17 Aug 2026 10:00:53 +0200
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="NQ+Mirvb"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=esbCDSLnJSk5ZzDvX+CGnmZ6wNI60+825cnF7d02IYo=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786957719; v=1; x=1787562519;
+ b=NQ+MirvbvLAUk5o8ZEmqm5y4ZLeZ+i+iDzUaoJ5a8G/Dl8dbMWQDE5xBlrry8nWil9DlUAH5
+ Lvs9Xquuuo1xbyxJgxwZuCDjePfJ8Te77Xc1igi7o3Sm1nOzqmZbTuXDM/899RsnXb3likFazCX
+ vJEqhGUUSIHYfaqF8SklHPP7eo7HjzabNwrm5on3t400HXXOVpgGYd/93pTcUz7NfsvDXMOXooo
+ zqGXZNTb1VGRqImuypUzO+xSsCWdDh1iixdE0py/uDsew6rEf3PaWsI4qiaz/W0P7sYiwPYz+8u
+ TnQlHxgClzAP60fGNYHnhlSUQuUC50pHwZcj7B9PjlYXw==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from [172.21.20.206] (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 5516108e9d7136dc;
+	Mon, 17 Aug 2026 09:08:38 +0000
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <29a25297-2f21-4763-b537-f6a895ce7dfe@chenxiaosong.com>
+Date: Mon, 17 Aug 2026 17:08:36 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -40,264 +40,65 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH samba] smbd: break directory leases before sending
- notify events
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
- linkinjeon@kernel.org, pc@manguebit.org, tom@talpey.com,
- senozhatsky@chromium.org, metze@samba.org
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260810082955.1128900-1-chenxiaosong@chenxiaosong.com>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- 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
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <20260810082955.1128900-1-chenxiaosong@chenxiaosong.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------nk08Gl0otKcr9eYy9tUv1Kia"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------nk08Gl0otKcr9eYy9tUv1Kia
-Content-Type: multipart/mixed; boundary="------------qK3B78z1pGewuVzeQPCStEBs";
- protected-headers="v1"; hp="clear"
-Message-ID: <a30dd591-dd3c-4881-8088-69d2b001c6e3@samba.org>
-Date: Mon, 17 Aug 2026 10:00:53 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH samba] smbd: break directory leases before sending
- notify events
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com,
- linkinjeon@kernel.org, pc@manguebit.org, tom@talpey.com,
- senozhatsky@chromium.org, metze@samba.org
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-References: <20260810082955.1128900-1-chenxiaosong@chenxiaosong.com>
-From: Ralph Boehme <slow@samba.org>
-Content-Language: en-US, de-DE
-Autocrypt: addr=slow@samba.org; keydata=
- xsFNBFRbb/sBEADGFqSo7Ya3S00RsDWC7O4esYxuo+J5PapFMKvFNiYvpNEAoHnoJkzT6bCG
- eZWlARe4Ihmry9XV67v/DUa3qXYihV62jmiTgCyEu1HFGhWGzkk99Vahq/2kVgN4vwz8zep1
- uvTAx4sgouL2Ri4HqeOdGveTQKQY4oOnWpEhXZ2qeCAc3fTHEB1FmRrZJp7A7y0C8/NEXnxT
- vfCZc7jsbanZAAUpQCGve+ilqn3px5Xo+1HZPnmfOrDODGo0qS/eJFnZ3aEy9y906I60fW27
- W+y++xX/8a1w76mi1nRGYQX7e8oAWshijPiM0X8hQNs91EW1TvUjvI7SiELEui0/OX/3cvR8
- kEEAmGlths99W+jigK15KbeWOO3OJdyCfY/Rimse4rJfVe41BdEF3J0z6YzaFQoJORXm0M8y
- O5OxpAZFYuhywfx8eCf4Cgzir7jFOKaDaRaFwlVRIOJwXlvidDuiKBfCcMzVafxn5wTyt/qy
- gcmvaHH/2qerqhfMI09kus0NfudYnbSjtpNcskecwJNEpo8BG9HVgwF9H/hiI9oh2BGBng7f
- bcz9sx2tGtQJpxKoBN91zuH0fWj7HYBX6FLnnD+m4ve2Avrg/H0Mk6pnvuTj5FxW5oqz9Dk1
- 1HDrco3/+4hFVaCJezv8THsyU7MLc8V2WmZGYiaRanbEb2CoSQARAQABzR1SYWxwaCBCw7Zo
- bWUgPHNsb3dAc2FtYmEub3JnPsLBlwQTAQgAQQIbAwULCQgHAwUVCgkICwUWAgMBAAIeAQIX
- gAIZARYhBPrixgiKJCUgUcVZ5Koem3EmOZ5GBQJo+I8JBQkYXvllAAoJEKoem3EmOZ5GdQoP
- /2BPMBZZCddHoXlJu++OPOf9Rk6TuYN3Pntq2LfhPsFEdNHrMCV0KSNY993cQBRFrn6HbvLD
- NazKxDR9U1kSAXoopKyk2M3qpJ6kRvekqriCY04sOZ/iHk75Vmn5bp/Q3/9f3+40ZC4e0hF1
- XNMLyunGtCoxOWfDViax+qemDVwJvamMNx7kQXYe5SMtH7Gpi2DiGAq41g+93xKj/pS9WEo3
- 5+d5zm2KEofaBQU4iecWA3H8U2OIh3kFJeiV4HDfVxkP5INcPNyP+bckpei4Nd3BczKN6I1q
- dAjdn/wmwGAlGpnSjjrYYKFKO3lHbBwm95Lv2rlpzqiBfIizXn656LsG0PQIslO6e5u9wwiR
- JOMlYBPmE/PwUPJkTiBSup8j1hFmyTqXYMzAjxGJ+MBkJ+QYCRSP8uMRvgiLY5+1h/C3dJBh
- lvRUW97qC/g+nji3CRXJRKHrmxmEy1E7u1HCZsrLhGCIKZqTZxdu3vEsFh/pd9XE9OoXlC9y
- x61umA92rIgOYU93/d4emsAIjvtxDmx/h2kuj5D1moFkAyLp2wnKPLJGeyXQc2WSbBJHlc4k
- iDPAFVWj0a8SlTagXtnmIQ+jG6QLvGdIbotpxnfrXTRKOqxDU5Fb9t40zNA4AnRjV/wYtvm7
- ps1qn9AfKACW6GcCX1jkLJQtLNXfi0WBIXixzsFNBFRbb/sBEADCSnUsQShBPcAPJQH9DMQN
- nCO3tUZ32mx32S/WD5ykiVpeIxpEa2X/QpS8d5c8OUh5ALB4uTUgrQqczXhWUwGHPAV2PW0s
- /S4NUXsCs/Mdry2ANNk/mfSMtQMr6j2ptg/Mb79FZAqSeNbS81KcfsWPwhALgeImYUw3JoyY
- g1KWgROltG+LC32vnDDTotcU8yekg4bKZ3lekVODxk0doZl8mFvDTAiHFK9O5Y1azeJaSMFk
- NE/BNHsI/deDzGkiV9HhRwge7/e4l4uJI0dPtLpGNELPq7fty97OvjxUc9dRfQDQ9CUBzovg
- 3rprpuxVNRktSpKAdaZzbTPLj8IcyKoFLQ+MqdaI7oak2Wr5dTCXldbByB0i4UweEyFs32WP
- NkJoGWq2P8zH9aKmc2wE7CHz7RyR7hE9m7NeGrUyqNKA8QpCEhoXHZvaJ6ko2aaTu1ej8KCs
- yR5xVsvRk90YzKiy+QAQKMg5JuJe92r7/uoRP/xT8yHDrgXLd2cDjeNeR5RLYi1/IrnqXuDi
- UPCs9/E7iTNyh3P0wh43jby8pJEUC5I3w200Do5cdQ4VGad7XeQBc3pEUmFc6FgwF7SVakJZ
- TvxkeL5FcE1On82rJqK6eSOIkV45pxTMvEuNyX8gs01A4BuReF06obg40o5P7bovlsog6NqZ
- oD+JDJWM0kdYZQARAQABwsGQBBgBCAAmAhsMFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmj4
- jwkFCRhe+WUAHgkQqh6bcSY5nkYJEKoem3EmOZ5GCRCqHptxJjmeRq7xEADDqdSBTnLC68Vr
- tq6Qum4LjdXmfsZjVr/JSgUCe89jrOaofycpddHBMP9ORk1UzPLJSZbO5N7gvwJTDK+ZBxtB
- 9yP5DtIhgzJZamb6m8h3cthyn/8RG3h+Fk5pXq6wtH12ZerHJ8XVNd0CCH2GxF8oVB3csGWh
- nrBt8maGYk7x0/wZK2ErylsohEiSCAA9aPJyhM5kafnk/6ov5bbc5bxqbnaI+jpwzZXeGT/v
- ACyWKv6cAmWepuexlQVsH/s9JchzVgasD7YWwGHszZwyMqLZi7XeOTz0pg0JKFGLlfsNYSpc
- LVhBztTc9vg5Uf/lFhObHkhXv/7ootSNOtll98/2Bk1qLW9rKQsnc5IR01AuNGCJNDuaBNfX
- IHd7AHUW6xUVUWOCBtyMCCyOdbOiDFlMzF8GvR4kCUuRh66CUvl+EYCUOnwr551f6rq4sJga
- Wqn2Ta8+lozMNjMkqri6QV7fyJQCryCv2/cI0q5IVUTPIzB0xfFCkgOX4vz8Te7ou7bkS5L2
- PgCGx2XZ0ICO1zdh1OafQXZcI0ZKA/+ZmMt7rFcf8cdjwJ3qRKtScUYhxq2N9wL3fQJNQPvK
- TXc80T2QVqV/yS3gZ4UmqYaBcMIoAyQWu8vbJnt6vCnf33g5sko3H8vbfpFW2TgesM6tyK1W
- rb9LanmjmJltdkLDwbd58Q==
-In-Reply-To: <20260810082955.1128900-1-chenxiaosong@chenxiaosong.com>
-
---------------qK3B78z1pGewuVzeQPCStEBs
+Subject: Re: [PATCH v2 2/2] ksmbd: add KUnit tests for the DACL declared-size
+ boundary
+To: Hang Nan <2122295973@qq.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Steve French <smfrench@gmail.com>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <8970140c-1de1-4989-b32c-ea485be00b79@chenxiaosong.com>
+ <20260812103945.82495-1-2122295973@qq.com>
+ <tencent_A5CB0E2E28ECF588B59EF49004BE80D22B09@qq.com>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <tencent_A5CB0E2E28ECF588B59EF49004BE80D22B09@qq.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 
-SGkhDQoNClRoYW5rcyBmb3IgbG9va2luZyBpbnRvIHRoaXMgYW5kIHRyeWluZyB0byBhZGRy
-ZXNzIHRoZSBpc3N1ZSENCg0KVW5mb3J0dW5hdGVseSwgaWlyYyBpdCB3b24ndCBiZSBhcyBz
-aW1wbGUgZHVlIHRvIHRoZSB3YXkgU2FtYmEgDQppbnRlcm5hbGx5IGludGVncmF0ZXMgaW5v
-dGlmeSB3aXRoIGNoYW5nZXMgY29taW5nIGluIG92ZXIgU01CLiBJIGhhdmUgDQp0aGlzIHNp
-dHRpbmcgb24gbXkgdG9kbyBsaXN0IGZvciB0aGUgbmV4dCBtb250aHMsIHRoZSBwbGFuIGlz
-IGFkZCBhIG5ldyANCmNoYW5nZS1ub3RpZnkgYmFja2VuZCBiYXNlZCBvbiBmYW5vdGlmeSwg
-d2hlcmUsIGluIGNvbnRyYXN0IHRvIGlub3RpZnksIA0KY2hhbmdlIG5vdGlmaWNhdGlvbnMg
-Y29udGFpbiB0aGUgcGlkIG9mIHRoZSB0cmlnZ2VyaW5nIHByb2Nlc3MuIFdlIG5lZWQgDQp0
-aGF0IGluZm9ybWF0aW9uIGFzIGEgZGlmZmVyZW50aWF0b3IgaW4gbm90aWZ5ZCB0byBjb3Jy
-ZWN0bHkgZHJpdmUgdGhlIA0KbWFjaGluZXJ5Lg0KDQpBcyBhbiBleGFtcGxlLCBpaXJjIHdp
-dGgganVzdCB5b3VyIHBhdGNoLCB3ZSB3b3VsZCBicmVhayB0aGUgZGlybGVhc2UgDQpmb3Ig
-Y2hhbmdlcyBkb25lIGJ5IHRoZSBjbGllbnQgb3duaW5nIGl0IGFuZCB0aGUgY2hhbmdlIGNv
-cnJlY3RseSANCnJlZmVyZW5jaW5nIGl0IHZpYSB0aGUgcGFyZW50IGRpcmxlYXNlIGtleSBp
-biB0aGUgaGFuZGxlIHRyaWdnZXJpbmcgdGhlIA0KY2hhbmdlLg0KDQpUaGFua3MhDQotc2xv
-dw0KDQpPbiA4LzEwLzI2IDEwOjI5IEFNLCBDaGVuWGlhb1Nvbmcgd3JvdGU6DQo+IEZyb206
-IENoZW5YaWFvU29uZyA8Y2hlbnhpYW9zb25nQGt5bGlub3MuY24+DQo+IA0KPiBSZXByb2R1
-Y2VyOg0KPiANCj4gICAgMS4gc2FtYmE6IGBzbWIuY29uZmA6DQo+ICAgICAgIFtnbG9iYWxd
-DQo+ICAgICAgICAgICBzbWIzIGRpcmVjdG9yeSBsZWFzZXMgPSB5ZXMNCj4gICAgMi4gc2Ft
-YmE6DQo+ICAgICAgIHN5c3RlbWN0bCBzdGFydCBzbWIgIyBmZWRvcmENCj4gICAgMy4gV2lu
-ZG93cyAxMSBGaWxlIEV4cGxvcmVyOg0KPiAgICAgICBNb3VudCB0aGUgc2hhcmUgYW5kIGVu
-dGVyIHRoZSB0b3AtbGV2ZWwgZGlyZWN0b3J5IG9mIHRoZSBtb3VudCBwb2ludC4NCj4gICAg
-NC4gc2FtYmE6IHRvdWNoIC9leHBvcnQvZmlsZQ0KPiAgICA1LiBXaW5kb3dzIDExIEZpbGUg
-RXhwbG9yZXI6DQo+ICAgICAgIGBmaWxlYCBkb2VzIG5vdCBhcHBlYXIgaW4gdGhlIHRvcC1s
-ZXZlbCBkaXJlY3Rvcnkgb2YgdGhlIG1vdW50IHBvaW50Lg0KPiANCj4gV2luZG93cyBjYW4g
-a2VlcCBkaXJlY3RvcnkgZGF0YSBpbiBhIGNhY2hlIHdoaWxlIGl0IGhhcyBhIGRpcmVjdG9y
-eQ0KPiBsZWFzZS4gQSBmaWxlIGNoYW5nZSBtYWRlIG9uIHRoZSBzZXJ2ZXIgZG9lcyBub3Qg
-dXNlIHRoZSBTTUIgcmVxdWVzdA0KPiBwYXRoLCBzbyB0aGUgbGVhc2UgaXMgbm90IGJyb2tl
-bi4NCj4gDQo+IFRoZSBzZXJ2ZXIgc2VuZHMgYSBub3RpZnkgZXZlbnQsIGJ1dCBXaW5kb3dz
-IG1heSBzdGlsbCB1c2UgdGhlIG9sZCBkYXRhLg0KPiBTb21lIG5ldyBmaWxlcyBhcmUgdGhl
-biBub3Qgc2hvd24gaW4gRmlsZSBFeHBsb3Jlci4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IENo
-ZW5YaWFvU29uZyA8Y2hlbnhpYW9zb25nQGt5bGlub3MuY24+DQo+IC0tLQ0KPiAgIHNvdXJj
-ZTMvc21iZC9ub3RpZnkuYyAgICAgICAgICAgfCAgNyArKysrKystDQo+ICAgc291cmNlMy9z
-bWJkL25vdGlmeWQvZmNuX3dhaXQuYyB8ICAyICstDQo+ICAgc291cmNlMy9zbWJkL25vdGlm
-eWQvbm90aWZ5ZC5jICB8ICAyICstDQo+ICAgc291cmNlMy9zbWJkL3Byb3RvLmggICAgICAg
-ICAgICB8ICAxICsNCj4gICBzb3VyY2UzL3NtYmQvc21iMl9vcGxvY2suYyAgICAgIHwgMzcg
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgNSBmaWxlcyBjaGFuZ2Vk
-LCA0NiBpbnNlcnRpb25zKCspLCAzIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBh
-L3NvdXJjZTMvc21iZC9ub3RpZnkuYyBiL3NvdXJjZTMvc21iZC9ub3RpZnkuYw0KPiBpbmRl
-eCA1OTcwYTdhOTIyMC4uMjRkY2VkYjlkYmEgMTAwNjQ0DQo+IC0tLSBhL3NvdXJjZTMvc21i
-ZC9ub3RpZnkuYw0KPiArKysgYi9zb3VyY2UzL3NtYmQvbm90aWZ5LmMNCj4gQEAgLTI2Miwx
-MCArMjYyLDE1IEBAIHN0YXRpYyBzdHJ1Y3QgZmlsZXNfc3RydWN0ICpub3RpZnlfZnNwX2Ni
-KHN0cnVjdCBmaWxlc19zdHJ1Y3QgKmZzcCwNCj4gICAJCQkJCSAgdm9pZCAqcHJpdmF0ZV9k
-YXRhKQ0KPiAgIHsNCj4gICAJc3RydWN0IG5vdGlmeV9mc3Bfc3RhdGUgKnN0YXRlID0gcHJp
-dmF0ZV9kYXRhOw0KPiArCXVpbnQzMl90IGFjdGlvbiA9IHN0YXRlLT5lLT5hY3Rpb247DQo+
-ICAgDQo+ICAgCWlmIChmc3AgPT0gc3RhdGUtPm5vdGlmaWVkX2ZzcCkgew0KPiAgIAkJREJH
-X0RFQlVHKCJub3RpZnlfY2FsbGJhY2sgY2FsbGVkIGZvciAlc1xuIiwgZnNwX3N0cl9kYmco
-ZnNwKSk7DQo+IC0JCW5vdGlmeV9mc3AoZnNwLCBzdGF0ZS0+d2hlbiwgc3RhdGUtPmUtPmFj
-dGlvbiwgc3RhdGUtPmUtPnBhdGgpOw0KPiArCQlpZiAoYWN0aW9uICYgTk9USUZZX0FDVElP
-Tl9ESVJMRUFTRV9CUkVBSykgew0KPiArCQkJY29udGVuZF9kaXJsZWFzZXNfYnlfZnNwKGZz
-cCk7DQo+ICsJCQlhY3Rpb24gJj0gfk5PVElGWV9BQ1RJT05fRElSTEVBU0VfQlJFQUs7DQo+
-ICsJCX0NCj4gKwkJbm90aWZ5X2ZzcChmc3AsIHN0YXRlLT53aGVuLCBhY3Rpb24sIHN0YXRl
-LT5lLT5wYXRoKTsNCj4gICAJCXJldHVybiBmc3A7DQo+ICAgCX0NCj4gICANCj4gZGlmZiAt
-LWdpdCBhL3NvdXJjZTMvc21iZC9ub3RpZnlkL2Zjbl93YWl0LmMgYi9zb3VyY2UzL3NtYmQv
-bm90aWZ5ZC9mY25fd2FpdC5jDQo+IGluZGV4IGUzMjI0MGQ5MTFhLi42YjViNmU2NmQ0MyAx
-MDA2NDQNCj4gLS0tIGEvc291cmNlMy9zbWJkL25vdGlmeWQvZmNuX3dhaXQuYw0KPiArKysg
-Yi9zb3VyY2UzL3NtYmQvbm90aWZ5ZC9mY25fd2FpdC5jDQo+IEBAIC0yNTYsNyArMjU2LDcg
-QEAgTlRTVEFUVVMgZmNuX3dhaXRfcmVjdigNCj4gICAJCSp3aGVuID0gZXZ0LT5tc2cud2hl
-bjsNCj4gICAJfQ0KPiAgIAlpZiAoYWN0aW9uICE9IE5VTEwpIHsNCj4gLQkJKmFjdGlvbiA9
-IGV2dC0+bXNnLmFjdGlvbjsNCj4gKwkJKmFjdGlvbiA9IGV2dC0+bXNnLmFjdGlvbiAmIH5O
-T1RJRllfQUNUSU9OX0RJUkxFQVNFX0JSRUFLOw0KPiAgIAl9DQo+ICAgDQo+ICAgCURMSVNU
-X1JFTU9WRShzdGF0ZS0+ZXZlbnRzLCBldnQpOw0KPiBkaWZmIC0tZ2l0IGEvc291cmNlMy9z
-bWJkL25vdGlmeWQvbm90aWZ5ZC5jIGIvc291cmNlMy9zbWJkL25vdGlmeWQvbm90aWZ5ZC5j
-DQo+IGluZGV4IDBiMDdhYjNlNDM1Li5hNDJhN2E5MTYyZSAxMDA2NDQNCj4gLS0tIGEvc291
-cmNlMy9zbWJkL25vdGlmeWQvbm90aWZ5ZC5jDQo+ICsrKyBiL3NvdXJjZTMvc21iZC9ub3Rp
-ZnlkL25vdGlmeWQuYw0KPiBAQCAtNTc5LDcgKzU3OSw3IEBAIHN0YXRpYyB2b2lkIG5vdGlm
-eWRfc3lzX2NhbGxiYWNrKHN0cnVjdCBzeXNfbm90aWZ5X2NvbnRleHQgKmN0eCwNCj4gICAN
-Cj4gICAJbXNnID0gKHN0cnVjdCBub3RpZnlfdHJpZ2dlcl9tc2cpIHsNCj4gICAJCS53aGVu
-ID0gdGltZXNwZWNfY3VycmVudCgpLA0KPiAtCQkuYWN0aW9uID0gZXYtPmFjdGlvbiwNCj4g
-KwkJLmFjdGlvbiA9IGV2LT5hY3Rpb24gfCBOT1RJRllfQUNUSU9OX0RJUkxFQVNFX0JSRUFL
-LA0KPiAgIAkJLmZpbHRlciA9IGZpbHRlciwNCj4gICAJfTsNCj4gICANCj4gZGlmZiAtLWdp
-dCBhL3NvdXJjZTMvc21iZC9wcm90by5oIGIvc291cmNlMy9zbWJkL3Byb3RvLmgNCj4gaW5k
-ZXggN2NlZDNhM2ZmZDUuLjAxMjAzOWM3YTVmIDEwMDY0NA0KPiAtLS0gYS9zb3VyY2UzL3Nt
-YmQvcHJvdG8uaA0KPiArKysgYi9zb3VyY2UzL3NtYmQvcHJvdG8uaA0KPiBAQCAtNzMwLDYg
-KzczMCw3IEBAIHZvaWQgc21iZF9jb250ZW5kX2xldmVsMl9vcGxvY2tzX2VuZChmaWxlc19z
-dHJ1Y3QgKmZzcCwNCj4gICB2b2lkIGNvbnRlbmRfZGlybGVhc2VzKHN0cnVjdCBjb25uZWN0
-aW9uX3N0cnVjdCAqY29ubiwNCj4gICAJCSAgICAgICBjb25zdCBzdHJ1Y3Qgc21iX2ZpbGVu
-YW1lICpzbWJfZm5hbWUsDQo+ICAgCQkgICAgICAgY29uc3Qgc3RydWN0IHNtYjJfbGVhc2Ug
-KmxlYXNlKTsNCj4gK3ZvaWQgY29udGVuZF9kaXJsZWFzZXNfYnlfZnNwKHN0cnVjdCBmaWxl
-c19zdHJ1Y3QgKmZzcCk7DQo+ICAgYm9vbCBpbml0X29wbG9ja3Moc3RydWN0IHNtYmRfc2Vy
-dmVyX2Nvbm5lY3Rpb24gKnNjb25uKTsNCj4gICB2b2lkIGluaXRfa2VybmVsX29wbG9ja3Mo
-c3RydWN0IHNtYmRfc2VydmVyX2Nvbm5lY3Rpb24gKnNjb25uKTsNCj4gICANCj4gZGlmZiAt
-LWdpdCBhL3NvdXJjZTMvc21iZC9zbWIyX29wbG9jay5jIGIvc291cmNlMy9zbWJkL3NtYjJf
-b3Bsb2NrLmMNCj4gaW5kZXggMjQ4OTA5MGFmNTUuLjRkZTMzODg5ZWZmIDEwMDY0NA0KPiAt
-LS0gYS9zb3VyY2UzL3NtYmQvc21iMl9vcGxvY2suYw0KPiArKysgYi9zb3VyY2UzL3NtYmQv
-c21iMl9vcGxvY2suYw0KPiBAQCAtMTM5OCw2ICsxMzk4LDQzIEBAIHZvaWQgY29udGVuZF9k
-aXJsZWFzZXMoc3RydWN0IGNvbm5lY3Rpb25fc3RydWN0ICpjb25uLA0KPiAgIAlUQUxMT0Nf
-RlJFRShsY2spOw0KPiAgIH0NCj4gICANCj4gK3ZvaWQgY29udGVuZF9kaXJsZWFzZXNfYnlf
-ZnNwKHN0cnVjdCBmaWxlc19zdHJ1Y3QgKmZzcCkNCj4gK3sNCj4gKwlzdHJ1Y3QgZGlybGVh
-c2VfYnJlYWtfc3RhdGUgc3RhdGUgPSB7DQo+ICsJCS5zY29ubiA9IGZzcC0+Y29ubi0+c2Nv
-bm4sDQo+ICsJCS5maWxlX2lkID0gZnNwLT5maWxlX2lkLA0KPiArCX07DQo+ICsJc3RydWN0
-IHNoYXJlX21vZGVfbG9jayAqbGNrID0gTlVMTDsNCj4gKwl1aW50MzJfdCBhY2Nlc3NfbWFz
-aywgc2hhcmVfbW9kZTsNCj4gKwlib29sIG9rOw0KPiArDQo+ICsJaWYgKCFscF9zbWIzX2Rp
-cmVjdG9yeV9sZWFzZXMoKSB8fCAhZnNwLT5mc3BfZmxhZ3MuaXNfZGlyZWN0b3J5KSB7DQo+
-ICsJCXJldHVybjsNCj4gKwl9DQo+ICsNCj4gKwlsY2sgPSBnZXRfZXhpc3Rpbmdfc2hhcmVf
-bW9kZV9sb2NrKHRhbGxvY190b3MoKSwgc3RhdGUuZmlsZV9pZCk7DQo+ICsJaWYgKGxjayA9
-PSBOVUxMKSB7DQo+ICsJCXJldHVybjsNCj4gKwl9DQo+ICsNCj4gKwlvayA9IHNoYXJlX21v
-ZGVfZm9yYWxsX2xlYXNlcyhsY2ssIGRvX2RpcmxlYXNlX2JyZWFrX3RvX25vbmUsICZzdGF0
-ZSk7DQo+ICsJaWYgKCFvaykgew0KPiArCQlEQkdfV0FSTklORygic2hhcmVfbW9kZV9mb3Jh
-bGxfbGVhc2VzIGZhaWxlZFxuIik7DQo+ICsJfQ0KPiArDQo+ICsJc2hhcmVfbW9kZV9mbGFn
-c19nZXQobGNrLA0KPiArCQkJICAgICAmYWNjZXNzX21hc2ssDQo+ICsJCQkgICAgICZzaGFy
-ZV9tb2RlLA0KPiArCQkJICAgICBOVUxMKTsNCj4gKwlzaGFyZV9tb2RlX2ZsYWdzX3NldChs
-Y2ssDQo+ICsJCQkgICAgIGFjY2Vzc19tYXNrLA0KPiArCQkJICAgICBzaGFyZV9tb2RlLA0K
-PiArCQkJICAgICBzdGF0ZS50b3RhbF9sZWFzZV90eXBlcywNCj4gKwkJCSAgICAgTlVMTCk7
-DQo+ICsNCj4gKwlUQUxMT0NfRlJFRShsY2spOw0KPiArfQ0KPiArDQo+ICAgLyoqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioNCj4gICAgVGhpcyBmdW5jdGlvbiBpcyBjYWxsZWQgb24gYW55IGZp
-bGUgbW9kaWZpY2F0aW9uIG9yIGxvY2sgcmVxdWVzdC4gSWYgYSBmaWxlDQo+ICAgIGlzIGxl
-dmVsIDIgb3Bsb2NrZWQgdGhlbiBpdCBtdXN0IHRlbGwgYWxsIG90aGVyIGxldmVsIDIgaG9s
-ZGVycyB0byBicmVhayB0bw0KDQo=
+On 8/12/26 18:39, Hang Nan wrote:
+> diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
+> index 08d8b7a965a6..05d16052b9a7 100644
+> --- a/fs/smb/server/Kconfig
+> +++ b/fs/smb/server/Kconfig
+> @@ -72,3 +72,16 @@ config SMB_SERVER_KERBEROS5
+>   	bool "Support for Kerberos 5"
+>   	depends on SMB_SERVER
+>   	default y
+> +
+> +config SMB_SERVER_KUNIT_TEST
+> +	tristate "KUnit tests for SMB3 server helpers" if !KUNIT_ALL_TESTS
+> +	depends on SMB_SERVER && KUNIT && SHMEM
 
---------------qK3B78z1pGewuVzeQPCStEBs--
 
---------------nk08Gl0otKcr9eYy9tUv1Kia
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+depends on SMB_SERVER && SMB_KUNIT_TESTS && TMPFS_XATTR
 
------BEGIN PGP SIGNATURE-----
+depends on TMPFS_XATTR because it calls ksmbd_vfs_set_sd_xattr().
 
-wsF5BAABCAAjFiEE+uLGCIokJSBRxVnkqh6bcSY5nkYFAmqCv7UFAwAAAAAACgkQqh6bcSY5nkYS
-1w//cD2XaDfyyYMuY7O+EdDMOT9kCG6KSfxyOBwHy4U+PzjbcsAtpj7fqVj0bSUzGiNmxsoY8CnK
-sxT48yl6bqnV492GOangltcVtB355MtU1MUxuY4JLEoUJ6W8RYtX+aPz/7DY4KnKd/wrfJnVKW8U
-CyAxZ3J7ayKga9qmXfXlDQftArna1WZlF9nHkLr9Q85iVgFs20s25yIQqnCWxfEPhxGQ3DVQJ7dD
-SgTT8LB9PlhYQ6c62Tykc57Ryh9r3CfVgyMXd1XCJYJZT+1IOJWQybdUD0IVLY/Jztfkc+3kLXHP
-ZUDclnYCg2rchvnHDYbthnM4Bucu8MdStDdIVRBihUWcKZdRFaJODOhlU1hTn9caQYqMu8vUVEQ5
-8tJL+7oArGbLsogT48bpj9+wPT2FWjNV2k3u5ox+SSim2WFs3+cn9TgZjZfV1Ro7iRch5c4bm5fw
-ohlGxHA+A+e6Ohw/+Czs2SzAg621ChZE54vibM5pH5ZuPe+hIuTcFOS4lVzqEVcC3FR0Ur3byzV+
-Z3qULOCGLNICtw8mwRkhR7HkplXVeJVEfHgEsIMApo42eWHvSitr2+FCzmfqGyal4tuoreGL67u4
-Qbnhv4uE7mGqugFIb0PADRRYv2Zia0m/im4RfPZCTmbBMwBWqq60a2fpKLy0j/n2O2iKVyBx7TtA
-PUg=
-=z9wx
------END PGP SIGNATURE-----
 
---------------nk08Gl0otKcr9eYy9tUv1Kia--
+> --- a/fs/smb/server/Makefile
+> +++ b/fs/smb/server/Makefile
+> @@ -19,3 +19,4 @@ $(obj)/ksmbd_spnego_negtokentarg.asn1.o: $(obj)/ksmbd_spnego_negtokentarg.asn1.c
+>   
+>   ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += transport_rdma.o
+>   ksmbd-$(CONFIG_PROC_FS) += proc.o
+> +ksmbd-$(CONFIG_SMB_SERVER_KUNIT_TEST) += smbacl_kunit_test.o
+
+
+obj-$(CONFIG_SMB_SERVER_KUNIT_TEST) += smbacl_kunit_test.o
+
+The kunit tests should be built as a separate .ko instead of being 
+linked into ksmbd.ko.
+
+
+> +static struct kunit_case ksmbd_smbacl_test_cases[] = {
+> +	KUNIT_CASE(ksmbd_dacl_walk_must_stop_at_declared_size),
+> +	KUNIT_CASE(ksmbd_smb_check_perm_dacl_boundary_test),
+
+
+We can also add a maximal-access variant of the smb_check_perm_dacl() 
+boundary test.
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
