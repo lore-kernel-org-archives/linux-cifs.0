@@ -1,36 +1,38 @@
-Received: from mta1.migadu.com (out-216.mta1.migadu.com [95.215.58.216])
+Received: from mta0.migadu.com (out-228.mta0.migadu.com [91.218.175.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01AC3B0AC3
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 06:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83C243BED42
+	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 08:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786949850; cv=none; b=oD9cj3aDPuRHIXbnpuzOnqz8IMqg5vQLwft2eY0gbxWqpJ8cgE5myR8O49nnDGTzAHSFA0B6JFkCAx+wt8v1WddJiiHNQUGsXRNOf7rMGNcs2vxKp5a44fQjwDC4Fs9wW+b+u3yYjs7U5wP0E9v0gMyGg12F22/ngl8XExxHfS8=
+	t=1786954342; cv=none; b=COrdNBcI5Ir/R6pazTg9YBIbSScH9k0Z+LXo5dMKqLQ+Fq8cHGxOiBVj4PQr/MSu3PvgkxGfV6CGLDkC7RTIJa1AmDmL0iP2ZnK1oUnxflGohkb+d6x9r/bbskXVPHUTv395wJyFJY2HnGnXqGcph2WJf/igF/g5XkQKU/ID9EI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786949850; c=relaxed/simple;
-	bh=LK7RKGnAzv19r27+Kf11yJLc+T/qWqLONAO2FvuGMzs=;
+	s=arc-20240116; t=1786954342; c=relaxed/simple;
+	bh=LLGSTNuZh8PMtRSRhEsuh+6u/nKVjFN1a/funpwowSc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W9x6PdYg9OT5LmERzNvLp3ImdQRMuo7OT6XTKm5JdnboxYUTXC8akvPzDRG8ezzsd4UF+vjY4CtMqQQHlzTWy0MArdKhzbmUghc/K8nYI0zX3oiZ4eI7Mx6zyadLvy1jsjQ9QrutVx5yhTi1B/lEJcl8n7vr7Q5Ttajtw6k7QMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PiZR7YT7; arc=none smtp.client-ip=95.215.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	 In-Reply-To:Content-Type; b=D3A3dIZwLBFjiBO7uQcFkQmw1T0TU1dZCn3hMPanxSFwL/s6l9q/fg3eyRCjriaPLreGx+KvXdoB08wxfi48fLTT2b6VpJRgd52KsKmJ9gcCeuQ/o5GpeermmeiiMidXkynS3tejz+uX513oL1V4UIRcAQSrNob4c2HBye6LLZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=PeRBzG7+; arc=none smtp.client-ip=91.218.175.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PiZR7YT7"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="PeRBzG7+"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=LK7RKGnAzv19r27+Kf11yJLc+T/qWqLONAO2FvuGMzs=;
- c=simple/simple; d=linux.dev;
+DKIM-Signature: a=rsa-sha256; bh=LLGSTNuZh8PMtRSRhEsuh+6u/nKVjFN1a/funpwowSc=;
+ c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1786949846; v=1; x=1787554646;
- b=PiZR7YT7cSagzFoLY41Sm4BBmiV0JxOQdBe54XvGt+lTQc1rS8Psgw+uKFURXeWblH5Naely
- zgRRKn1VAfoGw1LHnk+ktySOCrgNwcJBgBBk8BU4HH4ukhpOJ6K76zKSjtfa3RkMkxNdb+i+ZxB
- ewNgWSLrHQUmt65Wbe16TpJY=
+ t=1786954334; v=1; x=1787559134;
+ b=PeRBzG7+svcJnvTPYIGNE2FTEDd92qQ+uvTMdbRof3E0vTBcuzoyPBpUA8kV/dj/xGpCoRqo
+ LF29nnydVQP0EUJa0/wat6JUbvwrTKDIg1RdxWoNCZGIlnHyhY67lwOJBOyi1ULqKl1RDEPZS65
+ SU3ADdb8KiYAT8RXaIHQihB3B4eoL4/H1gr4nKtuMFV28dWbUtkq19mD8sX5CJhg2nGRtnxz7Ur
+ rLd1XHoFtKCw0knmDXnt9ctW9JMpsC31/b1SF+yHVMuHAHCHwClKA2Pu1IDIv7LTf37EkEvIQfY
+ rChdGzaiy6OikRz6tutE8u/UpQRzQbtGa8oVkNzwyx29A==
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: from [192.168.3.165] (116.128.244.171)
-	by smtp.migadu.com with ESMTPS id 112c9aa3c9f409b1;
-	Mon, 17 Aug 2026 06:57:26 +0000
+Received: from [172.21.20.206] (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 6a2fb4d233c3b3f1;
+	Mon, 17 Aug 2026 08:12:04 +0000
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <782ba8b3-336b-459f-8a39-808c1fde9f06@linux.dev>
-Date: Mon, 17 Aug 2026 14:57:21 +0800
+Message-ID: <966e202f-ebaf-4073-8216-094d63eeb3fe@chenxiaosong.com>
+Date: Mon, 17 Aug 2026 16:11:56 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -38,64 +40,45 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb/client: remove redundant NULL check before kfree()
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
- sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
- senozhatsky@chromium.org, dhowells@redhat.com, chenxiaosong@kylinos.cn,
- linux-cifs@vger.kernel.org, lkp@intel.com
-References: <20260816153922.484091-1-huiwen.he@linux.dev>
- <CAKYAXd_N3i0jvBn0Nw3-K+U1yS528-ynh0PVETrGuLDnGsZV_g@mail.gmail.com>
+Subject: Re: [RFC PATCH samba] smbd: break directory leases before sending
+ notify events
+To: Ralph Boehme <slow@samba.org>, smfrench@gmail.com, linkinjeon@kernel.org,
+ pc@manguebit.org, tom@talpey.com, senozhatsky@chromium.org, metze@samba.org
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260810082955.1128900-1-chenxiaosong@chenxiaosong.com>
+ <a30dd591-dd3c-4881-8088-69d2b001c6e3@samba.org>
 Content-Language: en-US
-From: hehuiwen <huiwen.he@linux.dev>
-In-Reply-To: <CAKYAXd_N3i0jvBn0Nw3-K+U1yS528-ynh0PVETrGuLDnGsZV_g@mail.gmail.com>
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <a30dd591-dd3c-4881-8088-69d2b001c6e3@samba.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hi Namjae,
+I look forward to your better solution. Please CC me when you send it, 
+and if you want, you can also add:
 
-I copied the Fixes, Reported-by, and Closes tags from the kernel test
-robot report when sending the patch.
+   Reported-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-> head:   3eb40771c00a8488fa6ed2cc1fe203477908bf38
-> commit: 5693347de107a26f68d1f43b25ff2e348c7229a9 smb/client: use writable handle for FS_IOC_SETFLAGS compression
-> date:   9 weeks ago
-> config: powerpc-randconfig-r053-20260812 (https://download.01.org/0day-ci/archive/20260816/202608160402.0ffQDoCg-lkp@intel.com/config)
-> compiler: clang version 24.0.0git (https://github.com/llvm/llvm-project 12df34b8469b8095359de8c249cb1b2753fadeea)
+On 8/17/26 16:00, Ralph Boehme wrote:
+> Hi!
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Fixes: 5693347de107 ("smb/client: use writable handle for FS_IOC_SETFLAGS compression")
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202608160402.0ffQDoCg-lkp@intel.com/
+> Thanks for looking into this and trying to address the issue!
 > 
-> cocci warnings: (new ones prefixed by >>)
->>> fs/smb/client/ioctl.c:135:2-7: WARNING: NULL check before some freeing functions is not needed.
+> Unfortunately, iirc it won't be as simple due to the way Samba 
+> internally integrates inotify with changes coming in over SMB. I have 
+> this sitting on my todo list for the next months, the plan is add a new 
+> change-notify backend based on fanotify, where, in contrast to inotify, 
+> change notifications contain the pid of the triggering process. We need 
+> that information as a differentiator in notifyd to correctly drive the 
+> machinery.
+> 
+> As an example, iirc with just your patch, we would break the dirlease 
+> for changes done by the client owning it and the change correctly 
+> referencing it via the parent dirlease key in the handle triggering the 
+> change.
 
-But chenxiaosong suggested that the Fixes tag may not be necessary 
-because this is only a Coccinelle cleanup with no functional change. I
-am not sure which convention is preferred here, so please feel free to
-drop the Fixes tag when applying the patch.
-
-Thanks,
-Huiwen
-
-
-在 2026/8/17 14:42, Namjae Jeon 写道:
-> On Mon, Aug 17, 2026 at 12:40 AM Huiwen He <huiwen.he@linux.dev> wrote:
->>
->> From: Huiwen He <hehuiwen@kylinos.cn>
->>
->> kfree() accepts NULL pointers, so checking tmp_cfile before freeing it
->> is unnecessary and triggers a Coccinelle warning.
->>
->> Remove the redundant check. This does not change runtime behavior.
->>
->> Fixes: 5693347de107 ("smb/client: use writable handle for FS_IOC_SETFLAGS compression")
->> Reported-by: kernel test robot <lkp@intel.com>
->> Closes: https://lore.kernel.org/oe-kbuild-all/202608160402.0ffQDoCg-lkp@intel.com/
->> Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
-> Applied it to #for-next.
-> Thanks!
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
