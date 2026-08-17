@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CE322A817
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 12:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB093C661A
+	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 12:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786968948; cv=none; b=dv+887uW17ZSojIYKHx/ZhP8BwJw+tOb0kf/Btw4d4rcCG0vrEwHkUFZ9aMLy30JYjCbF0KIbRT1teaHh2rV5w9XlKTi6oOFQdw6T6QbyEBodRHIb3A1XWmjaZ76mB/O/k0MndOcYO36QrPbxp9bWM+JGHUd8/goTG4NGBB4WmM=
+	t=1786968951; cv=none; b=Rkp+8Nn+6Ci+SFu0ER+asB439Qu9XiRW3h9dNt59fauaHsjiVEf+DKB4DlZVMxKfZlvBA5Mg/an2T9l19LLftSHT/vPVyj0utqCPHKrfXuouzEWACBtYVUnOXPTdNd3764k3eebfwjwR0P8kBHrNQV/JwDkog921s2FNU3q4oZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786968948; c=relaxed/simple;
-	bh=Y44y+wF/fpBrg/1M0T+fkLnRW2AH9zzRS98+fWDeXos=;
+	s=arc-20240116; t=1786968951; c=relaxed/simple;
+	bh=VAnfrHIUobDvwnE3yFY6fP9guaHALXI0RnT7S6rOGB8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AUfhXvp24AquZS+zS1F9XY5uGCxLabpuOUsaXkyn2qWL6w2eUsdFC29oI8cLOgR9r/ANPHM7y9tMUFEyNTBkyJah7ifyhP7PZXfxArtl+Bi7ugrYPwnR4bQ92hxYu4vCHSMGsVdy86OvoHF8l9t/0uw0uJ4I05RicwX7Tg1qVLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CDIuvUUB; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=lYliK64X20mUQOjkYkq/3OFjBsdn7+EXKpTAOHStBt+ROlFh2eLn8ZwyKg5QMRV0a8C09ZWiVYz9/utmo9LnlFFlxfqY6y+IyK9Gv6gmixoaIAY9n0odmQIaYzTjjpIh3nVsyi8rPf7e7FX+V31RCAxrpYZ3brYFmekjBOEByJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BGLkT1TQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CDIuvUUB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 734401F00A3A;
-	Mon, 17 Aug 2026 12:15:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BGLkT1TQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86DA51F000E9;
+	Mon, 17 Aug 2026 12:15:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786968947;
-	bh=u1qHoaTi6O4i+/NVAx9kYuhc87BSNXppgGuXtfwsBdU=;
+	s=k20260515; t=1786968949;
+	bh=abcktn7KCbFXKaTtv2gsVMCNIC8uRq6y20VxtQV85To=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=CDIuvUUBRSnWDEfNnzvAUdMqDz2M0YVj0VAFlTphu1294DUhCxWthNWRpWwzCIWLo
-	 DaGOM9dO1BbgZ0wsA55BNRrMdWATDfK53Q6GheqziW/MUOcAa3U/Us1HfVitRyW9zh
-	 4iFdhjtuUWrkLZ4ODz5tS+RCNKuY7qb2H8kYVJqplu8WWiKo1wvtgdGhaAsnEmgVo/
-	 g6wnK4Rw54eTZIIl2anZFrysLGEiRZsdro6s7cQ/vJ3DWrpGtTHCw4cb2I2dmxhlPj
-	 iHdooUfXVck/H5cUxT+02aU5IXvzYkEiBbCMBuQ4H7EDZyWQdUIVMlOuZkZNPqjBSZ
-	 cWdNvCYiJgG7g==
+	b=BGLkT1TQCcsG0MFFnEYerDqYTiJRejYy64Jj1O+Lp0rwMgxuWeD4utRREFLww2LnR
+	 2uzxF0kiwg46SDt0ubZpmqU+cOzAZYqAYEmzyXP14Rnyq4NuCCyjXt1kxCupNoMM/C
+	 2na1prqIRXpJ6BTi8KGspOQnSRmgsT31aaiUsGKSh12jVoTvpyEdN+1V4seOy0+rAZ
+	 cVfRHxB7smf8ecv0b2jnBHhihC/vOmqoYHvT/GtRzT9TmnWujU7bF1Wa7O9qolnau2
+	 g1OYLg4lsEDeSwT9txlyp0Rieg95e8qDTBdgDIxPLWnuh51fwulq1ZVUKczdm44dBX
+	 /qjxLGmQ+ICaQ==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: smfrench@gmail.com,
@@ -33,9 +33,9 @@ Cc: smfrench@gmail.com,
 	tom@talpey.com,
 	atteh.mailbox@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH] ksmbd: encrypt interim responses to encrypted requests
-Date: Mon, 17 Aug 2026 21:15:19 +0900
-Message-Id: <20260817121524.8812-7-linkinjeon@kernel.org>
+Subject: [PATCH] ksmbd: disconnect on SMB3 decryption failure
+Date: Mon, 17 Aug 2026 21:15:20 +0900
+Message-Id: <20260817121524.8812-8-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20260817121524.8812-1-linkinjeon@kernel.org>
 References: <20260817121524.8812-1-linkinjeon@kernel.org>
@@ -47,136 +47,106 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The normal response path applies an SMB3 transform when the request was
-encrypted.  Async interim responses, completed compound prefixes and two
-CHANGE_NOTIFY cleanup paths write their synthetic response work directly,
-bypassing that encryption step.
+MS-SMB2 requires the server to disconnect a connection when an
+encrypted transform cannot be associated with a session or fails
+authenticated decryption. This includes an encrypted request that
+still carries a SessionId invalidated through PreviousSessionId.
 
-A packet capture shows FE SMB2 STATUS_PENDING, CREATE and CHANGE_NOTIFY
-responses following FD SMB3 requests.  The client resets the connection
-immediately after receiving those plaintext responses.
+Move the connection to EXITING and shut down its transport when
+decrypt_req() fails. Add the missing TCP shutdown callback so a receive
+blocked in kernel_recvmsg() is released; SMB Direct already provides
+the corresponding callback.
 
-Send synthetic interim work through a common helper that applies the
-session encryption transform first.  A compound prefix shares the original
-work's response iov, which encryption would replace in place, so flatten it
-into an independently owned work before encrypting and sending it.
+Plaintext requests using an invalidated SessionId do not take this
+path and continue to receive STATUS_USER_SESSION_DELETED.
 
-Fixes: 64bfa9d49026 ("smb/server: use MSG_EOR for async interim response")
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 71 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 67 insertions(+), 4 deletions(-)
+ fs/smb/server/connection.c    | 16 ++++++++++++++++
+ fs/smb/server/connection.h    |  1 +
+ fs/smb/server/server.c        |  4 +++-
+ fs/smb/server/transport_tcp.c |  6 ++++++
+ 4 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 6581c79635fa..ade16532a8c1 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1124,6 +1124,66 @@ void release_async_work(struct ksmbd_work *work)
- 	}
+diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
+index 71d55d903f6f..5d729473dd18 100644
+--- a/fs/smb/server/connection.c
++++ b/fs/smb/server/connection.c
+@@ -439,6 +439,22 @@ void ksmbd_all_conn_set_status(struct ksmbd_session *sess, u32 status)
+ 	up_read(&conn_list_lock);
  }
  
-+static int smb2_send_interim_work(struct ksmbd_work *in_work,
-+				  struct ksmbd_work *work, bool eor)
++void ksmbd_conn_abort(struct ksmbd_conn *conn)
 +{
-+	int err = 0;
++	bool shutdown = false;
 +
-+	in_work->encrypted = work->encrypted;
-+	if (work->encrypted && work->sess && work->sess->enc &&
-+	    work->conn->ops->encrypt_resp) {
-+		in_work->sess = work->sess;
-+		err = work->conn->ops->encrypt_resp(in_work);
-+		in_work->sess = NULL;
++	spin_lock(&conn->request_lock);
++	if (!ksmbd_conn_exiting(conn) && !ksmbd_conn_releasing(conn)) {
++		ksmbd_conn_set_exiting(conn);
++		shutdown = true;
 +	}
-+	if (err)
-+		return err;
++	spin_unlock(&conn->request_lock);
++	wake_up_all(&conn->req_running_q);
 +
-+	return eor ? ksmbd_conn_write_eor(in_work) :
-+		ksmbd_conn_write(in_work);
++	if (shutdown && conn->transport->ops->shutdown)
++		conn->transport->ops->shutdown(conn->transport);
 +}
 +
-+static int smb2_send_interim_prefix_work(struct ksmbd_work *work)
-+{
-+	struct ksmbd_work *in_work;
-+	unsigned int len, copied = 0;
-+	char *dst;
-+	int err = -ENOMEM;
-+	int i;
-+
-+	len = get_rfc1002_len(work->iov[0].iov_base);
-+	in_work = ksmbd_alloc_work_struct();
-+	if (!in_work)
-+		return err;
-+
-+	in_work->response_buf = kvzalloc(len + 4, KSMBD_DEFAULT_GFP);
-+	if (!in_work->response_buf)
-+		goto out;
-+	in_work->response_sz = len + 4;
-+	in_work->conn = work->conn;
-+	dst = in_work->response_buf + 4;
-+	for (i = 1; i <= work->iov_idx; i++) {
-+		if (work->iov[i].iov_len > len - copied) {
-+			err = -EINVAL;
-+			goto out;
-+		}
-+		memcpy(dst + copied, work->iov[i].iov_base,
-+		       work->iov[i].iov_len);
-+		copied += work->iov[i].iov_len;
-+	}
-+	if (copied != len) {
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	err = ksmbd_iov_pin_rsp(in_work, dst, len);
-+	if (!err)
-+		err = smb2_send_interim_work(in_work, work, true);
-+out:
-+	ksmbd_free_work_struct(in_work);
-+	return err;
-+}
-+
- static void smb2_send_interim_compound_prefix(struct ksmbd_work *work)
+ void ksmbd_conn_wait_idle(struct ksmbd_conn *conn)
  {
- 	struct smb2_hdr *req_hdr;
-@@ -1152,7 +1212,7 @@ static void smb2_send_interim_compound_prefix(struct ksmbd_work *work)
- 	    work->conn->ops->set_sign_rsp)
- 		work->conn->ops->set_sign_rsp(work);
+ 	wait_event(conn->req_running_q, atomic_read(&conn->req_running) < 2);
+diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
+index c01ccbe8b97c..421907aed473 100644
+--- a/fs/smb/server/connection.h
++++ b/fs/smb/server/connection.h
+@@ -203,6 +203,7 @@ struct ksmbd_conn *ksmbd_conn_alloc(void);
+ void ksmbd_conn_free(struct ksmbd_conn *conn);
+ struct ksmbd_conn *ksmbd_conn_get(struct ksmbd_conn *conn);
+ void ksmbd_conn_put(struct ksmbd_conn *conn);
++void ksmbd_conn_abort(struct ksmbd_conn *conn);
+ int ksmbd_conn_wq_init(void);
+ void ksmbd_conn_wq_destroy(void);
+ bool ksmbd_conn_lookup_dialect(struct ksmbd_conn *c);
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 7881fc7bb8cd..ba44bea9ddc3 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -188,8 +188,10 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
+ 	if (conn->ops->is_transform_hdr &&
+ 	    conn->ops->is_transform_hdr(work->request_buf)) {
+ 		rc = conn->ops->decrypt_req(work);
+-		if (rc < 0)
++		if (rc < 0) {
++			ksmbd_conn_abort(conn);
+ 			return;
++		}
+ 		work->encrypted = true;
+ 	}
  
--	err = ksmbd_conn_write_eor(work);
-+	err = smb2_send_interim_prefix_work(work);
- 	if (err)
- 		ksmbd_debug(SMB, "failed to send compound interim prefix: %d\n",
- 			    err);
-@@ -1193,7 +1253,8 @@ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
- 	smb2_set_err_rsp(in_work);
- 	rsp_hdr->Status = status;
- 
--	ksmbd_conn_write_eor(in_work);
-+	if (smb2_send_interim_work(in_work, work, true))
-+		ksmbd_debug(SMB, "failed to send interim response\n");
- 	ksmbd_free_work_struct(in_work);
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 1045eca581c3..0ae5f145a332 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -435,6 +435,11 @@ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
+ 		atomic_dec(&active_num_conn);
  }
  
-@@ -11310,7 +11371,8 @@ int smb2_notify(struct ksmbd_work *work)
- 		in_work->async_id = work->async_id;
- 		work->async_id = 0;
- 		release_async_work(work);
--		ksmbd_conn_write(in_work);
-+		if (smb2_send_interim_work(in_work, work, false))
-+			ksmbd_debug(SMB, "failed to send notify cleanup\n");
- 		ksmbd_free_work_struct(in_work);
- 		work->send_no_response = 1;
- 		return 0;
-@@ -11415,7 +11477,8 @@ int smb2_notify(struct ksmbd_work *work)
- 		in_work->cancel_fn = NULL;
- 		in_work->asynchronous = false;
- 		ksmbd_fd_put(work, fp);
--		ksmbd_conn_write(in_work);
-+		if (smb2_send_interim_work(in_work, work, false))
-+			ksmbd_debug(SMB, "failed to send notify cleanup\n");
- 		ksmbd_free_work_struct(in_work);
- 		work->send_no_response = 1;
- 		return 0;
++static void ksmbd_tcp_shutdown(struct ksmbd_transport *t)
++{
++	kernel_sock_shutdown(TCP_TRANS(t)->sock, SHUT_RDWR);
++}
++
+ static void tcp_destroy_socket(struct socket *ksmbd_socket)
+ {
+ 	int ret;
+@@ -681,5 +686,6 @@ static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
+ 	.read		= ksmbd_tcp_read,
+ 	.writev		= ksmbd_tcp_writev,
+ 	.disconnect	= ksmbd_tcp_disconnect,
++	.shutdown	= ksmbd_tcp_shutdown,
+ 	.free_transport = ksmbd_tcp_free_transport,
+ };
 -- 
 2.25.1
 
