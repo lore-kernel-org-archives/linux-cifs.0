@@ -1,75 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-92.mta1.migadu.com [95.215.58.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0B43368A7
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E81A23EA97
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:37:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787038351; cv=none; b=RTTprYiFp/YrFFWC/T/6PsJZRJjH3qDfIRNtk8HX3L6iIzac++gwf2tmB/ueK2k+WWehfH1IicPfP6koBIQ+THJtXPWonJOFJ3JsHLE7+5AAqUXbI3bFr1f+WKjcZxvIdKCshIAUbeDAMS6LYkvbcO0q0LYfKH9rwFjH47iytoQ=
+	t=1787038642; cv=none; b=NRqpGfo4lZVnr4g05DjwfA4r4TKkBxj7wuybfXogf3H4QD3Vbkkvh59VfO2zP8i4DtF9TNUuGXgBYuTgWWG5pvcOAlV2mOSwnL2cYvg5kmDnPoB87dXsvN7E6digVmw/nM/E4n/Lq+bQmPeFbGXgTDhkKbSX3i0US9jtEaZC0rA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787038351; c=relaxed/simple;
-	bh=gWVKoELc41Q4ODZB1q8SMDrSdFTmOOLGWTN6c1AFAtU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E1P3NtiZyAWMAbFRNvSzrbLg11ePq/pelctqdsp98ZkUcRooKlEEhJr+doBzgohiy4F85yLikwaNq02IWNU3p/OU6CGlh6VGiPf74rPIdgzIvvfn2vZ1iIhYnx8Iqa8lwWlpG8Rnv10zlKN62glbm1k3ow3BsBUFJ0ok4km+qoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=na3h10R2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787038642; c=relaxed/simple;
+	bh=ymkI5orLZghKoSiMF348EW7IqUGDaHb0J3fVQpwFL20=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V0epkY1ftsJQ88k6FALyGyBInqrNZtqk02iHP4fZh2NJLEdcDbABaGFkiS84EkZg3cwaK4htymOi2nnNnvp2JPqSzkd9jJCcGGWWcBwtQPbPzKNr1RLdkA0Y6+r5ERJy8bi8NGo5wWrkot/FXeloOAywz2/dah5P+yIZjcN0QM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zb7twGS6; arc=none smtp.client-ip=95.215.58.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="na3h10R2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9882F1F000E9
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787038349;
-	bh=e/55hTSdvUMsXq7z6LxDTJi6siRoDAYgW8jGyft10fM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=na3h10R2b5vozIoca5z+mguPGClZ4AanuATliEWV1y8lk0nN+ZVg7XybohUPZiNZk
-	 NZyKCi2Toi70dsWp8svlBPRRGkDn4nN3Qey6pKb75KjfNCnWmGeWKTIwq6vqdOUWO0
-	 Umw1NdlGJqFgMO8F4vyMfA/oiNcQmYnDpeGCDUc2M2yi1Nhck+kQH1NDNSDcY4G2C9
-	 IQl9GyUdlAxhHbP3cDGLNgnsr16Yia0pZh7DEKoXRXXLl0YweuSiwTh3lbxGlqLPzP
-	 WuTLDoXKeEMYWNDs8bKsCkk9VUB5oS11fb5+N4g0UJ7ojrkhTJaPtmj+8HJGao8Du3
-	 +Q4JRb9YVscAg==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6a1a546a6bbso6465411a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:32:29 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwWhXsSqOb9WFp+Y6RY4dgB1VLZ74b0CnK/jMpFGUGJf5Bnnr3V
-	k5odi4YdYyA4snh7XdYeZbPxI0jZ9ml7GkgJtg3uSKtUADso+afGCRE//xnBZkpsHJNL41SxNe1
-	K4b76gn7bw3n9sesAofR9b5qZr3pIcp8=
-X-Received: by 2002:a05:6402:4345:b0:6a1:29ca:681e with SMTP id
- 4fb4d7f45d1cf-6a38a927f6dmr13487735a12.7.1787038348259; Tue, 18 Aug 2026
- 00:32:28 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zb7twGS6"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=ymkI5orLZghKoSiMF348EW7IqUGDaHb0J3fVQpwFL20=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787038638; v=1; x=1787643438;
+ b=Zb7twGS6i/eLQXZGjjj9Phjs7QUMnWHLCx18l8nkMYMjOSwK6qA/hzc2226L66MjjRCp3my4
+ CYFwB27JsG6qgQFfiDluJJDAiulWufOtKYvjIz3U5jJZS1Nl4zF4F120Nfq+BcTum/gQyYKR89i
+ F3q1PsPjnjZlBkVo06xudAzA=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from [192.168.3.165] (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 3b7e649179b15c41;
+	Tue, 18 Aug 2026 07:37:08 +0000
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <78f86195-d860-4ec5-bfd2-68cf2a716b6f@linux.dev>
+Date: Tue, 18 Aug 2026 15:36:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260817171651.212730-1-sorenson@redhat.com>
-In-Reply-To: <20260817171651.212730-1-sorenson@redhat.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 16:32:16 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-5mhDQ=2VYkvcE8KRiiMBJXSFiiYwTY9DNNVdsMaF3=A@mail.gmail.com>
-X-Gm-Features: AcwNN1UTgT6BGES4hWTDWJFq783w-ccGdA01bNHp2__GkFQ2Cu9_UCmwahtbntk
-Message-ID: <CAKYAXd-5mhDQ=2VYkvcE8KRiiMBJXSFiiYwTY9DNNVdsMaF3=A@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix ALIGN() overflow in symlink_data() error
- context loop
-To: Frank Sorenson <sorenson@redhat.com>
-Cc: linux-cifs@vger.kernel.org, stfrench@microsoft.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] smb/client: mark file sparse before emulating insert
+ range
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com,
+ sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com,
+ senozhatsky@chromium.org, dhowells@redhat.com, chenxiaosong@kylinos.cn,
+ linux-cifs@vger.kernel.org
+References: <20260813132136.366532-1-huiwen.he@linux.dev>
+ <20260813132136.366532-3-huiwen.he@linux.dev>
+ <CAKYAXd9=LsiPNG3=+-x44fvowpT0oXWtHwL0eYy8zEtLGR4POQ@mail.gmail.com>
+Content-Language: en-US
+From: hehuiwen <huiwen.he@linux.dev>
+In-Reply-To: <CAKYAXd9=LsiPNG3=+-x44fvowpT0oXWtHwL0eYy8zEtLGR4POQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 18, 2026 at 2:17=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
-> wrote:
->
-> The check added by commit 7d9a7f1f96cd compared the post-ALIGN length
-> against the remaining buffer, but ALIGN() itself can overflow: for
-> ErrorDataLength near UINT32_MAX (e.g. 0xFFFFFFF9), ALIGN(x, 8) wraps
-> to 0, so the subsequent bounds check passes, and the loop advances by
-> zero bytes leaving 'p' pointing into stale data.
->
-> Fix by checking the raw ErrorDataLength against the remaining space
-> before applying ALIGN(), then checking again after.  Since raw_len is
-> bounded by the buffer, raw_len + 7 cannot overflow, so the second check
-> is an exact post-alignment bounds guard.
->
-> Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Frank Sorenson <sorenson@redhat.com>
-Will appy it to #for-next with Paulo's acked-by tag.
-Thanks!
+Hi Namjae,
+
+Thanks for the review. I have also found a few other issues in the
+FALLOC_FL_INSERT_RANGE path and am working on further improvements to
+this series. I will send a v2 as soon as it is ready.
+
+Thanks,
+Huiwen
+
+在 2026/8/18 15:12, Namjae Jeon 写道:
+> Shouldn't this error be propagated? Unlike ordinary file extension,
+> FALLOC_FL_INSERT_RANGE is required to create an unallocated hole. If
+> SET_SPARSE fails, SET_ZERO_DATA only writes allocated zeroes, but the
+> operation still returns success...
+
