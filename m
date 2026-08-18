@@ -1,99 +1,86 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F453FB07A
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CBA385D86
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787039265; cv=none; b=C3yTVVuVSRSVFtiKtRV+wVtjavgPiddfW8CvBshMy7qpBchFQWSf/Dd8pb+O6ka79PxJw6/9+f5TUZzwyempn5ZXKTLgpzL9fnc/JTuvqwm+ZjQLmWImXHLAxo1Zq0J7/XWAGUR3fjb94AnOAT3fXTQSMFw/BE6OluDA6nX4WZU=
+	t=1787039305; cv=none; b=pXf8zYAFuPuiPQXq0NuI6V06uQj0dQ6Iuu3zWBAZFW7XxtoBOiek+WFn8OH9XuPGX4dqqWfZRtQpl0nYCwkekBbkf7KxGdosKAX61CplN/PmO3TlwIaNAu+TNkAXqoptHRsefC4DoreWRaMRhBopgDE55+X1TKeEXlXlfvzYFis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787039265; c=relaxed/simple;
-	bh=/2G73Adu2vLBI3aXG8fJWfFYMZL05rxfMquc7OyuULw=;
+	s=arc-20240116; t=1787039305; c=relaxed/simple;
+	bh=y8Z+VNWx7adawMpjR+uHXaVd3uW12KF3Yv3eqI+HRnU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=avWKVLOC7b8d+5pVVcH0DF/VGVTJVPybF9b+InrqBIAjU4WdMNDIcbJVXcOFUuD2B3WyAqWDqp/hzGUNOYFpBNvwR5wZV4yI9dnzMNX9n45LH31m0vW9SYCefhyrMUCMekw2Pi8c+P9hpgq6XPe/Ydv+VNtHhbgPvPyngWSaIvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03ADE1F00A3D
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:47:44 +0000 (UTC)
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c15cf78d1a2so450677866b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:47:43 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rq6Q1ouggT2GLeO0mvVi6zQ8KM5ALUshDM2SIbDJO1PuEC3VKUnQTyzHga3DMXYflj4RyZ8tXnR60u9@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEKMwk+u9odWPrSMCWOetn8IYIbFdocNzaSc4K1massCYMK1fS
-	zdtEOL/oA+qkOUP+hhUpeYNmxHtGTg9SyeaJ8fyyiqU3e88Zl6sTBBzO1RhJLTCuv6LC0e3xb39
-	eP2z/rzOq3pLdaontCcY2KpCHZqE1Obc=
-X-Received: by 2002:a17:907:9806:b0:c12:74af:51f3 with SMTP id
- a640c23a62f3a-c2129a9a404mr1426518366b.6.1787039261640; Tue, 18 Aug 2026
- 00:47:41 -0700 (PDT)
+	 To:Cc:Content-Type; b=We8kLGrLMwwZqGCsdeqbNltbLPlEgOmSMAEFJPM+tka5HOic6wSgGXfV831Y/kVwTjf4OBTDXERx48zjMH/mGBFUGevcWXAPo26d+yg+AOiiubMBp48FYUFLWqX2aGEMx9x1+VnRhVDXCw6/1G8XmOd0DxWoVbqEbzNkmprvW6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j06RfwU2; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j06RfwU2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF1211F00A3E
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787039303;
+	bh=BNv4fsjJl8E9LblXmHd2Gz8L1WWR9+noq+nOBM+836E=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=j06RfwU28rB9L0NOuM9mw4UcvcAof8UKaWliX/IQ4rsShX24etg2BKkfEXpqia/Gq
+	 EBsaErjITKxDidBGHBvwhVQam672ivvsT/DNCByw8We4TRBr2pIpNCJOtzyq7VrxJ+
+	 QSgvgIsLttMrmdX89hJ43pyggN7n1T+Gg0Vumj9T5whhQaCEdfSzs91SFOtG2Zh6oe
+	 XnBoh08qv+oBiery9XFQZclj1w7qLnk0NGj2ASE2jiUIM2sRJgzFacZd83smuEAcJh
+	 8nIv233ETFKAxoCqA0X7zoeAFvqAHFLpi8H6CxX/5aHqS1SPG7kp4GpCpNVIiGW9i/
+	 9i7kAHVrZdLwg==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6a3819e8be8so1450363a12.0
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:48:23 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rpk1asK6gWkijYa4yfieiJeKOuKWjsYDlugA3JXDXfRGsxLg99Y31gCj9vZHBxFZZ9xResnNIW4Kk04@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTRNu17PTDjWRCJSQeMV+O3k+VwZw1rd8QXzdBn4gl0798/Wlk
+	IhvR/SZs4fVqZeDhnm4O7KHFTO21zOZwXC/6TkUnqmdSR7LwEqyDVBN11ewmrJCep50jTormkVj
+	L7j0HKyZxoC/lrJidTB9RLsnTxvrD3SU=
+X-Received: by 2002:a05:6402:4548:b0:6a3:5685:703 with SMTP id
+ 4fb4d7f45d1cf-6a3e827e600mr1673593a12.3.1787039302385; Tue, 18 Aug 2026
+ 00:48:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260812130152.2861834-1-thuth@redhat.com> <20260812130152.2861834-5-thuth@redhat.com>
- <CAKYAXd_yLTgWFBv_ygYvbBdQcp3Z=pZ7F0A=_c8qdXWTLGdi1w@mail.gmail.com> <779785af-8700-42ee-a0f2-562343af6db2@redhat.com>
-In-Reply-To: <779785af-8700-42ee-a0f2-562343af6db2@redhat.com>
+References: <20260812130152.2861834-1-thuth@redhat.com> <20260812130152.2861834-2-thuth@redhat.com>
+ <CAKYAXd-0RLf6uYZO+yFnF8+gvDX_2AyMMPF75B8XcKL_qSaKzg@mail.gmail.com> <621b2dd4-fd61-4af8-b855-be6c82065acd@redhat.com>
+In-Reply-To: <621b2dd4-fd61-4af8-b855-be6c82065acd@redhat.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 16:47:29 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8SbS9W1UniQF9xgMyOf5azGfkZ8QyE31xkSLu-bjoxcA@mail.gmail.com>
-X-Gm-Features: AcwNN1XPDktVIenDPKgPWXVob29-Z7eH7L0lxB8ms3qK1v6EgZtgvUgNIc1PEE0
-Message-ID: <CAKYAXd8SbS9W1UniQF9xgMyOf5azGfkZ8QyE31xkSLu-bjoxcA@mail.gmail.com>
-Subject: Re: [PATCH 4/5] smb: client: Clear sensitive stack data in smb1encrypt.c
+Date: Tue, 18 Aug 2026 16:48:09 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9UzvYgjrOWe1QFe5HBXta3aeGwpksaDFZCwKHhkNtLeg@mail.gmail.com>
+X-Gm-Features: AcwNN1VKFtgHsOOZl1fGZzAfN5GyhDc__dtN5ISUV4tTmQiO6vHOwWQCCyV47yY
+Message-ID: <CAKYAXd9UzvYgjrOWe1QFe5HBXta3aeGwpksaDFZCwKHhkNtLeg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] smb: client: Clear sensitive stack data in smb2transport.c
 To: Thomas Huth <thuth@redhat.com>
 Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
 	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 18, 2026 at 3:33=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrot=
+On Tue, Aug 18, 2026 at 3:27=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrot=
 e:
 >
-> On 18/08/2026 07.58, Namjae Jeon wrote:
-> > On Wed, Aug 12, 2026 at 10:13=E2=80=AFPM Thomas Huth <thuth@redhat.com>=
- wrote:
+> On 18/08/2026 07.47, Namjae Jeon wrote:
+> >>   struct derivation {
+> >> @@ -482,6 +485,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct =
+TCP_Server_Info *server)
+> >>          memset(shdr->Signature, 0x0, SMB2_SIGNATURE_SIZE);
 > >>
-> >> From: Thomas Huth <thuth@redhat.com>
-> >>
-> >> Make sure to not leak signature data via the stack, clear it
-> >> with memzero_explicit() before leaving the function.
-> >>
-> >> To avoid that we have to introduce "goto"-cleanup here, we re-arrange
-> >> the code a little bit (and drop the commented cifs_dump_mem debug
-> >> code that looks like a leftover from very early days).
-> >>
-> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >> ---
-> >>   fs/smb/client/smb1encrypt.c | 19 +++++++++----------
-> >>   1 file changed, 9 insertions(+), 10 deletions(-)
-> >>
-> >> diff --git a/fs/smb/client/smb1encrypt.c b/fs/smb/client/smb1encrypt.c
-> >> index bf10fdeeedcab..c9eb68f04e7b0 100644
-> >> --- a/fs/smb/client/smb1encrypt.c
-> >> +++ b/fs/smb/client/smb1encrypt.c
-> >> @@ -81,6 +81,7 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP=
-_Server_Info *server,
-> >>          else
-> >>                  memcpy(cifs_pdu->Signature.SecuritySignature, smb_sig=
-nature, 8);
-> >>
-> >> +       memzero_explicit(smb_signature, sizeof(smb_signature));
-> >>          return rc;
-> >>   }
-> >>
-> >> @@ -126,15 +127,13 @@ int cifs_verify_signature(struct smb_rqst *rqst,
-> >>          rc =3D cifs_calc_signature(rqst, server, what_we_think_sig_sh=
-ould_be);
-> >>          cifs_server_unlock(server);
-> > The MD5 context in  cifs_calc_signature()  may remain uncleared when
-> > __cifs_calc_signature()  fails.
-> >
-> > rc =3D __cifs_calc_signature(...);
-> >                                                 =E2=94=83
-> > memzero_explicit(&ctx, sizeof(ctx));
-> My plan was to handle that via a __cleanup() function, too, but I need to
-> get that merged first:
+> >>          rc =3D aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE)=
+;
+> >> +       memzero_explicit(key, sizeof(key));
+> > cmac_key is not zeroized, and cmac_ctx  is not zeroized on error paths
+> > in smb3_calc_signature(). Please zeroize both on all exit paths,
+> > taking care not to clear an uninitialized context.
+>   Hi!
 >
->   https://lore.kernel.org/lkml/20260813134953.979481-7-thuth@redhat.com/
-Okay.
-Thanks.
+> The cmac_key and cmac_ctx have just been handled via the new __cleanup()
+> functions, that's why I did not add these to this patch here. The patch h=
+as
+> just been merged:
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D2b240733f27c8dd7e192f36540a10dcb88339222
+Okay. I will apply this patch-set to #for-next.
+Thanks!
