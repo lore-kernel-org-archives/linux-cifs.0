@@ -1,119 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-15.mta1.migadu.com [95.215.58.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1933368D50
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 04:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF128368D65
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 04:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787027848; cv=none; b=IHZGNZH1RgK4iA4g0L7fPh9MtMxs4x3UpGd9sEftATpfoFas9lZwO/oQ6NzegdkRUrvVCEiPen4LinCHMiTWga0mC4WyKLSx2s4/lUUNgHzPCBikFfnJYyOJOdTLK+/uU/1YB0rQ/VyiAtt/QqHbei4wZgjUqsqmC0RYEqNhQpc=
+	t=1787028757; cv=none; b=RKMRB9F2P8dXjjfRUIITrCIMdqJRn75Vv6ufHmjpFtMaMLRgy/tqJu94bGCCqUf4bLxQoDByXyD7bFdt1ZTbJ0eRWNhNoekSDHvSblk4TTJAT0LPJElZL0TZoCWI/fY2y56NtqalxO0bzvsTqPj7lscd6P33s6BWVziH91E5/d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787027848; c=relaxed/simple;
-	bh=XpCOb3jY/ok7ARQ9UbEJBrTEtcBhiKfga5GZhFprlAQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XJG0goT92B70yE3jwdYiJZMXsfhLoFoe2h0WBVJauN12ef4qmd0PeRqU8CKdtsXdOvxDR7vEityDWeKYK61s12j/2T2DW2PupQuWF64Uk6EbqnUMiKOsn9Ai4v6Ae+YMKH5OPuGjVQsKfwT7GXHlFA+Yvg/0QGOzFCe6PilwI3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7BnNspe; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787028757; c=relaxed/simple;
+	bh=0/rVj1nz20n5H0JtwLGLdqLRSY7BWdugh7vBYa6O+wY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LjafJkir8Dc7Va8hFfMoDgxC+ZPJJDI10GzIHZDfwnABHeHB1gDyUtX3NC+HZ+UTNyLG0VTq2370HHB7TdAQJAyFMEcMkeO1a1ucn/7LK7dDgRqIhSZr1kTpZf2v6frqFaKQCnrIMQr8FtOusHVujVPDUBJbiG2dytvALSSHLd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=e8hkw9JC; arc=none smtp.client-ip=95.215.58.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7BnNspe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85DF81F000E9
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 04:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787027846;
-	bh=sczxPFZ8JWLEDYhAlmLJ+QU8o7JMaSpf+TkkozSYuew=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=J7BnNspehz8G9q8f+bXg4A01pScRoGEUaNjmOEnBMXPSsZpmGAoRBuFWGj6+TK7nu
-	 0ZwAO7MGD/hfhlIkdR59RPRCEmWIsN+zU7pUy/ItNyl+SS12hHCDGETwLj2XaLesVq
-	 MK3f2z6idQG3Hjh9S2A4ghBJ2KGiSQj2CEC+SSCyxM14gXHvdCZuWMCRDqNGJ9i9Kz
-	 /feeUN380+fhQ1Dty7T7iYS39JxC3gb2S+ZOgac2kjKcMqC6UPThHfZTo9BoSR7jkW
-	 h/knQym/TC1g3WKOVpimMyCQtYbVcwX8S/DvPNsfqAey4wMhjJzdYQE+lf+auv+jnz
-	 mZIx828idq/MQ==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6a0a4aa99bdso5979290a12.1
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 21:37:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rpe2S3K8XIucsOAqqD2mAM9XN3llfTSc27eCZx1NfcILDwcy9oZDs3sVGV9rl/xP4LZ2OEyK3393jzF@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR9Qv0psDzif1Y0SFv/Ic3/Y1oa9VhK4Znqwkx+XbE95pvGgbs
-	AplEqhHmNS2tqOjAYp1shknsB6G+2tZ++ffAz4ZcTxadJgAq5OkgztyOk/YyG1aof4P+cqKzIYI
-	nPB8eJD/iJ1AI3PtHNXtgAEXuX0R1Eck=
-X-Received: by 2002:a05:6402:1907:b0:6a3:74c2:3cf3 with SMTP id
- 4fb4d7f45d1cf-6a38a8f54f9mr14428857a12.6.1787027845175; Mon, 17 Aug 2026
- 21:37:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="e8hkw9JC"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=0/rVj1nz20n5H0JtwLGLdqLRSY7BWdugh7vBYa6O+wY=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787028750; v=1; x=1787633550;
+ b=e8hkw9JCZXgXF5f12Xt+zD5/CKZ9Tw7WlY+R7DVkj/v7iUkefG0rpiCK8KAfOrXv7hgj5v+B
+ YnRCTG9Oz20K4fy89yhBJEHvW7HeZVKRuiNRGiuwy3UUaMfPu6TV+aek1jldX1Bk4Zgb422bAZN
+ vHiTk8CdRCpTt0dBnOPOL+HMVgkNkx8fv00ZuXDeJdKKw4YlU45whr+Y2srK1F1r4A17uVOaYcu
+ Kijo1+JRCXXkEpTZXO7e60e5pCAChQAylvt0nLMC96t+6iDe+VNZ+O7V35zEMC1zxQfN+h1kpJB
+ 8YoKsBPnCZMaggGVzmar4z8F7Xgas9zB2CRD4nLAaLpVQ==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from [192.168.3.216] (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 1addb81b58d348f5;
+	Tue, 18 Aug 2026 04:52:20 +0000
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <12ad789c-a5b8-48b0-a2d6-33e14c61725e@chenxiaosong.com>
+Date: Tue, 18 Aug 2026 12:52:15 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260805051112.305078-1-chenxiaosong@chenxiaosong.com>
- <20260805051112.305078-4-chenxiaosong@chenxiaosong.com> <db018269-4591-4d37-8e6d-93a4942fde46@linux.dev>
-In-Reply-To: <db018269-4591-4d37-8e6d-93a4942fde46@linux.dev>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 13:37:13 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9Gf_BrtMAFx7Zx1MZhSRV_xby0KGaKfuj0v+uT_SPGOA@mail.gmail.com>
-X-Gm-Features: AcwNN1X9IUFEerGvYKdzKObvEaF5Akq8rc7mqBfLb8hGJ6c5bC073mlnlMuF-fw
-Message-ID: <CAKYAXd9Gf_BrtMAFx7Zx1MZhSRV_xby0KGaKfuj0v+uT_SPGOA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 resend 3/3] smb/client: fix nlink of an overwritten
  open file
-To: hehuiwen <huiwen.he@linux.dev>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, smfrench@gmail.com, pc@manguebit.org, 
-	tom@talpey.com, senozhatsky@chromium.org, slow@samba.org, 
-	linux-cifs@vger.kernel.org, ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Namjae Jeon <linkinjeon@kernel.org>, hehuiwen <huiwen.he@linux.dev>
+Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com,
+ senozhatsky@chromium.org, slow@samba.org, linux-cifs@vger.kernel.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260805051112.305078-1-chenxiaosong@chenxiaosong.com>
+ <20260805051112.305078-4-chenxiaosong@chenxiaosong.com>
+ <db018269-4591-4d37-8e6d-93a4942fde46@linux.dev>
+ <CAKYAXd9Gf_BrtMAFx7Zx1MZhSRV_xby0KGaKfuj0v+uT_SPGOA@mail.gmail.com>
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd9Gf_BrtMAFx7Zx1MZhSRV_xby0KGaKfuj0v+uT_SPGOA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 7, 2026 at 7:28=E2=80=AFPM hehuiwen <huiwen.he@linux.dev> wrote=
-:
->
-> The AI review of the overwrite rename patch raised two possible races.
->
-> 1. A handle opened through a surviving hard link may be marked deleted:
->
->    target_fh -- target --+
->                          +--> inode X (nlink =3D 2)
->    alias_fh  -- alias  --+
->
->    CPU A                                   CPU B
->    -----                                   -----
->    rename(source, target)
->      server nlink: 2 -> 1
->
->                                            statx(alias,
->                                                  AT_STATX_FORCE_SYNC)
->                                              cached i_nlink: 2 -> 1
->
->    cifs_mark_open_handles_for_deleted_file()
->      sees i_nlink =3D=3D 1
->      marks every handle:
->        target_fh: deleted                   correct
->        alias_fh:  deleted                   wrong
->
-> 2. A concurrently refreshed link count may be decremented again:
->
->    CPU A                                   CPU B
->    -----                                   -----
->    rename(source, target)
->      server nlink: 2 -> 1
->
->                                            statx(alias,
->                                                  AT_STATX_FORCE_SYNC)
->                                              cached i_nlink: 2 -> 1
->
->    cifs_drop_nlink()
->      actual:   cached i_nlink: 1 -> 0       wrong
->      expected: cached i_nlink remains 1
->
-> I tried addressing these problems by taking an i_nlink snapshot before
-> the unlink/rename request, using it to decide which handles to mark,
-> and decrementing the cached link count only if it still matched the
-> snapshot.
->
-> Unfortunately, an nlink snapshot does not show whether revalidation
-> happened before or after unlink/rename. Therefore, it cannot fully
-> address these races or reject stale attribute responses that arrive late.
->
-> NFS addresses these issues with per-dentry silly rename, attribute
-> generation counters, and cache invalidation. A similar CIFS solution
-> may be challenging, as it must coordinate namespace operations,
-> open-handle state, and asynchronous attribute updates.
->
-> Do you have any ideas?
-This appears to be a possible issue, so the current patch needs
-improvement. I will drop the applied patch and await a response
-regarding this.
+It is a pre-existing issue and was not introduced by this patch. We will 
+try to fix it in a follow-up patch.
+https://sashiko.dev/#/patchset/20260804234205.72986-1-stfrench%40microsoft.com
+
+On 8/18/2026 12:37 PM, Namjae Jeon wrote:
+> This appears to be a possible issue, so the current patch needs
+> improvement. I will drop the applied patch and await a response
+> regarding this.
+
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
