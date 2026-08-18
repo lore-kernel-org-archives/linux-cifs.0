@@ -1,105 +1,75 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6425A33D6F9
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A86729E11A
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787036602; cv=none; b=Bm6NXm7zY66FG4uGOywHPq3hpfbVTLo50dlbnJtiniB020HEt2JGn+f9a/ZiRXA3uRWKs8EuwNFYvoJmwcmf7mpmyV6prE4Fe1r/UVU2a4uZXdmnogfHqpBavM85lqgUnaxa5xng3UOhWUGBy+qQEDvsqfcqOmpEyi0630XkwP4=
+	t=1787037195; cv=none; b=ESdEzJcw3nFk6x5SiMB47m6G0ieqOn3z6M1H+eQjs+r47V8/CY2gK9t3RwkmIWvcK9kYeug02hOn0Ct9JtVBz5zzZhpKs4sB10K7HfB6+PdhPTsaf80qaXfa4P+Ss7pzIVsGmYH91opw5Yxly/BkMRwgA9JawPZw3h3NQ/bSEI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787036602; c=relaxed/simple;
-	bh=FpCmCOHshs5IJZHDHYqBkMei21zP2Sk/lMvSM9DxYBA=;
+	s=arc-20240116; t=1787037195; c=relaxed/simple;
+	bh=JunbrMh1yI0mkLFpGxtU0Z5pI0zE+QPz5j4D4HgGYWA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SUhA0rzStDskTZmgLNyN3CqX+JH9y9+mSf+98JHU9fn/pXnCkEH74DGFIH9xA44y543rm/qQQdd0iD3JS0H6s9mvH25fe4YmU4o/qBUa6kfM0bPd7hUUnyUOVnZVJfhDug73IH9WEpsoZ5C5n68d1sUDLWeh8CctosMgRJYdf0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfsJ2T+G; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=INMRpu2Y2Inxe0xFL4XEhETBOUsYhfpRxzkncWDbhfVQ+p6F4P15nr0bqCSBVS+8aX9fw+IFzeiMC3qAZ15EGGbmTq+iM3YRknz4R/D7PUBlsiVaXhTGOPBDGE9E0muJ+JakgdpWvKtpB+hvmV3H/yCYH3QAPaiuqvi4pZCe+mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cB0DY737; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfsJ2T+G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEA9D1F000E9
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:03:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cB0DY737"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A56A11F00A3A
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:13:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787036601;
-	bh=El0iyo9X3wCnDyVvw7IxL2bZvVuo1Xce73p6V4jqSlA=;
+	s=k20260515; t=1787037193;
+	bh=A85nw1UST3SqzMgqsoL2q4u0M4lJIKKLMkysCrurgwo=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TfsJ2T+GhfoJIRwO4/XcMYD0Xcw7m+egimJtI9/nfUtdh9tVeOttMblewtU02/sFl
-	 2I+H6clG5cU96zs/OQ6yRWZ4tsGfyKQKY5jFfpO3dTYhRGF+e0zXxbGZIDyrB3q1jm
-	 6AEl0NlPOzj2D42E7Utru5KX5WNoGELefNSfHdWQDWJ8gOVk4XDG6G4MdrEQrYpZbi
-	 5w/aCpwj2GYaJ+CS2bwOo16OgWkmt3K3KFhGPuh3uvQiaknw1EJ0RbN4dp/qeCmpSO
-	 nAJ6Q9Jf1gOFmH5fNLC2h+hG8uc6BTC6/iyAjWGW7bmmmiROuOpviO0hRVKomw/ZrC
-	 0AKH1VR9Oo3Wg==
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6a0a4a28cbdso7246567a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:03:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RqtTXckXpzMM5a2V2zfDhicBof1TgjcJxofgRXbyIZ99fzez/Q57ehtQBTu4ai6IcQG1U0Vi4LtmgIm@vger.kernel.org
-X-Gm-Message-State: AOJu0YynnlqqaiGs5199S//9dfv3+7C8i9OMy1Lga+b4enKVH3/a7YTB
-	wEQm2HqvF/5HCHvzYoKQgANV/36ltynkiyo8A1/EIT/t/vRyWODazgekt83uwWfNoIbfoszhCd9
-	bxdLwib7dEZq/FpSryYBXlbHOUaWj1bY=
-X-Received: by 2002:a05:6402:2381:b0:6a1:854:e75e with SMTP id
- 4fb4d7f45d1cf-6a38a97fd22mr13040721a12.15.1787036599635; Tue, 18 Aug 2026
- 00:03:19 -0700 (PDT)
+	b=cB0DY737B0fMYYPRHRv/ME58NSxcYq4ExTY4VOFDm8VIuporTlyklFSFl8NNCU6cn
+	 zqxZst/WhAxOmp05ygRylmv3uxJfKfIlHuliaDsR3R2esvI3BY1DWW1prF2BZC0jDK
+	 GMKAm0J7g1N0wiSo7DpEWyShYy7aVtxVOSG01J5Nl8290BwT99O/Er/kLocX+BKPyG
+	 5nCIO9dnjUGyP8weroqy2a2aZ9n08RbtmLQL/GkVa1n2c1AkOxXhS2r2I4KfQFVbuo
+	 zitQ/HLyxZ/n7bQAaJ4gOH9xbunlXy2/x0e9gXNOMM3GPMepvN4PKH2N7nKGAvUz9p
+	 jsPbCwukVAw/A==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6a3819e8be8so1394875a12.0
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:13:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Ro4t2yaN4E6/U6ZdClQhzmK3/q2SLgxy6FS7Gm5xNKvGHzJoo8RJZoJvG0D3FDdum7ycE7+5Sg1gJp9@vger.kernel.org
+X-Gm-Message-State: AOJu0Yza7tecEdDi3LYTLdyazREUcN2drmR3Pu3dJ0XqfKtBLEOLzcI+
+	qCvgjLJh0FK5vnWOO38wM94RjtJ4qNc0pg65kVtZSuA9qS22aqOilz82AGHjZo40zxgmol42Gl4
+	grqUxHKfzKTeLEI7fYRQsgcbSz6wpo3I=
+X-Received: by 2002:a05:6402:24cd:b0:6a0:9ce5:3f5c with SMTP id
+ 4fb4d7f45d1cf-6a3e3c986f2mr2122879a12.7.1787037192330; Tue, 18 Aug 2026
+ 00:13:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260813074517.607275-1-rajasimandalos@gmail.com>
- <20260813094251.666373-1-rajasimandalos@gmail.com> <20260813094251.666373-8-rajasimandalos@gmail.com>
-In-Reply-To: <20260813094251.666373-8-rajasimandalos@gmail.com>
+References: <20260813132136.366532-1-huiwen.he@linux.dev> <20260813132136.366532-3-huiwen.he@linux.dev>
+In-Reply-To: <20260813132136.366532-3-huiwen.he@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 16:03:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-qNcPcg=NUEUz_DUfL4QCv14PHgG-=aCXsBWYg3vOp3Q@mail.gmail.com>
-X-Gm-Features: AcwNN1WutptrLcFDIG7M0QYG4z25h1ifna85PXz-nrGDiyzuqm5LS3CvtMyqai4
-Message-ID: <CAKYAXd-qNcPcg=NUEUz_DUfL4QCv14PHgG-=aCXsBWYg3vOp3Q@mail.gmail.com>
-Subject: Re: [PATCH v2 7/8] smb: client: allow nolease option to be
- reconfigured on remount
-To: rajasimandalos@gmail.com
-Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
-	Bharath SM <bharathsm@microsoft.com>, Meetakshi Setiya <msetiya@microsoft.com>
+Date: Tue, 18 Aug 2026 16:12:59 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9=LsiPNG3=+-x44fvowpT0oXWtHwL0eYy8zEtLGR4POQ@mail.gmail.com>
+X-Gm-Features: AcwNN1VKDwbxBmgKxuvvbMmkeXqoEIhqs_CeD8qa7IxmiHBEqdVpWzOSht39tTI
+Message-ID: <CAKYAXd9=LsiPNG3=+-x44fvowpT0oXWtHwL0eYy8zEtLGR4POQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] smb/client: mark file sparse before emulating insert range
+To: Huiwen He <huiwen.he@linux.dev>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, chenxiaosong@kylinos.cn, 
+	linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-> +/*
-> + * Invalidate cached directory entries across all tcons under a
-> + * superblock.  Count the tcons first so the pointer array can be
-> + * allocated with GFP_KERNEL outside tlink_tree_lock: allocating
-> + * per-tcon under the spinlock would force GFP_ATOMIC and, on failure,
-> + * silently leave some tcons with stale leases after a nolease remount.
-> + * References are then taken under tlink_tree_lock and the cached dirs
-> + * closed outside the spinlock since that can sleep.  Holding a tc_count
-> + * reference prevents the tcon from being freed by tlink_expire_delayed()
-> + * between dropping the spinlock and the call.
-> + *
-> + * Called on remount while the connection is live (e.g. switching to
-> + * nolease), so pass close_handles=true to actually release the
-> + * server-side directory handles and their leases.
-> + */
-> +void invalidate_all_cached_dirs_sb(struct cifs_sb_info *cifs_sb)
-> +{
-> +       struct rb_root *root = &cifs_sb->tlink_tree;
-> +       struct rb_node *node;
-> +       struct cifs_tcon *tcon;
-> +       struct tcon_link *tlink;
-> +       struct cifs_tcon **tcons;
-> +       unsigned int i, n = 0, count = 0;
-> +
-> +       spin_lock(&cifs_sb->tlink_tree_lock);
-> +       for (node = rb_first(root); node; node = rb_next(node)) {
-> +               tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-> +               if (!IS_ERR(tlink_tcon(tlink)))
-> +                       count++;
-> +       }
-> +       spin_unlock(&cifs_sb->tlink_tree_lock);
-> +
-> +       if (!count)
-> +               return;
-> +
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index bc7dda6d825a..430b6a1a2d92 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -4006,6 +4006,12 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
+>
+>         count = old_eof - off;
+>
 > +       /*
-> +        * Best effort: if the snapshot array can't be allocated, skip the
-> +        * eviction.  New opens still honor the updated nolease via the
-> +        * tcon->no_lease propagation done by the caller.
+> +        * SET_ZERO_DATA creates a hole only in a sparse file. Try to mark the file
+> +        * sparse, but continue the emulation regardless of the result.
 > +        */
-> +       tcons = kcalloc(count, sizeof(*tcons), GFP_KERNEL);
-> +       if (!tcons)
-> +               return;
-If this allocation fails, the function silently skips evicting cached
-directory FIDs while the remount still succeeds. Such a FID may then
-be reused after nolease is enabled. So please do not silently return
-here.
+> +       smb2_set_sparse(xid, tcon, cfile, inode, true);
+Shouldn't this error be propagated? Unlike ordinary file extension,
+FALLOC_FL_INSERT_RANGE is required to create an unallocated hole. If
+SET_SPARSE fails, SET_ZERO_DATA only writes allocated zeroes, but the
+operation still returns success...
