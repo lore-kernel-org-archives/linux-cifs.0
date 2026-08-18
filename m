@@ -1,98 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653A6331ED4
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F453FB07A
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:47:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787039013; cv=none; b=fPLGQZLqhg5kuRMuv3UnZ7meZNq3n8r2uCDUf9C5cXBcxlM7YbTQf9cWFAEnGzTjAEd+dbuyRQyBU9wOVzYJAAYIskJ2f2r7g8nU9VG0d4DrSrDTYFSOjyQgZXCdEwQk5yAFwoAMlr9ZgKJbvmFg2yiVjKp1mcAADV/oY3k+5us=
+	t=1787039265; cv=none; b=C3yTVVuVSRSVFtiKtRV+wVtjavgPiddfW8CvBshMy7qpBchFQWSf/Dd8pb+O6ka79PxJw6/9+f5TUZzwyempn5ZXKTLgpzL9fnc/JTuvqwm+ZjQLmWImXHLAxo1Zq0J7/XWAGUR3fjb94AnOAT3fXTQSMFw/BE6OluDA6nX4WZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787039013; c=relaxed/simple;
-	bh=FHHLAtsZQvQ2KzX9kTvT/uf50awMn7hIw+dD87XF+g4=;
+	s=arc-20240116; t=1787039265; c=relaxed/simple;
+	bh=/2G73Adu2vLBI3aXG8fJWfFYMZL05rxfMquc7OyuULw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D01YAmU79O/3RCYEroXbsyhkPhHdXyx88mQRUBAtQT8hHqrxfwK0x+m9VT1y3zjCQIBUKN4T5+yX6ypbt/6qmyoIwlEGodGcGw+xVsdFPSZnAIx2SGdPC2+oMs2v2lMl6puRhKBOncK5s94dRrox1ozPoHbpmdaXfVuU/GUPZJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gfBqhxot; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gfBqhxot"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E30B1F00A3D
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:43:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787039012;
-	bh=FHHLAtsZQvQ2KzX9kTvT/uf50awMn7hIw+dD87XF+g4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=gfBqhxot6FSZlnIVzLbuC6JuLl7TyFyhK5KFu8uSxGB2bW784JTIfQf64npjlZsK9
-	 ux/Ou5qzFfuz/hGGDmPZsPUwdKS1k4Q8S2sahaj8Oj6Maw+aLrj67t9NYKmgWlY0Qv
-	 KK/zyLoSULmnK5o7iSyg4NjuTAUAjz7OEVTl6McYUulZUFyrQIyCQ879G3dkHiPCxJ
-	 LF2elOWVOcOnhnpWWXGI9ncGyM2cqwCmQAnzl6ybQAdTtfIdPPOIzRZIE9uGBaNKFi
-	 ED5h39ZWIUPVzWf4JJU9KeuS2kj66+1ZU2Arw9BpWUwtIU7rmiVf6t5VuEPLP6pmvH
-	 udjbRsPAxESAw==
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6a0a4aa99bdso6188409a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:43:32 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro2gNiGmKvzBKVZvR8dBbZ1klNQ6IggslUxPruGH6M+o141/bCRxnePHsDpIdxdhSpurw2XQ1HCRQmq@vger.kernel.org
-X-Gm-Message-State: AOJu0YysKSPOQ6qlal3ylFcFc3IFL2SDg9NTu+oAcifxBznvK1VAhc4V
-	+NbfFFh7v33fvqiE8OH16McDdj+h4vPiP5I8ll/T6lzjGCYwXBsPIIXXdmkmf0cqaeZRK+9Yx9p
-	f+AsHLGmhzppnSxK4C3xV27cdbJkAryo=
-X-Received: by 2002:a05:6402:11d1:b0:6a3:72bc:7bc6 with SMTP id
- 4fb4d7f45d1cf-6a38a98f490mr14742334a12.17.1787039010790; Tue, 18 Aug 2026
- 00:43:30 -0700 (PDT)
+	 To:Cc:Content-Type; b=avWKVLOC7b8d+5pVVcH0DF/VGVTJVPybF9b+InrqBIAjU4WdMNDIcbJVXcOFUuD2B3WyAqWDqp/hzGUNOYFpBNvwR5wZV4yI9dnzMNX9n45LH31m0vW9SYCefhyrMUCMekw2Pi8c+P9hpgq6XPe/Ydv+VNtHhbgPvPyngWSaIvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03ADE1F00A3D
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:47:44 +0000 (UTC)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c15cf78d1a2so450677866b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:47:43 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rq6Q1ouggT2GLeO0mvVi6zQ8KM5ALUshDM2SIbDJO1PuEC3VKUnQTyzHga3DMXYflj4RyZ8tXnR60u9@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEKMwk+u9odWPrSMCWOetn8IYIbFdocNzaSc4K1massCYMK1fS
+	zdtEOL/oA+qkOUP+hhUpeYNmxHtGTg9SyeaJ8fyyiqU3e88Zl6sTBBzO1RhJLTCuv6LC0e3xb39
+	eP2z/rzOq3pLdaontCcY2KpCHZqE1Obc=
+X-Received: by 2002:a17:907:9806:b0:c12:74af:51f3 with SMTP id
+ a640c23a62f3a-c2129a9a404mr1426518366b.6.1787039261640; Tue, 18 Aug 2026
+ 00:47:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260818030635.3007590-1-wozizhi@huaweicloud.com>
-In-Reply-To: <20260818030635.3007590-1-wozizhi@huaweicloud.com>
+References: <20260812130152.2861834-1-thuth@redhat.com> <20260812130152.2861834-5-thuth@redhat.com>
+ <CAKYAXd_yLTgWFBv_ygYvbBdQcp3Z=pZ7F0A=_c8qdXWTLGdi1w@mail.gmail.com> <779785af-8700-42ee-a0f2-562343af6db2@redhat.com>
+In-Reply-To: <779785af-8700-42ee-a0f2-562343af6db2@redhat.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 16:43:18 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8R5W+-NVp0Mkqr2XcYoq70jKwvsefF9Bviu00xWh140w@mail.gmail.com>
-X-Gm-Features: AcwNN1V__hXTSp5jWvAJRkMu-V8VnMILsQWvRn9_RMdu41BYZaOYSnvHFG9OSqU
-Message-ID: <CAKYAXd8R5W+-NVp0Mkqr2XcYoq70jKwvsefF9Bviu00xWh140w@mail.gmail.com>
-Subject: Re: [PATCH] Revert "cifs: remove all cifs files before kill super"
-To: Zizhi Wo <wozizhi@huaweicloud.com>
-Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, yangerkun@huawei.com, chengzhihao1@huawei.com, 
-	wangzhaolong@fygo.io, mszjaas@qq.com, wozizhi@huawei.com
+Date: Tue, 18 Aug 2026 16:47:29 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8SbS9W1UniQF9xgMyOf5azGfkZ8QyE31xkSLu-bjoxcA@mail.gmail.com>
+X-Gm-Features: AcwNN1XPDktVIenDPKgPWXVob29-Z7eH7L0lxB8ms3qK1v6EgZtgvUgNIc1PEE0
+Message-ID: <CAKYAXd8SbS9W1UniQF9xgMyOf5azGfkZ8QyE31xkSLu-bjoxcA@mail.gmail.com>
+Subject: Re: [PATCH 4/5] smb: client: Clear sensitive stack data in smb1encrypt.c
+To: Thomas Huth <thuth@redhat.com>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 18, 2026 at 12:13=E2=80=AFPM Zizhi Wo <wozizhi@huaweicloud.com>=
+On Tue, Aug 18, 2026 at 3:33=E2=80=AFPM Thomas Huth <thuth@redhat.com> wrot=
+e:
+>
+> On 18/08/2026 07.58, Namjae Jeon wrote:
+> > On Wed, Aug 12, 2026 at 10:13=E2=80=AFPM Thomas Huth <thuth@redhat.com>=
  wrote:
+> >>
+> >> From: Thomas Huth <thuth@redhat.com>
+> >>
+> >> Make sure to not leak signature data via the stack, clear it
+> >> with memzero_explicit() before leaving the function.
+> >>
+> >> To avoid that we have to introduce "goto"-cleanup here, we re-arrange
+> >> the code a little bit (and drop the commented cifs_dump_mem debug
+> >> code that looks like a leftover from very early days).
+> >>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>   fs/smb/client/smb1encrypt.c | 19 +++++++++----------
+> >>   1 file changed, 9 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/fs/smb/client/smb1encrypt.c b/fs/smb/client/smb1encrypt.c
+> >> index bf10fdeeedcab..c9eb68f04e7b0 100644
+> >> --- a/fs/smb/client/smb1encrypt.c
+> >> +++ b/fs/smb/client/smb1encrypt.c
+> >> @@ -81,6 +81,7 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP=
+_Server_Info *server,
+> >>          else
+> >>                  memcpy(cifs_pdu->Signature.SecuritySignature, smb_sig=
+nature, 8);
+> >>
+> >> +       memzero_explicit(smb_signature, sizeof(smb_signature));
+> >>          return rc;
+> >>   }
+> >>
+> >> @@ -126,15 +127,13 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+> >>          rc =3D cifs_calc_signature(rqst, server, what_we_think_sig_sh=
+ould_be);
+> >>          cifs_server_unlock(server);
+> > The MD5 context in  cifs_calc_signature()  may remain uncleared when
+> > __cifs_calc_signature()  fails.
+> >
+> > rc =3D __cifs_calc_signature(...);
+> >                                                 =E2=94=83
+> > memzero_explicit(&ctx, sizeof(ctx));
+> My plan was to handle that via a __cleanup() function, too, but I need to
+> get that merged first:
 >
-> From: Zizhi Wo <wozizhi@huawei.com>
->
-> This reverts commit 6d9a4aaaa8b2612b5ef9d581e2f286a458b71ee1.
->
-> First, directly flushing fileinfo_put_wq in that commit cannot guarantee
-> that all in-flight I/O has run its cleanup_work on system_dfl_wq and
-> subsequently called queue_work(fileinfo_put_wq, ...). Flushing only the
-> latter workqueue may therefore miss puts that have not yet been queued, s=
-o
-> the fix is not reliable in the first place. Moreover, this fix flushes
-> inside cifs_umount(), which means the busy-dentry warning can still be
-> triggered when umount_check() is called inside kill_anon_super(), because
-> kill_anon_super() is executed before cifs_umount().
->
-> Second, commit 75f5c412fa86 ("smb: client: fix busy dentry warning on
-> unmount after DIO") already drains both serverclose_wq and fileinfo_put_w=
-q
-> in cifs_kill_sb(), before kill_anon_super(). By adding a per-superblock
-> outstanding-rreq counter, it guarantees that all cleanup_work for this sb
-> have run, and thus all relevant cfile puts are queued on fileinfo_put_wq
-> or serverclose_wq.
->
-> Third, no path between those drains and cifs_umount() can queue new work
-> onto either workqueue. In the "cifs_sb->root =3D=3D NULL" path there are =
-no
-> file-related workers either, so that case is safe as well.
->
-> Therefore the busy-dentry and null-ptr-deref problems cannot arise, and
-> the flush added by commit 6d9a4aaaa8b2 ("cifs: remove all cifs files befo=
-re
-> kill super") is redundant and can be removed.
->
-> Signed-off-by: Zizhi Wo <wozizhi@huawei.com>
-Will apply it to #for-next.
-Thanks!
+>   https://lore.kernel.org/lkml/20260813134953.979481-7-thuth@redhat.com/
+Okay.
+Thanks.
