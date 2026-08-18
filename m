@@ -1,86 +1,86 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A9633936A
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 06:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9B79460
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 06:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787034476; cv=none; b=A5Bqro/QQsjlAsVXd4+0pcyDCWzMQUXHK46B27WLBOM2FiubMmNrejegI2+hj7Pr9S1bTnXkvUVjwWDSrwhWetEz20EIrxv7X72lF07O01lX8jPE5fTUBOkEGUcFSG7N8iQji8z+y4EkIUUxiiCbeWbP5vRuOkIDfeBR0Q3Dymw=
+	t=1787034811; cv=none; b=jrMxRVYRNAWWJO2ABd7qKEdhqnAduJu1p1NLIEVpBMFTjnmqP2XuAln3gFrpwwu33fsV4SCRnlo7YUTueMGx4RCG762Po7wvN7J/lqlZ9fAQ2JNYLbQRSxWZFCzpI3e6BRzav0MVFGvphEshlzoVBA3g9IZJnxDaJdsBuUvsym0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787034476; c=relaxed/simple;
-	bh=XY+l5Qqhwnfhk+WflcqD231yF7jpJ414W7aQUz6JDG4=;
+	s=arc-20240116; t=1787034811; c=relaxed/simple;
+	bh=wACIL5l1nzeTMxOMXilHAzB3Vyr0BmkowTFodjAyfFA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aJS8pLm32ukuUnc09nptv5o9+qClXa221h3ukKnjN0dq0cWqy3R2uBLZDVupeFyJ3i6PcCsTVbcqJV5//dRpTo6n8Er4aRyjjpIbDfjvR0UcIiUZIKgvQK515yjyR7rLNih3L7Jr/VDbFvEOWCvPvi6eQ5cwWbMvjCOzeWb3oXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zakgyrrg; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FTCczSam; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=B934Yv+bblCWj5y9cpyc6pLv/vRCIdUzetb4lTu8cu9CA1s82akKkTgbOl0wgcSNOAycBl8zk7hmnN0IvVXdpO/ehSUKdzN7LjnN3IBYuUYzzxQhQmGOFbKXZBRImweF0X71HZ3HzFBWlJl38au3Uf4c7OA4SEsU7swpwqh56ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q7EGYW7b; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lFb+EToK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zakgyrrg";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FTCczSam"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7EGYW7b";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lFb+EToK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787034474;
+	s=mimecast20190719; t=1787034807;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/q8Pe1QuqFrKisLTTAMQw0LcTpFJzgKv7Tx/tDvibGY=;
-	b=ZakgyrrgZ5EFsVfoKKakENwTjewWBFGCo2c3qGWMKM1RHEcZGPI61BTz34K6COBUxWxa5g
-	NR/XPz3Z1F/ciYIRdgV6P3YHa2u3F9KtQBR/7UnZLJHZE6UTK4wdDq6gnwEeFJ4ubjq6C4
-	aI3eaJYKYnqxV1cmJale1PSAxQYqVso=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=FP6/4QD++Lt11Si7AWptT9ARlethlVge9lcY7SIdRy0=;
+	b=Q7EGYW7bJCbvgtrjuywkY54payJ7RS98moX8TzesCkDiqbxGYRBDjtLwLolrjvlIk7CqeK
+	utvvCRXFJB41X33wiFJVFktlaKXH0bhivR4c9SHa1J9IUD0AiQPCx8z7wdAL1wG5rH0iOC
+	V4+lEvzn8Hk1DNJRXTjKV25IQXWrZxA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-682-1P9myfxWP1iSWvGiJ-xvLA-1; Tue, 18 Aug 2026 02:27:47 -0400
-X-MC-Unique: 1P9myfxWP1iSWvGiJ-xvLA-1
-X-Mimecast-MFC-AGG-ID: 1P9myfxWP1iSWvGiJ-xvLA_1787034466
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4955ce558d8so45291895e9.3
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 23:27:47 -0700 (PDT)
+ us-mta-472-C5KDnf1NP525srUMEFs6wg-1; Tue, 18 Aug 2026 02:33:26 -0400
+X-MC-Unique: C5KDnf1NP525srUMEFs6wg-1
+X-Mimecast-MFC-AGG-ID: C5KDnf1NP525srUMEFs6wg_1787034805
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4957287363bso24989005e9.0
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 23:33:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1787034466; x=1787639266; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1787034805; x=1787639605; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=/q8Pe1QuqFrKisLTTAMQw0LcTpFJzgKv7Tx/tDvibGY=;
-        b=FTCczSamhy0HWT4tWz6e8QBjvoH5b4bG7O+vtttz+o6tlFYQy0Z5shFgxqKqw04Nlh
-         vLz9DCqeFYy7hsknL5nNfbUA4EZDez3WTRnOjNKl/KCmKALUXHopzohi9G6C/zuQ7Uzx
-         J9yKcD0STi+giXFzf22XQgT/2dIMU3Wbv9ZdvHK/TylnO5ty8fOe9xFrSAn9es+m7ub/
-         seJIQfwybgync4q/Ek1jjP0Q4Tz+Q3/Mmto5JBFwZB1E+Oq8Ro3BSCdFqZKm0V3OhUZG
-         z39dJZ/EiJAg/w6O356nd0eC3BgA5nAqqnRRnVCpOeQEv8K8dJOigPqs1VzS2X1pHm/i
-         PRog==
+        bh=FP6/4QD++Lt11Si7AWptT9ARlethlVge9lcY7SIdRy0=;
+        b=lFb+EToKgWgrwCjZ3cZa/sYunhFGwwqSZ+SQ2ctQT29MFsbgCE3GCVWz0J9jn1FXXB
+         4IZ/+Iqn81vu0N8M639+ABrAZzmGX6fJE0y2rMQasSOfJlF0XuehBj/6Rq5ksC3TdQXA
+         Ro2/6gLPQ9HluGA4bldS1BUu5SWsgQQdCEbWRfvBprlUiMZCNVhpYmzkAJEbfvdimou6
+         UqXxOWaqt0PWphXy9wj3v3Vg/vnFA9nHd+sIf7ASlmAhwdeZXWe6vQRH/A1kThHCiTCQ
+         /sIFeI1vGU9DOGORYW1rCEgImSz7eooK/y6wgof16vM40oT6grZ3qh2FkrCmUpht5chj
+         tP/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787034466; x=1787639266;
+        d=1e100.net; s=20251104; t=1787034805; x=1787639605;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=/q8Pe1QuqFrKisLTTAMQw0LcTpFJzgKv7Tx/tDvibGY=;
-        b=mcrA9YZhhiRLa3jXfT0pyrFcaxE5vLqu9FlIToRROXQ5JhdP9jzLp+s+D32zLmfoXF
-         BVaAow5cz8OVWukWkFCII/fI25tIc351S6HpXCqERQ5jppUSMfjvVxNaujN3mYPp14yC
-         wirPq0VuV9+TlaQPRkimvbv86DfTlOfUXOfPaSuJvLhXRO7wNVGs+Y/S0RC7fbO4rjaa
-         gHQ8Mhh3CUt7KrTGuEq7fk5fsg2w53svsIikNnJtivvYYZvHS6jzngyIj2vatgaq1Dod
-         jFvMIiGgUOUtu9C986aQibWJNAtVpifZtzFW2x5rqedAd0HbQiqyCw9unWv1P055FiWy
-         huvw==
-X-Forwarded-Encrypted: i=1; AHgh+RohWW8S56pPQoMdNApI4BHzb6RPiv76NbDZ8HLCmAa6OBqstKdfZ1uKZjk3n1ek5Os3yiobzButdP7/@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbONldO30haP8Onub4r7+ehTCyVS1kv1CbCeXLED/4+vhh2ki3
-	HkWItwv4jpxqlVTXRjoD/3F7IyKVH1o+NSowBjbByPpj/wU1wcrTZwy7mVn+NcKCxzlgVHhY2DU
-	pm5XQUEssOI1Lo1YqKz1iJrvimkd0SD3W1LR1NOPV3ZU+xNHM6CF6zL6HT2Upj54=
-X-Gm-Gg: AR+sD13fi9LS5wkyGwN9zqnxcUyqarcZGziw2ph1Rr5JoKqZxNl2PR1vgfnEs5GZE3L
-	ILfdhuCmv5iCj+zh0gQ/6407QUyCrtq0ux/96GBSE2sU22OzfpW65dvsLMYjhpVUcCkV3U8AgDy
-	BdNRWIChsxm2mCetvj75V7/9F9CwG23SVic2WZU8yEdd3KmXe982N6K4C3MKhA3wb8k8ghE5/SC
-	W/XCFwD6+UuWiHIhBSr4HiOsN4BOgHjXjQa+CBYJ2/PKje3spKqvr2C19yn68Mabn2KjlESfoEF
-	B/g1Srlu40vlrSohKnRmgmU4+7ALQUaT0D0YjcJdHarZPO80zmwbFK7zqXwB3v3+r5O6l5H3ths
-	g9uVHBZglDmrHD9gwSW2d8/mhEbgmqANoc06/
-X-Received: by 2002:a05:600c:840f:b0:499:a5fc:207e with SMTP id 5b1f17b1804b1-499a5fc2164mr4341255e9.8.1787034466165;
-        Mon, 17 Aug 2026 23:27:46 -0700 (PDT)
-X-Received: by 2002:a05:600c:840f:b0:499:a5fc:207e with SMTP id 5b1f17b1804b1-499a5fc2164mr4340885e9.8.1787034465876;
-        Mon, 17 Aug 2026 23:27:45 -0700 (PDT)
+        bh=FP6/4QD++Lt11Si7AWptT9ARlethlVge9lcY7SIdRy0=;
+        b=eE5ElKXveuCCMewnDKWuKs740/uvwj9D8HsuwPp0363ZQynoGHmnFExYFYZTxfmU+3
+         mueuJRi2+mhqDcQvio9eSBwMpXwM6yx1Kmvt9vJQhuapPW8qqzCKYHwLscXo7c7h3Tta
+         SGuSnxgAZIHsjHa88wtlNZExL0vmtdZaDqX4iZAEVTRLCMrudLOXbKI8T+OdcRQ2f6iy
+         sXXgh7pmV4NsGC2b49h+ruoQpBB/jdjf5rhxgQCKxTHJtABkPr6C8ns3RiJwvk1x89yu
+         EE7TyyCdJVdGMBJlMwJU+BaxdkGWTeWQqaeMYyGlT5HqqrLWHYKOr377L9Ma98Dx5jG8
+         UjBQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrywSrB2tPY4JR5Q+aZ8GPvhRP3ZdCNO7qLRCImI6Is9cBzrXm8Nia+c0feQHAxYXMScv16iiPsATTm@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIl1L1VFV8FmwYoQSWsXiPB5UwNdOBbvJY3wrlsPU3XXfcp7kU
+	XmqVzF0rJt6jGjqTxAuzgDIwcQULYEoTiMmAG4/rZrVhQcI3iiL+Y1vN+kEVR/G5HP8ZNrIqPkL
+	GDz7mUVMdBAjgnkWOxb4Cz4jMCB70puA4d7qHjC+czMYL5IhUygW7HPRlSSvL+Uw=
+X-Gm-Gg: AR+sD13BasK8GbgHnA9EGbyWvG63MELbivMq0ks3zt3w8u1getNN9O9u6SK1/6kpByr
+	e5LdKCItSQ0XbTdntKjxK9InUCfXGUkcNI/CE+vbCcdX0U//z4sHWG7DAARK77YfoPYycfKCiw7
+	VuRUuVvQZYATFZHmnd9LKow+q+RyDd0oQrHAb923tWGoId8zgCu2/uELm09Ec5YExtbqnXnL1YU
+	BxJBlJjYy3FNvSvI+QOmzXRgHfxr1x0cWj+2jCq7z5Vf/VZ1Mgd11+zO7ruz1JEBM8SZnaG691O
+	1Bh0/4jIuUXmc5Se0mYQdkAaNI/bchpJJufOzsO9vVAkv9RWgQ/q7JVYCOCJ23SX8d9msTfQPbI
+	IQ5thP8YcJzMZ7MxsWXF8pe3ZhNRz58V4Ermi
+X-Received: by 2002:a05:600c:3f06:b0:499:484a:81d0 with SMTP id 5b1f17b1804b1-49987961c32mr504855485e9.9.1787034805200;
+        Mon, 17 Aug 2026 23:33:25 -0700 (PDT)
+X-Received: by 2002:a05:600c:3f06:b0:499:484a:81d0 with SMTP id 5b1f17b1804b1-49987961c32mr504854765e9.9.1787034804876;
+        Mon, 17 Aug 2026 23:33:24 -0700 (PDT)
 Received: from ?IPV6:2a01:599:b20:fbe:bc54:ff69:ca5:383c? ([2a01:599:b20:fbe:bc54:ff69:ca5:383c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4999610ed6dsm276002265e9.8.2026.08.17.23.27.44
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49996100184sm262439635e9.1.2026.08.17.23.33.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Aug 2026 23:27:45 -0700 (PDT)
-Message-ID: <621b2dd4-fd61-4af8-b855-be6c82065acd@redhat.com>
-Date: Tue, 18 Aug 2026 08:27:44 +0200
+        Mon, 17 Aug 2026 23:33:24 -0700 (PDT)
+Message-ID: <779785af-8700-42ee-a0f2-562343af6db2@redhat.com>
+Date: Tue, 18 Aug 2026 08:33:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -88,17 +88,17 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/5] smb: client: Clear sensitive stack data in
- smb2transport.c
+Subject: Re: [PATCH 4/5] smb: client: Clear sensitive stack data in
+ smb1encrypt.c
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>,
  Ronnie Sahlberg <ronniesahlberg@gmail.com>,
  Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
  Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
 References: <20260812130152.2861834-1-thuth@redhat.com>
- <20260812130152.2861834-2-thuth@redhat.com>
- <CAKYAXd-0RLf6uYZO+yFnF8+gvDX_2AyMMPF75B8XcKL_qSaKzg@mail.gmail.com>
+ <20260812130152.2861834-5-thuth@redhat.com>
+ <CAKYAXd_yLTgWFBv_ygYvbBdQcp3Z=pZ7F0A=_c8qdXWTLGdi1w@mail.gmail.com>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -143,27 +143,52 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <CAKYAXd-0RLf6uYZO+yFnF8+gvDX_2AyMMPF75B8XcKL_qSaKzg@mail.gmail.com>
+In-Reply-To: <CAKYAXd_yLTgWFBv_ygYvbBdQcp3Z=pZ7F0A=_c8qdXWTLGdi1w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 18/08/2026 07.47, Namjae Jeon wrote:
->>   struct derivation {
->> @@ -482,6 +485,7 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
->>          memset(shdr->Signature, 0x0, SMB2_SIGNATURE_SIZE);
+On 18/08/2026 07.58, Namjae Jeon wrote:
+> On Wed, Aug 12, 2026 at 10:13 PM Thomas Huth <thuth@redhat.com> wrote:
 >>
->>          rc = aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE);
->> +       memzero_explicit(key, sizeof(key));
-> cmac_key is not zeroized, and cmac_ctx  is not zeroized on error paths
-> in smb3_calc_signature(). Please zeroize both on all exit paths,
-> taking care not to clear an uninitialized context.
-  Hi!
+>> From: Thomas Huth <thuth@redhat.com>
+>>
+>> Make sure to not leak signature data via the stack, clear it
+>> with memzero_explicit() before leaving the function.
+>>
+>> To avoid that we have to introduce "goto"-cleanup here, we re-arrange
+>> the code a little bit (and drop the commented cifs_dump_mem debug
+>> code that looks like a leftover from very early days).
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   fs/smb/client/smb1encrypt.c | 19 +++++++++----------
+>>   1 file changed, 9 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/fs/smb/client/smb1encrypt.c b/fs/smb/client/smb1encrypt.c
+>> index bf10fdeeedcab..c9eb68f04e7b0 100644
+>> --- a/fs/smb/client/smb1encrypt.c
+>> +++ b/fs/smb/client/smb1encrypt.c
+>> @@ -81,6 +81,7 @@ int cifs_sign_rqst(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+>>          else
+>>                  memcpy(cifs_pdu->Signature.SecuritySignature, smb_signature, 8);
+>>
+>> +       memzero_explicit(smb_signature, sizeof(smb_signature));
+>>          return rc;
+>>   }
+>>
+>> @@ -126,15 +127,13 @@ int cifs_verify_signature(struct smb_rqst *rqst,
+>>          rc = cifs_calc_signature(rqst, server, what_we_think_sig_should_be);
+>>          cifs_server_unlock(server);
+> The MD5 context in  cifs_calc_signature()  may remain uncleared when
+> __cifs_calc_signature()  fails.
+> 
+> rc = __cifs_calc_signature(...);
+>                                                 ┃
+> memzero_explicit(&ctx, sizeof(ctx));
+My plan was to handle that via a __cleanup() function, too, but I need to 
+get that merged first:
 
-The cmac_key and cmac_ctx have just been handled via the new __cleanup() 
-functions, that's why I did not add these to this patch here. The patch has 
-just been merged:
+  https://lore.kernel.org/lkml/20260813134953.979481-7-thuth@redhat.com/
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2b240733f27c8dd7e192f36540a10dcb88339222
-
-   Thomas
+  Thomas
 
