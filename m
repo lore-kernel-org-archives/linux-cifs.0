@@ -1,133 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABD3A208D0
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAC472621
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787012228; cv=none; b=DvxkB6baYwI5lXI8D6D/Ube06M0kwUP83oLx1Du6VyQ0JxuOR6hhImFIcAaOBmLAyAHMX+jAN6QVE27PaB8XQLEh/mbd74GGpZggut1quJL1e6ObGDYi5xuTiPkOTi6SBrzz6e51g+buZpASwv1fZFGUejsB8G6arRgXOq2bG0s=
+	t=1787012310; cv=none; b=jNCH10vSxlLT9YPuXttIRhacY4fTz2ZSgGChxK/jWfDR15+L/mkhA47eUdmwzSmVCUhwskdvvzNlsmxE3QLerOLdqZ//UJbiKhCU0noXY8lDHmgTK8R5OJZReK5YMdfZHbMYgerALft0tMHKN8YGb5DS4iQSoiZCasksuhtG1EU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787012228; c=relaxed/simple;
-	bh=mjpaPiZWDdY/rvb8RX+j7EhGzvUwKXLw/9xdT1p6Ook=;
+	s=arc-20240116; t=1787012310; c=relaxed/simple;
+	bh=lEqRLJsz2zFi3RY0L8Meap62WRf9/tkCSFWyR+KOScU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V8VxMlfXnEK4/4kA3gIfbbV8fVQBSiHw0bVUhNbah5Gd4BWDZc02kFrZdkcZlAN819po2qaC1wQL0Il03SP1jfjtXHOllRHysDFexITpG3xMxdAOv6mc9hp4stYg9uYSITu/N/oYVaM91Wfmo9aBpdmOofev0dPnVemNnDMo498=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dS5VKSUz; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=OuOpgdis5n/2b0oOChbZ2fBmBwyKaMukixpG0do58cjzemgsRbEVqel7QZBztiMxYz92zbYgXr0lm1CbZ6GDq3mF+H+qhmjf/LeL2q2nHA3lZL6aioMybLFkuDjwZ0NfKltA3jCnsjWOEo0utWOods7hSFlirfeEU9OHrSgghM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJBI+nKB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dS5VKSUz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF7F1F00A3D
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:17:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJBI+nKB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ABFA1F01558
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:18:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787012226;
-	bh=LPTSQGXWsw/cWs8YBVRbC2MT7uy6Y6pyEn/3BE7meHE=;
+	s=k20260515; t=1787012308;
+	bh=kBMrD5uPLprd85mL+To2H9xZCWjMIYqtknyksJER9Cs=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=dS5VKSUz3MTIlgWwyN/84TBJx4o0oTtqiHyCbqvcR9H73l5/3tA0iUyHyNT7PFEWf
-	 QFKmEYL9iBWNbPeJhE7n8J3WzKtXA+ohB6mzK9bWnmWCDSxI+nFZAvFXWPvMR40oky
-	 7uOtNPVQ6k6HrTkvX/NYbZ7R+EFU4v6Bsrw6C0Ct5OvIJ5VXSyYcPde9VyPHxxqe7m
-	 2O81uEwey/dRGxW4vGeSBPohjNliNrn0n/NbYaz7T0o2js0jSSk+Fi8/lFuna7t2Kz
-	 LHVrhlET4h1M/ZkREzeDLcIbZid5la3tr3qg2F+EhpIfAei4F0/X6QLa5LoBZ8shFl
-	 30T9zsCUIdrKQ==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c2020421077so659274666b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 17:17:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpgeCuGSDckFg2z7mqM48+IjBEeVaISdNglWN8qIwtvhzBfr8vbokvmnR0Jfy7ozkOG+WvBap2z6rOu@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvJpxMsEyXS+T3/OXA+SXKxjQ9ojpEB4q87+Zy3BylMvn2wXPk
-	5j1RVbJPyu1naO/nwbcZ43TF1R8rf2I992AdOPePpOy0UTvg6778XSn1Raakscw6ZFhIvBQWuzw
-	3t9tKCjkJlK94hOItv+4m56tg3bZVftk=
-X-Received: by 2002:a17:907:5c2:b0:c16:1227:e3d8 with SMTP id
- a640c23a62f3a-c2129c1bd00mr1437154466b.13.1787012224802; Mon, 17 Aug 2026
- 17:17:04 -0700 (PDT)
+	b=FJBI+nKBB5ofn5bk6a3gPf8PAN3NfX28jPGVWURsN/JT7daHK9wVbCwtP2nqIEQuu
+	 cHR0wkV0LfteOs/cFpA8Ytvil9se7GbBErasiV3MZaNMkUqoz5ik8OtA61ZOt+3cvf
+	 aaa8VpkWWXfQnGzatLohZYlEnNFVGLBAc5GX9zL73LHV10Man4l6lMWWEPuzBiRayD
+	 YFUC6V6e6gPe+DFgBVFvkWpgNcyaO264n699E64fnFL4Y3tctbp+8HKAlVIY+4bkjK
+	 qLZ7RBqauKsdYXnIksc/hsGTdYiWbxrQ8jAfdPV5yzxATpartsTuAaVpv/Nl2jlzM0
+	 Li0cbcgFlI8VQ==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c1712a04ddaso673045166b.2
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 17:18:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RocgxIKE2Rgg4Ug/8INsPBiNwhQtwIQcQ4UChO9J0meXDgCdhd8WTOrOW5H0ddHEPN41oxgAppOMMjw@vger.kernel.org
+X-Gm-Message-State: AOJu0YySNUemvghCZS0JZjtavD0cJCktfyAsNyYBKJH4eJqmEjhDWUko
+	DjO1X1dEW1397Q/CiQNDM5yoylUHvsbHZM9btTLmCISyroHkd2UL8VI8mhnlZ6l+fCI+Uyn6IGZ
+	0mR+zulAH0JZpp7QWx5gNmTCSSZsLABI=
+X-Received: by 2002:a17:907:1609:b0:c16:b87:de64 with SMTP id
+ a640c23a62f3a-c212a1250a6mr1429158266b.15.1787012307087; Mon, 17 Aug 2026
+ 17:18:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260729220017.944651-1-clusk@northecho.dev>
-In-Reply-To: <20260729220017.944651-1-clusk@northecho.dev>
+References: <20260729192002.876156-1-clusk@northecho.dev>
+In-Reply-To: <20260729192002.876156-1-clusk@northecho.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 09:16:52 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9idDQd5ggKC130P5OjfcbvYbxWhKDDQ7i7fbeuFRQRwA@mail.gmail.com>
-X-Gm-Features: AcwNN1Xook7nZrxU7UntBq-6js9x2sL1BRsbxOLHgd1cIxxcSQFwIp7X81K7_-s
-Message-ID: <CAKYAXd9idDQd5ggKC130P5OjfcbvYbxWhKDDQ7i7fbeuFRQRwA@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix request buffer leak in smb2_new_read_req()
+Date: Tue, 18 Aug 2026 09:18:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_hupeuYgwc+ndHtytwxqDcXhpuAOiHkqkXv44fFTojhg@mail.gmail.com>
+X-Gm-Features: AcwNN1U42Xw4fRJbjBWWj4U4FXnCyes2RE8Sit0JUqF5a1U01YuAgZjbaHSxZ5U
+Message-ID: <CAKYAXd_hupeuYgwc+ndHtytwxqDcXhpuAOiHkqkXv44fFTojhg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: set replay flag on the read send-error retry path
 To: clusk@northecho.dev
 Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
 	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	pshilov@microsoft.com, longli@microsoft.com, dhowells@redhat.com, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	netfs@lists.linux.dev, linux-kernel@vger.kernel.org
+	dhowells@redhat.com, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 30, 2026 at 7:05=E2=80=AFAM Christopher Lusk <clusk@northecho.d=
+On Thu, Jul 30, 2026 at 4:24=E2=80=AFAM Christopher Lusk <clusk@northecho.d=
 ev> wrote:
 >
-> smb2_new_read_req() allocates the request buffer with
-> smb2_plain_req_init() but only publishes it to the caller with
-> *buf =3D req at the very end of the function. Two error returns sit in
-> between:
+> smb2_async_readv() and smb2_async_writev() end with the same
+> send-error block: if the error is replayable and smb2_should_replay()
+> agrees, tell netfs to retry the subrequest. The write path also sets
+> wdata->replay. The read path does not set rdata->replay.
 >
->         rc =3D smb2_plain_req_init(SMB2_READ, io_parms->tcon, server,
->                                  (void **) &req, total_len);
->         if (rc)
->                 return rc;
+> smb2_should_replay() is not a pure predicate. It consumes the retry
+> budget and computes the exponential back-off, doubling cur_sleep up to
+> CIFS_MAX_SLEEP. That back-off is only applied where the replay flag is
+> tested at the top of the reissued request:
 >
->         if (server =3D=3D NULL)
->                 return -ECONNABORTED;
->         [...]
->                 rdata->mr =3D smbd_register_mr(server->smbd_conn,
->                                              &rdata->subreq.io_iter,
->                                              true, need_invalidate);
->                 if (!rdata->mr)
->                         return -EAGAIN;
->
-> On either of them the buffer is neither released nor handed back, so
-> it is leaked. The caller cannot clean up after it: smb2_async_readv()
-> does 'goto out' on a non-zero return, which skips the
-> cifs_small_buf_release(buf) at async_readv_out, and buf has not been
-> assigned at that point in any case.
->
-> The write path has never had this problem. smb2_async_writev()
-> registers the memory region inline and jumps to its release label
-> instead of returning:
->
->         wdata->mr =3D smbd_register_mr(...);
->         if (!wdata->mr) {
->                 rc =3D -EAGAIN;
->                 goto async_writev_out;
+>         if (rdata->replay) {
+>                 /* Back-off before retry */
+>                 if (rdata->cur_sleep)
+>                         msleep(rdata->cur_sleep);
+>                 smb2_set_replay(server, &rqst);
 >         }
 >
-> Commit b7972092199f ("cifs: smbd: Retry on memory registration
-> failure") changed both sides from -ENOBUFS to -EAGAIN in a single
-> patch, which puts the two shapes next to each other.
+> So on the read path the back-off is recomputed on every send-error
+> retry and then discarded, and SMB2_FLAGS_REPLAY_OPERATION is not set
+> on the reissued request.
 >
-> Only the -EAGAIN return is reachable in practice, because
-> smb2_plain_req_init() calls smb2_reconnect() first and that already
-> fails with -EIO when server is NULL, before anything is allocated.
-> Both returns are given the same treatment here rather than leaving
-> one of them correct only by accident.
+> netfs does not pace the retry either. netfs_reissue_read() calls
+> ->issue_read() directly, and fs/netfs/read_retry.c contains no delay
+> of its own, so read send-error retries reissue immediately while the
+> equivalent write retries back off.
 >
-> Because -EAGAIN is a replayable error, the failure also reaches the
-> retry block at the end of smb2_async_readv(), which marks the
-> subrequest NETFS_SREQ_NEED_RETRY, so a failing registration can be
-> retried rather than ending the I/O, and every attempt that reaches it
-> leaks another buffer. smb2_should_replay() short-circuits on
-> tcon->retry, so on a hard mount the attempt count is not bounded by
-> the retrans setting.
+> The read response callback already sets rdata->replay under the same
+> conditions, so the read path does use the replay mechanism. Only this
+> send-error path omits it.
 >
-> Only the asynchronous read path is affected. The synchronous
-> SMB2_read() caller passes rdata =3D=3D NULL and the memory registration
-> block is guarded on rdata.
+> Where the back-off belongs was settled while the commit below was
+> under review. David Howells asked whether netfslib should be doing the
+> back-off [1], and objected to sleeping inside the response callback
+> because that runs in the cifsd thread and would stall the socket [2].
+> The sleep was therefore taken out of smb2_should_replay() and moved to
+> just before the replay in smb2_async_readv() and smb2_async_writev()
+> [3]. Setting the flag here preserves that arrangement: the sleep still
+> happens at the top of the reissued request, not in a callback.
 >
-> The memory registration failure path was pointed out by the Sashiko
-> AI reviewer while it was reviewing an unrelated patch to
-> smb2_async_readv().
+> Set rdata->replay here, matching smb2_async_writev().
 >
-> Fixes: bd3dcc6a22a9 ("CIFS: SMBD: Upper layer performs SMB read via RDMA =
-write through memory registration")
-> Link: https://sashiko.dev/#/patchset/20260729192002.876156-1-clusk%40nort=
-hecho.dev
-> Link: https://lore.kernel.org/all/20260729192002.876156-1-clusk@northecho=
-.dev/
+> Fixes: 2c1238a7477a ("cifs: make retry logic in read/write path consisten=
+t with other paths")
+> Link: https://lore.kernel.org/all/1652858.1769038134@warthog.procyon.org.=
+uk/ [1]
+> Link: https://lore.kernel.org/all/1653031.1769038583@warthog.procyon.org.=
+uk/ [2]
+> Link: https://lore.kernel.org/all/CANT5p=3DpXP3+CywpmK-on2uTvxO3S=3D31_B8=
+5_UDR7RoK1dQVtMA@mail.gmail.com/ [3]
+> Assisted-by: Codex:gpt-5.5
 > Assisted-by: Claude:claude-opus-5
 > Signed-off-by: Christopher Lusk <clusk@northecho.dev>
 I will apply it to #for-next.
