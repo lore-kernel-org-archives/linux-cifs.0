@@ -1,115 +1,84 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906078834
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:49:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F56E1474CC
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 01:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787014144; cv=none; b=O0yFCm61uVLKVoCSEcFOcXXJOZgIVsPxbbTwibVWpWYzp8Lq4d3uXTMpqn6qBLFHE7TJpAyO3USNHU/RYYMkjF3Te4jj0elkbWLptLjBYKqT6rCGPWsnsS0fJ3rpDRe06MoIDD1glTMyPE8/1ykOO9I2gMsLTOT8y+ziIhXr2qU=
+	t=1787015799; cv=none; b=Dpv7HMS6bmBZ2Gx5Kks4xylRsl0i801IhT07ZGPvbWkzCuab3gmb0SDEfLBfBEQWswScU6gUmDAiSwMPh5rzrjL97jrl9bv5OD8zoKyK32DFwAhNrNYi4FwXSGpNoOg7nnuS5yqLyFEl1Sd0GjphJ8zHYW/4PtF1lgNNEtnHTxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787014144; c=relaxed/simple;
-	bh=SasMhfzwsxwjzD+6IIfn3u2enkJxhVF34aB+hIwprFo=;
+	s=arc-20240116; t=1787015799; c=relaxed/simple;
+	bh=rFcQcpptybZVKphhP4Sxqy2ozY4NAxENj2ttVW4LL/Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nn47TrqaAa7+BgA1dH+crAdERzwVVZ/MUocq/IE0sT87yZsBJiptPxV1I/OT2Pp7V37g6DNr9d35+zbYAtX1sfpW8heLa6dcylY/IH35naYHt031uKsO/lLjYJLDbrN7asPiPxWclW7Z5P5np52xCSu7xA7Nx0TlhA90iU6MFo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mIwU40qk; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=hgtOykeiL61H3HUEQwKsVCS57OH4YDsUrnTaN/FbLcQ7GiWx47yfOANAIXSWCPvpwJzNkkDuP0k9t8roaiBZdbzuhHoWCXu6osaCfZPlHAgW4+sI2ifWWkKJEGfZOpZ+4NoUzzIz5iIoIbCBFbZ8goMt48xnMJklefOmPmif834=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lPM74Ufc; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mIwU40qk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 331641F00A3E
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:49:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lPM74Ufc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E6971F00A3D
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 01:16:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787014143;
-	bh=vYR4eDIKGdygMV/CaA5QXqzipLBrq7FUa6fTRodUpdg=;
+	s=k20260515; t=1787015798;
+	bh=s++4m+hU8RC538/3gXWVoJGetCnZOPJ1k6ceCvUowpQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=mIwU40qkXJmJF0Vkge0IuTIkLFgYhLeuErRi4wfYjAuuN04RQZmxYb3L+OVIZ1Xq9
-	 8PImwLQGQkXjHXf1IxbNN1vXtifq1EqIk7i4x8zArBt4Z8u/M4nlGCKvNfQMnQPJ7P
-	 V0OoiSTYoo6J/ZCt/wgIcv8dQRJep4lL713A4E62XHuZM+xl7Ef3UQKaObGreGAE3/
-	 MBDweMo1PK9mk2rvklJdSGaT3K3a/OAX7V+LiDK2ukxX3ThdiGgGX1UNCaC5R93zUS
-	 ARZjk8B88L7R3gZIljFzsKzmwjUA1byPlRXDz3TWPOMz7lum3TN+6kTaFtzYQnvy/F
-	 d1RBfkONuupLw==
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6a20319d030so5512638a12.2
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 17:49:03 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rr8rMEnLiCFHXi9jAvAyG8B1t8O7c9hJKgXp/GWgU0FZkPdyXHlvTKYsiaqQdwzEmtsACZZoh25CZbp@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyzy8d21KInhXLHWzpuT5eFHRKKtRUD636LKnMdwSTxbAdVXp3T
-	W6CiMCQFo8+cSoZ7HSdpJkA4rEkB/z7V0BQfR0TRlJw1vdC+rT+lKB3yuTBQLusG3mNryGT9LML
-	N95lBEsbGMm8QfII2k4veKr2cglArqdo=
-X-Received: by 2002:a17:907:9413:b0:c16:592b:ec4c with SMTP id
- a640c23a62f3a-c212a090a10mr1249314166b.1.1787014141783; Mon, 17 Aug 2026
- 17:49:01 -0700 (PDT)
+	b=lPM74UfcAtc/zzXmGzr/fvOV7dpCZmE9kXkLvzlskVfcBi31Db6kILb25GFNwtKbl
+	 rNh4NESgebOWGKgx33qPm6z1zZWHOIDN/Y4R8L8whe/73HGuVqK14kRGPwqULhyxyU
+	 HselsCFVnM6TWEG/90v0Rx+N3CDbp/WBjO0ZtJVCObvxFhdYyBJTcemuePOXHfS3R0
+	 K9F6waFOqhEGdKF1bBP9iq/1o34COLfbFoE2gkInYHR3nhVFxqD2nLkFy7UjMF74P/
+	 farMsoC1kmggTVKRz+A3f9rHQp+CNTbM139syDgWsSe+Uo+whc89EDiP+evSda+ZAi
+	 SyTVkfM7uIevA==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c207cb16cf5so570917766b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 18:16:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RpiBJHFI1pi+S8Go27gXQ8OeuUM4dQ39+Tivefvm5p3VfCpv7ByAVInbidlbCmTsfRwt3HiNMejUWOg@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxLqaEaQW+cFhJCfGkOWnEe5FjOy2cUgMZYamiqPL+U06Q2c/g
+	f0f7ivyl4biQbaVbW3+kMBzu+evT4Ss7WRHj52OXePA9JNsdJnjz9wyZTPduWJXT8D4+bMBMBz6
+	C1vOEZo90/ijOkOWwOcLnNWtWQQKqiVQ=
+X-Received: by 2002:a17:906:9fc6:b0:c12:5a0e:3e0 with SMTP id
+ a640c23a62f3a-c2188a82275mr201539166b.19.1787015797056; Mon, 17 Aug 2026
+ 18:16:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260716022214.2727070-1-yijiangshan@kylinos.cn> <CAH2r5mv962Lp+mLi2JCjvWhtJLbzLqwmjxYSCjSUyy_KLjAzuw@mail.gmail.com>
-In-Reply-To: <CAH2r5mv962Lp+mLi2JCjvWhtJLbzLqwmjxYSCjSUyy_KLjAzuw@mail.gmail.com>
+References: <20260724023539.1596955-1-fredric.cover.lkernel@gmail.com> <20260724214435.1850384-1-fredric.cover.lkernel@gmail.com>
+In-Reply-To: <20260724214435.1850384-1-fredric.cover.lkernel@gmail.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 09:48:50 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9+Rap0OO5odjSSaZpdn1Vn8cj1=KyjYQVU-yRfD4i2wQ@mail.gmail.com>
-X-Gm-Features: AcwNN1WsonR2nRGwekbpuMYE5lOjPLe1GZD7mElDOEEo6c8KL0xYctHfF_Zz4OE
-Message-ID: <CAKYAXd9+Rap0OO5odjSSaZpdn1Vn8cj1=KyjYQVU-yRfD4i2wQ@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: clear setuid/setgid bit on write with
- cifsacl/modefromsid/posix extensions
-To: Steve French <smfrench@gmail.com>
-Cc: Jiangshan Yi <yijiangshan@kylinos.cn>, linux-cifs@vger.kernel.org, 
-	sprasad@microsoft.com, pc@manguebit.org, samba-technical@lists.samba.org, 
-	13667453960@163.com, jlayton@kernel.org, linux-kernel@vger.kernel.org, 
-	tom@talpey.com, bharathsm@microsoft.com, akpm@linux-foundation.org
+Date: Tue, 18 Aug 2026 10:16:24 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_uABp-cX+DgKKr4YvxUTM21X2KD=twffUpRt=harWCXQ@mail.gmail.com>
+X-Gm-Features: AcwNN1U0DgNdXW9K8pfeJ3clvgRqMVv9RUkVyPmYHzwNuei8_X4vlSywYPM3M8o
+Message-ID: <CAKYAXd_uABp-cX+DgKKr4YvxUTM21X2KD=twffUpRt=harWCXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] smb: client: fix dangling pointer in DFS target hints
+To: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Cc: sfrench@samba.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Jul 15, 2026 at 9:23=E2=80=AFPM Jiangshan Yi <yijiangshan@kylinos=
-.cn> wrote:
-> >
-> > When a file has the setuid or setgid bit set and is written to, the VFS
-> > strips those bits and issues a setattr with ATTR_KILL_SUID/ATTR_KILL_SG=
-ID
-> > together with an ATTR_MODE carrying the already-cleared mode.
-> >
-> > Both cifs_setattr_unix() and cifs_setattr_nounix() unconditionally drop=
-ped
-> > ATTR_MODE in that case:
-> >
-> >         /* skip mode change if it's just for clearing setuid/setgid */
-> >         if (attrs->ia_valid & (ATTR_KILL_SUID|ATTR_KILL_SGID))
-> >                 attrs->ia_valid &=3D ~ATTR_MODE;
-> >
-> > This is fine for the default mount, where the mode is only emulated via
-> > the DOS read-only attribute and cannot represent the setuid/setgid bits
-> > anyway.  However, with the "cifsacl" or "modefromsid" mount options the
-> > mode is stored on the server through an ACL (id_mode_to_cifs_acl()), wi=
-th
-> > the SMB3.1.1 POSIX extensions the mode is sent to the server directly,
-> > and with the SMB1 Unix extensions (cifs_setattr_unix) the mode is sent
-> > via CIFSSMBUnixSetPathInfo().  In all those cases dropping ATTR_MODE me=
-ans
-> > the cleared mode is never pushed to the server, so the setuid/setgid bi=
-t
-> > survives the write.
-> >
-> > This is a security issue: on local filesystems the setuid bit is stripp=
-ed
-> > when a file is written, but over these cifs.ko mounts the bit persists =
-on
-> > the server, potentially allowing an unexpected privilege escalation on
-> > subsequent execution.
-> >
-> > Fix this in two places:
-> >
-> >   1. cifs_setattr_nounix(): only take the "skip mode change" shortcut
-> >      when the mode is emulated via the DOS read-only attribute (i.e.
-> >      neither cifsacl/modefromsid nor the SMB3.1.1 POSIX extensions are
-> >      in effect), so that the cleared mode is propagated to the server
-> >      in the ACL / POSIX cases.
-> >
-> >   2. cifs_setattr_unix(): this function is only called when Unix
-> >      extensions are in effect, so the mode is always stored on the
-> >      server.  Remove the shortcut entirely so that the cleared mode is
-> >      always pushed.
-> >
-> > Fixes: d32c4f2626ac ("CIFS: ignore mode change if it's just for clearin=
-g setuid/setgid bits")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Jiangshan Yi <yijiangshan@kylinos.cn>
-I will apply it to #for-next.
+On Sat, Jul 25, 2026 at 6:47=E2=80=AFAM Fredric Cover
+<fredric.cover.lkernel@gmail.com> wrote:
+>
+> This series addresses a Use-After-Free bug where ce->tgthint was left
+> pointing to freed memory after free_tgts() was called.
+>
+> To fix this, Patch 1 hardens the DFS cache readers against ce->tgthint
+> being NULL. Also, Patch 1 hardens callers of get_tgt_name(), which
+> returns an error pointer when ce->tgthint is NULL.
+>
+> Patch 2 clears ce->tgthint in free_tgts(), eliminating the dangling
+> pointer.
+>
+> v1 -> v2:
+>  - Addressed automated review by Sashiko:
+>    https://sashiko.dev/#/patchset/20260724023539.1596955-1-fredric.cover.=
+lkernel%40gmail.com
+>    Split into a 2-patch series to harden readers against NULL and
+>    ERR_PTR target hints so that clearing ce->tgthint does not cause
+>    NULL pointer dereferences.
+>
+> Fredric Cover (2):
+>   smb: client: harden DFS cache against invalid target hints
+>   smb: client: clear ce->tgthint in free_tgts()
+I will apply v3 patch-set to #for-next.
 Thanks!
