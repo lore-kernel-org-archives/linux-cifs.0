@@ -1,53 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DDE3612F8
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0B43368A7
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787038319; cv=none; b=i2PSHiFCjdiaw8fs/RDZNbIGKDYREZub1tgks0yHGt6tAWjAtssUdNhfu3J/M1ijw7p2AgY+VT59eEmvG8dhTsCdtuf6F07yoA4JssSIruUwMl7TngT8k6J9cH60EJZu/0UyTlIYsJL8AmGvsOALnOyAYjDhDHdKVfCntIuaQa8=
+	t=1787038351; cv=none; b=RTTprYiFp/YrFFWC/T/6PsJZRJjH3qDfIRNtk8HX3L6iIzac++gwf2tmB/ueK2k+WWehfH1IicPfP6koBIQ+THJtXPWonJOFJ3JsHLE7+5AAqUXbI3bFr1f+WKjcZxvIdKCshIAUbeDAMS6LYkvbcO0q0LYfKH9rwFjH47iytoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787038319; c=relaxed/simple;
-	bh=+qYEbrsbxj7e9WQzvoPeckK44XOr8IeXkOfRcwGoItc=;
+	s=arc-20240116; t=1787038351; c=relaxed/simple;
+	bh=gWVKoELc41Q4ODZB1q8SMDrSdFTmOOLGWTN6c1AFAtU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=blpx5p+PWZ9Zh9/3iUFnjfDz8mQosbTCZrkMSUTI/aZ+vU9+jsT16Ouublyn5nuQiCiJDzoiZFoe28SPdyZL0HukWGfb0EQWCW0PPiz1CxnX8JwiwaXHvcqAbIkMi6+95u6TSmvoM8m6Rjzx4PTy/EwmW4PKSb3tYOWAtBcjaIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jwmmCRaE; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=E1P3NtiZyAWMAbFRNvSzrbLg11ePq/pelctqdsp98ZkUcRooKlEEhJr+doBzgohiy4F85yLikwaNq02IWNU3p/OU6CGlh6VGiPf74rPIdgzIvvfn2vZ1iIhYnx8Iqa8lwWlpG8Rnv10zlKN62glbm1k3ow3BsBUFJ0ok4km+qoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=na3h10R2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jwmmCRaE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B1CB1F00A3E
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:31:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="na3h10R2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9882F1F000E9
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:32:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787038318;
-	bh=fgU1zVBtw16i3Xm5dVnrej6Xkx66zn4xXZdqZiqmMe4=;
+	s=k20260515; t=1787038349;
+	bh=e/55hTSdvUMsXq7z6LxDTJi6siRoDAYgW8jGyft10fM=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=jwmmCRaEd7pqX2Mbtyl5Nr0TzvSVYM9cYBUrrRhk+kwvToYclAE3VIY+EbKo3BFhS
-	 cxQhNeEnvoETGEBY4cHJxHUd01LcM0Z4jq3sSy1GSERO54yW8vnlZmOLqxN4NYOrsR
-	 /Gu+g+CTozsQWrotWzm/cLmtdPMZzzNjbtc5lDOuVYW27uFu7izpk82tugmLVm8CZI
-	 8eXuSeA01JRlP840fihBFPDj70oBJEtIru/MsdocGW/bJwquGwEpPA+y6EI3sA5ipP
-	 O7wYm0CpHEGP9COziZ9TKPXXmQxCsKFyxI1sa8cuKMPDh420tkQ5UeD1nzm77aCoAI
-	 M4Wh9YBtrfpkg==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c15e592da74so584806566b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:31:58 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yyev0qnCjOsU60DkqSmQFWkCQ1PlN9bDDaIX7DDo2Jz31+oTGw1
-	+LUhzkjGQidH0AyPAc1jTgiZGBDYGcv+pkb7qpXjF1NGk7RNfk31xHqy83iU5pyhDIpimvlAtgz
-	hCEOk7ILmOYb6pr4gOyKttcZ1ALvUiiY=
-X-Received: by 2002:a17:906:fe02:b0:c16:9edc:612e with SMTP id
- a640c23a62f3a-c212a090d19mr1497844066b.3.1787038316995; Tue, 18 Aug 2026
- 00:31:56 -0700 (PDT)
+	b=na3h10R2b5vozIoca5z+mguPGClZ4AanuATliEWV1y8lk0nN+ZVg7XybohUPZiNZk
+	 NZyKCi2Toi70dsWp8svlBPRRGkDn4nN3Qey6pKb75KjfNCnWmGeWKTIwq6vqdOUWO0
+	 Umw1NdlGJqFgMO8F4vyMfA/oiNcQmYnDpeGCDUc2M2yi1Nhck+kQH1NDNSDcY4G2C9
+	 IQl9GyUdlAxhHbP3cDGLNgnsr16Yia0pZh7DEKoXRXXLl0YweuSiwTh3lbxGlqLPzP
+	 WuTLDoXKeEMYWNDs8bKsCkk9VUB5oS11fb5+N4g0UJ7ojrkhTJaPtmj+8HJGao8Du3
+	 +Q4JRb9YVscAg==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6a1a546a6bbso6465411a12.1
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:32:29 -0700 (PDT)
+X-Gm-Message-State: AOJu0YwWhXsSqOb9WFp+Y6RY4dgB1VLZ74b0CnK/jMpFGUGJf5Bnnr3V
+	k5odi4YdYyA4snh7XdYeZbPxI0jZ9ml7GkgJtg3uSKtUADso+afGCRE//xnBZkpsHJNL41SxNe1
+	K4b76gn7bw3n9sesAofR9b5qZr3pIcp8=
+X-Received: by 2002:a05:6402:4345:b0:6a1:29ca:681e with SMTP id
+ 4fb4d7f45d1cf-6a38a927f6dmr13487735a12.7.1787038348259; Tue, 18 Aug 2026
+ 00:32:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260817171657.212776-1-sorenson@redhat.com>
-In-Reply-To: <20260817171657.212776-1-sorenson@redhat.com>
+References: <20260817171651.212730-1-sorenson@redhat.com>
+In-Reply-To: <20260817171651.212730-1-sorenson@redhat.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 16:31:45 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8sLqY_j4yRQy1vassOwqovocJACH71Y2Zsv1YSetYs+w@mail.gmail.com>
-X-Gm-Features: AcwNN1Wyl_fTX05l4Fm8c5G-HZiGJsoB1qry4FfCMhYS_uF0xlXDr7lpTUK1Lxk
-Message-ID: <CAKYAXd8sLqY_j4yRQy1vassOwqovocJACH71Y2Zsv1YSetYs+w@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix use-before-check of ReparseDataLength in reparse_buf_ptr()
+Date: Tue, 18 Aug 2026 16:32:16 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-5mhDQ=2VYkvcE8KRiiMBJXSFiiYwTY9DNNVdsMaF3=A@mail.gmail.com>
+X-Gm-Features: AcwNN1UTgT6BGES4hWTDWJFq783w-ccGdA01bNHp2__GkFQ2Cu9_UCmwahtbntk
+Message-ID: <CAKYAXd-5mhDQ=2VYkvcE8KRiiMBJXSFiiYwTY9DNNVdsMaF3=A@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix ALIGN() overflow in symlink_data() error
+ context loop
 To: Frank Sorenson <sorenson@redhat.com>
 Cc: linux-cifs@vger.kernel.org, stfrench@microsoft.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -56,26 +57,18 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Aug 18, 2026 at 2:17=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
 > wrote:
 >
-> reparse_buf_ptr() reads buf->ReparseDataLength before checking that
-> count covers the full fixed header:
+> The check added by commit 7d9a7f1f96cd compared the post-ALIGN length
+> against the remaining buffer, but ALIGN() itself can overflow: for
+> ErrorDataLength near UINT32_MAX (e.g. 0xFFFFFFF9), ALIGN(x, 8) wraps
+> to 0, so the subsequent bounds check passes, and the loop advances by
+> zero bytes leaving 'p' pointing into stale data.
 >
->     buf =3D (struct reparse_data_buffer *)((u8 *)io + off);
->     len =3D sizeof(*buf);                          /* 8 bytes */
->     rdlen =3D le16_to_cpu(buf->ReparseDataLength); /* offset 4, 2 bytes *=
-/
+> Fix by checking the raw ErrorDataLength against the remaining space
+> before applying ALIGN(), then checking again after.  Since raw_len is
+> bounded by the buffer, raw_len + 7 cannot overflow, so the second check
+> is an exact post-alignment bounds guard.
 >
->     if (count < len || count < rdlen + len)      /* check comes after */
->
-> struct reparse_data_buffer has ReparseDataLength at offset 4.  If a
-> server returns OutputCount < 6, the read at offset 4-5 reaches past
-> the end of the received data.  The off+count bounds against iov_len
-> were already validated, but that does not protect against count being
-> smaller than sizeof(*buf).
->
-> Split the check: verify count >=3D sizeof(*buf) before reading
-> ReparseDataLength, then verify count covers the data region.
->
-> Fixes: a158bb66b137 ("smb: client: optimise reparse point querying")
+> Fixes: 76894f3e2f71 ("cifs: improve symlink handling for smb2+")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 Will appy it to #for-next with Paulo's acked-by tag.
