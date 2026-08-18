@@ -1,75 +1,67 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A86729E11A
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1E33403E8
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787037195; cv=none; b=ESdEzJcw3nFk6x5SiMB47m6G0ieqOn3z6M1H+eQjs+r47V8/CY2gK9t3RwkmIWvcK9kYeug02hOn0Ct9JtVBz5zzZhpKs4sB10K7HfB6+PdhPTsaf80qaXfa4P+Ss7pzIVsGmYH91opw5Yxly/BkMRwgA9JawPZw3h3NQ/bSEI8=
+	t=1787037903; cv=none; b=n69SfLY1Bc+T9sm/sToKmqU9PDmN6tWoItpKdrld2NgcdqbIgenMHD8pitzjKNPn5DuG81QO5217pksGNpoTvBL7zS+NtLI+gal3EQviUjwj2glKNIOiE1EnRFBnyL7wcICowA2p5YaGHGQYTg9VJUiuyC52qmcKsWH+6054bXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787037195; c=relaxed/simple;
-	bh=JunbrMh1yI0mkLFpGxtU0Z5pI0zE+QPz5j4D4HgGYWA=;
+	s=arc-20240116; t=1787037903; c=relaxed/simple;
+	bh=rjhuO8sSmUNRck8KQ4aCp/KEIV4i6l2rlYrYM45HPI0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=INMRpu2Y2Inxe0xFL4XEhETBOUsYhfpRxzkncWDbhfVQ+p6F4P15nr0bqCSBVS+8aX9fw+IFzeiMC3qAZ15EGGbmTq+iM3YRknz4R/D7PUBlsiVaXhTGOPBDGE9E0muJ+JakgdpWvKtpB+hvmV3H/yCYH3QAPaiuqvi4pZCe+mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cB0DY737; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=je1uwdUAvUc1+Ykcxozn2bnVgwQ3tsctJ1Bbv00lVM7mplXp14nTmb8bN8zm52B6hoNlHdNdMvlqpn1lMaM7bBJeSh2LLUPBwznKOmCL4cnTM33Rd7zI9L28ZyUTj9BN2dhiQIwWytpo5xi/J02FXAdEvFvCuI8NbSJobgdrxK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hmjK1P9o; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cB0DY737"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A56A11F00A3A
-	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:13:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hmjK1P9o"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F85A1F00A3F
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 07:25:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787037193;
-	bh=A85nw1UST3SqzMgqsoL2q4u0M4lJIKKLMkysCrurgwo=;
+	s=k20260515; t=1787037901;
+	bh=rjhuO8sSmUNRck8KQ4aCp/KEIV4i6l2rlYrYM45HPI0=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=cB0DY737B0fMYYPRHRv/ME58NSxcYq4ExTY4VOFDm8VIuporTlyklFSFl8NNCU6cn
-	 zqxZst/WhAxOmp05ygRylmv3uxJfKfIlHuliaDsR3R2esvI3BY1DWW1prF2BZC0jDK
-	 GMKAm0J7g1N0wiSo7DpEWyShYy7aVtxVOSG01J5Nl8290BwT99O/Er/kLocX+BKPyG
-	 5nCIO9dnjUGyP8weroqy2a2aZ9n08RbtmLQL/GkVa1n2c1AkOxXhS2r2I4KfQFVbuo
-	 zitQ/HLyxZ/n7bQAaJ4gOH9xbunlXy2/x0e9gXNOMM3GPMepvN4PKH2N7nKGAvUz9p
-	 jsPbCwukVAw/A==
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6a3819e8be8so1394875a12.0
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:13:13 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro4t2yaN4E6/U6ZdClQhzmK3/q2SLgxy6FS7Gm5xNKvGHzJoo8RJZoJvG0D3FDdum7ycE7+5Sg1gJp9@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza7tecEdDi3LYTLdyazREUcN2drmR3Pu3dJ0XqfKtBLEOLzcI+
-	qCvgjLJh0FK5vnWOO38wM94RjtJ4qNc0pg65kVtZSuA9qS22aqOilz82AGHjZo40zxgmol42Gl4
-	grqUxHKfzKTeLEI7fYRQsgcbSz6wpo3I=
-X-Received: by 2002:a05:6402:24cd:b0:6a0:9ce5:3f5c with SMTP id
- 4fb4d7f45d1cf-6a3e3c986f2mr2122879a12.7.1787037192330; Tue, 18 Aug 2026
- 00:13:12 -0700 (PDT)
+	b=hmjK1P9oTg5GLV6vGyxv3ZZ/jYvPtxVux3s/jCuko4yVwiCreC0QZ9oDgTkAlNYNL
+	 hLkltqy9uUBLnucm/CgnEgR7DMPngcYv59pwePg990KrErMCqdLJ06U5zyS14ApzV+
+	 s47Uz0JC66BmkQ40Ut8P3hDrIJ0N4HVrkzngfO5QXqsZSDbL8odcoC0QbiKGpUQszD
+	 ikLvePZToqnymVw1ypbDUu3I36FJ5oVidM/OMgmkLekXWzfVYf9fsVrLDLzHPIRgJb
+	 muQ+tCbI/RYYzASnpHaUEG3fi57kQERH8nHKEMIVHQ6sVqu1HtmgVS0xu5apoKos61
+	 xoo1PqFeWYrQA==
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c1600d040e4so96712366b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:25:01 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rp4FL2rSvc6VnQqmqBvKSlexzw/BICQqWcUSs94nEN3ugxOI2OBPivwQSRKtnICb2VZxuRaS2mprHdE@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKbFgMwPUwG1QOm+ZNBLsn24pwtBB1QZvX+3EsN/oUIj0QrUn/
+	qnlVMLn5h2yZJ81Gd5CiVlc/cSMbsm0yrByfuayYm2wqoqqWEunnKxu/O6mQsekM7DvXFHVKbdl
+	LqBgVUujhWCkQpFRJ2+Z5tZT8PkvfWFQ=
+X-Received: by 2002:a17:906:eeca:b0:c20:367d:f8b8 with SMTP id
+ a640c23a62f3a-c218afaa94emr239298566b.4.1787037900164; Tue, 18 Aug 2026
+ 00:25:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260813132136.366532-1-huiwen.he@linux.dev> <20260813132136.366532-3-huiwen.he@linux.dev>
-In-Reply-To: <20260813132136.366532-3-huiwen.he@linux.dev>
+References: <20260814041418.1216774-1-dmantipov@yandex.ru>
+In-Reply-To: <20260814041418.1216774-1-dmantipov@yandex.ru>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 18 Aug 2026 16:12:59 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9=LsiPNG3=+-x44fvowpT0oXWtHwL0eYy8zEtLGR4POQ@mail.gmail.com>
-X-Gm-Features: AcwNN1VKDwbxBmgKxuvvbMmkeXqoEIhqs_CeD8qa7IxmiHBEqdVpWzOSht39tTI
-Message-ID: <CAKYAXd9=LsiPNG3=+-x44fvowpT0oXWtHwL0eYy8zEtLGR4POQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] smb/client: mark file sparse before emulating insert range
-To: Huiwen He <huiwen.he@linux.dev>
-Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	senozhatsky@chromium.org, dhowells@redhat.com, chenxiaosong@kylinos.cn, 
-	linux-cifs@vger.kernel.org
+Date: Tue, 18 Aug 2026 16:24:47 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8zH5M0BMoHRA40Hnm9KHDBFNhNmjjEmQAD2Hy64ZAvBQ@mail.gmail.com>
+X-Gm-Features: AcwNN1VdvnISNSX-lLX5SzI9PwB0dMi0945mh5KbjsNzu3x38nmuT8QvPce5cCs
+Message-ID: <CAKYAXd8zH5M0BMoHRA40Hnm9KHDBFNhNmjjEmQAD2Hy64ZAvBQ@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: simplify __build_path_from_dentry_optional_prefix()
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index bc7dda6d825a..430b6a1a2d92 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -4006,6 +4006,12 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
+On Fri, Aug 14, 2026 at 1:22=E2=80=AFPM Dmitry Antipov <dmantipov@yandex.ru=
+> wrote:
 >
->         count = old_eof - off;
+> Use the convenient 'strreplace()' to simplify
+> '__build_path_from_dentry_optional_prefix()'.
 >
-> +       /*
-> +        * SET_ZERO_DATA creates a hole only in a sparse file. Try to mark the file
-> +        * sparse, but continue the emulation regardless of the result.
-> +        */
-> +       smb2_set_sparse(xid, tcon, cfile, inode, true);
-Shouldn't this error be propagated? Unlike ordinary file extension,
-FALLOC_FL_INSERT_RANGE is required to create an unallocated hole. If
-SET_SPARSE fails, SET_ZERO_DATA only writes allocated zeroes, but the
-operation still returns success...
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Will apply it to #for-next.
+Thanks!
