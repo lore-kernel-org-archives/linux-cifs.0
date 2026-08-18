@@ -1,114 +1,113 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B873BBFB1
-	for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 20:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F327D285CB9
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786999514; cv=none; b=seGqJ652nViRRAjBRLeJZ29c2Sbwo77bWIi0nYuEf2MOcJdlWSqJCyWwksTJo9fNr1ep+cDaTrZ9prynQCcg3HqUBLykuzwlE5B4ZAzUYb1ju2ygpFxriA0k+w1oqJadu5OfKqHKpJ9GlUP6FBy1InGA0slZoatU8rzi2Esjw5g=
+	t=1787011246; cv=none; b=oGXiqhYhKqWZ3A91kI1LRr53Jtu8me31o+g0cwduUuvA7GCkOVlawADYTU4QvgmYz/gHvDGLZnerEAnw1gIE8FFXRIjmRlWpzWSNmzHCLygb7z3/JRJx/CDHaFHoarJ+2Os2nw6MkpYmgnfR9QBjlXtb7lJsFld6ZUgKpB9jg4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786999514; c=relaxed/simple;
-	bh=mIUQ3UXgIQKzSLkCrkr3uy/3bn2erMtM8Ntw5Sxq3mY=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=i6u7RzMqhKOE4q+ao+GgqfbwvoDvjCYbvcioUHBGag6AxnRKUkCaJjLI9HtpTwyxVuuG/rZ2zScz5XesUgEzmT5dw8fKn8eQl+IGnBwaYsC4UTSXrUaMEiIJCnbqaJzVaQbcb+EotLLcsrw87OQb1WRWXXoA+lkA77HPq6iOXbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XxOjdPEL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SjElBlbg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1787011246; c=relaxed/simple;
+	bh=ytj5ujcC8TcJDZgIhyBzqrocKJH9J0D+xJBSZJM8Atw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CffH47taC7SH1V6nSMQY1RgML5zRmwbvaaCg/EMb+WZ4zw1lSYZEz0d+nOO2KuigymihUh31of0Yo00soameg2Q/sLLT8noNgAoJiQbB5Kp84YmrTsuFHIsWlXo8lHvRSt0VM9Figg6heUzHlMKatrmYK/2FGZydwdMsAXR9YgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lXccHndy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxOjdPEL";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjElBlbg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786999508;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dw8JGsbs4FSa5dEldFM9N96xFR4Uqf8/0f1/Ed51E8k=;
-	b=XxOjdPELciCO2m5nZ+sTz91A/vWxR1xjnmKQxmwThguaygo2SXW1N8Dj1TdmEkWGp7s7N7
-	Q7FD/IpYQRB07Vdyvl+Cu5dV+hgCbZEiwibYfLPLFfWhhOfNtQiKcdGO4hIMBogS9qU+m+
-	CJjPtVqF/yuWcN8NVz1v6IxjR2K9jY0=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-22-Xgh5SiX4POWPvYwAopgThw-1; Mon, 17 Aug 2026 16:45:02 -0400
-X-MC-Unique: Xgh5SiX4POWPvYwAopgThw-1
-X-Mimecast-MFC-AGG-ID: Xgh5SiX4POWPvYwAopgThw_1786999501
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7f4026a59cbso1090593a34.1
-        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 13:45:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786999501; x=1787604301; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=dw8JGsbs4FSa5dEldFM9N96xFR4Uqf8/0f1/Ed51E8k=;
-        b=SjElBlbg9SqKNnCciTCjdHYqRilsfR3lDbyCY9Z1jzWypLSwGFFujrpLr3mYIxfAaJ
-         reO5G0JegOHqtbfYRj0aPLUle3l9doHsfSwvaXzCydNiPPR8qTOvQbU3BLLwFIDqmwFm
-         ZV4SJhSSB7Oy1dmuGzfQtqWmQoNsqjGKFlgU5V24mC6Odl4i4i65hA0Nl8ykx/9MXoQC
-         a3ObPAdG47OsbxP/miJZ7vgkkvkVyekoIV9Hu5h+Bjg3sXU5SATbX48jK/rZf7FyoP5R
-         zocFXQkeVSGvCIi2w2D/uoWgF3ZmUeu0blqDxM23x+i7PhDfK7e2E/+D3i9yhyysI+LJ
-         N7MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786999501; x=1787604301;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :references:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=dw8JGsbs4FSa5dEldFM9N96xFR4Uqf8/0f1/Ed51E8k=;
-        b=eTwsfsRmAIkuXkPY1Y/IaFhGLSubkPicduLKI4eEhtXrvoRlB+iUc9Fe3Q0ILzXvGe
-         o/KFJHEXJYK8b6gPVJDt8X+pDcVYxA7ANooQnrfHHvToqeJeIez7griHG2aOBo+336d1
-         47VlU3fv7FAEp6xDNVHqj1D8bFLtq9HEXo40ctyzZZkoNu+it+NpGVonqTJ5KtuIm/cV
-         TpeU4mpeMDlwZRp0MwS2D8DGEe2TG0g6xD6oMJXaOmgUem0+5KWTKKdaAoGlEUQecvVw
-         qFFKEcnLeZOhFecynKl9W27EeEegPsR1ZIv940oJVZlfnC9z+NqBlI7MndgFJJmMjGMy
-         rGIw==
-X-Gm-Message-State: AOJu0YzrYp/wdKTnMDMp4i+1o1vDyzLI2RG2yQyDSu+X4CZCuZ0Ep8GT
-	QTaHfAKBY8RnKTf0UOv6Pi7gKImztNLnSrA3zspYeBS0blYwVjcQ0XWRthvObxu9rakP6lAeQCM
-	p01xwgl68nw6nIVUIqU9YPvURkKU0ca0RXyhyYVW5skh9avzLt+HAK+QOCPPeIr8GWoqHosW87l
-	PxoHKx+1AaQOFYE6yrIh6vQateydqoScUhnjjwEyZn0e2aKvQ=
-X-Gm-Gg: AR+sD12vQOiyNRv/oCG7hNqF05NeA990eask2vhP4SxvC3sE/pDW99KfpEaQKONd3tE
-	2S2STgDHs+doDsVat+PBpM5FNUTrJt9QOb92d4KtmaxZzBX/Dfk1SVNBuTmMVStf9OAdNf3u3/D
-	qdl+cqymCcMWi1tWnon5JzxwX+Ztjnvk+SmzLAqd5MCMkT9K9XZDgigtGigj+17qtIu0fqyiWgf
-	1I3igG4OVX1t0u/ggxyfZwKYfEPND6fwciPT9gb12k/JIwJVTGJLQ3bPfPzot47rsaRIJTbfPGT
-	q29m6lsD6dom9NOd8+r0fiBpSnznYOKXjQWd8njlD4kUZg8cZ6NggxcJz+QInZbY91eWRr4hJWL
-	cJcRZLzpO0DpP9NjHGc+kNWhCItbWsYAXfRAbHGHn
-X-Received: by 2002:a05:6820:628:b0:6a1:211e:3c6c with SMTP id 006d021491bc7-6b11e1f7e54mr2867813eaf.18.1786999501503;
-        Mon, 17 Aug 2026 13:45:01 -0700 (PDT)
-X-Received: by 2002:a05:6820:628:b0:6a1:211e:3c6c with SMTP id 006d021491bc7-6b11e1f7e54mr2867760eaf.18.1786999500823;
-        Mon, 17 Aug 2026 13:45:00 -0700 (PDT)
-Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6b1165cd4f0sm2615735eaf.4.2026.08.17.13.45.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Aug 2026 13:45:00 -0700 (PDT)
-Message-ID: <e0a480cf-9518-485f-9d53-88f2a97e3dc5@redhat.com>
-Date: Mon, 17 Aug 2026 15:44:59 -0500
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lXccHndy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC7B81F00ADF
+	for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 00:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787011244;
+	bh=jvg7Qel8kPi1+BA3DkE77LkZUtjRlpucRqS8kRlFnoU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=lXccHndybdpjyUukgbdw8IWdJpwC6i0cos/DhELbtJgmcHrWwtjihefDqvVJxRxH3
+	 4Us6KdzIcuRJLdhnITJElqipQ1Jc69oeHpF8WqFZLFeeJKcmpTSiYw+Tf2az65CY1B
+	 U/SXq9bb1rtNl6QJU9FXU8d6xI8bMrMxGWCM4mXvPv52vJzZpb5AzcZxS9UNoeE3HE
+	 miW+b56xhFqSZ3y0htl5Wu24CtrHE4jC9yhnZXUebUIKU2QYZ8XYO1fcedO+sWHEn2
+	 gaVpp3jRhdSq5YItYPWfHZvXmgjv37bnHm6v7sB3EVbIesPr9T+rBF+3LGdEiQG0gu
+	 xkw7YmHIxOHjg==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6a17c04563fso5900518a12.3
+        for <linux-cifs@vger.kernel.org>; Mon, 17 Aug 2026 17:00:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RpABe5RAyRSR1bt+RSPgFZJDjeR730CjBEUs4Bhf4lGXopjdVdALPvtBL3rAWzpkUeYc5FvUTUXg3/P@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA+rLKBFvfQpC4nYSzxhpfHW/rsiZ1sB7gppSWagCCn0j6/giF
+	v49It6bLGxVj7v/sbrKoBHqDB0qDBCh7xEtTh1bmgh8g2zfu/OQqDrtNztF1XEVjBV3Y9y2OLKh
+	EMA3LKK5nwQJCmzYkFUCAkdBPv8CRDkw=
+X-Received: by 2002:a17:907:c1f:b0:c1c:4a7d:c501 with SMTP id
+ a640c23a62f3a-c2129a9a26dmr1220629566b.1.1787011243252; Mon, 17 Aug 2026
+ 17:00:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] smb: client: reject lease breaks with reserved
- NewLeaseState bits set
-From: Frank Sorenson <sorenson@redhat.com>
-To: linux-cifs@vger.kernel.org, stfrench@microsoft.com,
- Paulo Alcantara <pc@manguebit.org>
-References: <20260817171634.212571-1-sorenson@redhat.com>
- <92add2b2-825a-4f1f-ab43-9105106daf74@redhat.com>
-Content-Language: en-US
-In-Reply-To: <92add2b2-825a-4f1f-ab43-9105106daf74@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20260728-b4-disp-6b8e68d4-v1-1-e69277237297@proton.me>
+In-Reply-To: <20260728-b4-disp-6b8e68d4-v1-1-e69277237297@proton.me>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 18 Aug 2026 09:00:30 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9pNtfDCSt8+5fM5m1maww_gVeoEzmZpOD_mhGo6dEewg@mail.gmail.com>
+X-Gm-Features: AcwNN1VUUw-3OQ3bcN43Skd9Jbww6cMCjhNzGkxInDuH_Oz_-autcpuwpSaQLKw
+Message-ID: <CAKYAXd9pNtfDCSt8+5fM5m1maww_gVeoEzmZpOD_mhGo6dEewg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: reject a tree connect response whose byte
+ count is too small
+To: hexlabsecurity@proton.me
+Cc: Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+	Shyam Prasad N <sprasad@microsoft.com>, samba-technical@lists.samba.org, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Layton <jlayton@kernel.org>, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
+	David Howells <dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I can't find anything in the specification to say what the client should 
-do if it receives an invalid NewLeaseState.  Does that mean it's a 
-condition we just don't worry about happening?  If so, I apologize for 
-the noise on this one.
+On Wed, Jul 29, 2026 at 3:12=E2=80=AFAM Bryam Vargas via B4 Relay
+<devnull+hexlabsecurity.proton.me@kernel.org> wrote:
+>
+> From: Bryam Vargas <hexlabsecurity@proton.me>
+Hi Bryam,
+>
+> CIFSTCon() bounds its strnlen() over the byte area with the server's
+> ByteCount minus two, which for ByteCount 0 or 1 goes negative as an int
+> and converts to a huge size_t.  The later subtraction then wraps __u16
+> bytes_left, and that is what bounds cifs_strndup_from_utf16().
+>
+> pByteArea() scales with the response's WordCount, also server-chosen, so
+> the walk can start past everything the request itself wrote, of which
+> cifs_buf_get() clears only the first 67 bytes.  KMSAN reports the read of
+> uninitialised heap, and the bytes reach userspace through
+> tcon->nativeFileSystem in /proc/fs/cifs/DebugData.
+>
+> Reject a byte area too small for what the parser consumes.  A response
+> carrying a service string has at least two bytes there, so nothing valid
+> is rejected, and both subtractions are then safe.
+>
+> Fixes: cc20c031bb06 ("cifs: convert CIFSTCon to use new unicode helper fu=
+nctions")
+> Cc: stable@kernel.org
+> Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+Can you check the build warning that was reported by the kernel test robot =
+?
 
-Frank
+All warnings (new ones prefixed by >>):
 
--- 
-Frank Sorenson
-sorenson@redhat.com
-Principal Software Maintenance Engineer, filesystems
-Red Hat
-
+>> fs/smb/client/cifssmb.c:1791:19: warning: implicit conversion from 'int'=
+ to 'enum smb_eio_trace' changes value from 128 to -128 [-Wconstant-convers=
+ion]
+    1791 |                         return smb_EIO(smb_eio_trace_write_too_f=
+ar);
+         |                                ~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~=
+~~
+   fs/smb/client/cifssmb.c:1982:17: warning: implicit conversion from
+'int' to 'enum smb_eio_trace' changes value from 128 to -128
+[-Wconstant-conversion]
+    1982 |                         rc =3D smb_EIO(smb_eio_trace_write_too_f=
+ar);
+         |                              ~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   fs/smb/client/cifssmb.c:2074:19: warning: implicit conversion from
+'int' to 'enum smb_eio_trace' changes value from 128 to -128
+[-Wconstant-conversion]
+    2074 |                         return smb_EIO(smb_eio_trace_write_too_f=
+ar);
+         |                                ~~~~~~~ ^~~~~~~~~~~~~~~~~~~~~~~~~=
+~~
+   3 warnings generated.
