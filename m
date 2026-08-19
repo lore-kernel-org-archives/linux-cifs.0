@@ -1,103 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB1F38E5FE
-	for <linux-cifs@vger.kernel.org>; Wed, 19 Aug 2026 00:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6771937C0F8
+	for <linux-cifs@vger.kernel.org>; Wed, 19 Aug 2026 03:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787099979; cv=none; b=YLfDaTIsJLrvhCDg9fG/o0LCBWud6A5SYtFuyRiRtR5aE2oyjMUa8gx8EVLgT7JV6TUulwveUB9/fj3NA/vx6Z+kjLJLkaf+zi7xaRSCcz8ZJN4uibRURXQg18HWclqs1zLvz9nVWKloZ6pLY+AQKB0McU3x+f2Dfan//pX0SDQ=
+	t=1787110246; cv=none; b=YHec6hDLdtCXLselB8lt/PAVqAaUPY1eU0RrFpaHxLZ2oRsqlMusFSh4O38jbDFttXomAjsnLsUz33wa8IGKuo0rzAiYN7jhCL5tmfRjjdSZb/xRxBoZGOux+S8ImQEcbDoHSKiP4XjKr01eKTniBS5Vdmto9/rl16T/qNclXpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787099979; c=relaxed/simple;
-	bh=tSxR5kHRd8n8XSY7BZKKx/QVlOWWrv8xOCxQUHDSa3E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q0JuUOo6TVs/Z3lr0EVqjEewuAw5uegiYbo27RyXClSdc9L6YJ5JOeLBqgoUrjR6shZi6cVM3FkPLFWSErTDKpn1hhceHpaffMMa6w316CijOF+y4u6Wlx6vc2y/LezPSUquLqR5aYDu44n63m7oumLMOqtTG1cnTt9E9txd164=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cfcBuR5o; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787110246; c=relaxed/simple;
+	bh=Hf8jb04n+OSG9+FTscCgMqP3jePXwQ1Qo8xtQt2hesA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d4x1bk1ai29/wrGUZ4TdpPeBvPc7uXgHgZCz4tWQmYfCX85mrCEmL+ItTK1IATErwGGMvuZDEXUfsL4FkIiKP9JSCwePHwpCVHZmoDADnhfwUErxoHudxSCfmKhKJSv7s8S89rURIay+/pTunqsOQ+MiaJueX4SwnX4bQqYPONM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGadT8q/; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cfcBuR5o"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6E71F00A3D
-	for <linux-cifs@vger.kernel.org>; Wed, 19 Aug 2026 00:39:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787099975;
-	bh=Puu9lK7xaqmySHa1E2CG6QwbIFGSaM87GP+rVqy5zRQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=cfcBuR5otDF7sHHK/hnF2tsr1qzbBYFaSnKfAVF59fUckCVIdeCspFuEZu7IwgpBM
-	 IHNSG+me1oUr6OrbNQwHMTSWIffA8/TmYlcEVugPMx8gqwzzh6mO78zKOVU0IO+g4x
-	 AWC0UpsCmaQ4iLuvNkU2o51EjxV8JKj2OoMTkpcnp5fHo42pxIzR2xBAMl+m8cHVxc
-	 Y4MUGEuVxvEpYQJAZw5lI7HN9QzM2y+Z+TOzAdQnEanNujajTvCBRx9yHo/qDG+GXQ
-	 bCzRiE40iIVodplN89cvJ0NUleqQaotIXdcF27hap+1kpj6fGN1A6om93zn4u0thF9
-	 AZbU2BcQFShPA==
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6a10d02ff43so863133a12.0
-        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 17:39:35 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rpidk9RX0zVk6Kn8c2tQdvWgOF951kbBXN8zlMQOuwA+JjmVzANdcVBZkrj3KapV8nhM1pzNwL2CRB3@vger.kernel.org
-X-Gm-Message-State: AOJu0YyW5t1Ow1iSfeGDceTN4MkpdE/ImcGGUAnJ7beeXSEP1dnPV9x4
-	lXpGhD2Mbk2A3T8uYCq2EtpRB5UcktxCssteYrCTXObC1Lzg+4sbqnvpLG/zDcz/ECASS6AhM5p
-	aDNoVU9a+ZmAQO2vrOEnwBTH3B+T4YPc=
-X-Received: by 2002:a17:907:7b96:b0:c19:45df:1856 with SMTP id
- a640c23a62f3a-c242e249bc0mr28803466b.17.1787099973913; Tue, 18 Aug 2026
- 17:39:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGadT8q/"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-c96c92c0980so267541a12.3
+        for <linux-cifs@vger.kernel.org>; Tue, 18 Aug 2026 20:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787110245; x=1787715045; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+ZoAAx48uqOdbRDUh6X+Manct/g/MGnlfeAG9fyc7HY=;
+        b=jGadT8q/0O4AWp3/gLMKM2WL9z8ASaS0yj931iLBIGVsSSU8vbdWA3JRUQfC0o8f0y
+         SIhToNaTJLmfAR4J0xWGCM3dHLqpmhRwI9v6Lb/KVyJUeGF7qOsnK8vBCVox/tCJqM5a
+         PXmZBWiEuCAzR9cDoc/p2CK9eNInTf+3TlyjJdclMoNFltLZgOHbfLEvH4Qn6GOkpZc8
+         t4gOpxDWC1sU5rqtQtwcTMKsHPkLejsZ4E1KmzOxpGm9mJjNnZp0htcrBXbkXxQQX4ip
+         9CDFsEN5iKdBBO9B4YpyGRZ8H7DnbmPEbMF9VxknboDz5h8Uo7dDYJDUG1JT7j68TDXe
+         2Iyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787110245; x=1787715045;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+ZoAAx48uqOdbRDUh6X+Manct/g/MGnlfeAG9fyc7HY=;
+        b=L5SE92sD7/pv07vknhp6Qijo/bYZfxeP+OvVjK+mB0dfNROBuufAhH8h9EPihWX0uj
+         Ez8YQYQjVJFPq1DbK57bwb68zvqJ6SpkP/PwVNysISntqvddP7VOkIRzbXm6bjkhW0Pl
+         sPVg481GsTpyw1CSuRuya6QXgjxiC7coi8c0nm0rEU0AvTaaJfIC1eR1BMbd1O79GT3B
+         TbV8BiCfqUFSCM3VjeCyzLQXISNRq6CjGIKi7GkqHHhmdOnAcbDRYqFqme0NQn3/zg3S
+         mm74Wkf7X10cEbfmC1CBlOlPoOeUKrMsvoShjzrTb50BCIYPVYKr5DhI0E5pjC5DB4xI
+         qdHQ==
+X-Gm-Message-State: AOJu0YxOx5n2WcRSoaNwM+XxjKwH7ImsDiVs0TlJGGMtC1mhpjqBt7Q/
+	0cd/JW6WVovomylNrpAAtV9+A5NB1eVy3dKMbQkpsokTtkUMacSm8lIZ
+X-Gm-Gg: AR+sD10z0hncmFDvle2tLhxNIKgV0WFgWj9GdqxTMy/sW0mwz2YerkNYUYXe2iDlBUw
+	7FPS35LDI8SDi5wX+dv4+wW1DSYCxrmE2sdl770R4027atiXfYdaupduwfbOZLxB4dL9P3tQAHh
+	WJjuhnupKmjbb8N8iFQpbQwtaEhbDeMhpK1S8YYRxLsNwrOUavmVJzx3Q83ZZN+YJr7NqUBnL0m
+	1SHYqGdPsT9rhJJqbiqtl6NFHwLZkyn9S4JsCXTVM0+yC3te49/ckF9eByG9tnsDs0SFWmOge/y
+	PJIvBK4X3InJIcKIgpYu9+Db8wK9kLcPQPtY3kwry+N5uHFkHxls7fPoIfkH71l5yTCkp5zr36G
+	aty1kCnSaJqD+n5ro3fDOcMwrhDpLNoWmUYJZniSf27l+n/B6yuIGa+NUCJgOtrzb5eBv0f5ler
+	0sd3rAyHG5Aq1P16GhqMmPF8UkPreb9DqfVF9Xw8620Gh5GYwPIwnjKWoG6wzDfrrZB18e+lkB9
+	FQ=
+X-Received: by 2002:a17:90b:384a:b0:38e:6a44:671b with SMTP id 98e67ed59e1d1-39580493a4cmr3181164a91.0.1787110244552;
+        Tue, 18 Aug 2026 20:30:44 -0700 (PDT)
+Received: from localhost.localdomain ([180.138.223.172])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3957fb17f48sm1016793a91.2.2026.08.18.20.30.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Aug 2026 20:30:44 -0700 (PDT)
+From: nanx95726@gmail.com
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org,
+	Hang Nan <nanx95726@gmail.com>
+Subject: [PATCH v4 0/3] ksmbd: bound smb_check_perm_dacl() ACE walks by DACL size
+Date: Wed, 19 Aug 2026 11:30:10 +0800
+Message-ID: <20260819033013.46824-1-nanx95726@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260818032335.10643-1-2122295973@qq.com> <tencent_D1F4F4FAB2A78B707B1EE2B1A718A4BE2F07@qq.com>
-In-Reply-To: <tencent_D1F4F4FAB2A78B707B1EE2B1A718A4BE2F07@qq.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 19 Aug 2026 09:39:21 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_6NEWvKAT-j5=3MFh=eT9AuL6vL-Q6HUf2ZMjEjk11OQ@mail.gmail.com>
-X-Gm-Features: AcwNN1WIY0tSdl8ZR8OOIFg4dr8kJX_J6VCKgV2boz4qLYKxTKeSC100awMRaZc
-Message-ID: <CAKYAXd_6NEWvKAT-j5=3MFh=eT9AuL6vL-Q6HUf2ZMjEjk11OQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] ksmbd: add KUnit test for the DACL walk boundary
-To: Hang Nan <2122295973@qq.com>
-Cc: smfrench@gmail.com, tom@talpey.com, senozhatsky@chromium.org, 
-	chenxiaosong@kylinos.cn, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
-> index 08d8b7a965a6..463fa19819b2 100644
-> --- a/fs/smb/server/Kconfig
-> +++ b/fs/smb/server/Kconfig
-> @@ -72,3 +72,18 @@ config SMB_SERVER_KERBEROS5
->         bool "Support for Kerberos 5"
->         depends on SMB_SERVER
->         default y
-> +
-> +config SMB_SERVER_KUNIT_TESTS
-> +       tristate "KUnit tests for SMB3 server helpers" if !KUNIT_ALL_TESTS
-> +       depends on SMB_SERVER && SMB_KUNIT_TESTS && TMPFS_XATTR
-> +       default SMB_KUNIT_TESTS
-> +
-> +       help
-> +         KUnit tests for ksmbd server helpers such as the DACL access
-> +         check in smb_check_perm_dacl().  The tests use crafted security
-> +         descriptors stored in tmpfs NTACL xattrs to exercise the real
-> +         permission-checking path.  This option is only useful for kernel
-> +         developers; enable it together with CONFIG_SMB_KUNIT_TESTS.
-The help text is currently tied to this particular test and its tmpfs
-NTACL implementation. Since SMB_SERVER_KUNIT_TESTS may cover more
-server tests in the future, please keep the description more generic.
-Also, SMB_KUNIT_TESTS is already listed in the dependency, so it does
-not need to be mentioned separately in the help text.
-> +
-> +         For more information on KUnit and unit tests in the kernel,
-> +         please read Documentation/dev-tools/kunit/index.rst.
-> diff --git a/fs/smb/server/Makefile b/fs/smb/server/Makefile
-> index a3e9306055e8..62228679fc9a 100644
-> --- a/fs/smb/server/Makefile
-> +++ b/fs/smb/server/Makefile
-> @@ -19,3 +19,4 @@ $(obj)/ksmbd_spnego_negtokentarg.asn1.o: $(obj)/ksmbd_spnego_negtokentarg.asn1.c
->
->  ksmbd-$(CONFIG_SMB_SERVER_SMBDIRECT) += transport_rdma.o
->  ksmbd-$(CONFIG_PROC_FS) += proc.o
-> +obj-$(CONFIG_SMB_SERVER_KUNIT_TESTS) += smbacl_test.o
-> diff --git a/fs/smb/server/smbacl_test.c b/fs/smb/server/smbacl_test.c
-Also, could the test be moved under fs/smb/server/tests/, for example:
+From: Hang Nan <nanx95726@gmail.com>
 
-        fs/smb/server/tests/smbacl_kunit.c
+Changes in v3:
 
-with a tests/Kconfig and tests/Makefile. This follows the usual KUnit
-layout and will make it easier to add more server-side tests later.
-These are not functional issues, but it seems worthwhile to get the
-layout right while adding the first test.
-Thanks!
+- Update SMB_SERVER_KUNIT_TESTS help text.
+- Moved kunit tests under fs/smb/server/tests/.
+
+The following patch from v2 have already been merged into #ksmbd-for-next-next:
+https://lore.kernel.org/linux-cifs/CAKYAXd9XHJSNfrFr+F8thNxFnXqGGcKpS1b1qR4DNuu82+j_VQ@mail.gmail.com/
+
+Hang Nan (3):
+  ksmbd: add KUnit test for the DACL walk boundary
+  ksmbd: test smb_check_perm_dacl() DACL walk boundary
+  ksmbd: test maximal-access DACL walk boundary
+
+ fs/smb/server/Kconfig              |   2 +
+ fs/smb/server/Makefile             |   1 +
+ fs/smb/server/smbacl.c             |   2 +
+ fs/smb/server/tests/Kconfig        |  15 ++
+ fs/smb/server/tests/Makefile       |   4 +
+ fs/smb/server/tests/smbacl_kunit.c | 301 +++++++++++++++++++++++++++++
+ fs/smb/server/vfs.c                |   2 +
+ 7 files changed, 327 insertions(+)
+ create mode 100644 fs/smb/server/tests/Kconfig
+ create mode 100644 fs/smb/server/tests/Makefile
+ create mode 100644 fs/smb/server/tests/smbacl_kunit.c
+
+-- 
+2.55.0
+
