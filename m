@@ -1,55 +1,50 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-90.mta0.migadu.com [91.218.175.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EE13B1EEE
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 06:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE5C3C1414
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 07:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787209117; cv=none; b=fGomWq/pC6E7u+mVMkKLdSBrulm/b8HbZbXv4lcbb7vmeCpMzsKoGvOq68QWvcJC/FtrOeicuj2a6psqxJ61+4bEc+ofotzG6yu19C9HQydh94qCpnXx1bwmT5wwkVrJC5QrY9rNBDcluw2iQQrgJksvcd0EqFFZpScH48M3i3Y=
+	t=1787210154; cv=none; b=NQtRzMXkQCez8nu1n4iVc24weGLdIEUsIOFREu3DU+xvKqM7E9T2ZevVw8IN7uvXOtdqEu4gBqM3ZN/HXilRkGgoG5nmuWIhykaMtO38PJOKWh7r0qypabpAVylD6w1qYNtxGB3DipezNdAa/tef9GkLbv06vACCiIQcrOlPiuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787209117; c=relaxed/simple;
-	bh=kynTe+djMAUMAKZWbeeP8HeejqzbszSZFzgZxBbA2uw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K4WzOPq300GgRINLTWB7EzB9gmg8+9pwN36kULxdh2ZuNJPysEEt7gOS656ORYIjv3HRaUTdfrH51VvnFh9Fk7jMTzCPH5IFFWflR+eAnWpOx0pFeWR/6jK9BdEy+hn8wsh4LbGbvifACueQlBe/TXezpyqiEztOD4tDAwRsk9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ts9jRgs5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1787210154; c=relaxed/simple;
+	bh=eaKPQ0lrpTvAw1naS3k22QikSAa6dEg50jDij93ae9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UPLMqip33ekwjv1Vs4KzS0HJZ5U2JeZBd6C8YajXfYX3ej83ckQJSNNh+sSqNC9ARsPNAVHuWdoI4ztYNXyD7jNo7vITyFgsHdNU8JNs7tcJH6bbDEVKCkpnTFXiKC3zlgVkQFsSz6k+tFhJ4uyP+jTDmaGAMgLwOYA/QPLY9i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oLtm3m9A; arc=none smtp.client-ip=91.218.175.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ts9jRgs5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787209114;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=1oMvv+ilbzFWyz0kC2CFBl3hm5fV9dGF5RL85Fpz3eM=;
-	b=Ts9jRgs5A8gyfNOtBLtCa8lJBFodlztlZ+R0d0x/fTd5jdTpbBFR7Ex3HBP616Eyxq8NjQ
-	4c5R78raEtIL/nEiGgjUC5YqGnEjNoufMCrc1Njk6JhIHEQ6SbIMDe6aYO9G5p2mylwdcD
-	S169SgmvQwHym3GHvMNz1H3PyjskIAo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-Y0Wy8mjBNHCPmmkEF1NkVQ-1; Thu,
- 20 Aug 2026 02:58:21 -0400
-X-MC-Unique: Y0Wy8mjBNHCPmmkEF1NkVQ-1
-X-Mimecast-MFC-AGG-ID: Y0Wy8mjBNHCPmmkEF1NkVQ_1787209099
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93872195608B;
-	Thu, 20 Aug 2026 06:58:19 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.44.32.124])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 78FE0423;
-	Thu, 20 Aug 2026 06:58:17 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Tom Talpey <tom@talpey.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb: server: Remove obsolete "select CRYPTO_LIB_DES" from Kconfig file
-Date: Thu, 20 Aug 2026 08:58:15 +0200
-Message-ID: <20260820065816.44267-1-thuth@redhat.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oLtm3m9A"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=eaKPQ0lrpTvAw1naS3k22QikSAa6dEg50jDij93ae9Q=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787210149; v=1; x=1787814949;
+ b=oLtm3m9AC3Dkuxq4fsOKge1mWKjXpq0wlRfy/2DHjDEsrQOCOYi7y1nZvxOGUzapYE1L/fRf
+ 7ZhrPzo/47rw+R0TCODLMwnTmcrd/+lBwdeSOmlXaQSydEdhLZXhzDy7IMTEgb3SxKn/NCWVUzE
+ cGnfMdmJzVADLWtE8lzyZ7QU=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from harry-WUJIE-Series.. (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 9bb3bf81686e4a1c;
+	Thu, 20 Aug 2026 07:15:49 +0000
+X-Mizu-Trace-ID: 9bb3bf81686e4a1c
+X-Migadu-Flow: FLOW_OUT
+From: Huiwen He <huiwen.he@linux.dev>
+To: smfrench@gmail.com,
+	linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	dhowells@redhat.com,
+	chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org
+Subject: [PATCH v2 0/6] smb/client: fix emulated insert/collapse range issues
+Date: Thu, 20 Aug 2026 15:15:20 +0800
+Message-ID: <20260820071526.826926-1-huiwen.he@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -57,30 +52,52 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-The DES encryption in the smb server code has been removed in 2021
-with the removal of the insecure NTLMv1 authentication code. Thus
-we don't need this "select" statement here anymore.
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-Fixes: ce812992f239f ("ksmbd: remove NTLMv1 authentication")
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- fs/smb/server/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+This series fixes the SMB3 FALLOC_FL_INSERT_RANGE and
+FALLOC_FL_COLLAPSE_RANGE emulation.
 
-diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
-index 08d8b7a965a64..221ec9717a834 100644
---- a/fs/smb/server/Kconfig
-+++ b/fs/smb/server/Kconfig
-@@ -9,7 +9,6 @@ config SMB_SERVER
- 	select CRYPTO
- 	select CRYPTO_LIB_AES_CBC_MACS
- 	select CRYPTO_LIB_ARC4
--	select CRYPTO_LIB_DES
- 	select CRYPTO_LIB_MD5
- 	select CRYPTO_LIB_SHA256
- 	select CRYPTO_LIB_SHA512
+Patch 1 validates the new EOF for insert range, which previously allowed
+RLIMIT_FSIZE to be bypassed.
+
+Patch 2 validates the new EOF for zero range when it extends the file.
+
+Patch 3 marks the file sparse before emulating insert range so the
+inserted range becomes a real hole, fixing xfstests generic/064 against
+Samba and ksmbd.
+
+Patch 4 fixes data corruption in emulated insert range by copying
+overlapping ranges from EOF backwards.
+
+Patch 5 fixes integer truncation when the collapse-range copy exceeds
+INT_MAX bytes.
+
+Patch 6 fixes stale page cache after the range emulation, where reads
+returned zeroes instead of the shifted data.
+
+Changes in v2:
+
+- update patch3 to propagate SET_SPARSE fails.
+- Add patch2 and patch4-6.
+ 
+Link to v1:
+https://lore.kernel.org/linux-cifs/20260813132136.366532-1-huiwen.he@linux.dev/
+
+Thanks,
+Huiwen
+
+Huiwen He (6):
+  smb/client: validate new EOF for insert range
+  smb/client: validate new EOF for zero range
+  smb/client: mark file sparse before emulating insert range
+  smb/client: fix data corruption in emulated insert range
+  smb/client: fix integer truncation in collapse range
+  smb/client: fix stale page cache in insert/collapse range
+
+ fs/smb/client/smb2ops.c | 202 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 168 insertions(+), 34 deletions(-)
+
 -- 
-2.55.0
+2.43.0
 
