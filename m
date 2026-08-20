@@ -1,34 +1,34 @@
-Received: from mta0.migadu.com (out-98.mta0.migadu.com [91.218.175.98])
+Received: from mta0.migadu.com (out-102.mta0.migadu.com [91.218.175.102])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7583C10A8
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 07:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5463A2857CC
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 07:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787210166; cv=none; b=A7+iIva8CdPFDCPh8Hgfsg0COEI4+lKqLrIYNN3Qz6mKTKXkqDsZtYeoS63mwxkJIbtYAjudM5YkVAKH10sBkTplOQ36GAwcoEQ1pTpd5KvQfkRN45e6KF6c6qdC7059CIyIWEe7brEY6KPm+/1L+tk9KaURH+zqVS/sbsCvhxs=
+	t=1787210173; cv=none; b=ShvVEpYeoXOoIHsEKlSGffv3dVlaJG08B0mWzq5vGaZbp4WytzDt0CPuBMfAsrUY9ELesu8eaHm3lXym2rnf852aNX0if05VfMe200JeJ/LlMuwjxPttqLq7QLFOSkbotqD1kalTMjVxp2G402zz9I4yPHk6oe7Sr84mN5kvTM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787210166; c=relaxed/simple;
-	bh=D9mqq6agSOYQ0eaVwBGh6Xa9bT4lViPNUIKGYdd53ec=;
+	s=arc-20240116; t=1787210173; c=relaxed/simple;
+	bh=W/EbRCfv7jD8jeoY5r13tu60l1QsAOl/kuZTqqbpwkw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FOWZfP1cG65Jrj8s3jbV7F2RQ0YS/geKFD2T8YWOnysYWTl4haaWem80h37l1Rc94KjQlEkDe9EgNq9lbDG5g6PoWaj/syMgiHJZSuSySDfZyBeOcrEsVVeKjuzdVwSZB/8adpfCrtoSSDyCDgHDJbt6M0h66mIMg+qESS+LbWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uHWJJM8/; arc=none smtp.client-ip=91.218.175.98
+	 MIME-Version; b=mvDkqdT4NHk9COnvvUDqaQg9xQv7QFlPH5RiWhijtylGZghukbxarnzQa7xzOYMnijU7mOKIllq8BB/6dzUPTtjWrQvW+WMpTCbgKFHo3BNY2aC9yffXh7ReugXflqt/feC3mdwgk9gLa5Hmc6gcPvkjRSBqUbCeMfEwUWtdVfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lSwXnybB; arc=none smtp.client-ip=91.218.175.102
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uHWJJM8/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lSwXnybB"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=D9mqq6agSOYQ0eaVwBGh6Xa9bT4lViPNUIKGYdd53ec=;
+DKIM-Signature: a=rsa-sha256; bh=W/EbRCfv7jD8jeoY5r13tu60l1QsAOl/kuZTqqbpwkw=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787210162; v=1; x=1787814962;
- b=uHWJJM8/iOJPqpofkQV575zKSPhiq7u8Y6cK2Ky1WsZSPEvpufJIDbdh16IpvVrtzKl/UnTx
- q2xX0fFMOAcxuMkjZziJN8vdamOFUVIghZjs2DMy0WJi5ZFwl0PM7AmTpV+MEYyqwtsWIjF/Kak
- 2SnQ+ZLUuzN0XPr2KxP51bEc=
+ t=1787210170; v=1; x=1787814970;
+ b=lSwXnybBnWF3rNBUN+5Koam0W09xp0g0G1y73wf4if+cu85XuCkiR6L62X08d11NXDBXqsI3
+ degvcLJ6VxB1EdhJSiDmahPE059BcL7pFTgEUxxocW4lsn44JQal/WzECUjP4BO1C9qKeYAEK0g
+ 0i00tNOuBBLODgR3HYDRV1Fo=
 X-Envelope-To: linux-cifs@vger.kernel.org
 Received: from harry-WUJIE-Series.. (116.128.244.171)
-	by smtp.migadu.com with ESMTPS id a69fd6dfd499454a;
-	Thu, 20 Aug 2026 07:16:02 +0000
-X-Mizu-Trace-ID: a69fd6dfd499454a
+	by smtp.migadu.com with ESMTPS id 12d1b3b2427453cf;
+	Thu, 20 Aug 2026 07:16:10 +0000
+X-Mizu-Trace-ID: 12d1b3b2427453cf
 X-Migadu-Flow: FLOW_OUT
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	dhowells@redhat.com,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 2/6] smb/client: validate new EOF for zero range
-Date: Thu, 20 Aug 2026 15:15:22 +0800
-Message-ID: <20260820071526.826926-3-huiwen.he@linux.dev>
+Subject: [PATCH v2 3/6] smb/client: mark file sparse before emulating insert range
+Date: Thu, 20 Aug 2026 15:15:23 +0800
+Message-ID: <20260820071526.826926-4-huiwen.he@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260820071526.826926-1-huiwen.he@linux.dev>
 References: <20260820071526.826926-1-huiwen.he@linux.dev>
@@ -58,75 +58,41 @@ Content-Transfer-Encoding: 8bit
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-When FALLOC_FL_ZERO_RANGE is used without FALLOC_FL_KEEP_SIZE,
-smb3_zero_range() may extend EOF without checking RLIMIT_FSIZE, allowing
-the file to grow beyond the caller's file-size limit.
+The SMB client emulates FALLOC_FL_INSERT_RANGE with SET_EOF, COPYCHUNK
+and SET_ZERO_DATA.
 
-Fix this by calling inode_newsize_ok() before sending the zero-range
-request when the operation would extend EOF.
+SET_ZERO_DATA creates a hole only when the file is sparse. On a
+non-sparse file, it clears the inserted range but leaves its blocks
+allocated, causing the extent count check in xfstests generic/064 to
+fail.
 
-Reproducer, using a file on a CIFS mount:
+Fix this by marking the file sparse before modifying it.
 
-	bash -c '
-	        FILE=/mnt/cifs/repro
+Tested with xfstests generic/064 against Samba and ksmbd.
 
-	        trap "" SIGXFSZ
-	        ulimit -f 3072
-
-	        truncate -s 2M "$FILE"
-	        fallocate --zero-range -o 0 -l 4M "$FILE"
-	        echo "fallocate rc=$?"
-	        stat -c "file size=%s" "$FILE"
-	'
-
-Before this change, the operation succeeds despite the 3 MiB limit:
-
-	fallocate rc=0
-	file size=4194304
-
-After this change, fallocate fails and leaves the file at 2 MiB.
-
-Fixes: 72c419d9b073 ("cifs: fix smb3_zero_range so it can expand the file-size when required")
+Fixes: 7fe6fe95b936 ("cifs: add FALLOC_FL_INSERT_RANGE support")
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ fs/smb/client/smb2ops.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index bc7dda6d825a..f823f9bc90eb 100644
+index f823f9bc90eb..1eff607a1e74 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3442,6 +3442,13 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	trace_smb3_zero_enter(xid, cfile->fid.persistent_fid, tcon->tid,
- 			      ses->Suid, offset, len);
+@@ -4013,6 +4013,11 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
  
-+	new_size = offset + len;
-+	if (!keep_size && i_size_read(inode) < new_size) {
-+		rc = inode_newsize_ok(inode, new_size);
-+		if (rc)
-+			goto out;
-+	}
+ 	count = old_eof - off;
+ 
++	/* SET_ZERO_DATA creates a hole only in a sparse file. */
++	rc = smb2_set_sparse(xid, tcon, cfile, inode, true);
++	if (rc)
++		goto out;
 +
  	filemap_invalidate_lock(inode->i_mapping);
- 
- 	netfs_read_sizes(inode, &i_size, &remote_i_size, &zero_point);
-@@ -3472,7 +3479,6 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	/*
- 	 * do we also need to change the size of the file?
- 	 */
--	new_size = offset + len;
- 	if (keep_size == false && (unsigned long long)i_size_read(inode) < new_size) {
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, new_size);
-@@ -3489,6 +3495,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 
-  zero_range_exit:
- 	filemap_invalidate_unlock(inode->i_mapping);
-+ out:
- 	free_xid(xid);
- 	if (rc)
- 		trace_smb3_zero_err(xid, cfile->fid.persistent_fid, tcon->tid,
+ 	rc = filemap_write_and_wait_range(inode->i_mapping, off, new_eof - 1);
+ 	if (rc < 0)
 -- 
 2.43.0
 
