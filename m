@@ -1,34 +1,34 @@
-Received: from mta0.migadu.com (out-95.mta0.migadu.com [91.218.175.95])
+Received: from mta0.migadu.com (out-98.mta0.migadu.com [91.218.175.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568D12E282B
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 07:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7583C10A8
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 07:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787210162; cv=none; b=D9RKWnJ7QjJsoFsqUQbMavDwHklVxnAvAo3J0EQRVSvPaXowZ+oRmAY3vVLTQLZcJGSFfVTr1WtWJCO336QDJQcjodIpFy9HmbbmhyiwQXHY6Y4vd0AIcFrm/xJ3zvCVE0G0IdEaodE3lHr2CNysJtYQOQni/LnDFNyeghTyZuw=
+	t=1787210166; cv=none; b=A7+iIva8CdPFDCPh8Hgfsg0COEI4+lKqLrIYNN3Qz6mKTKXkqDsZtYeoS63mwxkJIbtYAjudM5YkVAKH10sBkTplOQ36GAwcoEQ1pTpd5KvQfkRN45e6KF6c6qdC7059CIyIWEe7brEY6KPm+/1L+tk9KaURH+zqVS/sbsCvhxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787210162; c=relaxed/simple;
-	bh=wLD20CgWJXIysPLhdyNyOF51BfWz7KZURSsyYC0vNes=;
+	s=arc-20240116; t=1787210166; c=relaxed/simple;
+	bh=D9mqq6agSOYQ0eaVwBGh6Xa9bT4lViPNUIKGYdd53ec=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KuZkrbKEliLl2JTVlg+FFd69O/4+81/aR3J0vdF+eUXMiPRgnCMZZQT4hS5cjIWHOFycuYNROJ4qmpobSAPz7LPB9MYVY5R9tnsTfomgjbO3RD3EJqC4zeM+j8/c+fMP2BbS0hSfUCXqZuwbIJvc0NXqXLOExdR9pxOfIXJ93hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DUv5Jr2J; arc=none smtp.client-ip=91.218.175.95
+	 MIME-Version; b=FOWZfP1cG65Jrj8s3jbV7F2RQ0YS/geKFD2T8YWOnysYWTl4haaWem80h37l1Rc94KjQlEkDe9EgNq9lbDG5g6PoWaj/syMgiHJZSuSySDfZyBeOcrEsVVeKjuzdVwSZB/8adpfCrtoSSDyCDgHDJbt6M0h66mIMg+qESS+LbWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uHWJJM8/; arc=none smtp.client-ip=91.218.175.98
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DUv5Jr2J"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uHWJJM8/"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=wLD20CgWJXIysPLhdyNyOF51BfWz7KZURSsyYC0vNes=;
+DKIM-Signature: a=rsa-sha256; bh=D9mqq6agSOYQ0eaVwBGh6Xa9bT4lViPNUIKGYdd53ec=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787210157; v=1; x=1787814957;
- b=DUv5Jr2JCJkWTFUBKrYgj70LIoRpbcRHnOlQLFoVVeiwiBKiSeIK3no+qYznrBwnTKoYoQlQ
- b5Fknkfn5c4lmWnULEBwyO3GTRfqVyzlmvs5W70n5GC/unr/URhdO2t4SrNbECTRndNHv3C4hjE
- Quwg9rpFF0RBrIYkAbbm4rms=
+ t=1787210162; v=1; x=1787814962;
+ b=uHWJJM8/iOJPqpofkQV575zKSPhiq7u8Y6cK2Ky1WsZSPEvpufJIDbdh16IpvVrtzKl/UnTx
+ q2xX0fFMOAcxuMkjZziJN8vdamOFUVIghZjs2DMy0WJi5ZFwl0PM7AmTpV+MEYyqwtsWIjF/Kak
+ 2SnQ+ZLUuzN0XPr2KxP51bEc=
 X-Envelope-To: linux-cifs@vger.kernel.org
 Received: from harry-WUJIE-Series.. (116.128.244.171)
-	by smtp.migadu.com with ESMTPS id 4a37d7d2fb675d0c;
-	Thu, 20 Aug 2026 07:15:57 +0000
-X-Mizu-Trace-ID: 4a37d7d2fb675d0c
+	by smtp.migadu.com with ESMTPS id a69fd6dfd499454a;
+	Thu, 20 Aug 2026 07:16:02 +0000
+X-Mizu-Trace-ID: a69fd6dfd499454a
 X-Migadu-Flow: FLOW_OUT
 From: Huiwen He <huiwen.he@linux.dev>
 To: smfrench@gmail.com,
@@ -42,9 +42,9 @@ To: smfrench@gmail.com,
 	dhowells@redhat.com,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v2 1/6] smb/client: validate new EOF for insert range
-Date: Thu, 20 Aug 2026 15:15:21 +0800
-Message-ID: <20260820071526.826926-2-huiwen.he@linux.dev>
+Subject: [PATCH v2 2/6] smb/client: validate new EOF for zero range
+Date: Thu, 20 Aug 2026 15:15:22 +0800
+Message-ID: <20260820071526.826926-3-huiwen.he@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260820071526.826926-1-huiwen.he@linux.dev>
 References: <20260820071526.826926-1-huiwen.he@linux.dev>
@@ -58,85 +58,75 @@ Content-Transfer-Encoding: 8bit
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-smb3_insert_range() does not check if the new file size
-(i_size + len) is valid. This allows FALLOC_FL_INSERT_RANGE to bypass
-RLIMIT_FSIZE, exceed s_maxbytes, or produce a size outside the loff_t
-range.
+When FALLOC_FL_ZERO_RANGE is used without FALLOC_FL_KEEP_SIZE,
+smb3_zero_range() may extend EOF without checking RLIMIT_FSIZE, allowing
+the file to grow beyond the caller's file-size limit.
 
-Use check_add_overflow() to calculate the new EOF. Validate it with
-inode_newsize_ok() before modifying the file.
+Fix this by calling inode_newsize_ok() before sending the zero-range
+request when the operation would extend EOF.
 
 Reproducer, using a file on a CIFS mount:
 
 	bash -c '
-		FILE=/mnt/cifs/repro
+	        FILE=/mnt/cifs/repro
 
-		trap "" SIGXFSZ
-		ulimit -f 3072		# RLIMIT_FSIZE = 3 MiB
+	        trap "" SIGXFSZ
+	        ulimit -f 3072
 
-		# A regular write is stopped at 3 MiB.
-		dd if=/dev/zero of="$FILE" bs=1M count=4 status=none
-		stat -c "size after write: %s" "$FILE"
-
-		# Insert 2 MiB into a 2 MiB file.
-		truncate -s 2M "$FILE"
-		fallocate -i -o 0 -l 2M "$FILE"
-		stat -c "size after insert: %s" "$FILE"
+	        truncate -s 2M "$FILE"
+	        fallocate --zero-range -o 0 -l 4M "$FILE"
+	        echo "fallocate rc=$?"
+	        stat -c "file size=%s" "$FILE"
 	'
 
-Before this change, the regular write stops at the 3 MiB limit, but
-insert range grows the file to 4 MiB:
+Before this change, the operation succeeds despite the 3 MiB limit:
 
-	dd: error writing '/mnt/cifs/repro': File too large
-	size after write: 3145728
-	size after insert: 4194304
+	fallocate rc=0
+	file size=4194304
 
-After this change, insert range also fails at the limit and leaves the
-2 MiB file unchanged:
+After this change, fallocate fails and leaves the file at 2 MiB.
 
-	dd: error writing '/mnt/cifs/repro': File too large
-	size after write: 3145728
-	fallocate: fallocate failed: File too large
-	size after insert: 2097152
-
-Fixes: 7fe6fe95b936 ("cifs: add FALLOC_FL_INSERT_RANGE support")
+Fixes: 72c419d9b073 ("cifs: fix smb3_zero_range so it can expand the file-size when required")
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/smb2ops.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ fs/smb/client/smb2ops.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 192649fec25d..bc7dda6d825a 100644
+index bc7dda6d825a..f823f9bc90eb 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3985,7 +3985,8 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 	struct cifsFileInfo *cfile = file->private_data;
- 	struct inode *inode = file_inode(file);
- 	struct cifsInodeInfo *cifsi = CIFS_I(inode);
--	__u64 count, old_eof, new_eof;
-+	u64 count;
-+	loff_t old_eof, new_eof;
+@@ -3442,6 +3442,13 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	trace_smb3_zero_enter(xid, cfile->fid.persistent_fid, tcon->tid,
+ 			      ses->Suid, offset, len);
  
- 	xid = get_xid();
- 
-@@ -3995,8 +3996,15 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 		goto out;
- 	}
- 
-+	if (check_add_overflow(old_eof, len, &new_eof)) {
-+		rc = -EFBIG;
-+		goto out;
++	new_size = offset + len;
++	if (!keep_size && i_size_read(inode) < new_size) {
++		rc = inode_newsize_ok(inode, new_size);
++		if (rc)
++			goto out;
 +	}
-+	rc = inode_newsize_ok(inode, new_eof);
-+	if (rc)
-+		goto out;
 +
- 	count = old_eof - off;
--	new_eof = old_eof + len;
- 
  	filemap_invalidate_lock(inode->i_mapping);
- 	rc = filemap_write_and_wait_range(inode->i_mapping, off, new_eof - 1);
+ 
+ 	netfs_read_sizes(inode, &i_size, &remote_i_size, &zero_point);
+@@ -3472,7 +3479,6 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	/*
+ 	 * do we also need to change the size of the file?
+ 	 */
+-	new_size = offset + len;
+ 	if (keep_size == false && (unsigned long long)i_size_read(inode) < new_size) {
+ 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
+ 				  cfile->fid.volatile_fid, cfile->pid, new_size);
+@@ -3489,6 +3495,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 
+  zero_range_exit:
+ 	filemap_invalidate_unlock(inode->i_mapping);
++ out:
+ 	free_xid(xid);
+ 	if (rc)
+ 		trace_smb3_zero_err(xid, cfile->fid.persistent_fid, tcon->tid,
 -- 
 2.43.0
 
