@@ -1,79 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FF0F1CDFCA
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 00:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EE13B1EEE
+	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 06:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787186762; cv=none; b=dZap8jtLMWWwhbmL6jOxWJ+e1/tCaDPsvlm5VOV4lndP3drUhaGOf3yJUOi797NcbmbscXEOpLId7cNyd0vsJCaGhLnDw35A+kF49gXMKTEmQgiVSw223Tuhv+nUPvhxWcBK0sH9Zx3Q0JfzTyvjFrhks0t5Lqnjl1FEIFv5U00=
+	t=1787209117; cv=none; b=fGomWq/pC6E7u+mVMkKLdSBrulm/b8HbZbXv4lcbb7vmeCpMzsKoGvOq68QWvcJC/FtrOeicuj2a6psqxJ61+4bEc+ofotzG6yu19C9HQydh94qCpnXx1bwmT5wwkVrJC5QrY9rNBDcluw2iQQrgJksvcd0EqFFZpScH48M3i3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787186762; c=relaxed/simple;
-	bh=nrt9o/BXu6TjoQ8727PujcfcycKMfZHvXUfUSK8ZmWE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e07nvTqVw68NrV4I0MbTtadKJm6ZIC75/P/wKT3ROJuapkdquFO5bpI2Ko88Qd/trXWI8ie8PwUQfBbcNY4ub1pmNfz6hB5+X+ToHG5J4sLcWP4e7iIRx6uaLcWalkQc+sQ5dSTtxS+NvPikm+oBiYjLohvl29aWJsM1s0Z0wUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHU3bp0p; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787209117; c=relaxed/simple;
+	bh=kynTe+djMAUMAKZWbeeP8HeejqzbszSZFzgZxBbA2uw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K4WzOPq300GgRINLTWB7EzB9gmg8+9pwN36kULxdh2ZuNJPysEEt7gOS656ORYIjv3HRaUTdfrH51VvnFh9Fk7jMTzCPH5IFFWflR+eAnWpOx0pFeWR/6jK9BdEy+hn8wsh4LbGbvifACueQlBe/TXezpyqiEztOD4tDAwRsk9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ts9jRgs5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHU3bp0p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB4081F00A3E
-	for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 00:46:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787186760;
-	bh=mhTvFmpOgjXlNbmMTmItu40I5a2cbxrRiyP57MxZub0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=GHU3bp0pbgHns/1o4A/OQD7zVg3lBRGVLP2tnRkHVfOv/PO96xj4bFvkMtRKdGW6J
-	 1T8UtNmp1HxcrasqbDMauKl/1ZeWbHdIPENfz+sawrS2XaYvspkzlNtNTIxCcNEeSs
-	 MZFDJQJtC7C0DvAreYD3H4SdY/Y0EdU/oX9AsBTSjtPod9uiRycAx37hckcDIb+4RW
-	 f/V8o/PmDVkXo8e+HBZBfskaz/VJexTrc0E2+keXmkWTExvgCv10zaYcRDHyQI8Fqn
-	 3WUZm6t1EYLxWp/17PRuK7A6fI2R46k3ys5jvE9O++L3uTrrvwtNwMt4S1jkeVJeJq
-	 BvvwQa0VluvbQ==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6a18e24ad25so2357055a12.1
-        for <linux-cifs@vger.kernel.org>; Wed, 19 Aug 2026 17:46:00 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rrnqj5siL6ByahJ91/bcv/yjGfQ2UkzzzcREVggadHhBI9h9M4h5Ufs/4pf2YSuqn55on0wMICE7BVE@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8yMxBjPWtvU7TFqqmnVUJ44xEVhKhez4Q649r94f6pwip/sNG
-	jeZqVqWM7j8ODZx2irgN+w6twtRgCR5LOUZAtCJPCbe/6xFwBSC0XTQxECnIswE0HRKJ1WhVDxL
-	GVscDNhXmJO2uwuULWBjoAtGGVj3N1RU=
-X-Received: by 2002:a17:907:f815:b0:c20:af9d:4533 with SMTP id
- a640c23a62f3a-c242e2494f3mr613599366b.19.1787186759362; Wed, 19 Aug 2026
- 17:45:59 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ts9jRgs5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787209114;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=1oMvv+ilbzFWyz0kC2CFBl3hm5fV9dGF5RL85Fpz3eM=;
+	b=Ts9jRgs5A8gyfNOtBLtCa8lJBFodlztlZ+R0d0x/fTd5jdTpbBFR7Ex3HBP616Eyxq8NjQ
+	4c5R78raEtIL/nEiGgjUC5YqGnEjNoufMCrc1Njk6JhIHEQ6SbIMDe6aYO9G5p2mylwdcD
+	S169SgmvQwHym3GHvMNz1H3PyjskIAo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-Y0Wy8mjBNHCPmmkEF1NkVQ-1; Thu,
+ 20 Aug 2026 02:58:21 -0400
+X-MC-Unique: Y0Wy8mjBNHCPmmkEF1NkVQ-1
+X-Mimecast-MFC-AGG-ID: Y0Wy8mjBNHCPmmkEF1NkVQ_1787209099
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 93872195608B;
+	Thu, 20 Aug 2026 06:58:19 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.32.124])
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 78FE0423;
+	Thu, 20 Aug 2026 06:58:17 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Tom Talpey <tom@talpey.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] smb: server: Remove obsolete "select CRYPTO_LIB_DES" from Kconfig file
+Date: Thu, 20 Aug 2026 08:58:15 +0200
+Message-ID: <20260820065816.44267-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260819033013.46824-1-nanx95726@gmail.com>
-In-Reply-To: <20260819033013.46824-1-nanx95726@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 20 Aug 2026 09:45:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8i68x7pLWmjLFyQJMprJDD4Mip0w_SS80L5x1Gpik50Q@mail.gmail.com>
-X-Gm-Features: AcwNN1V80lC3a87ETCqs63eSGiCilLTJJHHSWqJvWS2ZOipfmx5jRlYuAwevH3c
-Message-ID: <CAKYAXd8i68x7pLWmjLFyQJMprJDD4Mip0w_SS80L5x1Gpik50Q@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] ksmbd: bound smb_check_perm_dacl() ACE walks by
- DACL size
-To: nanx95726@gmail.com
-Cc: smfrench@gmail.com, tom@talpey.com, senozhatsky@chromium.org, 
-	chenxiaosong@kylinos.cn, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-On Wed, Aug 19, 2026 at 12:30=E2=80=AFPM <nanx95726@gmail.com> wrote:
->
-> From: Hang Nan <nanx95726@gmail.com>
->
-> Changes in v3:
->
-> - Update SMB_SERVER_KUNIT_TESTS help text.
-> - Moved kunit tests under fs/smb/server/tests/.
->
-> The following patch from v2 have already been merged into #ksmbd-for-next=
--next:
-> https://lore.kernel.org/linux-cifs/CAKYAXd9XHJSNfrFr+F8thNxFnXqGGcKpS1b1q=
-R4DNuu82+j_VQ@mail.gmail.com/
->
-> Hang Nan (3):
->   ksmbd: add KUnit test for the DACL walk boundary
->   ksmbd: test smb_check_perm_dacl() DACL walk boundary
->   ksmbd: test maximal-access DACL walk boundary
-It=E2=80=99s a bit late to apply this to the 7.3 kernel. I will apply this
-patchset to the 7.4 kernel.
-Thanks!
+The DES encryption in the smb server code has been removed in 2021
+with the removal of the insecure NTLMv1 authentication code. Thus
+we don't need this "select" statement here anymore.
+
+Fixes: ce812992f239f ("ksmbd: remove NTLMv1 authentication")
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ fs/smb/server/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
+index 08d8b7a965a64..221ec9717a834 100644
+--- a/fs/smb/server/Kconfig
++++ b/fs/smb/server/Kconfig
+@@ -9,7 +9,6 @@ config SMB_SERVER
+ 	select CRYPTO
+ 	select CRYPTO_LIB_AES_CBC_MACS
+ 	select CRYPTO_LIB_ARC4
+-	select CRYPTO_LIB_DES
+ 	select CRYPTO_LIB_MD5
+ 	select CRYPTO_LIB_SHA256
+ 	select CRYPTO_LIB_SHA512
+-- 
+2.55.0
+
