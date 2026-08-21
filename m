@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0635E3515CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06245286D4D;
 	Fri, 21 Aug 2026 02:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787279121; cv=none; b=KYZgaoa0iV4cp2CsKodrU/6fC7ZKyYzxOAkXF73td2XqsURZ0Htt83SjOJ2oRirJoYnIHdB2qVBnB5S5Ev0b+PgSN8lk0Trvc1y1J15fItq/UvBbWZzViN/00OuxTNVyVyGy4NbhEPle913WnCHugmSXT7CbOA26yAVn4EBTxGA=
+	t=1787279121; cv=none; b=GoftUru0011ADvmqNTwr0ikkrgEe8npXIiBHcdTAA/3lj7RG1RJzfFjeprlxGMGh7NoKqZIcv+PLPuh+02x/LqFFuiOihWFCIo+LCavsP0dtQcrZRl1Kd1Yc3G94XHjz6dcDmhjJoEqgE1ZZyd2FZK/LMPdkHx9sAL96eoK+VPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787279121; c=relaxed/simple;
-	bh=hkYBbG8FA3hR/kddRkbidPW5t2Eag5CGjG7PEIkKtwE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TbdfYAJD1M5ZPG0UVM6AkWNL60ZkQ03GXt2CERyGI3WzNZTKnadfgdIFNON4pBm10LXWr1pL+77i4eNNljjXJqcSIAEj6bwEtzG6mjEU90lix8EERy3qpa1lsvM8C21T2Q4PkKX2tvbun3KGxUmSeKpB+/wMHko7aK7gRXNqArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5aKzZGc; arc=none smtp.client-ip=10.30.226.201
+	bh=uyR5KdriohoILzKQMgiDjFf+ySUexMpA9o8d0cXrK80=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jBaM7QtkrUUT0PsxKwWnJu8xrZQXaBWfcS1ieINuCIRUAsbxDdQefT7ggfhT4kciBCmFqnYg5bjTT1V9XR75hN2ZERi83yPbOvdJbjXySgX6EosOGujYi5treJGIBw+dGH2lCs8yZ9+6Uct1sz4zmNixvI06nTGIJ52UqRQ+d8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uaBZ9Fmj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5aKzZGc"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B520AC2BCC7;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaBZ9Fmj"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 917F0C2BCB3;
 	Fri, 21 Aug 2026 02:25:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1787279120;
-	bh=hkYBbG8FA3hR/kddRkbidPW5t2Eag5CGjG7PEIkKtwE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=r5aKzZGctWR7455u7n22a/eVHm7cyApXgGV0XQucQpbIPRLYZuciV2UMcMr894iu/
-	 KQFSbizipPs8uDnjnZUfTD7S1Yq5zNVJIY8V9JeyyIajZVVbRg6E60cPet3btB/8qP
-	 MZkCou349q5Xkmd6pUQiExzkHTBH0KNUyR3fhgHmeC+z1cgVp7uvzsdFm3r3ldqeLP
-	 UD2yE1QLliAYVZayZ/eUkRdBJPIgYSdEPYzfOlrAVpx333rLLvi7f3rSZaitnFtdI5
-	 Wc/da7NnT5j+VzTl4rQw7w355jhgfFTW0Moa1ZCvIrq8V/ZZIu0JSzP6eTsDqHtp1p
-	 wOcOl/2/r9YmA==
+	bh=uyR5KdriohoILzKQMgiDjFf+ySUexMpA9o8d0cXrK80=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=uaBZ9FmjWfTtBINcLDWv1qUGQ8trAG+cEdF+XIEzLJYuc9QUsoSLyYe1EAVoPzioj
+	 HNVXxoVedYvoSf+yxd8bKYQRxQiE8dDsIaLJV6TVHW9QLx0+PUppPRUYf2kC4Ir82J
+	 4Wd2oX1bsYhdoYm+FhZriqFw26BUBsqBgIp19C/beEwpaulxB3vbsLzOGlzTIUienJ
+	 2rPKh+gfrHV3ImITCe8HjrzIOjk9bX0EO2PFukuVQ2kb/lNiBb886oYrhTGHMzjO60
+	 UQTwL+CrQxJjm8MkcAiavRk6+xpyh41yHd9j5eDj44A+jEavpIrSzG7OctlYCXTMRo
+	 4lx/5yfvOurNQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A2CC5DF8F;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A99DC5DF88;
 	Fri, 21 Aug 2026 02:25:20 +0000 (UTC)
 From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
-Date: Thu, 20 Aug 2026 21:25:21 -0500
-Subject: [PATCH v2 2/2] smb: client: reject a tree connect response whose
- byte count is too small
+Subject: [PATCH v2 0/2] smb: client: reject a too-small tree connect byte
+ count
+Date: Thu, 20 Aug 2026 21:25:19 -0500
+Message-Id: <20260820-b4-disp-58f78a28-v2-0-1fb7a6cb1533@proton.me>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -41,9 +41,10 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260820-b4-disp-58f78a28-v2-2-1fb7a6cb1533@proton.me>
-References: <20260820-b4-disp-58f78a28-v2-0-1fb7a6cb1533@proton.me>
-In-Reply-To: <20260820-b4-disp-58f78a28-v2-0-1fb7a6cb1533@proton.me>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMPQ6DMAxA4asgz1hKrVIirlIx5McpZgAUF4SEu
+ HtDGb/hvQOUs7BCVx2QeROVeSqguoIwuOnDKLEYyNDLWDLonxhFF2xsaq0jiyb61BI19OAAJVs
+ yJ9n/y3d/W1c/cvheHzjPH20tTJ50AAAA
+X-Change-ID: 20260820-b4-disp-58f78a28-0dbf722521ec
 To: Steve French <sfrench@samba.org>
 Cc: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, 
  Shyam Prasad N <sprasad@microsoft.com>, 
@@ -54,11 +55,11 @@ Cc: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>,
  linux-kernel@vger.kernel.org, samba-technical@lists.samba.org, 
  Jeff Layton <jlayton@kernel.org>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787279119; l=2384;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1787279119; l=3146;
  i=hexlabsecurity@proton.me; s=default; h=from:subject:message-id;
- bh=jnZThUSNJS01CGO4lQzrO1j6YlnsYJLpzBtHx4exYdM=;
- b=w+/8Ihs+uz3rUM7EkxCLzcvtmL5f1IxPJsPnfuu+gT7d+3HRyjmDZeQJ/F9s+3IeFuOftzIIG
- oSnIGaY9WwNC07/DHz4+YkuMOblDdJgGv6XfZeMscePfWzv49dxgpjh
+ bh=uyR5KdriohoILzKQMgiDjFf+ySUexMpA9o8d0cXrK80=;
+ b=lCadI1INMNwMzoFOMmYTqRwGsvzESPiKvK5DKfb6A77i8LAxdm4+w7vhTZTKOgo8Hcf6Y29bT
+ zL8E1g+qzADAlwKC0q1bQWft3D2W1HuucKK388Af4xwi8d3fPOhIoDQ
 X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
  pk=xw1AhCtQdvuoQc+bOQIYy9o8G++cp4/VniI2G/tc3G8=
 X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/default with
@@ -66,66 +67,69 @@ X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/default with
 X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
 Reply-To: hexlabsecurity@proton.me
 
-From: Bryam Vargas <hexlabsecurity@proton.me>
+v1 was a single patch. The kernel test robot then reported three
+-Wconstant-conversion diagnostics in the write path, which Namjae asked about;
+they are v1's doing. enum smb_eio_trace is __mode(byte) and its list was
+already at 128 entries, so v1's new entry pushed smb_eio_trace_write_too_far to
+index 128, which the type cannot hold. clang gives the enum a signed underlying
+type and turns that into an error wherever CONFIG_WERROR is set -- x86_64
+defconfig sets it -- so v1 alone does not build there. gcc gives the same enum
+an unsigned underlying type and says nothing, which is why the tree had not run
+into this.
 
-CIFSTCon() bounds its strnlen() over the byte area with the server's
-ByteCount minus two, which for ByteCount 0 or 1 goes negative as an int
-and converts to a huge size_t.  The later subtraction wraps the __u16
-bytes_left, and that is what bounds cifs_strndup_from_utf16(): a bound of
-up to 65535 against a ~16 KB cifs_req_poolp object runs off the end of the
-slab object, and the bytes reach userspace through tcon->nativeFileSystem
-in /proc/fs/cifs/DebugData.
+1/2 gives the enum room, 2/2 is v1 unchanged. 1/2 has to land first: 2/2 is what
+adds the 129th entry, so on its own it does not build under clang. Stable trees
+older than v6.19 have neither smb_EIO2() nor the trace enum, so the backport
+there is 2/2's guard with a plain rc = -EIO.
 
-Reject a byte area too small for what the parser consumes.  Two bytes is
-the least the parse can consume, and no conformant response carries fewer
--- the Service field is at least "A:" and its NUL.
+Build A/B at v7.2, W=1, CONFIG_CIFS=m, with gcc 14.2 and clang 19.1.7:
 
-Fixes: cc20c031bb06 ("cifs: convert CIFSTCon to use new unicode helper functions")
-Cc: stable@kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+  source state        gcc      clang
+  v7.2, unpatched     clean    clean
+  2/2 only            clean    3 errors, build fails
+  1/2 + 2/2           clean    clean
+
+I dropped the attribute rather than widening it because on x86_64 the record
+does not grow either way. The field precedes an unsigned long at offset 8 of
+struct trace_event_raw_smb3_eio, so sizeof() is 32 with __mode(byte), with
+__mode(HI), and with a plain enum. A plain enum also avoids a spelling the tree
+does not use: all 68 __mode() uses in it are __mode(byte).
+
+smb_eio_trace was the only one of those 68 with no room left. rxrpc_abort_reason
+has 127 entries.
+
+Two corrections to what v1's changelog said, both prose and not code. The
+initialised prefix is 256 bytes rather than the 67 I wrote: header_assemble()
+memsets 256 right after cifs_buf_get(), so the byte area only starts past it
+from WordCount 111. And the impact was understated -- once bytes_left wraps, the
+bound handed to cifs_strndup_from_utf16() reaches 65535 against a ~16 KB
+cifs_req_poolp object, so this is a slab out-of-bounds read and not only an
+uninitialised one.
+
+checkSMB() is also not what makes the guard sufficient, which is why 2/2 adds no
+WordCount check: the parse runs on the request buffer, into which SendReceive()
+copies smbCalcSize() bytes, so an honest bytes_left is what keeps the walk
+inside the copy. Reproducer is a fake SMB1 server that answers negprot,
+completes SESSION_SETUP_ANDX and replies to TREE_CONNECT_ANDX with WordCount 128
+and ByteCount 0; KMSAN and KASAN logs on request.
+
+Prior version:
+https://lore.kernel.org/all/20260728-b4-disp-6b8e68d4-v1-1-e69277237297@proton.me/
+
 ---
+Bryam Vargas (2):
+      smb: client: let enum smb_eio_trace grow past 128 entries
+      smb: client: reject a tree connect response whose byte count is too small
+
  fs/smb/client/cifssmb.c | 6 ++++++
- fs/smb/client/trace.h   | 1 +
- 2 files changed, 7 insertions(+)
+ fs/smb/client/trace.h   | 3 ++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+---
+base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+change-id: 20260820-b4-disp-58f78a28-0dbf722521ec
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 1f77512252e7..f5aad5f61dce 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -615,6 +615,11 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 		tcon->tid = smb_buffer_response->Tid;
- 		bcc_ptr = pByteArea(smb_buffer_response);
- 		bytes_left = get_bcc(smb_buffer_response);
-+		if (bytes_left < 2) {
-+			rc = smb_EIO2(smb_eio_trace_tcon_bcc_too_small,
-+				      bytes_left, 2);
-+			goto out;
-+		}
- 		length = strnlen(bcc_ptr, bytes_left - 2);
- 		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
- 			is_unicode = true;
-@@ -670,6 +675,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 			reset_cifs_unix_caps(xid, tcon, NULL, NULL);
- 		}
- 	}
-+out:
- 	cifs_buf_release(smb_buffer);
- 	return rc;
- }
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 0a91d3aaa079..12241abb8e2e 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -133,6 +133,7 @@
- 	EM(smb_eio_trace_sym_slash,			"sym_slash") \
- 	EM(smb_eio_trace_sym_target_len,		"sym_target_len") \
- 	EM(smb_eio_trace_symlink_file_size,		"symlink_file_size") \
-+	EM(smb_eio_trace_tcon_bcc_too_small,		"tcon_bcc_too_small") \
- 	EM(smb_eio_trace_tdis_in_reconnect,		"tdis_in_reconnect") \
- 	EM(smb_eio_trace_tx_chained_async,		"tx_chained_async") \
- 	EM(smb_eio_trace_tx_compress_failed,		"tx_compress_failed") \
-
--- 
-2.55.0
+Best regards,
+--  
+Bryam Vargas <hexlabsecurity@proton.me>
 
 
