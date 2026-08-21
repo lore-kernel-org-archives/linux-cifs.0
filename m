@@ -1,122 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E1F253B42
-	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 01:02:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D131A262D;
+	Fri, 21 Aug 2026 01:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787274147; cv=none; b=tmB/8tJiGijyHoDSycqt5XVAv687Grhlx+2PtvxK9fwicuNpn+KCfwLucbwy++o+jUmuBECQas+UFWJiA3BhpFuR7VvjfxFIg0qMerqB7s+uMZUXm/pgmUMC90n21exwsvZFQe4X0SY6nrHsQlE2LUAYXczjSGV5LSkqJwmubFo=
+	t=1787274233; cv=none; b=LM6weUVDQ8/tBrSusCXfOYnQNo5vcfSH9ZertjXIYo77vzo6wxNFXSnVWazvdSQtvG8idYZUEgsdGul1HvVV30v3VY4npwNvLqg9cE3mOVlQC+mL02lhSTpTevd7Bs/9t8aHHOs2JxzRuCL+8x0rJL3QHmhEvrmAstgg4c+E2hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787274147; c=relaxed/simple;
-	bh=j4aVP/O/W2/08y9n5IJmtt486PyHueY1gGAM5ACsKfA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nRmyTRlXkJyG7rPGE5OE13pXuKf/q5ixi7z2Ptq+b+TcNZ1W8XoBI156B8B3W9n82lZhD/rY376CGLPGFF6EyNy4r0JimlJaKNi1KLoDjR48gN6Q8ubprxxNlwBvTIlqctEWraSlap5urXPiKgG9zqfjGhsy9/xtzbHHkWRMv8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BMWp7ymQ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787274233; c=relaxed/simple;
+	bh=vHlmQXt+2dpTWS+ko3KiwTPNlY/HHn5EObw0ePEsdwI=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=pExBqRELw6LpErgbGqevTZRTvIPKDJKQUjaInY/dx9m8gNYk2HJZs5pvQ3TX+amV4nQ24tfSxjrXJhvRzxv6/n5ZDKHyzXI5674Ku9wFdIDr++KMgAQQKmWdniMQrXGPUIVkd+jZ6mwWdmH9l2G/Gt/r0P5Kik9dxTewRbRmZ58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=bPH4E9Ii; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BMWp7ymQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 930881F00A3E
-	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 01:02:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787274145;
-	bh=bIwuEqezA9Y4sF4h0xhJBpZ039oEmYkcD9hpugZLGqU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=BMWp7ymQ5WWaFFn0PUofJOVKpdh3lxDBCIx4h6zhvxbsrYyctu1UQiS4QGEECVWxU
-	 OT+tWq9lpoE7GaMfFlwj7YdLmG+xSrsFXwf++eE15oB1BM5uG2ao3bzJxIYM/hpHCl
-	 wFPsZxq6TkVXULosLMMiahARSeuU1zH8LnJGGBl9Reg6JKJZIyyW5VPOz5hYZ2B22g
-	 DsN5TQmsV2QaPELuw2ik8v/dOHklTCd3Cz7F87EhuG2oymlHO3sD6gKiYNM2za1bhs
-	 WlbiaxwdNzkYgez8McNKML7iQGgPSWwE0sJk9LAqPsjLl3xLgD6mZiWPSy36cWQFr0
-	 5ofHudjEeL6eA==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6a0a4a28cbdso981118a12.3
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 18:02:25 -0700 (PDT)
-X-Gm-Message-State: AFuF++l3TTV9u2ATm/y8AsonWjgBDlSLAcd7GUdz0/8WA/yYUBY4h5xO
-	c9g9Ke1TXBGhed2eIStavZtFKiKlFPuoNZazG9eI6x093MfrUklC1TXtkv5mLEXdZ2D8fYFhtmj
-	WV4l4SDducq2bLtD1ZtK5WogKpNhuHUE=
-X-Received: by 2002:a05:6402:44d4:b0:6a1:854:e75e with SMTP id
- 4fb4d7f45d1cf-6a42f26e30cmr2311594a12.15.1787274144173; Thu, 20 Aug 2026
- 18:02:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="bPH4E9Ii"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Date:Subject:Cc:To:From:Message-ID:Sender:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=U6tX4rHjnCbEkmPOoaEfILDywWT/zgnW3sX0ar/qAjc=; b=bPH4E9Ii73rwoJWqnYYesFEIhU
+	hZNKY88pzFaWPNkzMcDf91jw8rYbfDGFyyYsVgrcNcs0HSHjZoq0tdQIsiYI2bBXWpUBzy72TQRY0
+	EJ9jqLtgHmd/ADYVTuHzms29Y1m9xWRaK0jJXm2y/4BSV08wQzsfCcwQjqIGVZCFAxJYBhWQyW7x7
+	qWLiSQ7xZe2GUsQoeOSg4oDJzUMaQjFNq1udSiuG36n6hTVKxXFcz7AAAZpvMGUEbts7GQdNCldfP
+	XFPJsDf8wwF12yJgYucsI7gllKOJR8v90kOX3/oJh7WxJ0fIIg8M69xjgpOFCKNSl3YAOUBD6SCUj
+	oEox6hHQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1wxDfX-00000000N6b-39Gu;
+	Thu, 20 Aug 2026 22:03:39 -0300
+Message-ID: <87d3741519271261fe69701617b20dd9@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, David Howells
+ <dhowells@redhat.com>, Steve French <smfrench@gmail.com>, Steve French
+ <sfrench@samba.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Al
+ Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
+ <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
+ <bharathsm@microsoft.com>, samba-technical@lists.samba.org,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: [GIT PULL] smb: client: replace Steve French as CIFS maintainer
+Date: Thu, 20 Aug 2026 22:03:39 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820211443.1472310-1-sorenson@redhat.com>
-In-Reply-To: <20260820211443.1472310-1-sorenson@redhat.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 21 Aug 2026 10:02:12 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8xbGTc8ADKqR1VMw1SETLDvFwrbnahp+4pWFTamZLB=w@mail.gmail.com>
-X-Gm-Features: AcwNN1WKqWTLEdvNSWjb5-Zf9b7P5pbJkFXXCVeB3e6Vr5pDSc9ajvTvOtvQSqg
-Message-ID: <CAKYAXd8xbGTc8ADKqR1VMw1SETLDvFwrbnahp+4pWFTamZLB=w@mail.gmail.com>
-Subject: Re: [PATCH] cifs: fix i_size inconsistency in smb2_duplicate_extents()
- on FSCTL failure
-To: Frank Sorenson <sorenson@redhat.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 21, 2026 at 6:14=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
-> wrote:
->
-> smb2_duplicate_extents() pre-extends the target file before sending
-> FSCTL_DUPLICATE_EXTENTS_TO_FILE.  If the FSCTL fails (e.g. ENOSPC,
-> byte-range lock conflict, unsupported file combination), the server
-> and client i_size are left reflecting the larger size while the data
-> in the extended range was never cloned.
->
-> Save the original i_size before pre-extension and restore it on FSCTL
-> failure.  If rollback fails, force revalidation instead.
->
-> Fixes: cfc63fc8126a ("smb3: fix cached file size problems in duplicate ex=
-tents (reflink)")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Frank Sorenson <sorenson@redhat.com>
-> ---
->  fs/smb/client/smb2ops.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-> index 7d6738ffcb80..38bd344a9740 100644
-> --- a/fs/smb/client/smb2ops.c
-> +++ b/fs/smb/client/smb2ops.c
-> @@ -2200,6 +2200,7 @@ smb2_duplicate_extents(const unsigned int xid,
->         struct duplicate_extents_to_file dup_ext_buf;
->         struct timespec64 ts;
->         struct cifs_tcon *tcon =3D tlink_tcon(trgtfile->tlink);
-> +       loff_t orig_size;
->         u64 asize;
->
->         /* server fileays advertise duplicate extent support with this fl=
-ag */
-> @@ -2218,7 +2219,8 @@ smb2_duplicate_extents(const unsigned int xid,
->                                trgtfile->fid.volatile_fid, tcon->tid,
->                                tcon->ses->Suid, src_off, dest_off, len);
->         inode =3D d_inode(trgtfile->dentry);
-> -       if (inode->i_size < dest_off + len) {
-> +       orig_size =3D i_size_read(inode);
-> +       if (orig_size < dest_off + len) {
->                 rc =3D smb2_set_file_size(xid, tcon, trgtfile, dest_off +=
- len, false);
->                 if (rc)
->                         goto duplicate_extents_out;
-> @@ -2235,6 +2237,23 @@ smb2_duplicate_extents(const unsigned int xid,
->         if (ret_data_len > 0)
->                 cifs_dbg(FYI, "Non-zero response length in duplicate exte=
-nts\n");
->
-> +       if (rc && i_size_read(inode) > orig_size) {
-> +               int rrc;
-> +
-> +               /*
-> +                * FSCTL failed after we pre-extended the file.  Attempt =
-to
-> +                * restore the original size so the caller sees a consist=
-ent
-> +                * file rather than a larger file with uncloned content.
-> +                */
-> +               rrc =3D smb2_set_file_size(xid, tcon, trgtfile, orig_size=
-, false);
-orig_size is only the locally cached size, and
-lock_two_nondirectories() does not prevent another SMB client from
-modifying the file. If the FSCTL fails, this rollback may truncate the
-server-side file to a stale, smaller size and delete data written by
-that client.
+Hi Linus,
+
+Could you please pull this?=C2=A0 It updates the CIFS Maintainer record to
+replace Steve French with myself and Namjae.
+
+Thanks,
+Paulo
+----------------------------------------------------------------
+The following changes since commit 8d3ae59288f1e7d58d76558a6ee96d533bc5019f:
+
+  Linux 7.2 (2026-08-16 14:32:26 -0700)
+
+are available in the Git repository at:
+
+  https://git.manguebit.org/linux.git tags/cifs-maintainer-switch-7.3-rc1
+
+for you to fetch changes up to 934753d26f1ed7fadeedf1b9e7df6fe75de303e8:
+
+  MAINTAINERS: Replace Steve French as CIFS maintainer (2026-08-20 21:32:00=
+ -0300)
+
+----------------------------------------------------------------
+CIFS Maintainer switch
+
+----------------------------------------------------------------
+Paulo Alcantara (1):
+      MAINTAINERS: Replace Steve French as CIFS maintainer
+
+ CREDITS     | 5 +++++
+ MAINTAINERS | 7 +++----
+ 2 files changed, 8 insertions(+), 4 deletions(-)
