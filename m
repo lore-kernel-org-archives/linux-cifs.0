@@ -1,194 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.amicon.ru (unknown [77.108.111.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B6E39FCE;
-	Fri, 21 Aug 2026 12:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA566495052;
+	Fri, 21 Aug 2026 13:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.108.111.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787315777; cv=none; b=U/MnYKL5tQkndnIM0QK5vVzdU1LFSkvI6LwYdaT7CIxIHaCpnVg9VcMndXyprojePk2ApSa0KiulBxfFdCyTu3rm2I+mU8RaPUlZTfdPDJUdn9mm+t19FmDo3fUrc0StxbsLN4fUVMVSFrLa5/jd/jXzgaQyyz2AQInp1O2rzCg=
+	t=1787320703; cv=none; b=LUPUgN5RgYCFyeyViqiWGLmxsikYNCK3flESGPlGaSe0D8GpQT3+ksRTT4moj4LmIRlAjnkc0zHgweDIVhPW0du12aZaDpLVWDWd8qshRVNiigIejDsdXvawN08WXAc6/P++uj3Le7XknLje/S5CTdP9DpHQQQv3/GqJbTO601o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787315777; c=relaxed/simple;
-	bh=P7g9eFq2cPaljcrkFNCo1rGiOnDBths5gWMuRCDGMhU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=V+ZXuJ7+U76qhX4J3oyUKtUBapb10UOIvhsKp10/9BCDBWGzqZQpkAT4YBVKzQXiBVpW4+1zy8S1PUQgMVAQ8TRQU9mlCuQyQKoXyXWnBfbCCbbDnVaUMRHN6J7E1o5RhIZPSM3XvmkNyXZlqHesO7E1hwlftzqRRvptQr4/OfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=isB+s9cT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1787320703; c=relaxed/simple;
+	bh=4NRiuqHjhLyQpQOlmog02/Mc6oiOKU1lqvYBdfl74ys=;
+	h=Content-Type:From:To:CC:Subject:Date:Message-ID:MIME-Version; b=qRNrTcM2ch7/cvlohHHicEm2YXiHaTzTDRJksKRG11peYrcxHyXZS7vXRPOv7bMXrTMlcJJ1uKMk9KqeaEr927iW8IozaFUIj//6OPLw5R8XqKy/uWsSNCdETSfOo8Vib5yMkmsLN8NTlunkJX7HR826jWD1QtBZwLFLZ0huRfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru; spf=pass smtp.mailfrom=amicon.ru; dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b=D42MY1kN; arc=none smtp.client-ip=77.108.111.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amicon.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amicon.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isB+s9cT"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 043E5C19425;
-	Fri, 21 Aug 2026 12:36:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1787315777;
-	bh=P7g9eFq2cPaljcrkFNCo1rGiOnDBths5gWMuRCDGMhU=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=isB+s9cTHSj8RQBD7G331qSU+86CpNIcsckYWjCb+KgBXLrH1MsLuszmLu4wV4COR
-	 x04Btn1DiAQTtP7lMeQF1lXV8Za2qIiauheGVWEJ4AIAMXnerCVFtoo8jQgjDOH7H1
-	 GJL+z+zMDy7u0MTEsuqTMRp1jidsmqe5YPanRTWGDRFpFNyeNRfIch49oa/gzVWpOw
-	 rfEJG//oUQi5ruJQ9SfhDSFZvGQS9caYDzGb3aLFiTMVuBna2Gt7RksOSwKPscMy5b
-	 2Jus5otXcdVlWJRuSAU2LCewUE1u7+0wyd/afZUMrKeWBvHC74PiL/FL2Wwi5P1e92
-	 y7AQEdWOZt10g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4ABC5DF87;
-	Fri, 21 Aug 2026 12:36:16 +0000 (UTC)
-From: Bryam Vargas via B4 Relay <devnull+hexlabsecurity.proton.me@kernel.org>
-Date: Fri, 21 Aug 2026 07:36:16 -0500
-Subject: [PATCH v3] smb: client: reject a tree connect response whose byte
- count is too small
+	dkim=pass (2048-bit key) header.d=amicon.ru header.i=@amicon.ru header.b="D42MY1kN"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; d=amicon.ru; s=mail; c=simple/simple;
+	t=1787320689; h=from:subject:to:date:message-id;
+	bh=4NRiuqHjhLyQpQOlmog02/Mc6oiOKU1lqvYBdfl74ys=;
+	b=D42MY1kNxwUxP1I2zz1IkZxy92yOI75hhXW6JX9ZBsFGmN1kax1LEjVArB/dZJq3OVoj/xOAWoH
+	hlnchfN5dWapdjamaGWAd3djOrQ8QkSgec13er6tTgKl+ARXkX1DtyITE/jjWFaamOrzi/4KBvXM+
+	cLJDbumngkbvp1ExavbaKUMuCAPuBDTTo8BVI0g/eGEnQ5LzYRbqt5McjxfXu/uvRneVPCDMivOK2
+	yGu3CiLipn3Xi00tzHRbI0uaFuh836IB6MZbJ3aJhzOQ4tw6jY1+mHTSYS8+BuLjAF/1+PbVhv8Ll
+	kFTKPZ0Y3cClaMegIRMLWc5dHMmv4zqtOzqw==
+Received: from localhost.localdomain (192.168.0.250) by mail.amicon.lan
+ (192.168.0.59) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.27; Fri, 21 Aug
+ 2026 16:58:09 +0300
+From: Aleksandr Khromov <haa@amicon.ru>
+To: <linkinjeon@kernel.org>, <sfrench@samba.org>
+CC: <senozhatsky@chromium.org>, <tom@talpey.com>,
+	<linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, <haa@amicon.ru>, <rrv@amicon.ru>
+Subject: [PATCH] ksmbd: zero the object ID before filling FS_OBJECT_ID_INFORMATION
+Date: Fri, 21 Aug 2026 16:58:01 +0300
+Message-ID: <20260821135801.3790290-1-haa@amicon.ru>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260821-b4-disp-5297959d-v3-1-2f92f9abccee@proton.me>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMQQ6CQAxA0auQrm0ChVHqVQwLZqZqWQCZIiEh3
- J1Rl2/x/w4mScXgXuyQZFXTacyoLwWEdz++BDVmA5V0LVuq0DcY1WZ0xDd2HDFSYGZPLnADOZu
- TPHX7LR/d3/bxg4Tl+4HjOAEz6Le/dAAAAA==
-X-Change-ID: 20260821-b4-disp-5297959d-d2c999b25c94
-To: Steve French <sfrench@samba.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
- Tom Talpey <tom@talpey.com>, Jeff Layton <jlayton@kernel.org>, 
- Paulo Alcantara <pc@manguebit.org>, Bharath SM <bharathsm@microsoft.com>, 
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
- Nathan Chancellor <nathan@kernel.org>, 
- Shyam Prasad N <sprasad@microsoft.com>, Namjae Jeon <linkinjeon@kernel.org>, 
- David Howells <dhowells@redhat.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1787315776; l=5552;
- i=hexlabsecurity@proton.me; s=default; h=from:subject:message-id;
- bh=qMp2eGIfdAo+bcIGMz77Vp4+Kci5+wsU3Q1GbqELbBU=;
- b=qOELhIkMRoeI2pwEJydpD9ulO5fvo9/XTMPbyURhD//3w9xLChtQah1n+hXHdJIBta18TZaCh
- diMxC7w9aLRDv+kGRnmLFZQSWDI0+iLJJnb/rw3hyqEaDate121hYh0
-X-Developer-Key: i=hexlabsecurity@proton.me; a=ed25519;
- pk=xw1AhCtQdvuoQc+bOQIYy9o8G++cp4/VniI2G/tc3G8=
-X-Endpoint-Received: by B4 Relay for hexlabsecurity@proton.me/default with
- auth_id=893
-X-Original-From: Bryam Vargas <hexlabsecurity@proton.me>
-Reply-To: hexlabsecurity@proton.me
+X-ClientProxiedBy: mail.amicon.lan (192.168.0.59) To mail.amicon.lan
+ (192.168.0.59)
 
-From: Bryam Vargas <hexlabsecurity@proton.me>
+FS_OBJECT_ID_INFORMATION reports 64 bytes to the client, so all 16 bytes
+of object_id_info::objid are sent.  When the volume UUID is not available
+only sizeof(stfs.f_fsid) (8 bytes) is copied, and the remaining 8 bytes
+are whatever the response buffer holds.
 
-CIFSTCon() bounds its strnlen() over the byte area with the server's
-ByteCount minus two, which for ByteCount 0 or 1 goes negative as an int
-and converts to a huge size_t.  The later subtraction wraps the __u16
-bytes_left, and that is what bounds cifs_strndup_from_utf16(): a bound of
-up to 65535 against a ~16 KB cifs_req_poolp object runs off the end of the
-slab object, and the bytes reach userspace through tcon->nativeFileSystem
-in /proc/fs/cifs/DebugData.
+The response buffer is zeroed on allocation (kzalloc()/kvzalloc()), so
+for a standalone request the tail is zero.  In a compound request it need
+not be: the offset of the next response is advanced by the length pinned
+for the previous one, so if a preceding command wrote its reply into the
+buffer and then failed, smb2_set_err_rsp() pins only the short error
+response and the next reply lands inside the area already written.  Only
+the header is cleared there:
 
-Reject a byte area too small for what the parser consumes.  Two bytes is
-the least it can consume, and no conformant response carries fewer.  The
-new trace point is the 129th smb_eio_trace entry, which __mode(byte)
-cannot represent, so the attribute goes with it.
+	memset((char *)rsp_hdr, 0, sizeof(struct smb2_hdr) + 2);
 
-Fixes: cc20c031bb06 ("cifs: convert CIFSTCon to use new unicode helper functions")
+Clear the field before filling it in.
+
+Fixes: 3a64125730ca ("ksmbd: use volume UUID in FS_OBJECT_ID_INFORMATION")
 Cc: stable@vger.kernel.org
-Signed-off-by: Bryam Vargas <hexlabsecurity@proton.me>
+Signed-off-by: Aleksandr Khromov <haa@amicon.ru>
 ---
-v3: squashed into one patch. v2's 1/2 existed only so the new trace point
-    would build -- the enum holds exactly 128 entries today and __mode(byte)
-    houses them fine, so split off it fixed nothing and asked stable to
-    backport a no-op. Its Fixes: f80ac7eda1cf went with it, and the enum
-    change is one sentence of the body now. Cc: switched from
-    stable@kernel.org to stable@vger.kernel.org, which is the delivering
-    address for a public posting.
-v2: https://lore.kernel.org/all/20260820-b4-disp-58f78a28-v2-0-1fb7a6cb1533@proton.me/
-v1: https://lore.kernel.org/all/20260728-b4-disp-6b8e68d4-v1-1-e69277237297@proton.me/
+ fs/smb/server/smb2pdu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Dropping __mode(byte) does not grow the record on x86_64: the field precedes
-an unsigned long at offset 8 of struct trace_event_raw_smb3_eio, so sizeof()
-stays 32 either way. Only clang notices the overflow -- it gives the enum a
-signed underlying type and converts the 129th value to -128, which
-CONFIG_WERROR=y turns into a build failure. gcc picks an unsigned underlying
-type and says nothing, so on gcc the symptom would instead be those events
-printing a raw number once the value stopped matching __print_symbolic().
-The kernel test robot reported it there:
-https://lore.kernel.org/oe-kbuild-all/202607290344.fvDmgRPA-lkp@intel.com/
-
-Found with KMSAN. The out-of-bounds half is visible to KASAN once bytes_left
-wraps, since the bound then exceeds the ~16 KB cifs_req_poolp object.
-
-The server picks both ends of the walk. pByteArea() is buf + 35 + 2*WordCount
-and CIFSTCon() never checks WordCount, so from WordCount 111 the byte area
-starts past the 256 bytes header_assemble() clears. ByteCount 0 or 1 then
-removes the bound. checkSMB() is not what saves this: the parse runs on the
-request buffer, into which SendReceive() copies smbCalcSize() bytes, so an
-honest bytes_left is what keeps the walk inside the copy.
-
-Reproducer: a fake SMB1 server that answers negprot, completes
-SESSION_SETUP_ANDX and replies to TREE_CONNECT_ANDX with WordCount 128 and
-ByteCount 0.
-
-  BUG: KMSAN: uninit-value in cifs_utf16_bytes+0x37e/0x400 [cifs]
-   cifs_utf16_bytes+0x37e/0x400 [cifs]
-   cifs_strndup_from_utf16+0x5c/0x210 [cifs]
-   CIFSTCon+0x1102/0x1510 [cifs]
-   cifs_setup_ipc+0x3b9/0xcf0 [cifs]
-
-Stable trees older than v6.19 have neither smb_EIO2() nor the trace enum; the
-backport there is the same guard with a plain rc = -EIO.
-
-I did not add a WordCount check: once bytes_left is honest, the byte area is
-always inside what SendReceive() copied. The guard sits after the tid store,
-like the other failure paths here.
----
- fs/smb/client/cifssmb.c | 6 ++++++
- fs/smb/client/trace.h   | 3 ++-
- 2 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 1f77512252e7..f5aad5f61dce 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -615,6 +615,11 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 		tcon->tid = smb_buffer_response->Tid;
- 		bcc_ptr = pByteArea(smb_buffer_response);
- 		bytes_left = get_bcc(smb_buffer_response);
-+		if (bytes_left < 2) {
-+			rc = smb_EIO2(smb_eio_trace_tcon_bcc_too_small,
-+				      bytes_left, 2);
-+			goto out;
-+		}
- 		length = strnlen(bcc_ptr, bytes_left - 2);
- 		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
- 			is_unicode = true;
-@@ -670,6 +675,7 @@ CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
- 			reset_cifs_unix_caps(xid, tcon, NULL, NULL);
- 		}
- 	}
-+out:
- 	cifs_buf_release(smb_buffer);
- 	return rc;
- }
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 5b21ad3c15fb..12241abb8e2e 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -133,6 +133,7 @@
- 	EM(smb_eio_trace_sym_slash,			"sym_slash") \
- 	EM(smb_eio_trace_sym_target_len,		"sym_target_len") \
- 	EM(smb_eio_trace_symlink_file_size,		"symlink_file_size") \
-+	EM(smb_eio_trace_tcon_bcc_too_small,		"tcon_bcc_too_small") \
- 	EM(smb_eio_trace_tdis_in_reconnect,		"tdis_in_reconnect") \
- 	EM(smb_eio_trace_tx_chained_async,		"tx_chained_async") \
- 	EM(smb_eio_trace_tx_compress_failed,		"tx_compress_failed") \
-@@ -213,7 +214,7 @@
- #define EM(a, b) a,
- #define E_(a, b) a
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 76f63f9adc72..6f5f4a399bde 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6093,6 +6093,7 @@ static int smb2_get_info_filesystem(struct ksmbd_work *work,
  
--enum smb_eio_trace		{ smb_eio_traces } __mode(byte);
-+enum smb_eio_trace		{ smb_eio_traces };
- enum smb3_rw_credits_trace	{ smb3_rw_credits_traces } __mode(byte);
- enum smb3_tcon_ref_trace	{ smb3_tcon_ref_traces } __mode(byte);
+ 		info = (struct object_id_info *)(rsp->Buffer);
  
-
----
-base-commit: c84d3e3130dfe1058cb27dc78e7ad8bd36f0545a
-change-id: 20260821-b4-disp-5297959d-d2c999b25c94
-
-Best regards,
---  
-Bryam Vargas <hexlabsecurity@proton.me>
-
++		memset(info->objid, 0, sizeof(info->objid));
+ 		if (path.mnt->mnt_sb->s_uuid_len == 16)
+ 			memcpy(info->objid, path.mnt->mnt_sb->s_uuid.b,
+ 					path.mnt->mnt_sb->s_uuid_len);
+-- 
+2.48.1
 
