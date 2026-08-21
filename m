@@ -1,45 +1,45 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB6942E411;
-	Fri, 21 Aug 2026 16:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 227CD37C93C
+	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 16:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787330437; cv=none; b=cz54FWM35akHDw3Y5GIuD8n7AOtg89rxIxwZaaugoMoHzY++NfuJXTpK8w1zCKl9gImxbRgHCe44qxfbMbhASZfT9Ym1SQYfGiRpONaO94XQkaaSa0QR4FELzVA9fK+BYFgOPPAHPwz/pOBJ6Jeccno7tz6Qxdd7zIhw4nLb18o=
+	t=1787330729; cv=none; b=RZUh04KlxrntYhPV5TlCpOR69KHcTDdN6PbMuDosDwM4JwlHZ4TpRPIomGseKiX3KvBdIO4K0ch7QskxMfo1jj51UUVSjC7sKQTrX/H9wwI3zL3syiithsUX6Vk0ZuFg6sOfEl0JwhX5ePpJvP3IN5yjBOYhlITlLXFVD1sJILA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787330437; c=relaxed/simple;
-	bh=rrQ8zsAhO4o4LBZpMUQvrV2eWH59JPECEmCQQ0d9k5E=;
+	s=arc-20240116; t=1787330729; c=relaxed/simple;
+	bh=q8pzCf1lvSLbAv306mDSyMhPbL8KOuLOlyT1tD3a+Fk=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=SuScI5JDpy2gOE+RXzDFOCoY6ThU2ayo6kILn1QgxBfHcZMVeKWoWZdUOHidRGYM/eIYGA7TtN7qR/x3ZZzQCfyx6/K6rw7AqF4UnwacnOwJ0mwS7xbbvq/0mYF8NaoOrTIFz8Mw/r/XZhT3cl1UbV4XXfhnmWeHXkw26TacgjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=5wVgU9Wv; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version:Content-Type; b=rSw1R290w1MghMGtvhh+79pnyjM0Fmgf9bzCNqj/X5XWq0P1S6u8t8Fc+yEw0CfXNmzIRk6xA65mdpbK+J0BoeV3M7liuTsSLloDk/tvDAJhgJXRSdvi0UNoZRCPCFz3wcGFmnPaP0v+IM6TJ+DcaHzLWrgr6BpblmX2kjmZZNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Ow+7XFrE; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="5wVgU9Wv"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Ow+7XFrE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=rrQ8zsAhO4o4LBZpMUQvrV2eWH59JPECEmCQQ0d9k5E=; b=5wVgU9WvglHehOz+gh2aOEKJEy
-	NOSJrNDLMtV0dS9zFW5vOOfQUiT0eV/xSzEDDhGizhFh/DAspcVyZpF0nHIxGp63JeQQjJm8Wfm0y
-	cSOi7MOs1mpIp3iTmrfwiHEy6KxxpQ3hdR+3pVI7TRsiiVTWWba8NHd7X07a6Fnhh8+IdtQrhxr6Q
-	bRClIlzHD0nc/KCZnahijYqJXVLG0E8XUx4gqYVp8S4sGsKAK0r9epz9x4iKkHjoVBWdKwHMuothq
-	ljQrpDOOnoYLiPGIBi8VW3Ykb1VGuiqjsXyiSN46PrOxTq4Li+5Pd1GL/pu/iRNUIe8RJnoaHwkjZ
-	4oek5+Jg==;
+	bh=q8pzCf1lvSLbAv306mDSyMhPbL8KOuLOlyT1tD3a+Fk=; b=Ow+7XFrEz45NLW00y9KHBwZPQ2
+	6+udjcqvagZHJ0nKeLAQd9HPEDDXvwxAEg2Y+FWtUbqfaKU6LSRUmgQQAzUfgwvQ3WZqpX+BNb2Tl
+	gOr7mCeR+I8mHn+WSjMvDWKebsGrXh2/HqMM7poaIOVNsVLbWf6dPOkrLS+zjGCczkIc2VnkdF3jB
+	i3Am8TuSRJxl/vPSc6oBMwEK8p/fJM6WdH4mxVATeaO62Gp+01Xr0K3VU4rdtQhq6gf6lm/eC6oPR
+	sKO6nEbmDVVDjeLVhk8yyqNX79QVvEZmQkeyqbrppMAlEVoL4KI/h7xQRQI1toKtcQKP7GseCX6My
+	ELTXyc7g==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1wxSIC-00000000PdA-15yE;
-	Fri, 21 Aug 2026 13:40:32 -0300
-Message-ID: <817d7032ea7ac21dff44604cc8377673@manguebit.org>
+	id 1wxSMo-00000000PeS-022B;
+	Fri, 21 Aug 2026 13:45:18 -0300
+Message-ID: <dc434bdc262320af3a9f274bd570304d@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
-To: mdshahid03@gmail.com, Steve French <sfrench@samba.org>, Ronnie Sahlberg
- <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
- Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- linux-kernel@vger.kernel.org, Mohammad Shahid <mdshahid03@gmail.com>
-Subject: Re: [PATCH] smb: client: remove redundant NULL check before kfree()
-In-Reply-To: <20260703122104.69788-1-mdshahid03@gmail.com>
-References: <20260703122104.69788-1-mdshahid03@gmail.com>
-Date: Fri, 21 Aug 2026 13:40:31 -0300
+To: Huiwen He <huiwen.he@linux.dev>, smfrench@gmail.com,
+ linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com, senozhatsky@chromium.org,
+ dhowells@redhat.com, chenxiaosong@kylinos.cn
+Cc: linux-cifs@vger.kernel.org, lkp@intel.com
+Subject: Re: [PATCH] smb/client: remove redundant NULL check before kfree()
+In-Reply-To: <20260816153922.484091-1-huiwen.he@linux.dev>
+References: <20260816153922.484091-1-huiwen.he@linux.dev>
+Date: Fri, 21 Aug 2026 13:45:17 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -48,12 +48,15 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-mdshahid03@gmail.com writes:
+Huiwen He <huiwen.he@linux.dev> writes:
 
-> From: Mohammad Shahid <mdshahid03@gmail.com>
+> From: Huiwen He <hehuiwen@kylinos.cn>
 >
-> kfree() safely handles NULL pointers, so the explicit NULL check
-> before calling kfree() is unnecessary.
-> ...
+> kfree() accepts NULL pointers, so checking tmp_cfile before freeing it
+> is unnecessary and triggers a Coccinelle warning.
+>
+> Remove the redundant check. This does not change runtime behavior.
 
-Applied.
+The same fix [1] was already sent, so I applied it.
+
+[1] https://lore.kernel.org/all/20260703122104.69788-1-mdshahid03@gmail.com/
