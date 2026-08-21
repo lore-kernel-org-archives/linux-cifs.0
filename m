@@ -1,78 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E157D3563CD
-	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 00:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E1F253B42
+	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 01:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787270435; cv=none; b=nppu6RBwYyrQ1ay8GyEM25hOs7f/EG2c+0hXi3PJjigLBaFaf/BSVeWU8tMcJNG+zqnyEa9ROYZFx5hdMKxJlC+6Ls2OOVQU2SKEKFo7oq9jYLXYtoWNpTUOcNSWlEhjqyTARLdu9mjy9P5+VVWAXy6owcmQuLcUuFShHst0aqU=
+	t=1787274147; cv=none; b=tmB/8tJiGijyHoDSycqt5XVAv687Grhlx+2PtvxK9fwicuNpn+KCfwLucbwy++o+jUmuBECQas+UFWJiA3BhpFuR7VvjfxFIg0qMerqB7s+uMZUXm/pgmUMC90n21exwsvZFQe4X0SY6nrHsQlE2LUAYXczjSGV5LSkqJwmubFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787270435; c=relaxed/simple;
-	bh=7ZbhctULEkmBi6avWi9Q0mrJ4lPpk3O74RsjhAXpTM8=;
+	s=arc-20240116; t=1787274147; c=relaxed/simple;
+	bh=j4aVP/O/W2/08y9n5IJmtt486PyHueY1gGAM5ACsKfA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F98X+1UnBvPRDNteTFK2usjcs17G6xWt/WxaR9cykfZiCkem+Ur+Hi76yd+f90aYS2Yg65tCBXWfguSoQSROXsP731lmp3iCJyFWSwibhHYJUCO+joPScZmzMYTKiH5EK5OMcE70Fz942K4J57qdxGAtOvFLOjk2Z1FHPD8vkxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODlmHXyB; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=nRmyTRlXkJyG7rPGE5OE13pXuKf/q5ixi7z2Ptq+b+TcNZ1W8XoBI156B8B3W9n82lZhD/rY376CGLPGFF6EyNy4r0JimlJaKNi1KLoDjR48gN6Q8ubprxxNlwBvTIlqctEWraSlap5urXPiKgG9zqfjGhsy9/xtzbHHkWRMv8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BMWp7ymQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODlmHXyB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C49FE1F00A3D
-	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 00:00:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BMWp7ymQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 930881F00A3E
+	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 01:02:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787270431;
-	bh=cDda+IRPjA3xmacgMMSmSkvOlzTi/NyOElFby2f5zsw=;
+	s=k20260515; t=1787274145;
+	bh=bIwuEqezA9Y4sF4h0xhJBpZ039oEmYkcD9hpugZLGqU=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=ODlmHXyBRF984PhO+dFamE54b/kue6FZARpAU+a7HWj7OR3M9zybyMeSFL6PALs+a
-	 uF50e/OO1K/3GYKRVL/q9fI27gj2m03pNJgiGWnrbzOEDjdfYdtznfr6k0+wItL3rI
-	 tW3ejSFKkKCNflrQDXakOr658+yeQHbIktcYY7YTfcijhUpQZNmJfzXO2VAe27FApc
-	 SHSiYBf+9SlbdQH1y4oGVNxVmB8o+vyPf4AUazmnlihJKMwIH0K0wjg0CzQVlSy+zA
-	 BXS/v8d3KQ/QCTPUSkjF+wYA3B5qUDYhb+36TRAymgaLTlFo6z57M3VqoqNAtjAX3Q
-	 QER5Wi/Irda9g==
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6a41191c9a9so1025099a12.3
-        for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 17:00:31 -0700 (PDT)
-X-Gm-Message-State: AFuF++msduWzAjqqr2j/4puNoS/zUKuIN+CIHkUC3KxnkmMxurynmDnI
-	gMv0zG8zZmaTXXCC6dLj1ttAPJ2lLvSdkNLaHo0HzmCgEJYKhDCt8Zn+oOu7VXHEXNrWLVX9ZFA
-	+r3A/cr/DrhbR0ZWeR6TWl4gAhJz1Koo=
-X-Received: by 2002:a05:6402:20da:b0:6a3:ff14:ebc9 with SMTP id
- 4fb4d7f45d1cf-6a42f1bcdd1mr2149119a12.11.1787270430476; Thu, 20 Aug 2026
- 17:00:30 -0700 (PDT)
+	b=BMWp7ymQ5WWaFFn0PUofJOVKpdh3lxDBCIx4h6zhvxbsrYyctu1UQiS4QGEECVWxU
+	 OT+tWq9lpoE7GaMfFlwj7YdLmG+xSrsFXwf++eE15oB1BM5uG2ao3bzJxIYM/hpHCl
+	 wFPsZxq6TkVXULosLMMiahARSeuU1zH8LnJGGBl9Reg6JKJZIyyW5VPOz5hYZ2B22g
+	 DsN5TQmsV2QaPELuw2ik8v/dOHklTCd3Cz7F87EhuG2oymlHO3sD6gKiYNM2za1bhs
+	 WlbiaxwdNzkYgez8McNKML7iQGgPSWwE0sJk9LAqPsjLl3xLgD6mZiWPSy36cWQFr0
+	 5ofHudjEeL6eA==
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-6a0a4a28cbdso981118a12.3
+        for <linux-cifs@vger.kernel.org>; Thu, 20 Aug 2026 18:02:25 -0700 (PDT)
+X-Gm-Message-State: AFuF++l3TTV9u2ATm/y8AsonWjgBDlSLAcd7GUdz0/8WA/yYUBY4h5xO
+	c9g9Ke1TXBGhed2eIStavZtFKiKlFPuoNZazG9eI6x093MfrUklC1TXtkv5mLEXdZ2D8fYFhtmj
+	WV4l4SDducq2bLtD1ZtK5WogKpNhuHUE=
+X-Received: by 2002:a05:6402:44d4:b0:6a1:854:e75e with SMTP id
+ 4fb4d7f45d1cf-6a42f26e30cmr2311594a12.15.1787274144173; Thu, 20 Aug 2026
+ 18:02:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260820211310.1471930-1-sorenson@redhat.com>
-In-Reply-To: <20260820211310.1471930-1-sorenson@redhat.com>
+References: <20260820211443.1472310-1-sorenson@redhat.com>
+In-Reply-To: <20260820211443.1472310-1-sorenson@redhat.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 21 Aug 2026 09:00:17 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9HApK3UYwfiak-CbLELePWspyrEpuVFhOAfzo92yz1iQ@mail.gmail.com>
-X-Gm-Features: AcwNN1Wm5agKh3RqtHnuU8tXyz9My3Iz_-7bFvHsOIDrqoXCu1eeY9wKvygTEZM
-Message-ID: <CAKYAXd9HApK3UYwfiak-CbLELePWspyrEpuVFhOAfzo92yz1iQ@mail.gmail.com>
-Subject: Re: [PATCH] cifs: call pagecache_isize_extended() in cifs_setsize()
- when extending
+Date: Fri, 21 Aug 2026 10:02:12 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8xbGTc8ADKqR1VMw1SETLDvFwrbnahp+4pWFTamZLB=w@mail.gmail.com>
+X-Gm-Features: AcwNN1WKqWTLEdvNSWjb5-Zf9b7P5pbJkFXXCVeB3e6Vr5pDSc9ajvTvOtvQSqg
+Message-ID: <CAKYAXd8xbGTc8ADKqR1VMw1SETLDvFwrbnahp+4pWFTamZLB=w@mail.gmail.com>
+Subject: Re: [PATCH] cifs: fix i_size inconsistency in smb2_duplicate_extents()
+ on FSCTL failure
 To: Frank Sorenson <sorenson@redhat.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, stable@vger.kernel.org, 
-	David Howells <dhowells@redhat.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 21, 2026 at 6:13=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
+On Fri, Aug 21, 2026 at 6:14=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
 > wrote:
 >
-> cifs_setsize() calls truncate_pagecache() but skips
-> pagecache_isize_extended() on extension.  truncate_setsize() shows
-> the correct pattern:
+> smb2_duplicate_extents() pre-extends the target file before sending
+> FSCTL_DUPLICATE_EXTENTS_TO_FILE.  If the FSCTL fails (e.g. ENOSPC,
+> byte-range lock conflict, unsupported file combination), the server
+> and client i_size are left reflecting the larger size while the data
+> in the extended range was never cloned.
 >
->   i_size_write(inode, newsize);
->   if (newsize > oldsize)
->       pagecache_isize_extended(inode, oldsize, newsize);
->   truncate_pagecache(inode, newsize);
+> Save the original i_size before pre-extension and restore it on FSCTL
+> failure.  If rollback fails, force revalidation instead.
 >
-> pagecache_isize_extended() zeroes the tail of the page straddling old
-> EOF.  Without it, dirty bytes in that region can be written back to
-> the server, exposing stale data in the newly extended range.
->
+> Fixes: cfc63fc8126a ("smb3: fix cached file size problems in duplicate ex=
+tents (reflink)")
 > Cc: stable@vger.kernel.org
-> Cc: David Howells <dhowells@redhat.com>
 > Signed-off-by: Frank Sorenson <sorenson@redhat.com>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks.
+> ---
+>  fs/smb/client/smb2ops.c | 21 ++++++++++++++++++++-
+>  1 file changed, 20 insertions(+), 1 deletion(-)
+>
+> diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+> index 7d6738ffcb80..38bd344a9740 100644
+> --- a/fs/smb/client/smb2ops.c
+> +++ b/fs/smb/client/smb2ops.c
+> @@ -2200,6 +2200,7 @@ smb2_duplicate_extents(const unsigned int xid,
+>         struct duplicate_extents_to_file dup_ext_buf;
+>         struct timespec64 ts;
+>         struct cifs_tcon *tcon =3D tlink_tcon(trgtfile->tlink);
+> +       loff_t orig_size;
+>         u64 asize;
+>
+>         /* server fileays advertise duplicate extent support with this fl=
+ag */
+> @@ -2218,7 +2219,8 @@ smb2_duplicate_extents(const unsigned int xid,
+>                                trgtfile->fid.volatile_fid, tcon->tid,
+>                                tcon->ses->Suid, src_off, dest_off, len);
+>         inode =3D d_inode(trgtfile->dentry);
+> -       if (inode->i_size < dest_off + len) {
+> +       orig_size =3D i_size_read(inode);
+> +       if (orig_size < dest_off + len) {
+>                 rc =3D smb2_set_file_size(xid, tcon, trgtfile, dest_off +=
+ len, false);
+>                 if (rc)
+>                         goto duplicate_extents_out;
+> @@ -2235,6 +2237,23 @@ smb2_duplicate_extents(const unsigned int xid,
+>         if (ret_data_len > 0)
+>                 cifs_dbg(FYI, "Non-zero response length in duplicate exte=
+nts\n");
+>
+> +       if (rc && i_size_read(inode) > orig_size) {
+> +               int rrc;
+> +
+> +               /*
+> +                * FSCTL failed after we pre-extended the file.  Attempt =
+to
+> +                * restore the original size so the caller sees a consist=
+ent
+> +                * file rather than a larger file with uncloned content.
+> +                */
+> +               rrc =3D smb2_set_file_size(xid, tcon, trgtfile, orig_size=
+, false);
+orig_size is only the locally cached size, and
+lock_two_nondirectories() does not prevent another SMB client from
+modifying the file. If the FSCTL fails, this rollback may truncate the
+server-side file to a stale, smaller size and delete data written by
+that client.
