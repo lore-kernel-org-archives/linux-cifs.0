@@ -1,63 +1,165 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769663A1D0C;
-	Fri, 21 Aug 2026 20:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EE4258EF3
+	for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 21:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787344051; cv=none; b=BN7e/3NKfMUBQAW9PxoL4871YvrkGt0SYcmg6RTkutwmb7Gs9WJC/0sJLTtM2fztOh9VblPlG2lVN03MDAgvTLiBnA8lfm1HUQqQ337S05I7Oih7S/6NhWWmJBRjC564kSFkAze8hEWj4+yOCgYs2T9YnIMeyVhUy3aJHeXptFo=
+	t=1787346588; cv=none; b=Grz41kwiY9BZv4RMqhS+L6PBaCBpoCMeKLDN/Vy9xrgiiSh2NyKdkZxDQwxokCBWQC/g+OXtAne3w6qzIByuELHm2ISWTibOiQ4x//ou9poSUb26ViJolBFXR47CBm6igRLp5lHdEFPdvxDefVe1M6ZmhN/6uUgXQ1x+FchyvKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787344051; c=relaxed/simple;
-	bh=UWB8XMODTFYbXmgTFBhNhxoFRYH60hWJ9gWc5pIalwg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=aHgfey/9K4XKLJhRmuPTdq5isRIT3oEtYDKrtwWCP9m2QLmIpotqE0Qw+Yc9Mih2ql2B9ZvDE0/ya8NeOiYhRoUJa6wXAXCI6ItJkQB2efzE6zBI8bP3F+GcPgFVl51aEnUhGEFDkz87hrvArLFG6eQ6SEoxDQURTh6RkUbNucQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QTOKphLw; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787346588; c=relaxed/simple;
+	bh=7GdTHQ5dM8bFTfyK7ZBwYs1Hdqz1nChKDU0kaXSG4Wc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N5lrlSE7R7eDMYOiUy+BylJO0w7KY2P57TAQKaW9yZvUwJYaMApP2Wr33+ToVjxJckyXUIVLmgtW2UqAiD3LeZHMl87pQ2xYOIKr/vToCil33140yDAi8dBpLKYxkSCjOLyJB8YoKhRnYmhu413Mtc0D4urHrzIet2Rcydxy6Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZttffsPY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=a7ZePmou; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QTOKphLw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B63F1F000E9;
-	Fri, 21 Aug 2026 20:27:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787344050;
-	bh=1UbcrIU2LNd8x6MHjaCAlACa0ihgwuepKkjHGk2DAGc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=QTOKphLw2kMGKqpOHdDyIjFrv1qMeG/q/h1To6CXQFaFTRk9gWdZJAOQ96oZvYy4c
-	 5hWuba63HOgAtTvWltzNEczDsCPZeOPIY2ggp6XT7KYhiqrhZ6oNFWQ8S68mZULq/N
-	 h/MTXNganJcgmdynCAJPvG3LPTFfiyFUDir8nvcPjogpkPEhPmcnKWRoPmso1BOqOJ
-	 elt0O9snKbyMTSGCnODIdvN78ofahq4lZpX/x2XZVQGaf8Xz7bIJ3lt7Y6PTI9yi2O
-	 QPqh/CYHIoOvZwrVrRtIF/N1hYpTLFPsqPJHlVzQ4+1izWriGwa1qDYLb8J4qRZ1kA
-	 mCzYLPSqsCK3g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1988F380CEC4;
-	Fri, 21 Aug 2026 20:26:41 +0000 (UTC)
-Subject: Re: [GIT PULL] smb: client: replace Steve French as CIFS maintainer
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <87d3741519271261fe69701617b20dd9@manguebit.org>
-References: <87d3741519271261fe69701617b20dd9@manguebit.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <87d3741519271261fe69701617b20dd9@manguebit.org>
-X-PR-Tracked-Remote: https://git.manguebit.org/linux.git tags/cifs-maintainer-switch-7.3-rc1
-X-PR-Tracked-Commit-Id: 934753d26f1ed7fadeedf1b9e7df6fe75de303e8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 614b9fb585f143d65162f17f1a4b4ec4cbdf5794
-Message-Id: <178734399969.1471056.5104582056257829878.pr-tracker-bot@kernel.org>
-Date: Fri, 21 Aug 2026 20:26:39 +0000
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Namjae Jeon <linkinjeon@kernel.org>, David Howells <dhowells@redhat.com>, Steve French <smfrench@gmail.com>, Steve French <sfrench@samba.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Al Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, samba-technical@lists.samba.org, linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZttffsPY";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="a7ZePmou"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787346586;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RqtdfT1ATXA1/0BUw37kG/PV9gR6XlRVJ/VESnJTw4I=;
+	b=ZttffsPYUuA+cawJbmcE5XJXHYoHzwibxd5/1zBz8rag1f69hQh9Fg6uIXA+1dNFyBIOGe
+	KNpmDM3x6qNrUplpZbcrlnk22I3VavYEHfszzU3+6ZQFE2oWaOKBUEl+DRE3UE+TPnOSvR
+	Or57UD4CNSi0RIhqqYYFTAvHIi9D3O4=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-fZgupYFTMGaeTNZZEFMUaw-1; Fri, 21 Aug 2026 17:09:44 -0400
+X-MC-Unique: fZgupYFTMGaeTNZZEFMUaw-1
+X-Mimecast-MFC-AGG-ID: fZgupYFTMGaeTNZZEFMUaw_1787346584
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-52827090cc5so19663921cf.0
+        for <linux-cifs@vger.kernel.org>; Fri, 21 Aug 2026 14:09:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1787346584; x=1787951384; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=RqtdfT1ATXA1/0BUw37kG/PV9gR6XlRVJ/VESnJTw4I=;
+        b=a7ZePmouGW1U7GqU3WhhXthgKmpqeftqxNpyTewRlnG02tpwoGDIJtJUzw6emkGCaL
+         q4wBthTygGfslyRHXpq1vQfWzbYfhxLxEFMDwNV++1WdICo5P9vXOxDosFjwDq0fvJ8C
+         Oy/hrAGCUG01vMOAssczQRviV+ohSHSAO9ijbHqqGP8hbhtRrf3p1zUQfGq9o3lhJa69
+         WkcJwyERmi4BTvIV6Q8E9uDSSsBhc1bYx5qYxZhzGWAIi4ncALZ1+cdwgFgBRNRr21Zf
+         sdi9SBcjrukj7/txOm6FrR3nJIYPeUXJNAZf7+5Phb135fk1FQzsF0oUTF4Fvt7PA+aL
+         HPVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787346584; x=1787951384;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=RqtdfT1ATXA1/0BUw37kG/PV9gR6XlRVJ/VESnJTw4I=;
+        b=qtKYOvBd7hZ9qNZszx39KJuYOEjg4eWmepJtzNGMGnSXOG8WjNv+ffIJL8mA+UFxoi
+         RXB0tGpDq3YbYJMra9l6sfCQn3eN5Wuxi2WWxZnlj2qD8rjNndmRydkNxMNGi1EIb37y
+         ERLfQnhKFdiCSkbNIGG+b0qruZb9WJw/8GRWZV8BXi0jBgumJ5hgHClFDSDKMPN3chkJ
+         crTebqt2sOaGOfaofFkmDWUaB70x/0cLVSsOLf5O6MAySMDoM0XUYzkdO7Qtp5DLadc8
+         VDVw7msrFO1mVr5Q+vLt78JydHabc2ASzwjcnamO7pFRMKRNJtlenldyuH0eHHpLjejo
+         wFCg==
+X-Gm-Message-State: AFuF++klaMnOrCoZw8ygW5Sjln0YpIy2+9tGFXHNAOUYt6zJEkxTE9WI
+	Ptp8AcvndlyXCFjrufeSiKmjs8eF0ZdUMTcFPIEXZv/7yfb5HLMCUDF1GyyTS3VQ2j6mEXpLtWg
+	IQrJs01LK9v3Xn3FI1OPjWYZwgVfI9sKQTAlIZcHpVThDoApkXdOYmNtfgI8IAYM=
+X-Gm-Gg: AR+sD135PF7NjIl5m1vpKlalgLT3QehEUVdCy8kF9VAlJ9vsKoHsV5vTNm07Axza83r
+	61iTAqYX18AZp2LNoFVWbtwk6eI2VwQvtMccP0/TZZi5Ct3AFOPmC4SNKgZGcGA/zA5dc5r2xm8
+	d4SdLFCpcnPr0ElG3jit8Y2hd7yQhKN8jigB5FnjfkGfhN5hf/gZ+hi8RxY8gPOtDq4U/tqTdeD
+	bnOXv7eN2ksbGGDYzh6Fgq9aDXk9owccD+3fiHrNLNgk8kJcmpAsir2b5tC7AB9Zhgagcy0ypYw
+	NjpOYsfdGh/SThS4+/s/ACG85qhIoVd1VyVRoJjtEzTEgvRkdno7P0oscv8FSzpsEwLJgy2zc6D
+	cqLpstWC/4HlpaeD+aO1APp5p40q5shlEqBeLHvN2
+X-Received: by 2002:a05:622a:1b28:b0:517:6fc2:4760 with SMTP id d75a77b69052e-52de2fb21dbmr177401901cf.9.1787346584173;
+        Fri, 21 Aug 2026 14:09:44 -0700 (PDT)
+X-Received: by 2002:a05:622a:1b28:b0:517:6fc2:4760 with SMTP id d75a77b69052e-52de2fb21dbmr177401221cf.9.1787346583749;
+        Fri, 21 Aug 2026 14:09:43 -0700 (PDT)
+Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90c5f2b5ccesm71569156d6.46.2026.08.21.14.09.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Aug 2026 14:09:43 -0700 (PDT)
+Message-ID: <512e7a00-5306-41a3-b336-3c75377a7d0d@redhat.com>
+Date: Fri, 21 Aug 2026 16:09:42 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: sorenson@redhat.com
+Subject: Re: [PATCH] smb: client: fix OOB array access in __smb2_calc_size()
+ on unknown Command
+To: Tom Talpey <tom@talpey.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, linkinjeon@kernel.org,
+ stable@vger.kernel.org
+References: <20260821142946.1728452-1-sorenson@redhat.com>
+ <32cea692-1aa7-4eac-8f6f-eb39db63777a@talpey.com>
+From: Frank Sorenson <sorenson@redhat.com>
+Content-Language: en-US
+In-Reply-To: <32cea692-1aa7-4eac-8f6f-eb39db63777a@talpey.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Thu, 20 Aug 2026 22:03:39 -0300:
 
-> https://git.manguebit.org/linux.git tags/cifs-maintainer-switch-7.3-rc1
+On 8/21/26 12:08 PM, Tom Talpey wrote:
+> The SMB3 protocol often specifies closing the connection on invalid messages, is there some reason you are opting to ignore this field?
+>
+> Tom.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/614b9fb585f143d65162f17f1a4b4ec4cbdf5794
+Examining the paths into __smb2_calc_size() more closely, I don't see a 
+call path that feeds an unvalidated Command into __smb2_calc_size(); 
+either smb2_check_message() pre-validates it (and tears down the 
+connection as you expected), or the caller is operating on already-known 
+data.
 
-Thank you!
+So at this point, the OOB is unreachable, and this patch is unnecessary.
+
+My apologies; this patch should be disregarded.
+
+
+Frank
+
+
+> Aug 21, 2026 10:45:35 AM Frank Sorenson <sorenson@redhat.com>:
+>
+>> has_smb2_data_area[] is indexed by the server-supplied shdr->Command
+>> with no bounds check:
+>>
+>>      if (has_smb2_data_area[le16_to_cpu(shdr->Command)] == false)
+>>
+>> The array has NUMBER_OF_SMB2_COMMANDS (0x13) entries; any Command value
+>>> = 0x13 reads past the end into adjacent read-only data.
+>> Add an upper-bound check before the lookup; commands outside the valid
+>> range have no data area, so treat them as false.
+>>
+>> Fixes: 093b2bdad322 ("CIFS: Make demultiplex_thread work with SMB2 code")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+>> ---
+>> fs/smb/client/smb2misc.c | 3 ++-
+>> 1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/fs/smb/client/smb2misc.c b/fs/smb/client/smb2misc.c
+>> index 9068175e57cd..26b41ea3b72b 100644
+>> --- a/fs/smb/client/smb2misc.c
+>> +++ b/fs/smb/client/smb2misc.c
+>> @@ -451,7 +451,8 @@ __smb2_calc_size(void *buf, bool *have_data, bool *data_area_overlap)
+>>       */
+>>      len += le16_to_cpu(pdu->StructureSize2);
+>>
+>> -   if (has_smb2_data_area[le16_to_cpu(shdr->Command)] == false)
+>> +   if (le16_to_cpu(shdr->Command) >= ARRAY_SIZE(has_smb2_data_area) ||
+>> +       !has_smb2_data_area[le16_to_cpu(shdr->Command)])
+>>          goto calc_size_exit;
+>>
+>>      smb2_get_data_area_len(&offset, &data_length, shdr);
+>> -- 
+>> 2.55.0
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Frank Sorenson
+sorenson@redhat.com
+Principal Software Maintenance Engineer, filesystems
+Red Hat
+
