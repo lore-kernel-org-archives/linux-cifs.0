@@ -1,72 +1,81 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6752238E5DA
-	for <linux-cifs@vger.kernel.org>; Sat, 22 Aug 2026 08:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1633C1D62
+	for <linux-cifs@vger.kernel.org>; Sat, 22 Aug 2026 10:45:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787388553; cv=none; b=NtT9aL8wumU8oPAgwo36UV5u3JsV7UGyNUmEv8r/cUOOstpRiwQV4UNQFujpoTX0cYaT/aIAytUe+3syP1nJMLi/k4aPXiZtiJT7e1LQAJE2r9TWOwAeVFiJ/qhJYxiNMcrsUQu40vY1XxCaUqPu9AqSXbYw9O4zoZWhSU3Gekg=
+	t=1787395531; cv=none; b=bp3BAg2JtUcmhKZdEeATSw3CUo/tcORSQPS0zZt3vlai8h46WIvy//MVKUmQ9s2y0ouFM9MO0tVzWp0NDZoKKu0FJ+ArbkyCUmN58lD1c9AwfuJ9OCCuY3nmncvAn2weN+P31veUCqCb7qhhoG3M6Q6DyRCTgTeyWHwbPtMzwG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787388553; c=relaxed/simple;
-	bh=4vXngXKZDUoUllYcKBkficNbrVYfStS2jVIk8YuZGSE=;
+	s=arc-20240116; t=1787395531; c=relaxed/simple;
+	bh=SA9YI/0lZ0vaLyK0geOCgau7AUUjlHK70+wxx3CZlco=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=auCuPbb0V4MKYh/LaCgaUcg0z6VieL3uj/MgY05ncMzGJXc7jSS6ObxpPhBxEP1TOBCUCi5xUga7oy8eUIxV4R6RYh42AtAMa0OD7jP0gDtxxotvBhD8tr+6JA8/pcw9CYDpdzxpGjxmfB1x5zjhhhyPFB+ZKixTetpL2jCxLtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FpqdkhDg; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=lLylYoQ1LO2FkWtaVz+lRWIkjnan9AQubFck8V645TPENsRuVhIuhDjYuSOts1CPrW6tRT3byfP4HzhiaIal1Y28E/heI5SygJiXv0BNZQhajVsmlH1Cv5rrYySnLl+visncTLDTisb7hvnrtdyPE/mLD+PnMcXyDlieKTxHDp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rvu9n80F; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpqdkhDg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF1401F00AC4
-	for <linux-cifs@vger.kernel.org>; Sat, 22 Aug 2026 08:49:11 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rvu9n80F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3801F00A3D
+	for <linux-cifs@vger.kernel.org>; Sat, 22 Aug 2026 10:45:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787388551;
-	bh=4vXngXKZDUoUllYcKBkficNbrVYfStS2jVIk8YuZGSE=;
+	s=k20260515; t=1787395528;
+	bh=RdvjQyZKwewCPeWayklU3iGh3k6jn4If1Cy/L8wfOlM=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=FpqdkhDgRrsdAEqZqnxVgJiQKsElFHckCYWDNkpqy9u0YlcpXRU4UK7puNiHyOveW
-	 DarKWESnDc4A8e+85DgHddLqD63JTka3ctzoC5kR5zgLMBfirNiwijejqFg09MrI/8
-	 xXnb+pdjZVvODxdlul0s+N7oCHpIB720WycNnjUHs8eYjuEmHFdGIXSfz6sLPRcuSA
-	 xuGLJZHLk5PZDP6VdzPeblzRo4DD5E4HZbBtPvzXjtLzSMLyvJkTkp0T8u20WVlmtA
-	 g9IPpYVBJNq3Rx/6CnnLiierHU7ebPbk0F/h/3BIEMnqnteXL/Wn21Han+INyvGBdb
-	 rL16bfed0Pc1Q==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c15e2dab83eso345669766b.1
-        for <linux-cifs@vger.kernel.org>; Sat, 22 Aug 2026 01:49:11 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro1AdnlRnbZu1njkKIXKOs9oGdhMvblBUbrZf+rS9wud6/u9EEai9Q71X0EYPsYcYwUcVf2UYHMiCzl@vger.kernel.org
-X-Gm-Message-State: AFuF++lgFuaZUY+uEAETg80gH7rPJ3OSdBN/hD7vju8bcIax1PLb0Nh8
-	SsfqRZ8KiabrVRe0o0QDEbLb5/AnVs2jFE1HWZKIBC2qAEmrpO5w7MoeJxTSYqfvsfdmFALCVE+
-	jGIutfAm28dxtZjsnFZTVvsiKnGF/gq0=
-X-Received: by 2002:a17:906:2481:b0:c1c:2007:298e with SMTP id
- a640c23a62f3a-c246b4c5e33mr1042607366b.24.1787388550512; Sat, 22 Aug 2026
- 01:49:10 -0700 (PDT)
+	b=Rvu9n80FdyWroYrY51crj5WVjSo5eD0S6a5X+KcG3ij8iqMXvOLsJvCTHdZaYLJqN
+	 N3nvULxH8MUmmP9iP2/+WkvXRTEHL3J/YMs9UlBbEsaF/a1G+FBF30iCpklRzw5urp
+	 u2+JHIaoWvxaqkcWXIqVqM47/aLT2olj9F1+k2f7EhhQLJ48QkIcvdueIa5pLLg1bD
+	 JxDMJrepEmRpBqJPSBJhVZbgzqmX7cXCzEDTFtsKizHqYGi/8f83uR82MwgqAdSTAw
+	 z+PXJ9SE44GiQTRy9FtHcSTizm9br+WFKLPJQF5e9w5hJfRUtWtmGLS0ZtOWqIcJoB
+	 +sGNVtPtjM2zw==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15b1da6b82so198948366b.1
+        for <linux-cifs@vger.kernel.org>; Sat, 22 Aug 2026 03:45:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RrJ7MSxjxSAAJZwNJfewoUncs/VMCc8x4vzHR/YbV3xIhsiUGk/YqTzGc3ZlMDieyr31/Q3GuBfc/Uc@vger.kernel.org
+X-Gm-Message-State: AFuF++l/RCxn/0WPGNKJjFaiwEB5GgefnnLcPf2fzPNLOy9w3nBOLfHx
+	acQ0DNwLwFVxDlOgDHKzyCXlJnK9ZOHE10wnQHufuVyuDyULpMMioGqT68jzbTUmdqLQWWAQvYs
+	fKQywOjOM2V4CS70YKRznoGSowJzRrGo=
+X-Received: by 2002:a17:907:c20:b0:c15:f4bb:e663 with SMTP id
+ a640c23a62f3a-c246a3ab3dfmr1353710666b.10.1787395526782; Sat, 22 Aug 2026
+ 03:45:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
- <CAKYAXd84UnfdQ6Ef2nqybnhdgURFo9uYpB1mHZpphFyCiMhutA@mail.gmail.com> <9aeb9ccf-dcd0-48a7-bc24-4b6948943f62@chenxiaosong.com>
-In-Reply-To: <9aeb9ccf-dcd0-48a7-bc24-4b6948943f62@chenxiaosong.com>
+References: <20260820071526.826926-1-huiwen.he@linux.dev> <20260820071526.826926-7-huiwen.he@linux.dev>
+In-Reply-To: <20260820071526.826926-7-huiwen.he@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 22 Aug 2026 17:48:58 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8JMs25fdyZhPn9KYEfv1WH297nxAV0enFHm6T+q=VTFQ@mail.gmail.com>
-X-Gm-Features: AcwNN1XpWdJA1Za5-BIoYSJN27a_FoNhZEBta0SpDkzpn3D4Q1325ar3fZ2wExU
-Message-ID: <CAKYAXd8JMs25fdyZhPn9KYEfv1WH297nxAV0enFHm6T+q=VTFQ@mail.gmail.com>
-Subject: Re: [PATCH v4 0/3] ksmbd: refactor smb2_notify() to a blocking wait
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com, 
-	senozhatsky@chromium.org, slow@samba.org, gael.blivet@gmail.com, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Date: Sat, 22 Aug 2026 19:45:15 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9Fe5EUYjmf9dp-aHw55YpaxuiKwZibcx8ePQYkJ+E0=Q@mail.gmail.com>
+X-Gm-Features: AcwNN1Xr5wZSP6rHOcd7rIdw9aEHvATcxOrNoQyKa8Zh8nSG27E5No2IzzKPQlk
+Message-ID: <CAKYAXd9Fe5EUYjmf9dp-aHw55YpaxuiKwZibcx8ePQYkJ+E0=Q@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] smb/client: fix stale page cache in
+ insert/collapse range
+To: Huiwen He <huiwen.he@linux.dev>
+Cc: smfrench@gmail.com, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	senozhatsky@chromium.org, dhowells@redhat.com, chenxiaosong@kylinos.cn, 
+	linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 21, 2026 at 3:47=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
+> @@ -4107,11 +4117,20 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
+>                 goto out;
 >
-> Hi Namjae,
->
-> Before this patchset, the two test cases also failed. I would like to
-> know your test results before this patchset. I am not sure whether there
-> is something wrong with my krb5 environment. But I tested the
-> `smb2.session.expire1s` and `smb2.session.expire1e` test cases, and they
-> passed.
-Can you check if smb2.session.expire1s/1e tests are passed after
-applying these patches ?
+>         filemap_invalidate_lock(inode->i_mapping);
+> -       rc = filemap_write_and_wait_range(inode->i_mapping, off, new_eof - 1);
+> +       rc = filemap_write_and_wait_range(inode->i_mapping,
+> +                                         round_down(off, PAGE_SIZE),
+> +                                         old_eof - 1);
+>         if (rc < 0)
+>                 goto out_2;
+> -       truncate_pagecache_range(inode, off, old_eof);
+>         netfs_wait_for_outstanding_io(inode);
+> +       /*
+> +        * Invalidate cached folios from the page containing off to EOF before
+> +        * moving data on the server, so subsequent reads do not see stale data.
+> +        */
+> +       rc = invalidate_inode_pages2_range(inode->i_mapping,
+> +                                          off >> PAGE_SHIFT, -1);
+> +       if (rc < 0)
+> +               goto out_2;
+Could we also invalidate the fscache ? If yes, we need to check
+collapse range, zero range and punch hole as well.
