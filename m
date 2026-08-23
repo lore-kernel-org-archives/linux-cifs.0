@@ -1,132 +1,169 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0F238C438
-	for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 16:07:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579E81BD9C9
+	for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 18:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787501251; cv=none; b=S6Bx/1pyx2lxrWwMIf+AZ3acF4qPmAHrPOs5kt/J1SaTQolLxktXCby93Mt1D3Y8T/vGdYQ3o+2Eg55MfPbLgJONuwXyFjWJnJR0q7918Q0rt6uYzzGahhwsf3/hkEmjd7uKt7DcLViKb8K5T8CsNhGLmLLwxsD7RTGEjhUxnNg=
+	t=1787511516; cv=none; b=uL4WfrwG0t8eiSyMNhf812Iltl9hEQU35rKl5iwh+ayKEQMVRvqvVeawAHl2/+wqpNu+DfNhwwxQ6aOKMx3UUNc5cJfXd4iJsShilphPXDVSzruP8gn7XUk+Gbl3+eUsbYM3GvGovFGGVn8GHODi8SGlYeBY9dakYNnVyVyJd2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787501251; c=relaxed/simple;
-	bh=t47MXdoZVmA/0CIxHNFWECHyPwzjT/krdzHraaaG/vk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PFg/LWRAVBCXpFuNHc5+Uf+/dKe/3iYMOum5qz7IffKcT0WC6s/a5qrTFnZH6UVqVpw/Rc6kutVPi6YkXBE7akaZWWjlRdWUKLxPGB+E/oC41wTGdfrRIMUdKmSqM2GBY+jMs4/jTkJJuEeNz/wwZ8QtRY65PhfWF7VUiL+i51E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=mMIpExsD; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
+	s=arc-20240116; t=1787511516; c=relaxed/simple;
+	bh=DnK0gIzL/z/yUdeScVmrwUWvLJ22ZTqo4Z2g9Hrkn+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=npPkP0NPLiIDBKHvDJ0r9tDbdsXvGoqiat9+27TigNx9+QDUIcMti8pRNK0+hywRFQSa//kQNP1HAKNVZnYC6nOXOiNfOZQF9eXFxOoTvBnhZwjwqnNethp0lVNw02F3POzk2maZauR37CBQr1CT6mBAqGC1aw86ThwVtQMBByI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hCX0Na2P; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IYkmfe/E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="mMIpExsD"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8486ac3f347so3155714b3a.1
-        for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 09:07:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hCX0Na2P";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IYkmfe/E"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787511513;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+cokJN3qKCJCUI7AikdkXX4c5WhNLfVl379htSsVc2I=;
+	b=hCX0Na2P2AydOR1QyOrhM1KOtlmZ1njeXrMcMayNsU2xGcyhQdwuNB+XJ9CO8SVlA7NZwK
+	kMM1dIdFzp4IU4YUFB1XLsQDw7ZMVsCiEc6K0qv6ewZQ6NMLAmFhUgO3OcJMhQR0iHcO3w
+	OD6NlKuog3gR4WFXQM2xY+43W4tJDkY=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-458-uFbZvD3XM4-HMItkx10yOQ-1; Sun, 23 Aug 2026 14:58:31 -0400
+X-MC-Unique: uFbZvD3XM4-HMItkx10yOQ-1
+X-Mimecast-MFC-AGG-ID: uFbZvD3XM4-HMItkx10yOQ_1787511511
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7e9fdc2870fso2115784a34.2
+        for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 11:58:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1787501249; x=1788106049; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=09gcrrpoB/ZfazZRgqzNGcQ8HoDldlLl2juqlWH2ddQ=;
-        b=mMIpExsDnugNZZRReCdte6GK0NPnEbAVKyxlthNRkP/U//bahUMZ1d2jaj8QHAIQ8t
-         5OXL7n9VcjbK2HJI9SE2+bhovmPs5RTSfmncqqwVloNBFZfGCP4N+KnfJ8vGGGb/CxLP
-         cKl7Nl3XEgRbIYaLaqthzNcVswPwYOqh7+DRHZ6ZSrdf1N3p2xDJ3k3oSQha+eIzb44z
-         L+GYi8N9HpukrzgXGof9ivYdpFeElPulaiajNg4XC/K3Og++v9KNqms6uPMJOe8G4XBN
-         hgutLTAVemu9/eYwjXVKcdF2kaRgCOonM4XACQ1srdhXseetATYJACsPJbNVWsJu/sqG
-         BlcQ==
+        d=redhat.com; s=google; t=1787511511; x=1788116311; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=+cokJN3qKCJCUI7AikdkXX4c5WhNLfVl379htSsVc2I=;
+        b=IYkmfe/EHxIXzGtGv684EbWbhRdHrY9ThyAyhjvrTigtIF9x/z9TYZNW4y8mBT6vcc
+         XEL+Y0FyudNMJPlJIwnYFXSOxAO7b7g6zmdfQmEGEV0FA1uUfYpeoLFG3k4YmzDhzLd0
+         ixVqt5taXrFho5wBzt59zf0QIR4UirSUMEAqDCJNtq2azwRkSp7qrhaU+tEhl+ulDE87
+         hWACyhchwpQgsntu0NhjzF7yjI6ypM5Uy3z4PInKCdyiil8I8sTMwDBpFuL8SqkC30LG
+         uKWYRCj13mi7UB9n0vpTf4ud+tXtrtBzVd3pP3S40i9zN/kfpqBiDcnY+lXoOUj8tIG7
+         5emQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787501249; x=1788106049;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=09gcrrpoB/ZfazZRgqzNGcQ8HoDldlLl2juqlWH2ddQ=;
-        b=jMYVl3OAtnDc/fiu2oikYYyhjmEjmj2h9RYDvNyWERysaOoCxZvQ4RAwGEPk/DLFZT
-         ibdSmEwm2oh96wgKLjR1gOtQaIUcmNAtmFC0LLaVsmSzWZDcxgw6nrT8JO40VlkKO71f
-         oJ0i87AGUWDOvsccbs4R4T47nySSC8byDGGTN2VHhkHrnJAzzsce7F+JH3YgjWZoofJX
-         TURmXtY3N2agrfpuaN4aEBAxGA5A1CpsYDzhe8ybkuFxQcZiTKO0arYq0cVuZdn2m79A
-         FfDOsHhvyAT7WOEU3fnhd2xSsoXdaBoPzJGoUtrCLXpM0PcFGuUa/AjlRgNTom1LShp6
-         NtEQ==
-X-Gm-Message-State: AFuF++msIZQ5u6QyMPFWrSQiGkFtysy6fej9GgEmaz70gUBR9kzjh94H
-	TD8C291K3fqySb6CzivhnhtmIlZSOhMyWWliysfRdqGsRUEBl0dGy6QbQ5lf6kT63RPn
-X-Gm-Gg: AR+sD130Ny+co96a88BI3eWADkry03OjOyBumn6JYE7hjEYsM/2v4iLEyvvWYvdcGJD
-	eiJSbyvIvgqJu6+Y6qyNNoR2AeI/c9pJmQxOzbJ56Xhed8/hvUSCTX3bStl59a9S1LrcsmFfcxx
-	VZTNOgOoI7dzGitxc6mvLZxEgLlo+4ptAoz1Bou0XadWurMESMsAXATnio5pW14MykTlR8bS8hI
-	s7s9185QnlGE8Ii6Aw4lBh3JkTM1u1Tkk4W4YovTzFNWy9kiWtXSSAmyjkX1yWlbEXSnLl3RXib
-	lqSu3VY9zaUxmRC8o0QK+oOaFrCgembyobhfgoCwSIvJiOqAr/6fK+5ARrkItgY1VsYIr1x2d7h
-	BR62mHCCbql1OHN1Ikuaj1MEdWQ4dX1glapfq3rUTC/PzvqyE/+CHwkhGxZ5DP9CK5skyCQfSqO
-	ktWN+Ig4pQi/Ch1azR+oODp0VdPxvFA7XaioJc5YSdOZwSIP9KxQZiJ0tqaMeAHXdTt+GauNnd7
-	oBXNZlzKQrjX8c6oP/VeYmrSGs=
-X-Received: by 2002:a05:6a00:300f:b0:851:8bde:7861 with SMTP id d2e1a72fcca58-851f9fa5b0bmr21741628b3a.1.1787501249566;
-        Sun, 23 Aug 2026 09:07:29 -0700 (PDT)
-Received: from gmail.com ([115.199.218.100])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8520f14a418sm1211724b3a.47.2026.08.23.09.07.24
+        d=1e100.net; s=20251104; t=1787511511; x=1788116311;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=+cokJN3qKCJCUI7AikdkXX4c5WhNLfVl379htSsVc2I=;
+        b=nK9vCBvrcsxOz/gWMidrhEYrBEX3PLlpZdX8JvccDveC6R3V73rPmHElCPZvCJgXyN
+         v1OqQ6kzg2JZiCDGPzMVf9gfQp2GzkyAUlzZmj8t/w+hnL5R5Qa2yr4AsxrgozJqiqv/
+         CWh7BCO17/tbLIfY1+gEuitlIemuoWbrT0165+FYv8EQEIq+PucSn94fYWCcExFIcKCK
+         PS9iLAgTMOzXjsi5uIQpivcBJcHusMF7ksnjU0kqOf1u1imCcsCS44B0fiArSe8zxqST
+         5gdwwjbd4I7zKbhzK0WmxMTj8zBFOJ6TjtkPSFowSOi8IE0lJcyl6TO+3qZrX7WqU0UD
+         54yw==
+X-Gm-Message-State: AFuF++n6BJ+17r1O0yrz25+cX6o2i6Ne356guJ3pFSJXeBVCJyFcPAgT
+	zpkWS8/4dgmt5SqpXwuTdJEFU9LPbArSr4NfKfcLC6exSijZOYLTt6wkvx4I5BgPjEaNlIR3RHr
+	i3aggqi0wy+0qV1U9UJXdwbEK6XeSbHgaksi/+gSHi+xbdQc04GYaUfCFHNqgqNVx2CHDhOCepZ
+	EDlxosNlnsZu3hdkTKkpxAAnjQ3SjjpPGTQMPDX+0mlWfj7vQ=
+X-Gm-Gg: AR+sD1344Kv3v2EtKAAQ3z6nKkAB+wrTgcYQvXa8lLmqMJ/E9C/IpKGdtv0jzubXifY
+	EN3+cRzidEbYkPZqNpYfzMfIh+3h6CyPU809MnI7BAxhuem+hS+7tRFsE9Z3D188Yat9IdP893o
+	p4PEjXJPD7AxTPiYQYHtWHOsXyNWKU/QKRgEke8oFpyUhJAMD6Cvh9hxvPuFTbh3b5LvqwsQpcq
+	L/HYLaelPKV6wmO6RN+qYULHM44RDaCIOhwoSkpsNBqNvfHUWIXcb2axHUac0ydKNe8YAH94r78
+	sg2DXrZEo3YiFLEjKD5EJeB9NJjj10jaPeTy1acXqlw6/47pHXsp4mw7CO/m3kY6m8NDvfEEgcl
+	P3/JltbgdOUFqNcXbngSpaWewiuz02nDxwy2IBocLd9vEPCFBRGw8QE3qz/8pvt6oAg==
+X-Received: by 2002:a05:6820:2bc9:b0:6a3:7ad3:e728 with SMTP id 006d021491bc7-6b16b4122a3mr8491895eaf.28.1787511510948;
+        Sun, 23 Aug 2026 11:58:30 -0700 (PDT)
+X-Received: by 2002:a05:6820:2bc9:b0:6a3:7ad3:e728 with SMTP id 006d021491bc7-6b16b4122a3mr8491871eaf.28.1787511510468;
+        Sun, 23 Aug 2026 11:58:30 -0700 (PDT)
+Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7f48fb1db63sm2518710a34.12.2026.08.23.11.58.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Aug 2026 09:07:29 -0700 (PDT)
-From: Zihan Xi <zihanx@nebusec.ai>
-To: Steve French <sfrench@samba.org>
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Pavel Shilovsky <pshilovsky@samba.org>,
-	Aurelien Aptel <aaptel@suse.com>,
-	stable@vger.kernel.org,
-	Vega <vega@nebusec.ai>
-Subject: [PATCH v2 2/2] smb: client: validate POSIX create context length
-Date: Sun, 23 Aug 2026 16:06:29 +0000
-Message-ID: <20260823160638.12198-2-zihanx@nebusec.ai>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1787486936.git.zihanx@nebusec.ai>
-References: <cover.1787486936.git.zihanx@nebusec.ai>
+        Sun, 23 Aug 2026 11:58:29 -0700 (PDT)
+From: Frank Sorenson <sorenson@redhat.com>
+To: linux-cifs@vger.kernel.org
+Cc: pc@manguebit.org,
+	linkinjeon@kernel.org
+Subject: [PATCH 00/11] smb: client: fix OOB reads and UAFs in SMB2/3 receive paths
+Date: Sun, 23 Aug 2026 13:57:56 -0500
+Message-ID: <20260823185807.3115901-1-sorenson@redhat.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-parse_posix_ctxt() reads the fixed nlink, reparse-tag, and mode fields
-before checking that the POSIX create context contains them.  A short
-context can pass the generic create-context checks and still make these
-fixed-width reads run past the declared data.
+This series fixes eleven bounds-checking defects in the SMB2/3 client,
+all reachable from a malicious or compromised server.
 
-Require the POSIX context data to cover the three fixed fields before
-reading them.  Keep the handler's existing soft-failure behavior for
-malformed metadata so a bad optional context does not fail the open.
+Patches 1-3 address the compound encrypted frame processing path:
 
-Fixes: 69dda3059e7a ("cifs: add SMB2_open() arg to return POSIX data")
-Cc: stable@vger.kernel.org
-Reported-by: Vega <vega@nebusec.ai>
-Assisted-by: Codex:gpt-5.4
-Signed-off-by: Zihan Xi <zihanx@nebusec.ai>
----
-changes in v2:
-  - Add a handler-level DataLength check before reading the three fixed POSIX fields.
-  - Attribute the fixed-field read to the POSIX create-context introduction.
-  - Preserve the existing soft-failure behavior for malformed optional metadata.
-  - v1 Link: https://lore.kernel.org/all/eb1bc35611f91bd10a4772400b37fac26f660956.1782579150.git.xizh2024@lzu.edu.cn/
----
- fs/smb/client/smb2pdu.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Patch 1 fixes four interacting bugs in receive_encrypted_standard():
+a missing lower bound on NextCommand, an off-by-one upper bound that
+admitted trailing slices too small for an SMB2 header (producing a
+write-after-free via next_buffer aliasing server->bigbuf), a stale
+next_buffer pointer not cleared before goto one_more, and use of the
+pre-decryption pdu_length instead of the plaintext extent for bounds
+checking.
 
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 95d862a1241b..e3973d331633 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -2405,11 +2405,14 @@ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
- 		 struct create_posix_rsp *posix)
- {
- 	int sid_len;
-+	u32 dlen = le32_to_cpu(cc->DataLength);
- 	u8 *beg = (u8 *)cc + le16_to_cpu(cc->DataOffset);
--	u8 *end = beg + le32_to_cpu(cc->DataLength);
-+	u8 *end = beg + dlen;
- 	u8 *sid;
- 
- 	memset(posix, 0, sizeof(*posix));
-+	if (dlen < 3 * sizeof(__le32))
-+		return;
- 
- 	posix->nlink = get_unaligned_le32(beg);
- 	posix->reparse_tag = get_unaligned_le32(beg + 4);
+Patch 2 adds smb2_min_pdu_len[], a per-command table of minimum response
+struct sizes, and uses it in smb2_check_message() to reject responses
+too short for smb2_get_data_area_len() to safely read command-specific
+struct fields.
+
+Patch 3 fixes server->total_read tracking in receive_encrypted_standard()
+so that smb2_check_message() sees the actual per-sub-PDU size rather than
+the full remaining compound tail.  Without this, a rogue server can craft
+a compound frame where any non-last sub-PDU is shorter than its declared
+fixed struct, bypassing the guards added in patch 2.
+
+The remaining patches fix lower-bound gaps and OOB reads in DFS referral
+parsing, EA list traversal, posix SID bounds, change-notify offset,
+snapshot enumeration, and SMB1 reparse point validation.
+
+Note on overlap with a concurrent series: Zihan Xi's
+[PATCH v2 0/2] "smb: client: fix create context out-of-bounds reads"
+(Message-ID: <cover.1787486936.git.zihanx@nebusec.ai>) touches
+smb2_parse_contexts() and parse_posix_ctxt() independently.  Patch 11
+here addresses the same function (smb2_parse_contexts()) but focuses on
+complementary issues that their series does not cover: NameOffset
+validation (lower and upper bounds) and gating all three handler
+dispatches on a non-zero DataLength to prevent zero-DataLength contexts
+from exercising parse_lease_buf, parse_query_id_ctxt, or parse_posix_ctxt.
+Their per-context cc_len bounding and lease/QFid minimum-length checks
+are not duplicated here.  parse_posix_ctxt() DataLength validation is
+omitted from this series entirely since their patch 2/2 addresses it.
+
+Frank Sorenson (11):
+  smb: client: fix NextCommand bounds and aliasing UAF in
+    receive_encrypted_standard()
+  smb: client: validate PDU length before smb2_get_data_area_len()
+    struct access
+  smb: client: fix server->total_read not tracking sub-PDU size in
+    receive_encrypted_standard()
+  smb: client: fix missing lower-bound check on DFS referral string
+    offsets
+  smb: client: fix missing lower-bound on Next field in
+    parse_server_interfaces()
+  smb: client: fix OOB struct field reads in move_smb2_ea_to_cifs()
+  smb: client: fix missing iov bounds check in parse_posix_sids()
+  smb: client: fix underflow in is_valid_oplock_break() notify offset
+    check
+  smb: client: fix potential OOB read in smb3_enum_snapshots()
+  smb: client: fix incomplete bounds check on reparse buffer in
+    cifs_query_reparse_point()
+  smb: client: fix NameOffset and Next field validation in
+    smb2_parse_contexts()
+
+ fs/smb/client/cifssmb.c   |  2 +-
+ fs/smb/client/misc.c      | 12 +++++++--
+ fs/smb/client/smb1misc.c  |  3 ++-
+ fs/smb/client/smb2inode.c | 11 ++++++++
+ fs/smb/client/smb2misc.c  | 53 +++++++++++++++++++++++++++++++++++++++
+ fs/smb/client/smb2ops.c   | 45 +++++++++++++++++++++++----------
+ fs/smb/client/smb2pdu.c   | 11 ++++----
+ fs/smb/client/trace.h     |  1 +
+ 8 files changed, 116 insertions(+), 22 deletions(-)
+
+-- 
+2.55.0
+
