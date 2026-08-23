@@ -1,63 +1,63 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8E7369D57
-	for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 16:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0F238C438
+	for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 16:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787501238; cv=none; b=al4rJ8ERZbg1pYlfirUCcX16xufd9zDwI9u9eQbDN98qimXVkYHJPEQpKJge1eRCH7ysA5QvaNI5VKpiPf7YuHmxtvwXSwiKgkHZbwifIN815CMq1bmlcjX+pTiUH3Us9Yx1ddBY8w7VrG0e1LQKICCtZFsLub9jgL7C8hXUu5w=
+	t=1787501251; cv=none; b=S6Bx/1pyx2lxrWwMIf+AZ3acF4qPmAHrPOs5kt/J1SaTQolLxktXCby93Mt1D3Y8T/vGdYQ3o+2Eg55MfPbLgJONuwXyFjWJnJR0q7918Q0rt6uYzzGahhwsf3/hkEmjd7uKt7DcLViKb8K5T8CsNhGLmLLwxsD7RTGEjhUxnNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787501238; c=relaxed/simple;
-	bh=WmRoR2qjdL0S4mdn9pkVY06GU4Q99k2G2O6p9GYRgmw=;
+	s=arc-20240116; t=1787501251; c=relaxed/simple;
+	bh=t47MXdoZVmA/0CIxHNFWECHyPwzjT/krdzHraaaG/vk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tm+Hg+4GsxGiyq4dj3o4dBTgDAvEnh3YhHoBZFvGiV5FTOlYfpESfi19apehjX1YUE6qSLFgj9xyGE/gWplB/oIYNSO4ptgiuvbn08ZOaB3ElXlg2gMPzyzkuWRppQCLs83vp3LkRSV7gbJzq1Nvx8x2Llk+QoTorUdMmjENgcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=kSROMfAt; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=PFg/LWRAVBCXpFuNHc5+Uf+/dKe/3iYMOum5qz7IffKcT0WC6s/a5qrTFnZH6UVqVpw/Rc6kutVPi6YkXBE7akaZWWjlRdWUKLxPGB+E/oC41wTGdfrRIMUdKmSqM2GBY+jMs4/jTkJJuEeNz/wwZ8QtRY65PhfWF7VUiL+i51E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=mMIpExsD; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="kSROMfAt"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-84a652535dcso1414979b3a.3
-        for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 09:07:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="mMIpExsD"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-8486ac3f347so3155714b3a.1
+        for <linux-cifs@vger.kernel.org>; Sun, 23 Aug 2026 09:07:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1787501236; x=1788106036; darn=vger.kernel.org;
+        d=nebusec.ai; s=google; t=1787501249; x=1788106049; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mNgkMYHHXvaXh9ETBcwWCoDa3W5TTVRzmfpXC6Gf2Lg=;
-        b=kSROMfAtIUVWsJkXiKZbfQRVzzD8j0viXKOlkngEU/dbsyOH7DX0uyV0LzAm6YWiPg
-         FojawNGvnOAptF54vdqyy0WNlKZpYXvtWkSNCykA3fIxC3ARtJ3d7ac9ZftDFzfgl7pI
-         HDbVXQ3uw8p3arnhAiMsrsMLdjFUmm/6nR/4mv0j+CKcxWN8TCoBss5fdG2DzROzCXnt
-         94uN2clQF8tjYfLO/Y5z5ZAjPb3YmgOxVRrVAQOOf2UAWVe0KauET/KyrrwRBF/9zZcm
-         qtiAeBBdPH4gwlc5HANQgUkuRlBserf5JG5aEabpbyi/gaV0JCBGKCeXM0uVBDhr7cB4
-         w9fg==
+        bh=09gcrrpoB/ZfazZRgqzNGcQ8HoDldlLl2juqlWH2ddQ=;
+        b=mMIpExsDnugNZZRReCdte6GK0NPnEbAVKyxlthNRkP/U//bahUMZ1d2jaj8QHAIQ8t
+         5OXL7n9VcjbK2HJI9SE2+bhovmPs5RTSfmncqqwVloNBFZfGCP4N+KnfJ8vGGGb/CxLP
+         cKl7Nl3XEgRbIYaLaqthzNcVswPwYOqh7+DRHZ6ZSrdf1N3p2xDJ3k3oSQha+eIzb44z
+         L+GYi8N9HpukrzgXGof9ivYdpFeElPulaiajNg4XC/K3Og++v9KNqms6uPMJOe8G4XBN
+         hgutLTAVemu9/eYwjXVKcdF2kaRgCOonM4XACQ1srdhXseetATYJACsPJbNVWsJu/sqG
+         BlcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787501236; x=1788106036;
+        d=1e100.net; s=20251104; t=1787501249; x=1788106049;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mNgkMYHHXvaXh9ETBcwWCoDa3W5TTVRzmfpXC6Gf2Lg=;
-        b=oHYubBUSPsIM5fnP77fbLnXzhpeOWtsHqz3iFTv1WeBxP60tkhv5hncgfvdZEiVhTo
-         +R/5osGEWaYITPGcXiq4M0K42qurSHKYLtUp0UZ20Ow6HUDuVldruU9GREVaCrYllkxa
-         Bh2I0pBZQwB2SPWZOoDFrb4EA70H/Kf3oOWfUvb9RBo/0r2UKl2g2Q+OBiaeRn3u+PGx
-         UHfscA91r/jLbUmvtBwDFetbIx63BYDU81neUeRWoICc5ENftpxkhX+W8V3o4lTvrhtY
-         4gVMeVi8AKlcTSIZeakpaz3+WGxXGC0sU0+RgdJLX1XE4dOvtOr254N/wANs3qBVLa1F
-         O9fA==
-X-Gm-Message-State: AFuF++kdetyncEVys7lkUPTBiN+ze1b4NOt42GkO2iX5uMF+eiTzX8O5
-	t9+46pmsG5PzZIoEovutQFInsVfqvsFSo3nqutfvzvbpW2GNxgqGGYBi6Q22DtkEUthj
-X-Gm-Gg: AR+sD121CMlniLrroibH5FhZBHeItOGE69AQwdGPRux46fIVjQ3NB+pGBxC9FyGjm8w
-	b9na0wE1qkqRkHApB+/7w4pQJzbmqWW2kG6ZCgjbrjzCaoxC0yOsAHm6zM7MIGHRHJ5hMZ8w0Ga
-	jgr0OdgcT3MUyW3Krm0Ig7hFkcbrbZHoY+gDCgzPzs3sdLbHKj/i5jY6ixon6TSz7MpBTB1Xtzb
-	YTkbjg/ytW43NO0Nn6M3rF1xtfeih///HYV9vjGiB5zwgF/cDY/HKcHr0VfYjldlpNyZsYmXFao
-	LgmntsyR78W7pIIMBjLtDBDWVza2NOT9g/HNk9nTx7Z361qGLpahouauMA5gyO7KETfQZ741sdT
-	JYGesd6AXKhq5p4lg52GOKjyVHtpY7GYXKKKUJi/7tMGnijfbXt1B+nbYJF4gfbVmDvflfaDTB4
-	yqgK4z5SCYhfqpuWah/RtoA7UuO7iFdBkwj6ZZJwNu3jx8ndzLExldxHbYOTs7QaTfLB5Daxsyy
-	MNfaJc5yh/0IcU=
-X-Received: by 2002:a05:6a00:b42:b0:848:62ab:7b7 with SMTP id d2e1a72fcca58-8520be923e7mr20008268b3a.16.1787501236345;
-        Sun, 23 Aug 2026 09:07:16 -0700 (PDT)
+        bh=09gcrrpoB/ZfazZRgqzNGcQ8HoDldlLl2juqlWH2ddQ=;
+        b=jMYVl3OAtnDc/fiu2oikYYyhjmEjmj2h9RYDvNyWERysaOoCxZvQ4RAwGEPk/DLFZT
+         ibdSmEwm2oh96wgKLjR1gOtQaIUcmNAtmFC0LLaVsmSzWZDcxgw6nrT8JO40VlkKO71f
+         oJ0i87AGUWDOvsccbs4R4T47nySSC8byDGGTN2VHhkHrnJAzzsce7F+JH3YgjWZoofJX
+         TURmXtY3N2agrfpuaN4aEBAxGA5A1CpsYDzhe8ybkuFxQcZiTKO0arYq0cVuZdn2m79A
+         FfDOsHhvyAT7WOEU3fnhd2xSsoXdaBoPzJGoUtrCLXpM0PcFGuUa/AjlRgNTom1LShp6
+         NtEQ==
+X-Gm-Message-State: AFuF++msIZQ5u6QyMPFWrSQiGkFtysy6fej9GgEmaz70gUBR9kzjh94H
+	TD8C291K3fqySb6CzivhnhtmIlZSOhMyWWliysfRdqGsRUEBl0dGy6QbQ5lf6kT63RPn
+X-Gm-Gg: AR+sD130Ny+co96a88BI3eWADkry03OjOyBumn6JYE7hjEYsM/2v4iLEyvvWYvdcGJD
+	eiJSbyvIvgqJu6+Y6qyNNoR2AeI/c9pJmQxOzbJ56Xhed8/hvUSCTX3bStl59a9S1LrcsmFfcxx
+	VZTNOgOoI7dzGitxc6mvLZxEgLlo+4ptAoz1Bou0XadWurMESMsAXATnio5pW14MykTlR8bS8hI
+	s7s9185QnlGE8Ii6Aw4lBh3JkTM1u1Tkk4W4YovTzFNWy9kiWtXSSAmyjkX1yWlbEXSnLl3RXib
+	lqSu3VY9zaUxmRC8o0QK+oOaFrCgembyobhfgoCwSIvJiOqAr/6fK+5ARrkItgY1VsYIr1x2d7h
+	BR62mHCCbql1OHN1Ikuaj1MEdWQ4dX1glapfq3rUTC/PzvqyE/+CHwkhGxZ5DP9CK5skyCQfSqO
+	ktWN+Ig4pQi/Ch1azR+oODp0VdPxvFA7XaioJc5YSdOZwSIP9KxQZiJ0tqaMeAHXdTt+GauNnd7
+	oBXNZlzKQrjX8c6oP/VeYmrSGs=
+X-Received: by 2002:a05:6a00:300f:b0:851:8bde:7861 with SMTP id d2e1a72fcca58-851f9fa5b0bmr21741628b3a.1.1787501249566;
+        Sun, 23 Aug 2026 09:07:29 -0700 (PDT)
 Received: from gmail.com ([115.199.218.100])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8520f14a418sm1211724b3a.47.2026.08.23.09.07.11
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8520f14a418sm1211724b3a.47.2026.08.23.09.07.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Aug 2026 09:07:15 -0700 (PDT)
+        Sun, 23 Aug 2026 09:07:29 -0700 (PDT)
 From: Zihan Xi <zihanx@nebusec.ai>
 To: Steve French <sfrench@samba.org>
 Cc: linux-cifs@vger.kernel.org,
@@ -72,9 +72,9 @@ Cc: linux-cifs@vger.kernel.org,
 	Aurelien Aptel <aaptel@suse.com>,
 	stable@vger.kernel.org,
 	Vega <vega@nebusec.ai>
-Subject: [PATCH v2 1/2] smb: client: fix create context out-of-bounds reads
-Date: Sun, 23 Aug 2026 16:06:28 +0000
-Message-ID: <20260823160638.12198-1-zihanx@nebusec.ai>
+Subject: [PATCH v2 2/2] smb: client: validate POSIX create context length
+Date: Sun, 23 Aug 2026 16:06:29 +0000
+Message-ID: <20260823160638.12198-2-zihanx@nebusec.ai>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <cover.1787486936.git.zihanx@nebusec.ai>
 References: <cover.1787486936.git.zihanx@nebusec.ai>
@@ -86,107 +86,47 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb2_parse_contexts() validates the complete create-context area but does
-not bound each context record by its Next field before dispatching to a
-handler.  A malformed chain can therefore expose bytes past one context to
-the handler.  The QFid handler also used a full response-structure cast even
-though it only consumes DiskFileId.
+parse_posix_ctxt() reads the fixed nlink, reparse-tag, and mode fields
+before checking that the POSIX create context contains them.  A short
+context can pass the generic create-context checks and still make these
+fixed-width reads run past the declared data.
 
-Bound each context by Next and reject malformed chains.  Read the QFid
-DiskFileId only when the context data covers that field, and do not call the
-lease parser unless the record contains every field it reads, including
-LeaseFlags.
+Require the POSIX context data to cover the three fixed fields before
+reading them.  Keep the handler's existing soft-failure behavior for
+malformed metadata so a bad optional context does not fail the open.
 
-Fixes: b8c32dbb0deb ("CIFS: Request SMB2.1 leases")
-Fixes: 89a5bfa350fa ("smb3: optimize open to not send query file internal info")
+Fixes: 69dda3059e7a ("cifs: add SMB2_open() arg to return POSIX data")
 Cc: stable@vger.kernel.org
 Reported-by: Vega <vega@nebusec.ai>
 Assisted-by: Codex:gpt-5.4
 Signed-off-by: Zihan Xi <zihanx@nebusec.ai>
 ---
 changes in v2:
-  - Bound each response context by Next and reject malformed chains.
-  - Read QFid DiskFileId only when DataLength covers the payload.
-  - Extend the SMB2 lease minimum through the LeaseFlags field.
-  - Correct Fixes history for the pre-existing Next/lease path and the later QFid path.
+  - Add a handler-level DataLength check before reading the three fixed POSIX fields.
+  - Attribute the fixed-field read to the POSIX create-context introduction.
+  - Preserve the existing soft-failure behavior for malformed optional metadata.
   - v1 Link: https://lore.kernel.org/all/eb1bc35611f91bd10a4772400b37fac26f660956.1782579150.git.xizh2024@lzu.edu.cn/
 ---
- fs/smb/client/smb2pdu.c | 38 ++++++++++++++++++++++++++++++++------
- 1 file changed, 32 insertions(+), 6 deletions(-)
+ fs/smb/client/smb2pdu.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4ce165e40657..95d862a1241b 100644
+index 95d862a1241b..e3973d331633 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -2375,14 +2375,29 @@ create_reconnect_durable_buf(struct cifs_fid *fid)
- 	return buf;
- }
- 
-+static size_t smb2_create_lease_min_cc_len(struct TCP_Server_Info *server)
-+{
-+	if (server->vals->create_lease_size == sizeof(struct create_lease_v2))
-+		return offsetof(struct create_lease_v2, lcontext.Epoch) +
-+			sizeof(__le16);
-+	return offsetof(struct create_lease, lcontext.LeaseFlags) +
-+		sizeof(__le32);
-+}
-+
- static void
- parse_query_id_ctxt(struct create_context *cc, struct smb2_file_all_info *buf)
+@@ -2405,11 +2405,14 @@ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
+ 		 struct create_posix_rsp *posix)
  {
--	struct create_disk_id_rsp *pdisk_id = (struct create_disk_id_rsp *)cc;
-+	u16 doff = le16_to_cpu(cc->DataOffset);
+ 	int sid_len;
 +	u32 dlen = le32_to_cpu(cc->DataLength);
-+	u8 *beg;
-+
-+	if (dlen < sizeof(__le64))
+ 	u8 *beg = (u8 *)cc + le16_to_cpu(cc->DataOffset);
+-	u8 *end = beg + le32_to_cpu(cc->DataLength);
++	u8 *end = beg + dlen;
+ 	u8 *sid;
+ 
+ 	memset(posix, 0, sizeof(*posix));
++	if (dlen < 3 * sizeof(__le32))
 +		return;
  
--	cifs_dbg(FYI, "parse query id context 0x%llx 0x%llx\n",
--		pdisk_id->DiskFileId, pdisk_id->VolumeId);
--	buf->IndexNumber = pdisk_id->DiskFileId;
-+	beg = (u8 *)cc + doff;
-+	memcpy(&buf->IndexNumber, beg, sizeof(__le64));
-+	cifs_dbg(FYI, "parse query id context 0x%llx\n",
-+		 le64_to_cpu(buf->IndexNumber));
- }
- 
- static void
-@@ -2430,6 +2445,7 @@ int smb2_parse_contexts(struct TCP_Server_Info *server,
- 	struct smb2_create_rsp *rsp = rsp_iov->iov_base;
- 	struct create_context *cc;
- 	size_t rem, off, len;
-+	size_t cc_len;
- 	size_t doff, dlen;
- 	size_t noff, nlen;
- 	char *name;
-@@ -2452,9 +2468,18 @@ int smb2_parse_contexts(struct TCP_Server_Info *server,
- 		buf->IndexNumber = 0;
- 
- 	while (rem >= sizeof(*cc)) {
-+		off = le32_to_cpu(cc->Next);
-+		if (off) {
-+			if ((off & 0x7) || off > rem || off < sizeof(*cc))
-+				return -EINVAL;
-+			cc_len = off;
-+		} else {
-+			cc_len = rem;
-+		}
-+
- 		doff = le16_to_cpu(cc->DataOffset);
- 		dlen = le32_to_cpu(cc->DataLength);
--		if (check_add_overflow(doff, dlen, &len) || len > rem)
-+		if (check_add_overflow(doff, dlen, &len) || len > cc_len)
- 			return -EINVAL;
- 
- 		noff = le16_to_cpu(cc->NameOffset);
-@@ -2466,7 +2491,8 @@ int smb2_parse_contexts(struct TCP_Server_Info *server,
- 		switch (nlen) {
- 		case 4:
- 			if (!strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4)) {
--				*oplock = server->ops->parse_lease_buf(cc, epoch,
-+				if (cc_len >= smb2_create_lease_min_cc_len(server))
-+					*oplock = server->ops->parse_lease_buf(cc, epoch,
- 								       lease_key);
- 			} else if (buf &&
- 				   !strncmp(name, SMB2_CREATE_QUERY_ON_DISK_ID, 4)) {
+ 	posix->nlink = get_unaligned_le32(beg);
+ 	posix->reparse_tag = get_unaligned_le32(beg + 4);
