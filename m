@@ -1,105 +1,101 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4E0412BE7;
-	Mon, 24 Aug 2026 12:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F8240861D
+	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 12:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787573324; cv=none; b=LJrkBmemkqyqlxaJvon7bVM8AfSvDzDbH5tp5MY1LlpBQqQnbSKOyKfqohAZwVukebVn9x5qs4yAI6foZxAf7qO/Ag6B2awQPVdciIB4JoY2fN8mzLGvWf93Gegd9g+xYZvbXVXhwji3z9o6Zloof9zm1DvfuEms5sTkraCNUpg=
+	t=1787573456; cv=none; b=KzXIGETjY0toET2ojGuPTY9mwgdQTJhpxzS9E3hMw2PtpuzpSFeA/PX9VqstMqeSqXmWne9h1KHd0ZKO0QGqyDr06IbVwMzHdtuOVi8PbzgQhQBvapQzyWwEslV6E5HMoDOjaZv2ge8uvbT2l3e7rbsxVSlbybr/UJHUVOfaka4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787573324; c=relaxed/simple;
-	bh=DNuXd0pKQn7U4+pLkpu+uX5FDrR9RBOyfwfmgrAQmaM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eqG46AuLr2Us2AeQCL2+FFeH5negZ4WMprd0//qjWm2GLu28PaDUI0QrbYPjyGb1JGZdMoS8x3E2N27OLn/7kHAsum4lIdZwlTHi5a5G8sXZINfVxhNdf+LavSr8bwfeZBCCpoT6V92zgMPeyxfzZi7MPBPy1sQobXZqgtn3D+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=auaeZgQ+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787573456; c=relaxed/simple;
+	bh=GSlM6OIdMiLIl0CjWUcx0YNdKYzwfIZjFwJ78LuagDQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZcFBWIUljfvPvsKLcSvrGU1PhMn4WBjkv3thib5PDElLWaPUAMmTT7Ukji8oJLBAZRTtSanbAiaZD8WEFpWwYAtqKAdoPeByD0EsVBPK4ZIhvN7/ggSV7yxVOMF3RxKS2+/4uhH358cq4wi6XnOFAv7zG5j6KmbsmZO4ZO2Jzys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TouP4G06; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="auaeZgQ+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64BA1F00A3A;
-	Mon, 24 Aug 2026 12:08:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TouP4G06"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A33C91F00A3D
+	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 12:10:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787573323;
-	bh=uQui/Mo5x/mE+ZdE3He0UvEKRAK0DKtU9+wg6AGH260=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=auaeZgQ++dDT6ZiZ6j0vOGeWJbMYu77qkLcsAZ2LPTVROkev5iy5DviBSsIzb2Y6/
-	 ZtcONh6wqJlHy5SxWbXTiC8pzO2Yi0YIaBNME3eOzW1iJtF1EBJez+ifmeeXFsLPWP
-	 p03vPpvNElYn6yV9r0s7L/StVf289CXsvw40aWG2jiRORRnogxOjWe6qInEB+SPJeh
-	 E3c+MsE1MOi87IWGqonmZ5BEFSESrz94UsQsQjqWEZ0pM4Ugy9YsvSyD0bZ02I0qtR
-	 yHGM4KizZC0xb9QHNPxhlMSQtUh6aD5/izOnJy93eOjZCxzEHBByLIfEt4wVC7Zao2
-	 1nrdZMFEI7O6A==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 24 Aug 2026 14:08:20 +0200
-Subject: [PATCH v2 5/5] pid_namespace: prevent TIF_NOTIFY_SIGNAL from
- interrupting the reaper
+	s=k20260515; t=1787573452;
+	bh=EfxyJxW5Up1XHPEaTMaIqUEPaYjhpQusSBgvDHSESeY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=TouP4G06LoYZTg7XTZZIqGySmS+zZ2BXWHJjuZXJJGfI+fjSNwnGqX6U/jH4q7Opx
+	 IbD/H00M+ECi2T9MWQlx11IE7kduN62o6ToaWq03qfAiwbFMBlcK1irSBwhbk4rNkH
+	 LGygEKN/eD5Yn1rOMZsSxTq8LGebTEsdU7EvjgJJmKnvPtCVcZWxkpreqvHBTbFqnK
+	 Oc29oagIgSI94It4qK3CRnyEFwc9n/SajdH1mRkXkQQOE3icbz3Lc/KOjlMm/m4OZ/
+	 +0ADxrPdZq9gIenR9+QvGOZQ7Ep4vm/Yf/QltMVvtcI79irsqMKE19YwoQ6GO5EC9G
+	 gkMNKeewY5Sig==
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c2055573c8cso508785366b.3
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 05:10:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rqsr1juw9fuGyDXrcsOCYNATVtlM7vt/8NO3KdDtUpNXrM+uQz+uucRVLCfV8NsHKaxjv1IpCpKVffV@vger.kernel.org
+X-Gm-Message-State: AFuF++lrfxHJTLW/plpayLVlxnPbhujGefaKz1F8kv2HJo0UyVJ3jGNm
+	KiecPE+CbpRTRSQ+kr37cUOgNcdKSAJalqUt6WL6+pvHyqmciC9kFvrBap3AtVr4VMrK1rtgls2
+	FkGiLK7KWmLhWd+WLfVadhwPmF5wW6x0=
+X-Received: by 2002:a17:907:80a:b0:c12:9b93:61fd with SMTP id
+ a640c23a62f3a-c24925a28bemr1914367666b.6.1787573451335; Mon, 24 Aug 2026
+ 05:10:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260824-work-tif_notify_signal-v2-5-6609e42b3157@kernel.org>
-References: <20260824-work-tif_notify_signal-v2-0-6609e42b3157@kernel.org>
-In-Reply-To: <20260824-work-tif_notify_signal-v2-0-6609e42b3157@kernel.org>
-To: Oleg Nesterov <oleg@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Peter Zijlstra <peterz@infradead.org>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- Steve French <sfrench@samba.org>, linux-fsdevel@vger.kernel.org, 
- bpf@vger.kernel.org, linux-cifs@vger.kernel.org, linux-mm@kvack.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.17-dev-362b8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1853; i=brauner@kernel.org;
- h=from:subject:message-id; bh=DNuXd0pKQn7U4+pLkpu+uX5FDrR9RBOyfwfmgrAQmaM=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT1mFi+/SQbxvzpzDOeWTM1LbY8mlm86STj0xu7n77kv
- T3fTGcmW0cpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEql4y/OF/4DczK1bwzyTX
- ABtWL3eWI5Gab1ZtKU3/dIz9/iTjcGaGfybL9IRqYoU3fGcv36qcMOWBmmPQ8flmz/ft4/nMdol
- djh0A
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+References: <20260821135801.3790290-1-haa@amicon.ru> <20260824102248.178152-1-haa@amicon.ru>
+ <20260824102248.178152-4-haa@amicon.ru>
+In-Reply-To: <20260824102248.178152-4-haa@amicon.ru>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 24 Aug 2026 21:10:38 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-db=9kDTige44CD5=Mkx_=5p24w+gf9pS1iVs3Z5zd8g@mail.gmail.com>
+X-Gm-Features: AcwNN1Ug7Nc57E38Fa4XwkrLlNjbcw3A7zSv4Hrs3119wW0BagmjTO_b_IYnccM
+Message-ID: <CAKYAXd-db=9kDTige44CD5=Mkx_=5p24w+gf9pS1iVs3Z5zd8g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] ksmbd: fill in FileSysIdentifier in FS_POSIX_INFORMATION
+To: Aleksandr Khromov <haa@amicon.ru>
+Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lvc-project@linuxtesting.org, rrv@amicon.ru
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since commit 7fea700e04bd ("zap_pid_ns_processes: clear
-TIF_NOTIFY_SIGNAL along with TIF_SIGPENDING") zap_pid_ns_processes()
-clears TIF_NOTIFY_SIGNAL before every kernel_wait4() call. Otherwise
-kernel_wait4() doesn't sleep and returns -ERESTARTSYS if
-signal_pending() is true and the reaper busy-waits.
-
-But clearing TIF_NOTIFY_SIGNAL doesn't fix it. It can get raised again.
-For example, klp_send_signals() sets it raw against any task that hasn't
-transitioned yet. And it keeps sending it until the livepatch finishes.
-
-The sleep loop waiting for pid_allocated to drop has the same problem
-and it doesn't even clear anything. So a schedule() in
-TASK_INTERRUPTIBLE returns immediately.
-
-Use a no_notify_signal guard. signal_pending() will ignore
-TIF_NOTIFY_SIGNAL and the pid namespace reaper sleeps until a child
-exits or free_pid() wakes it.
-
-Fixes: 7fea700e04bd ("zap_pid_ns_processes: clear TIF_NOTIFY_SIGNAL along with TIF_SIGPENDING")
-Cc: stable@vger.kernel.org
-Suggested-by: Oleg Nesterov <oleg@redhat.com>
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
----
- kernel/pid_namespace.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/kernel/pid_namespace.c b/kernel/pid_namespace.c
-index d36afc58ee1d..8bc9edb40b78 100644
---- a/kernel/pid_namespace.c
-+++ b/kernel/pid_namespace.c
-@@ -238,9 +238,10 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
- 	 * kernel_wait4() will also block until our children traced from the
- 	 * parent namespace are detached and become EXIT_DEAD.
- 	 */
-+	/* Task work must not busy-loop the reaper, see signal_pending(). */
-+	guard(no_notify_signal)();
- 	do {
- 		clear_thread_flag(TIF_SIGPENDING);
--		clear_thread_flag(TIF_NOTIFY_SIGNAL);
- 		rc = kernel_wait4(-1, NULL, __WALL, NULL);
- 	} while (rc != -ECHILD);
- 
-
--- 
-2.53.0
-
+On Mon, Aug 24, 2026 at 7:23=E2=80=AFPM Aleksandr Khromov <haa@amicon.ru> w=
+rote:
+>
+> smb2_get_info_filesystem() reports 56 bytes for FS_POSIX_INFORMATION,
+> that is the whole of FILE_SYSTEM_POSIX_INFO, but never assigns
+> FileSysIdentifier.  Those eight bytes go to the client as they are found
+> in the response buffer.
+>
+> The buffer is zeroed on allocation, so a standalone request leaks
+> nothing.  A compound request can leak: the offset of the next response
+> is advanced by the length pinned for the previous one, so a reply that
+> was written into the buffer and then dropped in favour of the short
+> error response of smb2_set_err_rsp() stays there, and the next reply is
+> laid over it with only the header cleared.
+>
+> Report the file system id statfs() returned, which is what the field is
+> for; ksmbd already hands the same value out in FS_OBJECT_ID_INFORMATION
+> when the volume UUID is not available.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aleksandr Khromov <haa@amicon.ru>
+> ---
+>  fs/smb/server/smb2pdu.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index 5e83ad4f085e..7f200ba103ba 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+> @@ -6167,6 +6167,8 @@ static int smb2_get_info_filesystem(struct ksmbd_wo=
+rk *work,
+>                         info->UserBlocksAvail =3D cpu_to_le64(stfs.f_bava=
+il);
+>                         info->TotalFileNodes =3D cpu_to_le64(stfs.f_files=
+);
+>                         info->FreeFileNodes =3D cpu_to_le64(stfs.f_ffree)=
+;
+> +                       memcpy(&info->FileSysIdentifier, &stfs.f_fsid,
+> +                              sizeof(stfs.f_fsid));
+Since FileSysIdentifier is __le64, endianness conversion is needed.
+Thanks.
