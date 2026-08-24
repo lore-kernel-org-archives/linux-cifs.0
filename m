@@ -1,81 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8FE395DBF
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 12:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FA742046B;
+	Mon, 24 Aug 2026 12:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787574368; cv=none; b=WspRv8sp4QWl+axhharSrgkWnSZJSKLtUE2ODekwkRSu0UYMJfRBmZPN6gDyw1ElGE12aZyffn7oqpdIFNgaysCafGzAc7QBmv8mLRvIW519k4UzT8b0X46+J/wmfmRNoFsbf6oJSdIk9XezifdL/PsYW7vzRyb+P2TQ0/oJN1I=
+	t=1787576172; cv=none; b=MsQ0OvvqNqbeerIOt8KPmSW1D35bR1tytglPaqDx0l9n7bWeWIw61ZbPRXECDdOtYsOJO/1/ZUE9/Jedr/hdqg/WyAfDkXY9kcJvdlUbe1g1fefmg8IhI+zvSbBJbjFCDA0NXeKsnU71YTvpz9/iiZsWG74nm9F9TL5nwS4QY3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787574368; c=relaxed/simple;
-	bh=j9aZZpCdgptJbt//i5RnBzvhBcYdoEc2Ws5J84COO0U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W2MMq+telWTJf079oJGhK3aujuPvQl31pZuG7DG+qt5tzI9tYdjazcuLnSghwevE7V8azhlwDO1O4Ky1FvBzzADDb6HE88BEWaJM7/W+NSoIY1+1L+AU4+Vt5au2zdcAEPg5SxZJVBlsXOrdbCxh68UKczZpyZIUH5vC2cJWGq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=THVFcswt; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787576172; c=relaxed/simple;
+	bh=wrqhKy562GAHR7e5XZIHxOchJnJQcrFJcxXpfKTZ52s=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=ZeuOndumQIW3H2g+Vh17r1cnfVaFyB82tKGaMbHkv9tFl+FzM2PsdzQyZeWWw8g2F4kc3MDAMphfQl90gWrYwak8JDT1TOfniyzgMFonZPeZ5kNX7VTNdP4D8e68oxkjCYWArtJxOZtWBi0oRm9rxAqtOy36iz/0CfXdd4LGfiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=NOm+pAAS; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="THVFcswt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C784A1F00A3D
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 12:26:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787574366;
-	bh=mLvmuNmvwBKnMnppd+F9eiEG1bT77LTPk/OhrmvLLsQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=THVFcswtUUwZ1ttEeCATXSdZZXCjRBSRpVpyfDIGpedBhYc2YlkzDwAJF6jdg2Pp5
-	 bUvFPLsTuQvi8wx9H16ldc7U/NYlu6n4KzTUOpi4zc7AsSSaWw1xCf7ORpKsQChqtJ
-	 5q2/P/dn50ju0ILg+5SxLIOoM0A6kfblJxN7TJY9hQwRgmngghaVaAhrFHyyB0n1N0
-	 Yt0/+vWUoj9G8vTAb3MXkMpJm4vGWJ+FojpIwdmWWlY2wvd7aHprvJ4jZv1Nr7k1DS
-	 J6hZha7nOuMPll+QcSQLLZoQosvK6LcF5QEtk1+oavumBL5W/ElbSdvgR6rnpjxmY5
-	 fNP6tgXy2jeeA==
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c15b1da6b82so358671366b.1
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 05:26:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RpQizCuOcDD5g0LHpE9U32HXiEPQhKysc29KrRVwqkvfrq/dXCIkexh8hbYbRuATiWljU/gm2KPAAxd@vger.kernel.org
-X-Gm-Message-State: AFuF++mBLMlWjcSZ8ly9KqZiRydgsOhvTOtb0H1izlle7zcjVbQZ/GL4
-	sTjqRu1Wq4zdyKQIbWItbXQJQw6X6FgkX7ne8f8jE7Jjbc1s4EsS0BBuoaLS3+F0uFhlNewBXro
-	i2Pr5hJatNOPyCyUEu2nuLC/fDUSFzaQ=
-X-Received: by 2002:a17:907:c706:b0:c20:f913:9337 with SMTP id
- a640c23a62f3a-c246a657f9fmr3151002366b.20.1787574365467; Mon, 24 Aug 2026
- 05:26:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="NOm+pAAS"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=JmNjsD4g0Ts1wD3Vf9jzJ1CDo7ezTLHe49tpjmt9ijg=; b=NOm+pAASUkqXhelcZas32k/gyP
+	UjV4Z89iJ4E8qDCTFe5GezrEpDZTEpMHaRd+0dHNgoGJ06PdyiFoh3MiV1x+gGl7Y6sLRjDqRN3vl
+	eNwBREZeLymNcmBrm0+46FaCKlyI5ve9YXfph61pYqtC5BhNjTtFELXiCyoD7LhfUaex5FjpAg9BX
+	pCu3HXBTf0g9SU4xfdm8NP1GyDERDb5JKBNAwXHCW8Qm6BBcSiU2CzEpSaDhEz3LLEi+kTwig0toT
+	6tloGukwzCb9GaQOXQ68Ul5U2hNO+yDWQbMAUuKtdUI5/VAo3MKNpoIq7nTzkWR01L2EgN8jdCz13
+	ucOie94Q==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1wyUDh-00000000YpK-1OC9;
+	Mon, 24 Aug 2026 09:56:09 -0300
+Message-ID: <a7e552d6083f042e9b5e8cd0b0e93cf8@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Frank Sorenson <sorenson@redhat.com>, linux-cifs@vger.kernel.org
+Cc: linkinjeon@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] cifs: fix loff_t underflow in cifs_remap_file_range()
+ when len == 0
+In-Reply-To: <20260822215517.2353835-1-sorenson@redhat.com>
+References: <20260822215517.2353835-1-sorenson@redhat.com>
+Date: Mon, 24 Aug 2026 09:56:09 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260821135801.3790290-1-haa@amicon.ru> <20260824102248.178152-1-haa@amicon.ru>
- <20260824102248.178152-3-haa@amicon.ru>
-In-Reply-To: <20260824102248.178152-3-haa@amicon.ru>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 24 Aug 2026 21:25:52 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-ya+P8ed6LZ2mjZBYg39TFf5mAA0r5APbr=qgdTdLsfQ@mail.gmail.com>
-X-Gm-Features: AcwNN1XLEiXmDkflQ6EnwWd-BrdE4FKdO9birCHT2WKEUPTiGc-BXV4tHwoTFm8
-Message-ID: <CAKYAXd-ya+P8ed6LZ2mjZBYg39TFf5mAA0r5APbr=qgdTdLsfQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] ksmbd: initialize FileSystemControlFlags in FS_CONTROL_INFORMATION
-To: Aleksandr Khromov <haa@amicon.ru>
-Cc: sfrench@samba.org, senozhatsky@chromium.org, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	lvc-project@linuxtesting.org, rrv@amicon.ru
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Mon, Aug 24, 2026 at 7:23=E2=80=AFPM Aleksandr Khromov <haa@amicon.ru> w=
-rote:
+Frank Sorenson <sorenson@redhat.com> writes:
+
+> With len == 0 (clone to EOF), the effective length is computed as:
 >
-> smb2_get_info_filesystem() reports 48 bytes for FS_CONTROL_INFORMATION,
-> that is the whole of struct smb2_fs_control_info, but never assigns
-> FileSystemControlFlags.  Those four bytes go to the client as they are
-> found in the response buffer.
+>     len = src_inode->i_size - off;
 >
-> The buffer is zeroed on allocation, so a standalone request leaks
-> nothing.  A compound request can leak: the offset of the next response
-> is advanced by the length pinned for the previous one, so a reply that
-> was written into the buffer and then dropped in favour of the short
-> error response of smb2_set_err_rsp() stays there, and the next reply is
-> laid over it with only the header cleared.
+> If off > i_size, this is a negative loff_t, corrupting the ByteCount
+> in the FSCTL_DUPLICATE_EXTENTS_TO_FILE request and inverting the range
+> in filemap_write_and_wait_range().  The existing off >= i_size check
+> fires only after the ioctl has already been sent.
 >
-> ksmbd does not implement quota tracking, so report no control flags.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Aleksandr Khromov <haa@amicon.ru>
-Applied it to #ksmbd-for-next.
-Thanks!
+> Snapshot i_size_read() once for both the bounds check and the length
+> calculation, eliminating the TOCTOU and 32-bit torn-read risk.  Reject
+> off > src_size with -EINVAL.  Treat off == src_size as a no-op,
+> consistent with __generic_remap_file_range_prep().
+> ...
+
+Applied.
