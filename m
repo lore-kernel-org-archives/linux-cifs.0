@@ -1,34 +1,35 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB019412BFB;
-	Mon, 24 Aug 2026 12:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4E0412BE7;
+	Mon, 24 Aug 2026 12:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787573321; cv=none; b=BAH0qZ9YIuZh+xODTBh4gZ2kXQZDVoEhmm4YiUaVjh+uVw5EqqlQxRyFtrTXov2pIuMZajS7C40E2i4lgHXdIJM9sNojI0Fy8QcgM+R7Z6YCCS+3YRbYzwo+b7DHqYO7WBKpTjLhSjtTTEuKnQOgy6CxT08afpKjeeGI2lmv5VQ=
+	t=1787573324; cv=none; b=LJrkBmemkqyqlxaJvon7bVM8AfSvDzDbH5tp5MY1LlpBQqQnbSKOyKfqohAZwVukebVn9x5qs4yAI6foZxAf7qO/Ag6B2awQPVdciIB4JoY2fN8mzLGvWf93Gegd9g+xYZvbXVXhwji3z9o6Zloof9zm1DvfuEms5sTkraCNUpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787573321; c=relaxed/simple;
-	bh=DegYEG6tpjLPd6zIyd0uvEZQ+CG03dLYC5VoDZmbB70=;
+	s=arc-20240116; t=1787573324; c=relaxed/simple;
+	bh=DNuXd0pKQn7U4+pLkpu+uX5FDrR9RBOyfwfmgrAQmaM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=BN39XJ0Ed+o/ryT16IMymIyGUBwOs4/ObgHS7hjwCRinjrPov2qssMA0rbioFwDDv7WYJTr3apwYtE+HxO8tEm2+90xk1MDn+d3E6pTFW2C2BXmRzdl+MNd2XFsPSnYDeVwEqzdb81cE4oppEdHpblJCWevN2E/0eGngG7utqgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lwYNaCQ0; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:To:Cc; b=eqG46AuLr2Us2AeQCL2+FFeH5negZ4WMprd0//qjWm2GLu28PaDUI0QrbYPjyGb1JGZdMoS8x3E2N27OLn/7kHAsum4lIdZwlTHi5a5G8sXZINfVxhNdf+LavSr8bwfeZBCCpoT6V92zgMPeyxfzZi7MPBPy1sQobXZqgtn3D+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=auaeZgQ+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lwYNaCQ0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB23A1F000E9;
-	Mon, 24 Aug 2026 12:08:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="auaeZgQ+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64BA1F00A3A;
+	Mon, 24 Aug 2026 12:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787573320;
-	bh=X/BRx6M0sWOF5lRkxvQBnf742kB/koawcH9FfpZ801w=;
+	s=k20260515; t=1787573323;
+	bh=uQui/Mo5x/mE+ZdE3He0UvEKRAK0DKtU9+wg6AGH260=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=lwYNaCQ08Sh6l7XGgwRZlDDmSSKrXqYwm396gFjuimZaVsGZytvx+p7297a3dagpi
-	 YpWIXwnkPt3mAI1yUptAYf7Qn2PyKlP3Db5dDCZ5mqpsKJxfLojXKz3UozogGoGPPn
-	 1XBsfiTvtxe2Tz2Va/ntmvrjrrRR7rWhAm3rzGa3kn7wpEplgEr4GYCEg1f09PyrhY
-	 zy2Zyq1wMjn7aXPCbxKkDWRCgd47EGvF//6Qe3llqXdUYmjPx03lToU8YftAJDgWtO
-	 IxpuSfIY0hNZTiYFal2u9395hoIKrXyECPdNlGqfatI1yXaDjABt/lLnC34accHbIu
-	 0pO6cqfWmQYgQ==
+	b=auaeZgQ++dDT6ZiZ6j0vOGeWJbMYu77qkLcsAZ2LPTVROkev5iy5DviBSsIzb2Y6/
+	 ZtcONh6wqJlHy5SxWbXTiC8pzO2Yi0YIaBNME3eOzW1iJtF1EBJez+ifmeeXFsLPWP
+	 p03vPpvNElYn6yV9r0s7L/StVf289CXsvw40aWG2jiRORRnogxOjWe6qInEB+SPJeh
+	 E3c+MsE1MOi87IWGqonmZ5BEFSESrz94UsQsQjqWEZ0pM4Ugy9YsvSyD0bZ02I0qtR
+	 yHGM4KizZC0xb9QHNPxhlMSQtUh6aD5/izOnJy93eOjZCxzEHBByLIfEt4wVC7Zao2
+	 1nrdZMFEI7O6A==
 From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 24 Aug 2026 14:08:19 +0200
-Subject: [PATCH v2 4/5] smb: prevent TIF_NOTIFY_SIGNAL from interrupting
+Date: Mon, 24 Aug 2026 14:08:20 +0200
+Subject: [PATCH v2 5/5] pid_namespace: prevent TIF_NOTIFY_SIGNAL from
+ interrupting the reaper
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -37,7 +38,7 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260824-work-tif_notify_signal-v2-4-6609e42b3157@kernel.org>
+Message-Id: <20260824-work-tif_notify_signal-v2-5-6609e42b3157@kernel.org>
 References: <20260824-work-tif_notify_signal-v2-0-6609e42b3157@kernel.org>
 In-Reply-To: <20260824-work-tif_notify_signal-v2-0-6609e42b3157@kernel.org>
 To: Oleg Nesterov <oleg@redhat.com>
@@ -45,72 +46,59 @@ Cc: Jens Axboe <axboe@kernel.dk>, Peter Zijlstra <peterz@infradead.org>,
  Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
  Steve French <sfrench@samba.org>, linux-fsdevel@vger.kernel.org, 
  bpf@vger.kernel.org, linux-cifs@vger.kernel.org, linux-mm@kvack.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>, 
- Paulo Alcantara <pc@manguebit.org>
+ "Christian Brauner (Amutable)" <brauner@kernel.org>, stable@vger.kernel.org
 X-Mailer: b4 0.17-dev-362b8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2185; i=brauner@kernel.org;
- h=from:subject:message-id; bh=DegYEG6tpjLPd6zIyd0uvEZQ+CG03dLYC5VoDZmbB70=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT1mFg6rpr9/KnJblcjBY2oGa/3Tnoe9H/NLofT+5YsD
- r662Hr/9I5SFgYxLgZZMUUWh3aTcLnlPBWbjTI1YOawMoEMYeDiFICJLDvHyHDilY5tlM6jJRu1
- 0k8xFa1M+GWvUb/SfuU36yfbfUpaT4YzMkyKr+KfFrleNnTzleSyhg+SVjHGzTmm0sr3e5vPMMT
- nMwEA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1853; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=DNuXd0pKQn7U4+pLkpu+uX5FDrR9RBOyfwfmgrAQmaM=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWT1mFi+/SQbxvzpzDOeWTM1LbY8mlm86STj0xu7n77kv
+ T3fTGcmW0cpC4MYF4OsmCKLQ7tJuNxynorNRpkaMHNYmUCGMHBxCsBEql4y/OF/4DczK1bwzyTX
+ ABtWL3eWI5Gab1ZtKU3/dIz9/iTjcGaGfybL9IRqYoU3fGcv36qcMOWBmmPQ8flmz/ft4/nMdol
+ djh0A
 X-Developer-Key: i=brauner@kernel.org; a=openpgp;
  fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-smb blocks every signal during some sends:
+Since commit 7fea700e04bd ("zap_pid_ns_processes: clear
+TIF_NOTIFY_SIGNAL along with TIF_SIGPENDING") zap_pid_ns_processes()
+clears TIF_NOTIFY_SIGNAL before every kernel_wait4() call. Otherwise
+kernel_wait4() doesn't sleep and returns -ERESTARTSYS if
+signal_pending() is true and the reaper busy-waits.
 
-	sigfillset(&mask);
-	sigprocmask(SIG_BLOCK, &mask, &oldmask);
+But clearing TIF_NOTIFY_SIGNAL doesn't fix it. It can get raised again.
+For example, klp_send_signals() sets it raw against any task that hasn't
+transitioned yet. And it keeps sending it until the livepatch finishes.
 
-An incomplete or partial send would cause the connection to become out
-of sync. That in turn would cause the session to be torn down and
-reconnected.
+The sleep loop waiting for pid_allocated to drop has the same problem
+and it doesn't even clear anything. So a schedule() in
+TASK_INTERRUPTIBLE returns immediately.
 
-In commit 00be6f26a2a7 ("smb: client: transport: avoid reconnects
-triggered by pending task work") smb hand-rolled its own solution. Have
-it use the new no_notify_signal_save() critical section instead.
+Use a no_notify_signal guard. signal_pending() will ignore
+TIF_NOTIFY_SIGNAL and the pid namespace reaper sleeps until a child
+exits or free_pid() wakes it.
 
-This stops io_uring from cancelling a send in flight but that's just
-like it is today and it is bounded by sk_sndtimeo at around 15s.
-
-Acked-by: Paulo Alcantara <pc@manguebit.org>
+Fixes: 7fea700e04bd ("zap_pid_ns_processes: clear TIF_NOTIFY_SIGNAL along with TIF_SIGPENDING")
+Cc: stable@vger.kernel.org
+Suggested-by: Oleg Nesterov <oleg@redhat.com>
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- fs/smb/client/transport.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ kernel/pid_namespace.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index fdf4e50c27ce..35fa699569e9 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -22,7 +22,6 @@
- #include <linux/mempool.h>
- #include <linux/sched/signal.h>
- #include <linux/task_io_accounting_ops.h>
--#include <linux/task_work.h>
- #include "cifsglob.h"
- #include "cifsproto.h"
- #include "cifs_debug.h"
-@@ -172,15 +171,11 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
- 		 * after the retries we will kill the socket and
- 		 * reconnect which may clear the network problem.
- 		 *
--		 * Even if regular signals are masked, EINTR might be
--		 * propagated from sk_stream_wait_memory() to here when
--		 * TIF_NOTIFY_SIGNAL is used for task work. For example,
--		 * certain io_uring completions will use that. Treat
--		 * having EINTR with pending task work the same as EAGAIN
--		 * to avoid unnecessary reconnects.
-+		 * Task work must not abort the send, see signal_pending().
- 		 */
--		rc = sock_sendmsg(ssocket, smb_msg);
--		if (rc == -EAGAIN || unlikely(rc == -EINTR && task_work_pending(current))) {
-+		scoped_guard(no_notify_signal)
-+			rc = sock_sendmsg(ssocket, smb_msg);
-+		if (rc == -EAGAIN) {
- 			retries++;
- 			if (retries >= 14 ||
- 			    (!server->noblocksnd && (retries > 2))) {
+diff --git a/kernel/pid_namespace.c b/kernel/pid_namespace.c
+index d36afc58ee1d..8bc9edb40b78 100644
+--- a/kernel/pid_namespace.c
++++ b/kernel/pid_namespace.c
+@@ -238,9 +238,10 @@ void zap_pid_ns_processes(struct pid_namespace *pid_ns)
+ 	 * kernel_wait4() will also block until our children traced from the
+ 	 * parent namespace are detached and become EXIT_DEAD.
+ 	 */
++	/* Task work must not busy-loop the reaper, see signal_pending(). */
++	guard(no_notify_signal)();
+ 	do {
+ 		clear_thread_flag(TIF_SIGPENDING);
+-		clear_thread_flag(TIF_NOTIFY_SIGNAL);
+ 		rc = kernel_wait4(-1, NULL, __WALL, NULL);
+ 	} while (rc != -ECHILD);
+ 
 
 -- 
 2.53.0
