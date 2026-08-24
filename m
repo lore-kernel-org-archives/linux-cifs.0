@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1954236E47A
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 11:44:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B43C3F20E3
+	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 11:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787571870; cv=none; b=g+DG4C2Xx8cJMQR3OsMFb40/UfTmULBSxzA7SvhPAIMIt/rQK3z+/yLA3gn4etYAyBeg2gR+eL+bG3D+uAetZV5PxjSEZpvGCB6N2CDMNxg2+F/J+qF6wV2vNfbBHrU0GVewB5lrzJzTA8ddIXGhYKJAj9ZvwsUkgCxMMInx0IY=
+	t=1787571873; cv=none; b=F/MRbr+9/sXkMIkCvCRbWJCZKp8GLwLoWgKaugQhkTt1gmIm87sBYjsoun3GG0iWhULfZpVjSc8nRCqkKXGfmMQ7AVjNIRumZgXUc3tNOfuoUart+vQxU9FU1USRgegbX+KKt9S1cUKauZY4TBwa1QD0ShIKYzFnvD6XEx1s9r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787571870; c=relaxed/simple;
-	bh=X/6xDcPr1Xrbx3DMnriRQU3BhbE5V+2GR4/ng2IxyjE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FEBAV5KfUiPwA2UzjU96fA4Y6BTwqJ+dNGN6jM+eIA01++tSo7d8e01l32xiMlrU/joDlvYJTLVm0Hjb87qECseeEs+10LcgMjBIG2hqyB1w72C9sYIMaiuFy6Je+ELtYYREdO9vINFbV8kmTXZ+89dwFunapBCbVUS5V4qWfRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PBmADvkA; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787571873; c=relaxed/simple;
+	bh=SpIjj+fVSRH4jL4dGTGKHzATm3UevBUVzUc7+hO6Vrg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=tswP47J1JzXkE2K0O0NhDIchgrdwGLr+vNTD58rV4MWBvpcuPO99omvdbYQSiq5vjqk3j8n+yn9dYEs1phuLFxf8FS3u32aKd+bqGjg7D2X8Nitnr6oTPagJgqJ++6/WThjs/pvvU9SqlPMcNWZsI/okrHqfcpCD2WIoPyJobzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bfw0ryst; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PBmADvkA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70EA61F00A3A;
-	Mon, 24 Aug 2026 11:44:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bfw0ryst"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F7531F00A3D;
+	Mon, 24 Aug 2026 11:44:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787571868;
-	bh=4MOFgeujtsWwD9vdJGiTSzDIN2jYycfwvStjb4efY+I=;
-	h=From:To:Cc:Subject:Date;
-	b=PBmADvkAjI2nMnsOugvNhyck9wH/cC/7sa16g0ozG6I8ACllvOXc92BtZaCe2QQqp
-	 jtk3NXabDsxTFiQQCJE6+6pmx3Exke0mTNbskIlAHugYXLZloX81KTcEgw5lsmZ7Py
-	 56KcLEY5KMjzgSXCsAPRBR0BL3JSOWJowf+ld4yki6bxAgW0mchA4C+DVg6RTys0TN
-	 awL5v73wrwQxG/ja2mPBh20gZfJuJLhOCoPe4jfGXTOd4EWi7erwgtOZw+xlMFN2fY
-	 jVinN/7ydKamJpobHliAELP2qiEbtESlb4/gx5DDcSfOkvh6b4y/CcXrZw0HX7nV/2
-	 MDXc9lwqgkFYA==
+	s=k20260515; t=1787571871;
+	bh=a7pniBc0r28M/Hqe7ZPsiSYj9OCpRZykOoAKlvgJ7Lg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Bfw0rysttFlsKXhhWGQrw0T3Vjx1pIyMNdAymlqlKZW5zqgs/vWrwQorQYEUJmv7z
+	 6S7twTsX6iDVaHdbbaYtfCGtuLJ5ooT+wdALA1NTOJICGFz2NvV+nvBv5Rzrru3AC7
+	 Z1+cqKrl3j6nL9/gG7neJQ/j3R8F3mAzUQwfoqAEEjRyBwgpzyoO+8GdzHME4Lek3g
+	 imMkpDkDgqrR7RvG6BqGH03nUYmIsIUCBanF2F9CuLYTQPlcI9CXFIkcGjpNohArn6
+	 5+O+K8c731vZxPlBw8OqrS3WLGXkN9eVwcP92/jbOonhr89YoyOMhg0VxDXZs2j58S
+	 B3ZonIzwR4Mpw==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: senozhatsky@chromium.org,
@@ -33,10 +34,12 @@ Cc: senozhatsky@chromium.org,
 	chenxiaosong@chenxiaosong.com,
 	chenxiaosong@kylinos.cn,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 1/2] ksmbd: doc: update SMB3 multichannel support status
-Date: Mon, 24 Aug 2026 20:44:04 +0900
-Message-Id: <20260824114405.8108-1-linkinjeon@kernel.org>
+Subject: [PATCH 2/2] ksmbd: doc: update RDMA feature support status
+Date: Mon, 24 Aug 2026 20:44:05 +0900
+Message-Id: <20260824114405.8108-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20260824114405.8108-1-linkinjeon@kernel.org>
+References: <20260824114405.8108-1-linkinjeon@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,28 +48,28 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SMB3 request replay support is now available. Update the ksmbd
-documentation to reflect that SMB3 multichannel is supported.
+ksmbd supports SMB3 encryption over RDMA, while signing over RDMA is
+still under development. Update the feature status table accordingly.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- Documentation/filesystems/smb/ksmbd.rst | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ Documentation/filesystems/smb/ksmbd.rst | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/filesystems/smb/ksmbd.rst b/Documentation/filesystems/smb/ksmbd.rst
-index 672c5d3892ff..050af25d5339 100644
+index 050af25d5339..2425f321f5b7 100644
 --- a/Documentation/filesystems/smb/ksmbd.rst
 +++ b/Documentation/filesystems/smb/ksmbd.rst
-@@ -82,8 +82,7 @@ Signing Update                 Supported.
- Pre-authentication integrity   Supported.
- SMB3 encryption(CCM, GCM)      Supported. (CCM/GCM128 and CCM/GCM256 supported)
- SMB direct(RDMA)               Supported.
--SMB3 Multi-channel             Partially Supported. Planned to implement
--                               replay/retry mechanisms for future.
-+SMB3 Multi-channel             Supported.
- Receive Side Scaling mode      Supported.
- SMB3.1.1 POSIX extension       Supported.
- ACLs                           Partially Supported. only DACLs available, SACLs
+@@ -112,7 +112,8 @@ ksmbd/nfsd interoperability    Planned for future. The features that ksmbd
+                                support are Leases, Notify, ACLs and Share modes.
+ SMB3.1.1 Compression           Supported.
+ SMB3.1.1 over QUIC             Planned for future.
+-Signing/Encryption over RDMA   Planned for future.
++Signing over RDMA              Under development.
++Encryption over RDMA           Supported.
+ SMB3.1.1 GMAC signing support  Planned for future.
+ ============================== =================================================
+ 
 -- 
 2.25.1
 
