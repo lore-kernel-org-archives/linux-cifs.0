@@ -1,111 +1,72 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBD73E171C;
-	Tue, 25 Aug 2026 08:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2577843F4B4
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 12:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787646656; cv=none; b=naJQWmCoyxEcBQR+mhN+cDbJIoupfqYpVgFbZUPtabwjvFxmXzlGrjZF7vkUejZdMsieOD+1whqSTFe4cwrseBNXy8WTZwEUyE8KN1XK5ZR0KUOUz8Q2H/gP3zvu5P2veNKcIISsCPrthe8N2OUZ3BUAXneS+Ch6IpuX4elw4vw=
+	t=1787661699; cv=none; b=GKn/HfD8KUU44X+Dm9xd2tgI2p3izc6ivQ5Ql7nhlRBYwtP2P1n1saYeG1SXjmtAZLaqUI+DyjL+lvGUlHWUZakRFvBJP09lZ9G5Ro2DlqM0u9yRnXrttSLzSFVhnxGrJmMpTK3WJ7rdpw5W9aCsE9Pt1FdHQegajsk5PUSpqEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787646656; c=relaxed/simple;
-	bh=u2fGCbhOYE4AOcgln312wvUk2txiBZMAagKaL6hDjcw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hpNCeBc7Jj21jSeKRq6AP+uPFymaoWODHIb5tPU/wD0itcJZ7VbppBvHYNvybq1zf/IiIo6Ss3A3Rlq41C0iywv400d2uV2Y8xWZjdhigTf6AtcBOVtO277N3y4NEgQbH6Nbldth/6eH6GQ2iEhXCAjskEtoGelmil9ymEEnyRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lbX3E2D5; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1787661699; c=relaxed/simple;
+	bh=vOmif/9omQ/1RzlG1fSykn06A+Tp5IYR4sAET4aEtjw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=STix+i6k1t1GXlu2JQAZ5KvStZWdqQR/4ehUBkefTivaBjO2EP1h9U10c34JYHEctUJ7W3DqCIe99e197W6lDk+o/uKpERl+caU7ryGGsNBWdsHz8Py231pBDT0fb+fcaf/qBnYhYT0x1y9Wyh9ncQQzygwEFbWZGMhmx7v+J+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QY1M0VeK; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lbX3E2D5"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1787646654; x=1819182654;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=u2fGCbhOYE4AOcgln312wvUk2txiBZMAagKaL6hDjcw=;
-  b=lbX3E2D5OyvRfHrOtAlmUBWBekPRkVT/tGIQ5170DOw+mwYsX6wsPpoC
-   9c/jrMsLBKaBHRu/GRSGCUns0pebu4frm3XJ1r9OI9f2j+1sm08yKt58E
-   EnRy+oAd2qXPMYHtTZXjhrtPp2NXFbJZ4QbBBKM1lfqtYdt8Gb8VnM33j
-   CM73u27vNtV05i9vOMDYzzYWaVVee2FuQst714gNl7mgE+e5bRt24Knrs
-   DCadxTLJDXFi5NSZJWWHwkWOjGIaF1AaPiW/FTvcqQRPJbPvnNwfGktLH
-   bKW2buvKBs8XvsIUfkGgtQy4HwHH8iTH4vfGsccXINJbF4/HbhV5BKe3V
-   w==;
-X-CSE-ConnectionGUID: 1N7StKUxTE6YKHx7utT/Ww==
-X-CSE-MsgGUID: Gs729jTuTuinq6f2vFq0eg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11885"; a="75643336"
-X-IronPort-AV: E=Sophos;i="6.25,242,1779174000"; 
-   d="scan'208";a="75643336"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Aug 2026 01:30:53 -0700
-X-CSE-ConnectionGUID: ph/jpuTtRXWxRfYNSponkQ==
-X-CSE-MsgGUID: 5haeeRpXRlytlvEromX3+g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,242,1779174000"; 
-   d="scan'208";a="271024859"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa004.jf.intel.com with ESMTP; 25 Aug 2026 01:30:51 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1003)
-	id ACF5699; Tue, 25 Aug 2026 10:30:49 +0200 (CEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Steve French <stfrench@microsoft.com>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 1/1] smb: client: transport: Fix debug printing in __release_mid()
-Date: Tue, 25 Aug 2026 10:30:43 +0200
-Message-ID: <20260825083043.4037868-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QY1M0VeK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3E451F00A3A
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 12:41:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787661697;
+	bh=vOmif/9omQ/1RzlG1fSykn06A+Tp5IYR4sAET4aEtjw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=QY1M0VeKNzIundrl7R5SYLDdj/Wi9hBM1AL14kXujOC2btXVM+1Z99axSYWZZXtp9
+	 YXOxNl630qY/FAsOL651vkmPxrqbIwUJeGzRItZm+W/V/3ScpD9Sp6Oed7bTqUsEA0
+	 QX3FrC/8SV05N2OQ5Q2WWhReoTgIZvMvIU4sDxZUbXH1iOeZXVLwZsfP4bszSjPUM3
+	 Yk9NJjpWCw+idUVq19mCszmE+11W6sdVw9DGS9wj4EN7JGv9xNe5bi+1gnUg1YaCU+
+	 o2pV1zLO2kQY4ixD7MzHyyenhQLYPeJJ3bhVgPctMwZDQFggzHrxnnwMNnSqfdDePQ
+	 tU/YaxERYwzag==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c167aa9500dso716672866b.3
+        for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 05:41:37 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rq1B9TjevvcUQNyQC0sKHuwLYyULFUe1jqfauULeBb2on+36LKPQ8Kwif9/mR9oDtxVNGEN+z08WdbA@vger.kernel.org
+X-Gm-Message-State: AFuF++njYumbQJsBn+HXuw635WIioRbVHYDyNGXcbQvU/nlCkFUnZFLg
+	FxiaF8q5Y6NbM+wGTZn8u/s1S/KiYxQL3PDou/SlZ2Mt8KVG//FKlhUV1lc4c/fkfUeX7ITM33p
+	VDqeYx3IbABdUC1HBUizCHZBa78w12Pg=
+X-Received: by 2002:a17:906:f246:b0:c21:61a6:8821 with SMTP id
+ a640c23a62f3a-c246a6cd384mr3165842866b.23.1787661696377; Tue, 25 Aug 2026
+ 05:41:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd84UnfdQ6Ef2nqybnhdgURFo9uYpB1mHZpphFyCiMhutA@mail.gmail.com>
+ <9aeb9ccf-dcd0-48a7-bc24-4b6948943f62@chenxiaosong.com> <CAKYAXd8JMs25fdyZhPn9KYEfv1WH297nxAV0enFHm6T+q=VTFQ@mail.gmail.com>
+ <51fba35c-967f-46b9-8252-d433beab7129@chenxiaosong.com>
+In-Reply-To: <51fba35c-967f-46b9-8252-d433beab7129@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 25 Aug 2026 21:41:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-1=RqAhykLJVgDrYEmr1AU6B-MUfiQb4o4S_JJyU0NVg@mail.gmail.com>
+X-Gm-Features: AcwNN1WTKWeyWpPGeyr6FGeEN43DWwrHdDomt5qfL7Q239ecXNkQhJ2R7bOSA_U
+Message-ID: <CAKYAXd-1=RqAhykLJVgDrYEmr1AU6B-MUfiQb4o4S_JJyU0NVg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/3] ksmbd: refactor smb2_notify() to a blocking wait
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com, 
+	senozhatsky@chromium.org, slow@samba.org, gael.blivet@gmail.com, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Long time ago during upgrading printk():s to the respective pr_<level>()
-calls one misconversion happened and nobody has noticed that. So,
-previously printk(KERN_DEBUG) + printk() worked as one long debug print
-since the trailing '\n' is only present in the followup printk() format
-string. The culprit change missed that and split the message to two on
-the different levels. Restore the original behaviour to make users be
-less confused in the most likely never happen cases of partially getting
-that message.
-
-Fixes: 0b456f04bcdf ("cifs: convert printk(LEVEL...) to pr_<level>")
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- fs/smb/client/transport.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index fdf4e50c27ce..e266859818a4 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -101,12 +101,11 @@ void __release_mid(struct TCP_Server_Info *server, struct mid_q_entry *midEntry)
- 		trace_smb3_slow_rsp(smb_cmd, midEntry->mid, midEntry->pid,
- 			       midEntry->when_sent, midEntry->when_received);
- 		if (cifsFYI & CIFS_TIMER) {
--			pr_debug("slow rsp: cmd %d mid %llu",
--				 midEntry->command, midEntry->mid);
--			cifs_info("A: 0x%lx S: 0x%lx R: 0x%lx\n",
--				  now - midEntry->when_alloc,
--				  now - midEntry->when_sent,
--				  now - midEntry->when_received);
-+			pr_debug("slow rsp: cmd %d mid %llu A: 0x%lx S: 0x%lx R: 0x%lx\n",
-+				 midEntry->command, midEntry->mid,
-+				 now - midEntry->when_alloc,
-+				 now - midEntry->when_sent,
-+				 now - midEntry->when_received);
- 		}
- 	}
- #endif
--- 
-2.50.1
-
+On Sun, Aug 23, 2026 at 1:30=E2=80=AFAM ChenXiaoSong
+<chenxiaosong@chenxiaosong.com> wrote:
+>
+> After this patchset, `smb2.session.expire1s/1e` are passed.
+>
+> On 8/22/2026 4:48 PM, Namjae Jeon wrote:
+> > Can you check if smb2.session.expire1s/1e tests are passed after
+> > applying these patches ?
+I tried to check again, but your patch set isn't applying to
+#ksmbd-for-next. If you could send the patch again, I will check it.
