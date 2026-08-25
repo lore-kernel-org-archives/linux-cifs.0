@@ -1,36 +1,35 @@
-Received: from mta0.migadu.com (out-225.mta0.migadu.com [91.218.175.225])
+Received: from mta1.migadu.com (out-28.mta1.migadu.com [95.215.58.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C4425393E
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 13:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D051345A2A8
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 13:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787665915; cv=none; b=p0+I+EMCVFtLtRj2mOCYUXNzSVwKyvn9po22WFLe/gDyk1GzON2wMkHIkjNW4ani+Uqey2UkGz/47JAkW2SQw3I4+GK2jTo4HutTp53hYCEwa4d0eyLTRKhyDiYPwRelXBMVN3RTCx4J2qXtR7DHrzOGdNpszJRU8ZPfIcx1/nc=
+	t=1787665917; cv=none; b=Ng15Ye+adNg0hlWUOfXsCc4d8Ckq+xWDcTwRAktqHDkLi57VB3bOq3hDaFXHiaR+pSqZrXQghiyaLc5sdSHAKKnDDDBUsqfW7NzXXP4FSzlG/clk7pkeP9C/cqfPHWytJxGHc9pMfLcyk1p0iEiVdJYmiY7x3y+SvAceNPUXkZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787665915; c=relaxed/simple;
-	bh=oYxei0/CCeDoZu+cT51W1UgtOJQdBTtD09246F1X+rM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NcdikJTfBgrbuiEKRtwg1/4+EDozHeoNtXTWgNTZ620+6zjEMv8VzKqhrjsXF/ujbyk+eDx6p8u7vfKQ4Y2xsWnsoHmmGGXmRaImQFSPAGKPNEZAH5loWTcu4B7jyJwbpMjJfmZJ9lPxwXJuXoAVcDRUuZ4OnrgcywyeeR3WKAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=h3HfbANF; arc=none smtp.client-ip=91.218.175.225
+	s=arc-20240116; t=1787665917; c=relaxed/simple;
+	bh=lB9hj8psDso0Jym+46/LL9DWP3iDtcZUr3NvS+e48QI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=chAbKJrxK1eSplqXK/X7RbhZQ61WpqvkNEg3nNhk9KcQUGE6WcXMlk6AQYefZHK65WDnW+afzF/jBDyblZPxWJ2muJ1rJjWOHKqqcWS2U8G8qjdGI7cIIOSNKJ0Y6iSfH8i+d2Ve10pOCWsewCo9r47Iy64fVYCQaFtVgkqL4wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=axqoQyZo; arc=none smtp.client-ip=95.215.58.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="h3HfbANF"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="axqoQyZo"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=oYxei0/CCeDoZu+cT51W1UgtOJQdBTtD09246F1X+rM=;
+DKIM-Signature: a=rsa-sha256; bh=lB9hj8psDso0Jym+46/LL9DWP3iDtcZUr3NvS+e48QI=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787665908; v=1; x=1788270708;
- b=h3HfbANFIh5tykzWUWPhGjf+pnJaEnew3KT+EHoqYDw+GVnR3m/22WT+4QyPI47d35sntr/M
- DW6X3aP0X1eVXdJ+/fh/iy9az4W8gwSiXaNXgJCAMlROtt3HYME1nzMCX5DwjgxVlyKbtKAk4iL
- muFz6G+xJOwgGlZ+Ufxn/QdXqBBVGtekovuO4kgOiC7mmJ24DoYQWJLCxnUM+GgTq9kylqXWZMP
- c0TZHvTE/BIj87XOn8eeRvflfgJIXUck2eK8/O3T/UF+teN3DK6hcW1UOtzlBUh9txi1n1vUgUZ
- 6fzSoWk2yN0YaRVZLNkouJj5uQ93yBr0Qek2Zr6t6RFYw==
+ t=1787665911; v=1; x=1788270711;
+ b=axqoQyZoYLOsaik6p4Ln9gym90m2KuRt+T5uXdRgKvtZZPgJQdgliCnVay+Q8+XCzvLUyUJD
+ Oc+8PZXH9fF3gkmYzJ4epMX+q6flOVH0BeXwec2MF40plVkzw43qGNAlnC2nXkf4MG5/SiEK+sA
+ 9nL0ihOEGCTFBd2xXeYBQU1n57xS+FjbbtwNYTfv5VSeneTxRbMidFXPRJXAOLuTaN0yGl7ehjl
+ YW3Z0VKcBUtdDVfO7viDto/qCTnndUDeXwVENn3MjUBbfN2krsJnFvPWCRvZdkPvSm0h5n6pzCu
+ D+gEV3spnjEH+3Ax0CKvkrNtYjSO0vdj9hdeercs8HyJQ==
 X-Envelope-To: linux-cifs@vger.kernel.org
 Received: from workspace-fedora (116.128.244.171)
-	by smtp.migadu.com with ESMTPS id 127f973a528648bc;
-	Tue, 25 Aug 2026 13:51:47 +0000
-X-Mizu-Trace-ID: 127f973a528648bc
+	by smtp.migadu.com with ESMTPS id f7e5b7662ac16178;
+	Tue, 25 Aug 2026 13:51:41 +0000
+X-Mizu-Trace-ID: f7e5b7662ac16178
 X-Migadu-Flow: FLOW_OUT
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: linkinjeon@kernel.org,
@@ -39,12 +38,10 @@ To: linkinjeon@kernel.org,
 	chenxiaosong@chenxiaosong.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v5 1/3] smb/server: support compound fid in notify requests
-Date: Tue, 25 Aug 2026 13:51:06 +0000
-Message-ID: <20260825135108.716663-2-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v5 0/3] ksmbd: refactor smb2_notify() to a blocking wait
+Date: Tue, 25 Aug 2026 13:51:05 +0000
+Message-ID: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
-References: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -55,69 +52,24 @@ Content-Transfer-Encoding: 8bit
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-A Windows client can send a compound request containing:
+v4->v5: Rebased on ksmbd-for-next branch.
 
-  Create Request, File: <share>; Notify Request
+v4: https://lore.kernel.org/linux-cifs/20260809161916.1071530-1-chenxiaosong@chenxiaosong.com/
 
-The Notify Request uses FFFF...FFFF as the compound FID.
+ChenXiaoSong (1):
+  smb/server: support compound fid in notify requests
 
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
----
- fs/smb/server/smb2pdu.c | 41 -----------------------------------------
- 1 file changed, 41 deletions(-)
+Gael Blivet (2):
+  ksmbd: temporarily remove interim-work change notify handling
+  ksmbd: refactor smb2_notify() to a blocking wait
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 2fbd9010513e..86f93f81cdfd 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -11818,47 +11818,6 @@ int smb2_notify(struct ksmbd_work *work)
- 		return -EIO;
- 	}
- 
--	/*
--	 * macOS backupd sends CHANGE_NOTIFY with FileId=FFFF...FFFF (share-root
--	 * sentinel) to watch for changes on the share root without holding an
--	 * open handle. Respond STATUS_PENDING + STATUS_NOTIFY_CLEANUP immediately;
--	 * without this, backupd aborts Time Machine setup on STATUS_FILE_CLOSED.
--	 */
--	if (req->VolatileFileId == SMB2_NO_FID &&
--	    req->PersistentFileId == SMB2_NO_FID) {
--		in_work = ksmbd_alloc_work_struct();
--		if (!in_work || allocate_interim_rsp_buf(in_work)) {
--			if (in_work)
--				ksmbd_free_work_struct(in_work);
--			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
--			smb2_set_err_rsp(work);
--			return 0;
--		}
--		if (setup_async_work(work, NULL, NULL)) {
--			ksmbd_free_work_struct(in_work);
--			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
--			smb2_set_err_rsp(work);
--			return 0;
--		}
--		smb2_send_interim_resp(work, STATUS_PENDING);
--		in_work->conn = work->conn;
--		in_hdr = smb_get_msg(in_work->response_buf);
--		memcpy(in_hdr, ksmbd_resp_buf_next(work),
--		       __SMB2_HEADER_STRUCTURE_SIZE);
--		in_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
--		in_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
--		smb2_set_err_rsp(in_work);
--		in_hdr->Status = STATUS_NOTIFY_CLEANUP;
--		in_work->async_id = work->async_id;
--		work->async_id = 0;
--		release_async_work(work);
--		if (smb2_send_interim_work(in_work, work, false))
--			ksmbd_debug(SMB, "failed to send notify cleanup\n");
--		ksmbd_free_work_struct(in_work);
--		work->send_no_response = 1;
--		return 0;
--	}
--
- 	/*
- 	 * KSMBD does not implement a real change-notification backend.
- 	 * Genuine SMB2 servers (and macOS smbfs) never complete a
+ fs/smb/server/ksmbd_work.c |   3 -
+ fs/smb/server/ksmbd_work.h |   5 +-
+ fs/smb/server/smb2pdu.c    | 349 +++++++------------------------------
+ fs/smb/server/vfs_cache.c  |  48 -----
+ fs/smb/server/vfs_cache.h  |   6 -
+ 5 files changed, 65 insertions(+), 346 deletions(-)
+
 -- 
 2.55.0
 
