@@ -1,100 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80D6334C3D
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 23:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C001FF7C8
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 00:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787615453; cv=none; b=lFQMwao0kEu219HgIJzragLGQCBV8uXftDxKG4NSKbGfkfYm1v6hNiT9lKu/jK/fN71HdH5liBxYrNhDNGWik0mfgnaJB0GhlJ0SqyWNjI0Ho9OaT/yHP/af3NeRqlFQh8gLgjZEQMDrXcj/+i7Aj5+fDT68DDFbMIfAzTPp+5I=
+	t=1787619588; cv=none; b=VGv9GQXkgfQR0L1+A/3r/Ax8DHvktJYhgvnwSTDqmuf4o4Zi5csG4vkUyVIPodOT5nJp4PF/RahlqFBLSWBr6tUpqAtyGenj07Rim02jC3b2+Ly6lks8reRnPDcOdBrVb+hLxxH+MOsqd6esKBQGlUXlI5pNF/h4RIBvEVjJmfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787615453; c=relaxed/simple;
-	bh=2b9h6pGiLZD2WRcgoOrhSLVmbDn1wudO9py0PQ/8ZVE=;
+	s=arc-20240116; t=1787619588; c=relaxed/simple;
+	bh=shNeVnxgPhWMkYieAjhk/IVt3GNRZrYxtX3YDmzS3TA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QKjqfAFBB6UjNRK2X07yuFU3//3iCUTXqtRbfceknZ3fs+tQvFizoZaheJqHKQA5kMZzbh5rIVIbfs+2J1XaL7Uz3dC0VnzGiW42W3aTSwJRUdSCqlUFSnCH1g4EciRL4nBSdCoGm2LPPgIGeG1uXfIMoLdfA3pZIU6C7WoJ+Vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sbtpv5K6; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=mey3N3CRWOvqMpu+V0FjOuFuHMS8yX0s37OnFGRPQU6Rnb16lMQpE2PKH3fwM5tYrmSWiXNkuvaqTMsbBGfT+V9OPXAZkSpITNTqEYdISN8NJ00xhV283EnHtzwVwJukBjTTJjvzz52RNpWA/0Qf1Z3hmJeAOo9Nby+Pf80oj08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZ1CkjrE; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sbtpv5K6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96CD51F00AC4
-	for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 23:50:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZ1CkjrE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E35BB1F000E9
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 00:59:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787615452;
-	bh=O1NxW5UCrvqxpbTSSg1+ct0wHpVvYfk3nZLtWuhg7kc=;
+	s=k20260515; t=1787619586;
+	bh=fEeLpys/hVxa2Jf6DKcJxfPsS9WWpLFcb2O+9vN9MkM=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Sbtpv5K6ESHpgj950NVUnDDytVN76zeS4qC7r7a2/vwgbwUcVJI+xwQK6WaUPysap
-	 G1l5XGH9ZW6X7oSEcCzUpuc37yU1aSosnIDCKVlZbSkCL2O0Gr+hOr4ToLZB9s9xMD
-	 eQ1GmVg0dcEh6gfwBmBqfuB3Q+YqEhey++UJBegL1JnhQJIb3Z9mYPrn9pr5CFjRuQ
-	 ok5Qhfcw43/qnVctT4OorBbZKS5cWSHR2uPRff2hAs66Cp+D3nRZp8SBLZrinsc1KU
-	 AJyflmpXbMwkRFV2v80Wo4mk94Nrna20o+L5zpmaEVJz1i6rtpXD+b8D1nngI3cPwy
-	 sJSfzx6J9uFUg==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c1f758014b8so451183466b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 16:50:52 -0700 (PDT)
-X-Gm-Message-State: AFuF++m57UjWoVRekgINfNqNwI2LFJdu92KFsZ/TCcXg1mom/NmkMJ2O
-	jwOK4xPnzAphPFm+0WCppz+th6PMcwLr5Z4U0n5b4WiXfFenL3+K79eRb1LH9obD6/8RYfAb4Nt
-	CTnkzEZsx2IWg9sKcE74Vps4Ey7MDN+0=
-X-Received: by 2002:a17:907:1c1f:b0:c20:31d1:a899 with SMTP id
- a640c23a62f3a-c246a4ad97emr3431061066b.4.1787615451207; Mon, 24 Aug 2026
- 16:50:51 -0700 (PDT)
+	b=jZ1CkjrE/WO7HgRj4ykZ3O1LSXBlCcpm8d81yRNJncKXkk5HCTFzVErjaS16Nkd4L
+	 wJhH+u6JagbgW+u395lO8MU5VakLMeSyAX0hDNsxhyb/UgJwyYOgXw0oF+014/fFH3
+	 BCA7Epoq7IQF9M3f0p4Wfx08zWE5m7N3xRQFCk6S0ulJyWhGnVe89ScJ8jJNPcjI/7
+	 k25aTGI6rKzAz1k/NO3z3WtlPJx3mCpyD4sZ6gpj/dx3W2V5VaONcvyvaMTo7HVkSW
+	 nwik5fkobaPh25vPRC5qgdaIoKD0/IfFrKxbov+jrVwEqxWSLqwpZXBonK2yWQmbDz
+	 TY2+AscTNd8bA==
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c15f020a223so614295666b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 24 Aug 2026 17:59:46 -0700 (PDT)
+X-Gm-Message-State: AFuF++mUPqbW8UQoAebBAlf8/t+27RObj7zmOiHkYpHIxPZQEtfSVpcq
+	tBUtsFqr5EQNj7mY6T2RUwf8g3wqPAwcagvibGe95p9psSiXz38nzR2FBxw92dYED9Z038rK7HF
+	ffEGHqJT1PsbEKyqAXsOnjv394VKnTzc=
+X-Received: by 2002:a17:906:5183:10b0:c16:84dc:9607 with SMTP id
+ a640c23a62f3a-c246a704562mr2696668566b.19.1787619585652; Mon, 24 Aug 2026
+ 17:59:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260824195912.634526-1-pc@manguebit.org>
-In-Reply-To: <20260824195912.634526-1-pc@manguebit.org>
+References: <20260824231030.3502884-1-sorenson@redhat.com>
+In-Reply-To: <20260824231030.3502884-1-sorenson@redhat.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 25 Aug 2026 08:50:39 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_wGZ_YMOHi7f-EE1-PVkCt6Qbt2Uh6LwYLB_+gW3F36Q@mail.gmail.com>
-X-Gm-Features: AcwNN1UWU_hePnn2jkBxdvdyARMOqhYPQjt55Nmla25GoReja-9jO_lTJaa1DX0
-Message-ID: <CAKYAXd_wGZ_YMOHi7f-EE1-PVkCt6Qbt2Uh6LwYLB_+gW3F36Q@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix multiuser mount with krb5
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, Jacob Shivers <jshivers@redhat.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, stable@vger.kernel.org
+Date: Tue, 25 Aug 2026 09:59:33 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_E2ZGzXzRJWCu4knD50LjXrC+dn4JPr8jxNMi5daWLCg@mail.gmail.com>
+X-Gm-Features: AcwNN1Xsc64SaR3a-QfPBo5enA5iYQb8CTtqMRRw6llvE8QowJrPmHoHeU0QLKM
+Message-ID: <CAKYAXd_E2ZGzXzRJWCu4knD50LjXrC+dn4JPr8jxNMi5daWLCg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: fix OOB pointer arithmetic in cifs_to_posix_acl()
+To: Frank Sorenson <sorenson@redhat.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, brauner@kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 25, 2026 at 4:59=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
-wrote:
+On Tue, Aug 25, 2026 at 8:10=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
+> wrote:
 >
-> Customer reported that they could no longer mount their SMB shares
-> with multiuser mount option and krb5.  Turned out that the client
-> wasn't duplicating username option when creating multiuser
-> connections, therefore failing to retrieve credentials as
-> cifs.upcall(8) couldn't find them in keytab.
+> In the ACL_TYPE_DEFAULT branch, cifs_to_posix_acl() forms a pointer
+> from the server-supplied access_entry_count before the size check that
+> bounds it:
+There seems to be still oob issue in this function although this patch
+is applied.
+Should we also validate acl header before accessing ->version ?
+
++        if (size_of_data_area < sizeof(*cifs_acl))
++              return -EINVAL;
+
+        if (le16_to_cpu(cifs_acl->version) !=3D CIFS_ACL_VERSION)
+                return -EOPNOTSUPP;
 >
-> Fix this by duplicating username option (if set) from original fs
-> context before creating multiuser connections with krb5.
+>         pACE =3D &cifs_acl->ace_array[count];     /* count =3D access_ent=
+ry_count */
+>         count =3D le16_to_cpu(cifs_acl->default_entry_count);
+>         size +=3D sizeof(struct cifs_posix_ace) * count;
+>         if (size_of_data_area < size)           /* too late */
+>                 return -EINVAL;
 >
-> Reproducer:
+> The pointer arithmetic is undefined behaviour before any bounds check.
 >
->   ```
->   $ ktutil
->   ktutil:  add_entry -password -p testuser -k 1 -e aes256-cts
->   Password for testuser@ZELDA.TEST:
->   ktutil:  write_kt /etc/krb5.keytab
->   ktutil:  quit
->   $ klist -ke
->   Keytab name: FILE:/etc/krb5.keytab
->   KVNO Principal
->    ---- ----------------------------------------------------------------
->      1 testuser@ZELDA.TEST (aes256-cts-hmac-sha1-96)
->   $ mount.cifs //w22-root2/scratch /mnt/1 -o \
->         uid=3D1000,sec=3Dkrb5,username=3Dtestuser@ZELDA.TEST,multiuser
->   mount error(13): Permission denied
->   Refer to the mount.cifs(8) manual page (e.g. man mount.cifs) and
->   kernel log messages (dmesg)
->   ```
->
-> Reported-by: Jacob Shivers <jshivers@redhat.com>
-> Fixes: 12b4c5d98cd7 ("smb: client: fix krb5 mount with username option")
-> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Bharath SM <bharathsm@microsoft.com>
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: stable@vger.kernel.org
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks.
+> Add an access-ACE size check before the pointer computation, matching
+> the existing guard in the ACL_TYPE_ACCESS path.
