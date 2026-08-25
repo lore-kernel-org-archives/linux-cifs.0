@@ -1,70 +1,123 @@
-Received: from mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from mta0.migadu.com (out-225.mta0.migadu.com [91.218.175.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F05408607
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 13:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C4425393E
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 13:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787664579; cv=none; b=CUnBNB4VgEB2SNXTvLWypl+rlDvKwhNLv1uxhkMoFXbSlQGScwu+8YnKbcpJhg8J9aBIUsjxdyeGwhXRbE13VM1Tsy3h0j0kzna+g83pYUTMz+cOh0gTNkz9gfnpxel01nY4kzD5z2WeQvpQCSEIYS+Akt5BXUYe6n2vAwkrnOs=
+	t=1787665915; cv=none; b=p0+I+EMCVFtLtRj2mOCYUXNzSVwKyvn9po22WFLe/gDyk1GzON2wMkHIkjNW4ani+Uqey2UkGz/47JAkW2SQw3I4+GK2jTo4HutTp53hYCEwa4d0eyLTRKhyDiYPwRelXBMVN3RTCx4J2qXtR7DHrzOGdNpszJRU8ZPfIcx1/nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787664579; c=relaxed/simple;
-	bh=oGxNvPEwA9upizmiIAH8clEB5j46vUJkf+sCPlXBEcA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=apZWrrpS2EMKbe3vpD9sgvRA73FvwxfMrS7vBeG44FdBdOa0k6oCqsuTLizPFkW1QCMqLW0MDyRvuqZi3FAjVIu42NWRe/P5fMFiIo808aS9LKkwldEngcQFmFVjhT9OYkzFdG5TpSPP6GjBB3T5xQwuJPbyzvOvcnvD1WFu3K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=UjOFvtDw; arc=none smtp.client-ip=91.218.175.179
+	s=arc-20240116; t=1787665915; c=relaxed/simple;
+	bh=oYxei0/CCeDoZu+cT51W1UgtOJQdBTtD09246F1X+rM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NcdikJTfBgrbuiEKRtwg1/4+EDozHeoNtXTWgNTZ620+6zjEMv8VzKqhrjsXF/ujbyk+eDx6p8u7vfKQ4Y2xsWnsoHmmGGXmRaImQFSPAGKPNEZAH5loWTcu4B7jyJwbpMjJfmZJ9lPxwXJuXoAVcDRUuZ4OnrgcywyeeR3WKAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=h3HfbANF; arc=none smtp.client-ip=91.218.175.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="UjOFvtDw"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="h3HfbANF"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=oGxNvPEwA9upizmiIAH8clEB5j46vUJkf+sCPlXBEcA=;
+DKIM-Signature: a=rsa-sha256; bh=oYxei0/CCeDoZu+cT51W1UgtOJQdBTtD09246F1X+rM=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787664572; v=1; x=1788269372;
- b=UjOFvtDw7qLEbCo5yWd7PNQHAAkYLiC6ueaQoskMBVsg+92EYqb670W9GPTpB2aV1sLO9bws
- HL80dI46/PhsqYpvGAKvIkGWAIV3GOSC4mvV304Zx2o61FvBwulnNAUJ0oj7l0/+ceYc9Y1X8/x
- sw1sBkw8uP0vZj6ugBDmieer7TtxUp3ZnR/+loDGE/NrZWck5iT935J0UrqJWFWMVg2N/TQpTHe
- 4MDHHqntGgByrX1g1yV0/QKE3a1pQBpj90MaN9neK1dS9ADleEghKJtJs7VkTlOm260N8bPTjp7
- zJ6bxVce9E1yGef82Im/PUpdSwpRJFx3be6VXNQ8K979w==
+ t=1787665908; v=1; x=1788270708;
+ b=h3HfbANFIh5tykzWUWPhGjf+pnJaEnew3KT+EHoqYDw+GVnR3m/22WT+4QyPI47d35sntr/M
+ DW6X3aP0X1eVXdJ+/fh/iy9az4W8gwSiXaNXgJCAMlROtt3HYME1nzMCX5DwjgxVlyKbtKAk4iL
+ muFz6G+xJOwgGlZ+Ufxn/QdXqBBVGtekovuO4kgOiC7mmJ24DoYQWJLCxnUM+GgTq9kylqXWZMP
+ c0TZHvTE/BIj87XOn8eeRvflfgJIXUck2eK8/O3T/UF+teN3DK6hcW1UOtzlBUh9txi1n1vUgUZ
+ 6fzSoWk2yN0YaRVZLNkouJj5uQ93yBr0Qek2Zr6t6RFYw==
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: from [192.168.0.103] (220.202.230.161)
-	by smtp.migadu.com with ESMTPS id 6b90914ac4aeb6fb;
-	Tue, 25 Aug 2026 13:29:21 +0000
-X-Mizu-Trace-ID: 6b90914ac4aeb6fb
+Received: from workspace-fedora (116.128.244.171)
+	by smtp.migadu.com with ESMTPS id 127f973a528648bc;
+	Tue, 25 Aug 2026 13:51:47 +0000
+X-Mizu-Trace-ID: 127f973a528648bc
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <c5f4897b-c2b5-4085-8834-60b070c14302@chenxiaosong.com>
-Date: Tue, 25 Aug 2026 21:29:18 +0800
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: linkinjeon@kernel.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	chenxiaosong@chenxiaosong.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v5 1/3] smb/server: support compound fid in notify requests
+Date: Tue, 25 Aug 2026 13:51:06 +0000
+Message-ID: <20260825135108.716663-2-chenxiaosong@chenxiaosong.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
+References: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/3] ksmbd: refactor smb2_notify() to a blocking wait
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com,
- senozhatsky@chromium.org, slow@samba.org, gael.blivet@gmail.com,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
-References: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
- <CAKYAXd84UnfdQ6Ef2nqybnhdgURFo9uYpB1mHZpphFyCiMhutA@mail.gmail.com>
- <9aeb9ccf-dcd0-48a7-bc24-4b6948943f62@chenxiaosong.com>
- <CAKYAXd8JMs25fdyZhPn9KYEfv1WH297nxAV0enFHm6T+q=VTFQ@mail.gmail.com>
- <51fba35c-967f-46b9-8252-d433beab7129@chenxiaosong.com>
- <CAKYAXd-1=RqAhykLJVgDrYEmr1AU6B-MUfiQb4o4S_JJyU0NVg@mail.gmail.com>
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <CAKYAXd-1=RqAhykLJVgDrYEmr1AU6B-MUfiQb4o4S_JJyU0NVg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-I will send the rebased v4 patchset soon.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-On 8/25/2026 8:41 PM, Namjae Jeon wrote:
-> I tried to check again, but your patch set isn't applying to
-> #ksmbd-for-next. If you could send the patch again, I will check it.
+A Windows client can send a compound request containing:
 
+  Create Request, File: <share>; Notify Request
+
+The Notify Request uses FFFF...FFFF as the compound FID.
+
+Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/server/smb2pdu.c | 41 -----------------------------------------
+ 1 file changed, 41 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 2fbd9010513e..86f93f81cdfd 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -11818,47 +11818,6 @@ int smb2_notify(struct ksmbd_work *work)
+ 		return -EIO;
+ 	}
+ 
+-	/*
+-	 * macOS backupd sends CHANGE_NOTIFY with FileId=FFFF...FFFF (share-root
+-	 * sentinel) to watch for changes on the share root without holding an
+-	 * open handle. Respond STATUS_PENDING + STATUS_NOTIFY_CLEANUP immediately;
+-	 * without this, backupd aborts Time Machine setup on STATUS_FILE_CLOSED.
+-	 */
+-	if (req->VolatileFileId == SMB2_NO_FID &&
+-	    req->PersistentFileId == SMB2_NO_FID) {
+-		in_work = ksmbd_alloc_work_struct();
+-		if (!in_work || allocate_interim_rsp_buf(in_work)) {
+-			if (in_work)
+-				ksmbd_free_work_struct(in_work);
+-			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+-			smb2_set_err_rsp(work);
+-			return 0;
+-		}
+-		if (setup_async_work(work, NULL, NULL)) {
+-			ksmbd_free_work_struct(in_work);
+-			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+-			smb2_set_err_rsp(work);
+-			return 0;
+-		}
+-		smb2_send_interim_resp(work, STATUS_PENDING);
+-		in_work->conn = work->conn;
+-		in_hdr = smb_get_msg(in_work->response_buf);
+-		memcpy(in_hdr, ksmbd_resp_buf_next(work),
+-		       __SMB2_HEADER_STRUCTURE_SIZE);
+-		in_hdr->Flags |= SMB2_FLAGS_ASYNC_COMMAND;
+-		in_hdr->Id.AsyncId = cpu_to_le64(work->async_id);
+-		smb2_set_err_rsp(in_work);
+-		in_hdr->Status = STATUS_NOTIFY_CLEANUP;
+-		in_work->async_id = work->async_id;
+-		work->async_id = 0;
+-		release_async_work(work);
+-		if (smb2_send_interim_work(in_work, work, false))
+-			ksmbd_debug(SMB, "failed to send notify cleanup\n");
+-		ksmbd_free_work_struct(in_work);
+-		work->send_no_response = 1;
+-		return 0;
+-	}
+-
+ 	/*
+ 	 * KSMBD does not implement a real change-notification backend.
+ 	 * Genuine SMB2 servers (and macOS smbfs) never complete a
 -- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+2.55.0
 
