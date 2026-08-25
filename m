@@ -1,206 +1,70 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCA2472F9D
-	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 13:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F05408607
+	for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 13:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787664115; cv=none; b=TlXULvwJcDZs9QPEEejsVbMTiSauhT6Gipa9xUjGy8NvI/JFoFalBN6wNH27Y+AkuxINe3umTPCxgev3TIkrLZ/5FRGT11GpSHSgaxR1MAhnUG3x54CqeEhHyV45MmstTH7qoGVrPjxRpgQAQOSuvsL1KlvWqYIdeUp0vfbyFL0=
+	t=1787664579; cv=none; b=CUnBNB4VgEB2SNXTvLWypl+rlDvKwhNLv1uxhkMoFXbSlQGScwu+8YnKbcpJhg8J9aBIUsjxdyeGwhXRbE13VM1Tsy3h0j0kzna+g83pYUTMz+cOh0gTNkz9gfnpxel01nY4kzD5z2WeQvpQCSEIYS+Akt5BXUYe6n2vAwkrnOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787664115; c=relaxed/simple;
-	bh=KZ6KryDoeo8J6srSXmaESOaWmDJlcHglaMBB60PNPQY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bkfa0QSSmAtRrqEt9+1h3CxJmc5gsS8Fi5+vlpkz6S3GNe2DcYz5t+hdzx6Xai++6aHjSDYj2yTYn4rbt5DuAUaruLZC9khOQQEyO3dtQaa1m0jW9t7qSiO4kQ1jRgOIRnc8/wYyl7HXprJBOF67hdjtKM5W662gPnemNXgzesk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UnqYwdMA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1787664579; c=relaxed/simple;
+	bh=oGxNvPEwA9upizmiIAH8clEB5j46vUJkf+sCPlXBEcA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=apZWrrpS2EMKbe3vpD9sgvRA73FvwxfMrS7vBeG44FdBdOa0k6oCqsuTLizPFkW1QCMqLW0MDyRvuqZi3FAjVIu42NWRe/P5fMFiIo808aS9LKkwldEngcQFmFVjhT9OYkzFdG5TpSPP6GjBB3T5xQwuJPbyzvOvcnvD1WFu3K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=UjOFvtDw; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UnqYwdMA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787664103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XdmER/0ot6k2e8DhxaTBmIQEr/pm9tQfzddtSKAfHwo=;
-	b=UnqYwdMAzgS9z3vuEAzz7b+wu+vRq2ADjgs7+VpcYCBTJk5+JxWLXOfnNAyjoQHjyaD1zY
-	Zw8OTohK4B7Utuq1aTrek3ByuIhBxoeBAqk00VVdx0IrQcTHF9g2mj3iJ1bKy+FuD+m52k
-	xqm3wNA7IYpKqlHWNSmaO0b12KABxGI=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-423-EEeaREptNamvUDN0wtyd7Q-1; Tue,
- 25 Aug 2026 09:21:38 -0400
-X-MC-Unique: EEeaREptNamvUDN0wtyd7Q-1
-X-Mimecast-MFC-AGG-ID: EEeaREptNamvUDN0wtyd7Q_1787664097
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 260A51935303;
-	Tue, 25 Aug 2026 13:21:37 +0000 (UTC)
-Received: from warthog.com (unknown [10.44.32.15])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6B9741803A44;
-	Tue, 25 Aug 2026 13:21:34 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 9/9] cachefiles: Fix potential UAF/KASAN warning
-Date: Tue, 25 Aug 2026 14:20:43 +0100
-Message-ID: <20260825132045.1000787-10-dhowells@redhat.com>
-In-Reply-To: <20260825132045.1000787-1-dhowells@redhat.com>
-References: <20260825132045.1000787-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="UjOFvtDw"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=oGxNvPEwA9upizmiIAH8clEB5j46vUJkf+sCPlXBEcA=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787664572; v=1; x=1788269372;
+ b=UjOFvtDw7qLEbCo5yWd7PNQHAAkYLiC6ueaQoskMBVsg+92EYqb670W9GPTpB2aV1sLO9bws
+ HL80dI46/PhsqYpvGAKvIkGWAIV3GOSC4mvV304Zx2o61FvBwulnNAUJ0oj7l0/+ceYc9Y1X8/x
+ sw1sBkw8uP0vZj6ugBDmieer7TtxUp3ZnR/+loDGE/NrZWck5iT935J0UrqJWFWMVg2N/TQpTHe
+ 4MDHHqntGgByrX1g1yV0/QKE3a1pQBpj90MaN9neK1dS9ADleEghKJtJs7VkTlOm260N8bPTjp7
+ zJ6bxVce9E1yGef82Im/PUpdSwpRJFx3be6VXNQ8K979w==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: from [192.168.0.103] (220.202.230.161)
+	by smtp.migadu.com with ESMTPS id 6b90914ac4aeb6fb;
+	Tue, 25 Aug 2026 13:29:21 +0000
+X-Mizu-Trace-ID: 6b90914ac4aeb6fb
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <c5f4897b-c2b5-4085-8834-60b070c14302@chenxiaosong.com>
+Date: Tue, 25 Aug 2026 21:29:18 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 0/3] ksmbd: refactor smb2_notify() to a blocking wait
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: smfrench@gmail.com, pc@manguebit.org, tom@talpey.com,
+ senozhatsky@chromium.org, slow@samba.org, gael.blivet@gmail.com,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org
+References: <20260809161916.1071530-1-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd84UnfdQ6Ef2nqybnhdgURFo9uYpB1mHZpphFyCiMhutA@mail.gmail.com>
+ <9aeb9ccf-dcd0-48a7-bc24-4b6948943f62@chenxiaosong.com>
+ <CAKYAXd8JMs25fdyZhPn9KYEfv1WH297nxAV0enFHm6T+q=VTFQ@mail.gmail.com>
+ <51fba35c-967f-46b9-8252-d433beab7129@chenxiaosong.com>
+ <CAKYAXd-1=RqAhykLJVgDrYEmr1AU6B-MUfiQb4o4S_JJyU0NVg@mail.gmail.com>
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd-1=RqAhykLJVgDrYEmr1AU6B-MUfiQb4o4S_JJyU0NVg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Currently, trace_cachefiles_coherency() is being passed a pointer to a
-__be64 lain over the coherency data in struct cachefiles_xattr so that it
-can display the first 8 bytes.  However, the data is of variable length and
-could even be 0 bytes.  This could lead to a UAF or KASAN warning.
+I will send the rebased v4 patchset soon.
 
-Fix this by making sure the buffer has room for at least 8 bytes and that
-those 8 bytes are pre-cleared.
+On 8/25/2026 8:41 PM, Namjae Jeon wrote:
+> I tried to check again, but your patch set isn't applying to
+> #ksmbd-for-next. If you could send the patch again, I will check it.
 
-Further, those bytes are not 8-byte aligned, so fix the tracepoint to
-extract the data as four 2-byte words (they are 2-byte aligned) and
-reassemble the __be64.  The compiler will convert this into a single 8-byte
-load where the CPU supports it.
-
-Fixes: 229105e5cfd9 ("cachefiles: Add auxiliary data trace")
-Link: https://sashiko.dev/#/patchset/20260810144746.574036-1-dhowells%40redhat.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/cachefiles/xattr.c             | 16 ++++++++--------
- include/trace/events/cachefiles.h | 19 +++++++++++++++++--
- 2 files changed, 25 insertions(+), 10 deletions(-)
-
-diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
-index f8ae78b3f7b6..c70bf67e52b0 100644
---- a/fs/cachefiles/xattr.c
-+++ b/fs/cachefiles/xattr.c
-@@ -13,6 +13,7 @@
- #include <linux/quotaops.h>
- #include <linux/xattr.h>
- #include <linux/slab.h>
-+#include <linux/unaligned.h>
- #include "internal.h"
- 
- #define CACHEFILES_COOKIE_TYPE_DATA 1
-@@ -50,7 +51,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
- 
- 	_enter("%x,#%d", object->debug_id, len);
- 
--	buf = kmalloc(sizeof(struct cachefiles_xattr) + len, GFP_KERNEL);
-+	buf = kmalloc(sizeof(struct cachefiles_xattr) + max(len, sizeof(__be64)), GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
- 
-@@ -60,6 +61,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
- 	buf->content		= object->content_info;
- 	if (test_bit(FSCACHE_COOKIE_LOCAL_WRITE, &object->cookie->flags))
- 		buf->content	= CACHEFILES_CONTENT_DIRTY;
-+	put_unaligned_be64(0, (__be64 *)buf->data);
- 	if (len > 0)
- 		memcpy(buf->data, fscache_get_aux(object->cookie), len);
- 
-@@ -77,8 +79,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
- 		trace_cachefiles_vfs_error(object, file_inode(file), ret,
- 					   cachefiles_trace_setxattr_error);
- 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
--					   be64_to_cpup((__be64 *)buf->data),
--					   buf->content,
-+					   buf->data, buf->content,
- 					   cachefiles_coherency_set_fail);
- 		if (ret != -ENOMEM)
- 			cachefiles_io_error_obj(
-@@ -86,8 +87,7 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
- 				"Failed to set xattr with error %d", ret);
- 	} else {
- 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
--					   be64_to_cpup((__be64 *)buf->data),
--					   buf->content,
-+					   buf->data, buf->content,
- 					   cachefiles_coherency_set_ok);
- 	}
- 
-@@ -110,9 +110,10 @@ int cachefiles_check_auxdata(struct cachefiles_object *object, struct file *file
- 	int ret = -ESTALE;
- 
- 	tlen = sizeof(struct cachefiles_xattr) + len;
--	buf = kmalloc(tlen, GFP_KERNEL);
-+	buf = kmalloc(sizeof(struct cachefiles_xattr) + max(len, sizeof(__be64)), GFP_KERNEL);
- 	if (!buf)
- 		return -ENOMEM;
-+	put_unaligned_be64(0, (__be64 *)buf->data);
- 
- 	xlen = cachefiles_inject_read_error();
- 	if (xlen == 0)
-@@ -148,8 +149,7 @@ int cachefiles_check_auxdata(struct cachefiles_object *object, struct file *file
- 
- out:
- 	trace_cachefiles_coherency(object, file_inode(file)->i_ino,
--				   be64_to_cpup((__be64 *)buf->data),
--				   buf->content, why);
-+				   buf->data, buf->content, why);
- 	kfree(buf);
- 	return ret;
- }
-diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
-index 9259bc71049e..e3101410e8b2 100644
---- a/include/trace/events/cachefiles.h
-+++ b/include/trace/events/cachefiles.h
-@@ -372,7 +372,7 @@ TRACE_EVENT(cachefiles_rename,
- TRACE_EVENT(cachefiles_coherency,
- 	    TP_PROTO(struct cachefiles_object *obj,
- 		     ino_t ino,
--		     u64 disk_aux,
-+		     const void *disk_aux,
- 		     enum cachefiles_content content,
- 		     enum cachefiles_coherency_trace why),
- 
-@@ -389,12 +389,27 @@ TRACE_EVENT(cachefiles_coherency,
- 			     ),
- 
- 	    TP_fast_assign(
-+		    union {
-+			    __be16 s[4];
-+			    __be64 ll;
-+		    } x;
-+
- 		    __entry->obj	= obj->debug_id;
- 		    __entry->why	= why;
- 		    __entry->content	= content;
- 		    __entry->ino	= ino;
- 		    __entry->aux	= be64_to_cpup((__be64 *)obj->cookie->inline_aux);
--		    __entry->disk_aux	= disk_aux;
-+
-+		    /* cachefiles_xattr::data is 2-byte aligned but not 8-byte aligned. */
-+		    if (disk_aux) {
-+			    x.s[0] = ((__be16 *)disk_aux)[0];
-+			    x.s[1] = ((__be16 *)disk_aux)[1];
-+			    x.s[2] = ((__be16 *)disk_aux)[2];
-+			    x.s[3] = ((__be16 *)disk_aux)[3];
-+			    __entry->disk_aux = be64_to_cpu(x.ll);
-+		    } else {
-+			    __entry->disk_aux = 0;
-+		    }
- 			   ),
- 
- 	    TP_printk("o=%08x %s B=%llx c=%u aux=%llx dsk=%llx",
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
