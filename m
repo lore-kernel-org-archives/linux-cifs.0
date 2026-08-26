@@ -1,177 +1,193 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2015312807
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CBB30B53F
 	for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 15:32:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787758339; cv=none; b=lsTbkz1pwlw24xRBH1PO6v/gebhHiMK6Dzj7Q4ZcSyKws7OvEC7Z+GeHFT4EU9z2Inw7h/SLUoJhuLQU97c0z3ruSoaEnBnTaTOaKV0M3vG6sw2YvJGz+nLfZGRAVEM46w6UcVqoyxjB3n7nnCadAxa4ekI1tKu6Q8B3rULRp/w=
+	t=1787758340; cv=none; b=eEnQstpEbqGZvDvB6xBXzHPNumNxC52o3ABcMJJZRGUI8qGiwA072/RFJ2Imig2F3dAsTRuLh5J8QQJBek2EQiH1tHBe+kl4UnUpD88jAwCtl4pDiCamD69PjeJyK1rlis6cV8RqU5J7GLWcbyHFthU9WNkqm+QJ0HN8oNVW5lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787758339; c=relaxed/simple;
-	bh=0ewtYPGbEfCig1MIT7YMKgVnUT0dsYToJVF5lModmfk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SOa/xRwsB8DqwSSeXX1fCDw0/zbXQoRreGQDcdrNlTOezLv9H+FxONBwxsqL0jspaOQtVGIkiDHKw+ky8dW5HIAOMfavhPlVLGrLOTY4Il2GQXE0ORWAk5blRzl/7JcRIp3JhMZFsXUDdpVX0eUswmUvMg7LzM8iwc1ap4B7Nnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPi42GaU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MduoLcPX; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1787758340; c=relaxed/simple;
+	bh=bnE+FSzqjNtL1H7wkLOmQEnV0PRbeLockTJl2iVs8IQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=naOD8ABVfxPh0TdvQusg0nZRjqBmfSfrWrxAmes5nf1NeJkvESIR/E9Q0Qf5P5OTkG7L4u6qy6EZn3s6AJuZSCfWhY1rG/g+zNQ00RWWkXiEXLaqf19eG5n08Ubnlv9J8Ogeq0IqECyX3s28qBRPFrsPJwnuQhvIfNUrG47mfNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H0F/Ed1/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=o/dMjbno; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPi42GaU";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MduoLcPX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H0F/Ed1/";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="o/dMjbno"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1787758334;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0TSmF71sZt5zvC/XaDbhrAyqdNJqPHNKw5vLfFTH3ZE=;
-	b=GPi42GaUyJ88sowvHG/67OWpH6/cJAThTWuo/5NDZzA2pyd2uRwoODpV4bpgQxmHQxBLuu
-	wQAxOCzPzAWBLt/DCmgTrWBCm74QgBr1vMYpxpMDTKUpDY4rRAj1eSvs/iP7/FWdus85kQ
-	JAM30bdkjc2yK5iN60YA+4SLKS83vqM=
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yc9hSSoUhAGZ2KNjDSvIAWtYSFJOBn5h7x8TSBvchF0=;
+	b=H0F/Ed1/gLdI/9WRORiT8bay9Imbuo4VPsAwdo4VX0CK00EruZ4c5v5KrTC2v+nLjBo3SQ
+	Pn5ixS5hJGJLNWmYplKju2pvZKWZC2aSgvmNecpnoPuYzFqEbdSmrYwmmAR8q2DgrBWlEU
+	n7FYWmM3qqHE4HtfhWXtc+e/uZDenKw=
 Received: from mail-yx1-f70.google.com (mail-yx1-f70.google.com
  [74.125.224.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-570-QCaY0j4OP0qpRN-1Um709w-1; Wed, 26 Aug 2026 11:32:12 -0400
-X-MC-Unique: QCaY0j4OP0qpRN-1Um709w-1
-X-Mimecast-MFC-AGG-ID: QCaY0j4OP0qpRN-1Um709w_1787758332
-Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-66ce3040ea9so2941251d50.2
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 08:32:12 -0700 (PDT)
+ us-mta-178-EoHfL8RiMPCKbBdANYCZ-A-1; Wed, 26 Aug 2026 11:32:13 -0400
+X-MC-Unique: EoHfL8RiMPCKbBdANYCZ-A-1
+X-Mimecast-MFC-AGG-ID: EoHfL8RiMPCKbBdANYCZ-A_1787758333
+Received: by mail-yx1-f70.google.com with SMTP id 956f58d0204a3-66d2a616d60so954874d50.2
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 08:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1787758332; x=1788363132; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=0TSmF71sZt5zvC/XaDbhrAyqdNJqPHNKw5vLfFTH3ZE=;
-        b=MduoLcPXftm/GitWaUdkC9IxfU9slEAVThDYZMKTEA4ip6Iyu5/FCZCqB/UphnYwLy
-         QQb8HkPtJ0BHWVhW9q3x0EpQS0Z6qKt8S2qeXp15G0Knvk7flY5JIosxUVr5eMei+EMV
-         svSGPRC3mv5eQmXjLhSizy8SM7lPAdNhhX4q/EWJ5efNhv5p28Y8z7xm7jd3g/Po2AIn
-         55kI/O2IQ9C1VDvZndYokT0o4KdkICEnXpmnV+SGTr5N+McO0DDlWyPJXwfBfAe/8WuW
-         RFM2H+ho50Cq5gvqQsiuxwsno/uDLvMHNhjECkSp8UTvLxEiJDownAkgs3KmYTHi8uFC
-         ZH+Q==
+        d=redhat.com; s=google; t=1787758333; x=1788363133; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Yc9hSSoUhAGZ2KNjDSvIAWtYSFJOBn5h7x8TSBvchF0=;
+        b=o/dMjbnoaBTeVN0LHFAOzF6FspEQXz3wjY5qTs88juwCaecH959BDBf+NRIUCqbOOo
+         Ug/6mtl+nUc2B6/EZqWKnKc6wifHOUDqkulPfRjrjp2MQ+vaCw8ztIUL3ImT1fWaq/aV
+         Oe0M3Cjommh1oJ3Euf4PDp3KHHM9sDyIJB4SvfeweVBw1+NqcTKk5jZFeX4g0S6Lw17R
+         czar7tYjVe1iyoBh2N1zcblyAtmBcxoeP+bnYMqz0gZsHjg1lVRAmNQdbHA42JkjPOna
+         TiuXLY1bUQCGmCbHJ+gjo041xn1T1rZOsXRcUJkagKS/gPvkjKlFNOoZN9TEDDpy8xTx
+         qgQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787758332; x=1788363132;
-        h=content-transfer-encoding:content-type:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=0TSmF71sZt5zvC/XaDbhrAyqdNJqPHNKw5vLfFTH3ZE=;
-        b=OE8UTtsMkgqAuZSqx6H25sMsF1XbtbEtGbA9RqvsTY6xQVvLJPcZBG+5jkT5zaaeZi
-         uRO9V3RpluQQds7Dk1gUCTSMRCK2T322ZHDRwxDnBs2OwPhZqWxwyjNLcxOatD5DK1ek
-         Pr/wncNnRq98ly6Wup1gOUH5IPtJnhy4WIsYo9BiR6kMuNJREklDcEWoGFXitcFyUcJ+
-         DTk6iU0PASRwu9Q2uEQ/mxbS8zoH8MRCtPH4y6Tn4HsNCKH0rt6Kz8mEbmOWzb+aXCO5
-         IMtx0ziGTqpDPmF5x+vPhKUc4xX81J84X+q/VVbPn3lXWObVHzRx0fQrQXl4rDmj5jmB
-         UbQw==
-X-Gm-Message-State: AFuF++nidZPxUY8v0F9ZHr407DEWGWf1E15Vuq07GIMaaXp7ZKEV5hwt
-	/fG+Agt40iNiTyeOaXQXe9HLUMEWrOJVhBvQGHRdbGUuQjqanx0ST9Kyq1PoP1AgkjUE76xPYzu
-	8FV5keogUwBHI5P71KXfiErYBRtIMNVEXHtEofXwEXhUmA41dTD/QuEAZ6jBG9zEj2Yevz0IkYH
-	Pu/CjqbqwMGRXy15VLTbD4vk4Yc4/4wGTEteglpoL5oKteLkU=
-X-Gm-Gg: AR+sD11HebVfRfQkqB+22j0iiAi9VEf6mv2q5iP/n/bMEN3sUZguLLvS20Yn2vyQp7c
-	u90G6+/dSurQ+ZJ4MOTbvY/VO3VaTVa3gZgsK6fpRcDzuwyP5SuA3JDcAGmXspSDPoRQyBq+022
-	3b1R1uZGx1kdrP8IhpZWp3RI72PQ/fZugoQ1l0zevmfVqxbJodPXJ3ZECVhXzNtflG5ovVWmh8B
-	kagP2v35ZTsZlDKBg0FpeYQ7Pgb+jz2Atqvi+LYSg3WDL+LZPi9B7gJTFjtVKVDjGaa4m84mAQ/
-	66/E/CLrDpJ5+2TqdTOgtp44dWTmUMZVAzm19vabfnNPLWxvSjSiIxeTJOfIuaQLgizFMf4gt5+
-	zaiaYy3m3povqF8zRCDMY//+ELfGxJX6pDqFHDTZSmjpBDrqKXoOdKpJNiD7K0vJ03Q==
-X-Received: by 2002:a05:690e:1c0a:b0:66d:28f9:3b55 with SMTP id 956f58d0204a3-66d28f93c6emr1938909d50.38.1787758332054;
+        d=1e100.net; s=20251104; t=1787758333; x=1788363133;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Yc9hSSoUhAGZ2KNjDSvIAWtYSFJOBn5h7x8TSBvchF0=;
+        b=Cfx652Mm08LBTO/nyx3i8Yr4O8l66lve6fgU2vxMpj9eR0UXNoiLznh+B/1DoVEOzP
+         WX9iaZ5keDenioJeedzLqXH4PVR9OAhsWWj/qXIZIkunDz513BPqgWWBxdvQcHjPRB8s
+         wao7dMSgjKEIXHYh9LnCJN9A42nc8Qp5RbhuOV7Y3PZN1aCytrfS2iNknyuz/y69th2M
+         OkqEF15CKXj9XhsxqHR2NhUSPSREGXxhTNf1AlKV0um11GXXeDmqDPuziIb4t5nOEgOk
+         IsUfI4C4pF79eb5scEmtMfBJS2ichpbQ1rLfyUM+jcYZ6lOXaB0ElshGlJlqlLUX7AXt
+         I3kw==
+X-Gm-Message-State: AFuF++mQdrJ8UzTZn03DiYtWHdV0Po+oTJQzXqhG4qv8XjeAMNDy8gN9
+	wyRCjGD/LV6KxGR/FdlkeZTUXA3syPaMn1wq7kUsKb1gJnO/NIetws82F1/lvbw9DktYJujGeyu
+	tixiuH5jIvUiUKnILNGMuPAStsmZ/YiZolbD07hmaQiN6qbCbIIp66+L5UPVL+wWdjUmSmpt34A
+	tLyZa8YqQ2MyzL5apkVoFLGQW3jeeGcUHjLBmXIgmYnCoAnws=
+X-Gm-Gg: AR+sD13ARzYMI2swghTrXWDXQpvnIPvBE/t88RgGJBbL+4i+oVKAgAEEihx52uJ3bYq
+	L5DE24HC8NAux/65nD255D+Amhv3UIEV6wdGKWi61tXbx/ZN6se+Ra2CX2btGnZ9uvKTtqtYUJy
+	wbXCosJaEK0MDFT/JYG4XPzOocT4oeh/PsmqPcjiviSQeU9/3/dDBAtpDOeYeC2acRyyuAsIdL5
+	SaMlD3Ucb7zEUWhfXPlDYlFpOH0KmUwV72LbbaprKZ09G0gVvokN3V/7dleqeWyhxdscxyEgnZS
+	RoO72aA8kWAGxwjlb+gp9gPNgorAb2NYwGCdib2xm0lJsCbuDb07r3jUolD9byny1IN51SoeiYH
+	LJh2J2HD3Jb5JaqZz1gM7kmJTT4YbTkZyJ3kHvO5SPQK74Ewbbx1753J3WFFNhBHebw==
+X-Received: by 2002:a05:690e:438c:b0:668:43f8:a83a with SMTP id 956f58d0204a3-66d256f88eamr2159816d50.15.1787758332524;
         Wed, 26 Aug 2026 08:32:12 -0700 (PDT)
-X-Received: by 2002:a05:690e:1c0a:b0:66d:28f9:3b55 with SMTP id 956f58d0204a3-66d28f93c6emr1938809d50.38.1787758330575;
-        Wed, 26 Aug 2026 08:32:10 -0700 (PDT)
+X-Received: by 2002:a05:690e:438c:b0:668:43f8:a83a with SMTP id 956f58d0204a3-66d256f88eamr2159768d50.15.1787758331480;
+        Wed, 26 Aug 2026 08:32:11 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66d24592f24sm1598209d50.6.2026.08.26.08.32.09
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66d24592f24sm1598209d50.6.2026.08.26.08.32.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2026 08:32:10 -0700 (PDT)
+        Wed, 26 Aug 2026 08:32:11 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org
 Cc: pc@manguebit.org,
-	linkinjeon@kernel.org
-Subject: [PATCH v3 00/11] smb: client: fix OOB reads and UAFs in SMB2/3 receive paths
-Date: Wed, 26 Aug 2026 10:31:36 -0500
-Message-ID: <20260826153147.4112943-1-sorenson@redhat.com>
+	linkinjeon@kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v3 01/11] smb: client: fix NextCommand bounds and aliasing UAF in receive_encrypted_standard()
+Date: Wed, 26 Aug 2026 10:31:37 -0500
+Message-ID: <20260826153147.4112943-2-sorenson@redhat.com>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260826153147.4112943-1-sorenson@redhat.com>
+References: <20260826153147.4112943-1-sorenson@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This series fixes eleven bounds-checking defects in the SMB2/3 client,
-all reachable from a malicious or compromised server.
+Four related bugs in receive_encrypted_standard():
 
-Patches 1-3 address the compound encrypted frame processing path:
+Lower bound: next_cmd is not checked against MID_HEADER_SIZE(server).  A
+non-zero NextCommand smaller than the SMB2 header size passes the
+upper-bound check; memcpy pulls bytes from within the current PDU header
+into next_buffer, and the next iteration casts that region as a fresh
+smb2_hdr.
 
-Patch 1 fixes four interacting bugs in receive_encrypted_standard():
-a missing lower bound on NextCommand, an off-by-one upper bound that
-admitted trailing slices too small for an SMB2 header (producing a
-write-after-free via next_buffer aliasing server->bigbuf), a stale
-next_buffer pointer not cleared before goto one_more, and use of the
-pre-decryption pdu_length instead of the plaintext extent for bounds
-checking.
+Upper bound / trailing slice: the original check uses strict greater-than
+(`next_cmd > pdu_length`), so next_cmd == pdu_length passes; memcpy copies
+zero bytes, smb2_check_message() rejects the zeroed buffer, ret != 0, and
+free_rsp_buf() releases next_buffer (aliasing server->bigbuf) while
+allocate_buffers() still holds it: write-after-free.  Even with strict
+less-than enforced, a next_cmd satisfying next_cmd < pdu_length but
+pdu_length - next_cmd < MID_HEADER_SIZE(server) leaves a trailing slice too
+small to hold an SMB2 header.  The next iteration reads shdr->NextCommand
+from uninitialized slab content; if it reads as 0, the else-if (ret != 0)
+branch frees next_buffer, again aliasing server->bigbuf: another
+write-after-free.  Replace with three unsigned comparisons that avoid
+addition: `next_cmd > pdu_length` to guard against underflow, then
+`pdu_length - next_cmd < MID_HEADER_SIZE(server)` for the trailing slice
+minimum.  The addition form (`(size_t)next_cmd +
+MID_HEADER_SIZE(server) > pdu_length`) wraps to zero on 32-bit
+kernels for next_cmd near UINT_MAX, silently admitting out-of-bounds.
 
-Patch 2 adds smb2_min_pdu_len[], a per-command table of minimum response
-struct sizes, and uses it in smb2_check_message() to reject responses
-too short for smb2_get_data_area_len() to safely read command-specific
-struct fields.
+Aliasing after goto: once server->bigbuf = buf = next_buffer and the goto
+fires, next_buffer still holds the live server->bigbuf pointer.  If
+smb2_check_message() fails on that iteration, ret != 0 and the else-if path
+frees next_buffer, freeing server->bigbuf while it remains referenced.
+Set next_buffer = NULL before goto one_more to prevent the aliased pointer
+from being freed as a standalone buffer.
 
-Patch 3 fixes server->total_read tracking in receive_encrypted_standard()
-so that smb2_check_message() sees the actual per-sub-PDU size rather than
-the full remaining compound tail.  Without this, a rogue server can craft
-a compound frame where any non-last sub-PDU is shorter than its declared
-fixed struct, bypassing the guards added in patch 2.
+Decrypted extent: decrypt_raw_data() moves plaintext to buf[0..buf_size-1]
+via memmove, where buf_size = pdu_length -
+sizeof(struct smb2_transform_hdr).  Using pdu_length as the upper bound
+allows next_cmd values in (buf_size, pdu_length], letting buf + next_cmd
+land in the stale 52-byte transform-header residue and memcpy to copy
+stale ciphertext into next_buffer as if it were the next SMB2 frame.
+Assign pdu_length = buf_size after successful decryption so bounds checks
+and the per-iteration decrement operate on the correct plaintext extent.
 
-The remaining patches fix lower-bound gaps and OOB reads in DFS referral
-parsing, EA list traversal, posix SID bounds, change-notify offset,
-snapshot enumeration, and SMB1 reparse point validation.
+smb2_next_header() already enforces the equivalent lower-bound:
 
-Note on overlap with a concurrent series: Zihan Xi's
-[PATCH v2 0/2] "smb: client: fix create context out-of-bounds reads"
-(Message-ID: <cover.1787486936.git.zihanx@nebusec.ai>) touches
-smb2_parse_contexts() and parse_posix_ctxt() independently.  Patch 11
-here addresses the same function (smb2_parse_contexts()) but focuses on
-complementary issues that their series does not cover: NameOffset
-validation (lower and upper bounds) and gating all three handler
-dispatches on a non-zero DataLength to prevent zero-DataLength contexts
-from exercising parse_lease_buf, parse_query_id_ctxt, or parse_posix_ctxt.
-Their per-context cc_len bounding and lease/QFid minimum-length checks
-are not duplicated here.  parse_posix_ctxt() DataLength validation is
-omitted from this series entirely since their patch 2/2 addresses it.
+    if (unlikely(*noff && *noff < MID_HEADER_SIZE(server)))
+        return -EINVAL;
 
+Apply the same constraint here.
 
-v3 changes:
- - respin entire series
+Fixes: b24df3e30cbf ("cifs: update receive_encrypted_standard to handle compounded responses")
+Cc: stable@vger.kernel.org
+Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+---
+ fs/smb/client/smb2ops.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-v2 changes:
- - patch 6: reject next_entry_offset values that leave fewer than
-   sizeof(*src) bytes remaining after advancing.
-
-Frank Sorenson (11):
-  smb: client: fix NextCommand bounds and aliasing UAF in
-    receive_encrypted_standard()
-  smb: client: validate PDU length before smb2_get_data_area_len()
-    struct access
-  smb: client: fix server->total_read not tracking sub-PDU size in
-    receive_encrypted_standard()
-  smb: client: fix missing lower-bound check on DFS referral string
-    offsets
-  smb: client: fix missing lower-bound on Next field in
-    parse_server_interfaces()
-  smb: client: fix OOB struct field reads in move_smb2_ea_to_cifs()
-  smb: client: fix missing iov bounds check in parse_posix_sids()
-  smb: client: fix underflow in is_valid_oplock_break() notify offset
-    check
-  smb: client: fix potential OOB read in smb3_enum_snapshots()
-  smb: client: fix incomplete bounds check on reparse buffer in
-    cifs_query_reparse_point()
-  smb: client: fix NameOffset and Next field validation in
-    smb2_parse_contexts()
-
- fs/smb/client/cifssmb.c   |  2 +-
- fs/smb/client/misc.c      | 12 +++++++--
- fs/smb/client/smb1misc.c  |  3 ++-
- fs/smb/client/smb2inode.c | 11 ++++++++
- fs/smb/client/smb2misc.c  | 53 +++++++++++++++++++++++++++++++++++++++
- fs/smb/client/smb2ops.c   | 51 +++++++++++++++++++++++++++----------
- fs/smb/client/smb2pdu.c   | 11 ++++----
- fs/smb/client/trace.h     |  1 +
- 8 files changed, 122 insertions(+), 22 deletions(-)
-
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 7d6738ffcb80..e75420dbe950 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -5242,6 +5242,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+ 	length = decrypt_raw_data(server, buf, buf_size, NULL, false);
+ 	if (length)
+ 		return length;
++	pdu_length = buf_size;
+ 
+ 	next_is_large = server->large_buf;
+ one_more:
+@@ -5254,8 +5255,15 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+ 	}
+ 
+ 	if (next_cmd) {
+-		if (WARN_ON_ONCE(next_cmd > pdu_length))
++		if (next_cmd < MID_HEADER_SIZE(server) ||
++		    next_cmd > pdu_length ||
++		    pdu_length - next_cmd < MID_HEADER_SIZE(server)) {
++			unsigned int max_next = pdu_length > (unsigned int)MID_HEADER_SIZE(server) ?
++					pdu_length - (unsigned int)MID_HEADER_SIZE(server) : 0;
++			cifs_server_dbg(VFS, "invalid NextCommand offset %u out of range [%zu, %u]\n",
++					next_cmd, MID_HEADER_SIZE(server), max_next);
+ 			return -1;
++		}
+ 		if (next_is_large)
+ 			next_buffer = (char *)cifs_buf_get();
+ 		else
+@@ -5291,6 +5299,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
+ 			server->bigbuf = buf = next_buffer;
+ 		else
+ 			server->smallbuf = buf = next_buffer;
++		next_buffer = NULL;
+ 		goto one_more;
+ 	} else if (ret != 0) {
+ 		/*
 -- 
 2.55.0
 
