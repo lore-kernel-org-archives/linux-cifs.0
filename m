@@ -1,120 +1,83 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4B11F938;
-	Wed, 26 Aug 2026 00:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECCF23507B
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 00:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787702634; cv=none; b=jCtXlVOGl+E82gDSd8oKynRU3hyXrwiuCjdHKM6lJFCcXcyoqfHy832dyhBrv33jJQE3zPKy5JcIHBgMZTUivtjyS1jo4KBlzYCuMxVAMMAPSDmWkADCWyR5I/mJqhDQyDKXVsbaRXXlgVJA6CsomWPENEBbP2qQ0BquIElXQfg=
+	t=1787705983; cv=none; b=fRCvS07AX63LXZEvTUoBxtF3eQnAIXKrxL3YEpMXYbZnRKv16y9ONQHNxsHVu71hJqE60RBCjuQ258sGWB7OfNTnnvaDSR3lCwpklbRh0+4KQ9LKjwVwo34HLmLXNFwYi3ome0gtAHxEqECANzerooLBN0IfAFdItZ/xEMaoa/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787702634; c=relaxed/simple;
-	bh=TkV0yfnmttToJnctJPVJOk56LrLV7FXdcb6wtlTl14o=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=XBTbICydSQ5jmrMi0nyvzPxnt5HD7AZczIWZh5GzQJv2Bu43R9HrVPDr4H2Zwaqh0RuIzuiqefYx2p5kqfkz2hPOOHrI6dCiBjoNByM4kdWgdKt3sMYmnjYEOWIGKFFC+vvGsHEOFmj1Gk4ZsZXeEO/3a2o7IcI3fOreZTRKX9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=s6QNzEj+; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1787705983; c=relaxed/simple;
+	bh=KCb1T+E2vbQj8UGhAouvaQQCblHWutyZfkzZoRmUhOA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=az4NdmpHH5tukQrpDuzXxv/bGM9JdESNOHbtgOuUfd2bJMdDKpzLNEzMO299HeiooOgg269z0JBD2UJpBpWyZJQ3igPQIadT629+OlFTnpiU/9nurAQ7GuJQ2oL4kl8JXsUOrgJxgqXAYuMX/+v4O9R7K8os87VK3uJE2nr93mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FDu3grqq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="s6QNzEj+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=dSyGYgQDWVGiejz01uIuvTstpuIaB2U4LpIO3bu8Ty8=; b=s6QNzEj+xuh4NqcuHTEEP9RBGf
-	egzbJU8I+rg2HMpwa6H4imnocGXiSfB2ecIL03MFbgcviIfFyc28j2r+E7jYK2PscOr49bIIF20g0
-	BysGKMdOBinKuiAmQV1g1ehZUDPJ6k2WNdlX3K4RtwmP2H5XFrqd1l3zdMTwBHRPvm6ErJAPr38Ob
-	fXFyc8GEerswPU3keOrg5dvfSO0a3bibo4dhmg1Vc+iiQ16n+zIbT8tQv3fWNEV7mDBQfgS5OQDFB
-	aR/hTt3UA9FANbzduzP8CybvSeRwZSum8SaCknba2X5Am6hQ+zazN5OPi84bCPTbUqyh5Co5WHtFF
-	R0Re0IlA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1wz17N-000000000Pi-3bpY;
-	Tue, 25 Aug 2026 21:03:49 -0300
-Message-ID: <b8ea942d21a0f0ede8518f33895def69@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Frank Sorenson <sorenson@redhat.com>, linux-cifs@vger.kernel.org
-Cc: linkinjeon@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] smb: client: fix heap overflow in cifs_do_set_acl()
-In-Reply-To: <20260825214328.3852168-1-sorenson@redhat.com>
-References: <20260825183229.3799705-1-sorenson@redhat.com>
- <20260825214328.3852168-1-sorenson@redhat.com>
-Date: Tue, 25 Aug 2026 21:03:49 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDu3grqq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66A031F00A3D
+	for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 00:59:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787705982;
+	bh=ZdEs8POfr9tAeDuibjStxAfJojgAbcwYDGHfH99U70Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=FDu3grqqFsBNpk0oYoedp6731PJL2hOFkapxakAKRX5ajbP0Tosz34rpj0ABp1AE1
+	 8Wi85AqQrmBwwq3NBrvDHJ2NgicXFLSwG4HUTXViXTkU70VbvJ3dTD51Dgu/cTLsdv
+	 9PXjkJcuofhm7HC3GRVFpQwnY82VkH+cJFYuFudM68r1sdbgYHG/TpM7YMB3jLUgu7
+	 f4NIEmsM+hfoOSyjvNRbKgTb3pGkg6a/wQ8fImJhm4d5wlrdtt26A7KiRLVUJrsrk5
+	 28ff9UXXnjboVtNgiosA/K7Oa6IGaUNb7r7suFKVK/VGQ1ulcKHSU/vXTX89kYvWA3
+	 4qI9xSRkaXFew==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c15d47266baso36552966b.3
+        for <linux-cifs@vger.kernel.org>; Tue, 25 Aug 2026 17:59:42 -0700 (PDT)
+X-Gm-Message-State: AFuF++kJ311ieFYhHDHqY3HLqcYD4mf/Fh6uVlle8ENnDXcJviHs29ML
+	SjCHw5rN4kMPNnFelby169d2hkt1BPGHnHzV9YiF3pZWQeoBPQw1uQqXNKpcbooAUbafPt5uEP1
+	eSticsVxVi03eva3U4dp6cFOmBrqwvcc=
+X-Received: by 2002:a17:907:9617:b0:c16:4e5:944a with SMTP id
+ a640c23a62f3a-c250c3529f9mr306989666b.21.1787705981065; Tue, 25 Aug 2026
+ 17:59:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20260823185807.3115901-7-sorenson@redhat.com> <20260825221300.3860212-1-sorenson@redhat.com>
+In-Reply-To: <20260825221300.3860212-1-sorenson@redhat.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 26 Aug 2026 09:59:28 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-fAv+GUahwuPbffD8TWAwLEVyVrNNmQx1jZMcsxHRe0w@mail.gmail.com>
+X-Gm-Features: AcwNN1VbxvYf__k2bE7Vep2m9r-Vzm7tqA6n1G8eZiM_vAAIFJZ2dwdnezjcj_I
+Message-ID: <CAKYAXd-fAv+GUahwuPbffD8TWAwLEVyVrNNmQx1jZMcsxHRe0w@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: client: fix OOB struct field reads in move_smb2_ea_to_cifs()
+To: Frank Sorenson <sorenson@redhat.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Frank Sorenson <sorenson@redhat.com> writes:
-
-> cifs_set_acl() validates ACL size using posix_acl_xattr_size():
+On Wed, Aug 26, 2026 at 7:13=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
+> wrote:
 >
->         4 + (count * 8)  // 4-byte header + 8 bytes per ACE
+> The while (src_size > 0) loop guard allows iteration after
+> next_entry_offset advances src past the point where a full struct fits
+> in src_size.  Reads of ea_name_length and ea_value_length on the next
+> iteration are then out-of-bounds.
 >
-> cifs_do_set_acl() then calls posix_acl_to_cifs() to write the CIFS
-> wire format into the same buffer:
+> Require src_size >=3D sizeof(*src) before reading any struct field,
+> and reject next_entry_offset values that are smaller than
+> sizeof(*src) or that leave fewer than sizeof(*src) bytes remaining
+> after advancing.
 >
->         6 + (count * 10)  // 6-byte header + 10 bytes per ACE
+> For calls where the server returns an EA list with an invalid
+> next_entry_offset, the error returned to userspace changes from
+> -ENODATA (getxattr) or -ERANGE (listxattr) to -EIO, correctly
+> signalling a server protocol error rather than "attribute not present"
+> or "output buffer too small".
 >
-> An ACL that passes the xattr-based check in cifs_set_acl() can
-> overflow the heap when posix_acl_to_cifs() writes the larger CIFS
-> format.
->
-> Validate the CIFS format size against the remaining buffer space and
-> USHRT_MAX before converting--data_count is __u16, so sizes above
-> USHRT_MAX truncate the on-wire packet length, causing the server to
-> apply a partial ACL.  Replace MaxDataCount = 1000 with
-> min(CIFSMaxBufSize, USHRT_MAX).
->
-> Fixes: dc1af4c4b4721 ("cifs: implement set acl method")
+> Fixes: 95907fea4fd8 ("cifs: Add support for reading attributes on SMB2+")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 > ---
 > v2 changes:
->  - Add USHRT_MAX bound to prevent u16 truncation of data_count for ACLs
->    with more than 6553 entries, which would cause a partial ACL to be
->    silently applied on the server
->  - limit MaxDataCount to min(CIFSMaxBufSize, USHRT_MAX)
->
->  fs/smb/client/cifssmb.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-> index f5aad5f61dce..621aca5d3b75 100644
-> --- a/fs/smb/client/cifssmb.c
-> +++ b/fs/smb/client/cifssmb.c
-> @@ -3555,6 +3555,7 @@ int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
->  	int rc = 0;
->  	int bytes_returned = 0;
->  	__u16 params, byte_count, data_count, param_offset, offset;
-> +	size_t cifs_acl_size, bytes_available;
->  
->  	cifs_dbg(FYI, "In SetPosixACL (Unix) for path %s\n", fileName);
->  setAclRetry:
-> @@ -3574,8 +3575,7 @@ int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
->  	}
->  	params = 6 + name_len;
->  	pSMB->MaxParameterCount = cpu_to_le16(2);
-> -	/* BB find max SMB size from sess */
-> -	pSMB->MaxDataCount = cpu_to_le16(1000);
-> +	pSMB->MaxDataCount = cpu_to_le16(min_t(unsigned int, CIFSMaxBufSize, USHRT_MAX));
->  	pSMB->MaxSetupCount = 0;
->  	pSMB->Reserved = 0;
->  	pSMB->Flags = 0;
-> @@ -3587,6 +3587,15 @@ int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
->  	parm_data = ((char *)pSMB) + offset;
->  	pSMB->ParameterOffset = cpu_to_le16(param_offset);
->  
-> +	/* make sure we can fit the larger cifs_posix_aces in the buffer */
-> +	cifs_acl_size = sizeof(struct cifs_posix_acl) +
-> +		       (acl->a_count * sizeof(struct cifs_posix_ace));
-> +	bytes_available = (CIFSMaxBufSize + MAX_SMB2_HDR_SIZE) - offset;
-
-Are you sure you want to use MAX_SMB2_HDR_SIZE?  This is SMB1 code, so I
-would expect to see MAX_CIFS_HDR_SIZE.  Alternatively, use
-MAX_HEADER_SIZE() helper.
-
-Do you have any reproducer?
-
-What server did you test these changes against?
+>  -  reject next_entry_offset values that leave fewer than
+>     sizeof(*src) bytes remainint after advancing.
+Since maintainers might accidentally pick up the v1 patch, I think it
+would be better to resend the entire patch-set as v2.
