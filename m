@@ -1,114 +1,115 @@
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F407E3CDBA5
-	for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 19:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362B139B960;
+	Wed, 26 Aug 2026 22:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787771467; cv=none; b=Fkfdybk7XTN7qFMRo6FhrqcdEhQT7ecTnfAUzbF59wKm4Ka4hsDt4VD+L/2brSiq4qWnBj4v7qPxO2B8agf8JeUV7ksAjm9i+soGTW7+7i0p6p/vcJjC2F1xiRUFy7aFeYeFGpA9ztx3CDgjAOHGrIRxLl2GANbbc4lzStzGR/o=
+	t=1787784370; cv=none; b=dUpMNE7IDzBSGwJd0ZjJPwYBl2NyNGTrFe0sD5zFwF28i0OPmGrlSnxVPClD77Yo/WDujrtQ+29vt0c3cQtgGxLDk4tECKbtws+LssHVHtnr/Vjk+QaOLrelf5KCapbCBcV12tsr+eeHgm2FnYrWYhX4vN63McmXv5MSAC4PVOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787771467; c=relaxed/simple;
-	bh=hA8SRvFuua85xZ5A7WL0pI+8AgdAGDofjCeAaFmQkbg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GYlBdhFHI4/EF19S+9lsxmgzU/bYyxH7O5q6w8uKho5SesnvqNVCmVqDN9IRyFbNfWeRj16mdfANQehgWYqK0WoFhh2LJ1XDqz8r6Q00ZRAQZCgBgcdawNEishr2BqjXkGoQ9zzNhM9cloCLmQRMiLpsoA5s1gIFteWZZ5Ste6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUE+NTQ0; arc=none smtp.client-ip=209.85.160.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787784370; c=relaxed/simple;
+	bh=a/k0oGALKGcR1YG6vIA9R7IM2I+Buj51KyQ5jysoFGU=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=WODg+MqSPV3fk3dZrH5iKBv0HHDoX2dcOIpTK7jB9DhQUz8FG4sV/fkW63iAHglDyQuv79uv4jeK82vkSlCxqkdATM+s2sqnhnNsL/QWeDh2G+NebiYfYMcNehDUae2saKCu8zi4VbH4RqUty6xrMeBkG4v0h9phMJ78FFK1S08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=eXQ1tMeJ; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUE+NTQ0"
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-4518ad44e83so1484591fac.0
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 12:11:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787771458; x=1788376258; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=o+kYzMea9PvaxPnoMNSVSpZwSGyo0Hz87g0xc/2UNKw=;
-        b=KUE+NTQ0U8SGgusgxjHltiggAY7AKzdhzvvwv/AvI7fi1bZvlkyG5TB85DXFbzvv0w
-         ANr5/McCw8/5EYfON5nyZhO36Mrk+3ya8ptetMI4X+HEU9Oxb2nCOBAoPfkt0rjdvPmo
-         5iQjp7CMYbdcwxcxfAyB4fFZNx9yZItOGMCZ8fnloG+DK0Eb+oVMQuT81Xd/y44mF3OS
-         U7rXHuuf2svxkUfV6ZzQ95V5O5S2dtgmByl+UYj/ddWjNLzOlVBTnpmRBXka5gTt+b4Y
-         JFgg5YqjROfERzw0SZIp9Syaxw4NX5DoIxLTBB/+SUtvAy8LAlDe7LEyMXm0mCin1yah
-         YEcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787771458; x=1788376258;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=o+kYzMea9PvaxPnoMNSVSpZwSGyo0Hz87g0xc/2UNKw=;
-        b=B2Q7OB47vEYuRPW2O/+i8N++3gBjm8epCqSoX39PEtp0cf9cuCRwBblHi3Bs6XewT6
-         PXAYs7Fuz1IaIRnj6gWlgcZhoG3qDaJ9zAj3NDVHoZI10FkVaVAdoOxKLdtW++AOmv1M
-         shaPBO1CD4t5OlreW4T+NK1TtdQqg0Gr51+6O3yYMbZGMEhm+mQRTb/jMZ2age7sWcmZ
-         unLdL8A+QvVLsRQKBublPR26Ui95bdZcUG5bt+XB2Ve2o5ydbieUhZk1iIyI+a2wA6We
-         KyJe2h5SmUqX8uPH5zN/pnLVMkoHQXvNAuMQoqJm1yRwZXqNugaLdGe1TuQOKo4E780S
-         A+tA==
-X-Forwarded-Encrypted: i=1; AHgh+Rrz53yDYR0u1AIgvFLIpSVSQ1H7jptMECVjzSe36GjQE8HfWXxXE1T5gj1siJA6VoHsTPa4BoB4HP9l@vger.kernel.org
-X-Gm-Message-State: AFuF++mfx7x68otelCyfWjxOcNx9l05PB4MGxy52g0d0evX/z5W07nkl
-	JJ/kWO2yjR9TzgCICmsLepDN1qt+0rdtynEv5pskpITB0YzG+OMBXCwC
-X-Gm-Gg: AR+sD104rnNr9jvwizd6Dz6gpgglM97oljEm1iDUOiPh6PVv2zcjrSLIgEoGsYsZGaG
-	NjyLMuy3r5bhoIlER3iJS9vv+LzRd/np0fZSdfq4AdfJdQgpfFRtbKR7Cef2ejshS8E6ivy/jV7
-	kR0dLVREdhshgo/q/AIBgbh4tde2DUHelwkjwWXBTCzGIX/2STakvUrPYlB8jx6St/A3pIFREpL
-	tT9kFxSOQ+BmoPw6FGaVMjc329KOADgH4/oc2YZfUHfOVClp/O+gutaPsm4F8FQQZn1+vfW9c3q
-	jKYa1IziLdnoy2VVJRWO/rgdjrrYpGm51AMgdbC3vN57i21WrH3zvdDRTi4Et/AI2l+sIKtsZhV
-	kPQ/JIKjb4vXm8dqAln+jgKxAfFPKeGRXJWrsTuPbWNrHyhTthor0A66XcCNcVjUxrG2rcY3p8p
-	bK+NV8MxhLE51FWGdu8vrTa4yen2qtHHvT24wwYvb+LZNPqs8NRnzOAa3MlFPiNQw28EyS3eXBj
-	DypPg==
-X-Received: by 2002:a05:6870:8326:b0:45e:9b66:7175 with SMTP id 586e51a60fabf-4659a399422mr9554944fac.16.1787771457575;
-        Wed, 26 Aug 2026 12:10:57 -0700 (PDT)
-Received: from FredPC.lan ([2600:382:3107:46eb:31a7:8fef:9fc6:7e8b])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-465ad9ecc2fsm3060369fac.4.2026.08.26.12.10.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2026 12:10:56 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-To: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH 2/2] smb: client: prevent out-of-bounds dfs_info3_param access in copy_ref_data()
-Date: Wed, 26 Aug 2026 12:10:33 -0700
-Message-ID: <20260826191033.162320-3-fredric.cover.lkernel@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260826191033.162320-1-fredric.cover.lkernel@gmail.com>
-References: <20260826191033.162320-1-fredric.cover.lkernel@gmail.com>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="eXQ1tMeJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=X/u+WH9V0cxkiHc9PWcoiS8u9bSUsjJuZoNcrK/RAT8=; b=eXQ1tMeJuNASXD+PLvXDACEOrV
+	QQGqdUVI8tYA2bKwygpWb5ose7HYrBjAwLKdhtBGQ0DXin8xfmJQTctqWjUEuAmkb9d7HJDVCr9dx
+	hfYQ/Rpr4P3Bzw7XhNquhWrTG3eS9WA/wGMAvQidBMcZkhd6ZWda0M2SC/9TCflIhrmyQ9dzNiY2p
+	27zKbYG0UzN+g8R7BgxBrM5IwX6sxIx5JMWHzaNBaD7OMIP4MKRUpr/HTOjNsd8Z2hGSd2AhdKZ4f
+	u3cLTM0XmvNmiSMw8XivpM1Kej2UKQTUaXFTlyLlJvMTCK6aNfIpTxTlk6o3QzIbWTasKpK1RtQth
+	cntYpV6g==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1wzMNd-000000004DZ-0hZu;
+	Wed, 26 Aug 2026 19:46:01 -0300
+Message-ID: <59a8b739c6b925fdc4fda0580852f91e@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Namjae Jeon <linkinjeon@kernel.org>, Frank Sorenson <sorenson@redhat.com>
+Cc: linux-cifs@vger.kernel.org, stable@vger.kernel.org, Paulo Alcantara
+ <pc@manguebit.com>
+Subject: Re: [PATCH v4 1/2] cifs: don't update i_size in cifs_do_truncate()
+ without a cached handle
+In-Reply-To: <CAKYAXd-st8zvEiMTKw5vggFVTvY_Ln5nA3zeZgThuqQuQxAZtA@mail.gmail.com>
+References: <20260821184109.1834871-1-sorenson@redhat.com>
+ <20260821184109.1834871-2-sorenson@redhat.com>
+ <CAKYAXd-st8zvEiMTKw5vggFVTvY_Ln5nA3zeZgThuqQuQxAZtA@mail.gmail.com>
+Date: Wed, 26 Aug 2026 19:46:00 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Currently, copy_ref_data() assumes that numrefs > 0, and unconditinally
-accesses refs[0]. If copy_ref_data() somehow is passed an empty list,
-this would cause major out-of-bounds write and read problems.
+Namjae Jeon <linkinjeon@kernel.org> writes:
 
-Enforce numrefs > 0.
+> On Sat, Aug 22, 2026 at 3:41=E2=80=AFAM Frank Sorenson <sorenson@redhat.c=
+om> wrote:
+>>
+>> If find_writable_file() returns NULL, cifs_file_flush() returns 0
+>> without issuing set_file_size, and the outer if (!rc) block sets i_size
+>> to 0 before the server is told to truncate.  If the subsequent
+>> cifs_open() fails, the inode is stranded at size 0 while the server
+>> file is unchanged.
+>>
+>> Move netfs_resize_file() and cifs_setsize() inside the if (cfile) arm
+>> so they only run after a successful set_file_size().  In the no-handle
+>> else branch, call truncate_inode_pages() to evict stale pages before
+>> the O_TRUNC open: cifs_invalidate_cache() is fscache-only and does not
+>> touch the VFS page cache, so without it old pages persist and may be
+>> served as stale data after a later file extension.
+>>
+>> Fixes: 110fee6b9bb5 ("smb: client: fix missing timestamp updates with O_=
+TRUNC")
+>> Cc: stable@vger.kernel.org
+>> Cc: Paulo Alcantara <pc@manguebit.com>
+>> Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+>> ---
+>>  fs/smb/client/file.c | 18 ++++++++++++++----
+>>  1 file changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+>> index 389083f9ce00..05aeb9d94ffe 100644
+>> --- a/fs/smb/client/file.c
+>> +++ b/fs/smb/client/file.c
+>> @@ -1012,10 +1012,20 @@ static int cifs_do_truncate(const unsigned int x=
+id, struct dentry *dentry)
+>>                         server =3D tcon->ses->server;
+>>                         rc =3D server->ops->set_file_size(xid, tcon,
+>>                                                         cfile, 0, false);
+>> -               }
+>> -               if (!rc) {
+>> -                       netfs_resize_file(&cinode->netfs, 0, true);
+>> -                       cifs_setsize(inode, 0);
+>> +                       if (!rc) {
+>> +                               netfs_resize_file(&cinode->netfs, 0, tru=
+e);
+>> +                               cifs_setsize(inode, 0);
+>> +                               cifs_invalidate_cache(inode, 0);
+>> +                       }
+>> +               } else {
+>> +                       /*
+>> +                        * No cached handle; the server truncates as par=
+t of the
+>> +                        * O_TRUNC open request that follows.  Evict sta=
+le pages
+>> +                        * from the page cache now so they cannot be ser=
+ved as
+>> +                        * stale data after the file is later extended; =
+i_size is
+>> +                        * updated from the server's open response.
+>> +                        */
+>> +                       truncate_inode_pages(inode->i_mapping, 0);
+> truncate_inode_pages() expects both ->i_rwsem and ->invalidate_lock to
+> be held. Please check the comment of truncate_inode_pages().
 
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
----
- fs/smb/client/dfs_cache.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index b0388c460499..b51c8355d73d 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -389,6 +389,9 @@ static int copy_ref_data(const struct dfs_info3_param *refs, int numrefs,
- 	struct cache_dfs_tgt *target;
- 	int i;
- 
-+	if (WARN_ON_ONCE(numrefs <= 0))
-+		return -EINVAL;
-+
- 	for (i = 0; i < numrefs; i++) {
- 		struct cache_dfs_tgt *t;
- 
--- 
-2.53.0
-
+Frank, please resend with the expected locks held.
