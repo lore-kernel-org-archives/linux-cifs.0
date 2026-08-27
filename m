@@ -1,173 +1,159 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889AD35E922
-	for <linux-cifs@vger.kernel.org>; Thu, 27 Aug 2026 01:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3666137B02A
+	for <linux-cifs@vger.kernel.org>; Thu, 27 Aug 2026 01:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787795474; cv=none; b=ozPJm4Oi9uWEWVZR4Q1/fCJD9xaO2F1JLGQBmubFV89ia+OztbYvj5Mg5GzuftzpAEgpaTqmWbvalpJZz8pCu3R1E7kpDCroh2iOc3X06R/S2hotX8BQZRWvongjVOm6RAn3A6JGm7a+4l5oo1JwHqLwA1DiKFM+WrO29Mhrx3g=
+	t=1787795865; cv=none; b=VEQa4J3oaf1SmwGwMeq07Wx7bsTLyu5OLsw+ozq+XdjUtfMHMSt6INlel3G7y08SQ0KQE97sC4ovsJnC44YLS8sSQwi+QcIC7YVs64RAFl9Kfvd7VS7KBiMBok5PNXlzxG/VNOW0ZkkMVChv8HKHPhkBfj57MR2InmRYZqcnBeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787795474; c=relaxed/simple;
-	bh=/5GHCPus8JVlsvmowqfGpvtY6DSST+HPkaDvTH4uhqQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m15jtf0CMoiXo+zO6jIbLd4lGDiTzTc+kjhqsXos1VM8/D7HJ3ewIPIXxd1rw1dsK1Wy8ujWt+bKa7up+b6fTJuvUYxQDDNrHKvXF4AhY84Uts7n70W0CPNWMTThArEFTgHKUflnUg5Tkrq/U/4ZqbtQcvx8JZELeusrdN/E8F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VZkovH8C; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=gEXYq82T; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1787795865; c=relaxed/simple;
+	bh=jhENR7oMROtVLiOxg0U+CVD+L+2JPr5RtX6xHqYhPz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Fq/WCGwInlbeHVx6nttrLAvAMPee6MMTuGsJ8sUdxPUv4YCfKPoQct325eCsruVwFcYOXR69U5WhEIMeQrHvPguharvr7ZXwLfhMxTKyDQcDtr+71r2+VRUm6W5qPYKwvE0m6pNHjusm+VBkDVeX9ssv3adZgOhpM+bPkiY4Ozg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YDJHp0DS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CXTch8+z; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZkovH8C";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="gEXYq82T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDJHp0DS";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CXTch8+z"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1787795471;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=mimecast20190719; t=1787795863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kwxQPCUC62n4A4jll7ISGwOMXeXpaSPMOhiI9Bk5Ugg=;
-	b=VZkovH8CuGJ1YSrBTC1wh/a/bxPg8PV2d6JI0+BNEPAKgRnNaqCUO+NmOhN/u/RGuwkNai
-	brjy3OY8IEqGZuTsJF50l145CqbPXf4d4j4OwQwsuogHX/EU35acrhKL7zULLkvPILHZ66
-	YL9mVAo1a2/aXmCTTDoiUpzWKScegPc=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=djdjWCEotBxmszXLMf1uKi2y2pajf3EcVhrRc+8hkLY=;
+	b=YDJHp0DSa58DmWoXOlSwduRaTxV2NT9EMsl+bGU5RrAZsZfWjZQ9jLkbofL1sfmXlgnos+
+	Sb/HpFnIkp7m4Qmy0YWjMtBsgMfkMXaXrHCPL3TjYxx32xCUo5FGHpfrQio9EXVJ2N14kb
+	s0JcIS4VX7VOd4J0bTwqfuZzLMy6FW4=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-173-AKHBPdVyM66BeKXwqflofw-1; Wed, 26 Aug 2026 21:51:10 -0400
-X-MC-Unique: AKHBPdVyM66BeKXwqflofw-1
-X-Mimecast-MFC-AGG-ID: AKHBPdVyM66BeKXwqflofw_1787795469
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-52f9e903b02so3758031cf.0
-        for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 18:51:09 -0700 (PDT)
+ us-mta-63-RnJruR4HMWaoR-zmeE51uQ-1; Wed, 26 Aug 2026 21:57:41 -0400
+X-MC-Unique: RnJruR4HMWaoR-zmeE51uQ-1
+X-Mimecast-MFC-AGG-ID: RnJruR4HMWaoR-zmeE51uQ_1787795861
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-930a098ea19so160194785a.1
+        for <linux-cifs@vger.kernel.org>; Wed, 26 Aug 2026 18:57:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1787795469; x=1788400269; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=kwxQPCUC62n4A4jll7ISGwOMXeXpaSPMOhiI9Bk5Ugg=;
-        b=gEXYq82To9sa7jRSE+n+sTjgH+Tlcz05ZAHysjKjbLwQf+qc92mj7ClUtgjIrn0BhH
-         2F+ecVxpRvAF8i05MpleaEjMsey42hVuseeYrrZb7xCns1jTQ901RF+xbZDFBNaD0FBk
-         VuUyDXGx4Gd23n8zUCAg/VRw5ejYvFj+lN19NDH/0xC0YZ1LJpQqXcV8AF6Aju1rJvf8
-         72EAH6eH9O8w78HvOWDmRl4kEoPNvScUPQ8tkYDj6WuXc1iJ9AqMeIBK+Oya+g05Q89V
-         ZyIGSaDSrv90wv53ZeoLnQ4PJODfd3eCRxz/muig/ef0Z7/Plgw1bzFZhdffzDPvatP7
-         Hpcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787795469; x=1788400269;
-        h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1787795861; x=1788400661; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=kwxQPCUC62n4A4jll7ISGwOMXeXpaSPMOhiI9Bk5Ugg=;
-        b=qhGS4Aj9kybFFrylm/bCFsESwhwO/djV1syYYt1+JZgrL/2wBcgpH44wQy1WY2Wilr
-         TpRGLj3bd3+m2bBlmGqwqgl9kPgdSxOAkicC/yiPKOiXMEtmSt8O6OMvWSU6Nth1o63J
-         HtGIPaUq6aUeVjMqmsMCsoWQAp0t6WTbCQbFgHKtfQp1dbRjaGMIzY+4qc55OMFLegP4
-         cMKJWE3ObHMUZ51bWhfPmbygvgk9aZhqeGfAl1YJgjLAqZw9yya1gGtI0qLJhgPWRa+5
-         Otlc67WTi1HfRTUTLS6b+QFM6opq3q1aQA75gevw/YgtO2/A3yNA1AK2e4DzMvwqxP7o
-         JjMw==
-X-Gm-Message-State: AFuF++kb+2zxbQkXuyti7I6ioxf76OZlDZfL31LbzAABWW5tLLMhgZA1
-	eUdu3PEZbJRdHGC4f4pnxJUN0d7JwzRdWSDJCoh7IoWwagFxUEVbfCkVaooJ4Uzvq1/7bWyx2dZ
-	kysPBbhmsWj9MdNY/qFTR8FxuzUCzIr1XPYwMitxF+5bTOJv7vVJzakFqOrMKbZS0RfAb+nI=
-X-Gm-Gg: AR+sD133N0EQUUpTruUgbxQepnuY2pngRHQLI/2MFYvrkooFIOQg3hZFzADKdRUOETt
-	HnQS/Ov25m2Cbrum2/XMUykwcqIORx0CzUtSnoJHVHfXA9wIfsfrQX5Yu31zoI5J0x0LpJ1S2IN
-	haAJcGxINOSwelFkfsf9LFTpVBTV5Sjy1Nx+8wF95o607eZ7ZIkPcSEnqZFbSxxIVdoNYPlpnzx
-	Y32y+pPjYV2iG17VIrgTAl5F4ONnr3set8KjuMEKqR7fHOBAgis0q9i2VEWqC1FHCEIu0CahTE2
-	IWajt7lRR5+lUYpygB5WG6+M5Hvu/qf6fsF26c8A5HZ7Qcvux0ewXlI6wNvc1dLNAmMbMnt4qMZ
-	KknvGTapY1870o4f3GZ4qP5Df7L4dQOiqpVj/Xz0i
-X-Received: by 2002:a05:622a:4d85:b0:528:ce0:e9f8 with SMTP id d75a77b69052e-52fa1a4aaa1mr39847401cf.3.1787795469384;
-        Wed, 26 Aug 2026 18:51:09 -0700 (PDT)
-X-Received: by 2002:a05:622a:4d85:b0:528:ce0:e9f8 with SMTP id d75a77b69052e-52fa1a4aaa1mr39847081cf.3.1787795468907;
-        Wed, 26 Aug 2026 18:51:08 -0700 (PDT)
-Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90cd7028aefsm4963426d6.14.2026.08.26.18.51.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Aug 2026 18:51:08 -0700 (PDT)
-Message-ID: <0b126924-ff65-4db2-8aa6-2a6b8ad4290b@redhat.com>
-Date: Wed, 26 Aug 2026 20:51:07 -0500
+        bh=djdjWCEotBxmszXLMf1uKi2y2pajf3EcVhrRc+8hkLY=;
+        b=CXTch8+zZIvvr6BeJIjvnY70kovmGMThfo4IxZdvn6OLYAAeI0lKKDt446itszZTak
+         /mPn1E7D2kX9mL9vXXH2jXRBuO2EFQcRyDOtrTwiWJKwej5ejSoPk23lP4hYP10oFMBV
+         iska0Lk6sGupX8qs0le/kf928LTq3uImM4DtZPIi08QKBoPRKpdLP2+bl5c7Bh7TF4WK
+         AU1G8aO3FxC8cXXtKRHh/CSjrUT9qIrUe/zz7lYoIkj4aOT3ySsvpQWDj8VGJExCb67l
+         MJBVOEMEmPfKY4TnSUBXjBi+1qyAL/X61HUbX7yrpMHd+7GHIk8zYJgb3xGrDX5O1Ehq
+         PRDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787795861; x=1788400661;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=djdjWCEotBxmszXLMf1uKi2y2pajf3EcVhrRc+8hkLY=;
+        b=geHJABcg37Qs9ce7LsAw1ui+F7bCs+Rik1xCbrOPGQJhYTCFY35wlw1lb5iWbJnwHD
+         o6SvYN++WiZbNtL14XuB7t16+8Icxt4/jXx6vMKWnA1V5qHFvBIrodsyqYEDytsFimUd
+         eKee09i722FhjHdfudhjP8+5rFkqd4YbC8kK7XbMgRxTqsVyii9FtDPCD4iNMQ+ntRgZ
+         6BC6wnQarT3ObjZM6AZJXueYYD48ZjQOyo0vnhCqNiKp9mWkCau1zb9GvJL0fQKE5nFc
+         KgPIlIf/wHfifv0ucI+pDKmI5kxOOSmiQvKfDH2WkwJ4kRfNC0/v5FifKODY0haJBBIl
+         O5oQ==
+X-Gm-Message-State: AFuF++lPhQCig33eaow+MXjx0mtIwX2pdaXDxxdNBXdnWxfJPYvw+zWr
+	ZoU3ScE5sRt/ZxVXDNhWzje/6040kP1lXu+NY4NID6nK3AKgtReeGynAa0mfTB4N+sbEN8IvXaY
+	daWjVwixGZCyRwn872/cal9MnuCs+CUq/sE9PcWR+1bbtIMc64SOTdfw0v+ZdNav77+H5x4AE8w
+	0rWMweqpKyOfnKIiOBpCgUdfqDR6CBzhfJyqYtVKtTSWQ/tlQ=
+X-Gm-Gg: AR+sD10HYsQTabTFCOKqHRXtelYWOkLi7b5SzWKhRkEQ74FolIC20Vp7K0u2Y60KpYk
+	0JdSjsQRx6S5AmZ8y3pd1X+tyd2Dz75uHRw79PZ+bJeQ05tFlofXTkTpdRHf/4UM7sTB8daMfxk
+	fB2nb3v4dCHfeI0LALbwMGRXt9XW/4LxZicpVHI+MZTHQGO1LlvPTo91CYcI8uhHhm7oqhf1lwx
+	dDEZg7/qlXSFIDTzjppz5rbQelJhuHx8ZA1n8RAMcuAdZp2x2EyyJBRFgcGrdzN1cqnwQzkl3JB
+	yAMSdE5xyQ6gCkkxv+QiWmjUeoWfoST6p+x1etN7uT2FktmDxH0LSfwYdZlo12Lyd1wADF/7TUn
+	I+9gWPbMJAgmG2hX5Vh0KxkrGB7+1ga7dVyoBC6pa7rTcLb9P18FUEtSsHm2Y
+X-Received: by 2002:a05:620a:36c4:b0:92e:7cc9:a888 with SMTP id af79cd13be357-937800dde60mr1010325485a.2.1787795861312;
+        Wed, 26 Aug 2026 18:57:41 -0700 (PDT)
+X-Received: by 2002:a05:620a:36c4:b0:92e:7cc9:a888 with SMTP id af79cd13be357-937800dde60mr1010322585a.2.1787795860727;
+        Wed, 26 Aug 2026 18:57:40 -0700 (PDT)
+Received: from bearskin.sorenson.redhat.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-9377e30adcesm341042385a.4.2026.08.26.18.57.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2026 18:57:40 -0700 (PDT)
+From: Frank Sorenson <sorenson@redhat.com>
+To: linux-cifs@vger.kernel.org
+Cc: pc@manguebit.org,
+	linkinjeon@kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v5] cifs: don't update i_size in cifs_do_truncate without a cached handle
+Date: Wed, 26 Aug 2026 20:57:38 -0500
+Message-ID: <20260827015738.79123-1-sorenson@redhat.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <c5ae6c999664ec603d3ca6aa8a226439d89eed48@manguebit.org>
+References: <c5ae6c999664ec603d3ca6aa8a226439d89eed48@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: sorenson@redhat.com
-Subject: Re: [PATCH v4 1/2] cifs: don't update i_size in cifs_do_truncate()
- without a cached handle
-To: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, Paulo Alcantara <pc@manguebit.com>
-References: <20260821184109.1834871-1-sorenson@redhat.com>
- <20260821184109.1834871-2-sorenson@redhat.com>
- <CAKYAXd-st8zvEiMTKw5vggFVTvY_Ln5nA3zeZgThuqQuQxAZtA@mail.gmail.com>
- <59a8b739c6b925fdc4fda0580852f91e@manguebit.org>
-From: Frank Sorenson <sorenson@redhat.com>
-Content-Language: en-US
-In-Reply-To: <59a8b739c6b925fdc4fda0580852f91e@manguebit.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+If find_writable_file() returns null, cifs_file_flush will return
+0 without issuing set_file_size, and the outer 'if (!rc)' block
+will set i_size to 0 before telling the server to truncate.  If
+the cifs_open() then fails, the inode will have size 0, while
+the server file is unchanged.
 
-On 8/26/26 5:46 PM, Paulo Alcantara wrote:
-> Namjae Jeon <linkinjeon@kernel.org> writes:
->
->> On Sat, Aug 22, 2026 at 3:41 AM Frank Sorenson <sorenson@redhat.com> wrote:
->>> If find_writable_file() returns NULL, cifs_file_flush() returns 0
->>> without issuing set_file_size, and the outer if (!rc) block sets i_size
->>> to 0 before the server is told to truncate.  If the subsequent
->>> cifs_open() fails, the inode is stranded at size 0 while the server
->>> file is unchanged.
->>>
->>> Move netfs_resize_file() and cifs_setsize() inside the if (cfile) arm
->>> so they only run after a successful set_file_size().  In the no-handle
->>> else branch, call truncate_inode_pages() to evict stale pages before
->>> the O_TRUNC open: cifs_invalidate_cache() is fscache-only and does not
->>> touch the VFS page cache, so without it old pages persist and may be
->>> served as stale data after a later file extension.
->>>
->>> Fixes: 110fee6b9bb5 ("smb: client: fix missing timestamp updates with O_TRUNC")
->>> Cc: stable@vger.kernel.org
->>> Cc: Paulo Alcantara <pc@manguebit.com>
->>> Signed-off-by: Frank Sorenson <sorenson@redhat.com>
->>> ---
->>>   fs/smb/client/file.c | 18 ++++++++++++++----
->>>   1 file changed, 14 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
->>> index 389083f9ce00..05aeb9d94ffe 100644
->>> --- a/fs/smb/client/file.c
->>> +++ b/fs/smb/client/file.c
->>> @@ -1012,10 +1012,20 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
->>>                          server = tcon->ses->server;
->>>                          rc = server->ops->set_file_size(xid, tcon,
->>>                                                          cfile, 0, false);
->>> -               }
->>> -               if (!rc) {
->>> -                       netfs_resize_file(&cinode->netfs, 0, true);
->>> -                       cifs_setsize(inode, 0);
->>> +                       if (!rc) {
->>> +                               netfs_resize_file(&cinode->netfs, 0, true);
->>> +                               cifs_setsize(inode, 0);
->>> +                               cifs_invalidate_cache(inode, 0);
->>> +                       }
->>> +               } else {
->>> +                       /*
->>> +                        * No cached handle; the server truncates as part of the
->>> +                        * O_TRUNC open request that follows.  Evict stale pages
->>> +                        * from the page cache now so they cannot be served as
->>> +                        * stale data after the file is later extended; i_size is
->>> +                        * updated from the server's open response.
->>> +                        */
->>> +                       truncate_inode_pages(inode->i_mapping, 0);
->> truncate_inode_pages() expects both ->i_rwsem and ->invalidate_lock to
->> be held. Please check the comment of truncate_inode_pages().
-> Frank, please resend with the expected locks held.
+Move the netfs_resize_file() and cifs_setsize() into the 'if
+(cfile)', so they only run after a successful set_file_size.
 
-Sorry, I thought I had.  I will do this now.
+In the no-handle else branch, evict stale pages with
+truncate_inode_pages before the O_TRUNC open to dispose of old
+cache pages, and let the open response set the i_size.
 
+Fixes: 110fee6b9bb5 ("smb: client: fix missing timestamp updates with O_TRUNC")
+Cc: stable@vger.kernel.org
+Signed-off-by: Frank Sorenson <sorenson@redhat.com>
+---
+v5 changes:
+ - take inode_lock/filemap_invalidate_lock as required
 
-(note: patch 2 of this series has already been taken, so I'll just 
-resend v5 of this patch)
+ fs/smb/client/file.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 389083f9ce00..100acc76e9be 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -1012,10 +1012,26 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
+ 			server = tcon->ses->server;
+ 			rc = server->ops->set_file_size(xid, tcon,
+ 							cfile, 0, false);
+-		}
+-		if (!rc) {
+-			netfs_resize_file(&cinode->netfs, 0, true);
+-			cifs_setsize(inode, 0);
++			if (!rc) {
++				inode_lock(inode);
++				filemap_invalidate_lock(inode->i_mapping);
++				netfs_resize_file(&cinode->netfs, 0, true);
++				cifs_setsize(inode, 0);
++				filemap_invalidate_unlock(inode->i_mapping);
++				inode_unlock(inode);
++				cifs_invalidate_cache(inode, 0);
++			}
++		} else {
++			/*
++			 * No cached handle; evict stale pages so they can't
++			 * be served after the file is later extended; let
++			 * the server's O_TRUNC open response set the i_size
++			 */
++			inode_lock(inode);
++			filemap_invalidate_lock(inode->i_mapping);
++			truncate_inode_pages(inode->i_mapping, 0);
++			filemap_invalidate_unlock(inode->i_mapping);
++			inode_unlock(inode);
+ 			cifs_invalidate_cache(inode, 0);
+ 		}
+ 	}
 -- 
-Frank Sorenson
-sorenson@redhat.com
-Principal Software Maintenance Engineer, filesystems
-Red Hat
+2.55.0
 
