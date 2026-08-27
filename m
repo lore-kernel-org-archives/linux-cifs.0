@@ -1,47 +1,45 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE9F379960
-	for <linux-cifs@vger.kernel.org>; Thu, 27 Aug 2026 02:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF93F3002AB;
+	Thu, 27 Aug 2026 02:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787797250; cv=none; b=jFqu7OWdadFaraUoetpwp/R0JvcSkiYzPn+3U5sJQzkqt3FBwO9oW9+z0RWYdVOGiNu7BRe3IYpGtf96aZqrVSPj7bEJm2qpMtveSL0pdKw+PE6xHZF+KZLvyBSjclXdrVE8Q/vcK0TsjF6cGhwgYf09LUQ5Xhp/DPw0QrFG8Q0=
+	t=1787797322; cv=none; b=QLBoJ9lE0zPKy3R8TwADjoI6Kl80llpjU3XFVbYJQHbsZmiZcY6lkQVHY0d39X0pMIj0t7aCX+hQNrxXTUZ6kmqbFQcZ7xYdSYkEN4l0cGUR77iKyi/GBUw8Geo4XIGtOd1HYix+jx1HQp2PXFEJRPLBKISohcSM5rg91IxyCPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787797250; c=relaxed/simple;
-	bh=smelnvJdld3RwoYrDm2oD04K5vzKubxj35kDRdsAOnk=;
+	s=arc-20240116; t=1787797322; c=relaxed/simple;
+	bh=SqePja7J/dEwuLLdIfh3YM2PPXtRMbBxzfhKtZRuQlE=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=kggVEkkROBG9sUUCLh96sg4L1IBQ/ZeH56GM7kGQIYG+NGBQ2V6t9pnWkDPLD0qJ8T/uIsOenibet/q6nLH6DvU395EYATfhEr35u8Wg3zPk/PvgT1KJLhWhW/5z2LsOx6hpK3KB0FWwvcG4sqGxON2lh+BYvrAio7Cf+3iOKUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=V7qPElPq; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version:Content-Type; b=k6vfHnCrjO6yCgpEGUVsUvr42CjApOCLDz9A/XcZ+orf4eugFOtV2oRleW70k3QZDwngQoFRDwxtaM8ZtFUdAhaxGREnN51CFvkRoMf2GPUBuehTnXrCQoL2Muk1aoAmLV2FNGo3HcDw7rvrMPXFu4kmpUUz6uxoBufxWc7PqQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=7dkyYzcV; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="V7qPElPq"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="7dkyYzcV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=smelnvJdld3RwoYrDm2oD04K5vzKubxj35kDRdsAOnk=; b=V7qPElPqI1dWMLHi1+ASA33bw9
-	MZ7S+7g3d4y2bp+GdlU0ucLQez+td/G6l2gf2owreD594NPiVZm4Hvf/rSOqMambxFYKe4JtjenA6
-	nUKQQoDBvXIgVYbySC6+3AyxhDLz3oQYVj8OhvThVmeI92Z3ZgIz00cw8CTCjBkiS4UEq/PJMDzoQ
-	7sDK/cCnRbolwRiOpoQWZt1kuU5GggWyWB2cOwGec7Lvqd0piKx+aBGFLhhrteWbBp9JNmDO4+z7V
-	T3XYg7Ty36h66yHJPXq/298wSd+4N0OgKIALe/lHA7hLbt2GXVHjRrksYRoZL53EP7uPg1jGFk7n+
-	PMc9uUXg==;
+	bh=QmPQRrUM2Ux/UrcDLf/3vOa5K/fkoAKcK35/7yi/VJo=; b=7dkyYzcV/tdEy7jNtilRZ4pE2Q
+	w7RfQ7Vz1OslifSoT2bOJxzBSCqeaqdh+O8ZBTr6cKkldHhTdLg8KthNAnQBWG5aKTEDHQK8htidh
+	5GJtAlmFLMzXrc+8QS9mv2VhR+DPgwCoRsO8tAuEH9ah39HvA8AuSpdCgvNJG2rqS2+qi9cHLsDk3
+	0y5OqGH7dZJ4j7pbJ7dd4YEinv986sTghXBjHOCEyP4rK1Lh6AgPkCaFJwPpVFvSlErf5wd2A++b4
+	iWG/QKVBoqh2q8noVA+gL6rawbVN9GaHhQxs55g0PZBbz7ciWIKqHkucqYqsPl3+5L4WVYlP0JOnt
+	X46yztjw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1wzPjT-000000004iz-18HS;
-	Wed, 26 Aug 2026 23:20:47 -0300
-Message-ID: <461661292820743c54bd8d67bc0f36bf@manguebit.org>
+	id 1wzPkd-000000004ja-0Ea1;
+	Wed, 26 Aug 2026 23:21:59 -0300
+Message-ID: <07d440fa8ba8fcdbd8ca1b5ed5988ba2@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
-To: Huiwen He <huiwen.he@linux.dev>, linkinjeon@kernel.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, senozhatsky@chromium.org, dhowells@redhat.com,
- chenxiaosong@kylinos.cn
-Cc: linux-cifs@vger.kernel.org
-Subject: Re: [PATCH v3 7/7] smb/client: invalidate fscache for fallocate
- range operations
-In-Reply-To: <20260823151053.935889-8-huiwen.he@linux.dev>
-References: <20260823151053.935889-1-huiwen.he@linux.dev>
- <20260823151053.935889-8-huiwen.he@linux.dev>
-Date: Wed, 26 Aug 2026 23:20:46 -0300
+To: linux-cifs@vger.kernel.org
+Cc: Jacob Shivers <jshivers@redhat.com>, Ronnie Sahlberg
+ <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, Namjae Jeon
+ <linkinjeon@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH] smb: client: fix multiuser mount with krb5
+In-Reply-To: <20260824195912.634526-1-pc@manguebit.org>
+References: <20260824195912.634526-1-pc@manguebit.org>
+Date: Wed, 26 Aug 2026 23:21:58 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -50,18 +48,16 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Huiwen He <huiwen.he@linux.dev> writes:
+Paulo Alcantara <pc@manguebit.org> writes:
 
-> From: Huiwen He <hehuiwen@kylinos.cn>
+> Customer reported that they could no longer mount their SMB shares
+> with multiuser mount option and krb5.  Turned out that the client
+> wasn't duplicating username option when creating multiuser
+> connections, therefore failing to retrieve credentials as
+> cifs.upcall(8) couldn't find them in keytab.
 >
-> smb3_zero_range(), smb3_punch_hole(), smb3_insert_range(), and
-> smb3_collapse_range() modify file contents through server-side range
-> operations. These operations discard the affected page cache, but leave
-> the FS-Cache cookie valid, so a later read may return data cached before
-> the range operation.
->
-> Fix this by invalidating FS-Cache after outstanding I/O has completed
-> and before modifying the file on the server.
+> Fix this by duplicating username option (if set) from original fs
+> context before creating multiuser connections with krb5.
 > ...
 
 Applied.
