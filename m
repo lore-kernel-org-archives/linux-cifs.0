@@ -1,33 +1,33 @@
-Received: from mta1.migadu.com (out-10.mta1.migadu.com [95.215.58.10])
+Received: from mta1.migadu.com (out-15.mta1.migadu.com [95.215.58.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2410B54781
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Aug 2026 07:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68934381B0D
+	for <linux-cifs@vger.kernel.org>; Fri, 28 Aug 2026 07:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787901688; cv=none; b=dpCNKUxvATKYzJfD17oS7FbYmrLVbOitqlsYlctBvXWN/3ySN41KRfFGeQWAHEDn/J3wkwKKIKQtx+rnLtAblrzSHzz8iwHUv6dAMt96KnDc/tLPYtQzM2nMWQQbsJI2w5ptEzwEg9Ox1qaMn7WmOqmhNDiLh+ybLK27IGegbaE=
+	t=1787901697; cv=none; b=Zk3Uwt3jKuk4OovBntnrv9GzUw4obhr1KkwSy09XxPv2tUDd0mbRKdhJQyYQpTawHL3G2Y12oiSTJ2/Nm64/qKHGok8BB2sNQnEy1MGebNHuuLD3ZP8k2P1fQFnoBu3fEf10FTquBprWqjcoNHf6NOeGLnH6p9u8KEA657Iu+Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787901688; c=relaxed/simple;
-	bh=O2QY0yYXqqiFvGSGxE17LLRKTsTzfvvg6OzjE5B3TU0=;
+	s=arc-20240116; t=1787901697; c=relaxed/simple;
+	bh=3nDLJrgcubBdmyTxcDTAAxsYdazICC3gJZf3719S0Dc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=evmzzYTEpqS0LR77ZeS8bVRC5j+y6Ox6luIt7y0IHr/hXmqhPhj+mx+Y0tsmyLivvuhcOSL9GxSyXnI0ZhQaZrchZsnudmER+a8H+7cvgPnxbYX16vqDqAZ9TbO7rNo0dX1jmp4AZnf7yXszr6vwpJ33nZbNcDPbMRgb2/HwaVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bGeQ9V24; arc=none smtp.client-ip=95.215.58.10
+	 MIME-Version; b=T7q1NCdFTa7v56JWMoaqncYa9pZzYmhAqovYiDlxltX5JnouqoCcaarTbQprAnFjr3uD11oBY7R4BpJwl2Fiq03tslQr1/SPE9A5zoQbWEdHqioVr3/jTXLQL0e0duHNRwCQn+4K9LwL0xWdqMAHMBGHqG+WvkvlJdZyS1MmqIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MLsq/MfL; arc=none smtp.client-ip=95.215.58.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bGeQ9V24"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MLsq/MfL"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=O2QY0yYXqqiFvGSGxE17LLRKTsTzfvvg6OzjE5B3TU0=;
+DKIM-Signature: a=rsa-sha256; bh=3nDLJrgcubBdmyTxcDTAAxsYdazICC3gJZf3719S0Dc=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787901684; v=1; x=1788506484;
- b=bGeQ9V24hZMKMa/JPTQI4i/4wHKkFeC7g6BWHJ2bGUQp9Z6ZsrUBP3iMPg9x0Ghob59h8zRS
- kjs/ROJrC8kTEPAJSzw5UgC1Ij2haTwdGDeoiGfxn1HByGJBKzMaaIxV+QPl0OxyfGPWjnvsyBa
- Qni0KjsoBEU7JWEqEf/sNtt0=
+ t=1787901693; v=1; x=1788506493;
+ b=MLsq/MfLFS2cjsGkCvwCqKdBQi0iKyB/HazGMIZ528UGk2QCScAuCsN1sEdEplnHosQ4yCYJ
+ P1Yfhc+Vi1t2LljG59FZmRuTFs1aW2Y11gZS2got7nwBRQegGu85w4jEdDApD0DrwOTorqwGemA
+ TA27XEBeavOVYL+Eaa3gNLao=
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 7673b1ac1386f03d;
-	Fri, 28 Aug 2026 07:21:24 +0000
-X-Mizu-Trace-ID: 7673b1ac1386f03d
+Received: by smtp.migadu.com with ESMTPS id d7d44cc6ab4025b1;
+	Fri, 28 Aug 2026 07:21:33 +0000
+X-Mizu-Trace-ID: d7d44cc6ab4025b1
 X-Migadu-Flow: FLOW_OUT
 From: Huiwen He <huiwen.he@linux.dev>
 To: linkinjeon@kernel.org,
@@ -40,9 +40,9 @@ To: linkinjeon@kernel.org,
 	dhowells@redhat.com,
 	chenxiaosong@kylinos.cn
 Cc: linux-cifs@vger.kernel.org
-Subject: [PATCH v4 6/7] smb/client: fix stale page cache in insert/collapse range
-Date: Fri, 28 Aug 2026 15:19:34 +0800
-Message-ID: <20260828071935.552165-7-huiwen.he@linux.dev>
+Subject: [PATCH v4 7/7] smb/client: invalidate fscache for fallocate range operations
+Date: Fri, 28 Aug 2026 15:19:35 +0800
+Message-ID: <20260828071935.552165-8-huiwen.he@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20260828071935.552165-1-huiwen.he@linux.dev>
 References: <20260828071935.552165-1-huiwen.he@linux.dev>
@@ -56,110 +56,103 @@ Content-Transfer-Encoding: 8bit
 
 From: Huiwen He <hehuiwen@kylinos.cn>
 
-smb3_insert_range() and smb3_collapse_range() use
-truncate_pagecache_range() to invalidate the affected page cache.
-However, if off or old_eof is not page-aligned, the boundary pages are
-only partially zeroed and remain uptodate. As a result, the client may
-return stale data after a successful insert/collapse range operation.
+smb3_zero_range(), smb3_punch_hole(), smb3_insert_range(), and
+smb3_collapse_range() modify file contents through server-side range
+operations. These operations discard the affected page cache, but leave
+the FS-Cache cookie valid, so a later read may return data cached before
+the range operation.
 
-For example, with 4K pages:
+Fix this by invalidating FS-Cache after outstanding I/O has completed
+and before modifying the file on the server.
 
-    page 0          page 1          page 2
-    0------4K       4K------8K      8K------12K
-       ^                                ^
-    off=2K                       old_eof=10K
+Run the following as root on a CIFS mount with fsc enabled and an active
+CacheFiles backend:
 
-Page 1 is removed from the page cache, while the boundary pages are
-only partially zeroed. After COPYCHUNK moves the data on the server,
-these cached pages may still return stale data.
+        bash -c '
+                MNT=/mnt/cifs
+                FILE="$MNT/repro"
 
-This can be reproduced on a CIFS mount:
+                # Generate four 1 MiB random blocks: [A][B][C][D].
+                dd if=/dev/urandom of=/tmp/src bs=1M count=4 status=none
 
-    bash -c '
-            FILE=/mnt/scratch/repro
+                # Expected contents after zeroing B: [A][zero][C][D].
+                cp /tmp/src /tmp/expected
+                dd if=/dev/zero of=/tmp/expected bs=1M seek=1 count=1 \
+                        conv=notrunc status=none
+                cp /tmp/src "$FILE"
 
-            # Use a 6 KiB file so EOF is not page-aligned.
-            dd if=/dev/urandom of=/tmp/src bs=1K count=6 status=none
+                # Populate FS-Cache, then discard the page cache.
+                sync
+                echo 1 > /proc/sys/vm/drop_caches
+                cat "$FILE" > /dev/null
+                sync
+                echo 1 > /proc/sys/vm/drop_caches
 
-            # Expected: a 4 KiB hole followed by the original data.
-            rm -f /tmp/expected
-            truncate -s 4K /tmp/expected
-            cat /tmp/src >> /tmp/expected
+                fallocate --zero-range -o 1M -l 1M "$FILE"
 
-            cp /tmp/src "$FILE"
+                if cmp -s /tmp/expected "$FILE"; then
+                        echo "readback: OK"
+                else
+                        echo "readback: STALE DATA"
+                fi
+        '
 
-            # Prime the page cache before moving data on the server.
-            cat "$FILE" > /dev/null
+Before this change, the readback differs from /tmp/expected:
 
-            fallocate --insert-range -o 0 -l 4K "$FILE"
+        readback: STALE DATA
 
-            if cmp -s /tmp/expected "$FILE"; then
-                    echo "readback: OK"
-            else
-                    echo "readback: STALE DATA"
-            fi
-    '
+After this change, it matches:
 
-Fix this by writing back dirty data and discarding the page cache from
-the start of the page containing off to EOF before moving data on the
-server.
+        readback: OK
 
-Fixes: 9c8b7a293f50 ("smb3: fix temporary data corruption in insert range")
-Fixes: fa30a81f255a ("smb3: fix temporary data corruption in collapse range")
+Fixes: 30175628bf7f ("[SMB3] Enable fallocate -z support for SMB3 mounts")
+Fixes: 31742c5a3317 ("enable fallocate punch hole ("fallocate -p") for SMB3")
+Fixes: 5476b5dd82c8 ("cifs: add support for FALLOC_FL_COLLAPSE_RANGE")
+Fixes: 7fe6fe95b936 ("cifs: add FALLOC_FL_INSERT_RANGE support")
 Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/client/smb2ops.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ fs/smb/client/smb2ops.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 4676c5fe54ba..ae9c2b7a2611 100644
+index ae9c2b7a2611..3e93fd002046 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -4026,15 +4026,22 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
- 	}
+@@ -3550,6 +3550,9 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
+ 	if (keep_size == false && !CIFS_CACHE_READ(cifsi))
+ 		goto zero_range_exit;
  
- 	filemap_invalidate_lock(inode->i_mapping);
--	rc = filemap_write_and_wait_range(inode->i_mapping, off, old_eof - 1);
-+	rc = filemap_write_and_wait_range(inode->i_mapping,
-+					  round_down(off, PAGE_SIZE),
-+					  old_eof - 1);
- 	if (rc < 0)
- 		goto out_2;
- 
--	truncate_pagecache_range(inode, off, old_eof);
-+	netfs_wait_for_outstanding_io(inode);
-+	/*
-+	 * Invalidate cached folios from the page containing off to EOF before
-+	 * moving data on the server, so subsequent reads do not see stale data.
-+	 */
-+	truncate_pagecache_range(inode, round_down(off, PAGE_SIZE), -1);
++	fscache_invalidate(cifs_inode_cookie(inode), NULL,
++			   i_size_read(inode), 0);
 +
+ 	rc = smb3_zero_data(file, tcon, offset, len, xid);
+ 	if (rc < 0)
+ 		goto zero_range_exit;
+@@ -3619,6 +3622,8 @@ static long smb3_punch_hole(struct file *file, struct cifs_tcon *tcon,
+ 	 */
+ 	truncate_pagecache_range(inode, offset, offset + len - 1);
+ 	netfs_wait_for_outstanding_io(inode);
++	fscache_invalidate(cifs_inode_cookie(inode), NULL,
++			   i_size_read(inode), 0);
+ 
+ 	cifs_dbg(FYI, "Offset %lld len %lld\n", offset, len);
+ 
+@@ -4038,6 +4043,7 @@ static long smb3_collapse_range(struct file *file, struct cifs_tcon *tcon,
+ 	 * moving data on the server, so subsequent reads do not see stale data.
+ 	 */
+ 	truncate_pagecache_range(inode, round_down(off, PAGE_SIZE), -1);
++	fscache_invalidate(cifs_inode_cookie(inode), NULL, old_eof, 0);
+ 
  	spin_lock(&inode->i_lock);
  	netfs_write_zero_point(inode, old_eof);
- 	spin_unlock(&inode->i_lock);
--	netfs_wait_for_outstanding_io(inode);
- 
- 	rc = __smb2_copychunk_range(xid, cfile, cfile, off + len,
- 				    old_eof - off - len, off);
-@@ -4094,11 +4101,17 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
- 		goto out;
- 
- 	filemap_invalidate_lock(inode->i_mapping);
--	rc = filemap_write_and_wait_range(inode->i_mapping, off, new_eof - 1);
-+	rc = filemap_write_and_wait_range(inode->i_mapping,
-+					  round_down(off, PAGE_SIZE),
-+					  old_eof - 1);
- 	if (rc < 0)
- 		goto out_2;
--	truncate_pagecache_range(inode, off, old_eof);
- 	netfs_wait_for_outstanding_io(inode);
-+	/*
-+	 * Invalidate cached folios from the page containing off to EOF before
-+	 * moving data on the server, so subsequent reads do not see stale data.
-+	 */
-+	truncate_pagecache_range(inode, round_down(off, PAGE_SIZE), -1);
+@@ -4112,6 +4118,7 @@ static long smb3_insert_range(struct file *file, struct cifs_tcon *tcon,
+ 	 * moving data on the server, so subsequent reads do not see stale data.
+ 	 */
+ 	truncate_pagecache_range(inode, round_down(off, PAGE_SIZE), -1);
++	fscache_invalidate(cifs_inode_cookie(inode), NULL, old_eof, 0);
  
  	rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
  			  cfile->fid.volatile_fid, cfile->pid, new_eof);
