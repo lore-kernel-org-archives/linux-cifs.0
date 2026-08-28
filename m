@@ -1,78 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B9527466A
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Aug 2026 16:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3A3396B8C;
+	Fri, 28 Aug 2026 23:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787933829; cv=none; b=hv1bdnwVF8Z6HIvgUwvLVcgerbqrrc1iTNrGhr8gcR6fBcf3yuSUxet1MYNibNUWAFtFMtPqUI4Yu4HnFT7WVH2zGJyV2DwAZm5mzYsGZPNVlHWiFwxgheSEPNHySq4T/Stb1CRs8fhyj6cLBoduqrRw7K5FQWV/OhlvUa3O6Jo=
+	t=1787958663; cv=none; b=aqjNyHENaT72GR9L40Xz0zpTZbTPQ+BMlLA9IuwuLHc3b6g76Vx1O5BFgs6p4T9UFqsDKuq8moABOo3KC4gSXYVYQYESPeE53x/lvb1NbdZqt2xmpcIQB2yTa+clPXJYkZe4tqVtebGC6jo2/ZEybnZMbcmp3oMs57kgik/Lr4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787933829; c=relaxed/simple;
-	bh=Nh1zOZ4rMtBskj60/Ea57iYsw/WbxlC0Hdk4OcEXXRA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YKazBsXNfWwndzqojjvtarnbxemPogvKMMp477wkIdgHGAJsxSKcJuHPxvPWuGOqlmuU89is+04OcKmjDQV6MlM0RYZb1XrqMdf4GyRMFPZSomNV8m3hu69txIXlYMBY/7RDSEOucP/hHd9pHKzJjwVqNGPnIsmirYczu8N8G1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXPiT2+B; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787958663; c=relaxed/simple;
+	bh=i/OHBM4lAjVh263PMpyHhngwq9F1GgbFCw7P7SopbFg=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=enXqDtxlqvzNARWM+C4pMflfskMCtuhejWkp+lbZIpiI1iadbtXwxoQqda/NJsuGCH/Xsme3w+u9n5ZI7Y5WD8wo6r06LwTPPWC341xT9DXG/Kczv+MYfET6PMki4Y7wE4R/41XZnVTWJ61EUs+3cKo94Z0Z5+5F6CI/ngBTyhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=5sLzWqKc; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXPiT2+B"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32ECF1F000E9
-	for <linux-cifs@vger.kernel.org>; Fri, 28 Aug 2026 16:17:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787933828;
-	bh=tHgdtXBbvJTF6KXsPTkqaN0c+COf6GNFi5TDtsEOH5o=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=ZXPiT2+BnAw4OdNLUfNfr/rGhMH+lzrgmUUwZooSLr4uS5rqMmP2xAbBEMzIUw6WX
-	 g8MdHMHynyRnYwYkSeP83m01tsXi138mJDaASlzzp0JCS6XorY21e/4OxEgpi05zun
-	 n6ZRsXywBTPlr9FFkhn93AzlxwNr0HydY472N5gzjm7anx9S+9+gouvNuo/Cw3iKUq
-	 aPuwqMbszvgtz8/25epqN2V0B2w8CeqAp7SdQcTivulEtaPtdwE1dvkTi224OVFEro
-	 y8D+Jyv8nPHJQAqp/mwUCtWahP+7njQaL+rYl5PrzzFcw9Svu/WR3SZFWQNSoqOsvE
-	 qmNJxycWdX7ng==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c1712a04ddaso170204666b.2
-        for <linux-cifs@vger.kernel.org>; Fri, 28 Aug 2026 09:17:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RojhT6EK6YO2Bv9w4DyXL2spztaabUUv/yJpvzmr1Ff1x8wvum7+g2jI+Gfr9ftLh2O7eBUfaXUKm6t@vger.kernel.org
-X-Gm-Message-State: AFuF++k/gIYHGIjvxiLZzYnaH/PTPdUkhc1Wm1k9uxRb7KKXRVnetW59
-	vv+w5IB6IjRnbmaw7O2jajXJZZf73SAmGcfiPuIyXdyTXZefEqLzb+WOVqzMnK8KQBlLrpoxfR0
-	br9AIILwArwYYXoaWdaRiOsNkZT3asns=
-X-Received: by 2002:a17:907:c78f:b0:c24:e0dc:8b66 with SMTP id
- a640c23a62f3a-c2556c7d3a5mr641933166b.6.1787933826843; Fri, 28 Aug 2026
- 09:17:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="5sLzWqKc"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=CKYG8glDfP9v+8wmhv+Y/Tb5gVd1pW5HMJCOFmbq68E=; b=5sLzWqKcMTId/rm9Q2fadOdH+O
+	f4h+/ZFtVpdTeRo4kA1PlE8AoyIs3rLY3JsdQz5+c/Zo8fPoso6976swE0m4ClMq0v8RXOT5lci2I
+	PbEFdaht5qzKKAVUqrO0YSPPgWIEYRi7LFqWOoI3PwzGA2wOraqfrOyA67h8Foxc7lkt92sOVTq0d
+	2JrSipndB3hxii2JheAzOJZ3clHqQyDrzqCznleZSV9Ho/mTQqBp7x5Zh+p7JsEvS+wbJKjBRn930
+	cc+YWpmU612F8RMZNU+ZAJHy2thI3SeSMLB/1AVtvo1Dnh0ksOc0ikjADZyaoCMgl7F3R4GMdmTms
+	NjW2mGkQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1x05im-00000000CN7-1cB1;
+	Fri, 28 Aug 2026 20:10:52 -0300
+Message-ID: <553e932a490242f297ef212b1e6ddcdb@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Frank Sorenson <sorenson@redhat.com>, linux-cifs@vger.kernel.org
+Cc: linkinjeon@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v5] cifs: don't update i_size in cifs_do_truncate
+ without a cached handle
+In-Reply-To: <20260827015738.79123-1-sorenson@redhat.com>
+References: <c5ae6c999664ec603d3ca6aa8a226439d89eed48@manguebit.org>
+ <20260827015738.79123-1-sorenson@redhat.com>
+Date: Fri, 28 Aug 2026 20:10:51 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260825135108.716663-1-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 29 Aug 2026 01:16:55 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd--bjiEic5WCTy2T-C7A7Jo59quAf=KX=Zx3ra2GQJCWg@mail.gmail.com>
-X-Gm-Features: AcwNN1VoK-MwmLV8v6Zk4RO25A5BIU_ePNsWIIX6pCtJoAtXpDXqWqy1xde5hk4
-Message-ID: <CAKYAXd--bjiEic5WCTy2T-C7A7Jo59quAf=KX=Zx3ra2GQJCWg@mail.gmail.com>
-Subject: Re: [PATCH v5 0/3] ksmbd: refactor smb2_notify() to a blocking wait
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Tue, Aug 25, 2026 at 10:51=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
+Frank Sorenson <sorenson@redhat.com> writes:
+
+> If find_writable_file() returns null, cifs_file_flush will return
+> 0 without issuing set_file_size, and the outer 'if (!rc)' block
+> will set i_size to 0 before telling the server to truncate.  If
+> the cifs_open() then fails, the inode will have size 0, while
+> the server file is unchanged.
 >
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Move the netfs_resize_file() and cifs_setsize() into the 'if
+> (cfile)', so they only run after a successful set_file_size.
 >
-> v4->v5: Rebased on ksmbd-for-next branch.
->
-> v4: https://lore.kernel.org/linux-cifs/20260809161916.1071530-1-chenxiaos=
-ong@chenxiaosong.com/
->
-> ChenXiaoSong (1):
->   smb/server: support compound fid in notify requests
->
-> Gael Blivet (2):
->   ksmbd: temporarily remove interim-work change notify handling
->   ksmbd: refactor smb2_notify() to a blocking wait
-The smbtorture failure was caused by 0002 patch removing the signing
-path in  smb2_send_notify_cancelled(). I combined patches 0002, 0003
-and the signing path into a single patch.
-And I will apply them to #ksmbd-for-next.
-Thanks!
+> In the no-handle else branch, evict stale pages with
+> truncate_inode_pages before the O_TRUNC open to dispose of old
+> cache pages, and let the open response set the i_size.
+> ...
+
+Applied.
