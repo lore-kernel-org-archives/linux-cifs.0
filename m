@@ -1,85 +1,85 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5D64078DE
-	for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 16:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C83175A74
+	for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 16:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788020781; cv=none; b=cXEGKgYNKVh06sY7KiD9qFhZwHt5WO6CLyRZUtFSZ3JjExHBsL4KeA10mmtMaO6x/UA1HPrmGBivI+m37x3ToDoqxEwcKbdqEXXlDGwQC0AT83IyiFrRsQgg+WzkLiRWpsYhtYGccs/601oOZEh6Mh6oV0nMS78eXh3NP1EW9Xg=
+	t=1788022366; cv=none; b=He+RNsBl5tvgoWZpMNF6TRmkMdLPLGFqJURG2ORyzwNJBzkqKFMv6EloweXsCfc0tzn7PluxQ0g44YjRq7rcLPE7oxealX1XKnfzN10jVgD+b5zR0B+hS2pajbnyBEYmRjg0W0IAT1gWs0IVD7FcMHyaBEP9R/pwbHXCwmO+/hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788020781; c=relaxed/simple;
-	bh=5bR150FonEhgq898E4phhk0OEo9sB3sk2J9h59+uRUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bdygqt+s5Xw1G0kLoY8WlJj1S+wB9xz2LsNj+BSNp2FjPf5yywW7RPwX+H59L/nzdLlJMlVMSHIz6TK7RoKv9+Y66XATWQWEzyhWp1fjZHyb/Yh0eu6N0H/jL5Eo8YixAqeqoDu55ojohhHA+emEd0pVOEMAwHW4GTBJMRuZVPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ivy4PC2B; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HYRdmgsj; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1788022366; c=relaxed/simple;
+	bh=1yKwZ6ZvkRR6i5NPWjGVEMUG4997wUO12yeLzomVEHk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KkvU+AQMpxuo7wKs+mOX4ud2GiI3nsWfopOaxPmybQI5RqIlcl9mHXxFC1M581Zy8OVQe2Qoz+p+pGluj/1YXjWrC50tdHhTHka5JThhxq0q62w/5t0S/UPH5i2yqI8N92jLIVxuQ+Q0JJwrsqqGquTdvrHzaz7qOD+8Z+z0Oto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jAZ4iFM9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fldFLEwk; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ivy4PC2B";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HYRdmgsj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jAZ4iFM9";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fldFLEwk"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788020772;
+	s=mimecast20190719; t=1788022364;
 	h=from:from:reply-to:reply-to:subject:subject:date:date:
 	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
 	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=In8PJoJM7TuliZupFW2/GUoBwBsuu3ZJ9uWEGEaBgFk=;
-	b=Ivy4PC2BHZWtJ0NlD5PkfMQSTQnwCfzesHdYGpD04D+nGEo3WcOaNwOPgqZsm9QXnNMMq0
-	ZVXkRgf0fu/jDyQ0MomhP4qHjZPGmlW7IZoq+GD8EFgLTe/UG8CZ/iLTilYb0M9PLYo6Fr
-	yMz4uV+Qs5MpZ2cVogHrVxAFCP0yBjk=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OjinuWNCoCWPerwCVDP7RZ6stRlkZpmuayoAvTI4RDI=;
+	b=jAZ4iFM9F0KCDckPZr8uhnxXbnyqXE+qo7KSMdXPa08l0/I4JrPWPSmryOG4gdYDRNAsrv
+	U8uK1zQdcVAhCLy+RBvp5INuO4z3fumXS4lzXZJbXUbpxv8cD9JanYU3X4sAI8ACMhmJ6f
+	CrQWa4PrK8WsNXJHJs1R1+pGkhw+bUs=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-fpy3NzB2NsKdJyyRROJaIA-1; Sat, 29 Aug 2026 12:26:11 -0400
-X-MC-Unique: fpy3NzB2NsKdJyyRROJaIA-1
-X-Mimecast-MFC-AGG-ID: fpy3NzB2NsKdJyyRROJaIA_1788020771
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-90e7db8d191so9499216d6.1
-        for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 09:26:11 -0700 (PDT)
+ us-mta-90-MHyqvo1nOcKNKrwCJwrFfA-1; Sat, 29 Aug 2026 12:52:42 -0400
+X-MC-Unique: MHyqvo1nOcKNKrwCJwrFfA-1
+X-Mimecast-MFC-AGG-ID: MHyqvo1nOcKNKrwCJwrFfA_1788022362
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-936708f129aso233636185a.0
+        for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 09:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1788020770; x=1788625570; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1788022362; x=1788627162; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :references:cc:to:from:subject:reply-to:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=In8PJoJM7TuliZupFW2/GUoBwBsuu3ZJ9uWEGEaBgFk=;
-        b=HYRdmgsjl0eBZWTq+N0qCpFFFxe0JFHLzw8vnTIclFwjZtMgTt7HK7OrkT1NDyb9jt
-         XMxHp81To9CS8u9FF4xQRvylMY75JBmwHOusnWKEEYqgevtzxZ6s9QDCDyRH8cZRsmCe
-         92I5lQssibkmjV7uS31LHvPUAYjNyrLm0gne9t3f5GvXXwJFcsm3dZpjWR7xe+8Vraoj
-         rAOBs3j/YLVW0UG1DViFA6BfRSz4vh9m+WGtrFW0bXXHREozwmUVj2Q8Vujlwl+m4KnK
-         pTOinLAig51o3OA5a+HBPg/6X20FVEOaPbsygOzn4gXHNRURXgyxan6h1Aqa10FngDQ/
-         Pw2Q==
+        bh=OjinuWNCoCWPerwCVDP7RZ6stRlkZpmuayoAvTI4RDI=;
+        b=fldFLEwkCxG6KPtP6zSm+FXKGM50ZOQYCvWIPiV1r0G/E6CiQKSKzQ47gblwah5W5i
+         9PaA2Z19w+cJoJMP5jC7D1GVHVI6+vBARZThHXOu/hV8byhapZvyrVXkIZ2P7wZwhBAN
+         whICqOb9x8ou9t8CD3q9B0guaoY0cY391hIGs2Bw24DcwCFWlezqrLM5qDSt+VFJRceb
+         YBObaEN40U3Oz+jrGIYLo3P83X/Y4KeObHs7cSlAIt9RBANU08AVuJj9NCx8Ug8ESW3c
+         Xa1ZpBVdPnvu6DDIpbm5w89RgGY97tF8r1zeKfLBQWgxqj3Q0lSTdoyv1NsnQYJnCxCj
+         881g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788020770; x=1788625570;
+        d=1e100.net; s=20251104; t=1788022362; x=1788627162;
         h=content-transfer-encoding:content-type:in-reply-to:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :references:cc:to:from:subject:reply-to:user-agent:mime-version:date
          :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=In8PJoJM7TuliZupFW2/GUoBwBsuu3ZJ9uWEGEaBgFk=;
-        b=Irpy9DJzJ9WxBdyYYyyKYhKdG9E4qBC1mNZb3EV+jrc+r2gR5Xy8CI22rzx2AnIrKW
-         4Qa++JjqdLDFsXbSjNNso4qoKirhKETQdp4Mpr7/fMtB9ciqC2Gbikgx++uTsyCCRslf
-         xgBnIKguYq/Bph6L5YggJ3HSVEgi/cZl/4ODshzAY2Y342+FLbGeG0VCbtFNvMX9XmEo
-         9HIFWGAMonrast7NvpBnFkwMDbPnkYRIW6KbnqDVn2483/l9N8/wBCmei+OkGPjZiZKA
-         OxYTxy2SO5/4AXkoSTPssqGQ+WWPSQGA5hHi3mi3uiszz+87Bnchzb+9wN+Ip6FiZRff
-         FiiA==
-X-Gm-Message-State: AFuF++kHCi+Ysi4/GP3/txWV+xD4XcJ6duVDggBEC3FNf2l3y0yiiiIa
-	TjH21fxumCnI4bu+hamjl239xyVvovkPo0dS3qTmsmvH3fxyWtG9u1fbOFONc2jgpkyeqQkS1iS
-	W9NbU9/G+dGDtmMmIAJlSyEgp/a5z8Flip2NNbpcCQrHwAoN9bXcMchH7uOLl0T205HWbozs=
-X-Gm-Gg: AYBFou2avUxEsmtYLSXCSzouPPTtC+qS0HnEDk19ZfIDLn9tSMdAtngGjx6l35H0h4L
-	/mPwd5omgdSKDECwPUiXWeaG5LIprX1C9vruVub5e2Nm0CVuN5Wi/fmw1v+UL7aCCYqtP9FamkQ
-	KIkUFrTQEorLQ7xDVvRCLR/suWpwWvwW+TGB6TLBxYhWyZbxcNomlD6HkYUf0qbku6Vvvb23q01
-	RoTZyn5d0Xewk7hlnDvb1QRG51gVeFpg56D+lo+xM9A3G2bPOCvHSJVFpFqo5gc0ZZHsfAGY7GU
-	w4Njhoe+wSjJHhfHAkvHs85akpDy5tcRr05pXE5a0kIDPQZJ+OeZGHTPKZM6Y3MrwHxvA7kyvKl
-	zw6KftkfPbzKy0fth6jQIYF1rljG45NAD7TySKbhX
-X-Received: by 2002:a05:6214:6344:b0:90c:e135:51e6 with SMTP id 6a1803df08f44-90ce13553cdmr149410456d6.9.1788020770510;
-        Sat, 29 Aug 2026 09:26:10 -0700 (PDT)
-X-Received: by 2002:a05:6214:6344:b0:90c:e135:51e6 with SMTP id 6a1803df08f44-90ce13553cdmr149410066d6.9.1788020770092;
-        Sat, 29 Aug 2026 09:26:10 -0700 (PDT)
+        bh=OjinuWNCoCWPerwCVDP7RZ6stRlkZpmuayoAvTI4RDI=;
+        b=Tk51CJGvExwwRsF4Z6u/s29cZAk7uq2QratG8XsjLN1LIiRBwRDSVRJuN+GNcuq+ub
+         xI1Ah3cY89XRLSpZrCivx7/ek2YSQX7KObcRfaoJTHAazGKger4knj20q0pYrqCIjevZ
+         7rPLmBAeq2JFnHq/mRisF2Xad6ustQTDWgE3h5qbuOWYCLi9nYEx5WwMzAS8H1iP95l4
+         PqMqFZaXCfgFSc+SIHfJZrDJsNEvO+jgcbsBWt1h4czuoznE7EI2UJmNV25evEC1E3GY
+         CDXHanguS9qvpq/AbfTxpOMZnFtQ0zgwYwQth6CD1ZtUX3U5DMiEVl5xNPDaj9gV6FsC
+         xrEg==
+X-Gm-Message-State: AFuF++mofiqGUAfUKHSUiENIAo9Yx1DY5zq5j9by5CyxZpAOug+Rv4v/
+	Grf/4sdgTHFftjkglmYgM9dhSuMzp1VJre6PQpiQ2wg6JIlRZmJ1NLhR4zZU+VHAzgjLwy9UAva
+	nXyOMgNS3IA8eDI32GPGkIlzqouiFoYbRX5+fEUFAL9w+bK5wpiY+lgbMPNm3XkU=
+X-Gm-Gg: AR+sD11EoAXlJ23ZLktqD+QRgyjlNbRng6O5Y9jC4TyYSQ8nzQlcp3bhotl+jK0hk1e
+	KwAkcVQ3vd+t+vMTeFMT+eyN4wBFxcihr5E89049VDLU/jQQdEezMIahMG9NENk8tWmoKe9+RmZ
+	JMpDmCw/bOdUCRaNZgCYwHPDEQ8V54LZ1zBYEwT56TDFwx8sDVpPxQeth2TyOVn65fyBPDx/sqt
+	Zn3H+m1+8gvbUUtQdAsMjezeafU9dyPQoYHtv0sOPlX7TXS0hXwv9vpaYDG9W3ySE9SVJFoT+kK
+	BH1h1SMKLYq5SR+39w9I95Z/QT6v2Vfq3FAhq4VX0IioMWk06EtW67OQgajyZoaOyaGUJ+TAsP7
+	ON56rA1FziF06Jqzr+LcNrkzZaq40BwyPNKncCuJq
+X-Received: by 2002:a05:620a:6c0d:b0:938:fd60:4f9 with SMTP id af79cd13be357-939138ffdc0mr1669555185a.27.1788022362061;
+        Sat, 29 Aug 2026 09:52:42 -0700 (PDT)
+X-Received: by 2002:a05:620a:6c0d:b0:938:fd60:4f9 with SMTP id af79cd13be357-939138ffdc0mr1669550885a.27.1788022361613;
+        Sat, 29 Aug 2026 09:52:41 -0700 (PDT)
 Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90ce4534ebesm42678606d6.48.2026.08.29.09.26.09
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-939173db029sm393233285a.35.2026.08.29.09.52.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 29 Aug 2026 09:26:09 -0700 (PDT)
-Message-ID: <666879b8-5117-4c41-ab1d-e50637e68a5d@redhat.com>
-Date: Sat, 29 Aug 2026 11:26:08 -0500
+        Sat, 29 Aug 2026 09:52:41 -0700 (PDT)
+Message-ID: <9b064466-4403-4ced-b6f9-7f92829f3414@redhat.com>
+Date: Sat, 29 Aug 2026 11:52:38 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -90,92 +90,46 @@ User-Agent: Mozilla Thunderbird
 Reply-To: sorenson@redhat.com
 Subject: Re: [PATCH v3 11/11] smb: client: fix NameOffset and Next field
  validation in smb2_parse_contexts()
+From: Frank Sorenson <sorenson@redhat.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, stable@vger.kernel.org
 References: <20260826153147.4112943-1-sorenson@redhat.com>
  <20260826153147.4112943-12-sorenson@redhat.com>
  <CAKYAXd8_jvTz6DX-1OjkCu1UAe7qKKHKOyW7-yOqrqVtxC6dPQ@mail.gmail.com>
-From: Frank Sorenson <sorenson@redhat.com>
+ <666879b8-5117-4c41-ab1d-e50637e68a5d@redhat.com>
 Content-Language: en-US
-In-Reply-To: <CAKYAXd8_jvTz6DX-1OjkCu1UAe7qKKHKOyW7-yOqrqVtxC6dPQ@mail.gmail.com>
+In-Reply-To: <666879b8-5117-4c41-ab1d-e50637e68a5d@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
-On 8/29/26 9:01 AM, Namjae Jeon wrote:
->>                  case 16:
->> -                       if (posix && !memcmp(name, smb3_create_tag_posix, 16))
->> +                       if (dlen && posix && !memcmp(name, smb3_create_tag_posix, 16))
-> Could we check that dlen is large enough for the fixed POSIX fields
-> before calling parse_posix_ctxt()? It reads 12 bytes even when
-> DataLength is smaller.
+On 8/29/26 11:26 AM, Frank Sorenson wrote:
+>
+> On 8/29/26 9:01 AM, Namjae Jeon wrote:
+>>>                  case 16:
+>>> -                       if (posix && !memcmp(name, 
+>>> smb3_create_tag_posix, 16))
+>>> +                       if (dlen && posix && !memcmp(name, 
+>>> smb3_create_tag_posix, 16))
+>> Could we check that dlen is large enough for the fixed POSIX fields
+>> before calling parse_posix_ctxt()? It reads 12 bytes even when
+>> DataLength is smaller. 
 
-so this needs to be:
-                      if (dlen > 12 && posix && !memcmp(name, smb3_create_tag_posix, 16))
 
-I think we'll need similar before the calls to the 
-server->ops->parse_lease_buf:
-                     if (dlen && !strncmp(name, 
-SMB2_CREATE_REQUEST_LEASE, 4)) {                                   
-*oplock = server->ops->parse_lease_buf(cc, epoch,                       
-                                                    lease_key);
+make that 24 bytes for smb2 and 50 bytes for smb3
 
-for smb2: smb2_parse_lease_buf(void *buf, __u16 *epoch, char *lease_key) 
-{         struct create_lease *lc = (struct create_lease *)buf;         
-*epoch = 0; /* not used */         if (lc->lcontext.LeaseFlags & 
-SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE)                 return 
-SMB2_OPLOCK_LEVEL_NOCHANGE;         return 
-le32_to_cpu(lc->lcontext.LeaseState);
 
-/* See MS-SMB2 2.2.13.2.8 */ struct lease_context {         __u8 
-LeaseKey[SMB2_LEASE_KEY_SIZE];         __le32 LeaseState;         __le32 
-LeaseFlags;         __le64 LeaseDuration; } __packed;
+so if we test inside the version-specific function, can we simply return 
+0 if the DataLength is not large enough:
 
-for smb2, we only access through LeaseFlags (24 bytes), but the entire 
-struct is 32
 
-static __u8 smb3_parse_lease_buf(void *buf, __u16 *epoch, char 
-*lease_key) {         struct create_lease_v2 *lc = (struct 
-create_lease_v2 *)buf;         *epoch = le16_to_cpu(lc->lcontext.Epoch); 
-         if (lc->lcontext.LeaseFlags & 
-SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE)                 return 
-SMB2_OPLOCK_LEVEL_NOCHANGE;         if (lease_key)                 
-memcpy(lease_key, &lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);         
-return le32_to_cpu(lc->lcontext.LeaseState);
-
-/* See MS-SMB2 2.2.13.2.10 */ struct lease_context_v2 {         __u8 
-LeaseKey[SMB2_LEASE_KEY_SIZE];         __le32 LeaseState;         __le32 
-LeaseFlags;         __le64 LeaseDuration;         __u8 
-ParentLeaseKey[SMB2_LEASE_KEY_SIZE];         __le16 Epoch;         
-__le16 Reserved; } __packed; and for smb3, we'll need through Epoch, so
-
-     SMB2_LEASE_KEY_SIZE + 4 + 4 + 8 + SMB2_LEASE_KEY_SIZE + 2 = 50,
-
-with the entire struct being 52 bytes
-
-and also before the call to parse_query_id_ctxt():
-                           } else if (dlen > 16 && buf &&               
-                        !strncmp(name, SMB2_CREATE_QUERY_ON_DISK_ID, 4)) 
-{                                   parse_query_id_ctxt(cc, buf);
-parse_query_id_ctxt(struct create_context *cc, struct smb2_file_all_info *buf)
+smb2_parse_lease_buf(void *buf, __u16 *epoch, char *lease_key)
 {
-         struct create_disk_id_rsp *pdisk_id = (struct create_disk_id_rsp *)cc;
+     struct create_lease *lc = (struct create_lease *)buf;
 
-         cifs_dbg(FYI, "parse query id context 0x%llx 0x%llx\n",
-                 pdisk_id->DiskFileId, pdisk_id->VolumeId);
-         buf->IndexNumber = pdisk_id->DiskFileId;
-
-/* See MS-SMB2 2.2.14.2.9 */
-struct create_disk_id_rsp {
-         struct create_context_hdr ccontext;
-         __u8   Name[8];
-         __le64 DiskFileId;
-         __le64 VolumeId;
-         __u8  Reserved[16];
-} __packed;
-
-
-With varying sizes, how do we handle the check prior to the call to the version-specificserver->ops->parse_lease_buf ?
+     *epoch = 0;
+     if (le32_to_cpu(lc->ccontext.DataLength) < 24)
+         return 0;
 
 
 -- 
