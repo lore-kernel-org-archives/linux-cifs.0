@@ -1,68 +1,69 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC26299929
-	for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 11:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67FF299929
+	for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 11:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788003513; cv=none; b=KSLl4BmOBrJ3voBOJMntgkRurQaaNIP0x2q4SR1TgVHz7sArnky4x3qkrefO7VuGneIDGlbQJbZbxB3HIK6R2ZgDh27uj45ASFUqcXKg4WtnwsJ1MzKg7QmtPr56/wiyjPAwFZ4eOP9jfHPA53atfjzRTgoYXRKzot8NT5kizZs=
+	t=1788003529; cv=none; b=RRjy1+qhil7CNXmaUVt7T/PTdHg8SiSBd4xeg7s6SgQod/JMdKSTOiIJAZtmiCbhtrqVlxjmvNpEW4Uf8kJZvKUWwQ8//776KYIz57uNxl7Rex4AOwCiHBziNMr3lEzjUW04Q5OIehU7OO4vqNbtNyWCvWec4WllinJdm1O37sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788003513; c=relaxed/simple;
+	s=arc-20240116; t=1788003529; c=relaxed/simple;
 	bh=wkVf6FcCQe7uQ51rUD2Vqedu2ziy9CNtQnhC7lFs4Bo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nG64/hfWXRudCrTeusYvVkhXa1+i0q39VaYHdnL5v+8J2E2OwC8yS0j7cD1NkS7DZWfZ8yCCIfJtrqqKplK9zDP6AP87rTVccjT3mesJW7m+E+d4tYMtxlhg4VnuRdoFJQvfzQ6wu21M2fQ1jWADOCrn8oowRTCCm010DtmBfNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J1OA596V; arc=none smtp.client-ip=209.85.128.43
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LuWpq/COBhvrOWHugnzDE8VNJRS3G4BAXeUbdJXphbrk4sZgz2uwli/jVsLsGqv+euNZNRjhbjQ4QnuKdhWG2KdWDPpnnGkUWt0z0cgq5MoCieLAl4gLAVDffLdgrTjYcv+2NRf+Davl7EiD7yHFwa/srakVZrzG0sdIyTo7oNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+CK10kq; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J1OA596V"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-49ccfbe062eso666875e9.3
-        for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 04:38:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+CK10kq"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4998b5a63e2so17553985e9.1
+        for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 04:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788003510; x=1788608310; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788003526; x=1788608326; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
         bh=xfNkiNSXms4b7S4NCuOwfo4nRXBgOTl0/DOqP5BUcpQ=;
-        b=J1OA596VV0DCIbl7lrdmo0Es0UQ/UDuwsLwKFoc2pXvx4EsHK4JMaMApZ56ZkusInm
-         afhbMu29LaX0yi9W3feiO9W8HI0rFyxLoC928TIbHAM6dp3iJFAR3/U+drLlDM2owjVq
-         7iMm45cNkrntydMyhxrPM/IfAz7LGYHLHgqrZocY+oKSI+YXwWSlPeIKSfF+OdCd9/m4
-         CLhBVzznVuMFK+5FBS25CQFiNL9+qRTSGZbVukgPTPR0O0o/x2TM7DOK3j97Xx5DY+SR
-         4A/uveExwEfmbSk0nCDPK+jA0A8MTM/lOIeFqkoGSb30XE3g87DfQB2LwzjdXNPgZ25f
-         2lmA==
+        b=d+CK10kq6YFLhno5MFRj3M93ozx29XXWg9KJKTcl8vQ7gaB+R/NB5hsEZIneu1cXWV
+         pQgt2OKtBLmJZVr5K4BbW+yUu37srn5JsWyCvfPhFWMa+eIln4e2JD8q488sBjNeFwCn
+         CmyVxLkGC6EsBlJkhMw7P0Jh+MX4+xobFzppb47JC5KyW5KqD7dkh0hTnWw4SEUy1Xus
+         JtEhyNwWTSAHLy0decrRojEaM8vj/U3yFjAgtQWNaKM0iXBr4vWyeO8bgmtVImBXaK1G
+         b+mlkjXrQP3UKUW692fwzcE7+Xqt3PqgwQ18ggRjIckU0PAuO2zxPirHwrAzdar0uCy8
+         SuPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788003510; x=1788608310;
+        d=1e100.net; s=20251104; t=1788003526; x=1788608326;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
         bh=xfNkiNSXms4b7S4NCuOwfo4nRXBgOTl0/DOqP5BUcpQ=;
-        b=JFbzf4KqagEHbLNACcyg0xYPDG/doiGnvhUNxlVwrJOOb13bLaE/hfuQTi3mrCjLKD
-         cbOun5/UqLGDZlrD2NFQzMpU4paTIG75gKYBMuVAHpn79jEnUxlkpm46Js9hlqnHPr3I
-         cJR/mk0VSfUFB/Hd/qWYVQ7cR8+RNv1ZvZgTh5fKkoOonpwSAMErcehkXETpedk2u2EV
-         j2DVhzsdR828wUXgejtkPKeZPp28bGnIfKtMZosacwKR1ymNzkRi0zHe3lbmdBFduiz6
-         Dvl/eoArsTjixGLKkeZgfAcL7GOo4j5+EJK7nSMR+5KWPKIpykcd7REp54HOLiu16pDp
-         aH0A==
-X-Gm-Message-State: AFuF++lCLxwySAhBzRJ0icRalrAjrPQqDR5+Qw/Aa3O284t9HclRJRUn
-	3AvUruFnpLJPsJLMS/81E3K5sieOd0mQy6L/CkRJKBrskN56W148IHySD7X4Gqxb
-X-Gm-Gg: AR+sD134Nt6gS9hP/dSclZdNutku1ekvrcH3D4W9UH0ZShEepTsfP56ym46GT8QxR8Y
-	4DBDtf0FFm2/mH5gVa3uq+S44NUTUVyYkkAhkhNWszok1g7x7gVDaA46aojXSnxhwgtR6jyxQjp
-	AG8X3iCCT4HR9QPZ7nB1lFZuKbxZZ11m+PzPP0xzDo/qcSQA9XsG+NvWjVwoAr/Lm2uFBY/rsK1
-	/1QdimLJqscpXIameMOEicY0TwSYaavpFBHGGZ+FlvZnpXYOZIH2p55NtQm+fx/NqXnjCf/C9lX
-	woUVKgVz+X3KB4pnsCEooJE4sH/cCllLTzaDLuMU4mnwF1AOd3sHPpy+8wXVbHuU4FHfH1+aXeX
-	dWELssofO/lYYuMgdnDC32+GpY4/c6lFP5TJZLAGnms9Fj9OmJtRXYCQkCEUoCGV2TY+E50Mmjb
-	XJ2g34vkejnBkO9BRuRFTyQzKdK2xOo3bFx9M1BHItoAtX/OaHusHBNER8ndti5h4Tc0ry
-X-Received: by 2002:a05:600c:1e0f:b0:49b:9113:e04a with SMTP id 5b1f17b1804b1-49b91c19c77mr234200015e9.1.1788003509866;
-        Sat, 29 Aug 2026 04:38:29 -0700 (PDT)
+        b=SpYkve/vDXiJYmYe88bT4QbWctyIimiVJyZEqvkhdfaOWAx9zctcsOmUd0hUDdEXpq
+         ULygTt+xPEsE8e9dmO3eVjaH7ekqovP1WShZqrk8sq+U+nwwj67IC7zt6EgN9qp7gGHd
+         5z8XVMZWbBJKZ2VfmIdDZW6O5BOs+f2dvSz/t5bvCj1CB4nCCyJptSM/yc0zO3fZ90Lb
+         dGLKe8gBo5fXkMQH9wlysXAMtChGqAKAaxouA8SDXhEHFRGd690SDCdgtajKj6hoxr6u
+         h/pqN03qiA1yvmGcqy2Hk/z5VK4evLmHn27AGowUQMQj5aHZiXoM7dgU4To7kTpFfitz
+         khCg==
+X-Gm-Message-State: AFuF++mhS8UV+GNIqSgK/ccIULiHhYVxl5/q89KVPP+ltp3IQtxRLQ1t
+	PFD612uzkG04xOlcs9tUArJkDiFEIOOsQyUVrEa5Y7go81ZaDhZksHezMSXHJpJG
+X-Gm-Gg: AR+sD10Vz1Jujru87R6ELGiMxNIfkjh0Qx6G6SxKWIE44dN8YKr5lFUzxk87mqllFM8
+	GPMS6sGBi5Sow1TNRY9nEpGiwrDBL/gpKtCLF/Amdrpl1A1ZF/+scNUz4hfeVUXgAm/Ik8EJP/q
+	deipoSaxkanRPIRfR343tW4AhkpgBw5ZAjmbWM/S9VEhIXN3VoPNDqaA9/JQi6w/8n4xvY0ktcS
+	cBpdwv/ZkMHkFNUxSN42sICvxRBMjdVG7533U6GWWiZmq3wulHNsAECBhiv54b0XGbDtKJWZnb2
+	Lxv8wCQNDIdmAuMkE+Tv56+PP4H+bc79sifbG+xQ0qnNB7fx2tnvE4VM0QIh7E1AyKxlgoSkoEh
+	bFbs9j2RkhkKVkP0XdFlDKYLTggLE5TqNN8R5zcKllGhWf4RezO50BGg2UY6zrLPCMvAuXVgK7G
+	ZjB1YjeKbqlm+XWHgOKr+6gl+XbJ3Cu5KPBnbwKrVsDeWORmgpPVXRI4ZXM9kgNGNvyyxRQeMPr
+	M7jU5E=
+X-Received: by 2002:a05:600c:34d2:b0:49c:cbad:1c44 with SMTP id 5b1f17b1804b1-49ccbad1cf1mr77289975e9.6.1788003525435;
+        Sat, 29 Aug 2026 04:38:45 -0700 (PDT)
 Received: from SurHub.localdomain ([196.188.112.230])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b95013d06sm173519205e9.12.2026.08.29.04.38.28
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b9267c369sm88905995e9.3.2026.08.29.04.38.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2026 04:38:29 -0700 (PDT)
+        Sat, 29 Aug 2026 04:38:44 -0700 (PDT)
 From: Abdifatah Suruur <suruurism@gmail.com>
 To: linux-cifs@vger.kernel.org
 Cc: linkinjeon@kernel.org,
 	senozhatsky@chromium.org,
 	tom@talpey.com
 Subject: [PATCH] ksmbd: fix use-after-free in oplock break notification
-Date: Sat, 29 Aug 2026 14:38:25 +0300
-Message-ID: <20260829113825.26709-1-suruurism@gmail.com>
+Date: Sat, 29 Aug 2026 14:38:41 +0300
+Message-ID: <20260829113841.26772-1-suruurism@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
