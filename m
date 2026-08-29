@@ -1,69 +1,68 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67FF299929
-	for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 11:38:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA2934F259
+	for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 11:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788003529; cv=none; b=RRjy1+qhil7CNXmaUVt7T/PTdHg8SiSBd4xeg7s6SgQod/JMdKSTOiIJAZtmiCbhtrqVlxjmvNpEW4Uf8kJZvKUWwQ8//776KYIz57uNxl7Rex4AOwCiHBziNMr3lEzjUW04Q5OIehU7OO4vqNbtNyWCvWec4WllinJdm1O37sw=
+	t=1788003564; cv=none; b=AEs6bZg+ZlQY4zANC7/gV56CFNDVRE/kHBSdRfn2R1OrKUNWA4Um2eH+OhaB94OEg01vCaNAy3vK+oiGzrwWL8+3/Zje+7rD7DNv8LIukDYUR9KzBPBTNVSEKkcKFZ37VoRvLaGdj0Jp+ecNDeF9XYPCTvjCQnIJBsW9wCO9pQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788003529; c=relaxed/simple;
+	s=arc-20240116; t=1788003564; c=relaxed/simple;
 	bh=wkVf6FcCQe7uQ51rUD2Vqedu2ziy9CNtQnhC7lFs4Bo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LuWpq/COBhvrOWHugnzDE8VNJRS3G4BAXeUbdJXphbrk4sZgz2uwli/jVsLsGqv+euNZNRjhbjQ4QnuKdhWG2KdWDPpnnGkUWt0z0cgq5MoCieLAl4gLAVDffLdgrTjYcv+2NRf+Davl7EiD7yHFwa/srakVZrzG0sdIyTo7oNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+CK10kq; arc=none smtp.client-ip=209.85.128.52
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y/rl/K/RUt+Ox1UN4M3fnAQHEO96pAiEZhA8Munb6g/er4i/POjpZohbIkRL2stwhK+TIEmIH89CvK5kYne+pTisDPwo/vWkgCqDEbj7UU43LDm3aSjEyxPtv88FXeAojaqEVdMMI9tXeYroGiTS32sA8BpJ6afzErtJbjW0Tac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fbJtuZWQ; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+CK10kq"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4998b5a63e2so17553985e9.1
-        for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 04:38:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fbJtuZWQ"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4980fe6b3beso18464625e9.0
+        for <linux-cifs@vger.kernel.org>; Sat, 29 Aug 2026 04:39:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788003526; x=1788608326; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788003561; x=1788608361; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
         bh=xfNkiNSXms4b7S4NCuOwfo4nRXBgOTl0/DOqP5BUcpQ=;
-        b=d+CK10kq6YFLhno5MFRj3M93ozx29XXWg9KJKTcl8vQ7gaB+R/NB5hsEZIneu1cXWV
-         pQgt2OKtBLmJZVr5K4BbW+yUu37srn5JsWyCvfPhFWMa+eIln4e2JD8q488sBjNeFwCn
-         CmyVxLkGC6EsBlJkhMw7P0Jh+MX4+xobFzppb47JC5KyW5KqD7dkh0hTnWw4SEUy1Xus
-         JtEhyNwWTSAHLy0decrRojEaM8vj/U3yFjAgtQWNaKM0iXBr4vWyeO8bgmtVImBXaK1G
-         b+mlkjXrQP3UKUW692fwzcE7+Xqt3PqgwQ18ggRjIckU0PAuO2zxPirHwrAzdar0uCy8
-         SuPg==
+        b=fbJtuZWQvh7ZmzJxIjxygpugCVIhR8uvnN6eFzHIK6O1JloMUSDFacL7GPhaxLBtWD
+         1yyfaW9XhofCr7H+G/5KXKl/Jnq4Dv43PNoMA54xfUcL1yKsFNSt6EYkBZ3oMwjqJFW1
+         DWtx3BhEPJH/HDE6LjXDzFC06pxEeijxj+ptGlE9yomkCLEQzJpDGPWllL2/Z10K/RVe
+         S5+0y1tDAGKe6FbbzWU0XhsP+Z2xiDTLcwNetCh2E+MRcaVOxTzRHk8RH1iXk+hrscwy
+         OpVwHSuovNpEHs8HBliuu7MLiQO63+bxxZyrDyK/mU2a6WGVp4MI6/ApgcHSvORycvFK
+         4HDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788003526; x=1788608326;
+        d=1e100.net; s=20251104; t=1788003561; x=1788608361;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
         bh=xfNkiNSXms4b7S4NCuOwfo4nRXBgOTl0/DOqP5BUcpQ=;
-        b=SpYkve/vDXiJYmYe88bT4QbWctyIimiVJyZEqvkhdfaOWAx9zctcsOmUd0hUDdEXpq
-         ULygTt+xPEsE8e9dmO3eVjaH7ekqovP1WShZqrk8sq+U+nwwj67IC7zt6EgN9qp7gGHd
-         5z8XVMZWbBJKZ2VfmIdDZW6O5BOs+f2dvSz/t5bvCj1CB4nCCyJptSM/yc0zO3fZ90Lb
-         dGLKe8gBo5fXkMQH9wlysXAMtChGqAKAaxouA8SDXhEHFRGd690SDCdgtajKj6hoxr6u
-         h/pqN03qiA1yvmGcqy2Hk/z5VK4evLmHn27AGowUQMQj5aHZiXoM7dgU4To7kTpFfitz
-         khCg==
-X-Gm-Message-State: AFuF++mhS8UV+GNIqSgK/ccIULiHhYVxl5/q89KVPP+ltp3IQtxRLQ1t
-	PFD612uzkG04xOlcs9tUArJkDiFEIOOsQyUVrEa5Y7go81ZaDhZksHezMSXHJpJG
-X-Gm-Gg: AR+sD10Vz1Jujru87R6ELGiMxNIfkjh0Qx6G6SxKWIE44dN8YKr5lFUzxk87mqllFM8
-	GPMS6sGBi5Sow1TNRY9nEpGiwrDBL/gpKtCLF/Amdrpl1A1ZF/+scNUz4hfeVUXgAm/Ik8EJP/q
-	deipoSaxkanRPIRfR343tW4AhkpgBw5ZAjmbWM/S9VEhIXN3VoPNDqaA9/JQi6w/8n4xvY0ktcS
-	cBpdwv/ZkMHkFNUxSN42sICvxRBMjdVG7533U6GWWiZmq3wulHNsAECBhiv54b0XGbDtKJWZnb2
-	Lxv8wCQNDIdmAuMkE+Tv56+PP4H+bc79sifbG+xQ0qnNB7fx2tnvE4VM0QIh7E1AyKxlgoSkoEh
-	bFbs9j2RkhkKVkP0XdFlDKYLTggLE5TqNN8R5zcKllGhWf4RezO50BGg2UY6zrLPCMvAuXVgK7G
-	ZjB1YjeKbqlm+XWHgOKr+6gl+XbJ3Cu5KPBnbwKrVsDeWORmgpPVXRI4ZXM9kgNGNvyyxRQeMPr
-	M7jU5E=
-X-Received: by 2002:a05:600c:34d2:b0:49c:cbad:1c44 with SMTP id 5b1f17b1804b1-49ccbad1cf1mr77289975e9.6.1788003525435;
-        Sat, 29 Aug 2026 04:38:45 -0700 (PDT)
+        b=MdOJ3maX+47X/Jk3RTAhxr7NDjt3FASSmSG8BHLJ1NqHhfI37xb6cnQFAte1mKeT+b
+         ueneUMoOB6zfrHY0AyfSeOaoK1bjhGkyOok660oUhBaU80F7NWH3YNrj8oStlV6nZH6B
+         GZbkcUQg7NLMg7VubYzMFsF13FPehQSsIqPWlX23sHPh56X3UAdzhIwnCNx/NrOiET0n
+         00C789OhSCqrD2kfrgJq0tzK5gghFTEteY8qlWjISE7VUDsXFKKhNZxyMhk6gJOv6F5g
+         xctKmy0BYm10ntq58Dn1OhdVq3AleBN/TqZWyJpZl+mywubSWemUOlbESOgbn4dDM7pf
+         UMRQ==
+X-Gm-Message-State: AFuF++ndGTAlQabppOY+UvIzKSuUi0BqjEv6NR1ruiMLyWvE9bP4XzNz
+	3kxYjpiUkVMbqdCtMgTze93cMc9gYYpMw+QbA6b6c6nKJdPaEJ3Ld3Za1DcCxQQO
+X-Gm-Gg: AR+sD12QNAoo/8ol5j/8JqhkQIJApZOLJ50E9W4JZntf9VC//3n3Org0YdKjKyLwruC
+	D0obrD2xWTmpLzNGKereCtPeoSbSX+NhYK/qDUQ7XAVWogwmYWvHPX1V1rk7KQ6dI4I985iuNfF
+	pFXa6e5XabfyDinwTSo+bPIEL5Pyti0Glt53INRe0FmAWxUZ6TzdLQcWUesHzrCs44DbXdIqbSm
+	QU7JmMrRn9jfF7UiwJlg3bc+tNk9cgtXXEpJM/RvtShcPUolUw8O4f+thXyD0dj8Dt8ofOBd1XM
+	WefTCeXHUDCTYL0kUi1zAwG+9YlgfSRUoyvKakJlNwWv375nKZHcTIfYEZkRatJN8iiTPztUmER
+	2wBBnuAFpymuQMUCX4huuEO7QcuLTb6LrvSvE5MeZ+aEERTI7bM/Zz1GWx7ENa37U94FSP0Cn2d
+	4Q1zSQYTFrOivSYgOLYeV83dVaHU7q7jqN53VVGAnIIRL96hRK3NUdp+M7LPB2gs9S1FEV
+X-Received: by 2002:a05:600c:699b:b0:49b:e22:4ee4 with SMTP id 5b1f17b1804b1-49cca2fee49mr75604335e9.4.1788003560590;
+        Sat, 29 Aug 2026 04:39:20 -0700 (PDT)
 Received: from SurHub.localdomain ([196.188.112.230])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b9267c369sm88905995e9.3.2026.08.29.04.38.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b91c52fdbsm100542215e9.0.2026.08.29.04.39.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Aug 2026 04:38:44 -0700 (PDT)
+        Sat, 29 Aug 2026 04:39:20 -0700 (PDT)
 From: Abdifatah Suruur <suruurism@gmail.com>
 To: linux-cifs@vger.kernel.org
 Cc: linkinjeon@kernel.org,
 	senozhatsky@chromium.org,
 	tom@talpey.com
-Subject: [PATCH] ksmbd: fix use-after-free in oplock break notification
-Date: Sat, 29 Aug 2026 14:38:41 +0300
-Message-ID: <20260829113841.26772-1-suruurism@gmail.com>
+Subject: [PATCH v2] ksmbd: fix use-after-free in oplock break notification
+Date: Sat, 29 Aug 2026 14:39:17 +0300
+Message-ID: <20260829113917.26882-1-suruurism@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
