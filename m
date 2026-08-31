@@ -1,43 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CDD45D1BA;
-	Mon, 31 Aug 2026 13:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9A241DE0F;
+	Mon, 31 Aug 2026 13:34:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788183286; cv=none; b=mhYMVJHJv2Y4VN7doVKsyefmx7P/XLb70Zhm5D9jXmLds/ZtQ5XoIbqCZMEaHLWT6I355J9TSBw0jEqBYNRg99XBPXmeT5WhAmriV89qd9+0pAiJC24k6MXbT6wbcaI2NmQhhvlqy9hKdlKowegQDplmITgC7lIuhZsIPH+uvII=
+	t=1788183291; cv=none; b=hviq3+Ccc7A8y80v/aIcvIu9HVvz5BJDuHOHv+TSEWcczFmwyas5uyKqTv2g7QMZ5mhrlIB7OGW3M0Bn2Hqo6rvvFNM7ujdTlJKM8/B5hZWC7SKc6OzSCmScNqk+WLBjXHk90erETLUa9b887D1J5Vy32E09voXX8aOn42rReMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788183286; c=relaxed/simple;
-	bh=hyEMb6Pd+n28yzIyR/ILAMDzupK47uN1KNRKnpySPgA=;
+	s=arc-20240116; t=1788183291; c=relaxed/simple;
+	bh=sd/yo/2MaLVKK9crSrnqz2EorDRSvn4hCtQmF+nmx+Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jLl7CVwIC3mf1Fj2Fidaxkg9yXuSm8chdZ8XHTm8+lkWsZuR86uG2URXK2be+r2NEY2fB5pLMelmLfmudjD48cTkvAAKBJk21Azpjmnpa1jZwGftBcXdKzyn6HBPDd59Od3u4n6WVEzVpy4mELjDbkk4JLrSEXClbaOIF0ktxSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NvMRC+eR; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=DqsYovT0s6PbE87M85EpMPq925HU+x8/r+PtVvVf2bsHIdkDZUHOR5lNe2jM8LFW3KtMr7y7kp7qepOqlyWj3AKGmahFW6W37nFu/PXgAiTjL+oUoAmGsLFI4h0tbt7gXxsfUq3buC29EjnpSlB/L6VBiDoWiVS7xOHN/vtxxF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SrqWSupZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NvMRC+eR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97E681F00A3D;
-	Mon, 31 Aug 2026 13:34:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SrqWSupZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C452E1F000E9;
+	Mon, 31 Aug 2026 13:34:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788183283;
-	bh=ts42t936biBKN+Jn2RLMye+YeFon94fudtO7pT68Q98=;
+	s=k20260515; t=1788183288;
+	bh=MLoECygpQTH0YKnAXnC15M1Xe9xOAqkR4Yx5C5mz72k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=NvMRC+eR0Z+myBTruNs6T+PWsmqTRkErWbmc+RUXdRxH0AeZKSs6hkreTgBh6aOG7
-	 uGNj3yTML6qRfl6dOrr+u8czAL+D0R4akz5AkC/tho6hyvjIHtT5dy9mz8Pm3VvaOK
-	 svnl6cmye9cSRs8IWaA7h/CMwV8g147jOpf7Ztx5noJrWQwPoA0Ahy9N5hiTe1csJx
-	 JgrpFW0V3INE7aDchh7nBWmfqychTlkL0Ikf0lGh3LTcq4nVLnFrVMlo02We/N1UVa
-	 YKr8DzfA5fhLxPeUsThlv4hJ0l8bz46msMjIzu4K+hjUdGkJxCCOv8nnJyBoOoUrkC
-	 X0cU+MEcZjo3Q==
+	b=SrqWSupZZjbVJ5mz3hBac53wdfWctkJx/KKUbvNQxM883xGAnZyUdiq4atueDGOoB
+	 7jut6DkRMqIaa3MY4S4+TALwKjnux1Ttdd104A5OG7BpiFtU94T4FMHYx3uBnpfSfL
+	 Jd2h4fqhUO0PuH2c8xGqfm9pJliL9lUMR7eGNQgcsDjhgomU8/7tiX/GMyT+Fg3+XV
+	 o+hjS78TCS1P2huRrlU8xSX0GMtIByrvU57Mw0WLNntJV89j/CHhC0hRFdKn8G85gd
+	 b37ZpGeQMDf1XyIviAVl0gAMod+7T+V0i0q4SzcvXYnLti1TQxhzknW22FRwX8VBJQ
+	 wpU2DpSVtyowg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Qiang Liu <liuqiang@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: use connection ClientGUID for lease lookup
-Date: Mon, 31 Aug 2026 09:21:23 -0400
-Message-ID: <20260831133314.4125787-55-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: fix sd_ndr.data memory leak in ksmbd_vfs_set_sd_xattr
+Date: Mon, 31 Aug 2026 09:21:27 -0400
+Message-ID: <20260831133314.4125787-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -53,286 +55,294 @@ X-stable-base: Linux 6.18.48
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Qiang Liu <liuqiang@kylinos.cn>
 
-[ Upstream commit fa111daae1a02dbff5693dfc12f368bccd9eb5f4 ]
+[ Upstream commit d4d56b00c7df88cd5751e7415bdfabc9fdbc82a7 ]
 
-MS-SMB2 defines the lease table lookup key as Connection.ClientGuid.
-Use the connection ClientGUID consistently when checking for same-client
-leases and duplicate lease keys.
+ndr_encode_v4_ntacl() allocates sd_ndr.data via kzalloc() at entry.
+If any subsequent ndr_write_*() call returns error during encoding,
+the allocated sd_ndr.data won't be freed and causes memory leak.
 
-Also preserve directory and parent lease metadata when copying an existing
-lease state to a new open.
+Move kfree(sd_ndr.data) into out label to ensure the buffer gets
+released on all success and error return paths.
 
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-# Stable Backport Analysis: `ksmbd: use connection ClientGUID for lease
-lookup`
+# Stable Backport Analysis: `ksmbd: fix sd_ndr.data memory leak in
+ksmbd_vfs_set_sd_xattr`
 
-**Local tree:** `v6.18.44` (`stable/linux-6.18.y`, detached HEAD at
-`2736c32da98b9`)
-**Commit evaluated:** `41fd6f97cf085` (upstream
-`fa111daae1a02dbff5693dfc12f368bccd9eb5f4`) — **not yet present in this
-tree**
+**Local tree:** Linux **6.18.44** (`git describe HEAD` →
+`v6.18.44-1-g2736c32da98b9`)
+**Fix commit (mainline):** `d4d56b00c7df8` — present on `master`,
+**not** in this 6.18.44 checkout
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
 ### Step 1.1: Subject line
-**Record:** `[ksmbd]` `[use]` — Use the connection `ClientGUID`
-consistently for SMB2 lease table lookups and duplicate-lease-key
-checks, and preserve directory/parent lease metadata when copying lease
-state to a new open.
+**Record:** `[ksmbd] [fix] sd_ndr.data memory leak in
+ksmbd_vfs_set_sd_xattr`
 
-### Step 1.2: Tags
+### Step 1.2: Commit message tags
 **Record:**
-- **Fixes:** — none
+- **Fixes:** — not present (expected for manual review)
 - **Reported-by:** — none
 - **Tested-by:** — none
-- **Reviewed-by:** — none
-- **Acked-by:** — none
+- **Reviewed-by:** ChenXiaoSong `<chenxiaosong@kylinos.cn>`
+- **Acked-by:** Namjae Jeon `<linkinjeon@kernel.org>` (ksmbd maintainer)
 - **Link:** — none
-- **Cc: stable:** — none (expected for manual review)
-- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>`, Steve French
-  `<stfrench@microsoft.com>` (ignore pipeline Sasha Levin SOB)
+- **Cc: stable:** — none (expected)
+- **Signed-off-by:** Qiang Liu (author), Steve French (committer);
+  ignore pipeline-added SOBs
 
-Notable: Steve French (ksmbd/SMB maintainer) signed off. No
-syzbot/fuzzer tags.
+Notable: maintainer Acked-by is a strong quality signal.
 
 ### Step 1.3: Body analysis
 **Record:**
-- **Bug:** ksmbd used `sess->ClientGUID` for lease table lookup and
-  same-client lease checks, but MS-SMB2 defines the lease table key as
-  `Connection.ClientGuid`. Lease tables are populated with
-  `conn->ClientGUID`.
-- **Symptom:** Incorrect lease duplicate detection; failure to recognize
-  same-client leases; incomplete lease state when re-opening with an
-  existing lease (`copy_lease()` omitted `is_dir` and
-  `parent_lease_key`; `flags` assignment clobbered existing flags).
-- **Root cause:** Inconsistent identifier choice (session vs connection)
-  and incomplete field copy in `copy_lease()`.
+- **Bug:** `ndr_encode_v4_ntacl()` allocates `sd_ndr.data` via
+  `kzalloc()`; if any subsequent `ndr_write_*()` fails, the buffer is
+  not freed.
+- **Symptom:** Memory leak on NDR encoding error path.
+- **Root cause:** `kfree(sd_ndr.data)` was placed before the `out:`
+  label, so `goto out` on `ndr_encode_v4_ntacl()` failure skipped the
+  free.
+- **Version info:** None in message.
 
-### Step 1.4: Hidden bug fix?
-**Record:** Yes. Although the subject says “use” rather than “fix,” this
-is a protocol-correctness bug fix. The `copy_lease()` and `flags |=`
-changes fix functional directory-lease and break-in-progress handling
-bugs.
+### Step 1.4: Hidden bug fix detection
+**Record:** Not hidden — explicitly labeled as a memory leak fix.
+Standard error-path cleanup correction.
 
 ---
 
 ## PHASE 2: DIFF ANALYSIS
 
-### Step 2.1: Inventory
+### Step 2.1: Change inventory
 **Record:**
-| File | Changes |
-|------|---------|
-| `fs/smb/server/oplock.c` | +11 / -9 |
-| `fs/smb/server/oplock.h` | +1 / -1 |
-| `fs/smb/server/smb2pdu.c` | +1 / -1 |
+- **Files:** `fs/smb/server/vfs.c` (+1 / −1)
+- **Function:** `ksmbd_vfs_set_sd_xattr()`
+- **Scope:** Single-file, surgical fix (1-line move)
 
-**Functions modified:** `same_client_has_lease()`,
-`find_same_lease_key()`, `copy_lease()`, `smb_grant_oplock()`
-**Scope:** Single-subsystem, surgical fix (3 files, ~20 lines).
-
-### Step 2.2: Code flow changes
+### Step 2.2: Code flow change
 **Record:**
-- **`find_same_lease_key()`:** API changes from `struct ksmbd_session
-  *sess` to `struct ksmbd_conn *conn`; table lookup and
-  `compare_guid_key()` now use `conn->ClientGUID` instead of
-  `sess->ClientGUID`.
-- **`smb_grant_oplock()`:** `same_client_has_lease()` called with
-  `work->conn->ClientGUID`; removed unused `sess` local.
-- **`copy_lease()`:** Copies `is_dir` and `parent_lease_key`; `flags`
-  set with `|=` instead of `=` when break is in progress.
-- **`smb2_open()`:** Passes `conn` instead of `sess` to
-  `find_same_lease_key()`.
+- **Hunk (before):** On `ndr_encode_v4_ntacl()` failure → `goto out` →
+  `sd_ndr.data` never freed. On success → `kfree(sd_ndr.data)` then
+  `out:` cleanup.
+- **Hunk (after):** All paths (success and error) reach `out:` where
+  `kfree(sd_ndr.data)` runs once, alongside existing cleanup of
+  `acl_ndr.data`, `smb_acl`, `def_smb_acl`.
 
 ### Step 2.3: Bug mechanism
 **Record:**
-- **Category:** Logic / protocol correctness + incomplete state copy.
-- **Mechanism:**
-  1. Lease tables are keyed by `opinfo->conn->ClientGUID`
-     (`alloc_lease_table()`, `add_lease_global_list()`,
-     `lookup_lease_in_table()`, `destroy_lease_table()`), but
-     `find_same_lease_key()` and `same_client_has_lease()` used
-     `sess->ClientGUID`. Per MS-SMB2 and the rest of ksmbd, the current
-     **connection’s** GUID is the correct lookup key.
-  2. `copy_lease()` did not copy `is_dir` or `parent_lease_key`,
-     breaking v2 directory lease parent-key logic (used in
-     `smb_send_parent_lease_break_noti()` and lease-break downgrade at
-     line 928).
-  3. `opinfo->o_lease->flags = SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE`
-     overwrote all flags; `|=` preserves other flags.
+- **Category:** Error-path resource leak
+- **Mechanism:** `ndr_encode_v4_ntacl()` allocates at entry
+  (`kzalloc(2048)`) and returns error without freeing on `ndr_write_*()`
+  failure (e.g. `krealloc` → `-ENOMEM`). Caller’s `goto out` bypassed
+  `kfree(sd_ndr.data)`.
+
+Verified in `ndr.c`:
+
+```397:447:fs/smb/server/ndr.c
+int ndr_encode_v4_ntacl(struct ndr *n, struct xattr_ntacl *acl)
+{
+        // ...
+        n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+        if (!n->data)
+                return -ENOMEM;
+
+        ret = ndr_write_int16(n, acl->version);
+        if (ret)
+                return ret;
+        // ... more ndr_write_* calls, all return without freeing
+n->data ...
+        ret = ndr_write_bytes(n, acl->sd_buf, acl->sd_size);
+        return ret;
+}
+```
+
+Buggy caller code in this tree:
+
+```1560:1577:fs/smb/server/vfs.c
+        rc = ndr_encode_v4_ntacl(&sd_ndr, &acl);
+        if (rc) {
+                pr_err("failed to encode ndr to posix acl\n");
+                goto out;
+        }
+        // ...
+        kfree(sd_ndr.data);
+out:
+        kfree(acl_ndr.data);
+        kfree(smb_acl);
+        kfree(def_smb_acl);
+        return rc;
+```
 
 ### Step 2.4: Fix quality
-**Record:** Obviously correct — aligns all lease paths with MS-SMB2 and
-with existing helpers (`lookup_lease_in_table()`, `compare_guid_key()`).
-Minimal, no API surface visible to userspace. Low regression risk.
+**Record:**
+- **Quality:** Obviously correct; mirrors how `acl_ndr.data` is already
+  freed at `out:`.
+- **Regression risk:** Very low. `kfree(NULL)` is safe if `sd_ndr.data`
+  was never allocated.
+- **No double-free:** Success path now frees once at `out:` instead of
+  before `out:`.
 
 ---
 
 ## PHASE 3: GIT HISTORY INVESTIGATION
 
 ### Step 3.1: Blame
-**Record:** `sess->ClientGUID` in `find_same_lease_key()` introduced in
-`af7c39d971e43` (Jul 2022, “fix racy issue while destroying session on
-multichannel”). Lease tables have used `conn->ClientGUID` since 2021
-(`e2f34481b24db`). The inconsistency has been present since multichannel
-work. `is_dir`/`parent_lease_key` added in `d47d9886aeef7` (directory v2
-leases); `copy_lease()` never copied them.
+**Record:** Buggy placement introduced in `f44158485826c` (2021-03-16,
+original cifsd/ksmbd code). Present since ksmbd NDR xattr support was
+added — long-standing.
 
 ### Step 3.2: Fixes: tag
 **Record:** N/A — no `Fixes:` tag.
 
 ### Step 3.3: Related file history
-**Record:** Recent `oplock.c` fixes in this tree are UAF/NULL-deref
-hardening (`35d3d6ff2bc1e`, `cd5c1b75d2f45`, etc.). This commit is
-separate protocol/correctness work. Later related commit `5198f8b2d0b1c`
-(“share SMB2 lease state across opens”) is a larger refactor **not** in
-this tree and **not** required for this patch.
+**Record:**
+- Part of v2 series `[PATCH v2 0/3] ksmbd: fix some memory leaks in
+  ksmbd_vfs_* functions`
+- Sibling fixes on master: `7ac657bb9c5c1` (dos attrib xattr leak),
+  `d708a36634bb7` (acl.sd_buf leak)
+- **This patch is standalone** — no structural dependencies on siblings
 
 ### Step 3.4: Author context
-**Record:** Namjae Jeon is ksmbd maintainer. Steve French signed off.
+**Record:** Qiang Liu; no prior ksmbd commits in this tree. Patch
+reviewed and Acked by subsystem maintainer Namjae Jeon.
 
-### Step 3.5: Dependencies
-**Record:** Standalone. Cherry-pick to current HEAD applies cleanly
-(auto-merge, no conflicts). Does not depend on the later “share SMB2
-lease state across opens” refactor.
+### Step 3.5: Prerequisites
+**Record:** None. Applies independently; no new APIs or structures
+required.
 
 ---
 
 ## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
 ### Step 4.1: Original discussion
-**Record:** `b4 dig -c 41fd6f97cf085` →
-`https://patch.msgid.link/20260618141739.9029-2-linkinjeon@kernel.org`
-(patch 2/N in a series). Lore fetch blocked by bot protection; full
-thread not readable. `b4 dig -a` returned no additional revisions.
+**Record:**
+- `b4 dig -c d4d56b00c7df8` →
+  https://patch.msgid.link/20260624011320.9146-2-liuqiangneo@163.com
+- Series: v1 (2026-06-23) → v2 (2026-06-24); committed version matches
+  v2
 
 ### Step 4.2: Reviewers
-**Record:** `b4 dig -w` returned the same patch link only; maintainer CC
-list not retrieved.
+**Record:** `b4 dig -w` CC’d Steve French, Namjae Jeon, linux-cifs, and
+other ksmbd maintainers/reviewers.
 
-### Step 4.3: Bug reports
-**Record:** No `Reported-by:` or `Link:` tags. Web search found this
-commit listed in Namjae Jeon’s June 2026 ksmbd git-pull, which describes
-fixes for **smbtorture** protocol divergence in SMB2/3 lease handling.
-That pull context is secondary evidence only (not the commit message
-itself).
+### Step 4.3: Bug report
+**Record:** No external bug report or syzbot link. Found via code review
+(same pattern as other ksmbd xattr leak fixes).
 
 ### Step 4.4: Series context
-**Record:** Part of a larger ksmbd lease rework series. This specific
-commit is self-contained and applies independently to the current 6.18.y
-code.
+**Record:** 3-patch series; each patch fixes an independent leak in a
+different function. This patch does not require the others.
 
-### Step 4.5: Stable list
-**Record:** Not searched (lore blocked). No stable-list discussion
-found.
+### Step 4.5: Stable list discussion
+**Record:** Could not fetch lore thread body (403/bot protection). No
+stable-list nomination verified. Absence of `Cc: stable` is not a
+negative signal per review rules.
 
 ---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
 ### Step 5.1: Key functions
-**Record:** `find_same_lease_key()`, `same_client_has_lease()`,
-`copy_lease()`, `smb_grant_oplock()`, `smb2_open()`.
+**Record:** `ksmbd_vfs_set_sd_xattr()`, `ndr_encode_v4_ntacl()`
 
 ### Step 5.2: Callers
 **Record:**
-- `find_same_lease_key()` — called from `smb2_open()` during SMB2 CREATE
-  with lease context (userspace-triggered file open).
-- `same_client_has_lease()` — called from `smb_grant_oplock()` on lease
-  grant path.
-- Both are reachable from normal SMB client file-open operations.
+- `fs/smb/server/smbacl.c:1397` — inherit ACL path
+- `fs/smb/server/smbacl.c:1663` — `set_info_sec()` (SMB2 SET_INFO
+  security)
+- `fs/smb/server/smb2pdu.c:3435` — SMB2 open/create with ACL xattr
+
+All are normal SMB server operation paths when
+`KSMBD_SHARE_FLAG_ACL_XATTR` is enabled.
 
 ### Step 5.3: Callees
-**Record:** `compare_guid_key()` (compares against
-`opinfo->conn->ClientGUID`), lease table list traversal, `opinfo_put()`.
+**Record:** `ndr_encode_posix_acl()`, `ndr_encode_v4_ntacl()`,
+`ksmbd_vfs_setxattr()`, `kfree()`
 
 ### Step 5.4: Reachability
-**Record:** Fully reachable from SMB2 CREATE with
-`SMB2_OPLOCK_LEVEL_LEASE` when `CONFIG_SMB_SERVER` is enabled. Common
-path for Windows/macOS clients using SMB2/3 leasing.
+**Record:**
+- Triggered by authenticated SMB clients setting security descriptors /
+  ACLs on shares with ACL xattr support.
+- Error path reachable when NDR buffer growth fails (`-ENOMEM` under
+  memory pressure).
+- **Userspace-reachable:** yes (SMB2 SET_INFO / ACL operations).
 
 ### Step 5.5: Similar patterns
-**Record:** `lookup_lease_in_table()`, `destroy_lease_table()`,
-`add_lease_global_list()`, and `smb_send_parent_lease_break_noti()`
-already use `conn->ClientGUID`. Only `find_same_lease_key()` and
-`same_client_has_lease()` call sites were wrong.
+**Record:** Same leak class fixed previously in this subsystem — e.g.
+`78ad2c277af4c` (`ksmbd: fix memory leak in ksmbd_vfs_get_sd_xattr()`).
+`acl_ndr.data` is already correctly freed at `out:`; only `sd_ndr.data`
+placement was wrong.
 
 ---
 
-## PHASE 6: CROSS-REFERENCE AGAINST LOCAL TREE
+## PHASE 6: CROSS-REFERENCING AGAINST LOCAL TREE (6.18.44)
 
 ### Step 6.1: Buggy code present?
-**Record:** **Yes.** Current tree at
-`fs/smb/server/oplock.c:1019,1035,1249` and `smb2pdu.c:3515` use
-`sess->ClientGUID`. `copy_lease()` at lines 1055–1068 omits `is_dir` and
-`parent_lease_key`.
+**Record:** **Yes.** Bug confirmed at `fs/smb/server/vfs.c:1572-1573` in
+this checkout. Present since 2021.
 
 ### Step 6.2: Backport complications
-**Record:** Clean apply verified via test cherry-pick. No conflicts.
+**Record:** **Clean apply.** Tested `git cherry-pick --no-commit
+d4d56b00c7df8` → auto-merged with no conflicts.
 
-### Step 6.3: Related fixes already present?
-**Record:** No equivalent fix in this tree. Upstream commit `fa111daa`
-is not an ancestor of HEAD.
-
----
-
-## PHASE 7: SUBSYSTEM CONTEXT
-
-### Step 7.1: Subsystem
-**Record:** `fs/smb/server/` (ksmbd in-kernel SMB server).
-**Criticality:** IMPORTANT for deployments using `CONFIG_SMB_SERVER`;
-not core kernel path for all users.
-
-### Step 7.2: Activity
-**Record:** Actively maintained — multiple ksmbd stable fixes already in
-6.18.y (UAF, NULL-deref, durable-handle fixes).
+### Step 6.3: Fix already present?
+**Record:** **No.** `git log --grep="sd_ndr.data memory leak"` returns
+nothing on HEAD. Fix exists only on `master` (`d4d56b00c7df8`), ahead of
+6.18.44.
 
 ---
 
-## PHASE 8: IMPACT AND RISK
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+
+### Step 7.1: Subsystem criticality
+**Record:** `fs/smb/server/` (ksmbd SMB3 server). **IMPORTANT** —
+affects SMB server deployments; not universal core, but security/ACL
+paths matter for server operators.
+
+### Step 7.2: Subsystem activity
+**Record:** Actively maintained; recent fixes in this tree include UAF,
+race, overflow, and memory-leak patches in ksmbd.
+
+---
+
+## PHASE 8: IMPACT AND RISK ASSESSMENT
 
 ### Step 8.1: Who is affected
-**Record:** Users of ksmbd (`CONFIG_SMB_SERVER`) with SMB2/3 leasing
-enabled — typically Samba-alternative NAS/file-server deployments
-serving Windows/macOS clients.
+**Record:** Users running `CONFIG_SMB_SERVER` (ksmbd) with ACL xattr
+shares. Not all kernel users, but real production SMB server
+deployments.
 
 ### Step 8.2: Trigger conditions
 **Record:**
-- Any SMB2 CREATE with a lease context (common for modern Windows
-  clients).
-- Directory v2 leases with parent lease keys (second open of same file
-  from same client).
-- Scenarios where connection-level and session-level GUID usage must
-  match MS-SMB2 (multichannel, durable reconnect contexts).
+- SMB client sets security descriptor / ACL on a file or directory
+- `ndr_encode_v4_ntacl()` fails after allocating buffer (typically
+  `-ENOMEM` on `krealloc`)
+- **Likelihood:** Low per operation, but repeatable; worst case under
+  memory pressure when leaks are most harmful
 
 ### Step 8.3: Failure mode severity
-**Record:**
-- Incorrect duplicate lease-key detection → spurious `-EINVAL` opens or
-  missed duplicate-key validation.
-- Missing `is_dir`/`parent_lease_key` on copy → wrong parent lease break
-  behavior for directory leases.
-- Flag clobber → incorrect lease break-in-progress reporting.
-- **Severity: MEDIUM-HIGH** — not a kernel oops, but SMB lease errors
-  affect client caching coherency; incorrect lease state can lead to
-  clients holding stale cached data (coherency/correctness issue for
-  file-server workloads).
+**Record:** Memory leak (≥2048 bytes per occurrence, potentially more
+after `krealloc`). **Severity: MEDIUM** — no direct crash/corruption,
+but contributes to OOM under pressure on a server hot path. Precedent:
+similar ksmbd leak fixes have been accepted to stable.
 
 ### Step 8.4: Risk-benefit
 **Record:**
-- **Benefit:** HIGH for ksmbd + leasing users — protocol compliance,
-  smbtorture-aligned behavior, directory lease correctness.
-- **Risk:** VERY LOW — ~20 lines, no new APIs, matches existing code
-  patterns.
-- **Ratio:** Strong benefit, minimal risk.
+- **Benefit:** Prevents leak on real error path in ACL/security xattr
+  handling
+- **Risk:** Minimal (1-line move, maintainer-acked, tested apply)
+- **Ratio:** Favorable
 
 ---
 
@@ -341,221 +351,95 @@ serving Windows/macOS clients.
 ### Step 9.1: Evidence summary
 
 **FOR backport:**
-- Real protocol bug: MS-SMB2 lease table key is `Connection.ClientGuid`;
-  code was inconsistent.
-- Incomplete `copy_lease()` breaks directory v2 lease metadata on re-
-  open.
-- `flags |=` fixes flag clobbering during break-in-progress.
-- Small, surgical, applies cleanly to 6.18.44.
-- Maintainer-signed (Steve French).
-- Listed in ksmbd git-pull as part of smbtorture protocol divergence
-  fixes.
+- Real, verified memory leak on error path
+- Bug present in 6.18.44 since 2021
+- Surgical 1-line fix, obviously correct
+- Maintainer Acked-by (Namjae Jeon)
+- Applies cleanly to this tree
+- Reachable from SMB client ACL/security operations
+- Consistent with prior ksmbd leak fixes already in stable trees
 
 **AGAINST backport:**
-- Only affects `CONFIG_SMB_SERVER` users (not universal).
-- No crash/oops/syzbot report in commit message.
-- Part of a larger lease rework series (but this patch is standalone).
+- Error path only (ENOMEM during encoding) — not a crash/corruption bug
+- Affects ksmbd users only (`CONFIG_SMB_SERVER`)
+- No syzbot/user crash report
 
-**UNRESOLVED:**
-- Full lore review thread (bot-blocked).
-- Explicit smbtorture test name not in commit message (only in git-pull
-  summary).
+**Unresolved:**
+- Full lore review thread content (fetch blocked)
+- No explicit stable nomination found in accessible sources
 
 ### Step 9.2: Stable rules checklist
-1. Obviously correct and tested? **PASS** — aligns with MS-SMB2,
-   existing ksmbd patterns, maintainer SOB; smbtorture context from git-
-   pull.
-2. Fixes a real bug? **PASS** — protocol divergence and incomplete lease
-   state copy.
-3. Important issue? **PASS** — MEDIUM-HIGH: SMB lease/coherency
-   correctness for file-server users.
-4. Small and contained? **PASS** — 3 files, ~20 lines.
-5. No new features/APIs? **PASS** — internal parameter type change only.
-6. Can apply to local tree? **PASS** — verified clean cherry-pick.
+1. Obviously correct and tested? **PASS** — standard cleanup pattern;
+   maintainer reviewed/acked; cherry-pick applies cleanly
+2. Fixes a real bug? **PASS** — verified leak on `goto out` after
+   `ndr_encode_v4_ntacl()` failure
+3. Important issue? **PASS (MEDIUM)** — memory leak on server error
+   path, worsens under memory pressure
+4. Small and contained? **PASS** — 1 file, 1 line moved
+5. No new features/APIs? **PASS**
+6. Can apply to local tree? **PASS** — verified clean cherry-pick
 
-### Step 9.3: Exception category
-**Record:** None (not device ID, quirk, DT, build, or docs). Standard
-protocol-correctness bug fix.
+### Step 9.3: Exception categories
+**Record:** N/A (not device ID, quirk, DT, build, or docs fix — standard
+bug fix)
 
-### Step 9.4: Problem and decision rationale
-
-This commit fixes ksmbd SMB2/3 lease handling to use the connection
-`ClientGUID` (per MS-SMB2) instead of the session `ClientGUID` when
-looking up lease tables and checking duplicate lease keys. The lease
-infrastructure already keys tables by `conn->ClientGUID`; using
-`sess->ClientGUID` was internally inconsistent and could cause wrong
-lease lookups. The `copy_lease()` additions fix directory lease metadata
-loss on second opens, and the `flags |=` change prevents overwriting
-other lease flags during break-in-progress.
-
-For stable 6.18.y users running ksmbd with SMB2/3 leasing, this is a
-worthwhile fix: small, low-risk, and addresses real client-visible lease
-correctness issues.
+### Step 9.4: Decision rationale
+For Linux **6.18.44**, the buggy code exists, the fix is absent, and the
+patch is a minimal, maintainer-acked correction of a long-standing
+error-path memory leak in ksmbd security-descriptor xattr handling.
+While not crash-critical, it meets stable criteria for a real, contained
+bug fix with low regression risk and established precedent in this
+subsystem.
 
 ---
 
 ## Verification
 
-- **[Phase 1]** `git show 41fd6f97cf085 --format=fuller`: parsed
-  subject, body, tags (Namjae Jeon, Steve French SOBs only).
-- **[Phase 2]** `git show 41fd6f97cf085 -p`: confirmed 3-file diff,
-  function-level changes.
-- **[Phase 2]** Read `oplock.c` lines 91, 489, 984, 1019, 1035,
-  1055–1068, 1077, 1130, 1249, 1820; `smb2pdu.c` line 3515;
-  `user_session.c` line 216.
-- **[Phase 3]** `git describe HEAD`: v6.18.44. `git blame -L 1018,1036
-  fs/smb/server/oplock.c`: `sess->ClientGUID` from `af7c39d971e43`
-  (2022).
-- **[Phase 3]** `git show af7c39d971e43`: multichannel session fix that
-  introduced `sess->ClientGUID` usage.
-- **[Phase 3]** `git log -1 -S"parent_lease_key"`: `d47d9886aeef7` added
-  directory lease parent keys.
-- **[Phase 3]** `git merge-base --is-ancestor fa111daa HEAD`: exit 1 —
-  fix not in tree.
-- **[Phase 3]** `git merge-base --is-ancestor 5198f8b2 HEAD`: exit 1 —
-  dependent refactor not in tree.
-- **[Phase 3]** Cherry-pick test: `git cherry-pick --no-commit
-  41fd6f97cf085` — clean auto-merge on 3 files.
-- **[Phase 4]** `b4 dig -c 41fd6f97cf085`: lore URL
-  `20260618141739.9029-2-linkinjeon@kernel.org`.
-- **[Phase 4]** Web search: found commit in ksmbd git-pull listing
-  smbtorture protocol fixes.
-- **[Phase 4]** Lore/patch.msgid.link fetch: blocked by bot protection —
-  thread content UNVERIFIED.
-- **[Phase 5]** `grep find_same_lease_key`: single caller in
-  `smb2pdu.c`; `same_client_has_lease` called from `smb_grant_oplock()`.
-- **[Phase 5]** Verified `lookup_lease_in_table()`,
-  `compare_guid_key()`, `add_lease_global_list()` use
-  `conn->ClientGUID`.
-- **[Phase 6]** `grep sess->ClientGUID fs/smb/server/oplock.c`: buggy
-  lines present at 1019, 1035, 1249.
-- **[Phase 6]** `copy_lease()` in tree lacks `is_dir`/`parent_lease_key`
-  copy.
-- **[Phase 7]** `grep CONFIG_SMB_SERVER fs/smb/Kconfig`: ksmbd is
-  `CONFIG_SMB_SERVER`.
-- **[Phase 8]** Failure mode assessed from code paths: lease
-  lookup/coherency bugs, not kernel crash.
+- **[Phase 1]** Parsed subject, tags, body; no syzbot/Reported-by;
+  Acked-by Namjae Jeon confirmed
+- **[Phase 2]** Read diff and `vfs.c`/`ndr.c`; confirmed leak mechanism
+  and fix correctness
+- **[Phase 3]** `git blame`: bug since `f44158485826c` (2021); `b4 dig
+  -a`: v1→v2 series; fix is patch 1/3, standalone
+- **[Phase 3]** `git log master`: fix at `d4d56b00c7df8`, not in HEAD
+  (6.18.44)
+- **[Phase 4]** `b4 dig -c d4d56b00c7df8`: lore URL found; `b4 dig -w`:
+  maintainers CC'd
+- **[Phase 4]** WebFetch/curl lore: **blocked** (403/bot protection) —
+  reviewer comments/stable nomination unverified
+- **[Phase 5]** `grep` callers: `smbacl.c` (×2), `smb2pdu.c` (×1); SMB2
+  SET_INFO security path confirmed
+- **[Phase 5]** `ndr.c`: `ndr_encode_v4_ntacl()` allocates without
+  error-path free confirmed
+- **[Phase 6]** `git describe HEAD`: 6.18.44; buggy code at lines
+  1572–1573 confirmed present
+- **[Phase 6]** `git cherry-pick --no-commit d4d56b00c7df8`: clean apply
+- **[Phase 6]** `git log --grep="sd_ndr.data memory leak"`: no existing
+  fix in tree
+- **[Phase 7]** `git log --oneline -20 -- fs/smb/server/`: active
+  subsystem with prior leak fixes
+- **[Phase 8]** Precedent: `78ad2c277af4c` similar ksmbd xattr leak fix
+  exists in tree history
 
-**YES**These background lookups are done. Summary:
+**YES**
 
-- **Commit identified:** `41fd6f97cf085` (upstream
-  `fa111daae1a02dbff5693dfc12f368bccd9eb5f4`) — `ksmbd: use connection
-  ClientGUID for lease lookup`
-- **Not in this tree:** Neither that commit nor the related refactor
-  `5198f8b2d0b1c` (“share SMB2 lease state across opens”) is in
-  `v6.18.44`
-- **`all-next`:** The ClientGUID commit wasn’t found there; recent
-  `oplock.c` work on that branch is separate UAF/NULL-deref hardening
-- **Standalone backport:** Cherry-pick to current HEAD applies cleanly;
-  it does not require the later “share SMB2 lease state” refactor
+ fs/smb/server/vfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-**Verdict from the full analysis: YES** — protocol-correctness fix for
-ksmbd SMB2/3 lease handling, small and low-risk for 6.18.y.
-
- fs/smb/server/oplock.c  | 16 +++++++++-------
- fs/smb/server/oplock.h  |  2 +-
- fs/smb/server/smb2pdu.c |  2 +-
- 3 files changed, 11 insertions(+), 9 deletions(-)
-
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index c12b2b2857667..b6705a07c6ebe 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -520,7 +520,7 @@ static inline int compare_guid_key(struct oplock_info *opinfo,
-  * Return:      oplock(lease) object on success, otherwise NULL
-  */
- static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
--						 char *client_guid,
-+						 const char *client_guid,
- 						 struct lease_ctx_info *lctx)
- {
- 	int ret;
-@@ -1014,7 +1014,7 @@ void destroy_lease_table(struct ksmbd_conn *conn)
- 	write_unlock(&lease_list_lock);
- }
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 32009ff8dfa45..263032adf0cd8 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1575,8 +1575,8 @@ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ 	if (rc < 0)
+ 		pr_err("Failed to store XATTR ntacl :%d\n", rc);
  
--int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
-+int find_same_lease_key(struct ksmbd_conn *conn, struct ksmbd_inode *ci,
- 			struct lease_ctx_info *lctx)
- {
- 	struct oplock_info *opinfo;
-@@ -1031,7 +1031,7 @@ int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
- 	}
- 
- 	list_for_each_entry(lb, &lease_table_list, l_entry) {
--		if (!memcmp(lb->client_guid, sess->ClientGUID,
-+		if (!memcmp(lb->client_guid, conn->ClientGUID,
- 			    SMB2_CLIENT_GUID_SIZE))
- 			goto found;
- 	}
-@@ -1047,7 +1047,7 @@ int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
- 		rcu_read_unlock();
- 		if (opinfo->o_fp->f_ci == ci)
- 			goto op_next;
--		err = compare_guid_key(opinfo, sess->ClientGUID,
-+		err = compare_guid_key(opinfo, conn->ClientGUID,
- 				       lctx->lease_key);
- 		if (err) {
- 			err = -EINVAL;
-@@ -1080,6 +1080,9 @@ static void copy_lease(struct oplock_info *op1, struct oplock_info *op2)
- 	lease2->flags = lease1->flags;
- 	lease2->epoch = lease1->epoch;
- 	lease2->version = lease1->version;
-+	lease2->is_dir = lease1->is_dir;
-+	memcpy(lease2->parent_lease_key, lease1->parent_lease_key,
-+	       SMB2_LEASE_KEY_SIZE);
- }
- 
- static void add_lease_global_list(struct oplock_info *opinfo,
-@@ -1218,7 +1221,6 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
- 		     struct ksmbd_file *fp, __u16 tid,
- 		     struct lease_ctx_info *lctx, int share_ret)
- {
--	struct ksmbd_session *sess = work->sess;
- 	int err = 0;
- 	struct oplock_info *opinfo = NULL, *prev_opinfo = NULL;
- 	struct ksmbd_inode *ci = fp->f_ci;
-@@ -1261,12 +1263,12 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
- 		struct oplock_info *m_opinfo;
- 
- 		/* is lease already granted ? */
--		m_opinfo = same_client_has_lease(ci, sess->ClientGUID,
-+		m_opinfo = same_client_has_lease(ci, work->conn->ClientGUID,
- 						 lctx);
- 		if (m_opinfo) {
- 			copy_lease(m_opinfo, opinfo);
- 			if (atomic_read(&m_opinfo->breaking_cnt))
--				opinfo->o_lease->flags =
-+				opinfo->o_lease->flags |=
- 					SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE;
- 			opinfo_put(m_opinfo);
- 			goto out;
-diff --git a/fs/smb/server/oplock.h b/fs/smb/server/oplock.h
-index d91a8266e065e..795a9119dad9a 100644
---- a/fs/smb/server/oplock.h
-+++ b/fs/smb/server/oplock.h
-@@ -116,7 +116,7 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp);
- struct create_context *smb2_find_context_vals(void *open_req, const char *tag, int tag_len);
- struct oplock_info *lookup_lease_in_table(struct ksmbd_conn *conn,
- 					  char *lease_key);
--int find_same_lease_key(struct ksmbd_session *sess, struct ksmbd_inode *ci,
-+int find_same_lease_key(struct ksmbd_conn *conn, struct ksmbd_inode *ci,
- 			struct lease_ctx_info *lctx);
- void destroy_lease_table(struct ksmbd_conn *conn);
- void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 99a0108cb21f4..66871fbe53f48 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3534,7 +3534,7 @@ int smb2_open(struct ksmbd_work *work)
- 			ksmbd_debug(SMB,
- 				    "lease req for(%s) req oplock state 0x%x, lease state 0x%x\n",
- 				    name, req_op_level, lc->req_state);
--			rc = find_same_lease_key(sess, fp->f_ci, lc);
-+			rc = find_same_lease_key(conn, fp->f_ci, lc);
- 			if (rc)
- 				goto err_out1;
- 		} else if (open_flags == O_RDONLY &&
+-	kfree(sd_ndr.data);
+ out:
++	kfree(sd_ndr.data);
+ 	kfree(acl_ndr.data);
+ 	kfree(smb_acl);
+ 	kfree(def_smb_acl);
 -- 
 2.53.0
 
