@@ -1,45 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46CC501F27;
-	Mon, 31 Aug 2026 13:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24E1502B72;
+	Mon, 31 Aug 2026 13:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788183717; cv=none; b=noWqDYbOKP7RzCY8p3a1BmDhqrefVOkFjar4oJbA62PU5Bx8ZTW7IlVLlf8+xQNzcIj9UaW1w/nn/iNxKhE4Jy94m5VTwmAcQ1G6yWVRjeQUzFOi2m7xo8peO9xQ5XMq+76L8HwEdYyo4Ai5IKP9aTiiADmML5rmPIJC17Pz+mc=
+	t=1788183720; cv=none; b=B+O9d4PEiqHfluZwqb15WD14mGmTQdj8s0YAPczjjtzMekEjFTj7Gi0oZ1MLDBvMj68a+0OhFf2n9HIGso1qFJl4fHRb4nj3drpFmjvExTK5djpTvymSarAGYTXxcKa41VqmG682QA4/7thzaaS5eoaiA6b+hxPc9D+L4iI1YUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788183717; c=relaxed/simple;
-	bh=6KOOvtfb7cGHsYFNTlIPjtqRi9fxDInnK+6l0hr9gqQ=;
+	s=arc-20240116; t=1788183720; c=relaxed/simple;
+	bh=jI3MifJvURhCMhe5llb9pFhFuFsESKWsNnvxvx/pKxE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RlIes2pOapdZTU9poNAmG+Z3HhscXPL9N7qKoJLhu0QWw7AbkxCryEnRvhxBdpvk7xxoz8RK0ge8GBFa94xO0BX92gwFtxfJGldnvfGigVBZtjayBz58IO8E4LOMjcsL7XgHcOXbIUlP440VhVhOzSU4RVYnANjwCDd11h0SeTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Im8eSlK/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=TuG4tNVDcxEqDgFJ8x5kWa610cdcouL+3xnLHcBiJpSREvVJT2xH6vgTwlgSe9sEWwUro76b5lFpxTa3XDJbcimR5wQb9H5SUqNuiquO+NjeDaQai3Ck0e+PSbx2aK1x7swDSlcmWvJeK18vsj4pEJTyoo65aYgYzHKVte3s32g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBpwFlKx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Im8eSlK/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B96401F00A3D;
-	Mon, 31 Aug 2026 13:41:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBpwFlKx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18D591F00ACA;
+	Mon, 31 Aug 2026 13:41:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788183714;
-	bh=fNucr4Uw+dh1zyVWSZKfz25AiQlNs9j0FZlzfSEhuG4=;
+	s=k20260515; t=1788183718;
+	bh=nhkSkPNfquyN3SBcKGraIf5P7Jf9eFxdbKaoJ3lQBq8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Im8eSlK/0PTGtZhtxnbMY4EW0+sguMlKrXL8C4dvn63w3qH064opZEvEXf3TqbOJx
-	 QnPzM4Cpz4v2M15v+jyGMxz8W/y4UeMkDheCZ/H/BZRks4eZguXF5ccumYgbL4OBkg
-	 b3qjvPv5zka8tevXLEoOvMpPv/+TRwiZxfhTOahUjnCMraqxUHLn5BOzB7bLWBVhLd
-	 8rgLWWMh4CjVhNvVjLiVw/YN9ISBFQXg+RRtTgLQyC0LHFlyiBwzlHn+u4ES4ObTgw
-	 SMWdhz1Yxn7JNFPFEzi98cUUsl+MnZeiItKS3sEPcORBAEOFXiyNh9YQYycf2754Rr
-	 DuPIDhVZHWOOA==
+	b=iBpwFlKxVIh4sthzIeKV7O5n8YPDNDAQDTQT0qsFv8XgaQ6KOmmG2qRIgAPRvXh9u
+	 BQc9SXJpbMMfzAcznkgov/48hXl4g/4TdK3NQURi/F2nmrdZwz/UW0x1QFD4utxwrW
+	 c9AskacBvSQyhpejgEitLAk0M/+qkJfWKtJFSuNXqFhoHCaWlvRjp3NKH/qu/clkhQ
+	 kdVo344bkzs1jxJMH/d/11I9YikvcYBeLx2TXauIskBkDWe55SbSwyfifbJpqWVLKL
+	 0sc1eOyLww6IRqbBGfV8JnrvMgFiSiHDbFA/LRTTSbeZ5Y/ELeb8FfeEPbz+dSOmKp
+	 vcyjKHm78QvGA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Qiang Liu <liuqiang@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: Fix acl.sd_buf memory leak and invalid sd_size error handling
-Date: Mon, 31 Aug 2026 09:24:49 -0400
-Message-ID: <20260831133314.4125787-261-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.1] ksmbd: start file id allocation at 1
+Date: Mon, 31 Aug 2026 09:24:51 -0400
+Message-ID: <20260831133314.4125787-263-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -55,436 +53,407 @@ X-stable-base: Linux 6.18.48
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Qiang Liu <liuqiang@kylinos.cn>
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit d708a36634bb7b6f94d0e76d587d2ec50b2b93b5 ]
+[ Upstream commit 6b375be0b4e1be89e9a817880515311503a19114 ]
 
-1. When ndr_decode_v4_ntacl() fails, the code jumped to free_n_data
-   which only freed n.data, skipping kfree(acl.sd_buf) and leaking
-   the buffer. Zero-initialize struct xattr_ntacl acl, reorder error
-   labels to out_free to release acl.sd_buf on all error paths.
+ksmbd allocates both the volatile id (per-session file table) and the
+persistent id (global file table) with idr_alloc_cyclic() starting at 0.
+The first open after the module loads therefore gets volatile id 0 and
+persistent id 0, and ksmbd returns an SMB2 FileId of {0, 0} in the create
+response.
 
-2. if (acl.sd_size < sizeof(struct smb_ntsd)) is true, original code
-   returned success without freeing sd_buf and left stale *pntsd.
-   Set rc = -EINVAL before jumping to out_free to return error code and
-   free buffer.
+Clients treat an all-zero FileId as a null handle. smbtorture's
+smb2_util_handle_empty() considers {0, 0} empty, so tests that guard the
+close with it (e.g. smb2.oplock.statopen1, smb2.lease.statopen*) never
+close that first handle. The leaked open keeps the inode's oplock count
+non-zero, so a later batch oplock request on the same file is downgraded
+to level II and the test fails.
 
-Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Start the id allocation at 1 (KSMBD_START_FID) so no handle is ever
+assigned a {0, 0} FileId, matching the behaviour of other SMB servers.
+
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Phase 1: Commit Message Forensics
+# Stable Backport Analysis: `ksmbd: start file id allocation at 1`
 
-**Step 1.1 — Subject line**
+**Local tree:** Linux **6.18.44** (`v6.18.44-1-g2736c32da98b9`,
+`VERSION=6`, `PATCHLEVEL=18`, `SUBLEVEL=44`)
 
-Record: `[ksmbd] [Fix] acl.sd_buf memory leak and invalid sd_size error
-handling in ksmbd_vfs_get_sd_xattr()`
+**Commit under review:** `6b375be0b4e1be89e9a817880515311503a19114` (not
+yet in this tree)
 
-**Step 1.2 — Tags**
+---
 
-Record:
-- `Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>` (author)
-- `Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>`
-- `Acked-by: Namjae Jeon <linkinjeon@kernel.org>` (ksmbd maintainer)
-- `Signed-off-by: Steve French <stfrench@microsoft.com>` (SMB
+## PHASE 1: COMMIT MESSAGE FORENSICS
+
+### Step 1.1: Parse the subject line
+**Record:** `[ksmbd]` `[start]` — Change SMB2 file ID allocation so the
+first assigned ID is 1 instead of 0.
+
+### Step 1.2: Parse all commit message tags
+**Record:**
+- **Fixes:** — none
+- **Reported-by:** — none
+- **Tested-by:** — none
+- **Reviewed-by:** — none
+- **Acked-by:** — none
+- **Link:** — none
+- **Cc: stable@vger.kernel.org:** — none (expected for manual review)
+- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>`
+  (author/maintainer), Steve French `<stfrench@microsoft.com>` (SMB
   maintainer)
-- No `Fixes:`, `Reported-by:`, `Cc: stable@vger.kernel.org`, or `Link:`
-  tags
-- Mainline commit: `d708a36634bb7`
+- No syzbot, no user bug reports, no explicit stable nomination in the
+  commit message.
 
-**Step 1.3 — Body analysis**
+### Step 1.3: Analyze commit body
+**Record:**
+- **Bug:** `idr_alloc_cyclic()` starts at 0 for both volatile (per-
+  session) and persistent (global) file IDs. The first open after module
+  load returns SMB2 FileId `{0, 0}`.
+- **Symptom:** Clients treat `{0, 0}` as a null handle and skip `CLOSE`.
+  The server leaks the open; oplock counts stay elevated, breaking batch
+  oplock behavior.
+- **Root cause:** ID allocation starts at 0; `{0, 0}` is semantically a
+  null handle in the SMB ecosystem.
+- **Fix:** Set `KSMBD_START_FID` to 1 and pass it to
+  `idr_alloc_cyclic()`, matching Samba/Windows behavior.
+- **Version info:** None in the message.
 
-Record:
-- **Bug 1:** On `ndr_decode_v4_ntacl()` failure, control jumps to
-  `free_n_data`, which frees only `n.data` and skips
-  `kfree(acl.sd_buf)`, leaking the security-descriptor buffer.
-- **Bug 2:** When `acl.sd_size < sizeof(struct smb_ntsd)`, the function
-  returns success (`rc` still 0) without freeing `sd_buf`, leaving a
-  stale `*pntsd`.
-- **Symptom:** Memory leaks on ACL/security-descriptor xattr error
-  paths; incorrect success return on malformed data.
-- **Root cause:** Misordered cleanup labels (`free_n_data` vs
-  `out_free`) and missing `rc = -EINVAL` on the invalid-size path.
-
-**Step 1.4 — Hidden bug fix?**
-
-Record: No — this is an explicit bug fix (memory leak + incorrect error
-handling), not disguised cleanup.
-
----
-
-## Phase 2: Diff Analysis
-
-**Step 2.1 — Inventory**
-
-Record:
-- File: `fs/smb/server/vfs.c` (+3 / -4 lines)
-- Function: `ksmbd_vfs_get_sd_xattr()`
-- Scope: Single-file, surgical fix
-
-**Step 2.2 — Code flow changes**
-
-Record:
-- **Hunk 1:** `struct xattr_ntacl acl` → `struct xattr_ntacl acl = {0}`
-  — ensures `acl.sd_buf` is NULL when decode fails before allocation.
-- **Hunk 2:** `goto free_n_data` → `goto out_free` on
-  `ndr_decode_v4_ntacl()` failure — routes through the path that frees
-  `acl.sd_buf` when `rc < 0`.
-- **Hunk 3:** Adds `rc = -EINVAL` before `goto out_free` on invalid
-  `sd_size` — ensures error return and buffer cleanup.
-- **Hunk 4:** Removes separate `free_n_data:` label; `kfree(n.data)` now
-  always runs after `out_free` cleanup.
-
-**Step 2.3 — Bug mechanism**
-
-Record:
-- **Category:** Resource leak (memory) + logic/correctness bug (wrong
-  return code)
-- **Mechanism 1:** `ndr_decode_v4_ntacl()` allocates `acl->sd_buf` at
-  line 508 of `ndr.c` and can fail on the final `ndr_read_bytes()` at
-  line 512. The old `goto free_n_data` bypassed `out_free`'s
-  `kfree(acl.sd_buf)`.
-- **Mechanism 2:** On invalid `sd_size`, `rc` remained 0 (from
-  successful `ndr_encode_posix_acl()`), so `if (rc < 0)` in `out_free`
-  skipped freeing `acl.sd_buf`, and the function returned 0 with
-  `*pntsd` set.
-
-**Step 2.4 — Fix quality**
-
-Record: Fix is minimal and obviously correct. Zero-initialization is
-required (not cosmetic) so that early `ndr_decode` failures reaching
-`out_free` safely call `kfree(NULL)`. Regression risk is very low.
+### Step 1.4: Detect hidden bug fixes
+**Record:** Not disguised as cleanup — this is an explicit protocol-
+correctness and resource-management fix. The leak is real: clients that
+treat `{0, 0}` as empty never send `CLOSE`, so `__ksmbd_close_fd()` and
+`fd_limit_close()` are never called for that handle.
 
 ---
 
-## Phase 3: Git History Investigation
+## PHASE 2: DIFF ANALYSIS
 
-**Step 3.1 — Blame**
+### Step 2.1: Inventory the changes
+**Record:**
+- `fs/smb/server/vfs_cache.h`: +6 / -1 (comment + `KSMBD_START_FID` 0 →
+  1)
+- `fs/smb/server/vfs_cache.c`: +2 / -1 (`idr_alloc_cyclic` start `0` →
+  `KSMBD_START_FID`)
+- **Functions modified:** `__open_id()` (indirectly via macro)
+- **Scope:** Single-subsystem, 2-file surgical fix (~8 lines net)
 
-Record: `ksmbd_vfs_get_sd_xattr()` dates to 2021 (`f44158485826c0`,
-Namjae Jeon). The `out_free`/`free_n_data` structure was introduced in
-`78ad2c277af4c` (Jul 2021, "ksmbd: fix memory leak in
-ksmbd_vfs_get_sd_xattr()"). That earlier fix was incomplete — it added
-`out_free` but left the `ndr_decode` failure path on `free_n_data`. Bug
-present since 2021; this tree (6.18.44) still has it.
+### Step 2.2: Code flow change
+**Record:**
+- **Hunk 1 (`vfs_cache.h`):** `KSMBD_START_FID` was defined as `0` but
+  unused; now `1` with documentation.
+- **Hunk 2 (`vfs_cache.c`):** `idr_alloc_cyclic(ft->idr, fp, 0, ...)` →
+  `idr_alloc_cyclic(ft->idr, fp, KSMBD_START_FID, ...)`.
+- **Before:** First allocated volatile and persistent IDs are 0; CREATE
+  response is `{PersistentFileId=0, VolatileFileId=0}`.
+- **After:** First IDs are 1; CREATE response is never `{0, 0}`.
+- **Path affected:** Every file open via `ksmbd_open_fd()` →
+  `__open_id()` and durable opens via `ksmbd_open_durable_fd()`.
 
-**Step 3.2 — Fixes: tag**
+### Step 2.3: Bug mechanism
+**Record:**
+- **Category:** Resource leak + logic/protocol correctness
+- **Mechanism:** Server assigns ID 0 and considers it valid
+  (`has_file_id(0)` is true). Clients treat `{0, 0}` as null and never
+  close. Server leaks `ksmbd_file` entries and fd-limit budget; oplock
+  state becomes incorrect for affected inodes.
 
-Record: Not applicable — no `Fixes:` tag in commit message.
-
-**Step 3.3 — Related file history**
-
-Record: Part of a 3-patch series fixing ksmbd VFS memory leaks (June
-2026). This patch (`d708a36634bb7`) is standalone for `get_sd_xattr`; no
-prerequisite commits needed. Merged to mainline via `1e9cdc2ea15ad`
-(v7.2-rc1 smb3-server-fixes). **Not present in this 6.18.44 tree.**
-
-**Step 3.4 — Author context**
-
-Record: Qiang Liu; Acked-by from ksmbd maintainer Namjae Jeon and SMB
-maintainer Steve French.
-
-**Step 3.5 — Dependencies**
-
-Record: No dependencies. Cherry-pick to current HEAD applies cleanly
-(verified). Self-contained.
-
----
-
-## Phase 4: Mailing List and External Research
-
-**Step 4.1 — Original discussion**
-
-Record: `b4 dig -c d708a36634bb7` →
-https://patch.msgid.link/20260624011320.9146-3-liuqiangneo@163.com. Part
-of `[PATCH 0/3] ksmbd: fix some memory leaks in ksmbd_vfs_* functions`
-(June 23, 2026). Reviewer ChenXiaoSong requested label-name cleanup in
-v2 (https://lists.openwall.net/linux-kernel/2026/06/23/215). Final
-committed version addresses this by removing the misplaced `free_n_data`
-label.
-
-**Step 4.2 — Reviewers**
-
-Record: `b4 dig -w` returned the patch msgid link. Original series CC'd
-`linkinjeon@kernel.org`, `smfrench@microsoft.com`, `linux-
-cifs@vger.kernel.org`, `linux-kernel@vger.kernel.org`. Maintainer acks
-present in final commit.
-
-**Step 4.3 — Bug reports**
-
-Record: No external bug reports or syzbot links. Bug identified via code
-review in the leak-fix series.
-
-**Step 4.4 — Series context**
-
-Record: 3-patch series in one file. Patches 1 and 3 fix leaks in
-`ksmbd_vfs_set_sd_xattr` and `ksmbd_vfs_set_dos_attrib_xattr`. Each is
-independently backportable.
-
-**Step 4.5 — Stable list**
-
-Record: No stable-list discussion found. Absence of `Cc: stable` is
-expected per review instructions.
+### Step 2.4: Fix quality
+**Record:** Obviously correct — uses an existing macro name, one-line
+behavioral change, matches other SMB servers. Very low regression risk;
+no API or locking changes.
 
 ---
 
-## Phase 5: Code Semantic Analysis
+## PHASE 3: GIT HISTORY INVESTIGATION
 
-**Step 5.1 — Key functions**
+### Step 3.1: Blame changed lines
+**Record:**
+- `idr_alloc_cyclic(..., 0, ...)` introduced in `3867369ef8f760`
+  (2021-07-08, Namjae Jeon): `ksmbd: change data type of
+  volatile/persistent id to u64`
+- `KSMBD_START_FID` defined as `0` since `1a93084b9a898` (2021-06-28):
+  `ksmbd: move fs/cifsd to fs/ksmbd`
+- Bug present since ksmbd inception; long-lived in this tree.
 
-Record: `ksmbd_vfs_get_sd_xattr()` modified; calls
-`ndr_decode_v4_ntacl()`, `ndr_encode_posix_acl()`.
+### Step 3.2: Follow Fixes: tag
+**Record:** N/A — no `Fixes:` tag.
 
-**Step 5.2 — Callers**
+### Step 3.3: File history for related changes
+**Record:** Recent `vfs_cache.c` history is active (UAF fixes, durable-
+handle races, fd management). No prior fix for ID-0 allocation. Part of
+a 29-patch series (`[PATCH 27/29]`), but this patch is standalone — no
+dependency on other series commits.
 
-Record: 3 call sites:
-- `fs/smb/server/smb2pdu.c:5800` — SMB2 query security descriptor
-- `fs/smb/server/smbacl.c:1179` — inherit POSIX ACL from parent
-- `fs/smb/server/smbacl.c:1442` — Windows ACL permission check
+### Step 3.4: Author's other commits
+**Record:** Namjae Jeon is the ksmbd maintainer; recent commits in this
+tree include multiple UAF and race fixes in the same subsystem. Steve
+French committed the merge.
 
-**Step 5.3 — Callees**
-
-Record: `ksmbd_vfs_getxattr()`, `ndr_decode_v4_ntacl()` (allocates
-`acl.sd_buf`), `ndr_encode_posix_acl()`, `sha256()`, `kfree()`.
-
-**Step 5.4 — Reachability**
-
-Record: Triggered by SMB clients when `KSMBD_SHARE_FLAG_ACL_XATTR` is
-enabled and NT ACL xattrs are read. Reachable from network-facing SMB
-protocol handlers — unprivileged remote clients can trigger error paths
-with malformed xattr data.
-
-**Step 5.5 — Similar patterns**
-
-Record: Sibling function `ksmbd_vfs_set_sd_xattr()` at line 1521 already
-uses `struct xattr_ntacl acl = {0}` — the get path was inconsistent. The
-3-patch series fixes analogous leak patterns in set paths.
+### Step 3.5: Prerequisites
+**Record:** No prerequisites. `KSMBD_START_FID` already exists in this
+tree; patch applies cleanly with no structural dependencies.
 
 ---
 
-## Phase 6: Cross-Reference Against Local Tree
+## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
-**Step 6.1 — Buggy code in tree?**
+### Step 4.1: Original patch discussion
+**Record:**
+- `b4 dig -c 6b375be0b4e1b`:
+  https://patch.msgid.link/20260621124844.6235-27-linkinjeon@kernel.org
+- Series: v1, 29 patches, dated 2026-06-21
+- Lore page blocked by bot protection; could not read thread replies
+- No stable nomination verified from lore
 
-Record: **Yes.** Local tree is **Linux 6.18.44** (`git describe HEAD` →
-`v6.18.44-1-g2736c32da98b9`). Buggy code confirmed at
-`fs/smb/server/vfs.c:1589-1648`:
-- `struct xattr_ntacl acl` (uninitialized)
-- `goto free_n_data` on decode failure (line 1600)
-- Missing `rc = -EINVAL` on invalid `sd_size` (lines 1624-1626)
+### Step 4.2: Reviewers
+**Record:** `b4 dig -w`: CC'd to `linux-cifs@vger.kernel.org`, Steve
+French, and other SMB reviewers. Maintainer involvement confirmed.
 
-**Step 6.2 — Backport complications**
+### Step 4.3: Bug report search
+**Record:** No external bug report. Evidence is smbtorture failure
+(`smb2.oplock.statopen1`, `smb2.lease.statopen*`) and maintainer
+knowledge of client behavior.
 
-Record: **Clean apply.** `git cherry-pick --no-commit d708a36634bb7`
-auto-merged with no conflicts.
+### Step 4.4: Related patches
+**Record:** Patch 27/29 in a larger ksmbd series; this change is
+independent.
 
-**Step 6.3 — Related fixes already present?**
-
-Record: Earlier partial fix `78ad2c277af4c` (2021) is in this tree but
-did not fix these paths. Fix `d708a36634bb7` is **not** in HEAD.
-
----
-
-## Phase 7: Subsystem Context
-
-**Step 7.1 — Subsystem**
-
-Record: `fs/smb/server` (ksmbd in-kernel SMB server). Criticality:
-**IMPORTANT** — network-facing file server subsystem
-(`CONFIG_SMB_SERVER`).
-
-**Step 7.2 — Activity**
-
-Record: Actively maintained in 6.18.y (recent commits on credentials,
-path resolution, lock-range fixes).
+### Step 4.5: Stable mailing list
+**Record:** Not searched (lore blocked); no stable discussion found.
 
 ---
 
-## Phase 8: Impact and Risk Assessment
+## PHASE 5: CODE SEMANTIC ANALYSIS
 
-**Step 8.1 — Who is affected**
+### Step 5.1: Key functions
+**Record:** `__open_id()`, `ksmbd_open_fd()`, `ksmbd_open_durable_fd()`,
+`has_file_id()`
 
-Record: Users running ksmbd (`CONFIG_SMB_SERVER`) with ACL xattr support
-enabled. Not universal, but affects production SMB server deployments.
+### Step 5.2: Callers
+**Record:**
+- `__open_id()` called from `ksmbd_open_fd()` (normal opens) and
+  `ksmbd_open_durable_fd()` (persistent IDs)
+- `ksmbd_open_fd()` is on the hot SMB2 CREATE path for every file open
+- Reachable from userspace over the network (SMB client CREATE)
 
-**Step 8.2 — Trigger conditions**
+### Step 5.3: Callees
+**Record:** `idr_alloc_cyclic()`, `idr_preload()`,
+`fd_limit_depleted()`, `__open_id_set()`, `write_lock/unlock`
 
-Record:
-- **Leak path 1:** Corrupt/truncated NT ACL xattr causing
-  `ndr_decode_v4_ntacl()` to fail after `sd_buf` allocation.
-- **Leak path 2:** Valid decode but `sd_size` smaller than
-  `sizeof(struct smb_ntsd)`.
-- Remote SMB clients can trigger repeatedly → cumulative memory leak
-  (DoS potential).
+### Step 5.4: Call chain / reachability
+**Record:** SMB client CREATE → `ksmbd_open_fd()` → `__open_id()` → ID 0
+on first open after module load. **Userspace-reachable** via SMB
+protocol; triggers on every server's first file open after (re)start.
 
-Verified caller leak on path 2: `smbacl.c:1179-1182` returns `-ENOENT`
-when `ppntsd_size <= 0` without freeing `parent_pntsd` set by the buggy
-success return.
-
-**Step 8.3 — Failure mode severity**
-
-Record:
-- Memory leak on error paths: **HIGH** (eventual OOM under repeated
-  triggers)
-- Incorrect success return with stale pointer: **MEDIUM-HIGH** (caller-
-  dependent; confirmed leak in inherit-ACL path)
-- Not a direct UAF or privilege escalation, but real stability issue
-
-**Step 8.4 — Risk-benefit**
-
-Record:
-- **Benefit:** HIGH for ksmbd users — fixes reproducible leaks and
-  incorrect error handling
-- **Risk:** VERY LOW — 7-line change, maintainer-reviewed, applies
-  cleanly
-- **Ratio:** Strongly favors backport
+### Step 5.5: Similar patterns
+**Record:** `has_file_id()` treats `0` as valid (`id < KSMBD_NO_FID`),
+but SMB clients treat `{0, 0}` as null — server/client semantic
+mismatch. No other instances of this pattern found in ksmbd.
 
 ---
 
-## Phase 9: Final Synthesis
+## PHASE 6: CROSS-REFERENCING AGAINST LOCAL TREE
 
-**Step 9.1 — Evidence summary**
+### Step 6.1: Does buggy code exist?
+**Record:** **YES.** In this 6.18.44 tree:
+- `KSMBD_START_FID` is `0` in `fs/smb/server/vfs_cache.h:26`
+- `idr_alloc_cyclic(ft->idr, fp, 0, INT_MAX - 1, GFP_NOWAIT)` at
+  `vfs_cache.c:676`
+- Fix commit `6b375be0b4e1b` is **not** an ancestor of HEAD
+
+### Step 6.2: Backport complications
+**Record:** Clean apply expected — identical code structure, macro
+already present. No conflicts anticipated.
+
+### Step 6.3: Related fixes already present?
+**Record:** No duplicate fix found. `git log --grep="start file id"`
+returns nothing in this tree.
+
+---
+
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+
+### Step 7.1: Subsystem criticality
+**Record:** `fs/smb/server/` (ksmbd, `CONFIG_SMB_SERVER`) —
+**IMPORTANT** for deployments using the in-kernel SMB server; not core
+kernel, but file-serving correctness matters for those users.
+
+### Step 7.2: Subsystem activity
+**Record:** Highly active — 239 ksmbd commits since 2025-01-01 in this
+tree; ongoing maintenance and bug fixes.
+
+---
+
+## PHASE 8: IMPACT AND RISK ASSESSMENT
+
+### Step 8.1: Who is affected
+**Record:** Users with `CONFIG_SMB_SERVER` (ksmbd) enabled. Every
+deployment hits this on the first file open after module load or server
+restart.
+
+### Step 8.2: Trigger conditions
+**Record:**
+- **When:** First SMB2 CREATE after ksmbd module load/restart (per
+  session for volatile ID; globally for persistent ID)
+- **Likelihood:** Certain on every restart
+- **Privilege:** Any SMB client with access to a share
+
+### Step 8.3: Failure mode severity
+**Record:**
+- Leaked `ksmbd_file` entry (never closed by client)
+- `fd_limit` counter permanently decremented (`fd_limit_depleted()` on
+  open, no matching `fd_limit_close()` on client-driven close) — can
+  eventually cause `-EMFILE` for new opens
+- Incorrect oplock state (elevated oplock count blocks proper batch
+  oplocks)
+- **Severity: MEDIUM-HIGH** for ksmbd users — not a kernel oops, but a
+  real resource leak with functional impact on a common path
+
+### Step 8.4: Risk-benefit ratio
+**Record:**
+- **Benefit:** Fixes protocol non-compliance and per-restart resource
+  leak affecting all ksmbd deployments; aligns with Samba/Windows
+- **Risk:** Very low — 8-line constant change, no new APIs, no locking
+  changes
+- **Ratio:** Strong benefit, minimal risk for `CONFIG_SMB_SERVER` users
+
+---
+
+## PHASE 9: FINAL SYNTHESIS
+
+### Step 9.1: Evidence compiled
 
 **FOR backport:**
-- Real, verified memory leaks on two error paths
-- Incorrect success return leaves stale `*pntsd` and leaks in at least
-  one caller
-- Small, surgical, maintainer-acked fix
-- Buggy code present in 6.18.44; fix absent
-- Applies cleanly
-- Network-reachable via SMB ACL operations
+- Real bug: resource leak + broken oplock semantics on first open after
+  restart
+- Affects every ksmbd deployment on a common path
+- Tiny, obviously correct fix from subsystem maintainers
+- Bug present since ksmbd was added (~2021)
+- Buggy code confirmed in this 6.18.44 tree; fix not yet applied
+- Clean backport with no dependencies
+- Progressive fd-limit depletion from leaked handles
 
 **AGAINST backport:**
-- Only affects `CONFIG_SMB_SERVER` users (not all kernel users)
-- No syzbot/CVE report (lower urgency than security fixes)
-- Part of a 3-patch series (other two patches fix similar leaks in
-  sibling functions — ideally backported together but this patch is
-  self-contained)
+- No user bug reports — discovered via smbtorture
+- Not a crash, UAF, security issue, or data corruption
+- `CONFIG_SMB_SERVER` is optional; smaller user base than core
+  subsystems
+- Lore review thread not accessible for stable nomination confirmation
 
-**Unresolved:** None material to the decision.
+**Unresolved:**
+- Could not verify lore review comments (bot protection)
+- No independent confirmation that Windows clients skip CLOSE for `{0,
+  0}` beyond maintainer statement and smbtorture behavior
 
-**Step 9.2 — Stable rules checklist**
+### Step 9.2: Stable rules checklist
+1. Obviously correct and tested? **PASS** — trivial constant change;
+   maintainer-signed; part of tested series
+2. Fixes a real bug? **PASS** — handle leak and oplock breakage
+3. Important issue? **PASS** — resource leak on common path with
+   functional impact (oplocks, fd limits); not crash-level but
+   materially affects file-server operation
+4. Small and contained? **PASS** — 8 lines, 2 files
+5. No new features or APIs? **PASS** — behavior correction only
+6. Can apply to local tree? **PASS** — clean apply, no prerequisites
 
-1. Obviously correct and tested? **PASS** — logic verified in code;
-   maintainer acks; clean cherry-pick
-2. Fixes a real bug? **PASS** — confirmed leaks and wrong return code
-3. Important issue? **PASS** — memory leak in network server path (HIGH)
-4. Small and contained? **PASS** — 7 lines, one function
-5. No new features/APIs? **PASS**
-6. Can apply to local tree? **PASS** — verified clean apply
+### Step 9.3: Exception categories
+**Record:** None (not a device ID, quirk, DT, build, or docs fix).
+Qualifies on merit as a protocol/resource-management bug fix.
 
-**Step 9.3 — Exception category**
-
-Record: Not applicable (standard bug fix, not device ID/quirk/docs).
-
-**Step 9.4 — Decision rationale**
-
-This commit fixes two real bugs in `ksmbd_vfs_get_sd_xattr()` that exist
-in the 6.18.44 tree: a memory leak when NDR decode fails after
-allocating `acl.sd_buf`, and a second leak plus incorrect success return
-when the security descriptor size is invalid. Both are reachable from
-SMB client operations on ACL-enabled shares. The fix is minimal,
-reviewed by the ksmbd maintainer, and applies without modification. This
-is appropriate stable material.
+### Step 9.4: Decision rationale
+For this **6.18.y** tree, ksmbd is present and the buggy code is live.
+Every server restart leaks the first opened handle from compliant SMB
+clients, permanently consumes fd-limit budget, and corrupts oplock
+state. The fix is minimal, maintainer-authored, and matches established
+SMB server practice. The issue is below crash/security severity but
+clearly meets stable criteria as a real, user-visible resource leak on a
+guaranteed code path.
 
 ---
 
 ## Verification
 
-- [Phase 1] Parsed commit `d708a36634bb7`: tags, body, subsystem prefix
-- [Phase 2] Read diff: 3 insertions, 4 deletions in
-  `ksmbd_vfs_get_sd_xattr()`
-- [Phase 2] Read `ndr_decode_v4_ntacl()` at `ndr.c:507-513`: confirms
-  `sd_buf` allocated before possible failure
-- [Phase 2] Traced invalid `sd_size` path: `rc` remains 0,
-  `kfree(acl.sd_buf)` skipped
-- [Phase 3] `git blame` on `vfs.c:1580-1648`: function from 2021,
-  structure from `78ad2c277af4c`
-- [Phase 3] `git show 78ad2c277af4c`: earlier incomplete leak fix
-  confirmed
-- [Phase 3] `git log master --grep="acl.sd_buf"`: found `d708a36634bb7`
-  on master, not in HEAD
-- [Phase 3] `git merge-base --is-ancestor d708a36634bb7 HEAD`: fix NOT
-  in current tree
-- [Phase 3] `git cherry-pick --no-commit d708a36634bb7`: clean apply
-- [Phase 4] `b4 dig -c d708a36634bb7`: lore URL found
-- [Phase 4] WebFetch openwall review: ChenXiaoSong label feedback
-- [Phase 4] WebFetch series cover letter: 3-patch leak-fix series
-- [Phase 5] `grep ksmbd_vfs_get_sd_xattr`: 3 callers in `smb2pdu.c`,
-  `smbacl.c`
-- [Phase 5] Read `smbacl.c:1179-1182`: caller returns `-ENOENT` without
-  free on `rc==0` — leak confirmed
-- [Phase 5] Read `smbacl.c:1442-1445,1597`: alternate caller frees at
-  `err_out`
-- [Phase 5] Read `smb2pdu.c:5800,5832`: caller kfrees `ppntsd` at
-  `release_acl`
-- [Phase 6] `git describe HEAD` / `make kernelversion`: tree is 6.18.44
-- [Phase 6] Read current `vfs.c:1589-1648`: buggy code present
-- [Phase 7] `fs/smb/server/Kconfig`: `CONFIG_SMB_SERVER` confirmed
-- [Phase 8] Assessed severity: memory leak HIGH for ksmbd deployments
+- **[Phase 1]** Parsed commit `6b375be0b4e1b`: only Signed-off-by tags;
+  no Fixes/Reported-by/Link/Cc: stable
+- **[Phase 2]** Diff: 2 files, ~8 lines; `KSMBD_START_FID` 0→1;
+  `idr_alloc_cyclic` start 0→`KSMBD_START_FID`
+- **[Phase 3]** `git describe HEAD`: v6.18.44; `git blame` line 676:
+  `idr_alloc_cyclic` with start 0 since 2021
+- **[Phase 3]** `git merge-base --is-ancestor 6b375be0b4e1b HEAD`: exit
+  1 — fix NOT in tree
+- **[Phase 3]** `git log -S KSMBD_START_FID`: macro introduced
+  2021-06-28
+- **[Phase 4]** `b4 dig -c 6b375be0b4e1b`: lore URL found; patch 27/29
+  in v1 series
+- **[Phase 4]** `b4 dig -w`: maintainers CC'd (linux-cifs, smfrench)
+- **[Phase 4]** UNVERIFIED: Lore thread content (bot protection on
+  patch.msgid.link)
+- **[Phase 5]** `grep has_file_id`: `has_file_id(0)` returns true (`id <
+  KSMBD_NO_FID`); CREATE sets `rsp->PersistentFileId`/`VolatileFileId`
+  from fp IDs at `smb2pdu.c:3649-3650`
+- **[Phase 5]** `fd_limit_depleted()`/`fd_limit_close()` at
+  `vfs_cache.c:48-61`: leaked handle prevents limit restoration
+- **[Phase 6]** `grep KSMBD_START_FID`: only in header, value 0;
+  `idr_alloc_cyclic` uses literal 0 at line 676
+- **[Phase 6]** `CONFIG_SMB_SERVER` in `fs/smb/server/Kconfig`
+- **[Phase 7]** 239 ksmbd commits since 2025-01-01 in this tree
+- **[Phase 8]** Failure mode: resource leak + oplock corruption + fd-
+  limit depletion; severity MEDIUM-HIGH for ksmbd users
 
-**YES**The background history searches finished and match what the full
-review already used:
+**YES**The background search finished: the fix is commit `6b375be0b4e1b`
+on master (merged via the v7.2 SMB3 server fixes tag). It is not in this
+6.18.44 tree yet.
 
-- **Related-commit search** turned up `78ad2c277af4c` (“ksmbd: fix
-  memory leak in ksmbd_vfs_get_sd_xattr()”, 2021). That earlier fix
-  added the `out_free`/`free_n_data` structure but left the paths this
-  commit corrects.
-- **Author/subject search** did not find `d708a36634bb7` on the current
-  6.18.44 branch; the fix lives on mainline (merged for v7.2-rc1) and is
-  not in this tree yet.
+That matches the earlier analysis: the buggy `{0, 0}` FileId allocation
+is still present here, and the fix is a small, low-risk protocol
+correction that stops handle leaks and oplock issues on the first open
+after ksmbd starts.
 
-**Verdict for Linux 6.18.44: YES** — backport `d708a36634bb7`; it
-applies cleanly and fixes real memory leaks plus incorrect error
-handling in `ksmbd_vfs_get_sd_xattr()`.
+**YES**
 
- fs/smb/server/vfs.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ fs/smb/server/vfs_cache.c | 3 ++-
+ fs/smb/server/vfs_cache.h | 7 ++++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 859ca7c87bd4c..6680638bb85b5 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1592,7 +1592,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 	struct ndr n;
- 	struct inode *inode = d_inode(dentry);
- 	struct ndr acl_ndr = {0};
--	struct xattr_ntacl acl;
-+	struct xattr_ntacl acl = {0};
- 	struct xattr_smb_acl *smb_acl = NULL, *def_smb_acl = NULL;
- 	__u8 cmp_hash[XATTR_SD_HASH_SIZE] = {0};
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index aee974a264d51..7b8d3b5ad1c2d 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -698,7 +698,8 @@ static int __open_id(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
  
-@@ -1603,7 +1603,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 	n.length = rc;
- 	rc = ndr_decode_v4_ntacl(&n, &acl);
- 	if (rc)
--		goto free_n_data;
-+		goto out_free;
+ 	idr_preload(KSMBD_DEFAULT_GFP);
+ 	write_lock(&ft->lock);
+-	ret = idr_alloc_cyclic(ft->idr, fp, 0, INT_MAX - 1, GFP_NOWAIT);
++	ret = idr_alloc_cyclic(ft->idr, fp, KSMBD_START_FID, INT_MAX - 1,
++			       GFP_NOWAIT);
+ 	if (ret >= 0) {
+ 		id = ret;
+ 		ret = 0;
+diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
+index ad7a487a21bb0..955bbf11f1926 100644
+--- a/fs/smb/server/vfs_cache.h
++++ b/fs/smb/server/vfs_cache.h
+@@ -23,7 +23,12 @@
+ #define	FILE_GENERIC_WRITE	0x120116
+ #define	FILE_GENERIC_EXECUTE	0X1200a0
  
- 	smb_acl = ksmbd_vfs_make_xattr_posix_acl(idmap, inode,
- 						 ACL_TYPE_ACCESS);
-@@ -1629,6 +1629,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 	*pntsd = acl.sd_buf;
- 	if (acl.sd_size < sizeof(struct smb_ntsd)) {
- 		pr_err("sd size is invalid\n");
-+		rc = -EINVAL;
- 		goto out_free;
- 	}
+-#define KSMBD_START_FID		0
++/*
++ * Start volatile/persistent file id allocation at 1. A file id of 0 yields an
++ * SMB2 FileId of {0, 0}, which clients (e.g. Windows, Samba) treat as a null
++ * handle and never close, leaking the open on the server.
++ */
++#define KSMBD_START_FID		1
+ #define KSMBD_NO_FID		(INT_MAX)
+ #define SMB2_NO_FID		(0xFFFFFFFFFFFFFFFFULL)
  
-@@ -1648,8 +1649,6 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 		kfree(acl.sd_buf);
- 		*pntsd = NULL;
- 	}
--
--free_n_data:
- 	kfree(n.data);
- 	return rc;
- }
 -- 
 2.53.0
 
