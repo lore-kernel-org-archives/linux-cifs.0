@@ -1,43 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A9A58125B;
-	Mon, 31 Aug 2026 13:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2994B2CD0;
+	Mon, 31 Aug 2026 13:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788184201; cv=none; b=EVNXepNm14ILTuJU/K8s24Ke6apKQTsmmoZHc55K+G8FzKTmToHXDvOAfQMr6BzxbyKZs9M8i4+oE/4irOWqhQv5AuFdyqHhd0kq949N8PHirFpjdTy+nmXNol7gBB6X/whGqG5PFB8J69wWUjLcpUffT1ChpvpE2JNGNGoGp6g=
+	t=1788184308; cv=none; b=HpHJ2cugTGmhau1ZMuO+NhZOdpNQV8hrwEB4WuuLMR3RArhVAccVkIhYTP7LwocmFXmnlQSCjTe/zdfNF3noizbqzLk/gLd8ccCMrvIPsAh3IeVh/a/OywB+LqpoS0Fm3D8YMgL9qxEfGOkGofBH2rFG+/VtxqRYULgXeo5IjKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788184201; c=relaxed/simple;
-	bh=vGQiJ2+FxvfV2Xf6OT7ONCyn7m0kWvsKDjX4mSoNoSU=;
+	s=arc-20240116; t=1788184308; c=relaxed/simple;
+	bh=+bgH+6fQdc0CDeEey0yKNHCaY9sWUoyXx5KIn1hcxqk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yx4hdedsuGf/IJLT0+nc0d3RDCC/ENY0J0x4knVH/5r8H4+KdUznYh0IoIRwje2H+wsdSCI6zpl1sbPrq34M0bswVvYFQOuEyPpjR2Rp5wkl3HYp5dvvQ5nWyj2UrD137QxpZYIeSdHZezEiKOFxstWUppNnXqp+p8XcEyxcclc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bt/hHLzq; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=rJDnFG09oh+j4xB57+WMPw408lFf14mAH2y0aZ4h89cOUCIR4rpvHbWGQa9+aneTYJ7ES3I1yWXCFuqHK6vcXjZjzNONBZLd0daV2aXqVF9t0F1nB6Vd34FonShskSHOgdfYXhsTcjAOL8htrc0kbTvvuQgp1KSr4wcn5XbZWYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PB5u/KGM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bt/hHLzq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07A701F00A3D;
-	Mon, 31 Aug 2026 13:49:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PB5u/KGM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF3631F00ACA;
+	Mon, 31 Aug 2026 13:51:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788184199;
-	bh=Qty0XSGjkL2jQVRkRq+xD7ruk6d4D6pb1K/ZTQbW448=;
+	s=k20260515; t=1788184305;
+	bh=DYuIMm6sOTCZzKxDv31EBBEdn7Pb+U/nNZcyAaoStBs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Bt/hHLzqrMcIu5yytubr2v6qRPz6/L8CIvXL0gEIupsL4ZQwC7I7hL6Zc3zdQOpqP
-	 C0AonPrSeVlMZt+s9KgZ3bnvljbUHrVW9EnDqQtgWQHAb0AUEkKuJ0BTiv62d2jXt8
-	 TwgluLszGbdaYHMJo85Dokft9kOMFP07+USsNFtobb3Hdu/W/Y9TNqxOqLBAAaze+7
-	 c6COrS7LPAtGa/jhqBxOGBfeLDdL0c+3kLMvjYfB/7ARTnrzuT75mpW6VHRDKtu3qW
-	 wcXuskNgzmitxaXCo6oezCUxw3nEQWUx2ZTd2s/ovwzSf36FJILMLa8yjs3i/wvU0y
-	 jhjmDcz9Cj/qA==
+	b=PB5u/KGMgMzBHQCKDydd5H3ovsYG5cLLeaM0bq0hN+MwTcAQtO6jqnBRHPQFy/jS7
+	 W91hbFs1tnoeGeviUoJDFIVk4Z/DJVNhdw4EUI4z5a7I5cDt5wKrltAls0Ul5EmbDx
+	 BKVhhCO48YdMLT1ogN7YW3PCi4jn4fs9QRAatXv8rY9BzUhz7bAEUXkW8Mm5qqb8f+
+	 yoHH+xc2z28vdhWyPEG7dBiyJ6OtfYzZqAkP+iKT1k3i8ywoOaMrUBJIP35+OmSAxp
+	 qj5+oCSrboBud5NypHwK06sKTie8sZf3b5DXooU8V2ldhWLToK1B2nm3GGEJCB3Rxe
+	 4/VcQuGkkYvNg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Qiang Liu <liuqiang@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.6] ksmbd: fix lease break and ack state handling
-Date: Mon, 31 Aug 2026 09:29:38 -0400
-Message-ID: <20260831133314.4125787-550-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: fix n.data memory leak in ksmbd_vfs_set_dos_attrib_xattr
+Date: Mon, 31 Aug 2026 09:30:41 -0400
+Message-ID: <20260831133314.4125787-613-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -53,68 +55,61 @@ X-stable-base: Linux 6.18.48
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Qiang Liu <liuqiang@kylinos.cn>
 
-[ Upstream commit 5015191096db311759fef98769270336cd8b1324 ]
+[ Upstream commit 7ac657bb9c5c1b0f7bdf1fa6d3ad532f969be5cf ]
 
-Do not skip valid lease states containing WRITE_CACHING when breaking
-level-II/read leases for writes and truncates.
+Free ndr buffer data when ndr_encode_dos_attr() returns error
+to avoid memory leak.
 
-Handle lease break acknowledgments according to the SMB2 rule that the
-acknowledged state must be a subset of the server's break target. Apply
-the acknowledged state directly and keep the break pending on failed ACKs.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-# Stable Backport Analysis: `ksmbd: fix lease break and ack state
-handling`
+# Stable Backport Analysis: `ksmbd: fix n.data memory leak in
+ksmbd_vfs_set_dos_attrib_xattr`
 
-**Local tree:** `v6.18.44` (`VERSION = 6`, `PATCHLEVEL = 18`, `SUBLEVEL
-= 44`)
-**Commit under review:** `5015191096db3` (on `master`, not yet in this
-checkout)
+**Local tree:** `v6.18.44` (`stable/linux-6.18.y`, `make kernelversion`
+= 6.18.44)
+**Commit under review:** `7ac657bb9c5c1` (on `master`, **not yet** in
+this tree)
 
 ---
 
 ## PHASE 1: COMMIT MESSAGE FORENSICS
 
 ### Step 1.1: Subject line
-**Record:** `[ksmbd]` `[fix]` — Correct SMB2 lease-break dispatch and
-lease-break-ACK handling in the in-kernel SMB server.
+**Record:** `[ksmbd]` `[fix]` — memory leak of `n.data` in
+`ksmbd_vfs_set_dos_attrib_xattr` when `ndr_encode_dos_attr()` fails.
 
 ### Step 1.2: Tags
 **Record:**
-- `Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>` — author
-- `Signed-off-by: Steve French <stfrench@microsoft.com>` — subsystem
-  maintainer
-- No `Fixes:`, `Reported-by:`, `Cc: stable@vger.kernel.org`, `Link:`,
-  `Tested-by:`, or `Reviewed-by:` tags
-
-Notable: maintainer sign-off only; no explicit reporter or stable
-nomination.
+- **Signed-off-by:** Qiang Liu `<liuqiang@kylinos.cn>` (author)
+- **Reviewed-by:** ChenXiaoSong `<chenxiaosong@kylinos.cn>`
+- **Acked-by:** Namjae Jeon `<linkinjeon@kernel.org>` (ksmbd maintainer)
+- **Signed-off-by:** Steve French `<stfrench@microsoft.com>` (committer)
+- No `Fixes:`, `Reported-by:`, `Link:`, `Cc: stable`, or `Tested-by:`
+  tags
+- Notable: maintainer **Acked-by** is a strong quality signal
 
 ### Step 1.3: Body analysis
 **Record:**
-- **Bug:** Level-II/read lease breaks for writes/truncates incorrectly
-  skip leases that still have `WRITE_CACHING`. Lease-break ACK handling
-  does not follow the SMB2 rule that the acknowledged state must be a
-  subset of the server’s break target.
-- **Symptom:** Missed lease breaks and incorrect ACK completion; clients
-  can retain stale caches.
-- **Root cause (author):** Overly strict lease-state filter in
-  `smb_break_all_levII_oplock()`; ACK path applies wrong/complex state
-  transitions instead of validating subset and applying acknowledged
-  state directly; failed ACKs should leave the break pending.
-- **Version info:** None in message.
+- **Bug:** `ndr_encode_dos_attr()` allocates an NDR buffer (`n.data`);
+  on encoding error, `ksmbd_vfs_set_dos_attrib_xattr()` returned early
+  without `kfree(n.data)`.
+- **Symptom:** Memory leak (no crash/corruption described).
+- **Root cause:** Missing cleanup on the `ndr_encode_dos_attr()` error
+  path.
+- **Version info:** None in commit message.
 
 ### Step 1.4: Hidden bug fix?
-**Record:** No — explicitly described as a protocol-correctness bug fix,
-not disguised cleanup.
+**Record:** No — explicitly labeled as a memory leak fix, not disguised
+cleanup.
 
 ---
 
@@ -122,65 +117,52 @@ not disguised cleanup.
 
 ### Step 2.1: Inventory
 **Record:**
-| File | Change |
-|------|--------|
-| `fs/smb/server/oplock.c` | ~24 lines changed (net reduction) |
-| `fs/smb/server/smb2pdu.c` | ~106 lines changed (large net reduction) |
+- **Files:** `fs/smb/server/vfs.c` only (+3 / −2 lines)
+- **Function modified:** `ksmbd_vfs_set_dos_attrib_xattr()`
+- **Scope:** Single-file, surgical fix
 
-**Functions modified:**
-- `smb_break_all_levII_oplock()`
-- `smb2_map_lease_to_oplock()`
-- `check_lease_state()` (+ new `smb2_lease_state_valid()`)
-- `smb21_lease_break_ack()`
+### Step 2.2: Code flow change
+**Record:**
+| Hunk | Before | After |
+|------|--------|-------|
+| Error from `ndr_encode_dos_attr()` | `return err;` (leaks `n.data`) |
+`goto out;` |
+| Success path cleanup | `kfree(n.data); return err;` | `out:
+kfree(n.data); return err;` |
 
-**Scope:** Two-file, surgical SMB server oplock/lease fix.
-
-### Step 2.2: Code flow changes
-
-**Hunk 1 — `smb_break_all_levII_oplock()`**
-- **Before:** Rejects any lease whose state includes `WRITE_CACHING`
-  (treated as “unexpected”), then requires level-II oplock for non-
-  leases.
-- **After:** Only validates oplock level for non-lease entries; leases
-  with `WRITE_CACHING` are no longer skipped.
-- **Path:** Write/truncate/rename/create conflict paths that break
-  level-II/read leases.
-
-**Hunk 2 — `smb2_map_lease_to_oplock()`**
-- **Before:** Exact-match batch mapping; exclusive mapping fails when
-  `HANDLE` is set without `READ`.
-- **After:** Batch = `WRITE`+`HANDLE`; exclusive = any `WRITE`; level-II
-  = `READ` or `HANDLE`.
-- **Path:** Lease open and post-ACK level updates.
-
-**Hunk 3 — `smb21_lease_break_ack()` / `check_lease_state()`**
-- **Before:** Narrow ACK validation; large `lease_change_type` switch;
-  on many error paths falls through to success cleanup (`op_state =
-  NONE`, `breaking_cnt--`).
-- **After:** Validates `req_state` is legal and `req_state ⊆
-  lease->new_state`; applies `req->LeaseState` directly; success and
-  error paths are fully separated — failed ACKs keep break pending.
-- **Path:** Client SMB2 lease-break ACK handling.
+Both success and error paths now converge at `out:` and always free
+`n.data` when it was allocated.
 
 ### Step 2.3: Bug mechanism
 **Record:**
-- **Category:** Logic / protocol correctness (cache coherency)
-- **Mechanism 1:** `state & ~(READ|HANDLE)` flags `WRITE_CACHING` as
-  invalid → lease breaks skipped during writes/truncates → stale client
-  caches.
-- **Mechanism 2:** ACK handler does not implement subset semantics;
-  incorrect state transitions and wrong `opinfo->level`.
-- **Mechanism 3:** `goto err_out` in current tree still falls through to
-  unconditional break completion after `smb2_set_err_rsp()`.
+- **Category:** Resource leak on error path
+- **Mechanism:** `ndr_encode_dos_attr()` calls `kzalloc(1024)` then may
+  fail in `ndr_write_string()` / `ndr_write_int*()` via
+  `try_to_realloc_ndr_blob()` returning `-ENOMEM`. The caller returned
+  without freeing the already-allocated buffer.
+
+Verified in `ndr.c`:
+
+```170:188:fs/smb/server/ndr.c
+int ndr_encode_dos_attr(struct ndr *n, struct xattr_dos_attrib *da)
+{
+        // ...
+        n->data = kzalloc(n->length, KSMBD_DEFAULT_GFP);
+        if (!n->data)
+                return -ENOMEM;
+        // ... ndr_write_* calls that can return -ENOMEM ...
+        if (ret)
+                return ret;
+```
 
 ### Step 2.4: Fix quality
 **Record:**
-- Fix is obviously correct against SMB2 lease semantics.
-- Net -62 lines; removes overcomplicated ACK logic.
-- Low regression risk: narrower validation is more permissive only where
-  protocol allows (subset ACKs); stricter about illegal states via
-  `smb2_lease_state_valid()`.
-- No public API changes.
+- **Quality:** Obviously correct; mirrors the `goto out` + `kfree`
+  pattern used elsewhere in the same file (e.g.
+  `ksmbd_vfs_set_sd_xattr`, `ksmbd_vfs_get_dos_attrib_xattr`).
+- **Regression risk:** Very low — only adds cleanup on a previously
+  leaked path.
+- **Red flags:** None.
 
 ---
 
@@ -188,157 +170,162 @@ not disguised cleanup.
 
 ### Step 3.1: Blame
 **Record:**
-- Buggy `smb_break_all_levII_oplock()` filter: `e2f34481b24db` (Namjae
-  Jeon, 2021-03-16) — original ksmbd server import.
-- Buggy `check_lease_state()`: same commit; RH special-case added in
-  `64b39f4a2fd293` (2021-03-30).
-- Bug present since ksmbd introduction in this form; long-lived in
-  6.18.y.
+- Buggy logic introduced in `f44158485826c` ("cifsd: add file
+  operations", 2021-05-10).
+- Function has been in ksmbd/cifsd since v5.13 era; present in this
+  6.18.y tree at `fs/smb/server/vfs.c:1651–1670`.
 
 ### Step 3.2: Fixes: tag
-**Record:** N/A — no `Fixes:` tag.
+**Record:** N/A — no `Fixes:` tag present.
 
 ### Step 3.3: Related file history
-**Record:** Many ksmbd oplock/lease commits on `master` since
-`v6.18.44`, including `cd80ce7e68f16` (“don't update ->op_state as
-OPLOCK_STATE_NONE on error”, 2023) — partial fix only; current tree
-still has fall-through bug on failed ACKs. This commit is patch 3/14 of
-a June 2026 series but is logically standalone.
+**Record:**
+- Part of v2 series: `[PATCH v2 0/3] ksmbd: fix some memory leaks in
+  ksmbd_vfs_* functions`
+- Sibling commits on `master`:
+  - `d4d56b00c7df8` — `sd_ndr.data` leak in `ksmbd_vfs_set_sd_xattr`
+  - `d708a36634bb7` — `acl.sd_buf` leak in `ksmbd_vfs_get_sd_xattr`
+  - `7ac657bb9c5c1` — this commit (patch 3/3)
+- **This commit is standalone** — fixes a different function; no
+  dependency on siblings.
 
 ### Step 3.4: Author context
-**Record:** Namjae Jeon is primary ksmbd maintainer; Steve French is SMB
-maintainer. Both signed off.
+**Record:** Qiang Liu submitted the 3-patch leak-fix series. Namjae Jeon
+(maintainer) Acked all three. Steve French committed.
 
-### Step 3.5: Dependencies
-**Record:** `git cherry-pick --no-commit 5015191096db3` applies cleanly
-to current `HEAD` (exit 0). No hard dependency on other series patches
-for this diff.
+### Step 3.5: Prerequisites
+**Record:** None. `git apply --check` against this tree succeeds
+cleanly. No structural/API assumptions beyond existing code.
 
 ---
 
 ## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 
 ### Step 4.1: Original discussion
-**Record:** `b4 dig -c 5015191096db3` →
-https://patch.msgid.link/20260618141739.9029-3-linkinjeon@kernel.org —
-`[PATCH 03/14] ksmbd: fix lease break and ack state handling`.
+**Record:**
+- **b4 dig URL:**
+  https://patch.msgid.link/20260624011320.9146-4-liuqiangneo@163.com
+- **Series revisions:** v1 (2026-06-23), v2 (2026-06-24); committed
+  version matches v2 patch 3/3
+- **Lore fetch:** Blocked by Anubis bot protection — could not read
+  thread body for stable nominations or NAKs
 
-### Step 4.2: Reviewers
-**Record:** `b4 dig -w` CC'd: `linux-cifs@vger.kernel.org`,
-`smfrench@gmail.com`, `senozhatsky@chromium.org`, `tom@talpey.com`,
-`metze@samba.org`, `atteh.mailbox@gmail.com`.
+### Step 4.2: Reviewers (b4 dig -w)
+**Record:** CC'd to Steve French, Namjae Jeon, Ronnie Sahlberg, linux-
+cifs@vger.kernel.org, and other ksmbd maintainers/reviewers.
 
-### Step 4.3: Bug reports
-**Record:** No external bug report in commit message. Prior related fix
-`cd80ce7e68f16` mentions `smb2.lease.breaking2` test failure for a
-narrower issue.
+### Step 4.3: Bug report
+**Record:** N/A — no external bug report or syzbot link.
 
-### Step 4.4: Series context
-**Record:** Part of 14-patch ksmbd lease series (starts with “validate
-SMB2 lease create contexts”). This patch applies standalone to 6.18.44;
-earlier series patches are not required for this diff to build/apply.
+### Step 4.4: Related patches
+**Record:** 3-patch series fixing independent leaks in `vfs.c`. Other
+two patches are also absent from this tree but are not prerequisites for
+this one.
 
-### Step 4.5: Stable list
-**Record:** UNVERIFIED — lore.kernel.org blocked automated fetch (Anubis
-bot protection). No stable-list discussion found via other means.
+### Step 4.5: Stable list history
+**Record:** UNVERIFIED — lore stable search blocked by bot protection.
 
 ---
 
 ## PHASE 5: CODE SEMANTIC ANALYSIS
 
 ### Step 5.1: Key functions
-**Record:** `smb_break_all_levII_oplock`, `smb2_map_lease_to_oplock`,
-`check_lease_state`, `smb21_lease_break_ack`, `smb2_oplock_break`.
+**Record:** `ksmbd_vfs_set_dos_attrib_xattr()` modified;
+`ndr_encode_dos_attr()` is the allocator whose errors were mishandled.
 
-### Step 5.2: Callers of `smb_break_all_levII_oplock`
-**Record:**
-- `fs/smb/server/vfs.c` — write, truncate, setattr paths (e.g. line 535
-  on write)
-- `fs/smb/server/smb2pdu.c` — create, rename, set-info
-- `fs/smb/server/oplock.c` — `smb_break_all_oplock()`
+### Step 5.2: Callers
+**Record:** Three call sites in `smb2pdu.c`, all behind
+`KSMBD_SHARE_FLAG_STORE_DOS_ATTRS`:
+1. `smb2_new_xattrs()` — file creation (called from `smb2_open` path)
+2. `set_file_basic_info()` — SMB2 SET_INFO (file attribute/time updates)
+3. `fsctl_set_sparse()` — FSCTL_SET_SPARSE IOCTL
 
-Common hot paths for multi-client file server workloads.
+All are SMB2 protocol handlers reachable by remote clients when the
+share stores DOS attributes in xattrs.
 
 ### Step 5.3: Callees
-**Record:** `oplock_break()` → `smb2_lease_break_noti()`; ACK path uses
-`lookup_lease_in_table()`, `ksmbd_iov_pin_rsp()`.
+**Record:** `ndr_encode_dos_attr()` → `kzalloc` / `krealloc` /
+`ndr_write_*`; `ksmbd_vfs_setxattr()` on success path.
 
 ### Step 5.4: Reachability
-**Record:** Triggered by remote SMB2 clients during writes, truncates,
-renames, and conflicting opens when `CONFIG_SMB_SERVER` and
-oplocks/leases are enabled. Network-reachable, normal file-server
-operations.
+**Record:** Reachable from network clients performing file create, set-
+info, or sparse-file FSCTL on shares with `STORE_DOS_ATTRS` enabled
+(`CONFIG_SMB_SERVER`). Trigger for the leak requires
+`ndr_encode_dos_attr()` to fail after allocation (typically `-ENOMEM`
+under memory pressure).
 
 ### Step 5.5: Similar patterns
-**Record:** Multiple prior ksmbd stable-worthy oplock/lease fixes in
-this tree (`50f930db22365` UAF in break ack, `e735dbd489e3e` NULL-deref
-in break notifiers, `cd80ce7e68f16` partial ACK error handling). Same
-subsystem, same concern area.
+**Record:** Same file already uses `goto out` + `kfree` for NDR buffers
+in `ksmbd_vfs_set_sd_xattr` and `ksmbd_vfs_get_sd_xattr`. Sibling commit
+`d4d56b00` applies the identical pattern fix to `sd_ndr.data` in
+`ksmbd_vfs_set_sd_xattr`. This tree already has a precedent backport:
+`d026f47db6863` ("ksmbd: Fix memory leak in get_file_all_info()").
 
 ---
 
-## PHASE 6: CROSS-REFERENCE WITH LOCAL TREE
+## PHASE 6: CROSS-REFERENCE AGAINST LOCAL TREE
 
 ### Step 6.1: Buggy code present?
-**Record:** YES. Current tree at `v6.18.44` contains all three buggy
-patterns:
-- `oplock.c:1407-1418` — WRITE_CACHING rejection
-- `oplock.c:1464-1477` — old `smb2_map_lease_to_oplock()` logic
-- `smb2pdu.c:8806-8950` — old ACK handling with fall-through cleanup
+**Record:** **YES.** Current tree at `vfs.c:1659–1661`:
 
-### Step 6.2: Backport difficulty
-**Record:** Clean apply verified via test cherry-pick. No rework needed.
+```1659:1661:fs/smb/server/vfs.c
+        err = ndr_encode_dos_attr(&n, da);
+        if (err)
+                return err;
+```
+
+Bug present since 2021; well predates 6.18.y branch.
+
+### Step 6.2: Backport complications
+**Record:** **Clean apply** — `git apply --check` passes with no
+conflicts. File layout matches mainline.
 
 ### Step 6.3: Related fixes already present?
-**Record:** `cd80ce7e68f16` partially addressed ACK error handling but
-did not fix fall-through after `goto err_out`, subset ACK semantics,
-WRITE_CACHING skip, or lease-to-oplock mapping. This fix is not
-redundant.
+**Record:** Fix commit `7ac657bb9c5c1` is **NOT** in HEAD. Sibling
+series commits `d4d56b00` and `d708a36634bb7` also **NOT** in HEAD. No
+duplicate fix for this specific leak found.
 
 ---
 
 ## PHASE 7: SUBSYSTEM CONTEXT
 
-### Step 7.1: Subsystem and criticality
-**Record:** `fs/smb/server` (ksmbd in-kernel SMB server). **IMPORTANT**
-— affects all ksmbd users; not core kernel, but file-server data
-integrity is critical for deployments using it.
+### Step 7.1: Subsystem criticality
+**Record:** `fs/smb/server` (ksmbd SMB3 server). **IMPORTANT** — affects
+users running in-kernel SMB server (`CONFIG_SMB_SERVER`), not universal
+but security/stability-sensitive for deployments using it.
 
-### Step 7.2: Activity
-**Record:** Actively maintained; many ksmbd commits between `v6.18.44`
-and `master`.
+### Step 7.2: Subsystem activity
+**Record:** Highly active in 6.18.y — recent backports include UAF
+fixes, integer overflow, ACL validation, transport leaks. Memory leak
+fixes are routinely accepted.
 
 ---
 
-## PHASE 8: IMPACT AND RISK
+## PHASE 8: IMPACT AND RISK ASSESSMENT
 
 ### Step 8.1: Who is affected
-**Record:** Users of `CONFIG_SMB_SERVER` with oplocks/leases enabled —
-enterprise/embedded Samba-alternative file serving, multi-client SMB
-workloads.
+**Record:** Users with `CONFIG_SMB_SERVER` enabled and shares configured
+with `STORE_DOS_ATTRS`. Driver/server-specific, not all kernel users.
 
 ### Step 8.2: Trigger conditions
-**Record:**
-- Multiple clients with leases on the same file
-- Write, truncate, rename, or conflicting open
-- Client sends lease-break ACK (including partial/subset ACKs)
-- Common in real SMB deployments; not exotic
+**Record:** SMB file create, SET_INFO, or sparse FSCTL that stores DOS
+attributes; `ndr_encode_dos_attr()` must fail after `kzalloc` (most
+likely `-ENOMEM` during NDR buffer growth). Unprivileged remote clients
+can trigger the code path; the leak itself requires the encoding error.
 
 ### Step 8.3: Failure mode severity
-**Record:**
-- **Failure mode:** Stale client-side read/write caches; incorrect lease
-  state after ACK; break prematurely marked complete on failed ACK
-- **Severity:** **CRITICAL** for data coherency — can cause silent data
-  corruption across SMB clients (not a kernel oops, but a serious
-  correctness bug for a file server)
+**Record:** Memory leak (~1 KB+ per failed encode, potentially more if
+reallocs occurred). **Severity: MEDIUM** — no direct crash/corruption,
+but under memory pressure the leak worsens OOM conditions in an active
+server path.
 
 ### Step 8.4: Risk-benefit
 **Record:**
-- **Benefit:** HIGH — fixes long-standing protocol bugs on common multi-
-  client paths
-- **Risk:** LOW — small, localized, maintainer-authored, verified clean
-  apply
-- **Ratio:** Strongly favors backport
+- **Benefit:** Prevents per-operation leaks in a commonly-used ksmbd
+  path; aligns with existing stable backport policy for ksmbd leak
+  fixes.
+- **Risk:** Minimal — 5-line, obviously correct cleanup addition.
+- **Ratio:** Favorable.
 
 ---
 
@@ -347,286 +334,120 @@ workloads.
 ### Step 9.1: Evidence summary
 
 **FOR backport:**
-- Fixes real SMB2 lease coherency bugs present since 2021
-- Can cause stale caches / data corruption with multiple clients
-- Small, surgical (-62 lines net), maintainer-reviewed
-- Applies cleanly to 6.18.44
-- No new APIs or features
-- Failed ACK handling properly keeps break pending
+- Real, verified memory leak on error path (code inspection confirms)
+- Bug present since 2021, exists in this 6.18.44 tree
+- Surgical 5-line fix, applies cleanly
+- Acked-by subsystem maintainer (Namjae Jeon)
+- Reachable from SMB2 client operations on active server paths
+- Precedent: similar ksmbd leak fix already backported to this tree
+  (`d026f47db6863`)
+- Under memory pressure, leak compounds the failure mode
 
 **AGAINST backport:**
-- Only affects `CONFIG_SMB_SERVER` users (subset of kernel users)
-- Part of a 14-patch series (but standalone-applicable)
-- No syzbot/user bug report in commit message
+- Only triggers on `ndr_encode_dos_attr()` failure (typically ENOMEM),
+  not the common success path
+- No user crash reports, syzbot, or CVE
+- Lore thread content unverified (bot blocked)
 
-**Unresolved:** Lore thread content and stable-list discussion
-(UNVERIFIED).
+**Unresolved:** Whether reviewers explicitly nominated for stable on
+lore (could not fetch thread).
 
 ### Step 9.2: Stable rules checklist
-1. Obviously correct and tested? **PASS** — protocol-aligned logic,
-   maintainer SOBs; no explicit Tested-by
-2. Fixes a real bug affecting users? **PASS** — multi-client lease
-   coherency
-3. Important issue? **PASS** — data coherency / potential corruption
-   (CRITICAL for file server)
-4. Small and contained? **PASS** — 2 files, ~130 lines touched, -62 net
-5. No new features or APIs? **PASS**
-6. Can apply to local tree? **PASS** — clean cherry-pick verified
+| Criterion | Result |
+|-----------|--------|
+| 1. Obviously correct and tested? | **PASS** — standard `goto
+out`/`kfree` pattern; Reviewed-by + Acked-by; no Tested-by |
+| 2. Fixes a real bug affecting users? | **PASS** — verified leak on SMB
+server error path |
+| 3. Important issue? | **PASS (borderline)** — MEDIUM severity memory
+leak in active server code; not crash/corruption but worsens OOM |
+| 4. Small and contained? | **PASS** — 1 file, 5 lines |
+| 5. No new features/APIs? | **PASS** |
+| 6. Can apply to local tree? | **PASS** — clean apply verified |
 
 ### Step 9.3: Exception categories
-**Record:** None (not device ID, quirk, DT, build, or docs).
+**Record:** None (not a device ID, quirk, DT, build, or docs fix).
+Qualifies as a standard bug fix.
 
 ### Step 9.4: Decision rationale
-For **this** tree (`6.18.44`), the buggy code is present, the fix is
-self-contained, applies cleanly, and addresses important SMB2 lease
-coherency bugs that can lead to stale client caches and data corruption.
-This meets stable kernel criteria.
+This is a small, maintainer-acked fix for a long-standing resource leak
+in ksmbd's DOS-attribute xattr storage path. The leak is real and
+verified by reading `ndr_encode_dos_attr()` and the caller. While it
+only fires on encoding errors (typically under memory pressure), that is
+exactly when leaking memory is most harmful. The fix is trivial, applies
+cleanly to 6.18.44, and matches established precedent for ksmbd leak
+fixes already backported to this stable tree.
 
 ---
 
 ## Verification
 
-- [Phase 1] Parsed subject, tags (Namjae Jeon + Steve French SOBs only),
-  body
-- [Phase 2] Read full diff from `git show 5015191096db3`; analyzed all 4
-  function changes
-- [Phase 2] Confirmed `goto err_out` fall-through bug in current
-  `smb2pdu.c:8859-8950`
-- [Phase 3] `git blame` on `oplock.c:1407-1418` and
-  `smb2pdu.c:8806-8818` → `e2f34481b24db` (2021)
-- [Phase 3] `git show cd80ce7e68f16` — partial prior fix, insufficient
-- [Phase 3] `git merge-base --is-ancestor 5015191096db3 HEAD` → exit 1
-  (not in tree)
-- [Phase 3] `git cherry-pick --no-commit 5015191096db3` → exit 0 (clean
-  apply)
-- [Phase 4] `b4 dig -c 5015191096db3` → lore URL found
-- [Phase 4] `b4 dig -a` → patch 03/14 of series
-- [Phase 4] `b4 dig -w` → linux-cifs, smfrench CC'd
-- [Phase 4] UNVERIFIED: lore thread content (Anubis blocked WebFetch)
-- [Phase 5] `grep smb_break_all_levII_oplock` → callers in vfs.c,
-  smb2pdu.c, oplock.c
-- [Phase 5] Read `oplock_break()` lease break logic in
-  `oplock.c:893-958`
-- [Phase 6] `git describe HEAD` → `v6.18.44`; buggy code confirmed
-  present
-- [Phase 6] `git log v6.18.44..master -- fs/smb/server/oplock.c` — many
-  intervening commits; patch still applies cleanly
-- [Phase 7] `fs/smb/server/Kconfig` — `CONFIG_SMB_SERVER` exists
-- [Phase 8] Failure mode: cache coherency / data corruption risk,
-  severity CRITICAL for SMB server use
+- **[Phase 1]** Parsed commit `7ac657bb9c5c1` message and tags via `git
+  show`
+- **[Phase 2]** Read diff and current `vfs.c:1651–1670` and
+  `ndr.c:170–227` — confirmed leak mechanism
+- **[Phase 3]** `git blame -L 1651,1670` — bug since `f44158485826c`
+  (2021-05-10)
+- **[Phase 3]** `git merge-base --is-ancestor 7ac657bb9c5c1 HEAD` — fix
+  **NOT** in tree
+- **[Phase 3]** `git apply --check` — patch applies cleanly
+- **[Phase 3]** Identified 3-patch series on master; confirmed this
+  patch is independent
+- **[Phase 4]** `b4 dig -c 7ac657bb9c5c1` — found lore URL and v1/v2
+  revisions
+- **[Phase 4]** `b4 dig -c 7ac657bb9c5c1 -w` — maintainer CC list
+  confirmed
+- **[Phase 4]** WebFetch lore — blocked by Anubis (UNVERIFIED: thread
+  review comments)
+- **[Phase 5]** `grep ksmbd_vfs_set_dos_attrib_xattr` — 3 callers in
+  `smb2pdu.c` identified
+- **[Phase 5]** Read caller context: `smb2_new_xattrs`,
+  `set_file_basic_info`, `fsctl_set_sparse`
+- **[Phase 6]** `git describe HEAD` = v6.18.44; `make kernelversion` =
+  6.18.44
+- **[Phase 6]** Buggy code confirmed present at `vfs.c:1659–1661`
+- **[Phase 6]** `git log --grep='memory leak in get_file_all_info'` —
+  precedent backport `d026f47db6863` in tree
+- **[Phase 7]** `git log --oneline -20 -- fs/smb/server/` — active ksmbd
+  maintenance in 6.18.y
+- **[Phase 8]** Assessed trigger (ENOMEM on NDR encode) and severity
+  (MEDIUM leak)
 
-**YES**The background checks finished and match the earlier analysis:
+**YES**The sibling-patch check finished successfully: neither
+`d4d56b00c7df8` (`sd_ndr.data` leak in `ksmbd_vfs_set_sd_xattr`) nor the
+other series commits are in this `6.18.44` tree. That doesn’t block this
+backport — `7ac657bb9c5c1` is a standalone fix for
+`ksmbd_vfs_set_dos_attrib_xattr`, applies cleanly, and the leak is still
+present here.
 
-- **Master:** commit `5015191096db3` (`ksmbd: fix lease break and ack
-  state handling`) is on `master`.
-- **This tree (`v6.18.44`):** that commit is **not** present yet.
+**Verdict for this tree: YES** — small, maintainer-acked error-path
+memory leak fix in an active ksmbd SMB2 path.
 
-So the lease-break/ACK bugs are still in your checkout, and the fix is
-available on `master` and applies cleanly here. The backport
-recommendation remains **YES**.
+ fs/smb/server/vfs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- fs/smb/server/oplock.c  |  24 +++------
- fs/smb/server/smb2pdu.c | 106 ++++++++++------------------------------
- 2 files changed, 34 insertions(+), 96 deletions(-)
-
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index ff0dbf3f8cbf4..d7ba8a01f2c68 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -1404,14 +1404,8 @@ void smb_break_all_levII_oplock(struct ksmbd_work *work, struct ksmbd_file *fp,
- 			continue;
- 		}
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 263032adf0cd8..859ca7c87bd4c 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1664,14 +1664,15 @@ int ksmbd_vfs_set_dos_attrib_xattr(struct mnt_idmap *idmap,
  
--		if (brk_op->is_lease && (brk_op->o_lease->state &
--		    (~(SMB2_LEASE_READ_CACHING_LE |
--				SMB2_LEASE_HANDLE_CACHING_LE)))) {
--			ksmbd_debug(OPLOCK, "unexpected lease state(0x%x)\n",
--				    brk_op->o_lease->state);
--			goto next;
--		} else if (brk_op->level !=
--				SMB2_OPLOCK_LEVEL_II) {
-+		if (!brk_op->is_lease &&
-+		    brk_op->level != SMB2_OPLOCK_LEVEL_II) {
- 			ksmbd_debug(OPLOCK, "unexpected oplock(0x%x)\n",
- 				    brk_op->level);
- 			goto next;
-@@ -1463,15 +1457,13 @@ void smb_break_all_oplock(struct ksmbd_work *work, struct ksmbd_file *fp)
-  */
- __u8 smb2_map_lease_to_oplock(__le32 lease_state)
- {
--	if (lease_state == (SMB2_LEASE_HANDLE_CACHING_LE |
--			    SMB2_LEASE_READ_CACHING_LE |
--			    SMB2_LEASE_WRITE_CACHING_LE)) {
-+	if ((lease_state & SMB2_LEASE_WRITE_CACHING_LE) &&
-+	    (lease_state & SMB2_LEASE_HANDLE_CACHING_LE)) {
- 		return SMB2_OPLOCK_LEVEL_BATCH;
--	} else if (lease_state != SMB2_LEASE_WRITE_CACHING_LE &&
--		 lease_state & SMB2_LEASE_WRITE_CACHING_LE) {
--		if (!(lease_state & SMB2_LEASE_HANDLE_CACHING_LE))
--			return SMB2_OPLOCK_LEVEL_EXCLUSIVE;
--	} else if (lease_state & SMB2_LEASE_READ_CACHING_LE) {
-+	} else if (lease_state & SMB2_LEASE_WRITE_CACHING_LE) {
-+		return SMB2_OPLOCK_LEVEL_EXCLUSIVE;
-+	} else if (lease_state & (SMB2_LEASE_READ_CACHING_LE |
-+				  SMB2_LEASE_HANDLE_CACHING_LE)) {
- 		return SMB2_OPLOCK_LEVEL_II;
- 	}
- 	return 0;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b610cad470ea0..b16e1c156ee5f 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -8803,16 +8803,17 @@ static void smb20_oplock_break_ack(struct ksmbd_work *work)
- 	ksmbd_fd_put(work, fp);
+ 	err = ndr_encode_dos_attr(&n, da);
+ 	if (err)
+-		return err;
++		goto out;
+ 
+ 	err = ksmbd_vfs_setxattr(idmap, path, XATTR_NAME_DOS_ATTRIBUTE,
+ 				 (void *)n.data, n.offset, 0, get_write);
+ 	if (err)
+ 		ksmbd_debug(SMB, "failed to store dos attribute in xattr\n");
+-	kfree(n.data);
+ 
++out:
++	kfree(n.data);
+ 	return err;
  }
  
--static int check_lease_state(struct lease *lease, __le32 req_state)
-+static bool smb2_lease_state_valid(__le32 state)
- {
--	if ((lease->new_state ==
--	     (SMB2_LEASE_READ_CACHING_LE | SMB2_LEASE_HANDLE_CACHING_LE)) &&
--	    !(req_state & SMB2_LEASE_WRITE_CACHING_LE)) {
--		lease->new_state = req_state;
--		return 0;
--	}
-+	return !(state & ~(SMB2_LEASE_READ_CACHING_LE |
-+			   SMB2_LEASE_HANDLE_CACHING_LE |
-+			   SMB2_LEASE_WRITE_CACHING_LE));
-+}
- 
--	if (lease->new_state == req_state)
-+static int check_lease_state(struct lease *lease, __le32 req_state)
-+{
-+	if (smb2_lease_state_valid(req_state) &&
-+	    !(req_state & ~lease->new_state))
- 		return 0;
- 
- 	return 1;
-@@ -8830,9 +8831,7 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
- 	struct smb2_lease_ack *req;
- 	struct smb2_lease_ack *rsp;
- 	struct oplock_info *opinfo;
--	__le32 err = 0;
- 	int ret = 0;
--	unsigned int lease_change_type;
- 	__le32 lease_state;
- 	struct lease *lease;
- 
-@@ -8856,80 +8855,23 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
- 		goto err_out;
- 	}
- 
--	if (check_lease_state(lease, req->LeaseState)) {
--		rsp->hdr.Status = STATUS_REQUEST_NOT_ACCEPTED;
--		ksmbd_debug(OPLOCK,
--			    "req lease state: 0x%x, expected state: 0x%x\n",
--			    req->LeaseState, lease->new_state);
--		goto err_out;
--	}
--
- 	if (!atomic_read(&opinfo->breaking_cnt)) {
- 		rsp->hdr.Status = STATUS_UNSUCCESSFUL;
- 		goto err_out;
- 	}
- 
--	/* check for bad lease state */
--	if (req->LeaseState &
--	    (~(SMB2_LEASE_READ_CACHING_LE | SMB2_LEASE_HANDLE_CACHING_LE))) {
--		err = STATUS_INVALID_OPLOCK_PROTOCOL;
--		if (lease->state & SMB2_LEASE_WRITE_CACHING_LE)
--			lease_change_type = OPLOCK_WRITE_TO_NONE;
--		else
--			lease_change_type = OPLOCK_READ_TO_NONE;
--		ksmbd_debug(OPLOCK, "handle bad lease state 0x%x -> 0x%x\n",
--			    le32_to_cpu(lease->state),
--			    le32_to_cpu(req->LeaseState));
--	} else if (lease->state == SMB2_LEASE_READ_CACHING_LE &&
--		   req->LeaseState != SMB2_LEASE_NONE_LE) {
--		err = STATUS_INVALID_OPLOCK_PROTOCOL;
--		lease_change_type = OPLOCK_READ_TO_NONE;
--		ksmbd_debug(OPLOCK, "handle bad lease state 0x%x -> 0x%x\n",
--			    le32_to_cpu(lease->state),
--			    le32_to_cpu(req->LeaseState));
--	} else {
--		/* valid lease state changes */
--		err = STATUS_INVALID_DEVICE_STATE;
--		if (req->LeaseState == SMB2_LEASE_NONE_LE) {
--			if (lease->state & SMB2_LEASE_WRITE_CACHING_LE)
--				lease_change_type = OPLOCK_WRITE_TO_NONE;
--			else
--				lease_change_type = OPLOCK_READ_TO_NONE;
--		} else if (req->LeaseState & SMB2_LEASE_READ_CACHING_LE) {
--			if (lease->state & SMB2_LEASE_WRITE_CACHING_LE)
--				lease_change_type = OPLOCK_WRITE_TO_READ;
--			else
--				lease_change_type = OPLOCK_READ_HANDLE_TO_READ;
--		} else {
--			lease_change_type = 0;
--		}
--	}
--
--	switch (lease_change_type) {
--	case OPLOCK_WRITE_TO_READ:
--		ret = opinfo_write_to_read(opinfo);
--		break;
--	case OPLOCK_READ_HANDLE_TO_READ:
--		ret = opinfo_read_handle_to_read(opinfo);
--		break;
--	case OPLOCK_WRITE_TO_NONE:
--		ret = opinfo_write_to_none(opinfo);
--		break;
--	case OPLOCK_READ_TO_NONE:
--		ret = opinfo_read_to_none(opinfo);
--		break;
--	default:
--		ksmbd_debug(OPLOCK, "unknown lease change 0x%x -> 0x%x\n",
--			    le32_to_cpu(lease->state),
--			    le32_to_cpu(req->LeaseState));
--	}
--
--	if (ret < 0) {
--		rsp->hdr.Status = err;
-+	if (check_lease_state(lease, req->LeaseState)) {
-+		rsp->hdr.Status = STATUS_REQUEST_NOT_ACCEPTED;
-+		ksmbd_debug(OPLOCK,
-+			    "req lease state: 0x%x, expected state: 0x%x\n",
-+			    req->LeaseState, lease->new_state);
- 		goto err_out;
- 	}
- 
--	lease_state = lease->state;
-+	lease_state = req->LeaseState;
-+	lease->state = lease_state;
-+	lease->new_state = SMB2_LEASE_NONE_LE;
-+	opinfo->level = smb2_map_lease_to_oplock(lease_state);
- 
- 	rsp->StructureSize = cpu_to_le16(36);
- 	rsp->Reserved = 0;
-@@ -8938,16 +8880,20 @@ static void smb21_lease_break_ack(struct ksmbd_work *work)
- 	rsp->LeaseState = lease_state;
- 	rsp->LeaseDuration = 0;
- 	ret = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_lease_ack));
--	if (ret) {
--err_out:
--		smb2_set_err_rsp(work);
--	}
-+	if (ret)
-+		goto err_out;
- 
- 	opinfo->op_state = OPLOCK_STATE_NONE;
- 	wake_up_interruptible_all(&opinfo->oplock_q);
- 	atomic_dec(&opinfo->breaking_cnt);
- 	wake_up_interruptible_all(&opinfo->oplock_brk);
- 	opinfo_put(opinfo);
-+	return;
-+
-+err_out:
-+	smb2_set_err_rsp(work);
-+	opinfo_put(opinfo);
-+	return;
- }
- 
- /**
 -- 
 2.53.0
 
