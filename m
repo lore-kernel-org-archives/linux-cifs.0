@@ -1,104 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5E43C9EF6;
-	Mon, 31 Aug 2026 07:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C74133B6F8
+	for <linux-cifs@vger.kernel.org>; Mon, 31 Aug 2026 10:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788162914; cv=none; b=A37A6TCCNIeBorCR4Csk++LcSc0i9aMSeER/34U1yNOjta7Ce/cyCo3bE7jMIT/juojQutxINcatyNgCK5TW9nSkhs51nOk3awfQTsKStV/10V+uFU2bbzMTS608gSKlz+8or0jo0hWFKm3chFMDAmBzkWi4vXxoavwSHyhbDAQ=
+	t=1788172694; cv=none; b=mw5P7qXQV7e2vbUwoa+xWANR92BTblVtp4umxEhAvD0GWzKiIYteekOgXR+Dz2IlQ33FBRyzx/5NBFuvEEdPWGtd2iguskySOi9prqwf7PPzr4oMuIB3DnZLDQ/RZjP6Uk0JQmHJi6BiwzJTKKYNv2SEBgApW75bFIvLALhZyGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788162914; c=relaxed/simple;
-	bh=XS6MnXjdLgN+IYhhFCbdkHwuEbPjLdRgd8mBHzowrsA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=al6XHs5fVzKhLfnNCFkzoc+91KwDoRC8v/7s5+1q9ThnLHZv3JVny2tfo5TpMg1Vj4eCCXJZ6kcHmv7iehKcIw4sF8oNvQZ8wMSfSyJkKuXBvJjY8W7Jko7mBc2/4EnQIhAScIAel2SikHlQjzI0BiMCD0D6K074N4giQWOrvTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4rqbM8Y; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788172694; c=relaxed/simple;
+	bh=vQy4xbSA3XJEmAKtO2L0l4HYxsca7+w4X9EglAe26J0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tgLoy0cNXkMkL48Uknof9JfLQHau5uZsz5jNphzweMZcdoZi5XVoK5+B/TAbRRYlFugKF6xr/PKNRonVj6IdiaBStc1vcLd50ZFE/m9fTo36d/+ucMUUHl0grZU0pzzEfNdnWg4lZK2uENRS0jkGDgjOaFDiu11XqvHXJPB1uRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ms3cQT+e; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4rqbM8Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF1F1F00ACF;
-	Mon, 31 Aug 2026 07:55:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ms3cQT+e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 196D21F00A3F
+	for <linux-cifs@vger.kernel.org>; Mon, 31 Aug 2026 10:38:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788162912;
-	bh=1TPnEmDnniutV5HQvwxJTUXw2WVcmYP9OzXkFa4bSgg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=Y4rqbM8YB6nCBdyUlbKEcz83EeJavjEKEBBRMR2B+C7ErWntMg+z3CmM322SjjLSn
-	 DA8fDWEBQ5wYwCThDMMDt+DosdzIyDSaQwR1+zDBvzj9XfmagYUW3/985rBoOWMRyq
-	 /qz+ESZitATPcdEaOcKx1vBaQoEDu7W4ZHeYe5YE0T/qmHANVxTft7pvBEwkWXo7X7
-	 /xf59VmTdPhh6QJymzMjgdliilE7+9yuIHtS+WH3sGRrJskpEEssyBSwAVOigzXjwN
-	 rSiXLMeexpgirZhC6AfqEUQ+V6nP4wmCPjBl/TJNVZFR/wsWPHI7Zu0aAwosaLjh6R
-	 SEJkbZ53rtGJw==
-From: Christian Brauner <brauner@kernel.org>
-To: Christian Brauner <brauner@kernel.org>, 
- David Howells <dhowells@redhat.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev, 
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
- ceph-devel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260827134304.2075713-1-dhowells@redhat.com>
-References: <20260827134304.2075713-1-dhowells@redhat.com>
-Subject: Re: [PATCH v4 00/10] netfs, cachefiles: Miscellaneous fixes
-Message-Id: <20260831-tabuisieren-flugobjekt-stangen-0dd7cf160bd3@brauner>
-Date: Mon, 31 Aug 2026 09:55:06 +0200
+	s=k20260515; t=1788172693;
+	bh=Zhz4xDEOf4LsvTmmwIdC3GdkF3FmixQ6AY9sdraEaV0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=ms3cQT+e1OyZ9PYC257sGo8WSn7MZR5c8L8Onkl7l1WMt2bUXHIMA1OuJO26JsVly
+	 yrElriXcRxcCCyzeExJihIyKRew+anO9lLs/qhKyDXm6OCRcKPIyodS/uO13VWt1BZ
+	 ju/cMmlKUpESm2ZkwM4uOGtU6Mc5vVKVWj54vE8lprqJj1JUXNoBZnnzdovqik1WQ0
+	 +yjrbzhm6JG5wOaisG2MPJVgIp/Cor5N5K0d+aSCnGCPCIaDALw6rEW/mhYtTe3TPS
+	 jrLiTeRZNLBdiQMnPr8YhjDQmeuVFW/CFEsJRbbjQAG04G4RvFiKmMH/3dYAUu1iAB
+	 DdE+mdGopBjGg==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6a601ba6870so4948849a12.0
+        for <linux-cifs@vger.kernel.org>; Mon, 31 Aug 2026 03:38:13 -0700 (PDT)
+X-Gm-Message-State: AFuF++kETo50tEa8Ybx+l8qWQGd7EfJn7inlCtxFXq1Q4V48d06g9M+k
+	JTPYPYZa0paGnmVaCOE2tAKxyCA/kVYopaW7/tBk97FCi08X1H0pfOx173bGaUEC6BA2Om2h+Pf
+	klfCfNsbLvWOF2RTnuZnAJFXaqCKrdqU=
+X-Received: by 2002:a05:6402:5414:b0:6a6:32f6:b with SMTP id
+ 4fb4d7f45d1cf-6a632f6019amr7535714a12.17.1788172691700; Mon, 31 Aug 2026
+ 03:38:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-362b8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2075; i=brauner@kernel.org;
- h=from:subject:message-id; bh=XS6MnXjdLgN+IYhhFCbdkHwuEbPjLdRgd8mBHzowrsA=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWRNNY7bJpSvk1b096VIscV85iNXdwV7cIjfrRLo2b5mh
- 7Dtlv3MHaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABPZbcnwV1DnULdcyBTnjear
- eq4EzVRZsu6R4v8+e5PLq6YWz9/V/Yfhr7im1gm/vukeSR1ZJ+1ry1+dvTTtd8iq0L2bshba9a5
- NYQYA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+References: <20260829113917.26882-1-suruurism@gmail.com> <CAKYAXd-PDvGyUc7834fVGAvDGnqaOxcrJE6XXMF22eLS5=dzLw@mail.gmail.com>
+ <CAFkjbpD7BrK3xtG6m7d3QAuLN4xO-VG5UPF81obBGjREgVy0pg@mail.gmail.com>
+In-Reply-To: <CAFkjbpD7BrK3xtG6m7d3QAuLN4xO-VG5UPF81obBGjREgVy0pg@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Mon, 31 Aug 2026 19:37:59 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-RVbV4iWcnZoJ4ePE_mDHCSsDCNV8Ovi68c39pd8rAEw@mail.gmail.com>
+X-Gm-Features: AcwNN1U_hN_rcmqVukdlDKDw6-vass8yxQCdHN0RWMsrpaI_cJYoNLGFJFgwxlM
+Message-ID: <CAKYAXd-RVbV4iWcnZoJ4ePE_mDHCSsDCNV8Ovi68c39pd8rAEw@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: fix use-after-free in oplock break notification
+To: Suruur <suruurism@gmail.com>
+Cc: linux-cifs@vger.kernel.org, senozhatsky@chromium.org, tom@talpey.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 27 Aug 2026 14:42:53 +0100, David Howells wrote:
-> netfs, cachefiles: Miscellaneous fixes
-> 
-> Hi Christian,
-> 
-> Here are some miscellaneous fixes for netfslib and one for cachefiles, if
-> you could pick them up?
-> 
-> [...]
-
-Applied to the vfs.fixes branch of the vfs/vfs.git tree.
-Patches in the vfs.fixes branch should appear in linux-next soon.
-
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs.fixes
-
-[01/10] netfs: Fix uninitialized return value in netfs_unbuffered_write()
-        https://git.kernel.org/vfs/vfs/c/f18e8774f4d3
-[02/10] netfs: Fix unbuffered/DIO write partial transfer error return
-        https://git.kernel.org/vfs/vfs/c/c753a33664e4
-[03/10] netfs: Fix error vs transferred passed to ->ki_complete()
-        https://git.kernel.org/vfs/vfs/c/0bfe2571a6af
-[04/10] netfs: Fix i_size update for partial transfer
-        https://git.kernel.org/vfs/vfs/c/741416a8003b
-[05/10] netfs: Fix subreq ref leak
-        https://git.kernel.org/vfs/vfs/c/3c30087e2759
-[06/10] netfs: break unbuffered write when netfs_alloc_subrequest() fails
-        https://git.kernel.org/vfs/vfs/c/8fb45a934661
-[07/10] netfs: Fix readahead synchronisation issues by loading all folios upfront
-        https://git.kernel.org/vfs/vfs/c/fed0b33e6c58
-[08/10] netfs: Mark folios with COPY_TO_CACHE whilst issuing subreqs
-        https://git.kernel.org/vfs/vfs/c/533203c41831
-[09/10] netfs: Fix read progress reporting
-        https://git.kernel.org/vfs/vfs/c/e00827a4d0cf
-[10/10] cachefiles: Fix potential UAF/KASAN warning
-        https://git.kernel.org/vfs/vfs/c/a67632c8c268
-
+On Sun, Aug 30, 2026 at 1:01=E2=80=AFAM Suruur <suruurism@gmail.com> wrote:
+>
+> Hi Namjae,
+>
+> On Sat, Aug 29, 2026, Namjae Jeon wrote:
+> > > +
+> > > +static inline struct ksmbd_inode *ksmbd_inode_ref(struct ksmbd_inode=
+ *ci)
+> > > +{
+> > > +       atomic_inc(&ci->m_count);
+> > Using m_count to pin o_ci breaks delete-on-close. The last file close
+> > will no longer drop m_count to zero, so __ksmbd_inode_close() can skip
+> > unlinking a delete-pending file.
+>
+> You're right, thank you. Holding the extra m_count reference until the
+> oplock_info is RCU-freed delays the drop to zero that
+> __ksmbd_inode_close() keys the delete-on-close unlink on, so a
+> delete-pending file opened with an oplock would never be unlinked.
+>
+> v3 drops the inode reference entirely. The notification path does not
+> need one: every caller of oplock_break() already holds a live
+> ksmbd_file (or an explicit ksmbd_inode_lookup_lock() reference in the
+> parent lease break paths) on the inode that owns the break target's
+> oplock list, so ci is pinned for the duration of the call. The
+> caller's inode is threaded through oplock_break() into
+> smb2_oplock_break_noti(), which takes ci->m_lock to select and pin the
+> connection without ever dereferencing opinfo->o_fp.
+>
+> opinfo->conn is updated under ci->m_lock by both session_fd_check()
+> (clear on disconnect) and ksmbd_reopen_durable_fd() (reassign
+> reconnect), so holding the read lock also prevents the oplock's
+> connection reference from being dropped while the notification
+> it - the same shape as the lease fix in commit 3a98de41b0a4d.
+>
+> Please see the v3 patch attached.
+Applied it to #ksmbd-for-next.
+Thanks!
