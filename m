@@ -1,43 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C92149C4CD;
-	Mon, 31 Aug 2026 13:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46CC501F27;
+	Mon, 31 Aug 2026 13:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788183595; cv=none; b=a5cVzWso5il2gcHiYuzZ/egxehk5O24jK2N9Mv57KlhCpxSFS/0cKujjtC9QtXQLXlVhwBD9XpblD3cSLbn3RrskylTkURB8UxX6EAQ2+KP0KoI84+VL/KqitbO4FRpZBpfwBQsmlj4pYUNOW9skJhXChJ8qvD0BIxlY3vJyOx8=
+	t=1788183717; cv=none; b=noWqDYbOKP7RzCY8p3a1BmDhqrefVOkFjar4oJbA62PU5Bx8ZTW7IlVLlf8+xQNzcIj9UaW1w/nn/iNxKhE4Jy94m5VTwmAcQ1G6yWVRjeQUzFOi2m7xo8peO9xQ5XMq+76L8HwEdYyo4Ai5IKP9aTiiADmML5rmPIJC17Pz+mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788183595; c=relaxed/simple;
-	bh=rZJaWVCHrTNz3ZB0rGwNIIDwlgEm7Fxvjwc8HJPKBrQ=;
+	s=arc-20240116; t=1788183717; c=relaxed/simple;
+	bh=6KOOvtfb7cGHsYFNTlIPjtqRi9fxDInnK+6l0hr9gqQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=liceBUBVo1UpiOKANyoiu/sMpYr5GV3ydHeDZ2KizwXQPWGINjpsb/ajJH3yXrA52yBhWoUGzat7wsSJhdR7OJ6aLF0YCckGU9dY+OwCFEq7adc9tsMk86EY/dXd2+RmKJSy+7aM+e2iTKOzEiDPAnvRpNvjDAfOU/wS0UB5wVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/gPn9hw; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=RlIes2pOapdZTU9poNAmG+Z3HhscXPL9N7qKoJLhu0QWw7AbkxCryEnRvhxBdpvk7xxoz8RK0ge8GBFa94xO0BX92gwFtxfJGldnvfGigVBZtjayBz58IO8E4LOMjcsL7XgHcOXbIUlP440VhVhOzSU4RVYnANjwCDd11h0SeTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Im8eSlK/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/gPn9hw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C27F91F000E9;
-	Mon, 31 Aug 2026 13:39:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Im8eSlK/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B96401F00A3D;
+	Mon, 31 Aug 2026 13:41:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788183593;
-	bh=iyHForfe9pPek3dEWIFFUFV9y6TsG4tMohaA4O7EN98=;
+	s=k20260515; t=1788183714;
+	bh=fNucr4Uw+dh1zyVWSZKfz25AiQlNs9j0FZlzfSEhuG4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=G/gPn9hwv8DkWuFdDcUhqCrtUGy8kMWUOnfnyjGqX6iT41o1d54DhINomIzr8YFTB
-	 jamDuPkA91NOnmDD2FdZaJSv0abFHANkOZI1WGZgXP2vdVMmYIRCY1Z/5s+STYlhDJ
-	 60IiGbgZA8H/9YmlX8JIE62MHfUhOdmTD5SYQYfccUVyHiRNl09tzpOgJvA6XwpyZD
-	 TTPgwmO0ksL27S7UYk5vPp6swTr9WS6G0hwWLNzMWYv636bbNvgp8g/ZElZF16uO2m
-	 1AzM2k9cdjPWkEP/exJysS4py3Bjco9gTKPmgABJHleKQVSwCSGLqY2CncbnlWp5+G
-	 PgQmecSv0zrLg==
+	b=Im8eSlK/0PTGtZhtxnbMY4EW0+sguMlKrXL8C4dvn63w3qH064opZEvEXf3TqbOJx
+	 QnPzM4Cpz4v2M15v+jyGMxz8W/y4UeMkDheCZ/H/BZRks4eZguXF5ccumYgbL4OBkg
+	 b3qjvPv5zka8tevXLEoOvMpPv/+TRwiZxfhTOahUjnCMraqxUHLn5BOzB7bLWBVhLd
+	 8rgLWWMh4CjVhNvVjLiVw/YN9ISBFQXg+RRtTgLQyC0LHFlyiBwzlHn+u4ES4ObTgw
+	 SMWdhz1Yxn7JNFPFEzi98cUUsl+MnZeiItKS3sEPcORBAEOFXiyNh9YQYycf2754Rr
+	 DuPIDhVZHWOOA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Qiang Liu <liuqiang@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: mark invalid session responses as signed
-Date: Mon, 31 Aug 2026 09:23:35 -0400
-Message-ID: <20260831133314.4125787-187-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: Fix acl.sd_buf memory leak and invalid sd_size error handling
+Date: Mon, 31 Aug 2026 09:24:49 -0400
+Message-ID: <20260831133314.4125787-261-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -53,26 +55,23 @@ X-stable-base: Linux 6.18.48
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Qiang Liu <liuqiang@kylinos.cn>
 
-[ Upstream commit 9e8ad620ddfde5a5f4ef58372e3805e9388cb0f4 ]
+[ Upstream commit d708a36634bb7b6f94d0e76d587d2ec50b2b93b5 ]
 
-When a signed request uses a session that is not registered on the
-connection, ksmbd returns STATUS_USER_SESSION_DELETED before reaching the
-normal response signing path. The response therefore lacks
-SMB2_FLAGS_SIGNED.
+1. When ndr_decode_v4_ntacl() fails, the code jumped to free_n_data
+   which only freed n.data, skipping kfree(acl.sd_buf) and leaking
+   the buffer. Zero-initialize struct xattr_ntacl acl, reorder error
+   labels to out_free to release acl.sd_buf on all error paths.
 
-Clients that require signing check this flag before handling
-STATUS_USER_SESSION_DELETED and replace the server status with
-STATUS_ACCESS_DENIED when it is absent. The protocol permits this error
-response to skip signature verification because the connection has no
-matching session key.
+2. if (acl.sd_size < sizeof(struct smb_ntsd)) is true, original code
+   returned success without freeing sd_buf and left stale *pntsd.
+   Set rc = -EINVAL before jumping to out_free to return error code and
+   free buffer.
 
-Preserve SMB2_FLAGS_SIGNED on the early error response when the request was
-signed. This lets the client propagate STATUS_USER_SESSION_DELETED.
-It fixes smb2.session.bind2.
-
-Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -81,336 +80,411 @@ LLM Generated explanations, may be completely bogus:
 
 ## Phase 1: Commit Message Forensics
 
-### Step 1.1: Subject line
-**Record:** `[ksmbd] [mark] invalid session responses as signed` — sets
-`SMB2_FLAGS_SIGNED` on early session-validation error responses when the
-request was signed.
+**Step 1.1 — Subject line**
 
-### Step 1.2: Tags
-**Record:**
-- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>` (author)
-- **Signed-off-by:** Steve French `<stfrench@microsoft.com>` (cifs/ksmbd
+Record: `[ksmbd] [Fix] acl.sd_buf memory leak and invalid sd_size error
+handling in ksmbd_vfs_get_sd_xattr()`
+
+**Step 1.2 — Tags**
+
+Record:
+- `Signed-off-by: Qiang Liu <liuqiang@kylinos.cn>` (author)
+- `Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>`
+- `Acked-by: Namjae Jeon <linkinjeon@kernel.org>` (ksmbd maintainer)
+- `Signed-off-by: Steve French <stfrench@microsoft.com>` (SMB
   maintainer)
-- No Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Acked-by:, Link:,
-  or Cc: stable tags (expected for manual review)
+- No `Fixes:`, `Reported-by:`, `Cc: stable@vger.kernel.org`, or `Link:`
+  tags
+- Mainline commit: `d708a36634bb7`
 
-### Step 1.3: Body analysis
-**Record:**
-- **Bug:** Signed request references a session not registered on the
-  connection; `smb2_check_user_session()` fails early; server returns
-  `STATUS_USER_SESSION_DELETED` without `SMB2_FLAGS_SIGNED`.
-- **Symptom:** Signing-required clients check `SMB2_FLAGS_SIGNED` before
-  honoring that status; missing flag → client reports
-  `STATUS_ACCESS_DENIED` instead of the server’s real status.
-- **Root cause:** Early `goto send` bypasses the normal signing path
-  (`work->sess` is NULL, so `set_sign_rsp()` is never called).
-- **Fix approach:** Set only `SMB2_FLAGS_SIGNED` (no signature bytes);
-  protocol allows skipping verification when no session key exists on
-  the connection.
-- **Test reference:** `smb2.session.bind2` (Samba protocol test suite).
+**Step 1.3 — Body analysis**
 
-### Step 1.4: Hidden bug fix?
-**Record:** Yes — described as marking responses signed, but it fixes a
-real SMB protocol/interoperability bug: wrong client-visible error on
-signed session-binding paths.
+Record:
+- **Bug 1:** On `ndr_decode_v4_ntacl()` failure, control jumps to
+  `free_n_data`, which frees only `n.data` and skips
+  `kfree(acl.sd_buf)`, leaking the security-descriptor buffer.
+- **Bug 2:** When `acl.sd_size < sizeof(struct smb_ntsd)`, the function
+  returns success (`rc` still 0) without freeing `sd_buf`, leaving a
+  stale `*pntsd`.
+- **Symptom:** Memory leaks on ACL/security-descriptor xattr error
+  paths; incorrect success return on malformed data.
+- **Root cause:** Misordered cleanup labels (`free_n_data` vs
+  `out_free`) and missing `rc = -EINVAL` on the invalid-size path.
+
+**Step 1.4 — Hidden bug fix?**
+
+Record: No — this is an explicit bug fix (memory leak + incorrect error
+handling), not disguised cleanup.
 
 ---
 
 ## Phase 2: Diff Analysis
 
-### Step 2.1: Inventory
-**Record:**
-- **Files:** `fs/smb/server/server.c` (+6 / -0)
-- **Function:** `__handle_ksmbd_work()`
-- **Scope:** Single-file, surgical fix in one error path
+**Step 2.1 — Inventory**
 
-### Step 2.2: Code flow change
-**Record:**
-- **Hunk (session check failure, `rc < 0`):**
-  - **Before:** Set `STATUS_INVALID_PARAMETER` or
-    `STATUS_USER_SESSION_DELETED`, `goto send` with unsigned response.
-  - **After:** If `is_sign_req(work, get_cmd_val(work))`, set
-    `SMB2_FLAGS_SIGNED` on current response header via
-    `ksmbd_resp_buf_curr()`, then `goto send`.
-- **Path affected:** Early error path before `__process_request()` and
-  before the `work->sess && ... set_sign_rsp()` block (lines 234–237).
+Record:
+- File: `fs/smb/server/vfs.c` (+3 / -4 lines)
+- Function: `ksmbd_vfs_get_sd_xattr()`
+- Scope: Single-file, surgical fix
 
-### Step 2.3: Bug mechanism
-**Record:** **Category:** Logic / protocol correctness on error path.
-- Normal signing requires `work->sess` (lines 234–237).
-- Invalid session → `work->sess` stays NULL → flag never set.
-- Fix sets the flag without signing when the request was signed and no
-  session key is available.
+**Step 2.2 — Code flow changes**
 
-### Step 2.4: Fix quality
-**Record:**
-- Minimal, matches existing pattern in related ksmbd signing fixes (e.g.
-  `1f12738`, `3e67423` on mainline).
-- Low regression risk: only touches error path; only sets a flag when
-  request was signed.
-- Uses `get_cmd_val(work)` (reads request header directly), not
-  uninitialized local `command` (still 0 at this point).
+Record:
+- **Hunk 1:** `struct xattr_ntacl acl` → `struct xattr_ntacl acl = {0}`
+  — ensures `acl.sd_buf` is NULL when decode fails before allocation.
+- **Hunk 2:** `goto free_n_data` → `goto out_free` on
+  `ndr_decode_v4_ntacl()` failure — routes through the path that frees
+  `acl.sd_buf` when `rc < 0`.
+- **Hunk 3:** Adds `rc = -EINVAL` before `goto out_free` on invalid
+  `sd_size` — ensures error return and buffer cleanup.
+- **Hunk 4:** Removes separate `free_n_data:` label; `kfree(n.data)` now
+  always runs after `out_free` cleanup.
+
+**Step 2.3 — Bug mechanism**
+
+Record:
+- **Category:** Resource leak (memory) + logic/correctness bug (wrong
+  return code)
+- **Mechanism 1:** `ndr_decode_v4_ntacl()` allocates `acl->sd_buf` at
+  line 508 of `ndr.c` and can fail on the final `ndr_read_bytes()` at
+  line 512. The old `goto free_n_data` bypassed `out_free`'s
+  `kfree(acl.sd_buf)`.
+- **Mechanism 2:** On invalid `sd_size`, `rc` remained 0 (from
+  successful `ndr_encode_posix_acl()`), so `if (rc < 0)` in `out_free`
+  skipped freeing `acl.sd_buf`, and the function returned 0 with
+  `*pntsd` set.
+
+**Step 2.4 — Fix quality**
+
+Record: Fix is minimal and obviously correct. Zero-initialization is
+required (not cosmetic) so that early `ndr_decode` failures reaching
+`out_free` safely call `kfree(NULL)`. Regression risk is very low.
 
 ---
 
 ## Phase 3: Git History Investigation
 
-### Step 3.1: Blame
-**Record:** Session-check early-exit block dates to merge
-`5d324e5159d9e` (v6.18-rc8 era, Nov 2025). Bug has been present since
-this code structure landed in this tree.
+**Step 3.1 — Blame**
 
-### Step 3.2: Fixes: tag
-**Record:** N/A — no Fixes: tag.
+Record: `ksmbd_vfs_get_sd_xattr()` dates to 2021 (`f44158485826c0`,
+Namjae Jeon). The `out_free`/`free_n_data` structure was introduced in
+`78ad2c277af4c` (Jul 2021, "ksmbd: fix memory leak in
+ksmbd_vfs_get_sd_xattr()"). That earlier fix was incomplete — it added
+`out_free` but left the `ndr_decode` failure path on `free_n_data`. Bug
+present since 2021; this tree (6.18.44) still has it.
 
-### Step 3.3: Related file history
-**Record:** Recent `server.c` changes are crypto-library refactors and
-leak/loop fixes (`74c2f0f`, `51c5f7e`, `71b5e7c`, `6a37bc4`). Related
-binding fixes exist in tree (`a897064a45705` “do not expire session on
-binding failure”, `9feb2d1bf86d9`). July 2026 signing series (`1f12738`,
-`3e67423`, `4b70636`, `9e8ad620`) is **not** in this tree yet. This
-commit is standalone for its code path.
+**Step 3.2 — Fixes: tag**
 
-### Step 3.4: Author context
-**Record:** Namjae Jeon is ksmbd maintainer; Steve French is cifs
-maintainer. Prior stable-nominated ksmbd fix in this tree:
-`8cabcb4dd3dc` (refcount leak on invalid session lookup, `Cc:
-stable@vger.kernel.org`).
+Record: Not applicable — no `Fixes:` tag in commit message.
 
-### Step 3.5: Dependencies
-**Record:** No series/prerequisite commits required. Uses existing APIs:
-`is_sign_req`, `get_cmd_val`, `ksmbd_resp_buf_curr`,
-`SMB2_FLAGS_SIGNED`. Patch applies cleanly (`git apply --check` on
-GitHub `.patch` succeeded).
+**Step 3.3 — Related file history**
+
+Record: Part of a 3-patch series fixing ksmbd VFS memory leaks (June
+2026). This patch (`d708a36634bb7`) is standalone for `get_sd_xattr`; no
+prerequisite commits needed. Merged to mainline via `1e9cdc2ea15ad`
+(v7.2-rc1 smb3-server-fixes). **Not present in this 6.18.44 tree.**
+
+**Step 3.4 — Author context**
+
+Record: Qiang Liu; Acked-by from ksmbd maintainer Namjae Jeon and SMB
+maintainer Steve French.
+
+**Step 3.5 — Dependencies**
+
+Record: No dependencies. Cherry-pick to current HEAD applies cleanly
+(verified). Self-contained.
 
 ---
 
 ## Phase 4: Mailing List and External Research
 
-### Step 4.1: Original discussion
-**Record:** `b4 dig -c 9e8ad620ddfde5a5f4ef58372e3805e9388cb0f4` — no
-lore match found. GitHub commit page confirms message and diff.
+**Step 4.1 — Original discussion**
 
-### Step 4.2: Reviewers
-**Record:** `b4 dig -w` — no lore data. Committer is subsystem
-maintainer (Steve French).
+Record: `b4 dig -c d708a36634bb7` →
+https://patch.msgid.link/20260624011320.9146-3-liuqiangneo@163.com. Part
+of `[PATCH 0/3] ksmbd: fix some memory leaks in ksmbd_vfs_* functions`
+(June 23, 2026). Reviewer ChenXiaoSong requested label-name cleanup in
+v2 (https://lists.openwall.net/linux-kernel/2026/06/23/215). Final
+committed version addresses this by removing the misplaced `free_n_data`
+label.
 
-### Step 4.3: Bug report
-**Record:** No external bug report; validation reference is Samba test
-`smb2.session.bind2`. Related mainline commits from same author/date
-document the same signing-flag pattern for binding errors.
+**Step 4.2 — Reviewers**
 
-### Step 4.4: Related patches
-**Record:** Part of a broader July 2026 ksmbd multichannel/signing fix
-set on mainline, but this patch is self-contained for the `server.c`
-early-session-check path.
+Record: `b4 dig -w` returned the patch msgid link. Original series CC'd
+`linkinjeon@kernel.org`, `smfrench@microsoft.com`, `linux-
+cifs@vger.kernel.org`, `linux-kernel@vger.kernel.org`. Maintainer acks
+present in final commit.
 
-### Step 4.5: Stable list history
-**Record:** Lore blocked by bot protection; no stable-list discussion
-found. Precedent: other ksmbd session/binding fixes backported to stable
-in this tree.
+**Step 4.3 — Bug reports**
+
+Record: No external bug reports or syzbot links. Bug identified via code
+review in the leak-fix series.
+
+**Step 4.4 — Series context**
+
+Record: 3-patch series in one file. Patches 1 and 3 fix leaks in
+`ksmbd_vfs_set_sd_xattr` and `ksmbd_vfs_set_dos_attrib_xattr`. Each is
+independently backportable.
+
+**Step 4.5 — Stable list**
+
+Record: No stable-list discussion found. Absence of `Cc: stable` is
+expected per review instructions.
 
 ---
 
 ## Phase 5: Code Semantic Analysis
 
-### Step 5.1: Key functions
-**Record:** `__handle_ksmbd_work()`, `smb2_check_user_session()`,
-`smb2_is_sign_req()`, `get_smb2_cmd_val()`, `ksmbd_resp_buf_curr()`.
+**Step 5.1 — Key functions**
 
-### Step 5.2: Callers
-**Record:** `__handle_ksmbd_work()` ← `handle_ksmbd_work()` ← workqueue
-processing of incoming SMB requests (network I/O path for all ksmbd
-clients).
+Record: `ksmbd_vfs_get_sd_xattr()` modified; calls
+`ndr_decode_v4_ntacl()`, `ndr_encode_posix_acl()`.
 
-### Step 5.3: Callees
-**Record:** On failure: `check_user_session()` →
-`ksmbd_session_lookup_all()`; fix calls `is_sign_req()` and sets
-response header flags.
+**Step 5.2 — Callers**
 
-### Step 5.4: Reachability
-**Record:** Triggered by any signed SMB2/3 request with a session ID not
-registered on the connection — reachable from remote SMB clients
-(session binding / multichannel scenarios).
+Record: 3 call sites:
+- `fs/smb/server/smb2pdu.c:5800` — SMB2 query security descriptor
+- `fs/smb/server/smbacl.c:1179` — inherit POSIX ACL from parent
+- `fs/smb/server/smbacl.c:1442` — Windows ACL permission check
 
-### Step 5.5: Similar patterns
-**Record:** Same `Flags |= SMB2_FLAGS_SIGNED` without full signing in
-mainline binding-error fixes (`3e67423`, `1f12738`). Normal signing
-still done via `set_sign_rsp()` when `work->sess` is valid (lines
-234–237).
+**Step 5.3 — Callees**
+
+Record: `ksmbd_vfs_getxattr()`, `ndr_decode_v4_ntacl()` (allocates
+`acl.sd_buf`), `ndr_encode_posix_acl()`, `sha256()`, `kfree()`.
+
+**Step 5.4 — Reachability**
+
+Record: Triggered by SMB clients when `KSMBD_SHARE_FLAG_ACL_XATTR` is
+enabled and NT ACL xattrs are read. Reachable from network-facing SMB
+protocol handlers — unprivileged remote clients can trigger error paths
+with malformed xattr data.
+
+**Step 5.5 — Similar patterns**
+
+Record: Sibling function `ksmbd_vfs_set_sd_xattr()` at line 1521 already
+uses `struct xattr_ntacl acl = {0}` — the get path was inconsistent. The
+3-patch series fixes analogous leak patterns in set paths.
 
 ---
 
 ## Phase 6: Cross-Reference Against Local Tree
 
-### Step 6.1: Buggy code present?
-**Record:** **Yes.** Local tree is **6.18.44** (`git describe HEAD` →
-`v6.18.44-1-g2736c32da98b9`). Buggy code at
-`fs/smb/server/server.c:189-198` — early `goto send` without setting
-signed flag. Commit `9e8ad620ddfde` is **not** an ancestor of HEAD.
+**Step 6.1 — Buggy code in tree?**
 
-### Step 6.2: Backport complications
-**Record:** **Clean apply** verified. No structural conflicts expected.
+Record: **Yes.** Local tree is **Linux 6.18.44** (`git describe HEAD` →
+`v6.18.44-1-g2736c32da98b9`). Buggy code confirmed at
+`fs/smb/server/vfs.c:1589-1648`:
+- `struct xattr_ntacl acl` (uninitialized)
+- `goto free_n_data` on decode failure (line 1600)
+- Missing `rc = -EINVAL` on invalid `sd_size` (lines 1624-1626)
 
-### Step 6.3: Related fixes already present?
-**Record:** Binding-related fixes present (`a897064a45705`,
-`9feb2d1bf86d9`). This specific signed-flag-on-early-session-error fix
-is **not** present.
+**Step 6.2 — Backport complications**
+
+Record: **Clean apply.** `git cherry-pick --no-commit d708a36634bb7`
+auto-merged with no conflicts.
+
+**Step 6.3 — Related fixes already present?**
+
+Record: Earlier partial fix `78ad2c277af4c` (2021) is in this tree but
+did not fix these paths. Fix `d708a36634bb7` is **not** in HEAD.
 
 ---
 
-## Phase 7: Subsystem and Maintainer Context
+## Phase 7: Subsystem Context
 
-### Step 7.1: Subsystem criticality
-**Record:** **fs/smb/server (ksmbd)** — IMPORTANT. Network file server;
-affects remote SMB clients, especially with mandatory signing.
+**Step 7.1 — Subsystem**
 
-### Step 7.2: Activity
-**Record:** Actively maintained in 6.18.y (recent ksmbd security and
-binding fixes in this tree).
+Record: `fs/smb/server` (ksmbd in-kernel SMB server). Criticality:
+**IMPORTANT** — network-facing file server subsystem
+(`CONFIG_SMB_SERVER`).
+
+**Step 7.2 — Activity**
+
+Record: Actively maintained in 6.18.y (recent commits on credentials,
+path resolution, lock-range fixes).
 
 ---
 
 ## Phase 8: Impact and Risk Assessment
 
-### Step 8.1: Who is affected
-**Record:** ksmbd users (`CONFIG_SMB_SERVER`) with SMB signing required
-and session binding/multichannel — enterprise and Windows-client
-environments.
+**Step 8.1 — Who is affected**
 
-### Step 8.2: Trigger conditions
-**Record:** Signed request with session ID unknown on current connection
-(common in SMB multichannel binding). Remote-triggerable; not timing-
-dependent.
+Record: Users running ksmbd (`CONFIG_SMB_SERVER`) with ACL xattr support
+enabled. Not universal, but affects production SMB server deployments.
 
-### Step 8.3: Failure mode severity
-**Record:** Wrong error status (`STATUS_ACCESS_DENIED` vs
-`STATUS_USER_SESSION_DELETED`) → session binding failures, multichannel
-setup breakage, client disconnects. **Severity: MEDIUM**
-(functional/protocol, not kernel oops/corruption).
+**Step 8.2 — Trigger conditions**
 
-### Step 8.4: Risk-benefit
-**Record:**
-- **Benefit:** MEDIUM-HIGH for ksmbd + signing + multichannel users
-- **Risk:** VERY LOW (+6 lines, error path only, flag-only change)
-- **Ratio:** Favorable for stable
+Record:
+- **Leak path 1:** Corrupt/truncated NT ACL xattr causing
+  `ndr_decode_v4_ntacl()` to fail after `sd_buf` allocation.
+- **Leak path 2:** Valid decode but `sd_size` smaller than
+  `sizeof(struct smb_ntsd)`.
+- Remote SMB clients can trigger repeatedly → cumulative memory leak
+  (DoS potential).
+
+Verified caller leak on path 2: `smbacl.c:1179-1182` returns `-ENOENT`
+when `ppntsd_size <= 0` without freeing `parent_pntsd` set by the buggy
+success return.
+
+**Step 8.3 — Failure mode severity**
+
+Record:
+- Memory leak on error paths: **HIGH** (eventual OOM under repeated
+  triggers)
+- Incorrect success return with stale pointer: **MEDIUM-HIGH** (caller-
+  dependent; confirmed leak in inherit-ACL path)
+- Not a direct UAF or privilege escalation, but real stability issue
+
+**Step 8.4 — Risk-benefit**
+
+Record:
+- **Benefit:** HIGH for ksmbd users — fixes reproducible leaks and
+  incorrect error handling
+- **Risk:** VERY LOW — 7-line change, maintainer-reviewed, applies
+  cleanly
+- **Ratio:** Strongly favors backport
 
 ---
 
 ## Phase 9: Final Synthesis
 
-### Step 9.1: Evidence summary
+**Step 9.1 — Evidence summary**
 
-**FOR:**
-- Real, reproducible protocol bug (Samba test `smb2.session.bind2`)
-- Buggy code confirmed in 6.18.44 tree
-- Small, obviously correct, applies cleanly
-- Maintainer-authored and maintainer-committed
-- Same signing-flag pattern as other accepted ksmbd stable fixes
-- Affects remote SMB clients on a production server subsystem
-- Precedent: ksmbd binding/session fixes already in this stable series
+**FOR backport:**
+- Real, verified memory leaks on two error paths
+- Incorrect success return leaves stale `*pntsd` and leaks in at least
+  one caller
+- Small, surgical, maintainer-acked fix
+- Buggy code present in 6.18.44; fix absent
+- Applies cleanly
+- Network-reachable via SMB ACL operations
 
-**AGAINST:**
-- Not crash/security/data-corruption class
-- Full `smb2.session.bind2` pass may also need other mainline signing
-  commits not yet in tree
-- No lore review trail found via b4
+**AGAINST backport:**
+- Only affects `CONFIG_SMB_SERVER` users (not all kernel users)
+- No syzbot/CVE report (lower urgency than security fixes)
+- Part of a 3-patch series (other two patches fix similar leaks in
+  sibling functions — ideally backported together but this patch is
+  self-contained)
 
-**UNRESOLVED:**
-- No mailing-list review thread found
-- Exact production user reports not verified beyond Samba test reference
+**Unresolved:** None material to the decision.
 
-### Step 9.2: Stable rules checklist
-1. Obviously correct and tested? **PASS** — logic is clear; Samba test
-   cited; maintainer sign-off
-2. Fixes real bug affecting users? **PASS** — wrong SMB status on signed
-   requests
-3. Important issue? **PASS (borderline)** — MEDIUM severity
-   protocol/interop bug breaking session binding with signing
-4. Small and contained? **PASS** — 6 lines, one file
-5. No new features/APIs? **PASS** — flag on existing error path only
+**Step 9.2 — Stable rules checklist**
+
+1. Obviously correct and tested? **PASS** — logic verified in code;
+   maintainer acks; clean cherry-pick
+2. Fixes a real bug? **PASS** — confirmed leaks and wrong return code
+3. Important issue? **PASS** — memory leak in network server path (HIGH)
+4. Small and contained? **PASS** — 7 lines, one function
+5. No new features/APIs? **PASS**
 6. Can apply to local tree? **PASS** — verified clean apply
 
-### Step 9.3: Exception categories
-**Record:** None (not device ID, quirk, DT, build, or docs). Qualifies
-as protocol correctness bug fix.
+**Step 9.3 — Exception category**
 
-### Step 9.4: Decision rationale
-For **this 6.18.44 tree**, ksmbd is present with multichannel/binding
-support, the buggy early-exit path exists, and the fix is minimal and
-low-risk. Wrong `STATUS_ACCESS_DENIED` on signed session-binding errors
-breaks real SMB client interoperability — the same class of issue other
-ksmbd binding fixes have addressed in stable. Benefit outweighs risk.
+Record: Not applicable (standard bug fix, not device ID/quirk/docs).
+
+**Step 9.4 — Decision rationale**
+
+This commit fixes two real bugs in `ksmbd_vfs_get_sd_xattr()` that exist
+in the 6.18.44 tree: a memory leak when NDR decode fails after
+allocating `acl.sd_buf`, and a second leak plus incorrect success return
+when the security descriptor size is invalid. Both are reachable from
+SMB client operations on ACL-enabled shares. The fix is minimal,
+reviewed by the ksmbd maintainer, and applies without modification. This
+is appropriate stable material.
 
 ---
 
 ## Verification
 
-- [Phase 1] Parsed subject, tags, body from provided commit message and
-  GitHub `9e8ad620ddfde`
-- [Phase 2] Read diff and `fs/smb/server/server.c:163-254`; traced
-  signing path at lines 234-237
-- [Phase 2] Read `smb2_check_user_session()` at `smb2pdu.c:581-629` —
-  returns `-ENOENT` when session not found
-- [Phase 2] Read `smb2_is_sign_req()` at `smb2pdu.c:9018-9028`
-- [Phase 3] `git blame -L 188,238 fs/smb/server/server.c` — block from
-  `5d324e5159d9e`
-- [Phase 3] `git merge-base --is-ancestor 9e8ad620ddfde HEAD` → exit 1
-  (not in tree)
-- [Phase 3] Related commits `1f12738`, `3e67423`, `4b70636` — all NOT in
-  tree
-- [Phase 3] `git log --grep="Cc: stable" -- fs/smb/server/` — found
-  `8cabcb4dd3dc` precedent
-- [Phase 4] `b4 dig -c 9e8ad620ddfde` — no lore match
-- [Phase 4] GitHub API/commit page — confirmed author, message, +6/-0
-- [Phase 5] `get_smb2_cmd_val()` at `smb2pdu.c:227-236` reads from
-  request buffer
-- [Phase 5] Header chain: `server.c` → `connection.h` → `ksmbd_work.h`
-  (`ksmbd_resp_buf_curr`); `smb_common.h` → `common/smb2pdu.h`
-  (`SMB2_FLAGS_SIGNED`, `struct smb2_hdr`)
-- [Phase 6] `git describe HEAD` → v6.18.44; `make kernelversion` →
-  6.18.44
-- [Phase 6] Buggy code present at lines 189-198 (no signed flag on early
-  error)
-- [Phase 6] `curl .../9e8ad620....patch | git apply --check` → success
-- [Phase 7] Multichannel binding code present in `smb2pdu.c:1734+`
-- [Phase 8] Failure mode: wrong SMB status, session binding breakage —
-  MEDIUM severity
+- [Phase 1] Parsed commit `d708a36634bb7`: tags, body, subsystem prefix
+- [Phase 2] Read diff: 3 insertions, 4 deletions in
+  `ksmbd_vfs_get_sd_xattr()`
+- [Phase 2] Read `ndr_decode_v4_ntacl()` at `ndr.c:507-513`: confirms
+  `sd_buf` allocated before possible failure
+- [Phase 2] Traced invalid `sd_size` path: `rc` remains 0,
+  `kfree(acl.sd_buf)` skipped
+- [Phase 3] `git blame` on `vfs.c:1580-1648`: function from 2021,
+  structure from `78ad2c277af4c`
+- [Phase 3] `git show 78ad2c277af4c`: earlier incomplete leak fix
+  confirmed
+- [Phase 3] `git log master --grep="acl.sd_buf"`: found `d708a36634bb7`
+  on master, not in HEAD
+- [Phase 3] `git merge-base --is-ancestor d708a36634bb7 HEAD`: fix NOT
+  in current tree
+- [Phase 3] `git cherry-pick --no-commit d708a36634bb7`: clean apply
+- [Phase 4] `b4 dig -c d708a36634bb7`: lore URL found
+- [Phase 4] WebFetch openwall review: ChenXiaoSong label feedback
+- [Phase 4] WebFetch series cover letter: 3-patch leak-fix series
+- [Phase 5] `grep ksmbd_vfs_get_sd_xattr`: 3 callers in `smb2pdu.c`,
+  `smbacl.c`
+- [Phase 5] Read `smbacl.c:1179-1182`: caller returns `-ENOENT` without
+  free on `rc==0` — leak confirmed
+- [Phase 5] Read `smbacl.c:1442-1445,1597`: alternate caller frees at
+  `err_out`
+- [Phase 5] Read `smb2pdu.c:5800,5832`: caller kfrees `ppntsd` at
+  `release_acl`
+- [Phase 6] `git describe HEAD` / `make kernelversion`: tree is 6.18.44
+- [Phase 6] Read current `vfs.c:1589-1648`: buggy code present
+- [Phase 7] `fs/smb/server/Kconfig`: `CONFIG_SMB_SERVER` confirmed
+- [Phase 8] Assessed severity: memory leak HIGH for ksmbd deployments
 
-**YES**The background check finished: none of the related July 2026
-ksmbd signing/binding commits are in this **6.18.44** tree yet:
+**YES**The background history searches finished and match what the full
+review already used:
 
-- `9e8ad620ddfde` — mark invalid session responses as signed (the
-  candidate)
-- `1f12738b0ed7` — sign rejected SMB2.1 session binding responses
-- `3e67423336f0` — mark rejected cross-dialect bindings as signed
-- `4b706360ffb7` — fix multichannel binding and enforce channel limit
+- **Related-commit search** turned up `78ad2c277af4c` (“ksmbd: fix
+  memory leak in ksmbd_vfs_get_sd_xattr()”, 2021). That earlier fix
+  added the `out_free`/`free_n_data` structure but left the paths this
+  commit corrects.
+- **Author/subject search** did not find `d708a36634bb7` on the current
+  6.18.44 branch; the fix lives on mainline (merged for v7.2-rc1) and is
+  not in this tree yet.
 
-The buggy early-exit path in `fs/smb/server/server.c` is still present
-here, and the candidate patch applies cleanly. That supports backporting
-**`9e8ad620`** on its own; passing `smb2.session.bind2` end-to-end may
-still need the other three mainline fixes.
+**Verdict for Linux 6.18.44: YES** — backport `d708a36634bb7`; it
+applies cleanly and fixes real memory leaks plus incorrect error
+handling in `ksmbd_vfs_get_sd_xattr()`.
 
- fs/smb/server/server.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ fs/smb/server/vfs.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index c729d47f9932b..e70ea8ef1deb8 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -195,6 +195,12 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
- 				else
- 					conn->ops->set_rsp_status(work,
- 						STATUS_USER_SESSION_DELETED);
-+				if (conn->ops->is_sign_req(work, conn->ops->get_cmd_val(work))) {
-+					struct smb2_hdr *rsp_hdr;
-+
-+					rsp_hdr = ksmbd_resp_buf_curr(work);
-+					rsp_hdr->Flags |= SMB2_FLAGS_SIGNED;
-+				}
- 				goto send;
- 			} else if (rc > 0) {
- 				rc = conn->ops->get_ksmbd_tcon(work);
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 859ca7c87bd4c..6680638bb85b5 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1592,7 +1592,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 	struct ndr n;
+ 	struct inode *inode = d_inode(dentry);
+ 	struct ndr acl_ndr = {0};
+-	struct xattr_ntacl acl;
++	struct xattr_ntacl acl = {0};
+ 	struct xattr_smb_acl *smb_acl = NULL, *def_smb_acl = NULL;
+ 	__u8 cmp_hash[XATTR_SD_HASH_SIZE] = {0};
+ 
+@@ -1603,7 +1603,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 	n.length = rc;
+ 	rc = ndr_decode_v4_ntacl(&n, &acl);
+ 	if (rc)
+-		goto free_n_data;
++		goto out_free;
+ 
+ 	smb_acl = ksmbd_vfs_make_xattr_posix_acl(idmap, inode,
+ 						 ACL_TYPE_ACCESS);
+@@ -1629,6 +1629,7 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 	*pntsd = acl.sd_buf;
+ 	if (acl.sd_size < sizeof(struct smb_ntsd)) {
+ 		pr_err("sd size is invalid\n");
++		rc = -EINVAL;
+ 		goto out_free;
+ 	}
+ 
+@@ -1648,8 +1649,6 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 		kfree(acl.sd_buf);
+ 		*pntsd = NULL;
+ 	}
+-
+-free_n_data:
+ 	kfree(n.data);
+ 	return rc;
+ }
 -- 
 2.53.0
 
