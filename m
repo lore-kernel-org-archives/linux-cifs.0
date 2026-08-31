@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA424E3782;
-	Mon, 31 Aug 2026 13:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C92149C4CD;
+	Mon, 31 Aug 2026 13:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788183567; cv=none; b=G10r4sgBJk+OhlBHlb3qYXi90MuNqGUe/47fjGmKc/Y1SS3rhunPuC4rKIDTxLDydfaLG1W/CpdCQ7oruTpgUaS+7LdvDtABu5Twcqu2hSrK1goPHc6f5xOmjyRABzSQ5+JXgzcYhZ+1t9NFAlz3e0ViAksI3lzfmxW2s6ED9iw=
+	t=1788183595; cv=none; b=a5cVzWso5il2gcHiYuzZ/egxehk5O24jK2N9Mv57KlhCpxSFS/0cKujjtC9QtXQLXlVhwBD9XpblD3cSLbn3RrskylTkURB8UxX6EAQ2+KP0KoI84+VL/KqitbO4FRpZBpfwBQsmlj4pYUNOW9skJhXChJ8qvD0BIxlY3vJyOx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788183567; c=relaxed/simple;
-	bh=oeU7jOD1C0UTRvrVcggrEmhcm0kMGclwDI6jyj28Hfo=;
+	s=arc-20240116; t=1788183595; c=relaxed/simple;
+	bh=rZJaWVCHrTNz3ZB0rGwNIIDwlgEm7Fxvjwc8HJPKBrQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L1GrUomViqpEpFL5kmCD3pYmXbXwSjtJzUBdIXSaNrKIyFNu3+yNk/UJXZS3IGolIidTjiUw6HkHavxs5Oo4NabaqaHwkzW6RPitM2G/goN8dVaOAtbhvCnSsrFU8z5C8lC0JCnc9THcW0AN3Eg+4NgnWCWaWmBrxqBIbIdbH2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aR5REhXp; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=liceBUBVo1UpiOKANyoiu/sMpYr5GV3ydHeDZ2KizwXQPWGINjpsb/ajJH3yXrA52yBhWoUGzat7wsSJhdR7OJ6aLF0YCckGU9dY+OwCFEq7adc9tsMk86EY/dXd2+RmKJSy+7aM+e2iTKOzEiDPAnvRpNvjDAfOU/wS0UB5wVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/gPn9hw; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aR5REhXp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 618951F00A3F;
-	Mon, 31 Aug 2026 13:39:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/gPn9hw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C27F91F000E9;
+	Mon, 31 Aug 2026 13:39:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788183564;
-	bh=EBHL3ebJEglbrEUidGQrHGwY+GePgvhXRvXxJLLBbCE=;
+	s=k20260515; t=1788183593;
+	bh=iyHForfe9pPek3dEWIFFUFV9y6TsG4tMohaA4O7EN98=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=aR5REhXppD3xC43PrfmzAXAV2ffZha3R7kc0tydqbSQFKeg2s5IFngBsZoLUzbslv
-	 H24KGpmDiJIX4l0UERDZDgnL6pMnPm1fhWPGv3KwTa9iZO0D8a9yCi7BpZW+D76Quz
-	 M6nJzB35eSg48EiS6xO6lP3YgAm5X7j2fdj4PQngGuON6IhI+LYAIDhuR4uOYUSipt
-	 r6Z8F57/KfIKIzeoKXsNHqNiDfEu2rGCbH5L223Xx4oSIO0Cur9eW5hASQC99U9kg6
-	 BiL3TKF/nKouYWpW1F1Vrcqg9R2Giibk1xcoELOLKj73+gJKE4oAKLLmgxgg9jCnUG
-	 tOXsxmVPhODaA==
+	b=G/gPn9hwv8DkWuFdDcUhqCrtUGy8kMWUOnfnyjGqX6iT41o1d54DhINomIzr8YFTB
+	 jamDuPkA91NOnmDD2FdZaJSv0abFHANkOZI1WGZgXP2vdVMmYIRCY1Z/5s+STYlhDJ
+	 60IiGbgZA8H/9YmlX8JIE62MHfUhOdmTD5SYQYfccUVyHiRNl09tzpOgJvA6XwpyZD
+	 TTPgwmO0ksL27S7UYk5vPp6swTr9WS6G0hwWLNzMWYv636bbNvgp8g/ZElZF16uO2m
+	 1AzM2k9cdjPWkEP/exJysS4py3Bjco9gTKPmgABJHleKQVSwCSGLqY2CncbnlWp5+G
+	 PgQmecSv0zrLg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -35,9 +35,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.6] ksmbd: treat read-control opens as stat opens only for leases
-Date: Mon, 31 Aug 2026 09:23:20 -0400
-Message-ID: <20260831133314.4125787-172-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: mark invalid session responses as signed
+Date: Mon, 31 Aug 2026 09:23:35 -0400
+Message-ID: <20260831133314.4125787-187-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -55,24 +55,22 @@ Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit be939e11c4724d1de3650e8bafd4c3583d9684b2 ]
+[ Upstream commit 9e8ad620ddfde5a5f4ef58372e3805e9388cb0f4 ]
 
-A second open that requests only metadata-level access must not break
-the existing caching state. ksmbd already skips the break for such opens
-via fp->attrib_only (FILE_READ_ATTRIBUTES,
-FILE_WRITE_ATTRIBUTES and FILE_SYNCHRONIZE).
+When a signed request uses a session that is not registered on the
+connection, ksmbd returns STATUS_USER_SESSION_DELETED before reaching the
+normal response signing path. The response therefore lacks
+SMB2_FLAGS_SIGNED.
 
-An open requesting only READ_CONTROL (reading the security descriptor)
-must be treated differently depending on the existing caching state.
-smbtorture smb2.lease.statopen4 expects a read-control open NOT to break
-a caching lease, while smb2.oplock.statopen1 expects the same open to
-break a batch oplock. So READ_CONTROL is a stat open for leases but not
-for oplocks.
+Clients that require signing check this flag before handling
+STATUS_USER_SESSION_DELETED and replace the server status with
+STATUS_ACCESS_DENIED when it is absent. The protocol permits this error
+response to skip signature verification because the connection has no
+matching session key.
 
-Extend the stat-open break-skip in smb_grant_oplock() to also cover a
-read-control-only open, but only when the existing holder is a lease.
-The global fp->attrib_only flag (used for share-mode, rename and truncate
-decisions) is left unchanged so oplock behaviour is preserved.
+Preserve SMB2_FLAGS_SIGNED on the early error response when the request was
+signed. This lets the client propagate STATUS_USER_SESSION_DELETED.
+It fixes smb2.session.bind2.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
@@ -81,398 +79,338 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-# Stable Backport Analysis: `ksmbd: treat read-control opens as stat
-opens only for leases`
+## Phase 1: Commit Message Forensics
 
-**Local tree:** `v6.18.44` (`linux-6.18.y` stable, `HEAD` detached at
-`2736c32da98b9`)
-**Candidate commit (mainline):** `be939e11c4724` (on `master`, not yet
-in this tree)
+### Step 1.1: Subject line
+**Record:** `[ksmbd] [mark] invalid session responses as signed` — sets
+`SMB2_FLAGS_SIGNED` on early session-validation error responses when the
+request was signed.
 
----
+### Step 1.2: Tags
+**Record:**
+- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>` (author)
+- **Signed-off-by:** Steve French `<stfrench@microsoft.com>` (cifs/ksmbd
+  maintainer)
+- No Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Acked-by:, Link:,
+  or Cc: stable tags (expected for manual review)
 
-## PHASE 1: COMMIT MESSAGE FORENSICS
+### Step 1.3: Body analysis
+**Record:**
+- **Bug:** Signed request references a session not registered on the
+  connection; `smb2_check_user_session()` fails early; server returns
+  `STATUS_USER_SESSION_DELETED` without `SMB2_FLAGS_SIGNED`.
+- **Symptom:** Signing-required clients check `SMB2_FLAGS_SIGNED` before
+  honoring that status; missing flag → client reports
+  `STATUS_ACCESS_DENIED` instead of the server’s real status.
+- **Root cause:** Early `goto send` bypasses the normal signing path
+  (`work->sess` is NULL, so `set_sign_rsp()` is never called).
+- **Fix approach:** Set only `SMB2_FLAGS_SIGNED` (no signature bytes);
+  protocol allows skipping verification when no session key exists on
+  the connection.
+- **Test reference:** `smb2.session.bind2` (Samba protocol test suite).
 
-**Step 1.1 – Subject line**
-Record: `[ksmbd] [treat] READ_CONTROL-only opens should be treated as
-stat opens for leases (but not oplocks)`
-
-**Step 1.2 – Tags**
-Record:
-- `Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>` (author)
-- `Signed-off-by: Steve French <stfrench@microsoft.com>`
-  (committer/maintainer)
-- No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-
-  by:`, `Link:`, or `Cc: stable@vger.kernel.org`
-- Notable absence: no user report or syzbot; verification cited is Samba
-  torture tests
-
-**Step 1.3 – Body analysis**
-Record:
-- **Bug:** A second open requesting only `READ_CONTROL` (security-
-  descriptor read) incorrectly breaks an existing SMB2 caching lease.
-- **Symptom:** Spurious lease break when a metadata-only open should
-  leave caching state intact; fails `smbtorture smb2.lease.statopen4`.
-- **Expected behavior:** `READ_CONTROL` is a stat open for leases (no
-  break) but not for oplocks (`smb2.oplock.statopen1` expects break).
-- **Root cause:** `fp->attrib_only` covers `FILE_READ_ATTRIBUTES`,
-  `FILE_WRITE_ATTRIBUTES`, and `FILE_SYNCHRONIZE` but not
-  `READ_CONTROL`; the stat-open skip in `smb_grant_oplock()` therefore
-  does not apply.
-- **Fix approach:** Extend the stat-open break-skip for
-  `READ_CONTROL`-only opens, but only when the existing holder is a
-  lease; leave `fp->attrib_only` unchanged so oplock behavior is
-  preserved.
-
-**Step 1.4 – Hidden bug fix?**
-Record: **Yes.** Despite no "fix" in the subject, this is a protocol-
-correctness bug in lease/oplock handling, not cosmetic cleanup.
+### Step 1.4: Hidden bug fix?
+**Record:** Yes — described as marking responses signed, but it fixes a
+real SMB protocol/interoperability bug: wrong client-visible error on
+signed session-binding paths.
 
 ---
 
-## PHASE 2: DIFF ANALYSIS
+## Phase 2: Diff Analysis
 
-**Step 2.1 – Inventory**
-Record:
-- **Files:** `fs/smb/server/oplock.c` only (+27 / −3 lines)
-- **Functions modified:** new `ksmbd_inode_has_lease()`; modified
-  `smb_grant_oplock()`
-- **Scope:** Single-file, surgical fix
+### Step 2.1: Inventory
+**Record:**
+- **Files:** `fs/smb/server/server.c` (+6 / -0)
+- **Function:** `__handle_ksmbd_work()`
+- **Scope:** Single-file, surgical fix in one error path
 
-**Step 2.2 – Code flow per hunk**
+### Step 2.2: Code flow change
+**Record:**
+- **Hunk (session check failure, `rc < 0`):**
+  - **Before:** Set `STATUS_INVALID_PARAMETER` or
+    `STATUS_USER_SESSION_DELETED`, `goto send` with unsigned response.
+  - **After:** If `is_sign_req(work, get_cmd_val(work))`, set
+    `SMB2_FLAGS_SIGNED` on current response header via
+    `ksmbd_resp_buf_curr()`, then `goto send`.
+- **Path affected:** Early error path before `__process_request()` and
+  before the `work->sess && ... set_sign_rsp()` block (lines 234–237).
 
-*Hunk 1 – `ksmbd_inode_has_lease()`:*
-Record: **Before:** no way to distinguish lease vs oplock holder in the
-stat-open path. **After:** peek at first `opinfo` on inode list, return
-`is_lease`, with proper refcount via `opinfo_get_list()` /
-`opinfo_put()`.
+### Step 2.3: Bug mechanism
+**Record:** **Category:** Logic / protocol correctness on error path.
+- Normal signing requires `work->sess` (lines 234–237).
+- Invalid session → `work->sess` stays NULL → flag never set.
+- Fix sets the flag without signing when the request was signed and no
+  session key is available.
 
-*Hunk 2 – `smb_grant_oplock()` stat-open skip:*
-Record: **Before:** only `fp->attrib_only` opens skip the break path
-(set `req_op_level = NONE`, `goto set_lev`). **After:** also skip when
-open requests only stat/metadata access including `READ_CONTROL` **and**
-`ksmbd_inode_has_lease(ci)` is true. Truncating dispositions
-(`FILE_OVERWRITE_*`, `FILE_SUPERSEDE`) still force a break.
-
-**Step 2.3 – Bug mechanism**
-Record:
-- **Category:** Logic / protocol correctness (lease vs oplock semantics)
-- **Mechanism:** `READ_CONTROL`-only open has `fp->attrib_only == false`
-  (set in `smb2pdu.c:3461-3462`), so code falls through to
-  `opinfo_get_list()` and `oplock_break()` even when the existing holder
-  is a caching lease. Fix short-circuits that path for lease holders.
-
-**Step 2.4 – Fix quality**
-Record:
-- Fix is minimal and mirrors existing `attrib_only` logic.
-- Deliberately preserves oplock break behavior by gating on
-  `ksmbd_inode_has_lease()`.
-- Uses existing `fp->daccess` (already set at `smb2pdu.c:3367` before
-  `smb_grant_oplock()` at line 3523).
-- Low regression risk; same `opinfo_get_list()` pattern already used
-  later in `smb_grant_oplock()`.
+### Step 2.4: Fix quality
+**Record:**
+- Minimal, matches existing pattern in related ksmbd signing fixes (e.g.
+  `1f12738`, `3e67423` on mainline).
+- Low regression risk: only touches error path; only sets a flag when
+  request was signed.
+- Uses `get_cmd_val(work)` (reads request header directly), not
+  uninitialized local `command` (still 0 at this point).
 
 ---
 
-## PHASE 3: GIT HISTORY INVESTIGATION
+## Phase 3: Git History Investigation
 
-**Step 3.1 – Blame**
-Record: Stat-open skip introduced in `849fbc549d4cca` (2021-06-29,
-"ksmbd: opencode to remove ATTR_FP macro"). Bug has existed since
-`attrib_only` was introduced. Present in this 6.18.y tree.
+### Step 3.1: Blame
+**Record:** Session-check early-exit block dates to merge
+`5d324e5159d9e` (v6.18-rc8 era, Nov 2025). Bug has been present since
+this code structure landed in this tree.
 
-**Step 3.2 – Fixes: tag**
-Record: N/A – no `Fixes:` tag.
+### Step 3.2: Fixes: tag
+**Record:** N/A — no Fixes: tag.
 
-**Step 3.3 – Related file history**
-Record: Recent `oplock.c` changes in 6.18.y are mostly UAF/NULL-
-deref/refcount fixes. Mainline has ~27 additional lease/oplock commits
-not in 6.18.y (series starting `a04159d96c27f`). This patch is **patch
-26/29** of that series but **`git apply --check` succeeds cleanly** on
-6.18.y without the other 25 patches.
+### Step 3.3: Related file history
+**Record:** Recent `server.c` changes are crypto-library refactors and
+leak/loop fixes (`74c2f0f`, `51c5f7e`, `71b5e7c`, `6a37bc4`). Related
+binding fixes exist in tree (`a897064a45705` “do not expire session on
+binding failure”, `9feb2d1bf86d9`). July 2026 signing series (`1f12738`,
+`3e67423`, `4b70636`, `9e8ad620`) is **not** in this tree yet. This
+commit is standalone for its code path.
 
-**Step 3.4 – Author context**
-Record: Namjae Jeon is ksmbd maintainer; Steve French is SMB/CIFS
-maintainer. Both signed off.
+### Step 3.4: Author context
+**Record:** Namjae Jeon is ksmbd maintainer; Steve French is cifs
+maintainer. Prior stable-nominated ksmbd fix in this tree:
+`8cabcb4dd3dc` (refcount leak on invalid session lookup, `Cc:
+stable@vger.kernel.org`).
 
-**Step 3.5 – Dependencies**
-Record: **Standalone.** No prerequisite commits required; all symbols
-(`opinfo_get_list`, `fp->daccess`, `FILE_READ_CONTROL_LE`, `is_lease`)
-exist in 6.18.y.
-
----
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-
-**Step 4.1 – Original discussion**
-Record:
-- `b4 dig -c be939e11c4724`:
-  https://patch.msgid.link/20260621124844.6235-26-linkinjeon@kernel.org
-- Part of v1 series `[PATCH 01/29]` through `[PATCH 29/29]`, dated
-  2026-06-21
-
-**Step 4.2 – Reviewers**
-Record: `b4 dig -w` CC'd `linux-cifs@vger.kernel.org`,
-`smfrench@gmail.com`, `senozhatsky@chromium.org`, `tom@talpey.com`,
-`atteh.mailbox@gmail.com`. No `Reviewed-by`/`Acked-by` on the committed
-patch.
-
-**Step 4.3 – Bug report**
-Record: No external bug report. Verification is internal Samba torture
-references (`smb2.lease.statopen4`, `smb2.oplock.statopen1`).
-
-**Step 4.4 – Series context**
-Record: Patch 26/29 in a large lease-improvement series. Earlier patches
-(e.g. `889d2e38943ad` "break conflicting-open leases only as far as
-needed") address related lease-break issues but are **not**
-prerequisites for this patch on 6.18.y.
-
-**Step 4.5 – Stable list history**
-Record: No `Cc: stable@vger.kernel.org` found in the lore thread (`rg`
-over downloaded mbox). No stable-specific discussion found.
+### Step 3.5: Dependencies
+**Record:** No series/prerequisite commits required. Uses existing APIs:
+`is_sign_req`, `get_cmd_val`, `ksmbd_resp_buf_curr`,
+`SMB2_FLAGS_SIGNED`. Patch applies cleanly (`git apply --check` on
+GitHub `.patch` succeeded).
 
 ---
 
-## PHASE 5: CODE SEMANTIC ANALYSIS
+## Phase 4: Mailing List and External Research
 
-**Step 5.1 – Key functions**
-Record: `ksmbd_inode_has_lease()`, `smb_grant_oplock()`, helpers
-`opinfo_get_list()`, `opinfo_put()`, `opinfo_count()`
+### Step 4.1: Original discussion
+**Record:** `b4 dig -c 9e8ad620ddfde5a5f4ef58372e3805e9388cb0f4` — no
+lore match found. GitHub commit page confirms message and diff.
 
-**Step 5.2 – Callers**
-Record: `smb_grant_oplock()` called from `smb2pdu.c:3523` during SMB2
-CREATE handling — common file-server path reachable by remote SMB
-clients on every open with oplock/lease request.
+### Step 4.2: Reviewers
+**Record:** `b4 dig -w` — no lore data. Committer is subsystem
+maintainer (Steve French).
 
-**Step 5.3 – Callees**
-Record: `opinfo_get_list()` acquires `ci->m_lock` read lock and bumps
-refcount; `oplock_break()` (avoided by fix) sends break notifications to
-clients.
+### Step 4.3: Bug report
+**Record:** No external bug report; validation reference is Samba test
+`smb2.session.bind2`. Related mainline commits from same author/date
+document the same signing-flag pattern for binding errors.
 
-**Step 5.4 – Reachability**
-Record: **Yes, remotely triggerable.** Any SMB client opening a file
-with only `READ_CONTROL` (+ stat bits) while another client holds a
-lease hits this path. ACL/security-descriptor reads are routine Windows
-operations.
+### Step 4.4: Related patches
+**Record:** Part of a broader July 2026 ksmbd multichannel/signing fix
+set on mainline, but this patch is self-contained for the `server.c`
+early-session-check path.
 
-**Step 5.5 – Similar patterns**
-Record: `smb2pdu.c:3303` already treats `FILE_READ_CONTROL` as non-
-conflicting for inode permission checks. `fp->attrib_only` definition at
-`smb2pdu.c:3461-3462` intentionally excludes `READ_CONTROL` because
-oplocks must still break — confirming the fix must be lease-specific,
-not a global `attrib_only` change.
+### Step 4.5: Stable list history
+**Record:** Lore blocked by bot protection; no stable-list discussion
+found. Precedent: other ksmbd session/binding fixes backported to stable
+in this tree.
 
 ---
 
-## PHASE 6: CROSS-REFERENCING AGAINST LOCAL TREE (6.18.y)
+## Phase 5: Code Semantic Analysis
 
-**Step 6.1 – Buggy code present?**
-Record: **Yes.** Current tree at `oplock.c:1237-1243`:
+### Step 5.1: Key functions
+**Record:** `__handle_ksmbd_work()`, `smb2_check_user_session()`,
+`smb2_is_sign_req()`, `get_smb2_cmd_val()`, `ksmbd_resp_buf_curr()`.
 
-```1237:1243:fs/smb/server/oplock.c
-        /* grant none-oplock if second open is trunc */
-        if (fp->attrib_only && fp->cdoption != FILE_OVERWRITE_IF_LE &&
-            fp->cdoption != FILE_OVERWRITE_LE &&
-            fp->cdoption != FILE_SUPERSEDE_LE) {
-                req_op_level = SMB2_OPLOCK_LEVEL_NONE;
-                goto set_lev;
-        }
-```
+### Step 5.2: Callers
+**Record:** `__handle_ksmbd_work()` ← `handle_ksmbd_work()` ← workqueue
+processing of incoming SMB requests (network I/O path for all ksmbd
+clients).
 
-Bug present since 2021 (`849fbc549d4cca`).
+### Step 5.3: Callees
+**Record:** On failure: `check_user_session()` →
+`ksmbd_session_lookup_all()`; fix calls `is_sign_req()` and sets
+response header flags.
 
-**Step 6.2 – Backport complications**
-Record: **`git format-patch -1 be939e11c4724 | git apply --check` →
-clean apply.** No conflicts expected.
+### Step 5.4: Reachability
+**Record:** Triggered by any signed SMB2/3 request with a session ID not
+registered on the connection — reachable from remote SMB clients
+(session binding / multichannel scenarios).
 
-**Step 6.3 – Related fixes already present?**
-Record: No equivalent fix in 6.18.y (`git log -S
-'ksmbd_inode_has_lease'` returns nothing on this tree).
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-**Step 7.1 – Subsystem**
-Record: `fs/smb/server` (ksmbd / `CONFIG_SMB_SERVER`) — **IMPORTANT**
-for SMB file-server deployments; not core kernel, but critical for that
-use case.
-
-**Step 7.2 – Activity**
-Record: Actively maintained in 6.18.y with frequent security and
-protocol fixes (e.g. `a60b5da05e318` negotiate rejection,
-`213b4568f6e5d` deferred-close status).
+### Step 5.5: Similar patterns
+**Record:** Same `Flags |= SMB2_FLAGS_SIGNED` without full signing in
+mainline binding-error fixes (`3e67423`, `1f12738`). Normal signing
+still done via `set_sign_rsp()` when `work->sess` is valid (lines
+234–237).
 
 ---
 
-## PHASE 8: IMPACT AND RISK ASSESSMENT
+## Phase 6: Cross-Reference Against Local Tree
 
-**Step 8.1 – Who is affected**
-Record: Users running `CONFIG_SMB_SERVER` (module `ksmbd`) with
-oplocks/leases enabled — SMB/NAS/file-server deployments.
+### Step 6.1: Buggy code present?
+**Record:** **Yes.** Local tree is **6.18.44** (`git describe HEAD` →
+`v6.18.44-1-g2736c32da98b9`). Buggy code at
+`fs/smb/server/server.c:189-198` — early `goto send` without setting
+signed flag. Commit `9e8ad620ddfde` is **not** an ancestor of HEAD.
 
-**Step 8.2 – Trigger conditions**
-Record: Second client opens a file requesting only `READ_CONTROL` (+
-optional stat bits) while a caching lease is held. **Common** for
-ACL/security-descriptor access. Unprivileged remote SMB clients can
-trigger.
+### Step 6.2: Backport complications
+**Record:** **Clean apply** verified. No structural conflicts expected.
 
-**Step 8.3 – Failure mode severity**
-Record: Spurious lease break → unnecessary client cache invalidation,
-extra break/ack round-trips, degraded I/O performance. **Not** crash,
-corruption, deadlock, or security exploit. Severity: **MEDIUM**
-(protocol/interoperability + performance).
-
-**Step 8.4 – Risk-benefit**
-Record:
-- **Benefit:** Correct SMB2 lease semantics; passes
-  `smb2.lease.statopen4`; prevents unnecessary cache churn on routine
-  ACL reads.
-- **Risk:** Very low — 27 lines, one file, clean apply, mirrors existing
-  logic.
-- **Ratio:** Favorable for SMB server users; conservative but justified.
+### Step 6.3: Related fixes already present?
+**Record:** Binding-related fixes present (`a897064a45705`,
+`9feb2d1bf86d9`). This specific signed-flag-on-early-session-error fix
+is **not** present.
 
 ---
 
-## PHASE 9: FINAL SYNTHESIS
+## Phase 7: Subsystem and Maintainer Context
 
-**Step 9.1 – Evidence compile**
+### Step 7.1: Subsystem criticality
+**Record:** **fs/smb/server (ksmbd)** — IMPORTANT. Network file server;
+affects remote SMB clients, especially with mandatory signing.
 
-*FOR backport:*
-- Real, long-standing protocol bug (since 2021)
-- Remotely triggerable on common SMB server path
-- Small, obviously correct, maintainer-authored fix
-- Applies cleanly to 6.18.y without series dependencies
-- In mainline (`be939e11c4724` on `master`)
-- Precedent: 6.18.y already backports ksmbd protocol/interop fixes
-  (`a60b5da`, `213b4568f6e5d`)
-- Samba torture test provides concrete verification
+### Step 7.2: Activity
+**Record:** Actively maintained in 6.18.y (recent ksmbd security and
+binding fixes in this tree).
 
-*AGAINST backport:*
-- No crash, corruption, security issue, or hang
-- No user `Reported-by`, no `Cc: stable`, no distro-maintainer
-  nomination
-- `CONFIG_SMB_SERVER` defaults to `n` — narrower audience
-- Performance/interop issue rather than hard failure
-- Part of a larger 29-patch lease series (though standalone applicable)
+---
 
-*Unresolved:* No end-user production bug reports found; impact
-quantified only via torture tests.
+## Phase 8: Impact and Risk Assessment
 
-**Step 9.2 – Stable rules checklist**
-1. Obviously correct and tested? **PASS** — logic is clear; torture-test
-   references; maintainer sign-off.
-2. Fixes a real bug affecting users? **PASS** — incorrect lease breaks
-   on ACL reads affect SMB server clients.
-3. Important issue? **PASS (borderline)** — not crash/corruption, but
-   protocol non-compliance causing spurious lease breaks and measurable
-   cache/performance impact on a file server.
-4. Small and contained? **PASS** — 27 lines, one file.
-5. No new features/APIs? **PASS** — behavior correction only.
-6. Can apply to local tree? **PASS** — verified clean apply.
+### Step 8.1: Who is affected
+**Record:** ksmbd users (`CONFIG_SMB_SERVER`) with SMB signing required
+and session binding/multichannel — enterprise and Windows-client
+environments.
 
-**Step 9.3 – Exception categories**
-Record: None (not device ID, quirk, DT, build fix, or docs). Qualifies
-as protocol correctness fix for existing `CONFIG_SMB_SERVER`
-functionality.
+### Step 8.2: Trigger conditions
+**Record:** Signed request with session ID unknown on current connection
+(common in SMB multichannel binding). Remote-triggerable; not timing-
+dependent.
 
-**Step 9.4 – Problem summary for stable users**
-Without this fix, ksmbd incorrectly breaks caching leases when a client
-opens a file solely to read its security descriptor (`READ_CONTROL`).
-Windows and Samba clients routinely perform such opens (Explorer
-properties, ACL tools, backup software). Each spurious break forces
-clients to flush caches and complete break acknowledgments, degrading
-performance and violating SMB2 lease semantics that Samba and Windows
-implement correctly. The fix is surgical, self-contained, and applies
-cleanly to 6.18.y.
+### Step 8.3: Failure mode severity
+**Record:** Wrong error status (`STATUS_ACCESS_DENIED` vs
+`STATUS_USER_SESSION_DELETED`) → session binding failures, multichannel
+setup breakage, client disconnects. **Severity: MEDIUM**
+(functional/protocol, not kernel oops/corruption).
+
+### Step 8.4: Risk-benefit
+**Record:**
+- **Benefit:** MEDIUM-HIGH for ksmbd + signing + multichannel users
+- **Risk:** VERY LOW (+6 lines, error path only, flag-only change)
+- **Ratio:** Favorable for stable
+
+---
+
+## Phase 9: Final Synthesis
+
+### Step 9.1: Evidence summary
+
+**FOR:**
+- Real, reproducible protocol bug (Samba test `smb2.session.bind2`)
+- Buggy code confirmed in 6.18.44 tree
+- Small, obviously correct, applies cleanly
+- Maintainer-authored and maintainer-committed
+- Same signing-flag pattern as other accepted ksmbd stable fixes
+- Affects remote SMB clients on a production server subsystem
+- Precedent: ksmbd binding/session fixes already in this stable series
+
+**AGAINST:**
+- Not crash/security/data-corruption class
+- Full `smb2.session.bind2` pass may also need other mainline signing
+  commits not yet in tree
+- No lore review trail found via b4
+
+**UNRESOLVED:**
+- No mailing-list review thread found
+- Exact production user reports not verified beyond Samba test reference
+
+### Step 9.2: Stable rules checklist
+1. Obviously correct and tested? **PASS** — logic is clear; Samba test
+   cited; maintainer sign-off
+2. Fixes real bug affecting users? **PASS** — wrong SMB status on signed
+   requests
+3. Important issue? **PASS (borderline)** — MEDIUM severity
+   protocol/interop bug breaking session binding with signing
+4. Small and contained? **PASS** — 6 lines, one file
+5. No new features/APIs? **PASS** — flag on existing error path only
+6. Can apply to local tree? **PASS** — verified clean apply
+
+### Step 9.3: Exception categories
+**Record:** None (not device ID, quirk, DT, build, or docs). Qualifies
+as protocol correctness bug fix.
+
+### Step 9.4: Decision rationale
+For **this 6.18.44 tree**, ksmbd is present with multichannel/binding
+support, the buggy early-exit path exists, and the fix is minimal and
+low-risk. Wrong `STATUS_ACCESS_DENIED` on signed session-binding errors
+breaks real SMB client interoperability — the same class of issue other
+ksmbd binding fixes have addressed in stable. Benefit outweighs risk.
 
 ---
 
 ## Verification
 
-- **[Phase 1]** Parsed commit message from user query and `git show
-  be939e11c4724`; tags recorded.
-- **[Phase 2]** Analyzed diff; confirmed `fp->daccess` field in
-  `vfs_cache.h:94`; confirmed `daccess` set before `smb_grant_oplock()`
-  at `smb2pdu.c:3367`/`3523`.
-- **[Phase 3]** `git describe HEAD` → `v6.18.44`; `git blame` → bug
-  since `849fbc549d4cca` (2021); `git log HEAD..master --
-  fs/smb/server/oplock.c` → 15+ commits including candidate; `git apply
-  --check` → clean.
-- **[Phase 4]** `b4 dig -c be939e11c4724` → lore URL found; `b4 dig -a`
-  → patch 26/29; `b4 dig -w` → recipients listed; mbox downloaded; no
-  `Cc: stable` or NAKs found.
-- **[Phase 5]** `grep smb_grant_oplock` → caller in `smb2pdu.c`; traced
-  `attrib_only` definition at `smb2pdu.c:3461-3462`.
-- **[Phase 6]** Confirmed buggy code at `oplock.c:1237-1243`;
-  `ksmbd_inode_has_lease` absent; `git apply --check` passes.
-- **[Phase 7]** `CONFIG_SMB_SERVER` in `fs/smb/server/Kconfig`; recent
-  ksmbd stable commits reviewed.
-- **[Phase 8]** Assessed trigger (remote READ_CONTROL open) and severity
-  (spurious lease break, MEDIUM).
-- **[Phase 9]** Stable rules checklist completed; decision synthesized.
+- [Phase 1] Parsed subject, tags, body from provided commit message and
+  GitHub `9e8ad620ddfde`
+- [Phase 2] Read diff and `fs/smb/server/server.c:163-254`; traced
+  signing path at lines 234-237
+- [Phase 2] Read `smb2_check_user_session()` at `smb2pdu.c:581-629` —
+  returns `-ENOENT` when session not found
+- [Phase 2] Read `smb2_is_sign_req()` at `smb2pdu.c:9018-9028`
+- [Phase 3] `git blame -L 188,238 fs/smb/server/server.c` — block from
+  `5d324e5159d9e`
+- [Phase 3] `git merge-base --is-ancestor 9e8ad620ddfde HEAD` → exit 1
+  (not in tree)
+- [Phase 3] Related commits `1f12738`, `3e67423`, `4b70636` — all NOT in
+  tree
+- [Phase 3] `git log --grep="Cc: stable" -- fs/smb/server/` — found
+  `8cabcb4dd3dc` precedent
+- [Phase 4] `b4 dig -c 9e8ad620ddfde` — no lore match
+- [Phase 4] GitHub API/commit page — confirmed author, message, +6/-0
+- [Phase 5] `get_smb2_cmd_val()` at `smb2pdu.c:227-236` reads from
+  request buffer
+- [Phase 5] Header chain: `server.c` → `connection.h` → `ksmbd_work.h`
+  (`ksmbd_resp_buf_curr`); `smb_common.h` → `common/smb2pdu.h`
+  (`SMB2_FLAGS_SIGNED`, `struct smb2_hdr`)
+- [Phase 6] `git describe HEAD` → v6.18.44; `make kernelversion` →
+  6.18.44
+- [Phase 6] Buggy code present at lines 189-198 (no signed flag on early
+  error)
+- [Phase 6] `curl .../9e8ad620....patch | git apply --check` → success
+- [Phase 7] Multichannel binding code present in `smb2pdu.c:1734+`
+- [Phase 8] Failure mode: wrong SMB status, session binding breakage —
+  MEDIUM severity
 
-**YES**The background `git log` searches timed out, but that didn’t
-block the analysis — the commit was found on `master` as
-`be939e11c4724`, and the rest of the investigation (clean apply to
-6.18.y, lore thread, code review) completed normally.
+**YES**The background check finished: none of the related July 2026
+ksmbd signing/binding commits are in this **6.18.44** tree yet:
 
-**Verdict for 6.18.y: YES** — this is a real SMB2 lease protocol bug
-(spurious lease breaks on `READ_CONTROL`-only opens) with a small, self-
-contained fix that applies cleanly.
+- `9e8ad620ddfde` — mark invalid session responses as signed (the
+  candidate)
+- `1f12738b0ed7` — sign rejected SMB2.1 session binding responses
+- `3e67423336f0` — mark rejected cross-dialect bindings as signed
+- `4b706360ffb7` — fix multichannel binding and enforce channel limit
 
- fs/smb/server/oplock.c | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+The buggy early-exit path in `fs/smb/server/server.c` is still present
+here, and the candidate patch applies cleanly. That supports backporting
+**`9e8ad620`** on its own; passing `smb2.session.bind2` end-to-end may
+still need the other three mainline fixes.
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index b6705a07c6ebe..f700ee48c54c0 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -208,6 +208,18 @@ void opinfo_put(struct oplock_info *opinfo)
- 	free_opinfo(opinfo);
- }
- 
-+static bool ksmbd_inode_has_lease(struct ksmbd_inode *ci)
-+{
-+	struct oplock_info *opinfo = opinfo_get_list(ci);
-+	bool is_lease;
+ fs/smb/server/server.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index c729d47f9932b..e70ea8ef1deb8 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -195,6 +195,12 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
+ 				else
+ 					conn->ops->set_rsp_status(work,
+ 						STATUS_USER_SESSION_DELETED);
++				if (conn->ops->is_sign_req(work, conn->ops->get_cmd_val(work))) {
++					struct smb2_hdr *rsp_hdr;
 +
-+	if (!opinfo)
-+		return false;
-+	is_lease = opinfo->is_lease;
-+	opinfo_put(opinfo);
-+	return is_lease;
-+}
-+
- static void opinfo_add(struct oplock_info *opinfo, struct ksmbd_file *fp)
- {
- 	struct ksmbd_inode *ci = fp->f_ci;
-@@ -1251,10 +1263,22 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
- 	if (!opinfo_count(fp))
- 		goto set_lev;
- 
--	/* grant none-oplock if second open is trunc */
--	if (fp->attrib_only && fp->cdoption != FILE_OVERWRITE_IF_LE &&
-+	/*
-+	 * A stat open that only requests metadata access must not break the
-+	 * existing caching state. READ_CONTROL (reading the security
-+	 * descriptor) does not conflict with a lease, but it does conflict
-+	 * with an oplock, so only treat a read-control-only open as a stat
-+	 * open when the existing holder is a lease.
-+	 */
-+	if (fp->cdoption != FILE_OVERWRITE_IF_LE &&
- 	    fp->cdoption != FILE_OVERWRITE_LE &&
--	    fp->cdoption != FILE_SUPERSEDE_LE) {
-+	    fp->cdoption != FILE_SUPERSEDE_LE &&
-+	    (fp->attrib_only ||
-+	     (!(fp->daccess & ~(FILE_READ_ATTRIBUTES_LE |
-+				FILE_WRITE_ATTRIBUTES_LE |
-+				FILE_SYNCHRONIZE_LE |
-+				FILE_READ_CONTROL_LE)) &&
-+	      ksmbd_inode_has_lease(ci)))) {
- 		req_op_level = SMB2_OPLOCK_LEVEL_NONE;
- 		goto set_lev;
- 	}
++					rsp_hdr = ksmbd_resp_buf_curr(work);
++					rsp_hdr->Flags |= SMB2_FLAGS_SIGNED;
++				}
+ 				goto send;
+ 			} else if (rc > 0) {
+ 				rc = conn->ops->get_ksmbd_tcon(work);
 -- 
 2.53.0
 
