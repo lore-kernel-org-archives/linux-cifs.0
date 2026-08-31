@@ -1,179 +1,430 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFCD3D6CC3
-	for <linux-cifs@vger.kernel.org>; Mon, 31 Aug 2026 12:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB4941B8F7;
+	Mon, 31 Aug 2026 13:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788180678; cv=none; b=F4zuLRlQx27wvtYhmUhT8IAD/adlmDTaxEkMcBjvYGdyHJUxylPWRGiqXoYCPjmiiAdaYyZuZJOOp9gT30ivC2mwJ2Urj677XRtAv3hhtx5949XfwKDCKQFNc7WHaPZZZLBeX0cfKauqMyrMZ/5xbr1KfDgTML2hLnWKqmjBfcc=
+	t=1788183201; cv=none; b=s8LWQSq1WFIADE49fP85d7rCDol58n/fnq1PiNIIqp6GNbW9hQEofO8rMoQSZrxltKGQVcTuNYITYPwikwFe6Id4Xpbh+QUuOphoaJzXZwkxvEqm3ZEhno1M1T1ExiYd6be3+YJTH6oS6359hv/oJCIFSBhlCwPz+FqJkDjPMuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788180678; c=relaxed/simple;
-	bh=MsgD6xMrJ817lE4I/y63u6Ufiz4oIuiclFfZLj4rF+8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=azqpLmRMDo7mqriw34vDHuzaWuK2V2+KWkyA6BhEx4ClFJWp2bxZdYCddBYQV04AqmCGqdlZSHd3Yrbv6B1ily1lg+h2AsvOdBZtYpIbJubN+Bj/7FSQLaKjDFhquA3n2YbJmMZUTd7QNnYq1KeVFT23gx4EuFTFp7/WSbB4mhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=ncTawx13; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bynar.io
+	s=arc-20240116; t=1788183201; c=relaxed/simple;
+	bh=K8LMQo5pHIEYPhl47hifXyrP06S40nRKtJ1EekNJJJA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LO0PlmrSEedA5e6iMl9IouDBDB/sueJUQxLnnhopvkGE7esglWyYDNmrczEz8JdwGGqcfAnCkWusyziJOS85KHyzYOYp01I3zR7dW8nouGnicm/CMBu3NzbkoXHptvuSlymU2Ou6zED0Gf82JI/ZNhVoqOqie0e/lZHE/1r60c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N3YuJI6g; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b="ncTawx13"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-49ccfbe062eso15307645e9.3
-        for <linux-cifs@vger.kernel.org>; Mon, 31 Aug 2026 05:51:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bynar.io; s=google; t=1788180675; x=1788785475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=5A26gOuAVOyjv1TvWMYcqopm/IcXjJSkKIFefy8rQWY=;
-        b=ncTawx13/dDkgf/CUItoXetCbuNzsZLgQ6QEoQEQqVkugqaz9ZIDut1O+t1Zsnt3Zp
-         LybQMbgR4HFKG3mXdOjOEET7OR9hdrnUK9Nk3tsAxfgUuRHuoPmo+mgCC/VYYAiTVeyf
-         DNNwGm9AAwRubePJQxHd6wN1cfATQBxhUL7fXTi28BGsaAXZkqC/EIjernZZeodJRiMs
-         5EiLHVYTT2h4HVt93Gcy6pXaLrwgikQewM9dL/INOj6NfeXiK81SwS72E9oKo15d9gdY
-         LyHRNPlF+eLqgztP1iBWavHJyJLWJfCwILfW/plQRk7d8NlzN86L2hj4pLn2Va+Keb7f
-         F/Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788180675; x=1788785475;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=5A26gOuAVOyjv1TvWMYcqopm/IcXjJSkKIFefy8rQWY=;
-        b=rwOeRUIoV99AdD617FdaawhkmWcbuL5HYZCDE8QbOtcWJnqqCYP2KxekReJ0mNNxQR
-         Ma76sRt6IZBxldU+8r3LHvuONHUSLnpX5uJWggX80LrJqc4MabOm0r2wRniwIsNPiQum
-         CypMVXxYs/iJp1GSmuOSocFSzo395zryXTEPaIL13rE6GKNE7REVdgIAlKB61Z+IRYx2
-         12RxYC4BXShyAIxE33ZWbcA0Bq5rRZMZUbpRL1GnxIzRERCY50RKK77hxojrO1rIv+ea
-         BnXT0iz6gRHvk/4JY5mXdq4yBTYn/5ifJebRHC83NU7BEcL1mx7on7dyOthgnXffN8KU
-         4BGw==
-X-Forwarded-Encrypted: i=1; AHgh+Rokr3LMWklbu2ilDdH5T2r2W5EF5QWn8lye0EnC5awneHucpySnHN+pJDydT+2/gYSDEM4w4fsTRlw5@vger.kernel.org
-X-Gm-Message-State: AFuF++l+hfCjD9k4xxpVKSwtLJpQ6Htxwp9sVpRvdHifAAmwO0a+9wRj
-	J6FeTHz7BdgT/mirL3Kdxdvu3+8YjP6EGv5Sz/LS4i+VKUqDIQ/q8B7KhooofbDj5fEu
-X-Gm-Gg: AR+sD10dxAEfmyyh7pFGUldBXAv4fYzoVIdEBQCOU6pGYtXW870QMaOHl1/oBJ08UEm
-	2UpzOUwqbZGXsEhwt9BH1XQJxBQFCGrmE0GUQ0kBPzR4f5BTLGrzi6/825WnWwPedrf8pI/16dy
-	JI9zn9piRfkMdvJRfVeUd3KjlCgwLWg1jE7U23kNEDTToYpLNya9OWq+4v2CcxtvaFN8p+6muX/
-	3z4LelfLOzGKGnOfoM+0bmxq58cupHls8kjyT8fQeGkqkXaN3x060YTQtREbY6RFllgoYgE/Mvv
-	v7CW//ki2dOptvfjzzeLNbrnUr5Q8IHCEIsfrUO6nuFfBIDkSfVq7FMIfPBeqTp4/XGa06eTw+Y
-	aXmyAnTvK98xjmEY1Lw4oiGzi1h5suKqSCijEg4lw+CPDMeIdPQ65vs2nPNnILQForXEHW1GaSZ
-	71xQMoWdgN3a1eUFZ4JyyxB+FH3G2fTmJ5rd6UEt+aLc+jx7szS0AGrkphrefizJX9
-X-Received: by 2002:a05:600c:8b86:b0:493:f5bf:4dc6 with SMTP id 5b1f17b1804b1-49b91c2777emr454968265e9.7.1788180674354;
-        Mon, 31 Aug 2026 05:51:14 -0700 (PDT)
-Received: from localhost.localdomain ([151.18.18.196])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-48432022ab8sm15739457f8f.28.2026.08.31.05.51.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Aug 2026 05:51:13 -0700 (PDT)
-From: Diego Oliva <diego@bynar.io>
-To: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N3YuJI6g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C1691F00ADB;
+	Mon, 31 Aug 2026 13:33:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788183199;
+	bh=+hHAJNcn3CcPnANLQp8lYUzqx56Dix9TWBfCNMpVvZs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=N3YuJI6gzAxZS7MlX1u2Ub9k2siCgNePHSe9A0XqdxHbHpifnkBbU0WGWQnzxqcwd
+	 ld+BnebW2LtZKBkI/s950L3PA29/j69VK0Th7LOOgQe1F168shH0OmjV6NsjtkHA7j
+	 qHUL0h13tdgN972lIAVmUMl3CURHzDmZEEUpSDAa2K0HVLeclCX1LeKk2mLEAkfI59
+	 BoM8uWLBmzUNvlLW3ba4nNywJIJVU9brZfUCmjm8LrCNme8azwUTTt3YdoVcdNW9WO
+	 gDOwGAUSP1DLuqPKzyJ95AHKhrbukSgiiCuvrTkHmfV5TZG+MoF88FOOnpPU09oBKZ
+	 SORxnFPNtPDgA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Charles Vosburgh <trilobyte777@gmail.com>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>,
+	smfrench@gmail.com,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] smb: client: reject out-of-bounds DataOffset in CIFSSMBRead()
-Date: Mon, 31 Aug 2026 13:50:45 +0100
-Message-Id: <20260831125045.479576-1-diego@bynar.io>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260828150203.1419003-1-diego@bynar.io>
-References: <20260828150203.1419003-1-diego@bynar.io>
+Subject: [PATCH AUTOSEL 6.18-6.6] ksmbd: preserve VFS inherited POSIX ACL mask
+Date: Mon, 31 Aug 2026 09:20:31 -0400
+Message-ID: <20260831133314.4125787-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
+References: <20260831133314.4125787-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18.48
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The SMB1 synchronous read helper CIFSSMBRead() validates the server's
-DataLength against CIFSMaxBufSize and the caller's count, but never
-validates DataOffset. The copy source is formed as
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-	&pSMBr->hdr.Protocol + le16_to_cpu(pSMBr->DataOffset)
+[ Upstream commit e148e567a9252643baa125cb65d7ae9c2c6cf68a ]
 
-and memcpy()'d for DataLength bytes with no check that the
-[DataOffset, DataOffset + DataLength) range lies within the response
-actually received from the server.
+The VFS initializes a child's POSIX ACL from the parent's default ACL and
+the requested creation mode. Do not mutate the parent ACL or overwrite the
+child's VFS-computed access and default ACLs afterwards.
 
-A malicious or compromised SMB1 server can return a short response
-carrying an in-range DataLength and a large DataOffset, driving the
-source pointer past the end of the response buffer. The memcpy() then
-copies adjacent kernel heap into the caller's read buffer (information
-disclosure), or reads unmapped memory and oopses (denial of service).
-SMB1 is not negotiated by default; reaching this code requires an
-explicit vers=1.0 mount.
+This preserves restrictive ACL_MASK entries and prevents SMB object creation
+from widening effective permissions.
 
-Both DataOffset and the received response length recorded in
-rsp_iov.iov_len are relative to the start of the SMB header, so reject
-the response unless DataOffset + DataLength fits within that length,
-using overflow-safe arithmetic, before forming the source pointer.
-
-While here, make data_length unsigned. It holds a length derived from
-an unsigned on-the-wire field and is only ever compared against
-unsigned quantities. This is not required by the validation added
-above, but it matches what the variable represents.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Assisted-by: Bynario AI
-Signed-off-by: Diego Oliva <diego@bynar.io>
+Reported-by: Charles Vosburgh <trilobyte777@gmail.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-v2:
- - make data_length unsigned, as suggested by Namjae Jeon
- - rebased on current upstream
- - v1: https://lore.kernel.org/linux-cifs/20260828150203.1419003-1-diego@bynar.io/
 
-Note for backporting: this uses the smb_EIO2() tracepoint helper added
-in v6.19 with f80ac7eda1cf5. For older kernels, the call can be
-replaced with a simple return of -EIO.
+LLM Generated explanations, may be completely bogus:
 
- fs/smb/client/cifssmb.c | 13 ++++++++++---
- fs/smb/client/trace.h   |  1 +
- 2 files changed, 11 insertions(+), 3 deletions(-)
+## Phase 1: Commit Message Forensics
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index f5aad5f61dce..b89d49395362 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1720,7 +1720,8 @@ CIFSSMBRead(const unsigned int xid, struct cifs_io_parms *io_parms,
- 	if (rc) {
- 		cifs_dbg(VFS, "Send error in read = %d\n", rc);
- 	} else {
--		int data_length = le16_to_cpu(pSMBr->DataLengthHigh);
-+		unsigned int data_length = le16_to_cpu(pSMBr->DataLengthHigh);
-+		__u16 data_offset = le16_to_cpu(pSMBr->DataOffset);
- 		data_length = data_length << 16;
- 		data_length += le16_to_cpu(pSMBr->DataLength);
- 		*nbytes = data_length;
-@@ -1733,9 +1734,15 @@ CIFSSMBRead(const unsigned int xid, struct cifs_io_parms *io_parms,
- 			rc = smb_EIO2(smb_eio_trace_read_overlarge,
- 				      data_length, count);
- 			*nbytes = 0;
-+		} else if ((size_t)data_offset + data_length > rsp_iov.iov_len) {
-+			/* check that the data lies within the received response */
-+			cifs_dbg(FYI, "bad data offset %u length %d for read response of %zu\n",
-+				 data_offset, data_length, rsp_iov.iov_len);
-+			rc = smb_EIO2(smb_eio_trace_read_bad_offset,
-+				      data_offset, data_length);
-+			*nbytes = 0;
- 		} else {
--			pReadData = (char *) (&pSMBr->hdr.Protocol) +
--					le16_to_cpu(pSMBr->DataOffset);
-+			pReadData = (char *) (&pSMBr->hdr.Protocol) + data_offset;
- /*			if (rc = copy_to_user(buf, pReadData, data_length)) {
- 				cifs_dbg(VFS, "Faulting on read rc = %d\n",rc);
- 				rc = -EFAULT;
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index 12241abb8e2e..982b6ba1e429 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -79,6 +79,7 @@
- 	EM(smb_eio_trace_qreparse_setup_count,		"qreparse_setup_count") \
- 	EM(smb_eio_trace_qreparse_sizes_wrong,		"qreparse_sizes_wrong") \
- 	EM(smb_eio_trace_qsym_bcc_too_small,		"qsym_bcc_too_small") \
-+	EM(smb_eio_trace_read_bad_offset,               "read_bad_offset") \
- 	EM(smb_eio_trace_read_mid_state_unknown,	"read_mid_state_unknown") \
- 	EM(smb_eio_trace_read_overlarge,		"read_overlarge") \
- 	EM(smb_eio_trace_read_rsp_malformed,		"read_rsp_malformed") \
+### Step 1.1: Subject line
+**Record:** `[ksmbd] [preserve] [Do not mutate parent ACL or overwrite
+VFS-computed child POSIX ACLs on SMB create]`
 
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+### Step 1.2: Tags
+**Record:**
+- **Reported-by:** Charles Vosburgh `<trilobyte777@gmail.com>` — real
+  user report
+- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>` — author
+- **Signed-off-by:** Steve French `<stfrench@microsoft.com>` — ksmbd
+  maintainer
+- No Fixes:, Cc: stable, Link:, Tested-by, Reviewed-by, or Acked-by tags
+- Notable: maintainer sign-off; user report; no syzbot
+
+### Step 1.3: Body analysis
+**Record:**
+- **Bug:** After VFS creates a child inode, ksmbd re-applies the
+  parent's default ACL to the child and forces `ACL_MASK` to `0x07`
+  (full rwx), overwriting VFS-computed access/default ACLs.
+- **Symptom:** SMB-created files/directories get wider effective
+  permissions than intended; restrictive `ACL_MASK` entries are lost.
+- **Root cause:** Redundant post-create ACL handling that mutates the
+  parent ACL and overwrites correct VFS inheritance.
+- **Version info:** None in the message.
+
+### Step 1.4: Hidden bug fix?
+**Record:** Yes. Although the subject says "preserve" rather than "fix",
+this is a real permissions/security bug: ACL mask widening on SMB object
+creation.
+
+---
+
+## Phase 2: Diff Analysis
+
+### Step 2.1: Inventory
+**Record:**
+- **Files:** `fs/smb/server/vfs.c` only
+- **Scope:** ~25 lines removed, 1 added (net -24 lines)
+- **Function modified:** `ksmbd_vfs_inherit_posix_acl()`
+- **Classification:** Single-file, surgical fix
+
+### Step 2.2: Code flow change
+**Record:**
+- **Hunk 1 (function body):** Before: fetch parent default ACL → mutate
+  `ACL_MASK` to `0x07` → `set_posix_acl()` on child access ACL → for
+  directories, also set default ACL → return `rc`. After: fetch parent
+  default ACL → release → return `0`. VFS-computed ACLs from
+  `vfs_create()`/`vfs_mkdir()` are left intact.
+- **Path affected:** Post-create ACL setup in SMB2 open/create (`created
+  == true`).
+
+### Step 2.3: Bug mechanism
+**Record:**
+- **Category:** Logic/correctness + security (permission widening)
+- **Mechanism:**
+  1. Filesystem `->create`/`->mkdir` (e.g. ext4 via `ext4_init_acl()` →
+     `posix_acl_create()`) already applies parent's default ACL with
+     correct `ACL_MASK` masking per creation mode.
+  2. `ksmbd_vfs_inherit_posix_acl()` then overwrote those ACLs.
+  3. `pace->e_perm = 0x07` forced mask to rwx, removing restrictive
+     masks.
+  4. `get_inode_acl()` can return a cached/shared ACL object; in-place
+     mutation may also corrupt the parent's cached default ACL.
+
+### Step 2.4: Fix quality
+**Record:** Obviously correct — trusts standard VFS ACL inheritance.
+Minimal change. Preserves the parent-has-no-default-ACL check
+(`-ENOENT`) used by caller fallback logic. Low regression risk; only
+affects ksmbd create path when `CONFIG_FS_POSIX_ACL` is enabled.
+
+---
+
+## Phase 3: Git History Investigation
+
+### Step 3.1: Blame
+**Record:** In this tree (`6.18.44`), buggy lines in
+`ksmbd_vfs_inherit_posix_acl()` blame to `5d324e5159d9e` (merge where
+`vfs.c` entered this checkout's history). Mainline history shows the
+`pace->e_perm = 0x07` pattern present since at least `25933573ef48`
+(2023-05-30); function dates to ksmbd POSIX ACL work (~2021,
+`67d1c432994c`).
+
+### Step 3.2: Fixes: tag
+**Record:** N/A — no Fixes: tag.
+
+### Step 3.3: Related file history
+**Record:** Recent `vfs.c` changes in this tree are unrelated (path
+resolution, credentials). No duplicate fix found. Standalone commit
+(mainline `e148e567a925`).
+
+### Step 3.4: Author context
+**Record:** Namjae Jeon is ksmbd maintainer. Steve French (co-
+maintainer) signed off. Recent ksmbd stable-worthy fixes in this tree
+include UAF, ACL validation, credential handling.
+
+### Step 3.5: Dependencies
+**Record:** No prerequisites. Self-contained. Function and caller exist
+in this tree.
+
+---
+
+## Phase 4: Mailing List and External Research
+
+### Step 4.1: Original discussion
+**Record:** `b4 dig -c e148e567a925` matched patch-id to `https://lore.k
+ernel.org/all/CAKYAXd-
+4MuqT49GwTO2meR0Lt338vTygzTrQ%2B6xBNpVW7kE0Xg@mail.gmail.com/` but could
+not fetch thread content (lore fetch failure). Mainline commit dated
+2026-07-17, merged via `8e371eff3f72` (v7.2-rc4 smb3-server-fixes).
+
+### Step 4.2: Reviewers
+**Record:** `b4 dig -w` failed (same fetch issue). Steve French
+maintainer sign-off verified via GitHub API.
+
+### Step 4.3: Bug report
+**Record:** Reported-by Charles Vosburgh — user-reported ACL permission
+widening on SMB create. No public bugzilla/syzbot link.
+
+### Step 4.4: Related patches
+**Record:** No multi-patch series. Standalone fix.
+
+### Step 4.5: Stable list
+**Record:** Could not search stable@ list (lore inaccessible). No
+evidence of prior stable rejection.
+
+---
+
+## Phase 5: Code Semantic Analysis
+
+### Step 5.1: Key functions
+**Record:** `ksmbd_vfs_inherit_posix_acl()` (modified); callers:
+`smb2_open()` path in `smb2pdu.c`.
+
+### Step 5.2: Callers
+**Record:** Single caller at `smb2pdu.c:3376`, inside `if (created)`
+after `smb2_creat()` → `ksmbd_vfs_create()`/`ksmbd_vfs_mkdir()` →
+`vfs_create()`/`vfs_mkdir()`. Userspace-reachable via SMB2 CREATE.
+
+### Step 5.3: Callees
+**Record:** Before fix: `get_inode_acl()`, `set_posix_acl()`,
+`posix_acl_release()`. After fix: `get_inode_acl()`,
+`posix_acl_release()`.
+
+### Step 5.4: Reachability
+**Record:** SMB client CREATE on a share backed by a POSIX-ACL
+filesystem (ext4, xfs, etc.) with parent default ACL containing
+`ACL_MASK`. Unprivileged network user can trigger.
+
+### Step 5.5: Similar patterns
+**Record:** `ksmbd_vfs_set_init_posix_acl()` also sets
+`acl_state.mask.allow = 0x07`, but only as fallback when inheritance
+fails and SD buffer setup fails — separate intentional path. No other
+`pace->e_perm = 0x07` in ksmbd.
+
+---
+
+## Phase 6: Cross-Reference Against Local Tree
+
+### Step 6.1: Buggy code present?
+**Record:** **Yes.** Local tree is **6.18.44** (`git describe`:
+`v6.18.44-2-g1b9e1abadee04`). Buggy code at
+`fs/smb/server/vfs.c:1967-2004` with `pace->e_perm = 0x07` and post-
+create `set_posix_acl()` calls. Fix not yet applied.
+
+### Step 6.2: Backport complications
+**Record:** `patch -p1 --dry-run` of the mainline diff applies cleanly
+to this tree (line offset differs from mainline but hunks match). Minor
+offset only — no logic conflicts.
+
+### Step 6.3: Related fixes already present?
+**Record:** No. Grep found no "preserve VFS inherited POSIX ACL" commit
+in this tree.
+
+---
+
+## Phase 7: Subsystem Context
+
+### Step 7.1: Subsystem criticality
+**Record:** `fs/smb/server` (ksmbd) — **IMPORTANT**. Network file
+server; ACL bugs affect multi-user share security.
+
+### Step 7.2: Activity
+**Record:** Actively maintained in 6.18.y (recent ksmbd commits in this
+tree).
+
+---
+
+## Phase 8: Impact and Risk Assessment
+
+### Step 8.1: Who is affected
+**Record:** ksmbd users (`CONFIG_SMB_SERVER`) exporting POSIX-ACL-
+enabled filesystems with default ACLs using `ACL_MASK`. Not universal,
+but real production deployments.
+
+### Step 8.2: Trigger conditions
+**Record:** SMB2 create of file/directory under parent with default
+POSIX ACL containing `ACL_MASK`. Common on managed shares. Remote SMB
+clients can trigger.
+
+### Step 8.3: Failure mode severity
+**Record:** Permission widening / ACL bypass — **HIGH** security impact
+(unauthorized access via elevated effective permissions). Possible
+parent ACL cache corruption from in-place mutation of cached ACL. Not a
+crash, but serious correctness/security issue.
+
+### Step 8.4: Risk-benefit
+**Record:**
+- **Benefit:** HIGH — restores intended ACL semantics, closes
+  permission-widening hole
+- **Risk:** LOW — 24-line deletion, defers to proven VFS path
+- **Ratio:** Strongly favors backport
+
+---
+
+## Phase 9: Final Synthesis
+
+### Step 9.1: Evidence summary
+
+**FOR backport:**
+- Real user-reported ACL security bug
+- Permission widening on SMB create (restrictive `ACL_MASK` ignored)
+- VFS already handles ACL inheritance correctly (`posix_acl_create()` /
+  `ext4_init_acl()`)
+- Small, surgical, maintainer-reviewed fix
+- Bug present in this 6.18.44 tree
+- Patch applies cleanly
+- Long-standing bug (since ~2021)
+
+**AGAINST backport:**
+- Only affects ksmbd + POSIX ACL configurations (not all kernel users)
+- No syzbot/CVE yet (severity still clear from code analysis)
+
+**Unresolved:**
+- Full lore review thread unavailable (fetch failed)
+- No explicit stable@ nomination found
+
+### Step 9.2: Stable rules checklist
+1. Obviously correct and tested? **PASS** — logic is clear; maintainer
+   sign-off; user tested/report
+2. Fixes real bug affecting users? **PASS** — user report + verified
+   code path
+3. Important issue? **PASS** — ACL permission widening (security)
+4. Small and contained? **PASS** — one function, ~24 lines removed
+5. No new features/APIs? **PASS** — removes incorrect behavior
+6. Can apply to local tree? **PASS** — dry-run apply succeeds
+
+### Step 9.3: Exception categories
+**Record:** None (not device ID, quirk, DT, build, or docs). Standard
+security/correctness bug fix.
+
+### Step 9.4: Decision rationale
+For **this 6.18.44 tree**, the buggy code is present and reachable. The
+fix stops ksmbd from overwriting VFS-correct ACLs and forcing `ACL_MASK`
+to full rwx. That is a clear, important security/correctness fix with
+minimal risk. It meets all stable kernel criteria.
+
+---
+
+## Verification
+
+- **[Phase 1]** `git describe HEAD` → v6.18.44; parsed commit message
+  tags
+- **[Phase 2]** Read `fs/smb/server/vfs.c:1967-2004` — confirmed buggy
+  code matches diff "before" state
+- **[Phase 2]** Read `fs/posix_acl.c:459-511` —
+  `posix_acl_create_masq()` correctly handles `ACL_MASK`
+- **[Phase 2]** Read `fs/ext4/acl.c:278-303` — `ext4_init_acl()` calls
+  `posix_acl_create()` during inode creation
+- **[Phase 3]** `git blame -L 1967,2005 fs/smb/server/vfs.c` — buggy
+  code present
+- **[Phase 3]** GitHub API: mainline fix `e148e567a925` (2026-07-17);
+  bug present in `25933573ef48` (2023-05-30)
+- **[Phase 3]** `git log --oneline -30 -- fs/smb/server/vfs.c` — no
+  duplicate fix
+- **[Phase 4]** `b4 dig -c e148e567a925` — matched lore URL; thread
+  fetch failed
+- **[Phase 4]** GitHub API — commit message and maintainer sign-off
+  confirmed
+- **[Phase 5]** `grep ksmbd_vfs_inherit_posix_acl` — single caller at
+  `smb2pdu.c:3376`
+- **[Phase 5]** Read `smb2pdu.c:2609-2644, 3268-3393` — create → inherit
+  ACL call chain verified
+- **[Phase 5]** Read `posix_acl.c:189-193` — `get_inode_acl()` returns
+  potentially cached/shared ACL
+- **[Phase 6]** `make kernelversion` → 6.18.44; buggy code confirmed
+  present; fix absent
+- **[Phase 6]** `patch -p1 --dry-run` of mainline diff → applies cleanly
+- **[Phase 6]** `diff` local vs mainline pre-fix function → identical
+- **[Phase 8]** Assessed severity as ACL permission widening — HIGH
+  security impact
+
+**YES**The background `git log --all` search was stopped — as expected,
+it’s too slow on this repo. History was covered instead with targeted
+`git log` (no `--all`) and the GitHub API.
+
+**Verdict for this tree (6.18.44): YES**
+
+`ksmbd_vfs_inherit_posix_acl()` in `fs/smb/server/vfs.c` overwrites VFS-
+correct child ACLs and forces `ACL_MASK` to `0x07`, widening effective
+permissions on SMB creates when the parent has a restrictive default
+ACL. The fix is small, applies cleanly here, and restores correct POSIX
+ACL inheritance.
+
+ fs/smb/server/vfs.c | 26 +-------------------------
+ 1 file changed, 1 insertion(+), 25 deletions(-)
+
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 6680638bb85b5..f129386a56c8f 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1974,10 +1974,6 @@ int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
+ 				const struct path *path, struct inode *parent_inode)
+ {
+ 	struct posix_acl *acls;
+-	struct posix_acl_entry *pace;
+-	struct dentry *dentry = path->dentry;
+-	struct inode *inode = d_inode(dentry);
+-	int rc, i;
+ 
+ 	if (!IS_ENABLED(CONFIG_FS_POSIX_ACL))
+ 		return -EOPNOTSUPP;
+@@ -1985,27 +1981,7 @@ int ksmbd_vfs_inherit_posix_acl(struct mnt_idmap *idmap,
+ 	acls = get_inode_acl(parent_inode, ACL_TYPE_DEFAULT);
+ 	if (IS_ERR_OR_NULL(acls))
+ 		return -ENOENT;
+-	pace = acls->a_entries;
+-
+-	for (i = 0; i < acls->a_count; i++, pace++) {
+-		if (pace->e_tag == ACL_MASK) {
+-			pace->e_perm = 0x07;
+-			break;
+-		}
+-	}
+-
+-	rc = set_posix_acl(idmap, dentry, ACL_TYPE_ACCESS, acls);
+-	if (rc < 0)
+-		ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
+-			    rc);
+-	if (S_ISDIR(inode->i_mode)) {
+-		rc = set_posix_acl(idmap, dentry, ACL_TYPE_DEFAULT,
+-				   acls);
+-		if (rc < 0)
+-			ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
+-				    rc);
+-	}
+ 
+ 	posix_acl_release(acls);
+-	return rc;
++	return 0;
+ }
 -- 
-2.39.5
+2.53.0
 
