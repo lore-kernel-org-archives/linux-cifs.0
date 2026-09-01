@@ -1,62 +1,38 @@
-Received: from sonic307-15.consmr.mail.ne1.yahoo.com (sonic307-15.consmr.mail.ne1.yahoo.com [66.163.190.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C4D43B4BD
-	for <linux-cifs@vger.kernel.org>; Tue,  1 Sep 2026 16:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.190.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD96399D00;
+	Tue,  1 Sep 2026 16:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788278643; cv=none; b=cNSTlquS7rH9WSBb/0Qc2cbeU1Jtnu2NXeyC9v16XiWIW++jI074xJgBbhoDqfvBPrOJ3AIjOPl2p2uaZNaNBaI/JQPh1GAIQWDVUMLyWxV5H4OwDlh3SQt4ryM5vqCcBrWpam3d3+4xgjd3oTiUK39ZDIuPSAU5FVVPlGbp7yQ=
+	t=1788281431; cv=none; b=t3x1MERKW3y7kZo+nW5osx+ythqvV1cdUo4gsZJXbaRLzU4o8Pf4Lg8RGsH5PMPGJw9gFy3+oRDK+tQiqJ9KFVmIzJenPo2vBb+e7o9xRVvoezwA2DrFPyRldd7fGshM0hLubpzaktBgZE3fRdZpM5nL9pPnWP8op1MFZZdlS6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788278643; c=relaxed/simple;
-	bh=EIjyPnqw8QTTn+ydcMEjt0qRWEFtEg0Ql8NGv6CxEVA=;
+	s=arc-20240116; t=1788281431; c=relaxed/simple;
+	bh=SDOwRP58mmnKlrUHlccngVQYFwJN3D63qUx2AYvxIKE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YK+YEevX38KCXtjb6UVsINp0mdv+pHXY7D+lfMEyc/sTyeTOUHjMKJScFpPS6by6inBtr7qv9lcxzJVV9hOfuZX+HXB0K7/UcIiP+FJ8eFVl2htA6iaW9sPpvzBwKhp5OGOcoHknTDRorGH8IuLyZgu87ajjkE4GSgU+EJg3iBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=HAv4y6Nr; arc=none smtp.client-ip=66.163.190.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+	 In-Reply-To:Content-Type; b=gQ/UcgC7BvCxI+dpKwrz+ezqo98DTRU3/3F+MP4dgg6eKBEUjGWwXq2hfBQeCJ4Fd3yn29zBE7V/Foyhv//f5eHipF3MzVf9tTnYCemKSs1f2bZ7aYTcZWZqRXw/8VxzbWnzzF7WRvgLtkhVZQPiDrM5afkvmnTErEpvbQkgrXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=VPmxNb81; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="HAv4y6Nr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1788278641; bh=gPh+X/iBiqRKhw1S4WGz1YTRGse+nCFpHEMx4R0LHRw=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=HAv4y6NrO49IyeCK8ZkLhfUqS3eLzWFDijFgd78h34+VEQMBxbHOTw4wYbM+n2iXkcnGmHTqypE3Z3w6bH4BXn10NPTA/NNlTmlMMZ+UxOi3yruY/DPYAIQyLGC/uXhydAK/tjmiqQm0PZWpo1XZxmVyHatm1r7KOqXXuwU+s4DhwOUwX5MN2KQIHqMVGU5l40dILhB5rJUpuDq8gLGgugv8kqF1Pm/MPD0NgdHhFdoJBYS6MPRV2R5NGqN4rSQoJSa2a7QCVXKSfV/urjknglW+Ox3GYIus0zUQA4j+L5GhRkDs147mshDbl4j8ZHvmavNdlXTshjQd+Oeg+9ty/w==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1788278641; bh=wn2ZX/Tgdre6shUVrYyavZOD5z9C5EcpSrBlEU3erfj=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Nm75f/6wjCVKuklhqsceLKFmMnnOhF6JAejKfl4ZGcy3EJJXF6O07xzRLbAoKYPmP4wuyHjB4AQ7PMazZke85ku8VGRzbtmVWjbFuZRZm/UQXEQBrZx5Pf6D/gbT48o0d1eX3mU7W7AZOj3xEm++v/8up2efjtcjSQEYajvGlbi46v3wCpqtvsFl80ZyuXaMa5HsP7l+BNktfFPGeRXGoA5o9d9XLCfGMR3YPM7VMNii+hWp83ggacOXXXoHy1ekYqLz7IfUseLA4P55Nv9ikeHXx+5LR/QcosPwCFuklYoaJTWwYueCmgi2/1A/zsWdBNeyi52PmB2Sj3miAGJ3ww==
-X-YMail-OSG: BnRSzUsVM1l6DMJ0RcDbVkj8OA4EnfP5.zaF5Sy_6KG2J6a5XNB2nRUsOjT3ART
- x5kLRUjxN7qI.IXN_GOJxUAxbDm4WQ1qWxDFpikbntvRnmDeeModNmJvEuDFj70nMxMVDCfR7i08
- TLoHA1R6hIZ1LhwgEBJz6BXTQpcu137HEdLRqbU3iAMWdmdCgHN.jybBtQrF.C89oj3iXdcwq83U
- kyDrUGwY2QAD56uB_yS9.v1b6lpsfgvy_wVq5Xl.XMcya.NblpqHct.74b_WgBLRj.n2g260Ze_5
- MC6oHD9kLsWBzV7oNxexUIrvLvA2NSEWiiQVAEF5Dyw0J_p2gi34blnPWV1ffY2fr2.2ndZK5mCw
- q8JZUkPybYawiAqbZMETn62xgxSJxqPLZriKVsh.Yur2GcbnN9rZY_BrvztvDaILL1w.poZ6QlwF
- HHWdMVYN65I.NYExwdSzLBLVE_XCTXiFgVwWkHjUWiRUX1WAttlhY7x7O4pRzoFf7rDr5KUvjq5T
- QFYbawEwONrjsddJQcutigmcwqUqQcYbsFsMPcGrG7uqKjThJvkpiyR9ZVvBcSQW7i.VmngJ09L3
- zNPMqOW23l3jYUmLNJA9tdLGcCRY8qixdtT_dA_LF6khvJdag3IzZ0iJXOPiBVwoPqOpVzmSDK0K
- rYXwTp56ucWKOEXaUx9qB5fKNpyhTVno69lmXRn586srKGKH9bcyQNuag15gmd4cQ_bwLRJpsebv
- hrH9oshCVWTElz0zb3kh5ZTnkTH3F540Joo96iqkl4GF1jBVeoHTGqM93jXemH20j.XQzu7F1kjv
- silAPMLu3nlfcOUZEuG6P6yeunGiFF8wT88ZXiNAvrO_eCWdV.BKTTl_GDY8Ki1_nhXYmMPNWTWL
- L4WVgb9bg2GzAGgwe7O_YWw1lUPljGE_7kizgV86h5n6.AeO1GAta2FijW7JtM4CIp94IlvVt3_X
- n2JoT.pEZXBK5T0805WWPzRfy0KT0RDYN2uYFdzPP3vo1mIWkiWPjfBSfdpa0P6T2p84k6QfmCkz
- HPyi8EzuxmPrb0oXLYeiYnj9Wv99M29bnqSOdD_91vneq9YVbWF7Q6Ob8VIQf6f_em9BBLlclDi4
- EXEc8pebwZ6v3bSF9hJIvWVd_1nwlDXudPKpTYbDy01lfwwMPxHqX4U7yo7jMXECMbWjiPC_EIei
- 1rwJ6gZqwT_kXId0dQZTUuj7.NHXwISkRI5c77y.JwwNOrTopnjvAO50EPbmSmBYZ.Wm9.zbd7zz
- 8mffN78xMRX437TWJmZsia5XHlwnD__SwtGTCFgLLDLqG0waLpdI5Gnjsk7PEsRhAB7b3weR_G4t
- mFhIaY7iOjLIM44a1g_LCMSSyJWLGhnL1u9Qf2jhZLL5gJ_6IYVXHVRVfV9ziNetQXEm_8WaIrTT
- tlixevJkEx6Dz..j6uh5NXC35zBpJbSM7StGjzdCZ6VVY86xr1QYX9Xm8BJhSQ7pkqx89uwC3CP0
- .p1kR0Plgh_Gdiw1C.9uSEEfWllyoBISuzXgpocW6t8tN5S53NAmNWF18cQm.SZHhO3Ncak.CkAx
- lo6eXKa52FjEofHF7ZRseScCLRHlnMH854MvxW05_v4OQqzn_dKcr.1mdNt1FlZvmNwoNCvKEhTr
- GBc11oR5WIkXvaO1zclx6FmXGgDjPc.Ie266nDgGo_72clnHYHYUKf875KOPIW1AzvxAW7oCLKHe
- 2ahfFP1DPqv5akZ1S14Gks6tf1x27QnHtgR7mdotq8XOFuwAZe7DpFOphuTtnOuu3rwpY5WAFfoO
- 8trFKjtEC7u.3PTb_9.FyXwuzAcJdZp6xU1DxO1LCDc9QG1ccOvBHiFjpwSgUkohS1J3Mu_vnr1p
- d5Wxy21YJJhYtS21aiCcV50vmBxj0jgvFg59llCpT3vN1pMaxf14PawfRh5PKiqRWhpad2vNXT4f
- FKtJWRdyhVAaFVTSBsbPot7S9XzzRgEInkTcl.vBKUhn9jtA8ADT7YWT9zvV1foYbKik0_X_dnYJ
- 7ckBVPo6fIx2.7eqgJZ8JOsUBOfYNp5C6Cd2io8btrpEiGP8XXEIXv8lNiMIuiZrcm841JUkmksG
- DyK0xgr3MeyHSybaP_Fys7Nltg.EIr4Q0v4309l60Yib91EEQ7awW7xjVpdcnBZw1bekGO9PBACm
- HJtn0fGSUS3U9JB.nlXkq9a.8PxosWl9UkcaGzsm98E_rYsjhEt3dLJIH0eSlHBj8M9ednNL0JvJ
- WkoKD3FJpOYf25tly81HBtlpU0e0sVW1fbNJ3xF70RJgzlCrypYY0bHfiaif786dAoWYR1oDy_Pd
- SPBHQbxcB6yTNOQ--
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: ae5512ae-c89c-4588-a92d-d5c736d4192f
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.ne1.yahoo.com with HTTP; Tue, 1 Sep 2026 16:04:01 +0000
-Received: by hermes--production-gq1-678d9dd684-mxdfs (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 7bb86a24437c43194baefa3abed212e3;
-          Tue, 01 Sep 2026 15:53:44 +0000 (UTC)
-Message-ID: <d3656927-c39d-421f-8baa-f04c8d4eeff3@schaufler-ca.com>
-Date: Tue, 1 Sep 2026 08:53:42 -0700
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="VPmxNb81"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=C30V8qWM8Ula8+RBcfws0g6Mkjg3NA2ZsU4qGPGdJpk=; b=VPmxNb81eFyfOgf41a72wjEHKf
+	VWtl5rilUbWLhd3Ag+s8wGuWXK/MHFl/l3jpHoinBn0VaJQTC4a3ZBMlgiuxXtPzLfpRLFnTo0gMt
+	yr0mpLzhEcvf96lznYG5lDpBJTELFMuhSnZ1x6kGpWvrQPBfa6Rb7Dqugb/gODCE+9122JQ8WkxNx
+	hKRCQuRkd2ZH25o2eDWAT30xsruNPeacFiovgHMeN4NuVbRoOKImWgs9EM505OLHnfKl7ZJzenir3
+	HLljfqgOmt1LwqNK9enMIGeI5bAhInphbI5ncZcbMzodhHW2hhOBWQKs6z6S1fQ88OKNLw6E+U6N5
+	aT2h94xtYjeyeaEjvYYkg5Ow/wqDrYSxftOgiT8Rg1w1pcWDOHUntfOLMg7KJIF0OryuyxBT4733M
+	S26EBYmF76txlsiPae8TZgp1aZCTS9kN6pks2W1HG36GIWBNQGdCr2sXQexxsh0Y8fU8pSKC5HeKZ
+	TI4KU7YJBztMejqMf4DxnNJv;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1x1Rgg-00000002P6e-0jyo;
+	Tue, 01 Sep 2026 16:50:18 +0000
+Message-ID: <47142579-3af7-453b-875c-ff6d610f26a7@samba.org>
+Date: Tue, 1 Sep 2026 18:50:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -64,170 +40,114 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 24/27] fs: port ->setattr() to pass const mnt_idmap
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
- Christoph Hellwig <hch@lst.de>, Seth Forshee <sforshee@kernel.org>,
- Paul Moore <paul@paul-moore.com>, linux-security-module@vger.kernel.org,
- Mimi Zohar <zohar@linux.ibm.com>, linux-integrity@vger.kernel.org,
- Ilya Dryomov <idryomov@gmail.com>, ceph-devel@vger.kernel.org,
- Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org,
- Miklos Szeredi <miklos@szeredi.hu>, Amir Goldstein <amir73il@gmail.com>,
- linux-unionfs@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
- Casey Schaufler <casey@schaufler-ca.com>
-References: <20260901-work-idmap-const-v1-0-54ccd48e100b@kernel.org>
- <20260901-work-idmap-const-v1-24-54ccd48e100b@kernel.org>
+Subject: Re: [RFC PATCH] RDMA/iwcm: allow aborting an active connect awaiting
+ CONNECT_REPLY
+To: Leon Romanovsky <leon@kernel.org>, Yunseong Kim <yunseong.kim@est.tech>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Jacob Moroni <jmoroni@google.com>,
+ Bart Van Assche <bvanassche@acm.org>, Namjae Jeon <linkinjeon@kernel.org>,
+ Tom Talpey <tom@talpey.com>, Yunseong Kim <yunseong.kim@ericsson.com>,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Bernard Metzler <bernard.metzler@linux.dev>
+References: <20260805000159.321645-2-yunseong.kim@est.tech>
+ <20260901124103.GL24140@unreal>
 Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20260901-work-idmap-const-v1-24-54ccd48e100b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20260901124103.GL24140@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.26380 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On 9/1/2026 5:14 AM, Christian Brauner wrote:
-> Convert to const struct mnt_idmap.
->
-> A mount's idmapping is immutable. The only thing that is allowed to be
-> modified afterwards is the reference count and that is hidden behind
-> mnt_idmap_get() and mnt_idmap_put(). Everything else only ever reads
-> from the idmapping. This is the same model that struct cred uses and the
-> idmapping is also rather sensitive.
->
-> So make the idmap argument const wherever we can. The conversion is done
-> from the bottom up so callers can continue to pass a non-const pointer
-> to a const parameter until the conversion is finished.
->
-> No functional changes.
->
-> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
-> ---
->  Documentation/filesystems/locking.rst     | 2 +-
->  Documentation/filesystems/vfs.rst         | 2 +-
->  arch/powerpc/platforms/cell/spufs/inode.c | 2 +-
->  fs/9p/v9fs_vfs.h                          | 2 +-
->  fs/9p/vfs_inode.c                         | 2 +-
->  fs/9p/vfs_inode_dotl.c                    | 2 +-
->  fs/adfs/adfs.h                            | 2 +-
->  fs/adfs/inode.c                           | 2 +-
->  fs/affs/affs.h                            | 2 +-
->  fs/affs/inode.c                           | 2 +-
->  fs/afs/inode.c                            | 2 +-
->  fs/afs/internal.h                         | 2 +-
->  fs/anon_inodes.c                          | 2 +-
->  fs/attr.c                                 | 2 +-
->  fs/bad_inode.c                            | 2 +-
->  fs/btrfs/inode.c                          | 2 +-
->  fs/ceph/inode.c                           | 2 +-
->  fs/ceph/super.h                           | 2 +-
->  fs/coda/coda_linux.h                      | 2 +-
->  fs/coda/inode.c                           | 2 +-
->  fs/configfs/configfs_internal.h           | 2 +-
->  fs/configfs/inode.c                       | 2 +-
->  fs/debugfs/inode.c                        | 2 +-
->  fs/ecryptfs/inode.c                       | 2 +-
->  fs/efivarfs/inode.c                       | 2 +-
->  fs/exfat/exfat_fs.h                       | 2 +-
->  fs/exfat/file.c                           | 2 +-
->  fs/ext2/ext2.h                            | 2 +-
->  fs/ext2/inode.c                           | 2 +-
->  fs/ext4/ext4.h                            | 2 +-
->  fs/ext4/inode.c                           | 2 +-
->  fs/f2fs/f2fs.h                            | 2 +-
->  fs/f2fs/file.c                            | 2 +-
->  fs/fat/fat.h                              | 2 +-
->  fs/fat/file.c                             | 2 +-
->  fs/fuse/dir.c                             | 2 +-
->  fs/gfs2/inode.c                           | 2 +-
->  fs/hfs/hfs_fs.h                           | 2 +-
->  fs/hfs/inode.c                            | 2 +-
->  fs/hfsplus/inode.c                        | 2 +-
->  fs/hostfs/hostfs_kern.c                   | 2 +-
->  fs/hpfs/hpfs_fn.h                         | 2 +-
->  fs/hpfs/inode.c                           | 2 +-
->  fs/hugetlbfs/inode.c                      | 2 +-
->  fs/inode.c                                | 2 +-
->  fs/internal.h                             | 2 +-
->  fs/jffs2/fs.c                             | 2 +-
->  fs/jffs2/os-linux.h                       | 2 +-
->  fs/jfs/file.c                             | 2 +-
->  fs/jfs/jfs_inode.h                        | 2 +-
->  fs/kernfs/inode.c                         | 2 +-
->  fs/kernfs/kernfs-internal.h               | 2 +-
->  fs/libfs.c                                | 4 ++--
->  fs/minix/file.c                           | 2 +-
->  fs/nfs/inode.c                            | 2 +-
->  fs/nfs/namespace.c                        | 2 +-
->  fs/nilfs2/inode.c                         | 2 +-
->  fs/nilfs2/nilfs.h                         | 2 +-
->  fs/ntfs/file.c                            | 2 +-
->  fs/ntfs/inode.h                           | 2 +-
->  fs/ntfs3/file.c                           | 2 +-
->  fs/ntfs3/ntfs_fs.h                        | 2 +-
->  fs/ocfs2/dlmfs/dlmfs.c                    | 2 +-
->  fs/ocfs2/file.c                           | 2 +-
->  fs/ocfs2/file.h                           | 2 +-
->  fs/omfs/file.c                            | 2 +-
->  fs/orangefs/inode.c                       | 2 +-
->  fs/orangefs/orangefs-kernel.h             | 2 +-
->  fs/overlayfs/inode.c                      | 2 +-
->  fs/overlayfs/overlayfs.h                  | 2 +-
->  fs/pidfs.c                                | 2 +-
->  fs/proc/base.c                            | 2 +-
->  fs/proc/generic.c                         | 2 +-
->  fs/proc/internal.h                        | 2 +-
->  fs/proc/proc_sysctl.c                     | 2 +-
->  fs/ramfs/file-nommu.c                     | 4 ++--
->  fs/smb/client/cifsfs.h                    | 2 +-
->  fs/smb/client/inode.c                     | 2 +-
->  fs/tracefs/event_inode.c                  | 2 +-
->  fs/tracefs/inode.c                        | 2 +-
->  fs/ubifs/file.c                           | 2 +-
->  fs/ubifs/ubifs.h                          | 2 +-
->  fs/udf/file.c                             | 2 +-
->  fs/ufs/inode.c                            | 2 +-
->  fs/ufs/ufs.h                              | 2 +-
->  fs/vboxsf/utils.c                         | 2 +-
->  fs/vboxsf/vfsmod.h                        | 2 +-
->  fs/xfs/xfs_iops.c                         | 2 +-
->  fs/zonefs/super.c                         | 2 +-
->  include/linux/fs.h                        | 6 +++---
->  include/linux/lsm_hook_defs.h             | 4 ++--
->  include/linux/nfs_fs.h                    | 2 +-
->  include/linux/security.h                  | 8 ++++----
->  mm/secretmem.c                            | 2 +-
->  mm/shmem.c                                | 2 +-
->  net/socket.c                              | 2 +-
->  security/integrity/evm/evm_main.c         | 4 ++--
->  security/integrity/ima/ima_appraise.c     | 2 +-
->  security/security.c                       | 4 ++--
->  security/selinux/hooks.c                  | 2 +-
->  security/smack/smack_lsm.c                | 2 +-
->  virt/kvm/guest_memfd.c                    | 2 +-
->  102 files changed, 112 insertions(+), 112 deletions(-)
+Hi Leon,
 
-...
+> On Wed, Aug 05, 2026 at 02:02:00AM +0200, Yunseong Kim wrote:
+>> After a successful connect downcall, iw_cm_connect() returns with
+>> IWCM_F_CONNECT_WAIT still set and the cm_id in IW_CM_STATE_CONN_SENT.
+>> The only thing that clears the flag is the provider delivering
+>> IW_CM_EVENT_CONNECT_REPLY (cm_conn_rep_handler()).  Until that event
+>> arrives, iw_cm_disconnect() and destroy_cm_id() sleep uninterruptibly
+>> in
+>>
+>> 	wait_event(cm_id_priv->connect_wait,
+>> 		   !test_bit(IWCM_F_CONNECT_WAIT, &cm_id_priv->flags));
+>>
+>> and both state machines treat IW_CM_STATE_CONN_SENT as BUG(), so the
+>> API has no way to cancel a pending active connect.  If the provider
+>> never generates the reply, because the peer died in the middle of
+>> connection setup or because of a provider bug, every teardown path
+>> (rdma_disconnect(), rdma_destroy_id()) blocks in D state forever and
+>> the ULP cannot recover: there is no way to disconnect after
+>> rdma_connect() was called without risking an unbounded hang.
+>>
+>> This class of problem is not theoretical.  The pending smbdirect
+>> change "smb: smbdirect: bound the disconnect wait in destroy_sync" [1]
+>> had to work around it on the ULP side:
+>> smbdirect_socket_destroy_sync() waited unbounded for the socket to
+>> reach SMBDIRECT_SOCKET_DISCONNECTED, a transition that depends on an
+>> asynchronous RDMA CM disconnect event, and when the peer died abruptly
+>> (a killed client, or Soft-RoCE/RXE where no graceful disconnect
+>> completes) that event never arrived.  The destroy ran on the single
+>> ksmbd-conn-release workqueue, every later connection release queued
+>> behind it in D state, and the whole server wedged until hung_task
+>> fired.  That change bounded the wait and drove the socket state
+>> machine to DISCONNECTED locally on timeout; ULPs should not have to
+>> resort to that, the CM should offer a teardown they can rely on.
+>>
+>> IWCM_F_CONNECT_WAIT currently guards two different windows:
+>>
+>>   * the connect/accept downcall into the provider being in progress;
+>>     teardown must keep waiting for that, it is short and bounded;
+>>
+>>   * an issued active connect waiting for CONNECT_REPLY, which is
+>>     potentially unbounded.
+>>
+>> Mark the second window with a new flag, IWCM_F_CONNECT_SENT: set by
+>> iw_cm_connect() once the downcall has returned successfully, cleared
+>> by cm_conn_rep_handler().  The teardown waits now complete when either
+>> the downcall has finished (!IWCM_F_CONNECT_WAIT, as before) or the
+>> pending-reply window has been entered (IWCM_F_CONNECT_SENT), and the
+>> previously BUG() CONN_SENT cases become:
+>>
+>>   * iw_cm_disconnect(): return -ENOTCONN; there is no established
+>>     connection to disconnect, aborting is the destroy path's job;
+>>
+>>   * destroy_cm_id(): abort the pending connect locally by moving to
+>>     DESTROYING and putting the QP into error so the provider tears the
+>>     connection attempt down.
+>>
+>> A CONNECT_REPLY that arrives after the abort is dropped: either
+>> cm_work_handler() sees IWCM_F_DROP_EVENTS, or cm_conn_rep_handler()
+>> now recognizes IW_CM_STATE_DESTROYING (the abort and the reply
+>> serialize on cm_id_priv->lock) and frees the event without touching
+>> the QP that destroy_cm_id() already released.  The cm_id memory stays
+>> valid for such a late reply because the provider holds its own
+>> reference (cm_id->add_ref) for as long as it can deliver events.
+>>
+>> The passive side has a sibling gap, where after a successful accept
+>> downcall the flag stays set until the provider's ESTABLISHED event
+>> arrives, which this patch deliberately does not change.
+>>
+>> [1] https://github.com/smfrench/smb3-kernel/commit/26d0f82a02c8a9c9c8cdfc138acb7ed0bf8e01a9
+>>
+>> Suggested-by: Stefan Metzmacher <metze@samba.org>
+>> Signed-off-by: Yunseong Kim <yunseong.kim@est.tech>
+>> ---
+>>   drivers/infiniband/core/iwcm.c | 76 +++++++++++++++++++++++++++++-----
+>>   drivers/infiniband/core/iwcm.h |  1 +
+>>   2 files changed, 67 insertions(+), 10 deletions(-)
+> 
+> I'm not sure what to do with this patch, as the iWARP folks have
+> remained silent.
+> 
+> Stefan,
+> 
+> Do you still need this patch? Have you tested it?
 
+I'll test it soon.
 
-> diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-> index df4fc6ff26aa..bb78569b3d5b 100644
-> --- a/security/smack/smack_lsm.c
-> +++ b/security/smack/smack_lsm.c
-> @@ -1270,7 +1270,7 @@ static int smack_inode_permission(struct inode *inode, int mask)
->   *
->   * Returns 0 if access is permitted, an error code otherwise
->   */
-> -static int smack_inode_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
-> +static int smack_inode_setattr(const struct mnt_idmap *idmap, struct dentry *dentry,
->  			       struct iattr *iattr)
+But the problem is real and I hit it very often in the past and the only option
+was a reboot.
 
-Please keep to 80 columns.
+I added Bernard explicitly...
 
-+static int smack_inode_setattr(const struct mnt_idmap *idmap,
-+				struct dentry *dentry, struct iattr *iattr)
+metze
 
-Note that the above may get whitespace mangled.
-
->  {
->  	struct smk_audit_info ad;
->
