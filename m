@@ -1,137 +1,123 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746FA371053;
-	Tue,  1 Sep 2026 12:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788266469; cv=none; b=LDwSDUp2ifi30rDiLEH9sTIph2FlIHVqmMEOHe8x/TR1wmAcd5o0p3Jssi54C6iZInhrB9jWsp72O6voZJverulkBu7WzuY3DcP0IVoeUOgdhB5r1ODu2rB9oTN5fyEaIK1B0VKr3B5i5kzT4bXmmaNfil4Mj4JfP/p40xCpD+M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788266469; c=relaxed/simple;
-	bh=mJo4l/y4MxbMvXcw1tprHy5vAB2h6U3R8qtue/noZ9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4pKvcqV1sDYF1RJM/Yo7v+IQsmPMR+5wphhC8jeY3M6J4meV6ijCdaCswW/jAXteXe0elQEAgQ1ULZDVFlEyGJX1ijhh3Kc0rPqscXy+uSvZSc59YAmovNCITxLBAiODpzoY1Ewz7iR+4UptDCt1b59h2Yqn9J3tW/FnVsU2U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QF3m0Q1F; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2503CB57F
+	for <linux-cifs@vger.kernel.org>; Tue,  1 Sep 2026 14:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.217.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788271567; cv=pass; b=nJQj33Z5wFh4ytxS4xzKuu/zsKb13JVK/LLBnyoRqgu4dlKPo++H0tMXZDBbM+8Cjp7pXaNEcCEIWFteJmyQ+aX3ooLkcRuiv+nOc72+lq3+xpA/oDgFX9/CKAFpE0ZqwQsQgYr92suZfV2d6/Jbnl27l2Eo40owtYWoFC2Cx/Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788271567; c=relaxed/simple;
+	bh=4q6iuHKZ/050PNB6y0beFVr46SQsOfuApu0ccHHkTuY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jfz6IN5cOsz9fwctxwBF29P65T1FbR3fHLCp8QK25v1gtYWLT4k5CDTWhKiVo7pEJoFrDAQCZEQJsn9okOTpbmQyPBlB/OAfDslUhJXfhLhnSEqV72NUeP9cKjED5Ck9A2uEf0st+7MAUH8mxyzsqlt3TFKj0cQMUbyXL9l7lwQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=AJkfkWHF; arc=pass smtp.client-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bynar.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QF3m0Q1F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E5021F000E9;
-	Tue,  1 Sep 2026 12:41:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788266468;
-	bh=8E/4HEhZ+01WRW16r1kh+DTxQ/1UAOLeU+xLOlmoQrA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QF3m0Q1FNTtxaECBq2LCYXalGE6aM1//FUA1jWjZwrYLMTd0dklCHmF+54khHi923
-	 k3Z4F1sqcdQRrgJ66QqjtMfAUZ8Ijv84XvJDPfK4nynCoMlh9DElVKpMPq0Mz6hZFC
-	 J/EKXuVwVgjD/uunoVMrZkjDGl89L1NLd+oq+R3Nx5XeFuhDaIJkD4dt1jWibGPAbm
-	 4lfWzYHq7OwpDj1M8KnOCcEAXs0VkgrmqzWrIbrGbq0s3UE8RuSEttTUhbe4JDuN+c
-	 vNsiky0jcDl80mZhYjrGiIF9NKqSZBM08MAOjTqiHh6NbME65+kozouZB1aC6P4fBk
-	 13MGrFDmwqGdw==
-Date: Tue, 1 Sep 2026 15:41:03 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Yunseong Kim <yunseong.kim@est.tech>,
-	Stefan Metzmacher <metze@samba.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Jacob Moroni <jmoroni@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Steve French <smfrench@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>,
-	Yunseong Kim <yunseong.kim@ericsson.com>,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [RFC PATCH] RDMA/iwcm: allow aborting an active connect awaiting
- CONNECT_REPLY
-Message-ID: <20260901124103.GL24140@unreal>
-References: <20260805000159.321645-2-yunseong.kim@est.tech>
+	dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b="AJkfkWHF"
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-765c077b5c1so293940137.3
+        for <linux-cifs@vger.kernel.org>; Tue, 01 Sep 2026 07:06:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788271564; cv=none;
+        d=google.com; s=arc-20260327;
+        b=f+bpIoMWbvQqq7J2zQdGKAYB5eICbyZ1sH0/z1MW6JA8V8ZxQ9uCYma+iCi+AplIvV
+         ApgO7rAwQypnBTdAD226eLr74pKzRYFJ0xucXbkrbkqSKApvxznExR+krpBU/CWWhvwb
+         KWawiJYgHLZD60YtK8Ug2shQYVd/AduPKh5ll4jpkWDg7vsPQPdpJk84r35O15suCiRR
+         k71zCvj4nbt8bcciHzVwxlGp9PzOF0ilKWUQyYCMflyW5fSIpqzJh/DCAd8cY62ozT0R
+         Kbio/2ZWHFr0qqFW42WXcGW4C/mGVuyYEaDnz/Bxzuu1xvH7nC8eI4aZvv96j963HkaJ
+         Excw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=hoBjSKSvVy1UEYsxbY/vRWyWBXYVCJ0DS+nH66eBBn4=;
+        fh=pEmG/Miye1Q6ksurJOtOxtk1cYAFAh4dZAlvvin1JcU=;
+        b=HkKADNsR+wo8uV5a2jeTmFAi5pbflXtEMKOBVrwnUxyk91C2QycpYbelpAsKcHiimz
+         ZE0AHAUAuIhZt82a5vL0673jnOpKMkO7r6NN7mJVj36VuJ/kYZ1JYTGmIfntrfZmhOTp
+         gqh2k/wn4vcnbpJji3UMW/Ms7tUqVjOQ9YIQ/Mg0dUeFA0ctvy1URLvCjvcjxwf9f/3s
+         3KYEUszzNXyZhEt96VKeruF6YnwrQGxICMTLREnkINwxpzHetoKDImnCdppM8Nszatbf
+         l/cusE8wY+jogkow14EEcCsvcMvhSTl36vAwJknEYvMyOYCOOBKe3Pn3YlzhIJdCOqBF
+         fgmA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bynar.io; s=google; t=1788271564; x=1788876364; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=hoBjSKSvVy1UEYsxbY/vRWyWBXYVCJ0DS+nH66eBBn4=;
+        b=AJkfkWHFgouF1QLMw4p9x41XAUYQKXUJL6PS9Mxs9uzWanuHafqwN+S4ZQloiAiPQA
+         U7afngQ+LPJd9mTCzKCmJgPgrT5S8zX0OrV3IjJrpjqXCxW/z8sUe48A+YSeP9YNFjUu
+         D3eZyurtL1w0/Hd4CSP1CBCWA4PpdWy5nVs+gp2z81M/QahGpoknp5tRrjabEtFesKci
+         OfQ2VIhC2f3lKJXCwcaA/Ugo+VMNLOezXTCLEYhzs1eDjD+6MSPl2Sj9omXmQ1HIEjH1
+         /c0h25tF65tNtMqo0nbC+dV/oE9xcGwR0NlElIRCWwvU73CnyyG+8FyAbyBN1+s1imAL
+         kRuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788271564; x=1788876364;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=hoBjSKSvVy1UEYsxbY/vRWyWBXYVCJ0DS+nH66eBBn4=;
+        b=SzhUJo2vkq0yEY9+4XX+XbFH+tqFStFp1SzZcA4GvdyXiYiise2Bnr6rtIz7hIBl0K
+         CZMQl0hme5TNfx7mK+1vx8OZ/PHLPUaj/dlkaDqcE/OUOvzYFKOWNpeBV7PeNkyL6BOa
+         fFRrYr3u0H2kvrbffe7kT/ij3b9KdJIH96JZubm/pfW+IBeQqlwC1lqqdNOrnrHx2AX1
+         fwFp89zVNqusMvitGjTYs7XDcHnIl/+fKpaCuHa1YE78TiGeWikHuUvjoNP5gsJ6Tjp+
+         kaLpNlWjUqNP65nrb8rbWZ+ibA4IKkNhnJy3sDR1wsz0wSNSL4MI1xFYw/VHR76ulr1I
+         HYJw==
+X-Forwarded-Encrypted: i=1; AHgh+RrHLC58rBpIZQh/V3GsM+oNYeKIYi9cwjSuAfGxRzqdfPV5JSAVVgeaqUjjMqttoXR8vyCOCHTTiroO@vger.kernel.org
+X-Gm-Message-State: AFuF++mvt9Icv7lFyxpcQrS8KKSrwp6aVN+anlee0O+FyyeeK52Kzm9l
+	BGNPOw/y/moVcORLzEQu/dkB7n6rXk39V/91WO4LUIOCPQ5I2LG4cci9VZdG7NwNZGGcIIn0hzw
+	pgTNn4qXKPtLFYYT0H1iX1DWmbVCBig8HgWStc3zUugA=
+X-Gm-Gg: AR+sD10f7aXN0BBuNSB2vzCsL493xs/Qwcg/YNVKi3P3IuuVuVWzq2sQs7xMa5Ob+9B
+	01v8hlyCYZr9obCa9IC8eUsk0mfnDKO3Laeo48BQZ+ZSiWSuh+5pRBfpQPejnbXn2bKs3TGtlRI
+	H47wpfVTMAt/ig/p7J/CenVzmh/uxP1gK3nU3g6SptRbP7S8ztzrxnjPDPMEeLwjs1m1YE9TmDK
+	YKe75OzRPLWPkmsxceyDGiyUBNv8XvG4XGnjCWt10zY+39Lc5BdeJZs8gx/9bM8pesp6GdM3/bE
+	IKqTJl5NbjlNGkAOXP0mwcwuh4MHZRDMR+zTGeGJVg==
+X-Received: by 2002:a05:6102:418b:b0:778:721:53db with SMTP id
+ ada2fe7eead31-7859426191emr10137186137.0.1788271564295; Tue, 01 Sep 2026
+ 07:06:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260805000159.321645-2-yunseong.kim@est.tech>
+References: <20260828150203.1419003-1-diego@bynar.io> <20260831125045.479576-1-diego@bynar.io>
+ <0abfb2d2f99e54aceac4cea63947b65a@manguebit.org>
+In-Reply-To: <0abfb2d2f99e54aceac4cea63947b65a@manguebit.org>
+From: Diego Oliva <diego@bynar.io>
+Date: Tue, 1 Sep 2026 15:05:52 +0100
+X-Gm-Features: AcwNN1WU18vieHng4ytPQGO18uS5XIOEm5pHMhikRsNphUH1T23WWbWetU5SBiQ
+Message-ID: <CAExJZk2r1wycZPrkvmFpUBM+3vyOBpj4+FAqs0uZ-ZUx5a_jcw@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: client: reject out-of-bounds DataOffset in CIFSSMBRead()
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 05, 2026 at 02:02:00AM +0200, Yunseong Kim wrote:
-> After a successful connect downcall, iw_cm_connect() returns with
-> IWCM_F_CONNECT_WAIT still set and the cm_id in IW_CM_STATE_CONN_SENT.
-> The only thing that clears the flag is the provider delivering
-> IW_CM_EVENT_CONNECT_REPLY (cm_conn_rep_handler()).  Until that event
-> arrives, iw_cm_disconnect() and destroy_cm_id() sleep uninterruptibly
-> in
-> 
-> 	wait_event(cm_id_priv->connect_wait,
-> 		   !test_bit(IWCM_F_CONNECT_WAIT, &cm_id_priv->flags));
-> 
-> and both state machines treat IW_CM_STATE_CONN_SENT as BUG(), so the
-> API has no way to cancel a pending active connect.  If the provider
-> never generates the reply, because the peer died in the middle of
-> connection setup or because of a provider bug, every teardown path
-> (rdma_disconnect(), rdma_destroy_id()) blocks in D state forever and
-> the ULP cannot recover: there is no way to disconnect after
-> rdma_connect() was called without risking an unbounded hang.
-> 
-> This class of problem is not theoretical.  The pending smbdirect
-> change "smb: smbdirect: bound the disconnect wait in destroy_sync" [1]
-> had to work around it on the ULP side:
-> smbdirect_socket_destroy_sync() waited unbounded for the socket to
-> reach SMBDIRECT_SOCKET_DISCONNECTED, a transition that depends on an
-> asynchronous RDMA CM disconnect event, and when the peer died abruptly
-> (a killed client, or Soft-RoCE/RXE where no graceful disconnect
-> completes) that event never arrived.  The destroy ran on the single
-> ksmbd-conn-release workqueue, every later connection release queued
-> behind it in D state, and the whole server wedged until hung_task
-> fired.  That change bounded the wait and drove the socket state
-> machine to DISCONNECTED locally on timeout; ULPs should not have to
-> resort to that, the CM should offer a teardown they can rely on.
-> 
-> IWCM_F_CONNECT_WAIT currently guards two different windows:
-> 
->  * the connect/accept downcall into the provider being in progress;
->    teardown must keep waiting for that, it is short and bounded;
-> 
->  * an issued active connect waiting for CONNECT_REPLY, which is
->    potentially unbounded.
-> 
-> Mark the second window with a new flag, IWCM_F_CONNECT_SENT: set by
-> iw_cm_connect() once the downcall has returned successfully, cleared
-> by cm_conn_rep_handler().  The teardown waits now complete when either
-> the downcall has finished (!IWCM_F_CONNECT_WAIT, as before) or the
-> pending-reply window has been entered (IWCM_F_CONNECT_SENT), and the
-> previously BUG() CONN_SENT cases become:
-> 
->  * iw_cm_disconnect(): return -ENOTCONN; there is no established
->    connection to disconnect, aborting is the destroy path's job;
-> 
->  * destroy_cm_id(): abort the pending connect locally by moving to
->    DESTROYING and putting the QP into error so the provider tears the
->    connection attempt down.
-> 
-> A CONNECT_REPLY that arrives after the abort is dropped: either
-> cm_work_handler() sees IWCM_F_DROP_EVENTS, or cm_conn_rep_handler()
-> now recognizes IW_CM_STATE_DESTROYING (the abort and the reply
-> serialize on cm_id_priv->lock) and frees the event without touching
-> the QP that destroy_cm_id() already released.  The cm_id memory stays
-> valid for such a late reply because the provider holds its own
-> reference (cm_id->add_ref) for as long as it can deliver events.
-> 
-> The passive side has a sibling gap, where after a successful accept
-> downcall the flag stays set until the provider's ESTABLISHED event
-> arrives, which this patch deliberately does not change.
-> 
-> [1] https://github.com/smfrench/smb3-kernel/commit/26d0f82a02c8a9c9c8cdfc138acb7ed0bf8e01a9
-> 
-> Suggested-by: Stefan Metzmacher <metze@samba.org>
-> Signed-off-by: Yunseong Kim <yunseong.kim@est.tech>
-> ---
->  drivers/infiniband/core/iwcm.c | 76 +++++++++++++++++++++++++++++-----
->  drivers/infiniband/core/iwcm.h |  1 +
->  2 files changed, 67 insertions(+), 10 deletions(-)
+On Mon, Aug 31, 2026 at 11:15=E2=80=AFPM Paulo Alcantara <pc@manguebit.org>=
+ wrote:
 
-I'm not sure what to do with this patch, as the iWARP folks have
-remained silent.
+> Shouldn't you also validate the minimum response size so that you can
+> safely dereference the above fields?  E.g.,
+>
+> if (rsp_iov.iov_len < tcon->ses->server->read_rsp_size) {
+>         rc =3D smb_EIO(...);
+>         *nbytes =3D 0;
+> } else {
+>         unsigned int data_length =3D le16_to_cpu(pSMBr->DataLengthHigh);
+>         ...
+> }
 
-Stefan,
+I've reproduced the scenario you referenced and confirmed an
+additional check is needed.
 
-Do you still need this patch? Have you tested it?
+> @data_length is now unsigned, so use '%u' instead.  Also, print __func__
+> in cifs_dbg().
 
-Thanks,
+Will do.
+
+Thanks for your time!
