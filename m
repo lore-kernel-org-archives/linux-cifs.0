@@ -1,153 +1,209 @@
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD96399D00;
-	Tue,  1 Sep 2026 16:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE4549B1F8;
+	Tue,  1 Sep 2026 18:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788281431; cv=none; b=t3x1MERKW3y7kZo+nW5osx+ythqvV1cdUo4gsZJXbaRLzU4o8Pf4Lg8RGsH5PMPGJw9gFy3+oRDK+tQiqJ9KFVmIzJenPo2vBb+e7o9xRVvoezwA2DrFPyRldd7fGshM0hLubpzaktBgZE3fRdZpM5nL9pPnWP8op1MFZZdlS6s=
+	t=1788286918; cv=none; b=iAqV1QeXfjz81e+15JGidU7zjjK3LMmupZFqUkqMJJdwPqtM1c7a2jSnzCLTFkLscwmTL3ydP3zPXQBki35mXc+rf2z/7+o2yr+lR9d+zL3swGKE8MjwpI85o9F0M3EjSaX79daEP6cFpnxns4GZopFeXuvixswiTFxDPNcVjKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788281431; c=relaxed/simple;
-	bh=SDOwRP58mmnKlrUHlccngVQYFwJN3D63qUx2AYvxIKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gQ/UcgC7BvCxI+dpKwrz+ezqo98DTRU3/3F+MP4dgg6eKBEUjGWwXq2hfBQeCJ4Fd3yn29zBE7V/Foyhv//f5eHipF3MzVf9tTnYCemKSs1f2bZ7aYTcZWZqRXw/8VxzbWnzzF7WRvgLtkhVZQPiDrM5afkvmnTErEpvbQkgrXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=VPmxNb81; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+	s=arc-20240116; t=1788286918; c=relaxed/simple;
+	bh=qcbqwjo8PQ6HOaFe+HESTBjYFEM7Qgci90O8hxG6YPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NVcRlfJs1vzRLhvns68R1D7zI0jStvWIkz6beFFYHXi1xCcMdp7YuLNcBfosB54+sLXaPD1YTmMOICQV2qrli7AESLoeGO1wR1lN1+JhHvr80kPSJPfyUscnnjz6B35Wa5lxf4WpFNxKz43NHu+ACMhPjGTP7Vux6WAx4XW6JnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=pP1dPX9x; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="VPmxNb81"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=C30V8qWM8Ula8+RBcfws0g6Mkjg3NA2ZsU4qGPGdJpk=; b=VPmxNb81eFyfOgf41a72wjEHKf
-	VWtl5rilUbWLhd3Ag+s8wGuWXK/MHFl/l3jpHoinBn0VaJQTC4a3ZBMlgiuxXtPzLfpRLFnTo0gMt
-	yr0mpLzhEcvf96lznYG5lDpBJTELFMuhSnZ1x6kGpWvrQPBfa6Rb7Dqugb/gODCE+9122JQ8WkxNx
-	hKRCQuRkd2ZH25o2eDWAT30xsruNPeacFiovgHMeN4NuVbRoOKImWgs9EM505OLHnfKl7ZJzenir3
-	HLljfqgOmt1LwqNK9enMIGeI5bAhInphbI5ncZcbMzodhHW2hhOBWQKs6z6S1fQ88OKNLw6E+U6N5
-	aT2h94xtYjeyeaEjvYYkg5Ow/wqDrYSxftOgiT8Rg1w1pcWDOHUntfOLMg7KJIF0OryuyxBT4733M
-	S26EBYmF76txlsiPae8TZgp1aZCTS9kN6pks2W1HG36GIWBNQGdCr2sXQexxsh0Y8fU8pSKC5HeKZ
-	TI4KU7YJBztMejqMf4DxnNJv;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1x1Rgg-00000002P6e-0jyo;
-	Tue, 01 Sep 2026 16:50:18 +0000
-Message-ID: <47142579-3af7-453b-875c-ff6d610f26a7@samba.org>
-Date: Tue, 1 Sep 2026 18:50:15 +0200
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="pP1dPX9x"
+Received: from localhost.localdomain (unknown [52.172.102.219])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4993E20B7166;
+	Tue,  1 Sep 2026 11:21:10 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4993E20B7166
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1788286880;
+	bh=j8p0fHYDQhDNXEvnAW4cKjXCyIpdjeOjWC3CDthUOCI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pP1dPX9xSEtbkNo1feR0YamEim4twVmOSp3MMncT84klmhFJ361Z+m/HWkY3EZI0C
+	 PiDXdO4tSifA4gQibyRa0ilQS5FLI+bMZZJzMKbatsrr4GtEyd0y7Nv75pidixxk36
+	 awCu+lfk9Tg5HMLrwcDSM5iODkqAMPKzGnxm85Qk=
+From: "Cen Zhang (Microsoft Security FORGE Labs)" <cenzhang@linux.microsoft.com>
+To: linkinjeon@kernel.org,
+	smfrench@gmail.com
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	nicholas@carlini.com,
+	bahubali.bg@samsung.com,
+	kees@kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	AutonomousCodeSecurity@microsoft.com,
+	xmei5@asu.edu,
+	tgopinath@linux.microsoft.com,
+	kys@microsoft.com,
+	"Cen Zhang (Microsoft Security FORGE Labs)" <cenzhang@linux.microsoft.com>
+Subject: [PATCH] ksmbd: fix tree connection use-after-free in smb2_tree_connect()
+Date: Tue,  1 Sep 2026 14:21:36 -0400
+Message-ID: <20260901182136.13745-1-cenzhang@linux.microsoft.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] RDMA/iwcm: allow aborting an active connect awaiting
- CONNECT_REPLY
-To: Leon Romanovsky <leon@kernel.org>, Yunseong Kim <yunseong.kim@est.tech>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Jacob Moroni <jmoroni@google.com>,
- Bart Van Assche <bvanassche@acm.org>, Namjae Jeon <linkinjeon@kernel.org>,
- Tom Talpey <tom@talpey.com>, Yunseong Kim <yunseong.kim@ericsson.com>,
- linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- Bernard Metzler <bernard.metzler@linux.dev>
-References: <20260805000159.321645-2-yunseong.kim@est.tech>
- <20260901124103.GL24140@unreal>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20260901124103.GL24140@unreal>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Leon,
+ksmbd_tree_conn_connect() publishes a new tree connection in
+sess->tree_conns with a single reference and returns its pointer to
+smb2_tree_connect(). The handler continues to initialize the object and
+build the response after publication. A concurrent session logoff can
+erase the connection and drop that reference, freeing the object while
+the handler still uses it.
 
-> On Wed, Aug 05, 2026 at 02:02:00AM +0200, Yunseong Kim wrote:
->> After a successful connect downcall, iw_cm_connect() returns with
->> IWCM_F_CONNECT_WAIT still set and the cm_id in IW_CM_STATE_CONN_SENT.
->> The only thing that clears the flag is the provider delivering
->> IW_CM_EVENT_CONNECT_REPLY (cm_conn_rep_handler()).  Until that event
->> arrives, iw_cm_disconnect() and destroy_cm_id() sleep uninterruptibly
->> in
->>
->> 	wait_event(cm_id_priv->connect_wait,
->> 		   !test_bit(IWCM_F_CONNECT_WAIT, &cm_id_priv->flags));
->>
->> and both state machines treat IW_CM_STATE_CONN_SENT as BUG(), so the
->> API has no way to cancel a pending active connect.  If the provider
->> never generates the reply, because the peer died in the middle of
->> connection setup or because of a provider bug, every teardown path
->> (rdma_disconnect(), rdma_destroy_id()) blocks in D state forever and
->> the ULP cannot recover: there is no way to disconnect after
->> rdma_connect() was called without risking an unbounded hang.
->>
->> This class of problem is not theoretical.  The pending smbdirect
->> change "smb: smbdirect: bound the disconnect wait in destroy_sync" [1]
->> had to work around it on the ULP side:
->> smbdirect_socket_destroy_sync() waited unbounded for the socket to
->> reach SMBDIRECT_SOCKET_DISCONNECTED, a transition that depends on an
->> asynchronous RDMA CM disconnect event, and when the peer died abruptly
->> (a killed client, or Soft-RoCE/RXE where no graceful disconnect
->> completes) that event never arrived.  The destroy ran on the single
->> ksmbd-conn-release workqueue, every later connection release queued
->> behind it in D state, and the whole server wedged until hung_task
->> fired.  That change bounded the wait and drove the socket state
->> machine to DISCONNECTED locally on timeout; ULPs should not have to
->> resort to that, the CM should offer a teardown they can rely on.
->>
->> IWCM_F_CONNECT_WAIT currently guards two different windows:
->>
->>   * the connect/accept downcall into the provider being in progress;
->>     teardown must keep waiting for that, it is short and bounded;
->>
->>   * an issued active connect waiting for CONNECT_REPLY, which is
->>     potentially unbounded.
->>
->> Mark the second window with a new flag, IWCM_F_CONNECT_SENT: set by
->> iw_cm_connect() once the downcall has returned successfully, cleared
->> by cm_conn_rep_handler().  The teardown waits now complete when either
->> the downcall has finished (!IWCM_F_CONNECT_WAIT, as before) or the
->> pending-reply window has been entered (IWCM_F_CONNECT_SENT), and the
->> previously BUG() CONN_SENT cases become:
->>
->>   * iw_cm_disconnect(): return -ENOTCONN; there is no established
->>     connection to disconnect, aborting is the destroy path's job;
->>
->>   * destroy_cm_id(): abort the pending connect locally by moving to
->>     DESTROYING and putting the QP into error so the provider tears the
->>     connection attempt down.
->>
->> A CONNECT_REPLY that arrives after the abort is dropped: either
->> cm_work_handler() sees IWCM_F_DROP_EVENTS, or cm_conn_rep_handler()
->> now recognizes IW_CM_STATE_DESTROYING (the abort and the reply
->> serialize on cm_id_priv->lock) and frees the event without touching
->> the QP that destroy_cm_id() already released.  The cm_id memory stays
->> valid for such a late reply because the provider holds its own
->> reference (cm_id->add_ref) for as long as it can deliver events.
->>
->> The passive side has a sibling gap, where after a successful accept
->> downcall the flag stays set until the provider's ESTABLISHED event
->> arrives, which this patch deliberately does not change.
->>
->> [1] https://github.com/smfrench/smb3-kernel/commit/26d0f82a02c8a9c9c8cdfc138acb7ed0bf8e01a9
->>
->> Suggested-by: Stefan Metzmacher <metze@samba.org>
->> Signed-off-by: Yunseong Kim <yunseong.kim@est.tech>
->> ---
->>   drivers/infiniband/core/iwcm.c | 76 +++++++++++++++++++++++++++++-----
->>   drivers/infiniband/core/iwcm.h |  1 +
->>   2 files changed, 67 insertions(+), 10 deletions(-)
-> 
-> I'm not sure what to do with this patch, as the iWARP folks have
-> remained silent.
-> 
-> Stefan,
-> 
-> Do you still need this patch? Have you tested it?
+BUG: KASAN: slab-use-after-free in smb2_tree_connect+0xe3d/0xf90
+  smb2_tree_connect (fs/smb/server/smb2pdu.c:2872)
+  handle_ksmbd_work
+  process_one_work
+  worker_thread
+  kthread
 
-I'll test it soon.
+After xa_store() succeeds, take a second reference before releasing
+tree_conns_lock. The original reference belongs to the xarray entry and
+the second belongs to the creating smb2_tree_connect() handler.
 
-But the problem is real and I hit it very often in the past and the only option
-was a reboot.
+Keep the references balanced in every path:
 
-I added Bernard explicitly...
+- On normal exit or an error after publication, smb2_tree_connect()
+  drops its creator reference. Error cleanup also calls
+  ksmbd_tree_conn_disconnect(), which drops the xarray reference only if
+  it removes the exact entry.
+- SMB2 TREE_DISCONNECT uses the same helper to remove the entry and drop
+  its xarray reference. The request's existing lookup reference remains
+  owned by the request and is released by the existing cleanup.
+- Session LOGOFF removes each entry and drops its xarray reference. If
+  it wins the race, later cleanup sees that the entry is gone and does
+  not drop that reference again.
 
-metze
+To enforce this ownership, claim the disconnected state and erase the
+exact entry atomically under tree_conns_lock. This guarantees one drop
+for the xarray reference and one drop by each in-flight user, regardless
+of which teardown path wins. If logoff removes the entry before
+initialization completes, fail the connect instead of marking the
+detached object TREE_CONNECTED.
+
+Fixes: 33b235a6e6eb ("ksmbd: fix race condition between tree conn lookup and disconnect")
+Reported-by: Xiang Mei (Microsoft) <xmei5@asu.edu>
+Cc: AutonomousCodeSecurity@microsoft.com
+Cc: stable@vger.kernel.org
+Signed-off-by: Cen Zhang (Microsoft Security FORGE Labs) <cenzhang@linux.microsoft.com>
+---
+ fs/smb/server/mgmt/tree_connect.c |  8 ++++++++
+ fs/smb/server/smb2pdu.c           | 28 +++++++++++++---------------
+ 2 files changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/fs/smb/server/mgmt/tree_connect.c b/fs/smb/server/mgmt/tree_connect.c
+index 5f63e236267a..dd1db3554cae 100644
+--- a/fs/smb/server/mgmt/tree_connect.c
++++ b/fs/smb/server/mgmt/tree_connect.c
+@@ -82,6 +82,8 @@ ksmbd_tree_conn_connect(struct ksmbd_work *work, const char *share_name)
+ 	down_write(&sess->tree_conns_lock);
+ 	ret = xa_err(xa_store(&sess->tree_conns, tree_conn->id, tree_conn,
+ 			      KSMBD_DEFAULT_GFP));
++	if (!ret)
++		atomic_inc(&tree_conn->refcount);
+ 	up_write(&sess->tree_conns_lock);
+ 	if (ret) {
+ 		status.ret = -ENOMEM;
+@@ -129,6 +131,12 @@ int ksmbd_tree_conn_disconnect(struct ksmbd_session *sess,
+ 			       struct ksmbd_tree_connect *tree_conn)
+ {
+ 	down_write(&sess->tree_conns_lock);
++	if (tree_conn->t_state == TREE_DISCONNECTED ||
++	    xa_load(&sess->tree_conns, tree_conn->id) != tree_conn) {
++		up_write(&sess->tree_conns_lock);
++		return -ENOENT;
++	}
++	tree_conn->t_state = TREE_DISCONNECTED;
+ 	xa_erase(&sess->tree_conns, tree_conn->id);
+ 	up_write(&sess->tree_conns_lock);
+ 
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 903ffffdd187..e7c965e7b068 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2804,6 +2804,7 @@ int smb2_tree_connect(struct ksmbd_work *work)
+ 	struct ksmbd_session *sess = work->sess;
+ 	char *treename = NULL, *name = NULL;
+ 	struct ksmbd_tree_conn_status status;
++	struct ksmbd_tree_connect *tree_conn = NULL;
+ 	struct ksmbd_share_config *share = NULL;
+ 	int rc = -EINVAL;
+ 
+@@ -2831,6 +2832,7 @@ int smb2_tree_connect(struct ksmbd_work *work)
+ 
+ 	status = ksmbd_tree_conn_connect(work, name);
+ 	if (status.ret == KSMBD_TREE_CONN_STATUS_OK) {
++		tree_conn = status.tree_conn;
+ 		rsp->hdr.Id.SyncId.TreeId = cpu_to_le32(status.tree_conn->id);
+ 		share = status.tree_conn->share_conf;
+ 
+@@ -2874,8 +2876,15 @@ int smb2_tree_connect(struct ksmbd_work *work)
+ 		status.tree_conn->posix_extensions = true;
+ 
+ 	down_write(&sess->tree_conns_lock);
+-	status.tree_conn->t_state = TREE_CONNECTED;
++	if (status.tree_conn->t_state == TREE_DISCONNECTED) {
++		status.ret = KSMBD_TREE_CONN_STATUS_ERROR;
++		share = NULL;
++	} else {
++		status.tree_conn->t_state = TREE_CONNECTED;
++	}
+ 	up_write(&sess->tree_conns_lock);
++	if (status.ret != KSMBD_TREE_CONN_STATUS_OK)
++		goto out_err1;
+ 	rsp->StructureSize = cpu_to_le16(16);
+ out_err1:
+ 	/*
+@@ -2902,9 +2911,6 @@ int smb2_tree_connect(struct ksmbd_work *work)
+ 	rc = ksmbd_iov_pin_rsp(work, rsp, sizeof(struct smb2_tree_connect_rsp));
+ 	if (rc) {
+ 		if (status.ret == KSMBD_TREE_CONN_STATUS_OK) {
+-			down_write(&sess->tree_conns_lock);
+-			status.tree_conn->t_state = TREE_DISCONNECTED;
+-			up_write(&sess->tree_conns_lock);
+ 			ksmbd_tree_conn_disconnect(sess, status.tree_conn);
+ 			status.tree_conn = NULL;
+ 		}
+@@ -2945,6 +2951,9 @@ int smb2_tree_connect(struct ksmbd_work *work)
+ 	if (status.ret != KSMBD_TREE_CONN_STATUS_OK)
+ 		smb2_set_err_rsp(work);
+ 
++	if (tree_conn)
++		ksmbd_tree_connect_put(tree_conn);
++
+ 	return rc;
+ }
+ 
+@@ -3048,17 +3057,6 @@ int smb2_tree_disconnect(struct ksmbd_work *work)
+ 
+ 	ksmbd_close_tree_conn_fds(work);
+ 
+-	down_write(&sess->tree_conns_lock);
+-	if (tcon->t_state == TREE_DISCONNECTED) {
+-		up_write(&sess->tree_conns_lock);
+-		rsp->hdr.Status = STATUS_NETWORK_NAME_DELETED;
+-		err = -ENOENT;
+-		goto err_out;
+-	}
+-
+-	tcon->t_state = TREE_DISCONNECTED;
+-	up_write(&sess->tree_conns_lock);
+-
+ 	err = ksmbd_tree_conn_disconnect(sess, tcon);
+ 	if (err) {
+ 		rsp->hdr.Status = STATUS_NETWORK_NAME_DELETED;
+
+base-commit: f7e5381fe0e2956317075a6d24aad1f56d6ce382
+-- 
+2.55.0
 
