@@ -1,145 +1,279 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A380649F116
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Sep 2026 12:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95E536308F;
+	Wed,  2 Sep 2026 14:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788353549; cv=none; b=t22Wn6G+3KlZpllAq7eYoR/vrH9+KppC3LvZ5eh44B0RiLirJ7YIn0X88rlP8QQwUXzdDC9mDVnd4BhZCEN7KoYhML5rfWcZaHzmNeOU7mZWS9BmPjmLCZRqQVEiqf785G2NfvMI1l7yzEe5bLo6uACf58Mdot4T4TGaxILGRNU=
+	t=1788357998; cv=none; b=hsStTv/1q9voCwc7BVEr/tPWyd2ygYO5ec4Q9xVci/TXh3gSL7D7yN4E8Cphwy5u9LEfvMT02F0IlK/VFFT/PHV3dhYQ9AUoSROTdNHIw76LInyFwEVLxdEpfdpIWGjqAyk4OPW17X2dpDYLBspJIzpX7Aj1zkL4HnYUhU/2W7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788353549; c=relaxed/simple;
-	bh=tI3rVoJWW5Y/q2jj7nEVvV+2mIlTZ1Y6Mz75ZeDzwUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hz1f1w333IfYyFzUDYBqPheJv2zfDH9w+FCBPwnCsyMcp2YImwNcGJZx6ZYGxQN016KlKA9uy8v/DjI0hGWoF68OCDLNs7o9o2IW/fGzFpyjGzkGTFj01Uks1QvnhFeOCkNR4W0ar/ovW8Q2vuIuI8lYQ/py+Wa4qsgp5b7nooE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1akQW0j; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788357998; c=relaxed/simple;
+	bh=EIoe2mqPEJ5mgn/d4f/HDwaO1aLOzjVQ4OAM5V7D67s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ii8+pA+DQl1cOy4mVv+UBjxzEylLCMT0xtwaGg3uic8C8HC/5qw+9fkFDlNVCVJfk28h8DqQX4nKxZ3KZUXgo16AN7LitDSiYNXu8o8vMu/Shtww7CmdtuSUYwHtuHWFmktdCo0qNhLIHtHZSzWrzU80BsRSafKLLgBhjCQRVXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ov933JCl; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=DoezQ8Ri; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=NIME0esV; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=SIyIcNby; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1akQW0j"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-854f8068301so608160b3a.0
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Sep 2026 05:52:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788353547; x=1788958347; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Vmkiwz6phO9IootCvbhHu4vPBafMAzZ/9jFbgheGL9c=;
-        b=F1akQW0j0e+rYbXXUOPh2F5SDRYNsmgKwG7q4PAj1XLlpti41qnQcL+qcetOr+dXf+
-         rqpLfhZL5O+zR7zuyZvl37iith/eaMx+jtVTzAMlwQmRLVl8VJgLzKcqd40Nqp5lXZvW
-         oJfy+VqmzC+ybaC6dNxNsnu3gGdQlAPO4A2HjjHe2JHBb0D7y01a4nrf1gThIupVNeyg
-         Di+n2fTq258vxqw59zpe7VSk21riPvrGCpwGhc8khPN1VvYIVKAuk5TT/2hk0jIvvQgw
-         Dqf1KD0wcAKj5edEF8kf2effOvk+zN7fImr2s8JW8MlUJREijo2dJ/PiSP4awz3k1xRo
-         0CFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788353547; x=1788958347;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Vmkiwz6phO9IootCvbhHu4vPBafMAzZ/9jFbgheGL9c=;
-        b=bRi601vBhTVxH5F/bGeQOS5ZK7TTZWaBzV7BcHpgWlF8GgM+gDCaXs9liq2Vj0ihx2
-         andzyWdUfU3UqFHS1rAq6T8b7s3oCq30uwFTByuNHwIreLpLWH+4XPcmoptk3IeBvcCK
-         ktlNXz9d0kQsLwMlvj+RAIqqB0YzFy3XKtbSI+05sGFJWOeqYlnaz2CRRX6CNlMWll6+
-         9YTYueSCgc8fhgMaicAt27weMkNlOAomEnd3S3xkL7SwIW/mtuElmS4Qi/2SRZssNhGA
-         3nfp4IOb/ZOrHQe8awi8ICrtWc4i1V3IYLxoxm4T000bXFSKe9g0VT0AOn2nNbq/bKmy
-         Jfig==
-X-Forwarded-Encrypted: i=1; AKwUvBzriDBIaWo887U3yi80KDy7egzDd5SrLlSrqkOLz7eLyC4OxRqucF99th46xJ7hymRYtR9VXj8PCL9I@vger.kernel.org
-X-Gm-Message-State: AFuF++koxjyjnjukdrMl7UKhZC4Znki4gKSxUfbpCLq3fZLdqpvx0sU1
-	jjOM67jyhgvQeACZHvoEQHWqPTuUgwe0wN/Vas8YjOHnKMUWLw6r+Fkz
-X-Gm-Gg: AYBFou1zWA2gx/POHAuNZQyTCaOXqoXWnhepPaRIMMaXHqExQjek7Vq5SLUS6pBpn2/
-	GMvL2FzIi2bC8r2Zb9k8SGNgja7XIDG2j24Vs4/K+rE2TPqIlYBf4d2Ouz4Dhb6OWHPbE2i18fp
-	ye2UXA5Z4k1KqPfGv+SBriGUx/ixMTzzyR6DxLWaPXm62LzwB2bn05bGha1xI5hgvaEGVeiPZd8
-	mgAy1akXih1FKe3w7jQ7ElQuvpFF/pFolo4sTwbin/6B9yQoSzDlEVyo+ZlUpVMKfpRQMycascL
-	VoFiwCFbFGL3xOmEKpoPplEoigxkcw/cZrGOz1Po3MlsJm4HoGBvJ/Ll83nAPH7bATCet7FX01n
-	oIqVHEwoYGZWB8LRpxeE4g9s+EyE9dwMDXe29CJ9IyHvU2QYX6wQhSE755J7ggXNVVrdX+aWvCc
-	k6W06Xy0W4mD26tRH3MurhLlazua95VvRZc5my1SQNNHjjUooj456SByAI3T/QZUh0jYQWpN0hY
-	Fasfzy9VpiwGMvuo5Qt8do=
-X-Received: by 2002:a05:6a00:2183:b0:857:727c:a1f5 with SMTP id d2e1a72fcca58-85ed4640011mr6382696b3a.23.1788353546711;
-        Wed, 02 Sep 2026 05:52:26 -0700 (PDT)
-Received: from localhost.localdomain ([180.101.244.66])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-85dc11fae5bsm1299104b3a.61.2026.09.02.05.52.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 05:52:26 -0700 (PDT)
-From: henrymei <ljp1205831794@gmail.com>
-X-Google-Original-From: henrymei <henrymei@tencent.com>
-To: sfrench@samba.org
-Cc: pc@manguebit.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Aohan Mei <henrymei@tencent.com>,
-	TencentOS Corvus AI <corvus@tencent.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: client: reject userspace cifs.idmap descriptions
-Date: Wed,  2 Sep 2026 20:52:13 +0800
-Message-ID: <20260902125217.3951486-1-henrymei@tencent.com>
-X-Mailer: git-send-email 2.43.7
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ov933JCl";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="DoezQ8Ri";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="NIME0esV";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="SIyIcNby"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id A162F21D17;
+	Wed,  2 Sep 2026 14:06:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1788357990; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbCDMIEfZFVatzaEEPp9gAsGk6EPyPCn6tMVBkwZzS4=;
+	b=ov933JClDQxCLII8uvFH82uzA0D7QF9xrNWMxCKvsnfyEHd1k2bBIkZdVR4LnLclFavPyp
+	Q33OLOi23RVosk0PKCgMKZN5EljSHHoaSoLCtcT7B05Zp3r/IXxNN+GIO1NpcA18j7dbuw
+	cXJQqqUyQpo/piTBpSkRIAE78TvNc7M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1788357990;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbCDMIEfZFVatzaEEPp9gAsGk6EPyPCn6tMVBkwZzS4=;
+	b=DoezQ8RitsWz+7sIQVTS50EnlsFhD8ttkA7dWRCTIkAHGBgl4t9sYkdv5+ak641PLwlpJv
+	+W7wDZ8SsaUDKnAA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1788357986; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbCDMIEfZFVatzaEEPp9gAsGk6EPyPCn6tMVBkwZzS4=;
+	b=NIME0esVzi5zNshnI5Tuo9JjESdFmxlh4Y6pYS8Xw5Vv0QjtguF4r8EZlRqhotaQj+nzLY
+	DU4DfxbXmKbCTzrPgO/mZlXhScJK78edrSeWIZN6QeE5ppNnZMKVg5KwtbYUqfG+B+7Bkn
+	nqMxy4IzqFKxKTwbm33wG8mHc/7UPLg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1788357986;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbCDMIEfZFVatzaEEPp9gAsGk6EPyPCn6tMVBkwZzS4=;
+	b=SIyIcNbyXMy+y+uWsHCZjysVfdpxmR4IybhFpzzB//aFy5zWq0fyYQpYcudwcYxY3PQ7mY
+	cgBr5HlW5PahMiAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7964213515;
+	Wed,  2 Sep 2026 14:06:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TMqdHWItmGq0fQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Wed, 02 Sep 2026 14:06:26 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 04131A13B5; Wed, 02 Sep 2026 16:06:21 +0200 (CEST)
+Date: Wed, 2 Sep 2026 16:06:21 +0200
+From: Jan Kara <jack@suse.cz>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, 
+	Seth Forshee <sforshee@kernel.org>, Paul Moore <paul@paul-moore.com>, 
+	linux-security-module@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>, 
+	linux-integrity@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>, ceph-devel@vger.kernel.org, 
+	Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>, 
+	Amir Goldstein <amir73il@gmail.com>, linux-unionfs@vger.kernel.org, 
+	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/27] userns: pass const uid_gid_map in lookup helpers
+Message-ID: <622txnxnjbd4hezoqqwf7kyfqfxuon7oapf7n4pmx2pdltb4km@riyz7tb7vzs6>
+References: <20260901-work-idmap-const-v1-0-54ccd48e100b@kernel.org>
+ <20260901-work-idmap-const-v1-1-54ccd48e100b@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260901-work-idmap-const-v1-1-54ccd48e100b@kernel.org>
+X-Spam-Score: -3.80
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email,suse.com:email];
+	RCPT_COUNT_TWELVE(0.00)[20];
+	RCVD_COUNT_THREE(0.00)[3];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,zeniv.linux.org.uk,suse.cz,lst.de,kernel.org,paul-moore.com,linux.ibm.com,gmail.com,szeredi.hu];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.cz:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
 
-From: Aohan Mei <henrymei@tencent.com>
+On Tue 01-09-26 14:14:26, Christian Brauner wrote:
+> map_id_down(), map_id_up() and map_id_range_up() search the extents
+> of an idmapping and never modify it. Let all relevant helpers pass a
+> const struct uid_gid_map. Callers can now pass pass struct mnt_idmap as
+> const and pass down &idmap->uid_map and &idmap->gid_map.
+> 
+> No functional changes.
+> 
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 
-cifs.idmap key descriptions carry authority-bearing fields (owner and
-group SIDs and uid/gid values in "os:"/"gs:"/"oi:"/"gi:" form) that the
-cifs.idmap upcall helper treats as kernel-originating inputs.  Unlike
-its sibling cifs.spnego, the cifs.idmap key type has no vet_description
-hook, so userspace can create keys of this type through
-request_key(2)/add_key(2) and supply those fields without CIFS origin.
-A request_key(2) call with a non-NULL callout then drives a root
-usermodehelper upcall (/sbin/request-key -> cifs.idmap) that consumes
-the unvetted description in root context.
+Looks good. Feel free to add:
 
-Only accept cifs.idmap descriptions while CIFS is using its private
-root_cred to request the key.  id_to_sid()/sid_to_id() already run
-under override_creds(root_cred), so the kernel-originated path is
-unaffected.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-This mirrors commit 3da1fdf4efbc ("smb: client: reject userspace
-cifs.spnego descriptions"), which applied the same restriction to
-cifs.spnego.
+								Honza
 
-Fixes: 4d79dba0e007 ("cifs: Add idmap key and related data structures and functions (try #17 repost)")
-Reported-by: TencentOS Corvus AI <corvus@tencent.com>
-Cc: stable@vger.kernel.org
-Assisted-by: CodeBuddy:Kimi-K3
-Signed-off-by: Aohan Mei <henrymei@tencent.com>
----
- fs/smb/client/cifsacl.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 12005f46307d..213a421bf8e9 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -100,8 +100,23 @@ cifs_idmap_key_destroy(struct key *key)
- 		kfree(key->payload.data[0]);
- }
- 
-+static int
-+cifs_idmap_key_vet_description(const char *description)
-+{
-+	/*
-+	 * cifs.idmap descriptions are authority-bearing inputs to the
-+	 * cifs.idmap upcall helper.  Only allow the kernel to create this
-+	 * type of key using the private root_cred installed in
-+	 * init_cifs_idmap; reject userspace request_key(2)/add_key(2).
-+	 */
-+	if (current_cred() != root_cred)
-+		return -EPERM;
-+	return 0;
-+}
-+
- static struct key_type cifs_idmap_key_type = {
- 	.name        = "cifs.idmap",
-+	.vet_description = cifs_idmap_key_vet_description,
- 	.instantiate = cifs_idmap_key_instantiate,
- 	.destroy     = cifs_idmap_key_destroy,
- 	.describe    = user_describe,
+> ---
+>  include/linux/uidgid.h  | 12 ++++++------
+>  kernel/user_namespace.c | 28 ++++++++++++++--------------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/include/linux/uidgid.h b/include/linux/uidgid.h
+> index 2dc767e08f54..02403629b49f 100644
+> --- a/include/linux/uidgid.h
+> +++ b/include/linux/uidgid.h
+> @@ -130,9 +130,9 @@ static inline bool kgid_has_mapping(struct user_namespace *ns, kgid_t gid)
+>  	return from_kgid(ns, gid) != (gid_t) -1;
+>  }
+>  
+> -u32 map_id_down(struct uid_gid_map *map, u32 id);
+> -u32 map_id_up(struct uid_gid_map *map, u32 id);
+> -u32 map_id_range_up(struct uid_gid_map *map, u32 id, u32 count);
+> +u32 map_id_down(const struct uid_gid_map *map, u32 id);
+> +u32 map_id_up(const struct uid_gid_map *map, u32 id);
+> +u32 map_id_range_up(const struct uid_gid_map *map, u32 id, u32 count);
+>  
+>  #else
+>  
+> @@ -182,17 +182,17 @@ static inline bool kgid_has_mapping(struct user_namespace *ns, kgid_t gid)
+>  	return gid_valid(gid);
+>  }
+>  
+> -static inline u32 map_id_down(struct uid_gid_map *map, u32 id)
+> +static inline u32 map_id_down(const struct uid_gid_map *map, u32 id)
+>  {
+>  	return id;
+>  }
+>  
+> -static inline u32 map_id_range_up(struct uid_gid_map *map, u32 id, u32 count)
+> +static inline u32 map_id_range_up(const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+>  	return id;
+>  }
+>  
+> -static inline u32 map_id_up(struct uid_gid_map *map, u32 id)
+> +static inline u32 map_id_up(const struct uid_gid_map *map, u32 id)
+>  {
+>  	return id;
+>  }
+> diff --git a/kernel/user_namespace.c b/kernel/user_namespace.c
+> index 0bed462e9b2a..55b6bd75624b 100644
+> --- a/kernel/user_namespace.c
+> +++ b/kernel/user_namespace.c
+> @@ -278,8 +278,8 @@ static int cmp_map_id(const void *k, const void *e)
+>   * map_id_range_down_max - Find idmap via binary search in ordered idmap array.
+>   * Can only be called if number of mappings exceeds UID_GID_MAP_MAX_BASE_EXTENTS.
+>   */
+> -static struct uid_gid_extent *
+> -map_id_range_down_max(unsigned extents, struct uid_gid_map *map, u32 id, u32 count)
+> +static const struct uid_gid_extent *
+> +map_id_range_down_max(unsigned extents, const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+>  	struct idmap_key key;
+>  
+> @@ -296,8 +296,8 @@ map_id_range_down_max(unsigned extents, struct uid_gid_map *map, u32 id, u32 cou
+>   * Can only be called if number of mappings is equal or less than
+>   * UID_GID_MAP_MAX_BASE_EXTENTS.
+>   */
+> -static struct uid_gid_extent *
+> -map_id_range_down_base(unsigned extents, struct uid_gid_map *map, u32 id, u32 count)
+> +static const struct uid_gid_extent *
+> +map_id_range_down_base(unsigned extents, const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+>  	unsigned idx;
+>  	u32 first, last, id2;
+> @@ -315,9 +315,9 @@ map_id_range_down_base(unsigned extents, struct uid_gid_map *map, u32 id, u32 co
+>  	return NULL;
+>  }
+>  
+> -static u32 map_id_range_down(struct uid_gid_map *map, u32 id, u32 count)
+> +static u32 map_id_range_down(const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+> -	struct uid_gid_extent *extent;
+> +	const struct uid_gid_extent *extent;
+>  	unsigned extents = map->nr_extents;
+>  	smp_rmb();
+>  
+> @@ -335,7 +335,7 @@ static u32 map_id_range_down(struct uid_gid_map *map, u32 id, u32 count)
+>  	return id;
+>  }
+>  
+> -u32 map_id_down(struct uid_gid_map *map, u32 id)
+> +u32 map_id_down(const struct uid_gid_map *map, u32 id)
+>  {
+>  	return map_id_range_down(map, id, 1);
+>  }
+> @@ -345,8 +345,8 @@ u32 map_id_down(struct uid_gid_map *map, u32 id)
+>   * Can only be called if number of mappings is equal or less than
+>   * UID_GID_MAP_MAX_BASE_EXTENTS.
+>   */
+> -static struct uid_gid_extent *
+> -map_id_range_up_base(unsigned extents, struct uid_gid_map *map, u32 id, u32 count)
+> +static const struct uid_gid_extent *
+> +map_id_range_up_base(unsigned extents, const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+>  	unsigned idx;
+>  	u32 first, last, id2;
+> @@ -368,8 +368,8 @@ map_id_range_up_base(unsigned extents, struct uid_gid_map *map, u32 id, u32 coun
+>   * map_id_up_max - Find idmap via binary search in ordered idmap array.
+>   * Can only be called if number of mappings exceeds UID_GID_MAP_MAX_BASE_EXTENTS.
+>   */
+> -static struct uid_gid_extent *
+> -map_id_range_up_max(unsigned extents, struct uid_gid_map *map, u32 id, u32 count)
+> +static const struct uid_gid_extent *
+> +map_id_range_up_max(unsigned extents, const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+>  	struct idmap_key key;
+>  
+> @@ -381,9 +381,9 @@ map_id_range_up_max(unsigned extents, struct uid_gid_map *map, u32 id, u32 count
+>  		       sizeof(struct uid_gid_extent), cmp_map_id);
+>  }
+>  
+> -u32 map_id_range_up(struct uid_gid_map *map, u32 id, u32 count)
+> +u32 map_id_range_up(const struct uid_gid_map *map, u32 id, u32 count)
+>  {
+> -	struct uid_gid_extent *extent;
+> +	const struct uid_gid_extent *extent;
+>  	unsigned extents = map->nr_extents;
+>  	smp_rmb();
+>  
+> @@ -401,7 +401,7 @@ u32 map_id_range_up(struct uid_gid_map *map, u32 id, u32 count)
+>  	return id;
+>  }
+>  
+> -u32 map_id_up(struct uid_gid_map *map, u32 id)
+> +u32 map_id_up(const struct uid_gid_map *map, u32 id)
+>  {
+>  	return map_id_range_up(map, id, 1);
+>  }
+> 
+> -- 
+> 2.53.0
+> 
 -- 
-2.43.7
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
