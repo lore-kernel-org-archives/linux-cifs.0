@@ -1,47 +1,47 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB3A37F739
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Sep 2026 17:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59884B1276
+	for <linux-cifs@vger.kernel.org>; Wed,  2 Sep 2026 17:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788370734; cv=none; b=XQP2RLXB2bfL6hhjjQtgDBfuoUFLpxCsmi2GDPsAZ+xxrGSesC/OorzmAKyNJg/fHev4LBR6dlYypzRqrJnvgxlXswFm2bZfInTXWl4Mh8cbvgw/MDwvmbnb9fATU30VVphKW3SoSa/+PYhzOlOEPRv4qlPm4VjVVrDlbV8Opdc=
+	t=1788370743; cv=none; b=tUSMGT2hZzT+KeSc7RmTWVM9QNkqrQpsRcptp0yL5ImFMadumMUeFMeXsvFNQOzX9KQ+LPAO2E/WrXhSu6sIz22J6YIHnyAWN/bD1/zg1oO3QRE7ckaZkw3rGNbOC18bOZUWxmHeeKjkQj0+9CpGYH7P2FVF+2OhbCRKtGfnSPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788370734; c=relaxed/simple;
-	bh=tDTSgf+S3/J6RPuJaorie96k8wgFDAi0GWhz6LW4PuY=;
+	s=arc-20240116; t=1788370743; c=relaxed/simple;
+	bh=XC9HZCdrIBllcRkCYBgFcJkGf7MKy8VVFi78dyv5/ik=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ToZ8iFRhlZ8SFZU4ZS5PwwnXMB3pxMi1nYhS4jJHgaxtO/Dd+ZUAXDvJB7eH4iuL9ZNMQRxbHqaXnZgI/ZTGuPsGQCL6DBZXmhKVkWsj96ok41GTwUEevopfGaBKIYHzPpBR4tsrLa78rz8butwKTu6ur/BaUp5USVZ6U2YmvyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aPu/8O+a; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=b+U20cUwdSj5gt3xAKZFUuTtSnVVkNRRW787BScVcdsKAdkN62WcV5TpCKw3W6WWWTm3RZjRw/7KiW6QmMIQ1Veh0ZGXOuZiXbJsRKWfo6Kk9QvNTcQiKnpXExOUn/rnsHrim7MtEtI/PaxgViZjNT8+E9mvvOmg5G98kzyVhqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gicA2nvV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aPu/8O+a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gicA2nvV"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788370729;
+	s=mimecast20190719; t=1788370737;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=xAQPSKbHDhhjvJMfHbAflRtuKuinLcohh3Mkhwc1Shc=;
-	b=aPu/8O+a0tvTInTEglGALMcm41pPnr6/J4qt/bg9arrpGy+tbo7OZTOz0+jjJ1ENMYt+gi
-	443Gfp3YM3387dO8k1/Z2mF/eiMSRdWvBnKDUq/ohAIbVqEx5YnryqiRXy5LyVkRpj+VNc
-	jkmzMzF+jVd8VI4Gy7hc/CCYhIDxbrI=
+	bh=SbbONJHaUDhDkGGWK9BkP7IsF+RViURMz0/NQExnPJo=;
+	b=gicA2nvVY/wvO6H3poKJhpkEAFlEuJz5/MmFVsvT0R19rK2NaOiquPOmPgH74eDQXoczIB
+	nnY19MFsGo4XVsGeFcBPjyWAZFkmqiRrLZ+9d/DsbqDhGyOEdl6ghT3qEweR2hCa51vtct
+	sjd3Mp6HHwmtySo4qREAJMo8CEBozlY=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-113-Mm8ZRr3qNiaQs3DsKJiHcw-1; Wed,
- 02 Sep 2026 13:38:45 -0400
-X-MC-Unique: Mm8ZRr3qNiaQs3DsKJiHcw-1
-X-Mimecast-MFC-AGG-ID: Mm8ZRr3qNiaQs3DsKJiHcw_1788370723
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-694-8jYihk-xMcWohK_zZMUEbw-1; Wed,
+ 02 Sep 2026 13:38:53 -0400
+X-MC-Unique: 8jYihk-xMcWohK_zZMUEbw-1
+X-Mimecast-MFC-AGG-ID: 8jYihk-xMcWohK_zZMUEbw_1788370730
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 166FE192DD60;
-	Wed,  2 Sep 2026 17:38:43 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A41E195604B;
+	Wed,  2 Sep 2026 17:38:50 +0000 (UTC)
 Received: from warthog.com (unknown [10.44.32.158])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2E4211800643;
-	Wed,  2 Sep 2026 17:38:36 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B35D11955F02;
+	Wed,  2 Sep 2026 17:38:44 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -66,9 +66,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v11 35/36] netfs: Clean up now-unused code
-Date: Wed,  2 Sep 2026 18:33:47 +0100
-Message-ID: <20260902173350.3468672-36-dhowells@redhat.com>
+Subject: [PATCH v11 36/36] cachefiles: Preset the state xattr when creating a new file
+Date: Wed,  2 Sep 2026 18:33:48 +0100
+Message-ID: <20260902173350.3468672-37-dhowells@redhat.com>
 In-Reply-To: <20260902173350.3468672-1-dhowells@redhat.com>
 References: <20260902173350.3468672-1-dhowells@redhat.com>
 Precedence: bulk
@@ -78,255 +78,318 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Delete now-unused code from netfslib, given the changes to the writeback
-dispatch code and the combination of ->prepare_xxx() and ->issue_xxx()
-methods.
+With a really small cache, cachefiles is likely to see a lot of writes
+hitting ENOSPC - and this can include setxattr that sets the state xattr on
+a cachefile - but we don't really want to successfully fill a cache file
+only to have to scrap it because we can't set the xattr.
+
+Instead, preset the xattr when we create the tmpfile we're going to use,
+and scrap the file at that point if we get ENOSPC.  Only if setxattr
+succeeds do we allow data to be written to the file.
+
+Note that there is a potential performance loss in that writes to the cache
+have to be delayed until this is completed - but we do the tmpfile/setxattr
+in parallel, starting when the file is opened and only have to wait once
+writeback occurs.
+
+Further, a new tracepoint, cachefiles_no_space, has been added to log ENOSPC
+events, along with a couple of subreq traces to log failure detection in
+netfslib.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
 cc: Paulo Alcantara <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Christoph Hellwig <hch@infradead.org>
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/netfs/write_issue.c | 217 -----------------------------------------
- 1 file changed, 217 deletions(-)
+ fs/cachefiles/internal.h          |  1 +
+ fs/cachefiles/io.c                | 23 ++++++++----
+ fs/cachefiles/namei.c             | 15 ++++++--
+ fs/cachefiles/xattr.c             | 59 ++++++++++++++++++++++++++++++-
+ include/trace/events/cachefiles.h | 30 +++++++++++++++-
+ include/trace/events/netfs.h      |  2 ++
+ 6 files changed, 120 insertions(+), 10 deletions(-)
 
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 0a79da073f03..9a258386a1c3 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -222,70 +222,6 @@ struct netfs_io_subrequest *netfs_alloc_write_subreq(struct netfs_io_request *wr
- 	return subreq;
+diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
+index b2605111fd56..664be64ab538 100644
+--- a/fs/cachefiles/internal.h
++++ b/fs/cachefiles/internal.h
+@@ -283,6 +283,7 @@ void cachefiles_withdraw_volume(struct cachefiles_volume *volume);
+ /*
+  * xattr.c
+  */
++int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file);
+ extern int cachefiles_set_object_xattr(struct cachefiles_object *object);
+ extern int cachefiles_check_auxdata(struct cachefiles_object *object,
+ 				    struct file *file);
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index a1580385d5fb..73c8ba01a9e2 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -672,10 +672,14 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+ 	 * space, we need to see if it's fully allocated.  If it's not, we may
+ 	 * want to cull it.
+ 	 */
+-	if (cachefiles_has_space(cache, 0, *_len / cache->bsize,
+-				 cachefiles_has_space_check) == 0)
++	ret = cachefiles_has_space(cache, 0, *_len / cache->bsize,
++				   cachefiles_has_space_check);
++	if (ret == 0)
+ 		return 0; /* Enough space to simply overwrite the whole block */
+ 
++	if (ret == -ENOBUFS)
++		trace_cachefiles_no_space(object, cachefiles_trace_write_nospace_2);
++
+ 	pos = cachefiles_inject_read_error();
+ 	if (pos == 0)
+ 		pos = vfs_llseek(file, start, SEEK_HOLE);
+@@ -704,8 +708,11 @@ int __cachefiles_prepare_write(struct cachefiles_object *object,
+ 	return ret;
+ 
+ check_space:
+-	return cachefiles_has_space(cache, 0, *_len / cache->bsize,
+-				    cachefiles_has_space_for_write);
++	ret = cachefiles_has_space(cache, 0, *_len / cache->bsize,
++				   cachefiles_has_space_for_write);
++	if (ret == -ENOBUFS)
++		trace_cachefiles_no_space(object, cachefiles_trace_write_nospace);
++	return ret;
  }
  
--#if 0 // TODO: Remove old stuff
--/*
-- * Prepare a write subrequest.  We need to allocate a new subrequest
-- * if we don't have one.
-- */
--void netfs_prepare_write(struct netfs_io_request *wreq,
--			 struct netfs_io_stream *stream,
--			 uoff_t start)
--{
--	struct netfs_io_subrequest *subreq;
--
--	subreq = netfs_alloc_subrequest(wreq, stream->source);
--	if (!subreq)
--		return;
--	subreq->start		= start;
--	subreq->stream_nr	= stream->stream_nr;
--
--	bvecq_pos_set(&subreq->dispatch_pos, &wreq->dispatch_cursor);
--
--	_enter("R=%x[%x]", wreq->debug_id, subreq->debug_index);
--
--	trace_netfs_sreq(subreq, netfs_sreq_trace_prepare);
--
--	stream->sreq_max_len	= UINT_MAX;
--	stream->sreq_max_segs	= INT_MAX;
--	switch (stream->source) {
--	case NETFS_UPLOAD_TO_SERVER:
--		netfs_stat(&netfs_n_wh_upload);
--		stream->sreq_max_len = wreq->wsize;
--		break;
--	case NETFS_WRITE_TO_CACHE:
--		netfs_stat(&netfs_n_wh_write);
--		break;
--	default:
--		WARN_ON_ONCE(1);
--		break;
--	}
--
--	if (stream->prepare_write)
--		stream->prepare_write(subreq);
--
--	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
--
--	/* We add to the end of the list whilst the collector may be walking
--	 * the list.  The collector only goes nextwards and uses the lock to
--	 * remove entries off of the front.
--	 */
--	spin_lock(&wreq->lock);
--	/* Write IN_PROGRESS before pointer to new subreq */
--	list_add_tail_release(&subreq->rreq_link, &stream->subrequests);
--	if (list_is_first(&subreq->rreq_link, &stream->subrequests)) {
--		if (!stream->active) {
--			stream->collected_to = subreq->start;
--			/* Write list pointers before active flag */
--			smp_store_release(&stream->active, true);
--		}
--	}
--
--	spin_unlock(&wreq->lock);
--
--	stream->construct = subreq;
--}
--#endif
--
- /*
-  * Advance the state of the amount of data buffered on a stream.
-  */
-@@ -368,159 +304,6 @@ int netfs_prepare_write_buffer(struct netfs_io_subrequest *subreq,
- }
- EXPORT_SYMBOL(netfs_prepare_write_buffer);
+ static int cachefiles_prepare_write_old(struct netfs_cache_resources *cres,
+@@ -757,10 +764,14 @@ static int cachefiles_issue_write(struct netfs_io_subrequest *subreq)
+ 	       wreq->debug_id, subreq->debug_index, start, start + len - 1);
  
--#if 0 // TODO: Remove old stuff
--/*
-- * Set the I/O iterator for the filesystem/cache to use and dispatch the I/O
-- * operation.  The operation may be asynchronous and should call
-- * netfs_write_subrequest_terminated() when complete.
-- */
--static void netfs_do_issue_write(struct netfs_io_stream *stream,
--				 struct netfs_io_subrequest *subreq)
--{
--	struct netfs_io_request *wreq = subreq->rreq;
--
--	_enter("R=%x[%x],%zx", wreq->debug_id, subreq->debug_index, subreq->len);
--
--	if (stream->source == NETFS_WRITE_TO_CACHE &&
--	    unlikely(test_bit(NETFS_RREQ_CACHE_STOP, &wreq->flags))) {
--		size_t dio_size = wreq->cache_resources.dio_size;
--		size_t len, disp;
--
--		disp = subreq->start & (dio_size - 1);
--		len = round_up(subreq->len + disp, dio_size);
--
--		subreq->start -= disp;
--		subreq->len = len;
--
--		__set_bit(NETFS_SREQ_CANCELLED, &subreq->flags);
--		return netfs_write_subrequest_terminated(subreq, subreq->len);
--	}
--
--	if (test_bit(NETFS_SREQ_FAILED, &subreq->flags))
--		return netfs_write_subrequest_terminated(subreq, subreq->error);
--
--	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
--	stream->issue_write(subreq);
--}
--
--void netfs_reissue_write(struct netfs_io_stream *stream,
--			 struct netfs_io_subrequest *subreq)
--{
--	// TODO: Use encrypted buffer
--	bvecq_pos_unset(&subreq->content);
--	bvecq_pos_set(&subreq->content, &subreq->dispatch_pos);
--	iov_iter_bvec_queue(&subreq->io_iter, ITER_SOURCE,
--			    subreq->content.bvecq, subreq->content.slot,
--			    subreq->content.offset,
--			    subreq->len);
--	iov_iter_advance(&subreq->io_iter, subreq->transferred);
--
--	subreq->retry_count++;
--	subreq->error = 0;
--	__clear_bit(NETFS_SREQ_MADE_PROGRESS, &subreq->flags);
--	__set_bit(NETFS_SREQ_IN_PROGRESS, &subreq->flags);
--	netfs_stat(&netfs_n_wh_retry_write_subreq);
--	netfs_do_issue_write(stream, subreq);
--}
--
--static void netfs_issue_write(struct netfs_io_request *wreq,
--			      struct netfs_io_stream *stream)
--{
--	struct netfs_io_subrequest *subreq = stream->construct;
--
--	if (!subreq)
--		return;
--
--	bvecq_pos_set(&subreq->content, &subreq->dispatch_pos);
--	iov_iter_bvec_queue(&subreq->io_iter, ITER_SOURCE,
--			    subreq->content.bvecq, subreq->content.slot,
--			    subreq->content.offset,
--			    subreq->len);
--
--	stream->construct = NULL;
--	netfs_do_issue_write(stream, subreq);
--}
--
--/*
-- * Add data to the write subrequest, dispatching each as we fill it up or if it
-- * is discontiguous with the previous.  We only fill one part at a time so that
-- * we can avoid overrunning the credits obtained (cifs) and try to parallelise
-- * content-crypto preparation with network writes.
-- */
--size_t netfs_advance_write(struct netfs_io_request *wreq,
--			   struct netfs_io_stream *stream,
--			   uoff_t start, size_t len, bool to_eof)
--{
--	struct netfs_io_subrequest *subreq = stream->construct;
--	size_t part;
--
--	if (!stream->avail) {
--		_leave("no write");
--		return len;
--	}
--
--	_enter("R=%x[%x]", wreq->debug_id, subreq ? subreq->debug_index : 0);
--
--	if (subreq && start != subreq->start + subreq->len) {
--		netfs_issue_write(wreq, stream);
--		subreq = NULL;
--	}
--
--	if (!stream->construct)
--		netfs_prepare_write(wreq, stream, start);
--	subreq = stream->construct;
--
--	part = umin(stream->sreq_max_len - subreq->len, len);
--	_debug("part %zx/%zx %zx/%zx", subreq->len, stream->sreq_max_len, part, len);
--	subreq->len += part;
--	subreq->nr_segs++;
--
--	if (subreq->len >= stream->sreq_max_len ||
--	    subreq->nr_segs >= stream->sreq_max_segs ||
--	    to_eof) {
--		netfs_issue_write(wreq, stream);
--		subreq = NULL;
--	}
--
--	return part;
--}
--
--/*
-- * Prepare and issue a subrequest.
-- * TODO: Replace with combined ->prepare/->issue call().
-- */
--static int netfs_prep_and_issue_subreq(struct netfs_io_request *wreq,
--				       struct netfs_io_stream *stream,
--				       struct netfs_io_subrequest *subreq)
--{
--	stream->sreq_max_len	= UINT_MAX;
--	stream->sreq_max_segs	= INT_MAX;
--	switch (stream->source) {
--	case NETFS_UPLOAD_TO_SERVER:
--		netfs_stat(&netfs_n_wh_upload);
--		stream->sreq_max_len = wreq->wsize;
--		break;
--	case NETFS_WRITE_TO_CACHE:
--		netfs_stat(&netfs_n_wh_write);
--		break;
--	default:
--		WARN_ON_ONCE(1);
--		break;
--	}
--
--	if (stream->prepare_write)
--		stream->prepare_write(subreq);
--	netfs_prepare_buffered_write_buffer(subreq, stream->sreq_max_segs);
--	iov_iter_bvec_queue(&subreq->io_iter, ITER_SOURCE,
--			    subreq->content.bvecq, subreq->content.slot,
--			    subreq->content.offset,
--			    subreq->len);
--	trace_netfs_sreq(subreq, netfs_sreq_trace_submit);
--	stream->issue_write(subreq);
--	return 0;
--}
--#endif
--
+ 	if (!cachefiles_cres_file(cres)) {
+-		if (!fscache_wait_for_operation(cres, FSCACHE_WANT_WRITE))
++		if (!fscache_wait_for_operation(cres, FSCACHE_WANT_WRITE)) {
++			trace_netfs_sreq(subreq, netfs_sreq_trace_cache_waitfail);
+ 			return -ENOBUFS;
+-		if (!cachefiles_cres_file(cres))
++		}
++		if (!cachefiles_cres_file(cres)) {
++			trace_netfs_sreq(subreq, netfs_sreq_trace_cache_nofile);
+ 			return -ENOBUFS;
++		}
+ 	}
+ 
+ 	ret = netfs_prepare_write_buffer(subreq, BIO_MAX_VECS);
+diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
+index a30df0f91e5e..ef656a319ede 100644
+--- a/fs/cachefiles/namei.c
++++ b/fs/cachefiles/namei.c
+@@ -117,8 +117,11 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
+ 	if (d_is_negative(subdir)) {
+ 		ret = cachefiles_has_space(cache, 1, 0,
+ 					   cachefiles_has_space_for_create);
+-		if (ret < 0)
++		if (ret < 0) {
++			if (ret == -ENOBUFS)
++				trace_cachefiles_no_space(NULL, cachefiles_trace_mkdir_nospace);
+ 			goto mkdir_error;
++		}
+ 
+ 		_debug("attempt mkdir");
+ 
+@@ -447,6 +450,11 @@ struct file *cachefiles_create_tmpfile(struct cachefiles_object *object)
+ 		pr_notice("Cache does not support read_iter and write_iter\n");
+ 		goto err_unuse;
+ 	}
++
++	/* Preallocate space for the xattr. */
++	ret = cachefiles_preset_object_xattr(object, file);
++	if (ret < 0)
++		goto err_unuse;
+ out:
+ 	cachefiles_end_secure(cache, saved_cred);
+ 	object->content_info = CACHEFILES_CONTENT_ALL;
+@@ -470,8 +478,11 @@ static bool cachefiles_create_file(struct cachefiles_object *object)
+ 
+ 	ret = cachefiles_has_space(object->volume->cache, 1, 0,
+ 				   cachefiles_has_space_for_create);
+-	if (ret < 0)
++	if (ret < 0) {
++		if (ret == -ENOBUFS)
++			trace_cachefiles_no_space(object, cachefiles_trace_create_nospace);
+ 		return false;
++	}
+ 
+ 	file = cachefiles_create_tmpfile(object);
+ 	if (IS_ERR(file))
+diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
+index 551a3b0069c2..8ebb713482e3 100644
+--- a/fs/cachefiles/xattr.c
++++ b/fs/cachefiles/xattr.c
+@@ -34,6 +34,57 @@ struct cachefiles_vol_xattr {
+ 	__u8	data[];		/* netfs volume coherency data */
+ } __packed;
+ 
++/*
++ * Preset the state xattr on a cache file to allocate space for it.
++ */
++int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file)
++{
++	struct cachefiles_xattr *buf;
++	struct dentry *dentry = file->f_path.dentry;
++	unsigned int len = object->cookie->aux_len;
++	int ret;
++
++	buf = kzalloc(sizeof(struct cachefiles_xattr) + min(len, sizeof(__be64)), GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	buf->type		= CACHEFILES_COOKIE_TYPE_DATA;
++	buf->content		= CACHEFILES_CONTENT_DIRTY;
++
++	ret = cachefiles_inject_write_error();
++	if (ret == 0) {
++		ret = mnt_want_write_file(file);
++		if (ret == 0) {
++			ret = vfs_setxattr(&nop_mnt_idmap, dentry,
++					   cachefiles_xattr_cache, buf,
++					   sizeof(struct cachefiles_xattr) + len, 0);
++			mnt_drop_write_file(file);
++		}
++	}
++	if (ret < 0) {
++		trace_cachefiles_vfs_error(object, file_inode(file), ret,
++					   cachefiles_trace_setxattr_error);
++		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
++					   object->object_size,
++					   buf->data, buf->content,
++					   cachefiles_coherency_set_fail);
++		switch (ret) {
++		case -ENOMEM:
++		case -ENOSPC:
++			break;
++		default:
++			cachefiles_io_error_obj(
++				object,
++				"Failed to set xattr with error %d", ret);
++			break;
++		}
++	}
++
++	kfree(buf);
++	_leave(" = %d", ret);
++	return ret;
++}
++
  /*
-  * Issue writes for a stream.
+  * set the state xattr on a cache file
   */
+@@ -82,10 +133,16 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
+ 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
+ 					   object_size, buf->data, buf->content,
+ 					   cachefiles_coherency_set_fail);
+-		if (ret != -ENOMEM)
++		switch (ret) {
++		case -ENOMEM:
++			break;
++		case -ENOSPC:
++		default:
+ 			cachefiles_io_error_obj(
+ 				object,
+ 				"Failed to set xattr with error %d", ret);
++			break;
++		}
+ 	} else {
+ 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
+ 					   object_size, buf->data, buf->content,
+diff --git a/include/trace/events/cachefiles.h b/include/trace/events/cachefiles.h
+index 61007729e55f..a19233e8ae78 100644
+--- a/include/trace/events/cachefiles.h
++++ b/include/trace/events/cachefiles.h
+@@ -85,11 +85,13 @@ enum cachefiles_prepare_read_trace {
+ 
+ enum cachefiles_error_trace {
+ 	cachefiles_trace_alignment_error,
++	cachefiles_trace_create_nospace,
+ 	cachefiles_trace_fallocate_error,
+ 	cachefiles_trace_getxattr_error,
+ 	cachefiles_trace_link_error,
+ 	cachefiles_trace_lookup_error,
+ 	cachefiles_trace_mkdir_error,
++	cachefiles_trace_mkdir_nospace,
+ 	cachefiles_trace_notify_change_error,
+ 	cachefiles_trace_open_error,
+ 	cachefiles_trace_read_error,
+@@ -102,6 +104,8 @@ enum cachefiles_error_trace {
+ 	cachefiles_trace_trunc_error,
+ 	cachefiles_trace_unlink_error,
+ 	cachefiles_trace_write_error,
++	cachefiles_trace_write_nospace,
++	cachefiles_trace_write_nospace_2,
+ };
+ 
+ #endif
+@@ -171,11 +175,13 @@ enum cachefiles_error_trace {
+ 
+ #define cachefiles_error_traces						\
+ 	EM(cachefiles_trace_alignment_error,	"align")		\
++	EM(cachefiles_trace_create_nospace,	"create-nospace")	\
+ 	EM(cachefiles_trace_fallocate_error,	"fallocate")		\
+ 	EM(cachefiles_trace_getxattr_error,	"getxattr")		\
+ 	EM(cachefiles_trace_link_error,		"link")			\
+ 	EM(cachefiles_trace_lookup_error,	"lookup")		\
+ 	EM(cachefiles_trace_mkdir_error,	"mkdir")		\
++	EM(cachefiles_trace_mkdir_nospace,	"mkdir-nospace")	\
+ 	EM(cachefiles_trace_notify_change_error, "notify_change")	\
+ 	EM(cachefiles_trace_open_error,		"open")			\
+ 	EM(cachefiles_trace_read_error,		"read")			\
+@@ -187,7 +193,9 @@ enum cachefiles_error_trace {
+ 	EM(cachefiles_trace_tmpfile_error,	"tmpfile")		\
+ 	EM(cachefiles_trace_trunc_error,	"trunc")		\
+ 	EM(cachefiles_trace_unlink_error,	"unlink")		\
+-	E_(cachefiles_trace_write_error,	"write")
++	EM(cachefiles_trace_write_error,	"write")		\
++	EM(cachefiles_trace_write_nospace,	"write-nospace")	\
++	E_(cachefiles_trace_write_nospace_2,	"write-nospace-2")
+ 
+ 
+ /*
+@@ -707,6 +715,26 @@ TRACE_EVENT(cachefiles_io_error,
+ 		      __entry->error)
+ 	    );
+ 
++TRACE_EVENT(cachefiles_no_space,
++	    TP_PROTO(struct cachefiles_object *obj, enum cachefiles_error_trace trace),
++
++	    TP_ARGS(obj, trace),
++
++	    TP_STRUCT__entry(
++		    __field(unsigned int,			obj)
++		    __field(enum cachefiles_error_trace,	trace)
++			     ),
++
++	    TP_fast_assign(
++		    __entry->obj	= obj ? obj->debug_id : 0;
++		    __entry->trace	= trace;
++			   ),
++
++	    TP_printk("o=%08x %s",
++		      __entry->obj,
++		      __print_symbolic(__entry->trace, cachefiles_error_traces))
++	    );
++
+ #endif /* _TRACE_CACHEFILES_H */
+ 
+ /* This part must be outside protection */
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index f43a212e4a79..8dad2211a2d7 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -102,8 +102,10 @@
+ 	EM(netfs_sreq_trace_abandoned,		"ABNDN")	\
+ 	EM(netfs_sreq_trace_add_donations,	"+DON ")	\
+ 	EM(netfs_sreq_trace_added,		"ADD  ")	\
++	EM(netfs_sreq_trace_cache_nofile,	"CA-!F")	\
+ 	EM(netfs_sreq_trace_cache_nowrite,	"CA-NW")	\
+ 	EM(netfs_sreq_trace_cache_prepare,	"CA-PR")	\
++	EM(netfs_sreq_trace_cache_waitfail,	"CA-!W")	\
+ 	EM(netfs_sreq_trace_cache_write,	"CA-WR")	\
+ 	EM(netfs_sreq_trace_cancel,		"CANCL")	\
+ 	EM(netfs_sreq_trace_clear,		"CLEAR")	\
 
