@@ -1,194 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7524AA1E6
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Sep 2026 17:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935783815CE;
+	Wed,  2 Sep 2026 17:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788370561; cv=none; b=HhR/Pvw+bZTMhwoTMabwsUw9lSGE7nc4hSfWJM0lUUuAUmyJZiorcTvvWPGxlj7IlUYe5v8wlfznmaPMdw6jy/7zp/ubM2XyySiMiXdKHgS4V5IzTbo5CJRrXdgz98teerKB9FhlrchqKvOGo74nO+IHKz77G6yX+Pem0wnP0/k=
+	t=1788370561; cv=none; b=Q+acm5lTuLqyyRLxeXXOdJX1oGRrcVXTLl9J2d3cA3u3UcFuqSedI+cGweSIognmK9D2Gqu4QKA4O7LYvFmPY+qdv928fqie8KsWrJ+oB03Psv4A3HtktSNuKyTRuQtbIY+Xjannn+1LlX3VpNRqjjV9nsMA/eMAAdl0rk8swoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788370561; c=relaxed/simple;
-	bh=hxt8zbjOTFGnpBBiqQfW+N1tChvqxp9WhUCVjYHuO9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ebYQRHEDqDcp7ibdXOQuI9Rr6QNS9ZKXsa7FVXF8HcSMNuu4av2/X8n/jchpfG8UIxXKzh4oJpfcdyWnvlAprmQ8sg8j8U/BIuxafirYsqWOgoEVNqvVHd5uf9UoyNqJnh5LWj2EEm5k+oAzvRcSUkoVA+ln8egESkHVMzOfboM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fu1u4P+Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	bh=cTWNxFcL6QFpDtQdEvB0uGdE7JwDLoFHZ3SOhFRSXkY=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=Eyr31yVVJccyw0HEBSEUx4SszkApBpgPqTTSVAzqC/CETVEJQY0wum6wZq0KkyrZvzoKKKJvbNiKzdZo+N+rId4+NSNxPyxazawG6xJEbP7WwKcyLHzvEqepoKt3vV/Vui3YXZJlNhD1xXUUdTp4hmmWOItGfE8wpo/2SrQwT2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=GsvUx0ff; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fu1u4P+Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788370558;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GsV/bFz2jJW8aQ9QDHq6eP6PICyJaBwOdY5nB5MwmFQ=;
-	b=Fu1u4P+QF3WlN45I6bFbtSc5fZVnQjjWFQ3cXc3bG6Q0eBySnFEwqk1a706mpeaiHRXtht
-	wMKzyCXWoLpbYqjofVBJUfYkcgtrO8DK1+eB0P4UAmAu0JE/lRG45pR1KN5WqYWvNKbd5y
-	l5hIwmZAE4SYfWCuSf9xaU6cLyyCr00=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-617-O2usy-VXO5y3O_vwsKYI6w-1; Wed,
- 02 Sep 2026 13:35:54 -0400
-X-MC-Unique: O2usy-VXO5y3O_vwsKYI6w-1
-X-Mimecast-MFC-AGG-ID: O2usy-VXO5y3O_vwsKYI6w_1788370552
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D391B195C241;
-	Wed,  2 Sep 2026 17:35:51 +0000 (UTC)
-Received: from warthog.com (unknown [10.44.32.158])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5DA2518005BA;
-	Wed,  2 Sep 2026 17:35:45 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Christian Brauner <christian@brauner.io>,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Hellwig <hch@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Leon Romanovsky <leon@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>
-Subject: [PATCH v11 13/36] smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
-Date: Wed,  2 Sep 2026 18:33:25 +0100
-Message-ID: <20260902173350.3468672-14-dhowells@redhat.com>
-In-Reply-To: <20260902173350.3468672-1-dhowells@redhat.com>
-References: <20260902173350.3468672-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="GsvUx0ff"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=/B848+l5fxXKXKpx4J9yfLGAcg5XFBzy/KARNVYEJaw=; b=GsvUx0ffvFqDuAUYngtRv0v2QX
+	Gxz1wTjXAxaEJFm4lULgngzKe36rymxnqI7N3D/3orYCtXxWTqqhij0SMfMm5ow5G/Xy3CIaUrCZo
+	b120rap0qkR2YNAbRcGEFZ62osVnWPCsATwqqHnWJHT0MUONsZ3kCOamOPIBsSarvUjQu5Dska5Fx
+	b7pWDFlGo4rfu6zOTdS3IIx8xLsUciLDYYjIACcj+RfVO4P5dHB+Aj6v/2AqjpEmVoXhrfuPNPXp1
+	T3Z9hoQWgaKb4c9l9pFrxD0t6YMj0vffI+9CP00z1/L0ckQqx05aCZ3rYVG/u6TzviMaO6+sYmKaD
+	AasRy66A==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1x1osO-00000000WvY-3l8y;
+	Wed, 02 Sep 2026 14:35:56 -0300
+Message-ID: <7afd24a483fc59d9217cefbab526bccf@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Fredric Cover <fredric.cover.lkernel@gmail.com>, Namjae Jeon
+ <linkinjeon@kernel.org>
+Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Tom Talpey
+ <tom@talpey.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad
+ N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>,
+ linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, Fredric Cover
+ <fredric.cover.lkernel@gmail.com>
+Subject: Re: [PATCH 2/2] smb: client: prevent out-of-bounds dfs_info3_param
+ access in copy_ref_data()
+In-Reply-To: <20260826191033.162320-3-fredric.cover.lkernel@gmail.com>
+References: <20260826191033.162320-1-fredric.cover.lkernel@gmail.com>
+ <20260826191033.162320-3-fredric.cover.lkernel@gmail.com>
+Date: Wed, 02 Sep 2026 14:35:56 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain
 
-Add support for ITER_BVECQ to smbdirect_map_sges_from_iter().
+Fredric Cover <fredric.cover.lkernel@gmail.com> writes:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-Acked-by: Stefan Metzmacher <metze@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Christoph Hellwig <hch@infradead.org>
-cc: Namjae Jeon <linkinjeon@kernel.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: Tom Talpey <tom@talpey.com>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/smb/smbdirect/connection.c | 67 +++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+> Currently, copy_ref_data() assumes that numrefs > 0, and unconditinally
+> accesses refs[0]. If copy_ref_data() somehow is passed an empty list,
+> this would cause major out-of-bounds write and read problems.
+>
+> Enforce numrefs > 0.
+>
+> Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+> ---
+>  fs/smb/client/dfs_cache.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+> index b0388c460499..b51c8355d73d 100644
+> --- a/fs/smb/client/dfs_cache.c
+> +++ b/fs/smb/client/dfs_cache.c
+> @@ -389,6 +389,9 @@ static int copy_ref_data(const struct dfs_info3_param *refs, int numrefs,
+>  	struct cache_dfs_tgt *target;
+>  	int i;
+>  
+> +	if (WARN_ON_ONCE(numrefs <= 0))
+> +		return -EINVAL;
 
-diff --git a/fs/smb/smbdirect/connection.c b/fs/smb/smbdirect/connection.c
-index 8adf58097534..f5e7e75dd809 100644
---- a/fs/smb/smbdirect/connection.c
-+++ b/fs/smb/smbdirect/connection.c
-@@ -5,6 +5,7 @@
-  */
- 
- #include "internal.h"
-+#include <linux/bvecq.h>
- #include <linux/folio_queue.h>
- 
- struct smbdirect_map_sges {
-@@ -2006,6 +2007,69 @@ static ssize_t smbdirect_map_sges_from_bvec(struct iov_iter *iter,
- 	return ret;
- }
- 
-+/*
-+ * Extract memory fragments from a BVECQ-class iterator and add them to an RDMA
-+ * list.  The fragments are not pinned.
-+ */
-+static ssize_t smbdirect_map_sges_from_bvecq(struct iov_iter *iter,
-+					     struct smbdirect_map_sges *state,
-+					     ssize_t maxsize)
-+{
-+	const struct bvecq *bq = iter->bvecq, *next;
-+	unsigned int slot = iter->bvecq_slot;
-+	ssize_t extracted = 0;
-+	size_t offset = iter->iov_offset;
-+
-+	maxsize = umin(maxsize, iov_iter_count(iter));
-+
-+	do {
-+		struct bio_vec *bv;
-+		size_t bsize;
-+
-+		while (slot >= bq->nr_slots) {
-+			next = bvecq_next(bq);
-+			if (!next) {
-+				if (WARN_ON_ONCE(maxsize > 0))
-+					return -EIO;
-+				goto out;
-+			}
-+			bq = next;
-+			slot = 0;
-+		}
-+
-+		bv = &bq->bv[slot];
-+		bsize = bv->bv_len;
-+
-+		if (offset < bsize) {
-+			size_t part = umin(maxsize, bsize - offset);
-+			bool ok;
-+
-+			ok = smbdirect_map_sges_single_page(state,
-+							    bv->bv_page,
-+							    bv->bv_offset + offset,
-+							    part);
-+			if (!ok)
-+				return -EIO;
-+
-+			offset += part;
-+			extracted += part;
-+			maxsize -= part;
-+		}
-+
-+		if (offset >= bsize) {
-+			offset = 0;
-+			slot++;
-+		}
-+	} while (state->num_sge < state->max_sge && maxsize > 0);
-+
-+out:
-+	iter->bvecq = bq;
-+	iter->bvecq_slot = slot;
-+	iter->iov_offset = offset;
-+	iter->count -= extracted;
-+	return extracted;
-+}
-+
- /*
-  * Extract fragments from a KVEC-class iterator and add them to an ib_sge list.
-  * This can deal with vmalloc'd buffers as well as kmalloc'd or static buffers.
-@@ -2155,6 +2219,9 @@ static ssize_t smbdirect_map_sges_from_iter(struct iov_iter *iter, size_t len,
- 	case ITER_BVEC:
- 		ret = smbdirect_map_sges_from_bvec(iter, state, len);
- 		break;
-+	case ITER_BVECQ:
-+		ret = smbdirect_map_sges_from_bvecq(iter, state, len);
-+		break;
- 	case ITER_KVEC:
- 		ret = smbdirect_map_sges_from_kvec(iter, state, len);
- 		break;
-
+I don't understand why this check is necessary.  All target referrals
+come from get_dfs_referral(), and in case @numrefs < 0,
+parse_dfs_referrals() would have returned -ENOENT and copy_ref_data()
+wouldn't be called.
