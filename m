@@ -1,207 +1,139 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9391739CCFB
-	for <linux-cifs@vger.kernel.org>; Wed,  2 Sep 2026 19:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE814AF16B
+	for <linux-cifs@vger.kernel.org>; Wed,  2 Sep 2026 21:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788377716; cv=none; b=k7iAzQUf1LPn/gFUW6f0DlThiDxDe4jdjZvhTp417DeS+hZ9QX6OmdUNql4ZMIeMJ44HYxXSm909+7o0y8SNudgef4Ky4i6yQHtsxGegKyN95yQCMAivluC7QPaAe5/mWrEHzNgihhs2HPGZVJIqXwO66FbOnz2v1NbYHhEmMK0=
+	t=1788384587; cv=none; b=aprJSCvsJNXo+U3sK3jq74LUj2KWX4bbvSH3UY7MnWSgT5TejZ1SQ0LGvtx3gIFASt0Ya+2koUh8J2wbcku6jo2qpeBcUTe6AV7GP9Y6sJYopzNWRFAQY3qAXQyXOBL3AZDrpp8pNQuEWNycn1p7TMoi+gojhK0F1Hqsn9r9aHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788377716; c=relaxed/simple;
-	bh=hV2MW1omBZf24pDu1TyLQ7VokUTMjJdalm/WKcqe5oQ=;
-	h=Date:Message-ID:MIME-Version:Content-Type:From:To:Cc:Subject:
-	 References:In-Reply-To; b=tOabc92Y8Z1wLAv3EzSyDHKuk/gLs4e+Bn4b9KiWDeTWOWaszuZvkvB1c04vCm2Y0IkIkPE5Ndkw51T/Go2zdkup9kHvRcLG7A8AC2ynT68jLsdjN3ovxe/NS//JZxEda3ukxGea1e+v8bDN5AU0be89a3JT/OOHAEMnYaQjxD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=GOKkdTYL; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	s=arc-20240116; t=1788384587; c=relaxed/simple;
+	bh=8ikXXU9gsjnfuEXFFzMc/pFblMUMmoXuqRxxynzibiU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uxLEBbq2hzNBybBWar8tdzK2I2vzhyX0brZVY5qRWh6bPGvMxmlSIohJCk8K0m1qq2xIBvWGpdb22H/MUo67cnfJgr4aAo+CX7PzRAIEhO52UIjiCiAKDJDBBs/eFwNIeyTvDXRjwHs9/p11RM4nsoBZb10cqo4Ws0J87NlQMYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jNMPCC2K; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KbmpHe36; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GOKkdTYL"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-92e57a753f9so176020485a.2
-        for <linux-cifs@vger.kernel.org>; Wed, 02 Sep 2026 12:35:00 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jNMPCC2K";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KbmpHe36"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1788384581;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G8/HZmSzxqzTAQEUn1qQz/Y2InSJgtncXySHZ9oVOAU=;
+	b=jNMPCC2KRie8FteS/HkAkbruhz3+dqgQZ0E+RYzui2kldYgOWNoVLX79QerWzRBlvvQOOM
+	vZspMSy5n7PvW1qiZ4BSvtK/IX68F5u8fXa9CN5vcq8eLVLR6DfmSH5qlwE+QAk87sswSb
+	1hCohIXGMT+b017sTgSDHe7IdXYYPI4=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-Y5ai6utOOYOONPqZzIG39A-1; Wed, 02 Sep 2026 17:29:39 -0400
+X-MC-Unique: Y5ai6utOOYOONPqZzIG39A-1
+X-Mimecast-MFC-AGG-ID: Y5ai6utOOYOONPqZzIG39A_1788384579
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-90cea0b5522so30378236d6.1
+        for <linux-cifs@vger.kernel.org>; Wed, 02 Sep 2026 14:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1788377695; x=1788982495; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
-         :content-type:mime-version:message-id:date:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=GC4FIfkk2kp9PFt1uwqlIhd5i3bfmRn6wjlpVpmfWwA=;
-        b=GOKkdTYLHtwfO3ngYpVGTvFI8bS9jy2AxeRMxBguqtyz+mrrUORq9lf9kDCSAKxOoR
-         I2u1MFMWwWZGUNwTNq/9I+IlnwmgCDArVPN+m+Iu/wTXYKIlMgFa93lR+Jynm0Mu4qEf
-         5PxuBOn4U3HwoWjMrUL94iXOSPSBHNeM4yrBPcctQBFB5MDB+AQSFM9k5owfyUGQEbiN
-         HUGDO1RvIz7iOVnLN1KfotthYbhUcF+ZHQXILDGx1Sj+n9/Ike59tT+7EsIK6KEFRo2/
-         Badzc6YVVwyjOiepd7sGNucttV9+0d0PqG4UHoWs9HhvSznmEOYBaD96nPZTIopNTfjc
-         ituw==
+        d=redhat.com; s=google; t=1788384579; x=1788989379; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=G8/HZmSzxqzTAQEUn1qQz/Y2InSJgtncXySHZ9oVOAU=;
+        b=KbmpHe36MvHM4vN5Z5GNR6NQOO1S74rStLC38fu6jFzOnCph+eX81jygU/x49mjbku
+         0QOD/xYu0W3GBkyKX51b1T5pHWjDtLlXzqjmuew7/Bm/3K6wpMb4wk2KIgA5y6AnoA73
+         2jYsLW3FI6dKcM26j2Yyqr2GDOgo1P4gPNfr8FAVnq/cKHVdOnfH3rnxxa+Yi4GlSuXN
+         j5bPb2g5WkuqGgnosgp9/g4gKzVJieaSJXHAPmV/OPyAx3EkEvxPl50iQ4fpZkCbPq/h
+         l3K0DZuFU9uSD8InK+rddmjQDT41UOX3BUff9zqBTGCdhYAIy5G/tpXlbNldkX3vfBsQ
+         7rhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788377695; x=1788982495;
-        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
-         :content-type:mime-version:message-id:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GC4FIfkk2kp9PFt1uwqlIhd5i3bfmRn6wjlpVpmfWwA=;
-        b=miJ4o9qqZrWW/V0K6jsq9VvLBopYLBw9b6TwEm2OHlY/JhJ0ZSDAMuFGZ/WPyvyZkG
-         X8dfIQqpGBjiCxggcNd1Yo4Kqy6Sqytd65MnsCAuxQnUI6TXs00b/HbaErzFXXchBClV
-         g1JcGalvu8aEEPxhE/y+7YTj0M4iKEvN0Te6MmRlE/DtZWDzG4m+n1QxxN2TXTL1JRpx
-         rLNMFS6B7zqn7NEpNPaAaCrlvAFrSUrNM62g5g/u6Pc+T0U3HeMVojzVMcI0bZ0sZ4Eo
-         0gDYudUfOV6TNiVapu8vavzpCE9eyWf8VtBiqi8BfPLrxUfus32Bh6H0sc3b1U/cxZ9H
-         lBYQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwxl5BsjKWo6CCXblmu6MDl/WCs0xascGs0OTg8+aukD9rQ+O8iEozlUidQiD+cnoa1IZB4KW5eU99+@vger.kernel.org
-X-Gm-Message-State: AFuF++l2FiYsex6tHpA9SDGW8aCnLfo0SXYvOAU61w24M6OiQLrNtLQS
-	n4Ll9dpuAIGJkyhfdDlmeyJKiWmtJQxWr6oAe2AYcuhl8rUYsM17VsRZSeXoZCtvPA==
-X-Gm-Gg: AYBFou0IP0vGlNkGIcw02B1t0jJQSysMflGP5WtbFPqhH/lQzMsU1YLt4ve6u46AbBX
-	lKrilEhpMLwiNIMeq5UzkPDVgmDx+5zFXoZl9hbQazQLqkkrzO1XeUBLz6hrDdhXpTUt5sAhuB0
-	SPmpCXm6KHm1HWX00y11+E1b9LYIE0C5CTBW0GhreqXUCfq76zHzHjeI0gvSdBLY54s0keApykD
-	Z7ALOmSvebb0a3IEbitDCr4arcHq4D7l4CNIE3dk8kjXiVwYdLrtLfcz8NCbEByJKU6kVEvMSPh
-	hwkcWoGKjFkRKbrOk1oLiZxO2V7Y4o3ZIoxlfq3V5/7ejQB22cql1soipIEEnhSPv+/BRAX1NLP
-	PgepFX1+TqLyiw0K2jF2cR2YbsjYW5W3an265nbZiWaqnKroZuqklJ3X/Ohn7THsk4rFM8xQPbC
-	9+69TpXWKRVR3ygdg00rjH46rW/IME2y3ks0NG7c6foY4OitQWrWepM7eLWzmOicPNBoSpEwZFn
-	61nj/oauAiXM/TuL451VBYY3hJijEJRwak=
-X-Received: by 2002:a05:620a:d94:b0:939:6de9:4cfb with SMTP id af79cd13be357-9396de968a9mr206623085a.46.1788377695492;
-        Wed, 02 Sep 2026 12:34:55 -0700 (PDT)
-Received: from localhost (pool-71-126-255-178.bstnma.fios.verizon.net. [71.126.255.178])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90e9ef0e9b1sm25737496d6.43.2026.09.02.12.34.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Sep 2026 12:34:54 -0700 (PDT)
-Date: Wed, 02 Sep 2026 15:34:53 -0400
-Message-ID: <0a5d61e6a17442e42646e98ac73dd7df@paul-moore.com>
+        d=1e100.net; s=20251104; t=1788384579; x=1788989379;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=G8/HZmSzxqzTAQEUn1qQz/Y2InSJgtncXySHZ9oVOAU=;
+        b=P+A0yLF2lgPtkq7MZk+nNv2pk9/u6nzZWxnLc7EWSVGOA2RbsA10mf9FZVvxbSVOiP
+         21mQ91ajXDkviyUI/Y76TNmc2aFscqHCM5kjyvAPMlMD8j0Y7iKQF4HxitrqCeO2RBIm
+         dFKA5lBkbL8A01hHwk8DgLYEft/ebW0See5nnBoJXhckNT3MQREDnUTDWeEysvv8qnqi
+         VnM5JO7VCiuhBZ42NfzTWbcp+4oyZNT0O8c4mdszHdyVTc1uX/3xLKINa/Vr9gVTSDJj
+         cQBegBCFUawIPzS9NtCw88KZDIngnNXjl9ynykwOCV867aiG3Ij9jiT7niI/me3/LhKc
+         GSqw==
+X-Forwarded-Encrypted: i=1; AKwUvBzslMpp7IKVx+MIFnyLsV2/LB2kqQXWpNER2Y4LfV5Cvl4pQCWEjAXJsNAqPhDf8mIn34zaMsz6o2Ii@vger.kernel.org
+X-Gm-Message-State: AFuF++lm9HdSg4u6CCugHZuMqbaONFhNBLuqXJHr+N5mpbSZatI6dXyo
+	pqLAFnc5R6Vb0fP33idq18X7YNU2Zga02ivKsYqn0v/rAfJHxSji69vuExANOkzPzFDMy4wTSLq
+	X7E/ju7jat0WZQKK+M3+gbOY9BHGQTgH37p00cWWqjWTF2PoI2C1wHcrjUbTs0Wc=
+X-Gm-Gg: AYBFou1SURrOjuHM3F0n94GX1Evwet0+WBCugz07xoUV8+YvwFPpZUFdcNRwhbk/Ed4
+	ypoSMOheob+hUmd3PQLofbyIt3VQgtjsZlC5G5Yv7r3nJT8p6Gf7yeXaBVvbZ1e46zCNjghtPoL
+	u6e+4YdUB3K7CzYMdTq/k/9ecgb5dmF0dGCju9UC0OBC9XjOVCSpO/AmQURwRicXobGpkepdPrF
+	VSxeon+F1NiXYxZ7efH7rDeSBxtTZF1aXVjFRmPF7UOL3CyWwt+6wR4r3LjPLlBk8HffsLMacQc
+	3eVGiHs/JU0IKX4R3JOkYFrzdwhVIGEb6Nom0wT08stnG+qJWuKyuM2mHqT4ylLpkR0vAtScWZb
+	IM+DiK7E8equTEFY4IoPUjMQdJzM/i+VMcvvahDYk
+X-Received: by 2002:ad4:5769:0:b0:90e:8e21:475c with SMTP id 6a1803df08f44-90ebab7cf42mr100561486d6.21.1788384579256;
+        Wed, 02 Sep 2026 14:29:39 -0700 (PDT)
+X-Received: by 2002:ad4:5769:0:b0:90e:8e21:475c with SMTP id 6a1803df08f44-90ebab7cf42mr100560936d6.21.1788384578608;
+        Wed, 02 Sep 2026 14:29:38 -0700 (PDT)
+Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-90e9f0d998dsm27152966d6.9.2026.09.02.14.29.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Sep 2026 14:29:38 -0700 (PDT)
+Message-ID: <e5dec57a-0186-4087-9de4-5037f0a09879@redhat.com>
+Date: Wed, 2 Sep 2026 16:29:36 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 
-Content-Type: text/plain; charset=UTF-8 
-Content-Transfer-Encoding: 8bit 
-X-Mailer: pstg-pwork:20260902_1319/pstg-lib:20260901_1604/pstg-pwork:20260902_1319
-From: Paul Moore <paul@paul-moore.com>
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>, Seth Forshee <sforshee@kernel.org>, linux-security-module@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>, linux-integrity@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>, ceph-devel@vger.kernel.org, Carlos Maiolino <cem@kernel.org>, linux-xfs@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>, Amir Goldstein <amir73il@gmail.com>, linux-unionfs@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, "Christian Brauner (Amutable)" <brauner@kernel.org>
-Subject: Re: [PATCH 24/27] fs: port ->setattr() to pass const mnt_idmap
-References: <20260901-work-idmap-const-v1-24-54ccd48e100b@kernel.org>
-In-Reply-To: <20260901-work-idmap-const-v1-24-54ccd48e100b@kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: sorenson@redhat.com
+Subject: Re: [PATCH v3 0/2] smb: client: fix out-of-bounds reads in
+ CIFSSMBRead()
+To: Diego Oliva <diego@bynar.io>, Paulo Alcantara <pc@manguebit.org>,
+ Namjae Jeon <linkinjeon@kernel.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+References: <20260902104207.1820332-1-diego@bynar.io>
+From: Frank Sorenson <sorenson@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260902104207.1820332-1-diego@bynar.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sep  1, 2026 Christian Brauner <brauner@kernel.org> wrote:
-> 
-> Convert to const struct mnt_idmap.
-> 
-> A mount's idmapping is immutable. The only thing that is allowed to be
-> modified afterwards is the reference count and that is hidden behind
-> mnt_idmap_get() and mnt_idmap_put(). Everything else only ever reads
-> from the idmapping. This is the same model that struct cred uses and the
-> idmapping is also rather sensitive.
-> 
-> So make the idmap argument const wherever we can. The conversion is done
-> from the bottom up so callers can continue to pass a non-const pointer
-> to a const parameter until the conversion is finished.
-> 
-> No functional changes.
-> 
-> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> ---
->  Documentation/filesystems/locking.rst     | 2 +-
->  Documentation/filesystems/vfs.rst         | 2 +-
->  arch/powerpc/platforms/cell/spufs/inode.c | 2 +-
->  fs/9p/v9fs_vfs.h                          | 2 +-
->  fs/9p/vfs_inode.c                         | 2 +-
->  fs/9p/vfs_inode_dotl.c                    | 2 +-
->  fs/adfs/adfs.h                            | 2 +-
->  fs/adfs/inode.c                           | 2 +-
->  fs/affs/affs.h                            | 2 +-
->  fs/affs/inode.c                           | 2 +-
->  fs/afs/inode.c                            | 2 +-
->  fs/afs/internal.h                         | 2 +-
->  fs/anon_inodes.c                          | 2 +-
->  fs/attr.c                                 | 2 +-
->  fs/bad_inode.c                            | 2 +-
->  fs/btrfs/inode.c                          | 2 +-
->  fs/ceph/inode.c                           | 2 +-
->  fs/ceph/super.h                           | 2 +-
->  fs/coda/coda_linux.h                      | 2 +-
->  fs/coda/inode.c                           | 2 +-
->  fs/configfs/configfs_internal.h           | 2 +-
->  fs/configfs/inode.c                       | 2 +-
->  fs/debugfs/inode.c                        | 2 +-
->  fs/ecryptfs/inode.c                       | 2 +-
->  fs/efivarfs/inode.c                       | 2 +-
->  fs/exfat/exfat_fs.h                       | 2 +-
->  fs/exfat/file.c                           | 2 +-
->  fs/ext2/ext2.h                            | 2 +-
->  fs/ext2/inode.c                           | 2 +-
->  fs/ext4/ext4.h                            | 2 +-
->  fs/ext4/inode.c                           | 2 +-
->  fs/f2fs/f2fs.h                            | 2 +-
->  fs/f2fs/file.c                            | 2 +-
->  fs/fat/fat.h                              | 2 +-
->  fs/fat/file.c                             | 2 +-
->  fs/fuse/dir.c                             | 2 +-
->  fs/gfs2/inode.c                           | 2 +-
->  fs/hfs/hfs_fs.h                           | 2 +-
->  fs/hfs/inode.c                            | 2 +-
->  fs/hfsplus/inode.c                        | 2 +-
->  fs/hostfs/hostfs_kern.c                   | 2 +-
->  fs/hpfs/hpfs_fn.h                         | 2 +-
->  fs/hpfs/inode.c                           | 2 +-
->  fs/hugetlbfs/inode.c                      | 2 +-
->  fs/inode.c                                | 2 +-
->  fs/internal.h                             | 2 +-
->  fs/jffs2/fs.c                             | 2 +-
->  fs/jffs2/os-linux.h                       | 2 +-
->  fs/jfs/file.c                             | 2 +-
->  fs/jfs/jfs_inode.h                        | 2 +-
->  fs/kernfs/inode.c                         | 2 +-
->  fs/kernfs/kernfs-internal.h               | 2 +-
->  fs/libfs.c                                | 4 ++--
->  fs/minix/file.c                           | 2 +-
->  fs/nfs/inode.c                            | 2 +-
->  fs/nfs/namespace.c                        | 2 +-
->  fs/nilfs2/inode.c                         | 2 +-
->  fs/nilfs2/nilfs.h                         | 2 +-
->  fs/ntfs/file.c                            | 2 +-
->  fs/ntfs/inode.h                           | 2 +-
->  fs/ntfs3/file.c                           | 2 +-
->  fs/ntfs3/ntfs_fs.h                        | 2 +-
->  fs/ocfs2/dlmfs/dlmfs.c                    | 2 +-
->  fs/ocfs2/file.c                           | 2 +-
->  fs/ocfs2/file.h                           | 2 +-
->  fs/omfs/file.c                            | 2 +-
->  fs/orangefs/inode.c                       | 2 +-
->  fs/orangefs/orangefs-kernel.h             | 2 +-
->  fs/overlayfs/inode.c                      | 2 +-
->  fs/overlayfs/overlayfs.h                  | 2 +-
->  fs/pidfs.c                                | 2 +-
->  fs/proc/base.c                            | 2 +-
->  fs/proc/generic.c                         | 2 +-
->  fs/proc/internal.h                        | 2 +-
->  fs/proc/proc_sysctl.c                     | 2 +-
->  fs/ramfs/file-nommu.c                     | 4 ++--
->  fs/smb/client/cifsfs.h                    | 2 +-
->  fs/smb/client/inode.c                     | 2 +-
->  fs/tracefs/event_inode.c                  | 2 +-
->  fs/tracefs/inode.c                        | 2 +-
->  fs/ubifs/file.c                           | 2 +-
->  fs/ubifs/ubifs.h                          | 2 +-
->  fs/udf/file.c                             | 2 +-
->  fs/ufs/inode.c                            | 2 +-
->  fs/ufs/ufs.h                              | 2 +-
->  fs/vboxsf/utils.c                         | 2 +-
->  fs/vboxsf/vfsmod.h                        | 2 +-
->  fs/xfs/xfs_iops.c                         | 2 +-
->  fs/zonefs/super.c                         | 2 +-
->  include/linux/fs.h                        | 6 +++---
->  include/linux/lsm_hook_defs.h             | 4 ++--
->  include/linux/nfs_fs.h                    | 2 +-
->  include/linux/security.h                  | 8 ++++----
->  mm/secretmem.c                            | 2 +-
->  mm/shmem.c                                | 2 +-
->  net/socket.c                              | 2 +-
->  security/integrity/evm/evm_main.c         | 4 ++--
->  security/integrity/ima/ima_appraise.c     | 2 +-
->  security/security.c                       | 4 ++--
->  security/selinux/hooks.c                  | 2 +-
->  security/smack/smack_lsm.c                | 2 +-
->  virt/kvm/guest_memfd.c                    | 2 +-
->  102 files changed, 112 insertions(+), 112 deletions(-)
+Hi Diego,
 
-Acked-by: Paul Moore <paul@paul-moore.com> (LSM, SELinux)
+On 9/2/26 5:42 AM, Diego Oliva wrote:
+> CIFSSMBRead() parses the server's READ_RSP without validating either
+> the length of the response or the DataOffset it carries. A malicious
+> or compromised SMB1 server can exploit either to read past the end of
+> the receive buffer, leaking adjacent kernel heap into the caller's
+> read buffer or oopsing on unmapped memory. SMB1 is not negotiated by
+> default; reaching this code requires an explicit vers=1.0 mount.
+>
+> Patch 1 rejects responses too short to contain a whole READ_RSP, so
+> the header fields can be dereferenced safely. Patch 2 ejects a
+> DataOffset/DataLength pair that falls outside the received response.
 
---
-paul-moore.com
+Your patch 2 checks that data_offset + data_length fit:
+
++		} else if ((size_t)data_offset + data_length > rsp_iov.iov_len) {
+
+but I think you may also need a lower-bound check to make sure
+data_offset is at least sizeof(READ_RSP):
+
++               } else if (data_offset < sizeof(READ_RSP)) {
+
+otherwise, the data would overlap the response header itself.
+
+Frank
+
+-- 
+Frank Sorenson
+sorenson@redhat.com
+Principal Software Maintenance Engineer, filesystems
+Red Hat
+
