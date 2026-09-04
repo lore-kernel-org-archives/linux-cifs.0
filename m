@@ -1,119 +1,213 @@
-Received: from pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.68.102])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB703EBF02;
-	Fri,  4 Sep 2026 10:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.68.102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5146F47605C;
+	Fri,  4 Sep 2026 11:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788518577; cv=none; b=jpig1krTe9MMtRK8gv4BLsDsZY6s64QJVc2o6RKLvGjqJ/6wdMo5r29ZWIeEcFoqPbJwVqca7jxvYF+Bv1O5itOUJnuYm2XPlknYov1pxzBeVxERseAS/Xg8vtSIvyJZo0zRnv1XYfFaZKKIZXCxiNaaFvOCbun7ZFzPsYhcBro=
+	t=1788520318; cv=none; b=GP8+oM4yKdKP2AXuJAgDPU3xgHgwBCyn9C4Hfv+djyDwhj+s+QiDopfYzmU41cg0xWtCVQS06BQcX9A570rbdr/uhKtaE5YZdQ6EkMo1Mz6uV6EoUZ0Zi1v/YcKVDxVA+Jh4X/nL7eIq9+Ytcpu4C04CWl/vDLDbpsrhcf58b2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788518577; c=relaxed/simple;
-	bh=Y8UTqHVFs/r62sanvMXXP9+HJolAKZbONmVh+mhmW0o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nbjILhniKHTbdFjYZbaU1FvU0bk4kAIxhpruK3M7c1syuAcHzksx88w9Bg2V7guDyPYDnokKerFDyx34olPsMbhOmYJ8SuiKiiZTvG1rjHt99QQebv6/iXFDBECQvYfm8AP8KyoqusBh5HzlVuiUnGku32xjIJKl3QhUuOi9BWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=HM232USl; arc=none smtp.client-ip=44.246.68.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1788520318; c=relaxed/simple;
+	bh=LucPl5wpiXhubkDHUJGCXwCDLV3zcb0boTvESRiFrSI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uKQN7KzPfIHdqsOvPzptvMCXXWaAXizzdQofLilQSvT0OfBnB4yLGzinf9tT8/5C12bwrMq7JkXN/JDeaM7QL0g+yfLoPavkPiC0SKnq5Ps/WqXi/kGTF+QiKsY23A+HSGREjtKKGvqetEy6x8jsnkunK1pr8cNCcLEOOHy3kkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHXvXP0q; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="HM232USl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1788518576; x=1820054576;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=cBCALBt8dP5FYvLBAGh85PuC3GAiNBF8WE57CqvCcoM=;
-  b=HM232USlgjn/qNLnOs23dj0FfxYa2YKxVPXi8cxahRUTrh8MHuc+PihA
-   6847FDoA3cfWCUD17Zg9a8YPO+JZYOrNvLRL9UBb1Syw79WOh1Lr6/xYc
-   v8xickXpDCznO035htVbBp9BekezlbMc33aYSKHaegzXty6RK0RfF6tqf
-   9VgqvhTZY6vMOkmga2lKP+GFrkd4M7N0qF8Xr6J5zX3JMK21DdFI4Xwf+
-   lmufjWSJZtHRAjDB3acv6JZTITb32d0osbDckY09LN1yJv4y2NHpG+3g/
-   iIVi+otA2f/+Z1iVk0OXeF/rSTUmB9lFYnkCb1MxCka5YnefkkOVmGsP7
-   A==;
-X-CSE-ConnectionGUID: fUVXw/NBT2GWluzFoxATqg==
-X-CSE-MsgGUID: 5uk5q8UrRwqbMB9C6o6yVA==
-X-IronPort-AV: E=Sophos;i="6.25,260,1779148800"; 
-   d="scan'208";a="27716154"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-003.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2026 10:42:53 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:28466]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.124:2525] with esmtp (Farcaster)
- id 09f58dd1-d0d9-4aa6-94d7-0237688b3269; Fri, 4 Sep 2026 10:42:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 09f58dd1-d0d9-4aa6-94d7-0237688b3269
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
- Fri, 4 Sep 2026 10:42:53 +0000
-Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.46;
- Fri, 4 Sep 2026 10:42:51 +0000
-From: Bjoern Doebel <doebel@amazon.de>
-To: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>
-CC: <stable@vger.kernel.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, "Bharath
- SM" <bharathsm@microsoft.com>, <linux-cifs@vger.kernel.org>,
-	<samba-technical@lists.samba.org>, <linux-kernel@vger.kernel.org>,
-	<doebel@amazon.de>
-Subject: [PATCH] smb: client: avoid leaking refcount when cifs_sb_tlink() fails
-Date: Fri, 4 Sep 2026 10:42:36 +0000
-Message-ID: <20260904104236.1603533-1-doebel@amazon.de>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHXvXP0q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F9F51F00A3D;
+	Fri,  4 Sep 2026 11:11:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788520316;
+	bh=TRMsq4nqQL0fBcw/P7GxsAHRsBPM0zF4AlxgHiF//tA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=XHXvXP0qoloSDDF+PJgvYn+wsZtUBr6M6yNp0gksJa5AXaWtf7CBOc5UIAvZJcgYa
+	 LFPT2wf2mU0R34aQr/hmILDsoWK41JJbs+gLcs+/XFzd/rqz83bA45xVKMA50fwjW6
+	 TYdJolvLC+86FgBbJ4qZHPUHqvvwO7shosao7BUtoyFXsHhF2HCdp1Q8wXSwWFcVFl
+	 orUaI5skPo0bJGQoRsb7ZZYHfMca0we6LEN21veggRCA7MHLxy+laoMsUekHkFAYA6
+	 ol2zkipllA0zpHWhKsA184IgFMSuSOqZaApIRPV8BPovueolntFz6c57lz3TbRtczB
+	 bFDtsa59Qi5FQ==
+Date: Fri, 4 Sep 2026 13:11:53 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jan Kara <jack@suse.cz>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Paulo Alcantara <pc@manguebit.org>, 
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] super: make iterate_supers_type() deletion-safe
+Message-ID: <20260904-rockkonzert-bergtour-dahin-23c9c5c87d0f@brauner>
+References: <20260903013336.92081-1-kmehltretter@gmail.com>
+ <32afuwcqxfzvc2qwsvx6ecpyvbunr45wnvmezbbqzz25qtfn35@tvotjvtm3soe>
+ <20260904-astronaut-anpfiff-unbebaut-743381f4995a@brauner>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260904-astronaut-anpfiff-unbebaut-743381f4995a@brauner>
 
-cifs_oplock_break() takes over the reference that
-cifs_queue_oplock_break() acquired when it queued the work, and drops it
-with _cifsFileInfo_put() once the break has been processed.
+On Fri, Sep 04, 2026 at 12:29:39PM +0200, Christian Brauner wrote:
+> On Thu, Sep 03, 2026 at 12:16:14PM +0200, Jan Kara wrote:
+> > On Thu 03-09-26 03:33:36, Karl Mehltretter wrote:
+> > > iterate_supers_type() drops sb_lock while invoking the callback and keeps
+> > > only a passive reference to the current superblock. That reference keeps
+> > > the object allocated, but does not keep its s_instances node linked.
+> > > 
+> > > After the callback releases s_umount, final teardown can unlink the current
+> > > s_instances node. The iterator then advances through a reinitialized node.
+> > > With the current hlist it stops without visiting the remaining superblocks.
+> > > The unlink moved from generic_shutdown_super() to kill_super_notify(), but
+> > > the cursor lifetime has been unsafe since the helper was introduced.
+> > > 
+> > > The CIFS DFS lookup can consequently miss a matching superblock and return
+> > > -EINVAL.
+> > > 
+> > > Walk the global superblock list in reverse and filter it by filesystem
+> > > type. A passive reference keeps its s_list node linked, and reverse
+> > > traversal preserves newest-first visitation. Superblocks removed from
+> > > fs_supers remain on the global list, but teardown marks them SB_DYING
+> > > before unlinking them, so the existing filter excludes them.
+> > > 
+> > > This broadens the scan from superblocks of one type to all superblocks.
+> > > The only in-tree caller is the CIFS DFS lookup, so the broader scan is
+> > > limited to that path.
+> > > 
+> > > Fixes: 43e15cdbefea ("new helper: iterate_supers_type()")
+> > > Cc: stable@vger.kernel.org
+> > > Assisted-by: LLM
+> > > Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> > 
+> > Good spotting! But what I'm wondering about is whether we just shouldn't
+> > move where we delete sb from fs_supers. Currently we do that in
+> > kill_super_notify() to hide the sb from sget_fc() (which would otherwise
+> > permanently retry and call test() for S_DEAD sb which can cause problems).
+> > But if we just skipped S_DEAD superblocks in sget_fc(), we could move
+> > removal from fs_supers list to put_super() (make it symmetric with the
+> > handling of super_blocks list) and that would also fix
+> > iterate_supers_type(). Christian, what do you think?
+> 
+> Yes, that might work work.
 
-Only in setups with "-o multiuser", cifs_sb_tlink() may fail, at which
-point cifs_oplock_break() returns without putting the file reference,
-mirroring the reference leak we already fixed in the companion patch to
-cifs_queue_oplock_break().
+Draft, feel free to grab, Jan or Karl.
 
-This would trigger a crash due to busy inodes on the next unmount:
-
-  BUG: Dentry ... still in use (1) [unmount of cifs cifs]
-  VFS: Busy inodes after unmount of cifs (cifs)
-
-Drop the reference on that path as well. Doing so before the out label
-mirrors the normal path, which also puts the reference before
-cifs_done_oplock_break().
-
-Found by Sashiko code review. The failure path was not exercised at
-runtime.
-
-Fixes: e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break")
-Cc: stable@vger.kernel.org
-Assisted-by: Kiro:claude-opus-5
-Signed-off-by: Bjoern Doebel <doebel@amazon.de>
 ---
- fs/smb/client/file.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ fs/kernfs/mount.c |  4 ++--
+ fs/super.c        | 39 +++++++++++++++++++--------------------
+ 2 files changed, 21 insertions(+), 22 deletions(-)
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index d7b0a9512dfa3..27b58d9072034 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -3348,8 +3348,11 @@ void cifs_oplock_break(struct work_struct *work)
- 			TASK_UNINTERRUPTIBLE);
+diff --git a/fs/kernfs/mount.c b/fs/kernfs/mount.c
+index f183a96778b9..a57399021c8b 100644
+--- a/fs/kernfs/mount.c
++++ b/fs/kernfs/mount.c
+@@ -434,8 +434,8 @@ void kernfs_kill_sb(struct super_block *sb)
+ 	up_write(&root->kernfs_supers_rwsem);
  
- 	tlink = cifs_sb_tlink(cifs_sb);
--	if (IS_ERR(tlink))
-+	if (IS_ERR(tlink)) {
-+		/* drop the reference taken when the break was queued */
-+		_cifsFileInfo_put(cfile, false /* do not wait for ourself */, false);
- 		goto out;
-+	}
- 	tcon = tlink_tcon(tlink);
- 	server = tcon->ses->server;
+ 	/*
+-	 * Remove the superblock from fs_supers/s_instances
+-	 * so we can't find it, before freeing kernfs_super_info.
++	 * Mark the superblock dead so sget_fc() can't find it,
++	 * before freeing kernfs_super_info.
+ 	 */
+ 	kill_anon_super(sb);
+ 	kfree(info);
+diff --git a/fs/super.c b/fs/super.c
+index 05e443173038..0f9e13eedb4f 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -433,15 +433,19 @@ static struct super_block *alloc_super(struct file_system_type *type, int flags,
+ void put_super(struct super_block *s)
+ {
+ 	if (refcount_dec_and_test(&s->s_passive)) {
++		struct file_system_type *type = s->s_type;
  
+ 		spin_lock(&sb_lock);
+ 		list_del_init(&s->s_list);
++		hlist_del_init(&s->s_instances);
+ 		spin_unlock(&sb_lock);
+ 
+ 		WARN_ON(s->s_dentry_lru.node);
+ 		WARN_ON(s->s_inode_lru.node);
+ 		WARN_ON(s->s_mounts);
+ 		call_rcu(&s->rcu, destroy_super_rcu);
++		/* The unlink above may touch type->fs_supers, so drop it last. */
++		put_filesystem(type);
+ 	}
+ }
+ 
+@@ -558,17 +562,6 @@ static void kill_super_notify(struct super_block *sb)
+ 	if (sb->s_flags & SB_DEAD)
+ 		return;
+ 
+-	/*
+-	 * Remove it from @fs_supers so it isn't found by new
+-	 * sget_fc() walkers anymore. Any concurrent mounter still
+-	 * managing to grab a temporary reference is guaranteed to
+-	 * already see SB_DYING and will wait until we notify them about
+-	 * SB_DEAD.
+-	 */
+-	spin_lock(&sb_lock);
+-	hlist_del_init(&sb->s_instances);
+-	spin_unlock(&sb_lock);
+-
+ 	/* Drop sget_fc()'s claim; a never-registered entry stays with the sb. */
+ 	if (sb->s_super_dev->sd_dev) {
+ 		super_dev_put(sb->s_super_dev);
+@@ -577,11 +570,15 @@ static void kill_super_notify(struct super_block *sb)
+ 
+ 	/*
+ 	 * Let concurrent mounts know that this thing is really dead.
+-	 * We don't need @sb->s_umount here as every concurrent caller
+-	 * will see SB_DYING and either discard the superblock or wait
+-	 * for SB_DEAD.
++	 * sget_fc() skips SB_DEAD superblocks and calls test() under
++	 * sb_lock, so set it under sb_lock: once we return no test()
++	 * runs on this superblock anymore and none will start. Everyone
++	 * else already saw SB_DYING and either discarded the superblock
++	 * or waits for SB_DEAD.
+ 	 */
++	spin_lock(&sb_lock);
+ 	super_wake(sb, SB_DEAD);
++	spin_unlock(&sb_lock);
+ }
+ 
+ /**
+@@ -608,7 +605,6 @@ void deactivate_locked_super(struct super_block *s)
+ 		list_lru_destroy(&s->s_dentry_lru);
+ 		list_lru_destroy(&s->s_inode_lru);
+ 
+-		put_filesystem(fs);
+ 		put_super(s);
+ 	} else {
+ 		super_unlock_excl(s);
+@@ -795,12 +791,12 @@ void generic_shutdown_super(struct super_block *sb)
+ 	}
+ 	/*
+ 	 * Broadcast to everyone that grabbed a temporary reference to this
+-	 * superblock before we removed it from @fs_supers that the superblock
+-	 * is dying. Every walker of @fs_supers outside of sget_fc() will now
+-	 * discard this superblock and treat it as dead.
++	 * superblock that it is dying. Every walker of @fs_supers outside
++	 * of sget_fc() will now discard this superblock and treat it as
++	 * dead.
+ 	 *
+-	 * We leave the superblock on @fs_supers so it can be found by
+-	 * sget_fc() until we passed sb->kill_sb().
++	 * sget_fc() keeps finding the superblock until SB_DEAD is set, so
++	 * a concurrent mounter waits until we passed sb->kill_sb().
+ 	 */
+ 	super_wake(sb, SB_DYING);
+ 	super_unlock_excl(sb);
+@@ -879,6 +875,9 @@ struct super_block *sget_fc(struct fs_context *fc,
+ 	spin_lock(&sb_lock);
+ 	if (test) {
+ 		hlist_for_each_entry(old, &fc->fs_type->fs_supers, s_instances) {
++			/* Only unlinked at the last passive reference. */
++			if (super_flags(old, SB_DEAD))
++				continue;
+ 			if (test(old, fc))
+ 				goto share_extant_sb;
+ 		}
 -- 
-2.50.1
+2.53.0
 
