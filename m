@@ -1,48 +1,46 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173F63A9D8B;
-	Sun,  6 Sep 2026 18:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E6D1A6836;
+	Sun,  6 Sep 2026 19:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788718546; cv=none; b=TfDFrl4M9xtP0Rwz4NyrhhlXQKBRUjpCq82+7pYPuPEc4xd8K7lawsLa+GUeeBuE9aGm6Gfzo3qZxGJJgE3w7mbe9Qs+BUk4vSbEg72liabiz3RtVMmWr+tMByGz7WEHZQc/foE+5mKluhDqiG7Z5ebqFXcRJFgzua1fixlQS4Q=
+	t=1788721687; cv=none; b=EM6QJKIPRYcxcRPea79PAP28oKccYA79FnOCJR1e9hTjw17hpnB6Ose6fOxN2IlGSPEkuMMDDY0u1uP/8k/SmJLrmT4wP/P7P5pxE/vvKZsldaRC0XVZ39g7Lx4/e3abawdsTEAqfECth4eKoAlVxvttl82LolBh0w2Y53eO3SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788718546; c=relaxed/simple;
-	bh=DwKl/Ybx8U39TXvM8UpOVW0Qi7LK2eu9evJzyiioO8s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lR3cKt74SsoMorLAEyDRoHvsqUhzx8DQWhIr3DcXool9aey+HWXfOS/zmKltdKQatE0d1hf9ybnZnkbTyp+kqN6cFrxwObbiBuQoXZFrsZj4Zk6/F0JgAJ4rm3+DKd/Y9HvzUdcuEBYWERgm+YEVv6uzje42WbEvUOf3GOjnSZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=vk9djoA9; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1788721687; c=relaxed/simple;
+	bh=73hW/ojDP8QUzwM/c2MQvta7xy4nuakxkwR2wIKXCQM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VeciQ6pnCjHVzMQ0S8r+K+yaLgcnO7YsKJzoO2tWblL6HM9ER0Vjvztw2GrD3BZEixHrwGlkSnlbPhw6qvzqY1R29Y862boH8IJNg7m58ZmH8xCzn2E/JkQd7MXZPHNDooFI7a8KEG30k6WP60mAf3JKxsBXBWa9/3tpJqyni8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=b6NG2Y6d; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="vk9djoA9"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="b6NG2Y6d"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
-	Content-ID:Content-Description;
-	bh=0gmucofUWueKp4eRQoBCRPC6i/o47qfE7AH8TKwPyXk=; b=vk9djoA9VV8SF2kp9W8RePYVOz
-	SXYNxDV/k0iFQNbnHv3rCE0I8RkJLevQkwIL8+jIJ9VQko3GWLSNt3PbUSP1M7bwVEOOVHuSkqv1u
-	AC52R9YRYl4YHbvab40NpribqlvajojCeVrC/dHVJGolikastAbxJ2ntn/sVTGgUoF9FyhLRxffg0
-	evs5Me+F+Xf9vJOZ7dlIXm8gIFVQlN7MelhkS63/2hfjiE9tiQaEvReR+4Nr1ct5fs4Ctn5sQX7dw
-	zuL45VqJsB2d+dPiX9f52zY84YVg+SNL5iHgAnzgxHYtlhwgCZ62tZA9ED5uJ0xQuL/cnysu/q4h2
-	NLV+qo1w==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=KK8JPDdyPpMg5VDkfRB8LYWcfgfH3UrRsjFE/UBZu9M=; b=b6NG2Y6dFYu12rAwb9NnmSLuJx
+	/S+3hMO6r2MInK+vME4xRitt9Q3Hkwtha/+Pbq2woLwQyf8+SQ3958AsRarvKRcZ2IH+wB0mmMFwH
+	TaltNyk6yCm/00MnQd90gouOnfmutM5lVJ1Zyjm/k5+9DLtt6a6xlvbkp5M+7jXZ0FNVQhWGB+F4b
+	ng0Rui/jWXAf8Vw3pJBHd4rKFoLS7nfaC2juMqN7IYr89t+Z82HMC75U9AWOWZDehkY4IwGKYq1hy
+	hVp2UR0vTwa9mCUHdM3rbzeZFae7KbFloOxniyVb2qOMzvcxojHrUcBkwfCoCpKsqgOWdOWiUsTWJ
+	DU9JtC3Q==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x3HP4-00000000nxg-1E2d;
-	Sun, 06 Sep 2026 15:15:42 -0300
+	id 1x3IDj-00000000o5c-417A;
+	Sun, 06 Sep 2026 16:08:03 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Arthur Lesuisse <arthur.lesuisse@ulb.be>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 5/5] smb: client: fix reparse point file type corruption
-Date: Sun,  6 Sep 2026 15:15:40 -0300
-Message-ID: <20260906181540.647469-5-pc@manguebit.org>
+Subject: [PATCH v3 1/7] smb: client: fix uid/gid override in getattr with posix extensions
+Date: Sun,  6 Sep 2026 16:07:57 -0300
+Message-ID: <20260906190803.667489-1-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260906181540.647469-1-pc@manguebit.org>
-References: <20260906181540.647469-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,22 +49,21 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-wsl_to_fattr() and posix_reparse_to_fattr() set the file type from
-reparse point tags (e.g. fattr->cf_mode |= S_IFCHR).  When cf_mode
-already has S_IFMT bits set by the caller, this corrupts the file
-type.
+When mounting with 'multiuser,posix' options, cifs_getattr() overrides
+the server-provided uid/gid with the current process's fsuid/fsgid.
+This is because the condition only checks for unix extensions
+(tcon->unix_ext) but not posix extensions (tcon->posix_extensions).
 
-For example, smb311_posix_info_to_fattr() sets cf_mode via
-wire_mode_to_posix() which includes S_IFREG, then calls
-cifs_reparse_point_to_fattr().  If the reparse tag indicates a
-character device, the result is S_IFREG | S_IFCHR = S_IFLNK,
-incorrectly turning the inode into a symlink.
+With SMB3 POSIX extensions, the server provides real uid/gid values
+just like with unix extensions, so they should be preserved rather
+than replaced with the caller's credentials.
 
-Fix both functions by clearing the S_IFMT bits before the switch
-statement, so the reparse point tag can set the correct file type
-without interference from previously set bits.
+Add a tcon->posix_extensions check to the condition so that uid/gid
+from the server are properly reported in stat results.
 
-Closes: https://sashiko.dev/#/patchset/20260906172005.627163-1-pc%40manguebit.org
+Reported-by: Arthur Lesuisse <arthur.lesuisse@ulb.be>
+Closes: https://lore.kernel.org/r/DB9P190MB2012266F6B8DECBE5D26A1798DB52@DB9P190MB2012.EURP190.PROD.OUTLOOK.COM
+Suggested-by: Arthur Lesuisse <arthur.lesuisse@ulb.be>
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
@@ -75,29 +72,32 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/reparse.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/smb/client/inode.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 10ef82d46d86..773ad2e21b47 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -1146,6 +1146,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
- 	fattr->cf_uid = cifs_sb->ctx->linux_uid;
- 	fattr->cf_gid = cifs_sb->ctx->linux_gid;
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 12ed8db10e00..49f9993ad567 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -2992,14 +2992,14 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
+ 		stat->attributes |= STATX_ATTR_ENCRYPTED;
  
-+	fattr->cf_mode &= ~S_IFMT;
- 	switch (tag) {
- 	case IO_REPARSE_TAG_LX_SYMLINK:
- 		fattr->cf_mode |= S_IFLNK;
-@@ -1234,6 +1235,7 @@ static bool posix_reparse_to_fattr(struct cifs_sb_info *cifs_sb,
- 		return false;
- 	}
- 
-+	fattr->cf_mode &= ~S_IFMT;
- 	switch (le64_to_cpu(buf->InodeType)) {
- 	case NFS_SPECFILE_CHR:
- 		if (le16_to_cpu(buf->ReparseDataLength) != sizeof(buf->InodeType) + 8) {
+ 	/*
+-	 * If on a multiuser mount without unix extensions or cifsacl being
+-	 * enabled, and the admin hasn't overridden them, set the ownership
+-	 * to the fsuid/fsgid of the current process.
++	 * If on a multiuser mount without unix extensions, posix extensions
++	 * or cifsacl being enabled, and the admin hasn't overridden them,
++	 * set the ownership to the fsuid/fsgid of the current process.
+ 	 */
+ 	sbflags = cifs_sb_flags(cifs_sb);
+ 	if ((sbflags & CIFS_MOUNT_MULTIUSER) &&
+ 	    !(sbflags & CIFS_MOUNT_CIFS_ACL) &&
+-	    !tcon->unix_ext) {
++	    !tcon->unix_ext && !tcon->posix_extensions) {
+ 		if (!(sbflags & CIFS_MOUNT_OVERR_UID))
+ 			stat->uid = current_fsuid();
+ 		if (!(sbflags & CIFS_MOUNT_OVERR_GID))
 -- 
 2.55.0
 
