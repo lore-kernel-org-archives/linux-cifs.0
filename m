@@ -1,44 +1,48 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C713BB13C
-	for <linux-cifs@vger.kernel.org>; Sun,  6 Sep 2026 17:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E6E35200A;
+	Sun,  6 Sep 2026 18:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788715210; cv=none; b=Fdh44z4zEX2+HuCLeYu4xUU8ygHPoHx1jdlEKVC8nmVuDArea8T7QElz5/7RoknNyu9Tun6JGiEZeWjxYwpjG99LlS4gGK34CZxaeUnjpUjydT0zouK5FQnNX54wYR9sh27JnT5kSl4rSoqX6M+AZxMA7KtPTD94ymGBi9x5HCE=
+	t=1788718544; cv=none; b=HZ6jMdqOmi8jlntbzhNL+Hm0DoraxTaAnTWWfBseFyzJWQPHBxtHPMjh4GJi9d47siledPQXlktCwwiEGRWCI7fZU0aSX+GdY/nYqrdN+gu6OwkJTRQWwaORy7DN5IwqXzQVYpmSsRXG1+jdGmnv7vjzyj9mkshD6ScwVvJvxCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788715210; c=relaxed/simple;
-	bh=7hugxxBdcOetw+5d8q0pidx4NXZ+3ItAXhF02agz+aY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BMrHmPjuupJE9zdOwL8u68P1xgK3f9EEGvgQurPB9VKcyAAaQcmt+wpjcv/VwUTK8ZjCxlxXsOtw2ShAMzW0b2PyYLC2/hqVjgX2mCJUGKd+b+uHm8H1GFtvnDYjLUIbhZYPFOCa5ZgZywtifCYlFu/jcHu8ZdimXmwN0vdXlY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=2e9O/+Xh; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1788718544; c=relaxed/simple;
+	bh=kx+0KBll47xBja+71MX4roOix4F8l3SWEEhnNuYvHws=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=f/WdthGPmWFefMRELzqb7dARGhL4h62mmOj0kgWRuo7jGJV+J6rRoAOrxv6G7toCBwM1JAsX4uT035Ek4P8NQ4Nvs5YRry1VpZOYm0fo2Yxds6P5zVqBiB5sP6ZTHpWE5GVn/1FvE3qsDBrVjEnOyDMXACix2Y+r5GFqsb22WPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=6Ry/2Ac1; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="2e9O/+Xh"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="6Ry/2Ac1"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=PxihXhoGTeejWdnkjNzx8wvmGxAyzX/t2Q9xLt1CcJc=; b=2e9O/+Xh//04Azuf2gCa2mhKTU
-	Q7P2y99cEu6f/JujGQ113KhEAmo2jcBA863+gqqKtAEWRRsBobx87q629FkDphLo2BzWnH711cxHb
-	A/mgLQd09yLEB4KgLe/GpWwxHlA6zNinAwS/1i6TLf55yDzuXTeXX3j2kAWqnv+LLrUeJInwaRtn1
-	bLf3rFi7xnMchZfllXBMa1iHW4atnVTVC9aaVHZk3ZN4BAAfzE7bQVmEgnQzKuFQmX2oXFqgWIkmt
-	FAlPAfzlOEBsaD1rYFg9ufP7mHzD0SI7lCbW5N21lqxybs6x70znBZtlBphwBF6JSExVepyPtryNj
-	q0O1/Y5Q==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=pnLE2nhzymF2E0YsAlz9oGUQqqbWaAtGELWeH4uXgSk=; b=6Ry/2Ac1eFGZpFXiKw43m8/eah
+	ukFAetYH/ZiHkioQF/Pjjj53SJFlfxWeKaVMg4ZmGnMSw9AzEGX3Iz0vlM3L6aqYy+jmdCcUjjtBj
+	cQd6AhMlkAxsT1z+rDaGHIH6yWE81bi7JKKVgbAHI/RfwlO1GalSiFzbON3PhDXEmvVPlqfmK7P+X
+	3v8LgPhct3E9YhjomgucMATSpUn4BnsstbFGEQ9zUrmUA9uVcWYeTJJDgm3FtiaRxW9VTHbvs3GGi
+	wUVFOp3bJJOaZGy4eSs5Tci9a0+K6aTXhG+HaL/u2AsZpqPr4W7BwbU8JfvEFdiLuv4uCUyN+PWlo
+	33Xk5HpA==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x3GXG-00000000nmO-12M5;
-	Sun, 06 Sep 2026 14:20:06 -0300
+	id 1x3HP3-00000000nx6-179I;
+	Sun, 06 Sep 2026 15:15:41 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 1/2] smb: client: honor forceuid/forcegid when mapping SIDs to uid/gid
-Date: Sun,  6 Sep 2026 14:20:04 -0300
-Message-ID: <20260906172005.627163-1-pc@manguebit.org>
+	stable@vger.kernel.org
+Subject: [PATCH v2 2/5] smb: client: honor forceuid/forcegid when mapping SIDs to uid/gid
+Date: Sun,  6 Sep 2026 15:15:37 -0300
+Message-ID: <20260906181540.647469-2-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260906181540.647469-1-pc@manguebit.org>
+References: <20260906181540.647469-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -67,11 +71,12 @@ extensions.
 
 Closes: https://sashiko.dev/#/patchset/20260906155816.603278-1-pc%40manguebit.org
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
 Cc: Shyam Prasad N <sprasad@microsoft.com>
 Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: stable@vger.kernel.org
 ---
  fs/smb/client/cifsacl.c | 29 ++++++++++++++++++-----------
  fs/smb/client/inode.c   |  9 +++++++--
