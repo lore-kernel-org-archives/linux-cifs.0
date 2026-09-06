@@ -1,33 +1,33 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88E32C0F8C;
-	Sun,  6 Sep 2026 19:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620643C09EE;
+	Sun,  6 Sep 2026 19:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788721687; cv=none; b=LcFLVq4iazDO3nDl7fsg1umOVSbSEiJv6DvKOFVoUCT4kP8J9sgbnWz5bXohhKLhXcibdsCp7K1KHnCtfBsIruPSK/FDmi4t5dKWJUYnWTx16es9uG81guWx76dpThVqb6+5AOo/rQ1WCDkGg/2xnrkxpO03f+WfpQOaJjHW8rA=
+	t=1788721687; cv=none; b=jcPq02mirltCBsAPxA0Ea+eH3+bd6gwEqFcRlQEv4wkL2D1WW+d5zYXN5+xJoCOViuV7khasHWPXpQgc/ftnXrqilOi2m6k+vBHy8o7GZu9s0qTj5T3gCiH0j1HOj+dBpCT+R8sFLDkNdopLqDKwiNeat25+NtSllVbBnWo/CEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788721687; c=relaxed/simple;
-	bh=kx+0KBll47xBja+71MX4roOix4F8l3SWEEhnNuYvHws=;
+	bh=oBDNTGYgepRxljjSoQnLCMvCkqERUpK6zDWGYrIuGpk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FgK30hTw5mfWjp9NNn9AomQ1jV3rRAuDn6WVbgEhsyD1BrxiSn6ZKEqniTpgv3nm3gVJ7rt6mKj+XisxW8AUMcJRU2X/K3Q3JTeB4Fs5W8yslgWFNwHz5SS/V0o1sa779Hx46yuJVDQSTVNstAc4S9DDINw21QPx4CQ0PWTYKpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=L4XhdWy9; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version; b=WKFEhuNMZtoWwAX+LRyfrO63RYBX4DTLyOFRDQgUOVZNMi3F73Gdxr+rTwDz+02ylP+LfAxLlqMhhxysa/LjuNninN+QTicGKo262Ay7it+T/CdI/s+wuHzC9IrxHs18X5hz2KgTnZn+tTioDoW+jg8CWGN62Ywqtcafbkr8BH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=d2+5vmBE; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="L4XhdWy9"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="d2+5vmBE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=pnLE2nhzymF2E0YsAlz9oGUQqqbWaAtGELWeH4uXgSk=; b=L4XhdWy9XpJGAHRfUx2tKEYT24
-	xLmo/XQ0B9qOM0EV8HSxWg7/RNrxMONkwWw1fTnAcbDv1ygUaCGoQdTM/qBX8QgtB9m8tJHGIJ+eP
-	f3LHcfuIpZ+9aenMBgVRcms5zswoi1MendyvlUB5eZIL/mUcvwBzwZZYDUX111o1z1E1vU2nIBEQP
-	HzhhGSmkru5SZGhtpOHSSwsstBuFAkOBdTDk6C/0dz16OewjMKt0/8OqVmrTNmKWqOfB7JFGGmEzQ
-	cLU1GUzBFDAPbO345SSmEVa+ymxEjyFdr9YMKzv85mQxYvw2l6pfxwVh3N6eQdyyOVJTFWoXV3ghY
-	TAwQa/eg==;
+	bh=xthyXZ7jQEhlCjI5NR3fSmX75PGPoCaKjUqDlnr3DyQ=; b=d2+5vmBEpaoHZKM4nd/nZ8c8hx
+	AWBQp/gF90whW2FOvX4ahPzWcducxEABbzUGxxUVTt3dT3RjQ4tZztwtVghuuPDTSvcZi/VYfR2tu
+	iMtXptEFbhNKFVSdWqsPdO6j+1r09swCRgcuyLXfFTDSBNuZKkIaLjchtTKinVWngKvLt9mnro9eQ
+	WG0kYPor7x4Ld5pcJA58OXrEwwOlETT5Cf3EE2nd3DJjcqN99G/5c3v4NH2M8QoDJ5KR23hYSV+Cv
+	a5klF4UBpobF8JJRsBB/+Zg5xzB/2LHvffz6VIKE3wLfuFVBiljWKZj1kvGYt+YfZmRX5JUaHDKIq
+	xRuF1ksw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x3IDk-00000000o5p-1Gkh;
+	id 1x3IDk-00000000o5z-2iPW;
 	Sun, 06 Sep 2026 16:08:04 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org
@@ -37,9 +37,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 2/7] smb: client: honor forceuid/forcegid when mapping SIDs to uid/gid
-Date: Sun,  6 Sep 2026 16:07:58 -0300
-Message-ID: <20260906190803.667489-2-pc@manguebit.org>
+Subject: [PATCH v3 3/7] smb: client: fix WSL reparse point uid/gid override
+Date: Sun,  6 Sep 2026 16:07:59 -0300
+Message-ID: <20260906190803.667489-3-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260906190803.667489-1-pc@manguebit.org>
 References: <20260906190803.667489-1-pc@manguebit.org>
@@ -51,25 +51,27 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the administrator mounts with forceuid or forcegid (uid=/gid=
-mount options), they expect all files to appear owned by the specified
-user/group.  However, several code paths unconditionally called
-sid_to_id() to overwrite cf_uid/cf_gid with server-provided values,
-ignoring the administrator's explicit override:
+wsl_to_fattr() unconditionally overwrites cf_uid/cf_gid with values
+from WSL extended attributes ($LXUID/$LXGID), ignoring the
+administrator's forceuid/forcegid mount options.  It also doesn't
+initialize the uid/gid defaults, so callers that invoke it before
+setting cf_uid/cf_gid (e.g. smb311_posix_info_to_fattr()) would
+leave zeroed values when forceuid/forcegid is set.
 
-  - smb311_posix_info_to_fattr() (stat via POSIX extensions)
-  - cifs_posix_to_fattr() (readdir via POSIX extensions)
-  - parse_sec_desc() (CIFS ACL ownership mapping)
+Additionally, when UNIX or SMB3 POSIX extensions are negotiated, the
+server already provides authoritative uid/gid and mode values through
+the extensions themselves, making the WSL reparse point EA values
+($LXUID, $LXGID, $LXMOD) redundant and potentially conflicting.
 
-This allowed an untrusted server to dictate local file ownership even
-when the mount was configured to force specific uid/gid values.
+Fix this by:
+  - Initializing cf_uid/cf_gid to the mount-specified linux_uid/
+    linux_gid defaults
+  - Gating the $LXUID/$LXGID EA parsing on CIFS_MOUNT_OVERR_UID/
+    CIFS_MOUNT_OVERR_GID
+  - Skipping $LXUID, $LXGID, and $LXMOD EA parsing entirely when
+    UNIX or POSIX extensions are active (only $LXDEV is still
+    parsed for device major/minor numbers)
 
-Fix all three call sites to check CIFS_MOUNT_OVERR_UID and
-CIFS_MOUNT_OVERR_GID before calling sid_to_id(), following the
-same pattern already used by cifs_unix_basic_to_fattr() for unix
-extensions.
-
-Closes: https://sashiko.dev/#/patchset/20260906155816.603278-1-pc%40manguebit.org
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
@@ -78,124 +80,61 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsacl.c | 29 ++++++++++++++++++-----------
- fs/smb/client/inode.c   |  9 +++++++--
- fs/smb/client/readdir.c |  9 +++++++--
- 3 files changed, 32 insertions(+), 15 deletions(-)
+ fs/smb/client/reparse.c | 30 +++++++++++++++++++++++++-----
+ 1 file changed, 25 insertions(+), 5 deletions(-)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 213a421bf8e9..def8908dd7e9 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1346,6 +1346,7 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 5cc5b0410d48..10ef82d46d86 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -1137,10 +1137,15 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+ 			 struct cifs_sb_info *cifs_sb,
+ 			 u32 tag, struct cifs_fattr *fattr)
  {
- 	int rc = 0;
- 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
++	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
 +	unsigned int sbflags = cifs_sb_flags(cifs_sb);
- 	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
- 	char *end_of_acl;
- 	__u32 dacloffset, osidoffset, gsidoffset;
-@@ -1364,17 +1365,21 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 	cifs_dbg(NOISY, "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
- 		 pntsd->revision, pntsd->type, osidoffset, gsidoffset,
- 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
--/*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
+ 	struct smb2_file_full_ea_info *ea;
+ 	bool have_xattr_dev = false;
+ 	u32 next = 0;
+ 
 +	fattr->cf_uid = cifs_sb->ctx->linux_uid;
 +	fattr->cf_gid = cifs_sb->ctx->linux_gid;
 +
- 	rc = sid_from_sd(pntsd, acl_len, osidoffset, &owner_sid_ptr);
- 	if (rc) {
- 		cifs_dbg(FYI, "%s: Error %d parsing Owner SID\n", __func__, rc);
- 		return rc;
- 	}
--	rc = sid_to_id(cifs_sb, owner_sid_ptr, fattr, SIDOWNER);
--	if (rc) {
--		cifs_dbg(FYI, "%s: Error %d mapping Owner SID to uid\n",
--			 __func__, rc);
--		return rc;
-+	if (!(sbflags & CIFS_MOUNT_OVERR_UID)) {
-+		rc = sid_to_id(cifs_sb, owner_sid_ptr, fattr, SIDOWNER);
-+		if (rc) {
-+			cifs_dbg(FYI, "%s: Error %d mapping Owner SID to uid\n",
-+				 __func__, rc);
-+			return rc;
+ 	switch (tag) {
+ 	case IO_REPARSE_TAG_LX_SYMLINK:
+ 		fattr->cf_mode |= S_IFLNK;
+@@ -1177,11 +1182,26 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+ 		nlen = ea->ea_name_length;
+ 		v = (void *)((u8 *)ea->ea_data + ea->ea_name_length + 1);
+ 
+-		if (!strncmp(name, SMB2_WSL_XATTR_UID, nlen))
+-			fattr->cf_uid = wsl_make_kuid(cifs_sb, v);
+-		else if (!strncmp(name, SMB2_WSL_XATTR_GID, nlen))
+-			fattr->cf_gid = wsl_make_kgid(cifs_sb, v);
+-		else if (!strncmp(name, SMB2_WSL_XATTR_MODE, nlen)) {
++		/*
++		 * Skip uid/gid/mode when UNIX or POSIX extensions are
++		 * active since the server provides these values through
++		 * the extensions themselves.
++		 */
++		if (tcon->unix_ext || tcon->posix_extensions) {
++			if (!strncmp(name, SMB2_WSL_XATTR_DEV, nlen)) {
++				fattr->cf_rdev = reparse_mkdev(v);
++				have_xattr_dev = true;
++			}
++			continue;
 +		}
- 	}
- 
- 	rc = sid_from_sd(pntsd, acl_len, gsidoffset, &group_sid_ptr);
-@@ -1383,11 +1388,13 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 			 __func__, rc);
- 		return rc;
- 	}
--	rc = sid_to_id(cifs_sb, group_sid_ptr, fattr, SIDGROUP);
--	if (rc) {
--		cifs_dbg(FYI, "%s: Error %d mapping Group SID to gid\n",
--			 __func__, rc);
--		return rc;
-+	if (!(sbflags & CIFS_MOUNT_OVERR_GID)) {
-+		rc = sid_to_id(cifs_sb, group_sid_ptr, fattr, SIDGROUP);
-+		if (rc) {
-+			cifs_dbg(FYI, "%s: Error %d mapping Group SID to gid\n",
-+				 __func__, rc);
-+			return rc;
-+		}
- 	}
- 
- 	if (dacloffset) {
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 49f9993ad567..1fe0ef0a95db 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -851,6 +851,7 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
- 	struct smb311_posix_qinfo *info = &data->posix_fi;
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
- 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
-+	unsigned int sbflags = cifs_sb_flags(cifs_sb);
- 
- 	memset(fattr, 0, sizeof(*fattr));
- 
-@@ -895,8 +896,12 @@ static void smb311_posix_info_to_fattr(struct cifs_fattr *fattr,
- 		fattr->cf_symlink_target = data->symlink_target;
- 		data->symlink_target = NULL;
- 	}
--	sid_to_id(cifs_sb, &data->posix_owner, fattr, SIDOWNER);
--	sid_to_id(cifs_sb, &data->posix_group, fattr, SIDGROUP);
-+	fattr->cf_uid = cifs_sb->ctx->linux_uid;
-+	fattr->cf_gid = cifs_sb->ctx->linux_gid;
-+	if (!(sbflags & CIFS_MOUNT_OVERR_UID))
-+		sid_to_id(cifs_sb, &data->posix_owner, fattr, SIDOWNER);
-+	if (!(sbflags & CIFS_MOUNT_OVERR_GID))
-+		sid_to_id(cifs_sb, &data->posix_group, fattr, SIDGROUP);
- 
- 	cifs_dbg(FYI, "POSIX query info: mode 0x%x uniqueid 0x%llx nlink %d\n",
- 		fattr->cf_mode, fattr->cf_uniqueid, fattr->cf_nlink);
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index 32a75afca8f5..1ea84f4ada39 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -242,6 +242,7 @@ static void
- cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- 		    struct cifs_sb_info *cifs_sb)
- {
-+	unsigned int sbflags = cifs_sb_flags(cifs_sb);
- 	struct smb2_posix_info_parsed parsed;
- 
- 	posix_info_parse(info, NULL, &parsed);
-@@ -281,8 +282,12 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- 		 le32_to_cpu(info->ReparseTag),
- 		 le32_to_cpu(info->Mode));
- 
--	sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
--	sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
-+	fattr->cf_uid = cifs_sb->ctx->linux_uid;
-+	fattr->cf_gid = cifs_sb->ctx->linux_gid;
-+	if (!(sbflags & CIFS_MOUNT_OVERR_UID))
-+		sid_to_id(cifs_sb, &parsed.owner, fattr, SIDOWNER);
-+	if (!(sbflags & CIFS_MOUNT_OVERR_GID))
-+		sid_to_id(cifs_sb, &parsed.group, fattr, SIDGROUP);
- }
- 
- static void __dir_info_to_fattr(struct cifs_fattr *fattr, const void *info)
++
++		if (!strncmp(name, SMB2_WSL_XATTR_UID, nlen)) {
++			if (!(sbflags & CIFS_MOUNT_OVERR_UID))
++				fattr->cf_uid = wsl_make_kuid(cifs_sb, v);
++		} else if (!strncmp(name, SMB2_WSL_XATTR_GID, nlen)) {
++			if (!(sbflags & CIFS_MOUNT_OVERR_GID))
++				fattr->cf_gid = wsl_make_kgid(cifs_sb, v);
++		} else if (!strncmp(name, SMB2_WSL_XATTR_MODE, nlen)) {
+ 			/* File type in reparse point tag and in xattr mode must match. */
+ 			if (S_DT(fattr->cf_mode) != S_DT(le32_to_cpu(*(__le32 *)v)))
+ 				return false;
 -- 
 2.55.0
 
