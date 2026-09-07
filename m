@@ -1,100 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD03501F47;
-	Mon,  7 Sep 2026 15:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C923403EF;
+	Mon,  7 Sep 2026 17:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788794096; cv=none; b=PHE6KHcPK0rJfQ34pkFnCIanWBDKk6OWY3yiKqEjHGsJ4dRvd5ChZPEC1kGAm9GfHKzZtG9SVutAiE6iRz9p7s3ZgfizQL6Ay2TpHDPNP0fwS+wob8PY6zfbS2eqlXk3ZwvYK/DLdHhZQPyPyDQFKS7BsN1W6embPabwrro37KA=
+	t=1788803988; cv=none; b=mrSSO6+or34k/nv007CZXBt3jNtWzKaJLUI68kbQLyc+G1WYcsZPgSidXAa+RyOMB1jfZYtjZycKHAbW4PTJJwG6FgTHWOueW7f3HA1J8pdVCxC6mZ2Nwd0LBLp1kErCV7fEbF1pFY+BQQ4wHSvNZ5nmBLKfJobpV6wuGVhuo/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788794096; c=relaxed/simple;
-	bh=UE3DvX9k8x91jIsR3T7WdH/vrR1IFqo7ESsc1dwiytk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qdt5/rQx3NVz2xl5o3p/7RYgWSRHTA2pLMsQI11aRGQFENUx0ZfJZ8JTlYXF4BBJOxoH2gAkwVO7PnQ1XhTrxt5oVbdF47a/FXB5MKNPmH8w7esV79qkEy1UT7mpHZrt96MckzyXrX9bC7lt+Jcc2LjFOgh5m1J3z26aO62IFyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bblvdamh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788803988; c=relaxed/simple;
+	bh=IMHU+H5IfHFb3lkocPMvQu1REuBAuXAi57pRFXui07Y=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=az+1+z9SBvMom2ImPv4c17RbCevkXxqua0CC+LEoBzRUf6jFWO7ZoHoNs4lrF2Q1r25zv/yP90ssMHkfyvsp4MPUnncT/dyVuCkqrUijwXne8KGdXAUOWXjRuvamS1dlDpzfSJVbS9UZ+YGbNTaSTVlzVnww6RwVMQDwpFO/D3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=eNQi31c2; arc=none smtp.client-ip=44.245.243.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bblvdamh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25AD01F00A3F;
-	Mon,  7 Sep 2026 15:14:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788794094;
-	bh=L3r8c6+2/cREJq285zS5xtPxoOkK62q7YUlNvEziciQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Bblvdamh4/ffjVkZz4S7Q9Ostc2j0eHA/VFGEGaEhJLVftS5MdHNiUoa4CBn0BDnl
-	 9uNG2cjDq/YxJXhPiVfijgjlRulHhkDHB2XYDneiwVC/HYbfLjc7eLAYf+A5qQyZ9L
-	 bOGoQ2WeOjjUZphkwOJ8nz0wTTy0yr0VeHfqFIMfoLGWUFWunGT8HcaiNJ5r7EpEze
-	 G7qp9VUV/o72jv/osthqUBS1Imhzi75TxCdJQTm2FRWx5f3rJ3DkHZ7ligczQIHS6a
-	 cUhR1NbnnWHqVZxS4f5gq+YQpGIYP7Y2taf/8S60uAZoUnLCwJ2gHuSTqRVYOgVqhT
-	 0nLtKjWk3iL3g==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18.y 3/4] cifs: Scripted clean up fs/smb/client/fscache.h
-Date: Mon,  7 Sep 2026 11:14:48 -0400
-Message-ID: <20260907151449.3749114-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260907151449.3749114-1-sashal@kernel.org>
-References: <2026090335-figure-bright-e488@gregkh>
- <20260907151449.3749114-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="eNQi31c2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
+  t=1788803987; x=1820339987;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XvTUmXvoh3a7PVjRYBNX6k3gA2v6vhjklyK/IlRTA04=;
+  b=eNQi31c2HxDXHKFFVZrpO3G035+pBZCnFws9izvWiKAoAYNgxTMGizaW
+   CFDe4dQXptl9L2XCKrAX3PJP5bhYBcr92mzr6ftjm2xNVxqA+04UGJKFi
+   3Odjcs/N7OVDCqcajyFSVo5r8gjWqlEbwXyxv345CVEJcrlEpd40f1dvx
+   qwvr0+oHl1RtCOynSDXMAY68X5Tyo5+TlR6n2Z2fcCmbdMWI06XpSZIrv
+   RWjBkmgC7OAU18VkEyk1szU/xF3R4XDy6MhqMzfUxxnoXbWzb3akWy1t9
+   TpkBQVCcEXWk/okTRaHKx02zbczGAFGyZQEYugxQ9Dlh5RHYMgeyzHuMc
+   Q==;
+X-CSE-ConnectionGUID: R6RwG5VaTzOOg+RciZqnyw==
+X-CSE-MsgGUID: EmefM6qNRKuIXsI3+N+w+w==
+X-IronPort-AV: E=Sophos;i="6.25,267,1779148800"; 
+   d="scan'208";a="27553766"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2026 17:59:44 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:4674]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.124:2525] with esmtp (Farcaster)
+ id 0247be03-975d-4825-9943-6503bfd3dd67; Mon, 7 Sep 2026 17:59:44 +0000 (UTC)
+X-Farcaster-Flow-ID: 0247be03-975d-4825-9943-6503bfd3dd67
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
+ Mon, 7 Sep 2026 17:59:44 +0000
+Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.46;
+ Mon, 7 Sep 2026 17:59:43 +0000
+From: Bjoern Doebel <doebel@amazon.de>
+To: Namjae Jeon <linkinjeon@kernel.org>
+CC: Bjoern Doebel <doebel@amazon.de>, <linux-cifs@vger.kernel.org>,
+	<pc@manguebit.org>, <ronniesahlberg@gmail.com>, <sprasad@microsoft.com>,
+	<tom@talpey.com>, <bharathsm@microsoft.com>,
+	<samba-technical@lists.samba.org>, <stable@vger.kernel.org>
+Subject: Re: [PATCH] smb: client: fix heap overflow in DACL owner/group rewrite
+Date: Mon, 7 Sep 2026 17:59:23 +0000
+Message-ID: <ap77V8bEpMjSvdOj@amazon.de>
+X-Mailer: git-send-email 2.50.1
+In-Reply-To: <CAKYAXd8r-zvLH6Ecxu33jDAjM_6Uv2KFS4Naa-tYFHAwntgreQ@mail.gmail.com>
+References: <20260709155440.2132459-1-doebel@amazon.de> <20260904125844.1803343-1-doebel@amazon.de> <CAKYAXd8r-zvLH6Ecxu33jDAjM_6Uv2KFS4Naa-tYFHAwntgreQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-From: David Howells <dhowells@redhat.com>
+Hi Namjae,
 
-[ Upstream commit bc3de356aae666de5d8b5131545be87cf7754431 ]
+On Sat, Sep 05, 2026 at 10:15:37AM +0900, Namjae Jeon wrote:
+> > @@ -1815,11 +1815,13 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
+> >                                 cifs_put_tlink(tlink);
+> >                                 return rc;
+> >                         }
+> > -                       if (mode_from_sid)
+> > -                               nsecdesclen +=
+> > -                                       le16_to_cpu(dacl_ptr->num_aces) * sizeof(struct smb_ace);
+> > -                       else /* cifsacl */
+> > -                               nsecdesclen += le16_to_cpu(dacl_ptr->size);
+> > +                       /*
+> > +                        * Worst case: every ACE is rewritten with a new SID of
+> > +                        * SID_MAX_SUB_AUTHORITIES sub-auths -> sizeof(smb_ace) each,
+> > +                        * plus the smb_acl header replace_sids_and_copy_aces() emits.
+> Since you mentioned replace_sids_and_copy_aces(), please check whether
+> replace_sids_and_copy_aces() also has a potential overflow issue.
 
-Remove externs, correct argument names and reformat declarations.
+That looks sensible. I'll send a followup v3 (the original patch also
+needs an update to the Fixes: tag, as you point out.)
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Stable-dep-of: 65deb1835934 ("smb: client: reject a tree connect response whose byte count is too small")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/fscache.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index f06cb24f5f3cf..b6c94db5edb94 100644
---- a/fs/smb/client/fscache.h
-+++ b/fs/smb/client/fscache.h
-@@ -38,12 +38,12 @@ struct cifs_fscache_inode_coherency_data {
- /*
-  * fscache.c
-  */
--extern int cifs_fscache_get_super_cookie(struct cifs_tcon *);
--extern void cifs_fscache_release_super_cookie(struct cifs_tcon *);
-+int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon);
-+void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon);
- 
--extern void cifs_fscache_get_inode_cookie(struct inode *inode);
--extern void cifs_fscache_release_inode_cookie(struct inode *);
--extern void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
-+void cifs_fscache_get_inode_cookie(struct inode *inode);
-+void cifs_fscache_release_inode_cookie(struct inode *inode);
-+void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
- 
- static inline
- void cifs_fscache_fill_coherency(struct inode *inode,
--- 
-2.53.0
+Bjoern
 
