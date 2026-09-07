@@ -1,49 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F411E3EC2FF;
-	Mon,  7 Sep 2026 14:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15C4471265;
+	Mon,  7 Sep 2026 15:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788791977; cv=none; b=JuWx8TZT3NNKSHL3HTmjOjckWGjDPLzdCTU/3oFkPcbZfMr1zs2bUHnxjqlEY75qxbqypbND/HekrUgYOs2kSdneB2+D9NUtw8jj2digJYTC2CN+gNZaGG6zNld+3koe5Sf6hCXj9GMCW8VyUeFRDnCKkbn+8GWbm1zprODqCwc=
+	t=1788793265; cv=none; b=uXue4A6x34z1ZD6ZpGG4WEn5IahQw+AlD6t+eXxg88Cgyj+oEYT5FxLvsmVVKrwMClYBs3I/tET4jCLBr2iMBlz5gybSSHayWrkBK3wRArXF+tF35zB5z4WC/bHIUcXuxzKeCnugxzZicmAlAkyDu2s0yriDIoxSk9MF5lrJqZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788791977; c=relaxed/simple;
-	bh=/bz/aFQQ20nFyliaYCaAIcREn7Se1rhUXGzYfo0Ic0k=;
+	s=arc-20240116; t=1788793265; c=relaxed/simple;
+	bh=39UUn2yP1cvDjmc+zrH9fSz2Egeo6asXiU4UJKKQ/6U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YAz0nEaRQWZ9oBiBJG6/b2DJKXz9c9WzJ5rgaugIpa7mpF7TqpWf1FOtIKuRicPE9CfAfzMntPRD2HVF/mIf+3gMsSHMZA+uQFIUMSytyGw1Q4GC8xyzXAzZsyqOIio0QQK+QFNJwCKC/x40XetPdobQf1IkOhNC2mkUXMzdQM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjM0/9i/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=CtiWWjq216Jc7lP3yzgpTIyz7n+VdIx+NG/5wKHaMrKjondiY5DNivpmeQEojpPbe+1p5hr3muo1D/PtLbMDIyxM1ewq4ZuGps5sSf0HgPFV/h46LzuPkz575rypP1V3iMhwp26K2cLNyrpR2836xpDDaMj0KIaY+FFolbIxiiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AX7YCDaY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjM0/9i/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0462B1F00A3F;
-	Mon,  7 Sep 2026 14:39:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AX7YCDaY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF951F00A3F;
+	Mon,  7 Sep 2026 15:01:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788791969;
-	bh=DSub+hZOtRHGsN+2zPdK5QKBiPWxfufgnD+1IXXZLf0=;
+	s=k20260515; t=1788793263;
+	bh=jcDm/y4MbLmKD+TCAj3jOJ//yimwJBq82zL8M3HhO10=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=jjM0/9i/h6ry7glcyv8ofb+uVX+bNoBCwX0AxVPTg18WklFHwIgbrEzu+yMwxulh5
-	 Quti9XGla5aKFuA+FAbD08h+uSRL5vkROkWhwqkH6t72UveXyLQd9fJPYISzoSV/s8
-	 05Dfb58H9AHolNqNgYpgo++hrcr7172SIvfyv+FxDGhJgRXfQYnxUzi3rvKLlioMqv
-	 FmdqVbNtIOyBv5AzcTuK17pZsRrlmKFPbCUmzuILqu9JALnYD4buGfAB6bfViJmdTR
-	 UN4D+4TBDlEAuD4q1+CD+eNzhR9j7dlfdbtlxsSjI9ph2McTbWlf0nSJ0fx3eb8WYA
-	 lH5loGiZu4Upw==
+	b=AX7YCDaYg9hJMzCWm6GrKL6vZYyRDcaBWVoXReYMkdPmx3O8stnMYj6cjSea/7DNs
+	 oklq0XQoD6Uv5M5MjG6D678Znq81WM2LA4EgfASv8E41VnB78rU6H6kL8WeAhzRs/F
+	 XkHWbLn8mehBQfLfVOM1b2sfml5yxPaA5nMlCmjMjdTf+Y2MPuIPh98ChtfcdsTNMe
+	 ovgA2LCHc2NH3dK2yo1rT8puj85+qfZ/NPXs1rTVqB/EW2N4wtn5O06sRnImbrt7w0
+	 LE83U4p/YJIkL03VrxXtywin88MMZlAZxck9inZWGHBFh47qtGOmlzKHvEaJTRvVQa
+	 h818hioZw9gZg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6.y 3/4] cifs: SMB1 split: Separate out SMB1 decls into smb1proto.h
-Date: Mon,  7 Sep 2026 10:39:22 -0400
-Message-ID: <20260907143923.3586545-3-sashal@kernel.org>
+Subject: [PATCH 6.12.y 2/6] cifs: Do some preparation prior to organising the function declarations
+Date: Mon,  7 Sep 2026 11:00:55 -0400
+Message-ID: <20260907150059.3712249-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260907143923.3586545-1-sashal@kernel.org>
-References: <2026090352-renegade-sneeze-d3c6@gregkh>
- <20260907143923.3586545-1-sashal@kernel.org>
+In-Reply-To: <20260907150059.3712249-1-sashal@kernel.org>
+References: <2026090303-ashamed-silver-ed5c@gregkh>
+ <20260907150059.3712249-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -54,561 +50,414 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit 645427b7a6c59e0074df29bf939aec2e9d6f2819 ]
+[ Upstream commit 32a60868093aed5ccaa5e57f3b57f791f22ac133 ]
 
-Separate out SMB1 declarations scriptedly into smb1proto.h.  Script below:
+Make some preparatory cleanups prior to running a script to organise the
+function declarations within the fs/smb/client/ headers.  These include:
 
-	#!/usr/bin/perl -w
-	use strict;
-	unless (@ARGV) {
-	    die "Usage: $0 <c_file1> [<c_file2> ...]\n";
-	}
+ (1) Remove "inline" from the dummy cifs_proc_init/clean() functions as
+     they are in a .c file.
 
-	# Data tracking
-	my %funcs = ();		# Func name => { func prototype }
-	my %headers = ();	# Header filename => { header content }
-	my %c_files = ();	# C filename => { ordered func list, header pref }
-	my %cmarkers = ();	# C filename marker => { header filename it's in }
+ (2) Move should_compress()'s kdoc comment to the .c file and remove kdoc
+     markers from the comments.
 
-	# Parse state
-	my $pathname = "-";
-	my $lineno = 0;
+ (3) Rename CIFS_ALLOW_INSECURE_LEGACY in #endif comments to have CONFIG_
+     on the front to allow the script to recognise it.
 
-	sub error(@) {
-	    print STDERR $pathname, ":", $lineno, ": ", @_, "\n";
-	    exit(1);
-	}
+ (4) Don't let comments have bare words at the left margin as that confused
+     the simplistic function detection code in the script.
 
-	sub pad($) {
-	    # Reindent the function arguments to line the arguments up with the char
-	    # after the opening bracket on the func argument list
-	    my ($lines) = @_;
-	    return $lines if ($#{$lines} <= 0);
-	    my $has_empty = 0;
-	    for (my $i = 0; $i <= $#{$lines}; $i++) {
-		$lines->[$i] =~ s/^[ \t]+//;
-		$has_empty = 1 if ($lines->[$i] eq "");
-	    }
+ (5) Adjust some argument lists so that when and if the cleanup script is
+     run they don't end up over 100 chars.
 
-	    if ($has_empty) {
-		my @clean = grep /.+/, @{$lines};
-		$lines = \@clean;
-	    }
+ (6) Fix a few comments to have missing '*' added or the "*/" moved to
+     their own lines so that checkpatch doesn't moan over the cleanup
+     script patch.
 
-	    my $indlen = index($lines->[0], "(");
-	    return $lines if ($indlen < 0);
-	    my $indent = "";
-	    $indlen++;
-	    $indent .= "\t" x ($indlen / 8);
-	    $indent .= " " x ($indlen % 8);
+ (7) Move struct cifs_calc_sig_ctx to cifsglob.h.
 
-	    my @padded = ();
-	    my $acc = "";
-	    my $len = -$indlen;
-	    for (my $i = 0; $i <= $#{$lines}; $i++) {
-		my $argument = $lines->[$i];
-		my $arglen = length($argument);
-		my $last = ($i == $#{$lines} ? 1 : 0);
-
-		if ($i == 0 ||
-		    $i == 1) {
-		    $acc .= $argument;
-		    $acc .= ";" if ($last);
-		    $len += $arglen + $last;
-		    next;
-		}
-		if (!$acc) {
-		    $acc = $indent . $argument;
-		    $acc .= ";" if ($last);
-		    $len += $arglen + $last;
-		    next;
-		}
-		if ($indlen + $len + 1 + $arglen + $last > 79) {
-		    push @padded, $acc;
-		    $acc = $indent . $argument;
-		    $acc .= ";" if ($last);
-		    $len = $arglen + $last;
-		    next;
-		}
-
-		$acc .= " " . $argument;
-		$acc .= ";" if ($last);
-		$len += 1 + $arglen + $last;
-	    }
-	    push @padded, $acc if ($acc);
-	    return \@padded;
-	}
-
-	sub earliest(@) {
-	    my $ret = -1;
-	    foreach (@_) {
-		$ret = $_ if ($ret < 0 || ($_ >= 0 && $_ < $ret));
-	    }
-	    return $ret;
-	}
-
-	foreach my $file (@ARGV) {
-	    # Open the file for reading.
-	    next if $file =~ /trace[.]h$/;
-	    next if $file =~ /smbdirect[.][ch]$/;
-	    open my $fh, "<$file"
-		or die "Could not open file '$file'";
-	    $pathname = $file;
-	    $lineno = 0;
-
-	    my $filename;
-	    my @file_content = ();
-	    my @copy = ();
-
-	    my $state = 0;
-	    my $qual = "";
-	    my $type = "";
-	    my $funcname = "";
-	    my @funcdef = ();
-	    my $bracket = 0;
-	    my $comment = 0;
-	    my $smb1 = 0;
-	    my $header = 0;
-	    my $inline = 0;
-	    my $file_marker = "";
-	    my $config = "";
-	    my $c_file = 0;
-
-	    $filename = $pathname;
-	    $filename =~ s!.*/!!;
-
-	    if ($file =~ m!.h$!) {
-		my %new_h_file = (
-		    path    => $pathname,
-		    fname   => $filename,
-		    content => [],
-		    );
-		$header = \%new_h_file;
-		$headers{$filename} = \%new_h_file;
-	    } elsif ($file =~ m!.c$!) {
-		my %new_c_file = (
-		    path  => $pathname,
-		    fname => $filename,
-		    funcs => [],
-		    );
-		$c_file = \%new_c_file;
-		$c_files{$filename} = \%new_c_file;
-	    } else {
-		warn("Ignoring unexpected file $file\n");
-		next;
-	    }
-
-	    $smb1 = 1 if ($file =~ m!/smb1ops.c|/cifssmb.c|/cifstransport.c!);
-
-	    foreach my $line (<$fh>) {
-		$lineno++;
-		chomp($line);
-		push @copy, $line;
-		if (!$line) {
-		    # Blank line
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Handle continuation or end of block comment.  Look for C file
-		# prototype insertion point markers.
-		if ($comment) {
-		    if ($line =~ m![*]/!) {
-			if ($comment == 2 && $file_marker) {
-			    $cmarkers{$file_marker} = $file_marker;
-			    push @copy, "#C_MARKER " . $file_marker;
-			    $file_marker = 0;
-			}
-			$comment = 0;
-		    } else {
-			$comment++;
-			if ($comment == 2 && $line =~ m! [*] ([a-z][a-z_0-9]*[.][c])$!) {
-			    $file_marker = $1;
-			    print("Found file marker ", $file_marker, " in ", $filename, "\n");
-			}
-		    }
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Check cpp directives, particularly looking for SMB1 bits
-		if ($line =~ /^[#]/) {
-		    if ($header) {
-			if ($line =~ /ifdef.*(CONFIG_[A-Z0-9_])/) {
-			    error("multiconfig") if $config;
-			    $config = $1;
-			    $smb1++ if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
-			} elsif ($line =~ /endif/) {
-			    $smb1-- if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
-			    $config = "";
-			}
-		    }
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Exclude interference in finding func names and return types
-		if ($line =~ /^[{]/ ||
-		    $line =~ /##/ ||
-		    $line =~ /^[_a-z0-9A-Z]+:$/ || # goto label
-		    $line =~ /^do [{]/ ||
-		    $line =~ m!^//!) {
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Start of a block comment
-		if ($line =~ m!^/[*]!) {
-		    $comment = 1 unless ($line =~ m![*]/!);
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# End of a braced section, such as a function implementation
-		if ($line =~ /^[}]/) {
-			$type = "";
-			$qual = "";
-			$funcname = "";
-			@funcdef = ();
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		}
-
-		if ($line =~ /^typedef/) {
-		    $type = "";
-		    $qual = "";
-		    $funcname = "";
-		    @funcdef = ();
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Extract function qualifiers.  There may be multiple of these in more
-		# or less any order.  Some of them cause the func to be skipped (e.g. inline).
-
-		if ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
-		    $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
-		    error("Unexpected qualifier '$1'") if ($state != 0);
-		    while ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
-			   $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
-			$qual .= " " if ($qual);
-			$qual .= $1;
-			$inline = 1 if ($1 eq "inline");
-			$inline = 1 if ($1 eq "__always_inline");
-			$line = substr($line, length($1));
-			$line =~ s/^\s+//;
-		    }
-		}
-
-		if ($state == 0) {
-		    # Extract what we assume to be the return type
-		    if ($line =~ /^\s/) {
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		    }
-		    while ($line =~ /^(unsigned|signed|bool|char|short|int|long|void|const|volatile|(struct|union|enum)\s+[_a-zA-Z][_a-zA-Z0-9]*|[*]|__init|__exit|__le16|__le32|__le64|__be16|__be32|__be64)/) {
-			$type .= " " if $type;
-			$type .= $1;
-			$line = substr($line, length($1));
-			$line =~ s/^\s+//;
-		    }
-		    if ($line =~ /^struct [{]/) {
-			# Ignore structure definitions
-			$type = "";
-			$qual = "";
-			$funcname = "";
-			@funcdef = ();
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		    }
-		    if (index($line, "=") >= 0) {
-			# Ignore assignments
-			$type = "";
-			$qual = "";
-			$funcname = "";
-			@funcdef = "";
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		    }
-
-		    # Try and extract a function's type and name
-		    while ($line =~ /(^[_a-zA-Z][_a-zA-Z0-9]*)/) {
-			my $name = $1;
-			$line = substr($line, length($name));
-			next if ($line =~ /^[{]/);
-			$line =~ s/^\s+//;
-
-			my $ch = substr($line, 0, 1);
-			last if ($ch eq "[" || $ch eq ";"); # Global variables
-
-			if ($ch eq "(") {
-			    # Found the function name
-			    $state = 1;
-			    $line = substr($line, 1);
-			    $funcname = $name;
-			    my $tmp = $qual . $type . " " . $funcname . "(";
-			    $tmp =~ s/[*] /*/;
-			    push @funcdef, $tmp;
-			    $bracket = 1;
-			    last;
-			}
-
-			if ($type) {
-			    last if (index($line, ";") >= 0 && index($line, "(") == -1);
-			    error("Unexpected name '$name' after '$type'");
-			}
-
-			$type .= " " if $type;
-			$type .= $name;
-			if ($line =~ /^(\s*[*]+)/) {
-			    my $ptr = $1;
-			    $type .= $ptr;
-			    $line = substr($line, length($ptr));
-			}
-		    }
-		}
-
-		# Try and extract a function's argument list
-		my $from = 0;
-		if ($state == 1) {
-		    while (1) {
-			my $o = index($line, "(", $from);
-			my $c = index($line, ")", $from);
-			my $m = index($line, ",", $from);
-
-			my $b = earliest($o, $c, $m);
-			if ($b < 0) {
-			    push @funcdef, $line
-				unless ($line eq "");
-			    last;
-			}
-			my $ch = substr($line, $b, 1);
-
-			# Push the arguments separately on to the list
-			if ($ch eq ",") {
-			    push @funcdef, substr($line, 0, $b + 1);
-			    $line = substr($line, $b + 1);
-			    $from = 0;
-			} elsif ($ch eq "(") {
-			    # Handle brackets in the argument list (e.g. function
-			    # pointers)
-			    $bracket++;
-			    $from = $b + 1;
-			} elsif ($ch eq ")") {
-			    $bracket--;
-			    if ($bracket == 0) {
-				push @funcdef, substr($line, 0, $b + 1);
-				$line = substr($line, $b + 1);
-				$state = 2;
-				last;
-			    }
-			    $from = $b + 1;
-			}
-		    }
-		}
-
-		if ($state == 2) {
-		    $inline = 1 if ($qual =~ /inline/);
-		    #print("QUAL $qual $type $funcname $inline ", $#funcdef, "\n");
-		    if (!$header &&
-			$qual !~ /static/ &&
-			$funcname ne "__acquires" &&
-			$funcname ne "__releases" &&
-			$funcname ne "module_init" &&
-			$funcname ne "module_exit" &&
-			$funcname ne "module_param" &&
-			$funcname ne "module_param_call" &&
-			$funcname ne "PROC_FILE_DEFINE" &&
-			$funcname !~ /MODULE_/ &&
-			$funcname !~ /DEFINE_/) {
-
-			# Okay, we appear to have a function implementation
-			my $func;
-			my $dup = 0;
-
-			if (exists($funcs{$funcname})) {
-			    $func = $funcs{$funcname};
-			    if (exists $func->{body}) {
-				print("dup $funcname\n");
-				$dup = 1;
-			    }
-			} else {
-			    my %new_func = (
-				name => $funcname,
-				cond => "",
-				legacy => 0,
-				);
-			    $func = \%new_func;
-			    $funcs{$funcname} = $func;
-			    $func->{body} = pad(\@funcdef);
-			}
-			$func->{body} = pad(\@funcdef);
-			$func->{legacy} = 1 if $smb1;
-
-			if ($funcname eq "cifs_inval_name_dfs_link_error") {
-			    $func->{cond} = "#ifdef CONFIG_CIFS_DFS_UPCALL";
-			} elsif ($funcname eq "cifs_listxattr") {
-			    $func->{cond} = "#ifdef CONFIG_CIFS_XATTR";
-			}
-
-			push @{$c_file->{funcs}}, $func
-			    unless $dup;
-		    } elsif (!$header || $inline) {
-			# Ignore inline function implementations and other weirdies
-			push @file_content, @copy;
-		    } elsif ($header && !$inline) {
-			push @file_content, "#FUNCPROTO " . $funcname;
-
-			my $func;
-
-			if (exists($funcs{$funcname})) {
-			    $func = $funcs{$funcname};
-			    $func->{lineno} = $lineno;
-			    $func->{pathname} = $pathname;
-			} else {
-			    my %new_func = (
-				name => $funcname,
-				cond => "",
-				lineno => $lineno,
-				pathname => $pathname,
-				legacy => 0,
-				);
-			    $func = \%new_func;
-			    $funcs{$funcname} = $func;
-			}
-
-			$func->{legacy} = 1 if $smb1;
-		    }
-
-		    @funcdef = ();
-		    $type = "";
-		    $qual = "";
-		    $funcname = "";
-		    $inline = 0;
-		    $state = 0;
-		    @copy = ();
-		}
-		if ($line =~ /;/) {
-		    $type = "";
-		    $qual = "";
-		    $funcname = "";
-		    @funcdef = ();
-		    $state = 0;
-		    push @file_content, @copy;
-		    @copy = ();
-		}
-	    }
-	    close($fh);
-
-	    if ($header) {
-		$header->{content} = \@file_content;
-	    }
-	}
-
-	sub write_header($)
-	{
-	    my ($header) = @_;
-	    my $path = $header->{path};
-	    my $legacy = 0;
-
-	    $legacy = 1 if ($path =~ m!smb1proto[.]h!);
-
-	    my @output = ();
-
-	    foreach my $line (@{$header->{content}}) {
-		if ($line =~ "^[#]C_MARKER (.*)") {
-		    my $file_marker = $cmarkers{$1};
-		    my $c_file = $c_files{$file_marker};
-		    print("Found $line\n");
-		    foreach my $func (@{$c_file->{funcs}}) {
-			print("func ", $func->{name}, "\n");
-			push @output, @{$func->{body}};
-		    }
-		    next;
-		} elsif ($line =~ "^[#]FUNCPROTO ([_a-zA-Z0-9]+)") {
-		    my $funcname = $1;
-		    my $func = $funcs{$funcname};
-		    if (!$func->{body}) {
-			print($func->{pathname}, ":", $func->{lineno}, ": '", $funcname,
-			      "' dead prototype\n");
-			next;
-		    }
-		    if ($func->{legacy} == $legacy) {
-			#push @output, $line;
-			push @output, @{$func->{body}};
-		    }
-		} else {
-		    push @output, $line;
-		}
-	    }
-
-	    open my $fh, ">$path"
-		or die "Could not open file '$path' for writing";
-	    foreach my $f (@output) {
-		print($fh $f, "\n") or die $path;
-	    }
-	    close($fh) or die $path;
-	}
-
-	foreach my $h (keys(%headers)) {
-	    write_header($headers{$h});
-	}
+ (8) Remove some __KERNEL__ conditionals.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-
-[ sashal: Reduced backport -- upstream 645427b7a6c59 touches 3 file(s), this
-  backport carries 1. Not backported here:
-  fs/smb/client/cifsproto.h
-  fs/smb/client/fscache.h
-  fs/smb/client/smb1proto.h
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: b8e5dc4f95e5 ("smb: client: clear setuid/setgid bit on write with cifsacl/modefromsid/posix extensions")
+Stable-dep-of: 730d0bb19507 ("smb: client: fix UAF and buffer leak in cifs_check_trans2() for malformed secondary T2")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/inode.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ fs/smb/client/cifs_debug.c   |  4 ++--
+ fs/smb/client/cifs_spnego.h  |  2 --
+ fs/smb/client/cifs_unicode.h |  3 ---
+ fs/smb/client/cifsfs.c       |  5 +++--
+ fs/smb/client/cifsglob.h     |  2 +-
+ fs/smb/client/cifsproto.h    |  2 +-
+ fs/smb/client/compress.c     | 21 ++++++++++++++++++---
+ fs/smb/client/compress.h     | 19 ++-----------------
+ fs/smb/client/dir.c          |  2 +-
+ fs/smb/client/dns_resolve.h  |  3 ---
+ fs/smb/client/fs_context.c   |  2 +-
+ fs/smb/client/misc.c         |  1 +
+ fs/smb/client/netmisc.c      |  2 +-
+ fs/smb/client/smb2file.c     |  3 ++-
+ fs/smb/client/smb2inode.c    |  1 -
+ fs/smb/client/smb2maperror.c |  3 +--
+ fs/smb/client/smb2ops.c      |  4 ++--
+ fs/smb/client/smb2pdu.c      |  5 +++--
+ fs/smb/client/smb2proto.h    |  2 ++
+ 19 files changed, 41 insertions(+), 45 deletions(-)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index cca480ab7e64b..158502136ecac 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3162,6 +3162,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	kgid_t gid = INVALID_GID;
- 	struct inode *inode = d_inode(direntry);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
-+	unsigned int sbflags = cifs_sb->mnt_cifs_flags;
- 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
- 	struct cifsFileInfo *wfile;
- 	struct cifs_tcon *tcon;
-@@ -3177,7 +3178,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
- 	cifs_dbg(FYI, "setattr on file %pd attrs->ia_valid 0x%x\n",
- 		 direntry, attrs->ia_valid);
+diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
+index 9092051776fc1..bd9ebd4368887 100644
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -1209,11 +1209,11 @@ static const struct proc_ops cifs_mount_params_proc_ops = {
+ };
  
--	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_NO_PERM)
-+	if (sbflags & CIFS_MOUNT_NO_PERM)
- 		attrs->ia_valid |= ATTR_FORCE;
+ #else
+-inline void cifs_proc_init(void)
++void cifs_proc_init(void)
+ {
+ }
  
- 	rc = setattr_prepare(&nop_mnt_idmap, direntry, attrs);
+-inline void cifs_proc_clean(void)
++void cifs_proc_clean(void)
+ {
+ }
+ #endif /* PROC_FS */
+diff --git a/fs/smb/client/cifs_spnego.h b/fs/smb/client/cifs_spnego.h
+index e4d751b0c8127..e70929db3611f 100644
+--- a/fs/smb/client/cifs_spnego.h
++++ b/fs/smb/client/cifs_spnego.h
+@@ -27,10 +27,8 @@ struct cifs_spnego_msg {
+ 	uint8_t		data[];
+ };
+ 
+-#ifdef __KERNEL__
+ extern struct key_type cifs_spnego_key_type;
+ extern struct key *cifs_get_spnego_key(struct cifs_ses *sesInfo,
+ 				       struct TCP_Server_Info *server);
+-#endif /* KERNEL */
+ 
+ #endif /* _CIFS_SPNEGO_H */
+diff --git a/fs/smb/client/cifs_unicode.h b/fs/smb/client/cifs_unicode.h
+index e137a0dfbbe9a..6e4b99786498d 100644
+--- a/fs/smb/client/cifs_unicode.h
++++ b/fs/smb/client/cifs_unicode.h
+@@ -54,7 +54,6 @@
+ #define SFM_MAP_UNI_RSVD	1
+ #define SFU_MAP_UNI_RSVD	2
+ 
+-#ifdef __KERNEL__
+ int cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
+ 		    const struct nls_table *cp, int map_type);
+ int cifs_utf16_bytes(const __le16 *from, int maxbytes,
+@@ -69,8 +68,6 @@ extern int cifs_remap(struct cifs_sb_info *cifs_sb);
+ extern __le16 *cifs_strndup_to_utf16(const char *src, const int maxlen,
+ 				     int *utf16_len, const struct nls_table *cp,
+ 				     int remap);
+-#endif
+-
+ wchar_t cifs_toupper(wchar_t in);
+ 
+ #endif /* _CIFS_UNICODE_H */
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 08e7931cdda2b..f7cf455b9e124 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -28,6 +28,8 @@
+ #include <linux/splice.h>
+ #include <linux/uuid.h>
+ #include <linux/xattr.h>
++#include <linux/mm.h>
++#include <linux/key-type.h>
+ #include <uapi/linux/magic.h>
+ #include <net/ipv6.h>
+ #include "cifsfs.h"
+@@ -35,10 +37,9 @@
+ #define DECLARE_GLOBALS_HERE
+ #include "cifsglob.h"
+ #include "cifsproto.h"
++#include "smb2proto.h"
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
+-#include <linux/mm.h>
+-#include <linux/key-type.h>
+ #include "cifs_spnego.h"
+ #include "fscache.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index d61a6424f20ca..13b01a90c2ea4 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -2065,7 +2065,7 @@ extern struct smb_version_operations smb1_operations;
+ extern struct smb_version_values smb1_values;
+ extern struct smb_version_operations smb20_operations;
+ extern struct smb_version_values smb20_values;
+-#endif /* CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ extern struct smb_version_operations smb21_operations;
+ extern struct smb_version_values smb21_values;
+ extern struct smb_version_values smbdefault_values;
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 5f28eee91eb9d..7965a751d35c0 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -595,7 +595,7 @@ extern int cifs_do_set_acl(const unsigned int xid, struct cifs_tcon *tcon,
+ 			   const struct nls_table *nls_codepage, int remap);
+ extern int CIFSGetExtAttr(const unsigned int xid, struct cifs_tcon *tcon,
+ 			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+-#endif /* CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
+ extern bool couldbe_mf_symlink(const struct cifs_fattr *fattr);
+ extern int check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+diff --git a/fs/smb/client/compress.c b/fs/smb/client/compress.c
+index db709f5cd2e1f..fb2a48f1d2ad0 100644
+--- a/fs/smb/client/compress.c
++++ b/fs/smb/client/compress.c
+@@ -44,7 +44,7 @@ struct bucket {
+ 	unsigned int count;
+ };
+ 
+-/**
++/*
+  * has_low_entropy() - Compute Shannon entropy of the sampled data.
+  * @bkt:	Bytes counts of the sample.
+  * @slen:	Size of the sample.
+@@ -82,7 +82,7 @@ static bool has_low_entropy(struct bucket *bkt, size_t slen)
+ #define BYTE_DIST_BAD		0
+ #define BYTE_DIST_GOOD		1
+ #define BYTE_DIST_MAYBE		2
+-/**
++/*
+  * calc_byte_distribution() - Compute byte distribution on the sampled data.
+  * @bkt:	Byte counts of the sample.
+  * @slen:	Size of the sample.
+@@ -182,7 +182,7 @@ static int collect_sample(const struct iov_iter *source, ssize_t max, u8 *sample
+ 	return s;
+ }
+ 
+-/**
++/*
+  * is_compressible() - Determines if a chunk of data is compressible.
+  * @data: Iterator containing uncompressed data.
+  *
+@@ -261,6 +261,21 @@ static bool is_compressible(const struct iov_iter *data)
+ 	return ret;
+ }
+ 
++/*
++ * should_compress() - Determines if a request (write) or the response to a
++ *		       request (read) should be compressed.
++ * @tcon: tcon of the request is being sent to
++ * @rqst: request to evaluate
++ *
++ * Return: true iff:
++ * - compression was successfully negotiated with server
++ * - server has enabled compression for the share
++ * - it's a read or write request
++ * - (write only) request length is >= SMB_COMPRESS_MIN_LEN
++ * - (write only) is_compressible() returns 1
++ *
++ * Return false otherwise.
++ */
+ bool should_compress(const struct cifs_tcon *tcon, const struct smb_rqst *rq)
+ {
+ 	const struct smb2_hdr *shdr = rq->rq_iov->iov_base;
+diff --git a/fs/smb/client/compress.h b/fs/smb/client/compress.h
+index f3ed1d3e52fbf..63aea32fbe921 100644
+--- a/fs/smb/client/compress.h
++++ b/fs/smb/client/compress.h
+@@ -29,26 +29,11 @@
+ #ifdef CONFIG_CIFS_COMPRESSION
+ typedef int (*compress_send_fn)(struct TCP_Server_Info *, int, struct smb_rqst *);
+ 
+-int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_send_fn send_fn);
+ 
+-/**
+- * should_compress() - Determines if a request (write) or the response to a
+- *		       request (read) should be compressed.
+- * @tcon: tcon of the request is being sent to
+- * @rqst: request to evaluate
+- *
+- * Return: true iff:
+- * - compression was successfully negotiated with server
+- * - server has enabled compression for the share
+- * - it's a read or write request
+- * - (write only) request length is >= SMB_COMPRESS_MIN_LEN
+- * - (write only) is_compressible() returns 1
+- *
+- * Return false otherwise.
+- */
++int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_send_fn send_fn);
+ bool should_compress(const struct cifs_tcon *tcon, const struct smb_rqst *rq);
+ 
+-/**
++/*
+  * smb_compress_alg_valid() - Validate a compression algorithm.
+  * @alg: Compression algorithm to check.
+  * @valid_none: Conditional check whether NONE algorithm should be
+diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+index 6bb0e98462a98..7c528dec4149e 100644
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -432,7 +432,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
+ 
+ int
+ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
+-		 struct file *file, unsigned oflags, umode_t mode)
++		 struct file *file, unsigned int oflags, umode_t mode)
+ {
+ 	int rc;
+ 	unsigned int xid;
+diff --git a/fs/smb/client/dns_resolve.h b/fs/smb/client/dns_resolve.h
+index 6eb0c15a24406..2e991cdd2f496 100644
+--- a/fs/smb/client/dns_resolve.h
++++ b/fs/smb/client/dns_resolve.h
+@@ -13,8 +13,5 @@
+ 
+ #include <linux/net.h>
+ 
+-#ifdef __KERNEL__
+ int dns_resolve_server_name_to_ip(const char *unc, struct sockaddr *ip_addr, time64_t *expiry);
+-#endif /* KERNEL */
+-
+ #endif /* _DNS_RESOLVE_H */
+diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
+index 769380020d41a..37665788f62bf 100644
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -443,7 +443,7 @@ cifs_parse_smb_version(struct fs_context *fc, char *value, struct smb3_fs_contex
+ 	case Smb_20:
+ 		cifs_errorf(fc, "vers=2.0 mount not permitted when legacy dialects disabled\n");
+ 		return 1;
+-#endif /* CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ 	case Smb_21:
+ 		ctx->ops = &smb21_operations;
+ 		ctx->vals = &smb21_values;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index ce8f3fdffc3bd..f7b842eac044e 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -18,6 +18,7 @@
+ #include "nterr.h"
+ #include "cifs_unicode.h"
+ #include "smb2pdu.h"
++#include "smb2proto.h"
+ #include "cifsfs.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ #include "dns_resolve.h"
+diff --git a/fs/smb/client/netmisc.c b/fs/smb/client/netmisc.c
+index 8db57bd1a39de..407bafe6dc2ef 100644
+--- a/fs/smb/client/netmisc.c
++++ b/fs/smb/client/netmisc.c
+@@ -200,7 +200,7 @@ cifs_set_port(struct sockaddr *addr, const unsigned short int port)
+ }
+ 
+ /*****************************************************************************
+-convert a NT status code to a dos class/code
++ *convert a NT status code to a dos class/code
+  *****************************************************************************/
+ /* NT status -> dos error map */
+ static const struct {
+diff --git a/fs/smb/client/smb2file.c b/fs/smb/client/smb2file.c
+index 279aaa755106a..e1bc36c0dc951 100644
+--- a/fs/smb/client/smb2file.c
++++ b/fs/smb/client/smb2file.c
+@@ -102,7 +102,8 @@ int smb2_parse_symlink_response(struct cifs_sb_info *cifs_sb, const struct kvec
+ 					 cifs_sb);
+ }
+ 
+-int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32 *oplock, void *buf)
++int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
++		   __u32 *oplock, void *buf)
+ {
+ 	int rc;
+ 	__le16 *smb2_path;
+diff --git a/fs/smb/client/smb2inode.c b/fs/smb/client/smb2inode.c
+index 4f08c808e4a3e..a85fc7354b613 100644
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -21,7 +21,6 @@
+ #include "cifs_unicode.h"
+ #include "fscache.h"
+ #include "smb2glob.h"
+-#include "smb2pdu.h"
+ #include "smb2proto.h"
+ #include "cached_dir.h"
+ #include "../common/smb2status.h"
+diff --git a/fs/smb/client/smb2maperror.c b/fs/smb/client/smb2maperror.c
+index b05313acf9b2b..43a2f4be494b2 100644
+--- a/fs/smb/client/smb2maperror.c
++++ b/fs/smb/client/smb2maperror.c
+@@ -10,10 +10,9 @@
+ #include <linux/errno.h>
+ #include "cifsglob.h"
+ #include "cifs_debug.h"
+-#include "smb2pdu.h"
+ #include "smb2proto.h"
+-#include "../common/smb2status.h"
+ #include "smb2glob.h"
++#include "../common/smb2status.h"
+ #include "trace.h"
+ 
+ struct status_to_posix_error {
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index e6e8c64a5d3d6..06c6d431c6123 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -17,9 +17,9 @@
+ #include <uapi/linux/magic.h>
+ #include "cifsfs.h"
+ #include "cifsglob.h"
+-#include "smb2pdu.h"
+-#include "smb2proto.h"
+ #include "cifsproto.h"
++#include "smb2proto.h"
++#include "smb2pdu.h"
+ #include "cifs_debug.h"
+ #include "cifs_unicode.h"
+ #include "../common/smb2status.h"
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index bd271d614ed6c..bb409d3ec454f 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -26,8 +26,8 @@
+ #include <linux/netfs.h>
+ #include <trace/events/netfs.h>
+ #include "cifsglob.h"
+-#include "cifsacl.h"
+ #include "cifsproto.h"
++#include "cifsacl.h"
+ #include "smb2proto.h"
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+@@ -3939,7 +3939,8 @@ int SMB2_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+ /* currently unused, as now we are doing compounding instead (see smb311_posix_query_path_info) */
+ int
+ SMB311_posix_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+-		u64 persistent_fid, u64 volatile_fid, struct smb311_posix_qinfo *data, u32 *plen)
++			u64 persistent_fid, u64 volatile_fid,
++			struct smb311_posix_qinfo *data, u32 *plen)
+ {
+ 	size_t output_len = sizeof(struct smb311_posix_qinfo) +
+ 			(sizeof(struct smb_sid) * 2) + (PATH_MAX * 2);
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index 51d890f74e36f..c0d9728977e80 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -9,8 +9,10 @@
+  */
+ #ifndef _SMB2PROTO_H
+ #define _SMB2PROTO_H
++
+ #include <linux/nls.h>
+ #include <linux/key-type.h>
++#include "cached_dir.h"
+ 
+ struct statfs;
+ struct smb_rqst;
 -- 
 2.53.0
 
