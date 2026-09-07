@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15F9286A4;
-	Mon,  7 Sep 2026 01:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B27271450;
+	Mon,  7 Sep 2026 01:03:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788742987; cv=none; b=ptdZBFgPMF/y4kBDac/MYP0jXO7fqJ1O1wfXQk4k3mVA692KBvHgGPTw0JSdIMOYW3Txks92BGDT3c4WqFw6N0J+PWU0nPbdDyDZSN1J8oh7/ZLjDQ7YVTExlrkDeCzdIZB3HXmMqklKsFtcMRHS4Todyc5ovMZRq2rnvapI3Zc=
+	t=1788742989; cv=none; b=Ka+ttDXjBG185j8obcQaFogm5aG+iRkw9kpN5XAU9Oj++6vZTSmgKiIybT9kJCD4tbyVJfYpZup2z+w577VRRYRxI2SVUPoro5p/qq+6y4yv2M3OqpyH6coUJokBCibuoHfRT4cshSLg4nXHSvLYYjFLdfytXJd07HqlYodpubk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788742987; c=relaxed/simple;
-	bh=SwiJvY7841r6HZHeU3Kbv2XYqlZY16xDqfek92Kbfqw=;
+	s=arc-20240116; t=1788742989; c=relaxed/simple;
+	bh=8LDh7DKYxYp6dUrAhEw5EaMywThx2+8UX2UN931Ukgc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=benCM5GE+X24obu9DV9kBH9EWqU89bLIkD9HTdj6Wa9cmq3XakBEPMRQZraxW/s/pHEUdg1Fsu6vfl2+PJtqW4SaP+GE7AIVoED6tRcEFLnaj0pLr3x0E5dtkMnOQKO/WAivItENrR1hw207yI4s1p0/PiqdpQn68ALWkEZYghw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HNm1iMUC; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ZT6UlQ9d7qAq7EO4sKTa8LhFj/xurgTFxRNJa7WKAEteKULlgA/sB82lJOM+Pck0fmcf/wVtZsUstFBgyU8c+Mwa4e1g0fvuV487ayr0htxBwu7Ee9bi549hWsUG7UWFQUoub8+mnLI/oYF5fyNb2bsCoN0KhfP95PnU2/0mDfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nuuko2LI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HNm1iMUC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 447271F00A3D;
-	Mon,  7 Sep 2026 01:03:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nuuko2LI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B4E21F00A3E;
+	Mon,  7 Sep 2026 01:03:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788742986;
-	bh=DpVjTYzqKoBwjxX/qPfSlinhE5TBflVi14T5Md5AzCQ=;
+	s=k20260515; t=1788742987;
+	bh=AYmXEkah6BUtmAMZO1tz3v/ye0n752JNOj8XTZCKA3c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=HNm1iMUCWwab2oBHl1hUlMIQ78luuvHSVDja1tXXaQmLRjIuA01I00QrJQhYduxp4
-	 EaTqRPy299MHf2Y0BjAisMCYNVgsrjaw5iv5qvFtoOH4mBZJryGUNEPstaGpvuU9eY
-	 /UjvAMngPKe7JJRr3TlteGdxW2vae2xXNscUH+jVVL4zRFpKeyB3FXhdYXP1SEdlPH
-	 8XtPyfSSGqqeQgMIKVg5z7oFdnGuI0uWXu955gQjdpa2q5rqNMRCTQWtkzedEw0tbI
-	 XGE5EIcaX2fs5T5jw1sgWPCVgTj79Mi6+RzrV2Ci6lkzI37j3EhUzL1iPfcVQM+DXO
-	 gLs9I4LbMOOUA==
+	b=Nuuko2LI2Z/fxdswK8EtqilQUTTo1lvawG7h9y3CIBDwbUHizHtpAlyN216hiNIYb
+	 gGXH8UTK2bat5Ti4jKNmxaTWrcIUSXssP+yqhLcXRqRbIb2wh6yzaoG1aXyfennrQW
+	 EEdCtLkHdHA8sMGoyNkDC5xbXqIJhl1/Fw4lZjD9kPmTgV/d43Lv6MySVZhPqp87sz
+	 kHq+vKgTHYqR0g5BuRs7r0evULwPKfESIP9VIeYlvjYmJNP0ybwwIzq9as2GmriKzD
+	 eJse6XCT4cnFMvGnrZJ8u2UdR223XeKQSdrYC9GyLF3xfNxsk08FKlebsdlIZUJLrX
+	 m1bMNTXxezCfQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -37,9 +37,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18.y 2/5] cifs: Scripted clean up fs/smb/client/fscache.h
-Date: Sun,  6 Sep 2026 21:02:59 -0400
-Message-ID: <20260907010302.1949559-2-sashal@kernel.org>
+Subject: [PATCH 6.18.y 3/5] cifs: Scripted clean up fs/smb/client/fs_context.h
+Date: Sun,  6 Sep 2026 21:03:00 -0400
+Message-ID: <20260907010302.1949559-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260907010302.1949559-1-sashal@kernel.org>
 References: <2026090324-defraud-tremble-b3d8@gregkh>
@@ -54,7 +54,7 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit bc3de356aae666de5d8b5131545be87cf7754431 ]
+[ Upstream commit 047e504766a357ab751f76ccdec7a2e824e75e6d ]
 
 Remove externs, correct argument names and reformat declarations.
 
@@ -70,31 +70,49 @@ Signed-off-by: Steve French <stfrench@microsoft.com>
 Stable-dep-of: b8e5dc4f95e5 ("smb: client: clear setuid/setgid bit on write with cifsacl/modefromsid/posix extensions")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/fscache.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/smb/client/fs_context.h | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index f06cb24f5f3cf..b6c94db5edb94 100644
---- a/fs/smb/client/fscache.h
-+++ b/fs/smb/client/fscache.h
-@@ -38,12 +38,12 @@ struct cifs_fscache_inode_coherency_data {
+diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
+index b0fec6b9a23b4..f88a3d795799b 100644
+--- a/fs/smb/client/fs_context.h
++++ b/fs/smb/client/fs_context.h
+@@ -359,18 +359,20 @@ static inline enum cifs_symlink_type cifs_symlink_type(struct cifs_sb_info *cifs
+ 	return CIFS_SYMLINK_TYPE_NONE;
+ }
+ 
+-extern int smb3_init_fs_context(struct fs_context *fc);
+-extern void smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx);
+-extern void smb3_cleanup_fs_context(struct smb3_fs_context *ctx);
++int smb3_init_fs_context(struct fs_context *fc);
++void smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx);
++void smb3_cleanup_fs_context(struct smb3_fs_context *ctx);
+ 
+ static inline struct smb3_fs_context *smb3_fc2context(const struct fs_context *fc)
+ {
+ 	return fc->fs_private;
+ }
+ 
+-extern int smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx);
+-extern int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses);
+-extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
++int smb3_fs_context_dup(struct smb3_fs_context *new_ctx,
++			struct smb3_fs_context *ctx);
++int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb,
++				    struct cifs_ses *ses);
++void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
+ 
  /*
-  * fscache.c
-  */
--extern int cifs_fscache_get_super_cookie(struct cifs_tcon *);
--extern void cifs_fscache_release_super_cookie(struct cifs_tcon *);
-+int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon);
-+void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon);
+  * max deferred close timeout (jiffies) - 2^30
+@@ -378,7 +380,7 @@ extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
+ #define SMB3_MAX_DCLOSETIMEO (1 << 30)
+ #define SMB3_DEF_DCLOSETIMEO (1 * HZ) /* even 1 sec enough to help eg open/write/close/open/read */
+ #define MAX_CACHED_FIDS 16
+-extern char *cifs_sanitize_prepath(char *prepath, gfp_t gfp);
++char *cifs_sanitize_prepath(char *prepath, gfp_t gfp);
  
--extern void cifs_fscache_get_inode_cookie(struct inode *inode);
--extern void cifs_fscache_release_inode_cookie(struct inode *);
--extern void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
-+void cifs_fscache_get_inode_cookie(struct inode *inode);
-+void cifs_fscache_release_inode_cookie(struct inode *inode);
-+void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
+ extern struct mutex cifs_mount_mutex;
  
- static inline
- void cifs_fscache_fill_coherency(struct inode *inode,
 -- 
 2.53.0
 
