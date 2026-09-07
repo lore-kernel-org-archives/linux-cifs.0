@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967483F44E4;
-	Mon,  7 Sep 2026 20:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1419526A83;
+	Mon,  7 Sep 2026 20:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788811223; cv=none; b=g1Nte5fvaROyaPkDlUR/RnT0n6CI1wHxX85nZ6u7FnXOOQTrKGKYZCRbAnjiHc2aozpl2r7em3ZXoawgfhv3CriVLexMGmpRieSys9/492ToImY5TcpZE+IG5BXDsd8mBbmQ3J5enmi4uPWPw1F1OrN5GBl2q78dlFcMH0FzVoU=
+	t=1788811225; cv=none; b=YgQ/3tcxTkddkieMtD9+y17U4DObif0ihAKYvci0Haiuq3KQWi8tLnxqhIUrTDvCQ6fqUG7BEHEQ8aVmRKYT+mJvunS1uynOIFdYf4+qhWxVrtCEB+ae0zQmiCz0J30wF5gCQXxAMohYSyblL7W7KXTgx93PJJ4qM8i52Duypw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788811223; c=relaxed/simple;
-	bh=dgxsJopgTj5wBot0SXP5pQPNNnJcDf4YEHZSuLZHtcg=;
+	s=arc-20240116; t=1788811225; c=relaxed/simple;
+	bh=tbUzkAYiYH0rLwE4BzsOOHZejC/5GsvU139wZhR7+S4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XMmc67iR1BA525XXs/5Qv5TA0gyRBFgjVjOncT84VSRw9XQbTC+7jl0OlnDDxMy3T3szaKS4CIYHydYmdzXJE+tlqxMCpBotfYWyeKN3gFEF2CAeE89SAK4QPZRIu0FfoF6ygWC7PYRyal/H3VSLScMz43KqaQmSWC7nMgGJLq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOsxdECu; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=pxq+1yzOyOA/qyt5sraqRrd9x53Q+fQjaNgSn+6olV9ieVpcd7kYoCjIUJOk0G9avI7gAzBtAEO7qUMgDtNWR1QjR4NMbeF3OlLehN+lvP5smkguDA6PR7FjRWlPhLzpg+LF+WwFTvooMW8DRfVvWtYgeWBRrkEzyuPqU5NZb2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OMN2sEDZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOsxdECu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EAA71F00A3D;
-	Mon,  7 Sep 2026 20:00:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OMN2sEDZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8072F1F00A3E;
+	Mon,  7 Sep 2026 20:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788811222;
-	bh=1SFDvVYmxlrLLWD8mX9hRNEALJYTpyJAIxl0gRU/Myo=;
+	s=k20260515; t=1788811223;
+	bh=LT9PIEG9rEjUhJObKdjLdYZXQvfXjA3gqdING8qZQCw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=EOsxdECuGUvN/Ez5FFHxQ3RuXntKy7xCtJxxQlH/NtzGs5Fw++7P0yBaUDXpAi6gz
-	 b90XdCJxw+QMyKABi7y71WuYDwbVGZ45uWOo9zgVseByqRE8PE4zE6+XSA3R3uW8GF
-	 pK+MXfVJxI26xUqzc6A+sKfRAM+8/4Yck8O1fPjByJIRhQn077/3SB/CVqRAOydCzt
-	 Y5Mv5qRicGCj5sI8s6FXSDtolnjSX4Tl6vmiXljH0gZilVCTyBNv1jGX5ZB0qndgrB
-	 ifkmKZS+1R/VfNDu+6vdeK4Cp9VmLf4t85MDdGPVgvVAYYAdUS+wiQWJMohBj/vRAj
-	 X2AggbH1H5sdQ==
+	b=OMN2sEDZhxVOgMnCCFatpi5YfqWLSbyWz3GSJQ8uVdJrfPFaMH6XCf53xrMwzXFLm
+	 vx+PWH+pBvyBh3qiQ+ICjlz2ObTMe5/EJAa97T36ZffqIm4IEBZmubdaW8qkT69ahB
+	 QCim9hbZc3V4jcGtOqMDvYSIPG2wX8c2KIfvcZlUyslDwOutERiBJocAlYLmiSu0/T
+	 U5YyyYSlbpnOxJDHRjz4wuAK2tD3sKRN0MSaHAMDSLxoO+DYp/+dF/p4OdGKuo0YB7
+	 nyPzLH/43dIo/lX7/Xi0B4u0PuazovYrSEGuDWTuVXufb6SKRp3y4S8+t/42lhUuHt
+	 hQWD4/6Sjgdig==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -37,9 +37,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6.y 2/4] cifs: Scripted clean up fs/smb/client/fscache.h
-Date: Mon,  7 Sep 2026 16:00:16 -0400
-Message-ID: <20260907200018.326904-2-sashal@kernel.org>
+Subject: [PATCH 6.6.y 3/4] cifs: SMB1 split: Create smb1proto.h for SMB1 declarations
+Date: Mon,  7 Sep 2026 16:00:17 -0400
+Message-ID: <20260907200018.326904-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260907200018.326904-1-sashal@kernel.org>
 References: <2026090303-fiddling-giant-6389@gregkh>
@@ -54,9 +54,7 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit bc3de356aae666de5d8b5131545be87cf7754431 ]
-
-Remove externs, correct argument names and reformat declarations.
+[ Upstream commit 86c666506ea2c42649879eeac7f29e7bedef2f23 ]
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Steve French <sfrench@samba.org>
@@ -70,31 +68,98 @@ Signed-off-by: Steve French <stfrench@microsoft.com>
 Stable-dep-of: 730d0bb19507 ("smb: client: fix UAF and buffer leak in cifs_check_trans2() for malformed secondary T2")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/fscache.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ fs/smb/client/cifsglob.h  |  2 --
+ fs/smb/client/cifsproto.h | 11 +----------
+ fs/smb/client/smb1proto.h | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+), 12 deletions(-)
+ create mode 100644 fs/smb/client/smb1proto.h
 
-diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index 1f2ea9f5cc9a8..4c2e269a268ed 100644
---- a/fs/smb/client/fscache.h
-+++ b/fs/smb/client/fscache.h
-@@ -38,12 +38,12 @@ struct cifs_fscache_inode_coherency_data {
- /*
-  * fscache.c
-  */
--extern int cifs_fscache_get_super_cookie(struct cifs_tcon *);
--extern void cifs_fscache_release_super_cookie(struct cifs_tcon *);
-+int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon);
-+void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon);
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index a4e0618c58efc..6c4f31fec2141 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -2098,8 +2098,6 @@ extern mempool_t *cifs_mid_poolp;
  
--extern void cifs_fscache_get_inode_cookie(struct inode *inode);
--extern void cifs_fscache_release_inode_cookie(struct inode *);
--extern void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
-+void cifs_fscache_get_inode_cookie(struct inode *inode);
-+void cifs_fscache_release_inode_cookie(struct inode *inode);
-+void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
+ /* Operations for different SMB versions */
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+-extern struct smb_version_operations smb1_operations;
+-extern struct smb_version_values smb1_values;
+ extern struct smb_version_operations smb20_operations;
+ extern struct smb_version_values smb20_values;
+ #endif /* CIFS_ALLOW_INSECURE_LEGACY */
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 36f5010d3787d..9f0a6eaa9b4e3 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -13,6 +13,7 @@
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ #include "dfs_cache.h"
+ #endif
++#include "smb1proto.h"
  
- static inline
- void cifs_fscache_fill_coherency(struct inode *inode,
+ struct statfs;
+ struct smb_rqst;
+@@ -424,16 +425,6 @@ extern int CIFSSMBSetFileSize(const unsigned int xid, struct cifs_tcon *tcon,
+ 			      struct cifsFileInfo *cfile, __u64 size,
+ 			      bool set_allocation);
+ 
+-struct cifs_unix_set_info_args {
+-	__u64	ctime;
+-	__u64	atime;
+-	__u64	mtime;
+-	__u64	mode;
+-	kuid_t	uid;
+-	kgid_t	gid;
+-	dev_t	device;
+-};
+-
+ extern int CIFSSMBUnixSetFileInfo(const unsigned int xid,
+ 				  struct cifs_tcon *tcon,
+ 				  const struct cifs_unix_set_info_args *args,
+diff --git a/fs/smb/client/smb1proto.h b/fs/smb/client/smb1proto.h
+new file mode 100644
+index 0000000000000..a73213f6a2aa1
+--- /dev/null
++++ b/fs/smb/client/smb1proto.h
+@@ -0,0 +1,38 @@
++/* SPDX-License-Identifier: LGPL-2.1 */
++/*
++ *
++ *   Copyright (c) International Business Machines  Corp., 2002,2008
++ *   Author(s): Steve French (sfrench@us.ibm.com)
++ *
++ */
++#ifndef _SMB1PROTO_H
++#define _SMB1PROTO_H
++
++struct cifs_unix_set_info_args {
++	__u64	ctime;
++	__u64	atime;
++	__u64	mtime;
++	__u64	mode;
++	kuid_t	uid;
++	kgid_t	gid;
++	dev_t	device;
++};
++
++#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
++
++/*
++ * cifssmb.c
++ */
++
++/*
++ * smb1ops.c
++ */
++extern struct smb_version_operations smb1_operations;
++extern struct smb_version_values smb1_values;
++
++/*
++ * smb1transport.c
++ */
++
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* _SMB1PROTO_H */
 -- 
 2.53.0
 
