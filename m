@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B27271450;
-	Mon,  7 Sep 2026 01:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4512D63E5;
+	Mon,  7 Sep 2026 01:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788742989; cv=none; b=Ka+ttDXjBG185j8obcQaFogm5aG+iRkw9kpN5XAU9Oj++6vZTSmgKiIybT9kJCD4tbyVJfYpZup2z+w577VRRYRxI2SVUPoro5p/qq+6y4yv2M3OqpyH6coUJokBCibuoHfRT4cshSLg4nXHSvLYYjFLdfytXJd07HqlYodpubk=
+	t=1788742990; cv=none; b=NRZjuuzImWeFoPmFsMXLe55oo0sY2pkqPKdB3QB/uvxWSCpSWYRU3YwA9+b+s6Dxpdy6wteIR9aOMwctUylQUCkeun+VClW87UqkkdzbDJdlsuTL9KIwDA2QcRuwUmpIUsYdZar7qZ2nE28i6l3o73N797sz09E9CKenscdQj6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788742989; c=relaxed/simple;
-	bh=8LDh7DKYxYp6dUrAhEw5EaMywThx2+8UX2UN931Ukgc=;
+	s=arc-20240116; t=1788742990; c=relaxed/simple;
+	bh=htVJA7Xdst3DKhsQ+H7Z+xJVMBvtRmY2KDlGYxYd1K4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZT6UlQ9d7qAq7EO4sKTa8LhFj/xurgTFxRNJa7WKAEteKULlgA/sB82lJOM+Pck0fmcf/wVtZsUstFBgyU8c+Mwa4e1g0fvuV487ayr0htxBwu7Ee9bi549hWsUG7UWFQUoub8+mnLI/oYF5fyNb2bsCoN0KhfP95PnU2/0mDfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nuuko2LI; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=KhMu0pd71rKFcl1bBQEKaNAnZlHEFhY2jCGrLVlA4Kv5OIXSIlr4HcsW4M5ikg7LIHauzCapZMoKd8G623wwUq/UwqXNcLY0VhVrXjDs6HDiqJr4ewTqTmGwi39TJKXLI32eADekM/p/ETKULiHFnDFGmKpFlxM+pGa3y2924wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gW8yvW74; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nuuko2LI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B4E21F00A3E;
-	Mon,  7 Sep 2026 01:03:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gW8yvW74"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF1BF1F00A3F;
+	Mon,  7 Sep 2026 01:03:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788742987;
-	bh=AYmXEkah6BUtmAMZO1tz3v/ye0n752JNOj8XTZCKA3c=;
+	s=k20260515; t=1788742988;
+	bh=VAt75mmVa6Rv/fTMilrWmbij7UoDmnN2Izra4rU9t9Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Nuuko2LI2Z/fxdswK8EtqilQUTTo1lvawG7h9y3CIBDwbUHizHtpAlyN216hiNIYb
-	 gGXH8UTK2bat5Ti4jKNmxaTWrcIUSXssP+yqhLcXRqRbIb2wh6yzaoG1aXyfennrQW
-	 EEdCtLkHdHA8sMGoyNkDC5xbXqIJhl1/Fw4lZjD9kPmTgV/d43Lv6MySVZhPqp87sz
-	 kHq+vKgTHYqR0g5BuRs7r0evULwPKfESIP9VIeYlvjYmJNP0ybwwIzq9as2GmriKzD
-	 eJse6XCT4cnFMvGnrZJ8u2UdR223XeKQSdrYC9GyLF3xfNxsk08FKlebsdlIZUJLrX
-	 m1bMNTXxezCfQ==
+	b=gW8yvW74pgGwWjJvl9yBJVdPyJx31t6ZpGflcjsQ9AmMOZbK2WEGJu8IeiBTUYGr9
+	 3kz68aRWMPcVtMJgEgRB9Oo2cGk/NbTi7edURqpg45b72RJ2ivF7DVxqADzLl14Wm3
+	 TtbRHKZEkueXx70AetqDWdOQOIv7mYpy65aHb3Yza0VM3m14ADdehhlWqqpCd7em+i
+	 dMPkSov8wL5F4962wtFeiUZKrKe1K9P4rb7joOu2d4I9ArQQfv1ymcV+eHv9jlj5Vw
+	 q4cEFBlxyyFIjjudDfeWa4EZHjaqzgGcj9Drn6HcFNrHEVOHsIq5dicHtyE9DUuZD5
+	 C0S26b7GBJUKg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -37,9 +37,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-kernel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18.y 3/5] cifs: Scripted clean up fs/smb/client/fs_context.h
-Date: Sun,  6 Sep 2026 21:03:00 -0400
-Message-ID: <20260907010302.1949559-3-sashal@kernel.org>
+Subject: [PATCH 6.18.y 4/5] cifs: Scripted clean up fs/smb/client/smb2proto.h
+Date: Sun,  6 Sep 2026 21:03:01 -0400
+Message-ID: <20260907010302.1949559-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260907010302.1949559-1-sashal@kernel.org>
 References: <2026090324-defraud-tremble-b3d8@gregkh>
@@ -54,7 +54,7 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit 047e504766a357ab751f76ccdec7a2e824e75e6d ]
+[ Upstream commit 1e009e3346db230787685a3989fd9c346fb412fb ]
 
 Remove externs, correct argument names and reformat declarations.
 
@@ -67,52 +67,58 @@ cc: linux-fsdevel@vger.kernel.org
 cc: linux-kernel@vger.kernel.org
 Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
 Signed-off-by: Steve French <stfrench@microsoft.com>
+
+For the stable backport, drop the original smb2proto.h cleanup because the
+stable header has gained and changed declarations that make the scripted
+rewrite conflict, while the target does not touch or depend on the header.
+Instead, carry only behavior-preserving context preparation in inode.c: use
+the type-safe kmalloc_obj() spelling and the existing local sbflags snapshot,
+and brace the adjacent else-if.  This allows both target hunks to apply
+cleanly without pre-applying the target's behavioral change.
+
+[ sashal: Reduced backport -- upstream 1e009e3346db touches 1 file(s), this
+  backport carries 1. Not backported here:
+  fs/smb/client/smb2proto.h
+  This note is generated from the file lists only; see the resolution record
+  for the reasoning. ]
+
+[ sashal: Reduced backport -- upstream 1e009e3346db2 touches 1 file(s), this
+  backport carries 1. Not backported here:
+  fs/smb/client/smb2proto.h
+  This note is generated from the file lists only; see the resolution record
+  for the reasoning. ]
+
 Stable-dep-of: b8e5dc4f95e5 ("smb: client: clear setuid/setgid bit on write with cifsacl/modefromsid/posix extensions")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/fs_context.h | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ fs/smb/client/inode.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index b0fec6b9a23b4..f88a3d795799b 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -359,18 +359,20 @@ static inline enum cifs_symlink_type cifs_symlink_type(struct cifs_sb_info *cifs
- 	return CIFS_SYMLINK_TYPE_NONE;
- }
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 88307e6b48006..f5b0596442bac 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -3187,7 +3187,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+ 	if (attrs->ia_valid & (ATTR_KILL_SUID|ATTR_KILL_SGID))
+ 		attrs->ia_valid &= ~ATTR_MODE;
  
--extern int smb3_init_fs_context(struct fs_context *fc);
--extern void smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx);
--extern void smb3_cleanup_fs_context(struct smb3_fs_context *ctx);
-+int smb3_init_fs_context(struct fs_context *fc);
-+void smb3_cleanup_fs_context_contents(struct smb3_fs_context *ctx);
-+void smb3_cleanup_fs_context(struct smb3_fs_context *ctx);
+-	args = kmalloc(sizeof(*args), GFP_KERNEL);
++	args = kmalloc_obj(*args);
+ 	if (args == NULL) {
+ 		rc = -ENOMEM;
+ 		goto out;
+@@ -3380,9 +3380,9 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 				goto cifs_setattr_exit;
+ 			}
+ 		}
+-	} else
+-	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID))
++	} else if (!(sbflags & CIFS_MOUNT_SET_UID)) {
+ 		attrs->ia_valid &= ~(ATTR_UID | ATTR_GID);
++	}
  
- static inline struct smb3_fs_context *smb3_fc2context(const struct fs_context *fc)
- {
- 	return fc->fs_private;
- }
- 
--extern int smb3_fs_context_dup(struct smb3_fs_context *new_ctx, struct smb3_fs_context *ctx);
--extern int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb, struct cifs_ses *ses);
--extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
-+int smb3_fs_context_dup(struct smb3_fs_context *new_ctx,
-+			struct smb3_fs_context *ctx);
-+int smb3_sync_session_ctx_passwords(struct cifs_sb_info *cifs_sb,
-+				    struct cifs_ses *ses);
-+void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
- 
- /*
-  * max deferred close timeout (jiffies) - 2^30
-@@ -378,7 +380,7 @@ extern void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb);
- #define SMB3_MAX_DCLOSETIMEO (1 << 30)
- #define SMB3_DEF_DCLOSETIMEO (1 * HZ) /* even 1 sec enough to help eg open/write/close/open/read */
- #define MAX_CACHED_FIDS 16
--extern char *cifs_sanitize_prepath(char *prepath, gfp_t gfp);
-+char *cifs_sanitize_prepath(char *prepath, gfp_t gfp);
- 
- extern struct mutex cifs_mount_mutex;
- 
+ 	/* skip mode change if it's just for clearing setuid/setgid */
+ 	if (attrs->ia_valid & (ATTR_KILL_SUID|ATTR_KILL_SGID))
 -- 
 2.53.0
 
