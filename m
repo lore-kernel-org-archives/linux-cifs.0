@@ -1,97 +1,269 @@
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C923403EF;
-	Mon,  7 Sep 2026 17:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752CA385D7C;
+	Mon,  7 Sep 2026 20:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788803988; cv=none; b=mrSSO6+or34k/nv007CZXBt3jNtWzKaJLUI68kbQLyc+G1WYcsZPgSidXAa+RyOMB1jfZYtjZycKHAbW4PTJJwG6FgTHWOueW7f3HA1J8pdVCxC6mZ2Nwd0LBLp1kErCV7fEbF1pFY+BQQ4wHSvNZ5nmBLKfJobpV6wuGVhuo/Y=
+	t=1788811222; cv=none; b=uJT7EPeM3hMOq9Ej5ZRrSDkL6ye0TjzPG4zo0hILwb3qUMl7Fy77a2WkevbnNKZcBsqDDjv59sdWZCbcvd+tHLdoRJN6k12sseOJ8DwPhANu+mYRF8QVMf0uMvm6uQWVz5pOw9p1+47Mc56VnCKJra/U8yrDgZs4/TN/OeD7sJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788803988; c=relaxed/simple;
-	bh=IMHU+H5IfHFb3lkocPMvQu1REuBAuXAi57pRFXui07Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=az+1+z9SBvMom2ImPv4c17RbCevkXxqua0CC+LEoBzRUf6jFWO7ZoHoNs4lrF2Q1r25zv/yP90ssMHkfyvsp4MPUnncT/dyVuCkqrUijwXne8KGdXAUOWXjRuvamS1dlDpzfSJVbS9UZ+YGbNTaSTVlzVnww6RwVMQDwpFO/D3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de; spf=pass smtp.mailfrom=amazon.de; dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b=eNQi31c2; arc=none smtp.client-ip=44.245.243.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1788811222; c=relaxed/simple;
+	bh=zZzMHMpHdJGULgrShhZhMcNvjZeNL2vkyBgYf5dvSfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BqqEOrSTt1MY6OARzYFSDG59CugvsOSNEE1MtoySclrm4NOH/h5fJVAAMywMqU3L9YptMUuIQZlpgrj8XFoaYSOKkJf/bZI8tIi6Cqs/u790XuQvGvDEl/WUrC9d0FUP0/KzUy7EjngWqFg3pBysysvNJsj0euXacLIs+ltkMHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJjy5P6j; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.de header.i=@amazon.de header.b="eNQi31c2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazoncorp2;
-  t=1788803987; x=1820339987;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XvTUmXvoh3a7PVjRYBNX6k3gA2v6vhjklyK/IlRTA04=;
-  b=eNQi31c2HxDXHKFFVZrpO3G035+pBZCnFws9izvWiKAoAYNgxTMGizaW
-   CFDe4dQXptl9L2XCKrAX3PJP5bhYBcr92mzr6ftjm2xNVxqA+04UGJKFi
-   3Odjcs/N7OVDCqcajyFSVo5r8gjWqlEbwXyxv345CVEJcrlEpd40f1dvx
-   qwvr0+oHl1RtCOynSDXMAY68X5Tyo5+TlR6n2Z2fcCmbdMWI06XpSZIrv
-   RWjBkmgC7OAU18VkEyk1szU/xF3R4XDy6MhqMzfUxxnoXbWzb3akWy1t9
-   TpkBQVCcEXWk/okTRaHKx02zbczGAFGyZQEYugxQ9Dlh5RHYMgeyzHuMc
-   Q==;
-X-CSE-ConnectionGUID: R6RwG5VaTzOOg+RciZqnyw==
-X-CSE-MsgGUID: EmefM6qNRKuIXsI3+N+w+w==
-X-IronPort-AV: E=Sophos;i="6.25,267,1779148800"; 
-   d="scan'208";a="27553766"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2026 17:59:44 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:4674]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.124:2525] with esmtp (Farcaster)
- id 0247be03-975d-4825-9943-6503bfd3dd67; Mon, 7 Sep 2026 17:59:44 +0000 (UTC)
-X-Farcaster-Flow-ID: 0247be03-975d-4825-9943-6503bfd3dd67
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.45;
- Mon, 7 Sep 2026 17:59:44 +0000
-Received: from dev-dsk-doebel-1a-7b355d76.us-east-1.amazon.com (10.169.119.5)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.46;
- Mon, 7 Sep 2026 17:59:43 +0000
-From: Bjoern Doebel <doebel@amazon.de>
-To: Namjae Jeon <linkinjeon@kernel.org>
-CC: Bjoern Doebel <doebel@amazon.de>, <linux-cifs@vger.kernel.org>,
-	<pc@manguebit.org>, <ronniesahlberg@gmail.com>, <sprasad@microsoft.com>,
-	<tom@talpey.com>, <bharathsm@microsoft.com>,
-	<samba-technical@lists.samba.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH] smb: client: fix heap overflow in DACL owner/group rewrite
-Date: Mon, 7 Sep 2026 17:59:23 +0000
-Message-ID: <ap77V8bEpMjSvdOj@amazon.de>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <CAKYAXd8r-zvLH6Ecxu33jDAjM_6Uv2KFS4Naa-tYFHAwntgreQ@mail.gmail.com>
-References: <20260709155440.2132459-1-doebel@amazon.de> <20260904125844.1803343-1-doebel@amazon.de> <CAKYAXd8r-zvLH6Ecxu33jDAjM_6Uv2KFS4Naa-tYFHAwntgreQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJjy5P6j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFA731F00A3A;
+	Mon,  7 Sep 2026 20:00:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788811221;
+	bh=F3qgb8x1U49ZWrSngkK781KK8VfF4NSqLywyGCgbcW0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=hJjy5P6jCSn18omVjKKoFEFqVyT6y9XsW2mAiOtlSq8i2dezZfXHnWebSa70fny8M
+	 IZaNauaCx7PVUohsILiPpRpPpDRmoGCc3L3qvj5YfbQWfW9shHRW36QjCvuCrQ+zKG
+	 COoviEmNrHmyfNNVDNfI4fhJ+91PR8XSzhk+JAjEOH/PchycD5gh18JNNJfEeb1vcW
+	 ojngW3knQ6orhb38jbh4hYowJ2T0my6TY/+tbCNfO4u+MHLkybc2T3mn1E+0HZnSyA
+	 ymu3R/JYHabuwZUqpn+26bug79pZOChXWa+ArE/m94DzNa/r3bpv9tAmSLBOMOS8vh
+	 KunFUlDMfXADA==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.6.y 1/4] cifs: Remove the server pointer from smb_message
+Date: Mon,  7 Sep 2026 16:00:15 -0400
+Message-ID: <20260907200018.326904-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <2026090303-fiddling-giant-6389@gregkh>
+References: <2026090303-fiddling-giant-6389@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hi Namjae,
+From: David Howells <dhowells@redhat.com>
 
-On Sat, Sep 05, 2026 at 10:15:37AM +0900, Namjae Jeon wrote:
-> > @@ -1815,11 +1815,13 @@ id_mode_to_cifs_acl(struct inode *inode, const char *path, __u64 *pnmode,
-> >                                 cifs_put_tlink(tlink);
-> >                                 return rc;
-> >                         }
-> > -                       if (mode_from_sid)
-> > -                               nsecdesclen +=
-> > -                                       le16_to_cpu(dacl_ptr->num_aces) * sizeof(struct smb_ace);
-> > -                       else /* cifsacl */
-> > -                               nsecdesclen += le16_to_cpu(dacl_ptr->size);
-> > +                       /*
-> > +                        * Worst case: every ACE is rewritten with a new SID of
-> > +                        * SID_MAX_SUB_AUTHORITIES sub-auths -> sizeof(smb_ace) each,
-> > +                        * plus the smb_acl header replace_sids_and_copy_aces() emits.
-> Since you mentioned replace_sids_and_copy_aces(), please check whether
-> replace_sids_and_copy_aces() also has a potential overflow issue.
+[ Upstream commit 87fba18abbb8433a47045c785f2edc027e4d2bc5 ]
 
-That looks sensible. I'll send a followup v3 (the original patch also
-needs an update to the Fixes: tag, as you point out.)
+Remove the server pointer from smb_message and instead pass it down to all
+the things that access it.
 
-Bjoern
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: Tom Talpey <tom@talpey.com> (RDMA, smbdirect)
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+
+[ sashal: Reduced backport -- upstream 87fba18abbb84 touches 12 file(s), this
+  backport carries 6. Not backported here:
+  fs/smb/client/cifsfs.c
+  fs/smb/client/cifsglob.h
+  fs/smb/client/cifssmb.c
+  fs/smb/client/cifstransport.c
+  fs/smb/client/netmisc.c
+  fs/smb/client/smb1ops.c
+  fs/smb/client/smb2pdu.c
+  fs/smb/client/smb2transport.c
+  This note is generated from the file lists only; see the resolution record
+  for the reasoning. ]
+
+Stable-dep-of: 730d0bb19507 ("smb: client: fix UAF and buffer leak in cifs_check_trans2() for malformed secondary T2")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/Makefile                       |  2 +-
+ fs/smb/client/cifsproto.h                    |  3 ++-
+ fs/smb/client/connect.c                      | 11 ++++++-----
+ fs/smb/client/{smb1ops.c => smb1transport.c} |  2 +-
+ fs/smb/client/smb2ops.c                      | 14 +++++++-------
+ fs/smb/client/transport.c                    |  4 ++--
+ 6 files changed, 19 insertions(+), 17 deletions(-)
+ rename fs/smb/client/{smb1ops.c => smb1transport.c} (99%)
+
+diff --git a/fs/smb/client/Makefile b/fs/smb/client/Makefile
+index e11985f2460b2..3c2af1fa9fa24 100644
+--- a/fs/smb/client/Makefile
++++ b/fs/smb/client/Makefile
+@@ -32,4 +32,4 @@ cifs-$(CONFIG_CIFS_SMB_DIRECT) += smbdirect.o
+ 
+ cifs-$(CONFIG_CIFS_ROOT) += cifsroot.o
+ 
+-cifs-$(CONFIG_CIFS_ALLOW_INSECURE_LEGACY) += smb1ops.o cifssmb.o
++cifs-$(CONFIG_CIFS_ALLOW_INSECURE_LEGACY) += smb1transport.o cifssmb.o
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 1f37bc2923fb8..36f5010d3787d 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -253,7 +253,8 @@ extern unsigned int setup_special_mode_ACE(struct smb_ace *pace,
+ 					   __u64 nmode);
+ extern unsigned int setup_special_user_owner_ACE(struct smb_ace *pace);
+ 
+-extern void dequeue_mid(struct mid_q_entry *mid, bool malformed);
++extern void dequeue_mid(struct TCP_Server_Info *server,
++			struct mid_q_entry *mid, bool malformed);
+ extern int cifs_read_from_socket(struct TCP_Server_Info *server, char *buf,
+ 			         unsigned int to_read);
+ extern ssize_t cifs_discard_from_socket(struct TCP_Server_Info *server,
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 68a000956d957..46a48e81a3847 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -882,12 +882,13 @@ is_smb_response(struct TCP_Server_Info *server, unsigned char type)
+ }
+ 
+ void
+-dequeue_mid(struct mid_q_entry *mid, bool malformed)
++dequeue_mid(struct TCP_Server_Info *server, struct mid_q_entry *mid,
++	    bool malformed)
+ {
+ #ifdef CONFIG_CIFS_STATS2
+ 	mid->when_received = jiffies;
+ #endif
+-	spin_lock(&mid->server->mid_lock);
++	spin_lock(&server->mid_lock);
+ 	if (!malformed)
+ 		mid->mid_state = MID_RESPONSE_RECEIVED;
+ 	else
+@@ -897,12 +898,12 @@ dequeue_mid(struct mid_q_entry *mid, bool malformed)
+ 	 * function has finished processing it is a bug.
+ 	 */
+ 	if (mid->mid_flags & MID_DELETED) {
+-		spin_unlock(&mid->server->mid_lock);
++		spin_unlock(&server->mid_lock);
+ 		pr_warn_once("trying to dequeue a deleted mid\n");
+ 	} else {
+ 		list_del_init(&mid->qhead);
+ 		mid->mid_flags |= MID_DELETED;
+-		spin_unlock(&mid->server->mid_lock);
++		spin_unlock(&server->mid_lock);
+ 	}
+ }
+ 
+@@ -938,7 +939,7 @@ handle_mid(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 		else
+ 			server->smallbuf = NULL;
+ 	}
+-	dequeue_mid(mid, malformed);
++	dequeue_mid(server, mid, malformed);
+ }
+ 
+ int
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1transport.c
+similarity index 99%
+rename from fs/smb/client/smb1ops.c
+rename to fs/smb/client/smb1transport.c
+index c80b291a14a57..824604cb0e468 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1transport.c
+@@ -398,7 +398,7 @@ cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 			return true;
+ 		/* All parts received or packet is malformed. */
+ 		mid->multiEnd = true;
+-		dequeue_mid(mid, malformed);
++		dequeue_mid(server, mid, malformed);
+ 		return true;
+ 	}
+ 	if (!server->large_buf) {
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 8a15694c1bbb5..b86457fdc08a1 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -4627,7 +4627,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		if (is_offloaded)
+ 			mid->mid_state = MID_RESPONSE_RECEIVED;
+ 		else
+-			dequeue_mid(mid, false);
++			dequeue_mid(server, mid, false);
+ 		return 0;
+ 	}
+ 
+@@ -4654,7 +4654,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		if (is_offloaded)
+ 			mid->mid_state = MID_RESPONSE_MALFORMED;
+ 		else
+-			dequeue_mid(mid, rdata->result);
++			dequeue_mid(server, mid, rdata->result);
+ 		return 0;
+ 	}
+ 
+@@ -4673,7 +4673,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 			if (is_offloaded)
+ 				mid->mid_state = MID_RESPONSE_MALFORMED;
+ 			else
+-				dequeue_mid(mid, rdata->result);
++				dequeue_mid(server, mid, rdata->result);
+ 			return 0;
+ 		}
+ 
+@@ -4683,7 +4683,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 			if (is_offloaded)
+ 				mid->mid_state = MID_RESPONSE_MALFORMED;
+ 			else
+-				dequeue_mid(mid, rdata->result);
++				dequeue_mid(server, mid, rdata->result);
+ 			return 0;
+ 		}
+ 
+@@ -4694,7 +4694,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 			if (is_offloaded)
+ 				mid->mid_state = MID_RESPONSE_MALFORMED;
+ 			else
+-				dequeue_mid(mid, rdata->result);
++				dequeue_mid(server, mid, rdata->result);
+ 			return 0;
+ 		}
+ 		rdata->got_bytes = pages_len;
+@@ -4714,14 +4714,14 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		if (is_offloaded)
+ 			mid->mid_state = MID_RESPONSE_MALFORMED;
+ 		else
+-			dequeue_mid(mid, rdata->result);
++			dequeue_mid(server, mid, rdata->result);
+ 		return 0;
+ 	}
+ 
+ 	if (is_offloaded)
+ 		mid->mid_state = MID_RESPONSE_RECEIVED;
+ 	else
+-		dequeue_mid(mid, false);
++		dequeue_mid(server, mid, false);
+ 	return 0;
+ }
+ 
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index a47242a0f5c6d..6a1de5973ea05 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -1690,7 +1690,7 @@ __cifs_readv_discard(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 	int length;
+ 
+ 	length = cifs_discard_remaining_data(server);
+-	dequeue_mid(mid, malformed);
++	dequeue_mid(server, mid, malformed);
+ 	mid->resp_buf = server->smallbuf;
+ 	server->smallbuf = NULL;
+ 	return length;
+@@ -1833,7 +1833,7 @@ cifs_readv_receive(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	if (server->total_read < buflen)
+ 		return cifs_readv_discard(server, mid);
+ 
+-	dequeue_mid(mid, false);
++	dequeue_mid(server, mid, false);
+ 	mid->resp_buf = server->smallbuf;
+ 	server->smallbuf = NULL;
+ 	return length;
+-- 
+2.53.0
 
