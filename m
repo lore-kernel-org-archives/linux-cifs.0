@@ -1,53 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384363043DB
-	for <linux-cifs@vger.kernel.org>; Mon,  7 Sep 2026 23:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B422A372B5A
+	for <linux-cifs@vger.kernel.org>; Mon,  7 Sep 2026 23:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788822062; cv=none; b=QMrXrNwOYjwogKeiIAhTszdX3dgDyqbAvUP4V6pj/m+qH1fPRr5tRPUIMLNYjnvLurZjLyzDudazMdngNpTZPkScCMsJmu9ODBA/QqaoQMxCYl6Q+999zdFTXo2Z1wja5HLIceJhHbA6HyN8+f969usEv3yTgIkOYt/1KM/FRwY=
+	t=1788822079; cv=none; b=D0xesuJBIjFW0jPEF2wCYn4FePtQsOrNfnNKCpNpHBc5iW3le28bt74sb0q01oSs5XIb1ZlG9ys0tjnk8KEkv8L0e/llZd8de3VQgOJApqUTYvp5rFPQl33F/PG1U6CIZcLSPR0h5piCkSUBIbvtE6++AbtgRYIpV7TxaiVR/4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788822062; c=relaxed/simple;
-	bh=FhDGlsmibDDb4ftfTcaZFCfOIdXAGfv6KGdOuxn4Ww4=;
+	s=arc-20240116; t=1788822079; c=relaxed/simple;
+	bh=octyGcAzRI1FTFrNG4m/rXphof1JrQJfSnM3RegK/og=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cumVKC/lExs0vDLpzw7j5n8GGgg3mQdgLEENlL52cMQYY3C79NB+3jXMLNXqW1/FrrRQHk0zifOPv7aKQBXMSftOd9IeVZVwn1oS+AsORLLKIjGmCjtEOClWqHQ2qR6BDb1vpAYyRyPXNyZ7dN+Jwa3c4G/swe/LZgms+LIDzDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YnpoRCp8; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=oo3/fkYPO5svjjiS3MnYlFjqs8uGg+sOfnx2+ACfRubBznGu/uDjpmhQzxq14FJy7LN57kqJBKtor4HsQ/B9b7YkNr2YycgYaTLPHAMN7bpKFIRlruiTfIU0rZBuaJFQzmGZc5zDNwF5e/7ZjWVzg2KKHbocrSCpn9T9LFcGub4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmtTaxO2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YnpoRCp8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 202601F00A3D
-	for <linux-cifs@vger.kernel.org>; Mon,  7 Sep 2026 23:01:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmtTaxO2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 642291F00A3F
+	for <linux-cifs@vger.kernel.org>; Mon,  7 Sep 2026 23:01:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788822061;
-	bh=PX+PF6Pn17SWhjBweuUcg+2Nwy0ktQaf/Kz1R4n5GAE=;
+	s=k20260515; t=1788822078;
+	bh=octyGcAzRI1FTFrNG4m/rXphof1JrQJfSnM3RegK/og=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=YnpoRCp88N40Bx+abjk+P9aymmwIZJoRjadwIMlMnIPOuy3J3WAL1GezE3BZB7841
-	 URBidqQV2AcRhrKRWBXmcCii0vNCqnWoMsjU+PA66VOyavDTk+dlAeslBkup4wWfpl
-	 mO+A0EZcC0dJYjfCpJ/EZfkG5yZC72T8DjFcu83xLdc9bBNme8biDfTK4YqW9pLKlI
-	 3UuL4yBOjIgRI4QjmTLBNfIP/pGc/Ajz91dHWZch+NXi89GkAQpPUtpCbiYaf5Z/ZM
-	 +47yrtd8BIy0g4lNSMFV/ssmAbk7u8CmiJ4X2lWo34ND+H+QAODWFuBNMeUsYYJfxy
-	 ThT1wfbX90XVg==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c20e70a0962so496296566b.2
-        for <linux-cifs@vger.kernel.org>; Mon, 07 Sep 2026 16:01:01 -0700 (PDT)
-X-Gm-Message-State: AFuF++nYF8XHtWma9wDheVJP6A9PiT6+MhsTljm6VocftzGABuhClY3A
-	AxTu8EgR3TaovcboZ8l2W8eOIohZBg7+Jw5PbjrcJTN9THhcdP1A1AqYpk28rx/GE+hdZqQZ9Yb
-	JISx8Ih7gPRETr1hygsM1a0n6LQcTFb8=
-X-Received: by 2002:a17:907:c16:b0:c25:2d27:5652 with SMTP id
- a640c23a62f3a-c260c9d1affmr1740826466b.11.1788822059805; Mon, 07 Sep 2026
- 16:00:59 -0700 (PDT)
+	b=SmtTaxO2V3gC7wQQp8oI4TAZhbINo6Lkgv4qUAZklqdZe6dPgugdal6n7dx0xfLg8
+	 sbrVQm9BlIqImlGYeGe5t65RdLG7eC7xPxQjka6qf3A9wlHBMSCcpyvkukwsooCVX5
+	 H5+KUAkLpgO6263pGpOIith8WyRgghwLVKYROkO41rCD71JNcHbD3UJINwoEGjq9cL
+	 UM+wSEv0m88KSRgDqUn5/4txUDLbdA4FQehYQBqv0IJpjK4tL7e+FLWJA+AV+MNbm8
+	 GdXuIPvHfl5Q5wV4BqF9T7Nr0D5PlQ73qpSw0IVz3p3jZKkkZuzwju5NenIbM2daPX
+	 kA9BDy7bNJuag==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c2544ff970dso547969166b.2
+        for <linux-cifs@vger.kernel.org>; Mon, 07 Sep 2026 16:01:18 -0700 (PDT)
+X-Gm-Message-State: AFuF++ne99sk4y5iCRz2Dyaw9X/q+66Qn/2HKAVoAxIlP/5x8YjsQzbL
+	2kVYlUAWSPnXHUJnMZtC3PWuZVqBml5nHaccrUzxryhNrcz8zyhzLwZ5Fm22GOvyXiWQNIr7Jbq
+	ozJjKM+SpYwKfcnOircFM5v482oB7by0=
+X-Received: by 2002:a17:907:1c22:b0:c26:1649:47a8 with SMTP id
+ a640c23a62f3a-c26164956d1mr848649066b.30.1788822077002; Mon, 07 Sep 2026
+ 16:01:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260906200517.725015-1-pc@manguebit.org> <20260906200517.725015-6-pc@manguebit.org>
-In-Reply-To: <20260906200517.725015-6-pc@manguebit.org>
+References: <20260906200517.725015-1-pc@manguebit.org> <20260906200517.725015-7-pc@manguebit.org>
+In-Reply-To: <20260906200517.725015-7-pc@manguebit.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 8 Sep 2026 08:00:46 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-5rqr0osjZx3Vu-076oB4X3uB11=Y4fue_s3Si0iSxmQ@mail.gmail.com>
-X-Gm-Features: AcwNN1Vnn_qMlVY3OP4Y951aknIl1vqM1jADHiDUO2zZMo8IbwZtrFLf6NlnG7w
-Message-ID: <CAKYAXd-5rqr0osjZx3Vu-076oB4X3uB11=Y4fue_s3Si0iSxmQ@mail.gmail.com>
-Subject: Re: [PATCH v4 6/7] smb: client: fix file type corruption in posix_reparse_to_fattr()
+Date: Tue, 8 Sep 2026 08:01:04 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-jqZW_7m1_jSjoSyfouOOBm=9ODAwrZ944AEuoSJX7-w@mail.gmail.com>
+X-Gm-Features: AcwNN1XlFM_hQqCPDh-Hcc09yNUnmrBg9e1g0z5uqTAK63tgxnG8xFZW4wlhKqQ
+Message-ID: <CAKYAXd-jqZW_7m1_jSjoSyfouOOBm=9ODAwrZ944AEuoSJX7-w@mail.gmail.com>
+Subject: Re: [PATCH v4 7/7] smb: client: fix file type corruption in cifs_reparse_point_to_fattr()
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: linux-cifs@vger.kernel.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
 	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
@@ -60,14 +60,11 @@ rote:
 >
 > Setting the file type in cf_mode without clearing the existing S_IFMT
 > bits first is wrong as it corrupts the file type when cf_mode already
-> has type bits set (e.g. S_IFREG | S_IFCHR =3D=3D S_IFLNK).
+> has type bits set (e.g. S_IFREG | S_IFLNK =3D=3D S_IFDIR | S_IFREG).
 >
-> Use a local ftype variable to collect the new file type and apply it
-> after validation succeeds, clearing S_IFMT and setting the new type in
-> a single assignment.  This avoids stripping cf_mode on malformed
-> reparse points where the function returns false early.
+> Clear S_IFMT before setting S_IFLNK for native and SMB1 symlinks.
 >
-> Closes: https://sashiko.dev/#/patchset/20260906172005.627163-1-pc%40mangu=
+> Closes: https://sashiko.dev/#/patchset/20260906181540.647469-1-pc%40mangu=
 ebit.org
 > Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 > Cc: Namjae Jeon <linkinjeon@kernel.org>
