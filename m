@@ -1,77 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B422A372B5A
-	for <linux-cifs@vger.kernel.org>; Mon,  7 Sep 2026 23:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDBC3542CF;
+	Mon,  7 Sep 2026 23:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788822079; cv=none; b=D0xesuJBIjFW0jPEF2wCYn4FePtQsOrNfnNKCpNpHBc5iW3le28bt74sb0q01oSs5XIb1ZlG9ys0tjnk8KEkv8L0e/llZd8de3VQgOJApqUTYvp5rFPQl33F/PG1U6CIZcLSPR0h5piCkSUBIbvtE6++AbtgRYIpV7TxaiVR/4g=
+	t=1788823220; cv=none; b=uzPTpq1KVSrJUsAvkm1/PkWwO4ZDyPwMKXMh0bFyvL1KUNwYDrDhovDXxpNx8+c3YoOZVktu19U8ea87qgjaTk9HJPohLyaHCp0y1A+6aYmCArE25MhriD0q1S6dnnbtwKTdo8/pEUxFdF60Ah09If5/q9BhnzG83X2DRVdN0GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788822079; c=relaxed/simple;
-	bh=octyGcAzRI1FTFrNG4m/rXphof1JrQJfSnM3RegK/og=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oo3/fkYPO5svjjiS3MnYlFjqs8uGg+sOfnx2+ACfRubBznGu/uDjpmhQzxq14FJy7LN57kqJBKtor4HsQ/B9b7YkNr2YycgYaTLPHAMN7bpKFIRlruiTfIU0rZBuaJFQzmGZc5zDNwF5e/7ZjWVzg2KKHbocrSCpn9T9LFcGub4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmtTaxO2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788823220; c=relaxed/simple;
+	bh=s1rm128vhtUTI/agKCVeujEStb80mQkqntxKg+Caizg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aD99S4KI9dg58PvRG9HyMt7tbawzQqXx20WpDbHPWTsRw09aGKsvpWXy00lTgJ0j/CzbkMgv0TCL4xG7uu0YwZFfpwrxOS/AUv5MJhLdHetYgkyJfU0XnJHmexCgAEw0bUII2EHsddTerQMxLqPuoAz0vQyQez+nVsppti9tEA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hiI3zn2C; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmtTaxO2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 642291F00A3F
-	for <linux-cifs@vger.kernel.org>; Mon,  7 Sep 2026 23:01:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hiI3zn2C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC52D1F00A3A;
+	Mon,  7 Sep 2026 23:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788822078;
-	bh=octyGcAzRI1FTFrNG4m/rXphof1JrQJfSnM3RegK/og=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=SmtTaxO2V3gC7wQQp8oI4TAZhbINo6Lkgv4qUAZklqdZe6dPgugdal6n7dx0xfLg8
-	 sbrVQm9BlIqImlGYeGe5t65RdLG7eC7xPxQjka6qf3A9wlHBMSCcpyvkukwsooCVX5
-	 H5+KUAkLpgO6263pGpOIith8WyRgghwLVKYROkO41rCD71JNcHbD3UJINwoEGjq9cL
-	 UM+wSEv0m88KSRgDqUn5/4txUDLbdA4FQehYQBqv0IJpjK4tL7e+FLWJA+AV+MNbm8
-	 GdXuIPvHfl5Q5wV4BqF9T7Nr0D5PlQ73qpSw0IVz3p3jZKkkZuzwju5NenIbM2daPX
-	 kA9BDy7bNJuag==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c2544ff970dso547969166b.2
-        for <linux-cifs@vger.kernel.org>; Mon, 07 Sep 2026 16:01:18 -0700 (PDT)
-X-Gm-Message-State: AFuF++ne99sk4y5iCRz2Dyaw9X/q+66Qn/2HKAVoAxIlP/5x8YjsQzbL
-	2kVYlUAWSPnXHUJnMZtC3PWuZVqBml5nHaccrUzxryhNrcz8zyhzLwZ5Fm22GOvyXiWQNIr7Jbq
-	ozJjKM+SpYwKfcnOircFM5v482oB7by0=
-X-Received: by 2002:a17:907:1c22:b0:c26:1649:47a8 with SMTP id
- a640c23a62f3a-c26164956d1mr848649066b.30.1788822077002; Mon, 07 Sep 2026
- 16:01:17 -0700 (PDT)
+	s=k20260515; t=1788823218;
+	bh=i8nSAyVxVRCbez6CF7JtknGWhoFuyigEybPbHugp+T0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=hiI3zn2CUg75JLqGPGVh/UyZc+xoi5A6n3zMXSt54VhQQ7yas5KpRLKaS5kWHFGzJ
+	 lNK6s2JD14bzYm2Oy1AZ4uKY9842f0n9Ww6F8bg7trS1jgAryorzgzYVsBYZO0i7RE
+	 wTVyhQKihwDtsxqDg1qBEhBIbrXOsfeo4NcjgdkTFYUmdty2RrWYjqvFq90QyJk/cP
+	 +U3grlICDkWuTm/1YiicTdnSHSUrgD/CMu+VmPUBvxRT+v9H8zj9H5D+dTYGpC7uvJ
+	 2Hl83mTZgKOmttjumNSyWC7v5f1NeymG9vM85IoUYIyPikq+I49vvh252YUcca73Ot
+	 b701KeKnStJzQ==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Enzo Matsumiya <ematsumiya@suse.de>,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1.y 1/3] cifs: Scripted clean up fs/smb/client/fscache.h
+Date: Mon,  7 Sep 2026 19:20:14 -0400
+Message-ID: <20260907232016.765564-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <2026090336-expend-runaround-0e93@gregkh>
+References: <2026090336-expend-runaround-0e93@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260906200517.725015-1-pc@manguebit.org> <20260906200517.725015-7-pc@manguebit.org>
-In-Reply-To: <20260906200517.725015-7-pc@manguebit.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 8 Sep 2026 08:01:04 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-jqZW_7m1_jSjoSyfouOOBm=9ODAwrZ944AEuoSJX7-w@mail.gmail.com>
-X-Gm-Features: AcwNN1XlFM_hQqCPDh-Hcc09yNUnmrBg9e1g0z5uqTAK63tgxnG8xFZW4wlhKqQ
-Message-ID: <CAKYAXd-jqZW_7m1_jSjoSyfouOOBm=9ODAwrZ944AEuoSJX7-w@mail.gmail.com>
-Subject: Re: [PATCH v4 7/7] smb: client: fix file type corruption in cifs_reparse_point_to_fattr()
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 7, 2026 at 5:05=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> w=
-rote:
->
-> Setting the file type in cf_mode without clearing the existing S_IFMT
-> bits first is wrong as it corrupts the file type when cf_mode already
-> has type bits set (e.g. S_IFREG | S_IFLNK =3D=3D S_IFDIR | S_IFREG).
->
-> Clear S_IFMT before setting S_IFLNK for native and SMB1 symlinks.
->
-> Closes: https://sashiko.dev/#/patchset/20260906181540.647469-1-pc%40mangu=
-ebit.org
-> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Bharath SM <bharathsm@microsoft.com>
-> Cc: stable@vger.kernel.org
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks!
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit bc3de356aae666de5d8b5131545be87cf7754431 ]
+
+Remove externs, correct argument names and reformat declarations.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Enzo Matsumiya <ematsumiya@suse.de>
+cc: linux-cifs@vger.kernel.org
+cc: linux-fsdevel@vger.kernel.org
+cc: linux-kernel@vger.kernel.org
+Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Stable-dep-of: 65deb1835934 ("smb: client: reject a tree connect response whose byte count is too small")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/fscache.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
+index c691b98b442a6..e89d26c6e0862 100644
+--- a/fs/smb/client/fscache.h
++++ b/fs/smb/client/fscache.h
+@@ -38,12 +38,12 @@ struct cifs_fscache_inode_coherency_data {
+ /*
+  * fscache.c
+  */
+-extern int cifs_fscache_get_super_cookie(struct cifs_tcon *);
+-extern void cifs_fscache_release_super_cookie(struct cifs_tcon *);
++int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon);
++void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon);
+ 
+-extern void cifs_fscache_get_inode_cookie(struct inode *inode);
+-extern void cifs_fscache_release_inode_cookie(struct inode *);
+-extern void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
++void cifs_fscache_get_inode_cookie(struct inode *inode);
++void cifs_fscache_release_inode_cookie(struct inode *inode);
++void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
+ 
+ static inline
+ void cifs_fscache_fill_coherency(struct inode *inode,
+-- 
+2.53.0
+
