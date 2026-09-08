@@ -1,133 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A262F3614
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 13:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D5B54EEDA;
+	Tue,  8 Sep 2026 15:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788874551; cv=none; b=I2cZfTiS8RbEuqlQu3RDIfJgLEnfGhlIoTYooFuFITgCGwdQoliT+dh0LMU7CujnZB6wu/VkiZ7Bl5Pp22EJ6QlsM9CV0XtzukgbUPUquo15rdWs2h5g/Pd3xGEJHZ/XJ7pt6uCcmvkGOrjEUf/CsKq8SWhw8GckvXeJV/dRbfs=
+	t=1788880809; cv=none; b=eJWDFfoCJEC4+FgfXPWN1Fy8TiZJSS28U/5hdEHyyaCxdh2jDtUMZdUHEvi3ALBe4MKfELjrrAcXd4bBQgGxDUeAhsPohKveV5/IB7YGN4IQ1Bmk1EIzJOmOqEZn2+c6+sUhQOZt6Q27fEUZUvPwgNaoC4drq3j7M3oAJcFhIqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788874551; c=relaxed/simple;
-	bh=jRLWmSQ1yJt4NVQzPoosjnnS6qFiP+AbIGW1zlfD8ek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mSMGmANy8K2Jp0/1RImX/hc68M2xvQs0/3vCqD1V59DK/LMsvvS/OjFML8BSyAfLPA74J9RnL4/R86CaZkVwfxiX3jwUpNBdmMGNFjMAOqjkSa5uL6RMG89hSepfhysqLBfPWNEBZsb9y8uBVGc9ZSzYCv+LSzaskPXGqDAUwy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L7jJAjxu; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788880809; c=relaxed/simple;
+	bh=Rq/mj3Dc9GL38rvpIngDgMLG0QO/a9np4yclZ7eq29Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=FIqCxrkSY6IRidCwxy0vBJFRANYrFIT1kwGQN+1MuedBrgRzm6GaD0hpRvnAiYVeawo/GYrBLDzF8IVavq5EQH5fF32ZMa9sffGEUHJL4/VUkmsE/ptWQHY6d8eaaCsSUu0T+vaLtxqg1DkQrKbramuuVuuIio+L7boPTGD6ZB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=LeU4FJ7d; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L7jJAjxu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 399D81F00AC4
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 13:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788874535;
-	bh=PB7mGes5DxmiOJerZm8E11TDr69SJwv8NYwNhjZZWCQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=L7jJAjxuuDmn1rF2EJlP/Bndi/IW3TEdyXadm0mOkNt6XOdJHZw6XE/Faqpq3T5O4
-	 dOih1KmECuCqqP9T6hPQKXQLoGOvhlm5AkEIDuSp05KNEU7WqUR6oU7ZXBQXCn7ptW
-	 n37Vx8tWjZTpA/8D8U+d7IU9YakR0WWKQ9LubTDUmkTzkjlRb/Evn0Nk/9CZjZccbz
-	 HzActnS+tfObzu0k0vVkiGv6rZkw4jZERgxHJvVduYNSEpLstYwnm0C6/cwwfoVp+P
-	 ThHgD2u7qMuasZdFkDkn6DNeju7dRDvNdML7gY+RW0epyL+f2TRD2hn3+K4UydkWmm
-	 a4JZIuXAykX7Q==
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c25b661d37dso649766666b.0
-        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 06:35:35 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBz2Cwip2ZEBQy17xgy949xLJyIlm1TUJNTrh/3p1rmZl3QvvGYj0TD8GBa6UTlFL/1b0GpvNH/UYzjd@vger.kernel.org
-X-Gm-Message-State: AFuF++kDMOjC4hhYyrTIl4wmH7srRClaWlUMh1I5CvWGIJQz3AeeepB6
-	RF5rIHI34flqvXXxFck6oeinN35izSW7IUpnkgjGqr/73h9ToZAHfBeCVlp2IlCFfZX6RB6ziUb
-	CS1IiNUPqhJb37DtiHIAXNFqXt6pN5tA=
-X-Received: by 2002:a17:907:ea8d:b0:c26:2795:b494 with SMTP id
- a640c23a62f3a-c262795c1b3mr741273366b.49.1788874530621; Tue, 08 Sep 2026
- 06:35:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="LeU4FJ7d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=Rq/mj3Dc9GL38rvpIngDgMLG0QO/a9np4yclZ7eq29Y=; b=L
+	eU4FJ7dfg5eO3OnFiSDQvb1nS2SeqEEOr0pfyRnfJT+AGXmhX9XhJteUB/JXqfbf
+	58TKKQAad+LELIJ0wB9r8B6qMndRxvCPqXxHu4sey7w/XVtexTWfxD9avtRY+ott
+	qIVa+VgT93Cy0gP/Rrf9jFc0E21JDSOOxsCH/BxU8Q=
+Date: Tue, 8 Sep 2026 23:19:24 +0800 (CST)
+From: huhai  <15815827059@163.com>
+To: "Namjae Jeon" <linkinjeon@kernel.org>
+Cc: senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org,
+	"Henry Hu" <huhai@kylinos.cn>, stable@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: Re:Re: [PATCH] ksmbd: fix invalid pointer dereference when
+ get_inode_acl() fails
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20260511(2e539873) Copyright (c) 2002-2026 www.mailtech.cn 163com
+In-Reply-To: <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
+References: <20260908081631.9735-1-15815827059@163.com>
+ <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
+X-NTES-SC: AL_Qu2TCvSTv08t4iScYOkdnk0Th+c8X8O3u/8m3YRSc/sElCXC8xoGd1toIl7k8tuQFgyKujqUVQRN8uBcWIpK2bS7SRnwSYsiDd0G6TRR1Q==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260908081631.9735-1-15815827059@163.com>
-In-Reply-To: <20260908081631.9735-1-15815827059@163.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 8 Sep 2026 22:35:18 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
-X-Gm-Features: AcwNN1WYpfTc2JE2BDFx-ZUXyxY7AN9NsXmy2W21aau5cA21jpg-cbjdzn6rCXQ
-Message-ID: <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix invalid pointer dereference when
- get_inode_acl() fails
-To: huhai <15815827059@163.com>
-Cc: senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org, 
-	Henry Hu <huhai@kylinos.cn>, stable@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <170e71f3.a2f8.1a0819a3e24.Coremail.15815827059@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cSgvCgD3X1Z8J6Bq0NVBAA--.13522W
+X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbCzhyrMWqgJ3wGkgAA3N
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Tue, Sep 8, 2026 at 5:16=E2=80=AFPM huhai <15815827059@163.com> wrote:
->
-> From: Henry Hu <huhai@kylinos.cn>
->
-> When get_inode_acl() fails, it returns an ERR_PTR(), but
-> ksmbd_acls_fattr() stored that pointer in smb_fattr without
-> checking for errors. Later callers then passed the error pointer
-> to security descriptor helpers or posix_acl_release(), resulting
-> in an invalid pointer dereference.
->
-> This was reproduced on an XFS-backed share when xfs_get_acl()
-> returned ERR_PTR(-ENOMEM). Querying the SMB ACL from a CIFS client
-> triggered the crash:
->
->   BUG: unable to handle page fault for address: fffffffffffffff8
->   RIP: smb_acl_sec_desc_scratch_len+0x58/0x90 [ksmbd]
->   Call Trace:
->    smb2_query_info+0x40d/0x17c0 [ksmbd]
->    handle_ksmbd_work+0x1ca/0x770 [ksmbd]
->
-> Fix this by checking the return values from get_inode_acl() in
-> ksmbd_acls_fattr() and propagating any errors to its callers.
-> Update smb2_open() and smb2_get_info_sec() to handle these errors.
->
-> Cc: stable@vger.kernel.org
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Assisted-by: Codex:gpt-5.6-sol
-> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> Signed-off-by: Henry Hu <huhai@kylinos.cn>
-> ---
->  fs/smb/server/smb2pdu.c | 29 +++++++++++++++++++++++------
->  1 file changed, 23 insertions(+), 6 deletions(-)
->
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index b7ce67094626..c6df9a9789ba 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -3634,9 +3634,9 @@ static int smb2_create_sd_buffer(struct ksmbd_work =
-*work,
->                             le32_to_cpu(sd_buf->ccontext.DataLength), tru=
-e, false);
->  }
->
-> -static void ksmbd_acls_fattr(struct smb_fattr *fattr,
-> -                            struct mnt_idmap *idmap,
-> -                            struct inode *inode)
-> +static int ksmbd_acls_fattr(struct smb_fattr *fattr,
-> +                           struct mnt_idmap *idmap,
-> +                           struct inode *inode)
->  {
->         vfsuid_t vfsuid =3D i_uid_into_vfsuid(idmap, inode);
->         vfsgid_t vfsgid =3D i_gid_into_vfsgid(idmap, inode);
-> @@ -3649,9 +3649,19 @@ static void ksmbd_acls_fattr(struct smb_fattr *fat=
-tr,
->
->         if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
->                 fattr->cf_acls =3D get_inode_acl(inode, ACL_TYPE_ACCESS);
-> -               if (S_ISDIR(inode->i_mode))
-> +               if (IS_ERR(fattr->cf_acls))
-> +                       return PTR_ERR(fattr->cf_acls);
--EOPNOTSUPP and -ENODATA can indicate that the filesystem does not
-support or have ACL, so those errors can be normalized to NULL.
-However, other errors such as -ENOMEM, -EIO, and ACL corruption errors
-should be propagated to the caller like this.
-
-> +
-> +               if (S_ISDIR(inode->i_mode)) {
->                         fattr->cf_dacls =3D get_inode_acl(inode, ACL_TYPE=
-_DEFAULT);
-> +                       if (IS_ERR(fattr->cf_dacls)) {
-> +                               posix_acl_release(fattr->cf_acls);
-> +                               return PTR_ERR(fattr->cf_dacls);
-Ditto.
-Thanks.
+QXQgMjAyNi0wOS0wOCAyMTozNToxOCwgIk5hbWphZSBKZW9uIiA8bGlua2luamVvbkBrZXJuZWwu
+b3JnPiB3cm90ZToKPk9uIFR1ZSwgU2VwIDgsIDIwMjYgYXQgNToxNuKAr1BNIGh1aGFpIDwxNTgx
+NTgyNzA1OUAxNjMuY29tPiB3cm90ZToKPj4KPj4gRnJvbTogSGVucnkgSHUgPGh1aGFpQGt5bGlu
+b3MuY24+Cj4+Cj4+IFdoZW4gZ2V0X2lub2RlX2FjbCgpIGZhaWxzLCBpdCByZXR1cm5zIGFuIEVS
+Ul9QVFIoKSwgYnV0Cj4+IGtzbWJkX2FjbHNfZmF0dHIoKSBzdG9yZWQgdGhhdCBwb2ludGVyIGlu
+IHNtYl9mYXR0ciB3aXRob3V0Cj4+IGNoZWNraW5nIGZvciBlcnJvcnMuIExhdGVyIGNhbGxlcnMg
+dGhlbiBwYXNzZWQgdGhlIGVycm9yIHBvaW50ZXIKPj4gdG8gc2VjdXJpdHkgZGVzY3JpcHRvciBo
+ZWxwZXJzIG9yIHBvc2l4X2FjbF9yZWxlYXNlKCksIHJlc3VsdGluZwo+PiBpbiBhbiBpbnZhbGlk
+IHBvaW50ZXIgZGVyZWZlcmVuY2UuCj4+Cj4+IFRoaXMgd2FzIHJlcHJvZHVjZWQgb24gYW4gWEZT
+LWJhY2tlZCBzaGFyZSB3aGVuIHhmc19nZXRfYWNsKCkKPj4gcmV0dXJuZWQgRVJSX1BUUigtRU5P
+TUVNKS4gUXVlcnlpbmcgdGhlIFNNQiBBQ0wgZnJvbSBhIENJRlMgY2xpZW50Cj4+IHRyaWdnZXJl
+ZCB0aGUgY3Jhc2g6Cj4+Cj4+ICAgQlVHOiB1bmFibGUgdG8gaGFuZGxlIHBhZ2UgZmF1bHQgZm9y
+IGFkZHJlc3M6IGZmZmZmZmZmZmZmZmZmZjgKPj4gICBSSVA6IHNtYl9hY2xfc2VjX2Rlc2Nfc2Ny
+YXRjaF9sZW4rMHg1OC8weDkwIFtrc21iZF0KPj4gICBDYWxsIFRyYWNlOgo+PiAgICBzbWIyX3F1
+ZXJ5X2luZm8rMHg0MGQvMHgxN2MwIFtrc21iZF0KPj4gICAgaGFuZGxlX2tzbWJkX3dvcmsrMHgx
+Y2EvMHg3NzAgW2tzbWJkXQo+Pgo+PiBGaXggdGhpcyBieSBjaGVja2luZyB0aGUgcmV0dXJuIHZh
+bHVlcyBmcm9tIGdldF9pbm9kZV9hY2woKSBpbgo+PiBrc21iZF9hY2xzX2ZhdHRyKCkgYW5kIHBy
+b3BhZ2F0aW5nIGFueSBlcnJvcnMgdG8gaXRzIGNhbGxlcnMuCj4+IFVwZGF0ZSBzbWIyX29wZW4o
+KSBhbmQgc21iMl9nZXRfaW5mb19zZWMoKSB0byBoYW5kbGUgdGhlc2UgZXJyb3JzLgo+Pgo+PiBD
+Yzogc3RhYmxlQHZnZXIua2VybmVsLm9yZwo+PiBGaXhlczogZTJmMzQ0ODFiMjRkICgiY2lmc2Q6
+IGFkZCBzZXJ2ZXItc2lkZSBwcm9jZWR1cmVzIGZvciBTTUIzIikKPj4gQXNzaXN0ZWQtYnk6IENv
+ZGV4OmdwdC01LjYtc29sCj4+IFJldmlld2VkLWJ5OiBDaGVuWGlhb1NvbmcgPGNoZW54aWFvc29u
+Z0BreWxpbm9zLmNuPgo+PiBTaWduZWQtb2ZmLWJ5OiBIZW5yeSBIdSA8aHVoYWlAa3lsaW5vcy5j
+bj4KPj4gLS0tCj4+ICBmcy9zbWIvc2VydmVyL3NtYjJwZHUuYyB8IDI5ICsrKysrKysrKysrKysr
+KysrKysrKysrLS0tLS0tCj4+ICAxIGZpbGUgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgNiBk
+ZWxldGlvbnMoLSkKPj4KPj4gZGlmZiAtLWdpdCBhL2ZzL3NtYi9zZXJ2ZXIvc21iMnBkdS5jIGIv
+ZnMvc21iL3NlcnZlci9zbWIycGR1LmMKPj4gaW5kZXggYjdjZTY3MDk0NjI2Li5jNmRmOWE5Nzg5
+YmEgMTAwNjQ0Cj4+IC0tLSBhL2ZzL3NtYi9zZXJ2ZXIvc21iMnBkdS5jCj4+ICsrKyBiL2ZzL3Nt
+Yi9zZXJ2ZXIvc21iMnBkdS5jCj4+IEBAIC0zNjM0LDkgKzM2MzQsOSBAQCBzdGF0aWMgaW50IHNt
+YjJfY3JlYXRlX3NkX2J1ZmZlcihzdHJ1Y3Qga3NtYmRfd29yayAqd29yaywKPj4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGxlMzJfdG9fY3B1KHNkX2J1Zi0+Y2NvbnRleHQuRGF0YUxlbmd0
+aCksIHRydWUsIGZhbHNlKTsKPj4gIH0KPj4KPj4gLXN0YXRpYyB2b2lkIGtzbWJkX2FjbHNfZmF0
+dHIoc3RydWN0IHNtYl9mYXR0ciAqZmF0dHIsCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgc3RydWN0IG1udF9pZG1hcCAqaWRtYXAsCj4+IC0gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgc3RydWN0IGlub2RlICppbm9kZSkKPj4gK3N0YXRpYyBpbnQga3NtYmRfYWNsc19mYXR0cihz
+dHJ1Y3Qgc21iX2ZhdHRyICpmYXR0ciwKPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0
+cnVjdCBtbnRfaWRtYXAgKmlkbWFwLAo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgc3Ry
+dWN0IGlub2RlICppbm9kZSkKPj4gIHsKPj4gICAgICAgICB2ZnN1aWRfdCB2ZnN1aWQgPSBpX3Vp
+ZF9pbnRvX3Zmc3VpZChpZG1hcCwgaW5vZGUpOwo+PiAgICAgICAgIHZmc2dpZF90IHZmc2dpZCA9
+IGlfZ2lkX2ludG9fdmZzZ2lkKGlkbWFwLCBpbm9kZSk7Cj4+IEBAIC0zNjQ5LDkgKzM2NDksMTkg
+QEAgc3RhdGljIHZvaWQga3NtYmRfYWNsc19mYXR0cihzdHJ1Y3Qgc21iX2ZhdHRyICpmYXR0ciwK
+Pj4KPj4gICAgICAgICBpZiAoSVNfRU5BQkxFRChDT05GSUdfRlNfUE9TSVhfQUNMKSkgewo+PiAg
+ICAgICAgICAgICAgICAgZmF0dHItPmNmX2FjbHMgPSBnZXRfaW5vZGVfYWNsKGlub2RlLCBBQ0xf
+VFlQRV9BQ0NFU1MpOwo+PiAtICAgICAgICAgICAgICAgaWYgKFNfSVNESVIoaW5vZGUtPmlfbW9k
+ZSkpCj4+ICsgICAgICAgICAgICAgICBpZiAoSVNfRVJSKGZhdHRyLT5jZl9hY2xzKSkKPj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIFBUUl9FUlIoZmF0dHItPmNmX2FjbHMpOwo+LUVP
+UE5PVFNVUFAgYW5kIC1FTk9EQVRBIGNhbiBpbmRpY2F0ZSB0aGF0IHRoZSBmaWxlc3lzdGVtIGRv
+ZXMgbm90Cj5zdXBwb3J0IG9yIGhhdmUgQUNMLCBzbyB0aG9zZSBlcnJvcnMgY2FuIGJlIG5vcm1h
+bGl6ZWQgdG8gTlVMTC4KPkhvd2V2ZXIsIG90aGVyIGVycm9ycyBzdWNoIGFzIC1FTk9NRU0sIC1F
+SU8sIGFuZCBBQ0wgY29ycnVwdGlvbiBlcnJvcnMKPnNob3VsZCBiZSBwcm9wYWdhdGVkIHRvIHRo
+ZSBjYWxsZXIgbGlrZSB0aGlzLgoKVGhhbmtzIGZvciB0aGUgcmV2aWV3ISBZb3UgYXJlIHJpZ2h0
+IHRoYXQgdW5zdXBwb3J0ZWQgb3IgbWlzc2luZyBBQ0xzIG5lZWQKdG8gYmUgZGlzdGluZ3Vpc2hl
+ZCBmcm9tIGFjdHVhbCBmYWlsdXJlcywgYW5kIEkgbm90aWNlZCB0aGF0IHRoZSBnZW5lcmljClZG
+UyBQT1NJWCBBQ0wgY2FsbGVycyBvbmx5IHRyZWF0IC1FT1BOT1RTVVBQIGFzIG1lYW5pbmcgIm5v
+IEFDTCI6CgpGb3IgZXhhbXBsZSwgcG9zaXhfYWNsX2NobW9kKCkgZG9lczoKICAgIGFjbCA9IGdl
+dF9pbm9kZV9hY2woaW5vZGUsIEFDTF9UWVBFX0FDQ0VTUyk7CiAgICBpZiAoSVNfRVJSX09SX05V
+TEwoYWNsKSkgewogICAgICAgIGlmIChhY2wgPT0gRVJSX1BUUigtRU9QTk9UU1VQUCkpCiAgICAg
+ICAgICAgIHJldHVybiAwOwogICAgICAgIHJldHVybiBQVFJfRVJSKGFjbCk7CiAgICB9Cgpwb3Np
+eF9hY2xfY3JlYXRlKCkgZG9lczoKCiAgICBwID0gZ2V0X2lub2RlX2FjbChkaXIsIEFDTF9UWVBF
+X0RFRkFVTFQpOwogICAgaWYgKCFwIHx8IHAgPT0gRVJSX1BUUigtRU9QTk9UU1VQUCkpIHsKICAg
+ICAgICAqbW9kZSAmPSB+Y3VycmVudF91bWFzaygpOwogICAgICAgIHJldHVybiAwOwogICAgfQog
+ICAgaWYgKElTX0VSUihwKSkKICAgICAgICByZXR1cm4gUFRSX0VSUihwKTsKCk1haW5zdHJlYW0g
+aW4tdHJlZSBmaWxlc3lzdGVtcywgc3VjaCBhcyBleHQ0LCBYRlMsIGFuZCBCdHJmcywgYWxyZWFk
+eQpjb252ZXJ0IC1FTk9EQVRBIChvciAtRU5PQVRUUiBpbiBYRlMsIHdoaWNoIGlzIGFuIGFsaWFz
+IGZvciAtRU5PREFUQSkKdG8gTlVMTCBpbnRlcm5hbGx5LiBUaGVyZWZvcmUsIEkgdGhpbmsgS1NN
+QkQgc2hvdWxkIG9ubHkgbm9ybWFsaXplCi1FT1BOT1RTVVBQIHRvIE5VTEwgYW5kIHByb3BhZ2F0
+ZSBhbGwgb3RoZXIgZXJyb3JzLgoKUGxlYXNlIGxldCBtZSBrbm93IHdoYXQgeW91IHRoaW5rLCBh
+bmQgSSB3aWxsIHNlbmQgYSB2MiBhY2NvcmRpbmdseS4KClRoYW5rcywKSGVucnkgSHUuCgo+Cj4+
+ICsKPj4gKyAgICAgICAgICAgICAgIGlmIChTX0lTRElSKGlub2RlLT5pX21vZGUpKSB7Cj4+ICAg
+ICAgICAgICAgICAgICAgICAgICAgIGZhdHRyLT5jZl9kYWNscyA9IGdldF9pbm9kZV9hY2woaW5v
+ZGUsIEFDTF9UWVBFX0RFRkFVTFQpOwo+PiArICAgICAgICAgICAgICAgICAgICAgICBpZiAoSVNf
+RVJSKGZhdHRyLT5jZl9kYWNscykpIHsKPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBwb3NpeF9hY2xfcmVsZWFzZShmYXR0ci0+Y2ZfYWNscyk7Cj4+ICsgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgcmV0dXJuIFBUUl9FUlIoZmF0dHItPmNmX2RhY2xzKTsKPkRpdHRvLgo+
+VGhhbmtzLgo=
