@@ -1,64 +1,64 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-qv2-f12.google.com (mail-qv2-f12.google.com [74.125.230.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4C4568550
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 15:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A04568548
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 15:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788882330; cv=none; b=jfuCeODE4xDkY6hbhuezFxqJEgHZZUSrJ331g1sdqnapFNRsAlww9A58EPjbqFhebfv15h0cYrAxtSQRIXo9EIM3OIp/Wvk36JmjAg5juM4bMIw6fT2hCMfKAfAbLL2RAOz3q8VrT5lWV1gJvdEqrifCg4xcsajwOSAGFSuvAvo=
+	t=1788882332; cv=none; b=c+xdAOt6FlP2C5oa3GpEJBPRxkJnbiG3VHKVX3xufX35Vc+BBwdAw29a0l/OWxgKaWZzealW53S8cfUKl2w9FEC6Y/YL4G3t7KYPClDiGhqGwwvzRakm9BaKyjbcwPb8C7IhZ/vRL8azfBG5P4III5FQ+5opv8idAIJV684SY2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788882330; c=relaxed/simple;
-	bh=dFKB6M5FKojpRsZt+gYTvbAvCaAVxlex6m2PzwZrubI=;
+	s=arc-20240116; t=1788882332; c=relaxed/simple;
+	bh=QXArjv15FVZH9C/nOWnq4DoBdtC3m4aUZ2D+uGnCtMc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f6nBfd0yl1BmVLJnwYM/lLCBltIg5QV/aekLwUX0hIceFR9wTZ3EKEU5U9UR/mxqYqJcF5bKnsG/DEg7Ub9kFFQVjGvvry4Wyv8LVu3AuI5vNMZwkEFnzco6DGnsx2ixTjA1BYeVXoB1F9fhc/IxwLC4ug1M5bMqSSDGw5Z/8wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2xelVBp; arc=none smtp.client-ip=209.85.219.54
+	 MIME-Version; b=BM/LEuZubD6rtlzuymwmICTSVC/SOTrWhmodCaP3N/bZ1j1rtM1Ce33/utMlau9mhOmWouseMJmTa0aSFHE7RcCGyNGnOWN5jQDxVy0ZGQ0wZTEiI07qHRo7CWz1pwS0aWxItpvFO8xJ+SRywuj0AYEhJdcPLPv1i/01qRhq9mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DgZ57w2e; arc=none smtp.client-ip=74.125.230.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2xelVBp"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-90ccbed6edcso72769166d6.0
-        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 08:45:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgZ57w2e"
+Received: by mail-qv2-f12.google.com with SMTP id 6a1803df08f44-90cdfbd148aso784116d6.2
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 08:45:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788882327; x=1789487127; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1788882328; x=1789487128; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=J2h+q2CPO6RUOr1bTBHq2Gab7Sy0CjwyXjSNQkF67CI=;
-        b=U2xelVBpPfi+FR92iBF3ElR1ZsNVeRFFgFWo1aOfKXbt0F8xE34wDo1yih0tOF5/25
-         8munbgqTHw38BTWjhYu8S3kjEJ8gkFZ/x9ARycZLwygXx1H9rUYawxaYMuijLjuWhap+
-         VdwvZE2VCvoCAH1VJ7e81R7w2owF27YO58s1pzalWxc76qOPAA2FWPUrvzE4x+dBdKtl
-         m6IXrx29mgpgfmtSbawijFdfjwfrz9HFBC2uExiDrLj7hk3SliZhP12JngjIG2v6rOfC
-         hgtViL/1wauXBHDxVx5ukxGWdOQy1lzOGPMnzBZpFysGFL76arx3NjtX2tPr5V74WMaW
-         Z5Rg==
+        bh=gaNUihdkxM1CZL4kcfrTQvejs/c08bSRJ/ek0fixoao=;
+        b=DgZ57w2eMqwBiK+/KAzjKuj3l6X2xWE5WAeAKZVbEHajWfG4ajuJHiz3bq0Ajw6Gt4
+         qi2eA5Tp8aHRkxcgIulPHMZC7ZRI5fg6TurR1MryuXok6e4st/u5w8T2r24E+GfOtvD2
+         V1jTq2phKFJannX0v1JD/U0d+rerF1ZsoGOwQG1rpH0bD1Q1rbEz1ur2u1ksCgiNhX2J
+         SXWHkXUVmGF4gZj1oU95Yx9HPhXKgzWoW3jddJRRzkmEmr2K6nK1LaeIzFRuAzrcdXt+
+         LTaSyNpxCzNsBwm1DruE0QeSnSEKQqU/Kysc1rgCdx8anIFu1fgIDrFCfrJIBchTRDcQ
+         pJxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788882327; x=1789487127;
+        d=1e100.net; s=20251104; t=1788882328; x=1789487128;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=J2h+q2CPO6RUOr1bTBHq2Gab7Sy0CjwyXjSNQkF67CI=;
-        b=kwkERH1ce6gRAEbK9g8rVPDjeER49f8S84NUl8BrpzdhiJWERRJ36pWgPEnBdT9VBu
-         rcRHApsvqZzp/qHalkZKQ5nTCsGf89XtYN3j82JwvWJmwCINW7wKYzEN0ictuCqvMSWF
-         QqawVNxliyrgTRShJ6y/R747qkjVtsLj1mGDAj9tNyFkqM2HFHDuct6vPoIZeRPgkyff
-         aCmV40SCyoXlBTCW1odpuxbOBV/dFYSiHJeywrsefDN95wKfW7L75Vi5hzixSyWMpVDz
-         GA6PLybCML2lW4G49a+S16hGKgHPpKPUddsIWvFt7Rp7WkZTPSCGf7RPWROFLZodZvjz
-         3Hvw==
-X-Forwarded-Encrypted: i=1; AKwUvBxvsdGcmgEpkeW6QioT36acE62yfxsrPAzdIa2++z7Z+nEqxNf2VbX7Nem4lMQ0HKYku0Y8VaU5Rojs@vger.kernel.org
-X-Gm-Message-State: AFuF++m9km1Nr94MhR8P12y0Ce2TIIcPPqKR4QasndnuwREv32NdfqYX
-	Io1TwZbJs/Kpa2VxcU/envABEsphTmdmkxwiEC+W7Msk5zScZusQOY6BtyLL87RIUis=
-X-Gm-Gg: AYBFou3AU3PG8LZDeG3xkLA7ioxaOfaeD0fbV2wGN+01LR66vMohdtn0+piiwj0sZic
-	pB9efi/tXV4oYMEIdNlfm/40SdiTKiZdnasmnLTmErLAru4WiF31z7Wo7fn77yhw/uzv4ov9EFY
-	/BXfrfUMkXOUSfo1wsFZJxyxS4788yyOgnr9DBcOh+Z4hYW7N8epc7a/XB4v+BI7LYQPX1lXTXQ
-	Y512rOdpZY+QuKpSKbuNoSPkT+2WzXQRkEBcmzYzry25uvgt6hfz2DtIBkk2Cq2xOqgwFdkJRUV
-	hWxbI2fZ98+Zw06ZrLKvr9UBk8KEUfeJkhsuoVu/9mnZ0BrNn3h5l328AgEVe5ZT7dwvnyEBG+h
-	6komHwnzqYqPgqrFHM3AF7fVTD986DETj9lNHQXGxAnXuD5YjvTXSvh5J0fvlbn3MT+WGsZ4/ZH
-	e7OhAp9Osa2r6fuQvx2NMxLADrH29JX9PLWQ4VK6sATmQ0PJH9+5Dv6rHmgPZBr3FeEdp4xovKW
-	FtWCnfOUrV1auIJklMdeCVrDgZ0i6xFbF5Bs0g/CQLa6mN6Ui6fwJW0yTh51p8=
-X-Received: by 2002:a05:6214:202b:b0:910:345b:4dea with SMTP id 6a1803df08f44-9103f086aa0mr381765736d6.36.1788882325436;
-        Tue, 08 Sep 2026 08:45:25 -0700 (PDT)
+        bh=gaNUihdkxM1CZL4kcfrTQvejs/c08bSRJ/ek0fixoao=;
+        b=iGw9iim2EWK76Wk++bmqDXIQfQ8Ox/sRQOoX3tyVXEUAvvOP4rWYOihgm5p67A5yTv
+         aCywyfHSwC4Uj6CTd8re8y5rdIGIJ6pK3Ltdl26G4/wYVhvin7KXVA1vK8nD90VeyYl/
+         tDoZT6Az4RC1yYirDwdU5eQ7MEPeoLDDVxXtgdSTuPs80q82BpZwehPq0OqpmK9rxNjl
+         /6wLMBd8OhcRIHOXvOTcQE3q/yXJd3LfpTZHh+8WAj+jZ4QDP5PN4iWfjGmGjK1r0nP7
+         p2Op35YibsiMrzM6JqpvfctildM6cJBMsVl9FUXKElHTfJocsFJXkcHa7bjboJCXfHXj
+         FSuQ==
+X-Forwarded-Encrypted: i=1; AKwUvBxuGeGr4uOC7xvcLaHp0EFjMmPTrfwTwl1Bw+xOXC92ubHt5ky1UjOhgj4CpHsWhDsDIE8whn5HD6h+@vger.kernel.org
+X-Gm-Message-State: AFuF++kXEf9ga9Jc0Bz+zpy/16nunJT3CR01si9E3ozo+li9b0LC+Ka4
+	lyYmKaFvmcXlNEXiPyN2FDtGakk9lyYz611AdDeXgkm/gK257EVieKUg
+X-Gm-Gg: AYBFou2zZGkdDvmetbbRAhj6XgcRVz8glfIiwo+g52nLd62iqMw9r0B7o4f5l9IJ1us
+	HbLZclCzYFqjkYV0SiAewYyhGrfHNTjtSRl3+FkVDTLxUfhjVnvFnUFghBt3XQGrJflwjgpTEeT
+	a1d115Uu7XEoIXP+7uBMgP1JAcIAp6RwYJLNbfTfSHJlN9JLEjbokP0XOHr2iIJA4f6zrinifpB
+	u1ROHk4mn/jm6MzfxMLYteDQVo7VdJM+mGDL6qWofXicuyZcYG/3Ly6OHPjIM5u9malsO4ezUJP
+	XHxgFFVVK9bZa5UdSugzeqzqHRbGlmeFQINJ8+Ge5oI/ewWILt4YKKTu9hXQ9A1ialsiUIhBm6q
+	MCyNIe97f6UBoXaO3XzwMs2xurorO79898X9jnREN8iq7x84q4drqnQBGr6OrdmI8QrNhbnAUuz
+	XCqAhwx43pf6o6ZLe3grz69mxvmQFIwPqV/BDXWbeYkvr3PlLv83rWuMq25lEYbhH8KeXEMQvtw
+	BeMUV2VjRORRyr7MXhMFI817LNIMn8QQy1VsthG7GKtnuccYlDFwygMW0gdavQ=
+X-Received: by 2002:a05:6214:4b03:b0:910:3451:5801 with SMTP id 6a1803df08f44-9106b42808bmr4290496d6.31.1788882328252;
+        Tue, 08 Sep 2026 08:45:28 -0700 (PDT)
 Received: from Ammar-PC-Fedora.tail72f32.ts.net ([2600:1702:7bd1:29f:8000::1])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9104049d30asm120779386d6.0.2026.09.08.08.45.23
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9104049d30asm120779386d6.0.2026.09.08.08.45.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Sep 2026 08:45:24 -0700 (PDT)
+        Tue, 08 Sep 2026 08:45:28 -0700 (PDT)
 From: Ammar Ratnani <ammrat13@gmail.com>
 To: linux-rdma@vger.kernel.org
 Cc: Ammar Ratnani <ammrat13@gmail.com>,
@@ -74,9 +74,9 @@ Cc: Ammar Ratnani <ammrat13@gmail.com>,
 	Tom Talpey <tom@talpey.com>,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH 1/2] infiniband: force disconnect if DREP and DREQ fail
-Date: Tue,  8 Sep 2026 08:44:26 -0700
-Message-ID: <20260908154454.10966-2-ammrat13@gmail.com>
+Subject: [PATCH 2/2] infiniband: trace force disconnections
+Date: Tue,  8 Sep 2026 08:44:27 -0700
+Message-ID: <20260908154454.10966-3-ammrat13@gmail.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260908154454.10966-1-ammrat13@gmail.com>
 References: <20260908154454.10966-1-ammrat13@gmail.com>
@@ -88,15 +88,10 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When we call `rdma_disconnect`, it's possible that we fail to send both
-a DREQ and a DREP. In that case, we currently either do nothing or move
-into the `IB_CM_TIMEWAIT` state. Either way, we remain in the
-`RDMA_CM_CONNECT` state. Anyone waiting for us to disconnect hangs.
-
-Instead, while we're connected, when we call `rdma_disconnect`, and fail
-to send both a DREQ and a DREP, mark the connection as disconnected.
-Call the upper layer's handler for the disconnect, and destroy the
-connection if instructed.
+When we failed to send both a DREQ and a DREP, we have to infer that by
+noting the absence of the `sent_dreq` and `sent_drep` trace events. It
+would be better if we could see this case by the presence of a trace
+event instead. Implement that.
 
 Cc: Leon Romanovsky <leon@kernel.org>
 Cc: Jason Gunthorpe <jgg@ziepe.ca>
@@ -110,68 +105,35 @@ Cc: samba-technical@lists.samba.org
 Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Ammar Ratnani <ammrat13@gmail.com>
 ---
- drivers/infiniband/core/cma.c | 39 +++++++++++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 4 deletions(-)
+ drivers/infiniband/core/cma.c       | 2 ++
+ drivers/infiniband/core/cma_trace.h | 1 +
+ 2 files changed, 3 insertions(+)
 
 diff --git a/drivers/infiniband/core/cma.c b/drivers/infiniband/core/cma.c
-index 73170b15fc3d..1f1a8b4e160a 100644
+index 1f1a8b4e160a..c4eab48a4a9f 100644
 --- a/drivers/infiniband/core/cma.c
 +++ b/drivers/infiniband/core/cma.c
-@@ -4823,6 +4823,34 @@ int rdma_reject(struct rdma_cm_id *id, const void *private_data,
- }
- EXPORT_SYMBOL(rdma_reject);
- 
-+/*
-+ * Called from rdma_disconnect() when we know we're not receiving a callback.
-+ * Emulate what that callback (in cma_ib_handler()) would have done.
-+ *
-+ * NOTE: Despite the name, this function will only actually disconnect when
-+ * we're in the RDMA_CM_CONNECT state. Else, it does nothing.
-+ */
-+static int cma_force_disconnect(struct rdma_id_private *id_priv)
-+{
-+	struct cma_work *work;
-+
-+	work = kzalloc_obj(*work);
-+	if (!work)
-+		return -ENOMEM;
-+
-+	INIT_WORK(&work->work, cma_work_handler);
-+	work->old_state = RDMA_CM_CONNECT;
-+	work->new_state = RDMA_CM_DISCONNECT;
-+	work->event.event = RDMA_CM_EVENT_DISCONNECTED;
-+	work->event.status = -ECONNABORTED;
-+
-+	cma_id_get(id_priv);
-+	work->id = id_priv;
-+
-+	queue_work(cma_wq, &work->work);
-+	return 0;
-+}
-+
- int rdma_disconnect(struct rdma_cm_id *id)
+@@ -4834,6 +4834,8 @@ static int cma_force_disconnect(struct rdma_id_private *id_priv)
  {
- 	struct rdma_id_private *id_priv;
-@@ -4838,12 +4866,15 @@ int rdma_disconnect(struct rdma_cm_id *id)
- 			goto out;
- 		/* Initiate or respond to a disconnect. */
- 		trace_cm_disconnect(id_priv);
--		if (ib_send_cm_dreq(id_priv->cm_id.ib, NULL, 0)) {
--			if (!ib_send_cm_drep(id_priv->cm_id.ib, NULL, 0))
--				trace_cm_sent_drep(id_priv);
--		} else {
-+		if (!ib_send_cm_dreq(id_priv->cm_id.ib, NULL, 0)) {
- 			trace_cm_sent_dreq(id_priv);
-+			goto out;
-+		}
-+		if (!ib_send_cm_drep(id_priv->cm_id.ib, NULL, 0)) {
-+			trace_cm_sent_drep(id_priv);
-+			goto out;
- 		}
-+		ret = cma_force_disconnect(id_priv);
- 	} else if (rdma_cap_iw_cm(id->device, id->port_num)) {
- 		ret = iw_cm_disconnect(id_priv->cm_id.iw, 0);
- 	} else
+ 	struct cma_work *work;
+ 
++	trace_cm_force_disconnect(id_priv);
++
+ 	work = kzalloc_obj(*work);
+ 	if (!work)
+ 		return -ENOMEM;
+diff --git a/drivers/infiniband/core/cma_trace.h b/drivers/infiniband/core/cma_trace.h
+index 3456d5f3aa47..3d05d8e80856 100644
+--- a/drivers/infiniband/core/cma_trace.h
++++ b/drivers/infiniband/core/cma_trace.h
+@@ -61,6 +61,7 @@ DEFINE_CMA_FSM_EVENT(send_sidr_rep);
+ DEFINE_CMA_FSM_EVENT(disconnect);
+ DEFINE_CMA_FSM_EVENT(sent_drep);
+ DEFINE_CMA_FSM_EVENT(sent_dreq);
++DEFINE_CMA_FSM_EVENT(force_disconnect);
+ DEFINE_CMA_FSM_EVENT(id_destroy);
+ 
+ TRACE_EVENT(cm_id_attach,
 -- 
 2.55.0
 
