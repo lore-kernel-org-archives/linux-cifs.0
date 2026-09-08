@@ -1,89 +1,149 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CBCA318EC1
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 01:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB53E3CE099;
+	Tue,  8 Sep 2026 08:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788831893; cv=none; b=QpRb4XFtuTahUKT9xvfbTBswU315kquDG4s7KwwqTCjotuXmAg+ey7hXjoXVSCcRttcDxmJba3yd11o2KXL3utTOwdS14MN8TfuTsRsG+LFSHbawKln/oPTGj5BAeKoj3OpCePb3ZWpbI+Xj4MbTM75AhhD0KGE/iaD451r9Yrg=
+	t=1788855428; cv=none; b=tfcJm4LQbjD3SUlf6PLxow+EJqIKFPhS9hak4nZbpjNX7ZRaZVA+fJh+aufH76Xo0RRPPabxcZ6t4ui0EgG342c7rjobwdz7JsDhkC89Fyt21fhLKie2kNuDy36CvAqiBZxkFTf3xZNEHwu9D+HVyngiIhRzuht+d0qbCmRNOQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788831893; c=relaxed/simple;
-	bh=/lNzL6LhhyMOeckWrw9zQffDuZMucxHXHdt6rpNPtoI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LcKVyWwk11d36DkzGBRMs5OPzD96pKQDF2txEz0dpJ7cQF1tr08LUc7N5Z3NRqMfSIwXWSIWntYQvgfH0MYycfbj1KXABehA04JN0gMU6wk86TcKeshTqxLimGmTA/kQb8z3CL7QKsVRlZPADV/ApOVMEQs3lujU4ScO3RNmnRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrAFH3N2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788855428; c=relaxed/simple;
+	bh=Sw65ndDTc8r9n81YHzvmjfvGSaHZtX4ahC8Fk6N37HA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nXsFK5+Escy5yauaGhgXGqctM8M/SbxiIdFnlmO/OpyOrLGUz+6EwEv1RK8eFNWe4QXQuPogaQ5EaFGnjwU4P7mHdN3aX6GbCOZKAOtIwCFs3kBf+SfI58tZc7N4nZ+BZ3oOvfD9d/IHsTbBwY/W9/m4xyzmNyjhKOnCBbThyxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=j/Z0kEYw; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrAFH3N2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B0D1F00A3A
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 01:44:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788831892;
-	bh=3eK0bf8a1JZWcRTunA+iwtbfBwY6iPMl68z8OPPeZA8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TrAFH3N2KcdUCQ0CjH0Jr8qWgtlyvjvaaih0f6+9yxxBPatOfpE37Xeg8kN7zm3Wf
-	 nrtXcX81tIq7IIgc6XcIYTmrcuT1lT7zYd0gZZIr8EvKqtkLfu5oLNNbVUidWqaz9O
-	 vmEJuxwB1xMV2Q1CcEK9FXC4RhfaOeutfEXTxG5OSkgu8YaUwMosBYrclKXMJY6rJ/
-	 cghw3xaj/n4kztsgwn/MDAF5u5Mh3fzaHUYvCTNEScR0cYqwtlxbwyKMAoB7l0ReyC
-	 /PeZTXqmZAYb1PZSVpxRk/XmbwIJKNbNdEXQMkrtfdMR7JZp2+pP3RtoVVMU34cKGC
-	 Y6titcQDXmtIw==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c197e7e4e94so657880266b.2
-        for <linux-cifs@vger.kernel.org>; Mon, 07 Sep 2026 18:44:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwFagVKl8erG7e0IYFlMlThyImTT/IwEMKL2p7/7eOvsQ43tNNFCqU1DyjWcCTI6X8tgx+kEF2SDw8c@vger.kernel.org
-X-Gm-Message-State: AFuF++kzx1EtNXY6I9NKAHPlZQWNbIsnzfsHbwJeCv9KyRN7d7jLMur3
-	Q2sykvLV+ZiG8OVgmCgRF4ojZjFQMsHKnNk526eU5h/P6b8BG3mnUsPYAe4rrmPYGf7rXfW41Cv
-	H4wWbt/MN2jurNFgsWe8o0gUmMmNnwr8=
-X-Received: by 2002:a17:907:e143:b0:c26:2751:3da4 with SMTP id
- a640c23a62f3a-c26275144e5mr457244766b.13.1788831890673; Mon, 07 Sep 2026
- 18:44:50 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="j/Z0kEYw"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=4T
+	j/lYeU7aAN9IIwH45WiWFJtIZJ9W4kfuzcyjjsibU=; b=j/Z0kEYw3Y9uc4JFtr
+	pU2gvbRC9RJhk1qpWsQQrpl7DlpTJyR9v1U1YN9dq/e20VrzBOJdEDcYnqX8+JCz
+	xN06LOW+eVueEjxPunNMkN+V9L3RF3yD+Fv8Y/3v/9eIOvaDq0RlsxNK2R7iYcIU
+	ocp7MiXmBMWT6JdEtfyqzy43o=
+Received: from ubuntu.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wAXQgJhxJ9q1J15BQ--.22909S2;
+	Tue, 08 Sep 2026 16:16:34 +0800 (CST)
+From: huhai <15815827059@163.com>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	linux-cifs@vger.kernel.org,
+	Henry Hu <huhai@kylinos.cn>,
+	stable@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] ksmbd: fix invalid pointer dereference when get_inode_acl() fails
+Date: Tue,  8 Sep 2026 16:16:31 +0800
+Message-Id: <20260908081631.9735-1-15815827059@163.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <AS8P251MB000193FB2931EC2E2363F2B9C8B22@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
-In-Reply-To: <AS8P251MB000193FB2931EC2E2363F2B9C8B22@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 8 Sep 2026 10:44:37 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8N6iFo_uvzyCzGE3QXYfwd0ysG2f_JsNfu5O5yQ=hL=A@mail.gmail.com>
-X-Gm-Features: AcwNN1UtN7XfeFU-oUnD5LZvYF2AJHTicwkgnecMYN4rPVC3fbkD91cDFnfO-1s
-Message-ID: <CAKYAXd8N6iFo_uvzyCzGE3QXYfwd0ysG2f_JsNfu5O5yQ=hL=A@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix empty DACL handling in smb_check_perm_dacl()
-To: Aamir Ahmed <elb12345@hotmail.co.uk>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Steve French <stfrench@microsoft.com>, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAXQgJhxJ9q1J15BQ--.22909S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyfJF17Kry7uw15Gw4UJwb_yoW5ZF4Upr
+	43Ga4vkrs8XFyxWr97JrWUZw1S9F18tw4fGrZ7K3yfA3Z3t34xtry0yryagFn8CrW8WFyI
+	vrs09r4S9r17JFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jrYFAUUUUU=
+X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbC8ALLUWqfxGKifwAA3m
 
-On Mon, Sep 7, 2026 at 1:31=E2=80=AFPM Aamir Ahmed <elb12345@hotmail.co.uk>=
- wrote:
->
-> smb_check_perm_dacl() does not properly enforce an empty (present,
-> zero-ACE) DACL. Per MS-DTYP section 2.4.5, an empty DACL grants no
-> access to anyone except the object owner's implicit READ_CONTROL and
-> WRITE_DAC permissions.
->
-> The current code has two problems:
->
-> 1. Non-owners requesting only READ_CONTROL or WRITE_DAC are allowed
->    access because the code does not check caller identity before
->    granting these permissions.
->
-> 2. When pdacl_size exceeds sizeof(struct smb_acl) (trailing bytes
->    after the zero-ACE DACL header), the condition
->    !(pdacl_size - sizeof(struct smb_acl)) evaluates to false, and the
->    function returns success (rc=3D0) regardless of the access requested.
->    This means trailing bytes after a zero-ACE DACL bypass all access
->    control.
->
-> Fix both by moving the uid/sid resolution and is_owner determination
-> before the num_aces check, then denying all non-owner access and
-> restricting owners to READ_CONTROL|WRITE_DAC.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Signed-off-by: Aamir Ahmed <elb12345@hotmail.co.uk>
-This patch is same with "ksmbd: deny access for an empty DACL instead
-of granting the request".
-It seems like only the patch titles are different. Which one should I check=
-?
+From: Henry Hu <huhai@kylinos.cn>
+
+When get_inode_acl() fails, it returns an ERR_PTR(), but
+ksmbd_acls_fattr() stored that pointer in smb_fattr without
+checking for errors. Later callers then passed the error pointer
+to security descriptor helpers or posix_acl_release(), resulting
+in an invalid pointer dereference.
+
+This was reproduced on an XFS-backed share when xfs_get_acl()
+returned ERR_PTR(-ENOMEM). Querying the SMB ACL from a CIFS client
+triggered the crash:
+
+  BUG: unable to handle page fault for address: fffffffffffffff8
+  RIP: smb_acl_sec_desc_scratch_len+0x58/0x90 [ksmbd]
+  Call Trace:
+   smb2_query_info+0x40d/0x17c0 [ksmbd]
+   handle_ksmbd_work+0x1ca/0x770 [ksmbd]
+
+Fix this by checking the return values from get_inode_acl() in
+ksmbd_acls_fattr() and propagating any errors to its callers.
+Update smb2_open() and smb2_get_info_sec() to handle these errors.
+
+Cc: stable@vger.kernel.org
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Assisted-by: Codex:gpt-5.6-sol
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: Henry Hu <huhai@kylinos.cn>
+---
+ fs/smb/server/smb2pdu.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b7ce67094626..c6df9a9789ba 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3634,9 +3634,9 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
+ 			    le32_to_cpu(sd_buf->ccontext.DataLength), true, false);
+ }
+ 
+-static void ksmbd_acls_fattr(struct smb_fattr *fattr,
+-			     struct mnt_idmap *idmap,
+-			     struct inode *inode)
++static int ksmbd_acls_fattr(struct smb_fattr *fattr,
++			    struct mnt_idmap *idmap,
++			    struct inode *inode)
+ {
+ 	vfsuid_t vfsuid = i_uid_into_vfsuid(idmap, inode);
+ 	vfsgid_t vfsgid = i_gid_into_vfsgid(idmap, inode);
+@@ -3649,9 +3649,19 @@ static void ksmbd_acls_fattr(struct smb_fattr *fattr,
+ 
+ 	if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
+ 		fattr->cf_acls = get_inode_acl(inode, ACL_TYPE_ACCESS);
+-		if (S_ISDIR(inode->i_mode))
++		if (IS_ERR(fattr->cf_acls))
++			return PTR_ERR(fattr->cf_acls);
++
++		if (S_ISDIR(inode->i_mode)) {
+ 			fattr->cf_dacls = get_inode_acl(inode, ACL_TYPE_DEFAULT);
++			if (IS_ERR(fattr->cf_dacls)) {
++				posix_acl_release(fattr->cf_acls);
++				return PTR_ERR(fattr->cf_dacls);
++			}
++		}
+ 	}
++
++	return 0;
+ }
+ 
+ enum {
+@@ -4778,7 +4788,10 @@ int smb2_open(struct ksmbd_work *work)
+ 					int pntsd_size;
+ 					size_t scratch_len;
+ 
+-					ksmbd_acls_fattr(&fattr, idmap, inode);
++					rc = ksmbd_acls_fattr(&fattr, idmap, inode);
++					if (rc)
++						goto err_out;
++
+ 					scratch_len = smb_acl_sec_desc_scratch_len(&fattr,
+ 							NULL, 0,
+ 							OWNER_SECINFO | GROUP_SECINFO |
+@@ -7643,7 +7656,11 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 
+ 	idmap = file_mnt_idmap(fp->filp);
+ 	inode = file_inode(fp->filp);
+-	ksmbd_acls_fattr(&fattr, idmap, inode);
++	rc = ksmbd_acls_fattr(&fattr, idmap, inode);
++	if (rc) {
++		ksmbd_fd_put(work, fp);
++		return rc;
++	}
+ 
+ 	if (test_share_config_flag(work->tcon->share_conf,
+ 				   KSMBD_SHARE_FLAG_ACL_XATTR))
+-- 
+2.40.1
+
