@@ -1,435 +1,133 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4254534460;
-	Tue,  8 Sep 2026 12:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A262F3614
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 13:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788870026; cv=none; b=lix8ST3UhjtMne++mhRZ0OVqvePad4ytNcp4k66qCVX5vQmKwWbQZvkNJ6iLTYM/L9BpYWlaPDlTceDH/gZy0zdzRPILhwIz7FbPj32OuGVmdO2/yRgaJxA7quv+hTKYQY7DChMydyklg14Ve9TRafXXCQiUFvy+rvtDYacYuCo=
+	t=1788874551; cv=none; b=I2cZfTiS8RbEuqlQu3RDIfJgLEnfGhlIoTYooFuFITgCGwdQoliT+dh0LMU7CujnZB6wu/VkiZ7Bl5Pp22EJ6QlsM9CV0XtzukgbUPUquo15rdWs2h5g/Pd3xGEJHZ/XJ7pt6uCcmvkGOrjEUf/CsKq8SWhw8GckvXeJV/dRbfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788870026; c=relaxed/simple;
-	bh=byAJOdTpBF4CGlWDA5AzH0j6A2+DrEKRxxsIboe9xrw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WLjiZBAJT0tnTb2k3kK6dcXN5mYx+jBZf551cmLw1qCLl8m2HTtPQa7QpuwcS3sZL/eDmk1ywCAi+UPTl7Kj1E7DvrvceYemWHvV4rYO1MiC88sPpXJDWAnMd49+Eyqufqlgfk38vQdk0eLXoKHqXeNfr6OyRVkaWK4D7ynRBVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkLMwUgT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788874551; c=relaxed/simple;
+	bh=jRLWmSQ1yJt4NVQzPoosjnnS6qFiP+AbIGW1zlfD8ek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mSMGmANy8K2Jp0/1RImX/hc68M2xvQs0/3vCqD1V59DK/LMsvvS/OjFML8BSyAfLPA74J9RnL4/R86CaZkVwfxiX3jwUpNBdmMGNFjMAOqjkSa5uL6RMG89hSepfhysqLBfPWNEBZsb9y8uBVGc9ZSzYCv+LSzaskPXGqDAUwy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L7jJAjxu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkLMwUgT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72EF21F00A3A;
-	Tue,  8 Sep 2026 12:20:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L7jJAjxu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 399D81F00AC4
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 13:35:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788870018;
-	bh=RfmNEGjJsS/8c2GKuZ5ounjH9LtPffgjWi3vpyDzxbs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=OkLMwUgTKFv4raOZUv4p+4J63le4/YXeU13EuJBy1LqxqbdNNHtlicHzn+Kplyz5L
-	 qUAK1hFZwfaRlbV135r2cvtZEYxww0H9xjjk4AJAzztAcJOspXAXm3wOMJ/5DT5cs0
-	 slbNhAQxRKrN5LTFC/H72y+/yROHVWxrMDCtf8gUNgK05WWcoi5dPopCXL5x9TnsGE
-	 uiP/7ink7TysEMkobIZA8Naq4SIbe38Ue0FlUYK8+mboRoX1S6cjPM7T9nMmisYLvn
-	 sFuBPM3L79pjse8K767ewj9vTC+93698Dd/CysrnKmdidUva4WoOn5y53rVauTALEX
-	 hVXbtTGMYL4lQ==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10.y 1/2] cifs: SMB1 split: connect.c
-Date: Tue,  8 Sep 2026 08:20:14 -0400
-Message-ID: <20260908122015.2050174-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <2026090337-crease-stuffing-cff2@gregkh>
-References: <2026090337-crease-stuffing-cff2@gregkh>
+	s=k20260515; t=1788874535;
+	bh=PB7mGes5DxmiOJerZm8E11TDr69SJwv8NYwNhjZZWCQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=L7jJAjxuuDmn1rF2EJlP/Bndi/IW3TEdyXadm0mOkNt6XOdJHZw6XE/Faqpq3T5O4
+	 dOih1KmECuCqqP9T6hPQKXQLoGOvhlm5AkEIDuSp05KNEU7WqUR6oU7ZXBQXCn7ptW
+	 n37Vx8tWjZTpA/8D8U+d7IU9YakR0WWKQ9LubTDUmkTzkjlRb/Evn0Nk/9CZjZccbz
+	 HzActnS+tfObzu0k0vVkiGv6rZkw4jZERgxHJvVduYNSEpLstYwnm0C6/cwwfoVp+P
+	 ThHgD2u7qMuasZdFkDkn6DNeju7dRDvNdML7gY+RW0epyL+f2TRD2hn3+K4UydkWmm
+	 a4JZIuXAykX7Q==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c25b661d37dso649766666b.0
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 06:35:35 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBz2Cwip2ZEBQy17xgy949xLJyIlm1TUJNTrh/3p1rmZl3QvvGYj0TD8GBa6UTlFL/1b0GpvNH/UYzjd@vger.kernel.org
+X-Gm-Message-State: AFuF++kDMOjC4hhYyrTIl4wmH7srRClaWlUMh1I5CvWGIJQz3AeeepB6
+	RF5rIHI34flqvXXxFck6oeinN35izSW7IUpnkgjGqr/73h9ToZAHfBeCVlp2IlCFfZX6RB6ziUb
+	CS1IiNUPqhJb37DtiHIAXNFqXt6pN5tA=
+X-Received: by 2002:a17:907:ea8d:b0:c26:2795:b494 with SMTP id
+ a640c23a62f3a-c262795c1b3mr741273366b.49.1788874530621; Tue, 08 Sep 2026
+ 06:35:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260908081631.9735-1-15815827059@163.com>
+In-Reply-To: <20260908081631.9735-1-15815827059@163.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 8 Sep 2026 22:35:18 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
+X-Gm-Features: AcwNN1WYpfTc2JE2BDFx-ZUXyxY7AN9NsXmy2W21aau5cA21jpg-cbjdzn6rCXQ
+Message-ID: <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix invalid pointer dereference when
+ get_inode_acl() fails
+To: huhai <15815827059@163.com>
+Cc: senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org, 
+	Henry Hu <huhai@kylinos.cn>, stable@vger.kernel.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: David Howells <dhowells@redhat.com>
+On Tue, Sep 8, 2026 at 5:16=E2=80=AFPM huhai <15815827059@163.com> wrote:
+>
+> From: Henry Hu <huhai@kylinos.cn>
+>
+> When get_inode_acl() fails, it returns an ERR_PTR(), but
+> ksmbd_acls_fattr() stored that pointer in smb_fattr without
+> checking for errors. Later callers then passed the error pointer
+> to security descriptor helpers or posix_acl_release(), resulting
+> in an invalid pointer dereference.
+>
+> This was reproduced on an XFS-backed share when xfs_get_acl()
+> returned ERR_PTR(-ENOMEM). Querying the SMB ACL from a CIFS client
+> triggered the crash:
+>
+>   BUG: unable to handle page fault for address: fffffffffffffff8
+>   RIP: smb_acl_sec_desc_scratch_len+0x58/0x90 [ksmbd]
+>   Call Trace:
+>    smb2_query_info+0x40d/0x17c0 [ksmbd]
+>    handle_ksmbd_work+0x1ca/0x770 [ksmbd]
+>
+> Fix this by checking the return values from get_inode_acl() in
+> ksmbd_acls_fattr() and propagating any errors to its callers.
+> Update smb2_open() and smb2_get_info_sec() to handle these errors.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Assisted-by: Codex:gpt-5.6-sol
+> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+> Signed-off-by: Henry Hu <huhai@kylinos.cn>
+> ---
+>  fs/smb/server/smb2pdu.c | 29 +++++++++++++++++++++++------
+>  1 file changed, 23 insertions(+), 6 deletions(-)
+>
+> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+> index b7ce67094626..c6df9a9789ba 100644
+> --- a/fs/smb/server/smb2pdu.c
+> +++ b/fs/smb/server/smb2pdu.c
+> @@ -3634,9 +3634,9 @@ static int smb2_create_sd_buffer(struct ksmbd_work =
+*work,
+>                             le32_to_cpu(sd_buf->ccontext.DataLength), tru=
+e, false);
+>  }
+>
+> -static void ksmbd_acls_fattr(struct smb_fattr *fattr,
+> -                            struct mnt_idmap *idmap,
+> -                            struct inode *inode)
+> +static int ksmbd_acls_fattr(struct smb_fattr *fattr,
+> +                           struct mnt_idmap *idmap,
+> +                           struct inode *inode)
+>  {
+>         vfsuid_t vfsuid =3D i_uid_into_vfsuid(idmap, inode);
+>         vfsgid_t vfsgid =3D i_gid_into_vfsgid(idmap, inode);
+> @@ -3649,9 +3649,19 @@ static void ksmbd_acls_fattr(struct smb_fattr *fat=
+tr,
+>
+>         if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
+>                 fattr->cf_acls =3D get_inode_acl(inode, ACL_TYPE_ACCESS);
+> -               if (S_ISDIR(inode->i_mode))
+> +               if (IS_ERR(fattr->cf_acls))
+> +                       return PTR_ERR(fattr->cf_acls);
+-EOPNOTSUPP and -ENODATA can indicate that the filesystem does not
+support or have ACL, so those errors can be normalized to NULL.
+However, other errors such as -ENOMEM, -EIO, and ACL corruption errors
+should be propagated to the caller like this.
 
-[ Upstream commit 88f7d7e32d9e086ba87c6b04a9ba57f3f41268bd ]
-
-Split SMB1-specific connection management stuff to smb1ops.c and move
-CIFSTCon() to cifssmb.c.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-
-[ sashal: Reduced backport -- upstream 88f7d7e32d9e0 touches 5 file(s), this
-  backport carries 2. Not backported here:
-  fs/smb/client/cifsproto.h
-  fs/smb/client/cifssmb.c
-  fs/smb/client/connect.c
-  fs/smb/client/smb1ops.c
-  fs/smb/client/smb1proto.h
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: 65deb1835934 ("smb: client: reject a tree connect response whose byte count is too small")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/cifs/cifssmb.c | 161 +++++++++++++++++++++++++++++++++++++++++++++
- fs/cifs/connect.c | 162 ----------------------------------------------
- 2 files changed, 161 insertions(+), 162 deletions(-)
-
-diff --git a/fs/cifs/cifssmb.c b/fs/cifs/cifssmb.c
-index 67ff1669cab2a..e69ab38a648d2 100644
---- a/fs/cifs/cifssmb.c
-+++ b/fs/cifs/cifssmb.c
-@@ -699,6 +699,167 @@ CIFSSMBNegotiate(const unsigned int xid, struct cifs_ses *ses)
- 	return rc;
- }
- 
-+/*
-+ * Issue a TREE_CONNECT request.
-+ */
-+int
-+CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
-+	 const char *tree, struct cifs_tcon *tcon,
-+	 const struct nls_table *nls_codepage)
-+{
-+	struct smb_hdr *smb_buffer;
-+	struct smb_hdr *smb_buffer_response;
-+	TCONX_REQ *pSMB;
-+	TCONX_RSP *pSMBr;
-+	unsigned char *bcc_ptr;
-+	int rc = 0;
-+	int length;
-+	__u16 bytes_left, count;
-+
-+	if (ses == NULL)
-+		return -EIO;
-+
-+	smb_buffer = cifs_buf_get();
-+	if (smb_buffer == NULL)
-+		return -ENOMEM;
-+
-+	smb_buffer_response = smb_buffer;
-+
-+	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
-+			NULL /*no tid */ , 4 /*wct */ );
-+
-+	smb_buffer->Mid = get_next_mid(ses->server);
-+	smb_buffer->Uid = ses->Suid;
-+	pSMB = (TCONX_REQ *) smb_buffer;
-+	pSMBr = (TCONX_RSP *) smb_buffer_response;
-+
-+	pSMB->AndXCommand = 0xFF;
-+	pSMB->Flags = cpu_to_le16(TCON_EXTENDED_SECINFO);
-+	bcc_ptr = &pSMB->Password[0];
-+	if (tcon->pipe || (ses->server->sec_mode & SECMODE_USER)) {
-+		pSMB->PasswordLength = cpu_to_le16(1);	/* minimum */
-+		*bcc_ptr = 0; /* password is null byte */
-+		bcc_ptr++;              /* skip password */
-+		/* already aligned so no need to do it below */
-+	} else {
-+		pSMB->PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
-+		/* BB FIXME add code to fail this if NTLMv2 or Kerberos
-+		   specified as required (when that support is added to
-+		   the vfs in the future) as only NTLM or the much
-+		   weaker LANMAN (which we do not send by default) is accepted
-+		   by Samba (not sure whether other servers allow
-+		   NTLMv2 password here) */
-+#ifdef CONFIG_CIFS_WEAK_PW_HASH
-+		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
-+		    (ses->sectype == LANMAN))
-+			calc_lanman_hash(tcon->password, ses->server->cryptkey,
-+					 ses->server->sec_mode &
-+					    SECMODE_PW_ENCRYPT ? true : false,
-+					 bcc_ptr);
-+		else
-+#endif /* CIFS_WEAK_PW_HASH */
-+		rc = SMBNTencrypt(tcon->password, ses->server->cryptkey,
-+					bcc_ptr, nls_codepage);
-+		if (rc) {
-+			cifs_dbg(FYI, "%s Can't generate NTLM rsp. Error: %d\n",
-+				 __func__, rc);
-+			goto out;
-+		}
-+
-+		bcc_ptr += CIFS_AUTH_RESP_SIZE;
-+		if (ses->capabilities & CAP_UNICODE) {
-+			/* must align unicode strings */
-+			*bcc_ptr = 0; /* null byte password */
-+			bcc_ptr++;
-+		}
-+	}
-+
-+	if (ses->server->sign)
-+		smb_buffer->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
-+
-+	if (ses->capabilities & CAP_STATUS32) {
-+		smb_buffer->Flags2 |= SMBFLG2_ERR_STATUS;
-+	}
-+	if (ses->capabilities & CAP_DFS) {
-+		smb_buffer->Flags2 |= SMBFLG2_DFS;
-+	}
-+	if (ses->capabilities & CAP_UNICODE) {
-+		smb_buffer->Flags2 |= SMBFLG2_UNICODE;
-+		length =
-+		    cifs_strtoUTF16((__le16 *) bcc_ptr, tree,
-+			6 /* max utf8 char length in bytes */ *
-+			(/* server len*/ + 256 /* share len */), nls_codepage);
-+		bcc_ptr += 2 * length;	/* convert num 16 bit words to bytes */
-+		bcc_ptr += 2;	/* skip trailing null */
-+	} else {		/* ASCII */
-+		strcpy(bcc_ptr, tree);
-+		bcc_ptr += strlen(tree) + 1;
-+	}
-+	strcpy(bcc_ptr, "?????");
-+	bcc_ptr += strlen("?????");
-+	bcc_ptr += 1;
-+	count = bcc_ptr - &pSMB->Password[0];
-+	be32_add_cpu(&pSMB->hdr.smb_buf_length, count);
-+	pSMB->ByteCount = cpu_to_le16(count);
-+
-+	rc = SendReceive(xid, ses, smb_buffer, smb_buffer_response, &length,
-+			 0);
-+
-+	/* above now done in SendReceive */
-+	if (rc == 0) {
-+		bool is_unicode;
-+
-+		tcon->tidStatus = CifsGood;
-+		tcon->need_reconnect = false;
-+		tcon->tid = smb_buffer_response->Tid;
-+		bcc_ptr = pByteArea(smb_buffer_response);
-+		bytes_left = get_bcc(smb_buffer_response);
-+		length = strnlen(bcc_ptr, bytes_left - 2);
-+		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
-+			is_unicode = true;
-+		else
-+			is_unicode = false;
-+
-+
-+		/* skip service field (NB: this field is always ASCII) */
-+		if (length == 3) {
-+			if ((bcc_ptr[0] == 'I') && (bcc_ptr[1] == 'P') &&
-+			    (bcc_ptr[2] == 'C')) {
-+				cifs_dbg(FYI, "IPC connection\n");
-+				tcon->ipc = true;
-+				tcon->pipe = true;
-+			}
-+		} else if (length == 2) {
-+			if ((bcc_ptr[0] == 'A') && (bcc_ptr[1] == ':')) {
-+				/* the most common case */
-+				cifs_dbg(FYI, "disk share connection\n");
-+			}
-+		}
-+		bcc_ptr += length + 1;
-+		bytes_left -= (length + 1);
-+		strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
-+
-+		/* mostly informational -- no need to fail on error here */
-+		kfree(tcon->nativeFileSystem);
-+		tcon->nativeFileSystem = cifs_strndup_from_utf16(bcc_ptr,
-+						      bytes_left, is_unicode,
-+						      nls_codepage);
-+
-+		cifs_dbg(FYI, "nativeFileSystem=%s\n", tcon->nativeFileSystem);
-+
-+		if ((smb_buffer_response->WordCount == 3) ||
-+				 (smb_buffer_response->WordCount == 7))
-+			/* field is in same location */
-+			tcon->Flags = le16_to_cpu(pSMBr->OptionalSupport);
-+		else
-+			tcon->Flags = 0;
-+		cifs_dbg(FYI, "Tcon flags: 0x%x\n", tcon->Flags);
-+	}
-+out:
-+	cifs_buf_release(smb_buffer);
-+	return rc;
-+}
-+
- int
- CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon)
- {
-diff --git a/fs/cifs/connect.c b/fs/cifs/connect.c
-index a95b9d2318fa2..16bc181a25647 100644
---- a/fs/cifs/connect.c
-+++ b/fs/cifs/connect.c
-@@ -4838,168 +4838,6 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb_vol *vol)
- }
- #endif
- 
--/*
-- * Issue a TREE_CONNECT request.
-- */
--int
--CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
--	 const char *tree, struct cifs_tcon *tcon,
--	 const struct nls_table *nls_codepage)
--{
--	struct smb_hdr *smb_buffer;
--	struct smb_hdr *smb_buffer_response;
--	TCONX_REQ *pSMB;
--	TCONX_RSP *pSMBr;
--	unsigned char *bcc_ptr;
--	int rc = 0;
--	int length;
--	__u16 bytes_left, count;
--
--	if (ses == NULL)
--		return -EIO;
--
--	smb_buffer = cifs_buf_get();
--	if (smb_buffer == NULL)
--		return -ENOMEM;
--
--	smb_buffer_response = smb_buffer;
--
--	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
--			NULL /*no tid */ , 4 /*wct */ );
--
--	smb_buffer->Mid = get_next_mid(ses->server);
--	smb_buffer->Uid = ses->Suid;
--	pSMB = (TCONX_REQ *) smb_buffer;
--	pSMBr = (TCONX_RSP *) smb_buffer_response;
--
--	pSMB->AndXCommand = 0xFF;
--	pSMB->Flags = cpu_to_le16(TCON_EXTENDED_SECINFO);
--	bcc_ptr = &pSMB->Password[0];
--	if (tcon->pipe || (ses->server->sec_mode & SECMODE_USER)) {
--		pSMB->PasswordLength = cpu_to_le16(1);	/* minimum */
--		*bcc_ptr = 0; /* password is null byte */
--		bcc_ptr++;              /* skip password */
--		/* already aligned so no need to do it below */
--	} else {
--		pSMB->PasswordLength = cpu_to_le16(CIFS_AUTH_RESP_SIZE);
--		/* BB FIXME add code to fail this if NTLMv2 or Kerberos
--		   specified as required (when that support is added to
--		   the vfs in the future) as only NTLM or the much
--		   weaker LANMAN (which we do not send by default) is accepted
--		   by Samba (not sure whether other servers allow
--		   NTLMv2 password here) */
--#ifdef CONFIG_CIFS_WEAK_PW_HASH
--		if ((global_secflags & CIFSSEC_MAY_LANMAN) &&
--		    (ses->sectype == LANMAN))
--			calc_lanman_hash(tcon->password, ses->server->cryptkey,
--					 ses->server->sec_mode &
--					    SECMODE_PW_ENCRYPT ? true : false,
--					 bcc_ptr);
--		else
--#endif /* CIFS_WEAK_PW_HASH */
--		rc = SMBNTencrypt(tcon->password, ses->server->cryptkey,
--					bcc_ptr, nls_codepage);
--		if (rc) {
--			cifs_dbg(FYI, "%s Can't generate NTLM rsp. Error: %d\n",
--				 __func__, rc);
--			cifs_buf_release(smb_buffer);
--			return rc;
--		}
--
--		bcc_ptr += CIFS_AUTH_RESP_SIZE;
--		if (ses->capabilities & CAP_UNICODE) {
--			/* must align unicode strings */
--			*bcc_ptr = 0; /* null byte password */
--			bcc_ptr++;
--		}
--	}
--
--	if (ses->server->sign)
--		smb_buffer->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
--
--	if (ses->capabilities & CAP_STATUS32) {
--		smb_buffer->Flags2 |= SMBFLG2_ERR_STATUS;
--	}
--	if (ses->capabilities & CAP_DFS) {
--		smb_buffer->Flags2 |= SMBFLG2_DFS;
--	}
--	if (ses->capabilities & CAP_UNICODE) {
--		smb_buffer->Flags2 |= SMBFLG2_UNICODE;
--		length =
--		    cifs_strtoUTF16((__le16 *) bcc_ptr, tree,
--			6 /* max utf8 char length in bytes */ *
--			(/* server len*/ + 256 /* share len */), nls_codepage);
--		bcc_ptr += 2 * length;	/* convert num 16 bit words to bytes */
--		bcc_ptr += 2;	/* skip trailing null */
--	} else {		/* ASCII */
--		strcpy(bcc_ptr, tree);
--		bcc_ptr += strlen(tree) + 1;
--	}
--	strcpy(bcc_ptr, "?????");
--	bcc_ptr += strlen("?????");
--	bcc_ptr += 1;
--	count = bcc_ptr - &pSMB->Password[0];
--	be32_add_cpu(&pSMB->hdr.smb_buf_length, count);
--	pSMB->ByteCount = cpu_to_le16(count);
--
--	rc = SendReceive(xid, ses, smb_buffer, smb_buffer_response, &length,
--			 0);
--
--	/* above now done in SendReceive */
--	if (rc == 0) {
--		bool is_unicode;
--
--		tcon->tidStatus = CifsGood;
--		tcon->need_reconnect = false;
--		tcon->tid = smb_buffer_response->Tid;
--		bcc_ptr = pByteArea(smb_buffer_response);
--		bytes_left = get_bcc(smb_buffer_response);
--		length = strnlen(bcc_ptr, bytes_left - 2);
--		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
--			is_unicode = true;
--		else
--			is_unicode = false;
--
--
--		/* skip service field (NB: this field is always ASCII) */
--		if (length == 3) {
--			if ((bcc_ptr[0] == 'I') && (bcc_ptr[1] == 'P') &&
--			    (bcc_ptr[2] == 'C')) {
--				cifs_dbg(FYI, "IPC connection\n");
--				tcon->ipc = true;
--				tcon->pipe = true;
--			}
--		} else if (length == 2) {
--			if ((bcc_ptr[0] == 'A') && (bcc_ptr[1] == ':')) {
--				/* the most common case */
--				cifs_dbg(FYI, "disk share connection\n");
--			}
--		}
--		bcc_ptr += length + 1;
--		bytes_left -= (length + 1);
--		strlcpy(tcon->treeName, tree, sizeof(tcon->treeName));
--
--		/* mostly informational -- no need to fail on error here */
--		kfree(tcon->nativeFileSystem);
--		tcon->nativeFileSystem = cifs_strndup_from_utf16(bcc_ptr,
--						      bytes_left, is_unicode,
--						      nls_codepage);
--
--		cifs_dbg(FYI, "nativeFileSystem=%s\n", tcon->nativeFileSystem);
--
--		if ((smb_buffer_response->WordCount == 3) ||
--			 (smb_buffer_response->WordCount == 7))
--			/* field is in same location */
--			tcon->Flags = le16_to_cpu(pSMBr->OptionalSupport);
--		else
--			tcon->Flags = 0;
--		cifs_dbg(FYI, "Tcon flags: 0x%x\n", tcon->Flags);
--	}
--
--	cifs_buf_release(smb_buffer);
--	return rc;
--}
--
- static void delayed_free(struct rcu_head *p)
- {
- 	struct cifs_sb_info *sbi = container_of(p, struct cifs_sb_info, rcu);
--- 
-2.53.0
-
+> +
+> +               if (S_ISDIR(inode->i_mode)) {
+>                         fattr->cf_dacls =3D get_inode_acl(inode, ACL_TYPE=
+_DEFAULT);
+> +                       if (IS_ERR(fattr->cf_dacls)) {
+> +                               posix_acl_release(fattr->cf_acls);
+> +                               return PTR_ERR(fattr->cf_dacls);
+Ditto.
+Thanks.
