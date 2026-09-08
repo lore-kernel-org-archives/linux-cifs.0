@@ -1,47 +1,47 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2824EBADC
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 09:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B19B52D2BD
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 09:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788858678; cv=none; b=M3MLP4B5eM5ZUywdVsdsRf6CxLVygr9/TO6fIIOTJZFMDAcupzJLdFxQDFhDc6b5TG54FTr2h17NcTu2fh8uIBWnhoiQxUeiOs1LeITVrfyj4PuKfsLm8fS8mMjL8Zm9dHLkzWLwbh5lra/xl2Cda/VwZ68GSBkcvkdE8+BKwjU=
+	t=1788858685; cv=none; b=rluWxdgJ8SvZMmPExQfUnRF7xA172ECO/GrCr/jdygNX95QymwEdluL8a/oxdY/mMaCrALRIfk/qCzVkfIyeFm9Ynf5B3//FcXM1GzRVWSW/ydoa7al4ae3hZXkAH7n2o8wn/I476pj0zRZ7a3OYLD++6UQeBOvKeL474oqcqJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788858678; c=relaxed/simple;
-	bh=cLsyGwNpMweEOeUhK/2nbHpVf8o+5CUfpU7U3AkBht0=;
+	s=arc-20240116; t=1788858685; c=relaxed/simple;
+	bh=mQCCPrHQqbqBWZ0n3q8gWV+rOjXSotF0l6AXILAozlI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XNXxOEELyE1Qe5TkoogDf1tEZDXcNm6twvbRAil/KDpSZWILPzl30PF6W0DKhFREIeUUdRY1LpgQFRuDbT6Ns4kVQDvuyzeWrMQgFwYkPFC4YtTu0zURRw81SAxqgH5zPZu4F22DqoJfhQKmgZlct7Uv9hPBTggCRz9yBZPTnNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6poAnGc; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=Us9yb8i/ApHyta0rlM08rCunoXPa1fCHEI5QxrCxSkIbrZeQfKmHtztewDbtw4QrHcuOwv+F4Ct9JR2hZZtavx3sGT42LqLtYqf2kKa6YbqIHLB2Zrv+A13Uyx+Lbj3b7iSWSJ0jcIyU4fNxl5CgM0EZOc57Hs7gaYQiukwdLTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XzCcgyrd; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6poAnGc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XzCcgyrd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788858675;
+	s=mimecast20190719; t=1788858682;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DslwRdsu/8tTWOlVJvkd0gqMqXh0L3cVibDrCzgiQjo=;
-	b=d6poAnGchuWae48mKgVx7JOuZ3wR+4qJ+MisGA5qhzz9P7WGgf+8rAIYqZG3HVmiJeB0z3
-	Uy1Xw5KjhfWD7D9tgioZV/D9QWysGsPOMNe+uNDSX42HCIvhK3ORHf2G9V7ax1ofZTLoP5
-	lS8LI5CGnGpDfSylC/gXCDc5C/cLhoM=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=qqlNS8q69FtxFvuCMkUAvTzRLGn3SbS5MM4c4KSMrN8=;
+	b=XzCcgyrdJGXViR1UJInWEJMwDSkuIiq9E4OyG6wE6mU7yleXcXBdkybjAsZVoBO5c//aJK
+	8rVXuQQAhCOttBJGTpiYvgiWUkHREmhc42KLe+h+c8fJjcLVIog0LEHgqYV4M9rgA0GKor
+	WUvCcl95tRsuQuYcB0+TicMuist6D6k=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-215-6qvyyVzNPoy5lIqG0rbmaQ-1; Tue,
- 08 Sep 2026 05:11:10 -0400
-X-MC-Unique: 6qvyyVzNPoy5lIqG0rbmaQ-1
-X-Mimecast-MFC-AGG-ID: 6qvyyVzNPoy5lIqG0rbmaQ_1788858668
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-625-wL0Fir5KMcGlb9kvCIayHQ-1; Tue,
+ 08 Sep 2026 05:11:17 -0400
+X-MC-Unique: wL0Fir5KMcGlb9kvCIayHQ-1
+X-Mimecast-MFC-AGG-ID: wL0Fir5KMcGlb9kvCIayHQ_1788858675
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8A4E195DBA6;
-	Tue,  8 Sep 2026 09:11:07 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B4FF0183F9EE;
+	Tue,  8 Sep 2026 09:11:14 +0000 (UTC)
 Received: from warthog.com (unknown [10.44.32.158])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2CFE030002ED;
-	Tue,  8 Sep 2026 09:11:00 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 66A311955F0C;
+	Tue,  8 Sep 2026 09:11:09 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: David Howells <dhowells@redhat.com>,
@@ -62,9 +62,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-erofs@lists.ozlabs.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v12 3/8] netfs: trace: Change the "clear" folio traces to "endwb"
-Date: Tue,  8 Sep 2026 10:10:24 +0100
-Message-ID: <20260908091031.1506798-4-dhowells@redhat.com>
+Subject: [PATCH v12 4/8] netfs: trace: Rejig a couple of the tracepoints
+Date: Tue,  8 Sep 2026 10:10:25 +0100
+Message-ID: <20260908091031.1506798-5-dhowells@redhat.com>
 In-Reply-To: <20260908091031.1506798-1-dhowells@redhat.com>
 References: <20260908091031.1506798-1-dhowells@redhat.com>
 Precedence: bulk
@@ -74,76 +74,127 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Change the "clear" folio traces to "endwb" as it's more obvious what it
-means.
+Rejig the following tracepoints:
+
+ (1) Change netfs_folio to show the pfn.
+
+ (2) Change netfs_collect_folio to show a folio index range rather than
+     file position range and don't show the cleaned_to or collected_to
+     points.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 Reviewed-by: Paulo Alcantara <pc@manguebit.org>
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/netfs/write_collect.c     | 8 ++++----
- include/trace/events/netfs.h | 8 ++++----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ fs/netfs/read_collect.c      |  2 +-
+ fs/netfs/read_pgpriv2.c      |  2 +-
+ fs/netfs/write_collect.c     |  2 +-
+ include/trace/events/netfs.h | 23 ++++++++++-------------
+ 4 files changed, 13 insertions(+), 16 deletions(-)
 
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index 6576a9b8671d..61f2664de6d3 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -192,7 +192,7 @@ static void netfs_read_unlock_folios(struct netfs_io_request *rreq,
+ 		fpos = folio_pos(folio);
+ 		fend = fpos + fsize;
+ 
+-		trace_netfs_collect_folio(rreq, folio, fend, collected_to);
++		trace_netfs_collect_folio(rreq, folio);
+ 
+ 		/* Unlock any folio we've transferred all of. */
+ 		if (collected_to < fend)
+diff --git a/fs/netfs/read_pgpriv2.c b/fs/netfs/read_pgpriv2.c
+index 4d50585f69a6..bf4d9d6877d7 100644
+--- a/fs/netfs/read_pgpriv2.c
++++ b/fs/netfs/read_pgpriv2.c
+@@ -201,7 +201,7 @@ bool netfs_pgpriv2_unlock_copied_folios(struct netfs_io_request *creq)
+ 
+ 		fend = min_t(uoff_t, fpos + flen, creq->i_size);
+ 
+-		trace_netfs_collect_folio(creq, folio, fend, collected_to);
++		trace_netfs_collect_folio(creq, folio);
+ 
+ 		/* Unlock any folio we've transferred all of. */
+ 		if (collected_to < fend)
 diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index 244a68e04624..6114bdf27ce0 100644
+index 6114bdf27ce0..7194182b975c 100644
 --- a/fs/netfs/write_collect.c
 +++ b/fs/netfs/write_collect.c
-@@ -56,7 +56,7 @@ static void netfs_dump_request(const struct netfs_io_request *rreq)
-  */
- int netfs_folio_written_back(struct folio *folio)
- {
--	enum netfs_folio_trace why = netfs_folio_trace_clear;
-+	enum netfs_folio_trace why = netfs_folio_trace_endwb;
- 	struct inode *inode = folio_inode(folio);
- 	struct netfs_inode *ictx = netfs_inode(inode);
- 	struct netfs_folio *finfo;
-@@ -79,13 +79,13 @@ int netfs_folio_written_back(struct folio *folio)
- 		group = finfo->netfs_group;
- 		gcount++;
- 		kfree(finfo);
--		why = netfs_folio_trace_clear_s;
-+		why = netfs_folio_trace_endwb_s;
- 		goto end_wb;
- 	}
+@@ -156,7 +156,7 @@ static void netfs_writeback_unlock_folios(struct netfs_io_request *wreq,
  
- 	if ((group = netfs_folio_group(folio))) {
- 		if (group == NETFS_FOLIO_COPY_TO_CACHE) {
--			why = netfs_folio_trace_clear_cc;
-+			why = netfs_folio_trace_endwb_cc;
- 			folio_detach_private(folio);
- 			goto end_wb;
- 		}
-@@ -98,7 +98,7 @@ int netfs_folio_written_back(struct folio *folio)
- 		if (!folio_test_dirty(folio)) {
- 			folio_detach_private(folio);
- 			gcount++;
--			why = netfs_folio_trace_clear_g;
-+			why = netfs_folio_trace_endwb_g;
- 		}
- 	}
+ 		fend = min_t(uoff_t, fpos + flen, wreq->i_size);
  
+-		trace_netfs_collect_folio(wreq, folio, fend, collected_to);
++		trace_netfs_collect_folio(wreq, folio);
+ 
+ 		/* Unlock any folio we've transferred all of. */
+ 		if (collected_to < fend)
 diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index ef1185993ba4..2491a0bc4179 100644
+index 2491a0bc4179..21a661cd1ca4 100644
 --- a/include/trace/events/netfs.h
 +++ b/include/trace/events/netfs.h
-@@ -192,11 +192,11 @@
- 	EM(netfs_folio_trace_alloc_buffer,	"alloc-buf")	\
- 	EM(netfs_folio_trace_cancel_copy,	"cancel-copy")	\
- 	EM(netfs_folio_trace_cancel_store,	"cancel-store")	\
--	EM(netfs_folio_trace_clear,		"clear")	\
--	EM(netfs_folio_trace_clear_cc,		"clear-cc")	\
--	EM(netfs_folio_trace_clear_g,		"clear-g")	\
--	EM(netfs_folio_trace_clear_s,		"clear-s")	\
- 	EM(netfs_folio_trace_end_copy,		"end-copy")	\
-+	EM(netfs_folio_trace_endwb,		"endwb")	\
-+	EM(netfs_folio_trace_endwb_cc,		"endwb-cc")	\
-+	EM(netfs_folio_trace_endwb_g,		"endwb-g")	\
-+	EM(netfs_folio_trace_endwb_s,		"endwb-s")	\
- 	EM(netfs_folio_trace_filled_gaps,	"filled-gaps")	\
- 	EM(netfs_folio_trace_invalidate_all,	"inval-all")	\
- 	EM(netfs_folio_trace_invalidate_front,	"inval-front")	\
+@@ -497,6 +497,7 @@ TRACE_EVENT(netfs_folio,
+ 	    TP_STRUCT__entry(
+ 		    __field(u64,			ino)
+ 		    __field(pgoff_t,			index)
++		    __field(unsigned long,		pfn)
+ 		    __field(unsigned int,		nr)
+ 		    __field(enum netfs_folio_trace,	why)
+ 			     ),
+@@ -507,9 +508,11 @@ TRACE_EVENT(netfs_folio,
+ 		    __entry->why = why;
+ 		    __entry->index = folio->index;
+ 		    __entry->nr = folio_nr_pages(folio);
++		    __entry->pfn = folio_pfn(folio);
+ 			   ),
+ 
+-	    TP_printk("i=%05llx ix=%05lx-%05lx %s",
++	    TP_printk("p=%lx i=%05llx ix=%05lx-%05lx %s",
++		      __entry->pfn,
+ 		      __entry->ino, __entry->index, __entry->index + __entry->nr - 1,
+ 		      __print_symbolic(__entry->why, netfs_folio_traces))
+ 	    );
+@@ -656,31 +659,25 @@ TRACE_EVENT(netfs_collect_sreq,
+ 
+ TRACE_EVENT(netfs_collect_folio,
+ 	    TP_PROTO(const struct netfs_io_request *wreq,
+-		     const struct folio *folio,
+-		     uoff_t fend, uoff_t collected_to),
++		     const struct folio *folio),
+ 
+-	    TP_ARGS(wreq, folio, fend, collected_to),
++	    TP_ARGS(wreq, folio),
+ 
+ 	    TP_STRUCT__entry(
+ 		    __field(unsigned int,	wreq)
+ 		    __field(unsigned long,	index)
+-		    __field(uoff_t,		fend)
+-		    __field(uoff_t,		cleaned_to)
+-		    __field(uoff_t,		collected_to)
++		    __field(unsigned int,	nr)
+ 			     ),
+ 
+ 	    TP_fast_assign(
+ 		    __entry->wreq	= wreq->debug_id;
+ 		    __entry->index	= folio->index;
+-		    __entry->fend	= fend;
+-		    __entry->cleaned_to	= wreq->cleaned_to;
+-		    __entry->collected_to = collected_to;
++		    __entry->nr		= folio_nr_pages(folio);
+ 			   ),
+ 
+-	    TP_printk("R=%08x ix=%05lx r=%llx-%llx t=%llx/%llx",
++	    TP_printk("R=%08x ix=%05lx-%05lx",
+ 		      __entry->wreq, __entry->index,
+-		      (uoff_t)__entry->index * PAGE_SIZE, __entry->fend,
+-		      __entry->cleaned_to, __entry->collected_to)
++		      __entry->index + __entry->nr - 1)
+ 	    );
+ 
+ TRACE_EVENT(netfs_collect_state,
 
