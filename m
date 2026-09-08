@@ -1,236 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A20F52FE2A
-	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 09:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7328F501F4A
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 09:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788858714; cv=none; b=RqZQy6ki2cBLHBLlvYc9UGvRhSlZ3373RQZNvbwGCmW3PuCrKSeh6GqgTbFKFjV42GKmvC3jmx1z1jOiKWLcKkPX7mXWxe9nKEk8hFh359CZNE5g55hcYYFfbVfncvGn4r3GMX0LjQ1q1VixLzHROjLP636OQR4YvmMGSUHGATk=
+	t=1788860926; cv=none; b=Pp//CCNMv27YARxWw6bmf/nN5UYlI7wbKiCpK773zhalkuJ1Tdvw4k1ZOui8c3bKgaujnE8oSFsVW8W4rOZiocGbE8D55Ezz5VPQHx+VFo58IZkElI1WYmfg8Mv5DjL0Z0ULVpvWoDmJn2eICnpvbKA2xibrBGNt3jRcUQy0x3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788858714; c=relaxed/simple;
-	bh=AfC6AN0+oRv9f00/2dtlwIkW+5nMtEfQM9UmhCLa+bE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DZy438MV/k3abZ7PxXy4PG+r82GsgLM5K8pBpCctR+iAcmljPhsaxA6NMYF6CB/VIbIbsT3iuaLdjsUJ7sRF+KyRI1u7n1rRzKL1l+R4oIW8GpOtUZvD+FNM48+xKXqDXW6dB8TICknDAG0cdF7N8p1cCPJ3B6lSFCbFK/WzwK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H7rj62h1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788860926; c=relaxed/simple;
+	bh=Blvn0uWkNwe49PloPyDuYxxfjFByrGWCHWjXd2Ojztk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MFk70piGTDertMA87yZwgtiSC+djUo9wJzUaOBhXq7jCQ+ExqneBqcf3lzavwKjbj4VwhWlKVdsU73JedErXRr79UEQhGvIeiaFB30k2+B9GexFRYYjpSac6GF3lUu/dBlt4RVIr2U+XxguwKZ30c3yeZK4dYIr4uTqXWq746Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXheTZKx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7rj62h1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788858712;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sxO7FEkCCz/20KjVrg30v5ozCynNyOtWLTOKJ0S48jc=;
-	b=H7rj62h1xvJ0ly1C/XQbGgQrPfQjLOrvhuAp7gZCOWauuhuB4y4KNeQ0NmEGgwLmDoSxSP
-	yT4BVfcdyk7nb/1m3MVsEGMkup7y1/tH1o4uYFmZmy9hyCwkS9+PXKVXTdh83nsd9JpQ3l
-	qWTm6ufb2sfj7A2CxMYl03Biv9updAU=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-622-8YNJsXH9MtiWIpWsQgpP2g-1; Tue,
- 08 Sep 2026 05:11:47 -0400
-X-MC-Unique: 8YNJsXH9MtiWIpWsQgpP2g-1
-X-Mimecast-MFC-AGG-ID: 8YNJsXH9MtiWIpWsQgpP2g_1788858705
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 017AC195DB9B;
-	Tue,  8 Sep 2026 09:11:45 +0000 (UTC)
-Received: from warthog.com (unknown [10.44.32.158])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 260CF1800605;
-	Tue,  8 Sep 2026 09:11:38 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Christian Brauner <christian@brauner.io>,
-	Matthew Wilcox <willy@infradead.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Subject: [PATCH v12 8/8] netfs: Set subrequest->source at alloc before trace emission
-Date: Tue,  8 Sep 2026 10:10:29 +0100
-Message-ID: <20260908091031.1506798-9-dhowells@redhat.com>
-In-Reply-To: <20260908091031.1506798-1-dhowells@redhat.com>
-References: <20260908091031.1506798-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXheTZKx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A0391F00A3A
+	for <linux-cifs@vger.kernel.org>; Tue,  8 Sep 2026 09:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788860925;
+	bh=4Cf+UZQ9uYJ7kCGqPtyT8Ptnze6DfkvO3+nNpliRVl8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=GXheTZKx+hbpJIFdtsxpQeDWYa7m9Mad1LnG+bmqVtuZG8BGx+xoR2WmVvuIEvohO
+	 A+mw3BE6J0ZYlHhjKXBdOb0AC3jdUZaGmVohNSR8h8kXE3OhloEPlAXa21W+0bLj0z
+	 s4186j+IwzTgB5u/vMkHBFxwNa5Fuq06ZegeNOnuPVMBZmbAiLN4j3uSMC/Dp1SLBm
+	 xs6fyx2vEl+j3gzCX9QI9Qobi4j/w93C6XoV9H4D6gndlnOSE5MNdMvWi6GmIieM4k
+	 E+A/9DsTo0azxG9cs8HFXVEDfLP4ImulJ8s/DeLCA6ElEjrnzAIZG0bw1U8xqoBi3e
+	 p0z23czb/nq+w==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c2530cabcf4so676605766b.0
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 02:48:45 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBw/InklccNVTawEfz6iGhy3dQy0CFBIen7xiG392agrsfhVk4UwuNuchml0FN9bQ2k5EK9QPdK8k+Hd@vger.kernel.org
+X-Gm-Message-State: AFuF++n8eP7bZY2PFoDXUH8wQga+3EGTRD9s2UhyX5Jgmps7bX4SagUb
+	At9NgXEVNMHDGMvRUnZoJs9Z1TJqEJQw9PU1/6jeOpsKcNd8DCGa15iW4tbPxPQcubQpzkvZLBL
+	HeG8jLngA7RaDOIjjGeKES6XKGI0zKDo=
+X-Received: by 2002:a17:906:ba8f:b0:c25:c14d:1c4d with SMTP id
+ a640c23a62f3a-c260c9ba8e8mr1898142866b.7.1788860924020; Tue, 08 Sep 2026
+ 02:48:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+References: <AS8P251MB000178EC4EE49C074687E8CBC8B32@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
+In-Reply-To: <AS8P251MB000178EC4EE49C074687E8CBC8B32@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 8 Sep 2026 18:48:30 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-oexdTbBKid8tNEQiX=uShzssNQ=W6dQcsxzmSih2ccA@mail.gmail.com>
+X-Gm-Features: AcwNN1W8WDN5_FLtEzP2xFQ0HjghcEWtHxnJRMPjUKs3po7v79lggASIXD8-RDk
+Message-ID: <CAKYAXd-oexdTbBKid8tNEQiX=uShzssNQ=W6dQcsxzmSih2ccA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: initialise the reserved fields of six SMB2 responses
+To: Aamir Ahmed <elb12345@hotmail.co.uk>
+Cc: Steve French <sfrench@samba.org>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Set subrequest->source in netfs_alloc_subrequest() before we emit the trace
-line indicating we allocated the subrequest.  Note that this requires the
-allocation of the subreq in netfs_read_to_pagecache() to be pushed to after
-the decision about what sort of subreq it should be.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
----
- fs/netfs/buffered_read.c | 4 ++--
- fs/netfs/direct_read.c   | 3 +--
- fs/netfs/internal.h      | 3 ++-
- fs/netfs/objects.c       | 4 +++-
- fs/netfs/read_retry.c    | 3 +--
- fs/netfs/read_single.c   | 2 +-
- fs/netfs/write_issue.c   | 3 +--
- fs/netfs/write_retry.c   | 3 +--
- 8 files changed, 12 insertions(+), 13 deletions(-)
-
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index e7fa30376862..f88b87c8303e 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -276,10 +276,10 @@ static void netfs_read_to_pagecache(struct netfs_io_request *rreq)
- 
- 	do {
- 		struct netfs_io_subrequest *subreq;
--		enum netfs_io_source source = NETFS_SOURCE_UNKNOWN;
-+		enum netfs_io_source source;
- 		ssize_t slice;
- 
--		subreq = netfs_alloc_subrequest(rreq);
-+		subreq = netfs_alloc_subrequest(rreq, NETFS_SOURCE_UNKNOWN);
- 		if (!subreq) {
- 			ret = -ENOMEM;
- 			break;
-diff --git a/fs/netfs/direct_read.c b/fs/netfs/direct_read.c
-index 5405e108b7a3..8c15f3079723 100644
---- a/fs/netfs/direct_read.c
-+++ b/fs/netfs/direct_read.c
-@@ -55,7 +55,7 @@ static void netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
- 		struct netfs_io_subrequest *subreq;
- 		ssize_t slice;
- 
--		subreq = netfs_alloc_subrequest(rreq);
-+		subreq = netfs_alloc_subrequest(rreq, NETFS_DOWNLOAD_FROM_SERVER);
- 		if (!subreq) {
- 			/* Stash the error in the request if there's not
- 			 * already an error set.
-@@ -64,7 +64,6 @@ static void netfs_dispatch_unbuffered_reads(struct netfs_io_request *rreq)
- 			break;
- 		}
- 
--		subreq->source	= NETFS_DOWNLOAD_FROM_SERVER;
- 		subreq->start	= start;
- 		subreq->len	= size;
- 
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index e0aa0ea510e9..ec520c948420 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -92,7 +92,8 @@ void netfs_get_request(struct netfs_io_request *rreq, enum netfs_rreq_ref_trace
- void netfs_clear_subrequests(struct netfs_io_request *rreq);
- void netfs_put_request(struct netfs_io_request *rreq, enum netfs_rreq_ref_trace what);
- void netfs_put_failed_request(struct netfs_io_request *rreq);
--struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq);
-+struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq,
-+						   enum netfs_io_source source);
- 
- static inline void netfs_see_request(struct netfs_io_request *rreq,
- 				     enum netfs_rreq_ref_trace what)
-diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-index 3460aa1c4af1..9c6ea718692a 100644
---- a/fs/netfs/objects.c
-+++ b/fs/netfs/objects.c
-@@ -207,7 +207,8 @@ void netfs_put_failed_request(struct netfs_io_request *rreq)
- /*
-  * Allocate and partially initialise an I/O request structure.
-  */
--struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq)
-+struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq,
-+						   enum netfs_io_source source)
- {
- 	struct netfs_io_subrequest *subreq;
- 	mempool_t *mempool = rreq->netfs_ops->subrequest_pool ?: &netfs_subrequest_pool;
-@@ -224,6 +225,7 @@ struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq
- 	INIT_WORK(&subreq->work, NULL);
- 	INIT_LIST_HEAD(&subreq->rreq_link);
- 	refcount_set(&subreq->ref, 2);
-+	subreq->source = source;
- 	subreq->rreq = rreq;
- 	subreq->debug_index = atomic_inc_return(&rreq->subreq_counter);
- 	netfs_get_request(rreq, netfs_rreq_trace_get_subreq);
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index 46810d29f0c0..396a05432a7e 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -195,12 +195,11 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 		 * and insert them after.
- 		 */
- 		do {
--			subreq = netfs_alloc_subrequest(rreq);
-+			subreq = netfs_alloc_subrequest(rreq, NETFS_DOWNLOAD_FROM_SERVER);
- 			if (!subreq) {
- 				subreq = to;
- 				goto abandon_after;
- 			}
--			subreq->source		= NETFS_DOWNLOAD_FROM_SERVER;
- 			subreq->start		= start;
- 			subreq->len		= len;
- 			subreq->stream_nr	= stream->stream_nr;
-diff --git a/fs/netfs/read_single.c b/fs/netfs/read_single.c
-index ccb5fc809d99..50775370d13d 100644
---- a/fs/netfs/read_single.c
-+++ b/fs/netfs/read_single.c
-@@ -92,7 +92,7 @@ static int netfs_single_dispatch_read(struct netfs_io_request *rreq)
- 	struct netfs_io_subrequest *subreq;
- 	int ret = 0;
- 
--	subreq = netfs_alloc_subrequest(rreq);
-+	subreq = netfs_alloc_subrequest(rreq, NETFS_DOWNLOAD_FROM_SERVER);
- 	if (!subreq)
- 		return -ENOMEM;
- 
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index 9a528da4bf9f..e7cb496f6324 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -168,10 +168,9 @@ void netfs_prepare_write(struct netfs_io_request *wreq,
- 	    wreq_iter->folioq_slot >= folioq_nr_slots(wreq_iter->folioq))
- 		rolling_buffer_make_space(&wreq->buffer, wreq->gfp);
- 
--	subreq = netfs_alloc_subrequest(wreq);
-+	subreq = netfs_alloc_subrequest(wreq, stream->source);
- 	if (!subreq)
- 		return;
--	subreq->source		= stream->source;
- 	subreq->start		= start;
- 	subreq->stream_nr	= stream->stream_nr;
- 	subreq->io_iter		= *wreq_iter;
-diff --git a/fs/netfs/write_retry.c b/fs/netfs/write_retry.c
-index 6cd584242af2..d7d5348496fc 100644
---- a/fs/netfs/write_retry.c
-+++ b/fs/netfs/write_retry.c
-@@ -149,8 +149,7 @@ static void netfs_retry_write_stream(struct netfs_io_request *wreq,
- 		 * and insert them after.
- 		 */
- 		do {
--			subreq = netfs_alloc_subrequest(wreq);
--			subreq->source		= to->source;
-+			subreq = netfs_alloc_subrequest(wreq, stream->source);
- 			subreq->start		= start;
- 			subreq->stream_nr	= to->stream_nr;
- 			subreq->retry_count	= 1;
-
+On Mon, Sep 7, 2026 at 8:38=E2=80=AFAM Aamir Ahmed <elb12345@hotmail.co.uk>=
+ wrote:
+>
+> smb2_allocate_rsp_buf() zeroes the response buffer, so a standalone
+> request never leaks.  A compound request can: the offset of the next
+> response is advanced by the length pinned for the previous one, so a
+> reply that was written into the buffer and then dropped in favour of the
+> short error response of smb2_set_err_rsp() stays there, and the next
+> reply is laid over it clearing only
+>
+>         memset(rsp_hdr, 0, sizeof(struct smb2_hdr) + 2);
+>
+> which covers the header and StructureSize and stops before Reserved.
+>
+> Six responses declare their full size but leave a field unwritten, so
+> those bytes reach the client as they are found in the buffer:
+>
+>   - get_file_standard_info() and get_standard_info_pipe() never set
+>     smb2_file_standard_info.Reserved, 2 bytes at offset 22 of the 24
+>     they report.
+>   - find_file_posix_info() never sets smb311_posix_qinfo.Zero or
+>     .ReparseTag, 4 bytes each at offsets 64 and 72 of the 112 it
+>     reports.
+>   - smb2_session_logoff() and smb2_tree_disconnect() never set Reserved
+>     in their 4-byte bodies, which are pinned with a bare sizeof().
+>   - the FSCTL_GET_REPARSE_POINT case of smb2_ioctl() sets ReparseTag and
+>     ReparseDataLength but not reparse_data_buffer.Reserved, 2 bytes at
+>     offset 6 of the 8 it reports.
+>
+> The logoff and tree disconnect cases are oversights rather than
+> convention: five responses share the layout { hdr; __le16 StructureSize;
+> __le16 Reserved; }, and smb2_echo(), smb2_flush() and smb2_lock() all
+> zero Reserved explicitly while those two do not.
+>
+> This is the same class as the FS_OBJECT_ID_INFORMATION and
+> FS_CONTROL_INFORMATION leaks fixed in the series merged on 2026-08-31.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Aamir Ahmed <elb12345@hotmail.co.uk>
+Applied it to #ksmbd-for-next.
+Thanks!
