@@ -1,44 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72CB58E2C4;
-	Wed,  9 Sep 2026 14:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF6958F079;
+	Wed,  9 Sep 2026 14:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788964796; cv=none; b=Pg2WZEyP+Z3CGSzezviMuKuEdTfD6bdHoBHBUxiQeVo3wYLIZqUlx4emaP9AObM7gR+FyQ4tyUDF+NGmFg2ZizU1gDFFg7QHmJSXqr3TqlaHjLjS+msYloA4RfQt5ZW4Qnbutjd0Wl4E5HbVjYQkzMxa8+g20bZP2IYlxlWzqRg=
+	t=1788964806; cv=none; b=hp1t53mpULMY7lDQoXrBRVA7aEvsOcQMZWD5frOi+9WNFdd6RovRS2GPGGIESa5474KD5W4XuDI4QQMI2Oe//syfYQyCpXoZbS/56oBr2fZnx135z1quHhTalvACfRfFPsJziy/u/Mlik/D8dqlebIHh69uZFU2fqQ+e4PAb+98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788964796; c=relaxed/simple;
-	bh=Ba3sWPmQ9vbrOhHlJ+03UBoTHgc32q1KN8H4+JVnk9w=;
+	s=arc-20240116; t=1788964806; c=relaxed/simple;
+	bh=stk47vCukJ7/voX6c6zi3oaLHF6Vz6HF5IeOZ/0wXL0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pa92WOqXAgIAAsM6x0imdPsei1nPekcM1jD2JZ0RmQn8opy+6pQnVVUcPqP3C7ij1uuvlLG0bYC1y5WkDbOCq/XwX5lmf+O/QASX8EmlB6Xx2yZbUz8f6MX9SmY2fSZDMzUZ1aWfDxbejx5sHjr93k8UQncW6AvflM8z1yBhWws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Pe0o0GMp; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ISYmvBmeynIfvpAIwBVqxAAEnQ/E42YrFH7IoquT4PvNgLhGSsUVJvKaWiAgrTIElihuu6U8fk+iNGpXN9QvSGjssGYHmWIPT6GTLOGJGoMEDoE/EotaInUAUqWmfB3bFZtw3981zhuDMOcGHvH5EY2RvoEaeL0pyEIjnkeAMIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=h4ASLug7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Pe0o0GMp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 168671F00A3D;
-	Wed,  9 Sep 2026 14:39:53 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="h4ASLug7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17C7A1F00A3D;
+	Wed,  9 Sep 2026 14:40:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1788964794;
-	bh=+J5BU39HWLQhVqlz2myUcFNfaU0g36DCHGCvK2iayEs=;
+	s=korg; t=1788964803;
+	bh=285/kYSXgS+ZZ56Yti6ZzdnfalMsqAyygPrpMq2fiPI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Pe0o0GMpuN68Gthfi6/DrOrZmelakU7FQKmYLxLp+5ReTPtBx7FPqwrCoQ5eBOHni
-	 WmjHmjydDCbAuYj6zppdjifYtGFlVBP8Xj0RvLeWC6oPQuIe9C0gEJ0xFowzXXcIVo
-	 CuRO4qo1XUKVOCuoeFZ728glWhX4PfyxziFR3mfw=
+	b=h4ASLug7bxfUrqP/WWYNns3Ap55eO/8l2PAyaSqO/hk8XysEaawgABe7ZeJzSrv0i
+	 XuEd4qEby4NVIvMeumbtnp1oBu1s8j8BgB640gLwGLqAfGKbE2KDnDc6jxxB+Xg2mJ
+	 yTMWWGx3PhZ/YQjSPlbhst/KyeRrmOh+aN/JUayk=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
 	David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18 545/583] cifs: SMB1 split: Separate out SMB1 decls into smb1proto.h
-Date: Wed,  9 Sep 2026 15:43:50 +0200
-Message-ID: <20260909134256.624372095@linuxfoundation.org>
+Subject: [PATCH 6.18 548/583] cifs: Do some preparation prior to organising the function declarations
+Date: Wed,  9 Sep 2026 15:43:53 +0200
+Message-ID: <20260909134256.714726954@linuxfoundation.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260909134237.773280130@linuxfoundation.org>
 References: <20260909134237.773280130@linuxfoundation.org>
@@ -59,916 +55,899 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit 645427b7a6c59e0074df29bf939aec2e9d6f2819 ]
+[ Upstream commit 32a60868093aed5ccaa5e57f3b57f791f22ac133 ]
 
-Separate out SMB1 declarations scriptedly into smb1proto.h.  Script below:
+Make some preparatory cleanups prior to running a script to organise the
+function declarations within the fs/smb/client/ headers.  These include:
 
-	#!/usr/bin/perl -w
-	use strict;
-	unless (@ARGV) {
-	    die "Usage: $0 <c_file1> [<c_file2> ...]\n";
-	}
+ (1) Remove "inline" from the dummy cifs_proc_init/clean() functions as
+     they are in a .c file.
 
-	# Data tracking
-	my %funcs = ();		# Func name => { func prototype }
-	my %headers = ();	# Header filename => { header content }
-	my %c_files = ();	# C filename => { ordered func list, header pref }
-	my %cmarkers = ();	# C filename marker => { header filename it's in }
+ (2) Move should_compress()'s kdoc comment to the .c file and remove kdoc
+     markers from the comments.
 
-	# Parse state
-	my $pathname = "-";
-	my $lineno = 0;
+ (3) Rename CIFS_ALLOW_INSECURE_LEGACY in #endif comments to have CONFIG_
+     on the front to allow the script to recognise it.
 
-	sub error(@) {
-	    print STDERR $pathname, ":", $lineno, ": ", @_, "\n";
-	    exit(1);
-	}
+ (4) Don't let comments have bare words at the left margin as that confused
+     the simplistic function detection code in the script.
 
-	sub pad($) {
-	    # Reindent the function arguments to line the arguments up with the char
-	    # after the opening bracket on the func argument list
-	    my ($lines) = @_;
-	    return $lines if ($#{$lines} <= 0);
-	    my $has_empty = 0;
-	    for (my $i = 0; $i <= $#{$lines}; $i++) {
-		$lines->[$i] =~ s/^[ \t]+//;
-		$has_empty = 1 if ($lines->[$i] eq "");
-	    }
+ (5) Adjust some argument lists so that when and if the cleanup script is
+     run they don't end up over 100 chars.
 
-	    if ($has_empty) {
-		my @clean = grep /.+/, @{$lines};
-		$lines = \@clean;
-	    }
+ (6) Fix a few comments to have missing '*' added or the "*/" moved to
+     their own lines so that checkpatch doesn't moan over the cleanup
+     script patch.
 
-	    my $indlen = index($lines->[0], "(");
-	    return $lines if ($indlen < 0);
-	    my $indent = "";
-	    $indlen++;
-	    $indent .= "\t" x ($indlen / 8);
-	    $indent .= " " x ($indlen % 8);
+ (7) Move struct cifs_calc_sig_ctx to cifsglob.h.
 
-	    my @padded = ();
-	    my $acc = "";
-	    my $len = -$indlen;
-	    for (my $i = 0; $i <= $#{$lines}; $i++) {
-		my $argument = $lines->[$i];
-		my $arglen = length($argument);
-		my $last = ($i == $#{$lines} ? 1 : 0);
-
-		if ($i == 0 ||
-		    $i == 1) {
-		    $acc .= $argument;
-		    $acc .= ";" if ($last);
-		    $len += $arglen + $last;
-		    next;
-		}
-		if (!$acc) {
-		    $acc = $indent . $argument;
-		    $acc .= ";" if ($last);
-		    $len += $arglen + $last;
-		    next;
-		}
-		if ($indlen + $len + 1 + $arglen + $last > 79) {
-		    push @padded, $acc;
-		    $acc = $indent . $argument;
-		    $acc .= ";" if ($last);
-		    $len = $arglen + $last;
-		    next;
-		}
-
-		$acc .= " " . $argument;
-		$acc .= ";" if ($last);
-		$len += 1 + $arglen + $last;
-	    }
-	    push @padded, $acc if ($acc);
-	    return \@padded;
-	}
-
-	sub earliest(@) {
-	    my $ret = -1;
-	    foreach (@_) {
-		$ret = $_ if ($ret < 0 || ($_ >= 0 && $_ < $ret));
-	    }
-	    return $ret;
-	}
-
-	foreach my $file (@ARGV) {
-	    # Open the file for reading.
-	    next if $file =~ /trace[.]h$/;
-	    next if $file =~ /smbdirect[.][ch]$/;
-	    open my $fh, "<$file"
-		or die "Could not open file '$file'";
-	    $pathname = $file;
-	    $lineno = 0;
-
-	    my $filename;
-	    my @file_content = ();
-	    my @copy = ();
-
-	    my $state = 0;
-	    my $qual = "";
-	    my $type = "";
-	    my $funcname = "";
-	    my @funcdef = ();
-	    my $bracket = 0;
-	    my $comment = 0;
-	    my $smb1 = 0;
-	    my $header = 0;
-	    my $inline = 0;
-	    my $file_marker = "";
-	    my $config = "";
-	    my $c_file = 0;
-
-	    $filename = $pathname;
-	    $filename =~ s!.*/!!;
-
-	    if ($file =~ m!.h$!) {
-		my %new_h_file = (
-		    path    => $pathname,
-		    fname   => $filename,
-		    content => [],
-		    );
-		$header = \%new_h_file;
-		$headers{$filename} = \%new_h_file;
-	    } elsif ($file =~ m!.c$!) {
-		my %new_c_file = (
-		    path  => $pathname,
-		    fname => $filename,
-		    funcs => [],
-		    );
-		$c_file = \%new_c_file;
-		$c_files{$filename} = \%new_c_file;
-	    } else {
-		warn("Ignoring unexpected file $file\n");
-		next;
-	    }
-
-	    $smb1 = 1 if ($file =~ m!/smb1ops.c|/cifssmb.c|/cifstransport.c!);
-
-	    foreach my $line (<$fh>) {
-		$lineno++;
-		chomp($line);
-		push @copy, $line;
-		if (!$line) {
-		    # Blank line
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Handle continuation or end of block comment.  Look for C file
-		# prototype insertion point markers.
-		if ($comment) {
-		    if ($line =~ m![*]/!) {
-			if ($comment == 2 && $file_marker) {
-			    $cmarkers{$file_marker} = $file_marker;
-			    push @copy, "#C_MARKER " . $file_marker;
-			    $file_marker = 0;
-			}
-			$comment = 0;
-		    } else {
-			$comment++;
-			if ($comment == 2 && $line =~ m! [*] ([a-z][a-z_0-9]*[.][c])$!) {
-			    $file_marker = $1;
-			    print("Found file marker ", $file_marker, " in ", $filename, "\n");
-			}
-		    }
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Check cpp directives, particularly looking for SMB1 bits
-		if ($line =~ /^[#]/) {
-		    if ($header) {
-			if ($line =~ /ifdef.*(CONFIG_[A-Z0-9_])/) {
-			    error("multiconfig") if $config;
-			    $config = $1;
-			    $smb1++ if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
-			} elsif ($line =~ /endif/) {
-			    $smb1-- if ($config eq "CONFIG_CIFS_ALLOW_INSECURE_LEGACY");
-			    $config = "";
-			}
-		    }
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Exclude interference in finding func names and return types
-		if ($line =~ /^[{]/ ||
-		    $line =~ /##/ ||
-		    $line =~ /^[_a-z0-9A-Z]+:$/ || # goto label
-		    $line =~ /^do [{]/ ||
-		    $line =~ m!^//!) {
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Start of a block comment
-		if ($line =~ m!^/[*]!) {
-		    $comment = 1 unless ($line =~ m![*]/!);
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# End of a braced section, such as a function implementation
-		if ($line =~ /^[}]/) {
-			$type = "";
-			$qual = "";
-			$funcname = "";
-			@funcdef = ();
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		}
-
-		if ($line =~ /^typedef/) {
-		    $type = "";
-		    $qual = "";
-		    $funcname = "";
-		    @funcdef = ();
-		    push @file_content, @copy;
-		    @copy = ();
-		    next;
-		}
-
-		# Extract function qualifiers.  There may be multiple of these in more
-		# or less any order.  Some of them cause the func to be skipped (e.g. inline).
-
-		if ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
-		    $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
-		    error("Unexpected qualifier '$1'") if ($state != 0);
-		    while ($line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)\W/ ||
-			   $line =~ /^(static|extern|inline|noinline|noinline_for_stack|__always_inline)$/) {
-			$qual .= " " if ($qual);
-			$qual .= $1;
-			$inline = 1 if ($1 eq "inline");
-			$inline = 1 if ($1 eq "__always_inline");
-			$line = substr($line, length($1));
-			$line =~ s/^\s+//;
-		    }
-		}
-
-		if ($state == 0) {
-		    # Extract what we assume to be the return type
-		    if ($line =~ /^\s/) {
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		    }
-		    while ($line =~ /^(unsigned|signed|bool|char|short|int|long|void|const|volatile|(struct|union|enum)\s+[_a-zA-Z][_a-zA-Z0-9]*|[*]|__init|__exit|__le16|__le32|__le64|__be16|__be32|__be64)/) {
-			$type .= " " if $type;
-			$type .= $1;
-			$line = substr($line, length($1));
-			$line =~ s/^\s+//;
-		    }
-		    if ($line =~ /^struct [{]/) {
-			# Ignore structure definitions
-			$type = "";
-			$qual = "";
-			$funcname = "";
-			@funcdef = ();
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		    }
-		    if (index($line, "=") >= 0) {
-			# Ignore assignments
-			$type = "";
-			$qual = "";
-			$funcname = "";
-			@funcdef = "";
-			push @file_content, @copy;
-			@copy = ();
-			next;
-		    }
-
-		    # Try and extract a function's type and name
-		    while ($line =~ /(^[_a-zA-Z][_a-zA-Z0-9]*)/) {
-			my $name = $1;
-			$line = substr($line, length($name));
-			next if ($line =~ /^[{]/);
-			$line =~ s/^\s+//;
-
-			my $ch = substr($line, 0, 1);
-			last if ($ch eq "[" || $ch eq ";"); # Global variables
-
-			if ($ch eq "(") {
-			    # Found the function name
-			    $state = 1;
-			    $line = substr($line, 1);
-			    $funcname = $name;
-			    my $tmp = $qual . $type . " " . $funcname . "(";
-			    $tmp =~ s/[*] /*/;
-			    push @funcdef, $tmp;
-			    $bracket = 1;
-			    last;
-			}
-
-			if ($type) {
-			    last if (index($line, ";") >= 0 && index($line, "(") == -1);
-			    error("Unexpected name '$name' after '$type'");
-			}
-
-			$type .= " " if $type;
-			$type .= $name;
-			if ($line =~ /^(\s*[*]+)/) {
-			    my $ptr = $1;
-			    $type .= $ptr;
-			    $line = substr($line, length($ptr));
-			}
-		    }
-		}
-
-		# Try and extract a function's argument list
-		my $from = 0;
-		if ($state == 1) {
-		    while (1) {
-			my $o = index($line, "(", $from);
-			my $c = index($line, ")", $from);
-			my $m = index($line, ",", $from);
-
-			my $b = earliest($o, $c, $m);
-			if ($b < 0) {
-			    push @funcdef, $line
-				unless ($line eq "");
-			    last;
-			}
-			my $ch = substr($line, $b, 1);
-
-			# Push the arguments separately on to the list
-			if ($ch eq ",") {
-			    push @funcdef, substr($line, 0, $b + 1);
-			    $line = substr($line, $b + 1);
-			    $from = 0;
-			} elsif ($ch eq "(") {
-			    # Handle brackets in the argument list (e.g. function
-			    # pointers)
-			    $bracket++;
-			    $from = $b + 1;
-			} elsif ($ch eq ")") {
-			    $bracket--;
-			    if ($bracket == 0) {
-				push @funcdef, substr($line, 0, $b + 1);
-				$line = substr($line, $b + 1);
-				$state = 2;
-				last;
-			    }
-			    $from = $b + 1;
-			}
-		    }
-		}
-
-		if ($state == 2) {
-		    $inline = 1 if ($qual =~ /inline/);
-		    #print("QUAL $qual $type $funcname $inline ", $#funcdef, "\n");
-		    if (!$header &&
-			$qual !~ /static/ &&
-			$funcname ne "__acquires" &&
-			$funcname ne "__releases" &&
-			$funcname ne "module_init" &&
-			$funcname ne "module_exit" &&
-			$funcname ne "module_param" &&
-			$funcname ne "module_param_call" &&
-			$funcname ne "PROC_FILE_DEFINE" &&
-			$funcname !~ /MODULE_/ &&
-			$funcname !~ /DEFINE_/) {
-
-			# Okay, we appear to have a function implementation
-			my $func;
-			my $dup = 0;
-
-			if (exists($funcs{$funcname})) {
-			    $func = $funcs{$funcname};
-			    if (exists $func->{body}) {
-				print("dup $funcname\n");
-				$dup = 1;
-			    }
-			} else {
-			    my %new_func = (
-				name => $funcname,
-				cond => "",
-				legacy => 0,
-				);
-			    $func = \%new_func;
-			    $funcs{$funcname} = $func;
-			    $func->{body} = pad(\@funcdef);
-			}
-			$func->{body} = pad(\@funcdef);
-			$func->{legacy} = 1 if $smb1;
-
-			if ($funcname eq "cifs_inval_name_dfs_link_error") {
-			    $func->{cond} = "#ifdef CONFIG_CIFS_DFS_UPCALL";
-			} elsif ($funcname eq "cifs_listxattr") {
-			    $func->{cond} = "#ifdef CONFIG_CIFS_XATTR";
-			}
-
-			push @{$c_file->{funcs}}, $func
-			    unless $dup;
-		    } elsif (!$header || $inline) {
-			# Ignore inline function implementations and other weirdies
-			push @file_content, @copy;
-		    } elsif ($header && !$inline) {
-			push @file_content, "#FUNCPROTO " . $funcname;
-
-			my $func;
-
-			if (exists($funcs{$funcname})) {
-			    $func = $funcs{$funcname};
-			    $func->{lineno} = $lineno;
-			    $func->{pathname} = $pathname;
-			} else {
-			    my %new_func = (
-				name => $funcname,
-				cond => "",
-				lineno => $lineno,
-				pathname => $pathname,
-				legacy => 0,
-				);
-			    $func = \%new_func;
-			    $funcs{$funcname} = $func;
-			}
-
-			$func->{legacy} = 1 if $smb1;
-		    }
-
-		    @funcdef = ();
-		    $type = "";
-		    $qual = "";
-		    $funcname = "";
-		    $inline = 0;
-		    $state = 0;
-		    @copy = ();
-		}
-		if ($line =~ /;/) {
-		    $type = "";
-		    $qual = "";
-		    $funcname = "";
-		    @funcdef = ();
-		    $state = 0;
-		    push @file_content, @copy;
-		    @copy = ();
-		}
-	    }
-	    close($fh);
-
-	    if ($header) {
-		$header->{content} = \@file_content;
-	    }
-	}
-
-	sub write_header($)
-	{
-	    my ($header) = @_;
-	    my $path = $header->{path};
-	    my $legacy = 0;
-
-	    $legacy = 1 if ($path =~ m!smb1proto[.]h!);
-
-	    my @output = ();
-
-	    foreach my $line (@{$header->{content}}) {
-		if ($line =~ "^[#]C_MARKER (.*)") {
-		    my $file_marker = $cmarkers{$1};
-		    my $c_file = $c_files{$file_marker};
-		    print("Found $line\n");
-		    foreach my $func (@{$c_file->{funcs}}) {
-			print("func ", $func->{name}, "\n");
-			push @output, @{$func->{body}};
-		    }
-		    next;
-		} elsif ($line =~ "^[#]FUNCPROTO ([_a-zA-Z0-9]+)") {
-		    my $funcname = $1;
-		    my $func = $funcs{$funcname};
-		    if (!$func->{body}) {
-			print($func->{pathname}, ":", $func->{lineno}, ": '", $funcname,
-			      "' dead prototype\n");
-			next;
-		    }
-		    if ($func->{legacy} == $legacy) {
-			#push @output, $line;
-			push @output, @{$func->{body}};
-		    }
-		} else {
-		    push @output, $line;
-		}
-	    }
-
-	    open my $fh, ">$path"
-		or die "Could not open file '$path' for writing";
-	    foreach my $f (@output) {
-		print($fh $f, "\n") or die $path;
-	    }
-	    close($fh) or die $path;
-	}
-
-	foreach my $h (keys(%headers)) {
-	    write_header($headers{$h});
-	}
+ (8) Remove some __KERNEL__ conditionals.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-
-[ sashal: Reduced backport -- upstream 645427b7a6c59 touches 3 file(s), this
-  backport carries 3. Not backported here:
-  fs/smb/client/cifsproto.h
-  fs/smb/client/fscache.h
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: 730d0bb19507 ("smb: client: fix UAF and buffer leak in cifs_check_trans2() for malformed secondary T2")
+Stable-dep-of: 65deb1835934 ("smb: client: reject a tree connect response whose byte count is too small")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/smb1ops.c       |  171 ------------------------------------------
- fs/smb/client/smb1proto.h     |    2 
- fs/smb/client/smb1transport.c |  171 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 173 insertions(+), 171 deletions(-)
+ fs/smb/client/cifs_debug.c   |    4 -
+ fs/smb/client/cifs_spnego.h  |    2 
+ fs/smb/client/cifs_unicode.h |    3 
+ fs/smb/client/cifsfs.c       |    5 -
+ fs/smb/client/cifsglob.h     |    8 ++
+ fs/smb/client/cifsproto.h    |   12 +--
+ fs/smb/client/cifssmb.c      |  140 ++++++++++++++++++++++++++++++++++++++++
+ fs/smb/client/compress.c     |   21 +++++-
+ fs/smb/client/compress.h     |   19 -----
+ fs/smb/client/connect.c      |  142 ----------------------------------------
+ fs/smb/client/dir.c          |    2 
+ fs/smb/client/dns_resolve.h  |    4 -
+ fs/smb/client/fs_context.c   |    2 
+ fs/smb/client/misc.c         |    1 
+ fs/smb/client/netmisc.c      |    2 
+ fs/smb/client/smb2file.c     |    3 
+ fs/smb/client/smb2inode.c    |    1 
+ fs/smb/client/smb2maperror.c |    3 
+ fs/smb/client/smb2ops.c      |    4 -
+ fs/smb/client/smb2pdu.c      |    5 -
+ fs/smb/client/smb2proto.h    |    2 
+ fs/smb/client/trace.h        |  150 +++++++++++++++++++++++++++++++++++++++++++
+ 22 files changed, 342 insertions(+), 193 deletions(-)
 
---- a/fs/smb/client/smb1ops.c
-+++ b/fs/smb/client/smb1ops.c
-@@ -238,146 +238,6 @@ cifs_get_next_mid(struct TCP_Server_Info
- 	return mid;
- }
+--- a/fs/smb/client/cifs_debug.c
++++ b/fs/smb/client/cifs_debug.c
+@@ -1307,11 +1307,11 @@ static const struct proc_ops cifs_mount_
+ };
  
--/*
--	return codes:
--		0	not a transact2, or all data present
--		>0	transact2 with that much data missing
--		-EINVAL	invalid transact2
-- */
--static int
--check2ndT2(char *buf)
--{
--	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
--	struct smb_t2_rsp *pSMBt;
--	int remaining;
--	__u16 total_data_size, data_in_this_rsp;
--
--	if (pSMB->Command != SMB_COM_TRANSACTION2)
--		return 0;
--
--	/* check for plausible wct, bcc and t2 data and parm sizes */
--	/* check for parm and data offset going beyond end of smb */
--	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
--		cifs_dbg(FYI, "Invalid transact2 word count\n");
--		return -EINVAL;
--	}
--
--	pSMBt = (struct smb_t2_rsp *)pSMB;
--
--	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
--	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
--
--	if (total_data_size == data_in_this_rsp)
--		return 0;
--	else if (total_data_size < data_in_this_rsp) {
--		cifs_dbg(FYI, "total data %d smaller than data in frame %d\n",
--			 total_data_size, data_in_this_rsp);
--		return -EINVAL;
--	}
--
--	remaining = total_data_size - data_in_this_rsp;
--
--	cifs_dbg(FYI, "missing %d bytes from transact2, check next response\n",
--		 remaining);
--	if (total_data_size > CIFSMaxBufSize) {
--		cifs_dbg(VFS, "TotalDataSize %d is over maximum buffer %d\n",
--			 total_data_size, CIFSMaxBufSize);
--		return -EINVAL;
--	}
--	return remaining;
--}
--
--static int
--coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
--{
--	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
--	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
--	char *data_area_of_tgt;
--	char *data_area_of_src;
--	int remaining;
--	unsigned int byte_count, total_in_tgt;
--	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
--
--	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
--	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
--
--	if (tgt_total_cnt != src_total_cnt)
--		cifs_dbg(FYI, "total data count of primary and secondary t2 differ source=%hu target=%hu\n",
--			 src_total_cnt, tgt_total_cnt);
--
--	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
--
--	remaining = tgt_total_cnt - total_in_tgt;
--
--	if (remaining < 0) {
--		cifs_dbg(FYI, "Server sent too much data. tgt_total_cnt=%hu total_in_tgt=%u\n",
--			 tgt_total_cnt, total_in_tgt);
--		return -EPROTO;
--	}
--
--	if (remaining == 0) {
--		/* nothing to do, ignore */
--		cifs_dbg(FYI, "no more data remains\n");
--		return 0;
--	}
--
--	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
--	if (remaining < total_in_src)
--		cifs_dbg(FYI, "transact2 2nd response contains too much data\n");
--
--	/* find end of first SMB data area */
--	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
--				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
--
--	/* validate target area */
--	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
--				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
--
--	data_area_of_tgt += total_in_tgt;
--
--	total_in_tgt += total_in_src;
--	/* is the result too big for the field? */
--	if (total_in_tgt > USHRT_MAX) {
--		cifs_dbg(FYI, "coalesced DataCount too large (%u)\n",
--			 total_in_tgt);
--		return -EPROTO;
--	}
--	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
--
--	/* fix up the BCC */
--	byte_count = get_bcc(target_hdr);
--	byte_count += total_in_src;
--	/* is the result too big for the field? */
--	if (byte_count > USHRT_MAX) {
--		cifs_dbg(FYI, "coalesced BCC too large (%u)\n", byte_count);
--		return -EPROTO;
--	}
--	put_bcc(byte_count, target_hdr);
--
--	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
--	byte_count += total_in_src;
--	/* don't allow buffer to overflow */
--	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
--		cifs_dbg(FYI, "coalesced BCC exceeds buffer size (%u)\n",
--			 byte_count);
--		return -ENOBUFS;
--	}
--	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
--
--	/* copy second buffer into end of first buffer */
--	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
--
--	if (remaining != total_in_src) {
--		/* more responses to go */
--		cifs_dbg(FYI, "waiting for more secondary responses\n");
--		return 1;
--	}
--
--	/* we are done */
--	cifs_dbg(FYI, "found the last secondary response\n");
--	return 0;
--}
--
- static void
- cifs_downgrade_oplock(struct TCP_Server_Info *server,
- 		      struct cifsInodeInfo *cinode, __u32 oplock,
-@@ -387,37 +247,6 @@ cifs_downgrade_oplock(struct TCP_Server_
- }
- 
- static bool
--cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
--		  char *buf, int malformed)
--{
--	if (malformed)
--		return false;
--	if (check2ndT2(buf) <= 0)
--		return false;
--	mid->multiRsp = true;
--	if (mid->resp_buf) {
--		/* merge response - fix up 1st*/
--		malformed = coalesce_t2(buf, mid->resp_buf);
--		if (malformed > 0)
--			return true;
--		/* All parts received or packet is malformed. */
--		mid->multiEnd = true;
--		dequeue_mid(mid, malformed);
--		return true;
--	}
--	if (!server->large_buf) {
--		/*FIXME: switch to already allocated largebuf?*/
--		cifs_dbg(VFS, "1st trans2 resp needs bigbuf\n");
--	} else {
--		/* Have first buffer */
--		mid->resp_buf = buf;
--		mid->large_buf = true;
--		server->bigbuf = NULL;
--	}
--	return true;
--}
--
--static bool
- cifs_need_neg(struct TCP_Server_Info *server)
+ #else
+-inline void cifs_proc_init(void)
++void cifs_proc_init(void)
  {
- 	return server->maxBuf == 0;
---- a/fs/smb/client/smb1proto.h
-+++ b/fs/smb/client/smb1proto.h
-@@ -33,6 +33,8 @@ extern struct smb_version_values smb1_va
- /*
-  * smb1transport.c
-  */
-+bool cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-+		       char *buf, int malformed);
+ }
  
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
- #endif /* _SMB1PROTO_H */
---- a/fs/smb/client/smb1transport.c
-+++ b/fs/smb/client/smb1transport.c
-@@ -563,3 +563,174 @@ out:
- 		return -ERESTARTSYS;
+-inline void cifs_proc_clean(void)
++void cifs_proc_clean(void)
+ {
+ }
+ #endif /* PROC_FS */
+--- a/fs/smb/client/cifs_spnego.h
++++ b/fs/smb/client/cifs_spnego.h
+@@ -27,10 +27,8 @@ struct cifs_spnego_msg {
+ 	uint8_t		data[];
+ };
+ 
+-#ifdef __KERNEL__
+ extern struct key_type cifs_spnego_key_type;
+ extern struct key *cifs_get_spnego_key(struct cifs_ses *sesInfo,
+ 				       struct TCP_Server_Info *server);
+-#endif /* KERNEL */
+ 
+ #endif /* _CIFS_SPNEGO_H */
+--- a/fs/smb/client/cifs_unicode.h
++++ b/fs/smb/client/cifs_unicode.h
+@@ -54,7 +54,6 @@
+ #define SFM_MAP_UNI_RSVD	1
+ #define SFU_MAP_UNI_RSVD	2
+ 
+-#ifdef __KERNEL__
+ int cifs_from_utf16(char *to, const __le16 *from, int tolen, int fromlen,
+ 		    const struct nls_table *cp, int map_type);
+ int cifs_utf16_bytes(const __le16 *from, int maxbytes,
+@@ -69,8 +68,6 @@ extern int cifs_remap(struct cifs_sb_inf
+ extern __le16 *cifs_strndup_to_utf16(const char *src, const int maxlen,
+ 				     int *utf16_len, const struct nls_table *cp,
+ 				     int remap);
+-#endif
+-
+ wchar_t cifs_toupper(wchar_t in);
+ 
+ #endif /* _CIFS_UNICODE_H */
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -28,6 +28,8 @@
+ #include <linux/splice.h>
+ #include <linux/uuid.h>
+ #include <linux/xattr.h>
++#include <linux/mm.h>
++#include <linux/key-type.h>
+ #include <uapi/linux/magic.h>
+ #include <net/ipv6.h>
+ #include "cifsfs.h"
+@@ -35,10 +37,9 @@
+ #define DECLARE_GLOBALS_HERE
+ #include "cifsglob.h"
+ #include "cifsproto.h"
++#include "smb2proto.h"
+ #include "cifs_debug.h"
+ #include "cifs_fs_sb.h"
+-#include <linux/mm.h>
+-#include <linux/key-type.h>
+ #include "cifs_spnego.h"
+ #include "fscache.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -2112,7 +2112,7 @@ extern mempool_t cifs_io_subrequest_pool
+ #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+ extern struct smb_version_operations smb20_operations;
+ extern struct smb_version_values smb20_values;
+-#endif /* CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ extern struct smb_version_operations smb21_operations;
+ extern struct smb_version_values smb21_values;
+ extern struct smb_version_values smbdefault_values;
+@@ -2383,4 +2383,10 @@ static inline int cifs_open_create_optio
+  */
+ #define CIFS_INO_BLOCKS(size) DIV_ROUND_UP_ULL((u64)(size), 512)
+ 
++struct cifs_calc_sig_ctx {
++	struct md5_ctx *md5;
++	struct hmac_sha256_ctx *hmac;
++	struct shash_desc *shash;
++};
++
+ #endif	/* _CIFS_GLOB_H */
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -590,7 +590,7 @@ extern int cifs_do_set_acl(const unsigne
+ 			   const struct nls_table *nls_codepage, int remap);
+ extern int CIFSGetExtAttr(const unsigned int xid, struct cifs_tcon *tcon,
+ 			const int netfid, __u64 *pExtAttrBits, __u64 *pMask);
+-#endif /* CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ extern void cifs_autodisable_serverino(struct cifs_sb_info *cifs_sb);
+ extern bool couldbe_mf_symlink(const struct cifs_fattr *fattr);
+ extern int check_mf_symlink(unsigned int xid, struct cifs_tcon *tcon,
+@@ -622,11 +622,6 @@ int cifs_create_mf_symlink(unsigned int
+ 			   struct cifs_sb_info *cifs_sb,
+ 			   const unsigned char *path, char *pbuf,
+ 			   unsigned int *pbytes_written);
+-struct cifs_calc_sig_ctx {
+-	struct md5_ctx *md5;
+-	struct hmac_sha256_ctx *hmac;
+-	struct shash_desc *shash;
+-};
+ int __cifs_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server,
+ 			  char *signature, struct cifs_calc_sig_ctx *ctx);
+ enum securityEnum cifs_select_sectype(struct TCP_Server_Info *,
+@@ -775,4 +770,9 @@ static inline void cifs_free_open_info(s
+ 	memset(data, 0, sizeof(*data));
+ }
+ 
++#define smb_EIO2(trace, info, info2) ({		\
++	trace_smb3_eio(trace, info, info2);	\
++	-EIO;					\
++})
++
+ #endif			/* _CIFSPROTO_H */
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -527,6 +527,146 @@ neg_err_exit:
  	return rc;
  }
-+
+ 
 +/*
-+	return codes:
-+		0	not a transact2, or all data present
-+		>0	transact2 with that much data missing
-+		-EINVAL	invalid transact2
++ * Issue a TREE_CONNECT request.
 + */
-+static int
-+check2ndT2(char *buf)
++int
++CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
++	 const char *tree, struct cifs_tcon *tcon,
++	 const struct nls_table *nls_codepage)
 +{
-+	struct smb_hdr *pSMB = (struct smb_hdr *)buf;
-+	struct smb_t2_rsp *pSMBt;
-+	int remaining;
-+	__u16 total_data_size, data_in_this_rsp;
++	struct smb_hdr *smb_buffer;
++	struct smb_hdr *smb_buffer_response;
++	TCONX_REQ *pSMB;
++	TCONX_RSP *pSMBr;
++	unsigned char *bcc_ptr;
++	int rc = 0;
++	int length;
++	__u16 bytes_left, count;
 +
-+	if (pSMB->Command != SMB_COM_TRANSACTION2)
-+		return 0;
++	if (ses == NULL)
++		return -EIO;
 +
-+	/* check for plausible wct, bcc and t2 data and parm sizes */
-+	/* check for parm and data offset going beyond end of smb */
-+	if (pSMB->WordCount != 10) { /* coalesce_t2 depends on this */
-+		cifs_dbg(FYI, "Invalid transact2 word count\n");
-+		return -EINVAL;
++	smb_buffer = cifs_buf_get();
++	if (smb_buffer == NULL)
++		return -ENOMEM;
++
++	smb_buffer_response = smb_buffer;
++
++	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
++			NULL /*no tid */, 4 /*wct */);
++
++	smb_buffer->Mid = get_next_mid(ses->server);
++	smb_buffer->Uid = ses->Suid;
++	pSMB = (TCONX_REQ *) smb_buffer;
++	pSMBr = (TCONX_RSP *) smb_buffer_response;
++
++	pSMB->AndXCommand = 0xFF;
++	pSMB->Flags = cpu_to_le16(TCON_EXTENDED_SECINFO);
++	bcc_ptr = &pSMB->Password[0];
++
++	pSMB->PasswordLength = cpu_to_le16(1);	/* minimum */
++	*bcc_ptr = 0; /* password is null byte */
++	bcc_ptr++;              /* skip password */
++	/* already aligned so no need to do it below */
++
++	if (ses->server->sign)
++		smb_buffer->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
++
++	if (ses->capabilities & CAP_STATUS32)
++		smb_buffer->Flags2 |= SMBFLG2_ERR_STATUS;
++
++	if (ses->capabilities & CAP_DFS)
++		smb_buffer->Flags2 |= SMBFLG2_DFS;
++
++	if (ses->capabilities & CAP_UNICODE) {
++		smb_buffer->Flags2 |= SMBFLG2_UNICODE;
++		length =
++		    cifs_strtoUTF16((__le16 *) bcc_ptr, tree,
++			6 /* max utf8 char length in bytes */ *
++			(/* server len*/ + 256 /* share len */), nls_codepage);
++		bcc_ptr += 2 * length;	/* convert num 16 bit words to bytes */
++		bcc_ptr += 2;	/* skip trailing null */
++	} else {		/* ASCII */
++		strcpy(bcc_ptr, tree);
++		bcc_ptr += strlen(tree) + 1;
 +	}
++	strcpy(bcc_ptr, "?????");
++	bcc_ptr += strlen("?????");
++	bcc_ptr += 1;
++	count = bcc_ptr - &pSMB->Password[0];
++	be32_add_cpu(&pSMB->hdr.smb_buf_length, count);
++	pSMB->ByteCount = cpu_to_le16(count);
 +
-+	pSMBt = (struct smb_t2_rsp *)pSMB;
++	rc = SendReceive(xid, ses, smb_buffer, smb_buffer_response, &length,
++			 0);
 +
-+	total_data_size = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
-+	data_in_this_rsp = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
++	/* above now done in SendReceive */
++	if (rc == 0) {
++		bool is_unicode;
 +
-+	if (total_data_size == data_in_this_rsp)
-+		return 0;
-+	else if (total_data_size < data_in_this_rsp) {
-+		cifs_dbg(FYI, "total data %d smaller than data in frame %d\n",
-+			 total_data_size, data_in_this_rsp);
-+		return -EINVAL;
++		tcon->tid = smb_buffer_response->Tid;
++		bcc_ptr = pByteArea(smb_buffer_response);
++		bytes_left = get_bcc(smb_buffer_response);
++		length = strnlen(bcc_ptr, bytes_left - 2);
++		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
++			is_unicode = true;
++		else
++			is_unicode = false;
++
++
++		/* skip service field (NB: this field is always ASCII) */
++		if (length == 3) {
++			if ((bcc_ptr[0] == 'I') && (bcc_ptr[1] == 'P') &&
++			    (bcc_ptr[2] == 'C')) {
++				cifs_dbg(FYI, "IPC connection\n");
++				tcon->ipc = true;
++				tcon->pipe = true;
++			}
++		} else if (length == 2) {
++			if ((bcc_ptr[0] == 'A') && (bcc_ptr[1] == ':')) {
++				/* the most common case */
++				cifs_dbg(FYI, "disk share connection\n");
++			}
++		}
++		bcc_ptr += length + 1;
++		bytes_left -= (length + 1);
++		strscpy(tcon->tree_name, tree, sizeof(tcon->tree_name));
++
++		/* mostly informational -- no need to fail on error here */
++		kfree(tcon->nativeFileSystem);
++		tcon->nativeFileSystem = cifs_strndup_from_utf16(bcc_ptr,
++						      bytes_left, is_unicode,
++						      nls_codepage);
++
++		cifs_dbg(FYI, "nativeFileSystem=%s\n", tcon->nativeFileSystem);
++
++		if ((smb_buffer_response->WordCount == 3) ||
++				 (smb_buffer_response->WordCount == 7))
++			/* field is in same location */
++			tcon->Flags = le16_to_cpu(pSMBr->OptionalSupport);
++		else
++			tcon->Flags = 0;
++		cifs_dbg(FYI, "Tcon flags: 0x%x\n", tcon->Flags);
++
++		/*
++		 * reset_cifs_unix_caps calls QFSInfo which requires
++		 * need_reconnect to be false, but we would not need to call
++		 * reset_caps if this were not a reconnect case so must check
++		 * need_reconnect flag here.  The caller will also clear
++		 * need_reconnect when tcon was successful but needed to be
++		 * cleared earlier in the case of unix extensions reconnect
++		 */
++		if (tcon->need_reconnect && tcon->unix_ext) {
++			cifs_dbg(FYI, "resetting caps for %s\n", tcon->tree_name);
++			tcon->need_reconnect = false;
++			reset_cifs_unix_caps(xid, tcon, NULL, NULL);
++		}
 +	}
-+
-+	remaining = total_data_size - data_in_this_rsp;
-+
-+	cifs_dbg(FYI, "missing %d bytes from transact2, check next response\n",
-+		 remaining);
-+	if (total_data_size > CIFSMaxBufSize) {
-+		cifs_dbg(VFS, "TotalDataSize %d is over maximum buffer %d\n",
-+			 total_data_size, CIFSMaxBufSize);
-+		return -EINVAL;
-+	}
-+	return remaining;
++	cifs_buf_release(smb_buffer);
++	return rc;
 +}
 +
-+static int
-+coalesce_t2(char *second_buf, struct smb_hdr *target_hdr)
-+{
-+	struct smb_t2_rsp *pSMBs = (struct smb_t2_rsp *)second_buf;
-+	struct smb_t2_rsp *pSMBt  = (struct smb_t2_rsp *)target_hdr;
-+	char *data_area_of_tgt;
-+	char *data_area_of_src;
-+	int remaining;
-+	unsigned int byte_count, total_in_tgt;
-+	__u16 tgt_total_cnt, src_total_cnt, total_in_src;
+ int
+ CIFSSMBTDis(const unsigned int xid, struct cifs_tcon *tcon)
+ {
+--- a/fs/smb/client/compress.c
++++ b/fs/smb/client/compress.c
+@@ -44,7 +44,7 @@ struct bucket {
+ 	unsigned int count;
+ };
+ 
+-/**
++/*
+  * has_low_entropy() - Compute Shannon entropy of the sampled data.
+  * @bkt:	Bytes counts of the sample.
+  * @slen:	Size of the sample.
+@@ -82,7 +82,7 @@ static bool has_low_entropy(struct bucke
+ #define BYTE_DIST_BAD		0
+ #define BYTE_DIST_GOOD		1
+ #define BYTE_DIST_MAYBE		2
+-/**
++/*
+  * calc_byte_distribution() - Compute byte distribution on the sampled data.
+  * @bkt:	Byte counts of the sample.
+  * @slen:	Size of the sample.
+@@ -182,7 +182,7 @@ static int collect_sample(const struct i
+ 	return s;
+ }
+ 
+-/**
++/*
+  * is_compressible() - Determines if a chunk of data is compressible.
+  * @data: Iterator containing uncompressed data.
+  *
+@@ -261,6 +261,21 @@ out:
+ 	return ret;
+ }
+ 
++/*
++ * should_compress() - Determines if a request (write) or the response to a
++ *		       request (read) should be compressed.
++ * @tcon: tcon of the request is being sent to
++ * @rqst: request to evaluate
++ *
++ * Return: true iff:
++ * - compression was successfully negotiated with server
++ * - server has enabled compression for the share
++ * - it's a read or write request
++ * - (write only) request length is >= SMB_COMPRESS_MIN_LEN
++ * - (write only) is_compressible() returns 1
++ *
++ * Return false otherwise.
++ */
+ bool should_compress(const struct cifs_tcon *tcon, const struct smb_rqst *rq)
+ {
+ 	const struct smb2_hdr *shdr = rq->rq_iov->iov_base;
+--- a/fs/smb/client/compress.h
++++ b/fs/smb/client/compress.h
+@@ -29,26 +29,11 @@
+ #ifdef CONFIG_CIFS_COMPRESSION
+ typedef int (*compress_send_fn)(struct TCP_Server_Info *, int, struct smb_rqst *);
+ 
+-int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_send_fn send_fn);
+ 
+-/**
+- * should_compress() - Determines if a request (write) or the response to a
+- *		       request (read) should be compressed.
+- * @tcon: tcon of the request is being sent to
+- * @rqst: request to evaluate
+- *
+- * Return: true iff:
+- * - compression was successfully negotiated with server
+- * - server has enabled compression for the share
+- * - it's a read or write request
+- * - (write only) request length is >= SMB_COMPRESS_MIN_LEN
+- * - (write only) is_compressible() returns 1
+- *
+- * Return false otherwise.
+- */
++int smb_compress(struct TCP_Server_Info *server, struct smb_rqst *rq, compress_send_fn send_fn);
+ bool should_compress(const struct cifs_tcon *tcon, const struct smb_rqst *rq);
+ 
+-/**
++/*
+  * smb_compress_alg_valid() - Validate a compression algorithm.
+  * @alg: Compression algorithm to check.
+  * @valid_none: Conditional check whether NONE algorithm should be
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3987,148 +3987,6 @@ error:
+ }
+ #endif
+ 
+-#ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
+-/*
+- * Issue a TREE_CONNECT request.
+- */
+-int
+-CIFSTCon(const unsigned int xid, struct cifs_ses *ses,
+-	 const char *tree, struct cifs_tcon *tcon,
+-	 const struct nls_table *nls_codepage)
+-{
+-	struct smb_hdr *smb_buffer;
+-	struct smb_hdr *smb_buffer_response;
+-	TCONX_REQ *pSMB;
+-	TCONX_RSP *pSMBr;
+-	unsigned char *bcc_ptr;
+-	int rc = 0;
+-	int length;
+-	__u16 bytes_left, count;
+-
+-	if (ses == NULL)
+-		return -EIO;
+-
+-	smb_buffer = cifs_buf_get();
+-	if (smb_buffer == NULL)
+-		return -ENOMEM;
+-
+-	smb_buffer_response = smb_buffer;
+-
+-	header_assemble(smb_buffer, SMB_COM_TREE_CONNECT_ANDX,
+-			NULL /*no tid */, 4 /*wct */);
+-
+-	smb_buffer->Mid = get_next_mid(ses->server);
+-	smb_buffer->Uid = ses->Suid;
+-	pSMB = (TCONX_REQ *) smb_buffer;
+-	pSMBr = (TCONX_RSP *) smb_buffer_response;
+-
+-	pSMB->AndXCommand = 0xFF;
+-	pSMB->Flags = cpu_to_le16(TCON_EXTENDED_SECINFO);
+-	bcc_ptr = &pSMB->Password[0];
+-
+-	pSMB->PasswordLength = cpu_to_le16(1);	/* minimum */
+-	*bcc_ptr = 0; /* password is null byte */
+-	bcc_ptr++;              /* skip password */
+-	/* already aligned so no need to do it below */
+-
+-	if (ses->server->sign)
+-		smb_buffer->Flags2 |= SMBFLG2_SECURITY_SIGNATURE;
+-
+-	if (ses->capabilities & CAP_STATUS32)
+-		smb_buffer->Flags2 |= SMBFLG2_ERR_STATUS;
+-
+-	if (ses->capabilities & CAP_DFS)
+-		smb_buffer->Flags2 |= SMBFLG2_DFS;
+-
+-	if (ses->capabilities & CAP_UNICODE) {
+-		smb_buffer->Flags2 |= SMBFLG2_UNICODE;
+-		length =
+-		    cifs_strtoUTF16((__le16 *) bcc_ptr, tree,
+-			6 /* max utf8 char length in bytes */ *
+-			(/* server len*/ + 256 /* share len */), nls_codepage);
+-		bcc_ptr += 2 * length;	/* convert num 16 bit words to bytes */
+-		bcc_ptr += 2;	/* skip trailing null */
+-	} else {		/* ASCII */
+-		strcpy(bcc_ptr, tree);
+-		bcc_ptr += strlen(tree) + 1;
+-	}
+-	strcpy(bcc_ptr, "?????");
+-	bcc_ptr += strlen("?????");
+-	bcc_ptr += 1;
+-	count = bcc_ptr - &pSMB->Password[0];
+-	be32_add_cpu(&pSMB->hdr.smb_buf_length, count);
+-	pSMB->ByteCount = cpu_to_le16(count);
+-
+-	rc = SendReceive(xid, ses, smb_buffer, smb_buffer_response, &length,
+-			 0);
+-
+-	/* above now done in SendReceive */
+-	if (rc == 0) {
+-		bool is_unicode;
+-
+-		tcon->tid = smb_buffer_response->Tid;
+-		bcc_ptr = pByteArea(smb_buffer_response);
+-		bytes_left = get_bcc(smb_buffer_response);
+-		length = strnlen(bcc_ptr, bytes_left - 2);
+-		if (smb_buffer->Flags2 & SMBFLG2_UNICODE)
+-			is_unicode = true;
+-		else
+-			is_unicode = false;
+-
+-
+-		/* skip service field (NB: this field is always ASCII) */
+-		if (length == 3) {
+-			if ((bcc_ptr[0] == 'I') && (bcc_ptr[1] == 'P') &&
+-			    (bcc_ptr[2] == 'C')) {
+-				cifs_dbg(FYI, "IPC connection\n");
+-				tcon->ipc = true;
+-				tcon->pipe = true;
+-			}
+-		} else if (length == 2) {
+-			if ((bcc_ptr[0] == 'A') && (bcc_ptr[1] == ':')) {
+-				/* the most common case */
+-				cifs_dbg(FYI, "disk share connection\n");
+-			}
+-		}
+-		bcc_ptr += length + 1;
+-		bytes_left -= (length + 1);
+-		strscpy(tcon->tree_name, tree, sizeof(tcon->tree_name));
+-
+-		/* mostly informational -- no need to fail on error here */
+-		kfree(tcon->nativeFileSystem);
+-		tcon->nativeFileSystem = cifs_strndup_from_utf16(bcc_ptr,
+-						      bytes_left, is_unicode,
+-						      nls_codepage);
+-
+-		cifs_dbg(FYI, "nativeFileSystem=%s\n", tcon->nativeFileSystem);
+-
+-		if ((smb_buffer_response->WordCount == 3) ||
+-			 (smb_buffer_response->WordCount == 7))
+-			/* field is in same location */
+-			tcon->Flags = le16_to_cpu(pSMBr->OptionalSupport);
+-		else
+-			tcon->Flags = 0;
+-		cifs_dbg(FYI, "Tcon flags: 0x%x\n", tcon->Flags);
+-
+-		/*
+-		 * reset_cifs_unix_caps calls QFSInfo which requires
+-		 * need_reconnect to be false, but we would not need to call
+-		 * reset_caps if this were not a reconnect case so must check
+-		 * need_reconnect flag here.  The caller will also clear
+-		 * need_reconnect when tcon was successful but needed to be
+-		 * cleared earlier in the case of unix extensions reconnect
+-		 */
+-		if (tcon->need_reconnect && tcon->unix_ext) {
+-			cifs_dbg(FYI, "resetting caps for %s\n", tcon->tree_name);
+-			tcon->need_reconnect = false;
+-			reset_cifs_unix_caps(xid, tcon, NULL, NULL);
+-		}
+-	}
+-	cifs_buf_release(smb_buffer);
+-	return rc;
+-}
+-#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+-
+ static void delayed_free(struct rcu_head *p)
+ {
+ 	struct cifs_sb_info *cifs_sb = container_of(p, struct cifs_sb_info, rcu);
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -458,7 +458,7 @@ out_err:
+ 
+ int
+ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
+-		 struct file *file, unsigned oflags, umode_t mode)
++		 struct file *file, unsigned int oflags, umode_t mode)
+ {
+ 	int rc;
+ 	unsigned int xid;
+--- a/fs/smb/client/dns_resolve.h
++++ b/fs/smb/client/dns_resolve.h
+@@ -15,8 +15,6 @@
+ #include "cifsglob.h"
+ #include "cifsproto.h"
+ 
+-#ifdef __KERNEL__
+-
+ int dns_resolve_name(const char *dom, const char *name,
+ 		     size_t namelen, struct sockaddr *ip_addr);
+ 
+@@ -36,6 +34,4 @@ static inline int dns_resolve_unc(const
+ 	return dns_resolve_name(dom, name, namelen, ip_addr);
+ }
+ 
+-#endif /* KERNEL */
+-
+ #endif /* _DNS_RESOLVE_H */
+--- a/fs/smb/client/fs_context.c
++++ b/fs/smb/client/fs_context.c
+@@ -505,7 +505,7 @@ cifs_parse_smb_version(struct fs_context
+ 	case Smb_20:
+ 		cifs_errorf(fc, "vers=2.0 mount not permitted when legacy dialects disabled\n");
+ 		return 1;
+-#endif /* CIFS_ALLOW_INSECURE_LEGACY */
++#endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
+ 	case Smb_21:
+ 		ctx->ops = &smb21_operations;
+ 		ctx->vals = &smb21_values;
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -18,6 +18,7 @@
+ #include "nterr.h"
+ #include "cifs_unicode.h"
+ #include "smb2pdu.h"
++#include "smb2proto.h"
+ #include "cifsfs.h"
+ #ifdef CONFIG_CIFS_DFS_UPCALL
+ #include "dns_resolve.h"
+--- a/fs/smb/client/netmisc.c
++++ b/fs/smb/client/netmisc.c
+@@ -200,7 +200,7 @@ cifs_set_port(struct sockaddr *addr, con
+ }
+ 
+ /*****************************************************************************
+-convert a NT status code to a dos class/code
++ *convert a NT status code to a dos class/code
+  *****************************************************************************/
+ /* NT status -> dos error map */
+ static const struct {
+--- a/fs/smb/client/smb2file.c
++++ b/fs/smb/client/smb2file.c
+@@ -163,7 +163,8 @@ int smb2_parse_symlink_response(struct c
+ 					 cifs_sb);
+ }
+ 
+-int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms, __u32 *oplock, void *buf)
++int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
++		   __u32 *oplock, void *buf)
+ {
+ 	int rc;
+ 	__le16 *smb2_path;
+--- a/fs/smb/client/smb2inode.c
++++ b/fs/smb/client/smb2inode.c
+@@ -21,7 +21,6 @@
+ #include "cifs_unicode.h"
+ #include "fscache.h"
+ #include "smb2glob.h"
+-#include "smb2pdu.h"
+ #include "smb2proto.h"
+ #include "cached_dir.h"
+ #include "../common/smb2status.h"
+--- a/fs/smb/client/smb2maperror.c
++++ b/fs/smb/client/smb2maperror.c
+@@ -10,10 +10,9 @@
+ #include <linux/errno.h>
+ #include "cifsglob.h"
+ #include "cifs_debug.h"
+-#include "smb2pdu.h"
+ #include "smb2proto.h"
+-#include "../common/smb2status.h"
+ #include "smb2glob.h"
++#include "../common/smb2status.h"
+ #include "trace.h"
+ 
+ struct status_to_posix_error {
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -17,9 +17,9 @@
+ #include <uapi/linux/magic.h>
+ #include "cifsfs.h"
+ #include "cifsglob.h"
+-#include "smb2pdu.h"
+-#include "smb2proto.h"
+ #include "cifsproto.h"
++#include "smb2proto.h"
++#include "smb2pdu.h"
+ #include "cifs_debug.h"
+ #include "cifs_unicode.h"
+ #include "../common/smb2status.h"
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -26,8 +26,8 @@
+ #include <linux/netfs.h>
+ #include <trace/events/netfs.h>
+ #include "cifsglob.h"
+-#include "cifsacl.h"
+ #include "cifsproto.h"
++#include "cifsacl.h"
+ #include "smb2proto.h"
+ #include "cifs_unicode.h"
+ #include "cifs_debug.h"
+@@ -3921,7 +3921,8 @@ int SMB2_query_info(const unsigned int x
+ /* currently unused, as now we are doing compounding instead (see smb311_posix_query_path_info) */
+ int
+ SMB311_posix_query_info(const unsigned int xid, struct cifs_tcon *tcon,
+-		u64 persistent_fid, u64 volatile_fid, struct smb311_posix_qinfo *data, u32 *plen)
++			u64 persistent_fid, u64 volatile_fid,
++			struct smb311_posix_qinfo *data, u32 *plen)
+ {
+ 	size_t output_len = sizeof(struct smb311_posix_qinfo) +
+ 			(sizeof(struct smb_sid) * 2) + (PATH_MAX * 2);
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -9,8 +9,10 @@
+  */
+ #ifndef _SMB2PROTO_H
+ #define _SMB2PROTO_H
 +
-+	src_total_cnt = get_unaligned_le16(&pSMBs->t2_rsp.TotalDataCount);
-+	tgt_total_cnt = get_unaligned_le16(&pSMBt->t2_rsp.TotalDataCount);
+ #include <linux/nls.h>
+ #include <linux/key-type.h>
++#include "cached_dir.h"
+ 
+ struct statfs;
+ struct smb_rqst;
+--- a/fs/smb/client/trace.h
++++ b/fs/smb/client/trace.h
+@@ -20,6 +20,136 @@
+ /*
+  * Specify enums for tracing information.
+  */
++#define smb_eio_traces \
++	EM(smb_eio_trace_compress_copy,			"compress_copy") \
++	EM(smb_eio_trace_copychunk_inv_rsp,		"copychunk_inv_rsp") \
++	EM(smb_eio_trace_copychunk_overcopy_b,		"copychunk_overcopy_b") \
++	EM(smb_eio_trace_copychunk_overcopy_c,		"copychunk_overcopy_c") \
++	EM(smb_eio_trace_create_rsp_too_small,		"create_rsp_too_small") \
++	EM(smb_eio_trace_dfsref_no_rsp,			"dfsref_no_rsp") \
++	EM(smb_eio_trace_ea_overrun,			"ea_overrun") \
++	EM(smb_eio_trace_extract_will_pin,		"extract_will_pin") \
++	EM(smb_eio_trace_forced_shutdown,		"forced_shutdown") \
++	EM(smb_eio_trace_getacl_bcc_too_small,		"getacl_bcc_too_small") \
++	EM(smb_eio_trace_getcifsacl_param_count,	"getcifsacl_param_count") \
++	EM(smb_eio_trace_getdfsrefer_bcc_too_small,	"getdfsrefer_bcc_too_small") \
++	EM(smb_eio_trace_getextattr_bcc_too_small,	"getextattr_bcc_too_small") \
++	EM(smb_eio_trace_getextattr_inv_size,		"getextattr_inv_size") \
++	EM(smb_eio_trace_getsrvinonum_bcc_too_small,	"getsrvinonum_bcc_too_small") \
++	EM(smb_eio_trace_getsrvinonum_size,		"getsrvinonum_size") \
++	EM(smb_eio_trace_ioctl_data_len,		"ioctl_data_len") \
++	EM(smb_eio_trace_ioctl_no_rsp,			"ioctl_no_rsp") \
++	EM(smb_eio_trace_ioctl_out_off,			"ioctl_out_off") \
++	EM(smb_eio_trace_lock_bcc_too_small,		"lock_bcc_too_small") \
++	EM(smb_eio_trace_lock_data_too_small,		"lock_data_too_small") \
++	EM(smb_eio_trace_malformed_ksid_key,		"malformed_ksid_key") \
++	EM(smb_eio_trace_malformed_sid_key,		"malformed_sid_key") \
++	EM(smb_eio_trace_mkdir_no_rsp,			"mkdir_no_rsp") \
++	EM(smb_eio_trace_neg_bad_rsplen,		"neg_bad_rsplen") \
++	EM(smb_eio_trace_neg_decode_token,		"neg_decode_token") \
++	EM(smb_eio_trace_neg_info_caps,			"neg_info_caps") \
++	EM(smb_eio_trace_neg_info_dialect,		"neg_info_dialect") \
++	EM(smb_eio_trace_neg_info_fail,			"neg_info_fail") \
++	EM(smb_eio_trace_neg_info_sec_mode,		"neg_info_sec_mode") \
++	EM(smb_eio_trace_neg_inval_dialect,		"neg_inval_dialect") \
++	EM(smb_eio_trace_neg_no_crypt_key,		"neg_no_crypt_key") \
++	EM(smb_eio_trace_neg_sec_blob_too_small,	"neg_sec_blob_too_small") \
++	EM(smb_eio_trace_neg_unreq_dialect,		"neg_unreq_dialect") \
++	EM(smb_eio_trace_no_auth_key,			"no_auth_key") \
++	EM(smb_eio_trace_no_lease_key,			"no_lease_key") \
++	EM(smb_eio_trace_not_netfs_writeback,		"not_netfs_writeback") \
++	EM(smb_eio_trace_null_pointers,			"null_pointers") \
++	EM(smb_eio_trace_oldqfsinfo_bcc_too_small,	"oldqfsinfo_bcc_too_small") \
++	EM(smb_eio_trace_pend_del_fail,			"pend_del_fail") \
++	EM(smb_eio_trace_qalleas_bcc_too_small,		"qalleas_bcc_too_small") \
++	EM(smb_eio_trace_qalleas_ea_overlong,		"qalleas_ea_overlong") \
++	EM(smb_eio_trace_qalleas_overlong,		"qalleas_overlong") \
++	EM(smb_eio_trace_qfileinfo_bcc_too_small,	"qfileinfo_bcc_too_small") \
++	EM(smb_eio_trace_qfileinfo_invalid,		"qfileinfo_invalid") \
++	EM(smb_eio_trace_qfsattrinfo_bcc_too_small,	"qfsattrinfo_bcc_too_small") \
++	EM(smb_eio_trace_qfsdevinfo_bcc_too_small,	"qfsdevinfo_bcc_too_small") \
++	EM(smb_eio_trace_qfsinfo_bcc_too_small,		"qfsinfo_bcc_too_small") \
++	EM(smb_eio_trace_qfsposixinfo_bcc_too_small,	"qfsposixinfo_bcc_too_small") \
++	EM(smb_eio_trace_qfsunixinfo_bcc_too_small,	"qfsunixinfo_bcc_too_small") \
++	EM(smb_eio_trace_qpathinfo_bcc_too_small,	"qpathinfo_bcc_too_small") \
++	EM(smb_eio_trace_qpathinfo_invalid,		"qpathinfo_invalid") \
++	EM(smb_eio_trace_qreparse_data_area,		"qreparse_data_area") \
++	EM(smb_eio_trace_qreparse_rep_datalen,		"qreparse_rep_datalen") \
++	EM(smb_eio_trace_qreparse_ret_datalen,		"qreparse_ret_datalen") \
++	EM(smb_eio_trace_qreparse_setup_count,		"qreparse_setup_count") \
++	EM(smb_eio_trace_qreparse_sizes_wrong,		"qreparse_sizes_wrong") \
++	EM(smb_eio_trace_qsym_bcc_too_small,		"qsym_bcc_too_small") \
++	EM(smb_eio_trace_read_mid_state_unknown,	"read_mid_state_unknown") \
++	EM(smb_eio_trace_read_overlarge,		"read_overlarge") \
++	EM(smb_eio_trace_read_rsp_malformed,		"read_rsp_malformed") \
++	EM(smb_eio_trace_read_rsp_short,		"read_rsp_short") \
++	EM(smb_eio_trace_read_too_far,			"read_too_far") \
++	EM(smb_eio_trace_reparse_data_len,		"reparse_data_len") \
++	EM(smb_eio_trace_reparse_native_len,		"reparse_native_len") \
++	EM(smb_eio_trace_reparse_native_nul,		"reparse_native_nul") \
++	EM(smb_eio_trace_reparse_native_sym_len,	"reparse_native_sym_len") \
++	EM(smb_eio_trace_reparse_nfs_dev,		"reparse_nfs_dev") \
++	EM(smb_eio_trace_reparse_nfs_nul,		"reparse_nfs_nul") \
++	EM(smb_eio_trace_reparse_nfs_sockfifo,		"reparse_nfs_sockfifo") \
++	EM(smb_eio_trace_reparse_nfs_symbuf,		"reparse_nfs_symbuf") \
++	EM(smb_eio_trace_reparse_nfs_too_short,		"reparse_nfs_too_short") \
++	EM(smb_eio_trace_reparse_overlong,		"reparse_overlong") \
++	EM(smb_eio_trace_reparse_rdlen,			"reparse_rdlen") \
++	EM(smb_eio_trace_reparse_wsl_nul,		"reparse_wsl_nul") \
++	EM(smb_eio_trace_reparse_wsl_symbuf,		"reparse_wsl_symbuf") \
++	EM(smb_eio_trace_reparse_wsl_ver,		"reparse_wsl_ver") \
++	EM(smb_eio_trace_rx_b_read_short,		"rx_b_read_short") \
++	EM(smb_eio_trace_rx_bad_datalen,		"rx_bad_datalen") \
++	EM(smb_eio_trace_rx_both_buf,			"rx_both_buf") \
++	EM(smb_eio_trace_rx_calc_len_too_big,		"rx_calc_len_too_big") \
++	EM(smb_eio_trace_rx_check_rsp,			"rx_check_rsp") \
++	EM(smb_eio_trace_rx_copy_to_iter,		"rx_copy_to_iter") \
++	EM(smb_eio_trace_rx_insuff_res,			"rx_insuff_res") \
++	EM(smb_eio_trace_rx_inv_bcc,			"rx_inv_bcc") \
++	EM(smb_eio_trace_rx_mid_unready,		"rx_mid_unready") \
++	EM(smb_eio_trace_rx_neg_sess_resp,		"rx_neg_sess_resp") \
++	EM(smb_eio_trace_rx_overlong,			"rx_overlong") \
++	EM(smb_eio_trace_rx_overpage,			"rx_overpage") \
++	EM(smb_eio_trace_rx_pos_sess_resp,		"rx_pos_sess_resp") \
++	EM(smb_eio_trace_rx_rfc1002_magic,		"rx_rfc1002_magic") \
++	EM(smb_eio_trace_rx_sync_mid_invalid,		"rx_sync_mid_invalid") \
++	EM(smb_eio_trace_rx_sync_mid_malformed,		"rx_sync_mid_malformed") \
++	EM(smb_eio_trace_rx_too_short,			"rx_too_short") \
++	EM(smb_eio_trace_rx_trans2_extract,		"rx_trans2_extract") \
++	EM(smb_eio_trace_rx_unknown_resp,		"rx_unknown_resp") \
++	EM(smb_eio_trace_rx_unspec_error,		"rx_unspec_error") \
++	EM(smb_eio_trace_sess_buf_off,			"sess_buf_off") \
++	EM(smb_eio_trace_sess_exiting,			"sess_exiting") \
++	EM(smb_eio_trace_sess_krb_wcc,			"sess_krb_wcc") \
++	EM(smb_eio_trace_sess_nl2_wcc,			"sess_nl2_wcc") \
++	EM(smb_eio_trace_sess_rawnl_auth_wcc,		"sess_rawnl_auth_wcc") \
++	EM(smb_eio_trace_sess_rawnl_neg_wcc,		"sess_rawnl_neg_wcc") \
++	EM(smb_eio_trace_short_symlink_write,		"short_symlink_write") \
++	EM(smb_eio_trace_sid_too_many_auth,		"sid_too_many_auth") \
++	EM(smb_eio_trace_sig_data_too_small,		"sig_data_too_small") \
++	EM(smb_eio_trace_sig_iter,			"sig_iter") \
++	EM(smb_eio_trace_smb1_received_error,		"smb1_received_error") \
++	EM(smb_eio_trace_smb2_received_error,		"smb2_received_error") \
++	EM(smb_eio_trace_sym_slash,			"sym_slash") \
++	EM(smb_eio_trace_sym_target_len,		"sym_target_len") \
++	EM(smb_eio_trace_symlink_file_size,		"symlink_file_size") \
++	EM(smb_eio_trace_tdis_in_reconnect,		"tdis_in_reconnect") \
++	EM(smb_eio_trace_tx_chained_async,		"tx_chained_async") \
++	EM(smb_eio_trace_tx_compress_failed,		"tx_compress_failed") \
++	EM(smb_eio_trace_tx_copy_iter_to_buf,		"tx_copy_iter_to_buf") \
++	EM(smb_eio_trace_tx_copy_to_buf,		"tx_copy_to_buf") \
++	EM(smb_eio_trace_tx_max_compound,		"tx_max_compound") \
++	EM(smb_eio_trace_tx_miscopy_to_buf,		"tx_miscopy_to_buf") \
++	EM(smb_eio_trace_tx_need_transform,		"tx_need_transform") \
++	EM(smb_eio_trace_tx_too_long,			"sr_too_long") \
++	EM(smb_eio_trace_unixqfileinfo_bcc_too_small,	"unixqfileinfo_bcc_too_small") \
++	EM(smb_eio_trace_unixqpathinfo_bcc_too_small,	"unixqpathinfo_bcc_too_small") \
++	EM(smb_eio_trace_user_iter,			"user_iter") \
++	EM(smb_eio_trace_write_bad_buf_type,		"write_bad_buf_type") \
++	EM(smb_eio_trace_write_mid_state_unknown,	"write_mid_state_unknown") \
++	EM(smb_eio_trace_write_rsp_malformed,		"write_rsp_malformed") \
++	E_(smb_eio_trace_write_too_far,			"write_too_far")
 +
-+	if (tgt_total_cnt != src_total_cnt)
-+		cifs_dbg(FYI, "total data count of primary and secondary t2 differ source=%hu target=%hu\n",
-+			 src_total_cnt, tgt_total_cnt);
+ #define smb3_rw_credits_traces \
+ 	EM(cifs_trace_rw_credits_call_readv_adjust,	"rd-call-adj") \
+ 	EM(cifs_trace_rw_credits_call_writev_adjust,	"wr-call-adj") \
+@@ -84,6 +214,7 @@
+ #define EM(a, b) a,
+ #define E_(a, b) a
+ 
++enum smb_eio_trace		{ smb_eio_traces } __mode(byte);
+ enum smb3_rw_credits_trace	{ smb3_rw_credits_traces } __mode(byte);
+ enum smb3_tcon_ref_trace	{ smb3_tcon_ref_traces } __mode(byte);
+ 
+@@ -97,6 +228,7 @@ enum smb3_tcon_ref_trace	{ smb3_tcon_ref
+ #define EM(a, b) TRACE_DEFINE_ENUM(a);
+ #define E_(a, b) TRACE_DEFINE_ENUM(a);
+ 
++smb_eio_traces;
+ smb3_rw_credits_traces;
+ smb3_tcon_ref_traces;
+ 
+@@ -1621,6 +1753,24 @@ TRACE_EVENT(smb3_rw_credits,
+ 		      __entry->server_credits, __entry->in_flight)
+ 	    );
+ 
++TRACE_EVENT(smb3_eio,
++	    TP_PROTO(enum smb_eio_trace trace, unsigned long info, unsigned long info2),
++	    TP_ARGS(trace, info, info2),
++	    TP_STRUCT__entry(
++		    __field(enum smb_eio_trace,	trace)
++		    __field(unsigned long,	info)
++		    __field(unsigned long,	info2)
++			     ),
++	    TP_fast_assign(
++		    __entry->trace	= trace;
++		    __entry->info	= info;
++		    __entry->info2	= info2;
++			   ),
++	    TP_printk("%s info=%lx,%lx",
++		      __print_symbolic(__entry->trace, smb_eio_traces),
++		      __entry->info, __entry->info2)
++	    );
 +
-+	total_in_tgt = get_unaligned_le16(&pSMBt->t2_rsp.DataCount);
-+
-+	remaining = tgt_total_cnt - total_in_tgt;
-+
-+	if (remaining < 0) {
-+		cifs_dbg(FYI, "Server sent too much data. tgt_total_cnt=%hu total_in_tgt=%u\n",
-+			 tgt_total_cnt, total_in_tgt);
-+		return -EPROTO;
-+	}
-+
-+	if (remaining == 0) {
-+		/* nothing to do, ignore */
-+		cifs_dbg(FYI, "no more data remains\n");
-+		return 0;
-+	}
-+
-+	total_in_src = get_unaligned_le16(&pSMBs->t2_rsp.DataCount);
-+	if (remaining < total_in_src)
-+		cifs_dbg(FYI, "transact2 2nd response contains too much data\n");
-+
-+	/* find end of first SMB data area */
-+	data_area_of_tgt = (char *)&pSMBt->hdr.Protocol +
-+				get_unaligned_le16(&pSMBt->t2_rsp.DataOffset);
-+
-+	/* validate target area */
-+	data_area_of_src = (char *)&pSMBs->hdr.Protocol +
-+				get_unaligned_le16(&pSMBs->t2_rsp.DataOffset);
-+
-+	data_area_of_tgt += total_in_tgt;
-+
-+	total_in_tgt += total_in_src;
-+	/* is the result too big for the field? */
-+	if (total_in_tgt > USHRT_MAX) {
-+		cifs_dbg(FYI, "coalesced DataCount too large (%u)\n",
-+			 total_in_tgt);
-+		return -EPROTO;
-+	}
-+	put_unaligned_le16(total_in_tgt, &pSMBt->t2_rsp.DataCount);
-+
-+	/* fix up the BCC */
-+	byte_count = get_bcc(target_hdr);
-+	byte_count += total_in_src;
-+	/* is the result too big for the field? */
-+	if (byte_count > USHRT_MAX) {
-+		cifs_dbg(FYI, "coalesced BCC too large (%u)\n", byte_count);
-+		return -EPROTO;
-+	}
-+	put_bcc(byte_count, target_hdr);
-+
-+	byte_count = be32_to_cpu(target_hdr->smb_buf_length);
-+	byte_count += total_in_src;
-+	/* don't allow buffer to overflow */
-+	if (byte_count > CIFSMaxBufSize + MAX_CIFS_HDR_SIZE - 4) {
-+		cifs_dbg(FYI, "coalesced BCC exceeds buffer size (%u)\n",
-+			 byte_count);
-+		return -ENOBUFS;
-+	}
-+	target_hdr->smb_buf_length = cpu_to_be32(byte_count);
-+
-+	/* copy second buffer into end of first buffer */
-+	memcpy(data_area_of_tgt, data_area_of_src, total_in_src);
-+
-+	if (remaining != total_in_src) {
-+		/* more responses to go */
-+		cifs_dbg(FYI, "waiting for more secondary responses\n");
-+		return 1;
-+	}
-+
-+	/* we are done */
-+	cifs_dbg(FYI, "found the last secondary response\n");
-+	return 0;
-+}
-+
-+bool
-+cifs_check_trans2(struct mid_q_entry *mid, struct TCP_Server_Info *server,
-+		  char *buf, int malformed)
-+{
-+	if (malformed)
-+		return false;
-+	if (check2ndT2(buf) <= 0)
-+		return false;
-+	mid->multiRsp = true;
-+	if (mid->resp_buf) {
-+		/* merge response - fix up 1st*/
-+		malformed = coalesce_t2(buf, mid->resp_buf);
-+		if (malformed > 0)
-+			return true;
-+		/* All parts received or packet is malformed. */
-+		mid->multiEnd = true;
-+		dequeue_mid(mid, malformed);
-+		return true;
-+	}
-+	if (!server->large_buf) {
-+		/*FIXME: switch to already allocated largebuf?*/
-+		cifs_dbg(VFS, "1st trans2 resp needs bigbuf\n");
-+	} else {
-+		/* Have first buffer */
-+		mid->resp_buf = buf;
-+		mid->large_buf = true;
-+		server->bigbuf = NULL;
-+	}
-+	return true;
-+}
+ 
+ #undef EM
+ #undef E_
 
 
