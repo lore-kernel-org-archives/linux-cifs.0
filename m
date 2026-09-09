@@ -1,192 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D264E3EF8
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 11:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A42550DBB
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 11:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788952519; cv=none; b=fI9EB3EI++yXYheFWz9j2/Kc6L2bEJimKYOxgacbjIOawURM77Qsu7siwOeSTEEG5zs0Z7TjTntGKfIkA/NmamGQc0j5yVNBDYSbuIDX38CanIB549XvKSwwnlzne1wHM3+zxByWd92B2t/tCmZUUerZF+y/9ly202Jq7Oeqwh8=
+	t=1788954967; cv=none; b=AHVRS7ctfIq/WGaWSYEZil1CFLJj3Mz0zQn880OuRysuxPbZZ9fLOwiFFp6H9KkH8RvA/vDr3hX4XwmMFBmWLgnQa2s2f6KXTOZH8NictJ2HdfsxoDh1pB62lzSC/vWF5CwEb89fudpohi9syg+kMYIWys3NWEmF/ko4ybkBB3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788952519; c=relaxed/simple;
-	bh=BOKYqUln8EQzlkZtnYZeIfKT2lDSbwiR9MwSykmYTMg=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=MVyHv48PUK7BfN1DuITgeUt1JPJ3OmDlUx2tZeaZk3bHhzBMbxkJWUKYqNa0G+bxDNp0UBsQVPcCJBWZVTRubFeZk92kHg2gAaQ1RmHlnmhF6LJC6EKUiQNgx9kCPBedYf0LzBu+MsR4/qBWyaHM/6m4hIR7aaX9wzHqayG4NUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XQMW0orl; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1788954967; c=relaxed/simple;
+	bh=HsLRaYuEbq7ZzzRNl6uSIAKV4rQlZ2M6v1OhzKK4PeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Khx6sFCAjbeECz11iyNdYcfcmhf78os9Ri4zhqGmz7YjuECMEvU8O2uE9fjUt8SXj2cJWr6s/ZJkmRJ4jskZcWAh/ybKWx3Wod3JCDmQkt2QkhItWSN/lDdNZ8GBvPzcB28qJbTlDGovf+YXyxbxTYtjFT/ePIOEFyNEDKxt/08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b+DYhiOP; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XQMW0orl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+DYhiOP"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788952517;
+	s=mimecast20190719; t=1788954964;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FD4MZ+85OAGIRur4qtfRpT71ya2ywh4k2+CQUSEmgmw=;
-	b=XQMW0orlE3SXQqOqLltJ7CFYCbxdGaoM5TirKvJhastABFyCpq3rwGrHGqBQB7hnKY0XhK
-	zyDs8IO3C7o4tVtZmAOQCf/x1tQPFgWBccQJjzEQWwbcoUIutHvqzxN2hvF72lG7+COyyA
-	2ejXXxl8I7gbe9ikvwKZvC20U7xts5k=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=hUSOoW0g30UFVhZc7yIBkWk1BVCAbM29mk2RKcbK+JY=;
+	b=b+DYhiOPEBzUXzhwFEcgfmHVssRWQPTlOuQcPO/60lUhURaaQSq3HQsM+dw+xGGIvvglG3
+	n7mO8oY8pCIo9kM1fC6OHRwRHEahVGGkC56SA2b3MRXDAvESDTG1hqXolKm/GjouoOlD/d
+	nW/Y8/16fNaemmJ/Ps/7X+TAVFCrt4Y=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-168-DcC2FFztMwSxkFoe42I7vA-1; Wed,
- 09 Sep 2026 07:15:15 -0400
-X-MC-Unique: DcC2FFztMwSxkFoe42I7vA-1
-X-Mimecast-MFC-AGG-ID: DcC2FFztMwSxkFoe42I7vA_1788952514
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-LTe7h3VOOKKbGcjQM4I0FQ-1; Wed,
+ 09 Sep 2026 07:56:01 -0400
+X-MC-Unique: LTe7h3VOOKKbGcjQM4I0FQ-1
+X-Mimecast-MFC-AGG-ID: LTe7h3VOOKKbGcjQM4I0FQ_1788954959
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BB1BF19540CF;
-	Wed,  9 Sep 2026 11:15:13 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.158])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 39E7041D;
-	Wed,  9 Sep 2026 11:15:10 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <a385053c-1c4a-4060-a3bb-befa007ddb33@redhat.com>
-References: <a385053c-1c4a-4060-a3bb-befa007ddb33@redhat.com>
-To: sorenson@redhat.com
-Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org,
-    netfs@lists.linux.dev, CIFS <linux-cifs@vger.kernel.org>,
-    linux-kernel@vger.kernel.org
-Subject: Re: netfs_read_gaps(): aliased sink folio makes the read destination unreadable, SIGBUS on cifs with signing
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED3CF19541AC;
+	Wed,  9 Sep 2026 11:55:58 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7D4991956088;
+	Wed,  9 Sep 2026 11:55:53 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH v2 12/13] smb: client: Use hmac_sha256_zeroize_ctx function to clear hmac_sha256_ctx
+Date: Wed,  9 Sep 2026 13:54:48 +0200
+Message-ID: <20260909115455.157093-13-thuth@redhat.com>
+In-Reply-To: <20260909115455.157093-1-thuth@redhat.com>
+References: <20260909115455.157093-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1714045.1788952509.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 09 Sep 2026 12:15:09 +0100
-Message-ID: <1714046.1788952509@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Frank,
+It's just cosmetics, but now that we have a helper function for clearing
+hmac_sha256_ctx with a __cleanup() statement, we can also use it in the smb
+client code for good measure.
 
-Can you try this?  It can be triggered manually with something like:
-
-   xfs_io -c "w 100 100" -c "r 0 4096" /xfstest.test/foo
-
-David
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
-commit 60314c47d9ccce8e7da23e1754e7defb70a234ee
-Author: David Howells <dhowells@redhat.com>
-Date:   Wed Sep 9 11:36:30 2026 +0100
+ fs/smb/client/smb2transport.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-    netfs: Fix netfs_read_gaps() to use separate sink folios
-    =
-
-    Fix netfs_read_gaps() to use separate folios rather than re-using a si=
-ngle
-    sink folio to discard the unwanted data so that cifs checksum checking=
- sees
-    all the data that was fetched.
-    =
-
-    Reported-by: Frank Sorenson <sorenson@redhat.com>
-    Closes: https://lore.kernel.org/r/a385053c-1c4a-4060-a3bb-befa007ddb33=
-@redhat.com/
-    Signed-off-by: David Howells <dhowells@redhat.com>
-    cc: Paulo Alcantara <pc@manguebit.org>
-    cc: Namjae Jeon <linkinjeon@kernel.org>
-    cc: netfs@lists.linux.dev
-    cc: linux-cifs@vger.kernel.org
-    cc: linux-fsdevel@vger.kernel.org
-    Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
-
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 424df70a5c30..64eb64c475a9 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -482,15 +482,14 @@ static int netfs_read_gaps(struct file *file, struct=
- folio *folio)
- 	struct netfs_group *group =3D netfs_folio_group(folio);
- 	struct netfs_folio *finfo =3D netfs_folio_info(folio);
- 	struct netfs_inode *ctx =3D netfs_inode(mapping->host);
--	struct folio *sink =3D NULL;
- 	struct bio_vec *bvec;
- 	unsigned int from =3D finfo->dirty_offset;
- 	unsigned int to =3D from + finfo->dirty_len;
--	unsigned int off =3D 0, i =3D 0;
-+	unsigned int off =3D 0;
- 	size_t flen =3D folio_size(folio);
- 	size_t nr_bvec =3D flen / PAGE_SIZE + 2;
- 	size_t part;
--	int ret;
-+	int ret, i =3D 0, sink_from =3D -1, sink_to =3D -1;
- =
-
- 	_enter("%lx", folio->index);
- =
-
-@@ -515,24 +514,23 @@ static int netfs_read_gaps(struct file *file, struct=
- folio *folio)
- 	if (!bvec)
- 		goto discard;
- =
-
--	sink =3D folio_alloc(GFP_KERNEL, 0);
--	if (!sink) {
--		kfree(bvec);
--		goto discard;
--	}
--
- 	trace_netfs_folio(folio, netfs_folio_trace_read_gaps);
- =
-
--	rreq->direct_bv =3D bvec;
--	rreq->direct_bv_count =3D nr_bvec;
- 	if (from > 0) {
- 		bvec_set_folio(&bvec[i++], folio, from, 0);
- 		off =3D from;
- 	}
-+	sink_from =3D i;
- 	while (off < to) {
-+		struct folio *sink =3D folio_alloc(GFP_KERNEL, 0);
-+
-+		if (!sink)
-+			goto discard;
- 		part =3D min_t(size_t, to - off, PAGE_SIZE);
--		bvec_set_folio(&bvec[i++], sink, part, 0);
-+		bvec_set_folio(&bvec[i], sink, part, 0);
- 		off +=3D part;
-+		sink_to =3D i;
-+		i++;
- 	}
- 	if (to < flen)
- 		bvec_set_folio(&bvec[i++], folio, flen - to, to);
-@@ -553,8 +551,10 @@ static int netfs_read_gaps(struct file *file, struct =
-folio *folio)
- 		folio_mark_uptodate(folio);
- 	}
- =
-
--	if (sink)
--		folio_put(sink);
-+	if (sink_to >=3D 0)
-+		for (; sink_from <=3D sink_to; sink_from++)
-+			folio_unlock(bvec_folio(&bvec[sink_from]));
-+	kfree(bvec);
- 	folio_unlock(folio);
- 	netfs_put_request(rreq, netfs_rreq_trace_put_return);
- 	return ret < 0 ? ret : 0;
-@@ -563,6 +563,10 @@ static int netfs_read_gaps(struct file *file, struct =
-folio *folio)
- 	netfs_put_failed_request(rreq);
- alloc_error:
- 	folio_unlock(folio);
-+	if (sink_to >=3D 0)
-+		for (; sink_from <=3D sink_to; sink_from++)
-+			folio_unlock(bvec_folio(&bvec[sink_from]));
-+	kfree(bvec);
- 	return ret;
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index c407f30e00401..080864b24a0c5 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -212,7 +212,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+-	struct hmac_sha256_ctx hmac_ctx;
++	struct hmac_sha256_ctx hmac_ctx __cleanup(hmac_sha256_zeroize_ctx);
+ 	struct smb_rqst drqst;
+ 	__u64 sid = le64_to_cpu(shdr->SessionId);
+ 	u8 key[SMB2_NTLMV2_SESSKEY_SIZE];
+@@ -250,7 +250,6 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 		memcpy(shdr->Signature, smb2_signature, SMB2_SIGNATURE_SIZE);
+ 
+ 	memzero_explicit(key, sizeof(key));
+-	memzero_explicit(&hmac_ctx, sizeof(hmac_ctx));
+ 	return rc;
  }
- =
+ 
+-- 
+2.55.0
 
