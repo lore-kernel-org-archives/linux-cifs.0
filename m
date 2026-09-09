@@ -1,44 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622F35867F1;
-	Wed,  9 Sep 2026 14:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D53572696;
+	Wed,  9 Sep 2026 14:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788964781; cv=none; b=luy83Y3nBQruIwbbraJLvGMh9iHrfE9kYqN6y7S9NA6wzN1h916cjy/K4BhGO3MtGM/2O+e2yk12j0EHpEqzf6rj9BjzbPDEO3d+v8pfO85k8nQpebkkR3v8F6z5H86BQbicqKfOJbPIet6Ok9QVnB6S7QTEAnjCgEJZoF7Pir0=
+	t=1788964787; cv=none; b=ZKxlw8A2GL2ifJAG978ggHHoVx/OQFafPzkkk4NAIoLJqHfz/3sggYjwz/MXUN/pKCjNNDAncufIOdtcrvO9pKaSLe4PXV9VMPeJEjaizCXeW0BBdkYX625FRTY8UENU8ooUES/Ktzy7sS/qUMYJWX1C1L+MRqkS01CUnBKTh8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788964781; c=relaxed/simple;
-	bh=9OK5JlF+P65HPu13qL6Xiimdvbv69bBWrLTWsT0flUQ=;
+	s=arc-20240116; t=1788964787; c=relaxed/simple;
+	bh=09yjYf3AjUKhfp/aCd1m0X7g/91pMkOPFlC9O3bFUh0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QlPDrMCEjvB3LzOjI/XSZUN7/kT8rOQFFXeQoaOR1qIDTmfzJ2sCqEJ+rm35RChvRmR1x5RcJbpfuvl/XFpFtgpob+rcOBway4ofDytuXcRcRjKubPA5e4OONhhMdq5RlRrf2zPQPfONPpW3S1mYj9UPKYgsbv3UZyof9ttM/t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rUrQZXFw; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=A3usE6gEayimQvMzH7GuUbHUBK91UVlMAMH0f1L/ZrhBmV89L1no27324YV2/mlDXk1HpFFJjeF4lidwTKeAJkix/4pFAeMHmqddAqNhd1M5MglpAAXZvdchbVNJro2knFc0QkHW126WHKYRLMWiIWSN1f2unmposfRU/ZzsvWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Gq9dxT4V; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rUrQZXFw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA51B1F00A3D;
-	Wed,  9 Sep 2026 14:39:39 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Gq9dxT4V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84DD21F00A3A;
+	Wed,  9 Sep 2026 14:39:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1788964780;
-	bh=Jt/ZLzMuioVM2lKFY41maX+aPGd1b/NQJUvMCiIQi1Q=;
+	s=korg; t=1788964786;
+	bh=WpkjuQVlGW+MyK7UsjCKALNyb2dkFqyKGSfAMLigb2c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=rUrQZXFwAR08P0pCMB8cC6M285Z0EXghdBCliSUfu9+r2e7385T4OX3ngZt5SJm6e
-	 CgqcB5NGmHF1CBWisfH1LUwXOZKRx7bEmQdn+nhssjROEa96CpqFXglxkwZrJ+g9t8
-	 yel7Y0KSHffNE6miwHUV5SnU52tEQK8NN2hXy1LU=
+	b=Gq9dxT4VmBOcpKxtGmW38VTg0T1JYizG/YXZwiLBC0ulHf9yci6k238Fb8xEVwjFe
+	 qQp73gKoXCVjTB8Hb7SvspVcm9/YWHznHzMffoLv4R6HEUMqINm6ZO+wmk2CoK+ISY
+	 RCr36LFrGwYh3WeIi53pZxUWVtAH9Zy0L03QJXT8=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	patches@lists.linux.dev,
 	David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
 	linux-cifs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18 541/583] cifs: Scripted clean up fs/smb/client/smb2proto.h
-Date: Wed,  9 Sep 2026 15:43:46 +0200
-Message-ID: <20260909134256.502125121@linuxfoundation.org>
+Subject: [PATCH 6.18 543/583] cifs: Remove dead function prototypes
+Date: Wed,  9 Sep 2026 15:43:48 +0200
+Message-ID: <20260909134256.561952075@linuxfoundation.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260909134237.773280130@linuxfoundation.org>
 References: <20260909134237.773280130@linuxfoundation.org>
@@ -59,69 +56,94 @@ Content-Transfer-Encoding: 8bit
 
 From: David Howells <dhowells@redhat.com>
 
-[ Upstream commit 1e009e3346db230787685a3989fd9c346fb412fb ]
+[ Upstream commit 9146c7e53fa8e5024e0f61d67129afd45a179a3b ]
 
-Remove externs, correct argument names and reformat declarations.
+Remove a bunch of dead function prototypes.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
 cc: linux-cifs@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
 Signed-off-by: Steve French <stfrench@microsoft.com>
-
-For the stable backport, drop the original smb2proto.h cleanup because the
-stable header has gained and changed declarations that make the scripted
-rewrite conflict, while the target does not touch or depend on the header.
-Instead, carry only behavior-preserving context preparation in inode.c: use
-the type-safe kmalloc_obj() spelling and the existing local sbflags snapshot,
-and brace the adjacent else-if.  This allows both target hunks to apply
-cleanly without pre-applying the target's behavioral change.
-
-[ sashal: Reduced backport -- upstream 1e009e3346db touches 1 file(s), this
-  backport carries 1. Not backported here:
-  fs/smb/client/smb2proto.h
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-[ sashal: Reduced backport -- upstream 1e009e3346db2 touches 1 file(s), this
-  backport carries 1. Not backported here:
-  fs/smb/client/smb2proto.h
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: b8e5dc4f95e5 ("smb: client: clear setuid/setgid bit on write with cifsacl/modefromsid/posix extensions")
+Stable-dep-of: 730d0bb19507 ("smb: client: fix UAF and buffer leak in cifs_check_trans2() for malformed secondary T2")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- fs/smb/client/inode.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/smb/client/cifsproto.h |    6 ------
+ fs/smb/client/smb2proto.h |   12 ------------
+ 2 files changed, 18 deletions(-)
 
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3202,7 +3202,7 @@ cifs_setattr_unix(struct dentry *direntr
- 	if (attrs->ia_valid & (ATTR_KILL_SUID|ATTR_KILL_SGID))
- 		attrs->ia_valid &= ~ATTR_MODE;
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -82,7 +82,6 @@ extern char *cifs_build_path_to_root(str
+ 				     struct cifs_sb_info *cifs_sb,
+ 				     struct cifs_tcon *tcon,
+ 				     int add_treename);
+-extern char *build_wildcard_path_from_dentry(struct dentry *direntry);
+ char *cifs_build_devname(char *nodename, const char *prepath);
+ extern void delete_mid(struct mid_q_entry *mid);
+ void __release_mid(struct kref *refcount);
+@@ -166,8 +165,6 @@ extern bool is_valid_oplock_break(char *
+ extern bool backup_cred(struct cifs_sb_info *);
+ extern bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 eof,
+ 				   bool from_readdir);
+-extern void cifs_update_eof(struct cifsInodeInfo *cifsi, loff_t offset,
+-			    unsigned int bytes_written);
+ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t result);
+ extern struct cifsFileInfo *find_writable_file(struct cifsInodeInfo *, int);
+ extern int cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
+@@ -194,8 +191,6 @@ extern void header_assemble(struct smb_h
+ extern int small_smb_init_no_tc(const int smb_cmd, const int wct,
+ 				struct cifs_ses *ses,
+ 				void **request_buf);
+-extern enum securityEnum select_sectype(struct TCP_Server_Info *server,
+-				enum securityEnum requested);
+ extern int CIFS_SessSetup(const unsigned int xid, struct cifs_ses *ses,
+ 			  struct TCP_Server_Info *server,
+ 			  const struct nls_table *nls_cp);
+@@ -651,7 +646,6 @@ void cifs_free_hash(struct shash_desc **
  
--	args = kmalloc(sizeof(*args), GFP_KERNEL);
-+	args = kmalloc_obj(*args);
- 	if (args == NULL) {
- 		rc = -ENOMEM;
- 		goto out;
-@@ -3395,9 +3395,9 @@ cifs_setattr_nounix(struct dentry *diren
- 				goto cifs_setattr_exit;
- 			}
- 		}
--	} else
--	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID))
-+	} else if (!(sbflags & CIFS_MOUNT_SET_UID)) {
- 		attrs->ia_valid &= ~(ATTR_UID | ATTR_GID);
-+	}
+ int cifs_try_adding_channels(struct cifs_ses *ses);
+ bool is_ses_using_iface(struct cifs_ses *ses, struct cifs_server_iface *iface);
+-void cifs_ses_mark_for_reconnect(struct cifs_ses *ses);
  
- 	/* skip mode change if it's just for clearing setuid/setgid */
- 	if (attrs->ia_valid & (ATTR_KILL_SUID|ATTR_KILL_SGID))
+ int
+ cifs_ses_get_chan_index(struct cifs_ses *ses,
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -39,15 +39,11 @@ extern struct mid_q_entry *smb2_setup_as
+ 			struct TCP_Server_Info *server, struct smb_rqst *rqst);
+ extern struct cifs_tcon *smb2_find_smb_tcon(struct TCP_Server_Info *server,
+ 						__u64 ses_id, __u32  tid);
+-extern void smb2_echo_request(struct work_struct *work);
+ extern __le32 smb2_get_lease_state(struct cifsInodeInfo *cinode);
+ extern bool smb2_is_valid_oplock_break(char *buffer,
+ 				       struct TCP_Server_Info *srv);
+ extern int smb3_handle_read_data(struct TCP_Server_Info *server,
+ 				 struct mid_q_entry *mid);
+-extern int smb2_query_reparse_tag(const unsigned int xid, struct cifs_tcon *tcon,
+-				struct cifs_sb_info *cifs_sb, const char *path,
+-				__u32 *reparse_tag);
+ struct inode *smb2_create_reparse_inode(struct cifs_open_info_data *data,
+ 				     struct super_block *sb,
+ 				     const unsigned int xid,
+@@ -300,17 +296,9 @@ extern int smb2_query_info_compound(cons
+ 				    struct kvec *rsp, int *buftype,
+ 				    struct cifs_sb_info *cifs_sb);
+ /* query path info from the server using SMB311 POSIX extensions*/
+-int smb311_posix_query_path_info(const unsigned int xid,
+-				 struct cifs_tcon *tcon,
+-				 struct cifs_sb_info *cifs_sb,
+-				 const char *full_path,
+-				 struct cifs_open_info_data *data);
+ int posix_info_parse(const void *beg, const void *end,
+ 		     struct smb2_posix_info_parsed *out);
+ int posix_info_sid_size(const void *beg, const void *end);
+-int smb2_make_nfs_node(unsigned int xid, struct inode *inode,
+-		       struct dentry *dentry, struct cifs_tcon *tcon,
+-		       const char *full_path, umode_t mode, dev_t dev);
+ int smb2_rename_pending_delete(const char *full_path,
+ 			       struct dentry *dentry,
+ 			       const unsigned int xid);
 
 
