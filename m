@@ -1,41 +1,68 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C10F1AC45D;
-	Wed,  9 Sep 2026 03:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58D33DAAC0
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 07:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788925182; cv=none; b=khPz0uwpVocCjhbFwmDD3GAamuszNZAPcJbNmXXdfrYCkA678eoCCkwt5HqDWj4glPTI8TrEWhrgWWN0nWISTLvEXPvaBaf/iZbGsTxZtiQ79xAXxbeKYrXhDPKkQt5vULTzssTDjTDKSOknDcRG1sfZqgDqCuloCoQ1Kk+X7e4=
+	t=1788938497; cv=none; b=kGTXLTGdegdJ/AiUwnsjn1QvzkUvjSh2DnKQX41+01DYcUcj23yQgrZIaKOp81HP+71cXrZBb6AVWz/ZhHz9vrhVmchC+hetK3V8ZKFVXtKZZv8GLWnmDkH28iCe93Y8Wjai8K2sG18dxzGO8jY+os4mAFY721HmAIYImyj+UbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788925182; c=relaxed/simple;
-	bh=4pV9vMnQZn8PibBgAyN/Wdfqc3vRuw/jAF+jOYsbCnI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZU5QUHeSd0K+UbBerbrPUJCyak0facA04eOxpHQNiiIAwR4onCERzANnmopYpvBg5CPqDdSzqwSeHLmAkfecn4cIERynjuS5L29vqqtwBdvQ0SC0Zk9bGDv6O0bogloIhYIBu5vJRCB92pJKnHCcWLcq4Rj2cCD0pMcw1tD2PEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Y9DCtRcA; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1788938497; c=relaxed/simple;
+	bh=Dq9QzC4Rw+uS4zcZFxnG/iQOlbmorYFisIjxewZuk38=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lcGNLR4y7MhsPLbCVylJiCfvKSi1b53IHd/2vW1gFLy2ANujNrVK73E0wnRbEh5cYhX6vCSCEgRXC8j6JQxVRyg0/q9ENr4EjlCEc2AEHbsfenjIwbZS7EqC+b861+ewjXh0Ze3UdjrPE6l5CtSmhWR6yTvYlXMEOciSyMm9B+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gxwqHr9S; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Y9DCtRcA"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=l7
-	54kcE82NR582rzgKOeiYFW0qHlGeMocNt4TOU2fl4=; b=Y9DCtRcAkTbKnnQ4X3
-	ZT5NLLx1yFOOfx0etdM/wt2fAqngkjbB9ED953q5Qm9NPlovakDQeDVHOrollybk
-	8Iy57BkWCqUB9xx0nLVcxfFPduRwVlNdG/5q7M4tgKTKvp16MW8tqal3I8TBL9RM
-	u3gP47CDsjRPZux+8fmPfSMfs=
-Received: from ubuntu.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDXX5Ld1KBqiRSZBg--.34011S2;
-	Wed, 09 Sep 2026 11:39:10 +0800 (CST)
-From: huhai <15815827059@163.com>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gxwqHr9S"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1788938492;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NwTohl+L3wBgxbiNt8Qf67OZRjLUf9WteY3EfU1JFtw=;
+	b=gxwqHr9SjKE5Pth8dqIH20iydy2iDdiCclSwvNixJ/Fc//nteRDbHdQ6XWcrMeKJcOl319
+	TBhcintEmbeaD6fbOHdUOG9qT+Cdzpd8b0U61A364MrABr/6cW0Gz6hJF1w2xuyFf7kYtU
+	+7MTm0wsAZk95vr/PlZo1VvVoWENfas=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-608-5zXez9ViMRWllKQjIz_I_A-1; Wed,
+ 09 Sep 2026 03:21:28 -0400
+X-MC-Unique: 5zXez9ViMRWllKQjIz_I_A-1
+X-Mimecast-MFC-AGG-ID: 5zXez9ViMRWllKQjIz_I_A_1788938486
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 97D8218005B3;
+	Wed,  9 Sep 2026 07:21:24 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.158])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C1CB01800446;
+	Wed,  9 Sep 2026 07:21:16 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
-	Henry Hu <huhai@kylinos.cn>,
-	stable@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2] ksmbd: fix invalid pointer dereference when get_inode_acl() fails
-Date: Wed,  9 Sep 2026 11:38:54 +0800
-Message-Id: <20260909033854.10107-1-15815827059@163.com>
-X-Mailer: git-send-email 2.40.1
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-erofs@lists.ozlabs.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v13 0/8] netfs: Miscellaneous preparatory changes
+Date: Wed,  9 Sep 2026 08:20:54 +0100
+Message-ID: <20260909072105.1663687-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -43,126 +70,108 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDXX5Ld1KBqiRSZBg--.34011S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyfJF17Kry7uw15ArWrXwb_yoWrJFyUpF
-	4rG3Wvkr4YqFy7Kr97JrWUZ3WSgF1ktw4fGrZ7Kw4xA3Z3tryfKry0yry29Fn8ArW8WFyI
-	vr4Y9r4IkF15JFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jrWrXUUUUU=
-X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbCzgAwtWqg1OAfBQAA3v
+X-Scanned-By: MIMEDefang 3.4.1 on 127.0.0.2
 
-From: Henry Hu <huhai@kylinos.cn>
+Hi Christian,
 
-When get_inode_acl() fails, it returns an ERR_PTR(), but
-ksmbd_acls_fattr() stored that pointer in smb_fattr without
-checking for errors. Later callers then passed the error pointer
-to security descriptor helpers or posix_acl_release(), resulting
-in an invalid pointer dereference.
+Could you pull these patches please for -next?  This is the first of four
+batches.  This is based on your vfs.fixes as there are some prerequisite
+patches there.  This was split from v11 of a larger series[1].
 
-This was reproduced on an XFS-backed share when xfs_get_acl()
-returned ERR_PTR(-ENOMEM). Querying the SMB ACL from a CIFS client
-triggered the crash:
+This a collection of miscellaneous modifications to netfslib that I want to
+make ahead of bigger changes, including:
 
-  BUG: unable to handle page fault for address: fffffffffffffff8
-  RIP: smb_acl_sec_desc_scratch_len+0x58/0x90 [ksmbd]
-  Call Trace:
-   smb2_query_info+0x40d/0x17c0 [ksmbd]
-   handle_ksmbd_work+0x1ca/0x770 [ksmbd]
+ (1) Convert "unsigned long long" to "uoff_t".  This makes it a little more
+     obvious as to the meaning of the value.  Also convert some "loff_t" to
+     "uoff_t" as most of the time it's used the value really should never
+     be negative.
 
-Fix this by checking the return values from get_inode_acl() in
-ksmbd_acls_fattr(). Treat -EOPNOTSUPP as indicating that no ACL is
-available, and propagate all other errors to the callers. Update
-smb2_open() and smb2_get_info_sec() to handle these errors.
+ (2) Remove the writethrough code as the locking is really tricky to get
+     right and it looks like it could deadlock with Ceph if snapshots are
+     used.
 
-Cc: stable@vger.kernel.org
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Assisted-by: Codex:gpt-5.6-sol
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Signed-off-by: Henry Hu <huhai@kylinos.cn>
----
-Changes:
-v2: Treat -EOPNOTSUPP as indicating that no ACL is available
+ (3) Adjust some tracepoints, including adding the cache object ID to
+     certain tracepoinits.
 
-v1: https://lore.kernel.org/all/20260908081631.9735-1-15815827059@163.com/
+ (4) Make use of PG_private_2 opt-in.  Use of PG_private_2 is deprecated
+     and the MM people would like their page bit back, so we need to stop
+     using it soon.
 
- fs/smb/server/smb2pdu.c | 42 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 34 insertions(+), 8 deletions(-)
+ (5) Add some helper functions to handle the barriering needed for the
+     NETFS_RREQ_ALL_QUEUED flag.
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b7ce67094626..08fec734fede 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3634,10 +3634,11 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
- 			    le32_to_cpu(sd_buf->ccontext.DataLength), true, false);
- }
- 
--static void ksmbd_acls_fattr(struct smb_fattr *fattr,
--			     struct mnt_idmap *idmap,
--			     struct inode *inode)
-+static int ksmbd_acls_fattr(struct smb_fattr *fattr,
-+			    struct mnt_idmap *idmap,
-+			    struct inode *inode)
- {
-+	struct posix_acl *acl;
- 	vfsuid_t vfsuid = i_uid_into_vfsuid(idmap, inode);
- 	vfsgid_t vfsgid = i_gid_into_vfsgid(idmap, inode);
- 
-@@ -3648,10 +3649,28 @@ static void ksmbd_acls_fattr(struct smb_fattr *fattr,
- 	fattr->cf_dacls = NULL;
- 
- 	if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
--		fattr->cf_acls = get_inode_acl(inode, ACL_TYPE_ACCESS);
--		if (S_ISDIR(inode->i_mode))
--			fattr->cf_dacls = get_inode_acl(inode, ACL_TYPE_DEFAULT);
-+		acl = get_inode_acl(inode, ACL_TYPE_ACCESS);
-+		if (IS_ERR(acl)) {
-+			if (acl != ERR_PTR(-EOPNOTSUPP))
-+				return PTR_ERR(acl);
-+			acl = NULL;
-+		}
-+		fattr->cf_acls = acl;
-+
-+		if (S_ISDIR(inode->i_mode)) {
-+			acl = get_inode_acl(inode, ACL_TYPE_DEFAULT);
-+			if (IS_ERR(acl)) {
-+				if (acl != ERR_PTR(-EOPNOTSUPP)) {
-+					posix_acl_release(fattr->cf_acls);
-+					return PTR_ERR(acl);
-+				}
-+				acl = NULL;
-+			}
-+			fattr->cf_dacls = acl;
-+		}
- 	}
-+
-+	return 0;
- }
- 
- enum {
-@@ -4778,7 +4797,10 @@ int smb2_open(struct ksmbd_work *work)
- 					int pntsd_size;
- 					size_t scratch_len;
- 
--					ksmbd_acls_fattr(&fattr, idmap, inode);
-+					rc = ksmbd_acls_fattr(&fattr, idmap, inode);
-+					if (rc)
-+						goto err_out;
-+
- 					scratch_len = smb_acl_sec_desc_scratch_len(&fattr,
- 							NULL, 0,
- 							OWNER_SECINFO | GROUP_SECINFO |
-@@ -7643,7 +7665,11 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- 
- 	idmap = file_mnt_idmap(fp->filp);
- 	inode = file_inode(fp->filp);
--	ksmbd_acls_fattr(&fattr, idmap, inode);
-+	rc = ksmbd_acls_fattr(&fattr, idmap, inode);
-+	if (rc) {
-+		ksmbd_fd_put(work, fp);
-+		return rc;
-+	}
- 
- 	if (test_share_config_flag(work->tcon->share_conf,
- 				   KSMBD_SHARE_FLAG_ACL_XATTR))
--- 
-2.40.1
+ (6) Set the subrequest type at allocation time so that the allocation
+     trace records the proposed type.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next-1
+
+Thanks,
+David
+
+Changes
+=======
+ver #13)
+- Fixed some sashiko-raised issues:
+  - Fixed netfs_mark_copy_to_cache() to use netfs_using_pgpriv2() rather
+    than checking NETFS_RREQ_USE_PGPRIV2.
+  - Fixed netfs_all_subreqs_queued() to do smp_mb__after_atomic() after
+    setting the NETFS_RREQ_ALL_QUEUED bit.
+  - Fixed netfs_single_dispatch_read() to not immediately contradict its
+    own initialisation of subreq->source.
+
+ver #12)
+- Split from v11 of "netfs: Keep track of folios in a segmented bio_vec[]
+  chain"[1]
+
+[1] https://lore.kernel.org/r/20260902173350.3468672-1-dhowells@redhat.com/
+[2] https://sashiko.dev/#/patchset/20260908091031.1506798-1-dhowells%40redhat.com
+
+David Howells (8):
+  netfs: Use uoff_t instead of unsigned long long and loff_t
+  netfs: Remove the writethrough code
+  netfs: trace: Change the "clear" folio traces to "endwb"
+  netfs: trace: Rejig a couple of the tracepoints
+  netfs: Add the cache object ID to netfs_read/write tracepoints
+  netfs: Make deprecated PG_private_2 support opt-in
+  netfs: Add some functions to wrap the all-queued handling
+  netfs: Set subrequest->source at alloc before trace emission
+
+ fs/9p/vfs_addr.c                  |   1 -
+ fs/afs/file.c                     |   5 +-
+ fs/cachefiles/interface.c         |  10 +--
+ fs/cachefiles/internal.h          |   4 +-
+ fs/cachefiles/io.c                |  25 +++---
+ fs/ceph/Kconfig                   |   1 +
+ fs/ceph/addr.c                    |   4 +-
+ fs/netfs/Kconfig                  |   3 +
+ fs/netfs/Makefile                 |   2 +-
+ fs/netfs/buffered_read.c          |  37 ++++-----
+ fs/netfs/buffered_write.c         |  66 +++------------
+ fs/netfs/direct_read.c            |  14 ++--
+ fs/netfs/direct_write.c           |   8 +-
+ fs/netfs/fscache_cookie.c         |   8 +-
+ fs/netfs/fscache_io.c             |  10 +--
+ fs/netfs/internal.h               |  68 ++++++++++++---
+ fs/netfs/iterator.c               |   2 +-
+ fs/netfs/main.c                   |   1 -
+ fs/netfs/misc.c                   |  10 +--
+ fs/netfs/objects.c                |   6 +-
+ fs/netfs/read_collect.c           |  14 ++--
+ fs/netfs/read_pgpriv2.c           |  13 ++-
+ fs/netfs/read_retry.c             |   5 +-
+ fs/netfs/read_single.c            |  12 +--
+ fs/netfs/stats.c                  |   4 +-
+ fs/netfs/write_collect.c          |  25 +++---
+ fs/netfs/write_issue.c            | 123 ++-------------------------
+ fs/netfs/write_retry.c            |   5 +-
+ fs/nfs/Kconfig                    |   1 +
+ include/linux/fscache-cache.h     |   2 +-
+ include/linux/fscache.h           |  36 ++++----
+ include/linux/netfs.h             |  80 +++++++++---------
+ include/trace/events/cachefiles.h |  30 +++----
+ include/trace/events/fscache.h    |  10 +--
+ include/trace/events/netfs.h      | 134 +++++++++++++++---------------
+ 35 files changed, 326 insertions(+), 453 deletions(-)
 
