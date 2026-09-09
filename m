@@ -1,73 +1,85 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3EF33DEF9
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 16:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA1B582BB6
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 16:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788970602; cv=none; b=S+RsvIPovx1tPB0U8AcHPKvOg/+1xIXWjC9hvIigrjgrz+a0yB8mbQGdklGXSQAbeQyzXbjl92mjF4SQJZPdlVIODKACi7X2QIrwfk5HZx/IViWQnvO7s/KArsgb+FOnMs/r6ANas9X3Yz3xMTtrCbjkF9/mwx3qIzQT1hKXbPo=
+	t=1788971710; cv=none; b=N4tN7L0sOLmIiq786H8sthbIcMrDpSZvahW7dcxlRqbhJiPDlcjFYR6P4PBmAmelTsSsJTcolBSWsFJkbYhHrrD9jS70RSJZdumAfaNXB4lOkWV0pxTQ0slZZb3B9vb5P1rX7Z6uWZXAmMbIzb7SnQ/eRrFDcbJiI/OobdnG/6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788970602; c=relaxed/simple;
-	bh=y31K/DCqAPKu02LB9jfZDpI0TpTf0y5H9bBzBT+cBdE=;
-	h=Message-ID:From:To:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=kc+z1uuZxZ3CJ4N5kY+JtPqG1L6GuLPzopfS2pD4OVSYaUNONxDaBs29Xpfmd5VbcZKefNEFSs6XpG2uDbWqBNNhUB+AsiUuXOvdlOq2YSkU+XKXaM9VGmXflx0HyOUlYXagdqTfix+Q3zsAdxaZEGgOx1TNsITnRJtM8i4JG2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=koNo7hRN; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1788971710; c=relaxed/simple;
+	bh=60WjLMgFMCrph66eBsvuCqz/GOUvYhoLcWJmyHIMc4Y=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=IloHi+fsQ0OZkqIx7bYxvhwGlTYQGPfwghrnmN0CKswMMv5EaCg7muSu8ovPZOWPZbrgHTxqSYV/45apeRdxoqe9jiW45y4+BwlPKZ+5Dyi7J3J3UBnPyPOpXFjKDzTQPzfayJfPkkayZdjIau5whNfcEIUjk+UkC5rxKf2lIo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QGc0eekE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="koNo7hRN"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:To:From:Message-ID:Sender:Cc:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=gwNY074Nd9qsmVTHudXKujvLiPAHXZkyUG/ENV03QZc=; b=koNo7hRNc9UZYFklYrWHiVJAz3
-	7N2PYONLv+8Qo+fe58bR3zl57EFifXlO19v1ZbDS71CQ2PfmII/BpJ0i72NhHj71Tx2nlEbXSck6X
-	LTGrAA/QnwwpkFzMHXlZAPDK7x8aC12tOfSnX2ZlxEZ6CdPvxNr+hhVkYXp8kcyuehtRxh0jlkTD9
-	wNLgtojd/cslu1bCF+1AJGapsExiB0IutVtGQ3RNUrdvoQQUhAv/c3bs8gsYqaP2TA0R0HUxcgbpp
-	jEfb1MRT0g37X2MT50zTkEEHsOk1JmxW3ma7WdmnORQd8q72etNjbOAHX2qnEF7oyEAiAMV+ywCTW
-	gmHlS44Q==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x4KyO-000000012qh-2y7S;
-	Wed, 09 Sep 2026 13:16:32 -0300
-Message-ID: <a4af8859841207a11fb6daccd7132ac0@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Shyam Prasad N <nspmangalore@gmail.com>, CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Soft lockup with 7.3-rc1
-In-Reply-To: <CANT5p=qCCdnFsDYTE0vTsBpD48ZkeVsb7=y7roczn61Kz1gtOw@mail.gmail.com>
-References: <CANT5p=qCCdnFsDYTE0vTsBpD48ZkeVsb7=y7roczn61Kz1gtOw@mail.gmail.com>
-Date: Wed, 09 Sep 2026 13:16:32 -0300
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QGc0eekE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1788971707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=60WjLMgFMCrph66eBsvuCqz/GOUvYhoLcWJmyHIMc4Y=;
+	b=QGc0eekEODe8TnmxNblRiT9qAQCBMvXj6+0eKUHuBp/0fEYjyIqvEayD/rFOMiZzAEHxHY
+	/OaA1babiC8cyiNr79nd5/Zu5LcqEKzYWFz13gOK/4K8Uqiqre1n0Pc0Xsu8d0vRV+ybBs
+	4Kye69xfKGFJhN/g+iLrqkg+6hqrZU8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-S15F5c3LOqK5FkAYxjUyhQ-1; Wed,
+ 09 Sep 2026 12:35:04 -0400
+X-MC-Unique: S15F5c3LOqK5FkAYxjUyhQ-1
+X-Mimecast-MFC-AGG-ID: S15F5c3LOqK5FkAYxjUyhQ_1788971703
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D927A1954ACF;
+	Wed,  9 Sep 2026 16:35:02 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.158])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6BEB230001A2;
+	Wed,  9 Sep 2026 16:35:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <afd68097-b2b2-47e5-889b-fb077e7a9247@redhat.com>
+References: <afd68097-b2b2-47e5-889b-fb077e7a9247@redhat.com> <a385053c-1c4a-4060-a3bb-befa007ddb33@redhat.com> <1714046.1788952509@warthog.procyon.org.uk>
+To: sorenson@redhat.com
+Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org,
+    netfs@lists.linux.dev, CIFS <linux-cifs@vger.kernel.org>,
+    linux-kernel@vger.kernel.org
+Subject: Re: netfs_read_gaps(): aliased sink folio makes the read destination unreadable, SIGBUS on cifs with signing
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 09 Sep 2026 17:34:58 +0100
+Message-ID: <1728242.1788971698@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi Shyam,
+Frank Sorenson <sorenson@redhat.com> wrote:
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+> unlocks something that was never locked, and never drops the reference.
+>=20
+> So should these be folio_put() instead?
 
-> On one occasion, when I was testing modefromsid,idsfromsid (which
-> appears to be broken btw), I observed a deadlock during umount.
-> Attaching the system logs from that time.
+Bah... Yes.
 
-Could you please be more specific in what exactly isn't working with
-'modefromsid,idsfromsid'?
+> 2) if netfs_alloc_request() fails,=C2=A0the kfree(bvec) at alloc_error is=
+ reachable
+> before bvec is assigned,
 
-I've quickly tested it against Windows Server 2022 from #cifs-next with
-kerberos and it worked for me.
+Fair point.
 
-Please share the server type, settings, full mount options, so I can try
-to reproduce it.
+David
 
-> Does this look familiar to you?
-
-Nope.  I recall seeing some lockdep warnings among those paths in the
-past, but I wasn't able to reproduce such deadlock.
-
-Unfortunately the dmesg output is incomplete and we can't tell who is
-the actual cifs_tcp_ses_lock lock holder.  Possibly on CPU 0 or 4.
-
-If you have any reproducers for the dealock or 'modefromsid,idsfromsid'
-issues, please share them.
