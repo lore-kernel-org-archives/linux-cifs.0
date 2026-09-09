@@ -1,160 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADD02CCC5
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 00:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7FA33EB01
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 02:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788914585; cv=none; b=FziMHzZSXhYeWJgTrMRAyQLqvIJTKk1c7xD+2uCQO1EosaEH4DhVZCZLI6StaVpLd14E+9gamYlEJVgHMMUDBsjaPaP8Tm8M72necmWWTpluqzdgGhB9VwvKZRmSIdyEmoQM9IzqvmztVw0TMjSxtRq2jBqvNJJZ7HAWVjdEVcE=
+	t=1788922562; cv=none; b=ZHgTne0KDvySerkhqJORTsUGWzG1hRJClxulTK/IKRJmcNU/wPGQhLexg9ZnmdmM1BJijM91fpR+mIhToGcAjotJAComEoXxljqQXa8bS8dDnvMa/IqtSj1X7075NqgW5w/JSFJcbcFIzBFfJ8SGXRGvl/OwQuvo5F/smnr+v9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788914585; c=relaxed/simple;
-	bh=501NVijf8hQU5sQaozm5Cq5rHbsZHWLfAFPjQ4DLrbE=;
+	s=arc-20240116; t=1788922562; c=relaxed/simple;
+	bh=l6LGxDGHF+eDcoMXHrxI/whvyp6dixIL/oRPs4Usrmk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SlPOPXHR746S9+k/9vRzyu2tfAgElGut0Vb8de9jHpB/xnl0RchV6OqgkqG2B3oHBgkxxxiyHQwUO9TouZKdq3JcqPAtUYZrz0mK+OKPvMl3u1MN9x3WIGCT0z4Uz6ZxtTswY8uwAlqPTf0lGehrL9lWNS18Re5lDtxXwew5a80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SPNPOies; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=H6w98a04wkHGi8N/ufQq0xXSvW+dHZZTw6bVpA1j8Xtcy8n/T/Q39Bmd0iXG3mgHqEsPuGhwn64MoaPADXUD5K21LqWdNLBCfc8gVGakQLTSEqXkAAPTDopZnNQz4UTBSsN0VL/MqHqR1OE/1Q67kP1YHXSZGY1D1YZ5KMNJ8q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WtbMhApa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPNPOies"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B01241F00A3A
-	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 00:43:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WtbMhApa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5B491F00A3D
+	for <linux-cifs@vger.kernel.org>; Wed,  9 Sep 2026 02:55:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788914583;
-	bh=fvX3paOkxKl+/epBtSS2786bEsOnAQ8sUO6Fb3dQDFc=;
+	s=k20260515; t=1788922558;
+	bh=l6LGxDGHF+eDcoMXHrxI/whvyp6dixIL/oRPs4Usrmk=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=SPNPOies1iUJS6rpJAt3DRXYFjsvMG2sVVBMmlQTutMalDBZPf3yFOObwNw2Dxmwe
-	 piB5c1aq8WqeDAxjrDMhJ+N01777tz9Z/udgPTPVhHnVNQ7CW74h4dzJJSnHsNiLsL
-	 ISZH9iJRiAbkC436Md/j4SbmojYaS19i0T+E5CutPDyFny73e/szSsshTlKI3OGN41
-	 u6xTU7HrlH2D4LKDJPviAR1td+VVyui+QTYKRAncmzE7xIHA2o3OqGfW/OPb++n5iP
-	 8oT77qczhVug2kvg9eF7QDZzLtSKevLE0AEdwu1cdVe1IYRbPNEMG3RPa9UErV9jUH
-	 GbtYD5JKt9BFw==
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f8694aeso134208966b.0
-        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 17:43:03 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwSmN0vZ4l3XoWjbYnAT4CacBFrl3ynnLhVl3Uf4DwCY4dFhaQehWSr+2VfCKNK3Gajw5/f7AA1P2WH@vger.kernel.org
-X-Gm-Message-State: AFuF++kbhOe3a10P20qxdU3KoHlSLcP0O8jStIBemhXRApDKlLBlGqbl
-	Ov4OOmAA6nDuiWSY2Gf0hUCOV9+W0oNLJsWotNnEpiqbnOiT7yfuqfyD8P0UgTlLPU3R8eNQ5qJ
-	Mex6G4pw/J5Sv0qfZVlqufc4P0iSwn0U=
-X-Received: by 2002:a17:907:6d15:b0:c12:3cbf:9f6d with SMTP id
- a640c23a62f3a-c29042b6f3bmr498570966b.1.1788914582356; Tue, 08 Sep 2026
- 17:43:02 -0700 (PDT)
+	b=WtbMhApaIp0etxcSlfp77RHASEir3oE6em3Xx6mpsQaRsiXemYz05NJWMt0KazvTi
+	 JefzswCuQNePAuprqVSomZiHA0Ji94QK8zZLObK511WENfBfoLoROBqzVOsGXvkVGJ
+	 4c3bfWE6tw4ecaiCts++sml+pnn3rTDb+GLGTc/VX1vxWh+EwJcVBuRpDGA4gWCDcP
+	 ciGbs7/F7tAzgOXmiYJDMcr5dVvZI9IGqwKC3iHKJd7+GIKRcgVZh0Q6HS4MmBDCqd
+	 sfc+E3Oz+Ltwkg2+rciD90dRHYkXsyLmJ6lgxRznFgaxD0bvVdHaDAlOh8m3FMsZ59
+	 CzFqRhZL2cg8Q==
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6a20319d030so7215636a12.2
+        for <linux-cifs@vger.kernel.org>; Tue, 08 Sep 2026 19:55:58 -0700 (PDT)
+X-Gm-Message-State: AFuF++k/I1/NnVtc1z/viqt6pwPK6xFDMyQyT1PC8YhaA5nIEMTqQKd7
+	zbB+BP3aB347ZiM9kmCVhDRXJe1Zd8QxQgQD5p8eeya1tBvtu5qHIhuL8qS2knS0H7WhIrZAqjW
+	w9NPHw8HlhAIbpotNRH5OZ2a5+2vTJvI=
+X-Received: by 2002:a17:907:3d44:b0:c27:420b:7c90 with SMTP id
+ a640c23a62f3a-c27420ba0camr812879466b.48.1788922557334; Tue, 08 Sep 2026
+ 19:55:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260908081631.9735-1-15815827059@163.com> <CAKYAXd8g5RbLf7d7uNvtLZmODR2w_xW900E8dcWD1QyF5_hRfw@mail.gmail.com>
- <170e71f3.a2f8.1a0819a3e24.Coremail.15815827059@163.com>
-In-Reply-To: <170e71f3.a2f8.1a0819a3e24.Coremail.15815827059@163.com>
+References: <20260904125844.1803343-1-doebel@amazon.de> <20260908161001.2603610-1-doebel@amazon.de>
+ <20260908161001.2603610-3-doebel@amazon.de>
+In-Reply-To: <20260908161001.2603610-3-doebel@amazon.de>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 9 Sep 2026 09:42:50 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-D-rMQTJJ170UGyoq2=fyGCCAe7QMEAJPM=Nk=c=+XBA@mail.gmail.com>
-X-Gm-Features: AcwNN1Wo10lWkAJlLsdt9BdwmslsjtqoWQ-uH57Pw_UuoQua2ONMctz-bduGNoQ
-Message-ID: <CAKYAXd-D-rMQTJJ170UGyoq2=fyGCCAe7QMEAJPM=Nk=c=+XBA@mail.gmail.com>
-Subject: Re: Re: [PATCH] ksmbd: fix invalid pointer dereference when
- get_inode_acl() fails
-To: huhai <15815827059@163.com>
-Cc: senozhatsky@chromium.org, tom@talpey.com, linux-cifs@vger.kernel.org, 
-	Henry Hu <huhai@kylinos.cn>, stable@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Date: Wed, 9 Sep 2026 11:55:44 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8s4Bp49YRxGM=W3a1STE3+PPVmR-N2a+=RCpHtigLkYQ@mail.gmail.com>
+X-Gm-Features: AcwNN1X0gTC-HlnXYdhW9zVt8bmrKrFLNngA0BusTz14uy_4lHbUHjbj2Oo8kLQ
+Message-ID: <CAKYAXd8s4Bp49YRxGM=W3a1STE3+PPVmR-N2a+=RCpHtigLkYQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] smb: client: fail DACL rewrite when the new DACL
+ exceeds 64K
+To: Bjoern Doebel <doebel@amazon.de>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 9, 2026 at 12:19=E2=80=AFAM huhai <15815827059@163.com> wrote:
+On Wed, Sep 9, 2026 at 1:10=E2=80=AFAM Bjoern Doebel <doebel@amazon.de> wro=
+te:
 >
-> At 2026-09-08 21:35:18, "Namjae Jeon" <linkinjeon@kernel.org> wrote:
-> >On Tue, Sep 8, 2026 at 5:16=E2=80=AFPM huhai <15815827059@163.com> wrote=
-:
-> >>
-> >> From: Henry Hu <huhai@kylinos.cn>
-> >>
-> >> When get_inode_acl() fails, it returns an ERR_PTR(), but
-> >> ksmbd_acls_fattr() stored that pointer in smb_fattr without
-> >> checking for errors. Later callers then passed the error pointer
-> >> to security descriptor helpers or posix_acl_release(), resulting
-> >> in an invalid pointer dereference.
-> >>
-> >> This was reproduced on an XFS-backed share when xfs_get_acl()
-> >> returned ERR_PTR(-ENOMEM). Querying the SMB ACL from a CIFS client
-> >> triggered the crash:
-> >>
-> >>   BUG: unable to handle page fault for address: fffffffffffffff8
-> >>   RIP: smb_acl_sec_desc_scratch_len+0x58/0x90 [ksmbd]
-> >>   Call Trace:
-> >>    smb2_query_info+0x40d/0x17c0 [ksmbd]
-> >>    handle_ksmbd_work+0x1ca/0x770 [ksmbd]
-> >>
-> >> Fix this by checking the return values from get_inode_acl() in
-> >> ksmbd_acls_fattr() and propagating any errors to its callers.
-> >> Update smb2_open() and smb2_get_info_sec() to handle these errors.
-> >>
-> >> Cc: stable@vger.kernel.org
-> >> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> >> Assisted-by: Codex:gpt-5.6-sol
-> >> Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-> >> Signed-off-by: Henry Hu <huhai@kylinos.cn>
-> >> ---
-> >>  fs/smb/server/smb2pdu.c | 29 +++++++++++++++++++++++------
-> >>  1 file changed, 23 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> >> index b7ce67094626..c6df9a9789ba 100644
-> >> --- a/fs/smb/server/smb2pdu.c
-> >> +++ b/fs/smb/server/smb2pdu.c
-> >> @@ -3634,9 +3634,9 @@ static int smb2_create_sd_buffer(struct ksmbd_wo=
-rk *work,
-> >>                             le32_to_cpu(sd_buf->ccontext.DataLength), =
-true, false);
-> >>  }
-> >>
-> >> -static void ksmbd_acls_fattr(struct smb_fattr *fattr,
-> >> -                            struct mnt_idmap *idmap,
-> >> -                            struct inode *inode)
-> >> +static int ksmbd_acls_fattr(struct smb_fattr *fattr,
-> >> +                           struct mnt_idmap *idmap,
-> >> +                           struct inode *inode)
-> >>  {
-> >>         vfsuid_t vfsuid =3D i_uid_into_vfsuid(idmap, inode);
-> >>         vfsgid_t vfsgid =3D i_gid_into_vfsgid(idmap, inode);
-> >> @@ -3649,9 +3649,19 @@ static void ksmbd_acls_fattr(struct smb_fattr *=
-fattr,
-> >>
-> >>         if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
-> >>                 fattr->cf_acls =3D get_inode_acl(inode, ACL_TYPE_ACCES=
-S);
-> >> -               if (S_ISDIR(inode->i_mode))
-> >> +               if (IS_ERR(fattr->cf_acls))
-> >> +                       return PTR_ERR(fattr->cf_acls);
-> >-EOPNOTSUPP and -ENODATA can indicate that the filesystem does not
-> >support or have ACL, so those errors can be normalized to NULL.
-> >However, other errors such as -ENOMEM, -EIO, and ACL corruption errors
-> >should be propagated to the caller like this.
+> replace_sids_and_copy_aces() and set_chmod_dacl() accumulate the size of
+> the DACL they build in a u16. That accumulator can wrap.
 >
-> Thanks for the review! You are right that unsupported or missing ACLs nee=
-d
-> to be distinguished from actual failures, and I noticed that the generic
-> VFS POSIX ACL callers only treat -EOPNOTSUPP as meaning "no ACL":
+> validate_dacl() caps num_aces at (dacl_size - sizeof(struct smb_acl)) /
+> 20, i.e. 3276 for a maximally sized DACL, while each rewritten ACE can
+> grow to sizeof(struct smb_ace) (76 bytes) once its SID is replaced with
+> one carrying SID_MAX_SUB_AUTHORITIES sub-authorities. The worst case is
+> therefore sizeof(struct smb_acl) + 3276 * 76 =3D 248984 bytes, far beyond
+> what a u16 can hold. A wraparound is reached with 863 ACEs.
 >
-> For example, posix_acl_chmod() does:
->     acl =3D get_inode_acl(inode, ACL_TYPE_ACCESS);
->     if (IS_ERR_OR_NULL(acl)) {
->         if (acl =3D=3D ERR_PTR(-EOPNOTSUPP))
->             return 0;
->         return PTR_ERR(acl);
->     }
+> After the wraparound, ndacl_ptr->size becomes meaningless and the offset
+> will point anywhere in the ACE array. As a result, we will see
+> corruption of the DACL, which then gets sent to the server. This is not
+> an out-of-bounds write as the allocation now covers the worst-case
+> expansion, so writes will always go into the buffer.
 >
-> posix_acl_create() does:
+> Adjust the code to use a u32 internally and return -EOVERFLOW in the
+> overflow case. The operation must be refused, because a DACL can only
+> hold 2^16-1 bytes on the wire and larger DACLs cannot be represented.
 >
->     p =3D get_inode_acl(dir, ACL_TYPE_DEFAULT);
->     if (!p || p =3D=3D ERR_PTR(-EOPNOTSUPP)) {
->         *mode &=3D ~current_umask();
->         return 0;
->     }
->     if (IS_ERR(p))
->         return PTR_ERR(p);
+> set_chmod_dacl() carries the same pattern and is fixed the same way. It
+> only wraps once the source DACL comes within roughly 380 bytes of the
+> 64K ceiling, but the failure mode is identical.
 >
-> Mainstream in-tree filesystems, such as ext4, XFS, and Btrfs, already
-> convert -ENODATA (or -ENOATTR in XFS, which is an alias for -ENODATA)
-> to NULL internally. Therefore, I think KSMBD should only normalize
-> -EOPNOTSUPP to NULL and propagate all other errors.
->
-> Please let me know what you think, and I will send a v2 accordingly.
-Okay. Please send v2 patch.
+> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: stable@vger.kernel.org
+> Fixes: f5065508897a ("cifs: Retain old ACEs when converting between mode =
+bits and ACL.")
+> Assisted-by: Kiro:claude-opus-5
+> Signed-off-by: Bjoern Doebel <doebel@amazon.de>
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
