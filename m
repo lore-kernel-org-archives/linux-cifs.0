@@ -1,171 +1,107 @@
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC65318EF6
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 05:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84C341D659;
+	Thu, 10 Sep 2026 08:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789017467; cv=none; b=NndrGCecyPXwhY+LS3RVVFcpwEDlPeR+/QbwK7A4VzfbPZCa8mOSvXsaafO7oqvDBEmobzlHae9Ntf/BMKFj+sF7ma0IKf7q7rm285dJYhZV6Q1uvOxPg8MP0Y/ueR+OYD0Zl7Lp977e7eoSrpac76XQoAyUjO9+URUcb135qFE=
+	t=1789027900; cv=none; b=Ra8gYRe6ss+lBA32ycWdJVbb/i1cOY97R1n14RReNMXJQnfO3OzSid0Oj9NN10CGiyM453xw1RICHoSAhufwliPLDESJkbDsetW7vooHBOfL1N6qwBZ7llUEvS+Ykf1dvV3fJD2B2Xt94hYImfLdR/s00UT4SMzVapV0dzRwGcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789017467; c=relaxed/simple;
-	bh=+uttU9LoNQl5UcNsiobpMhUgBKqCGf0qXMslcE3NoOo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dFBdHSA50+GCZBZD/+DMVh5UpF2cRDN1VFN8Q6OtxL3MLwPi0RkIJ73Kid1eiMUxOKBXxbxIxkv07kPje6KnOqp06YxFBqNHiiRUuGmM33xQgnT+FhyJjP7FkCwXN5EXaUGJuzKxQI8zDuxosOiZ47MJbdMXlR5TWHUbe6YDMt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=L5a43ra3; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1789027900; c=relaxed/simple;
+	bh=PSYLbShhpWiv3aVB2nJrOHdeh7Z3k4zELmiY4CjG9uE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=APz4CCiH+scFj5VaY5yCvC3vSP3RkakrrQqCN0KZJxQqOQRl9O8N8PvOv3WJ5sDVO3a3lyzW4l3fMMYMy/azwITyD5I/W4ZJ1O9lioVpnGUkkI94lQKNvaZwiMHjn5vg600ILmXr7WfEKx56KAqU3h0QGGIZKe3Lqkdm3He+LXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DAqb16Lh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="L5a43ra3"
-Received: from mail-yx1-f71.google.com (mail-yx1-f71.google.com [74.125.224.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id CC4B53FCF4
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 05:17:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1789017455;
-	bh=lnp4DkMY9rmqEKCqdg1i483FpRZlyfK5ov9pABziNG4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=L5a43ra3Q1NBdNjr/53rcCuKnVezL8f9Z+32FhxiecSRKZ/9MFHpeQC237GilLQkr
-	 /yyUCu79GXfNwfDYHWnIIf+FUlr951YEvib0mbf7MDvc0mzMzQ8o9RuQ+umq453+qI
-	 UIZtqVH2V/eC8EvlQuMWpg9vzAsnk5b3PpmKiVcfrSbGKgHvnXHty9MFEDiEUv1bzY
-	 9t8hVkiGyCaG+PFBocG/7QQ4gXvDeLUFHN4SsJMQadBw/rDnsY/vkqDqcPiQXquoJL
-	 BbXOmPEz93BJihf6UYNqnnan14JjEsnsJNqnvjvaKue3YRxT2M3vLE5LxTnn6uY/m/
-	 T75H64Km860TPApa80M+lMeo25VseusavKnCo88F76EPDfyU7kLoK1LGGBUZw+pzAG
-	 oZdxbuuc8BcrjVB8PAdBmtRoCJOshvJYcTrnWVqjHmbiIjn5kS7d2iLOD7QV8mjmJK
-	 PabeuCNxl+cbdzPSX0BSTSFAsfTfvMJv7ycOkxyiS0ir6Cf+3Hb4lR5KWvmEW2gG7j
-	 NPwyzSaLbnKzPtgNYsY4Fl3Rxjryskm4jZcgvFnrelNGt7wYGJHsaqZUURno/Ejv4E
-	 kUegXJbxPK49P2r9CBVKeMvUSqwTuNvJ7UZWDtpUKAIJSJ/j01iUoMGgP1z1xTqPRP
-	 4yxgNcTpV7IqjEQyauyK172g=
-Received: by mail-yx1-f71.google.com with SMTP id 956f58d0204a3-66cdb701595so8768629d50.1
-        for <linux-cifs@vger.kernel.org>; Wed, 09 Sep 2026 22:17:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789017455; x=1789622255;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=lnp4DkMY9rmqEKCqdg1i483FpRZlyfK5ov9pABziNG4=;
-        b=Out4e49VWoQFPd5QNKmc133ZkSJuHMQ64R8kGaG5caSHGc/z34GLltsRZjt1uSJXap
-         3W8SdTbtA77x/FYbrxuo42fbO1+mAjE4sXvtBqZRUXIQJfq7TZYxr9Ac2yUkPl9vUlzp
-         N8Sy+1M4xH7oX9PNQJTP56XSO4uRv4MH8r2+gVyXxMfRGTMVTXcj4Grt5vvjwIu/Q4hS
-         TlHw/77Q17vhuWbHaGU/rHAiXLH63LoOPDUwefy4N7dC7BqE2kDyJmzercgA3KjkfPg0
-         tmwAMpzw0bwLiVE+RBpkhYaINFMV3NiW2wvWmS+Mx/eHEsF09mdJ9PVMlrTtmTjNMpKI
-         bYKQ==
-X-Gm-Message-State: AFuF++mYTA8JpVB/fbD8fAiUWF8NoaZiIdHaMnaxtM1fsb1SDDdvDlvz
-	Oz3llMDZmS+H3SgdnwVJ+HugZ42ue16PS/Qecs/aHgWtqMMELITdA88pwwGHupc3mHnAveZFYyW
-	vnfzvjaKiAqWVxCWCaQHQ+qTMNtLAkwwcaWacJbbFOLgqaKFy/wCeCe+tfrO4L1N+fmW/3yQmml
-	dZVWKcwvvz4/ld9A==
-X-Gm-Gg: AYBFou1mjnHtCWUleh6A3LoTB6aDfFZBxC8nvD9qWw5jirq1NoqVtSHtqyCrxSpiU98
-	iOxnPsdW8KEie9gm9AXLjmPiHpTFFSKYQ44u8pfRVdnV9gVPCg5F+EYEpqYztBdIblGIHHX1CBd
-	9du0w76GwR8Wu7gU/DQi7/IJ7x6A+NNO1UDzXVwcPA0XfJ6Wz642376g24ZhwudcIHLcaF4eA6h
-	hR/Z4lv0IZ1daEc2q4r9nVxYGV01A//m3eeRu7pWhLXv1+FRKg+pkrSzyR77i0olIGVMqbO7Nd6
-	zyBpfLrxYTo3jiBN5jE/HLrShSi9cf4MCXXELGPOrVDflo996skeO59sKibWPy5gyiZ84Fia0yw
-	Zlm5dGm2UvQoLWwbyD+t4omSqnGjTddsTNNRDWqT75yA11q2sGGY3YVbkrSizYHZntCiVMp0are
-	TBGS/Fj92ZKXJKgTWDj/Litn00bg==
-X-Received: by 2002:a05:690e:4381:b0:66f:c1be:84d1 with SMTP id 956f58d0204a3-66fc1be86e7mr8345894d50.63.1789017454687;
-        Wed, 09 Sep 2026 22:17:34 -0700 (PDT)
-X-Received: by 2002:a05:690e:4381:b0:66f:c1be:84d1 with SMTP id 956f58d0204a3-66fc1be86e7mr8345887d50.63.1789017454357;
-        Wed, 09 Sep 2026 22:17:34 -0700 (PDT)
-Received: from april-canonical.lan (24-148-58-139.s4745.c3-0.lem-ubr1.chi-lem.il.cable.rcncustomer.com. [24.148.58.139])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66fb49763bfsm13441030d50.19.2026.09.09.22.17.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Sep 2026 22:17:33 -0700 (PDT)
-From: April Cardenas <april.cardenas@canonical.com>
-To: linux-cifs@vger.kernel.org
-Cc: pc@manguebit.org,
-	linkinjeon@kernel.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org,
-	April Cardenas <april.cardenas@canonical.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] smb/client: send lease break ACKs thru correct session for multiuser mounts
-Date: Thu, 10 Sep 2026 00:16:49 -0500
-Message-ID: <20260910051649.3806214-1-april.cardenas@canonical.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DAqb16Lh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D241F000FF;
+	Thu, 10 Sep 2026 08:11:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789027898;
+	bh=Bl2jWTajUKdkFTVEmaIsZckt4uMF6UIWmGeyLi3kFQg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=DAqb16LhXA4V3x2MEBgyebklpieMD75ealCT6F60CkFf+1FpmPAJyTfsmtGyVFhzC
+	 Eekvf46yp132dC4zoRl85r5FXyUpUdsWXVUh08Xcz1+9bOVObP5c6h1fXfZmlaxrzM
+	 P2tKsaJycMsQjasylX2DwThvMnSOubkKYXSyhG5k+ZOmCTZPVPkzq9xY4H9AAtgM2+
+	 bv/gFqBICa+dxei6mzc0FdAoQcLhta8R015Ur710MTEVpZDuYI8huu5pliRpIvykY1
+	 PM3ORUCluTaMjr1OPi/LRpzglnTOCs6cwf/AQvzv4pOZJCfOVOQQWJkrVBZxdVs+Io
+	 bpZbmlO4+cExw==
+From: Christian Brauner <brauner@kernel.org>
+To: Christian Brauner <brauner@kernel.org>, 
+ David Howells <dhowells@redhat.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, 
+ Matthew Wilcox <willy@infradead.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+ Marc Dionne <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, 
+ Eric Van Hensbergen <ericvh@kernel.org>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, 
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+ linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+In-Reply-To: <20260909072105.1663687-1-dhowells@redhat.com>
+References: <20260909072105.1663687-1-dhowells@redhat.com>
+Subject: Re: [PATCH v13 0/8] netfs: Miscellaneous preparatory changes
+Message-Id: <20260910-rohrkrepierer-clinchen-affront-100171384452@brauner>
+Date: Thu, 10 Sep 2026 10:11:29 +0200
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev-db0b7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1938; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=PSYLbShhpWiv3aVB2nJrOHdeh7Z3k4zELmiY4CjG9uE=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQtSjPOTU++uvzGNKGtX+59+bbANNaqinHmG+kZFS+fz
+ imr/6Fl01HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRiX6MDLNL9Jr6i6ZfcHJI
+ 5Zibue9R84UHvjxep8JUI2eX/pB/28/IcMBbawZXzeYHH6JTJjpNWJb77J//i10b/F5X3sh6F7u
+ ilg0A
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-Currently, when cifs_oplock_break handles a break request from the server
-it searches for the appropriate tlink to handle the request
-but incorrectly uses the current fsuid as the search key, eventually
-causing read errors for users with multiuser mounts on NetApp.
-Fix this by using the tlink from the cfile struct instead to respond
-through the correct session.
+On Wed, 09 Sep 2026 08:20:54 +0100, David Howells wrote:
+> netfs: Miscellaneous preparatory changes
+> 
+> Hi Christian,
+> 
+> Could you pull these patches please for -next?  This is the first of four
+> batches.  This is based on your vfs.fixes as there are some prerequisite
+> patches there.  This was split from v11 of a larger series[1].
+> 
+> [...]
 
-As breaks are handled in a worker thread, the current fsuid
-isn't guaranteed to match the session that the break is intended for.
-This means that cifs_sb_tlink may search the rbtree using the wrong fsuid,
-and return a tlink with an incorrect session than 
-the lease break was intended for. As a result, the breaks 
-may be ACKed through an incorrect session.
+Applied to the vfs-7.4.netfs branch of the vfs/vfs.git tree.
+Patches in the vfs-7.4.netfs branch should appear in linux-next soon.
 
-While it seems that Samba/Windows Servers 2016-2025 ignore this as long as 
-the lease key is correct, we ran into a case where if you're using 
-NetApp ONTAP or Azure NetApp Files they will reject the ACK 
-and return `STATUS_LOCK_NOT_GRANTED` errors on any future read requests
-a user may initiate through their still held open file handle, 
-and the server will eventually close the file.
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
-In the dmesg logs, the user may see errors like these:
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
 
-CIFS: Status code returned 0xc0000128 STATUS_FILE_CLOSED
-CIFS: VFS: Send error in read = -9
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
 
-With a multiuser mount using NetApp, this issue is really easy 
-for users to hit on a wide variety of kernel versions 
-by attempting to copy a file from the share 
-to the local machine through GNOME Files/Nautilus.
-This copy will always result in Nautilus throwing 
-a `Bad File Descriptor` error to the user and fail.
-With this fix, you can copy files through Nautilus without issue.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.4.netfs
 
-From looking at the traces, it seems that glib will 
-open the file first, and call listxattr before actually attempting 
-to copy the file data. The listxattr call always triggers a break,
-causing the copy to fail.
-
-The proposed fix returns to the way the client grabbed the tlink before 
-commit e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break").
-
-The bulk of that commit (checking for list empty) remains untouched, and
-I think the change to using cifs_sb_tlink was intended to avoid a
-NULL/ERR deference on the tlink as well as update the reference count.
-
-I believe this fix should preserve those safety properties, but of course
-I'd appreciate any corrections here.
-
-Fixes: e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break")
-Cc: stable@vger.kernel.org
-Signed-off-by: April Cardenas <april.cardenas@canonical.com>
----
- fs/smb/client/file.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 1aa4844f8b8a..0d428517f454 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -3354,8 +3354,8 @@ void cifs_oplock_break(struct work_struct *work)
- 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
- 			TASK_UNINTERRUPTIBLE);
- 
--	tlink = cifs_sb_tlink(cifs_sb);
--	if (IS_ERR(tlink)) {
-+	tlink = cifs_get_tlink(cfile->tlink);
-+	if (IS_ERR_OR_NULL(tlink)) {
- 		/* drop the reference taken when the break was queued */
- 		_cifsFileInfo_put(cfile, false /* do not wait for ourself */, false);
- 		goto out;
-
-base-commit: cb26524ef4ac28fcfa554c0656e8dc412c38a8ff
--- 
-2.53.0
+[1/8] netfs: Use uoff_t instead of unsigned long long and loff_t
+      https://git.kernel.org/vfs/vfs/c/0447d3e7ca81
+[2/8] netfs: Remove the writethrough code
+      https://git.kernel.org/vfs/vfs/c/1c167be3e3f3
+[3/8] netfs: trace: Change the "clear" folio traces to "endwb"
+      https://git.kernel.org/vfs/vfs/c/b4c9fce24e25
+[4/8] netfs: trace: Rejig a couple of the tracepoints
+      https://git.kernel.org/vfs/vfs/c/80fe2005dc3c
+[5/8] netfs: Add the cache object ID to netfs_read/write tracepoints
+      https://git.kernel.org/vfs/vfs/c/b1abd92147b1
+[6/8] netfs: Make deprecated PG_private_2 support opt-in
+      https://git.kernel.org/vfs/vfs/c/e5c67dd3bbf7
+[7/8] netfs: Add some functions to wrap the all-queued handling
+      https://git.kernel.org/vfs/vfs/c/a38f37509940
+[8/8] netfs: Set subrequest->source at alloc before trace emission
+      https://git.kernel.org/vfs/vfs/c/3df7501ad939
 
