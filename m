@@ -1,107 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84C341D659;
-	Thu, 10 Sep 2026 08:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5BB1A3A80
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 09:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789027900; cv=none; b=Ra8gYRe6ss+lBA32ycWdJVbb/i1cOY97R1n14RReNMXJQnfO3OzSid0Oj9NN10CGiyM453xw1RICHoSAhufwliPLDESJkbDsetW7vooHBOfL1N6qwBZ7llUEvS+Ykf1dvV3fJD2B2Xt94hYImfLdR/s00UT4SMzVapV0dzRwGcM=
+	t=1789031370; cv=none; b=NlH0XYV0SUid6X5CRWtRfTeXzVlUNg2Ku2ixczdWAAbjLfNGr920/PKMy1x+uXKJ3fHrIt25vCYINTrB7hL0ubTCjhzwdhBNiIjtNiR4NjqUn5A3q9fxPLrFNBUdTsYBktgWW9YknXL7bygD6gtncEZ7gdOKX7kNEbr/wup06ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789027900; c=relaxed/simple;
-	bh=PSYLbShhpWiv3aVB2nJrOHdeh7Z3k4zELmiY4CjG9uE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=APz4CCiH+scFj5VaY5yCvC3vSP3RkakrrQqCN0KZJxQqOQRl9O8N8PvOv3WJ5sDVO3a3lyzW4l3fMMYMy/azwITyD5I/W4ZJ1O9lioVpnGUkkI94lQKNvaZwiMHjn5vg600ILmXr7WfEKx56KAqU3h0QGGIZKe3Lqkdm3He+LXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DAqb16Lh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789031370; c=relaxed/simple;
+	bh=hVR/FYMuNu9uBqwvkMeHWPMtgGRlkP2e2g/lwD9f2NY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LW8GZYIKWE7OXmJ387d1Oeel0WddtAVTEN1mX6umUulOm7xCSW4LR//vdLueD2aLBHJFlMHa/IKL4swYo7xpPOpb9fIbuxd4NSFHHBpb4wb05cJiOGsI8VTfOI4Puek+II7Qe2TBGg8uuLlOvFvEpn5u2/qtHU8xxOSs8dwzbkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=j7GULNlU; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DAqb16Lh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D241F000FF;
-	Thu, 10 Sep 2026 08:11:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789027898;
-	bh=Bl2jWTajUKdkFTVEmaIsZckt4uMF6UIWmGeyLi3kFQg=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=DAqb16LhXA4V3x2MEBgyebklpieMD75ealCT6F60CkFf+1FpmPAJyTfsmtGyVFhzC
-	 Eekvf46yp132dC4zoRl85r5FXyUpUdsWXVUh08Xcz1+9bOVObP5c6h1fXfZmlaxrzM
-	 P2tKsaJycMsQjasylX2DwThvMnSOubkKYXSyhG5k+ZOmCTZPVPkzq9xY4H9AAtgM2+
-	 bv/gFqBICa+dxei6mzc0FdAoQcLhta8R015Ur710MTEVpZDuYI8huu5pliRpIvykY1
-	 PM3ORUCluTaMjr1OPi/LRpzglnTOCs6cwf/AQvzv4pOZJCfOVOQQWJkrVBZxdVs+Io
-	 bpZbmlO4+cExw==
-From: Christian Brauner <brauner@kernel.org>
-To: Christian Brauner <brauner@kernel.org>, 
- David Howells <dhowells@redhat.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, 
- Matthew Wilcox <willy@infradead.org>, Namjae Jeon <linkinjeon@kernel.org>, 
- Marc Dionne <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, 
- Eric Van Hensbergen <ericvh@kernel.org>, 
- Dominique Martinet <asmadeus@codewreck.org>, 
- Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, 
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
- linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-In-Reply-To: <20260909072105.1663687-1-dhowells@redhat.com>
-References: <20260909072105.1663687-1-dhowells@redhat.com>
-Subject: Re: [PATCH v13 0/8] netfs: Miscellaneous preparatory changes
-Message-Id: <20260910-rohrkrepierer-clinchen-affront-100171384452@brauner>
-Date: Thu, 10 Sep 2026 10:11:29 +0200
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="j7GULNlU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=o8
+	THzR+NFFB8ic+4r/g+NFFVO2+2eyuLbb4BBykymEI=; b=j7GULNlUIKZsyeUqRT
+	O1f8w7XP5ZqOSHwyWbiGBoQ8NXzRgw68bTdU1QY9+jbk7WziBeN6MWv7/gYkvLOE
+	HJmLXdLG1dw1et5BDi2iuI8wM+rZDxPlXKnQ75qrmX1Rz+tyYtQ/FQxDLWyN55tq
+	UAQURAdGnJoJtHDJ6kNxvh4/4=
+Received: from ubuntu.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD3P5uXc6Jq4+lDBw--.14608S2;
+	Thu, 10 Sep 2026 17:08:40 +0800 (CST)
+From: huhai <15815827059@163.com>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	Henry Hu <huhai@kylinos.cn>
+Subject: [PATCH] ksmbd: fix link speed query in fsctl_query_iface_info_ioctl()
+Date: Thu, 10 Sep 2026 17:08:18 +0800
+Message-Id: <20260910090818.24479-1-15815827059@163.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-db0b7
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1938; i=brauner@kernel.org;
- h=from:subject:message-id; bh=PSYLbShhpWiv3aVB2nJrOHdeh7Z3k4zELmiY4CjG9uE=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQtSjPOTU++uvzGNKGtX+59+bbANNaqinHmG+kZFS+fz
- imr/6Fl01HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjCRiX6MDLNL9Jr6i6ZfcHJI
- 5Zibue9R84UHvjxep8JUI2eX/pB/28/IcMBbawZXzeYHH6JTJjpNWJb77J//i10b/F5X3sh6F7u
- ilg0A
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3P5uXc6Jq4+lDBw--.14608S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WFWrurW3tw4UJr1DJr1UJrb_yoW8AF1rpw
+	4fuFykKryUW34fW34kJ3yruryav398WrsrKrWxGw42vF4rKrW3JFn7t34jkryfCFZYyFWF
+	gF4j9anY93Z3WFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jeT5dUUUUU=
+X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbCzRhGy2qic5hv8AAA3k
 
-On Wed, 09 Sep 2026 08:20:54 +0100, David Howells wrote:
-> netfs: Miscellaneous preparatory changes
-> 
-> Hi Christian,
-> 
-> Could you pull these patches please for -next?  This is the first of four
-> batches.  This is based on your vfs.fixes as there are some prerequisite
-> patches there.  This was split from v11 of a larger series[1].
-> 
-> [...]
+From: Henry Hu <huhai@kylinos.cn>
 
-Applied to the vfs-7.4.netfs branch of the vfs/vfs.git tree.
-Patches in the vfs-7.4.netfs branch should appear in linux-next soon.
+fsctl_query_iface_info_ioctl() used to call
+netdev->ethtool_ops->get_link_ksettings() directly and never checked the
+return value. If the callback fails, cmd.base.speed may be left
+uninitialized. Also, SPEED_UNKNOWN (-1) is treated as a numeric link speed
+and would be converted into a bogus link speed.
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+Use __ethtool_get_link_ksettings() to acquire the per-netdev ops lock when
+needed. Fall back to 1Gbps when the query fails, or when the reported speed
+is 0 or SPEED_UNKNOWN.
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Signed-off-by: Henry Hu <huhai@kylinos.cn>
+---
+ fs/smb/server/smb2pdu.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-7.4.netfs
-
-[1/8] netfs: Use uoff_t instead of unsigned long long and loff_t
-      https://git.kernel.org/vfs/vfs/c/0447d3e7ca81
-[2/8] netfs: Remove the writethrough code
-      https://git.kernel.org/vfs/vfs/c/1c167be3e3f3
-[3/8] netfs: trace: Change the "clear" folio traces to "endwb"
-      https://git.kernel.org/vfs/vfs/c/b4c9fce24e25
-[4/8] netfs: trace: Rejig a couple of the tracepoints
-      https://git.kernel.org/vfs/vfs/c/80fe2005dc3c
-[5/8] netfs: Add the cache object ID to netfs_read/write tracepoints
-      https://git.kernel.org/vfs/vfs/c/b1abd92147b1
-[6/8] netfs: Make deprecated PG_private_2 support opt-in
-      https://git.kernel.org/vfs/vfs/c/e5c67dd3bbf7
-[7/8] netfs: Add some functions to wrap the all-queued handling
-      https://git.kernel.org/vfs/vfs/c/a38f37509940
-[8/8] netfs: Set subrequest->source at alloc before trace emission
-      https://git.kernel.org/vfs/vfs/c/3df7501ad939
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b7ce67094626..b01d9cf07f65 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -10467,6 +10467,7 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 	struct sockaddr_storage_rsp *sockaddr_storage;
+ 	unsigned int flags;
+ 	unsigned long long speed;
++	struct ethtool_link_ksettings cmd;
+ 
+ 	rtnl_lock();
+ 	for_each_netdev(&init_net, netdev) {
+@@ -10501,10 +10502,8 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
+ 		nii_rsp->Next = cpu_to_le32(152);
+ 		nii_rsp->Reserved = 0;
+ 
+-		if (netdev->ethtool_ops->get_link_ksettings) {
+-			struct ethtool_link_ksettings cmd;
+-
+-			netdev->ethtool_ops->get_link_ksettings(netdev, &cmd);
++		if (!__ethtool_get_link_ksettings(netdev, &cmd) &&
++		    cmd.base.speed && cmd.base.speed != SPEED_UNKNOWN) {
+ 			speed = cmd.base.speed;
+ 		} else {
+ 			ksmbd_debug(SMB, "%s %s\n", netdev->name,
+-- 
+2.40.1
 
