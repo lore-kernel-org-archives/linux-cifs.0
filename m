@@ -1,153 +1,137 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBACD48F014;
-	Thu, 10 Sep 2026 15:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E7858B6A8;
+	Thu, 10 Sep 2026 18:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789055146; cv=none; b=YvVgdMQyerq5ZlrsLxbnxf3VBmkWxOrgjk1f45Z4Rxuhw8pybC+t1l3BTxtqjwnd+jKHN5LcQd0m0m7ipj0/GjXKgHRDGY71UC/MU0QkRqMzQSDyvtyHqKLxtsS2tX0hgAa3ZPcNJ3fW6wV9bpNRnL/Xus6F1CB5K+rLuSod5yw=
+	t=1789065712; cv=none; b=TKggy+noglKWw5NapX7rF15mwCvVZqpIJWETn1rCccmhc3c453V9fo5tTIzT2PhRv9VwpPoispNe+SyeAr1KI7rE6jggV6KQ/l3B0mVAcHeFLR64fcas9HqZxJWdTiTF2I2HVQT/y1S6f1CXOq1W6p/webOxcVHAK88XwolrV2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789055146; c=relaxed/simple;
-	bh=7SB5qyohHH+hDP9LCv7Qz6cDndRdllhbweSCueLi6Wk=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=pwamt0rpSubAxEF6aI2JxAoCnNzr6PKWBv352xwb1lzxzyeYmW5YGP/NUysDYv9hHGUt3POkB8jSlzM8WL2+Paq249/9roGm6aQaqMnyZqJ7qfYp5AwX2gRWqn9JfZ2ZtgdQn5t391ALu4ZskEAf62AXg/H1RatmDNuulo01jLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=36slLMdu; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1789065712; c=relaxed/simple;
+	bh=PZdK3L16QgUBQ0xLmf1s4QdiHWJ4Vf+7u/ZFogFYMGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S0+j62B6onuJveAl7ABYUtP8Kcy/fjKWbRnabYOcQc0vyc6CBeBRRcSRtz/xTm6Sdz0DXFc3+by+2Pu6jI2TpW0A9ssa05vqXqWSNDa08MJ9/PnUzwzCHPJx8RGmtguSpPCfHmG2ygZeZE18V6Fw3518FLylodwxW2qozIOihzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=KgvnrfHY; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="36slLMdu"
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="KgvnrfHY"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:Subject:Cc:To:From:
-	Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=WesXDRHOFhnI+QD4gqp8GWvY93+z4uLfHjnUTfl9m+Y=; b=36slLMduVuNDfk9FShAHoH17SI
-	rcaLfy6kbaxJ3LcqEvsP36RhBT9FySRENpq6pcXs6nUFP/QzJ0xoKaLjh+EkszE8q3G2azABy96/X
-	9pix9qwAeonFfi7f1zbihKjeg7KB/fzVHARvlSNs6vxH7ccGeKkHSICaroeODkkm+Vn9qcmn8mka+
-	avO9Gmkt3uR3d5SQGCakBepvO+/yYJqFuubmPzeQDF9U13XYQ4UBjxIpxjELuqqVysDXay8D0edhU
-	aoY/5kBI9Cv+FNWj9ZUHKwqLNmERwGkT97A1T7PmaU3cP26504e60/stHCBmeiQJylh+RrJTkwTpa
-	oQ1/ecLA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x4gy5-000000018V6-3urn;
-	Thu, 10 Sep 2026 12:45:41 -0300
-Message-ID: <bb769b6f6f976d75cbfca3ed00556bde@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: [GIT PULL] smb client fixes for 7.3-rc3
-Date: Thu, 10 Sep 2026 12:45:41 -0300
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0nOuKVnTAcBRd9oosJmEm2gPVlmW/NvmFy1eYa3dlkQ=; b=KgvnrfHYEJwhAYvKhbiHdzbF33
+	OarfsrFRPzlDJ0LU9q84daMHKCT3zZs8iquSnmOLtYfiSy2QrUuQslC0V5cg0mkgKLJw2Esgkvnms
+	oYguj1/o7Wba/NlWvL+Kt0HJl2H8gvuvuFnIYqiCzY1nR07haTOKU/HE7tIV766FnVC/WeRHvSX2t
+	orX1xICkat+Vksb11fLDdbQBMT5pcy5Kc0EpxGCy5UuN/19SMgm5QD/dpJ4VtVL82MWKDz710xB9K
+	qc6h12fRZJvdArOMI7mzS+gwO54BhrEJcfNTEmXZqsqcak6+Hj3GdR88bLdH5q+54LNIH7JuOnLN4
+	EYvQPfWA==;
+Received: from [151.115.150.205] (port=34186 helo=gepetto..)
+	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.99.5)
+	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
+	id 1x4jiU-0000000FTPh-0MZA;
+	Thu, 10 Sep 2026 20:41:43 +0200
+From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+Subject: [PATCH] smb: client: validate absolute native symlink targets before NT fixups
+Date: Thu, 10 Sep 2026 18:37:43 +0000
+Message-ID: <20260910183742.4029092-2-Jeremy.Jean@oss.cyber.gouv.fr>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Linus,
+With symlinkroot unset, an absolute target is copied without conversion
+to an NT drive path. Later code still assumes an NT prefix is present
+when modifying the target and calculating the print name length.
 
-Please consider pulling these smb client fixes for v7.3-rc3. They
-address file type corruption in reparse point handling, uid/gid
-ownership mapping bugs, heap overflows in DACL rewriting, reference
-count leaks, a DFS use-after-free and hardening of legacy smb1 input
-validation. All fixes are for stable.
+For "/ab", this causes two failures: sym[5] and path[5] are written
+past their allocations, and plen -= 2 * poff subtracts an assumed
+8-byte prefix from a 6-byte UTF-16 target, wrapping u16 plen to 65534.
+That underflow causes another overflow: memcpy() copies 65534 bytes
+into a 24-byte buffer. A user with write access to a mounted share
+can trigger these bugs with default settings.
 
-Thanks,
-Paulo
+Validate the NT drive prefix, including an ASCII drive letter, before
+accessing fixed offsets or subtracting the prefix length.
 
-----------------------------------------------------------------
-The following changes since commit 89a312991dc6e638a36adc43ccb91dbc25504c04:
+Fixes: 3363da82e02f ("smb: client: fix native SMB symlink traversal")
+Assisted-by: Codex:gpt-5
+Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+---
+ fs/smb/client/reparse.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-  Merge tag 'cifs-fixes-7.3-rc2' of https://git.manguebit.org/linux (2026-09-01 13:37:14 -0700)
+diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
+index 5cc5b04..acd5f51 100644
+--- a/fs/smb/client/reparse.c
++++ b/fs/smb/client/reparse.c
+@@ -3,6 +3,7 @@
+  * Copyright (c) 2024 Paulo Alcantara <pc@manguebit.com>
+  */
+ 
++#include <linux/ctype.h>
+ #include <linux/fs.h>
+ #include <linux/stat.h>
+ #include <linux/slab.h>
+@@ -159,15 +160,24 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
+ 		convert_delimiter(sym, sep);
+ 
+ 	/*
+-	 * For absolute NT symlinks it is required to pass also leading
+-	 * backslash and to not mangle NT object prefix "\\??\\" and not to
+-	 * mangle colon in drive letter. But cifs_convert_path_to_utf16()
+-	 * removes leading backslash and replaces '?' and ':'. So temporary
+-	 * mask these characters in NT object prefix by '_' and then change
+-	 * them back.
++	 * Absolute NT symlinks must retain the leading backslash, "\\??\\"
++	 * prefix and drive-letter colon. cifs_convert_path_to_utf16() strips
++	 * the leading backslash and maps '?' and ':', so temporarily mask
++	 * these characters with '_' and restore them after conversion.
++	 *
++	 * When symlinkroot is unset, sym comes directly from the caller.
++	 * Validate the complete "\\??\\X:" prefix before using fixed offsets
++	 * or subtracting the NT prefix length below. Require an ASCII drive
++	 * letter so the prefix occupies six characters in UTF-16 too.
+ 	 */
+-	if (!(sbflags & CIFS_MOUNT_POSIX_PATHS) && symname[0] == '/')
++	if (!(sbflags & CIFS_MOUNT_POSIX_PATHS) && symname[0] == '/') {
++		if (!strstarts(sym, "\\??\\") || !isascii(sym[4]) ||
++		    !isalpha(sym[4]) || sym[5] != ':') {
++			rc = -EINVAL;
++			goto out;
++		}
+ 		sym[0] = sym[1] = sym[2] = sym[5] = '_';
++	}
+ 
+ 	/*
+ 	 * On a POSIX paths mount the symlink target is stored verbatim, so
+-- 
+2.47.3
 
-are available in the Git repository at:
-
-  https://git.manguebit.org/linux.git tags/cifs-fixes-7.3-rc3
-
-for you to fetch changes up to cb26524ef4ac28fcfa554c0656e8dc412c38a8ff:
-
-  smb: client: fix one-byte OOB read in smb2_parse_native_symlink() (2026-09-09 22:06:05 -0300)
-
-----------------------------------------------------------------
-smb client fixes for v7.3-rc3
-
-A batch of bug fixes for the smb client:
-
- - File type corruption fixes in reparse point handling: setting S_IFMT
-   bits without clearing the existing type first corrupted the file mode
-   (e.g. S_IFREG | S_IFCHR == S_IFLNK). Fixed in the WSL, POSIX and
-   native symlink reparse parsers. Also fixes an uninitialized SID
-   structure in the POSIX readdir path when parsing fails.
-
- - Ownership mapping fixes: forceuid/forcegid mount options were
-   ignored in several code paths (SID-to-id mapping, WSL extended
-   attributes, POSIX extensions getattr), allowing an untrusted server
-   to dictate local file ownership despite explicit mount overrides.
-
- - Heap overflow and overflow fixes in DACL rewriting: replacing short
-   SIDs with long ones could overflow the DACL buffer, and the u16
-   accumulator for DACL size could wrap around with enough ACEs.
-
- - Reference count leak fixes in oplock break and deferred close:
-   duplicate oplock breaks on a queued work item leaked a
-   cifsFileInfo reference, and deferred close had a similar leak when
-   requeueing a running work item. Both cause busy-inode oopses on
-   unmount.
-
- - DFS superblock use-after-free fix: the iterator callback stored a
-   raw superblock pointer without pinning it, racing with automount
-   expiry.
-
- - One-byte slab OOB read in the native symlink parser when handling
-   share-root relative paths.
-
- - Hardening of legacy SMB1 input: reject userspace-crafted
-   cifs.idmap key descriptions that bypass kernel origin checks, and
-   validate DataOffset in CIFSSMBRead() to prevent heap info
-   disclosure from a malicious server.
-
- - DFS cache fix: defer metadata updates until target copying
-   succeeds to prevent partial-state cache entries on allocation
-   failure.
-
-----------------------------------------------------------------
-Aohan Mei (1):
-      smb: client: reject userspace cifs.idmap descriptions
-
-Bjoern Doebel (4):
-      smb: client: avoid leaking refcount in cifs_queue_oplock_break()
-      smb: client: avoid leaking refcount when cifs_sb_tlink() fails
-      smb: client: fix heap overflow in DACL owner/group rewrite
-      smb: client: fail DACL rewrite when the new DACL exceeds 64K
-
-Diego Oliva (2):
-      smb: client: reject short READ responses in CIFSSMBRead()
-      smb: client: reject out-of-bounds DataOffset in CIFSSMBRead()
-
-Fan Wu (1):
-      smb: client: fix cifsFileInfo reference leak in deferred close
-
-Fredric Cover (1):
-      smb: client: fill cache fields after populating cache in copy_ref_data()
-
-Karl Mehltretter (1):
-      smb: client: pin DFS superblock in iterator callback
-
-Paulo Alcantara (8):
-      smb: client: fix uid/gid override in getattr with posix extensions
-      smb: client: honor forceuid/forcegid when mapping SIDs to uid/gid
-      smb: client: fix WSL reparse point uid/gid override
-      smb: client: avoid using uninitialized SIDs in cifs_posix_to_fattr()
-      smb: client: fix file type corruption in wsl_to_fattr()
-      smb: client: fix file type corruption in posix_reparse_to_fattr()
-      smb: client: fix file type corruption in cifs_reparse_point_to_fattr()
-      smb: client: fix one-byte OOB read in smb2_parse_native_symlink()
-
- fs/smb/client/cifsacl.c   | 95 ++++++++++++++++++++++++++++++++---------------
- fs/smb/client/cifssmb.c   | 26 ++++++++++---
- fs/smb/client/dfs_cache.c | 18 ++++-----
- fs/smb/client/file.c      | 22 ++++++++---
- fs/smb/client/inode.c     | 17 ++++++---
- fs/smb/client/misc.c      | 24 ++++++------
- fs/smb/client/readdir.c   | 17 +++++++--
- fs/smb/client/reparse.c   | 33 ++++++++++------
- fs/smb/client/trace.h     |  1 +
- 9 files changed, 172 insertions(+), 81 deletions(-)
