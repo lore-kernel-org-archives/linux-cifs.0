@@ -1,76 +1,93 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45454485930
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 14:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16B1341068;
+	Thu, 10 Sep 2026 14:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789049631; cv=none; b=ZqJvWQ55aj3vKUhidsJje/94uBYhlWAjy+g6cG7ApRAH0suiEVEOzkpBvpk/V+fRp3LguFPwZzk8zNwXMIexMLM0nxmRRS5LtP19dosKNBLCaochSC2wCs1IpMwwvwhmTEOn//EEcchL7DlZD6B1EcTz4+EZairVPmEqtShJjB4=
+	t=1789049684; cv=none; b=SKteSJm8eIKDi56L2Zt1HpSfnYav4mDIWSohUgTvhNhbeoSyZ4NCbywuhKM1jwMfcLlkXQvTiMmtXgrOA9nqKrjUINjuM0pzou7LCisEpSjrf21QqcCjMAR4qL/ovwDHghmtPT1vxCFZEM5X9uSCQ+CZgy/YRhygPtsf5HZBjXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789049631; c=relaxed/simple;
-	bh=ipxPExihA6sPGiwrDwRjIH36USDATuM4VGr2+9JHiIg=;
+	s=arc-20240116; t=1789049684; c=relaxed/simple;
+	bh=8odRz4n4VgiTQHHIx1K/AVnMHcqYY/ae1HoVUyy6QtE=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=AW4NaihNtZzNAf0gvBveGG6jag6403tQLQ7dpDvlLVDv2EZD8rZNzvgq9i5IKQaW5e2O31fmNDmDIxQy7umWv6JbgFwShNWZ8r6whtIkJWBliiNrkN+ZXgJk5+oWJmLQ9f1bUTBAsDX1C6aPAJxMNlbcaUJE/Y6yXVhzT72gN88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=4X/iXwvN; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version:Content-Type; b=TSm4Ixr6mZYXuf/Wv71m71kxnc1k166oVDsACTL3V7Q1F67LIUJnVMkOisv/JM8+VJ+Jl4T/Fzl2LPh96J839X2ABT0CvHdgpQfySRqss2Kjoe65KuwVUZbz9dVsAXXQg31Geah9onvZShpgLq8UU9g2iZGl4GrtQqHfk9HCiRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=uocRacO0; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="4X/iXwvN"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="uocRacO0"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=3+JKQGbecm2wGCQ7U6I5F7605/T9ORYPeNAt7Tq3Id0=; b=4X/iXwvNrxjiG2ybLvmSRM5KHZ
-	Wevpt8efcmf+2ybwFrIJDSbh4cYX3UI9PeR9GHxISDNLWaAZd9H2/utJZChSRnCBn5AHciVpDKe/e
-	xkc8i9ueykCHAvNo6qgRibB7XPaUQtN54ANffof53CpsjlsJfCXn/aBHHiERBr6mASIoH06agC4Fq
-	izrUVEK7YsKICnHuRnN1XIgvnD1gEhzCrNOeUjajERV6Jk8k/Jqhak/KuMSFG5GmDK+ypPqcWapyx
-	JyiDcWFhbfCRmdtqS4HWBC0Bmtb8mKnOUbvuIx0329oetAbxmTVhvC0V2U3xNdHPQDqoOkf84GEKJ
-	o6UUDA2Q==;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=kIWQyuPhziZdEFcftncrQD98qtLPLGba+f0do/MFyWs=; b=uocRacO0iWyxvaK29kJuo5wY/m
+	TS4UfNzz3GLMhHT6g1CwNTg0wc09b1oGEOC0hY7BO+E5WB+/moQ94vTCT0FkbHqwrtpJ8uJvoyWEh
+	2U/4Bnx8cR9m3JuYnAM12eoeq3XuppNNbyIdw9kx6b0DLsqI7ArpKyQEqdcBR0PCA2YZP4ilulWWF
+	r7NcmIHKnPJ6ifCoKD5fOFIrnUwBIUFWvLesPiXQFEAKUcajAEREaBLcSP+ysr8aZkoA+zWglj5gN
+	aWobd5ZG3Zcrd2GqJx9+CLMEvcIQs1WB/1qpEsUOQ3bCUlpWuKlYTDio189BSZmZSfYgnVGtYIhof
+	BJTcQdrA==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x4fX9-0000000181h-3vZ9;
-	Thu, 10 Sep 2026 11:13:47 -0300
-Message-ID: <da83dabd471d4714579703762c150162@manguebit.org>
+	id 1x4fXv-0000000182C-0cFq;
+	Thu, 10 Sep 2026 11:14:35 -0300
+Message-ID: <d99c2b25ef6a34a2a9301e19f5f8fe0d@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
-To: Shyam Prasad N <nspmangalore@gmail.com>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Subject: Re: Soft lockup with 7.3-rc1
-In-Reply-To: <CANT5p=phx4OqBSbki3RQBGwVQSFtiK7rvhQ2_KUD8aVbbyA8rw@mail.gmail.com>
-References: <CANT5p=qCCdnFsDYTE0vTsBpD48ZkeVsb7=y7roczn61Kz1gtOw@mail.gmail.com>
- <a4af8859841207a11fb6daccd7132ac0@manguebit.org>
- <CANT5p=phx4OqBSbki3RQBGwVQSFtiK7rvhQ2_KUD8aVbbyA8rw@mail.gmail.com>
-Date: Thu, 10 Sep 2026 11:13:47 -0300
+To: linux-cifs@vger.kernel.org
+Cc: Yuanfu Xie <yuanfuxie@stu.pku.edu.cn>, Pali Rohar <pali@kernel.org>,
+ Namjae Jeon <linkinjeon@kernel.org>, Ronnie Sahlberg
+ <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] smb: client: fix one-byte OOB read in
+ smb2_parse_native_symlink()
+In-Reply-To: <20260909230748.1226168-1-pc@manguebit.org>
+References: <20260909230748.1226168-1-pc@manguebit.org>
+Date: Thu, 10 Sep 2026 11:14:34 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Shyam Prasad N <nspmangalore@gmail.com> writes:
+Paulo Alcantara <pc@manguebit.org> writes:
 
-> On Wed, Sep 9, 2026 at 9:46=E2=80=AFPM Paulo Alcantara <pc@manguebit.org>=
- wrote:
->>
->> Shyam Prasad N <nspmangalore@gmail.com> writes:
->>
->> > On one occasion, when I was testing modefromsid,idsfromsid (which
->> > appears to be broken btw), I observed a deadlock during umount.
->> > Attaching the system logs from that time.
->>
->> Could you please be more specific in what exactly isn't working with
->> 'modefromsid,idsfromsid'?
+> When parsing a share-root relative native symlink, memcpy copies
+> smb_target+1 (skipping the leading separator) but uses
+> strlen(smb_target)+1 as the length, reading one byte past the
+> allocated buffer.
 >
-> I debugged this further. The issue seems to be due to a combination of
-> modefromsid,idsfromsid and handlecache.
-> We cache file and dir attrs in the dir cache. But that does not fetch
-> security descriptors yet. So it falls back to uid/gid,
-> file_mode/dir_mode values.
-> There's a fix needed in my dir lease changes. Will submit that soon.
+> This fixes the following KASAN splat when accessing an SMB symlink
+> with a target of '\a\b':
+>
+>   BUG: KASAN: slab-out-of-bounds in smb2_parse_native_symlink+0x4f5/0xca0
+>   Read of size 5 at addr ffff88800878fe21 by task netfsfuzz-execu/1
+>   CPU: 1 UID: 0 PID: 1 Comm: netfsfuzz-execu Tainted: G N
+>   7.2.0-11943-g2709dd5ae32f-dirty #1 PREEMPT(lazy)
+>   Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_caps fix,
+>   1996)
+>   Call Trace:
+>    <TASK>
+>    dump_stack_lvl+0x7b/0xa0
+>    print_report+0xd0/0x630
+>    kasan_report+0xe5/0x120
+>    kasan_check_range+0x105/0x1b0
+>    __asan_memcpy+0x23/0x60
+>    smb2_parse_native_symlink+0x4f5/0xca0
+>    parse_reparse_point+0x68a/0x1530
+>    reparse_info_to_fattr+0x752/0xa20
+>    cifs_get_fattr+0x873/0x15b0
+>    cifs_get_inode_info+0xc0/0x310
+>    cifs_lookup+0x308/0xa70
+>    __lookup_slow+0x122/0x2b0
+>    lookup_slow+0x50/0x70
+>    path_lookupat+0x525/0xaf0
+>    filename_lookup+0x1f2/0x550
+>    vfs_statx+0xd1/0x1a0
+>    vfs_fstatat+0x65/0xc0
+>    __do_sys_newfstatat+0x9a/0x120
+>    do_syscall_64+0xdd/0x4a0
+>    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> ...
 
-Awesome, thanks.  Please send it separetely so we can backport it to
--stable as well.
-
-Let me know if you still hit the multichannel reconnect issues with the
-patches I'd sent you earlier.
+Applied.
