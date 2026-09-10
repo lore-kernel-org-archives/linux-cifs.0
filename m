@@ -1,140 +1,111 @@
-Received: from mail-ed2-f12.google.com (mail-ed2-f12.google.com [74.125.228.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13748471246
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 12:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789041716; cv=pass; b=JRcAi72a5i+S/rPVgK2G4YshJjyLsRXuH9Ju+lp3FSdUOhShjcc6cwSTycMMtIkFEiqIExyC9Iy6JMy0IXFsHjtsNXSw9gYhi4G8ousSf7WSOurAbW9ztv+q/hFddtEHqX8i0cVBCJEQ7jDJ67njs7ySigca+m/ldplqT7j7wNk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789041716; c=relaxed/simple;
-	bh=5X8NDK1IvRp7a4aAJHX5rGeSw785JfBRLyXBlvisMsE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bVDgdCc+HPRhHzoz9ggUzkBaVPmfqFs0u0XLdfNQANbbZwN+tWi9NYP3YUXjjTxKHw/T6XwzcqT84PgKrqWM0tgbbiBS+HwA7Vv+wjFYyOvCsWcDoBCGiEMg6vCy/jZHFOTa5F5Cs/3j+Xm2fedIel+byiu9xFk8+FfczVesLK4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VCtsmqVn; arc=pass smtp.client-ip=74.125.228.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3AA48A8C5
+	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 12:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789044173; cv=none; b=C17IN/W5oGXiz3oN4bwo3FoLj8/qj4uLXgJrukdwvMK7sFzZ4xfpLjilxF1qqJEMUiTIbpnsFTkkuPoEkpax2dOm8nXi7ZcL237PYz+xfFid5+uG71T5MqO28uNiNZQCxi/deppqn8rBFTpsG7axNCIQg7UNgwlEjivDDxPS6/Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789044173; c=relaxed/simple;
+	bh=HsLRaYuEbq7ZzzRNl6uSIAKV4rQlZ2M6v1OhzKK4PeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=sNTNkPvDvAwFKLo0uuEPi07De9luYkoH/hJVwLH09awe92zVh1kobFc9p1lC5wK/rn4LWpm6825cDp8ZQSoE7z+y7syqD+vmju86pothhadZBIIXI4Ez5p0wZ1pNPb95QTfKBQPhjL0oS68uTulq9ARFt5dhR0CfAWT811G7ktw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GOxuNvRh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VCtsmqVn"
-Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a67fa7a64eso2073600a12.1
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 05:01:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789041713; cv=none;
-        d=google.com; s=arc-20260327;
-        b=l9RzsEntevETi/GEI1PsRZSlm99JCJsM1ZTxwLn7TllSMkpbFHKTh/TK7Y9bcP2OBU
-         0FbwDFzPeTZI4850mhlMxX3xEZlHC/E5lOvIVJw2gPrQx/nYdfXzI/4qh3rbiVKALO/0
-         TldvNz9/8ZOk2JzxyBeIsf9ItxAd9AHISWo+9SjzjYR2BnVtJ5nD7ZMvs+lndErGNPK0
-         qwjHS96mlV71wThr+IIRMozY0PYSEYkCa9S0ZcAVmxsrUDUk4pD/u/zwd+LhHW7iRe+i
-         lGrscV6buxKaLPzj5VEZp6d2sOm71CK+S4LQ1hQCZ92j2kEzkH9IrNu+TfHfUviyguDH
-         c+Zg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1EZxOZZtHFabv0Jm4eVjpJOKmFRnvvaSJb+bZq+jrHw=;
-        fh=Ui3saCFAombT+YlVMTZJ2dgjOz22CKwvVfjicK6STNw=;
-        b=Hdu37HcAkUmPBICIPSfcKvwlAysLu2lBnfuSprLs5oAWcW4+3RijAG8JW1Ij4uG6Uu
-         W/iySTKD5G59St5svd5JOVJAzqLLVyBpQZ70Ai1LiwqdGGu1BEO7SmFy+Ni1IKwtev1n
-         dxcwT/FIoTIhr4wAmHXA/fhd2n0gQAxaAsvv4JjULM83Zp3MnUP9wQ12uaQFaVLwRD+l
-         25/irVPE3EmfVhgRYcCdO78o9nt4rZUwmss6Mh6fxMgoCP0VEqI6PE5JisnV0jjRov3d
-         g/+gCB5fHOUJXQOHlkVMS0fmQOlaEW8kGZ3mZHJyxpX2frAwAQcyLzW3P222DRn8NjcI
-         yWQA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789041713; x=1789646513; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1EZxOZZtHFabv0Jm4eVjpJOKmFRnvvaSJb+bZq+jrHw=;
-        b=VCtsmqVnnaeMvZWR8L4pAkB7f/tRq7OfDJUbHnWUXytrD2SmTQPk8AX/Qntib9ztxt
-         aXVcY/TUhbeeWkH7gnyeB1FtVAUNwH/yQ8PCBCDAUH3SkfUap+gIz1eYfjRyXghM6ap4
-         gx8Se64N6NENfw7b5GvC5z8k/74vBcOStM3cDSc+qbMktR3xJi6pdMYtqYRntzV2yg/1
-         DzFZTWtmu70Cm7CUVeLb2T2/NYRMR9aLu6SWeRCvo4X8Kws6FZK5OFVf5SYbnHg0fN0S
-         BAPgakqEN3Ocq2lWZNkZOrEsXEd2CowX4SKfk9iYaIPUdw7Xmszby7knjD4tHIm0B2Qm
-         IZ5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789041713; x=1789646513;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1EZxOZZtHFabv0Jm4eVjpJOKmFRnvvaSJb+bZq+jrHw=;
-        b=Ro5KsKd+uRkl9OjYxnPC/h7/vz6VY6H+aMfeHc6gwAi/8T6a+a5BR5xEKPyISUGWBZ
-         q6UpYOab/3bqcQ8wsDAReIfea7DGbDRMlKLQfLeUKDrMatw9HCIXhD4Oi5ZuMHLSsIuC
-         cW3mehkaBIcdXRZhTiYhuUVYVN51H3RpYIZAzcGIctwCkYd1AvY4cpdqMmvU4X+cQtDl
-         Qz/kJe8X5rNbX9RFgMG1uw6TchP4xB2NH9t8ik4lgx3Zdlr/ofmIqhMb5/rUIyIuvA6V
-         A2e6D1A7jEvO2rTM9zrsqeGyG+m6sL+cYm4cABWLtjmTX/DhoXR5/RMzV4IgqkDPQqkL
-         n52A==
-X-Gm-Message-State: AFuF++lQBLH+SCAbAu9vzYAQqe9Fq+mPPMFTQC+lUxnx9nCsBTlJwkvQ
-	DhpcCfBMQybUFi3cD38VUBc69d6DJTaKWXdmlWXu9l0DVfkgP04jxh2W+dOJuLC1AGIjJ4FC45y
-	uVB1G9JWokp/i78Dmh/dFjJ5GOCtO41k=
-X-Gm-Gg: AYBFou0Zom1xFNlIFXhcbeQ1/jRfSqpPg22D/Zl737nuA2jJEMriGPQZOzhChIgjeZl
-	3uAjbZ6HyZuTuVWP6lbsrBdgIK3LOrF/FuWK0s7YvHfuFGh/nwxbJQcBAqM/YZIcJAIKy/DeN6r
-	CH8eoQFIiU+PUL3MGQ/acuFwyKu94hxdWcgsX6uPy25q/tFr0G/zMKB+Q98OvVyObNN3Pm9c9pe
-	uBZWPS/GaDKwLP5Pd5TPCZfiSX1VKXpIRDaOtjDQC0x5nvcb8OTyA/gBl9tz2t7Xqh5RNjE0oGS
-	V3Z8eSs1POBDqRDivPZRo4lioSJ0V2xBj9bXz511BlIR8pmcM+NfNg==
-X-Received: by 2002:a05:6402:194d:b0:6a0:a4f5:f4eb with SMTP id
- 4fb4d7f45d1cf-6a99caa4a32mr2736469a12.4.1789041712693; Thu, 10 Sep 2026
- 05:01:52 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOxuNvRh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789044166;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hUSOoW0g30UFVhZc7yIBkWk1BVCAbM29mk2RKcbK+JY=;
+	b=GOxuNvRhwOg14A2rh6zMAbjsaO1W3oMwRhr6crCREHPlf0syHHgNcPxZR3U2NGc7A0RbKl
+	c1Du1TbbzfO3lUtYWoJzzkf00Gu4nhFPwfzEPuB6bBW5MYEF5rhd0MyOyGPZpVhKWcbouO
+	uIuB88CIDRKx7lFZqICvn3Sd7mCOCjM=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-43-UIXoWfPhPCiSv6Uz3Q3DUA-1; Thu,
+ 10 Sep 2026 08:42:43 -0400
+X-MC-Unique: UIXoWfPhPCiSv6Uz3Q3DUA-1
+X-Mimecast-MFC-AGG-ID: UIXoWfPhPCiSv6Uz3Q3DUA_1789044161
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E237418005A6;
+	Thu, 10 Sep 2026 12:42:40 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet03.pony-001.prod.iad2.dc.redhat.com [10.2.32.114])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9208630001A2;
+	Thu, 10 Sep 2026 12:42:35 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH v3 12/13] smb: client: Use hmac_sha256_zeroize_ctx function to clear hmac_sha256_ctx
+Date: Thu, 10 Sep 2026 14:41:31 +0200
+Message-ID: <20260910124138.417439-13-thuth@redhat.com>
+In-Reply-To: <20260910124138.417439-1-thuth@redhat.com>
+References: <20260910124138.417439-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANT5p=qCCdnFsDYTE0vTsBpD48ZkeVsb7=y7roczn61Kz1gtOw@mail.gmail.com>
- <a4af8859841207a11fb6daccd7132ac0@manguebit.org>
-In-Reply-To: <a4af8859841207a11fb6daccd7132ac0@manguebit.org>
-From: Shyam Prasad N <nspmangalore@gmail.com>
-Date: Thu, 10 Sep 2026 17:31:40 +0530
-X-Gm-Features: AcwNN1WDBs9jAO5uC5QOj2GEcW9g1cbWUBECNrpQ5NhqnGMYEQAN-4J9Iy1uOn8
-Message-ID: <CANT5p=phx4OqBSbki3RQBGwVQSFtiK7rvhQ2_KUD8aVbbyA8rw@mail.gmail.com>
-Subject: Re: Soft lockup with 7.3-rc1
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: CIFS <linux-cifs@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Sep 9, 2026 at 9:46=E2=80=AFPM Paulo Alcantara <pc@manguebit.org> w=
-rote:
->
-> Hi Shyam,
->
-> Shyam Prasad N <nspmangalore@gmail.com> writes:
->
-> > On one occasion, when I was testing modefromsid,idsfromsid (which
-> > appears to be broken btw), I observed a deadlock during umount.
-> > Attaching the system logs from that time.
->
-> Could you please be more specific in what exactly isn't working with
-> 'modefromsid,idsfromsid'?
+It's just cosmetics, but now that we have a helper function for clearing
+hmac_sha256_ctx with a __cleanup() statement, we can also use it in the smb
+client code for good measure.
 
-I debugged this further. The issue seems to be due to a combination of
-modefromsid,idsfromsid and handlecache.
-We cache file and dir attrs in the dir cache. But that does not fetch
-security descriptors yet. So it falls back to uid/gid,
-file_mode/dir_mode values.
-There's a fix needed in my dir lease changes. Will submit that soon.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ fs/smb/client/smb2transport.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
->
-> I've quickly tested it against Windows Server 2022 from #cifs-next with
-> kerberos and it worked for me.
->
-> Please share the server type, settings, full mount options, so I can try
-> to reproduce it.
->
-> > Does this look familiar to you?
->
-> Nope.  I recall seeing some lockdep warnings among those paths in the
-> past, but I wasn't able to reproduce such deadlock.
->
-> Unfortunately the dmesg output is incomplete and we can't tell who is
-> the actual cifs_tcp_ses_lock lock holder.  Possibly on CPU 0 or 4.
->
-> If you have any reproducers for the dealock or 'modefromsid,idsfromsid'
-> issues, please share them.
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index c407f30e00401..080864b24a0c5 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -212,7 +212,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+-	struct hmac_sha256_ctx hmac_ctx;
++	struct hmac_sha256_ctx hmac_ctx __cleanup(hmac_sha256_zeroize_ctx);
+ 	struct smb_rqst drqst;
+ 	__u64 sid = le64_to_cpu(shdr->SessionId);
+ 	u8 key[SMB2_NTLMV2_SESSKEY_SIZE];
+@@ -250,7 +250,6 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 		memcpy(shdr->Signature, smb2_signature, SMB2_SIGNATURE_SIZE);
+ 
+ 	memzero_explicit(key, sizeof(key));
+-	memzero_explicit(&hmac_ctx, sizeof(hmac_ctx));
+ 	return rc;
+ }
+ 
+-- 
+2.55.0
 
-
-
---=20
-Regards,
-Shyam
