@@ -1,118 +1,82 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA092580F2
-	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 01:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7363BFAD9
+	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 02:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789088697; cv=none; b=r/MCxTQ8Vx7sAvN19XpTC6GqySleRoaV+Tlp+0kJWIMR9WMrXpZk3A83egkSCrPQ/h2okiEfjWhGuB934QTC2tfVTSrZuw3nVTof13vEFm93Mna/SqNIEzXFaH5tF7JCtHSwZLt3P1xEBdP8CwJUovYAHY0cLvOht9GaWqAuLog=
+	t=1789092151; cv=none; b=PeHHsqhUqOWI41Q+ICyvd1geMYvS2EmTHpp61Gs+44E8n7kJcINSBOBD0JaPOROe79ZvGom0tIanW329ui3FnSVkL3xCLcvoIH4UQsqeqhpNfqgG7io6gZHm3EDna2wkqmGFtlJYte174foWBpHFrL2FJzT4o6TzQupfYJ7bJXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789088697; c=relaxed/simple;
-	bh=40Lu2wRqdfrtqMAY7zIJIS5t314kE0EHdzhMCpzObd0=;
+	s=arc-20240116; t=1789092151; c=relaxed/simple;
+	bh=6xPsvuCUZiWtDiYwTCJ2adkdAD9amKFNrL2zN0WQE2I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IESrJgxbq6ilXNMnVbF4ML4c+xrh074MUIx+ZWCgzPDjK9za4v1TFtC4XDbNd/p575YLh95oi+0VnhJ33Ic8lJA8c8qGVLJ5IFTRJWdUYpEBOFqN9ZitP8DWh8Gr2E7DQOQdJGdN6lps3CbdNUzffd47dBoeaxToiXaWa6rocaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAxQ5xON; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=Ef0DukLFDm29WOOHSU7tmaLzeV8b6bgmcxk0m6Y4PKqHXyzMr4Xg+BNARUq99oN9iZM1pHTD8Pa2IW9O+6VaFQ+JXY3pPCf/10AzwAL1nGbQE2Q5dR3vMYxTx5l1j47Z1X6A2Oi3Qs1JwMmKhQ64kZlQXH3NpAfWMIgx/biWxZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwpfbZJa; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAxQ5xON"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656A01F00893
-	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 01:04:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwpfbZJa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 768851F00898
+	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 02:02:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789088695;
-	bh=40Lu2wRqdfrtqMAY7zIJIS5t314kE0EHdzhMCpzObd0=;
+	s=k20260515; t=1789092148;
+	bh=6xPsvuCUZiWtDiYwTCJ2adkdAD9amKFNrL2zN0WQE2I=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=VAxQ5xONjv3ztUEcYy7yDo+iCH7TGm6/Xvu0LrQtuaYb7CeWB/ZaVKBp4sXcL/JP5
-	 iLxslT+w0+5W40sGuyoD4sE8JDQk1+2RR6jjmlof2jRtHC46PcrG6StWou+CEujdvx
-	 xVCC6Zsk/VEuZ54ol26x+gV2SpB12M8P0RAXrKcZlfsE2R0BwxW2uO2j3YBQkWl1Lc
-	 e72iYafvmwp7H6rxgVQSVdVrQSX4Jm13Xr+GM7h79uA+4iygAHTFW9/SJ7EJuxDpe8
-	 jyCKP4c18bbESK9RTg36Ej8Yfaw6luiFepIjVa8yBNKqMIhbU2AM/+Ly75SA8huX10
-	 dZu1UMN5E+10w==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c2637dd37c1so57166466b.0
-        for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 18:04:55 -0700 (PDT)
-X-Gm-Message-State: AFuF++lfgoYQQnEpj041jjt9s4qk942Jk6gho10aZcfHX1kOWUxooePL
-	QqTW71/1g5mwXfu/brk0cH9hv6G5XfXgBgRFqY4PNMVXz70+dGnVQOVGp53wQHVXHVlEEfeTddF
-	1ST2pY/q7RY2Lqbva3+P4M/wsXaGJCVA=
-X-Received: by 2002:a17:907:961a:b0:c28:ec7c:27ae with SMTP id
- a640c23a62f3a-c29666bfe90mr53903566b.25.1789088694040; Thu, 10 Sep 2026
- 18:04:54 -0700 (PDT)
+	b=KwpfbZJaSF0O1LfAuHE5wIn3l8V8cwFMMW0Nb+i22EA+WmNmywvHE6TuxXlKoHfuD
+	 uv6MMg+iPDFyQrsp3WkvJ+Busbm7mhUZ9JP+qaTFViYi/2UgaZLR2R9J0G2THChxA8
+	 jJCpvBGH+8GVMCh7Z0B69Yv1RIyzTqASfVqObep1tfjuylJpU4Lz/CeNobrrj+uo9I
+	 yVpy/izCgTsJ7FdKiFRiM2Gw92jDkV2uQnBYqrfqBuiDfpyq1ehQ2/SZfHmsui4yjw
+	 NZNhuGXB+pnvnG/hp8kC0wNp5ezJ8BsFvZu593HINsYsae5jwpnRphq7im+bV5l75g
+	 C9czlR8S4D+fQ==
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a60591bb18so262452a12.1
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 19:02:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxac3L2ckz76wJFfj1qkJ5k4Krr7yUoInzUFY6I9zHOKYMspcKQ5x7e3fXyNbCtZVNujTBtPdfD64+R@vger.kernel.org
+X-Gm-Message-State: AFuF++kllhuiqBtKq3o+DroTfWVQy44CIQ03/+Ik1+K1AfYOEbWmc/5C
+	ZpKNS1+Fc0tXCOB7m9M/Bxyq8rIIIBHsEH71a/FRmJlaTfZoYAWHOuc5Mz0qqPONc5deLZsgyYh
+	o5jP1Z6JIpjVrDSyxNUsdpvFbRP0xKb4=
+X-Received: by 2002:a05:6402:4028:b0:6a9:a088:6788 with SMTP id
+ 4fb4d7f45d1cf-6a9b50a3072mr884028a12.14.1789092147099; Thu, 10 Sep 2026
+ 19:02:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260910051649.3806214-1-april.cardenas@canonical.com>
-In-Reply-To: <20260910051649.3806214-1-april.cardenas@canonical.com>
+References: <20260910183742.4029092-2-Jeremy.Jean@oss.cyber.gouv.fr>
+In-Reply-To: <20260910183742.4029092-2-Jeremy.Jean@oss.cyber.gouv.fr>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 11 Sep 2026 10:04:41 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd829H6zq5g+n6Ue40cW96PfFaPu3kAXe+i5WZhp6E9u=w@mail.gmail.com>
-X-Gm-Features: AcwNN1XpUYrtKTZJ2AXoyTyNrttIcCISwwbTIIFxmObetxMzLHFFFo8SvJuZfwM
-Message-ID: <CAKYAXd829H6zq5g+n6Ue40cW96PfFaPu3kAXe+i5WZhp6E9u=w@mail.gmail.com>
-Subject: Re: [PATCH] smb/client: send lease break ACKs thru correct session
- for multiuser mounts
-To: April Cardenas <april.cardenas@canonical.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+Date: Fri, 11 Sep 2026 11:02:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9zfsscZ8xaPwdZSbtgfZiMaOi8zH2+c98Yh2oKBc89-w@mail.gmail.com>
+X-Gm-Features: AcwNN1XSWOXYM1Ndvz_QLB9icX217ocCOqcN2MvHx90cXrUPU7WMZq-cvovuqio
+Message-ID: <CAKYAXd9zfsscZ8xaPwdZSbtgfZiMaOi8zH2+c98Yh2oKBc89-w@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: validate absolute native symlink targets
+ before NT fixups
+To: =?UTF-8?B?SsOpcsOpbXkgSmVhbg==?= <Jeremy.Jean@oss.cyber.gouv.fr>
+Cc: Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 10, 2026 at 2:17=E2=80=AFPM April Cardenas
-<april.cardenas@canonical.com> wrote:
+On Fri, Sep 11, 2026 at 3:41=E2=80=AFAM J=C3=A9r=C3=A9my Jean
+<Jeremy.Jean@oss.cyber.gouv.fr> wrote:
 >
-> Currently, when cifs_oplock_break handles a break request from the server
-> it searches for the appropriate tlink to handle the request
-> but incorrectly uses the current fsuid as the search key, eventually
-> causing read errors for users with multiuser mounts on NetApp.
-> Fix this by using the tlink from the cfile struct instead to respond
-> through the correct session.
+> With symlinkroot unset, an absolute target is copied without conversion
+> to an NT drive path. Later code still assumes an NT prefix is present
+> when modifying the target and calculating the print name length.
 >
-> As breaks are handled in a worker thread, the current fsuid
-> isn't guaranteed to match the session that the break is intended for.
-> This means that cifs_sb_tlink may search the rbtree using the wrong fsuid=
-,
-> and return a tlink with an incorrect session than
-> the lease break was intended for. As a result, the breaks
-> may be ACKed through an incorrect session.
+> For "/ab", this causes two failures: sym[5] and path[5] are written
+> past their allocations, and plen -=3D 2 * poff subtracts an assumed
+> 8-byte prefix from a 6-byte UTF-16 target, wrapping u16 plen to 65534.
+> That underflow causes another overflow: memcpy() copies 65534 bytes
+> into a 24-byte buffer. A user with write access to a mounted share
+> can trigger these bugs with default settings.
 >
-> While it seems that Samba/Windows Servers 2016-2025 ignore this as long a=
-s
-> the lease key is correct, we ran into a case where if you're using
-> NetApp ONTAP or Azure NetApp Files they will reject the ACK
-> and return `STATUS_LOCK_NOT_GRANTED` errors on any future read requests
-> a user may initiate through their still held open file handle,
-> and the server will eventually close the file.
+> Validate the NT drive prefix, including an ASCII drive letter, before
+> accessing fixed offsets or subtracting the prefix length.
 >
-> In the dmesg logs, the user may see errors like these:
->
-> CIFS: Status code returned 0xc0000128 STATUS_FILE_CLOSED
-> CIFS: VFS: Send error in read =3D -9
->
-> With a multiuser mount using NetApp, this issue is really easy
-> for users to hit on a wide variety of kernel versions
-> by attempting to copy a file from the share
-> to the local machine through GNOME Files/Nautilus.
-> This copy will always result in Nautilus throwing
-> a `Bad File Descriptor` error to the user and fail.
-> With this fix, you can copy files through Nautilus without issue.
->
-> From looking at the traces, it seems that glib will
-> open the file first, and call listxattr before actually attempting
-> to copy the file data. The listxattr call always triggers a break,
-> causing the copy to fail.
->
-> The proposed fix returns to the way the client grabbed the tlink before
-> commit e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break").
->
-> The bulk of that commit (checking for list empty) remains untouched, and
-> I think the change to using cifs_sb_tlink was intended to avoid a
-> NULL/ERR deference on the tlink as well as update the reference count.
->
-> I believe this fix should preserve those safety properties, but of course
-> I'd appreciate any corrections here.
->
-> Fixes: e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: April Cardenas <april.cardenas@canonical.com>
+> Fixes: 3363da82e02f ("smb: client: fix native SMB symlink traversal")
+> Assisted-by: Codex:gpt-5
+> Signed-off-by: J=C3=A9r=C3=A9my Jean <Jeremy.Jean@oss.cyber.gouv.fr>
 Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
 Thanks.
