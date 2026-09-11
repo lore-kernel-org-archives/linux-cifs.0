@@ -1,138 +1,94 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA0459E35D;
-	Fri, 11 Sep 2026 20:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB75921F5;
+	Fri, 11 Sep 2026 20:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789158113; cv=none; b=VtyMnC5xDEb39UrZawTfV5AO5HBQrfmeOULD5kEtQ9oLhceoHRwc6XRKbx7ZpgVyUatnGy3di9CF3clGcKcv9fNQP6vV/wLYjt1FqS5QC7tqoIU4B2KTa1FNo46QzMOs+CQ23WeGDPw1THmb/H4z8bidQ2jt/8c0wBF+dub5DR8=
+	t=1789159490; cv=none; b=EuercaJdS7MFGpvQwead+3/U/aAsJDBDAyA6P1DLESRUMcLJDXaBH22KzHftn2rBylEDiuNhoBx6b+CUUlGcTEcVzqeGPx1W2ezj6z3UX6bKBQpyRRu4/2rpF9OBPCPPziGFr/DsboDQ3Xzr+U5xwyB4Tx2YQcwnfQhtRYAkHJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789158113; c=relaxed/simple;
-	bh=Gda/p45mn0eDZ98/49FQRJN55Cd0HHPAXWHYrDruXPk=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=eV+G2U8O9/uQXeKW8gVCKQlSXZCiC57rtpQ4zwwLy4Lnxpv1dtC8xnGa8Ecepy5rkLhXbGZXLsq7Y+R/w3LXP7qsVD6H3+udUsviAOYUY7M637wL1aWwWXxCmy+MdGqAcQ0/1SJPirdQi9ffUx7OGpARD13XrvVHX2lppZ0vfag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Ul0TTLRS; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1789159490; c=relaxed/simple;
+	bh=B0QlJJgpQrvNki3VWTTWXX6ET3zEvsgeG+tLBbS2U2E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HtrzCmHxqQNSUxyFGyf1jZBngFYm0RMJ02MA/aW8Vj6vlG5JHzRnNXL0uOI8IzBGgujcPB4Vp1InD3AgdqqmX2f40XwlOFITNpbrltF8wsdVzysP8qB5R3rALSAGYYMhpjOVBSFZlpmDmzBlZYqIpO0JidFf1Wpx2ao5uNHlNBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=DStkJLif; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Ul0TTLRS"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="DStkJLif"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=tdC+eeHQ2/y5B3/a3WDCCd1iGftUlGNNEOZKxfjw6Y8=; b=Ul0TTLRSppbnaeKmw4fCK2ft1x
-	F34mxzOMJUI0cVF9k/fXLnBWQgRO3UeJzWuhRYtK1KaZ8BnrVVFf6IZ8pWFPGAfyyz3lKhFN1UBsv
-	AhadtmlzpndrOPRm6lPyp0tyHYNEmMYUcq/tuyKNB5uS91toVwMIoiqZKtDHBnxt3vSHyfL0K+PCw
-	+SjgtXfNotNqhkNOwgjOzxOPKMftYOcwjSPDk3IaYWoAKYXMQXM9OA8ZrYyfpk6n1C6EwR3TZ6QKM
-	scYOL0wrM48BLSc4OLEb6vcHRx6dsk0wX5A40eNqhsDsU/oDu3KS8Ihsemii5xwg19/ZlnAwO9sdP
-	xO+iBfJA==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=OlE3EEI1PNpe4LteSgyHnUlkBf/IsEW3LTNzrM3ENzQ=; b=DStkJLifbfJSATHjYXYgB9IgPg
+	+cby3zi1/PiyJXrdgV5RbNHtIoQLtku2MYts6sLfDf9STAOq1ynZCXcZANoFIKSTmtwpwVwEq/C6+
+	FODDzWnCx7BeuEmBaevwdRRhlp45HCwHLJUX8UmKe5bjE1erE/2yTgG7AYO4xbRSxdfvpFJGdw2Bl
+	KauUdUdGaZuZLAPxRZ9P4SGn9d/waGAyY60bv8RFkz3oUfOv6nlZlgvoXYzzyQB4fUrK8pgAxhuve
+	/rJHtiQMADqqPfsScfNiuBKMoYRpaOxY22dgx5LkxDKnftMLlxV/HNsZr4yEIizzv47wx+/RlS5Eb
+	WuB9AC2Q==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x57kh-00000001Exp-194l;
-	Fri, 11 Sep 2026 17:21:39 -0300
-Message-ID: <920f0b50480231f1af8a9c8e7f118f5c@manguebit.org>
+	id 1x5874-00000001F3p-2WSF;
+	Fri, 11 Sep 2026 17:44:46 -0300
 From: Paulo Alcantara <pc@manguebit.org>
-To: David Howells <dhowells@redhat.com>, Christian Brauner
- <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>, Matthew Wilcox
- <willy@infradead.org>, Namjae Jeon <linkinjeon@kernel.org>, Marc Dionne
- <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, Eric Van
- Hensbergen <ericvh@kernel.org>, Dominique Martinet
- <asmadeus@codewreck.org>, Ilya Dryomov <idryomov@gmail.com>,
- netfs@lists.linux.dev, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 5/5] cachefiles: Preset the state xattr when
- creating a new file
-In-Reply-To: <20260910220242.2165023-6-dhowells@redhat.com>
-References: <20260910220242.2165023-1-dhowells@redhat.com>
- <20260910220242.2165023-6-dhowells@redhat.com>
-Date: Fri, 11 Sep 2026 17:21:38 -0300
+To: linux-cifs@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: fix rlist race and missing initialization
+Date: Fri, 11 Sep 2026 17:44:46 -0300
+Message-ID: <20260911204446.1719356-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-David Howells <dhowells@redhat.com> writes:
+TCP_Server_Info.rlist is allocated via kzalloc which zeros both ->next
+and ->prev to NULL instead of pointing to itself, making list_empty()
+always return false and list_add() dereference a NULL ->prev pointer.
 
-> With a really small cache, cachefiles is likely to see a lot of writes
-> hitting ENOSPC - and this can include setxattr that sets the state xattr on
-> a cachefile - but we don't really want to successfully fill a cache file
-> only to have to scrap it because we can't set the xattr.
->
-> Instead, preset the xattr when we create the tmpfile we're going to use,
-> and scrap the file at that point if we get ENOSPC.  Only if setxattr
-> succeeds do we allow data to be written to the file.
->
-> Note that there is a potential performance loss in that writes to the cache
-> have to be delayed until this is completed - but we do the tmpfile/setxattr
-> in parallel, starting when the file is opened and only have to wait once
-> writeback occurs.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Marc Dionne <marc.dionne@auristor.com>
-> cc: Paulo Alcantara <pc@manguebit.org>
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> ---
->  fs/cachefiles/internal.h |  1 +
->  fs/cachefiles/namei.c    |  5 ++++
->  fs/cachefiles/xattr.c    | 59 +++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 64 insertions(+), 1 deletion(-)
->
-> diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-> index b2605111fd56..664be64ab538 100644
-> --- a/fs/cachefiles/internal.h
-> +++ b/fs/cachefiles/internal.h
-> @@ -283,6 +283,7 @@ void cachefiles_withdraw_volume(struct cachefiles_volume *volume);
->  /*
->   * xattr.c
->   */
-> +int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file);
->  extern int cachefiles_set_object_xattr(struct cachefiles_object *object);
->  extern int cachefiles_check_auxdata(struct cachefiles_object *object,
->  				    struct file *file);
-> diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-> index ca093840e577..ef656a319ede 100644
-> --- a/fs/cachefiles/namei.c
-> +++ b/fs/cachefiles/namei.c
-> @@ -450,6 +450,11 @@ struct file *cachefiles_create_tmpfile(struct cachefiles_object *object)
->  		pr_notice("Cache does not support read_iter and write_iter\n");
->  		goto err_unuse;
->  	}
-> +
-> +	/* Preallocate space for the xattr. */
-> +	ret = cachefiles_preset_object_xattr(object, file);
-> +	if (ret < 0)
-> +		goto err_unuse;
->  out:
->  	cachefiles_end_secure(cache, saved_cred);
->  	object->content_info = CACHEFILES_CONTENT_ALL;
-> diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
-> index 551a3b0069c2..8ebb713482e3 100644
-> --- a/fs/cachefiles/xattr.c
-> +++ b/fs/cachefiles/xattr.c
-> @@ -34,6 +34,57 @@ struct cachefiles_vol_xattr {
->  	__u8	data[];		/* netfs volume coherency data */
->  } __packed;
->  
-> +/*
-> + * Preset the state xattr on a cache file to allocate space for it.
-> + */
-> +int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file)
-> +{
-> +	struct cachefiles_xattr *buf;
-> +	struct dentry *dentry = file->f_path.dentry;
-> +	unsigned int len = object->cookie->aux_len;
-> +	int ret;
-> +
-> +	buf = kzalloc(sizeof(struct cachefiles_xattr) + min(len, sizeof(__be64)), GFP_KERNEL);
+Also, cifs_signal_cifsd_for_reconnect() can be called concurrently
+from multiple cifsd threads, allowing the same server's rlist node to
+be added twice into the local list, corrupting it.
 
-You should use max() here.
+Fixes: df0e03a4fb94 ("smb: client: fix potential deadlock when reconnecting channels")
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Bharath SM <bharathsm@microsoft.com>
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/connect.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Otherwise looks good,
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index b6e98eb31673..bb256b60aa5d 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -174,6 +174,8 @@ cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
+ 				nserver = ses->chans[i].server;
+ 				if (!nserver)
+ 					continue;
++				if (!list_empty(&nserver->rlist))
++					continue;
+ 				nserver->srv_count++;
+ 				list_add(&nserver->rlist, &reco);
+ 			}
+@@ -1823,6 +1825,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 	spin_lock_init(&tcp_ses->mid_counter_lock);
+ 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
+ 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
++	INIT_LIST_HEAD(&tcp_ses->rlist);
+ 	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
+ 	INIT_DELAYED_WORK(&tcp_ses->reconnect, smb2_reconnect_server);
+ 	mutex_init(&tcp_ses->reconnect_mutex);
+-- 
+2.55.0
 
-Reviewed-by: Paulo Alcantara <pc@manguebit.org>
