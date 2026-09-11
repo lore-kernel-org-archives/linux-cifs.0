@@ -1,178 +1,137 @@
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463B13CAA50
-	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 12:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.172
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789129941; cv=pass; b=ietSLJ26yDEzNmmgW5wpgiZuhVBzdTqKb6e3dZW4TQvBQXnwd9kIakVyf5FzgUpc4Bzn4qXQMA77C40vP/ZUxx0bmedafZnQLnUyIypG/3JHfYj6206gR6uedsX1ae18XkUBOOtq0ztyGudP6/a+X525kyaZQWFTIn11D1sEkr8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789129941; c=relaxed/simple;
-	bh=GfGY13tQsBIBtgNZNUsiTH0qNAGdLQBQm0DmdUH5d+A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uvcBIoT9M1tHsdVZ7quutjf1oeJO+ZkciWvd5nGBfBjpWsUhDx85wS/jceACgiF0kOfFhBclgJR1yH3/Iz1/SQPthKgI5zcpC2JAYl9tVwQ3skiMn3e4uj1eVIE4sV8plOemEOQ6UqG1vVyC7jqB9qDz+vP+JEs+SSKiPxwLZeE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GDXP98Tj; arc=pass smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE68191F93
+	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 14:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789138724; cv=none; b=UYn75W2etqHwOXlZTEVPBvM+J494pxA1raiSylWNhi3/b7rygUKuVVKPyScebly2xrVOKx+T3G34ZYw0pHswZrQpo3qrbnCTS7f7grHr41rL1039bcF8u4zdvh2IXHZDEq8VpDSIY8eAILxCj+c/8UvEoQ5VOBYl5yz12cl+ndg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789138724; c=relaxed/simple;
+	bh=zIF97xRDmxkrD7RZY7qKo2721jxUukhbQbBdSokpQrQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dqKVqo9OYK0IH+t8lAbjG28C9poHHfpB+4sbZLj1is3zGwInIguIhzRip5761slQyyghRQ5gvbkxUHa2BHffJhC26gtqRIATUOBE1caie/LRJB2P5ka1KTeR2XhAegvjBAI9AslhZ4ZTdHVTOvQPiRvsRuQjp8JKA1iFCXRHATQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io; spf=pass smtp.mailfrom=bynar.io; dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b=K4hhc/jD; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bynar.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bynar.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GDXP98Tj"
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-86c0e4dd49cso7502977b3.3
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 05:32:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789129923; cv=none;
-        d=google.com; s=arc-20260327;
-        b=mwkSFIYbDs+uGabjPYZ8QdDVIDbh8bR/yWuSgZnlvXPvgHo6e8W5bHhNZBeiwH6/3/
-         rhW9eGhwrPj4tsDi+jWSxOrqd6d7tfwJgJ6hCGRkKNAg7+Ixk6DkBbYrkYXEcImHOXxa
-         n/bkj1TT/tGgASUVPyiS6U7sgKhuViBOLKo3JFEeqBj3jGLXzoMHRaHTvsBSVTAfHMgs
-         qQbGGF5Yt/IDJ2LE0TbwNJr2vg/VoWbEYrGAiukicHpkGxtwd7f5774RWsZ736rGmE6e
-         8DgKyIb6i5/cJ1Wi0H45xnDN0OqlNVRaK0POC/Ag8nIn7jRFr9fWr9fC4rOtEc0PwenV
-         MgGw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=caD0AN8MUeIKYzz7vLP38Y8N+w2mnj0GbXgaghHlPqA=;
-        fh=xhq3gBIfMpqLiGKjYG4p3G+zAer86O10T8tkghm1jas=;
-        b=pyW8pwpm+RIR0/VgT5BnZZn1vElfKNBHp9D8QKB6IVY1qGkpar38sKic3aThan7YKp
-         RmF3oKTHQXwMopv3GVZlgl9ulC8e5/nkEDDL2Dw2hnNZa1GILj6ke1jKKP6p35RqglYW
-         L4vdXCHY/xzQ3/91QOnVvF7D9JxcCee/g294PLNO//djtW4mMq9dl2fY6MZzEAa9mU2D
-         EWtXly6SNiyVrVsWHs8YOK7vI++KnZqezuMH1twFoCi+x6nnShecfogeLV0/7hE306Uu
-         0nSYFeNN05dgQDQ6Zn6fsvMgWbnY/xm+6XEu/Nc23xJmUUsHco2itWDqrK8ZnT7iloPN
-         VwOg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=bynar.io header.i=@bynar.io header.b="K4hhc/jD"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-49e651e83dfso5773655e9.0
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 07:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789129923; x=1789734723; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=caD0AN8MUeIKYzz7vLP38Y8N+w2mnj0GbXgaghHlPqA=;
-        b=GDXP98TjbTn7dENk33rIPd0Ksa4F7AqCVKcln4PHWCVvu879DL88cLai6ObgxzmMAh
-         TkdvpcbJFO8zkdQJkS+Gu4GTALJFYfGCNFfg5fLsBiSufeWjgxnXJ776BbQOgihAjJ29
-         4oFe2Ft+sy1SzkwQ7kBKDD0wbIYqLSVJRW47OtOz3ejBZ4wF4nacIAmlTyXcSnTDnXSb
-         BfxI//fsRzBmFIUt5uWD/ktmd530t6ZNMchhNjN0DY7tSnjlevGO2+J+hXPQu6c5ij7X
-         4kW8+ANcv/5rm7RVciGrVvcfD4VJObQn33JSlBK9WgtEGfJ8axi3H3YV31M2tBPTppvJ
-         z8Rg==
+        d=bynar.io; s=google; t=1789138718; x=1789743518; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/Tb7W5kgVkqc6kpeWvHH9IYSVovfvNchO4WGzcDWuCo=;
+        b=K4hhc/jDzZIO5QyGsO9brAwG+QgEI/tlq2jcQLnZXorv1DXZoWpkoDzoQMmYgi6jom
+         mlvvb/eaFX1qSoqxlxwiW1ecJkiGvTGspIwO6RhywsKZyNZB7HVl/15aatuLhW4foR/2
+         UdRkqwJVemLnybuzsG9+cAquLiaSeFuyDQvRmCxWr42LIE1mYsawdi0DfQksAb1sf0if
+         ly904pnQUjw/4aeM2FI/6qmnokXtJ5bN+XxtH0qApw/LqI+0Cc2V6A102rNLTC2P8tHD
+         RPTBJ/BFSskf3KptmxdY21b5eFW1Kzj79aFZWAXeVAQ7Rq3Zo5tyKH5XSvryqrbuMiAx
+         U2jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789129923; x=1789734723;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=caD0AN8MUeIKYzz7vLP38Y8N+w2mnj0GbXgaghHlPqA=;
-        b=izgLmxQVkQqnWzbXllXh2TPMjyNkaKLboIwUpJ/VXphKyDWUhlgdCicohaMKnbjJa2
-         frHj+n1fsS9BDhYN/n2n2PGph6H/rnA5OaTcipDnGgxJow97jXW5Gcaqd3q8Bf2ql6Mv
-         rPipFJC5Bp6tb8ymR+x7oI623q+jbriOetNvbP06q0D09XklLf1eKWmUQVkQNvFFLoAX
-         zVwwM7rgrZ24fCAZa1bAh9XakFkLpx6CpduXjG/P3KdUFGpWuDUC1UuHDBN4b5ePf8O8
-         m3+PMyof3tnlXhYEnWo0tDp+g3iC69Hs7kvNAzxEuDdoa5Z17MN9srGqEn4ceVPTsAz7
-         rhaw==
-X-Gm-Message-State: AFuF++lxDe5Btv1ASemmbfI6QEh0yP4o23TCl/si6qyosNGWuhFxraxg
-	sdBGNqjYJhgLVFXYveJIIkZ0enubZNbsx8yB/njDEHwGWrn1ngroYvYCJTGsCyYmckJxs+RXp/P
-	khYlnlCVxUukVJGRT0mhLN0eRGn116cU=
-X-Gm-Gg: AYBFou3Eon+GJBPwnz4ceJPVmAUsStN84mw5U6/vwvH4clDObEGUiWRYBAwpwwolZTT
-	qlBKiGnb5QyhPjET0sDFnj1mEtKRT0xyhe4O6HjN+E4u5YlHxt6Ate80nWKocxVFqwrivs4U/yE
-	V6ZlLYacZJa7ZKapqAnFt9LVQDDQjgotTSfpL6X+/rXJYFaoQO7RkkWvFxRxTs11oajOk/SyZzk
-	hTSVBhLanpS2iEvHO4eOrvKMhrr2t4K3GLeEEVPQfeqXV+6BdrUV/Zw4qU8SrXAnWI+PZn/Qi5h
-	8YRAulNZMvcZo7decq5ViGHuS4ojs6IoEc+ObOGj1A4n3FVijWcM
-X-Received: by 2002:a05:690e:4547:10b0:671:23de:14d9 with SMTP id
- 956f58d0204a3-67124574c68mr1013303d50.31.1789129923374; Fri, 11 Sep 2026
- 05:32:03 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1789138718; x=1789743518;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/Tb7W5kgVkqc6kpeWvHH9IYSVovfvNchO4WGzcDWuCo=;
+        b=QOcGMY8zMOHN615HglqjKXRy+IuyNDq8oeJvmCA6DaH0oU9jkSsRH0OtO9VGFE0RaS
+         72c3Y98uohCFhW0lE/TkSfvhCghsbjkOmq5876Ct4uuwWaWw8wjQa1T38WQkc9jVSH+E
+         lkfTMmpiUuKZXizxFin2dZ5BebLD5ACeN1nVB3h+JX1f+66Do0qBX1UE73ln+3PD6LSi
+         kq4Qas9UyPijyJHnP3nKQWZ/3cuwIBa/8rI4pCRb8gezsRUZFRy0HwHpsUkYDBx6K/fa
+         oX4TajtORkrgmJnq3ruuQHEyStcOOVyPhnwL51h5BOHTuWJihtBch9MQ/8MmLRF27Xfx
+         AJaw==
+X-Forwarded-Encrypted: i=1; AKwUvBw3kvPDnPMEmi9IvcxMUC/aAdZ8aA8aCI7NS9B2UjiNswPz9K7LeYduu25El/k7OK/BVmqvx2V/40qI@vger.kernel.org
+X-Gm-Message-State: AFuF++nJ0ifyLe75l0grixsEqEjNB71QNr4P5yKfM22eCJeaXxWhLXlV
+	WW3j8W0GEyHQNtD4EYUD/V45qYQQSH7YYMDPrCrG1KG13tiJtfKxSOIEFQ6Lw1+GcKbMaCtrMz3
+	d94gCGRFT1ko=
+X-Gm-Gg: AYBFou10o6NwO9lQe5sa4Q9yyv7xHkcklg2up/MtF2uOPFPgbNckOemhcn5WriJqGal
+	LOUAmiaSvJDtBlP/FGeb4CZSCwLv1XMZ92DMvjt3cdje7FCTeOEt4AGKwGe0AE3taaWSpGt9/iV
+	iwALtBBBWjGxwNN5kynGSuI+66rub80PCkAEOAueaxSCdw/voZzQeIP18xt96toLpux7gcPikQN
+	n98VJ3sqmFm0qF2rij7MheiMqF2i/fqbnT6wFgaGEdFSMMtla40rb35w4BNTTL9EpUFe8vxHT35
+	wsuj0lbQcTMp0OWiyqVv+KmmwrMnT0DwEY3mHdjHtsBp0AO+sERqo6sXVtI6HDTPKM04I1NL6mC
+	TaKRicvOf0NrIlONIBQCH+ehkERqJQB+UygW1iFAINPYaXDGeq5aH7GwrUBf/XSiVSPOsVQqh0/
+	IiZZu3P7cVIV9WuggifjJ5xG+DLcJsdDmNks89lVmDmEqOdpCXqnmssEWshd9XJWbPAmtp+1xUq
+	WkOU0PprwXPEd/sxykC7XrIQsmahZ83qja12Yg=
+X-Received: by 2002:a05:600c:1d08:b0:49b:8f18:714a with SMTP id 5b1f17b1804b1-49e619acfe0mr57704205e9.12.1789138718643;
+        Fri, 11 Sep 2026 07:58:38 -0700 (PDT)
+Received: from debian12.ucl.ac.uk (eduroam-int-pat-8-79.ucl.ac.uk. [144.82.8.79])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e61a81943sm50432915e9.1.2026.09.11.07.58.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2026 07:58:37 -0700 (PDT)
+From: Diego Oliva <diego@bynar.io>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	linux-cifs@vger.kernel.org
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	David Howells <dhowells@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] smb: client: validate SMB1 write and query response lengths
+Date: Fri, 11 Sep 2026 15:57:55 +0100
+Message-Id: <20260911145758.3833254-1-diego@bynar.io>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260910051649.3806214-1-april.cardenas@canonical.com>
-In-Reply-To: <20260910051649.3806214-1-april.cardenas@canonical.com>
-From: Bharath SM <bharathsm.hsk@gmail.com>
-Date: Fri, 11 Sep 2026 12:31:52 +0000
-X-Gm-Features: AcwNN1WbsQN-BPoDZ6fJmFMQpIFFBjaprIPiBLElv0YUz9QVJuPOcZeQ_WLxtig
-Message-ID: <CAGypqWxKokujjRHmrJ=iSM4vhqmmTxAPy_GrQQDmeZk271+Rmg@mail.gmail.com>
-Subject: Re: [PATCH] smb/client: send lease break ACKs thru correct session
- for multiuser mounts
-To: April Cardenas <april.cardenas@canonical.com>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, linkinjeon@kernel.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 10, 2026 at 5:17=E2=80=AFAM April Cardenas
-<april.cardenas@canonical.com> wrote:
->
-> Currently, when cifs_oplock_break handles a break request from the server
-> it searches for the appropriate tlink to handle the request
-> but incorrectly uses the current fsuid as the search key, eventually
-> causing read errors for users with multiuser mounts on NetApp.
-> Fix this by using the tlink from the cfile struct instead to respond
-> through the correct session.
->
-> As breaks are handled in a worker thread, the current fsuid
-> isn't guaranteed to match the session that the break is intended for.
-> This means that cifs_sb_tlink may search the rbtree using the wrong fsuid=
-,
-> and return a tlink with an incorrect session than
-> the lease break was intended for. As a result, the breaks
-> may be ACKed through an incorrect session.
->
-> While it seems that Samba/Windows Servers 2016-2025 ignore this as long a=
-s
-> the lease key is correct, we ran into a case where if you're using
-> NetApp ONTAP or Azure NetApp Files they will reject the ACK
-> and return `STATUS_LOCK_NOT_GRANTED` errors on any future read requests
-> a user may initiate through their still held open file handle,
-> and the server will eventually close the file.
->
-> In the dmesg logs, the user may see errors like these:
->
-> CIFS: Status code returned 0xc0000128 STATUS_FILE_CLOSED
-> CIFS: VFS: Send error in read =3D -9
->
-> With a multiuser mount using NetApp, this issue is really easy
-> for users to hit on a wide variety of kernel versions
-> by attempting to copy a file from the share
-> to the local machine through GNOME Files/Nautilus.
-> This copy will always result in Nautilus throwing
-> a `Bad File Descriptor` error to the user and fail.
-> With this fix, you can copy files through Nautilus without issue.
->
-> From looking at the traces, it seems that glib will
-> open the file first, and call listxattr before actually attempting
-> to copy the file data. The listxattr call always triggers a break,
-> causing the copy to fail.
->
-> The proposed fix returns to the way the client grabbed the tlink before
-> commit e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break").
->
-> The bulk of that commit (checking for list empty) remains untouched, and
-> I think the change to using cifs_sb_tlink was intended to avoid a
-> NULL/ERR deference on the tlink as well as update the reference count.
->
-> I believe this fix should preserve those safety properties, but of course
-> I'd appreciate any corrections here.
->
-> Fixes: e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: April Cardenas <april.cardenas@canonical.com>
-> ---
->  fs/smb/client/file.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-> index 1aa4844f8b8a..0d428517f454 100644
-> --- a/fs/smb/client/file.c
-> +++ b/fs/smb/client/file.c
-> @@ -3354,8 +3354,8 @@ void cifs_oplock_break(struct work_struct *work)
->         wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
->                         TASK_UNINTERRUPTIBLE);
->
-> -       tlink =3D cifs_sb_tlink(cifs_sb);
-> -       if (IS_ERR(tlink)) {
-> +       tlink =3D cifs_get_tlink(cfile->tlink);
-> +       if (IS_ERR_OR_NULL(tlink)) {
->                 /* drop the reference taken when the break was queued */
->                 _cifsFileInfo_put(cfile, false /* do not wait for ourself=
- */, false);
->                 goto out;
+Three fixes for SMB1 reply parsers that dereference a response struct
+without first establishing that the response was long enough to hold
+it. They are the same class of defect as the recent "smb: client:
+reject short READ responses in CIFSSMBRead()", generalised to the
+write and legacy query paths.
 
-LGTM. Reviewed-by: Bharath S M <bharathsm@microsoft.com>
+checkSMB() only requires the RFC1002 length to agree with WordCount
+and the byte count; it does not check either against what the command
+in question requires. Every fixed-layout SMB1 response struct is
+therefore unguarded unless its own parser checks: a reply carrying a
+smaller WordCount than the command expects is accepted and handed to
+the parser with rc == 0, and the smallest such reply is 35 bytes, a
+header with WordCount and ByteCount both zero.
+
+Patch 1 adds the missing minimum-length check to the three WRITE_RSP
+parsers, and patch 3 does the same for SMBQueryInformation(). In each
+case the size required is exactly the smallest reply a conforming
+server can send for the word count the response is documented to
+carry, so no legitimate server can be rejected:
+
+  sizeof(WRITE_RSP)              wct = 6    33 + 2*6  + 2 = 47
+  sizeof(QUERY_INFORMATION_RSP)  wct = 10   33 + 2*10 + 2 = 55
+
+where 33 is sizeof(struct smb_hdr) and the trailing 2 is ByteCount.
+
+Patch 2 is a different bug in one of the same parsers.
+cifs_writev_callback() accepts a byte count larger than the length it
+asked to write - the existing OS/2 workaround only masks off the high
+16 bits - and hands it to netfs, which answers with a WARN() from
+netfs_write_subrequest_terminated(). Before netfs clamps the value,
+cifs_write_subrequest_terminated() has already used it to grow the
+client's idea of the file size. Reject the reply instead.
+
+All three use smb_EIO2(), introduced in v6.19, so they do not apply to
+older stable trees as-is, and substituting plain -EIO is not enough on
+its own: older trees shape struct smb_hdr and struct mid_q_entry
+differently, so both the sizeof() bounds these patches test against and
+the response length patch 1 reads out of the mid need reworking.
+
+Diego Oliva (3):
+  smb: client: reject short WRITE responses in the SMB1 write paths
+  smb: client: reject over-long write counts in cifs_writev_callback()
+  smb: client: reject short responses in SMBQueryInformation()
+
+ fs/smb/client/cifssmb.c | 36 ++++++++++++++++++++++++++++++++++++
+ fs/smb/client/trace.h   |  3 +++
+ 2 files changed, 39 insertions(+)
+
+
+base-commit: 0a96d0d726cd380423ac38e2c28f538db2940a1d
+-- 
+2.39.5
+
