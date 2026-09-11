@@ -1,44 +1,102 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7459F4A5C22
-	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 16:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7712A36196E
+	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 17:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789144625; cv=none; b=AWwtPhBEVxZ06bNwzrx+Mk9ZVgHIzuvFBcdACt9Glnt5uPv+qqQPkLmSzlawiSD7tU0jDq2mYORNdqKlzplMnb1m0FJ9EPMGQ/xRPYuVBKDZEU9CVAcXwLdqwCou0ng2zCDQziT9xQylSdvDLSrZS0ORhGTO/5fe8+SnRGtOCE4=
+	t=1789146384; cv=none; b=uKgQokT/m9Mw+jM6siX9ayRg8q4XqFPRlkCfenBkh1ItszcsTtFqaddiCksB6RzkEP+YmAKZBWjL75DmFopA385I8v3jAkPF1wYxENLn0DrOJ0uyiikkvnM2eJYKCz4g3LicuFOwY5L60P0E0No32tPVd4lWeF2engemE9g1qBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789144625; c=relaxed/simple;
-	bh=uabykUrq5mWvHqjtaPI1rja+RFyS1MsbFPJX5BlQzxA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=h3S5dW3W/I3pNPy8rSYm+HfvyH4Fy3UeaAiYewb2lVdEugDqoQVzVq6rlpYiy6X9xwWt5McGC3nYHPubwsJcdYpvoaNA5zPOtrcQE7rWJPc9i+Nf/sCtPbHvMA0CqoT9Yo08R8FzQHZYOjs4R0NX3c2Qlh6u+BQ5XhFojmmOgKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=WwbjL/Yc; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1789146384; c=relaxed/simple;
+	bh=+R3ivebSuZpuL4FG2TRYxlXWK7mPI4IWQ3Tpoi4odgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UVclPQ+7TLYRTjdlL17PRFfKwXMEL0axu73EerMzHNLX+NH29zEhcrICEE+g/qxtoab7SgWbNsv4vTHVB/S1RHPEmqAl0D6O/3I4UpEHXe4KsaEBrnjzyFLhjUY0lmD162kylHOF/+D9wQFKITEvIqW1o9Jqjq9SN3Su0r0b3c0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fcm4wEHb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nCafHl5d; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="WwbjL/Yc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=0m
-	pt+pwzBw0cFGV0f1Vr8cVMgJkFp5gL2+eoYj2GfGg=; b=WwbjL/YcvJGn+2XiUO
-	hjNj+/Ld/Don3ej9Y4cE9F2wxCCCVzhGYseDF3Nd4xavn2I1h5QyiiviL5+UrITq
-	QzgSZRC4KIpcw8SicD2Zuc/Zi4bcYeIXYgquvOEYLp9JsAV0ii4G92GzWfGFWWXP
-	TRN5pvsFGSiR3fGtB6HS58oOk=
-Received: from hh.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgDnmY37LaRqM4PiOg--.53919S6;
-	Sat, 12 Sep 2026 00:36:14 +0800 (CST)
-From: huhai <15815827059@163.com>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fcm4wEHb";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nCafHl5d"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789146378;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8gSh+I98IpYLSh7UCgpWIS2EiiNfz/lZyRXhuHswHY4=;
+	b=fcm4wEHb8ABxN+rvpTSeI+eSRfpEASCrXlra5wDgTHEnPOHe1w1ppdb8MPxybWSIDnwe+J
+	O19PwkztDr1wiFKUDunPMQvA4wxekuH4GVKkx/1eruVhKfgroL1wfATvBXmklaAXK8eIik
+	ypSURLwQSwjQKlfK+HZY5sX8vrLV/YU=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-199-GVAi-gZ0M4Sljl0Orveimw-1; Fri, 11 Sep 2026 13:06:17 -0400
+X-MC-Unique: GVAi-gZ0M4Sljl0Orveimw-1
+X-Mimecast-MFC-AGG-ID: GVAi-gZ0M4Sljl0Orveimw_1789146376
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-7f4e0b45e4bso1348895a34.2
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 10:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1789146376; x=1789751176; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=8gSh+I98IpYLSh7UCgpWIS2EiiNfz/lZyRXhuHswHY4=;
+        b=nCafHl5dxH/Vue/i1CDhYJ6MyiCWOSDH//snVCNfdEUYEbG54OayOcd+EbU2YPxAZW
+         qj52WocQmfQF4XyMDzhS2+xm/9mspkAgKMoGYOzpG0q1bnAKZuZH4QfY0s7GfRgmqaMu
+         TnOzho4qqko3WTI4PaBtSmLR8r68R0CZ0R2VRsTCJbVVrGuFtRRaBWx5fklHDQ1QjSbw
+         8arWN/zO4fxA4YbKY5x/Ia4WAAlROuAS2WlB10fBcWGBUtYD1GD4pplaEN76/kfAOdhB
+         UGzBHtQaWiM501cmFchp2tvBMgMPuqp1SJvyvWj6Czhf6Ib8v9l3Gh74KMzBiMjXWbXs
+         CV1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789146376; x=1789751176;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=8gSh+I98IpYLSh7UCgpWIS2EiiNfz/lZyRXhuHswHY4=;
+        b=MmVvDg1E7IGperHVwvI1kjcdYtH3DvHoLjlFWVL2dYRzMeVCpVJ+POIgpq6KWgvvqK
+         cr2D02g/F5n5f4zIWkusTc40aDi1PtnHSW5IpeJK6sYjHHmJt1aC/VAiCmYWShNtNXz1
+         traUIsMfFgQJNTT+zyUCNmJl4dD6kBbE5vNV26CiQ5kcBuvQNjRyCJi08CfenwD2mIHV
+         c5QDmi/S6OJoNjwkF8jKiMT9D4jE1z4FHWRVr/Mw7KMtGhtX/AZP60XPhwKcf+Amc68g
+         C7wYiGug13cRqpKgp4bfjUSHKE5MRHVxePFYEeJol+QS4eBmw7fCJXZ7TP3zNN00t8m5
+         ZBMQ==
+X-Forwarded-Encrypted: i=1; AKwUvBw1FCJNaeUgHAnz+O0IeL6dRrQ74MTs24YvfVDeORBLSoGVSF0yNYRfVfhSQP7JwXp//79dWgPvS67H@vger.kernel.org
+X-Gm-Message-State: AFuF++nrvBKKouNFNqjwN9qbpUvY7M3PEpzaL4Hs3Gu9/qVRxaXccx0Y
+	UzT1w9U2+EX4JB+ucriKleeWL37D9fbsNcNS3qlvVaO9szAZtC7HZ2RTqbult2Ch1JZNL8FjSyI
+	hzuZTMC6XooDWymYkjGihKau63POoHwEZxKZl+EA0pJ5el9fZapz9gZ/dZPylm+1ndlGddkeoyQ
+	==
+X-Gm-Gg: AYBFou1Ahbp5vgk5nGYIrRlV9enu83aBs7LPyGG4iakAnWBe/4qhxAflHiXXVgUg4Qz
+	T+DMSC1s5kuAVE7XUsm1adEWoFKC4F1H4e+8Mo3Tp3KRlXZSBu+k7tVdKOcJdOiEnkSJ7A/V2zQ
+	8HVR7nNUQF8i8dAhliA3G9DvJZICzsHihXEvvWBoI1/7ZksgwJZclLUxqNssWv+QK4sM1hw6Iwz
+	zr9l0Q3GKOZdEdCjsbQ+m2/hSCRPOoKNUnSjGe64bMlRKmQxI7SjotJrxWVsVrwmr+hL3Wd13dk
+	BuRxFo5qwAdOZcue8OKrsjUtWE2qRuON7eH2Fa8BJGGsyU1MjJTETFl7qoo4x/9phWY/Hn1nIhr
+	9JAfvOxZBPWSLrnvznL6Y5b5OS/3j577xKrv2X5xMzZ5tLHH3aPd8wyiYhaNwKC14Eg==
+X-Received: by 2002:a05:6820:83cb:10b0:6b7:8415:d792 with SMTP id 006d021491bc7-6c0bd588a88mr2861333eaf.61.1789146376319;
+        Fri, 11 Sep 2026 10:06:16 -0700 (PDT)
+X-Received: by 2002:a05:6214:d4f:b0:912:ca8:278b with SMTP id 6a1803df08f44-91211fa9bc3mr66903086d6.0.1789146037347;
+        Fri, 11 Sep 2026 10:00:37 -0700 (PDT)
+Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f4d0700sm25450326d6.38.2026.09.11.10.00.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Sep 2026 10:00:36 -0700 (PDT)
+From: Frank Sorenson <sorenson@redhat.com>
+To: Zihan Xi <zihanx@nebusec.ai>
+Cc: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Pavel Shilovsky <pshilovsky@samba.org>,
+	Aurelien Aptel <aaptel@suse.com>,
 	linux-cifs@vger.kernel.org,
-	Henry Hu <huhai@kylinos.cn>,
-	Sashiko <sashiko-bot+sashiko@kernel.org>
-Subject: [PATCH v2 4/4] ksmbd: report IPv4 and IPv6 addresses independently in iface query
-Date: Sat, 12 Sep 2026 00:35:16 +0800
-Message-Id: <20260911163516.6403-5-15815827059@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260911163516.6403-1-15815827059@163.com>
-References: <20260911163516.6403-1-15815827059@163.com>
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] smb: client: fix create context out-of-bounds reads
+Date: Fri, 11 Sep 2026 12:00:29 -0500
+Message-ID: <20260911170034.1236993-1-sorenson@redhat.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260904140527.62354-1-zihanx@nebusec.ai>
+References: <cover.1788516372.git.zihanx@nebusec.ai> <20260904140527.62354-1-zihanx@nebusec.ai>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -46,216 +104,83 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgDnmY37LaRqM4PiOg--.53919S6
-X-Coremail-Antispam: 1Uf129KBjvJXoW3WF4kJF48Xr4UKr4rAryrWFg_yoWxZrWfpF
-	13AFWDAr4UJw1fWw4kJr17Cw1a9rykKay7CFZ3Cw1Skr4YkryfCrs7try7Za48ArWrZF4F
-	qr4UZFs0ga18CaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jcID7UUUUU=
-X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbC8B5O02qkLf7V-QAA3G
 
-From: Henry Hu <huhai@kylinos.cn>
+On Fri, Sep 04, 2026 at 02:05:17PM +0000, Zihan Xi wrote:
+> smb2_parse_contexts() validates the complete create-context area but does
+> not bound each context record by its Next field before dispatching to a
+> handler.  A malformed chain can therefore expose bytes past one context to
+> the handler.  The QFid handler also used a full response-structure cast even
+> though it only consumes DiskFileId.
 
-fsctl_query_iface_info_ioctl() appends an entry before checking that a
-usable address was found, so it advertises unspecified-address
-placeholders: an entry containing 0.0.0.0 when an in_device exists but
-has no primary IPv4 address, and an entry containing :: when an
-inet6_dev exists but its address list is empty or every address is
-tentative or deprecated.
+Hello,
 
-The loop also couples IPv6 reporting to IPv4 success: when
-__in_dev_get_rtnl() returns NULL it continues to the next interface,
-skipping the IPv6 pass, so an interface without an in_device is dropped
-even if it has a usable IPv6 address.
+I have some thoughts/comments on your series.
 
-Query IPv4 and IPv6 independently and append an entry only when an
-address is found. Factor out the common entry initialization and query
-the link speed once per interface instead of once per address family.
+First, a possible reason for not getting a response on your v2, and
+delayed response on this v3: Steve French passed away in August, so
+mail addressed to him isn't reaching a maintaner, and things may
+have gotten missed during transitions.  You'll want to send future
+versions to Paulo Alcantara <pc@manguebit.org>, with Cc to
+Namjae Jeon <linkinjeon@kernel.org>
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Reported-by: Sashiko <sashiko-bot+sashiko@kernel.org>
-Link: https://sashiko.dev/#/patchset/20260910090818.24479-1-15815827059%40163.com
-Assisted-by: Codex:gpt-5.6-sol
-Signed-off-by: Henry Hu <huhai@kylinos.cn>
----
- fs/smb/server/smb2pdu.c | 127 ++++++++++++++++++++++------------------
- 1 file changed, 70 insertions(+), 57 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ff3a0da7d749..9e1b48ed5bc2 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -10457,6 +10457,27 @@ static __be32 idev_ipv4_address(struct in_device *idev)
- 	return addr;
- }
- 
-+static struct network_interface_info_ioctl_rsp *
-+ksmbd_iface_entry_init(struct smb2_ioctl_rsp *rsp, int nbytes,
-+		       struct net_device *netdev, unsigned long long speed)
-+{
-+	struct network_interface_info_ioctl_rsp *nii_rsp;
-+
-+	nii_rsp = (struct network_interface_info_ioctl_rsp *)&rsp->Buffer[nbytes];
-+	nii_rsp->IfIndex = cpu_to_le32(netdev->ifindex);
-+	nii_rsp->Capability = 0;
-+	if (netdev->real_num_tx_queues > 1)
-+		nii_rsp->Capability |= RSS_CAPABLE;
-+	if (ksmbd_rdma_capable_netdev(netdev))
-+		nii_rsp->Capability |= RDMA_CAPABLE;
-+	nii_rsp->Next = cpu_to_le32(152);
-+	nii_rsp->Reserved = 0;
-+	nii_rsp->LinkSpeed = cpu_to_le64(speed);
-+	memset(nii_rsp->SockAddr_Storage, 0, 128);
-+
-+	return nii_rsp;
-+}
-+
- static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 					struct smb2_ioctl_rsp *rsp,
- 					unsigned int out_buf_len)
-@@ -10471,7 +10492,12 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 
- 	rtnl_lock();
- 	for_each_netdev(&init_net, netdev) {
--		bool ipv4_set = false;
-+		struct inet6_ifaddr *ifa;
-+		struct inet6_dev *idev6;
-+		struct in_device *idev;
-+		struct in6_addr ip6 = { };
-+		bool have_ip6 = false;
-+		__be32 ip4 = 0;
- 
- 		if (netdev->type == ARPHRD_LOOPBACK)
- 			continue;
-@@ -10482,25 +10508,6 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 		flags = netif_get_flags(netdev);
- 		if (!(flags & IFF_RUNNING))
- 			continue;
--ipv6_retry:
--		if (out_buf_len <
--		    nbytes + sizeof(struct network_interface_info_ioctl_rsp)) {
--			rtnl_unlock();
--			return -ENOSPC;
--		}
--
--		nii_rsp = (struct network_interface_info_ioctl_rsp *)
--				&rsp->Buffer[nbytes];
--		nii_rsp->IfIndex = cpu_to_le32(netdev->ifindex);
--
--		nii_rsp->Capability = 0;
--		if (netdev->real_num_tx_queues > 1)
--			nii_rsp->Capability |= RSS_CAPABLE;
--		if (ksmbd_rdma_capable_netdev(netdev))
--			nii_rsp->Capability |= RDMA_CAPABLE;
--
--		nii_rsp->Next = cpu_to_le32(152);
--		nii_rsp->Reserved = 0;
- 
- 		if (!__ethtool_get_link_ksettings(netdev, &cmd) &&
- 		    cmd.base.speed && cmd.base.speed != SPEED_UNKNOWN) {
-@@ -10510,60 +10517,66 @@ static int fsctl_query_iface_info_ioctl(struct ksmbd_conn *conn,
- 				    "speed is unknown, defaulting to 1Gb/sec");
- 			speed = SPEED_1000;
- 		}
--
- 		speed *= 1000000;
--		nii_rsp->LinkSpeed = cpu_to_le64(speed);
- 
--		sockaddr_storage = (struct sockaddr_storage_rsp *)
--					nii_rsp->SockAddr_Storage;
--		memset(sockaddr_storage, 0, 128);
-+		/*
-+		 * Query IPv4 and IPv6 independently; emit an entry only when a
-+		 * usable address exists, so an interface missing one family is
-+		 * still reported for the other and 0.0.0.0 / :: placeholders are
-+		 * never advertised.
-+		 */
-+		idev = __in_dev_get_rtnl(netdev);
-+		if (idev)
-+			ip4 = idev_ipv4_address(idev);
- 
--		if (!ipv4_set) {
--			struct in_device *idev;
-+		idev6 = __in6_dev_get(netdev);
-+		if (idev6) {
-+			rcu_read_lock();
-+			list_for_each_entry_rcu(ifa, &idev6->addr_list, if_list) {
-+				if (ifa->flags & (IFA_F_TENTATIVE | IFA_F_DEPRECATED))
-+					continue;
-+				memcpy(&ip6, ifa->addr.s6_addr, sizeof(ip6));
-+				have_ip6 = true;
-+				break;
-+			}
-+			rcu_read_unlock();
-+		}
- 
-+		if (ip4) {
-+			if (out_buf_len <
-+			    nbytes + sizeof(struct network_interface_info_ioctl_rsp)) {
-+				rtnl_unlock();
-+				return -ENOSPC;
-+			}
-+
-+			nii_rsp = ksmbd_iface_entry_init(rsp, nbytes, netdev, speed);
-+			sockaddr_storage = (struct sockaddr_storage_rsp *)nii_rsp->SockAddr_Storage;
- 			sockaddr_storage->Family = INTERNETWORK;
- 			sockaddr_storage->addr4.Port = 0;
--
--			idev = __in_dev_get_rtnl(netdev);
--			if (!idev)
--				continue;
--			sockaddr_storage->addr4.IPv4Address =
--						idev_ipv4_address(idev);
-+			sockaddr_storage->addr4.IPv4Address = ip4;
- 			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
--			ipv4_set = true;
--			goto ipv6_retry;
--		} else {
--			struct inet6_dev *idev6;
--			struct inet6_ifaddr *ifa;
--			__u8 *ipv6_addr = sockaddr_storage->addr6.IPv6Address;
-+		}
-+
-+		if (have_ip6) {
-+			if (out_buf_len <
-+			    nbytes + sizeof(struct network_interface_info_ioctl_rsp)) {
-+				rtnl_unlock();
-+				return -ENOSPC;
-+			}
- 
-+			nii_rsp = ksmbd_iface_entry_init(rsp, nbytes, netdev, speed);
-+			sockaddr_storage = (struct sockaddr_storage_rsp *)nii_rsp->SockAddr_Storage;
- 			sockaddr_storage->Family = INTERNETWORKV6;
- 			sockaddr_storage->addr6.Port = 0;
- 			sockaddr_storage->addr6.FlowInfo = 0;
--
--			idev6 = __in6_dev_get(netdev);
--			if (!idev6)
--				continue;
--
--			rcu_read_lock();
--			list_for_each_entry_rcu(ifa, &idev6->addr_list, if_list) {
--				if (ifa->flags & (IFA_F_TENTATIVE |
--							IFA_F_DEPRECATED))
--					continue;
--				memcpy(ipv6_addr, ifa->addr.s6_addr, 16);
--				break;
--			}
--			rcu_read_unlock();
-+			memcpy(sockaddr_storage->addr6.IPv6Address, ip6.s6_addr, 16);
- 			sockaddr_storage->addr6.ScopeId = 0;
- 			nbytes += sizeof(struct network_interface_info_ioctl_rsp);
- 		}
- 	}
- 	rtnl_unlock();
- 
--	/*
--	 * nii_rsp may point to an entry not included in nbytes if the IPv4
--	 * or IPv6 device lookup failed. Clear Next in the last returned entry.
--	 */
-+	/* Clear Next of the last committed entry to terminate the list. */
- 	if (nbytes > 0) {
- 		nii_rsp = (struct network_interface_info_ioctl_rsp *)
- 			  &rsp->Buffer[nbytes - sizeof(*nii_rsp)];
--- 
-2.25.1
+I've been carrying an overlapping patch (an earlier posting:
+https://lore.kernel.org/r/20260826153147.4112943-12-sorenson@redhat.com).
+in a bounds-checking series of my own.  Like yours, my patch has
+been addressing the memory safety problem in the three handlers
+which read at fixed offsets, rather than the generic checks.
+
+But I think yours is probably a better fix, and you've got the
+PoC, so if we can perfect yours and get it in, I'll be dropping
+mine in favor of this series.
+
+
+A few points (take with a grain of salt):
+
+1) The lease parser still reads at a fixed offset rather than from
+   DataOffset:
+
+>  		case 4:
+>  			if (!strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4)) {
+> -				*oplock = server->ops->parse_lease_buf(cc, epoch,
+> +				if (cc_len >= smb2_create_lease_min_cc_len(server))
+> +					*oplock = server->ops->parse_lease_buf(cc, epoch,
+>  								       lease_key);
+
+cc_len bounds the record, so the read stays in bounds.  But this is
+just like the QFid bug you just fixed nearby:  smb2_parse_lease_buf()
+and smb3_parse_lease_buf() reach the fields at the canonical offset
+of the create_lease layout, not at DataOffset, so a valid but non-
+canonical DataOffset could get in-bounds garbage rather than an
+OOB.  That's not a security fix, but since LeaseState drives client
+caching decisions, it's probably worth closing.  Reading lcontext
+from DataOffset, as with DiskFileId would make the two handlers
+consistent.
+
+(My version also had this, so it's more an observation than anything
+else)
+
+
+2) You may want to consider matching DataLength exactly, rather than
+   taking a minimum.
+
+ksmbd's parse_lease_state() requires:
+
+	sizeof(struct lease_context_v2) == le32_to_cpu(cc->DataLength)
+
+and validates DataOffset + DataLength against the create_lease_v2
+size, rather than accepting anything at least long enough.  It was
+suggested to me that having the client & server halves agree on
+strictness would be good.
+
+(I did confirm your minimums cover all the fields each of the parsers
+actually touch, so this is about strictness, not a hole)
+
+
+Frank
+--
+Frank Sorenson
+sorenson@redhat.com
+Principal Software Maintenance Engineer, filesystems
+Red Hat
 
