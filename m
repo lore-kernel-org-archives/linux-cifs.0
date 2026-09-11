@@ -1,211 +1,118 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5D442CAFC
-	for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 22:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA092580F2
+	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 01:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789077820; cv=none; b=Myw3I0vq7aMm+z5DmsBbz59lhmlgAp+4YCQxdQoDVqGSF4nFzqO0yA5uC+iU0aORXNz3TD8hiieYG6vU5W+WlAhh41L8Au7iliXWj4K5Owl3PMSn3WcWV6jrsSNfxIZKsiaiO/giEHBHBclIm6xU09BaZsOyMPVmae6M0KL+TVc=
+	t=1789088697; cv=none; b=r/MCxTQ8Vx7sAvN19XpTC6GqySleRoaV+Tlp+0kJWIMR9WMrXpZk3A83egkSCrPQ/h2okiEfjWhGuB934QTC2tfVTSrZuw3nVTof13vEFm93Mna/SqNIEzXFaH5tF7JCtHSwZLt3P1xEBdP8CwJUovYAHY0cLvOht9GaWqAuLog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789077820; c=relaxed/simple;
-	bh=7N71QSfXG/oEAXTPRExhYle1NWxzGUIUZP0hY0cvi58=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k6pnu0kE1IAe0lBIBzCnpozYkYDaPPLUXbqe3YzZJoawetKpo2f/NVOAhWy0u9y32xD3KVQNLBv+iPRYcl/90UP0Ez9PhuJWONo4omlOjVaokZlnHr9NMITHW2j+0Jlb0zbPEuiqQPRpFK8cR05nXrXw7DTlbjuz7dIQdSoKS+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i4YApoDC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1789088697; c=relaxed/simple;
+	bh=40Lu2wRqdfrtqMAY7zIJIS5t314kE0EHdzhMCpzObd0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IESrJgxbq6ilXNMnVbF4ML4c+xrh074MUIx+ZWCgzPDjK9za4v1TFtC4XDbNd/p575YLh95oi+0VnhJ33Ic8lJA8c8qGVLJ5IFTRJWdUYpEBOFqN9ZitP8DWh8Gr2E7DQOQdJGdN6lps3CbdNUzffd47dBoeaxToiXaWa6rocaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAxQ5xON; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4YApoDC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789077817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4HeOV1ic1gSfi0+R6SuHSn3W0D1ksy23qGyWj8cUwq4=;
-	b=i4YApoDCGo/HWDOk7pRB2AaIrOkI0T+uHs970HXuXmHAjG/I7ZpApvvoUL1Bwe9wcVC1GZ
-	/GRMFPinw72/xpLUlU5RrTth/ZDSkG0MsU25Wuv18fObKDyJkQMClX0fz3F8k7QNGL7v9W
-	2KtTaUKqHu2VjgU0BWGnRkVBqvuKbDU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-209-YoGHpsZjN12awYFG8sOJ1Q-1; Thu,
- 10 Sep 2026 18:03:32 -0400
-X-MC-Unique: YoGHpsZjN12awYFG8sOJ1Q-1
-X-Mimecast-MFC-AGG-ID: YoGHpsZjN12awYFG8sOJ1Q_1789077809
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ABD481954B19;
-	Thu, 10 Sep 2026 22:03:29 +0000 (UTC)
-Received: from warthog.com (unknown [10.44.32.54])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EC1DB18004D4;
-	Thu, 10 Sep 2026 22:03:24 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v12 5/5] cachefiles: Preset the state xattr when creating a new file
-Date: Thu, 10 Sep 2026 23:02:40 +0100
-Message-ID: <20260910220242.2165023-6-dhowells@redhat.com>
-In-Reply-To: <20260910220242.2165023-1-dhowells@redhat.com>
-References: <20260910220242.2165023-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAxQ5xON"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656A01F00893
+	for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 01:04:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789088695;
+	bh=40Lu2wRqdfrtqMAY7zIJIS5t314kE0EHdzhMCpzObd0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=VAxQ5xONjv3ztUEcYy7yDo+iCH7TGm6/Xvu0LrQtuaYb7CeWB/ZaVKBp4sXcL/JP5
+	 iLxslT+w0+5W40sGuyoD4sE8JDQk1+2RR6jjmlof2jRtHC46PcrG6StWou+CEujdvx
+	 xVCC6Zsk/VEuZ54ol26x+gV2SpB12M8P0RAXrKcZlfsE2R0BwxW2uO2j3YBQkWl1Lc
+	 e72iYafvmwp7H6rxgVQSVdVrQSX4Jm13Xr+GM7h79uA+4iygAHTFW9/SJ7EJuxDpe8
+	 jyCKP4c18bbESK9RTg36Ej8Yfaw6luiFepIjVa8yBNKqMIhbU2AM/+Ly75SA8huX10
+	 dZu1UMN5E+10w==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c2637dd37c1so57166466b.0
+        for <linux-cifs@vger.kernel.org>; Thu, 10 Sep 2026 18:04:55 -0700 (PDT)
+X-Gm-Message-State: AFuF++lfgoYQQnEpj041jjt9s4qk942Jk6gho10aZcfHX1kOWUxooePL
+	QqTW71/1g5mwXfu/brk0cH9hv6G5XfXgBgRFqY4PNMVXz70+dGnVQOVGp53wQHVXHVlEEfeTddF
+	1ST2pY/q7RY2Lqbva3+P4M/wsXaGJCVA=
+X-Received: by 2002:a17:907:961a:b0:c28:ec7c:27ae with SMTP id
+ a640c23a62f3a-c29666bfe90mr53903566b.25.1789088694040; Thu, 10 Sep 2026
+ 18:04:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20260910051649.3806214-1-april.cardenas@canonical.com>
+In-Reply-To: <20260910051649.3806214-1-april.cardenas@canonical.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 11 Sep 2026 10:04:41 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd829H6zq5g+n6Ue40cW96PfFaPu3kAXe+i5WZhp6E9u=w@mail.gmail.com>
+X-Gm-Features: AcwNN1XpUYrtKTZJ2AXoyTyNrttIcCISwwbTIIFxmObetxMzLHFFFo8SvJuZfwM
+Message-ID: <CAKYAXd829H6zq5g+n6Ue40cW96PfFaPu3kAXe+i5WZhp6E9u=w@mail.gmail.com>
+Subject: Re: [PATCH] smb/client: send lease break ACKs thru correct session
+ for multiuser mounts
+To: April Cardenas <april.cardenas@canonical.com>
+Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
+	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With a really small cache, cachefiles is likely to see a lot of writes
-hitting ENOSPC - and this can include setxattr that sets the state xattr on
-a cachefile - but we don't really want to successfully fill a cache file
-only to have to scrap it because we can't set the xattr.
-
-Instead, preset the xattr when we create the tmpfile we're going to use,
-and scrap the file at that point if we get ENOSPC.  Only if setxattr
-succeeds do we allow data to be written to the file.
-
-Note that there is a potential performance loss in that writes to the cache
-have to be delayed until this is completed - but we do the tmpfile/setxattr
-in parallel, starting when the file is opened and only have to wait once
-writeback occurs.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/cachefiles/internal.h |  1 +
- fs/cachefiles/namei.c    |  5 ++++
- fs/cachefiles/xattr.c    | 59 +++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 64 insertions(+), 1 deletion(-)
-
-diff --git a/fs/cachefiles/internal.h b/fs/cachefiles/internal.h
-index b2605111fd56..664be64ab538 100644
---- a/fs/cachefiles/internal.h
-+++ b/fs/cachefiles/internal.h
-@@ -283,6 +283,7 @@ void cachefiles_withdraw_volume(struct cachefiles_volume *volume);
- /*
-  * xattr.c
-  */
-+int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file);
- extern int cachefiles_set_object_xattr(struct cachefiles_object *object);
- extern int cachefiles_check_auxdata(struct cachefiles_object *object,
- 				    struct file *file);
-diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
-index ca093840e577..ef656a319ede 100644
---- a/fs/cachefiles/namei.c
-+++ b/fs/cachefiles/namei.c
-@@ -450,6 +450,11 @@ struct file *cachefiles_create_tmpfile(struct cachefiles_object *object)
- 		pr_notice("Cache does not support read_iter and write_iter\n");
- 		goto err_unuse;
- 	}
-+
-+	/* Preallocate space for the xattr. */
-+	ret = cachefiles_preset_object_xattr(object, file);
-+	if (ret < 0)
-+		goto err_unuse;
- out:
- 	cachefiles_end_secure(cache, saved_cred);
- 	object->content_info = CACHEFILES_CONTENT_ALL;
-diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
-index 551a3b0069c2..8ebb713482e3 100644
---- a/fs/cachefiles/xattr.c
-+++ b/fs/cachefiles/xattr.c
-@@ -34,6 +34,57 @@ struct cachefiles_vol_xattr {
- 	__u8	data[];		/* netfs volume coherency data */
- } __packed;
- 
-+/*
-+ * Preset the state xattr on a cache file to allocate space for it.
-+ */
-+int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file)
-+{
-+	struct cachefiles_xattr *buf;
-+	struct dentry *dentry = file->f_path.dentry;
-+	unsigned int len = object->cookie->aux_len;
-+	int ret;
-+
-+	buf = kzalloc(sizeof(struct cachefiles_xattr) + min(len, sizeof(__be64)), GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	buf->type		= CACHEFILES_COOKIE_TYPE_DATA;
-+	buf->content		= CACHEFILES_CONTENT_DIRTY;
-+
-+	ret = cachefiles_inject_write_error();
-+	if (ret == 0) {
-+		ret = mnt_want_write_file(file);
-+		if (ret == 0) {
-+			ret = vfs_setxattr(&nop_mnt_idmap, dentry,
-+					   cachefiles_xattr_cache, buf,
-+					   sizeof(struct cachefiles_xattr) + len, 0);
-+			mnt_drop_write_file(file);
-+		}
-+	}
-+	if (ret < 0) {
-+		trace_cachefiles_vfs_error(object, file_inode(file), ret,
-+					   cachefiles_trace_setxattr_error);
-+		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
-+					   object->object_size,
-+					   buf->data, buf->content,
-+					   cachefiles_coherency_set_fail);
-+		switch (ret) {
-+		case -ENOMEM:
-+		case -ENOSPC:
-+			break;
-+		default:
-+			cachefiles_io_error_obj(
-+				object,
-+				"Failed to set xattr with error %d", ret);
-+			break;
-+		}
-+	}
-+
-+	kfree(buf);
-+	_leave(" = %d", ret);
-+	return ret;
-+}
-+
- /*
-  * set the state xattr on a cache file
-  */
-@@ -82,10 +133,16 @@ int cachefiles_set_object_xattr(struct cachefiles_object *object)
- 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
- 					   object_size, buf->data, buf->content,
- 					   cachefiles_coherency_set_fail);
--		if (ret != -ENOMEM)
-+		switch (ret) {
-+		case -ENOMEM:
-+			break;
-+		case -ENOSPC:
-+		default:
- 			cachefiles_io_error_obj(
- 				object,
- 				"Failed to set xattr with error %d", ret);
-+			break;
-+		}
- 	} else {
- 		trace_cachefiles_coherency(object, file_inode(file)->i_ino,
- 					   object_size, buf->data, buf->content,
-
+On Thu, Sep 10, 2026 at 2:17=E2=80=AFPM April Cardenas
+<april.cardenas@canonical.com> wrote:
+>
+> Currently, when cifs_oplock_break handles a break request from the server
+> it searches for the appropriate tlink to handle the request
+> but incorrectly uses the current fsuid as the search key, eventually
+> causing read errors for users with multiuser mounts on NetApp.
+> Fix this by using the tlink from the cfile struct instead to respond
+> through the correct session.
+>
+> As breaks are handled in a worker thread, the current fsuid
+> isn't guaranteed to match the session that the break is intended for.
+> This means that cifs_sb_tlink may search the rbtree using the wrong fsuid=
+,
+> and return a tlink with an incorrect session than
+> the lease break was intended for. As a result, the breaks
+> may be ACKed through an incorrect session.
+>
+> While it seems that Samba/Windows Servers 2016-2025 ignore this as long a=
+s
+> the lease key is correct, we ran into a case where if you're using
+> NetApp ONTAP or Azure NetApp Files they will reject the ACK
+> and return `STATUS_LOCK_NOT_GRANTED` errors on any future read requests
+> a user may initiate through their still held open file handle,
+> and the server will eventually close the file.
+>
+> In the dmesg logs, the user may see errors like these:
+>
+> CIFS: Status code returned 0xc0000128 STATUS_FILE_CLOSED
+> CIFS: VFS: Send error in read =3D -9
+>
+> With a multiuser mount using NetApp, this issue is really easy
+> for users to hit on a wide variety of kernel versions
+> by attempting to copy a file from the share
+> to the local machine through GNOME Files/Nautilus.
+> This copy will always result in Nautilus throwing
+> a `Bad File Descriptor` error to the user and fail.
+> With this fix, you can copy files through Nautilus without issue.
+>
+> From looking at the traces, it seems that glib will
+> open the file first, and call listxattr before actually attempting
+> to copy the file data. The listxattr call always triggers a break,
+> causing the copy to fail.
+>
+> The proposed fix returns to the way the client grabbed the tlink before
+> commit e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break").
+>
+> The bulk of that commit (checking for list empty) remains untouched, and
+> I think the change to using cifs_sb_tlink was intended to avoid a
+> NULL/ERR deference on the tlink as well as update the reference count.
+>
+> I believe this fix should preserve those safety properties, but of course
+> I'd appreciate any corrections here.
+>
+> Fixes: e8f5f849ffce2 ("cifs: fix potential oops in cifs_oplock_break")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: April Cardenas <april.cardenas@canonical.com>
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks.
