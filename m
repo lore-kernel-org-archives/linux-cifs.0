@@ -1,80 +1,106 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92A92D12F3
-	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 01:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714D52C032E
+	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 01:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789175052; cv=none; b=NPgc0gbimZnPh0Qs3FMXxwJhKfb+1yjq3L01ISeQ0EE4XEqKVWDMDDF4AoyY7U8+iH+uH02MLMPy+91T0zMYvVRdtU5L+r5TumYsSPs70lKI8amdFIF+fV2iAPQmg78tiIlZicyrFvO0D3pp0UncqaGa126CEiuyg+eyT+SnGRE=
+	t=1789175685; cv=none; b=Hiair1sLtOga15qgoRs30dscxXf8iLwOULHRCfqke+Ou/bxTqouAykQKilNnZV6WKXQjLrl7ZDP3q7BCb4Lw1v2M2NUUENrtYFW/DIM8FxZYr9nmPkiJyvvG6MoTA3bNY2mqjQqQee2QIiQGg0ljdUbpERqGLe62D1kA86dAgtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789175052; c=relaxed/simple;
-	bh=vr07uqXgctEEZp90BcXpMmzEhnOInn+XstA72l+qsNc=;
+	s=arc-20240116; t=1789175685; c=relaxed/simple;
+	bh=d3D3a7/73jdFJEMa1Ir1py9KmvVaxw9gG9/znoYEZn0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oyb4F21MU4Q4k85YNGsZ/x0+xltJe81SRRnuCYPcAUoeR/c+z7Ulfz/kpf+OytjKt3a2Pr1krPgiEa6K7bhII5rVU0vo+jy9bAin4VW0fh9JWRv1f6xpl8II8yQDiGpMmQJ8KDOzm6HTepw0rSeVzGT459gtctm2NQtpgVjs9mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dE6toIvI; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=l2KG0UP0RdIxbkxORMXIcLRwp7Ylufnk9V/IAJORii3ICuC7qd6l32JvweG/Ssglc4SH//+Ie0+XRahrauBAKBzgun6gJ9T2zNDimX9mkZBKnjYq2oFVOtvpxm6VKzIxQgADQHpGPIk7BkGYQAP/xlIDQglPxw7anitZaewGmXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtWAEfBv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dE6toIvI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82D711F0089A
-	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 01:04:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtWAEfBv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE541F00898
+	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 01:14:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789175050;
-	bh=rKirC/zfbMh4nONwqtdSsb87sR4Y6BWN44jahYCmhvk=;
+	s=k20260515; t=1789175684;
+	bh=v73DhW4aS5+p4CEDwTW5FmMhbU7a5oBaZz8Gi/7erXg=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=dE6toIvI5cEjTsb4F+6GCbpP1AeOHyS3GRyqYpYlXfJdhzkKml6R5Mpd+9NMJzc6t
-	 kDZe3Y8QqlubPYxlwGSbe96fMkHxgGD1tl0cZpknsw6Y2DgNaBBECUWaY325ul17H3
-	 M9AXWn/qhIsDtWr+JGFVreBO9Uer4FjN+9AuiRTSTeTksr1KXLUerMekXb7+2xmbsj
-	 PzfBFeTjDbidL+k2jpxkh+GGCy/DUtSG4mRJlOow4hSJN/yPsZN98eC1dAwv/G8+kL
-	 IH++R16WQTDp7vS7XqySkfoYnzMj1NTOuW577YAdwDNMpdxJEN/7l1ZiNsTqoaQDX2
-	 BfobfBx5tNeOg==
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c254f8694aeso39066166b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 18:04:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByQ+d+AGr1/FfTqehfLQMNItuQklFG6Nk/yVwzHLItns7tf5PCUYn6lGDIkgJPBh2eufC1jvB8+MA/f@vger.kernel.org
-X-Gm-Message-State: AFuF++nw4t/ZcHnZtEKhIH42i6TMGFiqONTu3EggL8PbIYQ730PnvhV/
-	oJzRAHxd1EXY+XXTNyNqxi3TSyfBnIGCVSYs4z0u4lEdOmo9zB2C9CAUztJafLCO19KZlMGLeQl
-	Ztq9gsKZlC2pKL0QMQASt5+z+v68uQhY=
-X-Received: by 2002:a17:907:3cc1:b0:c25:f7db:4bea with SMTP id
- a640c23a62f3a-c2962c35e44mr349285966b.16.1789175049172; Fri, 11 Sep 2026
- 18:04:09 -0700 (PDT)
+	b=dtWAEfBvHVJVNibNKpIIafZ7kdUPwsYeeNVQBHpPFyiiAv/5RjJ/FRpJ1B0tx3f/y
+	 afkYKP6WgYkkyBdwvoG8diIKDT5yZ+VYrDlnhTArr4qkJ56je3lZHp33Ht2LY+JBxc
+	 dcteUmC9RT0ip2MrDoYaat0VNhJqzT+HlUcHYlIG23rChqiOguJyqX+l6fG3VGIXpV
+	 UiVLWzpq0eKAIhggTMhnJOOiAl2gnKM0em2X0HKvqHk3x4DSlhEpF9eMNq+GlQwj6E
+	 p77N4umfFTJ88BIEmey0UFquUHmcnfA8u0v3CjUZBnc2LaWyBkyXfXWPNAQsqfbejZ
+	 lCuzfUzlLdhtw==
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a60591bb18so335924a12.1
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 18:14:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBzM/pSWuQEafpb9l6OQRX9r2nOYg09I0fvDoHjSF6oWQmcmy5dOnl3OkXjKZaodJ+ssB+x1hpH5/9uu@vger.kernel.org
+X-Gm-Message-State: AFuF++nMYR4aoH0ZJiccvxs3HNBv817lATilVs07FabIMReaC0oGxD+h
+	aDgp8nbNGWsQUJWu++u0nr4upjkCleZv/ZtzDQoNDA/Z/WeiMoSWY2jj6U9QmLDiCHVWR4jIaAB
+	aV/jDBgBrvVu18fZo7k/4x611geeMsY0=
+X-Received: by 2002:a17:907:3f20:b0:c29:58ae:8327 with SMTP id
+ a640c23a62f3a-c2962c8a439mr393034766b.19.1789175682756; Fri, 11 Sep 2026
+ 18:14:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260911163516.6403-1-15815827059@163.com>
-In-Reply-To: <20260911163516.6403-1-15815827059@163.com>
+References: <20260912000817.763001-1-gkobakhi@asu.edu>
+In-Reply-To: <20260912000817.763001-1-gkobakhi@asu.edu>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 12 Sep 2026 10:03:57 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_5E9=EBuT_dHv6gvExmQfrmjVodM-WxHtLFcaL-1-knw@mail.gmail.com>
-X-Gm-Features: AcwNN1Wg8-CzhIT54vNLKpllkooDbShxMBxlbb63TNsw-OGnPrX6Qh0DJo0LiMU
-Message-ID: <CAKYAXd_5E9=EBuT_dHv6gvExmQfrmjVodM-WxHtLFcaL-1-knw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] smbd: fix FSCTL_QUERY_NETWORK_INTERFACE_INFO handling
-To: huhai <15815827059@163.com>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, huhai <huhai@kylinos.cn>
+Date: Sat, 12 Sep 2026 10:14:27 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd__LjM025c=ucjKMBQu15ZWbxuTsm2=a3tpNpqPMFttUw@mail.gmail.com>
+X-Gm-Features: AcwNN1UbzYVPtXNFBNoU69WCU6xyiDi5V3gFppGXRCt36C6xeXBjeBCaOvAOhvM
+Message-ID: <CAKYAXd__LjM025c=ucjKMBQu15ZWbxuTsm2=a3tpNpqPMFttUw@mail.gmail.com>
+Subject: Re: [PATCH ksmbd-for-next] ksmbd: fix overflow in dacloffset bounds
+ check in build_sec_desc()
+To: Giorgi Kobakhia <gkobakhi@asu.edu>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, xmei5@asu.edu, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 12, 2026 at 1:36=E2=80=AFAM huhai <15815827059@163.com> wrote:
+On Sat, Sep 12, 2026 at 9:09=E2=80=AFAM Giorgi Kobakhia <gkobakhi@asu.edu> =
+wrote:
 >
-> From: huhai <huhai@kylinos.cn>
+> When the large dacl_offset is provided, dacl_offset + sizeof(struct
+> smb_acl) overflows on 32-bit builds and the check is passed,
+> Which makes le16_to_cpu(ppdacl_ptr->size) read out-of-bounds. This
+> only happens for dacl_offset in range [0xFFFFFFF8, 0xFFFFFFFF]. So
+> the oob read is max 8 bytes preceding the allocated ppntsd.
 >
-> This series fixes several issues in fsctl_query_iface_info_ioctl():
-> incorrect link speeds, an unlocked IPv6 address-list walk, an invalid
-> final Next offset, and incorrect IPv4/IPv6 interface reporting.
+>     unsigned int dacl_offset =3D le32_to_cpu(ppntsd->dacloffset);
+>     int ppdacl_size, ntacl_size =3D ppntsd_size - dacl_offset;
 >
-> Patch 1 was previously submitted as a standalone patch; this series
-> supersedes that submission.
+>     if (!dacl_offset ||
+>         (dacl_offset + sizeof(struct smb_acl) > ppntsd_size))
+>             goto out;
 >
-> ---
-> v1: https://lore.kernel.org/all/20260910090818.24479-1-15815827059@163.co=
-m/
+> Commit beff0bc9d69b ("ksmbd: fix overflow in dacloffset bounds check")
+> fixes similar checks in other functions. But leaves this one out,
+> because it is only valid for 32-bit builds.
 >
-> Henry Hu (4):
->   ksmbd: fix link speed query in fsctl_query_iface_info_ioctl()
->   ksmbd: fix unlocked IPv6 addr_list walk in
->     fsctl_query_iface_info_ioctl()
->   ksmbd: fix invalid Next offset in interface info replies
->   ksmbd: report IPv4 and IPv6 addresses independently in iface query
+> Reproduced on 32-bit ARM with KASAN, by a client sending SMB2
+> SET_INFO(SEC) with dacloffset=3D0xfffffff8, then QUERY_INFO(SEC) on the
+> same file:
+>
+>  BUG: KASAN: slab-out-of-bounds in build_sec_desc (fs/smb/server/smbacl.c=
+:1105)
+>  Read of size 2 at addr c2a273fa by task kworker/1:1/35
+>  CPU: 1 UID: 0 PID: 35 Comm: kworker/1:1 Not tainted 7.3.0-rc2+ #5
+>  Workqueue: ksmbd-io handle_ksmbd_work
+>  Call trace:
+>   kasan_check_range from build_sec_desc (fs/smb/server/smbacl.c:1105)
+>   build_sec_desc from smb2_query_info (fs/smb/server/smb2pdu.c:7676)
+>   smb2_query_info from handle_ksmbd_work (fs/smb/server/server.c:160)
+>   handle_ksmbd_work from process_one_work (kernel/workqueue.c:3401)
+>   process_one_work from worker_thread (kernel/workqueue.c:3473)
+>   worker_thread from kthread (kernel/kthread.c:436)
+>
+> Add overflow check.
+>
+> Fixes: 8f0541186e9a ("ksmbd: fix heap-based overflow in set_ntacl_dacl()"=
+)
+> Cc: stable@vger.kernel.org
+> Assisted-by: LLM claude
+> Tested-by: Xiang Mei <xmei5@asu.edu>
+> Signed-off-by: Giorgi Kobakhia <gkobakhi@asu.edu>
 Applied it to #ksmbd-for-next.
 Thanks!
