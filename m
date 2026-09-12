@@ -1,106 +1,215 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lr2-f12.google.com (mail-lr2-f12.google.com [74.125.230.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714D52C032E
-	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 01:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789175685; cv=none; b=Hiair1sLtOga15qgoRs30dscxXf8iLwOULHRCfqke+Ou/bxTqouAykQKilNnZV6WKXQjLrl7ZDP3q7BCb4Lw1v2M2NUUENrtYFW/DIM8FxZYr9nmPkiJyvvG6MoTA3bNY2mqjQqQee2QIiQGg0ljdUbpERqGLe62D1kA86dAgtg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789175685; c=relaxed/simple;
-	bh=d3D3a7/73jdFJEMa1Ir1py9KmvVaxw9gG9/znoYEZn0=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424D835E1AC
+	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 02:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789181454; cv=pass; b=X6bydoZf5V6oVa6x/EBhkZNH8ck7GjYIodi4TnLpV4YO8SOmUm/yQB6uDbhbcJpXko9p+TMsckqHRE04eqQsWzb7ObHjYrqtI6jEX+w4dC55HZI5TZEBMlkzXnTPrIUksSmLNQZAx5p/5rlkxMAjvYKMfqUo5BTh0gBChjhu2uk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789181454; c=relaxed/simple;
+	bh=UBF68ob9rLLcJ+B4BGI8OMKoTXkffDblP9vHlbmSr8c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l2KG0UP0RdIxbkxORMXIcLRwp7Ylufnk9V/IAJORii3ICuC7qd6l32JvweG/Ssglc4SH//+Ie0+XRahrauBAKBzgun6gJ9T2zNDimX9mkZBKnjYq2oFVOtvpxm6VKzIxQgADQHpGPIk7BkGYQAP/xlIDQglPxw7anitZaewGmXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dtWAEfBv; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=kVcTzBjc2cyarV1YILBR2KAhyHpHYUm8rKqXu+FY2Trin+UYnslxZOKPgTxbrqxOz8WKQgzlTbUHxxaFONI2DmhlgxzeD6b1JYtnf6GWyxd9ALHWtlUirz4x8kvQgx3hoJpVenIhpvyIPue/4tdbS5ZpxFga/X9YMzylBtrCjhE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=soekMItX; arc=pass smtp.client-ip=74.125.230.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dtWAEfBv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE541F00898
-	for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 01:14:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789175684;
-	bh=v73DhW4aS5+p4CEDwTW5FmMhbU7a5oBaZz8Gi/7erXg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=dtWAEfBvHVJVNibNKpIIafZ7kdUPwsYeeNVQBHpPFyiiAv/5RjJ/FRpJ1B0tx3f/y
-	 afkYKP6WgYkkyBdwvoG8diIKDT5yZ+VYrDlnhTArr4qkJ56je3lZHp33Ht2LY+JBxc
-	 dcteUmC9RT0ip2MrDoYaat0VNhJqzT+HlUcHYlIG23rChqiOguJyqX+l6fG3VGIXpV
-	 UiVLWzpq0eKAIhggTMhnJOOiAl2gnKM0em2X0HKvqHk3x4DSlhEpF9eMNq+GlQwj6E
-	 p77N4umfFTJ88BIEmey0UFquUHmcnfA8u0v3CjUZBnc2LaWyBkyXfXWPNAQsqfbejZ
-	 lCuzfUzlLdhtw==
-Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a60591bb18so335924a12.1
-        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 18:14:44 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzM/pSWuQEafpb9l6OQRX9r2nOYg09I0fvDoHjSF6oWQmcmy5dOnl3OkXjKZaodJ+ssB+x1hpH5/9uu@vger.kernel.org
-X-Gm-Message-State: AFuF++nMYR4aoH0ZJiccvxs3HNBv817lATilVs07FabIMReaC0oGxD+h
-	aDgp8nbNGWsQUJWu++u0nr4upjkCleZv/ZtzDQoNDA/Z/WeiMoSWY2jj6U9QmLDiCHVWR4jIaAB
-	aV/jDBgBrvVu18fZo7k/4x611geeMsY0=
-X-Received: by 2002:a17:907:3f20:b0:c29:58ae:8327 with SMTP id
- a640c23a62f3a-c2962c8a439mr393034766b.19.1789175682756; Fri, 11 Sep 2026
- 18:14:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="soekMItX"
+Received: by mail-lr2-f12.google.com with SMTP id 38308e7fff4ca-3a2ff176d5eso4107191fa.0
+        for <linux-cifs@vger.kernel.org>; Fri, 11 Sep 2026 19:50:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789181451; cv=none;
+        d=google.com; s=arc-20260327;
+        b=mDqf9KsxN5I3zP9FMci+iY7JOO3We8s6pkwZQuGTNGoCK0nRxnKIHPVasn7XTE9DGE
+         dL7uJuizWyG7n1T4bdGRpDa/4Q8xgCn4Zbi53RM7jDhFIk2dw/NqBYnadKVfadGi3c9o
+         g7LxduRRMLk/JifoQtAgkDGaSlWUtc33O69uCfmOC0dMfDRxw6C4ZUKVKo61+2zWs+Tc
+         Fx/iBJJZvI0DdubVA7Sh32jNxJTC2TuPyg3y5xAxB98/TrGwmq1I5SP7MyAExkeZCJ64
+         MPoSS1TsetTrmNbMcysk2bTB5HJ/HCDF7ErnFgv00VXeDfVEYJSeLSRl40CPbNsOWYTX
+         P6Kg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=7lm0hPUEiNGm9wQton/cSC99gHERZOkyr34L44cajdM=;
+        fh=QqMst5RkZESzqan5AjRLLm5JBu+4bRUMWhsocIgBrJs=;
+        b=bKa5xk8rIGuqQhQytJ6ZcePRurNKzr8E7pwcukRXRQlUK5d27r0MrWDYu43JNsnukF
+         xBu8A4vyKmLGBDMj0CiGE+RTQXEXj9DqGPw7xFU5tz1be2STmtM2hYt4U1DveCGrW0U9
+         6hx3ifZXV1NN3xHQYBM8KWx4DJ2N+ZBDF/+K2e93DooNfjfTyFUBHuopQQjP83FpBfkN
+         ZyX90DCj/kaw1I0hmj5j7ZYVlTF65qAmmgfX+QRitTXWJEUnTKjZEDtElpTuA9Q7Ovho
+         K8yK8ojn+P7sWvJIB/q+RS3krNV5nYdnv2HcxQxCA7ioVxeFZxpC11JTTUpKCEtCmNLB
+         hVOQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=nebusec.ai; s=google; t=1789181451; x=1789786251; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=7lm0hPUEiNGm9wQton/cSC99gHERZOkyr34L44cajdM=;
+        b=soekMItXA9QqFaOQZUqkhYikTmgyQ3GxeHmtHh/W776sbTPTNFfZFQZxbFmJ5lGy1r
+         UTDOsYLtWXJUhDejqN6oRafURawF+E01esZbvRgC1nPi+j4D1r3Ipwhc3jeEofjFTUKZ
+         ldQoE1yCZ5ZFNnqhedj8lWp227/lVMVOvmM2yDkFbBv2sJVwprjh67H/psR1EnySNc9W
+         e0CfxcQrSruWo1qh3jKeUZZe7VUD2sQQcyEs+Od4HNyA1U79SEutUp2caxRzR6VKiQx1
+         pRnd4AHMowh+qp+/4l3tTZ7bwn+L17kIBucZWbG5eQQAg1DrRWavNsaIjxw2ZyD6HwqZ
+         OOjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1789181451; x=1789786251;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=7lm0hPUEiNGm9wQton/cSC99gHERZOkyr34L44cajdM=;
+        b=sFBquTrufQqVxGwrBraWHYlsJjhBKU1TeU0b64NGjU3uZdkj3xdyTiD0xfJW1KDocV
+         f7LIgFpw9NudtJ6ypWeoVo9P5wLgnOytC3IkiFWLDULkaDnJIUN+j4OgvUbRU9UyTJk3
+         KKWlR6cFoSW8+UJFYP05nOMgUkUiT9NyZCFG/Q8JVMnJ6YVAxrH1YjfNHmbYpeSvt64q
+         5pAFC0NI1CdaL9Nkvk1uog9MWqmlkATp4nLnGDP6EMcpV4Py5l62GcxAy603jfTKEoFu
+         jlQuTj1H1L8Om0l60MXKjDzQB4P06H01pOZtH0G4IpuIXW50HgwSQUOgL6sNf5fQm0ZL
+         ptbA==
+X-Forwarded-Encrypted: i=1; AKwUvBw2t5aE43S+139BMfarPXgAYe5KwxmwVM4GzJqvQr9zyAhlqq9CMcWAyY8Qj+CZzfKogjZCWy9KDm5f@vger.kernel.org
+X-Gm-Message-State: AFuF++k9dtR/hXai09PN7eKiTCh3Ml7Jdu+0RLXcvyarAANb++lSg8uR
+	fjxyz8Fbs+P4be1Hj1DRptns8WFhWQXMnhdur6imSUzYV5AXI8g5ezRRhML2gyoTZlLADelOHQF
+	poKcchKvFnlj0owSZMPo4AY1Iy/JWPg1ua0BNdlG3SSo=
+X-Gm-Gg: AYBFou0DnjzLa2eTUw+XZ5Z9qF4Yp1diVutWCPqBnG64gYQhblol5mOvT5J8O0P7XKw
+	VtcfV/cb4/TGdWtDZb75ApZOc/ZqfflyhVjaayI0xlD+QUNWgeMAzS2lyrGH0Pa9icKVuoru3AX
+	KyH6QetFcSo0/csr7PML04K2fRy0rFA2dnd3On5hcTuIghMpyr0n51lC8gGP/QuYqqBJhRY7uyQ
+	r/VHJRHYh1I6tZb1JiuRFy16K1dbGAng30BibJMsStkJDN3mHum1AMgEcKEAIgJ/Q8+MgSsamXQ
+	sk9IHVYJJba+sG780Q6eXe1RlDn9DgfJ2uqLqZCcQQwDwk4mPzUK/4fX0Ci8XSQsn8KYjLBArfU
+	QIuIXqiFsZQ==
+X-Received: by 2002:a05:651c:1503:b0:3a4:99ed:beac with SMTP id
+ 38308e7fff4ca-3a5a51c9fc4mr17435271fa.4.1789181451073; Fri, 11 Sep 2026
+ 19:50:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260912000817.763001-1-gkobakhi@asu.edu>
-In-Reply-To: <20260912000817.763001-1-gkobakhi@asu.edu>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 12 Sep 2026 10:14:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd__LjM025c=ucjKMBQu15ZWbxuTsm2=a3tpNpqPMFttUw@mail.gmail.com>
-X-Gm-Features: AcwNN1UbzYVPtXNFBNoU69WCU6xyiDi5V3gFppGXRCt36C6xeXBjeBCaOvAOhvM
-Message-ID: <CAKYAXd__LjM025c=ucjKMBQu15ZWbxuTsm2=a3tpNpqPMFttUw@mail.gmail.com>
-Subject: Re: [PATCH ksmbd-for-next] ksmbd: fix overflow in dacloffset bounds
- check in build_sec_desc()
-To: Giorgi Kobakhia <gkobakhi@asu.edu>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, xmei5@asu.edu, stable@vger.kernel.org
+References: <cover.1788516372.git.zihanx@nebusec.ai> <20260904140527.62354-1-zihanx@nebusec.ai>
+ <20260911170034.1236993-1-sorenson@redhat.com>
+In-Reply-To: <20260911170034.1236993-1-sorenson@redhat.com>
+From: zihan xi <zihanx@nebusec.ai>
+Date: Sat, 12 Sep 2026 10:50:38 +0800
+X-Gm-Features: AcwNN1U-uRTqt8ykL8GuFuZ-SOYux8MbyRejD1SIf3LqoAgM1qpEMJQANafNEo0
+Message-ID: <CAANe3eQwGetW4jWjGrjCwO+kXhGbDJpE5iMhVbWkJBGp+Do+MQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] smb: client: fix create context out-of-bounds reads
+To: Frank Sorenson <sorenson@redhat.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
+	Pavel Shilovsky <pshilovsky@samba.org>, Aurelien Aptel <aaptel@suse.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 12, 2026 at 9:09=E2=80=AFAM Giorgi Kobakhia <gkobakhi@asu.edu> =
-wrote:
+On Sat, Sep 12, 2026 at 1:05=E2=80=AFAM Frank Sorenson <sorenson@redhat.com=
+> wrote:
 >
-> When the large dacl_offset is provided, dacl_offset + sizeof(struct
-> smb_acl) overflows on 32-bit builds and the check is passed,
-> Which makes le16_to_cpu(ppdacl_ptr->size) read out-of-bounds. This
-> only happens for dacl_offset in range [0xFFFFFFF8, 0xFFFFFFFF]. So
-> the oob read is max 8 bytes preceding the allocated ppntsd.
+> On Fri, Sep 04, 2026 at 02:05:17PM +0000, Zihan Xi wrote:
+> > smb2_parse_contexts() validates the complete create-context area but do=
+es
+> > not bound each context record by its Next field before dispatching to a
+> > handler.  A malformed chain can therefore expose bytes past one context=
+ to
+> > the handler.  The QFid handler also used a full response-structure cast=
+ even
+> > though it only consumes DiskFileId.
 >
->     unsigned int dacl_offset =3D le32_to_cpu(ppntsd->dacloffset);
->     int ppdacl_size, ntacl_size =3D ppntsd_size - dacl_offset;
+> Hello,
 >
->     if (!dacl_offset ||
->         (dacl_offset + sizeof(struct smb_acl) > ppntsd_size))
->             goto out;
+> I have some thoughts/comments on your series.
 >
-> Commit beff0bc9d69b ("ksmbd: fix overflow in dacloffset bounds check")
-> fixes similar checks in other functions. But leaves this one out,
-> because it is only valid for 32-bit builds.
+> First, a possible reason for not getting a response on your v2, and
+> delayed response on this v3: Steve French passed away in August, so
+> mail addressed to him isn't reaching a maintaner, and things may
+> have gotten missed during transitions.  You'll want to send future
+> versions to Paulo Alcantara <pc@manguebit.org>, with Cc to
+> Namjae Jeon <linkinjeon@kernel.org>
 >
-> Reproduced on 32-bit ARM with KASAN, by a client sending SMB2
-> SET_INFO(SEC) with dacloffset=3D0xfffffff8, then QUERY_INFO(SEC) on the
-> same file:
 >
->  BUG: KASAN: slab-out-of-bounds in build_sec_desc (fs/smb/server/smbacl.c=
-:1105)
->  Read of size 2 at addr c2a273fa by task kworker/1:1/35
->  CPU: 1 UID: 0 PID: 35 Comm: kworker/1:1 Not tainted 7.3.0-rc2+ #5
->  Workqueue: ksmbd-io handle_ksmbd_work
->  Call trace:
->   kasan_check_range from build_sec_desc (fs/smb/server/smbacl.c:1105)
->   build_sec_desc from smb2_query_info (fs/smb/server/smb2pdu.c:7676)
->   smb2_query_info from handle_ksmbd_work (fs/smb/server/server.c:160)
->   handle_ksmbd_work from process_one_work (kernel/workqueue.c:3401)
->   process_one_work from worker_thread (kernel/workqueue.c:3473)
->   worker_thread from kthread (kernel/kthread.c:436)
+> I've been carrying an overlapping patch (an earlier posting:
+> https://lore.kernel.org/r/20260826153147.4112943-12-sorenson@redhat.com).
+> in a bounds-checking series of my own.  Like yours, my patch has
+> been addressing the memory safety problem in the three handlers
+> which read at fixed offsets, rather than the generic checks.
 >
-> Add overflow check.
+> But I think yours is probably a better fix, and you've got the
+> PoC, so if we can perfect yours and get it in, I'll be dropping
+> mine in favor of this series.
 >
-> Fixes: 8f0541186e9a ("ksmbd: fix heap-based overflow in set_ntacl_dacl()"=
+>
+> A few points (take with a grain of salt):
+>
+> 1) The lease parser still reads at a fixed offset rather than from
+>    DataOffset:
+>
+> >               case 4:
+> >                       if (!strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4))=
+ {
+> > -                             *oplock =3D server->ops->parse_lease_buf(=
+cc, epoch,
+> > +                             if (cc_len >=3D smb2_create_lease_min_cc_=
+len(server))
+> > +                                     *oplock =3D server->ops->parse_le=
+ase_buf(cc, epoch,
+> >                                                                      le=
+ase_key);
+>
+> cc_len bounds the record, so the read stays in bounds.  But this is
+> just like the QFid bug you just fixed nearby:  smb2_parse_lease_buf()
+> and smb3_parse_lease_buf() reach the fields at the canonical offset
+> of the create_lease layout, not at DataOffset, so a valid but non-
+> canonical DataOffset could get in-bounds garbage rather than an
+> OOB.  That's not a security fix, but since LeaseState drives client
+> caching decisions, it's probably worth closing.  Reading lcontext
+> from DataOffset, as with DiskFileId would make the two handlers
+> consistent.
+>
+> (My version also had this, so it's more an observation than anything
+> else)
+>
+>
+> 2) You may want to consider matching DataLength exactly, rather than
+>    taking a minimum.
+>
+> ksmbd's parse_lease_state() requires:
+>
+>         sizeof(struct lease_context_v2) =3D=3D le32_to_cpu(cc->DataLength=
 )
-> Cc: stable@vger.kernel.org
-> Assisted-by: LLM claude
-> Tested-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Giorgi Kobakhia <gkobakhi@asu.edu>
-Applied it to #ksmbd-for-next.
-Thanks!
+>
+> and validates DataOffset + DataLength against the create_lease_v2
+> size, rather than accepting anything at least long enough.  It was
+> suggested to me that having the client & server halves agree on
+> strictness would be good.
+>
+> (I did confirm your minimums cover all the fields each of the parsers
+> actually touch, so this is about strictness, not a hole)
+>
+>
+> Frank
+> --
+> Frank Sorenson
+> sorenson@redhat.com
+> Principal Software Maintenance Engineer, filesystems
+> Red Hat
+>
+
+Hi Frank,
+
+Thank you for the review.  I'm sorry to hear about Steve.  I'll send
+future versions to Paulo Alcantara, with Cc to Namjae Jeon.
+
+I also appreciate you carrying the overlapping bounds-checking series.
+
+I'll address both comments in v4 and send it as a new thread:
+
+1) smb2_parse_lease_buf() and smb3_parse_lease_buf() will copy the
+   lease context from DataOffset, as the QFid handler does for
+   DiskFileId.  Agreed this is not a security fix; it just keeps
+   LeaseState correct when DataOffset is non-canonical.
+
+2) DataLength will be required to equal sizeof(struct lease_context)
+   or sizeof(struct lease_context_v2) for the corresponding parser,
+   rather than a minimum.  A mismatch skips lease parsing and does
+   not fail the open.
+
+Thanks,
+Zihan
