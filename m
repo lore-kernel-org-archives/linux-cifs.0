@@ -1,45 +1,45 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D1838F949;
-	Sat, 12 Sep 2026 16:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026B9344DBD;
+	Sat, 12 Sep 2026 17:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789232107; cv=none; b=QgdKk+W7URmPNe4eE/eJFHVc1AZ3sBZuZjHNrpXa7I/cGQvQvAlaXv9PJJwp35ZHaRWI3Ewbn5reWWAtPT5M1q60YIzwbhzu5pDA4N0tYgTJlTJCVcNSytZvnm48BR2xP73Bjmh/C/gD7BMArvawkuJmpMsQWvoZeTjH6llObQc=
+	t=1789233913; cv=none; b=gldHX5SmKVzXyLsdiyUicCyTw2Nam5gmnwvLy8B8pbbkCngfkIfBA4AYE4x7tpEKIOcjbTPiSOTrciaC+HxDNeyM+qT7cQRtG7nY2M5HlfrxkQ71atG7r/iiW+kcRMElkGMZmJ2D7ANdxvgnT20RSjJc6zLSl72C0Uh8jApT65g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789232107; c=relaxed/simple;
-	bh=/jmm2aVW9UAYOf+kSwMbHi29736SD+qrLU7zbDLQSRE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NQzJdwqZugKpeMhHt/qc/pOAvCdhZbWh3PVi/FIOgZyy6o2zvYVGrxJivxQb0VDDO5dUYSLVUJZB+NVS1BvTVlgtOFN0Nrg+CpGofavfxNjNn2lhYkksNGamucSQ2Dh9BxVG2edwOCGdMgNzmaNK6Mgk3dkj4rc/1P94zXrurXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=RIl5A/NU; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1789233913; c=relaxed/simple;
+	bh=QXDRw9pV0IRdDDA/BtqZMyVyh7hevMPQ0dSLNvpv1LU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qlN0lOoDcbwpFC6jXnRb9mOOHnkxH5UWX0Y/63R2V8yzwWHG2CWTbbkagygI1w4jTYs50/BmhxbS+P1uoE3Os7VFjtmbIJZ+HCbEqKWGHIUOx4VQoJGGpO6/xKYctEo0q2lE3mYDaX7RGJewO4fbkJ3NuNTpVsMS6ms8qrYc2kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=jvqNcw2Y; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="RIl5A/NU"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="jvqNcw2Y"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
 	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
 	Content-Description:In-Reply-To:References;
-	bh=VJapbbZr2P/EcJp0eQ7mmRwmw9vSY38JTmHMxvMZEys=; b=RIl5A/NU48cUSGJ2AuXLY/lx+Q
-	+v9AtDXvJfQ4VcG4IK63NCXnZPrmAefg5B4BVMtWMUOSYwbvNCH7dovN5dA5NlqbGqvm/eDDZAxt6
-	Rlnv9IO1qfzZwsOopfYdLncERFn88cZC6Ensv9e5YcycI8h5mNOwm58AKwZeBQjlDAUNZtEl2k/zT
-	SC88WAiZPhOfmUkaIX+5XZ6mqK/UYwgIocr5ERzYfyjz4CrT1P6ECa4HeBfOzyTkyp9SJL1WgSnrb
-	KYc/T8UacuNbAv2JqRFmAV++6THceIA26wppbM2bnfGo2ujyIcdepUnnVygFPJfubfPEw7VxvyCQQ
-	YzctsVag==;
+	bh=rIGHI5YgO7yAfuFproSRnoA9xeddrN6au8mFY0weL5c=; b=jvqNcw2Yy3zfbJRX2GKMhNVe0m
+	j1/Lg0wZGePv77A13iy/kwef3UcATUx/kvcteQ8Dpf5QsrgnplswNDPdK4805PuA7/drFLUI/A13j
+	/xBSA/8sQm59ODIpHbQo8F4H9AEzHyZleSDTqOtCGZ2OIIjwWThqMPOK9Fqv9N7h+iExXUHT+3oIt
+	0ouSx32IGzfsNI1vdk4Ns47KB+vbSLbp/Wyonm5Z3vuk/5IbX88NLbttGAfj7iwZgP1y4A/jJhVsd
+	5xuB1QoGImXqqAvhqALBEIHqDD2/pN1xmhEXINox3PlbSF4JYEZ9hd3ckifumHmvXqDLKRtlPuFD0
+	5BLWSeGA==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x5R0J-00000001Htq-2Zin;
-	Sat, 12 Sep 2026 13:55:03 -0300
+	id 1x5RTR-00000001Hxi-1WPv;
+	Sat, 12 Sep 2026 14:25:09 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
+Cc: Tom Talpey <tom@talpey.com>,
+	Stefan Metzmacher <metze@samba.org>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v2] smb: client: fix rlist race and missing initialization
-Date: Sat, 12 Sep 2026 13:55:03 -0300
-Message-ID: <20260912165503.521597-1-pc@manguebit.org>
+Subject: [PATCH] smb: client: fix smbd_connection leak on cifs_get_tcp_session() error
+Date: Sat, 12 Sep 2026 14:25:09 -0300
+Message-ID: <20260912172509.542168-1-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -49,65 +49,41 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TCP_Server_Info.rlist is allocated via kzalloc which zeros both ->next
-and ->prev to NULL instead of pointing to itself, making list_empty()
-always return false and list_add() dereference a NULL ->prev pointer.
+When an RDMA connection is successfully established via
+smbd_get_connection() but cifs_get_tcp_session() later fails (e.g.
+kthread_create() returns an error), the error path frees tcp_ses
+without first destroying the smbd_connection.
 
-Also, cifs_signal_cifsd_for_reconnect() can be called concurrently
-from multiple cifsd threads, allowing the same server's rlist node to
-be added twice into the local list, corrupting it.
+Fix this by calling smbd_destroy() in the out_err cleanup path before
+kfree(tcp_ses).  smbd_destroy() safely handles the case where
+smbd_conn is NULL, so it can be called unconditionally.
 
-Closes: https://sashiko.dev/#/patchset/20260911204446.1719356-1-pc%40manguebit.org
-Fixes: df0e03a4fb94 ("smb: client: fix potential deadlock when reconnecting channels")
-Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-Cc: David Howells <dhowells@redhat.com>
+Closes: https://sashiko.dev/#/patchset/20260912165503.521597-1-pc%40manguebit.org
+Fixes: 2f8946464b11 ("CIFS: SMBD: Upper layer connects to SMBDirect session")
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Stefan Metzmacher <metze@samba.org>
 Cc: Shyam Prasad N <sprasad@microsoft.com>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: stable@vger.kernel.org
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 ---
- fs/smb/client/connect.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/smb/client/connect.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index bef710d9a3c3..4bd9f9fb93bb 100644
+index 4bd9f9fb93bb..28e1ddeb6182 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -174,6 +174,8 @@ cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
- 				nserver = ses->chans[i].server;
- 				if (!nserver)
- 					continue;
-+				if (!list_empty(&nserver->rlist))
-+					continue;
- 				nserver->srv_count++;
- 				list_add(&nserver->rlist, &reco);
- 			}
-@@ -182,11 +184,15 @@ cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
- 		}
+@@ -1934,6 +1934,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
+ 		kfree(tcp_ses->leaf_fullpath);
+ 		if (tcp_ses->ssocket)
+ 			sock_release(tcp_ses->ssocket);
++		smbd_destroy(tcp_ses);
+ 		kfree(tcp_ses);
  	}
- 
-+	spin_lock(&cifs_tcp_ses_lock);
- 	list_for_each_entry_safe(server, nserver, &reco, rlist) {
- 		list_del_init(&server->rlist);
- 		set_need_reco(server);
-+		spin_unlock(&cifs_tcp_ses_lock);
- 		cifs_put_tcp_session(server, 0);
-+		spin_lock(&cifs_tcp_ses_lock);
- 	}
-+	spin_unlock(&cifs_tcp_ses_lock);
- }
- 
- /*
-@@ -1824,6 +1830,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 	spin_lock_init(&tcp_ses->mid_counter_lock);
- 	INIT_LIST_HEAD(&tcp_ses->tcp_ses_list);
- 	INIT_LIST_HEAD(&tcp_ses->smb_ses_list);
-+	INIT_LIST_HEAD(&tcp_ses->rlist);
- 	INIT_DELAYED_WORK(&tcp_ses->echo, cifs_echo_request);
- 	INIT_DELAYED_WORK(&tcp_ses->reconnect, smb2_reconnect_server);
- 	mutex_init(&tcp_ses->reconnect_mutex);
+ 	return ERR_PTR(rc);
 -- 
 2.55.0
 
