@@ -1,82 +1,82 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92320369D4A
-	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 21:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1593A36C9CC
+	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 21:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789335936; cv=none; b=K0z1rR1A8orwQhTyNalwf5gh1xZG8rWNXAWISV7d8eTbKIpK84mJK6Q9zypxSRU3PPqagdyLmCyUJTs2dy5IW9FhFfca5TpK3nvnYNh7SuWB+TSJgEWUG+7cgEyERj65+ovxniEXddDs9WPalhGXbBth+VqZqjckIqjigwkvZgg=
+	t=1789335937; cv=none; b=sUTlcDIZmqddBEdLTEyPpprVaHTnwGXneIx8XGZBqcy564ndhfBGGMd9jVkodP6Jxv7tknwpeE4Gvqzo89Qlk3EM1o8fy5NU8d8yOwPiXNZHi6+9Tg4AogHFoDqpeKuhCHGi6TMufT4sQgDTiHB0WjFd60Ce2Y7x9SHdNW7Ol4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789335936; c=relaxed/simple;
-	bh=nuQpQA8faMLzi+ViEILyU/7P32ImMw0Svlm3CB3LCuc=;
+	s=arc-20240116; t=1789335937; c=relaxed/simple;
+	bh=Sj36XIv5xMRsbs/wOZ+6qit3KbIBL5gKeu9FcM1KgZc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gApHM7M8qfNm4k0vHyEKSXPMByMziyKqPsk2gUuLIXakl0bfB9QocPvW+2fWbPhyVWnPIVtVU8gMm9xOSZlrwR5R3g/lROSdZRr9HCrn1EUAfVTN1FqEeE7dMgBO5OORz4MCaJ+8I8LfTSMs03Z7Qkdb+1L93ABYKsGg7h3ZhQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ht2//hkX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=F4EZRUl+; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=dNZ/cMGbKw8HhkhmcTKnnMHrdZJNrIma+nok2zHjs0/G2OSbEnZyFn6/b4FsgZXxsvL5VHzO8xyE0bvHL6Pkrxb4DlLikFMuezqkLC7/uJwfsz8S7KUgJSgWsTbaXwT7uiF2qNh8thvGEMze2jb5VpWIdghqzLCBtOqhJQSIzoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WfCc3BNc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=m8tcJdpK; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ht2//hkX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4EZRUl+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WfCc3BNc";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="m8tcJdpK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789335933;
+	s=mimecast20190719; t=1789335935;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=h4wqcB7c2XOoCW8tei1Iz+P2VvDk2BP5ymqe1eDpV3Y=;
-	b=ht2//hkXkIYrJCkgCpLYN/roFxC4OuhRJ3gpekbI6M1GL6z5oV2EAHkBnYa6/RrERH/jsI
-	sI7lYiqcqg7X7Cmebm/8x+IqJJfaiQCWjh9S5XP+zZrb16tzcg8GdEYKFN+z/rioQO80To
-	b+De8iYr81aZb3uu+zQ0oLBLtSgMTLQ=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZWuq6vDDxC9a57mHhVLz+GoF6OV48cjZqu3A8mCuPWU=;
+	b=WfCc3BNcqjh2Dmm7IB07uva6GJolDRggoIrc9UPIYcQBwH7L5+KFiJ9y09i1JnlBsRTQnP
+	QFg2/G2v0xIoGyd/h4flBfWAXa9Mwm2JKkDkhlS7kW0/RpVR1KbvQZ9AqLj3HtFtuIAgIN
+	5u+eEJC3+B8KKCexvOSwMWwdCdAoqT0=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-217-VOmSbAitMKK30z3k-Rma8w-1; Sun, 13 Sep 2026 17:45:32 -0400
-X-MC-Unique: VOmSbAitMKK30z3k-Rma8w-1
-X-Mimecast-MFC-AGG-ID: VOmSbAitMKK30z3k-Rma8w_1789335932
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-530ef14c9caso19779651cf.0
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 14:45:32 -0700 (PDT)
+ us-mta-515-S6azwphxOgC4s1y5fB78zg-1; Sun, 13 Sep 2026 17:45:34 -0400
+X-MC-Unique: S6azwphxOgC4s1y5fB78zg-1
+X-Mimecast-MFC-AGG-ID: S6azwphxOgC4s1y5fB78zg_1789335933
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-9104ba8bf51so74071966d6.3
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 14:45:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1789335932; x=1789940732; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1789335933; x=1789940733; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=h4wqcB7c2XOoCW8tei1Iz+P2VvDk2BP5ymqe1eDpV3Y=;
-        b=F4EZRUl+t+bFDBCTejJmmnlWb80cKnCZNSL+Ur5NkfaK2mwlFHF9P0akvtL4rvmWY/
-         im3e+08BFqyNvwBNAB9sICyMQ3vug7Tn2TtxFEqxpNS5Yx5kajKFITfIO4kKWCZiQFqs
-         hzwvo784a+NLp6V0kI8CUkVRVDJHeG1DzPLlQK8HHFjcY1RdDM3ORnmNA4jdYmHlVUdf
-         3KKZ8kKVJSBSw+dOhtPaTyts6l/jtxcV74ErFOFgIT0WS0Iuyu6O/gyVSc9JCA/0t3Io
-         L/YqoCP4y7r9vgFK/W+QCj/DlMdinnA7hcGbasbwXO0uWsQWvnoLvn7qsEpYstLSUTgj
-         fcxQ==
+        bh=ZWuq6vDDxC9a57mHhVLz+GoF6OV48cjZqu3A8mCuPWU=;
+        b=m8tcJdpKOloXXB80jxqnv1dOPwQljVC9tarIqRNvJBbGK+K1Kc8wLh+dRtyzr2EDST
+         FoAzdCb7v3llFaIB4I+7M9xSQToHDvWJa4Zjqvo/EeBVZ7yE9lYl0HZN/kv6J8kHmCyn
+         GKOvirEhXd3A3at2Ffc8huVe+SzWtNNhlZxBRLmcudNq7M4FQovUwCjKdoB7ZbppNuAd
+         IHIL0qG8vUFYLMAIqRPqzUO53C7nJzAa9fPFgil7OhlEPJiUROE20vp+onzZ+k08cfKM
+         Ckd7HqKieQ7qkoxmOkFi68qwFN5xhZmyrG55F/wOc68OMCCjE8emEIjSxXEfR5Pd0MyG
+         w9Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789335932; x=1789940732;
+        d=1e100.net; s=20251104; t=1789335933; x=1789940733;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=h4wqcB7c2XOoCW8tei1Iz+P2VvDk2BP5ymqe1eDpV3Y=;
-        b=pjN9h5AYjTSHB9NKL8w3RGsIGipw/XPEurC6QI+FjoPeloTnrSbRqLlhpd6/TTBAa/
-         mhnu/VCGqGFawYh0phHAtjd/h0KvZLSY9/PCQcr8Mvihup9kL0jd1fwhJeNsLs70gHNv
-         gzrEW1WKxfHTQ4BrB6VUYZ+L3NKAS9EsEIksGnovKz7HzNBrDifRnO6Op6wdDAn+DTH+
-         2AaaYidx7cxZzYxQFjwhvHmO7YzmqENkqFL2zFCKLnXXLozIOuFmHjOzsCFUkgmR7Sxh
-         Vs89xF8CXoAl4USZ6uU9xLwkBfJ4UuffIsi5kH5grFtS7ArfEXtyYnfkhMRti0FmMVab
-         4AQQ==
-X-Gm-Message-State: AFuF++kfTvfv+ocZNW/dp7Hp9gbhRVlvO7bthCYaKR7jA1WbsGfCzOEV
-	n1Fpcc5bW5Hj5lHfs3kWcGGU/TlsAx5Lwkb2YrwteLx3KiZxhIWS0sxXuw5PDZDkGqmSqBjsvvL
-	DN7Ezo3JMJyVvs6AvCtP5WoFny9uAfZvBT3/HU1xP0s01RryiVoP8uXPSfP5NwLgawKVIcu5MyJ
-	aZ42UGyy5Ex8h9p1OiO2hMim4h9Nx4O0pNt2bm4LPnkBuBQJI=
-X-Gm-Gg: AYBFou2zTeUUg72//5jjzwp/+wyrMZLemjzw3FuJU+t/R9dxKSJKVx5m+gicEnF97jl
-	h0Om0HRSGtp/WSqqAEUNc2YJlkqHKHl4mpq86Hknriak3f+Hbs79dbXv01iYGgj7NaNJADAa6YD
-	1hLmNzQl0MuHzYqKemASc3kPBaZWf2hJ8Gb6HmMyqWCB77aqA/2ElYAUOKzyJnjDD7X5fJid5AY
-	4sNqecUwCufuFEfK8rBAVICBUJJ2uOnDKJwEx3xChZ/S2YfGZQEQNv1R+AT7hh/IDHz9fDoozze
-	nPV6HxB4STEMwlijS97ce56gcuF1wbuP2G5yD0BSFJUJbex4e1lRUxRUo+bJZn7it8tD6Fmg9Yx
-	APAVn6LTHNPsQHoLo63hXs2amiIYiH8V9+QZk7xzsZ+bYTzSGKibDdVscK2L03BZsFg==
-X-Received: by 2002:a05:622a:c08:b0:530:e36d:1855 with SMTP id d75a77b69052e-530e36d205cmr152534101cf.42.1789335931926;
-        Sun, 13 Sep 2026 14:45:31 -0700 (PDT)
-X-Received: by 2002:a05:622a:c08:b0:530:e36d:1855 with SMTP id d75a77b69052e-530e36d205cmr152533651cf.42.1789335931258;
-        Sun, 13 Sep 2026 14:45:31 -0700 (PDT)
+        bh=ZWuq6vDDxC9a57mHhVLz+GoF6OV48cjZqu3A8mCuPWU=;
+        b=HgnLjbAlsY/7Q5p7xnuWHJ/bz1e9w9PpAPVAwBADfwhijCgLr8WJr9HFyVgGnENR8w
+         mM5+l9w89tfmfoha9xusm06+LirK+iKcWviHa8MO5X0JUf8B360DxpwHXH/FXyIcyVJa
+         FhDtjYB5aZyyhSLGFAxtJb7VyR84gVhyKhawrNo6gTV/mDy7Y3eC7ui1ccg7bG9GtQ6w
+         rWXdn62rf881CsWuYuH0eF06BQD8dBLEZW0Sz+IY2CRTAawpiDiXT2mLCXg667QsIyQB
+         M/eD63rPQbeB6ul38ZTx6+Dupx1t8sLjYcdSSKoQ2Ig4cFDxlkenZbctPJzyyBt0tn9F
+         2mHw==
+X-Gm-Message-State: AFuF++lpRlQJhCUtgwYbbJusdRNzKM2Fpdgwu8qa7biSWJOJPx/cdVbw
+	lR3s6H+WLgeJxlAIzhlC90Xm8WkD3ddNllvEJTCq/r1as4wxwU9qAIF+2QJSrhrF7M4qzRq9XQF
+	szXS0dnb3Cfnt7lJZb6ZOY+0VnGNA7fv1hObjEpWC/Z1dZ0JhXKu7ST3xs9uFJITBgm3uM3O0oY
+	wFqqR4z693p7zZHgGobPbpCAklDrByHQ6qolNwvgLam90TsSs=
+X-Gm-Gg: AYBFou3h806/bK+xW3KHKV5eB78f3T0CjzdLFiUUmMJnktPdPYgwXyxto1azitbKc3k
+	vYnJnU1uxaSAdBL/sayOaUaFifoSjUeoqNUzkIIvahU8pJtf9WdJMuYSQSY9Tm/R7JqR7w9GJ//
+	RT7xrtvjjbpxebjhshPICrojNkant9kUVipNcDkrXoEFcsrjAor3QJudYtgHjKv/qWxsfwiqvTS
+	ZXaa8wrIC2psiCtfjIU7c602AtTRURv9T5mDWYm3o/Hip6FyPysTIbHGn8gXOR+7VxPgI81pz8W
+	n3FNsWJtCpqs08LGli3VDnugFDuzDA5N+UYQct3tziM75hodroEiDwFKuBkdFo3uZCO1nqKIHGC
+	hFnJB74eDKPs2B1gxx+6XUtnbb9FdGU0SEQ4/1amAoriNOUpX+t/7IREA6x0ekXMxbA==
+X-Received: by 2002:a05:6214:f64:b0:910:3452:d57f with SMTP id 6a1803df08f44-912120efc7fmr264356736d6.31.1789335933454;
+        Sun, 13 Sep 2026 14:45:33 -0700 (PDT)
+X-Received: by 2002:a05:6214:f64:b0:910:3452:d57f with SMTP id 6a1803df08f44-912120efc7fmr264356406d6.31.1789335933009;
+        Sun, 13 Sep 2026 14:45:33 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f49444bsm78581126d6.29.2026.09.13.14.45.29
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f49444bsm78581126d6.29.2026.09.13.14.45.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Sep 2026 14:45:30 -0700 (PDT)
+        Sun, 13 Sep 2026 14:45:32 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org,
 	pc@manguebit.org
@@ -86,9 +86,9 @@ Cc: linkinjeon@kernel.org,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	stable@vger.kernel.org
-Subject: [PATCH v4 09/10] smb: client: fix potential OOB read in smb3_enum_snapshots()
-Date: Sun, 13 Sep 2026 16:45:07 -0500
-Message-ID: <20260913214510.3071370-10-sorenson@redhat.com>
+Subject: [PATCH v4 10/10] smb: client: fix reparse buffer bounds in cifs_query_reparse_point()
+Date: Sun, 13 Sep 2026 16:45:08 -0500
+Message-ID: <20260913214510.3071370-11-sorenson@redhat.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260913214510.3071370-1-sorenson@redhat.com>
 References: <20260913214510.3071370-1-sorenson@redhat.com>
@@ -100,49 +100,38 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If snapshot_array_size is smaller than GMT_TOKEN_SIZE, smb3_enum_snapshots()
-sets ret_data_len to sizeof(struct smb_snapshot_array) without verifying
-the actual length of the server's reply.
+In cifs_query_reparse_point(), the start >= end check before casting to
+struct reparse_data_buffer * only ensures the start pointer is within the
+response. It fails to verify that there is enough space remaining for the
+fixed 8-byte header of the structure.
 
-Because SMB2_ioctl() places no lower bound on the server-supplied OutputCount
-and allocates retbuf to exactly that length, a short reply results in
-ret_data_len exceeding the size of retbuf. The subsequent copy_to_user()
-then reads past the end of retbuf, leaking adjacent slab memory to userspace.
-The subsequent clamp check is ineffective as it only reduces ret_data_len.
+If a server provides a DataOffset that leaves less than 8 bytes remaining,
+the check passes, but subsequent reads of ReparseTag and ReparseDataLength
+will occur out-of-bounds.
 
-Fix this by rejecting replies shorter than sizeof(struct smb_snapshot_array)
-with -EIO. Note that the bound is set to the 12-byte struct size rather than
-the 16-byte MIN_SNAPSHOT_ARRAY_SIZE defined in MS-SMB2 3.3.5.15.1, because
-12 bytes is exactly what copy_to_user() attempts to read to ensure memory
-safety.
+Fix this by ensuring the remaining space is at least the size of the
+reparse_data_buffer structure before accessing its fields.
 
-Fixes: e02789a53d71 ("smb3: enumerating snapshots was leaving part of the data off end")
+Fixes: c13b779d26b3 ("cifs: Fix validation of SMB1 query reparse point response")
 Cc: stable@vger.kernel.org
 Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 ---
- fs/smb/client/smb2ops.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ fs/smb/client/cifssmb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index ee3c98e3f316..3464470d3297 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2463,8 +2463,14 @@ smb3_enum_snapshots(const unsigned int xid, struct cifs_tcon *tcon,
- 		 * and retry the ioctl again with larger array size sufficient
- 		 * to hold all of the snapshot GMT tokens on the second try.
- 		 */
--		if (snapshot_in.snapshot_array_size < GMT_TOKEN_SIZE)
-+		if (snapshot_in.snapshot_array_size < GMT_TOKEN_SIZE) {
-+			if (ret_data_len < sizeof(struct smb_snapshot_array)) {
-+				rc = -EIO;
-+				kfree(retbuf);
-+				return rc;
-+			}
- 			ret_data_len = sizeof(struct smb_snapshot_array);
-+		}
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index f9aff0712794..6dddbd84b93b 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -3080,7 +3080,7 @@ int cifs_query_reparse_point(const unsigned int xid,
  
- 		/*
- 		 * We return struct SRV_SNAPSHOT_ARRAY, followed by
+ 	end = 2 + get_bcc(&io_rsp->hdr) + (__u8 *)&io_rsp->ByteCount;
+ 	start = (__u8 *)&io_rsp->hdr.Protocol + data_offset;
+-	if (start >= end) {
++	if (start >= end || (size_t)(end - start) < sizeof(*buf)) {
+ 		rc = smb_EIO2(smb_eio_trace_qreparse_data_area,
+ 			      (unsigned long)start - (unsigned long)io_rsp,
+ 			      (unsigned long)end - (unsigned long)io_rsp);
 -- 
 2.55.0
 
