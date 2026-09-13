@@ -1,82 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569A52F28FC
-	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 21:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F63A2FE060
+	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 21:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789335929; cv=none; b=mhYQynh6Db1m3SLBZpDHjqvshvTzboLzcEJijJoYum8YrlQJPNzdm1weCyFprY+cCpeh6i779hlyFJjkUDmvxN8UxADRi0fnKn3Fzec+hRj0AA2zNRHtaHsRafIxzzHkMB/bF05Uw8D6KRzgY8W1hIONaAXVNj7VGgKI/v8NoN8=
+	t=1789335930; cv=none; b=pQQnJg0hBlw5Si1Q6ZWiNgELVJLCW/5haeUv4ZXB6Xe2IHTk5sPFj11vU0YoY3YcvUw45HZA76VgXbKLWaXHoR1pigdk7wyi444XZ8guGOIgq6JCpGI3brZ1qWjiC752cfMWr1FHBJYSo/l2tpj55Ucyb6bzka2lAaRiklZp7Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789335929; c=relaxed/simple;
-	bh=nqfoL6Sp1nIQ19/slQDnpcHsImhTyPT0s8L8U0rdTI0=;
+	s=arc-20240116; t=1789335930; c=relaxed/simple;
+	bh=f+YJXylF+jELmM3YL8b/3zgaQ/j7J8cGlBlt+c/+tZQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EGjVbFhZ+REkEY/QbEhaom5up5vrOL5h5kaVHvR8BTMX+M5cci1Ym3tY1aWIpy9r4TiX3csr0zmDUR3Nl/TohWGrYC64TRakyT1eltSTTCBeqMyaABmAD5O7p9NOFZiBddgaOQhXujbY1oEKmv2nwp+ZfGji86AxUCJ/YlSp5mQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CG0Yt2GO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=UDKQjoY4; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=k6M/IgSCFSAvnxYEwZbuEgkyHCMXfkhsCn/vc4ifHyV287ujUd1m7HXGN6mwAQkFfMhajsE1vB1YquMl1tMzQJO6c2w0Ulu89S2aKTzKbRZI0cs6YnmmNIrJkWsaD1KNoqKRVNJ2N+p2VoedaDVdl4szkYpkNtaT4lTuPNbOWTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fgptOSQ6; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AG2MPAVa; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CG0Yt2GO";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="UDKQjoY4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fgptOSQ6";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AG2MPAVa"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789335927;
+	s=mimecast20190719; t=1789335928;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ABM2woyIBHuSZR/C0pNttPA7KR8KLBv44FjWRfwZWUU=;
-	b=CG0Yt2GOgdTzfrfcrpp2yhiKbBLTjWT4ePsP+WIbsBfl7w+9cSc8M8562wbmPhzkppoq0y
-	F+nsQQ4zpn2tLRwO9FQdBGmSpZd4bSNgNquN53dzBMbE+bVqHEBfJ9xzhHOBA9HekFVw/N
-	5UhoejHkfQKgygnRHan/YdF0V18wwTw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=KKqvOsVDrJRPcyxb6Szb7e0yhM454WCjOV2ZQ8hI9uY=;
+	b=fgptOSQ6LcmevO4aisjE46zY+hyvxxxL9+lvKweQAk2/8mUj+0hmCauKpaNt9mw2ap3Mpm
+	k7JQmGMbqDr+PsT45v9O2gOlgCpnqr/hh/EMnv0YQDr/TlBg/zPE11wyLh6gkDUHi7AWHH
+	ts3cNr2Bsk3BbDx482UFiBZmKu9klWE=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-279-8_1Td3nMNdyDR7IDLQyNwQ-1; Sun, 13 Sep 2026 17:45:26 -0400
-X-MC-Unique: 8_1Td3nMNdyDR7IDLQyNwQ-1
-X-Mimecast-MFC-AGG-ID: 8_1Td3nMNdyDR7IDLQyNwQ_1789335926
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-90e7de22fddso60035196d6.3
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 14:45:26 -0700 (PDT)
+ us-mta-452-jA_qDW9TNTuPJyA83F9cPg-1; Sun, 13 Sep 2026 17:45:22 -0400
+X-MC-Unique: jA_qDW9TNTuPJyA83F9cPg-1
+X-Mimecast-MFC-AGG-ID: jA_qDW9TNTuPJyA83F9cPg_1789335921
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-9103f4ddce5so31797806d6.3
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 14:45:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1789335926; x=1789940726; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1789335921; x=1789940721; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=ABM2woyIBHuSZR/C0pNttPA7KR8KLBv44FjWRfwZWUU=;
-        b=UDKQjoY4B/i/nAF9MhEaF3k2YKkIA5bYyM8ru6owLmlKeShDqyqjyo2LCgCkcj4Vr2
-         FdlZ3TX6RD3aT/tq2q9QoiKf2n8vMztJ/AkElVgKZxQ+8NwbrKgZk6SFQdr3Yib2zGCa
-         qPREGWlO3zThUeIpMD4R+LTvQJSuA33x8xKJ8bCgA5ilWG/HuQCLSFgdPeME4Zo9tlVO
-         6h647TyW972wgUjGms4kCvDwbyschsxuGObpuSx0IXFn4t8CEC0Wz28hnJuaEPTZOTyH
-         nfmT24TdXIjel5/k3YjGopbrXklfoim6x8eKC4er6IzYouRQ8O4+UgCLKfhgBkOuc/qV
-         Phrg==
+        bh=KKqvOsVDrJRPcyxb6Szb7e0yhM454WCjOV2ZQ8hI9uY=;
+        b=AG2MPAVak6OeIfAQNylyYx5uYp4f7Jk1VwsD7hB/LEkz2/LRXztVr4H3dtHYlxE+98
+         smMcffsme+Kmc0aPW2O8udosqi8l5Ml3wBX1ZduaODi/YxNYmYTEN1TwOxFpGDM3yYAN
+         mYiQrHgI1nu6YJ7NAhzeVPKi7ZzWYZsUp1DgEMHbZmFqpQ/kl1zz/As1iffgFyG51S8r
+         /XDlrWoJmBUSPHXfs7/2X+8qH++DveWi4Y5ZvOnI+fu/evT7I5svGosgZZVG8ii4QOxE
+         e3u1PKhscpYxptxIYn2zrzJ8IIzRGXBaWlch8WPxBX8pJW0M2m7CF7uE3dCXrcFN/Zfa
+         6sRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789335926; x=1789940726;
+        d=1e100.net; s=20251104; t=1789335921; x=1789940721;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ABM2woyIBHuSZR/C0pNttPA7KR8KLBv44FjWRfwZWUU=;
-        b=Qt22HLjcsfXeOz6E8IgnlSGnsP74hSpiy9aW1lcDH17lqXfiksBS6qurt7uY46r3mt
-         2FiJ8RpgHBxBXY3iz+/fQ2u+jsOD3/iT7GUYqDcWok00ZHCATvXlAjMaRDjZ6yw/9He9
-         v6l4BMjIJ3pk2k5u0zSnnCatPFRHdgVrKApM9QQ8e6HkRB4Q/YArWapDVl7CGbPYI6zX
-         O3qyHFPIeRdRccpbdLewJ88PGY6Y/XL9oPMtPdPr/j2Ic1kJMsh/LWPYgMclHTjOZMYh
-         s4CP4OkP7ooFhfQZy/ptooTZ2wmxh8+ZM086+2bCBhX+WUY0AlxEXzBuQVtwhRGg6B6N
-         8Iow==
-X-Gm-Message-State: AFuF++l3Hs8ffIbUyqHXJA9gzwxjq9JYIRnrr/AFfMHrhwdzZatR3Mbb
-	pMJOi8P+mPQsIaf0DW9Hlm3a0BtMBmNsneJ1swY6CeIfFxTnBDNCJ8zEbyJPRefDMBgte/eSAzm
-	uzvdOW9mssYKc3d274RDkjAeyu1Eq0XVbpeDilL6KM+8G7/qb75kx/voGLyNAq36LysyL87RJ9s
-	+HFw+Z4xSgdilObJDp3RSd8FG7jtzATYhRsXFd7EqmaYo7mSw8sg==
-X-Gm-Gg: AYBFou267/Q0Vft/34tNNuBkFViszUPXl2asDcEPDILZO7wdYr11nNa/dvIGUG0SKuq
-	JaCJiNDl32OZMYK0J9JLtXEZptrSqwsVSbMkSWCGISO5BoFmxuXdWjT7NqjZHooDLkasdZdgd6l
-	esOBBKiIJs3JuwMsP4qwC3Nve6PEqqGsXXKahL++eK+r31DzfO6YTF6wkw19X+k7QRQqFKQqlkf
-	iSvmnHRly7hUqpogODyPzJrf3NS/oKG9ZMSV/R1RFsAuFk3MLjQeLO5zhyd3C2hcLly8mP+eQVw
-	0lY3FRNCh2gYSuWr3DTkZANA0BWPFMD+kIBNVsVFu3bbFeGeKEv/z2egwOXC9vBTZCpxCH500+8
-	CtWfdDBjewuzRm10zoFxzx8PZV0oAtOwEKfltZyPWHaX7QWwSqnWX7EirOyIx59hrhg==
-X-Received: by 2002:a05:6214:5287:b0:90c:e240:3e89 with SMTP id 6a1803df08f44-9122e501040mr24666d6.13.1789335925636;
-        Sun, 13 Sep 2026 14:45:25 -0700 (PDT)
-X-Received: by 2002:a05:6214:5287:b0:90c:e240:3e89 with SMTP id 6a1803df08f44-9122e501040mr24306d6.13.1789335925159;
-        Sun, 13 Sep 2026 14:45:25 -0700 (PDT)
+        bh=KKqvOsVDrJRPcyxb6Szb7e0yhM454WCjOV2ZQ8hI9uY=;
+        b=VVB8vGOBGqrtLmjd+bE9MhecukQfkItRQ2LWMlG0z0Qsim9orWjTXdIFMvOUvbIi2v
+         VVDVzD1lDgbQt8NvxjArxGgmB4BM/9unEajAXoQY8F06W2pxvGvl5KbZkzv6Cp04W80B
+         HxL5khD08orGlze11FyWo9/xcqswkgzJXi6LAqf9U1wb68gYc12KkTmipau1QIBp986n
+         Fl1mLmAD520YUQchlKPyFFMkmJCVbipPA526q29bGSeTRjgwOTFu0zgxurqSq0FSTzzJ
+         za7wUs7m1aLywUuYuWih9SXs9ZpdfZRAgeB+0o8p7TpFExhbq5lXyJN6WUMc3Mh2mOl7
+         3bSw==
+X-Gm-Message-State: AFuF++k2VWIBttaOpV8SjhdilP9QXZzwi1kJEPfxH5w8Yxg9Mc3uxxfY
+	yp+vM/nxjjv234dYYlRAJm1sRiqrs9gMxMHEczS7EPdB2JNRSEyCUBZ58w0BcuSiZttFpu0Hlo9
+	RlZhPJTHu6rEpcuN019ZgWSVHZr2JcjKO4isX5Ib1VC05dAiQ9va77LHHyAW9GV9Z79MZtL65vr
+	qOB6FHyDpYkJmpAJMzxGCxA9Z4wo1Tmealneo2Jdj7PAlXpk8doA==
+X-Gm-Gg: AYBFou35ODP6seCuT3bURKzPEDXKS1HQ5AbWD3DjcSgKh9lldFEchysixIXSBem5Rbv
+	+1h1NG7bsdf/PbmAczU0veWh4vMfw1DZV/tskcQhc0dnv0HQRT3C5QCKOu0N+Wnqoj58qJIs8Y3
+	AsUiMponZePqD4Z1sax8uikpmVpAVRa+4kGwBOYzPSQcHAwGnHzOvkCn4mya/R/IzA+4XcNHAmL
+	15sGUY2fkfl+haNPNklK9xpTQLLwpnh+S/SXMt2WzrYR+gbFgEpcTbhdqWvawNPCU4/+1oJpIVX
+	tdoVqiac2CuGfO0oBuao7HaBRUI52gfBYN3BBY4gDV/bO8h5zcvvJYWR46lgrNc3Y9LDPqBXtqw
+	XKQMCU9Aj8Jw93b5YtYRAK3E7ST+Yu1It+lgv59vZNYo+fvDwawKjHiHN05p49exv3w==
+X-Received: by 2002:a05:6214:4a05:b0:910:3988:b3b with SMTP id 6a1803df08f44-9121210a899mr243747556d6.36.1789335921450;
+        Sun, 13 Sep 2026 14:45:21 -0700 (PDT)
+X-Received: by 2002:a05:6214:4a05:b0:910:3988:b3b with SMTP id 6a1803df08f44-9121210a899mr243747136d6.36.1789335920941;
+        Sun, 13 Sep 2026 14:45:20 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f49444bsm78581126d6.29.2026.09.13.14.45.23
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f49444bsm78581126d6.29.2026.09.13.14.45.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Sep 2026 14:45:24 -0700 (PDT)
+        Sun, 13 Sep 2026 14:45:19 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org,
 	pc@manguebit.org
@@ -86,9 +86,9 @@ Cc: linkinjeon@kernel.org,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	stable@vger.kernel.org
-Subject: [PATCH v4 06/10] smb: client: fix OOB struct field reads in move_smb2_ea_to_cifs()
-Date: Sun, 13 Sep 2026 16:45:04 -0500
-Message-ID: <20260913214510.3071370-7-sorenson@redhat.com>
+Subject: [PATCH v4 04/10] smb: client: fix missing lower-bound check on DFS referral string offsets
+Date: Sun, 13 Sep 2026 16:45:02 -0500
+Message-ID: <20260913214510.3071370-5-sorenson@redhat.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260913214510.3071370-1-sorenson@redhat.com>
 References: <20260913214510.3071370-1-sorenson@redhat.com>
@@ -100,88 +100,53 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In move_smb2_ea_to_cifs(), the while (src_size > 0) loop condition is
-insufficient. It allows iteration to continue even if the remaining
-src_size is too small to contain a complete smb2_ea_info structure.
-Consequently, reads of ea_name_length and ea_value_length can occur
-out-of-bounds.
+parse_dfs_referrals() checks that DfsPathOffset and NetworkAddressOffset
+do not exceed the buffer end, but fails to check that they don't point
+inside the referral header itself.
 
-Fix this by ensuring src_size >= sizeof(*src) before attempting to read
-any structure fields. Additionally, reject any next_entry_offset that is
-smaller than sizeof(*src) or that would advance the pointer beyond the
-available buffer.
+If a server provides an offset smaller than sizeof(struct dfs_referral_level_3),
+the derived string pointer overlaps with the struct fields, causing
+cifs_strndup_from_utf16() to interpret header data as UTF-16 strings.
 
-Note that for calls where the server returns a malformed EA list, the
-error returned to userspace changes from -ENODATA (getxattr) or
--ERANGE (listxattr) to -EIO. This correctly signals a server protocol
-error rather than misleadingly indicating "attribute not present" or
-"output buffer too small".
+Fix this by enforcing that string offsets are at least sizeof(*ref).
 
-Fixes: 95907fea4fd8 ("cifs: Add support for reading attributes on SMB2+")
+Fixes: 4ecce920e13a ("CIFS: move DFS response parsing out of SMB1 code")
 Cc: stable@vger.kernel.org
 Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 ---
- fs/smb/client/smb2ops.c | 25 +++++++++++++++++--------
- fs/smb/client/trace.h   |  1 +
- 2 files changed, 18 insertions(+), 8 deletions(-)
+ fs/smb/client/misc.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index bda940cb3784..ee3c98e3f316 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -1053,8 +1053,9 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
- 	char *name, *value;
- 	size_t buf_size = dst_size;
- 	size_t name_len, value_len, user_name_len;
-+	u32 next_off;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 945194fe7a97..05168284f205 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -788,7 +788,11 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
+ 		node->ref_flag = le16_to_cpu(ref->ReferralEntryFlags);
  
--	while (src_size > 0) {
-+	while (src_size >= sizeof(*src)) {
- 		name_len = (size_t)src->ea_name_length;
- 		value_len = (size_t)le16_to_cpu(src->ea_value_length);
- 
-@@ -1110,14 +1111,22 @@ move_smb2_ea_to_cifs(char *dst, size_t dst_size,
- 		if (!src->next_entry_offset)
- 			break;
- 
--		if (src_size < le32_to_cpu(src->next_entry_offset)) {
--			/* stop before overrun buffer */
--			rc = -ERANGE;
--			break;
-+		next_off = le32_to_cpu(src->next_entry_offset);
-+		if (next_off < sizeof(*src) || src_size < next_off) {
-+			cifs_dbg(FYI, "EA next_entry_offset %u out of range [%zu, %zu]\n",
-+				 next_off, sizeof(*src), src_size);
-+			rc = smb_EIO2(smb_eio_trace_ea_next_offset,
-+				      next_off, src_size);
-+			goto out;
-+		}
-+		src_size -= next_off;
-+		src = (void *)((char *)src + next_off);
-+		if (src_size > 0 && src_size < sizeof(*src)) {
-+			cifs_dbg(FYI, "EA next_entry_offset %u left truncated entry (%zu bytes)\n",
-+				 next_off, src_size);
-+			rc = smb_EIO2(smb_eio_trace_ea_next_offset, next_off, src_size);
-+			goto out;
+ 		/* copy DfsPath */
+-		if (le16_to_cpu(ref->DfsPathOffset) > data_end - (char *)ref) {
++		if (le16_to_cpu(ref->DfsPathOffset) < sizeof(*ref) ||
++		    le16_to_cpu(ref->DfsPathOffset) > data_end - (char *)ref) {
++			cifs_dbg(VFS, "%s: DfsPathOffset %u out of range [%zu, %td]\n",
++				 __func__, le16_to_cpu(ref->DfsPathOffset),
++				 sizeof(*ref), data_end - (char *)ref);
+ 			rc = -EINVAL;
+ 			goto parse_DFS_referrals_exit;
  		}
--		src_size -= le32_to_cpu(src->next_entry_offset);
--		src = (void *)((char *)src +
--			       le32_to_cpu(src->next_entry_offset));
- 	}
+@@ -802,7 +806,11 @@ parse_dfs_referrals(struct get_dfs_referral_rsp *rsp, u32 rsp_size,
+ 		}
  
- 	/* didn't find the named attribute */
-diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
-index b442cccd1530..bb8d0197cb54 100644
---- a/fs/smb/client/trace.h
-+++ b/fs/smb/client/trace.h
-@@ -27,6 +27,7 @@
- 	EM(smb_eio_trace_copychunk_overcopy_c,		"copychunk_overcopy_c") \
- 	EM(smb_eio_trace_create_rsp_too_small,		"create_rsp_too_small") \
- 	EM(smb_eio_trace_dfsref_no_rsp,			"dfsref_no_rsp") \
-+	EM(smb_eio_trace_ea_next_offset,		"ea_next_offset") \
- 	EM(smb_eio_trace_ea_overrun,			"ea_overrun") \
- 	EM(smb_eio_trace_extract_will_pin,		"extract_will_pin") \
- 	EM(smb_eio_trace_forced_shutdown,		"forced_shutdown") \
+ 		/* copy link target UNC */
+-		if (le16_to_cpu(ref->NetworkAddressOffset) > data_end - (char *)ref) {
++		if (le16_to_cpu(ref->NetworkAddressOffset) < sizeof(*ref) ||
++		    le16_to_cpu(ref->NetworkAddressOffset) > data_end - (char *)ref) {
++			cifs_dbg(VFS, "%s: NetworkAddressOffset %u out of range [%zu, %td]\n",
++				 __func__, le16_to_cpu(ref->NetworkAddressOffset),
++				 sizeof(*ref), data_end - (char *)ref);
+ 			rc = -EINVAL;
+ 			goto parse_DFS_referrals_exit;
+ 		}
 -- 
 2.55.0
 
