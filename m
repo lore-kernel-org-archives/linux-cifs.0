@@ -1,89 +1,102 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026B9344DBD;
-	Sat, 12 Sep 2026 17:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F339C79DA
+	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 00:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789233913; cv=none; b=gldHX5SmKVzXyLsdiyUicCyTw2Nam5gmnwvLy8B8pbbkCngfkIfBA4AYE4x7tpEKIOcjbTPiSOTrciaC+HxDNeyM+qT7cQRtG7nY2M5HlfrxkQ71atG7r/iiW+kcRMElkGMZmJ2D7ANdxvgnT20RSjJc6zLSl72C0Uh8jApT65g=
+	t=1789258605; cv=none; b=Y9Sj7JVd61D9Lc92e1rIeH44yOT1dy41aSbxf4who1Vh/e3uIptnUwMitChWCJpSVCfIwfzoxyM5ORpIe3r00Lziwe2wjbPbPs+rZXyEjJIsHDGai1jyBI5z5lzFV7XamFnfheUBvr9Kl+VXT457ZrrSRgwd0iCVkOauF63Qd0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789233913; c=relaxed/simple;
-	bh=QXDRw9pV0IRdDDA/BtqZMyVyh7hevMPQ0dSLNvpv1LU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qlN0lOoDcbwpFC6jXnRb9mOOHnkxH5UWX0Y/63R2V8yzwWHG2CWTbbkagygI1w4jTYs50/BmhxbS+P1uoE3Os7VFjtmbIJZ+HCbEqKWGHIUOx4VQoJGGpO6/xKYctEo0q2lE3mYDaX7RGJewO4fbkJ3NuNTpVsMS6ms8qrYc2kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=jvqNcw2Y; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1789258605; c=relaxed/simple;
+	bh=K93JjxfVWTbVc5J84tzC1c6xHkrZ1i1aRo1YDlITJVI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KbCJwGIjgJlWumTAKNBnlE/IQCVvRnn83KENX9SptsBj7mm2TvgZlOOXSz9e2uBoYS3zSKNmg9yh6AFqzAePANhDLm3OiV48M0y1ZUrLk/w77NbZ4HJCmABabdeWnURwp90Uv1B/iCUjmOR0GHv4dP6mzHTDlic90/B48tMFrIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECBNbBXi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="jvqNcw2Y"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=rIGHI5YgO7yAfuFproSRnoA9xeddrN6au8mFY0weL5c=; b=jvqNcw2Yy3zfbJRX2GKMhNVe0m
-	j1/Lg0wZGePv77A13iy/kwef3UcATUx/kvcteQ8Dpf5QsrgnplswNDPdK4805PuA7/drFLUI/A13j
-	/xBSA/8sQm59ODIpHbQo8F4H9AEzHyZleSDTqOtCGZ2OIIjwWThqMPOK9Fqv9N7h+iExXUHT+3oIt
-	0ouSx32IGzfsNI1vdk4Ns47KB+vbSLbp/Wyonm5Z3vuk/5IbX88NLbttGAfj7iwZgP1y4A/jJhVsd
-	5xuB1QoGImXqqAvhqALBEIHqDD2/pN1xmhEXINox3PlbSF4JYEZ9hd3ckifumHmvXqDLKRtlPuFD0
-	5BLWSeGA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x5RTR-00000001Hxi-1WPv;
-	Sat, 12 Sep 2026 14:25:09 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: linux-cifs@vger.kernel.org
-Cc: Tom Talpey <tom@talpey.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: client: fix smbd_connection leak on cifs_get_tcp_session() error
-Date: Sat, 12 Sep 2026 14:25:09 -0300
-Message-ID: <20260912172509.542168-1-pc@manguebit.org>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECBNbBXi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A2861F0089A
+	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 00:16:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789258603;
+	bh=ykMd2nIO4fq4zCWHnMs0SyAl3HMmRtYQO1fhrdSGI9U=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=ECBNbBXi1RJnOiSFdLTbFjG8H0gyB1o3SHCFTHgfxaoi9BU2cKuBHKwGg245V5IkJ
+	 FrtNWAUYByj7CPsB2LC0n5DMtOZshvCf+m36I2Gjw00IFcv1WONaQl+rmY01VJbEsx
+	 g9+sPnKu0AXwSLfxb1tk5iEMp+Ko5vRRIarQdG0bKIavvUYOmdJJjSVpLljN8b5zzE
+	 1kePIBLhlWJAMS8MoBIEfUBuEUkh2pLxw17Z+EgYAaCOWbIncTRBi3vvH7mw+74FSs
+	 IiA9EGheO52en2BGjb9MclNzon0cKNyfZHj1R8MFCe+D0mADjm1WFX5OGDBKnAq/cl
+	 izpgpaOu1eAAA==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c299de66a99so34340066b.2
+        for <linux-cifs@vger.kernel.org>; Sat, 12 Sep 2026 17:16:43 -0700 (PDT)
+X-Gm-Message-State: AFuF++nV7eqj5G+UX9oA47L8mytLP+stmaa9Y+4nuKreLNARjj07K0VJ
+	hC6r838+dHeZIG26YF2WKR2YT3ZqIVjzvCXWPBZT9jUraTkuK2WLzOv0IFIPYVvhdwaBbsxb3Q7
+	4BblIX/VbNziDTfejsSTvfl2G94teLrM=
+X-Received: by 2002:a17:907:9406:b0:c29:53eb:9919 with SMTP id
+ a640c23a62f3a-c296678b861mr548032566b.40.1789258602052; Sat, 12 Sep 2026
+ 17:16:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260912152008.392251-1-pc@manguebit.org>
+In-Reply-To: <20260912152008.392251-1-pc@manguebit.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 13 Sep 2026 09:16:30 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9GiyCxnEzcHYffVR-9ZtwWLtaskKj4Xq6c96Sy9rAR8A@mail.gmail.com>
+X-Gm-Features: AcwNN1V_t0iF3iPc-kRr-Lqbl0tWGhWCAgF_MZveUQi-Jd3YvdJeZExLrDONGpY
+Message-ID: <CAKYAXd9GiyCxnEzcHYffVR-9ZtwWLtaskKj4Xq6c96Sy9rAR8A@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: cancel reconnect work in clean_demultiplex_info()
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: linux-cifs@vger.kernel.org, 
+	syzbot+5003556314abc915a71f@syzkaller.appspotmail.com, 
+	David Howells <dhowells@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When an RDMA connection is successfully established via
-smbd_get_connection() but cifs_get_tcp_session() later fails (e.g.
-kthread_create() returns an error), the error path frees tcp_ses
-without first destroying the smbd_connection.
-
-Fix this by calling smbd_destroy() in the out_err cleanup path before
-kfree(tcp_ses).  smbd_destroy() safely handles the case where
-smbd_conn is NULL, so it can be called unconditionally.
-
-Closes: https://sashiko.dev/#/patchset/20260912165503.521597-1-pc%40manguebit.org
-Fixes: 2f8946464b11 ("CIFS: SMBD: Upper layer connects to SMBDirect session")
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Stefan Metzmacher <metze@samba.org>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Bharath SM <bharathsm@microsoft.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Paulo Alcantara <pc@manguebit.org>
----
- fs/smb/client/connect.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 4bd9f9fb93bb..28e1ddeb6182 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -1934,6 +1934,7 @@ cifs_get_tcp_session(struct smb3_fs_context *ctx,
- 		kfree(tcp_ses->leaf_fullpath);
- 		if (tcp_ses->ssocket)
- 			sock_release(tcp_ses->ssocket);
-+		smbd_destroy(tcp_ses);
- 		kfree(tcp_ses);
- 	}
- 	return ERR_PTR(rc);
--- 
-2.55.0
-
+On Sun, Sep 13, 2026 at 12:20=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
+ wrote:
+>
+> clean_demultiplex_info() cancels server->echo delayed work but not
+> server->reconnect, which can cause a use-after-free when the
+> demultiplex thread exits while a reconnect work is still queued:
+>
+>   cifs_demultiplex_thread()
+>     cifs_readv_from_socket()
+>       cifs_reconnect()
+>         __cifs_reconnect()
+>           cifs_queue_server_reconn()
+>             mod_delayed_work(cifsiod_wq, &server->reconnect, 0)
+>     clean_demultiplex_info()
+>       cancel_delayed_work_sync(&server->echo)   // echo canceled
+>                                                  // reconnect NOT cancele=
+d
+>       kfree_sensitive(server)                    // server freed
+>
+>   ...later, on cifsiod_wq:
+>
+>   smb2_reconnect_server()
+>     server->srv_count  // UAF read of freed server
+>
+> Fix this by canceling server->reconnect delayed work in
+> clean_demultiplex_info() before the server is freed, the same way
+> cifs_put_tcp_session() already does.
+>
+> Reported-by: syzbot+5003556314abc915a71f@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/r/6aa4a12d.f81106d8.2ab401.0023.GAE@googl=
+e.com
+> Fixes: 53e0e11efe92 ("CIFS: Fix a possible memory corruption during recon=
+nect")
+> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Bharath SM <bharathsm@microsoft.com>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: stable@vger.kernel.org
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
