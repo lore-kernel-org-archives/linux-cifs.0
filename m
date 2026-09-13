@@ -1,82 +1,82 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26E9372ED0
-	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 21:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBCE34F24A
+	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 21:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789335923; cv=none; b=G9kJ+IYoP4DRMhCHwWp2LM4yyhc6PTih+4zOTxOBLTw70k+2FrvlIwv+DOGbTG7nE3GvVrECiptWNHauq6iTB7CaMGZi9X0sAwKfK+rND5H8uIGEb+J5WvPPyKI7FhJjo/+QnaYPVpDUjAGsV2JV3GvGpdtc3DM1K0eF1fCXg6E=
+	t=1789335928; cv=none; b=FhTSiUVlwrm4kxk9FlLM+2rNyjM7VUxhJzUnzVFWxZnvziCi5q9kaSWJ+y43u3U8ursuqNrIdjzcJjTy4w5suVoPksHYwMcDZ4pbteN4aEh4L0I3LmbCK/uA1ZgUsX/+i9kB0ElxDQppveS4XXhVIcP1jUgdD6Bv+9v4s7TeZNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789335923; c=relaxed/simple;
-	bh=qqqqhAcoTazT3zDcG36T/OFmfZ0W7gsqaDYv/oilvnM=;
+	s=arc-20240116; t=1789335928; c=relaxed/simple;
+	bh=OFmUR5n12qboMmyBDS8aJ5gQxbHGee425Wkk4EjiRoo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hGaj1aVEzA9oZ6ogDZdbLS3hH3I4HC9G0QdcGts7DeYaTfB73RFyafTWLBAOnnpM+MJjJH8hcWQS4UGeRcfglHkRQ7Nwe4ULmv75wzVDAXFH9k8DCsqx+2fUKj3NaVVdHi2f6f+Ld0WeXS7P+mbk43UVcZWpoQnKOgUx+wiXNIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J5/X6zrY; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ol+27LzM; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=IFZy7rKIRUxIrim6Rx96hrXKOfGmYnd5ld4nm8Ryv6Vg9vWwF1k2GJYzB+fAI4mq9t6xbePrTbjXut7yDpVT06jcAsGlWoVIL4jnj7G66T2Rq1sKEzZcpnIMh/mgfOOxz/HsDjRY4TgObCu+Uf1Y9zlJG5DNxFu5mvfPzbFtlps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eqL9E29d; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MxV+27v/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5/X6zrY";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ol+27LzM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eqL9E29d";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxV+27v/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789335920;
+	s=mimecast20190719; t=1789335926;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jDQ6J6doFiv43Hl1XC1fv6A2Y0AiG/CVhsbe9ThB2Cs=;
-	b=J5/X6zrYCu83rrt9d/PJ4vCTKZ89nAcw3WmCqM8YMvmsgywxxyWr6Ijl5IbdJOI/9Aww6r
-	yXaxE1EgjIywoWS5txbUD44f3ymtPenBG7AkpiqHYetQEaznDE8hGJmn9pmyGcKT3O56wT
-	3tEehyVDPjViaQ7yYBnDOR85jv9lec8=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6OnhzbABUYbzzJKN8af0lhPKwu8S8OBp+evSnROGSRk=;
+	b=eqL9E29djmv34nt5xVMLFrWe/lagJOcpmv3U1f/ARSWjuoE38g9R0gjtsDjQk1KhFYWtYr
+	8RjUXXU+tI/9O39PEwjUxjIPVp22EARAoGxSbsS5MIrzy8xLCkxpwBauAKv894plFFKf4G
+	S1TQ+fKcB6qvqWO9Xk7bxnFluu/4ZsE=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-407-ZMoXbUdzPc-M-kO7QrIcIA-1; Sun, 13 Sep 2026 17:45:19 -0400
-X-MC-Unique: ZMoXbUdzPc-M-kO7QrIcIA-1
-X-Mimecast-MFC-AGG-ID: ZMoXbUdzPc-M-kO7QrIcIA_1789335919
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-90c8da50f8dso73326626d6.2
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 14:45:19 -0700 (PDT)
+ us-mta-15-Ma43eaITNaW-03uBmfCPcw-1; Sun, 13 Sep 2026 17:45:24 -0400
+X-MC-Unique: Ma43eaITNaW-03uBmfCPcw-1
+X-Mimecast-MFC-AGG-ID: Ma43eaITNaW-03uBmfCPcw_1789335924
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-9102f07f2fdso72534046d6.0
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 14:45:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1789335919; x=1789940719; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1789335924; x=1789940724; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=jDQ6J6doFiv43Hl1XC1fv6A2Y0AiG/CVhsbe9ThB2Cs=;
-        b=Ol+27LzMZdauGe+b4tCHmEfatBH2+fkaDl+DXCRPH2mhb2e9rTgduXOj4cKRMQBsKV
-         EIbdWkgDkYTUTtgJme05XPzQjcLqEew8dcjMNu4YJhfYkBHj2I9aZcqnspaJ9u+/sXHv
-         cog/j+Vy/LAahdby4tglYCxMY0decUg49HEwq2Pu7OOdzhX9uMvKovI3NHUH9MFPswn3
-         +WAEkZ40u3nEpHD6A4HmliUCtI2CbLG750TUh9mB9Bl0ROuhgWluNeiMjy4a2QG7XXLV
-         3rqZxv3elJ6ilG8sy3DOrL5N4q0oVaCWj/TfFhrP+G4PnLUu1HVWslv8kyx8rjBrlXgy
-         6EeQ==
+        bh=6OnhzbABUYbzzJKN8af0lhPKwu8S8OBp+evSnROGSRk=;
+        b=MxV+27v/EUnswzVAZG903qygAgW93OpvmlGD6zJP1uXjXa9vsernjQOi8nt6zzTRoe
+         9wyKQHwyGA1bio0yF5RLx2jmSIJTe+EGoY6gfr7Ypl8+EDCr/om8SQ91ZFL6zO91cakV
+         oy8lrTe0XGP4AimqJIA4z8S7ga0gEhmda/gI6YPj7EsWjRvF34wFDWMUqkX7lqPFD9C2
+         gi+PwvD2ypVWnNDIs1+Ii6Ih2rrvYqbAMLqUW92zV2T+4cCmmh6CduOBsrRLpnWIX+CP
+         38ptcPSyB0sIQDX+3b9KoGBXmlGCrcEH/Yd5KrYkIiobnpoBaUDoLB4OSI1drF81O5vb
+         shnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789335919; x=1789940719;
+        d=1e100.net; s=20251104; t=1789335924; x=1789940724;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jDQ6J6doFiv43Hl1XC1fv6A2Y0AiG/CVhsbe9ThB2Cs=;
-        b=Gu7tOlvNWT+Il8rJtkK+Y7TE9aZYywj30AGYjCUUtWP1qITQAxjU+f2qmwHVInMjMM
-         AI/J84HQ2b0SoXfrFeRvwrsmndC5kj4tYwsxkvMXT6HUzjmFhj+B1xLqebiml7Qf7DM1
-         avPRdL9VnnAzO0Hu+C/6Iecl0bR6n0p8mk9F/+anNxy9QxWwzzTtdkgRY5I9d3AFrpw1
-         pqC95AjOh3USY0amATAaVVAFdnVF4D2kWXIkszrmidGQtLfTTQKrcc0MiULkmWe5t/dW
-         xoa74fePs6S/U+xMEXC3NjQNoJNk/7GGnhc7KnYGLUpaZHoGt+gHO7k0J+Bmz2VxQAkn
-         m+pQ==
-X-Gm-Message-State: AFuF++neOOiYP48eTfcylD7U2K3pkkObEjtkvHcp9X562ho+WtBNynrz
-	yh2jevnZKb5TEpIg9tc1GbS8OwG171ERNakJy5jsDVrlJ7+3Kx/KraZAEc+X7vJmbHu58k30uDa
-	4RBmVyAFHSTI08v1Nql1vPlctVGvt0IS+dD9xrhEz+PW6icSLSNxH5R3fwqQOaa2dH2l3x0DpSg
-	39uzztAKrGVH3WEoM0PxMk5VP3spxefS5Yg0Eb3REUdN6v5zrvEQ==
-X-Gm-Gg: AYBFou03simZ3VIjQQHC4RjjO0Z3eHxlpcK26FNH2qZdcKHcJOcMPtP73CleakQ6kR4
-	0jGEJR6yh5v9wyk6gg8CJoPG2/VaQ7JqI4L4giAyYVuL2Ag2DpYSpj5SeQJM2r6IIzlas5nyyic
-	TmtdK8RU7JBLAgCM38jELmfjRgwSkJN6vJ0aMn8dglkvqrPiga9gn28SGclKm0Ny2UvsAgyJJjI
-	HuEpAgFa5pprCo+F6xhDGkQT32YFg3440i0zZEWgdbGGLyavkEolXJX1qSw/AHsCuODpiF8121z
-	IwNpmqVfSb9ZBLK4tPTceIZgf2D2pI8JNbNeLxTESyc5j3NJ0FK30HaGStaSRDBB6qYwT5BThzR
-	6aMFs8FvZ+8fS45pYDCXZeHIeEdOSy/jz6aSEIsB+lspCy1s7XV33xEFN27l0d9u+OA==
-X-Received: by 2002:a05:6214:5087:b0:910:47af:7b5b with SMTP id 6a1803df08f44-9121da764f3mr135222166d6.20.1789335918876;
-        Sun, 13 Sep 2026 14:45:18 -0700 (PDT)
-X-Received: by 2002:a05:6214:5087:b0:910:47af:7b5b with SMTP id 6a1803df08f44-9121da764f3mr135221436d6.20.1789335918250;
-        Sun, 13 Sep 2026 14:45:18 -0700 (PDT)
+        bh=6OnhzbABUYbzzJKN8af0lhPKwu8S8OBp+evSnROGSRk=;
+        b=d2toSArf3kN+gTgFg7ri1ZK4ttaXl+xU6DbGQPlOjNmsNbQ0ipatfQ74jUmYKWcBR7
+         /UUaNhWDK2oJbTv/Kl5TW4Y8zn1B5IbSGBfT+t3W9xI7+tjUc44OG4AsT9Yn8KvqMuSf
+         MpAnyJMUjJBEeaZlhzMLpEuAXoLMZVB2+ziivyXmmtGZjKnMhU3re9LbOSiR+ZhJF65t
+         JKpH3LJlbvVXhrehDesqtOg/EzCongg8YnTCXtY3pojlUFDXYDDuyUtJ8lDqRnXb5Ues
+         att0/9+GFi67eOhtidy2vSy1GIIgA8eBNMCnq/Y0GjNv43EZTv3fp/cmMxixQFtlwy31
+         yGug==
+X-Gm-Message-State: AFuF++lrSpEs9q3zhsAhM82xLrP5KfCLJ1Edz7goQpbSdPH2XAzWeH0R
+	6F8mWsCqyUsiSpXUe+B5H5eYVpmEbQRlqcA8dekwJpqcWCo43fNRI2CkuKpOiJGSN5oI1Ez2kT9
+	qUa9uLElZacyUtm0xJY/lad4FGCetmz0lB6smnIW13FWOVdy5eDH7arIZlBXi7O9EdEK64aU72W
+	WSGvjO1gch5xg6uKHDoDWCUBEXxMfQOgpXM8c4yY9ECVRyFxFjqg==
+X-Gm-Gg: AYBFou1P5oQdSoynJ/pUO7bbBzXLp3Z912ON4XqlnMx4aEeWfe8bXTgpGGf3fY38cJ3
+	a5C/uJmK3PaHWjin/2UsjKEmHatHPbyzAc0D32+saPpM8PG85+VmzvyAuUgSzPGMVoUz/P9J8aG
+	Js7cfnB7ii8jrSA/fTS0mV4UK92XudDm+pbZQHLx5MBkQHQuzx4xntaazvmNVLhzh1/62mOcX1l
+	zra3c0hiXvn/eeJpJ0F0tk1jaUb2wWVm6DwSTfHrqQA5RsD3cu+ey660id2z2ez2MKTfpf/gXFs
+	ni8YHhloA2Zxlb8d/O3WZCB2q8PZSOVSZUuSZtCwKnbjcqvZWsELHqscEvnjUMoJJeZ6lh0iIVC
+	WlPJVzKqM1lnUhqVcnaBSZ8nqBdrPlGO2DcEghO6ra/C1htP8z5DdKlLH5hvvu9rCjA==
+X-Received: by 2002:a05:622a:281:b0:52e:125b:9444 with SMTP id d75a77b69052e-530fb4983f7mr43674891cf.17.1789335924117;
+        Sun, 13 Sep 2026 14:45:24 -0700 (PDT)
+X-Received: by 2002:a05:622a:281:b0:52e:125b:9444 with SMTP id d75a77b69052e-530fb4983f7mr43674601cf.17.1789335923622;
+        Sun, 13 Sep 2026 14:45:23 -0700 (PDT)
 Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f49444bsm78581126d6.29.2026.09.13.14.45.17
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f49444bsm78581126d6.29.2026.09.13.14.45.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Sep 2026 14:45:17 -0700 (PDT)
+        Sun, 13 Sep 2026 14:45:22 -0700 (PDT)
 From: Frank Sorenson <sorenson@redhat.com>
 To: linux-cifs@vger.kernel.org,
 	pc@manguebit.org
@@ -86,9 +86,9 @@ Cc: linkinjeon@kernel.org,
 	tom@talpey.com,
 	bharathsm@microsoft.com,
 	stable@vger.kernel.org
-Subject: [PATCH v4 03/10] smb: client: fix server->total_read for compound encrypted PDUs
-Date: Sun, 13 Sep 2026 16:45:01 -0500
-Message-ID: <20260913214510.3071370-4-sorenson@redhat.com>
+Subject: [PATCH v4 05/10] smb: client: reject short Next offsets in parse_server_interfaces()
+Date: Sun, 13 Sep 2026 16:45:03 -0500
+Message-ID: <20260913214510.3071370-6-sorenson@redhat.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260913214510.3071370-1-sorenson@redhat.com>
 References: <20260913214510.3071370-1-sorenson@redhat.com>
@@ -100,38 +100,40 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In receive_encrypted_standard(), server->total_read is left at the
-full decrypted frame size when walking sub-PDUs of a compound encrypted
-frame. As a result, cifs_handle_standard() passes this full size
-to smb2_check_message(), causing the PDU length guards to incorrectly
-validate the entire compound frame instead of the current sub-PDU.
+In parse_server_interfaces(), the server-supplied Next offset is
+validated against bytes_left, but not against the size of the interface
+structure itself.
 
-This allows truncated non-last sub-PDUs to bypass length validation,
-leading to out-of-bounds reads in smb2_get_data_area_len().
+A small, non-zero Next value can pass the bounds check but advance the
+pointer by less than sizeof(*p). This causes the next iteration of the
+loop to read misaligned, overlapping structure fields.
 
-Fix this by setting server->total_read to the true length of the
-current sub-PDU: next_cmd for non-last sub-PDUs, and the remaining
-pdu_length for the last one.
+Fix this by ensuring the Next offset is at least sizeof(*p).
 
-Fixes: b24df3e30cbf ("cifs: update receive_encrypted_standard to handle compounded responses")
+Fixes: 7d34ec36abb8 ("smb3: fix for slab out of bounds on mount to ksmbd")
 Cc: stable@vger.kernel.org
 Signed-off-by: Frank Sorenson <sorenson@redhat.com>
 ---
- fs/smb/client/smb2ops.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/smb/client/smb2ops.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index fcf7033889c7..7f2177f6fc01 100644
+index 7f2177f6fc01..bda940cb3784 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -5371,6 +5371,7 @@ receive_encrypted_standard(struct TCP_Server_Info *server,
- one_more:
- 	shdr = (struct smb2_hdr *)buf;
- 	next_cmd = le32_to_cpu(shdr->NextCommand);
-+	server->total_read = next_cmd ? next_cmd : pdu_length;
- 
- 	if (*num_mids >= MAX_COMPOUND) {
- 		cifs_server_dbg(VFS, "too many PDUs in compound\n");
+@@ -785,9 +785,9 @@ parse_server_interfaces(struct network_interface_info_ioctl_rsp *buf,
+ 			break;
+ 		}
+ 		/* Validate that Next doesn't point beyond the buffer */
+-		if (next > bytes_left) {
+-			cifs_dbg(VFS, "%s: invalid Next pointer %zu > %zd\n",
+-				 __func__, next, bytes_left);
++		if (next < sizeof(*p) || next > bytes_left) {
++			cifs_dbg(VFS, "%s: invalid Next pointer %zu out of range [%zu, %zd]\n",
++				 __func__, next, sizeof(*p), bytes_left);
+ 			rc = -EINVAL;
+ 			goto out;
+ 		}
 -- 
 2.55.0
 
