@@ -1,72 +1,72 @@
 Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9558837B41F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38CF2E7185
 	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 23:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789342096; cv=none; b=kSpgtBThS2KWoltHtFRKFIoDiQ5IPVIcd600447VXAvy6mFI0+gArui4K0EQg52VhXrNRvYvZldBvR29rFX+vvWvz2wRxYxUP43QoUzdUA0Otc8y+wlFFatUD1oJnD9P6OuWhLLoskcoF3D6zdRAowKeWnbKmSjf9plnayS/QcE=
+	t=1789342096; cv=none; b=OaJkyzgP9CNcbFRb25UABjMnILA3dqVy3SZYAW6cK7iBsPTcosVlMpNa6Hc5xM+FVWr1ZfcqkzW31YyZnd1SKeiOLLd7/b/zjD+qV2Fr/J8/Cl5SBxT1oohdD42FhGoLfWOg5FbmCM6yT6K8ejHdjVkZGlPox7EwZfApDNvvPMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1789342096; c=relaxed/simple;
-	bh=blq7OQHAGqP5+dty+wpTPH422zohrf9FXG1IaSXd52I=;
+	bh=t8tFv8uAMASN/aq0WIFIHvOUy6F436mtOCJA9JzsuzQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uywXjIPhOQRr/Jp4utBnnisN27Lu9gx2SoIgq6Yikd5faicnFpV4J1eeehlOwC0FF1EtT5E8Zk9HM9Uww0VfOrEqk/tJH47cPLk/euF3kd04I5ZfCdu4V3jEXrP4GGwnCXLHOOAoDFfLPZ5Zuqb3jUikFa0ED22XMjaLKbrfrLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h7THdrC8; arc=none smtp.client-ip=74.125.225.140
+	 MIME-Version; b=jZeI0ZZgfGZBYl3G6CbISkTlMZyt0Mj2uFAPZcJrrWyVVfa1WoU0sYHij5V+3v3ehYft6cFd/Bx5XU1WLuEu57NAKYA9fssZHNVjrPaXt0wfNSF6fzMVZ/VFD8O5pM0OSS/DnQWFCyVCLlvTTQMp7ZlWDQx+30o9gkHsyvhEahQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YoXQQ1yL; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7THdrC8"
-Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49b965f447cso9680205e9.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YoXQQ1yL"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49cd5462b69so8150925e9.1
         for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 16:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20251104; t=1789342093; x=1789946893; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=o8eC+3Yn+xzTNX15r9U41LFIJ1eIVM79PPkv032nyCo=;
-        b=h7THdrC8DYVxT7nixhp5ytgWueQJLp9Ru9u9SBjVwR8jOPJZZhB5pvl4J0pnJb6QeA
-         /RVe6+/y7v4eU/S2MkBP83cyV56opLrEJ4st2UOa2ooEHRFaBVT0cWotWGJ8XwbmPF4M
-         AqxgxiCg7lziKmv5JYi3v8iYnYln1VnNnA4h0OMJDIOOrTCOJ93X7LEbkQ9Zi+Qx/F1S
-         AsPEDxca/1sNXERH6t4rS4aQRs2ZMe0PdLCUN4yXZ1U86JooPvkU7qQmE8sKpSHZ3FzJ
-         mtCDqDwyJNbeaJ7da309cTyukJO+vqyXhV2lqzWncNxCk11ICszah19j9KXEDvW0qLb3
-         7BBg==
+        bh=zg1m0C9O4uvn7KLOr801mi1GnnK/kwMkv7Jh2hnUVkI=;
+        b=YoXQQ1yLCDkhyubEPyDftnw0aD1X5KGRQZjA1v0ijq3F/9Cn7YZdLDCvo2S7dnvCjO
+         /fNrC+ikVQ1FHs91etQHQUsUHkmZIg9RMFVXozD1J/UgndwirFYr1eoROyaYICof/52K
+         b+wLX1u5tQd/dunGUy4ESuh+Dzm6ogUBMK1N4xRTARD5nSlDM2d7jnkkEcRcO+c0ariQ
+         btNqRRxsX95+S2ivWd0Mw9sp9weHG9KMpKtdxvcFlMHq7P3mbHky8leGyoza4y9n610f
+         H0m4+QBTkjZm9lhmmUwkrLRMb6pu/mcbP7vVy0CkCa+6gpEl03qcZZIPMb87v1lj3/Nn
+         RQwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20251104; t=1789342093; x=1789946893;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=o8eC+3Yn+xzTNX15r9U41LFIJ1eIVM79PPkv032nyCo=;
-        b=Zy3p2uYHwep1OEyPVVz5jZHXeoDQJY7Co3kzt6xumasFk6cp8vZfK2rw+9KXfooWHh
-         zieA6gaUj2hVb+3XBgM29uDaqTEe3rcD0oIGuePQcp6Ik9XaghnuLNrmsYphveAvKLs2
-         oA5ixCgsH5tut2ggBQY9xHRYqEu7JWN3/yenGMRa1zeQZlWtvtHQdrH2kAuaY/Gpof8J
-         JwhikYLgsPHai3fKYEDBYFkJi6slKIXFKzJdyRhAp8iv5ppRokqlyIAs0HgXeIK+U8Z2
-         le43ODBjxfFlTqR6pAiVm/qjKohnhIqAT7tMp1wAyruytAT8cK01RXwZX9mMVzzHrUEW
-         Pjmg==
-X-Forwarded-Encrypted: i=1; AKwUvBwQDappqqA5u3aqm465IYVgEvh4L+zS6r0PkmtsDooy1MU6z2jdqnBD5wlXGOKRjVIMdTMXdDBkJ7dU@vger.kernel.org
-X-Gm-Message-State: AFuF++mrAGoY/F9I06FpOavS3X10EQaWHjbIblwCpt+7x8fl+iRbPEk/
-	bVPsAjkRd8kVbZI+DyUpBo9rVm/RbKUqd0vNapdU6dVnD7AMXVU5RBfXhx34qQ==
-X-Gm-Gg: AYBFou1tCrpzA+NlqqIGKxb9AmPBR1ModX95wi76/LTfMgJFijckIDzZWXRjsq5onMX
-	MyJdOySn+S0VNFsLg0JnPk17c1iHTdtylC0w+sx1x/V+ZWKAx57Y+ZBfQN0s79U2ukpakvWgsyV
-	yTrXTxu/aKZFzHm1P0zxfjAskthav4RKfCGWqEsxfXgrXUf/MrnecdcxZcTqq+WJZZFO686QYAO
-	UCc/N50g+1kDvf9mqhYftULKswmDvjKn/nS8SIq7RgZw0fNRv8IBNwcwQszzxPTqof0rmirezXM
-	HmwyoagqW9m3Jpq99eqBkd7pcDg2JhlH4eI5EEv7bYDLoDbGI3eXdmCuTz23Enn+XTsbOqYd6xl
-	L+P3sWNC6zuQOxjQr1AgGs16ccWUNioQ+IwNYxdMMUfC82TozO7jlBhh256q7+9L5jVX5//0YhC
-	Oc/Nayd61RDKxYuSIG5DiUHUexgO5LMixDJKdWH/8GS98jMmTNDTlTn0zPGcRC4I/WQNRKClPeR
-	DFXDFdwL8xWJsG4rvytaws=
-X-Received: by 2002:a05:600c:4e89:b0:49e:6b55:22b8 with SMTP id 5b1f17b1804b1-49e7a6386b8mr1265455e9.4.1789342092387;
-        Sun, 13 Sep 2026 16:28:12 -0700 (PDT)
+        bh=zg1m0C9O4uvn7KLOr801mi1GnnK/kwMkv7Jh2hnUVkI=;
+        b=QnA4L9n+tIY5WsBaQjyHa6zJ927JL0GAGPAUzQsoNHHwROrshGp8jhQHXJMXpijyQy
+         hzwSwD42/VntVitqLrV2jPeBXQldeCjeaMaf0ULU3VGPigglCnLp8/W4WFg89UdNO49A
+         jnh3ZcddMrCdsm140fCnS1zEYWPFSXgPlz6EuKBZfgNQVqRevYK3k0pEyGiCvN2iu4BQ
+         5hwgVX9LbWMHUHOfbKiq2nyX/xAwAiJ5mWqGhV5xVntwmXbF5agCUBTQ6mTkuWSHdfPI
+         dIO0W4EHY4qCu584ALNztSGsy/XsKo2W09ul5T3wCWptjZqbAqZlYWCF5NOQ2U2yP5gr
+         7Rqg==
+X-Forwarded-Encrypted: i=1; AKwUvBw066cz949RCoCSTVcnifx22AdQpTLW55b5y4A/qApc/XjU3p7oAeJF8LgTn8w0f4NlOoDz2f2c8saw@vger.kernel.org
+X-Gm-Message-State: AFuF++lWEZOTI/Tih9tg9cQ3K92DV9YgBbyE7KHEyg6X3Sq5ONspZ0KM
+	q6fZAnAlDnze3Nl2QrQVVzNBUhHK8RuB9r4VSO3C4ORJfP747VGBZa9NCsyfxg==
+X-Gm-Gg: AYBFou1MXfHzDpmNgNe7m1EHWJbvSKdH/WYOZKOB/hDDYyzev2ObiRtJ5kcwAa82ppe
+	/Nm3IFsr+03qw/kioe4XWqON7FmSQDNfZZjFDcRwBUyRe8GdVr0oJozZyGt7MFIjI32SjIAFHw/
+	ivYQ71p0YDwIHIJTHKw3nND1n8QZKP8m9Zej7ZQT8bStNzCc68rBvk6vNx/POkYRSiayrQ2Vfht
+	24ydETh55kOmX1d8FfJLR1OQWJrgR+IL+4nxXLbtezqBcY+nEMhO9UmV//KGLd8mODf4z/KIy48
+	3DKeU3YCLgw+FVvImkLIB6eoCyYlXiMzCY+Q4eO1b1bWdFJWSP7Hx8PXtHDJzvECG4hz9QilA3I
+	c3JmOqrR7ZuiRkKqYxYVe9gqvCSL0W8fPJuCeR0XA90YOGnTaUN0W3+nAPd9Obo+siuzW2OscRW
+	O53APNWncsldA3hn7mRhFKX0lZj8EWLEvszTEy0VjfBe9Np6jouB2StBtI26dJQkI1HcXqvoxuW
+	E+SikseAc1Gl8LYFcO0Uw==
+X-Received: by 2002:a05:600c:6309:b0:49e:65ac:eb5f with SMTP id 5b1f17b1804b1-49e7a67eb3emr2318145e9.10.1789342093106;
+        Sun, 13 Sep 2026 16:28:13 -0700 (PDT)
 Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e6499d57bsm396657625e9.3.2026.09.13.16.28.11
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e6499d57bsm396657625e9.3.2026.09.13.16.28.12
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 13 Sep 2026 16:28:11 -0700 (PDT)
+        Sun, 13 Sep 2026 16:28:12 -0700 (PDT)
 From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Gael Blivet <gael.blivet@gmail.com>,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 2/4] ksmbd: look up stream size by exact xattr name
-Date: Mon, 14 Sep 2026 01:26:36 +0200
-Message-ID: <20260913232737.51704-3-g.blivet@me.com>
+Subject: [PATCH 3/4] ksmbd: fix AFP_AfpInfo header fields in synthesized xattr
+Date: Mon, 14 Sep 2026 01:26:37 +0200
+Message-ID: <20260913232737.51704-4-g.blivet@me.com>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260913232737.51704-1-g.blivet@me.com>
 References: <20260913232737.51704-1-g.blivet@me.com>
@@ -80,83 +80,45 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-get_file_stream_info() walks the xattr list from a single
-ksmbd_vfs_listxattr() and sizes each stream it finds with
-ksmbd_vfs_casexattr_len(), which matches with strncasecmp(). Linux
-xattr names are case-sensitive, so two streams differing only in case
-report each other's size.
+smb2_set_stream_name_xattr() synthesizes a 60-byte AFP_AfpInfo xattr
+when a client opens a nonexistent one on a Time Machine share, so the
+probe is answered instead of failing with -EBADF. Its header does not
+match what clients write: ksmbd uses 0x00051607 and 0x00020000 for the
+first two fields and leaves the third zero.
 
-The loop already holds the exact name, so query it directly with
-ksmbd_vfs_xattr_len(), which is what casexattr_len() calls once its
-search succeeds. Make it non-static and declare it in vfs.h, and drop
-the comment above it, which describes a different bug and no longer
-matches the code.
+The user.DosStream.AFP_AfpInfo:$DATA xattr a macOS client writes
+begins:
 
-This also drops a full listing per stream: casexattr_len() runs its own
-listxattr on every call, so enumerating a file with N xattrs cost N
-listings instead of one.
+  00000000: 4146 5000 0000 0100 0000 0000 0000 0080  AFP.............
 
-Fixes: 689f1eb3719d ("ksmbd: report actual xattr value length in stream enumeration")
+Write those sixteen bytes: the signature, the version at offset 4 and
+the backup time at offset 12. The 60-byte length is already correct and
+the rest stays zeroed: a zero type and creator lets the client use the
+file extension for icon and type detection.
+
+Fixes: eaff8e924f60 ("ksmbd: synthesize empty AFP_AfpInfo xattr on first probe")
 Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
 Assisted-by: Claude:claude-opus-5
 ---
- fs/smb/server/smb2pdu.c | 13 ++-----------
- fs/smb/server/vfs.c     |  4 ++--
- fs/smb/server/vfs.h     |  2 ++
- 3 files changed, 6 insertions(+), 13 deletions(-)
+ fs/smb/server/smb2pdu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index d5def8a3becc..79b0cd165562 100644
+index 79b0cd165562..52ec5dd19632 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -6951,17 +6951,8 @@ static int get_file_stream_info(struct ksmbd_work *work,
- 		streamlen *= 2;
- 		kfree(stream_buf);
- 		file_info->StreamNameLength = cpu_to_le32(streamlen);
--		/*
--		 * stream_name_len is the byte length of the xattr's *name*,
--		 * not its value -- same class of bug ksmbd_stream_eof()
--		 * (smb2pdu.c) already fixes for EndOfFile/AllocationSize on
--		 * a stream handle; this enumeration path needs the same
--		 * real xattr value length, not the name length reused as a
--		 * size.
--		 */
--		slen = ksmbd_vfs_casexattr_len(file_mnt_idmap(fp->filp),
--						path->dentry, stream_name,
--						strlen(stream_name) + 1);
-+		slen = ksmbd_vfs_xattr_len(file_mnt_idmap(fp->filp),
-+					   path->dentry, stream_name);
- 		ssize = slen < 0 ? 0 : (loff_t)slen;
- 		file_info->StreamSize = cpu_to_le64(ssize);
- 		file_info->StreamAllocationSize = cpu_to_le64(ssize);
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index c2bd972261c6..db0f2de2bab3 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -842,8 +842,8 @@ ssize_t ksmbd_vfs_listxattr(struct dentry *dentry, char **list)
- 	return size;
- }
- 
--static ssize_t ksmbd_vfs_xattr_len(struct mnt_idmap *idmap,
--				   struct dentry *dentry, char *xattr_name)
-+ssize_t ksmbd_vfs_xattr_len(struct mnt_idmap *idmap,
-+			    struct dentry *dentry, char *xattr_name)
- {
- 	return vfs_getxattr(idmap, dentry, xattr_name, NULL, 0);
- }
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index 2c53ca5bed7e..566c670c90be 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -108,6 +108,8 @@ ssize_t ksmbd_vfs_getxattr(struct mnt_idmap *idmap,
- 			   struct dentry *dentry,
- 			   char *xattr_name,
- 			   char **xattr_buf);
-+ssize_t ksmbd_vfs_xattr_len(struct mnt_idmap *idmap,
-+			    struct dentry *dentry, char *xattr_name);
- ssize_t ksmbd_vfs_getcasexattr(struct mnt_idmap *idmap,
- 			       struct dentry *dentry, char *attr_name,
- 			       int attr_name_len, char **attr_value);
+@@ -3433,8 +3433,9 @@ static noinline int smb2_set_stream_name_xattr(const struct path *path,
+ 			 * AAPL there too.
+ 			 */
+ 			static const u8 afpinfo_empty[60] = {
+-				0x00, 0x05, 0x16, 0x07, /* magic  0x00051607 BE */
+-				0x00, 0x02, 0x00, 0x00, /* version 0x00020000 BE */
++				'A', 'F', 'P', 0x00,	/* signature */
++				0x00, 0x00, 0x01, 0x00,	/* version */
++				[15] = 0x80,		/* backup time */
+ 			};
+ 			rc = ksmbd_vfs_setxattr(idmap, path, xattr_stream_name,
+ 						(void *)afpinfo_empty,
 -- 
 2.53.0
 
