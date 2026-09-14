@@ -1,169 +1,155 @@
-Received: from mail-wm2-f13.google.com (mail-wm2-f13.google.com [74.125.225.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9487E38DC5A
-	for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 23:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7E817A30A
+	for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 01:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789342097; cv=none; b=H+rPnCKCcChFaf2ADWMFmZLPYCHFnk5Dx9W7G4jZGwr2pM2JprXtyY45vJvlws7FafmEKQjCcOiPDq/L4xVCNADvNGxQ6ivEWbkEZcvEVCbTUUE8k2fr3BlO5PfYEIIGcu66f9sasMf9wbURKuYRWY8Y7cY2s5qP6g5+hi973Hc=
+	t=1789348109; cv=none; b=syNnqg3MhuYznApGGLz5twM78lf0dK1EYXFANjF+6euOdJlJLJ3yuVtOv875DbbEnTENVs5bcfrIiYhteEgh0+7MUs/3wlTUD8DiiSknlnM5ceuw8I2vYdv4EYLAyBu2tXpJb9BNJbo3Se0Iw2Vngp7q0yGHp+yOXWUMA3xs6s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789342097; c=relaxed/simple;
-	bh=NRSNQiedtmyO1EmftchigZrmdIYPRvtPCgXbRznGx+g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LM0I/LbpZd+kXTdNHezufKx1GZM+xnHpc9cckc1AYJxJg3fqGdaHSlTqbFs2RBJTK072byiJL3yVKXSSHKKLX5xEtzBbCBHVVQdp3BAxZg1iLIzIWNLNTdwTgP0zQLnpIKlc83tjMM06CAOGipgPek2KaPMoAtNP9Y9iKif+7+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VPHeMc6K; arc=none smtp.client-ip=74.125.225.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1789348109; c=relaxed/simple;
+	bh=DQ/wnVNvX1ka7omSU76z+E02ifNYOs/0mbN2a11sIhM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=u/Qfqegm2JbrgqV480eICcNYZlY4225msSQFZsHNo0kG1YkOdmdVymI0h89K8Wach1pZBdhf9VB7JX9n1jugaQo2U7tY1122clOa1XXWiF4zJw9hDoecmyPrCUgcBQmPdPFIPPtxZBvWdwwmGg72PCF29j+szSg/1q69Qcz4T7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W6m+pRA5; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BasUYHTX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPHeMc6K"
-Received: by mail-wm2-f13.google.com with SMTP id 5b1f17b1804b1-49e79a408deso404675e9.2
-        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 16:28:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6m+pRA5";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BasUYHTX"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789348105;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/pa8dMxBQhsNMlzKnHB50SRz3RGxFovnLMTnjMuhkP4=;
+	b=W6m+pRA5vHbcNl0M1C1tIGGcsWXQOk+nPc9I4qjq7Sip4xpNjtEa7JkldL/y06qV/ialf7
+	uAiUlQOZCAZuJ/9BLyjt0mu6TIYlIr/5SjGdKO86VxSPbqLrOLc5cTQH18Fw9645TFr3tT
+	RgE7KjgTJkNb5PId6fvauOHKTP8Jlgc=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-568-Xd3JKgBcOYCc-C4p4oGaDw-1; Sun, 13 Sep 2026 21:08:20 -0400
+X-MC-Unique: Xd3JKgBcOYCc-C4p4oGaDw-1
+X-Mimecast-MFC-AGG-ID: Xd3JKgBcOYCc-C4p4oGaDw_1789348099
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-91049eac948so45517736d6.1
+        for <linux-cifs@vger.kernel.org>; Sun, 13 Sep 2026 18:08:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789342094; x=1789946894; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=FHGh8Z/iQTWAr7ks0eD3K/QZN7oUordure7S8A/Ywjk=;
-        b=VPHeMc6Kst6OhEMZyA6bhqh874IDRB8OlKrPYUKcDn0tObn+avJyj/cIVON1ajEWGe
-         UBoWVqNYpPAPuevX+cyqY7CHE/iMcSTdRUk/SVcwswG5O2CGKofVv6D+qi9yo2SoqTO6
-         +HkQr1h9X4/bxa6wc+2W1T5It/Pilyz9HNFO4CwoRzA2BSoV1vLvB7kZqzn0+kvpJco3
-         CSdtLq5EnR6ngYzzuEs4TLnv3S0IloN/N6Z8dB5QGdwDmMR5Urv6SPRHL/3//YOxteeK
-         YVta43uoxqZkWHp9WrvxgBQP/LA0WtHgw/0EpEG5Oc3rOEW7WiStkSML36zrnwTdD2nZ
-         WtKQ==
+        d=redhat.com; s=google; t=1789348099; x=1789952899; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/pa8dMxBQhsNMlzKnHB50SRz3RGxFovnLMTnjMuhkP4=;
+        b=BasUYHTXMdNHutdrwlQqZeMlxLVPoWHCmLUYVlDvMgohVbYcvp84J6fBFWAS+LqS8U
+         ABawkdSyiSojGod/6TMK9yQHCgn445VIOz1Bxf12eu00pXcEDM6mn6nqVdKpCQhcqLgW
+         ePwYcMz7WG0fArHmyPlad3mBkRGFM/oMPw7AWy1u2g/0eklsYS6UyKxM5w9v7ghX7eFN
+         CcgpVb+gIgojrqFUcmPXWpAb7ynnb+pvHj+UAd/T3tlgytEKiuSIuOWLFx8OKMH73MbE
+         Vyb2PIsOBfmHTyNBS7gmHcwbv7O+aCL7Q0AOxVVJMt/dpa0wW9mWNlZVFMwU0MXKlv34
+         uDSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1789342094; x=1789946894;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=FHGh8Z/iQTWAr7ks0eD3K/QZN7oUordure7S8A/Ywjk=;
-        b=FL3LfuMrODp91p7pNeumRWkQqxu5JbbZouMsEl+MmWxgelYXRBQqF4wZgF2MZYp75D
-         F3oQoIgxLWrxLzc6987V6PSRFRTvkMUf2OVVV426G0lYpWLyw8y6J2QACRMkS8oWcswp
-         uUhVOC4ilgloH1DJM/t8XgEFkMGg5hYnntHJiGH9qW08bPo8tTLBsxaZTjH3pOj5+pky
-         mhHGZfV3Dau6S3J5GAH5hMa5G/DaWfgJfbCnocTfpLHXEwSqdMRuouidJ20c/AVMyvLW
-         KK+9CGFZ4b3cE3cw8LZj9azBMBmkmm7ig+mJr2zYwcog2b3fCEmQ/Te0hDjcdTkvSOu3
-         uQRg==
-X-Forwarded-Encrypted: i=1; AKwUvByleJ0ckkVQNiA8K1STjhWDF+CUvsZhIlK8ywW21JB/+bMeSGkEw/wfKGjNZ3PpCbl1HW2yLOu2qmhg@vger.kernel.org
-X-Gm-Message-State: AFuF++k61BFs3r7ERiTSdLOetGiRnBlvMrAZQhcT4IiHCQBVz0HcuJ2l
-	edUQ6ad5xEor25yhkH3OwRwMMb3v2oFZ0UXKAGYEj5qg1YCHR2Nj/snY
-X-Gm-Gg: AYBFou2E+gU+BcETRLHjTEM+faUETPCu6xbfhzPvVW633/+95QxMXiI52nPPdOFcUEa
-	0M1dNHyzP+w/zAgH7KhhGJGIr4sPk4BHnpjVTDG+9b+mdPOiqLzSnyJMkWsSPOaG1X1K4H7CBrS
-	ONuC9vK4zebQd9WHs40mE0vayd5QygfOqYlq5M29lCorrfQ9QPmOnVB6uHEYmrZjV1+31gAV69H
-	JYXUtKtWwdnl6MJ68m/6rioZh5gE3WEP5ePKWtJLhtlpSbnEtJnqg/JQSEQzT0DHKUPXRnvbbQY
-	vBCXvu9eGRN9IEZoPnCdZj3c0CvMcsTd2NG2uXup+j2ZFhpOzAQ0rUtFkf0oeVkjZimGobjXrMf
-	jwOFcluej0Qh4aUwrnDwlsy/vexhze/ScHGWBx6TmMlykGxeNSORBvJX4TSF27RwKRZLmPbi/Kp
-	3Mb1QEvCzd7n3GmNb1/7eddq2zaBvd7twSN1pYCDUDOYDUs4fZ2QctCPXiRUHuREk7vwAzR4Mur
-	M79ARhGYCel3O6j2Id+lA==
-X-Received: by 2002:a05:600c:4e89:b0:49d:7f5:4cdd with SMTP id 5b1f17b1804b1-49e7a68d80emr1010335e9.27.1789342093649;
-        Sun, 13 Sep 2026 16:28:13 -0700 (PDT)
-Received: from macbook-air-de-gael.home ([2a01:e0a:821:3a80::37ba:9a3e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49e6499d57bsm396657625e9.3.2026.09.13.16.28.13
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sun, 13 Sep 2026 16:28:13 -0700 (PDT)
-From: "=?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?=" <gael.blivet@gmail.com>
-X-Google-Original-From: =?UTF-8?q?Ga=C3=ABl=20Blivet-Bailly?= <g.blivet@me.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Gael Blivet <gael.blivet@gmail.com>,
-	linux-cifs@vger.kernel.org
-Subject: [PATCH 4/4] ksmbd: print IPv6 client addresses correctly in procfs
-Date: Mon, 14 Sep 2026 01:26:38 +0200
-Message-ID: <20260913232737.51704-5-g.blivet@me.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260913232737.51704-1-g.blivet@me.com>
-References: <20260913232737.51704-1-g.blivet@me.com>
+        d=1e100.net; s=20251104; t=1789348099; x=1789952899;
+        h=content-transfer-encoding:content-type:in-reply-to:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/pa8dMxBQhsNMlzKnHB50SRz3RGxFovnLMTnjMuhkP4=;
+        b=Y+2FpvvQ2U+/vG3VH5mZmpW+Bz8jqMJwC5Dv6ae+pswFC21ig/wDu5SnJSOYsTj82E
+         Ud7KOtmvFHa1K3fkSWp9dYf4tgKkwnoKI9hZ7Ywo9qFBoKkkeZNBAZWZjJGF7ATPLRx9
+         WIS43ZfXmeXZvMT/ahk8BYsIG0y84kXcaJjgdbdt7nmJI7fk5OThV5G6qZa+8UyUcM9v
+         3kjhRdTVeIiTw8zl/EBYoyyox+m6NiU+WNnNqK3eXUbiQJ4rmWouGRYI1fdiB0iLrijH
+         74i+d2UgCBVIcnW6arbW2Q7YuXU23XF3AnygkorSfLlbV+ywqD4e1WJThMLLJcKDg+Kk
+         UjVA==
+X-Gm-Message-State: AFuF++nwRbKYgbJubOFC4s45paTOoWD/iWuej1nXV+1NzINgX9971w3v
+	vQJfi/cJ9sGRIDGS2LRo3TMU+dGTO7IRGA1B/ktmq3axVcW17xvHSJywvfMzsv3RfF9/xVkzHW6
+	vhzCedg6oXyXah5JV2/fOvydpSVeXGY0qnFunNh01hX5aGUfNVgdhkeP80o/VzmLyXpKj6woE4Q
+	YogTcekOSaOSf5v4CwUwyC989yU8258v2Sad7kMCWVY2hLSXE=
+X-Gm-Gg: AYBFou1Ocs3BD/Yazzw4oRKKpIiK41pty4PpKwxwqjVopNhKiDaa1czHTdsxSXbN8IW
+	6bWlMxmRraxJVyRUqUR9jykVymfAme6/TTDJ2/Fwfo4xaZJxbU4wA/VakttEjV3ifQ1hTUL8XCB
+	E1MgGQgko3r5m/uaRkd41CNfr5ZmdYT0ebd9gvjEp8T5F1PPShSczG3iLGd0OCLN7NTS/5fYB10
+	d0Lr782Y4a5wDIteev+lAyW5rJ3hwfyLhdHZ1u9nCEN0gcjcEs/h+geOzBJUiSB8KNRsUJCAxzO
+	rTd1xqdCcOcSBmv8gwwgEZLrs25tMxt68wZDOf8oAo8bFlGeBIwhDHExSw/Fpq/x/P9ekUenW3R
+	2cpVsjkWBXgIk1kwIIkOwkCdX68KdlL0bTQWPm7K5
+X-Received: by 2002:a05:6214:268f:b0:911:9373:a171 with SMTP id 6a1803df08f44-9122e6761b7mr9140326d6.30.1789348098714;
+        Sun, 13 Sep 2026 18:08:18 -0700 (PDT)
+X-Received: by 2002:a05:6214:268f:b0:911:9373:a171 with SMTP id 6a1803df08f44-9122e6761b7mr9139916d6.30.1789348098242;
+        Sun, 13 Sep 2026 18:08:18 -0700 (PDT)
+Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-9120f47a6ebsm81974886d6.22.2026.09.13.18.08.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 13 Sep 2026 18:08:17 -0700 (PDT)
+Message-ID: <a4e7d433-f5ed-4508-8749-90c433262b85@redhat.com>
+Date: Sun, 13 Sep 2026 20:08:16 -0500
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/10] smb: client: fix OOB reads and UAFs in SMB2/3
+ receive paths
+From: Frank Sorenson <sorenson@redhat.com>
+To: linux-cifs@vger.kernel.org, pc@manguebit.org
+Cc: linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com
+References: <20260913214510.3071370-1-sorenson@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260913214510.3071370-1-sorenson@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Gael Blivet <gael.blivet@gmail.com>
+Notes on the Sashiko findings (https://sashiko.dev/#/patchset/20260913214510.3071370-1-sorenson%40redhat.com):
 
-conn->inet_addr and conn->inet6_addr share a union, and three procfs
-printers choose between them by testing whether inet_addr is zero. For
-an IPv6 peer that field aliases the first four bytes of the address,
-which are zero only for :: prefixed addresses, so a client with a
-global IPv6 address takes the IPv4 branch and is listed from those four
-bytes. A client at 2001:db8::1 is listed as 32.1.13.184.
+patch:
 
-IPv4 mapped addresses begin with zero bytes, so the listing is correct
-until a native IPv6 client connects.
+  1) pre-existing; memory leak
 
-Record the address family where the address is stored and select on
-that, in the client listing and in both session listings.
+  2) pre-existing; OOB read + memory leak
 
-Fixes: fe4dc5987d7d ("ksmbd: expose connection runtime state in procfs")
-Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
-Assisted-by: Claude:claude-opus-5
----
- fs/smb/server/connection.c        | 2 +-
- fs/smb/server/connection.h        | 3 +++
- fs/smb/server/mgmt/user_session.c | 4 ++--
- fs/smb/server/transport_tcp.c     | 1 +
- 4 files changed, 7 insertions(+), 3 deletions(-)
+  3) 3 findings
+     a. pre-existing; could incorrect iov_len be propagated
+     b. pre-existing; error handler could leak memory
+     c. pre-existing; could uninitialized heap memory be leaked
+        to user-space?
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index d211861ff86f..cc600b89cfdb 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -114,7 +114,7 @@ static int proc_show_clients(struct seq_file *m, void *v)
- 			sessions++;
- 		rcu_read_unlock();
- #if IS_ENABLED(CONFIG_IPV6)
--		if (!conn->inet_addr)
-+		if (conn->is_ipv6)
- 			seq_printf(m, "client:\t%pI6c\n", &conn->inet6_addr);
- 		else
- #endif
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 371f17b4f02a..2026a2afa5e4 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -68,6 +68,9 @@ struct ksmbd_conn {
- 		u8			inet6_addr[16];
- #endif
- 	};
-+#if IS_ENABLED(CONFIG_IPV6)
-+	bool				is_ipv6;
-+#endif
- 	unsigned int			inet_hash;
- 	char				*request_buf;
- 	struct ksmbd_transport		*transport;
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index 44dc3f800cd4..1321cd6c84e7 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -130,7 +130,7 @@ static int show_proc_session(struct seq_file *m, void *v)
- 		const char *name;
- 
- #if IS_ENABLED(CONFIG_IPV6)
--		if (chan->conn->inet_addr)
-+		if (!chan->conn->is_ipv6)
- 			seq_printf(m, "client:\t%pI4\n",
- 					&chan->conn->inet_addr);
- 		else
-@@ -231,7 +231,7 @@ static int show_proc_sessions(struct seq_file *m, void *v)
- 			ksmbd_user_session_get(session);
- 
- #if IS_ENABLED(CONFIG_IPV6)
--			if (!chan->conn->inet_addr)
-+			if (chan->conn->is_ipv6)
- 				seq_printf(m, "client:\t%pI6c\n", &chan->conn->inet6_addr);
- 			else
- #endif
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 4968cfc1a572..09eb9a34a2a8 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -77,6 +77,7 @@ static struct tcp_transport *alloc_transport(struct socket *client_sk)
- 	if (client_sk->sk->sk_family == AF_INET6) {
- 		memcpy(&conn->inet6_addr, &client_sk->sk->sk_v6_daddr, 16);
- 		conn->inet_hash = ipv6_addr_hash(&client_sk->sk->sk_v6_daddr);
-+		conn->is_ipv6 = true;
- 	} else {
- 		conn->inet_addr = inet_sk(client_sk->sk)->inet_daddr;
- 		conn->inet_hash = ipv4_addr_hash(inet_sk(client_sk->sk)->inet_daddr);
+  4) does the lower bound protect against header data parsed as
+       UTF-16 strings with multiple referrals?
+     Sashiko is correct, however the read stays in bounds so the
+       result would be a garbage path, not an OOB access.
+     Separate hardening could be done, if exact bound is desired.
+
+  5) pre-existing; potential race condition
+  8) 4 findings:
+     a. pre-existing; can uninitialized memory be read on truncated
+        packets?
+     b. is the new check possible to hit?
+        *** Sashiko is correct; the new check will never be true ***
+
+     c. pre-existing; can logging via %s format string trigger OOB read
+     d. pre-existing; do malformed packets bypass error handling and
+        get processed as oplock breaks?
+10) pre-existing; does bounds check rely on a structural offset to
+     calculate end, potentially leading to leak of uninitialized heap
+     memory?
+
+Recommendation:
+   patch 4 is still good
+   drop patch 8 entirely--it's a dead check
+
+The remainder of the findings are for pre-existing issues; could be
+investigated & addressed in future work.
+
+
+I can respin v5 without patch 8, or (assuming there isn't further
+work to do on the rest of the patches) we can simply drop patch 8.
+
+
+Frank
+
 -- 
-2.53.0
+Frank Sorenson
+sorenson@redhat.com
+Principal Software Maintenance Engineer, filesystems
+Red Hat
 
