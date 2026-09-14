@@ -1,38 +1,38 @@
-Received: from mta0.migadu.com (out-53.mta0.migadu.com [91.218.175.53])
+Received: from mta0.migadu.com (out-218.mta0.migadu.com [91.218.175.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B21530D3E0
-	for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 02:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3ED305687
+	for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 02:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789353503; cv=none; b=feUjl1LR/tnjyaiEvJVHt7jGzbYgTHgMh2I/tfIyXoHMtSj7TBV+7qNw//XQ6Fzl1MKRZm7H/eGCI+XTOxNm9XCWn+yWSS0W65/8Vz2gCcZKupwfoaVehSxItJItAdYhmSJiVUSqaQ1iymj5OAj3OOCfk57qY5OlSMQ+1XLLshs=
+	t=1789354346; cv=none; b=FXeuJhp7uvRmk6cxWtB80D77l8wAr/wzStrNpUdak6SfrNvAsWIGqMLuKQvb2OnOIFhwBxRzFy2wTwmPkx8tnWkwnHQBEAwQcCdBpqK8PADZYkld28TBBMbNsYIV1j0EZRpVQc1KWNc4e76xYJ6Am8NxtMRLvgZkPvDetdlbzjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789353503; c=relaxed/simple;
-	bh=3Ik4WNQy3c9C8bVnq3trfSLp9qmQTeT7JCMtUUcJNvQ=;
+	s=arc-20240116; t=1789354346; c=relaxed/simple;
+	bh=LlTPvehi23WBaf19vrqq11ukqaGGcEjArBPpBjRucoo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uJr7uq7vTfBnbdHzS0ARcqSnkXAIgDfpkYB1EGg8Lkf/jWgiw+Rlzr9eHg8aE9A+lhjTtI+7AboS0o+B5nCyzmqfBcRDLZbAdAx0d+DOSlR3UD1b6rvg6e4h4XgE4f0m+MHu/UKzsBmZMW79M6evGiyUEeeKUj9YBHK9o9CmH2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=npfzqa+Y; arc=none smtp.client-ip=91.218.175.53
+	 In-Reply-To:Content-Type; b=oZuj1f0mKTby+lYn3XPXvLh7+tSaT9G40sBzdjRbLp9zvZB6vjnS9XgHHYNipECseyIU4k7ia3JEAQyTS1aXZJWORVJcibXgRVLbvr7+v2CyW686ZoJz2hXCpoRajwfIrAqSxZMySojR8D2ycfxmh/PVloiTBzSTH5CjSP/WDzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=gGm0uO1S; arc=none smtp.client-ip=91.218.175.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="npfzqa+Y"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="gGm0uO1S"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=3Ik4WNQy3c9C8bVnq3trfSLp9qmQTeT7JCMtUUcJNvQ=;
+DKIM-Signature: a=rsa-sha256; bh=LlTPvehi23WBaf19vrqq11ukqaGGcEjArBPpBjRucoo=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789353496; v=1; x=1789958296;
- b=npfzqa+Ybk5d07ENizaKNyFMq+D3eHLoaHCjvXmggUKGs6z+ckxIKvC+T9TCPcp5B5ZHVvJk
- sBi9vzfrqgJnfRijfz7/Zlgdsedu5yXes7YXB96Ejsg3daj+ejRlwwa3JEd1VasVZ9QDqCda16R
- v2BNbh2HXZc9/RWkIJIoTGluK83OrJRWEz8GzgwywrBFkb5QtjhhszEd3RiL3XhYTl5+S5lC1O+
- M2NOucxigImYhWijqCrwvswqV3a+rcpwTMlUrZzHeTNcwT4rxX6af6hPma/daHF//5yU4g2A7+p
- XUkOAvgCV3fg36bZupplGxoT8i5O51pD3b9xI0lp8VnIQ==
+ t=1789354339; v=1; x=1789959139;
+ b=gGm0uO1ShDm6gUL/dVI/ZP+B5z6mHxxnwjeX4Hv2UPOKyY5fQOpMaSObnEjVwcQvBQuLcW21
+ 0l0GGa8uIBUzkYQoPv47hxePfr+czgKpre7NhJoyq+9Ih5fW8U4ONDtIW2X8ssuMXc8MqcUE5eM
+ iaCcuYhHp8Za6OzknIRb4E0hwvChmC/k65X4sF73R6+2DzX1ej2QgiIJ8iT2kENU7PhEMgwZZpT
+ zmq4henJ5/ZF//HqwT9eHwXtln9nuYZAb35Y3oA7CpqqHsnyqPMAmxbSspmoyGahmeltXDJmx/7
+ 7B5vx1DY8qetXh3DfAJ3Jkm5WqSEBqsOM/tCqpsn5Txzg==
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id bd8c35e081a59473;
-	Mon, 14 Sep 2026 02:38:05 +0000
-X-Mizu-Trace-ID: bd8c35e081a59473
+Received: by smtp.migadu.com with ESMTPS id 3f4385a223484ef3;
+	Mon, 14 Sep 2026 02:52:09 +0000
+X-Mizu-Trace-ID: 3f4385a223484ef3
 X-Migadu-Flow: FLOW_OUT
-Message-ID: <ebb45fdd-76f0-4d92-9899-13ecdaea555c@chenxiaosong.com>
-Date: Mon, 14 Sep 2026 10:38:00 +0800
+Message-ID: <8360c969-33f5-4d96-a44d-c6fcb7a8a41f@chenxiaosong.com>
+Date: Mon, 14 Sep 2026 10:52:02 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -46,73 +46,64 @@ Cc: senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com,
  chenxiaosong@kylinos.cn, Mobin Aydinfar <mobin@mobintestserver.ir>,
  linux-cifs@vger.kernel.org
 References: <20260913113552.11486-1-linkinjeon@kernel.org>
+ <ebb45fdd-76f0-4d92-9899-13ecdaea555c@chenxiaosong.com>
 Content-Language: en-US
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260913113552.11486-1-linkinjeon@kernel.org>
+In-Reply-To: <ebb45fdd-76f0-4d92-9899-13ecdaea555c@chenxiaosong.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Namjae,
+If needed, I would be happy to help send v2.
 
-According to MS-FSA 2.1.5.12.30: 
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/3d5c68f8-fbc5-4f94-a51d-3600a319fd45
+And it would be better to use FILE_NAME_INFORMATION_SIZE (should be 
+changed to 8) instead of FILE_ALTERNATE_NAME_INFORMATION_SIZE.
 
-   Set AvailableNameLength to BlockAlignTruncate((OutputBufferSize - 
-FieldOffset(FILE_NAME_INFORMATION.FileName)), 2).
-
-It seems that the following changes are also needed:
 ```
 smb2_get_info_file()
 {
-         unsigned int req_output_len = le32_to_cpu(req->OutputBufferLength);
 ...
+	case FILE_ALTERNATE_NAME_INFORMATION:
          case FILE_NORMALIZED_NAME_INFORMATION:
-                 fixed_len = FILE_NORMALIZED_NAME_INFORMATION_SIZE;
-                 req_output_len = round_down(req_output_len, 2);
-                 break;
+                 fixed_len = FILE_NAME_INFORMATION_SIZE; // 8
 ...
-         rc = buffer_check_err(req_output_len, fixed_len, rsp);
 }
 ```
 
-By the way, it seems that `struct smb2_file_alt_name_info` should be 
-renamed to `struct smb2_file_name_info`, since both 
-FILE_ALTERNATE_NAME_INFORMATION and FILE_NORMALIZED_NAME_INFORMATION use 
-this structure. See:
-- MS-FSA 2.1.5.12.4 FileAlternateNameInformation: 
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/5051d021-8d06-4b7e-94e3-55b118193427
-- MS-FSA 2.1.5.12.30 FileNormalizedNameInformation: 
-https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/3d5c68f8-fbc5-4f94-a51d-3600a319fd45
-
-On 9/13/26 19:35, Namjae Jeon wrote:
-> Windows may request FILE_NORMALIZED_NAME_INFORMATION with an output
-> buffer that only fits the fixed portion of the variable-length response.
-> Treat the fixed portion as FILE_ALTERNATE_NAME_INFORMATION_SIZE so ksmbd
-> returns STATUS_BUFFER_OVERFLOW instead of STATUS_INFO_LENGTH_MISMATCH.
+On 9/14/26 10:38, ChenXiaoSong wrote:
+> Hi Namjae,
 > 
-> This avoids rejecting valid partial normalized-name responses.
+> According to MS-FSA 2.1.5.12.30: https://learn.microsoft.com/en-us/ 
+> openspecs/windows_protocols/ms-fsa/3d5c68f8-fbc5-4f94-a51d-3600a319fd45
 > 
-> Fixes: 6b8b79226bc3 ("ksmbd: fix partial file information responses")
-> Reported-by: Mobin Aydinfar <mobin@mobintestserver.ir>
-> Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
-> ---
->   fs/smb/server/smb2pdu.c | 3 +++
->   1 file changed, 3 insertions(+)
+>    Set AvailableNameLength to BlockAlignTruncate((OutputBufferSize - 
+> FieldOffset(FILE_NAME_INFORMATION.FileName)), 2).
 > 
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index f4d96799e1d2..38cddbf3e6ed 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -7318,6 +7318,9 @@ static int smb2_get_info_file(struct ksmbd_work *work,
->   		case FILE_ALTERNATE_NAME_INFORMATION:
->   			fixed_len = FILE_ALTERNATE_NAME_INFORMATION_SIZE;
->   			break;
-> +		case FILE_NORMALIZED_NAME_INFORMATION:
-> +			fixed_len = FILE_ALTERNATE_NAME_INFORMATION_SIZE;
-> +			break;
->   		case FILE_STREAM_INFORMATION:
->   			fixed_len = FILE_STREAM_INFORMATION_SIZE;
->   			break;
+> It seems that the following changes are also needed:
+> ```
+> smb2_get_info_file()
+> {
+>          unsigned int req_output_len = le32_to_cpu(req- 
+>  >OutputBufferLength);
+> ...
+>          case FILE_NORMALIZED_NAME_INFORMATION:
+>                  fixed_len = FILE_NORMALIZED_NAME_INFORMATION_SIZE;
+>                  req_output_len = round_down(req_output_len, 2);
+>                  break;
+> ...
+>          rc = buffer_check_err(req_output_len, fixed_len, rsp);
+> }
+> ```
+> 
+> By the way, it seems that `struct smb2_file_alt_name_info` should be 
+> renamed to `struct smb2_file_name_info`, since both 
+> FILE_ALTERNATE_NAME_INFORMATION and FILE_NORMALIZED_NAME_INFORMATION use 
+> this structure. See:
+> - MS-FSA 2.1.5.12.4 FileAlternateNameInformation: https:// 
+> learn.microsoft.com/en-us/openspecs/windows_protocols/ms- 
+> fsa/5051d021-8d06-4b7e-94e3-55b118193427
+> - MS-FSA 2.1.5.12.30 FileNormalizedNameInformation: https:// 
+> learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/3d5c68f8- 
+> fbc5-4f94-a51d-3600a319fd45
 
 -- 
 ChenXiaoSong <chenxiaosong@chenxiaosong.com>
