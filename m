@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF4F44F576;
-	Tue, 15 Sep 2026 19:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A9D4CCDF8;
+	Tue, 15 Sep 2026 19:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789501861; cv=none; b=bXo1zcfaAIrVa5wV7tSCY0BVoOkqrVXnb1y7z/EyOhjOaphlqGKUfC2IqRCJ8Z6vp3d6+/QS5goROXPwJRsw/W3qtQf1WodZ02i1J+YbHDrDSlEFXXHkzWsgcqG6rleQdUKMhx1t/2QLRbG1+cmsCfYO/1hFJa+rHU5KpDgPZeI=
+	t=1789501862; cv=none; b=Dqe+laSjm1VIQ8Qc6c3P4gO3ew8A7fQOJYOXUC6WddleThnSdvfS5RfRFWJMmw/qnA1jznOVPquaEowkvDnkRZGzaN8lCgX/ly3HZKl7kLKVAadLUsTaEdaXmC8vZCd0T6RA/2OmRlyERQ3ElRHf4iqy10ZyBsuFA7TB73Oj4Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789501861; c=relaxed/simple;
-	bh=TalMPwoQpgeVG1vCT2Tj0jslcu3NwKfqy0Yf4c9fzD0=;
+	s=arc-20240116; t=1789501862; c=relaxed/simple;
+	bh=bCc04E61Rp12gnLyZZHdgOG8tFTubd0q7zl6A8B8IjM=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sFCceK1ZxBv+WQE1kXHnqEXRQDXASeucoOnrHolarBMNt+vWdlEwvE/Ze9ofCrS0ZTOOiVAh9GT75zVVVN4rf2NSa3FMvuoEqJC7QgETw6AQflXkJZlgYAHoLtmuauA02EMO6f87EIz1wW0WpMVpm71wbFKCFLWL7zTb8RaWsZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hDC+oAEv; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=tnHVSkvp7lHpqwMBCfZ4kNK+RTkHvegDf4m1I/BQ1FKPuvogqbleLxftUc2bNsxi6lngsDV9PE6Ny95p4d8mIMo06hZTaCZwrs5WKeIUA0ASoSOOpcpYI7nuZ6oek8QOPFseeHTc+jKD9QQm+ZMlbu4Bg7gONfIJ2iO094FG0L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cy32MMNr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hDC+oAEv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BC81F000FF;
-	Tue, 15 Sep 2026 19:50:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cy32MMNr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89A611F00893;
+	Tue, 15 Sep 2026 19:50:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789501859;
-	bh=nf4h7RDqFkHDmx8Mk7CO+YgG0/34neidLlQirNvNDb8=;
+	s=k20260515; t=1789501861;
+	bh=2Bim09QVxsJM3p4pdkDhDNcTwlw4SUxSG+t1HZ3c3pI=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=hDC+oAEvanONx8z25scRZinvo0rXIQ3pxb+N0PF3Zee3zXQ4mYpDPSZEQthvflFik
-	 JOy9FQXdnuJRYnLE2TdOz+5UWIGbhxwD/OdmuTlpfwHJtLLbPt5ebtdVzipczLp9Cf
-	 5VVTg8/FIvRdvLMDvbpUd0Ov6zV/uQ9KkekNuscScA4mHMP7Vakugy6nbYIbwSWroC
-	 2wrlpYl5yynAgFZGLlE8OTR3zSq+q8LUoxXixoNxLpG9/wdpOFSkc07iQaayRiZ/kt
-	 m1CcKQHU6LRJPOFWFDca0sbx8/PzajU+824do+7Vhg5tb4tzcm4znmzC5+ujXySo4X
-	 aNofLXgpMrxQA==
-Subject: Re: [PATCH net-next v15 13/15] quic: add timer management
+	b=Cy32MMNrkSRp8sm2kl85aTuI5nAgruspkdPXzAQDB5wuZkDjLS0pAk9Y6pt3Px9RF
+	 EiRm/YxXPwSz5EYqVX5omU0EAjHJeNuj8U3p0jWA6yEDlwPc9GNBuleNwnMkqjCK/E
+	 9WOaBriqIEQMDXwpwJvzCaL4Skf3cF0MpkCImsUIbfn4XMt1ZXMED6zREM+GXFlFRQ
+	 LIcPwFhyFQuFsO51/b9llxurTvP8+6htujJsXyE/UcDUwpq1bJzHIW2zWNvXmx1xUb
+	 j1P8vjAIpc/lEhyH/RglBYHTxPX2SCecphQXOGsmk7Msf0U+IQyrP+Sca01OH9RHa+
+	 Ud6KAspAnrpqQ==
+Subject: Re: [PATCH net-next v15 14/15] quic: add packet builder base
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -40,13 +40,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org
-Date: Tue, 15 Sep 2026 19:50:56 +0000
-Message-ID: <178950185646.22033.3124819474267826359@kernel.org>
-In-Reply-To: =?utf-8?q?=3C02bbb6b0c5e4aaf96227693a93ca401c36f25653=2E1789393?=
+Date: Tue, 15 Sep 2026 19:50:59 +0000
+Message-ID: <178950185914.22033.7074901863240008115@kernel.org>
+In-Reply-To: =?utf-8?q?=3C927bfa67165193368d642396c4b8fcfc580d494d=2E1789393?=
  =?utf-8?q?775=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3C02bbb6b0c5e4aaf96227693a93ca401c36f25653=2E17893937?=
+References: =?utf-8?q?=3C927bfa67165193368d642396c4b8fcfc580d494d=2E17893937?=
  =?utf-8?q?75=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Low
+X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -56,190 +56,205 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 2 potential
+Thank you for your contribution! Sashiko AI review found 4 potential
 issue(s) to consider:
 
-Critical: 0 · High: 0 · Medium: 0 · Low: 2
+Critical: 0 · High: 0 · Medium: 1 · Low: 3
 
-- [Low] The new timer abstraction discards compile-time type and index
-  checking: quic_timer() in net/quic/socket.h returns void * (all…
-- [Low] quic_timer_stop() (net/quic/timer.c:119) cancels the timer object
-  only; it never clears the matching QUIC_F_*_DEFERRED bit in…
+- [Medium] Unit mismatch in quic_packet_route()
+  (net/quic/packet.c:63-66): the *IP-level* MTU returned by dst_mtu() is…
+- [Low] Claim that the commit message over-advertises the packet builder:
+  quic_packet_handshake_create()/quic_packet_app_create()…
+- [Low] In struct quic_packet (net/quic/packet.h:24) the field comment
+  reads 'u16 mss[2]; /* MSS for datagram and non-datagram packets */',…
+- [Low] Claim that quic_packet_xmit() (net/quic/packet.c:199) must bail
+  out instead of only warning when skb_set_owner_sk_safe(skb, sk) fails,…
 
 --
 
-quic: add timer management
+quic: add packet builder base
 
-This adds a quic_timer abstraction covering the loss, delayed ACK, path
-validation, PMTU probing and pacing timers, with common start/reset/stop
-helpers.  Expiry while the socket is owned by a user is deferred through
-sk_tsq_flags and dispatched from quic_release_cb().
+This adds net/quic/packet.c and net/quic/packet.h with the TX-side
+'quic_packet' state: quic_packet_config() sets the path and computes header
+overhead, quic_packet_create_and_xmit() builds and sends a packet, and
+quic_packet_flush() sends any bundled packets.  quic_packet_init() is wired
+into quic_init_sock().
 
-A couple of questions below.
+A few questions on the new code below.
 
-> diff --git a/net/quic/socket.c b/net/quic/socket.c
-> index 8d3da3f03347b..2632f024029c0 100644
-> --- a/net/quic/socket.c
-> +++ b/net/quic/socket.c
-
-[ ... ]
-
-> @@ -214,6 +218,35 @@ static int quic_getsockopt(struct sock *sk, int level, int optname,
->  
->  static void quic_release_cb(struct sock *sk)
->  {
-> +	/* Similar to tcp_release_cb(). */
-> +	unsigned long nflags, flags = smp_load_acquire(&sk->sk_tsq_flags);
-> +
-> +	do {
-> +		if (!(flags & QUIC_DEFERRED_ALL))
-> +			return;
-> +		nflags = flags & ~QUIC_DEFERRED_ALL;
-> +	} while (!try_cmpxchg(&sk->sk_tsq_flags, &flags, nflags));
-> +
-> +	if (flags & QUIC_F_LOSS_DEFERRED) {
-> +		quic_timer_loss_handler(sk);
-> +		__sock_put(sk);
-> +	}
+> diff --git a/net/quic/packet.c b/net/quic/packet.c
+> new file mode 100644
+> index 0000000000000..a1967f39c9242
+> --- /dev/null
+> +++ b/net/quic/packet.c
+> @@ -0,0 +1,280 @@
 
 [ ... ]
 
-> diff --git a/net/quic/socket.h b/net/quic/socket.h
-> index d7811391cc8b5..c5654fdc06b59 100644
-> --- a/net/quic/socket.h
-> +++ b/net/quic/socket.h
-
-[ ... ]
-
-> @@ -119,6 +147,11 @@ static inline struct quic_crypto *quic_crypto(const struct sock *sk, u8 level)
->  	return &quic_sk(sk)->crypto[level];
->  }
->  
-> +static inline void *quic_timer(const struct sock *sk, u8 type)
+> +static struct sk_buff *quic_packet_handshake_create(struct sock *sk, gfp_t gfp)
 > +{
-> +	return (void *)&quic_sk(sk)->timers[type];
+> +	return NULL;
+> +}
+> +
+> +static int quic_packet_number_check(struct sock *sk, gfp_t gfp)
+> +{
+> +	return 0;
+> +}
+> +
+> +static struct sk_buff *quic_packet_app_create(struct sock *sk, gfp_t gfp)
+> +{
+> +	return NULL;
 > +}
 
 [Severity: Low]
-This isn't a bug today, but is the void * return here intentional?  All
-the sibling accessors in this header return typed pointers
-(quic_cong(), quic_crypto(), quic_pnspace(), quic_paths()), so a wrong
-type would still compile:
+This isn't a bug, but could the commit message list all of the placeholders?
 
-	if (timer_delete(quic_timer(sk, type)))
+It mentions that "Functions to create application (short) and handshake
+(long) packets are currently placeholders for future implementation", which
+covers quic_packet_handshake_create() and quic_packet_app_create() above,
+but quic_packet_encrypt_done() is also a stub that frees every
+asynchronously encrypted packet:
 
-With struct quic_timer being a union of struct timer_list and struct
-hrtimer, passing QUIC_TIMER_PACE to quic_timer_reset()/quic_timer_stop()
-would apply mod_timer()/timer_delete() to the hrtimer member, and
-quic_timer_reset() has to catch that at runtime instead:
+net/quic/packet.c:quic_packet_encrypt_done() {
+	/* Free it for now, future patches will implement the actual deferred
+	 * transmission logic.
+	 */
+	kfree_skb(skb);
+}
 
-	/* Note that type must never be QUIC_TIMER_PACE for this helper. */
-	if (WARN_ON_ONCE(type == QUIC_TIMER_PACE))
-		return;
-
-quic_timer_start() and quic_timer_stop() make the same timer_list versus
-hrtimer choice from type with no equivalent guard.  There is also no
-type < QUIC_TIMER_MAX taming here, and timers[] is the last member of
-struct quic_sock.
-
-Every caller in the series passes a compile-time enum constant
-(quic_timer_init()/quic_timer_free(), and QUIC_TIMER_PMTU from
-net/quic/packet.c), so nothing is reachable now.  Would returning
-struct quic_timer * (or keeping the pace hrtimer in its own field) let
-the compiler enforce this while the interface is still new?
-
-> diff --git a/net/quic/timer.c b/net/quic/timer.c
-> new file mode 100644
-> index 0000000000000..0dd6d6580bbd9
-> --- /dev/null
-> +++ b/net/quic/timer.c
-> @@ -0,0 +1,154 @@
+Worth naming that one in the changelog too?
 
 [ ... ]
 
-> +static void quic_timer_timeout(struct quic_timer *t, int type, int defer_bit,
-> +			       void (*handler)(struct sock *sk))
+> +/* Perform routing for the QUIC packet on the specified path, update header
+> + * length and MSS accordingly, reset path and start PMTU timer.
+> + */
+> +int quic_packet_route(struct sock *sk)
 > +{
-> +	struct quic_sock *qs = container_of(t, struct quic_sock, timers[type]);
-> +	struct sock *sk = &qs->inet.sk;
+> +	struct quic_path_group *paths = quic_paths(sk);
+> +	struct quic_packet *packet = quic_packet(sk);
+> +	union quic_addr *sa, *da;
+> +	u32 pmtu;
+> +	int err;
 > +
-> +	bh_lock_sock(sk);
-> +	if (sock_owned_by_user(sk)) {
-> +		if (!test_and_set_bit(defer_bit, &sk->sk_tsq_flags))
-> +			sock_hold(sk);
-> +		goto out;
-> +	}
+> +	da = quic_path_daddr(paths, packet->path);
+> +	sa = quic_path_saddr(paths, packet->path);
+> +	err = quic_flow_route(sk, da, sa, &paths->fl);
+> +	if (err)
+> +		return err < 0 ? err : 0;
 > +
-> +	handler(sk);
-> +out:
-> +	bh_unlock_sock(sk);
-> +	sock_put(sk);
-> +}
+> +	packet->hlen = quic_encap_len(da);
+> +	pmtu = clamp(dst_mtu(__sk_dst_get(sk)),
+> +		     QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU);
+> +	quic_packet_mss_update(sk, pmtu - packet->hlen);
 
-The type argument here duplicates information the timer pointer already
-carries, so container_of(t, struct quic_sock, timers[type]) can disagree
-with the slot the timer actually lives in and silently produce a wrong
-struct sock *.  Could the socket be derived from the timer pointer alone?
+[Severity: Medium]
+Are the units on both sides of this subtraction the same?
+
+The clamp floor is applied to the IP-level MTU returned by dst_mtu(), and
+packet->hlen (the full IP plus UDP encapsulation length from
+quic_encap_len(), 28 for IPv4 and 48 for IPv6) is subtracted afterwards.
+So for a route whose dst_mtu() is at or below 1228 (IPv4) the result is
+1172, and at or below 1248 (IPv6) it is 1152:
+
+	pmtu  = clamp(dst_mtu(...), 1200, 65535);   /* IP MTU */
+	mss   = pmtu - packet->hlen;                /* UDP payload */
+
+That value then lands in packet->mss[QUIC_PACKET_MSS_NORMAL] and in
+congestion control via quic_packet_mss_update() -> quic_cong_set_mss(),
+and it is also the coalescing limit in quic_packet_bundle():
+
+	if (packet->head->len + skb->len >
+	    packet->mss[QUIC_PACKET_MSS_NORMAL]) {
+
+Can that put the UDP payload size below the 1200-byte minimum that
+quic_packet_init() installs as QUIC_MIN_UDP_PAYLOAD, and below
+QUIC_BASE_PLPMTU (also 1200, in net/quic/path.c) that quic_path_pl_reset()
+writes into paths->pl.pmtu two lines later?
+
+Note dst_mtu() can legitimately come back well under 1200 after a remote
+ICMP "fragmentation needed", which is presumably why the clamp is there at
+all.  Should the floor be QUIC_MIN_UDP_PAYLOAD + packet->hlen, or the
+resulting MSS clamped to 1200 instead?
+
+The three 1200 constants in this codebase denote three different layers
+(net/quic/path.h QUIC_PATH_MIN_PMTU as an IP MTU floor, path.h
+QUIC_MIN_UDP_PAYLOAD as a UDP payload size, path.c QUIC_BASE_PLPMTU as a
+packetization-layer size), which makes this easy to mix up.
 
 [ ... ]
 
-> +void quic_timer_stop(struct sock *sk, u8 type)
+> +/* Transmit a QUIC packet, possibly encrypting and bundling it. */
+> +static int quic_packet_xmit(struct sock *sk, struct sk_buff *skb, gfp_t gfp)
 > +{
-> +	if (type == QUIC_TIMER_PACE) {
-> +		if (hrtimer_try_to_cancel(quic_timer(sk, type)) == 1)
-> +			sock_put(sk);
-> +		return;
-> +	}
-> +	if (timer_delete(quic_timer(sk, type)))
-> +		sock_put(sk);
-> +}
+> +	struct quic_packet *packet = quic_packet(sk);
+> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> +	struct net *net = sock_net(sk);
+> +	int err;
+> +
+> +	/* Associate skb with sk to ensure sk is valid during async encryption
+> +	 * completion.
+> +	 */
+> +	WARN_ON_ONCE(!skb_set_owner_sk_safe(skb, sk));
 
 [Severity: Low]
-Can a stopped timer still get its handler called?  quic_timer_stop()
-cancels the timer object but leaves the matching QUIC_F_*_DEFERRED bit
-set, and quic_release_cb() is the only place that clears those bits and
-it dispatches each one unconditionally:
+This isn't a bug, but the comment says the reference is what keeps sk alive
+across async encryption, while a failure here is only warned about and
+execution continues into quic_crypto_encrypt().
 
-quic_timer_timeout() (timer already fired, socket owned by user)
-	if (!test_and_set_bit(defer_bit, &sk->sk_tsq_flags))
-		sock_hold(sk);
-
-then quic_timer_stop() runs and only does:
-	if (timer_delete(quic_timer(sk, type)))
-		sock_put(sk);
-
-and later quic_release_cb() still does:
-	if (flags & QUIC_F_LOSS_DEFERRED) {
-		quic_timer_loss_handler(sk);
-		__sock_put(sk);
-	}
-
-The same applies to quic_timer_free() from quic_destroy_sock().
-tcp_write_timer_handler() re-checks icsk->icsk_pending before acting;
-here the handlers do no such re-validation.
-
-The reference accounting is balanced and all five handlers are empty in
-this patch, and the only quic_timer_stop() calls in the series are the
-five teardown calls inside quic_timer_free(), so nothing misbehaves yet.
-Once the handlers have real bodies, should quic_timer_stop() also clear
-the deferred bit (and drop the reference it holds), or should each
-handler re-validate its timer state?
-
-> diff --git a/net/quic/timer.h b/net/quic/timer.h
-> new file mode 100644
-> index 0000000000000..4f63660376027
-> --- /dev/null
-> +++ b/net/quic/timer.h
-> @@ -0,0 +1,45 @@
+skb_set_owner_sk_safe() only returns false when sk is NULL or
+refcount_inc_not_zero(&sk->sk_refcnt) fails, and neither can happen on a TX
+path whose caller already holds a socket reference, so the warn-and-continue
+form matches the existing users in net/ipv4/tcp.c and net/ipv4/udp.c.  Is a
+short note to that effect worth adding next to the WARN_ON_ONCE(), so it is
+clear the continuation is deliberate?
 
 [ ... ]
 
-> +struct quic_timer {
-> +	union {
-> +		struct timer_list t;
-> +		struct hrtimer hr;
-> +	};
-> +};
+> +void quic_packet_init(struct sock *sk)
+> +{
+> +	struct quic_packet *packet = quic_packet(sk);
+> +
+> +	INIT_LIST_HEAD(&packet->frame_list);
+> +	packet->taglen[QUIC_PACKET_FORM_SHORT] = QUIC_TAG_LEN;
+> +	packet->taglen[QUIC_PACKET_FORM_LONG] = QUIC_TAG_LEN;
+> +	packet->mss[QUIC_PACKET_MSS_NORMAL] = QUIC_MIN_UDP_PAYLOAD;
+> +	packet->mss[QUIC_PACKET_MSS_DGRAM] = QUIC_MIN_UDP_PAYLOAD;
+> +
+> +	packet->version = QUIC_VERSION_V1;
+> +}
+> diff --git a/net/quic/packet.h b/net/quic/packet.h
+> new file mode 100644
+> index 0000000000000..18b89f5051214
+> --- /dev/null
+> +++ b/net/quic/packet.h
+> @@ -0,0 +1,112 @@
+
+[ ... ]
+
+> +	u8 taglen[2];  /* Tag length for short and long packets */
+> +	u16 padding;   /* Total padding bytes to append after frames */
+> +	u16 frames;    /* Number of ack-eliciting frames */
+> +	u16 mss[2];    /* MSS for datagram and non-datagram packets */
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+[Severity: Low]
+This isn't a bug, but is the slot order in this comment backwards?
+
+The comment lists datagram first, which reads as slot 0 being the datagram
+MSS, while the macros added just below say the opposite:
+
+	#define QUIC_PACKET_MSS_NORMAL		0
+	#define QUIC_PACKET_MSS_DGRAM		1
+
+The neighbouring taglen[2] comment follows the "first listed is index 0"
+convention and matches QUIC_PACKET_FORM_SHORT 0 / QUIC_PACKET_FORM_LONG 1.
+Should this read "MSS for non-datagram and datagram packets" instead?
+
+[ ... ]
+
+> +#define QUIC_PACKET_MSS_NORMAL		0
+> +#define QUIC_PACKET_MSS_DGRAM		1
 
 [ ... ]
 
