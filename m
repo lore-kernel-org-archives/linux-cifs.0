@@ -1,54 +1,53 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D31E1A6839
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34AC1DB356
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789431192; cv=none; b=RfD3f/1q99BEJQgO1TrAqS7zggniqpAL4s3EYypqGUMgHhSaamUMXRPTSRWA1FccWEpHnH1sf/tz49iPujmQLI7DiedK02tB2OkkHTxJ+Uu0ML+/7bo/u5nrNdqyuXg3aTuGyrD+i3+Z1mq3S9jXxVjLyPnj+whLCz0MLoCWHoo=
+	t=1789431212; cv=none; b=arO38P19tKtyVhN6HfSfdt+0ny05TF8dIXToTT+98tEaM7jbQX19kE0ETqR7FUSqOzY688ZOJzcHs3yk4HV6MOwMeAZs1rVkbSzEDvo1kxFKOLEQPBPwttmNZAyRfg96DNe9VKCl873M4hQAlIee23rU6zCfBn6VZrUTQkPPGb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789431192; c=relaxed/simple;
-	bh=Tj736iMY4CcZwMWh0sCcamZcY2IxURiXqQBmVL7Kt84=;
+	s=arc-20240116; t=1789431212; c=relaxed/simple;
+	bh=tffxmS+pQvVXbjcu/RUtQEoYjvL47ymfo3Dfr7HH8NU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cSHx1Mf+ZZyCff5i4PlBzeo/ja/gc13GIPuFF86TGRGSF9tFYF2vMkRTdDIFe8Rz8HnjZske4eSY3cSuScdGoh2VukMndfIRSuS8wFz3FxDm9ixgWIV5kT9DqpqNYMVTjKcLJibYlPOqlMluQClTtvjNpWMSxEDP7XNn5BhLmrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9V+7MjQ; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=KoHhjxHIgJj7vVrKtuBmvgRFf++zB3XiGWuwMi98CdJQvu/2DLDFk8pXncDQSbDmtUsSDYRKdTBIwfULINTLqiUAY81pD5YV/DQEpqYsETAJQt2XKuOPnu3V9Ry1ZpJHgMNCbReILm3eRRHLy+ZpjlzZb4Ug1byiVVHyDexWfUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4som2LC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9V+7MjQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C366E1F0089A
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4som2LC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A9E1F00899
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789431190;
-	bh=Egm2nd4Owu0a8lT0TcA+6+U36gP3IJAbfA941epwJAU=;
+	s=k20260515; t=1789431211;
+	bh=f9lytcE2XegMAYQ5SLE8HvilyIu+GNdT3bUJNdbNgeo=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Z9V+7MjQPmAjmUks6mqSQd+9DL6q5FDPetDsNCHCu8ELgNOM+ew69j57rsVSyxIV4
-	 who37wtwqqVbWOhz+1QkuC5R74WT0ulUGlt4a0lvcy0kXXraWYApuKzdaiPXnpd6WG
-	 F7FKccGn/LEACZzy6L3nWuaKrwd0wy6p1DGc+jB4TFy5oe739Qq3Q7vMYHZ/7mdLRG
-	 Xohv1r2YUe2LSKUfB7X55XgKtjgOUz3JhtP5C8JzFylG7w3lxfJ0ZYSF2Sdrdlpwjo
-	 zSHxZS5X2rRvNiX069mxVGVMYBnd9bHEZ0V2ve2oeixK81xWkk7qy0PuP+83B8DeVx
-	 UAT6JRCRSc09Q==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c2940d16190so560577666b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 17:13:10 -0700 (PDT)
-X-Gm-Message-State: AFuF++lKIN6XccuDDGuM5OiP4C3dfx2ADtRR39L3MsFoiycxp0rpRZH9
-	A7tJaxN8qe+K/80DcjGFX6BQZfhtQqBJNIY4gBih4LjMfdGGVCUk4Nw0LUXsZBBSiHxIEAHC4MV
-	sInVKEJoMC2EgR99BUUqCsRvyIFZlils=
-X-Received: by 2002:a17:907:3f88:b0:c26:19e3:e98d with SMTP id
- a640c23a62f3a-c29b879db25mr308802066b.45.1789431189420; Mon, 14 Sep 2026
- 17:13:09 -0700 (PDT)
+	b=b4som2LCxOlJnKyr6uV8vDbTQBCz2fAD2TyPei2hxoS9th9d+HJY4pJKBMN/2srdr
+	 RNN1v4LmdHWQV8SgORm+CsTbDVJiCVcTNvbGRqRqCbhyS9it9svo3udtwvkqJG1/2/
+	 VymrwGkUdEPy+hGPRmkGVUsyFsIe90gH5d4gLVrccZ4KjX1udtLJTaDzfOohdRdXQS
+	 rJYhSI0KIPW2ympYcDsvpjoQKmT8kz0863torKF63r1z0+xxIwuoX9Hyt5/lkRVRpJ
+	 4EK6UN8TSJUCae6TiKNks9X8XdakXuVutJbgr1lx59WE1LURk85rTX195YuVeztoQ9
+	 rpufgJETBNsng==
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6a9cb66f7b4so4223414a12.3
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 17:13:31 -0700 (PDT)
+X-Gm-Message-State: AFuF++kDbYNo9HzWUjh7hUEFIwMGlcqVyTWjNEmzQWs1ZiRF6RrZT5aD
+	glZ7+r1LlkTpphes9oSw2rQWjKB5bpV2wrd6Af9v0CR2yGN3bfaEmO2NsHb4D+/sPG7P2sepFgE
+	FzHFhMWFTcw+AF/MTayD2ATPlUhD55jA=
+X-Received: by 2002:a05:6402:46cc:b0:6a7:ee54:f89b with SMTP id
+ 4fb4d7f45d1cf-6a9f63d6a09mr2684095a12.31.1789431210242; Mon, 14 Sep 2026
+ 17:13:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260914011052.809774-1-pc@manguebit.org>
-In-Reply-To: <20260914011052.809774-1-pc@manguebit.org>
+References: <20260914011052.809774-1-pc@manguebit.org> <20260914011052.809774-2-pc@manguebit.org>
+In-Reply-To: <20260914011052.809774-2-pc@manguebit.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 15 Sep 2026 09:12:57 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9WU4O7MkjFM_Qw3Ob8NtQzYgnNbCJX61sT3uSwoz2veQ@mail.gmail.com>
-X-Gm-Features: AcwNN1WTe6N7Ddu8nzN-nqcFgQDQiD2jyI6_06BTGmvw_Lhyi_n5DmNFN-A46cE
-Message-ID: <CAKYAXd9WU4O7MkjFM_Qw3Ob8NtQzYgnNbCJX61sT3uSwoz2veQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] smb: client: fix unaligned access in WSL reparse
- point parser
+Date: Tue, 15 Sep 2026 09:13:17 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9Kz49C7ey4m=3BQmpFu8NMWibaf5YNcbgFtt2O+nJnEw@mail.gmail.com>
+X-Gm-Features: AcwNN1WVavc6_pbK86jW4lMYnXaAKQH9A8iUc0Oa5nEv6VwB9RkCuKSEXrBXoyw
+Message-ID: <CAKYAXd9Kz49C7ey4m=3BQmpFu8NMWibaf5YNcbgFtt2O+nJnEw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] smb: client: fix fattr leaking on wsl_to_fattr() failure
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, 
 	Tom Talpey <tom@talpey.com>, Shyam Prasad N <sprasad@microsoft.com>, 
@@ -60,19 +59,12 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Sep 14, 2026 at 10:10=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
  wrote:
 >
-> When wsl_to_fattr() parses WSL extended attributes, it computes a
-> payload pointer from ea->ea_data + ea_name_length + 1.  Since the
-> smb2_file_full_ea_info struct is __packed and all WSL xattr names are
-> 6 bytes long, the value pointer always lands at an odd byte offset,
-> never satisfying __le32 or __le64 alignment requirements.
+> wsl_to_fattr() mutates fattr fields as it parses each WSL EA.  If
+> validation later fails, the function returns false with partially
+> mutated fattr fields that callers do not reset.
 >
-> The code then casts this pointer to __le32 * or __le64 * and
-> dereferences it directly, which may cause alignment faults on some
-> architectures.
->
-> Replace all such casts with get_unaligned_le32() and
-> get_unaligned_le64() in reparse_mkdev(), wsl_make_kuid(),
-> wsl_make_kgid() and wsl_to_fattr().
+> Fix this by parsing into local variables and only committing them to
+> fattr on success.
 >
 > Closes: https://sashiko.dev/#/patchset/20260906200517.725015-1-pc%40mangu=
 ebit.org
