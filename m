@@ -1,49 +1,41 @@
-Received: from mta0.migadu.com (out-37.mta0.migadu.com [91.218.175.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0447E32AAA3
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 06:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB87360ECE
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 14:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789454844; cv=none; b=Okv/vokuRyaT2H3Td4OLUBIa/FUrvcRMcFwQEdKVkIymzmbxXuuHZLR20Sd13GdLSqVAwRBwEVU7BIK7Qjgc2eseGZYt66voyqmWy3w+0bHYPpTd/F9YRoWU84DiWbWBHKKdrJfqu0jUhCew4Y3V2pcixRb5/O6lxc3sdlan+9c=
+	t=1789481378; cv=none; b=ju0ZrgkY2mTiHlV2OTHdQjz+wiskiq01S6mDN1kOfwoXQqMA7Qd1DDpkllflnR+b100pE+bZT+r/rcpQfR/4OM6LHvNiAhCxmbBik/R6wTylAuxg1TrPOw+WTLXi4AXYH2oJafYyN3tN7BYJGD0k6x95qkXoaC/LzkRxm1brm88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789454844; c=relaxed/simple;
-	bh=gU+YQWX+DwNqqzmSCVcXQ1CJTae+qZjl9phQ3iTk/1c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GuEGPf+zhU2GKbB5whsJSIqUuAirTtq43/PqAEHk+oSRoJ76VOxPdEmSTPDJji2psKyyRfEC6NGyD1jYenLJISqTK6oEGDbEsnK2YvN74G9er8ywoaBRel7m8wSdQn7xjkiN0RozcLkjKjblNrY6qnyUNP4NDuC5enJLpDWGGS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=NUh2OOtR; arc=none smtp.client-ip=91.218.175.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1789481378; c=relaxed/simple;
+	bh=yREmkMnVFGc2Wc0eQ78jm0lknObDoFuEPh83zenjuV8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rPXOQARdT599/GWDJ4A+21iPMJVYU785K3+lFVVeZOIZT1/rbultyAlGju8sOzqVxixMnZhh+HsmK3Y+SKHYsgc5NmNq+onv/VwSLyQdJcfSeUEKJDXx3K08bfdZr/z3XctCbIQ5HfDhe9zzLNnrakWpvfE/9xy5QYDC39XhB6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=E7V4sgPD; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="NUh2OOtR"
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=gU+YQWX+DwNqqzmSCVcXQ1CJTae+qZjl9phQ3iTk/1c=;
- c=simple/simple; d=chenxiaosong.com;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789454839; v=1; x=1790059639;
- b=NUh2OOtRYilQMNwhfOijH97l/8gnJ8u+jt/lOE+Af1uet39imNxrptgTD2uIxM/C2tdh6lXs
- ZY4m05rgPsd7GXRuESts91INlWtDYPqazsdYmPxMxgJBIdgB54WfVcgXnHAqFWw1xNCWou1shhH
- 5l6qn9piz7NYe1WcGkDfcQNb7e0q1lIEi5CBKVxxmbNzsDlCMlwOLsNltMho72QdVUSRl2IIbOB
- TW6Yt4YPWH/uzjlcbcvUdQK+DfePx5EAyNTcKTmyiBC3REipaLv0syydiXeowJgVp0ZYQaZ3Q6Z
- 0ZKiYznMfT5rT0igeg7YYbqUZUy3BkI3fxHZKY1czg7hw==
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 1546f172be0cf62d;
-	Tue, 15 Sep 2026 06:47:19 +0000
-X-Mizu-Trace-ID: 1546f172be0cf62d
-X-Migadu-Flow: FLOW_OUT
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-To: linkinjeon@kernel.org,
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="E7V4sgPD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=cL
+	PDLM8JxOmXSK6wk59sp6hMYxg/dzPIWecGH4Q9iZc=; b=E7V4sgPD323N9DPOsK
+	pHJoG8sQ+5QsZF1VDZkb0Cg7Q+DYQsbwYr0qOokYDemTJFv8/TOMzwpRkPvO/m0r
+	tolRQAzZoaqmfF1ZWSJreTing4gYNl+9vzkHQvx4JosPZNQ4f03bpQsk+fvCenGA
+	EK+xtqJSIcMXSGFEryC4MU8HQ=
+Received: from hh.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wDnj1N1UalqZ_l6Aw--.52667S2;
+	Tue, 15 Sep 2026 22:08:54 +0800 (CST)
+From: huhai <15815827059@163.com>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
 	tom@talpey.com,
-	senozhatsky@chromium.org,
-	chenxiaosong@chenxiaosong.com
-Cc: linux-cifs@vger.kernel.org,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 3/3] smb/server: rename smb2_file_alt_name_info to smb2_file_name_info
-Date: Tue, 15 Sep 2026 06:46:57 +0000
-Message-ID: <20260915064657.110687-4-chenxiaosong@chenxiaosong.com>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260915064657.110687-1-chenxiaosong@chenxiaosong.com>
-References: <20260915064657.110687-1-chenxiaosong@chenxiaosong.com>
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	Henry Hu <huhai@kylinos.cn>,
+	Sashiko <sashiko-bot+sashiko@kernel.org>
+Subject: [PATCH] ksmbd: fix iface_list use-after-free during server reset
+Date: Tue, 15 Sep 2026 22:08:34 +0800
+Message-Id: <20260915140834.5616-1-15815827059@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,100 +43,71 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnj1N1UalqZ_l6Aw--.52667S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KF47Cw1UKryDuw4DGF4kWFg_yoW8tr4rpF
+	W5WrWqkr4UXwnYgr4kXayUC34Fgan7W347CFyxuwn3XrnayrZrtrWkt3sI9r95A3y8WryF
+	qF4qv3s8uw4UA3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j46wAUUUUU=
+X-CM-SenderInfo: rprvmiivyslimvzbiqqrwthudrp/xtbCzRZ2+2qpUXbnIwAA32
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: Henry Hu <huhai@kylinos.cn>
 
-FileAlternateNameInformation and FileNormalizedNameInformation
-use the same structure.
+ksmbd_find_netdev_name_iface_list() walks iface_list for
+fsctl_query_iface_info_ioctl(), which holds RTNL. But during server
+reset, ksmbd_tcp_destroy() unlinks and frees the entries without RTNL,
+and queued SMB requests can still be running at that point. So an
+FSCTL_QUERY_NETWORK_INTERFACE_INFO request can therefore race with
+interface destruction and dereference a freed entry. With debug-only
+instrumentation to make the race deterministic, KASAN reports:
 
-Link: https://lore.kernel.org/linux-cifs/8360c969-33f5-4d96-a44d-c6fcb7a8a41f@chenxiaosong.com/
-Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+   BUG: KASAN: slab-use-after-free in
+   ksmbd_find_netdev_name_iface_list
+
+   ksmbd_find_netdev_name_iface_list
+   fsctl_query_iface_info_ioctl
+   smb2_ioctl
+   handle_ksmbd_work
+
+   Freed by:
+   kfree
+   ksmbd_tcp_destroy
+   ksmbd_conn_transport_destroy
+   kill_server_store
+
+The fix is to detach iface_list to a temporary list under RTNL, then drop
+RTNL before cleanup because the following cleanup may block and hold RTNL
+for a long time.
+
+Fixes: b2d99376c5d6 ("ksmbd: browse interfaces list on FSCTL_QUERY_INTERFACE_INFO IOCTL")
+Reported-by: Sashiko <sashiko-bot+sashiko@kernel.org>
+Link: https://sashiko.dev/#/patchset/20260911163516.6403-1-15815827059%40163.com
+Assisted-by: LLM
+Signed-off-by: Henry Hu <huhai@kylinos.cn>
 ---
- fs/smb/server/smb2pdu.c | 12 ++++++------
- fs/smb/server/smb2pdu.h |  6 ++----
- 2 files changed, 8 insertions(+), 10 deletions(-)
+ fs/smb/server/transport_tcp.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 9d5f354417b8..15e2801a8ce1 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -6779,12 +6779,12 @@ static void get_file_alternate_info(struct ksmbd_work *work,
- 				    void *rsp_org)
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 4968cfc1a572..e6f663acf5f8 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -656,10 +656,15 @@ static void ksmbd_tcp_stop_listener(struct interface *iface)
+ void ksmbd_tcp_destroy(void)
  {
- 	struct ksmbd_conn *conn = work->conn;
--	struct smb2_file_alt_name_info *file_info;
-+	struct smb2_file_name_info *file_info;
- 	struct dentry *dentry = fp->filp->f_path.dentry;
- 	int conv_len;
+ 	struct interface *iface, *tmp;
++	LIST_HEAD(iface_list_to_free);
  
- 	spin_lock(&dentry->d_lock);
--	file_info = (struct smb2_file_alt_name_info *)rsp->Buffer;
-+	file_info = (struct smb2_file_name_info *)rsp->Buffer;
- 	conv_len = ksmbd_extract_shortname(conn,
- 					   dentry->d_name.name,
- 					   file_info->FileName);
-@@ -6831,7 +6831,7 @@ static int get_file_normalized_name_info(struct ksmbd_work *work,
- 					 struct smb2_query_info_rsp *rsp,
- 					 struct ksmbd_file *fp)
- {
--	struct smb2_file_alt_name_info *file_info;
-+	struct smb2_file_name_info *file_info;
- 	char *filename, *normalized, *stream_name;
- 	int buf_free_len, conv_len, filename_len;
+ 	unregister_netdevice_notifier(&ksmbd_netdev_notifier);
  
-@@ -6865,7 +6865,7 @@ static int get_file_normalized_name_info(struct ksmbd_work *work,
- 		return -EINVAL;
- 	}
- 
--	file_info = (struct smb2_file_alt_name_info *)rsp->Buffer;
-+	file_info = (struct smb2_file_name_info *)rsp->Buffer;
- 	conv_len = smbConvertToUTF16((__le16 *)file_info->FileName,
- 				     normalized, filename_len,
- 				     work->conn->local_nls, 0);
-@@ -7333,10 +7333,10 @@ static int smb2_get_info_file(struct ksmbd_work *work,
- 			fixed_len = FILE_ALL_INFORMATION_SIZE;
- 			break;
- 		case FILE_ALTERNATE_NAME_INFORMATION:
--			fixed_len = FILE_ALTERNATE_NAME_INFORMATION_SIZE;
-+			fixed_len = FILE_NAME_INFORMATION_SIZE;
- 			break;
- 		case FILE_NORMALIZED_NAME_INFORMATION:
--			fixed_len = FILE_NORMALIZED_NAME_INFORMATION_SIZE;
-+			fixed_len = FILE_NAME_INFORMATION_SIZE;
- 			req_output_len = round_down(req_output_len, 2);
- 			break;
- 		case FILE_STREAM_INFORMATION:
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
-index ca8e27f7b712..95c89087553b 100644
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -199,7 +199,7 @@ struct file_sparse {
- #define FILE_INTERNAL_INFORMATION_SIZE        8
- #define FILE_EA_INFORMATION_SIZE              4
- #define FILE_ACCESS_INFORMATION_SIZE          4
--#define FILE_NAME_INFORMATION_SIZE            9
-+#define FILE_NAME_INFORMATION_SIZE            8
- #define FILE_RENAME_INFORMATION_SIZE          10
- #define FILE_LINK_INFORMATION_SIZE            11
- #define FILE_NAMES_INFORMATION_SIZE           12
-@@ -211,8 +211,6 @@ struct file_sparse {
- #define FILE_ALL_INFORMATION_SIZE             104
- #define FILE_ALLOCATION_INFORMATION_SIZE      19
- #define FILE_END_OF_FILE_INFORMATION_SIZE     20
--#define FILE_ALTERNATE_NAME_INFORMATION_SIZE  8
--#define FILE_NORMALIZED_NAME_INFORMATION_SIZE 8
- #define FILE_STREAM_INFORMATION_SIZE          32
- #define FILE_PIPE_INFORMATION_SIZE            23
- #define FILE_PIPE_LOCAL_INFORMATION_SIZE      24
-@@ -259,7 +257,7 @@ struct smb2_file_alignment_info {
- 	__le32 AlignmentRequirement;
- } __packed;
- 
--struct smb2_file_alt_name_info {
-+struct smb2_file_name_info {
- 	__le32 FileNameLength;
- 	char FileName[];
- } __packed;
+-	list_for_each_entry_safe(iface, tmp, &iface_list, entry) {
++	rtnl_lock();
++	list_splice_init(&iface_list, &iface_list_to_free);
++	rtnl_unlock();
++
++	list_for_each_entry_safe(iface, tmp, &iface_list_to_free, entry) {
+ 		ksmbd_tcp_stop_listener(iface);
+ 		list_del(&iface->entry);
+ 		kfree(iface->name);
 -- 
-2.55.0
+2.25.1
 
