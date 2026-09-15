@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F2D455610;
-	Tue, 15 Sep 2026 19:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC9049CF59;
+	Tue, 15 Sep 2026 19:50:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789501850; cv=none; b=qlbWunfpki8H3ARORW8UyBOzyI+0SnV7Bt0g8FN9zgNusAdYAdKP8GPY4HYPj/Rm1cGV6tLlOanoo4KqDJg6qtqL6FBO3aj4eFac/ou6o6HTmP+lpdy4DpmQRwPpUc4M6qvAW8TG30mPixh0uyiHBjkyd4CUwpbrjM9XLM8NWr4=
+	t=1789501853; cv=none; b=oTXlLqH4O46eAYg8fxakt+R9khjBGV4zyvkO1P64GnNhTViK1DfAEvMgyBIHMAQmBoqOuobRhK/Vmg4DoJb82M9EmvoN+37VbVcqU6n4Vjp3iXEF/ephLMGDb09CzGZyVk3Q2hfimXSqKWmjlB3rashs3uEYRwSchmfDbc4riNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789501850; c=relaxed/simple;
-	bh=quksUoBa27HSccnn9Yx/2346YgiY2PNjOz7a/Mz15i4=;
+	s=arc-20240116; t=1789501853; c=relaxed/simple;
+	bh=E6De9mMCTyXqWKKYZ1GQRsh5Hl2j20Uh/GgeEvspdmg=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=OcuwyLPbJuH1MGzLL2WLwsm6wSQZmLK8n5nZgXt4C7pXQ7or9nN8EmF6fl92LM/Ey7wSDVmbuNogUC+BMbUfJ6++iLjRHqY7egduoD2SiQe9Y4ts2GU/yrZksh6RzLUVqXvYRmE+k2sEkBWxn7pmXmJv4gDbzsteafglcVL+fyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KEd+eAO+; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=iulNDpKSKcmA7rsuh+nvPJl/941XnR6UA2v9sc7lnteYCztefbcgcDUBCA0m7btFRVcFN/uwjIUamjGUh9M/+e2k30RLQWtOYNzBDEJyZ1gb+vN8nKETAkPuLE4MaBAYHmTet1Zbhm2m17yBW884zxNym0brF4cCRhnoPBof5pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISeRPfrJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KEd+eAO+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A5841F00893;
-	Tue, 15 Sep 2026 19:50:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISeRPfrJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FEC61F000FF;
+	Tue, 15 Sep 2026 19:50:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789501848;
-	bh=aFM03JIpI2MY7KtA/blE/wRR7nbFnrLUML9ywdAZZyk=;
+	s=k20260515; t=1789501851;
+	bh=aq4/vWXHr+CFe434eqFCbhJ1hPfQyTz27y1EOb1SvBw=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=KEd+eAO+UrQTSlYankZQwGzdnew8qIn/oesTu0Xq34Sch3M4wX81foLFc9kk0Y3NC
-	 WkHpg4tJhoW3EZZcCFCIhHybeNS6P5Zb/IGVyVwqAURyKywrgSnKLfHyRypEDxYyDk
-	 9cpVq4405C0sNDqxLdBLhso4Da/M5igWuc+Cm6qznZbyC5vUZ7twZM2ACODhXHcD4/
-	 9kzXPp6F9yjUWQrfJ4GtuKLwhYrgJFUK5UawDKOS5xMDiNrqy1g1vQq6H1p9+R9WWb
-	 ag5weDKRAbTWDolXf5nzJEhffUxZXc/aue28D/mdRIMQTn9mghXIGx3mfjU14I91Ft
-	 rUs/ULqyFfSBw==
-Subject: Re: [PATCH net-next v15 09/15] quic: add congestion control
+	b=ISeRPfrJtZsDASUPiNyP0PWTbNXGTb6DIsjXjiSqyGdlw6XEBNZPEWhfnEVOzhqmm
+	 aNrxnN0tU+xPVXOWaSaxtQt24GCBnG2D0nkociz2q9RFE8k+H3Ol21bHaWLCdsKP6U
+	 LDSbtDZNdEOzoaZcYJjn7SvXCxv0M/FX8j/px9z0v/6gRaBeuUz2a/J3xPR8DEPIee
+	 7Ka0/JwrksLWhtUw4uYQ09GkXxuRpfLN+etFfWVzEaBDvQXhHejcaO9IFff5d1VUD/
+	 kN/1CNB2O2JorrUxReL/KwcSifOrr2+SRMuy1OekG+FF5I9N/xz4CDG+JJoIVnrNC1
+	 W3ESZvGGzp9xg==
+Subject: Re: [PATCH net-next v15 10/15] quic: add packet number space
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -40,13 +40,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org
-Date: Tue, 15 Sep 2026 19:50:46 +0000
-Message-ID: <178950184662.22033.5889968066649167674@kernel.org>
-In-Reply-To: =?utf-8?q?=3Cede5ba63212b87ddfa14acf70426b81d87501e44=2E1789393?=
+Date: Tue, 15 Sep 2026 19:50:48 +0000
+Message-ID: <178950184892.22033.12966498591440423948@kernel.org>
+In-Reply-To: =?utf-8?q?=3C9907f08c0834c76d2592ed990d235a4a7c5d413b=2E1789393?=
  =?utf-8?q?775=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3Cede5ba63212b87ddfa14acf70426b81d87501e44=2E17893937?=
+References: =?utf-8?q?=3C9907f08c0834c76d2592ed990d235a4a7c5d413b=2E17893937?=
  =?utf-8?q?75=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Medium
+X-sashiko-severity: Low
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -56,168 +56,237 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 2 potential
+Thank you for your contribution! Sashiko AI review found 4 potential
 issue(s) to consider:
 
-Critical: 0 · High: 0 · Medium: 1 · Low: 1
+Critical: 0 · High: 0 · Medium: 0 · Low: 4
 
-- [Medium] Spurious persistent-congestion detection:
-  quic_cong_on_packet_lost() (net/quic/cong.c:125-140) is the ONLY place…
-- [Low] Commit message vs. what the patch actually enables: the message
-  says the implementation 'adjusts the congestion window accordingly…
+- [Low] Commit message does not describe the ECN accounting/validation
+  API that the patch introduces.
+- [Low] Kernel-doc of `quic_pnspace_num_gabs()` (net/quic/pnspace.c line
+  228) claims that on overflow "the oldest gaps are merged into a single…
+- [Low] The field comment for `struct quic_pnspace::min_pn_seen`
+  (net/quic/pnspace.h line 73) says "Smallest PN received", but…
+- [Low] The pn_map layout comment in net/quic/pnspace.h documents the
+  packet-count advance trigger as "(max_pn_seen - last_max_pn_seen) >…
 
 --
 
-quic: add congestion control
+quic: add packet number space
 
-This adds net/quic/cong.c and net/quic/cong.h with RTT estimation, a
-congestion control state machine (slow start, recovery, congestion
-avoidance), pacing helpers and the New Reno algorithm behind a
-quic_cong_ops indirection.  quic_init_sock() now calls quic_cong_init().
+This patch adds struct quic_pnspace to track per packet number space state,
+including the next packet number to send, bytes in flight, loss timing and
+largest acknowledged packet number. It also adds the received packet number
+bitmap plus quic_pnspace_check(), quic_pnspace_mark() and
+quic_pnspace_num_gabs() for ACK frame generation.
 
-A couple of questions below.
+A few questions about the new code and its comments below.
 
-> This patch introduces 'quic_cong' for RTT measurement and congestion
-> control. The 'quic_cong_ops' is added to define the congestion
-> control algorithm.
+> diff --git a/net/quic/pnspace.c b/net/quic/pnspace.c
+> new file mode 100644
+> index 0000000000000..c7c4d0be2d980
+> --- /dev/null
+> +++ b/net/quic/pnspace.c
+> @@ -0,0 +1,273 @@
+
 [ ... ]
-> The implementation updates RTT estimates when packets are acknowledged,
-> reacts to loss and ECN signals, and adjusts the congestion window
-> accordingly during packet transmission and acknowledgment processing.
+
+> +int quic_pnspace_mark(struct quic_pnspace *space, s64 pn, gfp_t gfp)
+> +{
+
+[ ... ]
+
+> +	/* Check if enough time has elapsed or enough packets have been
+> +	 * received to update tracking.
+> +	 */
+> +	last_max_pn_seen = min_t(s64, space->last_max_pn_seen, space->base_pn);
+> +	last_max_pn_time = space->last_max_pn_time;
+> +	if (space->max_pn_time < last_max_pn_time + space->max_time_limit &&
+> +	    space->max_pn_seen <= last_max_pn_seen + QUIC_PN_MAP_LIMIT)
+> +		return 0;
 
 [Severity: Low]
-This isn't a bug, but does the description match what this patch alone
-does?
+Does the advance condition documented in the pn_map layout comment in
+net/quic/pnspace.h match what quic_pnspace_mark() actually evaluates?
 
-None of the six documented entry points has a caller at this commit, and
-quic_cong_on_packet_sent() only advances cong->pacing_time because New
-Reno registers no on_packet_sent hook:
+The header says:
 
-	if (cong->ops->on_packet_sent)
-		cong->ops->on_packet_sent(cong, time, bytes, number);
-	quic_cong_update_pacing_time(cong, bytes);
+ * Conditions to Advance pn_map:
+ *   - (max_pn_time - last_max_pn_time) >= max_time_limit, or
+ *   - (max_pn_seen - last_max_pn_seen) > QUIC_PN_MAP_LIMIT
 
-Similarly quic_cong_set_mss() in net/quic/cong.h, the only initializer of
-cong->mss, cong->min_window and cong->window, has no caller yet, and
-cong->time is never assigned here.  The comment in
-quic_reno_on_packet_acked() also refers to quic_packet_route(), which is
-only introduced by the later "quic: add packet builder base" patch:
+but the code clamps the reference point to base_pn first:
 
-		/* cong->window is never zero; it is initialized by
-		 * quic_packet_route() during connect/accept.
-		 */
+	last_max_pn_seen = min_t(s64, space->last_max_pn_seen, space->base_pn);
 
-Would something like "the congestion control infrastructure is added here
-and wired up in <later patch>" describe this patch more accurately?
+So whenever base_pn is below space->last_max_pn_seen, the effective packet
+count threshold is base_pn + QUIC_PN_MAP_LIMIT rather than the documented
+last_max_pn_seen + QUIC_PN_MAP_LIMIT, and the map advances earlier than the
+comment states.
 
-> diff --git a/net/quic/cong.c b/net/quic/cong.c
-> new file mode 100644
-> index 0000000000000..78f28bbdfb374
-> --- /dev/null
-> +++ b/net/quic/cong.c
-> @@ -0,0 +1,340 @@
+base_pn below last_max_pn_seen is easy for a peer to arrange: receive
+packet numbers 0..10 and 12, giving base_pn = 11 and max_pn_seen = 12; after
+a time based advance last_max_pn_seen becomes 12 while base_pn stays 11.
 
-[ ... ]
+Could the comment be updated to mention the base_pn clamp?
 
-> +static bool quic_cong_check_persistent_congestion(struct quic_cong *cong,
-> +						  u64 time)
-> +{
-> +	u32 ssthresh;
 > +
-> +	time -= cong->pc_start_time;
-> +
-> +	/* rfc9002#section-7.6.1:
-> +	 *   (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) *
-> +	 *      kPersistentCongestionThreshold
+> +	/* Advance base_pn if last_max_pn_seen is ahead of current base_pn.
+> +	 * This is needed because QUIC doesn't retransmit packets;
+> +	 * retransmitted frames are carried in new packets, so we move forward.
 > +	 */
-> +	ssthresh = cong->smoothed_rtt +
-> +		   max(4 * cong->rttvar, QUIC_KGRANULARITY);
-> +	ssthresh = (ssthresh + cong->max_ack_delay) *
-> +		   QUIC_KPERSISTENT_CONGESTION_THRESHOLD;
+> +	if (space->last_max_pn_seen + 1 > space->base_pn)
+> +		quic_pnspace_move(space, space->last_max_pn_seen);
 > +
-> +	return time > ssthresh;
-> +}
-> +
-> +/* COMMON APIs */
-> +void quic_cong_on_packet_lost(struct quic_cong *cong, u64 time, u32 bytes,
-> +			      s64 number)
-> +{
-> +	if (cong->pc_start_time && time > cong->pc_start_time &&
-> +	    quic_cong_check_persistent_congestion(cong, time)) {
-> +		cong->pc_start_time = 0;
-> +		cong->min_rtt_valid = 0;
-> +		cong->window = cong->min_window;
-> +		cong->state = QUIC_CONG_SLOW_START;
-> +		return;
-> +	}
-> +
-> +	if (!cong->pc_start_time && cong->is_rtt_set)
-> +		cong->pc_start_time = time;
-                ^^^^
-
-[Severity: Medium]
-Can persistent congestion be declared here even though a packet sent
-inside the interval was acknowledged?
-
-quic_cong_on_packet_lost() is the only place that establishes
-cong->pc_start_time, and quic_cong_on_packet_acked() can only clear an
-interval that already exists, so an acknowledgment processed before the
-first loss callback leaves no state behind.
-
-With srtt = 100ms the duration threshold is roughly 400ms.  Consider
-packet A sent at t=0, B sent at t=100ms, C sent at t=500ms, and B
-acknowledged first (ACK processing precedes loss detection):
-
-quic_cong_on_packet_acked(time=100ms)
-	/* pc_start_time == 0, so this guard is false */
-	if (cong->pc_start_time && time > cong->pc_start_time &&
-	    !quic_cong_check_persistent_congestion(cong, time))
-		cong->pc_start_time = 0;
-
-quic_cong_on_packet_lost(time=0ms)      /* A declared lost */
-	if (!cong->pc_start_time && cong->is_rtt_set)
-		cong->pc_start_time = time;     /* pc_start_time = 0ms */
-
-quic_cong_on_packet_lost(time=500ms)    /* C declared lost */
-	/* 500ms - 0ms > 400ms */
-	quic_cong_check_persistent_congestion() == true
-		cong->window = cong->min_window;
-		cong->state = QUIC_CONG_SLOW_START;
-		cong->min_rtt_valid = 0;
-
-B was sent at 100ms, i.e. between the send times of A and C, and it was
-acknowledged, which rfc9002#section-7.6.2 says should disqualify the
-interval.  Since neither the acknowledgment timestamp nor the packet
-number is retained (the number argument is unused in both callbacks), is
-there a way to reject this interval, for example by recording the send
-time or packet number of the most recently acknowledged packet?
-
-> +
-> +	cong->ops->on_packet_lost(cong, time, bytes, number);
-> +}
-> +
-> +void quic_cong_on_packet_acked(struct quic_cong *cong, u64 time, u32 bytes,
-> +			       s64 number)
-> +{
-[ ... ]
-> +	if (cong->pc_start_time && time > cong->pc_start_time &&
-> +	    !quic_cong_check_persistent_congestion(cong, time))
-> +		cong->pc_start_time = 0;
-> +
-> +	cong->ops->on_packet_acked(cong, time, bytes, number);
+> +	space->min_pn_seen = space->last_max_pn_seen;
+> +	space->last_max_pn_seen = space->max_pn_seen;
+> +	space->last_max_pn_time = space->max_pn_time;
+> +	return 0;
 > +}
 
 [ ... ]
 
-> +void quic_cong_on_packet_sent(struct quic_cong *cong, u64 time, u32 bytes,
-> +			      s64 number)
+> +/* Generate gap acknowledgment blocks (GABs). GABs describe ranges of
+> + * unacknowledged packets between received ones, and are used in ACK frames.
+> + *
+> + * This function uses a sliding window approach to ensure the most recent gaps
+> + * are preserved when the total number exceeds QUIC_PN_MAP_MAX_GABS. If there
+> + * are more gaps than the limit, the oldest gaps are merged into a single gap,
+> + * and the newest (QUIC_PN_MAP_MAX_GABS) gaps are preserved individually.
+> + *
+> + * Returns: Number of generated GABs (up to QUIC_PN_MAP_MAX_GABS).
+> + */
+
+[Severity: Low]
+Is this description of quic_pnspace_num_gabs() consistent with itself and
+with the code?  It says one merged gap plus QUIC_PN_MAP_MAX_GABS individual
+gaps are produced, which is QUIC_PN_MAP_MAX_GABS + 1 blocks, while the next
+line says the return value is at most QUIC_PN_MAP_MAX_GABS.
+
+The ring loop never stores more than QUIC_PN_MAP_MAX_GABS entries:
+
+	if (ngaps < QUIC_PN_MAP_MAX_GABS) {
+		...
+		ngaps++;
+		continue;
+	}
+	gabs[i].start = start;
+	gabs[i].end = end;
+	i = (i + 1) % QUIC_PN_MAP_MAX_GABS;
+
+and the merged range reuses the slot of the oldest surviving gap, so only
+QUIC_PN_MAP_MAX_GABS - 1 newest gaps stay individual.
+
+For 33 gaps, gaps 0..31 fill gabs[0..31] with mstart = gap0.start, gap 32
+overwrites gabs[0] and i becomes 1; then gabs[1].start = mstart turns the
+gap at index 1 into the merged block covering gap 0 and gap 1, and the
+rotation returns 32 blocks of which 31 are individual.
+
+Should the wording say QUIC_PN_MAP_MAX_GABS - 1 newest gaps are preserved
+individually, with the merged gap occupying the remaining slot?
+
+> +u16 quic_pnspace_num_gabs(struct quic_pnspace *space,
+> +			  struct quic_gap_ack_block *gabs)
 > +{
-> +	if (!bytes)
-> +		return;
-> +	if (cong->ops->on_packet_sent)
-> +		cong->ops->on_packet_sent(cong, time, bytes, number);
-> +	quic_cong_update_pacing_time(cong, bytes);
+
+[ ... ]
+
+> +	/* Overflow occurred: merge all discarded gaps with the gap at
+> +	 * position i (which hasn't been overwritten yet) into one.
+> +	 */
+> +	gabs[i].start = mstart;
+> +	memcpy(tmp, gabs, ngaps * sizeof(*gabs));
+> +	memcpy(gabs, &tmp[i], (ngaps - i) * sizeof(*gabs));
+> +	memcpy(gabs + (ngaps - i), tmp, i * sizeof(*gabs));
+> +
+> +	return ngaps;
 > +}
+> diff --git a/net/quic/pnspace.h b/net/quic/pnspace.h
+> new file mode 100644
+> index 0000000000000..15ce6d2ef7269
+> --- /dev/null
+> +++ b/net/quic/pnspace.h
+> @@ -0,0 +1,201 @@
+
+[ ... ]
+
+> +enum {
+> +	QUIC_ECN_ECT1,
+> +	QUIC_ECN_ECT0,
+> +	QUIC_ECN_CE,
+> +	QUIC_ECN_MAX
+> +};
+> +
+> +enum {
+> +	QUIC_ECN_LOCAL, /* ECN bits from incoming IP headers */
+> +	QUIC_ECN_PEER,  /* ECN bits reported by peer in ACK frames */
+> +	QUIC_ECN_ACKED, /* ECN bits from packets newly ACKed */
+> +	QUIC_ECN_DIR_MAX
+> +};
+
+[Severity: Low]
+Could the commit message mention the ECN accounting and validation added
+here?  The changelog body describes only the packet number bookkeeping and
+the three ACK map helpers:
+
+    "To support ACK frame generation, quic_pnspace includes a packet number
+    acknowledgment map (pn_ack_map) that tracks received packet numbers.
+    Supporting functions are provided to validate and mark received packet
+    numbers and compute the number of gap blocks needed during ACK frame
+    construction."
+
+but the patch also adds the ecn_count matrix, the QUIC_ECN_* enums above,
+and six inline helpers: quic_pnspace_inc_ecn_acked(),
+quic_pnspace_reset_ecn_acked(), quic_pnspace_inc_ecn_local(),
+quic_pnspace_has_ecn_local(), quic_pnspace_validate_ecn() and
+quic_pnspace_set_ecn_peer(), the last two encoding the RFC 9000 section
+13.4.2.1 validation policy.  The need_sack, sack_path and sack_pending
+fields are also new and unmentioned.
+
+The ECN work is described only in the v12 changelog below the --- line,
+which is dropped when the patch is applied.
+
+Also worth noting in the message: QUIC_ECN_ECT1 deliberately precedes
+QUIC_ECN_ECT0 so that ecn - 1 indexes correctly from the IP header ECN
+bits, while the ecn_count arrays passed in by callers are indexed with the
+same enum.  A follow-up populating that array in RFC wire order (ECT0,
+ECT1, CE) would silently swap the two counters.
+
+[ ... ]
+
+> +/* Packet Number Map (pn_map) Layout:
+> + *
+> + *     min_pn_seen -->++-----------------------+---------------------+---
+> + *         base_pn -----^   last_max_pn_seen --^       max_pn_seen --^
+> + *
+> + * Map Advancement Logic:
+> + *   - min_pn_seen = last_max_pn_seen;
+> + *   - base_pn = first zero bit after last_max_pn_seen;
+> + *   - last_max_pn_seen = max_pn_seen;
+> + *   - last_max_pn_time = current time;
+
+[ ... ]
+
+> +	s64 last_max_pn_seen; /* Largest PN seen before pn_map advance */
+> +	u64 last_max_pn_time; /* Timestamp last_max_pn_seen was received */
+> +	s64 min_pn_seen;      /* Smallest PN received */
+
+[Severity: Low]
+Is "Smallest PN received" the right description for min_pn_seen?
+
+quic_pnspace_mark() raises it to a former maximum on every window advance:
+
+	space->min_pn_seen = space->last_max_pn_seen;
+	space->last_max_pn_seen = space->max_pn_seen;
+
+so after the first advance it is a monotonically growing lower bound of the
+still trackable window, not the smallest packet number ever received.
+
+The layout comment above ("min_pn_seen = last_max_pn_seen") and the
+quic_pnspace_check() kernel-doc ("too old to track (below min_pn_seen)")
+both describe the window meaning, so this field comment looks like the
+outlier.  Would something like "Lower bound of the trackable PN window" be
+more accurate?
 
 [ ... ]
 
