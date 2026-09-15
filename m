@@ -1,77 +1,90 @@
-Received: from mta0.migadu.com (out-139.mta0.migadu.com [91.218.175.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8912B3921D8
-	for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 23:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D31E1A6839
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789429755; cv=none; b=kTG1kxJZehykjuaJCc7SVll5rbBkRSEPEzpJjjlf0IP6VrXsp2PgxndqMvgoCqf43rlzMi5GRl8vgOv/1GiJiKtAjaMhyv28H8epg7N3w0FiqQw8o5shr4URgnQ5cwbQHdeStFercWChTf9OZK5PZ5JTZfHtX+IWlrI8zCN/D2Y=
+	t=1789431192; cv=none; b=RfD3f/1q99BEJQgO1TrAqS7zggniqpAL4s3EYypqGUMgHhSaamUMXRPTSRWA1FccWEpHnH1sf/tz49iPujmQLI7DiedK02tB2OkkHTxJ+Uu0ML+/7bo/u5nrNdqyuXg3aTuGyrD+i3+Z1mq3S9jXxVjLyPnj+whLCz0MLoCWHoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789429755; c=relaxed/simple;
-	bh=1s4qECh5atXlexRf19vpBoKsTrx2P8TXyD3JaHc1j60=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bLmeVBCeWTodofggzxe2E9qB7jUdIx+emg/V7ywf5GeZeSfbHW3QVi6DTXse+ESYvI4pCi0GuItkxOwugK+hoFv5ZN4aEF64uxbFKia+RZ9N/o34eB9bGma7qerRY0qaub3izpOhn+4n53bjcbIPvQ9XcHlXl7at8bOUDFPHd+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=OHG2avxW; arc=none smtp.client-ip=91.218.175.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1789431192; c=relaxed/simple;
+	bh=Tj736iMY4CcZwMWh0sCcamZcY2IxURiXqQBmVL7Kt84=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cSHx1Mf+ZZyCff5i4PlBzeo/ja/gc13GIPuFF86TGRGSF9tFYF2vMkRTdDIFe8Rz8HnjZske4eSY3cSuScdGoh2VukMndfIRSuS8wFz3FxDm9ixgWIV5kT9DqpqNYMVTjKcLJibYlPOqlMluQClTtvjNpWMSxEDP7XNn5BhLmrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9V+7MjQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="OHG2avxW"
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=1s4qECh5atXlexRf19vpBoKsTrx2P8TXyD3JaHc1j60=;
- c=simple/simple; d=chenxiaosong.com;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789429746; v=1; x=1790034546;
- b=OHG2avxWoWms+julpdobBCp3lOj3fiAWFFbFMbcfFB4bS5dLo7RQhE5g/dJWaMLe0AsVRQ/Z
- eALRB/z4GrQ2mx7oPT8Av8VIpEF7BfNGewpXHNZFJZp94DHJ7fItdAT4THQF3wdNcLrmaO/Bfw8
- KHfVluV7jDNE5Lx+TeYn/kEHcyz715h7wfwVir1k1s46SUSdYeXKdfrBOUtBtiNgTTbcl3VQpeV
- I5r65YGhhjN547XeOjUg9rHvin5n7AmaZXxfRfEruf4KtZg6d/IYx4AXa3gk+Lzz2V2UdEDjqJH
- 3QjmyTIqj5mjTWh0lgJL/u979Js9LOSw6G6Bs+Q96GdLA==
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 5164600ab1574f70;
-	Mon, 14 Sep 2026 23:49:06 +0000
-X-Mizu-Trace-ID: 5164600ab1574f70
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <d1b5ef61-c0e8-405f-bf33-12ee695b73a2@chenxiaosong.com>
-Date: Tue, 15 Sep 2026 07:49:11 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9V+7MjQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C366E1F0089A
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789431190;
+	bh=Egm2nd4Owu0a8lT0TcA+6+U36gP3IJAbfA941epwJAU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Z9V+7MjQPmAjmUks6mqSQd+9DL6q5FDPetDsNCHCu8ELgNOM+ew69j57rsVSyxIV4
+	 who37wtwqqVbWOhz+1QkuC5R74WT0ulUGlt4a0lvcy0kXXraWYApuKzdaiPXnpd6WG
+	 F7FKccGn/LEACZzy6L3nWuaKrwd0wy6p1DGc+jB4TFy5oe739Qq3Q7vMYHZ/7mdLRG
+	 Xohv1r2YUe2LSKUfB7X55XgKtjgOUz3JhtP5C8JzFylG7w3lxfJ0ZYSF2Sdrdlpwjo
+	 zSHxZS5X2rRvNiX069mxVGVMYBnd9bHEZ0V2ve2oeixK81xWkk7qy0PuP+83B8DeVx
+	 UAT6JRCRSc09Q==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c2940d16190so560577666b.3
+        for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 17:13:10 -0700 (PDT)
+X-Gm-Message-State: AFuF++lKIN6XccuDDGuM5OiP4C3dfx2ADtRR39L3MsFoiycxp0rpRZH9
+	A7tJaxN8qe+K/80DcjGFX6BQZfhtQqBJNIY4gBih4LjMfdGGVCUk4Nw0LUXsZBBSiHxIEAHC4MV
+	sInVKEJoMC2EgR99BUUqCsRvyIFZlils=
+X-Received: by 2002:a17:907:3f88:b0:c26:19e3:e98d with SMTP id
+ a640c23a62f3a-c29b879db25mr308802066b.45.1789431189420; Mon, 14 Sep 2026
+ 17:13:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] ksmbd: keep compound responses on query info errors
-To: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
-Cc: senozhatsky@chromium.org, tom@talpey.com, atteh.mailbox@gmail.com,
- chenxiaosong@kylinos.cn, Mobin Aydinfar <mobin@mobintestserver.ir>
-References: <20260914111543.12381-1-linkinjeon@kernel.org>
- <20260914111543.12381-2-linkinjeon@kernel.org>
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20260914111543.12381-2-linkinjeon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20260914011052.809774-1-pc@manguebit.org>
+In-Reply-To: <20260914011052.809774-1-pc@manguebit.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 15 Sep 2026 09:12:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9WU4O7MkjFM_Qw3Ob8NtQzYgnNbCJX61sT3uSwoz2veQ@mail.gmail.com>
+X-Gm-Features: AcwNN1WTe6N7Ddu8nzN-nqcFgQDQiD2jyI6_06BTGmvw_Lhyi_n5DmNFN-A46cE
+Message-ID: <CAKYAXd9WU4O7MkjFM_Qw3Ob8NtQzYgnNbCJX61sT3uSwoz2veQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] smb: client: fix unaligned access in WSL reparse
+ point parser
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, 
+	Tom Talpey <tom@talpey.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Bharath SM <bharathsm@microsoft.com>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-
-On 9/14/2026 7:15 PM, Namjae Jeon wrote:
-> Do not reset the RFC1002 length of the complete response when a query
-> info buffer is too small. The current command will add its error response
-> through ksmbd_iov_pin_rsp(), while resetting the base length can truncate
-> earlier responses in a compound request.
-> 
-> This lets ksmbd return the earlier responses and the query-info error
-> response together. Remove the now-unused rsp_org parameter from the pipe
-> query-info helpers.
-> 
-> Fixes: e2b76ab8b5c9 ("ksmbd: add support for read compound")
-> Reported-by: Mobin Aydinfar<mobin@mobintestserver.ir>
-> Signed-off-by: Namjae Jeon<linkinjeon@kernel.org>
-> ---
->   fs/smb/server/smb2pdu.c | 31 ++++++++++++-------------------
->   1 file changed, 12 insertions(+), 19 deletions(-)
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+On Mon, Sep 14, 2026 at 10:10=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
+ wrote:
+>
+> When wsl_to_fattr() parses WSL extended attributes, it computes a
+> payload pointer from ea->ea_data + ea_name_length + 1.  Since the
+> smb2_file_full_ea_info struct is __packed and all WSL xattr names are
+> 6 bytes long, the value pointer always lands at an odd byte offset,
+> never satisfying __le32 or __le64 alignment requirements.
+>
+> The code then casts this pointer to __le32 * or __le64 * and
+> dereferences it directly, which may cause alignment faults on some
+> architectures.
+>
+> Replace all such casts with get_unaligned_le32() and
+> get_unaligned_le64() in reparse_mkdev(), wsl_make_kuid(),
+> wsl_make_kgid() and wsl_to_fattr().
+>
+> Closes: https://sashiko.dev/#/patchset/20260906200517.725015-1-pc%40mangu=
+ebit.org
+> Fixes: 78e26bec4d6d ("smb: client: parse uid, gid, mode and dev from WSL =
+reparse points")
+> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: Tom Talpey <tom@talpey.com>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+> Cc: Bharath SM <bharathsm@microsoft.com>
+> Cc: Namjae Jeon <linkinjeon@kernel.org>
+> Cc: stable@vger.kernel.org
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
