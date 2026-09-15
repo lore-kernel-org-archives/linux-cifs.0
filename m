@@ -1,82 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-234.mta0.migadu.com [91.218.175.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34AC1DB356
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6762D374A19
+	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 06:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789431212; cv=none; b=arO38P19tKtyVhN6HfSfdt+0ny05TF8dIXToTT+98tEaM7jbQX19kE0ETqR7FUSqOzY688ZOJzcHs3yk4HV6MOwMeAZs1rVkbSzEDvo1kxFKOLEQPBPwttmNZAyRfg96DNe9VKCl873M4hQAlIee23rU6zCfBn6VZrUTQkPPGb4=
+	t=1789454144; cv=none; b=QNtNDe0oo9AyPcZ4fjO6CGvTx/XqJ3UHOFbrt7sZz826bmpk55VQoEJSigOAp3J4k9ZdANBLZar0Z+Z/BJKi2/xIdA4azxR94cTDr5AQTrrlnt9exjNTSaYuNaZw2/dBh5aSTauWhZd3FjbkbtmPa7QyQaz7nLH6+9LJQy2Rq9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789431212; c=relaxed/simple;
-	bh=tffxmS+pQvVXbjcu/RUtQEoYjvL47ymfo3Dfr7HH8NU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KoHhjxHIgJj7vVrKtuBmvgRFf++zB3XiGWuwMi98CdJQvu/2DLDFk8pXncDQSbDmtUsSDYRKdTBIwfULINTLqiUAY81pD5YV/DQEpqYsETAJQt2XKuOPnu3V9Ry1ZpJHgMNCbReILm3eRRHLy+ZpjlzZb4Ug1byiVVHyDexWfUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4som2LC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789454144; c=relaxed/simple;
+	bh=a7VOIcc4lLYREXxV8xDQc/7Zm1F240KjQG2S08kt0QE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oGQBXhVTkwtanGG09PSAsWDBGlMmgLDucJ2wMfExdg3VTZ1B95jKCFKBl5/mDq+cU60QFimOXjw4Uy9u6eOdbkdTvA5eOiy2ufhOHrdAuGLaULJ1RLXHUoXayLzz0GCeQinr8P7V1lZzQavv3lCM/rjW3jhAlIpD/hoQBmUu+lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=asSMYEO8; arc=none smtp.client-ip=91.218.175.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4som2LC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A9E1F00899
-	for <linux-cifs@vger.kernel.org>; Tue, 15 Sep 2026 00:13:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789431211;
-	bh=f9lytcE2XegMAYQ5SLE8HvilyIu+GNdT3bUJNdbNgeo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=b4som2LCxOlJnKyr6uV8vDbTQBCz2fAD2TyPei2hxoS9th9d+HJY4pJKBMN/2srdr
-	 RNN1v4LmdHWQV8SgORm+CsTbDVJiCVcTNvbGRqRqCbhyS9it9svo3udtwvkqJG1/2/
-	 VymrwGkUdEPy+hGPRmkGVUsyFsIe90gH5d4gLVrccZ4KjX1udtLJTaDzfOohdRdXQS
-	 rJYhSI0KIPW2ympYcDsvpjoQKmT8kz0863torKF63r1z0+xxIwuoX9Hyt5/lkRVRpJ
-	 4EK6UN8TSJUCae6TiKNks9X8XdakXuVutJbgr1lx59WE1LURk85rTX195YuVeztoQ9
-	 rpufgJETBNsng==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6a9cb66f7b4so4223414a12.3
-        for <linux-cifs@vger.kernel.org>; Mon, 14 Sep 2026 17:13:31 -0700 (PDT)
-X-Gm-Message-State: AFuF++kDbYNo9HzWUjh7hUEFIwMGlcqVyTWjNEmzQWs1ZiRF6RrZT5aD
-	glZ7+r1LlkTpphes9oSw2rQWjKB5bpV2wrd6Af9v0CR2yGN3bfaEmO2NsHb4D+/sPG7P2sepFgE
-	FzHFhMWFTcw+AF/MTayD2ATPlUhD55jA=
-X-Received: by 2002:a05:6402:46cc:b0:6a7:ee54:f89b with SMTP id
- 4fb4d7f45d1cf-6a9f63d6a09mr2684095a12.31.1789431210242; Mon, 14 Sep 2026
- 17:13:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="asSMYEO8"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=a7VOIcc4lLYREXxV8xDQc/7Zm1F240KjQG2S08kt0QE=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789454137; v=1; x=1790058937;
+ b=asSMYEO8a6t5fvdxPkTvS7D+c+UOtL2x0QjHxCY8T5eMHpBlRgcerAahgG8TcyeBbDJl6Qsl
+ sAxhAfYemVYlbSwPCgnuDy10WguNdt2N1rIqp4jSJHDth68Bk8l58bkoK5UQailSVNoaD9wJqkL
+ ftlpTgySQNOm/cXuO3qWL15l2vuN0p8PDTYIgSQeYSC7GxYTPEqHe08LTdbQ4bcdoWH3Np6kksD
+ +ix/72qfsH9JuEDdU7O1JT6GyzqCwI2lImnEF0gQ+A43uKyGU+7bn4VXe4A6fMPNjJO13yON2+y
+ UCO+2ZGFEn2fBYbWt8YiKjEU946rySfTGUj/U3QUdGG3Q==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id f3bd77833987931f;
+	Tue, 15 Sep 2026 06:35:13 +0000
+X-Mizu-Trace-ID: f3bd77833987931f
+X-Migadu-Flow: FLOW_OUT
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: linkinjeon@kernel.org,
+	pc@manguebit.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	senozhatsky@chromium.org,
+	metze@samba.org,
+	slow@samba.org
+Cc: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH cifs-utils 0/2] smbinfo: add alternate and normalized name queries
+Date: Tue, 15 Sep 2026 06:34:27 +0000
+Message-ID: <20260915063429.110017-1-chenxiaosong@chenxiaosong.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260914011052.809774-1-pc@manguebit.org> <20260914011052.809774-2-pc@manguebit.org>
-In-Reply-To: <20260914011052.809774-2-pc@manguebit.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 15 Sep 2026 09:13:17 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9Kz49C7ey4m=3BQmpFu8NMWibaf5YNcbgFtt2O+nJnEw@mail.gmail.com>
-X-Gm-Features: AcwNN1WVavc6_pbK86jW4lMYnXaAKQH9A8iUc0Oa5nEv6VwB9RkCuKSEXrBXoyw
-Message-ID: <CAKYAXd9Kz49C7ey4m=3BQmpFu8NMWibaf5YNcbgFtt2O+nJnEw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] smb: client: fix fattr leaking on wsl_to_fattr() failure
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, 
-	Tom Talpey <tom@talpey.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Bharath SM <bharathsm@microsoft.com>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 14, 2026 at 10:10=E2=80=AFAM Paulo Alcantara <pc@manguebit.org>=
- wrote:
->
-> wsl_to_fattr() mutates fattr fields as it parses each WSL EA.  If
-> validation later fails, the function returns false with partially
-> mutated fattr fields that callers do not reset.
->
-> Fix this by parsing into local variables and only committing them to
-> fattr on success.
->
-> Closes: https://sashiko.dev/#/patchset/20260906200517.725015-1-pc%40mangu=
-ebit.org
-> Fixes: 78e26bec4d6d ("smb: client: parse uid, gid, mode and dev from WSL =
-reparse points")
-> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: Shyam Prasad N <sprasad@microsoft.com>
-> Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-> Cc: Bharath SM <bharathsm@microsoft.com>
-> Cc: Namjae Jeon <linkinjeon@kernel.org>
-> Cc: stable@vger.kernel.org
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks!
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+ChenXiaoSong (2):
+  smbinfo: add filealternatenameinfo subcommand
+  smbinfo: add filenormalizednameinfo subcommand
+
+ bash-completion/smbinfo |  7 +++++--
+ smbinfo                 | 36 ++++++++++++++++++++++++++++++++++++
+ smbinfo.rst             |  4 ++++
+ 3 files changed, 45 insertions(+), 2 deletions(-)
+
+-- 
+2.55.0
+
