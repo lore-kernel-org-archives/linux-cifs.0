@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C2F37E5E9;
-	Tue, 15 Sep 2026 19:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4F8411FB8;
+	Tue, 15 Sep 2026 19:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789501827; cv=none; b=C9mX+tdKnLQ4uWTgo2O5oaBNa9DQbFe6sHXCIRtmTa8MDAetZ0Cnr3XH7rEfxmJXd0rX88MT6RLUrEesre/RCRg/HG0oNn+eHQuC+vPfAXcT2pdbnJ/JXN/0LDo43z3l/9Yhu2C6qv39cjGWjA6jzU6XbHEdtTjDywZRZFeGz7c=
+	t=1789501838; cv=none; b=eP+vWYV7/wPlt3QwbSdaCDv5vaTTTFt6HFEPkEf5BPyCwSFCD2iBxhYBtHhp3bldFzEbd3nqIO+FlJyRzSQ4aAeC4UGLGzdQUae6vnAElfL5VPzJ2FGc8+W3qxxB7W6oXS5LUx5sEemNbIXn+qd+lLpI0hwZHQ2SuCo2nkwQZFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789501827; c=relaxed/simple;
-	bh=H9V74awVIuDUKLi7/wsQZmx2nUgC56/MKHJdwds+Xrg=;
+	s=arc-20240116; t=1789501838; c=relaxed/simple;
+	bh=cNjhCLtHBv58xVxWSoKFDLQINxAY93WS0LaC6HKR8Ww=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HD7S5+yT5UhXehoViCKHbPMKAcdIpxd4v//ebDdn5CBiROB/dhAIpj1xdE9FJYDWPoCPsPDli83Q1OzJmBcjeEgPby564v480WRVpkhfPL12FTuAlRET0/rz1MW7Sa9UAYSTtbobomkAl5UGfT1hXk59JtqE4IIX9AYdxp+lZGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9afK+AS; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=JEaTWKHC2alulRTHqhrlN+zDXGZ+kwn878m9Xw1Rpsgw3yjbXU7SJeScI22Vir2WypA5RI1nktJdqlkMnO+XTxaWnf6SV6GFdW3QDbXohgZKZ72EpsxpUxghgm9W4Fur36VrwkXEN5S5k6L8z14YQICZEtInPOgvh3E8Wms48ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T5wnORji; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9afK+AS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8115A1F000FF;
-	Tue, 15 Sep 2026 19:50:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T5wnORji"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE081F000FF;
+	Tue, 15 Sep 2026 19:50:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789501825;
-	bh=EwzVtkbA5LH9Erj8q4RPgjCDh9tMT6UX7ZqdPxb6gQI=;
+	s=k20260515; t=1789501836;
+	bh=tu8Ky0+820wR/OD362evPSvdWA4B/pBwdDMmrnhtADM=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=f9afK+ASMEhYo2hVRX9dsEZQ81zFUd+DzCyutcEBDfXHu4sAGCOT2GDs6EdkMJpAM
-	 6JW3SEY4NIMfS9g9A7IwEdSnIKtFocNjZOoEUvDG4qvHtdfj200tj2h9QZQrMpczVz
-	 /bOZy1c3isjpm2OuTJmd76z6YL8+5D2KIJZ32a+YWQR/UXOuaEUeYPJIbnrag1Z0kA
-	 vu78rSSWoQOk4FQzSTOXumgq8VjNAhnj9G7KwTZXdTGqC5JI6snXRJ/HH79Ns6sPh3
-	 CsJlMxBPOqUTC6YneYp0gRFjxxHxS6hQ3VJl9DLLcOGIUd0d9RLK32wsWWdcGR3PEA
-	 rg3vX1XT13WWQ==
-Subject: Re: [PATCH net-next v15 03/15] quic: provide common utilities and
- data structures
+	b=T5wnORjihruSBtREEMzS0beuXyFHBUpe+YD9zEjCjekD/AK8/Gfgq+A5SZAEBHD5A
+	 3zjlmJQ8H1yFD7o5OtISKX9ucB8JFBfwdia/RQxEboDEyqfz/suCujGA7Dr+cYFDdz
+	 OR2cKXyTEwKpF5/VJIwpufZb+SmdMSZbp1Ln3cfi7VQJ75hM/N1mQgGy5n+P7u63ZH
+	 iTKyCtSUlgZ/O0fyPuNjCIssmundpSoJrzBiQagXrSjLydn77waQs2TaW4YDBqILx1
+	 U28qcTEHw6GYbP+n3ScbnBbKWf8Gn+yQRm9lrJIdAWLXDmhWBfYoNn4p1PlYovWIWR
+	 ol89Vvmy89VHg==
+Subject: Re: [PATCH net-next v15 04/15] quic: provide family ops for address
+ and protocol
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -41,13 +41,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org
-Date: Tue, 15 Sep 2026 19:50:23 +0000
-Message-ID: <178950182306.22033.14152384539754204368@kernel.org>
-In-Reply-To: =?utf-8?q?=3C1cf83a4eb178197cd842e34468f4e357f42b9c28=2E1789393?=
+Date: Tue, 15 Sep 2026 19:50:25 +0000
+Message-ID: <178950182544.22033.14354065225790738831@kernel.org>
+In-Reply-To: =?utf-8?q?=3C627ebfc68bf77c45ae511de694aed1a4f2d9aa87=2E1789393?=
  =?utf-8?q?775=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3C1cf83a4eb178197cd842e34468f4e357f42b9c28=2E17893937?=
+References: =?utf-8?q?=3C627ebfc68bf77c45ae511de694aed1a4f2d9aa87=2E17893937?=
  =?utf-8?q?75=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Medium
+X-sashiko-severity: Low
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -57,115 +57,140 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 1 potential
+Thank you for your contribution! Sashiko AI review found 2 potential
 issue(s) to consider:
 
-Critical: 0 · High: 0 · Medium: 1 · Low: 0
+Critical: 0 · High: 0 · Medium: 0 · Low: 2
 
-- [Medium] Weak hash seeding in the new QUIC hash helpers:
-  `quic_sock_hash()` (net/quic/common.c:40-53) reduces IPv6 addresses to…
+- [Low] The commit message describes this patch only as the introduction
+  of family helper code ("provide helpers for routing, skb transmit…
+- [Low] Both new transmit debug messages format the unsigned skb->len
+  field with the signed %d conversion instead of %u:…
 
 --
 
-quic: provide common utilities and data structures
+quic: provide family ops for address and protocol
 
-This patch adds net/quic/common.c and net/quic/common.h with the QUIC
-packet header types, connection ID and address helpers, the socket and
-connection ID hash tables, and the varint/transport-parameter encoding
-helpers. quic_init() now initializes and tears down the hash tables.
+This adds net/quic/family.{c,h} with IPv4/IPv6 helpers for routing, lower
+transmit, address parsing and comparison, MTU info extraction and UDP
+tunnel socket configuration. It also wires quic_inet_getname() and the
+non-SOL_QUIC setsockopt/getsockopt paths into the new helpers.
 
-One question below about the hash helpers.
+> diff --git a/net/quic/Makefile b/net/quic/Makefile
 
-> diff --git a/net/quic/common.c b/net/quic/common.c
+[ ... ]
+
+> diff --git a/net/quic/family.c b/net/quic/family.c
 > new file mode 100644
-> index 0000000000000..51d71b6733c7d
+> index 0000000000000..f61a8203b2e17
 > --- /dev/null
-> +++ b/net/quic/common.c
-> @@ -0,0 +1,565 @@
+> +++ b/net/quic/family.c
+> @@ -0,0 +1,446 @@
 
 [ ... ]
 
-> +u32 quic_sock_hash(struct net *net, union quic_addr *s, union quic_addr *d)
+> +static void quic_v4_lower_xmit(struct sock *sk, struct sk_buff *skb,
+> +			       struct flowi *fl)
 > +{
-> +	u32 ports = ((__force u32)s->v4.sin_port) << 16 |
-> +		    (__force u32)d->v4.sin_port;
-> +	u32 saddr = (s->sa.sa_family == AF_INET6) ?
-> +		    jhash(&s->v6.sin6_addr, 16, 0) :
-> +		    (__force u32)s->v4.sin_addr.s_addr;
-> +	u32 daddr = (d->sa.sa_family == AF_INET6) ?
-> +		    jhash(&d->v6.sin6_addr, 16, 0) :
-> +		    (__force u32)d->v4.sin_addr.s_addr;
-> +	u32 hash = jhash_3words(saddr, daddr, ports, net_hash_mix(net));
+> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> +	struct flowi4 *fl4 = &fl->u.ip4;
+> +	u8 tos = inet_sk(sk)->tos, ttl;
+> +	struct dst_entry *dst;
+> +	__be16 df = 0;
 > +
-> +	return hash & (quic_sock_hash_size() - 1);
-> +}
+> +	pr_debug("%s: skb: %p, len: %d, num: %lld, %pI4:%d -> %pI4:%d\n",
+> +		 __func__, skb, skb->len, cb->number, &fl4->saddr,
+> +		 ntohs(fl4->fl4_sport), &fl4->daddr, ntohs(fl4->fl4_dport));
 
-[Severity: Medium]
-Should the inner IPv6 fold in quic_sock_hash() be seeded?
+[Severity: Low]
+This isn't a bug, but should the length conversion be %u here?  skb->len is
+declared unsigned in struct sk_buff:
 
-The per-netns secret is only mixed in the outer jhash_3words() call, while
-the 128-bit address is first reduced to 32 bits with jhash(..., 0). Since
-jhash_3words(a, b, c, initval) is a pure function of its inputs, two peer
-addresses whose unseeded 32-bit fold is equal produce identical (saddr,
-daddr, ports) triples and therefore the same bucket for every value of
-net_hash_mix(net).
+include/linux/skbuff.h:
+	unsigned int		len,
+				data_len;
 
-Does that let a peer controlling an IPv6 prefix pick colliding source
-addresses offline, without knowing the secret, and collapse many
-connections into one chain of quic_hashinfo.chash (capped at 16K buckets)
-that the per-packet lookup then walks?
-
-Compare with sctp_hashfn() in net/sctp/input.c, which the commit message
-cites as the model and which passes the seed into the inner fold:
-
-	if (paddr->sa.sa_family == AF_INET6)
-		addr = jhash(&paddr->v6.sin6_addr, 16, seed);
-	else
-		addr = (__force __u32)paddr->v4.sin_addr.s_addr;
-
-	return  jhash_3words(addr, ((__force __u32)paddr->v4.sin_port) << 16 |
-			     (__force __u32)lport, net_hash_mix(net), seed);
-
-Would jhash(&s->v6.sin6_addr, 16, net_hash_mix(net)) here be equivalent in
-cost?
+The same mismatch appears in quic_v6_lower_xmit() below.
 
 [ ... ]
 
-> +struct quic_shash_head *quic_source_conn_id_head(struct net *net, u8 *scid,
-> +						 u32 len)
+> +static void quic_v6_lower_xmit(struct sock *sk, struct sk_buff *skb,
+> +			       struct flowi *fl)
 > +{
-> +	u32 hash = jhash_1word(jhash(scid, len, 0), net_hash_mix(net));
-> +	struct quic_shash_table *ht = &quic_hashinfo.shash;
+> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> +	u8 tc = inet6_sk(sk)->tclass, ttl;
+> +	struct flowi6 *fl6 = &fl->u.ip6;
+> +	struct dst_entry *dst;
+> +	__be32 label;
 > +
-> +	return &ht->hash[hash & (ht->size - 1)];
-> +}
-
-[Severity: Medium]
-Same pattern here: the connection ID bytes are folded with jhash(scid, len,
-0) before the secret is applied, so any two connection IDs colliding in
-that unseeded fold share a bucket for any secret. Would passing
-net_hash_mix(net) as the initval of the inner jhash() be preferable?
-
-Note the connection IDs inserted in this series come from
-quic_conn_id_generate() using get_random_bytes(), so the practical exposure
-is smaller than for the connection socket table.
-
-> +u32 quic_addr_hash(struct net *net, union quic_addr *a)
-> +{
-> +	u32 addr = (a->sa.sa_family == AF_INET6) ?
-> +		   jhash(&a->v6.sin6_addr, 16, 0) :
-> +		   (__force u32)a->v4.sin_addr.s_addr;
-> +
-> +	return jhash_2words(addr, (__force u32)a->v4.sin_port,
-> +			    net_hash_mix(net));
-> +}
-
-[Severity: Medium]
-And the same unseeded sin6_addr fold appears in quic_addr_hash(), so
-address-keyed hashing inherits the same property. Should all three helpers
-be updated together?
+> +	pr_debug("%s: skb: %p, len: %d, num: %lld, %pI6c:%d -> %pI6c:%d\n",
+> +		 __func__, skb, skb->len, cb->number, &fl6->saddr,
+> +		 ntohs(fl6->fl6_sport), &fl6->daddr, ntohs(fl6->fl6_dport));
 
 [ ... ]
+
+> diff --git a/net/quic/protocol.c b/net/quic/protocol.c
+> index a53a2b1218a63..c5cd6d609d06f 100644
+> --- a/net/quic/protocol.c
+> +++ b/net/quic/protocol.c
+> @@ -47,7 +47,7 @@ static int quic_inet_listen(struct socket *sock, int backlog)
+>  static int quic_inet_getname(struct socket *sock, struct sockaddr *uaddr,
+>  			     int peer)
+>  {
+> -	return -EOPNOTSUPP;
+> +	return quic_get_sk_addr(sock, uaddr, peer);
+>  }
+>  
+>  static __poll_t quic_inet_poll(struct file *file, struct socket *sock,
+> diff --git a/net/quic/socket.c b/net/quic/socket.c
+> index c2841caca5dcc..1c97d95c61b2c 100644
+> --- a/net/quic/socket.c
+> +++ b/net/quic/socket.c
+> @@ -121,7 +121,8 @@ static int quic_setsockopt(struct sock *sk, int level, int optname,
+>  			   sockptr_t optval, unsigned int optlen)
+>  {
+>  	if (level != SOL_QUIC)
+> -		return -EOPNOTSUPP;
+> +		return quic_common_setsockopt(sk, level, optname, optval,
+> +					      optlen);
+>  
+>  	return quic_do_setsockopt(sk, optname, optval, optlen);
+>  }
+> @@ -136,7 +137,8 @@ static int quic_getsockopt(struct sock *sk, int level, int optname,
+>  			   char __user *optval, int __user *optlen)
+>  {
+>  	if (level != SOL_QUIC)
+> -		return -EOPNOTSUPP;
+> +		return quic_common_getsockopt(sk, level, optname, optval,
+> +					      optlen);
+>  
+>  	return quic_do_getsockopt(sk, optname, USER_SOCKPTR(optval),
+>  				  USER_SOCKPTR(optlen));
+
+[Severity: Low]
+Could the changelog mention these three behaviour changes?  The commit
+message describes the patch as
+
+    "The new quic_family.{c,h} provide helpers for routing, skb transmit
+    handling, address parsing and comparison and UDP socket config
+    initializing etc."
+
+but beyond adding helpers, three entry points that previously returned
+-EOPNOTSUPP now work:
+
+  quic_inet_getname() -> quic_get_sk_addr()
+  quic_setsockopt()   -> quic_common_setsockopt() -> ip_setsockopt()/ipv6_setsockopt()
+  quic_getsockopt()   -> quic_common_getsockopt() -> ip_getsockopt()/ipv6_getsockopt()
+
+So getsockname()/getpeername() start returning addresses, and every
+level != SOL_QUIC option is now passed through to the IP/IPv6 option
+handlers.  Some of those values are consumed by code added in this same
+patch: inet_sk(sk)->tos in quic_v4_lower_xmit(), inet6_sk(sk)->tclass in
+quic_v6_lower_xmit(), ipv6_only_sock() in quic_v6_udp_conf_init(), and
+pmtudisc through ip_dont_fragment() and quic_sk_accept_pmtu().
+
+Also, the message names the new files quic_family.{c,h} while the patch
+adds net/quic/family.{c,h}.
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1789393775.git.lucien.xin%40gmail.com
