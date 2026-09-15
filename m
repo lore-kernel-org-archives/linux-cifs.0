@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BF7455171;
-	Tue, 15 Sep 2026 19:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80987455610;
+	Tue, 15 Sep 2026 19:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789501843; cv=none; b=p37rMLrluvY/yLFU0AU8dEMqYrP9BaTNTY9J6MB0zRDZoF2AGs0Gom3GJTSFZZx10sgxk5Dvwq+9rnMv1Huv/Fie70ozVJamyjSAG2/Ioqt0D7/5AHXuKet3Sof/ZE6k+PV4BVv6b1Z+SVYAX6fY2fJ+/4jOkDRY1NGSRxGH1GY=
+	t=1789501845; cv=none; b=pI+gTh9YxpQ8avtmWKYmyrF+amOWmfd0P85rXFhxweBli/5W58p7xKSxnIJbi9d73nY/Wv3JouWGmoLcB+1Q9rlO8TPrX8tc0FjZueX/a8dpo8IS4e98oxi/PlFimdk285IQR6BkgHBae8UoEkAYSySMe74ZhLrQfyJQ1QIllkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789501843; c=relaxed/simple;
-	bh=7pAhkgANEwxgn8l1oPuF03lULyArxtQyBwEI9RYMApE=;
+	s=arc-20240116; t=1789501845; c=relaxed/simple;
+	bh=tC8c4Hfjl9K5O2Dg99ry1B3cUF734KPK0G/TpaJ7EiE=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mH/kXViJ4iklTw6IgiLS2pINHkKFeIObHV5TGfc+3x0fljQR8+xoIE0mQoo1YsXB61EE1QzCZ3ZsOzCVl8Q6R13PlelASYJfejoD2oNcx4F9QwVdjvXgWzf4dROvIa3QTjWTFn5U6lb/vnm81VQ0wVnfYbpK/q9dRtLS0K+/Zgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dgz1BDS5; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=NuY8s5WdZtU+t58BLSv5lonD5uKp3RuBn3BhmYiONxXvKkkY87cZRSnzGmCCpH8dza1OqsNseATQeDlR3/NjsDwjrDCbxxNJp6GiSSqjKctSpB+j4MRodgXrF/8UQRh/fEMyBchlkbkXuslnRwTRIr2TA7g6g/fiPrhBjNiMxjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1dNA6hQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dgz1BDS5"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D9E41F000FF;
-	Tue, 15 Sep 2026 19:50:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1dNA6hQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B74C1F00893;
+	Tue, 15 Sep 2026 19:50:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789501841;
-	bh=41PbzTlkbDDun+VgvFEcL5oYarBRBEjhf2sVY+7b2qY=;
+	s=k20260515; t=1789501844;
+	bh=wPIZ/DqfqszUSqqIOmHFIRGTmhababaQY+mW6tc3VLk=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=Dgz1BDS5005RIgsSrFQdknqfu/FpOvFx5v0nrRWiH7RVr2oT18O9vUjVpKXv22tOC
-	 ZRBXl1kzca3p3JYKJCS9KT3CgMMchLtumv929SCNt55lGS6zg/vS05FKm/KIpux1kW
-	 86xYUBfQWSI65IqV0IDAKGWMEo5RexS2wrLwkF7Mk2J5YPhUyPYTo5x4GZoBayYINu
-	 Fz4/x9ImNHisa1AjhhoRTl3y3Th0oLfPTIdUsvIzm4w2qX9v632D2bO7Oxrs38TU0v
-	 ++q+toZ/6IaY2pKZOePz/YozBWASFi3eVgRS/+ZXQPjWKpw9ug4UuaMya8sUFe1KrR
-	 44+fLaQ7m+yKA==
-Subject: Re: [PATCH net-next v15 06/15] quic: add stream management
+	b=Z1dNA6hQ0potbJ7k1Txwxrl3E8/9VHbLT9xZar9JFAYrX5OnJ0Kg4jVFgT1n1dEoY
+	 mcODZPGV0YuE/InNXzaIhjMymjzO3lI1BekFSIpvYDLvvk83NCFNBqCV44p+4Lz72L
+	 uI0V6taWcwqbsP6iTvwpH+d+TXxBtqR4Ya0T23gnKuyAZutF9fM7IIM5aGTurEBGn/
+	 rt+oVM/QtuGGS86pTE0/ykQi4DzXZJoQXtWF3rgtMAlLGMo4D9QShFBxGsZfO74oy7
+	 87cO1d3GXlEnMjRW+ieG2jV/cOJ7xExBDMNzjWluZDbcwYKPuSSh5nQl5mhP31JWqS
+	 LFVNHe6u+0u6Q==
+Subject: Re: [PATCH net-next v15 07/15] quic: add connection id management
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -40,13 +40,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org
-Date: Tue, 15 Sep 2026 19:50:39 +0000
-Message-ID: <178950183921.22033.10083649522216474862@kernel.org>
-In-Reply-To: =?utf-8?q?=3C6d7bfc9ba424a7170befff9ca9eaed1663017ca8=2E1789393?=
+Date: Tue, 15 Sep 2026 19:50:41 +0000
+Message-ID: <178950184154.22033.11596322184319753011@kernel.org>
+In-Reply-To: =?utf-8?q?=3C03da9d52c2e42c4e06c47dafd8437c38c2ee1d41=2E1789393?=
  =?utf-8?q?775=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3C6d7bfc9ba424a7170befff9ca9eaed1663017ca8=2E17893937?=
+References: =?utf-8?q?=3C03da9d52c2e42c4e06c47dafd8437c38c2ee1d41=2E17893937?=
  =?utf-8?q?75=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Medium
+X-sashiko-severity: Low
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -56,198 +56,113 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 3 potential
+Thank you for your contribution! Sashiko AI review found 1 potential
 issue(s) to consider:
 
-Critical: 0 · High: 0 · Medium: 1 · Low: 2
+Critical: 0 · High: 0 · Medium: 0 · Low: 1
 
-- [Medium] quic_stream_set_param() (net/quic/stream.c:387-416) treats the
-  UAPI field `struct quic_transport_param::remote` (a __u8, so 0..255)…
-- [Low] quic_stream_create() (net/quic/stream.c:83-160) allocates each
-  stream with kzalloc_obj() and explicitly initializes only id,…
-- [Low] Concern: quic_stream_free() is called from quic_destroy_sock()
-  (net/quic/socket.c:60), i.e. from proto->destroy, which…
+- [Low] quic_conn_id_lookup() (net/quic/connid.c) takes a hard socket
+  reference via refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt) but…
 
 --
 
-quic: add stream management
+quic: add connection id management
 
-Adds struct quic_stream_table and struct quic_stream along with the
-per-socket stream hash table, the acquire/release helpers
-quic_stream_get()/quic_stream_put(), the stream ID limit checks, and the
-transport parameter get/set helpers.  The table is allocated in
-quic_init_sock() and released in quic_destroy_sock().
+This patch adds struct quic_conn_id_set plus helpers to add, remove, and
+look up source and destination Connection IDs, including insertion of
+source CIDs into the global connection ID hash table.  It also wires the
+per-socket source/dest sets into quic_init_sock() and quic_destroy_sock().
 
-A few questions below about stream state initialization, the handling of
-the transport parameter "remote" field, and the teardown ordering.
-
-> diff --git a/net/quic/socket.c b/net/quic/socket.c
-> index 0e0a13235fa42..731c1e00dba2b 100644
-> --- a/net/quic/socket.c
-> +++ b/net/quic/socket.c
-> @@ -49,11 +49,16 @@ static int quic_init_sock(struct sock *sk)
->  	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
->  	INIT_LIST_HEAD(quic_reqs(sk));
->  
-> +	if (quic_stream_init(quic_streams(sk)))
-> +		return -ENOMEM;
-> +
->  	return 0;
->  }
->  
->  static void quic_destroy_sock(struct sock *sk)
->  {
-> +	quic_stream_free(quic_streams(sk));
-
-[Severity: Low]
-Is the stream table teardown ordering here what is intended for later
-patches?  quic_destroy_sock() is proto->destroy, and sk_common_release()
-runs it before ->unhash(), with no socket lock held:
-
-net/core/sock.c:sk_common_release() {
-	...
-	if (sk->sk_prot->destroy)
-		sk->sk_prot->destroy(sk);
-	...
-	sk->sk_prot->unhash(sk);
-	...
-}
-
-So quic_stream_free() frees streams->head and then stores NULL into it at
-a point where the socket is no longer reachable from user space but is
-still, in principle, reachable from the network.  A concurrent
-quic_stream_find() would then walk freed hlist heads, or dereference NULL
-in quic_stream_head().
-
-Nothing can hit this in the current tree, since quic_hash() is
-"return 0;" and quic_unhash() is empty, so a QUIC socket is never inserted
-into a hash table and cannot be looked up from the receive path.  Would it
-still be worth doing the free after unhash, or under the socket lock the
-way udp_destroy_sock() does with lock_sock_fast(), so this stays correct
-once the lookup paths land?
-
-[ ... ]
-
-> diff --git a/net/quic/stream.c b/net/quic/stream.c
+> diff --git a/net/quic/connid.c b/net/quic/connid.c
 > new file mode 100644
-> index 0000000000000..6b34b117103a8
+> index 0000000000000..e726a1d02c970
 > --- /dev/null
-> +++ b/net/quic/stream.c
-> @@ -0,0 +1,416 @@
+> +++ b/net/quic/connid.c
+> @@ -0,0 +1,283 @@
 
 [ ... ]
 
-> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in
-> +	 * all streams of that type with lower-numbered stream IDs also being
-> +	 * opened.
-> +	 */
-> +	while (stream_id <= max_stream_id) {
-> +		stream = kzalloc_obj(*stream, gfp);
-> +		if (!stream)
-> +			goto free;
-> +
-> +		stream->id = stream_id;
-> +		if (quic_stream_id_uni(stream_id)) {
-> +			if (send) {
-> +				stream->send.max_bytes =
-> +					limits->max_stream_data_uni;
-> +			} else {
-> +				stream->recv.max_bytes =
-> +					limits->max_stream_data_uni;
-> +				stream->recv.window = stream->recv.max_bytes;
-> +			}
-
-[Severity: Low]
-Should stream->recv.state be initialized here?
-
-The stream comes from kzalloc_obj(), and only id, send.max_bytes,
-recv.max_bytes and recv.window are assigned, so recv.state stays 0.  The
-send and receive states share one enum in include/uapi/linux/quic.h:
-
-	enum {
-		QUIC_STREAM_SEND_STATE_READY,
-		...
-		QUIC_STREAM_SEND_STATE_RESET_RECVD,
-
-		QUIC_STREAM_RECV_STATE_RECV,
-		...
-	};
-
-which makes 0 equal to QUIC_STREAM_SEND_STATE_READY, while
-QUIC_STREAM_RECV_STATE_RECV is 6.
-
-net/quic/stream.h documents the field as a receive state:
-
-		u8 state;  /* Receive stream state, per rfc9000#section-3.2 */
-
-and quic_stream_put() compares it against the receive constants:
-
-		if (stream->recv.state < QUIC_STREAM_RECV_STATE_RECVD)
-			return;
-
-This comparison happens to give the same answer for 0 as for 6, so nothing
-misbehaves today, and the same field is what gets reported to user space as
-struct quic_stream_update::state.  Would setting recv.state to
-QUIC_STREAM_RECV_STATE_RECV at creation time (or documenting that 0 means
-"Recv") avoid an equality test going wrong later?
-
-[ ... ]
-
-> +/* Configure stream hashtable from transport parameters. */
-> +void quic_stream_set_param(struct quic_stream_table *streams,
-> +			   struct quic_transport_param *p, bool is_serv)
+> +/* Lookup a source connection ID (scid) in the global source connection ID hash
+> + * table.
+> + */
+> +struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len)
 > +{
-> +	struct quic_stream_limits *limits = p->remote ? &streams->send :
-> +							&streams->recv;
-> +	u8 bidi_type, uni_type;
+> +	struct quic_shash_head *head = quic_source_conn_id_head(net, scid, len);
+> +	struct quic_source_conn_id *s_conn_id;
+> +	struct quic_conn_id *conn_id = NULL;
+> +	struct hlist_nulls_node *node;
 > +
-[ ... ]
-> +	if (p->remote ^ is_serv) {
-> +		bidi_type = QUIC_STREAM_TYPE_CLIENT_BIDI;
-> +		uni_type = QUIC_STREAM_TYPE_CLIENT_UNI;
-> +	} else {
-> +		bidi_type = QUIC_STREAM_TYPE_SERVER_BIDI;
-> +		uni_type = QUIC_STREAM_TYPE_SERVER_UNI;
+> +	WARN_ON_ONCE(!rcu_read_lock_held());
+> +
+> +	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
+> +		if (net != sock_net(s_conn_id->sk))
+> +			continue;
+> +		if (s_conn_id->common.id.len != len ||
+> +		    memcmp(scid, &s_conn_id->common.id.data, len))
+> +			continue;
+> +		if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt)))
+> +			conn_id = &s_conn_id->common.id;
+> +		break;
 > +	}
 
-[Severity: Medium]
-Can the two different interpretations of p->remote in this function
-disagree?  It is a __u8 in the uAPI (struct quic_transport_param), so it
-can hold 0..255.  The limits selection uses a truth test, while the type
-selection uses a bitwise XOR, so for p->remote == 2 with is_serv == true:
+[Severity: Low]
+This isn't a bug, but could the reference semantics here be spelled out?
 
-	limits    = &streams->send		/* truth test: non-zero */
-	2 ^ 1 = 3 -> non-zero			/* takes the CLIENT branch */
-	bidi_type = QUIC_STREAM_TYPE_CLIENT_BIDI
+quic_conn_id_lookup() takes a hard socket reference with
+refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt), yet it returns a
+struct quic_conn_id pointer.  Neither the kerneldoc-style comment above the
+function ("Lookup a source connection ID (scid) in the global source
+connection ID hash table.") nor the prototype in connid.h mentions that the
+caller now owns an sk reference that must be dropped with sock_put().
 
-which leaves streams->send.next_bidi_stream_id = 0 on a server instead of
-1.  Would !!p->remote ^ is_serv (or rejecting p->remote > 1) keep the two
-tests consistent?
+Recovering the socket from the return value also requires the caller to know
+about the type-punning accessor:
 
-The follow-on in that state is that quic_stream_get() for the server's
-first bidi stream (ID 1) passes every gate: quic_stream_id_valid(1, true,
-true) is true, find() returns NULL, quic_stream_id_local(1, true) is true,
-quic_stream_id_closed() is false because 1 < 0 is false, and
-quic_stream_id_exceeds() is false.  quic_stream_create() then starts at
-stream_id 0:
+net/quic/connid.h:
+	static inline struct sock *quic_conn_id_sk(struct quic_conn_id *conn_id)
+	{
+		return ((struct quic_source_conn_id *)conn_id)->sk;
+	}
 
-> +	while (stream_id <= max_stream_id) {
+Within this patch there is no matching sock_put() anywhere in the tree; the
+balance only appears later in the series in "quic: add packet parser base",
+where quic_packet_get_sock() converts the result via
+return quic_conn_id_sk(conn_id); and quic_packet_rcv() drops the reference
+with sock_put(sk) on every path after the lookup.  So this is not a leak as
+the series stands, only an implicit handoff that is easy to miss.
 
-allocates a single stream with id 0, advances stream_id to 4 and returns
-that stream.  quic_stream_get() reports success and records
-streams->send.active_stream_id = 1 for a stream that does not exist, while
-ID 1 is now permanently -ENOSTR because next_bidi_stream_id is 4.
+Would a short comment on quic_conn_id_lookup() stating that it returns with
+an sk reference held, and that the caller must sock_put(quic_conn_id_sk())
+it, make the contract clearer?
 
-A later quic_stream_put() on the returned stream 0 evaluates
-quic_stream_id_local(0, true) as false and decrements
-streams->recv.streams_bidi, which was never incremented, so that u16
-underflows and feeds quic_stream_max_streams_update().
+> +	/* No need to check get_nulls_value(node) != hash for !conn_id, as
+> +	 * hashtable size is fixed and a conn_id can not rehashed.
+> +	 */
+> +	return conn_id;
+> +}
 
-quic_stream_set_param() has no caller yet in the tree, so this is
-forward-looking rather than something reachable today.  Along the same
-lines, should quic_stream_create() return an error rather than a stream
-whose id differs from the requested max_stream_id, since no caller can
-detect that today?
+[ ... ]
+
+> diff --git a/net/quic/connid.h b/net/quic/connid.h
+> new file mode 100644
+> index 0000000000000..abad396a6ad6a
+> --- /dev/null
+> +++ b/net/quic/connid.h
+> @@ -0,0 +1,183 @@
+
+[ ... ]
+
+> +struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set,
+> +				       u32 number);
+> +struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len);
+
+[Severity: Low]
+These two declarations sit next to each other, return the same type, but
+have opposite reference-counting rules: quic_conn_id_find() returns a
+borrowed pointer while quic_conn_id_lookup() returns one with an sk
+reference attached.  Would it be worth documenting that difference here, or
+returning the struct sock * (or an output sk parameter) from
+quic_conn_id_lookup() so the acquired reference is visible in the signature?
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1789393775.git.lucien.xin%40gmail.com
