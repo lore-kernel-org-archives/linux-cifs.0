@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80987455610;
-	Tue, 15 Sep 2026 19:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7A8456DE1;
+	Tue, 15 Sep 2026 19:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789501845; cv=none; b=pI+gTh9YxpQ8avtmWKYmyrF+amOWmfd0P85rXFhxweBli/5W58p7xKSxnIJbi9d73nY/Wv3JouWGmoLcB+1Q9rlO8TPrX8tc0FjZueX/a8dpo8IS4e98oxi/PlFimdk285IQR6BkgHBae8UoEkAYSySMe74ZhLrQfyJQ1QIllkU=
+	t=1789501848; cv=none; b=LNBT6MsmWsQ7lERAsbJl3AUhuA73NaRa6vRw1hAUrenAz447TXI1tNT4IpBOuoOm9GgLiqMwokhhYkEEKglJkx6X9HDnIhnNJpZ3gKKvx+AsaRngNeDo2KfU0bmtt4QaxNGXUmzsGvx3UggqqPj/lvGcqoKtrclctwkiQYrCIvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789501845; c=relaxed/simple;
-	bh=tC8c4Hfjl9K5O2Dg99ry1B3cUF734KPK0G/TpaJ7EiE=;
+	s=arc-20240116; t=1789501848; c=relaxed/simple;
+	bh=kvmOlM/afqx5EFgaDLKldpaV8PgWJAvZ3M4pDWrPkpo=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NuY8s5WdZtU+t58BLSv5lonD5uKp3RuBn3BhmYiONxXvKkkY87cZRSnzGmCCpH8dza1OqsNseATQeDlR3/NjsDwjrDCbxxNJp6GiSSqjKctSpB+j4MRodgXrF/8UQRh/fEMyBchlkbkXuslnRwTRIr2TA7g6g/fiPrhBjNiMxjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1dNA6hQ; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=ns1fUb4TXz1sraTMcntGd+AS72RinrmoEhaObLnoantGOt4HoDhv09X3UmkfRJw60W91gT2Fo201AhuCzwmsQiJMOc/VDEnn9Bj99FRa2bxeFwBXPvW3NBoLIK912ubklDthpcyYkcYasEYRyunNAKAaJPtKhgKzYOeNHIcjQi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFpHtIpG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1dNA6hQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B74C1F00893;
-	Tue, 15 Sep 2026 19:50:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFpHtIpG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B15521F000FF;
+	Tue, 15 Sep 2026 19:50:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789501844;
-	bh=wPIZ/DqfqszUSqqIOmHFIRGTmhababaQY+mW6tc3VLk=;
+	s=k20260515; t=1789501846;
+	bh=eU2M/+mxMfhFRzEGHYVBLHiOCSXAx6SaM+buAgj5Usc=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=Z1dNA6hQ0potbJ7k1Txwxrl3E8/9VHbLT9xZar9JFAYrX5OnJ0Kg4jVFgT1n1dEoY
-	 mcODZPGV0YuE/InNXzaIhjMymjzO3lI1BekFSIpvYDLvvk83NCFNBqCV44p+4Lz72L
-	 uI0V6taWcwqbsP6iTvwpH+d+TXxBtqR4Ya0T23gnKuyAZutF9fM7IIM5aGTurEBGn/
-	 rt+oVM/QtuGGS86pTE0/ykQi4DzXZJoQXtWF3rgtMAlLGMo4D9QShFBxGsZfO74oy7
-	 87cO1d3GXlEnMjRW+ieG2jV/cOJ7xExBDMNzjWluZDbcwYKPuSSh5nQl5mhP31JWqS
-	 LFVNHe6u+0u6Q==
-Subject: Re: [PATCH net-next v15 07/15] quic: add connection id management
+	b=OFpHtIpG9uiLVfSuc/006bZJDER2bm6b9x6pitt7+vX9/9KwNGnAUB5bO7AA5xzvv
+	 UYBdw9EZT/wZL6bAHXsL7H2CHDNAVtW1eT7UuCFzxvCtpzr7p5BgblrLK30oqsJT7I
+	 ze+gPLVMuGb358v/UdSja8/OJdUsBv86ItVf0F65oUkQLK61RPkC4H9INZrEUT+Rk2
+	 EO/esqtgp3tOTvf2RFjs6j+W9teKgpyPEQ75kh8m/+w52i/wXNzglOvNmVUL8T1RPr
+	 Qb/SHyo3ddxXXZHlhkZTbqM8cvddAyVjeL8A1XcLegjvUXXkpw+iY8mRfavEuZ0pCB
+	 DmsTEA2NaeTCA==
+Subject: Re: [PATCH net-next v15 08/15] quic: add path management
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -40,13 +40,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org
-Date: Tue, 15 Sep 2026 19:50:41 +0000
-Message-ID: <178950184154.22033.11596322184319753011@kernel.org>
-In-Reply-To: =?utf-8?q?=3C03da9d52c2e42c4e06c47dafd8437c38c2ee1d41=2E1789393?=
+Date: Tue, 15 Sep 2026 19:50:44 +0000
+Message-ID: <178950184430.22033.8793987707688483661@kernel.org>
+In-Reply-To: =?utf-8?q?=3C375ee7fe827d9df248a27a8072c84a7c167fc50a=2E1789393?=
  =?utf-8?q?775=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3C03da9d52c2e42c4e06c47dafd8437c38c2ee1d41=2E17893937?=
+References: =?utf-8?q?=3C375ee7fe827d9df248a27a8072c84a7c167fc50a=2E17893937?=
  =?utf-8?q?75=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Low
+X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -56,113 +56,300 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 1 potential
+Thank you for your contribution! Sashiko AI review found 7 potential
 issue(s) to consider:
 
-Critical: 0 · High: 0 · Medium: 0 · Low: 1
+Critical: 0 · High: 0 · Medium: 2 · Low: 5
 
-- [Low] quic_conn_id_lookup() (net/quic/connid.c) takes a hard socket
-  reference via refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt) but…
+- [Medium] quic_path_swap() opens a write section on a bare seqcount_t
+  (paths->path_seq) with only local_bh_disable() for context protection.
+- [Medium] In the explicit-port branch of quic_path_bind(), an existing
+  UDP tunnel socket is reused whenever quic_cmp_sk_addr() matches.
+- [Low] Commit message claims PLPMTUD/ICMP feedback is integrated, but at
+  this commit quic_udp_err() is a stub returning 0 and no quic_path_pl_*…
+- [Low] quic_path_pl_send()'s kernel-doc ("Called immediately after
+  sending a probe packet in QUIC Path MTU Discovery") and the matching…
+- [Low] The new file net/quic/path.c carries the header comment
+  "Initialization/cleanup for QUIC protocol support." — verbatim…
+- [Low] quic_path_pl_recv()'s documented contract ("Return: New PMTU to
+  apply if search completes, or 0 if no change") disagrees with the…
+- [Low] The three PLPMTUD pr_debug() statements in quic_path_pl_send(),
+  quic_path_pl_recv() and quic_path_pl_toobig() print the label "dst:…
 
 --
 
-quic: add connection id management
+quic: add path management
 
-This patch adds struct quic_conn_id_set plus helpers to add, remove, and
-look up source and destination Connection IDs, including insertion of
-source CIDs into the global connection ID hash table.  It also wires the
-per-socket source/dest sets into quic_init_sock() and quic_destroy_sock().
+This patch adds struct quic_path / struct quic_path_group plus the global
+hash table of UDP tunnel sockets, with helpers to bind, unbind, swap and
+detect alternate paths for connection migration.  It also adds the RFC 8899
+PLPMTUD state machine helpers (quic_path_pl_send/recv/toobig/reset/confirm)
+and a quic_wq workqueue used to release UDP tunnel sockets.
 
-> diff --git a/net/quic/connid.c b/net/quic/connid.c
+A few questions below.
+
+> diff --git a/net/quic/path.c b/net/quic/path.c
 > new file mode 100644
-> index 0000000000000..e726a1d02c970
+> index 0000000000000..a9e02fc22e609
 > --- /dev/null
-> +++ b/net/quic/connid.c
-> @@ -0,0 +1,283 @@
+> +++ b/net/quic/path.c
+> @@ -0,0 +1,589 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* QUIC kernel implementation
+> + * (C) Copyright Red Hat Corp. 2023
+> + *
+> + * This file is part of the QUIC kernel implementation
+> + *
+> + * Initialization/cleanup for QUIC protocol support.
+
+[Severity: Low]
+This isn't a bug, but this one-line description is the same sentence that
+net/quic/common.c already carries, while this file implements UDP tunnel
+socket hashing, path bind/unbind/swap/alt-detection and the PLPMTUD state
+machine.  Should it describe path management instead?
+
+> + *
+> + * Written or modified by:
+> + *    Xin Long <lucien.xin@gmail.com>
+> + */
 
 [ ... ]
 
-> +/* Lookup a source connection ID (scid) in the global source connection ID hash
-> + * table.
-> + */
-> +struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len)
+> +static int quic_udp_err(struct sock *sk, struct sk_buff *skb)
 > +{
-> +	struct quic_shash_head *head = quic_source_conn_id_head(net, scid, len);
-> +	struct quic_source_conn_id *s_conn_id;
-> +	struct quic_conn_id *conn_id = NULL;
-> +	struct hlist_nulls_node *node;
-> +
-> +	WARN_ON_ONCE(!rcu_read_lock_held());
-> +
-> +	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
-> +		if (net != sock_net(s_conn_id->sk))
-> +			continue;
-> +		if (s_conn_id->common.id.len != len ||
-> +		    memcmp(scid, &s_conn_id->common.id.data, len))
-> +			continue;
-> +		if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt)))
-> +			conn_id = &s_conn_id->common.id;
-> +		break;
-> +	}
-
-[Severity: Low]
-This isn't a bug, but could the reference semantics here be spelled out?
-
-quic_conn_id_lookup() takes a hard socket reference with
-refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt), yet it returns a
-struct quic_conn_id pointer.  Neither the kerneldoc-style comment above the
-function ("Lookup a source connection ID (scid) in the global source
-connection ID hash table.") nor the prototype in connid.h mentions that the
-caller now owns an sk reference that must be dropped with sock_put().
-
-Recovering the socket from the return value also requires the caller to know
-about the type-punning accessor:
-
-net/quic/connid.h:
-	static inline struct sock *quic_conn_id_sk(struct quic_conn_id *conn_id)
-	{
-		return ((struct quic_source_conn_id *)conn_id)->sk;
-	}
-
-Within this patch there is no matching sock_put() anywhere in the tree; the
-balance only appears later in the series in "quic: add packet parser base",
-where quic_packet_get_sock() converts the result via
-return quic_conn_id_sk(conn_id); and quic_packet_rcv() drops the reference
-with sock_put(sk) on every path after the lookup.  So this is not a leak as
-the series stands, only an implicit handoff that is easy to miss.
-
-Would a short comment on quic_conn_id_lookup() stating that it returns with
-an sk reference held, and that the caller must sock_put(quic_conn_id_sk())
-it, make the contract clearer?
-
-> +	/* No need to check get_nulls_value(node) != hash for !conn_id, as
-> +	 * hashtable size is fixed and a conn_id can not rehashed.
-> +	 */
-> +	return conn_id;
+> +	return 0;
 > +}
 
+[Severity: Low]
+The commit message says:
+
+  "It also integrates basic support for Packetization Layer Path MTU
+   Discovery (PLPMTUD), using PING frames and ICMP feedback to adjust path
+   MTU and handle probe confirmation or resets during routing changes."
+
+At this commit quic_udp_err() discards the ICMP information and none of the
+quic_path_pl_* helpers (nor quic_path_bind()/quic_path_swap()/
+quic_path_detect_alt()) has a caller yet.  The ICMP side is wired up later
+in the same series, where quic_udp_err() becomes
+quic_packet_rcv(sk, skb, true) and quic_packet_rcv_err_pmtu() calls
+quic_path_pl_toobig().
+
+So this looks like wording only: would it be clearer to say the helpers are
+introduced here and hooked into the receive and send paths in the following
+patches?
+
 [ ... ]
 
-> diff --git a/net/quic/connid.h b/net/quic/connid.h
-> new file mode 100644
-> index 0000000000000..abad396a6ad6a
-> --- /dev/null
-> +++ b/net/quic/connid.h
-> @@ -0,0 +1,183 @@
+> +		if (a) {
+> +			if (quic_cmp_sk_addr(us->sk, &us->addr, a) &&
+> +			    us->bind_ifindex == quic_get_dev_if(sk, a))
+> +				return us;
+> +			continue;
+> +		}
 
 [ ... ]
 
-> +struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set,
-> +				       u32 number);
-> +struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len);
+> +		head = quic_udp_sock_head(net, port);
+> +		mutex_lock(&head->lock);
+> +		us = quic_udp_sock_lookup(sk, a, port);
+> +		if (us) {
+> +			if (!uid_eq(sk->sk_uid, us->sk->sk_uid)) {
+> +				mutex_unlock(&head->lock);
+> +				return -EADDRINUSE;
+> +			}
+> +			/* Allow reuse of an existing UDP tunnel socket.
+> +			 * However, if it is in the middle of asynchronous
+> +			 * teardown (via workqueue), it is temporarily unusable.
+> +			 * Return -EAGAIN (not -EADDRINUSE) to signal the caller
+> +			 * to retry soon.
+> +			 */
+> +			if (!quic_udp_sock_get(us)) {
+> +				mutex_unlock(&head->lock);
+> +				return -EAGAIN;
+> +			}
+> +		} else {
+> +			us = quic_udp_sock_create(sk, a);
+> +			if (IS_ERR(us)) {
+> +				mutex_unlock(&head->lock);
+> +				return PTR_ERR(us);
+> +			}
+> +		}
+> +		mutex_unlock(&head->lock);
+> +		quic_path_set_udp_sk(&paths->path[path], us);
+> +		return 0;
+> +	}
+
+[Severity: Medium]
+Can this reuse branch bind a path to a source address the host does not own?
+
+quic_udp_sock_lookup() calls quic_cmp_sk_addr(us->sk, &us->addr, a), so the
+existing tunnel socket address is the first argument, and
+net/quic/family.c:quic_v4_cmp_sk_addr() has:
+
+	/* Match only if socket is also ANY-bound. */
+	if (addr->v4.sin_addr.s_addr == htonl(INADDR_ANY))
+		return a->v4.sin_addr.s_addr == htonl(INADDR_ANY);
+	if (a->v4.sin_addr.s_addr == htonl(INADDR_ANY))
+		return true;
+
+That second test means an ANY-bound tunnel socket matches a request for an
+arbitrary specific address (quic_v6_cmp_sk_addr() has the same rule for
+IPv6).
+
+On that branch quic_path_bind() returns 0 without ever going through
+quic_udp_sock_create() -> udp_sock_create() -> kernel_bind(), so
+__inet_bind()'s address ownership check (inet_addr_type() must be
+RTN_LOCAL/MULTICAST/BROADCAST unless IP_FREEBIND, ip_nonlocal_bind or
+CAP_NET_ADMIN) never runs, and paths->path[path].saddr keeps the
+unvalidated address:
+
+  process A: bind 0.0.0.0:P     -> quic_udp_sock_create(), tunnel sk is ANY
+  process B (same uid): bind <non-local addr>:P
+                               -> quic_udp_sock_lookup() matches the ANY sk
+                               -> quic_udp_sock_get(), return 0
+
+The same request would be rejected if no wildcard tunnel socket existed for
+port P, since then udp_sock_create() would do the bind and validate the
+address.  Should the reuse branch validate the requested source address
+before accepting it?
+
+[ ... ]
+
+> +void quic_path_swap(struct quic_path_group *paths)
+> +{
+> +	struct quic_path path = paths->path[0];
+> +
+> +	paths->alt_probes = 0;
+> +	paths->alt_state = QUIC_PATH_ALT_SWAPPED;
+> +
+> +	/* Protect path[0] modifications with seqcount for RCU readers in
+> +	 * quic_sock_lookup(). The seqcount allows readers to detect torn reads
+> +	 * during the non-atomic structure assignment.
+> +	 */
+> +	local_bh_disable();
+> +	write_seqcount_begin(&paths->path_seq);
+
+[Severity: Medium]
+Is local_bh_disable() enough to open a write section on a bare seqcount_t?
+
+path_seq is declared as a plain counter in net/quic/path.h:
+
+	seqcount_t path_seq;      /* Protects path[0] during swap */
+
+so there is no associated write serialization lock, and
+write_seqcount_begin() expands to seqprop_assert(s), which for seqcount_t is
+lockdep_assert_preemption_disabled().  On PREEMPT_RT
+__local_bh_disable_ip() only takes softirq_ctrl.lock and does
+migrate_disable(); it does not touch preempt_count():
+
+	kernel/softirq.c (CONFIG_PREEMPT_RT)
+	void __local_bh_disable_ip(unsigned long ip, unsigned int cnt)
+	{
+		...
+		local_lock(&softirq_ctrl.lock);
+		...
+	}
+
+Does that make write_seqcount_begin() warn on every path swap with lockdep
+enabled on PREEMPT_RT?
+
+The other half of the same point: the odd-sequence window becomes
+preemptible, and the reader added later in the series busy-waits on it:
+
+	do {
+		seq = read_seqcount_begin(&paths->path_seq);
+		...
+	} while (read_seqcount_retry(&paths->path_seq, seq));
+
+Would preempt_disable_nested() around the write section, or declaring the
+counter as a seqcount_LOCKNAME_t associated with the socket lock, be a
+better fit here?
+
+[ ... ]
+
+> +/* Handle PLPMTUD probe failure on a QUIC path.
+> + *
+> + * Called immediately after sending a probe packet in QUIC Path MTU Discovery.
+> + * Tracks probe count and manages state transitions based on the number of
+> + * probes sent and current PLPMTUD state (BASE, SEARCH, COMPLETE, ERROR).
+> + * Detects probe failures and black holes, adjusting PMTU and probe sizes
+> + * accordingly.
+> + *
+> + * Return: New PMTU value if updated, else 0.
+> + */
+> +u32 quic_path_pl_send(struct quic_path_group *paths, s64 number)
+> +{
+> +	u32 pathmtu = 0;
+> +
+> +	paths->pl.number = number;
+> +	if (paths->pl.probe_count < QUIC_MAX_PROBES)
+> +		goto out;
 
 [Severity: Low]
-These two declarations sit next to each other, return the same type, but
-have opposite reference-counting rules: quic_conn_id_find() returns a
-borrowed pointer while quic_conn_id_lookup() returns one with an sk
-reference attached.  Would it be worth documenting that difference here, or
-returning the struct sock * (or an output sk parameter) from
-quic_conn_id_lookup() so the acquired reference is visible in the signature?
+Is the documented ordering inverted here?  The body records the packet
+number of the probe that is about to be built and returns the PMTU for the
+caller to apply to that upcoming packet, which only works if the helper runs
+before the probe is transmitted.
+
+The commit message has the same ordering:
+
+  "- quic_path_pl_send(): state transition and pmtu update after sending a
+     probe packet."
+
+Read as documented, the QUIC_MAX_PROBES = 3 budget looks like it only fires
+after a 4th probe.  Should both the kernel-doc line and the commit message
+bullet say before sending the probe packet?
+
+> +
+> +	paths->pl.probe_count = 0;
+
+[ ... ]
+
+> +out:
+> +	pr_debug("%s: dst: %p, state: %d, pmtu: %d, size: %d, high: %d\n",
+> +		 __func__, paths, paths->pl.state, paths->pl.pmtu,
+> +		 paths->pl.probe_size, paths->pl.probe_high);
+> +	paths->pl.probe_count++;
+> +	return pathmtu;
+> +}
+
+[Severity: Low]
+This isn't a bug, but the label says dst while the argument is paths, a
+struct quic_path_group * rather than a route entry.  The same "dst: %p"
+label appears in quic_path_pl_recv() and quic_path_pl_toobig(); it looks
+inherited from the SCTP PLPMTUD traces where the printed object was the
+transport.  Would "paths: %p" read better, since these are the only traces
+of the PLPMTUD state machine?
+
+> +
+> +/* Handle successful reception of a PMTU probe.
+> + *
+> + * Called when a probe packet is acknowledged. Updates probe size and
+> + * transitions state if needed (e.g., from SEARCH to COMPLETE).  Expands PMTU
+> + * using binary or linear search depending on state.
+> + *
+> + * Return: New PMTU to apply if search completes, or 0 if no change.
+> + */
+> +u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer,
+> +		      bool *complete)
+
+[Severity: Low]
+Does the QUIC_PL_ERROR branch below match this return description?  It
+returns a non-zero PMTU while moving ERROR -> SEARCH, that is, while the
+search is explicitly not complete:
+
+	} else if (paths->pl.state == QUIC_PL_ERROR) {
+		paths->pl.state = QUIC_PL_SEARCH; /* Error -> Search */
+
+		paths->pl.pmtu = paths->pl.probe_size;
+		pathmtu = (u32)paths->pl.pmtu;
+
+The two out-parameters that actually carry the completion and timer signals,
+bool *raise_timer and bool *complete, are not described either.  Could the
+comment say a non-zero return is a PMTU to apply and document the two
+out-parameters?
+
+[ ... ]
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1789393775.git.lucien.xin%40gmail.com
