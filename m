@@ -1,160 +1,111 @@
-Received: from mta0.migadu.com (out-88.mta0.migadu.com [91.218.175.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A274AA00D
-	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 09:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C1A4BD106
+	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 09:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789551698; cv=none; b=ChZPzGtiF9Q2OFIXyUGXHTUleLC2QGgLsGbfen4QCWqDhIncuX2Pb+BeOIHKMN0SdJwJbZwW316ldVMwP3bvcwx4/FlU9tbIgqN4jlAssXCgiKRcR0iO9Cy7TneIZkzmfiSzoG08OxsKBD/od4qX96PM0awfIMhRE4Jn2E7m0l4=
+	t=1789552307; cv=none; b=r8YuY1tB7r9/B/CPVZrQkCAZ+VH17mDB9vVJ1PcaqbnCquQoDZaC2uXgTLEvEyPqu4SmjmEQR37JjjihoDN/eC+Ii50fLv9QG0GmB4t4pPqne0H+Ytm8ZYg0cBSml/MnR5nJcz7XOmuN3C/yjZNbpkPO6ANre8ClNeo09PCqZW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789551698; c=relaxed/simple;
-	bh=/O66kM1XqK/k+1+V8AfJSc2H9zVFlAnRkccenBDJgnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JsfJR5Lg8YHNIvCdYCXDTOMEinci2nlDSYvfCjSTYsPPN3mMIqWL/NA+QkFvU7WpJ8ucak7s1nC+tlFOlQFLANT5gO9crNaUQKt1AuXm2ANZpw4h28juYtu3oDlkitXcvaBUfbvjBO5XpcQOloIwZTWv2w3QILD5jDYnv7CY9U4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kxr+j67c; arc=none smtp.client-ip=91.218.175.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789552307; c=relaxed/simple;
+	bh=HsLRaYuEbq7ZzzRNl6uSIAKV4rQlZ2M6v1OhzKK4PeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ge92FYYZz4f3a50lJt9uGaRCt32f3u6scpk4dUbuiJDjyR804HBrn42qde/iihFmS6wETRPXxUtfdaaxnihf3Ry+ScMcRydpH6kfhKKWdYRHK9HqPOuYoXA7u+yAEKZEFblSwtRZSSFy1MG43SO/6E4ReIs3LZBnVZ1Lab7Vhuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PLc13YlY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kxr+j67c"
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=/O66kM1XqK/k+1+V8AfJSc2H9zVFlAnRkccenBDJgnQ=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789551688; v=1; x=1790156488;
- b=kxr+j67cWvfl9niH+dahQfwtlUZACE/1mJVRa3Yqi3zANF7wEEIVAUbPaoXV3B1TJBXrJoJa
- +nZv4SStHF2SzrN2vop29oJkHnIP50DpWcEp79i58lWZMVkjRnJGKcl5VRGpFpQLOmaKkqr58fV
- 0OKFsToDHCC2aR5eniPB6bYs=
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 6bb14bcd9a7238ed;
-	Wed, 16 Sep 2026 09:41:28 +0000
-X-Mizu-Trace-ID: 6bb14bcd9a7238ed
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <cfcba100-609a-4016-9b47-186346709634@linux.dev>
-Date: Wed, 16 Sep 2026 17:42:08 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PLc13YlY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1789552296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hUSOoW0g30UFVhZc7yIBkWk1BVCAbM29mk2RKcbK+JY=;
+	b=PLc13YlYFPAjy908ncmepAFUQ+QvfI9RHcFJy0+WgFhJdrSDrCQwVtFoB733h660mKMKcr
+	ZAKY3hslg8KhbOAjlqvPIZuMZRADOen/sSmxxUjT3fJ/sx/DfN3k+9wRha1IRFWaGTlYVK
+	6naXa8s/7YXJJvx3qb/oDDMXVJd8C8E=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-398-eQhTA5pfOC-RaQf07cCbfQ-1; Wed,
+ 16 Sep 2026 05:51:32 -0400
+X-MC-Unique: eQhTA5pfOC-RaQf07cCbfQ-1
+X-Mimecast-MFC-AGG-ID: eQhTA5pfOC-RaQf07cCbfQ_1789552289
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0B7D11954227;
+	Wed, 16 Sep 2026 09:51:29 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 50C471800446;
+	Wed, 16 Sep 2026 09:51:23 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Subject: [PATCH v4 12/13] smb: client: Use hmac_sha256_zeroize_ctx function to clear hmac_sha256_ctx
+Date: Wed, 16 Sep 2026 11:50:14 +0200
+Message-ID: <20260916095022.604354-13-thuth@redhat.com>
+In-Reply-To: <20260916095022.604354-1-thuth@redhat.com>
+References: <20260916095022.604354-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: client side "current->alloc_tag not set WARNING:
- ./include/linux/alloc_tag.h:161" at accessing CIFS share
-To: Paulo Alcantara <pc@manguebit.org>, Erhard Furtner <erhard_f@mailbox.org>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>,
- netfs@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <0b004319-9ef7-437c-a4dd-174d6a9a83db@mailbox.org>
- <0e8961201179ba88038de511c587ddc7@manguebit.org>
-Content-Language: en-US
-From: Hao Ge <hao.ge@linux.dev>
-In-Reply-To: <0e8961201179ba88038de511c587ddc7@manguebit.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Hi Paulo
+It's just cosmetics, but now that we have a helper function for clearing
+hmac_sha256_ctx with a __cleanup() statement, we can also use it in the smb
+client code for good measure.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ fs/smb/client/smb2transport.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Sorry to jump in.
-
-On 2026/9/2 07:19, Paulo Alcantara wrote:
-> Erhard Furtner <erhard_f@mailbox.org> writes:
-> 
->> Getting this "current->alloc_tag not set WARNING:" every time on my 
->> client PC when I open files on the CIFS share (exported via KSMBD) from 
->> my host PC:
-> 
-> The warning is triggered by running the following in
-> netfs_alloc_request() with CONFIG_MEM_ALLOC_PROFILING_DEBUG=y kernels:
-> 
->         rreq = mempool->alloc(gfp, mempool->pool_data);
-> 
-> for the non-writeback path.
-> 
-> @mempool->alloc is set to mempool_alloc_slab(), which calls
-> kmem_cache_alloc_noprof() directly and expects the caller to have
-> already set current->alloc_tag.
-> 
-> It doesn't occur in the writeback path, however, because we call
-> mempool_alloc() macro that wraps to
-> 
->         alloc_hooks(mempool_alloc_noprof(...))
-> 
-> and it sets current->alloc_tag before the allocation.
->
-
-Right - and there's one more instance of the same pattern.
-Erhard's second warning (alloc_tag was not set on free) comes from
-netfs_folioq_alloc(), which does the same for the folio_queue:
-	
-	fq = netfs_folioq_pool.alloc(gfp, netfs_folioq_pool.pool_data);
-
-When I first saw the report I wondered why no other mempool user trips over this,
-so I had a look around the tree:
-
-Everyone else gets their elements through the mempool_alloc() macro, so the tag is
-set at their callsite and the callbacks see a valid current->alloc_tag.
-
-I went back to the commit that introduced the raw call, 1d78d56c43ef ("netfs: Fix folio_queue ENOMEM in
-writeback by adding a mempool") and OK, I think I roughly understand the story now.
-
-Here is my proposed fix patch. I don't have a test environment handy though. What do you think?
-
-diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-index 420ee7b26580..373be970ec31 100644
---- a/fs/netfs/internal.h
-+++ b/fs/netfs/internal.h
-@@ -45,6 +45,9 @@ extern mempool_t netfs_request_pool;
- extern mempool_t netfs_subrequest_pool;
- extern mempool_t netfs_folioq_pool;
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index c407f30e00401..080864b24a0c5 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -212,7 +212,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
+ 	struct kvec *iov = rqst->rq_iov;
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+-	struct hmac_sha256_ctx hmac_ctx;
++	struct hmac_sha256_ctx hmac_ctx __cleanup(hmac_sha256_zeroize_ctx);
+ 	struct smb_rqst drqst;
+ 	__u64 sid = le64_to_cpu(shdr->SessionId);
+ 	u8 key[SMB2_NTLMV2_SESSKEY_SIZE];
+@@ -250,7 +250,6 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 		memcpy(shdr->Signature, smb2_signature, SMB2_SIGNATURE_SIZE);
  
-+#define mempool_alloc_element(_pool, _gfp)				\
-+	alloc_hooks((_pool)->alloc(_gfp, (_pool)->pool_data))
-+
- #ifdef CONFIG_PROC_FS
- static inline void netfs_proc_add_rreq(struct netfs_io_request *rreq)
- {
-diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-index 01461a74642d..18f5c64d404e 100644
---- a/fs/netfs/objects.c
-+++ b/fs/netfs/objects.c
-@@ -34,7 +34,7 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
+ 	memzero_explicit(key, sizeof(key));
+-	memzero_explicit(&hmac_ctx, sizeof(hmac_ctx));
+ 	return rc;
+ }
  
- 		rreq = mempool_alloc(mempool, gfp);
- 	} else {
--		rreq = mempool->alloc(gfp, mempool->pool_data);
-+		rreq = mempool_alloc_element(mempool, gfp);
- 		if (!rreq)
- 			return ERR_PTR(-ENOMEM);
- 	}
-@@ -206,7 +206,7 @@ struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq
- 	struct kmem_cache *cache = mempool->pool_data;
- 
- 	if (rreq->gfp == GFP_KERNEL)
--		subreq = mempool->alloc(rreq->gfp, mempool->pool_data);
-+		subreq = mempool_alloc_element(mempool, rreq->gfp);
- 	else
- 		subreq = mempool_alloc(mempool, rreq->gfp);
- 	if (!subreq)
-diff --git a/fs/netfs/rolling_buffer.c b/fs/netfs/rolling_buffer.c
-index 8c0026836f9c..d1ae6e081664 100644
---- a/fs/netfs/rolling_buffer.c
-+++ b/fs/netfs/rolling_buffer.c
-@@ -29,7 +29,7 @@ struct folio_queue *netfs_folioq_alloc(unsigned int rreq_id, gfp_t gfp,
- 	struct folio_queue *fq;
- 
- 	if (gfp == GFP_KERNEL)
--		fq = netfs_folioq_pool.alloc(gfp, netfs_folioq_pool.pool_data);
-+		fq = mempool_alloc_element(&netfs_folioq_pool, gfp);
- 	else
- 		fq = mempool_alloc(&netfs_folioq_pool, gfp);
- 	if (fq) {
 -- 
-2.25.1
+2.55.0
 
-Thanks
-Best Regards
-Hao
-
-> I'll look for a possible solution and then let you know.
-> 
-> Thanks for the report.
