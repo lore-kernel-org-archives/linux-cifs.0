@@ -1,73 +1,73 @@
-Received: from mail-pz2-f12.google.com (mail-pz2-f12.google.com [74.125.228.12])
+Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E77A525A72
-	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 15:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314FC52B1D9
+	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 15:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789572594; cv=none; b=EeTcPO3oyL4mVp7u/bfpvYvjTwMzKrFwKPWKXw+vg8vUlHjaULPF2WJ+lQlYfODY+Vc/D8x7owRZ47rPEOBLuRhbXpXQekBD9cik4zgMAf+uJiadpkN87Z5ygIJgwdqFm8OfNrbkxrPPUsl3bohwOQ6FwRGNrJAZpr999Yw6x+8=
+	t=1789572596; cv=none; b=JDKfL2Jri2Q5Y7f0T2Q4N/559FXi80wd48mY8vNMGf3mnNQLUV2wG2bXeXXgPFHyZyoNBGD/Jh0Opb8jBuqCMPZ7waKjkPUDvnPTK4JzyPzIxixZfkMD1gM3vZOo3jFBOD5HybumrEhqFlVKRTMcnf9sIwyqPALSA0Dc36nD4UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789572594; c=relaxed/simple;
-	bh=e4mZrfsxkodpuQqeGRiSfS3fzBv+HZweuvs7ejDvKKk=;
+	s=arc-20240116; t=1789572596; c=relaxed/simple;
+	bh=I9O7wOHqdv0DpuA/FsaA4+6Z8EbI0eP7fNeYKNeFr4M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VQaXrVw/kNdiNgdX81jLCZhG0KNCjafj67Z+no7/5oaeC0cbsBGXyOkJemaS8f86F+Mf2sSQSH6AJ2V54gLTKT6uDSCQQW3VV1xytBY53WjpgrfPaLy/bkLquvWLi8JUWWdj2ACVrqdVoqxKWU4vZJpUGTe/yKTTCpWAZm1sLKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=Bn1Kq/Ap; arc=none smtp.client-ip=74.125.228.12
+	 MIME-Version; b=NgwYuAezEjaSX+r0UHnS/arydxjotFyIwr9hW5Q9e8TynE9nXQUjcGQFeDxBlI1gjT6uPuVMbczsVUE7R2zMSa8CktksgwI+BMys4bj9w6G4TIEi5sPq1KzNVx7ADqJw+BL104yGBurpmYjvqMfB8du3fZwe7T+g9IdEgJcW2Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=gF8AkeUd; arc=none smtp.client-ip=74.125.227.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="Bn1Kq/Ap"
-Received: by mail-pz2-f12.google.com with SMTP id 41be03b00d2f7-cc1cea50dc1so652636a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 08:29:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="gF8AkeUd"
+Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-398c066106cso845271a91.1
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 08:29:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1789572586; x=1790177386; darn=vger.kernel.org;
+        d=nebusec.ai; s=google; t=1789572590; x=1790177390; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=tPnCpncMFnpccjoQkrRtEWougbMuRTTA3lDYH8x7qRU=;
-        b=Bn1Kq/Ap6qgmm+ossvUe5UuBvzxbJlpcWQJ6Y/DIp+on+LUxYPFNs49+FMi5FC/rGf
-         6QbblNexMnxAyQ0piKzOYgVwSptCAXuLdU4sZlPYrjHe5dAjvAQzoQPP1+873EaA4kni
-         mmiyRWxMhjni6OHlTirSOsW4MpH3gnsWk6uz6VHfclvG6S6eoj5e/+CPNwPm1WYrsxyP
-         KlB2rM1qi7r7gk92rqfWShuuXtE+D4iaK7nVWRvmH0UZqkQTI67pZdijwW5b96lR0EB2
-         EV+b8VcsKIww+Z873zd6LTeYBWv/EeOLErxmx3uus0WlT3wsdJT82zqOGh4zUSwNRwmX
-         WmRQ==
+        bh=/JRJwUqCEcMZ/u6HkNzv6C/SQMcabKTuR7QxROLR/Ao=;
+        b=gF8AkeUdUhJGwq/9PSfP1Um0oS+Nm/sFpXGzlVsYGt5lOeJsTifqIq+pK3SL6wLsuU
+         iQyiHcHyeQHJyLG2BVOibLKPA18yAuv7y6palUdn0Z/hzg0tbSvLzu6cBYMy7/exSDDg
+         z40zoZZr0oQSFgXKtD4jNephLq/FwRw1xr6oFSAqYLaKrHfqGgDW0UYztVLMpdB5jwnx
+         M8Dpeo+15PJWa6FlS9crQXBQD8jqlD1JXO/WY1SMtHq8dfgk9sqlERruC+3TsX6mp1gA
+         3fLRruIWJJor18+EdB4DUT9yI5pIQaVHtDMs/GqezLiKoGugaQgIpXo1kAbxwE8PumbZ
+         urvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789572586; x=1790177386;
+        d=1e100.net; s=20260707; t=1789572590; x=1790177390;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=tPnCpncMFnpccjoQkrRtEWougbMuRTTA3lDYH8x7qRU=;
-        b=lHWrgeuSVgRqTdlwga1I7u8aCn5DiYED41k/V7MPHLcrZLEVDNCz7CBgynQdUc8uCa
-         LDjzJiris/qWleOPqWmyzDQgNCd412wVJVoD9xQ2sr0gzDJUBDb1NYM7nEcM6+irY1qU
-         xlI5wYfuuZT4drkdVLb/X1smVtMSsjqOh/wmjiVpOxKYsAKJKjpwDUdiBx3/JC5LAcJ4
-         b5n/nbPptHDYn2jqqWPfculEfJa6TPIAOqfJBgR0UaTaKJ3DbnRI/CGrFTs3LwWLbdcK
-         Rm4No70YsmTyHiOkTE27FWKCQshzo0KKKUr2rzec6lAk8zuJhLjMG5B6Knom8ofnYVjw
-         M+lA==
-X-Forwarded-Encrypted: i=1; AKwUvBwjwN1Yg+IXtlWpMtx9/ssSbeVDSstYJ7VwuIo+ETO0HQl6YqwTV5kqaHysHf8VHazOwThH1bFm/fkY@vger.kernel.org
-X-Gm-Message-State: AFuF++kuaL3Eoktl/eEA8KCxAFf+LCIIZL8NdhlVpIsXoLsKfjsrYlrQ
-	zTRRdOAlChVs4B8RnYRL9TLbgEGDdhDWjnuwBVqCdgvKx8chbDW79fopKSz+eD2iRF3A
-X-Gm-Gg: AYBFou0Ee/j427ntWQxbFo1wPccrbwu2O0A5z7LQoL0G6Ucw5td7k/L2BwRXRbOiOWQ
-	7J37pWdsN+FfRhDuLC/MLUiQZL3BybcW7TKgCZo7DnFfL0mnYxFZFUECjzBe8TvIHRTdj/hiK3X
-	ldCXCe9C1ZfQ+GBkMDjkLE8ak2cF0q0Yc614v0U1q+OVyqD3hlI3Y2PazhjJKS4yefc5ofoAJnj
-	IQsqgEt8rOyq9Sk2xeaSQJ9ktHNtEcqabGbLGgMWV3t8C3J4Wnq4uUW7tKfuhpT5CgxHzUQDvoG
-	37ie59G+7wpOoIl1raiLSz+1dFfrdkajEKFNb5TQ2brLmlv9iyWohmFRaoiBt4AF340zMuTMJ0p
-	2bDTs/Xop6UpiZCwfcev9DmskQXATHyzRHDL6+USQtBJHHFBEPd6Z39EisWTeVp1g3l8Cbxd+X6
-	MBBWECnlzziFTxDoqVJakUChwVEJVpH84PVLOhyvi8WLNEVXUGIoIn2PoNyLvbg7q2ABHoILdXy
-	TsujBsHYZAoWTRa96PrJ0qtgxP/iCe6LcT3ER1/
-X-Received: by 2002:a17:90b:560c:b0:39d:e523:8f3e with SMTP id 98e67ed59e1d1-39e1e2657b1mr7088907a91.3.1789572585728;
-        Wed, 16 Sep 2026 08:29:45 -0700 (PDT)
+        bh=/JRJwUqCEcMZ/u6HkNzv6C/SQMcabKTuR7QxROLR/Ao=;
+        b=Gbo+nhVAkviIuJtGaNBSWvurmujTPNLprowHSiKJIJ2fpuDJVau19WDyC9+wPJ5tik
+         Z+NXitK57OAnx0gUcnWhvOKsdP8oPqCuIr8mfFcK5W9JDWYbYHddRKEqjSKVURdhYtJO
+         6ZjRa4gl7ohZWR4l2ROLl2iJFWD29MUUl1In6RCLp4rAn/KpDPgrLS+EF0ZatS1slQyD
+         2iHayzQzJt9EMRQwh0GmZG4aSVo/eqRQVl6SeDK4w7MAd+x43DUX3GUKRCRUu0qOSPEk
+         zjIF1wEVu0jJulftG+0Y5nCe6Qm9CWlfsNaPUZP00G+xkqkP4ENT+JXlEdpVhBGTe2qT
+         3gMA==
+X-Forwarded-Encrypted: i=1; AKwUvBw+Fk8kHTxAO+4fwAeWLjDqO4P6MOeMt0e6nmmyDVGVvoO4Cmk77VgFgdivSLE4hdcAaw6arZ/X8fqY@vger.kernel.org
+X-Gm-Message-State: AFuF++kweTrHqkZh9z+tHpzVqGyUzqCpprMM3cxrpBH9t17E2D6uE82T
+	5Y5fGoTy3DfgaJpxBi/iHa5DN8FedKO0p9PD5Ok5E0sDRI1PHSDPxIeZ2FQNGZCBmKk8
+X-Gm-Gg: AYBFou2uEWTSJNP6/0vtEMD+4t6Q62C1eSIXkx/MZ4XK4rVhkano3STsrBzQ5jcb9AI
+	X4b5pdoXy47YMb377+YMSbuC1hkXiHKlgNwygPVMOIXqG915vznk1c/PbBZ+hyTrrqx6lYCz2js
+	PR4SWx+3YcyqEYM0m8VUE5WHSsrIq4VMh4vtpCusVkAN0vioTYk3zMsu3B/PamL+KwY6cqtZntB
+	ZHOVD/lGC6ZSnlNUM9bVNt3ugkglZvDCa+pTuJXBjWlugPid4D52burnp87Gkz0SUU/t6qT8f9p
+	2oBU/ItMiNH0eUPa3PYgswJuwI1uoQAxRAt3R3YMZfKMFHOCW5Jf/NVG/U1OQwtT7z7ODGnCOYf
+	McrLYswNJHI2XhWmK1/WXPCsPbUTW51tv3ggj0UfCcKP22qqA2dLB0twWCQ+uwqOOugWABxmd58
+	CVorTw/c4HPfK1dqcfc9d88RGUDpToD5dx/XQ0zt9b9m82EPfeNWOogJD15+owQvd0h3nLSZp0c
+	+/NDh1mchGc+hugzEeA2B1GQAjvHg==
+X-Received: by 2002:a17:90b:544e:b0:39e:35e4:d31b with SMTP id 98e67ed59e1d1-39e35e4d992mr25501a91.5.1789572589543;
+        Wed, 16 Sep 2026 08:29:49 -0700 (PDT)
 Received: from b6ad5085b32f.. ([122.51.212.64])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e35dab2e9sm28214a91.1.2026.09.16.08.29.43
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-39e35dab2e9sm28214a91.1.2026.09.16.08.29.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Sep 2026 08:29:45 -0700 (PDT)
+        Wed, 16 Sep 2026 08:29:48 -0700 (PDT)
 From: Zihan Xi <zihanx@nebusec.ai>
 To: pc@manguebit.org
 Cc: linkinjeon@kernel.org,
 	zihanx@nebusec.ai,
 	linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
-Subject: [PATCH v4 1/6] smb: client: fix create context out-of-bounds reads
-Date: Wed, 16 Sep 2026 15:29:24 +0000
-Message-ID: <4e24aefb4162e26094cf1be2a57db43fe3171ad4.1789478666.git.zihanx@nebusec.ai>
+Subject: [PATCH v4 2/6] smb: client: validate POSIX create context length
+Date: Wed, 16 Sep 2026 15:29:25 +0000
+Message-ID: <a1976857e250e714de562d67364e4b1ab6b5f2f4.1789478666.git.zihanx@nebusec.ai>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <cover.1789478666.git.zihanx@nebusec.ai>
 References: <cover.1789478666.git.zihanx@nebusec.ai>
@@ -79,28 +79,18 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb2_parse_contexts() validates the complete create-context area but
-does not limit each record to its Next field before dispatching it.  A
-malformed chain can therefore expose bytes beyond the current context to
-a handler.  The QFid handler also used a full response-structure cast
-although it only reads DiskFileId.
+parse_posix_ctxt() reads the fixed nlink, reparse_tag, and mode fields
+before checking that the POSIX create context contains them.  A short
+context can pass the generic checks and still make these fixed-width
+reads run past its declared data.
 
-The SMB2/SMB3 lease parsers made the same layout assumption: they read
-LeaseState and LeaseFlags at canonical offsets rather than at
-DataOffset.  A valid non-canonical DataOffset could therefore yield
-unrelated in-bounds data, while a short DataLength was still accepted.
+The current in-tree smb2_open_file() path passes a NULL posix pointer,
+so this handler is not reached on the ordinary open path.  Still require
+the POSIX data to cover all three fields before reading them because the
+helper performs those unguarded reads.  Keep the existing soft-failure
+behavior so malformed optional metadata does not fail the open.
 
-Limit each context to its Next value, reject offsets before the context
-header, and reject malformed chains.  Bound the name range by the current
-context and do not dispatch a known handler when DataLength is zero.  Read
-the QFid DiskFileId only when the context data covers that field.  Parse the
-lease context from DataOffset and require DataLength to match the v1 or v2
-lease_context size used by ksmbd.  A size mismatch skips lease parsing
-without failing the open.
-
-Fixes: b8c32dbb0deb ("CIFS: Request SMB2.1 leases")
-Fixes: f047390a097e ("CIFS: Add create lease v2 context for SMB3")
-Fixes: 89a5bfa350fa ("smb3: optimize open to not send query file internal info")
+Fixes: 69dda3059e7a ("cifs: add SMB2_open() arg to return POSIX data")
 Cc: stable@vger.kernel.org
 Reported-by: Vega <vega@nebusec.ai>
 Assisted-by: LLM
@@ -110,180 +100,43 @@ Signed-off-by: Zihan Xi <zihanx@nebusec.ai>
 
 ---
 changes in v4:
-  - Reject NameOffset and DataOffset values before the context header and
-    use checked arithmetic for the name range.
-  - Bound the name range by the current record and skip known-handler
-    dispatch when DataLength is zero.
-  - Parse lease data from DataOffset and require exact v1/v2 payload sizes.
-  - Add the SMB3 lease v2 Fixes attribution for f047390a097e.
+  - Keep the handler-level minimum check and preserve soft failure for
+    malformed optional POSIX metadata.
   - v3 Link: https://lore.kernel.org/all/cover.1788516372.git.zihanx@nebusec.ai/
 changes in v3:
   - Split the POSIX handler check into a separate patch and corrected the
     parser Fixes history.
   - v2 Link: https://lore.kernel.org/all/cover.1787486936.git.zihanx@nebusec.ai/
 changes in v2:
-  - Bound each response context by Next and reject malformed chains.
-  - Read QFid DiskFileId only when DataLength covers the payload.
-  - Extend the SMB2 lease minimum through the LeaseFlags field.
-  - Add a POSIX handler check for the three fixed fields.
+  - Add the POSIX handler check for the three fixed fields.
   - v1 Link: https://lore.kernel.org/all/eb1bc35611f91bd10a4772400b37fac26f660956.1782579150.git.xizh2024@lzu.edu.cn/
 
 ---
- fs/smb/client/smb2ops.c | 28 ++++++++++++++++++--------
- fs/smb/client/smb2pdu.c | 44 +++++++++++++++++++++++++++++++----------
- 2 files changed, 54 insertions(+), 18 deletions(-)
+ fs/smb/client/smb2pdu.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 192649fec25d5..749cee88fc38d 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -4437,25 +4437,37 @@ smb3_create_lease_buf(u8 *lease_key, u8 oplock, u8 *parent_lease_key, __le32 fla
- static __u8
- smb2_parse_lease_buf(void *buf, __u16 *epoch, char *lease_key)
- {
--	struct create_lease *lc = (struct create_lease *)buf;
-+	struct create_context *cc = buf;
-+	struct lease_context lc;
- 
- 	*epoch = 0; /* not used */
--	if (lc->lcontext.LeaseFlags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE)
-+	if (le32_to_cpu(cc->DataLength) != sizeof(lc))
-+		return 0;
-+
-+	memcpy(&lc, (u8 *)cc + le16_to_cpu(cc->DataOffset), sizeof(lc));
-+	if (lc.LeaseFlags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE)
- 		return SMB2_OPLOCK_LEVEL_NOCHANGE;
--	return le32_to_cpu(lc->lcontext.LeaseState);
-+	return le32_to_cpu(lc.LeaseState);
- }
- 
- static __u8
- smb3_parse_lease_buf(void *buf, __u16 *epoch, char *lease_key)
- {
--	struct create_lease_v2 *lc = (struct create_lease_v2 *)buf;
-+	struct create_context *cc = buf;
-+	struct lease_context_v2 lc;
-+
-+	if (le32_to_cpu(cc->DataLength) != sizeof(lc)) {
-+		*epoch = 0;
-+		return 0;
-+	}
- 
--	*epoch = le16_to_cpu(lc->lcontext.Epoch);
--	if (lc->lcontext.LeaseFlags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE)
-+	memcpy(&lc, (u8 *)cc + le16_to_cpu(cc->DataOffset), sizeof(lc));
-+	*epoch = le16_to_cpu(lc.Epoch);
-+	if (lc.LeaseFlags & SMB2_LEASE_FLAG_BREAK_IN_PROGRESS_LE)
- 		return SMB2_OPLOCK_LEVEL_NOCHANGE;
- 	if (lease_key)
--		memcpy(lease_key, &lc->lcontext.LeaseKey, SMB2_LEASE_KEY_SIZE);
--	return le32_to_cpu(lc->lcontext.LeaseState);
-+		memcpy(lease_key, lc.LeaseKey, SMB2_LEASE_KEY_SIZE);
-+	return le32_to_cpu(lc.LeaseState);
- }
- 
- static unsigned int
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index 4ce165e40657f..7a6627400ba30 100644
+index 7a6627400ba30..1b2ca3b2c2f87 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -2378,11 +2378,17 @@ create_reconnect_durable_buf(struct cifs_fid *fid)
- static void
- parse_query_id_ctxt(struct create_context *cc, struct smb2_file_all_info *buf)
+@@ -2395,12 +2395,15 @@ static void
+ parse_posix_ctxt(struct create_context *cc, struct smb2_file_all_info *info,
+ 		 struct create_posix_rsp *posix)
  {
--	struct create_disk_id_rsp *pdisk_id = (struct create_disk_id_rsp *)cc;
-+	u16 doff = le16_to_cpu(cc->DataOffset);
+-	int sid_len;
+ 	u8 *beg = (u8 *)cc + le16_to_cpu(cc->DataOffset);
+-	u8 *end = beg + le32_to_cpu(cc->DataLength);
 +	u32 dlen = le32_to_cpu(cc->DataLength);
-+	u8 *beg;
++	u8 *end = beg + dlen;
++	int sid_len;
+ 	u8 *sid;
  
--	cifs_dbg(FYI, "parse query id context 0x%llx 0x%llx\n",
--		pdisk_id->DiskFileId, pdisk_id->VolumeId);
--	buf->IndexNumber = pdisk_id->DiskFileId;
-+	if (dlen < sizeof(__le64))
+ 	memset(posix, 0, sizeof(*posix));
++	if (dlen < 3 * sizeof(__le32))
 +		return;
-+
-+	beg = (u8 *)cc + doff;
-+	memcpy(&buf->IndexNumber, beg, sizeof(__le64));
-+	cifs_dbg(FYI, "parse query id context 0x%llx\n",
-+		 le64_to_cpu(buf->IndexNumber));
- }
  
- static void
-@@ -2430,6 +2436,7 @@ int smb2_parse_contexts(struct TCP_Server_Info *server,
- 	struct smb2_create_rsp *rsp = rsp_iov->iov_base;
- 	struct create_context *cc;
- 	size_t rem, off, len;
-+	size_t cc_len;
- 	size_t doff, dlen;
- 	size_t noff, nlen;
- 	char *name;
-@@ -2452,29 +2459,41 @@ int smb2_parse_contexts(struct TCP_Server_Info *server,
- 		buf->IndexNumber = 0;
- 
- 	while (rem >= sizeof(*cc)) {
-+		off = le32_to_cpu(cc->Next);
-+		if (off) {
-+			if ((off & 0x7) || off >= rem || off < sizeof(*cc))
-+				return -EINVAL;
-+			cc_len = off;
-+		} else {
-+			cc_len = rem;
-+		}
-+
- 		doff = le16_to_cpu(cc->DataOffset);
- 		dlen = le32_to_cpu(cc->DataLength);
--		if (check_add_overflow(doff, dlen, &len) || len > rem)
-+		if (doff < sizeof(*cc) ||
-+		    check_add_overflow(doff, dlen, &len) || len > cc_len)
- 			return -EINVAL;
- 
- 		noff = le16_to_cpu(cc->NameOffset);
- 		nlen = le16_to_cpu(cc->NameLength);
--		if (noff + nlen > doff)
-+		if (noff < sizeof(*cc) ||
-+		    check_add_overflow(noff, nlen, &len) || len > cc_len ||
-+		    (dlen && len > doff))
- 			return -EINVAL;
- 
- 		name = (char *)cc + noff;
- 		switch (nlen) {
- 		case 4:
--			if (!strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4)) {
-+			if (dlen && !strncmp(name, SMB2_CREATE_REQUEST_LEASE, 4)) {
- 				*oplock = server->ops->parse_lease_buf(cc, epoch,
- 								       lease_key);
--			} else if (buf &&
-+			} else if (dlen && buf &&
- 				   !strncmp(name, SMB2_CREATE_QUERY_ON_DISK_ID, 4)) {
- 				parse_query_id_ctxt(cc, buf);
- 			}
- 			break;
- 		case 16:
--			if (posix && !memcmp(name, smb3_create_tag_posix, 16))
-+			if (dlen && posix && !memcmp(name, smb3_create_tag_posix, 16))
- 				parse_posix_ctxt(cc, buf, posix);
- 			break;
- 		default:
-@@ -2486,13 +2505,18 @@ int smb2_parse_contexts(struct TCP_Server_Info *server,
- 		}
- 
- 		off = le32_to_cpu(cc->Next);
--		if (!off)
-+		if (!off) {
-+			rem = 0;
- 			break;
-+		}
- 		if (check_sub_overflow(rem, off, &rem))
- 			return -EINVAL;
- 		cc = (struct create_context *)((u8 *)cc + off);
- 	}
- 
-+	if (rem)
-+		return -EINVAL;
-+
- 	if (rsp->OplockLevel != SMB2_OPLOCK_LEVEL_LEASE)
- 		*oplock = rsp->OplockLevel;
- 
+ 	posix->nlink = get_unaligned_le32(beg);
+ 	posix->reparse_tag = get_unaligned_le32(beg + 4);
 -- 
 2.43.0
 
