@@ -1,96 +1,96 @@
-Received: from mail-pz2-f41.google.com (mail-pz2-f41.google.com [74.125.228.41])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83AD84AAC76
-	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 15:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BC64CEE45
+	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 16:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789573933; cv=pass; b=nElbHw7HjLw0U2CAGi2EKVMYOopB0+MoMxqfLeTjivw+fnpfoZplZXfpTBHtVP+BbO7uV/HUlFYXAnzHOvtpEKazlLGG1j0FUuiNosKg/ltkSYGYBaOfDaWFSTHkSQaHMd1c4n6HLfAA7tuSbkm3pW8LnUmKETE9lTL/5aP5iiA=
+	t=1789574489; cv=pass; b=quudRQBxaeCwrUhGEMa0qm30J1k9UmnYL+6RmqtHckNDctYkVCElT2nRBm64Q+o13OVSjuSw7r5AHfoSXFtQ+GAu8u/SlXLY0ET3dOgb/9/3gUyEZ9DRfdPLkDKsYN6k2KF1oL6kGcB/Wa5ujft83fe3p04SDr5TqWBT1RMO8bg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789573933; c=relaxed/simple;
-	bh=95yWInc3f+wvYQiaDhRAR54L526l6o9/CFXKuqW3YLA=;
+	s=arc-20240116; t=1789574489; c=relaxed/simple;
+	bh=KZzkhX7Yg9tq5VztU7UiOhKrR7TxsvCHoG9frYwd3EM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oTYp5NYwzh9JrKPcT/+yo4mukbGOERT0K2pSVTuq+dOZsbqZ6B9lqNpERS64Ds/Xu1pgHzhME70EKcxwuBpQV3oeoy2cs66FYcj2V4dmcJ1AgB8b6ymVDOjuKVAl/WQdfp8tJgU8SwLZhKTmSaVkYkJFGO7EZ0DiMnlLJn/fa5M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bp1xQj1r; arc=pass smtp.client-ip=74.125.228.41
+	 To:Cc:Content-Type; b=Amaazt3MS0A4G0xhD92ogyBet2jDR8wYHvwYS9wNHkfoohY+DnuFZ7UvR17eflbnK59Rq9oIyrzW31YnkZkVchMQ/hXEl7EzuuYQ/eWi3Oa7YdPDoOWIyaBrjl/hDYdYhynriApW6tk77cVbAjVACun5XzchjHV/zYHy/SgXfvw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EnIkMeTc; arc=pass smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bp1xQj1r"
-Received: by mail-pz2-f41.google.com with SMTP id d2e1a72fcca58-85f0fc1fd8eso802077b3a.1
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 08:52:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789573928; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnIkMeTc"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-853e2610bb4so1462644b3a.0
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 09:01:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789574485; cv=none;
         d=google.com; s=arc-20260327;
-        b=crkmaDN2FEC5iwyEG+J1ZwHiySdLjfH4ZfWzOvyKZ3Ry7C5tAOituIUvCO0vkAHtLI
-         UOttgUJhWFzsi+0K5ozV7Mq4pTLBaA5HQ46BdYzxMBgjUKf+EK2e8vebM20cyRhPpGRz
-         18LHt48Yy1Bk/7LKedjQjwYDT0aeJlp9DAs3xt1CIqOAkJDcGMvPElOWeTizjNjZqZKF
-         TvZqnVHWebCowWIy605O6aNbHVlMuOxtjTPrZ33qk3KJIj6HtKCkmD1Y+AU45rxSTRnT
-         ZPjCttHVkgLQkvfcfAGmyMG7laNpVIvxAHGTdljnPtDSbq6jfy8UbtpwrC/fxnWms55t
-         S0Tw==
+        b=PuzgmgYpSV5EJ0JFaAMkVmju0qTK4Uo4GnLm4LXdIG4Q3v5FDdzFwTdWaI6VgrWoAM
+         juEysfdYemYBjXjxewxwrC3PABEdlylRfGUUxDMrUE7AwITi0kIseXATUmCEV6+gMlDn
+         0Xgw1HqUqKZpO81+gt5vW9w5Yqac2D1I6iuNchmqu02jOr0oWaMVot0JnggGXGvP47s1
+         jVz3M9UN2iAGOlPjWHGH7vkh8putbTQKfIqfCJwHA2HMe7y6Nz+5mWahXJ+pgIRdYVgy
+         UqTnVy6WsWuCWmPRMLO+XW8az8kllphtUx9+sFVDHsFGxidCdYyTaW+oKqzXH7jbxmri
+         aHBg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=r5EyfF2xmjvND7Ej5BcVBP3F4zIxnNANBeziUA4WJEI=;
-        fh=cefG01bxI4SJxQV+06XWTZGvq9qHHJsC3D0xJDF/LRA=;
-        b=O8O4rAndZWTcxOa9gT5up3R+eIRJjmnKtUmjOwhbtxiJ3UqPzRTMX0/rT75c535/uq
-         41Aahnew5OhBAn60IZyjIpebSw/W5O/1RlVUfDcNN5UvbBiijR0ROEfGRLn9reePLq+4
-         ASqKFfUDO8fTPfcFPzKCGij+DB0ZZBWqpU865I96T/Isgbr4N3RsWQONpACSLC909xFl
-         ppHG4EEypHiajGgDZn/2976MAAzXUHa6uqz73EMfTKv7OUyZ+h6VpWMUSbbWACu3hwNV
-         cf7XrTEPN3cMeGn6zDa/RnDjj3GwSA28Lt7iYmzVsF4us/3Q+K5intTetJq0eqcWq/f1
-         M9wQ==;
+        bh=6dZUcimEc7wlnFEZ6ZQZ/uU5ugi4xLHu5NBwADbejVU=;
+        fh=LWJHvJL3IhTl3BEZgb0BLqqrCVpU713cM0XwePn1jxo=;
+        b=kaJjFM7fmBo154VmMV3guWqVGbvglSEaqUKdfqZX09pJ6FX7w6P6PqZK2pXdYmPgGp
+         zpRkjs7aOBSzuZQQov6SXPtXJw9fkl/ILP40gGRclVePSDYGKvTgiJ4Wic7Ruy8xzolY
+         6E6qWNNC0aoUagyV81JOudkMuEqG4/aYKhwSwlC/g4hojvCpE4YiO2HOryWPHaMnYOyc
+         RGuJEEhFYz+JM4d+f8XwyexioNb4hi9CSqJRBrP2t+u42JB9csRmWR7YVVBGGOaFn93K
+         xOBhK33gdXEL1wdWa+sx1dgvIn5hRsAbBgNZ0phi5KM4k9Oqf/ZIiEDJYou1iojFf1hi
+         osVg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789573928; x=1790178728; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789574485; x=1790179285; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=r5EyfF2xmjvND7Ej5BcVBP3F4zIxnNANBeziUA4WJEI=;
-        b=Bp1xQj1rLBv1pXqQByiF36455pmW8LlSKKP9/y8U4Q9S6I/4uYomxtCWuer0U8uoDd
-         T+UihBOOvLPGHKuEDQ6KwuF6WPaT1cDn5Q1QzSUH190BNqcahEFgAjcnjptgqbCM+XpC
-         LWHDvpBeeZC4qnRnePNsskbaAh6Muj79j9UOk6inJfV9goWOY1KBazj7kc25TQCZ+qE4
-         stQkV8VwS90y5IA8Vh69cDpo3RjfByx0SAOE0wRcJUHZnuaCazAwbpZuM/Ro6IuirT8/
-         8DWmKCS+HaX9vahSrSrAeC9iso4oM8ro8ulFEK+nVQ49HkcEcoUpYUnsOca3gsfETLll
-         NjbQ==
+        bh=6dZUcimEc7wlnFEZ6ZQZ/uU5ugi4xLHu5NBwADbejVU=;
+        b=EnIkMeTcAXOTg0ci9YpA/47+oFUHkAXYxkUBwpNaRBxC3heOmzLO6tvS3tHeamEFAi
+         4SRifZ9S93GtWNNfIfGx+J1cJwhjonscB1tJAXvCbpY3WBMjw6Gd58HTmEH3e/GRoDtd
+         jhbYwtYDseS1GRCY6HugObB6su8NX6DPG6XuFpoAcKovcaqbpKf9wi4rtyz/3og54/wB
+         JiJiUB7mdPJ08v3WiIWpvM3gFPTp21LeuJTTUOQPIWd34qrSkH/OQMWkntXvrOFhWoRL
+         /DSoUOIbXm4Efy6+sY6FVsUQYjw3r+OBd2bFPb8JKb5+1KXDwi0Din7mp6Wf61EJ79UI
+         FhYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789573928; x=1790178728;
+        d=1e100.net; s=20260707; t=1789574485; x=1790179285;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=r5EyfF2xmjvND7Ej5BcVBP3F4zIxnNANBeziUA4WJEI=;
-        b=B5GSNUzSA+NELLCBbbSilALgtjv6aRZGwVkP+PFWKZC0FBFrYwqSc0I/7HiUczm45R
-         YjLf8P9prTLTswgEoZnMRlCeqa6IH95jmnGHj+WP+qjBUkkjHmXdhSObeg1NNU/U+voY
-         R1n+/mrn3gBCaFoVOhaVf/mP726tMbByzg3ELilgpnfUWDlwVqZLvLAd5qd3FwVP1xwa
-         MjAfQEAOhWTWK3s1dVFCJZzoUtUUzDr24NJRxnwxg3jK2QaFXn9C9SrGA6C0dz3yF7xL
-         N+p0AquziMFTFgXpoOx2rfg22AvFowEATd7fv+UJeBX0BUVqqE/bWw54fjeLXL3h8z+I
-         m0PA==
-X-Forwarded-Encrypted: i=1; AKwUvBwuemZGvcMSHXVrrh7H30In4/e2rCj3MZRfDhrim2Hw5tdzLHUezvgL0U9wb2+CSoZI7GI+taEY/9ta@vger.kernel.org
-X-Gm-Message-State: AFuF++krEUZ5IoJOcm3s2NqnGFLTYaG0hQYtsIvKLTtSbYEic/geHXud
-	xNlB44VedePs73ouQGKkIX7tZ+LHty3JTdGYSoWZfSO/fm8VlwI8thjf9ugHKv26WlcdQ0xj/M/
-	Dr6w3rP4jIZFpivx104NHvRKv29Ei9GY=
-X-Gm-Gg: AYBFou0clZSTEPGS7nmdFdX7sLb3XnYOrdueZyxFG9dcK4UWagCKaA3NpusVHv02nzb
-	UyLUwtUbqSGPtfZt2SKdS6F5xYLXmgPlUJ8JSuHvLHGOymKgoysM++fUujnXGY7oGgFqGr7g4cK
-	eSEus8v19VvMCjJh7fmz0A7hDw4e36tedoO3iUbTz48eK9EOKH641qYNxBNYgB52p3Xm0udREWR
-	k1fvnuOmS5u6lT6Vb0yv8g2UODUDY8l7xo334y799DuAixAjHQ3C7HnBBhA9zdOblR2iGKDDgMm
-	znjyizoMkVqWvcS85WFm9gYykqeJpoqgZ7YYwg6U7QJoEfPYqN7Zb8DU0RhFYKgo/GxBXLmU9j0
-	gXwLYjZA0WNY1DJGckL8uUSNhJjdHvmCCq1JM2CyIWuOagynOh8Gm3/xX
-X-Received: by 2002:a05:6a00:4b0f:b0:857:7317:cff4 with SMTP id
- d2e1a72fcca58-8723a199a5amr6423934b3a.21.1789573927943; Wed, 16 Sep 2026
- 08:52:07 -0700 (PDT)
+        bh=6dZUcimEc7wlnFEZ6ZQZ/uU5ugi4xLHu5NBwADbejVU=;
+        b=PX5IdDxuZ+Gm8tgZnAAP0I+TGpQmnKd717v/GZvcrJuYjufbLAVvuUeoFRIA7ynY9U
+         jcRs5nTKvwlWv6GNMR6Jy6xPcbjqyT7U1A0t0JGsXc5rn7mEtIbZ8gMvMB6AsuSUq/qw
+         aLy5dtQOiTcl3yDheBQ87nKrMoRcRpfmXE6x6rysmu46xMZH2A20wHlHP06KDJuDx4ZC
+         k0QkfanUg6IQCrjUZ7FdlqN6nNpaKIbR2bKbfBAmNvNXYVsXQf30hg3AZa+NoYxq/Dp0
+         Smh7T1HzlDx4rBmtXh7+nC31mhhMe23pOuaNmK0WQurSoRdIKRgg9kF8TvB6G4Tc2nxL
+         7z6w==
+X-Forwarded-Encrypted: i=1; AKwUvBzfo7zC9jE7yRzBEe127PD2xPZujD3TxKH+3rbkDUv+1g7CDK88jSnyJh7ILWxyyVHnmopTGKBo4ZQ7@vger.kernel.org
+X-Gm-Message-State: AFuF++n9QiNbrkWeeQ6ZwGtz8L/LxtyaJLp1unw5fkCU2kmCFQLnYLaf
+	+frnLGboGdAaFDCfHOenG+1vZpvKUIZlmrObNjVLPGm2CgOLaGQLqYrVABk+mwSD4qaY64Gd7HK
+	j6maNObsVcXj+aQSiSKdubgln0PlJUeI=
+X-Gm-Gg: AYBFou2wQmGLL0wUtkm6Y2O9qcH+JtJ/UIiNjckPtXUl5m7X4znJjYsfy9JFh598UJy
+	eOcCerbCSa2aGJtgRpkasHbCp69APBfco15HAhEQauQOc47crENE2CfnyhIaEee5qjR6zBa8rgX
+	1YvKMrjNx+OTCd6SYCDxlkvnwneRKXIE2R6OA/9IBmCKefnY55LwrdErLDpl+O7nUf5d4ca5R40
+	xm51xrdKyFX8aeYC9CAE9Jeep72UaISN4PcpPJyomh/Si1y1ajjG3NEHE7q2LGQv3GJIwQntGi8
+	+M+2NW5CnqtktkYM75OFCtmFRop8iQqI1nBGjp3FxGSQlm9dGwVQ4hXb4DPFutY7AFAACwMPCKe
+	mDeqKA/scGJuarqYaZWyL91bk6MVyDFANHz+oN2TXXtqbmLuAhmrKl4b/
+X-Received: by 2002:a05:6a00:194d:b0:858:ea6a:4415 with SMTP id
+ d2e1a72fcca58-87341085f89mr164645b3a.2.1789574484253; Wed, 16 Sep 2026
+ 09:01:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f886c618bd560e42692c0ac3296bae4878755cc1.1789393775.git.lucien.xin@gmail.com>
- <178950185147.22033.10922498784930147476@kernel.org>
-In-Reply-To: <178950185147.22033.10922498784930147476@kernel.org>
+References: <06841ed60dda515dce3f3f16b4c3b31fdd7113fe.1789393775.git.lucien.xin@gmail.com>
+ <178950185396.22033.4056258856263599395@kernel.org>
+In-Reply-To: <178950185396.22033.4056258856263599395@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 16 Sep 2026 11:51:55 -0400
-X-Gm-Features: AcwNN1UzfBxaJOMB6iv3Yg7aIgS3jN1akwkjx3YEKnt_lo6ALcoTP6dYS_KHoK0
-Message-ID: <CADvbK_f8PF0uvQsULf2Z6ZO4Ln4b4=670EH8ixZZLjE_1uSM5g@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 11/15] quic: add crypto key derivation and installation
+Date: Wed, 16 Sep 2026 12:01:12 -0400
+X-Gm-Features: AcwNN1Wlyl-Jb-pcM6ljfG1c-LlXoB2ud7xNxMc2wjUUg2Dsiy8bDgQmSGaxVHw
+Message-ID: <CADvbK_d9-8y8uC09+Sqqxxs_7a_YaOZxhL6JXC-5PQZXGARN6w@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 12/15] quic: add crypto packet encryption and decryption
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -109,97 +109,188 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Sep 15, 2026 at 3:50=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
 te:
 >
-> Thank you for your contribution! Sashiko AI review found 2 potential
+> Thank you for your contribution! Sashiko AI review found 4 potential
 > issue(s) to consider:
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 1
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 2 =C2=B7 Low: 2
 >
-> - [Medium] net/quic/Kconfig selects CRYPTO_HMAC but not a concrete digest
->   implementation, while every entry of the new ciphers[] table in=E2=80=
-=A6
-> - [Low] quic_crypto_set_secret() consumes the uAPI struct
->   quic_crypto_secret but never reads `level` or `reserved`, and honours=
+> - [Medium] quic_crypto_encrypt() records crypto->key_update_send_time =3D
+>   quic_ktime_get_us() *before* attempting to protect the packet=E2=80=A6
+> - [Medium] The new packet protection paths
+>   (quic_crypto_encrypt()/quic_crypto_decrypt() ->=E2=80=A6
+> - [Low] The comments on the new token helpers describe an earlier
+>   revision of the code and are now wrong in three ways.
+> - [Low] Reported concern: quic_crypto_generate_token() computes len =3D
+>   sizeof(flag) + addrlen + sizeof(u64) + conn_id->len + QUIC_TAG_LEN and=
 =E2=80=A6
 >
 > --
 >
-> quic: add crypto key derivation and installation
+> quic: add crypto packet encryption and decryption
 >
-> This adds net/quic/crypto.c with the QUIC key schedule: HKDF-Extract and
-> HKDF-Expand-Label helpers, Initial secret derivation, traffic secret
-> installation, key update, and stateless reset token derivation.  The new
-> struct quic_crypto is embedded per encryption level in struct quic_sock a=
-nd
-> freed from the new quic_sock_destruct().
+> This patch adds packet-level AEAD encryption and decryption for QUIC,
+> including header protection and its removal, plus helpers for the Retry
+> integrity tag and for generating and verifying address validation tokens.
+>
+> A few questions on the new code below.
 >
 > > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
-> > new file mode 100644
-> > index 0000000000000..910557b680524
-> > --- /dev/null
+> > index 910557b680524..d62c6c4bea7de 100644
+> > --- a/net/quic/crypto.c
 > > +++ b/net/quic/crypto.c
-> > @@ -0,0 +1,567 @@
 >
 > [ ... ]
 >
-> > +static const struct quic_cipher
-> > +ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] =3D {
-> > +     CIPHER_DESC(TLS_CIPHER_AES_GCM_128,
-> > +                 "gcm(aes)", "ecb(aes)", "hmac(sha256)"),
-> > +     CIPHER_DESC(TLS_CIPHER_AES_GCM_256,
-> > +                 "gcm(aes)", "ecb(aes)", "hmac(sha384)"),
-> > +     CIPHER_DESC(TLS_CIPHER_AES_CCM_128,
-> > +                 "ccm(aes)", "ecb(aes)", "hmac(sha256)"),
-> > +     CIPHER_DESC(TLS_CIPHER_CHACHA20_POLY1305,
-> > +                 "rfc7539(chacha20,poly1305)", "chacha20", "hmac(sha25=
+> > @@ -252,6 +253,457 @@ ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] =
+=3D {
+> >                   "rfc7539(chacha20,poly1305)", "chacha20", "hmac(sha25=
 6)"),
-> > +};
-> > +
-> > +int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type)
+> >  };
+> >
+>
+> [ ... ]
+>
+> > +/* AEAD Usage. */
+> > +static int quic_crypto_payload_protect(struct quic_crypto *crypto,
+> > +                                    struct sk_buff *skb, bool enc, gfp=
+_t gfp)
 > > +{
-> > +     const struct quic_cipher *cipher;
-> > +     void *tfm;
-> > +     int err;
-> > +
-> > +     if (type < QUIC_CIPHER_MIN || type > QUIC_CIPHER_MAX)
-> > +             return -EINVAL;
-> > +
-> > +     cipher =3D &ciphers[type - QUIC_CIPHER_MIN];
-> > +     tfm =3D crypto_alloc_shash(cipher->shash, 0, 0);
-> > +     if (IS_ERR(tfm))
-> > +             return PTR_ERR(tfm);
-> > +     crypto->secret_tfm =3D tfm;
+>
+> [ ... ]
+>
+> > +     aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > +                               quic_crypto_done, skb);
+> > +     *(struct quic_crypto **)ctx =3D crypto;
+> > +     atomic_inc(&crypto->async_pending[phase]);
+> > +     cb->crypto_ctx =3D ctx; /* Async free context for quic_crypto_don=
+e() */
+> > +     err =3D enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req)=
+;
 >
 > [Severity: Medium]
+> This is the single place where every QUIC packet is protected or
+> unprotected, so it looks like the natural home for the AEAD usage limits
+> of rfc9001#section-6.6.  Are those limits enforced anywhere?
 >
-> Every entry of ciphers[] requests either hmac(sha256) or hmac(sha384), bu=
-t
-> net/quic/Kconfig does not select a digest implementation:
+> struct quic_crypto in net/quic/crypto.h keeps secrets, IVs,
+> async_pending[], the key update timestamps and the bit flags, but has no
+> field for the number of packets protected with a key, nor for the number
+> of packets that failed authentication, and a grep over net/quic at the en=
+d
+> of the series finds no confidentiality or integrity limit check.
 >
->         select CRYPTO
->         select CRYPTO_HMAC
->         select CRYPTO_AES
->         select CRYPTO_GCM
->         select CRYPTO_CCM
->         select CRYPTO_CHACHA20POLY1305
->         select NET_UDP_TUNNEL
+> On the RX side quic_crypto_decrypt() just returns the AEAD error, so a
+> peer can keep submitting forgery attempts against the same key without th=
+e
+> connection ever being closed, which rfc9001#section-6.6 requires once the
+> integrity limit is reached:
 >
-> CRYPTO_HMAC is only the template (it selects CRYPTO_HASH and
-> CRYPTO_MANAGER), while CRYPTO_SHA256 and CRYPTO_SHA512 are independent
-> tristates without default y.
+>         err =3D quic_crypto_payload_protect(crypto, skb, false, gfp);
+>         if (err) {
+>                 if (err =3D=3D -EINPROGRESS)
+>                         return err;
+>                 ...
+>                 return err;
+>         }
 >
-> With IP_QUIC=3Dy/m and CRYPTO_SHA256=3Dn, does crypto_alloc_shash(cipher-=
->shash,
-> 0, 0) in quic_crypto_set_cipher() fail with -ENOENT, so that
-> quic_crypto_set_secret() and quic_crypto_initial_keys_install() can never
-> install keys and no connection can be established?
->
-> Should IP_QUIC also select CRYPTO_SHA256 and CRYPTO_SHA512 (the latter fo=
-r
-> the hmac(sha384) entry)?
+> TLS_CIPHER_AES_CCM_128 is supported here (quic_crypto_is_cipher_ccm() and
+> the "ccm(aes)" ciphers[] entry) and has the lowest integrity limit of the
+> QUIC AEADs.  Is the intent to add the per-key counters and the limit chec=
+ks
+> in a later patch?
 >
 True:
 
-Verified that CRYPTO_SHA512 can be disabled while QUIC is enabled. I'll add
-CRYPTO_SHA256 and CRYPTO_SHA512 to the select list.
+This is a missing feature. I'll add per-key counters and the corresponding
+limit checks.
+
+> > +     if (err =3D=3D -EINPROGRESS || err =3D=3D -EBUSY) {
+> > +             memzero_explicit(nonce, sizeof(nonce));
+> > +             return -EINPROGRESS;
+> > +     }
+> > +     atomic_dec(&crypto->async_pending[phase]);
+> > +     cb->crypto_ctx =3D NULL;
+> > +
+> > +out:
+> > +     kfree_sensitive(ctx);
+> > +     memzero_explicit(nonce, sizeof(nonce));
+> > +     return err;
+> > +}
+> > +
+> > +/* Encrypts a QUIC packet before transmission.  This function performs=
+ AEAD
+> > + * encryption of the packet payload and applies header protection. It =
+handles
+> > + * key phase tracking and key update timing.
+> > + *
+> > + * Return: 0 on success, or a negative error code.
+> > + */
+> > +int quic_crypto_encrypt(struct quic_crypto *crypto, struct sk_buff *sk=
+b,
+> > +                     gfp_t gfp)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     int err;
+> > +
+> > +     /* Packet payload is already encrypted (e.g., resumed from async)=
+,
+> > +      * proceed to header protection only.
+> > +      */
+> > +     if (cb->resume)
+> > +             goto out;
+> > +
+> > +     cb->key_phase =3D crypto->key_phase;
+> > +     /* If a key update is pending and this is the first packet using =
+the
+> > +      * new key, save the current time. Later used to clear old keys a=
+fter
+> > +      * some time has passed (see quic_crypto_decrypt()).
+> > +      */
+> > +     if (crypto->key_pending && !crypto->key_update_send_time)
+> > +             crypto->key_update_send_time =3D quic_ktime_get_us();
+> > +
+> > +     err =3D quic_crypto_payload_protect(crypto, skb, true, gfp);
+> > +     if (err)
+> > +             return err;
+>
+> [Severity: Medium]
+> Should key_update_send_time be committed only after the packet has actual=
+ly
+> been protected?
+>
+> Here the timestamp is stored before quic_crypto_payload_protect() runs, a=
+nd
+> neither this error return nor the header protection failure below restore=
+s
+> it.  If payload protection fails (skb_cow_data() returning -ENOMEM,
+> quic_crypto_aead_mem_alloc() returning -ENOMEM, an skb_to_sgvec() error, =
+or
+> an AEAD error) the skb is dropped by the caller, but
+> crypto->key_update_send_time now records a time at which nothing was sent=
+.
+>
+> quic_crypto_decrypt() then uses that value as the start of the old key
+> retention window:
+>
+>         if (crypto->key_pending && cb->key_phase =3D=3D crypto->key_phase=
+) {
+>                 time =3D crypto->key_update_send_time;
+>                 if (time &&
+>                     quic_ktime_get_us() - time >=3D crypto->key_update_ti=
+me) {
+>                         crypto->key_pending =3D 0;
+>
+> Can the window therefore already be expired when the first packet in the
+> new phase is really received, so that key_pending is cleared immediately =
+and
+> a later reordered old-phase packet is treated as a fresh key update
+> (phase !=3D crypto->key_phase && !crypto->key_pending), overwriting the o=
+ld
+> key slot before those packets can be decrypted?
+>
+True:
+
+This is not a major issue in practice. I'll move setting
+key_update_send_time to after payload protection succeeds.
 
 Thanks.
