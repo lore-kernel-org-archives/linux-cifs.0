@@ -1,96 +1,96 @@
 Received: from mail-pz2-f43.google.com (mail-pz2-f43.google.com [74.125.228.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA154D6C29
-	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 16:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF96E3DEFF0
+	for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 18:08:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789575663; cv=pass; b=PZDUEkyXbMPIR4tLKbm7Xpv+lq2lKotzy5svqIfETxcNEddh8Vb2eLHuW+i8j8mN1iy/XAuLysjF4Pq0EKmNqQtdj383AGeaEWGcNSXN9/6TVP7gcjZ4dgouwkZ1dCqOcAGPT/gL5eQiuDaFlcfTAm+xoGzsd8lamSP/b68c4tI=
+	t=1789582134; cv=pass; b=KNTFMyDluGQJv8Ag8ahxwnTXACuQLjBYJFhxYmawBLgQpgEO6qwVXcz+PgzwzptN2zUTR9J2ZwBIVOxgIKF6Huywd0Whjnpb04tjKOY4WMQw8yEaOKCCotu9L/fk6CS/t/76i7I//3U9geEcVWiqyCrg1HgGdvWZQuTfZ2AQrcQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789575663; c=relaxed/simple;
-	bh=FPz/2WUVvjgw7KkPB3vp0v3QrEeT+i8/AjpDko6jgx4=;
+	s=arc-20240116; t=1789582134; c=relaxed/simple;
+	bh=F7I1BNfKVLFa4ZA/B7t0vEn92pcVyy0nU1EvtPmr7yo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AahWrggJ0e91t5wtZA9OyOeYBY7CcoY/GVhW9vaSNd1BZ2LGtgWDbdU3DhfHDKEP0K3W36f1QnxOA69eVat5L7DukJ2PHJXgDlrAM3Y08c9VT2Lrik8DAgK7GhC17hSPjz+ivEAgfHI/2KSSMHLmu2+L27NKodNs4QIgft9uTM8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DcxznPPh; arc=pass smtp.client-ip=74.125.228.43
+	 To:Cc:Content-Type; b=mkGWLZgp45G/Nk+WknUAORPLVa4awux+E6reE5D5PpYwVTBHLBa4p6mEMOWttonMYb4r6Xc9KqEVDxIknOKlzZC3+QkLOVz5MFCPJa3b8Cxfi/xx6Sq0SG6QFWDZ93yX+XP4HGVlifNxlIWIJ8hkg5KEPtLkWmhAwFrsv1FqFgI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ietNd25e; arc=pass smtp.client-ip=74.125.228.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DcxznPPh"
-Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-85469e211a0so1067515b3a.1
-        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 09:21:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789575659; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ietNd25e"
+Received: by mail-pz2-f43.google.com with SMTP id d2e1a72fcca58-85469a33c9cso1323264b3a.0
+        for <linux-cifs@vger.kernel.org>; Wed, 16 Sep 2026 11:08:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789582115; cv=none;
         d=google.com; s=arc-20260327;
-        b=MaeJAuDVAR0RF2fadYUFe+JF3GeyAUP8kbdfJbmVX/kleLPdFegLcbwlCbN50GGiVP
-         9NbMyaPU46i+ph4YmN73Ks0tBkhWkLEdpQneQdhsRU4WSwmn0naSsUvqGP06+KYm0xS1
-         zCnSDEhP+iuG83NwAO9iRLCKhr7+Q5fu1JPESPRN5vKoERBXr4IfqMUsc4jYfoiLKtJE
-         708if6h4w5jTNghgCgRPc3SUiVL2n6p7gx0p13quyZKvHiz7M58TodjBTRCRfk1p1OC8
-         gN62UWrF0/fTVx3RjftYfHInVyvhBagSEWBB0iSd4cBwDz2rZFW6kCmjGplv9T9hMwLX
-         bzEg==
+        b=if8kCmpkStQ9b3eK6pYY7ajjVktedGYu4q9tniDu20zpWffj9n7mNNiUJ5nR4U/pfz
+         mmjYoHI7p3Q23c+AW+BaoZbzjhG6bsCS0R5FQdDlTS5BGIAKuqQdxUkE9gzX2LEEnZZ1
+         ftzFUmHi+ywZVoKFgXxCWikRyQS6d4zw1CgBPNZzK4MOTJk2c4rUI4zHUtnZJNVfzvPr
+         Ono4ZrzlpIzgt07LsHM6hpPucMT1GBRUrdoyT+nOx5Tbr6DYIMbmEemurCYargWcuJwG
+         h1ZrzmBYgMHkdFzZoitjyO8s3rXnLYC50fkK8CEjGvRrO3CZaQBG81Eyld3KrSS8Srng
+         QkQw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=x758SQiPr4F20CkTzm4wFsu2ipWDv2Ry++hF6Myngkc=;
-        fh=+klR53FZHf/ontJcuSXJeQG9gRyJMzAc0vqxIowiZkc=;
-        b=sSvpwTxTHNorDaj5Gvbw7kbC4tpjvyYpuXmHrgZRKcVkaIV/r6rfYiqzlfVUuo6Oky
-         oAJLeV02NK14llU3BwWdqj0I9rm/SkfD39iUDrEJLJWq94dxLrqygVasf0NuIY2z5QM2
-         K4+Vt/3ULvUJQtbWS8XHyCIl9mWcVDUgwsTv1kfwWnD3//mYwsbQQRAed0Nen0482USR
-         3W8R9yAFyvYPwKwwebZZOGI3pSPt0rURwybRcLxJ0S6Lk+7w8KGichcx0GUn2ydW+p6B
-         05impS3l9snOULUH9yIY5IxVabg+b45/A+ZkxdOW7Uzex+F2uC3qW4ZpEwXQTm6W7RAk
-         QPHA==;
+        bh=zk7ZRTa4/uNbLSjjz64qbMgZu6SnZnQXxXCrw4XD3tU=;
+        fh=/qmLwYSWy8J1lxDsL/pEU6X3Pb6+mlViaV5YYDkZ44g=;
+        b=fh9EJ0YqnCIX5T0Pnx6tA7ApLEJldM2eh2NmhDeZIqMEm0/S6FmHRCuewEod64JE9N
+         LgtBDV3aqV9JANtUWB22sEMGJQ/aXRTlpGTqWId8RCkCH5Qk5A9mddezKxSa/j5D5Db2
+         64csIPKr3VwKJd1Iax6KynhyIQgTDSDDhG4x82di1NPTznUghwquPUnmtPIgYzPRnm+y
+         mqz/Jx0ubxc92QYq1ahz2PuR3nbTQD6BaxrSC+7SBRAP6XOfZoRJfuDdwF4KxhMzqz9g
+         0yst/T4KMD8LqZX/DdDQFw5wgsOEqetjK7Xyn5c0L20nEA0+uRIHh5h9cT4Z/TeKK5Uy
+         ifdw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1789575659; x=1790180459; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1789582115; x=1790186915; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=x758SQiPr4F20CkTzm4wFsu2ipWDv2Ry++hF6Myngkc=;
-        b=DcxznPPhdi7bG8BEQfTEzmx560hfmZbBKMpgjdxuRYhhTDiN6KLltpCXR0toN1OUuL
-         tGcspEGdJu80Q8VEpgchq0UhYIMR6S389ENyhg981fbXtl+s1JCwAavZfxB5vIyOp6x6
-         YzdPVF+oEvSTSITyTkF2qAv7GX58VikVfCRc0RE0lYt6ppFwN5gNNUPRxlpxVsZgkVRm
-         nNIqkcXwxmyJEDCP/FDv3RnnGlp7qiwiy8PJLyyRe/mpydy5RP0VioqRCJfmkxhQvdgF
-         WIV5s/DY2kJs92NOJq1B6J/xjDN/iD8GHoYAglTspx+pUokE4y6AovVBJeaG69k9b10x
-         NNlg==
+        bh=zk7ZRTa4/uNbLSjjz64qbMgZu6SnZnQXxXCrw4XD3tU=;
+        b=ietNd25e1Xq7EbaCx/OdfwaNRrL0YHqYuT8e+2sLB0fh0U0lNcLlcTmAgKTjJNEPK2
+         cJsW0406Qf1G3Fj5bxb7YdvvTgb6qK+fmCYLpPu4EIaAoEFCZRnSkC4oyyaylgrnKCad
+         dFpaFg9F+uRKSw1dUSVcAp0Q0XNlAWBYDCF88xAwdlsVofTzjfvW+oZvFajXLnizqI3R
+         Jll3PUVkRph1CuN4ArmbceLIm2PxVReDRgJST+7VBaWKzcjqC0kS7+MU7CYkmNIRvF9g
+         KBIPvEGAUMb2DmtJFD6bYKe/vZUyDxMz0m0RMn/Onud5d8PcF4rWjYev9JG2JpVylojy
+         fC2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789575659; x=1790180459;
+        d=1e100.net; s=20260707; t=1789582115; x=1790186915;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=x758SQiPr4F20CkTzm4wFsu2ipWDv2Ry++hF6Myngkc=;
-        b=KTJXnY4wWFyyFSfnrA6f5iL5C+pxURvfSE3RFuWZEr/u1C6JOhRzcWF4MrlTLyDwMC
-         pAo/sxkMkrx55ucR+nAodJ9Ny4iY7YeMUsUk0IGBBCwrfUlFssL17qm/FeOMBnwzNgew
-         VjfN8PLeEJ3lTySnXoIW9d3mQ/SFpmWBJq7tHEHqGeuultMXVK0lViX+NY/cipImbYET
-         UnRVru+awmxphRCIl6phYZrovvCNI2KTvpga9NuxrgG6q8RA9we2XGlXzSZjtEw/ivw6
-         wynmazLj9LOrn4M4DaIuBfXZuwqgkyZQQDoKgsRBy81XbFvj6bMhTKg7VuPpYP0kkoAy
-         6OLw==
-X-Forwarded-Encrypted: i=1; AKwUvBw6Cyn/GokMlw26xPAHqJmkZ2wABnznzdvYg+2//ntXH5bA9VC4u1CAq2GK76Ow05GEkQ1nKa+9zyAh@vger.kernel.org
-X-Gm-Message-State: AFuF++kSgi3cqNFViggGLkPdc803K3xFdhMAhZzFBdhwZ92zu6WAwUMz
-	W6jWKQx5YDSZFi1bKg/rFkA6987NfFD+ght1MF2kOIr3khvCRyMrRslzIJYoqZlUEYUzd1zihcJ
-	jLKH4yJTHiiXBJCMwDsMoUmGwrpK/3hM=
-X-Gm-Gg: AYBFou2crWVJ+UYHiooXORy3QMAAwlb67R5UQUy0EJTR+7uZSi14xpNwZzp1w6Jmq6t
-	pEe6mWRVBCcmCrHi1PD7TJvDkYXnywhPqiciAMxJEoydtSxhCR0neSnk7bmW+5Il/8GCbIqSAx0
-	MOjiajpCawzE6yCCrIQcCRc05sYkjJSLL1N79sHpUBFDbbgvDq1UAuT+h26bRfIpo7p46WAxJ04
-	KfWrGdXx19vljvkPb4+AScRYoNE25yl+vR0ZoeXeo1ptx7KSZlG5pFDfngv/UL+ojOhumbJ3m8b
-	yhF6zu6a+rwGEFXlT6Nq/MS+/c09cJmyKTLveDUa0yrH2BeztgFuWoKBMni2yldLOKCA+BXEk/B
-	M/2BvyXCymywLYnz4Qgb2LoVepLo+9pwZGrhkNXNgfEE3INHRieHSbRPF
-X-Received: by 2002:a05:6a00:1888:b0:84a:60a4:2651 with SMTP id
- d2e1a72fcca58-87238c8aad3mr5950497b3a.6.1789575659295; Wed, 16 Sep 2026
- 09:20:59 -0700 (PDT)
+        bh=zk7ZRTa4/uNbLSjjz64qbMgZu6SnZnQXxXCrw4XD3tU=;
+        b=yLISHyUmboFdJNO3mC5ZN2tqA2wdb7iacaSB3aygE0IdrW2LzcA+9yg0QKwpjvmoiw
+         OYYcggQ6NS/CUIS3xofcQ3HK8RUDbmeXXTHhefArtz4cAfwK1enf8Rg1c0Bdyc15VGQU
+         VKs61UgL7ncJKJ6lwXYHD7D/LqeYzS9P3oopRR5LtneBxHHT1PDl6EDIWq/u629UDzbW
+         BEJOsJwz031ulYBYHbFD3BV4/eOGsZvpDh4z8RERN0eWSL9kx+WKHEq1/tovxcY7j+28
+         5OD/+5gP1sionP/yJlEcTASSqP5ArQd+LJSskuQRi1CgLLxx3C03fT4xzZ89vzZqw4Pw
+         eEfA==
+X-Forwarded-Encrypted: i=1; AKwUvByCv9ZEb+nuu2FY9nMUxaPbARa9RQ1mHIdldsMlQCLhERo4wPTj2kPjqdWy73awd+XiR0NVEecpSmkH@vger.kernel.org
+X-Gm-Message-State: AFuF++kvFuNiMKfHbgnsRkyEAqDkgiJk4lpyDGb38a5wnPyuX3HaaRik
+	tmoncvhIwxpKAjBPPtlbwu949Lp0pBkOJFQzqjKXkRwPJP5y1HBFWcAgIMrl3HdDRvnOPg2JI4p
+	1+AzoY/afgHJDKI7UDESXNRG04haMqR0=
+X-Gm-Gg: AYBFou3PiINyoa82g/kF9Rooz6sB1dE+qLDAFXxub6HL2LD0JngRjvcN/FJMeLy2ogp
+	Rml6aHyXCBC2K+cZLghXoJtZ1fz37bE3Ub+nrIQXmwDoY9clVCKT43Rerq1ZCqhTfS9Dmkj8v/N
+	MtZPsRRPxx0fkXxsF5royAJ2ZbPmxe+3NHZ9zVf9n/zqDKX8IC/vVp/EAlNDpgoBnYX4DV3v62K
+	pfmK1bQ6dmMnkR0jp3Lk0GvRiyucGhh+uuGQRHgBsIAZ4+SJUf3YNeidGmk7T1IdHvyqqXd282l
+	jTCzxuzMrzL+M5dyNr/Ee6G4oXl6KtYoRAmSn1FuCFlxkFgWR5acQdDgx63ssI6KQztFPPvlvH+
+	13LySWHYdfg5BW2OqWj9JzcfEBMfNgp1gD/kQFvf4XKIrvFhZnk0X4jID
+X-Received: by 2002:a05:6a00:8d94:b0:869:7511:b860 with SMTP id
+ d2e1a72fcca58-8723adafcd5mr7745685b3a.5.1789582114578; Wed, 16 Sep 2026
+ 11:08:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <927bfa67165193368d642396c4b8fcfc580d494d.1789393775.git.lucien.xin@gmail.com>
- <178950185914.22033.7074901863240008115@kernel.org>
-In-Reply-To: <178950185914.22033.7074901863240008115@kernel.org>
+References: <40d0796769992c78bffe59b179833d71ed80e771.1789393775.git.lucien.xin@gmail.com>
+ <178950186149.22033.824022402798948504@kernel.org>
+In-Reply-To: <178950186149.22033.824022402798948504@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 16 Sep 2026 12:20:47 -0400
-X-Gm-Features: AcwNN1XmGdIGcCY3hppZmiydWNjDn39LITr2KKjk_zm8yrhQJrHdBYRINPy6wLg
-Message-ID: <CADvbK_eN8x=MTceZrgNJRTGsGphQ2QsfJ0oNBET99VKBh=b9gA@mail.gmail.com>
-Subject: Re: [PATCH net-next v15 14/15] quic: add packet builder base
+Date: Wed, 16 Sep 2026 14:08:22 -0400
+X-Gm-Features: AcwNN1VnRxRax7MXc9uJwht51A6Q_JluQ9yCTvI8wNhK1nENvOaIslNzFN3HMaQ
+Message-ID: <CADvbK_dHPkHjkPwu0RepYgDsHs5reHepprRHU9hDFBxQM9_RGw@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 15/15] quic: add packet parser base
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -109,149 +109,355 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Sep 15, 2026 at 3:51=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
 te:
 >
-> Thank you for your contribution! Sashiko AI review found 4 potential
+> Thank you for your contribution! Sashiko AI review found 7 potential
 > issue(s) to consider:
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 3
+> Critical: 0 =C2=B7 High: 1 =C2=B7 Medium: 5 =C2=B7 Low: 1
 >
-> - [Medium] Unit mismatch in quic_packet_route()
->   (net/quic/packet.c:63-66): the *IP-level* MTU returned by dst_mtu() is=
-=E2=80=A6
-> - [Low] Claim that the commit message over-advertises the packet builder:
->   quic_packet_handshake_create()/quic_packet_app_create()=E2=80=A6
-> - [Low] In struct quic_packet (net/quic/packet.h:24) the field comment
->   reads 'u16 mss[2]; /* MSS for datagram and non-datagram packets */',=E2=
+> - [High] quic_request_sock_create() publishes a newly allocated request
+>   before its first packet is successfully queued: it links req into=E2=80=
+=A6
+> - [Medium] Commit message understates the scope of the patch and does not
+>   disclose that the newly added listen-side connection-establishment=E2=
 =80=A6
-> - [Low] Claim that quic_packet_xmit() (net/quic/packet.c:199) must bail
->   out instead of only warning when skb_set_owner_sk_safe(skb, sk) fails,=
-=E2=80=A6
+> - [Medium] quic_listen_sock_lookup() passes hdr_len =3D 1 to
+>   reuseport_select_sock() (net/quic/socket.c:292-293), but by the time=E2=
+=80=A6
+> - [Medium] In quic_accept_sock_exists() (net/quic/socket.c:132-135) and
+>   quic_listen_sock_switch() (socket.c:~330) the indirect call is=E2=80=A6
+> - [Medium] A QUIC Initial decryption failure inside
+>   quic_packet_get_alpn() is counted twice and once under the wrong=E2=80=
+=A6
+> - [Medium] quic_packet_listen_process() treats every non-zero return of
+>   quic_crypto_verify_token() as a peer token-validation failure.
+> - [Low] The documented meanings of struct quic_packet's saddr/daddr are
+>   the reverse of the new receive-side implementation.
 >
 > --
 >
-> quic: add packet builder base
+> quic: add packet parser base
 >
-> This adds net/quic/packet.c and net/quic/packet.h with the TX-side
-> 'quic_packet' state: quic_packet_config() sets the path and computes head=
-er
-> overhead, quic_packet_create_and_xmit() builds and sends a packet, and
-> quic_packet_flush() sends any bundled packets.  quic_packet_init() is wir=
-ed
-> into quic_init_sock().
+> This adds the RX side of the QUIC packet handling: quic_packet_rcv() look=
+s
+> up the socket for an incoming datagram, quic_packet_process() dispatches =
+it,
+> and ICMP Packet Too Big errors are turned into PMTU updates.  A listener
+> path with ALPN parsing, request sock creation and a per-socket deferred
+> workqueue is added as well.
 >
 > A few questions on the new code below.
 >
 > > diff --git a/net/quic/packet.c b/net/quic/packet.c
-> > new file mode 100644
-> > index 0000000000000..a1967f39c9242
-> > --- /dev/null
+> > index a1967f39c9242..db87c32d7469d 100644
+> > --- a/net/quic/packet.c
 > > +++ b/net/quic/packet.c
-> > @@ -0,0 +1,280 @@
+> > @@ -14,6 +14,768 @@
 >
 > [ ... ]
 >
-> > +static struct sk_buff *quic_packet_handshake_create(struct sock *sk, g=
-fp_t gfp)
-> > +{
-> > +     return NULL;
-> > +}
-> > +
-> > +static int quic_packet_number_check(struct sock *sk, gfp_t gfp)
-> > +{
-> > +     return 0;
-> > +}
-> > +
-> > +static struct sk_buff *quic_packet_app_create(struct sock *sk, gfp_t g=
-fp)
-> > +{
-> > +     return NULL;
-> > +}
->
-> [Severity: Low]
-> This isn't a bug, but could the commit message list all of the placeholde=
-rs?
->
-> It mentions that "Functions to create application (short) and handshake
-> (long) packets are currently placeholders for future implementation", whi=
-ch
-> covers quic_packet_handshake_create() and quic_packet_app_create() above,
-> but quic_packet_encrypt_done() is also a stub that frees every
-> asynchronously encrypted packet:
->
-> net/quic/packet.c:quic_packet_encrypt_done() {
->         /* Free it for now, future patches will implement the actual defe=
-rred
->          * transmission logic.
->          */
->         kfree_skb(skb);
-> }
->
-> Worth naming that one in the changelog too?
->
-> [ ... ]
->
-> > +/* Perform routing for the QUIC packet on the specified path, update h=
-eader
-> > + * length and MSS accordingly, reset path and start PMTU timer.
+> > +/* Decrypt Initial packet and extract ALPN from TLS ClientHello for AL=
+PN-based
+> > + * socket demultiplexing. Marks packet as decrypted (cb->resume =3D 1)=
+ to avoid
+> > + * redundant decryption later.
 > > + */
-> > +int quic_packet_route(struct sock *sk)
+> > +static int quic_packet_get_alpn(struct sk_buff *skb, struct quic_data =
+*alpn)
 > > +{
-> > +     struct quic_path_group *paths =3D quic_paths(sk);
-> > +     struct quic_packet *packet =3D quic_packet(sk);
-> > +     union quic_addr *sa, *da;
-> > +     u32 pmtu;
-> > +     int err;
-> > +
-> > +     da =3D quic_path_daddr(paths, packet->path);
-> > +     sa =3D quic_path_saddr(paths, packet->path);
-> > +     err =3D quic_flow_route(sk, da, sa, &paths->fl);
-> > +     if (err)
-> > +             return err < 0 ? err : 0;
-> > +
-> > +     packet->hlen =3D quic_encap_len(da);
-> > +     pmtu =3D clamp(dst_mtu(__sk_dst_get(sk)),
-> > +                  QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU);
-> > +     quic_packet_mss_update(sk, pmtu - packet->hlen);
+>
+> [ ... ]
+>
+> > +     cb->sync =3D 1;
+> > +     net =3D sock_net(sk);
+> > +     err =3D quic_crypto_decrypt(crypto, skb, GFP_KERNEL);
+> > +     if (err) {
+> > +             QUIC_INC_STATS(net, QUIC_MIB_PKT_DECDROP);
+> > +             return err;
+> > +     }
 >
 > [Severity: Medium]
-> Are the units on both sides of this subtraction the same?
+> Is a single dropped packet meant to bump two drop counters here?
 >
-> The clamp floor is applied to the IP-level MTU returned by dst_mtu(), and
-> packet->hlen (the full IP plus UDP encapsulation length from
-> quic_encap_len(), 28 for IPv4 and 48 for IPv6) is subtracted afterwards.
-> So for a route whose dst_mtu() is at or below 1228 (IPv4) the result is
-> 1172, and at or below 1248 (IPv6) it is 1152:
+> quic_packet_get_alpn() counts the AEAD failure as QUIC_MIB_PKT_DECDROP an=
+d
+> returns the error, and the caller in quic_packet_listen_process() then co=
+unts
+> the same skb again:
 >
->         pmtu  =3D clamp(dst_mtu(...), 1200, 65535);   /* IP MTU */
->         mss   =3D pmtu - packet->hlen;                /* UDP payload */
+>         err =3D quic_packet_get_alpn(skb, &alpns);
+>         if (err) {
+>                 QUIC_INC_STATS(net, QUIC_MIB_PKT_INVHDRDROP);
+>                 kfree_skb(skb);
+>                 return err;
+>         }
 >
-> That value then lands in packet->mss[QUIC_PACKET_MSS_NORMAL] and in
-> congestion control via quic_packet_mss_update() -> quic_cong_set_mss(),
-> and it is also the coalescing limit in quic_packet_bundle():
+> net/quic/protocol.h documents these as distinct reasons:
 >
->         if (packet->head->len + skb->len >
->             packet->mss[QUIC_PACKET_MSS_NORMAL]) {
+>         QUIC_MIB_PKT_INVHDRDROP,     /* Dropped: invalid packet header */
+>         ...
+>         QUIC_MIB_PKT_DECDROP,        /* Dropped: decryption failure */
 >
-> Can that put the UDP payload size below the 1200-byte minimum that
-> quic_packet_init() installs as QUIC_MIN_UDP_PAYLOAD, and below
-> QUIC_BASE_PLPMTU (also 1200, in net/quic/path.c) that quic_path_pl_reset(=
-)
-> writes into paths->pl.pmtu two lines later?
+> So QuicPktInvHdrDrop ends up reporting drops for packets whose header par=
+sed
+> fine.  The same applies to a quic_crypto_initial_keys_install() failure i=
+nside
+> quic_packet_get_alpn(), which is not a header error either.
 >
-> Note dst_mtu() can legitimately come back well under 1200 after a remote
-> ICMP "fragmentation needed", which is presumably why the clamp is there a=
-t
-> all.  Should the floor be QUIC_MIN_UDP_PAYLOAD + packet->hlen, or the
-> resulting MSS clamped to 1200 instead?
+True:
+
+quic_packet_get_alpn() doesn't really perform QUIC header parsing, so I'll
+remove this QUIC_INC_STATS(net, QUIC_MIB_PKT_INVHDRDROP).
+
+> [ ... ]
 >
-> The three 1200 constants in this codebase denote three different layers
-> (net/quic/path.h QUIC_PATH_MIN_PMTU as an IP MTU floor, path.h
-> QUIC_MIN_UDP_PAYLOAD as a UDP payload size, path.c QUIC_BASE_PLPMTU as a
-> packetization-layer size), which makes this easy to mix up.
+> > +static int quic_packet_retry_create_and_xmit(struct sock *sk)
+> > +{
+> > +     return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static int quic_packet_version_create_and_xmit(struct sock *sk, gfp_t =
+gfp)
+> > +{
+> > +     return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static int quic_packet_stateless_reset_create_and_xmit(struct sock *sk=
+, u32 len,
+> > +                                                    gfp_t gfp)
+> > +{
+> > +     return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static int quic_packet_refuse_close_create_and_xmit(struct sock *sk,
+> > +                                                 u32 errcode)
+> > +{
+> > +     return -EOPNOTSUPP;
+> > +}
+>
+> [Severity: Medium]
+> Could the changelog describe the listener side that is added here?
+>
+> The commit message says:
+>
+>   "Similar to the TX path, handling for application and handshake packets=
+ is
+>    not yet implemented."
+>
+> and names only quic_packet_get_alpn(), quic_packet_rcv(),
+> quic_packet_process() and quic_packet_rcv_err_pmtu().
+>
+> The patch also adds the whole listen path: quic_packet_listen_process() w=
+ith
+> token validation and Retry triggering, quic_request_sock_create() /
+> quic_request_sock_lookup() / quic_request_sock_backlog_tail() with accept
+> queue accounting, quic_accept_sock_exists(), quic_listen_sock_switch(), t=
+wo
+> socket lookup helpers and a per-socket deferred workqueue.
+>
+> At the same time every response the embedded RFC quotes promise is one of=
+ the
+> four stubs above, and the skb is then consumed, so those packets are sile=
+ntly
+> dropped rather than answered.
+>
+> And the request socks produced by this path have no consumer in the resul=
+ting
+> tree, since the registered .accept callback is:
+>
+> net/quic/socket.c:
+>         static struct sock *quic_accept(struct sock *sk, struct proto_acc=
+ept_arg *arg)
+>         {
+>                 arg->err =3D -EOPNOTSUPP;
+>                 return NULL;
+>         }
+>
+> so requests that are created, charged with sk_acceptq_added() and signall=
+ed
+> with sk_data_ready() can never be dequeued.
 >
 False:
 
-QUIC_MIN_UDP_PAYLOAD is only used for the minimum size of the Initial
-packet when building or parsing it. There is no requirement for it to match
-QUIC_PATH_MIN_PMTU or QUIC_BASE_PLPMTU.
+quic_listen(), quic_bind(), and quic_connect() are not implemented yet, so
+these packet processing functions cannot actually be reached at this stage.
+It is fine to leave some of them empty until the corresponding socket APIs
+are added.
+
+> [ ... ]
+>
+> > +             /* Verify Token. */
+> > +             crypto =3D quic_crypto(sk, QUIC_CRYPTO_INITIAL);
+> > +             err =3D quic_crypto_verify_token(crypto, &packet->daddr,
+> > +                                            sizeof(packet->daddr),
+> > +                                            &odcid, token.data, token.=
+len);
+> > +             if (err) {
+> > +                     if (!retry) {
+> > +                             err =3D quic_packet_retry_create_and_xmit=
+(sk);
+> > +                             consume_skb(skb);
+> > +                             return err;
+> > +                     }
+>
+> [Severity: Medium]
+> Should a local allocation failure here be reported to the peer as an inva=
+lid
+> token?
+>
+> quic_crypto_verify_token() does not only return token mismatches:
+>
+> net/quic/crypto.c:
+>         token_buf =3D kmemdup(token, len, GFP_KERNEL);
+>         if (!token_buf)
+>                 return -ENOMEM;
+>
+> and it also propagates -ENOMEM from quic_crypto_token_protect(), which
+> allocates via quic_crypto_aead_mem_alloc().
+>
+> Under memory pressure a client presenting a perfectly valid NEW_TOKEN tok=
+en
+> gets a Retry it should not receive, and one presenting a valid Retry toke=
+n
+> takes the rfc9000#section-8.1.3 path:
+>
+>         errcode =3D QUIC_TRANSPORT_ERROR_INVALID_TOKEN;
+>         quic_packet_refuse_close_create_and_xmit(sk, errcode);
+>
+> Would it be better to distinguish -ENOMEM from a real verification failur=
+e
+> and just drop the packet?
+False:
+
+I think it is fine to treat it as a verification failure, since memory
+allocation is part of the verification and allocation failures are very
+rare in practice.
+
+> [ ... ]
+>
+> > diff --git a/net/quic/socket.c b/net/quic/socket.c
+> > index 1e278a2109b2f..0fcb123d31bba 100644
+> > --- a/net/quic/socket.c
+> > +++ b/net/quic/socket.c
+> > @@ -24,6 +24,324 @@ static void quic_enter_memory_pressure(struct sock =
+*sk)
+>
+> [ ... ]
+>
+> > +/* Create and enqueue a QUIC request sock for a new incoming connectio=
+n. */
+> > +struct quic_request_sock *quic_request_sock_create(struct sock *sk,
+> > +                                                struct quic_conn_id *o=
+dcid,
+> > +                                                u8 retry, gfp_t gfp)
+> > +{
+>
+> [ ... ]
+>
+> > +     /* Enqueue request into listen socket=E2=80=99s pending list for =
+accept(). */
+> > +     list_add_tail(&req->list, quic_reqs(sk));
+> > +     sk_acceptq_added(sk);
+> > +     return req;
+> > +}
+> > +
+> > +int quic_request_sock_backlog_tail(struct sock *sk,
+> > +                                struct quic_request_sock *req,
+> > +                                struct sk_buff *skb)
+> > +{
+> > +     u32 limit =3D sk->sk_rcvbuf / sk->sk_max_ack_backlog;
+> > +     int len =3D skb->truesize;
+> > +
+> > +     limit =3D  max_t(u32, limit, QUIC_MIN_UDP_PAYLOAD * 4);
+> > +     if (req->blen + len > limit || !__sk_rmem_schedule(sk, len, false=
+)) {
+> > +             QUIC_INC_STATS(sock_net(sk), QUIC_MIB_PKT_RCVDROP);
+> > +             kfree_skb(skb);
+> > +             return -ENOBUFS;
+> > +     }
+>
+> [ ... ]
+>
+> > +     } else {
+> > +             /* Socket not busy: process immediately. */
+> > +             sk->sk_backlog_rcv(sk, skb); /* quic_packet_process(). */
+> > +     }
+>
+> [Severity: Medium]
+> Is the annotation on this indirect call right?  .backlog_rcv is
+> quic_backlog_rcv(), further down in this file:
+>
+>         static int quic_backlog_rcv(struct sock *sk, struct sk_buff *skb)
+>         {
+>                 return quic_packet_process(sk, skb, GFP_ATOMIC);
+>         }
+>
+> The existing site in quic_packet_rcv() spells it as
+> /* quic_backlog_rcv(). */, so the two new sites here and in
+> quic_listen_sock_switch() look inconsistent.
+>
+> More than the name: quic_listen_sock_switch() runs in sleepable context (=
+it
+> calls release_sock()/lock_sock() around the hand-off and is reached from =
+the
+> deferred workqueue), but routing through .backlog_rcv pins the allocation
+> flags to GFP_ATOMIC, which defeats the gfp argument this patch threads th=
+rough
+> quic_packet_process() so that quic_packet_deferred_work() can pass
+> GFP_KERNEL.  Should those two sites call quic_packet_process() directly w=
+ith
+> the appropriate gfp?
+>
+True:
+
+It would be better to call quic_packet_process() with GFP_KERNEL instead
+of GFP_ATOMIC in quic_listen_sock_switch().
+
+> [ ... ]
+>
+> > +struct sock *quic_listen_sock_lookup(struct sk_buff *skb, union quic_a=
+ddr *sa,
+> > +                                  union quic_addr *da, struct sock *us=
+k,
+> > +                                  struct quic_data *alpns)
+> > +{
+>
+> [ ... ]
+>
+> > +out:
+> > +     if (sk && sk->sk_reuseport)
+> > +             sk =3D reuseport_select_sock(sk, quic_addr_hash(net, da),=
+ skb, 1);
+>
+> [Severity: Medium]
+> Should the hdr_len argument be 0 rather than 1 here?
+>
+> quic_udp_rcv() already did skb_pull(skb, sizeof(struct udphdr)) before
+> quic_packet_rcv() is reached, so skb->data points at the QUIC payload, an=
+d
+> reuseport_select_sock() documents hdr_len as how far the pointer must adv=
+ance
+> to reach the payload.
+>
+> With a classic SO_ATTACH_REUSEPORT_CBPF program, run_bpf_filter() does:
+>
+> net/core/sock_reuseport.c:
+>         if (unlikely(!pskb_may_pull(skb, hdr_len)))
+>                 return -EINVAL;
+>         ...
+>         pskb_pull(skb, hdr_len);
+>         ...
+>         __skb_push(skb, hdr_len);
+>
+> so the filter would see the datagram starting one byte into the QUIC head=
+er:
+> all its offsets are shifted and the first byte (form/fixed/type bits) is
+> invisible, which can select the wrong socket in the reuseport group.
+>
+> [ ... ]
+>
+True:
+
+BPF programs may need to access the QUIC header, so I will pass 0 to
+reuseport_select_sock() to ensure the full QUIC packet is visible.
 
 Thanks.
