@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B5B353A86;
-	Thu, 17 Sep 2026 04:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3788E2A1BF;
+	Thu, 17 Sep 2026 04:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789618629; cv=none; b=ROxLddP5s5AqMZLj8KPWn7bP3/6Qi5ik9JU6cJKs6TGQ7zH7UgEkrD57jA5VlXwmIeJ+bYrJsTxLSVx0oicQPDnxyhAJjWtmr9WVJICrI/AzeH9eD5HvmB5lOo2ocHSbUDPl+H2jDlsXVlgh/U5gcfS4bIuSAmx645lkZTksV04=
+	t=1789618827; cv=none; b=tVSbosKim9VPMClziRM7Sn7JlYNxlP3Jdw2QGdZt06ScEbawkV26Bu4+kcGWR1fC+g+f+DAaysiVT3GqSYWiwREV8AYdhF2z7IGaNvcRRwXmFmXNaKmQ4XdoETj3mWwBihgEdMCJ3YNQZ6yb89/CfP4PU2FbwzONiLaz0mzULR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789618629; c=relaxed/simple;
-	bh=QcMOjPlttyZ/i980JtQZAzgxYLBgzcYGSfLpOGyNReE=;
+	s=arc-20240116; t=1789618827; c=relaxed/simple;
+	bh=yqz7WLo74ELWEEmIJDuciZQkZUfNrwmdNLemutO651s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FaCYFwvhNkz/N5Y+tAbYz8Ixs9MevQboZnELRWWpdycpQ1hDHIGWv40a9PGBwBwdJQcY20JqP86kyqmYu2fWLUauJYQFyYSX24b+wSm77O20o3hKhGmzuN+oDHe3qD0QFOhV6ZeBfNUo3xN/nBMci6eMG+YsPeVKm1BpHMpTO9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOKbI6Sz; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=ILyf5lxcw+hDsMyt9GSROgsZ5E0i/2PY7ccoaQPHUSnCTN8J4TrCsgrO/mtFhnkLfqqPo+8t/4blaS68vrZYCayATKXgLzivfku4lFVXMVK8NMCQTTTRNZFu/ONH0ViAq4CF20rYbM0OX/EbhY2zazYszzMYFXbDEfeCcrGpiXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GS3XoEGf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOKbI6Sz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 181BE1F000FF;
-	Thu, 17 Sep 2026 04:17:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GS3XoEGf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076781F000FF;
+	Thu, 17 Sep 2026 04:20:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789618625;
-	bh=hJZI85/zOpEePf9PovbsB3P19L41Indua/uNMDvCQZQ=;
+	s=k20260515; t=1789618823;
+	bh=diGt387kHa1cmrLu0aZBDn0bEEsWbdSH4YakFVGW/Ug=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IOKbI6Sz7TmYhITMhJEi+Ajk8aRIYbzbN+1x81/DGHbyoCB7F95ZZJ4O/9MyRcYva
-	 K0g5PGuJYD43nS4VGYZ/rUbVW8a6PghX6qE2eYKK/mI98ryp0shpITpJiHHB3wPmEE
-	 4dkBWUGK2XQmaPVP+gJrxbNfWioRiDV0QHsw7/+yuj8wehVZq3U1j1TSN6Ug2+8xgY
-	 XfVJmuGs2ydM94meGUouSrScWlihKrlLp7BfBeSVQBr6Ni2VpuGb9lMp1GqbvTnyxu
-	 c+QhhyrLo7zkacXCVFxwPdThVVAnJaCg1Vra0BPmcXtS9I+++HajKP7RJ7i4wiL6lW
-	 TefAcZagLO47Q==
+	b=GS3XoEGfx/oTTkm122uulkzOHKkFJYkblMrNp6pa5IpiM8n1K+UXfbLxoHot3YDQs
+	 vjhO1o+4QDHn7OaDObL1Mfl0S5VeXq67rnJKRdLJhWhl9ipyV/amnBcPBY3hC+V/IT
+	 s9N5ShlMf881v7Fq6nIz5Ws/jtejW4z00OoBgnSp921hR2xVDZuR5wTZbXEPNsQ1MQ
+	 AxCf72cZX6W+fKOk8CQqG9xM+4i9WqyoOAF83WACmgzc/4a9VbVnZ7af0iF4Fv6w+s
+	 6k98TXrJkJ0CQcaNx+TagstSli6zWK1teGRBxOPM3fF4Lnpyp+F6VE4f2aShweuEYd
+	 bXwkboncxiXIg==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Paulo Alcantara <pc@manguebit.org>,
@@ -34,11 +34,11 @@ Cc: Paulo Alcantara <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
 Subject: [PATCH 6.18.y 1/2] smb: client: use atomic_t for mnt_cifs_flags
-Date: Thu, 17 Sep 2026 00:17:02 -0400
-Message-ID: <20260917041703.4190978-1-sashal@kernel.org>
+Date: Thu, 17 Sep 2026 00:20:20 -0400
+Message-ID: <20260917042021.6589-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <2026091651-rehydrate-vexingly-f239@gregkh>
-References: <2026091651-rehydrate-vexingly-f239@gregkh>
+In-Reply-To: <2026091633-nearby-gravel-9004@gregkh>
+References: <2026091633-nearby-gravel-9004@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -60,19 +60,18 @@ Reviewed-by: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
 Signed-off-by: Steve French <stfrench@microsoft.com>
 
-[Backport to 6.18: retain the atomic mount-flag conversion while keeping
-this branch's existing function interfaces and locations.  Implement
-cifs_sb_flags as a single-evaluation macro with the upstream unsigned
-return type; do not add functions or import the generic CIFS_SB helpers,
-inode-state changes, reconnect helpers, or oplock refactors.
+Stable backport notes:
+Keep the atomic mount-flag conversion on the 6.18 interfaces. Retain the
+existing CIFS_SB/CIFS_FILE_SB accessors, cache/oplock handling, and helper
+locations rather than importing unrelated upstream refactors. Convert
+reset_cifs_unix_caps() in connect.c, where it lives in this stable tree.
 
-Convert the existing readers, including the legacy cache macros, to the
-accessor.  Use atomic bit operations at existing update sites, including
-reset_cifs_unix_caps in connect.c, and publish the remount flag snapshot
-with atomic_set.  Keep smb3_update_mnt_flags returning void.
-
-This supplies the accessor required by cd2b2b57921d (smb: client: fix WSL
-reparse point uid/gid override), whose patch applies without changes.]
+Use a single-evaluation cifs_sb_flags() macro instead of adding a function.
+Convert all existing flag reads and updates to atomic access, and publish
+smb3_update_mnt_flags() through a local snapshot without changing its API.
+Use the upstream sbflags snapshot in cifs_getattr() so that
+cf4d35896621b7298eef51b7a465e5c0cb22f670 applies without modification.
+No functions are added.
 
 [ sashal: Reduced backport -- upstream 4fc3a433c1394 touches 27 file(s), this
   backport carries 25. Not backported here:
@@ -81,7 +80,7 @@ reparse point uid/gid override), whose patch applies without changes.]
   This note is generated from the file lists only; see the resolution record
   for the reasoning. ]
 
-Stable-dep-of: cd2b2b57921d ("smb: client: fix WSL reparse point uid/gid override")
+Stable-dep-of: cf4d35896621 ("smb: client: fix uid/gid override in getattr with posix extensions")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
  fs/smb/client/cached_dir.c   |   2 +-
@@ -91,12 +90,12 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  fs/smb/client/cifsacl.c      |   6 +-
  fs/smb/client/cifsfs.c       |  66 ++++++++++-----------
  fs/smb/client/cifsglob.h     |  10 +++-
- fs/smb/client/connect.c      |  43 +++++++-------
+ fs/smb/client/connect.c      |  48 +++++++--------
  fs/smb/client/dfs_cache.c    |   2 +-
  fs/smb/client/dir.c          |  16 ++---
  fs/smb/client/file.c         |  32 +++++-----
  fs/smb/client/fs_context.c   | 110 +++++++++++++++++------------------
- fs/smb/client/inode.c        |  80 ++++++++++++-------------
+ fs/smb/client/inode.c        |  82 +++++++++++++-------------
  fs/smb/client/ioctl.c        |   2 +-
  fs/smb/client/link.c         |   4 +-
  fs/smb/client/misc.c         |  12 ++--
@@ -109,7 +108,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  fs/smb/client/smb2ops.c      |   4 +-
  fs/smb/client/smb2pdu.c      |   4 +-
  fs/smb/client/xattr.c        |   6 +-
- 25 files changed, 230 insertions(+), 223 deletions(-)
+ 25 files changed, 237 insertions(+), 223 deletions(-)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
 index de687b491df46..cef855456063a 100644
@@ -125,7 +124,7 @@ index de687b491df46..cef855456063a 100644
  		len = strlen(cifs_sb->prepath) + 1;
  		if (unlikely(len > strlen(path)))
 diff --git a/fs/smb/client/cifs_fs_sb.h b/fs/smb/client/cifs_fs_sb.h
-index 5e8d163cb5f80..fc75999ffdc44 100644
+index 5e8d163cb5f80..2d408fe9d45f7 100644
 --- a/fs/smb/client/cifs_fs_sb.h
 +++ b/fs/smb/client/cifs_fs_sb.h
 @@ -10,6 +10,7 @@
@@ -150,7 +149,7 @@ index 5e8d163cb5f80..fc75999ffdc44 100644
  	struct dentry *root;
  };
 +
-+/* Mount flags are accessed locklessly by mount/remount and reconnect paths. */
++/* Mount flags may change concurrently during remount and reconnect. */
 +#define cifs_sb_flags(cifs_sb) \
 +	((unsigned int)atomic_read(&(cifs_sb)->mnt_cifs_flags))
 +
@@ -373,7 +372,7 @@ index 425fe4e4e8ab7..7bd950b28deb5 100644
  
  	full_path = cifs_build_path_to_root(ctx, cifs_sb,
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 92a835e12eb33..1837f4820bd67 100644
+index 92a835e12eb33..a0dd8bd665a8a 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
 @@ -1540,9 +1540,13 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
@@ -382,13 +381,13 @@ index 92a835e12eb33..1837f4820bd67 100644
  
 -#define CIFS_CACHE_READ(cinode) ((cinode->oplock & CIFS_CACHE_READ_FLG) || (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RO_CACHE))
 +#define CIFS_CACHE_READ(cinode) \
-+	(((cinode)->oplock & CIFS_CACHE_READ_FLG) || \
-+	 (cifs_sb_flags(CIFS_SB((cinode)->netfs.inode.i_sb)) & CIFS_MOUNT_RO_CACHE))
++	((cinode->oplock & CIFS_CACHE_READ_FLG) || \
++	 (cifs_sb_flags(CIFS_SB(cinode->netfs.inode.i_sb)) & CIFS_MOUNT_RO_CACHE))
  #define CIFS_CACHE_HANDLE(cinode) (cinode->oplock & CIFS_CACHE_HANDLE_FLG)
 -#define CIFS_CACHE_WRITE(cinode) ((cinode->oplock & CIFS_CACHE_WRITE_FLG) || (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RW_CACHE))
 +#define CIFS_CACHE_WRITE(cinode) \
-+	(((cinode)->oplock & CIFS_CACHE_WRITE_FLG) || \
-+	 (cifs_sb_flags(CIFS_SB((cinode)->netfs.inode.i_sb)) & CIFS_MOUNT_RW_CACHE))
++	((cinode->oplock & CIFS_CACHE_WRITE_FLG) || \
++	 (cifs_sb_flags(CIFS_SB(cinode->netfs.inode.i_sb)) & CIFS_MOUNT_RW_CACHE))
  
  /*
   * One of these for each file inode
@@ -402,7 +401,7 @@ index 92a835e12eb33..1837f4820bd67 100644
  	else
  		return '\\';
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 551acb7721239..cac29e6a1e12e 100644
+index 551acb7721239..92aac19d4c4a5 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
 @@ -2917,8 +2917,8 @@ compare_mount_options(struct super_block *sb, struct cifs_mnt_data *mnt_data)
@@ -437,27 +436,29 @@ index 551acb7721239..cac29e6a1e12e 100644
  		spin_unlock(&cifs_tcp_ses_lock);
  		return 0;
  	}
-@@ -3531,8 +3531,7 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+@@ -3531,8 +3531,8 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
  		else if (CIFS_UNIX_POSIX_ACL_CAP & cap) {
  			cifs_dbg(FYI, "negotiated posix acl support\n");
  			if (cifs_sb)
 -				cifs_sb->mnt_cifs_flags |=
 -					CIFS_MOUNT_POSIXACL;
-+				atomic_or(CIFS_MOUNT_POSIXACL, &cifs_sb->mnt_cifs_flags);
++				atomic_or(CIFS_MOUNT_POSIXACL,
++					  &cifs_sb->mnt_cifs_flags);
  		}
  
  		if (ctx && ctx->posix_paths == 0)
-@@ -3540,8 +3539,7 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
+@@ -3540,8 +3540,8 @@ void reset_cifs_unix_caps(unsigned int xid, struct cifs_tcon *tcon,
  		else if (cap & CIFS_UNIX_POSIX_PATHNAMES_CAP) {
  			cifs_dbg(FYI, "negotiate posix pathnames\n");
  			if (cifs_sb)
 -				cifs_sb->mnt_cifs_flags |=
 -					CIFS_MOUNT_POSIX_PATHS;
-+				atomic_or(CIFS_MOUNT_POSIX_PATHS, &cifs_sb->mnt_cifs_flags);
++				atomic_or(CIFS_MOUNT_POSIX_PATHS,
++					  &cifs_sb->mnt_cifs_flags);
  		}
  
  		cifs_dbg(FYI, "Negotiate caps 0x%x\n", (int)cap);
-@@ -3609,11 +3607,10 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
+@@ -3609,11 +3609,11 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
  		cifs_dbg(FYI, "mounting share using direct i/o\n");
  	if (ctx->cache_ro) {
  		cifs_dbg(VFS, "mounting share with read only caching. Ensure that the share will not be modified while in use.\n");
@@ -467,11 +468,12 @@ index 551acb7721239..cac29e6a1e12e 100644
  		cifs_dbg(VFS, "mounting share in single client RW caching mode. Ensure that no other systems will be accessing the share.\n");
 -		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_RO_CACHE |
 -					    CIFS_MOUNT_RW_CACHE);
-+		atomic_or(CIFS_MOUNT_RO_CACHE | CIFS_MOUNT_RW_CACHE, &cifs_sb->mnt_cifs_flags);
++		atomic_or(CIFS_MOUNT_RO_CACHE | CIFS_MOUNT_RW_CACHE,
++			  &cifs_sb->mnt_cifs_flags);
  	}
  
  	if ((ctx->cifs_acl) && (ctx->dynperm))
-@@ -3623,7 +3620,7 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
+@@ -3623,7 +3623,7 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
  		cifs_sb->prepath = kstrdup(ctx->prepath, GFP_KERNEL);
  		if (cifs_sb->prepath == NULL)
  			return -ENOMEM;
@@ -480,16 +482,17 @@ index 551acb7721239..cac29e6a1e12e 100644
  	}
  
  	return 0;
-@@ -3643,7 +3640,7 @@ void cifs_mount_put_conns(struct cifs_mount_ctx *mnt_ctx)
+@@ -3643,7 +3643,8 @@ void cifs_mount_put_conns(struct cifs_mount_ctx *mnt_ctx)
  	mnt_ctx->ses = NULL;
  	mnt_ctx->tcon = NULL;
  	mnt_ctx->server = NULL;
 -	mnt_ctx->cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_POSIX_PATHS;
-+	atomic_andnot(CIFS_MOUNT_POSIX_PATHS, &mnt_ctx->cifs_sb->mnt_cifs_flags);
++	atomic_andnot(CIFS_MOUNT_POSIX_PATHS,
++		      &mnt_ctx->cifs_sb->mnt_cifs_flags);
  	free_xid(mnt_ctx->xid);
  }
  
-@@ -3724,9 +3721,9 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+@@ -3724,9 +3725,9 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
  	 * path (i.e., do not remap / and \ and do not map any special characters)
  	 */
  	if (tcon->posix_extensions) {
@@ -502,7 +505,7 @@ index 551acb7721239..cac29e6a1e12e 100644
  	}
  
  #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
-@@ -3753,11 +3750,11 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+@@ -3753,11 +3754,11 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
  	/* do not care if a following call succeed - informational */
  	if (!tcon->pipe && server->ops->qfs_tcon) {
  		server->ops->qfs_tcon(mnt_ctx->xid, tcon, cifs_sb);
@@ -516,7 +519,7 @@ index 551acb7721239..cac29e6a1e12e 100644
  				  CIFS_MOUNT_RW_CACHE) == 0)
  				cifs_dbg(VFS, "read only mount of RW share\n");
  			/* no need to log a RW mount of a typical RW share */
-@@ -3770,7 +3767,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
+@@ -3770,7 +3771,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
  	 * Inside cifs_fscache_get_super_cookie it checks
  	 * that we do not get super cookie twice.
  	 */
@@ -525,16 +528,17 @@ index 551acb7721239..cac29e6a1e12e 100644
  		cifs_fscache_get_super_cookie(tcon);
  
  out:
-@@ -3893,7 +3890,7 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mnt_ctx)
+@@ -3893,7 +3894,8 @@ int cifs_is_path_remote(struct cifs_mount_ctx *mnt_ctx)
  			cifs_sb, full_path, tcon->Flags & SMB_SHARE_IS_IN_DFS);
  		if (rc != 0) {
  			cifs_server_dbg(VFS, "cannot query dirs between root and final path, enabling CIFS_MOUNT_USE_PREFIX_PATH\n");
 -			cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_USE_PREFIX_PATH;
-+			atomic_or(CIFS_MOUNT_USE_PREFIX_PATH, &cifs_sb->mnt_cifs_flags);
++			atomic_or(CIFS_MOUNT_USE_PREFIX_PATH,
++				  &cifs_sb->mnt_cifs_flags);
  			rc = 0;
  		}
  	}
-@@ -3924,7 +3921,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
+@@ -3924,7 +3926,7 @@ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx)
  	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
  	 * that have different prefix paths.
  	 */
@@ -543,7 +547,7 @@ index 551acb7721239..cac29e6a1e12e 100644
  	kfree(cifs_sb->prepath);
  	cifs_sb->prepath = ctx->prepath;
  	ctx->prepath = NULL;
-@@ -4398,7 +4395,7 @@ cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
+@@ -4398,7 +4400,7 @@ cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
  	kuid_t fsuid = current_fsuid();
  	int err;
  
@@ -976,7 +980,7 @@ index 10db3e99a9be4..6e0e3deedd5a4 100644
 +	atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
  }
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index f23c36d6ae6b3..7f8d2edb828ee 100644
+index f23c36d6ae6b3..e3858ab001695 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
 @@ -63,18 +63,18 @@ static void cifs_set_ops(struct inode *inode)
@@ -1191,24 +1195,33 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  			goto skip_invalidate;
  
  		cifs_inode->netfs.zero_point = cifs_inode->netfs.remote_i_size;
-@@ -2975,12 +2975,12 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
+@@ -2919,6 +2919,7 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+ 	struct inode *inode = d_inode(dentry);
++	unsigned int sbflags;
+ 	int rc;
+ 
+ 	if (unlikely(cifs_forced_shutdown(CIFS_SB(inode->i_sb))))
+@@ -2975,12 +2976,13 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
  	 * enabled, and the admin hasn't overridden them, set the ownership
  	 * to the fsuid/fsgid of the current process.
  	 */
 -	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
 -	    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
-+	if ((cifs_sb_flags(cifs_sb) & CIFS_MOUNT_MULTIUSER) &&
-+	    !(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_CIFS_ACL) &&
++	sbflags = cifs_sb_flags(cifs_sb);
++	if ((sbflags & CIFS_MOUNT_MULTIUSER) &&
++	    !(sbflags & CIFS_MOUNT_CIFS_ACL) &&
  	    !tcon->unix_ext) {
 -		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
-+		if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_UID))
++		if (!(sbflags & CIFS_MOUNT_OVERR_UID))
  			stat->uid = current_fsuid();
 -		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
-+		if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_GID))
++		if (!(sbflags & CIFS_MOUNT_OVERR_GID))
  			stat->gid = current_fsgid();
  	}
  	return 0;
-@@ -3150,7 +3150,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+@@ -3150,7 +3152,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
  
  	xid = get_xid();
  
@@ -1217,7 +1230,7 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  		attrs->ia_valid |= ATTR_FORCE;
  
  	rc = setattr_prepare(&nop_mnt_idmap, direntry, attrs);
-@@ -3305,7 +3305,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3305,7 +3307,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	kgid_t gid = INVALID_GID;
  	struct inode *inode = d_inode(direntry);
  	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
@@ -1226,7 +1239,7 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
  	struct cifsFileInfo *cfile = NULL;
  	const char *full_path;
-@@ -3381,8 +3381,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3381,8 +3383,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	if (attrs->ia_valid & ATTR_GID)
  		gid = attrs->ia_gid;
  
@@ -1237,7 +1250,7 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  		if (uid_valid(uid) || gid_valid(gid)) {
  			mode = NO_CHANGE_64;
  			rc = id_mode_to_cifs_acl(inode, full_path, &mode,
-@@ -3419,8 +3419,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3419,8 +3421,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	if (attrs->ia_valid & ATTR_MODE) {
  		mode = attrs->ia_mode;
  		rc = 0;
@@ -1248,7 +1261,7 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  		    posix) {
  			rc = id_mode_to_cifs_acl(inode, full_path, &mode,
  						INVALID_UID, INVALID_GID);
-@@ -3443,7 +3443,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3443,7 +3445,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  			dosattr = cifsInode->cifsAttrs | ATTR_READONLY;
  
  			/* fix up mode if we're not using dynperm */
@@ -1257,7 +1270,7 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  				attrs->ia_mode = inode->i_mode & ~S_IWUGO;
  		} else if ((mode & S_IWUGO) &&
  			   (cifsInode->cifsAttrs & ATTR_READONLY)) {
-@@ -3454,7 +3454,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3454,7 +3456,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  				dosattr |= ATTR_NORMAL;
  
  			/* reset local inode permissions to normal */
@@ -1266,7 +1279,7 @@ index f23c36d6ae6b3..7f8d2edb828ee 100644
  				attrs->ia_mode &= ~(S_IALLUGO);
  				if (S_ISDIR(inode->i_mode))
  					attrs->ia_mode |=
-@@ -3463,7 +3463,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3463,7 +3465,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  					attrs->ia_mode |=
  						cifs_sb->ctx->file_mode;
  			}
