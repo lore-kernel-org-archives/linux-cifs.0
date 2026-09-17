@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6E384AF67F;
-	Thu, 17 Sep 2026 12:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C474908CB;
+	Thu, 17 Sep 2026 12:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789649355; cv=none; b=diSRbWzhOr89aT6CSU/qmFDpE595T0rZH513frSM+OmkawH4ERifMK54Crcs9j8se5e7Y0JM/PEDaren9M1D4heIHTdTSHE7TzuvLJVqqAgTBrulpHKrVyY0RJeVQeqmDncuSrL3m1SqlIh2UgIKrGW8j3gTSXnuyEqviPv+8Go=
+	t=1789649374; cv=none; b=lFok10cilGL5S8SIaMV4MHw+7QFos7WaxE4Pth+iuIIPQd5HH6jMyt2o4blNRg53djHf/PULRU3cIm4WVHyuiipZP9+CFQAoXJTuS5VIvBz+HaweeVCuPtguFz5YiKFsYyYa1RDkHBz+hDNovKnIrujlsBdYetSUFtPYiQJYOlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789649355; c=relaxed/simple;
-	bh=DpMjHR94tx86dNK/pp2QPVseFvsIk3ZX7GD/ktPH3OU=;
+	s=arc-20240116; t=1789649374; c=relaxed/simple;
+	bh=gAEy6EAooJ5wZ9JIyM/9fxAtcbnPfycN+KcafQqZkyA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NuXLGfsYBPkCTEGjL1dY3K5NJtaxHLdwLmYtaqNnhDk8nROSkLeyLog1VPX9cfk6BlZ5I2WBjeccRn8R0W7X9yC+dgiBI7vJ9GXw5XOpmwbE3MsEcCNH4g5g8xQ9sjwitZJ2UyJl3Uov8hDyqHlCPxBq3KSaVPHKNrWfWdQ+zGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPcdK5sK; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=HFKOCpB3pVv4nI0FYMXVgdkbz7sO6vQhnobubZ6PaWC1SPH81lyL5E57en5fM9L6lfjx4GhsAB6e+Nf+TV2iIPvPf9Pkzz9qR1nxhjgsjDpXUwmMsRbRb6qZoRetzekzw090VS1Wn6VReJ7oangSm93Rx/5CEKMNIvor9vnlhcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d6tK27RQ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPcdK5sK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D04941F00898;
-	Thu, 17 Sep 2026 12:48:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d6tK27RQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6F291F0089F;
+	Thu, 17 Sep 2026 12:49:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789649340;
-	bh=+q9BqnPrnm3BmHHQNyxYCFxcdguk2iZrpaZZjhbH5xM=;
+	s=k20260515; t=1789649349;
+	bh=fdmB8uYfWf42bdf1MTFBBjToSGeOuhp+lqWzq8v8qgI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=YPcdK5sKoXgSDSH5w0FFfVWjDknfiutFmFd076vDjtAYfrzE3yxXVNkMeKCmi+X4o
-	 WN17He8zc7ivMSVnW+H/dP6qxzVxXO0h/6h3pJsPyxM+zdkQJSIrlHv46U0I0Kokgc
-	 9Kb205IA9BJ5Zydd1Q3JGCmJq+NtXNnr4P5YIDqKigHevFQ2RosYac6svMdLmB7fZV
-	 0HlhmEJkKmlIW5CGjINuyx3KCER2THd2vaoNmHzJ5faDglVpbIoJ7tRqu2qHNjowGP
-	 qU14fUnaUEqGR+4Zsi18qW3W2VD6TOYtVZLyECgOuUl8RpceSJ2Ky557ndD2zW/suL
-	 FEnT/1L2wUb5A==
+	b=d6tK27RQlzybIO5yRnxr8svafpfn00gGTaCyxqINECdW8D/uW/BAP6SDMsInnxFlJ
+	 xPmzQUMxR0Do+Ag7wd0qrMafSa6xKflsemALdViILZWBOTquTFOZpfSsdtYlZYuVQ2
+	 ytlSQh57RlVRsTheHtww2NqlzCYbV1LGsmhR2y7WaF48rGfqIByT8sWT3gOX98mFc7
+	 bXiRVQLKDx3238dwa2ndy5QpcselKy8kOX92sGSnoWc8+kVPAD8VYSDFnF5ZACDKfa
+	 8Rej+0LasHXxy6txh3ccF6/HysHmeYYFZLw4msPaIpLhs5obgl91V20QmLeqEXihzp
+	 CQOnqcYDtoMfQ==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: Paulo Alcantara <pc@manguebit.org>,
@@ -34,12 +34,12 @@ Cc: Paulo Alcantara <pc@manguebit.org>,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
 Subject: [PATCH 6.12.y 2/3] smb: client: use atomic_t for mnt_cifs_flags
-Date: Thu, 17 Sep 2026 08:48:56 -0400
-Message-ID: <20260917124857.223602-2-sashal@kernel.org>
+Date: Thu, 17 Sep 2026 08:49:05 -0400
+Message-ID: <20260917124906.224368-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260917124857.223602-1-sashal@kernel.org>
-References: <2026091652-frantic-unexposed-7b62@gregkh>
- <20260917124857.223602-1-sashal@kernel.org>
+In-Reply-To: <20260917124906.224368-1-sashal@kernel.org>
+References: <2026091634-strongman-causation-bca7@gregkh>
+ <20260917124906.224368-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -61,19 +61,22 @@ Reviewed-by: David Howells <dhowells@redhat.com>
 Cc: linux-cifs@vger.kernel.org
 Signed-off-by: Steve French <stfrench@microsoft.com>
 
-Adapt the atomic mount-flag accesses to the 6.12 client, including its
-legacy SMB1 Unix-capability updates. Keep the existing CIFS_SB and
-CIFS_FILE_SB interfaces and leave cifs_remap and cifs_forced_shutdown in
-their existing locations. Omit refactoring of newer symlink and cache
-helpers that are not present in this stable tree.
+Adapt the atomic mount flags conversion to the existing 6.12 client.
+Keep CIFS_SB(), CIFS_FILE_SB(), cifs_remap() and cifs_forced_shutdown()
+in their existing forms and locations, and omit the upstream generic
+superblock accessor refactoring. Define cifs_sb_flags() as a macro so
+this backport introduces no functions.
 
-Provide cifs_sb_flags as a single-evaluation macro returning unsigned int,
-so this backport adds no functions. Keep smb3_update_mnt_flags returning
-void and publish the computed flag word with atomic_set inside it.
+Convert all existing flag readers and use atomic_or()/atomic_andnot()
+for the in-place flag updates. This includes the legacy Unix capability
+negotiation in connect.c, the existing cache macros and the older
+setattr and I/O paths. Keep smb3_update_mnt_flags()'s void interface and
+update individual flags atomically so unrelated concurrent flag changes
+are preserved.
 
-This supplies the accessor required by cd2b2b57921d ("smb: client: fix WSL
-reparse point uid/gid override") while preserving that target's existing
-wsl_to_fattr patch context.
+Take the upstream sbflags snapshot in cifs_getattr() so the follow-up
+uid/gid override fix cf4d35896621 applies without modification. Drop
+changes for newer reparse, symlink and I/O code absent from this tree.
 
 [ sashal: Reduced backport -- upstream 4fc3a433c1394 touches 27 file(s), this
   backport carries 23. Not backported here:
@@ -84,7 +87,7 @@ wsl_to_fattr patch context.
   This note is generated from the file lists only; see the resolution record
   for the reasoning. ]
 
-Stable-dep-of: cd2b2b57921d ("smb: client: fix WSL reparse point uid/gid override")
+Stable-dep-of: cf4d35896621 ("smb: client: fix uid/gid override in getattr with posix extensions")
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
  fs/smb/client/cached_dir.c   |   2 +-
@@ -93,24 +96,24 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  fs/smb/client/cifs_unicode.c |   4 +-
  fs/smb/client/cifsacl.c      |   6 +-
  fs/smb/client/cifsfs.c       |  66 ++++++++++-----------
- fs/smb/client/cifsglob.h     |   6 +-
+ fs/smb/client/cifsglob.h     |  10 +++-
  fs/smb/client/connect.c      |  39 ++++++-------
  fs/smb/client/dfs_cache.c    |   2 +-
- fs/smb/client/dir.c          |  16 ++---
- fs/smb/client/file.c         |  32 +++++-----
- fs/smb/client/fs_context.c   | 110 +++++++++++++++++------------------
- fs/smb/client/inode.c        |  84 +++++++++++++-------------
+ fs/smb/client/dir.c          |  16 +++---
+ fs/smb/client/file.c         |  32 +++++------
+ fs/smb/client/fs_context.c   | 107 +++++++++++++++++------------------
+ fs/smb/client/inode.c        |  88 ++++++++++++++--------------
  fs/smb/client/ioctl.c        |   2 +-
  fs/smb/client/link.c         |   4 +-
  fs/smb/client/misc.c         |  12 ++--
- fs/smb/client/readdir.c      |  16 ++---
+ fs/smb/client/readdir.c      |  16 +++---
  fs/smb/client/reparse.h      |   4 +-
  fs/smb/client/smb1ops.c      |   4 +-
  fs/smb/client/smb2misc.c     |   4 +-
  fs/smb/client/smb2ops.c      |   4 +-
  fs/smb/client/smb2pdu.c      |   4 +-
  fs/smb/client/xattr.c        |   6 +-
- 23 files changed, 219 insertions(+), 217 deletions(-)
+ 23 files changed, 224 insertions(+), 217 deletions(-)
 
 diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
 index fbc746813a6f2..ee045e6125809 100644
@@ -126,7 +129,7 @@ index fbc746813a6f2..ee045e6125809 100644
  		len = strlen(cifs_sb->prepath) + 1;
  		if (unlikely(len > strlen(path)))
 diff --git a/fs/smb/client/cifs_fs_sb.h b/fs/smb/client/cifs_fs_sb.h
-index 6517591922801..29dd84a9a6cbd 100644
+index 6517591922801..31799666b6614 100644
 --- a/fs/smb/client/cifs_fs_sb.h
 +++ b/fs/smb/client/cifs_fs_sb.h
 @@ -10,6 +10,7 @@
@@ -137,18 +140,7 @@ index 6517591922801..29dd84a9a6cbd 100644
  #include <linux/backing-dev.h>
  
  #define CIFS_MOUNT_NO_PERM      1 /* do not do client vfs_perm check */
-@@ -47,6 +48,10 @@
- #define CIFS_MOUNT_RW_CACHE	0x40000000  /* assumes only client accessing */
- #define CIFS_MOUNT_SHUTDOWN	0x80000000
- 
-+/* Mount flags are also updated by remount and reconnect paths. */
-+#define cifs_sb_flags(cifs_sb) \
-+	((unsigned int)atomic_read(&(cifs_sb)->mnt_cifs_flags))
-+
- struct cifs_sb_info {
- 	struct rb_root tlink_tree;
- 	spinlock_t tlink_tree_lock;
-@@ -54,7 +59,7 @@ struct cifs_sb_info {
+@@ -54,7 +55,7 @@ struct cifs_sb_info {
  	struct nls_table *local_nls;
  	struct smb3_fs_context *ctx;
  	atomic_t active;
@@ -157,6 +149,15 @@ index 6517591922801..29dd84a9a6cbd 100644
  	struct delayed_work prune_tlinks;
  	struct rcu_head rcu;
  
+@@ -71,4 +72,8 @@ struct cifs_sb_info {
+ 	 */
+ 	struct dentry *root;
+ };
++
++/* Mount/remount and reconnect paths update these flags without a common lock. */
++#define cifs_sb_flags(cifs_sb) ((unsigned int)atomic_read(&(cifs_sb)->mnt_cifs_flags))
++
+ #endif				/* _CIFS_FS_SB_H */
 diff --git a/fs/smb/client/cifs_ioctl.h b/fs/smb/client/cifs_ioctl.h
 index 26327442e383b..5d22b7d43033f 100644
 --- a/fs/smb/client/cifs_ioctl.h
@@ -375,22 +376,26 @@ index a14f24f8d4a51..3e9d3e3296dd1 100644
  
  	full_path = cifs_build_path_to_root(ctx, cifs_sb,
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 3f9c03828cd4f..7a2b6597c7df9 100644
+index 3f9c03828cd4f..841575272aba3 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1500,9 +1500,9 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
+@@ -1500,9 +1500,13 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file);
  #define CIFS_CACHE_RW_FLG	(CIFS_CACHE_READ_FLG | CIFS_CACHE_WRITE_FLG)
  #define CIFS_CACHE_RHW_FLG	(CIFS_CACHE_RW_FLG | CIFS_CACHE_HANDLE_FLG)
  
 -#define CIFS_CACHE_READ(cinode) ((cinode->oplock & CIFS_CACHE_READ_FLG) || (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RO_CACHE))
-+#define CIFS_CACHE_READ(cinode) ((cinode->oplock & CIFS_CACHE_READ_FLG) || (cifs_sb_flags(CIFS_SB(cinode->netfs.inode.i_sb)) & CIFS_MOUNT_RO_CACHE))
++#define CIFS_CACHE_READ(cinode) \
++	(((cinode)->oplock & CIFS_CACHE_READ_FLG) || \
++	 (cifs_sb_flags(CIFS_SB((cinode)->netfs.inode.i_sb)) & CIFS_MOUNT_RO_CACHE))
  #define CIFS_CACHE_HANDLE(cinode) (cinode->oplock & CIFS_CACHE_HANDLE_FLG)
 -#define CIFS_CACHE_WRITE(cinode) ((cinode->oplock & CIFS_CACHE_WRITE_FLG) || (CIFS_SB(cinode->netfs.inode.i_sb)->mnt_cifs_flags & CIFS_MOUNT_RW_CACHE))
-+#define CIFS_CACHE_WRITE(cinode) ((cinode->oplock & CIFS_CACHE_WRITE_FLG) || (cifs_sb_flags(CIFS_SB(cinode->netfs.inode.i_sb)) & CIFS_MOUNT_RW_CACHE))
++#define CIFS_CACHE_WRITE(cinode) \
++	(((cinode)->oplock & CIFS_CACHE_WRITE_FLG) || \
++	 (cifs_sb_flags(CIFS_SB((cinode)->netfs.inode.i_sb)) & CIFS_MOUNT_RW_CACHE))
  
  /*
   * One of these for each file inode
-@@ -1565,7 +1565,7 @@ CIFS_FILE_SB(struct file *file)
+@@ -1565,7 +1569,7 @@ CIFS_FILE_SB(struct file *file)
  
  static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
  {
@@ -764,214 +769,209 @@ index 70b64df9fb2eb..291f0695c4895 100644
  			we can change size safely */
  			return true;
 diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index 769380020d41a..2019416c7ee20 100644
+index 769380020d41a..88ca1824d2171 100644
 --- a/fs/smb/client/fs_context.c
 +++ b/fs/smb/client/fs_context.c
-@@ -1910,139 +1910,139 @@ smb3_cleanup_fs_context(struct smb3_fs_context *ctx)
- 
- void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb)
- {
-+	unsigned int sbflags = cifs_sb_flags(cifs_sb);
+@@ -1913,136 +1913,135 @@ void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb)
  	struct smb3_fs_context *ctx = cifs_sb->ctx;
  
  	if (ctx->nodfs)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_DFS;
-+		sbflags |= CIFS_MOUNT_NO_DFS;
++		atomic_or(CIFS_MOUNT_NO_DFS, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_DFS;
-+		sbflags &= ~CIFS_MOUNT_NO_DFS;
++		atomic_andnot(CIFS_MOUNT_NO_DFS, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->noperm)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_PERM;
-+		sbflags |= CIFS_MOUNT_NO_PERM;
++		atomic_or(CIFS_MOUNT_NO_PERM, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_PERM;
-+		sbflags &= ~CIFS_MOUNT_NO_PERM;
++		atomic_andnot(CIFS_MOUNT_NO_PERM, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->setuids)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SET_UID;
-+		sbflags |= CIFS_MOUNT_SET_UID;
++		atomic_or(CIFS_MOUNT_SET_UID, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SET_UID;
-+		sbflags &= ~CIFS_MOUNT_SET_UID;
++		atomic_andnot(CIFS_MOUNT_SET_UID, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->setuidfromacl)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UID_FROM_ACL;
-+		sbflags |= CIFS_MOUNT_UID_FROM_ACL;
++		atomic_or(CIFS_MOUNT_UID_FROM_ACL, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_UID_FROM_ACL;
-+		sbflags &= ~CIFS_MOUNT_UID_FROM_ACL;
++		atomic_andnot(CIFS_MOUNT_UID_FROM_ACL, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->server_ino)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_SERVER_INUM;
-+		sbflags |= CIFS_MOUNT_SERVER_INUM;
++		atomic_or(CIFS_MOUNT_SERVER_INUM, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SERVER_INUM;
-+		sbflags &= ~CIFS_MOUNT_SERVER_INUM;
++		atomic_andnot(CIFS_MOUNT_SERVER_INUM, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->remap)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MAP_SFM_CHR;
-+		sbflags |= CIFS_MOUNT_MAP_SFM_CHR;
++		atomic_or(CIFS_MOUNT_MAP_SFM_CHR, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MAP_SFM_CHR;
-+		sbflags &= ~CIFS_MOUNT_MAP_SFM_CHR;
++		atomic_andnot(CIFS_MOUNT_MAP_SFM_CHR, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->sfu_remap)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MAP_SPECIAL_CHR;
-+		sbflags |= CIFS_MOUNT_MAP_SPECIAL_CHR;
++		atomic_or(CIFS_MOUNT_MAP_SPECIAL_CHR, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MAP_SPECIAL_CHR;
-+		sbflags &= ~CIFS_MOUNT_MAP_SPECIAL_CHR;
++		atomic_andnot(CIFS_MOUNT_MAP_SPECIAL_CHR, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->no_xattr)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_XATTR;
-+		sbflags |= CIFS_MOUNT_NO_XATTR;
++		atomic_or(CIFS_MOUNT_NO_XATTR, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_XATTR;
-+		sbflags &= ~CIFS_MOUNT_NO_XATTR;
++		atomic_andnot(CIFS_MOUNT_NO_XATTR, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->sfu_emul)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_UNX_EMUL;
-+		sbflags |= CIFS_MOUNT_UNX_EMUL;
++		atomic_or(CIFS_MOUNT_UNX_EMUL, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_UNX_EMUL;
-+		sbflags &= ~CIFS_MOUNT_UNX_EMUL;
++		atomic_andnot(CIFS_MOUNT_UNX_EMUL, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->nobrl)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_BRL;
-+		sbflags |= CIFS_MOUNT_NO_BRL;
++		atomic_or(CIFS_MOUNT_NO_BRL, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_BRL;
-+		sbflags &= ~CIFS_MOUNT_NO_BRL;
++		atomic_andnot(CIFS_MOUNT_NO_BRL, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->nohandlecache)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NO_HANDLE_CACHE;
-+		sbflags |= CIFS_MOUNT_NO_HANDLE_CACHE;
++		atomic_or(CIFS_MOUNT_NO_HANDLE_CACHE, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NO_HANDLE_CACHE;
-+		sbflags &= ~CIFS_MOUNT_NO_HANDLE_CACHE;
++		atomic_andnot(CIFS_MOUNT_NO_HANDLE_CACHE, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->nostrictsync)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOSSYNC;
-+		sbflags |= CIFS_MOUNT_NOSSYNC;
++		atomic_or(CIFS_MOUNT_NOSSYNC, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NOSSYNC;
-+		sbflags &= ~CIFS_MOUNT_NOSSYNC;
++		atomic_andnot(CIFS_MOUNT_NOSSYNC, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->mand_lock)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_NOPOSIXBRL;
-+		sbflags |= CIFS_MOUNT_NOPOSIXBRL;
++		atomic_or(CIFS_MOUNT_NOPOSIXBRL, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_NOPOSIXBRL;
-+		sbflags &= ~CIFS_MOUNT_NOPOSIXBRL;
++		atomic_andnot(CIFS_MOUNT_NOPOSIXBRL, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->rwpidforward)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_RWPIDFORWARD;
-+		sbflags |= CIFS_MOUNT_RWPIDFORWARD;
++		atomic_or(CIFS_MOUNT_RWPIDFORWARD, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_RWPIDFORWARD;
-+		sbflags &= ~CIFS_MOUNT_RWPIDFORWARD;
++		atomic_andnot(CIFS_MOUNT_RWPIDFORWARD, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->mode_ace)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MODE_FROM_SID;
-+		sbflags |= CIFS_MOUNT_MODE_FROM_SID;
++		atomic_or(CIFS_MOUNT_MODE_FROM_SID, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MODE_FROM_SID;
-+		sbflags &= ~CIFS_MOUNT_MODE_FROM_SID;
++		atomic_andnot(CIFS_MOUNT_MODE_FROM_SID, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->cifs_acl)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_ACL;
-+		sbflags |= CIFS_MOUNT_CIFS_ACL;
++		atomic_or(CIFS_MOUNT_CIFS_ACL, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_CIFS_ACL;
-+		sbflags &= ~CIFS_MOUNT_CIFS_ACL;
++		atomic_andnot(CIFS_MOUNT_CIFS_ACL, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->backupuid_specified)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPUID;
-+		sbflags |= CIFS_MOUNT_CIFS_BACKUPUID;
++		atomic_or(CIFS_MOUNT_CIFS_BACKUPUID, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_CIFS_BACKUPUID;
-+		sbflags &= ~CIFS_MOUNT_CIFS_BACKUPUID;
++		atomic_andnot(CIFS_MOUNT_CIFS_BACKUPUID, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->backupgid_specified)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_CIFS_BACKUPGID;
-+		sbflags |= CIFS_MOUNT_CIFS_BACKUPGID;
++		atomic_or(CIFS_MOUNT_CIFS_BACKUPGID, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_CIFS_BACKUPGID;
-+		sbflags &= ~CIFS_MOUNT_CIFS_BACKUPGID;
++		atomic_andnot(CIFS_MOUNT_CIFS_BACKUPGID, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->override_uid)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_UID;
-+		sbflags |= CIFS_MOUNT_OVERR_UID;
++		atomic_or(CIFS_MOUNT_OVERR_UID, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_OVERR_UID;
-+		sbflags &= ~CIFS_MOUNT_OVERR_UID;
++		atomic_andnot(CIFS_MOUNT_OVERR_UID, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->override_gid)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_OVERR_GID;
-+		sbflags |= CIFS_MOUNT_OVERR_GID;
++		atomic_or(CIFS_MOUNT_OVERR_GID, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_OVERR_GID;
-+		sbflags &= ~CIFS_MOUNT_OVERR_GID;
++		atomic_andnot(CIFS_MOUNT_OVERR_GID, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->dynperm)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DYNPERM;
-+		sbflags |= CIFS_MOUNT_DYNPERM;
++		atomic_or(CIFS_MOUNT_DYNPERM, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_DYNPERM;
-+		sbflags &= ~CIFS_MOUNT_DYNPERM;
++		atomic_andnot(CIFS_MOUNT_DYNPERM, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->fsc)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_FSCACHE;
-+		sbflags |= CIFS_MOUNT_FSCACHE;
++		atomic_or(CIFS_MOUNT_FSCACHE, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_FSCACHE;
-+		sbflags &= ~CIFS_MOUNT_FSCACHE;
++		atomic_andnot(CIFS_MOUNT_FSCACHE, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->multiuser)
 -		cifs_sb->mnt_cifs_flags |= (CIFS_MOUNT_MULTIUSER |
 -					    CIFS_MOUNT_NO_PERM);
-+		sbflags |= CIFS_MOUNT_MULTIUSER | CIFS_MOUNT_NO_PERM;
++		atomic_or(CIFS_MOUNT_MULTIUSER | CIFS_MOUNT_NO_PERM, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MULTIUSER;
-+		sbflags &= ~CIFS_MOUNT_MULTIUSER;
++		atomic_andnot(CIFS_MOUNT_MULTIUSER, &cifs_sb->mnt_cifs_flags);
  
  
  	if (ctx->strict_io)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_STRICT_IO;
-+		sbflags |= CIFS_MOUNT_STRICT_IO;
++		atomic_or(CIFS_MOUNT_STRICT_IO, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_STRICT_IO;
-+		sbflags &= ~CIFS_MOUNT_STRICT_IO;
++		atomic_andnot(CIFS_MOUNT_STRICT_IO, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->direct_io)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_DIRECT_IO;
-+		sbflags |= CIFS_MOUNT_DIRECT_IO;
++		atomic_or(CIFS_MOUNT_DIRECT_IO, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_DIRECT_IO;
-+		sbflags &= ~CIFS_MOUNT_DIRECT_IO;
++		atomic_andnot(CIFS_MOUNT_DIRECT_IO, &cifs_sb->mnt_cifs_flags);
  
  	if (ctx->mfsymlinks)
 -		cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_MF_SYMLINKS;
-+		sbflags |= CIFS_MOUNT_MF_SYMLINKS;
++		atomic_or(CIFS_MOUNT_MF_SYMLINKS, &cifs_sb->mnt_cifs_flags);
  	else
 -		cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_MF_SYMLINKS;
-+		sbflags &= ~CIFS_MOUNT_MF_SYMLINKS;
++		atomic_andnot(CIFS_MOUNT_MF_SYMLINKS, &cifs_sb->mnt_cifs_flags);
  	if (ctx->mfsymlinks) {
  		if (ctx->sfu_emul) {
  			/*
-@@ -2062,7 +2062,7 @@ void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb)
+@@ -2062,7 +2061,7 @@ void smb3_update_mnt_flags(struct cifs_sb_info *cifs_sb)
  			cifs_dbg(VFS, "mount options mfsymlinks and sfu both enabled\n");
  		}
  	}
 -	cifs_sb->mnt_cifs_flags &= ~CIFS_MOUNT_SHUTDOWN;
-+	sbflags &= ~CIFS_MOUNT_SHUTDOWN;
++	atomic_andnot(CIFS_MOUNT_SHUTDOWN, &cifs_sb->mnt_cifs_flags);
  
--	return;
-+	atomic_set(&cifs_sb->mnt_cifs_flags, sbflags);
+ 	return;
  }
 diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index b67b316538b83..5e8d757cb3c90 100644
+index b67b316538b83..752982e3a0ece 100644
 --- a/fs/smb/client/inode.c
 +++ b/fs/smb/client/inode.c
 @@ -63,18 +63,18 @@ static void cifs_set_ops(struct inode *inode)
@@ -1186,24 +1186,33 @@ index b67b316538b83..5e8d757cb3c90 100644
  			goto skip_invalidate;
  
  		cifs_inode->netfs.zero_point = cifs_inode->netfs.remote_i_size;
-@@ -2886,12 +2886,12 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
+@@ -2830,6 +2830,7 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+ 	struct cifs_tcon *tcon = cifs_sb_master_tcon(cifs_sb);
+ 	struct inode *inode = d_inode(dentry);
++	unsigned int sbflags;
+ 	int rc;
+ 
+ 	if (unlikely(cifs_forced_shutdown(CIFS_SB(inode->i_sb))))
+@@ -2886,12 +2887,13 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
  	 * enabled, and the admin hasn't overridden them, set the ownership
  	 * to the fsuid/fsgid of the current process.
  	 */
 -	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
 -	    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
-+	if ((cifs_sb_flags(cifs_sb) & CIFS_MOUNT_MULTIUSER) &&
-+	    !(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_CIFS_ACL) &&
++	sbflags = cifs_sb_flags(cifs_sb);
++	if ((sbflags & CIFS_MOUNT_MULTIUSER) &&
++	    !(sbflags & CIFS_MOUNT_CIFS_ACL) &&
  	    !tcon->unix_ext) {
 -		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID))
-+		if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_UID))
++		if (!(sbflags & CIFS_MOUNT_OVERR_UID))
  			stat->uid = current_fsuid();
 -		if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID))
-+		if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_GID))
++		if (!(sbflags & CIFS_MOUNT_OVERR_GID))
  			stat->gid = current_fsgid();
  	}
  	return 0;
-@@ -3078,7 +3078,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
+@@ -3078,7 +3080,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
  
  	xid = get_xid();
  
@@ -1212,7 +1221,7 @@ index b67b316538b83..5e8d757cb3c90 100644
  		attrs->ia_valid |= ATTR_FORCE;
  
  	rc = setattr_prepare(&nop_mnt_idmap, direntry, attrs);
-@@ -3231,7 +3231,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3231,7 +3233,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	cifs_dbg(FYI, "setattr on file %pd attrs->ia_valid 0x%x\n",
  		 direntry, attrs->ia_valid);
  
@@ -1221,7 +1230,7 @@ index b67b316538b83..5e8d757cb3c90 100644
  		attrs->ia_valid |= ATTR_FORCE;
  
  	rc = setattr_prepare(&nop_mnt_idmap, direntry, attrs);
-@@ -3265,7 +3265,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3265,7 +3267,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	rc = 0;
  
  	if ((attrs->ia_valid & ATTR_MTIME) &&
@@ -1230,7 +1239,7 @@ index b67b316538b83..5e8d757cb3c90 100644
  		rc = cifs_get_writable_file(cifsInode, FIND_WR_ANY, &wfile);
  		if (!rc) {
  			tcon = tlink_tcon(wfile->tlink);
-@@ -3291,8 +3291,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3291,8 +3293,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	if (attrs->ia_valid & ATTR_GID)
  		gid = attrs->ia_gid;
  
@@ -1241,16 +1250,19 @@ index b67b316538b83..5e8d757cb3c90 100644
  		if (uid_valid(uid) || gid_valid(gid)) {
  			mode = NO_CHANGE_64;
  			rc = id_mode_to_cifs_acl(inode, full_path, &mode,
-@@ -3304,7 +3304,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3303,9 +3305,9 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 				goto cifs_setattr_exit;
  			}
  		}
- 	} else
+-	} else
 -	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_SET_UID))
-+	if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_SET_UID))
++	} else if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_SET_UID)) {
  		attrs->ia_valid &= ~(ATTR_UID | ATTR_GID);
++	}
  
  	/* skip mode change if it's just for clearing setuid/setgid */
-@@ -3314,8 +3314,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+ 	if (attrs->ia_valid & (ATTR_KILL_SUID|ATTR_KILL_SGID))
+@@ -3314,8 +3316,8 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  	if (attrs->ia_valid & ATTR_MODE) {
  		mode = attrs->ia_mode;
  		rc = 0;
@@ -1261,7 +1273,7 @@ index b67b316538b83..5e8d757cb3c90 100644
  		    posix) {
  			rc = id_mode_to_cifs_acl(inode, full_path, &mode,
  						INVALID_UID, INVALID_GID);
-@@ -3338,7 +3338,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3338,7 +3340,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  			dosattr = cifsInode->cifsAttrs | ATTR_READONLY;
  
  			/* fix up mode if we're not using dynperm */
@@ -1270,7 +1282,7 @@ index b67b316538b83..5e8d757cb3c90 100644
  				attrs->ia_mode = inode->i_mode & ~S_IWUGO;
  		} else if ((mode & S_IWUGO) &&
  			   (cifsInode->cifsAttrs & ATTR_READONLY)) {
-@@ -3349,7 +3349,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3349,7 +3351,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  				dosattr |= ATTR_NORMAL;
  
  			/* reset local inode permissions to normal */
@@ -1279,7 +1291,7 @@ index b67b316538b83..5e8d757cb3c90 100644
  				attrs->ia_mode &= ~(S_IALLUGO);
  				if (S_ISDIR(inode->i_mode))
  					attrs->ia_mode |=
-@@ -3358,7 +3358,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
+@@ -3358,7 +3360,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
  					attrs->ia_mode |=
  						cifs_sb->ctx->file_mode;
  			}
