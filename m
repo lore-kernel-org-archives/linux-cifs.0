@@ -1,99 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD3C5519B0;
-	Thu, 17 Sep 2026 15:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577494F3902
+	for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2026 16:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789658275; cv=none; b=OynIga36ensEY6/iRtl+apLOZWdbInw7T0GXaph46JwF8mxJ2p55eNHCpmt+7LOmGRi0l0DZGOpZ1ajZckZkrFhFUhjNB7TymIR+l7CSCTTJucJgV+j+JnrR6hucz4aPX2QTw/qGmKilSrW942NxNVHRmGE5a+Wavr5Gibas1Wk=
+	t=1789662136; cv=none; b=VRyrfO44oz3u4+NZLHgLS7AYExfGw10/GuQsjqSO7lPUB7M/1H6yAfpuusnjvpalbNVLF0sGWo9fGYYYbr7wDA9t80E4PdVIFx+lRojzkijp9C5OW4BBN7ESSeyQYrVZhq0vrmeSSgnzBFm3L2aZe1sJmle1aGOyMvptd5igp8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789658275; c=relaxed/simple;
-	bh=rvt5CIJrbHWd4sAELtIQYAu7Ai57ZGbhmp3jblOMiF4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OPdqQNbeAlR7BVRguPQivFtt4ZCB9h3bIdYiuzapuIJ+tjibqMKCKvccJ/8CV8rXyr9p/INnHE8nfpzzdpFi07hkI3p0U1+RPdT2hewi7DN6rCSTV3MMoaSZYI2ejiJnUaorgh6xQ4k5aApzEaylfzaH9tqQdXkqabuvCW4l4io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R71uWnyy; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789662136; c=relaxed/simple;
+	bh=xLcUrF0+42ya0VKrZZdaicTCP2bWIyWMuCPMhm6dw+U=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=sGxUXEqUx+dCKn5hLGbzCzPi+1Yb04/IRXMPWD9Yc423B3APinfYRuhnLEUzc2xKL5JzeDDV0uB7LTPrFZEbvY6eRhBmsVLcJsivlfnk5NuFmJlaPMb/mHxGqiqzoyaffs+TNHchyciYyHLwrzu8XdCA7X4amDHs/PsZm4aV9xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=87BEpiOe; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R71uWnyy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA0021F0089B;
-	Thu, 17 Sep 2026 15:17:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789658238;
-	bh=ZmdxHkFnLeNovaDlMjskd3RcaNWFmWcNEgKv1LFLFLc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=R71uWnyyuQkmN1/3pjxhHb0mi9GhS3rTmMlbCu5LtHvlLesdIyvOX5yW58WC1CyiI
-	 4uxOjqJ7FFSABz2LvqPbDw7IPyoxHTnzl08+AAhRN27NeQ0dTwxrohLkubV0YWqGUW
-	 thb8G7CXhdX4daEsF9Jz/i3G43zTvL8aN3Y1EcFkAPZ2Q5gyeh5OYpizQ8C/EpoQu8
-	 OuWt3k+qFuEzXwJ3UXN0oEI4l/cEtL7XTQqCCHZoe56zoZAG8vUi+CYeDrN8sxl18S
-	 6rpYltMCXT3qJNLfjvEwJ3f0Ha28eMmqiSMQ8J6z7HQhxNv7y+BcWivm9gb2gn7ala
-	 u/zcJ9MnbV0rg==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.1.y 1/3] cifs: Scripted clean up fs/smb/client/fscache.h
-Date: Thu, 17 Sep 2026 11:17:14 -0400
-Message-ID: <20260917151716.693532-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <2026091635-bolt-hunchback-845c@gregkh>
-References: <2026091635-bolt-hunchback-845c@gregkh>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="87BEpiOe"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=m9wrowE4knIImgVSXHJ2zIKBQF6p/UyK1B8OWHN7vu0=; b=87BEpiOe8Q0uoV0CGvXG55M9Xo
+	5tk44z8aPXaix+MVUv+hBNejHasqUYpGc6zLpoydMEcP+HHysp+qZgZJ9PlW6vQ8BXUa3KD3SlHfD
+	ldJbvrOUDxN6rB4uikRa/DGbvQSkG5QeDh/4l8G/4p/mLDayrE26aNacuQcj5bdVo9taMB87IISHV
+	OrzInfNVfRtAGid3fPBdGuQD/4eNhd+7Ehj2+l0ovYJ7VXqKCvD2S3bMrt/HoNv6jeE6/gB4qsKHC
+	fTMelsKVsZ6BuicDy08QaRp0AfdStqSXvwuva4/i32cm05b8ebx0Km3IgPodTXFqZFXFJhr41df6b
+	hswcedEQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1x7EsE-00000001fHb-36pN;
+	Thu, 17 Sep 2026 13:22:10 -0300
+Message-ID: <26c7e0c3802f0fca96aed145d6042cb8@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Pavel Shilovsky <piastryyy@gmail.com>
+Cc: Alexander Bokovoy <ab@samba.org>, Shyam Prasad N
+ <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, David
+ Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
+Subject: Re: [PATCH] cifs.upcall: resolve scraped ccache name explicitly
+In-Reply-To: <20260917003750.1790143-1-pc@manguebit.org>
+References: <20260917003750.1790143-1-pc@manguebit.org>
+Date: Thu, 17 Sep 2026 13:22:10 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: David Howells <dhowells@redhat.com>
+Paulo Alcantara <pc@manguebit.org> writes:
 
-[ Upstream commit bc3de356aae666de5d8b5131545be87cf7754431 ]
+> get_existing_cc() selected the credentials cache scraped from the
+> initiating process' environment by exporting it via setenv($KRB5CCNAME)
+> and then calling krb5_cc_default().
+>
+> MIT krb5 reads $KRB5CCNAME through secure_getenv(), which returns NULL
+> whenever the process runs with AT_SECURE set.  The request-key upcall
+> that spawns cifs.upcall triggers an SELinux domain transition, so on
+> systems with SELinux enforcing cifs.upcall runs with AT_SECURE=1.  The
+> setenv() is therefore silently ignored and krb5 falls back to the
+> profile default_ccache_name (KCM: on many distros).  As a result, a
+> valid TGT living in a FILE credential cache is never found, and the
+> mount fails with:
+>
+>   cifs.upcall: main: valid TGT is not present in credential cache
+>   cifs.upcall: Unable to obtain service ticket
+>
+> while the same TGT in a KCM cache (selected via the profile default,
+> not the environment) works fine.
+>
+> Resolve the scraped name directly with krb5_cc_resolve(), which takes
+> the ccache name as an argument and does not consult secure_getenv(),
+> so the FILE ccache is honored regardless of AT_SECURE.  Fall back to
+> krb5_cc_default() only when nothing was scraped.
+> ...
 
-Remove externs, correct argument names and reformat declarations.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Steve French <sfrench@samba.org>
-cc: Paulo Alcantara <pc@manguebit.org>
-cc: Enzo Matsumiya <ematsumiya@suse.de>
-cc: linux-cifs@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-kernel@vger.kernel.org
-Acked-by: Enzo Matsumiya <ematsumiya@suse.de>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Stable-dep-of: cf4d35896621 ("smb: client: fix uid/gid override in getattr with posix extensions")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/fscache.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/fs/smb/client/fscache.h b/fs/smb/client/fscache.h
-index c691b98b442a6..e89d26c6e0862 100644
---- a/fs/smb/client/fscache.h
-+++ b/fs/smb/client/fscache.h
-@@ -38,12 +38,12 @@ struct cifs_fscache_inode_coherency_data {
- /*
-  * fscache.c
-  */
--extern int cifs_fscache_get_super_cookie(struct cifs_tcon *);
--extern void cifs_fscache_release_super_cookie(struct cifs_tcon *);
-+int cifs_fscache_get_super_cookie(struct cifs_tcon *tcon);
-+void cifs_fscache_release_super_cookie(struct cifs_tcon *tcon);
- 
--extern void cifs_fscache_get_inode_cookie(struct inode *inode);
--extern void cifs_fscache_release_inode_cookie(struct inode *);
--extern void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
-+void cifs_fscache_get_inode_cookie(struct inode *inode);
-+void cifs_fscache_release_inode_cookie(struct inode *inode);
-+void cifs_fscache_unuse_inode_cookie(struct inode *inode, bool update);
- 
- static inline
- void cifs_fscache_fill_coherency(struct inode *inode,
--- 
-2.53.0
-
+Applied.
