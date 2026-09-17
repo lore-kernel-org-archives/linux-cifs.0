@@ -1,216 +1,199 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed2-f35.google.com (mail-ed2-f35.google.com [74.125.228.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9091448E0;
-	Thu, 17 Sep 2026 04:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789618993; cv=none; b=SuQUS1MI2jXi4C4L30zV7AIJoXav2AnDpgf9PubSt+ICu7xULXigIE5fX4lJfXE8RWh2h/5KX4sKTdxka3nwx2TW4V04ZUgb3UbgsyXASYYO5cgsWSclqkG7Jvc7hwS9LC5Pwj+S+YrWM0Hjhzq95zUrfe64Ju+dEK4lzbWX6Hw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789618993; c=relaxed/simple;
-	bh=QKc0k0iDIUzJMJr2+CqFXvWU+GKx/0184RIdLE9iT5s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sPetYc2YcDYBuCBssos8LZoXm5QWgm+DR/Hocv57EIZXj12V/k2VHc15oYk6b+ZFwwyNhxI63zcv3Bl8A9dsZh2bqf4h3U76MbnXK8RAffiadh1EeXM2rvyoTaHfsVffmGHpkv8IhsHMYybADrPN20x46jP4Cb0GlfTf+Emtlco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJERnEdP; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC193DA7C5
+	for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2026 07:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.99
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789628791; cv=pass; b=XbPTYsrGPODNhbGPMjI8ONccagWIlHyNkBDd2UZ4GptF8jT5psbpzgkWdoYfTcV6ekSiTZYx+tXBl/AKyYKFKs3Pv6IQkiatLIjhNS6OEqrNhM1tRG3x5Us3VQidAATgo+7oWWfT2wr5JNT41duReBg4QoLJKGHXPsMeJ7NIivg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789628791; c=relaxed/simple;
+	bh=J2uRQxDf8E+aareFzGaYlD702xZ3/doMA0NNbLNDJyE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QNP4pnqxn+Pct8UfzWkktlD249bJ0EzTAwtKYLwDI/WKcMYpkoHWCCB4FASvESwwo8XRAq691EQKC9MIqY/2CMYNBT4f7dXOgWJWXCgexz9xrQFUDjXAzo+0pbvbrkvMak3XaOYQsj+FU/1pck9dH+29/n7ByZUA2v/7PxpifQY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oppegwj3; arc=pass smtp.client-ip=74.125.228.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJERnEdP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E46771F000FF;
-	Thu, 17 Sep 2026 04:23:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789618992;
-	bh=4QY7bqwL68p6ieBMx5glR+xvm7Smu3lAInpJjIDp5hI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=aJERnEdPl4SIWULp1v4ClEmchvfbHDEp0ARzSme0b2P2jY294+2KPRTHGRUo8KC8O
-	 4FHxq6QpP56lVAFAH02aTzAvZdzhb8LbZQNj+O+khEEwhjoSz+BrgPtNpb6ytCFx+u
-	 hNhK0KCwm7WfCul8qqUXWYwRwm28goEYzJ2xueQ7aicnY2t5w5lqq73dnSo5w01T42
-	 ExGEfNFuLaWsWlJ+brcxioqwY830u1ZRdIZbUGjVVgOzVzGzzKXvdCaDX7tGFaD55r
-	 Wa4Nlu8KIe8PNDJ9THm7nc4z//p5QzPT+Hv+NNGVIV5q/80zMHpv7XQDqVBLC1s2gq
-	 fceVzIKvqQYAA==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18.y 1/2] smb: client: use atomic_t for mnt_cifs_flags
-Date: Thu, 17 Sep 2026 00:23:09 -0400
-Message-ID: <20260917042310.31062-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <2026091604-dehydrate-dribble-9957@gregkh>
-References: <2026091604-dehydrate-dribble-9957@gregkh>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oppegwj3"
+Received: by mail-ed2-f35.google.com with SMTP id 4fb4d7f45d1cf-6a985fba28bso641486a12.3
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2026 00:06:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789628788; cv=none;
+        d=google.com; s=arc-20260327;
+        b=F8bnN+F7fSjIYJ8n5v04SjpSYwnYjdcsDxkN2/sWo/EYw4+OYL2Tmajs5YbqVAaH4U
+         NRJjuocOqzX8Tmi10XLK1dT3sQ4rh9TR+osZ/yMens7sEhblCOkBcXVm8Z/ewh/slmHz
+         69jKzJO6urNnDaEwi5TQtsRAQDO1zCyOO1ooX8IUtCi4otSAl2jjXGy7hXWnPRaYOmXu
+         3RqnNn6uCI+bxhQywdlL9bnF1PGt26FIoi3t5b8vuvmXXlMR+CK37Fokxl/+LdmNWejT
+         GvNwNSAdLKRaUCmNvliQ7gN+V37fP9muzBl/xVfUo1DNkkXjcFnUz+isSa+xI3keaT8W
+         OK4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=NNxe8K44nQvoz/kViWtNNfcivqgrY0YqGszclygSN/s=;
+        fh=ZIkBjlmCUV9JilsQfeossITvxlkWwYWo9TpcUdkW+yA=;
+        b=RqafED2ctLe/XQzRyH8tapXXMT6GsEdfMSsZy1Sp9za2PmDDoC6uNReasZA9kiqqMm
+         oKQmn4qWqjp9YC4l3ZBYXTM481EvuX1bpvTgOT18M+QPeAEnXSPHlxAtA/8yUdANPFX9
+         45jE/AyGBm1I9KR2fv1SVZakUa3wFXBeJvrs14q+QkeqGgng06GZGNZTOe4aHVEILGar
+         uMRF4TTzc+n0/RD/3Slsbd4CxSrSRsZuhsGo4XFTqBwXAOao+dq7EVzfNxCNI2hJsJPj
+         VkuuzxamZB9Ps0h1FQRgnPcccT54ug3axn0zVnniKbXIfwCtQ0vl1kOT1QIm6ZPu2YMp
+         Ilfw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789628788; x=1790233588; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=NNxe8K44nQvoz/kViWtNNfcivqgrY0YqGszclygSN/s=;
+        b=Oppegwj3+jR7JzKeyMHmjJd0gjE7irPCajSdUaeTjiH3TFiUcxRSOqDD5RRtciF0bW
+         4URA0l0y+ZamhsTE3IQV4eumEGEe76AnQ9+0DGRwKFLcbCGuyC9V/U/iNl4eDoKqwfpQ
+         3YKLje6CisZIU5wXVQzwxbZFNP1mdY+CvhrTx32wkQvFEau1j4N/2EyPG0sh47gGoz45
+         BlZdHQ4L34vbOHtE5Mvjgf91R+mcWpsL18F9/eDgI9iu6Q7nbi55BrzPuAsbVlNbGbTu
+         R/LWvqzuC00vZut90Sux7VhLj0o+2NV/3hpsFiWm+Tzo5JYRHFfw8oo/Z5zTnUjabdmb
+         Fe/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789628788; x=1790233588;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=NNxe8K44nQvoz/kViWtNNfcivqgrY0YqGszclygSN/s=;
+        b=LEQCJL0AfAqJ84CKwgECrbndkBgiWJktMW2SPrR1PpmPagIJrBXy5gct0cORLzHJmV
+         gJIvbPvkzRUclpyOXBci6lbmPiabzoNlNDiEcI/Nfr48DXcB2wMAWzy4yBD+V+eOPhpL
+         jBDOknw8eosQH7YtheRG3sDRH7HUcTIFudPiDyag7+PuIJ3JJxGg9JHgv6hXI2j9ceWd
+         Q+MbWh36ZlG+vKbauyzv+NCJr9iBuTVNdqCcmmK/LEM0/tRMWJDsOC+xZ6rlvHA/0yqJ
+         GCF5hYj/YY59Duq+lxjRkPhxdOJr1MHCQjXXJ4XYc82v6KGC0eucZbu4HHXfqti9BAg7
+         tZ1w==
+X-Forwarded-Encrypted: i=1; AKwUvByh1N81umbP8HiZ1cbexVv6F13N3d6+11nVmQ/2tAFsAc/srbl68oqFe+rqJlqTowRJfEgyqq8jlv8p@vger.kernel.org
+X-Gm-Message-State: AFuF++lTWaKC2GOLXyFhMGxv/ztzgtu5S/pWn3bspQvGS27LtCiGlabZ
+	uZlBWZkI9tJHcjinMOdXDAs9mQdial75JXRDROXmZVazyEiWZQHWjXJ9w4wktTXILx1UBG4ext8
+	n85yWd0dZ0oLrp11xZ3E5TWu3tIxSEd8=
+X-Gm-Gg: AYBFou0s5VyuaSigkc66SZ1mQCYxJZBbk51faPPzEYSaMRcJXbWva4de4pIIX7W7xJW
+	JEQILMGxy8N1GAkjMosIK6tklCxW6pFswJbHwdWKl5uxhBlHVneKa25ZByWqNoeY85arVr5cDub
+	JLJhtuz/EpxwvxPvlOUBZWgOR9kBroW7dHjjOeXGT1lV+6XQ3Y9wk/3R2ePHvf6eQXOT+MPQzJ3
+	9TjYOYmV1myzQpkTCX5ZNoLE3sZ6Ex90VhHHSF5ez2iZO1IJFYQHVzEpJ+A2M6A445CTI1sj8L0
+	sbgNBtKLdNlxWOJNRNvt+yLlPicSJwJYiPkUT0Pi7vrXLKgpcI/1tw==
+X-Received: by 2002:a05:6402:2b85:b0:6aa:976:562 with SMTP id
+ 4fb4d7f45d1cf-6aa223a6ef6mr3603781a12.11.1789628787368; Thu, 17 Sep 2026
+ 00:06:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260917003750.1790143-1-pc@manguebit.org>
+In-Reply-To: <20260917003750.1790143-1-pc@manguebit.org>
+From: Shyam Prasad N <nspmangalore@gmail.com>
+Date: Thu, 17 Sep 2026 12:36:15 +0530
+X-Gm-Features: AcwNN1UOB-9ARP42Uhrun59wlBeaXtJ6Zggz9aWOQLG7syf_7WRR-0ry8OzIutU
+Message-ID: <CANT5p=qRoaxp4vzM0=GtwVgZMDKcJOO9rvJjc0HW2+5Y8cYd1g@mail.gmail.com>
+Subject: Re: [PATCH] cifs.upcall: resolve scraped ccache name explicitly
+To: Paulo Alcantara <pc@manguebit.org>
+Cc: Pavel Shilovsky <piastryyy@gmail.com>, Alexander Bokovoy <ab@samba.org>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>, 
+	David Howells <dhowells@redhat.com>, linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Paulo Alcantara <pc@manguebit.org>
+On Thu, Sep 17, 2026 at 6:27=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
+wrote:
+>
+> get_existing_cc() selected the credentials cache scraped from the
+> initiating process' environment by exporting it via setenv($KRB5CCNAME)
+> and then calling krb5_cc_default().
+>
+> MIT krb5 reads $KRB5CCNAME through secure_getenv(), which returns NULL
+> whenever the process runs with AT_SECURE set.  The request-key upcall
+> that spawns cifs.upcall triggers an SELinux domain transition, so on
+> systems with SELinux enforcing cifs.upcall runs with AT_SECURE=3D1.  The
+> setenv() is therefore silently ignored and krb5 falls back to the
+> profile default_ccache_name (KCM: on many distros).  As a result, a
+> valid TGT living in a FILE credential cache is never found, and the
+> mount fails with:
+>
+>   cifs.upcall: main: valid TGT is not present in credential cache
+>   cifs.upcall: Unable to obtain service ticket
+>
+> while the same TGT in a KCM cache (selected via the profile default,
+> not the environment) works fine.
+>
+> Resolve the scraped name directly with krb5_cc_resolve(), which takes
+> the ccache name as an argument and does not consult secure_getenv(),
+> so the FILE ccache is honored regardless of AT_SECURE.  Fall back to
+> krb5_cc_default() only when nothing was scraped.
+>
+> Reported-by: Alexander Bokovoy <ab@samba.org>
+> Fixes: ed97e4ecab4e ("cifs.upcall: allow scraping of KRB5CCNAME out of in=
+itiating task's /proc/<pid>/environ file")
+> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+> Cc: Shyam Prasad N <sprasad@microsoft.com>
+> Cc: Bharath SM <bharathsm@microsoft.com>
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: linux-cifs@vger.kernel.org
+> ---
+>  cifs.upcall.c | 32 ++++++++++++++++++++++++--------
+>  1 file changed, 24 insertions(+), 8 deletions(-)
+>
+> diff --git a/cifs.upcall.c b/cifs.upcall.c
+> index 76e88b79a760..8fdf1af710ef 100644
+> --- a/cifs.upcall.c
+> +++ b/cifs.upcall.c
+> @@ -534,15 +534,31 @@ get_existing_cc(const char *env_cachename)
+>         krb5_ccache cc;
+>         char *cachename;
+>
+> +       /*
+> +        * If we scraped a cache name out of the initiating process'
+> +        * environment, resolve it explicitly instead of exporting it via
+> +        * $KRB5CCNAME and relying on krb5_cc_default().  MIT krb5 reads
+> +        * $KRB5CCNAME through secure_getenv(), which returns NULL whenev=
+er the
+> +        * process runs with AT_SECURE set (e.g. an SELinux domain transi=
+tion on
+> +        * the request-key upcall).  In that case the setenv() is silentl=
+y
+> +        * ignored and krb5 falls back to the profile default_ccache_name=
+ (KCM:
+> +        * on many distros), so a TGT living in a FILE ccache is never fo=
+und.
+> +        * krb5_cc_resolve() takes the name directly and is not affected.
+> +        */
+>         if (env_cachename) {
+> -               if (setenv(ENV_NAME, env_cachename, 1))
+> -                       syslog(LOG_DEBUG, "%s: failed to setenv %d\n", __=
+func__, errno);
+> -       }
+> -
+> -       ret =3D krb5_cc_default(context, &cc);
+> -       if (ret) {
+> -               syslog(LOG_DEBUG, "%s: krb5_cc_default returned %d", __fu=
+nc__, ret);
+> -               return NULL;
+> +               ret =3D krb5_cc_resolve(context, env_cachename, &cc);
+> +               if (ret) {
+> +                       syslog(LOG_DEBUG, "%s: krb5_cc_resolve(%s) failed=
+: %d\n",
+> +                              __func__, env_cachename, ret);
+> +                       return NULL;
+> +               }
+> +       } else {
+> +               ret =3D krb5_cc_default(context, &cc);
+> +               if (ret) {
+> +                       syslog(LOG_DEBUG, "%s: krb5_cc_default returned %=
+d",
+> +                              __func__, ret);
+> +                       return NULL;
+> +               }
+>         }
+>
+>         ret =3D krb5_cc_get_full_name(context, cc, &cachename);
+> --
+> 2.55.0
+>
+>
+Seems like a reasonable fix. Pending testing, you can add my Acked-by.
 
-[ Upstream commit 4fc3a433c13944ee5766ec5b9bf6f1eb4d29b880 ]
-
-Use atomic_t for cifs_sb_info::mnt_cifs_flags as it's currently
-accessed locklessly and may be changed concurrently in mount/remount
-and reconnect paths.
-
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-
-[Stable dependency adaptation for 18a72975e9f35]
-
-Keep only the prerequisites needed by the forceuid/forcegid fix.  On 6.18,
-provide cifs_sb_flags as a READ_ONCE macro over the existing unsigned int
-field; do not import the tree-wide atomic_t conversion, generic CIFS_SB
-helpers, moved functions, or newer oplock/reconnect code.
-
-The target also expects the SID lookup interface introduced upstream by
-29f1005b8b4d3.  Rename and adapt the existing parse_sid implementation to
-sid_from_sd, with descriptor/offset/full-SID bounds checks, and update
-parse_sec_desc to the target's expected context.  This keeps the existing
-number of functions and preserves the stable DACL validation.  No new
-function is added, and the ownership override fix remains in the target.
-
-[ sashal: Reduced backport -- upstream 4fc3a433c1394 touches 27 file(s), this
-  backport carries 2. Not backported here:
-  fs/smb/client/cached_dir.c
-  fs/smb/client/cifsfs.c
-  fs/smb/client/cifs_fs_sb.h
-  fs/smb/client/cifs_ioctl.h
-  fs/smb/client/cifs_unicode.c
-  fs/smb/client/cifs_unicode.h
-  fs/smb/client/connect.c
-  fs/smb/client/dfs_cache.c
-  ... and 17 more
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: 18a72975e9f3 ("smb: client: honor forceuid/forcegid when mapping SIDs to uid/gid")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/cifsacl.c  | 54 ++++++++++++++++++++++++++--------------
- fs/smb/client/cifsglob.h |  3 +++
- 2 files changed, 39 insertions(+), 18 deletions(-)
-
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 92ee03cd01b39..11268d10a70ed 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1232,13 +1232,30 @@ static int set_chmod_dacl(struct smb_acl *pdacl, struct smb_acl *pndacl,
- 	return 0;
- }
- 
--static int parse_sid(struct smb_sid *psid, char *end_of_acl)
-+static int sid_from_sd(const struct smb_ntsd *pntsd, __u32 secdesclen,
-+		       __u32 sid_offset, struct smb_sid **sid)
- {
--	/* BB need to add parm so we can store the SID BB */
-+	struct smb_sid *psid;
-+	unsigned int sid_len;
- 
--	/* validate that we do not go past end of ACL - sid must be at least 8
--	   bytes long (assuming no sub-auths - e.g. the null SID */
--	if (end_of_acl < (char *)psid + 8) {
-+	if (secdesclen < sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	if (sid_offset < sizeof(struct smb_ntsd) ||
-+	    sid_offset > secdesclen - CIFS_SID_BASE_SIZE) {
-+		cifs_dbg(VFS, "Server returned illegal SID offset\n");
-+		return -EINVAL;
-+	}
-+
-+	psid = (struct smb_sid *)((char *)pntsd + sid_offset);
-+	if (psid->num_subauth > SID_MAX_SUB_AUTHORITIES) {
-+		cifs_dbg(VFS, "SID contains too many subauthorities %u\n",
-+			 psid->num_subauth);
-+		return -EINVAL;
-+	}
-+	sid_len = CIFS_SID_BASE_SIZE + psid->num_subauth * sizeof(__le32);
-+	if (sid_len > secdesclen - sid_offset) {
- 		cifs_dbg(VFS, "ACL too small to parse SID %p\n", psid);
- 		return -EINVAL;
- 	}
-@@ -1254,13 +1271,12 @@ static int parse_sid(struct smb_sid *psid, char *end_of_acl)
- 				 i, le32_to_cpu(psid->sub_auth[i]));
- 		}
- 
--		/* BB add length check to make sure that we do not have huge
--			num auths and therefore go off the end */
- 		cifs_dbg(FYI, "RID 0x%x\n",
- 			 le32_to_cpu(psid->sub_auth[psid->num_subauth-1]));
- 	}
- #endif
- 
-+	*sid = psid;
- 	return 0;
- }
- 
-@@ -1284,23 +1300,25 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 	int rc = 0;
- 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
- 	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
--	char *end_of_acl = ((char *)pntsd) + acl_len;
--	__u32 dacloffset;
-+	char *end_of_acl;
-+	__u32 dacloffset, osidoffset, gsidoffset;
- 
- 	if (pntsd == NULL)
- 		return -EIO;
-+	if (acl_len < (int)sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	end_of_acl = ((char *)pntsd) + acl_len;
- 
--	owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->osidoffset));
--	group_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->gsidoffset));
-+	osidoffset = le32_to_cpu(pntsd->osidoffset);
-+	gsidoffset = le32_to_cpu(pntsd->gsidoffset);
- 	dacloffset = le32_to_cpu(pntsd->dacloffset);
- 	cifs_dbg(NOISY, "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
--		 pntsd->revision, pntsd->type, le32_to_cpu(pntsd->osidoffset),
--		 le32_to_cpu(pntsd->gsidoffset),
-+		 pntsd->revision, pntsd->type, osidoffset, gsidoffset,
- 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
- /*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
--	rc = parse_sid(owner_sid_ptr, end_of_acl);
-+	rc = sid_from_sd(pntsd, acl_len, osidoffset, &owner_sid_ptr);
- 	if (rc) {
- 		cifs_dbg(FYI, "%s: Error %d parsing Owner SID\n", __func__, rc);
- 		return rc;
-@@ -1312,9 +1330,9 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 		return rc;
- 	}
- 
--	rc = parse_sid(group_sid_ptr, end_of_acl);
-+	rc = sid_from_sd(pntsd, acl_len, gsidoffset, &group_sid_ptr);
- 	if (rc) {
--		cifs_dbg(FYI, "%s: Error %d mapping Owner SID to gid\n",
-+		cifs_dbg(FYI, "%s: Error %d parsing Group SID\n",
- 			 __func__, rc);
- 		return rc;
- 	}
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 92a835e12eb33..fd898cab7b0f7 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1603,6 +1603,9 @@ CIFS_FILE_SB(struct file *file)
- 	return CIFS_SB(file_inode(file)->i_sb);
- }
- 
-+/* The stable tree retains unsigned int storage for the mount flags. */
-+#define cifs_sb_flags(cifs_sb) READ_ONCE((cifs_sb)->mnt_cifs_flags)
-+
- static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
- {
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
--- 
-2.53.0
-
+--=20
+Regards,
+Shyam
