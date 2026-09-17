@@ -1,216 +1,175 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27065111BE;
-	Thu, 17 Sep 2026 13:03:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789650241; cv=none; b=g5KMw6lnlnitxFSisVGgeWltfLbCAhNb2Z8shDVlDSnMHd5blmgOVhSHP52hG8PfjauHQEJC5tpRDQhgWjBKKoGWD0qU69F75n3mInJKvzXOM6pxAMCClDpZwkSg90wG+rAwZYA03Z/t8gmH1hN+BJOYlTEI8BfPgJ6yW/ld2gQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789650241; c=relaxed/simple;
-	bh=6/1H1KJvKE+jMYVj5fpw4BU1vGx1ddvCXn8hOW+KAZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X2SbE6PYqdh+6sauHKSlCmw49KM25nm0dYmuYTSHJTRrrgRIdfKj9cqG1iLPRWNKlbirh1JPlfAmQvSOTAAaUvBEqp7qLfp/ZakY6gcA8JvpDr5iS/wqZzzlDlojAvT1GSSe8kGEiyhGol6Q8MijnawdYUsodlkmAhKQqoXoSJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=en+t0+Ow; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC1C5427FC
+	for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2026 13:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.170
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789652304; cv=pass; b=oyF0ihVqWngo/H3c5Kam4Fz0CeasE4SQoWPv45G4GZ7KPbeRq/YA6tECopVAzuqQMKpCZgPv9Dwe09nrqGGFV67JvvuFNblzHKYF3tcGHV7pjP88PVi2DJGVVM/6huXl4evdrkkuDSLwwerCYil4KdswHhIOUdTDJjTrbpQPumM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789652304; c=relaxed/simple;
+	bh=QNgM/kGDeBltidJ5TEbfEpxfYTzoLMWF0KKEi/Dse7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=snzxOXeeCwpFS1EGgWBpC+7UXigbtQx9lhHNX6efaqn0ELvQsboovUVO/iLl8c09M1o6xYjFEsSTowArdCnhqwaBWOE8uO7szKdSXRqdJWL5EvzAfgounaBsG6u9G5VD++TOc4VLp6wkLTA+DUNIlQaoxdmLUnQ0bJKqdPB4eA4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pIrSUZxZ; arc=pass smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="en+t0+Ow"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAC321F00898;
-	Thu, 17 Sep 2026 13:03:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789650230;
-	bh=EO6Oy7ZsI8xjPivzeua5l32Qq3nr2jrDA+kt66F7lbI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=en+t0+Ow+xUbVduhnmABQ+byWB/lG8zRu14OAecqehuNT4cgkjN2UilAByopSPEBW
-	 n9WpjTm49timWboAlS971fT67bQf4dSW6AOJN1NXVGbF+ZfbsiTnv4Gcg5XAFyHlso
-	 kHK4uK1WtF7c3/3IPqwDMwgorR+5ueZoQmA2bPx/vMwEmMkicpgh7SL1KXGxVNieFf
-	 ByroZTb0s4ujekSSHOpB2GiSsQv5QhKjZ9bhJ2c5PjR974ykOvtDe1tEKqopDrFXnt
-	 8HfvLl6LRpsWU8E2VprYyuwwR240Quv0Z1bpEWQDI7YcPtNPFCRoe923ZLhjVYJ3nR
-	 SwbS3LeUdK7dQ==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6.y 1/2] smb: client: use atomic_t for mnt_cifs_flags
-Date: Thu, 17 Sep 2026 09:03:47 -0400
-Message-ID: <20260917130348.320328-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <2026091605-runaround-justness-9c84@gregkh>
-References: <2026091605-runaround-justness-9c84@gregkh>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pIrSUZxZ"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-86ec25cf7ecso728318b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2026 06:38:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789652292; cv=none;
+        d=google.com; s=arc-20260327;
+        b=VphJq+1OqmymFt5yX2Rh2QZVnfoL/454N+6Mz5kjnBIGYY4Yj1lNKW3sJZzk/ryJ6U
+         vzLEtYMgc545Mj7HHaAU2/xzqy54emJDCOW8VA0KisZtCPTYUG9ZqYv5ipb+H9id4hkQ
+         k5PSbRqo1GZ2D7nqBecm8PNbATMgdzO9Q7c2C04ecXVX7RU+1O0KT0h8eCKVG9zi6CwE
+         9HixuFAjtlU9w/qoLSmwagzv54mxyhfsmLL2lB1hcjxWUJRiCgWzWDGDvGr8pQI201b2
+         wTUc1LlvsuSqyx/sQ/I8uHGRGUjlO7NxKDi9VyS80b/tKpjodWcxXtvytAJPm0md3LU8
+         yHEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iuO1BQZ4V2eevpIqkFGI24nl/ujAkD0tm8XPYi2iD1M=;
+        fh=0yFdGGtjap+kcFE/oi6kygF6CFoT+TU6MOTRLM6/1Y0=;
+        b=pPeTMyFXxC3oUHeETn6XWgSyLI3GIuST8ogowT66ftAIiW3Oqoz9UAiC0Y4epeGd5u
+         9qiYP3+aKmIbVEyfoHi6HDuspei+LoWhLG0BwcF7ffZEFmEUwHiJ4z1E0uj8tGGA+e8f
+         rKR1paXILAJ2dCp5dDvbtCRZ/GKutfTyULVP9lG59dLTsUOJTWZ2qmBHcoHChQyBW5pj
+         5IZDsA5nL5FURvK49ID4uyq2TsNuaqwFGVa7OvZijb28vRnpMvT36YanMjlxzvm83hbf
+         iFKBt4Ldc8IX2kG3yaOW/PTyszaq2/m/YZv4IqZe/wZZMuAP1asi02qjzpRmUcLWZIYl
+         f2Yw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1789652292; x=1790257092; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=iuO1BQZ4V2eevpIqkFGI24nl/ujAkD0tm8XPYi2iD1M=;
+        b=pIrSUZxZcSdtIn2adyUd9JOpVISkFGg1qUjGy5JGjBzG8JYWdkHNQAN3IojHp7kMuw
+         5rJe0TbTZZULKB3Pq/03PWrAJgDa1LPXpqr8MCLCDE0uJOqUkgO91MDGWhLk7Vqvgo2K
+         Q7RGzGY+XeFjdYHdwL0hpsZod7Lsv5kT2f4lA6YxyMQh/fEr/Zx2YoG1C8pLK2pGSqoz
+         sjONTM2QL6O7wPGRNz+keRcEiXzi0zj+OsG6vTWz8lwCG+iD8HyR2+2Pnr6XTcQWeEGr
+         nBX9XMEwxPIAE89F+vhilGu9PA3T+1wc1AErBYjrlDK9uchf3ZhfXAb/Bkp+3iSfFxQ0
+         6TKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1789652292; x=1790257092;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iuO1BQZ4V2eevpIqkFGI24nl/ujAkD0tm8XPYi2iD1M=;
+        b=DKUQfRKAXeQymKEXt1SLK4l/W5qjPE/8G737o7ErNTecYXDWO4Z9P9emdQ/jpi/+T8
+         y9qTkSbmCAP23Hqutuydvx3+zIvXw0l9XekcvU20wydebru+p9IDDUwHLX/O/v/hLnGp
+         DVprzvSPTCFyfWfNS5Rox95FxZNoIZ1Ckq8d0E1g/YF5HT1f4i+GEHTzKypxGvuhAfyi
+         3diCJ65To7dRH1cihwQO4Rj6iqPHQY+GxlSBPA3Q34zvpxRtKwirZeKL6+DGOZDrs+/w
+         WjOq/XgxG3HpvHmM6HRCn9JnX9PNNy464VWqZE4duPYWDUzGkyrB2uNT7ONsWcH22vwN
+         P3ig==
+X-Forwarded-Encrypted: i=1; AKwUvBzLNZnLyeDHBmaTMI18gLDHgwTNcZuy7WrO9EE2w1GGkHvRU1dcsfD0GdWCxg0oeyhQkxG3LinVl0DA@vger.kernel.org
+X-Gm-Message-State: AFuF++lak9dmahmtJs0nM/UBnryX24+BRzqKnzrykauM6jqNEK0jxVHA
+	Tz0T9jBPmJk4uDKLAak1XGg8nzW5x57/AWTlPvx5/QV1yB+pm4y1lqbF4HH/4Unot/v29Zia29Y
+	0HMPaHq02ASnZLOm0gYZ3O734SZ4ssOU=
+X-Gm-Gg: AYBFou0IErQVDXhI38lTmzdCkSwj5dE/HfyfPR8T7kSaMz3K+WGa58DrG/hZ9FU7Fr8
+	FeR/zI6GdK9kppEoHeXW4F3VuYkRwoSt5g1Y1SwYwAvh4eNlYXakwl3EcvPVxLa8hYdaPYTTF7q
+	mT9MOCm2oQ3DbT6qfCZPRonIQCdpLkntMTkNBnrAYSpzmeWglZOjvxcT7gUYh9Oo3kCucba4PVm
+	/WSAxIYyXP+RJUvfjtw/VsypqhUeujrHzRLc+J7ZjrKANXwM7zk7fus0e3i0qTPZEPNMoUswJaj
+	CtlWKxV1KGIheHAdUT8XbrxwSuSGytVTI3a+dpPVAOYsHHm2AbIZv8d0ji3EtOWysGcmceccL4q
+	GV1S9UgczErIRoOyLchBAUY23gSfpzPVzuAsEaCMBNvz9JCjQYCdV1pw=
+X-Received: by 2002:a05:6a00:c58e:10b0:874:72b6:7dac with SMTP id
+ d2e1a72fcca58-87472b68104mr229753b3a.39.1789652291802; Thu, 17 Sep 2026
+ 06:38:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CADvbK_dHPkHjkPwu0RepYgDsHs5reHepprRHU9hDFBxQM9_RGw@mail.gmail.com>
+ <20260916234654.420056-1-kuniyu@google.com>
+In-Reply-To: <20260916234654.420056-1-kuniyu@google.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 17 Sep 2026 09:38:00 -0400
+X-Gm-Features: AcwNN1WyswquGpQo0eLBq8SospQls0DTN_D79sTSRdER_SDP9o7rXxWvgz7asJ4
+Message-ID: <CADvbK_df5X=Szsd-d8=0gndhoBSHJhnEqSh826iYUW6=Ce_xEw@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 15/15] quic: add packet parser base
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: aahringo@redhat.com, alibuda@linux.alibaba.com, 
+	andrew.gospodarek@broadcom.com, chuck.lever@oracle.com, daniel@haxx.se, 
+	davem@davemloft.net, dhowells@redhat.com, dreibh@simula.no, 
+	edumazet@google.com, hare@suse.de, hepengtao@xiaomi.com, horms@kernel.org, 
+	illiliti@protonmail.com, jbaron@akamai.com, jlayton@kernel.org, 
+	kernel-tls-handshake@lists.linux.dev, kuba@kernel.org, linkinjeon@kernel.org, 
+	linux-cifs@vger.kernel.org, mail@johnericson.me, marcelo.leitner@gmail.com, 
+	matttbe@kernel.org, mbuhl@openbsd.org, mef@scarletmail.rutgers.edu, 
+	metze@samba.org, netdev-bot+sashiko@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, paul@jakma.org, pc@manguebit.org, quic@lists.linux.dev, 
+	sd@queasysnail.net, steved@redhat.com, tfanelli@redhat.com, tom@talpey.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Paulo Alcantara <pc@manguebit.org>
+On Wed, Sep 16, 2026 at 7:46=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> From: Xin Long <lucien.xin@gmail.com>
+> Date: Wed, 16 Sep 2026 14:08:22 -0400
+> > > > +struct sock *quic_listen_sock_lookup(struct sk_buff *skb, union qu=
+ic_addr *sa,
+> > > > +                                  union quic_addr *da, struct sock=
+ *usk,
+> > > > +                                  struct quic_data *alpns)
+> > > > +{
+> > >
+> > > [ ... ]
+> > >
+> > > > +out:
+> > > > +     if (sk && sk->sk_reuseport)
+> > > > +             sk =3D reuseport_select_sock(sk, quic_addr_hash(net, =
+da), skb, 1);
+> > >
+> > > [Severity: Medium]
+> > > Should the hdr_len argument be 0 rather than 1 here?
+> > >
+> > > quic_udp_rcv() already did skb_pull(skb, sizeof(struct udphdr)) befor=
+e
+> > > quic_packet_rcv() is reached, so skb->data points at the QUIC payload=
+, and
+> > > reuseport_select_sock() documents hdr_len as how far the pointer must=
+ advance
+> > > to reach the payload.
+> > >
+> > > With a classic SO_ATTACH_REUSEPORT_CBPF program, run_bpf_filter() doe=
+s:
+> > >
+> > > net/core/sock_reuseport.c:
+> > >         if (unlikely(!pskb_may_pull(skb, hdr_len)))
+> > >                 return -EINVAL;
+> > >         ...
+> > >         pskb_pull(skb, hdr_len);
+> > >         ...
+> > >         __skb_push(skb, hdr_len);
+> > >
+> > > so the filter would see the datagram starting one byte into the QUIC =
+header:
+> > > all its offsets are shifted and the first byte (form/fixed/type bits)=
+ is
+> > > invisible, which can select the wrong socket in the reuseport group.
+> > >
+> > > [ ... ]
+> > >
+> > True:
+> >
+> > BPF programs may need to access the QUIC header, so I will pass 0 to
+> > reuseport_select_sock() to ensure the full QUIC packet is visible.
+>
+> Why do you use reuseport_select_sock() here ?
 
-[ Upstream commit 4fc3a433c13944ee5766ec5b9bf6f1eb4d29b880 ]
+Because QUIC socket supports SO_REUSEPORT and allows multiple sockets
+listening on the same addr/port/ALPNs:
 
-Use atomic_t for cifs_sb_info::mnt_cifs_flags as it's currently
-accessed locklessly and may be changed concurrently in mount/remount
-and reconnect paths.
+https://github.com/lxin/quic/blob/main/modules/net/quic/socket.c#L724
 
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
+The client Initial packet can select the listening socket based on the
+packet's source address and port, or by a BPF program that can inspect
+the QUIC packet.
 
-[Stable dependency adaptation for 18a72975e9f35]
-
-Keep only the prerequisites needed by the forceuid/forcegid fix.  On 6.18,
-provide cifs_sb_flags as a READ_ONCE macro over the existing unsigned int
-field; do not import the tree-wide atomic_t conversion, generic CIFS_SB
-helpers, moved functions, or newer oplock/reconnect code.
-
-The target also expects the SID lookup interface introduced upstream by
-29f1005b8b4d3.  Rename and adapt the existing parse_sid implementation to
-sid_from_sd, with descriptor/offset/full-SID bounds checks, and update
-parse_sec_desc to the target's expected context.  This keeps the existing
-number of functions and preserves the stable DACL validation.  No new
-function is added, and the ownership override fix remains in the target.
-
-[ sashal: Reduced backport -- upstream 4fc3a433c1394 touches 27 file(s), this
-  backport carries 2. Not backported here:
-  fs/smb/client/cached_dir.c
-  fs/smb/client/cifsfs.c
-  fs/smb/client/cifs_fs_sb.h
-  fs/smb/client/cifs_ioctl.h
-  fs/smb/client/cifs_unicode.c
-  fs/smb/client/cifs_unicode.h
-  fs/smb/client/connect.c
-  fs/smb/client/dfs_cache.c
-  ... and 17 more
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: 18a72975e9f3 ("smb: client: honor forceuid/forcegid when mapping SIDs to uid/gid")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/cifsacl.c  | 54 ++++++++++++++++++++++++++--------------
- fs/smb/client/cifsglob.h |  3 +++
- 2 files changed, 39 insertions(+), 18 deletions(-)
-
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 230b98b3a272c..af6f746f68256 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1233,13 +1233,30 @@ static int set_chmod_dacl(struct smb_acl *pdacl, struct smb_acl *pndacl,
- 	return 0;
- }
- 
--static int parse_sid(struct smb_sid *psid, char *end_of_acl)
-+static int sid_from_sd(const struct smb_ntsd *pntsd, __u32 secdesclen,
-+		       __u32 sid_offset, struct smb_sid **sid)
- {
--	/* BB need to add parm so we can store the SID BB */
-+	struct smb_sid *psid;
-+	unsigned int sid_len;
- 
--	/* validate that we do not go past end of ACL - sid must be at least 8
--	   bytes long (assuming no sub-auths - e.g. the null SID */
--	if (end_of_acl < (char *)psid + 8) {
-+	if (secdesclen < sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	if (sid_offset < sizeof(struct smb_ntsd) ||
-+	    sid_offset > secdesclen - CIFS_SID_BASE_SIZE) {
-+		cifs_dbg(VFS, "Server returned illegal SID offset\n");
-+		return -EINVAL;
-+	}
-+
-+	psid = (struct smb_sid *)((char *)pntsd + sid_offset);
-+	if (psid->num_subauth > SID_MAX_SUB_AUTHORITIES) {
-+		cifs_dbg(VFS, "SID contains too many subauthorities %u\n",
-+			 psid->num_subauth);
-+		return -EINVAL;
-+	}
-+	sid_len = CIFS_SID_BASE_SIZE + psid->num_subauth * sizeof(__le32);
-+	if (sid_len > secdesclen - sid_offset) {
- 		cifs_dbg(VFS, "ACL too small to parse SID %p\n", psid);
- 		return -EINVAL;
- 	}
-@@ -1255,13 +1272,12 @@ static int parse_sid(struct smb_sid *psid, char *end_of_acl)
- 				 i, le32_to_cpu(psid->sub_auth[i]));
- 		}
- 
--		/* BB add length check to make sure that we do not have huge
--			num auths and therefore go off the end */
- 		cifs_dbg(FYI, "RID 0x%x\n",
- 			 le32_to_cpu(psid->sub_auth[psid->num_subauth-1]));
- 	}
- #endif
- 
-+	*sid = psid;
- 	return 0;
- }
- 
-@@ -1285,23 +1301,25 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 	int rc = 0;
- 	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
- 	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
--	char *end_of_acl = ((char *)pntsd) + acl_len;
--	__u32 dacloffset;
-+	char *end_of_acl;
-+	__u32 dacloffset, osidoffset, gsidoffset;
- 
- 	if (pntsd == NULL)
- 		return -EIO;
-+	if (acl_len < (int)sizeof(struct smb_ntsd)) {
-+		cifs_dbg(VFS, "ACL too small to parse security descriptor\n");
-+		return -EINVAL;
-+	}
-+	end_of_acl = ((char *)pntsd) + acl_len;
- 
--	owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->osidoffset));
--	group_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->gsidoffset));
-+	osidoffset = le32_to_cpu(pntsd->osidoffset);
-+	gsidoffset = le32_to_cpu(pntsd->gsidoffset);
- 	dacloffset = le32_to_cpu(pntsd->dacloffset);
- 	cifs_dbg(NOISY, "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
--		 pntsd->revision, pntsd->type, le32_to_cpu(pntsd->osidoffset),
--		 le32_to_cpu(pntsd->gsidoffset),
-+		 pntsd->revision, pntsd->type, osidoffset, gsidoffset,
- 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
- /*	cifs_dump_mem("owner_sid: ", owner_sid_ptr, 64); */
--	rc = parse_sid(owner_sid_ptr, end_of_acl);
-+	rc = sid_from_sd(pntsd, acl_len, osidoffset, &owner_sid_ptr);
- 	if (rc) {
- 		cifs_dbg(FYI, "%s: Error %d parsing Owner SID\n", __func__, rc);
- 		return rc;
-@@ -1313,9 +1331,9 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 		return rc;
- 	}
- 
--	rc = parse_sid(group_sid_ptr, end_of_acl);
-+	rc = sid_from_sd(pntsd, acl_len, gsidoffset, &group_sid_ptr);
- 	if (rc) {
--		cifs_dbg(FYI, "%s: Error %d mapping Owner SID to gid\n",
-+		cifs_dbg(FYI, "%s: Error %d parsing Group SID\n",
- 			 __func__, rc);
- 		return rc;
- 	}
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index a4e0618c58efc..de86aaeb972b6 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1603,6 +1603,9 @@ CIFS_FILE_SB(struct file *file)
- 	return CIFS_SB(file_inode(file)->i_sb);
- }
- 
-+/* The stable tree retains unsigned int storage for the mount flags. */
-+#define cifs_sb_flags(cifs_sb) READ_ONCE((cifs_sb)->mnt_cifs_flags)
-+
- static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
- {
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
--- 
-2.53.0
-
+Thanks.
