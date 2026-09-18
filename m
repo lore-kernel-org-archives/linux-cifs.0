@@ -1,133 +1,185 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f42.google.com (mail-pz2-f42.google.com [74.125.228.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B52C3A874C
-	for <linux-cifs@vger.kernel.org>; Fri, 18 Sep 2026 01:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789696336; cv=none; b=KOfXjx8XxGeK8sdR8SAogEmozKbmhhbw8K+JZVsWws9JPdZk8RlTWqZY1OILfK3wDLfAarbiX+FjOCvTJa5j/pl8BzRmME7T6OVgt3VZiQnDd4b8nykJ2VF9zcdXKYJCeK92s78PYTqhNRQiUUvnXoy0cEHbdG0etraxE+Iss+A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789696336; c=relaxed/simple;
-	bh=EH8CfcHsQa5i7e0wbGVp9WWRcntCMVYyE/AUyK//3Pg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QFSghVguZkfl2iFUc8LvLHiVDYlBr8Q77ZsiFmyxCRZj2DtPbWlme0ySP1UGoAmHAxB6mLsdA6O8mEZY2h9bAZm4tDLzhkaNh4+RwEqAKPh6nJaimasBVlOApqce0BHgLi0x5jSpWXHlhefWPOrvwPNWLDopw5YZFSjlxiFskL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z3AHiDoP; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=QQosLLP8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BB151FCA9
+	for <linux-cifs@vger.kernel.org>; Fri, 18 Sep 2026 19:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789761084; cv=pass; b=YedbVTitgW/JFEeVbZF9azLh1O69iLEuxEnWdl70BCR7zgZEdVMIku2n6W6rxoK20ErJ/XnDQN1Bs7Xp4I807e6BZ2X0qI/vS4ZbLaeFCSyr4dmiUAF13Kr+tlbGZfgYcd+s7Pk3yBBWyV2Nk72GOM/M8bpt93mOJsnCovNWCKg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789761084; c=relaxed/simple;
+	bh=y/292QxEdUMf5pPsOfQZfieYF0PKSz2Ezz35GxIZDCw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cEBHs0BqYvEB0Ch2Cw8Gu2kRx7R7wo5KVhRXCamOgS3hin2u44YMYEAUPZ2dLV5Db6kw92D5QrtsIpor+KICVtMKk9chK5SASNmgmWAwFqwfJjW6MpxEPqMf64llPl+i7EfZczBW/UDuRY5VRAhQsuItfLAgUPidGQ8ztIsmLPg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lc2AWPgg; arc=pass smtp.client-ip=74.125.228.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3AHiDoP";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQosLLP8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789696328;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QRT56u7oa89lwXHln4d8jjC746ec/UQz4MnDVQXsKhk=;
-	b=Z3AHiDoPvgcrbhYmfdW2+0kNdQOHDZ1sndhVsyCen2gu8Bi3xNyYsw+k+fN3tsdQFaKtZT
-	e1XS1Rs2BW8vYb+ZzSSfHQLU+yjSKrGDn7c6BANlhbyOwsuVHYSoYEo8lMcgmlaIwOV8aO
-	DIxSi9nd/Q3Pckr7pet4FCNCGiyI2rM=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-42-dMwK7gOpPaOIs9JIbwYKXg-1; Thu, 17 Sep 2026 21:52:07 -0400
-X-MC-Unique: dMwK7gOpPaOIs9JIbwYKXg-1
-X-Mimecast-MFC-AGG-ID: dMwK7gOpPaOIs9JIbwYKXg_1789696326
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-9393ac4961fso32483685a.2
-        for <linux-cifs@vger.kernel.org>; Thu, 17 Sep 2026 18:52:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lc2AWPgg"
+Received: by mail-pz2-f42.google.com with SMTP id d2e1a72fcca58-86efece610cso1000965b3a.0
+        for <linux-cifs@vger.kernel.org>; Fri, 18 Sep 2026 12:51:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1789761082; cv=none;
+        d=google.com; s=arc-20260327;
+        b=eIh9L0H9euIQVC/DW0L6J6ZhFWHkSJ8yq7mUAdu72fpm7x6w17XqXM13a4mcN70bCS
+         ZqIJ9r59/GH/7ev63VXW/FLiNkWs2ALESSZJaKfHDeB56wRg8ULZ+dX+qugpyQF8P/4L
+         /dd01EeTX0HjXTXOVpkD8FnTstI0wNPtlYvef/oJrzS2wopQz5x7u1wFzILOKWRC1Z5D
+         +Mwtxs0zIswwRbak6qrv1y1V/DXvdq1KX2ciY2hCxlyvY+73aSsCgryzZUaNJmuLb7NG
+         ydrp0SQxd7lEb1Syx/tE70VyLX4z0rSn3NrFt/F9awrLdi7zTSOofbdLINIidDQnZt8K
+         4Pdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=87V+Fh4sb0y1GssnVq8tqPVBCLJOUuiDb7vS0kmG6PY=;
+        fh=wlmpV3DqwHi1CyfCDzeBZGyg6sYfcfOCPRIG5nf0zJ0=;
+        b=NKHk0fSTuVMsnZhRhUNWbCqlpClJec1WAidnNiD5ogG2vJM09stLOv3W1qQnSJ2jHU
+         3WnLYdVgaj8PeEJAL/VYNf0yITp0RiJC4M0/qhUF6kwiVoVuuHcB+2o3Ig3eFUxspwZp
+         E7OCrPIqRs/X3p+5lt1z/XEBJLEhzVJiZrxolYG2Enop1tK5ya2dlqFoM35KgG+McvhQ
+         23SwllPzj9fh1YzotWcoEXmwOMu7EgeIIyJc0qJSRjrt+PndFVHOju1gHR1x+Yh8cQNv
+         MJTtW8OGuLY+/jsZEJYxzbAhiifBRvhUbusDlRTkAeKD5Ps8Kjp1YdbwGEBvxzbTXa6L
+         Kofw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1789696326; x=1790301126; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=QRT56u7oa89lwXHln4d8jjC746ec/UQz4MnDVQXsKhk=;
-        b=QQosLLP86WGIyAtFhUKJmw+Kqbm7OqztjTYPxCqHvpY+a1nbQjJHnT9KbYls032AoJ
-         rOVT0gCEdukwmuQAHdt1kw//yQB/cK/88Mn5Whr24bRq/P1jI5cv6KHnEBgiA0rqlESQ
-         eFqa2doVOqxB1zYKk3LmuQktvpjfkIljKFp51DQA+OYhLTMtyCvvI5RR8b6wad5fOBNK
-         FbRiC+N6rstLpCGwBASWwce4Q0Lk0JaM7Ha/Du+N43hDAqqwr72ypZ5DH6p3Lk9vPbzS
-         74AT8V0U54Sp5uU6NzuY6u0ooPBu6ouvQL6Sp70oounoqxGj68n9y+1m3iB6sll6LlVm
-         sW/A==
+        d=gmail.com; s=20251104; t=1789761082; x=1790365882; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=87V+Fh4sb0y1GssnVq8tqPVBCLJOUuiDb7vS0kmG6PY=;
+        b=Lc2AWPggj1t+NG78OaGgJrUMRVniORVrZ9OmckywK411wMJyp2gJv9IAcSiiekjKY6
+         aCW2rzSY67m7ituBph+TZ4s46cUAZALx+GDAQGQ0x4KXCMRwKR5vEam2oGnwi6hBknh8
+         OVzJhMnMMRhw5nOv73VGjKnFaJ9efTiZzCeRo9WGhPqBZFIUMegZJeQaAXuCCSE6qs20
+         ri8EH1f8YKkC+vK3I3IPkU8vrSyVBYe/VX7iPrYm4pDtiXms0TMQgoDmjTvYGt51fuBF
+         f8iRJjLLLKN1AeLsNCg1+v/KALt9CQ4QAsz9nLWhyBAWEUagVUxPqg9v51Jzdivn9Gj3
+         J8EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789696326; x=1790301126;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=QRT56u7oa89lwXHln4d8jjC746ec/UQz4MnDVQXsKhk=;
-        b=DPPZk/Pd6vf1YrANs8AEK280x988hLGTRVVSEG6kjLDSdI3Zz7lc2CFcrstTLLJm3L
-         9hYJ+uVOMimHOGq8SjL3AyK7XzogBp0L5ttJ2fx1TUe4Zx+z68jmayXuYXdqg6Pisdj1
-         UXTXc/OW+zYc4ndgx+2TC5J3VcDqpSUgPTdL36YU2zDrONpMLaNHeFSDEht0BKSw+JrN
-         FsivJjvl1IAt4wXRap579lb9POxtF9jWXXykUkNNZFdM+YeK/cqE1rgQ6TSR0oGNWABQ
-         AYCzCuHBLJjC1Iu8qZNWFF/umXu9EV7UTT2mm0bPq+TUBopbZoYWazhz3E4A47bm1ifS
-         AThQ==
-X-Gm-Message-State: AFuF++n5Q0K/3imBIRTJveb9eL28xdmtwum7JTqzFoIsrzsokkROX5Sc
-	kz4fETyxdCWH7ayX98iq+lq3dACK4dwbElhzMO+TDNnHrVpHnhYeF9ZC54LEHxIAOaZisNcTg3M
-	3wMgNkBC745JXIuDtt6B2zxd7KZABOqA8ZymCxIuAGlyOp9S9P+l9yv5XrL5J9kA=
-X-Gm-Gg: AYBFou2oOPkPGNDsBxXKVHVzWv35fX1z0x2xHCnTlIZjFsMXZC72iUvV9qMPpUzD0vS
-	45fx//HIvGruN5EQuvdksUuExUlJsW+90xxIfMikS37Vv99KjBW8lBMOkAg8lwW1255Pnq5Bw42
-	1O/3SXp6nKnoA1g8iiHDNtf3LFmgyl768tE7aTvBE1brpVRnMVlBwulkdabx/Mj91TCO/rcvDqP
-	OrC1qaCAH/mqqETRiJhiL2op4PyoSo86dl2NydYJur9Obw1y9VWKUH4IvjmNn57s9AsTZJ5pS+y
-	ujhiP3cnB1wvolDAd0oRFIpMu0u7Nti9NhNbmmI2ig7lKDeEVpIjvNg+NHUeD6xtXM5eUFCI7Zi
-	EKQJCHa6thjMOnadnVgWKlV7lxnpI6h2FFwouOEvV
-X-Received: by 2002:a05:620a:f10:b0:93a:2e8:5af1 with SMTP id af79cd13be357-93bdc9d5537mr128367185a.46.1789696326341;
-        Thu, 17 Sep 2026 18:52:06 -0700 (PDT)
-X-Received: by 2002:a05:620a:f10:b0:93a:2e8:5af1 with SMTP id af79cd13be357-93bdc9d5537mr128365385a.46.1789696325917;
-        Thu, 17 Sep 2026 18:52:05 -0700 (PDT)
-Received: from [172.16.0.69] (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93be0cc8ae4sm16695385a.2.2026.09.17.18.52.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Sep 2026 18:52:04 -0700 (PDT)
-Message-ID: <c2dd4bc7-413e-4ebb-b94e-2c61e3fcee17@redhat.com>
-Date: Thu, 17 Sep 2026 20:52:02 -0500
+        d=1e100.net; s=20260707; t=1789761082; x=1790365882;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=87V+Fh4sb0y1GssnVq8tqPVBCLJOUuiDb7vS0kmG6PY=;
+        b=XFJIfjFGOszEN8EogmYIhoZNf2qlGl7TUVMsPja3xpSd1oBV68iVprh48B8MGqHLfq
+         6rGbP1xxZIzFCKQix9G0GajtpNQ3DWR2AG36axwQxlQHVCJ8bG+wzBZorO+MMgsn3G5a
+         q/X00oPQ9BLzOOL88BLgPmamgdz0SdnXpMkBnC1r4FGseQI73sn3qgHiGBJ+pghf3S+e
+         khcns/OFUuqlYFyD1aLCm/ThXlAqqOimbq7YdI/jJ/2Kuwh46+/Z13evG44z61FBm3cW
+         9/1utPvo0ivGoRbn9f08ZmBlNpvl5X0wX+fBhRsilTZftT6SmkX56hnOKjMJ1xZt6x4b
+         8FNA==
+X-Forwarded-Encrypted: i=1; AKwUvBxI8GCoDpWzwZ8qeFj8u8//KhGTKAE93uWADmFMbNEyijhV7bcSekK9kYoIyqRsbpYy8kih3C8fGCTj@vger.kernel.org
+X-Gm-Message-State: AFuF++lytKSREQpR3FpeoH6ylLAi2oWVIgL++zlXjPPh/YBoG1Gz3bMq
+	8QyPzQP5nrdaaEAcoBlt2i0jrLtBbf29tm5n3TwUV+J09MSjtkfa4f0glhjvAZgGB9yTAMF4l9u
+	A3Uw/KMAb2KMmKvwGCm7ZZLfJh/sA6G8=
+X-Gm-Gg: AYBFou3J4alEQwyeis6zlGbQGR/vi7+OmQZSNupPmO6uRYMJCsKtOTxAbud/8QWm7N/
+	wg/uN+fKPKHhaKla8qA8ZGOrYClU1GzLUKWa8hvkvKFGkeQjZSn3FQqZ8KYBPMbFxyKUhoTvwV2
+	SApmNK01pUCWFDBwcNpqyP9o8ZnGz+lLCkbLx6xYej42/P3/zqpzde4fi8XuVEmYq7/wWlVxykT
+	fi8oVOSrDAZvOu/XJ671cmjITry0H8GmhcagDRLpZkmqjuVs+nUoaU60iiAV9138Fvds07AqEu8
+	xxjLhmdKd+/s81SCWG2/EL1PxHuOERYepBcp9ReevhLvnkifVw97bGT5xYZ0PcqGxfsxejCQHbk
+	FxfdTjwX3YA+fOE5Mp74Gq9g0b/cJE5MfBvLKUxnxPqgAUL0aUdbsD39N
+X-Received: by 2002:a05:6a00:4185:b0:86b:b308:b926 with SMTP id
+ d2e1a72fcca58-874dcbed261mr7094177b3a.14.1789761082116; Fri, 18 Sep 2026
+ 12:51:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: sorenson@redhat.com
-Subject: Re: [PATCH] smb: client: fix potential use-after-free with
- TCP_Server_Info->hostname
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, stable@vger.kernel.org
-References: <20260918003327.2539470-1-sorenson@redhat.com>
- <CAKYAXd9UW34G21Xr6kUArCGsKUQZxz7ttkuCcdE9tVgyXNWTNA@mail.gmail.com>
-Content-Language: en-US
-From: Frank Sorenson <sorenson@redhat.com>
-In-Reply-To: <CAKYAXd9UW34G21Xr6kUArCGsKUQZxz7ttkuCcdE9tVgyXNWTNA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CADvbK_dHPkHjkPwu0RepYgDsHs5reHepprRHU9hDFBxQM9_RGw@mail.gmail.com>
+ <20260916234654.420056-1-kuniyu@google.com> <CADvbK_df5X=Szsd-d8=0gndhoBSHJhnEqSh826iYUW6=Ce_xEw@mail.gmail.com>
+ <CAAVpQUCRcBQOS4H5zJBOoYeCgsQBiGyu8gjhXaocDXDw9jqTOg@mail.gmail.com>
+In-Reply-To: <CAAVpQUCRcBQOS4H5zJBOoYeCgsQBiGyu8gjhXaocDXDw9jqTOg@mail.gmail.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 18 Sep 2026 15:51:09 -0400
+X-Gm-Features: AcwNN1VIcCElFEGPge_VRMPC4oISQAbf6IB5C7NCKiJGMnhf9LEZN0g8RJucO_Q
+Message-ID: <CADvbK_cweNjHtX-m=Ba5BT3g3aHhJ7se5TqaW44OXicONW6oYQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v15 15/15] quic: add packet parser base
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: aahringo@redhat.com, alibuda@linux.alibaba.com, 
+	andrew.gospodarek@broadcom.com, chuck.lever@oracle.com, daniel@haxx.se, 
+	davem@davemloft.net, dhowells@redhat.com, dreibh@simula.no, 
+	edumazet@google.com, hare@suse.de, hepengtao@xiaomi.com, horms@kernel.org, 
+	illiliti@protonmail.com, jbaron@akamai.com, jlayton@kernel.org, 
+	kernel-tls-handshake@lists.linux.dev, kuba@kernel.org, linkinjeon@kernel.org, 
+	linux-cifs@vger.kernel.org, mail@johnericson.me, marcelo.leitner@gmail.com, 
+	matttbe@kernel.org, mbuhl@openbsd.org, mef@scarletmail.rutgers.edu, 
+	metze@samba.org, netdev-bot+sashiko@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, paul@jakma.org, pc@manguebit.org, quic@lists.linux.dev, 
+	sd@queasysnail.net, steved@redhat.com, tfanelli@redhat.com, tom@talpey.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 9/17/26 8:47 PM, Namjae Jeon wrote:
->> diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
->> index dea05aeb53a1..bb30cfa156aa 100644
->> --- a/fs/smb/client/smb2pdu.c
->> +++ b/fs/smb/client/smb2pdu.c
->> @@ -173,9 +173,8 @@ cifs_chan_skip_or_disable(struct cifs_ses *ses,
->>          unsigned int chan_index;
->>
->>          if (SERVER_IS_CHAN(server)) {
->> -               cifs_dbg(VFS,
->> -                       "server %s does not support multichannel anymore. Skip secondary channel\n",
->> -                        ses->server->hostname);
->> +               cifs_server_dbg(VFS,
->> +                               "server does not support multichannel anymore. Skip secondary channel\n");
-> Since SERVER_IS_CHAN(server) means that server is a secondary channel,
-> Is it intentional that this now logs the secondary hostname instead of
-> the primary hostname?
-
-No, not intentional... I missed that server != ses->server at this
-point, so the patch is wrong.
-
-Frank
-
--- 
-Frank Sorenson
-sorenson@redhat.com
-Principal Software Maintenance Engineer, filesystems
-Red Hat
-
+On Thu, Sep 17, 2026 at 3:06=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> On Thu, Sep 17, 2026 at 6:38=E2=80=AFAM Xin Long <lucien.xin@gmail.com> w=
+rote:
+> >
+> > On Wed, Sep 16, 2026 at 7:46=E2=80=AFPM Kuniyuki Iwashima <kuniyu@googl=
+e.com> wrote:
+> > >
+> > > From: Xin Long <lucien.xin@gmail.com>
+> > > Date: Wed, 16 Sep 2026 14:08:22 -0400
+> > > > > > +struct sock *quic_listen_sock_lookup(struct sk_buff *skb, unio=
+n quic_addr *sa,
+> > > > > > +                                  union quic_addr *da, struct =
+sock *usk,
+> > > > > > +                                  struct quic_data *alpns)
+> > > > > > +{
+> > > > >
+> > > > > [ ... ]
+> > > > >
+> > > > > > +out:
+> > > > > > +     if (sk && sk->sk_reuseport)
+> > > > > > +             sk =3D reuseport_select_sock(sk, quic_addr_hash(n=
+et, da), skb, 1);
+> > > > >
+> > > > > [Severity: Medium]
+> > > > > Should the hdr_len argument be 0 rather than 1 here?
+> > > > >
+> > > > > quic_udp_rcv() already did skb_pull(skb, sizeof(struct udphdr)) b=
+efore
+> > > > > quic_packet_rcv() is reached, so skb->data points at the QUIC pay=
+load, and
+> > > > > reuseport_select_sock() documents hdr_len as how far the pointer =
+must advance
+> > > > > to reach the payload.
+> > > > >
+> > > > > With a classic SO_ATTACH_REUSEPORT_CBPF program, run_bpf_filter()=
+ does:
+> > > > >
+> > > > > net/core/sock_reuseport.c:
+> > > > >         if (unlikely(!pskb_may_pull(skb, hdr_len)))
+> > > > >                 return -EINVAL;
+> > > > >         ...
+> > > > >         pskb_pull(skb, hdr_len);
+> > > > >         ...
+> > > > >         __skb_push(skb, hdr_len);
+> > > > >
+> > > > > so the filter would see the datagram starting one byte into the Q=
+UIC header:
+> > > > > all its offsets are shifted and the first byte (form/fixed/type b=
+its) is
+> > > > > invisible, which can select the wrong socket in the reuseport gro=
+up.
+> > > > >
+> > > > > [ ... ]
+> > > > >
+> > > > True:
+> > > >
+> > > > BPF programs may need to access the QUIC header, so I will pass 0 t=
+o
+> > > > reuseport_select_sock() to ensure the full QUIC packet is visible.
+> > >
+> > > Why do you use reuseport_select_sock() here ?
+> >
+> > Because QUIC socket supports SO_REUSEPORT and allows multiple sockets
+> > listening on the same addr/port/ALPNs:
+> >
+> > https://github.com/lxin/quic/blob/main/modules/net/quic/socket.c#L724
+>
+> Okay, I was wondering how it was supposed to work without
+> reuseport_add_sock() etc.
+>
+> reuseport_select_sock() should be moved to a later patch.
+>
+I'll try. Thanks.
