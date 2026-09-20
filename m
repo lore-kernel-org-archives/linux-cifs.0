@@ -1,42 +1,46 @@
-Received: from mta1.migadu.com (out-156.mta1.migadu.com [95.215.58.156])
+Received: from mta0.migadu.com (out-104.mta0.migadu.com [91.218.175.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F0043D7D74
-	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 05:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879E63D566F
+	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 05:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789883826; cv=none; b=bUIz4uuKG1s/idQdkTKSrIsDW6NxpwR5M/wTXFA30/ULv+EtxIYHM0kLNRtfdqMOLpw892mvRdfsyww8iPLyEh9GhMNRolDDt/B2jB8kAijLXC2fwRNnA8c6+O+Ci+UDMQ82L9nJklGaNK23OAQVPOp6l9kSYfE92dmFtYZyv3I=
+	t=1789883827; cv=none; b=NWBa82ez1o9jddhcrTQzt8ZwX5g9W95SjHk0ULho1ygYPwrqTl7lZtwoMP1X4WZYgVxSFejW3kyx89bQqMKMWNklZo6qvDOL+9Od27ILTE4evMy+poH5Mx7sGxPpKSCKXLpUhGyodwDagokqE9yDWIjcDbrH05u/UjlS3767LLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789883826; c=relaxed/simple;
-	bh=qNSjSPJ8+/TRJ5drmhcR2+QZn0GaqooROE1QKibCd4I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z7xTJ4RZkODc4jtPev+O2/laxeZ6EWZ+sPXs4zc2ClLwi/h2eqJWlkgmpoDHU+fUsEhCyfZWuJb+xmMmp13tZK7pVuFdIxDMsFlvsS7A/iRYNqcr+0puaq13NWU8l8M55U76DNu/fA5C5MkiDo+owtFsqd4WA4TeiCd5W66cceE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Zci3L5c4; arc=none smtp.client-ip=95.215.58.156
+	s=arc-20240116; t=1789883827; c=relaxed/simple;
+	bh=hxKBXLMLld51nhr9cfCd0QX+wEaDXuckrczQ/YRkZeM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WLfqQPFN3xUDBqTjSlHwwYkBJG6Xevh/ATGNBHxo7El9fyM4DA1K3/nasL/Pp5fj3+tMC5N3AJo4pT0Et/6/aT1f/orG+QgH6ukcjQ9FZGZKvA2L22qU/XBGXrS4uQOFy8F1gejy1URMsxrZKGaWBul1vQwVmBpqcL6B6s24gEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FLqxIr+/; arc=none smtp.client-ip=91.218.175.104
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Zci3L5c4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FLqxIr+/"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=qNSjSPJ8+/TRJ5drmhcR2+QZn0GaqooROE1QKibCd4I=;
+DKIM-Signature: a=rsa-sha256; bh=hxKBXLMLld51nhr9cfCd0QX+wEaDXuckrczQ/YRkZeM=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789883819; v=1; x=1790488619;
- b=Zci3L5c4tBCT6TFsNvKvP8Jph+r9GsVycxaHxsRCtFXKAbUN0b20LWu7mwEBhC4Yc8oQUse+
- ErQWD+r5aVKDsRQLE9Vn3JD8rxsAZzGPYkLtyxE9jCuENMItg+m0gVlSMHw125AT21yuQXwJB86
- +DKzeHVUNgY6gMevCjy49jw0=
+ t=1789883822; v=1; x=1790488622;
+ b=FLqxIr+/RlViU43zpDUOwnmW90jxYoJgMWewNvYiwxYj3gIZselCGr1U9FSLdmhO2slC+sFK
+ 0omMXoJuoRRrEELdM773Y7IljTo4wkAXYBsZpZUfChy5sHhV8GLWbl/UP0LcO2DHNQjoVMmv+G/
+ Kker/MhFOE8tv0bu6/TjyHSY=
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 484b70df6fd80013;
-	Sun, 20 Sep 2026 05:56:59 +0000
-X-Mizu-Trace-ID: 484b70df6fd80013
+Received: by smtp.migadu.com with ESMTPS id ae84987a000af740;
+	Sun, 20 Sep 2026 05:57:02 +0000
+X-Mizu-Trace-ID: ae84987a000af740
 X-Migadu-Flow: FLOW_OUT
 From: ZhangGuoDong <zhang.guodong@linux.dev>
 To: linkinjeon@kernel.org,
 	pc@manguebit.org
 Cc: linux-cifs@vger.kernel.org,
+	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 0/3] smb: update POSIX extension specification references
-Date: Sun, 20 Sep 2026 13:56:50 +0800
-Message-ID: <20260920055653.114794-1-zhang.guodong@linux.dev>
+Subject: [PATCH 1/3] smb/server: update POSIX extension specification references
+Date: Sun, 20 Sep 2026 13:56:51 +0800
+Message-ID: <20260920055653.114794-2-zhang.guodong@linux.dev>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260920055653.114794-1-zhang.guodong@linux.dev>
+References: <20260920055653.114794-1-zhang.guodong@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -45,18 +49,66 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-ZhangGuoDong (3):
-  smb/server: update POSIX extension specification references
-  smb/client: update POSIX extension specification references
-  smb/common: update POSIX extension specification references
+The POSIX extension specifications have now been published:
+https://smb3posix.org/
 
- fs/smb/client/smb2pdu.h | 10 +++++++---
- fs/smb/common/fscc.h    |  3 +--
+Suggested-by: Paulo Alcantara <pc@manguebit.org>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+---
  fs/smb/server/smb2pdu.h | 16 +++++++---------
- 3 files changed, 15 insertions(+), 14 deletions(-)
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index 95c89087553b..40d61745ef41 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -156,8 +156,7 @@ struct create_durable_rsp {
+ } __packed;
+ 
+ /*
+- * See POSIX-SMB2 2.2.14.2.16
+- * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/smb3_posix_extensions.md
++ * See POSIX-SMB2 2.1.3.2.1
+  */
+ struct create_posix_rsp {
+ 	struct create_context_hdr ccontext;
+@@ -349,6 +348,7 @@ struct create_sd_buf_req {
+ 	struct smb_ntsd ntsd;
+ } __packed;
+ 
++/* See POSIX-FSCC 2.2.1 */
+ struct smb2_posix_info {
+ 	__le32 NextEntryOffset;
+ 	__u32 Ignored;
+@@ -362,20 +362,18 @@ struct smb2_posix_info {
+ 	__le64 Inode;
+ 	__le32 DeviceId;
+ 	__le32 Zero;
+-	/* beginning of POSIX Create Context Response */
++	/*
++	 * Beginning of POSIX Create Context Response
++	 * See POSIX-SMB2 2.1.3.2.1
++	 */
+ 	__le32 HardLinks;
+ 	__le32 ReparseTag;
+ 	__le32 Mode;
+ 	/* SidBuffer contain two sids (UNIX user sid(16), UNIX group sid(16)) */
+ 	u8 SidBuffer[32];
++	/* End of POSIX Create Context Response */
+ 	__le32 name_len;
+ 	u8 name[];
+-	/*
+-	 * var sized owner SID
+-	 * var sized group SID
+-	 * le32 filenamelength
+-	 * u8  filename[]
+-	 */
+ } __packed;
+ 
+ /* functions */
 -- 
 2.55.0
 
