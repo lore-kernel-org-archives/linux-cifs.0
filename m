@@ -1,80 +1,69 @@
-Received: from mta0.migadu.com (out-109.mta0.migadu.com [91.218.175.109])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D06A3D9531
-	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 05:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.109
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4510E2EEE79
+	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 13:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789883832; cv=none; b=uxKjJY1HgicgNoX/YjZkfGYjKrufghweOZohs52f06T5qkkFeNqyuRqMr4oLtBNBwk/042W+hzEIsKJk+UPznBU85TxLG+GMTKBZbnwNRga+lu7WZ8V0aFb3uyN3IbrWupFNA3wLyeXhkK15l07M5cUBGFARn8fs/YQ9wMpbaig=
+	t=1789912660; cv=none; b=p2cX8UbpZzgW1j1a3ctT6nHbm/cYB6jIlj5nk9c+02H9nP+ZBbaxFTLEu7QT1SWs0fVaZ9EKx5VMD1IQymy4RPzFQYOgTzBY0DMvZsy4Ap8KM8TFEMbwyl91v2V73ehpXGTzPK/anEWnqtDybcpsuGiS7aIyHuH1hUMG30YplnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789883832; c=relaxed/simple;
-	bh=LLDIeb/IRRHXpqQAcDqvh2JtuFdpd2KAw4EIlBAEiv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EbtBMaHEnaP6Oiq8x1frdADChTqbUbqnBMadcKwAPMnW6dP+CF9UAuBWFnNyYtLtITPBNacIOPGkqOJNXo4I6qak9iPLprZ9EdLtKISj4J/Ykm8qTOzKVIC6LHsRjMjtUDJ6DDR+PBTzCpuk6FJFhUe9ftB7x9ylWgKWvhEw7sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NPIQIPoV; arc=none smtp.client-ip=91.218.175.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1789912660; c=relaxed/simple;
+	bh=rMzGvmMSYw0s2I26d93/OwtHHDlpc0xslmehj8MrxNU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AgpSEWcUCh4S7rYCiKpYFuF726A1tAAXQwryLGyxSvNkmZD8EBNWRsaSe0whIw+eGo8TOKVdjLh3KDqzDed8K3czFfloBzWmnNhrvIW2jDiolRJqCXdqZitA1UVmemG4nY8nGNMf+yKGMzET+DKO9V2C3Sq4Ou9tpe5HHpLKmDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4hoZzpu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NPIQIPoV"
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=LLDIeb/IRRHXpqQAcDqvh2JtuFdpd2KAw4EIlBAEiv4=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1789883826; v=1; x=1790488626;
- b=NPIQIPoVaZEF8mcxH/ECcO/t35qzwOLmmHLAm1r6MaLTnRp6mnch2YNhQj5q/wfx2OOgxa/R
- 8J/+stjYLzM9edSMDeZyMa1+t5HxltPdChkWIVqrTOROW2J0H0b+JJWdHzXeKhX5kGkCAl41Vxr
- PZA4UXErqRHuHGk+N8n27PvM=
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 4bab649c30269cd9;
-	Sun, 20 Sep 2026 05:57:06 +0000
-X-Mizu-Trace-ID: 4bab649c30269cd9
-X-Migadu-Flow: FLOW_OUT
-From: ZhangGuoDong <zhang.guodong@linux.dev>
-To: linkinjeon@kernel.org,
-	pc@manguebit.org
-Cc: linux-cifs@vger.kernel.org,
-	ZhangGuoDong <zhangguodong@kylinos.cn>,
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 3/3] smb/common: update POSIX extension specification references
-Date: Sun, 20 Sep 2026 13:56:53 +0800
-Message-ID: <20260920055653.114794-4-zhang.guodong@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260920055653.114794-1-zhang.guodong@linux.dev>
-References: <20260920055653.114794-1-zhang.guodong@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4hoZzpu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD8711F00893
+	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 13:57:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789912658;
+	bh=AQcwCeLbietMNfeLliqZHBEaC6roYtrekeLRpBdYUqM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Q4hoZzpuXPAzuL9O7id0apDZOAnhRBjcq9H0IFdVdIi18ssh901sAV/bLu2/WBpIP
+	 D/Jnfat/ibWB/8P14WSKzr9ZKt0UJ2ntAs1H2pMTJL3OHbvU3B505UQeZu3gbOqM8v
+	 Uc3SgbAIqiDTo8L+rPVD7gorUWWa7tzLB5K/jPb0YmGwIlViVLCHfXNSTJluyKZKt+
+	 EFykbIA+yTgziqckPIOFg6fxTYI1U3LowWBBOIHB+eZ8TicbEU09T040CAXnhIRwAz
+	 GuGaZfbOWLWpIBiDDHiOlIRNqQaL0i2CqR3Vl6j4cVgeEURLBBKnWHqmIkEMupoik4
+	 4wJ7o6EmtOR6A==
+Received: by mail-ej2-f31.google.com with SMTP id a640c23a62f3a-c29703cb796so294220466b.2
+        for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 06:57:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwbF4uxeM6vSZoEyl5HGL1XqoGl6cwqCqZvEajCZ2h/acgYf2rI6MeohtbSPBJhcuAcqXfwI/Wg9Bx/@vger.kernel.org
+X-Gm-Message-State: AFuF++mVBWUbhgJjFd6PNUmq/6kp7ZO/EYJq19ify7aQTRdBBTTselV2
+	mDdn4biDnboxuZ7C2gaVTTqQ5av9DG5j9hnD/KFIEZzCoHdpDF2shlPulPmRlf1KK1tRdP4MoWa
+	O9RSAp2BJ3YMmYf3cCUUizljsSEddehM=
+X-Received: by 2002:a17:907:c70c:b0:c29:d31f:7d73 with SMTP id
+ a640c23a62f3a-c2a1584686cmr671031566b.9.1789912657563; Sun, 20 Sep 2026
+ 06:57:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260920055653.114794-1-zhang.guodong@linux.dev> <20260920055653.114794-4-zhang.guodong@linux.dev>
+In-Reply-To: <20260920055653.114794-4-zhang.guodong@linux.dev>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 20 Sep 2026 22:57:25 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9YE9w-Ddh1ATUaRoaxOM4fSbDBk0wH-7k-iC-Y=0m3Tw@mail.gmail.com>
+X-Gm-Features: AcwNN1UMD-EwCEtyPYW7XtA8bT3DKd_V6f8KIgPHF37tBkvzXPE6gHK51VhnU-E
+Message-ID: <CAKYAXd9YE9w-Ddh1ATUaRoaxOM4fSbDBk0wH-7k-iC-Y=0m3Tw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] smb/common: update POSIX extension specification references
+To: ZhangGuoDong <zhang.guodong@linux.dev>
+Cc: pc@manguebit.org, linux-cifs@vger.kernel.org, 
+	ZhangGuoDong <zhangguodong@kylinos.cn>, ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
 
-From: ZhangGuoDong <zhangguodong@kylinos.cn>
+> @@ -575,8 +575,7 @@ struct file_notify_information {
+>  } __packed;
+>
+>  /*
+> - * See POSIX Extensions to MS-FSCC 2.3.2.1
+> - * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/fscc_posix_extensions.md
+> + * See POSIX-FSCC 2.3.1
+Please also update the reference below, which still points to section 2.3.1.1.
 
-The POSIX extension specifications have now been published:
-https://smb3posix.org/
+/* See POSIX Extensions to MS-FSCC 2.3.1.1 */
+#define FS_POSIX_INFORMATION            100 /* SMB3.1.1 POSIX. Query */
 
-Suggested-by: Paulo Alcantara <pc@manguebit.org>
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
----
- fs/smb/common/fscc.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/fs/smb/common/fscc.h b/fs/smb/common/fscc.h
-index e46d3379b779..61bb1f8e4a64 100644
---- a/fs/smb/common/fscc.h
-+++ b/fs/smb/common/fscc.h
-@@ -575,8 +575,7 @@ struct file_notify_information {
- } __packed;
- 
- /*
-- * See POSIX Extensions to MS-FSCC 2.3.2.1
-- * Link: https://gitlab.com/samba-team/smb3-posix-spec/-/blob/master/fscc_posix_extensions.md
-+ * See POSIX-FSCC 2.3.1
-  */
- typedef struct {
- 	/* For undefined recommended transfer size return -1 in that field */
--- 
-2.55.0
-
+Thanks.
