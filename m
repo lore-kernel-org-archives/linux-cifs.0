@@ -1,221 +1,221 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E023CE0A4;
-	Sun, 20 Sep 2026 17:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD552F7F15;
+	Sun, 20 Sep 2026 18:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789924425; cv=none; b=FkpsjyCz6ggIQq8B/qJaXQOF/fOCUtfHJ3pmM5Y6rU2SGavxMGD8K/rOVineLcI+/4skWALC/WJtv1zptcSGSLEH69jypayLVKPeymIrfpG/HBLPgFHKbOhrctUTPjeEG0sarP7haEPcwLtuQ8aUj9U3HlJ5mpOvhDVcGvXdpwM=
+	t=1789928116; cv=none; b=aCoyYXSYpUddC8F84L/MgvvNo92aVhl66gf19wmh7Z1ARKaJI7FrmljjFsCzqUtrOgqpg3sYYGMAaCwREpdLVHnBnS0ALWyt+sdR7trFr0BXIjz4TO6N7FZSdbfpFR2yNzjh4hjN53fy+iZL18b/5HE/VHdmTNifJn/I/pDdWlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789924425; c=relaxed/simple;
-	bh=aAbjlVFRet/0a+Hx3O7Dyh/dGQ2tNy800tKg9xdBi60=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=rFttenD7a9HkptGng5D0hyekTljGdtWTmPJc0z1CgnbLI00ihJv4/LmBAZ8ylOk9RmnjoofYf5ba8uzcwMDxb/Y+jDMoIcz+31bMDQvyD/N8Gpk4/u4GZ8NY2bbiLuloRCKSLTuAYsZJ6WIG2XyWP2JknnD+vnDIMVAVyUGyPZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GawdX7yR; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1789928116; c=relaxed/simple;
+	bh=0ecfBPpTdT4pWzaZEQM5xnS9BNKsBkGsfWOoHvCBiqU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pzj/0E+p6JVnCsAx6g+sXMmjfWuUnjNqO+Ikgzw4FMsojxcvDWc4WyyCPrtcOzl89gEEIRgzolADB+xb9MTtqHn6eaD1KQsJ2sR8cSAkTIqprF3NmqScgIqaPJX32VPWjexNYMKzMMImO8VXUSaWxCWxliVTV4My+kPZPD855KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=QuS8QF41; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GawdX7yR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA8DD1F00898;
-	Sun, 20 Sep 2026 17:13:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789924424;
-	bh=s5+ypruUej3MvOqRrwRHaCrYLqaIsa2+ve3GjrhIfzo=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=GawdX7yRUS9G4soY/llhIEObDfa+31AFM4tRLkn9ecnjHJT/QV9jFfsfkMe3qJWTE
-	 ax6ohx0Jwif/XrPG3nf8C3lXWdyFtjFfMSaYYgX0sJLTPLV2qesy+myPin4gT9uY90
-	 Pw7Ik9/gnD+b2O95bYaxWIcp2Y1bvbCxAFRip/Xbz2ScZpeMu8GGvmL6baKEsQXXtp
-	 7XK7l3j4L0SXOuXUx0dwySv+rTaZGIkyWpb3laKB5E/a7LCUf/Vs0pZEKBWO2rmnET
-	 THzpStV2HxU3V5P2wGqcq4tlVG9za+kSGdijHbJqNIq+5wUh6j5kvTT9oMeiKD5rZ5
-	 AGGaP+dSA/DTg==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 091BCF40066;
-	Sun, 20 Sep 2026 13:13:43 -0400 (EDT)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Sun, 20 Sep 2026 13:13:43 -0400
-X-ME-Sender: <xms:RhSwamZCWCZsWF7KQ4U4iuI0PqBGqjM5VUaooEfBlDyrdJMJmeyeYQ>
-    <xme:RhSwakO90iQ2DT4U5vlKPAf2Y5IlSHVPbkgWuq46iqQ92VKq2b9EhlaPafH5CsQEJ
-    U0LJpPtDlXChHsx1OEKoNYzcsaEF2JqJ8atyBW7EKBigVMQPl1v6A>
-X-ME-Proxy-Cause: dmFkZTFOrMtTVTmiSu+HJol2ch3sUDDTyPSzR66nZCAwMgPMsuuooTYoXbzPm2z4WXATkD
-    m2G5DiZBB9u6DQHddY//e+woyllFEZasu9CMmZwRGT7h8iY0zuZ6fUOxCDufFGr1ZV7Sk7
-    omX0HZPU+pQGIq7LtSVzVv+HM9t466FyaByuKhHKfJwJmjx+6Gm/9Ic+FqxyPNdMX8NS8P
-    llcqB8tH9jJ8b2UA4FcQODkgXEpkcSmzVympD6rsGf4UpQdnC+hKRc5GqegehdcDarihbW
-    TQDPX/iaBNK+TbRD8FpAK4XL+QRAPP6vGEydcZ9/CcJtABptTPKiE8UWeYCnw9TH6d3iVj
-    70TSUjo/k8C/oKHWLYMQd6izf3Iu472cVhb/yNX+Q+h/Sybtp5F4Bw0rRx3g55f1P6PydW
-    33j0bICEoLnPqAQqRh/pr9HLIN12bOGw7M8PpZDJ5sINmNzeFQn4v+q7vFuxhYytHk+6v7
-    ne7tuHi9OrlJ7+TG96GVI01h/erk3FM0DgYdmq9M6zCT2pEdqwMoDEyYcygFDw2r0GMgD1
-    AMKEoLFiXUcSzYSSdKExYhTyGN6T+3bHuTvyCdM9jxtwdJXWQnWqb1Ey9Hp5HdcjFCBPp/
-    ITOXaqn/z3FWu5sGQ9dD6uxLHJ9iyqqwwnD3CLIQES3aeb8SSZVSsNKwKF+A
-X-ME-Proxy: <xmx:RhSwak8jSP1zRGadiyLtmvDqdseRohsLJuZuLcL8O14ZD8vfkdS27w>
-    <xmx:RxSwauCzFVSDxEs-rGFNzri5D2AVSQdyyhwNqlDzZv8AD2X8wRRXhQ>
-    <xmx:RxSwaurah_qMTU4-zdYrDZj3hpfW8FJNCT5vNIux9pTwsqcs2-lNpw>
-    <xmx:RxSwanIZ-iCwL-MbR-YkQZlHWSbws-KK0sbPBVru5jAFwnYwHHAGiw>
-    <xmx:RxSwagLfllQ9LjXsBYaZtUA9HPDztjAruF5DHAKQj41vbK2GtZaDqt0a>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id D0C5F780070; Sun, 20 Sep 2026 13:13:42 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="QuS8QF41"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Unsubscribe-Post:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=o+XBoGlMGszGwo5ad6ZhQjN7K3BEdC4fN2ak4+9DbTY=; b=QuS8QF41ngzRAxAvoAkkCJRC4x
+	4YSAbKKW+Fc9WnIh5ZDnIuHXlJKdqbBt0f7DQoJjiqAaZcGErsAh9Q+tJPRbjePkLzXHy+iPDQlSt
+	pLl3sAfdQcrjLZiXzQSHANFveBE/hjvZVk6WbwyLBUebSfnTrRbioW8VNhVog7YsIlJYC/z04Gq/s
+	WMK6bX08dni3g2NUpSNk/ZYvfFZ1yJ65bDyb0UEGQ3TxZHxZGs3wA9mGmEO6k89h/vV4QwQmcbNtl
+	s/Xc4l5EQg7SJLBcAJg6VdCM7OIhXfx4z4eEsVOujXEo+cBv2tGo++HvJPz2qHy+Ec3UGHZHnFvQI
+	7DUTz+9Q==;
+Received: from [151.115.150.205] (port=38752 helo=gepetto..)
+	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.100)
+	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
+	id 1x8M4A-00000009NDh-1py5;
+	Sun, 20 Sep 2026 20:15:06 +0200
+From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+Subject: [PATCH v2] ksmbd: fix SMB2 CREATE response buffer overflow
+Date: Sun, 20 Sep 2026 18:15:03 +0000
+Message-ID: <20260920181503.2830435-1-Jeremy.Jean@oss.cyber.gouv.fr>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AKy4i6IcFkHk
-Date: Sun, 20 Sep 2026 13:13:14 -0400
-From: "Chuck Lever" <cel@kernel.org>
-To: NeilBrown <neil@brown.name>
-Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
- "Jori Koolstra" <jkoolstra@xs4all.nl>, "Mateusz Guzik" <mjguzik@gmail.com>,
- "Dorjoy Chowdhury" <dorjoychy111@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "Andreas Gruenbacher" <agruenba@redhat.com>, gfs2@lists.linux.dev,
- "Ilya Dryomov" <idryomov@gmail.com>, "Alex Markuze" <amarkuze@redhat.com>,
- "Viacheslav Dubeyko" <slava@dubeyko.com>, ceph-devel@vger.kernel.org,
- "Paulo Alcantara" <pc@manguebit.org>, "Namjae Jeon" <linkinjeon@kernel.org>,
- linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-nfs@vger.kernel.org
-Message-Id: <29ccafd9-22ee-46c9-9049-e188734bc5b3@slotpi15m67>
-In-Reply-To: <20260919022441.3305170-15-neilb@ownmail.net>
-References: <20260919022441.3305170-1-neilb@ownmail.net>
- <20260919022441.3305170-15-neilb@ownmail.net>
-Subject: Re: [PATCH v2 14/14] nfsd: use vfs_lookup_open() for non-creating open
- requests too.
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Sat, Sep 19, 2026, NeilBrown wrote:
-> Now that we have vfs_lookup_open() for open requests which create, we
-> can use it for non-creating requests too as vfs_lookup_open() is already
-> able to do that.  nfsd4_create_file() is renamed to nfsd4_open_file()
-> and enhanced to not always create, and is then used for all OPEN
-> requests.
+smb2_allocate_rsp_buf() uses the MAX_CIFS_SMALL_BUFFER_SIZE
+(448-byte) buffer for a single SMB2_CREATE response. That buffer also
+holds a 4-byte length field, which only leaves 444 bytes for the SMB2
+body.
 
-[ ... ]
+The AAPL response made this buffer too small. After 8f1b796ff113, a
+request with AAPL response contexts may need at least 456 bytes. In
+the 456-byte case, create_aapl_rsp_buf() is appended last, clears 128
+bytes, and writes 12 bytes past the allocation.
 
-> As ->op_createmode isn't defined when op_create is zero, we need a
-> local createmode which is -1 (illegal value) when op_create is zero.
+KASAN reports:
 
-The code below sets createmode to NFS4_CREATE_UNCHECKED for the
-non-creating case, not -1. Is this paragraph left over from v1?
+    BUG: KASAN: slab-out-of-bounds in create_aapl_rsp_buf+0x31/0x6e0
+    Write of size 128 at addr ffff88800370954c by task kworker/0:0/9
+    ...
+    create_aapl_rsp_buf+0x31/0x6e0
+    smb2_open+0x58f9/0xef10
+    ...
+    smb2_allocate_rsp_buf+0x19d/0x370
+    ...
+    The buggy address is located 332 bytes inside of
+     allocated 448-byte region [ffff888003709400, ffff8880037095c0)
 
-Also, is ->op_createmode really undefined there? nfsd4_decode_open()
-starts with memset(open, 0, sizeof(*open)), and NFS4_CREATE_UNCHECKED
-is 0, so op_createmode already reads as UNCHECKED for a non-creating
-OPEN. If that can be relied on, the local createmode can go away, along
-with the op_create test added to do_open_lookup() at the end of this
-patch. If the intent is to stop depending on the decoder's memset,
-the description should say that instead.
+Reserve enough space for any fixed CREATE response KSMBD can build.
+Store the required allocation size in the per-dialect values table.
+This keeps the small buffer for other commands and avoids using the max
+transaction buffer for every CREATE.
 
+Fixes: 8f1b796ff113 ("ksmbd: add AAPL kAAPL_SERVER_QUERY create context support")
+Assisted-by: Codex:gpt-5
+Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
 
-> diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-> index 40bd1179bf60..6be6ca473586 100644
-> --- a/fs/nfsd/nfs4proc.c
-> +++ b/fs/nfsd/nfs4proc.c
-> @@ -249,28 +249,30 @@ static inline bool nfsd4_create_is_exclusive(int createmode)
->  }
->
->  /*
-> - * Implement NFSv4's unchecked, guarded, and exclusive create
-> - * semantics for regular files. Open state for this new file is
-> - * subsequently fabricated in nfsd4_process_open2().
-> + * Implement NFSv4's open semantics for regular files, both creating
-> + * (unchecked, guarded, and exclusive) and non-creating.  The "struct file"
-> + * is openned here, and other open state for is subsequently fabricated in
-> + * nfsd4_process_open2().
+---
 
-s/openned/opened/, and "other open state for is subsequently" has lost
-a word or gained one.
+Changes in v2:
+- This version implements the maintainer suggestion to precompute the sizes
+  for each SMB dialect.
 
+v1: https://lore.kernel.org/all/20260919165828.2230488-2-Jeremy.Jean@oss.cyber.gouv.fr/
 
-> @@ -359,11 +381,6 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  		iap->ia_atime.tv_nsec = 0;
->  	}
->
-> -	create_status = fh_verify(rqstp, fhp, S_IFDIR, NFSD_MAY_CREATE);
-> -	if (create_status)
-> -		/* Might still succeed if no create is needed */
-> -		oflags &= ~O_CREAT;
-> -
->  	open->op_filp = vfs_lookup_open(&parent,
->  					&QSTR_LEN(open->op_fname,
->  						  open->op_fnamelen),
+ fs/smb/common/smbglob.h |  1 +
+ fs/smb/server/smb2ops.c | 33 +++++++++++++++++++++++++++++++++
+ fs/smb/server/smb2pdu.c |  6 +++++-
+ 3 files changed, 39 insertions(+), 1 deletion(-)
 
-With every open-by-name now coming through here, does may_open() get
-in ahead of nfsd_permission()? For a file that already exists,
-vfs_lookup_open()->do_open() calls may_open() with MAY_READ or
-MAY_WRITE. The old non-create path was nfsd_lookup(), then
-do_open_permission(), and later __nfsd_open()->dentry_open(), which
-does not call may_open(). So nfsd_permission() had the only say, and
-there are two places where it is deliberately more generous than
-inode_permission():
-
- - do_open_permission() always sets NFSD_MAY_READ_IF_EXEC, so that a
-   client can read a mode 0111 binary in order to execute it. Now
-   inode_permission(MAY_READ) fails in may_open() before we get that
-   far, and the OPEN returns NFS4ERR_ACCESS.
-
- - do_open_lookup() sets NFSD_MAY_OWNER_OVERRIDE for
-   CLAIM_DELEGATE_CUR. That claim type is never a create, so it always
-   takes this path. An owner re-opening for write after a chmod 0444
-   would fail in may_open().
-
-That is from auditing the code; I have not run either case. I think an
-UNCHECKED create that finds an existing file has had the same exposure
-since 12/14, but here it becomes the common case. Could
-vfs_lookup_open() let the caller skip may_open(), perhaps by passing an
-acc_mode of 0 the way do_open() already does for FMODE_CREATED? Or
-should the non-creating case stay with nfsd_lookup()?
-
-
-> @@ -395,14 +412,14 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  		goto out;
->
->  	if (!open->op_created &&
-> -	    nfsd4_create_is_exclusive(open->op_createmode) &&
-> +	    nfsd4_create_is_exclusive(createmode) &&
->  	    inode_get_mtime_sec(d_inode(child)) == v_mtime &&
->  	    inode_get_atime_sec(d_inode(child)) == v_atime &&
->  	    d_inode(child)->i_size == 0)
->  		open->op_created = true;
->
->  	if (!open->op_created) {
-> -		if (open->op_createmode != NFS4_CREATE_UNCHECKED) {
-> +		if (createmode != NFS4_CREATE_UNCHECKED) {
->  			status = nfserr_exist;
->  			goto out;
->  		}
-
-This one is not new here, it arrived with 11/14. This patch makes
-it reachable from every non-creating OPEN. Just below this hunk:
-
-		if (unlikely(nfsd_mountpoint(child, fhp->fh_export) == 1)) {
-			dget(child);
-			nfsd_filp_close(open->op_filp);
-			open->op_filp = NULL;
-			goto do_cross_mnt;
-		}
-
-By this point fh_compose(resfhp, fhp->fh_export, child, fhp) has
-already succeeded, and do_cross_mnt calls fh_compose(resfhp, ...) a
-second time. When fh_dentry is already set, fh_compose() prints
-"fh_compose: fh ... not initialized!" and then overwrites fh_dentry and
-fh_export. Does that leak the first dentry and svc_export references?
-Would an fh_put(resfhp) before the goto be enough, or is it better to
-do the nfsd_mountpoint() check before the first fh_compose()?
-
-
-> @@ -521,46 +538,34 @@ do_open_lookup(struct svc_rqst *rqstp, struct nfsd4_compound_state *cstate, stru
-
-> +	/* FIXME: check session persistence and pnfs flags.
-> +	 * The nfsv4.1 spec requires the following semantics:
-> +	 *
-> +	 * Persistent   | pNFS   | Server REQUIRED | Client Allowed
-> +	 * Reply Cache  | server |                 |
-
-This table is only about create modes. Out of the op_create block it
-now reads as though it applies to every OPEN. Could it say "for
-creating OPENs", or move into the op_create arm of nfsd4_open_file()?
-
-
+diff --git a/fs/smb/common/smbglob.h b/fs/smb/common/smbglob.h
+index d9c7e6e7af29..fdf840888062 100644
+--- a/fs/smb/common/smbglob.h
++++ b/fs/smb/common/smbglob.h
+@@ -40,6 +40,7 @@ struct smb_version_values {
+ 	size_t		create_disk_id_size;
+ 	size_t		create_posix_size;
+ 	size_t		create_aapl_size;
++	size_t		create_rsp_size;
+ };
+ 
+ static inline unsigned int get_rfc1002_len(void *buf)
+diff --git a/fs/smb/server/smb2ops.c b/fs/smb/server/smb2ops.c
+index 4578291fb172..747276b171bd 100644
+--- a/fs/smb/server/smb2ops.c
++++ b/fs/smb/server/smb2ops.c
+@@ -13,6 +13,35 @@
+ #include "server.h"
+ #include "stats.h"
+ 
++/*
++ * work->response_sz includes the RFC1002 length field while smb_get_msg()
++ * skips over it. Durable v1 and v2 response contexts are mutually exclusive,
++ * and POSIX CREATE contexts are only negotiated for SMB3.1.1.
++ */
++#define SMB2_CREATE_RSP_SIZE(lease_size, durable_size)			\
++	(sizeof(__be32) + offsetof(struct smb2_create_rsp, Buffer) +	\
++	 (lease_size) + (durable_size) +				\
++	 sizeof(struct create_mxac_rsp) +				\
++	 sizeof(struct create_disk_id_rsp) +				\
++	 AAPL_RSP_MAX_SIZE)
++
++#define SMB21_CREATE_RSP_SIZE						\
++	SMB2_CREATE_RSP_SIZE(sizeof(struct create_lease),		\
++			     sizeof(struct create_durable_rsp))
++
++#define SMB3_CREATE_DURABLE_RSP_SIZE					\
++	((sizeof(struct create_durable_rsp) >				\
++	  sizeof(struct create_durable_rsp_v2)) ?			\
++	 sizeof(struct create_durable_rsp) :				\
++	 sizeof(struct create_durable_rsp_v2))
++
++#define SMB3_CREATE_RSP_SIZE						\
++	SMB2_CREATE_RSP_SIZE(sizeof(struct create_lease_v2),		\
++			     SMB3_CREATE_DURABLE_RSP_SIZE)
++
++#define SMB311_CREATE_RSP_SIZE						\
++	(SMB3_CREATE_RSP_SIZE + sizeof(struct create_posix_rsp))
++
+ static struct smb_version_values smb21_server_values = {
+ 	.version_string = SMB21_VERSION_STRING,
+ 	.protocol_id = SMB21_PROT_ID,
+@@ -38,6 +67,7 @@ static struct smb_version_values smb21_server_values = {
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
+ 	.create_aapl_size = AAPL_RSP_MAX_SIZE,
++	.create_rsp_size = SMB21_CREATE_RSP_SIZE,
+ };
+ 
+ static struct smb_version_values smb30_server_values = {
+@@ -66,6 +96,7 @@ static struct smb_version_values smb30_server_values = {
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
+ 	.create_aapl_size = AAPL_RSP_MAX_SIZE,
++	.create_rsp_size = SMB3_CREATE_RSP_SIZE,
+ };
+ 
+ static struct smb_version_values smb302_server_values = {
+@@ -94,6 +125,7 @@ static struct smb_version_values smb302_server_values = {
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
+ 	.create_aapl_size = AAPL_RSP_MAX_SIZE,
++	.create_rsp_size = SMB3_CREATE_RSP_SIZE,
+ };
+ 
+ static struct smb_version_values smb311_server_values = {
+@@ -122,6 +154,7 @@ static struct smb_version_values smb311_server_values = {
+ 	.create_disk_id_size = sizeof(struct create_disk_id_rsp),
+ 	.create_posix_size = sizeof(struct create_posix_rsp),
+ 	.create_aapl_size = AAPL_RSP_MAX_SIZE,
++	.create_rsp_size = SMB311_CREATE_RSP_SIZE,
+ };
+ 
+ static struct smb_version_ops smb2_0_server_ops = {
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b7ce67094626..15b1b3789d9f 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -860,14 +860,18 @@ static void smb2_update_lock_sequence(struct ksmbd_work *work,
+ int smb2_allocate_rsp_buf(struct ksmbd_work *work)
+ {
+ 	struct smb2_hdr *hdr = smb_get_msg(work->request_buf);
++	struct smb_version_values *vals = work->conn->vals;
+ 	size_t small_sz = MAX_CIFS_SMALL_BUFFER_SIZE;
+-	size_t large_sz = small_sz + work->conn->vals->max_trans_size;
++	size_t large_sz = small_sz + vals->max_trans_size;
+ 	size_t sz = small_sz;
+ 	int cmd = le16_to_cpu(hdr->Command);
+ 
+ 	if (cmd == SMB2_IOCTL_HE || cmd == SMB2_QUERY_DIRECTORY_HE)
+ 		sz = large_sz;
+ 
++	if (cmd == SMB2_CREATE_HE)
++		sz = max_t(size_t, sz, vals->create_rsp_size);
++
+ 	if (cmd == SMB2_QUERY_INFO_HE) {
+ 		struct smb2_query_info_req *req;
+ 
 -- 
-Chuck Lever (Come to NFS bake-a-thon! https://nfsv4bat.org)
+2.47.3
