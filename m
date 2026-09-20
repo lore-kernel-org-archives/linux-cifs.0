@@ -1,221 +1,205 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B421545C6E8
-	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 16:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=170.10.129.124
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789921940; cv=pass; b=rbqnYuCyw7PjaTidOXrSx9p+NIjZtmWWQX+Fn1E/tUBVDZeMgNQvpZGrqNv7OByjzf2lFViustkf0Unx0HKWqB2OASSQH8d2mmSPoSoAwvE3bgoBBL7bnfIj+ztD1B1H4aM+LNpYwEDJ5nVre+tlcA/BDQXnDciZtl6NkKnmxE0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789921940; c=relaxed/simple;
-	bh=+4YERuX/Tm4BEarMicY7oOWvS+xS/CmiXnLfQ+itnn8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J/Azl0pfymwso8O4Wx2JlKbaSFtoljI2r0dO9P4wLb4CR8p0BtFNO2JFAmQhBet9UX36CxkiK/F3dWh/5nWS3xupDnmJR774fgok9hNxse8iu2JvoE96ayNMH6vdt1qlv1KBft1wo90rSd5qfk3IBASDR2UPIN8OmyQlbaoFNNs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IPH/UlHc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=O2Zrr29N; arc=pass smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EA646C844
+	for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 17:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1789924133; cv=none; b=rlCzYw+Czn0RQndHaZTeCbgpAghQRfsJpR7vVwWukCQbHRhV/BUFlManoCH71Q+rBHEv6V93A2Bw19aR8al5CT6R3Yl1tQGv3ymwc72q0ARcrYb5gAHL2uTmtEK6+KPvYgxq/ikNsDTVV/QtmkanO+7Ny6iAbwxKOlZrK6I9l8Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1789924133; c=relaxed/simple;
+	bh=Ktr8iveArGKXM+AJMuKZDd1u7kF+3hA4fMnIriSPTmY=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:Subject:Content-Type; b=SbtXM3QRB8X8u0SgE8IP9yj8pnepr33bFb1BCAX2y27DgmNyzdKx5BHtZ8qD8w8vWWizKGAEbl2jxA9LlhgowozcORt/rPAZQtlac0USwTxufRNlZgcJlZear5doxh5r8ATiUYcTa6FIO90DYtAzUfCNneQz7w8/DEQPIjWPvPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OluzAmc1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IPH/UlHc";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2Zrr29N"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1789921933;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6ElUqtRQzGRczK+6qtQzmlt/OBYAjwvyq42r0CytLLM=;
-	b=IPH/UlHcVsUic4V9o/HJERvOAnPve1FCYhoh8rfNL4qbSj5r5Tx4RuL15d+Yz/ddw14er8
-	+pUlMbhNzLMIXrG7z+Xdu5fpTWW4JhVJaGfOjj4Rv5nmrynV45u5/9vS0avhLymF+UVc3y
-	VWw62VoJao+vyFAUBEDjzqcz8KybpvM=
-Received: from mail-yx1-f72.google.com (mail-yx1-f72.google.com
- [74.125.224.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-403-EvM6QFafMVqvhh74e-3AEA-1; Sun, 20 Sep 2026 12:32:12 -0400
-X-MC-Unique: EvM6QFafMVqvhh74e-3AEA-1
-X-Mimecast-MFC-AGG-ID: EvM6QFafMVqvhh74e-3AEA_1789921932
-Received: by mail-yx1-f72.google.com with SMTP id 956f58d0204a3-66c70fa2ba4so2341142d50.2
-        for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 09:32:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1789921932; cv=none;
-        d=google.com; s=arc-20260327;
-        b=cL3b2716A+puPorJ/ra/PoONsyYE5VIYh0/Uf72LTeZuP00etd78o9gL5TUh2e67bB
-         C6+jATVifoMPtGLcKytGghhlIYEQhVShKNQMJwm+uswzI8EH60a3BpN7KgCeWeMl45x3
-         49KZkU+FXQTT9XexrUda2XfHqztBQXZq8Ot52zWdcLwC9pRSUKRAEiDRahx9K6Fl0Sni
-         w1t6PPVt8toGYGq3jkeymtIqbeN37d1kgZ63TcFNaRutRBHRi8Pjf/fgVWQwIx7QLblJ
-         KL51yNMWded+t+bSGZkaAKvsexum9WRpxM/msLMGZRPyHDFQgrBWTHdqm4RpoppqIipz
-         wKyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=6ElUqtRQzGRczK+6qtQzmlt/OBYAjwvyq42r0CytLLM=;
-        fh=kMLBKBdzF1rSM4IGoKy1W8CoD97Z5/tEgrRpEO0i9I0=;
-        b=DfPj87CRcwPwzXOSOgI3bRMCCfqDQmhrulAcjtf2X7wIEjdR9LU4hiFYrrE/o0YiCM
-         4a1jorAEskJmu3hE+tDtKrVXoZtuKYfgqtaJ+YEGmaUaaU1HIE98TwBBMlqeoJJ8taoH
-         WUsZXuKVpCyP2w1GuHz6L/+dGs9Wi/NelzmboM+mWPCGO72Ic5mBILcbrRyMX282Sk09
-         16CRZIAths3vzLmqSgSWIP1wvdfk4SBuMCM7QP6GYs8Uj15Lpy3RMg7Ozjx1jaA8807h
-         36sJD43IM8JccVfDuS4sfoWIivHV+NZTXlMsXFgMPbpmTKp0qkca3Kw/pF71Qoi9t06Q
-         IqOQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1789921932; x=1790526732; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=6ElUqtRQzGRczK+6qtQzmlt/OBYAjwvyq42r0CytLLM=;
-        b=O2Zrr29NPOW53WilSxjiGi5+GUNvcBVvdOoqH73SkdEdUiROaNcUr/Dadgv5HRQK5S
-         5SohqF3YNLsUhWrHOtO3hDALjesXlygri5dK03KUhIieVN3sd/R9gCZqM285mVAkkhSO
-         +eCemdvwbh99xjp00OjVgcow4v3enfWfjUWx3UPKM7+p9xcABOtqk9+quAtR6yiQevRE
-         Pp9/kavNr2iMDdp8J2+ssCMO+kFuzKCkCXRvpHRP1Bb80K7ygFIvx1ywjX2h1ZZ6Kvd+
-         K0KmEy87O5P2mJ9RdpedP4huuujk4F2y/CyHDRTDF5v8GBCOGDpjxyjqYIsYaBPnBFSH
-         YbrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1789921932; x=1790526732;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6ElUqtRQzGRczK+6qtQzmlt/OBYAjwvyq42r0CytLLM=;
-        b=cojpJiVrvMq4ujuKq9XuyzNN66sekhgL30OpG+vHyex3Qaq6RVOJXxeOS0iqEUkKBv
-         ZyG/ojYmdYLJNsOPVCK9sEn2ZvEdup7kyQpf8wEyvleJPpyZOTLPEmYzyDECfbs2rb7S
-         ztNtJ9HnguGhG2gg9K08gr+i9cOie+J4t80axrvY/AfkODDMmWxt1iIP0ID3Y51Z571k
-         EzCNAwfAg5fToxqFFzSwvcsS0T/iqbrlHeGh3hdATnLlx8biKRSpYjWLpcKgKW+IOTyy
-         I45Bm7705Fn8T65V9MsxzLdBk3p8hwOSTxgZhLBpoBYsSsgAP8eXCny+pI9w60Wilj24
-         oT9g==
-X-Forwarded-Encrypted: i=1; AKwUvByQyoPawPChQbQS8FDT9YDXFyHtectBoPGZPnQ2JTj+69bhRdo+FBpV7PIZDYHftDMoCbkARgqBVsXz@vger.kernel.org
-X-Gm-Message-State: AFuF++lnY0wYFkODr7Z/6Vn8bSqK9/yCZX8LQaK2i0TfVZisF0Ow8nyp
-	EzxlWeLsraHSovkARVoGG2dxrM8j7VeH5UT09+CC4P/U4UVrmmCSb0GAB7uIT/5nYOG7lrOQXLP
-	P5XpBLApADJ0juOHMrgXncCFKbg0Ec7n5wfw8gvyLh4LkLGoHcD0Rqk3NVRsmnFFeVKcGJodpa3
-	FKWoQ79rKYzLdrfnc7TCamwiwb30xApM27Fv+isQ==
-X-Gm-Gg: AYBFou2/9qL5VG82ERyRl5RnS7NggDHjiS61o2h3Kfuzifk/oovFH9xBVP/L84GyWHd
-	ORK1wGIsCwrBaR8vHrxFAPjMKfuX+Tkjsk4CCvd6hi7uG1DW/PaSHcMQwrYEo1YcnZbsywtIfo1
-	fMjieHw49nrAJguG1HbGmcKQCJ2C/Ov248iV4JBlOxoaITC1jw1gCX0F8LrNnbhOUwcWem1Z2qj
-	H20rensGid2NGb+CFDpenzBlP0pIRbWKKlpYHbpYLzUYw==
-X-Received: by 2002:a05:690e:1348:b0:671:50b8:aee4 with SMTP id 956f58d0204a3-6717fdf7f42mr2684424d50.77.1789921931914;
-        Sun, 20 Sep 2026 09:32:11 -0700 (PDT)
-X-Received: by 2002:a05:690e:1348:b0:671:50b8:aee4 with SMTP id
- 956f58d0204a3-6717fdf7f42mr2684413d50.77.1789921931459; Sun, 20 Sep 2026
- 09:32:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OluzAmc1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 627131F00898;
+	Sun, 20 Sep 2026 17:08:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1789924132;
+	bh=WkaNo7HN5kCJFTD9bMLAl3NMY+GmFyJQa6e7ryXKOvY=;
+	h=Date:From:To:Cc:Subject;
+	b=OluzAmc1gxKGKmGijFCtkrmunmaGafufDnzSrzVp0J/HIR9KsOueXCSvye0/B1vxT
+	 Dssf8YAmjUOX2f1wwKwTwxuXEJK6GaPseabuJk/I2Su9JJRhGHTC06jqaKV/XDrmNG
+	 8a+Bszkry8dFxrI+msysllOVMwBD4R6t3ctlMLZmoT1uE8Dew2qQd0m80Fp4nxSjz/
+	 TECguakOyZKjWf5dxsfqLo4RltqAIN1Ntuf5vmkdUiPLn9klhP9fY1Fvq46OosLNcz
+	 54oX+mjlyuWIDeIjldQcmckYwiVcpsBpyzML0lM1Ph2tltzSgl8xGJkoNE7pIJLTNU
+	 k7Axp+AfLBq9w==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 8ADABF40068;
+	Sun, 20 Sep 2026 13:08:50 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Sun, 20 Sep 2026 13:08:50 -0400
+X-ME-Sender: <xms:IhOwatVw7y_oXB4hre0DQ6FjuKng2OxMRlBEEWmR1bDMh8Wpvi4gxA>
+    <xme:IhOwaoY8PR6Pvr2yo4MUFf7g1_1i3xxdOtFNJcF6zOlS0UJaQ7rsKhohZK5SQadXA
+    _UjGl9JVUdjJlIEQNu18Pu4pET3EFcu4X13A_UjP9bUzwzvxvvprV8>
+X-ME-Proxy-Cause: dmFkZTFtnh3vtJTxG35JYOX56IuAoeta1S5dY0VEJNuEAtCuAg1+k8Ljrc+94tdjLFv3eW
+    JF+4J+3neWbDQkb6ROgC8yzOA8y6Q0EoMIx5UdrVM4BeUQaAw6BlQcUWyQiZ7q1Qqi4HBZ
+    3m4Ro/h6bJxOpwq8Jm1XMjaNIUmdTXhL6sCocJISWpc8F32z9O5g59svM+YQ5Q0R+2XQH3
+    pG0bWAxnklQ4UlSzE5/DdN8KH8cghnwzEk7hQOKyONWhLvkyoSsJD2u47tP/r81/gBjQKR
+    kir8tL4m9X7xdca55GP7xX6xXf49muhRrZa8W3pvjYb73JjoFxTCMsq+hWqe3alIdyPdC/
+    JXRsId3L5zq0wAtSa3X79u5SLUU2U/ZC+mdJknPfwYzKY0sBh4SzWeSMw3PVPfcJCom3RY
+    DspuONvoEfMrbESUG1FQqfjmdUpSBwKHYjGFefzLZd/mAO8oftgxtobXECgt2bqBVVDkk6
+    0+E8P5u/m9mGh31ixkRJDGy+Gn76JkRfAfBBRagIUZdsfSigK3Bj6lQ4J8ZWV1dc9pmlBd
+    /24V7sY0nmGgvip9CICVOjVSUIVvhJ+Tk3lGO0NILifnzHS2Rnqjnn5OS/ekcWhgkktrQu
+    9N0c26pd3JfqCPH2Z25Ff2AQXPjiXgNfBtaPbaJNo2Q3BR/5VRRUTDvROIlg
+X-ME-Proxy: <xmx:IhOwap7eVBK_lZY1-JGlHt6IDc-M2W4D5s0A05JiZZLjILUH7rZppQ>
+    <xmx:IhOwaoNunukBcZaU_HOEVGSKXq-_Jzx9Qu-w8ZgLBPgiyjWS3NYQOw>
+    <xmx:IhOwalHEseXyUSAC8u-88hBqSxNjpEpOZOKrFYuoUACg0GVNcdXd_g>
+    <xmx:IhOwak0EeWaSssEAqVGm12SCB0wygX5RwbR6_gKL_252kIS7_BjBnQ>
+    <xmx:IhOwakGghV4NCa0ZpVRK5HnxEeIXyude15oB84eWbZKZgkjZsSeReP_v>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 5955D780070; Sun, 20 Sep 2026 13:08:50 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260919022441.3305170-1-neilb@ownmail.net> <20260919022441.3305170-4-neilb@ownmail.net>
- <CAHc6FU4M59nodfn+NCDsr81Wdmvd1Ubw712FF56ekVWfe1+Nuw@mail.gmail.com> <178985655280.37859.6894749467886035489@noble.neil.brown.name>
-In-Reply-To: <178985655280.37859.6894749467886035489@noble.neil.brown.name>
-From: Andreas Gruenbacher <agruenba@redhat.com>
-Date: Sun, 20 Sep 2026 18:31:59 +0200
-X-Gm-Features: AcwNN1WDWK2kuJ9juQym02aIIB-Y-9YWAPGC_3VkH8hMthBmOzCWtJtaHEAolhI
-Message-ID: <CAHc6FU4cD3fb13LE1-HOEnOoUNVdW1N3e892r7rFE9HJfztvhg@mail.gmail.com>
-Subject: Re: [PATCH v2 03/14] gfs2: simplify atomic_open handling.
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, Jori Koolstra <jkoolstra@xs4all.nl>, 
-	Mateusz Guzik <mjguzik@gmail.com>, Dorjoy Chowdhury <dorjoychy111@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, gfs2@lists.linux.dev, 
-	Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
-	Viacheslav Dubeyko <slava@dubeyko.com>, ceph-devel@vger.kernel.org, 
-	Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-ThreadId: Ao5V-aygA_bs
+Date: Sun, 20 Sep 2026 13:08:21 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: neilb@ownmail.net
+Cc: viro@zeniv.linux.org.uk, brauner@kernel.org, jlayton@kernel.org,
+ jkoolstra@xs4all.nl, mjguzik@gmail.com, dorjoychy111@gmail.com,
+ trondmy@kernel.org, anna@kernel.org, agruenba@redhat.com,
+ gfs2@lists.linux.dev, idryomov@gmail.com, amarkuze@redhat.com,
+ slava@dubeyko.com, ceph-devel@vger.kernel.org, pc@manguebit.org,
+ linkinjeon@kernel.org, linux-cifs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org
+Message-Id: <c3dfb897-c18c-426e-ba4c-10d957085e7e@slotpi15m67>
+Subject: Re: [PATCH v2 11/14] nfsd: check for mountpoints after non-creating open.
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Sun, Sep 20, 2026 at 12:22=E2=80=AFAM NeilBrown <neilb@ownmail.net> wrot=
-e:
-> On Sun, 20 Sep 2026, Andreas Gruenbacher wrote:
-> > Neil,
-> >
-> > On Sat, Sep 19, 2026 at 4:31=E2=80=AFAM NeilBrown <neilb@ownmail.net> w=
-rote:
-> > > From: NeilBrown <neil@brown.name>
-> > >
-> > > gfs2 incorrectly returns -EFTYPE for any non-regular when __O_REGULAR=
- is
-> > > in force.  A symlink might not be an error, and nfsd needs to know if=
- a
-> > > directory was found.
-> > >
-> > > Neither this check, or the following check for a directory is needed.
-> > > Both cases are handled correctly by instantiating the dentry and pass=
-ing
-> > > it to finish_no_open() - the caller will interpret the type.
-> > >
-> > > Signed-off-by: NeilBrown <neil@brown.name>
-> > > ---
-> > >  fs/gfs2/inode.c | 17 ++++-------------
-> > >  1 file changed, 4 insertions(+), 13 deletions(-)
-> > >
-> > > diff --git a/fs/gfs2/inode.c b/fs/gfs2/inode.c
-> > > index f361876c5583..7aa92bb31cf4 100644
-> > > --- a/fs/gfs2/inode.c
-> > > +++ b/fs/gfs2/inode.c
-> > > @@ -738,19 +738,10 @@ static int gfs2_create_inode(struct inode *dir,=
- struct dentry *dentry,
-> > >         inode =3D gfs2_dir_search(dir, &dentry->d_name, !S_ISREG(mode=
-) || excl);
-> > >         error =3D PTR_ERR(inode);
-> > >         if (!IS_ERR(inode)) {
-> > > -               if (file && (file->f_flags & __O_REGULAR) &&
-> > > -                   !S_ISREG(inode->i_mode)) {
-> > > -                       iput(inode);
-> > > -                       inode =3D NULL;
-> > > -                       error =3D -EFTYPE;
-> > > -                       goto fail_gunlock;
-> > > -               }
-> > > -               if (S_ISDIR(inode->i_mode)) {
-> > > -                       iput(inode);
-> > > -                       inode =3D NULL;
-> > > -                       error =3D -EISDIR;
-> > > -                       goto fail_gunlock;
-> > > -               }
-> >
-> > as you note below, when the inode exists but it isn't a regular file,
-> > we won't even get here (gfs2_dir_search() will have returned
-> > ERR_PTR(-EEXIST)). So the above two if statements are dead code, which
-> > contradicts the patch description. Could you please fix that?
->
-> There are two different modes here: the "mode" that was requested and
-> the "inode->i_mode" that was found.
-> This branch will only be taken if "mode" is "S_IFREG", but the inode
-> that is found could be anything.
+On 9/18/26 9:26 PM, NeilBrown wrote:
+> From: NeilBrown <neil@brown.name>
+> 
+> A file can be a mountpoint for nfsd purposes when it isn't in the
+> dcache.  This happens when it is a junction (nfsd4_is_junction()).
+> So when we open a file and find that it already existed though
+> not in the dcache, we have to check if it is a mountpoint (or junction)
+> and potentially follow the junction.
+> 
+> So move the mountpoint crossing code in nfsd4_create_file() to a new
+> label at the end of the function and goto there both when an in-dcache
+> lookup finds an existing file, and when vfs_lookup_open() finds an
+> existing file.
+> 
+> Signed-off-by: NeilBrown <neil@brown.name>
 
-Ah right, we could be looking for a regular inode non-exclusively and
-get back any inode type.
+At this point in the series, nfsd4_create_file() still calls the local
+do_lookup_open() helper. Nothing under fs/nfsd calls vfs_lookup_open()
+until 12/14. Can the last sentence name do_lookup_open() instead?
 
-> >
-> > > +               /*
-> > > +                * This can only happen if "S_ISREG(mode) && !excl" s=
-o "file"
-> > > +                * cannot be NULL.
-> > > +                */
-> >
-> > Is that comment useful without removing the below NULL check for file?
->
-> Fair point.  I'll remove the NULL check.
->
-> I'd feel more comfortable if gfs2_symlink(), gfs2_mkdir(), and
-> gfs2_mknod() all passed "1" (or "true") for the "excl" arg.
-> Then it would be even more obvious that we don't need to test
-> for NULL, as all callers that pass a NULL file, pass a true excl.
-> (you could remove the "!S_ISREG(mode) ||" which would make the code
-> look cleaner).
->
-> But that is beyond the scope of this patch.
 
-Yes, makes sense. I'll happily clean that up.
+> diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
+> index 6e443503d0b7..3d37754f787b 100644
+> --- a/fs/nfsd/nfs4proc.c
+> +++ b/fs/nfsd/nfs4proc.c
 
-In fact, could just remove the two if statements in this patch queue?
-We can then clean up the rest on gfs2 for-next without causing a merge
-conflict.
+[ ... ]
 
-Feel free to send a cleanup, or let me know if I should write that.
+> @@ -339,21 +340,8 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
+>  						    open->op_fnamelen),
+>  					  parent.dentry);
+>  		if (child && !IS_ERR(child) && d_is_reg(child) &&
+> -		    unlikely(nfsd_mountpoint(child, fhp->fh_export))) {
 
-> hmm... you could even pass "!file || excl" to gfs2_dir_search() to make
-> it impossible to use file if it were NULL :-)
+[ ... ]
 
-Right.
+> +		    unlikely(nfsd_mountpoint(child, fhp->fh_export)))
+> +			goto do_cross_mnt;
+>  		if (!IS_ERR(child))
+>  			dput(child);
+>  	}
+> @@ -466,6 +454,14 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
+>  			status = nfserr_exist;
+>  			goto out;
+>  		}
+> +		/* We opened an existing file, it might be a junction. */
+> +		if (unlikely(nfsd_mountpoint(child, fhp->fh_export) == 1)) {
+> +			dget(child);
+> +			nfsd_filp_close(open->op_filp);
+> +			open->op_filp = NULL;
+> +			goto do_cross_mnt;
+> +		}
 
-Thanks,
-Andreas
+Can this leak the dentry and export references held in resfhp? By the
+time this branch runs, resfhp has already been composed, just above:
 
+	status = fh_compose(resfhp, fhp->fh_export, child, fhp);
+	if (status != nfs_ok)
+		goto out;
+
+and do_cross_mnt then calls fh_compose(resfhp, ...) a second time.
+fh_compose() releases its target only when ref_fh == fhp, which is not
+the case here, so it complains and then overwrites both pointers:
+
+fs/nfsd/nfsfh.c:fh_compose() {
+    ...
+	if (fhp->fh_dentry) {
+		printk(KERN_ERR "fh_compose: fh %pd2 not initialized!\n",
+		       dentry);
+	}
+    ...
+	fhp->fh_dentry = dget(dentry); /* our internal copy */
+	fhp->fh_export = exp_get(exp);
+    ...
+}
+
+The goto from the try_lookup_noperm() check is fine, since it is taken
+before resfhp is composed. Calling fh_put(resfhp) before this goto might
+be enough.
+
+Nit: The dcache check above tests nfsd_mountpoint() for nonzero while
+this one tests for == 1. I think that works because a d_managed()
+dentry (return value 2) is pinned in the dcache, so the earlier check
+always catches it. Is that the reasoning? If so, could the comment say
+that? nfsd_mountpoint() also returns 1 for NFSEXP_V4ROOT exports, so
+it isn't only junctions that arrive here.
+
+
+> +
+>  		/* NFSv4 protocol requires change attributes
+>  		 * even though no change happened.
+>  		 */
+> @@ -511,6 +507,21 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
+>  out:
+>  	nfsd_attrs_free(&attrs);
+>  	return status;
+> +
+> +do_cross_mnt:
+> +	exp = exp_get(fhp->fh_export);
+> +
+> +	status = nfsd_cross_mnt(rqstp, &child, &exp);
+> +	if (status == nfs_ok)
+> +		status = fh_compose(resfhp, exp,
+> +				    child, fhp);
+> +	fh_fill_post_noop(fhp);
+> +	open->op_truncate =
+> +		(iap->ia_valid & ATTR_SIZE) &&
+> +		!iap->ia_size;
+
+Nit: The non-crossing path includes d_is_reg(child) in this expression:
+
+	open->op_truncate = (d_is_reg(child) &&
+			     (iap->ia_valid & ATTR_SIZE) &&
+			     !iap->ia_size);
+
+After nfsd_cross_mnt(), child might no longer be a regular file.
+do_open_lookup() rejects that via nfsd_check_obj_isreg() before
+op_truncate is used, so nothing breaks. Perhaps the two expressions
+should match?
+
+
+> +	dput(child);
+> +	exp_put(exp);
+> +	goto out;
+>  }
+
+
+-- 
+Chuck Lever (Come to NFS Bake-a-thon! https://nfsv4bat.org)
