@@ -1,54 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E9F35A385
-	for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 05:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D40F35E1CC
+	for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 05:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789969316; cv=none; b=IJUL3Zx/B85BQITC5fru2bbokH9Pt7p74vV1X7V0AE88NGWNyA7XhH0hS4Jn2QLI+jEoyH/a7X2dpTMc5YTYIpfTLIik8YFhMxH2jNRiiyv3rJ60f2cjoGyF2cIJL7cQ1kCKniPzny4j5PxSSymLn5rgHtRdEZ1yPuN2nZHSwm4=
+	t=1789969506; cv=none; b=eCJO1O1BSwoxFDgDOMgLkdR09Bf8D6k4GkRMolsM9F3iBk7wjGoAnCzQqdHeKFaZrFAbnNiCR9ut+mRvfjgxqHxPGWQ/LuDUfbrBVjI2SOJu6rVTU+OhTlvSEcv2uCEIzygsv7DAdpYYWfWVX/fcW1tsmVBbTyvI4HM0nY8kL6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789969316; c=relaxed/simple;
-	bh=alOkypGBl7StPCfxrufk7mKYOKXSsqxWIcxSoIzWQe8=;
+	s=arc-20240116; t=1789969506; c=relaxed/simple;
+	bh=u2QN2Kk7CAHgFMwjZvSJrK+XtCLXwmmeZC3Y3YrAisc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bJ3NbqSlQjcim7MaUUG+hp4e8vujhAxmda/no4+u6mbx7kKJzeXnIIwxpB9pOjBXw05RjsuAcyew30NSyS0vDWJwlmTNs3wi6kiUw+/3yuvtedCm6pfhg7sKbMax1qfHsku5svuVnO2E7IW0oAXpbYFHgKXcatPtEzJA3Ef240g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TmaHNahO; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=VjLS32H0VC2pHD3esMgZA87JZjXfyGjdg+7eol03bIVrUnqLjVDLzUB6iCHECcAHNpYuvjI86XfYwt/K2GwpsoSfA79ct+9vo+0BF22nSxPoodnMJp5n68jxdlTAjrM2Ws8StNXQ47c04trDXuHmqtulvsVGXc5hrxg4miuI3rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpLyD6mk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TmaHNahO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F1871F00898
-	for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 05:41:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpLyD6mk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532421F000FF
+	for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 05:45:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1789969315;
-	bh=alOkypGBl7StPCfxrufk7mKYOKXSsqxWIcxSoIzWQe8=;
+	s=k20260515; t=1789969505;
+	bh=u2QN2Kk7CAHgFMwjZvSJrK+XtCLXwmmeZC3Y3YrAisc=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TmaHNahOqM635+tF2NHyojsTxrdMHkrk/uWt6yI2kuWWRnzvDGun028lNuVOkQ7EA
-	 CP2GlT1ftphrC+lXH9ESwbkRzM7c2DQWUIEvrbVosVIGW3fhalRauVMJCNHqb9F3VR
-	 A3/pE4xIm8T5elet6FEpeGWrlk2huJEbc5dleEtbdbWlqAKt8t0LhikrTo7Kxzaj/o
-	 wXA8lfzRrejPkO/BxJ0pJqR/nz5g7MD1TWGGfOxrZaQwpVctpnldNSBJWRW2Env7SP
-	 TXi7M35VLiw03+6FcnSjHMUnfXVWwAFRNzeG76jNVJE5Xb6+Jvi4sC+Y23JBXn7coI
-	 u+3dKHpyTXWSQ==
-Received: by mail-ed2-f30.google.com with SMTP id 4fb4d7f45d1cf-6aa06e51bc3so4161856a12.2
-        for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 22:41:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBy0cVL80zXTBbQesa9GqgZldbJ7XE+xT01zWgY9WM9J3FTK1qHX0oTASEl1ayp9SzRT2oxWn1vwk322@vger.kernel.org
-X-Gm-Message-State: AFuF++nf0SFODs2f62vXn2MGrdPeOeDcWBSOsluCykg4fSzTMESVBr2d
-	a7JN/WY4DV3iEs90Sf1o24i2E7MkSA0Yo97HY6ttZAky92gJ7hQqjhIld6tubajHmhSen9HQlqN
-	5gCQPXx5oAH3wA3JfwDbgL0aH9vQ4psY=
-X-Received: by 2002:a05:6402:2750:b0:6a9:983b:79ba with SMTP id
- 4fb4d7f45d1cf-6aa569a9a71mr7351290a12.41.1789969313805; Sun, 20 Sep 2026
- 22:41:53 -0700 (PDT)
+	b=gpLyD6mkic+Iuxx8dxVTMulx4MvaZ9h66Y5FsYeB9de3hNepvlSBkTdU4pXSj8J63
+	 r4KrGufoowKYC4ejMHQ+3ezquERuEx7Nasr55LEdaIACg/Sb3eJukOvpbs45sv8GDw
+	 voiuTjv/zqMn+qtEXn7wNwqx5xPNI1XC0UR+HaQYb97Py6OjrdHFUjI0lveN5ZeUms
+	 5GgYNjcCPjUzTv3SWKn5uXdPQZTBmq2m2QCtMtZJv4HD/H3Ysdrgrbor8bvJ3wSmo2
+	 9UzuUTJnt15bC0PRnymogl6eAdbkSZrIxXovCItiv4SWHqJedw50yCMaJu0cBOLWFw
+	 JZ6kb65jeoxjw==
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a67fa7a64eso3948078a12.1
+        for <linux-cifs@vger.kernel.org>; Sun, 20 Sep 2026 22:45:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwWf2P1TLk5kFtHOX/vPxbqP9VO+52MmmHWErLXP519B2xZwWUhFf7Cx3u9FQefXlc+WiIlU2Mpzdm+@vger.kernel.org
+X-Gm-Message-State: AFuF++lPd01tzH/E8BUTaHyo2NoL9/ngA/AuNfT3DdcZwkMl5UM7+/fp
+	XS+2HZ64HdpCPcC8fIhEaZFtfadm0vqHRqu29+vgU4k4o3+jTIWd/2+nvtCBhVyAJoOnQP+ejSC
+	UFFNIZl7/yRqeW1KAXzTrHBGVn9rx2OU=
+X-Received: by 2002:a05:6402:5488:b0:6a5:d8f0:dc12 with SMTP id
+ 4fb4d7f45d1cf-6aa564f41ccmr6656525a12.14.1789969503981; Sun, 20 Sep 2026
+ 22:45:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260921014130.147229-1-zhang.guodong@linux.dev> <20260921014130.147229-3-zhang.guodong@linux.dev>
-In-Reply-To: <20260921014130.147229-3-zhang.guodong@linux.dev>
+References: <20260921014130.147229-1-zhang.guodong@linux.dev> <20260921014130.147229-2-zhang.guodong@linux.dev>
+In-Reply-To: <20260921014130.147229-2-zhang.guodong@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 21 Sep 2026 14:41:40 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_jScyDZC2tejqADDHW7aB0Cwd2cr8HoJr2iZarRbc3tw@mail.gmail.com>
-X-Gm-Features: AcwNN1XgZ2JDkYZiZCi9_1fbEthVFHypBChz_6Zlb0K3h-aJ7RxaMGdMyoz3Dvw
-Message-ID: <CAKYAXd_jScyDZC2tejqADDHW7aB0Cwd2cr8HoJr2iZarRbc3tw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] smb/client: update POSIX extension specification references
+Date: Mon, 21 Sep 2026 14:44:52 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9KE9PSi61z-PN0e3WLNNOxx8UW5QfQjq=qrOaJT2zVdA@mail.gmail.com>
+X-Gm-Features: AcwNN1W9Jw_WBwepa92xD-oGNFSfwM6A0lldc-9U7xWkhrcHtfyT0Ax_Qe__Q3U
+Message-ID: <CAKYAXd9KE9PSi61z-PN0e3WLNNOxx8UW5QfQjq=qrOaJT2zVdA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] smb/server: update POSIX extension specification references
 To: ZhangGuoDong <zhang.guodong@linux.dev>
 Cc: pc@manguebit.org, linux-cifs@vger.kernel.org, 
 	ZhangGuoDong <zhangguodong@kylinos.cn>, ChenXiaoSong <chenxiaosong@kylinos.cn>
@@ -66,5 +66,5 @@ dev> wrote:
 > Suggested-by: Paulo Alcantara <pc@manguebit.org>
 > Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 > Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks.
+Applied it to #ksmbd-for-next.
+Thanks!
