@@ -1,133 +1,72 @@
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-212.mta1.migadu.com [95.215.58.212])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AB3390999;
-	Sun, 20 Sep 2026 19:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A46C1FC0
+	for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 00:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.212
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1789931310; cv=none; b=COdEGHQhtzmDTV+zSWJeJcq34v/kRjHfyVo3fEybxXtGKu5jWZbv6HtS5yXF5JgH2POhEB6LbTA36BkuLVVSvPwyRy1tnKPbTi+6XNoP4f+UL9WrvTyyAY9nOhdRnZitATKZQg9YLcObLDXoozT/y3HITbz/ctSS5v0eVVq5E1Y=
+	t=1789950927; cv=none; b=sLp5u+x8OAL2y8wMzRyWWRB792lAwkRy+47P7WxN7gohBJw+IyT6th0vBuECCBKa6dEcoQB3Yi2KRzmis1KGPwdIw21qb6fJJw2b3/9XDKRA+Ny0Zrh8WN16AOxj/njZiSN6SdwEVD4zhoCdeKOQdRmh1WaJJVJ6iRoSgI6/5bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1789931310; c=relaxed/simple;
-	bh=kQtElpnNITSTtyHK2WXlyLGav5eKkDFQLAlezUEwYkg=;
+	s=arc-20240116; t=1789950927; c=relaxed/simple;
+	bh=2pvyrG7QUucWS7ATCd6iE/tMVCyElH3eDAzbSwZzvJ0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DQfnX9iS6KOpzbFKTHams1LeDl4zN1dDeanQvl0A5kqYnb9PG5JWpVwDsXJBQ+9fjm1bjxefltUL5SsKJKTjrpbFPkWIx9VUrmOGxaSN/xlzjti12CPlXjy7+qIEEIMnh4m7RjMhoGYKZ+HHggTqafw6nkWN0whUFnvnsf69gPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=NkteqUSC; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	 In-Reply-To:Content-Type; b=YUanYJi3PcxESBujjVFdfQur+CPDEIsP3muFiOiSUPH/cRylYNBz2vZV6e2DRvRlQiRDDHvKozYkvNgAa8zRd67yE4+HjTC2K5ndXvBJwM2DrkHCd2KhozHZgp1Afw799f1ja8gjfLfACezNI8tdmgO8rT8j6Ufy3VZHyPYJVTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aC8wn0SA; arc=none smtp.client-ip=95.215.58.212
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="NkteqUSC"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519MLKEM768 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4hnwqr4LgXzMl2c;
-	Sun, 20 Sep 2026 21:08:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1789931304;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vEHOjSWRZcPnxpiDog+HPMUx4qiEH33lrm296QWoL7s=;
-	b=NkteqUSCGYd9As8RVvAJzOfJB/11HqAb0ieUdsusYAMLTBmEfZAnVHx9O/hOy3yirtZPbO
-	LySsIYAlFExhaGWBMMwTotRZWyGbho1MYUPsyWx1SB82d18Vr6ymUN53rri1Jp26WrRUcm
-	/uRHTjIMUvYftLwjYW5w31uCb1JApfnjQIg/mlauHcboFvbIo89GIBNGZlfT4FZnAup4J7
-	SgLyzCQhrU2JzgpAcc/GK/4ADaJkirfzN5zsn5iaBS9mDfkkwFy+dgrcORvA2FjaYs/hJ0
-	c9cjbwQtBKLWozzdFFyeXcPC2DhLVSP1/xFrubpZBh1fiXWMUsTo+Rq5hnBGSA==
-Message-ID: <1c243393-4fb7-4be3-8d3c-9727b20ae373@mailbox.org>
-Date: Sun, 20 Sep 2026 21:08:20 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aC8wn0SA"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=2pvyrG7QUucWS7ATCd6iE/tMVCyElH3eDAzbSwZzvJ0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1789950923; v=1; x=1790555723;
+ b=aC8wn0SAUs4qrjGexcZT0abswTQgbfrBExebEzfZxBjbyLlZTPRFZt+y0N/O9lKkhvaRL4Gs
+ z10HzuWM6yCx0awR5F1ojKInE2hDPFs7wLJWnk59BAYzjLZYJ7mio3a81yVehGMRmlokm+J57r1
+ JO0DkMIch0AEHz7+IRIHRBX8=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id d0c77407e1d79bef;
+	Mon, 21 Sep 2026 00:35:15 +0000
+X-Mizu-Trace-ID: d0c77407e1d79bef
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <3daa7227-4921-4851-b734-d99b1c4d8bd8@linux.dev>
+Date: Mon, 21 Sep 2026 08:35:12 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: client side "current->alloc_tag not set WARNING:
- ./include/linux/alloc_tag.h:161" at accessing CIFS share
-To: Hao Ge <hao.ge@linux.dev>, Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>,
- netfs@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <0b004319-9ef7-437c-a4dd-174d6a9a83db@mailbox.org>
- <0e8961201179ba88038de511c587ddc7@manguebit.org>
- <cfcba100-609a-4016-9b47-186346709634@linux.dev>
-Content-Language: en-US, de-DE
-From: Erhard Furtner <erhard_f@mailbox.org>
-In-Reply-To: <cfcba100-609a-4016-9b47-186346709634@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] smb/server: update POSIX extension specification
+ references
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: pc@manguebit.org, linux-cifs@vger.kernel.org,
+ ZhangGuoDong <zhangguodong@kylinos.cn>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260920055653.114794-1-zhang.guodong@linux.dev>
+ <20260920055653.114794-2-zhang.guodong@linux.dev>
+ <CAKYAXd8kkDh54n3R2GZX0HrsZEcBSDP2UoyD+ozwomEXSeObYw@mail.gmail.com>
+Content-Language: en-US
+From: ZhangGuoDong <zhang.guodong@linux.dev>
+In-Reply-To: <CAKYAXd8kkDh54n3R2GZX0HrsZEcBSDP2UoyD+ozwomEXSeObYw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: yx9q3f76xgnwuhifp5debybtiokgsto3
-X-MBO-RS-ID: 086fc2c6401a82ff953
 
-On 9/16/26 11:42, Hao Ge wrote:
-> Right - and there's one more instance of the same pattern.
-> Erhard's second warning (alloc_tag was not set on free) comes from
-> netfs_folioq_alloc(), which does the same for the folio_queue:
-> 	
-> 	fq = netfs_folioq_pool.alloc(gfp, netfs_folioq_pool.pool_data);
-> 
-> When I first saw the report I wondered why no other mempool user trips over this,
-> so I had a look around the tree:
-> 
-> Everyone else gets their elements through the mempool_alloc() macro, so the tag is
-> set at their callsite and the callbacks see a valid current->alloc_tag.
-> 
-> I went back to the commit that introduced the raw call, 1d78d56c43ef ("netfs: Fix folio_queue ENOMEM in
-> writeback by adding a mempool") and OK, I think I roughly understand the story now.
-> 
-> Here is my proposed fix patch. I don't have a test environment handy though. What do you think?
-> 
-> diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
-> index 420ee7b26580..373be970ec31 100644
-> --- a/fs/netfs/internal.h
-> +++ b/fs/netfs/internal.h
-> @@ -45,6 +45,9 @@ extern mempool_t netfs_request_pool;
->   extern mempool_t netfs_subrequest_pool;
->   extern mempool_t netfs_folioq_pool;
->   
-> +#define mempool_alloc_element(_pool, _gfp)				\
-> +	alloc_hooks((_pool)->alloc(_gfp, (_pool)->pool_data))
-> +
->   #ifdef CONFIG_PROC_FS
->   static inline void netfs_proc_add_rreq(struct netfs_io_request *rreq)
->   {
-> diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
-> index 01461a74642d..18f5c64d404e 100644
-> --- a/fs/netfs/objects.c
-> +++ b/fs/netfs/objects.c
-> @@ -34,7 +34,7 @@ struct netfs_io_request *netfs_alloc_request(struct address_space *mapping,
->   
->   		rreq = mempool_alloc(mempool, gfp);
->   	} else {
-> -		rreq = mempool->alloc(gfp, mempool->pool_data);
-> +		rreq = mempool_alloc_element(mempool, gfp);
->   		if (!rreq)
->   			return ERR_PTR(-ENOMEM);
->   	}
-> @@ -206,7 +206,7 @@ struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_request *rreq
->   	struct kmem_cache *cache = mempool->pool_data;
->   
->   	if (rreq->gfp == GFP_KERNEL)
-> -		subreq = mempool->alloc(rreq->gfp, mempool->pool_data);
-> +		subreq = mempool_alloc_element(mempool, rreq->gfp);
->   	else
->   		subreq = mempool_alloc(mempool, rreq->gfp);
->   	if (!subreq)
-> diff --git a/fs/netfs/rolling_buffer.c b/fs/netfs/rolling_buffer.c
-> index 8c0026836f9c..d1ae6e081664 100644
-> --- a/fs/netfs/rolling_buffer.c
-> +++ b/fs/netfs/rolling_buffer.c
-> @@ -29,7 +29,7 @@ struct folio_queue *netfs_folioq_alloc(unsigned int rreq_id, gfp_t gfp,
->   	struct folio_queue *fq;
->   
->   	if (gfp == GFP_KERNEL)
-> -		fq = netfs_folioq_pool.alloc(gfp, netfs_folioq_pool.pool_data);
-> +		fq = mempool_alloc_element(&netfs_folioq_pool, gfp);
->   	else
->   		fq = mempool_alloc(&netfs_folioq_pool, gfp);
->   	if (fq) {
+These members are already defined in the structure, so the comments can 
+be removed.
 
-Thanks for your patch Hao! On my side I can confirm it applies on 
-v7.3-rc3 and fixes "the current->alloc_tag not set WARNING:"
+On 9/20/26 22:03, Namjae Jeon wrote:
+>>          /* SidBuffer contain two sids (UNIX user sid(16), UNIX group sid(16)) */
+>>          u8 SidBuffer[32];
+>> +       /* End of POSIX Create Context Response */
+>>          __le32 name_len;
+>>          u8 name[];
+>> -       /*
+>> -        * var sized owner SID
+>> -        * var sized group SID
+>> -        * le32 filenamelength
+>> -        * u8  filename[]
+>> -        */
+> Is there any reason to delete these?
 
-Regards,
-Erhard
