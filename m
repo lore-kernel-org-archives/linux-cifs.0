@@ -1,103 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy2-f22.google.com (mail-dy2-f22.google.com [74.125.229.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59FC5625FF;
-	Tue, 22 Sep 2026 13:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E4E56B871
+	for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 17:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790083337; cv=none; b=Ng82AGNbxlhG1vaMSXHpnoPyvFbXdlSoUcNhG4GLmNXV+szvgry4pv06DN9wqSkEHSxlIyLkFRe/dBuQCV1op2F6ZIkH/nHlCdP5LgoeiQV2A1nM0gfYWN6D8vKlqYliWfexQpwtUfobdcg7qO5QDjxvG35Z7FREtRMWP+uo9eA=
+	t=1790098920; cv=none; b=MXB7McDEVdyBamMaNEMxmKTg8OPDKds4kkcDBLv30xoBIdQaD9inT5dYUNy9J6AF5hi8fY6/61WKJuV4rhG7J/dxiPVVfTcutQUK/1XNhHytj+gKB8wZZPuOV6F2gluH8Wx62+v49zQdBCdCvXizELABnrxi6zEVMQpNVx4u+Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790083337; c=relaxed/simple;
-	bh=sK8BnE3OVUa3qcEA4w6XLPX3ICDTz3CLRhUFPO/Xmo0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCfEwvbeW4N5aSor1qSaKL4AK2OBJ18Ug6GwVV+OB0B4UQ8KKM/MDpGUYcfYNIQRGG3gZm6zyfzucPLifvyuvYOiPrnBaP+yiuI53VVrrnfO9myC+rjoxrZI0UHQu2oNh1/RUnGkwliAaDvlGhX81wg9InLYhC8EHFbA52JhptI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DaRB1lGh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790098920; c=relaxed/simple;
+	bh=YbQWCoLbJ2TBrHcsvoDcg8EEVw/4pDqVEBIsrTk1cBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u9IDouFVer9RnUjg+awZNGa5GiEviR0BRTj2ggXiFLGQAETk5aXJBpE8S5x3Uho8WurkoT9KhyXWgaPBBtVksgBYClTaXsPvucOx3nUZwnnHpUThgCpv/+lsVoIScPOVYonEzd0ueMIQACXiBm8hUykU2n9NVtKMtJRnzKNOssE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KrUvrx3m; arc=none smtp.client-ip=74.125.229.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DaRB1lGh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E221A1F00893;
-	Tue, 22 Sep 2026 13:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790083334;
-	bh=GfF8dRc2sKVUnBKfYNuG6L9N9wEZjzkAOGMMFnSAzCI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DaRB1lGhiLSSe5W1fpYBzLdg73B/4vy2V01aBrToXztlIslYWIvfB8lbQIxSKkU5L
-	 p+ujmKWKKkQtRvYFFSk9PD+DqqVIJB4temNjfY/czhPzle4BFacLAZnSHq3/TCgiWs
-	 H84azRT9Sg6JIvhczIBWBBzl8Fjmyv5DaA8rKCTcb9uaauXkF0Ak1RBtdTIorZXOX5
-	 8YQRVxppRhdxfbubvO3VizxqE09oczYIKk5lUHNnABf4ueIeh78sb0B0FayzCjFMxU
-	 77OjjUC/n/tHzFUQVx6kocj9rLY0kdy1DGwrVMbknr+2EBXOUmUccPx6Dtjpby1ZS4
-	 ZupgZtznXiiQQ==
-Date: Tue, 22 Sep 2026 16:22:09 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Ammar Ratnani <ammrat13@gmail.com>
-Cc: linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Stefan Metzmacher <metze@samba.org>, Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-kernel@vger.kernel.org, Ammar Ratnani <aratnani@nvidia.com>,
-	Kechen Lu <kechenl@nvidia.com>,
-	Mithun Maragiri <mmaragiri@nvidia.com>
-Subject: Re: [PATCH 0/2] smbdirect: don't hang on netdev reconfiguration
-Message-ID: <20260922132209.GI563127@unreal>
-References: <20260908154454.10966-1-ammrat13@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrUvrx3m"
+Received: by mail-dy2-f22.google.com with SMTP id 5a478bee46e88-33bf5a1c4d9so58916eec.3
+        for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 10:41:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790098918; x=1790703718; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=KpXDs9omfosdMoHljEwPZp4DRs9tPWpEJWp4t5OaeUo=;
+        b=KrUvrx3mS1t0oBKVtGl64s3X1+iAfRpO3LCWQRrQFc4X+Bi3kaHAsKBDPt55UGQ+oL
+         cw+B9+OK22Tzy7U1CHVToemknfM9l+PhNfohtBcWFy2q/vGCB1a01jNLWB1Vru/AMvyM
+         ZZ1KWgJw4tt07YCyBoVIneSEem7E+DJxGPjPwId69pXZzBA/S1YLRiSv4kwYwjlqYPzo
+         oG1+Wqto6gvEZNf8cdj5pyrGuMApMawrioYpweEEa+eCENFJz4hwyrM6BnXgHiCdKs9S
+         xslRKD8QXeos0G2IjD5d1DdEkQ9VAqtRy6w9Uaw8dLHBXTfK2mwlQAbkFxkx9L45QoLy
+         i5yA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790098918; x=1790703718;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=KpXDs9omfosdMoHljEwPZp4DRs9tPWpEJWp4t5OaeUo=;
+        b=SHOQj1cwRRyBJPCTIFmr+ozXMw5OYNZ9caE063roRUrLE8lTEVJdMGJwDxxLBLBb00
+         RhDISCci2sBFzKbz/wEz1tPJF9Iw7LjaJ/lpk5NI8riNwRPUgvey68Nuw9iQ5xUaYwam
+         2JkBRyCY/tdGWtooXWJ8uwf9CnhS4zMuazN9wYslmTV0Bl9e3aYl8rsy8wTXNaywuZ3A
+         rkHfZlqSjYbN+Kvx+nvpufw/q0dEUA+Rh+KjA/XNotACSJRe49PEm+Tn4s2uiQ4DSssW
+         jLsGSd4BQ2/BhgHyHccpyMuYqNYLs/QBh4/0tSOBccZZRE0D8bCaSMEdWBAQAx6WiXaB
+         newA==
+X-Forwarded-Encrypted: i=1; AKwUvBwYjuHIAHlCzD1aE2siIQ+K7m/ETKzA+llrVh9DUzLSQLbZmdUFHulDuq4i09cJ4wogK5rBoTSc58pn@vger.kernel.org
+X-Gm-Message-State: AFuF++kSi+/pV81MIAB4AbwDn4maMj7r0UqSsgZdFxQaXvTaQ7vYnw4/
+	aDG72ksi7lAOOtkzthiHQ0jPHw/RK5SvmW7H+r2grSH/sz02CVQ0s3BZ
+X-Gm-Gg: AYBFou2czQ4jwZD4LB8k2ysN3RIis+kFQ18OVZu4wAOYt6OkD58GEWT2DRtcWg81tmv
+	Hpw/l27UcC4RroqceEo3rLtZmmhKW9Ha40qtH5rQbwssHZMbXAhVxdYOCvcjZFN6cT26/ntL6J2
+	IkGkT9ypdlOAipMNAh5jOJ/XygSfN+BGhM9GNYsmecxfchnHGe8fAHr8Hqfz+CpovTw/BGOm+lL
+	uLfG3SRH8Fh0ID98D29H5MRxYIzSJl+nZyv+tfeKQQ7vw/bmho6NMHYQh6ajwGnXY/mpn1ZFNrp
+	z4lnjkSJnRNhl1pdDRECWwfkPKNBoIdNhE9GoLqcahSJ4YdV607ukvkCgjer/4ct6cJhOqyOazN
+	CoMeuZHyEPfvpEPb4BbFLx9P1ukcOGfhnVEjl2Dsy6AQLoRB1twYZTlxDxrV0RDwqtX4d3CK2Ub
+	AJSLoSrD3YSrTmorL7o2GFngNofmhxNBXh8sgv9Tl493PtIZQ+ummJdIULt5gPBLgiWDbOgz3Lb
+	I71kA9P8b6huHZUN3T5aw==
+X-Received: by 2002:a05:7022:29c:10b0:143:26ee:4203 with SMTP id a92af1059eb24-144f91547bamr91844c88.30.1790098917567;
+        Tue, 22 Sep 2026 10:41:57 -0700 (PDT)
+Received: from FredPC ([2600:382:8d06:9b8b:d94d:e185:fcc4:f1c4])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-144f9040420sm110074c88.15.2026.09.22.10.41.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Sep 2026 10:41:57 -0700 (PDT)
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Tom Talpey <tom@talpey.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fredric Cover <fredric.cover.lkernel@gmail.com>
+Subject: [PATCH] smb: client: use GFP_KERNEL in get_targets()
+Date: Tue, 22 Sep 2026 10:37:59 -0700
+Message-ID: <20260922173759.67445-1-fredric.cover.lkernel@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260908154454.10966-1-ammrat13@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 08, 2026 at 08:44:25AM -0700, Ammar Ratnani wrote:
-> When I mount a CIFS share using SMB Direct over RoCEv2, I observe a kernel
-> thread hang if I "configure" its slave network device by taking its link
-> down and bringing it back up. Attempting to just `ls` the mount point in
-> this state gives EHOSTDOWN.
-> 
-> I believe the following is the root-cause of the hang: When the link is
-> taken down, the corresponding GID Table Entry is marked as pending deletion
-> and has its slave ndev set to NULL. All sends on RDMA connections still
-> using that GID Table Entry fail at MAD creation. SMB Direct eventually
-> detects this and tries to disconnect / reconnect to recover. Unfortunately,
-> disconnecting requires successfully sending either a DREQ or a DREP. Since
-> neither of them even post, the connection remains in the RDMA_CM_CONNECT
-> state, and no callback moves it out. The SMB Direct layer never gets the
-> RDMA_CM_EVENT_DISCONNECTED it's waiting for, and hangs.
-> 
-> Fix this in the CMA. If we call `rdma_disconnect` on a connected connection
-> and we fail to send both a DREP and a DREQ; disconnect, and thereby send
-> the `RDMA_CM_EVENT_DISCONNECTED` event to SMB Direct.
-> 
-> I tested this change in QEMU using RXE. I ran Ubuntu 26.04.1 with a
-> mainline kernel. On commit 9f0346dcbea3 ("Merge tag 'driver-core-7.3-rc2'
-> of git://git.kernel.org/pub/scm/linux/kernel/git/driver-core/driver-core"),
-> I reproduce the hang. With this patch applied, SMB Direct immediately
-> disconnects and reconnects when the slave device is brought down then up.
-> Listing and reading files from the mount point also work afterwards.
-> 
-> Artifacts for reproducing the hang and testing my fix are available at
-> 
->     https://github.com/ammrat13/linux-cifs
-> 
-> There, you can find: logs from the "bad" and "good" kernels, the kernel
-> configuration, the VMs' configuration, and a playbook to trigger the hang.
-> 
-> Ammar Ratnani (2):
->   infiniband: force disconnect if DREP and DREQ fail
->   infiniband: trace force disconnections
+Currently, get_targets() uses GFP_ATOMIC to allocate the cache target
+iterator and to duplicate t->name. The callers of get_targets() are
+in a sleepable context; therefore, switch to GFP_KERNEL to reduce
+risk of failure and reduce pressure on emergency pools in low-memory
+scenarios.
 
-I squashed the second patch into the first one, fixed the subject, removed
-the useless AI-generated comments, placed trace call into right place, and
-pushed the result.
+Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+---
+ fs/smb/client/dfs_cache.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks
+diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+index f6c4259479c5..f727fb261331 100644
+--- a/fs/smb/client/dfs_cache.c
++++ b/fs/smb/client/dfs_cache.c
+@@ -798,13 +798,13 @@ static int get_targets(struct cache_entry *ce, struct dfs_cache_tgt_list *tl)
+ 	INIT_LIST_HEAD(head);
+ 
+ 	list_for_each_entry(t, &ce->tlist, list) {
+-		it = kzalloc_obj(*it, GFP_ATOMIC);
++		it = kzalloc_obj(*it, GFP_KERNEL);
+ 		if (!it) {
+ 			rc = -ENOMEM;
+ 			goto err_free_it;
+ 		}
+ 
+-		it->it_name = kstrdup(t->name, GFP_ATOMIC);
++		it->it_name = kstrdup(t->name, GFP_KERNEL);
+ 		if (!it->it_name) {
+ 			kfree(it);
+ 			rc = -ENOMEM;
+-- 
+2.53.0
 
-> 
->  drivers/infiniband/core/cma.c       | 41 ++++++++++++++++++++++++++---
->  drivers/infiniband/core/cma_trace.h |  1 +
->  2 files changed, 38 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.55.0
