@@ -1,77 +1,44 @@
-Received: from mail-dy2-f22.google.com (mail-dy2-f22.google.com [74.125.229.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E4E56B871
-	for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 17:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F473E4C6B;
+	Tue, 22 Sep 2026 17:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790098920; cv=none; b=MXB7McDEVdyBamMaNEMxmKTg8OPDKds4kkcDBLv30xoBIdQaD9inT5dYUNy9J6AF5hi8fY6/61WKJuV4rhG7J/dxiPVVfTcutQUK/1XNhHytj+gKB8wZZPuOV6F2gluH8Wx62+v49zQdBCdCvXizELABnrxi6zEVMQpNVx4u+Ts=
+	t=1790099477; cv=none; b=LSUoVvVM5JLJ7JI+HDK3KKrjPH3AY7YN5hhMWgkvdj3J8TDHrZbuwEMFU0jl/KtbkXzzcjIXLc5VZsUeJ3V+03cy6cWifZSsbkAkjuxF35iZuyr8EYKESztGPDBiDUno2cRuLCpEs3M6ccg27tbx9Dh/oNi/9kbiHeCb1B7Ef8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790098920; c=relaxed/simple;
-	bh=YbQWCoLbJ2TBrHcsvoDcg8EEVw/4pDqVEBIsrTk1cBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u9IDouFVer9RnUjg+awZNGa5GiEviR0BRTj2ggXiFLGQAETk5aXJBpE8S5x3Uho8WurkoT9KhyXWgaPBBtVksgBYClTaXsPvucOx3nUZwnnHpUThgCpv/+lsVoIScPOVYonEzd0ueMIQACXiBm8hUykU2n9NVtKMtJRnzKNOssE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KrUvrx3m; arc=none smtp.client-ip=74.125.229.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790099477; c=relaxed/simple;
+	bh=Tpk/2nPBoY/ZkNFlo3aZLy4jjsyY4fSJ/0FYz62qRcQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=B00di2o9psu7UtR9oyB28d9PF4YScr/SIGuyMsAxzq+KS6RIlprpQe7mEe97v5trgyJjFpHlBNBjKrs/MfYfCkslBgEZIy2zl8KYjlx1yn5OWPWPMOZe3J5Auwixf+GC4dVqdQknUdIayfn2DO63TP4ZFmsEA/tlD4Fc2iFE+aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T68juTUq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KrUvrx3m"
-Received: by mail-dy2-f22.google.com with SMTP id 5a478bee46e88-33bf5a1c4d9so58916eec.3
-        for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 10:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790098918; x=1790703718; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=KpXDs9omfosdMoHljEwPZp4DRs9tPWpEJWp4t5OaeUo=;
-        b=KrUvrx3mS1t0oBKVtGl64s3X1+iAfRpO3LCWQRrQFc4X+Bi3kaHAsKBDPt55UGQ+oL
-         cw+B9+OK22Tzy7U1CHVToemknfM9l+PhNfohtBcWFy2q/vGCB1a01jNLWB1Vru/AMvyM
-         ZZ1KWgJw4tt07YCyBoVIneSEem7E+DJxGPjPwId69pXZzBA/S1YLRiSv4kwYwjlqYPzo
-         oG1+Wqto6gvEZNf8cdj5pyrGuMApMawrioYpweEEa+eCENFJz4hwyrM6BnXgHiCdKs9S
-         xslRKD8QXeos0G2IjD5d1DdEkQ9VAqtRy6w9Uaw8dLHBXTfK2mwlQAbkFxkx9L45QoLy
-         i5yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790098918; x=1790703718;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=KpXDs9omfosdMoHljEwPZp4DRs9tPWpEJWp4t5OaeUo=;
-        b=SHOQj1cwRRyBJPCTIFmr+ozXMw5OYNZ9caE063roRUrLE8lTEVJdMGJwDxxLBLBb00
-         RhDISCci2sBFzKbz/wEz1tPJF9Iw7LjaJ/lpk5NI8riNwRPUgvey68Nuw9iQ5xUaYwam
-         2JkBRyCY/tdGWtooXWJ8uwf9CnhS4zMuazN9wYslmTV0Bl9e3aYl8rsy8wTXNaywuZ3A
-         rkHfZlqSjYbN+Kvx+nvpufw/q0dEUA+Rh+KjA/XNotACSJRe49PEm+Tn4s2uiQ4DSssW
-         jLsGSd4BQ2/BhgHyHccpyMuYqNYLs/QBh4/0tSOBccZZRE0D8bCaSMEdWBAQAx6WiXaB
-         newA==
-X-Forwarded-Encrypted: i=1; AKwUvBwYjuHIAHlCzD1aE2siIQ+K7m/ETKzA+llrVh9DUzLSQLbZmdUFHulDuq4i09cJ4wogK5rBoTSc58pn@vger.kernel.org
-X-Gm-Message-State: AFuF++kSi+/pV81MIAB4AbwDn4maMj7r0UqSsgZdFxQaXvTaQ7vYnw4/
-	aDG72ksi7lAOOtkzthiHQ0jPHw/RK5SvmW7H+r2grSH/sz02CVQ0s3BZ
-X-Gm-Gg: AYBFou2czQ4jwZD4LB8k2ysN3RIis+kFQ18OVZu4wAOYt6OkD58GEWT2DRtcWg81tmv
-	Hpw/l27UcC4RroqceEo3rLtZmmhKW9Ha40qtH5rQbwssHZMbXAhVxdYOCvcjZFN6cT26/ntL6J2
-	IkGkT9ypdlOAipMNAh5jOJ/XygSfN+BGhM9GNYsmecxfchnHGe8fAHr8Hqfz+CpovTw/BGOm+lL
-	uLfG3SRH8Fh0ID98D29H5MRxYIzSJl+nZyv+tfeKQQ7vw/bmho6NMHYQh6ajwGnXY/mpn1ZFNrp
-	z4lnjkSJnRNhl1pdDRECWwfkPKNBoIdNhE9GoLqcahSJ4YdV607ukvkCgjer/4ct6cJhOqyOazN
-	CoMeuZHyEPfvpEPb4BbFLx9P1ukcOGfhnVEjl2Dsy6AQLoRB1twYZTlxDxrV0RDwqtX4d3CK2Ub
-	AJSLoSrD3YSrTmorL7o2GFngNofmhxNBXh8sgv9Tl493PtIZQ+ummJdIULt5gPBLgiWDbOgz3Lb
-	I71kA9P8b6huHZUN3T5aw==
-X-Received: by 2002:a05:7022:29c:10b0:143:26ee:4203 with SMTP id a92af1059eb24-144f91547bamr91844c88.30.1790098917567;
-        Tue, 22 Sep 2026 10:41:57 -0700 (PDT)
-Received: from FredPC ([2600:382:8d06:9b8b:d94d:e185:fcc4:f1c4])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-144f9040420sm110074c88.15.2026.09.22.10.41.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Sep 2026 10:41:57 -0700 (PDT)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-To: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Bharath SM <bharathsm@microsoft.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T68juTUq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7E31F000FF;
+	Tue, 22 Sep 2026 17:51:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790099476;
+	bh=Yg4ZbR3szev00cJTbTktWuEBh3/Rf15wu0lb5Rbi36g=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=T68juTUq98nZe5cX8GhqzGG2zpsowze9r/frMwKi5vsRw+7mp3ymgP5Y3mvry2trx
+	 Kav5PNlpJj3tkZQwvfbGyHPSwLl2aOof/fZFS680pCXSwm0sS2FDLMQEMP39swLRSA
+	 O1atRJa5+glQTRLPHt78d02bUhz6BUk3au8OjUq42FQMLUni8avPgTjvCOwjbmxEWN
+	 A3UJ6lMe8a0KCaQBhDROLz6GeruOl4v7eA3Zufr8ktSJIXw+k8W1P2B45sjjmw5pY9
+	 2RyAJUmTAe9T36iUoPuMr5WZE2boIJjP31O2KyLn6I36OQNPYKRNFiQlJdl1tngshZ
+	 cZd8xickZNWoQ==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
 	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH] smb: client: use GFP_KERNEL in get_targets()
-Date: Tue, 22 Sep 2026 10:37:59 -0700
-Message-ID: <20260922173759.67445-1-fredric.cover.lkernel@gmail.com>
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.18.y 1/2] cifs: Fix specification of function pointers
+Date: Tue, 22 Sep 2026 13:51:11 -0400
+Message-ID: <20260922175112.3308891-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <2026092230-barmaid-washday-b084@gregkh>
+References: <2026092230-barmaid-washday-b084@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -80,37 +47,101 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, get_targets() uses GFP_ATOMIC to allocate the cache target
-iterator and to duplicate t->name. The callers of get_targets() are
-in a sleepable context; therefore, switch to GFP_KERNEL to reduce
-risk of failure and reduce pressure on emergency pools in low-memory
-scenarios.
+From: David Howells <dhowells@redhat.com>
 
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+[ Upstream commit 6a86a4cc281a5cfceda7af60ea6fa506b3db7430 ]
+
+Change the mid_receive_t, mid_callback_t and mid_handle_t function pointers
+to have the pointer marker in the typedef.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: linux-cifs@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Stable-dep-of: c60ae98c5aa6 ("9p: Fix v9fs_issue_write() to update i_size and remote_i_size")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- fs/smb/client/dfs_cache.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/client/cifsglob.h  | 12 ++++++------
+ fs/smb/client/cifsproto.h |  8 ++++----
+ fs/smb/client/transport.c |  4 ++--
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
-index f6c4259479c5..f727fb261331 100644
---- a/fs/smb/client/dfs_cache.c
-+++ b/fs/smb/client/dfs_cache.c
-@@ -798,13 +798,13 @@ static int get_targets(struct cache_entry *ce, struct dfs_cache_tgt_list *tl)
- 	INIT_LIST_HEAD(head);
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index 1837f4820bd67..ae67ff3743fe2 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1663,7 +1663,7 @@ static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
+  * Returns zero on a successful receive, or an error. The receive state in
+  * the TCP_Server_Info will also be updated.
+  */
+-typedef int (mid_receive_t)(struct TCP_Server_Info *server,
++typedef int (*mid_receive_t)(struct TCP_Server_Info *server,
+ 			    struct mid_q_entry *mid);
  
- 	list_for_each_entry(t, &ce->tlist, list) {
--		it = kzalloc_obj(*it, GFP_ATOMIC);
-+		it = kzalloc_obj(*it, GFP_KERNEL);
- 		if (!it) {
- 			rc = -ENOMEM;
- 			goto err_free_it;
- 		}
+ /*
+@@ -1674,13 +1674,13 @@ typedef int (mid_receive_t)(struct TCP_Server_Info *server,
+  * - it will be called by cifsd, with no locks held
+  * - the mid will be removed from any lists
+  */
+-typedef void (mid_callback_t)(struct mid_q_entry *mid);
++typedef void (*mid_callback_t)(struct mid_q_entry *mid);
  
--		it->it_name = kstrdup(t->name, GFP_ATOMIC);
-+		it->it_name = kstrdup(t->name, GFP_KERNEL);
- 		if (!it->it_name) {
- 			kfree(it);
- 			rc = -ENOMEM;
+ /*
+  * This is the protopyte for mid handle function. This is called once the mid
+  * has been recognized after decryption of the message.
+  */
+-typedef int (mid_handle_t)(struct TCP_Server_Info *server,
++typedef int (*mid_handle_t)(struct TCP_Server_Info *server,
+ 			    struct mid_q_entry *mid);
+ 
+ /* one of these for every pending CIFS request to the server */
+@@ -1698,9 +1698,9 @@ struct mid_q_entry {
+ 	unsigned long when_sent; /* time when smb send finished */
+ 	unsigned long when_received; /* when demux complete (taken off wire) */
+ #endif
+-	mid_receive_t *receive; /* call receive callback */
+-	mid_callback_t *callback; /* call completion callback */
+-	mid_handle_t *handle; /* call handle mid callback */
++	mid_receive_t receive;	/* call receive callback */
++	mid_callback_t callback; /* call completion callback */
++	mid_handle_t handle;	/* call handle mid callback */
+ 	void *callback_data;	  /* general purpose pointer for callback */
+ 	struct task_struct *creator;
+ 	void *resp_buf;		/* pointer to received SMB header */
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 325408073888e..d76e986aa1ad6 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -97,10 +97,10 @@ extern int cifs_ipaddr_cmp(struct sockaddr *srcaddr, struct sockaddr *rhs);
+ extern bool cifs_match_ipaddr(struct sockaddr *srcaddr, struct sockaddr *rhs);
+ extern int cifs_discard_remaining_data(struct TCP_Server_Info *server);
+ extern int cifs_call_async(struct TCP_Server_Info *server,
+-			struct smb_rqst *rqst,
+-			mid_receive_t *receive, mid_callback_t *callback,
+-			mid_handle_t *handle, void *cbdata, const int flags,
+-			const struct cifs_credits *exist_credits);
++			   struct smb_rqst *rqst,
++			   mid_receive_t receive, mid_callback_t callback,
++			   mid_handle_t handle, void *cbdata, const int flags,
++			   const struct cifs_credits *exist_credits);
+ extern struct TCP_Server_Info *cifs_pick_channel(struct cifs_ses *ses);
+ extern int cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 			  struct TCP_Server_Info *server,
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 4da3d62b6481e..fb8e837f92cd2 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -659,8 +659,8 @@ int wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *midQ)
+  */
+ int
+ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
+-		mid_receive_t *receive, mid_callback_t *callback,
+-		mid_handle_t *handle, void *cbdata, const int flags,
++		mid_receive_t receive, mid_callback_t callback,
++		mid_handle_t handle, void *cbdata, const int flags,
+ 		const struct cifs_credits *exist_credits)
+ {
+ 	int rc;
 -- 
 2.53.0
 
