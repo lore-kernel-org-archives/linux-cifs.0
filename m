@@ -1,94 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874DE36A03F
-	for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 01:31:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAAB25B09D
+	for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 01:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790040668; cv=none; b=emwtMixyULBjcDeCPt2Kq76jIxtEhHnVB010jKhlQ6N1rpXPhqBqN/N/OcSyEpZiwO9dDctoKeX4XuJISpe+4unN+w01hptWGtSZ1QEIx8eW0h0JoFO7IX8MLxKO9oUJPggKwRPPPNSXWgsGi7gInNhEYOWSHOLfDHnwYLlIklE=
+	t=1790040933; cv=none; b=VcpSYKsuaw7Q4KLAK0C4d7x/M5fXgCIWbeR5rrOReksrCUb0W1epi6/YtjDor7AerlZ4R5y4Zvs8MJgrfK1BuYJzkmlmYxzqoQSgXWGydArxcYLB84V3ubovHK6T7Sd9DazvSY9TPoOJ5dvf4+QOoIJu+Cp600KYtFIsiPX2pl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790040668; c=relaxed/simple;
-	bh=efk3ZirlziI/LThNa4jecb5ywGEkb9gRmunoJG1cryI=;
+	s=arc-20240116; t=1790040933; c=relaxed/simple;
+	bh=j8xJQatrLDHckHQEPFHpuWazOq0+3MD11XNz2vDdfbE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mxHwXcTTVRq2uf2SfDyIyb6caxNe0SU7eRw0reTufUg0gvaKy0Ridic3BeZR+XZmvsui8LNNf+wi9vcXt92mzx6brtqem30zTN6EUENrwElAlwgTiKnFifHATg4p11Jrr990RjQbhc+WHvga+QAuEXt47ozrEmEfprMs4Ttrm1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZsrDcv4; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=e63jhvJd1WbQ5zf+wKUXUdsAd5iYNrFLJANqRlDUnH86Ka4SdvgQMDzrJdlKUPZ+xORfC8FVjpOVmu5uudREtCuIzBNcLSqERu2j8nbS8F5YqCynTT2I8CXYQrPdPmAQik1+849BGkQ7bTPuMbVcXUzesTchrSVj5nQTfO7r3AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+YyT5do; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZsrDcv4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D14D1F0089C
-	for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 01:31:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+YyT5do"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 252C01F0089C
+	for <linux-cifs@vger.kernel.org>; Tue, 22 Sep 2026 01:35:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790040667;
-	bh=Ox81vjx/oDplgH9TE7Sigle4Z1vESmuvwoSMbL/ZP5o=;
+	s=k20260515; t=1790040932;
+	bh=iVMZ69N6521oqcOuPGqLHxFf8ZIKTjOI5rtJziJsruo=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=gZsrDcv4PGN7qGlvxiX4MopB/lTm9Y4+3ZgTRcuEmHmjFJ5k5lDoyLbcgv8Or5lrr
-	 JArb8yI1k8vv2jwh0RSR7yyWzTaZBRYhEQL0W4g9bHrbFI0y0WSD1qZMO1Y5zwycx+
-	 WBMVCholckopPRdfLLqf5cGPiMdDNRj4OxMcXPKkuvIpkqsHeYbpC0nldN6nbNOsCl
-	 IZf//U7OeKsdCH8Na9PHxEdKFQg1hFWfvQkiOiAHm0qVknCim9VBceOlpjoCsOz9ap
-	 x0qgrhUYU7GVotqGHvOU7dSXmggV6Na5aGu0Sdye0b+MBpp+XwG5ntGrnVCTeU6T5R
-	 +F8+7E0dVNAgg==
-Received: by mail-ej2-f43.google.com with SMTP id a640c23a62f3a-c2a1a631f6aso424886266b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 18:31:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwhIXOfOaR7pu6o/dlTYo0CQBapnBie/Md+y8+WvorOvpzTQAvG2PnwBCJ4fiGEx44lruqe+27E3+Vn@vger.kernel.org
-X-Gm-Message-State: AFuF++k7MviKb1mF138NIfCXjQYkA3vCvCp0CXOybLQdfZtat3gDxs4A
-	y/JgoAvdavpeIotXGIVOKlpEw2ktydsiPCwnapMvCu4WhbiyZqhZOy2vu2prks/hWh8M4o6EEjo
-	/SNg+NFTOExGp4O9DJ6/xQohuYmVvGck=
-X-Received: by 2002:a17:907:94d5:b0:c29:3a1b:ec91 with SMTP id
- a640c23a62f3a-c2a156d9481mr1102498966b.20.1790040665816; Mon, 21 Sep 2026
- 18:31:05 -0700 (PDT)
+	b=A+YyT5do2K+LtXp0PAETgNUG7Lf+ElKq/8tEzxcRounNo3oizErUOaSJOvXYOGd1o
+	 EUplz10rVHXe6/ZHbu9knT2yW9qcNzHWEsiCcW4U2+25XWgxu8XGoYEeaTXrqvtuPb
+	 qDP3zwQYJb5rHwbF0Q46t6Bv/9aWMgrrshqMAfzaAKB8QOUl5j1sRkvZQ8TyLfQlRx
+	 2+J/3BG8zi+ytapUpe+z/DynsXbrXSVkFduvDovNU/eu8K4eNEdJUB0xE2YDkthhf9
+	 u6/oHwUnwygvEOMO1F1rLfnmTMyd/c8t8JGIY20ISJdc7eb5e4V0A5ssNKm0T0i4Ht
+	 Eh3sQr1vSEIOw==
+Received: by mail-ej2-f31.google.com with SMTP id a640c23a62f3a-c29703cb796so492987566b.2
+        for <linux-cifs@vger.kernel.org>; Mon, 21 Sep 2026 18:35:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwitlUs+1xG7e8Jh0s+7M2UFt25rlCDyK+aoPR+cZ2u518aUqLRuuoc2zovwv+dLu6m+Q3jtToqXMZD@vger.kernel.org
+X-Gm-Message-State: AFuF++lmlCRYW3kvtpFJtQy3zek5V+v/TFH73N3Pt5IZ+lCPQRQCBzwv
+	ili8xbgopCmGxNxAvzZ+RGHKB7pNjlGMvn8oA8leAuvhP2XpXK9vXvvKTdb5tWb6b1HG4aZl22H
+	vDawDVW9/OVg+Abkhb1Kj/JGMmv1Rivw=
+X-Received: by 2002:a17:906:9f89:b0:c29:41c1:3779 with SMTP id
+ a640c23a62f3a-c2a159a972emr1089843966b.11.1790040930758; Mon, 21 Sep 2026
+ 18:35:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260920181503.2830435-1-Jeremy.Jean@oss.cyber.gouv.fr>
-In-Reply-To: <20260920181503.2830435-1-Jeremy.Jean@oss.cyber.gouv.fr>
+References: <20260920053126.28654-1-gotenksIN@aospa.co>
+In-Reply-To: <20260920053126.28654-1-gotenksIN@aospa.co>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 22 Sep 2026 10:30:52 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_=1S6GP6e9Py+GopcUOGQzGSHYrMqpw=7=VSnJ1P+s3g@mail.gmail.com>
-X-Gm-Features: AcwNN1V7kUn5wqRLPyFDy7g4XdXxCIsa8mszFJodO-7GKdZe9B9ErTVlqAh_dP4
-Message-ID: <CAKYAXd_=1S6GP6e9Py+GopcUOGQzGSHYrMqpw=7=VSnJ1P+s3g@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: fix SMB2 CREATE response buffer overflow
-To: =?UTF-8?B?SsOpcsOpbXkgSmVhbg==?= <Jeremy.Jean@oss.cyber.gouv.fr>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 22 Sep 2026 10:35:16 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9G7o057WEQyv8QgXAL1dX9DrdGxOnLrgNkSYN073kDAQ@mail.gmail.com>
+X-Gm-Features: AcwNN1X39V-HTl8xfGexe7XHsNqintVeQVxDVSupceuxMxLNYAErQNE7PAoOgXE
+Message-ID: <CAKYAXd9G7o057WEQyv8QgXAL1dX9DrdGxOnLrgNkSYN073kDAQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] ksmbd: Windows 11 SMB 3.1.1 interoperability fixes
+To: Omkar Chandorkar <omkar0926@gmail.com>
+Cc: Namjae Jeon <linkinjeon@samba.org>, Steve French <sfrench@samba.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, Omkar Chandorkar <gotenksIN@aospa.co>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 21, 2026 at 3:15=E2=80=AFAM J=C3=A9r=C3=A9my Jean
-<Jeremy.Jean@oss.cyber.gouv.fr> wrote:
+On Sun, Sep 20, 2026 at 2:31=E2=80=AFPM Omkar Chandorkar <omkar0926@gmail.c=
+om> wrote:
 >
-> smb2_allocate_rsp_buf() uses the MAX_CIFS_SMALL_BUFFER_SIZE
-> (448-byte) buffer for a single SMB2_CREATE response. That buffer also
-> holds a 4-byte length field, which only leaves 444 bytes for the SMB2
-> body.
+> This patch series resolves SMB 3.1.1 protocol interoperability defects
+> in ksmbd affecting Windows 11 clients, rebased on top of the latest
+> ksmbd-for-next tree.
 >
-> The AAPL response made this buffer too small. After 8f1b796ff113, a
-> request with AAPL response contexts may need at least 456 bytes. In
-> the 456-byte case, create_aapl_rsp_buf() is appended last, clears 128
-> bytes, and writes 12 bytes past the allocation.
+> Patch 1: smb: compress: relax trailing flags in chained decompression
+> Windows 11 leaves residual uninitialized bits in trailing compression
+> chunk headers during chained writes (e.g. copying .vhdx files).
+> smb_decompress_chained() previously rejected any trailing header whose
+> flags did not equal 0x0000, causing connection drops (ECONNRESET) and
+> Windows error 0x8007003B. Relax this check to accept non-chained trailing
+> payloads while preserving validation on segment lengths and bounds.
 >
-> KASAN reports:
+> Patch 2: ksmbd: fix FSCTL_PIPE_TRANSCEIVE file lookup and response handli=
+ng
+> When querying the share list (e.g. browsing \\server or running
+> 'net view \\server'), Windows 11 issues NetrShareEnum over \PIPE\srvsvc
+> using SMB2_IOCTL with FSCTL_PIPE_TRANSCEIVE. Named pipe handles exist in
+> sess->rpc_handle_list rather than the regular file table. While
+> commit a3bcea7c819a ("ksmbd: exempt FSCTL_PIPE_TRANSCEIVE from the
+> generic file-id lookup") exempted FSCTL_PIPE_TRANSCEIVE from the generic
+> file ID lookup, the response PersistentFileId and VolatileFileId were
+> left unpopulated (violating MS-SMB2 section 2.2.32), and invalid RPC
+> handles were not rejected under rpc_lock.
+> Fix this by validating the RPC handle under rpc_lock and populating the
+> resolved response file IDs before dispatching the transceive request.
 >
->     BUG: KASAN: slab-out-of-bounds in create_aapl_rsp_buf+0x31/0x6e0
->     Write of size 128 at addr ffff88800370954c by task kworker/0:0/9
->     ...
->     create_aapl_rsp_buf+0x31/0x6e0
->     smb2_open+0x58f9/0xef10
->     ...
->     smb2_allocate_rsp_buf+0x19d/0x370
->     ...
->     The buggy address is located 332 bytes inside of
->      allocated 448-byte region [ffff888003709400, ffff8880037095c0)
+> Changes in v2:
+> - Rebased series onto git.kernel.org linkinjeon/smb.git #ksmbd-for-next
+>   at commit 4bb07a7d5852 ("smb/server: rename smb2_file_alt_name_info to
+>   smb2_file_name_info").
+> - Dropped the compound CREATE + CHANGE_NOTIFY response handling patch
+>   from v1 because upstream already merged compound prefix response
+>   dispatching in commit 906a62216339 ("smb/server: send compound prefix
+>   before async pending response") and compound FID resolution in commit
+>   524efc568ea5 ("smb/server: support compound fid in notify requests").
+> - Refined the FSCTL_PIPE_TRANSCEIVE patch to populate response FileId
+>   fields per MS-SMB2 section 2.2.32 and validate RPC pipe handles under
+>   rpc_lock.
 >
-> Reserve enough space for any fixed CREATE response KSMBD can build.
-> Store the required allocation size in the per-dialect values table.
-> This keeps the small buffer for other commands and avoids using the max
-> transaction buffer for every CREATE.
+> Tooling and AI disclosure:
+> AI tooling (OpenCode:gpt-6-astra) was utilized to assist in protocol
+> trace analysis, specification cross-referencing ([MS-SMB2], [MS-SRVS]),
+> and drafting. All changes were manually audited, static-checked,
+> compiled, and verified against live Windows 11 clients.
 >
-> Fixes: 8f1b796ff113 ("ksmbd: add AAPL kAAPL_SERVER_QUERY create context s=
-upport")
-> Assisted-by: Codex:gpt-5
-> Signed-off-by: J=C3=A9r=C3=A9my Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-Applied it to #ksmbd-for-next.
+> Omkar Chandorkar (2):
+>   smb: compress: relax trailing flags in chained decompression
+>   ksmbd: fix FSCTL_PIPE_TRANSCEIVE file lookup and response handling
+Applied them to #ksmbd-for-next.
 Thanks!
