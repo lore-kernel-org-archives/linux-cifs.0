@@ -1,78 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3B546D2D3
-	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 08:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0D8306D2A
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 09:32:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790151201; cv=none; b=beZgJoBcrPxRYn/ntkXY59QCAXbo4YNkIKvF5tNzyy2FzYgRrdjmWavyKy8svL5KG78QjGcCKs50srOgMJwa7obvzLDVYvB91HhDfG5PVw7SSY3Vvt2x7WdQsnPV4O8sZ23YZFidmWmDXI6B61Laepv4t+RTNzCJTPOBPEruKvQ=
+	t=1790155930; cv=none; b=ks/sT2/GVfK2gEWOJ86MquVGI2itP01o4j4W/Ws5+k6EsbkSSJRj+S7IHgerpDx3sgcNBffY2gSItJiVRYbfPtrRJfhN8I8+8OcUS9hAcSKwofZBqBzwltk+1QTEWEmu+RjFUelWlYBOzlg8GTUhoNs+6SQzj4wfs/oifmflgIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790151201; c=relaxed/simple;
-	bh=BD6Yc4Awp5mXwTtTdoGGtvbdsAJKf9tOOFNNk3RqMwo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gFSRGCsN+U9O/UgcYl+6yUYFL79UqbbE8/Xq4eJd1+lN+5D4TxkWM7THPQCJSpfCFEqlZJsJbmz7t7cYT6kCyPNbaC4bxCy0jhK3Cy+Aid6WLH578u6m4r/XIl1Q3h/7xh4vrbMBgPoK2DmSe7nAnELXKPUZI+XZoWs9coWf42A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJBmVc2i; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790155930; c=relaxed/simple;
+	bh=2L3SoHYV1JIqdPMT/Fxn/Q2XHTbJEt+4pW/ESuTGMU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dpZ0/bqgLmS7kAovaO6NLr3G3sY4n4BUbR1VVlAFwCKxoBB5/P9ZeGYq1iM8NpmS8UF4sRQ9VDmJvUX1nFEOeYK+HdTm4k43AyWqB17UexRAuN82eY23WleBHFLiXiE2GdSz5mkKHOxS1elEdwyHKv74cmCzXh4cjL9Cv+9QklA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=gf7DyDHc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=xSWzkKgM; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJBmVc2i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EDF21F008BC
-	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 08:13:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790151200;
-	bh=vs6i4s6cZE2SzhYO9unvM1fDGvN8xO/nW1L12Au3yl8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=DJBmVc2iCWZlbQqynxRdaSplBcDQMpvrfKhmcDtZUpUsHpT+0lFFCAyU8JqcvMFr2
-	 uIeAgzoH2ux6fVrG4smmKxl0zo1UjKoeeRiHS8Dq8aJifZBwmiaf5/M7h1Rehujufd
-	 LnO01bqLSanFEc5iS8ViKc7UldWX9RgEaQeDpu0Iiw62m6uTY6I5/RsBKbA+urVlpk
-	 Lz67+6XHhWSAKiLf+6LEFAbeDTiuI8V/DU6VR0jWZcvPU50kf9pdZ/WZk2lOrHO1Kr
-	 LGD0PmDrnrZynfQURrVB4fjKMNaMt0Iy8i1lJQPazvBDBYZ+uNqhq+vygVxw8mGtGL
-	 0qyV3PaoS3rUQ==
-Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a60590a85cso1367865a12.0
-        for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 01:13:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByd3a5TZWuiOdb+yutcdwmf0WYqy5DDc9TaGKdN6QHPhoYBTDRy5A3sf4XPFiuchc3GXRT1zZ13dcOe@vger.kernel.org
-X-Gm-Message-State: AFuF++mae5WXD6ls9mO/9R9mv9z81LNXGoohYHg/Ue68s1C+Ttb4Pd7p
-	JYmeTtix0rfoFBlG5ZRLr4Dwqh7bgmL5cVEyM6OeSagEXBM4nuDG1aTvfMuglmgEcjiVHRBAMSc
-	1YZd5z+/+73uSKHyayD4Ho6wHeje8dkk=
-X-Received: by 2002:a17:907:1c94:b0:c2a:6a12:6fb3 with SMTP id
- a640c23a62f3a-c2aae272d7bmr136115466b.23.1790151198825; Wed, 23 Sep 2026
- 01:13:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="gf7DyDHc";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xSWzkKgM"
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 2ACD17A007C;
+	Wed, 23 Sep 2026 05:32:07 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Wed, 23 Sep 2026 05:32:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790155927;
+	 x=1790242327; bh=LV4jEDntEIfi1c/Mt21nNFZ9M5+p/Cu3ssa5LbK6r90=; b=
+	gf7DyDHcDwmtHe+YKZSZNjYIGbXzfN+96zrYIvejOXfspK2JIVZOQBIejSnFbjt+
+	/eTHVGfqX4QhBMgiub1xkNcqWcy+D1jKsFToGLZYoDQuzvWxfoDaRAlZJDxQXJhx
+	/GMHDfIFZxHOYjM8UqBGrDcEOpFWzwXHtdFnMIoH4FUcuUzT6Vv9EPjcP1OUlHER
+	CoIMs7xRjMjkzb4bBm4nkzTUliUlusFGSYHGJYSppWhsd6FqiCkPwBTue28TD/zd
+	DiBnGQcdzIHI9lyUt7f121TpCWjaIwAQQZS94EX3+lIjmjoArgdEINk8T54s4Wuz
+	SbiLuUHEBRGaBl9/DAhglg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790155927; x=
+	1790242327; bh=LV4jEDntEIfi1c/Mt21nNFZ9M5+p/Cu3ssa5LbK6r90=; b=x
+	SWzkKgMl54oFRDGOYtLFtOK8UtmvXGeidk/i7jnPShcaU4np7Dn5ALVjMen3nCCH
+	3EV1SATgeBRipbWT1hdO5rk+d8ixuTe3YigE8uwejhVRi+x4aWbprJRC34Mv3ZI+
+	yFaNwvDHfXcA4qeoK/Io0q1WvSurfZL+idAFBqplPnGVXYQDauZdt77s5ksR61V6
+	n6h/TMpjCzZvh/py68zNM8nVnuJg8Y9rfwSTj5z/M4cED8X7TyitirkyqGTrSRej
+	Gc6POFjpS1/lJewF5nGqP6MjfIYOVcjabG50Js4mRAv4aE4xNjJ6LHNLCgyalhA9
+	3jY8ekESe/CisN2qb+CRg==
+X-ME-Sender: <xms:lpyzai6ESrP3IZd4n-z_WlU38vXIaE4aR0A3Mb_VJ63uY5EjeFpvXg>
+    <xme:lpyzarW_SiN_D0J4PPx_fupRwiYl4LfiZxiFHBTOkVTMDDcusilY2PAgdZSrm3ayP
+    gAqY4YWuZq0-8z75uvWW2a5k5yPv7IhfN7wEszHQ7UrmU6e2A>
+X-ME-Received: <xmr:lpyzaihDF3TcKpozhNQq2kKU8vcfgayNY-GXPs75O4M9ZY1qTB0CtEkwybCZ>
+X-ME-Proxy-Cause: dmFkZTGhebgx/PDh41xP+iUKNOptwfGq/b13izNFs5RZeGtXa4XavDG7yfFxS+geWysbwL
+    Tqtduj+Hb11O8mwbirNE762+uTHAH4oFrMbM5Z9iNl7OBmB4eLYVmVflcrN8wM+FVf2sdU
+    sO/iT9Gvf+yTeWNsglTkcb9mXEJB3KrexOmJ1icYnS0lsnkc/l3InM+9T6w8jwKtc4Lch3
+    dekaSAW9mUTpjl0cgRvbEDPXynGSla6aVnm3TYpSzGArC1sef7EPoiYH6EMcuSXy1MoVNH
+    GAN6Yb+MeczRMAYKePlv5HtLpAPKqaEiOx4pNJPJuBRyTZcDaJXIiMkEtZQv5yYd6e+beT
+    cvi9cnK4jo2rxfbXVlBJwdbsdl9K5ENJ5BZ5XNkaRa9fWNFQaYOYybSXG7ZILd/hQir6zr
+    QHqha+CGFkSCwomaB1CkviBMt8b/V9ezCNGTlGxxIuttXtf4QboWh6ocCpTCfuJL7elghM
+    3VCNo70xluv3JCXcbNKSsZ04xQ4pLXdUVUfEZZyr4ptNa7/DzqKZqPCf7ZI6uBnHxIk5GX
+    3pssY/L94TZGdepxh2ReI7f0fVUQAPByCSsHgSgj3GlxysgTmZ4eb+ROKoDdzL68cMutXE
+    5oZOeE0RHxpMarMeJfyUnhnhp+oH7HAANHXOA0IRzVBybXPUFwxVEflfcOWA
+X-ME-Proxy: <xmx:lpyzajf7xyCLTpoZ0v7yLem4fqMXhT6djeQBXTtgYMzmzlyzU1narw>
+    <xmx:lpyzap3QcEpVGXrbI7zkcIGFUPjIa8dV9j0B4-Zn8niwmGWQFwJ0rQ>
+    <xmx:lpyzanqww9q6izTrDhMuNl-hdOWi4doHrXACzhTVCDQkkLxyr8k3gA>
+    <xmx:lpyzapjKAo1Y1lL_OKSuYvJTgF8bGYWVdFHyshhrjkPDMwjLoq0h9Q>
+    <xmx:l5yzarbsPRv7xNzTBtIIfmVMxYU5MW3ILtnilSZtb3GbBNXIYcIs6rJ8>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 23 Sep 2026 05:32:05 -0400 (EDT)
+Date: Wed, 23 Sep 2026 11:22:05 +0200
+From: Greg KH <greg@kroah.com>
+To: =?utf-8?B?5pyx5rWp?= <zhuhao@stu.pku.edu.cn>
+Cc: security <security@kernel.org>, linkinjeon <linkinjeon@kernel.org>,
+	linkinjeon <linkinjeon@samba.org>, smfrench <smfrench@gmail.com>,
+	sfrench <sfrench@samba.org>,
+	linux-cifs <linux-cifs@vger.kernel.org>
+Subject: Re: ksmbd: unlocked iface_list free during server reset vs
+ FSCTL_QUERY_NETWORK_INTERFACE_INFO traversal -> use-after-free (kernel oops)
+Message-ID: <2026092344-muck-retainer-dd6d@gregkh>
+References: <AL*ADQCbK5q8mAaIolsqNaq-.1.1790153264029.Hmail.2401112100@stu.pku.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260919022441.3305170-1-neilb@ownmail.net> <20260919022441.3305170-6-neilb@ownmail.net>
-In-Reply-To: <20260919022441.3305170-6-neilb@ownmail.net>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 23 Sep 2026 17:13:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9S4x4ghqFOf1J0FO7vDq61mMZWaxnBihQU799jnASZ4Q@mail.gmail.com>
-X-Gm-Features: AclHuK_-E_IUYXE5Xo_ebb9zx21UxugXhFsUxDAnoFldZXoIK8bk30DS2iEwx5w
-Message-ID: <CAKYAXd9S4x4ghqFOf1J0FO7vDq61mMZWaxnBihQU799jnASZ4Q@mail.gmail.com>
-Subject: Re: [PATCH v2 05/14] cifs: allow -EISDIR precedence over -EFTYPE in __cifs_do_create()
-To: NeilBrown <neil@brown.name>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, Jori Koolstra <jkoolstra@xs4all.nl>, 
-	Mateusz Guzik <mjguzik@gmail.com>, Dorjoy Chowdhury <dorjoychy111@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Andreas Gruenbacher <agruenba@redhat.com>, gfs2@lists.linux.dev, 
-	Ilya Dryomov <idryomov@gmail.com>, Alex Markuze <amarkuze@redhat.com>, 
-	Viacheslav Dubeyko <slava@dubeyko.com>, ceph-devel@vger.kernel.org, 
-	Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AL*ADQCbK5q8mAaIolsqNaq-.1.1790153264029.Hmail.2401112100@stu.pku.edu.cn>
 
-On Sat, Sep 19, 2026 at 11:25=E2=80=AFAM NeilBrown <neilb@ownmail.net> wrot=
-e:
->
-> From: NeilBrown <neil@brown.name>
->
-> If atomic_open is given __O_REGULAR, we now would prefer -EISDIR
-> if a directory was found.  So move the S_ISDIR() tests earlier.
->
-> Also don't return -EFTYPE for S_ISLNK() - that should get -ELOOP and only
-> if O_NOFOLLOW.
->
-> Signed-off-by: NeilBrown <neil@brown.name>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks!
+On Wed, Sep 23, 2026 at 04:47:44PM +0800, 朱浩 wrote:
+> Hello,
+> I would like to privately report a use-after-free vulnerability in the Linux kernel SMB
+> server (ksmbd) that leads to a kernel oops (denial of service). The bug is present in the
+> current upstream master as of this writing.
+> -------------------------------------------------------------------
+> Summary
+> -------------------------------------------------------------------
+> ksmbd frees the global interface list (iface_list) without any lock during server
+> reset / hard-kill, *before* stop_sessions() is invoked. Meanwhile the
+> FSCTL_QUERY_NETWORK_INTERFACE_INFO ioctl handler traverses that same list while holding
+> only rtnl_lock (a lock the free path does not take), dereferencing freed iface nodes.
+> A remote authenticated SMB client that floods FSCTL_QUERY_NETWORK_INTERFACE_INFO while the
+> server is being reset can trigger a use-after-free read, producing a KASAN
+> slab-use-after-free report and a general protection fault (kernel oops / DoS).
+> -------------------------------------------------------------------
+> Affected component and versions
+> -------------------------------------------------------------------
+> Component: Linux kernel, fs/smb/server (ksmbd)
+> Confirmed present:
+>   - Snapshot at commit af5226abb4 (6.15.0-rc3 era), where I reproduced it with KASAN.
+
+That is very very very old and obsolete and known broken and buggy.
+Please always test on the latest kernel version, hundreds, if not
+thousands, of changes to the ksmbd code have happened since then.
+
+>   - Current upstream master (checked 2026-09): ksmbd_tcp_destroy() still frees iface_list
+>     without any lock, and ksmbd_find_netdev_name_iface_list() still traverses it holding
+>     only rtnl_lock. No fix is present upstream as far as I can tell.
+
+Please test to verify.
+
+> Suggested fix
+> -------------------------------------------------------------------
+> Any of:
+>   1. Protect iface_list with a dedicated lock shared by ksmbd_tcp_destroy() and
+>      ksmbd_find_netdev_name_iface_list() (and all other traversers);
+>   2. Free the nodes via RCU and traverse under rcu_read_lock();
+>   3. Reorder ksmbd_conn_transport_destroy() to run stop_sessions() before freeing iface_list.
+
+Please create a patch that can be applied to resolve the issue so that
+you get full credit for this.
+
+thanks,
+
+greg k-h
