@@ -1,138 +1,246 @@
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0D8306D2A
-	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 09:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFD53BE652
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 11:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790155930; cv=none; b=ks/sT2/GVfK2gEWOJ86MquVGI2itP01o4j4W/Ws5+k6EsbkSSJRj+S7IHgerpDx3sgcNBffY2gSItJiVRYbfPtrRJfhN8I8+8OcUS9hAcSKwofZBqBzwltk+1QTEWEmu+RjFUelWlYBOzlg8GTUhoNs+6SQzj4wfs/oifmflgIM=
+	t=1790162771; cv=none; b=TT2EoQLpzZuelHvI0YPIhu9BfeEYyvd9ll0Xqc7ifIUMW1u7my9Zo2o2La1pn5xX2R79coMNFctRZnVFUEcI6RyNQ1mQv2iBe6aMXDd7gScpdJBoY0WxkcBtTTyoHeWBOeK1fUPOlcnAtXFUbipHc1B5OHP1T8gWUvfVaGQk+Io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790155930; c=relaxed/simple;
-	bh=2L3SoHYV1JIqdPMT/Fxn/Q2XHTbJEt+4pW/ESuTGMU0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpZ0/bqgLmS7kAovaO6NLr3G3sY4n4BUbR1VVlAFwCKxoBB5/P9ZeGYq1iM8NpmS8UF4sRQ9VDmJvUX1nFEOeYK+HdTm4k43AyWqB17UexRAuN82eY23WleBHFLiXiE2GdSz5mkKHOxS1elEdwyHKv74cmCzXh4cjL9Cv+9QklA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=gf7DyDHc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=xSWzkKgM; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	s=arc-20240116; t=1790162771; c=relaxed/simple;
+	bh=wn3to4HmecO3f7kNncaC3ZRIh6JTjLNcqPlqTcqTWxg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Um8LamHJRU8KRvJohRcihN29wmyQ0UjfEPq6IOH2de9IPAdk3kTW+++Vs5eF4mOl+fkbI0GqvY8kSeYtKbjhiGdylq6anaMpHbR04/Z+eUyHnCq6q6G42DldoLqiD+9/hWprlkmAv+yEXkAPQQ8Qt+0aEn5YWurA6YYisMp6tWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNrPu3cj; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="gf7DyDHc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xSWzkKgM"
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 2ACD17A007C;
-	Wed, 23 Sep 2026 05:32:07 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Wed, 23 Sep 2026 05:32:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1790155927;
-	 x=1790242327; bh=LV4jEDntEIfi1c/Mt21nNFZ9M5+p/Cu3ssa5LbK6r90=; b=
-	gf7DyDHcDwmtHe+YKZSZNjYIGbXzfN+96zrYIvejOXfspK2JIVZOQBIejSnFbjt+
-	/eTHVGfqX4QhBMgiub1xkNcqWcy+D1jKsFToGLZYoDQuzvWxfoDaRAlZJDxQXJhx
-	/GMHDfIFZxHOYjM8UqBGrDcEOpFWzwXHtdFnMIoH4FUcuUzT6Vv9EPjcP1OUlHER
-	CoIMs7xRjMjkzb4bBm4nkzTUliUlusFGSYHGJYSppWhsd6FqiCkPwBTue28TD/zd
-	DiBnGQcdzIHI9lyUt7f121TpCWjaIwAQQZS94EX3+lIjmjoArgdEINk8T54s4Wuz
-	SbiLuUHEBRGaBl9/DAhglg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790155927; x=
-	1790242327; bh=LV4jEDntEIfi1c/Mt21nNFZ9M5+p/Cu3ssa5LbK6r90=; b=x
-	SWzkKgMl54oFRDGOYtLFtOK8UtmvXGeidk/i7jnPShcaU4np7Dn5ALVjMen3nCCH
-	3EV1SATgeBRipbWT1hdO5rk+d8ixuTe3YigE8uwejhVRi+x4aWbprJRC34Mv3ZI+
-	yFaNwvDHfXcA4qeoK/Io0q1WvSurfZL+idAFBqplPnGVXYQDauZdt77s5ksR61V6
-	n6h/TMpjCzZvh/py68zNM8nVnuJg8Y9rfwSTj5z/M4cED8X7TyitirkyqGTrSRej
-	Gc6POFjpS1/lJewF5nGqP6MjfIYOVcjabG50Js4mRAv4aE4xNjJ6LHNLCgyalhA9
-	3jY8ekESe/CisN2qb+CRg==
-X-ME-Sender: <xms:lpyzai6ESrP3IZd4n-z_WlU38vXIaE4aR0A3Mb_VJ63uY5EjeFpvXg>
-    <xme:lpyzarW_SiN_D0J4PPx_fupRwiYl4LfiZxiFHBTOkVTMDDcusilY2PAgdZSrm3ayP
-    gAqY4YWuZq0-8z75uvWW2a5k5yPv7IhfN7wEszHQ7UrmU6e2A>
-X-ME-Received: <xmr:lpyzaihDF3TcKpozhNQq2kKU8vcfgayNY-GXPs75O4M9ZY1qTB0CtEkwybCZ>
-X-ME-Proxy-Cause: dmFkZTGhebgx/PDh41xP+iUKNOptwfGq/b13izNFs5RZeGtXa4XavDG7yfFxS+geWysbwL
-    Tqtduj+Hb11O8mwbirNE762+uTHAH4oFrMbM5Z9iNl7OBmB4eLYVmVflcrN8wM+FVf2sdU
-    sO/iT9Gvf+yTeWNsglTkcb9mXEJB3KrexOmJ1icYnS0lsnkc/l3InM+9T6w8jwKtc4Lch3
-    dekaSAW9mUTpjl0cgRvbEDPXynGSla6aVnm3TYpSzGArC1sef7EPoiYH6EMcuSXy1MoVNH
-    GAN6Yb+MeczRMAYKePlv5HtLpAPKqaEiOx4pNJPJuBRyTZcDaJXIiMkEtZQv5yYd6e+beT
-    cvi9cnK4jo2rxfbXVlBJwdbsdl9K5ENJ5BZ5XNkaRa9fWNFQaYOYybSXG7ZILd/hQir6zr
-    QHqha+CGFkSCwomaB1CkviBMt8b/V9ezCNGTlGxxIuttXtf4QboWh6ocCpTCfuJL7elghM
-    3VCNo70xluv3JCXcbNKSsZ04xQ4pLXdUVUfEZZyr4ptNa7/DzqKZqPCf7ZI6uBnHxIk5GX
-    3pssY/L94TZGdepxh2ReI7f0fVUQAPByCSsHgSgj3GlxysgTmZ4eb+ROKoDdzL68cMutXE
-    5oZOeE0RHxpMarMeJfyUnhnhp+oH7HAANHXOA0IRzVBybXPUFwxVEflfcOWA
-X-ME-Proxy: <xmx:lpyzajf7xyCLTpoZ0v7yLem4fqMXhT6djeQBXTtgYMzmzlyzU1narw>
-    <xmx:lpyzap3QcEpVGXrbI7zkcIGFUPjIa8dV9j0B4-Zn8niwmGWQFwJ0rQ>
-    <xmx:lpyzanqww9q6izTrDhMuNl-hdOWi4doHrXACzhTVCDQkkLxyr8k3gA>
-    <xmx:lpyzapjKAo1Y1lL_OKSuYvJTgF8bGYWVdFHyshhrjkPDMwjLoq0h9Q>
-    <xmx:l5yzarbsPRv7xNzTBtIIfmVMxYU5MW3ILtnilSZtb3GbBNXIYcIs6rJ8>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 23 Sep 2026 05:32:05 -0400 (EDT)
-Date: Wed, 23 Sep 2026 11:22:05 +0200
-From: Greg KH <greg@kroah.com>
-To: =?utf-8?B?5pyx5rWp?= <zhuhao@stu.pku.edu.cn>
-Cc: security <security@kernel.org>, linkinjeon <linkinjeon@kernel.org>,
-	linkinjeon <linkinjeon@samba.org>, smfrench <smfrench@gmail.com>,
-	sfrench <sfrench@samba.org>,
-	linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Re: ksmbd: unlocked iface_list free during server reset vs
- FSCTL_QUERY_NETWORK_INTERFACE_INFO traversal -> use-after-free (kernel oops)
-Message-ID: <2026092344-muck-retainer-dd6d@gregkh>
-References: <AL*ADQCbK5q8mAaIolsqNaq-.1.1790153264029.Hmail.2401112100@stu.pku.edu.cn>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNrPu3cj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C27B1F00893;
+	Wed, 23 Sep 2026 11:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790162763;
+	bh=MsqxLLMJOFtJoVPVJE5tkHJOL9G9gD3vWwTXVCZlLFU=;
+	h=From:To:Cc:Subject:Date;
+	b=KNrPu3cjHxfNX21KDrXsBSAfpnlg6j+q1eFNfNs1t0pV3shw8F7iZ1jMbWaLvDc55
+	 kVOWV0XRtOaKAcEjCJE4K4XvzhEV7iDA3BOlMf40yLQHk3PNrxv6urZp4Lpry5HDke
+	 nWir2oYAH16w9AIG5ApxCG1XpJJrqNI4nDbBWuDuP2SiQl8qZK1qlcrGkh/PknkIHc
+	 oUtdqYN+vD++cSlizpm62lUbym/vkUP1OoS+yDviSUpQKa/Vys4MEV6iwSmkVqmuyd
+	 82/Z/FIHEvfP9Ve3VrVEBH25nA8YsFBKx5k6lo1hp9nQCrsqfK+LkP9Tg1x3Bm7ENJ
+	 oYeU0E5ntZFMA==
+From: Namjae Jeon <linkinjeon@kernel.org>
+To: pc@manguebit.org,
+	linux-cifs@vger.kernel.org
+Cc: ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	bharathsm@microsoft.com,
+	tom@talpey.com,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH] cifs: use finish_no_open() for non-regular inodes
+Date: Wed, 23 Sep 2026 20:25:49 +0900
+Message-Id: <20260923112549.21294-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <AL*ADQCbK5q8mAaIolsqNaq-.1.1790153264029.Hmail.2401112100@stu.pku.edu.cn>
 
-On Wed, Sep 23, 2026 at 04:47:44PM +0800, 朱浩 wrote:
-> Hello,
-> I would like to privately report a use-after-free vulnerability in the Linux kernel SMB
-> server (ksmbd) that leads to a kernel oops (denial of service). The bug is present in the
-> current upstream master as of this writing.
-> -------------------------------------------------------------------
-> Summary
-> -------------------------------------------------------------------
-> ksmbd frees the global interface list (iface_list) without any lock during server
-> reset / hard-kill, *before* stop_sessions() is invoked. Meanwhile the
-> FSCTL_QUERY_NETWORK_INTERFACE_INFO ioctl handler traverses that same list while holding
-> only rtnl_lock (a lock the free path does not take), dereferencing freed iface nodes.
-> A remote authenticated SMB client that floods FSCTL_QUERY_NETWORK_INTERFACE_INFO while the
-> server is being reset can trigger a use-after-free read, producing a KASAN
-> slab-use-after-free report and a general protection fault (kernel oops / DoS).
-> -------------------------------------------------------------------
-> Affected component and versions
-> -------------------------------------------------------------------
-> Component: Linux kernel, fs/smb/server (ksmbd)
-> Confirmed present:
->   - Snapshot at commit af5226abb4 (6.15.0-rc3 era), where I reproduced it with KASAN.
+An O_CREAT open can find an existing symlink or another non-regular
+inode. cifs_atomic_open() calls finish_open() on it and attaches a
+cifsFileInfo. Symlink inodes have no CIFS release operation, so the
+dentry reference held by cifsFileInfo is leaked. FMODE_OPENED also
+prevents the VFS from following the symlink.
 
-That is very very very old and obsolete and known broken and buggy.
-Please always test on the latest kernel version, hundreds, if not
-thousands, of changes to the ksmbd code have happened since then.
+Track whether cifs_do_create() returned an open server handle. For
+non-regular inodes, close the handle if present, remove the pending
+open, and call finish_no_open() so the VFS can continue the lookup.
+Do not set FMODE_CREATED unless a regular file was opened. For
+O_NOFOLLOW with __O_REGULAR, return -ELOOP before the VFS's
+-EFTYPE check.
 
->   - Current upstream master (checked 2026-09): ksmbd_tcp_destroy() still frees iface_list
->     without any lock, and ksmbd_find_netdev_name_iface_list() still traverses it holding
->     only rtnl_lock. No fix is present upstream as far as I can tell.
+Defer closing a legacy POSIX handle on a non-regular inode until
+after inode lookup. This avoids closing it again if lookup fails.
 
-Please test to verify.
+Fixes: d2c127197dfc ("cifs: implement i_op->atomic_open()")
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/client/dir.c | 52 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 39 insertions(+), 13 deletions(-)
 
-> Suggested fix
-> -------------------------------------------------------------------
-> Any of:
->   1. Protect iface_list with a dedicated lock shared by ksmbd_tcp_destroy() and
->      ksmbd_find_netdev_name_iface_list() (and all other traversers);
->   2. Free the nodes via RCU and traverse under rcu_read_lock();
->   3. Reorder ksmbd_conn_transport_destroy() to run stop_sessions() before freeing iface_list.
+diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
+index 6fa6d48fdfd3..1a56fa4d0e89 100644
+--- a/fs/smb/client/dir.c
++++ b/fs/smb/client/dir.c
+@@ -199,7 +199,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 			    struct tcon_link *tlink, unsigned int oflags,
+ 			    umode_t mode, __u32 *oplock, struct cifs_fid *fid,
+ 			    struct cifs_open_info_data *buf,
+-			    struct inode **inode)
++			    struct inode **inode, bool *opened)
+ {
+ 	int rc = -ENOENT;
+ 	int create_options = CREATE_NOT_DIR;
+@@ -216,6 +216,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 	__le32 lease_flags = 0;
+ 
+ 	*inode = NULL;
++	*opened = false;
+ 	*oplock = 0;
+ 	if (tcon->ses->server->oplocks)
+ 		*oplock = REQ_OPLOCK;
+@@ -232,6 +233,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 				     oflags, oplock, &fid->netfid, xid);
+ 		switch (rc) {
+ 		case 0:
++			*opened = true;
+ 			if (newinode == NULL) {
+ 				/* query inode info */
+ 				goto cifs_create_get_file_info;
+@@ -253,11 +255,9 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 				/*
+ 				 * The server may allow us to open things like
+ 				 * FIFOs, but the client isn't set up to deal
+-				 * with that. If it's not a regular file, just
+-				 * close it and proceed as if it were a normal
+-				 * lookup.
++				 * with that. Keep the handle until the caller
++				 * can finish the lookup.
+ 				 */
+-				CIFSSMBClose(xid, tcon, fid->netfid);
+ 				goto cifs_create_get_file_info;
+ 			}
+ 			/* success, no need to query */
+@@ -384,6 +384,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 		}
+ 		return rc;
+ 	}
++	*opened = true;
+ 	if (rdwr_for_fscache == 2)
+ 		cifs_invalidate_cache(dir, FSCACHE_INVAL_DIO_WRITE);
+ 
+@@ -475,7 +476,7 @@ static int __cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 	return rc;
+ 
+ out_err:
+-	if (server->ops->close)
++	if (*opened && server->ops->close)
+ 		server->ops->close(xid, tcon, fid);
+ 	if (newinode)
+ 		iput(newinode);
+@@ -487,7 +488,7 @@ static int cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 			  unsigned int oflags, umode_t mode,
+ 			  __u32 *oplock, struct cifs_fid *fid,
+ 			  struct cifs_open_info_data *buf,
+-			  struct inode **inode)
++			  struct inode **inode, bool *opened)
+ {
+ 	void *page = alloc_dentry_path();
+ 	const char *full_path;
+@@ -496,10 +497,11 @@ static int cifs_do_create(struct inode *dir, struct dentry *direntry,
+ 	full_path = build_path_from_dentry(direntry, page);
+ 	if (IS_ERR(full_path)) {
+ 		rc = PTR_ERR(full_path);
++		*opened = false;
+ 	} else {
+ 		rc = __cifs_do_create(dir, direntry, full_path, xid,
+ 				      tlink, oflags, mode, oplock,
+-				      fid, buf, inode);
++				      fid, buf, inode, opened);
+ 	}
+ 	free_dentry_path(page);
+ 	return rc;
+@@ -529,6 +531,8 @@ int cifs_atomic_open(struct inode *dir, struct dentry *direntry,
+ 	struct inode *inode;
+ 	unsigned int xid;
+ 	__u32 oplock;
++	bool is_regular;
++	bool opened;
+ 	int rc;
+ 
+ 	if (unlikely(cifs_forced_shutdown(cifs_sb)))
+@@ -581,12 +585,26 @@ int cifs_atomic_open(struct inode *dir, struct dentry *direntry,
+ 	cifs_add_pending_open(&fid, tlink, &open);
+ 
+ 	rc = cifs_do_create(dir, direntry, xid, tlink, oflags, mode,
+-			    &oplock, &fid, &buf, &inode);
++			    &oplock, &fid, &buf, &inode, &opened);
+ 	if (rc) {
+ 		cifs_del_pending_open(&open);
+ 		goto out;
+ 	}
+ 
++	is_regular = S_ISREG(inode->i_mode);
++	if (!is_regular || !opened) {
++		if (opened && server->ops->close)
++			server->ops->close(xid, tcon, &fid);
++		cifs_del_pending_open(&open);
++		if (S_ISLNK(inode->i_mode) &&
++		    (oflags & (O_NOFOLLOW | __O_REGULAR)) ==
++		    (O_NOFOLLOW | __O_REGULAR) && !(oflags & O_EXCL)) {
++			iput(inode);
++			rc = -ELOOP;
++			goto out;
++		}
++	}
++
+ 	if (d_in_lookup(direntry)) {
+ 		alias = d_splice_alias(inode, direntry);
+ 		if (!IS_ERR_OR_NULL(alias))
+@@ -595,9 +613,15 @@ int cifs_atomic_open(struct inode *dir, struct dentry *direntry,
+ 		d_instantiate(direntry, inode);
+ 	}
+ 
+-	if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
++	if (is_regular && opened &&
++	    (oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+ 		file->f_mode |= FMODE_CREATED;
+ 
++	if (!is_regular || !opened) {
++		rc = finish_no_open(file, NULL);
++		goto out;
++	}
++
+ 	rc = finish_open(file, direntry, generic_file_open);
+ 	if (rc) {
+ 		if (server->ops->close)
+@@ -660,6 +684,7 @@ int cifs_create(struct mnt_idmap *idmap, struct inode *dir,
+ 	struct inode *inode;
+ 	struct cifs_fid fid;
+ 	__u32 oplock;
++	bool opened;
+ 	struct cifs_open_info_data buf = {};
+ 
+ 	cifs_dbg(FYI, "cifs_create parent inode = 0x%p name is: %pd and dentry = 0x%p\n",
+@@ -682,10 +707,10 @@ int cifs_create(struct mnt_idmap *idmap, struct inode *dir,
+ 		server->ops->new_lease_key(&fid);
+ 
+ 	rc = cifs_do_create(dir, direntry, xid, tlink, oflags,
+-			    mode, &oplock, &fid, &buf, &inode);
++			    mode, &oplock, &fid, &buf, &inode, &opened);
+ 	if (!rc) {
+ 		d_instantiate(direntry, inode);
+-		if (server->ops->close)
++		if (opened && server->ops->close)
+ 			server->ops->close(xid, tcon, &fid);
+ 	}
+ 
+@@ -1078,6 +1103,7 @@ int cifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
+ 	struct inode *inode;
+ 	unsigned int xid;
+ 	__u32 oplock;
++	bool opened;
+ 	int namelen;
+ 	int rc;
+ 
+@@ -1116,7 +1142,7 @@ int cifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
+ 		namelen = scnprintf(name, namesize, CIFS_TMPNAME_PREFIX "%x",
+ 				    atomic_inc_return(&cifs_tmpcounter));
+ 		rc = __cifs_do_create(dir, dentry, path, xid, tlink, oflags,
+-				      mode, &oplock, &fid, NULL, &inode);
++				      mode, &oplock, &fid, NULL, &inode, &opened);
+ 		if (!rc) {
+ 			rc = d_mark_tmpfile_name(file, &QSTR_LEN(name, namelen));
+ 			if (rc) {
+-- 
+2.25.1
 
-Please create a patch that can be applied to resolve the issue so that
-you get full credit for this.
-
-thanks,
-
-greg k-h
