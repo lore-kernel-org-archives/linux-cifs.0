@@ -1,208 +1,232 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B2935F602;
-	Wed, 23 Sep 2026 01:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08AB53B8BD1;
+	Wed, 23 Sep 2026 04:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790127597; cv=none; b=tckXD4vU/slAV3x3NynOsRYqh6C+Y9qC3Gwni4uKXQhtpUY1KZsKNdNEmNl6xL4yykMLNelYiPioLZeyag7ymJFijhZfPhoHoAvZ3yTtcSqGepXbgmibMeWOFcnQEXrzNm15KrV/67xp63i1BhZMNGnlXyI66iUVGAww9eo0iGs=
+	t=1790136487; cv=none; b=qAjBMrzFwKsjuqDru5GJYDtvjO2NT7FyNVacE9As42aoEezaBBZmP6wtjVU/muSRJ4ncBU4StaUhbeazCd3mY1/b1h+ZmLdanu+voE3n7ZOx6fzGgLaUig+3A+Dv9NR9YENqlvXRavqImQBRj8Fj6+rbSO/KPiQTfSZIfzJ3Vp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790127597; c=relaxed/simple;
-	bh=5RiZ8qJrlS0ckRVS4ECM+GbeZe5686I1svgoPeBjTp8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KJqsIATkn57PKzkcsBx0tvmQHv3cIXdT9M3/a0WT4yIuG1PUvnuWIUUTjXI3YthRAmn0/ySXLeOY1EbUXlQgvec8GPwkBW/j43MtgZrHuWY8tx0lzbKFoUU45QEgSnJVgY83sMxBb7Ycd0zRDzhUzXzB1Z8FqOppzY9mbm18jpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ef8b5JXk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790136487; c=relaxed/simple;
+	bh=Lj2Fbi+FXV/wCuoVFmvECm7gyCHyX3Bw8bz5HdWW7VE=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=E/gfvcEwZjW2jZbJAMzxH7lnI4VwcuoNlJkzsyXpCJx8G8CPJmLp9qti4GH57fgh/cDOPLaKiAAEPar7W+o3tjjtpDfVmNFXhy5WkqITMhb+Lu+b6TLgMMr7WiVIh2vYa3wl5UZdD77TxaXyx8uMRZTgFL8SbyoGVS7oGu7QRjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=kh+sFNNG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=P9KzoJv4; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ef8b5JXk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF7F1F000FF;
-	Wed, 23 Sep 2026 01:39:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790127595;
-	bh=x+8a0p0krsFJtmKfkARlnFZBg22hMExmumCWCYIWndU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Ef8b5JXkTGUn0OaCuSwR+hqkWhRqD5X3Vb8QEd+ILK+q4PmIkkf62Vv3NYjvT7kVw
-	 65YYP3qJe5ecYLbzy69P/1uiNahF8RErOQyr0gTUiQnIVO8XdB2vpMzxVtvfRGD1j+
-	 kXPSH7dOpmzb9C414rQwWQTQyDEmFuUvRSNTvifrOHwD5gN3anUbztor86ype0HSIN
-	 N9tZ/oXMoG80owk/ZOjwgQl7xhgWtxsAivXuBaZrj+pV/q8CdVaQtiSzh0IA52e5J8
-	 kpeAIl+tguK8tjXsEfKsfrX96Ujoo++A6R7Xn5/PXnRPnmfCsCaoeoFvuI4ROmsWcq
-	 2pNCdL0X5M6Bw==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-cifs@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6.y 1/2] smb: client: use atomic_t for mnt_cifs_flags
-Date: Tue, 22 Sep 2026 21:39:52 -0400
-Message-ID: <20260923013953.878249-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <2026092250-moneywise-parameter-6a1d@gregkh>
-References: <2026092250-moneywise-parameter-6a1d@gregkh>
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="kh+sFNNG";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="P9KzoJv4"
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 2499B1400141;
+	Wed, 23 Sep 2026 00:08:04 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Wed, 23 Sep 2026 00:08:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to; s=fm1; t=
+	1790136484; x=1790222884; bh=7687imxnyqYKdQpZxfQERznnhqWc2eAJVdr
+	7Tc4rXhY=; b=kh+sFNNGAmnfao1CYC27RR/Rrv0bFXkl1ahzJ9eKRjWeVYrwZXU
+	qKJmi/aONgLfLscqbk2fPGp5uDUQ4yHYfagZ3G1T3i8lVexU0c/JwAmPBCLrP++e
+	ATqw2FA0XnxEcZ/wG/DR49LH9WYFlmO2iEYdGyaJVyUvr0JWE03rf37PFCzkGYQz
+	dgzbd2jaNHhVvc67vYgDPVPrx3eXqU2OuP/zuP9cz/zaqY8fnyrFIeIyuQRsxZKP
+	f0IdqUr8cv7JD1HuY9BrGNd9IizPsTCoMB38uFk8oDuGEDmLh1F7qDcXnOJpg+eY
+	YqRPhJpnGGnjWU/KrqTIJVNXQG0M3c3Qngw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790136484; x=
+	1790222884; bh=7687imxnyqYKdQpZxfQERznnhqWc2eAJVdr7Tc4rXhY=; b=P
+	9KzoJv4IZk8PVHQF46ymMzIEDt1RSXzmTTjjvNGpfH7AuVLREMbOwers5/aOCoX/
+	Ofu3CZYgFHrTwufoozkcfnjhUk6CGU0LK2ZRhDtf8pLhQumQ7pF7mAGqMmJIbIlh
+	r9Oaap/SOI3TE8q9kKltBN3nr4xJaRrPp1xQufhpgSVL1zQxk+4vkPd53jgt+ajC
+	JmIp43HZZGtpCfWxWLGpvy2W2hT406jLDnDtN6u7tanYSh/R/IC2dPcISpd95j3s
+	1+ZsNVDoB34ux1ixZLEatEXZfShM4ljUJp+J+CDiveqtmEXK8Ud4+4FydIu6Ce4j
+	0KkwsrHkBQrlJj6VSwxOw==
+X-ME-Sender: <xms:o1CzapEuTKIwuw8xvwbjFNlLZ55LhoItbb20NNfheNu7FccAauCGZA>
+    <xme:o1CzauvNAAJZdedNrem1ZyIzMEkyy6eHwR-c0OaSgnhJ7UyHQv8rB4-Fdy7VNy9An
+    nzM53bdLpPx20Y-L3ck0cxDaXlwra1w1_YIyGfd9CYCENS4M1I>
+X-ME-Received: <xmr:o1CzasTctrB74IdzRCPIB73vy6J1FQsA7OHZtbQQ8bO0DICc3K8cbuyqMO2saZqDE55ZhLSLofqTn6bxpNfN8dV8Rt2ndIY>
+X-ME-Proxy-Cause: dmFkZTGbKx1XIXuhovXsOSwhyPjNh41Q9u4cakwDNfVJjNkwbDrNAtWoxM04p8iMx0qiBQ
+    y+36mEHzF5zS2+s4Vrw4e2IK9wxnkBlKgMXTbJRlrmgP58LyxFL/OOx8OmJioaZamDGd7p
+    G7vSyPLmo/RSoX/9P0zHrmRfKoU+0sDeFwLWywIbuY8tw44Z6yIp/mUKS942b0QQwYBOBK
+    8y7vmE2VgV6WztR+qw0ubdByPIadsQTS4Xnjusn6L5FHb7ZKtVGNxNCkNeNcTn8/Ik6dKH
+    suNCv1nSCIETpR1JuQzSNAFtrdR/ncDEq1fnONM8+pTRBmRgMo5Rf5lNNLPOK1JRH/f5pl
+    KhDSxRimALbxxrxsroq2NlUW1WdVybhvRi92l+McD9LLSY+eYoPA9TytqRrezz4kGFZ/+3
+    AmpSNDa1haJ7waZmladBXHSS1ElyNpQJbu3nPm9PVc7NcY1iF3ftRvXTZBhwTAFu9+8r4G
+    jp1weJ9PvNkm6uBTlN8HZ4q2ZSO6CFpDCn96tPd+o2eOUm0lXxBdieSYkkIcWVXzKsp1OJ
+    261CIXIBPTZbsgWkN/kO0IQtivXXWYg/WQMNPEf17oXhkhVnLGm3ktvc+iciEmehyRPba3
+    9xCHossQkQx7pg7QAKblIEZ9evpUwd98rITeZozetSMCP898h8Nh7UNwgx9g
+X-ME-Proxy: <xmx:o1CzarHItaJl8qqFanzU9wfA58PtKXXUOXyJDINzJzjgeXeGZp2yMg>
+    <xmx:o1Czaud9ELZDeerJFxr5Rdvxb_J_QWVQaSOT35ffqmIDZCendtZD5Q>
+    <xmx:o1CzaivN0mMDE0rHH4I-xlrU3yVRdvqAz9k79-SdH1zPdvu1RKvO9A>
+    <xmx:o1Czasea35jc1LbX0eX-ANze4Xv99LSmuEvMs7a-w4xTHA9sKLd12A>
+    <xmx:pFCzav7FHC8KsomHiwqMW6kpzZ3yCbh00Mn8ManHi-hEKyJjYAT-gXUr>
+Feedback-ID: i9d664b8f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 23 Sep 2026 00:07:57 -0400 (EDT)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: NeilBrown <neilb@ownmail.net>
+To: "Chuck Lever" <cel@kernel.org>
+Cc: "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
+ "Jori Koolstra" <jkoolstra@xs4all.nl>, "Mateusz Guzik" <mjguzik@gmail.com>,
+ "Dorjoy Chowdhury" <dorjoychy111@gmail.com>,
+ "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
+ "Andreas Gruenbacher" <agruenba@redhat.com>, gfs2@lists.linux.dev,
+ "Ilya Dryomov" <idryomov@gmail.com>, "Alex Markuze" <amarkuze@redhat.com>,
+ "Viacheslav Dubeyko" <slava@dubeyko.com>, ceph-devel@vger.kernel.org,
+ "Paulo Alcantara" <pc@manguebit.org>, "Namjae Jeon" <linkinjeon@kernel.org>,
+ linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-nfs@vger.kernel.org
+Subject: Re: [PATCH v2 12/14] nfsd: switch NFS4 OPEN to use vfs_lookup_open()
+In-reply-to: <179011412461.37859.5169498575115711178@noble.neil.brown.name>
+References: <20260919022441.3305170-1-neilb@ownmail.net>
+  <20260919022441.3305170-13-neilb@ownmail.net>
+  <0b2597f9-2af1-448d-9bff-c9a96a07068b@slotpi15m67>
+  <179011412461.37859.5169498575115711178@noble.neil.brown.name>
+Date: Wed, 23 Sep 2026 14:07:52 +1000
+Message-id: <179013647294.37859.820765753524082731@noble.neil.brown.name>
+Reply-To: NeilBrown <neil@brown.name>
 
-From: Paulo Alcantara <pc@manguebit.org>
+On Wed, 23 Sep 2026, NeilBrown wrote:
+> On Mon, 21 Sep 2026, Chuck Lever wrote:
+> >=20
+> > Can this fail an OPEN that nfsd_permission() would have allowed?
+>=20
+> Yes.  As you explain in detail (thanks) this is a problem.
+>=20
+> This highlights a problem with using nfsv4 to re-export a remote filesystem.
+>=20
+> Any non-standard permission checking we do in nfsd to handle reading
+> execute-only files, or opening recently created files without the
+> requested access, also needs to be performed on the server for a
+> re-exported filesystem.
+>=20
+> Re-exporting NFS is probably safe because nfsd is already relaxed about
+> these permissions, with NFSD_MAY_OWNER_OVERRIDE and NFSD_MAY_READ_IF_EXEC.
+> But other filesystems may not be.
+>=20
+> I wonder if we should communicate this through the VFS so we can at
+> least tell ->atomic_open and ->permission that it can be a little
+> relaxed about certain permission checks...
+>=20
+> I don't know what is best, but will dwell on if for a while.
 
-[ Upstream commit 4fc3a433c13944ee5766ec5b9bf6f1eb4d29b880 ]
+This is the sort of thing I'm thinking of.
+The FMODE_SERVE_FILE flag isn't used at the moment but it could be.
+e.g. nfs4_opendata_access() could use it to allow an FMODE_READ open
+to be satisfied by NFS4_ACCESS_EXECUTE.
+Currently if you re-export NFSv4 and the client tries to execute
+a file which it doesn't have read-access to, then it will fail.
+I haven't actually tried this - maybe I should.
 
-Use atomic_t for cifs_sb_info::mnt_cifs_flags as it's currently
-accessed locklessly and may be changed concurrently in mount/remount
-and reconnect paths.
+Anything reflections on this approach most welcome.
 
-Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-Reviewed-by: David Howells <dhowells@redhat.com>
-Cc: linux-cifs@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
+Thanks,
+NeilBrown
 
-Stable dependency adaptation for e1253a82bb4c0fed6706a5839fc8b6e01be1abe2:
 
-Retain the cifs_sb_flags interface needed by the WSL parser, implemented
-as a READ_ONCE macro over the existing unsigned mount flags. Drop the
-client-wide atomic_t conversion, generic CIFS_SB helpers, and unrelated
-symlink/refactoring hunks that depend on newer SMB client code. This
-stable adaptation does not implement the upstream atomic write changes.
-No functions are added.
 
-Prepare the existing wsl_to_fattr implementation to match the target's
-preimage: include the UID/GID defaults and forceuid/forcegid checks from
-cd2b2b57921d4, file-type clearing from fa7a2cfcf1e61, and unaligned WSL
-reads from e1aeaf79dea51. Use asm/unaligned.h as required by 6.6. Keep
-the target's transactional fattr update for the target commit itself.
-
-The target patch applies unchanged after this dependency adaptation.
-
-[ sashal: Reduced backport -- upstream 4fc3a433c1394 touches 27 file(s), this
-  backport carries 3. Not backported here:
-  fs/smb/client/cached_dir.c
-  fs/smb/client/cifsacl.c
-  fs/smb/client/cifsfs.c
-  fs/smb/client/cifs_fs_sb.h
-  fs/smb/client/cifs_ioctl.h
-  fs/smb/client/cifs_unicode.c
-  fs/smb/client/cifs_unicode.h
-  fs/smb/client/connect.c
-  ... and 16 more
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: e1253a82bb4c ("smb: client: fix fattr leaking on wsl_to_fattr() failure")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/cifsglob.h |  3 +++
- fs/smb/client/reparse.c  | 21 ++++++++++++++-------
- fs/smb/client/reparse.h  | 11 ++++++-----
- 3 files changed, 23 insertions(+), 12 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index a4e0618c58efc..82d33e4739702 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1603,6 +1603,9 @@ CIFS_FILE_SB(struct file *file)
- 	return CIFS_SB(file_inode(file)->i_sb);
- }
- 
-+/* Mount and reconnect paths may update these flags concurrently. */
-+#define cifs_sb_flags(cifs_sb) READ_ONCE((cifs_sb)->mnt_cifs_flags)
+diff --git a/Documentation/filesystems/vfs.rst b/Documentation/filesystems/vf=
+s.rst
+index 4a58450d8310..6afb7cdb2be8 100644
+--- a/Documentation/filesystems/vfs.rst
++++ b/Documentation/filesystems/vfs.rst
+@@ -642,6 +642,11 @@ otherwise noted.
+ 	FMODE_CREATED should be set if it is possible that this operation
+ 	created the object.
+=20
++	If atomic_open() calls finish_open() then it must have performed
++	all necessary access permission checks.  If FMODE_SERVE_FILE
++	is set in file->f_mode, this it should assume MAY_SERVE_FILE if=20
++	possible.
 +
- static inline char CIFS_DIR_SEP(const struct cifs_sb_info *cifs_sb)
- {
- 	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS)
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 4d45c31336df1..872b3a520c9a4 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -678,10 +678,15 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
- 			 struct cifs_sb_info *cifs_sb,
- 			 u32 tag, struct cifs_fattr *fattr)
- {
-+	unsigned int sbflags = cifs_sb_flags(cifs_sb);
- 	struct smb2_file_full_ea_info *ea;
- 	bool have_xattr_dev = false;
- 	u32 next = 0;
- 
-+	fattr->cf_uid = cifs_sb->ctx->linux_uid;
-+	fattr->cf_gid = cifs_sb->ctx->linux_gid;
+ 	This method is only called if the last component is negative or
+ 	needs lookup.  Cached positive dentries are still handled by
+ 	f_op->open().
+diff --git a/fs/namei.c b/fs/namei.c
+index 8ef2d44b6108..16c6ee8cfd74 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -441,6 +441,11 @@ static int acl_permission_check(struct mnt_idmap *idmap,
+ 	unsigned int mode =3D inode->i_mode;
+ 	vfsuid_t vfsuid;
+=20
++	if (mask & MAY_SERVE_FILE) {
++		/* 'x' permission grant 'r' permission */
++		mode |=3D (mode & 0111) << 2;
++	}
 +
-+	fattr->cf_mode &= ~S_IFMT;
- 	switch (tag) {
- 	case IO_REPARSE_TAG_LX_SYMLINK:
- 		fattr->cf_mode |= S_IFLNK;
-@@ -718,15 +723,17 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
- 		nlen = ea->ea_name_length;
- 		v = (void *)((u8 *)ea->ea_data + ea->ea_name_length + 1);
- 
--		if (!strncmp(name, SMB2_WSL_XATTR_UID, nlen))
--			fattr->cf_uid = wsl_make_kuid(cifs_sb, v);
--		else if (!strncmp(name, SMB2_WSL_XATTR_GID, nlen))
--			fattr->cf_gid = wsl_make_kgid(cifs_sb, v);
--		else if (!strncmp(name, SMB2_WSL_XATTR_MODE, nlen)) {
-+		if (!strncmp(name, SMB2_WSL_XATTR_UID, nlen)) {
-+			if (!(sbflags & CIFS_MOUNT_OVERR_UID))
-+				fattr->cf_uid = wsl_make_kuid(cifs_sb, v);
-+		} else if (!strncmp(name, SMB2_WSL_XATTR_GID, nlen)) {
-+			if (!(sbflags & CIFS_MOUNT_OVERR_GID))
-+				fattr->cf_gid = wsl_make_kgid(cifs_sb, v);
-+		} else if (!strncmp(name, SMB2_WSL_XATTR_MODE, nlen)) {
- 			/* File type in reparse point tag and in xattr mode must match. */
--			if (S_DT(fattr->cf_mode) != S_DT(le32_to_cpu(*(__le32 *)v)))
-+			if (S_DT(fattr->cf_mode) != S_DT(get_unaligned_le32(v)))
- 				return false;
--			fattr->cf_mode = (umode_t)le32_to_cpu(*(__le32 *)v);
-+			fattr->cf_mode = (umode_t)get_unaligned_le32(v);
- 		} else if (!strncmp(name, SMB2_WSL_XATTR_DEV, nlen)) {
- 			fattr->cf_rdev = reparse_mkdev(v);
- 			have_xattr_dev = true;
-diff --git a/fs/smb/client/reparse.h b/fs/smb/client/reparse.h
-index ff05b0e75c928..5b8b8addab89a 100644
---- a/fs/smb/client/reparse.h
-+++ b/fs/smb/client/reparse.h
-@@ -9,6 +9,7 @@
- #include <linux/fs.h>
- #include <linux/stat.h>
- #include <linux/uidgid.h>
-+#include <asm/unaligned.h>
- #include "fs_context.h"
- #include "cifsglob.h"
- 
-@@ -22,7 +23,7 @@
- 
- static inline dev_t reparse_mkdev(void *ptr)
- {
--	u64 v = le64_to_cpu(*(__le64 *)ptr);
-+	u64 v = get_unaligned_le64(ptr);
- 
- 	return MKDEV(v & 0xffffffff, v >> 32);
- }
-@@ -30,9 +31,9 @@ static inline dev_t reparse_mkdev(void *ptr)
- static inline kuid_t wsl_make_kuid(struct cifs_sb_info *cifs_sb,
- 				   void *ptr)
- {
--	u32 uid = le32_to_cpu(*(__le32 *)ptr);
-+	u32 uid = get_unaligned_le32(ptr);
- 
--	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_UID)
-+	if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_UID)
- 		return cifs_sb->ctx->linux_uid;
- 	return make_kuid(current_user_ns(), uid);
- }
-@@ -40,9 +41,9 @@ static inline kuid_t wsl_make_kuid(struct cifs_sb_info *cifs_sb,
- static inline kgid_t wsl_make_kgid(struct cifs_sb_info *cifs_sb,
- 				   void *ptr)
- {
--	u32 gid = le32_to_cpu(*(__le32 *)ptr);
-+	u32 gid = get_unaligned_le32(ptr);
- 
--	if (cifs_sb->mnt_cifs_flags & CIFS_MOUNT_OVERR_GID)
-+	if (cifs_sb_flags(cifs_sb) & CIFS_MOUNT_OVERR_GID)
- 		return cifs_sb->ctx->linux_gid;
- 	return make_kgid(current_user_ns(), gid);
- }
--- 
-2.53.0
-
+ 	/*
+ 	 * Common cheap case: everybody has the requested
+ 	 * rights, and there are no ACLs to check. No need
+@@ -468,7 +473,12 @@ static int acl_permission_check(struct mnt_idmap *idmap,
+ 	if (likely(vfsuid_eq_kuid(vfsuid, current_fsuid()))) {
+ 		mask &=3D 7;
+ 		mode >>=3D 6;
+-		return (mask & ~mode) ? -EACCES : 0;
++		if (likely((mask & ~mode) =3D=3D 0))
++			return 0;
++		if (mask & MAY_SERVE_FILE)
++			/* Owner always gets access */
++			return 0;
++		return -EACCES;
+ 	}
+=20
+ 	/* Do we have ACL's? */
+@@ -4652,6 +4662,7 @@ struct file *vfs_lookup_open(struct path *parent, struc=
+t qstr *last,
+ 	file =3D alloc_empty_file(open_flag, current_cred());
+ 	if (IS_ERR(file))
+ 		return file;
++	file->f_mode |=3D FMODE_SERVE_FILE;
+=20
+ 	nd.path =3D *parent;
+ 	nd.last =3D *last;
+@@ -4666,6 +4677,7 @@ struct file *vfs_lookup_open(struct path *parent, struc=
+t qstr *last,
+ 	op.acc_mode =3D ACC_MODE(open_flag);
+ 	if (open_flag & O_TRUNC)
+ 		op.acc_mode |=3D MAY_WRITE;
++	op.acc_mode |=3D MAY_SERVE_FILE;
+ 	dentry =3D lookup_open(&nd, file, &op);
+=20
+ 	if (IS_ERR(dentry))
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index f9d1e05e8ae6..83c36a5dc51f 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -98,6 +98,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t offse=
+t,
+ #define MAY_CHDIR		0x00000040
+ /* called from RCU mode, don't block */
+ #define MAY_NOT_BLOCK		0x00000080
++/* Passed by nfsd - owner may have any access, X access gives R */
++#define	MAY_SERVE_FILE		0x00000100
+=20
+ /*
+  * flags in file.f_mode.  Note that FMODE_READ and FMODE_WRITE must correspo=
+nd
+@@ -120,8 +122,8 @@ typedef int (dio_iodone_t)(struct kiocb *iocb, loff_t off=
+set,
+ #define FMODE_WRITE_RESTRICTED	((__force fmode_t)(1 << 6))
+ /* File supports atomic writes */
+ #define FMODE_CAN_ATOMIC_WRITE	((__force fmode_t)(1 << 7))
+-
+-/* FMODE_* bit 8 */
++/* File used to serve file to a client, so MAY_SERVE_FILE applies */
++#define FMODE_SERVE_FILE	((__force fmode_t)(1 << 8))
+=20
+ /* 32bit hashes as llseek() offset (for directories) */
+ #define FMODE_32BITHASH         ((__force fmode_t)(1 << 9))
