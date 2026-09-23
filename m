@@ -1,86 +1,84 @@
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F49499F2E
-	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 12:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B02C52CCC9
+	for <linux-cifs@vger.kernel.org>; Wed, 23 Sep 2026 13:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790166962; cv=none; b=SW461DesorBs3fPqrZQQKdb25EQ0QPtJfg94LR73xaVnQHeSy8lRleHcesPXyTLjEjyzM2olpQUqhD0OI2AC0wMOZsUPSM3sa/AXDCtbsGZL4a0EBy56hVfk1wHdTWWQsj7hh0Yh7sUPYxYShWSa1PWOHPTqcKneJfDrPUY4Lkc=
+	t=1790169775; cv=none; b=IoUe1ZArMgK4ZcdmT2+SvHIXzk411yeVS+xCLSlEZdmCItCYGdvaVPG/K38eqZdgJwHX7FFT4/XoeiQN7F3oz5RJVNgv+hDR9o8np8oJS6QIAycyOOiAO+vNInc3sMOEPpVrlmOC9AsUH6Wysakf++dFsJMtVSAv/AEUvZW+xdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790166962; c=relaxed/simple;
-	bh=DeDZtizp/9btnRavUGlnUmKJ0pwtfG9P46A7uKvTUlM=;
+	s=arc-20240116; t=1790169775; c=relaxed/simple;
+	bh=4D8PyH2lSydq8Jg6k9ObYForWYSmdE5pN9Dcs5Gxh1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tZ2s6LP9pL9NbVquTiw4Hk0p+LG0qEfRAOxWguDYm/c+kyx55DZlEGv8AkcIbi1hzN124LPZlE0d6nW4i0ZHLayaMKP88PPj04fExGhy7tPs9ObD+cIH8oIKqGKuPUfdE6Bf7RyXWYGllUVa4U18EYGQUshhel+ldWdf3Cqjg4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=hHMvaOao; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WqMAY9Ui; arc=none smtp.client-ip=202.12.124.158
+	 Content-Type:Content-Disposition:In-Reply-To; b=nRLJUOl7vZpoxnUkhX2g0NqGBmaaRmHAMnIZj4tK7krNH8sfXVV4Ls7oJ8T1P7vfr582svqV9SbmR8Jz6Q4ZgsJdftsdfW9bSn3foG4GY20LBIzwR6su1NeZkoDgP5jjT8YVCjnPJCPeoANhXdLTrs9pfPjQA5PHwOS8IOHASCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=afP48/vM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SamkMPm9; arc=none smtp.client-ip=202.12.124.159
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="hHMvaOao";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WqMAY9Ui"
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A70037A0111;
-	Wed, 23 Sep 2026 08:35:59 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-10.internal (MEProxy); Wed, 23 Sep 2026 08:36:00 -0400
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="afP48/vM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SamkMPm9"
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 01A287A00F9;
+	Wed, 23 Sep 2026 09:22:51 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Wed, 23 Sep 2026 09:22:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
 	:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1790166959;
-	 x=1790253359; bh=2wjHdwDAlhp5l/HlZTfjMoYaMl8K0a6jYEPkeuIFHIk=; b=
-	hHMvaOaohsk+4TOmkILUve3KfSpVIpwRIxcfv906rgy/+wSdxNYCN2WQL5DRw2Y4
-	clBb0q1h0q41DFIF3yCeljBjk0Kh18SMbvi2V2p7prDQuzZpRgrZm4rwnDpLWeoo
-	u8a3SmI9wACl9tltxE14e/eqxn0F/X/GMAC3oI89v/GjvcRLDxFSaTwdCl9DkyZt
-	ucoT2rVRrYV1iO5BMX0mN8CIKjEA+dUFLv36NXxrpxVfOVN564QhK6XW3Jo2eCBV
-	bN0mVQ7gPHjozbipehp4bfGgywzxJW+fCgWKifnExEIWUOoG9a+w667tkv0dbWqF
-	hgMDfJoIBrga5xjBCpmo+Q==
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1790169771;
+	 x=1790256171; bh=WxK9h2XLt8ZE5Dg3lRonmWvSaWUMiu49xpiBuCatZy0=; b=
+	afP48/vMfarW7PKgX6fzbaBxr9s4jb7L2E9Vm4zz5V+/eDT4koqusFiR2cCPOpZT
+	3D9AKMK45nKSZdjDi6K2koEzl/AdBsrHrojAGSQZvV110b9pxeLcesmuYYsnRGnQ
+	9k+PcEw/3gnz59ZTN7DVUOYvyoK2NCPdod6a0LKtqIUqfcVYKFzNTVQk3u5kK1Os
+	Q4+Y4l0gP/1NN8Rw1zfUGHZchvtgAEzTBq9zNm8lpEjjsV3xcWF9SVLp7MlVDjw8
+	8Hh3BWxHpdvjljtJ9AWabi71XdYlt4pKgXTHJ8emeJEkZX2xiveMFevRKbyIpLG8
+	mb69BYfPSapqsbi71fwiEA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790166959; x=
-	1790253359; bh=2wjHdwDAlhp5l/HlZTfjMoYaMl8K0a6jYEPkeuIFHIk=; b=W
-	qMAY9UiUx2MJpn/4kbmktJE9AA++wrSNP90fgmL/sQQcGSNPlrVEdJ/cMBuObCm7
-	U6pKnkN0EQ6LozlLjoKCiHfwXkmF/95EdelMxnJEz6SdtKP3/040IUZBysa0e8k2
-	thYqra453JRTS/x6/4oWKBDpoObL9h7kK48G8ADNqCLkVwporFTDzjv+cw0oh2hw
-	mz60PoTffyIxgHJ2r8yaf5gv5fhr7zx6nsEUP5FDBQuO7B2ULwJe9A8xVoUhsNPu
-	xu0uxEvgKeHGv5e9BKAhMhvOZfGDUNtLat4kUuUtM1IGPTtxTaMicG5Vin3IMaiZ
-	EjrpEhPLR21JzOW5fFGpA==
-X-ME-Sender: <xms:r8ezasYoB75KBxYeNgcJQCf387gxME3DGTTB19WVjvrITPoUGJptaA>
-    <xme:r8ezam1knb3RkdywAc8XDP_33kEZxeY3BpvP3-H5qQE0xfO0BicL_TultkljHVfDu
-    yxxSwhAuEzF8AgH8yXrVby43d1gjLoVUK17WMJqzXibeYbGKgI>
-X-ME-Received: <xmr:r8ezaoC15NKX3AOcJAAkyiWg0xpzVjbHtWTX5QzcGiTImlF1BAPHFn1HDmNX>
-X-ME-Proxy-Cause: dmFkZTEVQqeqPq8xXLI0VMjegImeLOZ2+Q6ApeZsGZlLTwtF3HexkHxyHECrDmv8z+U6Fu
-    xvvXxoTbitN7zpqXwuVMyuQiNCCfpKq/oO9J/6PyYK5tgZNUH9CvO/afVA2MyMZxrSU+xw
-    QEiYhFN2R3Z6wEF3btMr+Ee6qNlSqspuncXlWehopsBwNaoQ8A+v8i2VT0NaFZpvcs7gMY
-    G7pEZPk1c3u2WUszvJVoj5cfQ6uqw+RcMFhOy/RrEJNhBrUwm8pHCKP+WHkZmmlBnebKFz
-    vpGtlYEEpJ90ntrVD1T3fHJ1Bd+99Gc527yOybbaymdbdg/Cd+g8UMeaMsg8ChjdOh/nJE
-    BnBNLPbacoi4TPipgWiJwgJgULk+ADgbWrZkgPOCa8s6sKHU4WpkJzeyU1awufStqyFV8d
-    yleleoTrXGu1UHV6C62Bf+9ih9fvHVC5X4gS4n/b90o+5kWrKdKxrDhwZQX4ec9RCrOfTW
-    a3d6Q8MWD14+hPKWxhHk8va/EivTQ1FCpdVdfidOaJvmH0VI1bGIijzkeEqfFkO4KZei1Q
-    57DhzTgVJ867iX9kKT38Bo5FzT2ue0v6zBiwqMUP66KEPb37KafNPyRf+bKOo5+siWMxvX
-    uShN8r8AL31Qs+NePnWE/UnXAFkTtS5eISo4HBmTxeExpkdojyuaxoTsx0WA
-X-ME-Proxy: <xmx:r8ezaq-6HMy-UbaJHQHZnaDnub1U3Ki3eXHvYJhHnXY8tCe6WhfXJQ>
-    <xmx:r8ezarUmLPRgjtvf23YUgowKUWqLJO-NAT-E_OHBpnU6ylCkQMXrVw>
-    <xmx:r8ezarLoAJ3mNKtWYKcr1Yze9axesirNTi2BAJlE3PMjwWTDE8aMIQ>
-    <xmx:r8ezanAKNqUTCY9VNzu93eyw5srXQsqV-psqZMsnmiZ5NLRzb0XCDQ>
-    <xmx:r8ezahh4SdBA-Qo_Os160TP9EnueH0yVxs9TlWaQTKrj_8NwPfyOx6cw>
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1790169771; x=
+	1790256171; bh=WxK9h2XLt8ZE5Dg3lRonmWvSaWUMiu49xpiBuCatZy0=; b=S
+	amkMPm9Rc0T+/WNxMMln23w7ljA5k5fzUcHNyOOd6gQb14wZeqrN/marRpUiYKdu
+	hFNEtV2Y7NYiDz6ol5wb9b/vA/Rfx2RkovbXWe/AZwhAJ0t/PURWwueyZj1ZshPs
+	/M0I++K9w2k8Tb8gAT5bRMe7FP0OQMCXN4PkKCxwVZKNtr3vxai0NlG0sg+2lXT2
+	LMalP+uUAD+CaIWjmMGZt9yTE1r54c8BxgcG1CJQHxrCnJ7zwVsV3rJc0KLeOBQ8
+	QsGuflUFEUcIagLG6k7HzKttwRqZEbVNxUuBYQfi1FkjaIjrDX18YjREL4N/CtoT
+	lTt0O+iKri8McHkRXTELg==
+X-ME-Sender: <xms:q9Kzai4jhk20eo1pUPdAzBwjCkRlJCmYCt92x1QXuR4huD9TnmjbqA>
+    <xme:q9KzarVyh_MR_ydrzLSKGdFYVONTUMtzI3PiDkkk7Oe9uea2_pfKRR4OQwrj3rrVz
+    M_fXmAGO4ooyvXYBVsA-qaVVaVQzhP4mJsuU5Zm3MCCH5fz-l0>
+X-ME-Received: <xmr:q9Kzaih6waq3IqRAOZ8n1GYcVyIy4D1VEW8hVUxlstQQYT9MIskmFikV84Rh>
+X-ME-Proxy-Cause: dmFkZTGOCQPjs6y28iwbPYEt2gjVfWEVl10xOBpkOkj1s++gcIHTXUFjXvvq9J1BG/FVA9
+    WPVVZ2PuwUCOTqdcd6sVwlezMeCjX/fjcBaVwQYjJtTG9qhPcwtsqvklpMIkreidzG7TB8
+    MVGyEwzmbdOcWSDIoPY51wl5EQbnEi7LdzJbnWpfN2f69a/JhUVDffRCaU8NWwqNT/jkGc
+    fOnNKewTJhO6jQkARBsCZuJ2irBvWv0Iy/whYhlBkLyMKzjs2A+2RH3RIAiFeYGnQBD4KB
+    TTymk54BUMI5Wq/85A4jtdrv1wgm/ULPdhHkRzS7QV24Dx/lKHUMd8yo5jhTnw1+vRFvZN
+    AyHwMhRcp7FLpUfjmu547r3yS9OKKBC1xUI3s8F6ijdrv97jGv2glDmLyDp7ngFt0Z4bvj
+    07QDHg9BHFj839T1/Y5bz1IahsvOSQd8R4xvaqvKIrlVmHVpSCXrwVpl5OwTObLg/houfR
+    BCXyj+cgjlSUjhTMo+8fU2rLJO27ORBEVAzANsHMukJZjwAovjMFh9RkoZdjhbppB1Ur0F
+    XCjNSSxkWiHNB4i6j5j8mgMS09mTFI0FQjkJ0Daey3tgTMXPAL4Mfg+DSFxLi1EKOnq1ht
+    KOCtxuNM5QeVXLnt9wYQM0VxeF5peY9xB3ugXj9FdOKATM2sBmF6d8zh/SOQ
+X-ME-Proxy: <xmx:q9Kzajdmqwj2relwieTByuvxVEylkD-PoLqKoAOh-1RqbWSWFCORfA>
+    <xmx:q9Kzap1fZ_xZVzKi5H6bY9aQqaEtCRn1ycMtl_7S__FpW54sEanl8g>
+    <xmx:q9KzanqTOPlipjNrN_Dz-OSyE59UJ9Aa-tfm13Lk5EGALUnRxqzc2Q>
+    <xmx:q9KzaphxucyB7H-Lep7hbXgl23TAT0g5FQrXECQCIwz2MdeoKY5HJA>
+    <xmx:q9KzarazAJZ5tP8LVIB_lS9HKmzjNQNwacq-KkB_vm88xFSffEsq2VCh>
 Feedback-ID: i787e41f1:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 23 Sep 2026 08:35:58 -0400 (EDT)
-Date: Wed, 23 Sep 2026 14:35:56 +0200
+ 23 Sep 2026 09:22:51 -0400 (EDT)
+Date: Wed, 23 Sep 2026 15:22:48 +0200
 From: Greg KH <greg@kroah.com>
 To: =?utf-8?B?5pyx5rWp?= <zhuhao@stu.pku.edu.cn>
 Cc: security <security@kernel.org>, linkinjeon <linkinjeon@kernel.org>,
 	linkinjeon <linkinjeon@samba.org>, smfrench <smfrench@gmail.com>,
 	sfrench <sfrench@samba.org>,
 	linux-cifs <linux-cifs@vger.kernel.org>
-Subject: Re: ksmbd: unlocked iface_list free during server reset vs
- FSCTL_QUERY_NETWORK_INTERFACE_INFO traversal -> use-after-free (kernel oops)
-Message-ID: <2026092314-correct-entrench-c63e@gregkh>
-References: <AL*ADQCbK5q8mAaIolsqNaq-.1.1790153264029.Hmail.2401112100@stu.pku.edu.cn>
- <2026092344-muck-retainer-dd6d@gregkh>
- <AK2AhgCLKwK9zwB7Ti6KtqpK.3.1790166059428.Hmail.2401112100@stu.pku.edu.cn>
+Subject: Re: Subject: [RESEND][PATCH] ksmbd: add rwsem locking for iface_list
+ to fix UAF during server reset
+Message-ID: <2026092307-pursuant-catapult-1bea@gregkh>
+References: <APEAYwCSK6S9UyHZK957O4qI.1.1790169581212.Hmail.2401112100@stu.pku.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -90,14 +88,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <AK2AhgCLKwK9zwB7Ti6KtqpK.3.1790166059428.Hmail.2401112100@stu.pku.edu.cn>
+In-Reply-To: <APEAYwCSK6S9UyHZK957O4qI.1.1790169581212.Hmail.2401112100@stu.pku.edu.cn>
 
-On Wed, Sep 23, 2026 at 08:20:59PM +0800, 朱浩 wrote:
-> Thank you for your feedback. I'm sending the patch and test report below. Is replying to this email the appropriate way to submit them, or would you prefer another submission channel?
+On Wed, Sep 23, 2026 at 09:19:41PM +0800, 朱浩 wrote:
+> Hi,
+> Thank you for the feedback on formatting. I have repackaged the fix as a proper git format-patch patch (plain text, no HTML), so it applies cleanly.
 
-Please submit it in a format that it can be applied in (please read the
-submitting patches documentation).  This was sent in html format and all
-of the whitespace totally corrupted.
+You sent an html email and a binary, compressed attachment :(
+
+Please read the documentation again, specifically the email clients
+file, for how to do this properly.  Perhaps point your LLM at it?
 
 thanks,
 
