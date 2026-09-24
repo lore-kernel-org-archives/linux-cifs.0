@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751F147D92F;
-	Thu, 24 Sep 2026 13:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE1B285041;
+	Thu, 24 Sep 2026 13:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790255635; cv=none; b=kcQQcufLpZcNRoMbQuFr2TkhJP4p0JuRUQThN1BadQ90GCFZUdxNjPj+OxW5iLrC9D8tNKG/0AapPgpo45ZtLTEuV5Enz17WT/tGL1DmgiOVkTMm4wta1GRTNlK4svMBTP89wEq6nJcmLPpNW8S7eAuspIcyagC7+7oYqDkggT8=
+	t=1790256249; cv=none; b=sojTD77X9xmu0Vf7u5PUxuHS/cWkSbaGVTzFNZ+tYJB6Gi1GN9qgShK8I7VjcmyzgaiN/A6Dz3PvCkBq9QB7bLtTAEGZTCIyzJ4nZjVLhtYQdA/O2xpzx27lQ08NM9dXvOBZPaVqthHzf8kwFFmZvjwh/vyKql5Io7oGz8XhiuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790255635; c=relaxed/simple;
-	bh=SDRx3+VcdGaaNt8/JqYuEAywmrmMs0tJzocl9lQyMlg=;
+	s=arc-20240116; t=1790256249; c=relaxed/simple;
+	bh=oD96HPeB93PmGDXv5Xs45kg9jKq5KlY/ogmqR0eWnmc=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=u4hRrFz1LsvUJnZuDjUUaJ8RdypcNEGroXwmUd8YI9Y0X9EaAFtXv4J84irvc/blUdrNVJ1hf3/xZoyfOGvgiqN6qSNbliqLM8sLx4kXcVLJ3VFafzBlNrYcWgXmYqlJxWe269q4aHu0Flm0gbfeawPTRcu7+BSdLRrXDt67hJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nK3DqKYC; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=XEjPKb6qIUOr2K9gVzneVT0bfvsIPKa54zMuaFH0O8zkCre3/+IzlqsVYwQP7ECnHUD90aOHM5sceIHIDsRHcoA73OB4OEytb/Rs4iP07KB2D/b5qMh8SoQir93QSV5rjil4GaNf3EdEZGaOQgi0P/tkzYMWW6AVBdJgqGQkQs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIxPKVZk; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nK3DqKYC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A22DC1F000FF;
-	Thu, 24 Sep 2026 13:13:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIxPKVZk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F10151F000FF;
+	Thu, 24 Sep 2026 13:23:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790255634;
-	bh=1FPuxwA7U/Oka2FvjX4JcthGqDjhawyI31UGFPK+B8A=;
+	s=k20260515; t=1790256240;
+	bh=zNDk0mcKphEdrUdRK3vjk4xN5TSUj6ARDzxHlDFkxiw=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=nK3DqKYCh/zCXC4zGxqWUtES3r/fTjJm9w/ODW7RxJEzhk3SdLek8jvV851dQBZJO
-	 njpeITCa0GDdPkRoGUegV+b4WXq4Q3r2Mv+w9DK2KNJli3gD8oy2xYSpLm5smQ6ipk
-	 vpwq89vgyx5za29EiDaryndHi53+Qhub2xe8tEebYwvf1gAg/2ZwUxa+QYXv2KEaLe
-	 l15GyXoYlb7of4jhaeuttZlx0h0n/nojBIlP4vOS7RlL/mSa8Doc8NXb+2uxebNkTr
-	 ReUyGBwwFUT+EFIZ4NqUIT198KMEEZuQS9FZSo921z8DL/iwRAdyBcNsHhMGPeckvJ
-	 JfYMbARm6cYhw==
-Message-ID: <06b05140db43b94e8a8cbf877f73e74d3fbb306e.camel@kernel.org>
-Subject: Re: [PATCH v2 09/14] vfs: change vfs_lookup_open() to use
- do_open(), not vfs_open()
+	b=eIxPKVZkne5qwGl28a6yE5qWAzoHmA8O5R++6nvKNs/qAj80ps2aRxRzhu1OBnYog
+	 JJpTidgZ4OloPotM6KuSIaGR+3m382ZVbHsipLaVgn1aMk4O3rv1jR5m44PppQK5wt
+	 2toiNrd8yOJv2SS6RbKIZi0U2rF6vzA74cSSahe2sILoI+71cuFO3MduuUY2XNPmGz
+	 eZfMPcWzFjc0AJETWASt2BwXuSzzD6RPdH91ObbHZJIdMUQixP1a8yAEl4etdS6PMo
+	 iM8T/xDNbvJpgAZekALHSfxsOIcYAo9aj2r2heflfm21AB6s3zCmq3yCpUKaBNwozu
+	 CQmZmq6w9JSog==
+Message-ID: <1d617af0ddc11ae773808aa6a876d9d3f91e7115.camel@kernel.org>
+Subject: Re: [PATCH v2 10/14] nfsd: make EEXIST checks in
+ nfsd4_create_file() more consistent.
 From: Jeff Layton <jlayton@kernel.org>
 To: NeilBrown <neil@brown.name>, Alexander Viro <viro@zeniv.linux.org.uk>, 
  Christian Brauner
@@ -42,10 +42,10 @@ Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
  Alcantara	 <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, 
 	linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
 	linux-nfs@vger.kernel.org
-Date: Thu, 24 Sep 2026 09:13:51 -0400
-In-Reply-To: <20260919022441.3305170-10-neilb@ownmail.net>
+Date: Thu, 24 Sep 2026 09:23:57 -0400
+In-Reply-To: <20260919022441.3305170-11-neilb@ownmail.net>
 References: <20260919022441.3305170-1-neilb@ownmail.net>
-	 <20260919022441.3305170-10-neilb@ownmail.net>
+	 <20260919022441.3305170-11-neilb@ownmail.net>
 Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
  keydata=mQINBE6V0TwBEADXhJg7s8wFDwBMEvn0qyhAnzFLTOCHooMZyx7XO7dAiIhDSi7G1NPxw
  n8jdFUQMCR/GlpozMFlSFiZXiObE7sef9rTtM68ukUyZM4pJ9l0KjQNgDJ6Fr342Htkjxu/kFV1Wv
@@ -133,57 +133,72 @@ MIME-Version: 1.0
 On Sat, 2026-09-19 at 12:06 +1000, NeilBrown wrote:
 > From: NeilBrown <neil@brown.name>
 >=20
-> The vfs_open() call misses permission checks which should happen before
-> an open is attempted (atomic_open does separate permission checks).
+> nfsd4_create_file() has two places that check if an "eexists" style
+> error is needed - only if create_mode is not NFS4_CREATE_UNCHECKED.
 >=20
-> Much of the code in do_open() will have no effect as relevant LOOKUP_
-> flags aren't set.  truncation will be done (which nfsd is not expected
-> to use) along with some audit logs and security hook.  The important
-> benefit is getting the may_open() check.
+> One if when checking the error code from do_lookup_open(), one when
+> checking if ->op_created wasn't set.
+>=20
+> These are not consistent - one tests if op_createmode IS
+> NFS4_CREATE_UNCHECKED, the other tests if it isn't.
+>=20
+> Rearrange the second piece of code so that the tests look similar.
+> This will make some following patches a bit cleaner.
 >=20
 > Signed-off-by: NeilBrown <neil@brown.name>
 > ---
->  fs/namei.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+>  fs/nfsd/nfs4proc.c | 33 +++++++++++++++++----------------
+>  1 file changed, 17 insertions(+), 16 deletions(-)
 >=20
-> diff --git a/fs/namei.c b/fs/namei.c
-> index ba3e7e4b5fdb..8ef2d44b6108 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -4604,6 +4604,9 @@ out_dput:
->  	goto out;
->  }
+> diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
+> index 3a82af381a8d..6e443503d0b7 100644
+> --- a/fs/nfsd/nfs4proc.c
+> +++ b/fs/nfsd/nfs4proc.c
+> @@ -462,23 +462,24 @@ nfsd4_create_file(struct svc_rqst *rqstp, struct sv=
+c_fh *fhp,
+>  		open->op_created =3D true;
 > =20
-> +static int do_open(struct nameidata *nd,
-> +		   struct file *file, const struct open_flags *op);
+>  	if (!open->op_created) {
+> -		if (open->op_createmode =3D=3D NFS4_CREATE_UNCHECKED) {
+> -			/* NFSv4 protocol requires change attributes
+> -			 * even though no change happened.
+> -			 */
+> -			fh_fill_post_noop(fhp);
+> -
+> -			/*
+> -			 * In NFSv4, we don't want to truncate the file
+> -			 * now. This would be wrong if the OPEN fails for
+> -			 * some other reason. Furthermore, if the size is
+> -			 * nonzero, we should ignore it according to spec!
+> -			 */
+> -			open->op_truncate =3D (d_is_reg(child) &&
+> -					     (iap->ia_valid & ATTR_SIZE) &&
+> -					     !iap->ia_size);
+> -		} else
+> +		if (open->op_createmode !=3D NFS4_CREATE_UNCHECKED) {
+>  			status =3D nfserr_exist;
+> +			goto out;
+> +		}
+> +		/* NFSv4 protocol requires change attributes
+> +		 * even though no change happened.
+> +		 */
+> +		fh_fill_post_noop(fhp);
 > +
->  /**
->   * vfs_lookup_open - open and possibly create a regular file
->   * @parent: directory to contain file
-> @@ -4660,6 +4663,9 @@ struct file *vfs_lookup_open(struct path *parent, s=
-truct qstr *last,
->  	}
->  	op.open_flag =3D open_flag;
->  	op.mode =3D mode;
-> +	op.acc_mode =3D ACC_MODE(open_flag);
-> +	if (open_flag & O_TRUNC)
-> +		op.acc_mode |=3D MAY_WRITE;
->  	dentry =3D lookup_open(&nd, file, &op);
-> =20
->  	if (IS_ERR(dentry))
-> @@ -4677,7 +4683,7 @@ struct file *vfs_lookup_open(struct path *parent, s=
-truct qstr *last,
->  			error =3D -ELOOP;
->  	} else if (!(file->f_mode & FMODE_OPENED)) {
->  		nd.path.dentry =3D dentry;
-> -		error =3D vfs_open(&nd.path, file);
-> +		error =3D do_open(&nd, file, &op);
->  	}
->  	dput(dentry);
-> =20
+> +		/*
+> +		 * In NFSv4, we don't want to truncate the file
+> +		 * now. This would be wrong if the OPEN fails for
+> +		 * some other reason. Furthermore, if the size is
+> +		 * nonzero, we should ignore it according to spec!
+> +		 */
 
-I think the code looks right, but the vfs_open -> do_open change is
-largely unmentioned in the changelog. It'd be good to flesh that out
-some.
+Some mention of where in the spec that's written would be helpful for
+posterity. I think it's RFC 8881 =C2=A7 18.16.3.
+
+> +		open->op_truncate =3D (d_is_reg(child) &&
+> +				     (iap->ia_valid & ATTR_SIZE) &&
+> +				     !iap->ia_size);
+>  		goto out;
+>  	}
+>  	/* file was created */
 
 Reviewed-by: Jeff Layton <jlayton@kernel.org>
