@@ -1,50 +1,44 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373FE3D0919;
-	Thu, 24 Sep 2026 13:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5D418DB1A
+	for <linux-cifs@vger.kernel.org>; Thu, 24 Sep 2026 13:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790257421; cv=none; b=UjxNJH5pbnoHpVYumDvIIyxqm9dCknuzKCW1k7mabwy74kE+brLeQRky8PeLkcpaOSVjOvEJzMa+4BzMcZt4A1a0v8AEJJXpLEYRJ6kQfCrzMm7ieuZ0J9tfEtVA4DdzCbWdcPPttpjajXI4p7XJBW1LYnMkSIB4/6HTLnAnbH4=
+	t=1790257871; cv=none; b=BwF4RUV1+U2+yLtW6oo1wVIqnpWiXhrUCO69ssdGodypK0DNIRbwyrD5JfoIWxNH+lCDM7mUVw4b3scFQO+VkO8L2CpfZM+uuJOgtAaufh5WLO+cBL08OW5iKV3JmGnHnNcIwygXUBYt7emSztYuPdEBlUjJN8DI5WNbHvz55jw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790257421; c=relaxed/simple;
-	bh=cSzcyAZpFXUxMo6JHHFfSzdm6nZOBuy6I02fO+MyHlI=;
+	s=arc-20240116; t=1790257871; c=relaxed/simple;
+	bh=9bjvi+DtNN/Di7TA0B915pYv76qPLZo1AIqrQms2Djg=;
 	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=NJNYofyCle5cX05g0RP4XQOsCLjj6zULQSbJml4mVKIlkukEK1CCqMis4CPpy4nEtrUUyihppLSe4+h8yq3jayiNgPAhwk4lAFXV3W4F4iM/dB8T3NiTRgUWTIoO8RBhWUC3CQ79DYI+AmqP40X5CJCb7zhiC111mAukuEfJoos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=PxO7iqvh; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version:Content-Type; b=rRqBclxL5oBSXWE6nXabPpgUIRM7y7Rfy+igxdEynTFs+mnR0l0ldHOP7WAyu1SmpC5Xvk/3sB6HSvfVpQsbqoSnbq3cyUkwTR/QBmlb93N+CmFI9wAl1zLQOGMM+w8uF+oFkbsJMIG6psW3s8qQCnLQUelodkZxYRnzcU1xmDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=7JUBSLnu; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="PxO7iqvh"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="7JUBSLnu"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=92cVdM6V0Hli3vXQa2vXPk+2sd+TTKDKVdsSFrNZl3s=; b=PxO7iqvhFttEAOszQ2De6jYhCV
-	vULrfAd4JVPpkG6Wee4rC+Qvw7js5Akq65s62DUgYY7eRgF1UKYYbRja2sEHNTm3OtSn/bL0W7MOe
-	o6KpDXD3fow0o0sw9ARQAxFEPxGxupf2CWN6Yv9BVVPUFXyh1oPiYNEiz9XSF3rAGcP/nsPOMhh/m
-	b0bf3bTtJexHfkNpu7FUwXoOrJsRq8IsrCB0m0/PMaWFpeqCROXiqQtwkl6aO9jk6YlGWdV+/qoAz
-	ZWb6/dEkt/04pz0JNnQNC0zP7rGmArjBnEWI0btHcxdq5Rhum3AXDotZGjMEA6sP0BT5poArmqzkI
-	VER12SUA==;
+	bh=9bjvi+DtNN/Di7TA0B915pYv76qPLZo1AIqrQms2Djg=; b=7JUBSLnurpL3yglEzdCXHge4NE
+	4K4B2Ip/GxRIgiSOu0GVcgRJDKdbxMZ/7P0T2TZq9HfYxNeVxOQKrdRPLCP9eLfJGlXE89TpLXHdg
+	1AolvdyFW7HX4xfK44hcPu2YxMAdMcU18nUpqooHAotPnTF0/LYxTGEcDcFq8TNW9agdtmn3EW24A
+	/chFI7lAWWkc0//hQ+E9pAs6NR4DslsBKoJj55JHiJDkyAUFjxaYfmnCzDaTajXjHPKQlSY/iThcd
+	cStdb4nj5su9V6NubcPZtO0tpP2ogZJ7+J7gLuIcgrYYmBYe1M85e3WYfh56L5x6IjFlA2zFEk2Y9
+	CmL7BO4A==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1x9jjR-00000002Bzr-2jpz;
-	Thu, 24 Sep 2026 10:43:25 -0300
-Message-ID: <69b370341031e782027602519e8b5d17@manguebit.org>
+	id 1x9jqt-00000002C2N-3jbS;
+	Thu, 24 Sep 2026 10:51:07 -0300
+Message-ID: <6bff25748d26b4327eed7db64c6c117a@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: linux-cifs@vger.kernel.org, netfs@lists.linux.dev, David Howells
- <dhowells@redhat.com>, Christian Brauner <brauner@kernel.org>, Namjae Jeon
- <linkinjeon@kernel.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
- <bharathsm@microsoft.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] netfs: clear post-EOF pagecache when extending a
- file via write
-In-Reply-To: <arSkGzqebr4ogCZs@casper.infradead.org>
-References: <20260921230755.1133425-1-pc@manguebit.org>
- <arHVJ0ihdqmNETMw@casper.infradead.org>
- <b5a645319f7b2475f65306c3445953db@manguebit.org>
- <arSkGzqebr4ogCZs@casper.infradead.org>
-Date: Thu, 24 Sep 2026 10:43:25 -0300
+To: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
+Cc: ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ bharathsm@microsoft.com, tom@talpey.com, Namjae Jeon
+ <linkinjeon@kernel.org>
+Subject: Re: [PATCH] cifs: use finish_no_open() for non-regular inodes
+In-Reply-To: <20260923112549.21294-1-linkinjeon@kernel.org>
+References: <20260923112549.21294-1-linkinjeon@kernel.org>
+Date: Thu, 24 Sep 2026 10:51:07 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -53,21 +47,23 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Matthew Wilcox <willy@infradead.org> writes:
+Namjae Jeon <linkinjeon@kernel.org> writes:
 
-> On Wed, Sep 23, 2026 at 08:46:35PM -0300, Paulo Alcantara wrote:
->> - netfslib needs to honour NOWAIT, which pagecache_isize_extended()
->>   can't do due to filemap_lock_folio() and folio_mkclean().  Besides, we
->>   would also need to return -EAGAIN in case the folio is mapped or under
->>   writeback.
+> An O_CREAT open can find an existing symlink or another non-regular
+> inode. cifs_atomic_open() calls finish_open() on it and attaches a
+> cifsFileInfo. Symlink inodes have no CIFS release operation, so the
+> dentry reference held by cifsFileInfo is leaked. FMODE_OPENED also
+> prevents the VFS from following the symlink.
 >
-> btw, if IOCB_NOWAIT is important to you, you need to be calling
-> kiocb_modified() instead of file_remove_privs() and file_update_time()
-> in netfs_buffered_write_iter_locked().
+> Track whether cifs_do_create() returned an open server handle. For
+> non-regular inodes, close the handle if present, remove the pending
+> open, and call finish_no_open() so the VFS can continue the lookup.
+> Do not set FMODE_CREATED unless a regular file was opened. For
+> O_NOFOLLOW with __O_REGULAR, return -ELOOP before the VFS's
+> -EFTYPE check.
+>
+> Defer closing a legacy POSIX handle on a non-regular inode until
+> after inode lookup. This avoids closing it again if lookup fails.
+> ...
 
-Yes, you're right.  My life was so much easier when I initially started
-writing the fixes without having to care about IOCB_NOWAIT as I'd
-noticed that netfs wasn't actually handling it correctly in some places,
-then I thought: let's not make it any worse, handle it correctly in the
-new helper at least and then send other patches later to fix the other
-parts.
+Applied.
