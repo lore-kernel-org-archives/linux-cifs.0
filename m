@@ -1,186 +1,135 @@
-Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
+Received: from mail-pj2-f40.google.com (mail-pj2-f40.google.com [74.125.227.168])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACF73A5452
-	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 07:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154AC224AF2
+	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 08:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.168
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790409399; cv=none; b=DKtk5NypoqEONx6OmFYCD9yuDjQaTDxfkgspR7w1ozpprKjdxfVSarrM35/mOdPjhN20LQj3kobSmuYhYRkOoep+xM7zKn4xQl6p1Brah3219/dj/pawldR6m9u6g66JVF75IuoHSy7i/7HcM+WmomhSB6Z2NPB3ByPFhzRn40E=
+	t=1790409750; cv=none; b=Z1b9/T+oAS/A8HrcyhP1w295GarAbziuakTqa7mqlRJKpZcaD2rYJA5hev+yc22W6Nn7V8jAreJE3+m0FX3/cMnLrXltgeyvWBI75bOiE7sVpBDUWifEhr21Lq3OznP/8GEQeYfkCFUqrIxF3fgE1KKouqUq50T/ZKSxkOoDnWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790409399; c=relaxed/simple;
-	bh=yY5aPVN1kZdRX24f/rOo18N2WyJh702NUMPAilvlSUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UAG5jFiGkez/G7tQxboECa5AN5W+FeAHLyLtAcLrmQRF5OTMMTu0SMEQad4T3j3zkTvreBcSD3oOekY0mFRmXRl5baHCE9SWEZFZoZkei6LzL6TIuhTgT086aiswFoDL6lFVDXNu730N+44W31lcKmIATNno0kIAkeiVGumi2rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mmiKvR24; arc=none smtp.client-ip=74.125.225.99
+	s=arc-20240116; t=1790409750; c=relaxed/simple;
+	bh=JO526X/6Tt2mXMMyzxnEn8I9inabf6bHTO7ljFpjf1Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gu0UNNbpXqJd+I10iwR3YQq1bUeDEI0o3DFl2QiLXKcrOsYqRVHCe2z2ekKqflxpOAkoEOJt3mD+KH8+m1RlxLJcML8FToFd0w1jMtN0NJFltexj47v2coRr24H8qHvEIr6t019F+3tmIGMeKU/7Z46j+M8NY3ERffYoxGW8jSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wnq4v0xN; arc=none smtp.client-ip=74.125.227.168
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmiKvR24"
-Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-4887840c529so548677f8f.1
-        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 00:56:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wnq4v0xN"
+Received: by mail-pj2-f40.google.com with SMTP id 98e67ed59e1d1-3a0dc47fee0so185287a91.1
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 01:02:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790409394; x=1791014194; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YI9LML6UkRl05Tm2nCgeCpB6+5W0fxaRHeYbqDyeGfo=;
-        b=mmiKvR24FbgMjygoeg6BB8jRgCPJkWtPtwrwqdGb7ukGfBXGooX1tM8Cxvka87E4Ft
-         xI0fdGXhg0KAD0IfL3KIDWpM+cYK3kNr0arfep+z1tDNlL+Kr7G6ISQLpZk8dIaGA1YE
-         dH97uGTKbS0UH+/Dfpg5EfoLhYKRk072eZjojnBB3KeYUJx3Yi4WFNTPdYKnc4okaN5L
-         HQf2dWR3lIEogxRJi7BOJN/4go+24yCl49OccXKY68Jwbe7fEgNXXeLXhfu+eT9CQMG5
-         3oPoBj8JL6cVvWmb0HsXtXUoL4AQd2bts16KJ7CL/ESeAkFGH3AKwd5AtErE/sbq9sDW
-         KVeQ==
+        d=gmail.com; s=20251104; t=1790409748; x=1791014548; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=1QOIpORY6Eh+rWA+8y7RMDhGXP2bTeo70K5JN02r+40=;
+        b=Wnq4v0xNOWnDzD4ZSQiZqv41jmnb5WS2fguemQMuW9BI+zbaJnKuZbcq7owA81vEs2
+         ugD0O99tUvkVpNy+uZRG2Tk4rcCTUYEmWGZPZwo89vP3eij5tt1tW2S6gE2w5MjlVgSQ
+         +wcHFzHJZ2ql/8IU6PIJUDWiUOAvp9ZJ13DKVBpQyuwpH7Gz3SCcBKLHrrz9Tu/cQb/o
+         niFHrCeQXtu6AHSKZgirdkMb6Ccaf1KsIQtcojUoUZ8JTPV3SPD+PrExAcoflAIwWiuh
+         TFbVlzx45m6ZdD76zBFUAHnyKZht/qS+mynkLPsbxADZ/tYiljY11SJoEepFsQyd99jN
+         fLBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790409394; x=1791014194;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=YI9LML6UkRl05Tm2nCgeCpB6+5W0fxaRHeYbqDyeGfo=;
-        b=srt7Zh89DOZVLSas1hjSojbZY/JyApIyIFsKiioaXgYB5+EYegbtLnt7FF29/rwaSY
-         J55DUBT5fIprLsrDzyJA0xPPugRs6fhXkL6FA2n2MPTsQuj6NFcot0bNzJ3wYUcb+9xo
-         pwpaEuwjT1STOjT1TEFarD8x2ZC6qTDHqc4P7SyyTDST1nxVLI0AI5hceiEnO+bsZrs4
-         LMG61OGSgtPvA2FHBlRlgIQ9P5+eg1YxcG35lugaqJ5j36Lp7VE4VgOqV4q2JigtqPwi
-         eDLcA6zpu8NGs0VohrKMiP4a2sC5vn/r9hjrU/II/7XhGU6eENudLbnyoY0Sa2MZVAF1
-         XneQ==
-X-Forwarded-Encrypted: i=1; AKwUvByUDGBN/8fnd5lpPaqDz3imyaAoCnnRD+9TD01GiAYfAT10+rLU5dNYqly6WuZjC7JwZQmsNtuM2mF+@vger.kernel.org
-X-Gm-Message-State: AFuF++kn9l8OB1DjTQOdGquilygY+zi5YeUQcMFFuyAcdGXX65jXjgAQ
-	OSUxhwmTJbCkkBwKX5Hq+wgEC0QXOO8l8ceoV2qpXVrJltYI3BShKURR
-X-Gm-Gg: AYBFou3t+356JfuW/l/FbZ/1mE+nxisIncJXXnwF0VtpJf/9VstCdVdNV9ivUOsZ1xt
-	G9ddjtgTmvM6cEOZ6+8ER3b+pDDExULgNW++qhLB6Ynl3X57zPFKEAsHJU+/tjjpBZx75fFPOL6
-	M3xZdfpnHqO9cxtZ8/PottVBdMy7u07z2Tq+4pRoldY+ORh+eZUqrzsQyN7utkDmwrivlDtLCUX
-	eBIy35Fzyb54gSyMlwPrgVjFfkYKcHrEm5hMSLImogPXwm3MZJxcf1CQzJZEwpHHsRdSDorFFT5
-	GjGZc9sMuqM/tU1oD1jClAyymT1LvvIni1MYyrNpZcXkmSHiZW8qNRQD2m6+YXXYDhOk/zsGTmd
-	yUCfksc1MtO9l4yycDPYnUAO8mbvAbdyKGi+yf6sR+USz8I3I5K647rQDUsIYCAjFyySg8ovYu5
-	jzRYrvV0byM0001PNV/Bx4OL88HidJG0FR5ZWnhUjqFXIUkvQXmwdSgdBMhl8FVZ3PeImWY/5Ya
-	UB+y+kgHsiE1iR5J+otnfU=
-X-Received: by 2002:a05:600c:8b82:b0:49f:fefc:7d01 with SMTP id 5b1f17b1804b1-49ffefc7e4dmr2208755e9.15.1790409394348;
-        Sat, 26 Sep 2026 00:56:34 -0700 (PDT)
-Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fe667ae2fsm204215155e9.13.2026.09.26.00.56.33
+        d=1e100.net; s=20260707; t=1790409748; x=1791014548;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=1QOIpORY6Eh+rWA+8y7RMDhGXP2bTeo70K5JN02r+40=;
+        b=QXEv55tvOsZpNKkJmOVS1SROFs9Tf4qbWpA1ZlORw5AqzRrPp1QgattgnSZX23eOlp
+         lug4MPb0eyMzkmFlNrEljdV7aNvacqQRu53TvMe80kgoZ0/lOxSy7Szwap8F3xYuK8rQ
+         1oHK4kyyU66+j+F5+GIGtsMP+9yQTSXGky4O+oEeMzVydNgalCRDR5rVrdIqiKbz2p9T
+         YTUv7sXQkyvBuoPSb+NvGoEvcY//lVFSTQv0H3yj3C81UNCudnsy4ZeuY0EBgPjpdKbW
+         GdM8msbPdykKV2g473wwDfu53feq33PxmQvjC1GCeEaERELp04QOEa7la+R9DTNfRepR
+         EmMA==
+X-Gm-Message-State: AFq9FYLLFMNOhAT5e3hGSjgL00jt+fEpEtA2G55S/Mg/gSGB74h88Viy
+	E/Lq7nVGkCSxtBtMue5z8JKCdwtepdzHVYia1/KEc6okwsLtn8Kxhm97hceKAGZLB4o/TQ==
+X-Gm-Gg: AYBFou1a3iML9S9f9Ton8QfjzrYagU+keo2h6ayxgZWK6pyn4CHE/k00MMkvbXQD0j7
+	tQDQ92Mtj1QUHpJVcquvOXd1B6iDkxA6TUxuPf8hYA21CCTd+fsBam5RBlrIiBGuLWHBD5qf48U
+	KdgaEfLS0Zuza0hsJOJ0+8yI5epihQ/jBWhgZ6am3K3FXuT0wI51xSuToVndn+lnssr+Cwp1LGj
+	kgmGxW5FQ4/NQRWWOmTcZO9QWIf9h0vKtXpd1yHKYbSJhW3sB2GPp+22KxZrba32gVRn83lyX3B
+	nQQIm1sCzoUChbeDG6bs/kKsDAmAs1W7PTUtNvU6T4K8ZsSB8jA2gq787SFYx3CTxvKu6LfV8og
+	5sRlKhBkjJ6dqj/7sWc0EhlPm3pmxeIuhP8hgmVszjLKVEnDl3MOVctTQfO5qtc1kaEMatZh2wg
+	tAVTcL6gZ842umPWNkVUijj2d8isaq7Mn4cRQEGxfp2u+WKGEpdpKfYXMZ/6m7vd7uY3RL01s=
+X-Received: by 2002:a17:90b:4c42:b0:39e:4c80:f680 with SMTP id 98e67ed59e1d1-3a098bb66d1mr7292603a91.31.1790409748275;
+        Sat, 26 Sep 2026 01:02:28 -0700 (PDT)
+Received: from localhost ([180.184.92.195])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0b9355e54sm8355171a91.5.2026.09.26.01.02.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Sep 2026 00:56:33 -0700 (PDT)
-Date: Sat, 26 Sep 2026 09:56:28 +0200
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Justin Suess <utilityemal77@gmail.com>
-Cc: Cai Xinchen <caixinchen1@huawei.com>, mic@digikod.net,
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
-	serge@hallyn.com, corbet@lwn.net, skhan@linuxfoundation.org,
-	rdunlap@infradead.org, gregkh@linuxfoundation.org,
-	rafael@kernel.org, dakr@kernel.org, dlemoal@kernel.org, hch@lst.de,
-	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
-	jack@suse.cz, dhowells@redhat.com, code@tyhicks.com,
-	linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
-	hirofumi@mail.parknet.co.jp, cel@kernel.org, jlayton@kernel.org,
-	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
-	tom@talpey.com, miklos@szeredi.hu, amir73il@gmail.com,
-	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com,
-	zohar@linux.ibm.com, roberto.sassu@huawei.com,
-	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
-	stephen.smalley.work@gmail.com, omosnacek@gmail.com,
-	casey@schaufler-ca.com, nanx95726@gmail.com, djwong@kernel.org,
-	daniel@iogearbox.net, linux-security-module@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	driver-core@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
-	ecryptfs@vger.kernel.org, exfat@lists.linux.dev,
-	linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org,
-	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	xiujianfeng@huawei.com, lujialin4@huawei.com
-Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
- WRITE_METADATA access rights
-Message-ID: <20260926.255b951d3013@gnoack.org>
-References: <20260924104831.1081137-1-caixinchen1@huawei.com>
- <araxO4ze0KZBz756@suesslenovo>
+        Sat, 26 Sep 2026 01:02:27 -0700 (PDT)
+From: Dairui Zhang <zhangdairui@gmail.com>
+To: linux-cifs@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Dairui Zhang <zhangdairui@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: verify transform SessionId matches the decrypted header
+Date: Sat, 26 Sep 2026 16:02:24 +0800
+Message-ID: <20260926080224.1671214-1-zhangdairui@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <araxO4ze0KZBz756@suesslenovo>
 
-Hello!
+The decryption key for an encrypted request is selected by the
+SessionId in the encryption transform header, but the request is
+then authorized under the session named in the decrypted inner SMB2
+header. Nothing compares the two, so on a connection carrying more
+than one session a client can have a request decrypted with one
+session's key and executed under another session's identity. Since
+encrypted requests are also exempt from the signing requirement, the
+AEAD tag is the only proof of session identity, and it is checked
+against the wrong session.
 
-On Fri, Sep 25, 2026 at 02:03:05PM -0400, Justin Suess wrote:
-> On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
-> > This series adds two new Landlock filesystem access rights,
-> > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
-> > which control access to file and directory metadata such as inode
-> > attributes (mode, ownership, timestamps), extended attributes and POSIX
-> > ACLs.  It picks up the work from the "landlock: add chmod and chown
-> > support" series [1] and follows the coarse-grained grouping discussed in
-> > that thread [2]: instead of separate chmod/chown rights, metadata
-> > operations are grouped into one read and one write right.
-> > 
-> > Landlock evaluates access rights on a per-path basis, but the metadata
-> > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
-> > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
-> > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
-> > object.  Patches 1-7 therefore first pass struct path instead of dentry
-> > through the metadata-related VFS helpers and LSM hooks.  This is a pure
-> > refactoring with no behavior change, split so that every patch builds
-> > and works on its own:
-> >
-> I like these patches, but is the ability to read metadata already
-> sorta controlled by LANDLOCK_ACCESS_FS_READ_DIR on the parent
-> directory?
-> 
-> The one case I see this being different is:
-> 
-> 1. if you wanted to grant read access to the file, but not metadata
-> read access, but I can't think of any usecase for being able to read
-> the contents of a file, but not the metadata. (see below)
-> 
-> 2. If you had the absolute path already and didn't need READ_DIR.
-> 
-> I see introducing this READ_METADATA as causing potential
-> hard-to-diagnose issues.
-> 
-> Say you handle READ_METADATA and READ_FILE, but only grant READ_FILE.
-> 
-> The program can technically open the file with the READ_FILE permission,
-> but it may error out because the stat() on it beforehand failed.
-> It's pretty common for programs to do that kind of thing (stat before
-> open), like for checking for config files (strace bash and you see it
-> stat .profile, /etc/profile)
-> 
-> There may be other bugs, because being able to set permissions to read
-> a file *but not read it's metadata* isn't possible currently in posix
-> acl and userspace may not work well if that assumption no longer holds.
-> 
-> So maybe WRITE_METADATA is good enough?
+Per MS-SMB2 the server must verify that the SessionId in the
+transform header matches the one in the decrypted SMB2 header and
+treat a mismatch as a protocol error. Compare them after decryption
+and drop the connection on mismatch.
 
-The existing use cases are the combinations of (a) READ_DIR
-allowed/denied and (b) READ_METADATA allowed/denied.  Because these
-two access rights overlap slightly, it seems likely that for a given
-directory or file, users will want to either grant both, or deny both.
+The check only applies to plain SMB2 payloads; a compression
+transform payload carries the session id only after decompression
+and is left as-is for now.
 
-At the moment, where the (not yet existing) READ_METADATA is
-implicitly always allowed, the problematic case is the one where the
-Landlock user wants to deny READ_DIR, but where much of the same
-metadata is still available through stat() and the various
-get-attribute syscalls.  (c.f. the warning box in the Landlock docs
-[1])
+Reported-by: Dairui Zhang <zhangdairui@gmail.com>
+Assisted-by: LLM
+Cc: stable@vger.kernel.org
+Signed-off-by: Dairui Zhang <zhangdairui@gmail.com>
+---
+ fs/smb/server/smb2pdu.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-In my view the READ_METADATA right closes a gap that READ_DIR left
-open (which is also potentially surprising to callers if they did not
-read the docs closely).  Also, if its implementation is symmetric to
-WRITE_METADATA, I feel that it's worth having it in the same patch
-set.
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 4cf7083..e4cfbe6 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -10890,6 +10890,22 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+ 	if (rc)
+ 		return rc;
+ 
++	/*
++	 * The decryption key is selected by the transform header SessionId,
++	 * while the request is authorized under the session named in the
++	 * decrypted inner header. Per MS-SMB2 the two must match; verify
++	 * that here and drop the connection on mismatch. A compression
++	 * transform payload carries the session id only after
++	 * decompression, so it is not covered by this check.
++	 */
++	if (((struct smb2_hdr *)iov[1].iov_base)->ProtocolId ==
++	    SMB2_PROTO_NUMBER &&
++	    le64_to_cpu(tr_hdr->SessionId) !=
++	    le64_to_cpu(((struct smb2_hdr *)iov[1].iov_base)->SessionId)) {
++		pr_err_ratelimited("SessionId mismatch between transform and inner header\n");
++		return -ECONNABORTED;
++	}
++
+ 	/* Drop the AEAD authentication tag from the inner RFC1002 frame. */
+ 	memmove(buf + 4, iov[1].iov_base, original_msg_size);
+ 	*(__be32 *)buf = cpu_to_be32(original_msg_size);
+-- 
+2.53.0
 
-–Günther
-
-P.S.: I know, even after we can control stat(), there are likely ways
-to infer the presence of a file by observing Landlock error codes.
-This would be nice to fix as well, but is harder to do without
-controlling the path walk itself [2].  But also, the fact that this is
-currently not controllable is not an excuse for leaving READ_METADATA
-open IMHO.
-
-[1] https://docs.kernel.org/userspace-api/landlock.html#filesystem-flags
-[2] https://github.com/landlock-lsm/linux/issues/9
