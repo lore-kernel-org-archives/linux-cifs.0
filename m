@@ -1,133 +1,215 @@
-Received: from mail-pz2-f39.google.com (mail-pz2-f39.google.com [74.125.228.39])
+Received: from mail-wm2-f12.google.com (mail-wm2-f12.google.com [74.125.225.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4AC347BDC
-	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 08:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.228.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630ED38398E
+	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 08:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790410421; cv=none; b=c6QdRxVjgr2oDLoVInZ5ADcdOlvMGcsOqwvyirEJNjza9QIMG6Ga4J2hVw/of95XF4RRWChGekVIhJGZKiyjoo0CMRsILQl13mEz12fkDS4rocY6/kgJqUVocYgY4ApSu+OcoCwLUIiy7LFvPg6C/75u5bsYTTzo9X28klSup+o=
+	t=1790411287; cv=none; b=nRxqBEkktm27LQwoLMZND8VRq64LiGyobAXQXnHPmvKo3+FFxwL1RcWkfNRY7CID8jzqyuFK3ewbA7hbUHlzlW77YRWq9cVYiTWYKcaabqT958zhpBfCK4BMeJK6m+oAWzHfasXTMbHUzt+wzusiGyTlmzmo0zTiQwWgFkUZGFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790410421; c=relaxed/simple;
-	bh=ig3mWZg1JlZlBFwG9O95I6wXK9nFRyBhS7xFOG9iBpk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rGG5b8Q4RfuYC6X6v2CXsSQYR0b+4yRiWmsV8OalIdV+RWXK0ofQuwH9Vf6AOIgIG6gmGBgpBu3SwucqwODrQkqKKG78lb+5Du3jY5zHx5z5HW0AsGBFy7HSzeLL/VulFGF8Lzwcx0tir+alWVRb1VY1xjBNbzkBORofNtwNINQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrxfZzGb; arc=none smtp.client-ip=74.125.228.39
+	s=arc-20240116; t=1790411287; c=relaxed/simple;
+	bh=95Vs9hoaKg76Ufz/33WhtAeKWKx39eNDm61SF5fsyOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hi2ZxZw3qaXo2x0UNkjda71cw6MYi+7fRpMCh/KL89w0L+reV0qWfTCp9aLNVbX+zRyRfWIVEu/NhU0P1iDT7Au1BmFri9juTnuQaF8a/ijY3crNxsjsD+nKrIq6ppw6+bm4G2X2K6wHtJHDKIVoK2AZvNNc25KUP1NLfEJK1Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DniRPhJQ; arc=none smtp.client-ip=74.125.225.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrxfZzGb"
-Received: by mail-pz2-f39.google.com with SMTP id 41be03b00d2f7-cc7979d1dedso359490a12.3
-        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 01:13:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DniRPhJQ"
+Received: by mail-wm2-f12.google.com with SMTP id 5b1f17b1804b1-49ccff31419so14290075e9.3
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 01:28:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790410420; x=1791015220; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=RC+Pb5q4XmiSnvW+7RE10jsoQIna9GU2QDuK/YngZVE=;
-        b=nrxfZzGbMI/Y3D3yVXQP3P0bTDq/TK0XlMnb6c9cgmwGauyAFN5xVocEXgjJp/AbAV
-         8/f6FJ7P8zdiQAMy7E4XumX3Y6Kxfy3l9QY3VuwVPYFLplqDmfqrJ0f2wqAmOOh2OK5E
-         jUVZFIEPzWkNmPm7mgkAFfNqaWnxRCo7txBP48+CbzlJcQyeXuuu5l/94wkZkr/hpXNh
-         c7IvCf5JSMFLbZFLT8mrUI7cXcrhxFhr7j9vg028NNCoeVwxqNxF//l38t+xQJAhDd0D
-         gdMwTf2JL+hgdiXL0Lhnoz1Yy1cyJHWz7bxYhT+vqk3u6eNbFyCDmHYXFO0TBYa3xXZr
-         HREQ==
+        d=gmail.com; s=20251104; t=1790411284; x=1791016084; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=tPXUTB33yRiVb0ap+iiavNUW+iiPbvO+JMKJab+k0Zc=;
+        b=DniRPhJQplQ0wdwrhhLjitPE2tYLACalop1qkLYyutbqNFz1sWU0WfS0+AgbxsRGXr
+         AaX+j+rg2fV+8HV6eBhOVznOXhihs9BBOdBag9lJun+diTZys5pZ5wiK0UmedKjZvJM/
+         F4O13fvxOOIrZueKch3Extd1H049ZpHB/qdrah6b8Cj7effVItu+eEMCZh6icVrI0g2c
+         pS0DT8l6Za1wksdL2d3nmWgcTIxJX3q4I9bfcqSpz7A/CIKt/7Le7okC8mgVmhxU+Ix0
+         AJ+oAxsJJqPoDCY4Y7cDopY3hlREeHMYHQDyVEWlb3Wl7yMf6y/JE/7eVm42/W8RAe+u
+         eq7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790410420; x=1791015220;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=RC+Pb5q4XmiSnvW+7RE10jsoQIna9GU2QDuK/YngZVE=;
-        b=OD9cRSourAmMF61f8+mZ2weogr32/k1XCS7dUHbxRyZVV2wWJh4fzCE12cYDBH82RC
-         916fbQ5xuDmf09ysJyaW3gvppObGeZDRyJpwzOciAf3KSscmFJicjDNhGJ7MWHyeKVg0
-         5fpuV87e8bPgt675SQ9DkyAkV2gwRK6qt0MDYoegpRaDHPtE3OCziE/12H+U/iI6EUJ6
-         6tw7MxYYN3LQvt6LONQ3F3DgAcXO1m5YcUxMjtfNWWgn8lWXGSbzY6cQ+r5APqRAzp2M
-         XClaI+ufo04gqGqPrA8Pm2KpbHCbRxvEJAMgQgS7v0AcQju8EUwJU0D7QYZ1IxECBuFw
-         KZZg==
-X-Gm-Message-State: AFq9FYKVSri8iImhsJCUCttJ5Kan2TCPwfLXB/h6jZtD+/XoObk97KxU
-	F3Yo0i0N75Rg5CMI2tQwT85Nf6kMvEu9b4MhdkenuzRWevQMWVL1wRGzAgvil4CgDwJYTg==
-X-Gm-Gg: AYBFou2cZM645ypJIpZt/zyadxUVeT8ZxG6mXq8smtweiGuvAVGrUwd28XnIjY84h2e
-	Z/EXyDNCTHRYmnLc0x3Dp1W9Ak7wpcGLMuGA/3pZJelOKyl4Lotolx1seRNkmCVOjc/xGy6TVCR
-	YvqrsVdSuZDNkSQORYSZ9jpK8grxsJXVbHLXzg4x5HJGudM+PbKijq9mYuWc9DLG4S+XCzNj7MH
-	cxY8Z2A3XuvtDSjdKCMBMGJBQWTyVayl8Urk3pFqccXUIHm6IucbBizUAbV+J9fqfBLRTSX9wlO
-	3SViSEcvHEEQ3iT9On/hf5YXd+HaTzoRqIHvSzRVkZ2+DhVmT/71OyZZRuUf8C778k+0v4UVY/1
-	v0UNKbz9/ZWywSXMeZDYWAU67jnQyD39X9R9hTz3SDY4FsIerC83R29M0iJuoWKJG6fbTn25qqR
-	Gt5IC/wrqgK2rUvGqsGtF+GuTctTSM4zvtcq2YwXwDj8OpuR3LbmGoxCigbMWzEsY/HAuW+I8=
-X-Received: by 2002:a17:90b:4d09:b0:39f:d323:c988 with SMTP id 98e67ed59e1d1-3a098dff5e3mr6258618a91.48.1790410419831;
-        Sat, 26 Sep 2026 01:13:39 -0700 (PDT)
-Received: from localhost ([101.126.86.154])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a0b898cabesm8892556a91.0.2026.09.26.01.13.38
+        d=1e100.net; s=20260707; t=1790411284; x=1791016084;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=tPXUTB33yRiVb0ap+iiavNUW+iiPbvO+JMKJab+k0Zc=;
+        b=urlpQXYYlMLAQupeJ6NG26o2SxGBqDuLOP2QKUQsESFBBrmC32VBjVSptytJlO1bVg
+         Gu6raCvRPUq6PGEaVo98i5oiv+9m6Zi/7TMLCmzF+CLnsSimiw6xEdyTCqenXnEqTc0S
+         ZrYS3bmVr7K/yi/FqULCV5R5JxqlqNozdkTRr8o1ke8C/mdKGjfw465KJMKqcLT4sNVS
+         E0dMAs9VYdUD6froooyuF3nEJkQMuOb6WM5E2o9ipbtQojMscc/cYln8QepNDpFnN5lg
+         jglKLp3Kt3NXql0XJ0zkaMeKKRCbpSnaB1SPNPdoAhXdJvRDEJsa5TQLha+hZMbYvz6U
+         8nJA==
+X-Forwarded-Encrypted: i=1; AKwUvBxrCajzA2Hbl23aZk0zcNQPeT9DvO0zOh+R/RhNtnIZtx2CmZs6G4WlCrAPBU2tync/MTI72RJc407O@vger.kernel.org
+X-Gm-Message-State: AFuF++lVShVYxW7UXq+3T5nEP0Q+hKvTmTzmKqqxufZHxM96ezOm4uni
+	Hb+danLCz+XljLap4KGz1PLA2Y3SzhTxZE8AnlcNpTKAB4t4L0BC8rN5
+X-Gm-Gg: AYBFou3pjgA4J0PkIbMghYeOlSlNk6GmIL1Z/NY1qEBZu41Huav/efUbu02L682Sgvx
+	3gwr5Zqf23niEg6OvXRjDL9S2lijMXe3mqcQLK1QoZql/5OJTnQzVVeI7ZKEdKD6jvzUt+Ns5nI
+	+gAGnHQ56zYm2gtO5vrAsoPmxwn+6fqnKX8BwJMozKmvfUaJAqUgBDOyRQqeQnOK5lTDwpmjhvK
+	Z7WiwckkwhO8atURq+jhR8LDMt80xsNrYGV7z/70zAsN4UnfhF41iKgE1Av2hsdUHnF8aE2chit
+	iA0U/Rmpy105y5vOH8s5MzCzCzzcDm2Q9iZ5LU4Gp3MYVVqyK3LK9Zf11yxVaZaW5YTATfK2rcc
+	mLgO1zta6oHcP7ayfegRoNcq4himxT4j+1yXg6LYRnnxr3h2ot85wjQ24MqSlDrzYbVhD/H8h/+
+	KZVsQgCb819mi/Z7bv1A6KJyEeU06bFuDI3bs01ZlKhfNJsnYV7Mc/8h2lqmtV29pbwghXNDpXG
+	6ZnKCMAyTAbRHGMEmRA/p0=
+X-Received: by 2002:a05:600c:621a:b0:496:c1f3:e8f8 with SMTP id 5b1f17b1804b1-49fe7b52ed6mr138634065e9.7.1790411283366;
+        Sat, 26 Sep 2026 01:28:03 -0700 (PDT)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a64f9bcsm12711265f8f.32.2026.09.26.01.28.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Sep 2026 01:13:39 -0700 (PDT)
-From: Dairui Zhang <zhangdairui@gmail.com>
-To: linux-cifs@vger.kernel.org
-Cc: Dairui Zhang <zhangdairui@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Paulo Alcantara <pc@manguebit.org>
-Subject: [BUG] ksmbd: OOB read in ksmbd_validate_name_reconnect() via cross-share durable reconnect
-Date: Sat, 26 Sep 2026 16:13:35 +0800
-Message-ID: <20260926081335.1671600-1-zhangdairui@gmail.com>
-X-Mailer: git-send-email 2.53.0
+        Sat, 26 Sep 2026 01:28:02 -0700 (PDT)
+Date: Sat, 26 Sep 2026 10:27:57 +0200
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: Cai Xinchen <caixinchen1@huawei.com>
+Cc: mic@digikod.net, gnoack@google.com, paul@paul-moore.com,
+	jmorris@namei.org, serge@hallyn.com, corbet@lwn.net,
+	skhan@linuxfoundation.org, rdunlap@infradead.org,
+	gregkh@linuxfoundation.org, rafael@kernel.org, dakr@kernel.org,
+	dlemoal@kernel.org, hch@lst.de, axboe@kernel.dk,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
+	dhowells@redhat.com, code@tyhicks.com, linkinjeon@kernel.org,
+	sj1557.seo@samsung.com, yuezhang.mo@sony.com,
+	hirofumi@mail.parknet.co.jp, cel@kernel.org, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	tom@talpey.com, miklos@szeredi.hu, amir73il@gmail.com,
+	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com,
+	zohar@linux.ibm.com, roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+	stephen.smalley.work@gmail.com, omosnacek@gmail.com,
+	casey@schaufler-ca.com, nanx95726@gmail.com, djwong@kernel.org,
+	daniel@iogearbox.net, linux-security-module@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	driver-core@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+	ecryptfs@vger.kernel.org, exfat@lists.linux.dev,
+	linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org,
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	xiujianfeng@huawei.com, lujialin4@huawei.com, bpf@vger.kernel.org,
+	kpsingh@kernel.org, matt@bobrowski.net,
+	alexei.starovoitov@gmail.com
+Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
+ WRITE_METADATA access rights
+Message-ID: <20260926.e0135fe7712f@gnoack.org>
+References: <20260924104831.1081137-1-caixinchen1@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260924104831.1081137-1-caixinchen1@huawei.com>
 
-Hi,
+On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
+> This series adds two new Landlock filesystem access rights,
+> LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+> which control access to file and directory metadata such as inode
+> attributes (mode, ownership, timestamps), extended attributes and POSIX
+> ACLs.  It picks up the work from the "landlock: add chmod and chown
+> support" series [1] and follows the coarse-grained grouping discussed in
+> that thread [2]: instead of separate chmod/chown rights, metadata
+> operations are grouped into one read and one write right.
+> 
+> Landlock evaluates access rights on a per-path basis, but the metadata
+> related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+> inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+> inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+> object.  Patches 1-7 therefore first pass struct path instead of dentry
+> through the metadata-related VFS helpers and LSM hooks.  This is a pure
+> refactoring with no behavior change, split so that every patch builds
+> and works on its own:
+> 
+>   1: notify_change() and its callers
+>   2: inode_setsecctx hook (must come before 3: the SELinux and Smack
+>      implementations call __vfs_setxattr_locked internally)
+>   3: xattr helpers, which also drops a redundant EVM xattr size sanity
+>      check whose vfs_getxattr() call only has a dentry and therefore
+>      cannot be migrated to the new path-based signature
+>   4: POSIX ACL helpers
+>   5: inode_setattr hook
+>   6: inode xattr hooks
+>   7: inode POSIX ACL hooks
+> 
+> Two deliberate scoping decisions for this refactor:
+> 
+> - The hooks consistently take struct path rather than struct file.  The
+>   VFS call sites involved (chmod(2), chown(2), utimensat(2), xattr(2)
+>   and ACL syscalls) operate on paths, and several of them (lstat(2),
+>   lchown(2), llistxattr(2), ...) have no struct file to begin with.
+> 
+> - struct inode_operations->setattr still receives (idmap, dentry, attr).
+>   Only the VFS boundary (notify_change()) and the LSM hook layer see the
+>   path, which keeps the refactor contained to fs/attr.c and the LSM
+>   infrastructure instead of touching every filesystem.
+> 
+> Patches 8-12 then implement the new rights, their tests, the sandboxer
+> sample and the documentation.  Semantics:
+> 
+> - READ_METADATA covers stat(2) and friends, getxattr(2) and friends,
+>   listxattr(2) and friends, and POSIX ACL reads.
+> - WRITE_METADATA covers chmod(2), chown(2), utimensat(2), setxattr(2),
+>   removexattr(2) and friends, and POSIX ACL set and remove.
+> - Only explicit metadata changes requested by user space are restricted.
+>   Implicit changes performed by the kernel (e.g. timestamp updates on
+>   write(2), size changes on truncate(2)) are not, and neither are
+>   chmod(2)/chown(2) calls that change nothing (e.g. chown(2) with
+>   (-1, -1), which never reaches the hook), matching the SELinux
+>   inode_setattr behavior.
+> - Kernel-internal accesses performed with override_creds() (e.g.
+>   overlayfs, cachefiles) and kernel threads without a Landlock domain
+>   (e.g. nfsd, ksmbd) are not restricted.
+> 
+> The Landlock ABI version is incremented from 11 to 12.
+> 
+> The series is based on linux-next commit 5c4d4169604b ("Add linux-next
+> specific files for 20260921").
+> 
+> Testing: each patch has been built for aarch64 (gcc, -Werror) and the
+> landlock selftests (445 tests, including the new ones) pass in QEMU on
+> aarch64; base_test reports ABI v12.
+> 
+> [1] https://lore.kernel.org/all/20220827111215.131442-1-xiujianfeng@huawei.com/
+> [2] https://lore.kernel.org/all/abc960a1-e66e-792e-6869-cfd201c29dbe@digikod.net/
 
-In ksmbd_validate_name_reconnect() (vfs_cache.c:1701) the name check
-does:
+Thank you for sending this patch set!
 
-	pathname = kmalloc(PATH_MAX, KSMBD_DEFAULT_GFP);		/* :1707 */
-	ab_pathname = d_path(&fp->filp->f_path, pathname, PATH_MAX);	/* :1711 */
-	...
-	if (name && strcmp(&ab_pathname[share->path_sz + 1], name))	/* :1717 */
+Some meta-remarks at the beginning:
 
-d_path() fills the buffer from the end, so the string ends at
-pathname + PATH_MAX - 1. Nothing checks that ab_pathname is longer
-than share->path_sz + 1, or that it starts with share->path. If the
-file's real path is shorter, strcmp() reads past the end of the
-4096-byte buffer; the distance is
-share->path_sz + 1 - strlen(ab_pathname), which the client
-influences through the choice of share.
+* You might want to link the bugtracker feature request:
+  https://github.com/landlock-lsm/linux/issues/11
+* In the final version, I think it's preferred to merge patches 8
+  (adding the access right enums) and 9 (adding the LSM hooks that use
+  them).  Having the feature as an atomic commit makes it harder to
+  accidentally mess it up during a backport, because you can't patch 8
+  without 9.
+* As Paul alluded to, the changes to the LSM hook interface and to the
+  existing callers in VFS are likely the hardest part of this patch
+  set.  Alexei from the BPF subsystem has also reiterated recently
+  that he wants BPF to be looped into such changes.  BPF hooks do not
+  give the same backwards compatibility guarantees as the syscall
+  layer, but there are existing users of LSM hooks specifically
+  through the BPF LSM.
 
-The path can be shorter because the durable fp is not bound to its
-original share: session_fd_check() clears fp->conn/fp->tcon
-(vfs_cache.c:1647-1648), the reconnect looks the fp up globally by
-persistent id or CreateGuid, and smb2_check_durable_oplock()
-validates it against the *reconnecting* tree's share (smb2pdu.c:3773
--> oplock.c:2407) - it checks owner, ClientGUID and lease key, but
-never the share. So:
+* In https://github.com/landlock-lsm/linux/issues/18, we came across
+  statfs(), which returns file system meta-information based for the
+  file system that a given file belongs to.  I have weak confidence
+  that READ_METADATA would be the right access right to protect this
+  with, but it's a somewhat related operation.  Maybe you have some
+  thoughts on this?
 
-  1. open a file on share A (short path) with a durable handle,
-  2. drop the connection (the fp survives as durable-disconnected),
-  3. reconnect to share B (long path), send CREATE with
-     DURABLE_RECONNECT and the original ids,
+More concrete questions:
 
-and strcmp() reads roughly (share B path length) bytes past the
-kmalloc buffer. With a long enough share B path that is likely
-unmapped, so probably a kernel oops - a remote DoS. If it lands on a
-mapped page, the strcmp result is also a byte-equality oracle on
-adjacent heap: the reconnect succeeds exactly when the out-of-bounds
-string equals the requested name.
+* If a "inode" LSM hook gets a "path" argument now, should it be
+  renamed from "inode_..." to "path_..."?
 
-There is also a 1-byte over-read in the same-share case when the
-durable fp is the share root (strlen(ab_pathname) == share->path_sz,
-so the index lands exactly one past the buffer).
+  (Maybe the BPF people can chime in about to what extent that would
+  cause additional churn for BPF users, in a situation where they
+  anyway already need to make a change due to the changing function
+  signature?)
 
-Preconditions, as far as I can tell: durable handles enabled
-(KSMBD_GLOBAL_FLAG_DURABLE_HANDLE) and the attacker can reach two
-shares with different path lengths.
-
-Suggested fix: check the prefix before indexing -
-strlen(ab_pathname) > share->path_sz && ab_pathname[share->path_sz]
-== '/' - and ideally bind the durable fp to its original share at
-reconnect. Happy to write this up as a patch if that sounds right.
-
-From code reading only, my second report here - if I've misread
-something, please tell me.
-
-Thanks,
-Dairui Zhang
+–Günther
