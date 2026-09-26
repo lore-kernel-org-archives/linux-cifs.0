@@ -1,35 +1,35 @@
-Received: from mta0.migadu.com (out-40.mta0.migadu.com [91.218.175.40])
+Received: from mta0.migadu.com (out-42.mta0.migadu.com [91.218.175.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716F63A4535
-	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 09:06:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693ED374A19
+	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 09:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790413604; cv=none; b=F6a+KD0sc9mqWoRAtCWcsKAr9FYLsux3WB8/tRrw+ADrLkvwhV61lnDp6grMjHxTZrEm4lY+cCxzCLeBfj1+WkJHvR+WA0IlOAYsGIaZuTXHhSLqu8JhDO4luDFX+dckyJ2Q29HXc1wyw6QysJIOvq2CfkXWOBICWOjcRgyZ2tU=
+	t=1790413611; cv=none; b=hzVRv8D7DbTKDDCyQgSlZfG5ryoq5dRjbEr0DWGHNkcmjqFl4O5lvfH5UsywKLiEPCTxJiGefMYakJLUYUK7BYMOocspYPNJ2qRK1j/Brru+CJ0FxJ6Q5vui078xgAc3sjk+waC1jyzFl+6jsq6MpeYAkSmOlDUen16kvG41R+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790413604; c=relaxed/simple;
-	bh=3OezSaPtmEIievgrJ8ZkRX2hrLq3vKYyR3NkYpKbDuA=;
+	s=arc-20240116; t=1790413611; c=relaxed/simple;
+	bh=391l7XUcrMfchwWgJdLDegc0w5kQQHEs8Qu7LwYYZ4M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L/Z3z/uyU+e7l54uc+tKhww0R0CImvOHXLU/ep1uCnA00B6m9Ybq5OIXDEDYPiUEKXY4E3g4OlKQ1wRO+8fxQ96KC5jgDzK/C9S6JGf9FdyylClItEnPy0IPC6Yczf5pfnzoo+CKh6N95H3R6sO82SF22tZglRP/VPapK14TxjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=Yy3xoZ+h; arc=none smtp.client-ip=91.218.175.40
+	 MIME-Version; b=E4ynO3paOFOjQynGrpFk7oBnixPGUjnDj5yE9u7OLOaztnxXNx4b9Qecl1dsQjnIo9EqtDjfTGuNdHa8cznT+pWfHpvS0ke0J0ztIu6pgfXvR9GLT6a5crldPaCO76KWeC7/NTl+2I3afG75btRJ7mIKr0+gwBUs4vyJJ2cGnGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=NzCOksgG; arc=none smtp.client-ip=91.218.175.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="Yy3xoZ+h"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="NzCOksgG"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=3OezSaPtmEIievgrJ8ZkRX2hrLq3vKYyR3NkYpKbDuA=;
+DKIM-Signature: a=rsa-sha256; bh=391l7XUcrMfchwWgJdLDegc0w5kQQHEs8Qu7LwYYZ4M=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790413600; v=1; x=1791018400;
- b=Yy3xoZ+h4XKIcdv3tA6VgAEuLT8RJYicCopWL71AGLYsp4CjsLyF4q8Gcb7QPcW8GGUbZFBt
- 10XG9KQRP6TaP9XpmU9nIIRvdTpxwTSDT6QrzXnOlfMPBrPG6NhCcYHaNyk4pp/1Bgsp2oohkDk
- dKItKuOZN7p2LpZr2kgOdNBO3fvHjobncZysPDfytvdi9UCuvojxUcA+B+ucZ3YT6+l51BomSWk
- +GKowVSiAXb0Iz91d3nwfs7HUnU1hgfkucagirqJFRHeYtMoLqmllzchuyodrYNiwCseZnv85It
- NuAygQzRxhziQE4rF9SQ730uPV1Of5hJGurf3pR90Cq9g==
+ t=1790413607; v=1; x=1791018407;
+ b=NzCOksgGLiJwKYaxgorwKFhSS7NH9XL+9VbiWqAYyj6ynMOa0kvN8pqzusVzhLcq0AdYa6u7
+ Gwi6EXiUm2V78vb0khzALUCcjFfFmtveW44LjDsCcK4ugkY0r99hdoj1+sfy9lRCAxEijmeUM5M
+ ERCW1arOrYZZd1Ju7CKNNH2i4i41jgabccvvCFUsYojfgjWy7WkkGnHj/9zttR8DW0LwNl80YFP
+ vauGY3CO4jBu6lC7eFxxe5DZRBj5pZ7EozWR3k58KuF7cpqDDL17hbMmjBZy9JJ8ya76WztHNue
+ avZiGS3za6FHL8ccJoUMVWHddfXwGa9VYQDPKDoaKjCVA==
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id b5842735eee3ee7e;
-	Sat, 26 Sep 2026 09:06:40 +0000
-X-Mizu-Trace-ID: b5842735eee3ee7e
+Received: by smtp.migadu.com with ESMTPS id 36e5e0a717b46cfd;
+	Sat, 26 Sep 2026 09:06:47 +0000
+X-Mizu-Trace-ID: 36e5e0a717b46cfd
 X-Migadu-Flow: FLOW_OUT
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: linkinjeon@kernel.org,
@@ -38,9 +38,9 @@ To: linkinjeon@kernel.org,
 	chenxiaosong@chenxiaosong.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 06/12] smb/server: keep notify watches on file handles
-Date: Sat, 26 Sep 2026 09:05:12 +0000
-Message-ID: <20260926090518.78547-7-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 07/12] smb/server: save simple notify events
+Date: Sat, 26 Sep 2026 09:05:13 +0000
+Message-ID: <20260926090518.78547-8-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260926090518.78547-1-chenxiaosong@chenxiaosong.com>
 References: <20260926090518.78547-1-chenxiaosong@chenxiaosong.com>
@@ -54,164 +54,198 @@ Content-Transfer-Encoding: 8bit
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Keep one notify watch on each file handle. Reuse it for later requests,
-and remove it when the handle is closed.
+Save create, delete, and change events.
+
+Example:
+
+  1. client: smbinfo notify /mnt
+  2. server: ksmbd.control --debug=notify
+  3. server: touch /export/file
+     server debug log:
+       ksmbd: Queueing notify event, action 1, name file
+       ksmbd: Queueing notify event, action 3, name file
+  4. server: rm /export/file
+     server debug log:
+       ksmbd: Queueing notify event, action 2, name file
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/notify.c    | 44 +++++++++++++++++++++++++++++++++++----
- fs/smb/server/notify.h    |  2 ++
- fs/smb/server/vfs_cache.c |  3 +++
- fs/smb/server/vfs_cache.h |  4 ++++
- 4 files changed, 49 insertions(+), 4 deletions(-)
+ fs/smb/server/notify.c | 105 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
 diff --git a/fs/smb/server/notify.c b/fs/smb/server/notify.c
-index b34f2f9b6d3f..b49c0ec5117d 100644
+index b49c0ec5117d..355370c66de0 100644
 --- a/fs/smb/server/notify.c
 +++ b/fs/smb/server/notify.c
-@@ -305,6 +305,18 @@ static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
- 	struct fsnotify_mark *mark, *tree_mark;
- 	int err = 0;
+@@ -22,6 +22,14 @@
+ #include "vfs_cache.h"
+ #include "mgmt/user_session.h"
  
-+	mutex_lock(&fp->notify_lock);
-+	if (fp->notify) {
-+		/* Further requests on this open use the first request's options. */
-+		ksmbd_debug(NOTIFY,
-+			    "Reusing fsnotify mark, inode %llu, mask 0x%x, filter 0x%x, watch tree %d\n",
-+			    (unsigned long long)file_inode(fp->filp)->i_ino,
-+			    fp->notify->mark->mask, fp->notify->filter,
-+			    fp->notify->watch_tree);
-+		*notify_out = fp->notify;
-+		goto out;
-+	}
++struct ksmbd_notify_event {
++	struct list_head list;
++	u32 action;
++	u64 when;
++	size_t name_len;
++	char name[];
++};
 +
- 	notify = kzalloc_obj(*notify, KSMBD_DEFAULT_GFP);
- 	if (!notify) {
- 		pr_err("Failed to allocate notify watch\n");
-@@ -351,6 +363,7 @@ static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
- 		notify->tree_mark = tree_mark;
- 	}
+ struct ksmbd_notify {
+ 	struct fsnotify_group *group;
+ 	struct fsnotify_mark *mark;
+@@ -29,6 +37,8 @@ struct ksmbd_notify {
+ 	struct ksmbd_file *fp;
+ 	/* Protects filter, rename state and the queued events. */
+ 	spinlock_t lock;
++	struct list_head events;
++	unsigned int num_events;
+ 	u32 filter;
+ 	u32 mask;
+ 	bool watch_tree;
+@@ -40,6 +50,8 @@ struct ksmbd_notify_req {
  
-+	fp->notify = notify;
- 	*notify_out = notify;
- 	ksmbd_debug(NOTIFY,
- 		    "Added fsnotify mark, inode %llu, mask 0x%x, filter 0x%x, watch tree %d\n",
-@@ -363,9 +376,36 @@ static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
- 	kfree(notify);
+ #define KSMBD_NOTIFY_NAME_EVENT_MASK	(FS_CREATE | FS_DELETE | \
+ 					 FS_MOVED_FROM | FS_MOVED_TO)
++#define KSMBD_NOTIFY_EVENT_MASK		(FS_ATTRIB | FS_MODIFY | \
++					 KSMBD_NOTIFY_NAME_EVENT_MASK)
  
- out:
-+	mutex_unlock(&fp->notify_lock);
- 	return err;
+ static const struct {
+ 	u32 notify_mask;
+@@ -75,6 +87,34 @@ static u32 ksmbd_notify_map(u32 filter)
+ 	return mask;
  }
  
-+/**
-+ * ksmbd_notify_remove() - remove the notify watch for a closing handle
-+ * @fp: file handle whose watch is being removed
-+ *
-+ * A cancelled CHANGE_NOTIFY request leaves this watch installed. The watch is
-+ * owned by @fp and removed only when the file handle is finally closed.
-+ */
-+void ksmbd_notify_remove(struct ksmbd_file *fp)
++static void ksmbd_notify_free_events(struct list_head *events)
 +{
-+	struct ksmbd_notify *notify;
++	struct ksmbd_notify_event *event, *tmp;
 +
-+	mutex_lock(&fp->notify_lock);
-+	notify = fp->notify;
-+	fp->notify = NULL;
-+	mutex_unlock(&fp->notify_lock);
-+	if (!notify)
-+		return;
-+
-+	ksmbd_debug(NOTIFY,
-+		    "Removing fsnotify mark, inode %llu, mask 0x%x, watch tree %d\n",
-+		    (unsigned long long)file_inode(fp->filp)->i_ino,
-+		    notify->mark->mask, notify->watch_tree);
-+	ksmbd_notify_destroy_marks(notify);
-+	kfree(notify);
++	list_for_each_entry_safe(event, tmp, events, list) {
++		list_del(&event->list);
++		kfree(event);
++	}
 +}
 +
- static struct ksmbd_file *
- ksmbd_notify_validate_req(struct ksmbd_work *work,
- 			  struct smb2_change_notify_req *req,
-@@ -587,10 +627,6 @@ int ksmbd_handle_notify(struct ksmbd_work *work,
- 		release_async_work(work);
- 	else
- 		kfree(argv);
--	if (notify) {
--		ksmbd_notify_destroy_marks(notify);
--		kfree(notify);
--	}
- 	if (fp)
- 		ksmbd_fd_put(work, fp);
- 	return err;
-diff --git a/fs/smb/server/notify.h b/fs/smb/server/notify.h
-index 8de46e07b02e..1132b91c1d54 100644
---- a/fs/smb/server/notify.h
-+++ b/fs/smb/server/notify.h
-@@ -14,11 +14,13 @@
- #define __SMB_SERVER_NOTIFY_H__
++static bool ksmbd_notify_filter_match(struct ksmbd_notify *notify, u32 mask)
++{
++	u32 filter, notify_mask;
++
++	spin_lock(&notify->lock);
++	filter = notify->filter;
++	notify_mask = notify->mask;
++	spin_unlock(&notify->lock);
++
++	if (mask & KSMBD_NOTIFY_NAME_EVENT_MASK) {
++		if (mask & FS_ISDIR)
++			return filter & FILE_NOTIFY_CHANGE_DIR_NAME;
++		return filter & FILE_NOTIFY_CHANGE_FILE_NAME;
++	}
++
++	return mask & notify_mask;
++}
++
+ /*
+  * Cancel handler for a pending CHANGE_NOTIFY. Called either by
+  * smb2_cancel() (conn->request_lock held, work->state already set to
+@@ -94,14 +134,54 @@ static void smb2_notify_cancel(void **argv)
+ 	wake_up(&notify_req->wait);
+ }
  
- struct ksmbd_work;
-+struct ksmbd_file;
- struct smb2_change_notify_req;
- struct smb2_change_notify_rsp;
++static struct ksmbd_notify_event *
++ksmbd_notify_alloc_event(u32 action, const struct qstr *file_name, gfp_t gfp)
++{
++	struct ksmbd_notify_event *event;
++	size_t name_len = file_name ? file_name->len : 0;
++
++	event = kmalloc(sizeof(*event) + name_len + 1, gfp);
++	if (!event) {
++		pr_err("Failed to allocate notify event, action %u, name %.*s\n",
++		       action, file_name ? file_name->len : 0,
++		       file_name ? (const char *)file_name->name : "");
++		return NULL;
++	}
++
++	INIT_LIST_HEAD(&event->list);
++	event->action = action;
++	event->when = ktime_get_ns();
++	event->name_len = name_len;
++	if (name_len)
++		memcpy(event->name, file_name->name, name_len);
++	event->name[name_len] = '\0';
++
++	return event;
++}
++
++static void
++ksmbd_notify_queue_event(struct ksmbd_notify *notify,
++			 struct ksmbd_notify_event *event)
++{
++	ksmbd_debug(NOTIFY, "Queueing notify event, action %u, name %s\n",
++		    event->action, event->name);
++
++	spin_lock(&notify->lock);
++	list_add_tail(&event->list, &notify->events);
++	notify->num_events++;
++	spin_unlock(&notify->lock);
++}
++
+ static int ksmbd_notify_handle_inode_event(struct ksmbd_notify *notify,
+ 					   u32 mask, struct inode *inode,
+ 					   struct inode *dir,
+ 					   const struct qstr *file_name,
+ 					   u32 cookie)
+ {
++	struct ksmbd_notify_event *event;
+ 	struct inode *event_inode = dir ?: inode;
+ 	struct ksmbd_file *fp;
++	u32 action;
  
- int ksmbd_handle_notify(struct ksmbd_work *work,
- 			struct smb2_change_notify_req *req,
- 			struct smb2_change_notify_rsp *rsp);
-+void ksmbd_notify_remove(struct ksmbd_file *fp);
+ 	fp = notify->fp;
  
- #endif /* __SMB_SERVER_NOTIFY_H__ */
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index a96b764c4db5..b242babf5771 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -18,6 +18,7 @@
- #include "vfs.h"
- #include "connection.h"
- #include "misc.h"
-+#include "notify.h"
- #include "mgmt/tree_connect.h"
- #include "mgmt/user_session.h"
- #include "mgmt/user_config.h"
-@@ -626,6 +627,7 @@ static void __ksmbd_close_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
- 	close_id_del_oplock(fp);
- 	filp = fp->filp;
+@@ -112,6 +192,29 @@ static int ksmbd_notify_handle_inode_event(struct ksmbd_notify *notify,
+ 		    file_name ? file_name->len : 0,
+ 		    file_name ? (const char *)file_name->name : "", cookie);
  
-+	ksmbd_notify_remove(fp);
- 	__ksmbd_inode_close(fp);
- 	if (!IS_ERR_OR_NULL(filp))
- 		fput(filp);
-@@ -1220,6 +1222,7 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
- 	INIT_LIST_HEAD(&fp->node);
- 	INIT_LIST_HEAD(&fp->lock_list);
- 	spin_lock_init(&fp->f_lock);
-+	mutex_init(&fp->notify_lock);
- 	mutex_init(&fp->readdir_lock);
- 	atomic_set(&fp->refcount, 1);
++	if (!(mask & KSMBD_NOTIFY_EVENT_MASK)) {
++		ksmbd_debug(NOTIFY, "Ignored notify event mask 0x%x\n", mask);
++		return 0;
++	}
++
++	if (mask & FS_CREATE) {
++		action = FILE_ACTION_ADDED;
++	} else if (mask & FS_DELETE) {
++		action = FILE_ACTION_REMOVED;
++	} else {
++		action = FILE_ACTION_MODIFIED;
++	}
++
++	if (!ksmbd_notify_filter_match(notify, mask))
++		return 0;
++
++	event = ksmbd_notify_alloc_event(action, file_name,
++					 KSMBD_DEFAULT_GFP);
++	if (!event)
++		return 0;
++
++	ksmbd_notify_queue_event(notify, event);
++
+ 	return 0;
+ }
  
-diff --git a/fs/smb/server/vfs_cache.h b/fs/smb/server/vfs_cache.h
-index 732ae26dd6a7..fe8a01b062cd 100644
---- a/fs/smb/server/vfs_cache.h
-+++ b/fs/smb/server/vfs_cache.h
-@@ -33,6 +33,7 @@
- #define SMB2_NO_FID		(0xFFFFFFFFFFFFFFFFULL)
+@@ -326,6 +429,7 @@ static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
  
- struct ksmbd_conn;
-+struct ksmbd_notify;
- struct ksmbd_session;
+ 	notify->fp = fp;
+ 	spin_lock_init(&notify->lock);
++	INIT_LIST_HEAD(&notify->events);
+ 	notify->filter = filter;
+ 	notify->mask = mask;
+ 	notify->watch_tree = watch_tree;
+@@ -403,6 +507,7 @@ void ksmbd_notify_remove(struct ksmbd_file *fp)
+ 		    (unsigned long long)file_inode(fp->filp)->i_ino,
+ 		    notify->mark->mask, notify->watch_tree);
+ 	ksmbd_notify_destroy_marks(notify);
++	ksmbd_notify_free_events(&notify->events);
+ 	kfree(notify);
+ }
  
- struct ksmbd_lock {
-@@ -96,6 +97,9 @@ struct ksmbd_file {
- 	u64				durable_volatile_id;
- 
- 	spinlock_t			f_lock;
-+	/* Protects notify watch creation and removal. */
-+	struct mutex			notify_lock;
-+	struct ksmbd_notify		*notify;
- 
- 	struct ksmbd_inode		*f_ci;
- 	struct ksmbd_inode		*f_parent_ci;
 -- 
 2.55.0
 
