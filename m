@@ -1,35 +1,35 @@
-Received: from mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mta0.migadu.com (out-36.mta0.migadu.com [91.218.175.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94E4E34250E
-	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 09:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B42E34250E
+	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 09:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790413585; cv=none; b=KewwUinz7g/Bp+GtEHYHSEJ/MyAiVNoA1/9FvI+ElMK3LTUW5cqCdA9N3ttOgXF7rhj/s5poo9Q18uAwK6rNFrVRHMTsSAwynvcBcFNz9cZxBe45BMMb9+38tTPzlA3AS8IHEI0gh41fCK640mPcbxLe57WvuGIJVuWIICmUZPw=
+	t=1790413591; cv=none; b=mLMvKxnyjQAyoKVJaVQENlvEci5G/ECk6Cyr6lpOAhjyxKHKQKmkKPFpAxC0oGHQS4FiExkQA3JPIuHYfgWi87zUIsaas92dJFmmeUhRJuJAx6CpHVQR5L0ooEbw5wrsr70c6uEwuYLeV1er0eOHJNGnYIABzsIUqGmuS13zfyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790413585; c=relaxed/simple;
-	bh=M5SB8Vg50ZNwzHlvexHehiO0cDY1aoKxdOCIKbLs3y8=;
+	s=arc-20240116; t=1790413591; c=relaxed/simple;
+	bh=AJLXEsGteU57G6iY+mKLjzilXk4OTFENW7skGwqRsSE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KzcYy5KT6JTRdex28PycbF+IBiLxUpH6v6ELUVhSWy2/NgIOlYzSZlnIkPBPfjnFGpuF1mlNdLX+kXxekCujy5cdCCY5MVUZWJqpFipRNyRJDyJVWS01hUSDw4vYCdU8s/6KXCMYaeEnFP1Ikf9DLfNFu9CgZb65ECuOkJOUx/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=s3Zl37KQ; arc=none smtp.client-ip=95.215.58.178
+	 MIME-Version; b=PHaJ80EOT5kO7q9FtQL9WJm8uXDpPA+Q9+xzh5y222l/5pZbWdIJrfz9Z5OM0PrCWdlcOEXfA1no00qMTG1sG5Lrf8eU+SRjvzEF1DXs7xNe9IMufpzr8t0P7Wui2Q4PEuV0jbxOn6/obTds6kHU17cmpiCFe5AJP8tte8D/Wv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=wbBII794; arc=none smtp.client-ip=91.218.175.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="s3Zl37KQ"
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="wbBII794"
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=M5SB8Vg50ZNwzHlvexHehiO0cDY1aoKxdOCIKbLs3y8=;
+DKIM-Signature: a=rsa-sha256; bh=AJLXEsGteU57G6iY+mKLjzilXk4OTFENW7skGwqRsSE=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790413580; v=1; x=1791018380;
- b=s3Zl37KQSiMe6DruXnW638cbv42TkNrAMINQudEtXoWXt+FXq0C0InFvWkmysjbDKmpVCUC6
- GVHIv7sAgHRiuPdzKECPbBK2ALmd2UzYiU5JWDE1YXqLwQ0vnvcKslCp8L1kCR/Gas4+tVwGoxH
- Q3aPHKzO71id/cOXm4RDCXXD6dlAO5fLMuTsuAHidHx49mDpkczH75ZKRZwLvNnxHoX/l25ZmMI
- YZhyv9eFoCjNmE79qW+Tlhxy8ZIPCpaSXCT/na/XhCgbge9jrPwrkYzknGD7XdD62O1fgt1beQk
- mqk7KoJPhuyUi1OWYE+1t4jtP3+DU7uBtdbqr+ST7Bh1w==
+ t=1790413586; v=1; x=1791018386;
+ b=wbBII794x/dE++pmWSDGHanMij95qtggAfcvxjh9wXMqmJUIfc2HU43I+H6Fdu4bFvfHGydt
+ TsE1dLOjSTiDYWRoWTjLzDiLj5wxN6P3sIC4UbOgbpJk8/ugsdOGFK52op9+M7MLvx4NDBb40WK
+ jAv34iv51hswgpP0b9GIPQ0DDh/7GaV9GiJmHMSFX6vw3kf4plFudfIn7iosrPEjoT7J1D1rzXQ
+ UHEt95GQCfM3/bgWtSRdr/nXE2P/fRFACoDKOQijnzO7LCrwL3Y0gizRaepI1qQrtLSXiH4Juvk
+ mUogbKYsKN7nNf0ztgyLPxdfEUmFGMuYEjfRORLW42lKw==
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 735c926924e84459;
-	Sat, 26 Sep 2026 09:06:19 +0000
-X-Mizu-Trace-ID: 735c926924e84459
+Received: by smtp.migadu.com with ESMTPS id f330da9f02c2cbcc;
+	Sat, 26 Sep 2026 09:06:26 +0000
+X-Mizu-Trace-ID: f330da9f02c2cbcc
 X-Migadu-Flow: FLOW_OUT
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: linkinjeon@kernel.org,
@@ -38,9 +38,9 @@ To: linkinjeon@kernel.org,
 	chenxiaosong@chenxiaosong.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 03/12] smb/server: add debug type for change notify
-Date: Sat, 26 Sep 2026 09:05:09 +0000
-Message-ID: <20260926090518.78547-4-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH 04/12] smb/server: support non-recursive directory change watches
+Date: Sat, 26 Sep 2026 09:05:10 +0000
+Message-ID: <20260926090518.78547-5-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260926090518.78547-1-chenxiaosong@chenxiaosong.com>
 References: <20260926090518.78547-1-chenxiaosong@chenxiaosong.com>
@@ -54,111 +54,342 @@ Content-Transfer-Encoding: 8bit
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Add KSMBD_DEBUG_NOTIFY and expose it as "notify" to print logs
-for the change notify feature.
+Use fsnotify to watch a directory for changes. Add one watch for each
+SMB2 CHANGE_NOTIFY request with SMB2_WATCH_TREE unset.
 
 Example:
 
-  ksmbd.control --debug=notify
-  [ksmbd.control/802]: INFO: smb auth vfs oplock ipc conn rdma [notify]
+  1. client: smbinfo notify /mnt
+  2. server: ksmbd.control --debug=notify
+  3. server: touch /export/file
+  4. server debug log:
+     ksmbd: fid 4:4, notify event: mask=0x00000100 inode=2 name=file cookie=0
+     ksmbd: fid 4:4, notify event: mask=0x08000004 inode=2 name=file cookie=0
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/glob.h    |  3 ++-
- fs/smb/server/notify.c  | 12 ++++++++++++
- fs/smb/server/server.c  |  2 +-
- fs/smb/server/smb2pdu.c |  2 +-
- 4 files changed, 16 insertions(+), 3 deletions(-)
+ fs/smb/server/Kconfig  |   1 +
+ fs/smb/server/notify.c | 232 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 231 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/glob.h b/fs/smb/server/glob.h
-index 4ea187af2348..5131bad88d96 100644
---- a/fs/smb/server/glob.h
-+++ b/fs/smb/server/glob.h
-@@ -21,10 +21,11 @@ extern int ksmbd_debug_types;
- #define KSMBD_DEBUG_IPC         BIT(4)
- #define KSMBD_DEBUG_CONN        BIT(5)
- #define KSMBD_DEBUG_RDMA        BIT(6)
-+#define KSMBD_DEBUG_NOTIFY      BIT(7)
- #define KSMBD_DEBUG_ALL         (KSMBD_DEBUG_SMB | KSMBD_DEBUG_AUTH |	\
- 				KSMBD_DEBUG_VFS | KSMBD_DEBUG_OPLOCK |	\
- 				KSMBD_DEBUG_IPC | KSMBD_DEBUG_CONN |	\
--				KSMBD_DEBUG_RDMA)
-+				KSMBD_DEBUG_RDMA | KSMBD_DEBUG_NOTIFY)
- 
- #ifdef pr_fmt
- #undef pr_fmt
+diff --git a/fs/smb/server/Kconfig b/fs/smb/server/Kconfig
+index b7665e0e4942..1f91926151b2 100644
+--- a/fs/smb/server/Kconfig
++++ b/fs/smb/server/Kconfig
+@@ -19,6 +19,7 @@ config SMB_SERVER
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	select CRC32
++	select FSNOTIFY
+ 	default n
+ 	help
+ 	  Choose Y here if you want to allow SMB3 compliant clients
 diff --git a/fs/smb/server/notify.c b/fs/smb/server/notify.c
-index 18cf0005a037..502ec551c01e 100644
+index 502ec551c01e..b85f5fdb5066 100644
 --- a/fs/smb/server/notify.c
 +++ b/fs/smb/server/notify.c
-@@ -39,6 +39,7 @@ static void smb2_notify_cancel(void **argv)
- {
- 	struct ksmbd_notify_req *notify_req = argv[0];
+@@ -10,6 +10,7 @@
+  *
+  */
  
-+	ksmbd_debug(NOTIFY, "Wake pending notify request\n");
++#include <linux/fsnotify_backend.h>
+ #include "glob.h"
+ #include "../common/smb2status.h"
+ #include "connection.h"
+@@ -20,10 +21,57 @@
+ #include "vfs_cache.h"
+ #include "mgmt/user_session.h"
+ 
++struct ksmbd_notify {
++	struct fsnotify_group *group;
++	struct fsnotify_mark *mark;
++	struct ksmbd_file *fp;
++	/* Protects filter, rename state and the queued events. */
++	spinlock_t lock;
++	u32 filter;
++	u32 mask;
++};
++
+ struct ksmbd_notify_req {
+ 	wait_queue_head_t wait;
+ };
+ 
++#define KSMBD_NOTIFY_NAME_EVENT_MASK	(FS_CREATE | FS_DELETE | \
++					 FS_MOVED_FROM | FS_MOVED_TO)
++
++static const struct {
++	u32 notify_mask;
++	u32 fsnotify_mask;
++} ksmbd_notify_mapping[] = {
++	{ FILE_NOTIFY_CHANGE_FILE_NAME,
++	  KSMBD_NOTIFY_NAME_EVENT_MASK },
++	{ FILE_NOTIFY_CHANGE_DIR_NAME,
++	  KSMBD_NOTIFY_NAME_EVENT_MASK },
++	{ FILE_NOTIFY_CHANGE_ATTRIBUTES,
++	  FS_ATTRIB | FS_MOVED_FROM | FS_MOVED_TO | FS_MODIFY },
++	{ FILE_NOTIFY_CHANGE_SIZE, FS_MODIFY },
++	{ FILE_NOTIFY_CHANGE_LAST_WRITE, FS_ATTRIB },
++	{ FILE_NOTIFY_CHANGE_LAST_ACCESS, FS_ATTRIB },
++	{ FILE_NOTIFY_CHANGE_EA, FS_ATTRIB },
++	{ FILE_NOTIFY_CHANGE_SECURITY, FS_ATTRIB },
++};
++
++static u32 ksmbd_notify_map(u32 filter)
++{
++	size_t i;
++	u32 mask = 0;
++
++	for (i = 0; i < ARRAY_SIZE(ksmbd_notify_mapping); i++) {
++		if (ksmbd_notify_mapping[i].notify_mask & filter)
++			mask |= ksmbd_notify_mapping[i].fsnotify_mask;
++	}
++
++	ksmbd_debug(NOTIFY,
++		    "Mapped completion filter 0x%x to fsnotify mask 0x%x\n",
++		    filter, mask);
++
++	return mask;
++}
++
+ /*
+  * Cancel handler for a pending CHANGE_NOTIFY. Called either by
+  * smb2_cancel() (conn->request_lock held, work->state already set to
+@@ -43,6 +91,140 @@ static void smb2_notify_cancel(void **argv)
  	wake_up(&notify_req->wait);
  }
  
-@@ -66,6 +67,11 @@ ksmbd_notify_validate_req(struct ksmbd_work *work,
- 		return ERR_PTR(-ENOENT);
- 	}
- 
-+	ksmbd_debug(NOTIFY,
-+		    "fid %llu:%llu, handle notify request, filter 0x%x, flags 0x%x\n",
-+		    fp->persistent_id, fp->volatile_id,
-+		    le32_to_cpu(req->CompletionFilter), le16_to_cpu(req->Flags));
++static int ksmbd_notify_handle_inode_event(struct ksmbd_notify *notify,
++					   u32 mask, struct inode *inode,
++					   struct inode *dir,
++					   const struct qstr *file_name,
++					   u32 cookie)
++{
++	struct inode *event_inode = dir ?: inode;
++	struct ksmbd_file *fp;
 +
- 	if (le32_to_cpu(req->OutputBufferLength) >
- 	    work->conn->vals->max_trans_size) {
- 		pr_err("Notify output buffer length %u exceeds maximum %u\n",
-@@ -121,6 +127,8 @@ static int ksmbd_notify_wait(struct ksmbd_work *work,
- 	spin_unlock(&fp->f_lock);
- 	read_unlock(&work->sess->file_table.lock);
- 
-+	ksmbd_debug(NOTIFY, "Notify request pending, async id %d\n",
-+		    work->async_id);
- 	smb2_send_interim_resp(work, STATUS_PENDING);
- 
- 	err = wait_event_interruptible(notify_req->wait,
-@@ -195,8 +203,12 @@ int ksmbd_handle_notify(struct ksmbd_work *work,
- 
- 	if (work->state == KSMBD_WORK_CLOSED) {
- 		rsp->hdr.Status = STATUS_NOTIFY_CLEANUP;
-+		ksmbd_debug(NOTIFY, "Notify handle closed, async id %d\n",
-+			    work->async_id);
- 	} else {
- 		rsp->hdr.Status = STATUS_CANCELLED;
-+		ksmbd_debug(NOTIFY, "Notify request cancelled, async id %d\n",
-+			    work->async_id);
++	fp = notify->fp;
++
++	ksmbd_debug(NOTIFY,
++		    "fid %llu:%llu, notify event: mask=0x%08x inode=%llu name=%.*s cookie=%u\n",
++		    fp->persistent_id, fp->volatile_id, mask,
++		    event_inode ? (unsigned long long)event_inode->i_ino : 0,
++		    file_name ? file_name->len : 0,
++		    file_name ? (const char *)file_name->name : "", cookie);
++
++	return 0;
++}
++
++static int ksmbd_notify_handle_event(struct fsnotify_group *group, u32 mask,
++				     const void *data, int data_type,
++				     struct inode *dir,
++				     const struct qstr *file_name, u32 cookie,
++				     struct fsnotify_iter_info *iter_info)
++{
++	struct ksmbd_notify *notify = group->private;
++	struct inode *inode = fsnotify_data_inode(data, data_type);
++
++	return ksmbd_notify_handle_inode_event(notify, mask, inode, dir,
++					      file_name, cookie);
++}
++
++static void ksmbd_notify_free_mark(struct fsnotify_mark *mark)
++{
++	kfree(mark);
++}
++
++static const struct fsnotify_ops ksmbd_notify_fsnotify_ops = {
++	.handle_event = ksmbd_notify_handle_event,
++	.free_mark = ksmbd_notify_free_mark,
++};
++
++static struct fsnotify_mark *
++ksmbd_notify_add_mark(struct ksmbd_notify *notify, u32 mask, void *obj,
++		      unsigned int obj_type)
++{
++	struct fsnotify_mark *mark;
++	int err;
++
++	mark = kzalloc_obj(*mark, KSMBD_DEFAULT_GFP);
++	if (!mark) {
++		pr_err("Failed to allocate fsnotify mark\n");
++		return ERR_PTR(-ENOMEM);
++	}
++
++	fsnotify_init_mark(mark, notify->group);
++	mark->mask = mask | FS_EVENT_ON_CHILD;
++	err = fsnotify_add_mark(mark, obj, obj_type, 0);
++	if (err) {
++		pr_err("Failed to add fsnotify mark, type %u: %d\n",
++		       obj_type, err);
++		goto err_put_mark;
++	}
++
++	return mark;
++
++err_put_mark:
++	fsnotify_put_mark(mark);
++	return ERR_PTR(err);
++}
++
++static void ksmbd_notify_destroy_marks(struct ksmbd_notify *notify)
++{
++	if (notify->mark) {
++		fsnotify_destroy_mark(notify->mark, notify->group);
++		fsnotify_put_mark(notify->mark);
++	}
++	fsnotify_wait_marks_destroyed();
++	fsnotify_put_group(notify->group);
++}
++
++static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
++			    struct ksmbd_notify **notify_out)
++{
++	struct ksmbd_notify *notify;
++	struct fsnotify_mark *mark;
++	int err = 0;
++
++	notify = kzalloc_obj(*notify, KSMBD_DEFAULT_GFP);
++	if (!notify) {
++		pr_err("Failed to allocate notify watch\n");
++		err = -ENOMEM;
++		goto out;
++	}
++
++	notify->fp = fp;
++	spin_lock_init(&notify->lock);
++	notify->filter = filter;
++	notify->mask = mask;
++
++	notify->group = fsnotify_alloc_group(&ksmbd_notify_fsnotify_ops, 0);
++	if (IS_ERR(notify->group)) {
++		err = PTR_ERR(notify->group);
++		pr_err("Failed to allocate fsnotify group: %d\n", err);
++		kfree(notify);
++		goto out;
++	}
++	notify->group->private = notify;
++
++	mark = ksmbd_notify_add_mark(notify, mask, file_inode(fp->filp),
++				     FSNOTIFY_OBJ_TYPE_INODE);
++	if (IS_ERR(mark)) {
++		err = PTR_ERR(mark);
++		goto err_destroy_marks;
++	}
++	notify->mark = mark;
++
++	*notify_out = notify;
++	ksmbd_debug(NOTIFY,
++		    "Added fsnotify mark, inode %llu, mask 0x%x, filter 0x%x\n",
++		    (unsigned long long)file_inode(fp->filp)->i_ino, mark->mask,
++		    filter);
++	goto out;
++
++err_destroy_marks:
++	ksmbd_notify_destroy_marks(notify);
++	kfree(notify);
++
++out:
++	return err;
++}
++
+ static struct ksmbd_file *
+ ksmbd_notify_validate_req(struct ksmbd_work *work,
+ 			  struct smb2_change_notify_req *req,
+@@ -82,6 +264,13 @@ ksmbd_notify_validate_req(struct ksmbd_work *work,
+ 		goto err_put_fp;
  	}
- 	smb2_send_interim_resp(work, rsp->hdr.Status);
- 	work->send_no_response = 1;
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 0827c8c51006..958e952223aa 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -564,7 +564,7 @@ static ssize_t kill_server_store(const struct class *class,
  
- static const char * const debug_type_strings[] = {"smb", "auth", "vfs",
- 						  "oplock", "ipc", "conn",
--						  "rdma"};
-+						  "rdma", "notify"};
++	if (le16_to_cpu(req->Flags) & ~SMB2_WATCH_TREE) {
++		pr_err("Invalid notify flags 0x%x\n", le16_to_cpu(req->Flags));
++		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++		err = -EINVAL;
++		goto err_put_fp;
++	}
++
+ 	if (!S_ISDIR(file_inode(fp->filp)->i_mode)) {
+ 		pr_err("Notify file id is not a directory, fid %llu:%llu\n",
+ 		       fp->persistent_id, fp->volatile_id);
+@@ -105,10 +294,37 @@ ksmbd_notify_validate_req(struct ksmbd_work *work,
+ 	return ERR_PTR(err);
+ }
  
- static ssize_t debug_show(const struct class *class, const struct class_attribute *attr,
- 			  char *buf)
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 1f45a0836fe9..eb15cda699b7 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -11830,7 +11830,7 @@ int smb2_notify(struct ksmbd_work *work)
- 	struct smb2_change_notify_req *req;
- 	struct smb2_change_notify_rsp *rsp;
++static struct ksmbd_notify *
++ksmbd_notify_setup_watch(struct ksmbd_file *fp,
++			 struct smb2_change_notify_req *req,
++			 struct smb2_change_notify_rsp *rsp)
++{
++	struct ksmbd_notify *notify;
++	u32 filter, mask;
++	int err;
++
++	filter = le32_to_cpu(req->CompletionFilter);
++	mask = ksmbd_notify_map(filter);
++	if (!mask)
++		ksmbd_debug(NOTIFY,
++			    "No mapped completion filter bits; request will remain pending\n");
++
++	err = ksmbd_notify_add(fp, mask, filter, &notify);
++	if (err) {
++		pr_err("Failed to add notify watch, fid %llu:%llu: %d\n",
++		       fp->persistent_id, fp->volatile_id, err);
++		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
++		return ERR_PTR(err);
++	}
++
++	return notify;
++}
++
+ static int ksmbd_notify_wait(struct ksmbd_work *work,
+-			     struct ksmbd_file *fp,
++			     struct ksmbd_notify *notify,
+ 			     struct ksmbd_notify_req *notify_req)
+ {
++	struct ksmbd_file *fp = notify->fp;
+ 	int err;
  
--	ksmbd_debug(SMB, "Received smb2 notify\n");
-+	ksmbd_debug(NOTIFY, "Received smb2 notify\n");
+ 	/*
+@@ -165,6 +381,7 @@ int ksmbd_handle_notify(struct ksmbd_work *work,
+ 			struct smb2_change_notify_rsp *rsp)
+ {
+ 	struct ksmbd_notify_req notify_req = {};
++	struct ksmbd_notify *notify = NULL;
+ 	struct ksmbd_file *fp = NULL;
+ 	void **argv = NULL;
+ 	bool async_work = false;
+@@ -177,6 +394,13 @@ int ksmbd_handle_notify(struct ksmbd_work *work,
+ 		goto out;
+ 	}
  
- 	WORK_BUFFERS(work, req, rsp);
++	notify = ksmbd_notify_setup_watch(fp, req, rsp);
++	if (IS_ERR(notify)) {
++		err = PTR_ERR(notify);
++		notify = NULL;
++		goto out;
++	}
++
+ 	argv = kmalloc_obj(*argv, KSMBD_DEFAULT_GFP);
+ 	if (!argv) {
+ 		pr_err("Failed to allocate notify cancel arguments\n");
+@@ -195,7 +419,7 @@ int ksmbd_handle_notify(struct ksmbd_work *work,
+ 	}
+ 	async_work = true;
  
+-	err = ksmbd_notify_wait(work, fp, &notify_req);
++	err = ksmbd_notify_wait(work, notify, &notify_req);
+ 	if (err == -ENOENT) {
+ 		rsp->hdr.Status = STATUS_NOTIFY_CLEANUP;
+ 		goto out;
+@@ -220,6 +444,10 @@ int ksmbd_handle_notify(struct ksmbd_work *work,
+ 		release_async_work(work);
+ 	else
+ 		kfree(argv);
++	if (notify) {
++		ksmbd_notify_destroy_marks(notify);
++		kfree(notify);
++	}
+ 	if (fp)
+ 		ksmbd_fd_put(work, fp);
+ 	return err;
 -- 
 2.55.0
 
