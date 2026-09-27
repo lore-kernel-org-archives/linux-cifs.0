@@ -1,129 +1,70 @@
-Received: from mail-pj2-f13.google.com (mail-pj2-f13.google.com [74.125.227.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C84A286D5D
-	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 06:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DCA632
+	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 10:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790490827; cv=none; b=CiQaI2/ftFPZ7iwSYyMKg/6xjQbvbjfSCrHzULMaq+rP7/M8JxiyJ7cyZEe+w00s4nDQ54JyykRM0/wJpgL34RH2vYYLSV0epPh+v1atvDwZYsgXu7zHKc36EioE4zca0s1EXhE+BnntcG9WfIIkGnVhdbx9Q11SJxKszDwZDeI=
+	t=1790505100; cv=none; b=igghwE6sWR55nW+vdSuesOfkVcdg6XRWjTE0TuRuCGQPdQW6RAwfCMcGMtQ2GdGZxE/a21gZdzeMIXm5l8NKuBg9XBdYe7C4xBcl3DqwoxtdpQfPwAzQ+zkVTMHm42/4jc8efsJadbNZV1WO+UDaqaryCRgfj4Vlr239dueAX/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790490827; c=relaxed/simple;
-	bh=yKYsbQaSNbfxpL9AXn+Dk6w0376LevsziE0CM3vXnRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tNhqGef7K4kEwZBJ1JR49MiFQ9Ejg5yd3mNaodxr5EOjBQZ8JI1UFpn0F4VSvEp6NWT1DXsx63sCnQJUy9n8nYigg+X7PR/GSIvkKatYe2+GsEbWPatoko4700WhGISF5lNp70wM91M5OOjDDikHB6Sj8aC/5Cf8UTNATuXokHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iicfrTKc; arc=none smtp.client-ip=74.125.227.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790505100; c=relaxed/simple;
+	bh=StkCes5zuBuklQRBb36jTxpcInqoawJHSc/HfmZadrE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bD8HW47BsnO004DuC9BxS5eoX5TvYO2SqgKFFqwdrccIy7bYgRFWDzzViv2f3C/huMfRjY3sdk/+ZVSVClnujhpk9e+jpVAjqhI8PZ/SiJh8rlEiFN1PVWwY7eqmsl1BKZMmGGoEurP6ZqLmXxu4dEBGaRC4Fy2V0ONnfa5LuCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e540SDoR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iicfrTKc"
-Received: by mail-pj2-f13.google.com with SMTP id 98e67ed59e1d1-396ccb65437so1178553a91.3
-        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 23:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790490824; x=1791095624; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=x5E4VrjMKmWAeZuEbOPf8+lhLbvIn9eYFgM5VNzNGZ4=;
-        b=iicfrTKc1PAxp8WsHiF3LMwU5EowI+39ZBCp3xjDwgxk9MpZ0P58raaCXjzmhPkohs
-         UD4iNN9KPhE2o9epeIYkFDWtQEvMNyMq7jkM5DLqf/qUT15FLZUGGH5Mk35N+bPdQal/
-         fK3h2d6+FW3/n6mchLLrulwMo+FJt4tbpQe82UaIzXE9+K5lJQANUb+k6EztFvAau0yv
-         X3HKVMt/XlkMNWLyPGT5545Nxqg3ywZ/woBW8gQv4at+fbFSZhbEIWDrqKoK+xOZuLfs
-         0SFcEX+99vsgMLsL5exCzCk90S8YkSQEPW2lgy/K/g/K+Mm9duObf6RCGPvjvAF6Vru4
-         4sBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790490824; x=1791095624;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=x5E4VrjMKmWAeZuEbOPf8+lhLbvIn9eYFgM5VNzNGZ4=;
-        b=oeW7EyG22e2EtcB48eEFBX82fV9LD0s3XAasOMNplFsGsco+hxt/fs5yIzf9l8cBlG
-         4TGO4d7A+JpE0oOjXwrUOt/fskKF6MK78aGyaPTSpCM95RL6iuob/m07Po0kWQVv7itz
-         3Ufr+WaYfWiaHa1BssqLq2AJXRaCJdNVmoW5dLq4CA48KAuBAPNm8V7NY7bwro7TleJt
-         AKnP9xMosN5UtyyecgcBR0h/tuwnRbRMEp7plChiD4whP2zDqjSU+1tt767lC6XytruW
-         uvqf294IHVhOglyP44hkXairEzTL6lTABWyvJD91gOPcFIB4rYBAnFNSNAbFQMx+P2ru
-         ikNQ==
-X-Gm-Message-State: AFq9FYLTxe0+3OTvTgBb6IvTrIf+c14LyCttArnYok0TpXe45XH3ia8f
-	aCfvCML3A7ejRT0CvgLaE3pYV7x5N6Ueq6Rxtw3DJKNxZqn3Mi8ePI3et16hyTYuLqf9z28B
-X-Gm-Gg: AYBFou0GOz4BZ131xLvi6l4/+dHaB+yGSIeGZ6wW+AEEokqtD+DXAw+c9ot/tbDw84Y
-	rdv5F3M+1DwdiVnKwDBpbuOR1DWUBYqnr8hTvoNLl2x37X4mSChl2VLk7GP8OoUTojXcalWs51g
-	wgpHqIeZNhAa2RDrNCpagWq1WEdasW4iCA0oM9XZm3mg5cosJT/h5EOP7g8XjlZtARhHW27nDcd
-	8k9axcBAUgsOkL6LdtC9AbEr6d6DZ+GRF4dOgVHuN0IJKwyJG/pP+BWz6/rDrf8LMh1kOchfJ2B
-	GMSXgojuLNKRnnbSsV1QBDMWEe+LC2uuaa/GtaU8mAENCKW4ral39jJAapUcG8I2ddeGPNqJecR
-	sg5MtWsMq+3/Yx9AjSIDO3Xb++0v4qdFOmstAG5ETZCLui6G2j7G3HOMRzUamAiBKpZ8O3mdSDw
-	CbTgnjGLjWLCys4NBh9E8B/vESIvw5VUi7iatUBSkymR68/u34jrOxr2M74wqXndURV+ztp7PEP
-	oTt
-X-Received: by 2002:a17:90a:ec83:b0:39e:6c6a:4b77 with SMTP id 98e67ed59e1d1-3a098e43948mr7363556a91.65.1790490823764;
-        Sat, 26 Sep 2026 23:33:43 -0700 (PDT)
-Received: from localhost ([8.219.239.189])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a09773e7c3sm19804747a91.17.2026.09.26.23.33.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Sep 2026 23:33:43 -0700 (PDT)
-From: Dairui Zhang <zhangdairui@gmail.com>
-To: linux-cifs@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Dairui Zhang <zhangdairui@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: fix OOB read in ksmbd_validate_name_reconnect()
-Date: Sun, 27 Sep 2026 14:33:39 +0800
-Message-ID: <20260927063339.1731061-1-zhangdairui@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e540SDoR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 376141F000FF
+	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 10:31:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790505099;
+	bh=iCC94HONGBqqGOJ5/HF33KB59/H3exOfhAouviK5e/s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=e540SDoROqBKpaikAmdn7bpqIP5cRbfq3Ji3giov69yMDC1WNx47EPirwYdSb42Yo
+	 wujSn0+CdyuCOzs3HSHe5/reZ5+KOpZHbIuQKshGyyaGGqpULEsCxup/WZLgzrxbmL
+	 Qr3+Gya9IXhCJnthWbYGBeXDgBZp9KSX7hg/33TfQajdzFt1EtJ0ctJoDlrauzk22B
+	 +sAl7wcaokBJm++dQfXxo+nCnrb+ZQNj3ModjBBp9BnbqSiUzVkAeTL3fWoWdz3P5M
+	 e6Oy36kOB75ZxCYo1jU9q+EIavMb9PT+/NK09qQai7U2mpHZ3PleDqRSaErlJUKz4z
+	 ML+Eda2oLfEbQ==
+Received: by mail-ed2-f34.google.com with SMTP id 4fb4d7f45d1cf-6aaea1cb2e4so2449332a12.2
+        for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 03:31:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBy20o1f8/KUyubpdcge/fooANrOJ7BHbUoeYJVjYYaus4iSJO8mWrpO5xzLABYisZWYhudt55RZFAeb@vger.kernel.org
+X-Gm-Message-State: AFuF++mLGoLPrSk5YNF3tQXgyiypW2dMDdb5TJPTBlhJYRK16oFHeR1O
+	1QXNLq6RZ6L7QNy1mfGU7VEeI6BbIfm83RQdvgHLDgzQgIYfzDOFeStm5gptUvZTDa2VisMpV9T
+	rWLB6RZfvwf0J3obL2pCo6CtcIKEAfss=
+X-Received: by 2002:a17:906:4fc6:b0:c24:b11a:46fc with SMTP id
+ a640c23a62f3a-c2ac23ca0b6mr872368766b.22.1790505097851; Sun, 27 Sep 2026
+ 03:31:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260926090518.78547-1-chenxiaosong@chenxiaosong.com> <20260926090518.78547-8-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20260926090518.78547-8-chenxiaosong@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 27 Sep 2026 19:31:25 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8A3GB7QPUvevFaGOA2MNWcy++6nyEJTkhUnwqjUHdfhg@mail.gmail.com>
+X-Gm-Features: AclHuK8OaHTuMSy54oj2veAzL6-1LPXJ2vJix045GyMrDRwmLvb7hCdQBQUzLZ4
+Message-ID: <CAKYAXd8A3GB7QPUvevFaGOA2MNWcy++6nyEJTkhUnwqjUHdfhg@mail.gmail.com>
+Subject: Re: [PATCH 07/12] smb/server: save simple notify events
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
 
-ksmbd_validate_name_reconnect() indexes
-ab_pathname[share->path_sz + 1] without checking that the path is
-longer than share->path_sz + 1 (d_path() fills the buffer from the
-end). A durable fp is not bound to its original share, so a client
-can preserve a file from a short-path share and reconnect it on a
-long-path share, making strcmp() read past the PATH_MAX buffer -
-with a long enough share path this oopses the kernel, and on a
-mapped page it also gives a byte-equality oracle on adjacent heap
-(the reconnect succeeds exactly when the out-of-bounds string
-equals the requested name). A same-share variant with the durable
-fp at the share root reads 1 byte past the buffer
-(strlen(ab_pathname) == share->path_sz).
+> +static void
+> +ksmbd_notify_queue_event(struct ksmbd_notify *notify,
+> +                        struct ksmbd_notify_event *event)
+> +{
+> +       ksmbd_debug(NOTIFY, "Queueing notify event, action %u, name %s\n",
+> +                   event->action, event->name);
+> +
+> +       spin_lock(&notify->lock);
+> +       list_add_tail(&event->list, &notify->events);
+> +       notify->num_events++;
+Could we put a per-open limit on the memory used by notify->events?
 
-Check the prefix before indexing: the path must be longer than
-share->path_sz and the next character must be '/'. The comparison
-for the valid case is unchanged.
-
-Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
-Reported-by: Dairui Zhang <zhangdairui@gmail.com>
-Assisted-by: LLM
-Cc: stable@vger.kernel.org
-Signed-off-by: Dairui Zhang <zhangdairui@gmail.com>
----
- fs/smb/server/vfs_cache.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index 293dab9..52e83cf 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -1714,9 +1714,13 @@ int ksmbd_validate_name_reconnect(struct ksmbd_share_config *share,
- 		return -EACCES;
- 	}
- 
--	if (name && strcmp(&ab_pathname[share->path_sz + 1], name)) {
--		ksmbd_debug(SMB, "invalid name reconnect %s\n", name);
--		ret = -EINVAL;
-+	if (name) {
-+		if (strlen(ab_pathname) <= share->path_sz ||
-+		    ab_pathname[share->path_sz] != '/' ||
-+		    strcmp(&ab_pathname[share->path_sz + 1], name)) {
-+			ksmbd_debug(SMB, "invalid name reconnect %s\n", name);
-+			ret = -EINVAL;
-+		}
- 	}
- 
- 	kfree(pathname);
--- 
-2.53.0
-
+> +       spin_unlock(&notify->lock);
+> +}
