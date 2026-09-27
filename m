@@ -1,63 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3234274B53
-	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 01:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A010C38839F
+	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 02:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790474247; cv=none; b=KBSr4FrlxozRB5SLNAcPGOap8WH7IbufOumEbr1H/NYT78lmIq6aubwjh5yfY6MlyzoT7FDJQLe500zZwlEblboHQ/vl9p/q/bNpofnzx7x5FMlsYJVRHgp7PJOuBDzsY45M5CWadOfSo1YjlxxPPl62Yz1We+kY30q7x3u1fwI=
+	t=1790475816; cv=none; b=I7sSKbNfG+aX6Yx4tfQp7tcLS7CbN5AZn2jIdbJH0ESqEa2/dtm7VOe8d2mTB6CQVdoRGf6exBBSOxnTmxHAUKnT/d3Nttvcn0BNcLWMruIKINU7MxPIsf9G4f9v2UAZMeWHXd8tdXjHQGqBETQ6ggS3wT7vFvAnfibLwXYOCuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790474247; c=relaxed/simple;
-	bh=5zM9YADLAFZ7kXwVM4L9L6kp6GuAb/L9neMpIdYmTww=;
+	s=arc-20240116; t=1790475816; c=relaxed/simple;
+	bh=reNeOOXVzfXPjpIbTrcp6x8zksBzEAfx0mvL56+4vj8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OSBdIkGaqLdwuWysaYcaY9pqR4VJF6rmZtcg2S/AhkOat/8UySmXW97SmsLJpXGHeSVfsRnAOFCrIx7SaYwqJS23R9MRR0K4xChtZtGv/eVBI0g4V+mf+222jFel64CsBmg6xwvHPDkkuXi+s5uYnmf7mWl9v/y4ycpTuitAeiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mlmSxrIr; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=TV7UfrT0sj+KO8QOcn3D0nRbKFUPeDp602Yty9ifygv+Lmt3wCcHAY725UiH1v88g/Kq3KZ101nWDZZ6KJyK4UUNGsrOi4rXOdt8cig+QhW6gfs6XyW0/RNBPSpnUU8/cJWTjCvtulsWmEfYu782a2eb42/YnaeUGbHunzUd+ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgcLW/Hq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mlmSxrIr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC3A1F00898
-	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 01:57:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgcLW/Hq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45BE11F00893
+	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 02:23:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790474246;
-	bh=5zM9YADLAFZ7kXwVM4L9L6kp6GuAb/L9neMpIdYmTww=;
+	s=k20260515; t=1790475815;
+	bh=t0sd2WYEHNKUkojofc+b7E1p9eP04Ep5nooeYzFqgag=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=mlmSxrIr71RIhWR6Vh+5/tCW7BtbR9/nSjVIz8Qsz0ApCYNi3jcB7SKV0EMih1qfy
-	 i9rMtTeGhSrSDsxgv2RCobIN7zHQsJTYE5hAV1JQLFgpTn7SuIG3pKAQdP8hvA6Jx5
-	 b+5afE2FMDWarMBKuR/cA9dLpJrYxEMtNfdOJIY6pGW+rTD5g/Vh9ZZruAOJpxxcTk
-	 MDX1I4EpaLpC7M6YV+oNJSKUqUGl13jcEDA/vrYQq/yAmZ0Og0+yAzZn/lFZroCmbp
-	 zNq6W35tGmHAfVszcoCDBbbCXtWyaB/iO1qUgdEbPVTYTgdN2AmppPHxc/SKUBaGAY
-	 43KzIGdLp75/g==
-Received: by mail-ed2-f34.google.com with SMTP id 4fb4d7f45d1cf-6aaf5e6878fso2139844a12.3
-        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 18:57:26 -0700 (PDT)
-X-Gm-Message-State: AFq9FYJqAJgDSqGKZipEqkxEntgOorcwV99QclLYPlh32wBV5+tHB7a2
-	o8uWKLc1iTzO9MVxX1G29RhG2TyxWggS7ziwNFwRNzutMeWPPGG4rDGZSrdtcEJPHW432BSY16c
-	OdSHIQfsr6Z18l0JorYtlRO0skW6X2V0=
-X-Received: by 2002:a05:6402:3511:b0:6aa:9dfd:fe6e with SMTP id
- 4fb4d7f45d1cf-6aac8f54611mr8337005a12.20.1790474245062; Sat, 26 Sep 2026
- 18:57:25 -0700 (PDT)
+	b=VgcLW/HqyX5qBwGIWMAuSZ6qyB1F5mByDv5LrHfTMNvp2EWpTBPNnMqsAXuAGxMW1
+	 dpVQsYLfp+t0xg1AxVuu8g5ISqJzEYEFhGXsF8CFrUInGG0HMPWZcW9ESgp4WBYp6V
+	 He+GGUiGMlWrGbXli9xluNnQ4nqqmVpKjAdEI27JMyupeBsTo0k1SsmdkOYfnPfOfj
+	 95/dbithJMTKY5OTEHwUZRWaQbby0emF9auLeGGSegbLDZQ6X8RvNDPjfLtqrkZQiP
+	 e7EjB38+gXY8vhL6KAp6WC705w1VbO9KW0s+WVbtdOU6wQQEiR9xyPvFiDlexjBTm/
+	 ckJCSqRIfQgog==
+Received: by mail-ed2-f34.google.com with SMTP id 4fb4d7f45d1cf-6aaea178c96so2164058a12.3
+        for <linux-cifs@vger.kernel.org>; Sat, 26 Sep 2026 19:23:35 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBw4aYOq2xdjb7tEJByVHtxrFcxUYGOatam0cPsyZ2w19O4vJ1Zz+kz/Q92+IsEIbqDs8HURx+6EH0Oy@vger.kernel.org
+X-Gm-Message-State: AFq9FYISUKk0BsjFrqAHVo4gW8uJ81MGdG8fIaa/6q9wYBtlHLPIkcLI
+	IUmd87nhMqenjaFm8pGopExuus5Qr7n7Fm6cK6fT/xL9B9pZ0SkqLIW9REpPgHtQKJ/p6HsSc1/
+	uf8qECosyTHnpH2MsBWDRewGwdMwiQec=
+X-Received: by 2002:a05:6402:378e:b0:6a8:398d:f57d with SMTP id
+ 4fb4d7f45d1cf-6aacc83e309mr8161360a12.27.1790475813965; Sat, 26 Sep 2026
+ 19:23:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260926081335.1671600-1-zhangdairui@gmail.com>
-In-Reply-To: <20260926081335.1671600-1-zhangdairui@gmail.com>
+References: <20260926132208.23360-1-zihanx@nebusec.ai>
+In-Reply-To: <20260926132208.23360-1-zihanx@nebusec.ai>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sun, 27 Sep 2026 10:57:12 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9Ws=zcvL8VFL3kGThjai+yjwtTt+WWn5Q-MM-ueNdG7g@mail.gmail.com>
-X-Gm-Features: AclHuK_frEaCCpjHoTtZostIzX-Bs8h9m1h7ThqVkcYVrJ3ABXj-OMdv0Q9ZijE
-Message-ID: <CAKYAXd9Ws=zcvL8VFL3kGThjai+yjwtTt+WWn5Q-MM-ueNdG7g@mail.gmail.com>
-Subject: Re: [BUG] ksmbd: OOB read in ksmbd_validate_name_reconnect() via
- cross-share durable reconnect
-To: Dairui Zhang <zhangdairui@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Paulo Alcantara <pc@manguebit.org>
+Date: Sun, 27 Sep 2026 11:23:22 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_T=r4doyNdeykejj4SsJHiK7Fv8aujt-fXACFybUr9xg@mail.gmail.com>
+X-Gm-Features: AclHuK8IqYcRPOmdS5FFOdSF2W2Jugm1H1ys2DHDizlQVeQ0L2lg_0_gcJ6qYgc
+Message-ID: <CAKYAXd_T=r4doyNdeykejj4SsJHiK7Fv8aujt-fXACFybUr9xg@mail.gmail.com>
+Subject: Re: [PATCH] smb: client: avoid NULL resp_iov dereference
+To: Zihan Xi <zihanx@nebusec.ai>
+Cc: pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
+	tom@talpey.com, bharathsm@microsoft.com, dhowells@redhat.com, 
+	stfrench@microsoft.com, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org, kernel test robot <lkp@intel.com>, Dan Carpenter <error27@gmail.com>, 
+	Luxing Yin <root@tr0jan.top>
 Content-Type: text/plain; charset="UTF-8"
 
-> Suggested fix: check the prefix before indexing -
-> strlen(ab_pathname) > share->path_sz && ab_pathname[share->path_sz]
-> == '/' - and ideally bind the durable fp to its original share at
-> reconnect. Happy to write this up as a patch if that sounds right.
-Okay, Please send the patch to the list and me.
-Thanks.
+> @@ -1111,7 +1111,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+>         /*
+>          * Compounding is never used during session establish.
+>          */
+> -       if (num_processed == num_rqst) {
+> +       if (num_processed == num_rqst && resp_iov) {
+Could you please explain how this code path can be reached? Earlier in
+the function, if ses->ses_status == SES_NEW or optype contains
+CIFS_NEG_OP or CIFS_SESS_OP, the code checks !resp_iov and returns
+-EINVAL.
