@@ -1,107 +1,71 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-83.mta0.migadu.com [91.218.175.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37A537E5E1
-	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 22:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A773D73
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 00:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790549028; cv=none; b=lTZFWbFY0xwViN10WQh96BJ5mUP9GMTfV0LXXaQdBTatLH2wj3U2/APgeelmNoflBu/PZ24lSIAU+CmXdoo2fNhqaY6BVfT+Uciy6nWIv1fF6sR9kpM/wHlKLXc7cOKni5wBGDjYKKtlDDjlz0q8QxWFi9CC2kI47azzymYTC90=
+	t=1790555912; cv=none; b=a9ExyE59weV5/Q9DEf8BeRLMtKnaBEeCTurIfK/FcgFi+ynIk6AQUgdPzxiWtcDLSEKEdyXUzfNrzyNFV17GUBxFIkEgGk8Unii/G5InkeKGiz7TUAwypG6Of1igWHVeZwau6789/FexArPtQTyMfU7ZnOTGMGAihMQn+BLUBZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790549028; c=relaxed/simple;
-	bh=SZ41bFou93ZWtyfSeOGia3NG8wwxMtHJcDTJVtsjmk0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OMZpdyzfBnQhsDHR77tSe22TDK9HXlKWWT3sr/Tb0/xoRqbj08U1yLBgmyifvMUPzDpH1wV1hpOWnm0ufMWtOhaQ22VGUSrVCkidIr9Ch4pxSunsdeZZjueJBQW1RzDnQ+9iaw0wiTpJYTYuZZmIJuJZM9D5qtteYLKyrllOW5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NikH4m14; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790555912; c=relaxed/simple;
+	bh=zVj5nOUfi4CUttk9TvZPa6fa77tlRjsUaCF+FnG7GMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UUVQNYAmvrMmas123bof7dNn7ravhtOznHeYbtQwWwKSFeKUE+K2TRxOyzD6gYlT0dmcZqV2UDrxK0M6FR20yAhr8yKrF44jnR5CCf7a83+uVk3vX8mHdWehIXNC2Mpo8BJvxSczbCX8xtIgqwCJ2JgMF10nkamGsuDZ+VS/LNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=kxkyOpP9; arc=none smtp.client-ip=91.218.175.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NikH4m14"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F691F00893
-	for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 22:43:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790549027;
-	bh=SZ41bFou93ZWtyfSeOGia3NG8wwxMtHJcDTJVtsjmk0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=NikH4m14m8dDps3K1v5szkR7t7pCkaiPypfZ8qwJqzAfyT7TuxqUwv+R4h94gGf4n
-	 lhm3zXFdih7HKyorR74UN+QTXmt5fNEnEL0fnAzCyn+YgjIvaJmrFodYInV/13rfCz
-	 O6Db55Pnf9UHvZpkNO8Cx+Z5yr41rOsLVJgRA88+/BFNcVfFqbo0BuT/F5o9gVyW7e
-	 92ZhS+XJF1xc2HCKhUZcZJtISyAIc8Y0L32xBsRtiDIsSHRpnDZCNtARdGy/9Nop5J
-	 RSgiVaUGZN75mfhuekswiVyiztuXGWbxilTQaqXw69GoW2Nh+jbzhkyaGCgkn27LVP
-	 hn6a+E26TvxgQ==
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c2940ef15c1so308902066b.1
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 15:43:47 -0700 (PDT)
-X-Gm-Message-State: AFq9FYLeJE6qfN75x/U0/E+VjkQeBDQ2nQDu7rISiBWbwj9GWapbNvjL
-	76JZ8m/DocNlW35dIKcg7WY95KRmOjqsb067zYpkIt9hXzU3a0+y0SFOLgJ6n7thAdb9usl62rf
-	BDY6NBJoJ0aq98ht1Y0414yzI0tfXhO8=
-X-Received: by 2002:a17:907:3f8f:b0:c29:45ad:7afa with SMTP id
- a640c23a62f3a-c2ac20ffb1amr1009804166b.0.1790549025901; Sun, 27 Sep 2026
- 15:43:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="kxkyOpP9"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=zVj5nOUfi4CUttk9TvZPa6fa77tlRjsUaCF+FnG7GMY=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790555906; v=1; x=1791160706;
+ b=kxkyOpP968cBmgNWvhTjPbuTDEddvuqh3DxeNHuIMMXCn7QmwwdGwxHgoI/OSNQyM0zXtII3
+ MAXxVt33yt7dnyaKEceu6cdwNddz36h/Af3Yrq4NHX2huwjE1RdtN3u975yw/aPVu+wcAfWl+zA
+ Tzj3RpjcPfFczZFwMt5tIxN8ThnU+Z9fLPRpGv+zWqXhI7zkvxvtW+hazSWa68PyypGlizZ5w2O
+ 7+iN4+SyCA6KwzXovkBLTBs5OIFciwXdu4sEFnFT38qDSIQ3br7iMY9CniRJvuKJ6/BbHPbD9P8
+ RvqvBs3tI0ISCsa97728WKJHu989E3+gqDMTwr214EMOg==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 361e5ae07208bade;
+	Mon, 28 Sep 2026 00:38:16 +0000
+X-Mizu-Trace-ID: 361e5ae07208bade
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <8426bd7b-d0e7-499f-91d8-8549a8c1e591@chenxiaosong.com>
+Date: Mon, 28 Sep 2026 08:38:08 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260927061639.1722520-1-zhangdairui@gmail.com>
-In-Reply-To: <20260927061639.1722520-1-zhangdairui@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 28 Sep 2026 07:43:33 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9AJBY3GzRq7S3c7wENDf574YVFRjYsPnMjY-0O6WRr6Q@mail.gmail.com>
-X-Gm-Features: AclHuK80XptZNxXYWAc9MP0v453jlUhqtJhB01uJyt8qkplw6diP6bhwz4K4MP8
-Message-ID: <CAKYAXd9AJBY3GzRq7S3c7wENDf574YVFRjYsPnMjY-0O6WRr6Q@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: verify transform SessionId matches the decrypted header
-To: Dairui Zhang <zhangdairui@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Paulo Alcantara <pc@manguebit.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/12] smb/server: support non-recursive directory change
+ watches
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+References: <20260926090518.78547-1-chenxiaosong@chenxiaosong.com>
+ <20260926090518.78547-5-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd9OTKFO1actbPQUJqorAw4ZW7iBVEmbo_nVe1hjCL-uug@mail.gmail.com>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd9OTKFO1actbPQUJqorAw4ZW7iBVEmbo_nVe1hjCL-uug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Sep 27, 2026 at 3:16=E2=80=AFPM Dairui Zhang <zhangdairui@gmail.com=
-> wrote:
->
-> The decryption key for an encrypted request is selected by the
-> SessionId in the encryption transform header, but the request is
-> then authorized under the session named in the decrypted inner SMB2
-> header. Nothing compares the two, so on a connection carrying more
-> than one session a client can have a request decrypted with one
-> session's key and executed under another session's identity. Since
-> encrypted requests are also exempt from the signing requirement, the
-> AEAD tag is the only proof of session identity, and it is checked
-> against the wrong session.
->
-> Per MS-SMB2 the server must verify that the SessionId in the
-> transform header matches the one in the decrypted SMB2 header and
-> treat a mismatch as a protocol error. Compare them after decryption
-> and drop the connection on mismatch. When the encrypted payload is a
-> compression transform, the transform SessionId is saved and verified
-> against the decompressed SMB2 header instead, since a compression
-> transform header carries no SessionId.
+Yes, makes sense. Thanks for your suggestion.
 
-Could you extend this patch to validate the decrypted SMB2 message
-against the requirements below before dispatching any command? The
-current implementation checks the SessionId only in the first SMB2
-header. It does not validate subsequent operations in the compound
-chain.
+On 9/27/26 18:51, Namjae Jeon wrote:
+> Should we also map FILE_NOTIFY_CHANGE_LAST_WRITE to FS_MODIFY and
+> FILE_NOTIFY_CHANGE_LAST_ACCESS to FS_ACCESS, then add FS_ACCESS to
+> KSMBD_NOTIFY_EVENT_MASK? With a LAST_WRITE-only filter, ordinary
+> writes emit FS_MODIFY, but this watch subscribes only to FS_ATTRIB, so
+> the request can remain pending. The same issue applies to reads with a
+> LAST_ACCESS-only filter.
 
-For a singleton request and the first operation of a compounded request,
-=EF=82=A7 The size of the decrypted message is less than the size of the SM=
-B2 Header
-=EF=82=A7 SMB2_FLAGS_RELATED_OPERATIONS is set in the Flags field of the SM=
-B2 header of
-the request
-=EF=82=A7 The SessionId field in the SMB2 header of the request is not equa=
-l to
-Request.TransformSessionId.
-=EF=82=A7 In a compounded request, for each operation in the compounded cha=
-in
-except the first
-one, SMB2_FLAGS_RELATED_OPERATIONS is not set in the Flags field of the SMB=
-2
-header of the operation and SessionId in the SMB2 header of the
-operation is not equal
-to Request.TransformSessionId.
-=EF=82=A7 In a compounded request, each response in a compounded chain, exc=
-ept
-the first one,
-does not start at an 8-byte aligned boundary.
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
 
-Thanks!
