@@ -1,84 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6974DA9D7
-	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 14:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B84E4DDB4F
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 15:04:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790607369; cv=none; b=QbJDlQ44tiRKdrRt+45nvobeoYPWIKatBFkiI7DVWmYE5nSeyBRYnv9De1qu+lIgx7tLU0Ttk9LRRUbtUKwSpiXuGzMN6you6YoxrDiylUSwtGjIplFjyZglSbxis6c5FO8gLCABsh4a/XpmBH17TnBuCRQvSqllRtaxILRghgo=
+	t=1790607856; cv=none; b=BxYKbmtn+5g/L4QZ1F6JvCnRArRB9fFvLbkeettx/iynQybbP1Bv191f00hmpGbDo9yWfWPkCGViaLt5iync3b2h08u/62SsR4lOzvEmQoclLQwowVngEf7EvtZnTm3p2flA+s5QDHireuCgy7e92JnDLsfYAqtAwpI6r65hv60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790607369; c=relaxed/simple;
-	bh=W9jnR9BJhKGpIRqXrrZ4r8QXYmv7yWwOZsqTB6Dh6W8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CtmQ8e7J4dMYDue5PlEAtmm1VB4OjezVrzgVBATTsvp7u4gLe/CYtSQR6snTygjDdb5qz9oV5fCxRxt4fzM4r5PTUr6cwHVxSSI9NrNiAlpLjVQmBlGKs74lx+tzDtYjmBs/jUBBWDj+GzuVG5K64kWkb2UZJMjR4GK25Y2mrzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SVfXtGQ4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790607856; c=relaxed/simple;
+	bh=T7XtHqtCtO+PXW7C5qLUlB3/u0AC2R6ckd6PP/x7Yec=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c1SsebbQrSHBmRItguUfgKo7F4lwbSpgegWGzFjxVUF2HseW7qlkmCwH2DPJYIfIEkCLGG1EfFwTH/RDU+eJUdljPdQbqUFo+IvRk5fdB9qQ0VSGaVXwUACS9VjH1k6+gVa6f+9RUhpmYXPjwN2B5qi7284s8a4Kym5/qLemM2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0v2gyYea; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=k2v4ZoH6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VSdqD/wr; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=1IEKmTBB; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SVfXtGQ4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F931F00898
-	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 14:56:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790607367;
-	bh=W9jnR9BJhKGpIRqXrrZ4r8QXYmv7yWwOZsqTB6Dh6W8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=SVfXtGQ4Qb1xDudO4syPZVJfa+Km5HfNmHoU/XUTEdZwJ4xYO7yOHELwPZ8NPwVD/
-	 m9olEVz7Jh06vJvYuENNKho15Ou1HxExUvqqMWfYuOvqRYOZ9q0irpTsKWw79zsfdb
-	 hhoR6p/ntV2BxrnXli77r3p574t5OdWBB8hZH7gENKk8ZuU/qmjT1V9CTPkYmVhPks
-	 QJykcR5U7fg+6Sup3BqjNAHkZqQCYZmwQBH9DnRjEA54g97MvzoSbueDzQQw+lDUAk
-	 yQS+VmmcODBoD/lrKR+uqoTVz+nvvKb8q20UqiUrMrS3IBTV1MXWLdtH5rmAtNtYi6
-	 pjjAXu5TMYNYw==
-Received: by mail-ed2-f33.google.com with SMTP id 4fb4d7f45d1cf-6ac62c88c7cso2811952a12.0
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 07:56:07 -0700 (PDT)
-X-Gm-Message-State: AFuF++k7b2ZnnWCJuSKs+ZkI0MUuaZGOJaiLnH4EnPWGoeoMK5gpP4W/
-	GVFcGsUqEXuatWpdo+mCiVSbhtel+5E70EevR96SC1ITbj38/TQYrvHflk5DzSD1fqUxTh7ByKd
-	0BGtcUkiCd8gKOgOMbBrRgiZwkGm6ybo=
-X-Received: by 2002:a17:907:e00d:10b0:c2d:bb53:239c with SMTP id
- a640c23a62f3a-c2dbb53269dmr305102366b.21.1790607366142; Mon, 28 Sep 2026
- 07:56:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0v2gyYea";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="k2v4ZoH6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VSdqD/wr";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="1IEKmTBB"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id DE1B521A29;
+	Mon, 28 Sep 2026 15:04:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1790607849; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=BI1ft0xTg8Lmqg32678wCH/A/3ZpYGvXnV599mnIals=;
+	b=0v2gyYeaAVrn4rPWL8dWSSu34musUtwRqPA3ZIcGzEiMxLqZQp9C+ls3iU1zriLazBRZdH
+	HFO/P39X+D45a4vOwYneaKYF7NbMYknPbwvsLSURAIOftMU3HnT90ATaTXGc7FpgHi+NW7
+	1HAA6N/BrOfLI0cNTsRi8NdixpY2R54=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1790607849;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=BI1ft0xTg8Lmqg32678wCH/A/3ZpYGvXnV599mnIals=;
+	b=k2v4ZoH6ZWU64WIiK0pqkegBm1DY4vZv247pFzDwrfwNIAuur3csNLmGjEfysL6Sr1esqM
+	ZWa4nsiC4TbkfQDw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="VSdqD/wr";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=1IEKmTBB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1790607844; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=BI1ft0xTg8Lmqg32678wCH/A/3ZpYGvXnV599mnIals=;
+	b=VSdqD/wrkurn31KhozdUHxWhlFHgfIQ4m0qE2rPrBctWClfP0t6zLu9HCq5uoh4I+F0Qi6
+	RJs1V+A5Ql0iZ4AENrvhY7p3rJTqK9CZagEKnPSFRhnaloB3yE6G6ZGS1697wDjgdGX8Kc
+	kzMcg07ziebPqt+4i7H/2Ug2Vs+TQ8w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1790607844;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=BI1ft0xTg8Lmqg32678wCH/A/3ZpYGvXnV599mnIals=;
+	b=1IEKmTBBIhuOkPc8Pd0puWEjG21VzGEs411NW3ijozeobrNrXSALSKyuMD8AIPdFdkT89y
+	bqXzchcVKRGDmiAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4E704133F1;
+	Mon, 28 Sep 2026 15:04:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id FoWTNOOBumpOIwAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Mon, 28 Sep 2026 15:04:04 +0000
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: linux-cifs@vger.kernel.org
+Cc: pc@manguebit.org,
+	linkinjeon@kernel.org,
+	ronniesahlberg@gmail.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	bharathsm@microsoft.com,
+	henrique.carvalho@suse.com,
+	Enzo Matsumiya <ematsumiya@suse.de>
+Subject: [PATCH v2 0/2] reconnect fixes and improvements
+Date: Mon, 28 Sep 2026 12:03:53 -0300
+Message-ID: <20260928150355.850472-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260927063339.1731061-1-zhangdairui@gmail.com> <20260928052026.1789765-1-zhangdairui@gmail.com>
-In-Reply-To: <20260928052026.1789765-1-zhangdairui@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 28 Sep 2026 23:55:52 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_NZS0qn6ErXHUJB1ubLy-ioEL3_pNhYwLnMUyT6mRyHw@mail.gmail.com>
-X-Gm-Features: AclHuK-_2Nmg2CyZD2N4nKZDDkeVtWvTmm1Coxqwduag7p-kXXdKSd8bwAFt0lY
-Message-ID: <CAKYAXd_NZS0qn6ErXHUJB1ubLy-ioEL3_pNhYwLnMUyT6mRyHw@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: fix OOB read and cross-share confusion in ksmbd_validate_name_reconnect()
-To: Dairui Zhang <zhangdairui@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Paulo Alcantara <pc@manguebit.org>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Queue-Id: DE1B521A29
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[manguebit.org,kernel.org,gmail.com,microsoft.com,talpey.com,suse.com,suse.de];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,sashiko.dev:url,suse.de:dkim,suse.de:mid];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_SOME(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Flag: NO
+X-Spam-Score: -3.01
 
-On Mon, Sep 28, 2026 at 2:20=E2=80=AFPM Dairui Zhang <zhangdairui@gmail.com=
-> wrote:
->
-> ksmbd_validate_name_reconnect() indexes
-> ab_pathname[share->path_sz + 1] without checking that the path is
-> longer than share->path_sz + 1 (d_path() fills the buffer from the
-> end). A durable fp is not bound to its original share, so a client
-> can preserve a file from a short-path share and reconnect it on a
-> long-path share, making strcmp() read past the PATH_MAX buffer -
-> with a long enough share path this oopses the kernel, and on a
-> mapped page it also gives a byte-equality oracle on adjacent heap
-> (the reconnect succeeds exactly when the out-of-bounds string
-> equals the requested name). A same-share variant with the durable
-> fp at the share root reads 1 byte past the buffer
-> (strlen(ab_pathname) =3D=3D share->path_sz).
->
-> Check before comparing: the path must be longer than share->path_sz,
-> it must start with share->path, and the next character must be '/'.
-> The share root itself is accepted only for an empty name.
->
-> Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
-> Reported-by: Dairui Zhang <zhangdairui@gmail.com>
-> Assisted-by: LLM
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dairui Zhang <zhangdairui@gmail.com>
-Applied it to #ksmbd-for-next.
-Thanks!
+Hi all,
+
+Sending v2 to address the issues found by sashiko
+https://sashiko.dev/#/patchset/20260925202003.618856-1-ematsumiya%40suse.de
+
+Please refer to the original cover letter for rationale and reproducer
+https://lore.kernel.org/linux-cifs/20260925202003.618856-1-ematsumiya@suse.de/
+
+
+Cheers,
+
+Enzo Matsumiya (2):
+  smb: client: fast fail sends if need to reconnect
+  smb: client: prevent premature discard of requests if reconnecting
+
+ fs/smb/client/cifsglob.h  |  4 ++
+ fs/smb/client/connect.c   | 58 ++++++++++++++++++++-----
+ fs/smb/client/misc.c      | 91 +++++++++++++++++++++++++++------------
+ fs/smb/client/transport.c |  8 ++++
+ 4 files changed, 124 insertions(+), 37 deletions(-)
+
+-- 
+2.55.0
+
