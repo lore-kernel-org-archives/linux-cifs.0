@@ -1,82 +1,77 @@
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD90A2DFA3A;
-	Mon, 28 Sep 2026 05:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6319339847
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 05:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790572569; cv=none; b=QkNXsvyjUC73OdfuFgkPLvebUF/Z8xuuEZ8eCvHDGbjNkpycjTmjsEot+J/e9uxtoQQYD9bHZE7IF/iPxAFdqhczHfLHm6WLfkgUcq5Wy2xM50CwenG71RbUoHq6Dn/WcGbuhorsUKHdezrq7EnScVdkwsmN6p/5Dgvz/G7ZVpk=
+	t=1790572657; cv=none; b=JtC3SI/owp2xruw+6oNluLjcPnVQFs1Kn486yQnCTHLRgcjE6m4kaqwtPBsF+gkGCgj5xEjQNHJ/dYgxKb2eEU9lcqdQb+oP/s43j3RUqmPq0hANHLmXe+HVmkWE/gasZXQwvV/m1o8gxkZ2WoJwRt78eF8dqT7jGrPJARzj7UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790572569; c=relaxed/simple;
-	bh=jJDP1WGliYUG1BeCYo80zVySbsIovC8dCX9Cz9papEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uLbCmZHea+U0IbTBmc9Svga7RDBfXL2cO9gqPhmkIGgBrRItgyj4iUfwITR2uGPYuNyTJrozwFhXy3ELEWjSUD4Z65IbcxgMwQPLzpB/jWRpscv6trCYgKnAfRxPqr2nXuLDG0Wgh7Qey+JO/Nrpocww0FDKCcasyMIFufHfK+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=jNFDsa7+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=k4cigvjh; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	s=arc-20240116; t=1790572657; c=relaxed/simple;
+	bh=Ubl5ahUt9+d6TQXqOz4LsOJJBWLKc6J82Tnd8BSHv9A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eLR9iHxJzKiMV3U6g+f9YQms6gRHrAIrUCaCehvQ58IjslUkM+/TG/jA+7of+D0+e4/VmrpOjIDyK1jRVakBwb83kBJ1zLmOZMMaF/MVgHr9uEqQbTV2Axa0/ARzYJwj1TrgKuzcZrHX/+417HjffN1q+EV9PlPwn4gpPqTWb9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cY8LUbSZ; arc=none smtp.client-ip=74.125.229.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="jNFDsa7+";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="k4cigvjh"
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 9216214000A1;
-	Mon, 28 Sep 2026 01:16:06 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 28 Sep 2026 01:16:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1790572566; x=1790658966; bh=Pp2T234dxP
-	iZ9yPXbpgvnQGH/84HEKbpDYLipPtuYok=; b=jNFDsa7+8rauPT1N0xCz6wiDMr
-	/EbZxUgPWaxeDuL2CkFUJKHN/HF8vqGXf+3Z6Qen8gXcqzRAZ80vrhKQaA68Q6mF
-	A4lt2Vn9rg4HtL0Wg1JO7i+IG64kgSRRRYu7Mi8M4xqG8g3oNu8vSFZRghoa3Y7u
-	jZucbqKdefKAwzaQWFYCB9ypAwzi5fqkpmjxWR4QLjzrJhHI+4R1/LzzsQf13tsH
-	Qp2bweFW9wwb96k7xY1goDrBsSF1/jYBAVUjexPEJkDcNXOFxm0T3EaQ6lzua1ZN
-	kffUDCxXfkkwXPxk18ggvhJjIEKplruv0CfjJFG1Ql041Sy52221Hmvd9OsA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1790572566; x=1790658966; bh=Pp2T234dxPiZ9yPXbpgvnQGH/84HEKbpDYL
-	ipPtuYok=; b=k4cigvjhjx0yN3ijY+7o+M6dMFagEYGTbN7/RJ8WC3wKMeL6BKz
-	oIMSB+JCt80sYlM2fhj01UABE4+dbt9LbhyZMOFor/FrYinib8O3pi6dwS6s3LEQ
-	vfbgPdlGfdUWG+QeXCYQRTRD91PK/a6KGJrUT7W2tFN09lS7SER82uxUjkCcp1T3
-	FxhBKg0p6aPMs5S8k44ETbWCmecx7YW2SazeQVrwy/eCnHiDj/qA/LxGUayweW4a
-	xdLF4oDk7U6rMKLy+YYkRK+xpAvyUJBcckVuGNgCpByoS12a3pSRAQEyTLksClaT
-	yKlxqw6cSCz1KPDNrcdws0gDpUfl1cTd9Sw==
-X-ME-Sender: <xms:Fvi5ahiiA1zM2CD6efS7zS7YqVC_oTHNEKOnBz69sxchd2WqXSwXcQ>
-    <xme:Fvi5akjS047xqefcNGovL9fESrbiK1yals3A7m7dBjFKo-8cToUBwLiXsWj9GNdMN
-    3h4bP7ygCQQ15jqsUDDz_n3nTjFXCr3Bs94r0C6UI_RHvqReiI>
-X-ME-Received: <xmr:Fvi5an5Ued8L0zVeDKeEKFOQvJAtuAQXEd4Hjkdmt0e02VKDZ-8H2JyUBHWV8NhwN6i59Uwik2CvCmDK1C_3bmuMOreeH06wTvYdo-bln6Y>
-X-ME-Proxy-Cause: dmFkZTGRRSPD9+vV47KYqoBTk+U3XPaUbLoHWNfqn2ej9m2/UWEVudtX30Nq1rUXt05IbZ
-    ptRMEknEgXXQvgG7C6uZ0IK8i9VIy4XUTJLI5Ti8jQSQ2gklG2QUQKWsCigDTGReLaHNH8
-    hooKYf8joIdtZSAg8hEVbzDdtl8+moFRsAkxbswDMas8fdqG4sVhzEfelGikIHbLD6953B
-    3vsZFx80xq8Oi419kyWYaZCIxWoB9CJqk8bIQ+mL8rSGlkorHikD5omq47y86Qr4JBHy6d
-    yEVbqehUXec+l4bkQlGoy6sDwO0o5mrSKwochNahfyt9ASDpD80u0CmDXVvWewPclknCXM
-    u85qKjmhLEkt0Hb9X6BEMBYEM353YKxTylFSC5RwIQfvnPA2xPYRmKXG915W5uLBEC6ulP
-    tJVluaR9xBGfasdxXDPe9Mneh02UBghN/WZgsM2wALgFNGF8Ts7Utx5vS7LQuww36klRes
-    7PItYG4SG5kjDQJJrqwvL5OAVlkV614/TckBTbPGY89Tacli1QmDUxsPeEN3KAIa/A51nH
-    BkK6fTCv1JTtnHunZ5+29JPFdpMT3eFmB8hfjrzAIoPbHewN59AtIDHtRkC/WqsWWs7m1S
-    utJPWcYp7xoHBvcNRRof9abHDeQQmJcsVIsNAQowh2+plZFxRHXR7pFZyk6Q
-X-ME-Proxy: <xmx:Fvi5amR5ICKqL_VwW6HAfCxQU4VWbpZfh2Fg8TUkeWNQUFdwj0hPIA>
-    <xmx:Fvi5am_FEiUK0GbYK-jUnuQv-8k_5ypT_qlTsgjeChBtku8e6DpSCw>
-    <xmx:Fvi5anpI7CYX7LYQQnLAhxs15HxaSOZsjpk64ik3T4blQuieadq1sA>
-    <xmx:Fvi5asV93VbI0Mv1Sdppa33kQ3VzYWcvsy1yV8PrddFEbuw3OulsYw>
-    <xmx:Fvi5arAg_jskaW0Vp4-CSFXNg_qxZPfp8JiB8pIuPZsQ0xjxoRBkvP0r>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Sep 2026 01:16:05 -0400 (EDT)
-Date: Mon, 28 Sep 2026 07:16:03 +0200
-From: Greg KH <greg@kroah.com>
-To: Dairui Zhang <zhangdairui@gmail.com>
-Cc: linux-cifs@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cY8LUbSZ"
+Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-340fbf9c1c6so1560571eec.3
+        for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 22:17:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790572655; x=1791177455; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Ubl5ahUt9+d6TQXqOz4LsOJJBWLKc6J82Tnd8BSHv9A=;
+        b=cY8LUbSZsjku3hRLA95+giaU5tPzLN5JQ7hB1xVL+6KNgmgSQdzVOkX6r02sxKKJjL
+         OYfsLcMJycJ+0TGzzzaO+jKIXvUm8uSDAuX5u0l1/52qKfFzTu7Iw18EsI++1ey1SsoH
+         0TnlyLiwvFilnXRE4kW1o7M8BX5n/oZCNZY9R0VfyPKzutEQpFvOUwclxoiyjNCqMRJe
+         coeTlMA+jbxqLGiS16ZDFsEz0z5+ur8Sp5+D/+ZzTFbp8AAMz1BFCH+TIEOvTvTtmigc
+         4lxnJ61eUN2Zc9gYALr8yU4aLoQuuxvWzrf3VaHz0RAu3aIYYNAz2wd5pIivnnQGpUGD
+         77sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790572655; x=1791177455;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Ubl5ahUt9+d6TQXqOz4LsOJJBWLKc6J82Tnd8BSHv9A=;
+        b=wqCSCjXrDs9MN5owx8re3jWK12lc9xVKxyhwVIJKokGeyClkB6DqEwr0zUCBV2HqF1
+         YdZuxkaf+U7tHI8kBbM6sZRKAGwCQ1AVIfZLVkmrPq/M415RX/SSd6T4vLMUTDJ+i8Jl
+         1srXGgZWHJD896FFrdJvSUiqKwyz3MEWjArMM/HUVCPtHheHkpyYeLP2Y0feOzqKOiPN
+         GUqWoxhJMihfqjV3OCjkk/bka1W9on6tXWSJV+jFrCpbADWizNRG5f650eIxC/piEdo+
+         qoQx8aufLU+EGd3G+LllhBptXGp7LWoQBT0OyC3hlykZ7Rlya1u7IPt5v1nI0+3EOsvg
+         Dxtw==
+X-Gm-Message-State: AFq9FYJNx7bzHZhmfvufClqOOlZvaHMJw4aQknM1m+AES9hAboLvPlFA
+	6sVXnRUp8ALXNkZv+Uft4oRSRbYzPBWjBCdkb1LeaKDAGICIs3itAmkGeVFLydUunZgwgA==
+X-Gm-Gg: AYBFou3fFq9wdbmEUCAOKYlWHn880ZMQzYul2gn4ZIa+ghLXXqdT09KtUChmpE9WV74
+	SsmuUG5yXH3CjacD1Bs6qyl/l4kpghIPwBW2w6mLICs9pcYptKDObNIzpO8NHeAlnDs55vo2VpT
+	FT9GSLcSGygkCV5dcQLiIiNWF6YPt8+O9doSYU0Yzq28O4+U/kfcSK7NXS3g6N3z/e1mHU9YEfs
+	2c+o8RqyDSDoDMe3P3Vul0y6SyI4b+0/YMPKA0LeQCq8MkTJu7vRdkD/rYX5CEC0IoIJSEoB1aU
+	lwt6Z7C/2plTiJNyXAe6go04Hl1zQBuikmg5za2LH+G2xPBd3s0hGnRx2ESR4VklIglCox/cWSh
+	ZwG5hUKAC3S1JVnmQpCSh6oMbUI3I4wDwVXRJVZ6hrIaZPT2gnFpvfFIewRS6L05w3+NTP6WMNx
+	LjxagRhcodcv4cNnMbxg0m6pQ/dp1QZIqO2/fNULKlbRAlrWwwJMmHI3n3ju0pXCx757tLFNdJu
+	cQ=
+X-Received: by 2002:a05:7301:2224:b0:341:2466:2d68 with SMTP id 5a478bee46e88-3427304d4e6mr7925230eec.38.1790572654073;
+        Sun, 27 Sep 2026 22:17:34 -0700 (PDT)
+Received: from localhost ([8.219.88.255])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34571658054sm6999522eec.8.2026.09.27.22.17.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Sep 2026 22:17:33 -0700 (PDT)
+From: Dairui Zhang <zhangdairui@gmail.com>
+To: Greg KH <greg@kroah.com>
+Cc: linux-cifs@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Steve French <smfrench@gmail.com>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>, Paulo Alcantara <pc@manguebit.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] ksmbd: verify transform SessionId matches the decrypted
- header
-Message-ID: <2026092848-retaining-unlaced-7767@gregkh>
+	Tom Talpey <tom@talpey.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Dairui Zhang <zhangdairui@gmail.com>
+Subject: Re: [PATCH] ksmbd: verify transform SessionId matches the decrypted header
+Date: Mon, 28 Sep 2026 13:17:30 +0800
+Message-ID: <20260928051730.1789636-1-zhangdairui@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260928031300.1782690-1-zhangdairui@gmail.com>
 References: <20260928031300.1782690-1-zhangdairui@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -84,45 +79,14 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260928031300.1782690-1-zhangdairui@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 28, 2026 at 11:13:00AM +0800, Dairui Zhang wrote:
-> The decryption key for an encrypted request is selected by the
-> SessionId in the encryption transform header, but the request is
-> then authorized under the session named in the decrypted inner SMB2
-> header. Nothing compares the two, so on a connection carrying more
-> than one session a client can have a request decrypted with one
-> session's key and executed under another session's identity. Since
-> encrypted requests are also exempt from the signing requirement, the
-> AEAD tag is the only proof of session identity, and it is checked
-> against the wrong session.
-> 
-> Per MS-SMB2 the server must verify that the SessionId in the
-> transform header matches the one in the decrypted SMB2 header and
-> treat a mismatch as a protocol error. Validate the whole decrypted
-> message before dispatching it: the message must be at least one
-> fixed SMB2 header; the first operation must not set
-> SMB2_FLAGS_RELATED_OPERATIONS and its SessionId must match the
-> transform SessionId; each subsequent operation in a compound chain
-> must either set SMB2_FLAGS_RELATED_OPERATIONS or carry the same
-> SessionId; and NextCommand offsets must be 8-byte aligned and within
-> the message. When the encrypted payload is a compression transform,
-> the transform SessionId is saved during decryption and the same
-> validation runs on the decompressed message. (The 8-byte alignment
-> of compound responses is already handled by the existing
-> chained-response padding.)
-> 
-> Reported-by: Dairui Zhang <zhangdairui@gmail.com>
-> Assisted-by: LLM
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Dairui Zhang <zhangdairui@gmail.com>
-> ---
-> v2 -> v3:
-> - Per review, extend the check to the whole decrypted message before
->   dispatch: first-op size/RELATED_OPERATIONS/SessionId rules and
->   per-op compound-chain SessionId and NextCommand validation, shared
->   between the plain and compression paths via a common helper.
+Greg KH wrote:
+> The "v3" isn't up in the Subject line for some reason :(
 
-The "v3" isn't up in the Subject line for some reason :(
+You're right, my mistake - I forgot the version marker when
+respinning (all three went out as bare [PATCH] with the same
+subject). Resending as [PATCH v3] now; no code changes.
+
+Thanks,
+Dairui Zhang
