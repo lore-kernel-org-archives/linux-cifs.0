@@ -1,238 +1,137 @@
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23A038911B
-	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 19:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3E3CE4B5;
+	Mon, 28 Sep 2026 20:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790624849; cv=none; b=JT+agq3j1pdIuNzbGaAtf8HRdhPuBkLoN5Ka49WOGmXa0DK17A//YnIkYhaBMnqK3p6/HdXq11bkWmpHz0MV9zg3kHaukOYpFiWF4nq5GZpiOfZrdwLv3VYCX28Mo+cmXh/nwy0cdCIwmlswiPlbzLCiB9z0GXjbLUwUZdlKwKg=
+	t=1790626189; cv=none; b=e66tUP5pLMHYjURf43cHYQWa0Q8VZy7jECgz+FDatl08vJ6dBkTqD0www2PVkyWUOIIVHFmWXsXR3AxF8smZqYCnqVojgSEp7+juLB8OR6KJjzOZB5AtqH3iXeO8UceHv6NqPRSHdUYAiEzSR3TvtHfgWRaQfa81rUj2+Gv2Tso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790624849; c=relaxed/simple;
-	bh=U+kqju76cNoJQVhw6/DyvDJkrDhq+++/O9NLhBaWyAU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KcPoINpmosPhRJ08PXcFMg8vWICe+rGjEpBSLmO0wNi+CzFBwQrK5iauvva1uKXfj6mWkoY+KkYPSbeAnDZaUKxQkL+rEfv57cFTAofbuphlys2BxunKlV2SikInu3NJtYQ6Wp4mBmq6ylGWPpMxFZNwRW8fvzGxsf220nrpU+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=kxjEERuW; arc=none smtp.client-ip=45.157.188.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+	s=arc-20240116; t=1790626189; c=relaxed/simple;
+	bh=XQMsBMqLszkcUbZRRAZkipjWwIDWQ5kztILXmcdNqgw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qyV/tRu5zEe+tfEWNUWUs1NxNjV+zlFAgGkr05PlUIT9+a9lOFh6BFRbcAkHDZYdNWM6B+8deTFKoN75rJYCX+wh0uvUz8Nb/78aFekYe5xOCmstYhq12WqqhlH4oI7lfFB/uhC3/2PBbIcnxrX/OCJHgoDuaa5L8r+EuDf9lF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=IQg0ZjqB; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="kxjEERuW"
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4htsK66G5jznW5;
-	Mon, 28 Sep 2026 21:47:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1790624842;
-	bh=+VdTVqBVlfaHaioRFQvSt61ywqOeh3oyx/gpUYheHVw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kxjEERuWtRNOkoKYbnyFMJQOilbAHdkBxlSQMMZMvjbqPrsq2eMZbZvAL/F1Lg8wr
-	 hZmXb9TizZwTXzGEERZSbI2gk8zdZKkYDQsk+a7k5MydGnxkPjmDiTH92dVoV3de77
-	 Dqw46RQmrVe5y7Ys5yBJNPv2q4pSUH00ZdtLOuvg=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4htsJl14b7z2g4;
-	Mon, 28 Sep 2026 21:47:03 +0200 (CEST)
-Date: Mon, 28 Sep 2026 21:46:59 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Cai Xinchen <caixinchen1@huawei.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
-	corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, 
-	gregkh@linuxfoundation.org, rafael@kernel.org, dakr@kernel.org, dlemoal@kernel.org, 
-	hch@lst.de, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
-	jack@suse.cz, dhowells@redhat.com, code@tyhicks.com, linkinjeon@kernel.org, 
-	sj1557.seo@samsung.com, yuezhang.mo@sony.com, hirofumi@mail.parknet.co.jp, 
-	cel@kernel.org, jlayton@kernel.org, neil@brown.name, okorniev@redhat.com, 
-	Dai.Ngo@oracle.com, tom@talpey.com, miklos@szeredi.hu, amir73il@gmail.com, 
-	senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, zohar@linux.ibm.com, 
-	roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, eric.snowberg@oracle.com, 
-	stephen.smalley.work@gmail.com, omosnacek@gmail.com, casey@schaufler-ca.com, nanx95726@gmail.com, 
-	djwong@kernel.org, daniel@iogearbox.net, linux-security-module@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, driver-core@lists.linux.dev, 
-	linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, exfat@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	linux-unionfs@vger.kernel.org, linux-cifs@vger.kernel.org, linux-integrity@vger.kernel.org, 
-	selinux@vger.kernel.org, linux-kselftest@vger.kernel.org, xiujianfeng@huawei.com, 
-	lujialin4@huawei.com, bpf@vger.kernel.org, kpsingh@kernel.org, matt@bobrowski.net, 
-	alexei.starovoitov@gmail.com
-Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
- WRITE_METADATA access rights
-Message-ID: <20260928.phei6Ohmeiba@digikod.net>
-References: <20260924104831.1081137-1-caixinchen1@huawei.com>
- <20260926.e0135fe7712f@gnoack.org>
- <a6a40c38-0e1c-4a3f-a705-e4a38c575c25@huawei.com>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="IQg0ZjqB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=vI9hnkyTXmIp3v3C49B0iA4VlEHobWDvjNpSEFmIUX0=; b=IQg0ZjqBT515fYp2aL6OeKQZJs
+	uMZ+IdLfqyK7SfzJpBBCLOlN7x83mEl+Rxce6rXIoDNbODlu1cXZVDog+3W9S7JSdApWI6vlTiNix
+	c6zTazdqgBUJXXqvpEAkkJC+vSj182qi3IalOK6wmRKjRw8kT9ETsifu1StaKHa7KdLnrAf4YEcNU
+	nIbYGR90qS2HAYaT4UaAqxd1tTZoiLU2rrrlqNab2SlHNDDxA+je/CwX/sImtN7kjaYtSARfyOzih
+	jOpK4HOn7JtYupPaIILZ9k372bDr3pr+UONqKy02Dty/xBlsHwSkM6p6Zoxca6/cfHa3W5rKBsXib
+	TwPxsdqg==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1xBHfK-00000002UIs-2UTu;
+	Mon, 28 Sep 2026 17:09:34 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev
+Cc: Christian Brauner <brauner@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+Subject: [PATCH 00/15] netfs, cifs: data corruption fixes
+Date: Mon, 28 Sep 2026 17:09:19 -0300
+Message-ID: <20260928200934.1040189-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a6a40c38-0e1c-4a3f-a705-e4a38c575c25@huawei.com>
-X-Infomaniak-Routing: alpha
 
-Thank for this patch series!
+This series fixes a number of data corruption and spurious I/O error
+bugs found by running generic/363 (fsx) in a loop against Windows
+Server 2022 and Samba 4.24 servers.
 
-I'll send more reviews tomorrow, but in the meantime here are some
-answers:
+* Post-EOF pagecache poisoning on extend (1-5)
 
-On Mon, Sep 28, 2026 at 02:52:02PM +0800, Cai Xinchen wrote:
-> Thank you for review!
-> 
-> I will link the feature request
-> (https://github.com/landlock-lsm/linux/issues/11) in the v2 cover letter.
-> 
-> For https://github.com/landlock-lsm/linux/issues/18, the current
-> READ_METADATA cannot solve this problem, and I don't have a good idea for
-> now.
-> 
-> For path_* rename, I'd rather keep the inode_* names:
-> 
-> * There is precedent for the mismatch: the inode_getattr hook
->   upstream already takes a "const struct path *" (this series just
->   aligns the other metadata hooks with it).
-> 
-> * The path_* prefix has an established meaning in the LSM hook
->   interface: it denotes the pathname-based (TOMOYO/AppArmor-style)
->   hooks that are invoked at the VFS path level *before* the
->   corresponding inode_* hook, as a paired, duplicate check
->   serving a different class of LSMs.  For example, a chmod(2)
->   currently runs security_path_chmod() (fs/open.c, for TOMOYO and
->   AppArmor) and then, via notify_change(),
->   security_inode_setattr() (for SELinux, Smack and now Landlock);
->   vfs_mknod() similarly calls both security_path_mknod() and
->   security_inode_mknod().  Renaming inode_setattr to
->   path_setattr would put two path_-prefixed hooks with different
->   call contracts into the same syscall, and path_chown(path,
->   uid, gid) next to a path_setattr(path, attr) would read as a
->   redundant pair, even though they belong to different hook
->   families.  Landlock itself already uses the path_* family for
->   its real path-level hooks (e.g. path_truncate for the TRUNCATE
->   right), so mixing renamed inode hooks into that prefix would
->   also blur its own hook table.
+  Data dirtied past EOF through an mmapped region was never discarded,
+  so it reappeared as file content once the file was extended by an
+  ordinary write, a truncate, a zero range, a copy range or a clone
+  range.  pagecache_isize_extended() doesn't help here: it's a no-op on
+  cifs because i_blkbits is 14.  Only the one folio straddling the old
+  EOF can hold such data, since pages wholly beyond EOF can't be
+  faulted in, so each extending path now zeroes or discards that folio.
 
-I had the same though as Günther on this, but I'll leave that up to
-Paul.
+* Missing flush or drain before trusting server or pagecache state (6-9)
 
-Regarding the BPF LSM use case, I don't think it would make a big
-difference.  Anyway, some BPF selftests need to be updated at the same
-time, which will also make the changes clear to the BPF folks.
+  FSCTL_QUERY_ALLOCATED_RANGES can report just-written data as a hole
+  unless it has been committed to disk first, and the O_TRUNC open,
+  interior zero range and server-side copy/clone paths did not flush
+  dirty data or drain in-flight I/O before an operation that assumes
+  the pagecache and the server agree on the file's contents.
 
-> 
-> * If the consensus is that these hooks should be renamed, I think
->   that should be a standalone, tree-wide rename series (including
->   inode_getattr), so that BPF programs only break once instead of
->   twice.
+* fallocate refused without a read lease (10, 12)
 
-As a general rule, please create bisectable patches (e.g. any patch must
-pass BPF and Landlock selftests; all dependent kernel code must build).
-But new tests still deserve their own patches.
+  smb3_zero_range() and smb3_simple_falloc() returned -EOPNOTSUPP for
+  any size-extending request whenever the inode wasn't read caching,
+  since the cached i_size couldn't be trusted.  Query the server's EOF
+  in that case instead of refusing the request outright.
 
-> 
-> On 9/26/2026 4:27 PM, Günther Noack wrote:
-> > On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
-> > > This series adds two new Landlock filesystem access rights,
-> > > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
-> > > which control access to file and directory metadata such as inode
-> > > attributes (mode, ownership, timestamps), extended attributes and POSIX
-> > > ACLs.  It picks up the work from the "landlock: add chmod and chown
-> > > support" series [1] and follows the coarse-grained grouping discussed in
-> > > that thread [2]: instead of separate chmod/chown rights, metadata
-> > > operations are grouped into one read and one write right.
-> > > 
-> > > Landlock evaluates access rights on a per-path basis, but the metadata
-> > > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
-> > > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
-> > > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
-> > > object.  Patches 1-7 therefore first pass struct path instead of dentry
-> > > through the metadata-related VFS helpers and LSM hooks.  This is a pure
-> > > refactoring with no behavior change, split so that every patch builds
-> > > and works on its own:
-> > > 
-> > >    1: notify_change() and its callers
-> > >    2: inode_setsecctx hook (must come before 3: the SELinux and Smack
-> > >       implementations call __vfs_setxattr_locked internally)
-> > >    3: xattr helpers, which also drops a redundant EVM xattr size sanity
-> > >       check whose vfs_getxattr() call only has a dentry and therefore
-> > >       cannot be migrated to the new path-based signature
-> > >    4: POSIX ACL helpers
-> > >    5: inode_setattr hook
-> > >    6: inode xattr hooks
-> > >    7: inode POSIX ACL hooks
-> > > 
-> > > Two deliberate scoping decisions for this refactor:
-> > > 
-> > > - The hooks consistently take struct path rather than struct file.  The
-> > >    VFS call sites involved (chmod(2), chown(2), utimensat(2), xattr(2)
-> > >    and ACL syscalls) operate on paths, and several of them (lstat(2),
-> > >    lchown(2), llistxattr(2), ...) have no struct file to begin with.
-> > > 
-> > > - struct inode_operations->setattr still receives (idmap, dentry, attr).
-> > >    Only the VFS boundary (notify_change()) and the LSM hook layer see the
-> > >    path, which keeps the refactor contained to fs/attr.c and the LSM
-> > >    infrastructure instead of touching every filesystem.
-> > > 
-> > > Patches 8-12 then implement the new rights, their tests, the sandboxer
-> > > sample and the documentation.  Semantics:
-> > > 
-> > > - READ_METADATA covers stat(2) and friends, getxattr(2) and friends,
-> > >    listxattr(2) and friends, and POSIX ACL reads.
-> > > - WRITE_METADATA covers chmod(2), chown(2), utimensat(2), setxattr(2),
-> > >    removexattr(2) and friends, and POSIX ACL set and remove.
-> > > - Only explicit metadata changes requested by user space are restricted.
-> > >    Implicit changes performed by the kernel (e.g. timestamp updates on
-> > >    write(2), size changes on truncate(2)) are not, and neither are
-> > >    chmod(2)/chown(2) calls that change nothing (e.g. chown(2) with
-> > >    (-1, -1), which never reaches the hook), matching the SELinux
-> > >    inode_setattr behavior.
-> > > - Kernel-internal accesses performed with override_creds() (e.g.
-> > >    overlayfs, cachefiles) and kernel threads without a Landlock domain
-> > >    (e.g. nfsd, ksmbd) are not restricted.
-> > > 
-> > > The Landlock ABI version is incremented from 11 to 12.
-> > > 
-> > > The series is based on linux-next commit 5c4d4169604b ("Add linux-next
-> > > specific files for 20260921").
-> > > 
-> > > Testing: each patch has been built for aarch64 (gcc, -Werror) and the
-> > > landlock selftests (445 tests, including the new ones) pass in QEMU on
-> > > aarch64; base_test reports ABI v12.
-> > > 
-> > > [1] https://lore.kernel.org/all/20220827111215.131442-1-xiujianfeng@huawei.com/
-> > > [2] https://lore.kernel.org/all/abc960a1-e66e-792e-6869-cfd201c29dbe@digikod.net/
-> > Thank you for sending this patch set!
-> > 
-> > Some meta-remarks at the beginning:
-> > 
-> > * You might want to link the bugtracker feature request:
-> >    https://github.com/landlock-lsm/linux/issues/11
-> > * In the final version, I think it's preferred to merge patches 8
-> >    (adding the access right enums) and 9 (adding the LSM hooks that use
-> >    them).  Having the feature as an atomic commit makes it harder to
-> >    accidentally mess it up during a backport, because you can't patch 8
-> >    without 9.
-> > * As Paul alluded to, the changes to the LSM hook interface and to the
-> >    existing callers in VFS are likely the hardest part of this patch
-> >    set.  Alexei from the BPF subsystem has also reiterated recently
-> >    that he wants BPF to be looped into such changes.  BPF hooks do not
-> >    give the same backwards compatibility guarantees as the syscall
-> >    layer, but there are existing users of LSM hooks specifically
-> >    through the BPF LSM.
-> > 
-> > * In https://github.com/landlock-lsm/linux/issues/18, we came across
-> >    statfs(), which returns file system meta-information based for the
-> >    file system that a given file belongs to.  I have weak confidence
-> >    that READ_METADATA would be the right access right to protect this
-> >    with, but it's a somewhat related operation.  Maybe you have some
-> >    thoughts on this?
-> > 
-> > More concrete questions:
-> > 
-> > * If a "inode" LSM hook gets a "path" argument now, should it be
-> >    renamed from "inode_..." to "path_..."?
-> > 
-> >    (Maybe the BPF people can chime in about to what extent that would
-> >    cause additional churn for BPF users, in a situation where they
-> >    anyway already need to make a change due to the changing function
-> >    signature?)
-> > 
-> > –Günther
-> 
+* Short reads leaving stale data behind (11, 13, 14)
+
+  The read-gaps path and the DIO/unbuffered read collector left the
+  untransferred tail of a short read untouched, and cifs could not
+  tell a genuine EOF from a stale cached remote_i_size after a lease
+  downgrade.  A read racing an extending write could come back short
+  and, in the read-gaps case, have that stale folio content written
+  back to the server.
+
+* Unstable pages during a signed write (15)
+
+  cifs signs the pagecache folios in place before handing them to the
+  socket.  A buffered write could modify a folio while a write
+  subrequest built from it was still in flight, so the signature no
+  longer matched the data that followed it; the server answered
+  STATUS_ACCESS_DENIED, which surfaced later as -EIO.
+
+Paulo Alcantara (15):
+  netfs: clear post-EOF pagecache when extending a file via write
+  smb: client: clear post-EOF pagecache when extending a file via
+    truncate
+  smb: client: discard post-EOF pagecache when extending a file via zero
+    range
+  smb: client: discard post-EOF pagecache when extending a file via copy
+    range
+  smb: client: discard post-EOF pagecache when extending a file via
+    clone range
+  smb: client: flush and commit data before querying allocated ranges
+  smb: client: drain outstanding I/O before truncating on O_TRUNC open
+  smb: client: flush dirty data before zeroing a range
+  smb: client: drain and invalidate before server-side copy/clone
+  smb: client: only require read lease for size-extending zero range
+  netfs: zero gaps in read-gaps folio to avoid writing back stale data
+  smb: client: only require read lease for size-extending preallocate
+  netfs: zero the tail of a short DIO/unbuffered read
+  smb: client: distinguish real EOF from a stale remote_i_size on read
+  smb: client: require stable pages for signed connections
+
+ Documentation/filesystems/netfs_library.rst | 25 ++++++
+ fs/netfs/buffered_read.c                    |  7 ++
+ fs/netfs/buffered_write.c                   |  9 ++
+ fs/netfs/direct_write.c                     |  9 ++
+ fs/netfs/misc.c                             | 71 +++++++++++++++
+ fs/netfs/read_collect.c                     | 24 +++++
+ fs/smb/client/cifsfs.c                      | 25 +++++-
+ fs/smb/client/file.c                        |  2 +
+ fs/smb/client/inode.c                       | 19 ++--
+ fs/smb/client/smb2ops.c                     | 97 ++++++++++++++++-----
+ fs/smb/client/smb2pdu.c                     | 10 ++-
+ include/linux/netfs.h                       |  2 +
+ 12 files changed, 267 insertions(+), 33 deletions(-)
+
+-- 
+2.55.0
+
