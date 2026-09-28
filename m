@@ -1,117 +1,99 @@
-Received: from mail-wr2-f12.google.com (mail-wr2-f12.google.com [74.125.225.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9590F35675E
-	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 06:57:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.225.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFA8478851
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 08:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790578652; cv=none; b=ESbmDtIcnxaZGzmM8jZHn9bpnAQxlwmy9EOrhGzue3kG0q6X4KCiTEHv6oPXBWn5eycneeyB6k58UWjh6DnnQSNJZi5xSq1gHJW9FvupXSioUPpdRtbiL3OY+oDRLsEewsRdgfxJtuXHyGeAQQZnAXk4n7n27RJGG2t2b9bdN3Y=
+	t=1790584277; cv=none; b=OJkSpumfPynvnH8+M/uYTdsqOh3d4uPePdQBJKSrTqHhWPK/GXCMSDYEXrG3CKDiVW3kwBh1ZFW8xcfTmS3vo7VFDvCcKKjg8o9UMPY36rdXTvE7SWaQi8bfLRiUTeEeZAYdSur98k60ytKfkrYEV/tfX+XgKsHrf5QM1Yoeucc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790578652; c=relaxed/simple;
-	bh=iOLqsr/1Pfab3GjsjU48cf/53tj6Xn2AGw1oUU82SE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aCV944jUNs0CgzfzUpJ+88Eli6PChD+Go3aTvDPt66ErJ1Qqg1uX6q6rsD3P4pP7wtipKv75ldheBX9lKIXwPBq9+Q9wBzYxIkJKbOnuzOdinpYEBlzG/icQZ/CqJjnzFnmbmYf5bqAXDfLkhSBVQpoRWV2HmsHgsVxWbdLb+IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PL+E3Ce2; arc=none smtp.client-ip=74.125.225.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1790584277; c=relaxed/simple;
+	bh=pqz92F3ABU+ctP/jHfNv5yxJ+b0ipXikUkGD9+woI74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XFreXt6hto7e9DVrDWK/Ui+rL6VkpUVkLUNSSPZBvOI1/hUPBAC3SIlQUAavpgu7rZnifMTS+Czp91+DVpi349QWMMenntWl7XH14cNV5412b4Sd0B8mMIlMrwWzXlBck8DmPJlkEN+xPIkrc4BCuHnLoMD7K17rfDFOW2naAgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bPXoHSCr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PL+E3Ce2"
-Received: by mail-wr2-f12.google.com with SMTP id ffacd0b85a97d-485ac898fa4so2192081f8f.0
-        for <linux-cifs@vger.kernel.org>; Sun, 27 Sep 2026 23:57:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790578649; x=1791183449; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=M+uv1v96meiRGy5jfT/pRvcdeWPwSROmpvTYk5wo6xM=;
-        b=PL+E3Ce26eBaVIYWytVt8AiDxUTFZ8Q4RnMXDfM0/ep2ACua7eYf8Ud5wx3+uBuVMY
-         I8QApa1DMkYNj+nKyrYLx88btAHJ+OJy6YXqFgDJsum+YaIjALHAGb0XuvWMTcmdAkkw
-         6L2wqISF5EW9mGSBwFtDUUJmazhOVcS8Y6bn7SJjqf91F6Am51mLuSGPhmwjcgW2bIfa
-         0kwhOaiaigrP4rzQZ3zl2REKpZw1tUAAqmrgRIOoF31DmfFlekXftWbFZCyBJec0bOaW
-         S1T6kqQb3Fc6MUWQPv2Cl5OQesBscGPkkO8w8rJHanLl9Eq6zcZhLmbKu6eSiyvpeYy4
-         7FqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790578649; x=1791183449;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=M+uv1v96meiRGy5jfT/pRvcdeWPwSROmpvTYk5wo6xM=;
-        b=j9NtqCcAMuWqPUC0xu0b6MUAAEKvPY5nHNmKmAztudRSLBDGqT8ryNNi6V71mln+XM
-         SwaGgzY09WGAAyXGFh8/A/sRiunvjqYjGU2Rb5vuY8CXz0GDca/Q2kqHovJp127kUz7F
-         5g3y0mP4vXfbnR/6a8ac8R44+vz4hk9pZ7TNcA4vVQ/3yGS9CDy2g2xPUaiz9+fcVfF1
-         awUFT1uNe8cp1MuJwI/8c3fnD5WGKgk0hBQLP3c+9ThnE70I+TbzuCMw26E2MUEB3ap4
-         bMKcN+yXBfgl6Mo5P2/H/oB+lmFp5l2n4lqoz0wRRMzcIa4PqZBYmgO5y9OJpM/ffwZk
-         H2Jg==
-X-Forwarded-Encrypted: i=1; AKwUvBzzIGJ+6ehyjJ5KaKnI9c1PJACdHRCebJdBPJ+P8adyyj12fcBlPC0M+UjFiVxzmxSu1AyYbP0WNP7N@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ8YNNQ09y1oAzZNIZ9TRUFaJZ/8z/0duIl0XBkPbWKo1Nb2p6n
-	Czs63xp0Es3DlzqLL/oY3RphfuqakDED8Sq2czejuvokvoi48BWQO+QU
-X-Gm-Gg: AYBFou32ao5Mr/F5qcopaK/vkR5csRKFwStkFyTNVntTNU92DJzKIvhSYvXyCb30Ka6
-	GKDuwIdVB+HBgFtueaBoMaOfJKnizXLJ/l4ARmPg2Ymx7zVBZQ36sFNGRz3jyB6Kn9zl8ZQwah8
-	xFA181zL6ZBaWjjsZrtoFGTX+KoUjBtB3scHTayhU/TgtQxorNYou8t6uWlHsH00xYLnzq1Q6VU
-	jKLqMx7lHyjAYgrBDznSajgPDXEfJ21+LnQUv9WPl6Sco0Lv/PIQZAAuC3bnWJelRe6YpzG85bO
-	nwtRD75Y2JrXcszaPNIIzWi57qnfFig3pZH3vw3GjFZpCDLLkS665MSFdkLCq2HWgWnqwZ5PAzo
-	b7+4ae4b3QGl+rZGJUMrK9Ko8Jf7HK+BdGIGTTT+q1V62hZ0esi84drrCsUwyF4H+V+SZln/34Q
-	by9sQPmn+9zSjtkD1cNdsXdXMnGGJWnpUAR5jnkgjPLU/O8OK5OWiFMXwuWQ5uCehUT8w=
-X-Received: by 2002:a05:6000:4545:b0:488:7d08:edbc with SMTP id ffacd0b85a97d-4887d08edf2mr9877854f8f.24.1790578648847;
-        Sun, 27 Sep 2026 23:57:28 -0700 (PDT)
-Received: from localhost ([2c0f:3d00:6be:8900:ce5e:9212:ea4b:f30])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4887a64ed6esm27630582f8f.29.2026.09.27.23.57.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Sep 2026 23:57:28 -0700 (PDT)
-Date: Mon, 28 Sep 2026 09:57:24 +0300
-From: Dan Carpenter <error27@gmail.com>
-To: Philip Li <philip.li@intel.com>
-Cc: Zihan Xi <zihanx@nebusec.ai>, pc@manguebit.org, linkinjeon@kernel.org,
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-	bharathsm@microsoft.com, dhowells@redhat.com,
-	stfrench@microsoft.com, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, kernel test robot <lkp@intel.com>,
-	Luxing Yin <root@tr0jan.top>
-Subject: Re: [PATCH] smb: client: avoid NULL resp_iov dereference
-Message-ID: <aroP1B0gG2Mhtjzf@stanley.mountain>
-References: <20260926132208.23360-1-zihanx@nebusec.ai>
- <arkuJtmhKDAFnzTl@stanley.mountain>
- <arn+UIhVhM4QDP0c@rli9-mobl>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPXoHSCr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790584271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=D6axXkipxQGqzsk98AcSmRo1RDlRujd80D+J6A9Y3/Y=;
+	b=bPXoHSCrfrCjwtWQRaWCFH6ThZ72MudFsyeEUFrXwBhGXwpbthE3Ig+MPgf7lKRTG+x+r/
+	FzpBRHMoKLTjAlpE8wIgjSQVe5smNFGvs212gZ7pvN6cl6sxmLLgsbjlVn9/kPdSkZr9p7
+	d9GhrxldmRQdMPSueBuX5lV+fNPxcWM=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-253-3e3v-QgPNqm_-CeaG9DGJg-1; Mon,
+ 28 Sep 2026 04:31:06 -0400
+X-MC-Unique: 3e3v-QgPNqm_-CeaG9DGJg-1
+X-Mimecast-MFC-AGG-ID: 3e3v-QgPNqm_-CeaG9DGJg_1790584263
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3864E1954B07;
+	Mon, 28 Sep 2026 08:31:03 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.44.32.43])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C70501956086;
+	Mon, 28 Sep 2026 08:30:56 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>
+Subject: [PATCH 0/3] lib/crypto: Provide functions for zeroizing SHA2 hmac_sha* structures
+Date: Mon, 28 Sep 2026 10:30:52 +0200
+Message-ID: <20260928083055.104266-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <arn+UIhVhM4QDP0c@rli9-mobl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Sep 28, 2026 at 01:42:40PM +0800, Philip Li wrote:
-> On Sun, Sep 27, 2026 at 05:54:30PM +0300, Dan Carpenter wrote:
-> > On Sat, Sep 26, 2026 at 01:22:08PM +0000, Zihan Xi wrote:
-> > > compound_send_recv() only populates response vectors when resp_iov is
-> > > non-NULL. The final pre-authentication hash update nevertheless
-> > > dereferences resp_iov[0] whenever all compound requests complete.
-> > > 
-> > > Guard the update with resp_iov to match the response-buffer handling and
-> > > avoid a NULL pointer dereference on callers that do not request response
-> > > vectors.
-> > > 
-> > > Fixes: 62432a3f5145 ("cifs: Clean up some places where an extra kvec[] was required for rfc1002")
-> > > Cc: stable@vger.kernel.org
-> > > Reported-by: kernel test robot <lkp@intel.com>
-> > > Reported-by: Dan Carpenter <error27@gmail.com>
-> > > Closes: https://lore.kernel.org/all/202609241449.HlHmnZFZ-lkp@intel.com/
-> > 
-> > Originally the idea was that I would review these and filter out
-> > the false positives, but these days people use lei to read email so
-> > they recieve the unfiltered warnings.  The zero day bot should
-> > probably put a "Unfiltered warning" note at the top to let people
-> > know the warning hasn't been reviewed.
-> 
-> Got it, I will add this note to the bot report for unfiltered warnings.
-> 
+This patch series has been split of my earlier zeroization patch
+series since there were some troubles left with the purgatory patch:
 
-Thanks, Philip!
+ https://lore.kernel.org/all/20260924145806.GA1949494@ax162/
 
-regards,
-dan carpenter
+As I've confirmed now, the fix for the problem is indeed to set
+-D__DISABLE_EXPORTS for the other files in the x86 purgatory, too,
+so the first patch here has now been changed accordingly.
+
+Thomas Huth (3):
+  x86/purgatory: Compile purgatory with -D__NO_FORTIFY and
+    -D__DISABLE_EXPORTS
+  lib/crypto: sha2: Provide functions for zeroizing SHA2 hmac_sha*
+    structures
+  smb: client: Use hmac_sha256_zeroize_ctx function to clear
+    hmac_sha256_ctx
+
+ arch/x86/purgatory/Makefile   |  3 +-
+ fs/smb/client/smb2transport.c |  3 +-
+ include/crypto/sha2.h         | 73 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+), 4 deletions(-)
+
+-- 
+2.55.0
 
