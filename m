@@ -1,34 +1,34 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4734F85CC;
-	Mon, 28 Sep 2026 20:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1351F3B9930;
+	Mon, 28 Sep 2026 20:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790626197; cv=none; b=rC6kIGzK4/vVGZNUEObFwC4nD7ZlWF47DDPd2/v7r9OtzwvpL5E4VBHPJkr7dCr/qsuWPJXtfiM572tAFKdOQ/rNCjteYFde2vGlMc1SQ9h2ot/Ifp+rYHT3s2Y8iM8rS8lrDu1DikbdHWycQKc8qJmOBXIkvUmaWn4imRaqPns=
+	t=1790626200; cv=none; b=KRtRiUaDBGRBUOz96KY7OTphCv+PbTyCCLMWrSseC34nII80NkrNtj4a3oGyfgTlvGgVUmKFNQaOojyZdVxd4rHZEy6vBflyVkIX0YGJmsZ0ElqfFgEOgiPM2rmleteLPsAjOqcEuN9Nn6yqYRkbF/g/J/SJbCruzBvycrd6UFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790626197; c=relaxed/simple;
-	bh=MkTWHYtdREfXfoaFmZk0vo5wqTOOBFz2LrAvw/Gl0Fw=;
+	s=arc-20240116; t=1790626200; c=relaxed/simple;
+	bh=tPhx6NIaPQy7ys87IsfY+wBgTIDHdC6QTZtarcCMYao=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FoWUsDI59WDkr6nI4JZIlhZiMsPZOwUtP6jBmxxLUNKVUuokk5tWVw9JasaUEzdoEwWYWPf8Gg79YBx7fwIdmv95vD/pNnQQ+H+ngP9dr8pZ/aftt+qk0i7gN8LUoY0QZQ4ndBsy8/IwPenk1IMfWETGKv8DieNDAbW4SWpzY+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=cA/+/uWv; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version; b=DJNqLZH4pixY3N1PW5NczdzI0B3jKTabtn4KCau9mnTVZCIbya0Oy6Z+wAe1TyPWCPEjwSa/ZSR4Z9DETdUj37CNQm2xra2GVXse34CROIuW3rMq7WQAGN2zgvdqkFUhTUJqwTf1zi9A+9HfImDJ6e4Rd6R8f8xJPgiLfUmYH/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=10wCbwjU; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="cA/+/uWv"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="10wCbwjU"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=kX7TtGQjsAfZtKuoJoTCeQCJ9TeSpuavaoAnWuXEo+c=; b=cA/+/uWvfFUBOFoWtQi7kEpYB3
-	ejwy3g3j42vQzskQYdhDa0OkpVKvXhGsFkSzw5UlEGLK8UNcaG3EnPMFUeDeINrvQMVgyguPNhg7l
-	t/WZK9NVEzfzPZa1dpJmiwloW34a+mzMRnIl89eVqV+Swfpi2zZOn8Rllz8rWsCs7RDNZQs840Dtr
-	kU01iYvrU5TMS7cr7R1ybj14XvShlgrNsH4AGWLberwmg89hzt2FZFqYJRJztqplWR++h7cNUmBDB
-	8iRquzzbp02M9dhc89bFH/C2RmizCDgxAgw0h+2hxMaTvWy51GGYyXwzHDOnVc7vIYHcEhL55gsgM
-	/QmfACVw==;
+	bh=weYac4arN+e+Exglx88CO1TIeF/RTILfhffoN84p0LQ=; b=10wCbwjUVRiWjT+pjUCJFgweWl
+	iU4cY6hVgZxItZXDpZ2PRR//Gr3KYB7fQ0B1HBWcV/jYoAJ31wF8MuUyY1+bajtcbeobteXL6uYDx
+	0aEC131X9dxZJN942mAUl0ZIRIuqLDXfrta4Wmn/s77kukasCWGI4ROzeERDRrXu0Wu/GwC16vKkQ
+	jLWR2938Rst8iF/BS8yh3PXenJ43f/VUJko/JFFSu1SdkFOnPfZSt93YlNwu/MLmO3guZJDE4dsnh
+	1t6c0rr7CGW+n4vMWnNid8lWVL/FK/Oqpo8A4/R5ImP32uxjXV7XJnj1YTrSQMxIIOXJscO8kzqXn
+	lYdy/JEA==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xBHfK-00000002UIx-3wXr;
-	Mon, 28 Sep 2026 17:09:34 -0300
+	id 1xBHfP-00000002ULP-0EVj;
+	Mon, 28 Sep 2026 17:09:39 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH 01/15] netfs: clear post-EOF pagecache when extending a file via write
-Date: Mon, 28 Sep 2026 17:09:20 -0300
-Message-ID: <20260928200934.1040189-2-pc@manguebit.org>
+Subject: [PATCH 13/15] netfs: zero the tail of a short DIO/unbuffered read
+Date: Mon, 28 Sep 2026 17:09:32 -0300
+Message-ID: <20260928200934.1040189-14-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200934.1040189-1-pc@manguebit.org>
 References: <20260928200934.1040189-1-pc@manguebit.org>
@@ -55,41 +55,24 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix netfs to erase the contents of a hole created after the EOF by an
-ordinary write if dirty data has been previously left there by writes
-through an mmapped region.  Neither the buffered nor the unbuffered/DIO
-write path clears that stale pagecache.
+The buffered read collector zero-fills the tail of a short read that
+stops below the inode's i_size (netfs_clear_unread()), so a read that
+races an extending write still returns the expected number of bytes.
+The non-buffered collector path does no such thing: it just records
+how much was transferred.
 
-Zero the tail of the folio straddling the EOF before an extending
-write.  That is the only folio that can hold data written past the EOF
-through an mmap, as pages wholly beyond the EOF can't be faulted in.
-The folio is zeroed rather than dropped so a concurrent extending write
-can't lose data.
+Add the same zero-fill for the non-buffered case, gated on
+NETFS_SREQ_CLEAR_TAIL: a subreq's source sets that flag when a short
+result from it is known to be safe to treat as a hole, as opposed to
+NETFS_SREQ_HIT_EOF, which means the read genuinely ran off the end of
+the file and should be reported short as-is. Only CLEAR_TAIL should
+zero-fill here; a real EOF must stay a real short read.
 
-Both write paths downgrade the i_rwsem to shared, so extending writes
-can run concurrently and the i_size read by the caller may be stale by
-the time the folio is locked.  Re-read i_size under the folio lock and
-clamp the zeroed range up to it, so a racing write that already put
-data into the folio isn't clobbered.
+No source currently sets CLEAR_TAIL on an unbuffered/DIO subrequest,
+so this is inert on its own -- a following change teaches cifs to set
+it in the one case that needs it.
 
-Wait for any writeback on the folio to finish before zeroing it so that
-the pagecache isn't modified while it may still be read by the transport
-during transmission.  Honour IOCB_NOWAIT by returning -EAGAIN rather
-than blocking on the folio lock, on writeback, or in folio_mkclean()'s
-rmap walk when the folio is mapped.
-
-truncate_pagecache() can't be used here: it must be called with the
-i_rwsem held exclusively, but these write paths only hold it shared,
-and it would block unconditionally, breaking IOCB_NOWAIT.
-
-Export the helper so filesystems can clear the same stale data from
-their own truncate paths.
-
-This helper is required by the CIFS client to fix generic/363.
-
-Closes: https://sashiko.dev/#/patchset/20260921230755.1133425-1-pc%40manguebit.org
-Fixes: 938e13a73b24 ("netfs: Implement buffered write API")
-Fixes: 153a9961b551 ("netfs: Implement unbuffered/DIO write support")
+Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
 Reviewed-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: Christian Brauner <brauner@kernel.org>
@@ -101,195 +84,51 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: stable@vger.kernel.org
 ---
- Documentation/filesystems/netfs_library.rst | 25 ++++++++
- fs/netfs/buffered_write.c                   |  9 +++
- fs/netfs/direct_write.c                     |  9 +++
- fs/netfs/misc.c                             | 71 +++++++++++++++++++++
- include/linux/netfs.h                       |  2 +
- 5 files changed, 116 insertions(+)
+ fs/netfs/read_collect.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/Documentation/filesystems/netfs_library.rst b/Documentation/filesystems/netfs_library.rst
-index ddd799df6ce3..f2f22076168c 100644
---- a/Documentation/filesystems/netfs_library.rst
-+++ b/Documentation/filesystems/netfs_library.rst
-@@ -451,6 +451,31 @@ one.
- The inode should be marked ``NETFS_ICTX_SINGLE_NO_UPLOAD`` if this API is to be
- used.  The writeback function requires the buffer to be of ITER_FOLIOQ type.
- 
-+Clearing Stale Post-EOF Pagecache
-+---------------------------------
-+
-+When a file is extended, data left in the pagecache past the old EOF by a write
-+through an mmap must not be exposed as file content.  Netfslib clears this on
-+its own write paths, and exports a helper so a filesystem can do the same from,
-+for instance, its truncate or fallocate paths::
-+
-+	int netfs_clear_stale_post_eof(struct inode *inode, uoff_t from,
-+				       uoff_t to, bool nowait);
-+
-+This zeroes any such data within the ``[from, to)`` hole to be made, where @from
-+is the current EOF.  Only the folio straddling @from can hold data written past
-+the EOF through an mmap, as pages wholly beyond the EOF can't be faulted in, so
-+the zeroing is limited to that folio and clamped to the top of the hole.  The
-+folio is zeroed rather than dropped so that a concurrent extending write can't
-+lose data.  If @nowait is set, it returns ``-EAGAIN`` rather than blocking.
-+
-+This overlaps with ``pagecache_isize_extended()`` but can't reuse it: that
-+helper is keyed on a sub-page block size and is a no-op when the block size is
-+``>= PAGE_SIZE`` (as on network filesystems), it runs after ``i_size`` has been
-+updated, it can't honour a non-blocking caller, and it doesn't wait for
-+writeback.  As both address the same problem, a change to one should probably be
-+reflected in the other to keep them in sync.
-+
- High-Level VM API
- ==================
- 
-diff --git a/fs/netfs/buffered_write.c b/fs/netfs/buffered_write.c
-index 2cdb68e6b16f..cc0561f77bd0 100644
---- a/fs/netfs/buffered_write.c
-+++ b/fs/netfs/buffered_write.c
-@@ -469,6 +469,7 @@ ssize_t netfs_buffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *fr
- 					 struct netfs_group *netfs_group)
- {
- 	struct file *file = iocb->ki_filp;
-+	struct inode *inode = file_inode(file);
- 	ssize_t ret;
- 
- 	trace_netfs_write_iter(iocb, from);
-@@ -481,6 +482,14 @@ ssize_t netfs_buffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *fr
- 	if (ret)
- 		return ret;
- 
-+	if (iocb->ki_pos > i_size_read(inode)) {
-+		ret = netfs_clear_stale_post_eof(inode, i_size_read(inode),
-+						 iocb->ki_pos,
-+						 iocb->ki_flags & IOCB_NOWAIT);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	return netfs_perform_write(iocb, from, netfs_group);
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index a94197ef0181..c5bfaf2c6f25 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -33,6 +33,22 @@ static void netfs_clear_unread(struct netfs_io_subrequest *subreq)
+ 		__set_bit(NETFS_SREQ_HIT_EOF, &subreq->flags);
  }
- EXPORT_SYMBOL(netfs_buffered_write_iter_locked);
-diff --git a/fs/netfs/direct_write.c b/fs/netfs/direct_write.c
-index 2361277416c7..36c36bc6c9d2 100644
---- a/fs/netfs/direct_write.c
-+++ b/fs/netfs/direct_write.c
-@@ -359,6 +359,15 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	ret = file_update_time(file);
- 	if (ret < 0)
- 		goto out;
-+
-+	if (iocb->ki_pos > i_size_read(inode)) {
-+		ret = netfs_clear_stale_post_eof(inode, i_size_read(inode),
-+						 iocb->ki_pos,
-+						 iocb->ki_flags & IOCB_NOWAIT);
-+		if (ret < 0)
-+			goto out;
-+	}
-+
- 	if (iocb->ki_flags & IOCB_NOWAIT) {
- 		/* We could block if there are any pages in the range. */
- 		ret = -EAGAIN;
-diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
-index f5c1c463f4ff..d93d8571c090 100644
---- a/fs/netfs/misc.c
-+++ b/fs/netfs/misc.c
-@@ -6,6 +6,7 @@
-  */
  
- #include <linux/swap.h>
-+#include <linux/rmap.h>
- #include "internal.h"
- 
- /**
-@@ -582,3 +583,73 @@ void netfs_wait_for_put_ra_refs(struct netfs_io_request *rreq)
- 	trace_netfs_rreq(rreq, netfs_rreq_trace_waited_put_ra_refs);
- 	finish_wait(&rreq->waitq, &myself);
- }
-+
-+/**
-+ * netfs_clear_stale_post_eof - Clear stale pagecache in a to-be-created hole
-+ * @inode: The inode to act upon.
-+ * @from: The base of the hole to be made (the current EOF).
-+ * @to: The top of the hole to be made.
-+ * @nowait: True to return -EAGAIN rather than block.
-+ *
-+ * Before extending a file, zero any data left in the pagecache within the
-+ * [@from, @to) hole by a write through an mmap so that it isn't exposed as file
-+ * content once the file is extended.  Only the uptodate folio straddling @from
-+ * can hold such data as pages wholly beyond the EOF can't be faulted in, so the
-+ * zeroing is limited to that folio.  The folio is zeroed rather than dropped so
-+ * that a concurrent extending write can't lose data, and the zeroed range is
-+ * clamped to the current EOF so it can't clobber data written by such a write.
-+ *
-+ * pagecache_isize_extended() can't be reused here: it is keyed on a sub-page
-+ * block size (a no-op when the block size is >= PAGE_SIZE, as on network
-+ * filesystems), runs after i_size is updated, can't honour @nowait, and
-+ * doesn't wait for writeback.  Keep the two in sync if either is changed.
-+ *
-+ * Return: 0 on success, or -EAGAIN if @nowait is set and the folio is mapped
-+ * or under writeback and so can't be cleaned without blocking.
-+ */
-+int netfs_clear_stale_post_eof(struct inode *inode, uoff_t from,
-+			       uoff_t to, bool nowait)
++static void netfs_clear_unread_dio(struct netfs_io_subrequest *subreq)
 +{
-+	struct address_space *mapping = inode->i_mapping;
-+	fgf_t fgp = FGP_LOCK;
-+	struct folio *folio;
-+	int ret;
++	uoff_t pos = subreq->start + subreq->transferred;
++	struct netfs_io_request *rreq = subreq->rreq;
++	size_t fill;
 +
-+	if (from >= to)
-+		return 0;
++	if (pos >= rreq->i_size)
++		return;
 +
-+	if (nowait)
-+		fgp |= FGP_NOWAIT;
++	fill = min_t(uoff_t, rreq->i_size - pos,
++		     subreq->len - subreq->transferred);
 +
-+	folio = __filemap_get_folio(mapping, from >> PAGE_SHIFT, fgp, 0);
-+	if (IS_ERR(folio))
-+		return PTR_ERR(folio) == -EAGAIN ? -EAGAIN : 0;
-+
-+	ret = 0;
-+	if (nowait && (folio_mapped(folio) || folio_test_writeback(folio))) {
-+		ret = -EAGAIN;
-+		goto out;
-+	}
-+
-+	folio_wait_writeback(folio);
-+
-+	if (folio_mkclean(folio))
-+		folio_mark_dirty(folio);
-+
-+	if (folio_test_uptodate(folio)) {
-+		uoff_t fpos = folio_pos(folio);
-+
-+		from = umax(from, i_size_read(inode));
-+		if (from < to && from < fpos + folio_size(folio)) {
-+			size_t end = umin(to - fpos, folio_size(folio));
-+			size_t offset = from - fpos;
-+
-+			folio_zero_segment(folio, offset, end);
-+		}
-+	}
-+out:
-+	folio_unlock(folio);
-+	folio_put(folio);
-+	return ret;
++	netfs_reset_iter(subreq);
++	subreq->transferred += iov_iter_zero(fill, &subreq->io_iter);
 +}
-+EXPORT_SYMBOL(netfs_clear_stale_post_eof);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index b4dd32863dd4..c7b2ac404853 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -397,6 +397,8 @@ ssize_t netfs_unbuffered_write_iter(struct kiocb *iocb, struct iov_iter *from);
- ssize_t netfs_unbuffered_write_iter_locked(struct kiocb *iocb, struct iov_iter *iter,
- 					   struct netfs_group *netfs_group);
- ssize_t netfs_file_write_iter(struct kiocb *iocb, struct iov_iter *from);
-+int netfs_clear_stale_post_eof(struct inode *inode, uoff_t from,
-+			       uoff_t to, bool nowait);
- 
- /* Single, monolithic object read/write API. */
- void netfs_single_mark_inode_dirty(struct inode *inode);
++
+ /*
+  * Cancel the copy-to-cache mark on a folio.
+  */
+@@ -311,6 +327,14 @@ static void netfs_collect_read_results(struct netfs_io_request *rreq)
+ 			    test_bit(NETFS_SREQ_HIT_EOF, &front->flags))
+ 				netfs_read_unlock_folios(rreq, &notes);
+ 		} else {
++			if (!(notes & HIT_PENDING) &&
++			    front->error == 0 &&
++			    transferred < front->len &&
++			    test_bit(NETFS_SREQ_CLEAR_TAIL, &front->flags)) {
++				netfs_clear_unread_dio(front);
++				transferred = front->transferred;
++				trace_netfs_sreq(front, netfs_sreq_trace_clear);
++			}
+ 			stream->collected_to = front->start + transferred;
+ 			rreq->collected_to = stream->collected_to;
+ 		}
 -- 
 2.55.0
 
