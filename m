@@ -1,34 +1,34 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC00F4D7D48;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C36C4D2ECC;
 	Mon, 28 Sep 2026 20:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790626193; cv=none; b=SWgzDIdG3HHMMJchLHZ8wSGt0/AYER4qY/RDtTknZYfi7lWF9oUa3Z1kRwrdfwbqweH1vxK9rjJEhdzEhaDYRWHR86RLwXTUnnMoqQoG7tQFKnRxrMu/ceyK/3OgTwQg2bVAQ5w7WBy/vuottblAivrxpHH+r5R2YbZ0p4I1WeE=
+	t=1790626195; cv=none; b=n+pc8Fe3Guqj2oVXgFRi+XFEZAdlYhR5qgKwy5hM3jNZDtX9B0HsZ/l4t3KPJrB4GapFMvK6QnZe+UbOw287gpmrdgyAWaWoO+KFzigrB4sleX3CFU70ZsqA6aBbU9PxzvsLuVoAcYu7DBTlYRsx0LA7BP7Ga8UoB/pAWyfQJ6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790626193; c=relaxed/simple;
-	bh=aUAMiskV7BBWe1i8QtgrkbKJbU8eawJAi0cyE4KHY8M=;
+	s=arc-20240116; t=1790626195; c=relaxed/simple;
+	bh=bmAkz9HZaFkg7iWx2uu01qQIx2pEifP5CE8R8onQKPQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yvz35ci4ZkRsgJqub6hRVxWqijazo2pwuUpUAjnb6evqWD5IjDf0eHvt4/3gyUGHqLoxTu4CADI2WDFvvoifCBT3SuIze4zULLr9EnCc6iQtInjEo3r7pFKfERwZgqWNo9RLJo1nVtiHaYtW11FSosnc+YRgrl91sCzpNgLeg6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=rbU+BLnV; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version; b=cyTz4kWd3iedifbd8jhRa39uwzRbq6AqOiCngjMUzVg76+OtKRmnYfppb+mipzoLcwUUQUkCV//GFZSRjXyOKVRBfxQphiOIKsYUd003HhlmHYh8SwfLWRNZo9W6qXULi0AFe1m1KHWJ6evDEuC4TOkSpJSVoTUYt59sXMV4WZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Nazu6qw8; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="rbU+BLnV"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Nazu6qw8"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=t2NhoLZ9pqbNAZyYAKYLTM/ZaoIR3qEMdvPqqh/ziEA=; b=rbU+BLnVeMdmE/YTEqhkLZp6Cm
-	S6rTeQpcJaeOPxmuwY5dep9iXD5DU0sOilo8+5yCVdh/M1uHbH7Q2j5+x16MUdWTDDP12y8V0ya8x
-	HXh5TsKqeN6j9xqqndyfSlipuRshc1D/EHtOY04mGi1MjuvtQleSGc9zkcR4mU7FoRvlAobAW0o5M
-	1kT7+v/V+kZntqy6XLb2yQYZojvlkXq/I0GE/Xw+KAWf7HxCUDwXEafIuK7zovuKmdxA2/zvCJmmv
-	RXpxy40sUt5sQ8qmBO2rMVjJLQTUjJ/zWFcvOZj3fZIudWsHO32SVb7Rt7PdvaYzoLOcTP8w1UCWV
-	PAvuedjA==;
+	bh=VRVtnetmH5iAATaEs2Llxr4M5XSANr1hjNekudywaPQ=; b=Nazu6qw8yoA6+IqECv0k8Iw8HC
+	cEMIvc8uEwg1il950ejP8d0FOXZ3USyEYeUK6PWlSfF4X1SJ4VgEmjahktvcvVGxSI7+JMXkacDYx
+	0f14YHyPYeJzd//vNGZ7pwOLslsV97xDfPh5ceA7BBj2lbUyQxVzVjIfVUBF+40LI7bNk/GfnpPon
+	ofuG5kU9lrqKkYJWr+YI/NeVzOMHFKfDZB4z4+KrRpOLB6oyS+j6OZEUo9A0a0XdOcJSKvbfD51lh
+	nTBGsNkm+g50VtozkMmCcBVyz1fw17MryhxrvMd80ElMF3OJAFpm6/GqXTi2Vd/ALk5/WPOP6qDh+
+	139Ltrnw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xBHfO-00000002UKp-0CAO;
-	Mon, 28 Sep 2026 17:09:38 -0300
+	id 1xBHfM-00000002UJM-2oaN;
+	Mon, 28 Sep 2026 17:09:36 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH 10/15] smb: client: only require read lease for size-extending zero range
-Date: Mon, 28 Sep 2026 17:09:29 -0300
-Message-ID: <20260928200934.1040189-11-pc@manguebit.org>
+Subject: [PATCH 06/15] smb: client: flush and commit data before querying allocated ranges
+Date: Mon, 28 Sep 2026 17:09:25 -0300
+Message-ID: <20260928200934.1040189-7-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260928200934.1040189-1-pc@manguebit.org>
 References: <20260928200934.1040189-1-pc@manguebit.org>
@@ -55,43 +55,36 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb3_zero_range() refuses any FALLOC_FL_ZERO_RANGE that clears
-FALLOC_FL_KEEP_SIZE with -EOPNOTSUPP whenever the inode is not read
-caching:
+The mode 0 / FALLOC_FL_KEEP_SIZE fallocate emulation for small interior
+ranges in smb3_simple_fallocate_range() issues
+FSCTL_QUERY_ALLOCATED_RANGES and zero-fills any sub-range the server
+reports as an unallocated hole, to force block allocation without
+changing file contents.
 
-	/* if file not oplocked can't be sure whether asking to extend size */
-	rc = -EOPNOTSUPP;
-	if (keep_size == false && !CIFS_CACHE_READ(cifsi))
-		goto zero_range_exit;
+This is unsafe against Windows servers.  Per the Win32 documentation,
+FSCTL_QUERY_ALLOCATED_RANGES only reports ranges that *may* contain
+nonzero data and is explicitly not coherent with recently written data:
 
-The read lease is only needed to trust the cached i_size when deciding
-whether the range extends the file. When it is not held, the size can
-instead be fetched from the server, which is authoritative, rather than
-refusing the request outright: query the server's end of file and take
-the larger of it and the cached size for the interior-vs-extend
-decision. The larger of the two is used because the server's end of
-file reflects another client's growth while the cached size reflects
-this client's own writes that may not have reached the server yet;
-using the server size alone would wrongly shrink the file when the
-range flush above left an extending write unwritten.
+  "a call to FSCTL_QUERY_ALLOCATED_RANGES [after writing to a network
+   file] would not necessarily return a correct list of allocated
+   regions.  To ensure coherency [...] flush the data to the file"
 
-Rejecting interior ranges is observed as generic/363 randomly failing
-against Windows Server with
+fsx (generic/363) reproduces the resulting corruption against Windows
+Server 2022: a range is written, an uncached read returns the data, yet
+the next FSCTL_QUERY_ALLOCATED_RANGES on that range reports it as a whole
+hole, so the emulation overwrites live data with zeroes.  A network trace
+confirmed the WRITE, the READ returning data and the query returning an
+empty range list within microseconds.  Samba does not exhibit this; its
+query is coherent with the written data.
 
-	do_zero_range: fallocate: Operation not supported
+Write back the dirty pages, drain any outstanding I/O and issue an SMB2
+FLUSH to force the server to commit the data before querying the
+allocated ranges, so the query reflects the data actually present.
 
-fsx issues an interior, non-KEEP_SIZE zero range while the inode is
-transiently not read caching: the server had just downgraded the file's
-lease from RWH to RH after breaking the write caching, and the ensuing
-handle reopen/revalidation left CIFS_CACHE_READ momentarily clear. The
-range sat well within the server's end of file, so no extend was
-needed, yet the range was refused and fsx aborted. This keeps the
-emulation correct even when a genuine lease break from another client
-leaves the inode without read caching -- the case the -EOPNOTSUPP guard
-turned into a hard failure. The extra round trip only happens on the
-no-lease path; the common cached case is unchanged.
+With this, generic/363 passes against both Windows Server 2022 and Samba
+over 100000 fsx operations.
 
-Fixes: 30175628bf7f ("[SMB3] Enable fallocate -z support for SMB3 mounts")
+Fixes: 966a3cb7c7db ("cifs: improve fallocate emulation")
 Reviewed-by: David Howells <dhowells@redhat.com>
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: Christian Brauner <brauner@kernel.org>
@@ -103,60 +96,94 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/smb2ops.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ fs/smb/client/smb2ops.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
 
 diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 6e1682dedb87..45d5c66f1ad9 100644
+index e55e081e47b9..dbab69d1b28a 100644
 --- a/fs/smb/client/smb2ops.c
 +++ b/fs/smb/client/smb2ops.c
-@@ -3520,6 +3520,20 @@ static long smb3_zero_data(struct file *file, struct cifs_tcon *tcon,
- 			  0, NULL, NULL);
- }
+@@ -3748,6 +3748,24 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 		goto out;
+ 	}
  
-+static long query_server_eof(const unsigned int xid, struct cifs_tcon *tcon,
-+			     struct cifsFileInfo *cfile,
-+			     unsigned long long *eof)
-+{
-+	struct smb2_file_all_info file_inf = {};
-+	long rc;
++	filemap_invalidate_lock(inode->i_mapping);
 +
-+	rc = SMB2_query_info(xid, tcon, cfile->fid.persistent_fid,
-+			     cfile->fid.volatile_fid, &file_inf);
-+	if (!rc)
-+		*eof = le64_to_cpu(file_inf.EndOfFile);
-+	return rc;
-+}
++	/*
++	 * Flush and commit the data to the server, otherwise
++	 * FSCTL_QUERY_ALLOCATED_RANGES might report recently written data as
++	 * unallocated holes on Windows Servers, and the loop below would
++	 * then zero-fill them and corrupt the file.
++	 */
++	rc = filemap_write_and_wait_range(inode->i_mapping, off,
++					  off + len - 1);
++	if (rc)
++		goto out_unlock;
++	netfs_wait_for_outstanding_io(inode);
++	rc = SMB2_flush(xid, tcon, cfile->fid.persistent_fid,
++			cfile->fid.volatile_fid);
++	if (rc)
++		goto out_unlock;
 +
- static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 			    unsigned long long offset, unsigned long long len,
- 			    bool keep_size)
-@@ -3563,10 +3577,12 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	truncate_pagecache_range(inode, min(offset, i_size), offset + len - 1);
- 	netfs_wait_for_outstanding_io(inode);
+ 	in_data.file_offset = cpu_to_le64(off);
+ 	in_data.length = cpu_to_le64(len);
+ 	rc = SMB2_ioctl(xid, tcon, cfile->fid.persistent_fid,
+@@ -3757,7 +3775,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 			1024 * sizeof(struct file_allocated_range_buffer),
+ 			(char **)&out_data, &out_data_len);
+ 	if (rc)
+-		goto out;
++		goto out_unlock;
  
--	/* if file not oplocked can't be sure whether asking to extend size */
--	rc = -EOPNOTSUPP;
--	if (keep_size == false && !CIFS_CACHE_READ(cifsi))
--		goto zero_range_exit;
-+	if (!keep_size && !CIFS_CACHE_READ(cifsi)) {
-+		rc = query_server_eof(xid, tcon, cfile, &remote_i_size);
-+		if (rc)
-+			goto zero_range_exit;
-+		i_size = max(i_size, remote_i_size);
-+	}
+ 	tmp_data = out_data;
+ 	while (len) {
+@@ -3767,12 +3785,12 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 		if (out_data_len == 0) {
+ 			rc = smb3_simple_fallocate_write_range(xid, tcon,
+ 					       cfile, off, len, buf);
+-			goto out;
++			goto out_unlock;
+ 		}
  
- 	fscache_invalidate(cifs_inode_cookie(inode), NULL,
- 			   i_size_read(inode), 0);
-@@ -3578,7 +3594,7 @@ static long smb3_zero_range(struct file *file, struct cifs_tcon *tcon,
- 	/*
- 	 * do we also need to change the size of the file?
- 	 */
--	if (keep_size == false && (unsigned long long)i_size_read(inode) < new_size) {
-+	if (!keep_size && i_size < new_size) {
- 		rc = SMB2_set_eof(xid, tcon, cfile->fid.persistent_fid,
- 				  cfile->fid.volatile_fid, cfile->pid, new_size);
- 		if (rc >= 0) {
+ 		if (out_data_len < sizeof(struct file_allocated_range_buffer)) {
+ 			rc = -EINVAL;
+-			goto out;
++			goto out_unlock;
+ 		}
+ 
+ 		range_start = le64_to_cpu(tmp_data->file_offset);
+@@ -3780,7 +3798,7 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 		if (check_add_overflow(range_start, range_len, &range_end) ||
+ 		    range_end > S64_MAX) {
+ 			rc = -EINVAL;
+-			goto out;
++			goto out_unlock;
+ 		}
+ 
+ 		if (off < range_start) {
+@@ -3795,11 +3813,11 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 			rc = smb3_simple_fallocate_write_range(xid, tcon,
+ 					       cfile, off, l, buf);
+ 			if (rc)
+-				goto out;
++				goto out_unlock;
+ 			off = off + l;
+ 			len = len - l;
+ 			if (len == 0)
+-				goto out;
++				goto out_unlock;
+ 		}
+ 		/*
+ 		 * We are at a section of allocated data, just skip forward
+@@ -3818,6 +3836,8 @@ static int smb3_simple_fallocate_range(unsigned int xid,
+ 		out_data_len -= sizeof(struct file_allocated_range_buffer);
+ 	}
+ 
++ out_unlock:
++	filemap_invalidate_unlock(inode->i_mapping);
+  out:
+ 	kfree(out_data);
+ 	kvfree(buf);
 -- 
 2.55.0
 
