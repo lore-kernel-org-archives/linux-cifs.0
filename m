@@ -1,95 +1,77 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pj2-f43.google.com (mail-pj2-f43.google.com [74.125.227.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC81B495AD5
-	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 15:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8084E4C50
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 16:20:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.227.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790607869; cv=none; b=hFNcwtvWcg8ZxVlbKHyfotvSu2TgUAlDBA+6Y2zgZ4rxePzU91Hr7irwMX1Z/ia5rqPz8ZdXef6h5MAtXbUACkFLpIR5dFOHZ3JuGzLWCVVG1GOoMFri9dHXyF29cZa85PgDgmet05A+OCd1t/qmoMojAuucvYKJnu2iPO5dwZY=
+	t=1790612453; cv=none; b=CnB8DnyMNv5qMRRS46IQorReb1xOfNs9/046me8Y76uivxM/0qPbu7ZcFHXH83mV40r9RtHCNAnimBGhk4I3TR6fin3eR5nSzEHl9sx9+S7hTAYpXmqhyTR2L3ThUVn4IOLyq5WNbr8dAbdnetX0Gum76QTw/ektYDoHzQYen2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790607869; c=relaxed/simple;
-	bh=gGtIWKR4a2R9EiCkQk0R1XT1i7MooGCwo3oFaNkNUj4=;
+	s=arc-20240116; t=1790612453; c=relaxed/simple;
+	bh=vs01MtfEVBiTmJkI3GpvJwZkshOrLmwv+qiFKh+6pNA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EHRiyLamvDr7e6Q7bjcvzOxAljwS0gngbnVO57qQBMXAOtsuy8+FFNt1neUZWN5sF0yPhiMtmCSh5s0BVPbCztjAzFG3gy9Oen8qEt3sRdNrbNtD+iSaWS3ftQyDQxiIDR6WBmpufhCZXfIixdyZ1wiRQAOXeS7aFC3AjRQqKGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=akWOIViQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ZvK46Lnx; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nO3Agz72; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AldmV6/S; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 MIME-Version; b=WCeWuy23vUaCMls8lUg7WNc1cE5JxlqMgZOVjvRHRzTmzfx1q3G4Ipe03x1fbFe6ZCNeD2BLZ44JuEOtEMINcjUHY4RxPbrY3Zk5LshpSpFn3syMPx8cA33ZA8gm9wSlGPpQjUyucHgtVww6Zj/Y+9HwRIUTvCyVEkxl+PCCgZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X0gugmWc; arc=none smtp.client-ip=74.125.227.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="akWOIViQ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ZvK46Lnx";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nO3Agz72";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AldmV6/S"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B411221D9C;
-	Mon, 28 Sep 2026 15:04:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790607861; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XZjgOurjoSdTWYnP1YIe0lMLymcWhOnitXN9cMOeE+4=;
-	b=akWOIViQsz4RU2SvdxWDC/1ZvtqJIp5I5CXlh0gYHswkDvyX5TgHpvAUNcnTioFmr+JIUt
-	n9xc9+gTGQEzHjxuiOHD4MH40SNXdRqGtx1V4y0IgynCDef1waxNOrWMvcsdPfNjI2fRO/
-	DmmHJEsWPxBUZy2R3KCDs3LJ4IDpheM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790607861;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XZjgOurjoSdTWYnP1YIe0lMLymcWhOnitXN9cMOeE+4=;
-	b=ZvK46LnxHNyBNTQsj32BcDls8QN8YrWt2ATQHex3qdHGGi9HtUMVhCS/AIirl/YRpKCrLP
-	cnV+sKvzQ76PG1Cg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=nO3Agz72;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="AldmV6/S"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790607857; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XZjgOurjoSdTWYnP1YIe0lMLymcWhOnitXN9cMOeE+4=;
-	b=nO3Agz726LXxOV5/A9ZeKiPrAiD51BJMbawqGM1fQZjyzJ6FE1o1nUXfhfgbqck98VDWzJ
-	uBUsI2Pq+AJnAS732WNWQVQMbFfK3rE3Px2LOMnV1NTR7DsAMZoJ6rUbqDOxnWuChc0OCG
-	7cwoiCCalz+WSndEJlB1dDMdhx0LrmI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790607857;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XZjgOurjoSdTWYnP1YIe0lMLymcWhOnitXN9cMOeE+4=;
-	b=AldmV6/SjSXKKuZOvsvfZBQaZTsgZ4vDGNSxnP1Lii633hr5fFHxN8tyrtAQT74t8V5qwW
-	shFy1s/QuQ72vQCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 256861340F;
-	Mon, 28 Sep 2026 15:04:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /2wNKvCBumpdIwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Mon, 28 Sep 2026 15:04:16 +0000
-From: Enzo Matsumiya <ematsumiya@suse.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0gugmWc"
+Received: by mail-pj2-f43.google.com with SMTP id 98e67ed59e1d1-3a494638445so175129a91.1
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 09:20:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1790612451; x=1791217251; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=drEwMPfBNK7Qvk+gxJqEf+fPVQFTEJ4sYjTDfDQ8114=;
+        b=X0gugmWc4n5NSwJfbU/zwULC3fNTCLHehjT8V5kgtzLqHr4fkyU4X1H2No+X3YeeA+
+         tS3uZwBqznUDrYet0CPVws9nKfmAIm1QJ72tod7cc/HLhHGfE9LSam20kg7VkjtqT68Q
+         u4BuVSPErCAoyZZeF8df5lKCKwujQldPfRVRP8Zc8w9TPpw/YLiAvGkJRG88Eqv308Uj
+         oqPbRf1QDzVIzdf9DRqshQaYSTM1AXoMaFo+x3nYeRGdSE5vxxeTjDr8keNDToRKeiAt
+         YtPrC2BB8b6v4n05vSTcQnOAOQ8K6GSqPdMPJ+HdXNbkn7IGNRbChQVy5YpjaB0J+0HR
+         i7VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1790612451; x=1791217251;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=drEwMPfBNK7Qvk+gxJqEf+fPVQFTEJ4sYjTDfDQ8114=;
+        b=Kk9sSzf26NBRID+ogYSYBqy775fnS2KYA9asVie4TSPxmcm5DCZSB7NNv7PMxqRqYX
+         PqIGdSK4Kq3NL86MZvlI0TvkP8jAAZYRgfTt7p0Zf4gWsrZEEjTiLnYQgC8ec5YJRs9C
+         a1Napy42SQOHI5C+wBRWjNLA1zol+yUIfb9j5CULUDzaNy5V0wBYlhyRsk+yhK9HLA3A
+         r8pbyUHvnEqJtLncmgs8cd/pEhc8C6iq5VdqwbOwuMGKaOBENptBF0desczG3KMUhagu
+         gIb9dVzwgMV5m2/889K/749e52qlJE7F2QhCGLPwQ3FBduXOVatXBA6Q2RzOVCabzIHX
+         9h/A==
+X-Gm-Message-State: AFq9FYKeohqfKQ95brV+vb4z6stbeRF5cNclU96S/rgq9M0YBMZKr7kO
+	ktJyCmuDraPVFA50BOxG2mGA4OjlBrmHSG/Y/rSxWhFNgIsOskEsK2muGiszk4jRFOGvYQ==
+X-Gm-Gg: AYBFou02fv2X36bjcvNmQURA+upSNZ9jjRyYmf1GwmTlHEl+W7zcYnRE4vZTy26Bw/g
+	h4/Jo+u2BtucwMHrIo+x9MFieUQ6aMUOWjy130anq3pFVRZc95LPip1bSZJZacnHoh+v17o73Dr
+	WWnWHrSAasKpzw6oNQMBraZgGi5zqg9hDnfFZudf8an3g9XWZ3Xn4dG7h5A/rs6OaK+va5Xy9fB
+	WrlR1hfXZF/chYtSco8foI/ffMSRhVF/KtsuelhmD95CnsxcxKP9nDcu2Sehij4Kv6FJvdCE2B+
+	Qhh6QyvCaJxSiEshnlORPIWVMQAtpn10tTrrUY0+wCZuaWoKbl40YgWInNoktipX8l4Bx0miwCK
+	179USUbONhQ6+BF74Uc5wkyt/lRarAIqZmq1YklRJT8oaeEODuCAh3qqpptnNTtPLWCY+Netpuj
+	gekOTvHSZymkwzTOcCyOiolbBn0ai1wQlOGqYOL/P4OJtPRzw8O8VzVvs4tfDaunaFKg==
+X-Received: by 2002:a17:90a:fc48:b0:3a4:7bd0:2821 with SMTP id 98e67ed59e1d1-3a47bd02e51mr1017410a91.6.1790612450963;
+        Mon, 28 Sep 2026 09:20:50 -0700 (PDT)
+Received: from localhost ([8.219.235.175])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a497ebc998sm306128a91.2.2026.09.28.09.20.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Sep 2026 09:20:50 -0700 (PDT)
+From: Dairui Zhang <zhangdairui@gmail.com>
 To: linux-cifs@vger.kernel.org
-Cc: pc@manguebit.org,
-	linkinjeon@kernel.org,
-	ronniesahlberg@gmail.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	bharathsm@microsoft.com,
-	henrique.carvalho@suse.com,
-	Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH v2 2/2] smb: client: prevent premature discard of requests if reconnecting
-Date: Mon, 28 Sep 2026 12:03:55 -0300
-Message-ID: <20260928150355.850472-3-ematsumiya@suse.de>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260928150355.850472-1-ematsumiya@suse.de>
-References: <20260928150355.850472-1-ematsumiya@suse.de>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Dairui Zhang <zhangdairui@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: verify transform SessionId matches the decrypted header
+Date: Tue, 29 Sep 2026 00:20:47 +0800
+Message-ID: <20260928162047.1829104-1-zhangdairui@gmail.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260928031300.1782690-1-zhangdairui@gmail.com>
+References: <20260928031300.1782690-1-zhangdairui@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -97,228 +79,169 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -3.01
-X-Rspamd-Queue-Id: B411221D9C
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[manguebit.org,kernel.org,gmail.com,microsoft.com,talpey.com,suse.com,suse.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
 
-Add TCP_Server_Info::reconnecting to track cifs_reconnect() lifetime.
-Wait for it to be true in cifs_wait_for_server_reconnect(), and only
-then wait for tcpStatus change.
+When an encrypted request comes in, the decryption key is picked by
+the SessionId in the transform header, but the request is then
+authorized under whatever session the decrypted inner header names.
+Nothing ever compares the two, so on a connection with more than
+one session a client can get a request decrypted with one session's
+key and run it as another session. Encrypted requests are exempt
+from signing too, so a valid AEAD tag is the only proof of session
+identity, and it is checked against the wrong session.
 
-Also, return -ECONNRESET (instead of -EHOSTDOWN) if reconnect is still
-ongoing at the end, so requests are not discarded unnecessarily.
--ECONNRESET is not immediately retried by intermediate layers, e.g. VFS,
-but still serves as an indication to userspace that retrying the
-operation might be successful.
+MS-SMB2 says the server must check that the transform SessionId
+matches the one in the decrypted SMB2 header and treat a mismatch
+as a protocol error. Add that check before dispatching: the message
+has to be at least one fixed SMB2 header, the first operation must
+not set SMB2_FLAGS_RELATED_OPERATIONS and its SessionId must match
+the transform SessionId, and every following operation in a
+compound chain must either set RELATED or carry the same SessionId.
+The usual ULLONG_MAX wildcard is accepted for those, same as the
+existing compound session check, since it means the compound's
+session and cannot be a different session. NextCommand offsets must
+be 8-byte aligned and stay inside the message, and the accumulated
+offset is guarded against u32 overflow.
 
-Changes (refactor cifs_wait_for_server_reconnect()):
-- remove unnecessary do/while loop; use wait_event_interruptible()
-  for hard mounts
-- increase timeout, and base it on echo_interval to match user
-  preferences
-- remove useless debug log for interrupt errors
+While here I noticed there is no decompression step after
+decryption, so an encrypted compression transform would be
+dispatched as if it were a plain SMB2 message. ProtocolId is not
+checked anywhere on that path, so a crafted transform could be made
+to parse as a valid command under any session id in the payload.
+Reject those for now; if encrypted compression ever comes back, the
+decompression step has to be restored and the message needs the
+same check after decompression.
 
-Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+Reported-by: Dairui Zhang <zhangdairui@gmail.com>
+Assisted-by: LLM
+Cc: stable@vger.kernel.org
+Signed-off-by: Dairui Zhang <zhangdairui@gmail.com>
 ---
-v1 -> v2 (fix issues detected by sashiko):
-- handle condition changes post-wait_event timeouts
-- return -ECONNRESET instead of -EAGAIN when leaving still reconnecting
+v3 -> v4:
+- Rebase onto ksmbd-for-next as requested.
+- Guard the chain-walk offset accumulation with
+  check_add_overflow() before updating it, per Namjae's review
+  (an invalid NextCommand could otherwise wrap the offset and loop).
+- Reject encrypted compression transforms outright: for-next has no
+  decompression step after decryption, and an undecoded transform
+  would otherwise be dispatched as an attacker-crafted command
+  (ProtocolId is not validated downstream).
+- Exempt SessionId == ULLONG_MAX in subsequent compound operations,
+  matching the existing compound session-check behavior (it means
+  the compound's session and cannot be a confused deputy).
+---
+ fs/smb/server/smb2pdu.c | 85 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-(not from sashiko):
-- add missing wake_up() after setting server->reconnecting to true in
-  cifs_tcp_ses_needs_reconnect()
-- handle tcpStatus == CifsExiting in cifs_wait_for_server_reconnect()
-
-
- fs/smb/client/cifsglob.h |  1 +
- fs/smb/client/connect.c  |  4 ++
- fs/smb/client/misc.c     | 91 ++++++++++++++++++++++++++++------------
- 3 files changed, 69 insertions(+), 27 deletions(-)
-
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index d279b5c92a08..9623ee19312c 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -803,6 +803,7 @@ struct TCP_Server_Info {
- 	bool	posix_ext_supported;
- 	struct delayed_work reconnect; /* reconnect workqueue job */
- 	struct mutex reconnect_mutex; /* prevent simultaneous reconnects */
-+	bool reconnecting; /* if cifs_reconnect() is indeed running */
- 	unsigned long echo_interval;
- 
- 	/*
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 4cc433308c96..58efc5392fc4 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -398,6 +398,8 @@ static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num
- 	cifs_dbg(FYI, "Mark tcp session as need reconnect\n");
- 	trace_smb3_reconnect(server->current_mid, server->conn_id,
- 			     server->hostname);
-+	server->reconnecting = true;
-+	wake_up(&server->response_q);
- 	spin_unlock(&server->srv_lock);
- 
- 	set_need_reco(server);
-@@ -475,6 +477,7 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
- 	spin_lock(&server->srv_lock);
- 	if (server->tcpStatus == CifsNeedNegotiate)
- 		mod_delayed_work(cifsiod_wq, &server->echo, 0);
-+	server->reconnecting = false;
- 	spin_unlock(&server->srv_lock);
- 
- 	wake_up(&server->response_q);
-@@ -617,6 +620,7 @@ static int reconnect_dfs_server(struct TCP_Server_Info *server)
- 	spin_lock(&server->srv_lock);
- 	if (server->tcpStatus == CifsNeedNegotiate)
- 		mod_delayed_work(cifsiod_wq, &server->echo, 0);
-+	server->reconnecting = false;
- 	spin_unlock(&server->srv_lock);
- 
- 	wake_up(&server->response_q);
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 05168284f205..24aa0333553a 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -1077,44 +1077,81 @@ int cifs_inval_name_dfs_link_error(const unsigned int xid,
- 
- int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry)
- {
--	int timeout = 10;
--	int rc;
-+	int timeout, rc = 0;
-+
-+	/* Hard mounts keep waiting until process is killed or server comes back on-line. */
-+	if (retry)
-+		return wait_event_interruptible(server->response_q,
-+						(server->tcpStatus != CifsNeedReconnect));
- 
- 	spin_lock(&server->srv_lock);
- 	if (server->tcpStatus != CifsNeedReconnect) {
-+		if (unlikely(server->tcpStatus == CifsExiting))
-+			rc = -ESHUTDOWN;
- 		spin_unlock(&server->srv_lock);
--		return 0;
-+
-+		return rc;
- 	}
--	timeout *= server->nr_targets;
-+
-+	/*
-+	 * Soft mounts, wait with timeout.
-+	 * Compute timeout based on echo_interval, to match user expectations wrt. time to recover
-+	 * from network interruptions.
-+	 *
-+	 * Minimum is 17 seconds (per reconnect target):
-+	 *   7s for cifs socket timeout
-+	 *   3s sleep after a failed attempt
-+	 *   7s spare, to cover at least a full attempt
-+	 *
-+	 * Maximum is 60s; might not be enough in some rare cases, but >60s is too much.
-+	 */
-+	timeout = max(server->echo_interval / HZ, 17) * server->nr_targets;
-+	timeout = min(timeout, 60);
- 	spin_unlock(&server->srv_lock);
- 
- 	/*
--	 * Give demultiplex thread up to 10 seconds to each target available for
--	 * reconnect -- should be greater than cifs socket timeout which is 7
--	 * seconds.
-+	 * First, wait for cifs_reconnect() to start.
-+	 * This is needed because tcpStatus == CifsNeedReconnect doesn't imply cifs_reconnect()
-+	 * is actually running.
- 	 *
--	 * On "soft" mounts we wait once. Hard mounts keep retrying until
--	 * process is killed or server comes back on-line.
-+	 * Wait 3*timeout (max 180s) here, which should be more than enough.
- 	 */
--	do {
--		rc = wait_event_interruptible_timeout(server->response_q,
--						      (server->tcpStatus != CifsNeedReconnect),
--						      timeout * HZ);
--		if (rc < 0) {
--			cifs_dbg(FYI, "%s: aborting reconnect due to received signal\n",
--				 __func__);
--			return -ERESTARTSYS;
--		}
-+	rc = wait_event_interruptible_timeout(server->response_q,
-+					      (server->reconnecting ||
-+					       server->tcpStatus != CifsNeedReconnect),
-+					      min(3 * timeout, 180) * HZ);
-+
-+	/* cifs_reconnect() never started, don't wait any longer */
-+	spin_lock(&server->srv_lock);
-+	if (!rc && !server->reconnecting && server->tcpStatus == CifsNeedReconnect)
-+		rc = -EHOSTDOWN;
-+	spin_unlock(&server->srv_lock);
- 
--		/* are we still trying to reconnect? */
--		spin_lock(&server->srv_lock);
--		if (server->tcpStatus != CifsNeedReconnect) {
--			spin_unlock(&server->srv_lock);
--			return 0;
-+	if (rc < 0)
-+		return rc;
-+
-+	/* cifs_reconnect() started (maybe already succeeded), wait for status change */
-+	rc = wait_event_interruptible_timeout(server->response_q,
-+					      (server->tcpStatus != CifsNeedReconnect),
-+					      timeout * HZ);
-+	if (rc < 0)
-+		return rc;
-+
-+	spin_lock(&server->srv_lock);
-+	if (server->tcpStatus != CifsNeedReconnect) {
-+		rc = 0;
-+		if (server->tcpStatus == CifsExiting)
-+			rc = -ESHUTDOWN;
-+	} else {
-+		rc = -ECONNRESET;
-+
-+		/* Are we still even trying to reconnect? */
-+		if (!server->reconnecting) {
-+			cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
-+			rc = -EHOSTDOWN;
- 		}
--		spin_unlock(&server->srv_lock);
--	} while (retry);
-+	}
-+	spin_unlock(&server->srv_lock);
- 
--	cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
--	return -EHOSTDOWN;
-+	return rc;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index bfa8954..ec47457 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -11634,6 +11634,64 @@ bool smb3_is_transform_hdr(void *buf)
+ 	return trhdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM;
  }
+ 
++/*
++ * Validate the session binding of a decrypted message against the
++ * encryption transform SessionId, per MS-SMB2:
++ *  - the message must be at least one fixed SMB2 header;
++ *  - the first operation must not set SMB2_FLAGS_RELATED_OPERATIONS
++ *    and its SessionId must match the transform SessionId;
++ *  - each following operation in a compound chain must either set
++ *    SMB2_FLAGS_RELATED_OPERATIONS or carry the same SessionId;
++ *  - NextCommand offsets must be 8-byte aligned, and the accumulated
++ *    offset must not overflow and must stay inside the message.
++ * Returns 0 on success, -ECONNABORTED on protocol error.
++ */
++static int ksmbd_check_transform_session(struct smb2_hdr *hdr,
++				  unsigned int msg_len, __u64 tr_sess_id)
++{
++	struct smb2_hdr *in_hdr = hdr;
++	bool first = true;
++	u32 off = 0, next;
++
++	if (msg_len < sizeof(struct smb2_hdr)) {
++		pr_err_ratelimited("Decrypted message is smaller than SMB2 header\n");
++		return -ECONNABORTED;
++	}
++
++	for (;;) {
++		if (first) {
++			if (in_hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS) {
++				pr_err_ratelimited("RELATED_OPERATIONS set on first operation\n");
++				return -ECONNABORTED;
++			}
++			if (le64_to_cpu(in_hdr->SessionId) != tr_sess_id) {
++				pr_err_ratelimited("SessionId mismatch between transform and inner header\n");
++				return -ECONNABORTED;
++			}
++			first = false;
++		} else if (!(in_hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS) &&
++			   le64_to_cpu(in_hdr->SessionId) != ULLONG_MAX &&
++			   le64_to_cpu(in_hdr->SessionId) != tr_sess_id) {
++			pr_err_ratelimited("SessionId mismatch in compound chain\n");
++			return -ECONNABORTED;
++		}
++
++		next = le32_to_cpu(in_hdr->NextCommand);
++		if (!next)
++			return 0;
++		if (next % 8) {
++			pr_err_ratelimited("NextCommand %u is not 8-byte aligned\n", next);
++			return -ECONNABORTED;
++		}
++		if (check_add_overflow(off, next, &off) ||
++		    off + sizeof(struct smb2_hdr) > msg_len) {
++			pr_err_ratelimited("NextCommand %u is out of the message\n", next);
++			return -ECONNABORTED;
++		}
++		in_hdr = (struct smb2_hdr *)((u8 *)hdr + off);
++	}
++}
++
+ int smb3_decrypt_req(struct ksmbd_work *work)
+ {
+ 	char *buf = work->request_buf;
+@@ -11641,6 +11699,7 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+ 	struct kvec iov[2];
+ 	int buf_data_size = pdu_length - sizeof(struct smb2_transform_hdr);
+ 	struct smb2_transform_hdr *tr_hdr = smb_get_msg(buf);
++	__le32 proto;
+ 	int rc = 0;
+ 
+ 	if (pdu_length < sizeof(struct smb2_transform_hdr) ||
+@@ -11663,6 +11722,32 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+ 	if (rc)
+ 		return rc;
+ 
++	/*
++	 * The decryption key is selected by the transform header SessionId,
++	 * while the request is authorized under the session named in the
++	 * decrypted inner header. Per MS-SMB2 the two must match, so
++	 * validate the decrypted message before dispatching it.
++	 */
++	proto = ((struct smb2_hdr *)iov[1].iov_base)->ProtocolId;
++	if (proto == SMB2_PROTO_NUMBER) {
++		rc = ksmbd_check_transform_session(
++				(struct smb2_hdr *)iov[1].iov_base,
++				buf_data_size,
++				le64_to_cpu(tr_hdr->SessionId));
++		if (rc)
++			return rc;
++	} else if (proto == SMB2_COMPRESSION_TRANSFORM_ID) {
++		/*
++		 * There is no decompression step after decryption, so a
++		 * compression transform would be dispatched as if it were
++		 * an SMB2 message. ProtocolId is not checked on that path,
++		 * so a crafted transform could be made to run as a valid
++		 * command under any session id in the payload.
++		 */
++		pr_err_ratelimited("Encrypted compression transform is not supported\n");
++		return -ECONNABORTED;
++	}
++
+ 	memmove(buf + 4, iov[1].iov_base, buf_data_size);
+ 	*(__be32 *)buf = cpu_to_be32(buf_data_size);
+ 
 -- 
-2.55.0
+2.53.0
 
