@@ -1,71 +1,39 @@
-Received: from mail-yx2-f13.google.com (mail-yx2-f13.google.com [74.125.224.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-1908.mail.infomaniak.ch (smtp-1908.mail.infomaniak.ch [185.125.25.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311DA4E3248
-	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 17:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FAA4EFFDF
+	for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 19:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790615650; cv=none; b=DYnMsVUxvVrxKBRZso/NB5NtM8/oQ8AUYxjDHv9/l1V3qjf13f1Oq4RCvauddVw8PSjyrmaQo5u1oHcHXYLC8NjOhNeGO7lz1bSXKUj8BX3RXnJDjTZNDHPnp5k4+gub3Bw6R0q3eDoJHoALZFFRxjAPyU68bc0kT7zX2pnbj7w=
+	t=1790623591; cv=none; b=XkaktsQY0M61SakKabXLH38U9WdF5qBIIoPX9dC6WPJ5hFkjmbSoZ/ZgzTafhQDnjU0aMcSnVWsGF1t4/sLoLPDvAB4OIQE9fnwX/hHdnMYLiK3rzbvigxHjZz86fsoRTuur8TO37molTy7XrPcrmxeHxGCC4PB+6D9exwoe8bQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790615650; c=relaxed/simple;
-	bh=MbYUL73La3phT6CWXVxz3A2hkcPLAKJyAdn49kkRKFc=;
+	s=arc-20240116; t=1790623591; c=relaxed/simple;
+	bh=a/fVDOxXWPf4pRO+JMUIkEs0kESCcu/HaVc7rPzOchg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNmtwJS2i20UhVtldQEt/1LkOY6xsWQdgUMZulAv2OmHrBCHZj1547NA8aQ7fJI79KPzO9Hx8YmafTVuCRHzj6IcqF/NLkKVCvCv6qhmCYQpr46j+zPHAKkn3S0vop09VmN+A60Drf6ZlbenUfmrBF0WGFmbWlXfyddyxif3ENY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpEt8Q/R; arc=none smtp.client-ip=74.125.224.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=b9RGiHY1LAxSSBMeE7JWQjz9aQ/t3tpTPefVIw0x5ZK5Mvpp4dxrVMtKHJacFW2imj5XO+AQPMZzoXQOn1sgLl67ultmCmtSstlBANG0VB1m7kf7pIGuX0LrOKtd9A4fuidFpE+SGQ8+bx0ZBytlJvys6hZSiJKAAx9PZfaW5dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=sXM4jCYk; arc=none smtp.client-ip=185.125.25.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpEt8Q/R"
-Received: by mail-yx2-f13.google.com with SMTP id 956f58d0204a3-66e4ab20f4bso3502736d50.0
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 10:14:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790615647; x=1791220447; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MmJ/EW0KwY0F0cm8LaUC3Fhj6N704NFs3EmzLQEffnQ=;
-        b=DpEt8Q/Rtt6CU3VVCy088mlM94gI41xgFL8/OIpF7pLSuO5iZe0mNZsHnYrtDAxXH0
-         hJUBdhVhN4oej1WlPQhTfYlrf8FVZLn/Kqq6kzE7jSdpa5rY1Prk7NIoKnPW7z9n+klw
-         mWAtVjQboIZziiPgP+TY2Bge/YSusfHHOvkSn59MNZR1OAL3agPO+Lq0bqe90fr4z29l
-         BZDEZFONCqNi35OL8P0pUwsiDVQddf++iE7GOXMf2O6JOD4jkWmv+EUpdgqp/9MwXfbE
-         bhVWF7vK2Q+15ah7ydijagIGn6QwcNK70wA1I1/gAJIHvjji3tEm5JUboSICRcvCP8nh
-         fHZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790615647; x=1791220447;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-type:mime-version:references:message-id:subject:cc:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=MmJ/EW0KwY0F0cm8LaUC3Fhj6N704NFs3EmzLQEffnQ=;
-        b=AVwPEYB3TsaHIMZ8Fg3ANuHCiv7tmJkX0o+L4IxoCq5bg7s/DwrnIgHGRe2ldDs36Q
-         z5e/Ksn+fnsIRErgzZ6+ozoDGaldGsB/azjmdl+bosgYU3u/OFaTwE0M8qrdMhDEdQPd
-         5TNuA0WPU64X0iZoueJi2ARxmLPNMMv4t7THhjvEMPUTowihOdB/G//W61DV35WOSapt
-         m9WEe9U3r2HFFZ6yz9sQP8ocOzocRqqioVMoFA4t8SBSajxovb6DFxd52rcugmV2UP1H
-         pVAGHq8xdNFOcuy55CAFdfWHANSMMJaUm6wa4SRKt86i6CLs65iYGIzrPy30i2ytmQat
-         UDRA==
-X-Forwarded-Encrypted: i=1; AKwUvBxMrDzklwshGeOU15+2lpWoYnffzO71vKd076MUQGxV3X0KVZ/5aICoryTvJbFMgv7nJDcg/p/WqU0j@vger.kernel.org
-X-Gm-Message-State: AFq9FYJVOCc1gv4ePUbzaiPBLJyNg7sHWVFN/iX5VpibqTQglw8Ln3ow
-	JSWqTEvr/i6ALDtMPvUedu1mk/NlJuP56JvYj1A5I6aS8FkiIwP9S8gH
-X-Gm-Gg: AYBFou3CXCi5pwXJzWoT5N4hxWkwwQWmLj6lKKnwbbmIKoMQFdk3HKWkT88FU+U4lzO
-	xfYI0GQqucM41/dAaXIyiA5P5R+9MvRHAyfUqaQQhubiG+oqw0feq0QeEny45fg3smOeQ5bYhrs
-	doNK2+gjU33Cz99vwwTrbpJk06xf75kVCfRLx0+eIix0Ow+Jfd23ozuRgPgyVKa0Smc/kpX3CmP
-	1Arh00KTsltxS51mWmLDqfNoOkp+pp8Da2ce0nICvlup3AVMsShvHQhEmVQHnTISV9wiIgVB5Dp
-	DLo55ppYYDfAixLZrllBqthflEk0R0i1+FbfkiM8e1atd7smhNWdLVuNwsOswYIXjLJxqrAb4Ay
-	ot+4kw30A/bYXW8ZWqHWxFg1A8LAXaSDh5QSIaLX1Dt99J3i1dfVU0y6U02FoX/27RF3+fH9BkG
-	CxzgWYAVHn+Lr7sFtGyTS5bckwe4fMHmeDVpKDQEJ095aaLfoGJZYM+u9xfvlpQa5uLRCI6TDdF
-	Dw=
-X-Received: by 2002:a53:ac98:0:b0:671:1398:648d with SMTP id 956f58d0204a3-674111a8a77mr3399078d50.9.1790615647178;
-        Mon, 28 Sep 2026 10:14:07 -0700 (PDT)
-Received: from suesslenovo ([71.132.185.69])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6740ee940a0sm4752038d50.3.2026.09.28.10.14.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Sep 2026 10:14:06 -0700 (PDT)
-Date: Mon, 28 Sep 2026 13:13:35 -0400
-From: Justin Suess <utilityemal77@gmail.com>
-To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>
-Cc: Cai Xinchen <caixinchen1@huawei.com>, mic@digikod.net, 
-	gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com, 
-	corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, 
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="sXM4jCYk"
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4htrrm2x2VzWj0;
+	Mon, 28 Sep 2026 21:26:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1790623575;
+	bh=CrjvvaHMWaKYxoFcBUB4DJe92VZuzwdQ8u7IVRkbMcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sXM4jCYkfSMLVOJD3ZTes7bDu0d+mQkq46RD27THmJWjN2OLGRENiHtu/kk3q9MmY
+	 1rS3gQ42pIxSGI6Jri5E1rvadGfwYZ013Om7EwYKUsN0PhD4mOifCDvQNxdEVSmMKd
+	 jevpWMMN/ZmoE0TF9iizmsTOaz0QYQtwFwzl6pHE=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4htrrF6HTKzphQ;
+	Mon, 28 Sep 2026 21:25:48 +0200 (CEST)
+Date: Mon, 28 Sep 2026 21:25:44 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Justin Suess <utilityemal77@gmail.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
+	Cai Xinchen <caixinchen1@huawei.com>, gnoack@google.com, paul@paul-moore.com, jmorris@namei.org, 
+	serge@hallyn.com, corbet@lwn.net, skhan@linuxfoundation.org, rdunlap@infradead.org, 
 	gregkh@linuxfoundation.org, rafael@kernel.org, dakr@kernel.org, dlemoal@kernel.org, 
 	hch@lst.de, axboe@kernel.dk, viro@zeniv.linux.org.uk, brauner@kernel.org, 
 	jack@suse.cz, dhowells@redhat.com, code@tyhicks.com, linkinjeon@kernel.org, 
@@ -84,10 +52,11 @@ Cc: Cai Xinchen <caixinchen1@huawei.com>, mic@digikod.net,
 	lujialin4@huawei.com
 Subject: Re: [PATCH RFC -next 00/12] landlock: Add READ_METADATA and
  WRITE_METADATA access rights
-Message-ID: <arqcbjWLN1CLkL_Y@suesslenovo>
+Message-ID: <20260928.eithae8Oov4p@digikod.net>
 References: <20260924104831.1081137-1-caixinchen1@huawei.com>
  <araxO4ze0KZBz756@suesslenovo>
  <20260926.255b951d3013@gnoack.org>
+ <arqcbjWLN1CLkL_Y@suesslenovo>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -97,100 +66,128 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260926.255b951d3013@gnoack.org>
+In-Reply-To: <arqcbjWLN1CLkL_Y@suesslenovo>
+X-Infomaniak-Routing: alpha
 
-On Sat, Sep 26, 2026 at 09:56:28AM +0200, Günther Noack wrote:
-> Hello!
-> 
-> On Fri, Sep 25, 2026 at 02:03:05PM -0400, Justin Suess wrote:
-> > On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
-> > > This series adds two new Landlock filesystem access rights,
-> > > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
-> > > which control access to file and directory metadata such as inode
-> > > attributes (mode, ownership, timestamps), extended attributes and POSIX
-> > > ACLs.  It picks up the work from the "landlock: add chmod and chown
-> > > support" series [1] and follows the coarse-grained grouping discussed in
-> > > that thread [2]: instead of separate chmod/chown rights, metadata
-> > > operations are grouped into one read and one write right.
+On Mon, Sep 28, 2026 at 01:13:35PM -0400, Justin Suess wrote:
+> On Sat, Sep 26, 2026 at 09:56:28AM +0200, Günther Noack wrote:
+> > Hello!
+> > 
+> > On Fri, Sep 25, 2026 at 02:03:05PM -0400, Justin Suess wrote:
+> > > On Thu, Sep 24, 2026 at 06:48:19PM +0800, Cai Xinchen wrote:
+> > > > This series adds two new Landlock filesystem access rights,
+> > > > LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA,
+> > > > which control access to file and directory metadata such as inode
+> > > > attributes (mode, ownership, timestamps), extended attributes and POSIX
+> > > > ACLs.  It picks up the work from the "landlock: add chmod and chown
+> > > > support" series [1] and follows the coarse-grained grouping discussed in
+> > > > that thread [2]: instead of separate chmod/chown rights, metadata
+> > > > operations are grouped into one read and one write right.
+> > > > 
+> > > > Landlock evaluates access rights on a per-path basis, but the metadata
+> > > > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
+> > > > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
+> > > > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
+> > > > object.  Patches 1-7 therefore first pass struct path instead of dentry
+> > > > through the metadata-related VFS helpers and LSM hooks.  This is a pure
+> > > > refactoring with no behavior change, split so that every patch builds
+> > > > and works on its own:
+> > > >
+> > > I like these patches, but is the ability to read metadata already
+> > > sorta controlled by LANDLOCK_ACCESS_FS_READ_DIR on the parent
+> > > directory?
 > > > 
-> > > Landlock evaluates access rights on a per-path basis, but the metadata
-> > > related LSM hooks (inode_getattr, inode_setattr, inode_setxattr,
-> > > inode_getxattr, inode_listxattr, inode_removexattr, inode_set_acl,
-> > > inode_get_acl, inode_remove_acl) only receive the dentry of the accessed
-> > > object.  Patches 1-7 therefore first pass struct path instead of dentry
-> > > through the metadata-related VFS helpers and LSM hooks.  This is a pure
-> > > refactoring with no behavior change, split so that every patch builds
-> > > and works on its own:
+> > > The one case I see this being different is:
+> > > 
+> > > 1. if you wanted to grant read access to the file, but not metadata
+> > > read access, but I can't think of any usecase for being able to read
+> > > the contents of a file, but not the metadata. (see below)
+> > > 
+> > > 2. If you had the absolute path already and didn't need READ_DIR.
+> > > 
+> > > I see introducing this READ_METADATA as causing potential
+> > > hard-to-diagnose issues.
+> > > 
+> > > Say you handle READ_METADATA and READ_FILE, but only grant READ_FILE.
+> > > 
+> > > The program can technically open the file with the READ_FILE permission,
+> > > but it may error out because the stat() on it beforehand failed.
+> > > It's pretty common for programs to do that kind of thing (stat before
+> > > open), like for checking for config files (strace bash and you see it
+> > > stat .profile, /etc/profile)
+> > > 
+> > > There may be other bugs, because being able to set permissions to read
+> > > a file *but not read it's metadata* isn't possible currently in posix
+> > > acl and userspace may not work well if that assumption no longer holds.
 > > >
-> > I like these patches, but is the ability to read metadata already
-> > sorta controlled by LANDLOCK_ACCESS_FS_READ_DIR on the parent
-> > directory?
+> * posix acl and linux DAC.
+> 
+> > > So maybe WRITE_METADATA is good enough?
 > > 
-> > The one case I see this being different is:
+> > The existing use cases are the combinations of (a) READ_DIR
+> > allowed/denied and (b) READ_METADATA allowed/denied.  Because these
+> > two access rights overlap slightly, it seems likely that for a given
+> > directory or file, users will want to either grant both, or deny both.
 > > 
-> > 1. if you wanted to grant read access to the file, but not metadata
-> > read access, but I can't think of any usecase for being able to read
-> > the contents of a file, but not the metadata. (see below)
+> > At the moment, where the (not yet existing) READ_METADATA is
+> > implicitly always allowed, the problematic case is the one where the
+> > Landlock user wants to deny READ_DIR, but where much of the same
+> > metadata is still available through stat() and the various
+> > get-attribute syscalls.  (c.f. the warning box in the Landlock docs
+> > [1])
 > > 
-> > 2. If you had the absolute path already and didn't need READ_DIR.
+> > In my view the READ_METADATA right closes a gap that READ_DIR left
+> > open (which is also potentially surprising to callers if they did not
+> > read the docs closely).  Also, if its implementation is symmetric to
+> > WRITE_METADATA, I feel that it's worth having it in the same patch
+> > set.
 > > 
-> > I see introducing this READ_METADATA as causing potential
-> > hard-to-diagnose issues.
+> > –Günther
 > > 
-> > Say you handle READ_METADATA and READ_FILE, but only grant READ_FILE.
-> > 
-> > The program can technically open the file with the READ_FILE permission,
-> > but it may error out because the stat() on it beforehand failed.
-> > It's pretty common for programs to do that kind of thing (stat before
-> > open), like for checking for config files (strace bash and you see it
-> > stat .profile, /etc/profile)
-> > 
-> > There may be other bugs, because being able to set permissions to read
-> > a file *but not read it's metadata* isn't possible currently in posix
-> > acl and userspace may not work well if that assumption no longer holds.
+> > P.S.: I know, even after we can control stat(), there are likely ways
+> > to infer the presence of a file by observing Landlock error codes.
+> > This would be nice to fix as well, but is harder to do without
+> > controlling the path walk itself [2].  But also, the fact that this is
+> > currently not controllable is not an excuse for leaving READ_METADATA
+> > open IMHO.
 > >
-* posix acl and linux DAC.
+> I'm still sort of concerned about the case where read access is allowed,
+> but metadata isn't, due to how many applications will not cleanly handle
+> such an unexpected condition. You can reproduce this with a seccomp
+> policy forbidding stat().
 
-> > So maybe WRITE_METADATA is good enough?
-> 
-> The existing use cases are the combinations of (a) READ_DIR
-> allowed/denied and (b) READ_METADATA allowed/denied.  Because these
-> two access rights overlap slightly, it seems likely that for a given
-> directory or file, users will want to either grant both, or deny both.
-> 
-> At the moment, where the (not yet existing) READ_METADATA is
-> implicitly always allowed, the problematic case is the one where the
-> Landlock user wants to deny READ_DIR, but where much of the same
-> metadata is still available through stat() and the various
-> get-attribute syscalls.  (c.f. the warning box in the Landlock docs
-> [1])
-> 
-> In my view the READ_METADATA right closes a gap that READ_DIR left
-> open (which is also potentially surprising to callers if they did not
-> read the docs closely).  Also, if its implementation is symmetric to
-> WRITE_METADATA, I feel that it's worth having it in the same patch
-> set.
-> 
-> –Günther
-> 
-> P.S.: I know, even after we can control stat(), there are likely ways
-> to infer the presence of a file by observing Landlock error codes.
-> This would be nice to fix as well, but is harder to do without
-> controlling the path walk itself [2].  But also, the fact that this is
-> currently not controllable is not an excuse for leaving READ_METADATA
-> open IMHO.
->
-I'm still sort of concerned about the case where read access is allowed,
-but metadata isn't, due to how many applications will not cleanly handle
-such an unexpected condition. You can reproduce this with a seccomp
-policy forbidding stat().
+I agree that wrong policies could cause userspace to break, but that the
+same for any kind of access control/restriction (e.g. your seccomp
+example).
 
-Would it make sense to have the existing READ rights
-(READ_DIR/READ_FILE) imply READ_METADATA on the files/directories 
-if READ_METADATA is handled? Reading a file's contents should always
-imply that you can read the metadata.
+This series fill a gap which is to forbid access to metadata.  As for
+other kind of access rights, this should be use wisely, and (user space)
+libraries can help.
 
-Thanks,
-Justin
-> [1] https://docs.kernel.org/userspace-api/landlock.html#filesystem-flags
-> [2] https://github.com/landlock-lsm/linux/issues/9
+To be able to deny reading or modifying file's attributes, following the
+Landlock model means to "handle" the related access rights, and
+potentially to add exceptions to that with rules.
+
+Your concern is legitimate and the documentation should warn about this
+case (i.e. most of the time, users should tie READ_FILE with
+READ_METADATA...).
+
+> 
+> Would it make sense to have the existing READ rights
+> (READ_DIR/READ_FILE) imply READ_METADATA on the files/directories 
+> if READ_METADATA is handled? Reading a file's contents should always
+> imply that you can read the metadata.
+
+That would make the kernel code more complex, especially wrt nested
+domains.  However, user space libraries/configurations can make that the
+default.  Anyway, if user space break with this kind of too strict
+policy, I guess it would be quite loud and then fixed quickly.
+
+Also, some tailored user space programs may not need to read metadata.
+
+> 
+> Thanks,
+> Justin
+> > [1] https://docs.kernel.org/userspace-api/landlock.html#filesystem-flags
+> > [2] https://github.com/landlock-lsm/linux/issues/9
+> 
