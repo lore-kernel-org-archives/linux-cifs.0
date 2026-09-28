@@ -1,33 +1,34 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3E3CE4B5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752344F55B5;
 	Mon, 28 Sep 2026 20:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790626189; cv=none; b=e66tUP5pLMHYjURf43cHYQWa0Q8VZy7jECgz+FDatl08vJ6dBkTqD0www2PVkyWUOIIVHFmWXsXR3AxF8smZqYCnqVojgSEp7+juLB8OR6KJjzOZB5AtqH3iXeO8UceHv6NqPRSHdUYAiEzSR3TvtHfgWRaQfa81rUj2+Gv2Tso=
+	t=1790626190; cv=none; b=LG0/IOoGVNSsJrsDQhsKCqobruD0XsvJrTdBjK7WpMSGJ9MCFpByd6jeTdbn05a0KC19tSONGG3+z0H946laTiz8n337CACrXx542WPl82XalCB/XCgntzJ+Pdq9mhbl5H32735P5EyQLRfCmSUjhWjMs9DFOu4h/KHm/qIVQeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790626189; c=relaxed/simple;
-	bh=XQMsBMqLszkcUbZRRAZkipjWwIDWQ5kztILXmcdNqgw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qyV/tRu5zEe+tfEWNUWUs1NxNjV+zlFAgGkr05PlUIT9+a9lOFh6BFRbcAkHDZYdNWM6B+8deTFKoN75rJYCX+wh0uvUz8Nb/78aFekYe5xOCmstYhq12WqqhlH4oI7lfFB/uhC3/2PBbIcnxrX/OCJHgoDuaa5L8r+EuDf9lF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=IQg0ZjqB; arc=none smtp.client-ip=143.255.12.172
+	s=arc-20240116; t=1790626190; c=relaxed/simple;
+	bh=SjfWwRRL78AZq1F8aO5ICjQNnc2qsi7X4g4S9JvrNNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Y/EzPZCEILt8GuI+PmNPv1S4Z+aa4eB6VcQdWzUQ3fXU82yuj/OGryGVTGwGsXBfLG3tL/aQnZsoPGhb0Bu6UKgTxAzfuByV2tWSjtkia2Qf1CuHBGQ3gHrvs/XF54f/dC/HqnARxakIcUf2AslQO524NHJysd521Q3uJde6m9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=OkOCYT/2; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="IQg0ZjqB"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="OkOCYT/2"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
-	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=vI9hnkyTXmIp3v3C49B0iA4VlEHobWDvjNpSEFmIUX0=; b=IQg0ZjqBT515fYp2aL6OeKQZJs
-	uMZ+IdLfqyK7SfzJpBBCLOlN7x83mEl+Rxce6rXIoDNbODlu1cXZVDog+3W9S7JSdApWI6vlTiNix
-	c6zTazdqgBUJXXqvpEAkkJC+vSj182qi3IalOK6wmRKjRw8kT9ETsifu1StaKHa7KdLnrAf4YEcNU
-	nIbYGR90qS2HAYaT4UaAqxd1tTZoiLU2rrrlqNab2SlHNDDxA+je/CwX/sImtN7kjaYtSARfyOzih
-	jOpK4HOn7JtYupPaIILZ9k372bDr3pr+UONqKy02Dty/xBlsHwSkM6p6Zoxca6/cfHa3W5rKBsXib
-	TwPxsdqg==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=iK+XJajufQllYNemxs3SQ/XoqSAgjSfVZ4M9RYI8csY=; b=OkOCYT/2kzgPLc4tgRWhZ5Unzm
+	qz3AZ1WBuOUcrX9D5+JlojIxETeEIeRbqL7W55ChNUUAKtIDnhw6A9O9lu2V4Jz4pCb5zPC1uM0A8
+	fXMZlrfe6r1FfIiaNtQmbq2JLnxasNlcGEzTtuq+tuVeDBdpokG6M38x7Ff5lmMm/Sch5CZoAMF20
+	8bajEAnwDgWnq2CcsabbAdXBc/JCwrOwQxPKBxka+RL5UGYr0UmccJxQeRjYqBn4X1XEWZerCM6X1
+	PWkkyXlbynP8CDQSqhxGaOpoeAp9iX868dNdDC7jQwf5Z8+BycCupRyVl3qh7P/Q6XAMjWCjiKVqA
+	i0ni1FWg==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xBHfK-00000002UIs-2UTu;
-	Mon, 28 Sep 2026 17:09:34 -0300
+	id 1xBHfL-00000002UJ2-1Bkt;
+	Mon, 28 Sep 2026 17:09:35 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev
@@ -38,11 +39,14 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH 00/15] netfs, cifs: data corruption fixes
-Date: Mon, 28 Sep 2026 17:09:19 -0300
-Message-ID: <20260928200934.1040189-1-pc@manguebit.org>
+	Bharath SM <bharathsm@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 02/15] smb: client: clear post-EOF pagecache when extending a file via truncate
+Date: Mon, 28 Sep 2026 17:09:21 -0300
+Message-ID: <20260928200934.1040189-3-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260928200934.1040189-1-pc@manguebit.org>
+References: <20260928200934.1040189-1-pc@manguebit.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -51,87 +55,74 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series fixes a number of data corruption and spurious I/O error
-bugs found by running generic/363 (fsx) in a loop against Windows
-Server 2022 and Samba 4.24 servers.
+cifs_setsize() relied on pagecache_isize_extended() to zero the tail of
+the folio straddling the old EOF, but that helper is a no-op on CIFS
+(i_blkbits is 14), so data dirtied past EOF through an mmap survived and
+became visible once the file was extended.
 
-* Post-EOF pagecache poisoning on extend (1-5)
+When extending, zero the tail of the folio straddling the old EOF with
+netfs_clear_stale_post_eof() instead, mirroring what
+pagecache_isize_extended() does for filesystems with a sub-page block
+size.  Do this before updating i_size so that the helper, which clamps
+its zeroing to the current EOF, zeroes the whole [old_size, offset)
+hole.  truncate_pagecache() is then called as in truncate_setsize(): it
+is essentially a no-op on extend and drops the pagecache beyond the new
+EOF on shrink.
 
-  Data dirtied past EOF through an mmapped region was never discarded,
-  so it reappeared as file content once the file was extended by an
-  ordinary write, a truncate, a zero range, a copy range or a clone
-  range.  pagecache_isize_extended() doesn't help here: it's a no-op on
-  cifs because i_blkbits is 14.  Only the one folio straddling the old
-  EOF can hold such data, since pages wholly beyond EOF can't be
-  faulted in, so each extending path now zeroes or discards that folio.
+Closes: https://sashiko.dev/#/patchset/20260921230755.1133425-1-pc%40manguebit.org
+Fixes: c510edb9734a ("cifs: call pagecache_isize_extended() in cifs_setsize() when extending")
+Reviewed-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Bharath SM <bharathsm@microsoft.com>
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/inode.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-* Missing flush or drain before trusting server or pagecache state (6-9)
-
-  FSCTL_QUERY_ALLOCATED_RANGES can report just-written data as a hole
-  unless it has been committed to disk first, and the O_TRUNC open,
-  interior zero range and server-side copy/clone paths did not flush
-  dirty data or drain in-flight I/O before an operation that assumes
-  the pagecache and the server agree on the file's contents.
-
-* fallocate refused without a read lease (10, 12)
-
-  smb3_zero_range() and smb3_simple_falloc() returned -EOPNOTSUPP for
-  any size-extending request whenever the inode wasn't read caching,
-  since the cached i_size couldn't be trusted.  Query the server's EOF
-  in that case instead of refusing the request outright.
-
-* Short reads leaving stale data behind (11, 13, 14)
-
-  The read-gaps path and the DIO/unbuffered read collector left the
-  untransferred tail of a short read untouched, and cifs could not
-  tell a genuine EOF from a stale cached remote_i_size after a lease
-  downgrade.  A read racing an extending write could come back short
-  and, in the read-gaps case, have that stale folio content written
-  back to the server.
-
-* Unstable pages during a signed write (15)
-
-  cifs signs the pagecache folios in place before handing them to the
-  socket.  A buffered write could modify a folio while a write
-  subrequest built from it was still in flight, so the signature no
-  longer matched the data that followed it; the server answered
-  STATUS_ACCESS_DENIED, which surfaced later as -EIO.
-
-Paulo Alcantara (15):
-  netfs: clear post-EOF pagecache when extending a file via write
-  smb: client: clear post-EOF pagecache when extending a file via
-    truncate
-  smb: client: discard post-EOF pagecache when extending a file via zero
-    range
-  smb: client: discard post-EOF pagecache when extending a file via copy
-    range
-  smb: client: discard post-EOF pagecache when extending a file via
-    clone range
-  smb: client: flush and commit data before querying allocated ranges
-  smb: client: drain outstanding I/O before truncating on O_TRUNC open
-  smb: client: flush dirty data before zeroing a range
-  smb: client: drain and invalidate before server-side copy/clone
-  smb: client: only require read lease for size-extending zero range
-  netfs: zero gaps in read-gaps folio to avoid writing back stale data
-  smb: client: only require read lease for size-extending preallocate
-  netfs: zero the tail of a short DIO/unbuffered read
-  smb: client: distinguish real EOF from a stale remote_i_size on read
-  smb: client: require stable pages for signed connections
-
- Documentation/filesystems/netfs_library.rst | 25 ++++++
- fs/netfs/buffered_read.c                    |  7 ++
- fs/netfs/buffered_write.c                   |  9 ++
- fs/netfs/direct_write.c                     |  9 ++
- fs/netfs/misc.c                             | 71 +++++++++++++++
- fs/netfs/read_collect.c                     | 24 +++++
- fs/smb/client/cifsfs.c                      | 25 +++++-
- fs/smb/client/file.c                        |  2 +
- fs/smb/client/inode.c                       | 19 ++--
- fs/smb/client/smb2ops.c                     | 97 ++++++++++++++++-----
- fs/smb/client/smb2pdu.c                     | 10 ++-
- include/linux/netfs.h                       |  2 +
- 12 files changed, 267 insertions(+), 33 deletions(-)
-
+diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
+index 1fe0ef0a95db..ebc620c166a9 100644
+--- a/fs/smb/client/inode.c
++++ b/fs/smb/client/inode.c
+@@ -3055,13 +3055,20 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
+ 
+ void cifs_setsize(struct inode *inode, loff_t offset)
+ {
+-	loff_t old_size;
++	loff_t old_size = i_size_read(inode);
+ 	u64 blocks = CIFS_INO_BLOCKS(offset);
+ 
++	/*
++	 * When extending, zero the tail of the folio straddling the old EOF
++	 * (before updating i_size) so data dirtied past EOF through an mmap
++	 * isn't exposed.  truncate_pagecache() then drops any pagecache beyond
++	 * the new EOF, as in truncate_setsize().
++	 */
++	if (offset > old_size)
++		netfs_clear_stale_post_eof(inode, old_size, offset, false);
++
+ 	spin_lock(&inode->i_lock);
+-	old_size = i_size_read(inode);
+ 	i_size_write(inode, offset);
+-
+ 	/*
+ 	 * Extending EOF does not allocate the intervening range. Only clamp
+ 	 * i_blocks on shrink; allocation growth comes from writes or from the
+@@ -3071,8 +3078,7 @@ void cifs_setsize(struct inode *inode, loff_t offset)
+ 		inode->i_blocks = blocks;
+ 	spin_unlock(&inode->i_lock);
+ 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
+-	if (offset > old_size)
+-		pagecache_isize_extended(inode, old_size, offset);
++
+ 	truncate_pagecache(inode, offset);
+ 	netfs_wait_for_outstanding_io(inode);
+ }
 -- 
 2.55.0
 
