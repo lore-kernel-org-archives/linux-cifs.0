@@ -1,70 +1,79 @@
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7575923394A
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 17:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495CC39CD0F
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 17:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790701456; cv=none; b=nZjxjG3aH7c09NW/K5LiQ+YDcSm0OuoZaCm6bJXDGL/q821OC+Tt1j23uiEGNpRTBePdqWJU7NJU4gnuEwBme15yeJ+do1+pwUY/541gNM1Pzyj4qyN033kWZ8pxnh9okFlKlW7FA5yCcpzl7sKrpfxtW+/FjKVqelsKP+/dm1w=
+	t=1790701464; cv=none; b=GtDllMcjqW1KF62tl7GThzRp5SIWcl6Mm/4jSbyuJtju83kN/9nFMHTnqSyYLeTkfzvvGXSZfXa3Z5KPwfs0XyA2GNo9porxA4vE1r15cz13XbCGrnNZ0reyV5nh/lAiCNLCQGakCIJjsqM6q2+3GlMg81JdsKJ3zo2UExwIUHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790701456; c=relaxed/simple;
-	bh=vey49p4bSUVQvZUtkwa/9CLWyq2qXDJL+5sqHlmgf0I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gb3nbw5HHvcGmSMbmKpz69ylki/gCdih8CQkG/aW3yVqyCw9Li7byv3THb0kus4Pp/gRRMUjvawYImk0tyfxVa6kNTRM8QHj9NIzR8sIxmc6v3Q65PSoTXjGtF9JFpSEAl2vON26jdZOVWePoFOHr2mDQDJebMksxdmNvUKGse4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZEocSyCY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JnmEQBaz; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=g4Rs3b6e; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vgJhb4mY; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1790701464; c=relaxed/simple;
+	bh=9ZAIDxmF52/QJFskq9LArcN4k1mro7eMy7yU9XqV3vE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Dx8E3uDf2Wz5NQl9tkwkvYgOR6peeAxZywc/n1hmuuqB+uJsiwAxMP7muJipk820g16T0240KnDTFYHSZKiKkOGmHVot//qAT+3u6KeJJsKpzWbDkfKDWilEUfENnZDSMwTaaSd4ccOmT/y68ph2ojGZtBrKjzSLlZ6TkPk+f1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ejn38D0f; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=w92cNglG; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=QU8IwR5b; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=yCEBB3q1; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZEocSyCY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JnmEQBaz";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="g4Rs3b6e";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vgJhb4mY"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ejn38D0f";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="w92cNglG";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="QU8IwR5b";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="yCEBB3q1"
 Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AF2FB21D5C;
-	Tue, 29 Sep 2026 17:04:03 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C888B21D57;
+	Tue, 29 Sep 2026 17:04:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790701447; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=vP19ikey4TPnipyaX04mHvjM+G/EY/7ioThtw74+zsU=;
-	b=ZEocSyCYqKD1ji7ewqTZ51tQKsaHIQHiGl3tZ02rHJJDPX6TUCg1bifXYrqJAIbVn0leg+
-	CHZG0fmxbRQtvM5S5JG2sDKsl/ek9SRPL1V3GNzcXbE4vwiJfxp8L3sUK52udqse2Kfgjs
-	iZbTiQqwILFOh9ATCy4YTIbGN9jz2Ug=
+	t=1790701456; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1lekT6HQvaKPMxogk7uH5chLlIHHy/aR6KGIDhic1o=;
+	b=ejn38D0faTwsvSm1XZA13L0BumPaUfd3WnAA0GptAyITdtfFTAu1pCwBYrAQHhadEQX2GK
+	3vqZ/qRILbWMJ8z9cXuQ2m5Bam+GC5TKlK2M/XuDXYY3N2FXYgBz4h/M1zh7DWzkZqyFV9
+	qJJobDsTLw9hDJdLy9DJyVm0/PFkH04=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790701447;
+	s=susede2_ed25519; t=1790701456;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=vP19ikey4TPnipyaX04mHvjM+G/EY/7ioThtw74+zsU=;
-	b=JnmEQBaz+Z8SrMNNH1RUCEdjGfC/2CG1+yXOiZbJrMJHrXrkMBMpQWamdV7h7n/lWHMF1l
-	JjFjcrc3atT4NaAw==
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1lekT6HQvaKPMxogk7uH5chLlIHHy/aR6KGIDhic1o=;
+	b=w92cNglGZ5QkVIsOscjlGUul8WSPUBaqvupjSwPqiRq9AjGu90D8D2Lpywtu7h5nUSkafF
+	Ghod6UT+u6QRcTCg==
 Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=g4Rs3b6e;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=vgJhb4mY
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=QU8IwR5b;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=yCEBB3q1
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790701443; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=vP19ikey4TPnipyaX04mHvjM+G/EY/7ioThtw74+zsU=;
-	b=g4Rs3b6eLLrEWstPY/yM3r72B9B3hwAKVF9tIWyJ43ygveOiVF77WBKjRVa3lkEAszk5Uc
-	5N26FOMnXnfuWdG8hHZuVIsvXrpK0yAZEVRQ62nS2jA+7Jw0KU02zgtOX9hUOUmZ4unn9o
-	0LBxTKlLG4eE7rQhfGD3eFIo7NJmShw=
+	t=1790701451; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1lekT6HQvaKPMxogk7uH5chLlIHHy/aR6KGIDhic1o=;
+	b=QU8IwR5bHVpE42i0L6EUS9jjnstUXOso8aj6nNQFGxFX/QPIc80/TTAASXoihhl7EEuLt/
+	Gn6qwMd98l689nSWV2h8SZgwVThuTSP1LfCbEcpx1tJ658MFxuTqaEYC4xzbZ/1Lj6Uox9
+	EWVjU73VXbJJw0vQgShfH0MsAe2ACRo=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790701443;
+	s=susede2_ed25519; t=1790701451;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=vP19ikey4TPnipyaX04mHvjM+G/EY/7ioThtw74+zsU=;
-	b=vgJhb4mYhaGIX9xHXBxuToYUIU6Lv/6TPX310atGe2NoXNEHIUZRi5dIEU4xwxAUavSX/M
-	0Q/6Rma2yhmA16Cg==
+	 mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1lekT6HQvaKPMxogk7uH5chLlIHHy/aR6KGIDhic1o=;
+	b=yCEBB3q1P+LHjbrM8xH/+vEEp5tL7ZTZsMO58aP6Mty9PKY6Dsapd6zAihSupxCEkF0nYa
+	7Uq4J40CdlAELtBQ==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 161AE133F1;
-	Tue, 29 Sep 2026 17:04:02 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id DA804136D1;
+	Tue, 29 Sep 2026 17:04:10 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Zzi9JoLvu2pMCAAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 29 Sep 2026 17:04:02 +0000
+	id h6GxGorvu2pZCAAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Tue, 29 Sep 2026 17:04:10 +0000
 From: Enzo Matsumiya <ematsumiya@suse.de>
 To: linux-cifs@vger.kernel.org
 Cc: pc@manguebit.org,
@@ -75,10 +84,12 @@ Cc: pc@manguebit.org,
 	bharathsm@microsoft.com,
 	henrique.carvalho@suse.com,
 	Enzo Matsumiya <ematsumiya@suse.de>
-Subject: [PATCH v3 1/2] smb: client: fast fail sends if need to reconnect
-Date: Tue, 29 Sep 2026 14:03:57 -0300
-Message-ID: <20260929170358.270612-1-ematsumiya@suse.de>
+Subject: [PATCH v3 2/2] smb: client: prevent premature discard of requests if reconnecting
+Date: Tue, 29 Sep 2026 14:03:58 -0300
+Message-ID: <20260929170358.270612-2-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260929170358.270612-1-ematsumiya@suse.de>
+References: <20260929170358.270612-1-ematsumiya@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -105,7 +116,7 @@ X-Spamd-Result: default: False [-3.01 / 50.00];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
 	RCVD_TLS_ALL(0.00)[];
 	FROM_HAS_DN(0.00)[];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid];
+	URIBL_BLOCKED(0.00)[suse.de:dkim,suse.de:email,suse.de:mid,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
 	RCPT_COUNT_SEVEN(0.00)[9];
 	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:email,suse.de:mid];
 	TO_DN_SOME(0.00)[];
@@ -114,174 +125,202 @@ X-Spamd-Result: default: False [-3.01 / 50.00];
 X-Spam-Score: -3.01
 X-Spam-Level: 
 X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: AF2FB21D5C
+X-Rspamd-Queue-Id: C888B21D57
 X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 X-Spam-Flag: NO
 
-smb_send_kvec() keeps retrying when server needs to reconnect, which
-makes no sense as cifs_reconnect() will never run in parallel (because
-both need server mutex).
-IOW, retrying will never succeed, but only delay reconnects further.
+Add TCP_Server_Info::reconnecting to track cifs_reconnect() lifetime.
+Wait for it to be true in cifs_wait_for_server_reconnect(), and only
+then wait for tcpStatus change.
 
-Bail out early from smb_send_kvec() when need to reconnect.
+Also, return -ECONNRESET (instead of -EHOSTDOWN) if reconnect is still
+ongoing at the end, so requests are not discarded unnecessarily;
+-ECONNRESET is not immediately retried by intermediate layers, e.g. VFS
+or netfs, but still serves as an indication to userspace that retrying
+the operation might be successful.
 
-Also shutdown socket queues when CifsNeedReconnect is first detected,
-so any sends/receives fails immediately (and don't wait for socket to
-timeout).
-
-Add TCP_Server_Info::need_sock_shutdown to ensure socket is shutdown
-only once.
-
-kernel_sock_shutdown() will be called from whichever task detects it
-first;  cifsd (cifs_tcp_ses_needs_reconnect()), or sending tasks,
-through cifs_call_async() or compound_send_recv().
+Changes (refactor cifs_wait_for_server_reconnect()):
+- remove unnecessary do/while loop; use wait_event_interruptible()
+  for hard mounts
+- increase timeout, and base it on echo_interval to match user
+  preferences
+- remove useless debug log for interrupt errors
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 ---
-v2 -> v3 (patch refactor, change strategy but keep concept):
-- remove TCP_Server_Info::mutex_owner (covers sashiko report)
-- shutdown socket directly from sender functions (when need to reconnect)
-- bail out from smb_send_kvec() when need to reconnect only if rc <= 0
-  (from sasiko report)
+v2 -> v3:
+- handle CifsExiting status on hard mounts (from sashiko report)
 
 v1 -> v2 (fix issues detected by sashiko):
-- move kernel_sock_shutdown() call out of cifs_tcp_ses_lock
-- use server mutex to check/shutdown socket
+- handle condition changes post-wait_event timeouts
+- return -ECONNRESET instead of -EAGAIN when leaving still reconnecting
 
-
- fs/smb/client/cifsglob.h  |  1 +
- fs/smb/client/connect.c   | 22 +++++++++++++++++++---
- fs/smb/client/transport.c | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 50 insertions(+), 3 deletions(-)
+(not from sashiko):
+- add missing wake_up() after setting server->reconnecting to true in
+  cifs_tcp_ses_needs_reconnect()
+- handle tcpStatus == CifsExiting in cifs_wait_for_server_reconnect()
+ fs/smb/client/cifsglob.h |  1 +
+ fs/smb/client/connect.c  |  4 ++
+ fs/smb/client/misc.c     | 94 ++++++++++++++++++++++++++++------------
+ 3 files changed, 72 insertions(+), 27 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 79e4e84f8985..e49140d5c4a4 100644
+index e49140d5c4a4..61191a167b89 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -802,6 +802,7 @@ struct TCP_Server_Info {
- 	bool	posix_ext_supported;
+@@ -803,6 +803,7 @@ struct TCP_Server_Info {
  	struct delayed_work reconnect; /* reconnect workqueue job */
  	struct mutex reconnect_mutex; /* prevent simultaneous reconnects */
-+	bool need_sock_shutdown; /* true when CifsNeedReconnect was first set by non-cifsd task */
+ 	bool need_sock_shutdown; /* true when CifsNeedReconnect was first set by non-cifsd task */
++	bool reconnecting; /* if cifs_reconnect() is indeed running */
  	unsigned long echo_interval;
  
  	/*
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 28e1ddeb6182..733d50b042fd 100644
+index 733d50b042fd..8ea60965ae06 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -126,12 +126,14 @@ void smb2_query_server_interfaces(struct work_struct *work)
- 	queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
- 			   (SMB_INTERFACE_POLL_INTERVAL * HZ));
- }
--
- #define set_need_reco(server) \
- do { \
- 	spin_lock(&server->srv_lock); \
--	if (server->tcpStatus != CifsExiting) \
-+	if (server->tcpStatus != CifsExiting) { \
-+		if (server->tcpStatus != CifsNeedReconnect) \
-+			server->need_sock_shutdown = true; \
- 		server->tcpStatus = CifsNeedReconnect; \
-+	} \
- 	spin_unlock(&server->srv_lock); \
- } while (0)
- 
-@@ -353,6 +355,8 @@ cifs_abort_connection(struct TCP_Server_Info *server)
- 
- static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num_targets)
- {
-+	bool shutdown;
-+
- 	spin_lock(&server->srv_lock);
- 	server->nr_targets = num_targets;
- 	if (server->tcpStatus == CifsExiting) {
-@@ -365,9 +369,21 @@ static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num
- 	cifs_dbg(FYI, "Mark tcp session as need reconnect\n");
- 	trace_smb3_reconnect(server->current_mid, server->conn_id,
- 			     server->hostname);
--	server->tcpStatus = CifsNeedReconnect;
- 
-+	/* Cover cases where sender tasks didn't manage to shutdown the socket for some reason */
-+	shutdown = (server->tcpStatus != CifsNeedReconnect || server->need_sock_shutdown);
-+	server->need_sock_shutdown = false;
-+	server->tcpStatus = CifsNeedReconnect;
+@@ -374,6 +374,8 @@ static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num
+ 	shutdown = (server->tcpStatus != CifsNeedReconnect || server->need_sock_shutdown);
+ 	server->need_sock_shutdown = false;
+ 	server->tcpStatus = CifsNeedReconnect;
++	server->reconnecting = true;
++	wake_up(&server->response_q);
  	spin_unlock(&server->srv_lock);
+ 
+ 	if (shutdown) {
+@@ -457,6 +459,7 @@ static int __cifs_reconnect(struct TCP_Server_Info *server,
+ 	spin_lock(&server->srv_lock);
+ 	if (server->tcpStatus == CifsNeedNegotiate)
+ 		mod_delayed_work(cifsiod_wq, &server->echo, 0);
++	server->reconnecting = false;
+ 	spin_unlock(&server->srv_lock);
+ 
+ 	wake_up(&server->response_q);
+@@ -599,6 +602,7 @@ static int reconnect_dfs_server(struct TCP_Server_Info *server)
+ 	spin_lock(&server->srv_lock);
+ 	if (server->tcpStatus == CifsNeedNegotiate)
+ 		mod_delayed_work(cifsiod_wq, &server->echo, 0);
++	server->reconnecting = false;
+ 	spin_unlock(&server->srv_lock);
+ 
+ 	wake_up(&server->response_q);
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 05168284f205..3fa4e36aac32 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1077,44 +1077,84 @@ int cifs_inval_name_dfs_link_error(const unsigned int xid,
+ 
+ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry)
+ {
+-	int timeout = 10;
+-	int rc;
++	int timeout, rc = 0;
+ 
+ 	spin_lock(&server->srv_lock);
+ 	if (server->tcpStatus != CifsNeedReconnect) {
++		if (unlikely(server->tcpStatus == CifsExiting))
++			rc = -ESHUTDOWN;
+ 		spin_unlock(&server->srv_lock);
+-		return 0;
 +
-+	if (shutdown) {
-+		cifs_server_lock(server);
-+		if (server->ssocket)
-+			/* Don't release it here/yet! */
-+			kernel_sock_shutdown(server->ssocket, SHUT_RDWR);
-+		cifs_server_unlock(server);
++		return rc;
 +	}
 +
- 	return true;
- }
++	/* Hard mounts keep waiting until process is killed or server comes back on-line. */
++	if (retry) {
++		spin_unlock(&server->srv_lock);
++
++		return wait_event_interruptible(server->response_q,
++						(server->tcpStatus != CifsNeedReconnect));
+ 	}
+-	timeout *= server->nr_targets;
++
++	/*
++	 * Soft mounts, wait with timeout.
++	 * Compute timeout based on echo_interval, to match user expectations wrt. time to recover
++	 * from network interruptions.
++	 *
++	 * Minimum is 17 seconds (per reconnect target):
++	 *   7s for cifs socket timeout
++	 *   3s sleep after a failed attempt
++	 *   7s spare, to cover at least a full attempt
++	 *
++	 * Maximum is 60s; might not be enough in some rare cases, but >60s is too much.
++	 */
++	timeout = max(server->echo_interval / HZ, 17) * server->nr_targets;
++	timeout = min(timeout, 60);
+ 	spin_unlock(&server->srv_lock);
  
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 6e21b5f8754a..a1ae8548cf16 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -179,7 +179,18 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
- 		 * to avoid unnecessary reconnects.
- 		 */
- 		rc = sock_sendmsg(ssocket, smb_msg);
-+
-+		/*
-+		 * If need to reconnect, blame it for any non-interrupt error and bail out early,
-+		 * even if -EAGAIN;  reconnect will never happen in parallel as cifs_reconnect()
-+		 * needs server mutex (which we're already holding), so it's pointless to retry.
-+		 */
-+		if (unlikely(rc <= 0 && server->tcpStatus == CifsNeedReconnect &&
-+			     !is_interrupt_error(rc)))
-+			return -ECONNRESET;
-+
- 		if (rc == -EAGAIN || unlikely(rc == -EINTR && task_work_pending(current))) {
-+
- 			retries++;
- 			if (retries >= 14 ||
- 			    (!server->noblocksnd && (retries > 2))) {
-@@ -654,6 +665,23 @@ int wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 	return 0;
- }
+ 	/*
+-	 * Give demultiplex thread up to 10 seconds to each target available for
+-	 * reconnect -- should be greater than cifs socket timeout which is 7
+-	 * seconds.
++	 * First, wait for cifs_reconnect() to start.
++	 * This is needed because tcpStatus == CifsNeedReconnect doesn't imply cifs_reconnect()
++	 * is actually running.
+ 	 *
+-	 * On "soft" mounts we wait once. Hard mounts keep retrying until
+-	 * process is killed or server comes back on-line.
++	 * Wait 3*timeout (max 180s) here, which should be more than enough.
+ 	 */
+-	do {
+-		rc = wait_event_interruptible_timeout(server->response_q,
+-						      (server->tcpStatus != CifsNeedReconnect),
+-						      timeout * HZ);
+-		if (rc < 0) {
+-			cifs_dbg(FYI, "%s: aborting reconnect due to received signal\n",
+-				 __func__);
+-			return -ERESTARTSYS;
+-		}
++	rc = wait_event_interruptible_timeout(server->response_q,
++					      (server->reconnecting ||
++					       server->tcpStatus != CifsNeedReconnect),
++					      min(3 * timeout, 180) * HZ);
  
-+static inline void cond_sock_shutdown(struct TCP_Server_Info *server)
-+{
-+	bool shutdown;
-+
-+	lockdep_assert_held(&server->_srv_mutex);
-+
+-		/* are we still trying to reconnect? */
+-		spin_lock(&server->srv_lock);
+-		if (server->tcpStatus != CifsNeedReconnect) {
+-			spin_unlock(&server->srv_lock);
+-			return 0;
++	/* cifs_reconnect() never started, don't wait any longer */
 +	spin_lock(&server->srv_lock);
-+	/* No need to check status, need_sock_shutdown is only set if CifsNeedReconnect */
-+	shutdown = (server->need_sock_shutdown && server->ssocket);
-+	server->need_sock_shutdown = false;
++	if (!rc && !server->reconnecting && server->tcpStatus == CifsNeedReconnect)
++		rc = -EHOSTDOWN;
 +	spin_unlock(&server->srv_lock);
 +
-+	if (shutdown)
-+		/* Don't release it here/yet! */
-+		kernel_sock_shutdown(server->ssocket, SHUT_RDWR);
-+}
++	if (rc < 0)
++		return rc;
 +
- /*
-  * Send a SMB request and set the callback function in the mid to handle
-  * the result. Caller is responsible for dealing with timeouts.
-@@ -724,6 +752,7 @@ cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
- 		revert_current_mid(server, mid->credits);
- 		server->sequence_number -= 2;
- 		delete_mid(server, mid);
-+		cond_sock_shutdown(server);
- 	}
- 
- 	cifs_server_unlock(server);
-@@ -982,6 +1011,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 			delete_mid(server, mid[i]);
- 			cancelled_mid[i] = true;
++	/* cifs_reconnect() started (maybe already succeeded), wait for status change */
++	rc = wait_event_interruptible_timeout(server->response_q,
++					      (server->tcpStatus != CifsNeedReconnect),
++					      timeout * HZ);
++	if (rc < 0)
++		return rc;
++
++	spin_lock(&server->srv_lock);
++	if (server->tcpStatus != CifsNeedReconnect) {
++		rc = 0;
++		if (server->tcpStatus == CifsExiting)
++			rc = -ESHUTDOWN;
++	} else {
++		rc = -ECONNRESET;
++
++		/* Are we still even trying to reconnect? */
++		if (!server->reconnecting) {
++			cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
++			rc = -EHOSTDOWN;
  		}
-+		cond_sock_shutdown(server);
- 	}
+-		spin_unlock(&server->srv_lock);
+-	} while (retry);
++	}
++	spin_unlock(&server->srv_lock);
  
- 	cifs_server_unlock(server);
+-	cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
+-	return -EHOSTDOWN;
++	return rc;
+ }
 -- 
 2.55.0
 
