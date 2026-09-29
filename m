@@ -1,185 +1,223 @@
-Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DA18C1F;
-	Tue, 29 Sep 2026 06:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.71.155.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8F3AF644
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 07:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790662820; cv=none; b=ncTs5zFjROCmQmP2tByNzn3y3H5yMVLCDbnyPn5cgOx/X8olAHwbzcAcgHZDdYL9svr9Q3SGJwWGjtfhatUTChUNAfWCPXTea4rS1lRwjlw4sWkHigzm44QJFJ3pUD9HjITRxu21uaMm3zSPdKFJnoWVLk2qS3Mn/9KKEx07t7E=
+	t=1790668778; cv=none; b=phMEg+NGi0OQ4ojv3YytRraQFTF+ao+rIqGu7bIlHpBYY7PUffRNl9vSKiijA2V/n345mvncgzmp/Kh1uXQwIwaZnRLNFf4Oa8UZ84Pn2nogC3ujqH8PIqxUc93Wpps3hE4u4Q4HFb+4IZVHz35G+6CNQJhtlApJjWe9L42++lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790662820; c=relaxed/simple;
-	bh=DiDjwLgUJ2Ga1RJ/uPunNLpMVJhlYSR0X/a/1aZUwzE=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=eb6ywL+mobBHALFDVDYgXZ0a0oDWp69yKsgQ/Ka7+GO7P+t1q25AJuFYtLQzCoBBRLzSx5lj52oxQKriqptgBnZjcvaOqAqJ2xj1qYCn8xDHahlpVuvJClzbTLG+LRU35DO1TfNXrPBDOSdZEPJeFqz30nK0Kh4yQPeyDhSZ8Yc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn; spf=pass smtp.mailfrom=stu.pku.edu.cn; dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b=KGs3PoTh; arc=none smtp.client-ip=101.71.155.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
+	s=arc-20240116; t=1790668778; c=relaxed/simple;
+	bh=5YrHK4cctkzRIfTGun0k2AbKHxc2EmK5N7diHcBB30o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PzgyR5yVvGqUXtbjGQQxQQjMaBHEr4p66EOgJalE7CQhw8oCE82v+f5MuEMaFTnZUkhqeZ0wBfk2Y8xiJctoTs/XFN9Zb/Elh+2qmdZREtY0BAZ3U3zJyLFFstVh9xGNny9KQPJYtqDcC+1/1QlfJ882xLqoTKINjZ4HuDvEKhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K2TdPBaK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.b="KGs3PoTh"
-Received: from smtpclient.apple (unknown [IPV6:240e:305:1b9d:c000:ac22:2543:5288:8f9b])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 4f7471ea5;
-	Tue, 29 Sep 2026 14:20:10 +0800 (GMT+08:00)
-From: Yuanfu Xie <yuanfuxie@stu.pku.edu.cn>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2TdPBaK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790668775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KKrMTjP0ZLGqrXdItKkwrT0On91XxEvvcqwyjevqycI=;
+	b=K2TdPBaKkadqcyI1GO5fuSVRU3uvkWZRL93Vwwj0CIZ7z/x0rJuTfOSnzwePWK2gsvCtSd
+	m0Y42iRVC6bNSJJdtoDqsoNFhesTDT+URHVC8X4pxnDwJxhd+1eYQYcheQK4+odL4/aPbk
+	ADPQQYi3yRk3r0LIxrpWOd8jfFWRfCA=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-15-PGUjv593MZu1j53VLEIq2A-1; Tue,
+ 29 Sep 2026 03:59:31 -0400
+X-MC-Unique: PGUjv593MZu1j53VLEIq2A-1
+X-Mimecast-MFC-AGG-ID: PGUjv593MZu1j53VLEIq2A_1790668769
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E1E8B1944EBE;
+	Tue, 29 Sep 2026 07:59:27 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.54])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D7EF71956042;
+	Tue, 29 Sep 2026 07:59:20 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v12 00/10] netfs, cachefiles: Changes for next, primarily occupancy tracking-related
+Date: Tue, 29 Sep 2026 08:59:01 +0100
+Message-ID: <20260929075913.2740968-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3901.100.1.1.11\))
-Subject: [PATCH] smb: client: fix WARN_ON_ONCE() on malformed NFS reparse
- points
-Message-Id: <5B8D9C32-9B93-49DB-B817-B6921BC0737F@stu.pku.edu.cn>
-Date: Tue, 29 Sep 2026 14:19:59 +0800
-Cc: Ralph Boehme <slow@samba.org>,
- Steve French <stfrench@microsoft.com>,
- linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org,
- linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-To: Paulo Alcantara <pc@manguebit.org>,
- Namjae Jeon <linkinjeon@kernel.org>
-X-Mailer: Apple Mail (2.3901.100.1.1.11)
-X-HM-Tid: 0aa0ebd21ad803a1kunmde6cf84d229a07
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCGE9OVkxNHklOSB8fQ05IQlYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJT0seQUhLTkFKGUIfQRhLS0tBGhhJSUFJTk9IQU5JQ0NBQx
-	1CGVlXWRYaDxIVHRRZQVlPS0hVSktISk5MTlVKS0tVSkJLS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=KGs3PoTh+CHd3oEK/for3YnbviNUM7TPswaFQYM4Of18QA/NwPkakAX/Xsel90JA5XvhswD/Y1HycOgsLMg2BGM0DL6nIHos5vpO5INtTTT5sIAC9GaKAb34to1aOnG9ltDZih7TvKRqKZ/GTMnRG0e+FtUqdpLaT1uLjiiSdN8=; c=relaxed/relaxed; s=default; d=stu.pku.edu.cn; v=1;
-	bh=ybllncL2MRfyw/3gcGbfE8GCLH4Ev9bS9SqdG450J68=;
-	h=date:mime-version:subject:message-id:from;
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-posix_reparse_to_fattr() re-checks fields taken straight from an
-on-the-wire reparse_nfs_data_buffer and hits WARN_ON_ONCE() when
-ReparseDataLength is too short or does not match the inode type, or
-when the NFS inode type is unknown.
+Hi Christian,
 
-A malicious or buggy server can trigger any of the four warnings
-with a plain stat() on a single name: parse_reparse_nfs() reports
-the problem and rejects the buffer (-EIO or -EOPNOTSUPP), but
-reparse_info_to_fattr() still builds the inode attributes from the
-rejected buffer via cifs_open_info_to_fattr(), and
-posix_reparse_to_fattr() warns on the very same server-controlled
-data.  With panic_on_warn this takes the whole system down.
+Could you pull these patches please into your vfs-7.4.netfs branch?  This
+is the third of four (maybe five) batches, in this case replacing the
+folio_queue struct with a bvecq struct, and is based upon the
+aforementioned branch.  This was split from v11 of a larger netfslib
+series[1].
 
-parse_reparse_nfs() already logs each of these conditions, so fail
-quietly instead of warning, without changing the existing error and
-fallback behaviour.
+This series adds a new type, struct bvecq.  This points to a bounded array
+of bio_vecs with information about how to clean up the memory they point
+to.  A number of bvecq structs can be linked together to form a chain and
+an iterator type, ITER_BVECQ, is provided that can be pointed at the chain
+and can walk it.  Netfslib is then switched to use the new type and
+folio_queue is removed along with ITER_FOLIOQ.
 
-Triggered on v6.13+ with panic_on_warn=3D1 by stat()ing a name for
-which the server returns a CREATE response carrying
-SMB2_CREATE_FLAG_REPARSE_POINT and FILE_ATTRIBUTE_REPARSE_POINT and
-answers the following FSCTL_GET_REPARSE_POINT with an NFS reparse
-buffer holding an unknown inode type (e.g. 0xdeadbeef):
+This is intended as a more flexible replacement for struct folio_queue as
+the latter can only point to whole folios and cannot point to partial pages
+that might be extracted from an ITER_IOVEC/ITER_UBUF for direct or
+unbuffered I/O purposes.
 
-  CIFS: VFS: parse_reparse_nfs: unhandled inode type: 0xdeadbeef
-  ------------[ cut here ]------------
-  WARNING: fs/smb/client/reparse.c:1267 at
-  cifs_reparse_point_to_fattr+0xd4e/0x1080
-  CPU: 0 UID: 0 PID: 896 Comm: stat Tainted: G  N  =
-7.3.0-rc4-00537-ga3ff15db6820
-  ...
-  Call Trace:
-   cifs_open_info_to_fattr+0xa87/0x1520
-   reparse_info_to_fattr+0x5d1/0xdc0
-   cifs_get_fattr+0xa1d/0x1910
-   cifs_get_inode_info+0xc0/0x310
-   cifs_lookup+0x3a8/0xbd0
-   ...
-   vfs_fstatat+0x77/0xe0
-   __do_sys_newfstatat+0x97/0x120
+These patches make a more or less straight swap between struct folio_queue
+and struct bvecq.  The change is not quite trivial as the folio_queue
+struct contains a folio_batch struct and is basically a list of whole
+folios only, whereas the new bvecq struct is a chain of bio_vec arrays.
 
-Cc: stable@vger.kernel.org
-Fixes: 6a832bc8bbb223 ("fs/smb/client: Implement new SMB3 POSIX type")
-Signed-off-by: Yuanfu Xie <yuanfuxie@stu.pku.edu.cn>
----
+A further patchset will switch the netfslib unbuffered I/O code to using
+bvecqs and then the bvecqs will be passed down into the filesystem rather
+than passing an iterator.
 
-Hi Paulo, Namjae,
+The primary reason behind making this change is so that bvecq chains can be
+used in the assembly of network filesystem messages.  Netfslib can furnish
+the filesystem with bvecq chains representing the data buffers that need to
+be read or written and then, for example, for a write RPC, the filesystem
+can add protocol headers and trailers onto the chain without the need to
+copy it and can also glue multiple buffers together to form compound
+operations and/or perform sparse operations.
 
-found this while testing a CIFS client against a server under my
-control, so I'm sending the fix directly.  Some notes that did
-not belong in the commit message:
+One option here is to add two more fields to the bvecq struct, one to
+increase the offset of the first bio_vec and one to decrease the length of
+the last, thereby allowing a bvecq struct to point at a slice of another
+bio_vec array without having to copy the array - but at the cost of adding
+one or two extra conditional ops when getting the offset or length of a
+segment.
 
-Still present in mainline v7.3-rc5 as of 2026-09-29; the code
-shape first shipped in v6.13.  A numbered recipe for the trigger
-described in the commit message, on a v6.13+ client with
-panic_on_warn=3D1:
+I have in-progress patch sets to rewrite the cifs transport[2] and the ceph
+and rbd transport[3] to make use of bvecq chains.  With the cifs transport,
+the idea is to extend the SMB message concept further up the stack and have
+the PDU creation routines attach individual RPC requests blobs that can
+then be automatically chained by the transport when a compound is being
+assembled for transmission.
 
-  1. mount a CIFS share from a server you control;
-  2. answer the client's SMB2 CREATE for some name with
-     STATUS_SUCCESS, SMB2_CREATE_FLAG_REPARSEPOINT and
-     FILE_ATTRIBUTE_REPARSE_POINT;
-  3. answer the following FSCTL_GET_REPARSE_POINT with an NFS
-     (IO_REPARSE_TAG_NFS) reparse buffer whose InodeType is none
-     of the NFS_SPECFILE_* values, e.g. 0xdeadbeef;
-  4. stat() that name.
+With the ceph transport, the idea is to convert all the different data
+containers it has into just passing around bvecqs.  These can then be
+chained together in order to transmit them.
 
-Shrinking ReparseDataLength below sizeof(InodeType), or setting
-InodeType to NFS_SPECFILE_CHR/BLK with a wrong trailing length,
-reaches the other three warnings the same way.
+This improves efficiency in the TCP stack as we no longer need to cork the
+TCP socket, call sendmsg() multiple times and then uncork; rather we can
+preassemble the message in a bvecq chain and just send the entire messsage
+in one shot with a single sendmsg() and reduce the number of places doing
+loops.  This got an improvement in nfsd performance[4].
 
-I verified the warning fires with the recipe above on
-7.3.0-rc4-00537-ga3ff15db6820 and never fires with the patch
-applied, while the parse-time messages still appear.
+I also have some changes on the TCP receive side for the cifs transport
+(which is also likely applicable to the ceph TCP transport) whereby the
+receive buffers are 'spliced' out into a bvecq in the cifs I/O thread
+rather than being copied.  Using a bvecq chain here is advantageous as we
+don't know in advance how many segments we're going to have.  This allows
+us firstly to avoid copying data with the socket lock held (thus holding up
+sendmsg) and secondly to avoid copying data in the I/O thread (copying can
+be offloaded to the app thread).  The last time I benchmarked this, it
+appeared to get fio reading tests on cifs a 5% speedup.
 
- fs/smb/client/reparse.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Unfortunately, this doesn't help AFS much as that uses a UDP transport, but
+it might also help 9P, at least with its TCP transport.
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 3a27773186ae4..e6ed00bc114c5 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -1232,25 +1232,26 @@ static bool posix_reparse_to_fattr(struct =
-cifs_sb_info *cifs_sb,
- 	if (buf =3D=3D NULL)
- 		return true;
-=20
-+	/*
-+	 * parse_reparse_nfs() has already validated this buffer and
-+	 * reported anything wrong with it, but reparse_info_to_fattr()
-+	 * still builds attributes from the rejected buffer, so fail
-+	 * quietly on server-controlled data instead of warning.
-+	 */
- 	if (le16_to_cpu(buf->ReparseDataLength) < =
-sizeof(buf->InodeType)) {
--		WARN_ON_ONCE(1);
- 		return false;
- 	}
-=20
- 	switch (le64_to_cpu(buf->InodeType)) {
- 	case NFS_SPECFILE_CHR:
--		if (le16_to_cpu(buf->ReparseDataLength) !=3D =
-sizeof(buf->InodeType) + 8) {
--			WARN_ON_ONCE(1);
-+		if (le16_to_cpu(buf->ReparseDataLength) !=3D =
-sizeof(buf->InodeType) + 8)
- 			return false;
--		}
- 		ftype =3D S_IFCHR;
- 		fattr->cf_rdev =3D reparse_mkdev(buf->DataBuffer);
- 		break;
- 	case NFS_SPECFILE_BLK:
--		if (le16_to_cpu(buf->ReparseDataLength) !=3D =
-sizeof(buf->InodeType) + 8) {
--			WARN_ON_ONCE(1);
-+		if (le16_to_cpu(buf->ReparseDataLength) !=3D =
-sizeof(buf->InodeType) + 8)
- 			return false;
--		}
- 		ftype =3D S_IFBLK;
- 		fattr->cf_rdev =3D reparse_mkdev(buf->DataBuffer);
- 		break;
-@@ -1264,7 +1265,6 @@ static bool posix_reparse_to_fattr(struct =
-cifs_sb_info *cifs_sb,
- 		ftype =3D S_IFLNK;
- 		break;
- 	default:
--		WARN_ON_ONCE(1);
- 		return false;
- 	}
- 	fattr->cf_mode =3D (fattr->cf_mode & ~S_IFMT) | ftype;
---=20
-2.43.0=
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next-3
+
+Thanks,
+David
+
+Changes
+=======
+
+ver #12)
+- Split from v11 of "netfs: Keep track of folios in a segmented bio_vec[]
+  chain"[1]
+
+[1] https://lore.kernel.org/r/20260902173350.3468672-1-dhowells@redhat.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-experimental
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=ceph-iter
+[4] https://lore.kernel.org/netdev/168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net/
+
+David Howells (10):
+  Add a function to kmap one page of a multipage bio_vec
+  iov_iter: Add a segmented queue of bio_vec[]
+  netfs: Add some tools for managing bvecq chains
+  afs: Use a bvecq to hold dir content rather than folioq
+  cifs: Use a bvecq for buffering instead of a folioq
+  smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
+  netfs: Switch folioq to bvecq
+  smbdirect: Remove support for ITER_FOLIOQ from
+    smbdirect_map_sges_from_iter()
+  iov_iter: Remove ITER_FOLIOQ
+  netfs: Remove folio_queue
+
+ Documentation/core-api/folio_queue.rst      | 209 ---------
+ Documentation/core-api/index.rst            |   1 -
+ Documentation/filesystems/netfs_library.rst |   2 +-
+ fs/afs/dir.c                                |  35 +-
+ fs/afs/dir_edit.c                           |  43 +-
+ fs/afs/dir_search.c                         |  33 +-
+ fs/afs/inode.c                              |   2 +-
+ fs/afs/internal.h                           |   6 +-
+ fs/afs/symlink.c                            |  37 +-
+ fs/netfs/Makefile                           |   1 +
+ fs/netfs/buffered_read.c                    |  34 +-
+ fs/netfs/bvecq.c                            | 342 ++++++++++++++
+ fs/netfs/internal.h                         |   7 +-
+ fs/netfs/iterator.c                         |  33 +-
+ fs/netfs/main.c                             |  13 +-
+ fs/netfs/misc.c                             |  96 ----
+ fs/netfs/read_collect.c                     |  47 +-
+ fs/netfs/read_pgpriv2.c                     |  24 +-
+ fs/netfs/read_retry.c                       |  28 +-
+ fs/netfs/rolling_buffer.c                   | 189 +++-----
+ fs/netfs/stats.c                            |   6 +-
+ fs/netfs/write_collect.c                    |  26 +-
+ fs/netfs/write_issue.c                      | 180 ++-----
+ fs/smb/client/cifsglob.h                    |   2 +-
+ fs/smb/client/smb2ops.c                     |  78 ++--
+ fs/smb/smbdirect/connection.c               | 135 +++---
+ include/linux/bvec.h                        |  18 +
+ include/linux/bvecq.h                       | 166 +++++++
+ include/linux/folio_queue.h                 | 282 -----------
+ include/linux/iov_iter.h                    |  87 ++--
+ include/linux/netfs.h                       |  14 +-
+ include/linux/rolling_buffer.h              |  42 +-
+ include/linux/uio.h                         |  17 +-
+ include/trace/events/netfs.h                |  49 +-
+ kernel/bpf/btf.c                            |   2 -
+ lib/iov_iter.c                              | 494 +++++++++++++-------
+ lib/scatterlist.c                           |  82 ++--
+ lib/tests/kunit_iov_iter.c                  | 131 +++---
+ 38 files changed, 1437 insertions(+), 1556 deletions(-)
+ delete mode 100644 Documentation/core-api/folio_queue.rst
+ create mode 100644 fs/netfs/bvecq.c
+ create mode 100644 include/linux/bvecq.h
+ delete mode 100644 include/linux/folio_queue.h
+
