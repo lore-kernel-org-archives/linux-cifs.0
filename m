@@ -1,173 +1,125 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39654EDCA8
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 12:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD7A53B35F
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 15:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790684729; cv=none; b=tlbuajmy+G0BHlFumwS3nrGm78iU1NtvbG4L3L6Rw3XXVNwO+wsfd+tHeAZWBVaBpLdCwIBGZGlL1kh0VJ4M/YdBm4Vw4SDgUpr46nsRlwMmZt/ViUNRrwwRWmqukFSxgqrK9kkpLFSghKg7FtUdEn5kmXdUaEUA0gQPqpo9Ds0=
+	t=1790695154; cv=none; b=fcB1ppVuiLR60fo3PrRNJpmcJ5qyb71I009G++eOHmHOPkVMjAwmawQNj1N9Bw8s+Tuph6KV3WTYCQqSi9cWAXJc4TX/wakEp8nHtR3I2bknRHWjDMYfOjc/l9JrTdSURE59h534Ka1j3gNguwDynj19jZ9O0RONTvCan1N2TvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790684729; c=relaxed/simple;
-	bh=4CFkkm9dRBYJzBfyr6rHV1AYIBoZ8Ia5eLZbjwtjuIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nZGfz1wst9I4SUp5hPu6cL/RVwcNhCabYleEydn6GN/5lGbaHZ0MUEKRQc8Kn9vf8neqpjVm/NakmV6ayrQmhH2ufl15vx30iAgSArqwZ+wzALuZmMFlLr+VqgVLDarMqmOvR4gYHsnX7SvnyzaSBSlmPBMSUWf946UCTNRHT4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=duDs1/yP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=UT/RKiti; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=E4lASWBY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gomXZbgE; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1790695154; c=relaxed/simple;
+	bh=POxNgs3Sk0smUjRTdny0WLN3IwiIFf9y/TxNt7OHXSQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=o7sY3LEP59Y9D8xzKrEfgJ1jcMFlnJSPs3Tuah4p11MzELUyrZTvYCtPT8+Al/SXxDQNY2D/dCPsH71TzJfh2jgKj1Z1ZISmomExSv52UogCY4OPkDIQ/WypOv9V0tICRS+GkrZDMvBjEEwP+h0NgWvV5CPaU8iwmAag/fygcoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl; spf=pass smtp.mailfrom=xs4all.nl; dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b=kIgJPBzC; arc=none smtp.client-ip=195.121.94.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xs4all.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xs4all.nl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="duDs1/yP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="UT/RKiti";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="E4lASWBY";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gomXZbgE"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id ACF011F391;
-	Tue, 29 Sep 2026 12:25:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790684721; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+6KiDjBICQKqXNka/7Z751pkaMZnPB6P7U6h/yUanHs=;
-	b=duDs1/yPAcD9Qmh34k7IvfQ5TH0q0r658N47YQUAlIuFgZmI+Ue9vxu0S5TJQwEF8BE1me
-	xJ3UjwYQxBzbE/9Yjg5lZ9RRwpciG//ryywdmiSCuI4GtPls8e3kki8Y/cWQ1fSPXE6Jq2
-	W1ycjjLaBp/aj+V79XnhHE9Fdvb2+kU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790684721;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+6KiDjBICQKqXNka/7Z751pkaMZnPB6P7U6h/yUanHs=;
-	b=UT/RKitir3jRjtBdQ3mMKExdEd7iCRTuNNbalb6NZas6dHhMB5lB4JjUVSAZDeHPv+Y5gG
-	3JWDFxNwuyyTt/Bg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=E4lASWBY;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=gomXZbgE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1790684717; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+6KiDjBICQKqXNka/7Z751pkaMZnPB6P7U6h/yUanHs=;
-	b=E4lASWBYttguZYl7/eAFWofnpC01bf4vADqwRsXJm27hFEcCtE3TJ4jESTPqkSSU3+JXdy
-	qbcFXjjwBjwE2BWUpyzyC+IElyIdeN4/DMxYy2nJfN/ipb+TFMQIx0DHgmiJit/I38L8kN
-	c5RaxEZLA/Qch8UcAfP1znkCjj6+VGs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1790684717;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+6KiDjBICQKqXNka/7Z751pkaMZnPB6P7U6h/yUanHs=;
-	b=gomXZbgE0JjlemjJhETlz2uGFpidHKUjG0ur07iJX4sbJhzt2E749nhSgE692YDPoH/ghJ
-	btgC9gkFwROT+hAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1C508133F1;
-	Tue, 29 Sep 2026 12:25:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id x0hnKCyuu2onVQAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 29 Sep 2026 12:25:16 +0000
-Date: Tue, 29 Sep 2026 09:25:14 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Subject: Re: [PATCH v2 1/2] smb: client: fast fail sends if need to reconnect
-Message-ID: <arur-tfIfGJAVjWK@suse.de>
-References: <20260928150355.850472-1-ematsumiya@suse.de>
- <20260928150355.850472-2-ematsumiya@suse.de>
- <CAKYAXd9oL+fGZopR7+yx4Pin4eJKCbYW=ZXpdNSXMSjzw_JRiA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=xs4all.nl header.i=@xs4all.nl header.b="kIgJPBzC"
+X-KPN-MessageId: 1669baed-bc19-11f1-8f57-005056992ed3
+Received: from mta.kpnmail.nl (unknown [10.31.161.188])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 1669baed-bc19-11f1-8f57-005056992ed3;
+	Tue, 29 Sep 2026 17:18:56 +0200 (CEST)
+Received: from mtaoutbound.kpnmail.nl (unknown [10.128.135.190])
+	by mta.kpnmail.nl (Halon) with ESMTP
+	id 1668d7ff-bc19-11f1-ac16-00505699693e;
+	Tue, 29 Sep 2026 17:18:56 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=xs4all.nl; s=xs4all01;
+	h=content-type:mime-version:subject:message-id:to:from:date;
+	bh=ACDbdiVSBCu7/pMa28q8IG+OfHCoxEFwKjelrwVxaXo=;
+	b=kIgJPBzCNop8a7wcoqU8geEt3KueLJC8HCERj/V78bn7eUXjRqmdA644bvSv7EdS0MWjmYrh/UFxd
+	 tFiU2OLWUHxbpU2p6T83XLad/J99AS+469TyhklOophHku5FD15DOz7MP19VoAY/h3mbJduCxEgEwT
+	 XNdAzWxj6EQmWGbL91fvAQsFz6A+NtygULAHRIt2VCNoncS+tNrRc4HXavKEbzk1AT0sHCq89x37dN
+	 q2wbLjvoS0xq7JlftE/UgaOpfjS/3OUYYJCfhB0gg/gzF9ZVObwfnv1WM8+TwnNu4nMGX+1g0+VNw7
+	 B3R218MQ1kyHNTAiGeKf8OUkvw11t1A==
+X-KPN-MID: 33|VtfdXQ7XBA5Bw3zxqGdKWxVcQf+i4Kr3/piisen4KvftsHje7+hWv8iQzgUXMDK
+ 7JeBMbodJggf9I1eoncwpbKrrKhXu6MAJJbSoMVeWiZI=
+X-CMASSUN: 33|YNUny+R1v2qHD+kD8+nSA3o19Hx1QizAlwfuOS/xy4BMUe316Enrqn20iIYD+MH
+ qjZWeEaAK6ekHZ5+hj3Jgxw==
+X-KPN-VerifiedSender: Yes
+Received: from cpxoxapps-mh02 (cpxoxapps-mh02.personalcloud.so.kpn.org [10.128.135.208])
+	by mtaoutbound.kpnmail.nl (Halon) with ESMTPSA
+	id 165d89cd-bc19-11f1-916a-005056995d6c;
+	Tue, 29 Sep 2026 17:18:56 +0200 (CEST)
+Date: Tue, 29 Sep 2026 17:18:56 +0200 (CEST)
+From: Jori Koolstra <jkoolstra@xs4all.nl>
+To: NeilBrown <neil@brown.name>, NeilBrown <neilb@ownmail.net>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Chuck Lever <cel@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>, Mateusz Guzik <mjguzik@gmail.com>,
+	Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Cc: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+	Andreas Gruenbacher <agruenba@redhat.com>, gfs2@lists.linux.dev,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>, ceph-devel@vger.kernel.org,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org
+Message-ID: <113651329.602012.1790695136052@kpc.webmail.kpnmail.nl>
+In-Reply-To: <20260919022441.3305170-7-neilb@ownmail.net>
+References: <20260919022441.3305170-1-neilb@ownmail.net>
+ <20260919022441.3305170-7-neilb@ownmail.net>
+Subject: Re: [PATCH v2 06/14] vfs: add some allowed open flags to
+ vfs_lookup_open()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CAKYAXd9oL+fGZopR7+yx4Pin4eJKCbYW=ZXpdNSXMSjzw_JRiA@mail.gmail.com>
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,manguebit.org,gmail.com,microsoft.com,talpey.com,suse.com];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[sashiko.dev:url,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:dkim,suse.de:mid];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Score: -4.51
-X-Spam-Level: 
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: ACF011F391
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-
-On 09/29, Namjae Jeon wrote:
->> @@ -184,6 +214,9 @@ cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
->>                 }
->>         }
->>
->> +       if (shutdown)
->> +               kill_socket_queues(server);
->> +
->>         spin_lock(&cifs_tcp_ses_lock);
->Since this loop still holds cifs_tcp_ses_lock, It can sleep while
->holding a spinlock, causing a scheduling-while-atomic failure.
-
-I totally missed that second loop, will handle that in v3.
-
-AFAICS, the new set_need_reco() can be moved to after unlocking
-cifs_tcp_ses_lock, as tcpStatus is already protected by srv_lock.
-Any objections to that?
-
->The
->previous set_need_reco macro did not acquire a mutex.
-
-Yes, the server mutex is needed to access/shutdown server->ssocket,
-which is part of the core change in this patch.
-
->Please check sashiko's review comments.
->
->https://sashiko.dev/#/patchset/20260928150355.850472-1-ematsumiya%40suse.de
-
-The other concerns could be ignored, but I'll address them anyway in v3.
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
 
 
-Cheers,
+> Op 19-09-2026 04:06 CEST schreef NeilBrown <neilb@ownmail.net>:
+> 
+>  
+> From: NeilBrown <neil@brown.name>
+> 
+> vfs_lookup_open() must allow:
+>   O_LARGEFILE so that large files can be opened.
+>   O_NONBLOCK so that break_lease() can be asked to return -EWOULDBLOCK.
+> 
+> Also O_NOFOLLOW as we don't/can't handle symlinks.  In fact we
+> should enforce O_NOFOLLOW for the same reason we enforce __O_REGULAR.
 
-Enzo
+I don't know all the NFS background, but: you can handle intermediate symlinks
+but not trailing ones? Why is that?
 
->Thanks.
->>         list_for_each_entry_safe(server, nserver, &reco, rlist) {
->>                 list_del_init(&server->rlist);
->> @@ -365,9 +398,10 @@ static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num
->>         cifs_dbg(FYI, "Mark tcp session as need reconnect\n");
->>         trace_smb3_reconnect(server->current_mid, server->conn_id,
->>                              server->hostname);
->> -       server->tcpStatus = CifsNeedReconnect;
->> -
->>         spin_unlock(&server->srv_lock);
->> +
->> +       set_need_reco(server);
->> +
->>         return true;
+> 
+> Signed-off-by: NeilBrown <neil@brown.name>
+> ---
+>  fs/namei.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/namei.c b/fs/namei.c
+> index 0f69abb3743b..a08f37aca3e1 100644
+> --- a/fs/namei.c
+> +++ b/fs/namei.c
+> @@ -4632,11 +4632,12 @@ struct file *vfs_lookup_open(struct path *parent, struct qstr *last,
+>  	int error = 0;
+>  
+>  	WARN_ONCE(mode & ~S_IALLUGO, "mode must only have permission bits");
+> -	WARN_ONCE(open_flag & ~(O_ACCMODE|O_CREAT|O_EXCL|O_TRUNC|__O_REGULAR),
+> +	WARN_ONCE(open_flag & ~(O_ACCMODE|O_CREAT|O_EXCL|O_TRUNC|__O_REGULAR|
+> +				O_NONBLOCK|O_LARGEFILE|O_NOFOLLOW),
+>  		  "open_flag has unsupported flags");
+>  
+>  	mode |= S_IFREG;
+> -	open_flag |= __O_REGULAR;
+> +	open_flag |= __O_REGULAR | O_NOFOLLOW;
+
+What does __O_REGULAR | O_NOFOLLOW do? Does __O_REGULAR only block opening
+if the final resolved thing is not a regular file, or does is also block
+trailing symlinks? Afaict, the former.
+
+>  
+>  	error = lookup_noperm_common(last, parent->dentry);
+>  	if (error)
+> -- 
+> 2.50.0.107.gf914562f5916.dirty
