@@ -1,134 +1,87 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1351F3B9930;
-	Mon, 28 Sep 2026 20:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1071F30A9
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 01:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790626200; cv=none; b=KRtRiUaDBGRBUOz96KY7OTphCv+PbTyCCLMWrSseC34nII80NkrNtj4a3oGyfgTlvGgVUmKFNQaOojyZdVxd4rHZEy6vBflyVkIX0YGJmsZ0ElqfFgEOgiPM2rmleteLPsAjOqcEuN9Nn6yqYRkbF/g/J/SJbCruzBvycrd6UFU=
+	t=1790645582; cv=none; b=LI3N8sZoXvEk99X2oR/MWzzhyvwEEsgdsA4MRyrw38I6540oUSEK5mgK2vskFdzCebPN6zvUMrS6zOjx6XzweeQgUuIRY25y5jqaCk8qKpJe0Obd0nkmnqMgpoV1yH4yxKDBfqQW8KrPV88TJgCo1lZgKoBIkMOU0zFkedVrxtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790626200; c=relaxed/simple;
-	bh=tPhx6NIaPQy7ys87IsfY+wBgTIDHdC6QTZtarcCMYao=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DJNqLZH4pixY3N1PW5NczdzI0B3jKTabtn4KCau9mnTVZCIbya0Oy6Z+wAe1TyPWCPEjwSa/ZSR4Z9DETdUj37CNQm2xra2GVXse34CROIuW3rMq7WQAGN2zgvdqkFUhTUJqwTf1zi9A+9HfImDJ6e4Rd6R8f8xJPgiLfUmYH/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=10wCbwjU; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1790645582; c=relaxed/simple;
+	bh=6VejKzLt3Gr3nB+nx9CMUqtI89w0F9tZjfyzX3CuSos=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G+8MAH0PPaVJYKBSd/+wX3iq+Gj2b0vm5/OghR/Wrr1xw3S6C39BcG2cm2oIGNW8hcbaT065VAStIX094WUVbcIuANyUaWu2K0qo+yWZ59G+kd29LAR6zbS9OySIz/GjF02f5kVYvMpHdiC4d5cT2qDj+vBM7B1Dz6Iqszy7F7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZKd1Eb/+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="10wCbwjU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
-	Content-ID:Content-Description;
-	bh=weYac4arN+e+Exglx88CO1TIeF/RTILfhffoN84p0LQ=; b=10wCbwjUVRiWjT+pjUCJFgweWl
-	iU4cY6hVgZxItZXDpZ2PRR//Gr3KYB7fQ0B1HBWcV/jYoAJ31wF8MuUyY1+bajtcbeobteXL6uYDx
-	0aEC131X9dxZJN942mAUl0ZIRIuqLDXfrta4Wmn/s77kukasCWGI4ROzeERDRrXu0Wu/GwC16vKkQ
-	jLWR2938Rst8iF/BS8yh3PXenJ43f/VUJko/JFFSu1SdkFOnPfZSt93YlNwu/MLmO3guZJDE4dsnh
-	1t6c0rr7CGW+n4vMWnNid8lWVL/FK/Oqpo8A4/R5ImP32uxjXV7XJnj1YTrSQMxIIOXJscO8kzqXn
-	lYdy/JEA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xBHfP-00000002ULP-0EVj;
-	Mon, 28 Sep 2026 17:09:39 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev
-Cc: Christian Brauner <brauner@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 13/15] netfs: zero the tail of a short DIO/unbuffered read
-Date: Mon, 28 Sep 2026 17:09:32 -0300
-Message-ID: <20260928200934.1040189-14-pc@manguebit.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260928200934.1040189-1-pc@manguebit.org>
-References: <20260928200934.1040189-1-pc@manguebit.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZKd1Eb/+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 083B41F0089B
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 01:33:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1790645581;
+	bh=2TzV3oO1/AVpQ0DPkrFZRyPS6Zl8EIf9ZEQeAlWPbTo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=ZKd1Eb/+izdpTAfqguOfGKaQCR/Yiy8H6NWjW0b1qzoC1pxmOesFa3AlX3qf1CvKJ
+	 W64d1P+P0j+gSuGKUazpHMuome1faG643mZQQEavUrBUGEFCa1c9PljtjADdCPnJRs
+	 7xEAohCwi0br8Hh0dHlnMWICFtGdRiQkJ0LSFIsqTfZ/qfI3b2t6c8wIwtxOWNplEU
+	 E5gT2CPtCWd94f7u1KMhIL09AiCUzEB1q0al+HIk5EGdOu7AQtysMr17U24yad9RdL
+	 SctDl8QEmlCXbCMgCVmhlqaaEl9nbxPE/P70CckW8E7lgvQUvIU38/nJcffUKnlJlX
+	 Mc9enRl5D6zgA==
+Received: by mail-ed2-f12.google.com with SMTP id 4fb4d7f45d1cf-6a996c8adf3so5911297a12.1
+        for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 18:33:00 -0700 (PDT)
+X-Gm-Message-State: AFq9FYJqUUsOkY4CfxyYSJKdigCdj6GZMUGFMQx2KnLduSXvyQYF7Bxk
+	jug1S2Al1jUeCAgPn35KNMLxydd6w1sHHxQsFM/so1UvxWKjSl+fF1mfNbf7DCTU1r60uDHXrFN
+	cRxtzIOdLZnQU9Ml+ySGswk2wud+WcEw=
+X-Received: by 2002:a05:6402:5019:b0:6aa:734a:a081 with SMTP id
+ 4fb4d7f45d1cf-6aac8f72887mr12241454a12.24.1790645579601; Mon, 28 Sep 2026
+ 18:32:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260928031300.1782690-1-zhangdairui@gmail.com> <20260928162047.1829104-1-zhangdairui@gmail.com>
+In-Reply-To: <20260928162047.1829104-1-zhangdairui@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 29 Sep 2026 10:32:47 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_mC6ah5o6ctyYcuqj8HFi1nd8tWCxaFHekt43Z21JqdQ@mail.gmail.com>
+X-Gm-Features: AclHuK8hGU17doO-oGN4PpwZ0OPBz2C3qzdOOHTQq_2c_Wq6tiaO7pVa1gl1V54
+Message-ID: <CAKYAXd_mC6ah5o6ctyYcuqj8HFi1nd8tWCxaFHekt43Z21JqdQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: verify transform SessionId matches the decrypted header
+To: Dairui Zhang <zhangdairui@gmail.com>
+Cc: linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	Paulo Alcantara <pc@manguebit.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The buffered read collector zero-fills the tail of a short read that
-stops below the inode's i_size (netfs_clear_unread()), so a read that
-races an extending write still returns the expected number of bytes.
-The non-buffered collector path does no such thing: it just records
-how much was transferred.
-
-Add the same zero-fill for the non-buffered case, gated on
-NETFS_SREQ_CLEAR_TAIL: a subreq's source sets that flag when a short
-result from it is known to be safe to treat as a hole, as opposed to
-NETFS_SREQ_HIT_EOF, which means the read genuinely ran off the end of
-the file and should be reported short as-is. Only CLEAR_TAIL should
-zero-fill here; a real EOF must stay a real short read.
-
-No source currently sets CLEAR_TAIL on an unbuffered/DIO subrequest,
-so this is inert on its own -- a following change teaches cifs to set
-it in the one case that needs it.
-
-Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
-Reviewed-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Matthew Wilcox <willy@infradead.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Bharath SM <bharathsm@microsoft.com>
-Cc: stable@vger.kernel.org
----
- fs/netfs/read_collect.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index a94197ef0181..c5bfaf2c6f25 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -33,6 +33,22 @@ static void netfs_clear_unread(struct netfs_io_subrequest *subreq)
- 		__set_bit(NETFS_SREQ_HIT_EOF, &subreq->flags);
- }
- 
-+static void netfs_clear_unread_dio(struct netfs_io_subrequest *subreq)
-+{
-+	uoff_t pos = subreq->start + subreq->transferred;
-+	struct netfs_io_request *rreq = subreq->rreq;
-+	size_t fill;
-+
-+	if (pos >= rreq->i_size)
-+		return;
-+
-+	fill = min_t(uoff_t, rreq->i_size - pos,
-+		     subreq->len - subreq->transferred);
-+
-+	netfs_reset_iter(subreq);
-+	subreq->transferred += iov_iter_zero(fill, &subreq->io_iter);
-+}
-+
- /*
-  * Cancel the copy-to-cache mark on a folio.
-  */
-@@ -311,6 +327,14 @@ static void netfs_collect_read_results(struct netfs_io_request *rreq)
- 			    test_bit(NETFS_SREQ_HIT_EOF, &front->flags))
- 				netfs_read_unlock_folios(rreq, &notes);
- 		} else {
-+			if (!(notes & HIT_PENDING) &&
-+			    front->error == 0 &&
-+			    transferred < front->len &&
-+			    test_bit(NETFS_SREQ_CLEAR_TAIL, &front->flags)) {
-+				netfs_clear_unread_dio(front);
-+				transferred = front->transferred;
-+				trace_netfs_sreq(front, netfs_sreq_trace_clear);
-+			}
- 			stream->collected_to = front->start + transferred;
- 			rreq->collected_to = stream->collected_to;
- 		}
--- 
-2.55.0
-
+> @@ -11663,6 +11722,32 @@ int smb3_decrypt_req(struct ksmbd_work *work)
+>         if (rc)
+>                 return rc;
+>
+> +       /*
+> +        * The decryption key is selected by the transform header SessionId,
+> +        * while the request is authorized under the session named in the
+> +        * decrypted inner header. Per MS-SMB2 the two must match, so
+> +        * validate the decrypted message before dispatching it.
+> +        */
+> +       proto = ((struct smb2_hdr *)iov[1].iov_base)->ProtocolId;
+> +       if (proto == SMB2_PROTO_NUMBER) {
+> +               rc = ksmbd_check_transform_session(
+> +                               (struct smb2_hdr *)iov[1].iov_base,
+> +                               buf_data_size,
+> +                               le64_to_cpu(tr_hdr->SessionId));
+> +               if (rc)
+> +                       return rc;
+> +       } else if (proto == SMB2_COMPRESSION_TRANSFORM_ID) {
+> +               /*
+> +                * There is no decompression step after decryption, so a
+> +                * compression transform would be dispatched as if it were
+> +                * an SMB2 message. ProtocolId is not checked on that path,
+> +                * so a crafted transform could be made to run as a valid
+> +                * command under any session id in the payload.
+> +                */
+> +               pr_err_ratelimited("Encrypted compression transform is not supported\n");
+> +               return -ECONNABORTED;
+__handle_ksmbd_work() decompresses a compression transform after
+decryption via ksmbd_decompress_work_request(). It would regress that
+behavior...
