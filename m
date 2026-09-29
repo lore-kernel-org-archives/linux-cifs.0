@@ -1,73 +1,73 @@
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70EB3C4174;
-	Tue, 29 Sep 2026 02:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B792F547066;
+	Tue, 29 Sep 2026 02:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790649874; cv=none; b=obVzy6N/fgw4t82QSsX6KlTNpRPsbZ3pRlxRRfEwLI5y2chthLY9hG6twFfukE1kMhd96YXjXcK99jFujZdu0E1Wuh6Z76q8J0taykLRHt+AbeHRmH1Se+ahDa5oS2K4lKML7xfFYt4ZcQgE+/gx0UHnJ8p0ou7Owt7D6B2DUwA=
+	t=1790649880; cv=none; b=j7zDIw82Q+c+63WN+GBVDa4iXMfECOdY5Z7Rrd0CwTgqoOuyBs1bpbS4nXy2FKf5U/wMxyZ1zFoxznSwvpxE3OasIsidLbGFBlPV5Icsicx8rt2tqtyKYHzrsuqz8h1di6D2X0Y2+vsljVoaCwjCaU0HV8sqNx8QORPANB1Havk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790649874; c=relaxed/simple;
-	bh=NOur+8iD3NIPL2xjR2PDIFgZIgu7k894cHjpMcwXrFs=;
+	s=arc-20240116; t=1790649880; c=relaxed/simple;
+	bh=qZ72wdExjBx4qrtjfaaWj2pii5nFIYx2zoF3b1K23B4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZhBepN/a0ra9t2JRVSSjPMc5TpHatqYO5P5rkSyXjSI5bUauio/Wp1wPCUeROdS4JA1U2YF7L//cYVQ1gesB4IzKEWzqD1mmUAkM/j7kN0wPP1s0Zt6DGScDnwsXyUeO+iiplRhkwr3b87ryPU7XQhM6OZp+/W7hbUVSIRUqcP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=Wylr4zjD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WJEG626a; arc=none smtp.client-ip=202.12.124.151
+	 MIME-Version; b=mGMGqR8qF8PHXBfq0UldFMVnVQzM1qJ5s35BogesZ3zgzDbwX+8qKuW5MG+R0vrfF2uRyFVFLEy561G1z1vU8VzssAmJQBQcokoOEth9aB5XW7UenapmTAWmCyblwG4Rjm1EHNfCHFEEEYS7zVGzanZ9ZCrlaBPDMt5K4iQPyn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=TWq6DSo1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hLJZTOXe; arc=none smtp.client-ip=202.12.124.155
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="Wylr4zjD";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WJEG626a"
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.stl.internal (Postfix) with ESMTP id DFD851D00109;
-	Mon, 28 Sep 2026 22:44:31 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 28 Sep 2026 22:44:32 -0400
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="TWq6DSo1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hLJZTOXe"
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C21A07A008A;
+	Mon, 28 Sep 2026 22:44:37 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-07.internal (MEProxy); Mon, 28 Sep 2026 22:44:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:reply-to:subject:subject:to:to; s=fm1; t=1790649871;
-	 x=1790736271; bh=2/52RGbRVYUek+UlktvNaStIDvl7p4ic9TSPFC0w9vI=; b=
-	Wylr4zjDK7aK7wH4rkPgYkQ5IiW9ng2TOi2m0ZfJqH38wlH7t8NhzacrhSO0DfsN
-	LwztGIS2iPi+eaX54k80K6/Wbfe4z9MZxY8mpixwApSKnnC896j+gq2y/uIdFx7B
-	9e/mul/cnfAdyjaEagTkjCdCNmS2o7wHbf2LbIahla1pBoansCsmaThnbNd/+rmm
-	GN63h41dFj5fI5qrdFrY4DX0oAhpN3Kw7TZYbpaXPGilqdOD1GkpYCkkWSR8UpMY
-	Pu1mHmkUVO8qxbRpy5xZ5pbCGUoWP5zFu2GZ0iCqz1J7LbRpGqAzeUDwf4GL72g+
-	2fiNnqKSJqR9I1W6/uI2Fw==
+	:reply-to:reply-to:subject:subject:to:to; s=fm1; t=1790649877;
+	 x=1790736277; bh=erGK+AQzk4TXbJHojiBGhbq9S7OkazCWMpV38tG+cyY=; b=
+	TWq6DSo1LKqO1he14Qz3Kxy3Dh4k8sEXRAmlUZ3NHC9Et+XhBI3hvooadspqQM8c
+	xfRZ54RGTxrusgUVagRgxMdaSQj3iHcIl88wntePGWCwf0K8tyjvsoTW46/jukGO
+	sYVhlIHyfrAYFONmUl2uA3JcUUUF3CSif1MZasf0BCHJr3YK7w13kPzS8cpppLJb
+	GpvT4UkLmUGd69OMEaflidCNmbWTwl1T42/zSfJqCwtDgicRc+2QHqfxWZY0IzQ8
+	JmrKtdTir4esbP5kMfvMzc0AtmAmPwJ+CQJu5Tfe1UBPWNmNSgEJ74NrTrPkg/II
+	8esJsPqP/WoYcmOSMxavWA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm1; t=1790649871; x=1790736271; bh=2
-	/52RGbRVYUek+UlktvNaStIDvl7p4ic9TSPFC0w9vI=; b=WJEG626aLsIRwzQsc
-	AbCaZs8mVoeG/cLQvXAsZw09xILNPO8p7XTscJl2A2GkLBuIcJKOLSO1/p3F9ncQ
-	4cOR6FUYz/Rk8CyrFN1M7V3SGm3iPjmCGcKtDtYNQvEhAN/aRsi4c3A1mKIYhgYe
-	gROP0PR5q30sWmY1SrNc7oGd+X0Q4WWYvRLBhz6SMZTSpLdDwZZyGC1On1toesCe
-	3tIuytyb8FDL4yYYOsgEsSb4xW46ye1JAf+X9IXrtlUkItfNS60wFxa5k79jDQMo
-	RO1PGIwdVqfGC+YslrrAJFqYkIXMSYmX4ySEvZOBdisvoL8d5RWIse2y8iY3GWaN
-	ATDtg==
-X-ME-Sender: <xms:Dya7akdAeaLjm2EWS6zRP_tmbtCuULznPCgbCqFSJZw-p2SpcW3whQ>
-    <xme:Dya7apQpSSEGGm-faburVbEGkug_DwlG-IhoOLsycmYzGpEDhuNqKBydD8ZuAbvp2
-    PE6TVH1487h6h7zNSuhPwT9fhoku0PmUO0whvOWTJk4s1ZofBk>
-X-ME-Received: <xmr:Dya7agKED_BUBXKnOfZD7gLXVmUTX46QFXq2HtkuwHEac0tzyu6Yzi7Cu1vlQpYCf1NY7pCnzNkzc6iS8oz-JcTzhWvpnJI>
+	:x-me-sender:x-sasl-enc; s=fm1; t=1790649877; x=1790736277; bh=e
+	rGK+AQzk4TXbJHojiBGhbq9S7OkazCWMpV38tG+cyY=; b=hLJZTOXe1DRUuyYr9
+	opmdYNH7yes2mosOcB4jPq94b64zfGOSp2T8ScjccFswkah+Gx3u5opSIerYFUOC
+	aHyD01WAsciLBKHO+7YlH4tYJ4p1wOyRvJRoOS+bSJLwr0fxHTZ9oWyw4h/cDnJz
+	Mu3hHWZR2XbLhhf0hiRwWxkoxUXrKsglt+662eDd0Sd+xdo01RM+C/GeXs07qpaY
+	sgSuO0Odv+6d6p9gDvPcVeJo4t7fCDHXT6F1Fcseh5WKlaq7z2vhoZM2ueI0LX9T
+	+EQs+Mf1wshH/WHYIdJAuJF07N4lCZXxrh9q7JiCgBrI3Ox/ALqhgzc9oo5YTbMn
+	5g5fQ==
+X-ME-Sender: <xms:FSa7avwUXgnkUymSgDB41lMBj5kI95v2uTVS_wxhIUEF8cWF0Qs3PQ>
+    <xme:FSa7aqVYrpThwFqxcZ3TS06-kyejCd8XZn_QVPmqdB0poQrlgK54_SNGnppb7w4hD
+    LHmxzaMZq7pAoUuzPqYc7y_-BqjiZQjLlOXC0pptt2dsbT3t7k>
+X-ME-Received: <xmr:FSa7aj_UGRwKXstE_fxUE-ICY-8veD3UtxXx1fH4LbJZLcniAyaq2Ljqj1cPfo_rZLUNw3GPy8ja6nNtICfiQjxR-Mi69zk>
 X-ME-Proxy-Cause: dmFkZTGAETtLDaRhdK6zWwmD1skNo8oznbv/e2xQZSM2ujkSFd8PU+upR8wF9a9fwoqrPi
     faFoaFPojV/QsMDEtCK+pCBky2JCKDOeWUD5950YGVNewPYv1IqWWG2tHJT/nOvQXrcJ2C
     /dpBuqeOPU2uOmbufh4kWWa+l7OFQMxu6h0qLmDFlSzqkcbyXgnWtP7/5Hlg9k5TDoNx7W
     Lnhj8TKJndVGVDvl1jI4nKhIHo66v/mWkc8wAAFi0DtOQRMaKIvR3BY7zTw13iHmHBEtzh
-    xF5p/hKrSHHFxZfSHEj+9lI/7B/SyYuQzS+5bRvoY3OjIJ4y7CH2qWNNwosk4t5FaLNCql
-    ccIBmDO1lwzW4/2wZh+pgAeosGL8W2q6tcUX+aQQiCpTzlIu0NwQjVmJq9iVx0jJlsTTE3
-    s4u9hLHgjAGjKAAtXpohrcmFV0uSwTKk6E33I7A3RHXjeWDQXaaZ+5sC0P2Tc4OLT6VXP0
-    /Ew3+KnmiiVdaO49Qr/nL/dM540+rjtSJpMKVmdIsCRTmueMqimZAvAsdqkX4bXvrwjOrS
-    Ilz4YaveVtdXNPJ2+lxYRzvfvLJJikHeVNzfaT03nc8vsPY75yoX2pPCQrj3VOcylaDElu
-    xtSiYWbJ3cPBMuix6s0yTIrEnUDiUiWxq/qcDEBGNxTFHmLodgTsfhlRT49Q
-X-ME-Proxy: <xmx:Dya7amJ4D24XJ8uGloIKqTMmnu32-h563_CUcoaySWaTw5-6WuAUQg>
-    <xmx:Dya7ari21kzXKx_QEDyEvCzflwE2YDm40h51EgYV9XjE3OHox820sQ>
-    <xmx:Dya7agMtp2NadnMWT4P_c6w1O1S-zQqJJFbV5KcaeArPIJlHJ7JCrQ>
-    <xmx:Dya7amqe3ULI0OZz0W6MuTfsIXEcipQdow9p8euK-rJyZmxlRudMmw>
-    <xmx:Dya7apgUguoO3a2YOHg9m8AkDrfTsusLa_x8-hUBtu3cFM1UEkiuewgE>
+    xF5p/hKrSHHFxZfSHEj+9lI/7B/SyYuQzS+5bRvoY3OjIJ4y7CH2qWNNwosk4t5FaLNCVQ
+    mf9Lcmwy1jHDkSW/PqO8yAz7858yqELRnWeb7RCG2qLFUONp+k+eHsUfeFj9JbQcTobZlv
+    hgM8FivAA/wRzuuepPgqyH6dapqiRHMShGMZqWRQQRnLZjW+IOGarodZe+XeiT4z/bhWuY
+    72HmjMJmFKe5EnCJ6L25JBMiFQzf+hOe0VrxbUhE4yiEoMRbnduj38epwX1Na5w2ih0G0i
+    PpGhMTNwvruXPoIdYsWA3OPqXN8Si3Tk6mt7Yg+BZQovzNxlZOZ9IEKOYMOJL3bSx//bz+
+    B27M6Uxwx/NoDGSyFdJp04evSBCa1MPuRB0iJce/VhPXF2xTYfwp2Ib+JoKg
+X-ME-Proxy: <xmx:FSa7altwxlDL-R5ntVq7cQbPJuJZmO2NS8vvt3p5-fhUDIr6zN2tlA>
+    <xmx:FSa7ar0BFL_qQX44x69x1alSdypo-tpxnOXW5gl2FRKuMWAoqMfe6w>
+    <xmx:FSa7aiScwpdmkvazzEyDphZgu6P2WJLC6z76JdnD6KzMn7S6WiTBUQ>
+    <xmx:FSa7aneVzygsxmLcwWbN-ePURc-yjV-X4B2nDgflejC5nQigiJPNoA>
+    <xmx:FSa7ahigGvXu0uw9FpMgv11EJU-g3RBUacJ7EqFiMxqeOMFG6HC7d89f>
 Feedback-ID: i9d664b8f:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 28 Sep 2026 22:44:28 -0400 (EDT)
+ 28 Sep 2026 22:44:34 -0400 (EDT)
 From: NeilBrown <neilb@ownmail.net>
 To: Paulo Alcantara <pc@manguebit.org>,
 	Namjae Jeon <linkinjeon@kernel.org>,
@@ -78,9 +78,9 @@ Cc: Jeff Layton <jlayton@kernel.org>,
 	linux-fsdevel@vger.kernel.org,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] smb/client: use d_alloc_trylock in cifs_silly_fullpath()
-Date: Tue, 29 Sep 2026 12:40:02 +1000
-Message-ID: <20260929024352.1433257-3-neilb@ownmail.net>
+Subject: [PATCH v2 3/3] smb/client: Use d_alloc_trylock() in cifs_prime_dcache()
+Date: Tue, 29 Sep 2026 12:40:03 +1000
+Message-ID: <20260929024352.1433257-4-neilb@ownmail.net>
 X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
 In-Reply-To: <20260929024352.1433257-1-neilb@ownmail.net>
 References: <20260929024352.1433257-1-neilb@ownmail.net>
@@ -95,65 +95,91 @@ Content-Transfer-Encoding: 8bit
 
 From: NeilBrown <neil@brown.name>
 
-Rather than performing a normal lookup (which will be awkward with future
-locking changes) use d_alloc_trylock() to find a dentry for an
-unused name, and use an open-coded lookup_slow() to see if it is free on
-the server.
+cifs uses the results of readdir to prime the dcache.  Using
+d_alloc_parallel() can block if there is a concurrent lookup.  Blocking
+in that case is pointless as the lookup will add info to the dcache and
+there is no value in the readdir waiting to see if it should add the
+info too.
+
+Also this call to d_alloc_parallel() is made while the parent
+directory is locked.  A proposed change to locking will lock the parent
+later, after d_alloc_parallel().  This means it won't be safe to wait in
+d_alloc_parallel() while holding the directory lock.
+
+So change to use d_alloc_trylock().  As d_alloc_trylock() includes a
+try_lookup we don't need both.   Rearrange the code so we can choose
+either a try_lookup or d_alloc_trylock.
 
 Signed-off-by: NeilBrown <neil@brown.name>
 ---
- fs/smb/client/dir.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ fs/smb/client/readdir.c | 50 ++++++++++++++++++++---------------------
+ 1 file changed, 24 insertions(+), 26 deletions(-)
 
-diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-index 88fff65320f5..70ca3da28913 100644
---- a/fs/smb/client/dir.c
-+++ b/fs/smb/client/dir.c
-@@ -1183,23 +1183,36 @@ char *cifs_silly_fullpath(struct dentry *dentry)
- 	unsigned char name[CIFS_SILLYNAME_LEN + 1];
- 	int retries = 0, max_retries = 16;
- 	size_t namesize = sizeof(name);
--	struct dentry *sdentry = NULL;
-+	struct dentry *sdentry = NULL, *alias;
- 	char *path;
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index 32a75afca8f5..19d0c77046ab 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -77,36 +77,34 @@ cifs_prime_dcache(struct dentry *parent, struct qstr *name,
  
- 	do {
- 		dput(sdentry);
- 		scnprintf(name, namesize, CIFS_SILLYNAME_PREFIX "%x",
- 			  atomic_inc_return(&cifs_sillycounter));
--		sdentry = lookup_noperm(&QSTR(name), dentry->d_parent);
-+		sdentry = d_alloc_trylock(dentry->d_parent, &QSTR(name));
-+		if (sdentry == ERR_PTR(-EWOULDBLOCK)) {
-+			sdentry = NULL;
-+			continue;
-+		}
- 		if (IS_ERR(sdentry))
- 			return ERR_CAST(sdentry);
--		if (d_is_negative(sdentry)) {
--			dput(sdentry);
--			path = alloc_parent_path(dentry, CIFS_SILLYNAME_LEN);
--			if (!IS_ERR(path))
--				strcat(path, name);
--			return path;
-+		if (!d_in_lookup(sdentry))
-+			continue;
-+		alias = cifs_lookup(sdentry->d_parent->d_inode, sdentry, 0);
-+		d_lookup_done(sdentry);
-+		/* It is safest to return -EBUSY if there is an error in lookup */
-+		if (IS_ERR(alias))
+ 	cifs_dbg(FYI, "%s: for %s\n", __func__, name->name);
+ 
+-	dentry = try_lookup_noperm(name, parent);
+-	if (!dentry) {
+-		/*
+-		 * If we know that the inode will need to be revalidated
+-		 * immediately, then don't create a new dentry for it.
+-		 * We'll end up doing an on the wire call either way and
+-		 * this spares us an invalidation.
+-		 */
+-retry:
+-		if (posix) {
+-			switch (fattr->cf_mode & S_IFMT) {
+-			case S_IFLNK:
+-			case S_IFBLK:
+-			case S_IFCHR:
+-				reparse_need_reval = true;
+-				break;
+-			default:
+-				break;
+-			}
+-		} else if (fattr->cf_cifsattrs & ATTR_REPARSE_POINT) {
++	/*
++	 * If we know that the inode will need to be revalidated
++	 * immediately, then don't create a new dentry for it.
++	 * We'll end up doing an on the wire call either way and
++	 * this spares us an invalidation.
++	 */
++	if (posix) {
++		switch (fattr->cf_mode & S_IFMT) {
++		case S_IFLNK:
++		case S_IFBLK:
++		case S_IFCHR:
+ 			reparse_need_reval = true;
 +			break;
-+		if (alias || d_is_positive(sdentry)) {
-+			dput(alias);
-+			continue;
++		default:
++			break;
  		}
-+		dput(sdentry);
-+		path = alloc_parent_path(dentry, CIFS_SILLYNAME_LEN);
-+		if (!IS_ERR(path))
-+			strcat(path, name);
-+		return path;
- 	} while (++retries < max_retries);
- 	dput(sdentry);
- 	return ERR_PTR(-EBUSY);
++	} else if (fattr->cf_cifsattrs & ATTR_REPARSE_POINT) {
++		reparse_need_reval = true;
++	}
+ 
+-		if (reparse_need_reval ||
+-		    (fattr->cf_flags & CIFS_FATTR_NEED_REVAL))
+-			return;
++retry:
++	if (reparse_need_reval ||
++	    (fattr->cf_flags & CIFS_FATTR_NEED_REVAL))
++		dentry = try_lookup_noperm(name, parent);
++	else
++		dentry = d_alloc_trylock(parent, name);
+ 
+-		dentry = d_alloc_parallel(parent, name);
+-	}
+-	if (IS_ERR(dentry))
++	if (!dentry || IS_ERR(dentry))
+ 		return;
+ 	if (!d_in_lookup(dentry)) {
+ 		inode = d_inode(dentry);
 -- 
 2.50.0.107.gf914562f5916.dirty
 
