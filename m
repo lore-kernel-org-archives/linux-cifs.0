@@ -1,130 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDDA30C147
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 01:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D022CCC5;
+	Tue, 29 Sep 2026 02:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790646285; cv=none; b=oi2XI1+tRrNbDYdyyj5l9s7R3fWXSoSDJLI5vLR2Vu1eF3aO75cYUomMCip/XIqqcybK7zY7WZqHHiswW4rGA28y6nsrfgUFyvmYgU7EcjqMvsY+7smTZIbY/6SpdE9pXTxaBpXFSXODlbhHDMFz9bGr06RovDfxO89zIjt7V4o=
+	t=1790649862; cv=none; b=SyCm26GWPOOeYltFmM/ovcuupwmRvsAICrsX+rS3EsxuQTH5fzA90/JqnqErwefGW81x6U4z1yuK2v6lTRdmsWJiadYjoZFp9v3XMiyJQb2KJ1zehpmDLT1GLb6IpWi4qsMfqcZlTjGza9bQFR0gJjKeQaaKpJs03FxSlKrKXVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790646285; c=relaxed/simple;
-	bh=UpHWC+x2ex12/X/OsmxeQf8Izt53vagWkzbufxq+MwE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=llc/GELq+E3q60mXjgbLgzketmHHdsyXPYSUni5WqbJoGIB2gS25mcEWWjq51VUQGHmfiAbGeECoZduTu4oQVDA+C2h61UVn0QLYbdFs8iApR1FGoKhY4ONYMsTc9z6lxGpB0/3/cfmjlUVEUWR+t1J7VqPPbFWlRqeewo40VVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPfaXg1i; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790649862; c=relaxed/simple;
+	bh=iBfeqgMRiVxb4oRXFBF5GNVKWjz3mxIOViPtKeJ0HR0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OjA0aNI/hiwV51+aLhv0+iQA0fOWdoa7Zlw8rRG0i8PaF5+htj11vjOkkrPcAtwDmys57wQCZHITG2derAK6vr5eFht/Yf2PgJQdr0LaBcUP5RvWsLan0lL/BS/3B2LnLnWa5++3Pk7BobQQvRr8D06H9m5EXxhV6mYatxq/Z+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=jjWdnx63; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rXGcWBPr; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPfaXg1i"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B243C1F00898
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 01:44:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790646283;
-	bh=sp9uX2zFfpg5pK5KSRTvk8Ybpazr3ABIsJBvNYrYSqg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=PPfaXg1iHhAnM1g0d/pQwsmU636o37cfIBxL5rz1zlBC7OUFGLRGzfdoN8d5RickR
-	 HiogL24EWHMwbdKAJIIX0+Zv8goF0dzjbvplRKy3zHvTuEN7FEK4YPMgJVZLWDwRN7
-	 kVBH/VIin+hWf5Pe6KIyvkd/WLEjBv6zT11L9RLcft19ffrVqwLGOvnaO11dt5Q0ma
-	 PZvKi+MB5dS+VBaJF0aLsEvw4kvjlhHpU9Cyp8mNZO1rdQce58kYrUnqPC4oV0gq4t
-	 jdpkYjCT48L0tPWU65yEERSHteXkZp4tZaZkEmGPIO8OTNsqpKNtco3tNqod/bAd06
-	 luUo0y4zz2e1Q==
-Received: by mail-ej2-f42.google.com with SMTP id a640c23a62f3a-c2c570f6f36so347059866b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 28 Sep 2026 18:44:43 -0700 (PDT)
-X-Gm-Message-State: AFq9FYL7iTzqRlt5HbrcP1nxZCl0GNn7z4n88BaveYE1ck2EmQ9SwUZq
-	CJgFhLsHDH1AY9uf4TH5YTa4Uni8fC59EouBIAB7dFgcOzyAxYa8w2czLFUM6rAw7uonm07NgXo
-	jBuOy69UmHii1QGHZfO3ztZsGej7fi9E=
-X-Received: by 2002:a17:907:e8f:b0:c29:63f2:99bb with SMTP id
- a640c23a62f3a-c2ac26820b5mr1370695066b.47.1790646282381; Mon, 28 Sep 2026
- 18:44:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="jjWdnx63";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rXGcWBPr"
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 7AB031D00103;
+	Mon, 28 Sep 2026 22:44:20 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Mon, 28 Sep 2026 22:44:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
+	:subject:to:to; s=fm1; t=1790649860; x=1790736260; bh=zJ+BbXdMcO
+	DbkeUgo/YzN3mabbfa28QPHAXLG0M5wF8=; b=jjWdnx63If+rMal3WYxUdV7iD4
+	fl50sUbdPGfqWBGQfO/jaB1RFe1OB3MrR7IrG86cOYsH1J56a7snKwbH6/0zRpgK
+	87kG2Zn37wVhDSBJbmrk2tIW8TQhjCSWSF1rt325Kh0Ob+WA2bFe9U83qDYX+4Ks
+	YCWZlzmUyzrLHG4W43eYM31XVoIqrcUJY7w53YJQY1qKPsK0FZAzsuiCPoqI9bd0
+	wGVhBdmRPWm5ozIwKBVoaQsP5UUNq8q1jFxd4Sv95kpX02+4cF+VjePmb/kCk6sW
+	DLyw8ciByBfgbOkjlb7F9e2MOSbGavCU6jEDZRihKlTBzmioZjVUB8PwGVVQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm1; t=1790649860; x=1790736260; bh=zJ+BbXdMcODbkeUgo/YzN3mabbfa
+	28QPHAXLG0M5wF8=; b=rXGcWBPrRIsD0GanN1+pOG0unCsUQvN/LMyHwHMDUi8C
+	NNKDcQe+X4b9W7P2LZmK7YFQGz1BheNA5E317ByITZlJj5kWnE7qlC/pgOFlzWke
+	cSolIwiBXiZSWb3PXxKnjoIBbaGKyIhd/rIQxY+8hD0SGZhChNmE91UwsbEZlb1S
+	kpHpcvUusUvfKHEFgeQsZKytJ1bci21FlT1i6Hu3uCgbJ25hpLWZqZT8gH1SFZSb
+	etMXlaHK7eiULolCBlXLZY6e/0Fg4c3I3CIu5efzHuHS15blVNlmz44qAdOGNyQI
+	M/fiiwmrc6m/vwPW684RdTKgMrUNAlheTRwAuMYD4w==
+X-ME-Sender: <xms:Aya7amzHSDvX9fD2QTX1N2Zjr4hlygqtwkIai1WN-84m8kgblAwieg>
+    <xme:Aya7alXyLFHKexUyXXxZrHEgeVnL00uc6YX4gEFWkZzKtps96ZGezadKS2EBwt77M
+    K2TtNYuaHTVO441tm5Fb4B628eWJuFB5wjYNdRb3bkM0SLb0Q>
+X-ME-Received: <xmr:Aya7ai9kVWpDEwDrJgOU6epE1WMqldh6PyC4OmF1VLPhKBXToz5xoNzICfmTPBI3QPXVWv3O3KdXlmHI_2VNBglykwUqlI8>
+X-ME-Proxy-Cause: dmFkZTFFDn7pMCMiHwdfZshCBKQv2bOXMi0SXm0bspVjujJaKUMK7dLCygyMUfHAGTZiH7
+    M2MNkFhEIYI3KYqMcPadvxp8qvZt7MmXtAN4Cm+M+XHwRhaEGVtQSNdG41C4XTGSv1ld93
+    es7ppJExLsCEJtCH5uaoZCAoR2A2f8I7wC0+rkw+y6sTreQfBeC+e6JrV7fwLdIVUSihXX
+    /dQZhOcVMjBo4/zrNP/0N1Xqma1yxGWk1ZHdDytdQZqrfMnkH+fpo+IKbuNzm8t4HTLYKg
+    4UCUSETIFILqQo7WUfXAV4anfcO2H9XX7oVByL1UfcK+K+uNuPFLJEbOeHs59oxcpxIsGm
+    /Vj1G7Rvr4RufbsacgmWk7taEL/UwTBARa1Ey0bsVb0Hd08btO5dHrMk6GBSM2ah0Jm02R
+    4151mTLNc9eSnXRgynjwL6WwsarfmIbE4BXJet2dFoAxYk9K0vRWunCdAkS60B8E+d8Gc0
+    NCO1M+YCMEi05TC5EkCdJ8xsROrn2L2hc0yyd/E/zmTujaOkdUBosf3oUq/X/62Sgsub2H
+    Nqtc7GR5O1S18uflyu2IYNdJlGV7OtSo68AzOMt1L1s1bzYV43WA6VJlEixCjBvcU3erxg
+    uXLbRu0Xri+pAvZPRtbvpem6nQsB4Sx6WINyqtONeQrv0Xel4sKtwjczGCXA
+X-ME-Proxy: <xmx:Aya7aotZtPQw4aASxpyUdHf0AMwdItpqLtl2vxCIj-m_jOERc4q8bw>
+    <xmx:Aya7ai1rIeM3TJyvbyNjGn-YdSFPTJ-j6Bdl6hHvRfQTMLE8-Z-1jQ>
+    <xmx:Aya7atQgc1GvuL5hY2QX1COjAKhKh0ahQNZYIhXXd8qyQmrpFhM_cQ>
+    <xmx:Aya7amc0bsJ3TK5uq2S9gLAbaeNfw8T-xTzQm36_qo3f6fAQG6NJoQ>
+    <xmx:BCa7akicj4G63Ir0-TWWsQbvaECLCYVm4W2vA1dwaabbdToTLyVMt3hQ>
+Feedback-ID: i9d664b8f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 28 Sep 2026 22:44:16 -0400 (EDT)
+From: NeilBrown <neilb@ownmail.net>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Cc: Jeff Layton <jlayton@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] smb/client(cifs): prepare for VFS locking changes.
+Date: Tue, 29 Sep 2026 12:40:00 +1000
+Message-ID: <20260929024352.1433257-1-neilb@ownmail.net>
+X-Mailer: git-send-email 2.50.0.107.gf914562f5916.dirty
+Reply-To: NeilBrown <neil@brown.name>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260928200934.1040189-1-pc@manguebit.org>
-In-Reply-To: <20260928200934.1040189-1-pc@manguebit.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 29 Sep 2026 10:44:28 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-mCkoFH-metAK+PbT2hb+sWmw4HJCCOP3XqOpjgKNorg@mail.gmail.com>
-X-Gm-Features: AclHuK9qRWv1LVqtZNcohTCvryiBwziuqL2w9TCldOIHHP97-2mRkDRLZ0kQiIA
-Message-ID: <CAKYAXd-mCkoFH-metAK+PbT2hb+sWmw4HJCCOP3XqOpjgKNorg@mail.gmail.com>
-Subject: Re: [PATCH 00/15] netfs, cifs: data corruption fixes
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
-	Christian Brauner <brauner@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Matthew Wilcox <willy@infradead.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 29, 2026 at 5:09=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
-wrote:
->
-> This series fixes a number of data corruption and spurious I/O error
-> bugs found by running generic/363 (fsx) in a loop against Windows
-> Server 2022 and Samba 4.24 servers.
->
-> * Post-EOF pagecache poisoning on extend (1-5)
->
->   Data dirtied past EOF through an mmapped region was never discarded,
->   so it reappeared as file content once the file was extended by an
->   ordinary write, a truncate, a zero range, a copy range or a clone
->   range.  pagecache_isize_extended() doesn't help here: it's a no-op on
->   cifs because i_blkbits is 14.  Only the one folio straddling the old
->   EOF can hold such data, since pages wholly beyond EOF can't be
->   faulted in, so each extending path now zeroes or discards that folio.
->
-> * Missing flush or drain before trusting server or pagecache state (6-9)
->
->   FSCTL_QUERY_ALLOCATED_RANGES can report just-written data as a hole
->   unless it has been committed to disk first, and the O_TRUNC open,
->   interior zero range and server-side copy/clone paths did not flush
->   dirty data or drain in-flight I/O before an operation that assumes
->   the pagecache and the server agree on the file's contents.
->
-> * fallocate refused without a read lease (10, 12)
->
->   smb3_zero_range() and smb3_simple_falloc() returned -EOPNOTSUPP for
->   any size-extending request whenever the inode wasn't read caching,
->   since the cached i_size couldn't be trusted.  Query the server's EOF
->   in that case instead of refusing the request outright.
->
-> * Short reads leaving stale data behind (11, 13, 14)
->
->   The read-gaps path and the DIO/unbuffered read collector left the
->   untransferred tail of a short read untouched, and cifs could not
->   tell a genuine EOF from a stale cached remote_i_size after a lease
->   downgrade.  A read racing an extending write could come back short
->   and, in the read-gaps case, have that stale folio content written
->   back to the server.
->
-> * Unstable pages during a signed write (15)
->
->   cifs signs the pagecache folios in place before handing them to the
->   socket.  A buffered write could modify a folio while a write
->   subrequest built from it was still in flight, so the signature no
->   longer matched the data that followed it; the server answered
->   STATUS_ACCESS_DENIED, which surfaced later as -EIO.
->
-> Paulo Alcantara (15):
->   netfs: clear post-EOF pagecache when extending a file via write
->   smb: client: clear post-EOF pagecache when extending a file via
->     truncate
->   smb: client: discard post-EOF pagecache when extending a file via zero
->     range
->   smb: client: discard post-EOF pagecache when extending a file via copy
->     range
->   smb: client: discard post-EOF pagecache when extending a file via
->     clone range
->   smb: client: flush and commit data before querying allocated ranges
->   smb: client: drain outstanding I/O before truncating on O_TRUNC open
->   smb: client: flush dirty data before zeroing a range
->   smb: client: drain and invalidate before server-side copy/clone
->   smb: client: only require read lease for size-extending zero range
->   netfs: zero gaps in read-gaps folio to avoid writing back stale data
->   smb: client: only require read lease for size-extending preallocate
->   netfs: zero the tail of a short DIO/unbuffered read
->   smb: client: distinguish real EOF from a stale remote_i_size on read
->   smb: client: require stable pages for signed connections
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks!
+The previous version of this series had a couple of problems reported by sashiko,
+both in 2/3.
+1/ an error from cifs_lookup() wasn't handled properly - it should be fatal
+2/ The d_is_positive() tested the wrong dentry.
+
+Original intro message below.
+Thanks,
+NeilBrown
+
+
+I am working on changes to directory locking.  The medium term goal is
+to lift d_alloc_parallel() locking above i_rwsem, so d_alloc_paralle()
+can be run unlocked, and consequently cannot be called when ->i_rwsem is
+held.
+
+The requires:
+ 1/ that d_alloc_parallel() not be called while i_rwsem is held.  cifs
+    does this in a couple of places.  A new interface d_alloc_trylock()
+    is now available and can be used instead.
+
+ 2/ a dentry must not be d_drop()ed while an operation is ongoing, as an
+    unlocked d_alloc_parallel() would then be able to create a new
+    dentry with the same name.  In particular d_rehash() must be phased
+    out as it won't be safe.  This particularly affects the mechanism to
+    block lookups/revalidates while an unlink/rename is happening.  The
+    mechanism is changed to use one similar to how NFS addresses this
+    needed, though using the new LOOKUP_PRIVATE flag.
+
+The patches depend on patches recently added to the vfs tree.  I would
+prefer these land in that tree too with an Acked-by or similar from cifs
+maintainers.
+
+Thanks,
+NeilBrown
+
+ [PATCH v2 1/3] smb/client: don't unhash and rehash to prevent new
+ [PATCH v2 2/3] smb/client: use d_alloc_trylock in
+ [PATCH v2 3/3] smb/client: Use d_alloc_trylock() in
