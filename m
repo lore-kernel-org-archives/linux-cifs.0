@@ -1,260 +1,189 @@
-Received: from mail-dy2-f43.google.com (mail-dy2-f43.google.com [74.125.229.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11022122.outbound.protection.outlook.com [52.101.48.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4945545D920
-	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 16:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.229.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790698775; cv=none; b=uoGdrVmJhDqzafYMpvwJ0X+4EumiyfiK/5mmU9CERvM+EEU1doO6Q1PPlZNHGzrQyUui9wX2NZ5k+Q2h5RwnKfphbDycj3fPgl161PAROOaxJUjKnQr8fOZkR40tlfghw+TIL+Fi/T72vVl9r5UyPuWgvqbdRCYr9KSMRDIvOpw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790698775; c=relaxed/simple;
-	bh=ON/Nm199fXt25tUkNXWt6yTI0ajOWyNykjj4e5sjBPY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FFXlvMRXTjF+IqSWkX/tT+M/kb6Tk3er/a304p69MMk4CtbvpHnr+Zjc64tx8pLiZSoiI5K1+dGO4xS4gbJNrO/qjMat9wsQu6Cj7oZT+V08boHPmqI32TNM7bjgDsAYYAu1I7FvlUMXFuWp30XGNHdxRO+rb29EUJ4g/uvywPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fY+UQnWG; arc=none smtp.client-ip=74.125.229.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fY+UQnWG"
-Received: by mail-dy2-f43.google.com with SMTP id 5a478bee46e88-33e630052ebso4965080eec.0
-        for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 09:19:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1790698773; x=1791303573; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=ItJcp+tPRukYSHRfLwmMwoYplEEStSxemB80lg82sVU=;
-        b=fY+UQnWGcqpnV6JT4FcuSxidcoOn+HkFM3cieDMRrSZe8eLfjwRurB3s9n3mJMSLST
-         S+sEOXXoOh3kbdp0ULRvoSbLF3VcfDmPKpSGR/A7IqLVdnMeCr9XyBgOi7BaXr96plMq
-         2arFO6B3dlvqCbhuVu5wBOvWm/A5jYAvnecIQOP9URFX0tgmt7Jvh6HEmqmAp6sOlJ8o
-         SlvxaABMXRgpRUm+eNuTrGyy62ibrP0tIgvJE/MA8x34MijEmrzecgssrm4pfGoM8wGs
-         z7iHzXlXojmIBtTu6zl6yD7S2NFuuEhX9xhdnKcFYbgrFZh30LhAUta1ln/ZFptGmgsl
-         LgHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790698773; x=1791303573;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=ItJcp+tPRukYSHRfLwmMwoYplEEStSxemB80lg82sVU=;
-        b=KmYQ/Ne/WWtooU1Ve/b6YZh9kMbicuAbZ0s+DN0V4xUSSveVh7zoG261nproxDEuAq
-         y0hlNSI4EtO+OHC/m+m3l0aNzsqPBOAXjuEaxfkOsZHnLMy+LgTt3EdCd1NRgMYwLUb4
-         ZmfQuORUK5leISqT5bibZejyX6vKLWh3ajbwGIlJnzDnZ2ntqMARshiNymE1SswtTaAg
-         zFWojnDX9BoEECgPTDlON8w03Jaa3xwaAPfS4eoKBnwYlHQnK2daEGOyYGJ24fj0vSeP
-         xq0GtkeK4QtgHKuc6QO28hXYTbTqq1CbsyxnPftmvka4XsItzebbff6z8y+XXjDZ1HqH
-         550A==
-X-Gm-Message-State: AFq9FYIJpFS1lgq8fc/iaBUu6bUFZMs3ZvXmsfuBJsQuod3fpbM3svYp
-	JtrrXGh2xN8WaO/Yvs55b+e38uvtgChVU7faKYQQj5HbwFTsNT05oNQP
-X-Gm-Gg: AYBFou3wvGpmzbFjKvm+Yg+fRuXvN2pWm7xhcxAggIyB+1L9t06ZMsIOgtJEgETczzj
-	YUr5KudMq7+yxTyznnjL0FGMtY2yTgtbCsZPi25JatHOSXm2h8XU5h6bylec6Ud6Rnx1UOZmVay
-	eA2UtAtfsgu+rWKo9NkKdSbQAiDgV5HOL8uyp8uFYE3OrSlCVKCUt9+LPbscrwmC3VWtMbyM1XG
-	HAd/O8PKRFjl9KxnjG/9FqvpVefTuxrFvy6Y+ef1u2fNfqfB7tmOA9oo1rDZT5f26GdeQ6NgxkM
-	OPHlrOoFzxuv7l587vWo4/tiRRwQO2pDTO+WJXwVKfPk4mxsdF7XrSecBf0Y4NHXhEPRBZh63y+
-	CVQtHo4tkiryirrsyPZzSZZy2T3U6vYcLmw47SEsgxN6gcMVS4JmUA5KLMtZDx7k/P5Lp9qwwOx
-	Crq+D/zj2Dq/hvdadZaqHSjgiJj5eqAluo3WW/TGbfN0oZDsyC61jGlwdPBVGrvdWMJw==
-X-Received: by 2002:a05:7301:6493:b0:33e:4e63:5d80 with SMTP id 5a478bee46e88-34c44b10683mr200567eec.11.1790698773247;
-        Tue, 29 Sep 2026 09:19:33 -0700 (PDT)
-Received: from localhost ([8.219.235.175])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-34c386b6bd9sm488985eec.16.2026.09.29.09.19.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Sep 2026 09:19:32 -0700 (PDT)
-From: Dairui Zhang <zhangdairui@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E8D2367D3
+	for <linux-cifs@vger.kernel.org>; Tue, 29 Sep 2026 17:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.122
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790701252; cv=fail; b=L6yD7NE8KlzsePn5Rh1HC7mxNqHqLiqkTtqhgvzIo60LIOFihiXVepA0gT+WlvmQcvmcLbSZOE80E/pzrQiLjpMlu7hVFfmPMmDfHdtO3/HnwxC1gBK9LA50eC8TWpQY9mVXbly75LYnB2wtSvx+ug1LXjdThBPrpbtaOzIWQAw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790701252; c=relaxed/simple;
+	bh=+Z4RS7JOl+XLF/EoXY6ehKQiu03ofntJpGI946ynRw0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=u0IYrVvXFwF7icaiBTUBVAwWUMg2OPWtTSiz8nHRZkyae0ACupzj8GxuR8xkfqhSJH0e/QjU+HUlACc0V7BWmV/HK0asbHfteEM+dwziM4Cez0GfFx9x5+dHJ3Bqt0OKrnOWfneDRKwQGASaRnr3fxv7DxpYFVAQHIJPJKGiCDo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com; spf=pass smtp.mailfrom=talpey.com; arc=fail smtp.client-ip=52.101.48.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Nh9/rXalSxtcXQgM8rvvqYEgpjoCvFywkl8wtTpOu3xm9+IVqFLuOqcG6r/BcoYVQqzqv0ixw0zGRwEO8++LQgqv4pEw/N76L2e3x61ycl0c7WR7ujlIj3iAXJEtJUX/GlhwFgq7Q2d0ke4CVEX2n3THqMjLwCN37eJOR4RIRv3yBBKOJ77LHN4Ha+Kzl65tRe9vKmpmCHhlErnI6YgMP2i+gqMoDDLAyUhiraaxCUwYkdgU1KKk/jVBjIrI9uNvMcLA0gKEAvg1pyc2L3Kt5xWcSb8k4u3sg58OYN8RvX+ejteaYAOvtTIFQCC/+2T0wLtckBbQTW33ZDAP9rFvCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+Z4RS7JOl+XLF/EoXY6ehKQiu03ofntJpGI946ynRw0=;
+ b=JpDpUfsafTwXoweVib5ZRDITsLYKZppv/eaQslWGQoSe1erZTHI8ztWRrFVrJKFmNiiXTWw3XA6YuFQxPNkS0Fqo6TN9rsCWyzQ2fzZN563ovKkjvWRDwCKW1JtQnMU6XW5XtDeexgMxWHSMgf4wscahbtNi70s+J7CwuwvDCZ3SNqji0agPWHr498JfsOU+DBU4hkQC6ySxDtmHuLfdlNx4BLvTiz1XfvGQk8U678QfZjCJzT3hzv7JlLV85uYjA8dbDhpe/rznPnoAFGzXVjGQCXRG0cJGHgsOO2qL6YG2lCnVsTi7op+L6KZtv269HLJCWxNE0HfP0rz1aRQR3Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
+ dkim=pass header.d=talpey.com; arc=none
+Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=talpey.com;
+Received: from MW4PR01MB6338.prod.exchangelabs.com (2603:10b6:303:7b::15) by
+ IA1PR01MB9137.prod.exchangelabs.com (2603:10b6:208:594::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.451.24; Tue, 29 Sep 2026 17:00:43 +0000
+Received: from MW4PR01MB6338.prod.exchangelabs.com
+ ([fe80::e7ad:d8fa:59db:4761]) by MW4PR01MB6338.prod.exchangelabs.com
+ ([fe80::e7ad:d8fa:59db:4761%2]) with mapi id 15.21.0451.022; Tue, 29 Sep 2026
+ 17:00:42 +0000
+Message-ID: <e4941a3b-e155-4319-b53e-d6e70fe67969@talpey.com>
+Date: Tue, 29 Sep 2026 10:00:40 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] ksmbd: no check that transform SessionId matches inner one
+ on encrypted requests
 To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org,
-	smfrench@gmail.com,
-	senozhatsky@chromium.org,
-	tom@talpey.com,
-	pc@manguebit.org,
-	stable@vger.kernel.org,
-	Dairui Zhang <zhangdairui@gmail.com>
-Subject: [PATCH v5] ksmbd: verify transform SessionId matches the decrypted header
-Date: Wed, 30 Sep 2026 00:19:30 +0800
-Message-ID: <20260929161930.1894929-1-zhangdairui@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260928162015.1832109-1-zhangdairui@gmail.com>
-References: 
+Cc: Dairui Zhang <zhangdairui@gmail.com>, linux-cifs@vger.kernel.org,
+ Steve French <sfrench@samba.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Paulo Alcantara <pc@manguebit.org>
+References: <20260925174623.1640482-1-zhangdairui@gmail.com>
+ <CAKYAXd-3Q3WboGm=s=t-BYf_t6HgiGLTm8CboLNUsEU1VvBzMA@mail.gmail.com>
+ <6fa542de-3008-4f11-9923-b6f7fbdd24b6@talpey.com>
+ <CAKYAXd8yTKp5nh7Mc9_Cw9RY323cEZF0EAn6uc72AJS4mOaaKQ@mail.gmail.com>
+From: Tom Talpey <tom@talpey.com>
+Content-Language: en-US
+In-Reply-To: <CAKYAXd8yTKp5nh7Mc9_Cw9RY323cEZF0EAn6uc72AJS4mOaaKQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH8P223CA0016.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:510:2db::35) To MW4PR01MB6338.prod.exchangelabs.com
+ (2603:10b6:303:7b::15)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR01MB6338:EE_|IA1PR01MB9137:EE_
+X-MS-Office365-Filtering-Correlation-Id: 440057c5-2f99-4d1d-eee7-08df1e4b326a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|23010399003|10067099003|3023799007|18002099003|22082099003|4143699003|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	5pGfv+E039R/OArkRyBWXR5gFrDGjYgpzv5eJ/4pqZCZSjnPHLHWhEiQxfKaHzFxJ0WgNH143Ld8apXGoKqN4Dcw/3iNeUgrVqJvFFxv+xLaBGW8CW4Vpm+WKyx4gx00RTwkfjnk3Jc9sCotYOQXJpbGpbuqDPDvJKCVP7Hi09MbHptnLEjlGE6hUsjCm8Zx6ntBiIA08NfuDnGLWHi+l09IbU+hP4KKZIbYqSSJkZQWc+3S6urOm0L/zEDwEUPLvAKdjNsmZt6/VnOPyQ4IOuFJGn1lKcsRPVNoNX/ZYYkrgvdnLIx9eqSTQ0lHzXe+lA/py4WhJkADaEapfOwIbNK24rINwEyEFc/Zu7P+e+vn6KzczpqcTZoqNhQ6XKSwfSIGqXIRbTSsEz+TYgZMVbfj2SnDnVzYcaHExuXaHbUV/MHxPbPf79Cx/nk6+4s3W8xkcCrGJ0lfEFNyn/tlmjk5fCd6zIS5otWHDXhKax1fm4+VMwzZjyjzFMUkJyEb67hx/2gXxJN3kvHOIvMzROp+2u4m1CoZpuioocnP71VZU+iYrr5ggr9RdwcB9S3cXKLlmXDQ9FTlj7NVoZTMrggtqGQRfWTLLpDlJQBmqwvu57WzOgb9L0zdS1zDZvaJiSlc3wbk+VhJ6GbwW5+1hqr1q15FMoFPfbqMDDXQHLM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR01MB6338.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(23010399003)(10067099003)(3023799007)(18002099003)(22082099003)(4143699003)(56012099006);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?T1p3R2VHOElVeWJkM2I0YzMrSG9lQ0luUGJ6dGo5c2p6NEZaNE9RVjFMbXFW?=
+ =?utf-8?B?NEJyOFJhdDVEcjJyWG45akViUSs3T05QMnB5MWV2S2Fxc1BFU2pKdEJDVFFC?=
+ =?utf-8?B?ZmlmQngxTFFmUXU4ZGRleE40czJsNkd2di84d3dkY3VzMVl5elV1TUJiaEpn?=
+ =?utf-8?B?czRVK0tzUitFNTBZRXZGWFJveFF2UUhwOGdFaWhCOVdmNW91ZjJadkk4VE0w?=
+ =?utf-8?B?aEVLODlMOWw4cmp6WmtsaERNODdHVjRsc1E2bTUrd0pIYmpWdUhxbUY3TjdZ?=
+ =?utf-8?B?ODZod0FZeWNzSDM0MHRoenp3dm9vT2E1UCt1UFBCUTVnL2M2V3NXc1VYUkN6?=
+ =?utf-8?B?U3hLek1ncUtVWXRuM3BPOW5DVVJPeW8vdkFHRFJsZklaNmV2QzJ2WG9BTmF4?=
+ =?utf-8?B?SFVnSm9WWG9jSll6UFZQbnF3akhuSE1CUlh5bkZWY2xtcm8rVEdCd2NDU244?=
+ =?utf-8?B?Slg1NmczV21RUEFnMlZNU3VqeWpHZCtjOEhQM3RvZTdVNi9iV0kwVWVPTVBt?=
+ =?utf-8?B?Z241emJDYmViYXRVckVqWm1vbkpObkJoejh2WjlaV1V3RkdNYzVEWUh0ZHRQ?=
+ =?utf-8?B?YWRZaVczVzJjaGh2b0ZhdmJucnRsVGF0dEVPbzdKSVN1dlBVbnRxeUJrS1Mv?=
+ =?utf-8?B?bkdhbEZrUnd6endDQVBtcDA5RkxCN1ozQTJPbXpPS0hzaG5VYTJIOEZmUmxF?=
+ =?utf-8?B?YXVyWUczeFBVcWV6Rjl1THhNTzlVNVdHVU1XN2VuK1J3NVR3cVNWN3FnUDRu?=
+ =?utf-8?B?UjFNSzNvZ05nV2NhNTQxTmhaRG1NVCtiLzg4UFNrSHFONldWM3k4TGpZdWxx?=
+ =?utf-8?B?K0RvRlhlaGpTZWtsbnQ2SVpodUdOcmIxUlZEY2dLdE9HYnVYb0U1RWtqTVk2?=
+ =?utf-8?B?Z0pSck95a2ZCM3JLZE1hUytVVkpnYWtEelArT1Y5WlBrQTRsR0hVdzA2emdE?=
+ =?utf-8?B?blRJZ0R1dzUwOGVxNTdqaVBvN0xNNmwvSVFPcnA4ZWZwOEY0RVBXNkFkYmZ5?=
+ =?utf-8?B?N0FwZjI5cTFRYkdFdjVIdG5VSTYzamJRQnZGWW9NcW40Ryt4RW5kSldOYzFC?=
+ =?utf-8?B?aHV4d3h4dmFxV3RMSjF3NVEvR1ZKUHdUT3M3QzQzQVRZbTdmZFpWNE5Lb1lw?=
+ =?utf-8?B?eFlUbUlaZGpCZ096SmxLYnNaK1JPbnBFOHF5eDdpMVpxbmpOWE5xVUwxUk53?=
+ =?utf-8?B?VU1ncVBSaUw0akNRKy9ONmhHVzVZN0RGYVh3RS82eGUyamxjditCM3dsVW9F?=
+ =?utf-8?B?RTJiVHhET3cyMmpRVnNDL2FsdUVWLy8yZkVVTkNTK1JLVkIycks0N0tVQWo3?=
+ =?utf-8?B?SFdHVHVKK1VBZVVUVjArcWZvRWVmNm1udXErZno1Zy80dkFQeVJDTTNIM3FP?=
+ =?utf-8?B?aXprVHRKaFM4R3FYOU1VYWFFNm01cTdqUjZ2YjFnSFBqWW1yMmpIU1AxbDVR?=
+ =?utf-8?B?eWNDbEhyNVJaZmtUcDZ4MTIrYVhTMGVRdmNRdlhDS0pDWWp3a3FFREYybUhZ?=
+ =?utf-8?B?VWN6M0JDeDJBVVJaNTRtYlpockx1dHlzOUVQQTFHWXNpV1liTm1lODRhREZz?=
+ =?utf-8?B?dGJHZEczS0RoSFdDZWJnNFE2bE1MRlArZkN4ZU5JL0JvMWpJTGRTTXJZWlRR?=
+ =?utf-8?B?dmdwNUhuQVIvZ0FKZGVXOU01ZnBkS3BoNHVZOW5FcnZoc3B4ZXZpWGRGU2FY?=
+ =?utf-8?B?UkRiWnl1ZkRrUWRTNUVLUnV6WndpclUyeS83N3dLRlRMZnhmUEhkeDZUTjJE?=
+ =?utf-8?B?cGoxbGVCbTZzNUo2a3NnWWlFejAzL3o3clpPMGMrOTMwZUEyVEVHa2hHZ3Bz?=
+ =?utf-8?B?RDhGTzFuSkIrTlNYL3VKUXhJUHFEVlpQYkNBUWFYbFJOamRJZFNpSkR4UldW?=
+ =?utf-8?B?aCtYMEFhSjllMm5QYmF3SUp0cVdadTljWGY1MzlTeFQ0OGt3dnRSMTZwK0E0?=
+ =?utf-8?B?c0RYdmVZZlRTa1ZzYnE0aVBYRTRWdjFtVkVnbHE2S2tVa1V1L2h5Ti9lVERT?=
+ =?utf-8?B?T25MMzlkSnhDcEg2UWQyNzdoWjI3SnVSdFBiNWp5SjZXU2hSM1JJbCt2ZzFW?=
+ =?utf-8?B?RnJZRmFyVHk4RGEvSWRwQ2NtV05aNjR2cXFMcTJkVGJkelBMajFFeUZvSEhT?=
+ =?utf-8?B?Zmh4WjlRYWFJQW91LzhyaEdOc0tZV0RwODMwL0taOE1TTXRqMlZnQnZWTVg3?=
+ =?utf-8?B?ZlJYeDhYY3BCZ0pXK3BGcElXQzJZdDFDcmhkbFBoNlJaOWU2TjQrUVhXRUxC?=
+ =?utf-8?B?dUk1ZmJHSy9idDljVEFkSUVYT3lyN2NmM1h6VFhWY25id1Y4Y1diVG0xVXpH?=
+ =?utf-8?Q?VAAR8hR+EO9FwrumUB?=
+X-OriginatorOrg: talpey.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 440057c5-2f99-4d1d-eee7-08df1e4b326a
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR01MB6338.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2026 17:00:42.9296
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bfWF7NFMxwHmRv3/hje1eJwuyPhjbvM7bjhEFcC6YH9EOj1pQe0NnU1vbFlaAS9Q
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR01MB9137
 
-Namjae,
+On 9/26/2026 6:24 PM, Namjae Jeon wrote:
+> On Sun, Sep 27, 2026 at 9:25 AM Tom Talpey <tom@talpey.com> wrote:
+>>
+>> On 9/25/2026 4:45 PM, Namjae Jeon wrote:
+>>>> Suggested fix: compare the transform SessionId with the inner one
+>>>> after decryption and drop the connection on mismatch. Happy to send
+>>>> a patch if that approach sounds right.
+>>> Thanks for the detailed report. Please send the patch to the mailing
+>>> list and me.
+>> I agree that there appears to be an issue, but it may need some more
+>> analysis of MS-SMB2 section 3.2.5.1.1.1.
+>>
+>> This in particular.
+>>> As I read MS-SMB2, the server is supposed to verify the two
+>>> SessionIds match and treat a mismatch as a protocol error.
+>>
+>> MS-SMB2 does have explicit requirements that the server MUST check
+>> for equality (and drop the connection if unequal), but there is one
+>> SHOULD attached to a behavior note stating an exception that doesn't
+>> seem appropriate. So there may be a document issue which should be
+>> resolved before deciding.
+>>
+>> Some of us are at the SDC IOLab in Santa Clara this week, I'll bring
+>> it up with the Microsoft folks here and report back.
+> Thanks for looking into this. I’ll wait for your update!
+I did get a chance to look into it and there were some hyperlink issues
+with the behavior notes in the document I downloaded, which have been
+fixed. MS-SMB2 was updated just yesterday!
 
-You're right. I missed the decompression step in
-__handle_ksmbd_work(), and the "no decompression step" and
-"no ProtocolId check" claims in the v4 commit message were wrong.
-Sorry for the sloppy reading and the extra work it caused you.
+The situation is interesting however. On the client side, any difference
+in the encryption transform and message sessionid's is basically fatal
+and the connection is broken.
 
-v5 moves the check to __handle_ksmbd_work(), after the existing
-decompression step, so encrypted compression transforms are no
-longer rejected. The transform SessionId is read before
-decryption and verified against the final SMB2 message.
-The compound-walk bounds check now uses subtraction (the
-addition could wrap on 32-bit), and I added the Fixes tag.
+On the server, the received sessionid can validly differ if the message
+is an encrypted compound, in certain cases.
 
-From a320c66f1aeb773cf65d2489fae9f982eaf3873f Mon Sep 17 00:00:00 2001
-From: Dairui Zhang <zhangdairui@gmail.com>
-Date: Tue, 29 Sep 2026 22:30:00 +0800
-Subject: [PATCH v5] ksmbd: verify transform SessionId matches the decrypted
- header
+Section 3.3.5.2.1.1 says:
 
-When an encrypted request comes in, the decryption key is picked by
-the SessionId in the transform header, but the request is then
-authorized under whatever session the decrypted inner header names.
-Nothing ever compares the two, so on a connection with more than
-one session a client can get a request decrypted with one session's
-key and run it as another session. Encrypted requests are exempt
-from signing too, so a valid AEAD tag is the only proof of session
-identity, and it is checked against the wrong session.
+>  The server MUST verify if any of the following conditions are true and, if so, the server MUST
+> disconnect the connection as specified in section 3.3.7.1:
+>  For a singleton request and the first operation of a compounded request,
+>  The size of the decrypted message is less than the size of the SMB2 Header
+>  SMB2_FLAGS_RELATED_OPERATIONS is set in the Flags field of the SMB2 header of
+> the request
+>  The SessionId field in the SMB2 header of the request is not equal to
+> Request.TransformSessionId.
+>  In a compounded request, for each operation in the compounded chain except the first
+> one, SMB2_FLAGS_RELATED_OPERATIONS is not set in the Flags field of the SMB2
+> header of the operation and SessionId in the SMB2 header of the operation is not equal
+> to Request.TransformSessionId.
 
-MS-SMB2 says the server must check that the transform SessionId
-matches the one in the decrypted SMB2 header and treat a mismatch
-as a protocol error. Add that check in __handle_ksmbd_work() after
-decryption, before dispatching: the message has to be at least one
-fixed SMB2 header, the first operation must not set
-SMB2_FLAGS_RELATED_OPERATIONS and its SessionId must match the
-transform SessionId, and every following non-related operation in
-a compound chain must carry the same SessionId. SessionId ~0 is
-accepted in subsequent operations, same as the existing compound
-session check. NextCommand offsets must be 8-byte aligned and stay
-inside the message; the bounds check is done by subtraction so it
-cannot wrap.
+Because I'm not sure what version of MS-SMB2 was referred to in the
+fix comments, it would be good to re-verify against this text since it
+may have changed.
 
-When the decrypted payload is a compression transform, the
-existing decompression step runs first and the decompressed SMB2
-message is checked instead, since a compression transform header
-carries no SessionId.
+Bottom line, the server must drop the connection on any mismatch for
+singletons, and for the first operation in a compound. But subsequent
+operations in the compound may differ if !RELATED, yet must fail if
+not!
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Reported-by: Dairui Zhang <zhangdairui@gmail.com>
-Assisted-by: LLM
-Cc: stable@vger.kernel.org
-Signed-off-by: Dairui Zhang <zhangdairui@gmail.com>
----
-v4 -> v5:
-- Move the check into __handle_ksmbd_work(), after the existing
-  decompression step, instead of rejecting encrypted compression
-  transforms in smb3_decrypt_req(), per Namjae's review. The
-  transform SessionId is saved before decryption.
-- Use subtraction for the compound-walk bounds check; the
-  addition form could wrap on 32-bit.
-- Add the Fixes tag and drop the incorrect claims about the
-  decompression step and ProtocolId check from the commit message.
----
- fs/smb/server/server.c  | 16 ++++++++++++
- fs/smb/server/smb2pdu.c | 54 ++++++++++++++++++++++++++++++++++++++++
- fs/smb/server/smb2pdu.h |  1 +
- 3 files changed, 71 insertions(+)
-
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -187,6 +187,16 @@
- 
- 	if (conn->ops->is_transform_hdr &&
- 	    conn->ops->is_transform_hdr(work->request_buf)) {
-+		u64 tr_sess_id;
-+
-+		if (get_rfc1002_len(work->request_buf) <
-+		    sizeof(struct smb2_transform_hdr)) {
-+			ksmbd_conn_abort(conn);
-+			return;
-+		}
-+		tr_sess_id = le64_to_cpu(((struct smb2_transform_hdr *)
-+				smb_get_msg(work->request_buf))->SessionId);
-+
- 		rc = conn->ops->decrypt_req(work);
- 		if (rc < 0) {
- 			ksmbd_conn_abort(conn);
-@@ -215,6 +225,12 @@
- 			ksmbd_conn_abort(conn);
- 			return;
- 		}
-+
-+		rc = ksmbd_check_transform_session(work, tr_sess_id);
-+		if (rc < 0) {
-+			ksmbd_conn_abort(conn);
-+			return;
-+		}
- 	}
- 
- 	if (conn->ops->allocate_rsp_buf(work))
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -12256,6 +12256,60 @@
- 	return trhdr->ProtocolId == SMB2_TRANSFORM_PROTO_NUM;
- }
- 
-+/*
-+ * The decryption key is selected by the transform SessionId, but
-+ * the request is authorized under the session named in the
-+ * decrypted SMB2 header. Per MS-SMB2 the two must match, so check
-+ * the decrypted message and its compound chain before dispatch.
-+ */
-+int ksmbd_check_transform_session(struct ksmbd_work *work, u64 tr_sess_id)
-+{
-+	struct smb2_hdr *hdr = smb_get_msg(work->request_buf);
-+	size_t msg_len = get_rfc1002_len(work->request_buf);
-+	size_t off = 0;
-+	bool first = true;
-+
-+	if (msg_len < sizeof(*hdr)) {
-+		pr_err_ratelimited("Decrypted message is smaller than SMB2 header\n");
-+		return -ECONNABORTED;
-+	}
-+
-+	for (;;) {
-+		u64 sid = le64_to_cpu(hdr->SessionId);
-+		u32 next;
-+
-+		if (first) {
-+			if (hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS) {
-+				pr_err_ratelimited("RELATED_OPERATIONS set on first operation\n");
-+				return -ECONNABORTED;
-+			}
-+			if (sid != tr_sess_id) {
-+				pr_err_ratelimited("SessionId mismatch between transform and inner header\n");
-+				return -ECONNABORTED;
-+			}
-+			first = false;
-+		} else if (!(hdr->Flags & SMB2_FLAGS_RELATED_OPERATIONS) &&
-+			   sid != ULLONG_MAX && sid != tr_sess_id) {
-+			pr_err_ratelimited("SessionId mismatch in compound chain\n");
-+			return -ECONNABORTED;
-+		}
-+
-+		next = le32_to_cpu(hdr->NextCommand);
-+		if (!next)
-+			return 0;
-+		if (next % 8) {
-+			pr_err_ratelimited("NextCommand %u is not 8-byte aligned\n", next);
-+			return -ECONNABORTED;
-+		}
-+		if (next > msg_len - off - sizeof(*hdr)) {
-+			pr_err_ratelimited("NextCommand %u is out of the message\n", next);
-+			return -ECONNABORTED;
-+		}
-+		off += next;
-+		hdr = (struct smb2_hdr *)((u8 *)smb_get_msg(work->request_buf) + off);
-+	}
-+}
-+
- int smb3_decrypt_req(struct ksmbd_work *work)
- {
- 	char *buf = work->request_buf;
-diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
---- a/fs/smb/server/smb2pdu.h
-+++ b/fs/smb/server/smb2pdu.h
-@@ -416,6 +416,7 @@
- void smb3_preauth_hash_rsp(struct ksmbd_work *work);
- bool smb3_is_transform_hdr(void *buf);
- int smb3_decrypt_req(struct ksmbd_work *work);
-+int ksmbd_check_transform_session(struct ksmbd_work *work, u64 tr_sess_id);
- int smb3_encrypt_resp(struct ksmbd_work *work);
- bool smb3_11_final_sess_setup_resp(struct ksmbd_work *work);
- int smb2_set_rsp_credits(struct ksmbd_work *work);
--- 
-2.53.0
+Tom.
