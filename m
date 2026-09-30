@@ -1,119 +1,121 @@
-Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5A23BB100
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2026 12:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.133.245.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9A14D956E
+	for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2026 12:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790770491; cv=none; b=DrwmOHtZ5U+eToGKbAxbU7qAjFAhNlklD3FoxouUai93zK+8IfNJkfxzzcRG24wj4ZYiW0cvz0NvmXwhdMxxFzXud2SPV0E+/4htLC7vo4zoEDs/c3CRd+mWj4hXtkwNpPam+y9FDbXcGt8s20Kwwq6t8kigJSX9eVvEL0FsHE0=
+	t=1790772145; cv=none; b=CXEOdVBqtCD4pJgtyZ1/Z/DO/mDo4kv5YnN1iPTqoR5ny1m/rxlQxpBfsLrfjyPKUqe1yz/qGLRv7VB7/Gu7k+PTAlWvapjrLHi2BxhLcyPzW632yP5UFHb3/gYO276oAxcush3/febz8nHU9kx577ShQk6vWR1yxNr1szT+0BI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790770491; c=relaxed/simple;
-	bh=sSOQqKC3nHv5EGgRISyS/bdH7NSAjrFs3C+YLZBfZtM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g3JhQuaHlcuMfnLYWlSZvuzCRjLx/soY0IaX9h8Nz6KQ2+rPRNZgGcFKJMSCt/3hI8WnGeUWWAnO+NxlAYVPoOHbDSbc9ntFQllmuTLZqoMeNfP1fjUt+f8MPuDqCZIwTcqoZ/eLpt5ssHNKts2c0+d6QYiEt52u+NrEAYWFU2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru; spf=pass smtp.mailfrom=nppct.ru; dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b=BK7RThPB; arc=none smtp.client-ip=195.133.245.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nppct.ru
+	s=arc-20240116; t=1790772145; c=relaxed/simple;
+	bh=tTc//LGv9TAVpyPw7gFAbmUplMi6wHMNTuAZCOvjqk4=;
+	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=huljmAvMthHzWh0wJGmK6DKGMbbU0x3UN2Oo2kMHCZrs+WyPUadgzIhHt8bR7G+7ki89SRtr7O8N0YSXW8BnIty17DqgNxrlO7uFYQuQdV1nD+TNBBYwc4aQjQZlkOnghqcfTLoKwHnZRLR2kbjWJdhsLNETQGfKa5qeRIQVJ8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gSbUy3MR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="BK7RThPB"
-Received: from mail.nppct.ru (localhost [127.0.0.1])
-	by mail.nppct.ru (Postfix) with ESMTP id 3A73B1C1517
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2026 15:06:42 +0300 (MSK)
-Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
-	reason="pass (just generated, assumed good)" header.d=nppct.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:to:from:from; s=dkim; t=1790769990; x=
-	1791633991; bh=sSOQqKC3nHv5EGgRISyS/bdH7NSAjrFs3C+YLZBfZtM=; b=B
-	K7RThPBr9a62FFThLShn7bhg8QWyfl7eFCTaZbhozQxAeSESKGAPC0oDdEM37yrM
-	GTArI1NsWiIIP9q/f1hWFzafLhlVCmYmeBtXJ1McIcAyeD1TPDOO7kx+Hn4gutbj
-	WcGJDdA54GeE9IAn6F/TKpkN79E3ifj/9n/ZLCRWG4=
-X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
-Received: from mail.nppct.ru ([127.0.0.1])
-	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id j31_eVd-MkNq for <linux-cifs@vger.kernel.org>;
-	Wed, 30 Sep 2026 15:06:30 +0300 (MSK)
-Received: from onyx3 (109-252-39-47.nat.spd-mgts.ru [109.252.39.47])
-	by mail.nppct.ru (Postfix) with ESMTPSA id 5F6841C1496;
-	Wed, 30 Sep 2026 15:06:28 +0300 (MSK)
-From: Mikhail Mirkin <mmirkin@nppct.ru>
-To: mmirkin@nppct.ru
-Cc: David Howells <dhowells@redhat.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12.y] cifs: Fix handling of a beyond-EOF DIO/unbuffered read over SMB1
-Date: Wed, 30 Sep 2026 15:05:32 +0300
-Message-ID: <20260930120532.5436-1-mmirkin@nppct.ru>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gSbUy3MR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1790772129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qNJSgJbR6fMVZzNmYweTnjm7bTXvXcgIpTbJtn9BRBQ=;
+	b=gSbUy3MR0oNaDawhSS/jdQiU3n2m+DNvb/fpifZNIC/+a7vLXdUHSIvZFzIQcKqrEDDFa0
+	nngYOkKVrRlJqMFs2WYkQTYdzCONxJe+eerFXiCv9cQ90CNlBHFtQG57S8FDO4YQMX46aB
+	Q0hx/iBTzYOpo01L94E1bhF4zKmmkMM=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-456-ZO5yj58aPu67-DmS2bvXjg-1; Wed,
+ 30 Sep 2026 08:42:05 -0400
+X-MC-Unique: ZO5yj58aPu67-DmS2bvXjg-1
+X-Mimecast-MFC-AGG-ID: ZO5yj58aPu67-DmS2bvXjg_1790772124
+Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4BCCB18BAA29;
+	Wed, 30 Sep 2026 12:42:03 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.54])
+	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CC2695BC;
+	Wed, 30 Sep 2026 12:41:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <brauner@kernel.org>
+cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>, linux-cifs@vger.kernel.org,
+    netfs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: cachefiles: Fix unset error when calling netfs_prepare_write_failed()
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3227745.1790772118.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 Sep 2026 13:41:58 +0100
+Message-ID: <3227746.1790772118@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
 
-From: David Howells <dhowells@redhat.com>
+Fix cachefiles to set subreq->error before calling
+netfs_prepare_write_failed() otherwise netfslib will try (and fail) to
+retry the subrequest (it shouldn't retry writes to the cache, but rather
+abandon them).  This causes it to hang waiting for the request to complete=
+.
 
-commit c61af12157ef9fe480ab84b4923e8ca3d8f86a62 upstream.
-
-If a DIO read or an unbuffered read request extends beyond the EOF, the
-server will return a short read and a status code indicating that EOF was
-hit, which gets translated to -ENODATA.  Note that the client does not cap
-the request at i_size, but asks for the amount requested in case there's a
-race on the server with a third party.
-
-Now, on the client side, the request will get split into multiple
-subrequests if rsize is smaller than the full request size.  A subrequest
-that starts before or at the EOF and returns short data up to the EOF will
-be correctly handled, with the NETFS_SREQ_HIT_EOF flag being set,
-indicating to netfslib that we can't read more.
-
-If a subrequest, however, starts after the EOF and not at it, HIT_EOF will
-not be flagged, its error will be set to -ENODATA and it will be abandoned.
-This will cause the request as a whole to fail with -ENODATA.
-
-Fix this by setting NETFS_SREQ_HIT_EOF on any subrequest that lies beyond
-the EOF marker.
-
-This can be reproduced by mounting with "cache=none,sign,vers=1.0" and
-doing a read of a file that's significantly bigger than the size of the
-file (e.g. attempting to read 64KiB from a 16KiB file).
-
-Fixes: a68c74865f51 ("cifs: Fix SMB1 readv/writev callback in the same way as SMB2/3")
+Reported-by: Marc Dionne <marc.dionne@auristor.com>
+Fixes: 1a9fe4b6e787 ("cachefiles: Don't rely on backing fs storage map for=
+ most use cases")
 Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
+Tested-by: Marc Dionne <marc.dionne@auristor.com>
+cc: Paulo Alcantara <pc@manguebit.org>
+cc: Matthew Wilcox <willy@infradead.org>
 cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
-cc: lvc-project@linuxtesting.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Mikhail Mirkin: Adopted for 6.12]
-Signed-off-by: Mikhail Mirkin <mmirkin@nppct.ru>
 ---
- fs/smb/client/cifssmb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/cachefiles/io.c     |    2 ++
+ fs/netfs/write_issue.c |    1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 01c78d9e7..11d408d1a 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1321,7 +1321,7 @@ cifs_readv_callback(struct mid_q_entry *mid)
- 	} else {
- 		size_t trans = rdata->subreq.transferred + rdata->got_bytes;
- 		if (trans < rdata->subreq.len &&
--		    rdata->subreq.start + trans == ictx->remote_i_size) {
-+		    rdata->subreq.start + trans >= ictx->remote_i_size) {
- 			__set_bit(NETFS_SREQ_HIT_EOF, &rdata->subreq.flags);
- 			rdata->result = 0;
+diff --git a/fs/cachefiles/io.c b/fs/cachefiles/io.c
+index 4f547d97356e..d05059822288 100644
+--- a/fs/cachefiles/io.c
++++ b/fs/cachefiles/io.c
+@@ -528,10 +528,12 @@ static void cachefiles_prepare_write_subreq(struct n=
+etfs_io_subrequest *subreq)
+ =
+
+ 	if (!cachefiles_cres_file(cres)) {
+ 		if (!fscache_wait_for_operation(cres, FSCACHE_WANT_WRITE)) {
++			subreq->error =3D -ENOBUFS;
+ 			trace_netfs_sreq(subreq, netfs_sreq_trace_cache_waitfail);
+ 			return netfs_prepare_write_failed(subreq);
  		}
--- 
-2.50.1
+ 		if (!cachefiles_cres_file(cres)) {
++			subreq->error =3D -ENOBUFS;
+ 			trace_netfs_sreq(subreq, netfs_sreq_trace_cache_nofile);
+ 			return netfs_prepare_write_failed(subreq);
+ 		}
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index 9de73c0edad2..b255a1167bb1 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -148,6 +148,7 @@ struct netfs_io_request *netfs_create_write_req(struct=
+ address_space *mapping,
+  */
+ void netfs_prepare_write_failed(struct netfs_io_subrequest *subreq)
+ {
++	WARN_ON_ONCE(!subreq->error);
+ 	__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+ 	trace_netfs_sreq(subreq, netfs_sreq_trace_prep_failed);
+ }
 
