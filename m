@@ -1,34 +1,34 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B2BD374A17;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE193749FA;
 	Wed, 30 Sep 2026 03:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790738913; cv=none; b=tK/1HMbdsVQuM5FJAnK3EWjhYjUzXStIeUgwrbVI6OoJMqHjClO+VOn45RbcUTMm3dlIKr4+5NSp0uoFozWCgZoNlrtZ4pxwzkwTaGgNAvwcQ59SklRyBQHB9svO31nZzIP5cGgc+P0skCiVbmTIS36kWMyjk1cEQnJYkGvWqBs=
+	t=1790738914; cv=none; b=UHOIVhMgDUBXNo+LzIAt8ptKLZAj0FmXqavyn1q19HZO0PIHsHaDaFHil/ttGBTS0gov8NNQGNamFO04EfglhMrP3+Ud/T77MAPQF11cUHdIc8qg7t4ZmeMP/DKuSbnkTKd9NA6qkX54+Kb2xUYhDfDMlBezjj9T7c3Nc4d+R8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790738913; c=relaxed/simple;
-	bh=zXXmJ//fAUP5wYkoabvPC659fyQh6j2GY616lAVsWXc=;
+	s=arc-20240116; t=1790738914; c=relaxed/simple;
+	bh=T9LUOL0xRWtAnfZ/plfBMRhq5YsPlcEp8yIv4qG6Qbo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jGourQSlupbRjTNfdAUxKYfXe3TNLkXj5AJ6nQy6ADm70u/v+/0lhIkJ09+XI2qO72Ry6V8ZJjQDeh9in7r2faLnGYfBWOgWihSfav83qA5yoVzgMzPjkRSCE7m2aGy+ZkLCcZvil3fS3+PlFeY8RFfLk2GwDnPIJHKFc/Dv/7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=vLJErNfv; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version; b=at9lDo2wRw5FEplkxBQSOtWxFmVnPTN5FFqiaONUDnFaDj/Q/LRnrdVq4AbaSPiNOw1fLu8MoSfcIv3q9aRyXeEmEC/eJw3mH4fn9oylXkJCBPhP8X/jCMBzGzce4ZO+5AlyJJIBM/CGlwj4US62dtlbOhzolHPChd7YzFkcaSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Pp7YsAJt; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="vLJErNfv"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Pp7YsAJt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=BpEOs9luKJgPY84UQheuVHbfERcOG1ON3nUkmcu9ApY=; b=vLJErNfvIpx07OaEqfVxArN+fo
-	pS/8L2VYaAeQY2RwJ3SUBxzCKT54dZyJosdypeqX2UaHnEVT0/krixnRRtODUQoLSJIUFWXQk7LkJ
-	iKYIw992nfKCvw2K3eRAid1pgNWTHhMeyN1xkv7UanBk2OdHpFrTbcJYkh7SHzI6kRLYSeMG9r2yI
-	ZFNBFWT0vGTOkD3hWq0N/YtZLq+CJdQEAPruINzr9VxJTtYBra2YFSSEUtIbLVpcQOzGeGEdDPpUw
-	wFIQXsiQ8BpIDfGA01UuEPYgGSv7J/9Owp3km5j76eFLIUcf4vj/wsn6U5hK122K9XBE9MOxfen8U
-	qgo8C18g==;
+	bh=VX1GsVURtMx0AcAd5F90EUOQVkRrx8GKSS+iMNJHFuk=; b=Pp7YsAJtDsLQz7B5fyBABnuhec
+	bx/dwCu1ZCC1b1Q8AoMP9kVturiiTx6y0L823Hi8Kk/ibDTijkruZNdJ8V6mCc7vvv1RRZuX1evVm
+	EmgIo/yG0Xrq3sk3y60vUw8oAyu3BpuqA6eyDpg2Uuflzk1EhHwfCBaZ1AP5Wm2cezm9AmO7KI/nT
+	TvuCFA3vIjtcIUb+ixkK4iE/7BCvlKE1z0mcfa6jJwgzX8u7WYd5ZDSAt4M2J6oyQjEi6BTJXo/Ad
+	cTSKboKnA5ORE03RmoqHVUX00ZPC1xDIDHihh6f0AywSk1ubvnH7gQsErSlPHIiP1j5ygvhWZ1356
+	yJW1N2SA==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xBkzX-00000002as0-40t3;
-	Wed, 30 Sep 2026 00:28:23 -0300
+	id 1xBkzb-00000002asj-0HfB;
+	Wed, 30 Sep 2026 00:28:27 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 02/15] smb: client: clear post-EOF pagecache when extending a file via truncate
-Date: Wed, 30 Sep 2026 00:28:09 -0300
-Message-ID: <20260930032822.1835287-3-pc@manguebit.org>
+Subject: [PATCH v3 11/15] netfs: zero gaps in read-gaps folio to avoid writing back stale data
+Date: Wed, 30 Sep 2026 00:28:18 -0300
+Message-ID: <20260930032822.1835287-12-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260930032822.1835287-1-pc@manguebit.org>
 References: <20260930032822.1835287-1-pc@manguebit.org>
@@ -55,25 +55,20 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cifs_setsize() relied on pagecache_isize_extended() to zero the tail of
-the folio straddling the old EOF, but that helper is a no-op on CIFS
-(i_blkbits is 14), so data dirtied past EOF through an mmap survived
-and became visible once the file was extended.
+netfs_read_gaps() leaves gaps around a streaming write's dirty region
+unread on the server side, so a short/EOF response there left stale
+folio content that later got written back.
 
-Use netfs_clear_stale_post_isize() instead, called after i_size is
-updated since cifs_setsize() callers hold i_rwsem exclusively for the
-whole resize.  truncate_pagecache() is then called as in
-truncate_setsize(): a no-op on extend, and it drops the pagecache
-beyond the new EOF on shrink.
+Zero it after the read completes, not before: netfs_wait_for_read()
+returns rreq->transferred once ret >= 0, so build an iterator over the
+same bvec array the read used, advance past ret, and zero the rest.
+The dirty region already maps to sink pages in that array rather than
+the real folio, so this can't touch it, and only the actual shortfall
+gets zeroed instead of the whole gap upfront.
 
-Also thread old_size as an explicit parameter through cifs_setsize()
-and cifs_resize_file_locked(), captured by each caller before its own
-resize RPC.  This closes a race where a concurrent stat() could adopt
-the RPC's already-updated server size via is_size_safe_to_change()
-before cifs_setsize() reads old_size itself.
-
-Closes: https://sashiko.dev/#/patchset/20260921230755.1133425-1-pc%40manguebit.org
-Fixes: c510edb9734a ("cifs: call pagecache_isize_extended() in cifs_setsize() when extending")
+Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
+Reviewed-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: Christian Brauner <brauner@kernel.org>
 Cc: Matthew Wilcox <willy@infradead.org>
@@ -84,164 +79,27 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsfs.h  |  5 +++--
- fs/smb/client/file.c    |  3 ++-
- fs/smb/client/inode.c   | 22 ++++++++++++++--------
- fs/smb/client/smb2ops.c | 10 ++++++----
- 4 files changed, 25 insertions(+), 15 deletions(-)
+ fs/netfs/buffered_read.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-index 0c85daa8386e..e3d820c9778b 100644
---- a/fs/smb/client/cifsfs.h
-+++ b/fs/smb/client/cifsfs.h
-@@ -146,8 +146,9 @@ ssize_t cifs_file_copychunk_range(unsigned int xid, struct file *src_file,
- 				  unsigned int flags);
+diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+index 105194de6e13..e6506942aeda 100644
+--- a/fs/netfs/buffered_read.c
++++ b/fs/netfs/buffered_read.c
+@@ -541,6 +541,13 @@ static int netfs_read_gaps(struct file *file, struct folio *folio)
  
- long cifs_ioctl(struct file *filep, unsigned int command, unsigned long arg);
--void cifs_setsize(struct inode *inode, loff_t offset);
--void cifs_resize_file_locked(struct inode *inode, loff_t offset);
-+void cifs_setsize(struct inode *inode, loff_t old_size, loff_t offset);
-+void cifs_resize_file_locked(struct inode *inode, loff_t old_size,
-+			     loff_t offset);
- 
- struct fs_context;
- struct smb3_fs_context;
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 0d428517f454..4bcb87610897 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -1017,6 +1017,7 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
- 	if (!rc) {
- 		if (cfile) {
- 			struct netfs_inode *ictx = netfs_inode(inode);
-+			loff_t old_size = i_size_read(inode);
- 
- 			tcon = tlink_tcon(cfile->tlink);
- 			server = tcon->ses->server;
-@@ -1025,7 +1026,7 @@ static int cifs_do_truncate(const unsigned int xid, struct dentry *dentry)
- 							cfile, 0, false);
- 			if (!rc) {
- 				netfs_resize_file(&cinode->netfs, 0, true);
--				cifs_setsize(inode, 0);
-+				cifs_setsize(inode, old_size, 0);
- 				cifs_invalidate_cache(inode, 0);
- 			}
- 			netfs_wb_end(ictx);
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 1fe0ef0a95db..5062474991cf 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -3053,15 +3053,12 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
- 	return -EOPNOTSUPP;
- }
- 
--void cifs_setsize(struct inode *inode, loff_t offset)
-+void cifs_setsize(struct inode *inode, loff_t old_size, loff_t offset)
- {
--	loff_t old_size;
- 	u64 blocks = CIFS_INO_BLOCKS(offset);
- 
- 	spin_lock(&inode->i_lock);
--	old_size = i_size_read(inode);
- 	i_size_write(inode, offset);
--
- 	/*
- 	 * Extending EOF does not allocate the intervening range. Only clamp
- 	 * i_blocks on shrink; allocation growth comes from writes or from the
-@@ -3071,20 +3068,28 @@ void cifs_setsize(struct inode *inode, loff_t offset)
- 		inode->i_blocks = blocks;
- 	spin_unlock(&inode->i_lock);
- 	inode_set_mtime_to_ts(inode, inode_set_ctime_current(inode));
+ 	ret = netfs_wait_for_read(rreq);
+ 	if (ret >= 0) {
++		if (ret < flen) {
++			struct iov_iter iter;
 +
-+	/*
-+	 * Zero the tail of the folio straddling the old EOF so data dirtied
-+	 * past EOF through an mmap isn't exposed.  truncate_pagecache() then
-+	 * drops any pagecache beyond the new EOF, as in truncate_setsize().
-+	 */
- 	if (offset > old_size)
--		pagecache_isize_extended(inode, old_size, offset);
-+		netfs_clear_stale_post_isize(inode, old_size, offset);
-+
- 	truncate_pagecache(inode, offset);
- 	netfs_wait_for_outstanding_io(inode);
- }
- 
--void cifs_resize_file_locked(struct inode *inode, loff_t offset)
-+void cifs_resize_file_locked(struct inode *inode, loff_t old_size,
-+			     loff_t offset)
- {
- 	struct fscache_cookie *cookie = cifs_inode_cookie(inode);
- 
- 	lockdep_assert_held_write(&inode->i_rwsem);
- 
- 	netfs_resize_file(netfs_inode(inode), offset, true);
--	cifs_setsize(inode, offset);
-+	cifs_setsize(inode, old_size, offset);
- 
- 	if (!cookie)
- 		return;
-@@ -3101,6 +3106,7 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
- 	struct inode *inode = d_inode(dentry);
- 	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
- 	struct cifsInodeInfo *cifsInode = CIFS_I(inode);
-+	loff_t old_size = i_size_read(inode);
- 	struct tcon_link *tlink = NULL;
- 	struct cifs_tcon *tcon = NULL;
- 	struct TCP_Server_Info *server;
-@@ -3159,7 +3165,7 @@ int cifs_file_set_size(const unsigned int xid, struct dentry *dentry,
- 
- set_size_out:
- 	if (rc == 0)
--		cifs_resize_file_locked(inode, size);
-+		cifs_resize_file_locked(inode, old_size, size);
- 
- 	return rc;
- }
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index aa142420dae2..1ada1c0a728d 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -2287,6 +2287,7 @@ smb2_duplicate_extents(const unsigned int xid,
- 	struct duplicate_extents_to_file dup_ext_buf;
- 	struct timespec64 ts;
- 	struct cifs_tcon *tcon = tlink_tcon(trgtfile->tlink);
-+	loff_t old_size;
- 	u64 asize;
- 
- 	/* server fileays advertise duplicate extent support with this flag */
-@@ -2305,11 +2306,12 @@ smb2_duplicate_extents(const unsigned int xid,
- 			       trgtfile->fid.volatile_fid, tcon->tid,
- 			       tcon->ses->Suid, src_off, dest_off, len);
- 	inode = d_inode(trgtfile->dentry);
--	if (i_size_read(inode) < dest_off + len) {
-+	old_size = i_size_read(inode);
-+	if (old_size < dest_off + len) {
- 		rc = smb2_set_file_size(xid, tcon, trgtfile, dest_off + len, false);
- 		if (rc)
- 			goto duplicate_extents_out;
--		cifs_resize_file_locked(inode, dest_off + len);
-+		cifs_resize_file_locked(inode, old_size, dest_off + len);
- 	}
- 	rc = SMB2_ioctl(xid, tcon, trgtfile->fid.persistent_fid,
- 			trgtfile->fid.volatile_fid,
-@@ -3883,7 +3885,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 			}
- 
- 			new_eof = off + len;
--			cifs_resize_file_locked(inode, new_eof);
-+			cifs_resize_file_locked(inode, old_eof, new_eof);
- 
- 			qrc = SMB2_query_info(xid, tcon,
- 					      cfile->fid.persistent_fid,
-@@ -3931,7 +3933,7 @@ static long smb3_simple_falloc(struct file *file, struct cifs_tcon *tcon,
- 		if (rc)
- 			goto out;
- 
--		cifs_resize_file_locked(inode, new_eof);
-+		cifs_resize_file_locked(inode, old_eof, new_eof);
- 
- 		qrc = SMB2_query_info(xid, tcon,
- 				      cfile->fid.persistent_fid,
++			iov_iter_bvec(&iter, ITER_DEST, bvec, i, flen);
++			iov_iter_advance(&iter, ret);
++			iov_iter_zero(flen - ret, &iter);
++		}
+ 		if (group)
+ 			folio_change_private(folio, group);
+ 		else
 -- 
 2.55.0
 
