@@ -1,34 +1,34 @@
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED523750BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6123750AC;
 	Wed, 30 Sep 2026 03:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790738913; cv=none; b=egf3Hxny/+ASbXJhHnv6oTp8ahWXhdurALn0Wx8WoxkEbztjNPLKEvSxp7Ra7QsWRMoRezRgR4blyW0HVJcd+qe6Gr8MSHXZzAujhwx6ZHMfW6vnEhAKUmwUywzYZ+YiJJ/lDubu71LD6hMgwL27G2hiqQURAG1Xgc22YXe6Dw4=
+	t=1790738913; cv=none; b=FMrx4lgZi97yxDNUau1XCk2CehUOd5nkrYoa0ZqVRJTCY2Iz4xM/zaF9bkU/+MQawJMESsKSw3dfXxcqcuqmDPGXgcQ0pEk0HdilHWCF3MDoqkuj6YicQRV3QOLV8iVTqTXtHykSYx5F6RLU10EYAxCMVSUPvuwbJ7eLrHgRlgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1790738913; c=relaxed/simple;
-	bh=JDzD+K9ctWj9DEQN6JeY6YdNXkumA7bmhQ1IponxLb4=;
+	bh=KGfIvBlCbx/6hTHchRqWbEpxqs+q/TBXo5o9Dai4OFI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uyZVE4Hf7hpG38mjSchXIb0JGOR8w2F6yowMF9n/QgvX88OJPL6//lTfmYjiyN7lxJLgCVAwWHROEC3NSxJUmmdT9Taab4hotoML3eXdWoLF4t/MBHpeO6XawK7Wxi2EggDtVKxwuoEpfnODbJvqANwz0HNvS1LQy0Gxz1UtFRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=PD1Mez7B; arc=none smtp.client-ip=143.255.12.172
+	 MIME-Version; b=aDBxuas2NIuVkKHHG2U+Izm/Z/VjmE04eoEJRUW3E2nhdN2dOXa42nFgsj7xQeL8ASKKDDeq6+cweO+WIleUm5r9cRnNqTgkWRUvQq4yGpTB4R8kJyuzOyqFTDUalyKDZ40nuedOYdtzHyoZFOp1FLKzyglmHZSsuNA+O0DaNf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=va8ZKLDi; arc=none smtp.client-ip=143.255.12.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="PD1Mez7B"
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="va8ZKLDi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=lJT4YyzXCyUvSgOL73p+2MFoE9ZOl3detxnx4sCO+CM=; b=PD1Mez7BX4Xhr1NN+/gBdcZ8Rc
-	8P1reCgeKiqirVPItKnjT4TsaIWEIofJ8xas9/wn4KoZ84iGSu21NEmU7fyNO+rD7pjWra+mvLnlU
-	mcOCY2F6HE9AbtupWfc5J+6aU40A987j2UowjXkYM8Cra0F28jHx9cjCHbwwb8YIOv7eUNFlzfX9y
-	xaWidxnOUp6H21m4DXK8hCBkTCVRWAhNBuFWvisFDqnbt6Y8z51AhyluuhN5FczKxBuHxes2Atz5l
-	8r6gYyZ2xl6ZfZsPlXVrvnbZIL9JH0iFcf/VrfPef0A9ZhiSWx2QU6J2JKxW6jrDrwNnbCRawxXn/
-	VZKMSj0A==;
+	bh=BJ17WV1GnN5OT1URP0DH96YYJBOm5GXPtRjLgtxPpZw=; b=va8ZKLDil1TggCSNs9SG443ug1
+	+m+BI3zxRcsbXW1WQcJmTiuU4W8RjCM9fKY+Oq5CehxUqojTFNFrZ/+3+jbtjBur6rPrS5OHxThPn
+	iRIg+2Ya2r8aeXdIA2oVHGlbJaevrsWzLRfD18diBBRwwcqkXGNKNQi3pRsBr+BZ+qpiqpjE+bQ5N
+	COp6a8HtvW8+kPiK3nMSdkeWr8bTp/HO4AIWzoGs3MwlTitsR5lx+UEXZeWtF7Axwhx8x+fdN8KdJ
+	G9gZKLe2RyGAbaraib4RHM6ne23V9fJBQDlFgSLhQS8e1U/A58TOqC42a1oXI/+sVkiLXwep5dtvK
+	Oao+OW1A==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xBkzc-00000002auk-1wET;
-	Wed, 30 Sep 2026 00:28:28 -0300
+	id 1xBkzb-00000002ast-3DMN;
+	Wed, 30 Sep 2026 00:28:27 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev
@@ -41,9 +41,9 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 15/15] smb: client: require stable pages for signed connections
-Date: Wed, 30 Sep 2026 00:28:22 -0300
-Message-ID: <20260930032822.1835287-16-pc@manguebit.org>
+Subject: [PATCH v3 13/15] netfs: zero the tail of a short DIO/unbuffered read
+Date: Wed, 30 Sep 2026 00:28:20 -0300
+Message-ID: <20260930032822.1835287-14-pc@manguebit.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260930032822.1835287-1-pc@manguebit.org>
 References: <20260930032822.1835287-1-pc@manguebit.org>
@@ -55,21 +55,28 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When signing, cifs computes the SMB signature over the pagecache folios
-in place and then hands those same folios to the socket.  If a buffered
-write mutates a folio while a write subrequest is still in flight, the
-signature no longer matches the data that follows it, the server rejects
-the write with STATUS_ACCESS_DENIED (-EACCES), and the error is latched
-in the mapping, so the next fsync()/fallocate() returns -EIO.
+The buffered read collector zero-fills the tail of a short read that
+stops below the inode's i_size (netfs_clear_unread()), so a read that
+races an extending write still returns the expected number of bytes.
+The non-buffered collector path does no such thing: it just records
+how much was transferred.
 
-Mark the mapping for stable writes so netfs_perform_write() waits for
-writeback to complete before modifying an in-flight folio.  This is
-only needed when the connection is signed.
+Add the same zero-fill for the non-buffered case, gated on
+NETFS_SREQ_CLEAR_TAIL: a subreq's source sets that flag when a short
+result from it is known to be safe to treat as a hole, as opposed to
+NETFS_SREQ_HIT_EOF, which means the read genuinely ran off the end of
+the file and should be reported short as-is. Only CLEAR_TAIL should
+zero-fill here; a real EOF must stay a real short read.
 
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+No source currently sets CLEAR_TAIL on an unbuffered/DIO subrequest,
+so this is inert on its own -- a following change teaches cifs to set
+it in the one case that needs it.
+
+Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
+Reviewed-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: Christian Brauner <brauner@kernel.org>
-Cc: David Howells <dhowells@redhat.com>
 Cc: Matthew Wilcox <willy@infradead.org>
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
@@ -78,22 +85,51 @@ Cc: Tom Talpey <tom@talpey.com>
 Cc: Bharath SM <bharathsm@microsoft.com>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/inode.c | 2 ++
- 1 file changed, 2 insertions(+)
+ fs/netfs/read_collect.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 5062474991cf..f29555f3c7d0 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -88,6 +88,8 @@ static void cifs_set_ops(struct inode *inode)
- 		else
- 			inode->i_data.a_ops = &cifs_addr_ops;
- 		mapping_set_large_folios(inode->i_mapping);
-+		if (tcon->ses->server->sign)
-+			mapping_set_stable_writes(inode->i_mapping);
- 		break;
- 	case S_IFDIR:
- 		if (IS_AUTOMOUNT(inode)) {
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index a94197ef0181..c5bfaf2c6f25 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -33,6 +33,22 @@ static void netfs_clear_unread(struct netfs_io_subrequest *subreq)
+ 		__set_bit(NETFS_SREQ_HIT_EOF, &subreq->flags);
+ }
+ 
++static void netfs_clear_unread_dio(struct netfs_io_subrequest *subreq)
++{
++	uoff_t pos = subreq->start + subreq->transferred;
++	struct netfs_io_request *rreq = subreq->rreq;
++	size_t fill;
++
++	if (pos >= rreq->i_size)
++		return;
++
++	fill = min_t(uoff_t, rreq->i_size - pos,
++		     subreq->len - subreq->transferred);
++
++	netfs_reset_iter(subreq);
++	subreq->transferred += iov_iter_zero(fill, &subreq->io_iter);
++}
++
+ /*
+  * Cancel the copy-to-cache mark on a folio.
+  */
+@@ -311,6 +327,14 @@ static void netfs_collect_read_results(struct netfs_io_request *rreq)
+ 			    test_bit(NETFS_SREQ_HIT_EOF, &front->flags))
+ 				netfs_read_unlock_folios(rreq, &notes);
+ 		} else {
++			if (!(notes & HIT_PENDING) &&
++			    front->error == 0 &&
++			    transferred < front->len &&
++			    test_bit(NETFS_SREQ_CLEAR_TAIL, &front->flags)) {
++				netfs_clear_unread_dio(front);
++				transferred = front->transferred;
++				trace_netfs_sreq(front, netfs_sreq_trace_clear);
++			}
+ 			stream->collected_to = front->start + transferred;
+ 			rreq->collected_to = stream->collected_to;
+ 		}
 -- 
 2.55.0
 
