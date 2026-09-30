@@ -1,157 +1,288 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28DE374A05
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2026 15:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15D6351477A;
+	Wed, 30 Sep 2026 16:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790781470; cv=none; b=GHLToWFNvq+QnhmLEg6C+5j9GKEOEMqe5Q8K9dL/4X8Dn4Unvaqt84sJz8mM/lTkiemCm7BU9A/vxyh60CxRxlq/m/TwuS/NtPaqKZIkJufCKmTeYpK3iE0oNF/B9TdyBmRmvH8i/IyRYxz+78q3lztEZovxV1whNh76tMnXdkI=
+	t=1790786421; cv=none; b=JgOUHcU6E8BiWQM3QnhLTkq5KEpUacblc1EG+ydZ05F4gCKebPDdq0MZiT5xLZkEbv3aqOiV4d7HbGMFYIvWgGrXrNH8NV25jE3/WMhbJC0qmZV2cxJwjfKVE1gSfqt2aUTjJmpB6oNHykBkMG7YiONhyXS9x143cHsxg+L+Tq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790781470; c=relaxed/simple;
-	bh=18kZ8PnP52CRB5IvdMYDi+jRrKH5wEsbLEEmFjxLp8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rYZYwdXSoRIZT+g9ehE9sbki6hzmwItysm8uNrfFerzNY5oUayqKpsOvXfjLHuBOTKCcAEf5/dzZB9B+QxdqjLeywZ0+O6OUok5uRju43KJKm5ELjUuwII1GYrrBq1mgMBY2tb7K+jEJgIH3cJsGYG6ddoKf26k0LP9XvLIol/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLpzsh6j; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1790786421; c=relaxed/simple;
+	bh=N8GYaWTC0rUcAxPnIEiYJSiaJA+klV7VmQhi4X66//Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Shi+shXQYgF+zJRLLGs7bnWmk6LE7+hBNS+dXflarqIJxZQm+sCtmtow4ViqRoMXP5d4E0jd0dUTd5mZA6B0C841FeG8TUCqI9CbQObNo89RFrEMf8bX6yXNgHoiLjTrIQ8P2UexRtGBFZQYR312VKYcvpVs6uHkriZLCN9wyxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHALs2h3; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLpzsh6j"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC311F000FF
-	for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2026 15:17:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHALs2h3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E8261F0089A;
+	Wed, 30 Sep 2026 16:40:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790781458;
-	bh=yzDSJePxqrjjuXwILoDgCSkZpGfsogLk6JJtjsdaFyk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TLpzsh6jorD4stADLHECZ/eIS9Zrug7fJyC3Si6pE6xcZFHSV1yRl+q3kFcUYtdQJ
-	 knCnnMZ0CasHen4CtAPxUyi4UVjfeTBbv5rV3NhPxkFru+txmqOcSVN0GT3Dlt/xKP
-	 OyPvy8ZIbRD1JUDkVdNRXpVjH3hz6xp7U4K5m1vlGERSVhgOZwP6J1sFXlM2I3mBZr
-	 bzY/5jEFqUq5H7ANPl2wNs8ig1QJyOwOlXNXy6ODlvltoisYdLeEQSvkGGqkrR335J
-	 JLv5s4LY6ulXa7gJPpl8PmBA2wJcfkIsA4QQKvOTIctPS3/kpFbvXDm7WA5GRF/+re
-	 bi049VN6/FScA==
-Received: by mail-ej2-f12.google.com with SMTP id a640c23a62f3a-c29703cb796so770744666b.2
-        for <linux-cifs@vger.kernel.org>; Wed, 30 Sep 2026 08:17:37 -0700 (PDT)
-X-Gm-Message-State: AFuF++kOtcmnGMMI96YBTkFSiekTE3rrnWVhpQ5rTCoeMOCAil9PY99l
-	gezhUK2/FgbYLZldqYUa9YjUYRwKD8RlO4Om4+Cae2mcl5bE90PLNag8X7Fwaspjg4La9pGTyg+
-	6WEC/RY2yQ53/CgByfmF8DeyJBYj2zDU=
-X-Received: by 2002:a17:907:728d:b0:c2d:ce02:8def with SMTP id
- a640c23a62f3a-c2e23ca13d9mr145278066b.12.1790781456676; Wed, 30 Sep 2026
- 08:17:36 -0700 (PDT)
+	s=k20260515; t=1790786419;
+	bh=iPUuZLmAEeFRLgcWPsoOfbwxyIyXceeZl5aZ/gyXQ14=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=WHALs2h3RGR2UbhOhinhhr5VxRbpfCau4S7hEWLaQQ48ltJweoktvuG+2BrwXcRgX
+	 WpD9OR1LMiS4aHy4kyOdf+A4va6ixENLgPy9FT3qnw9dZoOjr6ePoSXwm7gM8UBHZX
+	 qWO46+qyY0nETAeC++5uSQhXOznrGtOp8P56rgNErbDQUD+RU1zp0qf0ikAwdHpUFS
+	 s+1269+gq9yYFu5NedmJyevRJ4dS6WQXPR3MrqZ/wElQBZY1ZIlh6PC16qZ+rp+KWi
+	 Uje/UeLgNB2fUBDOb1Ylw0QzF8MfOKyrmrutyr13FFpeq7GePrfbbSpkHx1pe4Y4e4
+	 B3JkJHWo27ofg==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Tom Talpey <tom@talpey.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.18.y 1/2] cifs: Remove the RFC1002 header from smb_hdr
+Date: Wed, 30 Sep 2026 12:40:16 -0400
+Message-ID: <20260930164017.3227931-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <2026092947-pull-universe-5b22@gregkh>
+References: <2026092947-pull-universe-5b22@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260930032822.1835287-1-pc@manguebit.org>
-In-Reply-To: <20260930032822.1835287-1-pc@manguebit.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 1 Oct 2026 00:17:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-zUMWSM_usuKdz6HBLGz-YLcqb2+i=iWRn9fGJ30esgw@mail.gmail.com>
-X-Gm-Features: AclHuK-5owUL19DJWQsYyUypw1TibuEWOeUWM1HnLtPC1wOaWAiXfKIBbY01L2o
-Message-ID: <CAKYAXd-zUMWSM_usuKdz6HBLGz-YLcqb2+i=iWRn9fGJ30esgw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/15] netfs, cifs: data corruption fixes
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, netfs@lists.linux.dev, 
-	Christian Brauner <brauner@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Matthew Wilcox <willy@infradead.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 30, 2026 at 12:28=E2=80=AFPM Paulo Alcantara <pc@manguebit.org>=
- wrote:
->
-> This series fixes a number of data corruption and spurious I/O error
-> bugs found by running generic/363 (fsx) in a loop against Windows
-> Server 2022 and Samba 4.24 servers.
->
-> * Post-EOF pagecache poisoning on extend (1-5)
->
->   Data dirtied past EOF through an mmapped region was never discarded,
->   so it reappeared as file content once the file was extended by an
->   ordinary write, a truncate, a zero range, a copy range or a clone
->   range.  pagecache_isize_extended() doesn't help here: it's a no-op on
->   cifs because i_blkbits is 14.  Only the one folio straddling the old
->   EOF can hold such data, since pages wholly beyond EOF can't be
->   faulted in, so each extending path now zeroes or discards that folio.
->
-> * Missing flush or drain before trusting server or pagecache state (6-9)
->
->   FSCTL_QUERY_ALLOCATED_RANGES can report just-written data as a hole
->   unless it has been committed to disk first, and the O_TRUNC open,
->   interior zero range and server-side copy/clone paths did not flush
->   dirty data or drain in-flight I/O before an operation that assumes
->   the pagecache and the server agree on the file's contents.
->
-> * fallocate refused without a read lease (10, 12)
->
->   smb3_zero_range() and smb3_simple_falloc() returned -EOPNOTSUPP for
->   any size-extending request whenever the inode wasn't read caching,
->   since the cached i_size couldn't be trusted.  Query the server's EOF
->   in that case instead of refusing the request outright.
->
-> * Short reads leaving stale data behind (11, 13, 14)
->
->   The read-gaps path and the DIO/unbuffered read collector left the
->   untransferred tail of a short read untouched, and cifs could not
->   tell a genuine EOF from a stale cached remote_i_size after a lease
->   downgrade.  A read racing an extending write could come back short
->   and, in the read-gaps case, have that stale folio content written
->   back to the server.
->
-> * Unstable pages during a signed write (15)
->
->   cifs signs the pagecache folios in place before handing them to the
->   socket.  A buffered write could modify a folio while a write
->   subrequest built from it was still in flight, so the signature no
->   longer matched the data that followed it; the server answered
->   STATUS_ACCESS_DENIED, which surfaced later as -EIO.
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> Changes since v2:
-> * Patch 12: zero the stale folio against the client's local i_size
->   instead of the server-queried EOF, so an extending, leaseless
->   preallocate can't skip zeroing past the client's real EOF.
->
-> Changes since v1:
-> * Patch 1: split the helper into netfs_clear_stale_pre_isize()
->   (unexported) and netfs_clear_stale_post_isize() (exported for CIFS).
-> * Patch 2: capture old_size before the resize RPC and call
->   netfs_clear_stale_post_isize() after i_size is updated, closing a
->   stat() race.
-> * Patch 9: restore unmap_mapping_pages() before the flush/invalidate so
->   a concurrent mmap store can't redirty the destination folio.
-> * Patch 10: refuse -EOPNOTSUPP when the queried server EOF still falls
->   short, and re-check a fresh i_size before the final SMB2_set_eof().
-> * Patch 12: thread old_eof into smb3_simple_fallocate_range() so it
->   doesn't misjudge a range as past EOF from a stale i_size.
-> * Picked up Reviewed-by from Namjae Jeon on patches 3-8, 11 and 13-14.
->
-> Paulo Alcantara (15):
->   netfs: clear post-EOF pagecache when extending a file via write
->   smb: client: clear post-EOF pagecache when extending a file via
->     truncate
->   smb: client: discard post-EOF pagecache when extending a file via zero
->     range
->   smb: client: discard post-EOF pagecache when extending a file via copy
->     range
->   smb: client: discard post-EOF pagecache when extending a file via
->     clone range
->   smb: client: flush and commit data before querying allocated ranges
->   smb: client: drain outstanding I/O before truncating on O_TRUNC open
->   smb: client: flush dirty data before zeroing a range
->   smb: client: drain and invalidate before server-side copy/clone
->   smb: client: only require read lease for size-extending zero range
->   netfs: zero gaps in read-gaps folio to avoid writing back stale data
->   smb: client: only require read lease for size-extending preallocate
->   netfs: zero the tail of a short DIO/unbuffered read
->   smb: client: distinguish real EOF from a stale remote_i_size on read
->   smb: client: require stable pages for signed connections
-I've reviewed the v3 changes, including updated patches 1, 2, 9, 10, 12 and=
- 15.
-The whole series looks good to me.
+From: David Howells <dhowells@redhat.com>
 
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+[ Upstream commit 83bfbd0bb9025f98fa62b44f93bd67466773d1db ]
 
-Thanks!
+Remove the RFC1002 header from struct smb_hdr as used for SMB-1.0.  This
+simplifies the SMB-1.0 code by simplifying a lot of places that have to add
+or subtract 4 to work around the fact that the RFC1002 header isn't really
+part of the message and the base for various offsets within the message is
+from the base of the smb_hdr, not the RFC1002 header.
+
+Further, clean up a bunch of places that require an extra kvec struct
+specifically pointing to the RFC1002 header, such that kvec[0].iov_base
+must be exactly 4 bytes before kvec[1].iov_base.
+
+This allows the header preamble size stuff to be removed too.
+
+The size of the request and response message are then handed around either
+directly or by summing the size of all the iov_len members in the kvec
+array for which we have a count.
+
+Also, this simplifies and cleans up the common transmission and receive
+paths for SMB1 and SMB2/3 as there no longer needs to be special handling
+casing for SMB1 messages as the RFC1002 header is now generated on the fly
+for SMB1 as it is for SMB2/3.
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+Reviewed-by: Tom Talpey <tom@talpey.com>
+Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Steve French <stfrench@microsoft.com>
+
+Stable dependency adaptation for 6c5c547f037bc18f0b8d0b5db5a648f8f630ce85:
+
+Retain only the midQ-to-mid rename in compound_send_recv(). Prepare its
+response-copy block using the corresponding layout from 62432a3f51450:
+check the received response first, then copy it and transfer ownership
+inside the resp_iov guard. This provides the context needed for the target
+to defer response-buffer transfers until compound synchronization finishes.
+
+Omit the SMB1 RFC1002 conversion and all other unrelated hunks. This stable
+tree still defines smb_hdr in client/cifspdu.h, uses the older negotiate
+and filesystem-info type names, and has moved CIFSTCon and transaction2
+helpers out of the upstream locations. Restoring those functions or
+importing the intervening SMB1 reorganization is unnecessary for the target.
+Keep HEADER_PREAMBLE_SIZE(server) in the response length because SMB1 still
+reaches this shared path through SendReceive2(). No functions are added.
+
+The target applies cleanly with a three-way application on this adaptation.
+
+cc: Shyam Prasad N <sprasad@microsoft.com>
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+
+[ sashal: Reduced backport -- upstream 83bfbd0bb9025 touches 19 file(s), this
+  backport carries 1. Not backported here:
+  fs/smb/client/cifs_debug.c
+  fs/smb/client/cifs_debug.h
+  fs/smb/client/cifsencrypt.c
+  fs/smb/client/cifsglob.h
+  fs/smb/client/cifspdu.h
+  fs/smb/client/cifsproto.h
+  fs/smb/client/cifssmb.c
+  fs/smb/client/cifstransport.c
+  ... and 10 more
+  This note is generated from the file lists only; see the resolution record
+  for the reasoning. ]
+
+Stable-dep-of: 6c5c547f037b ("smb: client: close completed creates on compound wait errors")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/transport.c | 73 ++++++++++++++++++++-------------------
+ 1 file changed, 37 insertions(+), 36 deletions(-)
+
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index 4da3d62b6481e..53db53a78d6c5 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -864,7 +864,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		   int *resp_buf_type, struct kvec *resp_iov)
+ {
+ 	int i, j, optype, rc = 0;
+-	struct mid_q_entry *midQ[MAX_COMPOUND];
++	struct mid_q_entry *mid[MAX_COMPOUND];
+ 	bool cancelled_mid[MAX_COMPOUND] = {false};
+ 	struct cifs_credits credits[MAX_COMPOUND] = {
+ 		{ .value = 0, .instance = 0 }
+@@ -930,35 +930,35 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	}
+ 
+ 	for (i = 0; i < num_rqst; i++) {
+-		midQ[i] = server->ops->setup_request(ses, server, &rqst[i]);
+-		if (IS_ERR(midQ[i])) {
++		mid[i] = server->ops->setup_request(ses, server, &rqst[i]);
++		if (IS_ERR(mid[i])) {
+ 			revert_current_mid(server, i);
+ 			for (j = 0; j < i; j++)
+-				delete_mid(midQ[j]);
++				delete_mid(mid[j]);
+ 			cifs_server_unlock(server);
+ 
+ 			/* Update # of requests on wire to server */
+ 			for (j = 0; j < num_rqst; j++)
+ 				add_credits(server, &credits[j], optype);
+-			return PTR_ERR(midQ[i]);
++			return PTR_ERR(mid[i]);
+ 		}
+ 
+-		midQ[i]->mid_state = MID_REQUEST_SUBMITTED;
+-		midQ[i]->optype = optype;
++		mid[i]->mid_state = MID_REQUEST_SUBMITTED;
++		mid[i]->optype = optype;
+ 		/*
+ 		 * Invoke callback for every part of the compound chain
+ 		 * to calculate credits properly. Wake up this thread only when
+ 		 * the last element is received.
+ 		 */
+ 		if (i < num_rqst - 1)
+-			midQ[i]->callback = cifs_compound_callback;
++			mid[i]->callback = cifs_compound_callback;
+ 		else
+-			midQ[i]->callback = cifs_compound_last_callback;
++			mid[i]->callback = cifs_compound_last_callback;
+ 	}
+ 	rc = smb_send_rqst(server, num_rqst, rqst, flags);
+ 
+ 	for (i = 0; i < num_rqst; i++)
+-		cifs_save_when_sent(midQ[i]);
++		cifs_save_when_sent(mid[i]);
+ 
+ 	if (rc < 0) {
+ 		revert_current_mid(server, num_rqst);
+@@ -1001,23 +1001,23 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	spin_unlock(&ses->ses_lock);
+ 
+ 	for (i = 0; i < num_rqst; i++) {
+-		rc = wait_for_response(server, midQ[i]);
++		rc = wait_for_response(server, mid[i]);
+ 		if (rc != 0)
+ 			break;
+ 	}
+ 	if (rc != 0) {
+ 		for (; i < num_rqst; i++) {
+ 			cifs_server_dbg(FYI, "Cancelling wait for mid %llu cmd: %d\n",
+-				 midQ[i]->mid, le16_to_cpu(midQ[i]->command));
+-			send_cancel(server, &rqst[i], midQ[i]);
+-			spin_lock(&midQ[i]->mid_lock);
+-			midQ[i]->wait_cancelled = true;
+-			if (midQ[i]->callback) {
+-				midQ[i]->callback = cifs_cancelled_callback;
++				 mid[i]->mid, le16_to_cpu(mid[i]->command));
++			send_cancel(server, &rqst[i], mid[i]);
++			spin_lock(&mid[i]->mid_lock);
++			mid[i]->wait_cancelled = true;
++			if (mid[i]->callback) {
++				mid[i]->callback = cifs_cancelled_callback;
+ 				cancelled_mid[i] = true;
+ 				credits[i].value = 0;
+ 			}
+-			spin_unlock(&midQ[i]->mid_lock);
++			spin_unlock(&mid[i]->mid_lock);
+ 		}
+ 	}
+ 
+@@ -1025,37 +1025,38 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 		if (rc < 0)
+ 			goto out;
+ 
+-		rc = cifs_sync_mid_result(midQ[i], server);
++		rc = cifs_sync_mid_result(mid[i], server);
+ 		if (rc != 0) {
+ 			/* mark this mid as cancelled to not free it below */
+ 			cancelled_mid[i] = true;
+ 			goto out;
+ 		}
+ 
+-		if (!midQ[i]->resp_buf ||
+-		    midQ[i]->mid_state != MID_RESPONSE_READY) {
++		if (!mid[i]->resp_buf ||
++		    mid[i]->mid_state != MID_RESPONSE_READY) {
+ 			rc = -EIO;
+ 			cifs_dbg(FYI, "Bad MID state?\n");
+ 			goto out;
+ 		}
+ 
+-		buf = (char *)midQ[i]->resp_buf;
+-		resp_iov[i].iov_base = buf;
+-		resp_iov[i].iov_len = midQ[i]->resp_buf_size +
+-			HEADER_PREAMBLE_SIZE(server);
++		rc = server->ops->check_receive(mid[i], server,
++						flags & CIFS_LOG_ERROR);
+ 
+-		if (midQ[i]->large_buf)
+-			resp_buf_type[i] = CIFS_LARGE_BUFFER;
+-		else
+-			resp_buf_type[i] = CIFS_SMALL_BUFFER;
+-
+-		rc = server->ops->check_receive(midQ[i], server,
+-						     flags & CIFS_LOG_ERROR);
++		if (resp_iov) {
++			buf = (char *)mid[i]->resp_buf;
++			resp_iov[i].iov_base = buf;
++			resp_iov[i].iov_len = mid[i]->resp_buf_size +
++				HEADER_PREAMBLE_SIZE(server);
+ 
+-		/* mark it so buf will not be freed by delete_mid */
+-		if ((flags & CIFS_NO_RSP_BUF) == 0)
+-			midQ[i]->resp_buf = NULL;
++			if (mid[i]->large_buf)
++				resp_buf_type[i] = CIFS_LARGE_BUFFER;
++			else
++				resp_buf_type[i] = CIFS_SMALL_BUFFER;
+ 
++			/* mark it so buf will not be freed by delete_mid */
++			if ((flags & CIFS_NO_RSP_BUF) == 0)
++				mid[i]->resp_buf = NULL;
++		}
+ 	}
+ 
+ 	/*
+@@ -1084,7 +1085,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
+ 	 */
+ 	for (i = 0; i < num_rqst; i++) {
+ 		if (!cancelled_mid[i])
+-			delete_mid(midQ[i]);
++			delete_mid(mid[i]);
+ 	}
+ 
+ 	return rc;
+-- 
+2.53.0
+
