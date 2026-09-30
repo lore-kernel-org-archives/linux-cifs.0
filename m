@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B5D3CA481;
-	Wed, 30 Sep 2026 18:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196C63CE4B9;
+	Wed, 30 Sep 2026 19:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790794211; cv=none; b=QOW17hr4z0kRay6rkjEUY2LsGFPsacqNRbCZUkkrbmzChUzO/SZyajyTFZJhf3fuuyqYI9lfM2RgqAnFada9fZi2AJ56T1Ww3SG6RFTy4sCKgWrq6GE1TtJXg1uw1E9Dbuzo7nNyyIYtZWl+iUt1A8lQyj+hBRvelDDCiZ53r9Y=
+	t=1790794882; cv=none; b=mOIDPGJoAYAJVspTRjnQIC6V3YFogzzvHdi/8AgT31mdaVKbYYQbdaKkzfXo+fPgTQ2brBl6/Ybd57Kl5PQFZAQtuCgqwYnIjbhJATGQ/Xn1p1hLn8RJAxhGpvKnPyNhk79fuTG38lKIgUEAJIATKNR313ol+x5d/eY/rKNPd0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790794211; c=relaxed/simple;
-	bh=kMSYG2TRN9dAoSD5zyjvp+YUyBTiXW5oUfawUAP/IAc=;
+	s=arc-20240116; t=1790794882; c=relaxed/simple;
+	bh=z5qUC+KBtmQBceQ4IXBXL0e35ZcvfnablVdqZrwGfGM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bTSU1U1q63TTCVzaWRxtsLydhgHFHX6r1BQex1PUQrmg+mt3tWXkeuh7wIomZK43BXhVyuyuCKw8TjsirZcIzv2fuuwMCOhq0SLc3IntzA5mftSlnk5SitpKb4JxZMmZiUDnZReQyUg9E5qdkp5ldOyGgUBYdaKfbiu6oKtOHC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kV421aLU; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=C2EhPNwC+kiNZ2QPSqzvhQ6cBIdOcIv5Su58Uw7kPUHdft6FZ5168AFRJ6FEoByepqGM6DRNlzFA9/LvTlKnNuuzQVZTIURo3dURGTF7/f4f4ucfD3XyiQxaOCVtdQUm+n4blezzTbUaPss4XjTjA2JFyFxoMlF7NBw2OFaKM28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SmuwJNI5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kV421aLU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB99C1F00899;
-	Wed, 30 Sep 2026 18:50:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SmuwJNI5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D36E1F0089E;
+	Wed, 30 Sep 2026 19:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1790794210;
-	bh=J5HX2VYhnq/u5nV6H2e0oAaZZuxVHhPL73VXbSHJ6ZU=;
+	s=k20260515; t=1790794864;
+	bh=8mejs2snWDXv/ZJ9p3I0Q607FlJmSMiPMxk60Z8MUOQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kV421aLU6vdnDaVnbmrpYDKHvzqBXWdpaBJfgcbhGakwxoPJ657qw1KPAUrM+RHKW
-	 JyU4uHwpIA32Elrmwu3ywDz//4v+2DLIa8jhOCm3304NAhBbKXydjpwmmsIpZed9UR
-	 TnEd1pPXbI0a/PNu3GCmJ/8MN9VNWMcXgkbARuifeL8KvLcoNJiCVf7t8YlkXMMpsg
-	 sBowO7kA7udz5cKAiNbLpWL6rLMhfMcGM2FxEjIDrBQ1v6E/0L4AfOS+XxF8fP8vBr
-	 7tdDP97Wk6522NBuq+1eZNYBXQWtV2bmEuukpclqo87uz/l4v921CMK5MoyIlbEkPf
-	 iAXCSzO+AZnFg==
+	b=SmuwJNI53hlPhad2K+ZxQlNODNSqVe5FaUeIBspt72sSgZ6DZNuFZDvQG+0DEfgYx
+	 Af1uTXPApo3YVfK4QXFpHzZw4V+hY6TqfWO3ZbKzdoe3TXSTJuvNCoLUbu1uOnRBGn
+	 2GhdEpjknPmDi5Xk1YA6IT2oBtWrJTnTLAi0anNt9YEq/8hP8TwnMIK1xflUp3qIbz
+	 R7ZC9bg1qwtuExQbkI0YwrdS+u6YmWdwrwGPihXzEigjMTNNqeQ0wAa0Z/w4PHkpr6
+	 6Ns4L03hdMqDg5q4+6bIL2+1qr/MlzbvVQSs9xB8F51gT02ZCKnpHYNKJoXoNJY/wE
+	 A6RZWM0mpr7mw==
 From: Sasha Levin <sashal@kernel.org>
 To: stable@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -33,13 +33,13 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-cifs@vger.kernel.org,
 	Steve French <stfrench@microsoft.com>,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.12.y 2/3] cifs: Fix specification of function pointers
-Date: Wed, 30 Sep 2026 14:50:05 -0400
-Message-ID: <20260930185006.338236-2-sashal@kernel.org>
+Subject: [PATCH 6.6.y 2/3] cifs: Fix specification of function pointers
+Date: Wed, 30 Sep 2026 15:00:59 -0400
+Message-ID: <20260930190100.383713-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260930185006.338236-1-sashal@kernel.org>
-References: <2026092926-stopwatch-rumbling-2993@gregkh>
- <20260930185006.338236-1-sashal@kernel.org>
+In-Reply-To: <20260930190100.383713-1-sashal@kernel.org>
+References: <2026092927-uproar-implement-c4b4@gregkh>
+ <20260930190100.383713-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -68,10 +68,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  3 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 3f9c03828cd4f..1734ae9bf318e 100644
+index a4e0618c58efc..c847f2d65867b 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1619,7 +1619,7 @@ static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
+@@ -1659,7 +1659,7 @@ static inline void cifs_stats_bytes_read(struct cifs_tcon *tcon,
   * Returns zero on a successful receive, or an error. The receive state in
   * the TCP_Server_Info will also be updated.
   */
@@ -80,7 +80,7 @@ index 3f9c03828cd4f..1734ae9bf318e 100644
  			    struct mid_q_entry *mid);
  
  /*
-@@ -1630,13 +1630,13 @@ typedef int (mid_receive_t)(struct TCP_Server_Info *server,
+@@ -1670,13 +1670,13 @@ typedef int (mid_receive_t)(struct TCP_Server_Info *server,
   * - it will be called by cifsd, with no locks held
   * - the mid will be removed from any lists
   */
@@ -96,7 +96,7 @@ index 3f9c03828cd4f..1734ae9bf318e 100644
  			    struct mid_q_entry *mid);
  
  /* one of these for every pending CIFS request to the server */
-@@ -1654,9 +1654,9 @@ struct mid_q_entry {
+@@ -1694,9 +1694,9 @@ struct mid_q_entry {
  	unsigned long when_sent; /* time when smb send finished */
  	unsigned long when_received; /* when demux complete (taken off wire) */
  #endif
@@ -110,7 +110,7 @@ index 3f9c03828cd4f..1734ae9bf318e 100644
  	struct task_struct *creator;
  	void *resp_buf;		/* pointer to received SMB header */
 diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index 11fdaf9029539..72d608af772d0 100644
+index 93cdb298d6327..c5feff5aeac3c 100644
 --- a/fs/smb/client/cifsproto.h
 +++ b/fs/smb/client/cifsproto.h
 @@ -96,10 +96,10 @@ extern int cifs_ipaddr_cmp(struct sockaddr *srcaddr, struct sockaddr *rhs);
@@ -129,10 +129,10 @@ index 11fdaf9029539..72d608af772d0 100644
  extern int cifs_send_recv(const unsigned int xid, struct cifs_ses *ses,
  			  struct TCP_Server_Info *server,
 diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 5c72c8eb94182..f3eb7c6b641d1 100644
+index 58c773e9760d4..7b882bafc5a5e 100644
 --- a/fs/smb/client/transport.c
 +++ b/fs/smb/client/transport.c
-@@ -792,8 +792,8 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
+@@ -789,8 +789,8 @@ cifs_setup_async_request(struct TCP_Server_Info *server, struct smb_rqst *rqst)
   */
  int
  cifs_call_async(struct TCP_Server_Info *server, struct smb_rqst *rqst,
