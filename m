@@ -1,63 +1,72 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-90.mta1.migadu.com [95.215.58.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9634428E0;
-	Thu,  1 Oct 2026 02:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283D7376A0A
+	for <linux-cifs@vger.kernel.org>; Thu,  1 Oct 2026 02:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790821033; cv=none; b=nhpOF0t0E7Ypmlj7uIjLRuYTOFBMFYu6Hd5h6Mz07Nph+V+/f4hySCQtfFiiu7Ftu+Lr5ebuzjPvca83jmSNUMk8uJM3dfmZq5zw5ZGXutBf6Rw/PSRBUhtKA7UeN6DjPdDWVZUlkGCQAR/6/f4JTYSwNQc8DbH1RH0dFSKa65Y=
+	t=1790823093; cv=none; b=OnWajU2ohoOp/AWHnZH3o0DSDvqcW39ad1BfAj2Smcwriptb3rTVU1N7msnOjVW4kidJLpWNziOdgI6Wv/FchTKW8fAlEEopDN1/+OIjlOrfSHLMczvC75m0Dz5pDvUW+0wh/Qvhc9nFDVTdTlXPnfVQ8y+bKgO5ZbxHt93Q8X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790821033; c=relaxed/simple;
-	bh=lz9gvUjHX1LkKy3atzMc9AOirF5pYt/IKHD5THcbOns=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=C32YKxrmaRNCjYsnnffS0pmhaKO4Ie8soVyIJhA8JBcheU3/iZ3mmLppFFJAlwlbc2dVwSECo4HuPEEW9JU3upkKtElRAkQID71C8pUzRxT806eGh/EMYyo62xdCKEOZlVFMp5D/H8L6f5GH1IVIWXPjpaHHMLgDgbTKDsCedzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=7JYhM8Q+; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1790823093; c=relaxed/simple;
+	bh=jeSj2deFRKgsRDPJJJ4y2YKe6wuxSS/dZR8no12kX1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n4y5M6RglHCGJ95b7qbsGB92Hzjcem08AEIm4r4iKMdieKPrszy9SvHUXHqCLDXOTej82gP/v7MKyYB2XYlHlmD8OiCIbczf0xiTiRwkf+RTkChNhhCX7Qjwx2IXQph4EnQ/VKgFZmc6xOHpebTJtl76TrEzWpfiR6/NC8PBiC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=ap/ScQkk; arc=none smtp.client-ip=95.215.58.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="7JYhM8Q+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=CQxYioWAVQtleKbZ7r56r5Q7N2oMXlHG2OpoPG0IyUE=; b=7JYhM8Q+zDYEOGUnG+HxoImlww
-	mHONDolHVBysnnXo6cjGMPxDKzSXiTxBPrYYW3+dqaid/OJZPe312ZuZer+lrGbo3M+AdZNNV11aU
-	lQSO6JT0vnpxUw1Pttzl3pDUrxqiJ5Nwno/YXtJPvxsW6jR09FF3K3jMk7FXABZTdKz1B8J5CaQpi
-	oe8T/CWuWmvlYi10qeu+UDg37TzreIbu7B7N7VYXohm2az2bza6DFFbKIVlf/LlYY59Gl1OsvkbqS
-	Ac5+CuSXDrUh+0sD4XVgT75O3k4Sgmfx06To9nMCmF45ypnnJr1YHDkBpP78THtz+qnYV9Rrv+tyi
-	pSl6xpzg==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xC6M1-00000002fuA-3tS9;
-	Wed, 30 Sep 2026 23:17:01 -0300
-Message-ID: <ca32019975be6dfa7347b831b432b50a@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Frank Sorenson <sorenson@redhat.com>, linux-cifs@vger.kernel.org
-Cc: linkinjeon@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] smb: client: split cifsFileInfo bitfields to avoid
- shared-byte RMW races
-In-Reply-To: <20260930204723.1555769-1-sorenson@redhat.com>
-References: <20260930204723.1555769-1-sorenson@redhat.com>
-Date: Wed, 30 Sep 2026 23:17:01 -0300
+	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="ap/ScQkk"
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=jeSj2deFRKgsRDPJJJ4y2YKe6wuxSS/dZR8no12kX1Y=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1790823086; v=1; x=1791427886;
+ b=ap/ScQkk1J36MMD1flMmkXiUIHSgYW+0UYuUBXVglBxu58vp8jMmSafQwheIFRmjRa50oInr
+ fJH1N1k+WtUaA08ZgrH+8+V1O9ukEv24lMj61pHOJhtIyzcZ030RZlkRTmWwyFWWeVJN2w7fgJ0
+ Bm9b1828VOxlKiZmnwBTvS9Gt0M55dQ9pn1MHCqvOso3sSLFif4JjVf4iZhwCYBwFQ5e6VFOtbe
+ 45uYsGs3qQ0/bAW0Q2CTfwqr7j+9JCVOxKwBAJMy7FTuOnVTYjeKutnoeKsgigkPq3814rQfLqi
+ YUJNZTeIDAhUxuZQ3AVnRPRzBN2ZW7TMWBpLF8OV4f6HQ==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id ae8e3eae607186db;
+	Thu, 01 Oct 2026 02:51:25 +0000
+X-Mizu-Trace-ID: ae8e3eae607186db
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <1b73e6c1-5e35-4e03-8310-892efdfd77e5@chenxiaosong.com>
+Date: Thu, 1 Oct 2026 10:51:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ksmbd: use clear_and_wake_up_bit() in
+ wake_up_oplock_break()
+To: Daijiamu <3058704216@qq.com>, linkinjeon@kernel.org,
+ sergey.senozhatsky@gmail.com, tom@talpey.com
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <tencent_238A42C6350C25F55AFAA340BCE35A0D3B08@qq.com>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <tencent_238A42C6350C25F55AFAA340BCE35A0D3B08@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Frank Sorenson <sorenson@redhat.com> writes:
+We can remove wake_up_oplock_break() now as well, call 
+clear_and_wake_up_bit() directly.
 
-> The invalidHandle, swapfile, oplock_break_cancelled, offload,
-> and status_file_deleted fields are stored in the same bitfield byte
-> in struct cifsFileInfo, but are updated in different code paths that
-> may run simultaneously, and are protected by different locks.  Since
-> bitfield assignments generate byte-level read-modify-write operations,
-> a modification to one flag can overwrite a concurrent modification to
-> another flag.
->
-> To avoid these races, convert these flags from a bitfield to
-> separate bool fields.
-> ...
+On 10/1/26 02:37, Daijiamu wrote:
+>   static void wake_up_oplock_break(struct oplock_info *opinfo)
+>   {
+> -	clear_bit_unlock(0, &opinfo->pending_break);
+> -	/* memory barrier is needed for wake_up_bit() */
+> -	smp_mb__after_atomic();
+> -	wake_up_bit(&opinfo->pending_break, 0);
+> +	clear_and_wake_up_bit(0, &opinfo->pending_break);
+>   }
 
-Applied.
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
