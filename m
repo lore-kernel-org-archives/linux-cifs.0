@@ -1,88 +1,160 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA8537647E
-	for <linux-cifs@vger.kernel.org>; Thu,  1 Oct 2026 13:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AAD51AFEF;
+	Thu,  1 Oct 2026 15:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790862735; cv=none; b=IiPdXvR1WPmiTj4SAn5c+wQd8EIZAWXOiDJPHCeg5xLhbYaB+N8zmSE+VmulsMretmU6u0XJa7dqxWg/XCzX6XXG743vi8jvMvoOcYvBcdz+4aXEaVBJfR8Ohlp5afiQjKG76lfiF5Nrzx2/iSDlTlwfSSbI8yugaCNlAZuDHsY=
+	t=1790867272; cv=none; b=HZpMA/0EAJDci2K55eQaIsS/RJUMN5P2xYZ0tc7UemuEFi0pvraeVmg/OW6tOgk3epVvCAD41KcrVpatTI0tu21R9BwleI2/R2zCoc8G2v75cLyfP5qPeOYKaRMcr9FNFbRXnsTfEG6zoiFmbnqGEwWcd6ICTdy119Ep2Ny4AyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790862735; c=relaxed/simple;
-	bh=0geIIBAtChqx0SPrXodBDN0wwm8n774sD/kCINfRRVI=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=eAYBhPGxiFf0LxpdXHU3WZf0L+FmbEzCD73i2tbcUFl5AS/x7Pez4Y+DQ3ZkYtzFw41pFi5T4tPakAuwEjgS5pxdyyhkWO6OKRy+6N04unLohYPoA9TW/3G2M4g6vcnmy0xdYsY/8wO1dDZbdW5hxgDagHskA+hShB3PYofm5TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JOONMuVZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1790867272; c=relaxed/simple;
+	bh=Vc43IMWHplUNJtOfUyoZJ8XglsaC8M3vSlsru1SXVc4=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=dBf/rpWZUHEbEpnAS240YQ5/zZYZSYlFyTnNVqklg5NltoHWrUY6PFT+eJSVlYNPivA80kuLg97//J3Cfkw109/6ijWkVLd/+YYKU7Cn9OlGcmTPHS+LK+KFW47iFMKVnegiJ3o2ZDoN9WnTzUFq6YG538rRfSoncXB7U60hSP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=MqZLQaIH; arc=none smtp.client-ip=162.62.58.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOONMuVZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790862732;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JjcPPUA2+KSJwXDBVE75ZLKJDqcpCkUXLHxsXrz7loQ=;
-	b=JOONMuVZv4xh8ez/M7Hza93kVux3MQZt5RGgwuZ2UHDimKXt2abaSH0R619Tk/IrLjwG/X
-	Kl/rn/FUvyOmgRE5IF9iUDx4MymcyqzDl7UTVzchvLw9am/FOt1QvlCTWCmI41ervM98o1
-	48cpKWUkN/nlzjMyu7PQXMZIz49dr7w=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-uJbyo1fROuqS7vWfhzcp3A-1; Thu,
- 01 Oct 2026 09:52:08 -0400
-X-MC-Unique: uJbyo1fROuqS7vWfhzcp3A-1
-X-Mimecast-MFC-AGG-ID: uJbyo1fROuqS7vWfhzcp3A_1790862726
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 26FDD18011FE;
-	Thu,  1 Oct 2026 13:52:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.54])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CC61E1800299;
-	Thu,  1 Oct 2026 13:51:57 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20261001091239.3343034-4-dhowells@redhat.com>
-References: <20261001091239.3343034-4-dhowells@redhat.com> <20261001091239.3343034-1-dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Namjae Jeon <linkinjeon@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v15 03/10] netfs: Add some tools for managing bvecq chains
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="MqZLQaIH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1790867255; bh=i6buGYmKMdp6JgRwIn6VvXYpH++bJk71QPeQ9y8/2r4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=MqZLQaIHAUM0tLyWcuGNovcqOD+7yCuaqxZ58hZF427tIQgYgQbg/ZXkCoQVGzK3/
+	 9Da7MleSdgHLxOV6gDaKeAw0jb4D12aEHNvl/dUJAR1DO7O/Me21ZNvg7xQavDG0EU
+	 xrGoWlKamvhLNClNXrkWvJ8cceZtvj7AR9jDw220=
+Received: from archlinux ([240e:473:7000:116e:7a96:2aa7:e2fe:5e21])
+	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
+	id 1921001C; Thu, 01 Oct 2026 23:06:18 +0800
+X-QQ-mid: xmsmtpt1790867178tok77l41k
+Message-ID: <tencent_464A86FF7A38FD3620EBF1C6062745316307@qq.com>
+X-QQ-XMAILINFO: MRMtjO3A6C9XX5U8+pnogmbMz5+zOU+dM9NBVRw4DsLhXv8Q/0eW30dj+oEEdQ
+	 Uq4FrU+ktwDejUTuFRJexNU2DDQFSftPMgfQWAGhekzPIdxyL6STUzkP3zZM0eBsRGAlso3kTRD8
+	 5c4oxB3tRr4GunPTdC2jgWhoaZ+wLStzIchFKMFstlTFTDK7o95cEwhafbdjDCTaCGH0kGAj8Yv1
+	 UAFADXgXtcBRBAkgyRxNmeKtdctYJTbwy4JdWH+Fo0FmAt26oITnHAr+cXv81WO22Gom06KiOWD5
+	 l5SKczSe6OcIujoVD2pX78nD2XaShAAo3mYihkxwaQXu/jBlGw/y0KchkfcwUxwWuP/WgbJivegv
+	 o6JCed86yyq6mxsSc/PNZfx9EDxeiP0lsBgnto3kQmzxW8FIisNgq9LWschTFg1OYRl4UqQJQtcU
+	 CcyIxR1j5vSjBL+ZUH6b1JjZm50/C1vxm6FJT6aTIXWMQ/3Oo3nR36Jb9bH0cpmAEquoa3DkuUOa
+	 hO6ViQekebFVrmmgt192lp9nrmjV3M8e9cQ6LyvheqhXB9nQezm3KAT8A0VR6MCWIldQhpv79Nj0
+	 MZUqwF81J9He2562e76yQQLSIOT7j2UfbkMVHZU6yYCqeHDgUYIIQgCFoS8k+p4K5WsP7F9+pVt3
+	 JwqsXbdDVb488DQCREikYZ79VZwyApmtQDiOh8pQOC/Ugc70uorEh4BiCZl4YMqNQgJVpUnrjXtX
+	 gvhhyWDA6mVV/TOQGv1jfCptNHnvBp8hEx8Yz/D75baEtX1qm9M0g+d/qJ91d0/Tj+I3hrN6DMeV
+	 usH1p/FCEIR/jGXDIuP2bqIO2hUj7z7XEtSrjLN3AGy1Et8rfgTIX2npBAAmCrEGT43hW/9zjR3o
+	 5EGXrlQe6yMA3TenLCMe/0fxtiT2n7T8UcLgTKXtK6QyN6cezodUfCyoloUMKnBGSbqiw0I82Cci
+	 OjQSQqMofzkaSd5p1epky8NFwTdemLOZNuBBg/XzuA7g7srwy93oGc+fXdfqE5KuAwftXDEwzzAV
+	 /xwBWFVlNQj9GIZnYLYSJYjdFbGI+pgW4x6oJH4Awn7GXbxUEt9LiLP12ZiBvFLHNWLnTJ+fVOxt
+	 ZoILIbs45N1ycZcjY=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ylTmHUqvI8+Wpn+Gzalws3A==
+From: Daijiamu <3058704216@qq.com>
+To: linkinjeon@kernel.org,
+	sergey.senozhatsky@gmail.com,
+	tom@talpey.com
+Cc: chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daijiamu <3058704216@qq.com>
+Subject: [PATCH v2] ksmbd: use clear_and_wake_up_bit() directly
+Date: Thu,  1 Oct 2026 23:06:14 +0800
+X-OQ-MSGID: <20261001150614.5900-1-3058704216@qq.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260930183758.32342-1-3058704216@qq.com>
+References: <20260930183758.32342-1-3058704216@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3609011.1790862716.1@warthog.procyon.org.uk>
-Date: Thu, 01 Oct 2026 14:51:56 +0100
-Message-ID: <3609012.1790862716@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
 
-Hi Christian,
+clear_and_wake_up_bit() was introduced by commit 8236b0ae31c8 ("bdi:
+wake up concurrent wb_shutdown() callers.") to replace the open-coded
+clear_bit_unlock() + smp_mb__after_atomic() + wake_up_bit() sequence.
 
-Could you add:
+Replace the sequence and drop the now-trivial wake_up_oplock_break()
+wrapper, calling the helper directly at each call site.
 
-	#include <linux/mempool.h>
+Suggested-by: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Signed-off-by: Daijiamu <3058704216@qq.com>
+---
+Changes in v2:
+- Call clear_and_wake_up_bit() directly and remove wake_up_oplock_break(),
+  as suggested by ChenXiaoSong.
+Link: https://lore.kernel.org/linux-cifs/20260930183758.32342-1-3058704216@qq.com/
+---
+ fs/smb/server/oplock.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-to fs/netfs/internal.h if you apply this?  One of the headers I'm using must
-bring it in conditionally because it's not pulled in when Paulo builds it.
-
-Thanks,
-David
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 1b8c3482d1e4..25ff8408f0ba 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -763,14 +763,6 @@ static bool wait_for_break_ack(struct oplock_info *opinfo)
+ 	return false;
+ }
+ 
+-static void wake_up_oplock_break(struct oplock_info *opinfo)
+-{
+-	clear_bit_unlock(0, &opinfo->pending_break);
+-	/* memory barrier is needed for wake_up_bit() */
+-	smp_mb__after_atomic();
+-	wake_up_bit(&opinfo->pending_break, 0);
+-}
+-
+ static bool oplock_break_set_ack_wait(struct oplock_info *opinfo)
+ {
+ 	bool ret = false;
+@@ -826,13 +818,13 @@ static int oplock_break_pending(struct oplock_info *opinfo, int req_op_level)
+ 
+ 	if (opinfo->level <= req_op_level) {
+ 		if (opinfo->is_lease == false) {
+-			wake_up_oplock_break(opinfo);
++			clear_and_wake_up_bit(0, &opinfo->pending_break);
+ 			return 1;
+ 		}
+ 		if (opinfo->o_lease->state !=
+ 		    (SMB2_LEASE_HANDLE_CACHING_LE |
+ 		     SMB2_LEASE_READ_CACHING_LE)) {
+-			wake_up_oplock_break(opinfo);
++			clear_and_wake_up_bit(0, &opinfo->pending_break);
+ 			return 1;
+ 		}
+ 	}
+@@ -1260,7 +1252,7 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 				SMB2_LEASE_HANDLE_CACHING_LE)) {
+ 			if (!oplock_break_set_ack_wait(brk_opinfo)) {
+ 				atomic_dec_if_positive(&brk_opinfo->breaking_cnt);
+-				wake_up_oplock_break(brk_opinfo);
++				clear_and_wake_up_bit(0, &brk_opinfo->pending_break);
+ 				return -ENOENT;
+ 			}
+ 		} else
+@@ -1309,7 +1301,7 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 		      lease->state != SMB2_LEASE_NONE_LE)))
+ 			goto again;
+ 
+-		wake_up_oplock_break(brk_opinfo);
++		clear_and_wake_up_bit(0, &brk_opinfo->pending_break);
+ 		return err;
+ 	} else {
+ 		err = oplock_break_pending(brk_opinfo, req_op_level);
+@@ -1319,7 +1311,7 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 		if (brk_opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||
+ 		    brk_opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
+ 			if (!oplock_break_set_ack_wait(brk_opinfo)) {
+-				wake_up_oplock_break(brk_opinfo);
++				clear_and_wake_up_bit(0, &brk_opinfo->pending_break);
+ 				return -ENOENT;
+ 			}
+ 		}
+@@ -1342,7 +1334,7 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 	ksmbd_debug(OPLOCK, "oplock granted = %d\n", brk_opinfo->level);
+ 	if (brk_opinfo->op_state == OPLOCK_CLOSING)
+ 		err = -EAGAIN;
+-	wake_up_oplock_break(brk_opinfo);
++	clear_and_wake_up_bit(0, &brk_opinfo->pending_break);
+ 
+ 	return err;
+ }
+-- 
+2.55.0
 
