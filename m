@@ -1,72 +1,58 @@
-Received: from mta0.migadu.com (out-42.mta0.migadu.com [91.218.175.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628B4328635
-	for <linux-cifs@vger.kernel.org>; Fri,  2 Oct 2026 01:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC073815E4;
+	Fri,  2 Oct 2026 08:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790906222; cv=none; b=qmtUswEdJBgWwf2hVbJy8c/nrgRFbtDGkSpk3xn1Io9yJxvWMBV0Ndo5GOtwtGNbMbAj5yh3MniB0663LD87ypRowyV5iIFEaw4e43pmy+V/XTBYpiVUfXy7f1YHIEHIXwRKh+/dRZYdIy4uz5FPw2uMaPnP2NHcsiI4nrpbofw=
+	t=1790931113; cv=none; b=ri1/aLhuqeXJ0bBj4FQOadiZpHBHDjGLRqXUk9OXUJR64p/EOEF2mkywDjo1Ke3mjoCUERmPpl5fcR3s8RhTsGGFeMFB4wyVFmW9Ez33KnRP8lwbVYgLoPNw2z2k842b0KdMrmjj4nUHHrtPCDfOx+xCTczq9eGKRWhMvffeuIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790906222; c=relaxed/simple;
-	bh=oOqG0TKLy8mFSMKvvWHi4lBN0bSUCNpyPVhQS8gtLHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WTtNy2/n/oCTqhm9dKQDdlZsPCFbxYx4NZhkK8DetoWaqnwBODAoG13X8tIuF6oQKkUfNQEFSZzqhhSkwPmnjorCdCY69VwGpLrSvjOQdD3Z226NKDzGNqh/nocW3jkez0QPzQcc10+T9/KTHbR+vkFRelHrTqFEOPQGOD7un04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com; spf=pass smtp.mailfrom=chenxiaosong.com; dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b=oyYatHiB; arc=none smtp.client-ip=91.218.175.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	s=arc-20240116; t=1790931113; c=relaxed/simple;
+	bh=/2VOdhIoDIWMkOAjIvMqep/xz4y0Iivv5oOAb13egi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=obrY9afzV4Zn8fvQDPegEeAlguB+LV3D4I7O94np87fDorq1Nkd8PSkhcNg+qthpEV3OHPUxdET+ARv6Kdjz6YBlSasac9N4pUnVjtXGxxrhcuzelPWdHnzoxxMVoD3KxgvPnWGLGrJIc1D3AnJbaVof+rILThfWLhSxl1MeKf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=S5+eBqZ8; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.b="oyYatHiB"
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=oOqG0TKLy8mFSMKvvWHi4lBN0bSUCNpyPVhQS8gtLHQ=;
- c=simple/simple; d=chenxiaosong.com;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1790906216; v=1; x=1791511016;
- b=oyYatHiBfl1+sm6rBHlFlj8Ax388RS59LB16gamYdsltInSEus9J7mdXogHIJ5CvfbYr3DtH
- XF/fu1yDWewznC3WjoIlOtsfdU7QRdX3MFR/P5wo7T8moc2NP3Dc1dbfzJD3ljGZPD0RC3KXLSY
- 5TNAFB0wbo3UoVrJ7coSOoHl5Fk3J/iljrHJM9+A52+DGf+l992uxY9p0Ax6iYvy7lLspKqBl4H
- SHVCpgb+kx1zN6+3ByXFwrKoQs5xqmcP8WE6iZsxAVK1hk+BKEnBLpTP41kJ8GH72tiRitym3NB
- bSpbMMAiwIxqzRq7WhoGoA0NSR6ge8RF5FqHRHzkik8pQ==
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 9428782484ed6090;
-	Fri, 02 Oct 2026 01:56:46 +0000
-X-Mizu-Trace-ID: 9428782484ed6090
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <dd85c8b1-075b-47a3-8a88-6b55e5adb224@chenxiaosong.com>
-Date: Fri, 2 Oct 2026 09:56:39 +0800
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="S5+eBqZ8"
+Received: from localhost (unknown [10.10.165.9])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 0BF3D406C750;
+	Fri,  2 Oct 2026 08:51:43 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 0BF3D406C750
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1790931103;
+	bh=Q6uermtlktZ0VkU5nIBo3CGNejxKsRw8bTF/OeHXl4E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S5+eBqZ8M9jOyOU0zzBnJ8xhqxC58KFLAFPS3CZzz8wXveaWDwAoBTl9WFmHyb4l3
+	 jZsajb6u3q1Y1Vd31vBePOOqO7brAGpggTx+qxuv9pJMugDo0SIeTJ2+FU79h+6LzF
+	 kjA5H4mnvvPCmrDU9HGI4BfIPCpCcbjz97bc7Iss=
+Date: Fri, 2 Oct 2026 11:51:42 +0300
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Mikhail Mirkin <mmirkin@nppct.ru>
+Cc: Sasha Levin <sashal@kernel.org>, linux-cifs@vger.kernel.org, 
+	Shyam Prasad N <sprasad@microsoft.com>, "Paulo Alcantara (Red Hat)" <pc@manguebit.org>, 
+	David Howells <dhowells@redhat.com>, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev, 
+	Steve French <stfrench@microsoft.com>, lvc-project@linuxtesting.org
+Subject: Re: [PATCH 6.12.y] cifs: Fix handling of a beyond-EOF DIO/unbuffered
+ read over SMB1
+Message-ID: <20261002114828-a0c191e9851a3e2487ada3a0-pchelkin@ispras>
+References: <20260930120532.5436-1-mmirkin@nppct.ru>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] ksmbd: use clear_and_wake_up_bit() directly
-To: Daijiamu <3058704216@qq.com>, linkinjeon@kernel.org,
- sergey.senozhatsky@gmail.com, tom@talpey.com
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260930183758.32342-1-3058704216@qq.com>
- <tencent_464A86FF7A38FD3620EBF1C6062745316307@qq.com>
-Content-Language: en-US
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <tencent_464A86FF7A38FD3620EBF1C6062745316307@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260930120532.5436-1-mmirkin@nppct.ru>
 
-Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
-
-On 10/1/26 23:06, Daijiamu wrote:
-> clear_and_wake_up_bit() was introduced by commit 8236b0ae31c8 ("bdi:
-> wake up concurrent wb_shutdown() callers.") to replace the open-coded
-> clear_bit_unlock() + smp_mb__after_atomic() + wake_up_bit() sequence.
+On Wed, 30. Sep 15:05, Mikhail Mirkin wrote:
+> From: David Howells <dhowells@redhat.com>
 > 
-> Replace the sequence and drop the now-trivial wake_up_oplock_break()
-> wrapper, calling the helper directly at each call site.
-> 
-> Suggested-by: ChenXiaoSong<chenxiaosong@chenxiaosong.com>
-> Signed-off-by: Daijiamu<3058704216@qq.com>
+> commit c61af12157ef9fe480ab84b4923e8ca3d8f86a62 upstream.
 
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
+That's not the hash of upstream commit.  It should be
+9d85ac939d52e93d80efb01a299c6f0bedb30487.
 
