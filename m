@@ -1,227 +1,184 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pz2-f41.google.com (mail-pz2-f41.google.com [74.125.228.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C504BD0EF
-	for <linux-cifs@vger.kernel.org>; Thu,  1 Oct 2026 22:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1790894305; cv=none; b=oqu3cLKwR2eAL/r0liA6cehtrw6eW+8QALkJLSMQDn90L1BW5X2KcgEYiCV/6YDjPj3Kt0u+eIdAp44KkhYPn8/tsQcBba6VgE15gI7xyqw2xI1NtnNHOWRrsecdSmJtM8HOTyiYd7HXjFESohrqjjWE/Io4RmE9qkQVbeG8gc4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1790894305; c=relaxed/simple;
-	bh=BmDo2NgwTobNw/QxfV/PXlm5U6X+tyxROqDF/lu1Jqc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NFxDFLy/PkYJkRxy6AX+7uRMEPG4CmICYhqTVBv4cnTZxbWdgORr4jCpMWcDS9KblnHUoEFAB5qyG7ZdJivg+fppsbxX2YOKXZa3k/3zpo0Av/XQ7acJ5QJvDwHn6eshIlD/7a90lqRSsUUXaAV+MIQgklcab2F0MxYffJ3l6es=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SVEl+BCm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=YtYfzpse; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DFC28690
+	for <linux-cifs@vger.kernel.org>; Fri,  2 Oct 2026 00:39:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.228.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1790901559; cv=pass; b=SlnY3AoMMPrbQiTOzQe3UAgubfVT3GlHftaL+i/xCXotvS4ncpETa9zmioUP62NkCru8NaBlf6SLiULQT+kUG3teyRHfBtJY4BNcAOiOXL2SuktunfC1JF2WU22fsWCo6dC3fzwRBfNUpwb2cgtuq1A6xYaVGnMTDnFTtv7z50A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1790901559; c=relaxed/simple;
+	bh=q+6JmjXoqXFzk75kbs4iOwFjPyx29ZsIRuPUTrNRfaw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=DyWRTlXRjyv9aY8uklJZAKvrq1j3QYNOicGT6Abc9dtgYj3h8OegkbAoPozL2wR8hHq7PNQoCvz/3g1qZ+T1CniPZsMWz8oaoq0IYMFrHh5o5uZghLwrZhjw70syGKz5RApl3hsEBoaK4OjPK7u0P0L5ErCh6PWEIfwugAD6Wwc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bsUDFJne; arc=pass smtp.client-ip=74.125.228.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVEl+BCm";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtYfzpse"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1790894302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WAQkY/3Hdz9pmH44JOpK4eYwhd5PHEHXQKuWf1a9nS4=;
-	b=SVEl+BCmuCHZpmDqMQcbzVswuODc4hAPKAiJbq2XKMyR8RMvyAh3bQQNhvWMILcF3e3Ijt
-	2ttyPbPdPhahcjieEi6vabNOT04ljaAbWbzI/A2X733cJp/mN7O70RDyfXz51+27VBCkPL
-	mGiul2LFWMBTrZLzgHjxfJ3a+26HLp0=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-2eRS70K6O9yeDPU-n-SFJw-1; Thu, 01 Oct 2026 18:38:21 -0400
-X-MC-Unique: 2eRS70K6O9yeDPU-n-SFJw-1
-X-Mimecast-MFC-AGG-ID: 2eRS70K6O9yeDPU-n-SFJw_1790894301
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-53397338004so12585361cf.2
-        for <linux-cifs@vger.kernel.org>; Thu, 01 Oct 2026 15:38:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsUDFJne"
+Received: by mail-pz2-f41.google.com with SMTP id d2e1a72fcca58-85469d249c6so4255996b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 01 Oct 2026 17:39:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1790901558; cv=none;
+        d=google.com; s=arc-20260327;
+        b=fRFzdkM+CDq/pIBg3Q8+aOx8BAWOzmuttO0U3o4EtW2KLx3mDxr7aZ4ZvF62kJSUjp
+         94T08RcIZ+nu+yNIHprQwJinezP7BAPYHd3edzaFiuYAkvNjbeOj7uT9T+8XV68cJvHK
+         28lSojZmgEWiuxuYi25Jz2Kz+0lNkem3yjs7+SbctCfSlTKUtkzmCsq8rNFAaXDt9xPF
+         4PlIAdE0w4HqbA8SgDSZK0o2KyzNDmHA/67urvLsynm0t3fYWze45Dbf/DDQxSOWUusj
+         GPv6tsI6u8HNNcaMixeftfcQoDUTibUSPBg7bT6Ur7HrmxQq0zb2GWLbCkWbxN6ijkXF
+         VeGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=L/QbTye19jxpIlXh5TM8jjJsFiN71Nkr83E5stflnG0=;
+        fh=qPdn3nxQgygyQjJTDEl9+ZhpBtTWrqIbsZA12qELXjI=;
+        b=Ggi+tEzOMEaoVkR+JDQYzQCKQ6qFBOeXSuQMKerucu8Kxi0e7rlt48pG37myIGnUQ8
+         MeIDNgPtaj3ckhWVZmQ6was1ri8dMmhNXJT/wDsR47ytE1RoHuDGZoaqpy/VUDNn2isN
+         gzEbVZ/5SOijdvT1FM27ar5Etqe2M/t6HO4hMoi+JV7rGM8bW9ckvFXgngmpYq24/Kkr
+         nez7Bi+OkHOVzBvsJZrWuJ2EZsHekXca+6Q/w+s8PqvmrN6mYF46JrWh9MosDncO28Bj
+         NeJPn4aMZbcQAVpDU3P642zOqiYU7LpfQavsmDzRVM2isZvlHjcDCrl4cQwQ5HxvLh3U
+         8kVA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1790894301; x=1791499101; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WAQkY/3Hdz9pmH44JOpK4eYwhd5PHEHXQKuWf1a9nS4=;
-        b=YtYfzpsefa89EfV2TwUMJ+AFG8JZWNUQd2RvXXXIwv1iZuccPv7mrmY9xVt6lfslNV
-         MD4i8W+yT+h3d+WU87c7anhGQmXSAliGrnpqpKWyIJe67GAnAkV+1JKn07iBW24+Xr5F
-         n+ec5G6HjUXQcXS/Ka9x5XYryCXzp/EmDxe8y6HWOyqP+O+ULJn1MlkCdocDxNXNDBA8
-         WU/m6SH4FouiQ5kgh+kUBG4vKP+k5XI7RBSIk4ZVy8k7ga1o7eeOXoxsJvMtmJX3wG4w
-         Q0KKZqKYiCgFwPQpEACZ0p69hAJmfef1KV9769C4dbsi+df2biadKy7TdmJdpy37oyTH
-         H6ig==
+        d=gmail.com; s=20251104; t=1790901558; x=1791506358; darn=vger.kernel.org;
+        h=content-type:to:subject:message-id:date:from:mime-version:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=L/QbTye19jxpIlXh5TM8jjJsFiN71Nkr83E5stflnG0=;
+        b=bsUDFJnew7aeVIDhmid1rh1aTNav0khFaZpFVJLD1r5WmHaouYkfPhCbD1j/50i1fK
+         KX4oKAV++PoLGIGA9A+GiQmoTjyp4wa5BQ66XlO9Cc6HYsqLM2hFVUlO9TZJSlTOidxa
+         iCXsgFdMY2hR1i1njwQG0Wj5+uv5UhGmfP3e7metSpLHVXnGMDeey6fENapjXeWZ1e3q
+         vwcUAr6AV63yNJEgx0MWZUBsxuZhCI4yaKHav1GL0+GLQhLWyUOPqNdquqVKeqSoubhx
+         ypyfaIR+oYJPF9owNlxpN2EarmFoLcq0MvdxIOkPbusLzaDvtraWy7+ipH3cjOAhA621
+         4Yog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1790894301; x=1791499101;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=WAQkY/3Hdz9pmH44JOpK4eYwhd5PHEHXQKuWf1a9nS4=;
-        b=cXhoiDJOQQUC2v/0hQYBGiQ1zmYRPf/Xgcar/QvSbE/lUP0PgGnAidifJXhFormZ3F
-         JR/doQIuprb+4JHBVRoxteoqo+ap4TLe4p5xwhe6G1dypvC6YpAB0QBuWiXf1oD0xBdt
-         V4hDhiNRTattf7vkv3cSmpCoPCznVKd/LVrMrMnS8sCTP3BukOg7AtPWbZDQ8ON5kxVt
-         mZmfYL7cByk0QCOqxmLu9fCbmSE9+NE6hSLstHlX1WcamYBGraoB9lZvMMCehRMFGdw5
-         U57nUGnXWrEDHz0Hld58UwDd0I+GQbytQe6336MbB+NzMaxKCvcQcl43nFBy9u6JqLKP
-         pHCg==
-X-Gm-Message-State: AFuF++mqTpzaXqB8rc2/W39FdnC9hPDrsefLJGsbanUFzkwL77fNu7pO
-	jCiVFmlrNe3iRPPFDv9RINgTGFVKtxoLcA0QB+H1k12335uAY/CVmPwvrTK/yeXVLmeg3I2Lk6Z
-	eqyBxNCUP6KDvWg3DtfPLJln5o/yTFYpTG7I2D3mYGSbDdA0jqSJPh1lkW3FEZx08DdEGj2G50h
-	nJvMTFJUnUNNiyopxH/A2zlWvmXDPdhEvgYP7VJ78ziFVe11g=
-X-Gm-Gg: AYBFou2qpmrMpdMbPAn0V27Ppnr5+8h2QSaATp658/FllQhA/eJqrNI7t4FoN94MSQH
-	8vqIFe8jJJvY9ly2v4/iGCubPtXYOuyvhTQwOe4XSXF9hQju+JlM+LSY1o0NTBIeHBlYhXoQpH5
-	vnvH3T88CNB5dHrTwzsvJC64GMYbVXgYL0PrbFoKfXYFXoYEs2vfXagYUxG5KoeDZ7b0eVnJu6h
-	K32AKA94MxHSyPhZcyP5+aidZ58giCEGni4u87Qdvt9GoC/aL5Xk9qykl6xQrgGtton8AdZsSpt
-	+/1gPjmqCLiD9qWL4eGFk+ZWbB5JUlJlwdQTK6wqxVugu4zvcktcBk3GEPslcvmpuKYE/2p9Dlp
-	7jDkoMZLW76r1KuZobLneFXFWe/5krmBaIsQw6gascOtWWGxY0BjoLJAcrAY7cJo/zw==
-X-Received: by 2002:a05:622a:488d:b0:533:929b:624e with SMTP id d75a77b69052e-533d96a6b22mr11650421cf.59.1790894300666;
-        Thu, 01 Oct 2026 15:38:20 -0700 (PDT)
-X-Received: by 2002:a05:622a:488d:b0:533:929b:624e with SMTP id d75a77b69052e-533d96a6b22mr11649961cf.59.1790894300099;
-        Thu, 01 Oct 2026 15:38:20 -0700 (PDT)
-Received: from bearskin.sorenson.redhat.com.com (c-98-227-24-213.hsd1.il.comcast.net. [98.227.24.213])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-53398a5c46csm9665251cf.10.2026.10.01.15.38.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Oct 2026 15:38:19 -0700 (PDT)
-From: Frank Sorenson <sorenson@redhat.com>
-To: linux-cifs@vger.kernel.org,
-	pc@manguebit.org
-Cc: linkinjeon@kernel.org
-Subject: [RFC PATCH] smb: client: fix data races in STATS2 per-command timing fields
-Date: Thu,  1 Oct 2026 17:38:14 -0500
-Message-ID: <20261001223817.2542012-1-sorenson@redhat.com>
-X-Mailer: git-send-email 2.55.0
+        d=1e100.net; s=20260707; t=1790901558; x=1791506358;
+        h=content-type:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=L/QbTye19jxpIlXh5TM8jjJsFiN71Nkr83E5stflnG0=;
+        b=fbr4GBNmBeKICxQ1QSPJgWQNrO3JYJ4hJe5YVLlB3z612PwCmP9zgCSyrzY/1JapLO
+         ls9lXg7WgyodKMMMno/jpD3rg4RBXjtB5SpYgNrXzifm6kEBjadT6aCh0uG/d4Fo7vo0
+         UN3+6Y7sqor5YqDOS1b5to8l+s6nZWuXII+PjA/T0nOkQdrh6UTN6KysMdW1gSij3TNK
+         HZOicVi8PUT/8PnUtwwPL9cosvAsZ+wuZhEbAVHs9n7//KLDCkPSvM30iz8E6XeDy4Ml
+         KatI6qC7xBEiTOtkgR8DFuvQjKPi53kTiY+RUO2tLIelP7V6ytdyfWW0ly5VmCjAz3ao
+         s46w==
+X-Gm-Message-State: AFq9FYKjw3P4J98OlCNC64RFSRA2t7Cl8js8PHiv30tC5lvQ+TC5jTVL
+	DeL1TAv7DxX5xpGF2wKnPjq8g5EG6k6s3CbyBXAc19iEsrV4ZSZKX1reXNAL4QNdbK7ZhO9bEfe
+	RipM0l8SQ5dztHP2aFDB4yCMN/sMdKh9bqVES
+X-Gm-Gg: AYBFou3zxreac3bclB+cosNsgG+MUtnqjygFOjs+kqWy6AMr4jgncfNONyA8YewbzsK
+	mfvV2U3y7YJU5IDSbKn4ZmpM4QpGgwdHpYtHw8bkycnp3IVXPYF3TlA9m1D+g7QqKxk7Mn7kz6h
+	IdUFZZ8CyLSuaysuZXMumizAPTiv91wjWOD9clFWPxz3zD06AOIXBawb1ZKcXJa9ceNL/RfxrNA
+	AbmM4sh8pqWtlMBLS4VF9aILgOrMiLJoiB1At2fxWX3CzFxRkEhqBJIxAVUnCld3tPpN/HqkZwp
+	L55mMVi+N2DAsrs173VqQabsf1fmIPmAMU4P4IY7bmBeIT3HOKNFdwY=
+X-Received: by 2002:a05:6a00:300b:b0:881:bc81:e8f6 with SMTP id
+ d2e1a72fcca58-88af7aada78mr896079b3a.23.1790901557632; Thu, 01 Oct 2026
+ 17:39:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Asim Siddiqui <riksha.driver@gmail.com>
+Date: Fri, 2 Oct 2026 10:39:05 +1000
+X-Gm-Features: AclHuK_5wf2Gdb9GTJNXSbaLzO8K0lha-oVXfVU39JNF0CT30oAa80Y3RW5x8SM
+Message-ID: <CAKhvyj1zeEmhp_vJWuPHcUFGJp=tZxqG3oAgfc7qSwmSmU0tMg@mail.gmail.com>
+Subject: BUG] ksmbd: in-tree SMB2 wire format does not match MS-SMB2 -
+ non-Linux clients cannot complete NEGOTIATE
+To: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-KCSAN reports concurrent read/write races on server->time_per_cmd[],
-server->slowest_cmd[], and server->fastest_cmd[] inside __release_mid().
+Hello,
 
-These debug counters are updated by every thread completing an smb2
-request without holding any lock, which can lead to inaccurate
-accumulated totals and min/max values.
+In-tree ksmbd cannot complete an SMB2/3 NEGOTIATE with any client that
+implements the MS-SMB2 wire format (Windows, macOS, Samba clients). It
+only interoperates with the in-kernel cifs.ko client, which uses the same
+internal struct layout.
 
-Reduce the data races by protecting the statistics updates:
- - Convert time_per_cmd[] to atomic64_t and use atomic64_add().
- - Use try_cmpxchg_relaxed() retry loops to safely update
-   slowest_cmd[] and fastest_cmd[]
- - Use WRITE_ONCE() for the initial assignment on first completion,
-   accepting the narrow race which might overwrite the very first
-   statistic.
+Environment
+-----------
+- Kernel: v7.0 (tag 3131ff5a117498bb4b9db3a238bb311cbf8383ce ->
+  028ef9c96e96197026887c0f092424679298aae8), clean mainline tree
+  (verified: the only local patch is an unrelated PCI p2pdma whitelist
+  entry; the running ksmbd.ko srcversion matches a build from the v7.0
+  tag).
+- The 64-byte struct smb2_hdr layout is present at least back to v6.6
+  (checked fs/smb/common/smb2pdu.h at v6.6, v6.10, v6.12, v6.14, v6.16 -
+  identical).
 
-Update cifs_stats_proc_show() and cifs_stats_proc_write() to use the
-corresponding atomic and READ_ONCE/WRITE_ONCE accessors.
+Symptom (reproducible)
+----------------------
+1. TCP connect to :445 succeeds; ksmbd accepts and ACKs.
+2. Client sends a spec-conformant RFC1002-framed SMB2 NEGOTIATE
+   (MS-SMB2 2.2.1 40-byte header, dialects 3.1.1/3.0.2).
+3. Server ACKs the PDU, then sends FIN with no SMB response. No log
+   output (dmesg/journal clean).
+4. Reproduced with macOS smbutil/mount_smbfs and with a hand-crafted
+   raw client.
+5. Control test: mount -t cifs -o guest //<lan-ip>/share (cifs.ko
+   client, same kernel) passes NEGOTIATE and reaches authentication
+   (rejected at auth, as configured) - i.e. kernel<->kernel interop
+   works, kernel<->MS-wire does not.
 
-Signed-off-by: Frank Sorenson <sorenson@redhat.com>
----
-Hi all,
+Root cause
+----------
+struct smb2_hdr (fs/smb/common/smb2pdu.h:142) is a 64-byte layout that
+is NOT the MS-SMB2 wire format:
 
-I'm sending this as an RFC because I'd like guidance on the preferred
-approach for fixing these STATS2 data races.
+  field                    MS-SMB2 wire (2.2.1)     in-tree struct smb2_hdr
+  total                    40 bytes                 64 bytes
+  StructureSize            40                       64
+  Flags                    offset 0x08              offset 0x10
+  Command                  offset 0x1C, 4 bytes     offset 0x0C, 2 bytes
+  CreditCount              offset 0x20, 4 bytes     offset 0x0E, 2 bytes
+  Status/Id/SessionId/Sig  separate                 embedded 0x08/0x20/0x28/0x30
 
-This patch fixes the races by using atomic64_t and cmpxchg loops for
-higher accuracy of the timing statistics, with a slight overhead
-due to the use of another atomic in a hot path.
+The server applies this struct directly to the raw wire buffer - there is
+no wire<->internal conversion:
 
-Obviously, locking is out of the question here, so the alternatives
-I see are:
+- smb_get_msg() is just "buf + 4" (fs/smb/server/smb_common.h:213).
+- ksmbd_negotiate_smb_dialect() (fs/smb/server/smb_common.c:283) casts
+  the request buffer to struct smb2_hdr * / struct smb2_negotiate_req *.
+- smb2_handle_negotiate() (fs/smb/server/smb2pdu.c:1103) computes
+  smb2_neg_size = offsetof(struct smb2_negotiate_req, Dialects) = 100
+  (64-byte hdr + 36-byte fixed body). A genuine MS-SMB2 NEGOTIATE PDU is
+  50-76 bytes, so "smb2_neg_size > smb2_buf_len" ->
+  STATUS_INVALID_PARAMETER / -EINVAL -> the connection is closed and the
+  prepared error response is not sent (hence the silent FIN).
+- cifs.ko builds its requests from the same structs, so its PDUs are
+  >=100 bytes and parse cleanly server-side - which is exactly why the
+  Linux<->Linux control test works while every MS-wire client fails.
 
-1. accept this patch to prioritize accuracy; the other two counter
-   fields in STATS2 are already atomic, so this makes the third
-   counter match.  And the try_cmpxchg_relaxed loops for
-   slowest_cmd and fastest_cmd should be exercised infrequently, so
-   overhead should be minimal.
+Evidence
+--------
+- tcpdump (server-side, port 445):
 
-2. change nothing about the logic, but wrap the existing bare
-   assignments in WRITE_ONCE()/READ_ONCE() and accept that
-   concurrent updates will sometimes silently clobber each
-   other.
+    09:54:18.170184 IP <client>.49454 > server.microsoft-ds: Flags [S]
+    09:54:18.170206 IP server.microsoft-ds > <client>.49454: Flags [S.]
+    09:54:18.173925 IP <client>.49454 > server.microsoft-ds: Flags [.], ack 1
+    (client then sends 66-byte framed SMB2 NEGOTIATE, dialects 0x0311/0x0302)
+    IP <client>.49496 > server.microsoft-ds: Flags [P.], seq 1:67, length 66
+    IP server.microsoft-ds > <client>.49496: Flags [.], ack 67
+    IP server.microsoft-ds > <client>.49496: Flags [F.], seq 1, ack 67
+    (no data from server; connection closed)
 
-Let me know which approach fits best, and I'll submit a formal
-v1.
+- dmesg: no entries for the framed NEGOTIATE. (Unframed probes do log
+  "ksmbd: PDU length(%u) exceeded maximum allowed pdu size(16384)" -
+  the RFC1002 length check at the 4-byte boundary works; the failure is
+  in header field offsets.)
+- mount -t cifs (cifs.ko client) -> "mount error(13): Permission denied"
+  (reached authentication stage); macOS smbutil view -> "server
+  connection failed: No such file or directory" (no data exchanged).
 
- fs/smb/client/cifs_debug.c | 12 ++++++------
- fs/smb/client/cifsglob.h   |  2 +-
- fs/smb/client/transport.c  | 24 +++++++++++++++++-------
- 3 files changed, 24 insertions(+), 14 deletions(-)
+Impact
+------
+In-tree ksmbd cannot serve standard SMB clients - its primary use case.
+Any distro shipping in-tree ksmbd (e.g. Ubuntu 26.04 ksmbd-tools) is
+affected; users are silently steered to the out-of-tree cifsd module or
+to Samba.
 
-diff --git a/fs/smb/client/cifs_debug.c b/fs/smb/client/cifs_debug.c
-index 3761d3ad6088..c354a554853a 100644
---- a/fs/smb/client/cifs_debug.c
-+++ b/fs/smb/client/cifs_debug.c
-@@ -752,9 +752,9 @@ static ssize_t cifs_stats_proc_write(struct file *file,
- 			for (i = 0; i < NUMBER_OF_SMB2_COMMANDS; i++) {
- 				atomic_set(&server->num_cmds[i], 0);
- 				atomic_set(&server->smb2slowcmd[i], 0);
--				server->time_per_cmd[i] = 0;
--				server->slowest_cmd[i] = 0;
--				server->fastest_cmd[i] = 0;
-+				atomic64_set(&server->time_per_cmd[i], 0);
-+				WRITE_ONCE(server->slowest_cmd[i], 0);
-+				WRITE_ONCE(server->fastest_cmd[i], 0);
- 			}
- #endif /* CONFIG_CIFS_STATS2 */
- 			list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
-@@ -826,9 +826,9 @@ static int cifs_stats_proc_show(struct seq_file *m, void *v)
- 		for (j = 0; j < NUMBER_OF_SMB2_COMMANDS; j++)
- 			seq_printf(m, "  %d\t\t%d\t%llu\t\t%u\t%u\n", j,
- 				atomic_read(&server->num_cmds[j]),
--				server->time_per_cmd[j],
--				server->fastest_cmd[j],
--				server->slowest_cmd[j]);
-+				(unsigned long long)atomic64_read(&server->time_per_cmd[j]),
-+				READ_ONCE(server->fastest_cmd[j]),
-+				READ_ONCE(server->slowest_cmd[j]));
- 		for (j = 0; j < NUMBER_OF_SMB2_COMMANDS; j++)
- 			if (atomic_read(&server->smb2slowcmd[j])) {
- 				spin_lock(&server->srv_lock);
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 5c5b76a9e9fe..96d945627548 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -772,7 +772,7 @@ struct TCP_Server_Info {
- #ifdef CONFIG_CIFS_STATS2
- 	atomic_t num_cmds[NUMBER_OF_SMB2_COMMANDS]; /* total requests by cmd */
- 	atomic_t smb2slowcmd[NUMBER_OF_SMB2_COMMANDS]; /* count resps > 1 sec */
--	__u64 time_per_cmd[NUMBER_OF_SMB2_COMMANDS]; /* total time per cmd */
-+	atomic64_t time_per_cmd[NUMBER_OF_SMB2_COMMANDS]; /* total time per cmd */
- 	__u32 slowest_cmd[NUMBER_OF_SMB2_COMMANDS];
- 	__u32 fastest_cmd[NUMBER_OF_SMB2_COMMANDS];
- #endif /* STATS2 */
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 6e21b5f8754a..437fc08dbfb5 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -67,16 +67,26 @@ void __release_mid(struct TCP_Server_Info *server, struct mid_q_entry *midEntry)
- 
- 	if (smb_cmd < NUMBER_OF_SMB2_COMMANDS) {
- 		if (atomic_read(&server->num_cmds[smb_cmd]) == 0) {
--			server->slowest_cmd[smb_cmd] = roundtrip_time;
--			server->fastest_cmd[smb_cmd] = roundtrip_time;
-+			/* First completion for this command: initialize min/max. */
-+			WRITE_ONCE(server->slowest_cmd[smb_cmd], roundtrip_time);
-+			WRITE_ONCE(server->fastest_cmd[smb_cmd], roundtrip_time);
- 		} else {
--			if (server->slowest_cmd[smb_cmd] < roundtrip_time)
--				server->slowest_cmd[smb_cmd] = roundtrip_time;
--			else if (server->fastest_cmd[smb_cmd] > roundtrip_time)
--				server->fastest_cmd[smb_cmd] = roundtrip_time;
-+			u32 old;
-+
-+			old = READ_ONCE(server->slowest_cmd[smb_cmd]);
-+			while (old < roundtrip_time &&
-+			       !try_cmpxchg_relaxed(&server->slowest_cmd[smb_cmd],
-+			       &old, roundtrip_time))
-+				;
-+
-+			old = READ_ONCE(server->fastest_cmd[smb_cmd]);
-+			while (old > roundtrip_time &&
-+			       !try_cmpxchg_relaxed(&server->fastest_cmd[smb_cmd],
-+			       &old, roundtrip_time))
-+				;
- 		}
- 		cifs_stats_inc(&server->num_cmds[smb_cmd]);
--		server->time_per_cmd[smb_cmd] += roundtrip_time;
-+		atomic64_add(roundtrip_time, &server->time_per_cmd[smb_cmd]);
- 	}
- 	/*
- 	 * commands taking longer than one second (default) can be indications
--- 
-2.55.0
-
+Suggested direction
+-------------------
+Keep the 64-byte layout (if it is the preferred internal representation)
+but restore the MS-SMB2 40-byte layout for the on-wire structs, or add an
+explicit wire<->internal conversion at the transport boundary
+(tcp_recv_data / smb2_handle_negotiate). The in-kernel client must be
+kept in sync so Linux<->Linux interop is preserved.
