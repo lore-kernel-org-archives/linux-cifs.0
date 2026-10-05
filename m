@@ -1,65 +1,66 @@
 Received: from mail-qk2-f41.google.com (mail-qk2-f41.google.com [74.125.230.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44AA4D9915
-	for <linux-cifs@vger.kernel.org>; Mon,  5 Oct 2026 19:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1144D796C
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Oct 2026 19:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.230.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791227140; cv=none; b=vFp339sOAHy84C88KerCDVJNGlVoGH21XRsYP+GRK5ppjyQt9BOkZwYawADQcFgrDkYUnn8BxQKW0riX9Jclip8rZrCUMxq4F1Z84jLodKAcffVsKqSfnf1RZ88TzeMhtBDMVINjP60wl6wHIvvUkFuFYQDmEbhHrhOQBUU2XTM=
+	t=1791227144; cv=none; b=LTelJw/9PC8Rwk4XQHERDdcBHnnV4zL4lfKPCI3Ael/EyPOE6aTEwjJjLhBFOUYv6UevKQvDO8Wv6QiB3btBLSuHOHrrH2Bcwaj6lr0SSxM0QM3i2UVU0tXXjkh+T1SoB5kdqZ1r9L1ZqWjBJ49rmQGhh4ylA43caXDlScKeKe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791227140; c=relaxed/simple;
-	bh=/YS/BZ604UKYVL5yPYGx92ZETX+iBPHSy3OmMdn9doI=;
+	s=arc-20240116; t=1791227144; c=relaxed/simple;
+	bh=I1kQ+aksiY72u7Wu0feoHT12PyM00+j4pleuEHqmVbc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aqrWVzr3X+MPmypBsnDPUrcRTZqvv3RmmiN9WGl5D35k6OA3A9W8C3FDpR6v45VtdsbXZpsZ1UrfiEPK/+kvDOa4Ux96ypQnQE1MgOTstGtyHttJDbAwBrN52u0m2yENFppxTFFJtzsulcSDw0a6R3So1Ufc8itQDjX+FYeEu8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzYgMR5G; arc=none smtp.client-ip=74.125.230.233
+	 MIME-Version:Content-Type; b=aSKXIjXzEHdVVPHoibfhI7g7K2iLOPSPpmf1xIxjW9DuhpZOHnUhjS4SMwBWWfB/Vv2DDuryKyeJtrD3Hh5BIjgjFp4TQPRskiWfR9CJzGFDbMCH79h9URoUs9dcJO8ze658lyi831GOgfgM5MwcO2hFPTw1MjCZ6lcQHccVc+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HK8NkR3w; arc=none smtp.client-ip=74.125.230.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzYgMR5G"
-Received: by mail-qk2-f41.google.com with SMTP id af79cd13be357-93bfc58ed04so71267285a.1
-        for <linux-cifs@vger.kernel.org>; Mon, 05 Oct 2026 12:05:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HK8NkR3w"
+Received: by mail-qk2-f41.google.com with SMTP id af79cd13be357-93e45f7898eso234062785a.0
+        for <linux-cifs@vger.kernel.org>; Mon, 05 Oct 2026 12:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791227136; x=1791831936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YxfaCQs22lEF4uK0VWv8vNMTib4PBh2WgafcZWAVbxU=;
-        b=DzYgMR5Gh0YxmoWWQsxXooDIpZsywwl1F1LUW9Z7/6zCnomW8izQ4t5Gy4DosEQ0pG
-         25v2DZHqwQ6G7W6FUaCWKBNANGX+wUFv8MoSkyoGqNMcD64RvewEy8pPgUS+LztYSK7n
-         xSMKYVXSAsrkqwJudbmcPn1vJkGAocoXJyjKKVpsdv/SKi234QHqF3w8RR/nXUk8Dgi9
-         UzincChsdZbLoLlS3v0zeE7PUlKJpgqMq+igR/GbNk9Y8xtsqB/0UiJr1Uxa4dftrhSM
-         TJc93CMEJgLMV+0MYODNTJjOhhs+VyL2zCDNJI08uLKopCRykK2bb1xjqrR/YUoptSpY
-         re0w==
+        d=gmail.com; s=20251104; t=1791227138; x=1791831938; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=jnVPRG1Av5oF1H+ivcU67iY5i4bJZtWKAv5m6gn2cmg=;
+        b=HK8NkR3w7cc/J3zoi89TxIgj6Dh79pq4CyVdsg8vJ/A43brX52QtidMOWWrhgvZ6kG
+         Wo0w1yT7f38YfOdnXbFeR3llC/PeDW83j7NHPzr/pf4I2CfPEQqzUd44ZbzsW/Y7Mf+S
+         i8X7EzI386Ci2VhApy3EGvieWU4lKumSxlwJakyES15yvnhn02pbEcyfeeLMSUTM5Hyp
+         tsBnRTIUbSUwLhe4GdZ2a9EORBCj91u01W1uWqwajLyzLPsKRR9I6Xqdbl+kOX/0f2qI
+         UFPs4HiFoNopMOLfY8SxY9aXu/GwVrLYxH+FnFcCYXhyWgSmB53jQAaoe2eVoJ/m0HDd
+         OJew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791227136; x=1791831936;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YxfaCQs22lEF4uK0VWv8vNMTib4PBh2WgafcZWAVbxU=;
-        b=IaHWhkyDMNNT4By5rkfPE87qu936nleDhHuttVO5DcltauyszzmvLWkU6AuY6mid+U
-         c613UyMtJS1KXNSQrNhc5ZZkMUr7He9tHJO9j1RngXHQme16UroecIznVaOTYyN4wVOa
-         2UFWqT1/cZYle7n5FdHl5bYVOJuoqD/gAoQmnYgyunPyNcoLkNt/6N+1lUCuVNj8p5i8
-         4xdh0L0v8pEAIFGM1l0M//ZthkXcYKh/JRGmIOINquV0GEalka2gblBd2kzw9ZSOYiwJ
-         OLUw2kRDynU8b8S3BPX1JUmM6Is/znBnHkA/KPBwR2gfMykxdn5XGBRP7DOBiogjd+g0
-         w+bA==
-X-Forwarded-Encrypted: i=1; AKwUvBxnbcBnNbpgCmsCiLQw8xnY1xpQegj/tFZBnRuc4fY0EN52DTR9VpbF0fokZcTSK/iX9yOGQ2JY3Gkn@vger.kernel.org
-X-Gm-Message-State: AFuF++na7voiEw4TvZflOZEIwQTtCRosKeoxm8Znbvqf7pt7w/MPbSR9
-	y/LRwRRKnbZyGoloE8l8KmHDDEAmuNIEfG8Y6m/jBiC1wwUKpFx9MoLp
-X-Gm-Gg: AYBFou2znTBCJOasEOY2/xHZSOWw1a0GcpR8NAxx6rAwAvcEkc0rT5mY3lw4+ahTFW9
-	TSt9N5ZnVvsMwsGrnIvy1tj+J62UzJ3p3u1M1Y/0L1/XRSpc+FlslJgXPcGOrmecTcKC9Vk8zOx
-	P2foXEeMZi243kcWc902ZbXyXrSdz3fxdVsm+AhQ+gz9o/ZJZHHdI12QMSJR2I7ZWhvGBLD/VBg
-	vWlQ8+tstxcKJmgcSwhlYD+EiOCkNhf5WxcjhkPiRmsw3Z1hYW+xdp40jNu1knj6W9wWNXoqwnn
-	GrVvNQthdXQCbpQu8xo2ekyOb5M7m3aGfIli1Bru7DOuC7RVR08arKnUHnqeg3FV/x8yuq9q/2e
-	MDm5zqBlvhpiPE6WHVkI2Y43JrsNyJc4FcF3s78X19V3QFbJBujSgejCQujl2gC5WuPBaIc2cl9
-	x2TcdlxQBS4Li2pQgFGj0bkt5tuVBcoeG7Gfz8syzRkwc8bAZTBU991Gd0wyu8+3vs9UfLb6zOe
-	NHvJ27X2Y6Y3F0xn6p8twlqECM8eWL/ynIjKSpqMF6XNfhCtusZZ6qUvboUjq1F0TVAvvJWJa9u
-	swOWV41x1tPVhC1Va7U6J/Oafflwb/grqxt+uw==
-X-Received: by 2002:a05:620a:2610:b0:93e:6f72:cd9d with SMTP id af79cd13be357-93e85edf6ebmr119478585a.9.1791227136319;
-        Mon, 05 Oct 2026 12:05:36 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1791227139; x=1791831939;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=jnVPRG1Av5oF1H+ivcU67iY5i4bJZtWKAv5m6gn2cmg=;
+        b=WL7OKtJNLXeVgqkjZnIDB6+KPoLRR/pQgsDmuBRqQ/ZvX8tLVPgHqY5wyXlvVKx46r
+         NTm1lwxTpEuV+hQRV4iVXZw+wo2qMOUJFPmX4aIUlBpTnCJSw8KYwPbPT7BWXEqxYlLw
+         C/N027RT5lTxOJtDgTHUXMLJ0b9suCipV2/dSr/1oPN3Q6zKrDYVS4AR0brj63mIfOyy
+         0Bk9TNkOgdNv69zHfgiCp9C8BRioLW8ZcaV05Zo6TIwoNE0Ve5TYVuvWbhFMst+s0zZu
+         Fugg9437yi1dGhzhCZYdaX87GuSOtsATz5Kfvf1zpyCZjgCTTnuRwmtf10tnoplt+Ypo
+         X47A==
+X-Forwarded-Encrypted: i=1; AKwUvBwltxOJiymWQaES1s3L67da1nnp/nMpvcnNDR7bfb7V42DUGFe+A62Pf0tCgNs3IaC2HrdGi1FIjGFN@vger.kernel.org
+X-Gm-Message-State: AFuF++nGPXYigYM9KEoHfUi8pixkHULLfdzs/Pp0yC/zwevaG3adyn+z
+	w2ieDNlSr0yvJe3+Ageo5wmqcxPhqIl7XciLqZAXREOI/KnBp4217QgJ
+X-Gm-Gg: AYBFou3+xsa2+Z7jJ9/uSSNfmQP+3KFwgbA4z4PxCDIKz7Dwh+4HWtRmexWmaUKIpWj
+	rtgyE187tnzaWemhEJ1VztHU1RASYCx2uB6CsKsvzxOTrMIWJEZu9wDD05+W2DLJsHj67SDjrSz
+	DpV7H1ixUgHWTi/EoTujHoO3NcCeie3UglAFZEISDJJ/g2nZSz3s2xZTJKAGVs0od5ofdLCpFuG
+	hAQn8CosehHxYsFcYHvRWkW3FW0Bbb5Bjo5bYe9GuYEdzt2SfbtM7ndgXSGzayNf3dNFC5L40fs
+	Iab62/EJD09+95P3igAyeU3bsJVx+AzaMSojwHWTEsasBPMNbLSFHZFDN8HYD3Tr9hKL0UuJ1HH
+	n0RDEd/a8V0vILE6TVzxlQjE7hZ/4+HM/fxHFmNJeXVJOW8G2EzvI7SmaZxHLKArQUehdU3eIVr
+	ExGWGZtuNoT+GA2JUzgYIukN91+OSPTG/PxkJlB6oR1TBgXZueLLAc2NslB8+Doq1uexsbKxk5F
+	5DqqeT7jX333lO+yx/4woE8X0XplbFhZKEG5BmOLAUXMSXh2n5HA/t2nXOLJuneUNwBMQPdRsdv
+	Q/JiwkWj6VslkM004hwwohs2sxqq757HiyGy2g==
+X-Received: by 2002:a05:620a:370d:b0:93a:48a:171 with SMTP id af79cd13be357-93cf188f6camr2169133885a.51.1791227138218;
+        Mon, 05 Oct 2026 12:05:38 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-93cca263708sm927117785a.31.2026.10.05.12.05.34
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-93cca263708sm927117785a.31.2026.10.05.12.05.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Oct 2026 12:05:35 -0700 (PDT)
+        Mon, 05 Oct 2026 12:05:37 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -97,9 +98,9 @@ Cc: davem@davemloft.net,
 	mef@scarletmail.rutgers.edu,
 	paul@jakma.org,
 	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [PATCH net-next v16 07/15] quic: add connection id management
-Date: Mon,  5 Oct 2026 15:04:02 -0400
-Message-ID: <ed18828ce3e3c80f4d03ac0f393164af3a64176b.1791227050.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v16 08/15] quic: add path management
+Date: Mon,  5 Oct 2026 15:04:03 -0400
+Message-ID: <ab05ff56b186e6aa6fcef9ad292b79e7ab8d5020.1791227050.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1791227050.git.lucien.xin@gmail.com>
 References: <cover.1791227050.git.lucien.xin@gmail.com>
@@ -109,109 +110,217 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch introduces 'struct quic_conn_id_set' for managing Connection
-IDs (CIDs), which are represented by 'struct quic_source_conn_id'
-and 'struct quic_dest_conn_id'.
+This patch introduces 'quic_path_group' for managing paths, represented
+by 'struct quic_path'. A connection may use two paths simultaneously
+for connection migration.
 
-It provides helpers to add and remove CIDs from the set, and handles
-insertion of source CIDs into the global connection ID hash table
-when necessary.
+Each path is associated with a UDP tunnel socket (sk), and a single
+UDP tunnel socket can be related to multiple paths from different sockets.
+These UDP tunnel sockets are wrapped in 'quic_udp_sock' structures and
+stored in a hash table.
 
-- quic_conn_id_add(): Add a new Connection ID to the set, and inserts
-  it to conn_id hash table if it is a source conn_id.
+It includes mechanisms to bind and unbind paths, detect alternative paths
+for migration, and swap paths to support seamless transition between
+networks.
 
-- quic_conn_id_remove(): Remove connection IDs the set with sequence
-  numbers less than or equal to a number.
+- quic_path_bind(): Bind a path to a port and associate it with a UDP sk.
 
-It also adds utilities to look up CIDs by value or sequence number,
-search the global hash table for incoming packets, and check for
-stateless reset tokens among destination CIDs. These functions are
-essential for RX path connection lookup and stateless reset processing.
+- quic_path_unbind(): Unbind a path from a port and disassociate it from a
+  UDP sk.
 
-- quic_conn_id_find(): Find a Connection ID in the set by seq number.
+- quic_path_swap(): Swap two paths to facilitate connection migration.
 
-- quic_conn_id_lookup(): Lookup a Connection ID from global hash table
-  using the ID value, typically used for socket lookup on the RX path.
+- quic_path_detect_alt(): Determine if a packet is using an alternative
+  path, used for connection migration.
 
-- quic_conn_id_token_exists(): Check if a stateless reset token exists
-  in any dest Connection ID (used during stateless reset processing).
+It also integrates basic support for Packetization Layer Path MTU
+Discovery (PLPMTUD), using PING frames and ICMP feedback to adjust path
+MTU and handle probe confirmation or resets during routing changes.
 
-Note source/dest conn_id set is per socket, the operations on it are
-always protected by the sock lock.
+- quic_path_pl_recv(): state transition and pmtu update after the probe
+  packet is acked.
 
+- quic_path_pl_toobig(): state transition and pmtu update after
+  receiving a toobig or needfrag icmp packet.
+
+- quic_path_pl_send(): state transition and pmtu update after sending a
+  probe packet.
+
+- quic_path_pl_reset(): restart the probing when path routing changes.
+
+- quic_path_pl_confirm(): check if probe packet gets acked.
+
+Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
 ---
 Sashiko, do not report any of the following concerns:
-  - Ignore the potential use-after-free of s_conn_id->sk in
-    quic_conn_id_lookup(). The QUIC socket will be marked with
-    SOCK_RCU_FREE before being inserted into the hash table in the
-    following patchset. Therefore, the socket lifetime is extended through
-    an RCU grace period, matching the RCU-protected lookup path.
+  - Ignore the potential use-after-free of the network namespace structure
+    in quic_udp_sock_put_work(). Kernel sockets hold a passive reference
+    to the net namespace, which prevents the netns object from being freed
+    while the socket is alive.
 
-  - Ignore the potential NULL dereference of id_set->active in
-    quic_conn_id_token_exists(), quic_conn_id_update_active(), and
-    quic_conn_id_select_alt(). id_set->active is guaranteed to be non-NULL
-    before these functions are called. These helpers are only used after
-    the destination connection ID set has been initialized with an active
-    CID, so the NULL state after quic_conn_id_set_init() is not reachable
-    on these paths.
+  - Ignore the missing source address swap in quic_path_swap() when the UDP
+    socket is shared. This case only occurs when paths->path[1].udp_sk is
+    NULL, which indicates a peer address change scenario.
 
-  - Ignore the potential count/first_number/last_number inconsistency
-    caused by inserting a CID with a number lower than the current first
-    CID in quic_conn_id_add(). The next patchset disallows lower-number
-    CID insertion, so the connection ID list invariant is preserved for
-    all valid inputs.
+  - Ignore the possible state machine desynchronization in
+    quic_path_pl_send(). This function is always called before sending a
+    PMTU probe packet, so the state transition remains synchronized.
 
-  - Ignore the concern about id_set->count overflowing in
-    quic_conn_id_add(). QUIC_CONN_ID_LIMIT and max_count are checked by all
-    callers of quic_conn_id_add() in the next patchset, so the count cannot
-    reach the overflow scenario described here.
+  - Ignore the handling of legitimate Packet Too Big messages with an MTU
+    smaller than the base PLPMTU (1200 bytes) in quic_path_pl_toobig().
+    Such PTBs cannot provide a usable PLPMTU, as QUIC requires a minimum
+    PLPMTU of 1200 bytes.
 
-  - Ignore the concern about quic_conn_id_remove() rejecting a legitimate
-    retirement. All callers will ensure number <
-    quic_conn_id_last_number(id_set) before calling it in the next
-    patchset.
+  - Ignore the concern about stale or torn reads in quic_path_set_udp_sk().
+    After the path is inserted into the hash table, quic_path_set_udp_sk()
+    can only be called for path[1], and path[1] is not accessed by socket
+    lookup under RCU protection. Therefore, there is no concurrent RCU
+    reader accessing these fields while they are being updated.
 
-  - Ignore the concern about non-consecutive connection IDs bypassing
-    active_connection_id_limit. In the next patchset, callers will ensure
-    that number - quic_conn_id_first_number(id_set) <= id_set->count before
-    adding a connection ID, preventing unbounded growth from sequence gaps.
+  - Ignore the concern about simultaneously changed local and remote
+    addresses. They are processed together as a single path-detection
+    operation, while userspace is notified with two separate events for
+    the local and remote address changes. Therefore, the combined check
+    is intentional.
 
-  - Ignore the concern about an out-of-bounds list dereference.
-    quic_conn_id_last_number() intentionally tracks only the last
-    consecutive connection ID, so id_set->active cannot be an ID beyond
-    that consecutive range in this path. The sequence-gap scenario does
-    not apply.
+  - Ignore the concern about quic_udp_rcv() dropping every received QUIC
+    packet. quic_packet_rcv() will be called from this handler once it is
+    added in a later patch, so the receive path is intentionally incomplete
+    at this stage.
 
-  - Ignore the concern about truncating the connection ID sequence number.
-    The caller will guarantee that number <= U32_MAX before calling
-    quic_conn_id_add() in the next patchset, so no truncation can occur.
+  - Ignore the concern about the missing seqcount read side. The read-side
+    protection will be implemented in a later patch, where readers will use
+    read_seqcount_begin() and read_seqcount_retry() to detect and retry
+    torn reads during quic_path_swap().
 
-  - Ignore the concern about max_count overflow. The callers will guarantee
-    that p->active_connection_id_limit <= 255 before calling
-    quic_conn_id_set_param() in the next patchset, so the assignment cannot
-    truncate.
+  - Ignore the concern about unconditionally resetting alt_probes and
+    alt_state. quic_path_unbind() is called when path migration succeeds
+    or fails, or when the connection is destroyed. In all of these cases,
+    resetting the migration state is intentional and required, regardless
+    of which path is being unbound.
 
-  - Ignore the concern about an RCU reader accessing the hash tables after
-    quic_hash_tables_destroy(). By the time quic_hash_tables_destroy() runs
-    during module exit, the QUIC stack is no longer receiving packets, so
-    quic_conn_id_lookup() cannot be invoked concurrently. Therefore, there
-    is no in-flight lookup that can access the freed hash tables.
+  - Ignore the concern about using a bare seqcount_t. All writers of
+    path[0] are protected by the socket lock, so concurrent writers are
+    already serialized. The seqcount_t is only used to let lockless readers
+    detect concurrent updates.
 
-  - Ignore the concern about id_set->count becoming inconsistent when
-    removing non-consecutive connection IDs. Callers will guarantee number
-    < quic_conn_id_last_number(id_set) before calling quic_conn_id_remove()
-    in the next patchset, so the described sequence-gap removal case cannot
-    occur.
+  - Ignore the concern about the initial PLPMTUD state.
+    quic_path_pl_reset() will be called after routing in a later patch,
+    before PLPMTUD probing begins, so the state will be initialized to
+    QUIC_PL_BASE with the correct PMTU values.
 
-  - Ignore the concern about tmp becoming the list-head sentinel. Callers
-    will guarantee number < quic_conn_id_last_number(id_set) before calling
-    quic_conn_id_remove() in the next patchset, so the last consecutive
-    entry cannot be removed and tmp will remain a valid connection-ID
-    entry.
+  - Ignore the concern about seqcount protection in quic_path_unbind().
+    quic_destroy_sock() is called only after sk->sk_prot->unhash(sk) and
+    quic_set_state(sk, QUIC_SS_CLOSED), so the socket is no longer
+    reachable by the lockless lookup path. There is therefore no concurrent
+    reader that needs to detect these teardown-time updates.
+
+  - Ignore the concern about sending one extra probe. quic_path_pl_send()
+    is called before the probe is actually transmitted. Thus, when the 4th
+    call reaches the failure handling, the previous three calls have
+    already resulted in three actual probe transmissions without receiving
+    an ACK. This correctly corresponds to QUIC_MAX_PROBES = 3.
+
+  - Ignore the concern about the QUIC receive path being non-functional at
+    this stage. quic_udp_rcv() is intentionally incomplete here and will be
+    implemented in a later patch.
+
+  - Ignore the concern about QUIC_PL_ERROR needing a recovery transition.
+    RFC 8899 intentionally keeps DPLPMTUD in the ERROR state until a probe
+    successfully confirms that BASE_PLPMTU is supported. Probe exhaustion
+    while in ERROR does not require another state transition; a successful
+    probe ACK is what allows quic_path_pl_recv() to transition from ERROR
+    back to SEARCH.
+
+  - Ignore the concern about skb_dst_force() triggering
+    WARN_ON(!rcu_read_lock_held()). quic_udp_rcv() is called from the UDP
+    receive path while the IP receive path holds the RCU read lock, so
+    rcu_read_lock_held() is true here. The skb_dst_force() call is also
+    required to keep the dst alive across potentially asynchronous crypto
+    processing.
+
+  - Ignore the concern about quic_wq being used after it is destroyed.
+    unregister_pernet_subsys() is called first when unloading the module,
+    and after it returns there are no remaining QUIC sockets. Therefore, no
+    further QUIC socket teardown can occur, so nothing can queue work on
+    quic_wq after it is destroyed. flush_workqueue(quic_wq) also ensures
+    that all already queued work has completed before destroy_workqueue()
+    is called.
+
+  - Ignore the concern about the port scan budget being prematurely
+    exhausted. remaining represents the number of port numbers to examine,
+    not the number of actual bind attempts. Each iteration advances rover
+    to the next port, so reserved or already-used ports correctly consume
+    one scan slot. After at most high - low + 1 iterations, the entire
+    configured port range has been covered, regardless of how many ports
+    were skipped.
+
+  - Ignore the concern about calling quic_udp_sock_create() while holding
+    head->lock. head->lock is a mutex, so the socket creation path is
+    allowed to sleep. Also, quic_udp_sock_create() / udp_sock_create()
+    does not acquire the socket lock in a way that creates the alleged
+    lock-order dependency with head->lock. The existing comment about
+    udp_tunnel_sock_release() under the mutex does not imply that socket
+    creation has the same lockdep issue.
+
+  - Ignore the concern about packet number 0 in quic_path_pl_confirm(). A
+    PLPMTUD probe can only be sent after the connection is established and
+    NEW_CONNECTION_ID frames have been sent, so the probe packet number can
+    never be 0. Therefore, using paths->pl.number == 0 to indicate that no
+    probe is active is safe.
+
+  - Ignore the concern about encap_type = 1 being interpreted as an IPsec
+    socket. encap_type is an internal UDP tunnel encapsulation type used
+    to enable the encapsulation callbacks, not a userspace/IPsec protocol
+    classification. Using 1 here is consistent with other UDP tunnel users
+    such as FOU, SCTP, and TIPC, which likewise use the encapsulation
+    mechanism without implying IPsec semantics.
+
+  - Ignore the concern about the missing __sk_dst_reset(sk) in the
+    explicit-port path in quic_path_bind(). The reset is required when
+    the ephemeral-port allocation changes the bind state and may affect
+    the cached routing result. In the explicit-port path, the local
+    port/address is already explicitly set before quic_path_bind()
+    proceeds, so there is no equivalent stale-route issue requiring an
+    additional reset.
+
+  - Ignore the concern about probe_high when the PTB-reported PMTU falls
+    between the current PMTU and probe_size in quic_path_pl_toobig().
+    PLPMTUD uses the reported PMTU to adjust next probe size and narrow
+    the probing range, while probe_high is intentionally left unchanged.
+
+  - Ignore the concern about equal-PMTU PTB handling in
+    quic_path_pl_toobig(). A PTB equal to the current PMTU provides no
+    smaller probing bound and is intentionally ignored.
+
+  - Ignore the concern about the destination cache in quic_path_swap().
+    __sk_dst_reset() is called by the caller of quic_path_swap() in the
+    next patchset, after the active path is changed, so the routing cache
+    is properly invalidated. No change is needed in quic_path_swap()
+    itself.
+
+  - Ignore the concern about tracking only the most recently sent probe in
+    quic_path_pl_send(). Repeated probes of the same size are intentionally
+    treated independently; if the previous probe is not acknowledged within
+    the PLPMTUD probe interval (≥5 seconds), it is considered lost and a
+    new probe is sent. A late ACK for the earlier probe is intentionally
+    ignored.
+
+  - Ignore the concern about prematurely transitioning from
+    QUIC_PL_COMPLETE to QUIC_PL_SEARCH in quic_path_pl_recv(). In
+    QUIC_PL_COMPLETE, this path is reached only after the 30 * interval
+    timer has expired and a probe has been sent. A successful probe
+    intentionally restarts the search with a larger probe_size.
+
+  - Ignore the concern about returning pathmtu == 0 while PLPMTUD is still
+    searching in quic_path_pl_recv(). The PMTU is intentionally updated
+    only when an optimized PMTU is found, which is indicated by probe_high
+    being set. During the ongoing search, the current PMTU remains in use
+    while larger probe sizes are tested.
 
   - Ignore the concern about leaking the socket counters in
     quic_init_sock(). When quic_init_sock() fails, inet_create() or
@@ -219,413 +328,782 @@ Sashiko, do not report any of the following concerns:
     destroy path and properly undoes the socket accounting before the
     socket is freed.
 
-  - Ignore the concern about the lifetime of conn_id returned by
-    quic_conn_id_lookup() after dropping the RCU read lock. The returned
-    conn_id is only accessed by the caller while still within the RCU
-    read-side critical section in the later patch, so quic_source_conn_id
-    cannot be freed before those accesses complete. No change to the return
-    type is needed.
+  - Ignore the concern about the reuse branch allowing a non-local source
+    address. The source address is validated by quic_get_user_addr() when
+    the quic_bind() socket API is added in the next patchset, including the
+    FREEBIND and sysctl_ip_nonlocal_bind checks. Therefore, the address has
+    already been validated before this UDP tunnel socket reuse path is
+    reached.
 
-  - Ignore the concern about WARN_ON_ONCE() being remotely triggerable in
-    quic_conn_id_add(). This collision check is for source connection IDs,
-    which are generated locally by the QUIC implementation; they are not
-    client-chosen Destination Connection IDs. Therefore, a remote peer
-    cannot directly trigger this collision through an Initial packet.
+  - Ignore the concern about adding a socket-lock assertion to
+    quic_path_swap(). This function only receives struct quic_path_group
+    *paths and does not have access to the associated struct sock, so it
+    cannot assert that the socket lock is held.
 
-  - Ignore the concern about uninitialized bytes in quic_conn_id_add().
-    All callers ensure the struct quic_conn_id is fully initialized before
-    passing it to quic_conn_id_add() in the next patchset, so the direct
-    struct assignment does not copy uninitialized memory.
+  - Ignore the concern about accessing us->sk after
+    udp_tunnel_sock_release(). The socket is explicitly held with
+    sock_hold() before udp_tunnel_sock_release(), so its struct sock
+    remains valid while quic_udp_sock_lookup() accesses it. The release is
+    intentionally performed before __hlist_del() so a new UDP tunnel socket
+    can be created for the same address and port if the lookup no longer
+    matches, and udp_tunnel_sock_release() cannot be called under the mutex
+    due to lockdep constraints.
 
-  - Ignore the concern about quic_conn_id_set_free() racing with the RX
-    path. Before processing a packet, the RX path acquires the socket
-    lock and checks whether the socket is closed; if the socket is already
-    closed or quic_destroy_sock() is being called, the packet is dropped
-    instead of being processed. Therefore, the RX path cannot access the
-    destination connection ID sets concurrently with their teardown here.
+  - Ignore the concern about accessing us->sk after
+    udp_tunnel_sock_release(). udp_tunnel_sock_release() does not clear
+    sk->sk_ipv6only, and ipv6_only_sock() used by quic_cmp_sk_addr()
+    remains safe to call on the socket during this window. The socket is
+    also held by the reference, so the object remains valid until it is
+    removed from the hash.
 
-  - Ignore the concern about quic_conn_id_lookup() accepting an unchecked
-    len. The caller of quic_conn_id_lookup() will validate the connection
-    ID length before calling it in a later patch. Therefore,
-    quic_source_conn_id_head() is not reachable with a length exceeding the
-    valid connection ID buffer.
-
-  - Ignore the concern about quic_conn_id_last_number() being called with
-    an empty ID set. It can only be called when the socket is in
-    ESTABLISHING or ESTABLISHED state, where id_set->count is guaranteed
-    to be non-zero. Therefore, both quic_conn_id_first_number() and
-    quic_conn_id_last_number() are safe for their intended callers, and an
-    additional empty-set check is unnecessary.
+  - Ignore the concern about silently ignoring a valid remote-only
+    migration when path[1] has a stale source address in
+    quic_path_detect_alt(). This is intentional: only one alternate path
+    can be pending at a time, and a new candidate must wait until the
+    current path is successfully probed or fails and path[1] is cleared.
+    Therefore, a candidate with a different source address is intentionally
+    rejected rather than overwriting an in-flight path validation.
 
 v3:
-  - Clarify in changelog that conn_id set is always protected by sock lock
-    (suggested by Paolo).
-  - Adjust global source conn_id hashtable operations for the new hashtable
-    type.
+  - Fix annotation in quic_udp_sock_lookup() (noted by Paolo).
+  - Use inet_sk_get_local_port_range() instead of
+    inet_get_local_port_range() (suggested by Paolo).
+  - Adjust global UDP tunnel socket hashtable operations for the new
+    hashtable type.
+  - Delete quic_workqueue; use system_wq for UDP tunnel socket destroy.
 v4:
-  - Replace struct hlist_node with hlist_nulls_node for the node in
-    struct quic_source_conn_id to support lockless lookup.
+  - Cache UDP tunnel socket pointer and its source address in struct
+    quic_path for RCU-protected lookup/access.
+  - Return -EAGAIN instead of -EINVAL in quic_path_bind() when UDP
+    socket is being released in workqueue.
+  - Move udp_tunnel_sock_release() out of the mutex_lock to avoid a
+    warning of lockdep in quic_udp_sock_put_work().
+  - Introduce quic_wq for UDP socket release work, so all pending works
+    can be flushed before destroying the hashtable in quic_exit().
+v5:
+  - Rename quic_path_free() to quic_path_unbind() (suggested by Paolo).
+  - Remove the 'serv' member from struct quic_path_group, since
+    quic_is_serv() defined in a previous patch now uses
+    sk->sk_max_ack_backlog for server-side detection.
+  - Use quic_ktime_get_us() to set skb_cb->time, as RTT is measured
+    in microseconds and jiffies_to_usecs() is not accurate enough.
+v6:
+  - Do not reset transport_header for QUIC in quic_udp_rcv(), allowing
+    removal of udph_offset and enabling access to the UDP header via
+    udp_hdr(); Pull skb->data in quic_udp_rcv() to allow access to the
+    QUIC header via skb->data.
 v7:
-  - Break the loop earlier if common->number > number in
-    quic_conn_id_remove/find() (suggested by Paolo).
-  - Add a comment in quic_conn_id_first_number().
+  - Pass udp sk to quic_path_rcv() and move the call to skb_linearize()
+    and skb_set_owner_sk_safe() to .quic_path_rcv().
+  - Delete the call to skb_linearize() and skb_set_owner_sk_safe() from
+    quic_udp_err(), as it should not change skb in .encap_err_lookup()
+    (noted by AI review).
 v8:
-  - Add a comment to quic_conn_id_remove() clarifying that the ID number
-    must be smaller than the sequence number of the last ID in the set.
+  - Remove indirect quic_path_rcv and late call quic_packet_rcv()
+    directly via extern (noted by Paolo).
+  - Add a comment in quic_udp_rcv() clarifying it must return 0.
+  - Add a comment in quic_udp_sock_put() clarifying the UDP socket
+    may be freed in atomic RX context during connection migration.
+  - Reorder some quic_path_group members to reduce struct size.
+v10:
+  - Replace open-coded kzalloc(sizeof(*us)) with kzalloc_obj(*us) in
+    quic_stream_create().
+  - Use get_random_u32_below() for ephemeral port selection instead of
+    manual scaling of get_random_u32() in quic_path_bind().
+  - Reset additional PLPMTUD probe state (probe_high, probe_count) in
+    quic_path_pl_reset() to ensure a clean probe restart.
+  - Add plpmtud_interval to struct quic_path_group to store the PLPMTUD
+    probe timer interval, previously kept in struct quic_sock.config.
 v11:
-  - Note for AI review: each id_set contains at most 8 connection IDs, so
-    using an RB-tree for faster lookup is unnecessary.
   - Set maximum line length to 80 characters.
-  - Add a check for number in quic_conn_id_remove().
+  - Add additional comments in quic_path_bind() and quic_path_pl_send()
+    for clarity.
+  - Return ERR_PTR() instead of NULL on error in quic_udp_sock_create().
+  - Change return type of quic_path_detect_alt() to bool.
+  - Allocate quic_wq using alloc_workqueue(WQ_MEM_RECLAIM | WQ_UNBOUND)
+    for UDP socket destruction and backlog packet processing (noted by
+    AI review).
 v12:
-  - Add a comment in quic_conn_id_lookup() clarifying why a
-    get_nulls_value() check is not needed.
-  - Do not match zero-valued tokens in quic_conn_id_token_exists().
-  - Update id_set->alt to the next entry when the current one is removed
-    in quic_conn_id_remove().
-  - Call quic_conn_id_set_init() with true/false instead of 1/0 in
-    quic_init_sock().
+  - Call quic_set_skb_iif() at the start of quic_udp_rcv().
+  - Set us->bind_ifindex from udp_conf.bind_ifindex instead of
+    sk->sk_bound_dev_if in quic_udp_sock_create().
+  - Compare us->bind_ifindex against quic_get_dev_if(sk, a) instead of
+    sk->sk_bound_dev_if, and do not match when only one is zero in
+    quic_udp_sock_lookup().
+  - Call cond_resched() in the retry loop of quic_path_bind() when
+    quic_udp_sock_create() returns -EADDRINUSE.
+  - Improve address-change handling and disable_saddr/daddr_alt checks
+    in quic_path_detect_alt().
+  - Do not pass WQ_MEM_RECLAIM to alloc_workqueue() to avoid a potential
+    deadlock.
+  - Change ampl_snd/rcvlen in struct quic_path_group to u32 to avoid
+    overflow, and move mtu_info for a better layout.
+  - Add keepalive_interval to struct quic_path_group to control path
+    liveness probing, and add version to indicate version negotiation
+    was performed.
+  - Pass sk instead of sk_socket to setup_udp_tunnel_sock() and
+    udp_tunnel_sock_release(), following their parameter type changes.
+  - Set bit fields paths->disable_saddr_alt and paths->disable_daddr_alt
+    from p->disable_active_migration using '!!'.
+  - Add QUIC_PMTUD_RAISE_TIMER_FACTOR for later use.
+  - Change QUIC_PATH_MAX_PMTU from 65536U to 65535U.
+v13:
+  - Drop explicit GFP_KERNEL from kzalloc_obj() in quic_udp_sock_create().
 v14:
-  - Pass gfp flags to quic_conn_id_add().
-  - Set id_set->alt to NULL in quic_conn_id_set_free() as a defensive
-    reset.
-  - Validate the ID and token of a new destination conn_id with a duplicate
-    sequence number in quic_conn_id_add().
-  - Use crypto_memneq() instead of memcmp() when comparing tokens in
-    quic_conn_id_token_exists() (noted by Sashiko AI review).
-  - Add WARN_ON_ONCE(!rcu_read_lock_held()) in quic_conn_id_lookup().
+  - Replace kzalloc_obj() with kmalloc_obj() in quic_udp_sock_create(), as
+    all members of the object are initialized afterwards.
+  - Move INIT_WORK() before hlist_add_head() in quic_udp_sock_create(), as
+    it makes the initialization order clearer.
+  - Remove the unnecessary pmtu >= QUIC_MIN_PLPMTU check from
+    quic_path_pl_toobig().
 v15:
-  - Add rcu_barrier() in quic_exit() when unloading the QUIC module to
-    wait for all source connection ID RCU callbacks to complete.
-  - Remove the redundant if (!hlist_nulls_unhashed(&s_conn_id->node)) check
-    from quic_source_conn_id_free().
-  - Add a collision check for source connection IDs in quic_conn_id_add().
+  - Add seqcount_t path_seq to quic_path_group to protect path[0] updates
+    during path migration when accessed by a concurrent quic_sock_lookup().
+    Also add quic_path_init() to initialize it in quic_init_sock().
+  - Add CAP_NET_BIND_SERVICE and sk_uid checks to quic_path_bind().
 v16:
-  - Improve quic_conn_id_lookup() annotataion to document the RCU read-side
-    protection requirement and clarify that the returned connection ID
-    holds a reference on its socket (noted by Sashiko AI review).
-  - Add bool source into struct quic_conn_id_set to track source and
-    destination connection ID sets explicitly instead of relying on their
-    entry sizes.
-  - Use bool for hashed instead of u8 in struct quic_common_conn_id.
-  - Improve connid.c file description.
+  - Disable preemption during the path swap in quic_path_swap(), as a
+    plain seqcount_t requires preemption to be disabled while its write
+    sequence is active. local_bh_disable() does not disable preemption
+    on PREEMPT_RT kernels (noted by Sashiko AI review).
+  - Fix the path group name from 'dst' to 'paths' in PMTU debug messages
+    (noted by Sashiko AI review).
+  - Clarify that quic_path_pl_recv() returns the new PMTU when it
+    changes, and 0 when it remains unchanged (noted by Sashiko AI review).
+  - Align struct member comments in quic_path_group using spaces instead
+    of tabs for consistent formatting.
+  - Fix the inaccurate comment for quic_path_pl_send(), which is called
+    before, not after, sending a probe packet. Also improve its summary
+    in the comment.
+  - Improve path.c file description.
+  - Improve quic_path_pl_recv() comment to clarify that PMTU expansion uses
+    a two-phase linear search.
 ---
  net/quic/Makefile   |   2 +-
- net/quic/connid.c   | 284 ++++++++++++++++++++++++++++++++++++++++++++
- net/quic/connid.h   | 184 ++++++++++++++++++++++++++++
- net/quic/protocol.c |   1 +
- net/quic/socket.c   |   6 +
- net/quic/socket.h   |  13 ++
- 6 files changed, 489 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/connid.c
- create mode 100644 net/quic/connid.h
+ net/quic/path.c     | 593 ++++++++++++++++++++++++++++++++++++++++++++
+ net/quic/path.h     | 191 ++++++++++++++
+ net/quic/protocol.c |  14 ++
+ net/quic/socket.c   |   4 +
+ net/quic/socket.h   |   7 +
+ 6 files changed, 810 insertions(+), 1 deletion(-)
+ create mode 100644 net/quic/path.c
+ create mode 100644 net/quic/path.h
 
 diff --git a/net/quic/Makefile b/net/quic/Makefile
-index 094e9da5d739..eee7501588d3 100644
+index eee7501588d3..1565fb5cef9d 100644
 --- a/net/quic/Makefile
 +++ b/net/quic/Makefile
 @@ -5,4 +5,4 @@
  
  obj-$(CONFIG_IP_QUIC) += quic.o
  
--quic-y := common.o family.o protocol.o socket.o stream.o
-+quic-y := common.o family.o protocol.o socket.o stream.o connid.o
-diff --git a/net/quic/connid.c b/net/quic/connid.c
+-quic-y := common.o family.o protocol.o socket.o stream.o connid.o
++quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o
+diff --git a/net/quic/path.c b/net/quic/path.c
 new file mode 100644
-index 000000000000..85b8fc481e60
+index 000000000000..b6bea7d2f267
 --- /dev/null
-+++ b/net/quic/connid.c
-@@ -0,0 +1,284 @@
++++ b/net/quic/path.c
+@@ -0,0 +1,593 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
 + *
 + * This file is part of the QUIC kernel implementation
 + *
-+ * Connection ID management.
++ * Path management.
 + *
 + * Written or modified by:
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#include <crypto/utils.h>
++#include <net/udp_tunnel.h>
 +#include <linux/quic.h>
-+#include <net/sock.h>
 +
 +#include "common.h"
-+#include "connid.h"
++#include "family.h"
++#include "path.h"
 +
-+/* Look up a source connection ID (SCID) in the global source connection ID hash
-+ * table. Must be called with RCU read-side protection held. On success, returns
-+ * the connection ID with a reference held on its socket.
-+ */
-+struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len)
++static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
 +{
-+	struct quic_shash_head *head = quic_source_conn_id_head(net, scid, len);
-+	struct quic_source_conn_id *s_conn_id;
-+	struct quic_conn_id *conn_id = NULL;
-+	struct hlist_nulls_node *node;
++	quic_set_skb_iif(skb);
 +
-+	WARN_ON_ONCE(!rcu_read_lock_held());
++	memset(skb->cb, 0, sizeof(skb->cb));
++	QUIC_SKB_CB(skb)->seqno = -1;
++	QUIC_SKB_CB(skb)->time = quic_ktime_get_us();
 +
-+	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
-+		if (net != sock_net(s_conn_id->sk))
-+			continue;
-+		if (s_conn_id->common.id.len != len ||
-+		    memcmp(scid, &s_conn_id->common.id.data, len))
-+			continue;
-+		if (likely(refcount_inc_not_zero(&s_conn_id->sk->sk_refcnt)))
-+			conn_id = &s_conn_id->common.id;
-+		break;
-+	}
-+	/* No need to check get_nulls_value(node) != hash for !conn_id, as
-+	 * hashtable size is fixed and a conn_id can not rehashed.
-+	 */
-+	return conn_id;
-+}
-+
-+/* Check if a given stateless reset token exists in any connection ID in the
-+ * connection ID set.
-+ */
-+bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token)
-+{
-+	struct quic_common_conn_id *common;
-+	struct quic_dest_conn_id *dcid;
-+
-+	dcid = (struct quic_dest_conn_id *)id_set->active;
-+	if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
-+	    !crypto_memneq(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-+		return true; /* Fast path. */
-+
-+	list_for_each_entry(common, &id_set->head, list) {
-+		dcid = (struct quic_dest_conn_id *)common;
-+		if (common == id_set->active)
-+			continue;
-+		if (memchr_inv(dcid->token, 0, QUIC_CONN_ID_TOKEN_LEN) &&
-+		    !crypto_memneq(dcid->token, token, QUIC_CONN_ID_TOKEN_LEN))
-+			return true;
-+	}
-+	return false;
-+}
-+
-+static void quic_source_conn_id_free_rcu(struct rcu_head *head)
-+{
-+	struct quic_source_conn_id *s_conn_id;
-+
-+	s_conn_id = container_of(head, struct quic_source_conn_id, rcu);
-+	kfree(s_conn_id);
-+}
-+
-+static void quic_source_conn_id_free(struct quic_source_conn_id *s_conn_id)
-+{
-+	u8 *data = s_conn_id->common.id.data;
-+	u32 len = s_conn_id->common.id.len;
-+	struct quic_shash_head *head;
-+
-+	head = quic_source_conn_id_head(sock_net(s_conn_id->sk), data, len);
-+	spin_lock_bh(&head->lock);
-+	hlist_nulls_del_init_rcu(&s_conn_id->node);
-+	spin_unlock_bh(&head->lock);
-+
-+	/* Freeing is deferred via RCU to avoid use-after-free during
-+	 * concurrent lookups.
-+	 */
-+	call_rcu(&s_conn_id->rcu, quic_source_conn_id_free_rcu);
-+}
-+
-+static void quic_conn_id_del(struct quic_common_conn_id *common)
-+{
-+	list_del(&common->list);
-+	if (!common->hashed) {
-+		kfree(common);
-+		return;
-+	}
-+	quic_source_conn_id_free((struct quic_source_conn_id *)common);
-+}
-+
-+/* Add a connection ID with sequence number and associated private data to the
-+ * connection ID set.
-+ */
-+int quic_conn_id_add(struct quic_conn_id_set *id_set,
-+		     struct quic_conn_id *conn_id, u32 number, void *data,
-+		     gfp_t gfp)
-+{
-+	struct quic_source_conn_id *s_conn_id, *pos;
-+	struct quic_dest_conn_id *d_conn_id;
-+	struct quic_common_conn_id *common;
-+	struct hlist_nulls_node *node;
-+	struct quic_shash_head *head;
-+	struct list_head *list;
-+	struct net *net;
-+
-+	/* Locate insertion point to keep list ordered by number. */
-+	list = &id_set->head;
-+	list_for_each_entry(common, list, list) {
-+		if (number == common->number) {
-+			if (quic_conn_id_cmp(&common->id, conn_id))
-+				return -EINVAL;
-+			if (!id_set->source && data) {
-+				d_conn_id = (struct quic_dest_conn_id *)common;
-+				if (crypto_memneq(d_conn_id->token, data,
-+						  QUIC_CONN_ID_TOKEN_LEN))
-+					return -EINVAL;
-+			}
-+			return 0; /* Ignore if it already exists on the list. */
-+		}
-+		if (number < common->number) {
-+			list = &common->list;
-+			break;
-+		}
-+	}
-+
-+	if (conn_id->len > QUIC_CONN_ID_MAX_LEN)
-+		return -EINVAL;
-+	common = kzalloc(id_set->entry_size, gfp);
-+	if (!common)
-+		return -ENOMEM;
-+	common->id = *conn_id;
-+	common->number = number;
-+	if (!id_set->source) {
-+		/* For destination connection IDs, copy the stateless reset
-+		 * token if available.
-+		 */
-+		if (data) {
-+			d_conn_id = (struct quic_dest_conn_id *)common;
-+			memcpy(d_conn_id->token, data, QUIC_CONN_ID_TOKEN_LEN);
-+		}
-+	} else {
-+		/* For source connection IDs, mark as hashed and insert into
-+		 * the global source connection ID hashtable.
-+		 */
-+		common->hashed = true;
-+		s_conn_id = (struct quic_source_conn_id *)common;
-+		s_conn_id->sk = data;
-+		net = sock_net(s_conn_id->sk);
-+
-+		head = quic_source_conn_id_head(net, common->id.data,
-+						common->id.len);
-+		spin_lock_bh(&head->lock);
-+
-+		/* Check for collision before inserting */
-+		hlist_nulls_for_each_entry(pos, node, &head->head, node) {
-+			if (net != sock_net(pos->sk))
-+				continue;
-+			if (quic_conn_id_cmp(&pos->common.id, &common->id))
-+				continue;
-+			spin_unlock_bh(&head->lock);
-+			kfree(common);
-+			WARN_ON_ONCE(1);
-+			return -EEXIST;
-+		}
-+
-+		hlist_nulls_add_head_rcu(&s_conn_id->node, &head->head);
-+		spin_unlock_bh(&head->lock);
-+	}
-+	list_add_tail(&common->list, list);
-+
-+	if (number == quic_conn_id_last_number(id_set) + 1) {
-+		if (!id_set->active)
-+			id_set->active = common;
-+		id_set->count++;
-+
-+		/* Increment count for consecutive following IDs. */
-+		list_for_each_entry_continue(common, &id_set->head, list) {
-+			if (common->number != ++number)
-+				break;
-+			id_set->count++;
-+		}
-+	}
++	skb_pull(skb, sizeof(struct udphdr));
++	skb_dst_force(skb);
++	kfree_skb(skb);
++	/* .encap_rcv must return 0 if skb was either consumed or dropped. */
 +	return 0;
 +}
 +
-+/* Remove consecutive connection IDs from the set with sequence numbers less
-+ * than or equal to a number.
-+ */
-+void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number)
++static int quic_udp_err(struct sock *sk, struct sk_buff *skb)
 +{
-+	struct quic_common_conn_id *common, *tmp;
-+	struct list_head *list;
-+
-+	/* The number must be less than the sequence number of the last
-+	 * consecutive connection ID in the set.
-+	 */
-+	if (WARN_ON_ONCE(number >= quic_conn_id_last_number(id_set)))
-+		return;
-+	list = &id_set->head;
-+	list_for_each_entry_safe(common, tmp, list, list) {
-+		if (common->number > number)
-+			break;
-+		if (id_set->active == common)
-+			id_set->active = tmp;
-+		if (id_set->alt == common)
-+			id_set->alt = tmp;
-+		quic_conn_id_del(common);
-+		id_set->count--;
-+	}
++	return 0;
 +}
 +
-+struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set,
-+				       u32 number)
++static void quic_udp_sock_put_work(struct work_struct *work)
 +{
-+	struct quic_common_conn_id *common;
++	struct quic_udp_sock *us = container_of(work, struct quic_udp_sock,
++						work);
++	struct quic_uhash_head *head;
++	struct sock *sk = us->sk;
 +
-+	list_for_each_entry(common, &id_set->head, list) {
-+		if (common->number > number)
-+			break;
-+		if (common->number == number)
-+			return &common->id;
++	/* Hold the sock to safely access it in quic_udp_sock_lookup() even
++	 * after udp_tunnel_sock_release(). The release must occur before
++	 * __hlist_del() so a new UDP tunnel socket can be created for the same
++	 * address and port if quic_udp_sock_lookup() fails to find one.
++	 *
++	 * Note: udp_tunnel_sock_release() cannot be called under the mutex due
++	 * to some lockdep warnings.
++	 */
++	sock_hold(sk);
++	udp_tunnel_sock_release(sk);
++
++	head = quic_udp_sock_head(sock_net(sk), ntohs(us->addr.v4.sin_port));
++	mutex_lock(&head->lock);
++	__hlist_del(&us->node);
++	mutex_unlock(&head->lock);
++
++	sock_put(sk);
++	kfree(us);
++}
++
++static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk,
++						  union quic_addr *a)
++{
++	struct udp_tunnel_sock_cfg tuncfg = {};
++	struct udp_port_cfg udp_conf = {};
++	struct net *net = sock_net(sk);
++	struct quic_uhash_head *head;
++	struct quic_udp_sock *us;
++	struct socket *sock;
++	int err;
++
++	us = kmalloc_obj(*us);
++	if (!us)
++		return ERR_PTR(-ENOMEM);
++
++	quic_udp_conf_init(sk, &udp_conf, a);
++	err = udp_sock_create(net, &udp_conf, &sock);
++	if (err) {
++		pr_debug("%s: failed to create udp sock\n", __func__);
++		kfree(us);
++		return ERR_PTR(err);
++	}
++
++	tuncfg.encap_type = 1;
++	tuncfg.encap_rcv = quic_udp_rcv;
++	tuncfg.encap_err_lookup = quic_udp_err;
++	setup_udp_tunnel_sock(net, sock->sk, &tuncfg);
++
++	refcount_set(&us->refcnt, 1);
++	us->sk = sock->sk;
++	memcpy(&us->addr, a, sizeof(*a));
++	us->bind_ifindex = udp_conf.bind_ifindex;
++
++	INIT_WORK(&us->work, quic_udp_sock_put_work);
++	head = quic_udp_sock_head(net, ntohs(a->v4.sin_port));
++	hlist_add_head(&us->node, &head->head);
++
++	return us;
++}
++
++static bool quic_udp_sock_get(struct quic_udp_sock *us)
++{
++	return refcount_inc_not_zero(&us->refcnt);
++}
++
++static void quic_udp_sock_put(struct quic_udp_sock *us)
++{
++	/* The UDP socket may be freed in atomic RX context during connection
++	 * migration; defer the release to a workqueue.
++	 */
++	if (refcount_dec_and_test(&us->refcnt))
++		queue_work(quic_wq, &us->work);
++}
++
++/* Lookup a quic_udp_sock in the global hash table by port or address.  If 'a'
++ * is provided, it searches for a socket whose local address matches 'a' and,
++ * if applicable, matches the device binding. If 'a' is NULL, it searches only
++ * by port.
++ */
++static struct quic_udp_sock *quic_udp_sock_lookup(struct sock *sk,
++						  union quic_addr *a, u16 port)
++{
++	struct net *net = sock_net(sk);
++	struct quic_uhash_head *head;
++	struct quic_udp_sock *us;
++
++	head = quic_udp_sock_head(net, port);
++	hlist_for_each_entry(us, &head->head, node) {
++		if (net != sock_net(us->sk))
++			continue;
++		if (a) {
++			if (quic_cmp_sk_addr(us->sk, &us->addr, a) &&
++			    us->bind_ifindex == quic_get_dev_if(sk, a))
++				return us;
++			continue;
++		}
++		if (ntohs(us->addr.v4.sin_port) == port)
++			return us;
 +	}
 +	return NULL;
 +}
 +
-+void quic_conn_id_update_active(struct quic_conn_id_set *id_set, u32 number)
++static void quic_path_set_udp_sk(struct quic_path *path,
++				 struct quic_udp_sock *us)
 +{
-+	struct quic_conn_id *conn_id;
++	if (path->udp_sk)
++		quic_udp_sock_put(path->udp_sk);
 +
-+	if (number == id_set->active->number)
++	path->udp_sk = us;
++	if (!us) {
++		path->usk = NULL;
++		memset(&path->uaddr, 0, sizeof(path->uaddr));
 +		return;
-+	conn_id = quic_conn_id_find(id_set, number);
-+	if (!conn_id)
++	}
++	path->usk = us->sk;
++	memcpy(&path->uaddr, &us->addr, sizeof(us->addr));
++}
++
++/* Binds a QUIC path to a local port and sets up a UDP socket. */
++int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 path)
++{
++	union quic_addr *a = quic_path_saddr(paths, path);
++	int rover, low, high, remaining;
++	struct net *net = sock_net(sk);
++	struct quic_uhash_head *head;
++	struct quic_udp_sock *us;
++	u16 port;
++
++	port = ntohs(a->v4.sin_port);
++	if (port) {
++		if (inet_port_requires_bind_service(net, port) &&
++		    !ns_capable(net->user_ns, CAP_NET_BIND_SERVICE))
++			return -EACCES;
++		head = quic_udp_sock_head(net, port);
++		mutex_lock(&head->lock);
++		us = quic_udp_sock_lookup(sk, a, port);
++		if (us) {
++			if (!uid_eq(sk->sk_uid, us->sk->sk_uid)) {
++				mutex_unlock(&head->lock);
++				return -EADDRINUSE;
++			}
++			/* Allow reuse of an existing UDP tunnel socket.
++			 * However, if it is in the middle of asynchronous
++			 * teardown (via workqueue), it is temporarily unusable.
++			 * Return -EAGAIN (not -EADDRINUSE) to signal the caller
++			 * to retry soon.
++			 */
++			if (!quic_udp_sock_get(us)) {
++				mutex_unlock(&head->lock);
++				return -EAGAIN;
++			}
++		} else {
++			us = quic_udp_sock_create(sk, a);
++			if (IS_ERR(us)) {
++				mutex_unlock(&head->lock);
++				return PTR_ERR(us);
++			}
++		}
++		mutex_unlock(&head->lock);
++		quic_path_set_udp_sk(&paths->path[path], us);
++		return 0;
++	}
++
++	inet_sk_get_local_port_range(sk, &low, &high);
++	remaining = (high - low) + 1;
++	rover = get_random_u32_below(remaining) + low;
++	do {
++		rover++;
++		if (rover < low || rover > high)
++			rover = low;
++		port = (u16)rover;
++		if (inet_is_local_reserved_port(net, port))
++			continue;
++
++		head = quic_udp_sock_head(net, port);
++		mutex_lock(&head->lock);
++		if (quic_udp_sock_lookup(sk, NULL, port)) {
++			mutex_unlock(&head->lock);
++			cond_resched();
++			continue;
++		}
++		a->v4.sin_port = htons(port);
++		us = quic_udp_sock_create(sk, a);
++		if (IS_ERR(us)) {
++			a->v4.sin_port = 0;
++			mutex_unlock(&head->lock);
++			if (PTR_ERR(us) == -EADDRINUSE) {
++				cond_resched();
++				continue;
++			}
++			return PTR_ERR(us);
++		}
++		mutex_unlock(&head->lock);
++
++		quic_path_set_udp_sk(&paths->path[path], us);
++		__sk_dst_reset(sk);
++		return 0;
++	} while (--remaining > 0);
++
++	return -EADDRINUSE;
++}
++
++/* Swaps the active and alternate QUIC paths.
++ *
++ * Promotes the alternate path (path[1]) to become the new active path
++ * (path[0]).  If the alternate path has a valid UDP socket, the entire path is
++ * swapped.  Otherwise, only the destination address is exchanged, assuming the
++ * source address is the same and no rebind is needed.
++ *
++ * This is typically used during path migration or alternate path promotion.
++ */
++void quic_path_swap(struct quic_path_group *paths)
++{
++	struct quic_path path = paths->path[0];
++
++	paths->alt_probes = 0;
++	paths->alt_state = QUIC_PATH_ALT_SWAPPED;
++
++	/* Protect path[0] modifications with seqcount for RCU readers in
++	 * quic_sock_lookup(). The seqcount allows readers to detect torn reads
++	 * during the non-atomic structure assignment.
++	 */
++	local_bh_disable();
++	preempt_disable_nested();
++	write_seqcount_begin(&paths->path_seq);
++	if (paths->path[1].udp_sk) {
++		paths->path[0] = paths->path[1];
++		paths->path[1] = path;
++		goto out;
++	}
++
++	paths->path[0].daddr = paths->path[1].daddr;
++	paths->path[1].daddr = path.daddr;
++out:
++	write_seqcount_end(&paths->path_seq);
++	preempt_enable_nested();
++	local_bh_enable();
++}
++
++/* Frees resources associated with a QUIC path.
++ *
++ * This is used for cleanup during error handling or when the path is no longer
++ * needed.
++ */
++void quic_path_unbind(struct sock *sk, struct quic_path_group *paths, u8 path)
++{
++	paths->alt_probes = 0;
++	paths->alt_state = QUIC_PATH_ALT_NONE;
++
++	quic_path_set_udp_sk(&paths->path[path], NULL);
++
++	memset(quic_path_daddr(paths, path), 0, sizeof(union quic_addr));
++	memset(quic_path_saddr(paths, path), 0, sizeof(union quic_addr));
++}
++
++/* Detects and records a potential alternate path.
++ *
++ * If the new source or destination address differs from the active path, and
++ * alternate path detection is not disabled, the function updates the alternate
++ * path slot (path[1]) with the new addresses.
++ *
++ * This is typically called on packet receive to detect new possible network
++ * paths (e.g., NAT rebinding, mobility).
++ *
++ * Returns true if a new alternate path was detected and updated, false
++ * otherwise.
++ */
++bool quic_path_detect_alt(struct quic_path_group *paths, union quic_addr *sa,
++			  union quic_addr *da, struct sock *sk)
++{
++	bool remote = !quic_cmp_sk_addr(sk, quic_path_daddr(paths, 0), da);
++	bool local = !quic_cmp_sk_addr(sk, quic_path_saddr(paths, 0), sa);
++
++	if (!local && !remote)
++		return false;
++
++	if ((local && paths->disable_saddr_alt) ||
++	    (remote && paths->disable_daddr_alt))
++		return false;
++
++	if (!quic_path_saddr(paths, 1)->v4.sin_port)
++		quic_path_set_saddr(paths, 1, sa);
++
++	if (!quic_cmp_sk_addr(sk, quic_path_saddr(paths, 1), sa))
++		return false;
++
++	if (!quic_path_daddr(paths, 1)->v4.sin_port)
++		quic_path_set_daddr(paths, 1, da);
++
++	return quic_cmp_sk_addr(sk, quic_path_daddr(paths, 1), da);
++}
++
++void quic_path_get_param(struct quic_path_group *paths,
++			 struct quic_transport_param *p)
++{
++	if (p->remote) {
++		p->disable_active_migration = paths->disable_saddr_alt;
 +		return;
-+	quic_conn_id_set_active(id_set, conn_id);
++	}
++	p->disable_active_migration = paths->disable_daddr_alt;
 +}
 +
-+void quic_conn_id_set_init(struct quic_conn_id_set *id_set, bool source)
++void quic_path_set_param(struct quic_path_group *paths,
++			 struct quic_transport_param *p)
 +{
-+	id_set->entry_size = source ? sizeof(struct quic_source_conn_id) :
-+				      sizeof(struct quic_dest_conn_id);
-+	id_set->source = source;
-+	INIT_LIST_HEAD(&id_set->head);
++	if (p->remote) {
++		paths->disable_saddr_alt = !!p->disable_active_migration;
++		return;
++	}
++	paths->disable_daddr_alt = !!p->disable_active_migration;
 +}
 +
-+void quic_conn_id_set_free(struct quic_conn_id_set *id_set)
++/* State Machine defined in rfc8899#section-5.2 */
++enum quic_plpmtud_state {
++	QUIC_PL_DISABLED,
++	QUIC_PL_BASE,
++	QUIC_PL_SEARCH,
++	QUIC_PL_COMPLETE,
++	QUIC_PL_ERROR,
++};
++
++#define QUIC_BASE_PLPMTU        1200
++#define QUIC_MAX_PLPMTU         9000
++#define QUIC_MIN_PLPMTU         512
++
++#define QUIC_MAX_PROBES         3
++
++#define QUIC_PL_BIG_STEP        32
++#define QUIC_PL_MIN_STEP        4
++
++/* Track PLPMTUD probe sends and handle probe exhaustion.
++ *
++ * Called right before sending a probe packet in QUIC Path MTU Discovery.
++ * Tracks probe count and manages state transitions based on the number of
++ * probes sent and current PLPMTUD state (BASE, SEARCH, COMPLETE, ERROR).
++ * Detects probe failures and black holes, adjusting PMTU and probe sizes
++ * accordingly.
++ *
++ * Return: New PMTU value if updated, else 0.
++ */
++u32 quic_path_pl_send(struct quic_path_group *paths, s64 number)
 +{
-+	struct quic_common_conn_id *common, *tmp;
++	u32 pathmtu = 0;
 +
-+	list_for_each_entry_safe(common, tmp, &id_set->head, list)
-+		quic_conn_id_del(common);
-+	id_set->count = 0;
-+	id_set->alt = NULL;
-+	id_set->active = NULL;
++	paths->pl.number = number;
++	if (paths->pl.probe_count < QUIC_MAX_PROBES)
++		goto out;
++
++	paths->pl.probe_count = 0;
++	if (paths->pl.state == QUIC_PL_BASE) {
++		if (paths->pl.probe_size == QUIC_BASE_PLPMTU) {
++			/* BASE_PLPMTU Confirming Failed: Base -> Error. */
++			paths->pl.state = QUIC_PL_ERROR;
++
++			paths->pl.pmtu = QUIC_BASE_PLPMTU;
++			pathmtu = QUIC_BASE_PLPMTU;
++		}
++	} else if (paths->pl.state == QUIC_PL_SEARCH) {
++		if (paths->pl.pmtu == paths->pl.probe_size) {
++			/* Black Hole Detected: Search -> Base. */
++			paths->pl.state = QUIC_PL_BASE;
++			paths->pl.probe_size = QUIC_BASE_PLPMTU;
++			paths->pl.probe_high = 0;
++
++			paths->pl.pmtu = QUIC_BASE_PLPMTU;
++			pathmtu = QUIC_BASE_PLPMTU;
++		} else { /* Normal probe failure. */
++			paths->pl.probe_high = paths->pl.probe_size;
++			paths->pl.probe_size = paths->pl.pmtu;
++		}
++	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
++		if (paths->pl.pmtu == paths->pl.probe_size) {
++			/* Black Hole Detected:  Search Complete -> Base. */
++			paths->pl.state = QUIC_PL_BASE;
++			paths->pl.probe_size = QUIC_BASE_PLPMTU;
++
++			/* probe_high already reset when entering COMPLETE. */
++			paths->pl.pmtu = QUIC_BASE_PLPMTU;
++			pathmtu = QUIC_BASE_PLPMTU;
++		}
++	}
++
++out:
++	pr_debug("%s: paths: %p, state: %d, pmtu: %d, size: %d, high: %d\n",
++		 __func__, paths, paths->pl.state, paths->pl.pmtu,
++		 paths->pl.probe_size, paths->pl.probe_high);
++	paths->pl.probe_count++;
++	return pathmtu;
 +}
 +
-+void quic_conn_id_get_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p)
++/* Handle successful reception of a PMTU probe.
++ *
++ * Called when a probe packet is acknowledged. Updates probe size and
++ * transitions state if needed (e.g., from SEARCH to COMPLETE). Expands PMTU
++ * using a two-phase linear search: coarse stepping (QUIC_PL_BIG_STEP) to
++ * quickly find the upper bound, then fine stepping (QUIC_PL_MIN_STEP) to
++ * refine.
++ *
++ * Return: New PMTU to apply, or 0 if unchanged.
++ */
++u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer,
++		      bool *complete)
 +{
-+	p->active_connection_id_limit = id_set->max_count;
++	u32 pathmtu = 0;
++	u16 next;
++
++	pr_debug("%s: paths: %p, state: %d, pmtu: %d, size: %d, high: %d\n",
++		 __func__, paths, paths->pl.state, paths->pl.pmtu,
++		 paths->pl.probe_size, paths->pl.probe_high);
++
++	*raise_timer = false;
++	paths->pl.number = 0;
++	paths->pl.pmtu = paths->pl.probe_size;
++	paths->pl.probe_count = 0;
++	if (paths->pl.state == QUIC_PL_BASE) {
++		paths->pl.state = QUIC_PL_SEARCH; /* Base -> Search */
++		paths->pl.probe_size += QUIC_PL_BIG_STEP;
++	} else if (paths->pl.state == QUIC_PL_ERROR) {
++		paths->pl.state = QUIC_PL_SEARCH; /* Error -> Search */
++
++		paths->pl.pmtu = paths->pl.probe_size;
++		pathmtu = (u32)paths->pl.pmtu;
++		paths->pl.probe_size += QUIC_PL_BIG_STEP;
++	} else if (paths->pl.state == QUIC_PL_SEARCH) {
++		if (!paths->pl.probe_high) {
++			if (paths->pl.probe_size < QUIC_MAX_PLPMTU) {
++				next = paths->pl.probe_size + QUIC_PL_BIG_STEP;
++				paths->pl.probe_size =
++					min_t(u16, next, QUIC_MAX_PLPMTU);
++				*complete = false;
++				return 0;
++			}
++			paths->pl.probe_high = QUIC_MAX_PLPMTU;
++		}
++		paths->pl.probe_size += QUIC_PL_MIN_STEP;
++		if (paths->pl.probe_size >= paths->pl.probe_high) {
++			paths->pl.probe_high = 0;
++			/* Search -> Search Complete */
++			paths->pl.state = QUIC_PL_COMPLETE;
++
++			paths->pl.probe_size = paths->pl.pmtu;
++			pathmtu = (u32)paths->pl.pmtu;
++			*raise_timer = true;
++		}
++	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
++		/* Raise probe_size after 30 * interval in Search Complete;
++		 * Search Complete -> Search.
++		 */
++		paths->pl.state = QUIC_PL_SEARCH;
++		next = paths->pl.probe_size + QUIC_PL_MIN_STEP;
++		paths->pl.probe_size = min_t(u16, next, QUIC_MAX_PLPMTU);
++	}
++
++	*complete = (paths->pl.state == QUIC_PL_COMPLETE);
++	return pathmtu;
 +}
 +
-+void quic_conn_id_set_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p)
++/* Handle ICMP "Packet Too Big" messages.
++ *
++ * Responds to an incoming ICMP error by reducing the probe size or falling
++ * back to a safe baseline PMTU depending on current state.  Also handles cases
++ * where the PMTU hint lies between probe and current PMTU.
++ *
++ * Return: New PMTU to apply if state changes, or 0 if no change.
++ */
++u32 quic_path_pl_toobig(struct quic_path_group *paths, u32 pmtu,
++			bool *reset_timer)
 +{
-+	id_set->max_count = p->active_connection_id_limit;
++	u32 pathmtu = 0;
++
++	pr_debug("%s: paths: %p, state: %d, pmtu: %d, size: %d, ptb: %d\n",
++		 __func__, paths, paths->pl.state, paths->pl.pmtu,
++		 paths->pl.probe_size, pmtu);
++
++	*reset_timer = false;
++	if (pmtu < QUIC_MIN_PLPMTU || pmtu >= (u32)paths->pl.probe_size)
++		return pathmtu;
++
++	if (paths->pl.state == QUIC_PL_BASE) {
++		if (pmtu < QUIC_BASE_PLPMTU) {
++			paths->pl.state = QUIC_PL_ERROR; /* Base -> Error */
++
++			paths->pl.pmtu = QUIC_BASE_PLPMTU;
++			pathmtu = QUIC_BASE_PLPMTU;
++		}
++	} else if (paths->pl.state == QUIC_PL_SEARCH) {
++		if (pmtu >= QUIC_BASE_PLPMTU && pmtu < (u32)paths->pl.pmtu) {
++			paths->pl.state = QUIC_PL_BASE;  /* Search -> Base */
++			paths->pl.probe_size = QUIC_BASE_PLPMTU;
++			paths->pl.probe_count = 0;
++
++			paths->pl.probe_high = 0;
++			paths->pl.pmtu = QUIC_BASE_PLPMTU;
++			pathmtu = QUIC_BASE_PLPMTU;
++		} else if (pmtu > (u32)paths->pl.pmtu &&
++			   pmtu < (u32)paths->pl.probe_size) {
++			paths->pl.probe_size = (u16)pmtu;
++			paths->pl.probe_count = 0;
++		}
++	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
++		if (pmtu >= QUIC_BASE_PLPMTU && pmtu < (u32)paths->pl.pmtu) {
++			paths->pl.state = QUIC_PL_BASE;  /* Complete -> Base */
++			paths->pl.probe_size = QUIC_BASE_PLPMTU;
++			paths->pl.probe_count = 0;
++
++			paths->pl.probe_high = 0;
++			paths->pl.pmtu = QUIC_BASE_PLPMTU;
++			pathmtu = QUIC_BASE_PLPMTU;
++			*reset_timer = true;
++		}
++	}
++	return pathmtu;
 +}
-diff --git a/net/quic/connid.h b/net/quic/connid.h
++
++/* Reset PLPMTUD state for a path.
++ *
++ * Resets all PLPMTUD-related state to its initial configuration.  Called when
++ * a new path is initialized or when recovering from errors.
++ */
++void quic_path_pl_reset(struct quic_path_group *paths)
++{
++	paths->pl.number = 0;
++	paths->pl.probe_high = 0;
++	paths->pl.probe_count = 0;
++	paths->pl.state = QUIC_PL_BASE;
++	paths->pl.pmtu = QUIC_BASE_PLPMTU;
++	paths->pl.probe_size = QUIC_BASE_PLPMTU;
++}
++
++/* Check if a packet number confirms PLPMTUD probe.
++ *
++ * Checks whether the last probe (tracked by .number) has been acknowledged.
++ * If the probe number lies within the ACK range, confirmation is successful.
++ *
++ * Return: true if probe is confirmed, false otherwise.
++ */
++bool quic_path_pl_confirm(struct quic_path_group *paths, s64 largest,
++			  s64 smallest)
++{
++	return paths->pl.number && paths->pl.number >= smallest &&
++	       paths->pl.number <= largest;
++}
++
++void quic_path_init(struct quic_path_group *paths)
++{
++	seqcount_init(&paths->path_seq);
++}
+diff --git a/net/quic/path.h b/net/quic/path.h
 new file mode 100644
-index 000000000000..105c2b4b0f2e
+index 000000000000..c2537cf65a7d
 --- /dev/null
-+++ b/net/quic/connid.h
-@@ -0,0 +1,184 @@
++++ b/net/quic/path.h
+@@ -0,0 +1,191 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/* QUIC kernel implementation
 + * (C) Copyright Red Hat Corp. 2023
@@ -636,249 +1114,282 @@ index 000000000000..105c2b4b0f2e
 + *    Xin Long <lucien.xin@gmail.com>
 + */
 +
-+#define QUIC_CONN_ID_LIMIT	8
-+#define QUIC_CONN_ID_DEF	7
-+#define QUIC_CONN_ID_LEAST	2
++#define QUIC_PATH_MIN_PMTU	1200U
++#define QUIC_PATH_MAX_PMTU	65535U
 +
-+#define QUIC_CONN_ID_TOKEN_LEN	16
++#define QUIC_MIN_UDP_PAYLOAD	1200
++#define QUIC_MAX_UDP_PAYLOAD	65527
 +
-+/* Common fields shared by both source and destination Connection IDs */
-+struct quic_common_conn_id {
-+	struct quic_conn_id id; /* Connection ID value and its length */
-+	struct list_head list;  /* List node for connection ID management */
-+	u32 number;  /* Sequence number assigned to this Connection ID */
-+	bool hashed; /* true if stored in source_conn_id hash table */
-+};
++#define QUIC_PATH_ENTROPY_LEN	8
 +
-+struct quic_source_conn_id {
-+	struct quic_common_conn_id common;
-+	struct hlist_nulls_node node; /* Hash table node for fast lookup */
-+	struct rcu_head rcu; /* RCU header for deferred destruction */
-+	struct sock *sk;     /* Socket associated with this Connection ID */
-+};
++#define QUIC_PMTUD_RAISE_TIMER_FACTOR	30
 +
-+struct quic_dest_conn_id {
-+	struct quic_common_conn_id common;
-+	/* Stateless reset token in rfc9000#section-10.3 */
-+	u8 token[QUIC_CONN_ID_TOKEN_LEN];
-+};
++extern struct workqueue_struct	*quic_wq;
 +
-+struct quic_conn_id_set {
-+	/* Connection ID in use on the current path */
-+	struct quic_common_conn_id *active;
-+	/* Connection ID to use for a new path (e.g., after migration) */
-+	struct quic_common_conn_id *alt;
-+	struct list_head head; /* List head of available connection IDs */
-+	u8 entry_size; /* Size of each connection ID entry in the list */
-+	u8 max_count;  /* active_connection_id_limit in rfc9000#section-18.2 */
-+	u8 count;      /* Current number of connection IDs in the list */
-+	bool source;   /* true if this is a source conn_id set, false if dest */
-+};
-+
-+static inline u32 quic_conn_id_first_number(struct quic_conn_id_set *id_set)
-+{
-+	struct quic_common_conn_id *common;
-+
-+	/* The id_set is guaranteed to be non-empty when called (sk is not in
-+	 * CLOSE state).
-+	 */
-+	common = list_first_entry(&id_set->head, struct quic_common_conn_id,
-+				  list);
-+	return common->number;
-+}
-+
-+static inline u32 quic_conn_id_last_number(struct quic_conn_id_set *id_set)
-+{
-+	return quic_conn_id_first_number(id_set) + id_set->count - 1;
-+}
-+
-+static inline void quic_conn_id_generate(struct quic_conn_id *conn_id)
-+{
-+	get_random_bytes(conn_id->data, QUIC_CONN_ID_DEF_LEN);
-+	conn_id->len = QUIC_CONN_ID_DEF_LEN;
-+}
-+
-+/* Select an alternate destination Connection ID for a new path (e.g., after
-+ * migration).
++/* Connection Migration State Machine:
++ *
++ * +--------+      recv non-probing, free old path    +----------+
++ * |  NONE  | <-------------------------------------- | SWAPPED  |
++ * +--------+                                         +----------+
++ *      |   ^ \                                            ^
++ *      |    \ \                                           |
++ *      |     \ \   new path detected,                     | recv
++ *      |      \ \  has another DCID,                      | Path
++ *      |       \ \ snd Path Challenge                     | Response
++ *      |        \ -------------------------------         |
++ *      |         ------------------------------- \        |
++ *      | new path detected,            Path     \ \       |
++ *      | has no other DCID,            Challenge \ \      |
++ *      | request a new DCID            failed     \ \     |
++ *      v                                           \ v    |
++ * +----------+                                       +----------+
++ * | PENDING  | ------------------------------------> | PROBING  |
++ * +----------+  recv a new DCID, snd Path Challenge  +----------+
 + */
-+static inline bool quic_conn_id_select_alt(struct quic_conn_id_set *id_set,
-+					   bool active)
++enum {
++	QUIC_PATH_ALT_NONE,
++	QUIC_PATH_ALT_PENDING, /* Waiting for new dest conn ID for migration */
++	QUIC_PATH_ALT_PROBING, /* Validating alternate path (PATH_CHALLENGE) */
++	QUIC_PATH_ALT_SWAPPED, /* Alternate path is now active; roles swapped */
++};
++
++struct quic_udp_sock {
++	struct work_struct work; /* Workqueue to destroy UDP tunnel socket */
++	struct hlist_node node;  /* Node in addr-based UDP socket hash table */
++	union quic_addr addr; /* Source addr of underlying UDP tunnel socket */
++	int bind_ifindex;
++	refcount_t refcnt;
++	struct sock *sk; /* Underlying UDP tunnel socket */
++};
++
++struct quic_path {
++	union quic_addr daddr; /* Destination address */
++	union quic_addr saddr; /* Source address */
++
++	/* Wrapped UDP socket for receiving QUIC */
++	struct quic_udp_sock *udp_sk;
++	/* Cached UDP tunnel socket and source addr for RCU access */
++	union quic_addr uaddr;
++	struct sock *usk;
++};
++
++struct quic_path_group {
++	/* Connection ID validation during handshake (rfc9000#section-7.3) */
++	struct quic_conn_id retry_dcid; /* Source CID from Retry packet */
++	struct quic_conn_id orig_dcid;  /* Destination CID from first Initial */
++
++	/* Path validation (rfc9000#section-8.2) */
++	u8 entropy[QUIC_PATH_ENTROPY_LEN]; /* Entropy for PATH_CHALLENGE */
++	struct quic_path path[2]; /* Active path (0) and alternate path (1) */
++	seqcount_t path_seq;      /* Protects path[0] during swap */
++	struct flowi fl;          /* Flow info from routing decisions */
++
++	/* Anti-amplification limit (rfc9000#section-8) */
++	u32 ampl_sndlen; /* Bytes sent before address is validated */
++	u32 ampl_rcvlen; /* Bytes received to lift amplification limit */
++
++	/* MTU discovery handling */
++	struct { /* PLPMTUD probing (rfc8899) */
++		s64 number; /* Packet number used for current probe */
++		u16 pmtu;   /* Confirmed path MTU */
++
++		u16 probe_size; /* Current probe packet size */
++		u16 probe_high; /* Highest failed probe size */
++		u8 probe_count; /* Retry count for current probe_size */
++		u8 state;       /* Probe state machine (rfc8899#section-5.2) */
++	} pl;
++	u32 mtu_info; /* PMTU value from received ICMP, pending apply */
++
++	u32 plpmtud_interval;   /* Time interval for the PLPMTUD probe timer */
++	u32 keepalive_interval; /* Time interval to maintain path liveness */
++
++	u8 ecn_probes;  /* ECN probe counter */
++	u8 validated:1; /* Path validated with PATH_RESPONSE */
++	u8 blocked:1;   /* Blocked by anti-amplification limit */
++	u8 version:1;   /* Version negotiation performed */
++	u8 retry:1;     /* Retry used in initial packet */
++
++	/* Connection Migration (rfc9000#section-9) */
++	u8 disable_saddr_alt:1; /* Remote disable_active_migration parameter */
++	u8 disable_daddr_alt:1; /* Local disable_active_migration parameter */
++	u8 pref_addr:1; /* Preferred address offered (rfc9000#section-18.2) */
++	u8 alt_probes;  /* Number of PATH_CHALLENGE probes sent */
++	u8 alt_state;   /* Connection migration state (see above) */
++};
++
++static inline union quic_addr *quic_path_saddr(struct quic_path_group *paths,
++					       u8 path)
 +{
-+	if (id_set->alt)
-+		return true;
-+	/* NAT rebinding: peer keeps using the current source conn_id.
-+	 * In this case, continue using the same dest conn_id for the new path.
-+	 */
-+	if (active) {
-+		id_set->alt = id_set->active;
-+		return true;
-+	}
-+	/* Treat the prev conn_ids as used.
-+	 * Try selecting the next conn_id in the list, unless at the end.
-+	 */
-+	if (id_set->active->number != quic_conn_id_last_number(id_set)) {
-+		id_set->alt = list_next_entry(id_set->active, list);
-+		return true;
-+	}
-+	/* If there's only one conn_id in the list, reuse the active one. */
-+	if (id_set->active->number == quic_conn_id_first_number(id_set)) {
-+		id_set->alt = id_set->active;
-+		return true;
-+	}
-+	/* No alternate conn_id could be selected.  Caller should send a
-+	 * QUIC_FRAME_RETIRE_CONNECTION_ID frame to request new connection IDs
-+	 * from the peer.
-+	 */
-+	return false;
++	return &paths->path[path].saddr;
 +}
 +
-+static inline void quic_conn_id_set_alt(struct quic_conn_id_set *id_set,
-+					struct quic_conn_id *alt)
++static inline void quic_path_set_saddr(struct quic_path_group *paths, u8 path,
++				       union quic_addr *addr)
 +{
-+	id_set->alt = (struct quic_common_conn_id *)alt;
++	memcpy(quic_path_saddr(paths, path), addr, sizeof(*addr));
 +}
 +
-+/* Swap the active and alternate destination Connection IDs after path
-+ * migration completes, since the path has already been switched accordingly.
-+ */
-+static inline void quic_conn_id_swap_active(struct quic_conn_id_set *id_set)
++static inline union quic_addr *quic_path_daddr(struct quic_path_group *paths,
++					       u8 path)
 +{
-+	void *active = id_set->active;
-+
-+	id_set->active = id_set->alt;
-+	id_set->alt = active;
++	return &paths->path[path].daddr;
 +}
 +
-+/* Choose which destination Connection ID to use for a new path migration if
-+ * alt is true.
++static inline void quic_path_set_daddr(struct quic_path_group *paths, u8 path,
++				       union quic_addr *addr)
++{
++	memcpy(quic_path_daddr(paths, path), addr, sizeof(*addr));
++}
++
++static inline union quic_addr *quic_path_uaddr(struct quic_path_group *paths,
++					       u8 path)
++{
++	return &paths->path[path].uaddr;
++}
++
++static inline struct sock *quic_path_usock(struct quic_path_group *paths,
++					   u8 path)
++{
++	return paths->path[path].usk;
++}
++
++static inline bool quic_path_alt_state(struct quic_path_group *paths, u8 state)
++{
++	return paths->alt_state == state;
++}
++
++static inline void quic_path_set_alt_state(struct quic_path_group *paths,
++					   u8 state)
++{
++	paths->alt_state = state;
++}
++
++/* Returns the destination Connection ID (DCID) used for identifying the
++ * connection.  Per rfc9000#section-7.3, handshake packets are considered part
++ * of the same connection if their DCID matches the one returned here.
 + */
 +static inline struct quic_conn_id *
-+quic_conn_id_choose(struct quic_conn_id_set *id_set, u8 alt)
++quic_path_orig_dcid(struct quic_path_group *paths)
 +{
-+	return (alt && id_set->alt) ? &id_set->alt->id : &id_set->active->id;
++	return paths->retry ? &paths->retry_dcid : &paths->orig_dcid;
 +}
 +
-+static inline struct quic_conn_id *
-+quic_conn_id_active(struct quic_conn_id_set *id_set)
-+{
-+	return &id_set->active->id;
-+}
++void quic_path_init(struct quic_path_group *paths);
 +
-+static inline void quic_conn_id_set_active(struct quic_conn_id_set *id_set,
-+					   struct quic_conn_id *active)
-+{
-+	id_set->active = (struct quic_common_conn_id *)active;
-+}
++bool quic_path_detect_alt(struct quic_path_group *paths, union quic_addr *sa,
++			  union quic_addr *da, struct sock *sk);
++int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 path);
++void quic_path_unbind(struct sock *sk, struct quic_path_group *paths, u8 path);
++void quic_path_swap(struct quic_path_group *paths);
 +
-+static inline u32 quic_conn_id_number(struct quic_conn_id *conn_id)
-+{
-+	return ((struct quic_common_conn_id *)conn_id)->number;
-+}
++u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer,
++		      bool *complete);
++u32 quic_path_pl_toobig(struct quic_path_group *paths, u32 pmtu,
++			bool *reset_timer);
++u32 quic_path_pl_send(struct quic_path_group *paths, s64 number);
 +
-+static inline struct sock *quic_conn_id_sk(struct quic_conn_id *conn_id)
-+{
-+	return ((struct quic_source_conn_id *)conn_id)->sk;
-+}
-+
-+static inline void quic_conn_id_set_token(struct quic_conn_id *conn_id,
-+					  u8 *token)
-+{
-+	memcpy(((struct quic_dest_conn_id *)conn_id)->token, token,
-+	       QUIC_CONN_ID_TOKEN_LEN);
-+}
-+
-+static inline int quic_conn_id_cmp(struct quic_conn_id *a,
-+				   struct quic_conn_id *b)
-+{
-+	return a->len != b->len || memcmp(a->data, b->data, a->len);
-+}
-+
-+int quic_conn_id_add(struct quic_conn_id_set *id_set,
-+		     struct quic_conn_id *conn_id, u32 number, void *data,
-+		     gfp_t gfp);
-+bool quic_conn_id_token_exists(struct quic_conn_id_set *id_set, u8 *token);
-+void quic_conn_id_remove(struct quic_conn_id_set *id_set, u32 number);
-+
-+struct quic_conn_id *quic_conn_id_find(struct quic_conn_id_set *id_set,
-+				       u32 number);
-+struct quic_conn_id *quic_conn_id_lookup(struct net *net, u8 *scid, u32 len);
-+void quic_conn_id_update_active(struct quic_conn_id_set *id_set, u32 number);
-+
-+void quic_conn_id_get_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p);
-+void quic_conn_id_set_param(struct quic_conn_id_set *id_set,
-+			    struct quic_transport_param *p);
-+void quic_conn_id_set_init(struct quic_conn_id_set *id_set, bool source);
-+void quic_conn_id_set_free(struct quic_conn_id_set *id_set);
++void quic_path_get_param(struct quic_path_group *paths,
++			 struct quic_transport_param *p);
++void quic_path_set_param(struct quic_path_group *paths,
++			 struct quic_transport_param *p);
++bool quic_path_pl_confirm(struct quic_path_group *paths,
++			  s64 largest, s64 smallest);
++void quic_path_pl_reset(struct quic_path_group *paths);
 diff --git a/net/quic/protocol.c b/net/quic/protocol.c
-index f515efca0ecd..15cebc2af740 100644
+index 15cebc2af740..589075367446 100644
 --- a/net/quic/protocol.c
 +++ b/net/quic/protocol.c
-@@ -375,6 +375,7 @@ static __exit void quic_exit(void)
+@@ -21,6 +21,7 @@
+ static unsigned int quic_net_id __read_mostly;
+ 
+ struct percpu_counter quic_sockets_allocated;
++struct workqueue_struct *quic_wq;
+ 
+ DEFINE_STATIC_KEY_FALSE(quic_alpn_demux_key);
+ 
+@@ -342,6 +343,15 @@ static __init int quic_init(void)
+ 	if (err)
+ 		goto err_hash;
+ 
++	/* Allocate an unbound workqueue for UDP socket destruction and backlog
++	 * packet processing.
++	 */
++	quic_wq = alloc_workqueue("quic_workqueue", WQ_UNBOUND, 0);
++	if (!quic_wq) {
++		err = -ENOMEM;
++		goto err_wq;
++	}
++
+ 	err = register_pernet_subsys(&quic_net_ops);
+ 	if (err)
+ 		goto err_def_ops;
+@@ -359,6 +369,8 @@ static __init int quic_init(void)
+ err_protosw:
  	unregister_pernet_subsys(&quic_net_ops);
+ err_def_ops:
++	destroy_workqueue(quic_wq);
++err_wq:
+ 	quic_hash_tables_destroy();
+ err_hash:
+ 	percpu_counter_destroy(&quic_sockets_allocated);
+@@ -373,6 +385,8 @@ static __exit void quic_exit(void)
+ #endif
+ 	quic_protosw_exit();
+ 	unregister_pernet_subsys(&quic_net_ops);
++	flush_workqueue(quic_wq);
++	destroy_workqueue(quic_wq);
  	quic_hash_tables_destroy();
  	percpu_counter_destroy(&quic_sockets_allocated);
-+	rcu_barrier();
- 	pr_info("quic: exit\n");
- }
- 
+ 	rcu_barrier();
 diff --git a/net/quic/socket.c b/net/quic/socket.c
-index cddc109b62ab..b59f6a70464e 100644
+index b59f6a70464e..1ef2f7c88735 100644
 --- a/net/quic/socket.c
 +++ b/net/quic/socket.c
-@@ -49,6 +49,9 @@ static int quic_init_sock(struct sock *sk)
- 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
- 	INIT_LIST_HEAD(quic_reqs(sk));
+@@ -51,6 +51,7 @@ static int quic_init_sock(struct sock *sk)
  
-+	quic_conn_id_set_init(quic_source(sk), true);
-+	quic_conn_id_set_init(quic_dest(sk), false);
-+
+ 	quic_conn_id_set_init(quic_source(sk), true);
+ 	quic_conn_id_set_init(quic_dest(sk), false);
++	quic_path_init(quic_paths(sk));
+ 
  	if (quic_stream_init(quic_streams(sk)))
  		return -ENOMEM;
- 
-@@ -57,6 +60,9 @@ static int quic_init_sock(struct sock *sk)
+@@ -60,6 +61,9 @@ static int quic_init_sock(struct sock *sk)
  
  static void quic_destroy_sock(struct sock *sk)
  {
-+	quic_conn_id_set_free(quic_source(sk));
-+	quic_conn_id_set_free(quic_dest(sk));
++	quic_path_unbind(sk, quic_paths(sk), 0);
++	quic_path_unbind(sk, quic_paths(sk), 1);
 +
- 	quic_stream_free(quic_streams(sk));
+ 	quic_conn_id_set_free(quic_source(sk));
+ 	quic_conn_id_set_free(quic_dest(sk));
  
- 	quic_data_free(quic_ticket(sk));
 diff --git a/net/quic/socket.h b/net/quic/socket.h
-index e76737b9b74b..68a58f0016cc 100644
+index 68a58f0016cc..91338601905e 100644
 --- a/net/quic/socket.h
 +++ b/net/quic/socket.h
-@@ -14,6 +14,7 @@
- #include "common.h"
+@@ -15,6 +15,7 @@
  #include "family.h"
  #include "stream.h"
-+#include "connid.h"
+ #include "connid.h"
++#include "path.h"
  
  #include "protocol.h"
  
-@@ -36,6 +37,8 @@ struct quic_sock {
- 	struct quic_data		alpn;
- 
+@@ -39,6 +40,7 @@ struct quic_sock {
  	struct quic_stream_table	streams;
-+	struct quic_conn_id_set		source;
-+	struct quic_conn_id_set		dest;
+ 	struct quic_conn_id_set		source;
+ 	struct quic_conn_id_set		dest;
++	struct quic_path_group		paths;
  };
  
  struct quic6_sock {
-@@ -73,6 +76,16 @@ static inline struct quic_stream_table *quic_streams(const struct sock *sk)
- 	return &quic_sk(sk)->streams;
+@@ -86,6 +88,11 @@ static inline struct quic_conn_id_set *quic_dest(const struct sock *sk)
+ 	return &quic_sk(sk)->dest;
  }
  
-+static inline struct quic_conn_id_set *quic_source(const struct sock *sk)
++static inline struct quic_path_group *quic_paths(const struct sock *sk)
 +{
-+	return &quic_sk(sk)->source;
-+}
-+
-+static inline struct quic_conn_id_set *quic_dest(const struct sock *sk)
-+{
-+	return &quic_sk(sk)->dest;
++	return &quic_sk(sk)->paths;
 +}
 +
  static inline bool quic_is_serv(const struct sock *sk)
