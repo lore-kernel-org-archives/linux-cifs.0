@@ -1,75 +1,125 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78997372B58;
-	Mon,  5 Oct 2026 08:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B3D46D560
+	for <linux-cifs@vger.kernel.org>; Mon,  5 Oct 2026 18:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791188502; cv=none; b=HeFdgVluUxmpYjsHJJUGkPJ03d2EDlyt8mkGJIpCsUXsSFcd1bChjZHlbjMh9pt1+RRlsAxJbAhAs+56DbFZBtHVKrkd8xkAPxfKlLkiBTv2QOb2rPqPt+jZueef0ubCY4MAXtoMZsOYiuJAceGPAdlPjoS41hfM/+zjY7fJxNI=
+	t=1791225375; cv=none; b=q8CnlI0TmSQTqjpfSD3FMO830441OfGRf3HQzMUdRFWZePGjQQchzacmN4xs6uCzU3y8R8hzOSfBI39lj/zgaW9YSQzmoiHKD4NGx/r4jbKDKYmNXhMHiIsK0ctOi2LAszWysBjxH+eZQgluioxSM495yxVKnZLVJLYSxLd6ziA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791188502; c=relaxed/simple;
-	bh=0jhQh3rJVVaGQcjH4pVxfGlSAHHjnWGt6FjGoaYJKlY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JjdaYAmTK3TJbcuenGS++hR4w+2/Zu7xTO65wzKKehW1mZZ78Wi+QhrSWd6qEQUZNQJi8rLygvRx2ctPqC98asowwjfgHFtvHpdtJIHt3+wI1Affiw/ZmVOGPH63sRPYfMZFT0/cD0JssB98XzIKsMuRGuDAVceAaw2VJHrsPOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EK7P1oU5; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1791225375; c=relaxed/simple;
+	bh=fSjggIzthkydkYA4jKl18LJ+Gji10RMFajAWr+lc5EU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pdjjZ3huZAgwbK4cHMhxMNmdW2VPPFxUg1qGf86r4YBTWC84D4rDbC7St4qNcVS3pN5/tYyXIXDM0F5LasHja+IXWZICXO6HcjQe+oLfjSEBTVuDMB7Vx9mPOuv8PslYGwdARfDtVZW4DZiyPSrIeXQykJ2YpLU+/SsTf9nTLuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=m7HqLsOF; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EK7P1oU5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=aZcthHFgGBzrUMqgfGcslZ6Iyog1TZ2LUofftaLjTDQ=; b=EK7P1oU5oihocO5AcKRiWEBahZ
-	8U4hC3+/Il/zzIwn7a2xQdDT5ezn54Iwg3OM29L9aSw5+RsndFzp35zhDxvj0ITumI537qD4QKKCj
-	Kd8+aK0qfOciZLNWFeev3AL1AS6pQAp9Fv0GT8e3Cb5tX4xYTbxzU7d6EZ+STDHRfZbm1ke+fDVF4
-	oD1zXy0TvTh4oSl8ls7WlEAONUuFWMhGvShQHFrlAvXVFQ/nPEWB/yV6ERXxos8pbe6wSQU1LNU5t
-	R8b9ATXgBPi/RKnMLYv1hEEF913nKG3QFRYNiq9qtm4Ynmkx/0icaqyGQWj3gDxeu0OyTDRRysHPg
-	dgG5boYg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1xDdwx-0000000Fry6-2r4P;
-	Mon, 05 Oct 2026 08:21:31 +0000
-Date: Mon, 5 Oct 2026 01:21:31 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Matthew Wilcox <willy@infradead.org>,
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="m7HqLsOF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=OAWUA66lXoe8rsZnc3F/vYliBnhwkgf9WQsyAsA1cUU=; b=m7HqLsOFRYxuoiwbMp5LCYoisg
+	wPTfsUicKXuJ/w5+bMZIn2pP154eOd0+sA375dUt8hxfwM2JuEQDOlwdklMABEQ9sa/uyEXTr+fFV
+	yk4cxZPP9rVkmK8FO2jva00Fca/AdZi5C4ryvouXPiSMumfGOk8I48Uh6J5QakcnMB/b2JQSuG92j
+	xCwLe5qckK/eG53sVH5sbYR5G7DMduRarIkBsjgpERkJ1sHPF9lQ4GqMl+9E7gm98p4Sx3pCXpefA
+	5uxdPz86wOb0fSzkK1K/OvDDrkF2ufI+gpY2i635EAImrstirRzVOn9nd1EvdH2JbqSqeT5jeVn9p
+	hQpXsjetPIkd54stNEkpwqKmqI0FdWta/UZfWA3TwxY/DFA0WS8dOj/Zwi8Xwnqa4Ypnd/myU/BgQ
+	Kss1YTT/1kNxX3j1ilaYHhoUE5Te4fK8HoitZpY3ZF793gWCQeopNCwDNXVlaZbGApRHVAxi+2VMg
+	vgwLWGVG4iHGTUXnzcaMqGKF;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1xDnXd-00000005er5-16eS;
+	Mon, 05 Oct 2026 18:36:01 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
 	Namjae Jeon <linkinjeon@kernel.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v15 01/10] Add a function to kmap one page of a multipage
- bio_vec
-Message-ID: <asNeCzye-xas_Lt7@infradead.org>
-References: <20261001091239.3343034-1-dhowells@redhat.com>
- <20261001091239.3343034-2-dhowells@redhat.com>
+	Paulo Alcantara <pc@manguebit.org>,
+	Tom Talpey <tom@talpey.com>,
+	=?UTF-8?q?=EB=A0=88=EB=93=9C=ED=8C=80=ED=95=98=EA=B3=A0=EC=8B=B6=EC=96=B4=EC=9A=94?= <ihopenre@gmail.com>
+Subject: [PATCH 0/3] smb: smbdirect: fix listener backlog leak and teardown races
+Date: Mon,  5 Oct 2026 20:35:49 +0200
+Message-ID: <cover.1791224972.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261001091239.3343034-2-dhowells@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-I've now got 4 copies of this series in less than a week, or rather
-partial copies as all of them seem to miss a cover letter.
+Hi Namjae,
 
-Thus I still don't know how the core code in this series is tested or why
-you've not considered using it for anything but your little corner and
-thus barely tested.
+These fix a set of problems in the shared smbdirect module
+(fs/smb/smbdirect/), reached through the listener/accept path, which in
+practice is driven by ksmbd for incoming SMB Direct connections.
 
-Please slow down a bit and after the nth time please consider
-testability.  Make sure core code regular exercised uses it, or find
-a way to unit test it at least.
+The main one is a pre-authentication remote denial of service: the
+listener keeps every accepted connection on a fixed-size backlog
+(listen.pending, limit 10 for ksmbd). A connection is only removed from
+that backlog on the success path (promotion to listen.ready after a
+completed negotiate, or dequeue by accept()). A connection that is
+accepted at the RDMA level but then fails before it is accepted by the
+upper layer - negotiate timeout, peer disconnect, or an invalid
+negotiate request - is never removed, so its backlog slot is leaked.
+After about ten such events the listener rejects every new connection
+with -EBUSY and SMB Direct stays unusable until the service is
+restarted. An unauthenticated peer can trigger this with ~10 aborted
+connections.
+
+This was reported by 레드팀하고싶어요 <ihopenre@gmail.com>:
+
+  https://lore.kernel.org/linux-cifs/CANTrAmxL5sWU8Sn29JAGZvSq5PBB2OA+VKA0MHsZJMesagtfzA@mail.gmail.com/
+
+The series:
+
+  - smbdirect_socket_destroy_sync() no longer waits for
+    RDMA_CM_EVENT_DISCONNECTED after rdma_disconnect(). That wait could
+    take very long (until the rdma cm gives up, e.g. a peer that just
+    vanished) or never complete if the event already happened and the
+    status was overwritten. rdma_destroy_id() in
+    smbdirect_socket_destroy() is enough to stop further events; the
+    rest of the disconnect protocol is handled by the rdma core
+    asynchronously. This also makes releasing orphaned sockets
+    (next patch) non-blocking.
+
+  - A failed, not-yet-accepted child of a listener now moves itself to a
+    new listen.orphaned list at the end of its cleanup work and queues
+    listen.purge_orphaned_work, which releases it, so it no longer leaks
+    its backlog slot (nor its struct sock / RDMA resources) for the
+    lifetime of the listener. sc->accept.listener is only changed under
+    listener->listen.lock, and whoever clears it owns the release;
+    the listener is freed via kfree_rcu() so a child can dereference it
+    under rcu_read_lock(). This is the DoS fix.
+
+  - smbdirect_socket_accept() no longer hands out a socket that failed
+    after it was put on the ready list (e.g. the peer disconnected in
+    the meantime); it checks first_error / the status under listen.lock,
+    orphans such a socket and tries the next one.
+
+I tested the reproducer and the problem is fixed
+and I run various xfstests.
+
+I think these are important and should go into 7.3
+
+Stefan Metzmacher (3):
+  smb: smbdirect: don't wait for RDMA_CM_EVENT_DISCONNECTED in
+    smbdirect_socket_destroy_sync()
+  smb: smbdirect: release failed pending sockets of a listener
+  smb: smbdirect: don't hand out already failed sockets in
+    smbdirect_socket_accept()
+
+ fs/smb/smbdirect/accept.c     | 122 ++++++++++++++++++++++++++--------
+ fs/smb/smbdirect/connection.c |  12 ++--
+ fs/smb/smbdirect/internal.h   |   2 +
+ fs/smb/smbdirect/listen.c     | 116 ++++++++++++++++++++++++++++++--
+ fs/smb/smbdirect/socket.c     | 113 +++++++++++++++++++++++++++----
+ fs/smb/smbdirect/socket.h     |  37 +++++++++++
+ 6 files changed, 352 insertions(+), 50 deletions(-)
+
+-- 
+2.43.0
 
