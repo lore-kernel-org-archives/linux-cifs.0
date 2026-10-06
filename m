@@ -1,334 +1,167 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F49134BA50
-	for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2026 18:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2FA2EA749
+	for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2026 19:09:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791312780; cv=none; b=Nz+XP8e+YrcnQCC6zPut1p1jDJIJeViryjGMZROSMlkmkuYdIpoYhVRZQnHwa+JQLsDRtM/GPGheqFArFJrhxN8ld+DMUO3pVKYKqrpYAi/5eFsnKxcsjwI1PvcDiX2/84/E3+nGys5Z49moxabHBaoLGUe7HWtTjk3eZpLXE/4=
+	t=1791313755; cv=none; b=mnIaicN7q/R5fpEwgTY8n80xX9o8G54xcW/NHbdbGH8XrpnTKaPeERC5ymdzxMVFWGNuBy/mmKCsEu3ZLKwDsXxJWcGcNNw0s/cGXOcCw5k7021p7cZdWNotRyoPsQAluF23k8gpYbQyW8WGwnlMnx2CrIuQWGd3bqWhkbnJUgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791312780; c=relaxed/simple;
-	bh=V3BYy+Uz/chS/Wm0oCgjMrO3ffMOoxkOHDtJXZPiqbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BG3iqegnTd6zLc3/Unq9WhcjFJqD8FVFgjpir/MleI2wcTbx+BEfeuCqUTCG4lo68Sk4i9HVA2pCUxWm2toxK5H9o2XHpbCIeBM6Z8KPLlwKVaNz/MPvFFk93hw5QBQA43esHc85XTDEhTmYqNDTR7tJa5Wt0UcGOZ0J/BxYy8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TgV2/TYa; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kbpRp1eq; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XLdH1k0P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BdXDNJ4p; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1791313755; c=relaxed/simple;
+	bh=/UU7vpaqvBGZO4B6Y7h6qd6Dg7+OHbxNmNWlnPECSlE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=atkJ+FUXdWXsCm4WKyPQAAnsVvT+tif1LKq5CEb2foVlw3TfrioXBxtNmKjuHSem3Rgo9KRMP4gixHKYPIHp1wnzqCKICgkTACPRShHT142DgjvjRNMP5rCdztEDw1+ajASbbtuaIykYhnWdYmn3LE68f/4klnnUQ/dVbV7jZt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uNOsiHjt; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TgV2/TYa";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kbpRp1eq";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XLdH1k0P";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BdXDNJ4p"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id C018E1F790;
-	Tue,  6 Oct 2026 18:52:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791312772; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ruIdQcMt3eD8Eo3IGE2Oase70KS1iLCSHU6lTXu/WQ4=;
-	b=TgV2/TYahUMdk8pdn0AJoa0hw9g4jKVzLDywvNbpfCwZyH3xeJlwKruEYBKkT8B77MmSfz
-	ZpeMK/03u0XhDNgLHe8m3Y+A80kBkgWS0Tcube96UYhpZDpzIxwR1/a7CE84alnY0TZVia
-	nooPEKGA9DKLnCr36C3+fvyxxszMRfI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791312772;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ruIdQcMt3eD8Eo3IGE2Oase70KS1iLCSHU6lTXu/WQ4=;
-	b=kbpRp1eqiZ5fiK22GybUxguAhwQoAWtzrAgPQ59/XVjsS7+WRVAfOomdRV/hczw3U2MKmb
-	n5HeNhFQucwUYBAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XLdH1k0P;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BdXDNJ4p
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1791312768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ruIdQcMt3eD8Eo3IGE2Oase70KS1iLCSHU6lTXu/WQ4=;
-	b=XLdH1k0PSDbt8v3+Dvzf7ho479mteev5rVkvehBzLlhMJY0KlygYXCPCLnD5nvD+ztxS5Y
-	GomSbJLSUW+TrNQWaqH03xP8J7AYfG5uOYL9TDbSDv6a+NVG8o8AQLhaVfY0nF8xVLfpV8
-	BJh1W4VPtQkTogwPhMR1T5XmQGmZ464=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1791312768;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ruIdQcMt3eD8Eo3IGE2Oase70KS1iLCSHU6lTXu/WQ4=;
-	b=BdXDNJ4p0AdpcgIBxXo8V193eSfhDDCT4+NqUzrm7M1+WMO1tm9E4/A6InCjf4OWvPvvOI
-	dy1lhnQOiKNkiwCQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2F0F7137AC;
-	Tue,  6 Oct 2026 18:52:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ESG3LH9DxWoCRwAAD6G6ig
-	(envelope-from <ematsumiya@suse.de>); Tue, 06 Oct 2026 18:52:47 +0000
-Date: Tue, 6 Oct 2026 15:52:45 -0300
-From: Enzo Matsumiya <ematsumiya@suse.de>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, linkinjeon@kernel.org, 
-	ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	henrique.carvalho@suse.com
-Subject: Re: [PATCH v3 1/2] smb: client: fast fail sends if need to reconnect
-Message-ID: <asU7Jr6Q_PJuubBJ@suse.de>
-References: <20260929170358.270612-1-ematsumiya@suse.de>
- <4627cfd704304e43bed6825ae68699ad@manguebit.org>
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uNOsiHjt"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=Message-ID:Date:Cc:To:From;
+	bh=Eui3efxAoFq1xcB64L3l3H8oOzM7utGrkGl1lQqiIVM=; b=uNOsiHjt4gFkvGgIpzn7hI57/X
+	zVL2D9/E4krAy/uFJc9SD279YSURK3wN35zdLlksgzlHyW1pIvwpHoAQ9k9XSuvWYxwPvDf9U9V4q
+	qzpaHZYEmRcA4a2r4b2mK+bfYlz+YJUNfltDozck513XGxnumsTsDSwa7H3MOj+/nTtJlIuMvjWoC
+	y6ziB3iJbg9ZA/tYgRJgh0Rq4HhpJhSsz754NsLRTBpSGp0cxPuz1g9miOp6Wk7AtIJeXrhKaTJLN
+	FZMPAYUyV+SieRjDbdc3Q6keTm5s6PV/HFEdgTNqmrLyVoZtRSDWk3jNC51vmeLTd4u8LSA8isj26
+	wWBwRw7PPUIeFJNPBUPSOYOEC87DC+aZ5NOxADulYUI0Z8PAe6geHiEkcdOJ+bIdU143Xs5n0yrTV
+	O15h0wXBU2LBVfraxoqVLPZrwT6389cNM3oxq8LposONboYkSSLjVm/40ovXumhMOlu3wSl0ID8UY
+	FFGCPfF0vyoAXOf3p5I3Ndtj;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1xEAXA-00000005yAL-1Qtc;
+	Tue, 06 Oct 2026 19:09:04 +0000
+From: Stefan Metzmacher <metze@samba.org>
+To: linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org
+Cc: metze@samba.org,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Tom Talpey <tom@talpey.com>,
+	Lee Seong Hyeon <ihopenre@gmail.com>
+Subject: [PATCH v3 0/3] smb: smbdirect: fix listener backlog leak and teardown races
+Date: Tue,  6 Oct 2026 21:08:54 +0200
+Message-ID: <cover.1791311817.git.metze@samba.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <4627cfd704304e43bed6825ae68699ad@manguebit.org>
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: C018E1F790
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,kernel.org,gmail.com,microsoft.com,talpey.com,suse.com];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:mid,suse.de:email,suse.de:dkim];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Spam-Flag: NO
-X-Spam-Score: -4.51
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 
-On 10/06, Paulo Alcantara wrote:
->Enzo Matsumiya <ematsumiya@suse.de> writes:
->
->> smb_send_kvec() keeps retrying when server needs to reconnect, which
->> makes no sense as cifs_reconnect() will never run in parallel (because
->> both need server mutex).
->> IOW, retrying will never succeed, but only delay reconnects further.
->>
->> Bail out early from smb_send_kvec() when need to reconnect.
->>
->> Also shutdown socket queues when CifsNeedReconnect is first detected,
->> so any sends/receives fails immediately (and don't wait for socket to
->> timeout).
->>
->> Add TCP_Server_Info::need_sock_shutdown to ensure socket is shutdown
->> only once.
->>
->> kernel_sock_shutdown() will be called from whichever task detects it
->> first;  cifsd (cifs_tcp_ses_needs_reconnect()), or sending tasks,
->> through cifs_call_async() or compound_send_recv().
->>
->> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
->> ---
->> v2 -> v3 (patch refactor, change strategy but keep concept):
->> - remove TCP_Server_Info::mutex_owner (covers sashiko report)
->> - shutdown socket directly from sender functions (when need to reconnect)
->> - bail out from smb_send_kvec() when need to reconnect only if rc <= 0
->>   (from sasiko report)
->>
->> v1 -> v2 (fix issues detected by sashiko):
->> - move kernel_sock_shutdown() call out of cifs_tcp_ses_lock
->> - use server mutex to check/shutdown socket
->>
->>
->>  fs/smb/client/cifsglob.h  |  1 +
->>  fs/smb/client/connect.c   | 22 +++++++++++++++++++---
->>  fs/smb/client/transport.c | 30 ++++++++++++++++++++++++++++++
->>  3 files changed, 50 insertions(+), 3 deletions(-)
->>
->> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
->> index 79e4e84f8985..e49140d5c4a4 100644
->> --- a/fs/smb/client/cifsglob.h
->> +++ b/fs/smb/client/cifsglob.h
->> @@ -802,6 +802,7 @@ struct TCP_Server_Info {
->>  	bool	posix_ext_supported;
->>  	struct delayed_work reconnect; /* reconnect workqueue job */
->>  	struct mutex reconnect_mutex; /* prevent simultaneous reconnects */
->> +	bool need_sock_shutdown; /* true when CifsNeedReconnect was first set by non-cifsd task */
->>  	unsigned long echo_interval;
->>
->>  	/*
->> diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
->> index 28e1ddeb6182..733d50b042fd 100644
->> --- a/fs/smb/client/connect.c
->> +++ b/fs/smb/client/connect.c
->> @@ -126,12 +126,14 @@ void smb2_query_server_interfaces(struct work_struct *work)
->>  	queue_delayed_work(cifsiod_wq, &tcon->query_interfaces,
->>  			   (SMB_INTERFACE_POLL_INTERVAL * HZ));
->>  }
->> -
->
->Why are you removing the blank line?
+Hi Namjae,
 
-Probably just because I saw it.
-Not sure why it should stay there, but I'll drop it.
+These fix a set of problems in the shared smbdirect module
+(fs/smb/smbdirect/), reached through the listener/accept path, which in
+practice is driven by ksmbd for incoming SMB Direct connections.
 
->>  #define set_need_reco(server) \
->>  do { \
->>  	spin_lock(&server->srv_lock); \
->> -	if (server->tcpStatus != CifsExiting) \
->> +	if (server->tcpStatus != CifsExiting) { \
->> +		if (server->tcpStatus != CifsNeedReconnect) \
->> +			server->need_sock_shutdown = true; \
->>  		server->tcpStatus = CifsNeedReconnect; \
->> +	} \
->>  	spin_unlock(&server->srv_lock); \
->>  } while (0)
->>
->> @@ -353,6 +355,8 @@ cifs_abort_connection(struct TCP_Server_Info *server)
->>
->>  static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num_targets)
->>  {
->> +	bool shutdown;
->> +
->>  	spin_lock(&server->srv_lock);
->>  	server->nr_targets = num_targets;
->>  	if (server->tcpStatus == CifsExiting) {
->> @@ -365,9 +369,21 @@ static bool cifs_tcp_ses_needs_reconnect(struct TCP_Server_Info *server, int num
->>  	cifs_dbg(FYI, "Mark tcp session as need reconnect\n");
->>  	trace_smb3_reconnect(server->current_mid, server->conn_id,
->>  			     server->hostname);
->> -	server->tcpStatus = CifsNeedReconnect;
->>
->> +	/* Cover cases where sender tasks didn't manage to shutdown the socket for some reason */
->> +	shutdown = (server->tcpStatus != CifsNeedReconnect || server->need_sock_shutdown);
->> +	server->need_sock_shutdown = false;
->> +	server->tcpStatus = CifsNeedReconnect;
->>  	spin_unlock(&server->srv_lock);
->> +
->> +	if (shutdown) {
->> +		cifs_server_lock(server);
->> +		if (server->ssocket)
->> +			/* Don't release it here/yet! */
->> +			kernel_sock_shutdown(server->ssocket, SHUT_RDWR);
->> +		cifs_server_unlock(server);
->> +	}
->> +
->
->The new TCP_Server_Info::need_sock_shutdown field seems unnecessary.
->
->You could simply call kernel_sock_shutdown() if @server->ssocket != NULL
->after releasing ->srv_sock, as the socket can be shut down only once.
+The main one is a pre-authentication remote denial of service: the
+listener keeps every accepted connection on a fixed-size backlog
+(listen.pending, limit 10 for ksmbd). A connection is only removed from
+that backlog on the success path (promotion to listen.ready after a
+completed negotiate, or dequeue by accept()). A connection that is
+accepted at the RDMA level but then fails before it is accepted by the
+upper layer - negotiate timeout, peer disconnect, or an invalid
+negotiate request - is never removed, so its backlog slot is leaked.
+After about ten such events the listener rejects every new connection
+with -EBUSY and SMB Direct stays unusable until the service is
+restarted. An unauthenticated peer can trigger this with ~10 aborted
+connections.
 
-The idea is to ensure the socket is shutdown only once from cifs POV,
-not TCP/net -- e.g. there could be simultaneous threads reaching the
-same code and shutdown the socket right after cifs_reconnect()
-successfully connected.
+This was reported by Lee Seong Hyeon <ihopenre@gmail.com>:
 
->>  }
->>
->> diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
->> index 6e21b5f8754a..a1ae8548cf16 100644
->> --- a/fs/smb/client/transport.c
->> +++ b/fs/smb/client/transport.c
->> @@ -179,7 +179,18 @@ smb_send_kvec(struct TCP_Server_Info *server, struct msghdr *smb_msg,
->>  		 * to avoid unnecessary reconnects.
->>  		 */
->>  		rc = sock_sendmsg(ssocket, smb_msg);
->> +
->> +		/*
->> +		 * If need to reconnect, blame it for any non-interrupt error and bail out early,
->> +		 * even if -EAGAIN;  reconnect will never happen in parallel as cifs_reconnect()
->> +		 * needs server mutex (which we're already holding), so it's pointless to retry.
->> +		 */
->
->Long lines.  Keep them at 80 columns max.
->
->Consider doing the same for the rest of the series.
+  https://lore.kernel.org/linux-cifs/CANTrAmxL5sWU8Sn29JAGZvSq5PBB2OA+VKA0MHsZJMesagtfzA@mail.gmail.com/
 
-checkpatch.pl has a default max_line_length = 100.  I was (have been)
-just following that, but sure I can change it.
+The series:
 
->
->> +		if (unlikely(rc <= 0 && server->tcpStatus == CifsNeedReconnect &&
->> +			     !is_interrupt_error(rc)))
->> +			return -ECONNRESET;
->
->You are reading tcpStatus without holding ->srv_lock.  Is that OK?  If
->so, you should use READ_ONCE() here.
+  - smbdirect_socket_destroy_sync() no longer waits for
+    RDMA_CM_EVENT_DISCONNECTED after rdma_disconnect(). That wait could
+    take very long (until the rdma cm gives up, e.g. a peer that just
+    vanished) or never complete if the event already happened and the
+    status was overwritten. rdma_destroy_id() in
+    smbdirect_socket_destroy() is enough to stop further events; the
+    rest of the disconnect protocol is handled by the rdma core
+    asynchronously. This also makes releasing orphaned sockets
+    (next patch) non-blocking.
 
-Ack, I'll add READ_ONCE().
-Unlocked read should be ok; it's a very specific condition, and even if
-it changes e.g. after returning, it means it reconnected, and we need to
-return some error anyway.
+  - A failed, not-yet-accepted child of a listener now moves itself to a
+    new listen.orphaned list at the end of its cleanup work and queues
+    listen.purge_orphaned_work, which releases it, so it no longer leaks
+    its backlog slot (nor its struct sock / RDMA resources) for the
+    lifetime of the listener. sc->accept.listener is only changed under
+    listener->listen.lock, and whoever clears it owns the release;
+    the listener is freed via kfree_rcu() so a child can dereference it
+    under rcu_read_lock(). This is the DoS fix.
 
->> +
->>  		if (rc == -EAGAIN || unlikely(rc == -EINTR && task_work_pending(current))) {
->> +
->
->Remove this new blank line.
+  - smbdirect_socket_accept() no longer hands out a socket that failed
+    after it was put on the ready list (e.g. the peer disconnected in
+    the meantime); it checks first_error / the status under listen.lock,
+    orphans such a socket and tries the next one.
 
-Wait, I thought we were keeping blank lines?! lol I'll remove it.
+I tested the reproducer and the problem is fixed
+and I run various xfstests.
 
->
->>  			retries++;
->>  			if (retries >= 14 ||
->>  			    (!server->noblocksnd && (retries > 2))) {
->> @@ -654,6 +665,23 @@ int wait_for_response(struct TCP_Server_Info *server, struct mid_q_entry *mid)
->>  	return 0;
->>  }
->>
->> +static inline void cond_sock_shutdown(struct TCP_Server_Info *server)
->
->inline is unnecessary.  This isn't even hot path.
+I think these are important and should go into 7.3
+Changes since v2:
+(https://lore.kernel.org/r/cover.1791229120.git.metze@samba.org/)
 
-Ack.
+- "smb: smbdirect: release failed pending sockets of a listener":
+  reworked the connect-request error handling after more Sashiko
+  review. smbdirect_accept_connect_request() no longer tears down any
+  RDMA state or clears the cm_id on failure; it only returns a
+  not-yet-posted recv_io to the pool and returns the error.
+  smbdirect_listen_connect_request() now sets nsc->accept.listener and
+  publishes nsc on the pending list *before* it calls
+  smbdirect_accept_connect_request(), and on a non-zero return it
+  schedules nsc's teardown with smbdirect_socket_schedule_cleanup() and
+  always returns 0, so the rdma_cm core keeps the connection id and nsc
+  owns it (and destroys it in its own deferred teardown). The teardown
+  must be deferred because nsc's id_priv->handler_mutex is held by the
+  rdma_cm core across the CONNECT_REQUEST handler; that same lock (and
+  the listener's) also guarantees nsc can't go away under us. This
+  closes the race Sashiko reported, where a connection that established
+  between rdma_accept() and setting the listener could be left stranded
+  on the pending list.
 
->> +{
->> +	bool shutdown;
->> +
->> +	lockdep_assert_held(&server->_srv_mutex);
->> +
->> +	spin_lock(&server->srv_lock);
->> +	/* No need to check status, need_sock_shutdown is only set if CifsNeedReconnect */
->> +	shutdown = (server->need_sock_shutdown && server->ssocket);
->
->Again, TCP_Server_info::need_sock_shutdown doesn't seem to be required
->as you could have done
->
->        shutdown = server->tcpStatus == CifsNeedReconnect && server->ssocket;
+Changes since v1:
+(https://lore.kernel.org/r/cover.1791224972.git.metze@samba.org)
 
-cf. comment above -- it's specially true for this case, as
-cond_sock_shutdown() is called from cifs_call_async() and
-compound_send_recv(), which increases the chances of them shutting
-down the socket right after it's connected.
+- "smb: smbdirect: release failed pending sockets of a listener":
+  fix a use-after-free and a missed-orphan race in
+  smbdirect_listen_connect_request(), spotted by Sashiko. The
+  nsc->first_error check and the orphaning are now done under
+  listen.lock, together with setting nsc->accept.listener, so a
+  concurrent smbdirect_socket_cleanup_work()/purge_orphaned_work()
+  can neither free nsc while we still look at it, nor miss the
+  orphaning and leak it on the pending list.
 
-(because they're reachable from userspace, whereas the above shutdown is
-done by cifsd, which we control)
+- "smb: smbdirect: don't hand out already failed sockets in
+  smbdirect_socket_accept()": bound the accept() wait across the
+  "skip a failed socket and try the next one" retries, also spotted
+  by Sashiko. smbdirect_socket_wait_for_accept() now returns the
+  remaining timeout and smbdirect_socket_accept() carries it over, so
+  a stream of failed connections can no longer reset the caller's
+  timeout. ksmbd passes MAX_SCHEDULE_TIMEOUT, so it is unaffected in
+  practice.
 
->Besides, the parentheses are unnecessary, so remove them.
+- Added Reported-by:/Closes: for the Sashiko reviews.
 
-Ack.
+Stefan Metzmacher (3):
+  smb: smbdirect: don't wait for RDMA_CM_EVENT_DISCONNECTED in
+    smbdirect_socket_destroy_sync()
+  smb: smbdirect: release failed pending sockets of a listener
+  smb: smbdirect: don't hand out already failed sockets in
+    smbdirect_socket_accept()
 
->Otherwise, looks good.
+ fs/smb/smbdirect/accept.c     | 194 +++++++++++++++++++++++-----------
+ fs/smb/smbdirect/connection.c |  12 +--
+ fs/smb/smbdirect/internal.h   |   2 +
+ fs/smb/smbdirect/listen.c     | 137 ++++++++++++++++++++++--
+ fs/smb/smbdirect/socket.c     | 113 +++++++++++++++++---
+ fs/smb/smbdirect/socket.h     |  42 ++++++++
+ 6 files changed, 411 insertions(+), 89 deletions(-)
 
+-- 
+2.43.0
 
-Thanks!  I'll send v4 addressing the issues you pointed out.
-
-
-Enzo
