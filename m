@@ -1,47 +1,48 @@
 Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F193D379EEF;
-	Tue,  6 Oct 2026 19:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29F33ACA51
+	for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2026 19:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791313760; cv=none; b=bSb1aTBebPLvQD/p2FHv2ydOAYoPNQ0M9UXLOo1ALsqMZ2ySiI9vwRv305tcQWhC5l1EA7Fr1xn492/jXQ+qsyoWiE4KB52huVgi9i0AgI5cc0NwEPyPKUgaXirSytOkhaQuofVn3eAQ+HyKXCjRDzYkj20WxWjo/pSd8a3ZETQ=
+	t=1791313761; cv=none; b=trMpx0Ipw/Abv8WF4LZVvLrTb6AzI5UiV8PxPmgpur8vOhujDyOVbngPCv00+5T2J6OrMasUgKVl30gd/b5c2RTBu77z7Jmh3GJU209Olt1BbI+evTTfQRsYgC/mvl745PBO3TFF8huKtNcbfLwKPYsaEd1XHddd/wOcMvQTyz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791313760; c=relaxed/simple;
-	bh=nlxNKLTxtCGCJhUjYU9tc9I7ItX6gDxW/6VNH0ckWXQ=;
+	s=arc-20240116; t=1791313761; c=relaxed/simple;
+	bh=glJNq4aIGPyE0GIehaL0d/b9Dfcj8vDBaFJdcFQ7dxI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y+qXIZfjTojgmhtFy9vvJ5o5ZPpOFKJ6DF6uls9FeonXXIiuy9k8sUPF+ypY4T0J9nhrUBRuTn9Jwy2bcCePBQ+qXyAFDQGnnGl7PbRf2hO0pAlvr+fccKQ6K4khQxkXYxxXqwC29cufjXtPWUW7A9AUxcwKZDyvpdtku4IILTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=M2ZMSOCN; arc=none smtp.client-ip=144.76.82.148
+	 MIME-Version; b=jUJ2KlGjizskNfXI7oLbl1yh2Qv6OpNGudtJw+BEsjB0YSSi1bAx58pHz41WRQLJB+fsUDdZuoHe5fIno43muZ6tP6hnJ9UI5NYkGvPm2Z7KSe909GP0gr+96koEVrp45JwcwguFPg6yoIWaMH+ejW9/Zm8lpwEM+gwvw+M9KQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=0ujmtl8J; arc=none smtp.client-ip=144.76.82.148
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="M2ZMSOCN"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="0ujmtl8J"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
 	s=42; h=Message-ID:Date:Cc:To:From;
-	bh=zTfblxxnInZhWQsr0kcjdO8r7ihPT85D9PkwUZk7olY=; b=M2ZMSOCNLS3bpsw5qT61GRozgF
-	2FYu03/d6V60D7IWaQXbpW+zw4/Bo/K29MD55Vgq17vw77iZdlzun7QfTsQkyWGCSTm7bLsuLCwTu
-	pmwmnHvc96wmar2gEtjMj7BFaydYAN/4AQUaJoVz1kEXA31dVJtQ+5/PeEYSGbfd7QIVoNXHEddX4
-	LRlYfPHo9xpEDfXKwqo2Z7UYj4XzjQ1A7YpTW1xX793c1BBooGwGBfieAbFRWK16vhcuLpijKdXHk
-	B3f8H6ofDW01VgFrZAokWZPnMyxznSDBa20Y5i1U6gv6beTC80feDRjnEwM2EqBJPuXlWPOKhohAy
-	V5HAgy/fvtGS3fu0ZjOaKFmfJit+imkDzr3NBEb383yd5uaIjD+q/AAgXZTYqmOriPM8Vs+uRfabt
-	oSpF9ucSPM9GYseTOhk0GmvFuXoQIdGGm9erlK02z67kRHTzlos+JkZ4PDLY3AMM6yo/5JhLRsJLt
-	tDXU/P8YGw/RJ4miXoEqoko0;
+	bh=hd203wcjJupZp3xL1EsEN/PIA8+0hbaR4haUmfEzadY=; b=0ujmtl8JrM6/I/xcs2iM6d37br
+	SQdX4NFDujiF1cUKGsDOd+pjKJAiFo9LKEH/5ffmEbzyJlkUaJH9+52yjvrQwU0xtXKBngXqI7dYh
+	bw7VNK8NZjwwACJ8YIR+MLlVllBD9H1m6RvzhIron/w4iKEWBt04wSM7fvzDiS4+Z6Z2IAla1IAfI
+	AQJj60dJORRdF03UDIRrlKyGbe94hzRBeAQGFbVFdQjxRmW5DUMeS4HEHkemC0sT7x0FZrvUGKvba
+	6gZh+eienyYIShieqZ9iyLgEE61DKc9BzvrZ6Gwr4LpF56sEFxI80ps6eFNrxZHrfUYuruBLCoS2p
+	HCiInF+1fAkUvxB5lZV1LwNYI/IyOLdmTJoGULxAHo+YP3PZiuPFEWqsnkz7AAmFiPsCr0i5QWyP0
+	ZjIrZESDBgYuOLKrzYCggwc3ZGd3BHGrRe7MRpUtqLR6Nm9/lLLDLjhCw8X0AztZxCuWlAKFEX0Au
+	Bnwdc5qHP8IId/EHVp4fws2W;
 Received: from [127.0.0.2] (localhost [127.0.0.1])
 	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
 	(Exim)
-	id 1xEAXF-00000005yAn-3Pvp;
-	Tue, 06 Oct 2026 19:09:09 +0000
+	id 1xEAXL-00000005yB2-1E8v;
+	Tue, 06 Oct 2026 19:09:15 +0000
 From: Stefan Metzmacher <metze@samba.org>
 To: linux-cifs@vger.kernel.org,
 	samba-technical@lists.samba.org
 Cc: metze@samba.org,
+	Lee Seong Hyeon <ihopenre@gmail.com>,
+	Sashiko <sashiko-bot+sashiko@kernel.org>,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Paulo Alcantara <pc@manguebit.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH v3 1/3] smb: smbdirect: don't wait for RDMA_CM_EVENT_DISCONNECTED in smbdirect_socket_destroy_sync()
-Date: Tue,  6 Oct 2026 21:08:55 +0200
-Message-ID: <22ab29ca3288e96cf92d4991c32b8975297d9a28.1791311817.git.metze@samba.org>
+	Tom Talpey <tom@talpey.com>
+Subject: [PATCH v3 2/3] smb: smbdirect: release failed pending sockets of a listener
+Date: Tue,  6 Oct 2026 21:08:56 +0200
+Message-ID: <ab714dc8161c7b23734d95157b0b86e5d0081f1b.1791311817.git.metze@samba.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1791311817.git.metze@samba.org>
 References: <cover.1791311817.git.metze@samba.org>
@@ -53,156 +54,685 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smbdirect_socket_destroy_sync() waited for RDMA_CM_EVENT_DISCONNECTED
-after smbdirect_socket_cleanup_work() called rdma_disconnect(). That
-can take very long, e.g. if the peer just disappeared, until the
-rdma cm gives up, or forever if the event already happened, but the
-status was overwritten afterwards.
+A child of a listener only left the listen.pending or listen.ready
+list via smbdirect_socket_accept() or when the listener was
+destroyed. So every connection that failed before it was accepted
+(negotiate timeout, peer disconnect, invalid negotiate request, ...)
+stayed on the list and counted against the backlog until the listener
+was destroyed. After about backlog (10 for ksmbd) such connections
+smbdirect_listen_connect_request() rejected every new connection with
+-EBUSY, so an unauthenticated peer was able to permanently stop
+ksmbd from accepting SMB-Direct connections.
 
-This is not needed: smbdirect_socket_destroy() drains the qp under
-rdma_lock_handler(), destroys it and calls rdma_destroy_id(), which
-only waits for a currently running event handler and makes sure no
-further events are delivered. The rest of the disconnect protocol
-(DREQ/DREP and timewait for IB, abrupt close for iWarp) is handled
-by the rdma core asynchronously. drivers/nvme/host/rdma.c also just
-calls rdma_disconnect() and ib_drain_qp() before rdma_destroy_id().
+Now a failed child moves itself to a new listen.orphaned list at the
+end of smbdirect_socket_cleanup_work(), after the disconnect was
+started, and queues listen.purge_orphaned_work, which releases it
+with smbdirect_socket_release(), without holding the listener's
+rdma_lock_handler() lock, in the same way smbdirect_socket_destroy()
+does for the remaining children. Orphaned sockets still count against
+the backlog until they are released.
 
-So smbdirect_socket_destroy() now also accepts
-SMBDIRECT_SOCKET_DISCONNECTING and changes the status to
-SMBDIRECT_SOCKET_DISCONNECTED itself under rdma_lock_handler().
+sc->accept.listener is now only changed under listener->listen.lock
+and whoever clears it is responsible for releasing the socket:
+smbdirect_socket_accept(), purge_orphaned_work or the destroy of the
+listener.
 
-We could still get RDMA_CM_EVENT_DISCONNECTED in the small
-windows between rdma_unlock_handler() and rdma_destroy_id(),
-but in that case smbdirect_connection_rdma_event_handler()
-is basically a no-op.
+In order to make that work:
 
-Fixes: 422a2436697d ("smb: smbdirect: introduce smbdirect_socket_destroy[_sync]()")
+- a struct smbdirect_socket that is a listener is now freed via
+  kfree_rcu(), so that a child can dereference sc->accept.listener
+  under rcu_read_lock(), even if the listener is released concurrently.
+
+- smbdirect_listen_connect_request() adds nsc to the listen.pending
+  list and sets nsc->accept.listener before it calls
+  smbdirect_accept_connect_request(), and always returns 0 so the
+  rdma_cm core keeps the connection id and nsc owns it. On a non-zero
+  return it schedules nsc's teardown with
+  smbdirect_socket_schedule_cleanup(), which orphans it off the
+  listener so that purge_orphaned_work releases it; nsc destroys its
+  own connection id with rdma_destroy_id() in that teardown. The
+  teardown has to be deferred because the rdma_cm core holds nsc's
+  id_priv->handler_mutex across the handler, so nsc->rdma.cm_id must
+  not be destroyed synchronously from here. That same handler_mutex
+  (and the listener's) also guarantees nsc can't go away under us,
+  so setting the listener before the call is safe and lets a failure
+  orphan nsc.
+
+- smbdirect_accept_negotiate_recv_work() no longer moves a socket to
+  the ready list if it already failed or no longer belongs to the
+  listener. Every accepting socket has a listener, so if
+  sc->accept.listener is already cleared, it no longer sends a
+  negotiate response, as the socket is about to be released.
+
+- smbdirect_socket_destroy() of the listener disables
+  purge_orphaned_work and also releases the orphaned sockets.
+
+Fixes: dc691b91ad16 ("smb: smbdirect: introduce smbdirect_socket_{listen,accept}()")
+Reported-by: Lee Seong Hyeon <ihopenre@gmail.com>
+Closes: https://lore.kernel.org/linux-cifs/CANTrAmxL5sWU8Sn29JAGZvSq5PBB2OA+VKA0MHsZJMesagtfzA@mail.gmail.com/
+Reported-by: Sashiko <sashiko-bot+sashiko@kernel.org>
+Closes: https://sashiko.dev/#/patchset/cover.1791224972.git.metze%40samba.org
+Closes: https://sashiko.dev/#/patchset/cover.1791229120.git.metze%40samba.org
 Cc: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Paulo Alcantara <pc@manguebit.org>
 Cc: Tom Talpey <tom@talpey.com>
 Cc: linux-cifs@vger.kernel.org
 Cc: samba-technical@lists.samba.org
-Cc: linux-rdma@vger.kernel.org
 Assisted-by: Claude:claude-opus-5-5
 Signed-off-by: Stefan Metzmacher <metze@samba.org>
 ---
- fs/smb/smbdirect/connection.c | 12 ++++----
- fs/smb/smbdirect/socket.c     | 56 ++++++++++++++++++++++++++++-------
- 2 files changed, 52 insertions(+), 16 deletions(-)
+ fs/smb/smbdirect/accept.c   | 123 +++++++++++++++++++-------------
+ fs/smb/smbdirect/internal.h |   2 +
+ fs/smb/smbdirect/listen.c   | 137 +++++++++++++++++++++++++++++++++---
+ fs/smb/smbdirect/socket.c   |  57 ++++++++++++++-
+ fs/smb/smbdirect/socket.h   |  42 +++++++++++
+ 5 files changed, 298 insertions(+), 63 deletions(-)
 
-diff --git a/fs/smb/smbdirect/connection.c b/fs/smb/smbdirect/connection.c
-index afd31fa12a36..f48c857bda5a 100644
---- a/fs/smb/smbdirect/connection.c
-+++ b/fs/smb/smbdirect/connection.c
-@@ -83,9 +83,9 @@ static int smbdirect_connection_rdma_event_handler(struct rdma_cm_id *id,
- 		 * smbdirect_socket_schedule_cleanup[_status]() =>
- 		 * smbdirect_socket_cleanup_work().
- 		 *
--		 * As otherwise we'd set SMBDIRECT_SOCKET_DISCONNECTING,
--		 * but never ever get RDMA_CM_EVENT_DISCONNECTED and
--		 * never reach SMBDIRECT_SOCKET_DISCONNECTED.
-+		 * As otherwise we'd set SMBDIRECT_SOCKET_DISCONNECTING
-+		 * and call rdma_disconnect(), but never ever get
-+		 * RDMA_CM_EVENT_DISCONNECTED.
- 		 */
- 		if (event->event == RDMA_CM_EVENT_DEVICE_REMOVAL)
- 			smbdirect_socket_schedule_cleanup_status(sc,
-@@ -113,9 +113,9 @@ static int smbdirect_connection_rdma_event_handler(struct rdma_cm_id *id,
- 		 * smbdirect_socket_schedule_cleanup_status() =>
- 		 * smbdirect_socket_cleanup_work().
- 		 *
--		 * As otherwise we'd set SMBDIRECT_SOCKET_DISCONNECTING,
--		 * but never ever get RDMA_CM_EVENT_DISCONNECTED and
--		 * never reach SMBDIRECT_SOCKET_DISCONNECTED.
-+		 * As otherwise we'd set SMBDIRECT_SOCKET_DISCONNECTING
-+		 * and call rdma_disconnect(), but never ever get
-+		 * RDMA_CM_EVENT_DISCONNECTED.
- 		 *
- 		 * This is also a normal disconnect so
- 		 * SMBDIRECT_LOG_INFO should be good enough
-diff --git a/fs/smb/smbdirect/socket.c b/fs/smb/smbdirect/socket.c
-index bb02df6158b9..c36cb7cc0088 100644
---- a/fs/smb/smbdirect/socket.c
-+++ b/fs/smb/smbdirect/socket.c
-@@ -511,7 +511,13 @@ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
- 	if (sc->status == SMBDIRECT_SOCKET_DESTROYED)
- 		return;
+diff --git a/fs/smb/smbdirect/accept.c b/fs/smb/smbdirect/accept.c
+index 1b30ca8476c1..9353c7647735 100644
+--- a/fs/smb/smbdirect/accept.c
++++ b/fs/smb/smbdirect/accept.c
+@@ -19,15 +19,17 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 				     const struct rdma_conn_param *param)
+ {
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
+-	struct smbdirect_recv_io *recv_io;
++	struct smbdirect_recv_io *recv_io = NULL;
+ 	u8 peer_initiator_depth;
+ 	u8 peer_responder_resources;
+ 	struct rdma_conn_param conn_param;
+ 	__be32 ird_ord_hdr[2];
+ 	int ret;
  
--	WARN_ONCE(sc->status != SMBDIRECT_SOCKET_DISCONNECTED,
-+	/*
-+	 * smbdirect_socket_destroy_sync() doesn't wait
-+	 * for RDMA_CM_EVENT_DISCONNECTED, so we may still
-+	 * be in SMBDIRECT_SOCKET_DISCONNECTING
-+	 * (or already reached SMBDIRECT_SOCKET_DISCONNECTED)
-+	 */
-+	WARN_ONCE(sc->status < SMBDIRECT_SOCKET_DISCONNECTING,
- 		  "status=%s first_error=%1pe",
- 		  smbdirect_socket_status_string(sc->status),
- 		  SMBDIRECT_DEBUG_ERR_PTR(sc->first_error));
-@@ -542,6 +548,32 @@ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
- 	if (sc->rdma.cm_id)
- 		rdma_lock_handler(sc->rdma.cm_id);
- 
-+	/*
-+	 * We hold the handler lock, so the rdma event
-+	 * handlers can't change the status anymore.
-+	 *
-+	 * If RDMA_CM_EVENT_DISCONNECTED didn't arrive yet,
-+	 * we just stop waiting for it here.
-+	 *
-+	 * We already disabled disconnect_work above
-+	 * and before we call rdma_unlock_handler below
-+	 * we call smbdirect_connection_destroy_qp which
-+	 * sets sc->ib.qp = NULL.
-+	 *
-+	 * Between rdma_unlock_handler() and
-+	 * rdma_destroy_id() below there's a small
-+	 * windows where RDMA_CM_EVENT_DISCONNECTED
-+	 * could still arrive.
-+	 *
-+	 * But smbdirect_connection_rdma_event_handler
-+	 * will be a noop when calling smbdirect_socket_schedule_cleanup*
-+	 * ib_drain_qp() also won't be called.
-+	 */
-+	if (sc->status < SMBDIRECT_SOCKET_DISCONNECTED) {
-+		sc->status = SMBDIRECT_SOCKET_DISCONNECTED;
-+		smbdirect_socket_wake_up_all(sc);
+-	if (SMBDIRECT_CHECK_STATUS_WARN(sc, SMBDIRECT_SOCKET_CREATED))
+-		return -EINVAL;
++	if (SMBDIRECT_CHECK_STATUS_WARN(sc, SMBDIRECT_SOCKET_CREATED)) {
++		ret = -EINVAL;
++		goto cleanup;
 +	}
-+
- 	if (sc->ib.qp) {
- 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
- 			"drain qp\n");
-@@ -679,17 +711,21 @@ void smbdirect_socket_destroy_sync(struct smbdirect_socket *sc)
- 		"destroying rdma session\n");
- 	if (sc->status < SMBDIRECT_SOCKET_DISCONNECTING)
- 		smbdirect_socket_cleanup_work(&sc->disconnect_work);
--	if (sc->status < SMBDIRECT_SOCKET_DISCONNECTED) {
--		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
--			"wait for transport being disconnected\n");
--		wait_event(sc->status_wait, sc->status == SMBDIRECT_SOCKET_DISCONNECTED);
--		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
--			"waited for transport being disconnected\n");
--	}
  
  	/*
--	 * Once we reached SMBDIRECT_SOCKET_DISCONNECTED,
--	 * we should call smbdirect_socket_destroy()
-+	 * We don't wait for RDMA_CM_EVENT_DISCONNECTED,
-+	 * rdma_disconnect() was already called by
-+	 * smbdirect_socket_cleanup_work() if needed
-+	 * and smbdirect_socket_destroy() drains the qp,
-+	 * destroys it and calls rdma_destroy_id(), which
-+	 * only waits for a currently running event handler
-+	 * and makes sure no further events are delivered.
-+	 * The rest of the disconnect protocol is handled
-+	 * by the rdma core asynchronously.
+ 	 * First set what the we as server are able to support
+@@ -48,7 +50,7 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+ 			"smbdirect_accept_init_params() failed %1pe\n",
+ 			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto init_params_failed;
++		goto cleanup;
+ 	}
+ 
+ 	ret = smbdirect_connection_create_qp(sc);
+@@ -56,7 +58,7 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+ 			"smbdirect_connection_create_qp() failed %1pe\n",
+ 			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto create_qp_failed;
++		goto cleanup;
+ 	}
+ 
+ 	ret = smbdirect_connection_create_mem_pools(sc);
+@@ -64,7 +66,7 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+ 			"smbdirect_connection_create_mem_pools() failed %1pe\n",
+ 			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto create_mem_failed;
++		goto cleanup;
+ 	}
+ 
+ 	recv_io = smbdirect_connection_get_recv_io(sc);
+@@ -73,7 +75,7 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+ 			"smbdirect_connection_get_recv_io() failed %1pe\n",
+ 			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto get_recv_io_failed;
++		goto cleanup;
+ 	}
+ 	recv_io->cqe.done = smbdirect_accept_negotiate_recv_done;
+ 
+@@ -87,7 +89,7 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+ 			"smbdirect_connection_post_recv_io() failed %1pe\n",
+ 			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto post_recv_io_failed;
++		goto cleanup;
+ 	}
+ 	/*
+ 	 * From here recv_io is known to the RDMA QP and needs ib_drain_qp and
+@@ -130,7 +132,7 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 		smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_ERR,
+ 			"rdma_accept() failed %1pe\n",
+ 			SMBDIRECT_DEBUG_ERR_PTR(ret));
+-		goto rdma_accept_failed;
++		goto cleanup;
+ 	}
+ 
+ 	/*
+@@ -144,31 +146,25 @@ int smbdirect_accept_connect_request(struct smbdirect_socket *sc,
+ 
+ 	return 0;
+ 
+-rdma_accept_failed:
++cleanup:
+ 	/*
+-	 * The recv_io posted above is now owned by the QP (recv_io was set to
+-	 * NULL after a successful post).  smbdirect_connection_destroy_qp()
+-	 * calls ib_drain_qp(), whose completion
+-	 * (smbdirect_accept_negotiate_recv_done) returns the recv_io to the
+-	 * free list via smbdirect_connection_put_recv_io().  It therefore MUST
+-	 * run BEFORE smbdirect_connection_destroy_mem_pools(): otherwise the
+-	 * posted recv_io is still outstanding when kmem_cache_destroy() runs
+-	 * ("Slab cache still has objects") and is later freed into an
+-	 * already-destroyed mempool (mempool_free_bulk NULL-ptr-deref).
++	 * No RDMA state is torn down here, and in particular sc is not
++	 * released: the caller (smbdirect_listen_connect_request()) owns that
++	 * decision and schedules sc's teardown via
++	 * smbdirect_socket_schedule_cleanup() on a non-zero return. All of the
++	 * RDMA state - the QP, the memory pools and the cm_id itself - is then
++	 * torn down asynchronously by smbdirect_socket_cleanup_work() ->
++	 * smbdirect_socket_release() -> smbdirect_socket_destroy(), which
++	 * drains the QP (returning any posted recv_io to the pool) before
++	 * destroying the memory pools and destroys the cm_id with
++	 * rdma_destroy_id(), all in the correct order.
 +	 *
-+	 * Waiting for RDMA_CM_EVENT_DISCONNECTED could
-+	 * take very long or forever, e.g. if the peer
-+	 * just disappeared.
++	 * The only resource not reachable by that teardown is a recv_io that
++	 * was taken from the pool but not yet posted to the QP (recv_io is set
++	 * to NULL after a successful post), so hand it back here.
  	 */
- 	smbdirect_socket_destroy(sc);
- 	smbdirect_log_rdma_event(sc, SMBDIRECT_LOG_INFO,
+-	smbdirect_connection_destroy_qp(sc);
+-	smbdirect_connection_destroy_mem_pools(sc);
+-	return ret;
+-post_recv_io_failed:
+-	/* post failed: recv_io was not accepted by the QP, still in hand */
+ 	if (recv_io)
+ 		smbdirect_connection_put_recv_io(recv_io);
+-get_recv_io_failed:
+-	smbdirect_connection_destroy_mem_pools(sc);
+-create_mem_failed:
+-	smbdirect_connection_destroy_qp(sc);
+-create_qp_failed:
+-init_params_failed:
+ 	return ret;
+ }
+ 
+@@ -302,6 +298,7 @@ static void smbdirect_accept_negotiate_recv_work(struct work_struct *work)
+ 	struct smbdirect_socket *sc =
+ 		container_of(work, struct smbdirect_socket, connect.work);
+ 	struct smbdirect_socket_parameters *sp = &sc->parameters;
++	struct smbdirect_socket *lsc;
+ 	struct smbdirect_recv_io *recv_io;
+ 	struct smbdirect_negotiate_req *nreq;
+ 	unsigned long flags;
+@@ -464,29 +461,55 @@ static void smbdirect_accept_negotiate_recv_work(struct work_struct *work)
+ 	 */
+ 	sp->max_fragmented_send_size = max_fragmented_size;
+ 
+-	if (sc->accept.listener) {
+-		struct smbdirect_socket *lsc = sc->accept.listener;
+-		unsigned long flags;
++	/*
++	 * Every accepting socket was created by
++	 * smbdirect_listen_connect_request() and has a
++	 * listener. If it's already cleared, the listener
++	 * (or its purge_orphaned_work) is responsible for
++	 * releasing us, so we must not send a negotiate
++	 * response.
++	 *
++	 * The memory of the listener is freed via kfree_rcu(),
++	 * see smbdirect_listen_orphan_socket().
++	 */
++	rcu_read_lock();
++	lsc = READ_ONCE(sc->accept.listener);
++	if (!lsc) {
++		rcu_read_unlock();
++		return;
++	}
+ 
+-		spin_lock_irqsave(&lsc->listen.lock, flags);
+-		list_del(&sc->accept.list);
+-		list_add_tail(&sc->accept.list, &lsc->listen.ready);
++	spin_lock_irqsave(&lsc->listen.lock, flags);
++	/*
++	 * The listener (or its purge_orphaned_work)
++	 * may have cleared sc->accept.listener in the
++	 * meantime and is responsible for releasing us.
++	 *
++	 * If we already failed, we're either
++	 * already on the orphaned list or
++	 * smbdirect_socket_cleanup_work() will
++	 * move us there.
++	 *
++	 * In both cases we must not move us
++	 * to the ready list.
++	 */
++	if (sc->accept.listener == lsc && !READ_ONCE(sc->first_error)) {
++		list_move_tail(&sc->accept.list, &lsc->listen.ready);
+ 		wake_up(&lsc->listen.wait_queue);
+-		spin_unlock_irqrestore(&lsc->listen.lock, flags);
+-
+-		/*
+-		 * smbdirect_socket_accept() will call
+-		 * smbdirect_accept_negotiate_finish(nsc, 0);
+-		 *
+-		 * So that we don't send the negotiation
+-		 * response that grants credits to the peer
+-		 * before the socket is accepted by the
+-		 * application.
+-		 */
+-		return;
+ 	}
++	spin_unlock_irqrestore(&lsc->listen.lock, flags);
++	rcu_read_unlock();
+ 
+-	ntstatus = le32_to_cpu(STATUS_SUCCESS);
++	/*
++	 * smbdirect_socket_accept() will call
++	 * smbdirect_accept_negotiate_finish(nsc, 0);
++	 *
++	 * So that we don't send the negotiation
++	 * response that grants credits to the peer
++	 * before the socket is accepted by the
++	 * application.
++	 */
++	return;
+ 
+ not_supported:
+ 	smbdirect_accept_negotiate_finish(sc, ntstatus);
+@@ -839,7 +862,7 @@ struct smbdirect_socket *smbdirect_socket_accept(struct smbdirect_socket *lsc,
+ 				       struct smbdirect_socket,
+ 				       accept.list);
+ 	if (nsc) {
+-		nsc->accept.listener = NULL;
++		WRITE_ONCE(nsc->accept.listener, NULL);
+ 		list_del_init_careful(&nsc->accept.list);
+ 		arg->is_empty = list_empty_careful(&lsc->listen.ready);
+ 	}
+diff --git a/fs/smb/smbdirect/internal.h b/fs/smb/smbdirect/internal.h
+index e9959e6dc13a..69d0c9f899de 100644
+--- a/fs/smb/smbdirect/internal.h
++++ b/fs/smb/smbdirect/internal.h
+@@ -74,6 +74,8 @@ void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
+ 
+ void smbdirect_socket_destroy_sync(struct smbdirect_socket *sc);
+ 
++void smbdirect_listen_orphan_socket(struct smbdirect_socket *sc);
++
+ int smbdirect_socket_wait_for_credits(struct smbdirect_socket *sc,
+ 				      enum smbdirect_socket_status expected_status,
+ 				      int unexpected_errno,
+diff --git a/fs/smb/smbdirect/listen.c b/fs/smb/smbdirect/listen.c
+index 2f78bcaedbf8..3c91f00d95ce 100644
+--- a/fs/smb/smbdirect/listen.c
++++ b/fs/smb/smbdirect/listen.c
+@@ -10,6 +10,78 @@
+ static int smbdirect_listen_rdma_event_handler(struct rdma_cm_id *id,
+ 					       struct rdma_cm_event *event);
+ 
++/*
++ * This is called by a socket that failed while it
++ * is still on the pending or ready list of its
++ * listener, typically at the end of
++ * smbdirect_socket_cleanup_work(), when the
++ * disconnect was already started.
++ *
++ * It moves itself to the orphaned list and
++ * lets smbdirect_listen_purge_orphaned_work()
++ * release it. Otherwise it would stay on the
++ * pending or ready list until the listener is
++ * destroyed and fill up the backlog, so that
++ * no new connections would be accepted.
++ *
++ * It's fine to call this more than once.
++ */
++void smbdirect_listen_orphan_socket(struct smbdirect_socket *sc)
++{
++	struct smbdirect_socket *lsc;
++	unsigned long flags;
++
++	/*
++	 * The memory of the listener is freed via
++	 * kfree_rcu(), so it's safe to dereference it
++	 * under rcu_read_lock(), even if sc->accept.listener
++	 * is cleared and the listener is released concurrently.
++	 */
++	rcu_read_lock();
++	lsc = READ_ONCE(sc->accept.listener);
++	if (!lsc) {
++		rcu_read_unlock();
++		return;
++	}
++
++	spin_lock_irqsave(&lsc->listen.lock, flags);
++	if (sc->accept.listener == lsc) {
++		list_move_tail(&sc->accept.list, &lsc->listen.orphaned);
++		queue_work(lsc->workqueues.cleanup, &lsc->listen.purge_orphaned_work);
++	}
++	spin_unlock_irqrestore(&lsc->listen.lock, flags);
++	rcu_read_unlock();
++}
++
++static void smbdirect_listen_purge_orphaned_work(struct work_struct *work)
++{
++	struct smbdirect_socket *lsc =
++		container_of(work, struct smbdirect_socket, listen.purge_orphaned_work);
++	struct smbdirect_socket *psc, *tsc;
++	LIST_HEAD(orphaned_list);
++	unsigned long flags;
++
++	/*
++	 * Clearing accept.listener under listen.lock
++	 * makes us responsible for releasing them.
++	 */
++	spin_lock_irqsave(&lsc->listen.lock, flags);
++	list_splice_tail_init(&lsc->listen.orphaned, &orphaned_list);
++	list_for_each_entry(psc, &orphaned_list, accept.list)
++		WRITE_ONCE(psc->accept.listener, NULL);
++	spin_unlock_irqrestore(&lsc->listen.lock, flags);
++
++	/*
++	 * We don't hold the listener's rdma_lock_handler()
++	 * lock here, see smbdirect_socket_destroy()
++	 * for why that's important.
++	 */
++	list_for_each_entry_safe(psc, tsc, &orphaned_list, accept.list) {
++		list_del_init(&psc->accept.list);
++		smbdirect_socket_release(psc);
++	}
++}
++
+ int smbdirect_socket_listen(struct smbdirect_socket *sc, int backlog)
+ {
+ 	int ret;
+@@ -47,6 +119,9 @@ int smbdirect_socket_listen(struct smbdirect_socket *sc, int backlog)
+ 	sc->rdma.cm_id->event_handler = smbdirect_listen_rdma_event_handler;
+ 	rdma_unlock_handler(sc->rdma.cm_id);
+ 
++	INIT_WORK(&sc->listen.purge_orphaned_work,
++		  smbdirect_listen_purge_orphaned_work);
++
+ 	ret = rdma_listen(sc->rdma.cm_id, backlog);
+ 	if (ret) {
+ 		sc->first_error = ret;
+@@ -214,6 +289,7 @@ static int smbdirect_listen_connect_request(struct smbdirect_socket *lsc,
+ 	size_t backlog = max_t(size_t, 1, lsc->listen.backlog);
+ 	size_t psockets;
+ 	size_t rsockets;
++	size_t osockets;
+ 	int ret;
+ 
+ 	if (!smbdirect_frwr_is_supported(&new_id->device->attrs)) {
+@@ -254,14 +330,21 @@ static int smbdirect_listen_connect_request(struct smbdirect_socket *lsc,
+ 	spin_lock_irqsave(&lsc->listen.lock, flags);
+ 	psockets = list_count_nodes(&lsc->listen.pending);
+ 	rsockets = list_count_nodes(&lsc->listen.ready);
++	/*
++	 * Orphaned sockets still count against
++	 * the backlog until they are released by
++	 * smbdirect_listen_purge_orphaned_work().
++	 */
++	osockets = list_count_nodes(&lsc->listen.orphaned);
+ 	spin_unlock_irqrestore(&lsc->listen.lock, flags);
+ 
+ 	if (psockets > backlog ||
+ 	    rsockets > backlog ||
+-	    (psockets + rsockets) > backlog) {
++	    osockets > backlog ||
++	    (psockets + rsockets + osockets) > backlog) {
+ 		smbdirect_log_rdma_event(lsc, SMBDIRECT_LOG_ERR,
+-			"Backlog[%d][%zu] full pending[%zu] ready[%zu]\n",
+-			lsc->listen.backlog, backlog, psockets, rsockets);
++			"Backlog[%d][%zu] full pending[%zu] ready[%zu] orphaned[%zu]\n",
++			lsc->listen.backlog, backlog, psockets, rsockets, osockets);
+ 		return -EBUSY;
+ 	}
+ 
+@@ -279,22 +362,54 @@ static int smbdirect_listen_connect_request(struct smbdirect_socket *lsc,
+ 	if (ret)
+ 		goto set_settings_failed;
+ 
++	/*
++	 * Publish nsc on the pending list with accept.listener set before
++	 * smbdirect_accept_connect_request() calls rdma_accept(). Once the
++	 * connection can establish, smbdirect_accept_negotiate_recv_work()
++	 * may run and it must observe accept.listener, otherwise nsc would
++	 * be left stranded on the pending list forever.
++	 *
++	 * The listener's handler_mutex is held while we're called, so
++	 * smbdirect_socket_destroy() of the listener can't reach nsc on the
++	 * pending list before we're done.
++	 *
++	 * From here nsc is published on the pending list: on failure of
++	 * smbdirect_accept_connect_request() below we schedule nsc's teardown,
++	 * which orphans nsc off the listener so
++	 * smbdirect_listen_purge_orphaned_work() -> smbdirect_socket_release()
++	 * releases it.
++	 */
+ 	spin_lock_irqsave(&lsc->listen.lock, flags);
+ 	list_add_tail(&nsc->accept.list, &lsc->listen.pending);
+-	nsc->accept.listener = lsc;
++	WRITE_ONCE(nsc->accept.listener, lsc);
+ 	spin_unlock_irqrestore(&lsc->listen.lock, flags);
+ 
+ 	ret = smbdirect_accept_connect_request(nsc, &event->param.conn);
+-	if (ret)
+-		goto accept_connect_failed;
++	if (ret) {
++		/*
++		 * The rdma_cm core holds both the listener's and nsc's
++		 * id_priv->handler_mutex across this CONNECT_REQUEST handler,
++		 * so neither can go away under us here and nsc cannot receive
++		 * any rdma event: it is safe to hand nsc to its teardown.
++		 *
++		 * That teardown must be deferred though: nsc->rdma.cm_id
++		 * (= new_id) has its handler_mutex held by us, so it cannot be
++		 * destroyed synchronously from here.
++		 * smbdirect_socket_schedule_cleanup() only queues work;
++		 * smbdirect_socket_cleanup_work() then orphans nsc off the
++		 * listener and smbdirect_listen_purge_orphaned_work() releases
++		 * it, destroying nsc's cm_id with rdma_destroy_id().
++		 */
++		smbdirect_socket_schedule_cleanup(nsc, ret);
++	}
+ 
++	/*
++	 * Always return 0 so the rdma_cm core keeps new_id: nsc owns it now.
++	 * On success it stays connected; on failure its deferred teardown
++	 * above destroys it.
++	 */
+ 	return 0;
+ 
+-accept_connect_failed:
+-	spin_lock_irqsave(&lsc->listen.lock, flags);
+-	list_del_init(&nsc->accept.list);
+-	nsc->accept.listener = NULL;
+-	spin_unlock_irqrestore(&lsc->listen.lock, flags);
+ set_settings_failed:
+ set_params_failed:
+ 	/*
+diff --git a/fs/smb/smbdirect/socket.c b/fs/smb/smbdirect/socket.c
+index c36cb7cc0088..e270e36b3145 100644
+--- a/fs/smb/smbdirect/socket.c
++++ b/fs/smb/smbdirect/socket.c
+@@ -319,6 +319,15 @@ void __smbdirect_socket_schedule_cleanup(struct smbdirect_socket *sc,
+ 	 * (smbdirect_socket_destroy) to reap.
+ 	 */
+ 	if (sc->listen.backlog != -1) { /* was a listener */
++		/*
++		 * We don't move them to the orphaned list here,
++		 * each child does that itself at the end of its
++		 * smbdirect_socket_cleanup_work(), see
++		 * smbdirect_listen_orphan_socket(). Only that checks
++		 * accept.listener, which is still NULL for a child
++		 * that smbdirect_listen_connect_request() is still
++		 * setting up and will release itself on failure.
++		 */
+ 		spin_lock_irqsave(&sc->listen.lock, flags);
+ 		list_splice_init(&sc->listen.ready, &sc->listen.pending);
+ 		list_for_each_entry_safe(psc, tsc, &sc->listen.pending, accept.list)
+@@ -427,6 +436,15 @@ static void smbdirect_socket_cleanup_work(struct work_struct *work)
+ 	 * instances of one class -- harmless, but lockdep cannot tell).
+ 	 */
+ 	if (sc->listen.backlog != -1) { /* was a listener */
++		/*
++		 * We don't move them to the orphaned list here,
++		 * each child does that itself at the end of its
++		 * smbdirect_socket_cleanup_work(), see
++		 * smbdirect_listen_orphan_socket(). Only that checks
++		 * accept.listener, which is still NULL for a child
++		 * that smbdirect_listen_connect_request() is still
++		 * setting up and will release itself on failure.
++		 */
+ 		spin_lock_irqsave(&sc->listen.lock, flags);
+ 		list_splice_init(&sc->listen.ready, &sc->listen.pending);
+ 		list_for_each_entry_safe(psc, tsc, &sc->listen.pending, accept.list)
+@@ -486,6 +504,18 @@ static void smbdirect_socket_cleanup_work(struct work_struct *work)
+ 	 * in order to notice the broken connection.
+ 	 */
+ 	smbdirect_socket_wake_up_all(sc);
++
++	/*
++	 * If we're still on the pending or ready list
++	 * of a listener, we started the disconnect
++	 * as far as possible above, so we move ourself
++	 * to the orphaned list of the listener,
++	 * which will release us.
++	 *
++	 * This is a no-op internally if
++	 * sc->accept.listener is NULL.
++	 */
++	smbdirect_listen_orphan_socket(sc);
+ }
+ 
+ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
+@@ -544,6 +574,7 @@ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
+ 	disable_work_sync(&sc->recv_io.posted.refill_work);
+ 	disable_work_sync(&sc->idle.immediate_work);
+ 	disable_delayed_work_sync(&sc->idle.timer_work);
++	disable_work_sync(&sc->listen.purge_orphaned_work);
+ 
+ 	if (sc->rdma.cm_id)
+ 		rdma_lock_handler(sc->rdma.cm_id);
+@@ -607,6 +638,19 @@ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
+ 	spin_lock_irqsave(&sc->listen.lock, flags);
+ 	list_splice_tail_init(&sc->listen.ready, &pending_list);
+ 	list_splice_tail_init(&sc->listen.pending, &pending_list);
++	/*
++	 * purge_orphaned_work is already disabled above,
++	 * so we also need to release the orphaned sockets.
++	 *
++	 * Clearing accept.listener under listen.lock
++	 * makes us responsible for releasing them and
++	 * prevents them from moving themselves to
++	 * the orphaned list via
++	 * smbdirect_listen_orphan_socket().
++	 */
++	list_splice_tail_init(&sc->listen.orphaned, &pending_list);
++	list_for_each_entry(psc, &pending_list, accept.list)
++		WRITE_ONCE(psc->accept.listener, NULL);
+ 	spin_unlock_irqrestore(&sc->listen.lock, flags);
+ 
+ 	/* It's not possible for upper layer to get to reassembly */
+@@ -650,7 +694,6 @@ static void smbdirect_socket_destroy(struct smbdirect_socket *sc)
+ 			"release %zu pending sockets\n", psockets);
+ 	list_for_each_entry_safe(psc, tsc, &pending_list, accept.list) {
+ 		list_del_init(&psc->accept.list);
+-		psc->accept.listener = NULL;
+ 		smbdirect_socket_release(psc);
+ 	}
+ 	if (sc->listen.backlog != -1) /* was a listener */
+@@ -777,7 +820,17 @@ static void smbdirect_socket_release_destroy(struct kref *kref)
+ 	 * in DESTROYED state, before we free the memory.
+ 	 */
+ 	smbdirect_socket_destroy_sync(sc);
+-	kfree(sc);
++
++	/*
++	 * Only a listener (backlog != -1) is ever dereferenced
++	 * via sc->accept.listener under rcu_read_lock(), see
++	 * smbdirect_listen_orphan_socket(). Other sockets can be
++	 * freed immediately.
++	 */
++	if (sc->listen.backlog != -1) /* was a listener */
++		kfree_rcu(sc, refs.rcu);
++	else
++		kfree(sc);
+ }
+ 
+ void smbdirect_socket_release(struct smbdirect_socket *sc)
+diff --git a/fs/smb/smbdirect/socket.h b/fs/smb/smbdirect/socket.h
+index c09eddd8ad16..14114a2567a2 100644
+--- a/fs/smb/smbdirect/socket.h
++++ b/fs/smb/smbdirect/socket.h
+@@ -151,6 +151,12 @@ struct smbdirect_socket {
+ 		 * the disconnect refcount.
+ 		 */
+ 		struct kref destroy;
++
++		/*
++		 * smbdirect_socket_release_destroy() uses
++		 * kfree_rcu(), see accept.listener.
++		 */
++		struct rcu_head rcu;
+ 	} refs;
+ 
+ 	/* RDMA related */
+@@ -216,6 +222,16 @@ struct smbdirect_socket {
+ 		 * only be > 0.
+ 		 */
+ 		int backlog;
++		/*
++		 * Sockets on pending or ready that failed
++		 * move themselves to orphaned and queue
++		 * purge_orphaned_work, which releases them.
++		 * So that they are freed while the listener
++		 * is still alive. They still count against
++		 * the backlog until they are released.
++		 */
++		struct list_head orphaned;
++		struct work_struct purge_orphaned_work;
+ 	} listen;
+ 
+ 	/*
+@@ -226,7 +242,30 @@ struct smbdirect_socket {
+ 	 * connection.
+ 	 */
+ 	struct {
++		/*
++		 * This is only set, protected by
++		 * listener->listen.lock, while the socket
++		 * is owned by the listener (on its pending,
++		 * ready or orphaned list). The one who clears
++		 * it is responsible for releasing the socket.
++		 *
++		 * The memory of a struct smbdirect_socket is
++		 * freed via kfree_rcu(), so the listener
++		 * can be dereferenced under rcu_read_lock(),
++		 * even if accept.listener is cleared and
++		 * the listener is released concurrently.
++		 */
+ 		struct smbdirect_socket *listener;
++		/*
++		 * Linkage on one of the listener's
++		 * listen.{pending,ready,orphaned} lists.
++		 *
++		 * accept.list and accept.listener are set
++		 * together under listener->listen.lock before
++		 * smbdirect_accept_connect_request() is called,
++		 * so whenever the socket is on one of those lists
++		 * accept.listener is that listener (never NULL).
++		 */
+ 		struct list_head list;
+ 	} accept;
+ 
+@@ -588,6 +627,9 @@ static __always_inline void smbdirect_socket_init(struct smbdirect_socket *sc)
+ 	spin_lock_init(&sc->listen.lock);
+ 	INIT_LIST_HEAD(&sc->listen.pending);
+ 	INIT_LIST_HEAD(&sc->listen.ready);
++	INIT_LIST_HEAD(&sc->listen.orphaned);
++	INIT_WORK(&sc->listen.purge_orphaned_work, __smbdirect_socket_disabled_work);
++	disable_work_sync(&sc->listen.purge_orphaned_work);
+ 	sc->listen.backlog = -1; /* not a listener */
+ 	init_waitqueue_head(&sc->listen.wait_queue);
+ 
 -- 
 2.43.0
 
