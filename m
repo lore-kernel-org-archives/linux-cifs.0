@@ -1,58 +1,160 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE173A1A35
-	for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2026 20:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7C949D5B0
+	for <linux-cifs@vger.kernel.org>; Tue,  6 Oct 2026 21:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791317603; cv=none; b=riD50Q3chV5dDlOAW5IqTplFDn4zH28/5/sXN6A0OX4MUrQfYdub+xexHSdFFnlPHxgkNx556b7MWNEOC8dAoaPspUjMVTVfZ7SWrv21NOnU248OaYg9KSUBDzm9thuGe5klOvnmjrCAqd+Np84xjK4rZGBAEaFWqA/7b+V15s0=
+	t=1791320406; cv=none; b=gvTTLx+D94RFAc/DHc1RCgaThVT/Qkti+lLV1wsnJYikFpGeLwUvhqCVJZLKriW9lsxcOSueH/wBlOMepq+eSmUWtUiK6cR1p6pkxFRZImk2knsIHoQVwLToHWWFNs7ksZdXvKsMZnnjDrtIO8LWMUEFRyfRDMiCoCmKUT6Lao8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791317603; c=relaxed/simple;
-	bh=pXdBA2owy/s7lJd+pmuSV/qWXIh+rPtOwhDKsHy9DrE=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=hwWtnw9mozFSxw/dqg9plXk332J/grR2tPJ/nVxb/4LqnXRIRByWxE9lExaUzpR1ve6hZDtTfalQ5bmvueaDDjPvBdwCXn22dbM06v4N5p+z2Wi2tYCt6ek7wrWeQIB77HXq15xUz4MwKDq+whv5WfnVu6V/XsilV+Bd3IDM57U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=Ec4IYo3Y; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1791320406; c=relaxed/simple;
+	bh=H2FmTP0VWiKuvmUZWBnJoF4rBt8lms4tNq1kNCnaFDA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DVZs824xbg71xv/XTeDnzVDzvsK72A1pX0U92EQivjy8Guq5+c2n21HpcOZ9l7Zw+xxl8MIpH+hGGu1iHIVQdC6Ww2X0vlJQWWoACH2zKf6mjwfMadZXf/KsWJaE0fOTI3ls6VZiZ78Q8aI2lLySAfcTwYh0ud4vLDgHG5cXfJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IVAC0+Jc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="Ec4IYo3Y"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sIeUIQ1uFLkLx7vtXK0m/1a6EpgvoAj8FITuPM3F+6s=; b=Ec4IYo3YEm5pC1bKc9rc9zx5+n
-	m040msSI3teIXqEJIddF5jqLvJXWa6a1Ly+8883e7DHn9t0/itNbVMTypwZuvtDEOQ7Y43gGBk811
-	Fg621k7Z6790OLSeImWAzwawTh/8NzqcY69QvxvzR0N31voXilBTd/sMmz+xr9Lr4ijmCzpm6Xel0
-	qf1fWGJ42HGFYHPUhFbMGsKfH0d/y6XZGVrhYTkFJF5A8njSnsIvOqjqX9GK3pVOdcD1c6EPh8e5I
-	uyBpgrhumQa0R97qmHsq8r3Gy69UXXyY3D0SdGe7xXH+5k7hlATh+eI5SYjvAKBD6Hpe8KmyiCq0p
-	k8UPxcBA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xEBXM-000000033Tr-0v9u;
-	Tue, 06 Oct 2026 17:13:20 -0300
-Message-ID: <b55d16b6a32d5bf148b0bddd3b4a2db4@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Stefan Metzmacher <metze@samba.org>, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org
-Cc: Tom Talpey <tom@talpey.com>, Namjae Jeon <linkinjeon@kernel.org>
-Subject: Re: [PATCH 0/5] smb: client: don't use server->smbd_conn without a
- reference or lock
-In-Reply-To: <1111a3da-3eb7-44e0-8c68-4a09bb4615a1@samba.org>
-References: <cover.1791225453.git.metze@samba.org>
- <1111a3da-3eb7-44e0-8c68-4a09bb4615a1@samba.org>
-Date: Tue, 06 Oct 2026 17:13:19 -0300
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IVAC0+Jc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1791320403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3UTBequP+2ece8Flw/LLZvFi64Wq0UqNMDxKFvdMi4Q=;
+	b=IVAC0+JcREgfid9oI7huFXOiz2J/hHFKY1GGxyG7ql8zBCr/A9XVQjyeyvjyTDctexiEHP
+	OMvlu8oI0CPz7PS7jOtVuDdruoedG8BhcwX6D9TfrSSuc+1cMf7KpmKySxvGzWAxs9WKwq
+	TlI8q8FPWCm0heRNRPY2Ogr+gMjmvG4=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-439-OEPpxjTLNkucTpIWnjS7-A-1; Tue,
+ 06 Oct 2026 17:00:02 -0400
+X-MC-Unique: OEPpxjTLNkucTpIWnjS7-A-1
+X-Mimecast-MFC-AGG-ID: OEPpxjTLNkucTpIWnjS7-A_1791320400
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CD3F1977303;
+	Tue,  6 Oct 2026 20:59:59 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.90])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 16CA1180058D;
+	Tue,  6 Oct 2026 20:59:50 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v13 0/8] netfs: Use a bvecq chain position abstraction
+Date: Tue,  6 Oct 2026 21:59:36 +0100
+Message-ID: <20261006205947.608356-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Stefan Metzmacher <metze@samba.org> writes:
+Hi Christian,
 
-> I'll address these https://sashiko.dev/#/patchset/cover.1791225453.git.metze%40samba.org
-> and resubmit v2 later...
+Could you pull these patches please into your vfs-7.4.netfs branch?  This
+is the fourth of five batches.  The primary purpose of this batch is to add
+an abstraction for a position in a bvecq chain and make use of it.
 
-Sounds good.  Thanks for the fixes.
+With that in mind, this patchset does the following:
 
-Looking forward to seeing the test results from Tom.
+ (1) Add a struct, bvecq_pos, to refer to a position in a bvecq chain.
+     This is a tuple of ( bvecq pointer, slot and offset } and the position
+     struct holds (for now) a ref on the bvecq pointed to.
+
+ (2) Change unbuffered/DIO to extract the supplied user buffers into a
+     bvecq chain rather than a bio_vec[] up front.  This means that
+     netfslib then uses bvecq chains for everything.
+
+ (3) Add a folio count to the readahead_control struct and then makes
+     readahead pre-create its buffer using that count to determine how many
+     slots are required.
+
+ (4) Change netfslib to use the bvecq_pos struct to keep track of the whole
+     request buffer and various points in it where loading, dispatch and
+     collection are taking place and to also keep track of the slice given
+     to each subrequest.
+
+This was split from v11 of a larger netfslib series[1].
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next-4
+
+Thanks,
+David
+
+Changes
+=======
+ver #13)
+- Rebased on -rc6 to account for some conflicting fixes.
+- Fixed a bug in netfs_prepare_read_iterator() where comparison was being
+  made against the wrong thing when limiting a subreq's size.
+
+ver #12)
+- Split from v11 of "netfs: Keep track of folios in a segmented bio_vec[]
+  chain"[1]
+
+[1] https://lore.kernel.org/r/20260902173350.3468672-1-dhowells@redhat.com/
+
+David Howells (8):
+  mm: Make readahead store folio count in readahead_control
+  netfs: Add a function to extract from an iter into a bvecq
+  netfs: Make unbuffered/DIO read and write use bvecq
+  netfs: Add some tools for managing a position in a bvecq chain
+  netfs: Provide a func to load the readahead buffers into a bvecq chain
+  netfs: Use bvecq_pos to hold the buffer positions
+  netfs: Remove the rolling_buffer implementation
+  netfs: Remove netfs_extract_user_iter()
+
+ fs/afs/dir.c                   |   5 +-
+ fs/afs/symlink.c               |   6 +-
+ fs/cachefiles/io.c             |  12 -
+ fs/netfs/Makefile              |   1 -
+ fs/netfs/buffered_read.c       | 178 ++++++++-------
+ fs/netfs/bvecq.c               | 310 ++++++++++++++++++++++++++
+ fs/netfs/direct_read.c         |  77 +++----
+ fs/netfs/direct_write.c        |  67 +++---
+ fs/netfs/internal.h            |   4 +-
+ fs/netfs/iterator.c            | 392 ++++++++++-----------------------
+ fs/netfs/misc.c                |  18 --
+ fs/netfs/objects.c             |  16 +-
+ fs/netfs/read_collect.c        | 106 +++++----
+ fs/netfs/read_pgpriv2.c        |  87 +++++---
+ fs/netfs/read_retry.c          |  86 ++++----
+ fs/netfs/read_single.c         |  16 +-
+ fs/netfs/rolling_buffer.c      | 182 ---------------
+ fs/netfs/write_collect.c       |  55 ++---
+ fs/netfs/write_issue.c         | 166 +++++++++-----
+ fs/netfs/write_retry.c         |  61 +++--
+ include/linux/bvecq.h          | 184 ++++++++++++++++
+ include/linux/netfs.h          |  25 ++-
+ include/linux/pagemap.h        |  10 +
+ include/linux/rolling_buffer.h |  47 ----
+ include/trace/events/netfs.h   |  32 ++-
+ mm/readahead.c                 |   5 +
+ 26 files changed, 1208 insertions(+), 940 deletions(-)
+ delete mode 100644 fs/netfs/rolling_buffer.c
+ delete mode 100644 include/linux/rolling_buffer.h
+
