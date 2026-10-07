@@ -1,32 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679EF22D792;
-	Wed,  7 Oct 2026 01:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F5522D792;
+	Wed,  7 Oct 2026 01:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791335122; cv=none; b=esOdtG/YmTxJQ7f1KtNRi+VO04J/9uqRo972hwuyWufi74shIcJJK4OmsPf885eks9Ds2A1mwNRqZJvljZrzlqBZC8VAt4oC4NcTDwOEr2+7udOXD425Wz44dwQkvhTgTkeWR4JL4jk7k8mnVc6HdGvPgwOK4NYKu5wlAkH3g84=
+	t=1791335125; cv=none; b=ocZNv4Hq/i27B5wvZdsmqdBbXwrlc7ogtQ/Mq6knoc95Dk1pRwxwKWOeDYoeFzZk8Ehfwxc4UhmCwM1AAO93RsGzvxoXcuag6a8EXa+9AnEWFYu6qT4h1lJr7a1febhlTVgGJCQWAlaYR5JkpKoBz1lyaAA6HszEKj/zd0a53G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791335122; c=relaxed/simple;
-	bh=KtY9H8H7O/Cb6mcqTI+yuCnH2LoWzbIJtqmjRMEvxIo=;
+	s=arc-20240116; t=1791335125; c=relaxed/simple;
+	bh=zk7WlV4y7nKoKBosfyOVjlrcn8sZouYVTZco+0tsLQk=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IBIF7FbcOInCeUk8wE8VPXoOpjEQyjTG095pUzq34OXQEgc51AVvzHp7lI7u9NJah8ypucLWtvAtX7BK1zfMssJC0jmYx9I1H8/E4XXBhwVAzyMCwj78l5emIdjsqeyUSJ6iQFyLNvi1th/4W6HzVMabjnkF0fjDGkc8L4h4OLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMMJXWrY; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=HFDefFeVn4yd3xqptyfSMQ3idbE/oDkAHET8Gb1b5A5HyPM0EdwKWcsFTkv0Hmsl4UJVcsAS9ljDlq0GqJT1jOPztpcGDVwEd0w4hHJ1OJrE8183X6RAU2mjNvzyFthGw32qlyo4whR5BAgYcWJA15wUh61urag2KZy+N1F4wk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GT3MQzRl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMMJXWrY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BE4E1F0089C;
-	Wed,  7 Oct 2026 01:05:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GT3MQzRl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9601F0089B;
+	Wed,  7 Oct 2026 01:05:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791335121;
-	bh=9B7VDfkF9cuaiAEuwLf9hvLT6HuP7LMtIr2TzvUW/0Y=;
+	s=k20260515; t=1791335123;
+	bh=1GiWlKTJSTlyYOqlE+nE9lrWSKcGbD4+/VoTJ34E2c8=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=IMMJXWrYfqJFY5cnKKOokW4td3/qyNWzfgsJDgnHelOdSejiQ17zYTqXdC+hCj3O9
-	 ZOqwXqo+IOKsGQV2UE9C8CLL2tw+sFYMb6Ckfbgn0FUJziW8lXmDzAr23zSlpCW8Nu
-	 jYDI/N34yj8d5Dz8eGbj1uCnEFISmrBSuS2ZLucv4Tlwg/bTfLmzIz0Gqkz1Jffk81
-	 w+AF+jDjpbsPqgJBujdukYjsTTJTauSaIMiOM9A9/cfxVpOk0uUAKxCme31+SmHkUb
-	 OVwgW+kANtD6ya2wmBRM1Z0j4ProgTuSpN9P80YvowuIiGQJQSOIBAJyxNFB9jYTBj
-	 VcA2b1icgcDAw==
-Subject: Re: [PATCH net-next v16 10/15] quic: add packet number space
+	b=GT3MQzRlZa5eBO1b6nKm111+H2SAaljxS4IQ12W7ToRJ1vl+hRAa8SB1PAq5au5Vf
+	 jL9pCjMqI5C5aa/6RbAx7Q5yIMnwo+DV7rFGYoKwhChWTMkyqe/2ZgNumQTvUVZlnS
+	 NpU8zxc3XZjd3bYwrdMixcP5S4kfpO+vfij4MoQ/2HTxhYRNIbN52VDubEe4rAP0+f
+	 9XJn0isNccsTj11ZKzb3Y8VLislTHLD5zQafZAPVtoyTEzCDYaanPPuFeq1BoTT7oa
+	 MsisxjPJZjGa28jJhl/tNsAkFVfw4kb+2+NJYdtGExQPjKP7zPCQ85UGvkL+BRMtat
+	 3KLJcXJNKitzw==
+Subject: Re: [PATCH net-next v16 11/15] quic: add crypto key derivation and
+ installation
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -40,13 +41,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
-Date: Wed, 07 Oct 2026 01:05:18 +0000
-Message-ID: <179133511883.434549.1095545154530968761@kernel.org>
-In-Reply-To: =?utf-8?q?=3C4e13764a900fab1fe886a34a3c05351262b9a585=2E1791227?=
+Date: Wed, 07 Oct 2026 01:05:21 +0000
+Message-ID: <179133512119.434549.18318076229328796602@kernel.org>
+In-Reply-To: =?utf-8?q?=3Ce7412c320cae4da8e01f4f4809f92e570a999593=2E1791227?=
  =?utf-8?q?050=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3C4e13764a900fab1fe886a34a3c05351262b9a585=2E17912270?=
+References: =?utf-8?q?=3Ce7412c320cae4da8e01f4f4809f92e570a999593=2E17912270?=
  =?utf-8?q?50=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Low
+X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -56,112 +57,115 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found more severe
-issue(s) in other patches of this series. This mail is only an FYI, in case
-you want to address the nit picks below when you respin.
+Thank you for your contribution! Sashiko AI review found 2 potential
+issue(s) to consider.
 
-Low priority / nit picks for your consideration:
+Critical: 0 · High: 0 · Medium: 1 · Low: 1
 
-- [Low] The commit message of "quic: add packet number space" does not
-  mention ECN anywhere, yet much of the new API is ECN accounting and…
-- [Low] The pn_map layout comment above struct quic_pnspace in
-  net/quic/pnspace.h gives the size-based trigger for advancing the map…
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
+
+- [Medium] quic_crypto_keys_derive_and_install() (net/quic/crypto.c) sets
+  `crypto->rx_fails[phase] = 0` every time it installs RX keys.
+- [Low] Two comments in net/quic/crypto.c do not match the code.
 
 --
 
-quic: add packet number space
+quic: add crypto key derivation and installation
 
-This patch adds struct quic_pnspace to track per packet number space
-state such as next PN, inflight bytes, loss and ACK timestamps, plus a
-received-PN bitmap. It provides helpers to check and mark received packet
-numbers and to build gap ACK blocks for ACK frames, with APP and EARLY
-sharing one packet number space.
+This patch adds the quic_crypto component. It derives and installs QUIC
+packet protection keys for the Initial, Handshake, 0-RTT and 1-RTT
+levels. Its helpers cover initial key installation, transform allocation,
+traffic secret installation, key updates, and secret derivation for
+stateless reset tokens and session resumption, and a new
+quic_sock_destruct() frees the crypto state.
 
-> It maintains the next packet number to assign, tracks the total length of
-> frames currently in flight, and records the time when the next packet may
-> be considered lost. It also keeps track of the largest acknowledged packet
-> number, the time it was acknowledged, and when the most recent ack
-> eliciting packet was sent. These fields are useful for loss detection,
-> RTT estimation, and congestion control.
-
-[Severity: Low]
-
-This isn't a bug, but the commit message never mentions ECN. A good part
-of the new API is ECN accounting and validation.
-
-The patch adds:
-
-- the ecn_count[QUIC_ECN_DIR_MAX][QUIC_ECN_MAX] array in struct
-  quic_pnspace
-- the QUIC_ECN_LOCAL/PEER/ACKED enum
-- the helpers quic_pnspace_inc_ecn_local(), quic_pnspace_inc_ecn_acked(),
-  quic_pnspace_reset_ecn_acked(), quic_pnspace_has_ecn_local(),
-  quic_pnspace_set_ecn_peer() and quic_pnspace_validate_ecn()
-
-quic_pnspace_validate_ecn() implements the validation rules from
-rfc9000#section-13.4.2.1.
-
-The ECN history only appears in the changelog below the --- line, and
-that part is dropped when the patch is applied.
-
-Could a sentence be added along the lines of: "It also tracks
-per-codepoint ECN counts (locally received, peer-reported, newly acked)
-and provides helpers to validate peer ECN counts per
-rfc9000#section-13.4.2.1."?
-
-> diff --git a/net/quic/pnspace.h b/net/quic/pnspace.h
+> diff --git a/net/quic/crypto.c b/net/quic/crypto.c
 > new file mode 100644
-> index 0000000000000..67981d5f1849c
+> index 0000000000000..4bb6acea5112a
 > --- /dev/null
-> +++ b/net/quic/pnspace.h
+> +++ b/net/quic/crypto.c
+> @@ -0,0 +1,587 @@
 
 [ ... ]
 
-> +/* Packet Number Map (pn_map) Layout:
-> + *
-> + *     min_pn_seen -->++-----------------------+---------------------+---
-> + *         base_pn -----^   last_max_pn_seen --^       max_pn_seen --^
-> + *
-> + * Map Advancement Logic:
-> + *   - min_pn_seen = last_max_pn_seen;
-> + *   - base_pn = first zero bit after last_max_pn_seen;
-> + *   - last_max_pn_seen = max_pn_seen;
-> + *   - last_max_pn_time = max_pn_time;
-> + *
-> + * Conditions to Advance pn_map:
-> + *   - (max_pn_time - last_max_pn_time) >= max_time_limit, or
-> + *   - (max_pn_seen - last_max_pn_seen) > QUIC_PN_MAP_LIMIT
+> +/* Derive and install reception (RX) or transmission (TX) packet protection
+> + * keys for the current key phase.  This installs AEAD protection key, IV, and
+> + * optionally header protection key.
+> + */
 
 [Severity: Low]
+This isn't a bug, but this comment says the keys are installed "for the
+current key phase". The function takes an explicit phase argument, and
+quic_crypto_key_update() calls it with !phase, which is the next phase.
 
-Does the second condition match quic_pnspace_mark()? The code limits
-the reference point to base_pn:
+That is also the case where header protection key derivation is skipped:
 
-net/quic/pnspace.c:quic_pnspace_mark() {
-    ...
-	last_max_pn_seen = min_t(s64, space->last_max_pn_seen, space->base_pn);
-	last_max_pn_time = space->last_max_pn_time;
-	if (space->max_pn_time < last_max_pn_time + space->max_time_limit &&
-	    space->max_pn_seen <= last_max_pn_seen + QUIC_PN_MAP_LIMIT)
-		return 0;
-    ...
-}
+	if (crypto->key_phase == phase)
+		hp = quic_data(&hp_k, hp_key, keylen);
 
-So the map advances once max_pn_seen is more than QUIC_PN_MAP_LIMIT past
-min(last_max_pn_seen, base_pn).
+There is a similar mismatch in quic_crypto_set_cipher(). The comments say:
 
-base_pn can be lower than last_max_pn_seen. During an advance,
-quic_pnspace_move() only moves base_pn to the first zero bit after the
-old last_max_pn_seen. Then last_max_pn_seen is set to max_pn_seen.
+	/* Allocate AEAD and HP transform for each RX key phase. */
+	...
+	/* Allocate AEAD and HP transform for each TX key phase. */
 
-If a packet between those two points is missing, base_pn stays below
-last_max_pn_seen. In that state the code advances earlier than this
-comment says.
+But only one HP skcipher is allocated per direction (rx_hp_tfm and
+tx_hp_tfm), and both phases share it. Only the AEAD tfms are per phase.
 
-This base_pn limit is what keeps pn - base_pn inside the
-QUIC_PN_MAP_SIZE bitmap. Could the comment be updated to show it, for
-example (max_pn_seen - min(last_max_pn_seen, base_pn)) >
-QUIC_PN_MAP_LIMIT?
+Could these comments be updated to match the code?
+
+> +static int quic_crypto_keys_derive_and_install(struct quic_crypto *crypto,
+> +					       bool rx, u8 phase)
+> +{
+
+[ ... ]
+
+> +	if (rx) {
+> +		crypto->rx_fails[phase] = 0;
+
+[Severity: Medium]
+Can resetting rx_fails[phase] here let the connection go past the AEAD
+integrity limit?
+
+RFC 9001 section 6.6 says endpoints must count packets that fail
+authentication across all keys used in the connection. Once that total
+goes over the integrity limit, the endpoint has to close the connection
+with AEAD_LIMIT_REACHED.
+
+Here the counter is split by key phase, and every RX key installation
+zeroes it, including each key update:
+
+quic_crypto_key_update()
+    quic_crypto_keys_derive_and_install(crypto, true, !phase)
+        crypto->rx_fails[phase] = 0;
+
+crypto.h also describes rxlimit as "Max failures decrypted per key".
+
+Later in the series, "quic: add crypto packet encryption and decryption"
+checks the limit in quic_crypto_decrypt() like this:
+
+	if (++crypto->rx_fails[cb->key_phase] >= crypto->cipher->rxlimit)
+		err = -EKEYEXPIRED;
+
+The later patches do not change how the counter works.
+
+An off-path attacker who knows the connection ID could send forged
+short-header packets until one phase counter is just below rxlimit. The
+next legitimate key update would then reset that counter to zero.
+
+With AES-CCM the limit is 2^21.5. A busy connection also has to update
+its keys about every 2^21.5 sent packets, so the attacker's total
+forgery budget grows with each key update. Splitting the count by phase
+also allows about twice rxlimit per key epoch.
+
+Should rx_fails be one connection-wide counter that key installation does
+not reset?
+
+[ ... ]
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1791227050.git.lucien.xin%40gmail.com
