@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F5522D792;
-	Wed,  7 Oct 2026 01:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5046322D792;
+	Wed,  7 Oct 2026 01:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791335125; cv=none; b=ocZNv4Hq/i27B5wvZdsmqdBbXwrlc7ogtQ/Mq6knoc95Dk1pRwxwKWOeDYoeFzZk8Ehfwxc4UhmCwM1AAO93RsGzvxoXcuag6a8EXa+9AnEWFYu6qT4h1lJr7a1febhlTVgGJCQWAlaYR5JkpKoBz1lyaAA6HszEKj/zd0a53G8=
+	t=1791335127; cv=none; b=bLFKFZpA1mHSxWxEwOyNH0MOhn6DZCpeqddQwlFZ120249vj/+ocor/AQqq3feUHhRPBbfPLMBVcDgeDUbz6SnlEqSq4ijN6AJNxic9N6KYqbPsjhAdY5wwAO8RqfeTeB/0LjUIB0hTqreQ1J5X3KzBKINhJ7vNbr5b89JkEWvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791335125; c=relaxed/simple;
-	bh=zk7WlV4y7nKoKBosfyOVjlrcn8sZouYVTZco+0tsLQk=;
+	s=arc-20240116; t=1791335127; c=relaxed/simple;
+	bh=C7KKwOZ2bUCd6iV3VCE/5t7zpDAN2WMijgPvdjcdeug=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HFDefFeVn4yd3xqptyfSMQ3idbE/oDkAHET8Gb1b5A5HyPM0EdwKWcsFTkv0Hmsl4UJVcsAS9ljDlq0GqJT1jOPztpcGDVwEd0w4hHJ1OJrE8183X6RAU2mjNvzyFthGw32qlyo4whR5BAgYcWJA15wUh61urag2KZy+N1F4wk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GT3MQzRl; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:MIME-Version; b=rNUkYZNk8iz9YfXcZjZMlGmH7usWmRPdYiO0QtwXPJqeMn4WfGhTmSmlZzl+jJUlDP3IC36PffPa5ZeBVBlRp7wJExVEgfnWFp7Jcp6TJsHSha1Smp34ktfxnVgcVmFEYHVjj1IKH/rd2FcKeFZHE+S4GVVE2xOP5QOvKExJ7cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BeS2RnNo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GT3MQzRl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E9601F0089B;
-	Wed,  7 Oct 2026 01:05:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BeS2RnNo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C30F1F0089C;
+	Wed,  7 Oct 2026 01:05:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791335123;
-	bh=1GiWlKTJSTlyYOqlE+nE9lrWSKcGbD4+/VoTJ34E2c8=;
+	s=k20260515; t=1791335126;
+	bh=8KJgCnX5dOaV2D8339K10TtV2WrhG/+Ka5C8a4Fr7EE=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=GT3MQzRlZa5eBO1b6nKm111+H2SAaljxS4IQ12W7ToRJ1vl+hRAa8SB1PAq5au5Vf
-	 jL9pCjMqI5C5aa/6RbAx7Q5yIMnwo+DV7rFGYoKwhChWTMkyqe/2ZgNumQTvUVZlnS
-	 NpU8zxc3XZjd3bYwrdMixcP5S4kfpO+vfij4MoQ/2HTxhYRNIbN52VDubEe4rAP0+f
-	 9XJn0isNccsTj11ZKzb3Y8VLislTHLD5zQafZAPVtoyTEzCDYaanPPuFeq1BoTT7oa
-	 MsisxjPJZjGa28jJhl/tNsAkFVfw4kb+2+NJYdtGExQPjKP7zPCQ85UGvkL+BRMtat
-	 3KLJcXJNKitzw==
-Subject: Re: [PATCH net-next v16 11/15] quic: add crypto key derivation and
- installation
+	b=BeS2RnNojatHBpo44iV6zdImr1QnDsrLyfKVpx4czeUk5gaCCf14EWzGTZx4MHWyD
+	 4hhd3JuIKYhvnvdz9P1J5d4zbfbs0WHUJxTcSqAW2UrAL5mG0tYP1wyUaO3mo0ZyW7
+	 oAEoZ2nhBx5F90eIvA928Z7YAaVkXEA46M/AYxwz+XLp1V+b1CgP6p3rj9MWiyikMu
+	 oweT6DmQaKUsxOuKE2sS1LKbdv1XApnxpLJARfIFeT6LnK80br/7z+xHpcIrro+WNQ
+	 cb7eTScMvnMrin4vF+/vMj1rNyRy4FZK1v969P2o15vQo1V4G3BUvHaNjIV9/SKogf
+	 65pfttdpunGiQ==
+Subject: Re: [PATCH net-next v16 12/15] quic: add crypto packet encryption and
+ decryption
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -41,11 +41,11 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
-Date: Wed, 07 Oct 2026 01:05:21 +0000
-Message-ID: <179133512119.434549.18318076229328796602@kernel.org>
-In-Reply-To: =?utf-8?q?=3Ce7412c320cae4da8e01f4f4809f92e570a999593=2E1791227?=
+Date: Wed, 07 Oct 2026 01:05:23 +0000
+Message-ID: <179133512379.434549.1011079085204348692@kernel.org>
+In-Reply-To: =?utf-8?q?=3C4dc3c5117810571e41211781bd0280510460e4da=2E1791227?=
  =?utf-8?q?050=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3Ce7412c320cae4da8e01f4f4809f92e570a999593=2E17912270?=
+References: =?utf-8?q?=3C4dc3c5117810571e41211781bd0280510460e4da=2E17912270?=
  =?utf-8?q?50=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
 X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
@@ -57,10 +57,10 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 2 potential
+Thank you for your contribution! Sashiko AI review found 5 potential
 issue(s) to consider.
 
-Critical: 0 · High: 0 · Medium: 1 · Low: 1
+Critical: 0 · High: 0 · Medium: 2 · Low: 3
 
 If you believe none of the issues are legitimate, please reply to each
 issue of Medium severity or higher and explain why the AI is wrong.
@@ -68,104 +68,249 @@ If any of them are legitimate and you plan to respin, please let patchwork
 know by including "pw-bot: cr" as a separate line at the end of your reply
 (one such reply per series is enough).
 
-- [Medium] quic_crypto_keys_derive_and_install() (net/quic/crypto.c) sets
-  `crypto->rx_fails[phase] = 0` every time it installs RX keys.
-- [Low] Two comments in net/quic/crypto.c do not match the code.
+- [Medium] The AEAD integrity limit that this patch enforces does not
+  count failures across the whole connection, as RFC 9001 §6.6 requires.
+- [Medium] quic_crypto_generate_token() writes the raw 64-bit
+  quic_ktime_get_us() timestamp (ktime_get(), i.e. CLOCK_MONOTONIC in µs…
+- [Low] The kernel-doc of quic_crypto_verify_token() says "Return: 0 if
+  the token is valid, -EINVAL if invalid, or another negative error…
+- [Low] quic_crypto_decrypt() counts every non-EINPROGRESS failure of
+  quic_crypto_payload_protect() toward the AEAD integrity limit, not…
+- [Low] async_pending[] is used as a quiescence check before re-keying a
+  tfm, but both sides use unordered atomics.
 
 --
 
-quic: add crypto key derivation and installation
+quic: add crypto packet encryption and decryption
 
-This patch adds the quic_crypto component. It derives and installs QUIC
-packet protection keys for the Initial, Handshake, 0-RTT and 1-RTT
-levels. Its helpers cover initial key installation, transform allocation,
-traffic secret installation, key updates, and secret derivation for
-stateless reset tokens and session resumption, and a new
-quic_sock_destruct() frees the crypto state.
+This patch adds AEAD payload protection and QUIC header protection for
+TX and RX via quic_crypto_encrypt() and quic_crypto_decrypt(). It also
+adds helpers to compute the Retry integrity tag, and to generate and
+verify Retry/address validation tokens.
 
 > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
-> new file mode 100644
-> index 0000000000000..4bb6acea5112a
-> --- /dev/null
+> index 4bb6acea5112a..fa326cc9266a8 100644
+> --- a/net/quic/crypto.c
 > +++ b/net/quic/crypto.c
-> @@ -0,0 +1,587 @@
+> @@ -270,6 +271,484 @@ ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] = {
 
 [ ... ]
 
-> +/* Derive and install reception (RX) or transmission (TX) packet protection
-> + * keys for the current key phase.  This installs AEAD protection key, IV, and
-> + * optionally header protection key.
-> + */
-
-[Severity: Low]
-This isn't a bug, but this comment says the keys are installed "for the
-current key phase". The function takes an explicit phase argument, and
-quic_crypto_key_update() calls it with !phase, which is the next phase.
-
-That is also the case where header protection key derivation is skipped:
-
-	if (crypto->key_phase == phase)
-		hp = quic_data(&hp_k, hp_key, keylen);
-
-There is a similar mismatch in quic_crypto_set_cipher(). The comments say:
-
-	/* Allocate AEAD and HP transform for each RX key phase. */
-	...
-	/* Allocate AEAD and HP transform for each TX key phase. */
-
-But only one HP skcipher is allocated per direction (rx_hp_tfm and
-tx_hp_tfm), and both phases share it. Only the AEAD tfms are per phase.
-
-Could these comments be updated to match the code?
-
-> +static int quic_crypto_keys_derive_and_install(struct quic_crypto *crypto,
-> +					       bool rx, u8 phase)
+> +int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *skb,
+> +			gfp_t gfp)
 > +{
 
 [ ... ]
 
-> +	if (rx) {
-> +		crypto->rx_fails[phase] = 0;
+> +	phase = cb->key_phase;
+> +	if (phase != crypto->key_phase && !crypto->key_pending) {
+> +		if (!crypto->send_ready) /* Not ready for key update. */
+> +			return -EINVAL;
+> +		if (!cb->backlog) /* Key update requires process context. */
+> +			return -EKEYREVOKED;
+> +		/* Cannot do key update while async crypto is in progress. */
+> +		if (unlikely(atomic_read(&crypto->async_pending[phase])))
+> +			return -EBUSY;
+> +		err = quic_crypto_key_update(crypto); /* Perform key update. */
 
-[Severity: Medium]
-Can resetting rx_fails[phase] here let the connection go past the AEAD
+[Severity: Low]
+Is the ordering here strong enough for async_pending[] to work as a
+quiescence check before re-keying?
+
+quic_crypto_done() signals completion with a plain atomic_dec(). Per
+Documentation/atomic_t.txt, that operation is unordered:
+
+    atomic_dec(&crypto->async_pending[cb->key_phase]);
+
+This side reads the counter with a relaxed atomic_read(). When it sees 0,
+it calls quic_crypto_key_update(), which rewrites the key schedule through
+crypto_aead_setkey().
+
+Nothing orders the completing CPU's loads of the key schedule during the
+AEAD operation before its decrement. The socket lock does not cover this,
+because the decrement happens before cb->crypto_done() takes the lock
+again.
+
+On weakly ordered architectures, can the re-keying CPU see 0 and overwrite
+the key while the completing request's reads are still unordered? Would
+atomic_dec_return_release(), or smp_mb__before_atomic() plus atomic_dec(),
+in quic_crypto_done() paired with atomic_read_acquire() here be needed?
+
+> +		if (err) {
+> +			cb->errcode = QUIC_TRANSPORT_ERROR_KEY_UPDATE;
+> +			return err;
+> +		}
+> +		cb->sync = 1;
+> +		cb->key_update = 1; /* Mark packet as triggering key update. */
+> +	}
+> +
+> +	err = quic_crypto_payload_protect(crypto, skb, false, gfp);
+> +	if (err) {
+> +		if (err == -EINPROGRESS)
+> +			return err;
+> +		/* When using the old keys can not decrypt the packets, the
+> +		 * peer might start another key_update. Thus, clear the last
+> +		 * key_pending so that next packets will trigger the new
+> +		 * key-update.
+> +		 */
+> +		if (crypto->key_pending && phase != crypto->key_phase) {
+> +			crypto->key_pending = 0;
+> +			crypto->key_update_time = 0;
+> +			crypto->key_update_send_time = 0;
+> +		}
+> +		goto err;
+> +	}
+
+[Severity: Low]
+Should every quic_crypto_payload_protect() failure count toward the AEAD
 integrity limit?
 
-RFC 9001 section 6.6 says endpoints must count packets that fail
-authentication across all keys used in the connection. Once that total
-goes over the integrity limit, the endpoint has to close the connection
-with AEAD_LIMIT_REACHED.
+All of these reach the err label and increment rx_fails[cb->key_phase]:
 
-Here the counter is split by key phase, and every RX key installation
-zeroes it, including each key update:
+  - -ENOMEM from quic_crypto_aead_mem_alloc()
+  - a negative skb_to_sgvec() result
+  - on the resume path, any async engine error delivered in
+    cb->crypto_err
 
-quic_crypto_key_update()
-    quic_crypto_keys_derive_and_install(crypto, true, !phase)
-        crypto->rx_fails[phase] = 0;
+RFC 9001 section 6.6 counts only received packets that fail
+authentication.
 
-crypto.h also describes rxlimit as "Max failures decrypted per key".
-
-Later in the series, "quic: add crypto packet encryption and decryption"
-checks the limit in quic_crypto_decrypt() like this:
-
-	if (++crypto->rx_fails[cb->key_phase] >= crypto->cipher->rxlimit)
-		err = -EKEYEXPIRED;
-
-The later patches do not change how the counter works.
-
-An off-path attacker who knows the connection ID could send forged
-short-header packets until one phase counter is just below rxlimit. The
-next legitimate key update would then reset that counter to zero.
-
-With AES-CCM the limit is 2^21.5. A busy connection also has to update
-its keys about every 2^21.5 sent packets, so the attacker's total
-forgery budget grows with each key update. Splitting the count by phase
-also allows about twice rxlimit per key epoch.
-
-Should rx_fails be one connection-wide counter that key installation does
-not reset?
+Under sustained allocation failure, could a legitimate connection end up
+with -EKEYEXPIRED (AEAD_LIMIT_REACHED) instead of just dropping packets?
 
 [ ... ]
+
+> +	return 0;
+> +err:
+> +	if (++crypto->rx_fails[cb->key_phase] >= crypto->cipher->rxlimit)
+> +		err = -EKEYEXPIRED;
+> +	return err;
+> +}
+
+[Severity: Medium]
+Does this enforce the integrity limit across the whole connection, as
+RFC 9001 section 6.6 requires?
+
+The comment on the QUIC_AEAD_RX_* constants cites that section. It says
+endpoints MUST count packets that fail authentication during the lifetime
+of a connection, across all keys.
+
+Two things seem to weaken the limit here.
+
+First, cb->key_phase comes from the key bit after header protection is
+removed, and the packet has not been authenticated yet. Forged
+short-header packets therefore spread across both rx_fails[] slots, which
+allows about 2 * rxlimit forgeries.
+
+Second, quic_crypto_keys_derive_and_install() resets the slot on every RX
+key install. That includes each key update reached through
+quic_crypto_decrypt()->quic_crypto_key_update():
+
+net/quic/crypto.c:quic_crypto_keys_derive_and_install() {
+    ...
+	if (rx) {
+		crypto->rx_fails[phase] = 0;
+    ...
+}
+
+For AES-CCM (rxlimit 2965820, about 2^21.5), an off-path sender would get
+roughly (2 + number of key updates) * rxlimit forgery attempts.
+
+Would a single connection-wide failure counter, not indexed by key phase
+and not reset on key install, be more appropriate? tx_count could stay
+per key.
+
+[ ... ]
+
+> @@ -560,6 +1039,234 @@ int quic_crypto_initial_keys_install(struct quic_crypto *crypto,
+
+[ ... ]
+
+> +int quic_crypto_generate_token(struct quic_crypto *crypto, void *addr,
+> +			       u32 addrlen, struct quic_conn_id *conn_id,
+> +			       u8 *token, u32 *tlen)
+> +{
+> +	u8 *token_buf, *p, flag = *token;
+> +	u64 ts = quic_ktime_get_us();
+> +	u32 len, tslen = sizeof(ts);
+> +	int err;
+> +
+> +	len = sizeof(flag) + addrlen + tslen + conn_id->len + QUIC_TAG_LEN;
+> +	token_buf = kmalloc(len, GFP_KERNEL);
+> +	if (!token_buf)
+> +		return -ENOMEM;
+> +
+> +	p = token_buf;
+> +	p = quic_put_int(p, flag, sizeof(flag));
+> +	p = quic_put_data(p, addr, addrlen);
+> +	p = quic_put_int(p, ts, tslen);
+> +	quic_put_data(p, conn_id->data, conn_id->len);
+
+[Severity: Medium]
+Does this expose the server's uptime to any client that receives a token?
+
+ts is the raw ktime_get() value, in microseconds since boot.
+quic_crypto_token_protect() only authenticates the flag, address and
+timestamp as associated data. It does not encrypt them:
+
+	aead_request_set_ad(req, adlen);
+	aead_request_set_crypt(req, sg, sg, len - adlen - extra, nonce);
+
+Tokens are sent to unauthenticated clients in Retry packets and NEW_TOKEN
+frames, so the monotonic clock can be read from them in plaintext. TCP
+avoids a similar leak with per-connection timestamp offsets
+(secure_tcp_ts_off).
+
+The v14 change moved the timestamp from the encrypted part into the AAD
+so it could be used for the nonce. That change appears to have introduced
+this exposure.
+
+The serialized address is also sent in plaintext. For IPv6,
+quic_v6_get_msg_addrs() in net/quic/family.c sets:
+
+	sa->v6.sin6_scope_id = skb->skb_iif;
+
+Would the server's ingress ifindex end up in the token as well?
+
+[ ... ]
+
+> +/* Validate a Retry or address validation token.
+> + *
+> + * Decrypts and authenticates the token, checks the client address and validates
+> + * the timestamp against the timeout selected by the token flag. For a Retry
+> + * token, extracts the original destination connection ID.
+> + *
+> + * Return: 0 if the token is valid, -EINVAL if invalid, or another negative
+> + * error code.
+> + */
+> +int quic_crypto_verify_token(struct quic_crypto *crypto, void *addr,
+> +			     u32 addrlen, struct quic_conn_id *conn_id,
+> +			     u8 *token, u32 len)
+> +{
+
+[ ... ]
+
+> +	err = quic_crypto_token_protect(crypto, token_buf, len,
+> +					sizeof(flag) + addrlen + tslen, false);
+> +	if (err)
+> +		goto out;
+> +
+> +	err = -EINVAL;
+
+[Severity: Low]
+The kernel-doc says -EINVAL is returned for an invalid token. Does a
+forged or tampered token actually return -EINVAL?
+
+A tag mismatch makes crypto_aead_decrypt() return -EBADMSG. That value is
+returned unchanged through the goto out above, before err is set to
+-EINVAL. A token key that was never set would give -ENOKEY in the same
+way.
+
+Only the length precheck and the address, timestamp and ODCID length
+checks return -EINVAL.
+
+Should the comment be updated, or should authentication failures be
+mapped to -EINVAL?
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1791227050.git.lucien.xin%40gmail.com
