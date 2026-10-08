@@ -1,78 +1,74 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-oo2-f11.google.com (mail-oo2-f11.google.com [74.125.231.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86454E2F28
-	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 15:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F873AAF5E
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 17:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.231.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791473184; cv=none; b=t27vc+z1ebt3zNt4/rCv8OtVRcFEthcx8J+qisTTgp6TxHr1Kl46YuqvOtunP2tq5RkMxNPSuQWBl8WCTue++P0T3Tt5PTwtXhxwU/UMdhG49p0W5e6wrSXdfICC1KzVw9NO9BenEKqLoHCxiz4oDgUR1Qdjub/f5dcxph9JY5o=
+	t=1791479152; cv=none; b=fKlgbMvqwMv/xbIEThvngAMeqJT23unVBUfUM9/B8ln8lgsF+Mjyih1bkijM2EU0m0Mbijrp3LWL2ZjxmSSrfpD6vpmyYBMJPWtG5RPFL/aKZZBUQBqXnoUVssUvm2izBPM46LjsRYcDohanDbqaz5BAkkymtqHEz3U2mSA3V4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791473184; c=relaxed/simple;
-	bh=BnX+tW917e2ep0AD06iDELoUpJb1f9PtjJfaF1/h/ME=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ogC9KN/ZGAdqvHA9p05tCy5fZBv3Ey3+sUlFGiSE20me91tYxPSV1QY7F9tsBHOT6LqIP+xiZHrmjwn/0ygO7Flh/B/ZkAqAF0j5d5tncx7CnOKoyoNG6Kw4EFT3uWAADnN7E9eFLwdMqh38A+0H9SCTicfYDQB1i6Na0H0AdZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtppJKn6; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1791479152; c=relaxed/simple;
+	bh=SXbUN2sTxUryiOzRpiJL6R9ofWBCAXsss9KIoIP3yOo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=inLI19THFvVpDs0kVNPrjo1/6O9VfOgl4eGjiUAs2ns0VOKtl79Nn8gSlVTJxmv0KKmvdgr5KJd5iC0aQ6syMIHmfOhVA7RDObUVGdItJD8oR9xMWHNA38VHnm3mZ6y7+xiRd8kesCzQX7DV6M1YmGRTyP7tFSGZP5wraP7OaSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlaFaf/y; arc=none smtp.client-ip=74.125.231.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtppJKn6"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3a6e6f80d64so149124a91.3
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 08:26:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlaFaf/y"
+Received: by mail-oo2-f11.google.com with SMTP id 46e09a7af769-82890dea412so1473318a34.0
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 10:05:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791473170; x=1792077970; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=W6dQo+XOFZwjP4FilzjIvU+VBwZHW7Mw0WgQYDNHew8=;
-        b=KtppJKn6juoG7WHPkz012cDyRd7omb/Vte4rzkJMPaCe7k4LAo72HoSfiRMJI1oV+5
-         gcOHZdbXUiiL5qNB/HlZ14bKcdk0xP9fGJitpGzoS5hv51rGdrtekz+tENQfvBX8Ck1c
-         tP0o8FO3E/UsuhnhsLODzjbrLAnbMi11/45MMMF44Y+xU81TBx5yRMSyEcidnIXyTxfG
-         H8GzWoHK34TbJt9Uz8zz+Add1MeaYg0P65y1l0zAlYEf3SPZIKSZm/0CYVbMIqmPbMgY
-         bP4WD3HIH0BcSgqJpA+/scbIrcIggLI+6cN6nKbsspBN5O+wditVNgK/AHY23qzcWaEy
-         p1dg==
+        d=gmail.com; s=20251104; t=1791479150; x=1792083950; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=mDzT7rRLBlLl1SvCaZ6GZFdRqjVzzQ2BxwbcnMx0rc0=;
+        b=XlaFaf/y9LEMd0+vtpF54qmy7VJUD5MA5Zb6bYkJkX+E2QKQbWQEgZDYhmcgOjz9Vp
+         lL1p5iOt3lZ7vxHqUjAyZEKC7+/184Emb9HkYZ1sO9xqRdcYSb/1a3c2QW6OrrtR8WmH
+         N3g8YfLIvtJwG7WYZrCUZ4uZ1IRwLxyYgHxF2nL88Fk6DCHPZZj+Ljrv+XvhliQF06Lh
+         ofGNyUW1R1jBMW7AVa3SFjNYCGIXNeA5x3liE6PVDvSY2S3kA9caw3KcMLZPr+TXIt8e
+         ItnYc21e8/WOOe6ZG4mXuvtHU93bG5dvTmhBFDcvGCWSmglMXaU4gl4CCETthwb6Lq4Q
+         l4Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791473170; x=1792077970;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=W6dQo+XOFZwjP4FilzjIvU+VBwZHW7Mw0WgQYDNHew8=;
-        b=SPoidHM8dYCN4iFCDetlPu4b3XmpP27JflGz6NBfPL+vumF3t453c3ulXN63zc0xS7
-         lxrlWtRfN3z56LfK/NtZYdm0h/ilYxCqG2C0C0i/l2yT7pkIEUCf4Zer7YLt/KnmL1w6
-         wiRfIiB+soVX4WD0Yc7kFmgyAov0JTuhNx926FGGC9edTDkM0r8okulz/0GvXFMi/s6o
-         fk+uUB6dce9IuhTX4b9ILqS+r0I90m91HqG/C5/T4RW0CmlGOQPoiWzsmnmczfnRTMYF
-         wjEIyjhWVHp+nOd9B8wwId2NhF1qljUkOa1sE5fOBNboUmjJdrVP/nKLVZvmVY1ql609
-         UyPg==
-X-Forwarded-Encrypted: i=1; AKwUvBwxPXnLfjNzANKeqLgj3/Wu8fr08MHgW65oyY3aJ/Qh7O/RpvGW9IIc8cWqpaVqx0BaOgXM5MmlucWQ@vger.kernel.org
-X-Gm-Message-State: AFq9FYJBX9JDNUERdiqrKQatwXFBxpdMNMhqGHikA/Sx12RIaR8gFYcO
-	o0ua/SGyNo2ASTVYgleFth1ZPbbrQRfuYzpQcdBUrOY7RGw7H+je6KbL
-X-Gm-Gg: AYBFou24KQJN9TV4apGp4I4Yz2fvzU7q2cT/kSAT9qCQKJQ96abD6e8HG4/mgMtRcir
-	WG7cTfXiL/bKcT5selfZY2c/rWwkPgy/m7vBrZeBmC9pmbzGId2HQyySqRL0/ut/xD6ciY72gkj
-	QPJMHz7/OmEik6uf4hZYyTmPWCY06HMDNmMWHHsdAeuSqA1BWCkkdI0gIWPRt2I7ZFBhdl3INWT
-	PO+R+jMflqWf511hshuiH0YulkjxHLSX7dN4iPizjODZI7R9v8nUD0zxUii4RIXqseUrVM6qF09
-	n76A+M9S9tz26doODZMuTnzpXaV7I8uZzpjP3uzk2SaLD/wnMjUnK1fi/h/VEgb+HzwQcxzwBC6
-	RDpwDc+dM3nJll+Vh1wVU7rgH74uim2fwSSDPYr63O2f2ULvdl27+4PllFrhXScS8kzYYRmJkNo
-	+KYGTSe3jpZ8zhNfXFnNOD0/J2Lje2XjdiN+YGXp1DcXFG5cUtIYOWPcsvGLiYTkw=
-X-Received: by 2002:a17:90b:1809:b0:3a0:bcc8:1549 with SMTP id 98e67ed59e1d1-3aa9a437f1emr4109382a91.6.1791473165176;
-        Thu, 08 Oct 2026 08:26:05 -0700 (PDT)
-Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3a9f1c17b63sm5554792a91.12.2026.10.08.08.26.02
+        d=1e100.net; s=20260707; t=1791479150; x=1792083950;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=mDzT7rRLBlLl1SvCaZ6GZFdRqjVzzQ2BxwbcnMx0rc0=;
+        b=WV1pcFSo7J6nKseokyhEDAcYKaFBbN61+jslgH8ZkEdUGZCZA1FMWMSDCDMU8Hrtvj
+         jNkKho10Wxor/a0JUiPOIGt7fD2j2e/o29rrQ4Ot0Jo4AalNfDRya4ZFqotYb3khEuth
+         IeTq0oxwh9xzSo7hTm0c3f3gd35hBKwE3RLGNALSpmXnwGnNM9duibzTO3UTjWYC8s3L
+         KKPTVThtRczzllyUhLz4s4WE0d5VWKeJnO93/97aQ3fiwncAD/1Tuzg+ahvFO0J/pw4m
+         kZp/62iB7v8H2V2eXtZyJSaEfZ9KEtvqWzOuhYpZKCww93jVvSfk9q6f0DZMao6Moh93
+         FD6w==
+X-Gm-Message-State: AFuF++ksUSuu5P+sEKSaoMKKfwWoIbeYfZfAwJnxFhQ1WfcXn2MNNPOY
+	t3wgw7GXr2ZMuarnvTn+H3bYRgWlMNzpKEn3XYdsyTFbyqO7cOnzvrcD
+X-Gm-Gg: AYBFou2UtBiqco7Uc+GXrfu2mlOb4mEml/ly5xsQdzxYERR2aY/It+Xgz6s7l0E8BuZ
+	HdkuF/kK/usj62q+nqOs2vD0QEh/xaOsHIPz0GEBBNbti3wwtwJBpA33t3xiSUI1QMTgQrgkgej
+	r8jG4Jggd/uQBVPt0Kh5O3N9MGct/c26imV5R0FaJoFosgcAVqqMPrHGVcwYMU2XD3ibRWEb1vw
+	bhtwGn2nPg6KMSG08qWQ6GrjUJZL0h+CZv0eELZmK0pLtbER51WC7LWL73hLlMS09vSfYJArMYl
+	Co/QYEXL2QXDWx7Mvz7kGiqf3Xk+D43T0f10HUSCL4+L4FpX6sT0XuKXDJXSEECWJV0m8/JaN/o
+	FCH7hdS3ZVAJoegShKcLTN5W2qy2DX/7IEoXGcr9nxEqmD7x9vc1/qImmGuT9BO2tYsUP8Og0Gu
+	jLBZsgzOVXG9L4X2ThhU3Dha+09n/ynjlYzGvPILIXmaxKVbNocFxKZSZIlXn5DoVp0H1zXpEog
+	SSlRVVisOCk/AX7sVGpoqme24VQju8V3MhbRkLsXQ8CtD6J
+X-Received: by 2002:a05:6830:81e7:b0:822:e9bf:6445 with SMTP id 46e09a7af769-82acfeb2c60mr6938276a34.9.1791479149825;
+        Thu, 08 Oct 2026 10:05:49 -0700 (PDT)
+Received: from localhost.localdomain ([117.88.121.66])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-82fc8873349sm131411a34.13.2026.10.08.10.05.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Oct 2026 08:26:04 -0700 (PDT)
-From: DaeMyung Kang <charsyam@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Thu, 08 Oct 2026 10:05:49 -0700 (PDT)
+From: Henry Martin <bsdhenrymartin@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	linux-cifs@vger.kernel.org,
+	Gael Blivet <gael.blivet@gmail.com>
+Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	DaeMyung Kang <charsyam@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/3] ksmbd: preserve unreadable named streams on open
-Date: Fri,  9 Oct 2026 00:25:37 +0900
-Message-ID: <20261008152537.4147299-4-charsyam@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261008152537.4147299-1-charsyam@gmail.com>
-References: <20261008152537.4147299-1-charsyam@gmail.com>
+	Henry Martin <bsdhenrymartin@gmail.com>
+Subject: [PATCH] ksmbd: fix heap out-of-bounds write in SMB2_CREATE context stacking
+Date: Fri,  9 Oct 2026 01:05:42 +0800
+Message-ID: <20261008170542.1034301-1-bsdhenrymartin@gmail.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -81,63 +77,84 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A write-only client can open an existing named stream with FILE_OPEN_IF
-without permission to read the underlying file. The case-insensitive
-lookup finds the xattr name, but querying its value length then fails
-with -EACCES. smb2_set_stream_name_xattr() treats every negative result
-as a missing stream and replaces the existing xattr with an empty value.
+smb2_open() appends up to six create contexts (lease, mxac, disk_id,
+durable, posix, aapl) back-to-back without checking the total length
+against work->response_sz.  A non-compound SMB2_CREATE only gets the
+448-byte small response buffer, which also carries the 4-byte rfc1002
+length word, leaving 292 bytes for contexts.  The AAPL response alone
+occupies 128 fixed bytes, so a client stacking contexts (up to 416)
+overruns the kmalloc-512 object into the adjacent allocation with a
+deterministic zero-fill.
 
-A failed xattr list is not proof that the stream is absent either:
-for example, -ENOMEM can lead to the same empty replacement. Preserve
-listing errors and create a stream only for -ENOENT or -ENODATA. The
-latter can occur if the xattr is removed between listing its name and
-querying its value. Return other lookup errors without changing the
-stream.
+Compute the worst-case context total from the per-dialect
+conn->vals->create_*_size table and grow the response buffer to fit
+before writing any context, so legitimate requests keep working
+unchanged.
 
-A write-only FILE_OPEN now reports access denied instead of name not
-found. FILE_OVERWRITE_IF and FILE_SUPERSEDE on an unreadable stream
-also fail instead of appearing to replace it. Stream writes and EOF
-changes already need to read the old value, so such handles cannot
-update the stream after opening either.
+This vulnerability was discovered by Tencent CodeBuddy Security.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
+Fixes: 8f1b796ff1135 ("ksmbd: add AAPL kAAPL_SERVER_QUERY create context support")
+Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
 ---
- fs/smb/server/smb2pdu.c | 2 ++
- fs/smb/server/vfs.c     | 6 +++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ fs/smb/server/smb2pdu.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 4d43de74f..52a19871d 100644
+index 6b8809f67b926..e18e6b630f757 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -3420,6 +3420,8 @@ static noinline int smb2_set_stream_name_xattr(const struct path *path,
- 				     xattr_stream_size, xattr_stream_name);
- 	if (rc >= 0)
- 		return 0;
-+	if (rc != -ENOENT && rc != -ENODATA)
-+		return rc;
- 
- 	if (fp->cdoption == FILE_OPEN_LE) {
- 		if (!strcmp(stream_name, "AFP_AfpInfo") &&
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 7020b7de3..3fa0e26e5 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1952,7 +1952,11 @@ ssize_t ksmbd_vfs_casexattr_len(struct mnt_idmap *idmap,
- 	ssize_t value_len = -ENOENT, xattr_list_len;
- 
- 	xattr_list_len = ksmbd_vfs_listxattr(dentry, &xattr_list);
--	if (xattr_list_len <= 0)
-+	if (xattr_list_len < 0) {
-+		value_len = xattr_list_len;
-+		goto out;
-+	}
-+	if (!xattr_list_len)
- 		goto out;
- 
- 	for (name = xattr_list; name - xattr_list < xattr_list_len;
--- 
-2.43.0
+@@ -5162,6 +5162,52 @@ int smb2_open(struct ksmbd_work *work)
+ 	rsp->CreateContextsLength = 0;
+ 	iov_len = offsetof(struct smb2_create_rsp, Buffer);
 
++	/*
++	 * The create contexts below are appended back-to-back with no
++	 * length check, while a non-compound CREATE only gets the 448-byte
++	 * small response buffer; a client stacking lease+mxac+disk_id+
++	 * durable+posix+AAPL contexts overruns it (the AAPL response alone
++	 * memsets 128 fixed bytes).  Compute the worst-case total and grow
++	 * the buffer before writing any context.  Note that response_buf
++	 * also carries the 4-byte rfc1002 length word before the SMB2
++	 * header.
++	 */
++	{
++		size_t ctx_max = 0;
++		size_t need;
++		void *nbuf;
++
++		if (opinfo && opinfo->is_lease)
++			ctx_max += conn->vals->create_lease_size;
++		if (maximal_access_ctxt)
++			ctx_max += conn->vals->create_mxac_size;
++		if (query_disk_id)
++			ctx_max += conn->vals->create_disk_id_size;
++		if (durable_rsp && dh_info.type == DURABLE_REQ_V2)
++			ctx_max += conn->vals->create_durable_v2_size;
++		else if (durable_rsp && dh_info.type == DURABLE_REQ)
++			ctx_max += conn->vals->create_durable_size;
++		if (posix_ctxt)
++			ctx_max += conn->vals->create_posix_size;
++		if (aapl_ctxt)
++			ctx_max += conn->vals->create_aapl_size;
++
++		need = 4 + offsetof(struct smb2_create_rsp, Buffer) + ctx_max;
++		if (need > work->response_sz) {
++			nbuf = kvzalloc(need, KSMBD_DEFAULT_GFP);
++			if (!nbuf) {
++				rc = -ENOMEM;
++				goto err_out;
++			}
++			memcpy(nbuf, work->response_buf,
++			       4 + offsetof(struct smb2_create_rsp, Buffer));
++			kvfree(work->response_buf);
++			work->response_buf = nbuf;
++			work->response_sz = need;
++			rsp = smb_get_msg(work->response_buf);
++		}
++	}
++
+ 	/* If lease is request send lease context response */
+ 	if (opinfo && opinfo->is_lease) {
+ 		struct create_context *lease_ccontext;
+--
+2.43.7
