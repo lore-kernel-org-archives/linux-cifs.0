@@ -1,88 +1,193 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A5B3C4554
-	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 06:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840F42EEE92
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 07:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791441026; cv=none; b=rJY99+h/L0fCpCoB59XHGEQ4ksVAOzLlhIWsxaJ5S0/5FUgu1KmmTcKVEp5By6LGhB/tFrJzobQRJt6MWgwAL9KcpXXwNpQZlv71NwI+9HE94+n9FcuRZrZNwkx1MU0TG3neREdX7RxuKUMGxVRZd84LNZMytt4PhFTGCqQcxa0=
+	t=1791445447; cv=none; b=dPqfKfXMxFcmODoqzLp7CbQaZ7qeZQHb//MJqHptGMtoOZtaAQc6SlN0lqcqrzmjm+5U+1IAUU7VjrEdpZVdDuYpBBCb1yIvqvR3lgECoiMkv1xNUy/4yQHC1l2RiLBW5m+wlC/Z/a0RAjM4njb1IRr/9stNKl7ecdvj8edzU5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791441026; c=relaxed/simple;
-	bh=vY9cv10EiDqAYKI3zi0x2UDFVDwoMp33I/kFa65iMOs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t+FVPy77OTVP+FQBvEsminMLur3rfg/Xgga9DR+BaWIcpb111/LKR6gt+N3aCyGKsA9bPrCDsXdDwKTK2h84N86Kva1TNjgMfk6qH9FsV1gzftK3PbmjNQGXFKbFNJg50QcSDFhJYW6zuli7h9U1yWhghaB5XtIBMdIPnqDsVPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WcxxgU8+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791445447; c=relaxed/simple;
+	bh=MOyrkKu/Obwobegg9HsqVsEDQwbw8Pzz8rTRIjAqFj4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UribJxbn9tMqpRWnH1qg+E55JiBkcrNc8AY7NbyHRHv4+Bx1WV9/+kuYZXLPWJ8e5eWyuUSNKWIG0sDPH0XIcZGV0NRWPXN46WdakexrrNJG3SkjR7fm53g3cia3K+eBmfZWhDksUkjCIdn6cxyHzLqyKrQ1dwifz2v2ZeTuNL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L5opAjjO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WcxxgU8+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0861F00899
-	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 06:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791441024;
-	bh=vY9cv10EiDqAYKI3zi0x2UDFVDwoMp33I/kFa65iMOs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=WcxxgU8+kfneCAPFaGNPCRCo/Y+P0Z7LpPJ46cmPEwMU4BNcRdg9fIArSVZb6bzz8
-	 McBy7BvUm2mYJ0NQ7vB7O0uCtdzzcRpWqdoij8JsDZg8ibxLcAYPn96Hs8QZF/49iy
-	 KguyZhH87ebHYAnze9f23FQnrJo60MAD9Bi5TUobNPr62ozcijG9h49wZZjucmXzvH
-	 NIfmNgh4/5pcAusxAsZW1kTcgUGztc6CcY0hMVFix7WCu9Kz7pz19x773+Gk0iJH3K
-	 yyFJQX2UqI/c2XxY1NWmbM/kGHajZ11hBnTmF6zFZw0dQmMAdCHzwVeid8Ux9NkS1W
-	 wxzp2jEiqK7XQ==
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c2e5f8fe879so405325666b.3
-        for <linux-cifs@vger.kernel.org>; Wed, 07 Oct 2026 23:30:24 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxs0e23U3Sg0WuzTrtLRftqGmM7FLY0NfjMeqvKbb00iaa9OVAm/Oq5z92RLSl2KgVxF5UyjFaTQQ6C@vger.kernel.org
-X-Gm-Message-State: AFuF++mW3T37iILwE+fBM9AjnnSeWjc1k2cDzqR+5uzre4F/3wT7oOkO
-	WdxYPgfpEKV4K1KWlH/P8ZmxL0sySosxYt5fmYKNvp9ZcKxQmw89Yb7/3jdgV72fR2TSSMsDPkr
-	NuFEmLOWXbkG0znNjbqRUmsHO/mBFMgo=
-X-Received: by 2002:a17:906:1011:10b0:c31:86b9:5525 with SMTP id
- a640c23a62f3a-c3186b95c42mr214826566b.30.1791441023269; Wed, 07 Oct 2026
- 23:30:23 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5opAjjO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1791445444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tKpk0FswZIpSpMgoXKEPBZ20GyyjP1Zbx70jc89ehr4=;
+	b=L5opAjjOcPRfJmPdL7/dGjzPs7ebsF1xqljzNYlMgzrYsiSD1tfK1ywV9O/0ClNA3fE5YY
+	dbUCInGL7bragKxVFCj5JYaQ5SjGFM+0X16qNr7QAlK4GcPzB9Ds7OIiVCO4CC1lc+SYXJ
+	ANg2aI3KElW1R1qyYdCiqd6r6AGn03U=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-64-ioJiaHgXPOC2jxdNrGzlIg-1; Thu,
+ 8 Oct 2026 07:44:01 +0000
+X-MC-Unique: ioJiaHgXPOC2jxdNrGzlIg-1
+X-Mimecast-MFC-AGG-ID: ioJiaHgXPOC2jxdNrGzlIg_1791445438
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 414FA1955F37;
+	Thu,  8 Oct 2026 07:43:57 +0000 (UTC)
+Received: from warthog.com (unknown [10.44.32.90])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 541961956040;
+	Thu,  8 Oct 2026 07:43:49 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v15 0/8] netfs: Use a bvecq chain position abstraction
+Date: Thu,  8 Oct 2026 08:43:36 +0100
+Message-ID: <20261008074346.936909-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20261007131351.2968640-1-charsyam@gmail.com>
-In-Reply-To: <20261007131351.2968640-1-charsyam@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 8 Oct 2026 15:30:11 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_cVup3rUM+7u3s=D7Tr8TxhvC1KZy9eOp_ymzpWAZ2Lg@mail.gmail.com>
-X-Gm-Features: AclHuK_bVDSRbo-CtIIIZEeFhwlZhmOaM3DWMHffbTVYPIF0V4qz3-E46Mxxozs
-Message-ID: <CAKYAXd_cVup3rUM+7u3s=D7Tr8TxhvC1KZy9eOp_ymzpWAZ2Lg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix named stream write and EOF handling
-To: DaeMyung Kang <charsyam@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Wed, Oct 7, 2026 at 10:14=E2=80=AFPM DaeMyung Kang <charsyam@gmail.com> =
-wrote:
->
-> An SMB WRITE to an existing named stream can silently discard data after
-> its written range. ksmbd stores streams as xattr values, but the write
-> path passes offset + count as the length of the replacement xattr even
-> when the old stream is longer. Writing 26 bytes at offset 0 to a 60-byte
-> stream reports 26 bytes written while discarding the remaining 34 bytes.
->
-> Keep the existing xattr length when an in-place write ends before EOF.
-> Reject writes that cross XATTR_SIZE_MAX rather than storing only the
-> portion that fits while reporting the full requested count.
->
-> Commit 4ea0bb8aaedf ("ksmbd: handle set/get info file for streamed file")
-> intentionally skipped ordinary inode truncation for stream handles: an
-> EOF SetInfo on an ADS had truncated the base file. That fixed the base
-> file corruption but left stream EOF changes reporting success without
-> resizing the stream. Handle these requests by resizing only the stream
-> xattr; the base file size remains untouched. Zero-fill stream extensions.
-> This is needed alongside the write fix: a short write's accidental
-> truncation previously masked an ignored explicit EOF change. The stream
-> resize helper returns xattr errors directly rather than using the
-> base-file truncate path's EBADF conversion.
->
-> Fixes: f44158485826 ("cifsd: add file operations")
-> Fixes: 4ea0bb8aaedf ("ksmbd: handle set/get info file for streamed file")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
-Applied it to #ksmbd-for-next.
-Thanks!
+Hi Christian,
+
+Could you pull these patches please into your vfs-7.4.netfs branch?  This
+is the fourth of five batches.  The primary purpose of this batch is to add
+an abstraction for a position in a bvecq chain and make use of it.
+
+With that in mind, this patchset does the following:
+
+ (1) Add a struct, bvecq_pos, to refer to a position in a bvecq chain.
+     This is a tuple of ( bvecq pointer, slot and offset } and the position
+     struct holds (for now) a ref on the bvecq pointed to.
+
+ (2) Change unbuffered/DIO to extract the supplied user buffers into a
+     bvecq chain rather than a bio_vec[] up front.  This means that
+     netfslib then uses bvecq chains for everything.
+
+ (3) Add a folio count to the readahead_control struct and then makes
+     readahead pre-create its buffer using that count to determine how many
+     slots are required.
+
+ (4) Change netfslib to use the bvecq_pos struct to keep track of the whole
+     request buffer and various points in it where loading, dispatch and
+     collection are taking place and to also keep track of the slice given
+     to each subrequest.
+
+This was split from v11 of a larger netfslib series[1].
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next-4
+
+Thanks,
+David
+
+Changes
+=======
+ver #15)
+- In netfs_extract_iter(), set BVECQ_MEM_EXTERNAL rather than
+  BVECQ_MEM_PAGECACHE for unpinned memory.
+- In netfs_clear_unread_dio(), don't need to update subreq->transferred
+  as the caller overwrites it after.
+- Fixed issues brought up by sashiko[3]:
+  - In netfs_extract_iter(), remove redundant max_len check.
+  - In bvecq_pos_nudge() make sure the recheck is checking the old bvecq,
+    not the new.
+  - In netfs_unlock_abandoned_read_pages(), start from collect_cursor.slot,
+    not from slot zero.
+  - In netfs_pgpriv2_copy_to_cache(), cancel the caching also if we fail to
+    allocate a bvecq.
+  - In netfs_retry_write_stream(), use the same superfluity detection as
+    the read side.
+  - In netfs_write_subrequest_terminated(), only set the RETRY flag on
+    short uploads, not short cache writes.
+
+ver #14)
+- Fixed issues brought up by sashiko[2]:
+  - In netfs_extract_iter(), limit the number of slots per bvecq to what
+    will fit inside a 4KiB allocation.
+  - In netfs_rreq_assess_dio(), only set the page dirty if it's from GUP or
+    it's from the pagecache.
+  - In bvecq_zero(), skip the call to bvec_zero() if part == 0.
+  - In bvecq_delete_spent(), prefer returning true because more slots got
+    added to returning false because we hit the chain end.
+  - In netfs_read_gaps(), fix a leak of already allocated sink folios if we
+    get OOM when allocating a sink folios.
+  - In netfs_clear_unread_dio(), fix double call to iov_iter_zero().
+
+ver #13)
+- Rebased on -rc6 to account for some conflicting fixes.
+- Fixed a bug in netfs_prepare_read_iterator() where comparison was being
+  made against the wrong thing when limiting a subreq's size.
+
+ver #12)
+- Split from v11 of "netfs: Keep track of folios in a segmented bio_vec[]
+  chain"[1]
+
+[1] https://lore.kernel.org/r/20260902173350.3468672-1-dhowells@redhat.com/
+[2] https://sashiko.dev/#/patchset/20261006205947.608356-1-dhowells%40redhat.com
+[3] https://sashiko.dev/#/patchset/20261007142001.851620-1-dhowells%40redhat.com
+
+David Howells (8):
+  mm: Make readahead store folio count in readahead_control
+  netfs: Add a function to extract from an iter into a bvecq
+  netfs: Make unbuffered/DIO read and write use bvecq
+  netfs: Add some tools for managing a position in a bvecq chain
+  netfs: Provide a func to load the readahead buffers into a bvecq chain
+  netfs: Use bvecq_pos to hold the buffer positions
+  netfs: Remove the rolling_buffer implementation
+  netfs: Remove netfs_extract_user_iter()
+
+ fs/afs/dir.c                   |   5 +-
+ fs/afs/symlink.c               |   6 +-
+ fs/cachefiles/io.c             |  12 -
+ fs/netfs/Makefile              |   1 -
+ fs/netfs/buffered_read.c       | 182 ++++++++-------
+ fs/netfs/bvecq.c               | 321 ++++++++++++++++++++++++++
+ fs/netfs/direct_read.c         |  77 +++----
+ fs/netfs/direct_write.c        |  67 +++---
+ fs/netfs/internal.h            |   4 +-
+ fs/netfs/iterator.c            | 398 ++++++++++-----------------------
+ fs/netfs/misc.c                |  18 --
+ fs/netfs/objects.c             |  16 +-
+ fs/netfs/read_collect.c        | 106 +++++----
+ fs/netfs/read_pgpriv2.c        |  88 +++++---
+ fs/netfs/read_retry.c          |  87 ++++---
+ fs/netfs/read_single.c         |  16 +-
+ fs/netfs/rolling_buffer.c      | 182 ---------------
+ fs/netfs/write_collect.c       |  73 +++---
+ fs/netfs/write_issue.c         | 166 +++++++++-----
+ fs/netfs/write_retry.c         |  73 +++---
+ include/linux/bvecq.h          | 185 +++++++++++++++
+ include/linux/netfs.h          |  25 ++-
+ include/linux/pagemap.h        |  10 +
+ include/linux/rolling_buffer.h |  47 ----
+ include/trace/events/netfs.h   |  32 ++-
+ mm/readahead.c                 |   5 +
+ 26 files changed, 1252 insertions(+), 950 deletions(-)
+ delete mode 100644 fs/netfs/rolling_buffer.c
+ delete mode 100644 include/linux/rolling_buffer.h
+
