@@ -1,103 +1,100 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B376547078
-	for <linux-cifs@vger.kernel.org>; Wed,  7 Oct 2026 23:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352AA22A4F1
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 02:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791416122; cv=none; b=cZPNniW9kM5eC/ISlQmEEncUlJT5jAom88oTKQh9BHggwMCTizNSdI+oezjYZ0fPdnb1+VEyjxOwwI7Iftrca3WOI87DV+fXFl6QQnRZU21tSPR9KgL2F9m709N7OAnysWDDOmHOOkyYVdIy7LCrRzgUruBfOnPOKU8X0gZMBDM=
+	t=1791426395; cv=none; b=ogNzNilCVtnFmVrAu9Jsb6F771Vox9Rp1vRK6k/3zoIv/1JRffa9svYUeVu9vga1Amvygqsd3+5l/jIfgJG49k+ZY/zDa0hMqG9zs63+PEY6psGFs0tvMXNqk5y4z8al4FFUfHVrPg97vdkF3VquEEIrJqMIg59bgCmEpxGsxzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791416122; c=relaxed/simple;
-	bh=ig63wu8Qo3nGGMb39Y8sLp3b7U6Y+r7BLEvZWN5ud1Q=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=q/cAu49bcTKt0+Q+USGsBbV9ZeNw/oTG4Q8qUKN9e93+IlL8vpjdi+zlf/UFenuED1RlN1m+nH4533QX/Q1gMLbs9JrAywhIJCcvcVJuUTtzFSu/tEWjoe5lMcxhO1KmS18mQZa12w4HZ1PNTPzNXsI1pC8brp6x1Yxfdvqp1Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=rCBC0eAa; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1791426395; c=relaxed/simple;
+	bh=ex9n3hDB+0NdXLB2WCiEr318O8NqS3kXL+I+apCsm5w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gfta4Cw1MqawcOp8gYzubyjwWvnDviAt8pVkxjLcw+ch+T8hysBI8BqpHKpV6ua0rTWc5J9E+ghXFshKPKIgL8eN2SCXyl8drRjrvbYy7SF3yDPiF2hI66Mg3PnHEFfAjYv0WndhhSWEeKk0r6hnQy8hyRq1ifQWvyCMCVyxGvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ebh3RBiU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="rCBC0eAa"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=whPJKcowSQx9e4tOJpTFnAzgcJ2qA9U6xjGOuWeQkGI=; b=rCBC0eAaV2przA79vU/87Q+v9E
-	grcpcRlwqTrFml0kW4TGyoQm7cdfe2Pd6sNFe4kGhHIB1X5x4GrCalnEU+OaUwaR/uOCm6gYzPStK
-	m1IA0bdpeye3DZKKmK2THbg1p9POGSnX0HuHTzEy8PRtnqeGISPo8IhkisiX9PCfMzHHx3hcC96zS
-	FogzZ/WZh0C+Lx8BGgOPerqr/Wg+R3S0FeBObEadAe5r9QYQ5HbVgJC+HTzKJ03m4o8+HjhaBAelG
-	d1zyw5dBO7uNpDSDeRFHHKta0nIS9xo3ilfUdtTCTIqgwKLKoHHgPVOmLAQL0CjHrovCIdZfVTtMR
-	J0pjFq4Q==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xEbAM-000000038JN-3oeZ;
-	Wed, 07 Oct 2026 20:35:18 -0300
-Message-ID: <ceb83f1d34307ebcbe203abe2cab40a1@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Enzo Matsumiya <ematsumiya@suse.de>
-Cc: linux-cifs@vger.kernel.org, linkinjeon@kernel.org,
- ronniesahlberg@gmail.com, sprasad@microsoft.com, tom@talpey.com,
- bharathsm@microsoft.com, henrique.carvalho@suse.com
-Subject: Re: [PATCH v3 2/2] smb: client: prevent premature discard of
- requests if reconnecting
-In-Reply-To: <asZ12ZKIHpc5yPsn@suse.de>
-References: <20260929170358.270612-1-ematsumiya@suse.de>
- <20260929170358.270612-2-ematsumiya@suse.de>
- <b0f37e56c4559eb51624f76f92c23ee8@manguebit.org>
- <asVQ8CHNUY3bxbaz@suse.de>
- <00e0fcdfdde0a281ed3f080040d6fb63@manguebit.org>
- <asZ12ZKIHpc5yPsn@suse.de>
-Date: Wed, 07 Oct 2026 20:35:18 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ebh3RBiU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B229B1F000FF
+	for <linux-cifs@vger.kernel.org>; Thu,  8 Oct 2026 02:26:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791426393;
+	bh=0BDdCGTIFhxuiERDwOV3CXMKl39K3PjHf7a34vLTQZs=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Ebh3RBiUQwWuxaijk5FK4Sg078GXYMcQuG84PIQSB+ix4O8mzZ/wPAgyroLRxF30K
+	 Oxm+UO0gV0esgiM9tHw1tbo5baLtGGJc3dJ27YIsjYwdtIJTi+45KvRjn/+V+BaCaZ
+	 v+7f21gEpY3BRcyLcxuoAaUBHGhVzoXpFUsVDfRaCs93yAXSkGTZIK2cwXX9QnEygP
+	 /x2pXQQQxDEEasC4/Gc1QzEuzu1VGEb0VURwsIqFls4ZQWPxpWS9p48RRqiCPyLwCv
+	 BdBIl1hdNDNbXLWG4QL496c+hmLNilbbaDMm0J93j1RlvSCCsE26byAWxV9xCbDmEX
+	 nJASfSfFvU1Jw==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c2e6df2742cso350127166b.2
+        for <linux-cifs@vger.kernel.org>; Wed, 07 Oct 2026 19:26:33 -0700 (PDT)
+X-Gm-Message-State: AFuF++npja4b2niSSProHdiUL2z2kw/0TqtxN9WEy3lNNpqMQrb4vHP3
+	U4/86Q5/lrlzc2c5DfKH/7XYoY3gG65JbYuXBVdCGqQcwgHSEOZrZUPWVTKFoxqBQuoGxDlQqnw
+	wRPEKUp8ZrCumfb8ivo+5GjDZ0J0NoPs=
+X-Received: by 2002:a17:907:3e8b:b0:c2e:7daa:7645 with SMTP id
+ a640c23a62f3a-c317bd9c34bmr348035366b.23.1791426392367; Wed, 07 Oct 2026
+ 19:26:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <cover.1791311817.git.metze@samba.org> <ab714dc8161c7b23734d95157b0b86e5d0081f1b.1791311817.git.metze@samba.org>
+In-Reply-To: <ab714dc8161c7b23734d95157b0b86e5d0081f1b.1791311817.git.metze@samba.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 8 Oct 2026 11:26:20 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-ziPYkMzYodQ1=nEEL2JGnAeGe9eYR8d_jk5EOTOEMPw@mail.gmail.com>
+X-Gm-Features: AclHuK9dDTiih_lk-9Ow0GjSFGENNoyqmZnW55u5RzHupDRwO4sVs5NzmlyFzmQ
+Message-ID: <CAKYAXd-ziPYkMzYodQ1=nEEL2JGnAeGe9eYR8d_jk5EOTOEMPw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] smb: smbdirect: release failed pending sockets of
+ a listener
+To: Stefan Metzmacher <metze@samba.org>
+Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	Lee Seong Hyeon <ihopenre@gmail.com>, Sashiko <sashiko-bot+sashiko@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Tom Talpey <tom@talpey.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Enzo Matsumiya <ematsumiya@suse.de> writes:
+>         ret = smbdirect_accept_connect_request(nsc, &event->param.conn);
+> -       if (ret)
+> -               goto accept_connect_failed;
+> +       if (ret) {
+> +               /*
+> +                * The rdma_cm core holds both the listener's and nsc's
+> +                * id_priv->handler_mutex across this CONNECT_REQUEST handler,
+> +                * so neither can go away under us here and nsc cannot receive
+> +                * any rdma event: it is safe to hand nsc to its teardown.
+> +                *
+> +                * That teardown must be deferred though: nsc->rdma.cm_id
+> +                * (= new_id) has its handler_mutex held by us, so it cannot be
+> +                * destroyed synchronously from here.
+> +                * smbdirect_socket_schedule_cleanup() only queues work;
+> +                * smbdirect_socket_cleanup_work() then orphans nsc off the
+> +                * listener and smbdirect_listen_purge_orphaned_work() releases
+> +                * it, destroying nsc's cm_id with rdma_destroy_id().
+> +                */
+> +               smbdirect_socket_schedule_cleanup(nsc, ret);
+Does this make return 0 unsafe? This path now queues cleanup after
+creating the QP, then returns before cleanup runs. If DEVICE_REMOVAL
+event arrives in that gap, the temporary handler sets sc->rdma.cm_id
+to NULL and returns -ESTALE. The CM core then destroys the ID, and the
+cleanup worker tries to destroy the QP with NULL ID, causing kernel
+oops ?
 
-> On 10/06, Paulo Alcantara wrote:
->>Note that there's currently no backoff mechanism in either CIFS or
->>netfslib for writeback, meaning that the write requests will be retried
->>forever if the server goes offline.  You'll end up with tasks hanging
->>forever on close or fsync.  Trying to fix that in the reconnect path
->>doesn't seem the right way to do it, IMO.
+> +       }
 >
-> Btw, I forgot perhaps the most important bit here -- whenever there's
-> a reconnect during a write, the file gets corrupted.
+> +       /*
+> +        * Always return 0 so the rdma_cm core keeps new_id: nsc owns it now.
+> +        * On success it stays connected; on failure its deferred teardown
+> +        * above destroys it.
+> +        */
+>         return 0;
 >
-> That's regardless of how long the downtime was.  As soon as the first
-> task times out in cifs_wait_for_server_reconnect(), returning
-> -EHOSTDOWN, that request is lost, and data is corrupted.
-
-Yes, because we explicitly return a non-retryable error if the server
-neve came back online.
-
-Then we're back to whether using 'hard' mount option or 'retrans=' to
-handle such cases.
-
-> Note that the writes (operations) _are_ resumed, but what was lost,
-> stays lost.
->
-> Again, I agree that retrying indefinitely might be wrong, but so is
-> corrupting data due to a short network outage.
-
-I agree.  Check the available mount options (hard and retrans=) to see
-if they help with your case.
-
-> I did try to relieve this situation with this patch, and TBH, after
-> reassessing it, I fail to see how/where this could be handled in netfs
-> or cifs I/O path.
-
-Reconnects and retries are definitely not easy to handle.  This,
-however, makes network filesystems quite interesting to work with,
-though :-)
-
-> The closest I got to a PoC was by loosening the restrictions to set
-> NETFS_SREQ_NEED_RETRY on smb2_writev_callback() and smb2_async_writev(),
-> and then we're obviously back to the retry-forever-but-no-corruption
-> dilemma.
-
-Yes.  Let me know what you think and let's keep talking on how to solve
-these issues.
-
-Thanks for looking into them!
+> -accept_connect_failed:
+> -       spin_lock_irqsave(&lsc->listen.lock, flags);
+> -       list_del_init(&nsc->accept.list);
+> -       nsc->accept.listener = NULL;
+> -       spin_unlock_irqrestore(&lsc->listen.lock, flags);
+>  set_settings_failed:
+>  set_params_failed:
+>         /*
