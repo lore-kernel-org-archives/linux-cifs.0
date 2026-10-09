@@ -1,145 +1,128 @@
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4A63EDAB8
-	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 18:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791569103; cv=pass; b=muAqM542z9a2bDoeaPaG/kzuulUGD4IJMco4X7U0bwf+oLXi2dfRkv2T1JtXU372y1iltdNA9UYeLzK60QeLcSVgtEFwi/ttEbNdfB0W/DpnVq8QEScNW6BshgS46YXWBsZa1tWvf+Zo+1WMPfBf2zqtmA6N+l7JLZSdlAzsvxQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791569103; c=relaxed/simple;
-	bh=zG2GYbFOx/yr4T6AS9CRERuFYMHGPxlfCsX97qPRAoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q8h0Jf6sX0sKRKy5u5vXptxRcQ8jw5qNJL4XcLNju1zNM/vqRD5Cvd6pueoi59oejLUrP9s8JpLxYOu2fl0ORWuLez1UTShVZx6C7qoBgeDF9oEaWKtJAm4Jm9pUrh/PYmpezjZ7i7cCyEf8/JZ0yIsL2eSLVhc64T+wIUCbqWM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+5tIT8N; arc=pass smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9892F45D1A5;
+	Fri,  9 Oct 2026 19:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791574040; cv=none; b=GUqBKsd58VlrH5ocyL4ffEHOnsN3J7ojPXKdU3spobUaJfbs3gi2zf2iZCPJFmNAuiKtGsGiv52wBwRQIAYVBHwl4StyAnfhCormkrFrBzRQJsbw7gRkZsQrapG7/bEy9kgQMo2rAd28SpaW3c/jpD/zsFqLcgnEAQI1daIQD5I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791574040; c=relaxed/simple;
+	bh=IIJt4GhnfKUZ5ZMrdUlvqukXGauHWCP7Z0q6PeQG2A8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=pAEBbm4y03fz2Ath9JGsK8wxoEtb3yJSMDX3U6Y7cYmP9w9k0+0d0x6d28eSf56BE1b4vL700vFAjcnnmt9YS/Pg+MpfyWH1ChmANSV+bxhi+gLh1Uy0ryxX6f/HEQrpLGvHqUhUt6r/Pnsuru+KK+uRt9/aByhAzYRLH/gho+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gTvx0eJ6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+5tIT8N"
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c2dc63f8d8aso23743566b.0
-        for <linux-cifs@vger.kernel.org>; Fri, 09 Oct 2026 11:04:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791569098; cv=none;
-        d=google.com; s=arc-20260327;
-        b=BiJntZGAGtbkfUtc88XKDkfyQOzEn/Qs9xn84PzPcKoRkIJyoaSHJdhOIeEqUMlGan
-         DsSA2eKZEZ5TP8tFMQpCq4MRzKaOwKLaujISkUeW82c6TuUQ4JkXI4ErbvT9NIj/p3bw
-         K94pcrNSoPZETVTaK249YxyirWqL4GdVlmUiZn5svFnSxQ80J1aREiCOyP4l8GiUmNuI
-         jN7YlbqzZUk6hVy9QrJogPV59baYX7QSIFP5uExE5XIxxpUR/vm+p+HQFT65fAiM4GLp
-         opMyPi15y1b6XeJrp0BnCCmIARFmY8xHU4OSpiIIEMt8NB+7ZkpJp2so7/fx8Di4TtQi
-         GMrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Nb/iVyVuqCqZPtjYpmZN8jbx7eWKt3E7mfsFqbnN7k0=;
-        fh=ryzDfyb8CiN0Wy1nem5qGRQJ84s/U5OcFdfDX93tidQ=;
-        b=YWxbGs8MMrfMMVRnierk7uDCdmrbf6jdqxR/ftticCasnu8IvVcfrVLDbY49D3VaYX
-         vM6sDCNi787LM3i0I1kHabWsoBA8XkX0rfCW9z7qiYTRKQEw6h2mNIhIv6FvDch7QV2S
-         BKt+y7/6N7KKjFI0T+7J/pfOx3nZiLNWDmWXLFRs62x+AnBUFDdH65mKivQj2roKG1rC
-         TG6ZJl2HsleCsM+AVLLXUp3NG33I3KIK7QRZHBAGh2NWc7CSOY+e7NPdFmBPzeTrtSfp
-         d30UB8JtB/76jzBtKTwqa9wu8yGje3To7UuRVlP+phq6G/Z9HPXAgii7MH30OB8NEOCE
-         +HFA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791569098; x=1792173898; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Nb/iVyVuqCqZPtjYpmZN8jbx7eWKt3E7mfsFqbnN7k0=;
-        b=h+5tIT8N1V6ssHj3l3CE7bSVT/w+k1+h+HVQofon5ogTLC8wMMiWdWmjtCpUb+BzXw
-         5oZLOypGH9lxBXbpDLlCcbStFDt9r1shfftRFRaQHwaeCAcs9Dwcik+5QBLFJ6MurasE
-         pJbCK0V2Xcbn9EmEa31SBzxfbOZG4ECvtw/9/g76/y7xQJmlzsiq8mXTFYo4TS+nUzmU
-         UUCTPepvbL0A1S2+03HJlHTwxySaXEzWZGFKKSTg1UfEch+rH9X9FVbmLTN49SAyC0Io
-         EtZw7Qxjn3X6JldCNMjZCOT+VE9eAdx87sdECBS0mzRiX+39lM9JHZ1rrY0r6d2FpKr5
-         Fsyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791569098; x=1792173898;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Nb/iVyVuqCqZPtjYpmZN8jbx7eWKt3E7mfsFqbnN7k0=;
-        b=OQVf6r/SSmFu6hZ40UNQMWPMMphah1ZUV0j6hFbxqFd9MOZjMBgErzOSduzYP6Ysyy
-         GFx/RSA4KY5zhZsNeVThg4ksLXWIFIs8D4J9WaqeUY+mK/I2w3GFjhWOhZWJnbldEGty
-         9v6O5tLgx12ODtd5nmvRnWi6MmRAs4H4UHc3PFhh3cP/b/BSZoSlqWLRJzrjVb41USnL
-         d19k3CirhibHfeph3zf8YcoSSasxT/p9ZEdW4RtVM3IPotGYVmL+aqPVsM+r6b3CLV/1
-         CBWOgBQifEOvPxaX/z0AGiuoHYgM8odIjFjgTZc23uK9rM143gPBOi13oh7VHrkIvpfa
-         MyTA==
-X-Forwarded-Encrypted: i=1; AKwUvBxCTISEnb2qLyOK2BxhDxRkuNmSggZ3PoHarybnKs49MmrF7HGptvU9l/KK9izUJF6k1FqTJgUmt3e2@vger.kernel.org
-X-Gm-Message-State: AFq9FYLujPjsEXUiciihnJ/JO9r29RI1KZrgxqY0wLKAltebDoqdXjT+
-	MO7kpbi1FLeoHI8drcg2jh5WW9OCgT77xRYId1Qatc2Xk3AvW50OHh+aPCsxlM9MdBeDIgkxJBW
-	fJ4rTkdJo7gvEbXimn0bm0wnEZ2m/2c8=
-X-Gm-Gg: AYBFou1Kx7/C9LH94e/nnRL+rhaXFxwiNWQujdYyyOaIMZd7woAcsBIEuOx+jyqgHWZ
-	QbAsyzsnIsqJ7Z5ucOKvrw9QZdeZXvUagFaR4deSIyleweDvPxorNGFa+m/g01q50jzPeW3l7YI
-	GIbOT4uky5O6wAfFaNX9nMH5t4TIx/pAZldo8rVHkdTRRORZbsp61mUGgBKV6Zt8356dS9bvQ2t
-	Pm/qEAXURaIjZS+3QxNgpqZi2xyb8Ysszg7UBXCItWqZCuq6188IUTcE81yRhxE0/LQyIWpkLsf
-	m/xxnnIU2otHxV8OMrJb65ubqO1VFitr+ZKA4XP52DuyNuXwc1lKp2/YeaVTPPnqCPJZ7gdlvpN
-	9/ZJS3u+t
-X-Received: by 2002:a17:907:6e90:b0:c2d:ca32:2176 with SMTP id
- a640c23a62f3a-c31a9fd2ca0mr292220166b.8.1791569097838; Fri, 09 Oct 2026
- 11:04:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gTvx0eJ6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E24C31F000FF;
+	Fri,  9 Oct 2026 19:27:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791574034;
+	bh=svaNQnV25Kh9KTrjtDpU1B43XeKF+ZRj6anUbIjpMYc=;
+	h=Date:From:To:Cc:Subject;
+	b=gTvx0eJ6NAyBlsMTfbLVZ6Whr0Lc6fvey35uYQQ+SCDe0Ha8eCCAFKJqVXLgOtKBc
+	 B54V20b2fS0SNt1eFehRtk40kGUI5IEk739zq9qzyS+h5T1NwLC2hNUVbyiHyvGmVI
+	 q7lVV5Jt5w+hrPL84Vui8hJ2xdUtJ/KJliWuHgHs2d9OjWY5p46I2/YkOWipmQsivd
+	 8fh49ETjKdQ5vGfq49pc0lUsfXlkl/cRog52pBwTC4Gv19KHHZSuJwTfusKR1LNAFj
+	 PEHro3TTPDDi7xpTvOH46KqBzvR04g0sNFTmf6vv8bTBD52ozN/ra578aDC5Zm95Mh
+	 7G7cVkvDQRN/Q==
+Received: by finisterre.sirena.org.uk (Postfix, from userid 1000)
+	id 56F691AC57D0; Fri, 09 Oct 2026 20:27:11 +0100 (BST)
+Date: Fri, 9 Oct 2026 21:27:11 +0200
+From: Mark Brown <broonie@kernel.org>
+To: Christian Brauner <brauner@kernel.org>
+Cc: CIFS <linux-cifs@vger.kernel.org>, Enzo Matsumiya <ematsumiya@suse.de>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>
+Subject: linux-next: manual merge of the vfs-brauner tree with the cifs tree
+Message-ID: <aslAD9CbIfMrpKsE@sirena.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+i7WArBKHotAcKVS8iYZp0qBK2rRvuuCw=YHEoyM0TUfvbONw@mail.gmail.com>
- <CAKYAXd8a-SpSgvEr39LSpu7XqmOBejjFAUEGm=0nXvbVHWTjSw@mail.gmail.com>
-In-Reply-To: <CAKYAXd8a-SpSgvEr39LSpu7XqmOBejjFAUEGm=0nXvbVHWTjSw@mail.gmail.com>
-From: Tea La Forgia <tealaforgia+alias@gmail.com>
-Date: Fri, 9 Oct 2026 20:04:21 +0200
-X-Gm-Features: AclHuK-GP_nlJK7MK1rJT4Em8EGEUoZ44R-SoD3XsbfMPsVlSa2aqoPf_fnvzmg
-Message-ID: <CA+i7WAoS-25bVQ3_3czQADJ-3-R4SpHt90bn+vMV1b5-=OEFug@mail.gmail.com>
-Subject: Re: ksmbd: second session setup on same connection fails
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: smfrench@gmail.com, linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4y3Ow8CUVbJPpJv2"
+Content-Disposition: inline
 
-Il giorno dom 4 ott 2026 alle ore 02:39 Namjae Jeon
-<linkinjeon@kernel.org> ha scritto:
-> Can you try to reproduce after applying the following change ?
->
-> diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-> index 1b24eb3f3998..88953315b160 100644
-> --- a/fs/smb/server/auth.c
-> +++ b/fs/smb/server/auth.c
-> @@ -336,8 +336,7 @@ ksmbd_build_ntlmssp_challenge_blob(struct
-> challenge_message *chgblob,
->         if (cflags & NTLMSSP_REQUEST_TARGET)
->                 flags |= NTLMSSP_REQUEST_TARGET;
->
-> -       if (conn->use_spnego &&
-> -           (cflags & NTLMSSP_NEGOTIATE_EXTENDED_SEC))
-> +       if (cflags & NTLMSSP_NEGOTIATE_EXTENDED_SEC)
->                 flags |= NTLMSSP_NEGOTIATE_EXTENDED_SEC;
->
->         if (cflags & NTLMSSP_NEGOTIATE_KEY_XCH)
->
-> Can you try to reproduce after applying the following two patches ?
->
-> 1. https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/fs/smb/server?id=906a62216339d7eccc336bfb4531ce3d7850b8ac
->
-> 2. https://git.kernel.org/pub/scm/linux/kernel/git/linkinjeon/smb.git/commit/?id=adecff0c5ba981640216ac5ba382c4a0b9d907fe
->
-> If you can still reproduce this problem 2, Please send pcap(packet
-> capture) with oplocks=no.
->
-> Thanks.
 
-Hi Namjae,
+--4y3Ow8CUVbJPpJv2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I have applied all the patches on top of kernel 7.2.8 and compiled the
-module. I can confirm that both issues are completely resolved!
+Hi all,
 
-The Administrator process issue is gone. I can now access the share
-from both elevated and non-elevated processes on Windows 11
-interchangeably without getting any errors.
+Today's linux-next merge of the vfs-brauner tree got a conflict in:
 
-The oplocks freeze is also fixed. Browsing folders in Windows Explorer
-with "oplocks = yes" is now perfectly smooth, with no more
-SESSION_SETUP spam or 56-second hangs.
+  fs/smb/client/transport.c
 
-Thank you very much for the incredibly fast and effective fix!
+between commit:
 
-Best regards,
--- 
-Tea La Forgia
+  fae67a14b8d25 ("smb: client: fast fail sends if need to reconnect")
+
+=66rom the cifs tree and commit:
+
+  d0ae35565f5d5 ("smb: prevent TIF_NOTIFY_SIGNAL from interrupting")
+
+=66rom the vfs-brauner tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc fs/smb/client/transport.c
+index cf11af490b0d8,93ff6a4dbb350..0000000000000
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@@ -171,26 -170,11 +170,22 @@@ smb_send_kvec(struct TCP_Server_Info *s
+  		 * after the retries we will kill the socket and
+  		 * reconnect which may clear the network problem.
+  		 *
+- 		 * Even if regular signals are masked, EINTR might be
+- 		 * propagated from sk_stream_wait_memory() to here when
+- 		 * TIF_NOTIFY_SIGNAL is used for task work. For example,
+- 		 * certain io_uring completions will use that. Treat
+- 		 * having EINTR with pending task work the same as EAGAIN
+- 		 * to avoid unnecessary reconnects.
++ 		 * Task work must not abort the send, see signal_pending().
+  		 */
+- 		rc =3D sock_sendmsg(ssocket, smb_msg);
++ 		scoped_guard(no_notify_signal)
++ 			rc =3D sock_sendmsg(ssocket, smb_msg);
+ +
+ +		/*
+ +		 * If need to reconnect, blame it for any non-interrupt error
+ +		 * and bail out early, even if -EAGAIN;  reconnect will never
+ +		 * happen in parallel as cifs_reconnect() needs server mutex
+ +		 * (which we're already holding), so it's pointless to retry.
+ +		 */
+ +		if (unlikely(rc <=3D 0 && !is_interrupt_error(rc) &&
+ +			     READ_ONCE(server->tcpStatus) =3D=3D CifsNeedReconnect))
+ +			return -ECONNRESET;
+ +
+- 		if (rc =3D=3D -EAGAIN || unlikely(rc =3D=3D -EINTR && task_work_pending=
+(current))) {
++ 		if (rc =3D=3D -EAGAIN) {
+  			retries++;
+  			if (retries >=3D 14 ||
+  			    (!server->noblocksnd && (retries > 2))) {
+
+--4y3Ow8CUVbJPpJv2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQReagvpf3TrrA7BoYYv73Ows9A4iQUCaslACwAKCRAv73Ows9A4
+iaMzAP9a+P7RdUoznGKPzU1e3Og6ddjgB3xC0+5m+R+Vt1k6WwEAhk4zwXM+QC4F
+JGdEKBi/j7vmW6ksy+rNVi+kJviC4AA=
+=PczA
+-----END PGP SIGNATURE-----
+
+--4y3Ow8CUVbJPpJv2--
