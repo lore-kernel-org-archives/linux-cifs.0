@@ -1,429 +1,373 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59DF3382CD
-	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 01:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791510937; cv=pass; b=B0cNGCHM/fg46GNxDYdZcid5mCr/tNp14299Rs45XL5bc1FnyLq4L15j8/oSA2kq/rhocJZY6arbYJDKm33mq8aJFje5e4i2H5q2ajMKi9vZXC3Q5nEcsQw+5nH/mJVpPC0xhz48qkXmGNerWxXlAzetkL+Q6pCx3MWiz7vgQJk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791510937; c=relaxed/simple;
-	bh=35fIWUdY0+PUqZkYVHqyYWSj8S/8qpG3+Jwu5f2fVSY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005AB1ACED5
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 02:10:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1791511820; cv=none; b=D1EcnRFMvUc3sAXQ7BK5f6Npfm+wMYb+CNnI6EzeI9u20EwX6xteVi/ctAxbtuk9JbIUxXyumPleE9YjRxhTAZX8IhrWlJfypBZ56nNc/YBgNINyzvJSdyLPNpy4zJaaO/sxsbgVFTsAAPiF5XVpIJhOyTWjNhgkgHkNW51L7MI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1791511820; c=relaxed/simple;
+	bh=t3occkMFWfAuAYHX806QwyAK2sVu8Pz6yjiMEYwvxTk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u7W+Uz/sB0v4dVu852PsHcEVJIgbZLhTBTD9MaROZlhRS/n6j6KWlkphmeNozPBWnoJTpw2KmEzYy4JIGOV52+6FQS2RlES9auu0rcTH5yXb4CyYi9Fqa2qPZ6sBX0M6jde3rQzgtKkuHNgPPW8I3A38AlyGHhUbjDN/T/YGzIA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n85S0maM; arc=pass smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=fG4CYG0LTtik5x8e7DjKlxM1gznBnUMJw6Eed+P3ns1tJm/+VRigTBFK03vPN1sX7hobmD/4nktgtdn/bMA6rPK6xcUK26GkJb28azxpT+pHGC0Ih0Kg0vla+7Y2DjP3T9BosHBJQmzsvRjn/2mFbqZqOqDy4qRqmlsuH6cwULI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBRkmYT4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n85S0maM"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-892734ce7e6so1167859b3a.1
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 18:55:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791510934; cv=none;
-        d=google.com; s=arc-20260327;
-        b=qe/Dl/Kw3/tBYR4XHJeeKGcCY/43BtPphptLjk78CQvU5VloYBy53YnQvt9fXA2yDb
-         245oJyz13BfMCDMKT/EN8s83BjSYDOw00VC7IX0YmpOkPmKxZIBiesy3ClBWZLuloLMF
-         EPKJqU/mAwvK2DNv4K1nWFxljv5PRo63JlYXaeK5UIDYSW3QxJSgrXLBBDzToiYBsDZc
-         VacYQBgZpgl50lvWJhujOt04OM0FwP69j/MQ8CuCBrWkri8JPPURS0K1edTglEMyxA+W
-         F/miPTJbwql8C3dDmEoOAC21c5wj2UGQu+6JFflgnH+jL0AloGHf6qR+494A4qph2Gel
-         +lDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=bKGCaBNhIQly2LY7lY+NOmyJ6aI0Yd/h629XMH7wx3Q=;
-        fh=t/vLE+ydOcOwSC/6ySEUOHPhLjbjZ5xw9IaklE0pA9M=;
-        b=QlunKHfbYVPpORuhjsz6XtABQrMFYoCI21NgMhSNs8hu007NMeM2vNHFQac2y61MxF
-         2W4FG38ecG8kCiISiqWJWPYm2AS3+83tsg1oGnV9qiIjwSINICYoffTW78QtndrhvG92
-         pGfo8queW81FeySYMBCIKOflcXx47iEiXcN1BcogqpAqk5kXPPT/hi79O+3JT+qW9KJo
-         hnrUWZ1F8Dl6y4XRH19muW7NTEZsjt5+jygmnoae81x50PtOYGVA1otlsHnmZyOsNBFo
-         OzbbrYUebyr97G5H1LLAzkbYDAh4FUVf6ej4QZbr2jtWrM4Wuh8u+NLwwVO9TlOqx0Lf
-         xSVw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791510934; x=1792115734; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=bKGCaBNhIQly2LY7lY+NOmyJ6aI0Yd/h629XMH7wx3Q=;
-        b=n85S0maMMYdJNjJeIea1AIL1ucIBiMZ8jEvI8a3fHf68dgmgVmxFQ3TN9JJsKuxlqd
-         x1+lawMxkzwMLbZsOg3x+1ovo0ZaCTFcVfgxHkXg7hGbqyOxY86htMGiRwzh/Nr8un7g
-         H1JeIe/weGeQuwa7TUK9+csR4hr74vevCNQ1vg8iMqpfutpXf8fr31nqxu3IuNjNCnsJ
-         0FsjKqKWnSK+R5gK0be0RAKDfBd4TJ5wh+zL0vNbTvCLLURaLZV318s8RfVjjYspFDMb
-         YbIwCXR5SROzd63IKFd10RL/QydiDXyd+1m/QNkVQ6HyI4aM8PsBcXPt+zgPJ50/cUJy
-         A81w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791510934; x=1792115734;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=bKGCaBNhIQly2LY7lY+NOmyJ6aI0Yd/h629XMH7wx3Q=;
-        b=bMdd1NfstoY/mKMkHR+vrWw4Oubgqfxe1XmAtfSZmmYVnfE6kthNGTJYTVnmEco/W+
-         fC7yURVMyPDHPqRxMuef0jRYtyYonB5F7qJxLvlKBGSF26Me8Q7LT11NpK16hlhPbFhD
-         uZpeGqeUW7mjl6YwwTtfcsEIRYuWcb2A+DwDmFp0/kUbqpaVkiai6O4rl5XiM4WFzxYX
-         yreNwWrA8DSRmzW1gWkHI3sFaBeRluBgYrlFjfleScBTphBKH2XEt0yey3v+pQgH8o4e
-         V18aFtzTbzzepK3hnxB/FbG+UyT+PaUw8+5quWgs2MkJO8YriLXX0PRWADQYblZv8A12
-         LDMA==
-X-Forwarded-Encrypted: i=1; AKwUvByc2vEjvFsyJ5SijjjQRx9Goiu3B3p03Vok+EpbKiySlJLxnqItNHI0P9h+qkcYf0NNqOBDtkvICNup@vger.kernel.org
-X-Gm-Message-State: AFq9FYL2XQph0bvLB3w5oiRWmSycy/nyx878q0gwsPHjE21I1qBm7feK
-	1/lx4OnjR/U3+Xo50JPd4nTcvajUV072zRIWPrMZEuZPpiqW267KAkUVCEZLWq9uz8VG3YX5UwU
-	LW5pE+6IDRzZVZ/6EBvxDR7ZzFZDX9xA=
-X-Gm-Gg: AYBFou2YVJDzkOqyqkIy/YhaJYAXlE+8Gxax2R+hebHcET852TKWdyybxVtDzEbqTsH
-	1qIeqX9yfywacvEGNeWXj9yO+oKTiEDcYPfnoK4U489q5fq43VXT4zhaE7nnwau/wPf8l1+ASkC
-	zlFpIKR96lVGQ3aJ+Jq/L6Zjh+Pd5LtSxx1bxACzDuF7YUtlkOrkaG406lu0MBqpxHdngU3Q42o
-	g2EzXWHhKPE11sbYu+dMr3McDAZleWTNbYl9Zv0llpxjDZ9iEXACFUoGAuPq/TWdzNdDrppil2h
-	h6Oig2oujP3ngLLN8l6HISz4KWorWMeYWhxXdYAQPc5Oe+SWs6HuXc2epfFkrwLEDpjt49QgaIQ
-	bgOAanebM5R3vhol19a9ojpJOBjAXjcaGkqk9R4b8XkNehrRidhEq
-X-Received: by 2002:a05:6a00:2887:b0:881:4b47:f30b with SMTP id
- d2e1a72fcca58-897c6443587mr353692b3a.12.1791510933832; Thu, 08 Oct 2026
- 18:55:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBRkmYT4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 871581F00893
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 02:10:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791511818;
+	bh=tfHpIuM0EcVsXOjhkChlUUyRkDaHNzm3/NO5xrwHoR8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=fBRkmYT4ohSdhwUGubABDWXiEoYqt2u8rfYflDAwwLD1hAktG7LYu0e8MlUE09EJU
+	 +pLaQ99bPzOwZ09/lzWwJr/CLKraDiXDU44ucoDVqEU4L+8DIz9IIsTHrbKfgCsXyL
+	 XjzI6EZA+J6Zt3x7KHL6X8Lb0+Tj2FcnVnRd2yrUmzdWdcuGvejzBMtYdbKVTvTLeh
+	 i422FlIMEohABOweDXy0RlJDKRfBEadajl4gbHEdfT504sZjuuvon9q8ThKeMZk6VH
+	 1R459SGsVzDUqlA6r5ZnJI8XroYit3ZkU3EFYAs2hE4jHLwb6L/VnVuUUVNryKLe0o
+	 y8PLdNXh3AaDw==
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c262f1186f0so505613366b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 19:10:18 -0700 (PDT)
+X-Gm-Message-State: AFq9FYJSeD2gCQSxJZ25Cz2fXOoZxfrEm9DyoR/8QrD9M7SoHXK4yWA4
+	2gTsM/6HHQC0LB53mfSs78SMG6NPVP9RHEo/wSPsi8kpSiQtodKsnkwV83cYUPrVrI9Xc1QS9M3
+	I/UrRTINZWHkkDjohn0ks4b+O4dJtTc8=
+X-Received: by 2002:a17:907:d92:b0:c2d:23af:5fcd with SMTP id
+ a640c23a62f3a-c31aa0b6250mr36490366b.44.1791511817091; Thu, 08 Oct 2026
+ 19:10:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <333607babf249e24fe90625d7abb7625b97c0b50.1791227050.git.lucien.xin@gmail.com>
- <179133512872.434549.11248338098140405125@kernel.org>
-In-Reply-To: <179133512872.434549.11248338098140405125@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 8 Oct 2026 21:55:21 -0400
-X-Gm-Features: AclHuK8bQc1UycT-_KEl0eTokTRsi7auN1Ri9mWxKSe-T9TNyMx8BTQMr8J1Amw
-Message-ID: <CADvbK_crkLjX2D+nu4LE16UpcQkUFa9DUp59hVKcXeTHxZXMHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 15/15] quic: add packet parser base
-To: netdev-bot+sashiko@kernel.org
-Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
-	metze@samba.org, mbuhl@openbsd.org, tfanelli@redhat.com, hepengtao@xiaomi.com, 
-	dreibh@simula.no, linux-cifs@vger.kernel.org, pc@manguebit.org, 
-	linkinjeon@kernel.org, tom@talpey.com, kernel-tls-handshake@lists.linux.dev, 
-	chuck.lever@oracle.com, jlayton@kernel.org, steved@redhat.com, hare@suse.de, 
-	aahringo@redhat.com, dhowells@redhat.com, matttbe@kernel.org, 
-	mail@johnericson.me, xiyou.wangcong@gmail.com, alibuda@linux.alibaba.com, 
-	jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net, 
-	marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com, 
-	mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
+References: <20261007063050.26322-1-tjdqudcks0424@naver.com>
+In-Reply-To: <20261007063050.26322-1-tjdqudcks0424@naver.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 9 Oct 2026 11:10:04 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-3W-7gV6_+L=Fv==dr7oZuqF4rEjF538eOkKfCy4t4Kw@mail.gmail.com>
+X-Gm-Features: AclHuK8uhx5uk857fxtOopwoPyUJia05X5XYsiEoYqlvWDhbD1PBlJnPOpqPwqg
+Message-ID: <CAKYAXd-3W-7gV6_+L=Fv==dr7oZuqF4rEjF538eOkKfCy4t4Kw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: validate AppInstanceId takeover target
+To: Sung Byeongchan <tjdqudcks0424@naver.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: multipart/mixed; boundary="00000000000078b211065d5ed9e6"
+
+--00000000000078b211065d5ed9e6
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 6, 2026 at 9:05=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wrot=
-e:
+On Wed, Oct 7, 2026 at 3:31=E2=80=AFPM Sung Byeongchan <tjdqudcks0424@naver=
+.com> wrote:
 >
-> Thank you for your contribution! Sashiko AI review found 7 potential
-> issue(s) to consider.
+> AppInstanceId lookup currently compares only the 16-byte identifier in
+> the global open table.  A CREATE on an unrelated share and pathname can
+> therefore close an existing open belonging to another session before
+> authorization for the new target has been established.
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 3 =C2=B7 Low: 4
+> MS-SMB2 requires the old open to have the same target path and share, a
+> different ClientGuid, and requires the current user's maximal access to
+> include GENERIC_READ before the old open is closed.
 >
-> If you believe none of the issues are legitimate, please reply to each
-> issue of Medium severity or higher and explain why the AI is wrong.
-> If any of them are legitimate and you plan to respin, please let patchwor=
-k
-> know by including "pw-bot: cr" as a separate line at the end of your repl=
-y
-> (one such reply per series is enough).
+> Move AppInstanceId handling after path and permission resolution and
+> enforce those matching and access conditions.  Pass the referenced file
+> which was validated directly to the close helper instead of performing
+> another identifier-only lookup.
 >
-> - [Medium] The permanent commit message (the part above '---') describes
->   much less than the patch does, and some of it is wrong.
-> - [Medium] When PLPMTUD is disabled (paths->plpmtud_interval =3D=3D 0, th=
-e
->   default in this tree because nothing sets it),=E2=80=A6
-> - [Medium] quic_packet_listen_process() replies to, and creates state
->   for, long-header packets of any size.
-> - [Low] The kernel-doc for quic_listen_sock_lookup() in net/quic/socket.c
->   says that when several listening sockets share the same address, port=
-=E2=80=A6
-> - [Low] The patch adds definitions that nothing in this commit uses.
-> - [Low] struct quic_packet in net/quic/packet.h documents `daddr` as
->   'Dest address from received packet' and `saddr` as 'Source address=E2=
-=80=A6
-> - [Low] The header comment of quic_packet_deferred_work() (packet.c:776)
->   reads 'Work function to process packets in the backlog queue', but the=
-=E2=80=A6
+> This was found by source review with AI assistance.  Two tests using
+> distinct authenticated users showed a CREATE on an unrelated share
+> force-close the victim's open.  The fixed kernel preserved the victim
+> open and retained the valid same-share, same-path takeover behavior.
 >
-> --
->
-> quic: add packet parser base
->
-> This commit adds the QUIC receive path. quic_packet_rcv() finds the
-> owning socket by connection ID, by address, or through the listener, then
-> passes the packet to quic_packet_process(). The patch also adds
-> listen-side Initial handling, request sockets, ALPN-based listener
-> switching through a per-socket work item, and ICMP Packet Too Big
-> handling through quic_packet_rcv_err() and quic_packet_rcv_err_pmtu().
->
-> > This patch uses 'quic_packet' to handle packing of QUIC packets on the
-> > receive (RX) path.
->
-> [ ... ]
->
-> > - quic_packet_get_alpn(): Parse the ALPN from a client Initial packet,
-> >   then locate the appropriate listener using the ALPN.
->
-> [ ... ]
->
-> > - quic_packet_rcv_err_pmtu(): Find the socket and update the PMTU via
-> >   quic_packet_mss_update().
->
-> [Severity: Medium]
-> Some parts of the commit message don't match the code.
->
-> Should "packing" in the first sentence be "parsing"?
->
-> quic_packet_get_alpn() installs the Initial keys, decrypts the packet and
-> parses the ALPN list. It doesn't look up a listener. The lookup and the
-> switch happen in quic_listen_sock_switch() in net/quic/socket.c.
->
-> For ICMP errors, the socket lookup is done in quic_packet_rcv_err(), not
-> in quic_packet_rcv_err_pmtu().
->
-> The message also leaves out much of what the patch adds:
->
->   - quic_packet_listen_process(), with token verification and the
->     Stateless Reset, Version Negotiation, Retry and CONNECTION_REFUSED
->     triggers
->   - struct quic_request_sock and quic_request_sock_lookup(),
->     quic_request_sock_create() and quic_request_sock_backlog_tail(),
->     which charge sk_ack_backlog and receive memory
->   - the per-socket work_struct with deferred_list/backlog_list on
->     quic_wq, and flush_work() in quic_packet_free()
->   - quic_accept_sock_exists() and quic_listen_sock_switch()
->   - quic_backlog_rcv() now processing packets instead of dropping them
->   - the ALPN free moving from quic_destroy_sock() to quic_sock_destruct()
->
-True.
-
-These updates were added only to the last version, and
-I will also reflect them on the commit message.
-
-> Most of this is described only in the changelog below the --- line, and
-> git am drops that part. Could the permanent commit message cover these
-> pieces?
->
-> > diff --git a/net/quic/packet.c b/net/quic/packet.c
-> > index 56d2b8df292a0..673f1cd491438 100644
-> > --- a/net/quic/packet.c
-> > +++ b/net/quic/packet.c
-> > @@ -14,6 +14,781 @@
-> >
-> >  #define QUIC_HLEN            1
-> >
-> > +#define QUIC_LONG_HLEN(dcid, scid) \
-> > +     (QUIC_HLEN + QUIC_VERSION_LEN + 1 + (dcid)->len + 1 + (scid)->len=
-)
->
-> [Severity: Low]
-> This isn't a bug, but nothing in this patch uses QUIC_LONG_HLEN().
->
-> Two of the new struct quic_packet members are in a similar state.
->
-> backlog_list is described as "Packets waiting for crypto keys". It is
-> only initialized in quic_packet_init() and purged in quic_packet_free(),
-> and nothing enqueues to it yet.
->
-> quic_packet_listen_process() reads validate_peer_address, but nothing
-> ever sets it, so the token validation and Retry branch can't be reached:
->
->         if (packet->validate_peer_address) {
->
-> The changelog says these are staged for the next patchset. Could they be
-> added together with the code that uses them? Failing that, could the
-> backlog_list comment describe what the field does today?
->
-> [ ... ]
->
-> > +/* Process PMTU reduction event on a QUIC socket. */
-> > +void quic_packet_rcv_err_pmtu(struct sock *sk)
-> > +{
->
-> [ ... ]
->
-> > +     info =3D clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX=
-_PMTU);
-> > +     /* If PLPMTUD is not enabled, update MSS using route and ICMP inf=
-o. */
-> > +     if (!paths->plpmtud_interval) {
-> > +             if (quic_packet_route(sk))
-> > +                     return;
-> > +
-> > +             dst =3D __sk_dst_get(sk);
-> > +             if (dst)
-> > +                     dst->ops->update_pmtu(dst, sk, NULL, info, true);
-> > +             quic_packet_mss_update(sk, info - packet->hlen);
->
-> [Severity: Medium]
-> Can a Packet Too Big that reports a larger MTU than the current path MTU
-> raise the MSS here?
->
-> info is only clamped to [QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU], and
-> quic_packet_mss_update() stores whatever it is given. The route layer
-> ignores increases:
->
-> net/ipv4/route.c:__ip_rt_update_pmtu() {
->     ...
->         old_mtu =3D ipv4_mtu(dst);
->         if (old_mtu < mtu)
->                 return;
->     ...
-> }
->
-> __ip6_rt_update_pmtu() also returns early when mtu >=3D dst6_mtu(dst).
->
-> Nothing in this tree sets plpmtud_interval, so this branch is the
-> default. A delayed or spoofed ICMP that arrives through quic_udp_err()
-> -> quic_packet_rcv() -> quic_packet_rcv_err() -> quic_packet_rcv_err_pmtu=
-()
-> and claims 9000 on a 1500-byte path would set the MSS to 9000 - hlen.
->
-> The route is left unchanged, so the cached dst stays valid. Later
-> quic_packet_route() calls then get 1 back from quic_flow_route() and
-> never recompute the MSS from dst_mtu().
->
-> Would it be safer to re-read dst_mtu(dst) after update_pmtu(), or to only
-> ever lower the MSS, as tcp_v4_mtu_reduced() does?
->
-True.
-
-Will follow the suggestion to re-read it after update_pmtu():
-
-    info =3D dst_mtu(dst);
-
-> [ ... ]
->
-> > +static int quic_packet_listen_process(struct sock *sk, struct sk_buff =
-*skb,
-> > +                                   gfp_t gfp)
-> > +{
->
-> [ ... ]
->
-> > +     if (!quic_packet_compatible_versions(version)) {
-> > +             /* rfc9000#section-6.1:
-> > +              *
-> > +              * If the version selected by the client is not acceptabl=
-e to
-> > +              * the server, the server responds with a Version Negotia=
-tion
-> > +              * packet. This includes a list of versions that the serv=
-er
-> > +              * will accept.
-> > +              */
-> > +             err =3D quic_packet_version_create_and_xmit(sk, gfp);
-> > +             consume_skb(skb);
-> > +             return err;
-> > +     }
->
-> [Severity: Medium]
-> Is a minimum datagram size check missing before this reply?
->
-> RFC 9000 sections 5.2.2 and 6.1 say a server MUST drop smaller packets
-> that specify an unsupported version. Section 14.1 says a server MUST
-> discard an Initial packet in a UDP datagram whose payload is smaller than
-> 1200 bytes.
->
-> On the receive path nothing compares skb->len with QUIC_MIN_UDP_PAYLOAD.
-> quic_packet_rcv() and quic_packet_get_sock() only require
-> skb->len >=3D QUIC_HLEN.
->
-> Packets of any size can therefore reach the Version Negotiation reply
-> above, the Retry and refuse-close paths, and this call further down:
->
->         req =3D quic_request_sock_create(sk, &odcid, retry, gfp);
->
-> When ALPN demux is disabled, the Length field isn't parsed at all. A
-> 16-byte spoofed long-header Initial (8-byte DCID, empty SCID, empty
-> token) would allocate a quic_request_sock and call sk_acceptq_added().
->
-> Could a burst of these fill the accept queue, so that legitimate clients
-> hit sk_acceptq_is_full() and get CONNECTION_REFUSED?
->
-> Once the Version Negotiation and Retry builders are implemented, would
-> they also reply to spoofed sources for these small datagrams?
->
-True.
-
-Will add a check for udp_hdr(skb)->len against QUIC_MIN_UDP_PAYLOAD here.
+> Fixes: 16c30649709d ("ksmbd: handle durable v2 app instance id")
+> Cc: stable@vger.kernel.org
+> Assisted-by: LLM
+> Signed-off-by: Sung Byeongchan <tjdqudcks0424@naver.com>
+I have directly updated this patch, Can you check the attached patch ?
 
 Thanks.
 
-> [ ... ]
->
-> > +/* Work function to process packets in the backlog queue. */
-> > +static void quic_packet_deferred_work(struct work_struct *work)
-> > +{
->
-> [ ... ]
->
-> > +     head =3D &quic_packet(sk)->deferred_list;
->
-> [Severity: Low]
-> This isn't a bug, but the comment says "backlog queue" while the function
-> drains deferred_list. struct quic_packet now has a separate backlog_list,
-> so should the comment say deferred list instead?
->
-> [ ... ]
->
-> > diff --git a/net/quic/packet.h b/net/quic/packet.h
-> > index cf0b97112d9b1..4a7bcf959e997 100644
-> > --- a/net/quic/packet.h
-> > +++ b/net/quic/packet.h
-> > @@ -14,6 +14,8 @@ struct quic_packet {
-> >       union quic_addr daddr;    /* Dest address from received packet */
-> >       union quic_addr saddr;    /* Source address from received packet =
-*/
->
-> [Severity: Low]
-> These comments seem reversed compared to how this patch fills the fields.
->
-> quic_get_msg_addrs() takes (skb, da, sa), and quic_packet_listen_process(=
-)
-> calls it like this:
->
->         quic_get_msg_addrs(skb, &packet->saddr, &packet->daddr);
->
-> The inline comment there says "Read Destination address (packet->saddr)
-> and Source address (packet->daddr)".
->
-> So packet->saddr holds the received packet's destination (local) address
-> and packet->daddr holds its source (peer) address. The users,
-> quic_crypto_verify_token(), quic_accept_sock_exists() and
-> quic_listen_sock_switch(), all follow that convention.
->
-> Could the struct comments be changed to match?
->
-> [ ... ]
->
-> > diff --git a/net/quic/socket.c b/net/quic/socket.c
-> > index 0173416d0368a..be8dc30f8208a 100644
-> > --- a/net/quic/socket.c
-> > +++ b/net/quic/socket.c
->
-> [ ... ]
->
-> > +/* Find the listening QUIC socket for an incoming packet.
-> > + *
-> > + * This function searches the QUIC socket table for a listening socket=
- that
-> > + * matches the dest address and port, and the ALPN(s) if presented in =
-the
-> > + * ClientHello.  If multiple listening sockets are bound to the same a=
-ddress,
-> > + * port, and ALPN(s) (e.g., via SO_REUSEPORT), this function selects a=
- socket
-> > + * from the reuseport group.
->
-> [Severity: Low]
-> This isn't a bug, but the function body doesn't select from a reuseport
-> group.
->
-> It walks the hash chain with sk_nulls_for_each_rcu() and returns the
-> first specific-address match, or an ANY-address candidate. It never calls
-> reuseport_select_sock() or looks at sk_reuseport_cb.
->
-> The v16 changelog says reuseport_select_sock() moved to the next
-> patchset. Should this part of the comment move with it?
->
-> [ ... ]
->
-> --
-> Sashiko AI review =C2=B7 https://netdev-ai.bots.linux.dev/sashiko/#/patch=
-set/cover.1791227050.git.lucien.xin%40gmail.com
+--00000000000078b211065d5ed9e6
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-ksmbd-validate-AppInstanceId-takeover-target.patch"
+Content-Disposition: attachment; 
+	filename="0001-ksmbd-validate-AppInstanceId-takeover-target.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mv0bur3k0>
+X-Attachment-Id: f_mv0bur3k0
+
+RnJvbSBkMGE2MTllMDk3YmE1MjIzZjFiNjFjMTNiZThkZGQ5OGQ2YzYzNTcwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBTdW5nIEJ5ZW9uZ2NoYW4gPHRqZHF1ZGNrczA0MjRAbmF2ZXIu
+Y29tPgpEYXRlOiBUaHUsIDggT2N0IDIwMjYgMTc6MjQ6NDQgKzA5MDAKU3ViamVjdDogW1BBVENI
+XSBrc21iZDogdmFsaWRhdGUgQXBwSW5zdGFuY2VJZCB0YWtlb3ZlciB0YXJnZXQKCkFwcEluc3Rh
+bmNlSWQgbG9va3VwIGN1cnJlbnRseSBzZWxlY3RzIHRoZSBmaXJzdCBvcGVuIHdpdGggdGhlIG1h
+dGNoaW5nCmlkZW50aWZpZXIuIENSRUFURSBmb3IgYW4gdW5yZWxhdGVkIHNoYXJlIG9yIHBhdGgg
+Y2FuIHRoZXJlZm9yZQpmb3JjZS1jbG9zZSBhbm90aGVyIHNlc3Npb24ncyBvcGVuIGJlZm9yZSBh
+dXRob3JpemF0aW9uIG9mIHRoZSBuZXcKdGFyZ2V0LiBNYXRjaGluZyBvbmx5IHRoZSBiYXNlIHBh
+dGggYWxzbyBjb25mbGF0ZXMgYWx0ZXJuYXRlIGRhdGEgc3RyZWFtcwp3aXRoIHRoZSB1bm5hbWVk
+IHN0cmVhbS4KCk1TLVNNQjIgcmVxdWlyZXMgdGhlIG9sZCBvcGVuIHRvIG1hdGNoIHRoZSBzaGFy
+ZSBhbmQgcGF0aCwgYmVsb25nIHRvIGEKZGlmZmVyZW50IENsaWVudEd1aWQsIGFuZCBiZSBjbG9z
+ZWQgb25seSB3aGVuIHRoZSByZXF1ZXN0ZXIgaGFzCkdFTkVSSUNfUkVBRCBhY2Nlc3MuIFNlYXJj
+aCBhbGwgb3BlbnMgd2l0aCB0aGUgSUQgYW5kIG1hdGNoIHNoYXJlLApyZXNvbHZlZCBwYXRoLCBz
+dHJlYW0sIGFuZCB0aGUgY3VycmVudCBjb25uZWN0aW9uJ3MgY2xpZW50IEdVSUQuIFJldGFpbiBh
+CnNoYXJlIGNvbmZpZ3VyYXRpb24gcmVmZXJlbmNlIGluIGtzbWJkX2ZpbGUgYW5kIHJldXNlIGl0
+cyBuYW1lIGluc3RlYWQgb2YKYWxsb2NhdGluZyBhIG5hbWUgZm9yIGV2ZXJ5IG9wZW4uIFRoaXMg
+a2VlcHMgbWF0Y2hpbmcgc2FmZSBkdXJpbmcgdHJlZQpjb25uZWN0aW9uIHRlYXJkb3duIGFuZCBw
+cmVzZXJ2ZXMgbmFtZS1iYXNlZCBtYXRjaGluZyBhY3Jvc3MgY29uZmlndXJhdGlvbgp1cGRhdGVz
+LgoKUmVmcmVzaCB0aGUgc2hhcmUgcmVmZXJlbmNlIG9uIGR1cmFibGUgcmVjb25uZWN0IGFuZCBy
+ZXN0b3JlIHRoZSBvbGQKcmVmZXJlbmNlIGlmIHJlb3BlbmluZyBmYWlscy4gU2VyaWFsaXplIGNv
+bm5lY3Rpb24gYW5kIHNoYXJlIGNvbXBhcmlzb25zCndpdGggZHVyYWJsZSBkaXNjb25uZWN0L3Jl
+Y29ubmVjdCwgYW5kIHJlY2hlY2sgdGhlIHRhcmdldCBiZWZvcmUgY2xvc2luZwppdC4gS2VlcCB0
+aGUgb3JpZ2luYWwgQ2xpZW50R3VpZCBmb3IgZHVyYWJsZSByZXBsYXkgYW5kIGxlYXNlIGNoZWNr
+cy4KCkNoZWNrIEFwcEluc3RhbmNlVmVyc2lvbiBiZWZvcmUgcXVlcnlpbmcgYWNjZXNzLCBldmVu
+IHdoZW4gR0VORVJJQ19SRUFECmlzIGFic2VudCwgYW5kIGJlZm9yZSBkaXNjb25uZWN0ZWQgZGVs
+ZXRlLW9uLWNsb3NlIGNsZWFudXAuIFJlamVjdGVkCkNSRUFURSBtdXN0IGxlYXZlIG90aGVyIGR1
+cmFibGUgb3BlbnMgdW50b3VjaGVkLiBDYWxjdWxhdGUgbWF4aW1hbCBhY2Nlc3MKb24gdGhlIG1h
+dGNoZWQgb3BlbidzIHJlZmVyZW5jZWQgcGF0aCBzbyBhIHJlbmFtZSBjYW5ub3Qgc3Vic3RpdHV0
+ZSBhbm90aGVyCmZpbGUncyBhdXRob3JpemF0aW9uLiBSZXF1aXJlIHJlYWQgYWNjZXNzIHdpdGgg
+dGhlIGVmZmVjdGl2ZSBWRlMKY3JlZGVudGlhbHMgYXMgd2VsbCBhcyB0aGUgTlQgREFDTCBiZWZv
+cmUgdGFrZW92ZXIuIEFjY2VzcyBkZW5pYWwgb25seQpza2lwcyB0YWtlb3ZlciBhbmQgbGVhdmVz
+IENSRUFURSB0byBpdHMgbm9ybWFsIGFjY2VzcyBjaGVja3MuIFJlc3RvcmUKZmlsZXN5c3RlbSBj
+cmVkZW50aWFscyBiZWZvcmUgcmV0dXJuaW5nIGEgdGFrZW92ZXIgZXJyb3IuCgpIYW5kbGUgdGFr
+ZW92ZXIgYmVmb3JlIGNoZWNraW5nIEZJTEVfQ1JFQVRFIGNvbGxpc2lvbnMsIGFuZCByZS1yZXNv
+bHZlCnRoZSBwYXRoIGFmdGVyIGNsb3NpbmcgdGhlIG9sZCBvcGVuLiBUaGlzIGxldHMgZGVsZXRl
+LW9uLWNsb3NlIHJlbW92ZSB0aGUKb2xkIGZpbGUgYmVmb3JlIGEgbmV3IG9uZSBpcyBjcmVhdGVk
+LiBJbmNsdWRlIFNZTkNIUk9OSVpFIGluIHRoZSBiYXNlbGluZQptYXhpbWFsLWFjY2VzcyBtYXNr
+IHNvIHJlYWQtb25seSBmaWxlcyByZXBvcnQgR0VORVJJQ19SRUFEIGNvcnJlY3RseS4KCkZpeGVz
+OiAxNmMzMDY0OTcwOWQgKCJrc21iZDogaGFuZGxlIGR1cmFibGUgdjIgYXBwIGluc3RhbmNlIGlk
+IikKQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcKQXNzaXN0ZWQtYnk6IExMTQpTaWduZWQtb2Zm
+LWJ5OiBTdW5nIEJ5ZW9uZ2NoYW4gPHRqZHF1ZGNrczA0MjRAbmF2ZXIuY29tPgpTaWduZWQtb2Zm
+LWJ5OiBOYW1qYWUgSmVvbiA8bGlua2luamVvbkBrZXJuZWwub3JnPgotLS0KIGZzL3NtYi9zZXJ2
+ZXIvc21iMnBkdS5jICAgfCAxMjMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKy0tLS0tLQogZnMvc21iL3NlcnZlci92ZnMuYyAgICAgICB8ICAgNSArLQogZnMvc21iL3Nl
+cnZlci92ZnNfY2FjaGUuYyB8ICA3NyArKysrKysrKysrKysrKysrKysrKystLS0tLS0tLQogZnMv
+c21iL3NlcnZlci92ZnNfY2FjaGUuaCB8ICAxMCArKystCiA0IGZpbGVzIGNoYW5nZWQsIDE3NSBp
+bnNlcnRpb25zKCspLCA0MCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9mcy9zbWIvc2VydmVy
+L3NtYjJwZHUuYyBiL2ZzL3NtYi9zZXJ2ZXIvc21iMnBkdS5jCmluZGV4IDEyYTQzZWYuLjc5NDRh
+OWYgMTAwNjQ0Ci0tLSBhL2ZzL3NtYi9zZXJ2ZXIvc21iMnBkdS5jCisrKyBiL2ZzL3NtYi9zZXJ2
+ZXIvc21iMnBkdS5jCkBAIC00MTE5LDE4ICs0MTE5LDc2IEBAIHN0YXRpYyBpbnQgcGFyc2VfYXBw
+X2luc3RhbmNlX3ZlcnNpb24oc3RydWN0IHNtYjJfY3JlYXRlX3JlcSAqcmVxLAogCXJldHVybiAw
+OwogfQogCi1zdGF0aWMgaW50IHNtYjJfaGFuZGxlX2FwcF9pbnN0YW5jZV9pZChzdHJ1Y3Qgc21i
+Ml9jcmVhdGVfcnNwICpyc3AsCi0JCQkJICAgICAgIHN0cnVjdCBkdXJhYmxlX2luZm8gKmRoX2lu
+Zm8pCitzdGF0aWMgaW50IHNtYjJfYXBwX2luc3RhbmNlX3N0cmVhbV9tYXRjaGVzKHN0cnVjdCBr
+c21iZF9maWxlICpmcCwKKwkJCQkJICAgIGNoYXIgKnN0cmVhbV9uYW1lLCBpbnQgc190eXBlLAor
+CQkJCQkgICAgYm9vbCAqbWF0Y2hlcykKIHsKKwljaGFyICp4YXR0cl9zdHJlYW1fbmFtZTsKKwlz
+aXplX3QgeGF0dHJfc3RyZWFtX3NpemU7CisJaW50IHJjOworCisJaWYgKCFzdHJlYW1fbmFtZSkg
+eworCQkqbWF0Y2hlcyA9ICFrc21iZF9zdHJlYW1fZmQoZnApOworCQlyZXR1cm4gMDsKKwl9CisK
+KwlyYyA9IGtzbWJkX3Zmc194YXR0cl9zdHJlYW1fbmFtZShzdHJlYW1fbmFtZSwgJnhhdHRyX3N0
+cmVhbV9uYW1lLAorCQkJCQkgJnhhdHRyX3N0cmVhbV9zaXplLCBzX3R5cGUpOworCWlmIChyYykK
+KwkJcmV0dXJuIHJjOworCisJKm1hdGNoZXMgPSBmcC0+c3RyZWFtLm5hbWUgJiYgZnAtPnN0cmVh
+bS5zaXplID49IDAgJiYKKwkJICAgKHNpemVfdClmcC0+c3RyZWFtLnNpemUgPT0geGF0dHJfc3Ry
+ZWFtX3NpemUgJiYKKwkJICAgIXN0cm5jYXNlY21wKGZwLT5zdHJlYW0ubmFtZSwgeGF0dHJfc3Ry
+ZWFtX25hbWUsCisJCQkJeGF0dHJfc3RyZWFtX3NpemUpOworCWtmcmVlKHhhdHRyX3N0cmVhbV9u
+YW1lKTsKKwlyZXR1cm4gMDsKK30KKworc3RhdGljIGludCBzbWIyX2hhbmRsZV9hcHBfaW5zdGFu
+Y2VfaWQoc3RydWN0IGtzbWJkX3dvcmsgKndvcmssCisJCQkJICAgICAgIHN0cnVjdCBzbWIyX2Ny
+ZWF0ZV9yc3AgKnJzcCwKKwkJCQkgICAgICAgc3RydWN0IGR1cmFibGVfaW5mbyAqZGhfaW5mbywK
+KwkJCQkgICAgICAgY29uc3Qgc3RydWN0IHBhdGggKnBhdGgsCisJCQkJICAgICAgIGNoYXIgKnN0
+cmVhbV9uYW1lLCBpbnQgc190eXBlLAorCQkJCSAgICAgICBib29sICpjbG9zZWQpCit7CisJc3Ry
+dWN0IGtzbWJkX2Nvbm4gKmNvbm4gPSB3b3JrLT5jb25uOwogCXN0cnVjdCBrc21iZF9maWxlICpv
+bGRfZnA7Ci0JYm9vbCByZWplY3QgPSBmYWxzZTsKKwljb25zdCBzdHJ1Y3QgcGF0aCAqb2xkX3Bh
+dGg7CisJY2hhciAqYXBwX2luc3RhbmNlX2lkOworCV9fbGUzMiBtYXhpbWFsX2FjY2VzcyA9IEZJ
+TEVfTUFYSU1BTF9BQ0NFU1NfTEU7CisJYm9vbCByZWplY3QgPSBmYWxzZSwgc3RyZWFtX21hdGNo
+ZXM7CisJaW50IGN1cnNvciA9IDAsIHJjOwogCisJKmNsb3NlZCA9IGZhbHNlOwogCWlmICghZGhf
+aW5mby0+YXBwX2luc3RhbmNlX2lkKQogCQlyZXR1cm4gMDsKKwlhcHBfaW5zdGFuY2VfaWQgPSBk
+aF9pbmZvLT5BcHBJbnN0YW5jZUlkOwogCi0Jb2xkX2ZwID0ga3NtYmRfbG9va3VwX2ZkX2FwcF9p
+bnN0YW5jZV9pZChkaF9pbmZvLT5BcHBJbnN0YW5jZUlkKTsKLQlpZiAoIW9sZF9mcCkKLQkJcmV0
+dXJuIDA7CisJd2hpbGUgKHRydWUpIHsKKwkJb2xkX2ZwID0ga3NtYmRfbG9va3VwX2ZkX2FwcF9p
+bnN0YW5jZV9pZF9uZXh0KGFwcF9pbnN0YW5jZV9pZCwKKwkJCQkJCQkgICAgICAmY3Vyc29yKTsK
+KwkJaWYgKCFvbGRfZnApCisJCQlyZXR1cm4gMDsKKworCQlpZiAoIWtzbWJkX2FwcF9pbnN0YW5j
+ZV9pZF9tYXRjaGVzKHdvcmssIG9sZF9mcCkgfHwKKwkJICAgICFwYXRoX2VxdWFsKCZvbGRfZnAt
+PmZpbHAtPmZfcGF0aCwgcGF0aCkpIHsKKwkJCWtzbWJkX3B1dF9kdXJhYmxlX2ZkKG9sZF9mcCk7
+CisJCQljb250aW51ZTsKKwkJfQorCisJCXJjID0gc21iMl9hcHBfaW5zdGFuY2Vfc3RyZWFtX21h
+dGNoZXMob2xkX2ZwLCBzdHJlYW1fbmFtZSwKKwkJCQkJCSAgICAgIHNfdHlwZSwgJnN0cmVhbV9t
+YXRjaGVzKTsKKwkJaWYgKHJjKSB7CisJCQlrc21iZF9wdXRfZHVyYWJsZV9mZChvbGRfZnApOwor
+CQkJcmV0dXJuIHJjOworCQl9CisJCWlmICghc3RyZWFtX21hdGNoZXMpIHsKKwkJCWtzbWJkX3B1
+dF9kdXJhYmxlX2ZkKG9sZF9mcCk7CisJCQljb250aW51ZTsKKwkJfQorCQlicmVhazsKKwl9CiAK
+IAlpZiAoZGhfaW5mby0+YXBwX2luc3RhbmNlX3ZlcnNpb25fdmFsaWQpIHsKIAkJaWYgKG9sZF9m
+cC0+YXBwX2luc3RhbmNlX3ZlcnNpb25fdmFsaWQgJiYKQEAgLTQxNDUsMTMgKzQyMDMsMzQgQEAg
+c3RhdGljIGludCBzbWIyX2hhbmRsZV9hcHBfaW5zdGFuY2VfaWQoc3RydWN0IHNtYjJfY3JlYXRl
+X3JzcCAqcnNwLAogCQlyZWplY3QgPSB0cnVlOwogCX0KIAotCWtzbWJkX3B1dF9kdXJhYmxlX2Zk
+KG9sZF9mcCk7CiAJaWYgKHJlamVjdCkgeworCQlrc21iZF9wdXRfZHVyYWJsZV9mZChvbGRfZnAp
+OwogCQlyc3AtPmhkci5TdGF0dXMgPSBTVEFUVVNfRklMRV9GT1JDRURfQ0xPU0VEOwogCQlyZXR1
+cm4gLUVJTzsKIAl9CiAKLQlyZXR1cm4ga3NtYmRfY2xvc2VfZmRfYXBwX2luc3RhbmNlX2lkKGRo
+X2luZm8tPkFwcEluc3RhbmNlSWQpOworCS8qIEF1dGhvcml6ZSB0aGUgcmVmZXJlbmNlZCBvcGVu
+IGV2ZW4gaWYgaXRzIG5hbWUgY2hhbmdlcyBtZWFud2hpbGUuICovCisJb2xkX3BhdGggPSAmb2xk
+X2ZwLT5maWxwLT5mX3BhdGg7CisJcmMgPSBzbWJfY2hlY2tfcGVybV9kYWNsKGNvbm4sIG9sZF9w
+YXRoLCAmbWF4aW1hbF9hY2Nlc3MsIDAsCisJCQkJIHdvcmstPnNlc3MtPnVzZXItPnVpZCwgZmFs
+c2UpOworCWlmIChyYykgeworCQkvKiBBY2Nlc3MgZGVuaWFsIHByZXZlbnRzIHRha2VvdmVyLCBu
+b3QgdGhlIENSRUFURSBpdHNlbGYuICovCisJCWtzbWJkX3B1dF9kdXJhYmxlX2ZkKG9sZF9mcCk7
+CisJCXJldHVybiByYyA9PSAtRUFDQ0VTID8gMCA6IHJjOworCX0KKwlpZiAobWF4aW1hbF9hY2Nl
+c3MgPT0gRklMRV9NQVhJTUFMX0FDQ0VTU19MRSkKKwkJa3NtYmRfdmZzX3F1ZXJ5X21heGltYWxf
+YWNjZXNzKG1udF9pZG1hcChvbGRfcGF0aC0+bW50KSwKKwkJCQkJICAgICAgIG9sZF9wYXRoLT5k
+ZW50cnksICZtYXhpbWFsX2FjY2Vzcyk7CisJLyogQWxzbyByZXF1aXJlIHJlYWQgYWNjZXNzIHdp
+dGggdGhlIGVmZmVjdGl2ZSBWRlMgY3JlZGVudGlhbHMuICovCisJaWYgKChsZTMyX3RvX2NwdSht
+YXhpbWFsX2FjY2VzcykgJiBHRU5FUklDX1JFQURfRkxBR1MpICE9CisJICAgIEdFTkVSSUNfUkVB
+RF9GTEFHUyB8fAorCSAgICBpbm9kZV9wZXJtaXNzaW9uKG1udF9pZG1hcChvbGRfcGF0aC0+bW50
+KSwKKwkJCSAgICAgZF9pbm9kZShvbGRfcGF0aC0+ZGVudHJ5KSwgTUFZX09QRU4gfCBNQVlfUkVB
+RCkpIHsKKwkJa3NtYmRfcHV0X2R1cmFibGVfZmQob2xkX2ZwKTsKKwkJcmV0dXJuIDA7CisJfQor
+CisJcmV0dXJuIGtzbWJkX2Nsb3NlX2ZkX2FwcF9pbnN0YW5jZV9pZCh3b3JrLCBvbGRfZnAsIGNs
+b3NlZCk7CiB9CiAKIC8qKgpAQCAtNDE5MSw2ICs0MjcwLDcgQEAgaW50IHNtYjJfb3BlbihzdHJ1
+Y3Qga3NtYmRfd29yayAqd29yaykKIAljaGFyICpuYW1lID0gTlVMTDsKIAljaGFyICpzdHJlYW1f
+bmFtZSA9IE5VTEw7CiAJYm9vbCBmaWxlX3ByZXNlbnQgPSBmYWxzZSwgY3JlYXRlZCA9IGZhbHNl
+LCBhbHJlYWR5X3Blcm1pdHRlZCA9IGZhbHNlOworCWJvb2wgYXBwX2luc3RhbmNlX2lkX2NoZWNr
+ZWQgPSBmYWxzZSwgYXBwX2luc3RhbmNlX2Nsb3NlZDsKIAlpbnQgc2hhcmVfcmV0LCBuZWVkX3Ry
+dW5jYXRlID0gMDsKIAl1NjQgdGltZSwgYWxsb2Nfc2l6ZSA9IDA7CiAJdW1vZGVfdCBwb3NpeF9t
+b2RlID0gMDsKQEAgLTQzNjUsMTMgKzQ0NDUsNiBAQCBpbnQgc21iMl9vcGVuKHN0cnVjdCBrc21i
+ZF93b3JrICp3b3JrKQogCQl9CiAJfQogCi0JaWYgKGRoX2luZm8uYXBwX2luc3RhbmNlX2lkICYm
+ICFkaF9pbmZvLnJlY29ubmVjdGVkICYmCi0JICAgICFkaF9pbmZvLnJlcGxheSkgewotCQlyYyA9
+IHNtYjJfaGFuZGxlX2FwcF9pbnN0YW5jZV9pZChyc3AsICZkaF9pbmZvKTsKLQkJaWYgKHJjKQot
+CQkJZ290byBlcnJfb3V0MjsKLQl9Ci0KIAlpZiAobGUzMl90b19jcHUocmVxLT5JbXBlcnNvbmF0
+aW9uTGV2ZWwpID4gbGUzMl90b19jcHUoSUxfREVMRUdBVEUpKSB7CiAJCXByX2VycigiSW52YWxp
+ZCBpbXBlcnNvbmF0aW9ubGV2ZWwgOiAweCV4XG4iLAogCQkgICAgICAgbGUzMl90b19jcHUocmVx
+LT5JbXBlcnNvbmF0aW9uTGV2ZWwpKTsKQEAgLTQ0ODQsOSArNDU1NywyOSBAQCBpbnQgc21iMl9v
+cGVuKHN0cnVjdCBrc21iZF93b3JrICp3b3JrKQogCQlnb3RvIGVycl9vdXQyOwogCX0KIAorcmVz
+b2x2ZV9wYXRoOgorCWZpbGVfcHJlc2VudCA9IGZhbHNlOworCW1heGltYWxfYWNjZXNzID0gMDsK
+IAlyYyA9IGtzbWJkX3Zmc19rZXJuX3BhdGgod29yaywgbmFtZSwgTE9PS1VQX05PX1NZTUxJTktT
+LAogCQkJCSAmcGF0aCwgMSk7CiAKKwkvKiBWYWxpZGF0ZSB0YWtlb3ZlciBiZWZvcmUgZGlzY29u
+bmVjdGVkIGRlbGV0ZS1vbi1jbG9zZSBjbGVhbnVwLiAqLworCWlmICghcmMgJiYgZGhfaW5mby5h
+cHBfaW5zdGFuY2VfaWQgJiYgIWRoX2luZm8ucmVjb25uZWN0ZWQgJiYKKwkgICAgIWRoX2luZm8u
+cmVwbGF5ICYmICFhcHBfaW5zdGFuY2VfaWRfY2hlY2tlZCkgeworCQlhcHBfaW5zdGFuY2VfaWRf
+Y2hlY2tlZCA9IHRydWU7CisJCXJjID0gc21iMl9oYW5kbGVfYXBwX2luc3RhbmNlX2lkKHdvcmss
+IHJzcCwgJmRoX2luZm8sICZwYXRoLAorCQkJCQkJIHN0cmVhbV9uYW1lLCBzX3R5cGUsCisJCQkJ
+CQkgJmFwcF9pbnN0YW5jZV9jbG9zZWQpOworCQlpZiAocmMpIHsKKwkJCXBhdGhfcHV0KCZwYXRo
+KTsKKwkJCWdvdG8gZXJyX291dDE7CisJCX0KKwkJaWYgKGFwcF9pbnN0YW5jZV9jbG9zZWQpIHsK
+KwkJCXBhdGhfcHV0KCZwYXRoKTsKKwkJCWdvdG8gcmVzb2x2ZV9wYXRoOworCQl9CisJfQorCiAJ
+LyoKIAkgKiBBIGR1cmFibGUgaGFuZGxlIG9wZW5lZCB3aXRoIGRlbGV0ZS1vbi1jbG9zZSBpcyBw
+cmVzZXJ2ZWQgYWNyb3NzIGEKIAkgKiBkaXNjb25uZWN0IHNvIGl0IGNhbiBiZSByZWNsYWltZWQg
+YnkgYSBkdXJhYmxlIHJlY29ubmVjdC4gIFdoZW4gYSBuZXcKZGlmZiAtLWdpdCBhL2ZzL3NtYi9z
+ZXJ2ZXIvdmZzLmMgYi9mcy9zbWIvc2VydmVyL3Zmcy5jCmluZGV4IDNlMDYwOTUuLjE1MDg3NzUg
+MTAwNjQ0Ci0tLSBhL2ZzL3NtYi9zZXJ2ZXIvdmZzLmMKKysrIGIvZnMvc21iL3NlcnZlci92ZnMu
+YwpAQCAtMTE5LDEwICsxMTksMTEgQEAgc3RhdGljIGludCBrc21iZF92ZnNfcGF0aF9sb29rdXAo
+c3RydWN0IGtzbWJkX3NoYXJlX2NvbmZpZyAqc2hhcmVfY29uZiwKIHZvaWQga3NtYmRfdmZzX3F1
+ZXJ5X21heGltYWxfYWNjZXNzKHN0cnVjdCBtbnRfaWRtYXAgKmlkbWFwLAogCQkJCSAgIHN0cnVj
+dCBkZW50cnkgKmRlbnRyeSwgX19sZTMyICpkYWNjZXNzKQogewotCSpkYWNjZXNzID0gY3B1X3Rv
+X2xlMzIoRklMRV9SRUFEX0FUVFJJQlVURVMgfCBSRUFEX0NPTlRST0wpOworCSpkYWNjZXNzID0g
+Y3B1X3RvX2xlMzIoRklMRV9SRUFEX0FUVFJJQlVURVMgfCBSRUFEX0NPTlRST0wgfAorCQkJICAg
+ICAgIFNZTkNIUk9OSVpFKTsKIAogCWlmICghaW5vZGVfcGVybWlzc2lvbihpZG1hcCwgZF9pbm9k
+ZShkZW50cnkpLCBNQVlfT1BFTiB8IE1BWV9XUklURSkpCi0JCSpkYWNjZXNzIHw9IGNwdV90b19s
+ZTMyKFdSSVRFX0RBQyB8IFdSSVRFX09XTkVSIHwgU1lOQ0hST05JWkUgfAorCQkqZGFjY2VzcyB8
+PSBjcHVfdG9fbGUzMihXUklURV9EQUMgfCBXUklURV9PV05FUiB8CiAJCQkJRklMRV9XUklURV9E
+QVRBIHwgRklMRV9BUFBFTkRfREFUQSB8CiAJCQkJRklMRV9XUklURV9FQSB8IEZJTEVfV1JJVEVf
+QVRUUklCVVRFUyB8CiAJCQkJRklMRV9ERUxFVEVfQ0hJTEQpOwpkaWZmIC0tZ2l0IGEvZnMvc21i
+L3NlcnZlci92ZnNfY2FjaGUuYyBiL2ZzL3NtYi9zZXJ2ZXIvdmZzX2NhY2hlLmMKaW5kZXggYWUz
+MGVlMC4uNDk2MDU1YyAxMDA2NDQKLS0tIGEvZnMvc21iL3NlcnZlci92ZnNfY2FjaGUuYworKysg
+Yi9mcy9zbWIvc2VydmVyL3Zmc19jYWNoZS5jCkBAIC02NjQsNiArNjY0LDcgQEAgc3RhdGljIHZv
+aWQgX19rc21iZF9jbG9zZV9mZChzdHJ1Y3Qga3NtYmRfZmlsZV90YWJsZSAqZnQsIHN0cnVjdCBr
+c21iZF9maWxlICpmcCkKIAogCWlmIChrc21iZF9zdHJlYW1fZmQoZnApKQogCQlrZnJlZShmcC0+
+c3RyZWFtLm5hbWUpOworCWtzbWJkX3NoYXJlX2NvbmZpZ19wdXQoZnAtPnNoYXJlX2NvbmYpOwog
+CWtmcmVlKGZwLT5vd25lci5uYW1lKTsKIAogCWttZW1fY2FjaGVfZnJlZShmaWxwX2NhY2hlLCBm
+cCk7CkBAIC05NjIsMzcgKzk2Myw1NCBAQCBib29sIGtzbWJkX2hhc19vdGhlcl9hY3RpdmVfZmQo
+c3RydWN0IGtzbWJkX2ZpbGUgKmZwKQogCXJldHVybiByZXQ7CiB9CiAKLXN0cnVjdCBrc21iZF9m
+aWxlICprc21iZF9sb29rdXBfZmRfYXBwX2luc3RhbmNlX2lkKGNoYXIgKmFwcF9pbnN0YW5jZV9p
+ZCkKK2Jvb2wga3NtYmRfYXBwX2luc3RhbmNlX2lkX21hdGNoZXMoc3RydWN0IGtzbWJkX3dvcmsg
+KndvcmssCisJCQkJICAgc3RydWN0IGtzbWJkX2ZpbGUgKmZwKQogewotCXN0cnVjdCBrc21iZF9m
+aWxlICpmcCA9IE5VTEw7Ci0JdW5zaWduZWQgaW50IGlkOworCWJvb2wgbWF0Y2hlczsKKworCS8q
+IEtlZXAgdGhlIGN1cnJlbnQgY29ubmVjdGlvbiBhbmQgc2hhcmUgYWxpdmUgYWNyb3NzIHRoZSBj
+b21wYXJpc29uLiAqLworCXNwaW5fbG9jaygmZnAtPmZfbG9jayk7CisJbWF0Y2hlcyA9IFJFQURf
+T05DRShmcC0+Zl9zdGF0ZSkgPT0gRlBfSU5JVEVEICYmCisJCSAgZnAtPmNvbm4gJiYgZnAtPnNo
+YXJlX2NvbmYgJiYKKwkJICAhc3RyY21wKGZwLT5zaGFyZV9jb25mLT5uYW1lLCB3b3JrLT50Y29u
+LT5zaGFyZV9jb25mLT5uYW1lKSAmJgorCQkgIG1lbWNtcChmcC0+Y29ubi0+Q2xpZW50R1VJRCwg
+d29yay0+Y29ubi0+Q2xpZW50R1VJRCwKKwkJCSBTTUIyX0NMSUVOVF9HVUlEX1NJWkUpOworCXNw
+aW5fdW5sb2NrKCZmcC0+Zl9sb2NrKTsKKworCXJldHVybiBtYXRjaGVzOworfQorCitzdHJ1Y3Qg
+a3NtYmRfZmlsZSAqCitrc21iZF9sb29rdXBfZmRfYXBwX2luc3RhbmNlX2lkX25leHQoY2hhciAq
+YXBwX2luc3RhbmNlX2lkLCBpbnQgKmN1cnNvcikKK3sKKwlzdHJ1Y3Qga3NtYmRfZmlsZSAqZnAs
+ICpmb3VuZCA9IE5VTEw7CisJaW50IGlkID0gKmN1cnNvcjsKIAogCXJlYWRfbG9jaygmZ2xvYmFs
+X2Z0LmxvY2spOwotCWlkcl9mb3JfZWFjaF9lbnRyeShnbG9iYWxfZnQuaWRyLCBmcCwgaWQpIHsK
+LQkJaWYgKCFmcC0+aGFzX2FwcF9pbnN0YW5jZV9pZCkKLQkJCWNvbnRpbnVlOwotCQlpZiAoIW1l
+bWNtcChmcC0+YXBwX2luc3RhbmNlX2lkLCBhcHBfaW5zdGFuY2VfaWQsCisJd2hpbGUgKChmcCA9
+IGlkcl9nZXRfbmV4dChnbG9iYWxfZnQuaWRyLCAmaWQpKSkgeworCQkqY3Vyc29yID0gaWQgKyAx
+OworCQlpZiAoZnAtPmhhc19hcHBfaW5zdGFuY2VfaWQgJiYKKwkJICAgICFtZW1jbXAoZnAtPmFw
+cF9pbnN0YW5jZV9pZCwgYXBwX2luc3RhbmNlX2lkLAogCQkJICAgIFNNQjJfQ1JFQVRFX0dVSURf
+U0laRSkpIHsKLQkJCWZwID0ga3NtYmRfZnBfZ2V0KGZwKTsKLQkJCWJyZWFrOworCQkJZm91bmQg
+PSBrc21iZF9mcF9nZXQoZnApOworCQkJaWYgKGZvdW5kKQorCQkJCWJyZWFrOwogCQl9CisJCWlk
+Kys7CiAJfQogCXJlYWRfdW5sb2NrKCZnbG9iYWxfZnQubG9jayk7CiAKLQlyZXR1cm4gZnA7CisJ
+cmV0dXJuIGZvdW5kOwogfQogCi1pbnQga3NtYmRfY2xvc2VfZmRfYXBwX2luc3RhbmNlX2lkKGNo
+YXIgKmFwcF9pbnN0YW5jZV9pZCkKK2ludCBrc21iZF9jbG9zZV9mZF9hcHBfaW5zdGFuY2VfaWQo
+c3RydWN0IGtzbWJkX3dvcmsgKndvcmssCisJCQkJIHN0cnVjdCBrc21iZF9maWxlICpmcCwgYm9v
+bCAqY2xvc2VkKQogewogCXN0cnVjdCBrc21iZF9maWxlX3RhYmxlICpmdDsKLQlzdHJ1Y3Qga3Nt
+YmRfZmlsZSAqZnA7CiAJc3RydWN0IG9wbG9ja19pbmZvICpvcGluZm87CiAJaW50IG5fdG9fZHJv
+cCA9IDA7CiAKLQlmcCA9IGtzbWJkX2xvb2t1cF9mZF9hcHBfaW5zdGFuY2VfaWQoYXBwX2luc3Rh
+bmNlX2lkKTsKLQlpZiAoIWZwKQotCQlyZXR1cm4gMDsKLQorCSpjbG9zZWQgPSBmYWxzZTsKIAlv
+cGluZm8gPSBvcGluZm9fZ2V0KGZwKTsKIAlpZiAoIW9waW5mbykKIAkJZ290byBvdXQ7CkBAIC0x
+MDA1LDcgKzEwMjMsOCBAQCBpbnQga3NtYmRfY2xvc2VfZmRfYXBwX2luc3RhbmNlX2lkKGNoYXIg
+KmFwcF9pbnN0YW5jZV9pZCkKIAogCWZ0ID0gJm9waW5mby0+c2Vzcy0+ZmlsZV90YWJsZTsKIAl3
+cml0ZV9sb2NrKCZmdC0+bG9jayk7Ci0JaWYgKGZwLT5mX3N0YXRlID09IEZQX0lOSVRFRCAmJiBo
+YXNfZmlsZV9pZChmcC0+dm9sYXRpbGVfaWQpKSB7CisJaWYgKGZwLT5mX3N0YXRlID09IEZQX0lO
+SVRFRCAmJiBoYXNfZmlsZV9pZChmcC0+dm9sYXRpbGVfaWQpICYmCisJICAgIGtzbWJkX2FwcF9p
+bnN0YW5jZV9pZF9tYXRjaGVzKHdvcmssIGZwKSkgewogCQlpZHJfcmVtb3ZlKGZ0LT5pZHIsIGZw
+LT52b2xhdGlsZV9pZCk7CiAJCWZwLT52b2xhdGlsZV9pZCA9IEtTTUJEX05PX0ZJRDsKIAkJbl90
+b19kcm9wID0ga3NtYmRfbWFya19mcF9jbG9zZWQoZnApOwpAQCAtMTAyMiw2ICsxMDQxLDcgQEAg
+aW50IGtzbWJkX2Nsb3NlX2ZkX2FwcF9pbnN0YW5jZV9pZChjaGFyICphcHBfaW5zdGFuY2VfaWQp
+CiAJbGlzdF9kZWxfaW5pdCgmZnAtPm5vZGUpOwogCXVwX3dyaXRlKCZmcC0+Zl9jaS0+bV9sb2Nr
+KTsKIAorCSpjbG9zZWQgPSB0cnVlOwogCWlmIChhdG9taWNfc3ViX2FuZF90ZXN0KG5fdG9fZHJv
+cCwgJmZwLT5yZWZjb3VudCkpIHsKIAkJaWYgKGZwLT5jb25uKQogCQkJYXRvbWljX2RlYygmZnAt
+PmNvbm4tPnN0YXRzLm9wZW5fZmlsZXNfY291bnQpOwpAQCAtMTIzMyw2ICsxMjUzLDggQEAgc3Ry
+dWN0IGtzbWJkX2ZpbGUgKmtzbWJkX29wZW5fZmQoc3RydWN0IGtzbWJkX3dvcmsgKndvcmssIHN0
+cnVjdCBmaWxlICpmaWxwKQogCSAqLwogCWZwLT5jb25uCQk9IGtzbWJkX2Nvbm5fZ2V0KHdvcmst
+PmNvbm4pOwogCWZwLT50Y29uCQk9IHdvcmstPnRjb247CisJZnAtPnNoYXJlX2NvbmYJCT0gd29y
+ay0+dGNvbi0+c2hhcmVfY29uZjsKKwlhdG9taWNfaW5jKCZmcC0+c2hhcmVfY29uZi0+cmVmY291
+bnQpOwogCWZwLT52b2xhdGlsZV9pZAkJPSBLU01CRF9OT19GSUQ7CiAJZnAtPnBlcnNpc3RlbnRf
+aWQJPSBLU01CRF9OT19GSUQ7CiAJZnAtPmZfc3RhdGUJCT0gRlBfTkVXOwpAQCAtMTI1NSw2ICsx
+Mjc3LDcgQEAgc3RydWN0IGtzbWJkX2ZpbGUgKmtzbWJkX29wZW5fZmQoc3RydWN0IGtzbWJkX3dv
+cmsgKndvcmssIHN0cnVjdCBmaWxlICpmaWxwKQogZXJyX291dDoKIAkvKiBmcC0+Y29ubiB3YXMg
+c2V0IGFuZCByZWZjb3VudGVkIGJlZm9yZSBldmVyeSBicmFuY2ggaGVyZS4gKi8KIAlrc21iZF9j
+b25uX3B1dChmcC0+Y29ubik7CisJa3NtYmRfc2hhcmVfY29uZmlnX3B1dChmcC0+c2hhcmVfY29u
+Zik7CiAJa21lbV9jYWNoZV9mcmVlKGZpbHBfY2FjaGUsIGZwKTsKIAlyZXR1cm4gRVJSX1BUUihy
+ZXQpOwogfQpAQCAtMTc1OSw5ICsxNzgyLDExIEBAIHN0YXRpYyBib29sIHNlc3Npb25fZmRfY2hl
+Y2soc3RydWN0IGtzbWJkX3RyZWVfY29ubmVjdCAqdGNvbiwKIAkJa3NtYmRfY29ubl9wdXQobG9j
+a19jb25uKTsKIAl9CiAKKwlzcGluX2xvY2soJmZwLT5mX2xvY2spOwogCWZwLT5jb25uID0gTlVM
+TDsKIAlmcC0+dGNvbiA9IE5VTEw7CiAJZnAtPnZvbGF0aWxlX2lkID0gS1NNQkRfTk9fRklEOwor
+CXNwaW5fdW5sb2NrKCZmcC0+Zl9sb2NrKTsKIAogCWlmIChmcC0+ZHVyYWJsZV90aW1lb3V0KQog
+CQlmcC0+ZHVyYWJsZV9zY2F2ZW5nZXJfdGltZW91dCA9CkBAIC0xODYyLDYgKzE4ODcsNyBAQCBp
+bnQga3NtYmRfcmVvcGVuX2R1cmFibGVfZmQoc3RydWN0IGtzbWJkX3dvcmsgKndvcmssIHN0cnVj
+dCBrc21iZF9maWxlICpmcCkKIAlzdHJ1Y3Qga3NtYmRfaW5vZGUgKmNpOwogCXN0cnVjdCBvcGxv
+Y2tfaW5mbyAqb3A7CiAJc3RydWN0IGtzbWJkX2Nvbm4gKmNvbm4gPSB3b3JrLT5jb25uOworCXN0
+cnVjdCBrc21iZF9zaGFyZV9jb25maWcgKm9sZF9zaGFyZTsKIAlzdHJ1Y3Qga3NtYmRfbG9jayAq
+c21iX2xvY2s7CiAJdW5zaWduZWQgaW50IG9sZF9mX3N0YXRlOwogCkBAIC0xODg2LDIxICsxOTEy
+LDI5IEBAIGludCBrc21iZF9yZW9wZW5fZHVyYWJsZV9mZChzdHJ1Y3Qga3NtYmRfd29yayAqd29y
+aywgc3RydWN0IGtzbWJkX2ZpbGUgKmZwKQogCSAqIHBhcnRpYWxseS1pbml0aWFsaXplZCBmcC4g
+IGZwIG93bnMgYSBzdHJvbmcgcmVmZXJlbmNlIG9uIHRoZSBuZXcKIAkgKiBjb25uIChzZWUga3Nt
+YmRfb3Blbl9mZCgpKTsgdW5kbyBpdCBvbiBfX29wZW5faWQoKSBmYWlsdXJlLgogCSAqLworCXNw
+aW5fbG9jaygmZnAtPmZfbG9jayk7CisJb2xkX2Zfc3RhdGUgPSBmcC0+Zl9zdGF0ZTsKKwlmcC0+
+Zl9zdGF0ZSA9IEZQX05FVzsKKwlvbGRfc2hhcmUgPSBmcC0+c2hhcmVfY29uZjsKKwlmcC0+c2hh
+cmVfY29uZiA9IHdvcmstPnRjb24tPnNoYXJlX2NvbmY7CisJYXRvbWljX2luYygmZnAtPnNoYXJl
+X2NvbmYtPnJlZmNvdW50KTsKIAlmcC0+Y29ubiA9IGtzbWJkX2Nvbm5fZ2V0KGNvbm4pOwogCWZw
+LT50Y29uID0gd29yay0+dGNvbjsKKwlzcGluX3VubG9jaygmZnAtPmZfbG9jayk7CiAJd3JpdGVf
+dW5sb2NrKCZnbG9iYWxfZnQubG9jayk7CiAKLQlvbGRfZl9zdGF0ZSA9IGZwLT5mX3N0YXRlOwot
+CWZwLT5mX3N0YXRlID0gRlBfTkVXOwotCiAJX19vcGVuX2lkKCZ3b3JrLT5zZXNzLT5maWxlX3Rh
+YmxlLCBmcCwgT1BFTl9JRF9UWVBFX1ZPTEFUSUxFX0lEKTsKIAlpZiAoIWhhc19maWxlX2lkKGZw
+LT52b2xhdGlsZV9pZCkpIHsKIAkJd3JpdGVfbG9jaygmZ2xvYmFsX2Z0LmxvY2spOworCQlzcGlu
+X2xvY2soJmZwLT5mX2xvY2spOwogCQlmcC0+Y29ubiA9IE5VTEw7CiAJCWZwLT50Y29uID0gTlVM
+TDsKKwkJZnAtPnNoYXJlX2NvbmYgPSBvbGRfc2hhcmU7CisJCWZwLT5mX3N0YXRlID0gb2xkX2Zf
+c3RhdGU7CisJCXNwaW5fdW5sb2NrKCZmcC0+Zl9sb2NrKTsKIAkJd3JpdGVfdW5sb2NrKCZnbG9i
+YWxfZnQubG9jayk7CiAJCWtzbWJkX2Nvbm5fcHV0KGNvbm4pOwotCQlmcC0+Zl9zdGF0ZSA9IG9s
+ZF9mX3N0YXRlOworCQlrc21iZF9zaGFyZV9jb25maWdfcHV0KHdvcmstPnRjb24tPnNoYXJlX2Nv
+bmYpOwogCQlyZXR1cm4gLUVCQURGOwogCX0KIApAQCAtMTkyNyw2ICsxOTYxLDcgQEAgaW50IGtz
+bWJkX3Jlb3Blbl9kdXJhYmxlX2ZkKHN0cnVjdCBrc21iZF93b3JrICp3b3JrLCBzdHJ1Y3Qga3Nt
+YmRfZmlsZSAqZnApCiAJa2ZyZWUoZnAtPm93bmVyLm5hbWUpOwogCWZwLT5vd25lci5uYW1lID0g
+TlVMTDsKIAlzcGluX3VubG9jaygmZnAtPmZfbG9jayk7CisJa3NtYmRfc2hhcmVfY29uZmlnX3B1
+dChvbGRfc2hhcmUpOwogCiAJcmV0dXJuIDA7CiB9CmRpZmYgLS1naXQgYS9mcy9zbWIvc2VydmVy
+L3Zmc19jYWNoZS5oIGIvZnMvc21iL3NlcnZlci92ZnNfY2FjaGUuaAppbmRleCA3MzJhZTI2Li43
+MDY2MzNiIDEwMDY0NAotLS0gYS9mcy9zbWIvc2VydmVyL3Zmc19jYWNoZS5oCisrKyBiL2ZzL3Nt
+Yi9zZXJ2ZXIvdmZzX2NhY2hlLmgKQEAgLTEwMiw2ICsxMDIsOCBAQCBzdHJ1Y3Qga3NtYmRfZmls
+ZSB7CiAJc3RydWN0IG9wbG9ja19pbmZvIF9fcmN1CSpmX29waW5mbzsKIAlzdHJ1Y3Qga3NtYmRf
+Y29ubgkJKmNvbm47CiAJc3RydWN0IGtzbWJkX3RyZWVfY29ubmVjdAkqdGNvbjsKKwkvKiBPd24g
+YSBzaGFyZSByZWZlcmVuY2UgaW5kZXBlbmRlbnRseSBvZiB0Y29uOyByZWJpbmQgdW5kZXIgZl9s
+b2NrLiAqLworCXN0cnVjdCBrc21iZF9zaGFyZV9jb25maWcJKnNoYXJlX2NvbmY7CiAKIAlhdG9t
+aWNfdAkJCXJlZmNvdW50OwogCV9fbGUzMgkJCQlkYWNjZXNzOwpAQCAtMjA3LDggKzIwOSwxMiBA
+QCB2b2lkIGtzbWJkX3B1dF9kdXJhYmxlX2ZkKHN0cnVjdCBrc21iZF9maWxlICpmcCk7CiBpbnQg
+a3NtYmRfaW52YWxpZGF0ZV9kdXJhYmxlX2ZkKHVuc2lnbmVkIGxvbmcgbG9uZyBpZCk7CiBib29s
+IGtzbWJkX2hhc19vdGhlcl9hY3RpdmVfZmQoc3RydWN0IGtzbWJkX2ZpbGUgKmZwKTsKIGJvb2wg
+a3NtYmRfaGFzX3N0cmVhbV93aXRob3V0X2RlbGV0ZV9zaGFyZShzdHJ1Y3Qga3NtYmRfZmlsZSAq
+ZnApOwotc3RydWN0IGtzbWJkX2ZpbGUgKmtzbWJkX2xvb2t1cF9mZF9hcHBfaW5zdGFuY2VfaWQo
+Y2hhciAqYXBwX2luc3RhbmNlX2lkKTsKLWludCBrc21iZF9jbG9zZV9mZF9hcHBfaW5zdGFuY2Vf
+aWQoY2hhciAqYXBwX2luc3RhbmNlX2lkKTsKK2Jvb2wga3NtYmRfYXBwX2luc3RhbmNlX2lkX21h
+dGNoZXMoc3RydWN0IGtzbWJkX3dvcmsgKndvcmssCisJCQkJICAgc3RydWN0IGtzbWJkX2ZpbGUg
+KmZwKTsKK3N0cnVjdCBrc21iZF9maWxlICoKK2tzbWJkX2xvb2t1cF9mZF9hcHBfaW5zdGFuY2Vf
+aWRfbmV4dChjaGFyICphcHBfaW5zdGFuY2VfaWQsIGludCAqY3Vyc29yKTsKK2ludCBrc21iZF9j
+bG9zZV9mZF9hcHBfaW5zdGFuY2VfaWQoc3RydWN0IGtzbWJkX3dvcmsgKndvcmssCisJCQkJIHN0
+cnVjdCBrc21iZF9maWxlICpmcCwgYm9vbCAqY2xvc2VkKTsKIHN0cnVjdCBrc21iZF9maWxlICpr
+c21iZF9sb29rdXBfZmRfY2d1aWQoY2hhciAqY2d1aWQpOwogc3RydWN0IGtzbWJkX2ZpbGUgKmtz
+bWJkX2xvb2t1cF9mZF9pbm9kZShzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpOwogYm9vbCBrc21iZF9o
+YXNfb3RoZXJfbm9ucG9zaXhfb3BlbihzdHJ1Y3QgZGVudHJ5ICpkZW50cnkpOwotLSAKMi4zNC4x
+Cgo=
+--00000000000078b211065d5ed9e6--
