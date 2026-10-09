@@ -1,296 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B10D3BBFBC;
-	Fri,  9 Oct 2026 14:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3EF44BCB0
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 14:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791555354; cv=none; b=m++IKQ/tMafAOZxdPZlMoIi24xqnh+1R7N81dQVsqUs8wMqMMgK5OOW1jHgkwrKaMdbKWadwVgw5pxvf7xf/fbpfuXm6PgO/pl0MW9ISap1q9ypPyRw4u93toEOcPMGWMyT2EBg0hmvOZsdmfXsoRB6jNOpkD8fhjqtpV3MPF8s=
+	t=1791556650; cv=none; b=ehO2aBTdZm761SR6VuuJ4w6BQ3F5PwR1aChsDYpv05zVMH2MXo3Y9+IrYqXiGAqfBRMApcmqI2AtGEIFW8RfI5csTxYfu/XKNF+X2ZABsLBueIViAynNcV2EEhqphYfhurQBozg2WoQ7ARh3tu75hXb0q3cSL1MmQYqZHYkvQjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791555354; c=relaxed/simple;
-	bh=3RoejBxp5tLKB/9SakvEwkWlyrmYkKPJ97SSUSqH21g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L2P45UIKiNDAxL173xVOm+OR209NgL5W3/+pDJJ3RrtQEm5+X5xxz4w4zYH4QKS9x68oJXrI4UqaM8yD0YQOCkWLmnRGOKHH+65bKTe14f72X+9FzNU3oMf1NhuH1gkpBxfkj8IYDX0vTenqwhrxXI8VhA2riEzEeySh83B3Hbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=BabylZaZ; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791556650; c=relaxed/simple;
+	bh=lgVY5zeOoe/w+1HO6HLIuJzLZCQIwA9T27m+tan5G/o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Co4nI0e6PiG564tf7Z8NvrDGMtdE4E2ta4KdtmQmsKZAUAMWFXXaKHU1d6f3ie65D0iwEu9wQAF9QvaB+q4lQcImuJADtvtATL7BgFoY5437Z+sIQpWSrEXu3jnSnOBm/JS5ThyPkpIjlsHY3a66GepKQMMAhsdNLKk3mebrWXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngSNv80F; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BabylZaZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08D01F000FF;
-	Fri,  9 Oct 2026 14:15:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1791555350;
-	bh=2gHfNVim2MkAVeFdAnE4gBFsQI41AkSwf/KApTwljmw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=BabylZaZDdNAb2DNaEW49A3E0uD8ZKUry5amsLzGUwnykgXebXzIpFGcSXBKxNCKp
-	 APyAjv9v9/cXQMqq0Fm+dJ9vXG2v+EWPk7bPKbEdAzrv/+r21ro5bBOHmuirA0p96x
-	 8mvwELL03Zuf50NxTrkjcE5vsp3A6jhG38g1rLMo=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	David Howells <dhowells@redhat.com>,
-	Tom Talpey <tom@talpey.com>,
-	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.18 017/403] cifs: Remove the RFC1002 header from smb_hdr
-Date: Fri,  9 Oct 2026 16:06:18 +0200
-Message-ID: <20261009140952.521502731@linuxfoundation.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261009140952.119038291@linuxfoundation.org>
-References: <20261009140952.119038291@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ngSNv80F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1EC01F00893
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 14:37:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791556649;
+	bh=PbKXIO1emAxqMQ2zv8mwSWYUzwH3/TBQTEFGkivyyJg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=ngSNv80FrHy3G4I3P/OLCmlsIbLxKQODWKurOmanv92Vf1R+gnE4Yf2MCfxJPgdnU
+	 vxsHsIhq4WbF38MIzhVSopAfhFPXs6RHpN7QQJqlUhZC7qJbPrKAhjDCouGiAyhcgJ
+	 GiyIRjenh6j8tt6pWawRvD24QHxT2j7qjSv/TyZq2VlxIWwbHGS4WIhCkGHHXSIiXm
+	 +j9cHnBvc1Kwj+xobNYxaH40VZElHdzqCQZzJwA2YDYnAy2CBjxlhmnYw0vQBESy6S
+	 0xTbZiFLYFLBWpaJnsrYCWwK49b7xUplPEJyTNlC+Yh6CtTYqzocS2jt2+TExMuI3f
+	 05dZz397l8kZQ==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6afe29c08ccso5583821a12.1
+        for <linux-cifs@vger.kernel.org>; Fri, 09 Oct 2026 07:37:28 -0700 (PDT)
+X-Gm-Message-State: AFq9FYJCIUVSJRr/byiZX6+rcKEPzvYXbss2OiAsOjPwsHUJSM3Ashsr
+	MPQGlzYkAneDuaMZp5CkbMkKGyEmHN8lYE0LJylqnRILK7ZZQydI7qISsJbyA/UwpZU6oaoVSU+
+	CjiT2P5zpkYmqLwteQYuy9+pLjaT5VZ0=
+X-Received: by 2002:a17:907:9485:b0:c2d:c5b2:a1e4 with SMTP id
+ a640c23a62f3a-c31a9b09b1fmr234230466b.16.1791556647594; Fri, 09 Oct 2026
+ 07:37:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261007062936.25827-1-tjdqudcks0424@naver.com> <20261009135400.722291-1-tjdqudcks0424@naver.com>
+In-Reply-To: <20261009135400.722291-1-tjdqudcks0424@naver.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 9 Oct 2026 23:37:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8md_8UbhNCJU6-SswRfsOo+vKpmVQQoyZK_WXAW7uaJw@mail.gmail.com>
+X-Gm-Features: AclHuK8sgnK44bFF4AwLJM7_AuHKjKxgkJtBnehs10v8BRGSqo6tW_TVnSnmh44
+Message-ID: <CAKYAXd8md_8UbhNCJU6-SswRfsOo+vKpmVQQoyZK_WXAW7uaJw@mail.gmail.com>
+Subject: Re: [PATCH v2] smb: client: hold TCP session for async decrypt work
+To: Sung Byeongchan <tjdqudcks0424@naver.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.18-stable review patch.  If anyone has any objections, please let me know.
-
-------------------
-
-From: David Howells <dhowells@redhat.com>
-
-[ Upstream commit 83bfbd0bb9025f98fa62b44f93bd67466773d1db ]
-
-Remove the RFC1002 header from struct smb_hdr as used for SMB-1.0.  This
-simplifies the SMB-1.0 code by simplifying a lot of places that have to add
-or subtract 4 to work around the fact that the RFC1002 header isn't really
-part of the message and the base for various offsets within the message is
-from the base of the smb_hdr, not the RFC1002 header.
-
-Further, clean up a bunch of places that require an extra kvec struct
-specifically pointing to the RFC1002 header, such that kvec[0].iov_base
-must be exactly 4 bytes before kvec[1].iov_base.
-
-This allows the header preamble size stuff to be removed too.
-
-The size of the request and response message are then handed around either
-directly or by summing the size of all the iov_len members in the kvec
-array for which we have a count.
-
-Also, this simplifies and cleans up the common transmission and receive
-paths for SMB1 and SMB2/3 as there no longer needs to be special handling
-casing for SMB1 messages as the RFC1002 header is now generated on the fly
-for SMB1 as it is for SMB2/3.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Tom Talpey <tom@talpey.com>
-Reviewed-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Steve French <stfrench@microsoft.com>
-
-Stable dependency adaptation for 6c5c547f037bc18f0b8d0b5db5a648f8f630ce85:
-
-Retain only the midQ-to-mid rename in compound_send_recv(). Prepare its
-response-copy block using the corresponding layout from 62432a3f51450:
-check the received response first, then copy it and transfer ownership
-inside the resp_iov guard. This provides the context needed for the target
-to defer response-buffer transfers until compound synchronization finishes.
-
-Omit the SMB1 RFC1002 conversion and all other unrelated hunks. This stable
-tree still defines smb_hdr in client/cifspdu.h, uses the older negotiate
-and filesystem-info type names, and has moved CIFSTCon and transaction2
-helpers out of the upstream locations. Restoring those functions or
-importing the intervening SMB1 reorganization is unnecessary for the target.
-Keep HEADER_PREAMBLE_SIZE(server) in the response length because SMB1 still
-reaches this shared path through SendReceive2(). No functions are added.
-
-The target applies cleanly with a three-way application on this adaptation.
-
-cc: Shyam Prasad N <sprasad@microsoft.com>
-cc: linux-cifs@vger.kernel.org
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
-
-[ sashal: Reduced backport -- upstream 83bfbd0bb9025 touches 19 file(s), this
-  backport carries 1. Not backported here:
-  fs/smb/client/cifs_debug.c
-  fs/smb/client/cifs_debug.h
-  fs/smb/client/cifsencrypt.c
-  fs/smb/client/cifsglob.h
-  fs/smb/client/cifspdu.h
-  fs/smb/client/cifsproto.h
-  fs/smb/client/cifssmb.c
-  fs/smb/client/cifstransport.c
-  ... and 10 more
-  This note is generated from the file lists only; see the resolution record
-  for the reasoning. ]
-
-Stable-dep-of: 6c5c547f037b ("smb: client: close completed creates on compound wait errors")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/transport.c | 73 ++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 36 deletions(-)
-
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index 4da3d62b6481e..53db53a78d6c5 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -864,7 +864,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 		   int *resp_buf_type, struct kvec *resp_iov)
- {
- 	int i, j, optype, rc = 0;
--	struct mid_q_entry *midQ[MAX_COMPOUND];
-+	struct mid_q_entry *mid[MAX_COMPOUND];
- 	bool cancelled_mid[MAX_COMPOUND] = {false};
- 	struct cifs_credits credits[MAX_COMPOUND] = {
- 		{ .value = 0, .instance = 0 }
-@@ -930,35 +930,35 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	}
- 
- 	for (i = 0; i < num_rqst; i++) {
--		midQ[i] = server->ops->setup_request(ses, server, &rqst[i]);
--		if (IS_ERR(midQ[i])) {
-+		mid[i] = server->ops->setup_request(ses, server, &rqst[i]);
-+		if (IS_ERR(mid[i])) {
- 			revert_current_mid(server, i);
- 			for (j = 0; j < i; j++)
--				delete_mid(midQ[j]);
-+				delete_mid(mid[j]);
- 			cifs_server_unlock(server);
- 
- 			/* Update # of requests on wire to server */
- 			for (j = 0; j < num_rqst; j++)
- 				add_credits(server, &credits[j], optype);
--			return PTR_ERR(midQ[i]);
-+			return PTR_ERR(mid[i]);
- 		}
- 
--		midQ[i]->mid_state = MID_REQUEST_SUBMITTED;
--		midQ[i]->optype = optype;
-+		mid[i]->mid_state = MID_REQUEST_SUBMITTED;
-+		mid[i]->optype = optype;
- 		/*
- 		 * Invoke callback for every part of the compound chain
- 		 * to calculate credits properly. Wake up this thread only when
- 		 * the last element is received.
- 		 */
- 		if (i < num_rqst - 1)
--			midQ[i]->callback = cifs_compound_callback;
-+			mid[i]->callback = cifs_compound_callback;
- 		else
--			midQ[i]->callback = cifs_compound_last_callback;
-+			mid[i]->callback = cifs_compound_last_callback;
- 	}
- 	rc = smb_send_rqst(server, num_rqst, rqst, flags);
- 
- 	for (i = 0; i < num_rqst; i++)
--		cifs_save_when_sent(midQ[i]);
-+		cifs_save_when_sent(mid[i]);
- 
- 	if (rc < 0) {
- 		revert_current_mid(server, num_rqst);
-@@ -1001,23 +1001,23 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	spin_unlock(&ses->ses_lock);
- 
- 	for (i = 0; i < num_rqst; i++) {
--		rc = wait_for_response(server, midQ[i]);
-+		rc = wait_for_response(server, mid[i]);
- 		if (rc != 0)
- 			break;
- 	}
- 	if (rc != 0) {
- 		for (; i < num_rqst; i++) {
- 			cifs_server_dbg(FYI, "Cancelling wait for mid %llu cmd: %d\n",
--				 midQ[i]->mid, le16_to_cpu(midQ[i]->command));
--			send_cancel(server, &rqst[i], midQ[i]);
--			spin_lock(&midQ[i]->mid_lock);
--			midQ[i]->wait_cancelled = true;
--			if (midQ[i]->callback) {
--				midQ[i]->callback = cifs_cancelled_callback;
-+				 mid[i]->mid, le16_to_cpu(mid[i]->command));
-+			send_cancel(server, &rqst[i], mid[i]);
-+			spin_lock(&mid[i]->mid_lock);
-+			mid[i]->wait_cancelled = true;
-+			if (mid[i]->callback) {
-+				mid[i]->callback = cifs_cancelled_callback;
- 				cancelled_mid[i] = true;
- 				credits[i].value = 0;
- 			}
--			spin_unlock(&midQ[i]->mid_lock);
-+			spin_unlock(&mid[i]->mid_lock);
- 		}
- 	}
- 
-@@ -1025,37 +1025,38 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 		if (rc < 0)
- 			goto out;
- 
--		rc = cifs_sync_mid_result(midQ[i], server);
-+		rc = cifs_sync_mid_result(mid[i], server);
- 		if (rc != 0) {
- 			/* mark this mid as cancelled to not free it below */
- 			cancelled_mid[i] = true;
- 			goto out;
- 		}
- 
--		if (!midQ[i]->resp_buf ||
--		    midQ[i]->mid_state != MID_RESPONSE_READY) {
-+		if (!mid[i]->resp_buf ||
-+		    mid[i]->mid_state != MID_RESPONSE_READY) {
- 			rc = -EIO;
- 			cifs_dbg(FYI, "Bad MID state?\n");
- 			goto out;
- 		}
- 
--		buf = (char *)midQ[i]->resp_buf;
--		resp_iov[i].iov_base = buf;
--		resp_iov[i].iov_len = midQ[i]->resp_buf_size +
--			HEADER_PREAMBLE_SIZE(server);
-+		rc = server->ops->check_receive(mid[i], server,
-+						flags & CIFS_LOG_ERROR);
- 
--		if (midQ[i]->large_buf)
--			resp_buf_type[i] = CIFS_LARGE_BUFFER;
--		else
--			resp_buf_type[i] = CIFS_SMALL_BUFFER;
--
--		rc = server->ops->check_receive(midQ[i], server,
--						     flags & CIFS_LOG_ERROR);
-+		if (resp_iov) {
-+			buf = (char *)mid[i]->resp_buf;
-+			resp_iov[i].iov_base = buf;
-+			resp_iov[i].iov_len = mid[i]->resp_buf_size +
-+				HEADER_PREAMBLE_SIZE(server);
- 
--		/* mark it so buf will not be freed by delete_mid */
--		if ((flags & CIFS_NO_RSP_BUF) == 0)
--			midQ[i]->resp_buf = NULL;
-+			if (mid[i]->large_buf)
-+				resp_buf_type[i] = CIFS_LARGE_BUFFER;
-+			else
-+				resp_buf_type[i] = CIFS_SMALL_BUFFER;
- 
-+			/* mark it so buf will not be freed by delete_mid */
-+			if ((flags & CIFS_NO_RSP_BUF) == 0)
-+				mid[i]->resp_buf = NULL;
-+		}
- 	}
- 
- 	/*
-@@ -1084,7 +1085,7 @@ compound_send_recv(const unsigned int xid, struct cifs_ses *ses,
- 	 */
- 	for (i = 0; i < num_rqst; i++) {
- 		if (!cancelled_mid[i])
--			delete_mid(midQ[i]);
-+			delete_mid(mid[i]);
- 	}
- 
- 	return rc;
--- 
-2.53.0
-
-
-
+On Fri, Oct 9, 2026 at 10:54=E2=80=AFPM Sung Byeongchan <tjdqudcks0424@nave=
+r.com> wrote:
+>
+> Large encrypted reads may be queued to the global decrypt workqueue.  The
+> work item stores a TCP_Server_Info pointer, but does not hold a server
+> reference while queued.
+>
+> If a multichannel mount removes a secondary channel before the worker run=
+s,
+> the final reference can be dropped and the demultiplex thread can free th=
+e
+> server.  smb2_decrypt_offload() then accesses the freed server object.
+>
+> Acquire a reference only while srv_count is nonzero under
+> cifs_tcp_ses_lock, which serializes the acquisition against the final put
+> without resurrecting a server already being torn down.  Do not queue the
+> work if acquisition fails.  Let each queued worker own one reference
+> until its final server use, and release the transferred small buffer and
+> reference if queue_work() unexpectedly rejects the work item.
+>
+> The unmodified kernel reproduced the same KASAN use-after-free in three
+> fresh encrypted multichannel runs.  With this change, the same race and
+> subsequent encrypted I/O, unmount, remount, and cleanup completed without=
+ a
+> sanitizer report in three fresh runs.  Encrypted multichannel,
+> single-channel, and unencrypted controls also passed.
+>
+> The demonstrated impact is a client-kernel use-after-free and crash cause=
+d
+> by an SMB peer able to coordinate encrypted responses and channel teardow=
+n.
+> No controlled write, information disclosure, privilege escalation, or cod=
+e
+> execution was demonstrated.
+>
+> Fixes: 35cf94a39728 ("smb3: allow parallelizing decryption of reads")
+> Cc: stable@vger.kernel.org
+> Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
+> Assisted-by: LLM
+> Signed-off-by: Sung Byeongchan <tjdqudcks0424@naver.com>
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
