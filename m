@@ -1,96 +1,96 @@
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E009C2DD5F6
-	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 01:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784CB33438F
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 01:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.173
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791510188; cv=pass; b=MqF/1RJa4RgqVP9nvCytBQPcpbHCYeZufj2bjKOVGwXQQftrDXbFrWAOZ4Vh/dnQdPxvabw+lvQXW7OtILI2fLV2DhhFgQ0Aww2J+ec819WTFBHU2jETCY5ULGdBLAvopsdzFMx1d5cLcMI36qdWbh3NQzj5maD+MJ69Op4rJ58=
+	t=1791510286; cv=pass; b=CUJ3qnlP+KSO6mJ1bQG4oo2qsDT6UaebYJ0aKhCIxnApsuqn/v3R2/KX5alAAJpfqOh9o6Zq9x3Pyt+hPa1CDyxBrUbo9NkuSS3qztAn1yM3CW9Nas3BZBsQ0RmKaie3q83SnJXMsRxD/A2G+5aNhMnnBpAP8BxhpoCDlmH4MPQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791510188; c=relaxed/simple;
-	bh=n8YcwL7I6ncHN6Di+TjkLj9HcqFEku0JBz9C1UzgFh8=;
+	s=arc-20240116; t=1791510286; c=relaxed/simple;
+	bh=ifO55Y1woCrSdawvKXwuZCI6hB5bLQyKtt689Hg6oug=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dplxkxh7yxxSA84qZBJrptGRh/bVQ0Fv0hoGepN6Ek0QstCfuIbtv/1OuYXSeTogoHq/DTui8dCM6Pr9z3DaZlAFc4OkDOtvq3BTmhZpB4JCWETHM5YSnWvxu7yY7eAUEddOLgJBgpCzn6SWNXH+KyMYr+3aVAe1+PR+G31L8pg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dQo5ywy2; arc=pass smtp.client-ip=209.85.215.169
+	 To:Cc:Content-Type; b=mV8F2wQMV+51DNdF7/7wQyhidRWdMYnBXtJniIcEHhEkrFe5omSOQew+XaGNVLBDnMemuthTz02K802RvY5A0e7Fpf5Jb7IA2hxg3youwbkYX1Gk0ACb59UZ6e9tamTKgStBjZD24/LYYSk/pF1NI8Eo0zzzgbhEbLZaubriHzw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qJzw9EPn; arc=pass smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQo5ywy2"
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cc1cb472b76so1671574a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 18:43:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791510185; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qJzw9EPn"
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-8819033dbadso2517590b3a.0
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 18:44:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791510284; cv=none;
         d=google.com; s=arc-20260327;
-        b=IU2nrX+wFW1pDnXdbuEDvjGPWN55TQfZHmZnk8VrEpZeGl0SzGsIP1QnsW4lrnCxfP
-         MSpLEDBkgumLp1X8vBTdqgoPFoRxPwH2vpRG9XtP2T+qU2LTzsU7dendlcb2pJri51IB
-         BrtnrS8j3ql9zOn24ui3pcQjRrYxIrFGnq68gM8jvaq0676dOD6/5QWJN6YFss/szUeQ
-         1RGsdmiY22vJYaDMxRI2gViL8uaBrhm+uW1ks2hpE0GXAktAcvb5c/EbTh/36woYkRao
-         rpHY2SgkVxPNIus7wL5+hNiqSzXbygbW35S0mJGBWo0ajv6DMU6W8lD608xmStblhzRx
-         fDrw==
+        b=qi14abiQ4/jgbx0UTVVBr6DY099hVIlyRk5JGRRUJYgRIvM95dppmjMs5YBzjad+RX
+         hhU2cPjcuZRh/qdP0vzLlkl/cLTuzq9FFM3GpCxJVP4ofOBX3thqamy1PA0prFuC7RA8
+         MGDsmVlNjVstukBGC76ALPejp7mKngrfEtCke786wPFseOb743zbzSzMFWwq2685qBL2
+         HlAzAuVLpvLE+j5O9WBvsFNoGMlItmiPxPkgxggKHOB1jMiiW2Atb8UqApf2rcjGGw78
+         zjqdvLbKEI2R4uc9nGFSY/a9qNBIQUER7TJAPMP0QY7k3M/gfgGzwMcDPw8Pto61xUC6
+         iBiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=nvNO4+uRT42xaw6c57vhH/gJBgCPU/zxf+gr5Cfeshg=;
-        fh=DRLHWYRKooPw3yCflwJSj1lveV+0Lr9mhWBV42ih58M=;
-        b=CHo0z+FMiGiaJfEQYtk8gR8Gs4suxKdEtvyBRd0XHqPb9HkUYBu78r5/zR7Uq3tphP
-         42uJPd2gZqaCSUj95D8ULzAeHYQa/yzNQRn6OiGzfm+HQW7mO/x6ABtyr9jymWisO9kW
-         mpB+LCmLrim6kK4NssqBjs3pl7UZU3j6uIHh7BNpmHFghVEXDxvVN+j9GcLRIBZi+i/I
-         V/Ab2K8YB+KB5GfKCYcbiLENOB5Ol4tTBfbnRUGzXIWZKztMa6e+tD1Ov4JBMq9dVzUj
-         XiZuai/s1y0o3kGaDsVClDRjMJ5x00u3KlPVx3oxgWuMAuICWiKqZO1UVMMdblu6iJrR
-         lrjQ==;
+        bh=ZlGj4iJYIsBwKh9YN7bwtWSK6UPi/wdJW0+jMmmEn7w=;
+        fh=8w+qZ3bMjz4v3uoYx+2u9wwsqg8lNthYy6/k3+owoMo=;
+        b=T7owF5x4nKmUK1zzaYec0Hur48d9c5QYlyFfhtQ+RWDKCe9gkNwcOrmj/ZXcH+zZa4
+         zyeNE6S5MngxmfjUi+NO9Y5TVqB5QUv6UnP4Owi43DcoFhR18yluLxV5LLTJVfoDbrDM
+         Veg3WBdOgZX6uX//FyofknkhjietfORV4aTaPH1gP9Rc3bNc+sH+a6CYpQcW6kmwmkbg
+         +HBRqElc4Hw0JoOMK288Bwuyg4itL9ipaImAiOgVRrFjUyH9NoZGZooqokuGQDXXVg51
+         rLeeT4d0Fqi3IRjM+7vfkojCzCQXVT0WPenlPNJQjyZx4GTmgnFnpFW3DEZSTlCW2vpD
+         cmFA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791510185; x=1792114985; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791510284; x=1792115084; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=nvNO4+uRT42xaw6c57vhH/gJBgCPU/zxf+gr5Cfeshg=;
-        b=dQo5ywy21i/At4hQMF37VWpi03lvu3GNJ0j2LYtt7liPTumA3n2u06dukLRNWTc1tX
-         LJGaTB54UI/YvfHxdeWz0XcrKmPTPd9wi9JZdRfAdq94tayyQnlc7++cVdoTV8f22STR
-         J9Rrdmuikcw2bnwZlQYB9SUzEmpoMHnv+vRD43yWW5c22xQB64BNPTvNwzauYN556aRt
-         xiRHZ3y5a93vSPUchTqcGybbFjGsDRbq/ElEFpDasrmwlA5UIPVsqY661CSyZyUwpMMg
-         1kgjyAhIDkW+6rJXBW21xTalGUKYdLpdFi4RDds4E3UptnCjjB57o6ixsqmTVhc6DSsT
-         bozw==
+        bh=ZlGj4iJYIsBwKh9YN7bwtWSK6UPi/wdJW0+jMmmEn7w=;
+        b=qJzw9EPnqzvAGmJRfDLqu4FyALA2+uXThNcTh2ZJaY7OYICxCixLCERYEF4yReYTCT
+         jYQABdS9XEnqbpDPT5a3K/MfC+lBerGl72/VGllVkZ+eLcTQMmZgtrvKhSTXjg8jj0nA
+         IRUg68Fw8YIwI97gAxpKH1NZUfeAIhEpp729tmUevtHPJXoCS6uxS/yOwMXJam/b9YVL
+         vZ1eIEs0zSUapJP8if+6lttuMCyA5+4nZ/aZ9wSYoLJkO9IZScw/M1NUqOwFtJvICrBe
+         3BQ5fHf88Y4B9UXD7g3Sm9WhVvIZ78as3HiiItd37h82jAE/sI4oVSvgveb4OjqZRd7X
+         fWhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791510185; x=1792114985;
+        d=1e100.net; s=20260707; t=1791510284; x=1792115084;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=nvNO4+uRT42xaw6c57vhH/gJBgCPU/zxf+gr5Cfeshg=;
-        b=nufFbdZNvv+qc1vfqOSyGR74Omceh1ZEnLU76IBNVw646c/tIXS82SDM+VjPYH9b25
-         AkHQlR5PrDvIXjfRRWNtCVHEY0EY6Ggn54ZYPrPM4sx1MeIt7Ezg5rj1R9T1S8pwLXv6
-         F/wxgWR3HfNRjlJxHEA6vCZHC/Y/aB60OEdW2O1qNFQ4Efa8nm1rgz65Pn5U+xDGlI0R
-         WVic8WMVvRQmHeQJJ1h5X26G12vyHeCz1wmcB5HnbbVklY8Rs/VufR/B8wmgaUBWLDjY
-         8cZ+U9nhaXZ+a8HrGXupoNrNyMSg8bl1Q/KgTXTT4eT84Obba/nrZlCWiTUatDAPx09M
-         pv3g==
-X-Forwarded-Encrypted: i=1; AKwUvBzDpEN0NYyF875auL0YG7jwdQi99DERLCkjvZ7gNTZ59MTpWRiRlDFJTB4chZN9qgxhL7nglwqM8hv0@vger.kernel.org
-X-Gm-Message-State: AFuF++nDgcwO9CjNsIPoW4RRLnwx+WX8cBrT6SijQM8LL/0sWIeVt0UO
-	ttgGBjAsExo2J64jrI7PioKP73YECNJNbvXuHdXNLlNSK7iJIcgDIkwF3zchboou80pOErxmnYU
-	edRmSsMbiH9u+aSwTtsBwNOS38momuW8=
-X-Gm-Gg: AYBFou0FkYw4U/jOd0lG4FZfE55Sb1kOJNKocXFYqNYQSM7QKqZTA0tTf2I0oAs8+rW
-	7dIr8bgqK9YPtAprrYOuct7p+zofh9bnuyJvKrRTBixbZCS0UaqDmsfSMLc8fAMdz9rWcyYYTv9
-	YUY+Qf0Nfcl5QXrAu045pufZ0zDzGQNuIPurm55hxOJ8SrGLyL7ZOmCREE93Zd4ZYCdNF6KOAj3
-	wsgetiS4sQXnHTk3vnBLeGyi5SM95QzpTqhFisl7Tl9KQLkx6Su+e/QZZe+ooeMtfrMhq6LdAEI
-	47nLH19XqhebXF8joTMVgSu0xATNPksp8oYohMhaVf2SU76aP0HPUPXJquHCbeKhyEZUEqsXK4p
-	JwWpjb22d79pQoGGCqbzUrsZs5mtPGwra8yMg923I6cJwWPZwJ1MosQZOagXFCPA=
-X-Received: by 2002:a05:6a21:483:b0:3e0:da23:874e with SMTP id
- adf61e73a8af0-3e16bdae7acmr234756637.21.1791510185039; Thu, 08 Oct 2026
- 18:43:05 -0700 (PDT)
+        bh=ZlGj4iJYIsBwKh9YN7bwtWSK6UPi/wdJW0+jMmmEn7w=;
+        b=PuEBqwo1yvh8/p4RnP2qd/gALJviujOtYt0g+YdP7yqAV8c7ujHNVMvcXTYFd3pMdY
+         MaSqDfRs3HaFxqMxCGvMaDsKH/2WvWLhtSKZeeOvaXZK+SEWmwOHHdpbqYjUh7fHNVsb
+         IdlktEJwGs+/fosNHO8w3SpFrGGzK//UjXMFOYlnoMTCG/HwP2DH4lp2sYjFUKPDTIZb
+         uFyxcYTg32LB+dxlyRtK770/0HCeyCd6Hy2wSUH0cOSYIX+yuwmSvvTmN/UI9+QLoBLu
+         uyV/y+7bXoPi66kK/uVR7WFJv5mWdQ3QrV8PjLWv83fWKbT+2+CM/VdtEmaAcRDV4oQw
+         3cIQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzQb0CeXWtAgThvZNCntjrYjtxWJ62bjRLzakegak5Vc4ICY+q1Nkm9JTCKA43hIXtL1QlyUNWw5TeX@vger.kernel.org
+X-Gm-Message-State: AFq9FYIIgHugVbRCuKei+MriwELp/IGWt0cakvvrkgMmorRN4ubbDxnd
+	z4tHEI6LngPhbOx7flLGen5+twQcyJkYMEJVH8lCMF9f+JXHFrzASKD4+39eeFTRMArGRsj6K0Y
+	+8f5alzsCG3iJ3WwhEaZd1JREK/GXIhU=
+X-Gm-Gg: AYBFou33xBZnYA4MvBRe7KSHVqGcYP7VNsp3vd/11wZzk2XeX4jjga3XqK0IHv8JARb
+	Rl8NOW/ydth+yrte1IzRIzB7fKVJmgLyvzsBlIxqQ9dYbFKmdp1U6UmNQLkJueVSJ4mzt7Eg6q3
+	/6TD4BqGL7uCjeFPPY+7WsFrI9S+2ILeaO7MdlV+L/UyJj/7TKovSU3hIXDHCd+AW5D7ZYgRNWq
+	3zSFFYJGSTSyM/pb502W0FOEk+ydgXRD/qSSM4q+C2PiOcq4JKRFvUvNvguiYzaSVOq+A9D2AcV
+	DT9TePon2bUqicN/LqZFbSeHwouD5tRURcjp1uvbXmy6auSQhk/GGJ+4DT48934X3YtbUHOP8Xa
+	eAk2L1XUnWefRVnu00Hmh942SSJwCZNeXqfNidG/4ZK/lgYH/TbXRhKnIbG8dMpK/
+X-Received: by 2002:a05:6a00:f8a:b0:880:740c:927c with SMTP id
+ d2e1a72fcca58-897c41e8cf0mr271786b3a.8.1791510283786; Thu, 08 Oct 2026
+ 18:44:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <04d71cfc6acd9df9eb52e4f998c35eee568c4319.1791227050.git.lucien.xin@gmail.com>
- <179133511607.434549.17774997950314089010@kernel.org>
-In-Reply-To: <179133511607.434549.17774997950314089010@kernel.org>
+References: <e7412c320cae4da8e01f4f4809f92e570a999593.1791227050.git.lucien.xin@gmail.com>
+ <179133512119.434549.18318076229328796602@kernel.org>
+In-Reply-To: <179133512119.434549.18318076229328796602@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 8 Oct 2026 21:42:53 -0400
-X-Gm-Features: AclHuK8W1Wf3zRSa6LnwypKbXEMa4xVD7fPbE6nLopWcgl-4MV4wP3DczF0C_mI
-Message-ID: <CADvbK_cYEE8nb3H8CB=sy_8HRmC+uxxFq+EC4bctyWQ+SnbOVQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 09/15] quic: add congestion control
+Date: Thu, 8 Oct 2026 21:44:30 -0400
+X-Gm-Features: AclHuK-lPgRdTjidUztJ96WcL1mJloJjp4wGF3s35F5afM1dBKT-4-2J0gwHe18
+Message-ID: <CADvbK_dAWQs-duCEhK8wuZ9CHto1Ykmpyh9X_8rR1kS503EaDg@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 11/15] quic: add crypto key derivation and installation
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -112,7 +112,7 @@ e:
 > Thank you for your contribution! Sashiko AI review found 2 potential
 > issue(s) to consider.
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 2 =C2=B7 Low: 0
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 1
 >
 > If you believe none of the issues are legitimate, please reply to each
 > issue of Medium severity or higher and explain why the AI is wrong.
@@ -122,165 +122,111 @@ k
 y
 > (one such reply per series is enough).
 >
-> - [Medium] quic_cong_on_packet_lost() (net/quic/cong.c) lets a packet
->   that was sent before the first RTT sample start the persistent-=E2=80=
-=A6
-> - [Medium] The New Reno handlers in net/quic/cong.c decide whether to
->   react to loss or ECN using only cong->state.
+> - [Medium] quic_crypto_keys_derive_and_install() (net/quic/crypto.c) sets
+>   `crypto->rx_fails[phase] =3D 0` every time it installs RX keys.
+> - [Low] Two comments in net/quic/crypto.c do not match the code.
 >
 > --
 >
-> quic: add congestion control
+> quic: add crypto key derivation and installation
 >
-> This patch adds struct quic_cong for RTT measurement and congestion
-> control, and a quic_cong_ops interface for congestion control
-> algorithms. It implements the RFC 9002 state machine (slow start,
-> congestion avoidance, recovery) with New Reno as the only algorithm. It
-> also adds persistent congestion detection and pacing.
+> This patch adds the quic_crypto component. It derives and installs QUIC
+> packet protection keys for the Initial, Handshake, 0-RTT and 1-RTT
+> levels. Its helpers cover initial key installation, transform allocation,
+> traffic secret installation, key updates, and secret derivation for
+> stateless reset tokens and session resumption, and a new
+> quic_sock_destruct() frees the crypto state.
 >
-> > diff --git a/net/quic/cong.c b/net/quic/cong.c
+> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
 > > new file mode 100644
-> > index 0000000000000..4779ffe90a3f2
+> > index 0000000000000..4bb6acea5112a
 > > --- /dev/null
-> > +++ b/net/quic/cong.c
-> > @@ -0,0 +1,319 @@
+> > +++ b/net/quic/crypto.c
+> > @@ -0,0 +1,587 @@
 >
 > [ ... ]
 >
-> > +/* NEW RENO APIs */
-> > +static void quic_reno_handle_packet_lost(struct quic_cong *cong)
+> > +/* Derive and install reception (RX) or transmission (TX) packet prote=
+ction
+> > + * keys for the current key phase.  This installs AEAD protection key,=
+ IV, and
+> > + * optionally header protection key.
+> > + */
+>
+> [Severity: Low]
+> This isn't a bug, but this comment says the keys are installed "for the
+> current key phase". The function takes an explicit phase argument, and
+> quic_crypto_key_update() calls it with !phase, which is the next phase.
+>
+> That is also the case where header protection key derivation is skipped:
+>
+>         if (crypto->key_phase =3D=3D phase)
+>                 hp =3D quic_data(&hp_k, hp_key, keylen);
+>
+> There is a similar mismatch in quic_crypto_set_cipher(). The comments say=
+:
+>
+>         /* Allocate AEAD and HP transform for each RX key phase. */
+>         ...
+>         /* Allocate AEAD and HP transform for each TX key phase. */
+>
+> But only one HP skcipher is allocated per direction (rx_hp_tfm and
+> tx_hp_tfm), and both phases share it. Only the AEAD tfms are per phase.
+>
+> Could these comments be updated to match the code?
+>
+> > +static int quic_crypto_keys_derive_and_install(struct quic_crypto *cry=
+pto,
+> > +                                            bool rx, u8 phase)
 > > +{
-> > +     switch (cong->state) {
-> > +     case QUIC_CONG_SLOW_START:
-> > +             pr_debug("%s: slow_start -> recovery, cwnd: %u, ssth: %u\=
-n",
-> > +                      __func__, cong->window, cong->ssthresh);
-> > +             break;
-> > +     case QUIC_CONG_RECOVERY_PERIOD:
-> > +             return;
-> > +     case QUIC_CONG_CONGESTION_AVOIDANCE:
 >
 > [ ... ]
 >
-> > +     cong->recovery_time =3D cong->time;
-> > +     cong->state =3D QUIC_CONG_RECOVERY_PERIOD;
-> > +     cong->ssthresh =3D max(cong->window >> 1U, cong->min_window);
-> > +     cong->window =3D cong->ssthresh;
-> > +}
-> > +
-> > +static void quic_reno_on_packet_lost(struct quic_cong *cong, u64 time,
-> > +                                  u32 bytes, s64 number)
-> > +{
-> > +     quic_reno_handle_packet_lost(cong);
-> > +}
+> > +     if (rx) {
+> > +             crypto->rx_fails[phase] =3D 0;
 >
 > [Severity: Medium]
-> Can one congestion event halve the window twice here?
-> quic_reno_on_packet_lost() gets the lost packet's send time in time, but
-> never uses it. quic_reno_handle_packet_lost() skips the reduction only
-> when cong->state is QUIC_CONG_RECOVERY_PERIOD.
+> Can resetting rx_fails[phase] here let the connection go past the AEAD
+> integrity limit?
 >
-> In quic_reno_on_packet_acked(), the state leaves recovery as soon as one
-> packet sent after recovery_time is acked:
+> RFC 9001 section 6.6 says endpoints must count packets that fail
+> authentication across all keys used in the connection. Once that total
+> goes over the integrity limit, the endpoint has to close the connection
+> with AEAD_LIMIT_REACHED.
 >
->         case QUIC_CONG_RECOVERY_PERIOD:
->                 if (cong->recovery_time >=3D time)
->                         break;
->                 cong->state =3D QUIC_CONG_CONGESTION_AVOIDANCE;
->                 ...
->                 fallthrough;
+> Here the counter is split by key phase, and every RX key installation
+> zeroes it, including each key update:
 >
-> Here is one sequence:
+> quic_crypto_key_update()
+>     quic_crypto_keys_derive_and_install(crypto, true, !phase)
+>         crypto->rx_fails[phase] =3D 0;
 >
->   - A loss at time T starts recovery.
->   - P20 was sent just before T and is lost in the network.
->   - An ACK of P21, sent after T, ends recovery.
+> crypto.h also describes rxlimit as "Max failures decrypted per key".
 >
-> Later, P20 is declared lost, either by packet threshold on a later ACK
-> or by the time-threshold loss timer. At that point the state is
-> QUIC_CONG_CONGESTION_AVOIDANCE. A new recovery period starts and both
-> ssthresh and window are halved again.
+> Later in the series, "quic: add crypto packet encryption and decryption"
+> checks the limit in quic_crypto_decrypt() like this:
 >
-> In RFC 9002 Appendix B.6, OnCongestionEvent(sent_time) returns early
-> when sent_time <=3D congestion_recovery_start_time. B.7 applies the same
-> rule to ECN-CE.
+>         if (++crypto->rx_fails[cb->key_phase] >=3D crypto->cipher->rxlimi=
+t)
+>                 err =3D -EKEYEXPIRED;
 >
-> Should quic_reno_on_packet_lost() compare time against
-> cong->recovery_time instead of relying only on cong->state?
-> quic_reno_on_process_ecn() gets no send time at all, so this check can't
-> be done there either.
+> The later patches do not change how the counter works.
 >
-> The ACK side has a similar gap. In B.5, acked packets sent before the
-> recovery start don't grow cwnd. In QUIC_CONG_CONGESTION_AVOIDANCE,
-> quic_reno_on_packet_acked() grows the window for every acked packet,
-> whatever its send time.
+> An off-path attacker who knows the connection ID could send forged
+> short-header packets until one phase counter is just below rxlimit. The
+> next legitimate key update would then reset that counter to zero.
+>
+> With AES-CCM the limit is 2^21.5. A busy connection also has to update
+> its keys about every 2^21.5 sent packets, so the attacker's total
+> forgery budget grows with each key update. Splitting the count by phase
+> also allows about twice rxlimit per key epoch.
+>
+> Should rx_fails be one connection-wide counter that key installation does
+> not reset?
 >
 True.
 
-Will check quic_cong_in_recovery() before calling .on_process_ecn,
-.on_packet_acked and .on_packet_lost.
-
-I may also remove these cong->state switches to simplify the code.
-
-> [ ... ]
->
-> > +/* COMMON APIs */
-> > +void quic_cong_on_packet_lost(struct quic_cong *cong, u64 time, u32 by=
-tes,
-> > +                           s64 number)
-> > +{
-> > +     if (cong->pc_detected)
-> > +             return;
-> > +
-> > +     if (cong->pc_start_time && time > cong->pc_start_time &&
-> > +         quic_cong_check_persistent_congestion(cong, time)) {
-> > +             cong->pc_detected =3D 1;
-> > +             cong->min_rtt_valid =3D 0;
-> > +             cong->window =3D cong->min_window;
-> > +             cong->state =3D QUIC_CONG_SLOW_START;
-> > +             return;
-> > +     }
-> > +
-> > +     if (!cong->pc_start_time && cong->is_rtt_set)
-> > +             cong->pc_start_time =3D time;
->
-> [Severity: Medium]
-> Can a packet sent before the first RTT sample start the persistent
-> congestion period here? time is the lost packet's send time. is_rtt_set
-> shows the state when the loss is detected, not when the packet was sent.
->
-> RFC 9002 section 7.6.2 says the persistent congestion period should not
-> start until there is at least one RTT sample. Appendix B.8 only looks at
-> lost packets with lost.time_sent > first_rtt_sample.
->
-> struct quic_cong has no field for the time of the first RTT sample.
-> quic_cong_rtt_update() sets cong->is_rtt_set =3D 1 but doesn't record
-> when.
->
-> Here is an example:
->
->   - A client sends Initial PN0 at T0.
->   - It sends a PTO probe PN1 at about T0 + 1s. The PTO from
->     QUIC_RTT_INIT is about 999ms.
->   - Both packets are lost.
->   - A later probe, PN2, is acked and gives a first RTT sample of 50ms.
->
-> Loss detection on that ACK marks PN0 lost. is_rtt_set is now 1, so
-> PN0's send time becomes pc_start_time.
->
-> PN1 is then marked lost. The gap of about 1s is larger than
-> (50 + max(4 * 25, 1) + 25) * 3 =3D 525ms. So the persistent congestion
-> branch above runs, cwnd drops to 2 * mss, and min_rtt_valid is cleared,
-> right after the handshake.
->
-> Should quic_cong_rtt_update() record the time of the first RTT sample?
-> quic_cong_on_packet_lost() could then use only lost packets sent after
-> that time.
->
-True.
-
-Will replace is_rtt_set with first_rtt_time, and check it before recording
-persistent_congestion.
+Will make rx_fails per connection instead of per key.
 
 Thanks.
 
