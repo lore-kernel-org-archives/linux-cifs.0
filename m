@@ -1,96 +1,96 @@
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 524502ED16D
-	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 01:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59DF3382CD
+	for <linux-cifs@vger.kernel.org>; Fri,  9 Oct 2026 01:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.171
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791510518; cv=pass; b=JSF/3OVpdPhHFZPDr1AS5ZUDOgC+jt/tF0sxd14so3EIYtcKsx+MbsHZNTfIF+mFXz2+fJ/Mg8YeEwoQS6Bywzmq0YoLn84kIScIgbp221keX9CjXNOj8MmZ2qwj2XAYUFn/VHIWFzXU/qhqsqIi1ow5qboAk94RjF4xCn/48Fw=
+	t=1791510937; cv=pass; b=B0cNGCHM/fg46GNxDYdZcid5mCr/tNp14299Rs45XL5bc1FnyLq4L15j8/oSA2kq/rhocJZY6arbYJDKm33mq8aJFje5e4i2H5q2ajMKi9vZXC3Q5nEcsQw+5nH/mJVpPC0xhz48qkXmGNerWxXlAzetkL+Q6pCx3MWiz7vgQJk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791510518; c=relaxed/simple;
-	bh=wUTN84wEWmLrTrkwe83lVi5yrj5Vdynx3RbkpcvXUYQ=;
+	s=arc-20240116; t=1791510937; c=relaxed/simple;
+	bh=35fIWUdY0+PUqZkYVHqyYWSj8S/8qpG3+Jwu5f2fVSY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Uym91Jdcj/BJ1PXTg7IR86fopnCaBkPbBi0E04PQ0RRjnlY0fH0+ier/rhfort4d8UBJ2va4/bIxAPRvvA4UWeMDvcGu8Lj0EhJj4huboTkAfL/VDrLhcjca8cGkY/Wws32955AoPuEoWkHgxSDasKdQW3Ft2w6DrAZI4NcQHqQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXsjTtpf; arc=pass smtp.client-ip=209.85.210.174
+	 To:Cc:Content-Type; b=u7W+Uz/sB0v4dVu852PsHcEVJIgbZLhTBTD9MaROZlhRS/n6j6KWlkphmeNozPBWnoJTpw2KmEzYy4JIGOV52+6FQS2RlES9auu0rcTH5yXb4CyYi9Fqa2qPZ6sBX0M6jde3rQzgtKkuHNgPPW8I3A38AlyGHhUbjDN/T/YGzIA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n85S0maM; arc=pass smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXsjTtpf"
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-872024e2b4eso1853000b3a.0
-        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 18:48:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1791510516; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n85S0maM"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-892734ce7e6so1167859b3a.1
+        for <linux-cifs@vger.kernel.org>; Thu, 08 Oct 2026 18:55:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1791510934; cv=none;
         d=google.com; s=arc-20260327;
-        b=mOAie86cSOQ2beJhmCmTkvhy+xlTY5N3hY4ULfASm1R75Rm7mHUx2ER4Y0N8+IVXxT
-         XkWad0XW8rTHEY2+uHUk3DCiWhG9GiOk0Fkfarwz5c8ipGxp6Gansh9uacIMQ4D5cia6
-         wJjXTE3wgx1OpwSIxS2akzaiNvfCQHHEfF4hzeYqB2AjnsNqx82uShDervo75yv3ecIq
-         9/AaMIhvAu+DrLD0XdjFqEs/g18w0AcNaycONnQK5rn0l+J1269iStdFoLo5vLZgAQCK
-         t8j6hdgYcApZn0LfEKYuHuyOBjxpVjIAic1rPtYhCFKyJ4kNGN6Ga44htUlHBC5Rpy+E
-         z1Vw==
+        b=qe/Dl/Kw3/tBYR4XHJeeKGcCY/43BtPphptLjk78CQvU5VloYBy53YnQvt9fXA2yDb
+         245oJyz13BfMCDMKT/EN8s83BjSYDOw00VC7IX0YmpOkPmKxZIBiesy3ClBWZLuloLMF
+         EPKJqU/mAwvK2DNv4K1nWFxljv5PRo63JlYXaeK5UIDYSW3QxJSgrXLBBDzToiYBsDZc
+         VacYQBgZpgl50lvWJhujOt04OM0FwP69j/MQ8CuCBrWkri8JPPURS0K1edTglEMyxA+W
+         F/miPTJbwql8C3dDmEoOAC21c5wj2UGQu+6JFflgnH+jL0AloGHf6qR+494A4qph2Gel
+         +lDw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=g0cBSDkX5TVuKiqF8g84xPSGpnh8it3kfI90lKRUo4w=;
-        fh=+OlhocqJ+xak5tpvvtw5oA1r2ZNNsq5fv2FYPOc6rv8=;
-        b=JLMR6AMWbdSd5I+0cWoPx8TxNMr0RBTi4h2MVKCCWiNth0VD6QOci4fdtCvEF+EKS4
-         IAZXcxEzFBjjrNdO//ALvkHhvX0rHyVmihcNj+rLuTIWUoldYQ8JG5P9qvzVgQpKqsQA
-         M7IzpkquxCUNASv0cFDg34OhJkzyv5dVPEkU7chd+OoQLUFZT7zExd+KWrNsWxkqjasU
-         Jh7yBtrZPgSLY8VR4son+speSM17aksrB+uh7ckCbSV7L0URkk1PRbr7VF1xNyvKYeOL
-         IJkkOU43b/0nT03GDZD5EYqU2i+6/jeUx4SZJRt+bJuY2M+AEv5zu2u2zAnhBN/m6BUF
-         I7Ng==;
+        bh=bKGCaBNhIQly2LY7lY+NOmyJ6aI0Yd/h629XMH7wx3Q=;
+        fh=t/vLE+ydOcOwSC/6ySEUOHPhLjbjZ5xw9IaklE0pA9M=;
+        b=QlunKHfbYVPpORuhjsz6XtABQrMFYoCI21NgMhSNs8hu007NMeM2vNHFQac2y61MxF
+         2W4FG38ecG8kCiISiqWJWPYm2AS3+83tsg1oGnV9qiIjwSINICYoffTW78QtndrhvG92
+         pGfo8queW81FeySYMBCIKOflcXx47iEiXcN1BcogqpAqk5kXPPT/hi79O+3JT+qW9KJo
+         hnrUWZ1F8Dl6y4XRH19muW7NTEZsjt5+jygmnoae81x50PtOYGVA1otlsHnmZyOsNBFo
+         OzbbrYUebyr97G5H1LLAzkbYDAh4FUVf6ej4QZbr2jtWrM4Wuh8u+NLwwVO9TlOqx0Lf
+         xSVw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1791510516; x=1792115316; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1791510934; x=1792115734; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=g0cBSDkX5TVuKiqF8g84xPSGpnh8it3kfI90lKRUo4w=;
-        b=iXsjTtpfZsshFHSpF7KnyDpmfIhrkwAjVR4sRmRcQV5sahY0LhTFwvX0cNsfLbB0l7
-         j/klO8ia91NNCSDSFpSybfmGWdPS19paG+z1mA+Arj2ORCNme2C8F5yZo9CKFPP8ddkn
-         c8Ou//rK725o0DREaeuqvjSo7ihmHyyjkFBNimOEJvxI+nOOwQGR5camDuaP8jtZ/daF
-         JuDsN67Jd7i8YjhF8aCQe66XBoBlMuA4IdPMCHvyV5iQJ8tE3LhJvDshiuNPQMGOpwIG
-         7thpnHFenJTJQVIf9lzfFsYQgC/v6xONUu1m26/v+5KB7VXgfK5/z3pjcul3B82xKza6
-         bSdA==
+        bh=bKGCaBNhIQly2LY7lY+NOmyJ6aI0Yd/h629XMH7wx3Q=;
+        b=n85S0maMMYdJNjJeIea1AIL1ucIBiMZ8jEvI8a3fHf68dgmgVmxFQ3TN9JJsKuxlqd
+         x1+lawMxkzwMLbZsOg3x+1ovo0ZaCTFcVfgxHkXg7hGbqyOxY86htMGiRwzh/Nr8un7g
+         H1JeIe/weGeQuwa7TUK9+csR4hr74vevCNQ1vg8iMqpfutpXf8fr31nqxu3IuNjNCnsJ
+         0FsjKqKWnSK+R5gK0be0RAKDfBd4TJ5wh+zL0vNbTvCLLURaLZV318s8RfVjjYspFDMb
+         YbIwCXR5SROzd63IKFd10RL/QydiDXyd+1m/QNkVQ6HyI4aM8PsBcXPt+zgPJ50/cUJy
+         A81w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791510516; x=1792115316;
+        d=1e100.net; s=20260707; t=1791510934; x=1792115734;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=g0cBSDkX5TVuKiqF8g84xPSGpnh8it3kfI90lKRUo4w=;
-        b=SRT2srMY1hfewFskpZNm+8sZcsGB0Nsbd6P4ldrgPI+DMyCMEQDeHamJn7SjDHb5ae
-         DdqFmXj5hlTmAzLH6pAm2/RdLsIzwzrXOBdclBlAmuoVMzEh8fL7ItbW16+RAFwk3hN9
-         WcmYPghVFRshp0yYxq/y2641QQAmj5lYYjJe5OukWkH+HM2+czIyaGH6xaTSr7NkXSDN
-         lMtSnM3W/JdJiQjrXFJu0bZtCZ5oZwLBMIpmubxSAeWvd6GdMcf4Fq6dx97cBiYhWrGG
-         0/sUmXaUbrOUMK6cykU77jrYCfLaeUvJUDwvUADiMPDQqk0lkBh78+9iU0ZwzQsm2ZJ/
-         gXGw==
-X-Forwarded-Encrypted: i=1; AKwUvBxp9CbXPU3aTn3JrzCJCgFTRnYUy4H0Izoq+NX/+vf9a+VnHGhLj833bkQGH+iTtbe/Y3i4bVnNNHoj@vger.kernel.org
-X-Gm-Message-State: AFq9FYJuUvW2PrGclhlCZ8RIm/2E8A2MPbexdILOQzNTngLcvx14qfNt
-	qxdVyAYMd1r8QzdlJT3+pIjyN/+VYptGQxtUUbAUV4b6vUnMQ5EljHMDr7bFOVDyL5+vyOGRYkL
-	kWTWISQzrIwiDKNpX5ajPnIFlVkS3W+s=
-X-Gm-Gg: AYBFou1LUMloYzwAuKFO3Awzvxhumb8sOWys7YFfUoPoeGhN85MJCNIHvWl9rBmDDGP
-	BkiyzkmPLWiaJ4++C1AK9CktamyQh+rRlNQWyBHp6LX6LX8j87nIRO5Smi6BJNDUbW1Lpcp7ORG
-	gXOX1AEm8BwKrUC+7JhbXjiCAr412T/byrz//6zyJ5O5FEOfDbOAPMGzBO+y7RBhf+H2pM0bfqN
-	GhS4xPbkFN/1XiiecLmvVXayxokACgtIQGIev9vPBZHy459Kl5KBfvB/HUEXWfhOjF+dCltpq2a
-	hBdWCeTp7jhWrxsfPgr7KoTtXPn6ealFoxO54Q73iK5LXBxbceLjTEcuJo+W1UTr13+HgPxQyYV
-	hyaevdKvOQmkoaZhgcShEKs+Z5/avnzA458bkohy8ZWurni21Z3VB
-X-Received: by 2002:a05:6a00:99a:b0:881:ac65:715e with SMTP id
- d2e1a72fcca58-897c82b3a1dmr267063b3a.58.1791510515511; Thu, 08 Oct 2026
- 18:48:35 -0700 (PDT)
+        bh=bKGCaBNhIQly2LY7lY+NOmyJ6aI0Yd/h629XMH7wx3Q=;
+        b=bMdd1NfstoY/mKMkHR+vrWw4Oubgqfxe1XmAtfSZmmYVnfE6kthNGTJYTVnmEco/W+
+         fC7yURVMyPDHPqRxMuef0jRYtyYonB5F7qJxLvlKBGSF26Me8Q7LT11NpK16hlhPbFhD
+         uZpeGqeUW7mjl6YwwTtfcsEIRYuWcb2A+DwDmFp0/kUbqpaVkiai6O4rl5XiM4WFzxYX
+         yreNwWrA8DSRmzW1gWkHI3sFaBeRluBgYrlFjfleScBTphBKH2XEt0yey3v+pQgH8o4e
+         V18aFtzTbzzepK3hnxB/FbG+UyT+PaUw8+5quWgs2MkJO8YriLXX0PRWADQYblZv8A12
+         LDMA==
+X-Forwarded-Encrypted: i=1; AKwUvByc2vEjvFsyJ5SijjjQRx9Goiu3B3p03Vok+EpbKiySlJLxnqItNHI0P9h+qkcYf0NNqOBDtkvICNup@vger.kernel.org
+X-Gm-Message-State: AFq9FYL2XQph0bvLB3w5oiRWmSycy/nyx878q0gwsPHjE21I1qBm7feK
+	1/lx4OnjR/U3+Xo50JPd4nTcvajUV072zRIWPrMZEuZPpiqW267KAkUVCEZLWq9uz8VG3YX5UwU
+	LW5pE+6IDRzZVZ/6EBvxDR7ZzFZDX9xA=
+X-Gm-Gg: AYBFou2YVJDzkOqyqkIy/YhaJYAXlE+8Gxax2R+hebHcET852TKWdyybxVtDzEbqTsH
+	1qIeqX9yfywacvEGNeWXj9yO+oKTiEDcYPfnoK4U489q5fq43VXT4zhaE7nnwau/wPf8l1+ASkC
+	zlFpIKR96lVGQ3aJ+Jq/L6Zjh+Pd5LtSxx1bxACzDuF7YUtlkOrkaG406lu0MBqpxHdngU3Q42o
+	g2EzXWHhKPE11sbYu+dMr3McDAZleWTNbYl9Zv0llpxjDZ9iEXACFUoGAuPq/TWdzNdDrppil2h
+	h6Oig2oujP3ngLLN8l6HISz4KWorWMeYWhxXdYAQPc5Oe+SWs6HuXc2epfFkrwLEDpjt49QgaIQ
+	bgOAanebM5R3vhol19a9ojpJOBjAXjcaGkqk9R4b8XkNehrRidhEq
+X-Received: by 2002:a05:6a00:2887:b0:881:4b47:f30b with SMTP id
+ d2e1a72fcca58-897c6443587mr353692b3a.12.1791510933832; Thu, 08 Oct 2026
+ 18:55:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4dc3c5117810571e41211781bd0280510460e4da.1791227050.git.lucien.xin@gmail.com>
- <179133512379.434549.1011079085204348692@kernel.org>
-In-Reply-To: <179133512379.434549.1011079085204348692@kernel.org>
+References: <333607babf249e24fe90625d7abb7625b97c0b50.1791227050.git.lucien.xin@gmail.com>
+ <179133512872.434549.11248338098140405125@kernel.org>
+In-Reply-To: <179133512872.434549.11248338098140405125@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 8 Oct 2026 21:48:24 -0400
-X-Gm-Features: AclHuK9uRikezuu_s0N89XRYmqsG92abnIe6hnbR5B-c3f-eILbuCbfT4rSeql8
-Message-ID: <CADvbK_f3s+p803=1UmbsG594jNsjXoyy4DDB4wzhCCoK_+EYAA@mail.gmail.com>
-Subject: Re: [PATCH net-next v16 12/15] quic: add crypto packet encryption and decryption
+Date: Thu, 8 Oct 2026 21:55:21 -0400
+X-Gm-Features: AclHuK8bQc1UycT-_KEl0eTokTRsi7auN1Ri9mWxKSe-T9TNyMx8BTQMr8J1Amw
+Message-ID: <CADvbK_crkLjX2D+nu4LE16UpcQkUFa9DUp59hVKcXeTHxZXMHA@mail.gmail.com>
+Subject: Re: [PATCH net-next v16 15/15] quic: add packet parser base
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -109,10 +109,10 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Oct 6, 2026 at 9:05=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wrot=
 e:
 >
-> Thank you for your contribution! Sashiko AI review found 5 potential
+> Thank you for your contribution! Sashiko AI review found 7 potential
 > issue(s) to consider.
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 2 =C2=B7 Low: 3
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 3 =C2=B7 Low: 4
 >
 > If you believe none of the issues are legitimate, please reply to each
 > issue of Medium severity or higher and explain why the AI is wrong.
@@ -122,282 +122,307 @@ k
 y
 > (one such reply per series is enough).
 >
-> - [Medium] The AEAD integrity limit that this patch enforces does not
->   count failures across the whole connection, as RFC 9001 =C2=A76.6 requi=
-res.
-> - [Medium] quic_crypto_generate_token() writes the raw 64-bit
->   quic_ktime_get_us() timestamp (ktime_get(), i.e. CLOCK_MONOTONIC in =C2=
-=B5s=E2=80=A6
-> - [Low] The kernel-doc of quic_crypto_verify_token() says "Return: 0 if
->   the token is valid, -EINVAL if invalid, or another negative error=E2=80=
-=A6
-> - [Low] quic_crypto_decrypt() counts every non-EINPROGRESS failure of
->   quic_crypto_payload_protect() toward the AEAD integrity limit, not=E2=
+> - [Medium] The permanent commit message (the part above '---') describes
+>   much less than the patch does, and some of it is wrong.
+> - [Medium] When PLPMTUD is disabled (paths->plpmtud_interval =3D=3D 0, th=
+e
+>   default in this tree because nothing sets it),=E2=80=A6
+> - [Medium] quic_packet_listen_process() replies to, and creates state
+>   for, long-header packets of any size.
+> - [Low] The kernel-doc for quic_listen_sock_lookup() in net/quic/socket.c
+>   says that when several listening sockets share the same address, port=
+=E2=80=A6
+> - [Low] The patch adds definitions that nothing in this commit uses.
+> - [Low] struct quic_packet in net/quic/packet.h documents `daddr` as
+>   'Dest address from received packet' and `saddr` as 'Source address=E2=
 =80=A6
-> - [Low] async_pending[] is used as a quiescence check before re-keying a
->   tfm, but both sides use unordered atomics.
+> - [Low] The header comment of quic_packet_deferred_work() (packet.c:776)
+>   reads 'Work function to process packets in the backlog queue', but the=
+=E2=80=A6
 >
 > --
 >
-> quic: add crypto packet encryption and decryption
+> quic: add packet parser base
 >
-> This patch adds AEAD payload protection and QUIC header protection for
-> TX and RX via quic_crypto_encrypt() and quic_crypto_decrypt(). It also
-> adds helpers to compute the Retry integrity tag, and to generate and
-> verify Retry/address validation tokens.
+> This commit adds the QUIC receive path. quic_packet_rcv() finds the
+> owning socket by connection ID, by address, or through the listener, then
+> passes the packet to quic_packet_process(). The patch also adds
+> listen-side Initial handling, request sockets, ALPN-based listener
+> switching through a per-socket work item, and ICMP Packet Too Big
+> handling through quic_packet_rcv_err() and quic_packet_rcv_err_pmtu().
 >
-> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
-> > index 4bb6acea5112a..fa326cc9266a8 100644
-> > --- a/net/quic/crypto.c
-> > +++ b/net/quic/crypto.c
-> > @@ -270,6 +271,484 @@ ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] =
-=3D {
+> > This patch uses 'quic_packet' to handle packing of QUIC packets on the
+> > receive (RX) path.
 >
 > [ ... ]
 >
-> > +int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *sk=
-b,
-> > +                     gfp_t gfp)
+> > - quic_packet_get_alpn(): Parse the ALPN from a client Initial packet,
+> >   then locate the appropriate listener using the ALPN.
+>
+> [ ... ]
+>
+> > - quic_packet_rcv_err_pmtu(): Find the socket and update the PMTU via
+> >   quic_packet_mss_update().
+>
+> [Severity: Medium]
+> Some parts of the commit message don't match the code.
+>
+> Should "packing" in the first sentence be "parsing"?
+>
+> quic_packet_get_alpn() installs the Initial keys, decrypts the packet and
+> parses the ALPN list. It doesn't look up a listener. The lookup and the
+> switch happen in quic_listen_sock_switch() in net/quic/socket.c.
+>
+> For ICMP errors, the socket lookup is done in quic_packet_rcv_err(), not
+> in quic_packet_rcv_err_pmtu().
+>
+> The message also leaves out much of what the patch adds:
+>
+>   - quic_packet_listen_process(), with token verification and the
+>     Stateless Reset, Version Negotiation, Retry and CONNECTION_REFUSED
+>     triggers
+>   - struct quic_request_sock and quic_request_sock_lookup(),
+>     quic_request_sock_create() and quic_request_sock_backlog_tail(),
+>     which charge sk_ack_backlog and receive memory
+>   - the per-socket work_struct with deferred_list/backlog_list on
+>     quic_wq, and flush_work() in quic_packet_free()
+>   - quic_accept_sock_exists() and quic_listen_sock_switch()
+>   - quic_backlog_rcv() now processing packets instead of dropping them
+>   - the ALPN free moving from quic_destroy_sock() to quic_sock_destruct()
+>
+True.
+
+These updates were added only to the last version, and
+I will also reflect them on the commit message.
+
+> Most of this is described only in the changelog below the --- line, and
+> git am drops that part. Could the permanent commit message cover these
+> pieces?
+>
+> > diff --git a/net/quic/packet.c b/net/quic/packet.c
+> > index 56d2b8df292a0..673f1cd491438 100644
+> > --- a/net/quic/packet.c
+> > +++ b/net/quic/packet.c
+> > @@ -14,6 +14,781 @@
+> >
+> >  #define QUIC_HLEN            1
+> >
+> > +#define QUIC_LONG_HLEN(dcid, scid) \
+> > +     (QUIC_HLEN + QUIC_VERSION_LEN + 1 + (dcid)->len + 1 + (scid)->len=
+)
+>
+> [Severity: Low]
+> This isn't a bug, but nothing in this patch uses QUIC_LONG_HLEN().
+>
+> Two of the new struct quic_packet members are in a similar state.
+>
+> backlog_list is described as "Packets waiting for crypto keys". It is
+> only initialized in quic_packet_init() and purged in quic_packet_free(),
+> and nothing enqueues to it yet.
+>
+> quic_packet_listen_process() reads validate_peer_address, but nothing
+> ever sets it, so the token validation and Retry branch can't be reached:
+>
+>         if (packet->validate_peer_address) {
+>
+> The changelog says these are staged for the next patchset. Could they be
+> added together with the code that uses them? Failing that, could the
+> backlog_list comment describe what the field does today?
+>
+> [ ... ]
+>
+> > +/* Process PMTU reduction event on a QUIC socket. */
+> > +void quic_packet_rcv_err_pmtu(struct sock *sk)
 > > +{
 >
 > [ ... ]
 >
-> > +     phase =3D cb->key_phase;
-> > +     if (phase !=3D crypto->key_phase && !crypto->key_pending) {
-> > +             if (!crypto->send_ready) /* Not ready for key update. */
-> > +                     return -EINVAL;
-> > +             if (!cb->backlog) /* Key update requires process context.=
- */
-> > +                     return -EKEYREVOKED;
-> > +             /* Cannot do key update while async crypto is in progress=
-. */
-> > +             if (unlikely(atomic_read(&crypto->async_pending[phase])))
-> > +                     return -EBUSY;
-> > +             err =3D quic_crypto_key_update(crypto); /* Perform key up=
-date. */
->
-> [Severity: Low]
-> Is the ordering here strong enough for async_pending[] to work as a
-> quiescence check before re-keying?
->
-> quic_crypto_done() signals completion with a plain atomic_dec(). Per
-> Documentation/atomic_t.txt, that operation is unordered:
->
->     atomic_dec(&crypto->async_pending[cb->key_phase]);
->
-> This side reads the counter with a relaxed atomic_read(). When it sees 0,
-> it calls quic_crypto_key_update(), which rewrites the key schedule throug=
-h
-> crypto_aead_setkey().
->
-> Nothing orders the completing CPU's loads of the key schedule during the
-> AEAD operation before its decrement. The socket lock does not cover this,
-> because the decrement happens before cb->crypto_done() takes the lock
-> again.
->
-> On weakly ordered architectures, can the re-keying CPU see 0 and overwrit=
-e
-> the key while the completing request's reads are still unordered? Would
-> atomic_dec_return_release(), or smp_mb__before_atomic() plus atomic_dec()=
-,
-> in quic_crypto_done() paired with atomic_read_acquire() here be needed?
->
-> > +             if (err) {
-> > +                     cb->errcode =3D QUIC_TRANSPORT_ERROR_KEY_UPDATE;
-> > +                     return err;
-> > +             }
-> > +             cb->sync =3D 1;
-> > +             cb->key_update =3D 1; /* Mark packet as triggering key up=
-date. */
-> > +     }
+> > +     info =3D clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX=
+_PMTU);
+> > +     /* If PLPMTUD is not enabled, update MSS using route and ICMP inf=
+o. */
+> > +     if (!paths->plpmtud_interval) {
+> > +             if (quic_packet_route(sk))
+> > +                     return;
 > > +
-> > +     err =3D quic_crypto_payload_protect(crypto, skb, false, gfp);
-> > +     if (err) {
-> > +             if (err =3D=3D -EINPROGRESS)
-> > +                     return err;
-> > +             /* When using the old keys can not decrypt the packets, t=
-he
-> > +              * peer might start another key_update. Thus, clear the l=
-ast
-> > +              * key_pending so that next packets will trigger the new
-> > +              * key-update.
-> > +              */
-> > +             if (crypto->key_pending && phase !=3D crypto->key_phase) =
-{
-> > +                     crypto->key_pending =3D 0;
-> > +                     crypto->key_update_time =3D 0;
-> > +                     crypto->key_update_send_time =3D 0;
-> > +             }
-> > +             goto err;
-> > +     }
->
-> [Severity: Low]
-> Should every quic_crypto_payload_protect() failure count toward the AEAD
-> integrity limit?
->
-> All of these reach the err label and increment rx_fails[cb->key_phase]:
->
->   - -ENOMEM from quic_crypto_aead_mem_alloc()
->   - a negative skb_to_sgvec() result
->   - on the resume path, any async engine error delivered in
->     cb->crypto_err
->
-> RFC 9001 section 6.6 counts only received packets that fail
-> authentication.
->
-> Under sustained allocation failure, could a legitimate connection end up
-> with -EKEYEXPIRED (AEAD_LIMIT_REACHED) instead of just dropping packets?
->
-> [ ... ]
->
-> > +     return 0;
-> > +err:
-> > +     if (++crypto->rx_fails[cb->key_phase] >=3D crypto->cipher->rxlimi=
-t)
-> > +             err =3D -EKEYEXPIRED;
-> > +     return err;
-> > +}
+> > +             dst =3D __sk_dst_get(sk);
+> > +             if (dst)
+> > +                     dst->ops->update_pmtu(dst, sk, NULL, info, true);
+> > +             quic_packet_mss_update(sk, info - packet->hlen);
 >
 > [Severity: Medium]
-> Does this enforce the integrity limit across the whole connection, as
-> RFC 9001 section 6.6 requires?
+> Can a Packet Too Big that reports a larger MTU than the current path MTU
+> raise the MSS here?
 >
-> The comment on the QUIC_AEAD_RX_* constants cites that section. It says
-> endpoints MUST count packets that fail authentication during the lifetime
-> of a connection, across all keys.
+> info is only clamped to [QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU], and
+> quic_packet_mss_update() stores whatever it is given. The route layer
+> ignores increases:
 >
-> Two things seem to weaken the limit here.
->
-> First, cb->key_phase comes from the key bit after header protection is
-> removed, and the packet has not been authenticated yet. Forged
-> short-header packets therefore spread across both rx_fails[] slots, which
-> allows about 2 * rxlimit forgeries.
->
-> Second, quic_crypto_keys_derive_and_install() resets the slot on every RX
-> key install. That includes each key update reached through
-> quic_crypto_decrypt()->quic_crypto_key_update():
->
-> net/quic/crypto.c:quic_crypto_keys_derive_and_install() {
+> net/ipv4/route.c:__ip_rt_update_pmtu() {
 >     ...
->         if (rx) {
->                 crypto->rx_fails[phase] =3D 0;
+>         old_mtu =3D ipv4_mtu(dst);
+>         if (old_mtu < mtu)
+>                 return;
 >     ...
 > }
 >
-> For AES-CCM (rxlimit 2965820, about 2^21.5), an off-path sender would get
-> roughly (2 + number of key updates) * rxlimit forgery attempts.
+> __ip6_rt_update_pmtu() also returns early when mtu >=3D dst6_mtu(dst).
 >
-> Would a single connection-wide failure counter, not indexed by key phase
-> and not reset on key install, be more appropriate? tx_count could stay
-> per key.
+> Nothing in this tree sets plpmtud_interval, so this branch is the
+> default. A delayed or spoofed ICMP that arrives through quic_udp_err()
+> -> quic_packet_rcv() -> quic_packet_rcv_err() -> quic_packet_rcv_err_pmtu=
+()
+> and claims 9000 on a 1500-byte path would set the MSS to 9000 - hlen.
+>
+> The route is left unchanged, so the cached dst stays valid. Later
+> quic_packet_route() calls then get 1 back from quic_flow_route() and
+> never recompute the MSS from dst_mtu().
+>
+> Would it be safer to re-read dst_mtu(dst) after update_pmtu(), or to only
+> ever lower the MSS, as tcp_v4_mtu_reduced() does?
+>
 True.
 
-But the same as the one reported on the last patch.
+Will follow the suggestion to re-read it after update_pmtu():
 
->
+    info =3D dst_mtu(dst);
+
 > [ ... ]
 >
-> > @@ -560,6 +1039,234 @@ int quic_crypto_initial_keys_install(struct quic=
-_crypto *crypto,
->
-> [ ... ]
->
-> > +int quic_crypto_generate_token(struct quic_crypto *crypto, void *addr,
-> > +                            u32 addrlen, struct quic_conn_id *conn_id,
-> > +                            u8 *token, u32 *tlen)
+> > +static int quic_packet_listen_process(struct sock *sk, struct sk_buff =
+*skb,
+> > +                                   gfp_t gfp)
 > > +{
-> > +     u8 *token_buf, *p, flag =3D *token;
-> > +     u64 ts =3D quic_ktime_get_us();
-> > +     u32 len, tslen =3D sizeof(ts);
-> > +     int err;
-> > +
-> > +     len =3D sizeof(flag) + addrlen + tslen + conn_id->len + QUIC_TAG_=
-LEN;
-> > +     token_buf =3D kmalloc(len, GFP_KERNEL);
-> > +     if (!token_buf)
-> > +             return -ENOMEM;
-> > +
-> > +     p =3D token_buf;
-> > +     p =3D quic_put_int(p, flag, sizeof(flag));
-> > +     p =3D quic_put_data(p, addr, addrlen);
-> > +     p =3D quic_put_int(p, ts, tslen);
-> > +     quic_put_data(p, conn_id->data, conn_id->len);
+>
+> [ ... ]
+>
+> > +     if (!quic_packet_compatible_versions(version)) {
+> > +             /* rfc9000#section-6.1:
+> > +              *
+> > +              * If the version selected by the client is not acceptabl=
+e to
+> > +              * the server, the server responds with a Version Negotia=
+tion
+> > +              * packet. This includes a list of versions that the serv=
+er
+> > +              * will accept.
+> > +              */
+> > +             err =3D quic_packet_version_create_and_xmit(sk, gfp);
+> > +             consume_skb(skb);
+> > +             return err;
+> > +     }
 >
 > [Severity: Medium]
-> Does this expose the server's uptime to any client that receives a token?
+> Is a minimum datagram size check missing before this reply?
 >
-> ts is the raw ktime_get() value, in microseconds since boot.
-> quic_crypto_token_protect() only authenticates the flag, address and
-> timestamp as associated data. It does not encrypt them:
+> RFC 9000 sections 5.2.2 and 6.1 say a server MUST drop smaller packets
+> that specify an unsupported version. Section 14.1 says a server MUST
+> discard an Initial packet in a UDP datagram whose payload is smaller than
+> 1200 bytes.
 >
->         aead_request_set_ad(req, adlen);
->         aead_request_set_crypt(req, sg, sg, len - adlen - extra, nonce);
+> On the receive path nothing compares skb->len with QUIC_MIN_UDP_PAYLOAD.
+> quic_packet_rcv() and quic_packet_get_sock() only require
+> skb->len >=3D QUIC_HLEN.
 >
-> Tokens are sent to unauthenticated clients in Retry packets and NEW_TOKEN
-> frames, so the monotonic clock can be read from them in plaintext. TCP
-> avoids a similar leak with per-connection timestamp offsets
-> (secure_tcp_ts_off).
+> Packets of any size can therefore reach the Version Negotiation reply
+> above, the Retry and refuse-close paths, and this call further down:
 >
-> The v14 change moved the timestamp from the encrypted part into the AAD
-> so it could be used for the nonce. That change appears to have introduced
-> this exposure.
+>         req =3D quic_request_sock_create(sk, &odcid, retry, gfp);
 >
-> The serialized address is also sent in plaintext. For IPv6,
-> quic_v6_get_msg_addrs() in net/quic/family.c sets:
+> When ALPN demux is disabled, the Length field isn't parsed at all. A
+> 16-byte spoofed long-header Initial (8-byte DCID, empty SCID, empty
+> token) would allocate a quic_request_sock and call sk_acceptq_added().
 >
->         sa->v6.sin6_scope_id =3D skb->skb_iif;
+> Could a burst of these fill the accept queue, so that legitimate clients
+> hit sk_acceptq_is_full() and get CONNECTION_REFUSED?
 >
-> Would the server's ingress ifindex end up in the token as well?
+> Once the Version Negotiation and Retry builders are implemented, would
+> they also reply to spoofed sources for these small datagrams?
 >
 True.
-- Will add crypto->ts_off to randomize the timestamps as TCP does.
-- Will move the address from the auth part to the encrypted part in token.
+
+Will add a check for udp_hdr(skb)->len against QUIC_MIN_UDP_PAYLOAD here.
 
 Thanks.
 
 > [ ... ]
 >
-> > +/* Validate a Retry or address validation token.
-> > + *
-> > + * Decrypts and authenticates the token, checks the client address and=
- validates
-> > + * the timestamp against the timeout selected by the token flag. For a=
- Retry
-> > + * token, extracts the original destination connection ID.
-> > + *
-> > + * Return: 0 if the token is valid, -EINVAL if invalid, or another neg=
-ative
-> > + * error code.
-> > + */
-> > +int quic_crypto_verify_token(struct quic_crypto *crypto, void *addr,
-> > +                          u32 addrlen, struct quic_conn_id *conn_id,
-> > +                          u8 *token, u32 len)
+> > +/* Work function to process packets in the backlog queue. */
+> > +static void quic_packet_deferred_work(struct work_struct *work)
 > > +{
 >
 > [ ... ]
 >
-> > +     err =3D quic_crypto_token_protect(crypto, token_buf, len,
-> > +                                     sizeof(flag) + addrlen + tslen, f=
-alse);
-> > +     if (err)
-> > +             goto out;
-> > +
-> > +     err =3D -EINVAL;
+> > +     head =3D &quic_packet(sk)->deferred_list;
 >
 > [Severity: Low]
-> The kernel-doc says -EINVAL is returned for an invalid token. Does a
-> forged or tampered token actually return -EINVAL?
+> This isn't a bug, but the comment says "backlog queue" while the function
+> drains deferred_list. struct quic_packet now has a separate backlog_list,
+> so should the comment say deferred list instead?
 >
-> A tag mismatch makes crypto_aead_decrypt() return -EBADMSG. That value is
-> returned unchanged through the goto out above, before err is set to
-> -EINVAL. A token key that was never set would give -ENOKEY in the same
-> way.
+> [ ... ]
 >
-> Only the length precheck and the address, timestamp and ODCID length
-> checks return -EINVAL.
+> > diff --git a/net/quic/packet.h b/net/quic/packet.h
+> > index cf0b97112d9b1..4a7bcf959e997 100644
+> > --- a/net/quic/packet.h
+> > +++ b/net/quic/packet.h
+> > @@ -14,6 +14,8 @@ struct quic_packet {
+> >       union quic_addr daddr;    /* Dest address from received packet */
+> >       union quic_addr saddr;    /* Source address from received packet =
+*/
 >
-> Should the comment be updated, or should authentication failures be
-> mapped to -EINVAL?
+> [Severity: Low]
+> These comments seem reversed compared to how this patch fills the fields.
+>
+> quic_get_msg_addrs() takes (skb, da, sa), and quic_packet_listen_process(=
+)
+> calls it like this:
+>
+>         quic_get_msg_addrs(skb, &packet->saddr, &packet->daddr);
+>
+> The inline comment there says "Read Destination address (packet->saddr)
+> and Source address (packet->daddr)".
+>
+> So packet->saddr holds the received packet's destination (local) address
+> and packet->daddr holds its source (peer) address. The users,
+> quic_crypto_verify_token(), quic_accept_sock_exists() and
+> quic_listen_sock_switch(), all follow that convention.
+>
+> Could the struct comments be changed to match?
+>
+> [ ... ]
+>
+> > diff --git a/net/quic/socket.c b/net/quic/socket.c
+> > index 0173416d0368a..be8dc30f8208a 100644
+> > --- a/net/quic/socket.c
+> > +++ b/net/quic/socket.c
+>
+> [ ... ]
+>
+> > +/* Find the listening QUIC socket for an incoming packet.
+> > + *
+> > + * This function searches the QUIC socket table for a listening socket=
+ that
+> > + * matches the dest address and port, and the ALPN(s) if presented in =
+the
+> > + * ClientHello.  If multiple listening sockets are bound to the same a=
+ddress,
+> > + * port, and ALPN(s) (e.g., via SO_REUSEPORT), this function selects a=
+ socket
+> > + * from the reuseport group.
+>
+> [Severity: Low]
+> This isn't a bug, but the function body doesn't select from a reuseport
+> group.
+>
+> It walks the hash chain with sk_nulls_for_each_rcu() and returns the
+> first specific-address match, or an ANY-address candidate. It never calls
+> reuseport_select_sock() or looks at sk_reuseport_cb.
+>
+> The v16 changelog says reuseport_select_sock() moved to the next
+> patchset. Should this part of the comment move with it?
+>
+> [ ... ]
 >
 > --
 > Sashiko AI review =C2=B7 https://netdev-ai.bots.linux.dev/sashiko/#/patch=
