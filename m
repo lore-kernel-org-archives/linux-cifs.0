@@ -1,169 +1,117 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F2F3C988B
-	for <linux-cifs@vger.kernel.org>; Sun, 11 Oct 2026 05:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456783BBFBF
+	for <linux-cifs@vger.kernel.org>; Sun, 11 Oct 2026 06:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791696595; cv=none; b=B4Z/cVK7LVMRO59IMmSnUwG/O6TKBZQNkN5hLx8QoZJK9VL5bZNwJ5pjmZyH5U/KgRUukd3o6zl1GOETcsqmBAyDsXvBHf6zecCpOaAlqKaKXW2XT0EfrM97NM0kwnQYP5KU6aumiN6OoBOR4vH7STpE6JWrDdg8nOLV+ZCgj1g=
+	t=1791698404; cv=none; b=k8axqzVH/bg09AhcZd0Z7jIt7yJO2UQEIWql2xw71vX4rdWL/DpxMwKo0zg0ss6KhiQ63cwaFtiV5aeL3/QZmYfl0WxvWG4VA2sJflUcS4wu3s8IuRuJ/jNqc3uCfxAZ807leZJJpnpyo6bZMjBoTZUkgE/KPTK5PTFwfEpCVtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791696595; c=relaxed/simple;
-	bh=1haV4dNMWDdQWqZsUuA0TFAZtQMdcpLXPmSnhiji0ao=;
-	h=From:To:Cc:Subject:Message-ID:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=uPyiX0RYcdQe7v9Hwq1SRHNoIKOcCUa22e7aUOGAFqWKNOm6BUqejwdF5t8oIp6mwVa45ZeBokndgB9i7ALAOkUc1juid4rNepjijq8QTqQ1UAx/B+HXe7MoIfYf1ne4KNzxj2gXFWZ5SnjH3fsb/XgQe1TbDmUBmi+LLSFPz+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innovatrics.com; spf=pass smtp.mailfrom=innovatrics.com; dkim=pass (1024-bit key) header.d=innovatrics.com header.i=@innovatrics.com header.b=sG+ClBZE; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innovatrics.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innovatrics.com
+	s=arc-20240116; t=1791698404; c=relaxed/simple;
+	bh=XIuNEXf2+WIoLde2cK4bKU6HlAzdv5yqHSbad4ISGMs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sFqwFGx0Ou3JHbW4Qx27eOSpMqCncpdUjSSEcALAA2YroKZYt+Q2WRXO1/ZcPH+wVv0n8Q6hssWcnorAexaXeP4PBtw7eV+4SFfWqAqZBEBAJHfOGvuNWWo0lVZQrMnHrrguN3WFRedfxysDuqINYRwyka47sEIrII7G19RJKh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AuxYxm6X; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=innovatrics.com header.i=@innovatrics.com header.b="sG+ClBZE"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4a166199820so5244315e9.1
-        for <linux-cifs@vger.kernel.org>; Sat, 10 Oct 2026 22:29:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuxYxm6X"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3ab3f899c8aso222167a91.1
+        for <linux-cifs@vger.kernel.org>; Sat, 10 Oct 2026 23:00:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=innovatrics.com; s=google; t=1791696592; x=1792301392; darn=vger.kernel.org;
-        h=content-type:mime-version:date:references:in-reply-to:message-id
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=q2LSr6tsQNBQXJylfG8nOPgyPFtDzDbVgLjnyN+NvOY=;
-        b=sG+ClBZEZshyYL12WpUA8gi5U4p3Lf2TUW5h8eG3RZVknGgosp9xUBym2Jg7on3Bti
-         u3YWy87k/lf3MT3ptjbhL28yBia/RGwBWim2B6spsjnWSKbqf/PRWIODLjHoWquV6rf6
-         lWE+oxJb1L+70J2GVpC844oToN87Xc7V4+zzg=
+        d=gmail.com; s=20251104; t=1791698403; x=1792303203; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=siZczXavzG4cpFqab0LU9thPiqjozk6z14MIL0cwYp0=;
+        b=AuxYxm6XBkc27Cj1VQmPaPLqhD7hpK/Ol4x9a1xQBzy/xSd7KgLcsQzCf2sGV9RV4H
+         pykZHTvEIfEsf9pmkUyK+0/HVLqFETdpdh/rzGODWLX3WHBX589zAb2p04O3wkPiCYe7
+         Ox6nARwuldYWDhkeygbp32hUWMWBkkPT5wZgplmLe9UuW3g13uPQqH0pzqjIe7D5o4cl
+         MYjw0I7WmYRojr+KN8q7XehLXy5YSuMR49CmS+CD/yLKoXqbz90YwpwQCvp07EmaL6gg
+         bKo6JtaJgpqWYauEAUCTNDptkYIFtsgYrExb9uGi+iRP/aVW7vNyAyKBqyjbm8N1hO++
+         BRpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1791696592; x=1792301392;
-        h=content-type:mime-version:date:references:in-reply-to:message-id
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=q2LSr6tsQNBQXJylfG8nOPgyPFtDzDbVgLjnyN+NvOY=;
-        b=yWjm5EjMYhZ+y3d1EUeE7ClRwgEgjjsXlME7PN09AK641GLgU5oOKuXS3og/Vv7xFZ
-         Uht7OokrHlF3opJCPzsxds9yuMmGq8otznyVe+aegC1ydbQe+gON9PSUJaV4yob4jnQp
-         7Gl+3sMLsmepcHAOR5AnPnsxgUO1ND4jb9MgCEXygIf7MUpE4rW7uVWqgC1l/QUa3hfX
-         ZVlhjfw2KPwQD/l1yNGMuOpt8ycw5yzlUX7VtYOSnQHMIUqnlH29llZKnexhD41I3ROq
-         y9oypDaXn8G8aUwsbF0ttxkj0CNVelAI4ej+28eZhBeyTWovWbmTGG4uARBjAtEhU81T
-         V8kA==
-X-Forwarded-Encrypted: i=1; AKwUvBw/Ijt+DccCukYzcq4t1bWdPl6RBw9sY82AH2/+paU2T4HcGl99qSmeWAZi7eFSNeGIqY9QkbKaevfH@vger.kernel.org
-X-Gm-Message-State: AFq9FYIv0SOoa43NJfYvC2jTrxL2CbYK8ORYmoPku8E4zwnWjJ9Yx3Bu
-	bQ/Hm6dk0SKP7pINWDVoQkYGn4o2mEOZHM1NCnK747FB7Kk+aJymZLB/akbsCnllUg==
-X-Gm-Gg: AYBFou2tf+eOlk5XpCEImwwXjHc/e76mDH1D0Uw5Sq9vtD2WBoZ7nzosEds8aFMS7jJ
-	4DCTEwKXB37zn1QVS0CqanCl7g+PZE0VMO1s6jJj9x2olN9c+htkFIawyNVM7ARSzDyCUnwMj12
-	p3AAqk6qZV4t/iRiDf1JOevbY4eKDzr0o7wphti3uMOaX1HjQyKJmd5v5xk+UgCpOwOTrslzFGP
-	kK5BSFCBCM8B+n6vueZdAURktmyjxPcvp6JPTzIPp8Wi7vWiSTYxVEnpt2dSy+pzsOx8SFHH06C
-	TrcZEx+uk1llK0sAfZ8lbOFy1eEv4qi0nFealFf0ZtmmU0BmJv0ouDarzaukPrHkj3H2Jq/Kjrt
-	pO+hjiLw+gMSVmI4jwohrXQ2V+dz8l/NAbJf/mFPmsMM2GZBBY/ch7gJ8J7F0x1uyH43YBhO81H
-	csvWHmd3Wtff+wx92TiBCe7Q7aXmFL973/8CHYKhdMlXpBllxgh23PEXDpK4JibYyJZPZcj75zR
-	dKLyuoFtAJ2rUKbqoGR6HhAFq48LFjYXSrlDR51/U4z//eWCMpv65n8y1pLn9fGvfz9Mz6ooOxS
-	h6x5M1btznWUcA15JkEzt6OO/UPHvA0=
-X-Received: by 2002:a05:600c:3146:b0:4a0:34a:588c with SMTP id 5b1f17b1804b1-4a18e4a7cb9mr117216165e9.14.1791696591843;
-        Sat, 10 Oct 2026 22:29:51 -0700 (PDT)
-Received: from [10.11.72.5] (bip-static-148.213-81-147.telecom.sk. [213.81.147.148])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a18bea0f1csm277235065e9.9.2026.10.10.22.29.50
+        d=1e100.net; s=20260707; t=1791698403; x=1792303203;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=siZczXavzG4cpFqab0LU9thPiqjozk6z14MIL0cwYp0=;
+        b=VpyWmh7pxqgRm4H34i/accPm+W09ypcmvTPFYV40d92LR+80hJco/pL+R+UhEH6V+N
+         G1ZviYT7WOrb+rQdvMwoXeDIpH3Otv/p0onbQzTOUPVrLXCUUG+BkeD/+aVtmTtmkJyn
+         0IGSzoU3s8VYENmzIn4T6YfrO6JfIec5+9rsSch8QyIPsfwxYNAjnAIdShBRuEew5p7i
+         LLlBZH8fBa+UO5IeHpLenNY0SPOdO/fOZkuN5F+FKiNhzBJt5jPct6sitiXs7Xqv3i5P
+         quZR4MzwXz7QMGsfQCEv+0q7NNTacqzw9we0359Bnw0lAM3pwg2dpIb85yM9W6mQNQ6L
+         SfhA==
+X-Forwarded-Encrypted: i=1; AKwUvBx106WE3OIpubNKFSdf/ln1HoguvzlymqTzEEwSFqoMj/M4aBYcJ0cVMgendDc9CwWfRvoyzg81P+Q5@vger.kernel.org
+X-Gm-Message-State: AFq9FYIlbz8SEX0MAqP/w9SGVF8A5oSuH+UdzcGcSU3ydwcWLO9bxQJo
+	vxeYYoOYEHyKQEwpazBo2ZUrZpls9wKAQph6HN7viaa8mby23t0/pZ6z
+X-Gm-Gg: AYBFou2XrwDj3rECIqECBl63+LGQh3t+6drzi5vpdWZFe6vsZdRnARZPlZv9BW8JnYm
+	50q/olLRJLO5HSFKr75fDNvK2zMInYcSuu17uFgXqdaTPsZUfbs1Dw87YW455hPUVuv87ndkeiM
+	hAKSWvfJPNdekc+58ll3q1PEsxRaTL4r71ut2wZb8Lpaq3maIcCEDuvtrN8nR2T1CybCkwGzBH6
+	HGymnw+HT0lcr5etZYcpFCdW6IVYyy8GA1WOPFg0SwFw2O3gDQfblbw2SgJbCb3hKA5C5GY0CYV
+	e1lnZrW9ao4tIAAWYcUVWBxZnSMewuBMsncyvzLEaHk1h51dQx103hWfliOLZxKapq9KJCOLE5F
+	JQ3CjsgSPxK+FTWd1s07aW3BPTk7h4yiqlCA+4ky2z6znguJ5Qz3lVMPWueHi9GWoFZDaLXlZHa
+	I6MVr+lbIDQ06ljA8EdA+S3GxLFMg+1DuYKaDLAvzv4j2X2wKprjgON6xqLx14Xcd3KFdjj1d1u
+	Q==
+X-Received: by 2002:a17:903:2f92:b0:2df:8ab7:fe3a with SMTP id d9443c01a7336-2e842abf30fmr88364935ad.4.1791698402534;
+        Sat, 10 Oct 2026 23:00:02 -0700 (PDT)
+Received: from ser8.. ([221.156.231.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2e8422b5fd2sm29784615ad.50.2026.10.10.23.00.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Oct 2026 22:29:51 -0700 (PDT)
-From: Petr Chmelar <petr.chmelar@innovatrics.com>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-    Paulo Alcantara <pc@manguebit.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Namjae Jeon <linkinjeon@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev,
-    linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 0/5] netfs, cachefiles: Changes for next, primarily
- occupancy tracking-related
-Message-ID: <20261011.cachefiles-seek-hole-walk.pchmelar@innovatrics.com>
-In-Reply-To: <20260910220242.2165023-1-dhowells@redhat.com>
-References: <20260910220242.2165023-1-dhowells@redhat.com>
-Date: Sun, 11 Oct 2026 05:29:50 +0000
+        Sat, 10 Oct 2026 23:00:02 -0700 (PDT)
+From: DaeMyung Kang <charsyam@gmail.com>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	DaeMyung Kang <charsyam@gmail.com>
+Subject: [PATCH] ksmbd: match the full EA name in single-entry queries
+Date: Sun, 11 Oct 2026 14:59:55 +0900
+Message-ID: <20261011055955.1487087-1-charsyam@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi David,
+An SMB2 QUERY_INFO request can name a specific extended attribute with
+FILE_GET_EA_INFORMATION. smb2_get_ea() compares only EaNameLength bytes
+of each xattr name, so a request for "Foo" also matches "Foobar". If
+both EAs exist and listxattr() returns "Foobar" first, ksmbd returns
+"Foobar" and its value instead of "Foo". It also returns "Foobar" when
+"Foo" does not exist.
 
-The cover letter leaves non-contiguous objects, which still use
-SEEK_DATA/SEEK_HOLE, for a later series.  We hit that case badly in
-production, so here are numbers in case they help with its priority.
+Check the xattr name length after removing the user. prefix before
+comparing the name bytes. This keeps enumeration without a requested
+name unchanged.
 
-Objects get into that state when a large file is read at random
-offsets, as training jobs do with data sets on NFS.  Each read is
-copied to the cache at its own offset, and with other files being
-cached at the same time most pieces end up in separate XFS extents.  The
-object is BACKFS_MAP from the first discontiguous write and stays so
-once it has filled in.
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
+---
+ fs/smb/server/smb2pdu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-SEEK_HOLE has no upper bound.  On XFS, iomap_seek_hole() calls
-xfs_seek_iomap_begin() once per extent until it finds a hole, and in a
-fully populated object the only hole is EOF.  cachefiles probes the
-occupancy at least once per read request, so a sequential read of such
-an object walks the rest of its extent list for every readahead batch.
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 12a43efdb53f..a49cc3a0c9de 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -6738,8 +6738,9 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 			continue;
+ 
+ 		if (req->InputBufferLength &&
+-		    strncmp(&name[XATTR_USER_PREFIX_LEN], ea_req->name,
+-			    ea_req->EaNameLength))
++		    (name_len - XATTR_USER_PREFIX_LEN != ea_req->EaNameLength ||
++		     strncmp(&name[XATTR_USER_PREFIX_LEN], ea_req->name,
++			     ea_req->EaNameLength)))
+ 			continue;
+ 
+ 		if (smb2_is_private_ea(&name[XATTR_USER_PREFIX_LEN],
+-- 
+2.43.0
 
-On our NFS clients (Ubuntu, v6.8, cache on XFS), a sequential read of a
-fully cached 184 GB object with 1,080,732 extents ran at 0.4 MB/s.  In
-a 15 s trace of one of the affected readers, each SEEK_HOLE took 64 ms
-to 1 s, XFS did 58.5 million extent lookups, and nothing was read from
-the server.  After xfs_fsr brought the object down to a few hundred
-extents, a traced read of it ran at 369 MB/s from the cache.  On
-another machine, v6.14 does the same walk at about 220 ns per extent,
-against 520 ns on v6.8.
-
-It's the same on vfs-7.4.netfs (9f8b64f66).  In QEMU (TCG, 4 vCPUs),
-over an NFSv4.2 loopback mount with fsc and the cache on XFS, a 1 GiB
-object filled by random 64 KiB reads, while a second file is filled
-the same way, ends up with about 16,300 extents.  A sequential read of
-it after dropping the page cache makes 4,098 SEEK_HOLE calls that take
-176 s in total, and runs at 4.3 MiB/s.
-
-To confirm that the walk is the whole problem, I wrote a naive
-workaround with LLM assistance.  I don't know the cachefiles and netfs
-internals well, so take it as a probe rather than a proposal:
-
- - Each cachefiles_object remembers the last region that SEEK_DATA/
-   SEEK_HOLE found to be contiguous data.  cachefiles_query_occupancy()
-   answers a query that starts inside that region without seeking, and
-   overlapping or abutting regions merge.  A sequential read then pays
-   for one walk instead of one per request.
-
- - The region is forgotten after every place where cachefiles removes
-   data from a backing file: the punch on low space in
-   __cachefiles_prepare_write(), the padding clear and the truncation in
-   cachefiles_collect_write(), cachefiles_shorten_object() and
-   invalidation.  A sequence number sampled before the seeks stops a
-   query that raced with a removal from recording what it saw, and
-   cookie->inval_counter ties the region to the backing file.
-
-In the same test, the workaround makes one SEEK_HOLE call taking 61 ms,
-and the read runs at 17 MiB/s.  A debug build that checked every
-remembered answer against a fresh SEEK_DATA/SEEK_HOLE saw no mismatch in
-more than 7,000 checks over NFS and 9p.  It only helps fully or mostly
-populated objects read in order; random reads of a partly cached object
-still seek.
-
-I expect the right fix is for cachefiles to track what it has written
-itself, as CONTENT_ALL now does for contiguous files, rather than
-something like the above.  I can send the workaround if it's useful as
-a reference, and I'm happy to test whatever you plan for this case on
-our workload.
-
-While testing it I hit a data corruption on partly cached objects that
-bisects to patch 4/5 of this series and reproduces without the
-workaround; I've reported it in a reply to that patch:
-
-  https://lore.kernel.org/r/20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com
-
-The numbers on vfs-7.4.netfs and the debug cross-check were also
-produced with LLM assistance.
-
-Thanks,
-Petr
