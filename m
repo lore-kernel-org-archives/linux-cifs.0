@@ -1,221 +1,165 @@
-Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD964A2A48
-	for <linux-cifs@vger.kernel.org>; Sat, 10 Oct 2026 19:11:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52193B5DED
+	for <linux-cifs@vger.kernel.org>; Sun, 11 Oct 2026 05:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791659522; cv=none; b=pKP5a5USi7XaDmtN47316knFgeodY6VEc/bOKJCIhGyJhZ2ol0epLMVxvd7mKpD8r5/Rv/sLZX7TNgyiDCwf5JOP8webHd4zLo0DNXUwnLj3Oad3yPDH99rNIO5KS5fURndV1xu1/EnQZMOKm5hs6F6Ji712L3GOYICnywcDO1I=
+	t=1791696588; cv=none; b=SO7+Lc3Zem6/mPiQmp0AabDLANWw6mYYx9JHdzy3pNY12mELUThupeluvBQhlXVmG4VcaA35pyDitcti9GLUKVO+YgtTD8CD6FtW7Ym/ljyAA/cDWJoP57VqpotjkKEyUmxSxTADw24IlRP6x1otq01BIHIjYEaxL62koX0KojU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791659522; c=relaxed/simple;
-	bh=lwVwmgkZTws1Bf1KrGLUNbjrdoP4vb6TfSWiGNKs0AE=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=k+ySY8hwaloGiygIBGOp/WwxZUDnRFFHkRT7X5BPTAO9jz/SMwc8sNjNadylWW+k2xUOb7UZ41cNTQ1SrpbAulkJXXMjQ78WSFu4/Fe80TcSIXQ7tqb9wf5+hNj+PYvToZZkla2WQ61eL+F+g6vkQkvHCTNeW1ZZl+N7TPWLuuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=YbbGm0zO; arc=none smtp.client-ip=162.62.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1791696588; c=relaxed/simple;
+	bh=sIbRso6W6WqLNYE6yLPCDLJ+kUhhHofo7p2mjFJFouk=;
+	h=From:To:Cc:Subject:Message-ID:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=PfhlSu0wRdB81Es9lqYA+PyzFY8lnnsoOa7sJdQLYv8Rz/R6ZfFWcvfel08LpDVHxsIcSaKiS5ut309atSSzOEYxEoxfvazMIDGpkwzH2UT28+/4BJgOlrv/uOMIFk1+Nq7mcAvL3kexKz8IwnmyqLx5VyVbA3MoysRgKzHActU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innovatrics.com; spf=pass smtp.mailfrom=innovatrics.com; dkim=pass (1024-bit key) header.d=innovatrics.com header.i=@innovatrics.com header.b=eqefMXFC; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innovatrics.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innovatrics.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="YbbGm0zO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1791659513; bh=7JOskYC05vmDetDxG1ATRi5gE341lcs3uWuHcd1fXYY=;
-	h=From:To:Cc:Subject:Date;
-	b=YbbGm0zOA2qc1f16uzIFSaAphnzoL6brCrE0h3+KFnvQF7Y8YJ8VBKIolndfdMR5v
-	 CP03yBEU9HGxhx09l5N9nYzoPLrbXV+PYRuHEekcrC6yVERQ2HCYI94zMjwTNDyjHz
-	 yUeqtux1vGl+rq/0Z1OOUhjwGOqng9C0wA9IxFwc=
-Received: from demiurge ([240e:b30:2199:72b1::e99])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id 2F3A3A5D; Sun, 11 Oct 2026 03:11:51 +0800
-X-QQ-mid: xmsmtpt1791659511t6k99pgsq
-Message-ID: <tencent_B5ED8BAE1AA8B048FF6EBB8AD35DBF004306@qq.com>
-X-QQ-XMAILINFO: MJf32pulH481gECSMZAjBqDvyJReaIMIbMmJa6PvR48zg9rLuRYbyDmiG/Ntnc
-	 XyKCksAYXsCajtfAeMqtBHRPUuUuKduiGAGcJJ6W+tm4GtNVybPX0zXuKNEXmbtP8cNnguSq2t+c
-	 mQQFr6xKnlxWzDVCmX0azO9OCULCpA9AvGQWGFPJb54030v+iCHNEWeF3AvJUGz4tuNRC1nkGhFr
-	 2dBwZ55FJdXGZfGpxTauSWTHyLtufRNjMHBMfD/5dfz/9Z03r57jhYpYWSf505jKfcmqguHWf0dM
-	 RV03pTYuti1+V1hAbzUUs1pNALqQz76idRAmJqz/1MP8bppl4dz/bXy2PmHRAjCjQkjuqzrgDYyQ
-	 6dsLFvjtk5vmM4m3QqTbHXP8/HO39rVtiiWZIqh2VReMwc9Nkp/R2frtcIAQTTI/A2czQKetDJU2
-	 St5r9duI4gf0mnwY8vRY+b3pmuj2JsiY/wNSWZRPSr6N0JJKDITDF+tj/TOtG0fld/KihhBZB52L
-	 An+1iWgw4BrxOqz12fkU7KIAVFRa0+YfUNqxvr7CduYwMcvhBoKbLpJ9J05nmPhmttlP/SiebDTm
-	 6ptA4Xb23nx0sbHlaQkAihxgKdOO5DJCMkwuDLQPP7QfLDTAxrt328pOfmYY9UiQrsa/RXWz9I9t
-	 apCCbtxS3OM5TPp9aQEXESY2RPvI2f4FIBTvPJWsuGZmDTYOypZh2z9uIBpGBCpXXEkYby0ngDK7
-	 G6v+5+XrLtn9A3K0IwnR2oXUj1JvQt71eveFqK7hd6w9MOzgmDTXlaxeQBArwbeVx36D7NVfy7rE
-	 5xHma750RGXlO3j1dnQs4oahpOXNITt2xONXdf4ffH3f77leF8/sQnSlcSQP16fy2GEJlltcZvHs
-	 HuZPX/j5whLdM6VS1eDB4Pz5UfvlK0Mjsh/+PbjaGLBr2uHejfrY2dDRD7aGlslJ7GlPzi83z7Cd
-	 A8940QKFU4YiWnYUnVnEBahry/geQUp55U80oJ2c1dnenHGvWHPFVOqJYQIrzqORrnkdwMm9VV1U
-	 Z2nXwDXv6mZbgyfyi7sHUKGPCmf50sa/BtT8CEcWnS3X47yF4Gg/X716cPe+g=
-X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
-From: =?UTF-8?q?=E6=98=9F=E6=B5=B7=E6=98=94=E6=B6=9F?= <starcyrene@qq.com>
-To: linux-cifs@vger.kernel.org
-Cc: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	samba-technical@lists.samba.org,
-	=?UTF-8?q?=E6=98=9F=E6=B5=B7=E6=98=94=E6=B6=9F?= <starcyrene@qq.com>
-Subject: [PATCH] smb: client: add "noautomount" mount option to skip junction submounts
-Date: Sun, 11 Oct 2026 03:11:51 +0800
-X-OQ-MSGID: <20261010191151.242558-1-starcyrene@qq.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (1024-bit key) header.d=innovatrics.com header.i=@innovatrics.com header.b="eqefMXFC"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4a16af2a232so7701925e9.1
+        for <linux-cifs@vger.kernel.org>; Sat, 10 Oct 2026 22:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=innovatrics.com; s=google; t=1791696585; x=1792301385; darn=vger.kernel.org;
+        h=content-type:mime-version:date:references:in-reply-to:message-id
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=EwJQAcrSA8vm2/QDhj4tfogkpVMYET7O/tmaR0Uw6Xg=;
+        b=eqefMXFCtMdjqzxlckHAdKhdWg45OVbq12RRfTeUnpr5REQeBjRlA4pvRF/8tX2SrU
+         DOxrr52H3C0AgyMCvq5wtF1r/IYYnEersFGO9EFi3Iu2k1HLsXzNf4IT+bWUR2+wVoJj
+         xl41LRWS6re51wj+N3vj+nJQOwbAQxAPdTARg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791696585; x=1792301385;
+        h=content-type:mime-version:date:references:in-reply-to:message-id
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=EwJQAcrSA8vm2/QDhj4tfogkpVMYET7O/tmaR0Uw6Xg=;
+        b=QzIRR2GaDz0Q4neAjySrECO0RxGcvUSeDXG5AP7SHWE0mIT4n/eaIV9FESOf1trZiy
+         P5xo5uUSrXVPtQOhS2sOv3WevsoyxAA0kq9w26Z5bl035dgwD/XX1PVqCb46dPYeAAH8
+         v/U4Tf83zJYem7y7YXhd0YXaxVPN6eUJfTkxn9jlAS4VU/HkoA432WkILfLKEIuGV2d7
+         sZ/nOkxazISr5TLccp/VXUjcVReYdnVKdVgtpE5/NGwaAYfcEE3yVgBQ8CM+292EAV8e
+         6FkghofOTGhJ6dZxhLLYldFS6RTsyuE3hSaqNf06aKvebagBU3TVCuuJD+2Q1Uj7bk5v
+         TPwA==
+X-Forwarded-Encrypted: i=1; AKwUvBwdHWu39HEDfDjsbg7xzR67jUGvjbHykMqMjnKou4l3VNIR74+ZcQPGYR+u2FnoABjAL0rV93bQS8oU@vger.kernel.org
+X-Gm-Message-State: AFq9FYJFtizt55uHBi43d2knpmLrv0cp2kH2k9zppKYaLcH6ZI7kdU/k
+	sKONIMj20tZASlLen4YrJRIL+Kqe6TOo34QbxwbmoisSjkEiFvqpLyDnD1j87KirhA==
+X-Gm-Gg: AYBFou3srnybm4DGgE824Gyj2LQKIz/w2E4Vsz2e/U5yB4buu/6W+BVnsabEXDn/fwd
+	V1fMWwxxfRwhcu6ye/G8XMbsOIQQRGIRmPZiE1JsJBR4OgitdQ1cMqW/w3yAV5rru2OlWTy+Ud8
+	8eArGi6Xe5owq9MrP6mzM56X1ttrHG9NMQnmG8l5aBuw0uoZ7tC59FvCiZbcWZ+lAkiJtDTqn6R
+	2upfzQ2YZEfSNz5lhrPTf8x0gudhxWGmd6UgK7Qe7Dq57PV+pVM6Dm9+Gm/JDpCf1aTJ4aNo7c2
+	5Kruf4L1DKxlhKL8uuZe/ShWC4x2HbsxrVIfKLWizAlKx15NHgnI4Jrqq3G45PL1GD4u5AX4/nu
+	/Q1vnEWumY7e+S9+ozwYm5t1L+kWzgpB45VOx7ef7dyBiDljLE44QmTvwoYUHB3NHEu3IC832KB
+	e4uZyE/7lG9S6jKGPrOvahCDmohFh+epGuU3uMY9rL8EcK8OAI2DmgO9T/WO60CKBKwdDdgUwGC
+	L6fcXnqYuIld782wTqIRPGD7imaOJ++5UgR3wNSYOqesJuxgp899UVFVTyfFdSD1T43yR0qdeMJ
+	lHTTU9e5rLvbb4k2LWQUQiHvL/FoO8U=
+X-Received: by 2002:a05:600c:e558:20b0:4a1:946c:953f with SMTP id 5b1f17b1804b1-4a1946c9744mr30278845e9.20.1791696585122;
+        Sat, 10 Oct 2026 22:29:45 -0700 (PDT)
+Received: from [10.11.72.5] (bip-static-148.213-81-147.telecom.sk. [213.81.147.148])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a193f2c992sm107606015e9.5.2026.10.10.22.29.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Oct 2026 22:29:44 -0700 (PDT)
+From: Petr Chmelar <petr.chmelar@innovatrics.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 4/5] cachefiles: Don't rely on backing fs storage map
+ for most use cases
+Message-ID: <20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com>
+In-Reply-To: <20260910220242.2165023-5-dhowells@redhat.com>
+References: <20260910220242.2165023-1-dhowells@redhat.com>
+ <20260910220242.2165023-5-dhowells@redhat.com>
+Date: Sun, 11 Oct 2026 05:29:43 +0000
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
 
-When the cifs client walks into a name-surrogate reparse point that
-points to a directory and that it cannot handle locally (a plain NTFS
-junction, for instance), the dentry is marked DCACHE_NEED_AUTOMOUNT and
-the next traversal creates a separate CIFS submount for it
-(cifs_d_automount() -> cifs_do_automount()).
+Hi David,
 
-That machinery is what makes DFS referrals work, but for regular
-junctions every traversal pays for a new superblock and SMB session and
-leaves a mount behind.  Scanning a tree that contains many junctions
-therefore floods the mount table: a single find(1) over a Windows share
-whose package cache holds 2014 junctions created 2014 CIFS submounts,
-which broke tools that enumerate mounts (a hosting panel rendering one
-entry per mount stopped responding).  The submounts are also mostly
-useless: reading through them typically fails with EACCES even when the
-very same path is perfectly readable through the parent mount.
+With this patch, reading a file whose cache object is only partly
+filled returns wrong data, mostly whole 64 KiB blocks of zeros.  A
+second full read returns the same wrong blocks.  It reproduces over
+NFS and 9p on vfs-7.4.netfs (9f8b64f66).  Over 9p it bisects to this
+patch, 13e340e397 in that branch; over NFS its parent is clean and the
+branch tip is not.
 
-None of the existing options turn this off: "nodfs" only skips DFS
-referral resolution (these junction submounts are not DFS), and
-"reparse=" selects the format used when creating new reparse points,
-not how existing ones are traversed.
+#regzbot introduced: 13e340e397
 
-Add a "noautomount" mount option.  When set, CIFS_FATTR_JUNCTION inodes
-are not marked S_AUTOMOUNT, so junctions stay regular directories and
-the SMB server resolves the reparse target on access - which Windows
-does transparently for normal path traversal.  The default is off, so
-behavior without the option is completely unchanged.  Note that the
-option also disables automounting of DFS referrals, so it should not be
-used on DFS mounts.
+Reproducer: random 64 KiB reads covering half of a 256 MiB file of
+random data, then a full read after dropping the page cache, compared
+with the original per 64 KiB block:
 
-Tested against a Windows 11 SMB 3.1.1 server (workgroup) sharing C: and
-D: with 2014 junctions (package cache) plus several system junctions
-("Documents and Settings", "Start Menu/Programs", NVIDIA plugin dirs):
+  fio --name=half --filename=/mnt/part.bin --rw=randread --bs=64k \
+      --ioengine=psync --fadvise_hint=random --size=256m --io_size=128m \
+      --randrepeat=1
+  sync; echo 3 > /proc/sys/vm/drop_caches
+  cmp /mnt/part.bin /path/to/original
 
-  - with "noautomount": deep tree scans create zero submounts, junction
-    directories are listable through the parent mount, and sequential
-    reads run at full speed (99 MB/s, identical to the unpatched
-    module on the same hardware),
-  - without it: behavior is identical to the unpatched module (one
-    submount per junction, "CIFS: Attempting to mount" per entry).
+Setup: QEMU 8.2.2 (TCG, 4 vCPUs), cache on a fresh XFS on a loop device
+(2 GiB for 9p, 4 GiB for NFS), cachefilesd 0.10.10 with brun 10%, bcull
+7%, bstop 3%, fio 3.36.  Mounts:
 
-Assisted-by: DeepSeek-V4-Flash
-Signed-off-by: 星海昔涟 <starcyrene@qq.com>
----
- Documentation/admin-guide/cifs/usage.rst | 11 +++++++++++
- fs/smb/client/cifsfs.c                   |  2 ++
- fs/smb/client/fs_context.c               |  4 ++++
- fs/smb/client/fs_context.h               |  2 ++
- fs/smb/client/inode.c                    | 13 ++++++++++++-
- 5 files changed, 31 insertions(+), 1 deletion(-)
+  NFS: NFSv4.2 loopback export of a tmpfs, vers=4.2,fsc,actimeo=1
+  9p:  trans=virtio,version=9p2000.L,cache=fscache,msize=1048576
 
-diff --git a/Documentation/admin-guide/cifs/usage.rst b/Documentation/admin-guide/cifs/usage.rst
-index d989ae5..e4904ac 100644
---- a/Documentation/admin-guide/cifs/usage.rst
-+++ b/Documentation/admin-guide/cifs/usage.rst
-@@ -613,6 +613,17 @@ A partial list of the supported mount options follows:
- 		server claims to support it.  This can help work around
- 		a problem with parsing of DFS paths with Samba server
- 		versions 3.0.24 and 3.0.25.
-+  noautomount
-+		Do not turn name-surrogate reparse points (e.g. Windows
-+		NTFS junctions) pointing to a directory into submounts
-+		on traversal.  Such entries are then exposed as regular
-+		directories and the server resolves the reparse target
-+		on access.  Without this option a deep scan of a tree
-+		containing many junctions creates one CIFS submount per
-+		junction, which floods the mount table with entries that
-+		are usually useless and often not even listable.  Note
-+		that this option also disables automounting of DFS
-+		referrals, so it should not be used on DFS mounts.
-   remount
- 		remount the share (often used to change from ro to rw mounts
- 		or vice versa)
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 149becc..db74faa 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -748,6 +748,8 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 		seq_puts(s, ",nounix");
- 	if (sbflags & CIFS_MOUNT_NO_DFS)
- 		seq_puts(s, ",nodfs");
-+	if (cifs_sb->ctx->noautomount)
-+		seq_puts(s, ",noautomount");
- 	if (sbflags & CIFS_MOUNT_POSIX_PATHS)
- 		seq_puts(s, ",posixpaths");
- 	if (sbflags & CIFS_MOUNT_SET_UID)
-diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-index b6d1e06..ff03b65 100644
---- a/fs/smb/client/fs_context.c
-+++ b/fs/smb/client/fs_context.c
-@@ -90,6 +90,7 @@ const struct fs_parameter_spec smb3_fs_parameters[] = {
- 	fsparam_flag("nomapchars", Opt_nomapchars),
- 	fsparam_flag_no("sfu", Opt_sfu),
- 	fsparam_flag("nodfs", Opt_nodfs),
-+	fsparam_flag("noautomount", Opt_noautomount),
- 	fsparam_flag_no("posixpaths", Opt_posixpaths),
- 	fsparam_flag_no("unix", Opt_unix),
- 	fsparam_flag_no("linux", Opt_unix),
-@@ -1321,6 +1322,9 @@ static int smb3_fs_context_parse_param(struct fs_context *fc,
- 	case Opt_nodfs:
- 		ctx->nodfs = 1;
- 		break;
-+	case Opt_noautomount:
-+		ctx->noautomount = 1;
-+		break;
- 	case Opt_hard:
- 		if (result.negated) {
- 			if (ctx->retry == 1)
-diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-index 0b64fcb..a0ed492 100644
---- a/fs/smb/client/fs_context.h
-+++ b/fs/smb/client/fs_context.h
-@@ -113,6 +113,7 @@ enum cifs_param {
- 	Opt_nomapchars,
- 	Opt_sfu,
- 	Opt_nodfs,
-+	Opt_noautomount,
- 	Opt_posixpaths,
- 	Opt_unix,
- 	Opt_nocase,
-@@ -277,6 +278,7 @@ struct smb3_fs_context {
- 	bool mand_lock:1;  /* send mandatory not posix byte range lock reqs */
- 	bool seal:1;       /* request transport encryption on share */
- 	bool nodfs:1;      /* Do not request DFS, even if available */
-+	bool noautomount:1; /* Do not automount junctions/reparse points */
- 	bool local_lease:1; /* check leases only on local system, not remote */
- 	bool noblocksnd:1;
- 	bool noautotune:1;
-diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-index 4661407..95e60f0 100644
---- a/fs/smb/client/inode.c
-+++ b/fs/smb/client/inode.c
-@@ -248,7 +248,18 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
- 	}
- 	spin_unlock(&inode->i_lock);
- 
--	if (fattr->cf_flags & CIFS_FATTR_JUNCTION)
-+	/*
-+	 * With the "noautomount" mount option, do not turn junctions and
-+	 * other name-surrogate reparse points into submounts; keep them as
-+	 * regular directories instead and let the server resolve the
-+	 * reparse target on access.  Scanning a tree that contains many
-+	 * junctions (e.g. a package cache) otherwise creates a submount per
-+	 * junction and floods the mount table with entries that are useless
-+	 * and often not even listable.  Default behavior is unchanged.
-+	 * Note that the option also affects DFS referral mounts, so it
-+	 * should not be used on DFS shares.
-+	 */
-+	if (fattr->cf_flags & CIFS_FATTR_JUNCTION && !cifs_sb->ctx->noautomount)
- 		inode->i_flags |= S_AUTOMOUNT;
- 	if (inode_state_read_once(inode) & I_NEW) {
- 		cifs_set_netfs_context(inode);
--- 
-2.53.0
+Wrong 64 KiB blocks out of 4096, first full read / second full read:
 
+  kernel                mount     wrong       all zeros
+  v7.3-rc6              9p        0 / 0       0
+  e0aa90eb8c            9p        0 / 0       0
+  98e0cd700d (parent)   9p        0 / 0       0
+  98e0cd700d (parent)   NFS       0 / 0       0
+  13e340e397 (this)     9p        936 / 936   825
+  8097a263bd (merge)    9p        936 / 936   825
+  9f8b64f66             9p        936 / 936   825
+  9f8b64f66             NFS       817 / 817   817
+  9f8b64f66             9p loose  0 / 0       0
+
+  "9p loose" is the 9p mount with cache=loose, without fscache.
+
+On 9f8b64f66 over 9p, three runs gave the same counts and the same
+first wrong blocks.  The first wrong blocks are 10, 13, 15, 24, 26 and
+27 over 9p, and 50, 51, 53, 54, 55 and 56 over NFS.
+
+Two more observations, in case they help:
+
+ - Over 9p, after the random fill and both full reads, the backing
+   object has 451 extents with this patch and 28 on v7.3-rc6 (37 on
+   98e0cd700d).
+
+ - Over NFS on 9f8b64f66, the fscache counters after the fill and both
+   full reads are IO rd=371 wr=2189.  I haven't traced whether the
+   zeros come from reads over holes in the backing file or from what
+   was written to it.
+
+Over NFS, a server-side rewrite of the file (invalidation) and a shrink
+and regrow through the mount both read back correctly on 9f8b64f66 and
+98e0cd700d.
+
+I found this while testing a workaround for slow reads from fragmented
+cache objects, which I describe in a reply to the cover letter:
+
+  https://lore.kernel.org/r/20261011.cachefiles-seek-hole-walk.pchmelar@innovatrics.com
+
+It reproduces without that workaround.  The reproducer and the
+bisection were done with LLM assistance.
+
+Thanks,
+Petr
