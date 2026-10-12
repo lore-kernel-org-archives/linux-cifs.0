@@ -1,94 +1,79 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB35D39EB59;
-	Mon, 12 Oct 2026 16:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBE14A5C43
+	for <linux-cifs@vger.kernel.org>; Mon, 12 Oct 2026 19:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791820972; cv=none; b=puf9REF6bEuwoYTn52LzUTnQOdbzJ2f6DhecauRI4sMdDJdPZpfqE2Uov0eVlMc8nzeWPXtSmCNZbu0XPFvfcuoOZ53L4qK8OBmLpt5dQ7yqlX7hvR0WSiZwEpDC6b5SPT8J1qcwWs54lIxNZIICcpK7SrwQxURfbvaJaS0XjaE=
+	t=1791832381; cv=none; b=W06bBeOJ1nxiLs0zEAtOwvoY/dQD6Y0c5JGoeRh6CN8ZOrnZweaGKeHmQFVbTDGUfoK89XeG+tyfuG+SD7b4XJ8apv45s3JGiDKMKZqRHC+7kJOzO3TpUMecB3bhpARK9mv97kh7og2i5GSXyS2w2WwdiwHI68ciRvd/hOhfjuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791820972; c=relaxed/simple;
-	bh=kMMV4dSgIuIINhs4G4bbHvnLS5XWVNYT7KOjXT95fwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tf9kYMOR9OzggCM53jqn+bIGSytiJjivcy1HoMT/tLNa+eiP5JMDb3B/Vhqs9ajJFBeud86+3/sSiifXsPw8SOovinNc/VTiuFzwODHOa3G5K5TMJIAM/7xbMUydDBRs1pb9jNozoMSFONyVDN5cK1bWvA56FmmdEO1gpn2mxYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrlQtDVp; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791832381; c=relaxed/simple;
+	bh=Vmee7MXnwkoo2I4ZVE7vFh76h2ZIAq9AX1YxjXTcBdY=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=Q79Y8btlc88G8KKU69rgpg4Lge72DbvqwStlxbtRYkfolM6mjLfDxus9Krh5VYacvByVogquN3mjYfgZ6sspu4gt0FdKykIeNn6xwHI3Juf6h00UQFFMtIW9/omkr3wE4EEZpwq/zPLcNlyjS2D1brsFK/FHExMqQVFc+BUBj5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=mWTTdxst; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DrlQtDVp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F21151F0089B;
-	Mon, 12 Oct 2026 16:02:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791820971;
-	bh=kMMV4dSgIuIINhs4G4bbHvnLS5XWVNYT7KOjXT95fwQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DrlQtDVpAWdY2ZNst+h6PAcJZ7lrUA8jlexA1pf+PyEa9ACqlnywBdau677VwsPsn
-	 8w1KHcrgFLS7jRLrF6/dKPKUXFOjEFQYlYULJFcVYExdne0S4feSjlkOPhSZTNIkC4
-	 xpFCPbQZrbgj7YQyFSeQEWzFyLXpwpIFh4a9d+Y3KiEe9krOPNY5t3UuvdxKw8DXST
-	 qzl+rtRsoJdV1bnFbkztQO2tY3G++6qDtWrnOmbRkW9BMp+JbBh+xgpC6NUjPdVdfl
-	 5k7SEgWn/vg2x7/sb87EQYt7isjKoIWVMoqy12FT28KzoDh7FR/vVT2R44/gE+hr0I
-	 BPDum5lSqmrBQ==
-Date: Mon, 12 Oct 2026 17:02:47 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Ozgur <zgrieee@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	CIFS <linux-cifs@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the vfs-brauner tree
-Message-ID: <30b72db8-b92d-4e93-bab8-e82bac8a485f@sirena.org.uk>
-References: <aszji59b6B79a3Hi@sirena.org.uk>
- <CAOFRbGnVCnW4CEvhp_x6t58v0sB2to+6AP0hHYtci0EBnUWQzQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="mWTTdxst"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=JrQNlir/2s2tXMZYGGGP8mc9Uk5Na/tDysS6UvK6GnI=; b=mWTTdxst1xK0JpL0BS1m7/0f0v
+	VwpjgkChXhONPmeLh9wlFGtmgkfBm4yHwXmnGAR79S8Lo8irxy4a3/14HbLlBWivGXOWuektU09DJ
+	aHVrTaiYHzcYnQq3nJUkc7qo0AMt2M9G2Ipbbxo5fXzWq+yyn0zcrn8qiJErg9BHJozyVvWuhDyNY
+	cBhm9+nltYva4s6n88/c1sesj4aWfZSmsYSqfrzm40ItVWvLOw7Z73sZ0tnGaGYkKN9EDis8ex34J
+	ZYMXzvd/vQIi4QbUgsYtKfAoxTBm41vQb3g6hnCsOdIex8ueYPem34afnDWdqEHEEP9Eb2GTtrcoq
+	362pkNEA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1xGLS3-00000003Trx-3XlP;
+	Mon, 12 Oct 2026 16:12:47 -0300
+Message-ID: <a921bdd206f0a651e2dda9d9e3ef5429@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: =?utf-8?B?5pif5rW35piU5raf?= <starcyrene@qq.com>,
+ linux-cifs@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Ronnie Sahlberg
+ <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>,
+ samba-technical@lists.samba.org, =?utf-8?B?5pif5rW35piU5raf?=
+ <starcyrene@qq.com>
+Subject: Re: [PATCH] smb: client: add "noautomount" mount option to skip
+ junction submounts
+In-Reply-To: <tencent_B5ED8BAE1AA8B048FF6EBB8AD35DBF004306@qq.com>
+References: <tencent_B5ED8BAE1AA8B048FF6EBB8AD35DBF004306@qq.com>
+Date: Mon, 12 Oct 2026 16:12:47 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="NvMt478TcZTwFp0s"
-Content-Disposition: inline
-In-Reply-To: <CAOFRbGnVCnW4CEvhp_x6t58v0sB2to+6AP0hHYtci0EBnUWQzQ@mail.gmail.com>
-X-Cookie: Is this TERMINAL fun?
-
-
---NvMt478TcZTwFp0s
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 12, 2026 at 05:30:28PM +0300, Ozgur wrote:
-> Mark Brown <broonie@kernel.org>, 12 Eki 2026 Pzt, 16:50 tarihinde =C5=9Fu=
-nu yazd=C4=B1:
-> >
-> > Hi all,
->=20
-> Hi Mark,
->=20
-> i noticed Namjae Jeon's commit (2de2cdd9cc08, ntfs: add pathname
-> access for named streams) is currently present in fs-next and your
-> reported build failure appears to result from this commit interacting
-> with VFS changes that make mnt_idmap const in the ->setattr() and
-> ->getattr() callbacks, and i think fs-next before changes are
-> integrated into linux-next
->=20
-> i compiled linux-next tree but couldnt reproduce the build failure.
+=E6=98=9F=E6=B5=B7=E6=98=94=E6=B6=9F <starcyrene@qq.com> writes:
 
-Today's -next hasn't been published...
+> None of the existing options turn this off: "nodfs" only skips DFS
+> referral resolution (these junction submounts are not DFS), and
+> "reparse=3D" selects the format used when creating new reparse points,
+> not how existing ones are traversed.
+>
+> Add a "noautomount" mount option.  When set, CIFS_FATTR_JUNCTION inodes
+> are not marked S_AUTOMOUNT, so junctions stay regular directories and
+> the SMB server resolves the reparse target on access - which Windows
+> does transparently for normal path traversal.  The default is off, so
+> behavior without the option is completely unchanged.  Note that the
+> option also disables automounting of DFS referrals, so it should not be
+> used on DFS mounts.
 
---NvMt478TcZTwFp0s
-Content-Type: application/pgp-signature; name="signature.asc"
+Instead of introducing a new mount option, can't you use 'noserverino'
+to handle such cases?  That is, if you mount the share with
+'noserverino' mount option and the client finds a directory with a
+name-surrogate reparse point that it can't handle, then neither create
+fake attrs nor make them as automounts.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmrNBKYACgkQJNaLcl1U
-h9DCvQf/cNP6xzycFuNGZgpc2WR17TOZjf8e5Qj4nc+rlzs8bSbiKjoKJh74CVAI
-Cd0a1N3g+WvYVtQRSvx1FMaTb1Sw6ODGZCSEpijNBgi0oY4bl7/tK/SIl5C9Vrek
-bwc11J1bkrGpgvAALpPttc381k37HW6PwDH0UszJ+YiwAGIMpM3BN4v82AGwPqS2
-eefqr14MhO4VNqnSFbQLyXruIabGFC7HX8vtGr0aNAYxY0H7xTlD76lI4sB7Z+3M
-cbMEYrchb9cQRaEInkwqXE1KS9ok5oN+XSVasRXxsksFS+UT71QAMT/2ZckEV05V
-HcsjN8rvIf/NzxwMqbCBSGpr+Cnqkg==
-=twEO
------END PGP SIGNATURE-----
-
---NvMt478TcZTwFp0s--
+The original intent of marking those as automounts was to prevent inode
+collisions when accessing files from those directories and then leaving
+the parent mount still trusting inode numbers from the server, as way to
+keep hardlinks working on the parent mount.
