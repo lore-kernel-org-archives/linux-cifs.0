@@ -1,108 +1,178 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6304E37A83D;
-	Tue, 13 Oct 2026 06:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6613AA51E
+	for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 07:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791874502; cv=none; b=T9Z8g3SDCtc+ZwP1Qb/zVOy+Vuk8e28RAlvtkNcwqY1K7NYWXmcnhWqsYf8enGUypv94rEexivaf8R4LQVYd//ZAs9ikYgLxtLBDZ7j1t2LrepHKJT7mURR1D3aVKm43E8zk7p5sj4UXM4q0ALQ6gCDVmVD1wjBLH5PFjU8ZjA0=
+	t=1791878125; cv=none; b=OPrtT8zgtHttEJCA8MtH13QJlRMIszSOT//eAmFade7YSWRiUzMUy6dvpsWf/gzDZzv22PkhkD4Ot6ZANI4grphR9PW0H9zIWoM5FgMgbo5ENkk4Y16c+zTMkVDvMu5ZJ5shWcJSOse3gDSTb5HRbpFgVx3sw9XNfZdwI7Q1v+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791874502; c=relaxed/simple;
-	bh=hRoYxsfBsowU+NotN/1uUOF5kLjHwlMbQURl+BUL6W4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VdJxo2fInMXSd7OiX0R1NVl/m76OW0iRl8CoZ8svvrkW/Umq+t0HRtj6FRXjcE0pF+Fjv0nepgJReLxEwgKBsymzxnGnG2TrTHrUyEutWftaGfFfFv+B9amTkWz510bslrH4gXypfgVR86+Bn4/9jIrgJwtNTzDA7TkvUH986t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jaorVEKc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791878125; c=relaxed/simple;
+	bh=RPlfzWYmM8FirW88IjwmpVbxiR/zbaOepgou5oQs+ac=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=VgPH7ASRGS/axaH0cU5+SaZZPr/ijXPkPM3infL20zBc4YWMsZ9Yki1sWbDv4x/kR9u8HFiUQQpvQpRuSCIHimeoe59r53q1iS26M2BDYSS4qFYof41J2G/D9+JbExKGQTurb3m4fshpxc+dLTeANt5W/6+x46Y4d0UP5kAmrsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ICZv0BTU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jaorVEKc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A281F000FF;
-	Tue, 13 Oct 2026 06:55:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791874501;
-	bh=DYAbOYWC8XUm/vdalOehKI/pNO5n7negRX/AHRNbpNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=jaorVEKcOwxh0iHjhm7fFRvF+N+LSRKTEi2AcRkGR4fGK7v375G340S6Y06cftdzz
-	 sP6/qGpTYWel/0flaXci7Mfd2t4kYM0uxSuUFO8N5G11Fmdjs65wSjo262iMrF9hU8
-	 ilt35Rqe9a7Wb/IqLXsFktDPywStKJSGGofMXl/9tffhHmV33TaErvsbWmU8HyCFx+
-	 lRXV7xuV3Gv0ocrKHYkBH6OLkVWlUlXvmR8BbBT5bMUWxbvpigUE2XIlAiBjMtqjiI
-	 wU5DvSkElmE6DQxEyvIeqPdT/zICo5+Skgxy0hx8IHXrSZmjdRj7a2SME3tntqk9g2
-	 nPqP23wWzMCAg==
-Received: by pali.im (Postfix)
-	id 05F52365; Tue, 13 Oct 2026 08:55:03 +0200 (CEST)
-Date: Tue, 13 Oct 2026 08:55:03 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/9] Various changes
-Message-ID: <20261013065503.rndxu2qxauehudil@pali>
-References: <20260821214722.q7rkflclyyugdxll@pali>
- <20260825230622.24617-1-pali@kernel.org>
- <20261012141053.4ud5pihrtrxpkxfy@pali>
- <CAKYAXd_FP7F1U_ETWx+0QKwpDuEFp=UJzhMjrSmuT9uG3nAxEA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ICZv0BTU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1791878122;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CaDYtVwJjGFlT9vzY/XFr3IPNhGIGR2PZeK9wCQ1Tvk=;
+	b=ICZv0BTUEpg/8WMmmcYh6LVNglaivggjqL+neRQknMzTe8/mhgkJB4NflQVNkkA+Qf37/p
+	DGqMhMHfDI9NX3PsvpUr0RS99V0727z1I9p0B9H75BmRd18i6oADJbfOvQ2GpFfOONcKj9
+	hAZbwSGaHAXaIJS3Omlc9JWzMIWjMpY=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-58-rUZAsi6DMcieVbVMGWpCBQ-1; Tue,
+ 13 Oct 2026 07:55:12 +0000
+X-MC-Unique: rUZAsi6DMcieVbVMGWpCBQ-1
+X-Mimecast-MFC-AGG-ID: rUZAsi6DMcieVbVMGWpCBQ_1791878109
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 972E618009D3;
+	Tue, 13 Oct 2026 07:55:06 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.11])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3345430001B9;
+	Tue, 13 Oct 2026 07:54:59 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com>
+References: <20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com> <20260910220242.2165023-1-dhowells@redhat.com> <20260910220242.2165023-5-dhowells@redhat.com>
+To: Petr Chmelar <petr.chmelar@innovatrics.com>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 4/5] cachefiles: Don't rely on backing fs storage map for most use cases
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKYAXd_FP7F1U_ETWx+0QKwpDuEFp=UJzhMjrSmuT9uG3nAxEA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1655267.1791878098.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Oct 2026 08:54:58 +0100
+Message-ID: <1655268.1791878098@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tuesday 13 October 2026 14:25:34 Namjae Jeon wrote:
-> On Mon, Oct 12, 2026 at 11:10 PM Pali Rohár <pali@kernel.org> wrote:
-> >
-> Hi Pali,
-> > Hello, now when is the -rc7 cycle, could you review these patches?
-> > So if there are any issues, I would have a chance to address them for
-> > the next merge window.
-> Could you check sashiko's review comments from these patches ?
-> 
-> https://sashiko.dev/#/patchset/20260825230622.24617-1-pali%40kernel.org
-> 
-> Thanks!
+Petr Chmelar <petr.chmelar@innovatrics.com> wrote:
 
-Sure, I did not know that there is already review from machine. I have
-not received any email about it.
+> Reproducer: random 64 KiB reads covering half of a 256 MiB file of
+> random data, then a full read after dropping the page cache, compared
+> with the original per 64 KiB block:
+> =
 
-I have checked those comments and here is what I think about it:
+>   fio --name=3Dhalf --filename=3D/mnt/part.bin --rw=3Drandread --bs=3D64=
+k \
+>       --ioengine=3Dpsync --fadvise_hint=3Drandom --size=3D256m --io_size=
+=3D128m \
+>       --randrepeat=3D1
+>   sync; echo 3 > /proc/sys/vm/drop_caches
+>   cmp /mnt/part.bin /path/to/original
 
-PATCH 1/9 is removal of dead code and sashiko found just pre-existing
-issue which seems to be not related to this patch.
+Unfortunately, I can't reproduce this.  Can you get me some tracing?
 
-PATCH 2/9 comment 1 - here sashiko things that the code for serverino
-disable should not be called. I think that this is wrong. If cifs.ko
-detects that the inode number cannot retrieved then it must disable
-serverino otherwise cifs.ko start reporting duplicate inode numbers to
-userspace.  I think that in the current situation it must already happen
-(from different code path), so I do not think this is valid point.
+echo 65536 >/sys/kernel/tracing/buffer_size_kb
+echo 1 >/sys/kernel/tracing/events/netfs/netfs_read/enable
+echo 1 >/sys/kernel/tracing/events/netfs/netfs_write/enable
+echo 1 >/sys/kernel/tracing/events/netfs/netfs_rreq/enable
+echo 1 >/sys/kernel/tracing/events/netfs/netfs_sreq/enable
+echo 1 >/sys/kernel/tracing/events/netfs/netfs_failure/enable
+echo 1 >/sys/kernel/tracing/events/cachefiles/cachefiles_coherency/enable
 
-PATCH 2/9 comment 2 - this is preexisting issue
+before running, then after running do:
 
-PATCH 4/9 - preexisting issue
+cat /sys/kernel/tracing/trace | bzip2 -9 >/tmp/cachefiles-bug.trace.bz2
 
-PATCH 7/9 comment 1 - this is not a problem, non-WSL clients (therefore
-also Linux one) do not need that EA for working correctly. Also
-userspace application cannot see a special EA from userspace and even if
-it is able to retrieve it (e.g. via separate own userspace smb client on
-separate connection), this is basically a race condition in the smb
-protocol itself like any other which requires multiple requests to
-finish one filesystem call.
+When I do this and grep the trace output for 'WRITEBACK\|WRIT TERM\|cachef=
+iles'
+it all looks reasonable, looking something like:
 
-PATCH 7/9 comment 2 - this is preexisting issue
+fio-5895 : netfs_write: R=3D00001301 WRITEBACK c=3D00000006 o=3D00000004 i=
+=3Dc6a742 by=3D0-ffffffffffffffff
+fio-5895 : netfs_sreq: R=3D00001301[2] WRIT TERM  f=3D100 s=3D0 100000/100=
+000 s=3D7 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[4] WRIT TERM  f=3D100 s=3D100000 10000=
+0/100000 s=3D15 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[6] WRIT TERM  f=3D100 s=3D200000 10000=
+0/100000 s=3D23 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[8] WRIT TERM  f=3D100 s=3D300000 10000=
+0/100000 s=3D0 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[a] WRIT TERM  f=3D100 s=3D400000 10000=
+0/100000 s=3D8 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[c] WRIT TERM  f=3D100 s=3D500000 10000=
+0/100000 s=3D16 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[e] WRIT TERM  f=3D100 s=3D600000 10000=
+0/100000 s=3D24 e=3D0
+...
+fio-5895 : netfs_sreq: R=3D00001301[1f4] WRIT TERM  f=3D100 s=3Df900000 10=
+0000/100000 s=3D15 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[1f6] WRIT TERM  f=3D100 s=3Dfa00000 10=
+0000/100000 s=3D23 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[1f8] WRIT TERM  f=3D100 s=3Dfb00000 10=
+0000/100000 s=3D0 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[1fa] WRIT TERM  f=3D100 s=3Dfc00000 10=
+0000/100000 s=3D8 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[1fc] WRIT TERM  f=3D100 s=3Dfd00000 10=
+0000/100000 s=3D16 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[1fe] WRIT TERM  f=3D100 s=3Dfe00000 10=
+0000/100000 s=3D24 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[200] WRIT TERM  f=3D100 s=3Dff00000 10=
+0000/100000 s=3D1 e=3D0
+ kworker : cachefiles_coherency: o=3D00000004 SET ok   B=3D46012e oz=3D100=
+00000 c=3D2 aux=3D0 dsk=3D0
 
-PATCH 8/9 comment 1 - unbound memory allocation based on symlink length
-- this is valid, but unfortunately all the symlink parsing code would do
-similar thing. And we have already more symlink types. Do we have some
-limit how long could be symlink? Does it make sense to address only this
-one issue and let all other untouched? I would rather propose to define
-one common limit and fix this issue on all places.
+You can see the writes to the cache terminating and then the cache is set =
+c=3D2
+which is CACHEFILES_CONTENT_ALL indicating that the cache file has no hole=
+s in
+it.
 
-PATCH 8/9 comment 2 - fid.netfid initialization - I'm not sure here.
-I had an impression that this is a right pattern how to open and read
-file. Can somebody else recheck this?
+That happens pretty much as soon as fio lays out its file and then all fut=
+ure
+accesses are just reads from the cache.
 
-PATCH 9/9 - masking sync_write error by -EI - This looks to be valid.
-The fix is simple, just adding "rc &&" before "bytes_written !=".
+Looking at the UPLD lines is interesting:
+
+fio-5895 : netfs_sreq: R=3D00001301[185] UPLD TERM  f=3D110 s=3Dc1fedd0 ff=
+fe8/fffe8 s=3D8 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[187] UPLD TERM  f=3D110 s=3Dc2fedb8 ff=
+fe8/fffe8 s=3D16 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[189] UPLD TERM  f=3D110 s=3Dc3feda0 ff=
+fe8/fffe8 s=3D24 e=3D0
+fio-5895 : netfs_sreq: R=3D00001301[18b] UPLD TERM  f=3D110 s=3Dc4fed88 ff=
+fe8/fffe8 s=3D1 e=3D0
+
+I guess 9P can't quite squeeze 1M of data in a packet as metadata has to g=
+o in
+as well.
+
+One further question occurs to me: does the entire 256M file fit in the te=
+st
+VM's memory?
+
+Thanks,
+David
+
