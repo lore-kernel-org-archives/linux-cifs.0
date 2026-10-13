@@ -1,326 +1,166 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB00379EE7;
-	Tue, 13 Oct 2026 08:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321243AEB2D
+	for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 09:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791881305; cv=none; b=GVwdQ5ydBABDWhUss/6v8kceMPlIAZxhLcGUlnXHVoBZvXjhNzf4aZKaNlhXd5JITEGHnnSOWtVnH5srOpwUwSEapj1iM05vuymR+8GdD6l4NWoN+FUzpvcMM8eOJMRp5P7yOPnXpaIwT388esBbaJp+jlGZ7LinMqCtW/dSU3s=
+	t=1791885403; cv=none; b=Raz1u+EErTht361lPN9rXUTQioypm0j2lgyUtfJqdEYlVMptEBWWoOl4RA9f7AMln7oUOsY6u3Dumng3s02weTmW4cZ2B2Wrht/jCooC1dKLqG+YAQku4Ahtr7Rus6+mnEIc3D816zXzmNUuHTzW7svoCbwnGSWKJNHEfPOiab0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791881305; c=relaxed/simple;
-	bh=6Uns4Iatk5nXYUhlCp0NWFeL8339ljdkYhtticETHtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L4iclVMwrya3UyIN/V7SGYiTkOQhL8Z3vCqqHyaxobPXUQHMt4B8ZKghWa//jv+so9qP4Wtz3kcQnHiKMnBzgcK62FuKHJ5wTwAlBz+2e7ama2UDkBKvw7u4ZjzO9jTc/gjKMWEMGasLC9tSMrjfveo7JmXKrA+Kpp9PDCvThI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z6xYPTQz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791885403; c=relaxed/simple;
+	bh=HFJ4UjRCkhaihkIH92sybsRJA7S5NLo3OntK/t8+1bY=;
+	h=From:To:Cc:Subject:Message-ID:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=PawlDWLLlXc4KtxLqZ7crqKEY5nd35bpWl1vznkAvlJFhhEJS584NBD6M0RAQB+g7on50Gn9dzeq1jGvUp1yytO3ul7VHiWgwtmwrHgimgac5rS08DrRw/YNRYNAAJklvv3VnBBKQxMWrANZAG2fnLncSfeZ56jpPLD6c38FD+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innovatrics.com; spf=pass smtp.mailfrom=innovatrics.com; dkim=pass (1024-bit key) header.d=innovatrics.com header.i=@innovatrics.com header.b=f2qTN+IP; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innovatrics.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innovatrics.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z6xYPTQz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCD31F000FF;
-	Tue, 13 Oct 2026 08:48:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791881304;
-	bh=7uRrapYtCLXNlaZsq3q4NUJsxOV8bJ81AcgWFGmMuPA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Z6xYPTQz8KrXwdvil5wqD0EranZOgMoXueGIMWQb22FMzdIapnqwICbr4x5eF/MfN
-	 EZYsPtZzoHzZsJuG7u4JVbaN49q4mqbPAz49NRr5p89rQIQ4Pmu90506/+vKOYP6vJ
-	 lq0ikS/Z/JId2AToy4hdJNzSinJavI/4vvUKjIoHGcOIsIOnSBqufgyY0gYE9F8358
-	 DPg4s64mWyRx8C1ZoOhEqLRjK4Ey8fS9XbJwLn4vRRD9g8ogEDV2CjfI+mAU90z+Ie
-	 jxhBSCVDvxARzTTKzCrtyPz6+Vfjg8Fom+tzNz+Ue0cWBKLo2uHglFBiADv24ouwj0
-	 s0/ZxeN0kPIUw==
-Received: by pali.im (Postfix)
-	id CE48C365; Tue, 13 Oct 2026 10:48:27 +0200 (CEST)
-Date: Tue, 13 Oct 2026 10:48:27 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 9/9] cifs: Add support for creating WSL symlinks in
- version 1 format
-Message-ID: <20261013084827.ulqi2u2eebb4i3ay@pali>
-References: <20260821214722.q7rkflclyyugdxll@pali>
- <20260825230622.24617-1-pali@kernel.org>
- <20260825230622.24617-10-pali@kernel.org>
+	dkim=pass (1024-bit key) header.d=innovatrics.com header.i=@innovatrics.com header.b="f2qTN+IP"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4a171b677d2so16280895e9.0
+        for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 02:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=innovatrics.com; s=google; t=1791885399; x=1792490199; darn=vger.kernel.org;
+        h=content-type:mime-version:date:references:in-reply-to:message-id
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=St+5KkhKptBQbmhWMvm7sQZJ2JL6wlGqGqKQDJo/9iM=;
+        b=f2qTN+IPbgAf9AFTnqIFnA0+EFd9chhkqWbo9ujAYlUoIIB6b94DVLEFvuMMx4MDht
+         rDU7HE0clCOb2uv2Ax05WtETaT+AAYaHDmmY2vekq4etv11VynKz/Uhw/cEtYcYLnVSJ
+         +0JDljA8j7m5b9RdH1PAEZPDC3Xf6DttepzLE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1791885399; x=1792490199;
+        h=content-type:mime-version:date:references:in-reply-to:message-id
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=St+5KkhKptBQbmhWMvm7sQZJ2JL6wlGqGqKQDJo/9iM=;
+        b=qB61HwPgcDyCzqZtJSUPQcvyfkmS/JcbYDxgX9qYpcLziI203Yn5yrfOPczATQvf8X
+         pII0eSg2dmLcAdBKA3Mm2J6XhJzC5OGkTo8uPokTOfxxGfJvIiaLMi4GPpOw4Lj88UUX
+         V89weZt66xu/iqY3heoaOdmyJt8Pf6QSX2ABsWzVtAAeq8gAtFpHkCf5vqRiDJiceZht
+         0pksocZwMvZF8RcH/OaXO9Ju/isD1m9vznd3E/XQ5gDUDIucHyjGU9ukLJ+Q43XrXfS9
+         tkLrdx2y+Ozp7VUtvfcTR5wnLAySMxfW+NxxvI3NmIVPwZoM8xjtiD6Ztc8eNuYQ/j6u
+         qKsA==
+X-Forwarded-Encrypted: i=1; AKwUvByr4ZbtxPCs9RBhrmj4QD4twSV8CnqhWWa6ChYuxcxrAzIse/jgzDVbR/N/MAVg7z1xQlG0R5nVHgSw@vger.kernel.org
+X-Gm-Message-State: AFq9FYL3so37Ocv9M73oABpT0LRNgrfPhTd1ut5tiXLjQv9BlNyx8JYX
+	JJHWoIiLELJWe/kLD/x+aGkjrLR/XUc2S5D7kcm72cY2tgLPq5XKt66KrYNr5g9C4w==
+X-Gm-Gg: AYBFou0FNkU3A3TWbarcItAclNbpjhhuHHAAUAoA9oGqAEVlv3h9dmIF4CmKV0Y2P0C
+	TIcqR5Q+dMcpuY3M5+Bp61v4B2SuZJMEf5bp3Q/OhOAVjTYStPOCZj+AIb7aAZNUWYS5tdvGZ5w
+	An99BNujqyzZsd/zsnZmG820S4QmsiQhdqn3KQ7Td6g57HhJcfXCmTeJiJObPHb+nfCR9do+Sl1
+	Lp2JINLK8bkyiwP6MC0s61Yxd+YOGbhWKByMh87VHR6jO3Y55ECLQiLheLiaMtcLef7JkggnO45
+	TlBOQfT79Dwb5l1gSnv/JX26pxp3PlWrOraU1gMjbv6Kf302f+BrAePw4wYivsh4fRQmsBbuLj3
+	bS2qvV018QDZr9u6xXVlJ7pXnSL1GrSyIettNue5YOb66fhNZHXupriT5HD+GnL56ScGCcusObV
+	1m3/jz4NLDRQOctKGbspSTsGjpLTdb0sOo21wfYv8ymF9262l95vxhD9GguDdFhB/6g+L/CfMYK
+	B+NcZbW5kU4kcvwMPCq8Iko64bnlGqhNFiwFqxGy5eXH4WC/vfCMv4DeLoaa3e950b8ZV/ATJh8
+	t8LlrYXfw1POjfkPu0HI0SvQMPjPiD4=
+X-Received: by 2002:a05:600c:1c07:b0:4a1:b044:9ccd with SMTP id 5b1f17b1804b1-4a1b0449d00mr3292955e9.28.1791885399299;
+        Tue, 13 Oct 2026 02:56:39 -0700 (PDT)
+Received: from [10.11.72.5] (bip-static-148.213-81-147.telecom.sk. [213.81.147.148])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a19f249692sm289830295e9.3.2026.10.13.02.56.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Oct 2026 02:56:38 -0700 (PDT)
+From: Petr Chmelar <petr.chmelar@innovatrics.com>
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev,
+    linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 4/5] cachefiles: Don't rely on backing fs storage map
+ for most use cases
+Message-ID: <20261013.cachefiles-partial-zeros-trace.pchmelar@innovatrics.com>
+In-Reply-To: <1655268.1791878098@warthog.procyon.org.uk>
+References: <20260910220242.2165023-1-dhowells@redhat.com>
+ <20260910220242.2165023-5-dhowells@redhat.com>
+ <20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com>
+ <1655268.1791878098@warthog.procyon.org.uk>
+Date: Tue, 13 Oct 2026 09:56:37 +0000
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260825230622.24617-10-pali@kernel.org>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset="utf-8"
 
-On Wednesday 26 August 2026 01:06:22 Pali Rohár wrote:
-> Add a new mount option -o symlink=wsl1 which cause that all newly created
-> symlinks would be of WSL style in layout version 1 format. This type of
-> symlinks is supported by all WSL versions.
-> 
-> Existing mount option -o symlink=wsl will be now an alias to -o
-> symlink=wsl2 which creates symlinks in layout version 2 format.
-> 
-> Signed-off-by: Pali Rohár <pali@kernel.org>
-> ---
->  fs/smb/client/cifsglob.h   |  9 +++--
->  fs/smb/client/fs_context.c | 11 ++++--
->  fs/smb/client/fs_context.h |  3 +-
->  fs/smb/client/link.c       |  3 +-
->  fs/smb/client/reparse.c    | 74 ++++++++++++++++++++++++++++++++------
->  5 files changed, 82 insertions(+), 18 deletions(-)
-> 
-> diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-> index c5fdc0138165..66d4370f37dc 100644
-> --- a/fs/smb/client/cifsglob.h
-> +++ b/fs/smb/client/cifsglob.h
-> @@ -190,7 +190,8 @@ enum cifs_symlink_type {
->  	CIFS_SYMLINK_TYPE_MFSYMLINKS,
->  	CIFS_SYMLINK_TYPE_SFU,
->  	CIFS_SYMLINK_TYPE_NFS,
-> -	CIFS_SYMLINK_TYPE_WSL,
-> +	CIFS_SYMLINK_TYPE_WSL1,
-> +	CIFS_SYMLINK_TYPE_WSL2,
->  };
->  
->  static inline const char *cifs_symlink_type_str(enum cifs_symlink_type type)
-> @@ -208,8 +209,10 @@ static inline const char *cifs_symlink_type_str(enum cifs_symlink_type type)
->  		return "sfu";
->  	case CIFS_SYMLINK_TYPE_NFS:
->  		return "nfs";
-> -	case CIFS_SYMLINK_TYPE_WSL:
-> -		return "wsl";
-> +	case CIFS_SYMLINK_TYPE_WSL1:
-> +		return "wsl1";
-> +	case CIFS_SYMLINK_TYPE_WSL2:
-> +		return "wsl2";
->  	default:
->  		return "unknown";
->  	}
-> diff --git a/fs/smb/client/fs_context.c b/fs/smb/client/fs_context.c
-> index abc29500a664..3e8e4b43690a 100644
-> --- a/fs/smb/client/fs_context.c
-> +++ b/fs/smb/client/fs_context.c
-> @@ -376,7 +376,9 @@ static const match_table_t symlink_flavor_tokens = {
->  	{ Opt_symlink_mfsymlinks,	"mfsymlinks" },
->  	{ Opt_symlink_sfu,		"sfu" },
->  	{ Opt_symlink_nfs,		"nfs" },
-> -	{ Opt_symlink_wsl,		"wsl" },
-> +	{ Opt_symlink_wsl1,		"wsl1" },
-> +	{ Opt_symlink_wsl2,		"wsl2" },
-> +	{ Opt_symlink_wsl2,		"wsl" }, /* wsl - alias for wsl2 */
->  	{ Opt_symlink_err,		NULL },
->  };
->  
-> @@ -407,8 +409,11 @@ static int parse_symlink_flavor(struct fs_context *fc, char *value,
->  	case Opt_symlink_nfs:
->  		ctx->symlink_type = CIFS_SYMLINK_TYPE_NFS;
->  		break;
-> -	case Opt_symlink_wsl:
-> -		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL;
-> +	case Opt_symlink_wsl1:
-> +		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL1;
-> +		break;
-> +	case Opt_symlink_wsl2:
-> +		ctx->symlink_type = CIFS_SYMLINK_TYPE_WSL2;
->  		break;
->  	default:
->  		cifs_errorf(fc, "bad symlink= option: %s\n", value);
-> diff --git a/fs/smb/client/fs_context.h b/fs/smb/client/fs_context.h
-> index a80a5caff23c..56bbb20a30a3 100644
-> --- a/fs/smb/client/fs_context.h
-> +++ b/fs/smb/client/fs_context.h
-> @@ -72,7 +72,8 @@ enum cifs_symlink_parm {
->  	Opt_symlink_mfsymlinks,
->  	Opt_symlink_sfu,
->  	Opt_symlink_nfs,
-> -	Opt_symlink_wsl,
-> +	Opt_symlink_wsl1,
-> +	Opt_symlink_wsl2,
->  	Opt_symlink_err
->  };
->  
-> diff --git a/fs/smb/client/link.c b/fs/smb/client/link.c
-> index 8d5d6aca742a..fd7203aa0917 100644
-> --- a/fs/smb/client/link.c
-> +++ b/fs/smb/client/link.c
-> @@ -604,7 +604,8 @@ cifs_symlink(struct mnt_idmap *idmap, struct inode *inode,
->  
->  	case CIFS_SYMLINK_TYPE_NATIVE:
->  	case CIFS_SYMLINK_TYPE_NFS:
-> -	case CIFS_SYMLINK_TYPE_WSL:
-> +	case CIFS_SYMLINK_TYPE_WSL1:
-> +	case CIFS_SYMLINK_TYPE_WSL2:
->  		if (CIFS_REPARSE_SUPPORT(pTcon)) {
->  			rc = create_reparse_symlink(xid, inode, direntry, pTcon,
->  						    full_path, symname);
-> diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-> index bed6f764c0bc..8db3e4917788 100644
-> --- a/fs/smb/client/reparse.c
-> +++ b/fs/smb/client/reparse.c
-> @@ -22,7 +22,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
->  static int mknod_wsl(unsigned int xid, struct inode *inode,
->  		     struct dentry *dentry, struct cifs_tcon *tcon,
->  		     const char *full_path, umode_t mode, dev_t dev,
-> -		     const char *symname);
-> +		     const char *symname, int symver);
->  
->  static int create_native_symlink(const unsigned int xid, struct inode *inode,
->  				 struct dentry *dentry, struct cifs_tcon *tcon,
-> @@ -43,8 +43,10 @@ int create_reparse_symlink(const unsigned int xid, struct inode *inode,
->  		return create_native_symlink(xid, inode, dentry, tcon, full_path, symname);
->  	case CIFS_SYMLINK_TYPE_NFS:
->  		return mknod_nfs(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname);
-> -	case CIFS_SYMLINK_TYPE_WSL:
-> -		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname);
-> +	case CIFS_SYMLINK_TYPE_WSL1:
-> +		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname, 1);
-> +	case CIFS_SYMLINK_TYPE_WSL2:
-> +		return mknod_wsl(xid, inode, dentry, tcon, full_path, S_IFLNK, 0, symname, 2);
->  	default:
->  		return -EOPNOTSUPP;
->  	}
-> @@ -554,6 +556,7 @@ static int mknod_nfs(unsigned int xid, struct inode *inode,
->  
->  static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
->  			       mode_t mode, const char *symname,
-> +			       int symver,
->  			       struct cifs_sb_info *cifs_sb,
->  			       struct kvec *iov)
->  {
-> @@ -589,15 +592,20 @@ static int wsl_set_reparse_buf(struct reparse_data_buffer **buf,
->  			kfree(symname_utf16);
->  			return -ENOMEM;
->  		}
-> -		/* Version field must be set to 2 (MS-FSCC 2.1.2.7) */
-> -		symlink_buf->Version = cpu_to_le32(2);
-> -		/* Target for Version 2 is in UTF-8 but without trailing null-term byte */
-> +		symlink_buf->Version = cpu_to_le32(symver);
-> +		/* Target is in UTF-8 but without trailing null-term byte */
->  		symname_utf8_len = utf16s_to_utf8s((wchar_t *)symname_utf16, symname_utf16_len/2,
->  						   UTF16_LITTLE_ENDIAN,
->  						   symlink_buf->Target,
->  						   symname_utf8_maxlen);
->  		*buf = (struct reparse_data_buffer *)symlink_buf;
-> -		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer) + symname_utf8_len;
-> +		buf_len = sizeof(struct reparse_wsl_symlink_data_buffer);
-> +		/*
-> +		 * Layout version 2 stores the symlink target in the reparse point buffer.
-> +		 * Layout version 1 stores the symlink target in the data section of the file.
-> +		 */
-> +		if (symver == 2)
-> +			buf_len += symname_utf8_len;
->  		kfree(symname_utf16);
->  		break;
->  	default:
-> @@ -698,7 +706,7 @@ static int wsl_set_xattrs(struct inode *inode, umode_t _mode,
->  static int mknod_wsl(unsigned int xid, struct inode *inode,
->  		     struct dentry *dentry, struct cifs_tcon *tcon,
->  		     const char *full_path, umode_t mode, dev_t dev,
-> -		     const char *symname)
-> +		     const char *symname, int symver)
->  {
->  	struct cifs_sb_info *cifs_sb = CIFS_SB(inode->i_sb);
->  	struct cifs_open_info_data data;
-> @@ -707,6 +715,12 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
->  	struct inode *new;
->  	unsigned int len;
->  	struct kvec reparse_iov, xattr_iov;
-> +	struct cifs_open_parms oparms;
-> +	struct cifs_io_parms io_parms;
-> +	unsigned int bytes_written;
-> +	struct kvec symv1_iov[2];
-> +	struct cifs_fid fid;
-> +	__u32 oplock;
->  	int rc;
->  
->  	/*
-> @@ -716,7 +730,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
->  	if (!(le32_to_cpu(tcon->fsAttrInfo.Attributes) & FILE_SUPPORTS_EXTENDED_ATTRIBUTES))
->  		return -EOPNOTSUPP;
->  
-> -	rc = wsl_set_reparse_buf(&buf, mode, symname, cifs_sb, &reparse_iov);
-> +	rc = wsl_set_reparse_buf(&buf, mode, symname, symver, cifs_sb, &reparse_iov);
->  	if (rc)
->  		return rc;
->  
-> @@ -741,6 +755,46 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
->  				     &data, inode->i_sb,
->  				     xid, tcon, full_path, false,
->  				     &reparse_iov, &xattr_iov);
-> +	if (!IS_ERR(new) && mode == S_IFLNK && symver == 1) {
-> +		/*
-> +		 * WSL symlink layout version 1 stores the symlink target
-> +		 * location into the data section of the file.
-> +		 * Store it now after the reparse point file was created.
-> +		 * The target location was allocated into the buf but iov
-> +		 * size filled in reparse_iov by wsl_set_reparse_buf() was
-> +		 * set to smaller so the created reparse point does not
-> +		 * contain it.
-> +		 */
-> +		oparms = CIFS_OPARMS(cifs_sb, tcon, full_path, FILE_WRITE_DATA,
-> +				     FILE_OPEN, CREATE_NOT_DIR | OPEN_REPARSE_POINT,
-> +				     ACL_NO_MODE);
-> +		oparms.fid = &fid;
-> +		oplock = tcon->ses->server->oplocks ? REQ_OPLOCK : 0;
-> +		rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
-> +		if (!rc) {
-> +			symv1_iov[1].iov_base = ((struct reparse_wsl_symlink_data_buffer *)buf)->Target;
-> +			symv1_iov[1].iov_len = strlen((const char *)symv1_iov[1].iov_base);
-> +			io_parms = (struct cifs_io_parms) {
-> +				.netfid = fid.netfid,
-> +				.pid = current->tgid,
-> +				.tcon = tcon,
-> +				.offset = 0,
-> +				.length = symv1_iov[1].iov_len,
-> +			};
-> +			rc = tcon->ses->server->ops->sync_write(xid, &fid, &io_parms,
-> +								&bytes_written,
-> +								symv1_iov,
-> +								ARRAY_SIZE(symv1_iov)-1);
-> +			if (bytes_written != symv1_iov[1].iov_len)
-> +				rc = -EIO;
-> +			tcon->ses->server->ops->close(xid, tcon, &fid);
-> +		}
-> +		if (rc) {
-> +			tcon->ses->server->ops->unlink(xid, tcon, full_path, cifs_sb, NULL);
-> +			iput(new);
-> +			new = ERR_PTR(rc);
-> +		}
-> +	}
->  	if (!IS_ERR(new))
->  		d_instantiate(dentry, new);
->  	else
-> @@ -764,7 +818,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
->  	case CIFS_REPARSE_TYPE_NFS:
->  		return mknod_nfs(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
->  	case CIFS_REPARSE_TYPE_WSL:
-> -		return mknod_wsl(xid, inode, dentry, tcon, full_path, mode, dev, NULL);
-> +		return mknod_wsl(xid, inode, dentry, tcon, full_path, mode, dev, NULL, 0);
->  	default:
->  		return -EOPNOTSUPP;
->  	}
-> -- 
-> 2.20.1
-> 
+David Howells <dhowells@redhat.com> wrote:
 
-For visibility, this is fixup for sashiko review:
+> Unfortunately, I can't reproduce this.  Can you get me some tracing?
 
-diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index c3e125669e9b..679ba469b77e 100644
---- a/fs/smb/client/reparse.c
-+++ b/fs/smb/client/reparse.c
-@@ -775,7 +775,6 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
- 			symv1_iov[1].iov_base = ((struct reparse_wsl_symlink_data_buffer *)buf)->Target;
- 			symv1_iov[1].iov_len = strlen((const char *)symv1_iov[1].iov_base);
- 			io_parms = (struct cifs_io_parms) {
--				.netfid = fid.netfid,
- 				.pid = current->tgid,
- 				.tcon = tcon,
- 				.offset = 0,
-@@ -785,7 +784,7 @@ static int mknod_wsl(unsigned int xid, struct inode *inode,
- 								&bytes_written,
- 								symv1_iov,
- 								ARRAY_SIZE(symv1_iov)-1);
--			if (bytes_written != symv1_iov[1].iov_len)
-+			if (!rc && bytes_written != symv1_iov[1].iov_len)
- 				rc = -EIO;
- 			tcon->ses->server->ops->close(xid, tcon, &fid);
- 		}
+Thanks for looking.  The trace shows reads served from the cache over
+ranges that were never written to it; details below.
+
+I think the reason you don't see it is how the file gets into the cache,
+which I should have said in the report.  In your run, fio lays the file
+out through the mount, so the client fills its cache sequentially and the
+object ends up CONTENT_ALL.  In ours, the client never writes the file:
+it is written on the server side beforehand, and the client's cache fills
+only as the client reads it, at random offsets, so the object stays
+BACKFS_MAP.  That is how our training nodes use the cache: they read data
+sets that they didn't write, mostly at random offsets.
+
+I reran it on 9f8b64f66 over 9p with your tracepoints enabled, with the
+same result: 936 of 4096 64 KiB blocks wrong, 825 of them zeros, first
+wrong blocks 10, 13, 15, 24, 26 and 27.  I'm sending you the trace
+off-list; it is 790 KB as bzip2.
+
+What the trace shows:
+
+ - After the random reads the object is set to BACKFS_MAP:
+
+     cachefiles_coherency: o=00000001 SET ok   B=c4 oz=10000000 c=3
+
+   After dropping the page cache it is looked up again (o=00000002 OK,
+   c=3) and set to c=4.
+
+ - Before the full read, WRIT TERM subrequests cover 2048 of the 4096
+   64 KiB blocks, as expected for half the file.
+
+ - During the full read, READ subrequests from the cache cover 2143
+   blocks, and 936 of those never had a WRIT: the same count as the wrong
+   blocks, starting with the same blocks, 10, 13, 15, 24, 26 and 27.
+   For example this one read:
+
+     R=0000285a[1] READ TERM  f=110 s=7c000 7c000/7c000 s=7 e=0
+
+   covers 0xa0000-0xb0000, 0xd0000-0xe0000 and 0xf0000-0xf8000, and no
+   write ever reached those ranges.  The writes around it were:
+
+     R=00002291[3] WRIT TERM  f=100 s=70000 20000/20000 s=6 e=0
+     R=000024dc[1] WRIT TERM  f=100 s=90000 10000/10000 s=16 e=0
+     R=00002291[4] WRIT TERM  f=100 s=b0000 20000/20000 s=9 e=0
+     R=000024dc[2] WRIT TERM  f=100 s=e0000 10000/10000 s=3 e=0
+
+So for the BACKFS_MAP object, the occupancy the read is based on treats
+the holes between those writes as data.
+
+> One further question occurs to me: does the entire 256M file fit in the
+> test VM's memory?
+
+Yes.  The VM has 7946 MiB of memory with 7498 MiB available, and the page
+cache is dropped before the full read.
+
+The setup, for reference:
+
+ - 9f8b64f66 with netfs, fscache, cachefiles, 9p and 9p fscache built in;
+   QEMU without KVM, 4 vCPUs, 8 GiB RAM
+ - 9p: QEMU virtfs local, security_model=none, the host directory on XFS;
+   mounted with trans=virtio,version=9p2000.L,cache=fscache,msize=1048576
+ - part.bin: 256 MiB from /dev/urandom, written on the host before the
+   mount
+ - cache: XFS on a loop device in the guest, cachefilesd 0.10.10
+
+The trace analysis was done with LLM assistance.
+
+Thanks,
+Petr
