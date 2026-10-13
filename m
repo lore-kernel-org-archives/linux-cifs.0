@@ -1,86 +1,135 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9219D13B58C;
-	Tue, 13 Oct 2026 08:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D063D954F
+	for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 08:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791879104; cv=none; b=Zu+qkA0Wk/cJPmL/w/GNyXGXKnnOXj4s/uSZNTABDwh2qer/rlrT1XdxqkH1GKfgfQAL+kXbBjSvRm4+1uInwuzM/pQzAzznvHQwyCTs2iICbIYW+IQio9WBB83Sx4PnVk9KZUfPjUMBB2zdwTHpmrbAu7Ij0dvu6oOQ7MjKGk4=
+	t=1791879265; cv=none; b=DWoOaanxDzV5k4sOn/FatC5drVZsGArXJWUdp2CCvwV1h5VghxnY1DifvFfwoBAsjH5D1eoL/WLY5XF2PZDWiNX4a0UE2D8uRCs0rEkm4MpuyX6mNcaPx0Jitbn/Rd3OiVdQdbCOTyeK2Go1IL6Ug6qAhQeVSKBWGmA9xaLW4MI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791879104; c=relaxed/simple;
-	bh=XoCwIXHKXW+tfFtNLDwQeZdZAWUkAGIKEYsQXC1DUuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fhlVgwEJ56+PsJBJGpnrR+Iui2I2aajfCuBOuc9UOQk8OEU25AcbRuMuKBEjt9+j7o85272hNDd1M6wiPNxMrPtIOnhLFDimcemQyMtwlMtiGib1qdcEvxzHhWOB76aT7qbRJic4i7qcPC8aafbrgwmErTLhRwv1uhEKh26Ajd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEsmCjtD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791879265; c=relaxed/simple;
+	bh=/TsNlix0rD1la6imrvri2d2fqWkLRSA20dnSbOazxh0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=UFeqq4oJownE7uJ97NSvC/C2n5XMZRis9o/Jg5rzvQQV+YEw17qD+caDP4iEuqBlm2ge/KVXZMNMZcZ+fVeT+MOLGAcs5pErQsLl8Qa+VZahuLeOcLvS8aI7oiYSI5xEeuVPg7sJresnE6Mj5coxJ+j0ksCj3XMwLOVtUawHmyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iloT7260; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEsmCjtD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14F131F000FF;
-	Tue, 13 Oct 2026 08:11:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791879103;
-	bh=rG5/bOFUh4a/oPwdbz1FLyL4WUfF1x7/+mhBG8QG764=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=MEsmCjtDefv61voXiqbbGM9dW6xGdCpybixzopYSRpNR0CoU5po41/oDFJ26YBJJ9
-	 FhkxJiF2zs16HOLMj6w99Kp9NEjHWhksaepW8pAtfhlX6L/pvM8D1w4WY441P9YbCe
-	 thfnGHFdXLvjr11eCOXyBUpaIvkjcYsRC8XeqRsSk/vwS2I2FunlBT5JficDQkPFHh
-	 7Vp026iInXMNHU/jqKF6NW9ONWTqu1jP6cmqyQQ/HgbuKkXka3eEwDWHaYmME+6+8T
-	 8rnt8Z3H8ZDMNaUdsBRtqOhBOAUmDOUqKIxvOw/9grZKixbIGil0KV5VwqJ3sVxLot
-	 PKwMx0XsSzOrg==
-Received: by pali.im (Postfix)
-	id 082F9365; Tue, 13 Oct 2026 10:11:46 +0200 (CEST)
-Date: Tue, 13 Oct 2026 10:11:45 +0200
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/9] Various changes
-Message-ID: <20261013081145.fel4juluk55wbfcy@pali>
-References: <20260821214722.q7rkflclyyugdxll@pali>
- <20260825230622.24617-1-pali@kernel.org>
- <20261012141053.4ud5pihrtrxpkxfy@pali>
- <CAKYAXd_FP7F1U_ETWx+0QKwpDuEFp=UJzhMjrSmuT9uG3nAxEA@mail.gmail.com>
- <20261013065503.rndxu2qxauehudil@pali>
- <CAKYAXd90dbd9p8uh3nyT_e=gr=P9qQeJd5TE0=+K4+gV2-JG8w@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iloT7260"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1791879262;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0rqjRqfF/5K2TERBFz32cqjmcGEc960K6cb/OYdJM6A=;
+	b=iloT7260+fRXYsljf4hB4hG4M+hs1J+f839wpzcamsJNJIc4pdd5wCxJL0z13MvrC2EIH5
+	kL1Kd9TqB9YPfUDgL8qqZKU9kI/0ZARb+wbHgT1j26mq7C3RU+kKf1KBzmOEFyVMtemraM
+	c0UCujLdnJP9D0SZiZSjl6CrLNTpJlY=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-15-W3Z3eWXuN-uipHnTTMh3Aw-1; Tue,
+ 13 Oct 2026 08:14:19 +0000
+X-MC-Unique: W3Z3eWXuN-uipHnTTMh3Aw-1
+X-Mimecast-MFC-AGG-ID: W3Z3eWXuN-uipHnTTMh3Aw_1791879256
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8FC411956055;
+	Tue, 13 Oct 2026 08:14:15 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.11])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F30691956095;
+	Tue, 13 Oct 2026 08:14:09 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20261011.cachefiles-seek-hole-walk.pchmelar@innovatrics.com>
+References: <20261011.cachefiles-seek-hole-walk.pchmelar@innovatrics.com> <20260910220242.2165023-1-dhowells@redhat.com>
+To: Petr Chmelar <petr.chmelar@innovatrics.com>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 0/5] netfs, cachefiles: Changes for next, primarily occupancy tracking-related
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKYAXd90dbd9p8uh3nyT_e=gr=P9qQeJd5TE0=+K4+gV2-JG8w@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1655914.1791879248.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 13 Oct 2026 09:14:08 +0100
+Message-ID: <1655915.1791879248@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tuesday 13 October 2026 16:56:30 Namjae Jeon wrote:
-> > PATCH 8/9 comment 1 - unbound memory allocation based on symlink length
-> > - this is valid, but unfortunately all the symlink parsing code would do
-> > similar thing. And we have already more symlink types. Do we have some
-> > limit how long could be symlink? Does it make sense to address only this
-> > one issue and let all other untouched? I would rather propose to define
-> > one common limit and fix this issue on all places.
-> I agree that a common limit is preferable. cifs.ko already has
-> REPARSE_SYM_PATH_MAX(4060) for native reparse symlinks.
+Petr Chmelar <petr.chmelar@innovatrics.com> wrote:
 
-Lets this for followup change.
+> The cover letter leaves non-contiguous objects, which still use
+> SEEK_DATA/SEEK_HOLE, for a later series.  We hit that case badly in
+> production, so here are numbers in case they help with its priority.
 
-> >
-> > PATCH 8/9 comment 2 - fid.netfid initialization - I'm not sure here.
-> > I had an impression that this is a right pattern how to open and read
-> > file. Can somebody else recheck this?
-> For smb2, open() sets persistent_fid and volatile_fid, but not netfid.
-> Therefore, .netfid = fid.netfid reads an uninitialized value.
-> smb2_sync_read() uses the persistent and volatile IDs instead, so the
-> .netfid initializer is unnecessary and should be removed in PATCH 8/9.
+I know.  But it's a tricky problem to solve as I need to store a map of th=
+e
+content somewhere.  xattrs are painful as I can only read or write them
+atomically and as whole blobs - and also I'm not sure if I need to limit t=
+he
+size of any given xattr to 512 bytes.  Further, the xattr wangling interfa=
+ce
+inside the kernel assumes a flat virtual buffer rather than taking an I/O
+iterator.
 
-Ok. So this would be also simple change to just remove .netfid setting.
+I have patches that store a bitmap in an xattr, with 1 bit per 256K block =
+of
+cachefile, for a 512 byte xattr able to map up to 1G of file size.  I need=
+ to
+revisit this at some point soon.  It may be better to switch to storing an
+extent list, but:
 
-> +               io_parms = (struct cifs_io_parms) {
-> +                       .netfid = fid.netfid,
-> 
-> >
-> > PATCH 9/9 - masking sync_write error by -EI - This looks to be valid.
-> > The fix is simple, just adding "rc &&" before "bytes_written !=".
-> Okay. Thanks.
+> On our NFS clients (Ubuntu, v6.8, cache on XFS), a sequential read of a
+> fully cached 184 GB object with 1,080,732 extents ran at 0.4 MB/s.
 
-So just these two simple fixups are from the sashiko review, right?
+Trying to store a million+ extent records in a single xattr would kind of
+suck.  Now, it might be possible to collapse that somewhat if a lot of the
+extents are virtually sequential within the file, since I don't care about
+physical sequentiality.
+
+Also, can you tell if you have a preferred cache granularity?  Would a 256=
+K
+granularity, say, use too much space?
+
+> I expect the right fix is for cachefiles to track what it has written
+> itself, as CONTENT_ALL now does for contiguous files, rather than
+> something like the above.
+
+Indeed - as mentioned above.
+
+> I can send the workaround if it's useful as a reference,
+
+If you could, that would be great!
+
+> and I'm happy to test whatever you plan for this case on our workload.
+
+Thanks.  Now I just need to reproduce your bug.  Note that I posted anothe=
+r
+cachefiles patch that Christian hasn't picked up yet:
+
+https://lore.kernel.org/linux-fsdevel/1091807.1791483394@warthog.procyon.o=
+rg.uk/T/#u
+
+David
+
