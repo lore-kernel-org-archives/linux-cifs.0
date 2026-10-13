@@ -1,79 +1,70 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBE14A5C43
-	for <linux-cifs@vger.kernel.org>; Mon, 12 Oct 2026 19:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01D4155C97
+	for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 05:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791832381; cv=none; b=W06bBeOJ1nxiLs0zEAtOwvoY/dQD6Y0c5JGoeRh6CN8ZOrnZweaGKeHmQFVbTDGUfoK89XeG+tyfuG+SD7b4XJ8apv45s3JGiDKMKZqRHC+7kJOzO3TpUMecB3bhpARK9mv97kh7og2i5GSXyS2w2WwdiwHI68ciRvd/hOhfjuE=
+	t=1791869149; cv=none; b=O/EhSEi643oHkOnJsVeQ/RvseRTjB4Mw4VhdX/fHtaCgJbtc3gunjV19OHGGrwyks/EAe1Mdgv4Tl2LcdtsC+ywBLhonrbDV1q3iuZog1hHOXoOq4ZCNWQc2ZP90MIx0dU0Zaj9qIOVFr/+Z78riwDUyW0z/WMVxz9V3VS3Ufj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791832381; c=relaxed/simple;
-	bh=Vmee7MXnwkoo2I4ZVE7vFh76h2ZIAq9AX1YxjXTcBdY=;
-	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
-	 MIME-Version:Content-Type; b=Q79Y8btlc88G8KKU69rgpg4Lge72DbvqwStlxbtRYkfolM6mjLfDxus9Krh5VYacvByVogquN3mjYfgZ6sspu4gt0FdKykIeNn6xwHI3Juf6h00UQFFMtIW9/omkr3wE4EEZpwq/zPLcNlyjS2D1brsFK/FHExMqQVFc+BUBj5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=mWTTdxst; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1791869149; c=relaxed/simple;
+	bh=e7h9DAZ9jHbQxGvAFb/lAiP3ZpPx88/vVWjRYl8WoQo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NLmUmcKrMFKoYRtx4gr7srKoNNA1dVn+cUxopSIWE7uMo5aZmYpEsLWKwZpsAO/finQxqZu2uIgO3PX1BU9UykhXIrJmvOequFfY6WfqW9S+lQg9CbsETk2PI48xgBhc2pMAXMNStrmGwdjU+SlGw0GKZ2D8RigWE0pcLHh+94I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MPjX0j8I; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="mWTTdxst"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=JrQNlir/2s2tXMZYGGGP8mc9Uk5Na/tDysS6UvK6GnI=; b=mWTTdxst1xK0JpL0BS1m7/0f0v
-	VwpjgkChXhONPmeLh9wlFGtmgkfBm4yHwXmnGAR79S8Lo8irxy4a3/14HbLlBWivGXOWuektU09DJ
-	aHVrTaiYHzcYnQq3nJUkc7qo0AMt2M9G2Ipbbxo5fXzWq+yyn0zcrn8qiJErg9BHJozyVvWuhDyNY
-	cBhm9+nltYva4s6n88/c1sesj4aWfZSmsYSqfrzm40ItVWvLOw7Z73sZ0tnGaGYkKN9EDis8ex34J
-	ZYMXzvd/vQIi4QbUgsYtKfAoxTBm41vQb3g6hnCsOdIex8ueYPem34afnDWdqEHEEP9Eb2GTtrcoq
-	362pkNEA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xGLS3-00000003Trx-3XlP;
-	Mon, 12 Oct 2026 16:12:47 -0300
-Message-ID: <a921bdd206f0a651e2dda9d9e3ef5429@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: =?utf-8?B?5pif5rW35piU5raf?= <starcyrene@qq.com>,
- linux-cifs@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Ronnie Sahlberg
- <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
- Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>,
- samba-technical@lists.samba.org, =?utf-8?B?5pif5rW35piU5raf?=
- <starcyrene@qq.com>
-Subject: Re: [PATCH] smb: client: add "noautomount" mount option to skip
- junction submounts
-In-Reply-To: <tencent_B5ED8BAE1AA8B048FF6EBB8AD35DBF004306@qq.com>
-References: <tencent_B5ED8BAE1AA8B048FF6EBB8AD35DBF004306@qq.com>
-Date: Mon, 12 Oct 2026 16:12:47 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MPjX0j8I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9522F1F00893
+	for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 05:25:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1791869148;
+	bh=e7h9DAZ9jHbQxGvAFb/lAiP3ZpPx88/vVWjRYl8WoQo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=MPjX0j8IM8jPjutumYV01obpOfeJ4WB238ApqielTw9dZx77Pe0KUtCHnyd9v26CI
+	 02VWvsSt8NF94ML/okBE6iAlvyVKNA7yI+X5yfoZqIeoWTd0JT0SGfkNst4kOygOIt
+	 uNDSUVVprqxLKRU3vmGkM1FB/1KdvkWCJtjA4xj/4SiRciB6zUDbnF+9jaX1CCcelx
+	 ySii9gnoEbVukZNqzMjy6yNGqXWVqcJqEg6FOOeKO5mLIKRq9OAUqSoqAsmHgJ0WJW
+	 dSDAxEbURe0waXS9LjVfbq2L4vTgv3Zga97x/USPQDTmAbj2HmSInLRbc8LUh08muM
+	 D6ceZQvpWA/Dw==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6a374bea882so3699188a12.1
+        for <linux-cifs@vger.kernel.org>; Mon, 12 Oct 2026 22:25:48 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwNmuUmUMRZRMvU6FPgxmaqitk3oVBJRbiC3PyrIF+NSQVDNLiNpMgOHK310kpZgEsp45Yw1LWwnvHK@vger.kernel.org
+X-Gm-Message-State: AFq9FYLyEX0mHFY3LFWc5iW5xnJMbISeVjB4jB43gYs2rcPGliqmdjdf
+	y3KF5WMnfAhxXy+gJXIAcXGG0APx921jSQC8jyW1gHItdf1AS730uVSihiUIELpbnvRpK+yK1BT
+	rqfAKRwmtHjmsVGhB2XHdDknDkTGucYc=
+X-Received: by 2002:a17:907:3fa9:b0:c2a:6c3:9e98 with SMTP id
+ a640c23a62f3a-c31aa098468mr1065055666b.40.1791869147293; Mon, 12 Oct 2026
+ 22:25:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20260821214722.q7rkflclyyugdxll@pali> <20260825230622.24617-1-pali@kernel.org>
+ <20261012141053.4ud5pihrtrxpkxfy@pali>
+In-Reply-To: <20261012141053.4ud5pihrtrxpkxfy@pali>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 13 Oct 2026 14:25:34 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_FP7F1U_ETWx+0QKwpDuEFp=UJzhMjrSmuT9uG3nAxEA@mail.gmail.com>
+X-Gm-Features: AclHuK-irOv8qyFoMe7M9j31gFr8maV2gaiTnXJ0icm0SZqBTsQU89DryhSXRFk
+Message-ID: <CAKYAXd_FP7F1U_ETWx+0QKwpDuEFp=UJzhMjrSmuT9uG3nAxEA@mail.gmail.com>
+Subject: Re: [PATCH 0/9] Various changes
+To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
+Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-=E6=98=9F=E6=B5=B7=E6=98=94=E6=B6=9F <starcyrene@qq.com> writes:
-
-> None of the existing options turn this off: "nodfs" only skips DFS
-> referral resolution (these junction submounts are not DFS), and
-> "reparse=3D" selects the format used when creating new reparse points,
-> not how existing ones are traversed.
+On Mon, Oct 12, 2026 at 11:10=E2=80=AFPM Pali Roh=C3=A1r <pali@kernel.org> =
+wrote:
 >
-> Add a "noautomount" mount option.  When set, CIFS_FATTR_JUNCTION inodes
-> are not marked S_AUTOMOUNT, so junctions stay regular directories and
-> the SMB server resolves the reparse target on access - which Windows
-> does transparently for normal path traversal.  The default is off, so
-> behavior without the option is completely unchanged.  Note that the
-> option also disables automounting of DFS referrals, so it should not be
-> used on DFS mounts.
+Hi Pali,
+> Hello, now when is the -rc7 cycle, could you review these patches?
+> So if there are any issues, I would have a chance to address them for
+> the next merge window.
+Could you check sashiko's review comments from these patches ?
 
-Instead of introducing a new mount option, can't you use 'noserverino'
-to handle such cases?  That is, if you mount the share with
-'noserverino' mount option and the client finds a directory with a
-name-surrogate reparse point that it can't handle, then neither create
-fake attrs nor make them as automounts.
+https://sashiko.dev/#/patchset/20260825230622.24617-1-pali%40kernel.org
 
-The original intent of marking those as automounts was to prevent inode
-collisions when accessing files from those directories and then leaving
-the parent mount still trusting inode numbers from the server, as way to
-keep hardlinks working on the parent mount.
+Thanks!
