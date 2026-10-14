@@ -1,99 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5418F4DE709
-	for <linux-cifs@vger.kernel.org>; Wed, 14 Oct 2026 09:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6003F788F
+	for <linux-cifs@vger.kernel.org>; Wed, 14 Oct 2026 23:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791971152; cv=none; b=Ffe9SSSR2zMr2px71JjVw+nQXltXh2Dk8nzBoECvr0H98LmdEKGOuYtOJTs1cazLPZ69X4lPpS3ggtz7OtAHbYKr0PVgPnPEeluvSoc0zTqX0cCoLz4O7f333X38/+nlG/n0LCyOuO3inYFygh0t3mM93f16r0y+afDJFlYysdU=
+	t=1792019197; cv=none; b=p3cL+rPqDyLyLPBsUQUWyGWlV01VV+TCT3l3usOMJwWhfEkJEuXKCcBDp7JjVa04l9QxDchuAty2D/sobaNiUT7NMrMsM1ROSFBFgWIRLMWyjwTickeZo+aCP3pNhYQ16FHcHv2+lbJiBd9JOokfQwDnk56KFXVNIzxb/JQIqoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791971152; c=relaxed/simple;
-	bh=ID1YiJiWvOAG0AsnZJUSvdj0b+7VZeh7snBXhoGQ7yo=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=tqawQ3dyUHhIzWOpxr5mA1xGMWA4GDIGY10TsHEvMKFPdmvwS0+oGb+h/QnyO//cAI/yDtncuPzSempu1G9HHqXYN8MnFWZZYz+/zZt4gaHtkqP7nFpaRyHA77EFYLuI2CiFt/EVee4FSfelwkKHLLkwl4X8CADscJz2JGvIOc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JrTqRSlg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1792019197; c=relaxed/simple;
+	bh=O3kcsc/wjAUCWA3m+n/j7qbPuWuNMx8KaAafTLFGOL4=;
+	h=Message-ID:From:To:Cc:Subject:In-Reply-To:References:Date:
+	 MIME-Version:Content-Type; b=JHIMlxheUwYXkHtfFnBeRCN97VLgkMccgmT0WXQuwFF/ozhuJ+s+R4Uccx0pXMEerCkTotSTRIFaOB1vu7WI32NtWaVcofRnhIt6TGmyl8S5QZAs9sFakbLovpPccfcN0hNwqxQd5CWyWB+I7Azc69HCpni5oaoN5CWXyRJ+wig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=bDqd5PDY; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JrTqRSlg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1791971150;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=psHmh+mmjF/vIp3ChRxGhlRhpQq6TSm83eNrdquwHxw=;
-	b=JrTqRSlg9U7WqHcm/+jjdgD9KpM80Qg69iZKL0HrnAkQso6/1CgBD0WJa5R+BjoL7B0vFb
-	VXSzNECXleSnwXtQWU8l/IrmNHUVhI40klFMtgatoQbmdP2797JPgAS9zdc18G3P/FdLdu
-	5mriKjCH+RCT2VLmvzBTC9LeOp/T5aI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-524-o3tIefQBPv-FG1zUwHrgIw-1; Wed,
- 14 Oct 2026 09:45:38 +0000
-X-MC-Unique: o3tIefQBPv-FG1zUwHrgIw-1
-X-Mimecast-MFC-AGG-ID: o3tIefQBPv-FG1zUwHrgIw_1791971135
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 396ED19560B2;
-	Wed, 14 Oct 2026 09:45:34 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.48.11])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 696E830000E3;
-	Wed, 14 Oct 2026 09:45:27 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20261013.cachefiles-partial-zeros-trace.pchmelar@innovatrics.com>
-References: <20261013.cachefiles-partial-zeros-trace.pchmelar@innovatrics.com> <20260910220242.2165023-1-dhowells@redhat.com> <20260910220242.2165023-5-dhowells@redhat.com> <20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com> <1655268.1791878098@warthog.procyon.org.uk>
-To: Petr Chmelar <petr.chmelar@innovatrics.com>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Paulo Alcantara <pc@manguebit.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Namjae Jeon <linkinjeon@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 4/5] cachefiles: Don't rely on backing fs storage map for most use cases
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="bDqd5PDY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=93CWaKi/vVBe/kVNvqhlUkzqitBYlT3JTTO72+6OCKY=; b=bDqd5PDYAy73YTo3mglJES3GYa
+	MCKN4pFuNCIK+RCD2LjA9Jj3dmR3OKRUChOz+Nq26UVI2bsQCSRk8Vw+mL84tTkbKaeImh+iB77yi
+	fmASaofIHvQ9wz5X8GPDKLKAsC0JBNvUTx97wazL2QoAGI3sYFbZn5ALQvh8YVA8i4O6lt3S9n3vA
+	gaSWyDCFntsRn2gM/tDQMeozfpHmhrdDjJ5+A5DQDnyyxypGg6cEzghS+YnMnLBCufnHZNyttGKmO
+	f++p8/tSfWq+rZzBAcVN2a0IMywg8AXk0u8EYkaReQH9jGSyjTcRQ2xm8PiCJRXrCy8lGLko/51SL
+	hAkRDjPw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1xH839-00000003f9n-2p0n;
+	Wed, 14 Oct 2026 20:06:19 -0300
+Message-ID: <adb08c60bb8da380fe105c5b9aa4331c@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Ren Wei <n05ec@lzu.edu.cn>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org
+Cc: linkinjeon@kernel.org, ronniesahlberg@gmail.com, sprasad@microsoft.com,
+ tom@talpey.com, bharathsm@microsoft.com, jlayton@kernel.org,
+ smfrench@gmail.com, bird@lzu.edu.cn, rakukuip@gmail.com, n05ec@lzu.edu.cn
+Subject: Re: [PATCH 1/1] cifs: fix buffer overflow in SMB2_tcon
+In-Reply-To: <0f3d431d65a5f46c0487293d127e748775ca85b8.1791865501.git.rakukuip@gmail.com>
+References: <cover.1791865501.git.rakukuip@gmail.com>
+ <0f3d431d65a5f46c0487293d127e748775ca85b8.1791865501.git.rakukuip@gmail.com>
+Date: Wed, 14 Oct 2026 20:06:19 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1995692.1791971125.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Oct 2026 10:45:25 +0100
-Message-ID: <1995693.1791971125@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain
 
-Does the attached fix the problem?
+Ren Wei <n05ec@lzu.edu.cn> writes:
 
-David
----
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index cc1b00f301d2..c0157f9a338d 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -379,7 +379,7 @@ static void netfs_read_to_pagecache(struct netfs_io_re=
-quest *rreq)
- 		}
- =
+> From: Luxiao Xu <rakukuip@gmail.com>
+>
+> In SMB2_tcon(), unc_path is allocated with a fixed buffer size of
+> MAX_SHARENAME_LENGTH * 2 bytes (672 bytes). However, the user-controlled
+> UNC path (tree) length is passed to cifs_strtoUTF16(), which assumes the
+> destination buffer is large enough and writes strlen(tree) + 1 UTF-16 code
+> units.
+>
+> Commit 62a1a439e0fd ("cifs: clean up handling of unc= option") removed the
+> length check on UNC mount options, allowing mount paths to exceed
+> MAX_SHARENAME_LENGTH while retaining the fixed-size buffer allocation in
+> SMB2_tcon(). Consequently, an oversized UNC string causes cifs_strtoUTF16()
+> to write past the end of the heap object, resulting in a slab-out-of-bounds
+> write.
+>
+> Fix this by dynamically allocating unc_path based on the length of tree so
+> that it safely accommodates all UTF-16 code units.
 
- 		subreq->start	=3D start;
--		subreq->len	=3D size;
-+		subreq->len	=3D len;
- 		if (copy)
- 			__set_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags);
- =
+I don't think we should allow SMB2_tcon() with a @tree more than
+MAX_TREE_SIZE characters.
 
+With your fix, we might end up with a truncated tree name set in
+cifs_tcon::tree_name.  It will work in the first tree connect, but if
+the client needs to issue another tree connect for some reason
+(e.g. reconnect/failover), then it will fail.
+
+Some places rely on the tree name not having more than MAX_TREE_SIZE
+characters.  I'd rather return -EINVAL along with an error message in
+SMB2_tcon() if @tree exceeds that length.
+
+From another patch, we could also add an early MAX_TREE_SIZE check
+against smb3_fs_context::UNC in smb3_parse_devname().
+
+BTW, mount.cifs(8) will not allow an UNC path that has more than 1024
+characters.
+
+What do you think?
