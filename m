@@ -1,91 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F02B22F01
-	for <linux-cifs@vger.kernel.org>; Wed, 14 Oct 2026 01:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5418F4DE709
+	for <linux-cifs@vger.kernel.org>; Wed, 14 Oct 2026 09:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1791942515; cv=none; b=Kvx3KLYrns+daWIyQMZvf2MfK/iDJ9249vNNnPEqQutlqOf2gioiLFSd52R463Pc56YU8M0SjOSQbCRx3SKgJRtvzYlY63vXcruNDW/9Pzmcp0kJHDe55TDAJeOiWxEd2DasMPg4Nk8hibd8lZCcbFGd7lW7I1r0DlFQBR9ltz4=
+	t=1791971152; cv=none; b=Ffe9SSSR2zMr2px71JjVw+nQXltXh2Dk8nzBoECvr0H98LmdEKGOuYtOJTs1cazLPZ69X4lPpS3ggtz7OtAHbYKr0PVgPnPEeluvSoc0zTqX0cCoLz4O7f333X38/+nlG/n0LCyOuO3inYFygh0t3mM93f16r0y+afDJFlYysdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1791942515; c=relaxed/simple;
-	bh=bNhxfSO3PykIeoiJNaMKeGlO/pELpsMJqXv0MoaMiE0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t+whnOWvLmF/N48N4yTitjjzXepzQMXmVElX2cWGkviZcZcLFsxs8NO1cviQxYR6M57pMy1+xa3oqZmX5jQFKWjSclt0YZZRGg7rRLcgS8VbSJOnJwXjmIN3cSHWtRgmQVx/thgrtcpq1NoZ+Z1UiSWRJEL0exqN1OSpoJdGjRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PJJ3l/Uh; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1791971152; c=relaxed/simple;
+	bh=ID1YiJiWvOAG0AsnZJUSvdj0b+7VZeh7snBXhoGQ7yo=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=tqawQ3dyUHhIzWOpxr5mA1xGMWA4GDIGY10TsHEvMKFPdmvwS0+oGb+h/QnyO//cAI/yDtncuPzSempu1G9HHqXYN8MnFWZZYz+/zZt4gaHtkqP7nFpaRyHA77EFYLuI2CiFt/EVee4FSfelwkKHLLkwl4X8CADscJz2JGvIOc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JrTqRSlg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PJJ3l/Uh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1E101F00899
-	for <linux-cifs@vger.kernel.org>; Wed, 14 Oct 2026 01:48:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1791942513;
-	bh=bNhxfSO3PykIeoiJNaMKeGlO/pELpsMJqXv0MoaMiE0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=PJJ3l/Uha05+9M/TwxqaykQtC6iwaDjOcJ/lJu1mD1iy06B0iPRzQM2fLuP2/sFli
-	 mEoTBhf7f0ifcv01V1PuLYDUC+b0lWiD1Cz54fRIz+b6euKXgH1BM8AEWxHsErcx4p
-	 gb+MX06RiS4c4UdZ03t2anEdumkHBoPuJG+YKY3ayWiUmH/1PUi/wu5syyjlipTiqP
-	 1s3h5xesV6+D7cUZZ+eueQoSKjm4SWzxbl7stFg7xbUkQKzfGsLEsbd4mFJrz0Z9dw
-	 ylW/VZuSPI9aMtN28QRKgq0D7nxvNWHbfx1odznzBXhL8TBfuEdzhGlTgLzyic/pRp
-	 RxBgXZmX+00Tg==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c2e8c710847so444424866b.0
-        for <linux-cifs@vger.kernel.org>; Tue, 13 Oct 2026 18:48:33 -0700 (PDT)
-X-Gm-Message-State: AFq9FYIMoIgRAorTBV9fG2Nx23Im1XdMvnmhfAwKnDTcUh5FEfcPUDU6
-	j4oMaZkML76m80VE5Jvf2ksrmOJV2NC1h9w2vECJQh82g0gwLC/HwhSdma4R3DkO2z2lCG3KhzQ
-	3PCosLWYv56lprf6T5v9QQW0d+2K9f54=
-X-Received: by 2002:a17:907:9816:b0:c2e:378c:8ceb with SMTP id
- a640c23a62f3a-c31a9fa39abmr1344030866b.36.1791942512575; Tue, 13 Oct 2026
- 18:48:32 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JrTqRSlg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1791971150;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=psHmh+mmjF/vIp3ChRxGhlRhpQq6TSm83eNrdquwHxw=;
+	b=JrTqRSlg9U7WqHcm/+jjdgD9KpM80Qg69iZKL0HrnAkQso6/1CgBD0WJa5R+BjoL7B0vFb
+	VXSzNECXleSnwXtQWU8l/IrmNHUVhI40klFMtgatoQbmdP2797JPgAS9zdc18G3P/FdLdu
+	5mriKjCH+RCT2VLmvzBTC9LeOp/T5aI=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-524-o3tIefQBPv-FG1zUwHrgIw-1; Wed,
+ 14 Oct 2026 09:45:38 +0000
+X-MC-Unique: o3tIefQBPv-FG1zUwHrgIw-1
+X-Mimecast-MFC-AGG-ID: o3tIefQBPv-FG1zUwHrgIw_1791971135
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 396ED19560B2;
+	Wed, 14 Oct 2026 09:45:34 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.11])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 696E830000E3;
+	Wed, 14 Oct 2026 09:45:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20261013.cachefiles-partial-zeros-trace.pchmelar@innovatrics.com>
+References: <20261013.cachefiles-partial-zeros-trace.pchmelar@innovatrics.com> <20260910220242.2165023-1-dhowells@redhat.com> <20260910220242.2165023-5-dhowells@redhat.com> <20261011.cachefiles-partial-zeros.pchmelar@innovatrics.com> <1655268.1791878098@warthog.procyon.org.uk>
+To: Petr Chmelar <petr.chmelar@innovatrics.com>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 4/5] cachefiles: Don't rely on backing fs storage map for most use cases
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1791865501.git.rakukuip@gmail.com> <0f3d431d65a5f46c0487293d127e748775ca85b8.1791865501.git.rakukuip@gmail.com>
-In-Reply-To: <0f3d431d65a5f46c0487293d127e748775ca85b8.1791865501.git.rakukuip@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 14 Oct 2026 10:48:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9XUxmA_feJJePfFu1YDkZ6_n2SPpYEV+TA+_eWyuL-6Q@mail.gmail.com>
-X-Gm-Features: AclHuK9MKhT_u8pnv3FeWTi7d6jQazECqsT-hoiVko2PFuIYi3DwhYPtt_IYrqM
-Message-ID: <CAKYAXd9XUxmA_feJJePfFu1YDkZ6_n2SPpYEV+TA+_eWyuL-6Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] cifs: fix buffer overflow in SMB2_tcon
-To: Ren Wei <n05ec@lzu.edu.cn>
-Cc: linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	pc@manguebit.org, ronniesahlberg@gmail.com, sprasad@microsoft.com, 
-	tom@talpey.com, bharathsm@microsoft.com, jlayton@kernel.org, 
-	smfrench@gmail.com, bird@lzu.edu.cn, rakukuip@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1995692.1791971125.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Oct 2026 10:45:25 +0100
+Message-ID: <1995693.1791971125@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Oct 14, 2026 at 2:16=E2=80=AFAM Ren Wei <n05ec@lzu.edu.cn> wrote:
->
-> From: Luxiao Xu <rakukuip@gmail.com>
->
-> In SMB2_tcon(), unc_path is allocated with a fixed buffer size of
-> MAX_SHARENAME_LENGTH * 2 bytes (672 bytes). However, the user-controlled
-> UNC path (tree) length is passed to cifs_strtoUTF16(), which assumes the
-> destination buffer is large enough and writes strlen(tree) + 1 UTF-16 cod=
-e
-> units.
->
-> Commit 62a1a439e0fd ("cifs: clean up handling of unc=3D option") removed =
-the
-> length check on UNC mount options, allowing mount paths to exceed
-> MAX_SHARENAME_LENGTH while retaining the fixed-size buffer allocation in
-> SMB2_tcon(). Consequently, an oversized UNC string causes cifs_strtoUTF16=
-()
-> to write past the end of the heap object, resulting in a slab-out-of-boun=
-ds
-> write.
->
-> Fix this by dynamically allocating unc_path based on the length of tree s=
-o
-> that it safely accommodates all UTF-16 code units.
->
-> Fixes: 62a1a439e0fd ("cifs: clean up handling of unc=3D option")
-> Cc: stable@vger.kernel.org
-> Reported-by: Xin Liu <bird@lzu.edu.cn>
-> Assisted-by: LLM
-> Signed-off-by: Luxiao Xu <rakukuip@gmail.com>
-> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks.
+Does the attached fix the problem?
+
+David
+---
+diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+index cc1b00f301d2..c0157f9a338d 100644
+--- a/fs/netfs/buffered_read.c
++++ b/fs/netfs/buffered_read.c
+@@ -379,7 +379,7 @@ static void netfs_read_to_pagecache(struct netfs_io_re=
+quest *rreq)
+ 		}
+ =
+
+ 		subreq->start	=3D start;
+-		subreq->len	=3D size;
++		subreq->len	=3D len;
+ 		if (copy)
+ 			__set_bit(NETFS_SREQ_COPY_TO_CACHE, &subreq->flags);
+ =
+
