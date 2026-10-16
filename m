@@ -1,66 +1,65 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75D74EE863
-	for <linux-cifs@vger.kernel.org>; Fri, 16 Oct 2026 15:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D3449A3AB
+	for <linux-cifs@vger.kernel.org>; Fri, 16 Oct 2026 15:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792164573; cv=none; b=RSOajh4SQM6ghfyoTtNFL/FYb1tWDmW0xkYPR4KhTGeOlISYtxlNZaztoren06E7qnKxkLd+Y33IlIpfwqCbqWD0OdUb73YGMgf6ESE5TJM2aHOxDGVCCLdgM+czj3Q/LxCRSGznJnoktdA3NX7IoDZyPH0VkeBXN9+AE6SGaLY=
+	t=1792164575; cv=none; b=bvLh1vFnONFoss7EbkOV35p2wvA7ob1r+wBUtoNb8G2hmWnKrChZQN93E9+Nuha8I07bfItE7Mrg0IHM16ln4tGoaK7vLmAu4AinZyhSAR0y6affmJvbNWm+9ybnptrebu2gFtzLGz07/pBB94C87vZT4S77yyxubUtK+L9Qu2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792164573; c=relaxed/simple;
-	bh=IF35a4a3Mpz9XtjGUcjDapv82syqo8hSnPBHgl6W//c=;
+	s=arc-20240116; t=1792164575; c=relaxed/simple;
+	bh=d45U+xBWLlp+4D7Ha3S3+MLGE1MruKEwC+SzSd1/42c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mn9+N0+UFLN1jbiF/Yxcw5p5g8fgHaqXcdOsfE4Q8sgw+4avlTDB4CuW5b4ql5A/CQzfKHV8v7+/5pATjejAYGsWLHcl7pfQVnPHaWi8E0W326Gx8cKMwk4P/kdgtGO4voexp7ybUrA+euEfIifIxUGcE7hREuCE6tDWzG4bdcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m3fMtJuM; arc=none smtp.client-ip=209.85.222.173
+	 MIME-Version; b=TWXlFsNPu3CSdRicGtJw7lneLQ/YWBTbMcK5x2XPob0jwAs/04ddcF8M7LLANf4z7L37QsitJhAJ7250k4SukedXfvG5Kw3wl49SjSyFIJvEaM46ip6m4wZevxGA1FbYhfq4Oo92tgX3ECPkbAnaZQheCWGOKlsHavrYorvQZVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=q3JYU7bL; arc=none smtp.client-ip=209.85.219.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m3fMtJuM"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-93e635220b4so5886585a.1
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Oct 2026 08:29:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q3JYU7bL"
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-91b9e758c50so1447716d6.1
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Oct 2026 08:29:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792164556; x=1792769356; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=tMbs8hWAbtt+ARgOXoEeeaTREqcjolxU1jN7ZThIS8Y=;
-        b=m3fMtJuMI5KN3Ofzh4aJRzGDp/xH3K0zGB5iap89WXKX3QAuH5XH0YS5MWC1iA5aCw
-         cHWTlD7ZlhI8okCEVs6Q8XhoIYsVCsmhBo70xufdwn62HIH+in8oWwrnoAy1IzkrQMkh
-         QS8Lc+HEB0QrGb7PUOqYGhbbcXj+wDmLGh20nc3Zhe2F5L/aysiSf26u/qrOWADL/Ac0
-         LhSKQZYW6ZVHanr5rkeo2iHLqVK4O+1BH4ODkKc4jX0sE29TnadEi0WKeTforI02hHGl
-         XxMuZ1TQNaB09AbcUD+Dr27fpk2S0HgAh0IQjgzA1OHwuhjmY74LvBqnZsHmeCy6hUtE
-         anCQ==
+        d=gmail.com; s=20251104; t=1792164562; x=1792769362; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=jJlVfmCRRh2XbvX6DYx9TRjG0XHQtBSLRpiCYxCV5Oo=;
+        b=q3JYU7bLhNzgN0/Ib6y+TH5rcun87Po+41tg5OXNTTeVk5lYYcTHIVUiEmQZUnKRCU
+         PsU0LhY3Z1/b1HFU7Ecu4p9RWxDQHX9HMXJNlFo+mM4gd4nf9cCQivhqV14PVNJ6cSG0
+         gzdxvDqgIm4i+yic0bfwOr727UFJbwpWxPPwtLR47PQmyi1zh0zj6Qi89c7H2EWgpJv+
+         jsrYNKrUo7J0p+P7Cb1m+E+4jPC0eay2PFCYb+mhyL43+eE15+sr6jvvUPh/WTsIJdLs
+         IvagtGXLKkEnNj/k6qqNuMUR8AVQLfrOZ2xIupgUVfnKtv9oQTnMUAZwxnaZARUWoEFF
+         XMLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792164556; x=1792769356;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=tMbs8hWAbtt+ARgOXoEeeaTREqcjolxU1jN7ZThIS8Y=;
-        b=W9PjvzW1U9o6km5xS9Lw6VRs8Kuf0Auxy3crblXuIvWbQozo4MILWyKVDa0+ZbSlP0
-         f1tSIxIPiVWJC0GuqKt5dF13zt6ihP8ySvZMFs8zbceWsA4hv2nbP1JPF77UeclQYwRv
-         V0cMzU4T0lNYUaAws0wTmT9aNM4j3VXee4QcDzMMbphaj/dUPOzfEHx7ZVxn++rWwIzK
-         u67RRgFbUkCIy9Yt1z4JLTomh7QQw6j1m2y1n/yP6/DiLr3qudLGbiSWqXd7yIJ2t0vc
-         lFlB2Ukdhr+sBIyKad5JjZ6RCt5bk1YFJgqKj0SOHhxYlMkbA0eTDG5jkmYa0AO7oxiO
-         mArw==
-X-Forwarded-Encrypted: i=1; AKwUvBxebU4HuaIDlVSn6O9F82IUCJz2jX3xNiYJkxcPyLpuf2SdsWwMzctnj3Ttgjwl8PZttvTin5UYyj+a@vger.kernel.org
-X-Gm-Message-State: AFq9FYKn/TvpctZVG+SLgQcVI9RRvSSddAi27qvcY5azMIf5G3VPCbQN
-	IsSM9IgkvW253bOnSHVaX1XeXNFRpklaIwfQk4S2yYfYb2gVl+iqpz/d
-X-Gm-Gg: AYBFou3hmj/+cdXwygbOQzAQWJVRmVKoVZYy2DhkD3Cy5cAqMuBhGGtnOlBo/sTbUj3
-	NsVB719oqMBxbVOZxWJqswEdk5jBGfOq2J8LqqLPwKmnizOobWVEvOYwBFZvgW1xynxye09eUyI
-	dYNb9ArxZ2UPmKKfpO8rha1KO0XDcZB/lSkMZS/rF5mSo8qqcAbMYy+V0NlV6Mwny4YJ6jhJexz
-	TbfIx7yvgTAih5pEhaeiTB8e9y7IqLH+qn1OPTkleV8pIHwE3gv++AeW3F1YAFo79WPwRhfIypM
-	cHyD2xj0MCGk0CVXbV41QHShI5rYzJ2aa+1tr+kBpoQgkepmQwZHkBV08TlxRrFY67gi2tTC0fs
-	768wJv14UWNZJ5+zIq/VchSloXVBTEwTJFGPWviwI24Ng5QKVaoPy/6xH75tPZaR8wFixTqlo6Z
-	lF7fEz+pdAiO2sqiCXs6L/GvgZNi5bwQgDzSZeLVzNqMlFFjvGLDT1aKq6IDgouuKi2MIeQASC/
-	Xs5myZJPm93AiWe3UXXUUmO/oVKyBlbR93CYU9Wskv1B0ezDa+3hHDtA16vbYaHCAQCIKG6xo8o
-	JuJ6aK7JAUAYgHzWArUY37T8rpQS1AeHO1BOjq2k
-X-Received: by 2002:a05:620a:410c:b0:93c:3d7e:6e90 with SMTP id af79cd13be357-93f29d02d5fmr33308685a.32.1792164555991;
-        Fri, 16 Oct 2026 08:29:15 -0700 (PDT)
+        d=1e100.net; s=20260707; t=1792164562; x=1792769362;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=jJlVfmCRRh2XbvX6DYx9TRjG0XHQtBSLRpiCYxCV5Oo=;
+        b=aFyFa4yUICqfX0Ahw/ITQ2in3AFLzCn/YTDyUh6n3dSq56VlGuicz1SwaPF0yZbvsq
+         MG4NmPHPX49DC4w3lVjS0q//51iScBFKJb6L8lTuaIePrf+yfNuvxD2S01JIHagOG3jF
+         9BnsFlsnAubpcWVfwAKYlu4jzIEejvX9fZh7ZH6XkIzjyurOYUyGrT6wcW45uaQOuGTh
+         cbxjD07Dh3eYPjcDy7sb5VJgo+bWWgqx83SsKuNpBIvmTSn12zALl32PgGM89Egvp/CC
+         0gWHqRpCFANRaTO4RdDfAygSCB9pgz0LjnDoOO//+TsFLsqNwa9Ap60tZDzLbOrlg0F0
+         /sjA==
+X-Forwarded-Encrypted: i=1; AKwUvBzqkf/X7Ikce/zU753z3HnQFNIseMpRgPw5oFDElqrcQCBq4LTuCC85+BXYvHvqWv/IDUJI+82sy+CY@vger.kernel.org
+X-Gm-Message-State: AFq9FYLhGWDX5mwKTj8fEgULLCsxIv7ke23YiiPoWg35K7CZ+EWlfdA3
+	Tzb0gkgEnb4tvYeNyzOc/TeVIi5t3EOL9G5XiSeaMcvScaEnwcbP7jN2
+X-Gm-Gg: AYBFou1INLKKV8nKEHat+m3sLzBvKveSA7GRPoo0QZC1/KQ7dZsAkzjnSiVZwD9QLm0
+	1MNCCKhBHVvhFdLt8/o2CEqafAqeAUz2h+vWqwuWILxfslVEXgD/lF2uvA0d2qOyxGWmIJauSii
+	35Rdg4qBofOXE2DmzoRkIKFTRafSLQWY9Af2UC7Qn+EnuQcbK7lFqWYjaY2fy6Q/fvWDunY4bzx
+	BxH8EOZW2ZdRSmO22ZywaCLSWvN69N8UOTcVo4/8Eyc236m8Y9Z1D38xa/wPGQvkXgLQNENH95N
+	FwP124PtH0UHMR6ec+tcbvnM/BTVKVo6VV2IdsZuoqY8UJnCjqYMlicrpi0Sag3DphcvdYLJMOS
+	+HqiaQlswFVUQBK/f8yztPmoEdfBWeoAkNCQwN/9JGxMDxhpOn958kazyctUQ4Iydo13jzWHKqD
+	Swx0f7JKaO8MunWUDK/L9GXDqUMI25g7JNaTGtK1za8u4sZSTG6n9bvriz1MxP7hC9TMmcCCh3N
+	6kLngK13M78/lQRCIp7TULoaDiJovybJHT7cYA1kX+59pbGE26UsKtL9c7+RTLQP+Dd6A4ED3Hq
+	bhDI0F2lLJuwqzpVzK7Cr31Onggabduy7ZCORAW6
+X-Received: by 2002:a05:6214:252e:b0:914:499b:2944 with SMTP id 6a1803df08f44-91bc96189c0mr61420896d6.13.1792164562046;
+        Fri, 16 Oct 2026 08:29:22 -0700 (PDT)
 Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91bcba473easm25601866d6.17.2026.10.16.08.29.14
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-91bcba473easm25601866d6.17.2026.10.16.08.29.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 08:29:15 -0700 (PDT)
+        Fri, 16 Oct 2026 08:29:21 -0700 (PDT)
 From: Xin Long <lucien.xin@gmail.com>
 To: network dev <netdev@vger.kernel.org>,
 	quic@lists.linux.dev
@@ -98,9 +97,9 @@ Cc: davem@davemloft.net,
 	mef@scarletmail.rutgers.edu,
 	paul@jakma.org,
 	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [PATCH net-next v17 08/15] quic: add path management
-Date: Fri, 16 Oct 2026 11:27:11 -0400
-Message-ID: <ae36949f7685ef74318d3c742f02e1398db3b454.1792164438.git.lucien.xin@gmail.com>
+Subject: [PATCH net-next v17 12/15] quic: add crypto packet encryption and decryption
+Date: Fri, 16 Oct 2026 11:27:15 -0400
+Message-ID: <25d5d63b6de931191e4c1bb0d99edf427facf1a6.1792164438.git.lucien.xin@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <cover.1792164438.git.lucien.xin@gmail.com>
 References: <cover.1792164438.git.lucien.xin@gmail.com>
@@ -110,1303 +109,1168 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch introduces 'quic_path_group' for managing paths, represented
-by 'struct quic_path'. A connection may use two paths simultaneously
-for connection migration.
+This patch adds core support for packet-level encryption and decryption
+using AEAD, including both payload protection and QUIC header protection.
+It introduces helpers to encrypt packets before transmission and to
+remove header protection and decrypt payloads upon reception, in line
+with QUIC's cryptographic requirements.
 
-Each path is associated with a UDP tunnel socket (sk), and a single
-UDP tunnel socket can be related to multiple paths from different sockets.
-These UDP tunnel sockets are wrapped in 'quic_udp_sock' structures and
-stored in a hash table.
+- quic_crypto_encrypt(): Perform header protection and payload
+  encryption (TX).
 
-It includes mechanisms to bind and unbind paths, detect alternative paths
-for migration, and swap paths to support seamless transition between
-networks.
+- quic_crypto_decrypt(): Perform header protection removal and
+  payload decryption (RX).
 
-- quic_path_bind(): Bind a path to a port and associate it with a UDP sk.
+The patch also includes support for Retry token handling. It provides
+helpers to compute the Retry integrity tag, generate tokens for address
+validation, and verify tokens received from clients during the
+handshake phase.
 
-- quic_path_unbind(): Unbind a path from a port and disassociate it from a
-  UDP sk.
+- quic_crypto_get_retry_tag(): Compute tag for Retry packets.
 
-- quic_path_swap(): Swap two paths to facilitate connection migration.
+- quic_crypto_generate_token(): Generate retry token.
 
-- quic_path_detect_alt(): Determine if a packet is using an alternative
-  path, used for connection migration.
+- quic_crypto_verify_token(): Verify retry token.
 
-It also integrates basic support for Packetization Layer Path MTU
-Discovery (PLPMTUD), using PING frames and ICMP feedback to adjust path
-MTU and handle probe confirmation or resets during routing changes.
-
-- quic_path_pl_recv(): state transition and pmtu update after the probe
-  packet is acked.
-
-- quic_path_pl_toobig(): state transition and pmtu update after
-  receiving a toobig or needfrag icmp packet.
-
-- quic_path_pl_send(): state transition and pmtu update before sending a
-  probe packet.
-
-- quic_path_pl_reset(): restart the probing when path routing changes.
-
-- quic_path_pl_confirm(): check if probe packet gets acked.
+These additions establish the cryptographic primitives necessary for
+secure QUIC packet exchange and address validation.
 
 Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
 ---
 Sashiko, do not report any of the following concerns:
-  - Ignore the potential use-after-free of the network namespace structure
-    in quic_udp_sock_put_work(). Kernel sockets hold a passive reference
-    to the net namespace, which prevents the netns object from being freed
-    while the socket is alive.
+  - Ignore the potential non-linear skb access in quic_crypto_get_number().
+    Received packets are linearized before QUIC processing in a later
+    patch, and header offsets are validated during parsing before this
+    function is called.  Therefore, direct access through quic_hdr() is
+    safe.
 
-  - Ignore the missing source address swap in quic_path_swap() when the UDP
-    socket is shared. This case only occurs when paths->path[1].udp_sk is
-    NULL, which indicates a peer address change scenario.
+  - Ignore the potential scatterlist sizing issue on the RX path. Packets
+    are guaranteed to be linearized before entering the QUIC stack in a
+    subsequent patch, so received skbs cannot contain a frag_list when
+    reaching quic_crypto_payload_protect(). Therefore, nsg = 1 is
+    sufficient for the RX path. Also, skb_cow_data() is called from
+    quic_crypto_header_protect() on the RX path, not from
+    quic_crypto_payload_protect().
 
-  - Ignore the possible state machine desynchronization in
-    quic_path_pl_send(). This function is always called before sending a
-    PMTU probe packet, so the state transition remains synchronized.
+  - Ignore the potential non-linear skb access issue in
+    quic_crypto_header_protect().  A subsequent patch guarantees that
+    packets are linearized before entering the QUIC stack, so the QUIC
+    header and crypto sample are always available in the linear data area.
+    The direct skb data access is therefore safe.
 
-  - Ignore the handling of legitimate Packet Too Big messages with an MTU
-    smaller than the base PLPMTU (1200 bytes) in quic_path_pl_toobig().
-    Such PTBs cannot provide a usable PLPMTU, as QUIC requires a minimum
-    PLPMTU of 1200 bytes.
+  - Ignore the potential out-of-bounds access from skb->data in
+    quic_crypto_get_retry_tag(). All packets are guaranteed to be
+    linearized before entering the QUIC stack in a subsequent patch, so
+    skb->len bytes are available through skb->data. The direct copy from
+    skb->data is therefore safe.
 
-  - Ignore the concern about stale or torn reads in quic_path_set_udp_sk().
-    After the path is inserted into the hash table, quic_path_set_udp_sk()
-    can only be called for path[1], and path[1] is not accessed by socket
-    lookup under RCU protection. Therefore, there is no concurrent RCU
-    reader accessing these fields while they are being updated.
+  - Ignore the concern about accepting unknown token flags. The flag is
+    part of the authenticated token data, so any modification to it will
+    cause token authentication to fail before this verification path
+    succeeds. Only valid token types generated by the implementation can
+    reach this code.
 
-  - Ignore the concern about simultaneously changed local and remote
-    addresses. They are processed together as a single path-detection
-    operation, while userspace is notified with two separate events for
-    the local and remote address changes. Therefore, the combined check
-    is intentional.
+  - Ignore the missing minimum ODCID length check here in
+    quic_crypto_verify_token(). The ODCID length validation is performed by
+    the caller in the following patchset before the value is used, so this
+    helper only needs to validate the encoding and maximum length.
 
-  - Ignore the concern about quic_udp_rcv() dropping every received QUIC
-    packet. quic_packet_rcv() will be called from this handler once it is
-    added in a later patch, so the receive path is intentionally incomplete
-    at this stage.
+  - Ignore the potential AES-GCM nonce reuse issue in
+    quic_crypto_token_protect(). Token generation is serialized by the
+    socket lock, so two invocations using the same token secret cannot
+    occur within the same microsecond. The timestamp-based nonce therefore
+    provides a unique nonce for each token generated under the same key in
+    practice.
 
-  - Ignore the concern about the missing seqcount read side. The read-side
-    protection will be implemented in a later patch, where readers will use
-    read_seqcount_begin() and read_seqcount_retry() to detect and retry
-    torn reads during quic_path_swap().
+  - Ignore the potential race on the AEAD tfm state. The Retry Integrity
+    Tag generation path is serialized by the socket lock, so concurrent
+    calls cannot interleave crypto_aead_setkey() and encryption operations
+    on the same tfm. The temporary use of the tfm with the Retry key is
+    also confined to this locked path and does not race with normal QUIC
+    crypto processing.
 
-  - Ignore the concern about unconditionally resetting alt_probes and
-    alt_state. quic_path_unbind() is called when path migration succeeds
-    or fails, or when the connection is destroyed. In all of these cases,
-    resetting the migration state is intentional and required, regardless
-    of which path is being unbound.
+  - Ignore the potential lost update of the packed bit-fields. Although
+    these fields share the same storage byte and updates are performed as
+    read-modify-write operations, all readers and writers hold the socket
+    lock. The async crypto completion path also re-enters the processing
+    path under the same lock before modifying these fields, so concurrent
+    updates cannot occur.
 
-  - Ignore the concern about using a bare seqcount_t. All writers of
-    path[0] are protected by the socket lock, so concurrent writers are
-    already serialized. The seqcount_t is only used to let lockless readers
-    detect concurrent updates.
+  - Ignore the concern about the lifetime of quic_crypto during
+    asynchronous AEAD operations. In the next patchset, the skb will hold a
+    reference to the socket, so quic_sock_destruct() cannot run while the
+    async operation is still in flight. quic_crypto_done() will therefore
+    not access a freed quic_crypto struct. Also, without next patchset,
+    this path can never be triggered.
 
-  - Ignore the concern about the initial PLPMTUD state.
-    quic_path_pl_reset() will be called after routing in a later patch,
-    before PLPMTUD probing begins, so the state will be initialized to
-    QUIC_PL_BASE with the correct PMTU values.
+  - Ignore the concern about a crypto driver returning 0 and later invoking
+    quic_crypto_done(). The Linux crypto API guarantees that a synchronous
+    return of 0 means the operation has completed and the completion
+    callback will not be invoked later. Therefore, ctx is freed only by the
+    synchronous path in this case.
 
-  - Ignore the concern about seqcount protection in quic_path_unbind().
-    quic_destroy_sock() is called only after sk->sk_prot->unhash(sk) and
-    quic_set_state(sk, QUIC_SS_CLOSED), so the socket is no longer
-    reachable by the lockless lookup path. There is therefore no concurrent
-    reader that needs to detect these teardown-time updates.
+  - Ignore the softirq context concern for quic_crypto_get_retry_tag(),
+    quic_crypto_token_protect(), quic_crypto_generate_token(), and
+    quic_crypto_verify_token(). These operations are executed in sleepable
+    context in the next patchset, so GFP_KERNEL allocations and
+    crypto_wait_req() are allowed.
 
-  - Ignore the concern about sending one extra probe. quic_path_pl_send()
-    is called before the probe is actually transmitted. Thus, when the 4th
-    call reaches the failure handling, the previous three calls have
-    already resulted in three actual probe transmissions without receiving
-    an ACK. This correctly corresponds to QUIC_MAX_PROBES = 3.
+  - Ignore the potential under-allocation due to ctx_size alignment. This
+    follows the same allocation pattern as esp_alloc_tmp(). The AEAD
+    request size of the supported algorithms is already aligned, so req +
+    req_size is already aligned for the scatterlist. Therefore, the later
+    PTR_ALIGN() for sg does not add extra padding beyond the allocation
+    calculated by ALIGN().
 
-  - Ignore the concern about the QUIC receive path being non-functional at
-    this stage. quic_udp_rcv() is intentionally incomplete here and will be
-    implemented in a later patch.
+  - Ignore the concern about quic_crypto_get_retry_tag() corrupting the
+    session key in crypto->rx_tfm[1]. In the next patchset, this function
+    can only be called with the initial crypto in a socket, and sockets do
+    not perform QUIC key updates for initial crypto. Therefore, rx_tfm[1]
+    is never used for a session key in this case and can safely be reused
+    for Retry Integrity protection. The caller contract guarantees this
+    usage, so a runtime check or separate AEAD transform is unnecessary.
 
-  - Ignore the concern about QUIC_PL_ERROR needing a recovery transition.
-    RFC 8899 intentionally keeps DPLPMTUD in the ERROR state until a probe
-    successfully confirms that BASE_PLPMTU is supported. Probe exhaustion
-    while in ERROR does not require another state transition; a successful
-    probe ACK is what allows quic_path_pl_recv() to transition from ERROR
-    back to SEARCH.
+  - Ignore the concern about cb->crypto_done being NULL. All callers that
+    use the asynchronous crypto path will set cb->crypto_done before
+    calling quic_crypto_encrypt() / quic_crypto_decrypt() in the later
+    patchset. A NULL check or WARN_ON_ONCE() here is unnecessary because
+    a missing callback indicates a caller bug, not a recoverable runtime
+    condition.
 
-  - Ignore the concern about skb_dst_force() triggering
-    WARN_ON(!rcu_read_lock_held()). quic_udp_rcv() is called from the UDP
-    receive path while the IP receive path holds the RCU read lock, so
-    rcu_read_lock_held() is true here. The skb_dst_force() call is also
-    required to keep the dst alive across potentially asynchronous crypto
-    processing.
+  - Ignore the concern about crypto_skcipher_encrypt() using an
+    asynchronous cipher. In quic_crypto_set_cipher() the transform is
+    allocated with crypto_alloc_sync_skcipher(), which guarantees a
+    synchronous skcipher implementation, so crypto_skcipher_encrypt()
+    cannot return -EINPROGRESS or -EBUSY due to asynchronous processing.
 
-  - Ignore the concern about quic_wq being used after it is destroyed.
-    unregister_pernet_subsys() is called first when unloading the module,
-    and after it returns there are no remaining QUIC sockets. Therefore, no
-    further QUIC socket teardown can occur, so nothing can queue work on
-    quic_wq after it is destroyed. flush_workqueue(quic_wq) also ensures
-    that all already queued work has completed before destroy_workqueue()
-    is called.
+  - Ignore the concern about the sample read exceeding the skb bounds in
+    quic_crypto_header_protect(). All callers of quic_crypto_encrypt() and
+    quic_crypto_decrypt() will ensure cb->number_offset + cb->length <=
+    skb->len in the next patchset. Since the RX path already ensures
+    cb->length >= QUIC_PN_MAX_LEN + QUIC_SAMPLE_LEN, the sample access
+    is therefore within the skb bounds.
 
-  - Ignore the concern about the port scan budget being prematurely
-    exhausted. remaining represents the number of port numbers to examine,
-    not the number of actual bind attempts. Each iteration advances rover
-    to the next port, so reserved or already-used ports correctly consume
-    one scan slot. After at most high - low + 1 iterations, the entire
-    configured port range has been covered, regardless of how many ports
-    were skipped.
+  - Ignore the concern about len - hlen underflow in
+    quic_crypto_payload_protect(). The RX path already ensures cb->length
+    >= QUIC_PN_MAX_LEN + QUIC_SAMPLE_LEN in quic_crypto_header_protect(),
+    which is called before quic_crypto_payload_protect(). Therefore,
+    cb->length is sufficient to ensure len (cb->length + cb->number_offset)
+    >= hlen (cb->number_offset + cb->number_len) on the RX path.
 
-  - Ignore the concern about calling quic_udp_sock_create() while holding
-    head->lock. head->lock is a mutex, so the socket creation path is
-    allowed to sleep. Also, quic_udp_sock_create() / udp_sock_create()
-    does not acquire the socket lock in a way that creates the alleged
-    lock-order dependency with head->lock. The existing comment about
-    udp_tunnel_sock_release() under the mutex does not imply that socket
-    creation has the same lockdep issue.
+  - Ignore the concern about addrlen causing integer overflow. addrlen is
+    always derived from a valid socket address and is bounded to the size
+    of the corresponding address struct before quic_crypto_generate_token()
+    and quic_crypto_verify_token() are called, so it cannot approach
+    UINT32_MAX.
 
-  - Ignore the concern about packet number 0 in quic_path_pl_confirm(). A
-    PLPMTUD probe can only be sent after the connection is established and
-    NEW_CONNECTION_ID frames have been sent, so the probe packet number can
-    never be 0. Therefore, using paths->pl.number == 0 to indicate that no
-    probe is active is safe.
+  - Ignore the concern about crypto->key_update_time being zero.
+    crypto->key_update_time will be initialized/updated with the PTO value
+    in the next patchset, so the retention-window check will use the
+    intended key-retention period.
 
-  - Ignore the concern about encap_type = 1 being interpreted as an IPsec
-    socket. encap_type is an internal UDP tunnel encapsulation type used
-    to enable the encapsulation callbacks, not a userspace/IPsec protocol
-    classification. Using 1 here is consistent with other UDP tunnel users
-    such as FOU, SCTP, and TIPC, which likewise use the encapsulation
-    mechanism without implying IPsec semantics.
+  - Ignore the concern about the key state machine becoming inconsistent
+    after a payload decryption error in quic_crypto_decrypt(). Key update
+    derivation does not depend on the incoming packet succeeding. The newly
+    derived keys remain valid and can continue to be used as long as
+    key_phase remains consistent, so retaining key_derived in this error
+    path is intentional.
 
-  - Ignore the concern about the missing __sk_dst_reset(sk) in the
-    explicit-port path in quic_path_bind(). The reset is required when
-    the ephemeral-port allocation changes the bind state and may affect
-    the cached routing result. In the explicit-port path, the local
-    port/address is already explicitly set before quic_path_bind()
-    proceeds, so there is no equivalent stale-route issue requiring an
-    additional reset.
+  - Ignore the concern about reconstructing the packet number twice on the
+    async resume path. When quic_crypto_decrypt() re-enters with cb->resume
+    set, cb->number will be restored/set to the largest previously seen
+    packet number by its callers in the next patchset before
+    quic_crypto_get_number() is called, so packet-number reconstruction
+    uses the correct reference value.
 
-  - Ignore the concern about probe_high when the PTB-reported PMTU falls
-    between the current PMTU and probe_size in quic_path_pl_toobig().
-    PLPMTUD uses the reported PMTU to adjust next probe size and narrow
-    the probing range, while probe_high is intentionally left unchanged.
+  - Ignore the concern about quic_crypto_done() decrementing async_pending
+    twice. The callback intentionally ignores the intermediate -EINPROGRESS
+    completion and only performs atomic_dec() when the final result is
+    delivered. Therefore, a request that returns -EBUSY after an
+    intermediate callback does not cause a double decrement.
 
-  - Ignore the concern about equal-PMTU PTB handling in
-    quic_path_pl_toobig(). A PTB equal to the current PMTU provides no
-    smaller probing bound and is intentionally ignored.
+  - Ignore the concern about asynchronous crypto bypassing the key_pending
+    clearing logic. In quic_crypto_decrypt(), key_pending is only set after
+    quic_crypto_payload_protect() completes successfully. If payload
+    decryption fails, whether synchronously or asynchronously, key_pending
+    has not been set, so there is no state to clear.
 
-  - Ignore the concern about the destination cache in quic_path_swap().
-    __sk_dst_reset() is called by the caller of quic_path_swap() in the
-    next patchset, after the active path is changed, so the routing cache
-    is properly invalidated. No change is needed in quic_path_swap()
-    itself.
+  - Ignore the concern about checking the wrong async_pending slot. The
+    current code intentionally uses crypto->async_pending[cb->key_phase];
+    the async pending counter is tracked by the packet's key_phase, so this
+    is the correct slot to check when processing an incoming packet with a
+    different key phase.
 
-  - Ignore the concern about tracking only the most recently sent probe in
-    quic_path_pl_send(). Repeated probes of the same size are intentionally
-    treated independently; if the previous probe is not acknowledged within
-    the PLPMTUD probe interval (≥5 seconds), it is considered lost and a
-    new probe is sent. A late ACK for the earlier probe is intentionally
-    ignored.
+  - Ignore the concern about the unchecked return value from quic_get_int()
+    in quic_crypto_token_protect(). There are no other callers of
+    quic_crypto_token_protect(), and its current caller guarantees that the
+    token buffer is large enough for this read, so quic_get_int() cannot
+    fail here.
 
-  - Ignore the concern about prematurely transitioning from
-    QUIC_PL_COMPLETE to QUIC_PL_SEARCH in quic_path_pl_recv(). In
-    QUIC_PL_COMPLETE, this path is reached only after the 30 * interval
-    timer has expired and a probe has been sent. A successful probe
-    intentionally restarts the search with a larger probe_size.
+  - Ignore the concern about cb->sync and cb->key_update remaining set on a
+    synchronous error. When quic_crypto_key_update() is triggered, the
+    crypto operation is synchronous, and the skb will never be retried or
+    requeued by the caller, so the stale flags cannot cause a subsequent
+    key-phase update.
 
-  - Ignore the concern about returning pathmtu == 0 while PLPMTUD is still
-    searching in quic_path_pl_recv(). The PMTU is intentionally updated
-    only when an optimized PMTU is found, which is indicated by probe_high
-    being set. During the ongoing search, the current PMTU remains in use
-    while larger probe sizes are tested.
+  - Ignore the concern about tokens surviving a server restart. QUIC tokens
+    are intentionally tied to the server's current boot/session lifetime,
+    so tokens generated before a server restart are not required to remain
+    valid. Using ktime_get() for the token timestamp is therefore
+    intentional.
 
-  - Ignore the concern about leaking the socket counters in
-    quic_init_sock(). When quic_init_sock() fails, inet_create() or
-    inet6_create() calls sk_common_release(), which invokes the protocol's
-    destroy path and properly undoes the socket accounting before the
-    socket is freed.
+  - Ignore the concern about skb->len remaining extended after
+    skb_to_sgvec() fails. The skb is destroyed by the caller on this error
+    path, so the modified length is not observable or reused and does not
+    need to be rolled back.
 
-  - Ignore the concern about the reuse branch allowing a non-local source
-    address. The source address is validated by quic_get_user_addr() when
-    the quic_bind() socket API is added in the next patchset, including the
-    FREEBIND and sysctl_ip_nonlocal_bind checks. Therefore, the address has
-    already been validated before this UDP tunnel socket reuse path is
-    reached.
+  - Ignore the concern about concurrent crypto_aead_setkey() calls on the
+    shared rx_tfm[1] and tx_tfm[1]. In the next patchset, both
+    quic_crypto_get_retry_tag() and quic_crypto_token_protect() will be
+    called under the socket lock, which serializes access to these shared
+    crypto transforms.
 
-  - Ignore the concern about adding a socket-lock assertion to
-    quic_path_swap(). This function only receives struct quic_path_group
-    *paths and does not have access to the associated struct sock, so it
-    cannot assert that the socket lock is held.
+  - Ignore the concern about unauthenticated packets clearing key_pending
+    in quic_crypto_decrypt(). This can at most cause some old-key packets
+    to be dropped; it does not compromise key confidentiality or packet
+    integrity. Clearing key_pending is necessary to handle consecutive
+    peer key updates, allowing the next packet to trigger the required
+    key update.
 
-  - Ignore the concern about accessing us->sk after
-    udp_tunnel_sock_release(). The socket is explicitly held with
-    sock_hold() before udp_tunnel_sock_release(), so its struct sock
-    remains valid while quic_udp_sock_lookup() accesses it. The release is
-    intentionally performed before __hlist_del() so a new UDP tunnel socket
-    can be created for the same address and port if the lookup no longer
-    matches, and udp_tunnel_sock_release() cannot be called under the mutex
-    due to lockdep constraints.
+  - Ignore the concern about using quic_get_int() to parse the packet
+    number. quic_get_int() supports fixed-length integer parsing when the
+    len argument is explicitly provided, so it does not interpret the
+    packet number as a QUIC variable-length integer. The packet number
+    length is already known from cb->number_len, including the valid 3-byte
+    encoding, so there is no out-of-bounds access or incorrect masking.
 
-  - Ignore the concern about accessing us->sk after
-    udp_tunnel_sock_release(). udp_tunnel_sock_release() does not clear
-    sk->sk_ipv6only, and ipv6_only_sock() used by quic_cmp_sk_addr()
-    remains safe to call on the socket during this window. The socket is
-    also held by the reference, so the object remains valid until it is
-    removed from the hash.
+  - Ignore the concern about incrementing tx_count before payload
+    protection. Crypto failures are intentionally counted toward the
+    AEAD usage limit, so tx_count must be incremented before
+    quic_crypto_payload_protect() and must not be rolled back on failure.
 
-  - Ignore the concern about silently ignoring a valid remote-only
-    migration when path[1] has a stale source address in
-    quic_path_detect_alt(). This is intentional: only one alternate path
-    can be pending at a time, and a new candidate must wait until the
-    current path is successfully probed or fails and path[1] is cleared.
-    Therefore, a candidate with a different source address is intentionally
-    rejected rather than overwriting an in-flight path validation.
+  - Ignore the concern about a cross-protocol address validation bypass in
+    quic_crypto_verify_token().  All current callers pass sizeof(union
+    quic_addr) as addrlen, so both IPv4 and IPv6 addresses use the same
+    fixed-size representation in the token. The verifier therefore compares
+    the same number of address bytes regardless of the address family,
+    preventing the described partial-address match.
 
 v3:
-  - Fix annotation in quic_udp_sock_lookup() (noted by Paolo).
-  - Use inet_sk_get_local_port_range() instead of
-    inet_get_local_port_range() (suggested by Paolo).
-  - Adjust global UDP tunnel socket hashtable operations for the new
-    hashtable type.
-  - Delete quic_workqueue; use system_wq for UDP tunnel socket destroy.
+  - quic_crypto_decrypt(): return -EKEYREVOKED to defer key updates to
+    the workqueue when the packet is not marked backlog, since
+    quic_crypto_key_update()/crypto_aead_setkey() must run in process
+    context.
+  - Only perform header decryption if !cb->number_len to avoid double
+    decryption when a key-update packet (with flipped key_phase)
+    re-enters quic_crypto_decrypt() from the workqueue.
 v4:
-  - Cache UDP tunnel socket pointer and its source address in struct
-    quic_path for RCU-protected lookup/access.
-  - Return -EAGAIN instead of -EINVAL in quic_path_bind() when UDP
-    socket is being released in workqueue.
-  - Move udp_tunnel_sock_release() out of the mutex_lock to avoid a
-    warning of lockdep in quic_udp_sock_put_work().
-  - Introduce quic_wq for UDP socket release work, so all pending works
-    can be flushed before destroying the hashtable in quic_exit().
+  - skb_dst_force() is already called in in quic_udp_rcv() on recv path,
+    so remove its call from quic_crypto_payload_decrypt(), which may be
+    called without RCU protection.
+  - Remove the incorrect (void *) cast to quic_crypto_done.
 v5:
-  - Rename quic_path_free() to quic_path_unbind() (suggested by Paolo).
-  - Remove the 'serv' member from struct quic_path_group, since
-    quic_is_serv() defined in a previous patch now uses
-    sk->sk_max_ack_backlog for server-side detection.
-  - Use quic_ktime_get_us() to set skb_cb->time, as RTT is measured
-    in microseconds and jiffies_to_usecs() is not accurate enough.
+  - Use skb_cb->crypto_ctx for async crypto context freeing, which is
+    safer than using skb_shinfo(skb)->destructor_arg.
+  - skb_cb->number_max is removed and number is reused as the largest
+    previously seen and update quic_crypto_get_header() accordingly.
+  - Change timestamp variables from u32 to u64 and use quic_ktime_get_us()
+    for current timestamps, as jiffies_to_usecs() is not accurate enough.
 v6:
-  - Do not reset transport_header for QUIC in quic_udp_rcv(), allowing
-    removal of udph_offset and enabling access to the UDP header via
-    udp_hdr(); Pull skb->data in quic_udp_rcv() to allow access to the
-    QUIC header via skb->data.
-v7:
-  - Pass udp sk to quic_path_rcv() and move the call to skb_linearize()
-    and skb_set_owner_sk_safe() to .quic_path_rcv().
-  - Delete the call to skb_linearize() and skb_set_owner_sk_safe() from
-    quic_udp_err(), as it should not change skb in .encap_err_lookup()
-    (noted by AI review).
+  - Rename quic_crypto_get_header() to quic_crypto_get_number(), move
+    key_phase parsing out of it, check cb->length when parsing packet
+    number, and update all callers.
+  - Use hdr->pnl + 1 instead of (*p & QUIC_PN_LEN_BITS_MASK) + 1 to get
+    packet number length, and remove the unnecessary the len variable
+    and QUIC_PN_LEN_BITS_MASK macro from quic_crypto_header_decrypt().
 v8:
-  - Remove indirect quic_path_rcv and late call quic_packet_rcv()
-    directly via extern (noted by Paolo).
-  - Add a comment in quic_udp_rcv() clarifying it must return 0.
-  - Add a comment in quic_udp_sock_put() clarifying the UDP socket
-    may be freed in atomic RX context during connection migration.
-  - Reorder some quic_path_group members to reduce struct size.
+  - Move skb_cow_data() from quic_crypto_payload_decrypt() to
+    quic_crypto_header_decrypt(), as header decryption also writes to
+    the skb and is invoked earlier than payload decryption on RX path.
 v10:
-  - Replace open-coded kzalloc(sizeof(*us)) with kzalloc_obj(*us) in
-    quic_stream_create().
-  - Use get_random_u32_below() for ephemeral port selection instead of
-    manual scaling of get_random_u32() in quic_path_bind().
-  - Reset additional PLPMTUD probe state (probe_high, probe_count) in
-    quic_path_pl_reset() to ensure a clean probe restart.
-  - Add plpmtud_interval to struct quic_path_group to store the PLPMTUD
-    probe timer interval, previously kept in struct quic_sock.config.
+  - Fix double period at end of the comment for quic_crypto_encrypt().
 v11:
+  - Note for AI review: call quic_crypto_aead_mem_alloc() after
+    skb_cow_data() as it uses the return value for nsg. If the allocation
+    fails, skb is dropped, so no rollback of prior skb modifications is
+    needed.
   - Set maximum line length to 80 characters.
-  - Add additional comments in quic_path_bind() and quic_path_pl_send()
-    for clarity.
-  - Return ERR_PTR() instead of NULL on error in quic_udp_sock_create().
-  - Change return type of quic_path_detect_alt() to bool.
-  - Allocate quic_wq using alloc_workqueue(WQ_MEM_RECLAIM | WQ_UNBOUND)
-    for UDP socket destruction and backlog packet processing (noted by
-    AI review).
+  - Add a check for skb->len in quic_crypto_get_retry_tag().
+  - Also reset key_update_send_time when key_pending is cleared in
+    quic_crypto_decrypt().
+  - Handle -EBUSY returned from crypto_aead_en/decrypt() and return when
+    err == -EINPROGRESS in quic_crypto_done().
+  - Extract quic_crypto_token_init() from quic_crypto_generate_token() and
+    quic_crypto_verify_token().
+  - Merge quic_crypto_header_en/decrypt() to quic_crypto_header_protect()
+    with an extra parameter to reduce code duplication.
+  - Merge quic_crypto_payload_en/decrypt() to quic_crypto_payload_protect()
+    with an extra parameter to reduce code duplication (noted by AI
+    review).
 v12:
-  - Call quic_set_skb_iif() at the start of quic_udp_rcv().
-  - Set us->bind_ifindex from udp_conf.bind_ifindex instead of
-    sk->sk_bound_dev_if in quic_udp_sock_create().
-  - Compare us->bind_ifindex against quic_get_dev_if(sk, a) instead of
-    sk->sk_bound_dev_if, and do not match when only one is zero in
-    quic_udp_sock_lookup().
-  - Call cond_resched() in the retry loop of quic_path_bind() when
-    quic_udp_sock_create() returns -EADDRINUSE.
-  - Improve address-change handling and disable_saddr/daddr_alt checks
-    in quic_path_detect_alt().
-  - Do not pass WQ_MEM_RECLAIM to alloc_workqueue() to avoid a potential
-    deadlock.
-  - Change ampl_snd/rcvlen in struct quic_path_group to u32 to avoid
-    overflow, and move mtu_info for a better layout.
-  - Add keepalive_interval to struct quic_path_group to control path
-    liveness probing, and add version to indicate version negotiation
-    was performed.
-  - Pass sk instead of sk_socket to setup_udp_tunnel_sock() and
-    udp_tunnel_sock_release(), following their parameter type changes.
-  - Set bit fields paths->disable_saddr_alt and paths->disable_daddr_alt
-    from p->disable_active_migration using '!!'.
-  - Add QUIC_PMTUD_RAISE_TIMER_FACTOR for later use.
-  - Change QUIC_PATH_MAX_PMTU from 65536U to 65535U.
+  - Move ciphers definitions to above the encryption/decryption functions.
+  - Fix some indentations in quic_crypto_skcipher_mem_alloc() and
+    quic_crypto_header_protect().
+  - Pass crypto and fetch the key phase only for short header packets in
+    quic_crypto_header_protect() and quic_crypto_payload_protect().
+  - Increment async_pending[phase] for asynchronous encryption/decryption
+    operations, and pass crypto to quic_crypto_done() to decrement it.
+  - Update key_phase and key_pending only after successful payload
+    decryption in quic_crypto_decrypt() to comply with RFC9001.
+  - Take the token flag into account when calling aead_request_set_ad() in
+    quic_crypto_generate_token() and quic_crypto_verify_token().
+  - Replace quic_crypto_token_init() with quic_crypto_token_protect() to
+    perform AEAD encryption/decryption for the provided token, and update
+    quic_crypto_generate/verify_token() accordingly.
+  - Reuse TX AEAD (phase 1) from socket initial crypto in
+    quic_crypto_token_protect(), and use crypto_wait for sync mode.
+  - Reuse RX AEAD (phase 1) from socket initial crypto in
+    quic_crypto_get_retry_tag(), using crypto_wait for sync mode.
+  - Check cb->sync in quic_crypto_payload_protect() to enforce sync mode;
+    set cb->sync in quic_crypto_decrypt() after key update in process
+    context.
+  - Change the label name 'err:' to 'out:' in quic_crypto_payload_protect()
+    and quic_crypto_header_protect().
+  - Reset crypto->key_derived if crypo->key_phase is flipped by key_update
+    in quic_crypto_decrypt().
 v13:
-  - Drop explicit GFP_KERNEL from kzalloc_obj() in quic_udp_sock_create().
+  - Fix the opportunity for kmemdup warning from cocci-check by replacing
+    kzalloc() + memcpy() with kmemdup() in quic_crypto_verify_token().
 v14:
-  - Replace kzalloc_obj() with kmalloc_obj() in quic_udp_sock_create(), as
-    all members of the object are initialized afterwards.
-  - Move INIT_WORK() before hlist_add_head() in quic_udp_sock_create(), as
-    it makes the initialization order clearer.
-  - Remove the unnecessary pmtu >= QUIC_MIN_PLPMTU check from
-    quic_path_pl_toobig().
+  - Pass gfp flags to quic_crypto_encrypt(), quic_crypto_decrypt(),
+    quic_crypto_header_protect(), quic_crypto_payload_protect(),
+    quic_crypto_aead_mem_alloc(), and quic_crypto_skcipher_mem_alloc().
+  - Change the skb->len < QUIC_TAG_LEN check to skb->len <= QUIC_TAG_LEN
+    to match the comment.
+  - Remove key derivation from quic_crypto_token_protect(), as it is
+    already performed by quic_crypto_set_token_secret().
+  - Move the timestamp from the encrypted part to AAD in
+    quic_crypto_generate_token() and quic_crypto_verify_token(), so it can
+    be used to generate the nonce by XORing it with the IV in
+    quic_crypto_token_protect().
+  - Replace memcmp() with crypto_memneq() in quic_crypto_verify_token()
+    (noted by Sashiko AI review).
+  - Reject tokens in quic_crypto_verify_token() if the timestamp is in the
+    future or older than the allowed timeout.
 v15:
-  - Add seqcount_t path_seq to quic_path_group to protect path[0] updates
-    during path migration when accessed by a concurrent quic_sock_lookup().
-    Also add quic_path_init() to initialize it in quic_init_sock().
-  - Add CAP_NET_BIND_SERVICE and sk_uid checks to quic_path_bind().
+  - Use kfree_sensitive() to free token_buf in quic_crypto_generate_token()
+    and quic_crypto_verify_token().
+  - Change len from int to u32 to avoid a false warning from AI reviews
+    in quic_crypto_generate_token().
+  - Move cb->key_phase = crypto->key_phase after the cb->resume check to
+    preserve the key phase across asynchronous encryption resumption.
+  - Increment async_pending before calling crypto_aead_encrypt() or
+    crypto_aead_decrypt() to account for asynchronous operations before
+    they can complete in quic_crypto_payload_protect().
+  - Clear cb->crypto_ctx for synchronous crypto operations to avoid a false
+    warning from AI reviews in quic_crypto_payload_protect().
 v16:
-  - Disable preemption during the path swap in quic_path_swap(), as a
-    plain seqcount_t requires preemption to be disabled while its write
-    sequence is active. local_bh_disable() does not disable preemption
-    on PREEMPT_RT kernels (noted by Sashiko AI review).
-  - Fix the path group name from 'dst' to 'paths' in PMTU debug messages
-    (noted by Sashiko AI review).
-  - Clarify that quic_path_pl_recv() returns the new PMTU when it
-    changes, and 0 when it remains unchanged (noted by Sashiko AI review).
-  - Align struct member comments in quic_path_group using spaces instead
-    of tabs for consistent formatting.
-  - Fix the inaccurate comment for quic_path_pl_send(), which is called
-    before, not after, sending a probe packet. Also improve its summary
-    in the comment.
-  - Improve path.c file description.
-  - Improve quic_path_pl_recv() comment to clarify that PMTU expansion uses
-    a two-phase linear search.
+  - Improve the annotations for quic_crypto_token_protect() and
+    quic_crypto_generate/verify_token() to clarify token AEAD protection,
+    format, and authentication (noted by Sashiko AI review).
+  - Store async crypto errors in crypto_err in quic_crypto_done() instead
+    of passing them to cb->crypto_done().
+  - Check cb->crypto_err on resume in quic_crypto_encrypt() and
+    quic_crypto_decrypt() to drop packets that failed async crypto.
+  - Update the key update timestamp after packet protection succeeds in
+    quic_crypto_encrypt(), so failed protection does not start the old-key
+    retention window (noted by Sashiko AI review).
+  - Enforce AEAD usage limits by checking tx_count against txlimit in
+    quic_crypto_encrypt() and rx_fails against rxlimit in
+    quic_crypto_decrypt() (noted by Sashiko AI review).
+  - Reset the pending key update state when asynchronous decryption fails
+    with a different key phase, matching the synchronous error path and
+    avoiding a stuck key update state in quic_crypto_decrypt().
+  - Improve the return documentation to mention -EINPROGRESS as a distinct
+    non-error return value for quic_crypto_encrypt() and
+    quic_crypto_decrypt().
 v17:
-  - Hold a netns reference when creating quic_udp_sock and release it after
-    deferred UDP socket cleanup completes (noted by Sashiko AI review).
-  - Compare the current fsuid with the existing tunnel socket's sk_uid to
-    match the ownership semantics used when creating the tunnel socket
-    (noted by Sashiko AI review).
-  - Replace us->sk->sk_uid with sk_uid(us->sk) in quic_path_bind().
-  - Fix the alternate path detection comment for quic_path_detect_alt().
-  - Fix format specifier for PMTU with pr_debug() in quic_path_pl_toobig().
+  - Use crypto->rx_fails instead of crypto->rx_fails[cb->key_phase], as
+    rx_fails is now a connection-wide counter rather than a per-key
+    counter.
+  - Use crypto->ts_off in quic_crypto_generate_token() and
+    quic_crypto_verify_token() to prevent timestamps from directly
+    revealing system uptime (noted by Sashiko AI review).
+  - Move the address field after the timestamp and include it in the
+    encrypted token to avoid exposing the ingress interface index stored
+    in the address scope ID (noted by Sashiko AI review).
+  - Update the comment for quic_crypto_verify_token() to accurately
+    describe its return values.
 ---
- net/quic/Makefile   |   2 +-
- net/quic/path.c     | 596 ++++++++++++++++++++++++++++++++++++++++++++
- net/quic/path.h     | 191 ++++++++++++++
- net/quic/protocol.c |  14 ++
- net/quic/socket.c   |   4 +
- net/quic/socket.h   |   7 +
- 6 files changed, 813 insertions(+), 1 deletion(-)
- create mode 100644 net/quic/path.c
- create mode 100644 net/quic/path.h
+ net/quic/crypto.c | 714 ++++++++++++++++++++++++++++++++++++++++++++++
+ net/quic/crypto.h |  14 +
+ 2 files changed, 728 insertions(+)
 
-diff --git a/net/quic/Makefile b/net/quic/Makefile
-index eee7501588d3..1565fb5cef9d 100644
---- a/net/quic/Makefile
-+++ b/net/quic/Makefile
-@@ -5,4 +5,4 @@
+diff --git a/net/quic/crypto.c b/net/quic/crypto.c
+index 2b72a781493a..93fd4cdb055f 100644
+--- a/net/quic/crypto.c
++++ b/net/quic/crypto.c
+@@ -12,6 +12,7 @@
  
- obj-$(CONFIG_IP_QUIC) += quic.o
- 
--quic-y := common.o family.o protocol.o socket.o stream.o connid.o
-+quic-y := common.o family.o protocol.o socket.o stream.o connid.o path.o
-diff --git a/net/quic/path.c b/net/quic/path.c
-new file mode 100644
-index 000000000000..ba7e2c952a36
---- /dev/null
-+++ b/net/quic/path.c
-@@ -0,0 +1,596 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Path management.
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+#include <net/udp_tunnel.h>
-+#include <linux/quic.h>
-+
-+#include "common.h"
-+#include "family.h"
-+#include "path.h"
-+
-+static int quic_udp_rcv(struct sock *sk, struct sk_buff *skb)
-+{
-+	quic_set_skb_iif(skb);
-+
-+	memset(skb->cb, 0, sizeof(skb->cb));
-+	QUIC_SKB_CB(skb)->seqno = -1;
-+	QUIC_SKB_CB(skb)->time = quic_ktime_get_us();
-+
-+	skb_pull(skb, sizeof(struct udphdr));
-+	skb_dst_force(skb);
-+	kfree_skb(skb);
-+	/* .encap_rcv must return 0 if skb was either consumed or dropped. */
-+	return 0;
-+}
-+
-+static int quic_udp_err(struct sock *sk, struct sk_buff *skb)
-+{
-+	return 0;
-+}
-+
-+static void quic_udp_sock_put_work(struct work_struct *work)
-+{
-+	struct quic_udp_sock *us = container_of(work, struct quic_udp_sock,
-+						work);
-+	struct quic_uhash_head *head;
-+	struct sock *sk = us->sk;
-+
-+	/* Hold the sock to safely access it in quic_udp_sock_lookup() even
-+	 * after udp_tunnel_sock_release(). The release must occur before
-+	 * __hlist_del() so a new UDP tunnel socket can be created for the same
-+	 * address and port if quic_udp_sock_lookup() fails to find one.
-+	 *
-+	 * Note: udp_tunnel_sock_release() cannot be called under the mutex due
-+	 * to some lockdep warnings.
-+	 */
-+	sock_hold(sk);
-+	udp_tunnel_sock_release(sk);
-+
-+	head = quic_udp_sock_head(sock_net(sk), ntohs(us->addr.v4.sin_port));
-+	mutex_lock(&head->lock);
-+	__hlist_del(&us->node);
-+	mutex_unlock(&head->lock);
-+
-+	put_net(sock_net(sk));
-+	sock_put(sk);
-+	kfree(us);
-+}
-+
-+static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk,
-+						  union quic_addr *a)
-+{
-+	struct udp_tunnel_sock_cfg tuncfg = {};
-+	struct udp_port_cfg udp_conf = {};
-+	struct net *net = sock_net(sk);
-+	struct quic_uhash_head *head;
-+	struct quic_udp_sock *us;
-+	struct socket *sock;
-+	int err;
-+
-+	us = kmalloc_obj(*us);
-+	if (!us)
-+		return ERR_PTR(-ENOMEM);
-+
-+	quic_udp_conf_init(sk, &udp_conf, a);
-+	err = udp_sock_create(net, &udp_conf, &sock);
-+	if (err) {
-+		pr_debug("%s: failed to create udp sock\n", __func__);
-+		kfree(us);
-+		return ERR_PTR(err);
-+	}
-+
-+	tuncfg.encap_type = 1;
-+	tuncfg.encap_rcv = quic_udp_rcv;
-+	tuncfg.encap_err_lookup = quic_udp_err;
-+	setup_udp_tunnel_sock(net, sock->sk, &tuncfg);
-+
-+	refcount_set(&us->refcnt, 1);
-+	us->sk = sock->sk;
-+	memcpy(&us->addr, a, sizeof(*a));
-+	us->bind_ifindex = udp_conf.bind_ifindex;
-+	get_net(net);
-+
-+	INIT_WORK(&us->work, quic_udp_sock_put_work);
-+	head = quic_udp_sock_head(net, ntohs(a->v4.sin_port));
-+	hlist_add_head(&us->node, &head->head);
-+
-+	return us;
-+}
-+
-+static bool quic_udp_sock_get(struct quic_udp_sock *us)
-+{
-+	return refcount_inc_not_zero(&us->refcnt);
-+}
-+
-+static void quic_udp_sock_put(struct quic_udp_sock *us)
-+{
-+	/* The UDP socket may be freed in atomic RX context during connection
-+	 * migration; defer the release to a workqueue.
-+	 */
-+	if (refcount_dec_and_test(&us->refcnt))
-+		queue_work(quic_wq, &us->work);
-+}
-+
-+/* Lookup a quic_udp_sock in the global hash table by port or address.  If 'a'
-+ * is provided, it searches for a socket whose local address matches 'a' and,
-+ * if applicable, matches the device binding. If 'a' is NULL, it searches only
-+ * by port.
-+ */
-+static struct quic_udp_sock *quic_udp_sock_lookup(struct sock *sk,
-+						  union quic_addr *a, u16 port)
-+{
-+	struct net *net = sock_net(sk);
-+	struct quic_uhash_head *head;
-+	struct quic_udp_sock *us;
-+
-+	head = quic_udp_sock_head(net, port);
-+	hlist_for_each_entry(us, &head->head, node) {
-+		if (net != sock_net(us->sk))
-+			continue;
-+		if (a) {
-+			if (quic_cmp_sk_addr(us->sk, &us->addr, a) &&
-+			    us->bind_ifindex == quic_get_dev_if(sk, a))
-+				return us;
-+			continue;
-+		}
-+		if (ntohs(us->addr.v4.sin_port) == port)
-+			return us;
-+	}
-+	return NULL;
-+}
-+
-+static void quic_path_set_udp_sk(struct quic_path *path,
-+				 struct quic_udp_sock *us)
-+{
-+	if (path->udp_sk)
-+		quic_udp_sock_put(path->udp_sk);
-+
-+	path->udp_sk = us;
-+	if (!us) {
-+		path->usk = NULL;
-+		memset(&path->uaddr, 0, sizeof(path->uaddr));
-+		return;
-+	}
-+	path->usk = us->sk;
-+	memcpy(&path->uaddr, &us->addr, sizeof(us->addr));
-+}
-+
-+/* Binds a QUIC path to a local port and sets up a UDP socket. */
-+int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 path)
-+{
-+	union quic_addr *a = quic_path_saddr(paths, path);
-+	int rover, low, high, remaining;
-+	struct net *net = sock_net(sk);
-+	struct quic_uhash_head *head;
-+	struct quic_udp_sock *us;
-+	u16 port;
-+
-+	port = ntohs(a->v4.sin_port);
-+	if (port) {
-+		if (inet_port_requires_bind_service(net, port) &&
-+		    !ns_capable(net->user_ns, CAP_NET_BIND_SERVICE))
-+			return -EACCES;
-+		head = quic_udp_sock_head(net, port);
-+		mutex_lock(&head->lock);
-+		us = quic_udp_sock_lookup(sk, a, port);
-+		if (us) {
-+			if (!uid_eq(current_fsuid(), sk_uid(us->sk))) {
-+				mutex_unlock(&head->lock);
-+				return -EADDRINUSE;
-+			}
-+			/* Allow reuse of an existing UDP tunnel socket.
-+			 * However, if it is in the middle of asynchronous
-+			 * teardown (via workqueue), it is temporarily unusable.
-+			 * Return -EAGAIN (not -EADDRINUSE) to signal the caller
-+			 * to retry soon.
-+			 */
-+			if (!quic_udp_sock_get(us)) {
-+				mutex_unlock(&head->lock);
-+				return -EAGAIN;
-+			}
-+		} else {
-+			us = quic_udp_sock_create(sk, a);
-+			if (IS_ERR(us)) {
-+				mutex_unlock(&head->lock);
-+				return PTR_ERR(us);
-+			}
-+		}
-+		mutex_unlock(&head->lock);
-+		quic_path_set_udp_sk(&paths->path[path], us);
-+		return 0;
-+	}
-+
-+	inet_sk_get_local_port_range(sk, &low, &high);
-+	remaining = (high - low) + 1;
-+	rover = get_random_u32_below(remaining) + low;
-+	do {
-+		rover++;
-+		if (rover < low || rover > high)
-+			rover = low;
-+		port = (u16)rover;
-+		if (inet_is_local_reserved_port(net, port))
-+			continue;
-+
-+		head = quic_udp_sock_head(net, port);
-+		mutex_lock(&head->lock);
-+		if (quic_udp_sock_lookup(sk, NULL, port)) {
-+			mutex_unlock(&head->lock);
-+			cond_resched();
-+			continue;
-+		}
-+		a->v4.sin_port = htons(port);
-+		us = quic_udp_sock_create(sk, a);
-+		if (IS_ERR(us)) {
-+			a->v4.sin_port = 0;
-+			mutex_unlock(&head->lock);
-+			if (PTR_ERR(us) == -EADDRINUSE) {
-+				cond_resched();
-+				continue;
-+			}
-+			return PTR_ERR(us);
-+		}
-+		mutex_unlock(&head->lock);
-+
-+		quic_path_set_udp_sk(&paths->path[path], us);
-+		__sk_dst_reset(sk);
-+		return 0;
-+	} while (--remaining > 0);
-+
-+	return -EADDRINUSE;
-+}
-+
-+/* Swaps the active and alternate QUIC paths.
-+ *
-+ * Promotes the alternate path (path[1]) to become the new active path
-+ * (path[0]).  If the alternate path has a valid UDP socket, the entire path is
-+ * swapped.  Otherwise, only the destination address is exchanged, assuming the
-+ * source address is the same and no rebind is needed.
-+ *
-+ * This is typically used during path migration or alternate path promotion.
-+ */
-+void quic_path_swap(struct quic_path_group *paths)
-+{
-+	struct quic_path path = paths->path[0];
-+
-+	paths->alt_probes = 0;
-+	paths->alt_state = QUIC_PATH_ALT_SWAPPED;
-+
-+	/* Protect path[0] modifications with seqcount for RCU readers in
-+	 * quic_sock_lookup(). The seqcount allows readers to detect torn reads
-+	 * during the non-atomic structure assignment.
-+	 */
-+	local_bh_disable();
-+	preempt_disable_nested();
-+	write_seqcount_begin(&paths->path_seq);
-+	if (paths->path[1].udp_sk) {
-+		paths->path[0] = paths->path[1];
-+		paths->path[1] = path;
-+		goto out;
-+	}
-+
-+	paths->path[0].daddr = paths->path[1].daddr;
-+	paths->path[1].daddr = path.daddr;
-+out:
-+	write_seqcount_end(&paths->path_seq);
-+	preempt_enable_nested();
-+	local_bh_enable();
-+}
-+
-+/* Frees resources associated with a QUIC path.
-+ *
-+ * This is used for cleanup during error handling or when the path is no longer
-+ * needed.
-+ */
-+void quic_path_unbind(struct sock *sk, struct quic_path_group *paths, u8 path)
-+{
-+	paths->alt_probes = 0;
-+	paths->alt_state = QUIC_PATH_ALT_NONE;
-+
-+	quic_path_set_udp_sk(&paths->path[path], NULL);
-+
-+	memset(quic_path_daddr(paths, path), 0, sizeof(union quic_addr));
-+	memset(quic_path_saddr(paths, path), 0, sizeof(union quic_addr));
-+}
-+
-+/* Detects and records a potential alternate path.
-+ *
-+ * If the new source or destination address differs from the active path, and
-+ * alternate path detection is not disabled, the function updates the alternate
-+ * path slot (path[1]) with the new addresses.
-+ *
-+ * This is typically called on packet receive to detect new possible network
-+ * paths (e.g., NAT rebinding, mobility).
-+ *
-+ * Returns true if the alternate path (path[1]) matches (sa, da), regardless
-+ * of whether it was newly detected or already present. Returns false if the
-+ * addresses don't match the alternate path.
-+ */
-+bool quic_path_detect_alt(struct quic_path_group *paths, union quic_addr *sa,
-+			  union quic_addr *da, struct sock *sk)
-+{
-+	bool remote = !quic_cmp_sk_addr(sk, quic_path_daddr(paths, 0), da);
-+	bool local = !quic_cmp_sk_addr(sk, quic_path_saddr(paths, 0), sa);
-+
-+	if (!local && !remote)
-+		return false;
-+
-+	if ((local && paths->disable_saddr_alt) ||
-+	    (remote && paths->disable_daddr_alt))
-+		return false;
-+
-+	if (!quic_path_saddr(paths, 1)->v4.sin_port)
-+		quic_path_set_saddr(paths, 1, sa);
-+
-+	if (!quic_cmp_sk_addr(sk, quic_path_saddr(paths, 1), sa))
-+		return false;
-+
-+	if (!quic_path_daddr(paths, 1)->v4.sin_port)
-+		quic_path_set_daddr(paths, 1, da);
-+
-+	return quic_cmp_sk_addr(sk, quic_path_daddr(paths, 1), da);
-+}
-+
-+void quic_path_get_param(struct quic_path_group *paths,
-+			 struct quic_transport_param *p)
-+{
-+	if (p->remote) {
-+		p->disable_active_migration = paths->disable_saddr_alt;
-+		return;
-+	}
-+	p->disable_active_migration = paths->disable_daddr_alt;
-+}
-+
-+void quic_path_set_param(struct quic_path_group *paths,
-+			 struct quic_transport_param *p)
-+{
-+	if (p->remote) {
-+		paths->disable_saddr_alt = !!p->disable_active_migration;
-+		return;
-+	}
-+	paths->disable_daddr_alt = !!p->disable_active_migration;
-+}
-+
-+/* State Machine defined in rfc8899#section-5.2 */
-+enum quic_plpmtud_state {
-+	QUIC_PL_DISABLED,
-+	QUIC_PL_BASE,
-+	QUIC_PL_SEARCH,
-+	QUIC_PL_COMPLETE,
-+	QUIC_PL_ERROR,
-+};
-+
-+#define QUIC_BASE_PLPMTU        1200
-+#define QUIC_MAX_PLPMTU         9000
-+#define QUIC_MIN_PLPMTU         512
-+
-+#define QUIC_MAX_PROBES         3
-+
-+#define QUIC_PL_BIG_STEP        32
-+#define QUIC_PL_MIN_STEP        4
-+
-+/* Track PLPMTUD probe sends and handle probe exhaustion.
-+ *
-+ * Called right before sending a probe packet in QUIC Path MTU Discovery.
-+ * Tracks probe count and manages state transitions based on the number of
-+ * probes sent and current PLPMTUD state (BASE, SEARCH, COMPLETE, ERROR).
-+ * Detects probe failures and black holes, adjusting PMTU and probe sizes
-+ * accordingly.
-+ *
-+ * Return: New PMTU value if updated, else 0.
-+ */
-+u32 quic_path_pl_send(struct quic_path_group *paths, s64 number)
-+{
-+	u32 pathmtu = 0;
-+
-+	paths->pl.number = number;
-+	if (paths->pl.probe_count < QUIC_MAX_PROBES)
-+		goto out;
-+
-+	paths->pl.probe_count = 0;
-+	if (paths->pl.state == QUIC_PL_BASE) {
-+		if (paths->pl.probe_size == QUIC_BASE_PLPMTU) {
-+			/* BASE_PLPMTU Confirming Failed: Base -> Error. */
-+			paths->pl.state = QUIC_PL_ERROR;
-+
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_SEARCH) {
-+		if (paths->pl.pmtu == paths->pl.probe_size) {
-+			/* Black Hole Detected: Search -> Base. */
-+			paths->pl.state = QUIC_PL_BASE;
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+			paths->pl.probe_high = 0;
-+
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		} else { /* Normal probe failure. */
-+			paths->pl.probe_high = paths->pl.probe_size;
-+			paths->pl.probe_size = paths->pl.pmtu;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
-+		if (paths->pl.pmtu == paths->pl.probe_size) {
-+			/* Black Hole Detected:  Search Complete -> Base. */
-+			paths->pl.state = QUIC_PL_BASE;
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+
-+			/* probe_high already reset when entering COMPLETE. */
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		}
-+	}
-+
-+out:
-+	pr_debug("%s: paths: %p, state: %d, pmtu: %d, size: %d, high: %d\n",
-+		 __func__, paths, paths->pl.state, paths->pl.pmtu,
-+		 paths->pl.probe_size, paths->pl.probe_high);
-+	paths->pl.probe_count++;
-+	return pathmtu;
-+}
-+
-+/* Handle successful reception of a PMTU probe.
-+ *
-+ * Called when a probe packet is acknowledged. Updates probe size and
-+ * transitions state if needed (e.g., from SEARCH to COMPLETE). Expands PMTU
-+ * using a two-phase linear search: coarse stepping (QUIC_PL_BIG_STEP) to
-+ * quickly find the upper bound, then fine stepping (QUIC_PL_MIN_STEP) to
-+ * refine.
-+ *
-+ * Return: New PMTU to apply, or 0 if unchanged.
-+ */
-+u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer,
-+		      bool *complete)
-+{
-+	u32 pathmtu = 0;
-+	u16 next;
-+
-+	pr_debug("%s: paths: %p, state: %d, pmtu: %d, size: %d, high: %d\n",
-+		 __func__, paths, paths->pl.state, paths->pl.pmtu,
-+		 paths->pl.probe_size, paths->pl.probe_high);
-+
-+	*raise_timer = false;
-+	paths->pl.number = 0;
-+	paths->pl.pmtu = paths->pl.probe_size;
-+	paths->pl.probe_count = 0;
-+	if (paths->pl.state == QUIC_PL_BASE) {
-+		paths->pl.state = QUIC_PL_SEARCH; /* Base -> Search */
-+		paths->pl.probe_size += QUIC_PL_BIG_STEP;
-+	} else if (paths->pl.state == QUIC_PL_ERROR) {
-+		paths->pl.state = QUIC_PL_SEARCH; /* Error -> Search */
-+
-+		paths->pl.pmtu = paths->pl.probe_size;
-+		pathmtu = (u32)paths->pl.pmtu;
-+		paths->pl.probe_size += QUIC_PL_BIG_STEP;
-+	} else if (paths->pl.state == QUIC_PL_SEARCH) {
-+		if (!paths->pl.probe_high) {
-+			if (paths->pl.probe_size < QUIC_MAX_PLPMTU) {
-+				next = paths->pl.probe_size + QUIC_PL_BIG_STEP;
-+				paths->pl.probe_size =
-+					min_t(u16, next, QUIC_MAX_PLPMTU);
-+				*complete = false;
-+				return 0;
-+			}
-+			paths->pl.probe_high = QUIC_MAX_PLPMTU;
-+		}
-+		paths->pl.probe_size += QUIC_PL_MIN_STEP;
-+		if (paths->pl.probe_size >= paths->pl.probe_high) {
-+			paths->pl.probe_high = 0;
-+			/* Search -> Search Complete */
-+			paths->pl.state = QUIC_PL_COMPLETE;
-+
-+			paths->pl.probe_size = paths->pl.pmtu;
-+			pathmtu = (u32)paths->pl.pmtu;
-+			*raise_timer = true;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
-+		/* Raise probe_size after 30 * interval in Search Complete;
-+		 * Search Complete -> Search.
-+		 */
-+		paths->pl.state = QUIC_PL_SEARCH;
-+		next = paths->pl.probe_size + QUIC_PL_MIN_STEP;
-+		paths->pl.probe_size = min_t(u16, next, QUIC_MAX_PLPMTU);
-+	}
-+
-+	*complete = (paths->pl.state == QUIC_PL_COMPLETE);
-+	return pathmtu;
-+}
-+
-+/* Handle ICMP "Packet Too Big" messages.
-+ *
-+ * Responds to an incoming ICMP error by reducing the probe size or falling
-+ * back to a safe baseline PMTU depending on current state.  Also handles cases
-+ * where the PMTU hint lies between probe and current PMTU.
-+ *
-+ * Return: New PMTU to apply if state changes, or 0 if no change.
-+ */
-+u32 quic_path_pl_toobig(struct quic_path_group *paths, u32 pmtu,
-+			bool *reset_timer)
-+{
-+	u32 pathmtu = 0;
-+
-+	pr_debug("%s: paths: %p, state: %d, pmtu: %d, size: %d, ptb: %u\n",
-+		 __func__, paths, paths->pl.state, paths->pl.pmtu,
-+		 paths->pl.probe_size, pmtu);
-+
-+	*reset_timer = false;
-+	if (pmtu < QUIC_MIN_PLPMTU || pmtu >= (u32)paths->pl.probe_size)
-+		return pathmtu;
-+
-+	if (paths->pl.state == QUIC_PL_BASE) {
-+		if (pmtu < QUIC_BASE_PLPMTU) {
-+			paths->pl.state = QUIC_PL_ERROR; /* Base -> Error */
-+
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_SEARCH) {
-+		if (pmtu >= QUIC_BASE_PLPMTU && pmtu < (u32)paths->pl.pmtu) {
-+			paths->pl.state = QUIC_PL_BASE;  /* Search -> Base */
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+			paths->pl.probe_count = 0;
-+
-+			paths->pl.probe_high = 0;
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+		} else if (pmtu > (u32)paths->pl.pmtu &&
-+			   pmtu < (u32)paths->pl.probe_size) {
-+			paths->pl.probe_size = (u16)pmtu;
-+			paths->pl.probe_count = 0;
-+		}
-+	} else if (paths->pl.state == QUIC_PL_COMPLETE) {
-+		if (pmtu >= QUIC_BASE_PLPMTU && pmtu < (u32)paths->pl.pmtu) {
-+			paths->pl.state = QUIC_PL_BASE;  /* Complete -> Base */
-+			paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+			paths->pl.probe_count = 0;
-+
-+			paths->pl.probe_high = 0;
-+			paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+			pathmtu = QUIC_BASE_PLPMTU;
-+			*reset_timer = true;
-+		}
-+	}
-+	return pathmtu;
-+}
-+
-+/* Reset PLPMTUD state for a path.
-+ *
-+ * Resets all PLPMTUD-related state to its initial configuration.  Called when
-+ * a new path is initialized or when recovering from errors.
-+ */
-+void quic_path_pl_reset(struct quic_path_group *paths)
-+{
-+	paths->pl.number = 0;
-+	paths->pl.probe_high = 0;
-+	paths->pl.probe_count = 0;
-+	paths->pl.state = QUIC_PL_BASE;
-+	paths->pl.pmtu = QUIC_BASE_PLPMTU;
-+	paths->pl.probe_size = QUIC_BASE_PLPMTU;
-+}
-+
-+/* Check if a packet number confirms PLPMTUD probe.
-+ *
-+ * Checks whether the last probe (tracked by .number) has been acknowledged.
-+ * If the probe number lies within the ACK range, confirmation is successful.
-+ *
-+ * Return: true if probe is confirmed, false otherwise.
-+ */
-+bool quic_path_pl_confirm(struct quic_path_group *paths, s64 largest,
-+			  s64 smallest)
-+{
-+	return paths->pl.number && paths->pl.number >= smallest &&
-+	       paths->pl.number <= largest;
-+}
-+
-+void quic_path_init(struct quic_path_group *paths)
-+{
-+	seqcount_init(&paths->path_seq);
-+}
-diff --git a/net/quic/path.h b/net/quic/path.h
-new file mode 100644
-index 000000000000..c2537cf65a7d
---- /dev/null
-+++ b/net/quic/path.h
-@@ -0,0 +1,191 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* QUIC kernel implementation
-+ * (C) Copyright Red Hat Corp. 2023
-+ *
-+ * This file is part of the QUIC kernel implementation
-+ *
-+ * Written or modified by:
-+ *    Xin Long <lucien.xin@gmail.com>
-+ */
-+
-+#define QUIC_PATH_MIN_PMTU	1200U
-+#define QUIC_PATH_MAX_PMTU	65535U
-+
-+#define QUIC_MIN_UDP_PAYLOAD	1200
-+#define QUIC_MAX_UDP_PAYLOAD	65527
-+
-+#define QUIC_PATH_ENTROPY_LEN	8
-+
-+#define QUIC_PMTUD_RAISE_TIMER_FACTOR	30
-+
-+extern struct workqueue_struct	*quic_wq;
-+
-+/* Connection Migration State Machine:
-+ *
-+ * +--------+      recv non-probing, free old path    +----------+
-+ * |  NONE  | <-------------------------------------- | SWAPPED  |
-+ * +--------+                                         +----------+
-+ *      |   ^ \                                            ^
-+ *      |    \ \                                           |
-+ *      |     \ \   new path detected,                     | recv
-+ *      |      \ \  has another DCID,                      | Path
-+ *      |       \ \ snd Path Challenge                     | Response
-+ *      |        \ -------------------------------         |
-+ *      |         ------------------------------- \        |
-+ *      | new path detected,            Path     \ \       |
-+ *      | has no other DCID,            Challenge \ \      |
-+ *      | request a new DCID            failed     \ \     |
-+ *      v                                           \ v    |
-+ * +----------+                                       +----------+
-+ * | PENDING  | ------------------------------------> | PROBING  |
-+ * +----------+  recv a new DCID, snd Path Challenge  +----------+
-+ */
-+enum {
-+	QUIC_PATH_ALT_NONE,
-+	QUIC_PATH_ALT_PENDING, /* Waiting for new dest conn ID for migration */
-+	QUIC_PATH_ALT_PROBING, /* Validating alternate path (PATH_CHALLENGE) */
-+	QUIC_PATH_ALT_SWAPPED, /* Alternate path is now active; roles swapped */
-+};
-+
-+struct quic_udp_sock {
-+	struct work_struct work; /* Workqueue to destroy UDP tunnel socket */
-+	struct hlist_node node;  /* Node in addr-based UDP socket hash table */
-+	union quic_addr addr; /* Source addr of underlying UDP tunnel socket */
-+	int bind_ifindex;
-+	refcount_t refcnt;
-+	struct sock *sk; /* Underlying UDP tunnel socket */
-+};
-+
-+struct quic_path {
-+	union quic_addr daddr; /* Destination address */
-+	union quic_addr saddr; /* Source address */
-+
-+	/* Wrapped UDP socket for receiving QUIC */
-+	struct quic_udp_sock *udp_sk;
-+	/* Cached UDP tunnel socket and source addr for RCU access */
-+	union quic_addr uaddr;
-+	struct sock *usk;
-+};
-+
-+struct quic_path_group {
-+	/* Connection ID validation during handshake (rfc9000#section-7.3) */
-+	struct quic_conn_id retry_dcid; /* Source CID from Retry packet */
-+	struct quic_conn_id orig_dcid;  /* Destination CID from first Initial */
-+
-+	/* Path validation (rfc9000#section-8.2) */
-+	u8 entropy[QUIC_PATH_ENTROPY_LEN]; /* Entropy for PATH_CHALLENGE */
-+	struct quic_path path[2]; /* Active path (0) and alternate path (1) */
-+	seqcount_t path_seq;      /* Protects path[0] during swap */
-+	struct flowi fl;          /* Flow info from routing decisions */
-+
-+	/* Anti-amplification limit (rfc9000#section-8) */
-+	u32 ampl_sndlen; /* Bytes sent before address is validated */
-+	u32 ampl_rcvlen; /* Bytes received to lift amplification limit */
-+
-+	/* MTU discovery handling */
-+	struct { /* PLPMTUD probing (rfc8899) */
-+		s64 number; /* Packet number used for current probe */
-+		u16 pmtu;   /* Confirmed path MTU */
-+
-+		u16 probe_size; /* Current probe packet size */
-+		u16 probe_high; /* Highest failed probe size */
-+		u8 probe_count; /* Retry count for current probe_size */
-+		u8 state;       /* Probe state machine (rfc8899#section-5.2) */
-+	} pl;
-+	u32 mtu_info; /* PMTU value from received ICMP, pending apply */
-+
-+	u32 plpmtud_interval;   /* Time interval for the PLPMTUD probe timer */
-+	u32 keepalive_interval; /* Time interval to maintain path liveness */
-+
-+	u8 ecn_probes;  /* ECN probe counter */
-+	u8 validated:1; /* Path validated with PATH_RESPONSE */
-+	u8 blocked:1;   /* Blocked by anti-amplification limit */
-+	u8 version:1;   /* Version negotiation performed */
-+	u8 retry:1;     /* Retry used in initial packet */
-+
-+	/* Connection Migration (rfc9000#section-9) */
-+	u8 disable_saddr_alt:1; /* Remote disable_active_migration parameter */
-+	u8 disable_daddr_alt:1; /* Local disable_active_migration parameter */
-+	u8 pref_addr:1; /* Preferred address offered (rfc9000#section-18.2) */
-+	u8 alt_probes;  /* Number of PATH_CHALLENGE probes sent */
-+	u8 alt_state;   /* Connection migration state (see above) */
-+};
-+
-+static inline union quic_addr *quic_path_saddr(struct quic_path_group *paths,
-+					       u8 path)
-+{
-+	return &paths->path[path].saddr;
-+}
-+
-+static inline void quic_path_set_saddr(struct quic_path_group *paths, u8 path,
-+				       union quic_addr *addr)
-+{
-+	memcpy(quic_path_saddr(paths, path), addr, sizeof(*addr));
-+}
-+
-+static inline union quic_addr *quic_path_daddr(struct quic_path_group *paths,
-+					       u8 path)
-+{
-+	return &paths->path[path].daddr;
-+}
-+
-+static inline void quic_path_set_daddr(struct quic_path_group *paths, u8 path,
-+				       union quic_addr *addr)
-+{
-+	memcpy(quic_path_daddr(paths, path), addr, sizeof(*addr));
-+}
-+
-+static inline union quic_addr *quic_path_uaddr(struct quic_path_group *paths,
-+					       u8 path)
-+{
-+	return &paths->path[path].uaddr;
-+}
-+
-+static inline struct sock *quic_path_usock(struct quic_path_group *paths,
-+					   u8 path)
-+{
-+	return paths->path[path].usk;
-+}
-+
-+static inline bool quic_path_alt_state(struct quic_path_group *paths, u8 state)
-+{
-+	return paths->alt_state == state;
-+}
-+
-+static inline void quic_path_set_alt_state(struct quic_path_group *paths,
-+					   u8 state)
-+{
-+	paths->alt_state = state;
-+}
-+
-+/* Returns the destination Connection ID (DCID) used for identifying the
-+ * connection.  Per rfc9000#section-7.3, handshake packets are considered part
-+ * of the same connection if their DCID matches the one returned here.
-+ */
-+static inline struct quic_conn_id *
-+quic_path_orig_dcid(struct quic_path_group *paths)
-+{
-+	return paths->retry ? &paths->retry_dcid : &paths->orig_dcid;
-+}
-+
-+void quic_path_init(struct quic_path_group *paths);
-+
-+bool quic_path_detect_alt(struct quic_path_group *paths, union quic_addr *sa,
-+			  union quic_addr *da, struct sock *sk);
-+int quic_path_bind(struct sock *sk, struct quic_path_group *paths, u8 path);
-+void quic_path_unbind(struct sock *sk, struct quic_path_group *paths, u8 path);
-+void quic_path_swap(struct quic_path_group *paths);
-+
-+u32 quic_path_pl_recv(struct quic_path_group *paths, bool *raise_timer,
-+		      bool *complete);
-+u32 quic_path_pl_toobig(struct quic_path_group *paths, u32 pmtu,
-+			bool *reset_timer);
-+u32 quic_path_pl_send(struct quic_path_group *paths, s64 number);
-+
-+void quic_path_get_param(struct quic_path_group *paths,
-+			 struct quic_transport_param *p);
-+void quic_path_set_param(struct quic_path_group *paths,
-+			 struct quic_transport_param *p);
-+bool quic_path_pl_confirm(struct quic_path_group *paths,
-+			  s64 largest, s64 smallest);
-+void quic_path_pl_reset(struct quic_path_group *paths);
-diff --git a/net/quic/protocol.c b/net/quic/protocol.c
-index d6ea3c8708b8..25308653ebb4 100644
---- a/net/quic/protocol.c
-+++ b/net/quic/protocol.c
-@@ -21,6 +21,7 @@
- static unsigned int quic_net_id __read_mostly;
- 
- struct percpu_counter quic_sockets_allocated;
-+struct workqueue_struct *quic_wq;
- 
- DEFINE_STATIC_KEY_FALSE(quic_alpn_demux_key);
- 
-@@ -342,6 +343,15 @@ static __init int quic_init(void)
- 	if (err)
- 		goto err_hash;
- 
-+	/* Allocate an unbound workqueue for UDP socket destruction and backlog
-+	 * packet processing.
-+	 */
-+	quic_wq = alloc_workqueue("quic_workqueue", WQ_UNBOUND, 0);
-+	if (!quic_wq) {
-+		err = -ENOMEM;
-+		goto err_wq;
-+	}
-+
- 	err = register_pernet_subsys(&quic_net_ops);
- 	if (err)
- 		goto err_def_ops;
-@@ -359,6 +369,8 @@ static __init int quic_init(void)
- err_protosw:
- 	unregister_pernet_subsys(&quic_net_ops);
- err_def_ops:
-+	destroy_workqueue(quic_wq);
-+err_wq:
- 	quic_hash_tables_destroy();
- err_hash:
- 	percpu_counter_destroy(&quic_sockets_allocated);
-@@ -373,6 +385,8 @@ static __exit void quic_exit(void)
- #endif
- 	quic_protosw_exit();
- 	unregister_pernet_subsys(&quic_net_ops);
-+	flush_workqueue(quic_wq);
-+	destroy_workqueue(quic_wq);
- 	quic_hash_tables_destroy();
- 	percpu_counter_destroy(&quic_sockets_allocated);
- 	rcu_barrier();
-diff --git a/net/quic/socket.c b/net/quic/socket.c
-index b59f6a70464e..1ef2f7c88735 100644
---- a/net/quic/socket.c
-+++ b/net/quic/socket.c
-@@ -51,6 +51,7 @@ static int quic_init_sock(struct sock *sk)
- 
- 	quic_conn_id_set_init(quic_source(sk), true);
- 	quic_conn_id_set_init(quic_dest(sk), false);
-+	quic_path_init(quic_paths(sk));
- 
- 	if (quic_stream_init(quic_streams(sk)))
- 		return -ENOMEM;
-@@ -60,6 +61,9 @@ static int quic_init_sock(struct sock *sk)
- 
- static void quic_destroy_sock(struct sock *sk)
- {
-+	quic_path_unbind(sk, quic_paths(sk), 0);
-+	quic_path_unbind(sk, quic_paths(sk), 1);
-+
- 	quic_conn_id_set_free(quic_source(sk));
- 	quic_conn_id_set_free(quic_dest(sk));
- 
-diff --git a/net/quic/socket.h b/net/quic/socket.h
-index 68a58f0016cc..91338601905e 100644
---- a/net/quic/socket.h
-+++ b/net/quic/socket.h
-@@ -15,6 +15,7 @@
- #include "family.h"
- #include "stream.h"
- #include "connid.h"
-+#include "path.h"
- 
- #include "protocol.h"
- 
-@@ -39,6 +40,7 @@ struct quic_sock {
- 	struct quic_stream_table	streams;
- 	struct quic_conn_id_set		source;
- 	struct quic_conn_id_set		dest;
-+	struct quic_path_group		paths;
+ #include <crypto/skcipher.h>
+ #include <linux/skbuff.h>
++#include <crypto/utils.h>
+ #include <crypto/aead.h>
+ #include <crypto/hash.h>
+ #include <linux/quic.h>
+@@ -269,6 +270,484 @@ ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] = {
+ 		    QUIC_AEAD_TX_CHACHA, QUIC_AEAD_RX_CHACHA),
  };
  
- struct quic6_sock {
-@@ -86,6 +88,11 @@ static inline struct quic_conn_id_set *quic_dest(const struct sock *sk)
- 	return &quic_sk(sk)->dest;
- }
- 
-+static inline struct quic_path_group *quic_paths(const struct sock *sk)
++static bool quic_crypto_is_cipher_ccm(struct quic_crypto *crypto)
 +{
-+	return &quic_sk(sk)->paths;
++	return crypto->cipher_type == TLS_CIPHER_AES_CCM_128;
 +}
 +
- static inline bool quic_is_serv(const struct sock *sk)
++static bool quic_crypto_is_cipher_chacha(struct quic_crypto *crypto)
++{
++	return crypto->cipher_type == TLS_CIPHER_CHACHA20_POLY1305;
++}
++
++static void *quic_crypto_skcipher_mem_alloc(struct crypto_skcipher *tfm,
++					    u32 mask_size, u8 **iv,
++					    struct skcipher_request **req,
++					    gfp_t gfp)
++{
++	unsigned int iv_size, req_size;
++	unsigned int len;
++	u8 *mem;
++
++	iv_size = crypto_skcipher_ivsize(tfm);
++	req_size = sizeof(**req) + crypto_skcipher_reqsize(tfm);
++
++	len = mask_size;
++	len += iv_size;
++	len += crypto_skcipher_alignmask(tfm) &
++	       ~(crypto_tfm_ctx_alignment() - 1);
++	len = ALIGN(len, crypto_tfm_ctx_alignment());
++	len += req_size;
++
++	mem = kzalloc(len, gfp);
++	if (!mem)
++		return NULL;
++
++	*iv = (u8 *)PTR_ALIGN(mem + mask_size,
++			      crypto_skcipher_alignmask(tfm) + 1);
++	*req = (struct skcipher_request *)PTR_ALIGN(*iv + iv_size,
++						    crypto_tfm_ctx_alignment());
++
++	return (void *)mem;
++}
++
++/* Extracts and reconstructs the packet number from an incoming QUIC packet. */
++static int quic_crypto_get_number(struct sk_buff *skb)
++{
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	s64 number_max = cb->number;
++	u32 len = cb->length;
++	u8 *p;
++
++	/* rfc9000#section-17.1:
++	 *
++	 * Once header protection is removed, the packet number is decoded by
++	 * finding the packet number value that is closest to the next expected
++	 * packet. The next expected packet is the highest received packet
++	 * number plus one.
++	 */
++	p = (u8 *)quic_hdr(skb) + cb->number_offset;
++	if (!quic_get_int(&p, &len, &cb->number, cb->number_len))
++		return -EINVAL;
++	cb->number = quic_get_num(number_max, cb->number, cb->number_len);
++	return 0;
++}
++
++#define QUIC_SAMPLE_LEN		16
++
++#define QUIC_HEADER_FORM_BIT	0x80
++#define QUIC_LONG_HEADER_MASK	0x0f
++#define QUIC_SHORT_HEADER_MASK	0x1f
++
++/* Header Protection. */
++static int quic_crypto_header_protect(struct quic_crypto *crypto,
++				      struct sk_buff *skb, bool enc, gfp_t gfp)
++{
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	u8 *mask, *iv, *p, h_mask, chacha;
++	struct skcipher_request *req;
++	struct crypto_skcipher *tfm;
++	struct sk_buff *trailer;
++	struct scatterlist sg;
++	int err, i;
++
++	chacha = quic_crypto_is_cipher_chacha(crypto);
++	if (!enc) {
++		tfm = crypto->rx_hp_tfm;
++		if (cb->length < QUIC_PN_MAX_LEN + QUIC_SAMPLE_LEN)
++			return -EINVAL;
++
++		err = skb_cow_data(skb, 0, &trailer);
++		if (err < 0)
++			return err;
++	} else {
++		tfm = crypto->tx_hp_tfm;
++	}
++
++	mask = quic_crypto_skcipher_mem_alloc(tfm, QUIC_SAMPLE_LEN, &iv, &req,
++					      gfp);
++	if (!mask)
++		return -ENOMEM;
++
++	/* rfc9001#section-5.4.2: Header Protection Sample:
++	 *
++	 *   # pn_offset is the start of the Packet Number field.
++	 *   sample_offset = pn_offset + 4
++	 *
++	 *   sample = packet[sample_offset..sample_offset+sample_length]
++	 *
++	 * rfc9001#section-5.4.3: AES-Based Header Protection:
++	 *
++	 *   header_protection(hp_key, sample):
++	 *     mask = AES-ECB(hp_key, sample)
++	 *
++	 * rfc9001#section-5.4.4: ChaCha20-Based Header Protection:
++	 *
++	 *   header_protection(hp_key, sample):
++	 *     counter = sample[0..3]
++	 *     nonce = sample[4..15]
++	 *     mask = ChaCha20(hp_key, counter, nonce, {0,0,0,0,0})
++	 */
++	p = skb->data + cb->number_offset + QUIC_PN_MAX_LEN;
++	memcpy((chacha ? iv : mask), p, QUIC_SAMPLE_LEN);
++	sg_init_one(&sg, mask, QUIC_SAMPLE_LEN);
++	skcipher_request_set_tfm(req, tfm);
++	skcipher_request_set_crypt(req, &sg, &sg, QUIC_SAMPLE_LEN, iv);
++	err = crypto_skcipher_encrypt(req);
++	if (err)
++		goto out;
++
++	/* rfc9001#section-5.4.1:
++	 *
++	 * mask = header_protection(hp_key, sample)
++	 *
++	 * pn_length = (packet[0] & 0x03) + 1
++	 * if (packet[0] & 0x80) == 0x80:
++	 *    # Long header: 4 bits masked
++	 *    packet[0] ^= mask[0] & 0x0f
++	 * else:
++	 *    # Short header: 5 bits masked
++	 *    packet[0] ^= mask[0] & 0x1f
++	 *
++	 * # pn_offset is the start of the Packet Number field.
++	 * packet[pn_offset:pn_offset+pn_length] ^= mask[1:1+pn_length]
++	 */
++	p = skb->data;
++	h_mask = ((*p & QUIC_HEADER_FORM_BIT) == QUIC_HEADER_FORM_BIT) ?
++		 QUIC_LONG_HEADER_MASK : QUIC_SHORT_HEADER_MASK;
++	*p = (u8)(*p ^ (mask[0] & h_mask));
++	if (!enc) {
++		if (!quic_hdr(skb)->form)
++			cb->key_phase = quic_hdr(skb)->key;
++		cb->number_len = quic_hdr(skb)->pnl + 1;
++	}
++	p += cb->number_offset;
++	for (i = 1; i <= cb->number_len; i++)
++		*p++ ^= mask[i];
++
++	if (!enc)
++		err = quic_crypto_get_number(skb);
++out:
++	kfree_sensitive(mask);
++	return err;
++}
++
++static void *quic_crypto_aead_mem_alloc(struct crypto_aead *tfm, u32 ctx_size,
++					u8 **iv, struct aead_request **req,
++					struct scatterlist **sg, u32 nsg,
++					gfp_t gfp)
++{
++	unsigned int iv_size, req_size;
++	unsigned int len;
++	u8 *mem;
++
++	iv_size = crypto_aead_ivsize(tfm);
++	req_size = sizeof(**req) + crypto_aead_reqsize(tfm);
++
++	len = ctx_size;
++	len += iv_size;
++	len += crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment() - 1);
++	len = ALIGN(len, crypto_tfm_ctx_alignment());
++	len += req_size;
++	len = ALIGN(len, __alignof__(struct scatterlist));
++	len += nsg * sizeof(**sg);
++
++	mem = kzalloc(len, gfp);
++	if (!mem)
++		return NULL;
++
++	*iv = (u8 *)PTR_ALIGN(mem + ctx_size, crypto_aead_alignmask(tfm) + 1);
++	*req = (struct aead_request *)PTR_ALIGN(*iv + iv_size,
++						crypto_tfm_ctx_alignment());
++	*sg = (struct scatterlist *)PTR_ALIGN((u8 *)*req + req_size,
++					      __alignof__(struct scatterlist));
++
++	return (void *)mem;
++}
++
++static void quic_crypto_done(void *data, int err)
++{
++	struct sk_buff *skb = data;
++	struct quic_crypto *crypto;
++	struct quic_skb_cb *cb;
++
++	if (err == -EINPROGRESS)
++		return;
++
++	cb = QUIC_SKB_CB(skb);
++	crypto = *(struct quic_crypto **)cb->crypto_ctx;
++	atomic_dec(&crypto->async_pending[cb->key_phase]);
++
++	kfree_sensitive(cb->crypto_ctx);
++	cb->crypto_err = err;
++	cb->crypto_done(skb);
++}
++
++/* AEAD Usage. */
++static int quic_crypto_payload_protect(struct quic_crypto *crypto,
++				       struct sk_buff *skb, bool enc, gfp_t gfp)
++{
++	u8 *base_iv, *iv, i, nonce[QUIC_IV_LEN], ccm, phase;
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	u32 len, hlen, sglen, nsg;
++	struct aead_request *req;
++	struct crypto_aead *tfm;
++	struct sk_buff *trailer;
++	struct scatterlist *sg;
++	void *ctx;
++	__be64 n;
++	int err;
++
++	ccm = quic_crypto_is_cipher_ccm(crypto);
++	phase = cb->key_phase;
++	hlen = cb->number_offset + cb->number_len;
++	if (enc) {
++		tfm = crypto->tx_tfm[phase];
++		base_iv = crypto->tx_iv[phase];
++		len = skb->len;
++		err = skb_cow_data(skb, QUIC_TAG_LEN, &trailer);
++		if (err < 0)
++			return err;
++		pskb_put(skb, trailer, QUIC_TAG_LEN);
++		if (!quic_hdr(skb)->form)
++			quic_hdr(skb)->key = phase;
++		sglen = skb->len;
++		nsg = (u32)err;
++	} else {
++		tfm = crypto->rx_tfm[phase];
++		base_iv = crypto->rx_iv[phase];
++		len = cb->length + cb->number_offset;
++		if (len - hlen < QUIC_TAG_LEN)
++			return -EINVAL;
++		sglen = len;
++		nsg = 1;
++	}
++
++	ctx = quic_crypto_aead_mem_alloc(tfm, sizeof(void *), &iv, &req, &sg,
++					 nsg, gfp);
++	if (!ctx)
++		return -ENOMEM;
++
++	sg_init_table(sg, nsg);
++	err = skb_to_sgvec(skb, sg, 0, sglen);
++	if (err < 0)
++		goto out;
++
++	/* rfc9001#section-5.3:
++	 *
++	 * The associated data, A, for the AEAD is the contents of the QUIC
++	 * header, starting from the first byte of either the short or long
++	 * header, up to and including the unprotected packet number.
++	 *
++	 * The nonce, N, is formed by combining the packet protection IV with
++	 * the packet number.  The 62 bits of the reconstructed QUIC packet
++	 * number in network byte order are left-padded with zeros to the size
++	 * of the IV. The exclusive OR of the padded packet number and the IV
++	 * forms the AEAD nonce.
++	 */
++	memcpy(nonce, base_iv, QUIC_IV_LEN);
++	n = cpu_to_be64(cb->number);
++	for (i = 0; i < sizeof(n); i++)
++		nonce[QUIC_IV_LEN - sizeof(n) + i] ^= ((u8 *)&n)[i];
++
++	/* For CCM based ciphers, first byte of IV is a constant. */
++	iv[0] = TLS_AES_CCM_IV_B0_BYTE;
++	memcpy(&iv[ccm], nonce, QUIC_IV_LEN);
++	aead_request_set_tfm(req, tfm);
++	aead_request_set_ad(req, hlen);
++	aead_request_set_crypt(req, sg, sg, len - hlen, iv);
++	if (cb->sync) {
++		DECLARE_CRYPTO_WAIT(wait);
++
++		aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					  crypto_req_done, &wait);
++		err = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
++		if (err == -EINPROGRESS || err == -EBUSY)
++			err = crypto_wait_req(err, &wait);
++		goto out;
++	}
++
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  quic_crypto_done, skb);
++	*(struct quic_crypto **)ctx = crypto;
++	atomic_inc(&crypto->async_pending[phase]);
++	cb->crypto_ctx = ctx; /* Async free context for quic_crypto_done() */
++	err = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
++	if (err == -EINPROGRESS || err == -EBUSY) {
++		memzero_explicit(nonce, sizeof(nonce));
++		return -EINPROGRESS;
++	}
++	atomic_dec(&crypto->async_pending[phase]);
++	cb->crypto_ctx = NULL;
++
++out:
++	kfree_sensitive(ctx);
++	memzero_explicit(nonce, sizeof(nonce));
++	return err;
++}
++
++/* Encrypts a QUIC packet before transmission.  This function performs AEAD
++ * encryption of the packet payload and applies header protection. It handles
++ * key phase tracking and key update timing.
++ *
++ * Return: 0 on success, -EINPROGRESS for async operation, or negative error.
++ */
++int quic_crypto_encrypt(struct quic_crypto *crypto, struct sk_buff *skb,
++			gfp_t gfp)
++{
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	int err;
++
++	/* Packet payload is already encrypted (e.g., resumed from async),
++	 * proceed to header protection only.
++	 */
++	if (cb->resume) {
++		err = cb->crypto_err;
++		if (err)
++			return err;
++		goto out;
++	}
++
++	cb->key_phase = crypto->key_phase;
++	if (crypto->tx_count[cb->key_phase] >= crypto->cipher->txlimit)
++		return -EKEYEXPIRED;
++	crypto->tx_count[cb->key_phase]++;
++	err = quic_crypto_payload_protect(crypto, skb, true, gfp);
++	if (err)
++		return err;
++out:
++	err = quic_crypto_header_protect(crypto, skb, true, gfp);
++	if (err)
++		return err;
++	/* If a key update is pending and this is the first packet using the
++	 * new key, save the current time. Later used to clear old keys after
++	 * some time has passed (see quic_crypto_decrypt()).
++	 */
++	if (crypto->key_pending && !crypto->key_update_send_time)
++		crypto->key_update_send_time = quic_ktime_get_us();
++	return 0;
++}
++
++/* Decrypts a QUIC packet after reception.  This function removes header
++ * protection, decrypts the payload, and processes any key updates if the key
++ * phase bit changes.
++ *
++ * Return: 0 on success, -EINPROGRESS for async operation, or negative error.
++ */
++int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *skb,
++			gfp_t gfp)
++{
++	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
++	int err = 0;
++	u64 time;
++	u8 phase;
++
++	/* Payload was decrypted asynchronously.  Proceed with parsing packet
++	 * number and key phase.
++	 */
++	if (cb->resume) {
++		err = cb->crypto_err;
++		if (err) {
++			/* Apply same key_pending cleanup as synchronous path to
++			 * avoid deadlock in key update state machine.
++			 */
++			if (crypto->key_pending &&
++			    cb->key_phase != crypto->key_phase) {
++				crypto->key_pending = 0;
++				crypto->key_update_time = 0;
++				crypto->key_update_send_time = 0;
++			}
++			goto err;
++		}
++		err = quic_crypto_get_number(skb);
++		if (err)
++			return err;
++		goto out;
++	}
++	if (!cb->number_len) { /* Packet header not yet decrypted. */
++		err = quic_crypto_header_protect(crypto, skb, false, gfp);
++		if (err) {
++			pr_debug("%s: hd decrypt err %d\n", __func__, err);
++			return err;
++		}
++	}
++
++	/* rfc9001#section-6:
++	 *
++	 * The Key Phase bit allows a recipient to detect a change in keying
++	 * material without needing to receive the first packet that triggered
++	 * the change. An endpoint that notices a changed Key Phase bit updates
++	 * keys and decrypts the packet that contains the changed value.
++	 */
++	phase = cb->key_phase;
++	if (phase != crypto->key_phase && !crypto->key_pending) {
++		if (!crypto->send_ready) /* Not ready for key update. */
++			return -EINVAL;
++		if (!cb->backlog) /* Key update requires process context. */
++			return -EKEYREVOKED;
++		/* Cannot do key update while async crypto is in progress. */
++		if (unlikely(atomic_read(&crypto->async_pending[phase])))
++			return -EBUSY;
++		err = quic_crypto_key_update(crypto); /* Perform key update. */
++		if (err) {
++			cb->errcode = QUIC_TRANSPORT_ERROR_KEY_UPDATE;
++			return err;
++		}
++		cb->sync = 1;
++		cb->key_update = 1; /* Mark packet as triggering key update. */
++	}
++
++	err = quic_crypto_payload_protect(crypto, skb, false, gfp);
++	if (err) {
++		if (err == -EINPROGRESS)
++			return err;
++		/* When using the old keys can not decrypt the packets, the
++		 * peer might start another key_update. Thus, clear the last
++		 * key_pending so that next packets will trigger the new
++		 * key-update.
++		 */
++		if (crypto->key_pending && phase != crypto->key_phase) {
++			crypto->key_pending = 0;
++			crypto->key_update_time = 0;
++			crypto->key_update_send_time = 0;
++		}
++		goto err;
++	}
++
++out:
++	/* rfc9001#section-6.2:
++	 *
++	 * If a packet is successfully processed using the next key and IV,
++	 * then the peer has initiated a key update.
++	 */
++	if (cb->key_update) {
++		crypto->key_pending = 1;
++		crypto->key_derived = 0;
++		crypto->key_phase = !crypto->key_phase;
++	}
++	/* rfc9001#section-6.1:
++	 *
++	 * An endpoint MUST retain old keys until it has successfully
++	 * unprotected a packet sent using the new keys. An endpoint SHOULD
++	 * retain old keys for some time after unprotecting a packet sent using
++	 * the new keys.
++	 */
++	if (crypto->key_pending && cb->key_phase == crypto->key_phase) {
++		time = crypto->key_update_send_time;
++		if (time &&
++		    quic_ktime_get_us() - time >= crypto->key_update_time) {
++			crypto->key_pending = 0;
++			crypto->key_update_time = 0;
++			crypto->key_update_send_time = 0;
++		}
++	}
++	return 0;
++err:
++	if (++crypto->rx_fails >= crypto->cipher->rxlimit)
++		err = -EKEYEXPIRED;
++	return err;
++}
++
+ int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type)
  {
- 	return !!sk->sk_max_ack_backlog;
+ 	const struct quic_cipher *cipher;
+@@ -565,6 +1044,241 @@ int quic_crypto_initial_keys_install(struct quic_crypto *crypto,
+ 	return err;
+ }
+ 
++#define QUIC_RETRY_KEY_V1 \
++	"\xbe\x0c\x69\x0b\x9f\x66\x57\x5a\x1d\x76\x6b\x54\xe3\x68\xc8\x4e"
++#define QUIC_RETRY_KEY_V2 \
++	"\x8f\xb4\xb0\x1b\x56\xac\x48\xe2\x60\xfb\xcb\xce\xad\x7c\xcc\x92"
++
++#define QUIC_RETRY_NONCE_V1 "\x46\x15\x99\xd3\x5d\x63\x2b\xf2\x23\x98\x25\xbb"
++#define QUIC_RETRY_NONCE_V2 "\xd8\x69\x69\xbc\x2d\x7c\x6d\x99\x90\xef\xb0\x4a"
++
++/* Retry Packet Integrity. */
++int quic_crypto_get_retry_tag(struct quic_crypto *crypto, struct sk_buff *skb,
++			      struct quic_conn_id *odcid, u32 version, u8 *tag)
++{
++	/* Reuse RX AEAD (phase 1) in Initial crypto. */
++	struct crypto_aead *tfm = crypto->rx_tfm[1];
++	u8 *pseudo_retry, *p, *iv, *key;
++	DECLARE_CRYPTO_WAIT(wait);
++	struct aead_request *req;
++	struct scatterlist *sg;
++	u32 plen;
++	int err;
++
++	/* The caller must ensure skb->len > QUIC_TAG_LEN. */
++	if (skb->len <= QUIC_TAG_LEN)
++		return -EINVAL;
++
++	/* rfc9001#section-5.8:
++	 *
++	 * The Retry Integrity Tag is a 128-bit field that is computed as the
++	 * output of AEAD_AES_128_GCM used with the following inputs:
++	 *
++	 * - The secret key, K, is 128 bits equal to
++	 *   0xbe0c690b9f66575a1d766b54e368c84e.
++	 * - The nonce, N, is 96 bits equal to 0x461599d35d632bf2239825bb.
++	 * - The plaintext, P, is empty.
++	 * - The associated data, A, is the contents of the Retry
++	 *   Pseudo-Packet,
++	 *
++	 * The Retry Pseudo-Packet is not sent over the wire. It is computed by
++	 * taking the transmitted Retry packet, removing the Retry Integrity
++	 * Tag, and prepending the two following fields: ODCID Length +
++	 * Original Destination Connection ID (ODCID).
++	 */
++	err = crypto_aead_setauthsize(tfm, QUIC_TAG_LEN);
++	if (err)
++		return err;
++	key = QUIC_RETRY_KEY_V1;
++	if (version == QUIC_VERSION_V2)
++		key = QUIC_RETRY_KEY_V2;
++	err = crypto_aead_setkey(tfm, key, TLS_CIPHER_AES_GCM_128_KEY_SIZE);
++	if (err)
++		return err;
++
++	plen = 1 + odcid->len + skb->len - QUIC_TAG_LEN;
++	pseudo_retry = quic_crypto_aead_mem_alloc(tfm, plen + QUIC_TAG_LEN, &iv,
++						  &req, &sg, 1, GFP_KERNEL);
++	if (!pseudo_retry)
++		return -ENOMEM;
++
++	p = pseudo_retry;
++	p = quic_put_int(p, odcid->len, 1);
++	p = quic_put_data(p, odcid->data, odcid->len);
++	p = quic_put_data(p, skb->data, skb->len - QUIC_TAG_LEN);
++	sg_init_one(sg, pseudo_retry, plen + QUIC_TAG_LEN);
++
++	memcpy(iv, QUIC_RETRY_NONCE_V1, QUIC_IV_LEN);
++	if (version == QUIC_VERSION_V2)
++		memcpy(iv, QUIC_RETRY_NONCE_V2, QUIC_IV_LEN);
++	aead_request_set_tfm(req, tfm);
++	aead_request_set_ad(req, plen);
++	aead_request_set_crypt(req, sg, sg, 0, iv);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
++	err = crypto_aead_encrypt(req);
++	if (err == -EINPROGRESS || err == -EBUSY)
++		err = crypto_wait_req(err, &wait);
++	if (!err)
++		memcpy(tag, p, QUIC_TAG_LEN);
++
++	kfree_sensitive(pseudo_retry);
++	return err;
++}
++
++/* Protect or unprotect a token using the token AEAD transform and IV.
++ *
++ * The token AEAD key and authentication size must be initialized by
++ * quic_crypto_set_token_secret() before calling this function.
++ */
++static int quic_crypto_token_protect(struct quic_crypto *crypto, u8 *token,
++				     u32 len, u32 adlen, bool enc)
++{
++	/* Reuse TX AEAD (phase 1) in Initial crypto. */
++	struct crypto_aead *tfm = crypto->tx_tfm[1];
++	u32 extra = enc ? QUIC_TAG_LEN : 0, tslen;
++	DECLARE_CRYPTO_WAIT(wait);
++	struct aead_request *req;
++	struct scatterlist *sg;
++	void *ctx = NULL;
++	u8 *nonce, *p, i;
++	__be64 n;
++	int err;
++	u64 ts;
++
++	ctx = quic_crypto_aead_mem_alloc(tfm, 0, &nonce, &req, &sg, 1,
++					 GFP_KERNEL);
++	if (!ctx) {
++		err = -ENOMEM;
++		goto out;
++	}
++	memcpy(nonce, crypto->tx_iv[1], QUIC_IV_LEN);
++
++	tslen = sizeof(ts);
++	p = token + adlen - tslen;
++	quic_get_int(&p, &tslen, &ts, tslen);
++
++	n = cpu_to_be64(ts);
++	for (i = 0; i < sizeof(n); i++)
++		nonce[QUIC_IV_LEN - sizeof(n) + i] ^= ((u8 *)&n)[i];
++
++	sg_init_one(sg, token, len);
++	aead_request_set_tfm(req, tfm);
++	aead_request_set_ad(req, adlen);
++	aead_request_set_crypt(req, sg, sg, len - adlen - extra, nonce);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
++	err = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
++	if (err == -EINPROGRESS || err == -EBUSY)
++		err = crypto_wait_req(err, &wait);
++
++out:
++	kfree_sensitive(ctx);
++	return err;
++}
++
++/* Generate a Retry or address validation token.
++ *
++ * Builds a token containing the flag, timestamp, client address, and original
++ * DCID. The flag and timestamp are authenticated as associated data; the
++ * client address and original DCID are encrypted with AES-GCM.
++ *
++ * Return: 0 on success or a negative error code on failure.
++ */
++int quic_crypto_generate_token(struct quic_crypto *crypto, void *addr,
++			       u32 addrlen, struct quic_conn_id *conn_id,
++			       u8 *token, u32 *tlen)
++{
++	u64 ts = quic_ktime_get_us() - crypto->ts_off;
++	u8 *token_buf, *p, flag = *token;
++	u32 len, tslen = sizeof(ts);
++	int err;
++
++	len = sizeof(flag) + tslen + addrlen + conn_id->len + QUIC_TAG_LEN;
++	token_buf = kmalloc(len, GFP_KERNEL);
++	if (!token_buf)
++		return -ENOMEM;
++
++	p = token_buf;
++	p = quic_put_int(p, flag, sizeof(flag));
++	p = quic_put_int(p, ts, tslen);
++	p = quic_put_data(p, addr, addrlen);
++	quic_put_data(p, conn_id->data, conn_id->len);
++
++	err = quic_crypto_token_protect(crypto, token_buf, len,
++					sizeof(flag) + tslen, true);
++	if (err)
++		goto out;
++
++	memcpy(token, token_buf, len);
++	*tlen = len;
++out:
++	kfree_sensitive(token_buf);
++	return err;
++}
++
++/* Validate a Retry or address validation token.
++ *
++ * Decrypts and authenticates the token, checks the client address and validates
++ * the timestamp against the timeout selected by the token flag. For a Retry
++ * token, extracts the original destination connection ID.
++ *
++ * Return: 0 on success or a negative error code on failure.
++ */
++int quic_crypto_verify_token(struct quic_crypto *crypto, void *addr,
++			     u32 addrlen, struct quic_conn_id *conn_id,
++			     u8 *token, u32 len)
++{
++	u64 t, ts = quic_ktime_get_us() - crypto->ts_off;
++	s64 timeout = QUIC_TOKEN_TIMEOUT_RETRY;
++	u8 *token_buf, *p, flag;
++	u32 tslen = sizeof(ts);
++	int err;
++	s64 age;
++
++	if (len < sizeof(flag) + tslen + addrlen + QUIC_TAG_LEN)
++		return -EINVAL;
++	token_buf = kmemdup(token, len, GFP_KERNEL);
++	if (!token_buf)
++		return -ENOMEM;
++
++	err = quic_crypto_token_protect(crypto, token_buf, len,
++					sizeof(flag) + tslen, false);
++	if (err)
++		goto out;
++
++	err = -EINVAL;
++	p = token_buf;
++	flag = *p++;
++	len -= sizeof(flag);
++	if (flag == QUIC_TOKEN_FLAG_REGULAR)
++		timeout = QUIC_TOKEN_TIMEOUT_REGULAR;
++	if (!quic_get_int(&p, &len, &t, tslen))
++		goto out;
++	/* Wraparound-safe timestamp validation (similar to time_after64).
++	 * Check if token timestamp is in the future or has expired.
++	 */
++	age = (s64)(ts - t);
++	if (age < 0 || age > timeout)
++		goto out;
++	if (crypto_memneq(p, addr, addrlen))
++		goto out;
++
++	p += addrlen;
++	len -= addrlen;
++
++	len -= QUIC_TAG_LEN;
++	if (len > QUIC_CONN_ID_MAX_LEN)
++		goto out;
++
++	if (flag == QUIC_TOKEN_FLAG_RETRY)
++		quic_conn_id_update(conn_id, p, len);
++	err = 0;
++out:
++	kfree_sensitive(token_buf);
++	return err;
++}
++
+ /* Derive a secret using HKDF-Extract and HKDF-Expand with the given label.
+  * Used to generate a stateless reset token or session resumption master key.
+  */
+diff --git a/net/quic/crypto.h b/net/quic/crypto.h
+index 704d00c26daf..fdd81b73a490 100644
+--- a/net/quic/crypto.h
++++ b/net/quic/crypto.h
+@@ -70,6 +70,11 @@ int quic_crypto_set_secret(struct quic_crypto *crypto,
+ int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type);
+ int quic_crypto_key_update(struct quic_crypto *crypto);
+ 
++int quic_crypto_encrypt(struct quic_crypto *crypto, struct sk_buff *skb,
++			gfp_t gfp);
++int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *skb,
++			gfp_t gfp);
++
+ int quic_crypto_derive_secret(struct quic_crypto *crypto, void *data, u32 len,
+ 			      char *label, u8 *srt, u32 srt_len);
+ int quic_crypto_initial_keys_install(struct quic_crypto *crypto,
+@@ -77,4 +82,13 @@ int quic_crypto_initial_keys_install(struct quic_crypto *crypto,
+ 				     u32 version, bool is_serv);
+ int quic_crypto_set_token_secret(struct quic_crypto *crypto);
+ 
++int quic_crypto_generate_token(struct quic_crypto *crypto, void *addr,
++			       u32 addrlen, struct quic_conn_id *conn_id,
++			       u8 *token, u32 *tlen);
++int quic_crypto_get_retry_tag(struct quic_crypto *crypto, struct sk_buff *skb,
++			      struct quic_conn_id *odcid, u32 version, u8 *tag);
++int quic_crypto_verify_token(struct quic_crypto *crypto, void *addr,
++			     u32 addrlen, struct quic_conn_id *conn_id,
++			     u8 *token, u32 len);
++
+ void quic_crypto_free(struct quic_crypto *crypto);
 -- 
 2.47.1
 
