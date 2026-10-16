@@ -1,216 +1,210 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12675455173;
-	Fri, 16 Oct 2026 21:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DE545039;
+	Fri, 16 Oct 2026 23:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792187631; cv=none; b=qxpkdoRA6u02C+V2xqhk3fV5jEV+FYm+X0AMzd+eWj53LzJaFtzb24wym/7tkXAJE8ksKQ3WymOYMBDwgHw8E0oXaoW5iFj4cz0bmB9RAxlbUJFWIgqkVbTfh/x2GiGQtOn1zve0PLmuSHTnt9VIPshQ9K8mUk5wt7miZXc39m0=
+	t=1792194767; cv=none; b=YEXdt5ibb9FEtLQqh4QGRZQUZ+Io06+4Ow18O4uYgDzPoKGH5TUQQLjxkRG2T1pA5TcXI/jZCA82gkeiAN5Mb+hTiEiZsX58DbhZpDUPIut53wp7MnVuFF6KFEryTiaIO7iBcnFQsXzgF2xD9+I9JKkqHMFelQZmwMvLc+5xRfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792187631; c=relaxed/simple;
-	bh=ZK7azRDiS9PvC6iZGVPB6px13u1Gw01tOdsHuvz3mwA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rItQP9E5Pfu/gm+bH31Dkr1uxuLQpjLM3r4vtqLLWlD5OHu1X8dtRgdBUmvHTWX4E2yWu77Y8isi8LgHSJ1k0uyGufHJwkWG+UCaVhKPzVmSYv1uhTqdXmVTaIZIwUVdk6/afZ9N5qJdeDTJL/45BrR+27PBbIhv+vuQf5mnT88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+s0sxKA; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792194767; c=relaxed/simple;
+	bh=QXilKyRqJrwNMzcX7XioD1gEYG2j2+eesqh+yf+HYU4=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=GlLn/hdlp89nv9crw+xiMOjnFI9YJ/F4/ONWjzLP2mnnADZHgFdYPZoTuH6qJWgYNRMfayEy3t+4GrGRf8asaQe/u7uTfz6jYTQjTfdHweCpKwg7mwp3GkT/qA56gPH8JN7Ww/cY6r2Sj6kjIQR58NrQfEaZTyKLw2XBbMOjHvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=yqe0fViP; arc=none smtp.client-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+s0sxKA"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0F29E1F000C4;
-	Fri, 16 Oct 2026 21:53:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792187629;
-	bh=bCMwZ8mQei7EDDTNVs6DlPqXteYgikRw7RDXBv3wkLk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=j+s0sxKA15LzpHP1KuWt5AxRcy/KHUT7ToKU5j3WjtfMR+5+pFgPQ0v9oiWa3PLE1
-	 mNsAKNcdf+/MPcV0G2FZOsSLH1hZBTBashII1hMH8hKJePofybTaxFqe1jzrdnIh7/
-	 CpOFAFh8AAjenjNMf1tICp62HXQtF07uqnN8TKz5YVgGi5aBrRM6/ykf/gMHwWihUp
-	 17TdB6BCfE+muKJweyGRtG8yMZ/HAFV2TFqY3yoDbQtE8Nuy0PZUVa5yh7Na7zlFbm
-	 WdaTmQOQ0omdyAvMKj62EHgpHj3XXJmAUmh3nXYkb2kyoG2sfjW1rkIKe1eMEPksig
-	 CF2FBgRxMFVMA==
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: keyrings@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	linux-cifs@vger.kernel.org (open list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
-	samba-technical@lists.samba.org (moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
-	linux-kernel@vger.kernel.org (open list),
-	linux-security-module@vger.kernel.org (open list:SECURITY SUBSYSTEM)
-Subject: [RFC PATCH 1/6] keys: prevent quota overflow and widen quotalen and datalen to 32 bits
-Date: Sat, 17 Oct 2026 00:52:59 +0300
-Message-ID: <20261016215326.4110064-2-jarkko@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261016215326.4110064-1-jarkko@kernel.org>
-References: <20261016215326.4110064-1-jarkko@kernel.org>
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="yqe0fViP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:Subject:Cc:To:From:
+	Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=aGtv9OjoqZMn1pYmcItOtLJ0759sNOoF1i5JiX/CXbs=; b=yqe0fViP+IiKkRAbNTNjoRbvlY
+	mlITTZtVhZq83KAWVsfAbeTWJdHa1f5wX9yTSpGVgK3+pGn/rCxUMZeHJBunADNz3/vTwyLSrzSDH
+	ERK8A7wAmiymda9Ri5rZM7EZq26/Dt19LDeZavumh3o3kYCqmkngN/X4WGNE/qA2FVOlrvJE6ufkN
+	SvL7i/kQTwC1J0ijus3sj8Qi43h7NwVFhNBs2ZBNkcchPFvN0eqnKCeDvgNV/h2ITdS03V10SmVA/
+	n6PivAV6IXTAJNQCAoXH+HWw5DNqq8DiOcWFCGhML0ZDswgMKJErqqSsUgyNXwvlwUOp64W+6nfju
+	koD95p6A==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1xHrj8-00000003pDj-1oWX;
+	Fri, 16 Oct 2026 20:52:42 -0300
+Message-ID: <fcf60d2f4382fc7ccd77ea41c5e55b50@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Christian Brauner <brauner@kernel.org>, Mark Brown <broonie@kernel.org>,
+ linux-cifs@vger.kernel.org, linux-next@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [GIT PULL] smb client changes for v7.4
+Date: Fri, 16 Oct 2026 20:52:42 -0300
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-In struct key, quotalen and datalen are 16-bit unsigned shorts, limiting
-payload and quota tracking to 64 KiB. With large descriptions or payload
-updates, addition and difference calculations can truncate or overflow,
-corrupting user quota accounting.
+Linus,
 
-Additionally, existing quota checks rely on undefined signed overflow
-checks (e.g. user->qnbytes + quotalen < user->qnbytes) and do not guard
-against user->qnkeys or user->qnbytes reaching INT_MAX.
+Please pull the following smb client changes for v7.4.  These are mostly
+cleanups, a number of fixes (crashes, out-of-bounds reads and
+data-integrity bugs), support for changing SMB compression through
+chattr and internal CIFS version removal.
 
-Widen quotalen and datalen to unsigned 32-bit integers in struct key.
-Validate description lengths against INT_MAX in key_alloc(), and check
-quota headroom using safe subtraction across key_alloc(),
-key_payload_reserve(), and keyctl_chown_key().
+This conflicts with the vfs tree in fs/smb/client (mnt_idmap
+constification, fscache_resize_cookie() and transport.c).  The
+resolution is trivial and linux-next has been carrying it for a while.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Assisted-by: LLM
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
----
- fs/smb/client/cifsacl.c |  6 +++---
- include/linux/key.h     |  4 ++--
- security/keys/key.c     | 25 ++++++++++++++++++++-----
- security/keys/keyctl.c  |  9 +++++----
- 4 files changed, 30 insertions(+), 14 deletions(-)
+Thanks,
+Paulo
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index c5e47a835f99..de2acc7234be 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -385,7 +385,7 @@ id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
- 		goto out_revert_creds;
- 	} else if (sidkey->datalen < CIFS_SID_BASE_SIZE) {
- 		rc = smb_EIO1(smb_eio_trace_malformed_sid_key, sidkey->datalen);
--		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
-+		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u)\n",
- 			 __func__, sidkey->datalen);
- 		goto invalidate_key;
- 	}
-@@ -403,7 +403,7 @@ id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
- 	if (ksid_size > sidkey->datalen) {
- 		rc = smb_EIO2(smb_eio_trace_malformed_ksid_key,
- 			      ksid_size, sidkey->datalen);
--		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu, ksid_size=%u)\n",
-+		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u, ksid_size=%u)\n",
- 			 __func__, sidkey->datalen, ksid_size);
- 		goto invalidate_key;
- 	}
-@@ -498,7 +498,7 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_sid *psid,
- 	 */
- 	BUILD_BUG_ON(sizeof(uid_t) != sizeof(gid_t));
- 	if (sidkey->datalen != sizeof(uid_t)) {
--		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
-+		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u)\n",
- 			 __func__, sidkey->datalen);
- 		key_invalidate(sidkey);
- 		goto out_key_put;
-diff --git a/include/linux/key.h b/include/linux/key.h
-index e40b5267658f..26139c3adf62 100644
---- a/include/linux/key.h
-+++ b/include/linux/key.h
-@@ -216,8 +216,8 @@ struct key {
- 	kuid_t			uid;
- 	kgid_t			gid;
- 	key_perm_t		perm;		/* access permissions */
--	unsigned short		quotalen;	/* length added to quota */
--	unsigned short		datalen;	/* payload data length
-+	unsigned int		quotalen;	/* length added to quota */
-+	unsigned int		datalen;	/* payload data length
- 						 * - may not match RCU dereferenced payload
- 						 * - payload should contain own length
- 						 */
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 6ebb8691551f..144745684334 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -245,6 +245,10 @@ struct key *key_alloc(struct key_type *type, const char *desc,
- 	}
- 
- 	desclen = strlen(desc);
-+	if (desclen >= INT_MAX || type->def_datalen > INT_MAX - desclen - 1) {
-+		key = ERR_PTR(-EINVAL);
-+		goto error;
-+	}
- 	quotalen = desclen + 1 + type->def_datalen;
- 
- 	/* get hold of the key tracking for this user */
-@@ -261,10 +265,14 @@ struct key *key_alloc(struct key_type *type, const char *desc,
- 			key_quota_root_maxbytes : key_quota_maxbytes;
- 
- 		spin_lock_irqsave(&user->lock, irqflags);
-+		if (user->qnkeys == INT_MAX ||
-+		    quotalen > INT_MAX - user->qnbytes)
-+			goto no_quota;
-+
- 		if (!(flags & KEY_ALLOC_QUOTA_OVERRUN)) {
- 			if (user->qnkeys + 1 > maxkeys ||
--			    user->qnbytes + quotalen > maxbytes ||
--			    user->qnbytes + quotalen < user->qnbytes)
-+			    quotalen > maxbytes ||
-+			    user->qnbytes > maxbytes - quotalen)
- 				goto no_quota;
- 		}
- 
-@@ -373,11 +381,16 @@ EXPORT_SYMBOL(key_alloc);
-  */
- int key_payload_reserve(struct key *key, size_t datalen)
- {
--	int delta = (int)datalen - key->datalen;
-+	int delta;
- 	int ret = 0;
- 
- 	key_check(key);
- 
-+	if (datalen > INT_MAX)
-+		return -EINVAL;
-+
-+	delta = (int)datalen - (int)key->datalen;
-+
- 	/* contemplate the quota adjustment */
- 	if (delta != 0 && test_bit(KEY_FLAG_IN_QUOTA, &key->flags)) {
- 		unsigned maxbytes = uid_eq(key->user->uid, GLOBAL_ROOT_UID) ?
-@@ -387,8 +400,10 @@ int key_payload_reserve(struct key *key, size_t datalen)
- 		spin_lock_irqsave(&key->user->lock, flags);
- 
- 		if (delta > 0 &&
--		    (key->user->qnbytes + delta > maxbytes ||
--		     key->user->qnbytes + delta < key->user->qnbytes)) {
-+		    (delta > INT_MAX - key->user->qnbytes ||
-+		     delta > INT_MAX - key->quotalen ||
-+		     delta > maxbytes ||
-+		     key->user->qnbytes > maxbytes - delta)) {
- 			ret = -EDQUOT;
- 		}
- 		else {
-diff --git a/security/keys/keyctl.c b/security/keys/keyctl.c
-index 5a5efa26ed0e..6b528faab1a7 100644
---- a/security/keys/keyctl.c
-+++ b/security/keys/keyctl.c
-@@ -1014,10 +1014,11 @@ long keyctl_chown_key(key_serial_t id, uid_t user, gid_t group)
- 				key_quota_root_maxbytes : key_quota_maxbytes;
- 
- 			spin_lock_irqsave(&newowner->lock, flags);
--			if (newowner->qnkeys + 1 > maxkeys ||
--			    newowner->qnbytes + key->quotalen > maxbytes ||
--			    newowner->qnbytes + key->quotalen <
--			    newowner->qnbytes)
-+			if (newowner->qnkeys == INT_MAX ||
-+			    newowner->qnkeys + 1 > maxkeys ||
-+			    key->quotalen > INT_MAX - newowner->qnbytes ||
-+			    key->quotalen > maxbytes ||
-+			    newowner->qnbytes > maxbytes - key->quotalen)
- 				goto quota_overrun;
- 
- 			newowner->qnkeys++;
--- 
-2.47.3
+----------------------------------------------------------------
+The following changes since commit ff47652a4b66c067c765a7ad464d930b5a9367cc:
 
+  Merge tag 'cifs-fixes-7.3-rc6' of https://git.manguebit.org/linux (2026-10-02 14:04:11 -0700)
+
+are available in the Git repository at:
+
+  https://git.manguebit.org/linux.git tags/cifs-for-7.4
+
+for you to fetch changes up to 78f73985846465a25a7bd1d89904053661f3ca92:
+
+  smb: client: reclaim credits for decrypted reads with no matching mid (2026-10-15 16:45:30 -0300)
+
+----------------------------------------------------------------
+ - Implement ->fileattr_set so chattr(1) compression changes (chattr +c/-c)
+   go through the generic VFS fileattr path and its permission and
+   serialization checks instead of the raw FS_IOC_SETFLAGS fallback and
+   remove the now-unreachable file flags ioctl handlers
+
+ - Require stable pages when the connection is signed or SMB compression is
+   enabled, so a buffered write can no longer modify a folio that is still in
+   flight and corrupt its signature (surfaced as -EIO) or, with compression,
+   silently corrupt the data stored on the server
+
+ - Stop breaking a file's just-granted lease while probing it for a
+   Minshall+French symlink, by reusing an already open handle or opening with
+   the inode's lease key
+
+ - Fix several out-of-bounds reads and use-after-free bug in SMB1
+
+ - Fix an use-after-free bug in cifs_ses_add_channel()
+
+ - Fix a NULL pointer dereference in the demultiplex thread when an encrypted
+   read response matches no outstanding request and reclaim the credits
+   granted on such responses to avoid starving the connection of credits
+
+ - Fail sends fast when the connection needs to reconnect
+
+ - Drop the redundant nls_table argument threaded through the session setup,
+   tree connect and path-based call paths, allocate the session setup state
+   on the stack and remove the internal CIFS version number along with a
+   batch of write-only fields and commented-out code
+
+----------------------------------------------------------------
+Diego Oliva (7):
+      smb: client: fix use-after-free infoleak via the readdir resume name
+      smb: client: fix OOB last_entry pointer from unbounded LastNameOffset
+      smb: client: fix OOB read of the resume name sent in TRANS2_FIND_NEXT2
+      smb: client: fix OOB read in the SMB_FIND_FILE_UNIX name scan
+      smb: client: reject FIND data areas that run past the received response
+      smb: client: reject short or out-of-range FIND response parameters
+      smb: client: drop the redundant name bounds in cifs_filldir()
+
+Enzo Matsumiya (1):
+      smb: client: fast fail sends if need to reconnect
+
+Henry Martin (1):
+      smb: client: fix use-after-free in cifs_ses_add_channel()
+
+Huiwen He (2):
+      smb: client: implement fileattr_set for compression flags
+      smb: client: remove unused file flags ioctl handlers
+
+Paulo Alcantara (49):
+      smb: client: rename mfsymlink helpers to the smb2_ prefix
+      smb: client: set lease_granted before revalidating inode in cifs_nt_open()
+      smb: client: avoid breaking the file lease when probing mfsymlinks
+      smb: client: log the selected security type on session setup failure
+      smb: client: remove commented-out ntlmv2_support definition
+      smb: client: remove commented-out i_flags assignment
+      smb: client: remove commented-out cancel_*_requests() calls
+      smb: client: remove commented-out oplock assignment
+      smb: client: remove commented-out write debug message
+      smb: client: remove commented-out LOCK_RSP declaration
+      smb: client: remove commented-out QPathInfo debug message
+      smb: client: remove commented-out CIFSSMBWinSetPerms() call
+      smb: client: remove commented-out time conversion debug message
+      smb: client: remove commented-out Unix caps assignment
+      smb: client: clean up cifs_buf_release()
+      smb: client: remove the internal CIFS version number
+      smb: client: remove unused overrideSecFlg from struct cifs_ses
+      smb: client: remove write-only max_rw from TCP_Server_Info
+      smb: client: remove write-only sec_kerberosu2u from TCP_Server_Info
+      smb: client: remove write-only signing_negotiated from TCP_Server_Info
+      smb: client: remove unused num_acl_set stat from cifs_tcon
+      smb: client: size smb2_compound_vars.qi_iov for the padding iov
+      smb: client: drop redundant nls_table arg from SMBSetInformation()
+      smb: client: drop redundant nls_table arg from CIFSSMBSetPathInfo()
+      smb: client: drop redundant nls_table arg from ->set_EA()
+      smb: client: drop redundant nls_table arg from build_avpair_blob()
+      smb: client: drop redundant nls_table arg from calc_ntlmv2_hash()
+      smb: client: drop redundant nls_table arg from setup_ntlmv2_rsp()
+      smb: client: drop redundant nls_table arg from build_ntlmssp_negotiate_blob()
+      smb: client: drop redundant nls_table arg from build_ntlmssp_smb3_negotiate_blob()
+      smb: client: drop redundant nls_table arg from build_ntlmssp_auth_blob()
+      smb: client: drop unused nls_table arg from ascii_oslm_strings()
+      smb: client: drop redundant nls_table arg from unicode_domain_string()
+      smb: client: drop unused nls_table arg from ascii_domain_string()
+      smb: client: drop redundant nls_table arg from unicode_ssetup_strings()
+      smb: client: drop unused nls_table arg from ascii_ssetup_strings()
+      smb: client: drop redundant nls_table arg from decode_unicode_ssetup()
+      smb: client: drop unused nls_table arg from decode_ascii_ssetup()
+      smb: client: drop redundant nls_table arg from ->sess_setup()
+      smb: client: drop redundant nls_table arg from cifs_setup_session()
+      smb: client: drop redundant nls_table arg from ->tree_connect()
+      smb: client: drop redundant nls_table arg from CIFSPOSIXDelFile()
+      smb: client: drop redundant nls_table arg from CIFSPOSIXCreate()
+      smb: client: drop redundant nls_table arg from SMBLegacyOpen()
+      smb: client: drop redundant nls_table arg from CIFSSMBRenameOpenFile()
+      smb: client: allocate struct sess_data on the stack
+      smb: client: allocate struct SMB2_sess_data on the stack
+      smb: client: require stable pages for SMB compression
+      smb: client: reclaim credits for decrypted reads with no matching mid
+
+Zikang Gao (1):
+      smb: client: do not pass a NULL buf to is_oplock_break()
+
+ fs/smb/client/asn1.c        |   2 -
+ fs/smb/client/cifs_debug.c  |   1 -
+ fs/smb/client/cifsencrypt.c |  31 +++--
+ fs/smb/client/cifsfs.c      |  11 +-
+ fs/smb/client/cifsfs.h      |   5 +-
+ fs/smb/client/cifsglob.h    |  26 ++---
+ fs/smb/client/cifsproto.h   |  19 +--
+ fs/smb/client/cifssmb.c     | 183 +++++++++++++++++------------
+ fs/smb/client/connect.c     |  59 +++++++---
+ fs/smb/client/dfs.c         |   6 +-
+ fs/smb/client/dir.c         |   1 -
+ fs/smb/client/file.c        |   7 +-
+ fs/smb/client/inode.c       |  36 +++---
+ fs/smb/client/ioctl.c       | 165 ++++++++++++--------------
+ fs/smb/client/link.c        | 273 ++++++++++++++++++++++++++++++++------------
+ fs/smb/client/misc.c        |   4 +-
+ fs/smb/client/netmisc.c     |   3 -
+ fs/smb/client/ntlmssp.h     |  11 +-
+ fs/smb/client/readdir.c     |  80 +++++++++----
+ fs/smb/client/sess.c        |  37 +++---
+ fs/smb/client/smb1ops.c     |  14 +--
+ fs/smb/client/smb1proto.h   |  21 ++--
+ fs/smb/client/smb1session.c | 120 +++++++++----------
+ fs/smb/client/smb2glob.h    |   8 ++
+ fs/smb/client/smb2inode.c   |   7 +-
+ fs/smb/client/smb2ops.c     |  36 +++---
+ fs/smb/client/smb2pdu.c     |  66 +++++------
+ fs/smb/client/smb2pdu.h     |   3 +
+ fs/smb/client/smb2proto.h   |  17 ++-
+ fs/smb/client/trace.h       |   2 +
+ fs/smb/client/transport.c   |  33 ++++++
+ fs/smb/client/xattr.c       |   2 +-
+ 32 files changed, 740 insertions(+), 549 deletions(-)
