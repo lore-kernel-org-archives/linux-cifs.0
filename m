@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B3135F162
-	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCB0E555
+	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792199045; cv=none; b=o4sOvyxMm/3+UIEg8lX8U9Ptqr4l+tICYcY4ONgqn0RLzkFA+K33SnO92xyru3bhaHx4kHmAxwrOsUDVnFwGsKJ3ktSBWd+ttLh7FL0mUFWGAz76bWHNL5S6r0VmMHv46Pw3XfBL3ld1Upgc4WYfGSdklC+0mERYbgQIugJrIzg=
+	t=1792199048; cv=none; b=lkPqJxQd3qtZ3+zKqtaqYBvf/cwp5stF6qDDH/OvJBJFlQRx8VBPqzsoRA537aqH5ZmoA/qkRoGYhxBn1y3pr+f4kXLlN94Ntw0I2aYG7WYv2m7bFJbDyVUuNaNkavA4C3sNpU5q+mIzvykHI2Xs64pTOnzStNbgMo6Et211h/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792199045; c=relaxed/simple;
-	bh=yuZJcfrm+QB9M8jWwsTJCPsxoZJ4I5ugkrbjEIAY6Hg=;
+	s=arc-20240116; t=1792199048; c=relaxed/simple;
+	bh=IdTQ4cdOSzw5SxFnsIi6iJpofmD8Bk0Le8I1iBjEKCY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o0aXjjE7oDdnOB+DshUVKEHrtmLC16UXqVv2xkSuMoVlyf8s6TYf3UMLCIn3Jb1ZXYeIYqIOnUHIINiAASVcV0dx8EOGqjdBMwmHM1vxhBgUuHsUUUM14hmN9Ipi+xnnpqI78VnqdGEypnliHTFexSBXAJhd2a+4swdVXbkqnDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W4RaKoFF; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=H3AN4+A6zTY1w7tGQZBTmM0ER1ooCb5o/rhHZoLH8n0yfXO39h5HIrfhZ5FFCAoPLyWnhlMY5OYXlGC4uqqxYgRIRYLBf3gQg7hh3XtCy0BcQklLKdmkzALIGQ2lQCe+uinN32OHifcf9pNMe5y/+wVGcnSCxH2XyFqFYqLpB8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bN+iEUJR; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W4RaKoFF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0B871F000C4;
-	Sat, 17 Oct 2026 01:04:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bN+iEUJR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40C7E1F000C5;
+	Sat, 17 Oct 2026 01:04:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792199043;
-	bh=olTAI28Yb1jvG9kS3MQpSsz7XV6/8EDbuO2QsNnAE6M=;
+	s=k20260515; t=1792199045;
+	bh=NJ0gDBeDUI6K8syqLyQ87RNwQEUbxAIHPMaMtuBAtZM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=W4RaKoFFqrM8L745y148tLNHNsJc/BgCDF2L+wLcQ28PcNLumcTm4AiFSVc0jODNC
-	 HWGCKbJ/5eABpTTnvCH/LSQYRn4IZY/yT7T4JBS1qDSPkaGIIck+vS101Vg1AWDfDv
-	 xL0RbQ7jQ9La2YX9HLtV+AYWMfRvZ9CfqLcanSFvb2Gr/t21qkBOkilk/dRHPNFgyU
-	 0vwT3qdE5uM72QAK/pAm2vzMRHTCRMQ9ln9WsFcgxxUtCHXMql8pPIi0GdGED8N6nW
-	 IkIS06kSRSeWhROSDF2UlSIreXXIOYftxFBb/JF2BRajsGWJNSLV+EV13xpm6yxfEL
-	 rv1dAbtUWQzDw==
+	b=bN+iEUJR+QEZFDqPWANC5yY1U3z5OqUYZ/nKjE1R/6eniv65Pui9ErTooi91FV5gm
+	 PyJoMavlVN3webNn2BtzPPzTLiTH5hz+OfZmnVuNWX+HOUQnHvcuPaIo6dCmR36tSa
+	 1bFm+6kYEAsa2Do47uaY18aCEhk3Zu1GMRJuNHepnnfOCSQdOsgabdP5joO6NWdmbO
+	 V0r0cBlhZPccbN/GFeX58YYZ83HPsLIFVnbNuUBLczg6+GS+K0BIcPeMXYBl/nyt1X
+	 k0RqADVFqIQrLIyIwj9MPu2V1PD9ks6wBg16pjQ0nOzQyZ9GBD+KhMLGDn/0Bj2ijr
+	 6nDOxrM1W7bEg==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: senozhatsky@chromium.org,
@@ -35,9 +35,9 @@ Cc: senozhatsky@chromium.org,
 	chenxiaosong@kylinos.cn,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	Pan Guihua <pan.guihua@datatom.com>
-Subject: [PATCH 03/22] ksmbd: track delivery of queued TCP writes
-Date: Sat, 17 Oct 2026 10:03:25 +0900
-Message-Id: <20261017010344.11478-3-linkinjeon@kernel.org>
+Subject: [PATCH 04/22] ksmbd: retry break notifications on another connection
+Date: Sat, 17 Oct 2026 10:03:26 +0900
+Message-Id: <20261017010344.11478-4-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20261017010344.11478-1-linkinjeon@kernel.org>
 References: <20261017010344.11478-1-linkinjeon@kernel.org>
@@ -49,603 +49,1290 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A nonblocking break send must distinguish a PDU accepted by TCP from one
-still queued in ksmbd. Retrying an accepted PDU can send duplicates, while
-abandoning a partial send can corrupt the stream.
+An oplock or lease break belongs to an open that can outlive its original
+channel. A draining channel or stalled TCP writer can otherwise leave the
+break pending until timeout or invalidate a durable open.
 
-Queue owned PDU bytes when TCP cannot accept the full message. Track the
-stream position through socket delivery and TCP ACK, and expose it to break
-retries. Bound retained data and stop queued writes during teardown.
+Snapshot the owner's live channels and try eligible connections with the
+same notification. Track TCP delivery separately from the SMB ACK, retry
+when a channel stops progressing, and share one break deadline. Run
+ordinary break waits on a dedicated workqueue so blocked request
+responses do not stall breaks.
+
+Publish NONE before sending a level II break, which requires no ACK, so
+an unsolicited ACK observes the completed level while TCP delivery is
+pending.
+
+Keep the first rename lease notification in the request context and
+enqueue the interim writer only after the notification is accepted. Join
+that work before returning so a blocked interim response does not stop
+notification retries or release the request early.
 
 Reported-by: Pan Guihua <pan.guihua@datatom.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/connection.c    |  52 +++++-
- fs/smb/server/connection.h    |  24 ++-
- fs/smb/server/transport_tcp.c | 299 +++++++++++++++++++++++++++++++++-
- 3 files changed, 356 insertions(+), 19 deletions(-)
+ fs/smb/server/ksmbd_work.c        |  19 +
+ fs/smb/server/ksmbd_work.h        |   2 +
+ fs/smb/server/mgmt/user_session.c |  31 ++
+ fs/smb/server/mgmt/user_session.h |   3 +
+ fs/smb/server/oplock.c            | 855 +++++++++++++++++-------------
+ fs/smb/server/oplock.h            |  14 +-
+ fs/smb/server/vfs_cache.c         |   2 +
+ 7 files changed, 539 insertions(+), 387 deletions(-)
 
-diff --git a/fs/smb/server/connection.c b/fs/smb/server/connection.c
-index d1cc725eeb06..19d32681bb92 100644
---- a/fs/smb/server/connection.c
-+++ b/fs/smb/server/connection.c
-@@ -457,17 +457,13 @@ void ksmbd_all_conn_set_status(struct ksmbd_session *sess, u32 status)
+diff --git a/fs/smb/server/ksmbd_work.c b/fs/smb/server/ksmbd_work.c
+index 52ea1a674a67..6e5122e2d6fc 100644
+--- a/fs/smb/server/ksmbd_work.c
++++ b/fs/smb/server/ksmbd_work.c
+@@ -16,6 +16,7 @@
  
- void ksmbd_conn_abort(struct ksmbd_conn *conn)
+ static struct kmem_cache *work_cache;
+ static struct workqueue_struct *ksmbd_wq;
++static struct workqueue_struct *ksmbd_break_wq;
+ 
+ static int ksmbd_reserve_iov(struct ksmbd_work *work, int need_iov_cnt)
  {
--	bool shutdown = false;
--
- 	spin_lock(&conn->request_lock);
--	if (!ksmbd_conn_exiting(conn) && !ksmbd_conn_releasing(conn)) {
-+	if (!ksmbd_conn_exiting(conn) && !ksmbd_conn_releasing(conn))
- 		ksmbd_conn_set_exiting(conn);
--		shutdown = true;
--	}
- 	spin_unlock(&conn->request_lock);
- 	wake_up_all(&conn->req_running_q);
- 
--	if (shutdown && conn->transport->ops->shutdown)
-+	if (conn->transport->ops->shutdown)
- 		conn->transport->ops->shutdown(conn->transport);
- }
- 
-@@ -534,12 +530,19 @@ static int __ksmbd_conn_write(struct ksmbd_work *work,
- 	tx->need_invalidate_rkey = work->need_invalidate_rkey;
- 	tx->remote_key = work->remote_key;
- 
--	ksmbd_conn_lock(conn);
-+	if (tx->tracking) {
-+		/* A busy writer must not consume the break's retry budget. */
-+		if (!mutex_trylock(&conn->srv_mutex))
-+			return -EAGAIN;
-+	} else {
-+		ksmbd_conn_lock(conn);
-+	}
- 	sent = conn->transport->ops->writev(conn->transport, tx);
- 	ksmbd_conn_unlock(conn);
- 
- 	if (sent < 0) {
--		pr_err("Failed to send message: %d\n", sent);
-+		if (!tx->tracking || sent != -EAGAIN)
-+			pr_err("Failed to send message: %d\n", sent);
- 		return sent;
- 	}
- 
-@@ -553,6 +556,20 @@ int ksmbd_conn_write(struct ksmbd_work *work)
- 	return __ksmbd_conn_write(work, &tx);
- }
- 
-+int ksmbd_conn_write_tracked(struct ksmbd_work *work,
-+			     struct ksmbd_tx_tracking *tracking)
-+{
-+	struct ksmbd_transport_write tx = {};
-+
-+	tracking->valid = false;
-+	/* Transports without delivery tracking keep their synchronous send path. */
-+	if (work->conn->transport->ops->is_acked) {
-+		tx.msg_flags = MSG_DONTWAIT;
-+		tx.tracking = tracking;
-+	}
-+	return __ksmbd_conn_write(work, &tx);
-+}
-+
- int ksmbd_conn_write_eor(struct ksmbd_work *work)
- {
- 	struct ksmbd_transport_write tx = {
-@@ -805,7 +822,12 @@ int ksmbd_conn_handler_loop(void *p)
- 		}
- 	}
- 
-+	/* Exclude new break senders before draining their work references. */
-+	spin_lock(&conn->request_lock);
- 	ksmbd_conn_set_releasing(conn);
-+	spin_unlock(&conn->request_lock);
-+	/* TCP writers waiting for queue space must release their work references. */
-+	wake_up_all(&conn->req_running_q);
- 	ksmbd_conn_cancel_async_requests(conn);
- 	/* Wait till all reference dropped to the Server object*/
- 	ksmbd_debug(CONN, "Wait for all pending requests(%d)\n", atomic_read(&conn->r_count));
-@@ -832,6 +854,20 @@ void ksmbd_conn_r_count_inc(struct ksmbd_conn *conn)
- 	atomic_inc(&conn->r_count);
- }
- 
-+/* The caller already owns a connection reference. */
-+bool ksmbd_conn_r_count_inc_if_good(struct ksmbd_conn *conn)
-+{
-+	bool ret = false;
-+
-+	spin_lock(&conn->request_lock);
-+	if (ksmbd_conn_good(conn)) {
-+		atomic_inc(&conn->r_count);
-+		ret = true;
-+	}
-+	spin_unlock(&conn->request_lock);
-+	return ret;
-+}
-+
- void ksmbd_conn_r_count_dec(struct ksmbd_conn *conn)
- {
- 	/*
-diff --git a/fs/smb/server/connection.h b/fs/smb/server/connection.h
-index 2026a2afa5e4..85e2d2073cd2 100644
---- a/fs/smb/server/connection.h
-+++ b/fs/smb/server/connection.h
-@@ -103,6 +103,8 @@ struct ksmbd_conn {
- 	wait_queue_head_t		r_count_q;
- 	/* Lock to protect requests list*/
- 	spinlock_t			request_lock;
-+	/* Set under request_lock at teardown start and kept set thereafter. */
-+	bool				releasing;
- 	struct list_head		requests;
- 	struct list_head		async_requests;
- 	int				connection_type;
-@@ -162,6 +164,13 @@ struct ksmbd_conn_ops {
- 	int	(*terminate_fn)(struct ksmbd_conn *conn);
- };
- 
-+struct ksmbd_tx_tracking {
-+	/* Required TCP byte count, including transport and socket queues. */
-+	u64		end;
-+	unsigned long	retry_after;
-+	bool		valid;
-+};
-+
- struct ksmbd_transport_write {
- 	struct kvec	*iov;
- 	int		iov_cnt;
-@@ -169,6 +178,7 @@ struct ksmbd_transport_write {
- 	bool		need_invalidate_rkey;
- 	unsigned int	remote_key;
- 	int		msg_flags;
-+	struct ksmbd_tx_tracking *tracking;
- };
- 
- struct ksmbd_transport_ops {
-@@ -176,8 +186,12 @@ struct ksmbd_transport_ops {
- 	void (*shutdown)(struct ksmbd_transport *t);
- 	int (*read)(struct ksmbd_transport *t, char *buf,
- 		    unsigned int size, int max_retries);
-+	/* Retained bytes must be privately owned before a full result is returned. */
- 	int (*writev)(struct ksmbd_transport *t,
- 		      const struct ksmbd_transport_write *tx);
-+	/* Optional delivery tracking for nonblocking break sends. */
-+	bool (*is_acked)(struct ksmbd_transport *t,
-+			 const struct ksmbd_tx_tracking *tracking);
- 	int (*rdma_read)(struct ksmbd_transport *t,
- 			 void *buf, unsigned int len,
- 			 struct smbdirect_buffer_descriptor_v1 *desc,
-@@ -217,6 +231,8 @@ int ksmbd_conn_wq_init(void);
- void ksmbd_conn_wq_destroy(void);
- bool ksmbd_conn_lookup_dialect(struct ksmbd_conn *c);
- int ksmbd_conn_write(struct ksmbd_work *work);
-+int ksmbd_conn_write_tracked(struct ksmbd_work *work,
-+			     struct ksmbd_tx_tracking *tracking);
- int ksmbd_conn_write_eor(struct ksmbd_work *work);
- int ksmbd_conn_rdma_read(struct ksmbd_conn *conn,
- 			 void *buf, unsigned int buflen,
-@@ -235,6 +251,7 @@ void ksmbd_conn_transport_destroy(void);
- void ksmbd_conn_lock(struct ksmbd_conn *conn);
- void ksmbd_conn_unlock(struct ksmbd_conn *conn);
- void ksmbd_conn_r_count_inc(struct ksmbd_conn *conn);
-+bool ksmbd_conn_r_count_inc_if_good(struct ksmbd_conn *conn);
- void ksmbd_conn_r_count_dec(struct ksmbd_conn *conn);
- 
- /*
-@@ -250,7 +267,8 @@ static inline bool ksmbd_conn_new(struct ksmbd_conn *conn)
- 
- static inline bool ksmbd_conn_good(struct ksmbd_conn *conn)
- {
--	return READ_ONCE(conn->status) == KSMBD_SESS_GOOD;
-+	return !READ_ONCE(conn->releasing) &&
-+		READ_ONCE(conn->status) == KSMBD_SESS_GOOD;
- }
- 
- static inline unsigned int
-@@ -284,7 +302,8 @@ static inline bool ksmbd_conn_exiting(struct ksmbd_conn *conn)
- 
- static inline bool ksmbd_conn_releasing(struct ksmbd_conn *conn)
- {
--	return READ_ONCE(conn->status) == KSMBD_SESS_RELEASING;
-+	return READ_ONCE(conn->releasing) ||
-+		READ_ONCE(conn->status) == KSMBD_SESS_RELEASING;
- }
- 
- static inline void ksmbd_conn_set_new(struct ksmbd_conn *conn)
-@@ -319,6 +338,7 @@ static inline void ksmbd_conn_set_exiting(struct ksmbd_conn *conn)
- 
- static inline void ksmbd_conn_set_releasing(struct ksmbd_conn *conn)
- {
-+	WRITE_ONCE(conn->releasing, true);
- 	WRITE_ONCE(conn->status, KSMBD_SESS_RELEASING);
- }
- 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 488ca113b431..9c6ca878d30f 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -5,6 +5,7 @@
-  */
- 
- #include <linux/freezer.h>
-+#include <linux/uio.h>
- 
- #include "smb_common.h"
- #include "server.h"
-@@ -29,11 +30,30 @@ static LIST_HEAD(iface_list);
- 
- static int bind_additional_ifaces;
- 
-+struct tcp_tx {
-+	struct list_head		list;
-+	size_t			len;
-+	size_t			offset;
-+	unsigned long		deadline;
-+	int			msg_flags;
-+	u8			data[];
-+};
-+
- struct tcp_transport {
- 	struct ksmbd_transport		transport;
- 	struct socket			*sock;
- 	struct kvec			*iov;
- 	unsigned int			nr_iov;
-+	/* Serializes queue access and socket writes. Never taken by callbacks. */
-+	struct mutex			tx_lock;
-+	struct list_head		tx_queue;
-+	struct delayed_work		tx_work;
-+	size_t				tx_queued;
-+	/* TCP byte positions for accepted PDUs and bytes passed to the socket. */
-+	u64				tx_end;
-+	u64				tx_sent;
-+	bool				tx_stopped;
-+	void				(*write_space)(struct sock *sk);
- };
- 
- static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops;
-@@ -42,6 +62,10 @@ static void tcp_stop_kthread(struct task_struct *kthread);
- static void ksmbd_tcp_stop_listener(struct interface *iface);
- static struct interface *alloc_iface(char *ifname);
- static void ksmbd_tcp_disconnect(struct ksmbd_transport *t);
-+static void ksmbd_tcp_shutdown(struct ksmbd_transport *t);
-+static void ksmbd_tcp_tx_work(struct work_struct *work);
-+static void ksmbd_tcp_write_space(struct sock *sk);
-+static void ksmbd_tcp_stop_tx(struct tcp_transport *t);
- 
- #define KSMBD_TRANS(t)	(&(t)->transport)
- #define TCP_TRANS(t)	((struct tcp_transport *)container_of(t, \
-@@ -66,6 +90,9 @@ static struct tcp_transport *alloc_transport(struct socket *client_sk)
- 	if (!t)
- 		return NULL;
- 	t->sock = client_sk;
-+	mutex_init(&t->tx_lock);
-+	INIT_LIST_HEAD(&t->tx_queue);
-+	INIT_DELAYED_WORK(&t->tx_work, ksmbd_tcp_tx_work);
- 
- 	conn = ksmbd_conn_alloc();
- 	if (!conn) {
-@@ -86,13 +113,26 @@ static struct tcp_transport *alloc_transport(struct socket *client_sk)
- 	conn->inet_addr = inet_sk(client_sk->sk)->inet_daddr;
- 	conn->inet_hash = ipv4_addr_hash(inet_sk(client_sk->sk)->inet_daddr);
- #endif
--	down_write(&conn_list_lock);
--	hash_add(conn_list, &conn->hlist, conn->inet_hash);
--	up_write(&conn_list_lock);
--
- 	conn->transport = KSMBD_TRANS(t);
- 	KSMBD_TRANS(t)->conn = conn;
- 	KSMBD_TRANS(t)->ops = &ksmbd_tcp_transport_ops;
-+
-+	lock_sock(client_sk->sk);
-+	t->tx_end = tcp_sk(client_sk->sk)->bytes_acked +
-+		(u32)(tcp_sk(client_sk->sk)->write_seq -
-+		      tcp_sk(client_sk->sk)->snd_una);
-+	t->tx_sent = t->tx_end;
-+	release_sock(client_sk->sk);
-+
-+	write_lock_bh(&client_sk->sk->sk_callback_lock);
-+	t->write_space = client_sk->sk->sk_write_space;
-+	client_sk->sk->sk_user_data = t;
-+	client_sk->sk->sk_write_space = ksmbd_tcp_write_space;
-+	write_unlock_bh(&client_sk->sk->sk_callback_lock);
-+
-+	down_write(&conn_list_lock);
-+	hash_add(conn_list, &conn->hlist, conn->inet_hash);
-+	up_write(&conn_list_lock);
- 	return t;
- }
- 
-@@ -100,6 +140,7 @@ static void ksmbd_tcp_free_transport(struct ksmbd_transport *kt)
- {
- 	struct tcp_transport *t = TCP_TRANS(kt);
- 
-+	ksmbd_tcp_stop_tx(t);
- 	sock_release(t->sock);
- 	kfree(t->iov);
- 	kfree(t);
-@@ -107,7 +148,8 @@ static void ksmbd_tcp_free_transport(struct ksmbd_transport *kt)
- 
- static void free_transport(struct tcp_transport *t)
- {
--	kernel_sock_shutdown(t->sock, SHUT_RDWR);
-+	ksmbd_tcp_shutdown(KSMBD_TRANS(t));
-+	ksmbd_tcp_stop_tx(t);
- 	ksmbd_conn_free(KSMBD_TRANS(t)->conn);
- }
- 
-@@ -432,15 +474,251 @@ static int ksmbd_tcp_read(struct ksmbd_transport *t, char *buf,
- 	return ksmbd_tcp_readv(TCP_TRANS(t), &iov, 1, to_read, max_retries);
- }
- 
-+static bool ksmbd_tcp_tx_has_space(struct tcp_transport *t, size_t size)
-+{
-+	size_t limit = max_t(size_t, READ_ONCE(t->sock->sk->sk_sndbuf), size);
-+
-+	/* Allow one large response, but bound the retained response buffers. */
-+	return READ_ONCE(t->tx_queued) <= limit - size;
-+}
-+
-+static struct tcp_tx *ksmbd_tcp_alloc_tx(const struct ksmbd_transport_write *tx,
-+					 size_t offset)
-+{
-+	struct tcp_tx *msg;
-+	struct iov_iter iter;
-+	size_t remaining = tx->size - offset;
-+
-+	msg = kvmalloc(struct_size(msg, data, remaining), KSMBD_DEFAULT_GFP);
-+	if (!msg)
-+		return NULL;
-+
-+	iov_iter_kvec(&iter, ITER_SOURCE, tx->iov, tx->iov_cnt, tx->size);
-+	iov_iter_advance(&iter, offset);
-+	if (!copy_from_iter_full(msg->data, remaining, &iter)) {
-+		kvfree(msg);
-+		return NULL;
-+	}
-+	msg->len = remaining;
-+	msg->offset = 0;
-+	msg->msg_flags = tx->msg_flags;
-+	return msg;
-+}
-+
-+static void ksmbd_tcp_purge_tx(struct tcp_transport *t)
-+{
-+	struct tcp_tx *msg, *next;
-+
-+	list_for_each_entry_safe(msg, next, &t->tx_queue, list) {
-+		list_del(&msg->list);
-+		kvfree(msg);
-+	}
-+	WRITE_ONCE(t->tx_queued, 0);
-+}
-+
-+static bool ksmbd_tcp_send_retry(int ret)
-+{
-+	return ret == -EAGAIN || ret == -EINTR || ret == -ERESTARTSYS ||
-+		ret == -ENOMEM;
-+}
-+
-+static void ksmbd_tcp_tx_work(struct work_struct *work)
-+{
-+	struct tcp_transport *t = container_of(to_delayed_work(work),
-+					     struct tcp_transport, tx_work);
-+	unsigned long delay = 0;
-+	unsigned int budget = 16;
-+	bool failed = false;
-+	int ret;
-+
-+	mutex_lock(&t->tx_lock);
-+	while (!READ_ONCE(t->tx_stopped) && !list_empty(&t->tx_queue) && budget--) {
-+		struct tcp_tx *msg = list_first_entry(&t->tx_queue, struct tcp_tx, list);
-+		struct msghdr hdr = {
-+			.msg_flags = MSG_NOSIGNAL | MSG_DONTWAIT | msg->msg_flags,
-+		};
-+		struct kvec iov = {
-+			.iov_base = msg->data + msg->offset,
-+			.iov_len = msg->len - msg->offset,
-+		};
-+
-+		/* MSG_DONTWAIT bypasses sk_sndtimeo, including for retained PDUs. */
-+		if (time_after_eq(jiffies, msg->deadline)) {
-+			WRITE_ONCE(t->tx_stopped, true);
-+			failed = true;
-+			break;
-+		}
-+		ret = kernel_sendmsg(t->sock, &hdr, &iov, 1, iov.iov_len);
-+		if (ret > 0) {
-+			msg->offset += ret;
-+			t->tx_sent += ret;
-+			if (msg->offset == msg->len) {
-+				WRITE_ONCE(t->tx_queued, t->tx_queued - msg->len);
-+				list_del(&msg->list);
-+				kvfree(msg);
-+				continue;
-+			}
-+		} else if (!ksmbd_tcp_send_retry(ret)) {
-+			WRITE_ONCE(t->tx_stopped, true);
-+			failed = true;
-+			break;
-+		}
-+		/*
-+		 * Write-space notifications normally resume the head of the queue.
-+		 * Also retry after memory pressure, which may produce no notification.
-+		 */
-+		delay = max_t(unsigned long, 1, HZ / 10);
-+		break;
-+	}
-+	if (READ_ONCE(t->tx_stopped))
-+		ksmbd_tcp_purge_tx(t);
-+	else if (!list_empty(&t->tx_queue))
-+		queue_delayed_work(system_unbound_wq, &t->tx_work, delay);
-+	mutex_unlock(&t->tx_lock);
-+	wake_up_all(&t->transport.conn->req_running_q);
-+
-+	if (failed)
-+		ksmbd_conn_abort(t->transport.conn);
-+}
-+
-+static void ksmbd_tcp_write_space(struct sock *sk)
-+{
-+	struct tcp_transport *t;
-+
-+	read_lock_bh(&sk->sk_callback_lock);
-+	t = sk->sk_user_data;
-+	if (t) {
-+		t->write_space(sk);
-+		if (!READ_ONCE(t->tx_stopped) && sk_stream_is_writeable(sk))
-+			mod_delayed_work(system_unbound_wq, &t->tx_work, 0);
-+	}
-+	read_unlock_bh(&sk->sk_callback_lock);
-+}
-+
-+static void ksmbd_tcp_stop_tx(struct tcp_transport *t)
-+{
-+	struct sock *sk = t->sock->sk;
-+
-+	WRITE_ONCE(t->tx_stopped, true);
-+	write_lock_bh(&sk->sk_callback_lock);
-+	if (sk->sk_user_data == t) {
-+		sk->sk_write_space = t->write_space;
-+		sk->sk_user_data = NULL;
-+	}
-+	write_unlock_bh(&sk->sk_callback_lock);
-+	cancel_delayed_work_sync(&t->tx_work);
-+	mutex_lock(&t->tx_lock);
-+	ksmbd_tcp_purge_tx(t);
-+	mutex_unlock(&t->tx_lock);
-+	wake_up_all(&t->transport.conn->req_running_q);
-+}
-+
- static int ksmbd_tcp_writev(struct ksmbd_transport *t,
- 			    const struct ksmbd_transport_write *tx)
- {
--	struct msghdr smb_msg = {
--		.msg_flags = MSG_NOSIGNAL | tx->msg_flags,
-+	struct tcp_transport *tt = TCP_TRANS(t);
-+	struct sock *sk = tt->sock->sk;
-+	struct msghdr hdr = {
-+		.msg_flags = MSG_NOSIGNAL | MSG_DONTWAIT | tx->msg_flags,
- 	};
-+	struct tcp_tx *msg;
-+	unsigned long deadline = jiffies + KSMBD_TCP_SEND_TIMEOUT;
-+	long timeout;
-+	int sent = 0;
-+
-+	for (;;) {
-+		if (tx->msg_flags & MSG_DONTWAIT) {
-+			if (!mutex_trylock(&tt->tx_lock))
-+				return -EAGAIN;
-+		} else {
-+			mutex_lock(&tt->tx_lock);
-+		}
-+		if (READ_ONCE(tt->tx_stopped) || ksmbd_conn_exiting(t->conn) ||
-+		    ksmbd_conn_releasing(t->conn)) {
-+			mutex_unlock(&tt->tx_lock);
-+			return -EPIPE;
-+		}
-+		if (ksmbd_tcp_tx_has_space(tt, tx->size))
-+			break;
-+		mutex_unlock(&tt->tx_lock);
-+		if (tx->msg_flags & MSG_DONTWAIT)
-+			return -EAGAIN;
-+		timeout = deadline - jiffies;
-+		if (time_after_eq(jiffies, deadline) ||
-+		    !wait_event_timeout(t->conn->req_running_q,
-+					READ_ONCE(tt->tx_stopped) ||
-+					ksmbd_conn_exiting(t->conn) ||
-+					ksmbd_conn_releasing(t->conn) ||
-+					ksmbd_tcp_tx_has_space(tt, tx->size),
-+					timeout)) {
-+			/* A queued PDU may already have a prefix in the socket. */
-+			ksmbd_conn_abort(t->conn);
-+			return -EAGAIN;
-+		}
-+	}
- 
--	return kernel_sendmsg(TCP_TRANS(t)->sock, &smb_msg, tx->iov,
--			      tx->iov_cnt, tx->size);
-+	/* Avoid an extra copy when the socket accepts the whole PDU at once. */
-+	if (list_empty(&tt->tx_queue)) {
-+		sent = kernel_sendmsg(tt->sock, &hdr, tx->iov, tx->iov_cnt, tx->size);
-+		if (sent > 0) {
-+			tt->tx_sent += sent;
-+			if (sent == tx->size)
-+				goto accepted;
-+		} else if (ksmbd_tcp_send_retry(sent)) {
-+			sent = 0;
-+		} else {
-+			WRITE_ONCE(tt->tx_stopped, true);
-+			mutex_unlock(&tt->tx_lock);
-+			ksmbd_conn_abort(t->conn);
-+			return sent ?: -EPIPE;
-+		}
-+	}
-+
-+	/* The request buffers can be freed as soon as writev returns. */
-+	msg = ksmbd_tcp_alloc_tx(tx, sent);
-+	if (!msg) {
-+		if (sent)
-+			WRITE_ONCE(tt->tx_stopped, true);
-+		mutex_unlock(&tt->tx_lock);
-+		if (sent)
-+			ksmbd_conn_abort(t->conn);
+@@ -110,6 +111,12 @@ int ksmbd_workqueue_init(void)
+ 	ksmbd_wq = alloc_workqueue("ksmbd-io", WQ_PERCPU, 0);
+ 	if (!ksmbd_wq)
+ 		return -ENOMEM;
++	ksmbd_break_wq = alloc_workqueue("ksmbd-break", WQ_UNBOUND, 0);
++	if (!ksmbd_break_wq) {
++		destroy_workqueue(ksmbd_wq);
++		ksmbd_wq = NULL;
 +		return -ENOMEM;
 +	}
-+	msg->deadline = deadline;
-+	list_add_tail(&msg->list, &tt->tx_queue);
-+	WRITE_ONCE(tt->tx_queued, tt->tx_queued + msg->len);
-+	queue_delayed_work(system_unbound_wq, &tt->tx_work, 0);
-+
-+accepted:
-+	tt->tx_end += tx->size;
-+	if (tx->tracking) {
-+		/* Include retained data, without retaining the caller's tracking object. */
-+		tx->tracking->end = tt->tx_end;
-+		lock_sock(sk);
-+		tx->tracking->retry_after =
-+			clamp_t(unsigned long, 6UL * inet_csk(sk)->icsk_rto,
-+				msecs_to_jiffies(1200), 6 * HZ);
-+		release_sock(sk);
-+		tx->tracking->valid = true;
-+	}
-+	mutex_unlock(&tt->tx_lock);
-+	return tx->size;
+ 	return 0;
+ }
+ 
+@@ -117,6 +124,8 @@ void ksmbd_workqueue_destroy(void)
+ {
+ 	destroy_workqueue(ksmbd_wq);
+ 	ksmbd_wq = NULL;
++	destroy_workqueue(ksmbd_break_wq);
++	ksmbd_break_wq = NULL;
+ }
+ 
+ bool ksmbd_queue_work(struct ksmbd_work *work)
+@@ -124,6 +133,16 @@ bool ksmbd_queue_work(struct ksmbd_work *work)
+ 	return queue_work(ksmbd_wq, &work->work);
+ }
+ 
++void ksmbd_queue_io_work(struct work_struct *work)
++{
++	queue_work(ksmbd_wq, work);
 +}
 +
-+static bool ksmbd_tcp_is_acked(struct ksmbd_transport *t,
-+			     const struct ksmbd_tx_tracking *tracking)
++void ksmbd_queue_break_work(struct work_struct *work)
 +{
-+	struct tcp_transport *tt = TCP_TRANS(t);
-+	struct sock *sk = tt->sock->sk;
-+	bool acked;
++	queue_work(ksmbd_break_wq, work);
++}
 +
-+	mutex_lock(&tt->tx_lock);
-+	lock_sock(sk);
-+	acked = tt->tx_sent >= tracking->end &&
-+		tcp_sk(sk)->bytes_acked >= tracking->end;
-+	release_sock(sk);
-+	mutex_unlock(&tt->tx_lock);
-+	return acked;
- }
- 
- static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
-@@ -452,7 +730,9 @@ static void ksmbd_tcp_disconnect(struct ksmbd_transport *t)
- 
- static void ksmbd_tcp_shutdown(struct ksmbd_transport *t)
+ static inline void __ksmbd_iov_pin(struct ksmbd_work *work, void *ib,
+ 				   unsigned int ib_len)
  {
-+	WRITE_ONCE(TCP_TRANS(t)->tx_stopped, true);
- 	kernel_sock_shutdown(TCP_TRANS(t)->sock, SHUT_RDWR);
-+	wake_up_all(&t->conn->req_running_q);
+diff --git a/fs/smb/server/ksmbd_work.h b/fs/smb/server/ksmbd_work.h
+index 40f70a5d08b5..b51dea69cb0e 100644
+--- a/fs/smb/server/ksmbd_work.h
++++ b/fs/smb/server/ksmbd_work.h
+@@ -155,6 +155,8 @@ int ksmbd_work_pool_init(void);
+ int ksmbd_workqueue_init(void);
+ void ksmbd_workqueue_destroy(void);
+ bool ksmbd_queue_work(struct ksmbd_work *work);
++void ksmbd_queue_io_work(struct work_struct *work);
++void ksmbd_queue_break_work(struct work_struct *work);
+ int ksmbd_iov_pin_rsp_read(struct ksmbd_work *work, void *ib, int len,
+ 			   void *aux_buf, unsigned int aux_size);
+ int ksmbd_iov_pin_rsp(struct ksmbd_work *work, void *ib, int len);
+diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
+index d814a99ff519..554434c7673a 100644
+--- a/fs/smb/server/mgmt/user_session.c
++++ b/fs/smb/server/mgmt/user_session.c
+@@ -674,6 +674,37 @@ struct ksmbd_session *ksmbd_session_lookup_slowpath(unsigned long long id)
+ 	return sess;
  }
  
- static void tcp_destroy_socket(struct socket *ksmbd_socket)
-@@ -721,6 +1001,7 @@ int ksmbd_tcp_set_interfaces(char *ifc_list, int ifc_list_sz)
- static const struct ksmbd_transport_ops ksmbd_tcp_transport_ops = {
- 	.read		= ksmbd_tcp_read,
- 	.writev		= ksmbd_tcp_writev,
-+	.is_acked	= ksmbd_tcp_is_acked,
- 	.disconnect	= ksmbd_tcp_disconnect,
- 	.shutdown	= ksmbd_tcp_shutdown,
- 	.free_transport = ksmbd_tcp_free_transport,
++/* The caller holds a session reference and must put each returned connection. */
++unsigned int ksmbd_session_get_channels(struct ksmbd_session *sess,
++					struct ksmbd_conn **conns,
++					unsigned int max_conns)
++{
++	struct channel *chann;
++	unsigned long index;
++	unsigned int nr_conns = 0;
++
++	/*
++	 * Channel connections are borrowed. Unregister can leave the channel
++	 * list in a pinned session after removing it from the registry, so
++	 * chann_lock alone does not keep those connections alive. Only collect
++	 * registered sessions, excluding both unregister and connection cleanup
++	 * until the connection references have been taken.
++	 */
++	down_read(&sessions_table_lock);
++	if (hlist_unhashed(&sess->hlist))
++		goto out;
++	down_read(&sess->chann_lock);
++	xa_for_each(&sess->ksmbd_chann_list, index, chann) {
++		if (nr_conns == max_conns)
++			break;
++		conns[nr_conns++] = ksmbd_conn_get(chann->conn);
++	}
++	up_read(&sess->chann_lock);
++out:
++	up_read(&sessions_table_lock);
++	return nr_conns;
++}
++
+ struct ksmbd_session *ksmbd_session_lookup_all_states(struct ksmbd_conn *conn,
+ 						      unsigned long long id)
+ {
+diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
+index 217258551d6d..aff31f1694db 100644
+--- a/fs/smb/server/mgmt/user_session.h
++++ b/fs/smb/server/mgmt/user_session.h
+@@ -94,6 +94,9 @@ struct ksmbd_session *ksmbd_smb2_session_create(void);
+ void ksmbd_session_destroy(struct ksmbd_session *sess);
+ 
+ struct ksmbd_session *ksmbd_session_lookup_slowpath(unsigned long long id);
++unsigned int ksmbd_session_get_channels(struct ksmbd_session *sess,
++					struct ksmbd_conn **conns,
++					unsigned int max_conns);
+ struct ksmbd_session *ksmbd_session_lookup(struct ksmbd_conn *conn,
+ 					   unsigned long long id);
+ bool is_ksmbd_session_in_connection(struct ksmbd_conn *conn,
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index 25ff8408f0ba..313bf01ad350 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -87,6 +87,7 @@ static struct oplock_info *alloc_opinfo(struct ksmbd_work *work,
+ 		return NULL;
+ 
+ 	opinfo->sess = sess;
++	opinfo->session_id = sess->id;
+ 	opinfo->conn = ksmbd_conn_get(work->conn);
+ 	opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
+ 	opinfo->op_state = OPLOCK_STATE_NONE;
+@@ -302,15 +303,9 @@ static struct oplock_info *opinfo_get_list(struct ksmbd_inode *ci,
+ 	opinfo = list_first_entry_or_null(&ci->m_op_list, struct oplock_info,
+ 					  op_entry);
+ 	if (opinfo) {
+-		if (opinfo->conn == NULL ||
+-		    !atomic_inc_not_zero(&opinfo->refcount))
++		/* A live open may still be bound to a disconnected channel. */
++		if (!atomic_inc_not_zero(&opinfo->refcount))
+ 			opinfo = NULL;
+-		else {
+-			if (ksmbd_conn_releasing(opinfo->conn)) {
+-				atomic_dec(&opinfo->refcount);
+-				opinfo = NULL;
+-			}
+-		}
+ 
+ 		if (opinfo && snapshot && opinfo->o_fp &&
+ 		    opinfo->o_fp != skip_fp &&
+@@ -367,7 +362,7 @@ static void opinfo_del(struct oplock_info *opinfo)
+ 		lease_del_open(opinfo);
+ 
+ 	down_write(&ci->m_lock);
+-	list_del(&opinfo->op_entry);
++	list_del_init(&opinfo->op_entry);
+ 	up_write(&ci->m_lock);
+ }
+ 
+@@ -639,19 +634,27 @@ static void grant_none_oplock(struct oplock_info *opinfo_new,
+ static inline int compare_guid_key(struct oplock_info *opinfo,
+ 				   const char *guid1, const char *key1)
+ {
+-	const char *guid2, *key2;
++	struct lease *lease = opinfo->o_lease;
++	struct lease_table *lb;
+ 	struct ksmbd_conn *conn;
++	int ret = 0;
+ 
+-	conn = READ_ONCE(opinfo->conn);
+-	if (!conn)
++	if (memcmp(key1, lease->lease_key, SMB2_LEASE_KEY_SIZE))
+ 		return 0;
+-	guid2 = conn->ClientGUID;
+-	key2 = opinfo->o_lease->lease_key;
+-	if (!memcmp(guid1, guid2, SMB2_CLIENT_GUID_SIZE) &&
+-	    !memcmp(key1, key2, SMB2_LEASE_KEY_SIZE))
+-		return 1;
+ 
+-	return 0;
++	/* The caller holds ci->m_lock, which protects opinfo->conn. */
++	conn = READ_ONCE(opinfo->conn);
++	if (conn)
++		return !memcmp(guid1, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
++
++	/* A detached durable lease retains its client identity in the table. */
++	read_lock(&lease_list_lock);
++	lb = lease->l_lb;
++	if (lb)
++		ret = !memcmp(guid1, lb->client_guid, SMB2_CLIENT_GUID_SIZE);
++	read_unlock(&lease_list_lock);
++
++	return ret;
+ }
+ 
+ /**
+@@ -681,7 +684,7 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
+ 	 */
+ 	down_read(&ci->m_lock);
+ 	list_for_each_entry(opinfo, &ci->m_op_list, op_entry) {
+-		if (!opinfo->is_lease || !opinfo->conn)
++		if (!opinfo->is_lease)
+ 			continue;
+ 		lease = opinfo->o_lease;
+ 
+@@ -734,35 +737,6 @@ static struct oplock_info *same_client_has_lease(struct ksmbd_inode *ci,
+ 	return m_opinfo;
+ }
+ 
+-static bool wait_for_break_ack(struct oplock_info *opinfo)
+-{
+-	int rc = 0;
+-
+-	rc = wait_event_interruptible_timeout(opinfo->oplock_q,
+-					      opinfo->op_state == OPLOCK_STATE_NONE ||
+-					      opinfo->op_state == OPLOCK_CLOSING,
+-					      OPLOCK_WAIT_TIME);
+-
+-	/* is this a timeout ? */
+-	if (!rc) {
+-		spin_lock(&opinfo->state_lock);
+-		if (opinfo->op_state == OPLOCK_CLOSING) {
+-			spin_unlock(&opinfo->state_lock);
+-			return false;
+-		}
+-		if (opinfo->is_lease) {
+-			opinfo->o_lease->state = SMB2_LEASE_NONE_LE;
+-			lease_update_oplock_levels(opinfo->o_lease);
+-		}
+-		opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
+-		opinfo->op_state = OPLOCK_STATE_NONE;
+-		spin_unlock(&opinfo->state_lock);
+-		return true;
+-	}
+-
+-	return false;
+-}
+-
+ static bool oplock_break_set_ack_wait(struct oplock_info *opinfo)
+ {
+ 	bool ret = false;
+@@ -842,330 +816,492 @@ static bool lease_break_needed(struct oplock_info *opinfo, int req_op_level,
+ 	return opinfo->level > req_op_level;
+ }
+ 
+-/**
+- * __smb2_oplock_break_noti() - send smb2 oplock break cmd from conn
+- * to client
+- * @wk:     smb work object
+- *
+- * There are two ways this function can be called. 1- while file open we break
+- * from exclusive/batch lock to levelII oplock and 2- while file write/truncate
+- * we break from levelII oplock no oplock.
+- * work->request_buf contains oplock_info.
+- */
+-static void __smb2_oplock_break_noti(struct work_struct *wk)
++struct smb2_break_channel {
++	struct list_head list;
++	struct ksmbd_conn *conn;
++	struct ksmbd_tx_tracking tracking;
++	bool queued;
++	bool delivered;
++	bool failed;
++};
++
++static bool smb2_break_complete(struct oplock_info *opinfo, bool expect_ack)
+ {
+-	struct smb2_oplock_break *rsp = NULL;
+-	struct ksmbd_work *work = container_of(wk, struct ksmbd_work, work);
+-	struct ksmbd_conn *conn = work->conn;
+-	struct oplock_break_info *br_info = work->request_buf;
+-	struct smb2_hdr *rsp_hdr;
+-	struct ksmbd_file *fp;
++	bool complete;
+ 
+-	fp = ksmbd_lookup_global_fd(br_info->fid);
+-	if (!fp)
+-		goto out;
++	spin_lock(&opinfo->state_lock);
++	complete = opinfo->op_state == OPLOCK_CLOSING ||
++		(expect_ack && opinfo->op_state == OPLOCK_STATE_NONE);
++	spin_unlock(&opinfo->state_lock);
++	return complete;
++}
+ 
+-	if (allocate_interim_rsp_buf(work)) {
+-		pr_err("smb2_allocate_rsp_buf failed! ");
+-		ksmbd_fd_put(work, fp);
+-		goto out;
++static int smb2_break_failed(struct oplock_info *opinfo, bool expect_ack)
++{
++	spin_lock(&opinfo->state_lock);
++	/* An ACK or close which won the race has already completed the break. */
++	if (opinfo->op_state == OPLOCK_CLOSING ||
++	    (expect_ack && opinfo->op_state == OPLOCK_STATE_NONE)) {
++		spin_unlock(&opinfo->state_lock);
++		return 0;
+ 	}
++	if (opinfo->is_lease) {
++		opinfo->o_lease->state = SMB2_LEASE_NONE_LE;
++		opinfo->o_lease->new_state = SMB2_LEASE_NONE_LE;
++		lease_update_oplock_levels(opinfo->o_lease);
++		atomic_set(&opinfo->breaking_cnt, 0);
++	}
++	opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
++	opinfo->op_state = OPLOCK_STATE_NONE;
++	spin_unlock(&opinfo->state_lock);
++	wake_up_interruptible_all(&opinfo->oplock_q);
++	wake_up_interruptible_all(&opinfo->oplock_brk);
++	return ksmbd_invalidate_durable_fd(opinfo->fid);
++}
+ 
+-	rsp_hdr = smb_get_msg(work->response_buf);
+-	memset(rsp_hdr, 0, sizeof(struct smb2_hdr) + 2);
+-	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;
+-	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;
+-	rsp_hdr->CreditRequest = cpu_to_le16(0);
+-	rsp_hdr->Command = SMB2_OPLOCK_BREAK;
+-	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR);
+-	rsp_hdr->NextCommand = 0;
+-	rsp_hdr->MessageId = cpu_to_le64(-1);
+-	rsp_hdr->Id.SyncId.ProcessId = 0;
+-	rsp_hdr->Id.SyncId.TreeId = 0;
+-	rsp_hdr->SessionId = 0;
+-	memset(rsp_hdr->Signature, 0, 16);
+-
+-	rsp = smb_get_msg(work->response_buf);
+-
+-	rsp->StructureSize = cpu_to_le16(24);
+-	if (!br_info->open_trunc &&
+-	    (br_info->level == SMB2_OPLOCK_LEVEL_BATCH ||
+-	     br_info->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE))
+-		rsp->OplockLevel = SMB2_OPLOCK_LEVEL_II;
+-	else
+-		rsp->OplockLevel = SMB2_OPLOCK_LEVEL_NONE;
+-	rsp->Reserved = 0;
+-	rsp->Reserved2 = 0;
+-	rsp->PersistentFid = fp->persistent_id;
+-	rsp->VolatileFid = fp->volatile_id;
+-
+-	ksmbd_fd_put(work, fp);
+-	if (ksmbd_iov_pin_rsp(work, (void *)rsp,
+-			      sizeof(struct smb2_oplock_break)))
+-		goto out;
+-
+-	ksmbd_debug(OPLOCK,
+-		    "sending oplock break v_id %llu p_id = %llu lock level = %d\n",
+-		    rsp->VolatileFid, rsp->PersistentFid, rsp->OplockLevel);
+-
+-	ksmbd_conn_write(work);
++static int smb2_break_add_channel(struct list_head *head, struct ksmbd_conn *conn)
++{
++	struct smb2_break_channel *channel;
+ 
+-out:
+-	ksmbd_free_work_struct(work);
+-	ksmbd_conn_r_count_dec(conn);
+-	ksmbd_conn_put(conn);
++	channel = kzalloc_obj(*channel, KSMBD_DEFAULT_GFP);
++	if (!channel)
++		return -ENOMEM;
++	channel->conn = ksmbd_conn_get(conn);
++	list_add_tail(&channel->list, head);
++	return 0;
+ }
+ 
+ /*
+- * Select and pin the connection used for an oplock break before doing any
+- * allocations which may sleep.  The caller of oplock_break() holds a live
+- * reference on ci (a file being opened, a file being operated on, or an
+- * explicit ksmbd_inode_lookup_lock() reference in the parent lease break
+- * paths), so the inode cannot be freed during the call and its lock is
+- * reachable without dereferencing opinfo->o_fp, which is not pinned by
+- * the oplock reference and may be freed by a concurrent close.
+- *
+- * opinfo->conn is cleared under ci->m_lock by session_fd_check() when the
+- * durable handle owning the oplock is disconnected, reassigned by
+- * ksmbd_reopen_durable_fd() under the same lock, and the last
+- * ksmbd_conn_put() of the old connection frees it.  Holding the read lock
+- * excludes both writers, so the connection cannot be freed while it is
+- * selected.
++ * Snapshot connections before sending. References keep their transports alive,
++ * while r_count is taken separately for each write, under request_lock.
+  */
+-static struct ksmbd_conn *smb2_oplock_break_conn_get(struct oplock_info *opinfo,
+-						     struct ksmbd_inode *ci)
+-{
++static int smb2_break_collect_channels(struct oplock_info *opinfo,
++				       struct ksmbd_inode *ci,
++				       struct smb2_break_channel *owner,
++				       struct list_head *head,
++				       struct smb2_oplock_break *rsp)
++{
++	struct ksmbd_session *sess = NULL;
++	struct ksmbd_conn *session_conns[KSMBD_MAX_CHANNELS];
++	struct ksmbd_file_table *ft;
++	struct ksmbd_file *fp;
+ 	struct ksmbd_conn *conn;
++	struct lease_table *lb;
++	char guid[SMB2_CLIENT_GUID_SIZE];
++	u64 session_id = 0;
++	unsigned int nr_conns, i;
++	bool have_guid = false;
++	int bkt, ret = 0;
+ 
++	/* m_lock protects membership and binding, but not the session's lifetime. */
+ 	down_read(&ci->m_lock);
+-	conn = READ_ONCE(opinfo->conn);
+-	if (conn && !ksmbd_conn_releasing(conn))
+-		conn = ksmbd_conn_get(conn);
+-	else
+-		conn = NULL;
++	if (!list_empty(&opinfo->op_entry)) {
++		if (!opinfo->is_lease) {
++			rsp->PersistentFid = READ_ONCE(opinfo->o_fp->persistent_id);
++			rsp->VolatileFid = READ_ONCE(opinfo->o_fp->volatile_id);
++			if (!has_file_id(rsp->PersistentFid) ||
++			    !has_file_id(rsp->VolatileFid)) {
++				/* A detached oplock must take the failed-break path. */
++				ret = opinfo->conn ? -ENOENT : -ENOTCONN;
++				goto unlock;
++			}
++			session_id = opinfo->session_id;
++		}
++		conn = opinfo->conn;
++		if (conn) {
++			owner->conn = ksmbd_conn_get(conn);
++			memcpy(guid, conn->ClientGUID, sizeof(guid));
++			have_guid = true;
++		}
++	} else {
++		ret = -ENOENT;
++	}
++unlock:
+ 	up_read(&ci->m_lock);
++	if (ret)
++		return ret;
++
++	if (opinfo->is_lease && !have_guid) {
++		read_lock(&lease_list_lock);
++		lb = opinfo->o_lease->l_lb;
++		if (lb) {
++			memcpy(guid, lb->client_guid, sizeof(guid));
++			have_guid = true;
++			if (lb->conn)
++				owner->conn = ksmbd_conn_get(lb->conn);
++		}
++		read_unlock(&lease_list_lock);
++	}
++	if (owner->conn)
++		list_add_tail(&owner->list, head);
++
++	if (!opinfo->is_lease) {
++		/* Session teardown takes m_lock while holding the session table lock. */
++		sess = ksmbd_session_lookup_slowpath(session_id);
++		if (!sess)
++			return -ENOENT;
++
++		/* Revalidate the binding and IDs after taking a safe session reference. */
++		down_read(&ci->m_lock);
++		if (list_empty(&opinfo->op_entry) || opinfo->sess != sess) {
++			ret = -ENOENT;
++		} else {
++			ft = &sess->file_table;
++			read_lock(&ft->lock);
++			fp = opinfo->o_fp;
++			if (fp->f_state == FP_CLOSED ||
++			    !has_file_id(fp->volatile_id) ||
++			    idr_find(ft->idr, fp->volatile_id) != fp) {
++				ret = -ENOENT;
++			} else {
++				rsp->PersistentFid = READ_ONCE(fp->persistent_id);
++				rsp->VolatileFid = fp->volatile_id;
++			}
++			read_unlock(&ft->lock);
++		}
++		up_read(&ci->m_lock);
++		if (ret) {
++			ksmbd_user_session_put(sess);
++			return ret;
++		}
++	}
+ 
+-	return conn;
++	if (opinfo->is_lease && have_guid) {
++		down_read(&conn_list_lock);
++		hash_for_each(conn_list, bkt, conn, hlist) {
++			if (conn == owner->conn || !ksmbd_conn_good(conn) ||
++			    memcmp(conn->ClientGUID, guid, sizeof(guid)))
++				continue;
++			ret = smb2_break_add_channel(head, conn);
++			if (ret)
++				break;
++		}
++		up_read(&conn_list_lock);
++	} else if (!opinfo->is_lease && sess && sess->dialect >= SMB30_PROT_ID) {
++		nr_conns = ksmbd_session_get_channels(sess, session_conns,
++						      ARRAY_SIZE(session_conns));
++		for (i = 0; i < nr_conns; i++) {
++			conn = session_conns[i];
++			if (!ret && conn && conn != owner->conn && ksmbd_conn_good(conn))
++				ret = smb2_break_add_channel(head, conn);
++			/* Drop all snapshot references, also on allocation failure. */
++			ksmbd_conn_put(conn);
++		}
++	}
++	ksmbd_user_session_put(sess);
++
++	/* Allocation pressure may limit retries, but must not discard the owner. */
++	return list_empty(head) ? (ret ?: -ENOTCONN) : 0;
+ }
+ 
+-/**
+- * smb2_oplock_break_noti() - send smb2 exclusive/batch to level2 oplock
+- *		break command from server to client
+- * @opinfo:		oplock info object
+- * @ci:		inode owning the break target's oplock list, pinned by
+- *		the caller
+- *
+- * Return:      0 on success, otherwise error
+- */
+-static int smb2_oplock_break_noti(struct oplock_info *opinfo,
+-				  struct ksmbd_inode *ci)
++static bool smb2_break_delivered(struct list_head *head, bool require_live)
+ {
++	struct smb2_break_channel *channel;
+ 	struct ksmbd_conn *conn;
+-	struct oplock_break_info *br_info;
+-	int ret = 0;
+-	struct ksmbd_work *work;
+-
+-	conn = smb2_oplock_break_conn_get(opinfo, ci);
+-	if (!conn)
+-		return ksmbd_invalidate_durable_fd(opinfo->fid);
+ 
+-	work = ksmbd_alloc_work_struct();
+-	if (!work) {
+-		ksmbd_conn_put(conn);
+-		return -ENOMEM;
++	list_for_each_entry(channel, head, list) {
++		conn = channel->conn;
++		if (!channel->queued || (require_live && !ksmbd_conn_good(conn)))
++			continue;
++		/* A synchronous send needs no separate delivery probe. */
++		if (channel->delivered || !channel->tracking.valid ||
++		    conn->transport->ops->is_acked(conn->transport,
++						  &channel->tracking)) {
++			channel->delivered = true;
++			return true;
++		}
+ 	}
++	return false;
++}
+ 
+-	br_info = kmalloc_obj(struct oplock_break_info, KSMBD_DEFAULT_GFP);
+-	if (!br_info) {
+-		ksmbd_free_work_struct(work);
+-		ksmbd_conn_put(conn);
+-		return -ENOMEM;
+-	}
++static bool smb2_break_has_unsent_channels(struct list_head *head)
++{
++	struct smb2_break_channel *channel;
+ 
+-	br_info->level = opinfo->level;
+-	br_info->fid = opinfo->fid;
+-	br_info->open_trunc = opinfo->open_trunc;
++	list_for_each_entry(channel, head, list) {
++		if (!channel->queued && !channel->failed)
++			return true;
++	}
++	return false;
++}
+ 
+-	work->request_buf = (char *)br_info;
+-	/* Transfer the reference acquired by smb2_oplock_break_conn_get(). */
+-	work->conn = conn;
+-	work->sess = opinfo->sess;
++static int smb2_break_wait(struct oplock_info *opinfo, struct list_head *head,
++			   struct smb2_break_channel *sent_channel,
++			   bool expect_ack, bool wait_ack, bool can_retry,
++			   unsigned long retry_at, unsigned long deadline)
++{
++	unsigned long remaining;
++	long ret;
+ 
+-	ksmbd_conn_r_count_inc(conn);
+-	if (opinfo->op_state == OPLOCK_ACK_WAIT) {
+-		INIT_WORK(&work->work, __smb2_oplock_break_noti);
+-		ksmbd_queue_work(work);
++	for (;;) {
++		if (smb2_break_complete(opinfo, expect_ack))
++			return 0;
++		if (!wait_ack && smb2_break_delivered(head, false))
++			return 0;
++		if (time_after_eq(jiffies, deadline))
++			return -ETIMEDOUT;
++		/* TCP delivery followed by a slow SMB ACK is not a send failure. */
++		if (can_retry && !smb2_break_delivered(head, true) &&
++		    ((sent_channel && !ksmbd_conn_good(sent_channel->conn)) ||
++		     time_after_eq(jiffies, retry_at)))
++			return -EAGAIN;
+ 
+-		if (wait_for_break_ack(opinfo))
+-			ret = ksmbd_invalidate_durable_fd(opinfo->fid);
+-	} else {
+-		__smb2_oplock_break_noti(&work->work);
+-		if (opinfo->level == SMB2_OPLOCK_LEVEL_II)
+-			opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
++		remaining = min_t(unsigned long, deadline - jiffies,
++				  max_t(unsigned long, 1, HZ / 10));
++		ret = wait_event_interruptible_timeout(opinfo->oplock_q,
++						       smb2_break_complete(opinfo, expect_ack),
++						       remaining);
++		if (ret < 0)
++			return ret;
+ 	}
+-	return ret;
+ }
+ 
+-/**
+- * __smb2_lease_break_noti() - send lease break command from server
+- * to client
+- * @wk:     smb work object
+- */
+-static void __smb2_lease_break_noti(struct work_struct *wk)
++static void smb2_break_init_header(struct smb2_hdr *hdr)
+ {
+-	struct smb2_lease_break *rsp = NULL;
+-	struct ksmbd_work *work = container_of(wk, struct ksmbd_work, work);
+-	struct ksmbd_conn *conn = work->conn;
+-	struct lease_break_info *br_info = work->request_buf;
+-	struct smb2_hdr *rsp_hdr;
++	memset(hdr, 0, sizeof(*hdr));
++	hdr->ProtocolId = SMB2_PROTO_NUMBER;
++	hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;
++	hdr->Command = SMB2_OPLOCK_BREAK;
++	hdr->Flags = SMB2_FLAGS_SERVER_TO_REDIR;
++	hdr->MessageId = cpu_to_le64(-1);
++}
+ 
+-	if (allocate_interim_rsp_buf(work)) {
+-		ksmbd_debug(OPLOCK, "smb2_allocate_rsp_buf failed! ");
+-		goto out;
++/* Build one notification and reuse its payload and epoch on each connection. */
++static int smb2_break_notify(struct oplock_info *opinfo, struct ksmbd_inode *ci,
++			     bool expect_ack, bool wait_ack, bool inc_epoch,
++			     struct work_struct *interim_work)
++{
++	struct smb2_break_channel owner = {}, *channel, *tmp, *last = NULL;
++	struct ksmbd_work *work;
++	struct smb2_oplock_break *oplock_rsp;
++	struct smb2_lease_break *lease_rsp;
++	struct lease *lease = opinfo->o_lease;
++	unsigned long deadline, retry_at;
++	int ret, size;
++	LIST_HEAD(channels);
++
++	if (smb2_break_complete(opinfo, expect_ack)) {
++		ret = 0;
++		goto out_interim;
++	}
++	wait_ack = wait_ack && expect_ack;
++	work = ksmbd_alloc_work_struct();
++	if (!work) {
++		ret = smb2_break_failed(opinfo, expect_ack);
++		goto out_interim;
+ 	}
++	ret = allocate_interim_rsp_buf(work);
++	if (ret)
++		goto failed;
++	oplock_rsp = smb_get_msg(work->response_buf);
++	smb2_break_init_header(&oplock_rsp->hdr);
+ 
+-	rsp_hdr = smb_get_msg(work->response_buf);
+-	memset(rsp_hdr, 0, sizeof(struct smb2_hdr) + 2);
+-	rsp_hdr->ProtocolId = SMB2_PROTO_NUMBER;
+-	rsp_hdr->StructureSize = SMB2_HEADER_STRUCTURE_SIZE;
+-	rsp_hdr->CreditRequest = cpu_to_le16(0);
+-	rsp_hdr->Command = SMB2_OPLOCK_BREAK;
+-	rsp_hdr->Flags = (SMB2_FLAGS_SERVER_TO_REDIR);
+-	rsp_hdr->NextCommand = 0;
+-	rsp_hdr->MessageId = cpu_to_le64(-1);
+-	rsp_hdr->Id.SyncId.ProcessId = 0;
+-	rsp_hdr->Id.SyncId.TreeId = 0;
+-	rsp_hdr->SessionId = 0;
+-	memset(rsp_hdr->Signature, 0, 16);
+-
+-	rsp = smb_get_msg(work->response_buf);
+-	rsp->StructureSize = cpu_to_le16(44);
+-	rsp->Epoch = br_info->epoch;
+-	rsp->Flags = 0;
+-
+-	if (br_info->curr_state & (SMB2_LEASE_WRITE_CACHING_LE |
+-			SMB2_LEASE_HANDLE_CACHING_LE))
+-		rsp->Flags = SMB2_NOTIFY_BREAK_LEASE_FLAG_ACK_REQUIRED;
+-
+-	memcpy(rsp->LeaseKey, br_info->lease_key, SMB2_LEASE_KEY_SIZE);
+-	rsp->CurrentLeaseState = br_info->curr_state;
+-	rsp->NewLeaseState = br_info->new_state;
+-	rsp->BreakReason = 0;
+-	rsp->AccessMaskHint = 0;
+-	rsp->ShareMaskHint = 0;
+-
+-	if (ksmbd_iov_pin_rsp(work, (void *)rsp,
+-			      sizeof(struct smb2_lease_break)))
++	ret = smb2_break_collect_channels(opinfo, ci, &owner, &channels, oplock_rsp);
++	if (ret == -ENOENT)
+ 		goto out;
++	if (ret)
++		goto failed;
+ 
+-	ksmbd_conn_write(work);
+-
++	spin_lock(&opinfo->state_lock);
++	if (opinfo->op_state == OPLOCK_CLOSING ||
++	    (expect_ack && opinfo->op_state == OPLOCK_STATE_NONE)) {
++		spin_unlock(&opinfo->state_lock);
++		ret = 0;
++		goto out;
++	}
++	if (opinfo->is_lease) {
++		lease_rsp = smb_get_msg(work->response_buf);
++		lease_rsp->StructureSize = cpu_to_le16(44);
++		if (lease->version == 2) {
++			if (inc_epoch)
++				lease->epoch++;
++			lease_rsp->Epoch = cpu_to_le16(lease->epoch);
++		}
++		if (lease->state & (SMB2_LEASE_WRITE_CACHING_LE |
++				    SMB2_LEASE_HANDLE_CACHING_LE))
++			lease_rsp->Flags = SMB2_NOTIFY_BREAK_LEASE_FLAG_ACK_REQUIRED;
++		memcpy(lease_rsp->LeaseKey, lease->lease_key, SMB2_LEASE_KEY_SIZE);
++		lease_rsp->CurrentLeaseState = lease->state;
++		lease_rsp->NewLeaseState = lease->new_state;
++		size = sizeof(*lease_rsp);
++	} else {
++		oplock_rsp->StructureSize = cpu_to_le16(24);
++		oplock_rsp->OplockLevel = !opinfo->open_trunc &&
++			(opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||
++			 opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) ?
++			SMB2_OPLOCK_LEVEL_II : SMB2_OPLOCK_LEVEL_NONE;
++		/*
++		 * A level II break needs no ACK. Publish NONE before sending so
++		 * an unsolicited ACK cannot observe II while delivery is pending.
++		 */
++		if (!expect_ack)
++			opinfo->level = SMB2_OPLOCK_LEVEL_NONE;
++		size = sizeof(*oplock_rsp);
++	}
++	spin_unlock(&opinfo->state_lock);
++	ret = ksmbd_iov_pin_rsp(work, oplock_rsp, size);
++	if (ret)
++		goto failed;
++
++	deadline = jiffies + OPLOCK_WAIT_TIME;
++retry:
++	list_for_each_entry(channel, &channels, list) {
++		if (channel->queued || channel->failed)
++			continue;
++		if (smb2_break_complete(opinfo, expect_ack)) {
++			ret = 0;
++			goto out;
++		}
++		if (time_after_eq(jiffies, deadline)) {
++			ret = -ETIMEDOUT;
++			break;
++		}
++		if (!ksmbd_conn_r_count_inc_if_good(channel->conn)) {
++			channel->failed = true;
++			ret = -ENOTCONN;
++			continue;
++		}
++		work->conn = channel->conn;
++		ret = ksmbd_conn_write_tracked(work, &channel->tracking);
++		ksmbd_conn_r_count_dec(channel->conn);
++		if (ret) {
++			/* Only a nonblocking send guarantees no bytes on -EAGAIN. */
++			if (ret != -EAGAIN || !channel->conn->transport->ops->is_acked)
++				channel->failed = true;
++			continue;
++		}
++		channel->queued = true;
++		if (interim_work) {
++			ksmbd_queue_io_work(interim_work);
++			interim_work = NULL;
++		}
++		last = channel;
++		retry_at = jiffies + channel->tracking.retry_after;
++		ret = smb2_break_wait(opinfo, &channels, channel, expect_ack,
++				      wait_ack, smb2_break_has_unsent_channels(&channels),
++				      retry_at, deadline);
++		if (ret != -EAGAIN)
++			goto done;
++	}
++	if (smb2_break_has_unsent_channels(&channels)) {
++		/* Allow busy writers to make progress before another nonblocking pass. */
++		retry_at = jiffies + max_t(unsigned long, 1, HZ / 10);
++		ret = smb2_break_wait(opinfo, &channels, NULL, expect_ack,
++				      wait_ack, true, retry_at, deadline);
++		if (ret == -EAGAIN)
++			goto retry;
++	} else if (last) {
++		/* Give already queued notifications the rest of the shared wait. */
++		ret = smb2_break_wait(opinfo, &channels, last, expect_ack,
++				      wait_ack, false, deadline, deadline);
++	}
++
++done:
++	if (ret)
++		goto failed;
++	if (!expect_ack && opinfo->is_lease) {
++		spin_lock(&opinfo->state_lock);
++		if (opinfo->op_state != OPLOCK_CLOSING) {
++			lease->state = lease->new_state;
++			lease_update_oplock_levels(lease);
++		}
++		spin_unlock(&opinfo->state_lock);
++	}
++	goto out;
++failed:
++	ret = smb2_break_failed(opinfo, expect_ack);
+ out:
+ 	ksmbd_free_work_struct(work);
+-	ksmbd_conn_r_count_dec(conn);
+-	ksmbd_conn_put(conn);
++	list_for_each_entry_safe(channel, tmp, &channels, list) {
++		list_del(&channel->list);
++		ksmbd_conn_put(channel->conn);
++		if (channel != &owner)
++			kfree(channel);
++	}
++out_interim:
++	if (interim_work)
++		ksmbd_queue_io_work(interim_work);
++	return ret;
+ }
+ 
+-/*
+- * Select and pin the connection used for a lease break before doing any
+- * allocations which may sleep. opinfo->conn is cleared under ci->m_lock,
+- * while lease->l_lb and the lease table lifetime are protected by
+- * lease_list_lock.
+- */
+-static struct ksmbd_conn *smb2_lease_break_conn_get(struct oplock_info *opinfo)
++struct smb2_interim_work {
++	struct work_struct work;
++	struct ksmbd_work *in_work;
++};
++
++static void smb2_break_interim_work(struct work_struct *work)
+ {
+-	struct lease *lease = opinfo->o_lease;
+-	struct lease_table *lb;
+-	struct ksmbd_conn *conn;
++	struct smb2_interim_work *iw = container_of(work, struct smb2_interim_work, work);
+ 
+-	/* Keep the connection which owns the open, when it is still active. */
+-	down_read(&lease->ci->m_lock);
+-	conn = READ_ONCE(opinfo->conn);
+-	if (conn && !ksmbd_conn_releasing(conn))
+-		conn = ksmbd_conn_get(conn);
+-	else
+-		conn = NULL;
+-	up_read(&lease->ci->m_lock);
++	if (!setup_async_work(iw->in_work, NULL, NULL)) {
++		smb2_send_interim_resp(iw->in_work, STATUS_PENDING);
++		release_async_work(iw->in_work);
++	}
++}
+ 
+-	if (conn || lease->version != 2)
+-		return conn;
++struct smb2_break_work {
++	struct work_struct work;
++	struct oplock_info *opinfo;
++	struct ksmbd_inode *ci;
++	bool expect_ack;
++	bool wait_ack;
++	bool inc_epoch;
++	int ret;
++};
+ 
+-	/* Otherwise route v2 lease breaks through the shared lease channel. */
+-	read_lock(&lease_list_lock);
+-	lb = lease->l_lb;
+-	if (lb && lb->conn && !ksmbd_conn_releasing(lb->conn))
+-		conn = ksmbd_conn_get(lb->conn);
+-	read_unlock(&lease_list_lock);
++static void smb2_break_notify_work(struct work_struct *work)
++{
++	struct smb2_break_work *bw = container_of(work, struct smb2_break_work, work);
+ 
+-	return conn;
++	bw->ret = smb2_break_notify(bw->opinfo, bw->ci, bw->expect_ack,
++				   bw->wait_ack, bw->inc_epoch, NULL);
+ }
+ 
+-/**
+- * smb2_lease_break_noti() - break lease when a new client request
+- *			write lease
+- * @opinfo:		contains lease state information
+- * @sync:		send the lease break notification synchronously
+- * @inc_epoch:		increment the lease epoch before sending the break
+- *
+- * Return:	0 on success, otherwise error
+- */
+-static int smb2_lease_break_noti(struct oplock_info *opinfo, bool sync,
+-				 bool inc_epoch)
++static int smb2_break_notify_with_interim(struct oplock_info *opinfo,
++					struct ksmbd_inode *ci,
++					bool expect_ack, bool wait_ack,
++					bool inc_epoch, struct ksmbd_work *in_work,
++					bool notify_first)
+ {
+-	struct ksmbd_conn *conn;
+-	struct ksmbd_work *work;
+-	struct lease_break_info *br_info;
+-	struct lease *lease = opinfo->o_lease;
++	struct smb2_break_work bw = {
++		.opinfo = opinfo,
++		.ci = ci,
++		.expect_ack = expect_ack,
++		.wait_ack = wait_ack,
++		.inc_epoch = inc_epoch,
++	};
+ 
+-	conn = smb2_lease_break_conn_get(opinfo);
+-	if (!conn)
+-		return ksmbd_invalidate_durable_fd(opinfo->fid);
++	if (!in_work)
++		return smb2_break_notify(opinfo, ci, expect_ack, wait_ack, inc_epoch, NULL);
+ 
+-	work = ksmbd_alloc_work_struct();
+-	if (!work) {
+-		ksmbd_conn_put(conn);
+-		return -ENOMEM;
+-	}
++	if (notify_first) {
++		struct smb2_interim_work iw = { .in_work = in_work };
++		int ret;
+ 
+-	br_info = kmalloc_obj(struct lease_break_info, KSMBD_DEFAULT_GFP);
+-	if (!br_info) {
+-		ksmbd_free_work_struct(work);
+-		ksmbd_conn_put(conn);
+-		return -ENOMEM;
+-	}
+-
+-	br_info->curr_state = lease->state;
+-	br_info->new_state = lease->new_state;
+-	if (lease->version == 2) {
+-		if (inc_epoch)
+-			lease->epoch++;
+-		br_info->epoch = cpu_to_le16(lease->epoch);
+-	} else {
+-		br_info->epoch = 0;
++		/*
++		 * Rename sends the first notification in the request context.
++		 * Queue the interim writer after that send so a blocked response
++		 * cannot stop notification retries or the break ACK wait.
++		 */
++		INIT_WORK_ONSTACK(&iw.work, smb2_break_interim_work);
++		ret = smb2_break_notify(opinfo, ci, expect_ack, wait_ack,
++					inc_epoch, &iw.work);
++		flush_work(&iw.work);
++		destroy_work_on_stack(&iw.work);
++		return ret;
+ 	}
+-	memcpy(br_info->lease_key, lease->lease_key, SMB2_LEASE_KEY_SIZE);
+ 
+-	work->request_buf = (char *)br_info;
+-	/* Transfer the reference acquired by smb2_lease_break_conn_get(). */
+-	work->conn = conn;
+-	work->sess = opinfo->sess;
+-
+-	ksmbd_conn_r_count_inc(conn);
+-	if (opinfo->op_state == OPLOCK_ACK_WAIT) {
+-		if (sync) {
+-			__smb2_lease_break_noti(&work->work);
+-		} else {
+-			INIT_WORK(&work->work, __smb2_lease_break_noti);
+-			ksmbd_queue_work(work);
+-		}
+-	} else {
+-		__smb2_lease_break_noti(&work->work);
+-		if (opinfo->o_lease->new_state == SMB2_LEASE_NONE_LE) {
+-			opinfo->o_lease->state = SMB2_LEASE_NONE_LE;
+-			lease_update_oplock_levels(opinfo->o_lease);
+-		}
++	/* A blocked interim writer must not stop notification sends or retries. */
++	INIT_WORK_ONSTACK(&bw.work, smb2_break_notify_work);
++	ksmbd_queue_break_work(&bw.work);
++	if (!setup_async_work(in_work, NULL, NULL)) {
++		smb2_send_interim_resp(in_work, STATUS_PENDING);
++		release_async_work(in_work);
+ 	}
+-	return 0;
++	/* The caller keeps opinfo and ci alive until the notifier has finished. */
++	flush_work(&bw.work);
++	destroy_work_on_stack(&bw.work);
++	return bw.ret;
+ }
+ 
+ static void wait_lease_breaking(struct oplock_info *opinfo)
+@@ -1187,10 +1323,11 @@ static void wait_lease_breaking(struct oplock_info *opinfo)
+ 
+ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 			int req_op_level, struct ksmbd_work *in_work,
+-			bool share_break, bool sync_lease_break)
++			bool share_break, bool notify_first)
+ {
+ 	int err = 0;
+ 	bool sent_interim = false;
++	bool expect_ack = false;
+ 
+ 	/* Need to break exclusive/batch oplock, write lease or overwrite_if */
+ 	ksmbd_debug(OPLOCK,
+@@ -1248,8 +1385,9 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 			}
+ 		}
+ 
+-		if (lease->state & (SMB2_LEASE_WRITE_CACHING_LE |
+-				SMB2_LEASE_HANDLE_CACHING_LE)) {
++		expect_ack = lease->state & (SMB2_LEASE_WRITE_CACHING_LE |
++					     SMB2_LEASE_HANDLE_CACHING_LE);
++		if (expect_ack) {
+ 			if (!oplock_break_set_ack_wait(brk_opinfo)) {
+ 				atomic_dec_if_positive(&brk_opinfo->breaking_cnt);
+ 				clear_and_wake_up_bit(0, &brk_opinfo->pending_break);
+@@ -1265,16 +1403,12 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 			inc_epoch = false;
+ 			lease->reuse_epoch = false;
+ 		}
+-		err = smb2_lease_break_noti(brk_opinfo, sync_lease_break, inc_epoch);
++		err = smb2_break_notify_with_interim(brk_opinfo, ci, expect_ack,
++						    wait_ack, inc_epoch,
++						    sent_interim ? NULL : in_work,
++						    notify_first);
++		sent_interim = true;
+ 		inc_epoch = false;
+-		if (in_work && !sent_interim) {
+-			setup_async_work(in_work, NULL, NULL);
+-			smb2_send_interim_resp(in_work, STATUS_PENDING);
+-			release_async_work(in_work);
+-			sent_interim = true;
+-		}
+-		if (wait_ack && !err && wait_for_break_ack(brk_opinfo))
+-			err = ksmbd_invalidate_durable_fd(brk_opinfo->fid);
+ 
+ 		ksmbd_debug(OPLOCK, "oplock granted = %d\n", brk_opinfo->level);
+ 		if (brk_opinfo->op_state == OPLOCK_CLOSING)
+@@ -1310,26 +1444,16 @@ static int oplock_break(struct oplock_info *brk_opinfo, struct ksmbd_inode *ci,
+ 
+ 		if (brk_opinfo->level == SMB2_OPLOCK_LEVEL_BATCH ||
+ 		    brk_opinfo->level == SMB2_OPLOCK_LEVEL_EXCLUSIVE) {
++			expect_ack = true;
+ 			if (!oplock_break_set_ack_wait(brk_opinfo)) {
+ 				clear_and_wake_up_bit(0, &brk_opinfo->pending_break);
+ 				return -ENOENT;
+ 			}
+ 		}
+-
+-		/*
+-		 * Keep a conflicting CREATE asynchronous while waiting for an
+-		 * oplock-break acknowledgement.  Besides avoiding a blocked client
+-		 * request, this lets a replay arrive while the original CREATE is
+-		 * still pending and be rejected with FILE_NOT_AVAILABLE.
+-		 */
+-		if (in_work) {
+-			setup_async_work(in_work, NULL, NULL);
+-			smb2_send_interim_resp(in_work, STATUS_PENDING);
+-			release_async_work(in_work);
+-		}
+ 	}
+ 
+-	err = smb2_oplock_break_noti(brk_opinfo, ci);
++	err = smb2_break_notify_with_interim(brk_opinfo, ci, expect_ack,
++					    true, false, in_work, false);
+ 
+ 	ksmbd_debug(OPLOCK, "oplock granted = %d\n", brk_opinfo->level);
+ 	if (brk_opinfo->op_state == OPLOCK_CLOSING)
+@@ -1491,7 +1615,7 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
+ 
+ 	down_read(&p_ci->m_lock);
+ 	list_for_each_entry(opinfo, &p_ci->m_op_list, op_entry) {
+-		if (opinfo->conn == NULL || !opinfo->is_lease)
++		if (!opinfo->is_lease)
+ 			continue;
+ 
+ 		if (opinfo->o_lease->state != SMB2_OPLOCK_LEVEL_NONE &&
+@@ -1502,11 +1626,6 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
+ 			if (!atomic_inc_not_zero(&opinfo->refcount))
+ 				continue;
+ 
+-			if (ksmbd_conn_releasing(opinfo->conn)) {
+-				opinfo_put(opinfo);
+-				continue;
+-			}
+-
+ 			if (oplock_break_add(&brk_list, opinfo))
+ 				opinfo_put(opinfo);
+ 		}
+@@ -1539,18 +1658,13 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
+ 
+ 	down_read(&p_ci->m_lock);
+ 	list_for_each_entry(opinfo, &p_ci->m_op_list, op_entry) {
+-		if (opinfo->conn == NULL || !opinfo->is_lease)
++		if (!opinfo->is_lease)
+ 			continue;
+ 
+ 		if (opinfo->o_lease->state != SMB2_OPLOCK_LEVEL_NONE) {
+ 			if (!atomic_inc_not_zero(&opinfo->refcount))
+ 				continue;
+ 
+-			if (ksmbd_conn_releasing(opinfo->conn)) {
+-				opinfo_put(opinfo);
+-				continue;
+-			}
+-
+ 			if (oplock_break_add(&brk_list, opinfo))
+ 				opinfo_put(opinfo);
+ 		}
+@@ -1699,7 +1813,11 @@ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level, u64 pid,
+ 
+ 	err = oplock_break(prev_opinfo, ci, break_level, work,
+ 			   share_ret < 0 && prev_opinfo->is_lease, false);
+-	if (prev_durable_detached || (prev_durable_open && err == -ENOENT))
++	/* Keep a detached durable lease if its break retains handle caching. */
++	if ((prev_durable_detached &&
++	     (!prev_op_has_lease ||
++	      !(prev_opinfo->o_lease->state & SMB2_LEASE_HANDLE_CACHING_LE))) ||
++	    (prev_durable_open && err == -ENOENT))
+ 		ksmbd_invalidate_durable_fd(prev_fid);
+ 	opinfo_put(prev_opinfo);
+ 	if (err == -EAGAIN) {
+@@ -1803,8 +1921,7 @@ static bool smb_break_all_write_oplock(struct ksmbd_work *work,
+ 	}
+ 
+ 	brk_opinfo->open_trunc = is_trunc;
+-	oplock_break(brk_opinfo, fp->f_ci, SMB2_OPLOCK_LEVEL_II, work, false,
+-		     false);
++	oplock_break(brk_opinfo, fp->f_ci, SMB2_OPLOCK_LEVEL_II, work, false, false);
+ 	sent_break = true;
+ 	opinfo_put(brk_opinfo);
+ 
+@@ -1819,12 +1936,12 @@ static bool smb_break_all_write_oplock(struct ksmbd_work *work,
+  * @is_trunc:		truncate on open
+  * @send_interim:	send interim response to the client
+  * @send_oplock_break:	send oplock break notification to the client
+- * @sync_lease_break:	send the lease break notification synchronously
++ * @notify_first:	send the lease break notification before the interim response
+  */
+ static void __smb_break_all_levII_oplock(struct ksmbd_work *work,
+ 					 struct ksmbd_file *fp, int is_trunc,
+ 					 bool send_interim, bool send_oplock_break,
+-					 bool sync_lease_break)
++					 bool notify_first)
+ {
+ 	struct oplock_info *op, *brk_op;
+ 	struct oplock_break_entry *ent, *tmp;
+@@ -1842,17 +1959,9 @@ static void __smb_break_all_levII_oplock(struct ksmbd_work *work,
+ 
+ 	down_read(&ci->m_lock);
+ 	list_for_each_entry(brk_op, &ci->m_op_list, op_entry) {
+-		if (brk_op->conn == NULL)
+-			continue;
+-
+ 		if (!atomic_inc_not_zero(&brk_op->refcount))
+ 			continue;
+ 
+-		if (ksmbd_conn_releasing(brk_op->conn)) {
+-			opinfo_put(brk_op);
+-			continue;
+-		}
+-
+ 		if (!brk_op->is_lease &&
+ 		    brk_op->level != SMB2_OPLOCK_LEVEL_II) {
+ 			ksmbd_debug(OPLOCK, "unexpected oplock(0x%x)\n",
+@@ -1867,10 +1976,8 @@ static void __smb_break_all_levII_oplock(struct ksmbd_work *work,
+ 			goto next;
+ 
+ 		if (op && op->is_lease && brk_op->is_lease &&
+-		    !memcmp(conn->ClientGUID, brk_op->conn->ClientGUID,
+-			    SMB2_CLIENT_GUID_SIZE) &&
+-		    !memcmp(op->o_lease->lease_key, brk_op->o_lease->lease_key,
+-			    SMB2_LEASE_KEY_SIZE))
++		    compare_guid_key(brk_op, conn->ClientGUID,
++				     op->o_lease->lease_key))
+ 			goto next;
+ 		brk_op->open_trunc = is_trunc;
+ 
+@@ -1900,7 +2007,7 @@ static void __smb_break_all_levII_oplock(struct ksmbd_work *work,
+ 				     brk_op->is_lease && !is_trunc ?
+ 				     SMB2_OPLOCK_LEVEL_II : SMB2_OPLOCK_LEVEL_NONE,
+ 				     send_interim && !sent_interim ? work : NULL,
+-				     false, sync_lease_break);
++				     false, notify_first);
+ 		}
+ 		sent_interim = true;
+ 		list_del(&ent->list);
+diff --git a/fs/smb/server/oplock.h b/fs/smb/server/oplock.h
+index b08d21758e07..e114e2148c30 100644
+--- a/fs/smb/server/oplock.h
++++ b/fs/smb/server/oplock.h
+@@ -62,6 +62,7 @@ struct lease {
+ struct oplock_info {
+ 	struct ksmbd_conn	*conn;
+ 	struct ksmbd_session	*sess;
++	u64			session_id;
+ 	struct ksmbd_work	*work;
+ 	struct ksmbd_file	*o_fp;
+ 	int                     level;
+@@ -82,19 +83,6 @@ struct oplock_info {
+ 	struct rcu_head		rcu;
+ };
+ 
+-struct lease_break_info {
+-	__le32			curr_state;
+-	__le32			new_state;
+-	__le16			epoch;
+-	char			lease_key[SMB2_LEASE_KEY_SIZE];
+-};
+-
+-struct oplock_break_info {
+-	int level;
+-	int open_trunc;
+-	int fid;
+-};
+-
+ int smb_grant_oplock(struct ksmbd_work *work, int req_op_level,
+ 		     u64 pid, struct ksmbd_file *fp, __u16 tid,
+ 		     struct lease_ctx_info *lctx, int share_ret, bool replay);
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index 496055ce4a4d..11c123673f9a 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -1767,6 +1767,7 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
+ 		ksmbd_conn_put(op->conn);
+ 		op->conn = NULL;
+ 		op->sess = NULL;
++		op->session_id = 0;
+ 	}
+ 	up_write(&ci->m_lock);
+ 
+@@ -1953,6 +1954,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
+ 			continue;
+ 		op->conn = ksmbd_conn_get(fp->conn);
+ 		op->sess = work->sess;
++		op->session_id = work->sess->id;
+ 	}
+ 	up_write(&ci->m_lock);
+ 
 -- 
 2.25.1
 
