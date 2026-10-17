@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5209620D4FC
-	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E0720D4FC
+	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792199079; cv=none; b=iiARqw54BeOkWATRZXDT+OyM+aHDwe/E5GV8nwvAk9/9SBmI0CFqeV7G+fh/Tzt+do+A+74iB1FZjeUwSYI+Q9RXJt04g8Moczjxz65LV5TzNMcnvuw4cGNmv/7x9mGi0zOMVjqSv/d4tOJ82AO+989j1NDr32DGHzpi+bRJKyQ=
+	t=1792199081; cv=none; b=roIT1ANGi5jX0dkX0VqVu5tOCuFa5EAY/FQYkdjsWi6BGojBpm40gTV4cMMdlAJRjYn3cQZBHufNzHj1fKfDIDeKLVjkAH9vczqExm6jutYzXO0qPcjehxqSmOeQEc8Lfwp9J+NG1q34hq0P2+CCmx1LaYhkOZOrcnkj7oLDPeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792199079; c=relaxed/simple;
-	bh=2iX7sM6v7VwoTdn9dKtS2+e7CdOsKNtKeph/cVouWQY=;
+	s=arc-20240116; t=1792199081; c=relaxed/simple;
+	bh=Rdx712Sym94fi9ABo0uGtZTCbKZSvyi3RiuX4sszRLw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gRDtLJ9ME/qtMpywPH6ZhqEeMGz8KnHumU0Lr1GlNu/pbDtlJnKypv/6XxaCAuOMpW5witEuBoEfzvE7z3aDw8CiTgXisGL+ogGw7dMPuSSYbqzSjQDGfAarq8VavWfPp/1bkrC6VQmIeVesEG+L2D+VDnjU94GTmovRpV86GkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gliwBw+9; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=DL0Xq6ex6Q+37Z2VjSxXVYC/Npsjh15yQ6dNcEpAZrQsq68ngRgAkN45zLn/YhCfEFprnrQ4YA6MpjpB7byKTzhq5bVguNFXKsYTfUqlM5z7KgBf2RNfADqGaEG8UJIDN7AZExJrNPLpQZ5i7C4m0qkDwN5wrX7M8GIGk9RlFVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cr0e+Xrt; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gliwBw+9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E721F000C4;
-	Sat, 17 Oct 2026 01:04:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cr0e+Xrt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19A651F000C5;
+	Sat, 17 Oct 2026 01:04:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792199078;
-	bh=7XVvZiTN9eLAPhVyQ9IscE2qS4X85Xv+zF1X8w4hlc8=;
+	s=k20260515; t=1792199080;
+	bh=WBpSM8B4iQHO4Ql5HOCLS+ZDzi4MXp7tW27mXy+GFng=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=gliwBw+9exp3B4ySfXcetobe53enaGwnQjNd5dnNG1QF+i++lAPh26UzZy/oABezf
-	 01lAbozskH6II9axTJ3ZTeey+GCqIi5/e+3zyTdVLbirg7r2Wm7dgNUt+pXYX8K54r
-	 RTY9MoMnrxPBY9RBPfgcM1qG3xA0LOKjWxHowI+nOI6u1CAd/U9NQUapg2WdN0P2Eb
-	 QJH5hdWcQkUkGVdG2SqCPwnQeGPuHYdFVlf8oRuNjbScwX4qPl4LuZS9OuPAcXm17U
-	 0DfT/xQIj2C2sIVYg7sFV9zEM2WXpfabjgEIDoPy9Mxxbj6diIAuGf/Bq7AusEvuEL
-	 6B6Ax/r6YKeGA==
+	b=cr0e+Xrtyj5W1bTZhP0EOG3T9O2QiOxAsnfu++5Qc3n9DrYFZDoCFOmpfgbWteYiE
+	 4ZcOUmoLcFhYMQlFu+DaHPWGU/9ia5HI5KxhPv4Mhyr3i3DlCmAZRKRKNArkgDE2YK
+	 qH2i2D1nExqqu1luls2DsttvbYtVaNbWbxUpPyUhRJs0+GPNF1Wu3xEoua+v2B04cX
+	 xHIBn5XvmPFpmkt6oghSE+zorEsjqJWpdr9v7zYMZ7ofyGAs5wrIiGnfss3RQXF1AH
+	 vs+wV1dS6VJBqyKtyNa4DCENZTqErtOvHRX5hWxXbIRvVtSU0CZoCiwfmM+DoGriuq
+	 gI0DXjR2xITpA==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: senozhatsky@chromium.org,
@@ -34,9 +34,9 @@ Cc: senozhatsky@chromium.org,
 	chenxiaosong@chenxiaosong.com,
 	chenxiaosong@kylinos.cn,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 17/22] ksmbd: apply POSIX mode ACEs in security updates
-Date: Sat, 17 Oct 2026 10:03:39 +0900
-Message-Id: <20261017010344.11478-17-linkinjeon@kernel.org>
+Subject: [PATCH 18/22] ksmbd: correct POSIX file metadata in responses
+Date: Sat, 17 Oct 2026 10:03:40 +0900
+Message-Id: <20261017010344.11478-18-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20261017010344.11478-1-linkinjeon@kernel.org>
 References: <20261017010344.11478-1-linkinjeon@kernel.org>
@@ -48,138 +48,137 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Explicit modes carried by NFS mode ACEs can be overwritten by the DACL
-permission fallback, and security updates discard special mode bits.
+POSIX responses omit special permission bits, and the create response
+reports a file identifier as its reparse tag without encoding the file
+type. Directory and file queries also report rdev as the filesystem
+device identifier.
 
-Track modes supplied by ACCESS_ALLOWED NFS mode ACEs and bypass the
-permission fallback for them. Apply both permission and special bits
-when setting an explicit POSIX mode.
-
-For SET_INFO, require a POSIX open for explicit mode changes and apply
-the mode only when DACL security information is requested.
+Report the POSIX mode and file type in create responses, include
+special permission bits in all three response paths, and use the
+special-file reparse tag consistently. Set the corresponding DOS
+attribute in directory and file queries, report the filesystem device
+identifier and initialize reserved fields.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c |  7 +++++--
- fs/smb/server/smbacl.c  | 26 +++++++++++++++++++++++---
- fs/smb/server/smbacl.h  |  4 +++-
- 3 files changed, 31 insertions(+), 6 deletions(-)
+ fs/smb/server/oplock.c  | 23 +++++++++++++++++++++--
+ fs/smb/server/smb2pdu.c | 19 ++++++++++++++-----
+ fs/smb/server/smb2pdu.h |  2 ++
+ 3 files changed, 37 insertions(+), 7 deletions(-)
 
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index a911ff70b29e..10c81550b8a7 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -2569,8 +2569,27 @@ void create_posix_rsp_buf(char *cc, struct ksmbd_file *fp)
+ 	buf->Name[15] = 0x7C;
+ 
+ 	buf->nlink = cpu_to_le32(inode->i_nlink);
+-	buf->reparse_tag = cpu_to_le32(fp->volatile_id);
+-	buf->mode = cpu_to_le32(inode->i_mode & 0777);
++	buf->reparse_tag = smb2_get_reparse_tag_special_file(inode->i_mode);
++	buf->mode = cpu_to_le32(inode->i_mode & 07777);
++	switch (inode->i_mode & S_IFMT) {
++	case S_IFDIR:
++		buf->mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
++		break;
++	case S_IFLNK:
++		buf->mode |= cpu_to_le32(POSIX_TYPE_SYMLINK << POSIX_FILETYPE_SHIFT);
++		break;
++	case S_IFCHR:
++		buf->mode |= cpu_to_le32(POSIX_TYPE_CHARDEV << POSIX_FILETYPE_SHIFT);
++		break;
++	case S_IFBLK:
++		buf->mode |= cpu_to_le32(POSIX_TYPE_BLKDEV << POSIX_FILETYPE_SHIFT);
++		break;
++	case S_IFIFO:
++		buf->mode |= cpu_to_le32(POSIX_TYPE_FIFO << POSIX_FILETYPE_SHIFT);
++		break;
++	case S_IFSOCK:
++		buf->mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
++	}
+ 	/*
+ 	 * SidBuffer(44) contain two sids(Domain sid(28), UNIX group sid(16)).
+ 	 * Domain sid(28) = revision(1) + num_subauth(1) + authority(6) +
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 953a2eeaa15a..92489bb86791 100644
+index 92489bb86791..a4908b6e566e 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -3667,7 +3667,8 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
- 	    sizeof(struct create_sd_buf_req))
- 		return -EINVAL;
- 	return set_info_sec(work->conn, work->tcon, path, &sd_buf->ntsd,
--			    le32_to_cpu(sd_buf->ccontext.DataLength), true, false);
-+			    le32_to_cpu(sd_buf->ccontext.DataLength), true, false,
-+			    true, true);
+@@ -1294,7 +1294,7 @@ void smb2_send_interim_resp(struct ksmbd_work *work, __le32 status)
+ 	ksmbd_free_work_struct(in_work);
  }
  
- static int ksmbd_acls_fattr(struct smb_fattr *fattr,
-@@ -9241,7 +9242,9 @@ static int smb2_set_info_sec(struct ksmbd_file *fp, int addition_info,
- 		return -EACCES;
- 
- 	return set_info_sec(fp->conn, fp->tcon, &fp->filp->f_path, pntsd,
--			buf_len, false, true);
-+			buf_len, false, true,
-+			fp->conn->dialect == SMB311_PROT_ID && fp->is_posix_ctxt,
-+			addition_info & DACL_SECINFO);
- }
- 
- static int smb2_set_info_quota(struct ksmbd_work *work, struct ksmbd_file *fp,
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index e75247915c87..a01e0a8b76cb 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -477,10 +477,12 @@ static int parse_dacl(struct mnt_idmap *idmap,
- 		ppace[i]->access_req =
- 			smb_map_generic_desired_access(ppace[i]->access_req);
- 
--		if (ppace[i]->sid.num_subauth >= 3 &&
-+		if (ppace[i]->type == ACCESS_ALLOWED &&
-+		    ppace[i]->sid.num_subauth >= 3 &&
- 		    !(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
- 			fattr->cf_mode =
- 				le32_to_cpu(ppace[i]->sid.sub_auth[2]);
-+			fattr->cf_posix_mode = true;
- 			break;
- 		} else if (!compare_sids(&ppace[i]->sid, pownersid)) {
- 			acl_mode = access_flags_to_mode(fattr,
-@@ -546,6 +548,10 @@ static int parse_dacl(struct mnt_idmap *idmap,
- 				((acl_mode & 0700) >> 6) | 0004;
- 		}
- 	}
-+	if (fattr->cf_posix_mode) {
-+		ret = 0;
-+		goto out;
-+	}
- 
- 	if (owner_found) {
- 		/* The owner must be set to at least read-only. */
-@@ -1673,7 +1679,8 @@ EXPORT_SYMBOL_IF_KUNIT(smb_check_perm_dacl);
- 
- int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 		 const struct path *path, struct smb_ntsd *pntsd, int ntsd_len,
--		 bool type_check, bool get_write)
-+		 bool type_check, bool get_write, bool posix_open,
-+		 bool dacl_requested)
+-static __le32 smb2_get_reparse_tag_special_file(umode_t mode)
++__le32 smb2_get_reparse_tag_special_file(umode_t mode)
  {
- 	int rc;
- 	struct smb_fattr fattr = {{0}};
-@@ -1688,6 +1695,14 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 	rc = parse_sec_desc(idmap, pntsd, ntsd_len, &fattr);
- 	if (rc)
- 		goto out;
-+	if (fattr.cf_posix_mode && !dacl_requested) {
-+		fattr.cf_posix_mode = false;
-+		fattr.cf_mode = inode->i_mode;
-+	}
-+	if (fattr.cf_posix_mode && !posix_open) {
-+		rc = -EOPNOTSUPP;
-+		goto out;
-+	}
+ 	if (S_ISDIR(mode) || S_ISREG(mode))
+ 		return 0;
+@@ -6020,6 +6020,7 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
  
- 	newattrs.ia_valid = ATTR_CTIME;
- 	if (!uid_eq(fattr.cf_uid, INVALID_UID)) {
-@@ -1699,7 +1714,12 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 		newattrs.ia_gid = fattr.cf_gid;
+ 		posix_info = (struct smb2_posix_info *)kstat;
+ 		posix_info->Ignored = 0;
++		posix_info->Zero = 0;
+ 		posix_info->CreationTime = cpu_to_le64(ksmbd_kstat->create_time);
+ 		time = ksmbd_UnixTimeToNT(ksmbd_kstat->kstat->ctime);
+ 		posix_info->ChangeTime = cpu_to_le64(time);
+@@ -6029,9 +6030,11 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 		posix_info->LastWriteTime = cpu_to_le64(time);
+ 		posix_info->EndOfFile = cpu_to_le64(ksmbd_kstat->kstat->size);
+ 		posix_info->AllocationSize = cpu_to_le64(ksmbd_kstat->kstat->blocks << 9);
+-		posix_info->DeviceId = cpu_to_le32(ksmbd_kstat->kstat->rdev);
++		posix_info->DeviceId = cpu_to_le32(ksmbd_kstat->kstat->dev);
+ 		posix_info->HardLinks = cpu_to_le32(ksmbd_kstat->kstat->nlink);
+-		posix_info->Mode = cpu_to_le32(ksmbd_kstat->kstat->mode & 0777);
++		posix_info->ReparseTag =
++			smb2_get_reparse_tag_special_file(ksmbd_kstat->kstat->mode);
++		posix_info->Mode = cpu_to_le32(ksmbd_kstat->kstat->mode & 07777);
+ 		switch (ksmbd_kstat->kstat->mode & S_IFMT) {
+ 		case S_IFDIR:
+ 			posix_info->Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
+@@ -6056,6 +6059,8 @@ static int smb2_populate_readdir_entry(struct ksmbd_conn *conn, int info_level,
+ 		posix_info->DosAttributes =
+ 			S_ISDIR(ksmbd_kstat->kstat->mode) ?
+ 				FILE_ATTRIBUTE_DIRECTORY_LE : FILE_ATTRIBUTE_ARCHIVE_LE;
++		if (posix_info->ReparseTag)
++			posix_info->DosAttributes |= FILE_ATTRIBUTE_REPARSE_POINT_LE;
+ 		if (d_info->hide_dot_file && d_info->name[0] == '.')
+ 			posix_info->DosAttributes |= FILE_ATTRIBUTE_HIDDEN_LE;
+ 		/*
+@@ -7500,7 +7505,7 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
+ 		file_info->AllocationSize = cpu_to_le64((u64)seof);
  	}
- 	newattrs.ia_valid |= ATTR_MODE;
--	newattrs.ia_mode = (inode->i_mode & ~0777) | (fattr.cf_mode & 0777);
-+	if (fattr.cf_posix_mode)
-+		newattrs.ia_mode = (inode->i_mode & ~07777) |
-+				   (fattr.cf_mode & 07777);
-+	else
-+		newattrs.ia_mode = (inode->i_mode & ~0777) |
-+				   (fattr.cf_mode & 0777);
+ 	file_info->HardLinks = cpu_to_le32(stat.nlink);
+-	file_info->Mode = cpu_to_le32(stat.mode & 0777);
++	file_info->Mode = cpu_to_le32(stat.mode & 07777);
+ 	switch (stat.mode & S_IFMT) {
+ 	case S_IFDIR:
+ 		file_info->Mode |= cpu_to_le32(POSIX_TYPE_DIR << POSIX_FILETYPE_SHIFT);
+@@ -7521,7 +7526,11 @@ static int find_file_posix_info(struct smb2_query_info_rsp *rsp,
+ 		file_info->Mode |= cpu_to_le32(POSIX_TYPE_SOCKET << POSIX_FILETYPE_SHIFT);
+ 	}
  
- 	ksmbd_vfs_remove_acl_xattrs(idmap, path);
- 	/* Update posix acls */
-diff --git a/fs/smb/server/smbacl.h b/fs/smb/server/smbacl.h
-index 01810c16cc04..c9705548efb2 100644
---- a/fs/smb/server/smbacl.h
-+++ b/fs/smb/server/smbacl.h
-@@ -43,6 +43,7 @@ struct smb_fattr {
- 	kuid_t	cf_uid;
- 	kgid_t	cf_gid;
- 	umode_t	cf_mode;
-+	bool	cf_posix_mode;
- 	__le32 daccess;
- 	struct posix_acl *cf_acls;
- 	struct posix_acl *cf_dacls;
-@@ -99,7 +100,8 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			bool strict);
- int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 		 const struct path *path, struct smb_ntsd *pntsd, int ntsd_len,
--		 bool type_check, bool get_write);
-+		 bool type_check, bool get_write, bool posix_open,
-+		 bool dacl_requested);
- void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid);
- void ksmbd_init_domain(u32 *sub_auth);
- size_t smb_acl_sec_desc_scratch_len(struct smb_fattr *fattr,
+-	file_info->DeviceId = cpu_to_le32(stat.rdev);
++	file_info->DeviceId = cpu_to_le32(stat.dev);
++	file_info->Zero = 0;
++	file_info->ReparseTag = smb2_get_reparse_tag_special_file(stat.mode);
++	if (file_info->ReparseTag)
++		file_info->DosAttributes |= FILE_ATTRIBUTE_REPARSE_POINT_LE;
+ 
+ 	/*
+ 	 * Sids(32) contain two sids(Domain sid(16), UNIX group sid(16)).
+diff --git a/fs/smb/server/smb2pdu.h b/fs/smb/server/smb2pdu.h
+index e07700d0a405..e706aa52352c 100644
+--- a/fs/smb/server/smb2pdu.h
++++ b/fs/smb/server/smb2pdu.h
+@@ -168,6 +168,8 @@ struct create_posix_rsp {
+ 	u8 SidBuffer[44];
+ } __packed;
+ 
++__le32 smb2_get_reparse_tag_special_file(umode_t mode);
++
+ #define SMB2_0_IOCTL_IS_FSCTL 0x00000001
+ 
+ struct sockaddr_storage_rsp {
 -- 
 2.25.1
 
