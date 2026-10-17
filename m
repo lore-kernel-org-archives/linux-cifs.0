@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4B4326951
-	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC7A20D4FC
+	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792199073; cv=none; b=oAjU+nzdpnLXTD9CdB980+/kMtDeQ/mkJgMwSn0tyRvN6fL3aZCx/NDLX+pUElmedVzHqZjhIVVrFjKVWpgBFKbeT+a00CNBBLiyBTjB8cQo65VNzj75abgOPZQjurgxexiHmUlK8nsrzTqGmpu8iR5v4YLwdhGaXsWfvfdh1Tg=
+	t=1792199076; cv=none; b=gbEs4mJxJUF9F35/a3ATamPJ/bFQ+9pm7lyK0uCGggRf56JooYZCGVLC+NPn3yuv1941N+yb0RtjK7zKVoiV6srT4xpfLmBNHsbPh+y8s/WWafmJ6naFzOTM9kAnHzyakiJk1brPgrw76vQiStuR6kmj5tB5GZD5lw47qfbW9VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792199073; c=relaxed/simple;
-	bh=yzX2IkZvjhm7fNg1wq+jnTYkNwqeGXs/RZDXy8GAeCM=;
+	s=arc-20240116; t=1792199076; c=relaxed/simple;
+	bh=677mBkUONVMU2XpgoooCqDqpt6E8ucmVaaNj7+clSLQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sj76H1QMY4hgIUK4MYRwK3XndbcKWm1pTxH0DbcPKwCKNqHYYaXGywuPXuRPCCSXvTPi3A2tMBkmLCNMTq4UZf3Y+00F7jZpujGj89ogrx09nHC0ScMvMESCoCpj35EZiaGIozMngL7vf7wJJfIuacAPQsCs4BM8D0+oH+pmF2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OGyB1mzP; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=KlUeOgPYGw0rJRW5aYhuKKa0yb6Zdn8gvR/uUz02GwR+0NdzKZypQn8opOx5WtkkZ2T1CR/CjbolB3YdhBzABSGrMAoYGq8TvrKxZ1sS1LBXs/1mdzs3HvBWEIE95DOU2wM4FneJDH9fmXFpcrrHU30kFB0g9JxzqMBuZo128o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKVRerjl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OGyB1mzP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F6851F000C5;
-	Sat, 17 Oct 2026 01:04:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKVRerjl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34F911F000C4;
+	Sat, 17 Oct 2026 01:04:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792199072;
-	bh=0BARvTh+Gf1ljgIJuZ0OsDyfL+kSU0Sp1nhQE6YPy0g=;
+	s=k20260515; t=1792199075;
+	bh=q3+MejJxuzxmrHYQQsYxu6dOlFc/md9XGxCIYl6FNYo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=OGyB1mzPQV8ZobqgwMX8WRBHz16vy3E7vgNbPYv5K46OtgaXCm+Wm1QPebyNcxNvm
-	 VAyCQRGTQjJpFS2SmdkroizHTX6fbMRseBfd54g3AEuPrpfY7YBTETiAGPeRVyKpQL
-	 Wonaf4TRZ4V43uHsWnz6e8tpYVT4zORFF/+k4H8Qg6WUdpOHuLScpOGEk6DtFFO4MG
-	 fc8X/sDFwY3rAu5TmljroQQlhpT1OHezG/zvmhyF266P3EgnwuP/8ALjrTkerZihQs
-	 +QOvfT9ChhrIvHje/CzNe8O5o+zqkYCZ3jfkm3XwXLppm4WNlQec6J5hLvIp0CeDch
-	 TVChQ66/CjEbQ==
+	b=YKVRerjl8GeQZHRjxOR5fmT+qWNkKk20HJesXh0tJptBuABfynfaIHwNFZjHg7yaP
+	 6ncY8TYpv8BezvhW2HlaihumOAzU2hFVNJDbot86SZSzNAN/Ht0+fXpi6ig9GjSjfT
+	 dy+Ca3Bz+McM0K06pqhnrtuPH6uXZ+uRrS3L/fSUJb7dLb0BpC/MWFhRqXGxEYA0UA
+	 R1e1z8iKHNxi6qMQqWEhFRBvqxFmvSqrVlUCKdosgTDG9cRGCn/8gWLMFI0Gt7WUdh
+	 +2P5aN6Aczr1njcLl3Xb+WzaLCLQMQe9nq0i2bAHhKllQ8jnzjrUuvuS5JKZIXyIs1
+	 7hDY4dtpEgStA==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: senozhatsky@chromium.org,
@@ -34,9 +34,9 @@ Cc: senozhatsky@chromium.org,
 	chenxiaosong@chenxiaosong.com,
 	chenxiaosong@kylinos.cn,
 	Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH 15/22] ksmbd: apply byte-range lock checks per open
-Date: Sat, 17 Oct 2026 10:03:37 +0900
-Message-Id: <20261017010344.11478-15-linkinjeon@kernel.org>
+Subject: [PATCH 16/22] ksmbd: use requested mode in POSIX creates
+Date: Sat, 17 Oct 2026 10:03:38 +0900
+Message-Id: <20261017010344.11478-16-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20261017010344.11478-1-linkinjeon@kernel.org>
 References: <20261017010344.11478-1-linkinjeon@kernel.org>
@@ -48,39 +48,54 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Using the tree's POSIX extension flag to skip byte-range lock checks
-also skips them for ordinary opens on a POSIX-enabled tree.
+The share mode helpers treat a requested POSIX mode of zero as an
+unspecified mode, replacing it with the share's default permissions.
 
-Base the read and write lock checks on each file's POSIX create context
-instead.
+Use the requested mode, including zero, before applying the share masks
+and forced modes. Pass an explicit default-mode sentinel for non-POSIX
+creates to keep their existing mode selection.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/vfs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/server/mgmt/share_config.h | 4 ++--
+ fs/smb/server/smb2pdu.c           | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index f917f6aeb84d..de08e63a7794 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -362,7 +362,7 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
- 	if (ksmbd_stream_fd(fp))
- 		return ksmbd_vfs_stream_read(fp, rbuf, pos, count);
+diff --git a/fs/smb/server/mgmt/share_config.h b/fs/smb/server/mgmt/share_config.h
+index 91691b525907..390c966726f4 100644
+--- a/fs/smb/server/mgmt/share_config.h
++++ b/fs/smb/server/mgmt/share_config.h
+@@ -45,7 +45,7 @@ static inline umode_t
+ share_config_create_mode(struct ksmbd_share_config *share,
+ 			 umode_t posix_mode)
+ {
+-	umode_t mode = (posix_mode ?: (umode_t)-1) & share->create_mask;
++	umode_t mode = posix_mode & share->create_mask;
  
--	if (!work->tcon->posix_extensions) {
-+	if (!fp->is_posix_ctxt) {
- 		int ret;
+ 	return mode | share->force_create_mode;
+ }
+@@ -54,7 +54,7 @@ static inline umode_t
+ share_config_directory_mode(struct ksmbd_share_config *share,
+ 			    umode_t posix_mode)
+ {
+-	umode_t mode = (posix_mode ?: (umode_t)-1) & share->directory_mask;
++	umode_t mode = posix_mode & share->directory_mask;
  
- 		ret = check_lock_range(filp, *pos, *pos + count - 1, READ);
-@@ -547,7 +547,7 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		goto out;
- 	}
- 
--	if (!work->tcon->posix_extensions) {
-+	if (!fp->is_posix_ctxt) {
- 		err = check_lock_range(filp, *pos, *pos + count - 1, WRITE);
- 		if (err) {
- 			pr_err("unable to write due to lock\n");
+ 	return mode | share->force_directory_mode;
+ }
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 396f10fb2a91..953a2eeaa15a 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -4752,7 +4752,7 @@ int smb2_open(struct ksmbd_work *work)
+ 	/*create file if not present */
+ 	if (!file_present) {
+ 		rc = smb2_creat(work, &path, name, open_flags,
+-				posix_mode,
++				posix_ctxt ? posix_mode : (umode_t)-1,
+ 				req->CreateOptions & FILE_DIRECTORY_FILE_LE);
+ 		if (rc) {
+ 			if (rc == -ENOENT) {
 -- 
 2.25.1
 
