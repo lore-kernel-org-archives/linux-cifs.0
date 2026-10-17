@@ -1,187 +1,356 @@
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAA13D4138
-	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 03:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792208464; cv=none; b=A5dWCTwWFBQUInEUnDTNO3QVx8um9iMfojgwjdI17XBbW8yFrT2Pl3scxTbsUiUSI2yTkkBhwJpd44RpQt99o+b1jiWZdZ9JlWkkSCwtWzFzoRSk5OS9WcES4VVWOBQ9BuIlYJf+zDF0q7lFwafyB7fB6j6mHfnuVLXfJlV+xJA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792208464; c=relaxed/simple;
-	bh=T2ydNBrdSAiQY/mHYN1MfyKAYiXmXfQX8l11uhxEwP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RiJH1Ln8i4JgOVrLYCORan2lsadCTkIFwUVLjujXrYzk7DMeYdr8Re+5DuXkWekprFmj/u1TnFWlqcl3TJqte+ZP+4xwul8Q+oOQ3176dVwdE8suCWk2DeP+QmSP3Y2erlm2cs1+jgsLqvwtkjy2G4R6DMTg0GjAkYWhvwSCZhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U7nkYha/; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFB53546EA
+	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 04:42:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.176
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1792212179; cv=pass; b=DBng5ppOEw0wEjXFEqgOw2uba82Vuivo5/bbk/AyZvpkKkfVYlj2fRAeZpWKFCgtKQBqVARgqDBxrkWZf/gtMQvPkiCKBciuaOBiZwGn2kG3a3+Sy8wmG+XmfMkWBwV3GnfB37H4OINz+v7gZSa6mAhcQiJjQ4fdFiUv3BhTpwM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1792212179; c=relaxed/simple;
+	bh=nvfkS/PbPdRIPJQqXsJRdEzX0IF841PEvFdhX4ItgNY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hle2UJpvBS3uP22qYq9lJedCcykiSopTIjnxs0b3X7+NV51vmD3pF5tvR6+F8RSOHqgU/AllohnsZmLXwgIRHmaStmdHnXXgz4bKzMo+jzShlR3K9jxaeKrWNlzPgSv6WFF0t4MgMZtc2DOX8+T1d4Eme3CytTm6A01OXLJ5ekk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYfyqvKK; arc=pass smtp.client-ip=209.85.128.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7nkYha/"
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3a89f92d7b3so88700a91.2
-        for <linux-cifs@vger.kernel.org>; Fri, 16 Oct 2026 20:41:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYfyqvKK"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-8b0a921ee46so4635147b3.2
+        for <linux-cifs@vger.kernel.org>; Fri, 16 Oct 2026 21:42:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792212176; cv=none;
+        d=google.com; s=arc-20260327;
+        b=dS+KjjGHvU2JaSDZF4afgtapzj5NxUHa6iaaXOuNpQ7nBaEW62aJhYzwY/mpgVi3mw
+         p9BQxNNJwo09+deSPcU6/0LMuURGWNWXEZmo3m60ZcYri3cPRyVEfqzs69Jy8jGbNkuF
+         6eFQLDC+eZX4g9EZmwMHwnwMVWCzIEBzRYmG72g8qG6ykiZJ7XdEC/TSY0Y6hQUW755A
+         p/RU5ebzHG3ULrwaxh9hWVdtNIfmjebqQ30nwYi91y6q7m5vOezpPQHnGUuUko0Ecviw
+         6RI5rpSGJMG0jYKzARjWvuVLolNOYFt1bkjcfTMrDOqZn3MNTgpR4qgWIEw+jPIQEglD
+         Ifgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=Uh/GVxZjnU6z/3b98dpSkIACi2Ik+1ig9vewyhqQMhY=;
+        fh=MKY6YH3ZWmP6GACBDJJmpEhxGDIksJn+5CQsVu+bTgc=;
+        b=ZVXTsOAIpijAQBFHtFns4meSivK/mIFu77nNp16WmIjdtfzH9mD5xfEPfLW26193yf
+         s9QsxI/0vq5UlmxSj4lMf6w52+vbD59RD/G1pgygLvxB8vP37ZfoLOq7PmIKtiJ/uV41
+         w7nJAL3AVl0FSGmFms1cEIFwrBWBRaIUnfj+vCBSRl+eKYX3xQz5w/VGh7vHMTTaFo4l
+         2UKGpaShdm/fmYr2umjplwelriVI4hzxBiG/bPGwYFaVi5Q4FMvlbQ/ptlW4VG38wa75
+         X9R8mm6hBEC5kMZk/qQFnmiNwepxVIMH2nEmp4lga+cW6uP+gHnJ3WEO4cU5+tfnEeAN
+         5kgQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792208462; x=1792813262; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=T/A4ESg/M6eHiPTNzUedDsWmNCisSQL4A05jpFBuAJA=;
-        b=U7nkYha/+CPVueRR/rixWZxXAotlKlOONvWn0eqxoODqEn5ULohqd6Rb5YHBOXxwdo
-         MJddmK2sZ8fNAmUFG/4g1DCLSIuQmWVMdPKOGF2r5XRy6PMVPbhMpeZiAF0sY3mz09bh
-         /7emOb7cfzTKdzvSLg3SyGF/Z5vEtQ1E0MlLg1zFItEbm5svdVMitg8aTCjO96fvXQ5G
-         hAUPEJYQAiC4myqXc1rCeO3CM3Bxk61Jc6xvVtU1auv3XRNyBXGGsbabxHFG+ve5GxWc
-         xQnpqtNllLCCgffo+PftZGukiDmjtCmYvh6jJhuP3sRcQr5epapXtH4mirH0x6ZFWIjx
-         j2Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792208462; x=1792813262;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=gmail.com; s=20251104; t=1792212176; x=1792816976; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=T/A4ESg/M6eHiPTNzUedDsWmNCisSQL4A05jpFBuAJA=;
-        b=1crdFRzL8/dWVPIbHVQhXJlleLe5IiO1lBW3kwO9LvVx2Ef3E5uJuTXVnzDYnb9Z+B
-         Q/IHrYakSURlMpkYVlZSWSKsE4fIvgfo5PzomnuGUoirWROCR9iG63uWDZlIRqHguCYX
-         AgwWMMrE2CLksHc/4kH2M5i75FH617ciBT98kWwwJgzE9MjdCSFbWd7dLy+bTlZLFRwW
-         3FT+mzPqyYnOUaokqyO39ADyIftI04YiUCHNmaPOUUfwCBYJMB4++n1Im+WU77YfHfGn
-         j9kL4xr7s009h3KR5DF+D7TWMozpS69p5tV3OFoOLW88+g5zB82uStN5nvO5Qqddg4zm
-         optg==
-X-Forwarded-Encrypted: i=1; AKwUvBykQUSxYvjm7rF6UNDLJU3Dx5UDQG1AdqAf6MQ1YvPf5/WeT4hlGW9R6by6k0Qy3Q4yXMhGUs/4snGb@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ5v+6idaiQovYowN9d7EaPGZRo0mgSYeUV4WXgKKkuPYLNS6Yw
-	9KdiT3ZCbiTznFEhGElaMcWTG6F40/haT2yhvUn+7p/cZuwkEOFBav32
-X-Gm-Gg: AYBFou39sd8mzw1bPJ4KWldEDgMXWZsWHCgP4WvSp6vurTp5wYBPnm4tWt6z/Af1O2e
-	+kZfF1vEGx1qVgoUoDKTz061SyMN//4pfX5sNVE9rPPF6M3X1JzW4QRQNNhNPjT+7dFfFslDGLZ
-	YssZhgVZGEMDD/iXks7Cno8K+nVLHNtlWx9jraiwG6Yva+RV/fWlliPMokcn5NzlAiXafweij/u
-	GrT7ET/hbItSzGw7RMRgArz3t785fSbce9TOqT+RDnpDcqwOkqdsi6GIPlrTbwXgrtSkvEjO3p/
-	RZELX87K0ZPMwae8jMk3eeRBp8WFSBoKbTmFc0nR2d+KLpwdBB1lSenojSZaaw2lud6n/xv2jc9
-	HDZGcghJrG8w3onMZgUpNvoo6ey/qGoaUbaEEL+QY4Sy18UKsgMVpWLMxUEn8AIvEanoJxrqwMZ
-	U/JvPQjy8MVRqcuacBOHQAwDP59ZpL6C00NljysRx62JeZFV7kv+aLTEYgTyNoJbI=
-X-Received: by 2002:a17:90b:4b82:b0:3ac:75d5:7388 with SMTP id 98e67ed59e1d1-3aceebe3f7fmr2409820a91.3.1792208462499;
-        Fri, 16 Oct 2026 20:41:02 -0700 (PDT)
-Received: from ser8.. ([221.156.231.192])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3ac945e7311sm11708667a91.4.2026.10.16.20.41.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Oct 2026 20:41:02 -0700 (PDT)
-From: DaeMyung Kang <charsyam@gmail.com>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	DaeMyung Kang <charsyam@gmail.com>
-Subject: [PATCH 2/2] ksmbd: round SetAllocation to the advertised allocation unit
-Date: Sat, 17 Oct 2026 12:40:51 +0900
-Message-ID: <20261017034051.72932-3-charsyam@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261017034051.72932-1-charsyam@gmail.com>
-References: <CAKYAXd_50E7cH51hxKi9xWfE3Hjyj0PhwccgsuGX416pEJVs8A@mail.gmail.com>
- <20261017034051.72932-1-charsyam@gmail.com>
+        bh=Uh/GVxZjnU6z/3b98dpSkIACi2Ik+1ig9vewyhqQMhY=;
+        b=UYfyqvKKyEfE5cdl3LGlUsH30oQD+7K5sXQTnPdcNimPZlPS0O/c0fWL6cuj6fPtid
+         HOBGKevWfgL+XGwQve8xXhscbqzjsJNu2ZsT4KxGYhE7L4FDKLa+xOPBBJ3gc5JVhuNY
+         xaYGC6jFcoKDFgAlA8VhEmTZ+sFm1d8LYtjmGTIfTdU/seUQ+/4M1dLR5dO0hUAVeNZY
+         CjX8uxb9WE6bjPT2KY+OsGWpaWB43nY+jkqng9XpoNNkfSF2D7ejlu52lVnc9VwOCuWu
+         vTWMcAfWl+AIWsyGuQ8rMgXzO3oApqXG4MuAKnhASg4ewtCFClLBAMu7lHdTyaRPicNX
+         zukQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792212176; x=1792816976;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=Uh/GVxZjnU6z/3b98dpSkIACi2Ik+1ig9vewyhqQMhY=;
+        b=tK1yyxhj51jqnegjMYRnfaoFkF4C1GNjIMAP4mSw4O2RBseEcJwv+Ok5yZUXZuCe+f
+         ibHx6XRNDOgdQTgPef72ew4sB/ydBlcLjvJ5znMxaoetvwNRkhauFjiYD6vuHS76IUU5
+         QTwcklt1CjfUAKH1F2PzO+EbQ5yVBrzzN/Sqdha8E7PFlySKCPfTXuUNygG6xOqTvGk+
+         aUZPUL798guC727aPbI72TLuyPBLKqEMB7CcJWg1pv3m8eMNbJu1HJ4nC4XffP0bwixh
+         ADYfxCNTltB77RSyhJf7UOInEW1Z92EnYiOnMYDtTY5ZR5kcEsTNkS5XuBtvg99L7SQs
+         7jhA==
+X-Forwarded-Encrypted: i=1; AKwUvBzQ730B26gyticc0bWP2fMBEPuoOBckvwebH5cNGhEZLg3dBli4yStEh/ZJ2DymMl0U+X+RtTzkdGkX@vger.kernel.org
+X-Gm-Message-State: AFq9FYKSlioQYsKsZVGULCeu1vBES29vCzlnU5yMBU2fdVTlIHxD1b+w
+	2hwexhbdILJNyivdDrbWqls498r7bLHcvhNo1WUFOuiVpybiGvJLVcEnXh7+3lKvVNVaCH5cvdV
+	mQsB9dkQ9sBkUCJfkaMVgc2doJawwRHI=
+X-Gm-Gg: AYBFou3g9h66+AnjNBEWgn++e1RyVPHsbWUue3VjRt4mplgNR8ic6TH6P6Y+DdFb/wg
+	S/BbMtfmbIdOCuTVyjsmhQcPcIBcsLPZTxUTCt+Cq1Mh2AimjBicOXK0JyAQUmdiKjAE5DUshUJ
+	CDDZ9j4en2wE9PnvO2xyZ2YOTY2Nasm3vS4j1rDB8zocPebo46qxTtM3qKUb5GjEfvHflHXiF2T
+	wpmMo9NSgCA+EbfL6tP8pnNuanVGHdH+E9oHam1IuxMf5Fu+l4kGiQ/+1V4V02Y/BX8N72XY0LD
+	a7yj/OYgs0NAjJfYBxdmkJkCcQi+bpu23Py+0SZ3hEI97dGsm1N2kPbI467+D7Kkzx/FriN9NfX
+	KKYq7YnD56muvurJGiOLnkrIgtaMHTFlQKqUAH/sMAs2gHuLROw==
+X-Received: by 2002:a05:690c:a4c5:b0:8b0:cf3d:7b35 with SMTP id
+ 00721157ae682-8b0f2074384mr4926687b3.15.1792212176537; Fri, 16 Oct 2026
+ 21:42:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Sat, 17 Oct 2026 14:42:45 +1000
+X-Gm-Features: AclHuK93DYXTF16ik09W6YeUDi6L52MGyp2DqfqOwvdc-ozmEuPeAyiQQHALves
+Message-ID: <CAN05THQKjL8oyGH1N-K4TTT9cQErNJaz4SO91uP_QHRmRGhG6g@mail.gmail.com>
+Subject: ksmbd: related compound QUERY_INFO fails with STATUS_FILE_CLOSED when
+ the previous operation is not a CREATE
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	chenxiaosong@chenxiaosong.com, linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-SetAllocation rounds requests to 512-byte blocks, although
-FS_SIZE_INFORMATION advertises the filesystem's f_bsize as its
-allocation unit. For example, on a filesystem with a 4 KiB unit, a
-1000-byte request can truncate an 8 KiB file to 1024 bytes instead of
-4 KiB.
+Hi,
 
-Round the request to the advertised unit and use the same result for
-the block-count decision, fallocate, truncate, and the size stored on
-the open handle. Validate the unit and rounded size before either
-operation. Use DIV_ROUND_UP_ULL() so the calculation works on 32-bit
-kernels.
+ksmbd rejects a related compound request that Windows and Samba accept,
+and that MS-SMB2 says the server must accept. It showed up as a libsmb2
+regression: our fstat sends two QUERY_INFO requests on an already open
+handle as a related compound, and against ksmbd the second one fails.
+(libsmb2 now works around it by sending the two as an unrelated
+compound, so nothing is urgent on our side.)
 
-This does not change the existing block-count decision for whether to
-call fallocate. In particular, success does not yet guarantee
-reservation of holes within the requested range on a sparse file.
+The sequence, on a file already opened by an earlier, separate CREATE:
 
-Signed-off-by: DaeMyung Kang <charsyam@gmail.com>
----
- fs/smb/server/smb2pdu.c | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
+  1. QUERY_INFO  FileAttributeTagInformation   FileId = <real handle>
+  2. QUERY_INFO  FileAllInformation            FileId = 0xFFFFFFFFFFFFFFFF
+                                               SMB2_FLAGS_RELATED_OPERATIONS
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index d06bdc8b23db..6a91f939f3d6 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -8596,10 +8596,11 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- 	 * properly with any smb.conf option
- 	 */
- 
--	loff_t alloc_blks;
--	u64 alloc_size;
-+	u64 alloc_size, target, alloc_blks;
-+	u32 alloc_unit;
- 	struct inode *inode;
- 	struct kstat stat;
-+	struct kstatfs stfs;
- 	int rc;
- 
- 	if (!(fp->daccess & FILE_WRITE_DATA_LE))
-@@ -8612,44 +8613,48 @@ static int set_file_allocation_info(struct ksmbd_work *work,
- 			 AT_STATX_SYNC_AS_STAT);
- 	if (rc)
- 		return rc;
-+	rc = vfs_statfs(&fp->filp->f_path, &stfs);
-+	if (rc)
-+		return rc;
- 
- 	/*
--	 * AllocationSize is fully client-controlled (the caller only
--	 * validates the fixed 8-byte buffer length). Reject values that
--	 * would overflow the "round up to 512-byte blocks" conversion
--	 * below instead of silently wrapping it to a tiny block count,
--	 * which would truncate the file to a size the client never
--	 * asked for.
-+	 * Use the allocation unit advertised in FS_SIZE_INFORMATION.
-+	 * Reject requests that overflow when rounded to a whole unit.
- 	 */
- 	alloc_size = le64_to_cpu(file_alloc_info->AllocationSize);
--	if (alloc_size > MAX_LFS_FILESIZE - 511)
-+	if (stfs.f_bsize <= 0 || (u64)stfs.f_bsize > U32_MAX)
-+		return -EINVAL;
-+	alloc_unit = stfs.f_bsize;
-+	if (alloc_size > MAX_LFS_FILESIZE - (alloc_unit - 1))
- 		return -EINVAL;
- 
--	alloc_blks = (alloc_size + 511) >> 9;
-+	target = DIV_ROUND_UP_ULL(alloc_size, alloc_unit) * alloc_unit;
-+	alloc_blks = DIV_ROUND_UP_ULL(target, 512);
- 	inode = file_inode(fp->filp);
-+	if (target > inode->i_sb->s_maxbytes)
-+		return -EFBIG;
- 
- 	if (alloc_blks > stat.blocks) {
- 		smb_break_all_levII_oplock(work, fp, 1);
--		rc = vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0,
--				   alloc_blks * 512);
-+		rc = vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0, target);
- 		if (rc && rc != -EOPNOTSUPP) {
- 			pr_err("vfs_fallocate is failed : %d\n", rc);
- 			return rc;
- 		}
- 	} else if (alloc_blks < stat.blocks &&
--		   alloc_blks * 512 <= i_size_read(inode)) {
-+		   target <= i_size_read(inode)) {
- 		/*
- 		 * Truncate at or below EOF to discard excess allocation.
- 		 * Truncating above EOF would extend the file on disk.
- 		 */
--		rc = ksmbd_vfs_truncate(work, fp, alloc_blks * 512);
-+		rc = ksmbd_vfs_truncate(work, fp, target);
- 		if (rc) {
- 			pr_err("truncate failed!, err %d\n", rc);
- 			return rc;
- 		}
- 	}
- 
--	fp->allocation_size = le64_to_cpu(file_alloc_info->AllocationSize);
-+	fp->allocation_size = target;
- 	fp->allocation_size_set = true;
- 	return 0;
- }
--- 
-2.43.0
+Results:
 
+  Windows Server 2016:            1 STATUS_SUCCESS, 2 STATUS_SUCCESS
+  Samba 4.24.7:                   1 STATUS_SUCCESS, 2 STATUS_SUCCESS
+  ksmbd, Debian 6.12.107 (TCP):   1 STATUS_SUCCESS, 2 STATUS_FILE_CLOSED
+  ksmbd, same, SMB Direct (RoCE): 1 STATUS_SUCCESS, 2 STATUS_FILE_CLOSED
+
+MS-SMB2 3.3.5.2.7.2 "Handling Compounded Related Requests":
+
+  For every subsequent operation, the values used for FileId,
+  SessionId, and TreeId MUST be the ones used in processing the
+  previous operation or generated for the previous resulting response.
+
+  When the current operation requires a FileId, and if the previous
+  operation neither contains nor generates a FileId, the server MUST
+  fail the current operation and all subsequent operations with
+  STATUS_INVALID_HANDLE.
+
+So a FileId that the previous request contains counts the same as one
+a CREATE generates. Here request 1 contains one, so request 2 should
+run on that handle.
+
+Looking at fs/smb/server/smb2pdu.c (I have only tested 6.12, master is
+from reading the source):
+
+ - In 6.12, init_chained_smb2_rsp() sets work->compound_fid only after
+   a successful CREATE.
+ - In master it is also set from the FileId of a successful FLUSH, READ
+   or WRITE, but not after QUERY_INFO, SET_INFO, IOCTL, LOCK or
+   QUERY_DIRECTORY, which also contain a FileId.
+
+So in master the sequence above should still fail.
+smb2_get_info_file() finds no compound_fid, falls back to
+req->VolatileFileId, which is the 0xFFFFFFFFFFFFFFFF placeholder,
+ksmbd_lookup_fd_slow() fails, and smb2_query_info() maps -ENOENT to
+STATUS_FILE_CLOSED.
+
+The natural fix seems to be to do what master already does for
+FLUSH/READ/WRITE for every request that contains a FileId. Separately,
+when there really is no FileId to inherit, the spec asks for
+STATUS_INVALID_HANDLE rather than STATUS_FILE_CLOSED.
+
+Reproducer
+----------
+
+Below is a small program against libsmb2's public API. It opens a
+file, sends the related compound above and, as a control, the same two
+queries as an unrelated compound with the real FileId in both. It
+prints the status of each reply and exits 0 on PASS, 1 if the related
+compound is rejected.
+
+Build (libsmb2 master, https://github.com/sahlberg/libsmb2):
+
+  git clone https://github.com/sahlberg/libsmb2
+  cd libsmb2 && sh bootstrap && ./configure && make && sudo make install
+  export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig   # default prefix
+  gcc -o smb2-related-qi smb2-related-qi.c \
+      $(pkg-config --cflags --libs libsmb2)
+
+Run (any existing file on the share; the password comes from a file
+with DOMAIN:USERNAME:PASSWORD lines):
+
+  echo ':user:password' > ntlm
+  NTLM_USER_FILE=ntlm ./smb2-related-qi smb://user@server/share/file
+
+Output against ksmbd:
+
+  Related compound:
+    QUERY_INFO FileAttributeTagInformation   FileId <real>
+-> 0x00000000 STATUS_SUCCESS
+    QUERY_INFO FileAllInformation            FileId 0xFFFFFFFFFFFFFFFF
+-> 0xc0000128 STATUS_FILE_CLOSED
+  Unrelated compound:
+    QUERY_INFO FileAttributeTagInformation   FileId <real>
+-> 0x00000000 STATUS_SUCCESS
+    QUERY_INFO FileAllInformation            FileId <real>
+-> 0x00000000 STATUS_SUCCESS
+  FAIL: related compound rejected
+
+Against Windows Server 2016 and Samba 4.24.7 all four are
+STATUS_SUCCESS and it prints PASS.
+
+---8<--- smb2-related-qi.c ---8<---
+/*
+ * smb2-related-qi: send a compound of two QUERY_INFO requests on an open
+ * file, the first with the real FileId and the second with the related
+ * operation placeholder FileId 0xFFFFFFFFFFFFFFFF, and print the status
+ * of each reply.
+ *
+ * MS-SMB2 3.3.5.2.7.2: the second request must use the FileId of the
+ * first one, which "contains" a FileId. Windows does that and returns
+ * STATUS_SUCCESS for both.
+ *
+ * As a control the same two queries are then sent as an unrelated
+ * compound, both with the real FileId.
+ *
+ * Build against libsmb2 (https://github.com/sahlberg/libsmb2, master):
+ *   gcc -o smb2-related-qi smb2-related-qi.c $(pkg-config --cflags
+--libs libsmb2)
+ *
+ * Usage:
+ *   smb2-related-qi smb://[domain;][user@]server/share/path/to/file
+ * The password is read from the file NTLM_USER_FILE points to, one
+ * DOMAIN:USERNAME:PASSWORD line per user.
+ */
+
+#include <fcntl.h>
+#include <inttypes.h>
+#include <poll.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+#include <smb2/smb2.h>
+#include <smb2/libsmb2.h>
+#include <smb2/libsmb2-raw.h>
+
+struct query {
+        const char *name;
+        int done;
+        uint32_t status;
+};
+
+static void
+qi_cb(struct smb2_context *smb2, int status, void *command_data,
+      void *private_data)
+{
+        struct query *q = private_data;
+        struct smb2_query_info_reply *rep = command_data;
+
+        q->done = 1;
+        q->status = (uint32_t)status;
+        if (status == 0 && rep != NULL) {
+                smb2_free_data(smb2, rep->output_buffer);
+        }
+}
+
+static int
+run(struct smb2_context *smb2, struct smb2fh *fh, int related)
+{
+        struct smb2_query_info_request req;
+        struct smb2_pdu *pdu, *next;
+        struct query q1 = { .name = "QUERY_INFO FileAttributeTagInformation" };
+        struct query q2 = { .name = "QUERY_INFO FileAllInformation" };
+
+        printf("%s compound:\n", related ? "Related" : "Unrelated");
+
+        memset(&req, 0, sizeof(req));
+        req.info_type = SMB2_0_INFO_FILE;
+        req.output_buffer_length = 65535;
+        memcpy(req.file_id, smb2_get_file_id(fh), SMB2_FD_SIZE);
+
+        req.file_info_class = SMB2_FILE_ATTRIBUTE_TAG_INFORMATION;
+        pdu = smb2_cmd_query_info_async(smb2, &req, qi_cb, &q1);
+
+        req.file_info_class = SMB2_FILE_ALL_INFORMATION;
+        if (related) {
+                /* "use the FileId of the previous operation" */
+                memset(req.file_id, 0xff, SMB2_FD_SIZE);
+        }
+        next = smb2_cmd_query_info_async(smb2, &req, qi_cb, &q2);
+        if (pdu == NULL || next == NULL) {
+                printf("failed to create the requests: %s\n",
+                       smb2_get_error(smb2));
+                return -1;
+        }
+        if (related) {
+                smb2_add_compound_pdu(smb2, pdu, next);
+        } else {
+                smb2_add_unrelated_compound_pdu(smb2, pdu, next);
+        }
+        smb2_queue_pdu(smb2, pdu);
+
+        while (!q1.done || !q2.done) {
+                struct pollfd pfd;
+
+                pfd.fd = smb2_get_fd(smb2);
+                pfd.events = smb2_which_events(smb2);
+                if (poll(&pfd, 1, 1000) < 0) {
+                        perror("poll");
+                        return -1;
+                }
+                if (pfd.revents && smb2_service(smb2, pfd.revents) < 0) {
+                        printf("smb2_service failed: %s\n",
+                               smb2_get_error(smb2));
+                        return -1;
+                }
+        }
+
+        printf("  %-40s FileId %-18s -> 0x%08" PRIx32 " %s\n", q1.name,
+               "<real>", q1.status, nterror_to_str(q1.status));
+        printf("  %-40s FileId %-18s -> 0x%08" PRIx32 " %s\n", q2.name,
+               related ? "0xFFFFFFFFFFFFFFFF" : "<real>", q2.status,
+               nterror_to_str(q2.status));
+        return q1.status == 0 && q2.status == 0 ? 0 : 1;
+}
+
+int main(int argc, char *argv[])
+{
+        struct smb2_context *smb2;
+        struct smb2_url *url;
+        struct smb2fh *fh;
+        int ret;
+
+        if (argc != 2) {
+                fprintf(stderr, "Usage: %s smb://[user@]server/share/file\n",
+                        argv[0]);
+                return 2;
+        }
+        smb2 = smb2_init_context();
+        url = smb2_parse_url(smb2, argv[1]);
+        if (url == NULL || url->path == NULL || url->path[0] == 0) {
+                fprintf(stderr, "Bad URL, it must name a file: %s\n",
+                        smb2_get_error(smb2));
+                return 2;
+        }
+        if (smb2_connect_share(smb2, url->server, url->share,
+                               url->user) < 0) {
+                fprintf(stderr, "connect failed: %s\n", smb2_get_error(smb2));
+                return 2;
+        }
+        fh = smb2_open(smb2, url->path, O_RDONLY);
+        if (fh == NULL) {
+                fprintf(stderr, "open %s failed: %s\n", url->path,
+                        smb2_get_error(smb2));
+                return 2;
+        }
+
+        ret = run(smb2, fh, 1);
+        if (run(smb2, fh, 0) != 0) {
+                ret = 2;
+        }
+        printf("%s\n", ret == 0 ? "PASS" :
+               ret == 1 ? "FAIL: related compound rejected" :
+               "ERROR: control (unrelated compound) failed too");
+
+        smb2_close(smb2, fh);
+        smb2_disconnect_share(smb2);
+        smb2_destroy_url(url);
+        smb2_destroy_context(smb2);
+        return ret;
+}
+---8<---
+
+Thanks,
+Ronnie Sahlberg
