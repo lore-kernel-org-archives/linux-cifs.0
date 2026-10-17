@@ -1,210 +1,280 @@
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DE545039;
-	Fri, 16 Oct 2026 23:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=143.255.12.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEEB22A4F1
+	for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 01:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792194767; cv=none; b=YEXdt5ibb9FEtLQqh4QGRZQUZ+Io06+4Ow18O4uYgDzPoKGH5TUQQLjxkRG2T1pA5TcXI/jZCA82gkeiAN5Mb+hTiEiZsX58DbhZpDUPIut53wp7MnVuFF6KFEryTiaIO7iBcnFQsXzgF2xD9+I9JKkqHMFelQZmwMvLc+5xRfI=
+	t=1792199039; cv=none; b=jjP3s6BGTd7b211bNPXua5+/mJE0eQmr7qOibFiaJj7zqvk8/1TUNtzQSc2FnypMbNTPueFLEx9ZJczIC9w6rQRjQu1Q2CODVlEQyYKxFfVKFF5TdPLv8mmPgxTWC8yy9dzauJafwUjYJA/g5wEV/ZO8f/1Hoph/PufwRll2ep8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792194767; c=relaxed/simple;
-	bh=QXilKyRqJrwNMzcX7XioD1gEYG2j2+eesqh+yf+HYU4=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=GlLn/hdlp89nv9crw+xiMOjnFI9YJ/F4/ONWjzLP2mnnADZHgFdYPZoTuH6qJWgYNRMfayEy3t+4GrGRf8asaQe/u7uTfz6jYTQjTfdHweCpKwg7mwp3GkT/qA56gPH8JN7Ww/cY6r2Sj6kjIQR58NrQfEaZTyKLw2XBbMOjHvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org; spf=pass smtp.mailfrom=manguebit.org; dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b=yqe0fViP; arc=none smtp.client-ip=143.255.12.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	s=arc-20240116; t=1792199039; c=relaxed/simple;
+	bh=j1TsAab9EJQ/daAl3RK3IIyF6Fto1glq3JSv7x0jk/c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m9Z8z3Ng4x9Lus6NJXKALaTxISsM2oCvneKpqYpu6bTpm9qiF0iDvBsENG8b6Xdg+VVZMHj3CbNqTlVtdfvddC8BIOiq0fNS8LgjCS/ZruZv2IlAJ9/dkWgAdibz7Gc/t9RI9VCx1aCp65y6A8oozdIpqfCD0T15wPuxNPaok8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WkHSLh6R; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.b="yqe0fViP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:Subject:Cc:To:From:
-	Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=aGtv9OjoqZMn1pYmcItOtLJ0759sNOoF1i5JiX/CXbs=; b=yqe0fViP+IiKkRAbNTNjoRbvlY
-	mlITTZtVhZq83KAWVsfAbeTWJdHa1f5wX9yTSpGVgK3+pGn/rCxUMZeHJBunADNz3/vTwyLSrzSDH
-	ERK8A7wAmiymda9Ri5rZM7EZq26/Dt19LDeZavumh3o3kYCqmkngN/X4WGNE/qA2FVOlrvJE6ufkN
-	SvL7i/kQTwC1J0ijus3sj8Qi43h7NwVFhNBs2ZBNkcchPFvN0eqnKCeDvgNV/h2ITdS03V10SmVA/
-	n6PivAV6IXTAJNQCAoXH+HWw5DNqq8DiOcWFCGhML0ZDswgMKJErqqSsUgyNXwvlwUOp64W+6nfju
-	koD95p6A==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
-	id 1xHrj8-00000003pDj-1oWX;
-	Fri, 16 Oct 2026 20:52:42 -0300
-Message-ID: <fcf60d2f4382fc7ccd77ea41c5e55b50@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Christian Brauner <brauner@kernel.org>, Mark Brown <broonie@kernel.org>,
- linux-cifs@vger.kernel.org, linux-next@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [GIT PULL] smb client changes for v7.4
-Date: Fri, 16 Oct 2026 20:52:42 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WkHSLh6R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 830341F000C4;
+	Sat, 17 Oct 2026 01:03:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792199037;
+	bh=u9zkXL8+Ub42f+5YWZo4HwsUTKwXtEpYvU0P1gatkwg=;
+	h=From:To:Cc:Subject:Date;
+	b=WkHSLh6RmY+gf4AS+wA4vC1JOmKXNfHf24zYt8rhZTvuCL8DVNYwtsuNQogYZ6aYc
+	 PVb4Jmu/046JAnLbqAlqXYfO6YoNTVVvjpiQFsVPPFc94X6GIIiLc38A8Cn6jtCcgj
+	 Sit+FurEzte35syMtl5cDwDefP0G7PYwrPzDoWDIRfdH2ExC4N2GJXyAG6PgUhhFt8
+	 Ia1hVQdxB1KlaQiu3U2Q7+nUI925U7kBEsmrpP991ffhC/+8ts4Gvv9HBLoHYrsgtk
+	 OvXuoYWUVVtvnRdPtLYgaCH1OcWtKCvpCsHH01AI+lF1Lbkp+LQYpHgMf+Qi4JMmpz
+	 OlduSPJyThZvw==
+From: Namjae Jeon <linkinjeon@kernel.org>
+To: linux-cifs@vger.kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	atteh.mailbox@gmail.com,
+	chenxiaosong@chenxiaosong.com,
+	chenxiaosong@kylinos.cn,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Pan Guihua <pan.guihua@datatom.com>
+Subject: [PATCH 01/22] ksmbd: release connection lock while draining old session
+Date: Sat, 17 Oct 2026 10:03:23 +0900
+Message-Id: <20261017010344.11478-1-linkinjeon@kernel.org>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Linus,
+Previous-session teardown waits for requests on the old channels. Holding
+srv_mutex during that wait can block their responses and prevent the drain
+from completing.
 
-Please pull the following smb client changes for v7.4.  These are mostly
-cleanups, a number of fixes (crashes, out-of-bounds reads and
-data-integrity bugs), support for changing SMB compression through
-chattr and internal CIFS version removal.
+Record the previous session ID during authentication, finish using the
+request's authentication state, and release srv_mutex while the old
+session drains. Keep the response binding decision in the work item because
+signing and preauthentication hashing run after the drain.
 
-This conflicts with the vfs tree in fs/smb/client (mnt_idmap
-constification, fscache_resize_cookie() and transport.c).  The
-resolution is trivial and linux-next has been carrying it for a while.
+Reported-by: Pan Guihua <pan.guihua@datatom.com>
+Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
+---
+ fs/smb/server/ksmbd_work.h        |  2 ++
+ fs/smb/server/mgmt/user_session.c | 15 +++++++++
+ fs/smb/server/smb2pdu.c           | 56 ++++++++++++++++++-------------
+ 3 files changed, 49 insertions(+), 24 deletions(-)
 
-Thanks,
-Paulo
+diff --git a/fs/smb/server/ksmbd_work.h b/fs/smb/server/ksmbd_work.h
+index 3a14e4d69aa1..40f70a5d08b5 100644
+--- a/fs/smb/server/ksmbd_work.h
++++ b/fs/smb/server/ksmbd_work.h
+@@ -94,6 +94,8 @@ struct ksmbd_work {
+ 	bool                            need_invalidate_rkey:1;
+ 	bool				request_open_chseq_tracked:1;
+ 	bool				session_setup_reauth:1;
++	/* Retain the binding decision for response signing and preauth hashing. */
++	bool				session_setup_binding:1;
+ 
+ 	unsigned int                    remote_key;
+ 	/* cancel works */
+diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
+index 1321cd6c84e7..d814a99ff519 100644
+--- a/fs/smb/server/mgmt/user_session.c
++++ b/fs/smb/server/mgmt/user_session.c
+@@ -759,6 +759,7 @@ void destroy_previous_session(struct ksmbd_conn *conn,
+ {
+ 	struct ksmbd_session *prev_sess;
+ 	struct ksmbd_user *prev_user;
++	bool pinned = false;
+ 	int err;
+ 
+ 	down_write(&sessions_table_lock);
+@@ -781,9 +782,21 @@ void destroy_previous_session(struct ksmbd_conn *conn,
+ 	}
+ 	prev_sess->tearing_down = true;
+ 	up_write(&prev_sess->chann_lock);
++	ksmbd_user_session_get(prev_sess);
++	pinned = true;
++	up_write(&conn->session_lock);
++	up_write(&sessions_table_lock);
+ 
+ 	ksmbd_all_conn_set_status(prev_sess, KSMBD_SESS_NEED_RECONNECT);
++	/*
++	 * The caller has finished using the connection's authentication state.
++	 * Drop srv_mutex so drained requests can write their responses.
++	 */
++	ksmbd_conn_unlock(conn);
+ 	err = ksmbd_conn_wait_idle_sess(conn, prev_sess);
++	ksmbd_conn_lock(conn);
++	down_write(&sessions_table_lock);
++	down_write(&conn->session_lock);
+ 	if (err) {
+ 		down_write(&prev_sess->chann_lock);
+ 		prev_sess->tearing_down = false;
+@@ -800,6 +813,8 @@ void destroy_previous_session(struct ksmbd_conn *conn,
+ out:
+ 	up_write(&conn->session_lock);
+ 	up_write(&sessions_table_lock);
++	if (pinned)
++		ksmbd_user_session_put(prev_sess);
+ }
+ 
+ static bool ksmbd_preauth_session_id_match(struct preauth_session *sess,
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 2da6163ee776..aca51f54a38d 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2206,14 +2206,14 @@ static struct ksmbd_user *session_user(struct ksmbd_conn *conn,
+ 
+ static int ntlm_authenticate(struct ksmbd_work *work,
+ 			     struct smb2_sess_setup_req *req,
+-			     struct smb2_sess_setup_rsp *rsp)
++			     struct smb2_sess_setup_rsp *rsp,
++			     u64 *previous_session_id)
+ {
+ 	struct ksmbd_conn *conn = work->conn;
+ 	struct ksmbd_session *sess = work->sess;
+ 	struct ksmbd_user *user;
+ 	char channel_key[CIFS_KEY_SIZE] = {};
+ 	char *auth_key = conn->binding ? channel_key : sess->sess_key;
+-	u64 prev_id;
+ 	bool binding = conn->binding;
+ 	int sz, rc;
+ 
+@@ -2278,9 +2278,7 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+ 		}
+ 	}
+ 
+-	prev_id = le64_to_cpu(req->PreviousSessionId);
+-	if (prev_id && prev_id != sess->id)
+-		destroy_previous_session(conn, sess->user, prev_id);
++	*previous_session_id = le64_to_cpu(req->PreviousSessionId);
+ 
+ 	/*
+ 	 * If session state is SMB2_SESSION_VALID, We can assume
+@@ -2342,7 +2340,8 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+ #ifdef CONFIG_SMB_SERVER_KERBEROS5
+ static int krb5_authenticate(struct ksmbd_work *work,
+ 			     struct smb2_sess_setup_req *req,
+-			     struct smb2_sess_setup_rsp *rsp)
++			     struct smb2_sess_setup_rsp *rsp,
++			     u64 *previous_session_id)
+ {
+ 	struct ksmbd_conn *conn = work->conn;
+ 	struct ksmbd_session *sess = work->sess;
+@@ -2351,7 +2350,6 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ 	char reauth_key[CIFS_KEY_SIZE] = {};
+ 	char *auth_key = conn->binding ? channel_key :
+ 		(work->session_setup_reauth ? reauth_key : sess->sess_key);
+-	u64 prev_sess_id;
+ 	bool binding = conn->binding;
+ 	int in_len, out_len;
+ 	int retval;
+@@ -2373,10 +2371,7 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ 		goto out;
+ 	}
+ 
+-	/* Check previous session */
+-	prev_sess_id = le64_to_cpu(req->PreviousSessionId);
+-	if (prev_sess_id && prev_sess_id != sess->id)
+-		destroy_previous_session(conn, sess->user, prev_sess_id);
++	*previous_session_id = le64_to_cpu(req->PreviousSessionId);
+ 
+ 	rsp->SecurityBufferLength = cpu_to_le16(out_len);
+ 
+@@ -2445,7 +2440,8 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ #else
+ static int krb5_authenticate(struct ksmbd_work *work,
+ 			     struct smb2_sess_setup_req *req,
+-			     struct smb2_sess_setup_rsp *rsp)
++			     struct smb2_sess_setup_rsp *rsp,
++			     u64 *previous_session_id)
+ {
+ 	return -EOPNOTSUPP;
+ }
+@@ -2459,6 +2455,8 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 	struct ksmbd_session *sess = NULL;
+ 	struct negotiate_message *negblob;
+ 	unsigned int negblob_len, negblob_off;
++	u64 previous_session_id = 0;
++	bool authenticated = false;
+ 	int rc = 0;
+ 
+ 	ksmbd_debug(SMB, "Received smb2 session setup request\n");
+@@ -2648,14 +2646,11 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 
+ 		if (conn->preferred_auth_mech &
+ 				(KSMBD_AUTH_KRB5 | KSMBD_AUTH_MSKRB5)) {
+-			rc = krb5_authenticate(work, req, rsp);
++			rc = krb5_authenticate(work, req, rsp, &previous_session_id);
+ 			if (rc)
+ 				goto out_err;
+ 
+-			if (!ksmbd_conn_need_reconnect(conn)) {
+-				ksmbd_conn_set_good(conn);
+-				sess->state = SMB2_SESSION_VALID;
+-			}
++			authenticated = true;
+ 		} else if (conn->preferred_auth_mech == KSMBD_AUTH_NTLMSSP) {
+ 			if (negblob->MessageType == NtLmNegotiate) {
+ 				rc = ntlm_negotiate(work, negblob, negblob_len, rsp);
+@@ -2664,14 +2659,12 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 				rsp->hdr.Status =
+ 					STATUS_MORE_PROCESSING_REQUIRED;
+ 			} else if (negblob->MessageType == NtLmAuthenticate) {
+-				rc = ntlm_authenticate(work, req, rsp);
++				rc = ntlm_authenticate(work, req, rsp,
++						       &previous_session_id);
+ 				if (rc)
+ 					goto out_err;
+ 
+-				if (!ksmbd_conn_need_reconnect(conn)) {
+-					ksmbd_conn_set_good(conn);
+-					sess->state = SMB2_SESSION_VALID;
+-				}
++				authenticated = true;
+ 				if (conn->binding) {
+ 					struct preauth_session *preauth_sess;
+ 
+@@ -2804,6 +2797,21 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+ 	}
+ 
++	work->session_setup_binding = conn->binding;
++	if (authenticated) {
++		/*
++		 * Draining the previous session drops srv_mutex. Finish using the
++		 * connection's authentication state and free mechToken first, and
++		 * retain this request's binding decision for response processing.
++		 */
++		if (previous_session_id && previous_session_id != sess->id)
++			destroy_previous_session(conn, sess->user, previous_session_id);
++		if (!ksmbd_conn_need_reconnect(conn)) {
++			ksmbd_conn_set_good(conn);
++			sess->state = SMB2_SESSION_VALID;
++		}
++	}
++
+ 	ksmbd_conn_unlock(conn);
+ 	return rc;
+ }
+@@ -12478,7 +12486,7 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
+ 	command = le16_to_cpu(hdr->Command);
+ 
+ 	if (command == SMB2_SESSION_SETUP_HE &&
+-	    (!conn->binding || hdr->Status != STATUS_SUCCESS)) {
++	    (!work->session_setup_binding || hdr->Status != STATUS_SUCCESS)) {
+ 		signing_key = work->sess->smb3signingkey;
+ 	} else {
+ 		chann = lookup_chann_list(work->sess, work->conn);
+@@ -12527,7 +12535,7 @@ void smb3_preauth_hash_rsp(struct ksmbd_work *work)
+ 	if (le16_to_cpu(rsp->Command) == SMB2_SESSION_SETUP_HE && sess) {
+ 		ksmbd_conn_lock(conn);
+ 
+-		if (conn->binding) {
++		if (work->session_setup_binding) {
+ 			struct preauth_session *preauth_sess;
+ 
+ 			preauth_sess = ksmbd_preauth_session_lookup(conn, sess->id);
+-- 
+2.25.1
 
-----------------------------------------------------------------
-The following changes since commit ff47652a4b66c067c765a7ad464d930b5a9367cc:
-
-  Merge tag 'cifs-fixes-7.3-rc6' of https://git.manguebit.org/linux (2026-10-02 14:04:11 -0700)
-
-are available in the Git repository at:
-
-  https://git.manguebit.org/linux.git tags/cifs-for-7.4
-
-for you to fetch changes up to 78f73985846465a25a7bd1d89904053661f3ca92:
-
-  smb: client: reclaim credits for decrypted reads with no matching mid (2026-10-15 16:45:30 -0300)
-
-----------------------------------------------------------------
- - Implement ->fileattr_set so chattr(1) compression changes (chattr +c/-c)
-   go through the generic VFS fileattr path and its permission and
-   serialization checks instead of the raw FS_IOC_SETFLAGS fallback and
-   remove the now-unreachable file flags ioctl handlers
-
- - Require stable pages when the connection is signed or SMB compression is
-   enabled, so a buffered write can no longer modify a folio that is still in
-   flight and corrupt its signature (surfaced as -EIO) or, with compression,
-   silently corrupt the data stored on the server
-
- - Stop breaking a file's just-granted lease while probing it for a
-   Minshall+French symlink, by reusing an already open handle or opening with
-   the inode's lease key
-
- - Fix several out-of-bounds reads and use-after-free bug in SMB1
-
- - Fix an use-after-free bug in cifs_ses_add_channel()
-
- - Fix a NULL pointer dereference in the demultiplex thread when an encrypted
-   read response matches no outstanding request and reclaim the credits
-   granted on such responses to avoid starving the connection of credits
-
- - Fail sends fast when the connection needs to reconnect
-
- - Drop the redundant nls_table argument threaded through the session setup,
-   tree connect and path-based call paths, allocate the session setup state
-   on the stack and remove the internal CIFS version number along with a
-   batch of write-only fields and commented-out code
-
-----------------------------------------------------------------
-Diego Oliva (7):
-      smb: client: fix use-after-free infoleak via the readdir resume name
-      smb: client: fix OOB last_entry pointer from unbounded LastNameOffset
-      smb: client: fix OOB read of the resume name sent in TRANS2_FIND_NEXT2
-      smb: client: fix OOB read in the SMB_FIND_FILE_UNIX name scan
-      smb: client: reject FIND data areas that run past the received response
-      smb: client: reject short or out-of-range FIND response parameters
-      smb: client: drop the redundant name bounds in cifs_filldir()
-
-Enzo Matsumiya (1):
-      smb: client: fast fail sends if need to reconnect
-
-Henry Martin (1):
-      smb: client: fix use-after-free in cifs_ses_add_channel()
-
-Huiwen He (2):
-      smb: client: implement fileattr_set for compression flags
-      smb: client: remove unused file flags ioctl handlers
-
-Paulo Alcantara (49):
-      smb: client: rename mfsymlink helpers to the smb2_ prefix
-      smb: client: set lease_granted before revalidating inode in cifs_nt_open()
-      smb: client: avoid breaking the file lease when probing mfsymlinks
-      smb: client: log the selected security type on session setup failure
-      smb: client: remove commented-out ntlmv2_support definition
-      smb: client: remove commented-out i_flags assignment
-      smb: client: remove commented-out cancel_*_requests() calls
-      smb: client: remove commented-out oplock assignment
-      smb: client: remove commented-out write debug message
-      smb: client: remove commented-out LOCK_RSP declaration
-      smb: client: remove commented-out QPathInfo debug message
-      smb: client: remove commented-out CIFSSMBWinSetPerms() call
-      smb: client: remove commented-out time conversion debug message
-      smb: client: remove commented-out Unix caps assignment
-      smb: client: clean up cifs_buf_release()
-      smb: client: remove the internal CIFS version number
-      smb: client: remove unused overrideSecFlg from struct cifs_ses
-      smb: client: remove write-only max_rw from TCP_Server_Info
-      smb: client: remove write-only sec_kerberosu2u from TCP_Server_Info
-      smb: client: remove write-only signing_negotiated from TCP_Server_Info
-      smb: client: remove unused num_acl_set stat from cifs_tcon
-      smb: client: size smb2_compound_vars.qi_iov for the padding iov
-      smb: client: drop redundant nls_table arg from SMBSetInformation()
-      smb: client: drop redundant nls_table arg from CIFSSMBSetPathInfo()
-      smb: client: drop redundant nls_table arg from ->set_EA()
-      smb: client: drop redundant nls_table arg from build_avpair_blob()
-      smb: client: drop redundant nls_table arg from calc_ntlmv2_hash()
-      smb: client: drop redundant nls_table arg from setup_ntlmv2_rsp()
-      smb: client: drop redundant nls_table arg from build_ntlmssp_negotiate_blob()
-      smb: client: drop redundant nls_table arg from build_ntlmssp_smb3_negotiate_blob()
-      smb: client: drop redundant nls_table arg from build_ntlmssp_auth_blob()
-      smb: client: drop unused nls_table arg from ascii_oslm_strings()
-      smb: client: drop redundant nls_table arg from unicode_domain_string()
-      smb: client: drop unused nls_table arg from ascii_domain_string()
-      smb: client: drop redundant nls_table arg from unicode_ssetup_strings()
-      smb: client: drop unused nls_table arg from ascii_ssetup_strings()
-      smb: client: drop redundant nls_table arg from decode_unicode_ssetup()
-      smb: client: drop unused nls_table arg from decode_ascii_ssetup()
-      smb: client: drop redundant nls_table arg from ->sess_setup()
-      smb: client: drop redundant nls_table arg from cifs_setup_session()
-      smb: client: drop redundant nls_table arg from ->tree_connect()
-      smb: client: drop redundant nls_table arg from CIFSPOSIXDelFile()
-      smb: client: drop redundant nls_table arg from CIFSPOSIXCreate()
-      smb: client: drop redundant nls_table arg from SMBLegacyOpen()
-      smb: client: drop redundant nls_table arg from CIFSSMBRenameOpenFile()
-      smb: client: allocate struct sess_data on the stack
-      smb: client: allocate struct SMB2_sess_data on the stack
-      smb: client: require stable pages for SMB compression
-      smb: client: reclaim credits for decrypted reads with no matching mid
-
-Zikang Gao (1):
-      smb: client: do not pass a NULL buf to is_oplock_break()
-
- fs/smb/client/asn1.c        |   2 -
- fs/smb/client/cifs_debug.c  |   1 -
- fs/smb/client/cifsencrypt.c |  31 +++--
- fs/smb/client/cifsfs.c      |  11 +-
- fs/smb/client/cifsfs.h      |   5 +-
- fs/smb/client/cifsglob.h    |  26 ++---
- fs/smb/client/cifsproto.h   |  19 +--
- fs/smb/client/cifssmb.c     | 183 +++++++++++++++++------------
- fs/smb/client/connect.c     |  59 +++++++---
- fs/smb/client/dfs.c         |   6 +-
- fs/smb/client/dir.c         |   1 -
- fs/smb/client/file.c        |   7 +-
- fs/smb/client/inode.c       |  36 +++---
- fs/smb/client/ioctl.c       | 165 ++++++++++++--------------
- fs/smb/client/link.c        | 273 ++++++++++++++++++++++++++++++++------------
- fs/smb/client/misc.c        |   4 +-
- fs/smb/client/netmisc.c     |   3 -
- fs/smb/client/ntlmssp.h     |  11 +-
- fs/smb/client/readdir.c     |  80 +++++++++----
- fs/smb/client/sess.c        |  37 +++---
- fs/smb/client/smb1ops.c     |  14 +--
- fs/smb/client/smb1proto.h   |  21 ++--
- fs/smb/client/smb1session.c | 120 +++++++++----------
- fs/smb/client/smb2glob.h    |   8 ++
- fs/smb/client/smb2inode.c   |   7 +-
- fs/smb/client/smb2ops.c     |  36 +++---
- fs/smb/client/smb2pdu.c     |  66 +++++------
- fs/smb/client/smb2pdu.h     |   3 +
- fs/smb/client/smb2proto.h   |  17 ++-
- fs/smb/client/trace.h       |   2 +
- fs/smb/client/transport.c   |  33 ++++++
- fs/smb/client/xattr.c       |   2 +-
- 32 files changed, 740 insertions(+), 549 deletions(-)
