@@ -1,120 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B4F1F16B;
-	Sat, 17 Oct 2026 17:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519FB312836
+	for <linux-cifs@vger.kernel.org>; Sun, 18 Oct 2026 01:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792258151; cv=none; b=fc1X1wAgecZ8cKQvESd2Bg266YlRCvg4RNcqvMH2LWbhvt3iDmp9sOlBsRsYt4uck2w9nZRarho4bXubMcNedNZKy/PhrWTBYgn6X/c/pC6tgFhFHR8FYstzv684dUeH5yq0duI8v/Auc3dSGgFIfkssfpN63KwSrXrBeZHdx1s=
+	t=1792286633; cv=none; b=uoyLv2xZ0u8ITFz8nAkfkow+97e/U9tmyRqv+FJHbrvi862ul18if8pQbugqkRDiESzgq+O5Cs3/mXaJk1iIwgXWjOOImUPeU3EIdEFo7Wk+BdyyobrQJLY2nIXmV0JEt7E/GwVhh38egxUyFq0vKWf5wr+77bBIcjrY+8Hna5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792258151; c=relaxed/simple;
-	bh=HXdbwhT2S/4HhN2HunFr5ZFlA1AZBs4LLShxf6zFmRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c1v40k/h/geLo3TQzIC8aNfvTIknksrJG4FaTdPUahtikCVBAkgRF1M4W1wy7kB2qGJ/M/qjlZ5Rem9JxYiP/gZfwAumCs47sVrx4ww4qYOq+FKZQf8x5fXSmWy763hypvUg+5o1sQ4T5TO/O/l5Goud8scvGFnJNviRCqdRPQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=yeysZP55; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792286633; c=relaxed/simple;
+	bh=kdIS09yOM769VQIrjhLpMRDuAml2Kw78mE+2NlzQLBI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m1XyOWdIDNLWIPzFr39sT3TcCeumWW3Pir4Bgl1JjjRLJpCT8wwjCnyaly+Dk9SdhWXzo5OGKNZ2QB1P4ZN+vgJquQ5o04clD3ZDeiA1PtBR0hdnC/UZ9jGzXGFWVs3/mLpR/L2j+hml83DYwXI1LObaMwFXDzwueZbOq+5uOR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/ExLNyU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="yeysZP55"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F06DA1F000C4;
-	Sat, 17 Oct 2026 17:29:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1792258150;
-	bh=OxUHcoFzPsDp6qlaG53MUFmGtbJnOg6gqliI+iDvNUY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=yeysZP55UGArUH8wfBMeunRtSflIUbHvXH0ipE6zqIm+MSpI3eyMUWcXEEpb5fKbO
-	 QuwvNBB2owww6CPm6H4CvrAYTZsy3DvWTCwHU3YCE18RcPZxFo7i6HvNAnH0RxKD0q
-	 yVsF4IxZxAtqRf2K/Y+667WZWEodXZ2vPQERO1Fg=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	Tom Talpey <tom@talpey.com>,
-	Long Li <longli@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Stefan Metzmacher <metze@samba.org>,
-	Steve French <stfrench@microsoft.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.6 0788/1674] smb: client: let recv_done verify data_offset, data_length and remaining_data_length
-Date: Sat, 17 Oct 2026 17:51:00 +0200
-Message-ID: <20261017160451.329969222@linuxfoundation.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261017160431.119607952@linuxfoundation.org>
-References: <20261017160431.119607952@linuxfoundation.org>
-User-Agent: quilt/0.69
-X-stable: review
-X-Patchwork-Hint: ignore
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/ExLNyU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B88971F000C4
+	for <linux-cifs@vger.kernel.org>; Sun, 18 Oct 2026 01:23:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792286630;
+	bh=kdIS09yOM769VQIrjhLpMRDuAml2Kw78mE+2NlzQLBI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=h/ExLNyUy0NboTANrohPCMMREjSTrvJnc79tIfpOgo9d8iyqjNTALBKhqzWNOsEiF
+	 OuSbxOqWTggbMf5ocI5K+yhz6mw8Ak8qumr11RaCsClh/IvFAQcLc2Lz/DV9QxYFWr
+	 Mvu269CEppW8DPtKt8JLDBrczuPEiEf/xsBlwYxZbC1Vw+w5jyEKkuawM74lw8RZ2Q
+	 qgs79hXK+gYfu//MWtu+Mwr191cjwFWSettayzJlxWPFKQIgwXDcnqaq70N3FvKQva
+	 AJHBhR4lDS4kLxviSjY0JsVKndc4Lfm493HsJmpaagKiZSuQn43yytImmsycBJDQcR
+	 li4WRu3p7CPHg==
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6b170129413so1533556a12.1
+        for <linux-cifs@vger.kernel.org>; Sat, 17 Oct 2026 18:23:50 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxPo3FilUKZmyMYbT3MvqT3tJ/SLMR9gFyZmoyje8fFMlXV1d9/KxoaX4aCpzl4wQGJtJLHrRjjFUyi@vger.kernel.org
+X-Gm-Message-State: AFq9FYJVBaKe2XPYlTpwT+ysK1j9n4Up2UaMYMESlDTv8Yy3dT6FMPGK
+	+BD3rwj2sAJj7QrIuGs58ar+ITjZH73OGX5ojQ9wcg+sQWLLX1Xc9+mNjzT+LcEEaRwYlG6Pba/
+	ZFDhg9mTXxQ83X1LQsHJlp4Sbt7coJj4=
+X-Received: by 2002:a17:907:c510:b0:c40:d920:746f with SMTP id
+ a640c23a62f3a-c41a0ecce8bmr236774966b.46.1792286629421; Sat, 17 Oct 2026
+ 18:23:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAN05THQKjL8oyGH1N-K4TTT9cQErNJaz4SO91uP_QHRmRGhG6g@mail.gmail.com>
+In-Reply-To: <CAN05THQKjL8oyGH1N-K4TTT9cQErNJaz4SO91uP_QHRmRGhG6g@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sun, 18 Oct 2026 10:23:37 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-9UvkX0qeTNuhV3o3dM3P9Vcm5+GjwWFRQxXOZUmRu=A@mail.gmail.com>
+X-Gm-Features: AclHuK-toprV95m5vF3MBjykBrC1kL3BclmJsMk4CdZ1QVLAbrQXak1Dfs3tLM0
+Message-ID: <CAKYAXd-9UvkX0qeTNuhV3o3dM3P9Vcm5+GjwWFRQxXOZUmRu=A@mail.gmail.com>
+Subject: Re: ksmbd: related compound QUERY_INFO fails with STATUS_FILE_CLOSED
+ when the previous operation is not a CREATE
+To: ronnie sahlberg <ronniesahlberg@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	chenxiaosong@chenxiaosong.com, linux-cifs <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-6.6-stable review patch.  If anyone has any objections, please let me know.
+On Sat, Oct 17, 2026 at 1:42=E2=80=AFPM ronnie sahlberg
+<ronniesahlberg@gmail.com> wrote:
+>
+> Hi,
+Hi Ronnie,
 
-------------------
-
-From: Stefan Metzmacher <metze@samba.org>
-
-[ Upstream commit f57e53ea252363234f86674db475839e5b87102e ]
-
-This is inspired by the related server fixes.
-
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Long Li <longli@microsoft.com>
-Cc: linux-cifs@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Fixes: f198186aa9bb ("CIFS: SMBD: Establish SMB Direct connection")
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
-Signed-off-by: Steve French <stfrench@microsoft.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/smb/client/smbdirect.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/client/smbdirect.c b/fs/smb/client/smbdirect.c
-index 359ab64e17d99..5b99ea2f5728f 100644
---- a/fs/smb/client/smbdirect.c
-+++ b/fs/smb/client/smbdirect.c
-@@ -473,7 +473,9 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	struct smbd_response *response =
- 		container_of(wc->wr_cqe, struct smbd_response, cqe);
- 	struct smbd_connection *info = response->info;
--	int data_length = 0;
-+	u32 data_offset = 0;
-+	u32 data_length = 0;
-+	u32 remaining_data_length = 0;
- 
- 	log_rdma_recv(INFO, "response=0x%p type=%d wc status=%d wc opcode %d byte_len=%d pkey_index=%u\n",
- 		      response, response->type, wc->status, wc->opcode,
-@@ -505,7 +507,22 @@ static void recv_done(struct ib_cq *cq, struct ib_wc *wc)
- 	/* SMBD data transfer packet */
- 	case SMBD_TRANSFER_DATA:
- 		data_transfer = smbd_response_payload(response);
-+
-+		if (wc->byte_len <
-+		    offsetof(struct smbd_data_transfer, padding))
-+			goto error;
-+
-+		remaining_data_length = le32_to_cpu(data_transfer->remaining_data_length);
-+		data_offset = le32_to_cpu(data_transfer->data_offset);
- 		data_length = le32_to_cpu(data_transfer->data_length);
-+		if (wc->byte_len < data_offset ||
-+		    (u64)wc->byte_len < (u64)data_offset + data_length)
-+			goto error;
-+
-+		if (remaining_data_length > info->max_fragmented_recv_size ||
-+		    data_length > info->max_fragmented_recv_size ||
-+		    (u64)remaining_data_length + (u64)data_length > (u64)info->max_fragmented_recv_size)
-+			goto error;
- 
- 		/*
- 		 * If this is a packet with data playload place the data in
--- 
-2.53.0
-
-
-
+>
+> ksmbd rejects a related compound request that Windows and Samba accept,
+> and that MS-SMB2 says the server must accept. It showed up as a libsmb2
+> regression: our fstat sends two QUERY_INFO requests on an already open
+> handle as a related compound, and against ksmbd the second one fails.
+> (libsmb2 now works around it by sending the two as an unrelated
+> compound, so nothing is urgent on our side.)
+Okay, I will fix it.
+Thanks for the report!
