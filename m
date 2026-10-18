@@ -1,40 +1,43 @@
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06173EFD0E;
-	Sun, 18 Oct 2026 17:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612A840803B;
+	Sun, 18 Oct 2026 17:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792346008; cv=none; b=u+vg8inG9vOz11OEg4E6Ocgjj34Q36rSD3KnqDH0pzs74lSfZsTk3t7xBkN9zRofl/Q6V3iO1OhesSmEihhiVu4DcGoRbFJcmahVvno3HDFrLpfer3x2C25kLw2RZ3QRYU84ZoS3yqw0yIJg3077KkKVRaT7wwEed8zuH8iA7po=
+	t=1792346012; cv=none; b=cibebhJE2yIlBD74mkIvHMwoSiz2Qgz6oa2uRypcmXd3tzQS2aS4a9LuZuURvqz43nVBHztSwBz8oZZRSs1UNrb8v7UtSoAEbNreNAkW2MABt/1k1OlyzoxSdl+IqaZDb5RBnJshD9yxyofMQLWC/knf1MVd1IBDNfASHaqZNR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792346008; c=relaxed/simple;
-	bh=n3Nds5bgpG/JAHM0pFdSCGcUG0lWLJLVtJbkNGHKOjE=;
-	h=Message-ID:From:Subject:To:Cc:Date; b=Ht2BescHqL1aOfvf3tE00/HlC4WlgtzqLDYuYGn/Vbe2mSDC6pYj+0PL5whtYx7rJsYKsa4dIy9MW//R25AU6O3FsxCZt5pDcZAV2Zg7LKq15oNu7dldG5E01TlOUV/x866LCcqfu3BonWBHW/2jn8FBkDJwMaV8ccKz44bPhys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=jan.koester@gmx.net header.b=WpXFsghG; arc=none smtp.client-ip=212.227.15.18
+	s=arc-20240116; t=1792346012; c=relaxed/simple;
+	bh=iVSP1hK5NPP6v87jrXxqiWjS4+26ltrJN+QbKrM0q5E=;
+	h=Message-ID:In-Reply-To:References:From:Subject:To:Cc:Date; b=IU8MD3PgX7aHIkfSJ0rykUQ87rC7G44i33RtMq23AzCxOultt/+0jZKT4GZkhOKXmlRavYYSJwrwlS9QA5r4AHhY1dekNnvDYShPRccCJxBJRBeIPas9X2CI5pIA9hWqS4CVWD4ovExi2ljhinBKIIxEzlrTLGJSk5llzn0AGJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=jan.koester@gmx.net header.b=l8+DtixI; arc=none smtp.client-ip=212.227.15.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=jan.koester@gmx.net header.b="WpXFsghG"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=jan.koester@gmx.net header.b="l8+DtixI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1792345996; x=1792950796; i=jan.koester@gmx.net;
-	bh=HiageaLU7PDrKjhAgcDMq6YDvQMkrjIcbDb5XqSxjxE=;
-	h=X-UI-Sender-Class:Message-ID:From:Subject:To:Cc:Date:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	s=s31663417; t=1792345999; x=1792950799; i=jan.koester@gmx.net;
+	bh=Gn/GMpZ+LCIUOsuc0RvGxobrMeLbyZBuGTCxRFacq3g=;
+	h=X-UI-Sender-Class:Message-ID:In-Reply-To:References:From:Subject:
+	 To:Cc:Date:Content-Transfer-Encoding:cc:content-transfer-encoding:
 	 content-type:date:from:message-id:mime-version:reply-to:subject:
 	 to;
-	b=WpXFsghGQB/130TeUD5QgKzweL4XEWRBs3uRMyRYWtSZQGwzjmuzgB2vSy0xvMoh
-	 eYTMf3AuhCixH/S+FKvgk9Wd3FC/YEQ1GWGb6JIyOPGSsvZd69cYne+Y6ex8AfJyQ
-	 FxHnkrEgAstt4wwiar0DqlkQ/aVecdPT1Ir3rsEpedx1BtPjBdDG5oZvIVHFMo94s
-	 n2ULjHeqhmQ19qfwfudcMecOxu4YVWkJxoppy3BXaFYajZaTD44B8XE2wFMf1dxx+
-	 MjWNlimigC32dRBJGeMVXcqjeIqPI4GpGWzyUYO2GyDiRVtfkr6DERcHyPSKPtYX/
-	 v5VmimFkooB1Cgtwhw==
+	b=l8+DtixIOr74NPy3n3zcoAs6P/U8rLgwfLJU9dlv4ROp/x0O7OlrC0Fx9bfpy5ni
+	 fLD+eq2dSM9J0j5lQMwF68fWgRNWLE/xiczqRUiOBSl/2HyFlMFzAMIdPTlN/bDrt
+	 3ijV2kiO+2tF7Cy4u+jstfeGXGatYkM6FmjkclQI+vTK/cl8pLrM1luGo+G9TvqFW
+	 bNDLFkkl619l3lWBDpzkGhvh+AnWuCrSegFX77+MSSqyFreK9cLlTnu80+AqX1u6i
+	 i4+H+A6LTS64118Q/7fDQr0wpBJ5ygkp1A2WYMgq807jbDCycrVGdj6FtX0h6p11S
+	 LP7z8qcqzojkbux2xw==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from client.hidden.invalid by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MplXz-1woidV0fTJ-00gGq9; Sun, 18
- Oct 2026 19:53:16 +0200
-Message-ID: <cover.1792345559.git.jan.koester@gmx.net>
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MdNcA-1wjRIl1hOC-00jEr6; Sun, 18
+ Oct 2026 19:53:19 +0200
+Message-ID: <1861a1d193fc19a37cac28c3d3312046d69bf5bf.1792345559.git.jan.koester@gmx.net>
+In-Reply-To: <cover.1792345559.git.jan.koester@gmx.net>
+References: <cover.1792345559.git.jan.koester@gmx.net>
 From: Jan Koester <jan.koester@gmx.net>
-Subject: [PATCH 0/2] ksmbd: NTLM pass-through to a domain controller
+Subject: [PATCH 2/2] ksmbd: put the workgroup into the NTLMSSP target info's
+ domain names
 To: Namjae Jeon <linkinjeon@kernel.org>,
     Steve French <smfrench@gmail.com>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
@@ -43,106 +46,106 @@ Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
     linux-cifs@vger.kernel.org,
     samba-technical@lists.samba.org,
     linux-kernel@vger.kernel.org
-Date: Sun, 18 Oct 2026 19:53:14 +0200
-X-Provags-ID: V03:K1:QYXzFwv8tcrcNGZ0x+JuOS2iOvJVKue1qVIkG/CbHbsIdVnM2UP
- kpX64scEc9/vAL7BLafcy2ODKcHL1vjTLp7KcoAS+BcNWdGQTr1EP2vNAP6iO74KvtT0lks
- 7Pm0ha1kfjhd1sKLiUSpRK+KkxLCpv7I9WATLJVLV9yITd4JmPqJDqygph279M/ej98mV1j
- h9E8TgMeEgKm5BMokuBJQ==
+Date: Sun, 18 Oct 2026 19:53:16 +0200
+X-Provags-ID: V03:K1:posw8+Heo3TOWor+tw4qYw55XYiIHM8lqoZxpMmN+R6L0rja+n5
+ E/OnTkfXIdiezLa+U1fax3Vib2uG82VHKm93KcmOYZgLGKIHZPFoZU3LHP1J9ZAHrAmM4Km
+ x43AUEYrlZPDs3LKb9h1tmqoS5/Nbf05IH71bAEWIN6M3PA6DOf5aHwV+NuHjBMNRrSYSCg
+ 219aytE2pwywy0U0G2EcA==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:w89379Gbzys=;GFsWZQPfB/VZYWeaxrWNkce9uJz
- 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
+UI-OutboundReport: notjunk:1;M01:P0:dzfIR/+0tRc=;IPQgPdjiNVDiSAy/jWFz795DUZJ
+ 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
+ =
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -150,61 +153,160 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 
-Hi,
+ksmbd_build_ntlmssp_challenge_blob() writes the netbios name into all
+four AV pairs of the challenge's target info, the domain names
+(MsvAvNbDomainName, MsvAvDnsDomainName) included. The client copies
+them into its NTLMv2 response.
 
-a ksmbd server joined to an Active Directory domain can authenticate
-domain users with Kerberos, but not with NTLM: it has no password hash
-for them, so the NTLMv2 response can't be checked locally. Clients that
-fall back to NTLM (access by IP address, machines outside the domain,
-mount.cifs with user name and password) are refused.
+With NTLM pass-through, a domain controller verifies that response over
+NETLOGON, and Samba (NTLMv2_RESPONSE_verify_workstation()) refuses it
+with NT_STATUS_LOGON_FAILURE unless MsvAvNbComputerName is the secure
+channel's computer account and MsvAvNbDomainName its workgroup. Every
+pass-through login of a domain user then fails.
 
-Samba solves this by forwarding the response to a domain controller
-over NETLOGON (NetrLogonSamLogonEx on a schannel connection). These two
-patches give ksmbd the kernel half of that, and leave the NETLOGON client
-to user space, like the rest of ksmbd's user handling:
+Put the workgroup into the two domain names. Size the challenge blob
+from both names in one helper, ntlmssp_challenge_size(), and check that
+the blob fits into the response buffer when it is built in place
+without SPNEGO: the workgroup may be longer than the netbios name.
 
-1/2 adds a KSMBD_USER_FLAG_PASSTHROUGH login flag. For such a user,
-    ksmbd_decode_ntlmssp_auth_blob() doesn't compute the response from a
-    local hash. It sends the server challenge, the user, domain and
-    workstation names and the NT/LM responses to user space in a new
-    KSMBD_EVENT_NTLM_AUTHEN_REQUEST event, then takes the session base
-    key from KSMBD_EVENT_NTLM_AUTHEN_RESPONSE and goes on with the
-    existing key exchange. Both events have a strict netlink policy and
-    are checked in ipc_validate_msg().
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Jan Koester <jan.koester@gmx.net>
+=2D--
+ fs/smb/server/auth.c    | 41 ++++++++++++++++++++++++++++++++++-------
+ fs/smb/server/smb2pdu.c | 21 +++++++++++++++++++--
+ 2 files changed, 53 insertions(+), 9 deletions(-)
 
-2/2 puts the workgroup, not the netbios name, into MsvAvNbDomainName and
-    MsvAvDnsDomainName of the challenge's target info. A domain
-    controller checks these when it verifies the NTLMv2 response (Samba
-    in NTLMv2_RESPONSE_verify_workstation()), so without this patch
-    every pass-through login fails with NT_STATUS_LOGON_FAILURE. The
-    patch also checks that the challenge blob fits the response buffer,
-    since the workgroup can be longer than the netbios name.
-
-Logins of users without the new flag are checked as before. The only
-change they see is the domain names in the challenge's target info
-(patch 2/2). ksmbd-tools doesn't set the flag yet. The user space side
-we tested with is sharedd/adconnect from FenrirOS: it marks domain users
-without a local hash as pass-through, and it answers the event through
-a NETLOGON schannel client, tested against a Samba 4.22 AD DC.
-
-I can send the matching ksmbd-tools change if the interface looks
-acceptable.
-
-The series is based on v7.3-rc7.
-
-Jan Koester (2):
-  ksmbd: pass through NTLM authentication to a domain controller
-  ksmbd: put the workgroup into the NTLMSSP target info's domain names
-
- fs/smb/server/auth.c          | 109 +++++++++++++++++++++++++++++++---
- fs/smb/server/ksmbd_netlink.h |  41 +++++++++++++
- fs/smb/server/smb2pdu.c       |  21 ++++++-
- fs/smb/server/transport_ipc.c |  73 ++++++++++++++++++++++-
- fs/smb/server/transport_ipc.h |   3 +
- 5 files changed, 236 insertions(+), 11 deletions(-)
-
-
-base-commit: 32c52ec87d6245ee2d12ed5dd509e40062939b50
+diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
+index 9a2a3c6a37..8639997080 100644
+=2D-- a/fs/smb/server/auth.c
++++ b/fs/smb/server/auth.c
+@@ -376,10 +376,10 @@ ksmbd_build_ntlmssp_challenge_blob(struct challenge_=
+message *chgblob,
+ 				   struct ksmbd_conn *conn)
+ {
+ 	struct target_info *tinfo;
+-	wchar_t *name;
++	wchar_t *name, *domain;
+ 	__u8 *target_name;
+ 	unsigned int flags, blob_off, blob_len, type, target_info_len =3D 0;
+-	int len, uni_len, conv_len;
++	int len, uni_len, dom_len, conv_len;
+ 	int cflags =3D conn->ntlmssp.client_flags;
+=20
+ 	memcpy(chgblob->Signature, NTLMSSP_SIGNATURE, 8);
+@@ -426,6 +426,23 @@ ksmbd_build_ntlmssp_challenge_blob(struct challenge_m=
+essage *chgblob,
+=20
+ 	uni_len =3D UNICODE_LEN(conv_len);
+=20
++	len =3D strlen(ksmbd_work_group());
++	domain =3D kmalloc(2 + UNICODE_LEN(len), KSMBD_DEFAULT_GFP);
++	if (!domain) {
++		kfree(name);
++		return -ENOMEM;
++	}
++
++	conv_len =3D smb_strtoUTF16((__le16 *)domain, ksmbd_work_group(), len,
++				  conn->local_nls);
++	if (conv_len < 0 || conv_len > len) {
++		kfree(domain);
++		kfree(name);
++		return -EINVAL;
++	}
++
++	dom_len =3D UNICODE_LEN(conv_len);
++
+ 	blob_off =3D sizeof(struct challenge_message);
+ 	blob_len =3D blob_off + uni_len;
+=20
+@@ -446,14 +463,23 @@ ksmbd_build_ntlmssp_challenge_blob(struct challenge_=
+message *chgblob,
+ 	tinfo =3D (struct target_info *)(target_name + uni_len);
+=20
+ 	chgblob->TargetInfoArray.Length =3D 0;
+-	/* Add target info list for NetBIOS/DNS settings */
++	/*
++	 * Add target info list for NetBIOS/DNS settings: the computer names
++	 * are the netbios name, the domain names the workgroup. A domain
++	 * controller checks the latter when it is asked to verify the
++	 * NTLMv2 response of a domain user (NETLOGON pass-through).
++	 */
+ 	for (type =3D NTLMSSP_AV_NB_COMPUTER_NAME;
+ 	     type <=3D NTLMSSP_AV_DNS_DOMAIN_NAME; type++) {
++		bool is_domain =3D type =3D=3D NTLMSSP_AV_NB_DOMAIN_NAME ||
++				 type =3D=3D NTLMSSP_AV_DNS_DOMAIN_NAME;
++		int av_len =3D is_domain ? dom_len : uni_len;
++
+ 		tinfo->Type =3D cpu_to_le16(type);
+-		tinfo->Length =3D cpu_to_le16(uni_len);
+-		memcpy(tinfo->Content, name, uni_len);
+-		tinfo =3D (struct target_info *)((char *)tinfo + 4 + uni_len);
+-		target_info_len +=3D 4 + uni_len;
++		tinfo->Length =3D cpu_to_le16(av_len);
++		memcpy(tinfo->Content, is_domain ? domain : name, av_len);
++		tinfo =3D (struct target_info *)((char *)tinfo + 4 + av_len);
++		target_info_len +=3D 4 + av_len;
+ 	}
+=20
+ 	/* Add terminator subblock */
+@@ -464,6 +490,7 @@ ksmbd_build_ntlmssp_challenge_blob(struct challenge_me=
+ssage *chgblob,
+ 	chgblob->TargetInfoArray.Length =3D cpu_to_le16(target_info_len);
+ 	chgblob->TargetInfoArray.MaximumLength =3D cpu_to_le16(target_info_len);
+ 	blob_len +=3D target_info_len;
++	kfree(domain);
+ 	kfree(name);
+ 	ksmbd_debug(AUTH, "NTLMSSP SecurityBufferLength %d\n", blob_len);
+ 	return blob_len;
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 6b8809f67b..704c694fe7 100644
+=2D-- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -1822,6 +1822,20 @@ static __le32 deassemble_neg_contexts(struct ksmbd_=
+conn *conn,
+ 	return status;
+ }
+=20
++/*
++ * ntlmssp_challenge_size() - room for the challenge blob: the netbios na=
+me as
++ * target name and the two computer names, the workgroup as the two domai=
+n
++ * names (UTF-16, each with its 4-byte AV pair header), the terminator
++ */
++static size_t ntlmssp_challenge_size(void)
++{
++	size_t nb =3D strlen(ksmbd_netbios_name()) * 2;
++	size_t wg =3D strlen(ksmbd_work_group()) * 2;
++
++	return sizeof(struct challenge_message) + nb + 2 * (4 + nb) +
++	       2 * (4 + wg) + 4;
++}
++
+ /**
+  * smb2_handle_negotiate() - handler for smb2 negotiate command
+  * @work:	smb work containing smb request buffer
+@@ -2096,6 +2110,10 @@ static int ntlm_negotiate(struct ksmbd_work *work,
+ 	memset(chgblob, 0, sizeof(struct challenge_message));
+=20
+ 	if (!work->conn->use_spnego) {
++		if ((char *)rsp->Buffer + ntlmssp_challenge_size() >
++		    (char *)work->response_buf + work->response_sz)
++			return -EINVAL;
++
+ 		sz =3D ksmbd_build_ntlmssp_challenge_blob(chgblob, work->conn);
+ 		if (sz < 0)
+ 			return -ENOMEM;
+@@ -2104,8 +2122,7 @@ static int ntlm_negotiate(struct ksmbd_work *work,
+ 		return 0;
+ 	}
+=20
+-	sz =3D sizeof(struct challenge_message);
+-	sz +=3D (strlen(ksmbd_netbios_name()) * 2 + 1 + 4) * 6;
++	sz =3D ntlmssp_challenge_size();
+=20
+ 	neg_blob =3D kzalloc(sz, KSMBD_DEFAULT_GFP);
+ 	if (!neg_blob)
 =2D-=20
 2.56.0
 
