@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0743502761;
-	Mon, 19 Oct 2026 13:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B00B55265A1;
+	Mon, 19 Oct 2026 13:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418100; cv=none; b=L8SQJ41mZo/67AvwStTAeZ1yEK2Fte3JWn8cqM7zlNPHQljzFOYIAX/U6fRnFnQG6ELfwbgE5eHA0TQ/z9CQmnV4IEGbWSZOrSiZeoLb25kXJ1lFJHvdxA3a0op4zJrYYKNLWFj9Kd9GQSG3o+VuCNTRglxIwpfSLZ/wWFaEPhA=
+	t=1792418156; cv=none; b=rXjqlI8NCiedwMO1Vdd3uCj8iaInq4PGgTrJ1ZuTf3p/Vo9M+mlXHb9tI65GGwX62ZjwcojfQ8v5GOugQYRnuS0dTHcUnbjyTTLhc7G2UXK9EEWCrZvpMUjhKTe5dyxAkfGnMmbhsyKFGwKA5i+J+B/d7624cinPsOJF7ReerIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418100; c=relaxed/simple;
-	bh=U1hSlX6is/+DZkSOHfZzx7CPO93HGULopVL/4fORQPQ=;
+	s=arc-20240116; t=1792418156; c=relaxed/simple;
+	bh=NUzz42/l/JNvh+aKl8Zudn1jS2p3hLZsgKoC7V6+ag4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b/AsTtESpFIwH9qMuxpUSL2x7B7dhVmz5Uz4XJr0GlQrpiUuY/3o1HayzqMh9q/bbr7Jjr/1c1mthXI6XbFxGLf9Nf6cgxdCUZIQvBU+1mSDayDJQ9Z9+h3PYL5h+jqhtcqb3ZpF6fc7uB/dzy9OAyqitQfZIQnj3I5R3Ho5RHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZ/dEdz3; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=BmkLLesb6qlbV5FrhYyDAyrMy4wEtrmCmoQTdeHVXb90S4YbP0lenPZsnp92ACaBecHAqG3vHuofAt2NEqecvQo0bjVFj+bXhUSpViy5o6452thVuVYweOc3WthZXFHQRnHa6JpYY5HrLyNDJFRcyldL0ePVpXIBnfYOZMsc4xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DjDKKG2b; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZ/dEdz3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00F1C1F000C4;
-	Mon, 19 Oct 2026 13:54:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DjDKKG2b"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D328B1F000C7;
+	Mon, 19 Oct 2026 13:55:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418096;
-	bh=zKuoh1nnUGwxg6ybdmMK7TTsXQpl1pI2r6jynQVGfEs=;
+	s=k20260515; t=1792418153;
+	bh=QGfTKxqXLTODBipg9RV5zTAAjhUlDhSEXdbND3UDPm4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cZ/dEdz3mRGACoL52g5D+5XLyEum6XEfFc/HJ9GDFsHHK7W9f5YnOpgBMcRqvjwkM
-	 wyXa9oBWiEhylBUXRQhoCrQl4yalPmbQNVAKNTQAhbvazQmXcdoHvxOjqBEjk0jK3l
-	 +hUsjtFRIQpirCrd8v2MAzdT61sZ30DgX1LDiy+1MKFjos6OLlwEolJwXGKBOCjuDa
-	 Wb8zwxSoOt9vijcO4FimbhDXNoUgvIE3m/FEmQk4uYB23R5ZlxzfmMU6u0hOvBJJdq
-	 VrKb36XwFvv7FQsHjCf7rp8zGBXSZF5OAynPU6OsouwKxXDkmWAlr/JJ/SBNJMKGik
-	 sZ8nLjvIkjq8A==
+	b=DjDKKG2bqHBAzwV4H6yJDDYl7LQpHMVrT8wsOogxENTvlSWBfYNQqvMwWZboDd1/4
+	 MsE3ifFDZg+xzeOXN8gp9egl6/PaIZ0an03OW+ggcnz+O3NQVcGart5eZ8MN/ik2on
+	 QEhwcW3eJpp7jHjUac1OfkR6u9fFL758KLvwqqcGrvrynRENnLgqZUmZaa5eU5kCwQ
+	 9umcd6Nvph/FKQ8mw6RZN568OOonc9ZliMsYthagrWI+sreYhUdWI4yh+LEmSng1Mq
+	 yqa7/yqRBHzLh3PIoX0RTGzI4M/EOdSzsGhtAZ+vz/1N7nlSKhKGVdLAecRnF1d14O
+	 /6EClBSAG6mCQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -34,9 +34,9 @@ Cc: Gael Blivet <gael.blivet@gmail.com>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: skip fallocate for SMB2_CREATE_ALLOCATION_SIZE on a stream handle
-Date: Mon, 19 Oct 2026 09:45:01 -0400
-Message-ID: <20261019135441.1420968-10-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.12] ksmbd: fix off-by-one rejecting minimal COPYCHUNK query-limits request
+Date: Mon, 19 Oct 2026 09:45:41 -0400
+Message-ID: <20261019135441.1420968-50-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -54,17 +54,19 @@ Content-Transfer-Encoding: 8bit
 
 From: Gael Blivet <gael.blivet@gmail.com>
 
-[ Upstream commit bfdf81c62f4f52a3626ea62db0744def6778e83f ]
+[ Upstream commit d68d4b3293034f549d55f407a23b4c0a6c90e50a ]
 
-smb2_open() calls vfs_fallocate(fp->filp, ...) unconditionally when a
-client's CREATE request includes an AllocationSize create context.
-For a stream handle, fp->filp refers to the base file's data fork
-(streams are xattr-backed on the same underlying file, not separate
-files), so this pre-allocates storage on the base file's actual data
-instead of doing anything meaningful for the stream -- fallocate has
-no applicability to an xattr-backed stream at all.
+The FSCTL_COPYCHUNK/FSCTL_COPYCHUNK_WRITE input length check uses
+in_buf_len <= sizeof(struct copychunk_ioctl_req), which rejects a
+buffer that is exactly sizeof(struct copychunk_ioctl_req) bytes -- the
+minimal, valid request containing only the fixed header with
+ChunkCount=0 and no chunk entries, used by clients to query the
+server's copy limits before issuing a real copychunk.
 
-Skip the fallocate call for stream handles.
+Since copychunk_ioctl_req ends in a flexible array member, the correct
+minimum is that the buffer covers the fixed header, so use
+offsetof(..., Chunks) with '<' instead of '<=' against sizeof(): same
+value, but the boundary case is now correctly accepted.
 
 Assisted-by: Claude:claude-sonnet-5
 Signed-off-by: Gael Blivet <gael.blivet@gmail.com>
@@ -74,386 +76,410 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-The local tree is **6.12.111**. The buggy `vfs_fallocate()` on stream
-CREATEs is present here, and the skip is a small, self-contained
-correctness fix that applies to this checkout.
+I have enough to judge this as a one-line protocol check against the
+6.12 tree: the buggy `<= sizeof` test is present, the handler already
+implements ChunkCount=0, and the patch applies cleanly.
 
-## Phase 1: Commit message forensics
+===============================================================
+PHASE 1: COMMIT MESSAGE FORENSICS
+===============================================================
 
-**Step 1.1: Subject line**
-- Record: **[ksmbd] [skip] skip fallocate for
-  SMB2_CREATE_ALLOCATION_SIZE on a stream handle**
-- Subsystem: ksmbd (in-kernel SMB3 server). Verb “skip” here means “do
-  not run a VFS operation that does not apply.”
+**Step 1.1: PARSE THE SUBJECT LINE**
+Record: **[ksmbd]** **[fix]** off-by-one that rejects a minimal
+COPYCHUNK query-limits request (ChunkCount=0, header-only).
 
-**Step 1.2: Tags**
-- Record:
-  - `Assisted-by: Claude:claude-sonnet-5`
-  - `Signed-off-by: Gael Blivet <gael.blivet@gmail.com>`
-  - `Acked-by: Namjae Jeon <linkinjeon@kernel.org>` (on `e360be3d03f77`;
-    the candidate copy uses `Signed-off-by: Namjae Jeon`)
-  - `Signed-off-by: Steve French` (on the smb.git copy)
-  - No `Fixes:`, `Reported-by:`, `Tested-by:`, `Cc: stable`, or `Link:`
-  - Absence of `Fixes:`/`Cc: stable` is expected for this review
-    pipeline
+**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+Record:
+- **Signed-off-by:** Gael Blivet `<gael.blivet@gmail.com>` (author)
+- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>` (ksmbd
+  maintainer)
+- **Assisted-by:** Claude:claude-sonnet-5
+- **No Fixes:** tag (expected for this review pipeline)
+- **No Cc: stable** (expected)
+- **No Reported-by / Tested-by / Reviewed-by / Acked-by / Link:** in the
+  committed message
+- Ignore any pipeline “Upstream commit” / Sasha Levin SOB (none in the
+  provided message)
 
-**Step 1.3: Body**
-- Record:
-  - **Bug:** `smb2_open()` always calls `vfs_fallocate(fp->filp,
-    FALLOC_FL_KEEP_SIZE, …)` when CREATE has an AllocationSize context.
-  - **Root cause:** For a named-stream handle, `fp->filp` is the **base
-    file**. Streams are xattr-backed, not separate files.
-  - **Symptom:** Preallocation (and a level-II oplock break) hits the
-    base file’s data fork instead of the stream.
-  - **Failure mode:** Wrong-file disk preallocation; unexpected oplock
-    break on the base file.
-  - No stack trace, no version list, no user report.
+Notable: maintainer SOB is a quality signal. No syzbot/KASAN tags.
 
-**Step 1.4: Hidden bug fix?**
-- Record: **Yes, this is an explicit bug fix**, not cleanup. Cover
-  letter for series 8/8: opening a stream with AllocationSize
-  “fallocates storage on the underlying base file’s actual data.”
+**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
+Record:
+- **Bug:** `in_buf_len <= sizeof(struct copychunk_ioctl_req)` rejects a
+  buffer that is **exactly** the fixed header size.
+- **Symptom:** clients sending FSCTL_COPYCHUNK / FSCTL_COPYCHUNK_WRITE
+  with ChunkCount=0 and no chunk entries (the standard “query server
+  copy limits” request) get `-EINVAL` / `STATUS_INVALID_PARAMETER`.
+- **Root cause:** the struct ends in a flexible array; the minimum valid
+  length is the fixed header. `sizeof` and `offsetof(..., Chunks)` are
+  the same numeric value (32); the real change is `<=` → `<` so equality
+  is accepted.
+- **Version info:** none in the message. The FAM conversion that made
+  `sizeof` equal the header size is in this tree.
 
-## Phase 2: Diff analysis
+**Step 1.4: DETECT HIDDEN BUG FIXES**
+Record: **Not hidden.** Subject/body explicitly describe a protocol off-
+by-one. Not cleanup/refactor.
 
-**Step 2.1: Inventory**
-- Record:
-  - File: `fs/smb/server/smb2pdu.c` only
-  - Scope: **+16 / −7** (net +9), one function: `smb2_open()`
-  - Classification: **single-file surgical fix**
+===============================================================
+PHASE 2: DIFF ANALYSIS - LINE BY LINE
+===============================================================
 
-**Step 2.2: Code-flow change**
-- Record:
-  - **Before:** If CREATE has `SMB2_CREATE_ALLOCATION_SIZE`, always
-    `smb_break_all_levII_oplock(work, fp, 1)` then
-    `vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0, alloc_size)`.
-    Failures are only debug-logged.
-  - **After:** Same path, but only when `!ksmbd_stream_fd(fp)`. Stream
-    handles skip both the oplock break and fallocate.
-  - Affected path: SMB2 CREATE with AllocationSize on a stream, after
-    the file is already opened.
+**Step 2.1: INVENTORY THE CHANGES**
+Record:
+- **File:** `fs/smb/server/smb2pdu.c` — 1 line changed (`<= sizeof(...)`
+  → `< offsetof(..., Chunks)`).
+- **Function:** `smb2_ioctl()` (`FSCTL_SRV_COPYCHUNK` /
+  `FSCTL_SRV_COPYCHUNK_WRITE` cases).
+- **Scope:** single-file surgical fix, ~1 line.
 
-**Step 2.3: Bug mechanism**
-- Record:
-  - **Category:** logic / correctness (wrong object for a VFS call),
-    with resource side effects
-  - **Mechanism:** Stream fds share the base `struct file`.
-    `ksmbd_stream_fd()` is `fp->stream.name != NULL`. Stream I/O already
-    goes through xattrs (`ksmbd_vfs_stream_read`/`_write`); fallocate
-    has no stream equivalent.
-  - `FALLOC_FL_KEEP_SIZE` does not change `i_size`, but it **does**
-    allocate blocks on the base inode and can fill the filesystem.
-    `vfs_fallocate()` also takes `file_start_write()` and may run for a
-    long time on a large client-supplied size (bounded by `s_maxbytes`).
+**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+Record:
+- **Before:** reject when `in_buf_len <= 32` → a valid 32-byte header-
+  only request is rejected; `goto out` with `ret = -EINVAL` **before**
+  `nbytes` is set, so the client gets an error response **without** the
+  copychunk limits body.
+- **After:** reject only when `in_buf_len < 32` → 32-byte request
+  proceeds into `fsctl_copychunk()`.
+- **Path:** ioctl input-length check (not a crash path). Downstream
+  `fsctl_copychunk()` already does `if (chunk_count == 0) goto out;`
+  after filling max chunk count/size/total in the response.
 
-**Step 2.4: Fix quality**
-- Record:
-  - Obviously correct: skip a VFS op that cannot apply to an xattr
-    stream.
-  - Matches existing stream guards (read/write/copy-chunk).
-  - Regression risk is **very low**: regular-file CREATE is unchanged;
-    stream CREATE only stops a harmful no-op-for-the-stream.
-  - Incomplete vs SET_INFO: `set_file_allocation_info()` in this tree
-    still fallocates `fp->filp` with no stream check. That does not make
-    this CREATE skip wrong.
-
-## Phase 3: Git history
-
-**Step 3.1: Blame**
-- Record:
-  - Unconditional fallocate in `smb2_open()` comes from `e8c061917133dd`
-    (“ksmbd: opencode to avoid trivial wrappers”, 2021-06-22), replacing
-    `ksmbd_vfs_alloc_size()`.
-  - That commit **is an ancestor of this HEAD**.
-  - `ksmbd_stream_fd()` is from `f44158485826c0` (2021-03-16) and is
-    also an ancestor.
-  - Bug has been in ksmbd for the lifetime of this 6.12 line.
-
-**Step 3.2: Fixes: tag**
-- Record: **N/A** (no `Fixes:`). Introducer is the original CREATE
-  AllocationSize handling, present since cifsd/`e8c0619`.
-
-**Step 3.3: Related file history**
-- Record:
-  - `a9f106c765c12` — “fix wrong allocation size update in smb2_open()”
-    (response timing, not this bug).
-  - `2a4179c99bc6b` — overflow in `set_file_allocation_info()` (already
-    in this tree).
-  - `3b41d8b05dc89` — “return requested create allocation size” is
-    **not** in this tree (`merge-base --is-ancestor` failed). Candidate
-    parent uses outer-scope `alloc_size`; 6.12 still has a local `loff_t
-    alloc_size`. Functional hunk still matches.
-
-**Step 3.4: Author**
-- Record: Gael Blivet, stream/AAPL/Time Machine work; maintainer Namjae
-  Jeon acked and applied this patch. Not a drive-by.
-
-**Step 3.5: Dependencies**
-- Record:
-  - Cover: **“None of this depends on or touches the AAPL/Time Machine
-    feature series.”**
-  - Needs only `ksmbd_stream_fd()`, which exists here.
-  - Series is **[PATCH 8/8]**; this hunk does not need patches 1–7.
-  - `git apply --check` of `e360be3d03f77` on this tree: **Hunk #1
-    succeeded at 3593 (offset -504 lines).**
-
-## Phase 4: Mailing list / external
-
-**Step 4.1: Original discussion**
-- Record:
-  - `b4 dig -c e360be3d03f77` →
-    https://patch.msgid.link/20260709000548.66445-9-g.blivet@me.com
-  - Series: **[PATCH 0/8] ksmbd: follow-up fixes to previously-merged
-    patches** (2026-07-09)
-  - Only **v1** found (`b4 dig -a`).
-  - Namjae Jeon: **“Applied them except 0002, 0005 patch”** — this is
-    patch 8, so it was applied. No NAK on patch 8. No `Cc: stable` in
-    review.
-
-**Step 4.2: Recipients (`b4 dig -w`)**
-- Record: Gaël Blivet-Bailly, Namjae Jeon, `linux-cifs@vger.kernel.org`.
-  Maintainer was on To/Cc and acked.
-
-**Step 4.3: Bug report**
-- Record: No syzbot/bugzilla. Found by **Sashiko (LLM review)** of
-  stream-handling code. Related real-world class: namjaejeon/ksmbd#507
-  (SetInfo/EOF on a stream truncated the **base** file because
-  `fp->filp` is the base file). Same object-confusion pattern.
-
-**Step 4.4: Series context**
-- Record: Eight independent follow-ups. Patch 8 is standalone. Also
-  listed in the 7.3-rc1 ksmbd pull under alternate-data-stream handling
-  (`e360be3d03f77`).
-
-**Step 4.5: Stable list**
-- Record: lore.kernel.org/stable returned **403**. **UNVERIFIED**
-  whether stable@ already discussed this; that does not change the
-  technical verdict.
-
-## Phase 5: Semantic / call-graph
-
-**Step 5.1: Functions**
-- Record: `smb2_open()` only. Helper used: `ksmbd_stream_fd()`.
-
-**Step 5.2: Callers**
-- Record: `fs/smb/server/smb2ops.c` maps `SMB2_CREATE_HE` → `smb2_open`.
-  Reachable from any authenticated SMB2 CREATE.
-
-**Step 5.3: Callees**
-- Record: `smb2_find_context_vals()`, `smb_break_all_levII_oplock()`,
-  `vfs_fallocate()`. Stream CREATE still sets `fp->stream.name` via
-  `smb2_set_stream_name_xattr()` **before** this block (around line
-  3485).
-
-**Step 5.4: Reachability**
-- Record: **Yes, from the network.** Requires:
-  1. `CONFIG_SMB_SERVER`
-  2. Share with `KSMBD_SHARE_FLAG_STREAMS`
-  3. CREATE of `name:stream` plus AllocationSize create context (`AlSi`)
-- Windows ADS and macOS resource-fork/Finder streams are the usual
-  clients. Unprivileged local syscall is not the path; an authenticated
-  SMB client is.
-
-**Step 5.5: Similar patterns**
-- Record: `ksmbd_vfs_read`/`write` already branch on
-  `ksmbd_stream_fd()`. `ksmbd_vfs_copy_file_ranges()` returns `-EBADF`
-  for streams. This CREATE fallocate path was the missing guard.
-  `set_file_allocation_info()` still unguarded in **this** tree.
-
-## Phase 6: This tree (6.12.111)
-
-**Step 6.1: Buggy code present?**
-- Record: **Yes.** `fs/smb/server/smb2pdu.c` ~3596–3602:
-
-```3592:3602:fs/smb/server/smb2pdu.c
-                        alloc_size =
-le64_to_cpu(az_req->AllocationSize);
-                        ksmbd_debug(SMB,
-                                    "request smb2 create allocate size :
-%llu\n",
-                                    alloc_size);
-                        smb_break_all_levII_oplock(work, fp, 1);
-                        err = vfs_fallocate(fp->filp,
-FALLOC_FL_KEEP_SIZE, 0,
-                                            alloc_size);
-                        if (err < 0)
-                                ksmbd_debug(SMB,
-                                            "vfs_fallocate is failed :
-%d\n",
-                                            err);
-```
-
-- `ksmbd_stream_fd()` is in `fs/smb/server/vfs_cache.h`.
-- Candidate SHAs `e360be3d03f77` / `bfdf81c62f4f` are **not** ancestors
-  of HEAD.
-
-**Step 6.2: Backport difficulty**
-- Record: **Clean apply with offset** (`git apply --check` succeeded at
-  line 3593). Local `loff_t alloc_size` vs later outer-scope
-  `alloc_size` does not conflict with the wrapped lines.
-
-**Step 6.3: Related fixes already here?**
-- Record: No skip of CREATE fallocate for streams. Overflow check in
-  SET_INFO allocation is a different bug.
-
-## Phase 7: Subsystem context
-
-**Step 7.1**
-- Record: **ksmbd (`fs/smb/server`)**, **IMPORTANT** (in-kernel SMB3
-  server for NAS/shares). Not mm/core, but network-facing and used in
-  production.
-
-**Step 7.2**
-- Record: Actively backported on this branch (many ksmbd fixes in recent
-  `git log -- fs/smb/server`).
-
-## Phase 8: Impact and risk
-
-**Step 8.1: Who is affected**
-- Record: ksmbd users with **streams enabled**, when a client CREATEs a
-  named stream with AllocationSize. Typical Windows/macOS
+**Step 2.3: IDENTIFY THE BUG MECHANISM**
+Record:
+- **Category:** logic / correctness (off-by-one bounds check), protocol
   interoperability.
+- **Mechanism:** `<=` vs `<` on a FAM struct whose `sizeof` is the
+  header size. Valid minimum request was treated as too small.
+- **Not:** UAF, leak, race, overflow, deadlock.
 
-**Step 8.2: Trigger**
-- Record: Authenticated SMB CREATE of `file:stream` + AllocationSize.
-  Not every open; common enough for ADS-aware clients. Same client could
-  already write the file; unique harm is **wrong object** (base file)
-  and a large fallocate without intending to preallocate the data fork.
+Verified safety after the change: if a 32-byte buffer lies with
+ChunkCount ≠ 0, `fsctl_copychunk()` still rejects via `input_count <
+struct_size(ci_req, Chunks, chunk_count)` before touching `Chunks[]`.
 
-**Step 8.3: Failure mode**
-- Record:
-  - Preallocates blocks on the **base file** (`FALLOC_FL_KEEP_SIZE` → no
-    size change, but real space use).
-  - Breaks level-II oplocks on the base file (other clients can lose
-    caching).
-  - Large `AllocationSize` can run a long `fallocate` under
-    `file_start_write()` (filesystem write exclusion).
-  - **Severity: HIGH** for disk/oplock side effects on a NAS; not a
-    panic/UAF. Not content corruption of existing data.
+**Step 2.4: ASSESS THE FIX QUALITY**
+Record:
+- **Obviously correct.** `offsetof` on a FAM is the idiomatic minimum;
+  verified `sizeof == offsetof == 32` with a packed layout compile.
+- **Minimal.** No unrelated changes, no API/struct changes.
+- **Regression risk: very low.** Only newly accepted case is `in_buf_len
+  == 32`, which is the documented header-only request. Inner
+  ChunkCount=0 path already exists in this tree.
 
-**Step 8.4: Risk–benefit**
-- Record:
-  - **Benefit:** Stops wrong-file preallocation and spurious oplock
-    breaks; one `if` around existing code.
-  - **Risk:** Very low. Stream CREATE AllocationSize currently does the
-    wrong thing; skipping is the correct xattr-stream behavior.
-  - **Ratio:** Favorable.
+===============================================================
+PHASE 3: GIT HISTORY INVESTIGATION
+===============================================================
 
-## Phase 9: Synthesis
+**Step 3.1: BLAME THE CHANGED LINES**
+Record:
+- Current check is from **8bb04fb2b7e34** (“ksmbd: Replace one-element
+  arrays with flexible-array members”, Thorsten Blum, 2024-08-20; in
+  v6.12).
+- That commit changed `< sizeof` to `<= sizeof` when converting `__u8
+  Chunks[1]` (sizeof **33**) to a FAM (sizeof **32**), preserving “need
+  33+ bytes” and thus still rejecting the 32-byte query.
+- Original ioctl length check: **f7db8fd03a4bc5** (“ksmbd: add
+  validation in smb2_ioctl”, 2021-10-08), `in_buf_len < sizeof` with the
+  1-byte dummy array — also rejected 32-byte requests.
+- **Bug has been present since ioctl validation was added (5.16-era
+  ksmbd), still present in this 6.12 tree.**
 
-**Step 9.1: Evidence**
+**Step 3.2: FOLLOW THE FIXES: TAG**
+Record: **No Fixes: tag.** Buggy behavior traces to f7db8fd / 8bb04fb as
+above. Both are ancestors of HEAD.
 
-**For:**
-- Real wrong-file VFS operation, present since 2021, present in 6.12.111
-- User-visible: disk on the base file, oplock disruption
-- Small, obviously correct, applies with offset
-- `ksmbd_stream_fd()` already here; no AAPL/Time Machine dependency
-- Maintainer applied it (patch 8 of 8)
-- Same stream/`fp->filp` confusion class as documented user bugs
+**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
+Record:
+- **0801c1374ab15** — `__counted_by_le` on `copychunk_ioctl_req` (in
+  this tree); inner `struct_size` check is already correct.
+- **8a84ffa455462** — moved copychunk structs to
+  `fs/smb/common/smb2pdu.h` (in this tree).
+- No other local commit already applies this `<=` → `< offsetof` change
+  (`git log --grep` on the path found nothing).
+- **Standalone.** Cover letter: “These 7 fixes are independent of each
+  other.”
 
-**Against:**
-- No crash/UAF/CVE; found by automated review, not a reporter
-- SET_INFO allocation path still unfixed here
-- Needs streams share flag
-- lore stable search unverified (HTTP 403)
+**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
+Record:
+- Author Gael Blivet has **no** prior commits in this tree’s `fs/smb/`.
+- Series: macOS/Time Machine work; this patch is explicitly **not**
+  Apple-specific.
+- **Namjae Jeon** (maintainer) applied the series (except patch 7,
+  replaced by other ADS copychunk commits).
 
-**Step 9.2: Stable rules**
-1. Obviously correct and tested? **PASS** — skip is correct; maintainer
-   applied it.
-2. Real bug affecting users? **PASS** — wrong-file fallocate on stream
-   CREATE.
-3. Important (crash/security/corruption/deadlock/etc.)? **PASS** —
-   unexpected allocation and oplock break on the base file of a network
-   file server; can consume substantial disk.
-4. Small and contained? **PASS** — ~9 lines, one function.
-5. No new features/APIs? **PASS**
-6. Applies to this tree? **PASS** — `git apply --check` succeeded.
+**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
+Record:
+- Needs FAM `Chunks[]` so `offsetof(..., Chunks)` is valid — **present**
+  (8bb04fb).
+- Does **not** need later AAPL full-file-copy (`529d203daa00b`, not in
+  this tree). In 6.12, ChunkCount=0 already means “return limits and
+  succeed.”
+- **Can apply standalone.** `git apply --check` succeeded at offset −857
+  lines.
 
-**Step 9.3: Exceptions**
-- Record: Not a device-ID/quirk/DT/build/doc exception. Qualifies as a
-  normal small bugfix.
+===============================================================
+PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+===============================================================
 
-**Step 9.4: Decision**
-Backport to **this** 6.12.111 tree. The bug is here, the helper is here,
-the patch applies, and the change only disables a harmful path.
+**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+Record:
+- **b4 dig -c fdf17b206bdc8:** match at
+  https://patch.msgid.link/20260707100033.47512-2-g.blivet@me.com
+- **b4 dig -a:** only **v1**; committed version is that v1 (plus later
+  Assisted-by in the git message).
+- Cover: `[PATCH 0/7] ksmbd: assorted fixes found while adding
+  macOS/Time Machine support` (2026-07-07).
+- Author: independent of Apple-specific behavior; this one “affects any
+  client probing server copy limits with a minimal FSCTL_SRV_COPYCHUNK
+  request (ChunkCount=0).” Found and verified in live Time
+  Machine/Finder testing.
+- **Namjae Jeon (2026-07-08):** “Applied them to #ksmbd-for-next-next
+  except 0007 patch.” **No NAK.** No reviewer asked for Cc: stable.
 
----
+**Step 4.2: CHECK WHO REVIEWED THE PATCH**
+Record (**b4 dig -w**): To/Cc were Gaël Blivet-Bailly, **Namjae Jeon**,
+**linux-cifs@vger.kernel.org**. Maintainer was the recipient and applied
+it. No other Named Reviewed-by.
 
-### What this solves for 6.12 users
-On ksmbd shares with named streams, an SMB2 CREATE of an alternate data
-stream that includes AllocationSize currently calls `vfs_fallocate()` on
-the **base file**. That can allocate disk and break oplocks on the wrong
-object. Streams are xattr-backed; fallocate cannot apply to them.
-Skipping it is the correct, minimal fix.
+**Step 4.3: SEARCH FOR THE BUG REPORT**
+Record: no bugzilla/syzbot. Evidence is live macOS Finder/Time Machine
+testing described in the cover letter. Linux CIFS client
+(`__smb2_copychunk_range`) does **not** send ChunkCount=0; it sends real
+chunks and learns limits from `STATUS_INVALID_PARAMETER` + response
+body. This bug hits clients that probe with a header-only request (macOS
+Finder, and any similar SMB2 client).
 
-### Verification
-- **[Phase 1]** Parsed tags on `e360be3d03f77` / `bfdf81c62f4f` (same
-  patch-id `8e46981f5116…`); no Fixes/Reported-by/Cc:stable
-- **[Phase 2]** Diff: wrap fallocate + oplock break in `if
-  (!ksmbd_stream_fd(fp))` in `smb2_open()`
-- **[Phase 3]** `git blame`: fallocate from `e8c061917133dd` (ancestor);
-  `ksmbd_stream_fd` from `f44158485826c0` (ancestor)
-- **[Phase 3]** `git merge-base --is-ancestor e360be3d03f77 HEAD` → not
-  in this tree
-- **[Phase 3]** `git merge-base --is-ancestor 3b41d8b05dc89 HEAD` →
-  later alloc_size-field commit not here
-- **[Phase 4]** `b4 dig -c e360be3d03f77` → lore msgid
-  `20260709000548.66445-9-g.blivet@me.com`; series 8/8
-- **[Phase 4]** `b4 dig -a`: v1 only; `b4 dig -w`: linux-cifs + Namjae
-  Jeon
-- **[Phase 4]** mbox: Namjae “Applied them except 0002, 0005”; patch 8
-  applied; no NAK
-- **[Phase 4]** Cover: independent of Time Machine/AAPL
-- **[Phase 5]** `SMB2_CREATE_HE` → `smb2_open`; streams gated by
-  `KSMBD_SHARE_FLAG_STREAMS`
-- **[Phase 6]** `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`; `make
-  kernelversion` → **6.12.111**
-- **[Phase 6]** Buggy lines at `smb2pdu.c:3596–3602`; `git apply
-  --check` succeeded at 3593
-- **[Phase 8]** Failure mode: wrong-file preallocation + oplock break;
-  severity HIGH for ksmbd/NAS, not a panic
-- **UNVERIFIED:** stable@ lore search (HTTP 403); whether Windows always
-  sends AllocationSize on ADS CREATE (bug is still real when it does)
+**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
+Record: 7 independent patches. This is 1/7. Patch 7 (ADS copychunk) was
+**not** taken; maintainer used other commits. Later AAPL ChunkCount=0
+full-file copy is a **feature**, not required here.
+
+**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
+Record: lore.kernel.org/stable search did not turn up discussion of this
+specific fix (WebSearch results were unrelated). No evidence it was
+previously rejected for stable.
+
+===============================================================
+PHASE 5: CODE SEMANTIC ANALYSIS
+===============================================================
+
+**Step 5.1: IDENTIFY KEY FUNCTIONS**
+Record: `smb2_ioctl()` (length check). Downstream: `fsctl_copychunk()`.
+
+**Step 5.2: TRACE CALLERS**
+Record: `smb2_ioctl` is `SMB2_IOCTL_HE` in `fs/smb/server/smb2ops.c`.
+Reachable from authenticated SMB2/SMB3 clients over the network (not a
+local syscall). Interrupt/hot-path: no; file-server request path.
+
+**Step 5.3: TRACE CALLEES**
+Record: on success, `fsctl_copychunk()` fills `copychunk_ioctl_rsp` with
+`ksmbd_server_side_copy_max_{chunk_count,chunk_size,total_size}()` (256
+chunks, ~2GiB), then if ChunkCount==0 returns 0 without copy I/O.
+
+**Step 5.4: FOLLOW THE CALL CHAIN**
+Record: SMB client → SMB2 IOCTL → `smb2_ioctl` → (currently rejected) /
+(after fix) `fsctl_copychunk`. **Reachable from userspace/network** with
+a writable share. Unprivileged local users cannot hit it unless they are
+SMB clients of ksmbd.
+
+**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
+Record: same FAM conversion also used `<= sizeof` for `smb2_ea_info_req`
+(line 4779). That is a **different** request and not this patch. Other
+ioctl checks already use `in_buf_len < sizeof` or `offsetof`
+(validate_negotiate, sparse, zero-data, etc.).
+
+===============================================================
+PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+===============================================================
+
+**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
+Record: **Yes.** Local tree is **6.12.111** (`pending-6.12`, `git
+describe` p-6.12-3-gc504cf0baa3d8). Buggy check is at
+`fs/smb/server/smb2pdu.c:8475`. Inner ChunkCount=0 limits path is at
+7925–7934. Candidate commit **fdf17b206bdc8 is not** an ancestor of
+HEAD.
+
+**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
+Record: **Clean apply** with line-number offset (`git apply --check`:
+hunk succeeded at 8472). Context around the COPYCHUNK cases matches. No
+conflicting local refactor of this check.
+
+**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
+Record: **No.** `git log --grep='off-by-one rejecting minimal
+COPYCHUNK'` on `fs/smb/server/` is empty. No alternate fix of this
+comparison.
+
+===============================================================
+PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+===============================================================
+
+**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
+Record: **ksmbd** (`fs/smb/server/`), in-kernel SMB3 server.
+**IMPORTANT** (not core mm/VFS; not staging). `CONFIG_SMB_SERVER`.
+Network-facing; protocol mistakes affect all clients of that server.
+
+**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
+Record: **Active.** Recent 6.12.y ksmbd work is mostly
+protocol/security/response-size fixes. Mature enough that this ioctl
+check dates to 2021; still getting interoperability fixes.
+
+===============================================================
+PHASE 8: IMPACT AND RISK ASSESSMENT
+===============================================================
+
+**Step 8.1: DETERMINE WHO IS AFFECTED**
+Record: **Config-specific + client-specific:** ksmbd servers whose
+clients send a 32-byte COPYCHUNK query-limits request. Linux CIFS does
+not. macOS Finder does (author’s live testing). Any other SMB2 client
+using that probe is affected.
+
+**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
+Record: Authenticated client, writable share,
+FSCTL_SRV_COPYCHUNK(_WRITE) with InputCount=32 and ChunkCount=0.
+**Common for macOS file copy / Time Machine-style copychunk probing.**
+Not a race. Not triggerable by a random unprivileged local process
+unless it is an SMB client.
+
+**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
+Record:
+- **Failure:** `STATUS_INVALID_PARAMETER` and **no** limits payload
+  (`smb2_set_err_rsp` after `-EINVAL` with nbytes still 0).
+- Server-side copy probe fails; clients that require this query cannot
+  offload copy (fail or fall back to read/write).
+- **Not** a panic, UAF, deadlock, or corruption.
+- **Severity: MEDIUM** (functional/interop), important for
+  ksmbd+macOS/Finder, not a kernel crash.
+
+**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
+Record:
+- **Benefit: medium-high for ksmbd users** — restores a path the inner
+  handler already implements; 1-line; live-tested against real clients.
+- **Risk: very low** — equality case only; ChunkCount≠0 still size-
+  checked; no locking/API change.
+- **Ratio:** strongly favors backport.
+
+===============================================================
+PHASE 9: FINAL SYNTHESIS
+===============================================================
+
+**Step 9.1: COMPILE THE EVIDENCE**
+
+**FOR:**
+- Real protocol bug: valid header-only COPYCHUNK is rejected; inner
+  handler already supports ChunkCount=0 query-limits.
+- User-visible: macOS Finder/Time Machine testing; any client using that
+  probe.
+- 1-line, obviously correct; sizeof/offsetof verified equal to 32.
+- Standalone; maintainer applied it; applies cleanly here.
+- Buggy code is in 6.12; candidate is not.
+- Downstream access of `Chunks[]` remains guarded.
+
+**AGAINST:**
+- Not a crash/security/corruption/deadlock.
+- Linux CIFS does not use this probe (Windows often uses oversized-chunk
+  + EINVAL).
+- Full Time Machine still needs later AAPL work not in 6.12 — but Finder
+  copychunk probing does not.
+- No Fixes:/Cc: stable (expected; not a negative).
+
+**UNRESOLVED:**
+- Exact share of Windows versions that send ChunkCount=0 was not
+  verified against MS-SMB2 traces (author’s claim is “any client” using
+  that probe; macOS was live-tested).
+- lore.kernel.org HTTP fetch returned 403; discussion recovered via `b4
+  dig -m`.
+
+**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
+1. Obviously correct and tested? **PASS** — 1-line; maintainer applied;
+   live Finder/TM testing.
+2. Fixes a real bug that affects users? **PASS** — valid SMB2 request
+   rejected.
+3. Important issue? **PASS** — interoperability for server-side copy
+   (MEDIUM, not panic). For ksmbd this is a real service bug, not
+   cosmetic.
+4. Small and contained? **PASS** — 1 line, one function.
+5. No new features or APIs? **PASS** — enables an already-implemented
+   handler path.
+6. Can apply to the local tree? **PASS** — `git apply --check` clean.
+
+**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
+Record: None (not a device ID, quirk, DT, build, or docs fix). Qualifies
+as a normal small bugfix.
+
+**Step 9.4: MAKE YOUR DECISION**
+This is a surgical protocol off-by-one in ksmbd’s COPYCHUNK ioctl check.
+The 6.12 tree still has `in_buf_len <= sizeof(...)`, which rejects the
+32-byte query-limits request that `fsctl_copychunk()` already handles.
+Benefit is real for ksmbd users with clients that probe that way; risk
+is negligible. It meets stable rules for this tree.
+
+### What the commit solves and why it matters here
+ksmbd currently turns a spec-valid FSCTL_COPYCHUNK with only the 32-byte
+header (ChunkCount=0) into `STATUS_INVALID_PARAMETER` and drops the
+limits body. After the fix, that request reaches the existing
+ChunkCount=0 path and returns max chunk count/size/total. That is
+required for server-side copy probing used by macOS Finder (and similar
+clients). On **this** 6.12 tree the bug is present and the later AAPL
+full-file-copy feature is not required.
+
+### Risk vs benefit
+Benefit: restore working COPYCHUNK limit queries. Risk: one comparison
+change; non-zero ChunkCount still validated with `struct_size`. Applies
+with a line offset only.
+
+Verification:
+- [Phase 1] Parsed tags: SOB Gael Blivet + Namjae Jeon; Assisted-by
+  Claude; no Fixes/Cc stable/Reported-by
+- [Phase 2] Diff: 1 line in `smb2_ioctl` COPYCHUNK cases; `<= sizeof` →
+  `< offsetof(..., Chunks)`
+- [Phase 2] Compile check: packed `sizeof=32` and `offsetof(Chunks)=32`
+- [Phase 2] Read `fsctl_copychunk`: ChunkCount==0 already fills limits
+  and returns 0; non-zero uses `struct_size` before `Chunks[]`
+- [Phase 2] Read `smb2_ioctl` `out:`: `-EINVAL` →
+  `STATUS_INVALID_PARAMETER` via `smb2_set_err_rsp` (no limits body)
+- [Phase 3] `git blame`: check from 8bb04fb2b7e34 (FAM); originally
+  f7db8fd03a4bc5
+- [Phase 3] `git merge-base --is-ancestor` 8bb04fb, f7db8fd, 0801c137:
+  all in HEAD; fdf17b206bdc8 not in HEAD
+- [Phase 3] `git log --grep='off-by-one rejecting minimal COPYCHUNK' --
+  fs/smb/server/`: empty
+- [Phase 4] `b4 dig -c fdf17b206bdc8`: lore match
+  20260707100033.47512-2; cover 0/7; Namjae applied except 0007
+- [Phase 4] `b4 dig -a`: v1 only; `b4 dig -w`: maintainer + linux-cifs
+- [Phase 4] Cover letter: independent of Apple-specific patches; live
+  TM/Finder testing
+- [Phase 4] stable@ lore search: no hit for this subject
+- [Phase 5] Caller: `smb2ops.c` SMB2_IOCTL_HE → `smb2_ioctl`; network
+  SMB path
+- [Phase 5] Linux client `__smb2_copychunk_range` does not send
+  ChunkCount=0
+- [Phase 6] `git describe HEAD`: p-6.12-3-gc504cf0baa3d8; `make
+  kernelversion`: 6.12.111
+- [Phase 6] Buggy line at smb2pdu.c:8475; `git apply --check` succeeded
+  at 8472
+- [Phase 8] Failure: protocol reject of valid COPYCHUNK query, severity
+  MEDIUM; not a crash
+- UNVERIFIED: whether every Windows build sends ChunkCount=0 (not used
+  to drive the verdict)
 
 **YES**
 
- fs/smb/server/smb2pdu.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ fs/smb/server/smb2pdu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index f383d1e5e5cb7..9c5275d3640cc 100644
+index d64753124dd9a..9bb885fa1ac66 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -3633,13 +3633,22 @@ int smb2_open(struct ksmbd_work *work)
- 			ksmbd_debug(SMB,
- 				    "request smb2 create allocate size : %llu\n",
- 				    alloc_size);
--			smb_break_all_levII_oplock(work, fp, 1);
--			err = vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0,
--					    alloc_size);
--			if (err < 0)
--				ksmbd_debug(SMB,
--					    "vfs_fallocate is failed : %d\n",
--					    err);
-+			/*
-+			 * fp->filp is the base file's data fork for a stream
-+			 * handle (streams are xattr-backed on the same
-+			 * underlying file) -- fallocate has no meaning for a
-+			 * stream and would otherwise pre-allocate storage on
-+			 * the base file's data instead.
-+			 */
-+			if (!ksmbd_stream_fd(fp)) {
-+				smb_break_all_levII_oplock(work, fp, 1);
-+				err = vfs_fallocate(fp->filp, FALLOC_FL_KEEP_SIZE, 0,
-+						    alloc_size);
-+				if (err < 0)
-+					ksmbd_debug(SMB,
-+						    "vfs_fallocate is failed : %d\n",
-+						    err);
-+			}
+@@ -8576,7 +8576,7 @@ int smb2_ioctl(struct ksmbd_work *work)
+ 			goto out;
  		}
  
- 		context = smb2_find_context_vals(req, SMB2_CREATE_QUERY_ON_DISK_ID, 4);
+-		if (in_buf_len <= sizeof(struct copychunk_ioctl_req)) {
++		if (in_buf_len < offsetof(struct copychunk_ioctl_req, Chunks)) {
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
 -- 
 2.53.0
 
