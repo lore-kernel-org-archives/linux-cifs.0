@@ -1,55 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792453689;
-	b=5dImREec1k3NN5oBuTU9UY+qH9dJNqXt/W2VacvE5JQsET56PVZQzjOvUKPo4cYxKYH0
-	 P1R3Y3y7txl+jjLzjiRKL575IAAWsMq6GhkWRnPc27Qk0mcV1Ze7B9TUrOFzyxPV7u5kx
-	 NfcSMx2lpRT62jREoHtjDdvrVul3SrVC61sU38QwseW22DsklNAr+w+87TdOywBUBW64B
-	 qsgyFcCNRzVew5ghHjtN8taYqFwNsw5QhvhiECKir8ezl/g6RQfYLSvaq4x9XD5BL+Ozs
-	 a4zfGnEwCuLLW1WGW4xk6TGVuXLf+uOEcRHCYibYw7BXm9hx56mMzszfPm6AakmyavQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792453689;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=NgUgGYEdXUH4DLTqTb+i6zWjjXHXqFWh5z6PHbqh+Fc=;
-	b=2UQeYqN0CRjoKg9AgvV74WTnvdLZkZsbeAPNpRl86rnIGS/Ezal1E0reeWhqmwHFH5HC
-	 5nD+lGTlUKuU486/GA00BaozRgVV180fktvrzc4MQINgQXOghT2dzjafAurlbAsuSMgAD
-	 8kfaizWmUHHYFgkNX/CulYPanJVgo9KI7pLgiOHewVa5WutYkRLkz2/REVaVx9raB0qMF
-	 nhOQsnrwd3V+Z8B9lSutUgmyAV1CxEpsnSaQJaAAr3gW679fQN0vVSdd9BN6jkKvzccpE
-	 tw33ogPLWA9+HIR4UrAxBqYli5sLA3YYE6W6EA/8zUuHf0OvvGjd4jZNrzybxbo9oBQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FWvDamp7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.182
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792453700;
+	b=aFDPc8rmhdxX/ep97qF8fuAqNlqE7W7RtFho5oyrJgojYO9uLsiSyfvFCxsu33xkCIDK
+	 rMEvX9bV4Cy3AaK5naUKiUpO1X03uqpCqLt5WRjkn5Kiy4EkxEtQFN0ecubRReAUOcrp6
+	 Z40yqIjlXCi30kpM5MsgUtD5qPHiMyhQwmCzPjIP6pDJtIwnGIZkuLv/iN5Qt4U4093Qv
+	 3NLnAjBxysc+YkCW4sPe/+vs0wf+5r5H95cRBPKVVYdkaC11MNPP6WWZZvCaO0+n/Wrjq
+	 sp42Tbn1Vk0IdQJaB/i7Gu+wbX8Af2qwCuQn2R3tXlMd2A902thxdzr6hwTF+HPG5Yg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792453700;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
+	bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
+	b=rb58G3t2eVvdcQLcPWUDLQTGdawEXKDKOTbiBhwUeg9eSOlaX0hrsDD2qBuzF7o6SiCb
+	 6TymOjGCgl9sExyhXMsc8mgoU+D/y5NZFB2Z+6LF/US9Is4LDNti3kI24tk2y3SsKTcxK
+	 KArbmoj2QwHkNksublppntXeaUtjVc3b9ifsAqgvRnHxZlDlHSPi4rYAAnPGeT99hukx3
+	 DLEmSl2osc4aM5IU03KqUFNJwdQmBqPYHQw79VYiiFaLGrJoFIPyokOCbMJVrOjamb3tL
+	 1qFAYPY7cy+zDJsKhcZpbTip7v+hIJV+pcOmkI9WYMq5Hy+MXnL1HBzPHjrISd3Me9A==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sZ6xiB9D;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.182
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C07606A31B
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 23:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F52606A31B
+	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 23:48:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62F52606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FWvDamp7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5B6D1F000C9
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 23:48:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792453688;
-	bh=NgUgGYEdXUH4DLTqTb+i6zWjjXHXqFWh5z6PHbqh+Fc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=FWvDamp7UlG+1r21LWu47kUBu6e+TeMNAsaWBjYJfhBldBbZroHj6YoLtJpCAriEe
-	 EqU+o9h1p80DjeOM+QrQzPSf4197Gy8HdUuPgRRhFZyDi5QHFdnwur5iMK5gyCykOR
-	 7d4dhhDBO4ZuiGXUR1LV9LrnQQa0rdHUBI57mCXh08xm+lvIq6K39JVbpICPb3GDK0
-	 1uMoNi6Ss2w1GKWZgGp+fWPJJnwoAz00tQkMAnQENL5Nli365FTizygkJkFNGte5+R
-	 9P4DfnIqlLmo3y06x2QsLSWXzfE7KBN8qiS2UAPSIL2AyF791SEP8k9ZnzMu1ThyCG
-	 PMBt/WeuyideA==
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c37b612635bso340868866b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 16:48:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByQGRsfAGP/LPtc5T/0I6hqFIHHM082AV90Vom4hyUlDz35bUWeS57so2y8nyOvfWlsW37BKjsFWETK@vger.kernel.org
-X-Gm-Message-State: AFq9FYL3vb0Ofl3On3aWQK7d8f4weqRyVyGfepB5cWrRGUrtXfM0w2Wq
-	OAdfqWu4M5T4PhNBC6VkLwlJ+KeROw1WEfprgeqWihdp1fF0AyMtTHslAVFf7fu2oJ2vdQXQ+FS
-	QtUT+kTybXGTcs1Tf3vZlhCssT/xkl0I=
-X-Received: by 2002:a17:907:d86:b0:c41:1750:59a4 with SMTP id
- a640c23a62f3a-c41a0bd6576mr614219766b.39.1792453687521; Mon, 19 Oct 2026
- 16:48:07 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sZ6xiB9D
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-8ab38a051aaso22489127b3.3
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 16:48:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792453699; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jDyCl51dfyKm8HdVQMTg7PG79ABXUGQ/0VX7kQHa4izHkq+oUhOHmQyjCe3zw7sf0H
+         0pEGhneI5g+7DLlGFYuvyC9uBGnuqrNuDdOto80gv81d2wS/cSYABWCa11HAwIhoECgM
+         Vsw+QqKQ8tFZpBsZUhRmGkcKR3ZY1WEi+rj638mlSombxr/Xjr29WiYRZ4RosNccnIjL
+         2l0sFwYvVJlf6pl9q7En8tCuG0PnPsJUODxyASlzhu1IhccmZXytSOccXEc84qvuvDHx
+         9UWs9EK5FjHNhVFRwSpKM42JBHDUcG6PRWyVhcIsG0W4gxJRI7TTYlQywmX7t6XBS9jR
+         jDdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
+        fh=kH0xamkYoUp8lVCxIi9w5C9/waAa7UrXU3oXFU5PLC8=;
+        b=XF7+b+Mn6aB6GToo4rE31wWPakY/fudKlKa1znsX95Vah/i9L/ZB588Dm0O9V0KGPH
+         38XiIEcB3J1x1J9GjoPwRlC4KijauCyEKpD7N6o20BQ9yDc7k8FNPunfX2ssLMvWNRhl
+         MzH1rfvbtN+VqdL+LxnnkKorABH8c39sq+l5aVVT10p+fYgSQHtF8+RddCYuDZYe1lpn
+         U8JY2Kikf+qHSNrCC3p+J/SQwp9bhv4fdEtk2+X1khO56x46ki0NO1sjQHjt7ZFuoVTu
+         FZ+1kPMeOCCwmGlFSBg1fjRc3rKjx07UDOUMVUoR6SLCIdhtoIQBibYgmSOm3hnBRFxj
+         17OA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792453699; x=1793058499; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
+        b=sZ6xiB9DuvcbqVv0gIB/zNnczwsp8q30SPuOjUTT9uajYr9Trkdwl5LZ7iAPMFRhB4
+         vWQgSrvjExCHojmr6NPW41q2+N2t8vsnXC0CRNnxlJdLJx9cBjeDhJsV6G0StaWjrWdw
+         +I4Vl1SB+UsQ7UecidixlCOBL7xn5/67LmNFrA5NDnb2izdlycFvHNtglThC9KWhsFpr
+         2j/DG83kTglmE46OhDnqBLIDtDmozPA04Me2koYZ3GCfcA3BJbsOUGeR3BfUfyEmmtIB
+         SS1RxU2tcnDMpR5dv+1Bs2RICDJCe0JkEfNu4/mEW6TOe2qHbh9Hp7IP3/WkOQm2oQLu
+         xDMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792453699; x=1793058499;
+        h=content-type:cc:to:subject:message-id:date:from:mime-version
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
+        b=NU9JHZ2gL/cyMiYpaxrdq6Bv3KczzzPDEcFkBS21cw9hyqNro4nWLcIdcmAbrTbRw1
+         hFRI4NlWsbL/h+GPN6a4M2KirL7dOzMvmZpqTWWw8s6XpPrTkE6w8x8X6tMPgrtUhtUR
+         q36FFM3kcEnEQGYPI1lHkqHZGCpPJXGhRwbbVPy+OUnQVtG7xUPqXhb0/RsmtAXqH3V+
+         KUF1kCp5LR2gZ/Hh/5vi2jeTEx+NH/w56mzJAcozCcg/5ikgnNFBugu/11cJXzIy4uMR
+         CVbkjVcMYEQ+GwnSh42tXPM2ESKy2gJWOgt31QUdD0/4WdLGgnaqYw8BnfdDFquAx+rT
+         iLIg==
+X-Gm-Message-State: AFq9FYLEFJD79aYF/wC+vJbp9kuG6+6igp9eL0XnyujVBIug4IFHSFlA
+	PvMEwrEbelGFtKuwg4XoBJdeDtNqrgHOlwfdcnq0DzP5+ftwC8pL4s4UZ4r/KPJD7KkOwjX4ie/
+	7rQw5YtfobqNtkfykaiid3fEQ8xqTPOA6Fqme
+X-Gm-Gg: AYBFou2Mwpic8wfJG2cGzOEOvZxIuloVmfh+PJEJdml2Qt+aSZtvcCU0LTJYo0efOMR
+	WkJZRq/Lq+sOOKsa2DWyoXINbmj0iFuAhBbQVXibJKVhS43/59Tk0sabt4TAbivLGieq3BxOHCJ
+	UlgCLIV69yrGICItfT51e7hXH3AJsv2miXnaoygHhkKDsijUSyoEEJWRgCjtRZHXcBU9sDp+LjA
+	XiM2fzwvn5LIKgZzpB0aAkK8MmW2FTugYnJqGOOAmqpzXNp6wpLpu9MrGTmcgGP5tGdDIgBOmBo
+	f5uIq3TJX+J3z+nFiBfsQn/SWeeDfq784Y2cUgaP7PxlzoBKFOE0jo/i9TvvpexwJvQ+BtD15RK
+	uIXBIfnKwWjwjxg==
+X-Received: by 2002:a05:690c:447:b0:878:cee5:9885 with SMTP id
+ 00721157ae682-8b0f220138bmr32688737b3.43.1792453699302; Mon, 19 Oct 2026
+ 16:48:19 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,48 +99,83 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <CAKYAXd_50E7cH51hxKi9xWfE3Hjyj0PhwccgsuGX416pEJVs8A@mail.gmail.com>
- <20261017034051.72932-1-charsyam@gmail.com>
-In-Reply-To: <20261017034051.72932-1-charsyam@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 20 Oct 2026 08:47:54 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9ueojJ40xXmVfRKuOZGZ1sxJCtxXiYodgtXRQkfEtf9Q@mail.gmail.com>
-X-Gm-Features: AclHuK-LdNI1l4YXOY-OMrlNkd6SJpfpHJiBlt2LrhzNDHSdQOdRrjZr5MXmVuw
-Message-ID: <CAKYAXd9ueojJ40xXmVfRKuOZGZ1sxJCtxXiYodgtXRQkfEtf9Q@mail.gmail.com>
-Subject: Re: [PATCH 0/2] ksmbd: fix SetAllocation EOF and rounding
-To: DaeMyung Kang <charsyam@gmail.com>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Mohammed <mohammed.saad.alquraini@gmail.com>
+Date: Tue, 20 Oct 2026 02:48:07 +0300
+X-Gm-Features: AclHuK-gvoCc23Waig2bSdFxXWyGK8fjHfJcG9ab-NPqqE3Ye07teLWp7_WHx80
+Message-ID: <CAD37_9gGnApAuagqOuZ13WB=DW8c_ZpWFBX4cE00YtGhmE2PbQ@mail.gmail.com>
+Subject: [Bug report] ksmbd: fd_limit leaks a slot per durable-handle
+ reconnect -> cross-user open DoS
+To: linkinjeon@kernel.org
+Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 17, 2026 at 12:40=E2=80=AFPM DaeMyung Kang <charsyam@gmail.com>=
- wrote:
->
-> In response to Namjae's review of my earlier SetAllocation patch, this
-> series separates two fixes. Patch 1/2 prevents the existing cleanup
-> branch from extending EOF on disk and then restoring only the in-memory
-> size. It carries Fixes and Cc: stable. Patch 2/2 rounds the request to
-> f_bsize, the allocation unit ksmbd advertises in FS_SIZE_INFORMATION,
-> instead of 512 bytes.
->
-> The other review point, reserving the requested range when shrinking,
-> remains open. I tried fallocate before truncate, but the decision to
-> shrink uses an EOF value read before vfs_truncate() takes inode_lock.
-> The existing block-count branch already has this race; extending
-> truncate to additional sparse-file cases would expose it more widely.
-> If another client truncates and writes in that interval, our truncate
-> can extend the file again with zeros. I reproduced this with an
-> injected delay in QEMU. Rechecking EOF after fallocate narrows the
-> window but does not close it.
->
-> A VFS operation that checks EOF and truncates under the same inode_lock
-> without extending the file may be needed. I plan to discuss the
-> reservation fix separately with linux-fsdevel and would welcome your
-> thoughts on that approach.
->
-> DaeMyung Kang (2):
->   ksmbd: avoid restoring only in-memory EOF after allocation change
->   ksmbd: round SetAllocation to the advertised allocation unit
-Applied them to #ksmbd-for-next.
-Thanks!
+Hello Namjae,
+
+ksmbd's global open-file counter (fd_limit) leaks one slot per durable-handle
+reconnect, so an authenticated user can exhaust the server-wide budget and deny
+other users' opens. Validated end-to-end on an unmodified kernel; every number
+below is measured. Found with an LLM-assisted code-analysis pipeline (disclosed
+up front per security-bugs.rst). Low severity -- it needs a non-default config
+and the cap is already soft (see caveat), so this is a regular bug for the
+public list, not a security@ case.
+
+Affected
+========
+fs/smb/server/vfs_cache.c at torvalds master 70dd4ee7 (2026-10-16); the reopen
+path is unchanged in current ksmbd-for-next. Requires "durable handles = yes"
+(the shipped ksmbd.conf.example has it off). Not a regression.
+
+Mechanism
+=========
+fd_limit is one server-global counter. A slot is taken per volatile id in
+__open_id(), and released in exactly two places: final close (__ksmbd_close_fd)
+and the idr-failure path. On disconnect the session is destroyed and a durable
+fp is preserved with its volatile id unpublished but NO fd_limit_close(). On
+reconnect, ksmbd_reopen_durable_fd() calls __open_id(VOLATILE) again for the
+same still-open fp -- a second slot -- and final close returns only one. Net:
+one slot leaked per reconnect cycle, in a server-wide counter, never returned.
+
+Impact (measured)
+=================
+With the shipped default max open files = 10000, 20 authenticated connections --
+each holding exactly one open file -- exhausted the global budget in 56.6 s
+(~177 leaks/s); a different user's CREATE then returned
+STATUS_INSUFFICIENT_RESOURCES (0xc000009a). The leaked slots survive the
+attacker's disconnect; only a restart frees them. The same open/drop/reconnect
+loop is what a benign macOS/Time Machine client does, so a server also degrades
+under normal use.
+
+Caveat, stated plainly: the counter is global with no per-user quota, so one
+user can already exhaust it by holding ~10000 opens; this bug's increment is
+that the leaked slots are unrecoverable and need only a single handle.
+
+Reproducing
+===========
+Self-contained SMB2 client (C, no third-party deps) against a mainline kernel
+with CONFIG_SMB_SERVER and ksmbd-tools; [global] durable handles = yes,
+max open files = 10000. Authenticate; CREATE a file with a batch oplock
+(RequestedOplockLevel=0x09) and a durable-v1 request context ("DHnQ"); read the
+persistent id from the response. Loop: abrupt TCP close (session teardown
+preserves the handle), then reconnect on a new connection with a "DHnC" context
+carrying that id. Each cycle leaks one slot; once the budget is gone a different
+user's CREATE fails with 0xc000009a. Setting max open files = 16 makes it
+visible in ~15 cycles; an instrumented run shows fd_limit going 16->0 with 18
+takes and 0 releases. Full client source and logs on request.
+
+Fix (Not tested yet)
+===================================================================
+Return the slot the preserved fp already holds at reopen, so it keeps exactly
+one slot for its one logical open:
+
+    /* ksmbd_reopen_durable_fd(), fs/smb/server/vfs_cache.c, before
+__open_id() */
+    fd_limit_close();   /* preserved fp's slot; reopen must not double-count */
+    __open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
+
+(or move the accounting to fp lifetime instead of per-volatile-id). Must keep
+-EMFILE -> STATUS_INSUFFICIENT_RESOURCES for genuinely new opens.
+
+Tested by hand on arm64 (70dd4ee7); the mechanism is architecture-independent.
+
+Thanks,
+Mohammed Alquraini
