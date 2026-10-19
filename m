@@ -1,42 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A8D6167AE;
-	Mon, 19 Oct 2026 14:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175F861F3EF;
+	Mon, 19 Oct 2026 14:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418649; cv=none; b=Eln4/3ubGi5v/WQ5o2KW1ZRQ5USQ+x7lrPGWB/yJXp0KaZ6WOGlyE7HBgWzrboEqFLXyQMfQwMFTtBrnwKb1Bqti9VKWO/LIzI47UewJVD5OSbfIsqmcRsqPhC86kVkjynQkCsCFAchh+tLA07cotnB2GhiD3WjAgPbYmpzTj3o=
+	t=1792418673; cv=none; b=qQTBnIVa7X0P/6EgW0S3pg58wWjkstywFFn5a/HFze8N98rNIxshEDTYEHfNiDcGq5iDneizOT6cLNDKie4D6e1ck6cdaqJOI1tVRb7zg/yiFH0PDHhYV6GooMx9UwW6KllKzSXxM9CVqSfaS5xbBoI1Fue3v4oBTtJzqUdEvf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418649; c=relaxed/simple;
-	bh=h28QfuKQW0s/T3nHUNG4IwJWf6u0RYiVoNZv09vhwZc=;
+	s=arc-20240116; t=1792418673; c=relaxed/simple;
+	bh=wBT+UpiCNd4y3nsEHiyxuV0pRS8k2vPEQBoWPB6bhAY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oqlaQy3R1JGaWM5RZkArDn4Pp2H5gJI+ywR6NmHHJ7tArc/omDSTKeZ0uuu68TiNE0tn2JPpW7PbYitBOnHoLxhEb6T/28UKrU6JfjDcaWCt3UFQSYdNlssG7rnH3T9PQt6/LEDm0MI6s5pttvnp8Gx2VXGw0Igd1aQ/l3p+gJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ag4e60XY; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=JUQtfq5qMkdSidrpZVvOJta6LykVAEOhvhyBAxHqWIVK8RbA7N0jJIYNy72XPVfgAX88R68IwN8pVirOVQENyhnxwUp5WHgUr894qk1L3eSjLYViNqG1CnCB1nYNonAZiGFm2CNBRc8gLyb2DYkgtgvnbvV5QSucw7zMoEX233I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h+7vYlvf; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ag4e60XY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF94F1F000C5;
-	Mon, 19 Oct 2026 14:04:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+7vYlvf"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42AE01F000C5;
+	Mon, 19 Oct 2026 14:04:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418646;
-	bh=3OZNVVxxdQo5rbx1RXIX1Z+cH2R3fiOyYgS+oEmHadE=;
+	s=k20260515; t=1792418671;
+	bh=JV/rBGGY22lnyRZ5ZT3jhnPWdk4mM9JkDPdi8J0tE0U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Ag4e60XYGLakfiLnkR1ZfYt0vJIS0UmPeza5E/PlMj1sTGbkUTsTre5eHOXLeIyao
-	 O//xl0ZUiDbJK+FosZ4Y7dobI+qp5wOL7c5Fzscwl3mbmezx6LfpeB5BxvbU3dd4xU
-	 65Dm3qOTk5uhsth0siHeaKF/j+aduEf21VsxcCE02oey1WAudSbJb4en8nNZmtq1ix
-	 8iqbkU/J1yAUENpV34asIpqURdGBU8jZRmJmW+gXQx6xsu7C8lKAFcPNXXreBstwB9
-	 JM6nlec+CLxybQ2yfKXzcsLt9ehK6HjTZoSC5Hd+JYYlph9cwmRzzb+NP9sghEd1nO
-	 V6JdXa2zmQkOQ==
+	b=h+7vYlvfiHDWznQ15+mnb3nNpM99gMJFcKnsqVSxGkeQHcT4mBbbHeJPsHNcdH0NK
+	 isb7PpFimJI9sda4fgGkxCyDI5hWqFav0icC1r6UMhjgpKM7p2KQ58+BHPH+H/BVCu
+	 19OONQm8xvqOcA1HT23eLx2gaK5x5UKgfqaojuOMnbwbVkBGlaVrOqoyiiW71Lmy42
+	 tfFbJ/XABXd5q0IR1lrTmE7aFrs1ITQGmsuev6gQN3VActVikRBHGPXlN86nBzWhVr
+	 /HtMDMfbHQch+l/M1Q1J0Q+l9zVqpAcWBQJkJt5LfVC+1LLDRCZDiBdzh/6Y6U3gSF
+	 i5uiQlACrh5Ww==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Thomas Huth <thuth@redhat.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-6.6] smb: server: Make sure that passkey is not leaked on the heap in user_config.c
-Date: Mon, 19 Oct 2026 09:51:28 -0400
-Message-ID: <20261019135441.1420968-397-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.1] ksmbd: honor byte-range locks for zero data
+Date: Mon, 19 Oct 2026 09:51:45 -0400
+Message-ID: <20261019135441.1420968-414-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -52,386 +51,277 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Thomas Huth <thuth@redhat.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 2c5a176882695f73b52482df03b0017b006ef2d1 ]
+[ Upstream commit 8b57448a147d2378088e63cd473e7f2a967d6802 ]
 
-Use kfree_sensitive() to free the user->passkey (and the struct
-ksmbd_login_response in ksmbd_login_user() that contains the same
-information) to avoid that this information could leak somewhere
-else via the heap.
+FSCTL_SET_ZERO_DATA changes file allocation state and must respect
+byte-range locks over the affected part of the file. Check the requested
+range, clipped to EOF, before issuing the fallocate operation.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Return STATUS_FILE_LOCK_CONFLICT when the range conflicts with an
+existing lock. Ranges starting past EOF are left untouched by the lock
+check so they continue to succeed.
+
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-I have enough to decide: the NTLM passkey wipe is present in this 6.12
-tree, the helpers already exist, and the change is a three-line secret-
-clearing fix. Fetching the series cover letter wrapped up the remaining
-mailing-list context.
+The local tree is **6.12.111** (`pending-6.12`). The buggy
+`FSCTL_SET_ZERO_DATA` path is present here, the lock helper already
+exists, and the patch applies cleanly. This is a real lock-bypass data-
+integrity bug, not a new feature.
 
 ===============================================================
 PHASE 1: COMMIT MESSAGE FORENSICS
 ===============================================================
 
 **Step 1.1: PARSE THE SUBJECT LINE**
-
-Record: **[smb: server:] [Make sure] [passkey is not leaked on the heap
-in user_config.c]**
-
-- Subsystem: `smb: server:` (ksmbd in-kernel SMB3 server)
-- Action verb: “Make sure” — safety/correctness language, not a feature
-- Claimed intent: wipe `user->passkey` (and the IPC login response that
-  holds the same hash) before returning the memory to the heap
+Record: `[ksmbd] [honor] honor byte-range locks for FSCTL_SET_ZERO_DATA`
 
 **Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+Original commit: `8b57448a147d2378088e63cd473e7f2a967d6802` (Namjae
+Jeon, 2026-08-17)
 
-Record:
-- **Fixes:** none (expected for this review pipeline)
-- **Reported-by:** none
-- **Tested-by:** none
-- **Reviewed-by:** none on the commit itself
-- **Acked-by:** none
-- **Link:** none in the commit message
-- **Cc: stable:** none (expected; not a negative signal)
-- **Signed-off-by:** Thomas Huth \<thuth@redhat.com\> (author); Namjae
-  Jeon \<linkinjeon@kernel.org\> (ksmbd maintainer). Ignore any Sasha
-  Levin SOB from candidate preparation.
+Tags present:
+- `Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>` (author + ksmbd
+  maintainer)
+- No `Fixes:`, `Cc: stable`, `Reported-by`, `Tested-by`, `Reviewed-by`,
+  `Acked-by`, or `Link:` (absence of Fixes/Cc:stable is expected for
+  this review)
 
-Notable pattern: no syzbot/CVE/reporter tags. This came from a
-maintainer-applied hardening series, not a crash report.
+Record: Maintainer-authored; no user/syzbot report tags.
 
 **Step 1.3: ANALYZE THE COMMIT BODY TEXT**
-
 Record:
-- **Bug:** `user->passkey` and `struct ksmbd_login_response` (which
-  contains `hash[]`) are freed with ordinary `kfree()`/`kvfree()`, so
-  the NTLM password hash remains in the slab until the object is reused.
-- **Symptom/failure mode:** heap leftover of authentication secret
-  material; a later kmalloc of the same cache can return pages still
-  holding the hash (classic kfree-vs-kfree_sensitive info leak).
-- **Version information:** none in the message.
-- **Root cause (author):** passkey-bearing objects were not cleared
-  before free.
+- Bug: `FSCTL_SET_ZERO_DATA` changes allocation (punch-hole / zero-
+  range) without checking SMB byte-range locks.
+- Symptom: a client can zero or punch a range another handle has locked;
+  the locker does not get `STATUS_FILE_LOCK_CONFLICT`.
+- Root cause: `ksmbd_vfs_zero_data()` calls `vfs_fallocate()` with no
+  `check_lock_range()`.
+- Intentional edge: ranges starting past EOF skip the lock check so they
+  still succeed.
 
 **Step 1.4: DETECT HIDDEN BUG FIXES**
-
-Record: Not a disguised cleanup. The message is explicit about a secret
-leak. It is a security hygiene fix (wipe-before-free), not a crash/UAF.
-Still a real bug class the kernel already treats as such via
-`kfree_sensitive()`.
+Record: Not a disguised cleanup. Explicit protocol/correctness fix:
+missing lock enforcement on a mutating FSCTL.
 
 ===============================================================
 PHASE 2: DIFF ANALYSIS - LINE BY LINE
 ===============================================================
 
 **Step 2.1: INVENTORY THE CHANGES**
-
 Record:
-- File: `fs/smb/server/mgmt/user_config.c` only
-- Scope: **3 substitutions, ~3 lines**, single-file surgical
-- Functions: `ksmbd_login_user()`, `ksmbd_alloc_user()` error path,
-  `ksmbd_free_user()`
-- Surrounding mainline context in the candidate (hash_sz bounds check,
-  `kmalloc_obj`) is **not** part of this commit’s semantic change; it is
-  later-tree context.
+- `fs/smb/server/vfs.c`: +12 in `ksmbd_vfs_zero_data()`
+- `fs/smb/server/smb2pdu.c`: +6/-1 in `smb2_ioctl()`
+  `FSCTL_SET_ZERO_DATA`
+- Total: 18 insertions, 1 deletion
+- Scope: single-subsystem, two-file surgical fix
 
 **Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
-
 Record:
-1. `ksmbd_login_user()` `out:` path: `kvfree(resp)` →
-   `kvfree_sensitive(resp, sizeof(*resp))`. This is the **normal** login
-   path (and the login-failure path). `resp` is the IPC login response
-   from ksmbd.mountd and contains `hash[]`.
-2. `ksmbd_alloc_user()` `err_free:`: `kfree(user->passkey)` →
-   `kfree_sensitive(user->passkey)`. **Error** path after the hash was
-   copied into `user->passkey`.
-3. `ksmbd_free_user()`: same `kfree` → `kfree_sensitive` for
-   `user->passkey`. **Normal** session teardown / reauth mismatch path.
+- **vfs.c before:** break Level II oplocks, then
+  `vfs_fallocate(PUNCH_HOLE or ZERO_RANGE | KEEP_SIZE)` with no lock
+  check.
+- **vfs.c after:** same, but for non-POSIX shares, if `off < i_size`,
+  call `check_lock_range(filp, off, min(off+len, size)-1, WRITE)` and
+  return `-EAGAIN` on conflict.
+- **smb2pdu.c before:** any `ret < 0` goes to ioctl `out`, which maps
+  unknown errors to `STATUS_INVALID_PARAMETER`.
+- **smb2pdu.c after:** `-EAGAIN` sets `STATUS_FILE_LOCK_CONFLICT`, `ret
+  = 0`, then `goto out` so the generic mapper does not overwrite the
+  status.
 
 **Step 2.3: IDENTIFY THE BUG MECHANISM**
-
 Record:
-- **Category:** security / sensitive-data leak (heap residual), not
-  UAF/race/crash
-- **Mechanism:** `resp->hash` is the NT hash (`KSMBD_REQ_MAX_HASH_SZ` is
-  18; auth uses `CIFS_ENCPWD_SIZE` of 16 as HMAC-MD5 key in
-  `calc_ntlmv2_hash()`). After `kfree`/`kvfree`, that hash stays in the
-  slab. `kfree_sensitive()` does `memzero_explicit()` over `ksize()`
-  then `kfree()`. `kvfree_sensitive()` does `memzero_explicit(addr,
-  len)` then `kvfree()`.
+- Category: logic / protocol correctness, with data-integrity impact.
+- Mechanism: SMB byte-range locks in ksmbd are POSIX locks;
+  `vfs_fallocate()` does not consult them (verified in `fs/open.c`:
+  permission/lease/overflow checks only). Read, write, truncate, and
+  copychunk already call `check_lock_range()`; zero-data did not. A
+  WRITE lock on another handle, or a READ lock vs this WRITE, is ignored
+  and the range is zeroed/punched.
 
 **Step 2.4: ASSESS THE FIX QUALITY**
-
 Record:
-- Obviously correct: drop-in replacement; `kfree_sensitive(NULL)` is a
-  documented no-op (needed on `err_free` when `passkey` alloc failed);
-  `kvfree_sensitive` skips `ZERO_OR_NULL_PTR`.
-- Minimal: three call-site changes, no API/structure change.
-- Regression risk: **very low**. Same free, plus a small
-  `memzero_explicit`. `passkey` is ~16 bytes; `sizeof(*resp)` is a fixed
-  login-response struct. No lock/order/API change.
-- Incomplete vs the rest of ksmbd (auth.c still `kvfree(resp)` on the
-  SPNEGO path) — that is a **sibling** series patch, not a dependency of
-  this one.
+- Quality: high. Same pattern as `ksmbd_vfs_write()` /
+  `ksmbd_vfs_truncate()` / `ksmbd_vfs_copy_file_ranges()`.
+- `posix_extensions` skip matches those callers.
+- Clipping to EOF avoids `start > end` if the request extends past EOF.
+- Regression risk: low. Only behavioral change is rejecting previously-
+  illegal zeroing of locked ranges. `ret = 0` plus pre-set status is a
+  bit awkward versus adding `-EAGAIN` in the ioctl `out` mapper, but it
+  works: `out` only overwrites status when `ret < 0 || Status == 0`, so
+  `STATUS_FILE_LOCK_CONFLICT` is preserved and `smb2_set_err_rsp()`
+  still runs.
 
 ===============================================================
 PHASE 3: GIT HISTORY INVESTIGATION
 ===============================================================
 
 **Step 3.1: BLAME THE CHANGED LINES**
-
 Record:
-- `kvfree(resp)`: introduced as cifsd code in `79f6b11a104f3a` (“cifsd:
-  remove wrappers of kvmalloc/kvfree”, 2021) on top of `e2f34481b24db2`
-  (“cifsd: add server-side procedures for SMB3”, 2021-05-10).
-- `kfree(user->passkey)` in `ksmbd_free_user()`: `822bc8ea514ecd`
-  (“cifsd: use kfree to free memory allocated by kmalloc or kzalloc”,
-  2021) — switched from kvfree wrappers to `kfree`.
-- `kfree(user->passkey)` on `err_free`: `a77e0e02af1c2` (“ksmbd: add
-  support for supplementary groups”, 2024-10-11).
-- The leak has been in the SMB server **since cifsd/ksmbd was merged
-  (~v5.15 era)**. Present in this 6.12 tree.
+- `ksmbd_vfs_zero_data()` introduced by Namjae Jeon in 2021
+  (`fs/cifsd/vfs.c`, blame `f44158485826c0` / `64b39f4a2fd293`).
+- Never had a lock check. Present throughout 6.12.
+- `override_creds` wrapper already in this tree via `fb1cae6302d58`
+  (`ksmbd: use opener credentials for FSCTL mutations`).
 
 **Step 3.2: FOLLOW THE FIXES: TAG**
-
-Record: No `Fixes:` tag. Not applicable. The buggy free sites predate
-this tree’s branch point and are in HEAD.
+Record: No `Fixes:` tag. Buggy code is the original zero-data
+implementation, not a later regression.
 
 **Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-
-Record (this tree, `-- fs/smb/server/mgmt/user_config.c`):
-- `c9f2872e91b9f` — leak of `ksmbd_ipc_login_request_ext()` buffer
-  (already in this tree; candidate context includes `kvfree(resp_ext)`).
-- `7dd0c858e1909` — ipc_validate_msg size checks
-- `a77e0e02af1c2` — supplementary groups
-- No existing `kfree_sensitive` conversion in this file.
-- Standalone relative to later hash_sz/`kmalloc_obj` work (those strings
-  are **absent** here).
+Record:
+- Already in this tree: `f751d6e39d4c9` “Do not skip lock checks for
+  single-byte ranges”; `ca53bb17f4e82` “add a permission check for
+  FSCTL_SET_ZERO_DATA”; `fe20d492a69a6` lock-owner tracking.
+- On `origin/master`, parent `3c707d4b3f926` (“fix permission checks for
+  file allocation ioctls”) is independent (SPARSE/QUERY_ALLOCATED_RANGES
+  access bits), not required for this lock check.
+- No `patch X/Y` in the subject. Standalone.
 
 **Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-
-Record: Thomas Huth has **no** other commits under `fs/smb/` in this
-checkout (series is newer than 6.12). Namjae Jeon is the ksmbd
-maintainer and signed the patch off. Cover letter: 5-patch series “Clear
-sensitive data before freeing it”; this is **v2 2/5**.
+Record: Namjae Jeon is the ksmbd maintainer (`Signed-off-by` on both
+authorship and merge). This tree already carries many of his ksmbd
+stable fixes.
 
 **Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-
-Record:
-- Needs `kfree_sensitive()` / `kvfree_sensitive()` — both exist in this
-  tree (`include/linux/slab.h`, implemented in `mm/slab_common.c` /
-  `mm/util.c`).
-- Does **not** need `kmalloc_obj` or the hash_sz guard (those are only
-  nearby mainline context).
-- Other patches in the series (auth.c, user_session.c, connection.c,
-  smb2pdu.c) are independent per-file wipes. This file’s change applies
-  **standalone**.
-- `user_config.c` already includes `<linux/slab.h>`.
+Record: None. `check_lock_range()` is `static` in the same `vfs.c`
+(lines 325–358). `STATUS_FILE_LOCK_CONFLICT` already exists.
+`posix_extensions` and `i_size_read`/`min()` are present. `git apply
+--check` of `8b57448a147d2` succeeded (smb2pdu offset −1234, vfs.c
+offset +71).
 
 ===============================================================
 PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 ===============================================================
 
 **Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
-
 Record:
-- `b4 dig -c <sha>`: **not run** — the candidate SHA is not in this
-  checkout (evaluating a candidate, not an in-tree commit).
-- Found via search: **[PATCH v2 2/5]** Message-ID
-  `20260811154620.2425851-3-thuth@redhat.com`
-- Cover:
-  https://patchew.org/linux/20260811154620.2425851-1-thuth@redhat.com/
-- Openwall: https://lists.openwall.net/linux-kernel/2026/08/11/1820
-- v2 vs v1: cover letter says v2 fixed `kvfree_sensitive` **size in
-  patch 1 (auth.c)**, added a connection.c hunk, and added the smb2pdu.c
-  patch. **This user_config.c patch was not the one that needed a size-
-  calculation fix.**
-- Namjae Jeon: “Applied them to #ksmbd-for-next-next.” No NAK found.
-- Author framed it as “good security practice”; spots found with AI,
-  patches written by hand; asked for careful review. Maintainer still
-  applied the series.
-- No reviewer `Cc: stable` found.
+- `b4 dig -c 8b57448a147d2`: lore returned server errors; no thread URL.
+- WebFetch of lore.kernel.org search URLs: HTTP 403.
+- UNVERIFIED: reviewer comments, v2/v3 history, explicit Cc:stable in
+  review.
 
 **Step 4.2: CHECK WHO REVIEWED THE PATCH**
-
-Record: To/Cc from the v2 mail: Namjae Jeon (ksmbd maintainer), Steve
-French (CIFS/SMB maintainer), linux-kernel, Sergey Senozhatsky, Tom
-Talpey. Maintainer applied it. No separate Reviewed-by on this patch.
+Record: UNVERIFIED via b4. Commit is maintainer-authored and merged to
+`origin/master`.
 
 **Step 4.3: SEARCH FOR THE BUG REPORT**
-
-Record: No syzbot, bugzilla, or user crash. This is proactive secret-
-wipe, not a reported oops. Severity from the author: heap leftover of
-passkey/hash.
+Record: No `Reported-by` / bugzilla / syzbot. Bug is identified from
+protocol analysis, not a crash report.
 
 **Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-
-Record: Series of 5 independent kfree_sensitive/memzero_explicit
-patches:
-1. auth.c stack/heap
-2. **user_config.c passkey (this one)**
-3. user_session.c
-4. connection.c
-5. smb2pdu.c Preauth_HashValue
-
-This patch does not depend on 1/3/4/5 applying first.
+Record: Nearby `origin/master` ksmbd FSCTL work (`support file level
+trim`, allocation ioctl permission, allocated-range holes) is related
+thematically, not a hard dependency. Samba’s `fsctl_zero_data()` takes a
+WRITE strict lock and returns `NT_STATUS_FILE_LOCK_CONFLICT` on failure
+(source3/smbd/smb2_ioctl_filesys.c). That matches this fix.
 
 **Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-
-Record: No stable-list hit for this passkey wipe (search did not turn up
-a prior stable request or a rejection). UNVERIFIED that a later stable
-thread exists beyond what search returned. lore.kernel.org fetches
-returned 403 in this environment; discussion was recovered from
-patchew/openwall.
+Record: UNVERIFIED (lore 403). No local evidence this was rejected for
+stable.
 
 ===============================================================
 PHASE 5: CODE SEMANTIC ANALYSIS
 ===============================================================
 
 **Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF**
-
-Record: `ksmbd_login_user`, `ksmbd_alloc_user`, `ksmbd_free_user`
+Record: `ksmbd_vfs_zero_data()`, `smb2_ioctl()` (`FSCTL_SET_ZERO_DATA`),
+callee `check_lock_range()`.
 
 **Step 5.2: TRACE CALLERS**
-
-Record (this tree):
-- `ksmbd_login_user()` ← `session_user()` in `fs/smb/server/smb2pdu.c` ←
-  SMB2 SESSION_SETUP / `ntlm_authenticate()`. **Network-reachable** on
-  every NTLM login.
-- `ksmbd_alloc_user()` ← `ksmbd_login_user()` and
-  `ksmbd_krb5_authenticate()` in `auth.c` (CONFIG_SMB_SERVER_KERBEROS5).
-- `ksmbd_free_user()` ← session teardown in `user_session.c`; reauth
-  mismatch / anonymous reuse in `smb2pdu.c`; kerberos reauth in
-  `auth.c`.
+Record:
+- `ksmbd_vfs_zero_data()`: only `smb2_ioctl()` FSCTL_SET_ZERO_DATA
+  (`fs/smb/server/smb2pdu.c:8548`).
+- `smb2_ioctl()`: SMB2 command table `SMB2_IOCTL_HE` in
+  `fs/smb/server/smb2ops.c`.
+- Reachable from authenticated SMB clients issuing ioctl on an open
+  writable handle.
 
 **Step 5.3: TRACE CALLEES**
-
-Record:
-- `ksmbd_ipc_login_request()` → netlink to ksmbd.mountd; response
-  allocated with `kvzalloc(sz)` in `handle_response()`
-  (`transport_ipc.c:294`), so `kvfree`/`kvfree_sensitive` is the right
-  family.
-- `user->passkey = kmalloc(resp->hash_sz, ...)` then `memcpy` from
-  `resp->hash` — `kfree_sensitive` is the right family.
-- `calc_ntlmv2_hash()` uses `user_passkey()` as HMAC-MD5 key
-  (`CIFS_ENCPWD_SIZE`). Confirmed: this is the NT hash, not a username.
+Record: `check_lock_range()` walks `flc_posix` under `flc_lock`;
+conflicts if overlapping READ lock vs WRITE, or WRITE lock owned by
+another `filp`. `vfs_fallocate()` does not check those locks.
 
 **Step 5.4: FOLLOW THE CALL CHAIN**
-
-Record: Unprivileged SMB client sends SESSION_SETUP → kernel looks up
-user via IPC → hash lives in `resp` then `user->passkey` → on
-logout/free, hash is currently left in the slab. Path is **reachable
-from the network** whenever ksmbd is enabled and serving NTLM users. Not
-a syscall-from-unprivileged-local-only issue; it is a **server-side
-credential residual**.
+Record: SMB2 IOCTL → `smb2_ioctl` → `ksmbd_vfs_zero_data` →
+`vfs_fallocate` (punch/zero). Userspace/network reachable on any ksmbd
+share without POSIX extensions (the common Windows-client case).
 
 **Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-
-Record: The SMB **client** in this same tree already uses
-`kfree_sensitive` widely for passwords/`auth_key`
-(`fs/smb/client/smb2pdu.c`, `sess.c`, `fs_context.c`, `misc.c`, …).
-ksmbd server side in this tree still uses plain `kfree`/`kvfree` for
-passkey (only `auth.c` has one `kfree_sensitive(ctx_arc4)`). Same bug
-class, server lagging the client.
+Record: Same `!posix_extensions` + `check_lock_range` + `-EAGAIN`
+pattern in `ksmbd_vfs_read` (396–400), `ksmbd_vfs_write` (521–527),
+`ksmbd_vfs_truncate` (835–849), `ksmbd_vfs_copy_file_ranges`
+(1854–1866). Zero-data was the missing sibling. Read/write/setinfo
+already map `-EAGAIN` to `STATUS_FILE_LOCK_CONFLICT`; ioctl did not,
+which is why smb2pdu.c is patched.
 
 ===============================================================
 PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
 ===============================================================
 
 **Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-
-Record: **Yes.** Local tree is **6.12.111** (`pending-6.12`,
-`p-6.12-3-gc504cf0baa3d8`).
-
-```31:31:fs/smb/server/mgmt/user_config.c
-        kvfree(resp);
-```
-
-```74:74:fs/smb/server/mgmt/user_config.c
-        kfree(user->passkey);
-```
-
-```84:84:fs/smb/server/mgmt/user_config.c
-        kfree(user->passkey);
-```
-
-No `kvfree_sensitive` / `kfree_sensitive` in this file today. Bug
-introduced with cifsd (2021), long before 6.12.
+Record: Yes. Local `ksmbd_vfs_zero_data()` at
+`fs/smb/server/vfs.c:995-1013` has no lock check. `git merge-base --is-
+ancestor 8b57448a147d2 HEAD` failed (not in this tree). Bug present
+since ksmbd’s 2021 introduction; well before 6.12.
 
 **Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-
-Record: **Minor context, not semantic.** This tree has
-`kmalloc(sizeof(struct ksmbd_user), ...)` not `kmalloc_obj`, and **no**
-`hash_sz > sizeof(resp->hash)` guard. The three substitution sites exist
-verbatim (`kvfree(resp);` ×1, `kfree(user->passkey);` ×2). A 3-line
-backport applies; a raw mainline patch with 41-line context around
-`ksmbd_alloc_user` would conflict. `kvfree(resp_ext)` from
-`c9f2872e91b9f` is already here, matching the candidate’s
-`ksmbd_login_user` shape.
+Record: Clean apply with line offset. Local ioctl `out` mapper still
+lacks `-EAGAIN`, so both hunks are required. No refactor blocking the
+patch.
 
 **Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-
-Record: No passkey wipe already in this file. Client-side
-`kfree_sensitive` does not cover ksmbd server objects.
+Record: Permission check for SET_ZERO_DATA is here (`ca53bb17f4e82`);
+lock-check skip-for-1-byte fix is here (`f751d6e39d4c9`). Neither
+implements this FSCTL lock check. No duplicate fix.
 
 ===============================================================
 PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 ===============================================================
 
 **Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-
-Record: **ksmbd (CONFIG_SMB_SERVER)** under `fs/smb/server/`.
-**IMPORTANT** (not core mm/VFS): optional in-kernel SMB3 server used on
-NAS/embedded; default `n`. Network-facing auth path.
+Record: ksmbd (`fs/smb/server`, `CONFIG_SMB_SERVER`, default n).
+Criticality: IMPORTANT for ksmbd deployments (NAS, distros), not core
+mm/VFS. File-server data path.
 
 **Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-
-Record: Actively maintained (many recent ksmbd fixes on this branch:
-OOB, ACL, session, credit). Mature enough that the passkey free path has
-been stable since 2021.
+Record: Actively maintained; this 6.12 tree already backports many ksmbd
+protocol, lock, and UAF fixes. Mature enough that missing lock checks
+are long-standing, not new-code churn.
 
 ===============================================================
 PHASE 8: IMPACT AND RISK ASSESSMENT
 ===============================================================
 
 **Step 8.1: DETERMINE WHO IS AFFECTED**
-
-Record: **config-specific / driver-specific:** systems with
-`CONFIG_SMB_SERVER` (ksmbd) and live SMB sessions. Distros that ship
-ksmbd for NAS (openSUSE, some embedded, ksmbd-tools users).
+Record: ksmbd users, non-POSIX SMB shares, clients that use byte-range
+locks and `FSCTL_SET_ZERO_DATA` (Windows sparse/zero APIs, some
+databases/backup tools).
 
 **Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-
-Record:
-- Trigger: **every successful NTLM login** (`ksmbd_login_user` always
-  frees `resp` containing the hash) and **every `ksmbd_free_user`**
-  (session destroy / failed reauth).
-- Common on any ksmbd server with password auth.
-- Local unprivileged userspace does not need to call a special syscall;
-  a remote SMB client causes the kernel to hold then free the hash.
-  Recovering the leftover bytes still needs another heap-read primitive
-  or slab reuse that exposes old contents — that is the usual
-  `kfree_sensitive` threat model.
+Record: Handle A holds an SMB lock; handle B (or another client) issues
+`FSCTL_SET_ZERO_DATA` overlapping that range with `FILE_WRITE_DATA`. Not
+every I/O, but a realistic multi-client/multi-handle case. Authenticated
+SMB user; not unprivileged local syscall.
 
 **Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-
-Record: **Failure mode:** NT hash residual in kmalloc/kvmalloc heap.
-**Severity: HIGH** (credential/info leak; pass-the-hash material). Not a
-panic. Not theoretical-only in kind: this is why `kfree_sensitive`
-exists, and the CIFS client already wipes the same class of secrets.
+Record: Locked file data can be silently zeroed or punched. Failure
+mode: data corruption / lock-semantics violation. Severity: HIGH (not a
+kernel oops).
 
 **Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-
 Record:
-- **Benefit:** HIGH for ksmbd users — wipes NTLM hashes that currently
-  survive free on a hot auth path.
-- **Risk:** VERY LOW — 3 lines, existing helpers, NULL-safe, no behavior
-  change except zeroing freed secret bytes.
-- **Ratio:** strongly favors backport.
+- Benefit: high for ksmbd — restores lock integrity on a data-destroying
+  FSCTL; aligns with Samba/Windows.
+- Risk: very low — 18 lines, existing helper, applies cleanly, only
+  rejects operations that should have failed.
+- Ratio: strongly favors backport.
 
 ===============================================================
 PHASE 9: FINAL SYNTHESIS
@@ -439,150 +329,152 @@ PHASE 9: FINAL SYNTHESIS
 
 **Step 9.1: COMPILE THE EVIDENCE**
 
-**FOR:**
-- Real leftover NT hash (`resp->hash` / `user->passkey`) on heap after
-  login IPC and session free
-- Reachable from SMB SESSION_SETUP on deployed ksmbd
-- 3-line, obviously correct, uses APIs that exist in 6.12
-- Buggy frees present in this tree since 2021
-- Maintainer (Namjae Jeon) applied the series
-- Same pattern already used by `fs/smb/client/` in this tree
-- `kfree_sensitive(NULL)` safe on the alloc-failure path
+FOR:
+- Real bug: SET_ZERO_DATA ignores byte-range locks while
+  read/write/truncate/copychunk do not.
+- User-visible: silent zero/punch of locked ranges (data integrity).
+- Samba returns `NT_STATUS_FILE_LOCK_CONFLICT` for the same FSCTL.
+- Small, obviously correct, maintainer-authored.
+- Helpers and surrounding lock policy already in 6.12; patch applies
+  cleanly.
+- This tree already backported the same class (`f751d6e39d4c9`) and
+  SET_ZERO_DATA access control (`ca53bb17f4e82`).
 
-**AGAINST:**
-- Hardening / defense-in-depth, no CVE/syzbot/user report
-- Part of a 5-patch series (others also wipe secrets; this file does not
-  need them)
-- ksmbd is optional (`default n`)
-- Raw mainline hunk context includes later `kmalloc_obj` / hash_sz check
-  (needs a tiny backport, not the later features)
+AGAINST:
+- No crash/UAF/syzbot report.
+- ksmbd is optional (`CONFIG_SMB_SERVER`).
+- No mailing-list confirmation (lore unreachable).
+- Slightly weaker than Samba on past-EOF ranges (intentional per commit
+  message).
 
-**UNRESOLVED:**
-- Could not run `b4 dig` against a local SHA (candidate not in this git
-  object store)
-- lore.kernel.org HTTP 403; discussion recovered from patchew/openwall
-- No evidence this was previously rejected for stable
+UNRESOLVED:
+- Original lore thread / reviewer NAKs (b4 and lore failed).
 
 **Step 9.2: APPLY THE STABLE RULES CHECKLIST**
-
-1. Obviously correct and tested? **PASS** — drop-in sensitive-free;
-   maintainer applied v2.
-2. Fixes a real bug that affects users? **PASS** — NTLM hash left in
-   slab after ksmbd login/logout.
-3. Important issue? **PASS** — security info leak of auth material
-   (HIGH, not a crash).
-4. Small and contained? **PASS** — 3 lines, one file.
-5. No new features or APIs? **PASS**
-6. Can apply to the local tree? **PASS** — sites and helpers exist;
-   context tweak only (no `kmalloc_obj` required).
+1. Obviously correct and tested? **PASS** — matches existing ksmbd lock
+   checks; maintainer SOB. (No extra Tested-by.)
+2. Fixes a real bug that affects users? **PASS** — lock bypass on a
+   mutating FSCTL.
+3. Important issue (crash, security, corruption, deadlock)? **PASS** —
+   data corruption / exclusive-lock violation. HIGH, not panic.
+4. Small and contained? **PASS** — 18/+1 lines, two files, one FSCTL.
+5. No new features or APIs? **PASS** — enforces existing SMB lock rules.
+6. Can apply to the local tree? **PASS** — `git apply --check`
+   succeeded.
 
 **Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-
-Record: Not a device-ID/quirk/DT/build/docs exception. Qualifies as a
-**small security fix** (secret wipe), which stable regularly takes.
+Record: None (not a device-ID/quirk/DT/build/doc exception). Qualifies
+as a normal important bugfix.
 
 **Step 9.4: MAKE YOUR DECISION**
+Backport. The 6.12 tree has the buggy path, the same
+`check_lock_range()` policy, and already takes ksmbd lock-correctness
+fixes. Benefit is lock-integrity on a data-destroying ioctl; risk is
+minimal.
 
-This should be backported to **this** 6.12 tree. The bug is here, the
-helpers are here, and the change is a surgical wipe of NTLM passkeys
-that ksmbd currently leaves in the heap after every login IPC and
-session free. Risk is negligible; benefit is wiping high-value
-credential material on a network-facing path.
+### What the commit solves
+On this 6.12 tree, `FSCTL_SET_ZERO_DATA` breaks oplocks and calls
+`vfs_fallocate()` without `check_lock_range()`. POSIX/SMB locks are not
+enforced by `vfs_fallocate()`, so another handle can zero or punch a
+locked range. The patch checks the range clipped to EOF and returns
+`STATUS_FILE_LOCK_CONFLICT`, matching Samba and ksmbd’s other mutating
+paths.
 
-### What the commit solves for this tree
-
-On 6.12.111 ksmbd still does `kvfree(resp)` on the login response (which
-includes `hash[KSMBD_REQ_MAX_HASH_SZ]`) and `kfree(user->passkey)` after
-copying that hash. Those bytes are the NT hash used as the NTLMv2 HMAC
-key. Switching to `kvfree_sensitive` / `kfree_sensitive` zeros them
-before the slab can reuse the object. That matches what the SMB client
-in this same tree already does for passwords.
+### Stable rules
+Surgical, no new API, applies here, fixes real data-integrity/protocol
+failure. Not a feature add.
 
 ### Risk vs benefit
-
-Benefit is wiping secrets on a common ksmbd auth path. Risk is a few
-extra `memzero_explicit` bytes on free. No locking, no API, no control-
-flow change.
+Benefit: prevent silent destruction of locked file data on ksmbd. Risk:
+low; only newly failed requests are ones that violated locks.
 
 ### Concerns
-
-A verbatim mainline apply may need a 3-line backport because this tree
-lacks `kmalloc_obj` and the later `hash_sz` cap; those are **not**
-prerequisites. Sibling series patches (auth.c SPNEGO `kvfree(resp)`,
-session/connection/preauth) are independent and do not block this file’s
-fix.
+Mailing-list review could not be fetched. Parent permission-ioctl commit
+is not required. `ret = 0` before `goto out` is slightly unusual but
+correct given this ioctl error mapper.
 
 Verification:
-- [Phase 1] Parsed subject/body/tags: no Fixes/Reported-by/Cc:stable;
-  SOBs Thomas Huth + Namjae Jeon
-- [Phase 2] Diff: 3 substitutions in user_config.c; `kvfree(resp)` and
-  two `kfree(user->passkey)`
-- [Phase 2] Confirmed `KSMBD_REQ_MAX_HASH_SZ` is 18 and
-  `calc_ntlmv2_hash()` uses `user_passkey()` as HMAC-MD5 key
-  (`CIFS_ENCPWD_SIZE` 16)
-- [Phase 3] `git blame`: `kvfree(resp)` from 2021 cifsd
-  (`79f6b11a104f3a` / `e2f34481b24db2`); passkey `kfree` from
-  `822bc8ea514ecd` / `a77e0e02af1c2`
-- [Phase 3] `git merge-base --is-ancestor` of those SHAs vs HEAD: all
-  present (exit 0)
-- [Phase 3] `git log --author="Thomas Huth" -- fs/smb/`: empty in this
-  tree (series is newer)
-- [Phase 4] Patchew/openwall: v2 2/5 of “Clear sensitive data before
-  freeing it”; Namjae applied to ksmbd-for-next-next; no NAK
-- [Phase 4] lore.kernel.org WebFetch: 403; b4 dig: no local candidate
-  SHA — discussion recovered from patchew/openwall
-- [Phase 5] Callers: `smb2pdu.c` SESSION_SETUP
-  `session_user()`/`ntlm_authenticate()`, `auth.c` krb5 path,
-  `user_session.c` teardown
-- [Phase 5] `handle_response()` uses `kvzalloc` — `kvfree_sensitive` is
-  the correct free family
-- [Phase 6] `git describe HEAD` / `make kernelversion`: **6.12.111**
-  (`pending-6.12`); buggy kfree/kvfree still in file;
-  `kfree_sensitive`/`kvfree_sensitive` declared in
-  `include/linux/slab.h`
-- [Phase 6] Local file has no `kmalloc_obj` / hash_sz cap; three target
-  call sites exist verbatim
-- [Phase 8] Failure mode: NT-hash residual in heap after login/free;
-  severity HIGH; regression risk very low
-- UNVERIFIED: full lore mailbox / b4 patch-id match; whether a later CVE
-  was assigned
+- [Phase 1] Parsed tags on `8b57448a147d2`: only Namjae Jeon SOB; no
+  Fixes/Cc:stable/Reported-by
+- [Phase 1] `git describe HEAD` / Makefile: `p-6.12-3-gc504cf0baa3d8`,
+  VERSION 6.12.111, branch `pending-6.12`
+- [Phase 2] Diff: +12 vfs.c `ksmbd_vfs_zero_data`, +6/-1 smb2pdu.c
+  FSCTL_SET_ZERO_DATA
+- [Phase 2] Local `smb2_ioctl` `out` (8694–8708) maps unknown errors to
+  `STATUS_INVALID_PARAMETER`, not lock conflict — smb2pdu hunk required
+- [Phase 2] `vfs_fallocate()` in `fs/open.c:246` has no posix-lock check
+- [Phase 3] Blame: zero_data from 2021 cifsd; no lock check ever; `git
+  merge-base --is-ancestor 8b57448a147d2 HEAD` → not ancestor
+- [Phase 3] Related in-tree: `f751d6e39d4c9` (1-byte lock skip),
+  `ca53bb17f4e82` (SET_ZERO_DATA FILE_WRITE_DATA)
+- [Phase 3] Parent `3c707d4b3f926` is independent permission tweak, not
+  a prerequisite
+- [Phase 3] `git apply --check` of `8b57448a147d2`: both hunks apply
+  (offsets −1234 / +71)
+- [Phase 4] `b4 dig -c 8b57448a147d2`: lore errors, no thread —
+  UNVERIFIED review discussion
+- [Phase 4] lore WebFetch 403 — UNVERIFIED stable-list discussion
+- [Phase 4] Samba `fsctl_zero_data` uses STRICT_LOCK WRITE and returns
+  `NT_STATUS_FILE_LOCK_CONFLICT` (web/source confirmation)
+- [Phase 5] Only caller of `ksmbd_vfs_zero_data` is `smb2_ioctl`;
+  dispatched via `SMB2_IOCTL_HE`
+- [Phase 5] `check_lock_range` already used for
+  read/write/truncate/copychunk in this tree
+- [Phase 6] Local `ksmbd_vfs_zero_data` (vfs.c:995–1013) matches pre-
+  patch; bug exists here
+- [Phase 8] Failure mode: zero/punch of locked ranges → data integrity
+  HIGH
+- UNVERIFIED: original lore review comments and whether anyone nominated
+  this for stable on the list
 
 **YES**
 
- fs/smb/server/mgmt/user_config.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ fs/smb/server/smb2pdu.c |  7 ++++++-
+ fs/smb/server/vfs.c     | 12 ++++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/server/mgmt/user_config.c b/fs/smb/server/mgmt/user_config.c
-index 0e5fcd6f95c15..909f219c79faa 100644
---- a/fs/smb/server/mgmt/user_config.c
-+++ b/fs/smb/server/mgmt/user_config.c
-@@ -28,7 +28,7 @@ struct ksmbd_user *ksmbd_login_user(const char *account)
- 	user = ksmbd_alloc_user(resp, resp_ext);
- 	kvfree(resp_ext);
- out:
--	kvfree(resp);
-+	kvfree_sensitive(resp, sizeof(*resp));
- 	return user;
- }
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index c18590d8ee2b9..6b3cf2dadeecd 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -8665,8 +8665,13 @@ int smb2_ioctl(struct ksmbd_work *work)
  
-@@ -82,7 +82,7 @@ struct ksmbd_user *ksmbd_alloc_user(struct ksmbd_login_response *resp,
+ 			ret = ksmbd_vfs_zero_data(work, fp, off, len);
+ 			ksmbd_fd_put(work, fp);
+-			if (ret < 0)
++			if (ret == -EAGAIN) {
++				rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
++				ret = 0;
+ 				goto out;
++			} else if (ret < 0) {
++				goto out;
++			}
+ 		}
+ 		break;
+ 	}
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 47c289ad9c3dc..f894092901bc5 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1003,6 +1003,18 @@ int ksmbd_vfs_zero_data(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 	int err;
  
- err_free:
- 	kfree(user->name);
--	kfree(user->passkey);
-+	kfree_sensitive(user->passkey);
- 	kfree(user);
- 	return NULL;
- }
-@@ -92,7 +92,7 @@ void ksmbd_free_user(struct ksmbd_user *user)
- 	ksmbd_ipc_logout_request(user->name, user->flags);
- 	kfree(user->sgid);
- 	kfree(user->name);
--	kfree(user->passkey);
-+	kfree_sensitive(user->passkey);
- 	kfree(user);
- }
- 
+ 	smb_break_all_levII_oplock(work, fp, 1);
++	if (!work->tcon->posix_extensions) {
++		loff_t size = i_size_read(file_inode(fp->filp));
++
++		if (off < size) {
++			err = check_lock_range(fp->filp, off,
++					       min(off + len, size) - 1,
++					       WRITE);
++			if (err)
++				return -EAGAIN;
++		}
++	}
++
+ 	saved_cred = override_creds(fp->filp->f_cred);
+ 	if (fp->f_ci->m_fattr & FILE_ATTRIBUTE_SPARSE_FILE_LE)
+ 		err = vfs_fallocate(fp->filp,
 -- 
 2.53.0
 
