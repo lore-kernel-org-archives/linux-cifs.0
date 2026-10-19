@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BA6546443;
-	Mon, 19 Oct 2026 14:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D2A546278;
+	Mon, 19 Oct 2026 14:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418823; cv=none; b=Mbh0jE7iec2v/soAfjl/zyXwB5h4maBY0jlphYAIELuo18XNhY0lNSyA526ZJmWJBdhWBYReT76dcjO66u/A4US8upBTURJRfj+fTaq6LzI9bV9uHjTB1v7CBCbRwmjZ7UwgE4KiI8HXbxmZE8iZVI4Y1PoLE2/5lGWIkjAzeRI=
+	t=1792418824; cv=none; b=NP9DfuRfrQraOM8VQQ/DcQBtCfhJRbFQvoNmHZbY3h34v0Nj2Toiv8Qw6BJAh8yrr3cpj5l9frCTIMQJ10/nngDAaA9QywuWuCQzCL2spOu/CtO2UBfnrCuhPCXE3H3Ua6IJgiMKE1Di1ydBrPQtJboy+r6KO29+WZ2sptU9An0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418823; c=relaxed/simple;
-	bh=SEXOvpv4tjRY8TmdjmlMaarnyXmkYcb0LWl4CaXOQ2U=;
+	s=arc-20240116; t=1792418824; c=relaxed/simple;
+	bh=eIiTJCnbyurFWbexnYa44LpNvzRx5yq71nsTVY+qbPo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZPiONGYPVCTIQMsk209F07hFMfP89qR8kptw8hpLolZjSlrqouJG/JsYjeomeMKp+bKw1wMRcJ4+PQRZim412twMZ+4I4hWrTfsrqVdTrjcNFwE8+WwvtIEjGSRr2M0Nv2YO/H2BIMwJlKobsgQC6hm138mzGcujnYSxO7hoiJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nR16xfd7; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=KJEN3Uqq3mA0dz0LC7vBp9eHfmtydtBtX9oUL4yCaYsdoEj36QOUYFQwWGRsNsAP4fU9bkDFf7ETWeX8pEvVtUNwIhFophadJkD63kzsa48fSP4wKqdFsMdzF2iSOynjHrqQMFECjzl8xAE8p//Z7Tn9RpJVHq+nughHR/8Ye5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eOFNmjFN; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nR16xfd7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3848D1F000C8;
-	Mon, 19 Oct 2026 14:06:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eOFNmjFN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABC731F000C7;
+	Mon, 19 Oct 2026 14:06:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418810;
-	bh=Txqof9Akvi325cjYNjB/ahec7ok75H6zc/VAzTFmsdQ=;
+	s=k20260515; t=1792418817;
+	bh=56dMIbxR9eJy41+fq2GpRGFSyd+njYgwae4ZeSsn8ek=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=nR16xfd7PL6OfpL/nylqaHlqJd9RM1CUt1kt3khds2ngQrBRB3APxsqXAI5vaknAC
-	 u38rssmoBIu/o/vbq7wVjL8LN/cueEumJlZcrB3/oSJf+8Bhu6QUM6mK/SaDuO8+O+
-	 PVuc06GIKYPOlfpqNp5Rp9mLxTynm6/xeaJHNzWeZhU/EkPhQdwl1Rz53iTcVmorhD
-	 OukgXhly3tHlFDtMIhnIDXjm9/Z3Kle+hgQCmRYmLqGko9GGamNjKbjTsASGz4QXlK
-	 qpoJiNoKuTqITaJMtKcjX/eAfwsSABfNc5z+QFGWNy3OFaXBN+zzwVRw5jp6VSHLLd
-	 3FvT19IaXo5+A==
+	b=eOFNmjFNtXbodbWsrfan8Yfl82s8rwCq4WYVVzzwnw5a1gJ+lEAi3yLtxUMo+Fhdw
+	 wxt6MzEXElIqIuzOBC9TVNSd5yQtK7HG+4UTVMQxTeyl3B3pm2JNbfmBWSdAfBe2s+
+	 PnQ+JNGnEzCBXCPVezWQeU1NbmvevXu/iZjCXL21AG8+0njaU4YXqM0FwJ61kUPYn6
+	 6iAgk5l1PASOplT2yspvZDOwzC/6NXW6sfPekn+15iamgQmpzBV1ykVY67QZjmFGTq
+	 e76L/GE9XXq7wJOERwnTGGXprT9aumuYTBT13RNRKeCp4v1qLd3VuTdDe5vVt7Fcjo
+	 g53L1szYqP8pg==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,9 +33,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: enable TCP keepalive for accepted connections
-Date: Mon, 19 Oct 2026 09:53:24 -0400
-Message-ID: <20261019135441.1420968-513-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: fix SMB2 byte-range lock end offset
+Date: Mon, 19 Oct 2026 09:53:29 -0400
+Message-ID: <20261019135441.1420968-518-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -53,17 +53,17 @@ Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 56549c18a4f75309161ca780feaa4d17904e3ee9 ]
+[ Upstream commit 54d90311f9b4eb23f3b0b62650b0cfddb11a12ef ]
 
-A client that disappears without sending a FIN or RST can leave its
-ksmbd connection in ESTABLISHED indefinitely. ksmbd sets a socket
-receive timeout, but the connection receive loop retries timeout errors
-without a limit, so the connection remains in conn_list and consumes the
-per-IP connection quota.
+SMB2 describes a byte-range lock using an offset and a length, while
+Linux file_lock uses an inclusive end offset. smb2_lock() currently sets
+fl_end to start + length and consequently locks one extra byte for every
+nonzero-length request.
 
-Enable SO_KEEPALIVE on accepted TCP sockets so the TCP stack can detect a
-silent peer failure. The keepalive idle time, interval, and probe count
-remain controlled by the existing TCP sysctl settings.
+Translate nonzero lengths to start + length - 1 and reject ranges that
+cannot be represented by loff_t instead of silently truncating them at
+OFFSET_MAX. Track zero-length locks from the request length so one-byte
+ranges are not mistaken for zero-length locks after endpoint conversion.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -71,407 +71,464 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-The local tree is **6.12.111** (`pending-6.12`). The buggy
-accept/receive path is present, and this is a small, real connection-
-leak fix that belongs here.
+The local tree is **6.12.111** (`pending-6.12`). The candidate is
+mainline `54d90311f9b4e` (`ksmbd: fix SMB2 byte-range lock end offset`).
+It is not in this checkout, and the buggy `smb2_lock()` conversion is.
 
----
+===============================================================
+PHASE 1: COMMIT MESSAGE FORENSICS
+===============================================================
 
-## PHASE 1: COMMIT MESSAGE FORENSICS
+Step 1.1: PARSE THE SUBJECT LINE
+Record: [ksmbd] [fix] [SMB2 byte-range lock end offset is off by one vs
+Linux file_lock inclusive ends]
 
-**Step 1.1: PARSE THE SUBJECT LINE**
-Record: **[ksmbd]** **[enable]** Enable TCP keepalive on accepted ksmbd
-sockets so a silent peer does not leave the connection ESTABLISHED
-forever.
-
-**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
 Record:
-- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>` (ksmbd
+- Signed-off-by: Namjae Jeon \<linkinjeon@kernel.org\> (ksmbd
   maintainer)
-- No **Fixes:**, **Reported-by:**, **Tested-by:**, **Reviewed-by:**,
-  **Acked-by:**, **Link:**, or **Cc: stable** on this commit (absence
-  expected for this review)
-- Companion later commit `80b6367ec37f` has `Link:
-  https://github.com/openwrt/openwrt/issues/24744` (different bug: FIN-
-  WAIT-1 orphans)
+- No Fixes:
+- No Reported-by / Tested-by / Reviewed-by / Acked-by
+- No Link:
+- No Cc: stable
+Absence of Fixes/Cc:stable is expected for this review pipeline and is
+not a negative signal.
 
-**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
+Step 1.3: ANALYZE THE COMMIT BODY TEXT
 Record:
-- **Bug:** Client vanishes without FIN/RST; ksmbd connection stays
-  ESTABLISHED.
-- **Mechanism:** `sk_rcvtimeo` is set, but the receive loop retries
-  timeout/`-EAGAIN` with no limit, so the conn stays in `conn_list` and
-  consumes the per-IP quota.
-- **Fix:** `sock_set_keepalive()` on the accepted socket;
-  idle/interval/probes stay on existing TCP sysctls.
-- **Symptom:** leaked kthreads/sockets and eventual refusal of new
-  clients from that IP.
-- **Version info:** none in the message. Code path has been in-tree
-  since the 2023 unlimited-retry change.
+- Bug: SMB2 describes a lock as (offset, length). Linux `file_lock` uses
+  an inclusive `fl_end`. `smb2_lock()` sets `fl_end = start + length`,
+  so every nonzero-length lock covers one extra byte.
+- Symptom: adjacent-byte I/O or locks can hit a false conflict;
+  unlock/lock ranges disagree with Windows/Samba; huge ranges are
+  silently truncated at `OFFSET_MAX` instead of being rejected.
+- Root cause: missing `length - 1` conversion, plus `start == end` used
+  as a zero-length detector (that becomes wrong once 1-byte locks
+  correctly get `start == end`).
+- No kernel version called out in the message. Pull text for 7.3-rc1
+  lists this among protocol-compatibility lock fixes.
 
-**Step 1.4: DETECT HIDDEN BUG FIXES**
-Record: Not disguised. It is explicitly a leak/stuck-connection fix that
-uses an existing socket option. Not a new userspace API.
+Step 1.4: DETECT HIDDEN BUG FIXES
+Record: Not disguised. It is an explicit off-by-one / range-translation
+bug fix, plus a necessary zero-length tracking correction so the
+conversion does not reclassify 1-byte locks as empty.
 
----
+===============================================================
+PHASE 2: DIFF ANALYSIS - LINE BY LINE
+===============================================================
 
-## PHASE 2: DIFF ANALYSIS
-
-**Step 2.1: INVENTORY THE CHANGES**
+Step 2.1: INVENTORY THE CHANGES
 Record:
-- File: `fs/smb/server/transport_tcp.c` (**+6 / -0**)
-- Function: `ksmbd_kthread_fn()` (accept path)
-- Scope: single-file surgical fix (one call + comment)
+- File: `fs/smb/server/smb2pdu.c` only (+14 / -30)
+- Functions: `smb2_lock_init()`, `smb2_lock()`
+- Scope: single-file surgical fix
 
-**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
 Record:
-- **Before:** After accept, set `sk_rcvtimeo` / `sk_sndtimeo`, then
-  `ksmbd_tcp_new_connection()`.
-- **After:** Same, plus `sock_set_keepalive(client_sk->sk)` so TCP
-  probes a silent peer.
-- Path: normal accept of a new SMB TCP connection.
+1. `smb2_lock_init()`: stop inferring `zero_len` from `start == end`;
+   take it from the SMB2 request length (`!lock_length`).
+2. Range setup in `smb2_lock()`:
+   - Before: clamp start/length to `OFFSET_MAX`, set `fl_end = start +
+     length`, then reject wrap with `fl_end < fl_start`.
+   - After: reject if start or inclusive end cannot be represented in
+     `loff_t`; set `fl_end = start + length - 1` (or `start` if length
+     is 0).
+3. Zero-byte conflict tests: `< end` → `<= end` so the last locked byte
+   is included.
+4. Non-zero overlap test: ad-hoc half-open checks → standard inclusive
+   overlap (`start1 <= end2 && start2 <= end1`), matching VFS
+   `locks_overlap()`.
 
-**Step 2.3: IDENTIFY THE BUG MECHANISM**
+Step 2.3: IDENTIFY THE BUG MECHANISM
+Record: [Logic / correctness, plus bounds]
+- Off-by-one: POSIX `fl_end` is inclusive (`fs/locks.c` uses `fl_end =
+  fl_start + (l_len - 1)`).
+- Classification: after that conversion, a 1-byte lock has `start ==
+  end`. Using that as `zero_len` would skip `vfs_lock_file()` (`if
+  (smb_lock->zero_len) goto skip`).
+- Overflow: old code silently truncated at `OFFSET_MAX`; new code
+  returns `STATUS_INVALID_LOCK_RANGE`.
+- Conflict checks: old comparisons assumed exclusive-ish ends and missed
+  some inclusive overlaps.
+
+Step 2.4: ASSESS THE FIX QUALITY
+Record: Obviously correct. Same conversion as VFS
+`flock_to_posix_lock()` and the CIFS client (`fl_end = start + (length ?
+length - 1 : 0)`). Overlap test matches `locks_overlap()`. Minimal, no
+API change. Regression risk is low: adjacent-byte I/O that was wrongly
+denied will now succeed; unrepresentable ranges that were clamped will
+now fail, which matches the spec.
+
+===============================================================
+PHASE 3: GIT HISTORY INVESTIGATION
+===============================================================
+
+Step 3.1: BLAME THE CHANGED LINES
 Record:
-- **Category:** resource leak / stuck connection (logic/correctness),
-  mitigated by a standard TCP keepalive workaround.
-- **Broken behavior:** `ksmbd_conn_handler_loop()` reads the RFC1002
-  header with `max_retries = -1`. `ksmbd_tcp_readv()` treats negative
-  `max_retries` as unlimited `-EAGAIN` retries. `KSMBD_TCP_RECV_TIMEOUT`
-  is `7 * HZ`, so a dead peer yields `-EAGAIN` forever.
-- `ksmbd_conn_alive()` only drops idle conns when `deadtime > 0` **and**
-  `open_files_count == 0`. A crashed client with open files stays alive
-  forever.
-- **Fix:** `sock_set_keepalive()` → `tcp_set_keepalive()` → keepalive
-  timer. Failed probes produce RST/`tcp_write_err()`, `kernel_recvmsg()`
-  returns 0/error, handler exits, conn leaves `conn_list`.
+- Core `fl_end = fl_start + lock_length` comes from `e2f34481b24db2`
+  (“cifsd: add server-side procedures for SMB3”, 2021-05-10), first in
+  v5.15-rc1.
+- `OFFSET_MAX` clamping: `50bf80a553ccb5` (“cifsd: fix xfstests
+  generic/504 test failure”).
+- `zero_len` / conflict checks: `d63528eb0d43c4` (Hyunchul Lee,
+  2021-07-10).
+The bug has been in ksmbd since the server was merged.
 
-**Step 2.4: ASSESS THE FIX QUALITY**
+Step 3.2: FOLLOW THE FIXES: TAG
+Record: No Fixes: tag. The introducing commit is in this tree (`git
+merge-base --is-ancestor e2f34481b24db2 HEAD` succeeded).
+
+Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
 Record:
-- Obviously correct: same helper NFS/RPC and RDS already use
-  (`sock_set_keepalive` since 2020).
-- Minimal; comment-only extra.
-- Regression risk **low**: default keepalive is 2 hours + 9 probes ×
-  75s. Healthy SMB clients send traffic/echoes. No new sysctl/API. Does
-  not change the unlimited-retry policy for truly idle-but-alive
-  sessions.
+- Already in this tree: `f751d6e39d4c9` “ksmbd: Do not skip lock checks
+  for single-byte ranges” — `check_lock_range()` uses inclusive `start +
+  length - 1`. That makes the remaining `smb2_lock()` off-by-one more
+  inconsistent, not less.
+- Later on fs-next, not required here: `5ce5227cd60b7` “recognize
+  replayed SMB2 lock sequences” (replay feature, not a prerequisite).
+Standalone.
 
----
+Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
+Record: Namjae Jeon is the ksmbd maintainer (MAINTAINERS + Git). This is
+not a drive-by change.
 
-## PHASE 3: GIT HISTORY INVESTIGATION
+Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
+Record: No new helpers. `smb2_lock_init()` has a single caller. `git
+apply --check` of `54d90311f9b4e` succeeds on this tree (hunk offsets
+only). Standalone.
 
-**Step 3.1: BLAME THE CHANGED LINES**
+===============================================================
+PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+===============================================================
+
+Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
 Record:
-- Timeout assignment: present since original cifsd/ksmbd
-  (`0626e6641f6b`, 2021).
-- Unlimited retry: **`be6f42fad5f5fd`** “ksmbd: don't terminate inactive
-  sessions after a few seconds” (**v6.3-rc4**, 2023-03-22). That commit
-  is in this tree and was itself `Cc: stable`. Keepalive was never added
-  then.
+- `b4 dig -c 54d90311f9b4e` (with and without `-C`/`-a`):
+  lore.kernel.org returned errors; no thread URL.
+- WebFetch of lore.kernel.org: HTTP 403.
+- LKML `[GIT PULL] ksmbd server update for 7.3-rc1` lists this commit in
+  Namjae’s 7.3-rc1 pull, among lock/protocol-compatibility fixes.
+UNVERIFIED: individual review comments, v2/v3 revisions, reviewer
+Cc:stable.
 
-**Step 3.2: FOLLOW THE FIXES: TAG**
-Record: No Fixes: tag. Conceptual introducer is `be6f42fad5f5fd`,
-present here.
+Step 4.2: CHECK WHO REVIEWED THE PATCH
+Record: Only the maintainer SOB is on the commit. `b4 dig -w` failed.
+Subsystem maintainer authored it.
 
-**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
+Step 4.3: SEARCH FOR THE BUG REPORT
+Record: No Reported-by on this commit. Older ksmbd-tools issue #68 shows
+real users hitting `smb2_lock` “end offset(ffffffffffffffff) is smaller
+than the start offset” — the overflow path this patch now rejects
+instead of wrapping. That report is historical (cifsd era), not a direct
+report of this patch.
+
+Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
+Record: Adjacent 7.3 lock patches are replay/UAF/compound features. This
+conversion fix does not depend on them. Related inclusive-range I/O fix
+is already in this tree.
+
+Step 4.5: CHECK STABLE MAILING LIST HISTORY
+Record: lore.kernel.org/stable search could not be fetched (403). No
+verified stable NAK. This tree does not already contain “lock end
+offset”.
+
+===============================================================
+PHASE 5: CODE SEMANTIC ANALYSIS
+===============================================================
+
+Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF
+Record: `smb2_lock_init()`, `smb2_lock()`
+
+Step 5.2: TRACE CALLERS
 Record:
-- Recent `transport_tcp.c` work: per-IP limits, `sock_create_kern`,
-  `active_num_conn` leaks.
-- Same-day companion: **`80b6367ec37f`** “keep TCP timers alive for
-  kernel sockets” (`sk_net_refcnt_upgrade` on the **listen** socket).
-  That is a **different** bug (FIN-WAIT-1 orphans after `tcp_close()`
-  clears timers on kernel sockets). Not required for keepalive on a
-  still-held ESTABLISHED socket.
-- Standalone for the ESTABLISHED leak.
+- `smb2_lock()` is the SMB2_LOCK handler
+  (`smb2_0_server_cmds[SMB2_LOCK_HE]` in `fs/smb/server/smb2ops.c`).
+- `smb2_lock_init()` is only called from `smb2_lock()`.
+Reachable from any SMB2/SMB3 client that issues LOCK.
 
-**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-Record: Namjae Jeon is the ksmbd maintainer; many recent ksmbd fixes in
-this tree.
+Step 5.3: TRACE CALLEES
+Record: `vfs_lock_file()`, `locks_free_lock()`, `smb_flock_init()`,
+ksmbd connection lock-list walk. Zero-length locks still skip
+`vfs_lock_file()` by design (POSIX `l_len == 0` means lock-to-EOF, which
+is not SMB zero-byte lock semantics).
 
-**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
+Step 5.4: FOLLOW THE CALL CHAIN
+Record: Network SMB2 LOCK → `smb2_lock()` → VFS POSIX locks / ksmbd lock
+list → later `check_lock_range()` on read/write/truncate. Userspace-
+reachable over the network. Not a rare config path if
+`CONFIG_SMB_SERVER` is enabled.
+
+Step 5.5: SEARCH FOR SIMILAR PATTERNS
+Record: Same inclusive conversion already exists in `fs/locks.c` and
+`fs/smb/client/cifssmb.c`. I/O-side `check_lock_range()` in this tree
+already uses `pos + count - 1`. Only the LOCK request path was still off
+by one.
+
+===============================================================
+PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+===============================================================
+
+Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
+Record: Yes. `fs/smb/server/smb2pdu.c` around 7584–7602 still does
+`fl_end = fl_start + lock_length` and `if (lock->start == lock->end)
+lock->zero_len = 1`. Introduced with cifsd in v5.15, present in
+6.12.111.
+`git merge-base --is-ancestor 54d90311f9b4e HEAD` failed — the fix is
+not here.
+
+Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
+Record: Clean apply (`git apply --check` succeeded; hunks at 7488+).
+Nearby mainline-only context (`lock_count > 64`, `kzalloc_obj`) is not
+part of this commit’s hunks. Expected difficulty: clean apply.
+
+Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
+Record: Inclusive I/O lock checks (`f751d6e39d4c9`) are here. No prior
+“lock end offset” fix. Applying this makes LOCK and I/O use the same
+inclusive model.
+
+===============================================================
+PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+===============================================================
+
+Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
+Record: [fs/smb/server (ksmbd)] [IMPORTANT for ksmbd users / PERIPHERAL
+vs core VFS]. Byte-range locks are a core SMB feature for Windows apps,
+databases, and exclusive file access. `CONFIG_SMB_SERVER` defaults to n.
+
+Step 7.2: ASSESS SUBSYSTEM ACTIVITY
+Record: Actively maintained; this 6.12 tree already carries many ksmbd
+stable backports. The author is the maintainer.
+
+===============================================================
+PHASE 8: IMPACT AND RISK ASSESSMENT
+===============================================================
+
+Step 8.1: DETERMINE WHO IS AFFECTED
+Record: ksmbd/SMB3 server users (`CONFIG_SMB_SERVER`). Every SMB2 LOCK
+with nonzero length.
+
+Step 8.2: DETERMINE THE TRIGGER CONDITIONS
+Record: Common for any client using byte-range locks (Office, databases,
+installers, some build tools). Network-facing; an unprivileged SMB user
+who can open a file can issue LOCK. Not a rare race.
+
+Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
 Record:
-- Needs `sock_set_keepalive()` — in this tree (`ce3d9544cecac`, 2020),
-  `EXPORT_SYMBOL`.
-- `connection.h` already includes `<net/sock.h>`.
-- Companion `sk_net_refcnt_upgrade` is **not** a prerequisite for this
-  ESTABLISHED-path fix.
-- Can apply standalone.
+- Over-lock of one extra byte → false `STATUS_FILE_LOCK_CONFLICT` /
+  denied I/O on the adjacent byte; apps can fail or block. HIGH for
+  ksmbd shares that use locking.
+- Silent clamp of huge ranges → requested bytes past `OFFSET_MAX` stay
+  unlocked. Integrity hole, rare offsets. MEDIUM.
+- If this conversion were done without passing original `zero_len`,
+  1-byte locks would skip VFS — that would be under-lock / data-race.
+  The patch prevents that. HIGH if mishandled; the patch handles it.
+Severity overall: HIGH for locking correctness, not a kernel oops.
 
----
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-
-**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+Step 8.4: CALCULATE RISK-BENEFIT RATIO
 Record:
-- Upstream SHA: **`56549c18a4f75309161ca780feaa4d17904e3ee9`**
-- Lore:
-  https://patch.msgid.link/20260820135420.5634-1-linkinjeon@kernel.org
-- Submitted 2026-08-20 as `[PATCH]` (with the timer patch as `-2`);
-  merged in ksmbd 7.3-rc1 pull (“Improve TCP connection reliability…”)
-- `b4 dig -a`: v1 keepalive + v2 timer companion, same day. No later
-  unapplied revision.
-- Mbox: author-only; no NAK, no extra review comments (maintainer tree).
-- WebFetch of lore URLs returned 403; thread recovered via `b4`.
+- Benefit: correct exclusive ranges vs Windows/Samba/VFS; fewer false
+  conflicts; no silent truncation.
+- Risk: very low (14/30 lines, one file, applies cleanly, matches
+  established conversion).
+- Ratio: strongly favors backporting.
 
-**Step 4.2: CHECK WHO REVIEWED THE PATCH**
-Record (`b4 dig -w`): linux-cifs@vger.kernel.org, Sergey Senozhatsky,
-Tom Talpey, Atte Heikkilä, ChenXiaoSong. No NAK found.
+===============================================================
+PHASE 9: FINAL SYNTHESIS
+===============================================================
 
-**Step 4.3: SEARCH FOR THE BUG REPORT**
-Record:
-- Direct Reported-by: none on this commit.
-- Real-world match: [cifsd-team/ksmbd#627](https://github.com/cifsd-
-  team/ksmbd/issues/627) — Windows 11, stale ESTABLISHED sockets,
-  connection limit exhausted (default ~32), only restart helps. Kernel
-  6.19.9 in that report; **same receive-loop logic is in 6.12**.
-- Related: namjaejeon/ksmbd#517 (ESTABLISHED after client power-off;
-  `deadtime = 10` did not help — consistent with open files skipping
-  deadtime).
+Step 9.1: COMPILE THE EVIDENCE
+FOR:
+- Real, long-standing off-by-one in mandatory SMB byte-range locks
+  (since v5.15).
+- User-visible false conflicts on the extra byte; protocol mismatch with
+  Windows/Samba.
+- Silent `OFFSET_MAX` truncation replaced by a spec-style invalid-range
+  error.
+- Zero-length vs 1-byte classification fixed so inclusive ends do not
+  skip `vfs_lock_file()`.
+- Overlap tests aligned with VFS `locks_overlap()`.
+- Small, maintainer-authored, applies cleanly here.
+- This tree already uses inclusive ends on the I/O path, so leaving LOCK
+  wrong is inconsistent.
 
-**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-Record: Two-patch reliability pair. Patch 1 = this (keepalive). Patch 2
-= listen-socket netns upgrade for post-close timers. This patch is
-useful alone.
+AGAINST:
+- No crash/UAF/CVE; no Reported-by on this commit.
+- ksmbd is opt-in, not core VFS.
+- Could not retrieve the original review thread (lore errors).
 
-**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-Record: lore.kernel.org/stable search 403. No evidence this was already
-rejected for 6.12. Not in this tree (`git merge-base --is-ancestor
-56549c18… HEAD` failed).
+UNRESOLVED:
+- Original mailing-list review comments / explicit stable nomination.
 
----
+Step 9.2: APPLY THE STABLE RULES CHECKLIST
+1. Obviously correct and tested? PASS — matches VFS and CIFS client
+   math; maintainer SOB; in the 7.3-rc1 ksmbd pull.
+2. Fixes a real bug that affects users? PASS — wrong lock coverage on
+   every nonzero SMB2 LOCK.
+3. Important issue? PASS — mandatory lock correctness (false conflicts;
+   possible under-lock on truncated huge ranges). Not a panic, but it is
+   data-access / sharing integrity.
+4. Small and contained? PASS — one file, +14/-30.
+5. No new features or APIs? PASS.
+6. Can apply to the local tree? PASS — `git apply --check` clean; buggy
+   code present.
 
-## PHASE 5: CODE SEMANTIC ANALYSIS
+Step 9.3: CHECK FOR EXCEPTION CATEGORIES
+Record: Not a device-ID/quirk/DT/build/docs exception. Ordinary
+correctness fix.
 
-**Step 5.1: IDENTIFY KEY FUNCTIONS**
-Record: modified `ksmbd_kthread_fn`; callees `sock_set_keepalive` /
-`tcp_set_keepalive`; related `ksmbd_tcp_readv`,
-`ksmbd_conn_handler_loop`, `ksmbd_conn_alive`.
+Step 9.4: MAKE YOUR DECISION
+This should be backported to this 6.12 tree. The extra locked byte is a
+real protocol bug on a path every locking SMB client hits. The patch is
+small, correct, has no prerequisites that this tree lacks, and applies
+cleanly.
 
-**Step 5.2: TRACE CALLERS**
-Record:
-- `ksmbd_kthread_fn` ← `kthread_run` in `ksmbd_tcp_run_kthread` (listen
-  on 445).
-- Header read: `ksmbd_conn_handler_loop` → `t->ops->read(..., -1)` →
-  `ksmbd_tcp_read` → `ksmbd_tcp_readv`.
-- Process context, one kthread per connection. Userspace-reachable: any
-  SMB client connect.
+Verification:
+- [Phase 1] Parsed subject/body/tags on `54d90311f9b4e`; maintainer SOB
+  only; no Fixes/Reported-by/Cc:stable.
+- [Phase 2] Diff: `smb2_lock_init` + `smb2_lock` in
+  `fs/smb/server/smb2pdu.c`, +14/-30; inclusive `fl_end`, request-based
+  `zero_len`, overlap `<=`.
+- [Phase 2] Confirmed VFS conversion at `fs/locks.c:515-518` (`fl_end =
+  fl_start + (l_len - 1)`) and `locks_overlap()` at 621-624.
+- [Phase 2] Confirmed CIFS client uses the same formula at
+  `fs/smb/client/cifssmb.c:2122-2124`.
+- [Phase 2] Confirmed zero-len locks skip `vfs_lock_file()` at
+  `smb2pdu.c:7742-7748` in this tree.
+- [Phase 3] `git blame`: buggy `fl_end = start + length` from
+  `e2f34481b24db2` (v5.15-rc1); clamp from `50bf80a553ccb5`.
+- [Phase 3] `git merge-base --is-ancestor e2f34481b24db2 HEAD`
+  succeeded; `54d90311f9b4e` is not an ancestor of HEAD.
+- [Phase 3] Follow-up `5ce5227cd60b7` is lock-replay, not a
+  prerequisite.
+- [Phase 4] `b4 dig -c 54d90311f9b4e` failed (lore errors). LKML 7.3-rc1
+  ksmbd pull lists this commit.
+- [Phase 4] UNVERIFIED: original lore review thread (403/server error).
+- [Phase 5] `smb2_lock` is `SMB2_LOCK_HE` proc; `smb2_lock_init` has one
+  caller.
+- [Phase 6] `make kernelversion` / Makefile: 6.12.111, branch
+  `pending-6.12`, `git describe HEAD` = `p-6.12-3-gc504cf0baa3d8`.
+- [Phase 6] Live code at `smb2pdu.c:7602` still uses `fl_start +
+  lock_length`.
+- [Phase 6] `git show 54d90311f9b4e | git apply --check` succeeded.
+- [Phase 6] Related `f751d6e39d4c9` (inclusive I/O checks) is already in
+  HEAD.
+- [Phase 7] MAINTAINERS: ksmbd maintained by Namjae Jeon;
+  `CONFIG_SMB_SERVER` default n.
+- [Phase 8] Failure mode: false lock conflicts / incorrect coverage on
+  SMB2 LOCK; severity HIGH for ksmbd locking users, not a kernel oops.
+- UNVERIFIED: Could not read lore.kernel.org patch review or stable@
+  discussion.
 
-**Step 5.3: TRACE CALLEES**
-Record: `sock_set_keepalive` locks the sock, calls
-`sk->sk_prot->keepalive(sk, true)` (`tcp_set_keepalive` for TCP), sets
-`SOCK_KEEPOPEN`. `tcp_set_keepalive` arms
-`inet_csk_reset_keepalive_timer`. Failed probes: `tcp_send_active_reset`
-+ `tcp_write_err`.
-
-**Step 5.4: FOLLOW THE CALL CHAIN**
-Record: SMB connect to 445 → accept → keepalive enabled → handler recv
-loop. Unprivileged network clients can leave zombie conns (especially
-after crash/VPN drop). **Reachable.**
-
-**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-Record: `net/sunrpc/xprtsock.c` and `net/rds/tcp_listen.c` already call
-`sock_set_keepalive`. ksmbd was the outlier.
-
----
-
-## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
-
-**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-Record: **Yes.**
-- Tree: **pending-6.12 / 6.12.111** (`p-6.12-3-gc504cf0baa3d8`)
-- Accept path at `ksmbd_kthread_fn` (~L325–329): timeouts set, **no**
-  keepalive.
-- Unlimited retry in `ksmbd_tcp_readv` (L409–423) and `max_retries = -1`
-  (connection.c L444).
-- Introduced v6.3 (`be6f42fad5f5fd`); present for the whole 6.12
-  lifetime.
-- Keepalive commit is **not** an ancestor of HEAD.
-
-**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-Record: **Clean apply.** Insertion point matches this file exactly
-(`sk_sndtimeo` then `ksmbd_tcp_new_connection`). `sock_set_keepalive`
-already exported.
-
-**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-Record: No keepalive on ksmbd sockets. `deadtime` is optional userspace
-config and skipped when files are open. Not a substitute.
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-Record: **fs/smb/server (ksmbd)**. **IMPORTANT** (in-kernel SMB3 server:
-NAS, OpenWrt, appliances). Not core mm/VFS, but production file service.
-
-**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-Record: Active (connection-limit, sock_create_kern, leak fixes). Mature
-enough that this long-standing hole matters.
-
----
-
-## PHASE 8: IMPACT AND RISK ASSESSMENT
-
-**Step 8.1: DETERMINE WHO IS AFFECTED**
-Record: **Driver/config-specific:** `CONFIG_SMB_SERVER`. Typical stable
-users: NAS, routers, embedded SMB.
-
-**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-Record:
-- Trigger: client crash, sleep, VPN drop, power-off without FIN/RST.
-- Common on laptops/Wi‑Fi/VPN.
-- Unprivileged remote clients can fill the per-IP quota
-  (`max_ip_connections` is in this tree).
-- Timing: default first probe after **2 hours**, then ~11 minutes of
-  probes. Slow but **finite**, vs never.
-
-**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-Record:
-- Failure: kthread + socket + `conn_list` entry leak; per-IP/global
-  connection quota exhaustion; new mounts fail until ksmbd restart.
-- **Severity: HIGH** (service outage / resource leak). Not a panic, but
-  a real production hang of the SMB service.
-
-**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-Record:
-- **Benefit: HIGH** for ksmbd users (closes zombies, restores quota).
-- **Risk: VERY LOW** (6 lines, existing helper, sysctl-controlled,
-  conservative defaults).
-- Ratio strongly favors backport.
-
----
-
-## PHASE 9: FINAL SYNTHESIS
-
-**Step 9.1: COMPILE THE EVIDENCE**
-
-**FOR:**
-- Real stuck-connection / quota DoS, not style.
-- Unlimited `-EAGAIN` retry (`be6f42fad5f5fd`, in this tree, previously
-  sent to stable) without keepalive is the hole.
-- `deadtime` does not cover open-file + silent peer.
-- User reports of ESTABLISHED pile-up (#627).
-- 6-line, obviously correct, existing API.
-- Applies cleanly to 6.12.111.
-- Maintainer-authored; same pattern as sunrpc/RDS.
-
-**AGAINST:**
-- Looks like “enable a feature,” but it only turns on SO_KEEPALIVE.
-- Default 2-hour idle before probes (slow, still a fix).
-- No Fixes:/Cc: stable on this commit (not a negative per review rules).
-- Companion timer patch is separate (do not block this on it).
-
-**UNRESOLVED:**
-- lore.kernel.org HTTP 403 (thread recovered via b4).
-- No on-list Reviewed-by (maintainer submission).
-
-**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
-1. Obviously correct and tested? **PASS** — one well-known helper; in
-   mainline 7.3.
-2. Fixes a real bug that affects users? **PASS** — leaked ESTABLISHED
-   conns / quota; #627.
-3. Important issue? **PASS** — service DoS / resource leak on a file
-   server (HIGH).
-4. Small and contained? **PASS** — +6 lines, one function.
-5. No new features or APIs? **PASS** — existing SO_KEEPALIVE / sysctls
-   only.
-6. Can apply to the local tree? **PASS** — code and helper exist; clean
-   insert.
-
-**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-Record: Not a device-ID/DT/build/docs exception. Fits “hardware/protocol
-workaround”: enable kernel TCP keepalive so dead peers are detected.
-
-**Step 9.4: MAKE YOUR DECISION**
-This tree has the unlimited recv-timeout retry and no keepalive. The
-patch is the missing counterpart to the 2023 stable change that stopped
-tearing down idle sessions. Benefit is real for ksmbd; risk is
-negligible.
-
----
-
-### What it solves for stable users
-A client that disappears without FIN/RST leaves ksmbd in ESTABLISHED:
-the handler retries receive timeouts forever, holding a kthread and a
-`conn_list` slot (and the per-IP quota). That matches field reports of
-Windows clients filling the connection limit until ksmbd is restarted.
-Keepalive lets TCP fail the socket so the handler can tear the conn
-down.
-
-### Risk vs benefit
-Benefit: prevents unbounded connection growth and SMB accept failures.
-Risk: one `sock_set_keepalive()` with default 2-hour keepalive — will
-not drop healthy sessions on a short idle.
-
-### Concerns
-None that block 6.12. The later `sk_net_refcnt_upgrade` patch is a
-separate FIN-WAIT-1 orphan fix, not required for this ESTABLISHED-path
-change.
-
----
-
-### Verification
-- **[Phase 1]** Parsed message: enable keepalive; SOB Namjae Jeon; no
-  Fixes/Reported-by.
-- **[Phase 2]** Diff: +6 in `ksmbd_kthread_fn`;
-  `sock_set_keepalive(client_sk->sk)` after timeouts.
-- **[Phase 2]** Confirmed `ksmbd_tcp_readv` unlimited retry when
-  `max_retries < 0`; handler uses `-1` for header read.
-- **[Phase 2]** Confirmed `ksmbd_conn_alive()` returns true if
-  `open_files_count > 0`, ignoring deadtime.
-- **[Phase 2]** Confirmed `sock_set_keepalive` → `tcp_set_keepalive`
-  (`net/core/sock.c`, `net/ipv4/tcp_timer.c`).
-- **[Phase 3]** `git describe HEAD` / `make kernelversion`: **p-6.12-3 /
-  6.12.111**.
-- **[Phase 3]** Blame: unlimited retry from `be6f42fad5f5fd` (v6.3);
-  `git merge-base --is-ancestor be6f42fad5f5f HEAD` succeeded.
-- **[Phase 3]** `git merge-base --is-ancestor
-  56549c18a4f75309161ca780feaa4d17904e3ee9 HEAD` failed (not in this
-  tree).
-- **[Phase 3]** `sock_set_keepalive` introduced `ce3d9544cecac` (2020);
-  present here.
-- **[Phase 4]** `b4 dig -c 56549c18…`: lore `20260820135420.5634-1`;
-  series with timer patch `-2`.
-- **[Phase 4]** `b4 dig -w`: linux-cifs, Senozhatsky, Talpey, et al.
-- **[Phase 4]** `b4 dig -a`: v1 keepalive + companion timer patch; no
-  later unapplied rev.
-- **[Phase 4]** GitHub ksmbd#627: stale ESTABLISHED / quota exhaustion.
-- **[Phase 4]** Companion `80b6367ec37f`: listen-socket
-  `sk_net_refcnt_upgrade` for post-close timers — different bug.
-- **[Phase 5]** Call chain: accept kthread → `ksmbd_tcp_new_connection`
-  → `ksmbd_conn_handler_loop` → unlimited `read(..., -1)`.
-- **[Phase 5]** Same helper in sunrpc/RDS.
-- **[Phase 6]** Local accept path L325–329 has no keepalive; context
-  matches the patch.
-- **[Phase 6]** `connection.h` includes `<net/sock.h>`.
-- **[Phase 8]** Defaults: `TCP_KEEPALIVE_TIME` 2h, `PROBES` 9, `INTVL`
-  75s (`include/net/tcp.h`).
-- **UNVERIFIED:** HTTP fetch of lore.kernel.org (403); recovered via b4.
-  Whether every distro sets `deadtime` (irrelevant: deadtime skipped
-  with open files).
+The extra-byte lock is a real, old ksmbd protocol bug. The fix is small,
+matches VFS, and applies cleanly to 6.12.111.
 
 **YES**
 
- fs/smb/server/transport_tcp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ fs/smb/server/smb2pdu.c | 44 +++++++++++++----------------------------
+ 1 file changed, 14 insertions(+), 30 deletions(-)
 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 472d387098767..ede54bb049532 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -312,6 +312,12 @@ static int ksmbd_kthread_fn(void *p)
- 		ksmbd_debug(CONN, "connect success: accepted new connection\n");
- 		client_sk->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
- 		client_sk->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
-+		/*
-+		 * Detect peers that disappear without sending a FIN or RST.
-+		 * Otherwise the connection handler can retry receive timeouts
-+		 * indefinitely and keep the connection in conn_list.
-+		 */
-+		sock_set_keepalive(client_sk->sk);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 277c03fe2a4e4..ea5a130ef83ce 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -7604,7 +7604,7 @@ static int smb2_set_flock_flags(struct file_lock *flock, int flags)
+ }
  
- 		ksmbd_tcp_new_connection(client_sk);
- 	}
+ static struct ksmbd_lock *smb2_lock_init(struct file_lock *flock,
+-					 unsigned int cmd, int flags,
++					 unsigned int cmd, int flags, bool zero_len,
+ 					 struct list_head *lock_list)
+ {
+ 	struct ksmbd_lock *lock;
+@@ -7618,8 +7618,7 @@ static struct ksmbd_lock *smb2_lock_init(struct file_lock *flock,
+ 	lock->start = flock->fl_start;
+ 	lock->end = flock->fl_end;
+ 	lock->flags = flags;
+-	if (lock->start == lock->end)
+-		lock->zero_len = 1;
++	lock->zero_len = zero_len;
+ 	INIT_LIST_HEAD(&lock->clist);
+ 	INIT_LIST_HEAD(&lock->flist);
+ 	INIT_LIST_HEAD(&lock->llist);
+@@ -7712,32 +7711,18 @@ int smb2_lock(struct ksmbd_work *work)
+ 
+ 		lock_start = le64_to_cpu(lock_ele[i].Offset);
+ 		lock_length = le64_to_cpu(lock_ele[i].Length);
+-		if (lock_start > U64_MAX - lock_length) {
++		if (lock_start > OFFSET_MAX ||
++		    (lock_length &&
++		     lock_length - 1 > OFFSET_MAX - lock_start)) {
+ 			pr_err("Invalid lock range requested\n");
+ 			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
+ 			locks_free_lock(flock);
+ 			goto out;
+ 		}
+ 
+-		if (lock_start > OFFSET_MAX)
+-			flock->fl_start = OFFSET_MAX;
+-		else
+-			flock->fl_start = lock_start;
+-
+-		lock_length = le64_to_cpu(lock_ele[i].Length);
+-		if (lock_length > OFFSET_MAX - flock->fl_start)
+-			lock_length = OFFSET_MAX - flock->fl_start;
+-
+-		flock->fl_end = flock->fl_start + lock_length;
+-
+-		if (flock->fl_end < flock->fl_start) {
+-			ksmbd_debug(SMB,
+-				    "the end offset(%llx) is smaller than the start offset(%llx)\n",
+-				    flock->fl_end, flock->fl_start);
+-			rsp->hdr.Status = STATUS_INVALID_LOCK_RANGE;
+-			locks_free_lock(flock);
+-			goto out;
+-		}
++		flock->fl_start = lock_start;
++		flock->fl_end = lock_length ?
++			flock->fl_start + lock_length - 1 : flock->fl_start;
+ 
+ 		/* Check conflict locks in one request */
+ 		list_for_each_entry(cmp_lock, &lock_list, llist) {
+@@ -7753,7 +7738,8 @@ int smb2_lock(struct ksmbd_work *work)
+ 			}
+ 		}
+ 
+-		smb_lock = smb2_lock_init(flock, cmd, flags, &lock_list);
++		smb_lock = smb2_lock_init(flock, cmd, flags, !lock_length,
++					   &lock_list);
+ 		if (!smb_lock) {
+ 			err = -EINVAL;
+ 			locks_free_lock(flock);
+@@ -7827,7 +7813,7 @@ int smb2_lock(struct ksmbd_work *work)
+ 				/* check zero byte lock range */
+ 				if (cmp_lock->zero_len && !smb_lock->zero_len &&
+ 				    cmp_lock->start > smb_lock->start &&
+-				    cmp_lock->start < smb_lock->end) {
++				    cmp_lock->start <= smb_lock->end) {
+ 					spin_unlock(&conn->llist_lock);
+ 					up_read(&conn_list_lock);
+ 					pr_err("previous lock conflict with zero byte lock range\n");
+@@ -7836,17 +7822,15 @@ int smb2_lock(struct ksmbd_work *work)
+ 
+ 				if (smb_lock->zero_len && !cmp_lock->zero_len &&
+ 				    smb_lock->start > cmp_lock->start &&
+-				    smb_lock->start < cmp_lock->end) {
++				    smb_lock->start <= cmp_lock->end) {
+ 					spin_unlock(&conn->llist_lock);
+ 					up_read(&conn_list_lock);
+ 					pr_err("current lock conflict with zero byte lock range\n");
+ 					goto out;
+ 				}
+ 
+-				if (((cmp_lock->start <= smb_lock->start &&
+-				      cmp_lock->end > smb_lock->start) ||
+-				     (cmp_lock->start < smb_lock->end &&
+-				      cmp_lock->end >= smb_lock->end)) &&
++				if (cmp_lock->start <= smb_lock->end &&
++				    smb_lock->start <= cmp_lock->end &&
+ 				    !cmp_lock->zero_len && !smb_lock->zero_len) {
+ 					spin_unlock(&conn->llist_lock);
+ 					up_read(&conn_list_lock);
 -- 
 2.53.0
 
