@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C654558703;
-	Mon, 19 Oct 2026 13:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD60755CE8A;
+	Mon, 19 Oct 2026 13:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418231; cv=none; b=G+eeubZjuwwgrMesq4uFNXr1VPUzFgvswfG+gbcOj9HUuXYlLqU1Ej3j4Rih0RVai0M7eOU5ydAW/wq0sBPyvS470rfqrH6OoCYSastU1kvoDAJ5vENZWtdA2RZyXlsHpvAZJwE+A3IlSvNVjxt1iGCSZWQA/OkWaJ2d1ZYftNI=
+	t=1792418241; cv=none; b=meG8y8WFfLQiKIbFu0K74YBofOkl675cJuXPXksRZUB+uITyGfIAx8XFsUmEz1Tqwt3kE4wi4h7KNnTcs9HaAgntZbIBOZ3HjNhpcyQnBjVN+g0TjuU+leUkFs7Wk8OCl5p9g2DpiMBs4frGuUQ1XRHyZjoT6Rlf78OuorHZHq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418231; c=relaxed/simple;
-	bh=aHgLq/tebAINb5gYHKI0k1iGNAU4UAK6jtVtJx1xs3A=;
+	s=arc-20240116; t=1792418241; c=relaxed/simple;
+	bh=lllUlP1QonrTirlCoHP92O/x64/muos+cHM+k1w8JyE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a0YtO4YTvO9aGGyjc/HvYD34LpNML3rqac+gMArI/1hZeU/Q/bzB3Jdm5XskDg97akMNSREDiSIo01R4cSMpNgdwz5Yo3sMbCr3hS+Aqpw3kejbYgQve1t2wYvvGqGc6uNsZNfDPVjr/TuBiLe/6dT1EEWx16spftlpP8tICzm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddtRi9mQ; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=npA6mA/0a8IHrvphG+bVmk9JTcfunA9byzuhCHfHVjEgwEnsxk+FFlTE1AkX0j8g792EiGyJeyHbEscvyYiNngdjC5IJTR2zw3uSuB5AgGbcJqpRGKwaxugbP7ri3nwZ9US7zYmIiOVrM79erCmD1rLxWP7U2Fbww9qf0oQ/q6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PzYo2Eyl; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddtRi9mQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0BDB1F000C8;
-	Mon, 19 Oct 2026 13:57:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzYo2Eyl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8FF81F000C4;
+	Mon, 19 Oct 2026 13:57:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418228;
-	bh=0r/8Lb/WBrvIXryyNi1s30vdlPNeUoD+N6RqN8PvK/o=;
+	s=k20260515; t=1792418237;
+	bh=NOLY40vBr3l0eZcVND2O1VKq9S6GQPH/WQtkykAh8/M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ddtRi9mQh5Pr9pwqwQjf+1sIz2QQZ9eCiMa4mn42OG9tqNS1dcn8HORBCervIwuPz
-	 lStlOf5cuu5/W+0wbJMs29u+RaG0i6psAuUtgz1Qj7+ZKW56d7NyncGuU9q/uDYyIO
-	 Hx4bO/y8QooRdXdPWq2PxrYQLr+fEDKFDobNnnHg3Bzil6UWyNRoCZwEjLCZ/z9Njx
-	 QhkctS071vQGxrvjhAEMDz2Ar6WXnM4VZiOCbBbPowCEpt9/Cj+whnUasGDQEn1wAq
-	 cJYf3kHPNvv1M9Q0/o+a5B8opqbWxladQ4j+xV0iNLQ7vDyW0hnsxCygElP0O+V+ZC
-	 lzDSIULJPN1bQ==
+	b=PzYo2EylKwwp/h1b/TPMs9WTGtlSM4iGFAkiXKULlQc/sUcMD+DiBa2XeNW6YOZRr
+	 iIPXtZ9DBEAuIXviPQnje6CZcALvqgL4phEH0v832l8s97xi6Qqfl2J/9qeQqUANaE
+	 ccFH1ER2Qe5rSrOE+8wx3X5pOA38DG0NzdajtmL/lW27Nm0wHd8wZpNhyZla0Mtqp/
+	 IE5so/gWCuxRYx3iJ3b9zUMcjK4l62Ex1IVsMu+j3Q+xBpxuJ75yhaD3b2L07fqL8c
+	 s+z4M4iCjgE7/zkGcaUsK26dU0W8FmnlsgwU0NNglpBm+hF/vgbdDRD4Xu8mXl1Kex
+	 zb7zwaUlD/bog==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,9 +33,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: notify parent directory leases on child create
-Date: Mon, 19 Oct 2026 09:46:34 -0400
-Message-ID: <20261019135441.1420968-103-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.1] ksmbd: handle allocated range queries on dense files
+Date: Mon, 19 Oct 2026 09:46:41 -0400
+Message-ID: <20261019135441.1420968-110-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -53,18 +53,25 @@ Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit abe5acb34282206c2a6303d0e09b3165b1addf0e ]
+[ Upstream commit 350684e0498512d06963858b810101f58563810b ]
 
-BVT_DirectoryLeasing_ReadWriteHandleCaching requires a parent directory
-lease break notification when another client creates a child in the
-leased directory. A child CREATE without a lease context did not notify
-the parent lease holders because the notification path expected a
-non-NULL lease context.
+FSCTL_QUERY_ALLOCATED_RANGES currently relies on SEEK_DATA and SEEK_HOLE
+for every file. That works for files with holes, but it is not a good
+match for dense files.
 
-Allow the parent lease notification helper to handle a NULL child lease
-context and notify matching parent leases. Invoke it after a child is
-created without a lease context while preserving the existing lease-key
-filtering for requests that provide one.
+A zeroed range in a dense file may be represented as an unwritten extent
+and skipped by SEEK_DATA. The server can then return no allocated ranges
+even though the file should still be treated as allocated from the
+protocol point of view.
+
+For dense files, report the requested range clipped to EOF as allocated
+instead of probing holes. Keep using SEEK_DATA and SEEK_HOLE for files
+marked with FILE_ATTRIBUTE_SPARSE_FILE, and wait for writeback before
+probing so punch-hole updates are visible to the filesystem seek
+implementation.
+
+This fixes the case where a query after zeroing data could return no
+ranges for a dense file.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -72,518 +79,468 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-The local tree is **6.12.111** (`pending-6.12`). Directory leasing is
-already advertised here, and this patch fills a hole in that existing
-notification path.
+Connection lost, reconnecting to https://agentn.us.api5.cursor.sh
+(attempt 1)...
+Retry attempt 1...
+Local tree is **6.12.111** (`pending-6.12`). The buggy
+`ksmbd_vfs_fqar_lseek()` path is in this checkout; the candidate is not.
 
----
+===============================================================
+PHASE 1: COMMIT MESSAGE FORENSICS
+===============================================================
 
-## PHASE 1: COMMIT MESSAGE FORENSICS
+Step 1.1: PARSE THE SUBJECT LINE
+Record: **[ksmbd] [handle] FSCTL_QUERY_ALLOCATED_RANGES on dense (non-
+sparse) files should not use SEEK_DATA/SEEK_HOLE**
 
-**Step 1.1: PARSE THE SUBJECT LINE**
-
-Record: **[ksmbd] [notify] parent directory leases on child create**
-
-- Subsystem: `ksmbd` (kernel SMB3 server)
-- Verb: “notify” — protocol-correctness / missing-event fix, not a
-  feature add
-- Claimed intent: send a parent directory lease break when a child is
-  created
-
-**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
-
-Verified from `git log -1 --format='%B' abe5acb342822`:
-
-- **Signed-off-by: Namjae Jeon** `<linkinjeon@kernel.org>` (author and
-  committer; ksmbd maintainer)
-- **No Fixes:** tag (expected for this review pipeline)
-- **No Cc: stable** (expected)
-- **No Reported-by / Tested-by / Reviewed-by / Acked-by / Link**
-- Ignore pipeline-added Sasha Levin SOB / `[Upstream commit …]` if
-  present on a candidate copy
-
-Notable: maintainer-authored, no external review tags. The body cites
-Microsoft BVT `BVT_DirectoryLeasing_ReadWriteHandleCaching`.
-
-**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
-
+Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
 Record:
-- **Bug:** A child CREATE with no lease context never notifies holders
-  of a parent directory lease, because
-  `smb_send_parent_lease_break_noti()` assumed `lctx` was non-NULL.
-- **Symptom:** Windows BVT `BVT_DirectoryLeasing_ReadWriteHandleCaching`
-  fails; SMB3 clients with a directory lease keep a stale directory
-  cache after another client creates a child.
-- **Version info:** None in the message. Introducing code is from
-  v6.7-rc6 (`d47d9886aeef7`).
-- **Root cause:** Notification only ran on CREATE-with-lease-context;
-  the helper immediately used `lctx->version`.
+- Signed-off-by: Namjae Jeon \<linkinjeon@kernel.org\> (ksmbd
+  maintainer)
+- No Fixes, Reported-by, Tested-by, Reviewed-by, Acked-by, Link, or Cc:
+  stable
+- Ignore pipeline markers (none in the provided message besides the
+  evaluation copy)
+- Notable: maintainer-authored; no syzbot/CVE tags
 
-**Step 1.4: DETECT HIDDEN BUG FIXES**
+Upstream SHA recovered from GitHub:
+`350684e0498512d06963858b810101f58563810b` (Namjae Jeon, 2026-07-11;
++26/-3 in `fs/smb/server/vfs.c`). Merged via ksmbd-for-7.3-rc1.
 
-Record: **Not a disguised cleanup.** This is an explicit protocol bug
-fix: missing lease-break on a common CREATE path. Not a refactor or new
-API.
-
----
-
-## PHASE 2: DIFF ANALYSIS
-
-**Step 2.1: INVENTORY THE CHANGES**
-
+Step 1.3: ANALYZE THE COMMIT BODY TEXT
 Record:
-- `fs/smb/server/oplock.c`: +5/−4 in
-  `smb_send_parent_lease_break_noti()`
-- `fs/smb/server/smb2pdu.c`: +3 in `smb2_open()`
-- **Scope:** 8 insertions, 4 deletions; single-subsystem surgical fix
+- **Bug:** FSCTL_QUERY_ALLOCATED_RANGES always uses SEEK_DATA/SEEK_HOLE.
+  After FSCTL_SET_ZERO_DATA on a dense file, ksmbd uses
+  `FALLOC_FL_ZERO_RANGE`, which can leave unwritten extents. SEEK_DATA
+  skips those, so the server can return **no allocated ranges**.
+- **Symptom:** Protocol-incorrect empty range list after zeroing a dense
+  file. Copy/backup clients that copy only allocated ranges can skip the
+  zeroed region and leave **stale data** on the destination.
+- **Root cause:** Linux SEEK_DATA treats unwritten extents as holes; SMB
+  dense files must still be reported as allocated (MS-FSA).
+- **Fix:** For non-sparse files, return the request clipped to EOF as
+  one allocated range. For sparse files, keep SEEK_DATA/SEEK_HOLE and
+  `file_write_and_wait_range()` first so punch-hole is visible.
+- **Versions:** No version listed. Code has been in tree since cifsd
+  file ops (2021).
 
-**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+Step 1.4: DETECT HIDDEN BUG FIXES
+Record: Not a disguised cleanup. Subject “handle” plus body “This fixes
+the case where a query after zeroing data could return no ranges” is an
+explicit protocol/correctness fix. Extra i_size clipping (`start >=
+size`, `!length`, `i_size_read`) is a real underflow/EOF-handling
+improvement in the same function.
 
-Verified against local `smb_send_parent_lease_break_noti()`
-(`fs/smb/server/oplock.c` ~1214) and `smb2_open()` (~3521):
+===============================================================
+PHASE 2: DIFF ANALYSIS - LINE BY LINE
+===============================================================
 
-Hunk 1 (helper guard):
-- **Before:** `if (lctx->version != 2) return;` — NULL `lctx` would
-  crash; callers never passed NULL.
-- **After:** `if (lctx && lctx->version != 2) return;` — NULL means
-  “notify matching parent leases”.
-
-Hunk 2 (filter condition):
-- **Before:** Always used `lctx->flags` / `lctx->parent_lease_key` to
-  skip the same parent lease.
-- **After:** `!lctx || (existing parent-key filter)` — NULL child
-  context breaks all active parent directory leases; lease-key filtering
-  is unchanged when `lctx` is present.
-
-Hunk 3 (`smb2_open`):
-- **Before:** Parent notify only inside `if (req_op_level ==
-  SMB2_OPLOCK_LEVEL_LEASE && lc)`.
-- **After:** Also `if (created && !lc)
-  smb_send_parent_lease_break_noti(fp, NULL);` in the oplocks-enabled
-  branch.
-
-`created` is set when `smb2_creat()` succeeds (`smb2pdu.c` ~3301–3313).
-`lc` is only set when a lease create context is parsed (~3017, ~3061).
-The two notify sites are mutually exclusive (`!lc` vs `lc`).
-
-**Step 2.3: IDENTIFY THE BUG MECHANISM**
-
-Record: **[Logic / protocol correctness]** Directory leasing is
-advertised (`SMB2_GLOBAL_CAP_DIRECTORY_LEASING` in `smb2ops.c`; docs say
-“Directory leases(v2 lease) Supported”). CREATE without a lease context
-never broke the parent directory lease. The helper change is a NULL-safe
-call convention so that path can notify. Not UAF/leak/race/overflow by
-itself; the failure mode is stale client directory cache.
-
-**Step 2.4: ASSESS THE FIX QUALITY**
-
+Step 2.1: INVENTORY THE CHANGES
 Record:
-- Obviously correct: short-circuit `!lctx` avoids `lctx->flags` deref;
-  reuses the existing break helper.
-- Minimal; no unrelated edits.
-- Regression risk **low**: extra breaks only on real child create with
-  no lease context, which MS-SMB2 requires. Locking matches the existing
-  `smb_send_parent_lease_break_noti(fp, lc)` call a few lines later
-  (`p_ci->m_lock` then `oplock_break_drain_none()`).
-- No public API / data-structure change.
+- File: `fs/smb/server/vfs.c` only (+26/-3; GitHub)
+- Function: `ksmbd_vfs_fqar_lseek()`
+- Scope: single-function surgical change
+- `ksmbd_vfs_zero_data()` is **not** modified (only described as context
+  in the message)
 
----
-
-## PHASE 3: GIT HISTORY INVESTIGATION
-
-**Step 3.1: BLAME THE CHANGED LINES**
-
+Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
 Record:
-- Buggy helper and the lease-context-only call site: **`d47d9886aeef7`**
-  (“ksmbd: send v2 lease break notification for directory”, Namjae Jeon,
-  2023-12-08).
-- First contained in **`v6.7-rc6`**. Present in this 6.12 tree (`git
-  merge-base --is-ancestor d47d9886aeef7 HEAD` → yes).
-- Directory leasing capability: **`18dd1c367c31d`** (“ksmbd: set v2
-  lease capability”), also in this tree.
+- **EOF clip (before):** `if (start + length > inode->i_size) length =
+  inode->i_size - start` using unlocked `inode->i_size`. If `start >
+  i_size`, length goes negative; the loop then does not run.
+- **EOF clip (after):** `size = i_size_read(inode)`; return 0 if `start
+  >= size` or `!length`; then clip `length` to `size - start`.
+- **Dense path (before):** always SEEK_DATA/SEEK_HOLE.
+- **Dense path (after):** if `!(m_fattr &
+  FILE_ATTRIBUTE_SPARSE_FILE_LE)`, write one
+  `FILE_ALLOCATED_RANGE_BUFFER` for `[query_start, query_length]` and
+  return.
+- **Sparse path (after):** `file_write_and_wait_range(f, start, end-1)`
+  then the existing SEEK loop.
 
-**Step 3.2: FOLLOW THE FIXES: TAG**
-
-Record: **No Fixes: tag.** The incomplete behavior was introduced by
-`d47d9886aeef7`, which is in this tree.
-
-**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-
+Step 2.3: IDENTIFY THE BUG MECHANISM
 Record:
-- Same class already in this tree: `3fc74c65b3674` “send lease break
-  notification on FILE_RENAME_INFORMATION” (smb2.lease.v2_epoch2);
-  `7f58458e9db92` “break RH leases before delete-on-close”.
-- Later on `all-next`, `0e753899627b5` only changes
-  `oplock_break_drain_none(&brk_list)` → `(&brk_list, p_ci)` — **already
-  present locally** via `5de0527f78243`. Not a prerequisite of this
-  patch.
-- `git log all-next -S 'created && !lc'` shows **only** `abe5acb342822`
-  — no follow-up rewrite of this call.
+- **Category:** logic/protocol correctness (allocated-range under-
+  reporting), plus sparse writeback visibility
+- **Mechanism:** `iomap_seek_data()` treats `IOMAP_UNWRITTEN` as a hole
+  unless pagecache has data (`fs/iomap/seek.c`). `FALLOC_FL_ZERO_RANGE`
+  on dense files creates unwritten extents → SEEK_DATA returns `-ENXIO`
+  → empty SMB range list.
+- MS-FSA (FSCTL_QUERY_ALLOCATED_RANGES): if `Open.Stream.IsSparse` is
+  FALSE, return a single range of the requested offset/length. Win32:
+  non-sparse files return one entry covering the request.
+- Sparse writeback: after punch-hole, seek can see stale extents until
+  writeback.
 
-**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-
-Record: Namjae Jeon is listed as **KERNEL SMB3 SERVER (KSMBD)**
-maintainer in `MAINTAINERS`. Recent local ksmbd lease work includes
-lease lookup, RH lease break, lease context validation.
-
-**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-
-Record: **Standalone.** Uses existing
-`smb_send_parent_lease_break_noti()`, `created`, and `lc`. `git show
-abe5acb342822 | git apply --check` **succeeds** on this tree (oplock.c
-offset −232, smb2pdu.c offset −1136).
-
-Candidate SHA on `all-next`: **`abe5acb342822`** (in `ksmbd-
-for-7.3-rc1`, described as `v7.3-rc1~77^2~20`). **Not** in HEAD.
-
----
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-
-**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
-
+Step 2.4: ASSESS THE FIX QUALITY
 Record:
-- `b4 dig -c abe5acb342822`: lore search returned server errors; **no
-  thread URL**.
-- lore.kernel.org WebFetch: **403**.
-- Found via LKML: [GIT PULL] ksmbd server update for 7.3-rc1 (Namjae
-  Jeon, 2026-08-23) lists this commit and calls out **“parent directory
-  lease notifications”** among protocol-compatibility fixes.
-- Linus merge `61a09cfc12147` uses the same wording.
+- Dense shortcut matches MS-FSA and is easy to verify.
+- `in_count` is already rejected as 0 before `ranges[0]` is written.
+- `file_write_and_wait_range()` exists in this tree
+  (`include/linux/fs.h`) and `vfs.c` already includes `linux/fs.h`.
+- **Regression risk:** non-sparse files that still have Linux holes
+  (write-beyond-EOF, sparse attr cleared without materializing) will be
+  reported as fully allocated. That matches Windows QUERY semantics;
+  reads still return zeros. Bandwidth can increase for holey non-sparse
+  files. Later mainline commit `25e414db7033` removed this shortcut for
+  CIFS FIEMAP (see Phase 3).
+- No new API, no lock-order change, no data-structure change.
 
-**Step 4.2: CHECK WHO REVIEWED THE PATCH**
+===============================================================
+PHASE 3: GIT HISTORY INVESTIGATION
+===============================================================
 
-Record: No Reviewed-by. Author is the maintainer and committed it to the
-ksmbd tree. Recipients of the original mail **unverified** (lore 403 /
-b4 failure).
-
-**Step 4.3: SEARCH FOR THE BUG REPORT**
-
-Record: No syzbot/bugzilla. Trigger is Microsoft BVT
-**BVT_DirectoryLeasing_ReadWriteHandleCaching** (Windows protocol test:
-client A holds a directory RWH lease; client B creates a child without a
-lease context; A must get a break).
-
-**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-
-Record: Not labeled `N/M`. Adjacent commits are AppInstanceVersion
-takeover / durable reconnect — unrelated. Independent.
-
-**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-
-Record: **UNVERIFIED** (lore 403). No evidence it was rejected for
-stable. Absence of Cc: stable is expected here.
-
----
-
-## PHASE 5: CODE SEMANTIC ANALYSIS
-
-**Step 5.1: KEY FUNCTIONS**
-
-Record: `smb_send_parent_lease_break_noti()`, `smb2_open()`.
-
-**Step 5.2: TRACE CALLERS**
-
-Record (this tree, `git grep`):
-- `smb_send_parent_lease_break_noti` — only `smb2_open()`.
-- After the patch: two sites in `smb2_open` (`created && !lc`, and
-  existing lease-context path).
-- `smb2_open` is the SMB2 CREATE handler — authenticated SMB clients.
-
-Related: `smb_lazy_parent_lease_break_close()` on close after write
-(`reserve_lease_break`); not this CREATE gap.
-
-**Step 5.3: TRACE CALLEES**
-
-Record: `ksmbd_inode_lookup_lock(parent)`, `down_read(p_ci->m_lock)`,
-walk `m_op_list`, `compare_guid_key()`, `oplock_break_add()`,
-`oplock_break_drain_none()`, `ksmbd_inode_put()`. Same as today’s
-helper.
-
-**Step 5.4: FOLLOW THE CALL CHAIN**
-
-Record: Userspace SMB2 CREATE → `smb2_open` → (new) parent lease break.
-Reachable whenever ksmbd is running with leases/`smb2 leases` and a
-client holds a directory lease. Windows 8+ SMB3 clients request
-directory leases by default. **Yes, client-triggerable.**
-
-**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-
-Record: Same missing-break pattern already fixed for rename
-(`3fc74c65b3674`, in this tree). Unlink/close uses
-`smb_lazy_parent_lease_break_close`. This patch is the CREATE-without-
-lease counterpart.
-
----
-
-## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
-
-**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-
-Record: **Yes.**
-
-```1221:1236:fs/smb/server/oplock.c
-        if (lctx->version != 2)
-                return;
-        // ...
-                    (!(lctx->flags &
-SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE) ||
-                     !compare_guid_key(opinfo, fp->conn->ClientGUID,
-                                      lctx->parent_lease_key))) {
-```
-
-```3530:3541:fs/smb/server/smb2pdu.c
-                if (req_op_level == SMB2_OPLOCK_LEVEL_LEASE && lc) {
-                        // ...
-                        smb_send_parent_lease_break_noti(fp, lc);
-```
-
-Bug introduced **v6.7** (`d47d9886aeef7`). Capability advertised in
-`init_smb3_0_server()` / `init_smb3_02_server()`. Docs: “Directory
-leases(v2 lease) Supported.”
-
-**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-
-Record: **Clean apply with offset.** Local helper already has
-`oplock_break_drain_none(&brk_list, p_ci)` from `5de0527f78243`; that
-line is outside the candidate hunks. `git apply --check` succeeded.
-
-**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-
-Record: Rename/delete-on-close lease-break fixes are here. **This
-CREATE-without-lease notify is not.** Subject grep found no equivalent.
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-
-Record: **[ksmbd / fs/smb/server] [IMPORTANT]** — in-kernel SMB3 server
-for NAS/embedded. Not core VFS; not staging. Config `SMB_SERVER`,
-default n.
-
-**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-
-Record: **Actively developed.** This pending 6.12 tree already carries
-many ksmbd protocol and lease fixes (partial responses, RH lease break,
-lease context validation, oplock UAF). Mature enough that directory
-leasing has been “Supported” since ~6.7.
-
----
-
-## PHASE 8: IMPACT AND RISK ASSESSMENT
-
-**Step 8.1: DETERMINE WHO IS AFFECTED**
-
-Record: **Config/driver-specific:** `CONFIG_SMB_SERVER` with SMB2 leases
-and SMB3 directory leasing. Affects Windows/SMB3 clients that cache
-directories against ksmbd.
-
-**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-
+Step 3.1: BLAME THE CHANGED LINES
 Record:
-- Client A holds a v2 directory lease.
-- Client B creates a child **without** a lease create context (`created
-  && !lc`).
-- Common for a second client or simple SMB CREATE; exactly the BVT
-  setup.
-- Authenticated SMB client, not a local unprivileged syscall.
+- SEEK_DATA/SEEK_HOLE loop: `f44158485826c0` (“cifsd: add file
+  operations”, 2021-03-16; in tree 2021-05-10). Present since ksmbd was
+  merged.
+- `vfs_llseek(..., SEEK_DATA/SEEK_HOLE)`: `067baa9a37b32b` (2022).
+- Dense vs sparse zeroing: original `f44158485826c0` already used
+  PUNCH_HOLE for sparse and ZERO_RANGE for dense. `18e39fb960e6a` added
+  `FALLOC_FL_KEEP_SIZE`.
+- Bug is old, not post-6.12.
 
-**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
+Step 3.2: FOLLOW THE FIXES: TAG
+Record: No Fixes: tag. Buggy code is the original fqar implementation,
+ancestor of HEAD (`git merge-base --is-ancestor f44158485826c0 HEAD`
+succeeded).
 
-Record: **Stale directory cache / protocol violation.** Not
-oops/deadlock/fs corruption. Clients can miss newly created names until
-some other break. **Severity: MEDIUM** (interoperability / user-visible
-wrong directory contents), same class as the rename lease-break fix
-already in this tree.
-
-**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-
+Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
 Record:
-- **Benefit:** High for ksmbd+Windows SMB3: advertised directory leasing
-  actually invalidates on child create.
-- **Risk:** Very low — ~8 lines, existing helper, applies cleanly, no
-  new locks/APIs.
-- **Ratio:** Favor backport.
+- Candidate **not** in this tree (`git merge-base --is-ancestor
+  350684e0498512d06963858b810101f58563810b HEAD` failed).
+- Follow-up **not** in this tree:
+  `25e414db703334954747cb1b3eedf914b093ff8c` “ksmbd: report holes in
+  allocated range queries” (2026-07-26, +148/-46, 3 files).
+- That follow-up **removes** the dense early-return, renames the helper,
+  writes real zeros for dense SET_ZERO_DATA, and materializes holes when
+  clearing sparse. It is a later redesign, not a prerequisite.
+- Sibling “handle empty QUERY_ALLOCATED_RANGES output” is also absent;
+  this patch does not need it (it does not touch `smb2pdu.c`).
+- Current `ksmbd_vfs_fqar_lseek()` matches the pre-image of the
+  candidate; apply is offset-only.
 
----
+Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
+Record: Namjae Jeon is the ksmbd maintainer. Recent local ksmbd work is
+protocol/security fixes already on this branch. This commit is
+maintainer-authored for 7.3-rc1, listed in the ksmbd pull as smbtorture-
+validated protocol compatibility.
 
-## PHASE 9: FINAL SYNTHESIS
+Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
+Record: Standalone. Uses existing `i_size_read`,
+`file_write_and_wait_range`, `FILE_ATTRIBUTE_SPARSE_FILE_LE`,
+`ksmbd_vfs_fqar_lseek`. No rename, no new helper. Follow-up is larger
+and depends on empty-output handling that 6.12 does not have; this
+commit does not.
 
-**Step 9.1: COMPILE THE EVIDENCE**
+===============================================================
+PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+===============================================================
 
-**FOR:**
-- Real protocol bug in **advertised** directory leasing (docs +
-  `SMB2_GLOBAL_CAP_DIRECTORY_LEASING`).
-- User-visible: stale Windows directory cache; Microsoft BVT failure.
-- Buggy code in this 6.12 tree since v6.7.
-- Small, obviously correct, applies cleanly.
-- Same class as `3fc74c65b3674` already in this tree.
-- Maintainer-authored; in `ksmbd-for-7.3-rc1` as a protocol-
-  compatibility fix.
-- No extra prerequisites.
+Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
+Record:
+- `b4 dig -c 350684e0498512d06963858b810101f58563810b`: lore.kernel.org
+  returned errors; no thread URL.
+- lore WebFetch: HTTP 403.
+- Openwall `[GIT PULL] ksmbd server update for 7.3-rc1` (2026-08-23)
+  lists this commit among allocated-range / sparse-file protocol fixes
+  “validated with smbtorture”.
+- GitHub commit page confirms the same message and +26/-3 vfs.c diff as
+  the candidate.
 
-**AGAINST:**
-- Not a crash, UAF, or security issue.
-- No Fixes:/Cc: stable (expected; not a negative).
-- No public user bugzilla; test-suite driven.
-- `SMB_SERVER` is optional.
+UNVERIFIED: v1/v2 review comments, NAKs, explicit Cc: stable on the
+original mail.
 
-**UNRESOLVED:** Original lore review thread (b4/lore 403). No NAK found
-in the 7.3-rc1 pull.
+Step 4.2: CHECK WHO REVIEWED THE PATCH
+Record: Commit has only the author’s SOB (Steve French did not SOB this
+one; it went through Namjae’s ksmbd tree). `b4 dig -w` failed with lore
+errors.
 
-**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
+UNVERIFIED: original To/Cc list.
 
-1. Obviously correct and tested? **PASS** — logic is clear; cited BVT;
-   maintainer committed it.
-2. Fixes a real bug that affects users? **PASS** — missing required
-   lease break; stale listings.
-3. Important issue? **PASS** at protocol-correctness / “oh, that's not
-   good” — not CRITICAL crash, but user-visible on an advertised file-
-   server feature. Matches other ksmbd lease-break backports in this
-   tree.
-4. Small and contained? **PASS** — 2 files, ~8 lines.
-5. No new features or APIs? **PASS** — completes existing notify helper;
-   no new uAPI.
-6. Can apply to the local tree? **PASS** — `git apply --check`
-   succeeded.
+Step 4.3: SEARCH FOR THE BUG REPORT
+Record:
+- No Reported-by on the commit.
+- 2023 thread “Issues with FIEMAP, xfstests, Samba, ksmbd and CIFS”
+  (lkml/fsdevel) describes the same class: SET_ZERO_DATA vs
+  PUNCH_HOLE/ZERO_RANGE and SEEK_DATA/HOLE returning no allocated range.
+- MS-FSA: non-sparse → single allocated range of the request.
+- Win32 FSCTL_QUERY_ALLOCATED_RANGES: non-sparse output is one entry
+  covering the requested range.
 
-**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
+Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
+Record: 7.3-rc1 cluster:
+- persist/reject/allow FSCTL_SET_SPARSE
+- handle empty QUERY_ALLOCATED_RANGES output
+- **this commit**
+- later: report holes in allocated range queries (`25e414db7033`)
 
-Record: None (not a device ID/quirk/DT/build/docs exception). Qualifies
-as a normal contained bugfix.
+This function-level change is self-contained. The follow-up replaces the
+dense shortcut rather than depending on it.
 
-**Step 9.4: MAKE YOUR DECISION**
+Step 4.5: CHECK STABLE MAILING LIST HISTORY
+Record: lore.kernel.org/stable search not available (403). No evidence
+this was rejected for stable.
 
-This should be backported to **this 6.12 tree**. Directory leasing is
-already on; CREATE without a lease context is a hole in the existing
-break path; the fix is tiny and applies cleanly. Treating it as a new
-feature would be wrong: the feature is already shipped and documented as
-supported.
+UNVERIFIED: stable@ discussion.
 
----
+===============================================================
+PHASE 5: CODE SEMANTIC ANALYSIS
+===============================================================
 
-## What the commit solves (and why it matters here)
+Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF
+Record: `ksmbd_vfs_fqar_lseek()` only.
 
-On 6.12, ksmbd advertises SMB3 directory leasing. Parent breaks were
-only sent when the **child CREATE included a lease context**. A second
-client creating a file the usual way (no lease context) left the
-directory lease intact, so Windows clients could keep a cached listing
-that omitted the new name. That fails
-`BVT_DirectoryLeasing_ReadWriteHandleCaching` and breaks real SMB3
-directory caching.
+Step 5.2: TRACE CALLERS
+Record: Single caller: `fsctl_query_allocated_ranges()` in
+`fs/smb/server/smb2pdu.c`, from `smb2_ioctl()`
+`FSCTL_QUERY_ALLOCATED_RANGES`. Userspace/SMB-client reachable (backup,
+robocopy, CIFS FIEMAP, smbtorture). Not interrupt context.
 
-The patch (1) lets the existing helper accept `lctx == NULL` and break
-active parent leases, and (2) calls it after a successful create when
-`!lc`. Lease-key filtering for CREATE-with-lease is unchanged.
+Step 5.3: TRACE CALLEES
+Record: After the patch: `i_size_read`, `file_write_and_wait_range`
+(sparse only), `vfs_llseek(SEEK_DATA/SEEK_HOLE)` (sparse only). Zeroing
+still goes through `ksmbd_vfs_zero_data()` →
+`vfs_fallocate(FALLOC_FL_ZERO_RANGE)` for dense files.
 
-## Risk vs benefit
+Step 5.4: FOLLOW THE CALL CHAIN
+Record: SMB2 IOCTL (authenticated session, valid file id) →
+`fsctl_query_allocated_ranges` → `ksmbd_vfs_fqar_lseek`. Triggered by
+normal Windows/Linux SMB clients. Combined with SET_ZERO_DATA on a non-
+sparse handle, this is a realistic path.
 
-Benefit is correct directory invalidation for ksmbd users with
-Windows/SMB3 clients. Risk is extra lease breaks only when a child is
-actually created — required by the protocol. No new locking scheme; same
-helper already used in `smb2_open`.
+Step 5.5: SEARCH FOR SIMILAR PATTERNS
+Record: CIFS client `smb3_llseek()` already special-cases non-sparse
+files (`!(cifsAttrs & FILE_ATTRIBUTE_SPARSE_FILE)` skips
+QUERY_ALLOCATED_RANGES and treats the file as fully allocated) and
+flushes before querying. Samba/Windows do the same for dense files.
+ksmbd was the outlier.
 
-## Concerns
+===============================================================
+PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+===============================================================
 
-- Context offset vs mainline (`oplock_break_drain_none` already takes
-  `p_ci` here) — **does not block apply**.
-- Remaining gap (pre-existing): CREATE with a **v1** lease still returns
-  early (`lctx->version != 2`). This patch correctly does not expand
-  that; it only adds the NULL-context path the BVT hits.
-- Not a panic/UAF; still appropriate because this tree already backports
-  the same kind of ksmbd lease-break completeness fixes.
+Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
+Record: Yes. `ksmbd_vfs_fqar_lseek()` at `fs/smb/server/vfs.c` still
+always SEEK_DATA/SEEK_HOLE. Dense zeroing still uses
+`FALLOC_FL_ZERO_RANGE`. Introduced 2021; this 6.12.111 tree has it.
+`query_start` / dense early-return are absent.
 
----
+Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
+Record: **Clean apply with line offset** (function is ~1015 here vs ~947
+in the 7.3 pre-image). Surrounding function body matches the candidate
+hunk. `file_write_and_wait_range` is present.
 
-## Verification
+Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
+Record: No “dense files”, “report holes”, or “empty QUERY_ALLOCATED”
+commits in `fs/smb/server/`. Current empty `in_count == 0` still returns
+`-EINVAL` in `fsctl_query_allocated_ranges`; unrelated.
 
-- **[Phase 1]** `git log -1 --format='%B' abe5acb342822`: only Namjae
-  SOB; BVT named; no Fixes/Cc/Reported-by.
-- **[Phase 1]** `git describe HEAD` / Makefile: **p-6.12-3 / 6.12.111**.
-- **[Phase 2]** Read local `smb_send_parent_lease_break_noti` and
-  `smb2_open`; confirmed NULL deref assumption and lease-context-only
-  call.
-- **[Phase 2]** Confirmed `created` set after `smb2_creat`; `lc` only
-  from `parse_lease_state`.
-- **[Phase 3]** `git blame`: helper/call site from `d47d9886aeef7`
-  (2023-12-08); `git describe --contains` → **v6.7-rc6**.
-- **[Phase 3]** `git merge-base --is-ancestor d47d9886aeef7 HEAD` → yes;
-  `abe5acb342822` → **not** in HEAD.
-- **[Phase 3]** `git show abe5acb342822 | git apply --check --verbose` →
-  both files apply (offsets −232 / −1136).
-- **[Phase 3]** `git log all-next -S 'created && !lc'` → only this
-  commit; no follow-up.
-- **[Phase 4]** `b4 dig -c abe5acb342822` → lore errors, no match.
-- **[Phase 4]** WebFetch lore.kernel.org → 403.
-- **[Phase 4]** LKML GIT PULL 7.3-rc1 lists this commit; merge
-  `61a09cfc12147` mentions parent directory lease notifications.
-- **[Phase 5]** `git grep smb_send_parent_lease_break_noti` → only
-  `smb2_open` + declaration.
-- **[Phase 5]** `smb2ops.c`: `SMB2_GLOBAL_CAP_DIRECTORY_LEASING` set for
-  SMB3.0/3.02 when leases enabled.
-- **[Phase 6]** Docs `ksmbd.rst`: “Directory leases(v2 lease)
-  Supported.”
-- **[Phase 6]** Similar fix `3fc74c65b3674` is already an ancestor of
-  HEAD.
-- **[Phase 7]** `MAINTAINERS`: Namjae Jeon is ksmbd maintainer.
-- **[Phase 8]** Failure mode verified from code + BVT name: stale
-  directory lease, not a kernel oops.
-- **UNVERIFIED:** Original lore review comments / NAKs (lore
-  unavailable). Not used to drive the verdict; maintainer merge is
-  verified.
+===============================================================
+PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+===============================================================
 
-The fix is small, applies to this tree, and closes a real hole in
-advertised SMB3 directory leasing.
+Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
+Record: **ksmbd (fs/smb/server)** — SMB3 in-kernel server. **IMPORTANT**
+for NAS/embedded/enterprise SMB users; default `n` so not universal. Not
+staging.
+
+Step 7.2: ASSESS SUBSYSTEM ACTIVITY
+Record: Active on this branch (many recent protocol/security ksmbd
+backports). This is long-standing protocol behavior, not a bug in brand-
+new 7.3-only code.
+
+===============================================================
+PHASE 8: IMPACT AND RISK ASSESSMENT
+===============================================================
+
+Step 8.1: DETERMINE WHO IS AFFECTED
+Record: ksmbd users (`CONFIG_SMB_SERVER`). Dense-file path hits handles
+without `FILE_ATTRIBUTE_SPARSE_FILE` (FSCTL_SET_SPARSE off, no fake-
+sparse DOS attr). Sparse path (writeback wait) hits sparse files,
+including the common fake-fscaps sparse marking.
+
+Step 8.2: DETERMINE THE TRIGGER CONDITIONS
+Record:
+- Dense bug: SET_ZERO_DATA (or other ZERO_RANGE) then
+  QUERY_ALLOCATED_RANGES on a non-sparse file, on filesystems where
+  unwritten extents are SEEK holes (ext4/xfs via iomap).
+- Sparse writeback: QUERY after punch-hole before writeback.
+- Authenticated SMB client; not unprivileged local syscall except via a
+  mounted share.
+
+Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
+Record:
+- Failure: empty allocated-range list for data that SMB considers
+  allocated (zeros). Copy/backup that skips holes can leave **old
+  contents** instead of zeros.
+- Severity: **HIGH** for data integrity of SMB copy/zero workflows; not
+  a kernel oops/UAF.
+- Sparse stale seek: wrong ranges until writeback; usually zeros-vs-
+  holes, less severe.
+
+Step 8.4: CALCULATE RISK-BENEFIT RATIO
+Record:
+- **Benefit:** HIGH for ksmbd dense-file zero+query and Windows-
+  compatible QUERY; writeback wait is a small sparse correctness win.
+- **Risk:** LOW-MEDIUM. ~25 lines, one function. Behavior change: non-
+  sparse files with Linux holes look fully allocated (MS-FSA-correct;
+  more network copy of zeros, not stale data). Follow-up `25e414db7033`
+  later dropped the shortcut for CIFS FIEMAP; that is a later redesign,
+  not a crash report against this patch.
+- Ratio: benefit outweighs risk on this 6.12 tree.
+
+===============================================================
+PHASE 9: FINAL SYNTHESIS
+===============================================================
+
+Step 9.1: COMPILE THE EVIDENCE
+
+FOR:
+- Real protocol bug since 2021; present in 6.12.111
+- Under-reporting allocated ranges after dense ZERO_RANGE can cause
+  client copies to skip zeros → stale destination data
+- Matches MS-FSA / Win32 / CIFS-client dense handling
+- Small, contained, applies cleanly
+- iomap SEEK_DATA skipping `IOMAP_UNWRITTEN` verified in this tree
+- Sparse `file_write_and_wait_range` is independently correct and kept
+  in later mainline
+- Maintainer patch; listed in 7.3-rc1 ksmbd pull as smbtorture-related
+  protocol work
+- No new features/APIs
+
+AGAINST:
+- Not a kernel crash/UAF/deadlock
+- Core dense shortcut was removed 15 days later in `25e414db7033`
+  because CIFS FIEMAP saw holes as allocated
+- No Fixes/Reported-by/Reviewed-by (absence expected; review thread
+  UNVERIFIED due to lore)
+- ksmbd is opt-in
+
+UNRESOLVED:
+- Original lore review/NAKs (lore 403, b4 dig failed)
+- stable@ history
+
+Step 9.2: APPLY THE STABLE RULES CHECKLIST
+1. Obviously correct and tested? **PASS** — MS-FSA match; logic is local
+   and readable. Testing claimed via 7.3-rc1 smbtorture set, not a named
+   Tested-by.
+2. Fixes a real bug that affects users? **PASS** — wrong
+   QUERY_ALLOCATED_RANGES after zeroing dense files.
+3. Important issue? **PASS** — application-level data integrity on
+   copy/backup after SET_ZERO_DATA, not a panic. Severity HIGH for that
+   path.
+4. Small and contained? **PASS** — one function, ~25 lines.
+5. No new features or APIs? **PASS**
+6. Can apply to the local tree? **PASS** — buggy function present; hunk
+   matches; helpers exist.
+
+Step 9.3: CHECK FOR EXCEPTION CATEGORIES
+Record: None (not a device ID/quirk/DT/build/doc exception). Qualifies
+as a normal bugfix.
+
+Step 9.4: MAKE YOUR DECISION
+This tree still has the 2021 SEEK_DATA-only QUERY path and dense
+`FALLOC_FL_ZERO_RANGE`. The patch is the small MS-FSA-correct fix for
+empty ranges after zeroing. The later mainline redesign is not a reason
+to leave 6.12 returning no ranges; over-reporting allocation is safer
+than under-reporting, and the follow-up is a larger 3-file change that
+needs other 7.3 ksmbd work.
+
+The problem is protocol-incorrect FSCTL_QUERY_ALLOCATED_RANGES on dense
+files after zeroing, which can make copy/backup skip zeros and keep
+stale data. It meets stable rules: real user-visible bug, small, no new
+API, clean apply on this 6.12 tree. Risk is a Windows-correct change in
+reported ranges for holey non-sparse files, not a crash.
+
+Verification:
+- [Phase 1] Subject/tags: ksmbd “handle”; only Namjae Jeon SOB; no
+  Fixes/syzbot
+- [Phase 1] Body: empty ranges after zeroing dense files via SEEK_DATA
+  vs unwritten extents
+- [Phase 2] Diff: +26/-3 `ksmbd_vfs_fqar_lseek` only; dense early-return
+  + sparse writeback + i_size_read EOF clip
+- [Phase 2] `fs/iomap/seek.c`: `IOMAP_UNWRITTEN` skipped by SEEK_DATA
+  unless pagecache has data
+- [Phase 2] MS-FSA: non-sparse returns one range; Win32 docs agree
+- [Phase 3] blame: `f44158485826c0` (2021) introduced fqar SEEK loop;
+  ancestor of HEAD
+- [Phase 3] `git merge-base --is-ancestor 350684e04985 HEAD` → not in
+  this tree
+- [Phase 3] follow-up `25e414db7033` not in tree; removes dense
+  shortcut; not required for this backport
+- [Phase 3] current function body matches candidate pre-image (apply
+  with offset)
+- [Phase 4] b4 dig: lore errors, no thread; openwall 7.3-rc1 pull lists
+  the commit
+- [Phase 4] UNVERIFIED: original review comments / stable@
+- [Phase 5] only caller `fsctl_query_allocated_ranges` ← SMB2
+  FSCTL_QUERY_ALLOCATED_RANGES
+- [Phase 5] CIFS client already special-cases non-sparse files in
+  `smb3_llseek()`
+- [Phase 6] `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`; `make
+  kernelversion` → 6.12.111
+- [Phase 6] `file_write_and_wait_range` declared in
+  `include/linux/fs.h`; `vfs.c` includes `linux/fs.h`
+- [Phase 8] Failure mode: empty allocated ranges after dense zero →
+  skipped copy → stale data; HIGH for that SMB path
 
 **YES**
 
- fs/smb/server/oplock.c  | 9 +++++----
- fs/smb/server/smb2pdu.c | 3 +++
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ fs/smb/server/vfs.c | 29 ++++++++++++++++++++++++++---
+ 1 file changed, 26 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 08e3e4504b03f..7d78d4ae43acb 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -1271,7 +1271,7 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 	struct ksmbd_inode *p_ci = NULL;
- 	LIST_HEAD(brk_list);
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index f894092901bc5..cd0d3c13da3e7 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1034,7 +1034,8 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
+ {
+ 	struct file *f = fp->filp;
+ 	struct inode *inode = file_inode(fp->filp);
+-	loff_t maxbytes = (u64)inode->i_sb->s_maxbytes, end;
++	loff_t maxbytes = (u64)inode->i_sb->s_maxbytes, end, query_start;
++	loff_t query_length, size;
+ 	loff_t extent_start, extent_end;
+ 	int ret = 0;
  
--	if (lctx->version != 2)
-+	if (lctx && lctx->version != 2)
- 		return;
+@@ -1050,11 +1051,33 @@ int ksmbd_vfs_fqar_lseek(struct ksmbd_file *fp, loff_t start, loff_t length,
+ 	if (length > maxbytes || (maxbytes - length) < start)
+ 		length = maxbytes - start;
  
- 	p_ci = ksmbd_inode_lookup_lock(fp->filp->f_path.dentry->d_parent);
-@@ -1284,9 +1284,10 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 			continue;
- 
- 		if (opinfo->o_lease->state != SMB2_OPLOCK_LEVEL_NONE &&
--		    (!(lctx->flags & SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE) ||
--		     !compare_guid_key(opinfo, fp->conn->ClientGUID,
--				      lctx->parent_lease_key))) {
-+		    (!lctx ||
-+		     (!(lctx->flags & SMB2_LEASE_FLAG_PARENT_LEASE_KEY_SET_LE) ||
-+		      !compare_guid_key(opinfo, fp->conn->ClientGUID,
-+			       lctx->parent_lease_key)))) {
- 			if (!atomic_inc_not_zero(&opinfo->refcount))
- 				continue;
- 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index e7b1cab45ab2d..7d9c8246edfd6 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3565,6 +3565,9 @@ int smb2_open(struct ksmbd_work *work)
- 			goto err_out1;
- 		}
- 	} else {
-+		if (created && !lc)
-+			smb_send_parent_lease_break_noti(fp, NULL);
+-	if (start + length > inode->i_size)
+-		length = inode->i_size - start;
++	size = i_size_read(inode);
++	if (start >= size)
++		return 0;
 +
- 		if (req_op_level == SMB2_OPLOCK_LEVEL_LEASE && lc) {
- 			if (S_ISDIR(file_inode(filp)->i_mode)) {
- 				lc->req_state &= ~SMB2_LEASE_WRITE_CACHING_LE;
++	if (!length)
++		return 0;
++
++	if (start + length > size)
++		length = size - start;
+ 
+ 	*out_count = 0;
++	query_start = start;
++	query_length = length;
+ 	end = start + length;
++	if (!(fp->f_ci->m_fattr & FILE_ATTRIBUTE_SPARSE_FILE_LE)) {
++		ranges[0].file_offset = cpu_to_le64(query_start);
++		ranges[0].length = cpu_to_le64(query_length);
++		*out_count = 1;
++		return 0;
++	}
++
++	if (start < end) {
++		ret = file_write_and_wait_range(f, start, end - 1);
++		if (ret)
++			return ret;
++	}
++
+ 	while (start < end && *out_count < in_count) {
+ 		extent_start = vfs_llseek(f, start, SEEK_DATA);
+ 		if (extent_start < 0) {
 -- 
 2.53.0
 
