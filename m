@@ -1,140 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAD74E56F3
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 13:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C388E4F4043;
+	Mon, 19 Oct 2026 13:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792414988; cv=none; b=k/krO7H7grzyHiGQnM8d8TiN3fFuQKLM+U9zq4yLLtkdHKT1wWFGoREMDY9lyE4lHLR3H1tzv2QhdpPkowUXT+HT+xVa+MGrJJuzLaEqAlcU/e6QrsfQ+H15tsXJH4w5d1Dfw/3uRdwlruEem3J9UrceRFBnS28sGge/h2Csnyw=
+	t=1792415807; cv=none; b=p9y034GIKmj4+x2ziW0SHvyiIy6KpV+4gM9hwHkf4SpI1WD5bNfXvlk6wmN02Rykiv/Br/YOrfokJtDWhbEBp2w5wD0E0f5eDZcI/DEJ7vTGT4uuIJEFNn/JnaJavg/lZ5aEaSbn/jbmcPsYyQrdRAZjxIa4CWLcNWCO2ECsWMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792414988; c=relaxed/simple;
-	bh=AxHaZknLmHw2c4oUtLvoTM/Sy3ITwXsf/3WpjcpHKCQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bKnR9qbeMdMZaPwvBzSwXIIa8cfTiaIRB/FoCh2504GuvqD5X9p2ELirbnQYtenJ9M1lnX4oQCnojzcmi3r07CB/0uBf8il+7tHz18FNYRPD6kZngXxOvV/mXetL69fLjVoGy9iz31+vAquSSJDPMwFlKeO/6y6SNZZB7b6ZzHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aMZB5Nqc; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1792415807; c=relaxed/simple;
+	bh=KEfUjJ+sWeyEpypWIo35O6elA0OeVZ28l/vNOIqBtYE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mA5/VZwc5jpK8Yvou1ZFTHU80J2mswJ24LI3Boh1XORYUYOGJ7C3SX5xYGegXqi5nVbI2fdtrTIwxSDnvltkUUHaL/joIQZGSrD+FMg0OC0iXHsb3acLJ3cEb/9DU9OTaiHq+y4juD2qWTHboD48rp66iSVaQvrOSQp+um4GJGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=CGjJxHSS; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aMZB5Nqc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92DA91F000C5
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 13:03:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792414987;
-	bh=a7bxq443au8bQdE7gaA78lFXj0+dw95FX0dHaWtaB9c=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=aMZB5NqcghmwWC+OZSYyUzAHEuBLMhw5H8NjlJFl5SgcdRBOuVXYOWb0O4Ds7yben
-	 50Vpvo/zc0jcIOqZz1hRrgKSvajBnZICbKnQP9921c721wHHkXIfjaYtGA9z5u6jQO
-	 NyxQikFuahGLTYm/Vo5h8rblmh13XG0hRVbydNkeyotHnQC+Iisc+M5mw17qRnDnhe
-	 d96wY1Au0Oc47FDSwODCcX9XzZbLxIvTZMo7jxbum8fPpaonno3YFSNbyrH3sN5CaF
-	 S5uReJGH6p5jJHXTEZFSo2uVkEgsI8+sDrtfcyWAVCzxHVX4cgPk9Dt85DRwxCLwtZ
-	 gbSLnCfPrPNfg==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c3f8d72d7ceso346865066b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 06:03:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxJ+89xgp1XQcyeoCPywsea9AFM1He1R3+7Hvk9TBGCt5a8FaaNoPDmy3env/anzLDO0EscTuSi/nrP@vger.kernel.org
-X-Gm-Message-State: AFq9FYLqMRgccPrBZ+o2ibQvx2RsY+QSmSG6xWDftekZ35ghIZSpZhQr
-	QCWyFVY+CdjYXIgP5WVsGkUTRp66Ju9dYuAk+I2U/0vKC2eMHQHiRnVS94HKxMyuzbjltWUOmdY
-	JiEJKrP/2zomQ2pD894Q5gPJMNw/B1fk=
-X-Received: by 2002:a17:906:8e15:b0:c2e:893:7010 with SMTP id
- a640c23a62f3a-c419f906220mr466260266b.37.1792414986239; Mon, 19 Oct 2026
- 06:03:06 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="CGjJxHSS"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=KEfUjJ+sWeyEpypWIo35O6elA0OeVZ28l/vNOIqBtYE=;
+	b=CGjJxHSSLnLyFiBJ6fmCvw7MlJSp71N6IQMPcQkTfVBF4w4+qhSNBqybtc2YkWCvE5LwoEOVU
+	nkl6Q6kL3AgrL1evhkMPi2OeyEjemmmAVgbOgxQlks5tBhbrz4Ra7a12Oy27gvkosJfa6xtd7mk
+	IO1wVoLvEGKoMecheF6kbbs=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4j7bfV0G5ZzRhrQ;
+	Mon, 19 Oct 2026 21:16:34 +0800 (CST)
+Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3320840575;
+	Mon, 19 Oct 2026 21:16:37 +0800 (CST)
+Received: from [10.67.110.140] (10.67.110.140) by
+ whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Mon, 19 Oct 2026 21:16:30 +0800
+Message-ID: <5e6e9ac9-172e-4434-a333-8bcad9e026de@huawei.com>
+Date: Mon, 19 Oct 2026 21:16:28 +0800
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1792345559.git.jan.koester@gmx.net> <CAKYAXd_2AUVQFZWcmk55fBU2Rk-REb-onj38whT=kNCuZ=COew@mail.gmail.com>
- <0cadbdcf-6074-449c-98f9-3aeda3756160@samba.org>
-In-Reply-To: <0cadbdcf-6074-449c-98f9-3aeda3756160@samba.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 19 Oct 2026 22:02:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8-QCawP+oEXDtubc62-QuAWGQk_zn4ZfGk+iKic_j2rA@mail.gmail.com>
-X-Gm-Features: AclHuK8Kvkxp7NShd7TUCYnc22_xbq0PEFp6g_negDd21xABx3Nu3gk3ghWdAqs
-Message-ID: <CAKYAXd8-QCawP+oEXDtubc62-QuAWGQk_zn4ZfGk+iKic_j2rA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] ksmbd: NTLM pass-through to a domain controller
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Jan Koester <jan.koester@gmx.net>, linux-cifs@vger.kernel.org, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org, Tom Talpey <tom@talpey.com>, 
-	Wang Zhaolong <wangzhaolong@fygo.io>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
-	wang zhaolong <wangzhaolong@fnnas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 -next 09/18] landlock: Add READ_METADATA and
+ WRITE_METADATA access rights
+To: Justin Suess <utilityemal77@gmail.com>
+CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
+	<skhan@linuxfoundation.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <eddyz87@gmail.com>, <memxor@gmail.com>,
+	<martin.lau@linux.dev>, <song@kernel.org>, <yonghong.song@linux.dev>,
+	<jolsa@kernel.org>, <emil@etsalapatis.com>, <ihor.solodrai@linux.dev>,
+	<rdunlap@infradead.org>, <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
+	<dakr@kernel.org>, <johan@kernel.org>, <dlemoal@kernel.org>, <hch@lst.de>,
+	<axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<jack@suse.cz>, <dhowells@redhat.com>, <code@tyhicks.com>,
+	<linkinjeon@kernel.org>, <sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
+	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
+	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <hyc.lee@gmail.com>, <miklos@szeredi.hu>,
+	<amir73il@gmail.com>, <senozhatsky@chromium.org>,
+	<chenxiaosong@chenxiaosong.com>, <kpsingh@kernel.org>, <matt@bobrowski.net>,
+	<rostedt@goodmis.org>, <mhiramat@kernel.org>,
+	<mathieu.desnoyers@efficios.com>, <john.johansen@canonical.com>,
+	<georgia.garcia@canonical.com>, <zohar@linux.ibm.com>,
+	<roberto.sassu@huawei.com>, <dmitry.kasatkin@gmail.com>,
+	<eric.snowberg@oracle.com>, <stephen.smalley.work@gmail.com>,
+	<omosnacek@gmail.com>, <casey@schaufler-ca.com>, <takedakn@nttdata.co.jp>,
+	<penguin-kernel@i-love.sakura.ne.jp>, <xiujianfeng@huawei.com>,
+	<nanx95726@gmail.com>, <djwong@kernel.org>, <lujialin4@huawei.com>,
+	<bpf@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<driver-core@lists.linux.dev>, <linux-block@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <netfs@lists.linux.dev>,
+	<ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, <ntfs@lists.linux.dev>,
+	<linux-unionfs@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <apparmor@lists.ubuntu.com>,
+	<linux-integrity@vger.kernel.org>, <selinux@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20261015125425.3246251-1-caixinchen1@huawei.com>
+ <20261015125425.3246251-10-caixinchen1@huawei.com> <atI20Vs7Du9-g1Hz@zenbox>
+Content-Language: en-US
+From: Cai Xinchen <caixinchen1@huawei.com>
+In-Reply-To: <atI20Vs7Du9-g1Hz@zenbox>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ whupemk100010.china.huawei.com (7.152.184.41)
 
-On Mon, Oct 19, 2026 at 7:43=E2=80=AFPM Stefan Metzmacher <metze@samba.org>=
- wrote:
->
-> Hi Jan,
->
-> >> a ksmbd server joined to an Active Directory domain can authenticate
-> >> domain users with Kerberos, but not with NTLM: it has no password hash
-> >> for them, so the NTLMv2 response can't be checked locally. Clients tha=
-t
-> >> fall back to NTLM (access by IP address, machines outside the domain,
-> >> mount.cifs with user name and password) are refused.
-> >>
-> >> Samba solves this by forwarding the response to a domain controller
-> >> over NETLOGON (NetrLogonSamLogonEx on a schannel connection). These tw=
-o
-> >> patches give ksmbd the kernel half of that, and leave the NETLOGON cli=
-ent
-> >> to user space, like the rest of ksmbd's user handling:
-> >>
-> >> 1/2 adds a KSMBD_USER_FLAG_PASSTHROUGH login flag. For such a user,
-> >>      ksmbd_decode_ntlmssp_auth_blob() doesn't compute the response fro=
-m a
-> >>      local hash. It sends the server challenge, the user, domain and
-> >>      workstation names and the NT/LM responses to user space in a new
-> >>      KSMBD_EVENT_NTLM_AUTHEN_REQUEST event, then takes the session bas=
-e
-> >>      key from KSMBD_EVENT_NTLM_AUTHEN_RESPONSE and goes on with the
-> >>      existing key exchange. Both events have a strict netlink policy a=
-nd
-> >>      are checked in ipc_validate_msg().
-> >>
-> >> 2/2 puts the workgroup, not the netbios name, into MsvAvNbDomainName a=
-nd
-> >>      MsvAvDnsDomainName of the challenge's target info. A domain
-> >>      controller checks these when it verifies the NTLMv2 response (Sam=
-ba
-> >>      in NTLMv2_RESPONSE_verify_workstation()), so without this patch
-> >>      every pass-through login fails with NT_STATUS_LOGON_FAILURE. The
-> >>      patch also checks that the challenge blob fits the response buffe=
-r,
-> >>      since the workgroup can be longer than the netbios name.
-> >>
-> >> Logins of users without the new flag are checked as before. The only
-> >> change they see is the domain names in the challenge's target info
-> >> (patch 2/2). ksmbd-tools doesn't set the flag yet. The user space side
-> >> we tested with is sharedd/adconnect from FenrirOS: it marks domain use=
-rs
-> >> without a local hash as pass-through, and it answers the event through
-> >> a NETLOGON schannel client, tested against a Samba 4.22 AD DC.
-> >>
-> >> I can send the matching ksmbd-tools change if the interface looks
-> >> acceptable.
-> > Okay, Please send a PR to ksmbd-tools. Wang is also currently
-> > implementing AD/DC features in ksmbd and might be interested, so I'm
-> > adding him to CC.
->
-> why making this NTLM specific, I think it would be good to the whole sess=
-ion setup
-> blob exchange to userspace, so that authentication is not used in kernel =
-at all?
-> And it will also help when IAKERB and other things will be implemented la=
-ter.
-> It would also be good to have the infrastructure working with winbindd be=
-ing
-> the bridge to the domain.
-I prefer keeping the current patch's approach for now. I'd like to
-stick to minimal changes rather than making a drastic refactoring. As
-for IAKERB, we can revisit and discuss any necessary structural
-changes when we actually reach the point of implementing it.
+Hello Justin,
 
+Thank you for the review, and for thinking the implications through so
+carefully -- the concrete scenarios you describe were very helpful to
+settle the design.
+
+I agree it should be a conscious
+decision: the next revision will make the *_METADATA checked at open time
+
+and follow the mechanic for the truncate right
+
+On 10/16/2026 10:44 PM, Justin Suess wrote:
+> LANDLOCK_ACCESS_FS_*_METADATA should be checked at open time and follow
+> the mechanic for the truncate right. Otherwise the access for already
+> opened file descriptors would be changed. See hook_file_open in
+> security/landlock/fs.c and this discussion here [1]
 >
-> What exactly is "sharedd/adconnect from FenrirOS"?
->
-> And Wang, what are the AD/DC features?
-Active Directory Domain Controller Support.
->
-> metze
-> > Thanks for the patches!
->
+> It should have clear documentation for this as well.
