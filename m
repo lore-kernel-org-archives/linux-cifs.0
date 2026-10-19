@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792445399;
-	b=UNDOaBte8owIodjB4A+NqjQ2c0V0qFuKxgVMIsDF7eDG2TecmXDIZ6rAV5MobOaWywSC
-	 7FL9MFVZjC0YdFPRqnjFPRtqBMdJitUkt52sW19EMhY8t2o4QfWH22ZdtWGV8YoBZ5kJb
-	 C4Gw4lcal7aqjgUto9VTHMlLmTNwBQ6WOz3rqzX5xMR2G32/pUcrVhm9iUIFsQMMiPrGw
-	 1upEJBKQ0MNoGTEFeRQ36NXEBPCJ9g9psDRjEq4NJ36kz926iF1MKF0A6tik5K9Mjw8+Y
-	 90yBSKUqtr6UIlTk9U7FY7caa/nTjOck7SanwTTkOtHB+W+n/gSE/YXHLU4vATLxv2A==
+	t=1792445402;
+	b=gNWpx5m3HcT4Kz4QbYOfBwx1+ncU3QUnk7lnXh6qnO9HsTDyjHVDV2YnQlpyfxkWoj79
+	 HO0/BsPU/BbuyxZ/YsQXRhYpj4U2afIMdFV24y+vpm90kbz37zwbGpzOPNiQOpdWgy0L5
+	 FpNOF4OxJ1RTN6ZimRet4oj7lVl/EqSve/TELZfAIMuPdJcSUsz/DWe0VIk/MSusjRLDN
+	 FrSNQnwZcxFCR52sH6F5VHZhNXlKzk+Pa+/9ozxz+ILGBr/f2soW0+sfDzlyT6KfTQaRy
+	 5zEF7Bb8amgrKdwMPCYNMUODI+3cwZb+t+VD/aATJz4kyPudIrOmcAnhw/Bqur05jbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792445399;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792445402;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=qO/g4Acy+1cPSpxqYSMxIsGa5SLJV+7eifKnXeT0hnY=;
-	b=fnvfd6xDxcFYBhx/1wk7ds4RPTNim0zxewGO2v1oWUGsQmg0Bq75fKCMrXlmsFQfaTfj
-	 SWhuJd8Cwngeg9OEdFtpSNYlUuTH8XIJRpkGNbhUrAy2/n+qnVnMEjhaLX3BI2VoEFQYO
-	 bhO01MgjXK4V1voSMALH9cvizqkOT55nSIS2G9RRioA24j6yvoSDo+8bO4KYm2q0QGZ3J
-	 FBL8Csk6Jz9pw0sRQ7QQ7q+dpmsHxcsn/yrs6vQkUPWo74oUAtPZIxcz/9Rp+WzvrUzj0
-	 JHR9HjvCfmha1t1e+YzzDPcS8W04T+/zvawR5w//ja0bDGV6imhCUsgS14ZBbukTKCQ==
+	bh=zYWrixPm+QMNkzjCpnwk9/Rk+hqbPSVNxVQvHcB89o8=;
+	b=d6uUkQRuQkeEllRtdpoxvtM8y19NLQGkH4Aan7z/RNDyebl1+jJOoIrxmYqLHOw+xkWF
+	 j5Gy06JQQnVeTwc1zXWGEjC7PI6IMfrYtT74cEiTqJbcFGaekIwCMqKAqUSRd2U1s5g/U
+	 VXs++ytZqvCmmdKxL701hX2njugl5VZFV9tJKRNNsYDx5xrA7wxRsvTIpydTELU3jIgFC
+	 oWId676hfMiwbMh9MUby+sC5O23pAhxDqrcx1CWvWdq5DMJPu98iXmIOd14ztK+kjXy1V
+	 WH+35WvPz0rph3G88k/UbiAOdn/Hhsbdvbyjyg6Mti1ISZlSG6clBDAFKThrJZw0wtQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nbLfhtoH;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B6VIF6hs;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C611C606A320;
-	Mon, 19 Oct 2026 21:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A07606A322;
+	Mon, 19 Oct 2026 21:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nbLfhtoH
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D961F000C4;
-	Mon, 19 Oct 2026 21:29:56 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=B6VIF6hs
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 170291F000C7;
+	Mon, 19 Oct 2026 21:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792445398;
-	bh=qO/g4Acy+1cPSpxqYSMxIsGa5SLJV+7eifKnXeT0hnY=;
+	s=k20260515; t=1792445401;
+	bh=zYWrixPm+QMNkzjCpnwk9/Rk+hqbPSVNxVQvHcB89o8=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=nbLfhtoHsFNZw6w3lMT/CI4gs8tAllnXBzgTQlK36k++xBlsa+VOouR8w0sJAK3Xt
-	 HseCWBPNhS6ezFdbV8FVPIp4F2Ophd9yabr4eweHAfHA6gWoEday5FNu+iG/AuEs7Y
-	 +t0dasITZkj1uFUvsL3Z/hENw24Fjvze3WTRu8O2sC8IIsmpAaIAglu8CFhk2kVs1H
-	 TqAljXzVFAhOETz6FdmtmvY2lsG9u1RQ+4QKClGgKioCV9MDTsFECO8A2uBfcZcvfm
-	 R7YQ9bBt3+DW1q2zRMh314ofCLtZOn59rhC87lOAVN49/2sPWe9iBcQ+7BOUvzTCPk
-	 RWHbGYVynEWRw==
-Subject: Re: [PATCH net-next v17 07/15] quic: add connection id management
+	b=B6VIF6hseZ0ecdud3CbCjOez+ciHl0bolWQvLE/QgZNzvzJsedt+DSroOLl2EbKiq
+	 WEzbVtRvFTD4ONxSJJ1lvoItgJFaZJkd/U9ntcHjQBJ6FOQ/l5Dbf9cLKMFNMhh+2a
+	 Mr3SMT11wrJ0FqYQzk9whntkqf3orlpzSo2g8TC8aRsN85wxQQ/kXJz8B4A2Tvol6B
+	 9EZhOIOq/5Uj4lL8bWElRQc7cm3ywekFjkLo+VfP17rDn6gQ1mIuU5E5wItP0FZ9ge
+	 sF0NvNbpd2Fyw6/DEfqzHmcfdQi+vioshGAxXx877Z78Y076TMoZY3oXWOLzvp1V8B
+	 pc/zG9cIV5crA==
+Subject: Re: [PATCH net-next v17 08/15] quic: add path management
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -54,13 +54,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
-Date: Mon, 19 Oct 2026 21:29:55 +0000
-Message-ID: <179244539578.3135.2545046427986099445@kernel.org>
-In-Reply-To: =?utf-8?q?=3Ce444094df836a7945028f960a458f520effdf221=2E1792164?=
+Date: Mon, 19 Oct 2026 21:29:58 +0000
+Message-ID: <179244539859.3135.15973054396060254186@kernel.org>
+In-Reply-To: =?utf-8?q?=3Cae36949f7685ef74318d3c742f02e1398db3b454=2E1792164?=
  =?utf-8?q?438=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3Ce444094df836a7945028f960a458f520effdf221=2E17921644?=
+References: =?utf-8?q?=3Cae36949f7685ef74318d3c742f02e1398db3b454=2E17921644?=
  =?utf-8?q?38=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Low
+X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -73,87 +73,142 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found more severe
-issue(s) in other patches of this series. This mail is only an FYI, in case
-you want to address the nit picks below when you respin.
+Thank you for your contribution! Sashiko AI review found 2 potential
+issue(s) to consider.
 
-Low priority / nit picks for your consideration:
+Critical: 0 · High: 0 · Medium: 2 · Low: 0
 
-- [Low] The comment on the `count` field of `struct quic_conn_id_set`
-  (net/quic/connid.h:46) does not match the code.
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
+
+- [Medium] quic_udp_sock_create() in net/quic/path.c zero-initializes
+  udp_conf and fills it with quic_udp_conf_init() ->…
+- [Medium] IP_FREEBIND (and the IPv6 equivalent) set on a QUIC socket has
+  no effect when a new UDP tunnel socket is created.
 
 --
 
-quic: add connection id management
+quic: add path management
 
-This patch adds struct quic_conn_id_set to manage QUIC source and
-destination connection IDs. It provides helpers to add, remove and find
-connection IDs in a set, and inserts source connection IDs into a global
-RCU-protected hash table. It also adds helpers for RX path lookup and for
-checking stateless reset tokens.
+This adds struct quic_path_group and struct quic_path to manage the
+active and alternate paths of a QUIC connection. Each path is bound to a
+kernel UDP tunnel socket, which can be shared and is tracked in a
+per-port hash table. The patch also adds bind, unbind and swap helpers,
+alternate path detection for migration, and basic PLPMTUD state handling.
 
-> diff --git a/net/quic/connid.h b/net/quic/connid.h
+> diff --git a/net/quic/path.c b/net/quic/path.c
 > new file mode 100644
-> index 0000000000000..105c2b4b0f2ec
+> index 0000000000000..ba7e2c952a36a
 > --- /dev/null
-> +++ b/net/quic/connid.h
-> @@ -0,0 +1,184 @@
+> +++ b/net/quic/path.c
+> @@ -0,0 +1,596 @@
 
 [ ... ]
 
-> +struct quic_conn_id_set {
-> +	/* Connection ID in use on the current path */
-> +	struct quic_common_conn_id *active;
-> +	/* Connection ID to use for a new path (e.g., after migration) */
-> +	struct quic_common_conn_id *alt;
-> +	struct list_head head; /* List head of available connection IDs */
-> +	u8 entry_size; /* Size of each connection ID entry in the list */
-> +	u8 max_count;  /* active_connection_id_limit in rfc9000#section-18.2 */
-> +	u8 count;      /* Current number of connection IDs in the list */
-
-[Severity: Low]
-
-This isn't a bug, but is this comment accurate?
-
-quic_conn_id_add() links every new entry into the list. It only increments
-count when the new number extends the consecutive run:
-
-	list_add_tail(&common->list, list);
-
-	if (number == quic_conn_id_last_number(id_set) + 1) {
-		if (!id_set->active)
-			id_set->active = common;
-		id_set->count++;
-
-For example, after adding numbers 0 and 5 to an empty set, the list holds
-two entries but count is 1.
-
-The consumers rely on count being the length of the consecutive run that
-starts at the first entry:
-
-	return quic_conn_id_first_number(id_set) + id_set->count - 1;
-
-The WARN_ON_ONCE() guard in quic_conn_id_remove() and the
-active->number != last_number check in quic_conn_id_select_alt() both
-depend on that meaning.
-
-Could the comment describe count as the number of consecutive connection
-IDs starting from the first entry in the list? Otherwise a later caller
-that compares count against max_count (active_connection_id_limit) would
-be comparing a run length against a list-size limit.
-
-> +	bool source;   /* true if this is a source conn_id set, false if dest */
-> +};
+> +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk,
+> +						  union quic_addr *a)
+> +{
+> +	struct udp_tunnel_sock_cfg tuncfg = {};
+> +	struct udp_port_cfg udp_conf = {};
+> +	struct net *net = sock_net(sk);
+> +	struct quic_uhash_head *head;
+> +	struct quic_udp_sock *us;
+> +	struct socket *sock;
+> +	int err;
 > +
-> +static inline u32 quic_conn_id_first_number(struct quic_conn_id_set *id_set)
-> +{
+> +	us = kmalloc_obj(*us);
+> +	if (!us)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	quic_udp_conf_init(sk, &udp_conf, a);
 
-[ ... ]
+[Severity: Medium]
+Should the tunnel socket take its IPV6_V6ONLY setting from the QUIC
+socket that owns it?
 
-> +static inline u32 quic_conn_id_last_number(struct quic_conn_id_set *id_set)
-> +{
-> +	return quic_conn_id_first_number(id_set) + id_set->count - 1;
-> +}
+quic_udp_conf_init()->quic_v6_udp_conf_init() fills in the family,
+address, port, checksum flags and bind_ifindex. It never sets
+conf->ipv6_v6only:
+
+net/quic/family.c:quic_v6_udp_conf_init() {
+	conf->family = AF_INET6;
+	conf->local_ip6 = a->v6.sin6_addr;
+	conf->local_udp_port = a->v6.sin6_port;
+	conf->use_udp6_rx_checksums = true;
+	conf->use_udp6_tx_checksums = true;
+	conf->bind_ifindex = quic_get_dev_if(sk, a);
+}
+
+udp_sock_create6() applies v6only only when the config asks for it:
+
+net/ipv6/ip6_udp_tunnel.c:udp_sock_create6() {
+    ...
+	if (cfg->ipv6_v6only) {
+		err = ip6_sock_set_v6only(sock->sk);
+    ...
+}
+
+As a result, the kernel UDP socket always gets the net.ipv6.bindv6only
+default. An IPV6_V6ONLY value set on the QUIC socket through
+quic_setsockopt()->ipv6_setsockopt() is ignored. A zero cfg value also
+can't clear an inherited bindv6only=1.
+
+With bindv6only=0, could an IPV6_V6ONLY QUIC socket bound to [::]:P get a
+dual-stack tunnel? That tunnel would also hold IPv4 port P and could
+cause unexpected EADDRINUSE for IPv4 binds.
+
+With bindv6only=1, a QUIC socket that cleared IPV6_V6ONLY gets a v6-only
+tunnel, and IPv4 UDP lookup skips ipv6_only sockets. Would IPv4 packets
+for that dual-stack QUIC socket ever be delivered?
+
+quic_udp_sock_lookup() also decides sharing through
+quic_cmp_sk_addr(us->sk, ...), which checks ipv6_only_sock() on the
+tunnel socket. A wrong v6only state would therefore also change which
+QUIC sockets end up sharing a tunnel.
+
+quic_path_bind() has no caller yet in this series, so this would only
+show up once quic_bind() is wired in by the next patchset.
+
+> +	err = udp_sock_create(net, &udp_conf, &sock);
+
+[Severity: Medium]
+Is IP_FREEBIND (or its IPv6 equivalent) on the QUIC socket honoured
+when a new tunnel socket is created here?
+
+struct udp_port_cfg has no freebind or transparent field.
+udp_sock_create4() and udp_sock_create6() call kernel_bind() right after
+sock_create_kern(), so FREEBIND can never be set on the new socket
+before it is bound:
+
+net/ipv6/ip6_udp_tunnel.c:udp_sock_create6() {
+	err = sock_create_kern(net, AF_INET6, SOCK_DGRAM, 0, &sock);
+    ...
+	err = kernel_bind(sock, (struct sockaddr_unsized *)&udp6_addr,
+			  sizeof(udp6_addr));
+    ...
+}
+
+The bind path then calls inet_addr_valid_or_nonlocal() on the new tunnel
+socket. That socket doesn't have FREEBIND set, so a nonlocal source
+address would fail with -EADDRNOTAVAIL.
+
+The QUIC socket accepts IP_FREEBIND through
+quic_common_setsockopt()->ip_setsockopt(). quic_get_user_addr() in the
+next patchset is described as honouring FREEBIND. Could bind validation
+then accept the address, only for
+quic_path_bind()->quic_udp_sock_create() to reject it?
+
+It looks like only the netns-wide ip_nonlocal_bind sysctl would make a
+nonlocal bind work here.
+
+> +	if (err) {
+> +		pr_debug("%s: failed to create udp sock\n", __func__);
+> +		kfree(us);
+> +		return ERR_PTR(err);
+> +	}
 
 [ ... ]
 
