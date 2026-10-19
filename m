@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE8A59F51D;
-	Mon, 19 Oct 2026 13:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923355A4659;
+	Mon, 19 Oct 2026 13:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418371; cv=none; b=Uii3MqE7cYGTFwJftx8VPVqwNBhLgoLqJHHoayNXSSruGL7t3Pxw6j8uIcpYrmKBonRxNwIgyDkTP1+jXKsWg5qLxL5h1QPNHl9icKm5QAXG8Do74TnBub0BZDXK0DDFm4IB573G7/L284Ak7tGN6mchWYp19y0t9FXXkWlhitk=
+	t=1792418385; cv=none; b=GNC3Fx3dolh4hkxSJuHyem2syknV/CRZZU5UO0DTzHcL3nOv9F549toUFK11vV/qipDd6Odt3Rh+rAQEcXEjqFs2RIpsZG9/a3Zj5f0ZKuFax9bzioqC+RJU0u2JRFpwzf5RwGbd+LhEkTUzP03+qxUGYSKLqKcEtrtnoUkrJ08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418371; c=relaxed/simple;
-	bh=3CqDiwc+aGFulVbpCYEr+hO5CJ/k3rk2QV1mL+1tE4Y=;
+	s=arc-20240116; t=1792418385; c=relaxed/simple;
+	bh=CXnKF4+ZDrpWbpAZxBrFKka87tvf/mPvxrk92r7+buY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SCza7iNm8ECpPipHLREQfGUEuCg8BDa9XrOK16I+7L7ZCbut5tcIjiXr8wrbXAql+sI9+9ZcRNseZRvxEVHGyMcDereYn9I3sLS/1x3tSWwxJ8/HgvopRxseYKd7SOhXaUCPlZ7B/+nV+BzZ3fkvtH9w3wvWkgOxzyeq/mTTC0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kyPBK8u8; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=cdrlAI4ORqpS1awKda7ZSWO7Ex4ZN+3ekPH0sCpWaeUss28Mi7QhR9SBO4B+ITodMdzCENEr8P0Uh+2sXrLMK6vMdn/dydmjD2V/fcffY9LoAE3NT1Z2yacc5Wt+sPZWvhSpTZWnDC0e464I5Yv5ShaFZOoEImA3lQn83tmlULY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GY2EEfgI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kyPBK8u8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 647931F000C4;
-	Mon, 19 Oct 2026 13:59:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GY2EEfgI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 724951F000C7;
+	Mon, 19 Oct 2026 13:59:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418368;
-	bh=rMXuUkx7GYbCKLLF+yXIXy6tQcY24ixbQww77LpLt8o=;
+	s=k20260515; t=1792418382;
+	bh=U9Vkwbm05lDdxzxOAYs6Jk3Nr9THOJjffnHBcf4GiHE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kyPBK8u80WaGlrmXoaR4m6iZmUSAstYEekTbyqD5AGQ3QDzLmi1QH0zSFjN95grV5
-	 zgJofTrSGx2HMcb2XM15dssiYy5hH3/6uYueYkCvK8E2aCB2ZToSwHgJfXZbEg3gL8
-	 fSrHuaoEpNBpizO6vowVEuPBkQSyxjLU5zCxqtTBknk8IoA4qj/ZVf1KgWQ8O4Ajrj
-	 5S9zBGiH98idh+/ySvbhFZN1h6OYq+CX876ixyyc7//5BrbRhe4uV/c5UpU4iuS/1R
-	 u6xadD1pwJc13xOOrL1XWdUc6ssmXrjMZ8Yi4bNTB67Rtil4WC9s+wL8t5+Bd5Qm9b
-	 mZbGeVSEI9elQ==
+	b=GY2EEfgIrn+JQr1y96dyZF9u1Yct5GyqIzR1eAw2qXf8dOszuMl4W8S9mvhEQa3Cu
+	 2tHHre59FvD6BMX5HnX2AmPBb4WUrZx/DnCNuios4+vyi2UJLQ003nHm04wKaWDJ3X
+	 Djf0hEMYwU/x8kBmuNp/vh1zQjmP31bYOoIyA4mpMOD3kjfiKZZPlHBxE/AyqFxMoX
+	 QCANvLXNiJ7FLwgOwnSbTJcj5yAjpE0of8XnfhAeRXgiyWZbBNsQzfSTKKnVHO+EIS
+	 qY2xoprPbblqr4YNx0DSNVIUZcaH8J7n1yFDJvbJ2c9qvOPpwcGorxyBSvudsRQHuW
+	 qer5vka9HhUNw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,9 +33,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: allow FSCTL_SET_SPARSE without input buffer
-Date: Mon, 19 Oct 2026 09:48:09 -0400
-Message-ID: <20261019135441.1420968-198-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: protect private extended attributes
+Date: Mon, 19 Oct 2026 09:48:20 -0400
+Message-ID: <20261019135441.1420968-209-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -53,11 +53,19 @@ Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 86c84cc760080929b7be44bceebe5854957b99da ]
+[ Upstream commit 4ea46ea602fc7055eee4b5b0e84f90f22da7f7e7 ]
 
-FSCTL_SET_SPARSE without an input buffer sets a file sparse.  Treat a
-zero-length input buffer as SetSparse=true and keep rejecting truncated
-non-empty buffers.
+SMB clients can currently create an EA named NTACL because SMB EAs are
+mapped into the user namespace while the ksmbd security descriptor is
+stored as security.NTACL. Allowing the reserved logical name makes the
+server-private ACL metadata appear writable through the SMB EA API.
+
+Reject NTACL, DOSATTRIB, and DosStream-prefixed EA names without regard
+to case. Filter the same private names from EA query results so stale or
+externally-created user namespace attributes cannot be exposed.
+
+This fixes smb2.ea.acl_xattr when acl_xattr_name is configured as
+NTACL.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -65,429 +73,359 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-Local tree is **6.12.111** (`p-6.12-3-gc504cf0baa3d8`). The candidate is
-mainline `86c84cc76008` (“ksmbd: allow FSCTL_SET_SPARSE without input
-buffer”). It is **not** in this checkout; the overly strict length check
-**is**.
+## Phase 1: Commit message forensics
 
-===============================================================
-PHASE 1: COMMIT MESSAGE FORENSICS
-===============================================================
+**Step 1.1 — Subject**
+- Record: `[ksmbd] [protect] keep server-private xattr names off the SMB
+  EA API`
 
-**Step 1.1: PARSE THE SUBJECT LINE**
-Record: **[ksmbd] [allow] [accept FSCTL_SET_SPARSE with a zero-length
-input buffer]**
+**Step 1.2 — Tags**
+- Record: `Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>` (ksmbd
+  maintainer; author and committer).
+- No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-
+  by:`, `Link:`, or `Cc: stable`. Absence of `Fixes:`/`Cc: stable` is
+  expected for this review and is not a negative signal.
 
-**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
-Record:
-- **Signed-off-by:** Namjae Jeon `<linkinjeon@kernel.org>` (author and,
-  on GitHub, committer)
-- **No** Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Acked-by:,
-  Link:, or Cc: stable
-- Absence of Fixes/Cc: stable is expected for this review pipeline and
-  is **not** a negative signal
-- Ignore any “[Upstream commit …]” / “Signed-off-by: Sasha Levin”
-  markers if present in candidate prep
+**Step 1.3 — Body**
+- Record: SMB EAs are stored as `user.*` xattrs. ksmbd keeps NT ACL
+  metadata in `security.NTACL`. Clients can still create an EA named
+  `NTACL`, so the reserved logical name looks writable over SMB
+  SET_INFO/QUERY_INFO EA. The patch rejects `NTACL`, `DOSATTRIB`, and
+  `DosStream.`-prefixed names case-insensitively on set, and filters the
+  same names from query results so leftover `user.*` copies are not
+  exposed. Failure mode: reserved metadata can be written or listed
+  through the EA API. Symptom: Samba smbtorture `smb2.ea.acl_xattr`
+  fails when `acl_xattr_name=NTACL`. Introduced with original ksmbd EA
+  mapping; not a new 7.x-only bug.
 
-**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
-Record:
-- **Bug:** MS-FSCC FSCTL_SET_SPARSE with no data element must set the
-  sparse flag (SetSparse=TRUE). ksmbd currently rejects InputCount==0.
-- **Symptom:** Client gets an invalid-parameter style failure (`-EINVAL`
-  from this path) instead of marking the file sparse.
-- **Root cause (from message + code):** A length check requires
-  `in_buf_len >= sizeof(struct file_sparse)` (1 byte), so a spec-legal
-  empty buffer is treated as truncated.
-- **Version info in the message:** none
-- **Failure mode:** interoperability / protocol reject, not a kernel
-  oops
+**Step 1.4 — Hidden bug fix?**
+- Record: Yes. “Protect” is a security/integrity fix, not cleanup. SET
+  currently does not reject reserved names. GET already skipped
+  `DosStream.` / `DOSATTRIB` with case-sensitive `strncmp`, but not
+  `NTACL` and not case variants.
 
-**Step 1.4: DETECT HIDDEN BUG FIXES**
-Record: **Not disguised cleanup.** Subject says “allow”, but this
-restores documented protocol behavior that the 2021 ioctl validation
-made too strict. It is a spec-compliance bug fix, not a new API.
+## Phase 2: Diff analysis
 
-===============================================================
-PHASE 2: DIFF ANALYSIS - LINE BY LINE
-===============================================================
+**Step 2.1 — Inventory**
+- Record: `fs/smb/server/smb2pdu.c` only (`+22/-6`). Functions: new
+  `smb2_is_private_ea()`; `smb2_set_ea()`; `smb2_get_ea()`.
+  Classification: single-file surgical fix.
 
-**Step 2.1: INVENTORY THE CHANGES**
-Record:
-- **File:** `fs/smb/server/smb2pdu.c` only (**+8 / −2** upstream)
-- **Function:** `smb2_ioctl()`, `case FSCTL_SET_SPARSE:`
-- **Scope:** single-file surgical change
+**Step 2.2 — Flow**
+- Record:
+  - SET: after the EA name-length check, reserved names return `-EACCES`
+    instead of `ksmbd_vfs_setxattr`/`remove_xattr` on `user.<name>`.
+  - GET: STREAM and DOSATTRIB `strncmp` skips become one
+    `smb2_is_private_ea()` skip (adds `NTACL`, case-insensitive).
+    Specific-name QUERY still cannot return those names.
 
-**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
-Record:
-- **Before:** `if (in_buf_len < sizeof(struct file_sparse)) return
-  -EINVAL;` then pass `buffer` to `fsctl_set_sparse()`.
-- **After:** reject only **non-empty truncated** buffers; if `in_buf_len
-  == 0`, pass a stack `file_sparse` with SetSparse=1; otherwise keep
-  using the request buffer.
-- **Path:** ioctl handling for one FSCTL; not init, not an error-path
-  leak fix.
+**Step 2.3 — Bug mechanism**
+- Record: Logic/correctness plus a hardware/protocol reserved-name
+  filter (category g/h). Same-namespace collisions: `user.DOSATTRIB`
+  (DOS flags/create time) and `user.DosStream.*` (named streams).
+  `security.NTACL` is a different namespace, so SET of EA `NTACL`
+  creates `user.NTACL` rather than overwriting the SD; the patch still
+  blocks that reserved name and hides any leftover `user.NTACL`.
 
-Verified current 6.12 code (exact pre-image of the patch):
+**Step 2.4 — Fix quality**
+- Record: Obviously correct. `strncasecmp` + exact length for
+  `NTACL`/`DOSATTRIB`, prefix match for streams. `-EACCES` maps to
+  `STATUS_ACCESS_DENIED` in both `smb2_set_info()` and CREATE error
+  mapping, matching smbtorture. Regression risk is low: only reserved
+  Samba/ksmbd names are rejected. Query of a private name still yields
+  `STATUS_NO_EAS_ON_FILE` rather than ACCESS_DENIED; that is pre-
+  existing GET skip behavior, not a new crash path.
 
-```8496:8505:fs/smb/server/smb2pdu.c
-        case FSCTL_SET_SPARSE:
-                if (in_buf_len < sizeof(struct file_sparse)) {
-                        ret = -EINVAL;
-                        goto out;
-                }
+## Phase 3: Git history
 
-                ret = fsctl_set_sparse(work, id, (struct file_sparse
-*)buffer);
-                if (ret < 0)
-                        goto out;
-                break;
-```
+**Step 3.1 — Blame**
+- Record: Unfiltered SET and GET STREAM/DOSATTRIB skips come from
+  `e2f34481b24db` (“cifsd: add server-side procedures for SMB3”,
+  2021-03-16). Present since ksmbd entered the kernel (5.15 era). `git
+  merge-base --is-ancestor e2f34481b24db HEAD` succeeds.
 
-`struct file_sparse` is a packed 1-byte `SetSparse` field
-(`fs/smb/server/smb2pdu.h`). `in_buf_len` is
-`le32_to_cpu(req->InputCount)` (`unsigned int`). For a 1-byte struct,
-`in_buf_len && in_buf_len < 1` is never true; the real behavioral change
-is **InputCount == 0**.
+**Step 3.2 — Fixes tag**
+- Record: None. Buggy behavior is the original EA mapping, not a later
+  regression.
 
-**Step 2.3: IDENTIFY THE BUG MECHANISM**
-Record:
-- **Category:** logic / protocol correctness (over-strict length check)
-- **Mechanism:** 2021 validation blocked the documented empty-buffer
-  form to avoid reading `SetSparse` from a zero-length buffer. The fix
-  keeps that OOB protection (does not dereference `buffer` when
-  `in_buf_len == 0`) and supplies SetSparse=true locally.
+**Step 3.3 — File history**
+- Record: Recent 6.12 ksmbd work is unrelated (buffer sizes, leases,
+  durable reconnect). No competing private-EA helper in this tree.
 
-**Step 2.4: ASSESS THE FIX QUALITY**
-Record:
-- **Obviously correct** vs MS-FSCC 2.3.83 and vs Samba `vfswrap_fsctl()`
-  (`set_sparse = true` unless `in_len >= 1 && in_data[0] == 0`).
-- **Minimal.** No unrelated edits.
-- **Regression risk low:** existing 1-byte path unchanged; share/handle
-  checks in `fsctl_set_sparse()` still apply
-  (`KSMBD_TREE_CONN_FLAG_WRITABLE` and
-  `FILE_WRITE_DATA|FILE_WRITE_ATTRIBUTES`, already in this tree via
-  `c5ab11263e3c8`).
-- `*(u8 *)&sparse = 1` is equivalent to `sparse.SetSparse = 1` for this
-  struct.
+**Step 3.4 — Author**
+- Record: Namjae Jeon is the ksmbd maintainer. Surrounding 7.3 ksmbd
+  commits are other protocol/security fixes; this commit is standalone
+  (`4ea46ea602fc`).
 
-===============================================================
-PHASE 3: GIT HISTORY INVESTIGATION
-===============================================================
+**Step 3.5 — Dependencies**
+- Record: Needs `SD_PREFIX`, `DOS_ATTRIBUTE_PREFIX`, `STREAM_PREFIX`
+  from `fs/smb/server/xattr.h` (included via `vfs.h` in `smb2pdu.c`).
+  All exist here. `strncasecmp` is in `include/linux/string.h`. Applies
+  standalone.
 
-**Step 3.1: BLAME THE CHANGED LINES**
-Record:
-- `case FSCTL_SET_SPARSE:` from `e2f34481b24d` (“cifsd: add server-side
-  procedures for SMB3”, 2021) — **in this tree**
-- Length check from `f7db8fd03a4bc5` (“ksmbd: add validation in
-  smb2_ioctl”, 2021-10-13) — **in this tree**
-- Buffer base from `c6cd2e8d2d9aa7` (InputOffset, not `&req->Buffer[0]`)
-- Bug has been present for the entire 6.12 lifetime (introduced 2021)
+## Phase 4: Mailing list / external
 
-**Step 3.2: FOLLOW THE FIXES: TAG**
-Record: **No Fixes: tag.** Introducer of the too-strict check is
-`f7db8fd03a4bc5`, present here.
+**Step 4.1**
+- Record: SHA `4ea46ea602fc7055eee4b5b0e84f90f22da7f7e7` (v7.3-rc1). `b4
+  dig -c 4ea46ea602fc` failed: lore.kernel.org returned errors (Anubis
+  bot challenge). WebFetch to lore also 403. UNVERIFIED: original thread
+  text, NAKs, reviewer Cc:stable.
 
-**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-Record:
-- Same-day mainline series around sparse (2026-07-08), including:
-  - `159e727f763d` persist FSCTL_SET_SPARSE state
-  - `31169f41778a` reject FSCTL_SET_SPARSE on directories
-  - `86c84cc76008` **this** empty-buffer change
-- Those other patches change advertisement/persistence and directory
-  rejection. **This hunk does not use those new structures.**
-- Recent 6.12 ksmbd work on `smb2pdu.c` is unrelated (compound/query-
-  info, leases, etc.).
-- **Standalone** for backport of the empty-buffer check.
+**Step 4.2**
+- Record: UNVERIFIED recipients. Commit is authored and committed by the
+  subsystem maintainer; Linus merged it in `ksmbd-for-7.3-rc1`
+  (`61a09cfc12147`), described as smbtorture-validated protocol fixes
+  and security hardening.
 
-**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-Record: Namjae Jeon is the **ksmbd maintainer**. Many ksmbd fixes in
-this tree are his. That is a strong quality signal, not a substitute for
-importance.
+**Step 4.3**
+- Record: Samba `source4/torture/smb2/ea.c` `torture_smb2_acl_xattr`
+  (`smb2.ea.acl_xattr`) requires `acl_xattr_name`, checks the name is
+  not listed, and expects SET to fail with `NT_STATUS_ACCESS_DENIED`.
+  Confirmed from samba-team/samba master.
 
-**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-Record:
-- Needs existing `fsctl_set_sparse()`, `struct file_sparse`, and
-  `in_buf_len` — all present.
-- Does **not** require persist-xattr or directory-reject commits.
-- `git merge-base --is-ancestor 86c84cc76008 HEAD` → **not an ancestor**
-  (candidate not in this tree).
+**Step 4.4**
+- Record: Standalone. No later revert or follow-up on
+  `smb2_is_private_ea` through v7.3-rc1 (`git grep` still shows the
+  helper at three sites).
 
-===============================================================
-PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-===============================================================
+**Step 4.5**
+- Record: UNVERIFIED on lore.kernel.org/stable (lore blocked). No in-
+  tree revert.
 
-**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
-Record:
-- `b4 dig -c 86c84cc76008` (and `-a`/`-w`): lore.kernel.org returned an
-  error; **no thread matched**
-- Direct lore fetch: **403 / Anubis bot wall**
-- GitHub commit: https://github.com/torvalds/linux/commit/86c84cc7600809
-  29b7be44bceebe5854957b99da (2026-07-08 / committed 2026-08-17)
-- **UNVERIFIED:** reviewer comments, v2/v3, NAKs, in-thread Cc: stable
+## Phase 5: Code semantics
 
-**Step 4.2: CHECK WHO REVIEWED THE PATCH**
-Record: Message has only the author’s SOB. Maintainer self-applied.
-**UNVERIFIED** original To/Cc list (`b4 -w` failed).
+**Step 5.1**
+- Record: `smb2_is_private_ea`, `smb2_set_ea`, `smb2_get_ea`.
 
-**Step 4.3: SEARCH FOR THE BUG REPORT**
-Record: No Reported-by/Link. Bug is specified by protocol, not a syzbot
-crash.
+**Step 5.2**
+- Record: `smb2_set_ea` callers: CREATE EA context (`smb2_open` path
+  ~3322) and `FILE_FULL_EA_INFORMATION` in `smb2_set_info_file` (~6644).
+  `smb2_get_ea` caller: `smb2_get_info_file` (~5493). Reachable from
+  SMB2 CREATE / SET_INFO / QUERY_INFO.
 
-Verified spec (MS-FSCC 2.3.83): *“The message either has no data
-elements at all or it contains a FILE_SET_SPARSE_BUFFER element. If
-there is no data element, the sparse flag for the file is set, exactly
-as if … SetSparse value of TRUE.”*
+**Step 5.3**
+- Record: SET uses `ksmbd_vfs_setxattr` / `ksmbd_vfs_remove_xattr` after
+  prefixing `XATTR_USER_PREFIX`. GET uses `ksmbd_vfs_listxattr` /
+  `ksmbd_vfs_getxattr`. Internal DOS/stream/SD writers
+  (`ksmbd_vfs_set_dos_attrib_xattr`, stream helpers,
+  `ksmbd_vfs_set_sd_xattr`) do not go through `smb2_set_ea`, so server-
+  internal writes remain allowed.
 
-Win32 `FSCTL_SET_SPARSE`: *“If the lpInBuffer parameter is NULL, the
-operation will behave the same as if … SetSparse … were TRUE.”*
+**Step 5.4**
+- Record: Yes, from userspace: authenticated SMB client with
+  `FILE_WRITE_EA` / `FILE_READ_EA`. Those rights are normally part of
+  generic write/read.
 
-Samba `vfs_default.c`: empty/`in_len==0` → `file_set_sparse(..., true)`.
-smbtorture includes `test_ioctl_sparse_set_nobuf`.
+**Step 5.5**
+- Record: GET already special-cased STREAM and DOSATTRIB; SET did not.
+  Same reserved names as Samba (`user.DOSATTRIB`, `user.DosStream.*`,
+  `security.NTACL`).
 
-**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-Record: Same-day sparse series exists; this patch is the empty-buffer
-piece and is **self-contained**. Later `smb2pdu.c` mainline commits
-(Aug–Sep 2026) do not revert or retune this hunk.
+## Phase 6: This tree (6.12.111)
 
-**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-Record: **UNVERIFIED** (lore/stable search blocked). No evidence this
-was rejected for stable.
+**Step 6.1**
+- Record: Local tree is `pending-6.12`, `git describe`
+  `p-6.12-3-gc504cf0baa3d8`, `make kernelversion` **6.12.111**.
+  Candidate is **not** an ancestor of HEAD. Buggy SET/GET code is
+  present (`smb2_set_ea` at 2392, `smb2_get_ea` at 4758).
+  `smb2_is_private_ea` is absent.
 
-===============================================================
-PHASE 5: CODE SEMANTIC ANALYSIS
-===============================================================
+**Step 6.2**
+- Record: `git apply --check` of `4ea46ea602fc` succeeded (hunks at
+  2379, 2436, 4852; offsets only). Clean apply.
 
-**Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF**
-Record: `smb2_ioctl()` (modified); `fsctl_set_sparse()` (callee,
-unchanged by this patch).
+**Step 6.3**
+- Record: No alternate fix. GET still uses case-sensitive
+  STREAM/DOSATTRIB skips and does not filter NTACL.
 
-**Step 5.2: TRACE CALLERS**
-Record:
-- `smb2_ioctl` registered as `[SMB2_IOCTL_HE].proc` in
-  `fs/smb/server/smb2ops.c`
-- Reachable from authenticated SMB2 IOCTL over the network
-  (`CONFIG_SMB_SERVER`)
-- Not interrupt context; request path from ksmbd workers
+## Phase 7: Subsystem
 
-**Step 5.3: TRACE CALLEES**
-Record: `fsctl_set_sparse()` looks up the handle, checks writability,
-sets/clears `FILE_ATTRIBUTE_SPARSE_FILE_LE`, optionally writes DOS
-xattr, `ksmbd_fd_put()`.
+**Step 7.1**
+- Record: `fs/smb/server` (ksmbd). Criticality: IMPORTANT — network file
+  server, optional (`CONFIG_SMB_SERVER` default n), but a common stable
+  attack/integrity surface.
 
-**Step 5.4: FOLLOW THE CALL CHAIN**
-Record: SMB client → SMB2 IOCTL → `smb2_ioctl` → FSCTL_SET_SPARSE.
-**Yes, userspace/network reachable.** Linux CIFS client currently sends
-a 1-byte buffer (`smb2_set_sparse` → `SMB2_ioctl(..., &setsparse, 1,
-...)`), so Linux-to-ksmbd already works. Windows `DeviceIoControl` with
-NULL buffer and Samba torture `*_nobuf` hit the broken path.
+**Step 7.2**
+- Record: Actively maintained. This bug is old (original EA code), not a
+  7.3-only feature.
 
-**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-Record: Other FSCTLs in the same switch still require a non-empty input
-struct (`SET_ZERO_DATA`, copychunk, duplicate extents). Only SET_SPARSE
-is specified as valid with no data element. No sibling copy-paste of
-this empty-buffer rule in 6.12 ksmbd.
+## Phase 8: Impact and risk
 
-===============================================================
-PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
-===============================================================
+**Step 8.1**
+- Record: ksmbd users only (NAS, appliances, distro ksmbd). Not
+  universal.
 
-**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
-Record: **Yes**, `fs/smb/server/smb2pdu.c` `smb2_ioctl()`
-FSCTL_SET_SPARSE case, lines 8496–8505. Introduced 2021
-(`f7db8fd03a4bc5`). Local version **6.12.111**.
+**Step 8.2**
+- Record: Trigger: SMB2 SET_INFO FULL_EA or CREATE with EA context using
+  reserved names. Common for any client that can write EAs. Unprivileged
+  local processes cannot hit it unless they are SMB clients; an
+  authenticated SMB user can.
 
-**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-Record: Pre-image matches exactly (line numbers ~8496 vs mainline
-~9470). **Expected clean apply** with only context offset. No struct/API
-mismatch.
+**Step 8.3**
+- Record: Failure mode: overwrite `user.DOSATTRIB` (hidden/system/create
+  time) and `user.DosStream.*` (stream data); expose or plant
+  `user.NTACL`. Severity: **HIGH** (metadata/stream integrity and
+  reserved-name ACL confusion). Not a kernel oops. Default ksmbd ACL
+  store is `security.NTACL`, so SET EA `NTACL` does not overwrite the
+  SD; DOSATTRIB/streams are the real same-namespace collisions.
 
-**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-Record:
-- Permission checks: **yes** (`c5ab11263e3c8`)
-- Empty-buffer handling: **no**
-- Persist/advertise sparse overhaul (`159e727f763d`) and directory
-  reject (`31169f41778a`): **not in this tree**, and **not required**
-  for this fix
+**Step 8.4**
+- Record: Benefit high for ksmbd hosts. Risk very low (~20-line filter,
+  no locking/API change). Ratio favors backport.
 
-===============================================================
-PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-===============================================================
+## Phase 9: Synthesis
 
-**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-Record: **ksmbd** (`fs/smb/server/`, `CONFIG_SMB_SERVER`). **IMPORTANT**
-for SMB server deployments (Windows/macOS clients), not core mm/VFS. Not
-staging.
+**Step 9.1 — Evidence**
 
-**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-Record: Actively patched in 6.12.y (leases, query-info, durable
-reconnect, SET_SPARSE permission). Mature server with ongoing protocol-
-correctness backports.
+FOR:
+- Real reserved-name hole on a network server: SET can write
+  `user.DOSATTRIB` and `user.DosStream.*`.
+- GET can leak `user.NTACL` if that xattr exists.
+- Matches Samba’s long-standing hide/reject of those names; smbtorture
+  `smb2.ea.acl_xattr` expects ACCESS_DENIED.
+- Small, maintainer-authored, in v7.3-rc1 with no revert.
+- Applies cleanly to this 6.12 tree; macros and callers exist.
+- `-EACCES` already maps to `STATUS_ACCESS_DENIED`.
 
-===============================================================
-PHASE 8: IMPACT AND RISK ASSESSMENT
-===============================================================
+AGAINST:
+- Not a crash/UAF.
+- NTACL SD lives in `security.*`, so this is not a direct ACL overwrite
+  on default ksmbd.
+- Commit message is partly a test fix.
+- Lore review UNVERIFIED.
 
-**Step 8.1: DETERMINE WHO IS AFFECTED**
-Record: **Driver/config-specific:** ksmbd (`CONFIG_SMB_SERVER`) users
-whose clients send FSCTL_SET_SPARSE with InputCount=0 (Windows NULL
-`lpInBuffer`, Samba torture nobuf). Not universal.
+UNRESOLVED:
+- Original lore thread / reviewer stable nomination (lore blocked).
 
-**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-Record:
-- Trigger: SMB2 IOCTL FSCTL_SET_SPARSE with zero InputCount
-- Common for **Windows** documented API; **not** the Linux CIFS client
-  path (sends 1 byte)
-- Authenticated client with a writable handle (existing checks)
-- Not a race
+**Step 9.2 — Stable rules**
+1. Obviously correct and tested? **PASS** (applies cleanly; smbtorture
+   named; maintainer).
+2. Real user-visible bug? **PASS** (EA write/list of private metadata).
+3. Important (crash/security/corruption/deadlock)? **PASS** (HIGH:
+   metadata/stream integrity on an SMB server; security-boundary).
+4. Small and contained? **PASS** (+22/-6, one file).
+5. No new features/APIs? **PASS** (reject/filter only).
+6. Applies to this tree? **PASS** (`git apply --check` succeeded).
 
-**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-Record:
-- **Failure:** request rejected; file not marked sparse
-- **Not** oops, UAF, deadlock, or silent data corruption
-- **Severity: MEDIUM** — user-visible protocol break for a documented,
-  commonly used FSCTL
+**Step 9.3 — Exceptions**
+- Record: Not a device-ID/quirk/DT/build/docs exception. Qualifies as a
+  normal security/integrity bug fix.
 
-**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-Record:
-- **Benefit:** Windows/spec clients can set sparse the way MS-FSCC and
-  Samba already do; smbtorture nobuf can pass
-- **Risk:** very low (≈10-line ioctl case, no locking/API change, still
-  go through `fsctl_set_sparse()`)
-- **Ratio:** favorable
+**Step 9.4 — Decision**
+Backport to this 6.12 tree. The important part is not the Samba test
+name; it is that authenticated clients can currently smash DOS attribute
+and named-stream xattrs that ksmbd treats as private.
 
-===============================================================
-PHASE 9: FINAL SYNTHESIS
-===============================================================
+---
 
-**Step 9.1: COMPILE THE EVIDENCE**
+### What this solves for 6.12 users
 
-**FOR backporting:**
-- Real protocol bug: empty SET_SPARSE must set sparse (MS-FSCC + Win32 +
-  Samba)
-- Buggy length check has been in this tree since 2021
-- Small, obviously correct; does not reintroduce the OOB the 2021
-  validation prevented
-- Applies cleanly; no missing helpers
-- ksmbd maintainer authored it
-- Same class of ksmbd protocol-correctness fixes already land in 6.12.y
-- Existing permission checks still gate the operation
+ksmbd maps SMB EAs to `user.*`. It stores DOS attributes in
+`user.DOSATTRIB` and streams in `user.DosStream.*`. `smb2_set_ea()` does
+not reject those names, so a client with `FILE_WRITE_EA` can overwrite
+that metadata. Query already hid some of those names, but not `NTACL`
+and not case variants. The patch closes SET and GET.
 
-**AGAINST:**
-- Not a crash, UAF, leak, or CVE-class issue
-- No user report / Tested-by / lore review recovered
-- Same-day mainline series also changes sparse persistence/advertising;
-  this patch is the least dependent piece of that work
-- Linux CIFS client already sends a 1-byte buffer
-- On 6.12, `smb2_get_dos_mode()` still ORs SPARSE onto every regular
-  file when `share_fake_fscaps` has `FILE_SUPPORTS_SPARSE_FILES`, which
-  can mask some client need to SET_SPARSE
+### Stable-rules / risk
 
-**UNRESOLVED:**
-- Mailing-list review, stable nomination, and whether a newer revision
-  existed (`b4`/lore blocked)
+Meets all six criteria. Benefit is integrity of ksmbd private xattrs;
+risk is a tight ACCESS_DENIED on reserved names that Samba has treated
+as private for years.
 
-**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
-1. Obviously correct and tested? **PASS** — matches MS-FSCC/Samba;
-   maintainer-authored. No independent Tested-by (typical for this
-   size).
-2. Fixes a real bug that affects users? **PASS** — spec-legal
-   Windows/Samba requests fail on ksmbd.
-3. Important issue? **PASS** (medium) — interoperability failure on a
-   documented FSCTL, which stable-kernel-rules.rst here also covers as
-   an “oh, that’s not good” user-visible bug; not a kernel panic.
-4. Small and contained? **PASS** — one case in one file, +8/−2.
-5. No new features or APIs? **PASS** — does not add a userspace API;
-   restores required SMB behavior.
-6. Can apply to the local tree? **PASS** — pre-image present, would
-   apply with line-number offset only.
-
-**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-Record: Not a device-ID/quirk/DT/build/docs exception. Qualifies as a
-normal small protocol bugfix.
-
-**Step 9.4: MAKE YOUR DECISION**
-This should be backported to **this** 6.12.111 tree. The code the patch
-fixes is here, the change is surgical, and rejecting empty
-FSCTL_SET_SPARSE is a real Windows/Samba interoperability bug, not a new
-feature and not blocked by the later persist-sparse series.
-
-What it solves for stable users: ksmbd no longer returns invalid
-parameter when a client sends the documented empty SET_SPARSE request;
-the file is marked sparse via the existing `fsctl_set_sparse()` path.
-
-Risk vs benefit: very low risk, clear spec-backed benefit. No extra
-commits are required for the empty-buffer path to work here.
-
-===============================================================
-Verification
-===============================================================
-- [Phase 1] Parsed message/tags: only Namjae Jeon SOB; no
-  Fixes/Reported-by/Cc: stable
-- [Phase 2] Diff: +8/−2 in `smb2_ioctl` FSCTL_SET_SPARSE; empty buffer →
-  stack SetSparse=1; non-empty path unchanged
-- [Phase 2] Confirmed `struct file_sparse` is one packed `__u8`;
-  `in_buf_len` is `unsigned int` from `InputCount`
-- [Phase 2] Confirmed `fsctl_set_sparse()` already has share/handle
-  write checks in this tree (`c5ab11263e3c8`)
-- [Phase 3] `git describe HEAD` / Makefile: 6.12.111
-  (`p-6.12-3-gc504cf0baa3d8`)
-- [Phase 3] `git blame`: length check from `f7db8fd03a4bc5` (2021); case
-  from `e2f34481b24d`; both ancestors of HEAD
-- [Phase 3] `git merge-base --is-ancestor 86c84cc76008 HEAD` → not in
-  this tree
-- [Phase 3] Related mainline series (`159e727f763d`, `31169f41778a`) not
-  required; this hunk is independent
-- [Phase 4] `b4 dig -c/-a/-w 86c84cc76008`: lore error, no thread —
-  UNVERIFIED review
-- [Phase 4] GitHub: commit `86c84cc760080929b7be44bceebe5854957b99da`
-  matches the candidate text
-- [Phase 4] MS-FSCC 2.3.83 and Win32 FSCTL_SET_SPARSE: empty/NULL buffer
-  = SetSparse TRUE
-- [Phase 4] Samba `vfswrap_fsctl` FSCTL_SET_SPARSE: `in_len==0` → set
-  sparse true
-- [Phase 5] Caller: `smb2ops.c` SMB2_IOCTL_HE → `smb2_ioctl`; Linux
-  client sends 1-byte buffer in `smb2_set_sparse()`
-- [Phase 6] Local pre-image unique match at `smb2pdu.c` 8496–8505;
-  expected clean apply
-- [Phase 7] Subsystem ksmbd / CONFIG_SMB_SERVER, actively maintained on
-  this branch
-- [Phase 8] Failure: client EINVAL, severity MEDIUM; not oops/UAF
-- UNVERIFIED: lore/stable discussion and any mailing-list NAKs (lore
-  403)
+### Verification
+- [Phase 1] Parsed message/tags on `4ea46ea602fc`; only author SOB; no
+  Fixes/Link.
+- [Phase 2] Full `git show 4ea46ea602fc` diff: helper + SET `-EACCES` +
+  GET filter.
+- [Phase 2] Confirmed `-EACCES` → `STATUS_ACCESS_DENIED` at
+  `smb2_set_info` err_out (~6761) and CREATE err_out (~3812).
+- [Phase 2] Confirmed `XATTR_NAME_DOS_ATTRIBUTE` = `user.`+`DOSATTRIB`,
+  `XATTR_NAME_STREAM` = `user.`+`DosStream.`, `XATTR_NAME_SD` =
+  `security.`+`NTACL` in `xattr.h`.
+- [Phase 3] `git blame` SET/GET: `e2f34481b24db` (2021); ancestor of
+  HEAD.
+- [Phase 3] `git merge-base --is-ancestor 4ea46ea602fc HEAD` → no (not
+  in 6.12).
+- [Phase 4] `b4 dig -c 4ea46ea602fc` → lore error. UNVERIFIED mailing-
+  list discussion.
+- [Phase 4] Samba `torture_smb2_acl_xattr` expects SET ACCESS_DENIED and
+  no list leak.
+- [Phase 4] Merge `61a09cfc12147` mentions smbtorture protocol fixes /
+  security hardening.
+- [Phase 4] `smb2_is_private_ea` still in v7.3-rc1; no revert.
+- [Phase 5] Callers: CREATE EA context, SET_INFO FULL_EA, QUERY_INFO EA.
+- [Phase 6] `git describe HEAD` = `p-6.12-3-gc504cf0baa3d8`;
+  kernelversion 6.12.111.
+- [Phase 6] `git apply --check` of the commit succeeded with line
+  offsets only.
+- [Phase 8] Same-namespace overwrite of DOSATTRIB/streams verified in
+  `vfs.c` / `smb2_update_xattrs`.
+- UNVERIFIED: lore reviewers, CVE assignment, whether any distro already
+  carries a different backport.
 
 **YES**
 
- fs/smb/server/smb2pdu.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ fs/smb/server/smb2pdu.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 6b3cf2dadeecd..f383d1e5e5cb7 100644
+index e73edf006df72..4f8e2a6307602 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -8612,15 +8612,21 @@ int smb2_ioctl(struct ksmbd_work *work)
- 				rsp);
- 		break;
- 	case FSCTL_SET_SPARSE:
--		if (in_buf_len < sizeof(struct file_sparse)) {
-+	{
-+		struct file_sparse sparse = {0};
-+
-+		if (in_buf_len && in_buf_len < sizeof(struct file_sparse)) {
- 			ret = -EINVAL;
- 			goto out;
- 		}
+@@ -2378,6 +2378,22 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
+ 	return err;
+ }
  
--		ret = fsctl_set_sparse(work, id, (struct file_sparse *)buffer);
-+		*(u8 *)&sparse = 1;
-+		ret = fsctl_set_sparse(work, id, in_buf_len ?
-+				       (struct file_sparse *)buffer : &sparse);
- 		if (ret < 0)
- 			goto out;
- 		break;
-+	}
- 	case FSCTL_SET_ZERO_DATA:
- 	{
- 		struct file_zero_data_information *zero_data;
++static bool smb2_is_private_ea(const char *name, size_t name_len)
++{
++	if (name_len == SD_PREFIX_LEN &&
++	    !strncasecmp(name, SD_PREFIX, SD_PREFIX_LEN))
++		return true;
++	if (name_len == DOS_ATTRIBUTE_PREFIX_LEN &&
++	    !strncasecmp(name, DOS_ATTRIBUTE_PREFIX,
++			   DOS_ATTRIBUTE_PREFIX_LEN))
++		return true;
++	if (name_len >= STREAM_PREFIX_LEN &&
++	    !strncasecmp(name, STREAM_PREFIX, STREAM_PREFIX_LEN))
++		return true;
++
++	return false;
++}
++
+ /**
+  * smb2_set_ea() - handler for setting extended attributes using set
+  *		info command
+@@ -2419,6 +2435,10 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
+ 			rc = -EINVAL;
+ 			break;
+ 		}
++		if (smb2_is_private_ea(eabuf->name, eabuf->EaNameLength)) {
++			rc = -EACCES;
++			break;
++		}
+ 
+ 		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
+ 		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], eabuf->name,
+@@ -4828,17 +4848,13 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
+ 		if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN))
+ 			continue;
+ 
+-		if (!strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX,
+-			     STREAM_PREFIX_LEN))
+-			continue;
+-
+ 		if (req->InputBufferLength &&
+ 		    strncmp(&name[XATTR_USER_PREFIX_LEN], ea_req->name,
+ 			    ea_req->EaNameLength))
+ 			continue;
+ 
+-		if (!strncmp(&name[XATTR_USER_PREFIX_LEN],
+-			     DOS_ATTRIBUTE_PREFIX, DOS_ATTRIBUTE_PREFIX_LEN))
++		if (smb2_is_private_ea(&name[XATTR_USER_PREFIX_LEN],
++				       name_len - XATTR_USER_PREFIX_LEN))
+ 			continue;
+ 
+ 		if (!strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN))
 -- 
 2.53.0
 
