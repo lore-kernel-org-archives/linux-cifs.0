@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923355A4659;
-	Mon, 19 Oct 2026 13:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4154A5A8767;
+	Mon, 19 Oct 2026 13:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418385; cv=none; b=GNC3Fx3dolh4hkxSJuHyem2syknV/CRZZU5UO0DTzHcL3nOv9F549toUFK11vV/qipDd6Odt3Rh+rAQEcXEjqFs2RIpsZG9/a3Zj5f0ZKuFax9bzioqC+RJU0u2JRFpwzf5RwGbd+LhEkTUzP03+qxUGYSKLqKcEtrtnoUkrJ08=
+	t=1792418397; cv=none; b=qC1a1C776UDMAd8N3en4uTdxqJd66RLLi0hwZOdsjgewhBrsCyL9cgwKW01+pP11rV2YuSQsUVR0JmTN4zRAvDy0MeP2/Jp/nUi8D8am71QyDg4/s4IqvcGsIYaTNMHNRbu9meEOqG+/3u5y8J581kEF5ZHvMyy6F2wPOWEjTck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418385; c=relaxed/simple;
-	bh=CXnKF4+ZDrpWbpAZxBrFKka87tvf/mPvxrk92r7+buY=;
+	s=arc-20240116; t=1792418397; c=relaxed/simple;
+	bh=lXAEDhNCr2vsjmfDWLRZ8UrqZWYjFwAPdewqndj9g24=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cdrlAI4ORqpS1awKda7ZSWO7Ex4ZN+3ekPH0sCpWaeUss28Mi7QhR9SBO4B+ITodMdzCENEr8P0Uh+2sXrLMK6vMdn/dydmjD2V/fcffY9LoAE3NT1Z2yacc5Wt+sPZWvhSpTZWnDC0e464I5Yv5ShaFZOoEImA3lQn83tmlULY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GY2EEfgI; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=XqYV7QGR0vbN2DeD7Q2IO3h6cEpD8m9pat/0erUIHBYDnnKkpr5EaFDEmuUy8u2/5sU2c4DUbNiAoiFfVc2Rx39Onw6XOaXJNN2ZikbUIT+EsaO56gK+Il/ypFLoIr80iN6k3XxxZDKu8QK3qOOITQFDuvDvPywIQuUfvU3kvSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ll3rkweG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GY2EEfgI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 724951F000C7;
-	Mon, 19 Oct 2026 13:59:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ll3rkweG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BAD01F000C4;
+	Mon, 19 Oct 2026 13:59:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418382;
-	bh=U9Vkwbm05lDdxzxOAYs6Jk3Nr9THOJjffnHBcf4GiHE=;
+	s=k20260515; t=1792418395;
+	bh=Hohi6tC2hi2Y/Me0I+YLX5SX56omrwG9apCpo34mcI0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=GY2EEfgIrn+JQr1y96dyZF9u1Yct5GyqIzR1eAw2qXf8dOszuMl4W8S9mvhEQa3Cu
-	 2tHHre59FvD6BMX5HnX2AmPBb4WUrZx/DnCNuios4+vyi2UJLQ003nHm04wKaWDJ3X
-	 Djf0hEMYwU/x8kBmuNp/vh1zQjmP31bYOoIyA4mpMOD3kjfiKZZPlHBxE/AyqFxMoX
-	 QCANvLXNiJ7FLwgOwnSbTJcj5yAjpE0of8XnfhAeRXgiyWZbBNsQzfSTKKnVHO+EIS
-	 qY2xoprPbblqr4YNx0DSNVIUZcaH8J7n1yFDJvbJ2c9qvOPpwcGorxyBSvudsRQHuW
-	 qer5vka9HhUNw==
+	b=ll3rkweGxJmw2LoiZpLRrr0lAIEEr3EPMPu+DYV5xSTbGUQulczmon9fxqpr3SdnS
+	 BffvjaoYSMQ0qvv9ojAWUSbdcc8O5KukoHN/36HUTjYNTqJ7kPHsarCzVEM9bwRHRu
+	 2r0s54zLtI4Xfi6d9d4y8ss5UXcWOe47aAlqsAQ9PKiTNjYgqKVS2ZMTVohY7xUYkR
+	 S9MHigOCSK50eUGx5ixkkr5MhqTPcMAAB0p2+t0kZgC+vjKErjSJpNzZIBmgl3uEhU
+	 ObA/Sz8DlLkQYQQ+dOwzc9I6Ki9yr2UcIzWepXZApJHu01vQHllmOxIZuHX5vKV1Fi
+	 npna5EbigB4wA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,9 +33,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: protect private extended attributes
-Date: Mon, 19 Oct 2026 09:48:20 -0400
-Message-ID: <20261019135441.1420968-209-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.1] ksmbd: allow I/O on directory named streams
+Date: Mon, 19 Oct 2026 09:48:30 -0400
+Message-ID: <20261019135441.1420968-219-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -53,19 +53,17 @@ Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 4ea46ea602fc7055eee4b5b0e84f90f22da7f7e7 ]
+[ Upstream commit 8184c425a19d44f138d42b44cc363917c08e5f1c ]
 
-SMB clients can currently create an EA named NTACL because SMB EAs are
-mapped into the user namespace while the ksmbd security descriptor is
-stored as security.NTACL. Allowing the reserved logical name makes the
-server-private ACL metadata appear writable through the SMB EA API.
+Named streams are stored as extended attributes on the base inode. The
+VFS read and write helpers reject directory inodes before or together
+with checking whether the handle represents a stream.
 
-Reject NTACL, DOSATTRIB, and DosStream-prefixed EA names without regard
-to case. Filter the same private names from EA query results so stale or
-externally-created user namespace attributes cannot be exposed.
+Permit read and write operations when a directory-backed handle is a
+named stream. Continue rejecting direct I/O on ordinary directory
+handles.
 
-This fixes smb2.ea.acl_xattr when acl_xattr_name is configured as
-NTACL.
+This fixes creation of the directory stream in smb2.getinfo.complex.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -75,357 +73,349 @@ LLM Generated explanations, may be completely bogus:
 
 ## Phase 1: Commit message forensics
 
-**Step 1.1 — Subject**
-- Record: `[ksmbd] [protect] keep server-private xattr names off the SMB
-  EA API`
+**Step 1.1: PARSE THE SUBJECT LINE**
+Record: `[ksmbd] [allow] permit read/write on named streams whose base
+inode is a directory`
 
-**Step 1.2 — Tags**
-- Record: `Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>` (ksmbd
-  maintainer; author and committer).
+**Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+Record:
+- `Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>` (ksmbd
+  maintainer; author)
 - No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-
-  by:`, `Link:`, or `Cc: stable`. Absence of `Fixes:`/`Cc: stable` is
-  expected for this review and is not a negative signal.
+  by:`, `Link:`, or `Cc: stable@`
+- Absence of `Fixes:`/`Cc: stable` is expected for this review pipeline
+  and is not a negative signal
+- Ignore any later `[Upstream commit ...]` / `Signed-off-by: Sasha
+  Levin` markers; they are candidate-prep, not selection
 
-**Step 1.3 — Body**
-- Record: SMB EAs are stored as `user.*` xattrs. ksmbd keeps NT ACL
-  metadata in `security.NTACL`. Clients can still create an EA named
-  `NTACL`, so the reserved logical name looks writable over SMB
-  SET_INFO/QUERY_INFO EA. The patch rejects `NTACL`, `DOSATTRIB`, and
-  `DosStream.`-prefixed names case-insensitively on set, and filters the
-  same names from query results so leftover `user.*` copies are not
-  exposed. Failure mode: reserved metadata can be written or listed
-  through the EA API. Symptom: Samba smbtorture `smb2.ea.acl_xattr`
-  fails when `acl_xattr_name=NTACL`. Introduced with original ksmbd EA
-  mapping; not a new 7.x-only bug.
+**Step 1.3: ANALYZE THE COMMIT BODY TEXT**
+Record:
+- **Bug:** Named streams are stored as xattrs on the base inode.
+  `ksmbd_vfs_read()` and `ksmbd_vfs_write()` reject directory inodes
+  before (read) or together with (write) the stream-handle check, so a
+  directory-backed stream never reaches `ksmbd_vfs_stream_read()` /
+  `ksmbd_vfs_stream_write()`.
+- **Symptom:** SMB read/write of a named stream on a directory fails
+  (`-EISDIR` / `-EACCES`). Samba smbtorture `smb2.getinfo.complex`
+  cannot create `DNAME:streamtwo`.
+- **Version info in the message:** none.
+- **Root cause:** directory inode check is applied to the base inode,
+  not to whether the handle is a stream.
 
-**Step 1.4 — Hidden bug fix?**
-- Record: Yes. “Protect” is a security/integrity fix, not cleanup. SET
-  currently does not reject reserved names. GET already skipped
-  `DosStream.` / `DOSATTRIB` with case-sensitive `strncmp`, but not
-  `NTACL` and not case variants.
+**Step 1.4: DETECT HIDDEN BUG FIXES**
+Record: Not disguised. This is an explicit protocol-correctness fix for
+existing ADS I/O. “Allow” here means “stop rejecting a path that already
+exists,” not a new API.
 
 ## Phase 2: Diff analysis
 
-**Step 2.1 — Inventory**
-- Record: `fs/smb/server/smb2pdu.c` only (`+22/-6`). Functions: new
-  `smb2_is_private_ea()`; `smb2_set_ea()`; `smb2_get_ea()`.
-  Classification: single-file surgical fix.
+**Step 2.1: INVENTORY THE CHANGES**
+Record:
+- File: `fs/smb/server/vfs.c` — 3 insertions, 2 deletions
+- Functions: `ksmbd_vfs_read()`, `ksmbd_vfs_write()`
+- Scope: single-file surgical fix
 
-**Step 2.2 — Flow**
-- Record:
-  - SET: after the EA name-length check, reserved names return `-EACCES`
-    instead of `ksmbd_vfs_setxattr`/`remove_xattr` on `user.<name>`.
-  - GET: STREAM and DOSATTRIB `strncmp` skips become one
-    `smb2_is_private_ea()` skip (adds `NTACL`, case-insensitive).
-    Specific-name QUERY still cannot return those names.
+**Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+Record:
+- **Read, before:** `S_ISDIR(inode)` → immediate `-EISDIR`, so
+  `ksmbd_stream_fd()` is never reached.
+- **Read, after:** reject only `S_ISDIR && !ksmbd_stream_fd(fp)`. Stream
+  handles fall through to `ksmbd_vfs_stream_read()` (xattr).
+- **Write, before:** inside the SMB access check, `S_ISDIR` forces
+  `-EACCES` even for stream fds.
+- **Write, after:** same access check, but directory rejection is
+  skipped for `ksmbd_stream_fd(fp)`, then the existing stream-write
+  branch runs.
+- Ordinary directory I/O is still rejected. Stream I/O still never calls
+  `kernel_read()` / `kernel_write()`.
 
-**Step 2.3 — Bug mechanism**
-- Record: Logic/correctness plus a hardware/protocol reserved-name
-  filter (category g/h). Same-namespace collisions: `user.DOSATTRIB`
-  (DOS flags/create time) and `user.DosStream.*` (named streams).
-  `security.NTACL` is a different namespace, so SET of EA `NTACL`
-  creates `user.NTACL` rather than overwriting the SD; the patch still
-  blocks that reserved name and hides any leftover `user.NTACL`.
+**Step 2.3: IDENTIFY THE BUG MECHANISM**
+Record: **Logic / protocol correctness.** Directory ADS is valid SMB.
+The VFS helpers treated the base directory inode as “no I/O allowed” and
+never used the xattr stream path.
 
-**Step 2.4 — Fix quality**
-- Record: Obviously correct. `strncasecmp` + exact length for
-  `NTACL`/`DOSATTRIB`, prefix match for streams. `-EACCES` maps to
-  `STATUS_ACCESS_DENIED` in both `smb2_set_info()` and CREATE error
-  mapping, matching smbtorture. Regression risk is low: only reserved
-  Samba/ksmbd names are rejected. Query of a private name still yields
-  `STATUS_NO_EAS_ON_FILE` rather than ACCESS_DENIED; that is pre-
-  existing GET skip behavior, not a new crash path.
+**Step 2.4: ASSESS THE FIX QUALITY**
+Record: Obviously correct and minimal. `ksmbd_stream_fd()` is an
+existing inline (`fp->stream.name != NULL`). After the exemption, both
+functions still take the stream branch and `goto out` / return before
+VFS file I/O, so the `__kernel_write_iter` WARNING that motivated the
+earlier directory-write ban is not reintroduced. Regression risk is very
+low.
 
-## Phase 3: Git history
+## Phase 3: Git history investigation
 
-**Step 3.1 — Blame**
-- Record: Unfiltered SET and GET STREAM/DOSATTRIB skips come from
-  `e2f34481b24db` (“cifsd: add server-side procedures for SMB3”,
-  2021-03-16). Present since ksmbd entered the kernel (5.15 era). `git
-  merge-base --is-ancestor e2f34481b24db HEAD` succeeds.
+**Step 3.1: BLAME THE CHANGED LINES**
+Record:
+- Read `S_ISDIR` check: `f44158485826c0` (“cifsd: add file operations”,
+  2021). Directory stream **reads** have been broken since ksmbd’s
+  original file ops.
+- Write `S_ISDIR` check: `2a879da5c34a1` (“ksmbd: fix the warning from
+  __kernel_write_iter”), upstream `b37f2f332b40`, present here as
+  `v6.12.25~99`. That stable backport banned all directory writes to
+  avoid `WARNING: CPU: ... at fs/read_write.c:599 __kernel_write_iter`.
+  It sits **before** the stream-fd check, so it also blocked directory
+  **stream** writes that previously went through xattrs.
 
-**Step 3.2 — Fixes tag**
-- Record: None. Buggy behavior is the original EA mapping, not a later
-  regression.
+**Step 3.2: FOLLOW THE FIXES: TAG**
+Record: No `Fixes:` tag. The write-side bug is a follow-on to
+`2a879da5c34a1` / `b37f2f332b40`, which **is** in this tree.
 
-**Step 3.3 — File history**
-- Record: Recent 6.12 ksmbd work is unrelated (buffer sizes, leases,
-  durable reconnect). No competing private-EA helper in this tree.
+**Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
+Record: Stream I/O already exists here (`ksmbd_vfs_stream_read/write`,
+`d62ba16563a86` OOB check, `5c54a557bde18` empty-stream write fix,
+`a8f5d39971bba` opener creds for ADS). Neighboring 7.3 stream patches
+(copychunk, AAPL FinderInfo, stream delete, `::$DATA` validation) are
+**not** prerequisites for this 3-line change. Standalone.
 
-**Step 3.4 — Author**
-- Record: Namjae Jeon is the ksmbd maintainer. Surrounding 7.3 ksmbd
-  commits are other protocol/security fixes; this commit is standalone
-  (`4ea46ea602fc`).
+**Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
+Record: Namjae Jeon is the ksmbd maintainer. This landed in the ksmbd
+7.3-rc1 pull among other ADS/protocol fixes. Same author previously
+landed `2fb9b5dc80cab` (“allow write with FILE_APPEND_DATA”) on stable
+for a similar client-visible I/O rejection.
 
-**Step 3.5 — Dependencies**
-- Record: Needs `SD_PREFIX`, `DOS_ATTRIBUTE_PREFIX`, `STREAM_PREFIX`
-  from `fs/smb/server/xattr.h` (included via `vfs.h` in `smb2pdu.c`).
-  All exist here. `strncasecmp` is in `include/linux/string.h`. Applies
-  standalone.
+**Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
+Record: Uses only `ksmbd_stream_fd()`, already in
+`fs/smb/server/vfs_cache.h` and included from `vfs.c`. Parent
+`4ea46ea602fc7` (“protect private extended attributes”) is **not** in
+this tree and is not required. `git show 8184c425a19d4 | git apply
+--check` succeeds on this tree.
 
-## Phase 4: Mailing list / external
+## Phase 4: Mailing list and external research
 
-**Step 4.1**
-- Record: SHA `4ea46ea602fc7055eee4b5b0e84f90f22da7f7e7` (v7.3-rc1). `b4
-  dig -c 4ea46ea602fc` failed: lore.kernel.org returned errors (Anubis
-  bot challenge). WebFetch to lore also 403. UNVERIFIED: original thread
-  text, NAKs, reviewer Cc:stable.
+**Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
+Record: `b4 dig -c 8184c425a19d4` failed (lore.kernel.org returned an
+error / Anubis bot wall). Same for lore search URLs. Fallback: the
+commit is listed in Namjae’s **[GIT PULL] ksmbd server update for
+7.3-rc1** (2026-08-23) as `ksmbd: allow I/O on directory named streams`,
+under “Correct alternate-data-stream and named-stream handling,” not
+under “New features.”
 
-**Step 4.2**
-- Record: UNVERIFIED recipients. Commit is authored and committed by the
-  subsystem maintainer; Linus merged it in `ksmbd-for-7.3-rc1`
-  (`61a09cfc12147`), described as smbtorture-validated protocol fixes
-  and security hardening.
+**Step 4.2: CHECK WHO REVIEWED THE PATCH**
+Record: UNVERIFIED at patch-thread level (lore unreachable). The pull is
+from the subsystem maintainer to Linus.
 
-**Step 4.3**
-- Record: Samba `source4/torture/smb2/ea.c` `torture_smb2_acl_xattr`
-  (`smb2.ea.acl_xattr`) requires `acl_xattr_name`, checks the name is
-  not listed, and expects SET to fail with `NT_STATUS_ACCESS_DENIED`.
-  Confirmed from samba-team/samba master.
+**Step 4.3: SEARCH FOR THE BUG REPORT**
+Record: Samba `smb2.getinfo.complex` (`source4/torture/smb2/getinfo.c`)
+does:
+- `torture_setup_complex_dir(..., DNAME)`
+- `torture_setup_complex_file(..., DNAME ":streamtwo")`
+Historically noted as “streams on directories does not work.” That is a
+real client/test failure, not a theoretical one.
 
-**Step 4.4**
-- Record: Standalone. No later revert or follow-up on
-  `smb2_is_private_ea` through v7.3-rc1 (`git grep` still shows the
-  helper at three sites).
+**Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
+Record: Part of the large 7.3 ksmbd dump, but this hunk is self-
+contained. Later stream patches improve enumeration, delete, copychunk,
+AAPL; they are not needed for this I/O gate.
 
-**Step 4.5**
-- Record: UNVERIFIED on lore.kernel.org/stable (lore blocked). No in-
-  tree revert.
+**Step 4.5: CHECK STABLE MAILING LIST HISTORY**
+Record: UNVERIFIED (lore blocked). No in-tree discussion of rejecting
+this fix.
 
-## Phase 5: Code semantics
+## Phase 5: Code semantic analysis
 
-**Step 5.1**
-- Record: `smb2_is_private_ea`, `smb2_set_ea`, `smb2_get_ea`.
+**Step 5.1: IDENTIFY KEY FUNCTIONS**
+Record: `ksmbd_vfs_read()`, `ksmbd_vfs_write()`, helper
+`ksmbd_stream_fd()`.
 
-**Step 5.2**
-- Record: `smb2_set_ea` callers: CREATE EA context (`smb2_open` path
-  ~3322) and `FILE_FULL_EA_INFORMATION` in `smb2_set_info_file` (~6644).
-  `smb2_get_ea` caller: `smb2_get_info_file` (~5493). Reachable from
-  SMB2 CREATE / SET_INFO / QUERY_INFO.
+**Step 5.2: TRACE CALLERS**
+Record:
+- `ksmbd_vfs_read()` ← `smb2_read()` (`smb2pdu.c`)
+- `ksmbd_vfs_write()` ← `smb2_write()` and `smb2_write_rdma_channel()`
+Reachable from normal SMB2 READ/WRITE on a connected share.
+`connection_type` is set from the negotiated dialect, so the write-side
+directory check applies to SMB2/SMB3.
 
-**Step 5.3**
-- Record: SET uses `ksmbd_vfs_setxattr` / `ksmbd_vfs_remove_xattr` after
-  prefixing `XATTR_USER_PREFIX`. GET uses `ksmbd_vfs_listxattr` /
-  `ksmbd_vfs_getxattr`. Internal DOS/stream/SD writers
-  (`ksmbd_vfs_set_dos_attrib_xattr`, stream helpers,
-  `ksmbd_vfs_set_sd_xattr`) do not go through `smb2_set_ea`, so server-
-  internal writes remain allowed.
+**Step 5.3: TRACE CALLEES**
+Record: Stream path uses `ksmbd_vfs_getcasexattr` / `ksmbd_vfs_setxattr`
+on the dentry. Directories support xattrs; no `kernel_write()` on the
+directory inode.
 
-**Step 5.4**
-- Record: Yes, from userspace: authenticated SMB client with
-  `FILE_WRITE_EA` / `FILE_READ_EA`. Those rights are normally part of
-  generic write/read.
+**Step 5.4: FOLLOW THE CALL CHAIN**
+Record: Userspace SMB client → SMB2 CREATE of `dir:streamtwo` (open
+already allowed when `s_type` is not explicit `$DATA`) → SMB2 WRITE →
+`ksmbd_vfs_write()` currently returns `-EACCES`. Triggerable by any
+client with streams enabled (`KSMBD_SHARE_FLAG_STREAMS`).
 
-**Step 5.5**
-- Record: GET already special-cased STREAM and DOSATTRIB; SET did not.
-  Same reserved names as Samba (`user.DOSATTRIB`, `user.DosStream.*`,
-  `security.NTACL`).
+**Step 5.5: SEARCH FOR SIMILAR PATTERNS**
+Record: Other `S_ISDIR` checks in ksmbd (oplock, setattr, query info)
+are separate. No duplicate I/O gate that would still block this path
+after the patch.
 
-## Phase 6: This tree (6.12.111)
+## Phase 6: Cross-referencing against the local tree
 
-**Step 6.1**
-- Record: Local tree is `pending-6.12`, `git describe`
-  `p-6.12-3-gc504cf0baa3d8`, `make kernelversion` **6.12.111**.
-  Candidate is **not** an ancestor of HEAD. Buggy SET/GET code is
-  present (`smb2_set_ea` at 2392, `smb2_get_ea` at 4758).
-  `smb2_is_private_ea` is absent.
+**Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
+Record: Yes. Local tree is **6.12.111** (`pending-6.12`,
+`p-6.12-3-gc504cf0baa3d8`). Current code:
 
-**Step 6.2**
-- Record: `git apply --check` of `4ea46ea602fc` succeeded (hunks at
-  2379, 2436, 4852; offsets only). Clean apply.
+```377:378:fs/smb/server/vfs.c
+        if (S_ISDIR(inode->i_mode))
+                return -EISDIR;
+```
 
-**Step 6.3**
-- Record: No alternate fix. GET still uses case-sensitive
-  STREAM/DOSATTRIB skips and does not filter NTACL.
+```503:505:fs/smb/server/vfs.c
+        if (work->conn->connection_type) {
+                if (!(fp->daccess & (FILE_WRITE_DATA_LE |
+FILE_APPEND_DATA_LE)) ||
+                    S_ISDIR(file_inode(fp->filp)->i_mode)) {
+```
 
-## Phase 7: Subsystem
+`8184c425a19d4` is **not** an ancestor of HEAD. Write-side regression
+introduced in **v6.12.25**.
 
-**Step 7.1**
-- Record: `fs/smb/server` (ksmbd). Criticality: IMPORTANT — network file
-  server, optional (`CONFIG_SMB_SERVER` default n), but a common stable
-  attack/integrity surface.
+**Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
+Record: Clean apply (`git apply --check` exit 0). Surrounding functions
+match the upstream hunk context. `ksmbd_stream_fd()` already present.
 
-**Step 7.2**
-- Record: Actively maintained. This bug is old (original EA code), not a
-  7.3-only feature.
+**Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
+Record: No equivalent directory-stream I/O exemption. Stream write
+OOB/empty-xattr fixes are present but do not address `S_ISDIR`.
 
-## Phase 8: Impact and risk
+## Phase 7: Subsystem and maintainer context
 
-**Step 8.1**
-- Record: ksmbd users only (NAS, appliances, distro ksmbd). Not
-  universal.
+**Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
+Record: `fs/smb/server` (ksmbd). **IMPORTANT** — in-kernel SMB3 server
+used by NAS/embedded/distro images. Not core mm/VFS, not staging.
 
-**Step 8.2**
-- Record: Trigger: SMB2 SET_INFO FULL_EA or CREATE with EA context using
-  reserved names. Common for any client that can write EAs. Unprivileged
-  local processes cannot hit it unless they are SMB clients; an
-  authenticated SMB user can.
+**Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
+Record: Actively maintained; this tree already carries many ksmbd
+protocol and memory-safety backports. Mature ADS support has existed
+since the cifsd era (2021).
 
-**Step 8.3**
-- Record: Failure mode: overwrite `user.DOSATTRIB` (hidden/system/create
-  time) and `user.DosStream.*` (stream data); expose or plant
-  `user.NTACL`. Severity: **HIGH** (metadata/stream integrity and
-  reserved-name ACL confusion). Not a kernel oops. Default ksmbd ACL
-  store is `security.NTACL`, so SET EA `NTACL` does not overwrite the
-  SD; DOSATTRIB/streams are the real same-namespace collisions.
+## Phase 8: Impact and risk assessment
 
-**Step 8.4**
-- Record: Benefit high for ksmbd hosts. Risk very low (~20-line filter,
-  no locking/API change). Ratio favors backport.
+**Step 8.1: DETERMINE WHO IS AFFECTED**
+Record: ksmbd users with `KSMBD_SHARE_FLAG_STREAMS` who have
+Windows/Samba/macOS clients using named streams on directories (Explorer
+ADS, smbtorture, some backup/metadata workflows).
 
-## Phase 9: Synthesis
+**Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
+Record: SMB2 WRITE/READ on a handle opened as `dir:stream`. Common in
+protocol tests; less common than file ADS, but a supported SMB feature.
+Unprivileged share users can trigger it if they can create streams.
 
-**Step 9.1 — Evidence**
+**Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
+Record: Client I/O fails (`STATUS` derived from `-EISDIR`/`-EACCES`);
+not a panic, UAF, or silent corruption. **MEDIUM**
+functional/interoperability, **HIGH** as a **stable-to-stable write
+regression** since v6.12.25.
+
+**Step 8.4: CALCULATE RISK-BENEFIT RATIO**
+Record:
+- **Benefit:** Restores directory ADS I/O; undoes over-broad fallout
+  from the `__kernel_write_iter` stable fix; unblocks
+  `smb2.getinfo.complex`.
+- **Risk:** Very low (3 lines, existing helper, stream path still
+  bypasses `kernel_write`).
+- **Ratio:** favorable.
+
+## Phase 9: Final synthesis
+
+**Step 9.1: COMPILE THE EVIDENCE**
 
 FOR:
-- Real reserved-name hole on a network server: SET can write
-  `user.DOSATTRIB` and `user.DosStream.*`.
-- GET can leak `user.NTACL` if that xattr exists.
-- Matches Samba’s long-standing hide/reject of those names; smbtorture
-  `smb2.ea.acl_xattr` expects ACCESS_DENIED.
-- Small, maintainer-authored, in v7.3-rc1 with no revert.
-- Applies cleanly to this 6.12 tree; macros and callers exist.
-- `-EACCES` already maps to `STATUS_ACCESS_DENIED`.
+- Real SMB protocol bug: named streams live in xattrs; directory base
+  inodes must still allow stream I/O.
+- Write path is a **regression** from `2a879da5c34a1` (v6.12.25) already
+  on this 6.12.y tree.
+- Existing ADS stack is in this tree; this only opens the gate to it.
+- 3-line, obviously correct, applies cleanly.
+- Maintainer-authored; validated via smbtorture `smb2.getinfo.complex`.
+- Does not restore the directory `kernel_write` WARNING.
 
 AGAINST:
-- Not a crash/UAF.
-- NTACL SD lives in `security.*`, so this is not a direct ACL overwrite
-  on default ksmbd.
-- Commit message is partly a test fix.
-- Lore review UNVERIFIED.
+- Not a crash/security/corruption issue.
+- Directory ADS is a narrower client feature than file ADS.
+- Read-side rejection has existed since 2021 (enabling reads is
+  correctness, not a 6.12.y regression).
 
 UNRESOLVED:
-- Original lore thread / reviewer stable nomination (lore blocked).
+- Original lore review thread (b4/lore blocked).
+- Whether reviewers asked for `Cc: stable`.
 
-**Step 9.2 — Stable rules**
-1. Obviously correct and tested? **PASS** (applies cleanly; smbtorture
-   named; maintainer).
-2. Real user-visible bug? **PASS** (EA write/list of private metadata).
-3. Important (crash/security/corruption/deadlock)? **PASS** (HIGH:
-   metadata/stream integrity on an SMB server; security-boundary).
-4. Small and contained? **PASS** (+22/-6, one file).
-5. No new features/APIs? **PASS** (reject/filter only).
-6. Applies to this tree? **PASS** (`git apply --check` succeeded).
+**Step 9.2: APPLY THE STABLE RULES CHECKLIST**
+1. Obviously correct and tested? **PASS** — logic is local and was
+   exercised by smbtorture.
+2. Fixes a real bug that affects users? **PASS** — SMB clients cannot
+   I/O directory named streams.
+3. Important issue? **PASS** — interoperability failure plus a write-
+   side regression from a prior stable commit. Not a panic, but user-
+   visible and already shipped in 6.12.y.
+4. Small and contained? **PASS** — 3 lines, one file.
+5. No new features or APIs? **PASS** — no new syscall/sysfs; streams
+   already advertised.
+6. Can apply to the local tree? **PASS** — clean apply; helpers exist.
 
-**Step 9.3 — Exceptions**
-- Record: Not a device-ID/quirk/DT/build/docs exception. Qualifies as a
-  normal security/integrity bug fix.
+**Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
+Record: None of device-ID / quirk / DT / build / docs. Qualifies on
+ordinary bug-fix rules.
 
-**Step 9.4 — Decision**
-Backport to this 6.12 tree. The important part is not the Samba test
-name; it is that authenticated clients can currently smash DOS attribute
-and named-stream xattrs that ksmbd treats as private.
+**Step 9.4: MAKE YOUR DECISION**
+This tree already contains ksmbd named-stream I/O and the v6.12.25
+directory-write ban. The ban is correct for ordinary directory handles
+but incorrectly covers stream handles, which never use `kernel_write()`.
+Backporting this exemption restores intended ADS behavior with
+negligible risk.
 
 ---
 
-### What this solves for 6.12 users
+What this solves for 6.12.y: Windows/Samba clients that write a named
+stream on a directory (as `smb2.getinfo.complex` does with
+`DNAME:streamtwo`) currently get `-EACCES` on write and `-EISDIR` on
+read. After v6.12.25 that write failure is a regression from a WARNING
+fix. The patch is a 3-line predicate change; stream I/O still goes
+through xattrs, so the WARNING does not come back.
 
-ksmbd maps SMB EAs to `user.*`. It stores DOS attributes in
-`user.DOSATTRIB` and streams in `user.DosStream.*`. `smb2_set_ea()` does
-not reject those names, so a client with `FILE_WRITE_EA` can overwrite
-that metadata. Query already hid some of those names, but not `NTACL`
-and not case variants. The patch closes SET and GET.
-
-### Stable-rules / risk
-
-Meets all six criteria. Benefit is integrity of ksmbd private xattrs;
-risk is a tight ACCESS_DENIED on reserved names that Samba has treated
-as private for years.
-
-### Verification
-- [Phase 1] Parsed message/tags on `4ea46ea602fc`; only author SOB; no
-  Fixes/Link.
-- [Phase 2] Full `git show 4ea46ea602fc` diff: helper + SET `-EACCES` +
-  GET filter.
-- [Phase 2] Confirmed `-EACCES` → `STATUS_ACCESS_DENIED` at
-  `smb2_set_info` err_out (~6761) and CREATE err_out (~3812).
-- [Phase 2] Confirmed `XATTR_NAME_DOS_ATTRIBUTE` = `user.`+`DOSATTRIB`,
-  `XATTR_NAME_STREAM` = `user.`+`DosStream.`, `XATTR_NAME_SD` =
-  `security.`+`NTACL` in `xattr.h`.
-- [Phase 3] `git blame` SET/GET: `e2f34481b24db` (2021); ancestor of
-  HEAD.
-- [Phase 3] `git merge-base --is-ancestor 4ea46ea602fc HEAD` → no (not
-  in 6.12).
-- [Phase 4] `b4 dig -c 4ea46ea602fc` → lore error. UNVERIFIED mailing-
-  list discussion.
-- [Phase 4] Samba `torture_smb2_acl_xattr` expects SET ACCESS_DENIED and
-  no list leak.
-- [Phase 4] Merge `61a09cfc12147` mentions smbtorture protocol fixes /
-  security hardening.
-- [Phase 4] `smb2_is_private_ea` still in v7.3-rc1; no revert.
-- [Phase 5] Callers: CREATE EA context, SET_INFO FULL_EA, QUERY_INFO EA.
-- [Phase 6] `git describe HEAD` = `p-6.12-3-gc504cf0baa3d8`;
-  kernelversion 6.12.111.
-- [Phase 6] `git apply --check` of the commit succeeded with line
-  offsets only.
-- [Phase 8] Same-namespace overwrite of DOSATTRIB/streams verified in
-  `vfs.c` / `smb2_update_xattrs`.
-- UNVERIFIED: lore reviewers, CVE assignment, whether any distro already
-  carries a different backport.
+Verification:
+- [Phase 1] Parsed tags: only maintainer SOB; no Fixes/Reported-by/Cc:
+  stable
+- [Phase 2] Diff: 3 lines in `ksmbd_vfs_read`/`ksmbd_vfs_write`; exempts
+  `ksmbd_stream_fd()` from `S_ISDIR`
+- [Phase 3] `git blame`: read check from `f44158485826c0` (2021); write
+  check from `2a879da5c34a1` (`v6.12.25~99`)
+- [Phase 3] `git merge-base --is-ancestor 2a879da5c34a1 HEAD` → yes;
+  `8184c425a19d4` → no
+- [Phase 3] `git apply --check` of `8184c425a19d4` → clean
+- [Phase 4] `b4 dig -c 8184c425a19d4` failed (lore error)
+- [Phase 4] 7.3-rc1 GIT PULL lists this under ADS handling, not new
+  features
+- [Phase 4] Samba `getinfo.c` creates `DNAME ":streamtwo"` in
+  `smb2.getinfo.complex`
+- [Phase 5] Callers: `smb2_read` / `smb2_write` / RDMA write; stream
+  callees are xattr helpers
+- [Phase 6] `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`; `make
+  kernelversion` → 6.12.111; buggy `S_ISDIR` present
+- [Phase 8] Failure mode: failed SMB stream I/O, plus write regression
+  since v6.12.25; not a panic
+- UNVERIFIED: lore review comments / stable ML discussion (lore blocked)
 
 **YES**
 
- fs/smb/server/smb2pdu.c | 28 ++++++++++++++++++++++------
- 1 file changed, 22 insertions(+), 6 deletions(-)
+ fs/smb/server/vfs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index e73edf006df72..4f8e2a6307602 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2378,6 +2378,22 @@ static noinline int create_smb2_pipe(struct ksmbd_work *work)
- 	return err;
- }
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 3ac5f3f48121d..47c289ad9c3dc 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -372,7 +372,7 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
+ 	ssize_t nbytes = 0;
+ 	struct inode *inode = file_inode(filp);
  
-+static bool smb2_is_private_ea(const char *name, size_t name_len)
-+{
-+	if (name_len == SD_PREFIX_LEN &&
-+	    !strncasecmp(name, SD_PREFIX, SD_PREFIX_LEN))
-+		return true;
-+	if (name_len == DOS_ATTRIBUTE_PREFIX_LEN &&
-+	    !strncasecmp(name, DOS_ATTRIBUTE_PREFIX,
-+			   DOS_ATTRIBUTE_PREFIX_LEN))
-+		return true;
-+	if (name_len >= STREAM_PREFIX_LEN &&
-+	    !strncasecmp(name, STREAM_PREFIX, STREAM_PREFIX_LEN))
-+		return true;
-+
-+	return false;
-+}
-+
- /**
-  * smb2_set_ea() - handler for setting extended attributes using set
-  *		info command
-@@ -2419,6 +2435,10 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
- 			rc = -EINVAL;
- 			break;
- 		}
-+		if (smb2_is_private_ea(eabuf->name, eabuf->EaNameLength)) {
-+			rc = -EACCES;
-+			break;
-+		}
+-	if (S_ISDIR(inode->i_mode))
++	if (S_ISDIR(inode->i_mode) && !ksmbd_stream_fd(fp))
+ 		return -EISDIR;
  
- 		memcpy(attr_name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN);
- 		memcpy(&attr_name[XATTR_USER_PREFIX_LEN], eabuf->name,
-@@ -4828,17 +4848,13 @@ static int smb2_get_ea(struct ksmbd_work *work, struct ksmbd_file *fp,
- 		if (strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN))
- 			continue;
+ 	if (unlikely(count == 0))
+@@ -500,7 +500,8 @@ int ksmbd_vfs_write(struct ksmbd_work *work, struct ksmbd_file *fp,
  
--		if (!strncmp(&name[XATTR_USER_PREFIX_LEN], STREAM_PREFIX,
--			     STREAM_PREFIX_LEN))
--			continue;
--
- 		if (req->InputBufferLength &&
- 		    strncmp(&name[XATTR_USER_PREFIX_LEN], ea_req->name,
- 			    ea_req->EaNameLength))
- 			continue;
- 
--		if (!strncmp(&name[XATTR_USER_PREFIX_LEN],
--			     DOS_ATTRIBUTE_PREFIX, DOS_ATTRIBUTE_PREFIX_LEN))
-+		if (smb2_is_private_ea(&name[XATTR_USER_PREFIX_LEN],
-+				       name_len - XATTR_USER_PREFIX_LEN))
- 			continue;
- 
- 		if (!strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN))
+ 	if (work->conn->connection_type) {
+ 		if (!(fp->daccess & (FILE_WRITE_DATA_LE | FILE_APPEND_DATA_LE)) ||
+-		    S_ISDIR(file_inode(fp->filp)->i_mode)) {
++		    (S_ISDIR(file_inode(fp->filp)->i_mode) &&
++		     !ksmbd_stream_fd(fp))) {
+ 			pr_err("no right to write(%pD)\n", fp->filp);
+ 			err = -EACCES;
+ 			goto out;
 -- 
 2.53.0
 
