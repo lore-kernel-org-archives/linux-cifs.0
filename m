@@ -1,42 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8EE4D1F8B;
-	Mon, 19 Oct 2026 14:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3DD528E7C;
+	Mon, 19 Oct 2026 14:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418503; cv=none; b=SCSGRteuEuVdmmuIR0nXq2icIk4+L3oORrLXcBMA86EK83BGXk9lDbNR/dcBF0sDfbwqfUme8+PNZ8+LezBIJVrPyXDN8M7QJgGacHCCPb94FUfhCPh2+Xwwcle39C/FcsmaeOmHIvoM2duHrVNhLAVEer4P9AalCZhxLjAPokk=
+	t=1792418579; cv=none; b=i//t6wZEFeRdRVv9G5NOefD67VyXbLHmQp4nMHdGKxKBUfyoYsrSo1mApX+ZH7kZI8/b30W96xMFEJraY8thvXuaJeqDXyCyoGvFiyxmaId4vQIpyFuraRaiX93/UEJMvKzHj9J2obCHGULBpoK80onEkJf8pnz88/5rREUrvmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418503; c=relaxed/simple;
-	bh=Pw16NMBKp4Tb7RpBxtRLoXIQzsakfGEM8SLKudZ+8JE=;
+	s=arc-20240116; t=1792418579; c=relaxed/simple;
+	bh=X0WWpL/yAc+d45sAZxg4kVZZZqi6sb8JBuCq80J76pI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cNomdWyhUh1mtzIgymZsFFsWtOM3DouuOJSNAUnD+p81c3Dfd/fq+3y9zoCFQbNnlMDMOhIJXMd2Nq/dJ6mEP/fVpfn39S22oRtuwRZzpo+FVkmjONczgG7Ub7mLtHJj2UJqqNm0BZU06/XlsxQTJWrYEIwyAPmqEfjv95Y5DVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bb0BZXX+; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=OPUyJtG5NLdoww0i3eK4G1Tk1Jmc4gI5bsTO/dmNZd/trhR+VEEBRBUDLWVX6USj23FvOYw/GVm3lV1HmoR2xR2XmMyq9ffgy8DfjvtRiRVZF0B6rYPn9didP6xb//r9KhrC1YeiKcAynwZgIh+FjGE4Tk+YAi9E1f5VvlwqCRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ME3ZVss+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bb0BZXX+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0992C1F000C9;
-	Mon, 19 Oct 2026 14:01:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ME3ZVss+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C59BB1F000CD;
+	Mon, 19 Oct 2026 14:02:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418500;
-	bh=vCYSX0KAdzMp4LUoB36agPXg/WOb5Qw+5T8Kzg7aaEc=;
+	s=k20260515; t=1792418576;
+	bh=wcTZCSdHSKjaGx5kDio+SrLyCa2fp7o+hd0FbeYvW1E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Bb0BZXX+XXSb2TK8BkM7gxBi954yujRm0UpD3MDPufSsrMxxU/FkEf4gu+H1SvsJY
-	 YxdNc/MAcEYDhFXezh0wSMyDCpo6gbKE743Ww/+m0Gy58Oy1ggZymCWzZndOEb+sSn
-	 jLpLUivEEQFfxGm2pFEKMZOJH5vXPRKMv3nW/N+rmq2sU+pl934FjfiDN92DVH5X88
-	 xI34YrU499JZoCvDPYclaD4TUKF9XXkF0qZLnzjF7cUuAAYyjzE2Tw6eFMb+dEStqU
-	 Otw48UlEh+5rvgKZpHBbilza91rCTFgxl1Q0PuuQDiyMhnCmLxh+2m17XrYULJuO69
-	 ixAMwR6X9F5HQ==
+	b=ME3ZVss+nm3SGoZwWEz9WoYfJi149CpaEpC1sEplGAhbCcFf/309x4j8kR27vV2Li
+	 SryPOlIALhHex7Gfe/CZwfKnnm3DXpVbeTtw+/b7COKASZbRshLoOfx9tDQRf7Esvh
+	 2GBn9fjRRT1siVkoWM56BB3NLZjSHLF8eP+MqWJMPti9+tJp2D9+rs6BxsSJt3Ot8E
+	 MQsjIiekmjUw47EjDmNqCrliCyoCOhBtycFlZ2UArPdtVMo+0k/l0v07FxBS+pNwVw
+	 Ft33IeJ82xGEZX7gCMQWs6uBMgda9loPNAt7pu7IqjjnQ8fDQ+eE4+vzbV3Dke7+r0
+	 4AT50XGtfnpLA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Thomas Huth <thuth@redhat.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] smb: server: Free session data in user_session.c with kfree_sensitive()
-Date: Mon, 19 Oct 2026 09:49:44 -0400
-Message-ID: <20261019135441.1420968-293-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.6] ksmbd: return buffer too small for short security queries
+Date: Mon, 19 Oct 2026 09:50:37 -0400
+Message-ID: <20261019135441.1420968-346-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -52,380 +51,411 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Thomas Huth <thuth@redhat.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 9a4bd6507c21f66e84dc021705a4b9d84773111e ]
+[ Upstream commit 2103add92a02505bdd536ba6fce7f64a427222a2 ]
 
-struct ksmbd_session contains some arrays with sensitive information, like
-sess_key, smb3encryptionkey, smb3decryptionkey and smb3signingkey. Thus
-let's make sure that this information cannot leak via the heap and use
-kfree_sensitive() to free it.
+SMB2 QUERY_INFO security requests with an output buffer too small for
+the self-relative security descriptor header can fall through descriptor
+construction and be reported as STATUS_INVALID_INFO_CLASS.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+After validating the file handle, reject buffers shorter than struct
+smb_ntsd with STATUS_BUFFER_TOO_SMALL before building the descriptor.
+
+This fixes smb2.getinfo.qsec_buffercheck.
+
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-I have the local 6.12.111 code, the upstream commit, and the mailing-
-list thread. Compiling the nine-phase analysis next.
+The local tree is **6.12.111** (`pending-6.12`). The candidate is
+mainline `2103add92a02` (“ksmbd: return buffer too small for short
+security queries”). It is not an ancestor of HEAD, but the buggy path is
+present and the patch applies.
 
-## Phase 1: Commit message forensics
+===============================================================
+PHASE 1: COMMIT MESSAGE FORENSICS
+===============================================================
 
-**Step 1.1: Subject line**
-- Record: `[smb/ksmbd server] [Free / use kfree_sensitive] Wipe ksmbd
-  session objects (and Preauth_HashValue) so session keys cannot remain
-  in freed heap memory`
+Step 1.1: PARSE THE SUBJECT LINE
+Record: [ksmbd] [return] SMB2 QUERY_INFO security with a too-small
+output buffer should return STATUS_BUFFER_TOO_SMALL instead of a wrong
+NT status.
 
-**Step 1.2: Tags** (from upstream
-`d4a6d1c94f7a383c16fd5f5e912a39a640d1cb9d`; ignore pipeline SOBs)
-- No `Fixes:`
-- No `Reported-by:` / `Tested-by:` / `Reviewed-by:` / `Cc: stable`
-- `Acked-by: Namjae Jeon <linkinjeon@kernel.org>` (ksmbd maintainer)
-- `Signed-off-by: Thomas Huth <thuth@redhat.com>` (author)
-- `Signed-off-by: Steve French <stfrench@microsoft.com>` (CIFS
-  maintainer; present on the merged commit)
-- Candidate-prep copy also had `Signed-off-by: Namjae Jeon`; merged form
-  uses Acked-by instead
-- Record: Maintainer ack, no user report, no syzbot, no CVE tag
+Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
+Record:
+- Signed-off-by: Namjae Jeon \<linkinjeon@kernel.org\> (ksmbd
+  maintainer)
+- No Fixes:, Reported-by:, Tested-by:, Reviewed-by:, Acked-by:, Link:,
+  or Cc: stable
+- Absence of Fixes/Cc-stable is expected for this review pipeline and is
+  not a negative signal
+- Pipeline-added markers (Upstream commit / Sasha Levin SOB) ignored per
+  instructions
 
-**Step 1.3: Body**
-- Record: `[Bug] ksmbd_session holds sess_key, smb3encryptionkey,
-  smb3decryptionkey, smb3signingkey and a Preauth_HashValue buffer, then
-  frees them with kfree(), so those secrets can remain in the slab.
-  [Symptom] Potential heap disclosure of SMB session/crypto keys after
-  session teardown. [Versions] None stated. [Root cause] Sensitive
-  material is returned to the allocator without memzero_explicit.]`
-- Cover letter (series v2 0/5): “It's good security practice to clear
-  sensitive data… and to use kfree_sensitive() for data that is returned
-  to the heap.”
+Step 1.3: ANALYZE THE COMMIT BODY TEXT
+Record:
+- Bug: SMB2 QUERY_INFO (security) with OutputBufferLength smaller than
+  `struct smb_ntsd` can still run descriptor construction and be
+  reported as STATUS_INVALID_INFO_CLASS
+- Symptom: wrong NT status on short security queries; Samba smbtorture
+  `smb2.getinfo.qsec_buffercheck` fails
+- Author’s root cause: missing early reject after the file handle is
+  validated
+- Fix: if OutputBufferLength \< sizeof(struct smb_ntsd), set
+  STATUS_BUFFER_TOO_SMALL, put the fd, return -ENOSPC
 
-**Step 1.4: Hidden bug fix?**
-- Record: Not disguised cleanup. It is an explicit secret-wipe / heap-
-  disclosure hardening change. Functional behavior of session teardown
-  is unchanged except the object is zeroed before free.
+Step 1.4: DETECT HIDDEN BUG FIXES
+Record: Not a disguised cleanup. It is an explicit protocol/error-code
+fix. The “fall through descriptor construction” wording matches a real
+control-flow bug, not style.
 
-## Phase 2: Diff analysis
+===============================================================
+PHASE 2: DIFF ANALYSIS - LINE BY LINE
+===============================================================
 
-**Step 2.1: Inventory**
-- Record: `[fs/smb/server/mgmt/user_session.c: 2 insertions, 2
-  deletions] [function: ksmbd_session_destroy] [scope: single-file, two-
-  call-site surgical change]`
+Step 2.1: INVENTORY THE CHANGES
+Record:
+- File: `fs/smb/server/smb2pdu.c` (+6 / -0)
+- Function: `smb2_get_info_sec()`
+- Scope: single-file surgical fix, one insertion after
+  `ksmbd_lookup_fd_slow()`
 
-**Step 2.2: Code flow**
-- Record: Before, `ksmbd_session_destroy()` calls
-  `kfree(sess->Preauth_HashValue)` then `kfree(sess)` after logoff/file-
-  table/user/RPC/channel teardown. After, those two frees use
-  `kfree_sensitive()`, which `memzero_explicit`s the whole allocation
-  then `kfree`s. Normal teardown path only; not an error-path
-  restructure.
+Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
+Record:
+- Before: after a successful fd lookup, the function always builds POSIX
+  ACL fattr / optional SD xattr, allocates a scratch SD, calls
+  `build_sec_desc()`, then `buffer_check_err()`.
+- After: if `OutputBufferLength < sizeof(struct smb_ntsd)` (20 bytes),
+  return immediately with STATUS_BUFFER_TOO_SMALL and `ksmbd_fd_put()`.
+- Path: error path for client-provided undersized QUERY_INFO security
+  buffers (including the Samba test’s 0- and 1-byte probes).
 
-Verified in this tree at:
+Step 2.3: IDENTIFY THE BUG MECHANISM
+Record:
+- Category: logic / protocol correctness (wrong NT status)
+- Mechanism verified in this tree:
+  1. Samba `qsec_buffercheck` uses AdditionalInformation=0 and
+     OutputBufferLength 0 then 1.
+  2. `smb_acl_sec_desc_scratch_len()` with no OWNER/GROUP/DACL flags
+     returns `sizeof(struct smb_ntsd)` = 20.
+  3. `build_sec_desc()` also sets `secdesclen` to 20.
+  4. The OOB-fix guard `ALIGN(secdesclen, 8) > scratch_len` is 24 > 20,
+     so rc = -EFBIG with Status still 0.
+  5. `smb2_query_info()` maps unmapped errors with Status==0 to
+     STATUS_INVALID_INFO_CLASS.
+- That matches the commit message. MS-SMB2 3.3.5.20.3 requires
+  STATUS_BUFFER_TOO_SMALL when OutputBufferLength is zero or
+  insufficient for the security descriptor.
 
-```159:175:fs/smb/server/mgmt/user_session.c
-void ksmbd_session_destroy(struct ksmbd_session *sess)
-{
-        if (!sess)
-                return;
+Step 2.4: ASSESS THE FIX QUALITY
+Record:
+- Obviously correct: a self-relative NTSD is at least `sizeof(struct
+  smb_ntsd)`; smaller buffers cannot hold one.
+- `ksmbd_fd_put()` is required after `ksmbd_lookup_fd_slow()`; no leak.
+- `smb2_query_info()` does not remap -ENOSPC when Status is already set,
+  so BUFFER_TOO_SMALL is preserved.
+- Regression risk is low: only OutputBufferLength < 20 on QUERY_INFO
+  security changes, from a wrong error to the spec-required one.
+- Incomplete vs MS-SMB2: the error response still has ByteCount 0
+  (`smb2_set_err_rsp()`), so the required size is not returned. The
+  torture test only asserts the status. That does not make the patch
+  incorrect.
 
-        ksmbd_tree_conn_session_logoff(sess);
-        ksmbd_destroy_file_table(sess);
-        if (sess->user)
-                ksmbd_free_user(sess->user);
-        ksmbd_launch_ksmbd_durable_scavenger();
-        ksmbd_session_rpc_clear_list(sess);
-        free_channel_list(sess);
-        kfree(sess->Preauth_HashValue);
-        ksmbd_release_id(&session_ida, sess->id);
-        ida_destroy(&sess->tree_conn_ida);
-        kfree(sess);
-}
-```
+===============================================================
+PHASE 3: GIT HISTORY INVESTIGATION
+===============================================================
 
-Sensitive fields verified in `struct ksmbd_session` (`user_session.h`):
-`sess_key`, `smb3encryptionkey`, `smb3decryptionkey`, `smb3signingkey`,
-plus `Preauth_HashValue`.
+Step 3.1: BLAME THE CHANGED LINES
+Record:
+- Insertion point is immediately after the fd lookup, which dates to
+  e2f34481b24db2 (Namjae Jeon, 2021, original cifsd QUERY_INFO security
+  path).
+- The INVALID_INFO_CLASS outcome for this short-buffer case comes from
+  d48c64fb80ad7 (“ksmbd: fix OOB write in QUERY_INFO for compound
+  requests”, 2026-03-25), which added scratch_len + ALIGN check +
+  buffer_check_err. That commit **is** in this tree.
 
-**Step 2.3: Bug mechanism**
-- Record: `[Memory safety / cryptographic material leftover] [kfree()
-  does not clear; kfree_sensitive() zeros via memzero_explicit then
-  frees. Category: information leak / CWE-226 class, not UAF/crash.]`
+Step 3.2: FOLLOW THE FIXES: TAG
+Record: No Fixes: tag. Functionally this is a follow-up to
+d48c64fb80ad7, which is already in HEAD.
 
-**Step 2.4: Fix quality**
-- Record: `[Obviously correct drop-in. kfree_sensitive() is NULL-safe
-  like kfree(). Session is kzalloc'd, so ksize/kfree_sensitive is the
-  right API. No API/lock/struct change.] [Regression risk: very low.
-  Docs warn kfree_sensitive is not for hot paths; session destroy is
-  logoff/expire/teardown, not a packet hot path.]`
+Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
+Record: Related QUERY_INFO buffer-status commits already in this tree:
+- fb29c008e1f3b ksmbd: return buffer overflow for partial filesystem
+  info (fixes smb2.getinfo.qfs_buffercheck)
+- df33d8243ce6b ksmbd: fix partial file information responses (mainline
+  parent of this candidate)
+- ab1da5f071fae ksmbd: keep compound responses on query info errors
+- ff021a8abacab ksmbd: fix partial normalized name responses
+This is the security-info counterpart of qfs_buffercheck, not a large
+series that needs extra unapplied patches.
 
-## Phase 3: Git history
+Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
+Record: Namjae Jeon is the ksmbd maintainer (MAINTAINERS / Kconfig
+SMB_SERVER). Many of his QUERY_INFO buffer-handling fixes are already on
+this branch.
 
-**Step 3.1: Blame**
-- Record: `ksmbd_session_destroy` and `kfree(sess->Preauth_HashValue)`
-  from `e2f34481b24db2` (“cifsd: add server-side procedures for SMB3”),
-  contained in `v5.15-rc1`. `kfree(sess)` from `822bc8ea514ecd` (2021).
-  Encryption key fields from `5a0ca7700591a5` (2021). Bug has been in
-  this code since ksmbd entered mainline.
+Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
+Record: Standalone. Needs `smb2_get_info_sec()`, `struct smb_ntsd`,
+`ksmbd_fd_put()`, STATUS_BUFFER_TOO_SMALL, and the existing query_info
+error mapper — all present. `git apply --check` of 2103add92a succeeded
+(hunk offset only). Parent 6b8b79226bc3 (“fix partial file information
+responses”) is in the tree as df33d8243ce6b.
 
-**Step 3.2: Fixes: tag**
-- Record: No `Fixes:` tag. Not applicable. Introducer is the original
-  ksmbd session code, which is in this tree (`git merge-base --is-
-  ancestor` of those SHAs vs HEAD succeeded).
+===============================================================
+PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+===============================================================
 
-**Step 3.3: File history**
-- Record: Recent 6.12.y ksmbd session work is lifetime/UAF/ida (e.g.
-  `9d58ac0643e5b` destroy tree_conn_ida, session leak/UAF fixes). None
-  already switches these two `kfree`s. Not blocked by later refactor in
-  this file.
+Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
+Record:
+- Mainline SHA confirmed via GitHub API:
+  2103add92a02505bdd536ba6fce7f64a427222a2
+- `b4 dig -c 2103add92a` failed: lore.kernel.org returned server errors
+  (exact patch-id, author+subject, and in-body From all failed)
+- lore WebFetch also 403
+- UNVERIFIED: mailing-list review comments, NAKs, Cc: stable from
+  reviewers, series revisions
 
-**Step 3.4: Author**
-- Record: Thomas Huth (Red Hat); not the ksmbd maintainer. Series of
-  five independent kfree_sensitive conversions. Maintainer Namjae Jeon
-  acked and applied to `#ksmbd-for-next-next`. Steve French signed off
-  on the merge.
+Step 4.2: CHECK WHO REVIEWED THE PATCH
+Record: Commit has only the author’s SOB. UNVERIFIED original To/Cc (b4
+-w not usable without lore).
 
-**Step 3.5: Dependencies**
-- Record: Patch 3/5 of “Clear sensitive data before freeing it”. Sibling
-  patches touch `auth.c`, `user_config.c`, `connection.c`, `smb2pdu.c`.
-  This hunk does not call new helpers and does not depend on those other
-  diffs. `linux/slab.h` already included. `kfree_sensitive()` exists in
-  this tree (`mm/slab_common.c`, exported). Standalone apply: yes.
+Step 4.3: SEARCH FOR THE BUG REPORT
+Record: Samba smbtorture `source4/torture/smb2/getinfo.c`
+`torture_smb2_qsec_buffercheck()`:
+- QUERY_INFO SECURITY, output_buffer_length 0 → expect
+  NT_STATUS_BUFFER_TOO_SMALL
+- same with length 1 → expect NT_STATUS_BUFFER_TOO_SMALL
+This is a documented interoperability test against Windows/Samba
+behavior, not a theoretical check.
 
-## Phase 4: Mailing list / external
+Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
+Record: Not labeled X/Y. Parent is the already-backported partial file-
+info fix. Sister test qfs_buffercheck is already fixed in this tree. No
+extra series member is required for this hunk.
 
-**Step 4.1: Original discussion**
-- Record: `[Lore]
-  https://patch.msgid.link/20260811154620.2425851-4-thuth@redhat.com`
-- Series: v1 (4 patches, 2026-08-10) → v2 (5 patches, 2026-08-11). This
-  file hunk is unchanged v1→v2.
-- v1 review (Namjae): also wipe `struct preauth_session` in
-  `ksmbd_preauth_session_destroy()`. That was handled in v2 patch 5
-  (`smb2pdu.c` session-setup paths), not in this commit. This commit is
-  still self-contained.
-- No NAK. No reviewer asked for `Cc: stable`. Maintainer: “Applied them
-  to #ksmbd-for-next-next.”
+Step 4.5: CHECK STABLE MAILING LIST HISTORY
+Record: UNVERIFIED (lore.kernel.org/stable search not available; 403).
+Decision does not rely on stable-list history.
 
-**Step 4.2: Recipients (b4 dig -w)**
-- Record: Thomas Huth; Namjae Jeon; Steve French; Sergey Senozhatsky;
-  Tom Talpey; linux-kernel@. Subsystem maintainers were on To/Cc and the
-  ksmbd maintainer acked.
+===============================================================
+PHASE 5: CODE SEMANTIC ANALYSIS
+===============================================================
 
-**Step 4.3: Bug report**
-- Record: No syzbot/bugzilla/CVE for this change. Author framed it as
-  hygiene; spots “identified with AI” then written by hand.
+Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF
+Record: `smb2_get_info_sec()` only.
 
-**Step 4.4: Series context**
-- Record: Five independent wipe sites. This one wipes the session object
-  that actually embeds the SMB3 keys. Related remaining `kfree(chann)`
-  of `struct channel` (contains `smb3signingkey`) is not part of this
-  commit; that does not make this hunk incorrect.
+Step 5.2: TRACE CALLERS
+Record:
+- `smb2_query_info()` → case SMB2_O_INFO_SECURITY
+- Registered in `fs/smb/server/smb2ops.c` as SMB2_QUERY_INFO_HE
+- Reachable from any SMB2 client that issues QUERY_INFO security
+  (Windows ACL UI, `icacls`, Samba, etc.)
 
-**Step 4.5: Stable list**
-- Record: No stable@ discussion found for this subject. Unverified that
-  it was previously rejected for stable.
+Step 5.3: TRACE CALLEES
+Record: New path calls `ksmbd_fd_put()` and returns. It avoids
+`ksmbd_acls_fattr`, `ksmbd_vfs_get_sd_xattr`,
+`smb_acl_sec_desc_scratch_len`, `build_sec_desc`.
 
-Upstream SHA (not in this branch):
-`d4a6d1c94f7a383c16fd5f5e912a39a640d1cb9d`. `git merge-base --is-
-ancestor d4a6d1c94f7a3 HEAD` failed (exit 1).
+Step 5.4: FOLLOW THE CALL CHAIN
+Record: Userspace/network reachable: authenticated SMB2 QUERY_INFO on an
+open handle. Unprivileged local users cannot hit it unless they can
+speak SMB to a ksmbd share; remote SMB clients can.
 
-## Phase 5: Semantic analysis
+Step 5.5: SEARCH FOR SIMILAR PATTERNS
+Record: Same QUERY_INFO buffer-status pattern already fixed for
+filesystem info (qfs_buffercheck) and file info. Security info was the
+remaining class for this Samba suite.
 
-**Step 5.1: Functions**
-- Record: `ksmbd_session_destroy` only.
+===============================================================
+PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+===============================================================
 
-**Step 5.2: Callers**
-- Record: Same file: `ksmbd_expire_session`, `ksmbd_sessions_deregister`
-  (two sites), `ksmbd_user_session_put`, `__session_create` error path.
-- `ksmbd_user_session_put` is used from `smb2pdu.c` (session
-  setup/logoff), `server.c`, `auth.c`, and register failure.
-- Context: SMB session lifetime (logoff, expire, connection teardown,
-  create failure). Not IRQ. Reachable from a connected SMB client.
+Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
+Record: Yes. `smb2_get_info_sec()` at `fs/smb/server/smb2pdu.c:5789` has
+the lookup then immediately `file_mnt_idmap()` with no
+OutputBufferLength vs `sizeof(struct smb_ntsd)` check. `git merge-base
+--is-ancestor 2103add92a HEAD` is false. `git describe HEAD` =
+p-6.12-3-gc504cf0baa3d8, `make kernelversion` = 6.12.111.
 
-**Step 5.3: Callees**
-- Record: tree-connect logoff, file table destroy, `ksmbd_free_user`,
-  durable scavenger, RPC clear, `free_channel_list`, then the two frees.
-  Side effect of the patch is only the wipe-before-free.
+Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
+Record: Clean apply (`git apply --check` succeeded; offset -507 lines
+because mainline’s file is larger). No API mismatch.
 
-**Step 5.4: Reachability**
-- Record: Yes. Any ksmbd login then logoff/disconnect/expire hits this.
-  CONFIG_SMB_SERVER (default n), module `ksmbd`. Network-facing when
-  enabled.
+Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
+Record: qfs_buffercheck / partial file info / compound query-info error
+handling are here. This exact BUFFER_TOO_SMALL early reject is not. No
+alternate fix for qsec_buffercheck found (`git log --grep=qsec` empty on
+fs/smb/server).
 
-**Step 5.5: Similar patterns**
-- Record: CIFS client already uses `kfree_sensitive` widely for session
-  keys/passwords in this tree. ksmbd server only uses it in `auth.c`
-  (`kfree_sensitive(ctx_arc4)`). `free_channel_list`/`ksmbd_chann_del`
-  still `kfree` channel objects that embed `smb3signingkey`.
-  `ksmbd_preauth_session_destroy` still `kfree`s `preauth_session` (hash
-  embedded). Same class of leftover secrets; this patch still covers the
-  primary session key material.
+===============================================================
+PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
+===============================================================
 
-## Phase 6: This tree (6.12.111)
+Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
+Record: ksmbd (`fs/smb/server`, CONFIG_SMB_SERVER, default n).
+Criticality: IMPORTANT for ksmbd deployments (network file server),
+PERIPHERAL for kernels that do not enable it.
 
-**Step 6.1: Buggy code present?**
-- Record: Yes. `pending-6.12` / `make kernelversion` = 6.12.111. Exact
-  `kfree(sess->Preauth_HashValue)` and `kfree(sess)` still in
-  `ksmbd_session_destroy`. Introduced with ksmbd (v5.15), long before
-  6.12.
+Step 7.2: ASSESS SUBSYSTEM ACTIVITY
+Record: Actively maintained; recent 6.12 backports are mostly ksmbd
+protocol and lifetime fixes from Namjae Jeon.
 
-**Step 6.2: Backport difficulty**
-- Record: Clean apply. Mailing-list hunk context
-  (`ksmbd_launch_ksmbd_durable_scavenger` … `ida_destroy`) matches this
-  tree. Upstream later added `delete_proc_session(sess)` above these
-  lines; that symbol is absent here but is not in the 3-line context of
-  the actual change. `kfree_sensitive` already declared in
-  `include/linux/slab.h`.
+===============================================================
+PHASE 8: IMPACT AND RISK ASSESSMENT
+===============================================================
 
-**Step 6.3: Related fixes already here?**
-- Record: No equivalent wipe of these two allocations. `git log
-  --grep=kfree_sensitive -- fs/smb/server` has no matching session-
-  destroy commit.
+Step 8.1: DETERMINE WHO IS AFFECTED
+Record: ksmbd users (CONFIG_SMB_SERVER). Windows/Samba clients querying
+security descriptors with a short or zero output buffer.
 
-## Phase 7: Subsystem context
+Step 8.2: DETERMINE THE TRIGGER CONDITIONS
+Record: Common for ACL probes: OutputBufferLength 0 or 1 (exactly what
+the Samba test sends; Windows often probes with a small buffer then
+retries). Authenticated SMB client on a share; not a local unprivileged
+syscall.
 
-**Step 7.1**
-- Record: `[ksmbd / fs/smb/server] [IMPORTANT for systems with
-  CONFIG_SMB_SERVER: NAS/embedded SMB3 server; not CORE for every 6.12
-  user]`
+Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
+Record: Wrong NT status (INVALID_INFO_CLASS instead of
+BUFFER_TOO_SMALL). Clients that treat INVALID_INFO_CLASS as
+“unsupported” will not retry with a larger buffer, so ACL queries can
+fail. Not a kernel oops/UAF. Severity: MEDIUM (interop / functional
+failure on a file server), HIGH for ksmbd ACL usability.
 
-**Step 7.2**
-- Record: Actively maintained; this 6.12.y branch already carries many
-  ksmbd security/UAF backports. Code path itself is mature (since 5.15).
+Step 8.4: CALCULATE RISK-BENEFIT RATIO
+Record:
+- Benefit: restores MS-SMB2-required status for short security queries;
+  unbreaks smb2.getinfo.qsec_buffercheck; repairs fallout from an OOB
+  fix already in this tree.
+- Risk: very low (6 lines, error path only, fd_put balanced).
+- Ratio: favorable.
 
-## Phase 8: Impact and risk
+===============================================================
+PHASE 9: FINAL SYNTHESIS
+===============================================================
 
-**Step 8.1: Who is affected**
-- Record: Config-specific (`CONFIG_SMB_SERVER`). Users running ksmbd
-  (SMB3 kernel server).
+Step 9.1: COMPILE THE EVIDENCE
 
-**Step 8.2: Trigger**
-- Record: Session destroy on logoff, idle expire, connection teardown,
-  or failed session create. Common on any real ksmbd workload.
-  Triggering the leftover keys does not require a race; the wipe
-  omission is deterministic. Reading the leftover keys does require
-  another info leak, a dump, or similar.
+FOR:
+- Real protocol bug: MS-SMB2 3.3.5.20.3 MUST return
+  STATUS_BUFFER_TOO_SMALL for insufficient security QUERY_INFO buffers
+- Concrete user-visible failure: Samba torture qsec_buffercheck; Windows
+  ACL size-probe pattern
+- Mechanism verified in this tree: ALIGN(secdesclen,8) > scratch_len →
+  -EFBIG → INVALID_INFO_CLASS
+- Follow-up to d48c64fb80ad7, which is already in 6.12.111 (stable-to-
+  stable)
+- 6-line surgical change, fd_put correct, Status not overwritten
+- Applies cleanly
+- Same class as qfs_buffercheck, already backported here
+- Maintainer-authored
 
-**Step 8.3: Failure mode**
-- Record: `[Residual SMB session/encryption/signing keys and preauth
-  hash in slab after free] [Severity: MEDIUM as a standalone disclosure
-  (needs another read of freed/reused heap), HIGH in combination with an
-  uninitialized-kmalloc leak or memory dump because the secrets can
-  decrypt prior SMB3 traffic or expose session key material]`
+AGAINST:
+- Not a crash, UAF, or data-corruption fix
+- Incomplete vs spec (no 4-byte required length in the error body)
+- ksmbd is optional (default n)
+- No Fixes:/Cc:stable (expected; not used as a NO)
 
-**Step 8.4: Risk-benefit**
-- Record: `[Benefit: medium for ksmbd deployments — clears the actual
-  SMB3 key material on every session end] [Risk: very low — 2 lines,
-  dedicated API, teardown path only] [Ratio: favorable]`
+UNRESOLVED:
+- lore/b4 discussion (lore returned errors)
+- Whether any reviewer NAK’d (no evidence either way)
 
-## Phase 9: Synthesis
+Step 9.2: APPLY THE STABLE RULES CHECKLIST
+1. Obviously correct and tested? PASS — size check vs NTSD header;
+   author cites passing qsec_buffercheck; logic confirmed in-tree
+2. Fixes a real bug that affects users? PASS — wrong SMB status on
+   security queries; Windows/Samba clients
+3. Important issue? PASS — interoperability failure on a network file
+   server; fallout from an already-applied OOB fix. Not a panic, but
+   user-visible ACL query failure
+4. Small and contained? PASS — +6 lines, one function
+5. No new features or APIs? PASS — error-code correction only
+6. Can apply to the local tree? PASS — apply --check succeeded;
+   prerequisites present
 
-**Evidence FOR**
-- Deterministic failure to clear SMB3 session keys, signing keys,
-  encryption/decryption keys, and Preauth_HashValue on session destroy.
-- `kfree_sensitive()` exists specifically for this; CIFS client in this
-  tree already uses it for the same class of secrets.
-- Two-line, obviously correct, maintainer-acked, already merged
-  upstream.
-- Applies cleanly to 6.12.111; no new API; no lock/data-structure
-  change.
-- ksmbd is a network-facing file server; leftover keys after logoff are
-  real cryptographic material, not a style nit.
-- Official stable rules include “a real security issue”; this is secret
-  leftover in heap (CWE-226), not a feature.
+Step 9.3: CHECK FOR EXCEPTION CATEGORIES
+Record: None (not a device ID/quirk/DT/build/docs exception). Qualifies
+as a normal small bugfix.
 
-**Evidence AGAINST**
-- Cover letter calls it “good security practice,” not a demonstrated
-  crash/CVE. No `Reported-by`, no exploit write-up.
-- Official rule: no “this could be a problem” without how it is
-  exploited. Direct userspace leak is not shown; it is residual data
-  until slab reuse or a dump.
-- Incomplete hygiene: channel objects and
-  `ksmbd_preauth_session_destroy()` still use `kfree` in this file.
-- `CONFIG_SMB_SERVER` defaults to n.
+Step 9.4: MAKE YOUR DECISION
+This should be backported to this 6.12 tree. The buggy path exists, the
+OOB-fix regression is here, the patch is tiny and applies, and the wrong
+status is a real ksmbd interop bug.
 
-**Unresolved**
-- No stable@ thread found (search quality limited;
-  lore.kernel.org/stable returned unrelated hits).
-- Semcode MCP not available; callers traced with `git grep`.
+What the commit solves for stable users:
+ksmbd currently answers short SMB2 QUERY_INFO security requests with
+STATUS_INVALID_INFO_CLASS (or INFO_LENGTH_MISMATCH when extra secinfo
+flags are set). Clients that probe with a 0-byte buffer then retry never
+learn that they only needed a larger buffer. The patch returns
+STATUS_BUFFER_TOO_SMALL after the handle is validated, which is what MS-
+SMB2 requires and what Samba’s qsec_buffercheck expects.
 
-**Stable rules checklist**
-1. Obviously correct and tested? **PASS** — drop-in `kfree` →
-   `kfree_sensitive`; maintainer ack; applied upstream.
-2. Fixes a real bug that affects users? **PASS** — session objects with
-   live SMB3 keys are freed without wiping; that is leftover secret
-   material on a path every ksmbd session takes.
-3. Important issue? **PASS** (security: key leftover; not
-   oops/deadlock). Severity is secret wipe, not a panic.
-4. Small and contained? **PASS** — 2 lines, one function.
-5. No new features/APIs? **PASS**.
-6. Can apply to this tree? **PASS** — same function body aside from
-   later `delete_proc_session`, which this hunk does not need.
-
-**Exception category:** None of ID/quirk/DT/build/docs. Security wipe of
-existing allocations.
-
-This is not a crash fix, but it is a small, obviously correct wipe of
-real SMB3 key material on session teardown, the code is present in
-6.12.111, and regression risk is negligible. That meets the stable bar
-for a real security issue on ksmbd.
+Risk vs benefit:
+Benefit is restoring ACL query probing on ksmbd 6.12. Risk is a 6-line
+error-path change with balanced fd_put. No new APIs, no extra
+prerequisites.
 
 Verification:
-- [Phase 1] Parsed subject/body/tags from candidate text and `git log -1
-  d4a6d1c94f7a3`; maintainer Acked-by; no Fixes/Reported-by/Cc: stable
-- [Phase 2] Read `ksmbd_session_destroy` and `struct ksmbd_session` in
-  this tree; confirmed two `kfree` sites and key arrays
-- [Phase 2] Read `kfree_sensitive()` in `mm/slab_common.c` (zeros via
-  `memzero_explicit`, then `kfree`)
-- [Phase 3] `git blame -L 159,175` user_session.c; introducer
-  `e2f34481b24db2` contained in v5.15-rc1
-- [Phase 3] `git merge-base --is-ancestor` of introducer and of
-  `d4a6d1c94f7a3` vs HEAD: introducer yes, this fix no
-- [Phase 3] `git log --oneline -20 --
-  fs/smb/server/mgmt/user_session.c`: no prior equivalent wipe
-- [Phase 4] `b4 dig -c d4a6d1c94f7a3` / `-a` / `-w`: v1 then v2; lore
-  https://patch.msgid.link/20260811154620.2425851-4-thuth@redhat.com;
-  Namjae applied v2; no NAK; no stable nomination
-- [Phase 4] Cover letter and v1 review (preauth_session) fetched from
-  openwall/lkml/patchew
-- [Phase 5] `git grep ksmbd_session_destroy` / `ksmbd_user_session_put`:
-  session logoff/expire/teardown/create-error
-- [Phase 5] Confirmed `__session_create` uses `kzalloc`;
-  `user_session.c` includes `linux/slab.h`
-- [Phase 6] `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`; `make
-  kernelversion` → 6.12.111
-- [Phase 6] `delete_proc_session` absent here; does not block the two-
-  line hunk
-- [Phase 7] `CONFIG_SMB_SERVER` in `fs/smb/server/Kconfig`, default n
-- [Phase 8] Failure mode: leftover session keys in slab after destroy
-- UNVERIFIED: no dedicated stable@ discussion located
-
-The two-line `kfree_sensitive()` conversion belongs in this 6.12 tree:
-the buggy frees are here, the API is here, and it wipes real SMB3
-session keys on teardown with negligible risk.
+- [Phase 1] Parsed tags: only Namjae Jeon SOB; no Fixes/Reported-
+  by/Link/Cc stable
+- [Phase 2] Diff: +6 in smb2_get_info_sec after fd lookup;
+  STATUS_BUFFER_TOO_SMALL + ksmbd_fd_put + return -ENOSPC
+- [Phase 2] Confirmed sizeof packed smb_ntsd is 20 bytes
+  (le16+le16+4×le32)
+- [Phase 2] Confirmed smb2_query_info() keeps pre-set Status for -ENOSPC
+  (does not map to INVALID_INFO_CLASS)
+- [Phase 2] Confirmed ALIGN(20,8)=24 > scratch_len 20 produces -EFBIG →
+  INVALID_INFO_CLASS for AdditionalInformation=0
+- [Phase 3] git describe HEAD: p-6.12-3-gc504cf0baa3d8; kernelversion
+  6.12.111
+- [Phase 3] git merge-base --is-ancestor 2103add92a HEAD: not ancestor
+- [Phase 3] git merge-base --is-ancestor d48c64fb80ad7 HEAD: yes (OOB
+  fix present)
+- [Phase 3] git blame: lookup from e2f34481b24db2 (2021); ALIGN/scratch
+  from d48c64fb80ad7
+- [Phase 3] Parent 6b8b79226bc3 is in tree as df33d8243ce6b
+- [Phase 3] git apply --check: clean (offset -507)
+- [Phase 4] GitHub API: mainline SHA
+  2103add92a02505bdd536ba6fce7f64a427222a2
+- [Phase 4] b4 dig: UNVERIFIED (lore server error)
+- [Phase 4] Samba getinfo.c: qsec_buffercheck expects BUFFER_TOO_SMALL
+  for lengths 0 and 1
+- [Phase 4] MS-SMB2 3.3.5.20.3: MUST return BUFFER_TOO_SMALL when
+  OutputBufferLength is zero or insufficient
+- [Phase 5] Caller: smb2_query_info via SMB2_QUERY_INFO_HE; network-
+  reachable
+- [Phase 6] Buggy code at smb2pdu.c:5840–5846; no existing qsec fix in
+  git log
+- [Phase 8] Failure mode: wrong NT status → ACL probe/retry failure;
+  severity MEDIUM/HIGH for ksmbd users
+- UNVERIFIED: lore review thread, stable@ discussion, whether error-data
+  required-size follow-up exists in later mainline
 
 **YES**
 
- fs/smb/server/mgmt/user_session.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ fs/smb/server/smb2pdu.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index 3a2591434b5f8..973db0466575e 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -168,10 +168,10 @@ void ksmbd_session_destroy(struct ksmbd_session *sess)
- 	ksmbd_launch_ksmbd_durable_scavenger();
- 	ksmbd_session_rpc_clear_list(sess);
- 	free_channel_list(sess);
--	kfree(sess->Preauth_HashValue);
-+	kfree_sensitive(sess->Preauth_HashValue);
- 	ksmbd_release_id(&session_ida, sess->id);
- 	ida_destroy(&sess->tree_conn_ida);
--	kfree(sess);
-+	kfree_sensitive(sess);
- }
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 9bb885fa1ac66..0fbbb47f94644 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5902,6 +5902,12 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 	if (!fp)
+ 		return -ENOENT;
  
- struct ksmbd_session *__session_lookup(unsigned long long id)
++	if (le32_to_cpu(req->OutputBufferLength) < sizeof(struct smb_ntsd)) {
++		rsp->hdr.Status = STATUS_BUFFER_TOO_SMALL;
++		ksmbd_fd_put(work, fp);
++		return -ENOSPC;
++	}
++
+ 	idmap = file_mnt_idmap(fp->filp);
+ 	inode = file_inode(fp->filp);
+ 	ksmbd_acls_fattr(&fattr, idmap, inode);
 -- 
 2.53.0
 
