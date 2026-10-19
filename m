@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D87A50A409;
-	Mon, 19 Oct 2026 14:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED98538761;
+	Mon, 19 Oct 2026 14:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418696; cv=none; b=YNyf2MdqUT6n+Jv8deMK81iv4C8dqx03S8QAcEGGFpWGO5fB1AGA61s6VaUPGggu6Ve+iJuTlr56PKltt/6emaYrocX+7UE7m1B1lHqCqR0LnUd0Ux3gA7F7xjULKtLvzNK5LFjFPoHFFjwkqia/C+SmCn7Btdd79HudV0V7XlA=
+	t=1792418701; cv=none; b=mlMSSwuEB/vR20UHU+KYHlkRDwnKD4RG3oO4k/8a40uTvNEItv/KsW83PC3TWntv4xQaj+7kyHMCBMv4i3sKACECRWIEwquXtl1ebH4AtpFguQ1fl6SAv8nruAABsQ27L80uH1DHm7sx4FXp8g/XUpSetV1SjmYX01TBH6pGWYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418696; c=relaxed/simple;
-	bh=gCVuU97oSrXK/L1JLFSEE/Ug9AxP5Wi7VVOM7nxRM7o=;
+	s=arc-20240116; t=1792418701; c=relaxed/simple;
+	bh=24d7NsJbbsGL/694baAXjNMCkaHCuUP7ioiqoBd8DRY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lyBmX8mO6nKEAjX4agGGkLkk6XKGKKI9/tUygBjwdOGi5gmfdFPqgHvMy7sR64nN71xfLzBhXnvJWbo//V9oRppYu/p25eTzqERsrt0AZGMag9nfI+0OpxMlrmrEehIMKPqC+2fgYmDf0y2zXabXn+p3QZSO9DF6XN2xzNjgGF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wz0R7P3a; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=WYAxrjublETIQjaXrw4klyP53YhOl0d302MVWz+h92CrwArtMUkD8RMnaIOcmnmQPdJxnpenHWEcxRA5Hmn+Ma77SqSc1p9dinmB3Tjk0CXvSABakMS89LGzu5sQxhBDHCKy8C+04Cwow1BTzwgi+au9RBvTuGTzMp9W8wT/76c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UqcfdmZV; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wz0R7P3a"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B62161F000C5;
-	Mon, 19 Oct 2026 14:04:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UqcfdmZV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 025671F000C6;
+	Mon, 19 Oct 2026 14:04:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418693;
-	bh=HITv5j7hsqMbUz5K0NPWp26P44NuVIsOAXqSRUFnrE4=;
+	s=k20260515; t=1792418698;
+	bh=4uUYZsf7HeD1FtA/2f/cFcVEPSgoow6CLwoxLwi+h8Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Wz0R7P3ajN5Yx7yShJ4JFWntmCu4fPFOFIILibnePN040A5wTeUNj0XkLQcNwMAst
-	 gXKatSeBaqCZrWEHDlvGEeLUcWifdhgY/+lY0IixrX9c1vc0aHEuzGAKDnNub9g7Wo
-	 4dRraxkNl6vct0rpZdviPRlZb69A0uRNaIuPgz/hYl4LnZv790MmUFhAKMjm/s6He3
-	 CcTw6DJqfmtSjOYw48Uld8h96RpFAVQ/qSv0NuPPuBnJreRRJ+ASZqwr0Zwk7w0zMW
-	 acSOHC30KcTmITN8PD38GzkxWJL+YGUbkFQIZE/oI493icc7VGBDE5MJgQUFY/yH85
-	 h2NbHXbV48wig==
+	b=UqcfdmZVupyotCD3mZQX+swkTyWLAo80tp1uwKRZWaleWpdrMwh6yHpnTTWZgiG0W
+	 BhOfOYkxfcByj2076LvwNJ3lsFcwwl1p8wRCt7wmHueQ3j4XP2/VTLkZX3D1CTZ+CO
+	 TOAodqKansN0uanN6Qs5KX/pIigdhOtGReKzsvCnrMcjl+nivO4w7yLKcjTVbocdqn
+	 yNvB5gyjEFhdDCccof6Sa1SUuDNIcPcF8SP+RXYAn+ToYcqx9/HBKJ4/p7lcx5NeyE
+	 ut4dOqoX4m95dXpQavveWmzJgsov51HHvUNQ3tdVs9y3GEaxowldIpkJYn5b06uPz0
+	 2s+uzV4YYSh2g==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -33,9 +33,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: reject blocking compound lock requests
-Date: Mon, 19 Oct 2026 09:52:00 -0400
-Message-ID: <20261019135441.1420968-429-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-6.12] ksmbd: reject SMB3.1.1 binding with mismatched cipher
+Date: Mon, 19 Oct 2026 09:52:04 -0400
+Message-ID: <20261019135441.1420968-433-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -53,17 +53,20 @@ Content-Transfer-Encoding: 8bit
 
 From: Namjae Jeon <linkinjeon@kernel.org>
 
-[ Upstream commit 16a7f7c2ecf3c893b65f0fb78fa7a7171ae0ba9e ]
+[ Upstream commit 7019a11f79dc408f2b47b1027240e7f198784c9a ]
 
-Clients set SMB2_LOCKFLAG_FAIL_IMMEDIATELY when a LOCK request contains
-multiple lock elements, and servers reject requests that omit it.
-Accepting such a request can leave earlier elements locked while a later
-element waits asynchronously, enabling prolonged partial lock ownership
-and avoidable deadlocks.
+SMB3.1.1 multichannel connections belonging to the same session must use
+the same negotiated encryption cipher.
 
-Return STATUS_INVALID_PARAMETER before processing any element when a
-multi-element lock request contains a blocking lock. Unlock arrays remain
-unaffected.
+ksmbd validates the dialect and client GUID during session binding, but
+does not compare the cipher negotiated by the new connection with the
+cipher used by the existing session channels. This allows a channel
+negotiated with AES-128-CCM to bind to a session using AES-128-GCM.
+
+Compare the new connection's cipher with an existing session channel and
+return STATUS_INVALID_PARAMETER when they differ.
+
+This fixes smb2.session.bind_negative_smb3encGtoCs.
 
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
@@ -71,368 +74,392 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
 
 LLM Generated explanations, may be completely bogus:
 
-This is a protocol-validation deadlock fix in ksmbd’s SMB2 LOCK path. It
-belongs in this 6.12 tree: the buggy loop has been here since ksmbd was
-added, and the change is a seven-line reject of a request the spec and
-Samba already forbid.
+## Local tree
 
-===============================================================
-PHASE 1: COMMIT MESSAGE FORENSICS
-===============================================================
+This checkout is **6.12.111** (`pending-6.12`, `git describe` =
+`p-6.12-3-gc504cf0baa3d8`). The verdict is only for this tree.
 
-Step 1.1: PARSE THE SUBJECT LINE
-Record: [ksmbd] [reject] [refuse multi-element SMB2 LOCK requests that
-omit SMB2_LOCKFLAG_FAIL_IMMEDIATELY]
+Upstream commit analyzed: `7019a11f79dc408f2b47b1027240e7f198784c9a`
+(not in this tree). `git apply --check` of that diff against local
+`fs/smb/server/smb2pdu.c` succeeds.
 
-“Reject” is a bug-fix verb: stop accepting invalid protocol that can
-hang the server.
+---
 
-Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
+## PHASE 1: COMMIT MESSAGE FORENSICS
+
+**Step 1.1: Subject**
+Record: `[ksmbd] [reject] SMB3.1.1 session binding must not succeed when
+the new connection negotiated a different encryption cipher`
+
+**Step 1.2: Tags**
 Record:
-- Signed-off-by: Namjae Jeon `<linkinjeon@kernel.org>` (ksmbd
-  maintainer; ignore any pipeline SOB)
-- No Fixes:, Reported-by, Tested-by, Reviewed-by, Acked-by, Link:, or
-  Cc: stable
-- Absence of Fixes/Cc:stable is expected for this review and is not a
-  negative signal
+- Signed-off-by: Namjae Jeon `<linkinjeon@kernel.org>` (author and
+  committer)
+- No `Fixes:`, `Reported-by:`, `Tested-by:`, `Reviewed-by:`, `Acked-
+  by:`, `Link:`, or `Cc: stable`
+- Absence of `Fixes:`/`Cc: stable` is expected for this review path and
+  is not treated as a negative signal
 
-Step 1.3: ANALYZE THE COMMIT BODY TEXT
+**Step 1.3: Body**
 Record:
-- Bug: a LOCK with more than one element may omit FAIL_IMMEDIATELY (a
-  blocking lock). ksmbd currently processes elements in order, so
-  earlier ranges can be granted while a later range waits
-  asynchronously.
-- Symptom: prolonged partial lock ownership and avoidable deadlocks.
-- Spec intent: clients set FAIL_IMMEDIATELY on multi-element LOCK;
-  servers reject requests that omit it with STATUS_INVALID_PARAMETER.
-- Unlock arrays are intentionally left unchanged.
+- Bug: SMB3.1.1 multichannel session binding checks dialect and client
+  GUID, but not cipher. A connection that negotiated AES-128-CCM can
+  bind to a session whose existing channel uses AES-128-GCM.
+- Symptom: invalid bind is accepted; smbtorture
+  `smb2.session.bind_negative_smb3encGtoCs` fails (expects
+  `STATUS_INVALID_PARAMETER`).
+- Root cause: missing comparison of `conn->cipher_type` against an
+  existing session channel.
+- Fix: under `sess->chann_lock`, compare ciphers and return `-EINVAL` →
+  `STATUS_INVALID_PARAMETER`.
 - No kernel-version range in the message.
 
-Step 1.4: DETECT HIDDEN BUG FIXES
-Record: Not a disguised cleanup. It is an explicit protocol/deadlock
-fix.
+**Step 1.4: Hidden bug fix?**
+Record: Not hidden. Explicit protocol-validation fix for encryption-
+cipher mismatch on bind.
 
-===============================================================
-PHASE 2: DIFF ANALYSIS - LINE BY LINE
-===============================================================
+---
 
-Step 2.1: INVENTORY THE CHANGES
+## PHASE 2: DIFF ANALYSIS
+
+**Step 2.1: Inventory**
 Record:
-- File: `fs/smb/server/smb2pdu.c` only (~7 lines added, 0 removed)
-- Function: `smb2_lock()`
-- Scope: single-file surgical validation in the existing lock-element
-  loop
+- File: `fs/smb/server/smb2pdu.c` only (`+15` lines)
+- Function: `smb2_sess_setup()`
+- Scope: single-file surgical insertion in the existing SMB 3.x
+  multichannel binding branch, immediately after the dialect check
 
-Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
+**Step 2.2: Code flow**
 Record:
-Before: after building `lock_list`, the loop validates cmd/flags/mix,
-then may call `vfs_lock_file()`. A blocking element uses
-`F_SETLKW`/`FL_SLEEP`, can return `FILE_LOCK_DEFERRED`, send
-STATUS_PENDING, and `ksmbd_vfs_posix_lock_wait()`. Earlier elements
-already granted stay on `rollback_list` / `conn->lock_list` during that
-wait.
-After: if `lock_count > 1`, the first element is not UNLOCK, and the
-current element lacks FAIL_IMMEDIATELY, set `err = -EINVAL` and `goto
-out` before `vfs_lock_file()` on that element. `out`/`out2` already map
-`-EINVAL` to STATUS_INVALID_PARAMETER and roll back granted locks.
+- Before: after `conn->dialect != sess->dialect`, binding proceeds to
+  the signed-request and GUID checks.
+- After: if dialect is SMB 3.1.1, take `down_read(&sess->chann_lock)`,
+  walk `sess->ksmbd_chann_list`, if `conn->cipher_type !=
+  chann->conn->cipher_type` set `rc = -EINVAL`, then `up_read` and `goto
+  out_err`.
+- Path: SESSION_SETUP with `SMB2_SESSION_REQ_FLAG_BINDING` on SMB 3.1.1
+  with multichannel enabled. Existing `out_err` maps `-EINVAL` to
+  `STATUS_INVALID_PARAMETER` (local lines 1916–1917).
 
-Step 2.3: IDENTIFY THE BUG MECHANISM
-Record: [Logic / protocol correctness + deadlock prevention]
-- Spec (MS-SMB2 3.3.5.14.2): if Locks[] has more than one entry and any
-  lacks FAIL_IMMEDIATELY, the server SHOULD fail with
-  STATUS_INVALID_PARAMETER.
-- Client rule (MS-SMB2 3.2.4.19): if Locks[] has more than one element,
-  the client MUST set FAIL_IMMEDIATELY.
-- Mechanism: reject blocking multi-element LOCKs so ksmbd cannot hold
-  earlier ranges while waiting on a later one.
-
-Step 2.4: ASSESS THE FIX QUALITY
+**Step 2.3: Bug mechanism**
 Record:
-- Obviously correct: same check Samba already does in
-  `smbd_smb2_lock_send()`.
-- Minimal: one condition, existing error path.
-- Regression risk: very low for compliant clients (they always set the
-  flag). A non-compliant client that used blocking multi-locks would
-  start getting STATUS_INVALID_PARAMETER — that is the intended spec
-  behavior.
-- Caveat: the check is inside the processing loop, so a later blocking
-  element can still apply earlier FAIL_IMMEDIATELY locks and then roll
-  them back. That matches existing `out:` rollback, not a new leak.
-  Samba checks the whole array first; this is slightly later but still
-  correct.
-- The new `if` runs before `list_del(&smb_lock->llist)`, so the current
-  element is still on `lock_list` and is freed on `out:`. No leak.
+- Category: protocol/crypto correctness (logic), not UAF/leak/race.
+- Mechanism: cipher is per-connection (`conn->cipher_type`, set in
+  `decode_encrypt_ctxt()` at NEGOTIATE). Session encryption/decryption
+  keys are session-wide (`sess->smb3encryptionkey` /
+  `smb3decryptionkey`) and are **not** regenerated on bind
+  (`generate_encryptionkey` is skipped when
+  `SMB2_SESSION_REQ_FLAG_BINDING` is set, local lines 1545–1546).
+  `ksmbd_crypt_message()` then selects GCM vs CCM and 128 vs 256 from
+  **this connection’s** `cipher_type` while using those shared session
+  keys. Accepting a mismatched cipher therefore attaches a channel that
+  will encrypt/decrypt with the wrong AEAD (and possibly the wrong key
+  length) for the session keys.
+- The `break` after the first channel is intentional: one existing
+  channel is enough because all channels of a session are supposed to
+  share one cipher.
 
-===============================================================
-PHASE 3: GIT HISTORY INVESTIGATION
-===============================================================
-
-Step 3.1: BLAME THE CHANGED LINES
-Record: The processing loop was introduced in `e2f34481b24db` (“cifsd:
-add server-side procedures for SMB3”, 2021-05-10). `git merge-base --is-
-ancestor e2f34481b24db HEAD` succeeds. This has been in ksmbd since it
-landed, including this 6.12 tree.
-
-Step 3.2: FOLLOW THE FIXES: TAG
-Record: No Fixes: tag. Not applicable. The missing check dates to the
-original smb2_lock implementation.
-
-Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
-Record: Recent `smb2pdu.c` work in this tree is other protocol/security
-fixes (partial info, leases, etc.), not this check. Related historical
-lock bugs already here include UAFs and leaks in deferred-lock/cancel
-(`ddb9239828336`, `89ae9df09d2c1`, `463bbd7969851`, `a0609097fd10d`).
-This patch is standalone, not “2/N”.
-
-Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
-Record: Namjae Jeon is the ksmbd maintainer. Many of this tree’s ksmbd
-stable-style fixes are his. The 7.3-rc1 ksmbd pull lists this commit
-among lock/async correctness updates.
-
-Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
-Record: No new helpers or fields. It uses `lock_count`,
-`lock_ele[0].Flags`, `smb_lock->flags`, and `SMB2_LOCKFLAG_*`, all
-present here. Nearby 7.3 lock work (replay sequences, deferred-lock
-discard) is not required. Standalone.
-
-===============================================================
-PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-===============================================================
-
-Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
-Record: lore.kernel.org search returned 403; `b4 dig -c` needs a commit
-that is not in this checkout. The commit is listed in Namjae’s `[GIT
-PULL] ksmbd server update for 7.3-rc1` (2026-08-23, Message-ID
-`CAKYAXd8PROT1-3CXk2MnJco2KNKH_4iiN-Ypo5vOFWLPhRki4Q@mail.gmail.com`),
-tag `ksmbd-for-7.3-rc1`. Full v1/v2 review thread: UNVERIFIED.
-
-Step 4.2: CHECK WHO REVIEWED THE PATCH
-Record: UNVERIFIED for the original To/Cc list. It went through the
-ksmbd maintainer pull to Linus. No NAK found in the pull description.
-
-Step 4.3: SEARCH FOR THE BUG REPORT
-Record: No syzbot/bugzilla link. Motivation is MS-SMB2 + deadlock
-analysis, not a named CVE. Samba documents the same SHOULD-fail rule
-with a comment citing 3.3.5.14.2.
-
-Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
-Record: Same 7.3 pull also has lock-sequence replay, deferred-lock
-discard, and detach-before-free. Those are separate. This one is self-
-contained validation.
-
-Step 4.5: CHECK STABLE MAILING LIST HISTORY
-Record: lore.kernel.org/stable search returned 403. No evidence this was
-already rejected for stable. UNVERIFIED whether AUTOSEL already queued
-it.
-
-===============================================================
-PHASE 5: CODE SEMANTIC ANALYSIS
-===============================================================
-
-Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF
-Record: `smb2_lock()` only.
-
-Step 5.2: TRACE CALLERS
-Record: Dispatched as `smb2_0_server_cmds[SMB2_LOCK_HE].proc =
-smb2_lock` in `fs/smb/server/smb2ops.c`. Reached from
-`__handle_ksmbd_work()` → `cmds->proc(work)` in `fs/smb/server/server.c`
-for any SMB2 LOCK on an authenticated session with a valid file id.
-
-Step 5.3: TRACE CALLEES
-Record: Existing path uses `vfs_lock_file()`, `setup_async_work()`,
-`smb2_send_interim_resp()`, `ksmbd_vfs_posix_lock_wait()`. The wait is
-`wait_event(flock->c.flc_wait, !flock->c.flc_blocker)` —
-uninterruptible. That is why a blocking multi-lock can pin a ksmbd
-worker while earlier ranges stay held.
-
-Step 5.4: FOLLOW THE CALL CHAIN
-Record: Userspace/network reachable: SMB client → TCP → ksmbd worker →
-`smb2_lock()`. Needs an authenticated session and open handle, not
-CAP_SYS_ADMIN. Typical NAS user can send it.
-
-Step 5.5: SEARCH FOR SIMILAR PATTERNS
-Record: Samba `source3/smbd/smb2_lock.c` rejects `in_lock_count > 1`
-when the first element is a blocking SHARED/EXCLUSIVE lock, then walks
-remaining elements and fails any without FAIL_IMMEDIATELY. Same bug
-class, already fixed in Samba.
-
-===============================================================
-PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
-===============================================================
-
-Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
-Record: Yes. Local tree is **6.12.111** (`pending-6.12`, `git describe`
-`p-6.12-3-gc504cf0baa3d8`). `smb2_lock()` at
-`fs/smb/server/smb2pdu.c:7535` still starts the loop at 7635 with no
-multi-element FAIL_IMMEDIATELY check. Bug introduced with ksmbd
-(v5.15-era `e2f34481b24db`), present here. `git log --grep='reject
-blocking compound lock' -- fs/smb/server/` is empty.
-
-Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
-Record: Insertion point matches. Upstream hunk context uses
-`smb2_lock_init(..., !lock_length, &lock_list)`; this tree still has
-`smb2_lock_init(flock, cmd, flags, &lock_list)`. Expect a minor context
-conflict, trivial to apply by hand. No semantic dependency on the extra
-`!lock_length` argument.
-
-Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
-Record: No equivalent check. Existing FAIL_IMMEDIATELY use only skips
-connection-list conflict checks for blocking single locks (`goto
-no_check_cl`). That is the opposite of rejecting multi-element blocking
-locks.
-
-===============================================================
-PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-===============================================================
-
-Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
-Record: [fs/smb/server (ksmbd)] [IMPORTANT for CONFIG_SMB_SERVER;
-default n]. Network-facing file server. Lock bugs affect all ksmbd
-shares.
-
-Step 7.2: ASSESS SUBSYSTEM ACTIVITY
-Record: Actively maintained; this 6.12 branch already carries many ksmbd
-protocol and UAF fixes. Mature lock path, old bug.
-
-===============================================================
-PHASE 8: IMPACT AND RISK ASSESSMENT
-===============================================================
-
-Step 8.1: DETERMINE WHO IS AFFECTED
-Record: Config-specific: `CONFIG_SMB_SERVER`. Authenticated SMB clients
-of ksmbd NAS/embedded/Android-style servers.
-
-Step 8.2: DETERMINE THE TRIGGER CONDITIONS
-Record: SMB2 LOCK with LockCount > 1 and at least one non-unlock element
-without FAIL_IMMEDIATELY. Windows/Samba clients must set the flag, so
-well-behaved traffic never hits it. A buggy or malicious authenticated
-client can. Unprivileged in the kernel sense; needs a ksmbd login and
-file handle.
-
-Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
-Record: [Deadlock / worker hang / cross-client lock inversion] [HIGH]
-Not a KASAN crash. Holding range A while waiting uninterruptibly for
-range B is a real deadlock and can stall a ksmbd workqueue thread. That
-is why the protocol forbids it.
-
-Step 8.4: CALCULATE RISK-BENEFIT RATIO
+**Step 2.4: Fix quality**
 Record:
-- Benefit: high for ksmbd hosts — closes a remote deadlock/DoS via
-  illegal LOCK arrays; aligns with Samba/MS-SMB2.
-- Risk: very low — 7 lines, existing `-EINVAL` path, no ABI, no lock-
-  order change.
-- Ratio: strongly favors backport.
+- Obviously correct: same lock and `xa_for_each` pattern as
+  `free_channel_list()` / `ksmbd_sessions_deregister()`. Lock order
+  matches existing `smb2_sess_setup` (`ksmbd_conn_lock` then
+  `chann_lock`).
+- Minimal: 15 lines, no API/struct change.
+- Regression risk: low. Well-behaved clients already use one cipher for
+  all channels; the new path only rejects invalid binds. `chann->conn`
+  is set when the channel is allocated (`chann->conn = conn` in
+  `ntlm_authenticate`) and the channel is erased under `chann_lock`
+  before free.
 
-===============================================================
-PHASE 9: FINAL SYNTHESIS
-===============================================================
+---
 
-Step 9.1: COMPILE THE EVIDENCE
+## PHASE 3: GIT HISTORY INVESTIGATION
+
+**Step 3.1: Blame**
+Record:
+- Binding path originates in `f5a544e3bab7` (“ksmbd: add support for
+  SMB3 multichannel”, 2021); it is an ancestor of this HEAD.
+- Dialect check: `af7c39d971e43c` (2022); also an ancestor.
+- Cipher field: `connection.h` `cipher_type` present in this tree.
+- Missing cipher compare has been true for as long as ksmbd had SMB
+  3.1.1 encryption + multichannel, including all of 6.12.
+
+**Step 3.2: Fixes: tag**
+Record: none. No `Fixes:` follow-up required.
+
+**Step 3.3: File history**
+Record:
+- Local recent `smb2pdu.c` work is other ksmbd validation/UAF fixes;
+  none already implement this cipher compare (`git log -S 'cipher_type
+  != chann'` on this file is empty here).
+- On `origin/master`, the only commit with this compare is
+  `7019a11f79dc4` itself (no later rework).
+- Neighbor bind_negative work (`f49bca41c12f9`, `3e67423336f08`,
+  `1f12738b0ed7b`, `1c5daa2ea924be`) is **not** in this tree and is
+  about signing of rejected responses / user mismatch, not a
+  prerequisite for this hunk.
+
+**Step 3.4: Author**
+Record: Namjae Jeon is the ksmbd maintainer. Many of his protocol-
+validation commits are already in this 6.12 tree.
+
+**Step 3.5: Dependencies**
+Record: Standalone. Needs `sess->chann_lock`, `sess->ksmbd_chann_list`,
+`struct channel { ... *conn }`, `conn->cipher_type`, `SMB311_PROT_ID` —
+all present locally. Not labeled `patch X/Y`. `4b706360ffb7e` (channel
+limit) is not required.
+
+---
+
+## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+
+**Step 4.1: Original discussion**
+Record: `b4 dig -c 7019a11f79dc4` (and `-C`) failed: lore.kernel.org
+returned an error. WebFetch of lore URLs returned 403. Mailing-list
+review text is **UNVERIFIED**.
+
+**Step 4.2: Recipients**
+Record: Could not run `b4 dig -w` successfully. Commit has only the
+maintainer’s SOB (author = committer).
+
+**Step 4.3: Bug report / spec / test**
+Record (verified):
+- Samba smbtorture `test_session_bind_negative_smb3encGtoCs`
+  (source4/torture/smb2/session.c): SMB 3.1.1, encryption required,
+  channel 1 AES-128-GCM, bind channel AES-128-CCM, same ClientGUID,
+  expects `NT_STATUS_INVALID_PARAMETER`.
+- Microsoft Open Specifications blog “SMB 3.1.1 Encryption in Windows
+  10”: “Session binding (multichannel) requires that all channels bound
+  to a given session negotiate the same encryption cipher as the master
+  session’s connection” and that all channels share the same encryption
+  keys.
+- MS-SMB2 3.3.5.5 (SESSION_SETUP) documents dialect/GUID/signed/state
+  checks that ksmbd already performs; the published HTML for that
+  section does **not** spell out a CipherId compare (the Windows/Samba
+  behavior and the blog do).
+
+**Step 4.4: Series**
+Record: Cluster of July 2026 `bind_negative_*` ksmbd fixes on
+`origin/master`. This commit is self-contained; it does not depend on
+the signing-response patches.
+
+**Step 4.5: Stable list**
+Record: lore.kernel.org/stable search not reachable (403).
+**UNVERIFIED** whether it was previously discussed for stable.
+
+---
+
+## PHASE 5: CODE SEMANTIC ANALYSIS
+
+**Step 5.1: Functions**
+Record: `smb2_sess_setup()` only.
+
+**Step 5.2: Callers**
+Record: `fs/smb/server/smb2ops.c` command table `[SMB2_SESSION_SETUP_HE]
+= { .proc = smb2_sess_setup }`. Invoked for every SMB2 SESSION_SETUP on
+the ksmbd server. Network-reachable.
+
+**Step 5.3: Callees**
+Record: `down_read`/`up_read`, `xa_for_each` on
+`sess->ksmbd_chann_list`. Existing error path `goto out_err`.
+
+**Step 5.4: Reachability**
+Record: Yes, from a remote SMB client if `CONFIG_SMB_SERVER` and
+`KSMBD_GLOBAL_FLAG_SMB3_MULTICHANNEL` are enabled. Trigger: SMB 3.1.1
+session, then a second connection that negotiates a different cipher and
+sends a signed binding SESSION_SETUP. Unprivileged in the sense of “any
+client that can authenticate to ksmbd”; not a local syscall UAF.
+
+**Step 5.5: Similar patterns**
+Record: Dialect mismatch already rejected in the same function. Samba
+has a second test `bind_negative_smb3encGtoCd` (different GUID); this
+tree already rejects GUID mismatch via `memcmp(conn->ClientGUID,
+sess->ClientGUID)`.
+
+---
+
+## PHASE 6: CROSS-REFERENCE AGAINST THIS TREE
+
+**Step 6.1: Buggy code present?**
+Record: Yes. Local `smb2_sess_setup()` at `fs/smb/server/smb2pdu.c`
+~1743–1757 does dialect/GUID checks and has **no** cipher compare.
+`7019a11f79dc4` is not an ancestor of HEAD.
+
+**Step 6.2: Backport difficulty**
+Record: **Clean apply** (`git apply --check` exit 0). Line-number offset
+only vs mainline.
+
+**Step 6.3: Related fixes already here?**
+Record: No `bind_negative` ksmbd commits in this tree. No other cipher-
+on-bind check.
+
+---
+
+## PHASE 7: SUBSYSTEM CONTEXT
+
+**Step 7.1**
+Record: `fs/smb/server` (ksmbd). Criticality: **IMPORTANT** — in-kernel
+SMB3 server, remote attack surface, not core mm/VFS, not staging.
+
+**Step 7.2**
+Record: Actively maintained; this 6.12 tree already carries many ksmbd
+validation backports (`reject repeated SMB2 NEGOTIATE`, DACL bounds,
+etc.).
+
+---
+
+## PHASE 8: IMPACT AND RISK
+
+**Step 8.1: Who is affected**
+Record: Users of ksmbd with SMB3 multichannel enabled. Not universal.
+
+**Step 8.2: Trigger**
+Record: Uncommon for production Windows/Samba clients (they keep one
+cipher). Fully reachable from a custom or test client. Requires an
+existing authenticated session plus a signed bind (not an
+unauthenticated bypass).
+
+**Step 8.3: Failure mode**
+Record: Today the invalid bind **succeeds**. Later encrypt/decrypt on
+that channel uses the new connection’s AEAD with session keys derived
+for the original cipher → AEAD failure / broken encrypted I/O, not a
+demonstrated kernel oops. Spec/Windows require rejection with
+`STATUS_INVALID_PARAMETER`. Severity: **MEDIUM** (protocol/crypto
+invariant), not a panic/UAF.
+
+**Step 8.4: Risk–benefit**
+Record:
+- Benefit: enforces a documented SMB 3.1.1 encryption invariant on a
+  network server; matches Windows/Samba; tiny.
+- Risk: very low — 15 lines, existing locks, rejects only illegal binds.
+- Ratio: favorable for this tree because the code exists, the patch
+  applies cleanly, and ksmbd crypto protocol holes are worth closing
+  even when the trigger is rare.
+
+---
+
+## PHASE 9: SYNTHESIS
+
+**Step 9.1: Evidence**
+
 FOR:
-- Real deadlock/partial-ownership bug on a network file server
-- MS-SMB2 3.3.5.14.2 and Samba implement the same reject
-- Tiny, obviously correct, uses existing error/rollback
-- Buggy code present in this 6.12 tree since ksmbd introduction
-- Maintainer-authored; in the 7.3-rc1 ksmbd pull
-- Reachable by authenticated SMB clients
+- Real missing check: dialect is validated, cipher is not.
+- Session keys are shared; cipher is per-connection; mismatch is a
+  crypto/protocol bug, not cosmetic.
+- Samba negative test and Microsoft encryption blog require same cipher
+  on all bound channels.
+- 15 lines, maintainer-authored, applies cleanly to 6.12.111.
+- All data structures and the insertion site exist here; bug is old
+  (multichannel + 3.1.1 encryption).
 
 AGAINST:
-- Spec is SHOULD, not MUST (footnote 373); Windows may differ
-- Compliant clients never send this
-- No Reported-by / syzbot / CVE
-- Original lore review thread not retrieved
+- No crash, UAF, deadlock, or known CVE.
+- Production clients typically never send this.
+- No `Reviewed-by`; lore discussion could not be fetched.
+- Adjacent bind_negative signing patches are not in this tree (not
+  required for this hunk).
 
 UNRESOLVED:
-- Exact lore URL / series revisions (b4/lore 403)
-- Whether AUTOSEL already picked it for some series
+- Original mailing-list review / any NAK (lore unreachable).
+- Whether MS-SMB2 3.3.5.5 normative text currently names CipherId (blog
+  + Samba/Windows behavior still require the check).
 
-Step 9.2: APPLY THE STABLE RULES CHECKLIST
-1. Obviously correct and tested? PASS — matches Samba; ksmbd maintainer;
-   uses existing STATUS_INVALID_PARAMETER path
-2. Fixes a real bug that affects users? PASS — deadlock/partial lock
-   ownership on ksmbd
-3. Important issue? PASS — deadlock / server-worker hang, not a style
-   tweak
-4. Small and contained? PASS — 7 lines, one function
-5. No new features or APIs? PASS — validation only
-6. Can apply to the local tree? PASS — same loop; at most a trivial
-   `smb2_lock_init` context tweak
+**Step 9.2: Stable rules**
+1. Obviously correct and tested? **PASS** — small, same locking as
+   existing channel walks; covered by smbtorture
+   `bind_negative_smb3encGtoCs`.
+2. Real bug affecting users? **PASS** — ksmbd accepts a bind the
+   protocol forbids; encrypted traffic on that channel is then
+   inconsistent.
+3. Important (crash/security/corruption/deadlock)? **PASS** (lower end)
+   — encryption-cipher invariant on a remote SMB server, not a panic.
+   Important enough given ksmbd’s role and the size of the fix.
+4. Small and contained? **PASS** — +15 lines, one function.
+5. No new features/APIs? **PASS**.
+6. Applies to this tree? **PASS** — clean apply; buggy code present.
 
-Step 9.3: CHECK FOR EXCEPTION CATEGORIES
-Record: None. Qualifies as a normal important bug fix, not a device-
-ID/quirk/DT exception.
+**Step 9.3: Exception category**
+Record: none (not a device ID/quirk/DT/build/docs exception). Qualifies
+as a normal small protocol/crypto bugfix.
 
-Step 9.4: MAKE YOUR DECISION
-Backport to this 6.12 tree. The bug is here, the fix is surgical, and
-leaving ksmbd willing to block on multi-element LOCKs is a deadlock
-hazard for a network-facing server.
+**Step 9.4: Decision**
+Backport to this 6.12 tree. The missing check is in this code, the fix
+is surgical, and rejecting mismatched SMB 3.1.1 ciphers on bind is the
+correct, low-risk behavior for stable ksmbd.
 
-What it solves for stable users: ksmbd currently accepts multi-range
-LOCK requests that omit FAIL_IMMEDIATELY. It can grant earlier ranges,
-then sleep uninterruptibly on a later range
-(`ksmbd_vfs_posix_lock_wait()`), which enables lock-order deadlocks and
-stuck workers. The patch returns STATUS_INVALID_PARAMETER first (unlock
-arrays unchanged).
+---
 
-Risk vs benefit: benefit is deadlock prevention on ksmbd; risk is a one-
-condition reject of traffic no compliant client sends.
+## Why this matters for 6.12 stable users
 
-Concerns: apply context around `smb2_lock_init()` may need a one-line
-tweak; no other prerequisites.
+ksmbd already refuses a bind when the **dialect** does not match. It
+still allows a second SMB 3.1.1 channel to join the same session with a
+**different** negotiated cipher (e.g. AES-128-CCM vs AES-128-GCM).
+Encryption keys are session-scoped and not rebuilt on bind; each
+connection then picks GCM/CCM and key length from its own `cipher_type`.
+That is a protocol and crypto consistency bug on a network-facing
+server. The patch only adds the missing compare and returns
+`STATUS_INVALID_PARAMETER`, which is what Windows/Samba tests expect.
 
-Verification:
-- [Phase 1] Tags: only Namjae Jeon SOB; no Fixes/Reported-by/Link
-- [Phase 2] Diff: 7 lines in `smb2_lock()` loop; `-EINVAL` →
-  STATUS_INVALID_PARAMETER at smb2pdu.c:7889-7891; check is before
-  `list_del`/`vfs_lock_file`
-- [Phase 2] Local blocking path: FILE_LOCK_DEFERRED →
-  `ksmbd_vfs_posix_lock_wait()` at smb2pdu.c:7760-7788; wait is
-  `wait_event()` in vfs.c:1894-1896
-- [Phase 3] Blame: loop from e2f34481b24db (2021); ancestor of HEAD; fix
-  not in this tree
-- [Phase 3] No Fixes: tag to follow
-- [Phase 3] Related history: deferred-lock UAFs already in tree; this
-  check is independent
-- [Phase 4] GIT PULL 7.3-rc1 lists this subject; lore/b4 thread
-  UNVERIFIED (403 / no local SHA)
-- [Phase 4] MS-SMB2 3.3.5.14.2 SHOULD-fail; 3.2.4.19 client MUST set
-  FAIL_IMMEDIATELY on multi-element LOCK
-- [Phase 4] Samba smb2_lock.c:342-378 implements the same
-  INVALID_PARAMETER reject
-- [Phase 5] Caller: smb2ops.c:187 SMB2_LOCK_HE → server.c:147
-  `cmds->proc`
-- [Phase 6] `make kernelversion` 6.12.111; buggy loop at smb2pdu.c:7635;
-  `smb2_lock_init` here has 4 args vs upstream 5 in hunk context
-- [Phase 6] `git log --grep='reject blocking compound lock' --
-  fs/smb/server/` empty
-- [Phase 8] Failure mode: deadlock/worker hang, not oops; authenticated
-  SMB client can trigger
-- UNVERIFIED: original lore review comments, AUTOSEL status, Windows
-  footnote 373 runtime behavior
+Risk is low: correct clients are unchanged. The hunk applies here
+without prerequisites.
+
+### Verification
+- [Phase 1] Parsed message/tags: maintainer SOB only; no
+  Fixes/Cc/Reported-by.
+- [Phase 2] Diff: +15 lines in `smb2_sess_setup()` binding branch;
+  `-EINVAL` already maps to `STATUS_INVALID_PARAMETER`.
+- [Phase 2] Confirmed bind skips `generate_encryptionkey` (local
+  1545–1546); `ksmbd_crypt_message()` uses `conn->cipher_type` (auth.c
+  1135–1155).
+- [Phase 3] `git describe HEAD` / `make kernelversion`: 6.12.111. `git
+  merge-base --is-ancestor 7019a11f79dc4 HEAD` → not in tree.
+- [Phase 3] `f5a544e3bab7` and `af7c39d971e43c` are ancestors; dialect
+  check present, cipher check absent (local ~1754–1757).
+- [Phase 3] `git apply --check` of `7019a11f79dc4` → clean.
+- [Phase 3] No later origin/master rework of this compare; related
+  bind_negative signing commits are not ancestors and are not required.
+- [Phase 4] `b4 dig` lore error; lore WebFetch 403. Samba test and MS
+  encryption blog fetched successfully.
+- [Phase 5] Caller: `smb2ops.c` SESSION_SETUP proc. Channel
+  lock/list/`cipher_type` exist in this tree.
+- [Phase 6] Insertion site matches; no local substitute fix.
+- [Phase 8] Failure mode: invalid encrypted channel accepted; AEAD
+  mismatch on subsequent I/O. Severity MEDIUM, regression risk very low.
+- UNVERIFIED: lore review thread, stable@ discussion, explicit CipherId
+  sentence in current MS-SMB2 3.3.5.5 HTML.
 
 **YES**
 
- fs/smb/server/smb2pdu.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ fs/smb/server/smb2pdu.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index ad6faaf54b991..cc3a3da410eaf 100644
+index ccefd325e52e3..d64753124dd9a 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -7748,6 +7748,13 @@ int smb2_lock(struct ksmbd_work *work)
- 	}
+@@ -1747,6 +1747,21 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 			goto out_err;
+ 		}
  
- 	list_for_each_entry_safe(smb_lock, tmp, &lock_list, llist) {
-+		if (lock_count > 1 &&
-+		    !(le32_to_cpu(lock_ele[0].Flags) & SMB2_LOCKFLAG_UNLOCK) &&
-+		    !(smb_lock->flags & SMB2_LOCKFLAG_FAIL_IMMEDIATELY)) {
-+			err = -EINVAL;
-+			goto out;
++		if (conn->dialect == SMB311_PROT_ID) {
++			struct channel *chann;
++			unsigned long index;
++
++			down_read(&sess->chann_lock);
++			xa_for_each(&sess->ksmbd_chann_list, index, chann) {
++				if (conn->cipher_type != chann->conn->cipher_type)
++					rc = -EINVAL;
++				break;
++			}
++			up_read(&sess->chann_lock);
++			if (rc)
++				goto out_err;
 +		}
 +
- 		if (smb_lock->cmd < 0) {
- 			err = -EINVAL;
- 			goto out;
+ 		if (!(req->hdr.Flags & SMB2_FLAGS_SIGNED)) {
+ 			rc = -EINVAL;
+ 			goto out_err;
 -- 
 2.53.0
 
