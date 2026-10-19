@@ -1,46 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792445396;
-	b=j/e38DJZOSUkFF9M/wf1JrnF7D4o2dI7aAGI0TnGVqDWMRo7vG0h+CjEd3oUKT4yRUQ0
-	 uwlzFCCZtr2WUr+MLxy7Juvw/jAmFBq4QXNIJDzbxPyi4V//mr3udJ1uif7QY9esYJW7n
-	 FuCuVp+JTi/NjLDdR4ol9B3fG0JZpQVYL3hFfMlGKRObazbiQlBiVREaVqfJMPX5/kkVd
-	 rroaHPJBzIgsGBxnBUHwrOh++w5mWUHEWLZZycnhBl3ta/CwN9XhjVshW6rdeaA4lMeiq
-	 js3M8P75Pw8GRwkW9nrBVYhuJ+L3aMOncyiPA6n8PuaItQacdzfby+0hqHoxuR//+pg==
+	t=1792445393;
+	b=VZAW6Xpoi9dKX/89881g5ZhUaiDuA7OREfdoWajVR3ByljDsFRckQUiMKjSyiVW1F3dg
+	 WiqnoakfYijkMshlOke4Ek2KKwxZf9556hk/IeN40ZSxWEDSxEoD60G4UcuifQjC1YqU8
+	 Id8NmIt04Cx6GPsOyu4kFKpAHV8YOyOIwiLii7cNBI922jyonWymPyjDelCu/4Wc9LOuI
+	 wqH5ChUx1bYZX3dsFap7hD2lUPZemVoS/2+CgonLunUGpCPmL+5SUaH0mnrnIRaJTkPdv
+	 4tjzY7pJzJtBhdTf6WFih9pxX8xmFmjuJPIOpMxWWY7U9ZPBZJwk4PA+tEvKD023a2A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792445396;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792445393;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=V1SKqgXsrplLlDz06eFww2PKsFDxp6WP2CMViFGG9y4=;
-	b=kHaGJGF60ZeqP+pXT8IX0qXMzEalXAg/4+6aooENz6B5Z0Vsl4kD+7xrUOjR+HqfhCkY
-	 glcxvpsIj+UFseKbJdsWocDpIzUyS0dPyGFBNtsdPcy3DDXqCl0I4wHg+kAuPVoQzFxgh
-	 vcMYoQRNfXa5gsFF3dgTezVQcQ+cgtAfSdEee+wlOWdzLXVY0ZZbGItRz95Sx10MmPgfC
-	 JgrBithD/kzkC6+mDQLYRYn3pmJp4VHrp/RoJMoJDgKRahUHWJiNbFWjYymqwRmau7VBS
-	 oAfCCZo5dKygEYN7LUuDFde6dmUgy7ikS8jFoWYS9RxM+eeij99GUNMqpKKsdwrRCXw==
+	bh=odS2zyccxmV+JZ7Tq4Ok5FJ8aGGiNb2b8pM1e9hYks8=;
+	b=KCa1h+FULaqBJ/47bLR2TUTQnUXAhLBIyQde0OPtoAFmY3IAM7M9+xaxgQGDBULwNHhv
+	 j0f+QP1r+gXbphLiRKnoGGjrabLAhnUeOFPozRXBAOwSvmBCaq5d1RgV3J7JO3UZK3KuZ
+	 yrD8vZ1Zs9S//5472tBycrU4jRRNhuBqYA4SzZY+ATHZy+qeV2wNVP1XtU+jf8/xD5870
+	 sh4M0DCbYfE8ESmkbo0VCgA4DNTcCKHvO6c+2AQ6TmpD8umOhVIfI/yBqQSz6UcJQ0ZFd
+	 lJnv7aPxsMQwhZGqRfLqH9/ZZCdRaMGBsyfh+qp9rS0q4kpkbhd4xr8HBayePy4vW+w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=heJgehEC;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eGUTpIKp;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3DB606A31D;
-	Mon, 19 Oct 2026 21:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=heJgehEC
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C9701F000C5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519C8606A31A;
 	Mon, 19 Oct 2026 21:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eGUTpIKp
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFAEA1F000C4;
+	Mon, 19 Oct 2026 21:29:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792445395;
-	bh=V1SKqgXsrplLlDz06eFww2PKsFDxp6WP2CMViFGG9y4=;
+	s=k20260515; t=1792445392;
+	bh=odS2zyccxmV+JZ7Tq4Ok5FJ8aGGiNb2b8pM1e9hYks8=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=heJgehECDE3wC00XKNuh5KTLi5FNL+/+u55oMozDqmzbiDw8JL4kE/qUYScpZ5MaI
-	 nr1GlwXZWZcIFuNSmxRItuKfXeAzDwtuwldJu/P7VzKxviODYWA/mZ6jAQsKz/Lsm2
-	 0TCG2pLvxboVLyGhEefw6GRpB1wYacFecLa1WHBBdA0wJC9HRzJm9Ypn1h0MWH5MEN
-	 6kHQlnKswpT903Ah9hbeulO7c8W+K2yZp5LY3m0xeb245oFMNjueFc7Ci6Zg7zXJmX
-	 4iJ8GKyN571/N6L/uxltwC2khpv4XQ2EyH+DVB+vaBXHHt1A7jaDm3JnKbnCBp/C0G
-	 dFISMWb/NlqRw==
-Subject: Re: [PATCH net-next v17 06/15] quic: add stream management
+	b=eGUTpIKplpR8zHtdrOIfnNPYBYscYCnGi97uW9YAcReWe5sLyWWrg3ovcd8yhAKd9
+	 91HHkpugkt63XLSmgbeLoN41Dwdq71nk08GNxccJ+toQkVC1s1M1NRFZI3xMd0pV3w
+	 HEiDtz8GLXK2HXG8y27IZLvtOLUrIMPolhnvX+2pOylJSjtERXFlnajPxvisLC5wC4
+	 Li4Ap/v7vqj6gUrzzvCv+hWtO9p3KdzMto95aqe8X+PWH7T7XQrYB8u73FcBGUVsaD
+	 dI/yrFE5AGyIoLo9XMjN+dVjZHbNNeicw2WMDlCb9wc88GmiKdOn21CFKxi509OTG8
+	 bGT0dg32cxFAw==
+Subject: Re: [PATCH net-next v17 04/15] quic: provide family ops for address
+ and protocol
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -54,13 +55,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
-Date: Mon, 19 Oct 2026 21:29:53 +0000
-Message-ID: <179244539310.3135.8921542260670507924@kernel.org>
-In-Reply-To: =?utf-8?q?=3Ca92cd8233a031c412bf8b709ba98ed8e9477b74d=2E1792164?=
+Date: Mon, 19 Oct 2026 21:29:50 +0000
+Message-ID: <179244539028.3135.8632269420764172979@kernel.org>
+In-Reply-To: =?utf-8?q?=3C89a17e38fca0c84eb23ccde147942e44034ce05b=2E1792164?=
  =?utf-8?q?438=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3Ca92cd8233a031c412bf8b709ba98ed8e9477b74d=2E17921644?=
+References: =?utf-8?q?=3C89a17e38fca0c84eb23ccde147942e44034ce05b=2E17921644?=
  =?utf-8?q?38=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Low
+X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -73,83 +74,168 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found more severe
-issue(s) in other patches of this series. This mail is only an FYI, in case
-you want to address the nit picks below when you respin.
+Thank you for your contribution! Sashiko AI review found 3 potential
+issue(s) to consider.
 
-Low priority / nit picks for your consideration:
+Critical: 0 · High: 0 · Medium: 1 · Low: 2
 
-- [Low] The comment above quic_stream_max_streams_update()
-  (net/quic/stream.c:313-319) says it "Recalculates the max_uni and…
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
+
+- [Medium] quic_common_setsockopt() (net/quic/family.c:416) passes every
+  SOL_IP/SOL_IPV6 option to the core IP stack without filtering.
+- [Low] The commit message describes the patch as only adding
+  family.{c,h} helpers (routing, transmit, address parsing and…
+- [Low] When routing picks a link-local source for a wildcard sa,
+  quic_v6_flow_route() (net/quic/family.c:131) sets…
 
 --
 
-quic: add stream management
+quic: provide family ops for address and protocol
 
-This patch adds struct quic_stream_table and struct quic_stream to manage
-QUIC streams per socket. It adds quic_stream_get() and quic_stream_put() to
-acquire and release send and receive streams. It also adds
-quic_stream_id_exceeds() and quic_stream_max_streams_update() to track
-stream limits.
+This patch adds net/quic/family.{c,h} with IPv4/IPv6 helpers for routing,
+UDP tunnel transmit, address parsing and comparison, and UDP socket config
+setup. It also connects quic_inet_getname() to quic_get_sk_addr(), and sends
+setsockopt/getsockopt calls for any level other than SOL_QUIC to the
+IP/IPv6 handlers.
 
-> diff --git a/net/quic/stream.c b/net/quic/stream.c
-> new file mode 100644
-> index 0000000000000..29c9f3568b287
-> --- /dev/null
-> +++ b/net/quic/stream.c
-> @@ -0,0 +1,427 @@
-
-[ ... ]
-
-> +/* Updates the maximum allowed incoming stream IDs if any streams were recently
-> + * closed.  Recalculates the max_uni and max_bidi stream ID limits based on the
-> + * number of open streams and whether any were marked for deletion.
-> + *
-> + * Returns true if either max_uni or max_bidi was updated, indicating that a
-> + * MAX_STREAMS_UNI or MAX_STREAMS_BIDI frame should be sent to the peer.
-> + */
-> +bool quic_stream_max_streams_update(struct quic_stream_table *streams,
-> +				    s64 *max_uni, s64 *max_bidi)
-> +{
-> +	s64 max, rem;
-> +
-> +	*max_uni = 0;
-> +	*max_bidi = 0;
-> +	if (streams->recv.uni_pending) {
-> +		rem = streams->recv.max_streams_uni - streams->recv.streams_uni;
-> +		max = streams->recv.next_uni_stream_id - QUIC_STREAM_ID_STEP +
-> +		      (rem << QUIC_STREAM_TYPE_BITS);
-> +
-> +		streams->recv.max_uni_stream_id = max;
-> +		*max_uni = quic_stream_id_to_streams(max);
+> Introduce QUIC address and protocol family operations to handle IPv4/IPv6
+> specifics consistently. The new family.{c,h} provide helpers for routing,
+> skb transmit handling, address parsing and comparison and UDP socket config
+> initializing etc.
 
 [Severity: Low]
-This isn't a bug, but does the comment above
-quic_stream_max_streams_update() describe max_uni and max_bidi correctly?
+This isn't a bug, but the commit message only talks about new helpers. The
+patch also changes three socket entry points that userspace can see.
 
-The comment says the function "Recalculates the max_uni and max_bidi stream
-ID limits". max_uni and max_bidi are the names of the output parameters, but
-those parameters receive stream counts:
+quic_inet_getname() in net/quic/protocol.c used to return -EOPNOTSUPP. It
+now calls quic_get_sk_addr(), so getsockname() and getpeername() return
+real addresses. IPv4-mapped results on AF_INET6 sockets are also rewritten
+to sockaddr_in.
 
-    *max_uni = quic_stream_id_to_streams(max);
-    ...
-    *max_bidi = quic_stream_id_to_streams(max);
+quic_setsockopt() and quic_getsockopt() in net/quic/socket.c now pass every
+level other than SOL_QUIC to ip_setsockopt()/ipv6_setsockopt() and
+ip_getsockopt()/ipv6_getsockopt(). That makes the full SOL_IP and SOL_IPV6
+option sets reachable on QUIC sockets.
 
-Here quic_stream_id_to_streams() returns (stream_id >> 2) + 1. The stream ID
-limits are only stored in streams->recv.max_uni_stream_id and
-streams->recv.max_bidi_stream_id.
+The errno for unknown levels changes as well. setsockopt() now returns
+-ENOPROTOOPT. getsockopt() returns -EOPNOTSUPP from do_ip_getsockopt() on
+IPv4 sockets and -ENOPROTOOPT from ipv6_getsockopt() on IPv6 sockets.
 
-The code itself is correct, because MAX_STREAMS frames carry a count. Nothing
-in the series calls this function yet. A future caller that follows the
-comment and encodes *max_uni and *max_bidi as stream IDs would advertise the
-wrong MAX_STREAMS value.
+Could the commit message mention these changes?
 
-Could the comment say that the output parameters are stream counts?
-
-> +		streams->recv.uni_pending = 0;
-> +	}
+> diff --git a/net/quic/family.c b/net/quic/family.c
+> new file mode 100644
+> index 0000000000000..dc41a0ae07086
+> --- /dev/null
+> +++ b/net/quic/family.c
+> @@ -0,0 +1,441 @@
 
 [ ... ]
+
+> +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da,
+> +			      union quic_addr *sa, struct flowi *fl)
+> +{
+
+[ ... ]
+
+> +	fl6->flowi6_proto = IPPROTO_UDP;
+> +	fl6->flowi6_oif = quic_get_dev_if(sk, da);
+
+[ ... ]
+
+> +	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
+> +	if (IS_ERR(dst))
+> +		return PTR_ERR(dst);
+> +
+> +	if (quic_v6_is_any_addr(sa)) {
+> +		sa->v6.sin6_family = AF_INET6;
+> +		sa->v6.sin6_addr = fl6->saddr;
+> +		if ((ipv6_addr_type(&fl6->saddr) & IPV6_ADDR_LINKLOCAL))
+> +			sa->v6.sin6_scope_id = fl6->flowi6_oif;
+
+[Severity: Low]
+Is fl6->flowi6_oif the right value to store as the scope id here?
+
+It holds the oif requested before the lookup, which is
+quic_get_dev_if(sk, da). The ip6_dst_lookup_flow()->ip6_dst_lookup_tail()
+path doesn't appear to write the chosen egress device back into it.
+
+On the fib6 rules path, l3mdev_update_flow() can also clear it when the oif
+is an L3 master:
+
+	if (netif_is_l3_master(dev))
+		fl->flowi_oif = 0;
+
+The IPv4 side is different. ip_route_output_flow() sets
+flp4->flowi4_oif = rt->dst.dev->ifindex after the lookup.
+
+Two cases can store a link-local source with sin6_scope_id == 0: an unbound
+socket with a link-local destination that has no scope, or routing picking
+a link-local source.
+
+After that, quic_get_dev_if(sk, sa) falls back to sk->sk_bound_dev_if (0).
+quic_v6_udp_conf_init() then asks to bind a link-local local_ip6 with
+bind_ifindex 0, which __inet6_bind() rejects. The link-local scope check in
+quic_v6_cmp_sk_addr() is also skipped, because one side's scope is 0.
+
+Would dst_dev(dst)->ifindex record the real egress interface instead?
+
+> +	}
+> +	ip6_dst_store(sk, dst, false, false);
+> +	return 0;
+> +}
+
+[ ... ]
+
+> +int quic_common_setsockopt(struct sock *sk, int level, int optname,
+> +			   sockptr_t optval, unsigned int optlen)
+> +{
+> +	return quic_pf_ipv4(sk) ?
+> +	       ip_setsockopt(sk, level, optname, optval, optlen) :
+> +	       ipv6_setsockopt(sk, level, optname, optval, optlen);
+> +}
+
+[Severity: Medium]
+This passes every SOL_IP and SOL_IPV6 option to the core IP stack. The
+QUIC route and transmit helpers above only use part of the resulting
+socket state: tos/tclass, uc_ttl/hop_limit, pmtudisc, SNDFLOW flow labels,
+sk_bound_dev_if, mark and uid.
+
+Can setsockopt() then report success for options that never take effect on
+QUIC traffic? Some examples follow.
+
+IP_OPTIONS sets inet->inet_opt. However, quic_v4_lower_xmit() goes through
+udp_tunnel_xmit_skb()->iptunnel_xmit(), which always builds a header with
+no options:
+
+net/ipv4/ip_tunnel_core.c:iptunnel_xmit() {
+    ...
+	iph->ihl	=	sizeof(struct iphdr) >> 2;
+    ...
+}
+
+quic_v4_flow_route() also does no source route handling.
+
+IPV6_RTHDR, IPV6_HOPOPTS and IPV6_DSTOPTS set np->opt, but
+udp_tunnel6_xmit_skb() never adds extension headers. The v17 changelog
+notes this when it drops fl6_update_dst(), yet these options are still
+accepted.
+
+IP_UNICAST_IF (inet->uc_index) and IPV6_UNICAST_IF (np->ucast_oif) are
+ignored, because quic_get_dev_if() only looks at the link-local scope id
+and sk_bound_dev_if. UDP does use ucast_oif in udpv6_sendmsg():
+
+	fl6->flowi6_oif = READ_ONCE(np->ucast_oif);
+
+The sticky IPV6_PKTINFO (np->sticky_pktinfo) and IP_TRANSPARENT are not
+checked either.
+
+Would an allow-list in quic_common_setsockopt() make sense, returning
+-EOPNOTSUPP for options the QUIC path can't honour, as MPTCP does?
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1792164438.git.lucien.xin%40gmail.com
