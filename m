@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792445404;
-	b=HUrh3EVRMh3c+Qlznq0UwQvyoJjw18cnXI6Ib/3FOwXlphPcTLfhMyjxcBCSWm1rzvuy
-	 J3mDGGr0hvi5IcjJlP32VMAGW4f97ZPX6fx4XMqcUXKDeTwCY3D5CetNnuVfFratqXutB
-	 J6Nh/Dhuh/TR2MhWJrzRiarjy51d+rVRARf2/k88A9+CAxyr9td0EPeGqobYVVTV8kVa5
-	 USAqkAYUrpjAY17g+1TFQaG9EwcIj3pyV6lL7k4KlvScLI+uQ7lMiPGLktZ6EKuiaZRzs
-	 3ENDsk7h2JKyS7EMUpI2CIfP7e7SiU87ndgA1mAiDTrUXFhwsKucor7++62y4GGBtyQ==
+	t=1792445413;
+	b=kMtmkWo5Yu27bhX3Y/b2iPc4AzAwvPyulL4/tyaVGLl/Q0WfcwcOwV5RiymjcOOG5Emu
+	 iwBeWDHR3s1Er1VzLLWMX4uTwybifwOifu3MQerjxKzFIsgsRcJgaz8Hsq1FtMtckQnNM
+	 nurwP4xQfiDE4QZYUgJ8Saix7JT8goyqmnFNgqP+LL5sKTpe/bBbe3tzZKUAf1La2vggJ
+	 r9H12mfh2nwvBRhq6y8OV46aHcVnb9RmnYJepfokZBezzaKcZNlMHG8VQ2AGfcgzeT81n
+	 FKUlYNQkP+jTNf/U7ldnvF9g5X3nmqz4SvGOi5HCTe9vPHItqG273nNALWra+Rxr0AQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792445404;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792445413;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=uHUMsq2KI9y0hFfNoOWys1j9L9M/UkbWorvw/tQ4h+U=;
-	b=MRRwgcx3Ebi9awwm+5EilXlFkKyXUVFZOtuw90dk81auS8pzY1n29e7HWWflUi/aGY8Y
-	 NRJlm3x3/zfMHd0MHwLePRoyHC3HPp8C/T7vVTlznAg8J+gUSpPG3JagsAIHS9NfnlXxM
-	 3ec2QwRyIAHB6pX56/5bfYXPOc3lRktTx6PnVkM0NqUqYwbt3PaZkhPVgB5a04SZ45GaP
-	 K/fQVrebeEOEYoHIlzMHXb2gNIxTG8na1rZdGSX7WspjQAA0BPa+YsVqdXiSo1OSABbnb
-	 vfpQAFZpSEWLLFtLVvxf6CU3p1VFVeKaSRHpzUpifwJo2mwcL47A2bhvBZ0HpXylisA==
+	bh=UuICSS5DMo4Gcw0hAWTDJJ5h4bUS85wyXSJnINw8FnE=;
+	b=aSe763eP1Pv4KRW4qFZKeIJLJrXVwjU2oeMBmv7PvEpkJ6XVz/uC/7xeZyPVBrpHtVE0
+	 N1MtJy/JMdO7PXgx60Xt6DeOQ3cn2+syM87YwazjijSa2g5f1ZQEi5VCEEXIzv4v4Mqq4
+	 KnA2p4UI0eTh3cm+Tg0BmTb/BD8I/1y2y28utkZq2h5MdIwyG6nRAnZsZrUb3vIfBWdSA
+	 yplkzhp+RLZZAKyi3mGKsNIH7oUXQjRCPPHQFAFjwEUVeX5GnBFKTn9tOGapW3/TzavPh
+	 1Yh+jT0/62o3Bj+UyzAtAt3TpWWMsW95o3BZ2DRvuYgtzLADWBxi2Y7rulzabDm2arg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HObmAAfq;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X6BYdnTv;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B11606A32C;
-	Mon, 19 Oct 2026 21:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63506606A319;
+	Mon, 19 Oct 2026 21:30:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HObmAAfq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E8F51F000C4;
-	Mon, 19 Oct 2026 21:30:02 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X6BYdnTv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B88A01F000C9;
+	Mon, 19 Oct 2026 21:30:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792445404;
-	bh=uHUMsq2KI9y0hFfNoOWys1j9L9M/UkbWorvw/tQ4h+U=;
+	s=k20260515; t=1792445412;
+	bh=UuICSS5DMo4Gcw0hAWTDJJ5h4bUS85wyXSJnINw8FnE=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=HObmAAfq5ED79ei/i0VeS2FeVUSE5A7IFBunT+1DZP+CwOpdyZt4tVSUgR4m76/ss
-	 ovUPAbvc8/E1v3IsUoe1t3VOQETHQgcvpw/5Nm/kFE2cnoVWbyQaw34T0Ru5q/TYEM
-	 I4UVm4fw1EqRvqbPUrkMPd+WFdHwF1f5AT6RoLd5KT0wEEjkR1ScDoCuSUg7sRXo7J
-	 KL7YxYaiV7ii2hWpwENrf6I5M58vL4zstIOldDND29Oe+a+NLGNzVvCCquIl/r5YAG
-	 Ghh+9MYh4O1yIgrl4JyZm55NwNZjPGIJxpcC57kHLr8LCaSQLW5cK1D3YuWbyQROo6
-	 5HsH8fubzIWhg==
-Subject: Re: [PATCH net-next v17 09/15] quic: add congestion control
+	b=X6BYdnTvC6C15mHDkX22cBjEl6SoM5OpsD1FPrncIRLgN2Y7ja0uoYw6CPQrHHlEQ
+	 cV2fGLklVZXA7zmRbtdkOhRn29swKPDzzh3I5d/3lMuT005nTO9lXJ3N49RWNpUAoE
+	 mid7bcvLFFQ8YQCcRGxfHueccbAcZqn4jFY85UJfggmQ/tKMSLQ5cgcf4YEIkTKKMF
+	 taTnKv155x3+a+xP3fk2RArbEUHBL+7kIUrH1eWiX5PgzbuIu9l6yxtaK4euEQjZDA
+	 0RIXXvXy9cbipOpnmKDyiPVKmVjgBFVsNA36wEPI5iFxBuZDoOmdJ6IsMIPGA+pgeO
+	 64S7a2B3ujdVA==
+Subject: Re: [PATCH net-next v17 15/15] quic: add packet parser base
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -54,13 +54,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
-Date: Mon, 19 Oct 2026 21:30:01 +0000
-Message-ID: <179244540161.3135.791644548439735124@kernel.org>
-In-Reply-To: =?utf-8?q?=3C9e1c586f76943aa9fcd96cecedec805c66fc6e07=2E1792164?=
+Date: Mon, 19 Oct 2026 21:30:10 +0000
+Message-ID: <179244541026.3135.1595523596507400028@kernel.org>
+In-Reply-To: =?utf-8?q?=3C47ec29f97f3986e6b9cb5b07f109dcae340916e6=2E1792164?=
  =?utf-8?q?438=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-References: =?utf-8?q?=3C9e1c586f76943aa9fcd96cecedec805c66fc6e07=2E17921644?=
+References: =?utf-8?q?=3C47ec29f97f3986e6b9cb5b07f109dcae340916e6=2E17921644?=
  =?utf-8?q?38=2Egit=2Elucien=2Exin=40gmail=2Ecom=3E?=
-X-sashiko-severity: Medium
+X-sashiko-severity: High
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -73,10 +73,10 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found 3 potential
+Thank you for your contribution! Sashiko AI review found 6 potential
 issue(s) to consider.
 
-Critical: 0 · High: 0 · Medium: 1 · Low: 2
+Critical: 0 · High: 1 · Medium: 1 · Low: 4
 
 If you believe none of the issues are legitimate, please reply to each
 issue of Medium severity or higher and explain why the AI is wrong.
@@ -84,173 +84,289 @@ If any of them are legitimate and you plan to respin, please let patchwork
 know by including "pw-bot: cr" as a separate line at the end of your reply
 (one such reply per series is enough).
 
-- [Medium] When quic_cong_on_packet_lost() (net/quic/cong.c:94-99)
-  declares persistent congestion, it sets cong->window =…
-- [Low] The commit message says the implementation "adjusts the
-  congestion window accordingly during packet transmission and…
-- [Low] quic_cong_rtt_update() (net/quic/cong.c:207-209) throws away the
-  whole RTT sample when the raw send-to-ACK interval (cong->time - time)…
+- [High] When PLPMTUD is disabled, ICMP Packet Too Big messages never
+  lower the MSS.
+- [Medium] quic_accept_sock_exists() (net/quic/socket.c) passes an skb to
+  an accept socket's sk_backlog_rcv() while atomic: local_bh_disable()…
+- [Low] quic_packet_get_connid() rejects any connection ID longer than
+  QUIC_CONN_ID_MAX_LEN (20) regardless of version.
+- [Low] quic_request_sock_backlog_tail() calls __sk_rmem_schedule(sk,
+  len) before skb_set_owner_r().
+- [Low] quic_packet_deferred_work() drains deferred_list while holding
+  lock_sock(sk) and never calls cond_resched(): `while ((skb =…
+- [Low] quic_packet_get_alpn() prints the u32 field alpn->len (struct
+  quic_data in net/quic/common.h) with %d: `pr_debug("%s: alpn_len:…
 
 --
 
-quic: add congestion control
+quic: add packet parser base
 
-This patch adds struct quic_cong and struct quic_cong_ops to the QUIC
-stack. They cover RTT measurement, loss and ECN handling, and pacing.
-New Reno is the only algorithm so far, and quic_init_sock() sets it up
-through quic_cong_init().
+This patch adds the QUIC receive path. Sockets are looked up by
+connection ID and address, and packets are dispatched by socket state.
+Listen sockets handle client Initial packets (request sockets, ALPN
+demux, deferred work), and ICMP Packet Too Big errors update the path
+MTU.
 
-> The implementation updates RTT estimates when packets are acknowledged,
-> reacts to loss and ECN signals, and adjusts the congestion window
-> accordingly during packet transmission and acknowledgment processing.
-
-[Severity: Low]
-Is this accurate for the transmit path? quic_cong_on_packet_sent() never
-touches cong->window:
-
-    if (cong->ops->on_packet_sent)
-        cong->ops->on_packet_sent(cong, time, bytes, number);
-    quic_cong_update_pacing_time(cong, bytes);
-
-The New Reno entry in quic_congs[] has no .on_packet_sent, so on transmit
-only cong->pacing_time changes.
-
-The commit message body also doesn't mention pacing. That covers the
-pacing_rate and pacing_time fields, the 2 * window / smoothed_rtt rate in
-quic_cong_pace_update(), and quic_cong_update_pacing_time(). Pacing only
-shows up in the version changelog notes.
-
-Could the commit message describe pacing, and drop the part about
-adjusting the window during transmission?
-
-> diff --git a/net/quic/cong.c b/net/quic/cong.c
-> new file mode 100644
-> index 0000000000000..765f50660f0e4
-> --- /dev/null
-> +++ b/net/quic/cong.c
-> @@ -0,0 +1,287 @@
+> diff --git a/net/quic/packet.c b/net/quic/packet.c
+> index 56d2b8df292a0..a2f836cc22d70 100644
+> --- a/net/quic/packet.c
+> +++ b/net/quic/packet.c
+> @@ -14,6 +14,801 @@
 
 [ ... ]
 
-> +/* NEW RENO APIs */
-> +static void reno_recovery(struct quic_cong *cong)
+> +/* Extracts a QUIC Connection ID from a buffer in the long header packet. */
+> +static int quic_packet_get_connid(struct quic_conn_id *connid, u8 **pp,
+> +				  u32 *plen)
 > +{
-> +	cong->recovery_time = cong->time;
-> +	cong->ssthresh = max(cong->window >> 1U, cong->min_window);
-> +	cong->window = cong->ssthresh;
+> +	u64 len;
+> +
+> +	if (!quic_get_int(pp, plen, &len, 1) ||
+> +	    len > *plen || len > QUIC_CONN_ID_MAX_LEN)
+> +		return -EINVAL;
+
+[Severity: Low]
+Should the 20-byte connection ID limit be applied before we know the
+version is supported?
+
+quic_packet_get_long_header() is called from quic_packet_get_sock() and
+from quic_packet_listen_process(). Both calls happen before the
+!quic_packet_compatible_versions(version) branch that sends Version
+Negotiation.
+
+So a long-header packet with an unknown version and a CID longer than
+20 bytes is dropped as an invalid header, and no Version Negotiation is
+sent.
+
+RFC 9000 section 17.2 limits CIDs to 20 bytes only for version 1.
+Sections 5.2.2 and 6.1 say a server SHOULD be able to read longer CIDs
+from other versions so that it can send Version Negotiation.
+
+[ ... ]
+
+> +/* Process PMTU reduction event on a QUIC socket. */
+> +void quic_packet_rcv_err_pmtu(struct sock *sk)
+> +{
+
+[ ... ]
+
+> +	info = clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU);
+> +	/* If PLPMTUD is not enabled, update MSS using route and ICMP info. */
+> +	if (!paths->plpmtud_interval) {
+> +		if (quic_packet_route(sk))
+> +			return;
+> +
+> +		dst = __sk_dst_get(sk);
+> +		if (dst) {
+> +			dst->ops->update_pmtu(dst, sk, NULL, info, true);
+> +			/* Re-read actual MTU after update_pmtu, which may have
+> +			 * rejected the increase. Only use values accepted by
+> +			 * route layer to prevent spoofed ICMP from raising MSS.
+> +			 */
+> +			info = clamp(dst_mtu(dst), QUIC_PATH_MIN_PMTU,
+> +				     QUIC_PATH_MAX_PMTU);
+> +		}
+> +		quic_packet_mss_update(sk, info - packet->hlen);
+
+[Severity: High]
+Does this ever lower the MSS when PLPMTUD is disabled?
+
+With skb == NULL, ip_rt_update_pmtu() builds its flow key through
+ip_rt_build_flow_key()->build_sk_flow_key(), which takes the
+destination from the socket:
+
+net/ipv4/route.c:build_sk_flow_key() {
+    ...
+	__be32 daddr = inet->inet_daddr;
+    ...
+}
+
+When there is no packet header, __ip6_rt_update_pmtu() does the same
+with sk->sk_v6_daddr.
+
+Nothing in net/quic sets inet_daddr or sk_v6_daddr, and ip6_dst_store()
+is called with daddr_set false. The exception would then be created for
+0.0.0.0 or :: instead of the peer.
+
+Even with the right key there is a second problem. When
+update_or_create_fnhe() creates a new exception, it only marks the
+cached routes obsolete:
+
+	WRITE_ONCE(rt->dst.obsolete, DST_OBSOLETE_KILL);
+
+It does not change their MTU. The IPv6 path inserts a new RTF_CACHE
+route and leaves the old dst unchanged.
+
+So re-reading dst_mtu(dst) on the same cached dst would return the old
+MTU, and quic_packet_mss_update() keeps the old MSS.
+
+If that's right, the v17 change to re-read the MTU after update_pmtu()
+makes the ICMP-driven reduction a no-op. plpmtud_interval is 0 by
+default, so a path whose PMTU is below the local MTU could stall:
+full-size DF packets are dropped and the PTBs are ignored.
+
+For comparison, SCTP temporarily sets the socket daddr around
+update_pmtu() (to_sk_daddr()), and inet_csk_update_pmtu() re-checks the
+dst with __sk_dst_check() afterwards. Is something similar needed here?
+
+[ ... ]
+
+> +	pr_debug("%s: alpn_len: %d\n", __func__, alpn->len);
+
+[Severity: Low]
+This isn't a bug, but alpn->len is a u32 in struct quic_data, so %u
+would match it. The v16 changelog made the same fix in quic_packet_rcv().
+
+[ ... ]
+
+> +/* Work function to process packets in the deferred list. */
+> +static void quic_packet_deferred_work(struct work_struct *work)
+> +{
+> +	struct quic_sock *qs = container_of(work, struct quic_sock, work);
+> +	struct sock *sk = &qs->inet.sk;
+> +	struct sk_buff_head *head;
+> +	struct sk_buff *skb;
+> +
+> +	lock_sock(sk);
+> +	head = &quic_packet(sk)->deferred_list;
+> +	while ((skb = __skb_dequeue(head)) != NULL)
+> +		quic_packet_process(sk, skb, GFP_KERNEL);
+
+[Severity: Low]
+Was the cond_resched() from the v12 changelog lost in the v15 rework?
+The v12 entry reads:
+
+  "Call cond_resched() in the loop inside quic_packet_backlog_work()."
+
+Each iteration here can run synchronous AEAD decryption (cb->sync = 1),
+GFP_KERNEL allocations and token verification, all under lock_sock().
+
+On the quic_listen_sock_switch() path, the listener lock is dropped and
+re-taken in the middle of this loop. Under sustained traffic, packets
+processed from the socket backlog in that window can keep adding to
+deferred_list, so the loop keeps running.
+
+> +	release_sock(sk);
+> +	sock_put(sk);
 > +}
 
 [ ... ]
 
-> +/* COMMON APIs */
-> +void quic_cong_on_packet_lost(struct quic_cong *cong, u64 time, u32 bytes,
-> +			      s64 number)
-> +{
-> +	if (cong->pc_detected)
-> +		return;
-> +
-> +	if (cong->pc_start_time && time > cong->pc_start_time &&
-> +	    quic_cong_check_persistent_congestion(cong, time)) {
-> +		cong->pc_detected = 1;
-> +		cong->min_rtt_valid = 0;
-> +		cong->window = cong->min_window;
-> +		return;
-> +	}
-
-[Severity: Medium]
-Should this branch also reset cong->recovery_time?
-
-The recovery state comes only from quic_cong_in_recovery():
-
-    return time <= cong->recovery_time;
-
-The only place that writes recovery_time is reno_recovery(), which sets
-it to cong->time (now).
-
-Take a single loss-detection pass after a link outage:
-
-  P1 lost (pc_start_time is 0, first_rtt_time is set, not in recovery)
-    quic_cong_on_packet_lost()
-      cong->pc_start_time = time of P1
-      quic_reno_on_packet_lost()
-        reno_recovery()
-          cong->recovery_time = cong->time;    /* now */
-
-  P2 lost, sent more than the persistent congestion duration after P1
-    quic_cong_on_packet_lost()
-      quic_cong_check_persistent_congestion() returns true
-      cong->window = cong->min_window;
-
-Every packet still in flight was sent before now, so the ACK for each of
-them returns early here:
-
-    quic_cong_on_packet_acked()
-        if (quic_cong_in_recovery(cong, time))
-            return;
-
-In that case ops->on_packet_acked() is never called. Would the window
-then stay at min_window for at least one more RTT, until a packet sent
-after recovery_time is acked?
-
-RFC 9002 Appendix B.8 sets congestion_recovery_start_time to 0 on
-persistent congestion, so these ACKs grow the window in slow start. The
-state diagram in cong.h shows the same transition:
-
- *             persistent congestion |   Slow     |
- *         (O)---------------------->|   Start    |
-
-Here, though, the derived state ends up as Recovery Period, not Slow
-Start.
-
-Nothing in this patch calls the quic_cong_on_packet_* hooks yet. This
-would show up once the outqueue changes start calling them.
+> diff --git a/net/quic/socket.c b/net/quic/socket.c
+> index 0173416d0368a..c75d2dcaba9d4 100644
+> --- a/net/quic/socket.c
+> +++ b/net/quic/socket.c
+> @@ -24,6 +24,319 @@ static void quic_enter_memory_pressure(struct sock *sk)
 
 [ ... ]
 
-> +/* rfc9002#section-5: Estimating the Round-Trip Time */
-> +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_delay)
+> +int quic_request_sock_backlog_tail(struct sock *sk,
+> +				   struct quic_request_sock *req,
+> +				   struct sk_buff *skb)
 > +{
-> +	u32 adjusted_rtt, rttvar_sample;
+> +	u32 limit = sk->sk_rcvbuf / sk->sk_max_ack_backlog;
+> +	int len = skb->truesize;
 > +
-> +	/* Ignore RTT sample if ACK delay is suspiciously large. */
-> +	if (ack_delay > cong->max_ack_delay * 2 ||
-> +	    cong->time - time > QUIC_RTT_MAX)
-> +		return;
+> +	limit =  max_t(u32, limit, QUIC_MIN_UDP_PAYLOAD * 4);
+> +	if (req->blen + len > limit || !__sk_rmem_schedule(sk, len, false)) {
+> +		QUIC_INC_STATS(sock_net(sk), QUIC_MIB_PKT_RCVDROP);
+> +		kfree_skb(skb);
+> +		return -ENOBUFS;
+> +	}
+> +
+> +	QUIC_SKB_CB(skb)->backlog = 1;
+> +	skb_set_owner_r(skb, sk);
 
 [Severity: Low]
-Is the 6 second QUIC_RTT_MAX cutoff too tight here?
+Can this push sk_forward_alloc negative when the skb is already charged
+to this listener?
 
-cong->time - time is the raw interval from send to ACK, so it includes
-the peer's ACK delay. RFC 9000 allows max_ack_delay up to 2^14 ms, which
-matches common.h:
+Consider a second Initial packet for the same connection that was
+deferred through quic_packet_deferred_schedule(). Its destructor is
+already sock_rfree, and in quic_packet_listen_process() it takes this
+path, which skips skb_set_owner_sk_safe():
 
-    #define QUIC_MAX_ACK_DELAY	(16384 * 1000)
+	req = quic_request_sock_lookup(sk);
+	if (req) /* If request sock already exists, enqueue packet directly. */
+		goto out;
 
-For example, take a peer max_ack_delay of 8s, an ack_delay of 7s and a
-measured interval of 7.1s. The sample passes the ack_delay check but is
-still thrown away. The same happens on any path whose RTT stays above
-6s.
+In quic_request_sock_backlog_tail(), __sk_rmem_schedule() reserves the
+memory first. skb_set_owner_r() then orphans the skb
+(sock_rfree()->sk_mem_uncharge()->sk_mem_reclaim()) and charges it
+again.
 
-The early return comes before anything is updated. smoothed_rtt and
-rttvar stay at their initial 333ms and 166ms, and those feed into pto,
-loss_delay and the pacing rate.
+The reclaim can return the pages that were just reserved, so the
+sk_mem_charge() that follows can leave sk_forward_alloc below zero.
 
-first_rtt_time also stays 0, so this condition in
-quic_cong_on_packet_lost() is never true:
+For example, start with forward_alloc 2000 and truesize 2304:
 
-    if (!cong->pc_start_time && cong->first_rtt_time &&
-        time > cong->first_rtt_time)
-        cong->pc_start_time = time;
+  schedule adds a page:      6096
+  uncharge:                  8400
+  reclaim leaves:            208
+  charge leaves:             -2096
 
-As a result, persistent congestion tracking never starts.
+Would orphaning the skb before the __sk_rmem_schedule() check avoid
+this?
 
-The v14 changelog says the cap prevents latest_rtt overflow. latest_rtt
-is a u32 in microseconds, though, so it doesn't overflow until about
-4295 seconds.
+> +	__skb_queue_tail(&req->backlog_list, skb);
+> +	req->blen += len;
 
-Could the limit be raised, or could ack_delay be subtracted before the
-check? Nothing in this patch calls quic_cong_rtt_update() yet, so this
-only matters once later patches call it.
+[ ... ]
+
+> +	/* Look up accepted socket matching packet addresses and DCID. */
+> +	local_bh_disable();
+> +	sk = quic_sock_lookup(skb, &packet->daddr, &packet->saddr,
+> +			      quic_path_usock(quic_paths(sk), 0),
+> +			      &packet->dcid);
+> +	if (!sk)
+> +		goto out;
+> +
+> +	/* Found a matching accept socket. Process packet with this socket. */
+> +	skb_orphan(skb);
+> +	bh_lock_sock_nested(sk);
+> +	if (sock_owned_by_user(sk)) {
+> +		/* Socket is busy (owned by user context): queue to backlog. */
+> +		if (sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf))) {
+> +			QUIC_INC_STATS(sock_net(sk), QUIC_MIB_PKT_RCVDROP);
+> +			kfree_skb(skb);
+> +		}
+> +	} else {
+> +		/* Socket not busy: process immediately. */
+> +		sk->sk_backlog_rcv(sk, skb); /* quic_backlog_rcv(). */
+> +	}
+
+[Severity: Medium]
+Should cb->backlog and cb->sync be cleared before the skb is handed to
+the accept socket here?
+
+When this runs from quic_packet_deferred_work(), the skb came off
+deferred_list with cb->backlog = 1. An skb that went through
+quic_listen_sock_switch() also has cb->sync = 1 and cb->resume = 1, set
+by quic_packet_get_alpn().
+
+The call path here is atomic:
+
+quic_packet_deferred_work()
+  quic_packet_process()
+    quic_packet_listen_process()
+      quic_accept_sock_exists()
+        local_bh_disable()
+        bh_lock_sock_nested(accept_sk)
+        accept_sk->sk_backlog_rcv()
+          quic_packet_process(..., GFP_ATOMIC)
+
+Elsewhere the patch treats cb->backlog as meaning the context can sleep,
+for example in quic_packet_deferred_schedule():
+
+	if (cb->backlog)
+		return 0;
+
+quic_crypto_decrypt() also checks !cb->backlog before doing a key
+update, and cb->sync forces a blocking crypto wait.
+
+The handshake and app handlers are still stubs in this patch. Once they
+are filled in, could these leftover flags make them sleep while holding
+the spinlock with BH disabled?
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1792164438.git.lucien.xin%40gmail.com
