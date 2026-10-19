@@ -1,82 +1,82 @@
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BC44ABBD4
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 10:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D3149A3BA
+	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 10:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.175
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792404996; cv=pass; b=FmGEJGKjW6JO0xZBikdp8jAs33Qx4UwBGbB8s4ATTVkGtd+6Ug1S26E5OltmOusWcmp3lNd38MxZK4thaemNtGNokt2rWUP4I0MEiixm4k/Gp2GBlj3WXgBh2p3+KWXwokBWoHyaqi7x+6obA13AIrt7hZAF584K4bAK2W6HXAY=
+	t=1792404998; cv=pass; b=eUZn2+ItR0W9nFinOyJgGISJm6RK/ysJk/WyupiXbnNPde9+CLCIoM7X2cCSoPQShGLGVU6eahyPe5BnpPIVY70GpHPOPbOGahxH7nDj89J45zegWnaX/XLtH4+9Z0Qj1UgcUoGwlTzO/0vWQyNoE1UaCQLl4BnDRSdXj1tnhsQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792404996; c=relaxed/simple;
-	bh=Bfo6yA4tdFTz0CojFmxTqPYvarBD8CeXSaQxDqBheJU=;
-	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=ZzV0lmHPEQ2IkdOqS0U4py/MsDJRVL5Q8YbzGax3gkIiqpXRrPdjD9krgsfqsFkIXTK/sWuwaKfnudC6pF9Iupr7cjYFDJupVH1VPJU+i3G4U+Csf1w3kcONnUQB11+Z01Jp1FN7XmOEYQoLFQHSfyy+Ti2w53DispYYsMQlHQM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lNEc+mED; arc=pass smtp.client-ip=209.85.160.173
+	s=arc-20240116; t=1792404998; c=relaxed/simple;
+	bh=G4P5DiCaepBBmkM6SKxCxPCgFUV2Fc53Vf9I3vwmIvE=;
+	h=From:MIME-Version:Date:Message-ID:Subject:To:Cc:Content-Type; b=B62s1Co4jEQlgXZsfazptmm4Vy3uy2TG0lutnEtSoLap0BtwvPyezXtvP8sh6BTtFR2u7pi+BYBF6M+twefSooI2zBaBZDuzZ3pVIeKUKwOkXqDO9kduVuwxYoPlM0K3KqUq5XwsUkrPuRclrSo8+AamQjdqfDdcvIfcTGXXM/A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CGo0P9As; arc=pass smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lNEc+mED"
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-5337c7b9937so404771cf.0
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 03:16:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792404994; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CGo0P9As"
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-535f598d126so323901cf.1
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 03:16:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792404996; cv=none;
         d=google.com; s=arc-20260327;
-        b=Udg1n8Bc/WuDTzAlIsoEiN9y68SyX1MtZu/Bo4jvBWmsFbVkOq8LLiTeNPo580ROAp
-         4ICf6dl1IHqRtI4d+XznxgdqR61Eb1htdRvv2axB0+5oQIZ6Q6YQwlVFW0ULVsMOsUEs
-         SMBHjfJjVYn4iWm0aPwEft5fGosy0qRbs/4DRak87ducOz0hUdBMD2YzruvnjHtmeafo
-         6aU1XANQAjNoVPokoW/ETMgKwy0GiyNcXtuMtSTX/eqy8uYOmgt//FCdslADS5QAIHy7
-         xZqtoHzuvAlsCul/tNAUZlhWkrosOEPVcqvOJHHI9PL5KdOFoSQiDp2a17pYUlbG0nTq
-         NE7w==
+        b=ghir3JtYMZSUvICOctyVnGmiCMeSUWMCR3FjFp7/fbn8EamOut2DhaWErvxtB1imdc
+         h7sDygsDP60xdDu6uPqV1tGVWwCrZmHjWNIdaCgPXguQSXfsACJJFvPviXvN9V6Ms8Cd
+         aDfchmjA4RU3kcTqj7iiiaigQ1a8gsIJXh7V8tEu4iAyM/y9NROn+udPxz9JxhnDwtai
+         vfJIPgcUl7elpWc8tSb9opsIolzuDeJkcQOxfM8gyPyrYqBsfFJ/9zYUlE5T3rjm+1Em
+         yACCSDXqb7jvG48L2fKGXseYLXMRGbjpNQUTAWVCP//gOnFZjkb/XuwE1wyjlBl6TKGZ
+         t+kg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:mime-version:from:dkim-signature;
-        bh=hDoj6XweuEIzgZODOcQI/MCL15mW9RVkIWVbM7dr42g=;
+        bh=mcsn42Lhkb8Ku2tF+hMSF6j2gRSuMGyz6+whGpcvxAI=;
         fh=t+1v03sPehsmpmWnOGMeVD8iSyn8gxsLZc+9SIasI9c=;
-        b=e6P2RHTN7U5HObedqY6Qalpb3S8e/ZsxyxVUgPO2AyZQlOI2mQ7Q7FPbdL8b32nzVG
-         WPYe/G5xLkBBqgWJyda+TWjRgw81SAS5H5HYQyDmsyePcF+2omhkxIqEJBq6c/+1mhKx
-         OpWb10akgSV2K4N2WcjadnGXmW65EUgI1X7obYsNvrMdx+QqZzJIhzWo6OudYBUO3zMP
-         9wTuJtCJfiQBEOJlS1uLnxflrH5+NNq5cYRvl3s5rALMGjoLwucm9zNj+XMeQwx8fEeg
-         ZfAAPWa4MqcVDNdMhg+SNs0AoNAbp6ZwkPptJohbhj1JTTEswKwX0OmY23G9BQCPF0h3
-         6jgQ==;
+        b=D7suqrOhFj5ZrJBrN/ZSQ8RoysZG9MJar/1yo+RElA3wGrJ6CKCt1MY9Pv34CrCM/5
+         5Le7Vjg6vYhaUCo58DJ+V7jhSuoSPK2TWhNNrj4nOynxfixDhFPTd+QwQIHjd0fc70RO
+         cqQ9ewArMWSO9ayU5iOX1rTvbctpRm3boO5v7UajrSAeGoAtoVC89H5gIC54L0+qz4YP
+         XyLn4ddLBSXpKBKLTM7xz+loysGH3EPlWTw28vXfqw7tFIsqQaC3q27UPd/klWsRFag1
+         vxvTvDj8QLeRxWFBr1R7E8pXgo6IkwD3wQph1BCJkMuO0wnTVDgmeaqa2PCfnleoQ9nG
+         a6uA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1792404994; x=1793009794; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1792404996; x=1793009796; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:mime-version:from:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=hDoj6XweuEIzgZODOcQI/MCL15mW9RVkIWVbM7dr42g=;
-        b=lNEc+mEDEerVCMdaCZqieW8rwKE5+Oiybjj/+dFfMHU3kFXk3GD+rrFO761l4jrMph
-         bUkQkp88O0Txb81sROK6/syImj6NU/fiWSQ5fSrZL84uLgBJq2PP50hRzrHdI4L54rL4
-         evdHeLyrR9iuaN14lLRC1koM6oaLbftTHP3yr68WiPmmqFrU3+TuhZDUaU8MmaUCLI5o
-         KmjrWA7Jyt9KM4I5rEvK5zmcsYF9wNNVmA8iw5AkRl6QuZ+efWHrd5llRyKOlXwhY+8c
-         tJKHcuN5L4kbq3udobGkWH2T0R3Neoa5EpGrX/BlKSaVpr7Y6N/UQK4bmvu034v6lRjk
-         b4rA==
+        bh=mcsn42Lhkb8Ku2tF+hMSF6j2gRSuMGyz6+whGpcvxAI=;
+        b=CGo0P9Asm4QK3OdbpB8j3cpahBovwfBgu8UrxCGIQbd6QRn4rX8BpBtaND3N6bloT/
+         vK7zcI2vws1ILNxTRS8kGpuAJ1Nmh5nTtZWp8UgOmW2vG48zzt/3X8R2aBLh76EbWKdI
+         s38D03G7droa3Rgd3AIyS++yvsRP2a50EoaErwW0l6fK0xhi7tQj8oQRebuXMB+Jkzg4
+         G8hiEBLufUG8g+D26sYlTQtnCslG2pxE1vG9eBf/7R8q8nqU05378nKFfQsW7pW/BBlT
+         WkX9EHri2JuOq8S8sCDLx5F8dhle1xSKBD+oJv/aAEkrFF+WX6NVuZRJZKAHhFYrv7Ck
+         i3CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792404994; x=1793009794;
+        d=1e100.net; s=20260707; t=1792404996; x=1793009796;
         h=content-type:cc:to:subject:message-id:date:mime-version:from
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=hDoj6XweuEIzgZODOcQI/MCL15mW9RVkIWVbM7dr42g=;
-        b=ikQSdWoHEtL0D9oj4yu2SQfvFvXY7TVf1STW+Uve4KLfVVImfOfsYINbRkC79XRQtE
-         KLM2zOkaTDLa5YTzKs9aHkRefuyIzqJ7BGIY/cv1yH3gtoL1/AVTUYQVcJM1sprb3qPK
-         knRA4Gt/EtxrKUynZ5/kp7gQinZmmaVc7djfUTwauSdnK5BmE3fMuo+/OcvqnsARCMsz
-         Lhuv/e/tDSHCSv9TAsYVBoGo8J3wyVe28tRtj/ehXRLh7+fkxOGbOiIQkBHeMEPruTSK
-         vssAV+WwNATEp5NUXtz5uxtiPhz2yDKPJWkxJR3Jb05nadKGBzk6e2p8SP2A7avL33xg
-         ExQQ==
-X-Gm-Message-State: AFq9FYIfz4uOrT5+OF6qThXDGmQYlwKcSxL4gWh2iByPIZ4+4rjS4ArM
-	wlGua2g40H7mcuH045bIkGiCEx2v/Ij5JFwJMMvc0jKg8bfUTOUJrjd1AgrMpy24DPAw5ioEcCz
-	wJR86Wg/okZf6kGD9NTgFV/b923SLjxFzzDVSnHNDNxVV/g1mrGBNHaC3VWw=
-X-Gm-Gg: AYBFou17hEEzyckoTe1P7n8TU05eY1QA8UyM+S4jf81Bme6lf9Y6LPRyWFZ4tD4GW/B
-	w9xz/BDpr4bGHNaQ0Qu44cbVGwjGOWiMaougErLFiK3FSDMnpkuwy+hCDFjxVK9zZFLHxvYj6H3
-	xvEpROnFR2mDm6vTeWfK7KxEML4aOxzSbodXmgaYlzmXA8cwBQc4fGNPrseggXJUO2eMG8fChqH
-	ETQdHwJMm37kLIxhHp3Lfq2Ox9wSAEHUxbvbpArmlmlcu7AspBM6lNcUC8sDY8JQu0q1SyNvaQT
-	BFhUto1ThsHwXFvuyiA2oy+/vr/rJjxy+1DJV9P4FDTYPhcAwgtqrWOBmdOJqfVONTyIX4a6JWA
-	DphfHgj1BGHfCDT9dlfjECYzAFzSL3WKa0EXL5jppCXyjkTW4+qauS/CXzuOUe7yJnBW3bJo0Nq
-	armTISaYAh2WxNC4yYZV2Nx6Iw6YAe4kuOAazlkw5AYzF4i6WaM5am+epSdc0Exeg=
-X-Received: by 2002:a05:622a:120f:b0:535:84ef:2e26 with SMTP id
- d75a77b69052e-53645fd0692mr15498011cf.7.1792404992732; Mon, 19 Oct 2026
- 03:16:32 -0700 (PDT)
+        bh=mcsn42Lhkb8Ku2tF+hMSF6j2gRSuMGyz6+whGpcvxAI=;
+        b=q1SmtTK3wva6ufe79ijthxlDwKKL0TrR8OKlC5vHTGWS9pciuZAB+ABl5aX0SAoZ4f
+         Fv+Z5lrkF5HMukkKS2HeH5yyTv+vO6qR7DZPYBt9xn+JTQdUBjvN5GStDPze1wM1jVbF
+         BZTOYE5O9IA8Y0vuCZqYaoHfFGNll6IefT68p318j6iUi54suIxeP3ichzQoFinVi+kC
+         9Y24EJEEoptTiWm2djecMj1D4HLG73PHEOLYzXtVB5VF786AvDDwS31f7JRBR8oAWeZ5
+         Ld2UzTTF6JK0qxl70cc3oPZDATBMwiOuD4CVi/9gUbCblHUV97lwaxHCp7IhKq7t1xjj
+         hjsQ==
+X-Gm-Message-State: AFq9FYI8HX+BDLcIANiSONQyCP2743hXr+uMbaxVY9+Try7goHqIRDtd
+	sRyO+XJ5Tqn5JtaPTZGkK1iL7x7rSCfDI3PtKr4wbBYJlhs//boNZWOtZlmHbJXW3W6aJYrL4AQ
+	R4vVvMeuV6zTcioLSxqX+XNaDf69ewtKL/nRye5VE
+X-Gm-Gg: AYBFou0rxB+B7AqQcUCvRovY0K2xtW4GzpZzb2XxPVyyn/ZOkd8dLiBeGyIvN4kOkpb
+	xMIOrryvj41nmI9nD4U2xX1oe9MGE0kcaU+YN641d5k/MQTxHGr92rPY6f1Au0UdpltVhrZ4G8n
+	95yj+Qeg2CFDTo3F926MO4nDk7xECApj2c+nd43r63gRiEGiIzGkcQHsgvNKnFTP3To8cVq0Jy4
+	bnLna02oNqn/D0JrpNq22UIdr+CsKQJ5Nrkhh7eVCbznfTNsn0HGiI2+8L1ctnHfA8NDHAShYgx
+	2IeeIU2Ajl+8jAXufAVP4dmeChejq3dDczeGGVB1sPYL1DFE1vTMSDdpoZhjsTBwyQf9i9WbpPh
+	v8eShMWDLgFoiA2dBfdPd3IPPIzHulwiqBv0HOaCGZsLx8o/qyyV1aOh3Ewtj0RTtudZAfVZMJr
+	OJfriinps9+GTCq35hJ8zFF1PjbLeoA58g5k950a652FPepCerGoCm1IAfByrn/Bk=
+X-Received: by 2002:ac8:5ace:0:b0:534:b7b2:634f with SMTP id
+ d75a77b69052e-53646227b1amr31868371cf.8.1792404994740; Mon, 19 Oct 2026
+ 03:16:34 -0700 (PDT)
 Received: from 913411032810 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 19 Oct 2026 03:16:30 -0700
+ HTTPREST; Mon, 19 Oct 2026 03:16:33 -0700
 Received: from 913411032810 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 19 Oct 2026 03:16:30 -0700
+ HTTPREST; Mon, 19 Oct 2026 03:16:33 -0700
 From: Dominik Maier <dmnk@google.com>
 Precedence: bulk
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -84,74 +84,66 @@ List-Id: <linux-cifs.vger.kernel.org>
 List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 19 Oct 2026 03:16:30 -0700
-X-Gm-Features: AclHuK_bT9nyHjcGezSGj4_7-dlTSQOXROJaI16d96Q4cQAKv2Ul3Rg_A9jpyq8
-Message-ID: <CAE7N4Sq5L=Y2iKHYXsB4cogCA7-J2HoHy8jrnBNAq1cLZZ2E2Q@mail.gmail.com>
-Subject: [BUG] smb: client: slab-out-of-bounds write in id_mode_to_cifs_acl()
- chmod branch
+Date: Mon, 19 Oct 2026 03:16:33 -0700
+X-Gm-Features: AclHuK-ZKmiSJW_z3Mc51F2sfWWX6kiNMdx3qzJOoENGtxIr-zUkcyVIhH5JI3o
+Message-ID: <CAE7N4SrkzmJ2_3ZDq84+6cmVOYe0huz4uHhg8RcHq9h936OfaA@mail.gmail.com>
+Subject: [BUG] smb: client: slab-out-of-bounds read in CIFSSMBPosixLock()
 To: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org, dmnk+artist@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-In Linux 7.3.0 (commit c03c1a14507d), the chmod branch of
-id_mode_to_cifs_acl() in fs/smb/client/cifsacl.c (line 1827) can
-under-allocate the target security descriptor buffer pnntsd, leading to
-a slab-out-of-bounds write in copy_sec_desc().
+In Linux 7.3.0 (commit c03c1a14507d), CIFSSMBPosixLock() in
+fs/smb/client/cifssmb.c (lines 2365-2420) validates data_count against
+sizeof(struct cifs_posix_lock) when handling a
+TRANS2_QUERY_FILE_INFORMATION response, but does not verify that
+data_offset + sizeof(struct cifs_posix_lock) lies within the received
+SMB packet.
 
-Commit 0ee150794c75 ("smb: client: fix heap overflow in DACL owner/group
-rewrite") fixed the chown branch of id_mode_to_cifs_acl() by reserving
-sizeof(struct smb_ntsd) + 2 * sizeof(struct smb_sid) when computing
-nsecdesclen. However, the chmod branch immediately above it also invokes
-build_sec_desc() -> copy_sec_desc(), which unconditionally writes both
-the Owner SID and Group SID at pnntsd + sidsoffset and
-pnntsd + sidsoffset + sizeof(struct smb_sid) (2 * 68 = 136 bytes total).
+SendReceive2() allocates the response in a 448-byte cifs_small_rq slab
+buffer, and validate_t2() only checks DataOffset <= 1024 and
+DataCount <= ByteCount. When an SMB1 POSIX share is mounted with
+-o vers=1.0 (with CONFIG_CIFS=y and CONFIG_CIFS_ALLOW_INSECURE_LEGACY=y)
+and the server returns a short response with ByteCount = 24,
+DataCount = 24, and DataOffset = 300 (or 480),
+parm_data = (char *)&pSMBr->hdr.Protocol + data_offset points past the
+end of the received packet (or past the end of the 448-byte
+cifs_small_rq slab object). Calling fcntl(fd, F_GETLK, &fl) then copies
+20 bytes of out-of-bounds kernel slab memory (fl_start, fl_end, flc_pid)
+into the struct flock returned to userspace.
 
-When a file on an SMB2/SMB3 share mounted with -o cifsacl,
--o modefromsid, or posix (with CONFIG_CIFS=y) has a security descriptor
-with compact or overlapping Owner/Group SIDs, calling chmod()
-under-allocates pnntsd and writes up to 80 bytes past the end of
-kmalloc-1024 on -o cifsacl, 124 bytes on -o modefromsid, and 64 bytes
-past kmalloc-128 on posix.
+We reproduced this in QEMU with a local loopback SMB1 POSIX server that
+replies to TRANS2_QUERY_FILE_INFORMATION with DataOffset = 300 and a
+client that mounts //127.0.0.1/share with -o vers=1.0 and calls
+fcntl(fd, F_GETLK, &fl), reading 20 bytes of out-of-bounds slab memory
+into struct flock. The reproducer is available upon request.
 
-We reproduced this in QEMU with a local loopback SMB2 server that
-returns a 644-byte security descriptor containing compact Owner/Group
-SIDs and a client that mounts //127.0.0.1/share with -o cifsacl and
-calls chmod(testfile, 0127), causing id_mode_to_cifs_acl() to allocate
-1024 bytes (kmalloc-1024) and write 1104 bytes (+80 bytes out-of-bounds).
-The reproducer is available upon request.
+Below is a proposed fix (also tested in QEMU) verifying that data_offset
+points at or after ByteCount and that
+data_offset + sizeof(struct cifs_posix_lock) does not exceed the
+received SMB message size.
 
-Below is a proposed fix (also tested in QEMU) that reserves
-sizeof(struct smb_acl) + 2 * sizeof(struct smb_sid) (plus
-sizeof(struct smb_ntsd) on the posix path) in the chmod branch.
-
-Fixes: 0ee150794c75 ("smb: client: fix heap overflow in DACL
-owner/group rewrite")
+Fixes: 92d198a3a208 ("[CIFS] Add POSIX lock support")
 Assisted-by: ARTIST LLM
 ---
- fs/smb/client/cifsacl.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ fs/smb/client/cifssmb.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index 0cc5b0cd2d5c..8b780a92d91f 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1826,12 +1826,15 @@ id_mode_to_cifs_acl(struct inode *inode, const
-char *path, __u64 *pnmode,
-
- 	/* Potentially, five new ACEs can be added to the ACL for U,G,O mapping */
- 	if (pnmode && *pnmode != NO_CHANGE_64) { /* chmod */
-+		nsecdesclen = sizeof(struct smb_acl) +
-+			      (sizeof(struct smb_sid) * 2);
- 		if (posix)
--			nsecdesclen = 1 * sizeof(struct smb_ace);
-+			nsecdesclen += sizeof(struct smb_ntsd) +
-+				       sizeof(struct smb_ace);
- 		else if (mode_from_sid)
--			nsecdesclen = secdesclen + (2 * sizeof(struct smb_ace));
-+			nsecdesclen += secdesclen + (2 * sizeof(struct smb_ace));
- 		else /* cifsacl */
--			nsecdesclen = secdesclen + (5 * sizeof(struct smb_ace));
-+			nsecdesclen += secdesclen + (5 * sizeof(struct smb_ace));
- 	} else { /* chown */
- 		/* When ownership changes, changes new owner sid length could be different */
- 		nsecdesclen = sizeof(struct smb_ntsd) + (sizeof(struct smb_sid) * 2);
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index f329ddfd2ca9..62f8c7a38c5e 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -2391,7 +2391,12 @@ CIFSSMBPosixLock(const unsigned int xid, struct
+cifs_tcon *tcon,
+ 		}
+ 		data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+ 		data_count  = le16_to_cpu(pSMBr->t2.DataCount);
+-		if (data_count < sizeof(struct cifs_posix_lock)) {
++		if (data_count < sizeof(struct cifs_posix_lock) ||
++		    data_offset <
++		    offsetof(typeof(*pSMBr), ByteCount) -
++		    offsetof(struct smb_hdr, Protocol) ||
++		    data_offset + sizeof(struct cifs_posix_lock) >
++		    smbCalcSize(pSMBr) - offsetof(struct smb_hdr, Protocol)) {
+ 			rc = smb_EIO2(smb_eio_trace_lock_data_too_small,
+ 				      data_count, sizeof(struct cifs_posix_lock));
+ 			goto plk_err_exit;
