@@ -1,41 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ABD6050B6;
-	Mon, 19 Oct 2026 14:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF85560FEEC;
+	Mon, 19 Oct 2026 14:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1792418596; cv=none; b=dSRKDUjx/2r+vWBNL/H/vwLzUSF10pr3/dNDhBz07JCXlmDSGnN74Wmhpgz7lTiDFwQkQPJh2mmZ1Z29lxUlWk+A0lS8czJ2xrc5oiQiVI5hUJDhjyayoJ7HbWrMjXZshuxCm6JtTSpg/SZCEqgFy/rV4q6ZEVCl1EzCIpGhoWk=
+	t=1792418624; cv=none; b=fMeKbD4AdxiKltxK5zTKxIqg1AogZycVyqGiUyODMVnfUXgMweUsMcEWEehUq2HcREiDQeO91Yaofp+MazLKMFaPeIxzdB6V6/AuG5CfoFeGMBcvpCiMQqua9Uyi9rVLdfn/PZEMEUurwLKQ9BaBK6MyAf+UYMoX4p5ku8ujSns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1792418596; c=relaxed/simple;
-	bh=bAkn31bfhihMnu+4s73ziXtAiWB3g5T7iCPLK092/Vw=;
+	s=arc-20240116; t=1792418624; c=relaxed/simple;
+	bh=HFPDjsmkDaFNueVcRLv5yIDSYQxUXS4BARS7ATXhhXE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ba9UECa6bLJIJWFeOgFPq9nXM7I6JviMoPn2IqXGEO5wTgV6Vh9txJ1YOkqogQt7czhtaEJGP3Fk5MGMYsdFj0ead2T/lC+21cOMjd60qsUCuIGFxajxRlaJfNlTqiTlKMnkysrYukcG3XyQLCR6S8+G5wSVFSjLTcWhYVqgfk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ix/FWIZ1; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=g6AnNafybWQr76VYK0oVa0B5OOP0ePGRDPWlG1Er0wuai8glXHYR+qvllCt5wW07mLgCMZj3pneV527V8FKtaqAY+uzC6dQE1IKksKKhlGDlYw37GDzZ6qmVVp0v73M6QCY0LDLT5KyyLjiljNlD0aBuiNaPsG2Zo6H07e4Hylc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ic5U0hdh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ix/FWIZ1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A43031F000C8;
-	Mon, 19 Oct 2026 14:03:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ic5U0hdh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08DC1F000C6;
+	Mon, 19 Oct 2026 14:03:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792418593;
-	bh=S9xlGI5jGkR9UswSLAQN8kEyFXa7BHo3/L0IuGZTnog=;
+	s=k20260515; t=1792418621;
+	bh=AlwlwgS9Y/I1s9P3UBBS2X0yBOzNwOax0VPJjy3Gpso=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ix/FWIZ11W7hG4fxIn8FL4xbgjnhh+Ar14sDAUevEVrqjjiX0dpAuyKCM1z75iGg5
-	 kcZykv4JqQHCRqoj53LbF5nL0cA4q4/knMCPrQljMsNnT4CacjOwVyZ/Zc5J26w7f2
-	 pfEleYv+nEpN1fol2trMIwm5HeXh4F0RmY+WreWqZ6Ez/f7telDkrNEnvXATzhCCvR
-	 JIt3uGxopCOqFlFsdwWipML8gYpCUfNjLGn3Ts0Mu4quXUdoCejd/y4StBDi9y+t8x
-	 PhOZ74eYj7Fx/Tgpk12r7CFN308k4yNQB+qt7DcDiDidJtJcWm8sDiCUAY6OdgWE7g
-	 1j3PymLdvt98A==
+	b=ic5U0hdhyfJSL8Bmf/OmLcJlklKIZLK0dXyBU+Eejy5ti5zkOdYY6jI3ovuVg3Uuy
+	 kkzUA9OCXQ4SffyoHVpMorLbFjitEG1DGnqrqDHonLkVh5VVMX9r75grzr81RekIm3
+	 wsRzYsT01WmTeyG7U0czwbP7Zqk7dKijXerqzkA3SKbGVtRQn3QJR2tsl/vF/srh72
+	 7KDkqF360H6IW5Jk45f/YHtWFPU18pVSTVLoGGo5HVWyPzIzjxCO3xFzbWtO4apwr7
+	 cwxqSKZI1/6Vt3AKyLCppahWUEILWPP9gvuVA0werf4RQjl+GPK3dxCoHYm97QiF8N
+	 WcA+2BADbzNeA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
+Cc: Ilan Dudnik <ilan.dudnik@safebreach.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: preserve access denied status for copychunk
-Date: Mon, 19 Oct 2026 09:50:49 -0400
-Message-ID: <20261019135441.1420968-358-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18-5.15] ksmbd: fix heap out-of-bounds write in krb5_authenticate()
+Date: Mon, 19 Oct 2026 09:51:10 -0400
+Message-ID: <20261019135441.1420968-379-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261019135441.1420968-1-sashal@kernel.org>
 References: <20261019135441.1420968-1-sashal@kernel.org>
@@ -51,358 +52,363 @@ X-stable-base: Linux 6.18.57
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Namjae Jeon <linkinjeon@kernel.org>
+From: Ilan Dudnik <ilan.dudnik@safebreach.com>
 
-[ Upstream commit f7c0366e0a80bf8cd5eacc5479927abb50958b5e ]
+[ Upstream commit 23a0be6a84a38ac169eeab49017934e8e27c65f0 ]
 
-The copychunk error mapping handles -EACCES in an independent if
-statement. The following error chain therefore reaches its final else
-clause and overwrites STATUS_ACCESS_DENIED with
-STATUS_UNEXPECTED_IO_ERROR.
+In krb5_authenticate(), out_len is calculated to determine available
+headroom in response_buf for the incoming Kerberos AP-REP token. However,
+when SMB2_SESSION_SETUP is processed as a non-first element of a compounded
+SMB2 request, the calculation omits work->next_smb2_rsp_hdr_off.
 
-Join the -EACCES check to the remaining error chain so an access failure
-is returned as STATUS_ACCESS_DENIED.
+This causes out_len to overstate remaining buffer headroom by
+the cumulative size of prior responses in the compound chain. Consequently,
+the length check in ksmbd_krb5_authenticate()
+(*out_len <= resp->spnego_blob_len) passes erroneously, allowing memcpy()
+to write the AP-REP blob past the end of response_buf into adjacent kernel
+heap memory.
 
+Fix this by subtracting work->next_smb2_rsp_hdr_off when computing out_len,
+ensuring it accurately reflects physical remaining buffer space.
+
+Signed-off-by: Ilan Dudnik <ilan.dudnik@safebreach.com>
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-I have the full picture: the one-line `if`/`else if` bug is in this
-6.12.111 tree, it applies cleanly, and the original submitter explicitly
-asked for stable. Writing up the nine-phase analysis.
+The local tree is **6.12.111** (`pending-6.12`). The buggy `out_len`
+math is present, and the one-line heap-OOB fix applies here.
 
 ===============================================================
 PHASE 1: COMMIT MESSAGE FORENSICS
 ===============================================================
 
 **Step 1.1: PARSE THE SUBJECT LINE**
-
-Record: **[ksmbd]** **[preserve]** preserve access denied status for
-copychunk.
-
-Subsystem is the in-kernel SMB3 server. “Preserve” here means “stop
-overwriting a correctly computed NTSTATUS,” which is a correctness fix,
-not a feature.
+Record: `[ksmbd] [fix] heap out-of-bounds write in krb5_authenticate()`
+- Subsystem: ksmbd (in-kernel SMB3 server)
+- Action verb: **fix**
+- Claimed intent: stop a heap OOB write while building a Kerberos AP-REP
+  in `krb5_authenticate()`
 
 **Step 1.2: PARSE ALL COMMIT MESSAGE TAGS**
+Upstream commit: `23a0be6a84a38ac169eeab49017934e8e27c65f0` (verified
+via `git show` on `origin/master`)
 
-Mainline commit `f7c0366e0a80bf8cd5eacc5479927abb50958b5e` (author
-Namjae Jeon, AuthorDate 2026-07-07, CommitDate 2026-08-17):
-
+Tags present:
+- Signed-off-by: Ilan Dudnik \<ilan.dudnik@safebreach.com\> (author;
+  SafeBreach threat research)
 - Signed-off-by: Namjae Jeon \<linkinjeon@kernel.org\> (ksmbd
-  maintainer; he both authored and committed it)
-- No Fixes:, Reported-by, Tested-by, Reviewed-by, Acked-by, Link:, or
-  Cc: stable on the committed version
+  maintainer, committer)
 
-The absence of Fixes:/Cc: stable on the committed object is expected for
-this review pipeline and is not a negative signal.
+Tags absent (expected for this review pipeline):
+- No `Fixes:`
+- No `Cc: stable@vger.kernel.org`
+- No `Reported-by:` / `Tested-by:` / `Reviewed-by:` / `Acked-by:` /
+  `Link:`
 
-An independent mailing-list submission of the **same one-line change**
-did carry those tags (see Phase 4):
-- Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-- Cc: stable@vger.kernel.org
-- Reviewed-by: ChenXiaoSong
+Notable: author is a security researcher; the ksmbd maintainer applied
+the patch directly.
 
 **Step 1.3: ANALYZE THE COMMIT BODY TEXT**
-
 Record:
-- **Bug:** In `fsctl_copychunk()`, `-EACCES` is handled by a standalone
-  `if`. The next `if (ret == -EAGAIN) / else if ... / else` chain then
-  runs anyway.
-- **Symptom:** `STATUS_ACCESS_DENIED` is written, then immediately
-  overwritten by `STATUS_UNEXPECTED_IO_ERROR`.
-- **Failure mode:** SMB clients doing server-side copy (FSCTL_COPYCHUNK
-  / FSCTL_COPYCHUNK_WRITE) see a generic I/O error instead of access
-  denied. The copy is still rejected; the protocol status is wrong.
-- **Version info:** none in the committed message. The UnionTech
-  submission pins it to the original cifsd SMB3 engine commit.
-- **Root cause:** missing `else` so `-EACCES` falls into the final
-  `else`.
+- **Bug:** `out_len` is computed from `work->response_sz` minus
+  `SecurityBufferOffset + 4`, and does not subtract
+  `work->next_smb2_rsp_hdr_off`.
+- **When:** SMB2 `SESSION_SETUP` as a **non-first** compound command
+  (`next_smb2_rsp_hdr_off > 0`).
+- **Symptom:** `out_len` overstates remaining heap by the size of prior
+  compound responses. `ksmbd_krb5_authenticate()` then accepts a blob
+  that does not actually fit, and `memcpy()` writes the AP-REP past
+  `response_buf`.
+- **Failure mode:** kernel **heap out-of-bounds write**.
+- **Version info in message:** none. Code has been this way since ksmbd
+  was added.
+- **Root cause:** remaining-space calculation uses the start of the
+  allocation, not the current compound slot.
 
 **Step 1.4: DETECT HIDDEN BUG FIXES**
-
-Record: Not hidden. The message describes a real control-flow bug.
-“Preserve” is the action verb for keeping the correct status.
+Record: Not hidden. Explicit heap-OOB write fix. Not cleanup/refactor.
 
 ===============================================================
 PHASE 2: DIFF ANALYSIS - LINE BY LINE
 ===============================================================
 
 **Step 2.1: INVENTORY THE CHANGES**
-
 Record:
-- File: `fs/smb/server/smb2pdu.c` — 1 line changed (`if` → `else if`)
-- Function: `fsctl_copychunk()`
-- Scope: single-file surgical fix
+- File: `fs/smb/server/smb2pdu.c` — **+1 / -1** (one line)
+- Function: `krb5_authenticate()`
+- Scope: **single-file surgical fix**
+
+```2160:2164:fs/smb/server/smb2pdu.c
+        out_blob = (char *)&rsp->hdr.ProtocolId +
+                le16_to_cpu(rsp->SecurityBufferOffset);
+- out_len = work->response_sz -
++       out_len = work->response_sz - work->next_smb2_rsp_hdr_off -
+                (le16_to_cpu(rsp->SecurityBufferOffset) + 4);
+```
 
 **Step 2.2: UNDERSTAND THE CODE FLOW CHANGE**
+Record:
+- **Before:** `out_len = response_sz - (SecurityBufferOffset + 4)` =
+  space from the **start** of the SMB payload to the end of the
+  allocation.
+- **After:** also subtract `next_smb2_rsp_hdr_off`, i.e. space from the
+  **current** compound response to the end of the allocation.
+- Path: Kerberos `SESSION_SETUP` after
+  `ksmbd_ipc_spnego_authen_request()` succeeds, immediately before
+  `memcpy(out_blob, ...)`.
+- First-in-compound (`next_smb2_rsp_hdr_off == 0`): behavior unchanged.
 
-This tree currently has:
-
-```7988:8005:fs/smb/server/smb2pdu.c
-        if (ret < 0) {
-                if (ret == -EACCES)
-                        rsp->hdr.Status = STATUS_ACCESS_DENIED;
-                if (ret == -EAGAIN)
-                        rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
-                else if (ret == -EBADF)
-                        rsp->hdr.Status = STATUS_INVALID_HANDLE;
-                else if (ret == -EFBIG || ret == -ENOSPC)
-                        rsp->hdr.Status = STATUS_DISK_FULL;
-                else if (ret == -EINVAL)
-                        rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-                else if (ret == -EISDIR)
-                        rsp->hdr.Status = STATUS_FILE_IS_A_DIRECTORY;
-                else if (ret == -E2BIG)
-                        rsp->hdr.Status = STATUS_INVALID_VIEW_SIZE;
-                else
-                        rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
-        }
-```
-
-Record: Before, `-EACCES` sets `STATUS_ACCESS_DENIED`, then misses
-`-EAGAIN` and every later `else if`, and the final `else` overwrites it
-with `STATUS_UNEXPECTED_IO_ERROR`. After, `-EACCES` is exclusive and the
-status sticks. Other errno mappings are unchanged. This is the
-`ksmbd_vfs_copy_file_ranges()` error path, not probe/init.
+Verified layout in this tree:
+- `ksmbd_resp_buf_next()` = `response_buf + next_smb2_rsp_hdr_off + 4`
+- `WORK_BUFFERS` uses that for non-first compound commands
+- `out_blob = rsp + SecurityBufferOffset`
+- Remaining bytes = `response_sz - next_smb2_rsp_hdr_off -
+  SecurityBufferOffset - 4`
 
 **Step 2.3: IDENTIFY THE BUG MECHANISM**
+Record:
+- **Category:** (d) memory safety — heap buffer overflow / OOB write
+- **Mechanism:** length check `*out_len <= resp->spnego_blob_len` in
+  `ksmbd_krb5_authenticate()` uses an inflated `out_len`. Check passes;
+  `memcpy(out_blob, resp->payload + session_key_len,
+  resp->spnego_blob_len)` writes off the end of `response_buf`.
+- Confirmed memcpy in this tree:
 
-Record: **Logic / correctness.** Missing `else` on an errno-to-NTSTATUS
-ladder. `-EACCES` is a real return from `ksmbd_vfs_copy_file_ranges()`:
-
-```1840:1847:fs/smb/server/vfs.c
-        if (!(src_fp->daccess & (FILE_READ_DATA_LE | FILE_EXECUTE_LE)))
-{
-                pr_err("no right to read(%pD)\n", src_fp->filp);
-                return -EACCES;
+```533:572:fs/smb/server/auth.c
+        if (*out_len <= resp->spnego_blob_len) {
+                ksmbd_debug(AUTH, "buf len %d, but blob len %d\n",
+                            *out_len, resp->spnego_blob_len);
+                retval = -EINVAL;
+                goto out;
         }
-        if (!(dst_fp->daccess & (FILE_WRITE_DATA_LE |
-FILE_APPEND_DATA_LE))) {
-                pr_err("no right to write(%pD)\n", dst_fp->filp);
-                return -EACCES;
-        }
+        ...
+        memcpy(out_blob, resp->payload + resp->session_key_len,
+               resp->spnego_blob_len);
 ```
 
-`vfs_copy_file_range()` can also return `-EACCES`. The access check
-still denies the copy; only the SMB status is wrong.
-
 **Step 2.4: ASSESS THE FIX QUALITY**
-
-Record: Obviously correct. One token. No API, locking, or allocation
-change. Regression risk is negligible: `-EACCES` already matched nothing
-else in the chain.
+Record:
+- Obviously correct: remaining space must exclude prior compound
+  responses.
+- Minimal: one term added to one expression.
+- Regression risk: **very low**.
+  - First command: `next_smb2_rsp_hdr_off` is 0 (work is zeroed).
+  - If `out_len` goes negative, `*out_len <= blob_len` is true →
+    `-EINVAL`, no memcpy (fail closed).
+- No API/data-structure/locking changes.
 
 ===============================================================
 PHASE 3: GIT HISTORY INVESTIGATION
 ===============================================================
 
 **Step 3.1: BLAME THE CHANGED LINES**
-
-Record: `git blame -L 7988,8005 fs/smb/server/smb2pdu.c` attributes the
-whole ladder to `e2f34481b24db2` (“cifsd: add server-side procedures for
-SMB3”, Namjae Jeon, 2021-03-16). That is the original ksmbd/cifsd SMB3
-engine, present since the server was merged (v5.15-era). The bug is old,
-not recent churn.
+Record:
+- `out_len = work->response_sz -` introduced in `e2f34481b24db2`
+  (“cifsd: add server-side procedures for SMB3”, 2021-05-10). Ancestor
+  of HEAD.
+- Offset term `(SecurityBufferOffset + 4)` from `cb4517201b8acd`
+  (“ksmbd: remove smb2_buf_length in smb2_hdr”, 2021-11-11).
+- Bug has been in ksmbd since it entered the kernel (~5.15), including
+  6.12.
 
 **Step 3.2: FOLLOW THE FIXES: TAG**
-
-Committed object has no Fixes: tag. The equivalent linux-cifs patch
-tagged `e2f34481b24d`. `git merge-base --is-ancestor e2f34481b24db2
-HEAD` succeeded — the introducing commit is in this tree. No later
-rewrite of this ladder was found in this checkout.
+Record: No `Fixes:` tag. Introducer is `e2f34481b24db2`, present in this
+tree (`git merge-base --is-ancestor` exit 0).
 
 **Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES**
-
-Record: Recent `smb2pdu.c` work in this tree is unrelated (partial
-QUERY_INFO responses, compound errors, lease/durable-handle fixes).
-Neighboring mainline copychunk work from the same day (`fd309860ef245`
-overlapping-copy data preservation, `8482150a0743c` ADS copychunk) is
-**not** in HEAD and is **not** required: this change only joins two
-`if`s in the error map. Standalone.
+Record:
+- `98422bdd4cb3c` “ksmbd: fix out of bounds read in smb2_sess_setup” (in
+  this tree): compound `SESSION_SETUP` used `smb2_get_msg()` on the
+  **start** of the buffer → OOB **read**. ZDI-CAN-21355. They passed
+  `req`/`rsp` from `WORK_BUFFERS` but **did not** fix `out_len`.
+- Other compound OOB fixes already in 6.12 (`smb2_get_ea`, `QUERY_INFO`,
+  `get_file_all_info`) show this class of bug is real and has been
+  backported before.
+- This commit is standalone (not `N/M`).
 
 **Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS**
-
-Record: Namjae Jeon is the ksmbd maintainer (`git log --author="Namjae
-Jeon" -- fs/smb/server/`). He authored and committed this. Same-day
-mainline commits touch other copychunk behavior but do not alter this
-mapping.
+Record:
+- Ilan Dudnik: two ksmbd security fixes in 7.3 (`23a0be6a84a38` and
+  `29f74f0f2e6df` UAF/double-free in lock publishing). Not a regular in-
+  tree 6.12 contributor.
+- Namjae Jeon is the ksmbd maintainer and committed this.
 
 **Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS**
-
-Record: None. `git show f7c0366e0a80b | git apply --check` succeeded on
-this tree (hunk offset -764 lines). No new helpers or structs.
+Record:
+- Mainline `krb5_authenticate()` later grew `channel_key` / `auth_key`;
+  **6.12 does not have those**. The changed `out_len` lines are the
+  same.
+- `next_smb2_rsp_hdr_off` exists in `ksmbd_work.h` here.
+- `git show 23a0be6a84a38 | git apply --check` **succeeds** on this
+  tree.
+- Standalone: **yes**.
 
 ===============================================================
 PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
 ===============================================================
 
 **Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION**
-
 Record:
-- `b4 dig -c f7c0366e0a80b` failed (lore returned an error to b4).
-- Direct lore search found the same fix submitted independently:
-
-https://lore.kernel.org/linux-
-cifs/2DC5EE1DC892643F+20260731072020.1307022-1-raoxu@uniontech.com/
-
-Xu Rao (UnionTech), 2026-07-31, subject “ksmbd: preserve
-STATUS_ACCESS_DENIED for copychunk errors”. Same `if` → `else if`. Cites
-**MS-SMB2 3.3.5.15.6**: FSCTL_SRV_COPYCHUNK / COPYCHUNK_WRITE must fail
-with `STATUS_ACCESS_DENIED` when the source open lacks `FILE_READ_DATA`
-or the destination lacks `FILE_WRITE_DATA`/`FILE_APPEND_DATA`.
-**Fixes:** e2f34481b24d. **Cc: stable@vger.kernel.org.** No NAK.
-
-Namjae’s committed patch (author date 2026-07-07) is the same change,
-queued earlier in ksmbd-for-next and merged via `ksmbd-for-7.3-rc1`
-(`git describe --contains` → `v7.3-rc1~77^2~124`).
+- `b4 dig -c 23a0be6a84a38`: lore returned errors; no thread match.
+- `curl` lore linux-cifs / all for `Ilan Dudnik` and `krb5_authenticate
+  heap`: **no public thread**.
+- Likely private maintainer submission (typical for a security-firm heap
+  overflow).
+- Landed via ksmbd-for-7.3-rc1 pull (Namjae Jeon, 2026-08-23). Pull
+  text: “Fix heap out-of-bounds accesses … in authentication, Kerberos
+  …”.
+- Contained in `v7.3-rc1~77^2~32`.
 
 **Step 4.2: CHECK WHO REVIEWED THE PATCH**
-
-Record: UnionTech patch To/Cc: Namjae Jeon, Steve French, Sergey
-Senozhatsky, Tom Talpey, linux-cifs, LKML, **stable@vger.kernel.org**.
-ChenXiaoSong replied with Reviewed-by.
+Record: No public review trail. Signed off and committed by Namjae Jeon
+(MAINTAINERS: KERNEL SMB3 SERVER). That is maintainer-acked.
 
 **Step 4.3: SEARCH FOR THE BUG REPORT**
-
-Record: No syzbot/bugzilla. Two independent authors (maintainer +
-UnionTech) found the same missing-`else`. Spec citation is MS-SMB2
-3.3.5.15.6.
+Record: No syzbot/bugzilla/CVE found for **this** heap OOB (other 2026
+ksmbd CVEs are different bugs). Author affiliation is independently
+verified (SafeBreach). UNVERIFIED: no public reproducer.
 
 **Step 4.4: CHECK FOR RELATED PATCHES AND SERIES**
-
-Record: Not a numbered series. Same-day copychunk patches are
-independent and not in this tree; this line does not need them.
+Record: Same-author sibling `29f74f0f2e6df` is a different bug (lock
+UAF). This `out_len` change does not depend on it.
 
 **Step 4.5: CHECK STABLE MAILING LIST HISTORY**
-
-Record: lore.kernel.org/stable search for this subject did not turn up a
-prior rejection. The UnionTech mail itself was Cced to stable.
-ChenXiaoSong noted the bug was already fixed in ksmbd-for-next-next (htt
-ps://github.com/smfrench/smb3-
-kernel/commit/35e11e324a2f97d2974ef08d308063c9c5f9e9d8) — that is the
-maintainer tree copy of this same fix, not a reason to skip stable.
+Record: lore/stable hits are **other** ksmbd OOB patches (ZDI compound
+sess_setup OOB-read; stack channel_key overflow). **This** commit is not
+on stable@ yet. The 2023 compound sess_setup OOB-read **was**
+backported, which supports backporting this related compound-buffer bug.
 
 ===============================================================
 PHASE 5: CODE SEMANTIC ANALYSIS
 ===============================================================
 
 **Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF**
-
-Record: `fsctl_copychunk()` only.
+Record: `krb5_authenticate()` (caller of `ksmbd_krb5_authenticate()`).
 
 **Step 5.2: TRACE CALLERS**
-
-Record: Only caller is `smb2_ioctl()` for `FSCTL_COPYCHUNK` /
-`FSCTL_COPYCHUNK_WRITE` (`fs/smb/server/smb2pdu.c` around 8466–8495).
-`smb2_ioctl` is registered as `SMB2_IOCTL_HE` in
-`fs/smb/server/smb2ops.c`. Reachable from any authenticated SMB2/SMB3
-client issuing a copychunk FSCTL (Windows Explorer / CopyFile server-
-side copy, robocopy, smbclient, etc.).
-
-Important: `fsctl_copychunk()`’s return value is discarded. Status is
-taken from `rsp->hdr.Status`, then `ksmbd_iov_pin_rsp()` sends the ioctl
-response. The wrong status is what the client actually receives.
-
-Tree-not-writable uses `ret = -EACCES; goto out;` in `smb2_ioctl()` and
-maps correctly. The broken path is the **file-handle** access check
-inside `ksmbd_vfs_copy_file_ranges()`.
+Record:
+- Only caller: `smb2_sess_setup()` when `preferred_auth_mech` includes
+  `KSMBD_AUTH_KRB5 | KSMBD_AUTH_MSKRB5`.
+- `smb2_sess_setup` is the SMB2 SESSION_SETUP handler (`server.c`
+  `__process_request` loop).
+- Compound: after each command, `is_chained_smb2_message()` advances
+  `next_smb2_rsp_hdr_off`.
+- `smb2_check_user_session()` returns 0 for SESSION_SETUP **without**
+  requiring a session, so SESSION_SETUP as a later compound element is
+  allowed.
 
 **Step 5.3: TRACE CALLEES**
-
-Record: `ksmbd_vfs_copy_file_ranges()` → access checks, lock checks,
-`vfs_copy_file_range()`. `-EACCES` comes from the access checks (and
-potentially VFS).
+Record: `ksmbd_krb5_authenticate()` →
+`ksmbd_ipc_spnego_authen_request()` (netlink to ksmbd.mountd) → length
+check → `memcpy` of AP-REP into `out_blob`.
 
 **Step 5.4: FOLLOW THE CALL CHAIN**
-
-Record: SMB2 IOCTL (network) → `smb2_ioctl` → `fsctl_copychunk` →
-`ksmbd_vfs_copy_file_ranges`. Triggerable by a logged-in SMB user with
-opens that lack read-on-source or write-on-dest. Not a local
-unprivileged syscall, but a normal file-server path.
+Record:
+- Reachable from the network on a ksmbd share with Kerberos
+  (`CONFIG_SMB_SERVER_KERBEROS5`).
+- `memcpy` runs only after userspace reports `KSMBD_USER_FLAG_OK`
+  (successful Kerberos).
+- Trigger is still realistic: compound a large command (e.g.
+  `QUERY_DIRECTORY` / `IOCTL`, which use `large_sz = 448 +
+  max_trans_size` with `max_trans_size` typically 1MB) then Kerberos
+  `SESSION_SETUP`.
+- `is_chained_smb2_message()` continues while remaining ≥
+  `MAX_CIFS_SMALL_BUFFER_SIZE` (**448**). After a ~72-byte SESSION_SETUP
+  header, ~376 bytes remain for the blob.
+- `spnego_blob_len` is `__u16`; IPC request blobs are capped at
+  `KSMBD_IPC_MAX_PAYLOAD` (4096). A typical AP-REP is hundreds to
+  thousands of bytes — larger than 376, smaller than the inflated
+  `out_len`.
+- Userspace-reachable: **yes** (SMB client with Kerberos). Unprivileged
+  remote without tickets: memcpy does not run (auth fails first).
+  Authenticated Kerberos user: **yes**.
 
 **Step 5.5: SEARCH FOR SIMILAR PATTERNS**
-
-Record: The only other `if (ret == -EACCES)` in
-`fs/smb/server/smb2pdu.c` is the outer `smb2_ioctl()` mapper, which
-**already** uses `else if`. This copychunk ladder is the broken
-instance.
+Record:
+- `smb2_resp_buf_len()` correctly uses `get_rfc1002_len(response_buf)`
+  for remaining space (QUERY_DIR/INFO). Kerberos setup does not.
+- `ntlm_negotiate()` `memcpy(rsp->Buffer, spnego_blob, spnego_blob_len)`
+  has no remaining-space check (separate issue, not this commit).
 
 ===============================================================
 PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
 ===============================================================
 
 **Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?**
+Record: **Yes.** `fs/smb/server/smb2pdu.c` lines 1616–1617:
 
-Record: Yes. `git describe HEAD` = `p-6.12-3-gc504cf0baa3d8`; `make
-kernelversion` = **6.12.111**. Buggy ladder is at
-`fs/smb/server/smb2pdu.c:7988-8005`. `git merge-base --is-ancestor
-f7c0366e0a80b HEAD` failed — fix is **not** in this checkout. Introduced
-by `e2f34481b24d` (2021), which **is** an ancestor of HEAD.
+```
+        out_len = work->response_sz -
+                (le16_to_cpu(rsp->SecurityBufferOffset) + 4);
+```
+
+`git merge-base --is-ancestor 23a0be6a84a38 HEAD` → **not in this tree**
+(exit 1).
+Bug introduced ~v5.15 (`e2f34481b24db2`).
 
 **Step 6.2: CHECK FOR BACKPORT COMPLICATIONS**
-
-Record: **Clean apply.** `git apply --check` of the mainline diff
-succeeded (offset -764). Surrounding copychunk ioctl code matches aside
-from line numbers. Mainline context uses `FSCTL_SRV_COPYCHUNK` in a
-nearby (unchanged) check; this tree still uses `FSCTL_COPYCHUNK`. That
-is outside the changed line and did not block apply.
+Record: **Clean apply.** `git apply --check` of `23a0be6a84a38`
+succeeded. Surrounding `krb5_authenticate()` is simpler than mainline
+(no `channel_key`/`auth_key`); the `out_len` lines match.
 
 **Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE**
-
-Record: `git log --grep="preserve access denied" -- fs/smb/server` has
-no hit. No alternate mapping fix in this tree.
+Record: Compound `req`/`rsp` pointer fix (`98422bdd4cb3c`) is here; it
+does **not** correct `out_len`. No substitute for this overflow.
 
 ===============================================================
 PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 ===============================================================
 
 **Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY**
-
-Record: `fs/smb/server` (ksmbd), `CONFIG_SMB_SERVER`. **IMPORTANT** for
-NAS/embedded/distros that ship ksmbd; not core mm/VFS for every box.
-Protocol status on copychunk is user-visible for those servers.
+Record:
+- Subsystem: `fs/smb/server` (ksmbd)
+- Criticality: **IMPORTANT** — network-facing file server. Not core
+  mm/VFS, but historically a high-CVE surface; enterprise/NAS use.
 
 **Step 7.2: ASSESS SUBSYSTEM ACTIVITY**
-
-Record: Actively maintained (many recent ksmbd commits on this branch).
-This particular ladder has been unchanged since 2021.
+Record: Actively maintained. Many 6.12 ksmbd security backports already
+on this branch. Kerberos path is `#ifdef CONFIG_SMB_SERVER_KERBEROS5`
+(`default n`).
 
 ===============================================================
 PHASE 8: IMPACT AND RISK ASSESSMENT
 ===============================================================
 
 **Step 8.1: DETERMINE WHO IS AFFECTED**
-
-Record: Config-specific / server-specific: ksmbd users. Windows and
-other SMB clients using server-side copy against ksmbd.
+Record: ksmbd servers with `CONFIG_SMB_SERVER_KERBEROS5=y`
+(AD/Kerberos). Config- and driver-specific, not universal.
 
 **Step 8.2: DETERMINE THE TRIGGER CONDITIONS**
-
-Record: Authenticated client issues FSCTL_COPYCHUNK[_WRITE] with a
-source handle lacking read/execute or a dest handle lacking write/append
-(or VFS returns `-EACCES`). Common for copy-offload when opens don’t
-carry the rights MS-SMB2 requires. Not a rare race.
+Record:
+- Compound SMB2 with SESSION_SETUP not first, Kerberos selected,
+  userspace auth success, AP-REP larger than **actual** remaining heap.
+- Common Windows `NEGOTIATE+SESSION_SETUP` often still has ~1MB
+  remaining, so a small AP-REP may fit — **not** the only case.
+- Crafted compound that leaves ~448 bytes (allowed by
+  `is_chained_smb2_message`) **does** overflow for a normal-sized
+  ticket.
+- Unprivileged unauthenticated remote: memcpy not reached (UNVERIFIED as
+  a pre-auth RCE).
+- Authenticated Kerberos client: **yes** (reauth after a large compound
+  command).
 
 **Step 8.3: DETERMINE THE FAILURE MODE SEVERITY**
-
-Record: Wrong NTSTATUS (`STATUS_UNEXPECTED_IO_ERROR` instead of
-`STATUS_ACCESS_DENIED`). Copy is still denied — not a bypass, crash, or
-corruption. Clients/apps can surface “I/O device error”, retry, or
-mishandle a permission failure. **Severity: MEDIUM**, but it is a
-documented SMB protocol violation (MS-SMB2 3.3.5.15.6).
+Record:
+- Failure mode: heap OOB write → memory corruption, oops/panic, possible
+  code execution in ksmbd workqueue context.
+- Severity: **CRITICAL** (network-facing heap write). Same class as
+  prior ksmbd stable CVEs.
 
 **Step 8.4: CALCULATE RISK-BENEFIT RATIO**
-
 Record:
-- **Benefit:** Correct access-denied reporting on a standard Windows
-  copy-offload path; matches spec.
-- **Risk:** Very low (one `else`, no behavioral change except the status
-  for `-EACCES`).
-- **Ratio:** Favorable. Independent submitter Cced stable for this exact
-  change.
+- Benefit: **very high** for Kerberos ksmbd (stops kernel heap
+  corruption).
+- Risk: **very low** (1 line, first-command path unchanged, fail-closed
+  if `out_len` is negative).
+- Ratio: strongly in favor of backport.
 
 ===============================================================
 PHASE 9: FINAL SYNTHESIS
@@ -411,105 +417,89 @@ PHASE 9: FINAL SYNTHESIS
 **Step 9.1: COMPILE THE EVIDENCE**
 
 FOR:
-- Real, verified missing-`else` bug in this 6.12.111 tree
-- `-EACCES` is a live return from `ksmbd_vfs_copy_file_ranges()`
-- Client-visible SMB status is wrong; MS-SMB2 requires ACCESS_DENIED
-- 1-line, obviously correct, applies cleanly
-- Present since original cifsd merge; introducing commit is in HEAD
-- Maintainer-authored; independently rediscovered; Reviewed-by
-  ChenXiaoSong; **Cc: stable** on the public patch
-- No prerequisites
+- Real heap OOB write on a documented, previously attacked compound
+  SESSION_SETUP path (ZDI-CAN-21355 was the OOB-read sibling).
+- Network-facing ksmbd; memcpy after a broken length check.
+- One-line, obviously correct, applies cleanly to 6.12.111.
+- Bug present since ksmbd introduction; maintainer-signed; in v7.3-rc1.
+- Fail-closed if `out_len` becomes negative.
+- Author is a professional vulnerability researcher.
 
 AGAINST:
-- Not a crash, UAF, deadlock, or data-corruption fix
-- Committed object dropped Fixes:/Cc: stable
-- Only affects `CONFIG_SMB_SERVER`
+- Kerberos is `default n`; only those builds.
+- memcpy requires successful Kerberos (not a trivial pre-auth spray).
+- No public lore thread, syzbot report, or CVE **for this SHA**
+  (UNVERIFIED as assigned CVE).
+- Happy-path NEGOTIATE+SESSION_SETUP may not overflow if the AP-REP fits
+  in leftover 1MB.
 
 UNRESOLVED:
-- `b4 dig` could not match Namjae’s committed subject (lore error). The
-  UnionTech thread was recovered by direct lore search and is the same
-  diff.
+- No public reproducer (lore empty; b4 failed).
+- No CVE number found for this exact bug.
+
+Those gaps do not outweigh a verified heap write with a one-line fix.
 
 **Step 9.2: APPLY THE STABLE RULES CHECKLIST**
-
-1. Obviously correct and tested? **PASS** — control flow is unambiguous;
-   maintainer committed it; Reviewed-by on the twin patch.
-2. Fixes a real bug that affects users? **PASS** — wrong NTSTATUS on
-   copychunk permission failure.
-3. Important issue? **PASS** (medium, protocol) — spec-mandated
-   ACCESS_DENIED becomes UNEXPECTED_IO_ERROR on a common Windows copy
-   path; not a crash, but user-visible interoperability.
+1. Obviously correct and tested? **PASS** — arithmetic matches buffer
+   layout; maintainer applied it; first-command behavior unchanged.
+2. Fixes a real bug that affects users? **PASS** — compound Kerberos
+   SESSION_SETUP overstates headroom; memcpy OOB is in this tree.
+3. Important issue? **PASS** — heap OOB write / memory corruption
+   (CRITICAL).
 4. Small and contained? **PASS** — 1 line, one function.
-5. No new features or APIs? **PASS**
-6. Can apply to the local tree? **PASS** — `git apply --check`
-   succeeded.
+5. No new features or APIs? **PASS**.
+6. Can apply to the local tree? **PASS** — `git apply --check` clean;
+   buggy code present.
 
 **Step 9.3: CHECK FOR EXCEPTION CATEGORIES**
-
-Record: None (not a device ID/quirk/DT/build/docs exception). Qualifies
-as a normal small correctness fix.
+Record: Not ID/quirk/DT/docs. Ordinary security bugfix; no exception
+needed.
 
 **Step 9.4: MAKE YOUR DECISION**
-
-This belongs in 6.12.y. The buggy ladder is here, the fix is one `else`,
-and it restores the NTSTATUS ksmbd already tried to set and that MS-SMB2
-requires. Risk is essentially zero.
-
-------------------------------------------------
-What the commit solves for this tree
-------------------------------------------------
-
-On 6.12.111 ksmbd, `fsctl_copychunk()` maps `-EACCES` from
-`ksmbd_vfs_copy_file_ranges()` to `STATUS_ACCESS_DENIED`, then the next
-if/else chain overwrites it with `STATUS_UNEXPECTED_IO_ERROR`. SMB
-clients doing server-side copy therefore see a generic I/O error instead
-of access denied. The copy is still rejected; the protocol status is
-wrong. Joining the `-EACCES` arm with `else if` is the whole fix.
-
-It meets the stable rules: obviously correct, real user-visible bug,
-tiny, no new API, applies cleanly here. Benefit is correct SMB
-semantics; regression risk is negligible.
-
-Concerns: not a panic/UAF class bug; ksmbd-only. Those do not outweigh a
-one-line protocol-status fix that an independent submitter already
-nominated for stable.
+This is a one-line remaining-space correction that stops a kernel heap
+overflow in ksmbd’s Kerberos session-setup path. The buggy calculation
+exists in 6.12.111, the patch applies cleanly, and the downside is
+negligible. It belongs in this stable tree.
 
 Verification:
-- [Phase 1] Parsed committed tags: only SOB Namjae Jeon on
-  `f7c0366e0a80b`; no Fixes:/Cc: stable on the git object
-- [Phase 1] UnionTech twin patch on lore has Fixes: e2f34481b24d and Cc:
-  stable@vger.kernel.org
-- [Phase 2] Diff: 1 line in `fsctl_copychunk()`, `if` → `else if` on
-  `-EAGAIN`
-- [Phase 2] Confirmed `-EACCES` returns in
-  `ksmbd_vfs_copy_file_ranges()` at vfs.c:1840-1847 in this tree
-- [Phase 2] Confirmed overwrite path in smb2pdu.c:7988-8005 in this tree
-- [Phase 3] git blame: ladder from e2f34481b24db2 (2021 cifsd SMB3
-  engine)
-- [Phase 3] git merge-base --is-ancestor e2f34481b24db2 HEAD: yes
-- [Phase 3] git merge-base --is-ancestor f7c0366e0a80b HEAD: no (fix not
-  present)
-- [Phase 3] Neighboring copychunk commits fd309860ef245 / 8482150a0743c:
-  not in HEAD, not required
-- [Phase 3] git apply --check of mainline diff: succeeded at offset -764
-- [Phase 4] b4 dig -c f7c0366e0a80b: lore error, no match
-- [Phase 4] lore thread: https://lore.kernel.org/linux-
-  cifs/2DC5EE1DC892643F+20260731072020.1307022-1-raoxu@uniontech.com/ —
-  same diff, Cc: stable, MS-SMB2 3.3.5.15.6
-- [Phase 4] ChenXiaoSong Reviewed-by; noted already in ksmbd-for-next-
-  next
-- [Phase 4] stable list: no prior rejection found
-- [Phase 5] Only caller: smb2_ioctl FSCTL_COPYCHUNK/COPYCHUNK_WRITE;
-  return value discarded; client sees rsp->hdr.Status
-- [Phase 5] Only other -EACCES map in smb2pdu.c already uses else if
-- [Phase 6] git describe HEAD: p-6.12-3-gc504cf0baa3d8; kernelversion
-  6.12.111
-- [Phase 6] git describe --contains f7c0366e0a80b: v7.3-rc1~77^2~124
-  (merged in ksmbd-for-7.3-rc1)
-- [Phase 8] Failure mode: wrong NTSTATUS on permission failure, MEDIUM,
-  not a crash
-- UNVERIFIED: Could not retrieve Namjae’s original mail (b4/lore subject
-  mismatch); content confirmed via committed diff + UnionTech thread
+- [Phase 1] Parsed message/tags: SOB Dudnik + Namjae Jeon; no Fixes/Cc
+  stable/Reported-by. SHA `23a0be6a84a38ac169eeab49017934e8e27c65f0`.
+- [Phase 1] `git show --no-walk --format=fuller 23a0be6a84a38`:
+  AuthorDate 2026-08-07, CommitDate 2026-08-17, committer Namjae Jeon.
+- [Phase 2] Diff: one line in `krb5_authenticate()` adding `-
+  work->next_smb2_rsp_hdr_off`.
+- [Phase 2] Read local `ksmbd_resp_buf_next` / `WORK_BUFFERS` /
+  `ksmbd_krb5_authenticate` memcpy; remaining-space formula matches the
+  fix.
+- [Phase 3] `git blame -L 1610,1630 fs/smb/server/smb2pdu.c`: out_len
+  from `e2f34481b24db2` (2021).
+- [Phase 3] `git merge-base --is-ancestor e2f34481b24db2 HEAD` → 0
+  (present). `23a0be6a84a38` → 1 (not in this tree).
+- [Phase 3] Related: `98422bdd4cb3c` compound sess_setup OOB-read (ZDI-
+  CAN-21355) is in this tree; does not fix out_len.
+- [Phase 4] `b4 dig -c 23a0be6a84a38`: lore errors, no match.
+- [Phase 4] lore.kernel.org linux-cifs/all: no Ilan Dudnik / this
+  subject thread.
+- [Phase 4] ksmbd-for-7.3-rc1 pull lists this commit under heap-
+  OOB/Kerberos security fixes; `git describe --contains` →
+  `v7.3-rc1~77^2~32`.
+- [Phase 4] lore/stable: other ksmbd OOB backports, not this SHA.
+- [Phase 5] `krb5_authenticate` only from `smb2_sess_setup`;
+  SESSION_SETUP skips session check; compound loop in `server.c` +
+  `init_chained_smb2_rsp`.
+- [Phase 5] `MAX_CIFS_SMALL_BUFFER_SIZE` 448; `SMB3_DEFAULT_TRANS_SIZE`
+  1MB; `spnego_blob_len` is `__u16`; IPC request cap 4096.
+- [Phase 6] Local tree: `git describe HEAD` → `p-6.12-3-gc504cf0baa3d8`;
+  `make kernelversion` → **6.12.111**.
+- [Phase 6] Buggy out_len at smb2pdu.c:1616-1617; `git apply --check` of
+  23a0be6a84a38 **clean**.
+- [Phase 7] MAINTAINERS: Namjae Jeon + Steve French, linux-cifs.
+- [Phase 8] Heap OOB write after successful Kerberos on compound
+  SESSION_SETUP; severity CRITICAL.
+- UNVERIFIED: public reproducer, CVE ID, mailing-list review comments
+  (no public thread).
+
+The fix is small, surgical, and meets all stable kernel criteria.
 
 **YES**
 
@@ -517,18 +507,18 @@ Verification:
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 4f8e2a6307602..22c49921b1c07 100644
+index 7d9c8246edfd6..5a61beef9cc44 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -8068,7 +8068,7 @@ static int fsctl_copychunk(struct ksmbd_work *work,
- 	if (ret < 0) {
- 		if (ret == -EACCES)
- 			rsp->hdr.Status = STATUS_ACCESS_DENIED;
--		if (ret == -EAGAIN)
-+		else if (ret == -EAGAIN)
- 			rsp->hdr.Status = STATUS_FILE_LOCK_CONFLICT;
- 		else if (ret == -EBADF)
- 			rsp->hdr.Status = STATUS_INVALID_HANDLE;
+@@ -1607,7 +1607,7 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ 	in_len = le16_to_cpu(req->SecurityBufferLength);
+ 	out_blob = (char *)&rsp->hdr.ProtocolId +
+ 		le16_to_cpu(rsp->SecurityBufferOffset);
+-	out_len = work->response_sz -
++	out_len = work->response_sz - work->next_smb2_rsp_hdr_off -
+ 		(le16_to_cpu(rsp->SecurityBufferOffset) + 4);
+ 
+ 	retval = ksmbd_krb5_authenticate(sess, in_blob, in_len,
 -- 
 2.53.0
 
