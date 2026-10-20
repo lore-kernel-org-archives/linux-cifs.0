@@ -1,54 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.167.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792458341;
-	b=gt3SLKmBfhEPZWKZ/asYMLf0LvI3MvnF6flWS9BLx5aBVzppuTat67QVx53EtXPN5Ugw
-	 EIU2SUqiednb1mhILnNzRyEUOliBdqKEUhcppTlOvJzPzexPhp/gTAuQWEbpBC2VQmuTK
-	 OUoADEwomuYUzKr583Dvx7h5un9i6qmqPPlB4TzBoo1kCedTIxUV1rQEnH6IYIo0Y4KME
-	 87HbQvwWp4g5TEv+nlL7GtI1sqHwf73ke7dDKYT5BffrHTlp3yYkqmAr07wbGtKgVTrvk
-	 iAkeGG9LoT9LekB/abBWeNvpNZLzXJL0znDEB74If1v8+xPB5hHr+Hk9azJXTqITrew==
+	t=1792460828;
+	b=DHXx9X1d6hIuk67Z5Vhn+JPaUT2qwKjhaSGD6EVHggJrQePjY62P2k/fzc9L8Q77AEm6
+	 QasF+5ZNbrNM+EU7aIBbpmi+Yy+0loJbHTGsX74KMTGKcYE3VORFeA/pY+0H6DDN6lATo
+	 URvUkRD6yi2Gck1KC+3BbQBpvjv6NSeJ29bIxgV7qg9MbJyfyLTLPT1EHa9CoTIGaHraI
+	 bDLEr8cBMzX8bjnrafwByiRl/871785haijYs00LBUBAjzurW+a6rAqbJTjmyWlm0/Ik6
+	 IADqvc3KCGOZHZ5r6xFgepXlxO4r8SKK9bPjSvmtEnZ1lgmOLkC3Vs3DNcQU+HXG53Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792458341;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Content-Type;
-	bh=71xlRhy0KQqFKDLpjD4JcOfEoZi763hKFB0PEaFGPMA=;
-	b=gny2Nw62txNZpflElPcDCE//qPb7aiHY+CnJHW/zzUJJKM3wDjMxU195/9q1MKA3/bgz
-	 zc+OXmb6EWLVY2XzfVGBlUItGGj9tisxkFthZB8o3pFxmPflWA3PFme0UxqDFRTy8piEr
-	 8uAdAvquVzaGEHmH+vvAyzLSSfgrt1wObQzHRHkoXSU01RGf1lwA6Dh8w/bm3+i72LV7M
-	 OpD5OYYzfDxL0aPBHbajFdYfZ7qvxSljPY7Sn3XqXQiMVM/LTUWYW4YDABRBSi6NDrStm
-	 V8HF0X5KlX4agsL/2sjNCH4I7D0kTd0rsAk4jxy2MZ7GiQVZ/fINrwJcXw66YG/G42w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792460828;
+	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type;
+	bh=36aiT4SCiJW1oC+ypktSbMwxV9Bu9o1ziS132CV1Ul0=;
+	b=K8yG9ASnVBnuZc7KyB2nPOjNqPTf/eFVa0wG4mAU2P5WoFmys4jXPnTf3alqrDXCN6mk
+	 hpPJfmyq8tVXlWWqz64Cs2hXh99neXSeaOId57/x+Pjh7E3tO61CGH35mp892TMtSXd1/
+	 913lVwSvbPYUkkpjbCKpxOG/NBZlfgUiw2kik2bOUCxLskLgG9hDnhlFN4btGKFiEhiXT
+	 JkQBbCt1O5JNYYL+eBCT/nso2Iex62LNGNHItvKqBrrE5qzTB+4fA7ScZDCsUG50IZAiK
+	 JEGyJIR+blJd22cB2hkZ0gBiGvqh3/M7YGaHszr1FA/cdQzJ9A9SZGIeXUhG1blG8RQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.167.197
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nhEJWdXe;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27DA606A31A
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 01:05:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A27DA606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-54213290993so1091457b6e.0
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 18:05:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792458339; x=1793063139;
-        h=content-type:to:from:subject:message-id:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=71xlRhy0KQqFKDLpjD4JcOfEoZi763hKFB0PEaFGPMA=;
-        b=sv7P++hYO3zMEbugI/hgEWx5EMheD3YbIBtkFHKZ5IVtrYC/mwgclY5/eYoDvNQGIm
-         lenzEGNbiqPHGkfZLfgH23xk8jMuJUsTeKZkG6YG2TRXroCgtEV583jRNpMBcyXcWxyu
-         y7m+yHnHj4PNTQH2HNvIq+2gTDF5+PYmtab1fGUZHtZVEDWz27k1qyvYb/U9qbKfMzBZ
-         NgE9yv9pz+U7Flvm8QC3jbjEMNpaS0PHgsIm9hsxQLHjul4BEbJtwGy/Yle93zXzoDmf
-         LVSe+M2Pef/UCcazz45uDNmzhmjo9v9O93IcJFbDVRRc65HqdPl9Zpl5kGXYEtewfY4o
-         gSNA==
-X-Forwarded-Encrypted: i=1; AKwUvBx+KdmVtWMF73b5T2Cfh0tEO0dKMCOgKrLLuqSAsAylsJIZGubzZDPcRBMQmBCJvU5hcsqeEMqizOyN@vger.kernel.org
-X-Gm-Message-State: AFq9FYKaFePblYUv66UaMzvWLZ89wQMFfMelRdv8iKXLhk0iFH+Tw6ed
-	CWS+P+1KP9ZEalfIQ0SIpAnQmSjz8AzlfLCkycFJBd7/3e+jZrgu2Pmax11yYbWGx4GFlXBGGwh
-	zSzoiXeg/DC5MYWDuZvlMRiHXDHwAANJR8X0cpwX4LBLavgEPKHn91qMfTtU=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3440606A319
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 01:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nhEJWdXe
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAFBF1F000C6
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 01:47:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792460827;
+	bh=36aiT4SCiJW1oC+ypktSbMwxV9Bu9o1ziS132CV1Ul0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=nhEJWdXeolRSp+v+VXzqalxWMoqCThAifAqyHbbpcUuwpO9YfmGm8RNZV9CfcL0yz
+	 EN6wKRBKzeVNnlJeW8a+D40glUuqYSsxPskzeL9mTnTRcI/G2dpNcvpoB1jPmV+mIW
+	 5xE2BHMV86FqW1JOuoh1ORXiczN8FCuKM6gY5J+KQrcFSwZ30eOisG0AGeTMbt94OS
+	 Olw8432zHhz3pB4LZ6XdS2EVCMz8JkfNmlublqiowrJDrdkFFvdEO/PRVDAGdInzYD
+	 tz/Ltjnj+jDSW9kzmAsZwFZ3nITHMYIecEXy8x9FVJSeDhK8ueiDhaLEEPwJP0pTY9
+	 8COOio9kSE1HQ==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c445c95d553so188924766b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 18:47:07 -0700 (PDT)
+X-Gm-Message-State: AFq9FYIQHDaRCozQYPa3eyBa979xJsFPMd2HF9a0rd3dAGUYVGktQm1a
+	O6fz82LKaYLPwP0ioB0O0kbh6u1v25oA50o3qAIkhDpg8osXanSuTEyc+tQpUwL6ORI17ao1vsS
+	5hA4kJxY4EKkM8bfjOkwKonSpnHqIfVc=
+X-Received: by 2002:a17:907:d307:b0:c39:34ba:2f6b with SMTP id
+ a640c23a62f3a-c419e836de6mr677187766b.26.1792460826446; Mon, 19 Oct 2026
+ 18:47:06 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,744 +58,103 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1914:b0:4cb:26a3:a0dc with SMTP id
- 5614622812f47-53ccd9ba7e5mr7738248b6e.20.1792458339574; Mon, 19 Oct 2026
- 18:05:39 -0700 (PDT)
-Date: Mon, 19 Oct 2026 18:05:39 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6ad6be63.a20cb897.960b0.0079.GAE@google.com>
-Subject: [syzbot] [cifs?] KASAN: slab-use-after-free Read in cifs_crypto_secmech_release
-From: syzbot <syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com>
-To: bharathsm@microsoft.com, linkinjeon@kernel.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	samba-technical@lists.samba.org, sprasad@microsoft.com, 
-	syzkaller-bugs@googlegroups.com, tom@talpey.com
+References: <CAD37_9gGnApAuagqOuZ13WB=DW8c_ZpWFBX4cE00YtGhmE2PbQ@mail.gmail.com>
+In-Reply-To: <CAD37_9gGnApAuagqOuZ13WB=DW8c_ZpWFBX4cE00YtGhmE2PbQ@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 20 Oct 2026 10:46:54 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_FXeaK2GBRgskkTNBXVjJc92qNDP0S_39u=Eb19h1rBw@mail.gmail.com>
+X-Gm-Features: AclHuK9tQfR87KJWXqOG0KkUxMGFh-fwO9eNBnU_-v8HNVuoE02EkN_BRnR1Yhs
+Message-ID: <CAKYAXd_FXeaK2GBRgskkTNBXVjJc92qNDP0S_39u=Eb19h1rBw@mail.gmail.com>
+Subject: Re: [Bug report] ksmbd: fd_limit leaks a slot per durable-handle
+ reconnect -> cross-user open DoS
+To: Mohammed <mohammed.saad.alquraini@gmail.com>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: multipart/mixed; boundary="000000000000d5d2c4065e3bce90"
+
+--000000000000d5d2c4065e3bce90
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Oct 20, 2026 at 8:48=E2=80=AFAM Mohammed
+<mohammed.saad.alquraini@gmail.com> wrote:
+>
+> Hello Namjae,
+Hi Mohammed,
 
-syzbot found the following issue on:
+>
+> ksmbd's global open-file counter (fd_limit) leaks one slot per durable-ha=
+ndle
+> reconnect, so an authenticated user can exhaust the server-wide budget an=
+d deny
+> other users' opens. Validated end-to-end on an unmodified kernel; every n=
+umber
+> below is measured. Found with an LLM-assisted code-analysis pipeline (dis=
+closed
+> up front per security-bugs.rst). Low severity -- it needs a non-default c=
+onfig
+> and the cap is already soft (see caveat), so this is a regular bug for th=
+e
+> public list, not a security@ case.
+Can you check if an attached patch fixes this issue ?
+Thanks for the report.
 
-HEAD commit:    045958acaa75 Merge tag 'net-7.3-rc8' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11ac9f01580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3e4baf48b1a52e1
-dashboard link: https://syzkaller.appspot.com/bug?extid=c2ec61adfbcb24e5ec20
-compiler:       gcc (Debian 14.2.0-19) 14.2.0, GNU ld (GNU Binutils for Debian) 2.44
+--000000000000d5d2c4065e3bce90
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-ksmbd-fix-fd_limit-accounting-across-durable-reconne.patch"
+Content-Disposition: attachment; 
+	filename="0001-ksmbd-fix-fd_limit-accounting-across-durable-reconne.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_mvg0uzzg0>
+X-Attachment-Id: f_mvg0uzzg0
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/02297297c905/disk-045958ac.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7722daeec07b/vmlinux-045958ac.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c601e2d8abc7/bzImage-045958ac.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com
-
-CIFS: VFS: \\172.20.20.170 Error -512 sending data on socket to server
-==================================================================
-BUG: KASAN: slab-use-after-free in cifs_crypto_secmech_release+0xed/0x120 fs/smb/client/cifsencrypt.c:512
-Read of size 8 at addr ffff8880526ec490 by task syz.3.92/6393
-
-CPU: 1 UID: 0 PID: 6393 Comm: syz.3.92 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/05/2026
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x13d/0x4b0 mm/kasan/report.c:482
- kasan_report+0xdf/0x1c0 mm/kasan/report.c:595
- cifs_crypto_secmech_release+0xed/0x120 fs/smb/client/cifsencrypt.c:512
- cifs_put_tcp_session+0x240/0x3e0 fs/smb/client/connect.c:1740
- cifs_mount_put_conns+0x2b3/0x340 fs/smb/client/connect.c:3554
- cifs_mount+0x4ac/0xdb0 fs/smb/client/connect.c:3912
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f35d7b9e559
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f35d5de0028 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007f35d7e26180 RCX: 00007f35d7b9e559
-RDX: 0000200000000300 RSI: 0000200000000100 RDI: 0000200000000200
-RBP: 00007f35d7c358b0 R08: 0000200000000400 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f35d7e26218 R14: 00007f35d7e26180 R15: 00007ffce1bc0ac8
- </TASK>
-
-Allocated by task 6393:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:409 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:426
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x2f8/0x6d0 mm/slub.c:5563
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6394:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:264 [inline]
- __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:296
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2748 [inline]
- slab_free mm/slub.c:6509 [inline]
- kfree+0x22b/0x6d0 mm/slub.c:6802
- clean_demultiplex_info+0x997/0xe90 fs/smb/client/connect.c:1153
- cifs_demultiplex_thread+0x5b5/0x2ea0 fs/smb/client/connect.c:1446
- kthread+0x373/0x450 kernel/kthread.c:436
- ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff8880526ec000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 1168 bytes inside of
- freed 4096-byte region [ffff8880526ec000, ffff8880526ed000)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x526e8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 6393, tgid 6385 (syz.3.92), ts 190011878541
- set_page_owner include/linux/page_owner.h:33 [inline]
- post_alloc_hook+0xfd/0x120 mm/page_alloc.c:1871
- prep_new_page mm/page_alloc.c:1879 [inline]
- get_page_from_freelist+0x110d/0x35d0 mm/page_alloc.c:3943
- __alloc_frozen_pages_noprof+0x2eb/0x3300 mm/page_alloc.c:5436
- alloc_slab_page mm/slub.c:3347 [inline]
- allocate_slab mm/slub.c:3462 [inline]
- new_slab+0xa9/0x6e0 mm/slub.c:3513
- refill_objects+0xe3/0x410 mm/slub.c:7418
- refill_sheaf mm/slub.c:2885 [inline]
- __pcs_replace_empty_main+0x35e/0x650 mm/slub.c:4774
- alloc_from_pcs mm/slub.c:4850 [inline]
- slab_alloc_node mm/slub.c:4984 [inline]
- __kmalloc_cache_noprof+0x4f4/0x6d0 mm/slub.c:5559
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
-page last free pid 6391 tgid 6385 ts 189990448004 stack trace:
- reset_page_owner include/linux/page_owner.h:26 [inline]
- __free_pages_prepare mm/page_alloc.c:1418 [inline]
- __free_frozen_pages+0x79f/0x10f0 mm/page_alloc.c:2962
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x47/0xf0 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x1a0/0x1f0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:361
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4683 [inline]
- kmem_cache_alloc_bulk_noprof+0x352/0x890 mm/slub.c:7543
- __io_alloc_req_refill+0x9e/0x330 io_uring/io_uring.c:981
- io_alloc_req io_uring/io_uring.h:537 [inline]
- io_submit_sqes.cold+0xf6/0x301 io_uring/io_uring.c:2039
- __do_sys_io_uring_enter+0xa88/0x1b10 io_uring/io_uring.c:2640
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff8880526ec380: fb fb fb fb fb fb fb f
- ffff8880526ec380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff8880526ec480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                         ^
- ffff8880526ec500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-==================================================================
-BUG: KASAN: slab-use-after-free in cifs_crypto_secmech_release+0xfa/0x120 fs/smb/client/cifsencrypt.c:516
-Read of size 8 at addr ffff8880526ec498 by task syz.3.92/6393
-
-CPU: 1 UID: 0 PID: 6393 Comm: syz.3.92 Tainted: G    B               syzkaller #0 PREEMPT(full) 
-Tainted: [B]=BAD_PAGE
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/05/2026
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x13d/0x4b0 mm/kasan/report.c:482
- kasan_report+0xdf/0x1c0 mm/kasan/report.c:595
- cifs_crypto_secmech_release+0xfa/0x120 fs/smb/client/cifsencrypt.c:516
- cifs_put_tcp_session+0x240/0x3e0 fs/smb/client/connect.c:1740
- cifs_mount_put_conns+0x2b3/0x340 fs/smb/client/connect.c:3554
- cifs_mount+0x4ac/0xdb0 fs/smb/client/connect.c:3912
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f35d7b9e559
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f35d5de0028 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007f35d7e26180 RCX: 00007f35d7b9e559
-RDX: 0000200000000300 RSI: 0000200000000100 RDI: 0000200000000200
-RBP: 00007f35d7c358b0 R08: 0000200000000400 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f35d7e26218 R14: 00007f35d7e26180 R15: 00007ffce1bc0ac8
- </TASK>
-
-Allocated by task 6393:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:409 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:426
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x2f8/0x6d0 mm/slub.c:5563
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6394:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:264 [inline]
- __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:296
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2748 [inline]
- slab_free mm/slub.c:6509 [inline]
- kfree+0x22b/0x6d0 mm/slub.c:6802
- clean_demultiplex_info+0x997/0xe90 fs/smb/client/connect.c:1153
- cifs_demultiplex_thread+0x5b5/0x2ea0 fs/smb/client/connect.c:1446
- kthread+0x373/0x450 kernel/kthread.c:436
- ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff8880526ec000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 1176 bytes inside of
- freed 4096-byte region [ffff8880526ec000, ffff8880526ed000)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x526e8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 6393, tgid 6385 (syz.3.92), ts 190011878541
- set_page_owner include/linux/page_owner.h:33 [inline]
- post_alloc_hook+0xfd/0x120 mm/page_alloc.c:1871
- prep_new_page mm/page_alloc.c:1879 [inline]
- get_page_from_freelist+0x110d/0x35d0 mm/page_alloc.c:3943
- __alloc_frozen_pages_noprof+0x2eb/0x3300 mm/page_alloc.c:5436
- alloc_slab_page mm/slub.c:3347 [inline]
- allocate_slab mm/slub.c:3462 [inline]
- new_slab+0xa9/0x6e0 mm/slub.c:3513
- refill_objects+0xe3/0x410 mm/slub.c:7418
- refill_sheaf mm/slub.c:2885 [inline]
- __pcs_replace_empty_main+0x35e/0x650 mm/slub.c:4774
- alloc_from_pcs mm/slub.c:4850 [inline]
- slab_alloc_node mm/slub.c:4984 [inline]
- __kmalloc_cache_noprof+0x4f4/0x6d0 mm/slub.c:5559
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
-page last free pid 6391 tgid 6385 ts 189990448004 stack trace:
- reset_page_owner include/linux/page_owner.h:26 [inline]
- __free_pages_prepare mm/page_alloc.c:1418 [inline]
- __free_frozen_pages+0x79f/0x10f0 mm/page_alloc.c:2962
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x47/0xf0 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x1a0/0x1f0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:361
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4683 [inline]
- kmem_cache_alloc_bulk_noprof+0x352/0x890 mm/slub.c:7543
- __io_alloc_req_refill+0x9e/0x330 io_uring/io_uring.c:981
- io_alloc_req io_uring/io_uring.h:537 [inline]
- io_submit_sqes.cold+0xf6/0x301 io_uring/io_uring.c:2039
- __do_sys_io_uring_enter+0xa88/0x1b10 io_uring/io_uring.c:2640
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff8880526ec380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff8880526ec480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                            ^
- ffff8880526ec500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-==================================================================
-BUG: KASAN: slab-use-after-free in cifs_put_tcp_session+0x374/0x3e0 fs/smb/client/connect.c:1742
-Read of size 8 at addr ffff8880526ec470 by task syz.3.92/6393
-
-CPU: 1 UID: 0 PID: 6393 Comm: syz.3.92 Tainted: G    B               syzkaller #0 PREEMPT(full) 
-Tainted: [B]=BAD_PAGE
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/05/2026
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x13d/0x4b0 mm/kasan/report.c:482
- kasan_report+0xdf/0x1c0 mm/kasan/report.c:595
- cifs_put_tcp_session+0x374/0x3e0 fs/smb/client/connect.c:1742
- cifs_mount_put_conns+0x2b3/0x340 fs/smb/client/connect.c:3554
- cifs_mount+0x4ac/0xdb0 fs/smb/client/connect.c:3912
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f35d7b9e559
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f35d5de0028 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007f35d7e26180 RCX: 00007f35d7b9e559
-RDX: 0000200000000300 RSI: 0000200000000100 RDI: 0000200000000200
-RBP: 00007f35d7c358b0 R08: 0000200000000400 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f35d7e26218 R14: 00007f35d7e26180 R15: 00007ffce1bc0ac8
- </TASK>
-
-Allocated by task 6393:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:409 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:426
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x2f8/0x6d0 mm/slub.c:5563
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6394:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:264 [inline]
- __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:296
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2748 [inline]
- slab_free mm/slub.c:6509 [inline]
- kfree+0x22b/0x6d0 mm/slub.c:6802
- clean_demultiplex_info+0x997/0xe90 fs/smb/client/connect.c:1153
- cifs_demultiplex_thread+0x5b5/0x2ea0 fs/smb/client/connect.c:1446
- kthread+0x373/0x450 kernel/kthread.c:436
- ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff8880526ec000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 1136 bytes inside of
- freed 4096-byte region [ffff8880526ec000, ffff8880526ed000)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x526e8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 6393, tgid 6385 (syz.3.92), ts 190011878541
- set_page_owner include/linux/page_owner.h:33 [inline]
- post_alloc_hook+0xfd/0x120 mm/page_alloc.c:1871
- prep_new_page mm/page_alloc.c:1879 [inline]
- get_page_from_freelist+0x110d/0x35d0 mm/page_alloc.c:3943
- __alloc_frozen_pages_noprof+0x2eb/0x3300 mm/page_alloc.c:5436
- alloc_slab_page mm/slub.c:3347 [inline]
- allocate_slab mm/slub.c:3462 [inline]
- new_slab+0xa9/0x6e0 mm/slub.c:3513
- refill_objects+0xe3/0x410 mm/slub.c:7418
- refill_sheaf mm/slub.c:2885 [inline]
- __pcs_replace_empty_main+0x35e/0x650 mm/slub.c:4774
- alloc_from_pcs mm/slub.c:4850 [inline]
- slab_alloc_node mm/slub.c:4984 [inline]
- __kmalloc_cache_noprof+0x4f4/0x6d0 mm/slub.c:5559
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
-page last free pid 6391 tgid 6385 ts 189990448004 stack trace:
- reset_page_owner include/linux/page_owner.h:26 [inline]
- __free_pages_prepare mm/page_alloc.c:1418 [inline]
- __free_frozen_pages+0x79f/0x10f0 mm/page_alloc.c:2962
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x47/0xf0 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x1a0/0x1f0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:361
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4683 [inline]
- kmem_cache_alloc_bulk_noprof+0x352/0x890 mm/slub.c:7543
- __io_alloc_req_refill+0x9e/0x330 io_uring/io_uring.c:981
- io_alloc_req io_uring/io_uring.h:537 [inline]
- io_submit_sqes.cold+0xf6/0x301 io_uring/io_uring.c:2039
- __do_sys_io_uring_enter+0xa88/0x1b10 io_uring/io_uring.c:2640
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff8880526ec300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff8880526ec400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                             ^
- ffff8880526ec480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-==================================================================
-BUG: KASAN: slab-use-after-free in cifs_put_tcp_session+0x381/0x3e0 fs/smb/client/connect.c:1743
-Write of size 8 at addr ffff8880526ec470 by task syz.3.92/6393
-
-CPU: 1 UID: 0 PID: 6393 Comm: syz.3.92 Tainted: G    B               syzkaller #0 PREEMPT(full) 
-Tainted: [B]=BAD_PAGE
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/05/2026
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x100/0x190 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x13d/0x4b0 mm/kasan/report.c:482
- kasan_report+0xdf/0x1c0 mm/kasan/report.c:595
- cifs_put_tcp_session+0x381/0x3e0 fs/smb/client/connect.c:1743
- cifs_mount_put_conns+0x2b3/0x340 fs/smb/client/connect.c:3554
- cifs_mount+0x4ac/0xdb0 fs/smb/client/connect.c:3912
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f35d7b9e559
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f35d5de0028 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007f35d7e26180 RCX: 00007f35d7b9e559
-RDX: 0000200000000300 RSI: 0000200000000100 RDI: 0000200000000200
-RBP: 00007f35d7c358b0 R08: 0000200000000400 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f35d7e26218 R14: 00007f35d7e26180 R15: 00007ffce1bc0ac8
- </TASK>
-
-Allocated by task 6393:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- poison_kmalloc_redzone mm/kasan/common.c:409 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:426
- kasan_kmalloc include/linux/kasan.h:263 [inline]
- __kmalloc_cache_noprof+0x2f8/0x6d0 mm/slub.c:5563
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6394:
- kasan_save_stack+0x30/0x50 mm/kasan/common.c:57
- kasan_save_track+0x14/0x30 mm/kasan/common.c:78
- kasan_save_free_info+0x3b/0x70 mm/kasan/generic.c:584
- poison_slab_object mm/kasan/common.c:264 [inline]
- __kasan_slab_free+0x5f/0x80 mm/kasan/common.c:296
- kasan_slab_free include/linux/kasan.h:235 [inline]
- slab_free_hook mm/slub.c:2748 [inline]
- slab_free mm/slub.c:6509 [inline]
- kfree+0x22b/0x6d0 mm/slub.c:6802
- clean_demultiplex_info+0x997/0xe90 fs/smb/client/connect.c:1153
- cifs_demultiplex_thread+0x5b5/0x2ea0 fs/smb/client/connect.c:1446
- kthread+0x373/0x450 kernel/kthread.c:436
- ret_from_fork+0x730/0xd60 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-The buggy address belongs to the object at ffff8880526ec000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 1136 bytes inside of
- freed 4096-byte region [ffff8880526ec000, ffff8880526ed000)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x526e8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000040 ffff88801d035140 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000040004 00000000f5000000 0000000000000000
-head: 00fff00000000003 fffffffffffffe01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 6393, tgid 6385 (syz.3.92), ts 190011878541
- set_page_owner include/linux/page_owner.h:33 [inline]
- post_alloc_hook+0xfd/0x120 mm/page_alloc.c:1871
- prep_new_page mm/page_alloc.c:1879 [inline]
- get_page_from_freelist+0x110d/0x35d0 mm/page_alloc.c:3943
- __alloc_frozen_pages_noprof+0x2eb/0x3300 mm/page_alloc.c:5436
- alloc_slab_page mm/slub.c:3347 [inline]
- allocate_slab mm/slub.c:3462 [inline]
- new_slab+0xa9/0x6e0 mm/slub.c:3513
- refill_objects+0xe3/0x410 mm/slub.c:7418
- refill_sheaf mm/slub.c:2885 [inline]
- __pcs_replace_empty_main+0x35e/0x650 mm/slub.c:4774
- alloc_from_pcs mm/slub.c:4850 [inline]
- slab_alloc_node mm/slub.c:4984 [inline]
- __kmalloc_cache_noprof+0x4f4/0x6d0 mm/slub.c:5559
- _kmalloc_noprof include/linux/slab.h:991 [inline]
- _kzalloc_noprof include/linux/slab.h:1312 [inline]
- cifs_get_tcp_session+0x144/0x1f80 fs/smb/client/connect.c:1765
- cifs_mount_get_session+0xc9/0x460 fs/smb/client/connect.c:3579
- get_session fs/smb/client/dfs.c:65 [inline]
- dfs_mount_share+0x200/0x1e20 fs/smb/client/dfs.c:275
- cifs_mount+0xc4/0xdb0 fs/smb/client/connect.c:3869
- cifs_smb3_do_mount+0x2c0/0x1b10 fs/smb/client/cifsfs.c:1026
- smb3_get_tree_common fs/smb/client/fs_context.c:897 [inline]
- smb3_get_tree fs/smb/client/fs_context.c:917 [inline]
- smb3_get_tree+0x1fd/0x440 fs/smb/client/fs_context.c:909
- vfs_get_tree+0x92/0x320 fs/super.c:1932
- fc_mount fs/namespace.c:1278 [inline]
- do_new_mount_fc fs/namespace.c:3885 [inline]
- do_new_mount fs/namespace.c:3961 [inline]
- path_mount+0x7d0/0x2850 fs/namespace.c:4312
- do_mount fs/namespace.c:4325 [inline]
- __do_sys_mount fs/namespace.c:4543 [inline]
- __se_sys_mount fs/namespace.c:4520 [inline]
- __x64_sys_mount+0x293/0x310 fs/namespace.c:4520
-page last free pid 6391 tgid 6385 ts 189990448004 stack trace:
- reset_page_owner include/linux/page_owner.h:26 [inline]
- __free_pages_prepare mm/page_alloc.c:1418 [inline]
- __free_frozen_pages+0x79f/0x10f0 mm/page_alloc.c:2962
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x47/0xf0 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x1a0/0x1f0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:361
- kasan_slab_alloc include/linux/kasan.h:253 [inline]
- slab_post_alloc_hook mm/slub.c:4683 [inline]
- kmem_cache_alloc_bulk_noprof+0x352/0x890 mm/slub.c:7543
- __io_alloc_req_refill+0x9e/0x330 io_uring/io_uring.c:981
- io_alloc_req io_uring/io_uring.h:537 [inline]
- io_submit_sqes.cold+0xf6/0x301 io_uring/io_uring.c:2039
- __do_sys_io_uring_enter+0xa88/0x1b10 io_uring/io_uring.c:2640
- do_syscall_x64 arch/x86/entry/syscall_64.c:61 [inline]
- do_syscall_64+0x123/0x790 arch/x86/entry/syscall_64.c:84
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff8880526ec300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff8880526ec400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                                             ^
- ffff8880526ec480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880526ec500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+RnJvbSA0NTRhZThlNWMzMDZlNWRkYWU3MDQ2ZTViM2JkMWQwZjg2NDNlNGQwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBOYW1qYWUgSmVvbiA8bGlua2luamVvbkBrZXJuZWwub3JnPgpE
+YXRlOiBUdWUsIDIwIE9jdCAyMDI2IDEwOjE5OjE5ICswOTAwClN1YmplY3Q6IFtQQVRDSF0ga3Nt
+YmQ6IGZpeCBmZF9saW1pdCBhY2NvdW50aW5nIGFjcm9zcyBkdXJhYmxlIHJlY29ubmVjdHMKCkEg
+ZGlzY29ubmVjdGVkIGR1cmFibGUgaGFuZGxlIGtlZXBzIGl0cyBrc21iZF9maWxlIGFuZCB0aGUg
+ZmRfbGltaXQKcmVzZXJ2YXRpb24gdGFrZW4gYXQgaXRzIGluaXRpYWwgb3Blbi4gUmVjb25uZWN0
+aW5nIGFsbG9jYXRlcyBhbm90aGVyCnZvbGF0aWxlIElEIGFuZCB0YWtlcyBhbm90aGVyIHJlc2Vy
+dmF0aW9uIGZvciB0aGUgc2FtZSBmaWxlLiBGaW5hbCBjbG9zZQpyZXR1cm5zIG9ubHkgb25lIHJl
+c2VydmF0aW9uLCBzbyByZXBlYXRlZCByZWNvbm5lY3RzIHBlcm1hbmVudGx5IHJlZHVjZQp0aGUg
+c2VydmVyLXdpZGUgb3Blbi1maWxlIGJ1ZGdldC4KCk1vdmUgcmVzZXJ2YXRpb24gaW50byBrc21i
+ZF9vcGVuX2ZkKCkgYW5kIHJlbGVhc2UgaXQgb24gZXZlcnkgY3JlYXRpb24KZmFpbHVyZS4gS2Vl
+cCB0aGUgcmVzZXJ2YXRpb24gdW50aWwgZmluYWwgY2xvc2UsIGluY2x1ZGluZyB3aGlsZSBhIGR1
+cmFibGUKaGFuZGxlIGlzIGRpc2Nvbm5lY3RlZC4gTWFrZSBJRCBhbGxvY2F0aW9uIGluZGVwZW5k
+ZW50IG9mIGZkX2xpbWl0IHNvCnJlY29ubmVjdHMgbmVpdGhlciBjb25zdW1lIG5vciByZXR1cm4g
+c2xvdHMuIFRoaXMgYWxzbyBhdm9pZHMgcmV0dXJuaW5nIGFuCnVucmVzZXJ2ZWQgc2xvdCB3aGVu
+IHBlcnNpc3RlbnQgSUQgYWxsb2NhdGlvbiBmYWlscy4KCk5ldyBvcGVucyBjb250aW51ZSB0byBy
+ZXR1cm4gLUVNRklMRSB3aGVuIHRoZSBidWRnZXQgaXMgZXhoYXVzdGVkLCBrZWVwaW5nCnRoZSBl
+eGlzdGluZyBTVEFUVVNfSU5TVUZGSUNJRU5UX1JFU09VUkNFUyBtYXBwaW5nLgoKRml4ZXM6IGM4
+ZWZjYzc4NjE0NiAoImtzbWJkOiBhZGQgc3VwcG9ydCBmb3IgZHVyYWJsZSBoYW5kbGVzIHYxL3Yy
+IikKUmVwb3J0ZWQtYnk6IE1vaGFtbWVkIDxtb2hhbW1lZC5zYWFkLmFscXVyYWluaUBnbWFpbC5j
+b20+ClNpZ25lZC1vZmYtYnk6IE5hbWphZSBKZW9uIDxsaW5raW5qZW9uQGtlcm5lbC5vcmc+Ci0t
+LQogZnMvc21iL3NlcnZlci92ZnNfY2FjaGUuYyB8IDE1ICsrKysrKysrLS0tLS0tLQogMSBmaWxl
+IGNoYW5nZWQsIDggaW5zZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9m
+cy9zbWIvc2VydmVyL3Zmc19jYWNoZS5jIGIvZnMvc21iL3NlcnZlci92ZnNfY2FjaGUuYwppbmRl
+eCAzNWMzNTYzOGRjY2MuLmJmYTI4ZWYxOTdmNiAxMDA2NDQKLS0tIGEvZnMvc21iL3NlcnZlci92
+ZnNfY2FjaGUuYworKysgYi9mcy9zbWIvc2VydmVyL3Zmc19jYWNoZS5jCkBAIC0xNDQ2LDExICsx
+NDQ2LDYgQEAgc3RhdGljIGludCBfX29wZW5faWQoc3RydWN0IGtzbWJkX2ZpbGVfdGFibGUgKmZ0
+LCBzdHJ1Y3Qga3NtYmRfZmlsZSAqZnAsCiAJdTY0CQkJaWQgPSAwOwogCWludAkJCXJldDsKIAot
+CWlmICh0eXBlID09IE9QRU5fSURfVFlQRV9WT0xBVElMRV9JRCAmJiBmZF9saW1pdF9kZXBsZXRl
+ZCgpKSB7Ci0JCV9fb3Blbl9pZF9zZXQoZnAsIEtTTUJEX05PX0ZJRCwgdHlwZSk7Ci0JCXJldHVy
+biAtRU1GSUxFOwotCX0KLQogCWlkcl9wcmVsb2FkKEtTTUJEX0RFRkFVTFRfR0ZQKTsKIAl3cml0
+ZV9sb2NrKCZmdC0+bG9jayk7CiAJcmV0ID0gaWRyX2FsbG9jX2N5Y2xpYyhmdC0+aWRyLCBmcCwg
+S1NNQkRfU1RBUlRfRklELCBJTlRfTUFYIC0gMSwKQEAgLTE0NjAsNyArMTQ1NSw2IEBAIHN0YXRp
+YyBpbnQgX19vcGVuX2lkKHN0cnVjdCBrc21iZF9maWxlX3RhYmxlICpmdCwgc3RydWN0IGtzbWJk
+X2ZpbGUgKmZwLAogCQlyZXQgPSAwOwogCX0gZWxzZSB7CiAJCWlkID0gS1NNQkRfTk9fRklEOwot
+CQlmZF9saW1pdF9jbG9zZSgpOwogCX0KIAogCV9fb3Blbl9pZF9zZXQoZnAsIGlkLCB0eXBlKTsK
+QEAgLTE0ODAsMTAgKzE0NzQsMTUgQEAgc3RydWN0IGtzbWJkX2ZpbGUgKmtzbWJkX29wZW5fZmQo
+c3RydWN0IGtzbWJkX3dvcmsgKndvcmssIHN0cnVjdCBmaWxlICpmaWxwKQogCXN0cnVjdCBrc21i
+ZF9maWxlICpmcDsKIAlpbnQgcmV0OwogCisJLyogRHVyYWJsZSByZWNvbm5lY3RzIHJldXNlIHRo
+ZSBzbG90IGhlbGQgZm9yIHRoZSBsaWZldGltZSBvZiBmcC4gKi8KKwlpZiAoZmRfbGltaXRfZGVw
+bGV0ZWQoKSkKKwkJcmV0dXJuIEVSUl9QVFIoLUVNRklMRSk7CisKIAlmcCA9IGttZW1fY2FjaGVf
+emFsbG9jKGZpbHBfY2FjaGUsIEtTTUJEX0RFRkFVTFRfR0ZQKTsKIAlpZiAoIWZwKSB7CiAJCXBy
+X2VycigiRmFpbGVkIHRvIGFsbG9jYXRlIG1lbW9yeVxuIik7Ci0JCXJldHVybiBFUlJfUFRSKC1F
+Tk9NRU0pOworCQlyZXQgPSAtRU5PTUVNOworCQlnb3RvIGVycl9mZF9saW1pdDsKIAl9CiAKIAlJ
+TklUX0xJU1RfSEVBRCgmZnAtPmJsb2NrZWRfd29ya3MpOwpAQCAtMTUyOSw2ICsxNTI4LDggQEAg
+c3RydWN0IGtzbWJkX2ZpbGUgKmtzbWJkX29wZW5fZmQoc3RydWN0IGtzbWJkX3dvcmsgKndvcmss
+IHN0cnVjdCBmaWxlICpmaWxwKQogCWtzbWJkX2Nvbm5fcHV0KGZwLT5jb25uKTsKIAlrc21iZF9z
+aGFyZV9jb25maWdfcHV0KGZwLT5zaGFyZV9jb25mKTsKIAlrbWVtX2NhY2hlX2ZyZWUoZmlscF9j
+YWNoZSwgZnApOworZXJyX2ZkX2xpbWl0OgorCWZkX2xpbWl0X2Nsb3NlKCk7CiAJcmV0dXJuIEVS
+Ul9QVFIocmV0KTsKIH0KIAotLSAKMi4yNS4xCgo=
+--000000000000d5d2c4065e3bce90--
