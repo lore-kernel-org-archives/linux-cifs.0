@@ -1,94 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.53
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792523037;
-	b=KnHYw8iomtsC5R19ZaVppruul61yCslfURVDn7VnAYemT4hBNkYApnp4+rHT2beqvirJ
-	 DheXyeSJfjIz3qUih2A66kKA5xsMD9gtZgiWkVwMbjFHjlHQol+QlgxKc2p1PdWTkCOzh
-	 /dkUUbpbAd/coH+xsuScuQ1+PGUliguUdqoL2jxI7rD+8n3gnd3ThmWyCPKlu+7v0GTjW
-	 99l0xUdPnLnhSntMFV1cZl9sfy+4kap1EpKn9+ZCAszP2cuPJ/hSpWgsggWavYEcY8DIH
-	 WrRlsQkZ3dwATYksU2S1cQTVXisEFTT3BekuLOGi5McOIdPLFSHKWFVkAuwPZCs4BjQ==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792523037;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.177
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792525226;
+	b=NBcbQr/RHm3TVwNecXz54aKWVtXm0S6+WTJeGLIf905wJ/9uorto8nhNMyqZZQAiZMbz
+	 tybU/WdbIF+7NQOJXbZeYMRWqbx8rj0vQRgTTohAgHNjN+hW+szOwpWHHfMssBmyRTVQ1
+	 xCO4uib8xQo47Uf25o0c/m3FFgwLyhm8Z253RFvxafB0V4cIFn2ZArDUdrZf725zg9KSM
+	 ie+ytCBV6lLXqAIi2ALrO5/5vgv++QGGcLZRFwS2L0sACIgtG/LSYbKhpzCBDufNXCRhr
+	 64bUaTb8E/MumuukAwuKn2qRa6fObxWKERXrlOJn9AEJWU95IZO9GQywZOha5lOARxw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792525226;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=m+YVhDETtUQWm9g1HvFHGXlxhsLtvKkYiiefCwtpS5Q=;
-	b=NXW2aFTg+/htIM2A/k5Gcy7M9STsAcrqXTnRMsaO/Rl+EnGx9OwpgIU+z+scpR+Oo3cI
-	 W8NWSFePB82uOKxoS5FFW/wNY81arKpqktN6qP9fnNYhB7spPbAFS/v7u2X5XVf3+xRa6
-	 Eh7av0NEw2HkC5NRiLMbslbKBnXwiWWglFYUQ34yrRRbzYOld1OgjLYfcIDJY8w0qMbk6
-	 d5QUHVVQwoC50JDmu7Axo3k/BH2N9YPEzb22/ajOef91Bs1wtwRUwyzAUHlGIqxcrUOEK
-	 SvucUoAwxKc5Ln8SYydiO3IF6FKbix5p/ZunjCIwMJPC0Lte3gooAGSJ580z/KP/9Gg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type;
+	bh=e4JsFSb02TA55hrw/5psLRJkNgQYlwZOZtfuBpG76qU=;
+	b=n4hO3GT6kXyE+8w0yJa42NLW+F++jH9JSbzXOYF8gO2DAh7g0If3ZMUvNJpTyaJXv0rR
+	 nU1S3D848fN8e8IK9uIk6FKJtRowqnammgZNjRhatOslwVGHfwazZksHqDPW5KhOiMcCO
+	 u+Jd1OaUW5eVFZjhVisY3yxonsq0Klbq57nd/E4VerNJkbV4Hl/Hn/8klqYr5oJzPts6Q
+	 rnD28NdKIvBmC49V8UbcM4mcBkwp2xWfrVs7uzQzfSs8vcUFtQHQe5JZB1KYkgEfbSf55
+	 G5PJX9zLh0PZnB6qdtFHHcCnhjvkIJXdzaUMw7zs9BeXW4pUL0QqWxmvd5YXltk1mrg==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Yi1QS84B;
-	arc=none smtp.remote-ip=209.85.208.53
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sDq4O5Mz;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.177
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30202606A319
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 19:03:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30202606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794C5606A322
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 19:40:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 794C5606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Yi1QS84B
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6aa9164072cso5012046a12.2
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 12:03:56 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sDq4O5Mz
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-8b06c0794cfso232597b3.0
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 12:40:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792525224; cv=none;
+        d=google.com; s=arc-20260327;
+        b=se19chtzTS3YHhJqW3z6LVvLR/Sd/3RzA8pwcHRkQ1/onRh4ybfymWikoM7tz13DCZ
+         5g04kRP7b4hLrPR/DXajF5rO3VNEZpCjGOVjp0A9BtcoZ82fNLFM/J8od+c8DXCFSRN5
+         N+iKaqjSBDvctkDDKlzeEEnKYJBALSKc9j0wP7DlSHKnBsjqTiGP+Nqzxb8mmEToXtP8
+         QwHF2vDgJyEGyNngnCgeG6vbABNNjJuSoKzzarkoHeGZAVmXRh5Aww4WnTHDVqOkHepr
+         CD8idBhY3ssCMgFwecwfcv/s5XRVLSpT8sq5JDFLGrtBh83pfcHwzgoos9E9Bm+owDhL
+         NUXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=e4JsFSb02TA55hrw/5psLRJkNgQYlwZOZtfuBpG76qU=;
+        fh=5DA/jpqiat3+yNMmXToa7te5X3tWElb7xPSho0++ipc=;
+        b=mHWPAeafE/OP2Fu8WqWCBSqqDaXCufavydt7wtXA04BCakQAKz3FeVHisK1KWbcnk4
+         7sHHNyP6ZXVP1U2qnMiHQVwggOMR8TEMDTfO3eG6Kgn3vwZIIu7lUsGUesDcILaU4Vpd
+         IQTbTFeAF6JT/q0yMN94tLMcre8ABvl9nqTZYB6zCkSfPNYLdny19gEljPfIH8gEDXyE
+         2Wft0zrjr5bAi6hQqFFGK6zdACDPBSk/wq6GGVe7+8jzcfg548aAM9SuDB9jdoR2kcxs
+         uR0kghxU12O8P1egN+gtFubFsicPPtmMCSAVVEu5W/hO0MKcbFh1p+wnx65/bwRm+Ggp
+         KSxQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792523035; x=1793127835; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=m+YVhDETtUQWm9g1HvFHGXlxhsLtvKkYiiefCwtpS5Q=;
-        b=Yi1QS84BGHvS8TsgRfabeYKIqe70t8cUNCXCVXCmavgsqsUzeP1VJbf7UDqxQRbvHX
-         Wk+y8GqSYwdO0exxPbPb3hBvRhyAnCfeNVAoY6WIdDkjacF2+jMOsZ6O85wi2ebiagy6
-         GioTRewLq6QPvGlqHl9+ygm4T/An5kAObTYsZnhek1hxs8BAcMGDMgbCHwiZmjy/RnB5
-         YD5tUsMix7DS3s753iR1oqHU9WTOG64ucFZIQCdMcHen/Z2mUpf2bV1RvKjopYaP3DpJ
-         5nXAcvUs+HJ1uuKHOcvrmICOwUtEkSp0V78sG7A9zdGKwYF5ZAfgwvHeah5uaX5AX2de
-         t2Cw==
+        d=gmail.com; s=20251104; t=1792525224; x=1793130024; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=e4JsFSb02TA55hrw/5psLRJkNgQYlwZOZtfuBpG76qU=;
+        b=sDq4O5Mzv7SmSuBHS4/QTeRkTYRt6RhWEfl8ZGLyy8160fn+uTZ3CXqPFf2+79S0Km
+         SDYJ/z7uhRxvfIcef2kxnQeREhqofAYj/xN5S7T8HuUi2RsE6a43WK8wm8sZHC42zGOK
+         3sVw6jq/wurpM7z0B7/kw8EoYfjoQHgX56LbMfcD1yIcPiQR9LatgvbHkOKlx7T+HewV
+         B50XErQ2qAWjhzE448dWlpZcwINXqVof3JTa5DiMoy2f77Rucd0+/yc3RmTb/jreNC/a
+         iuC+FeJYjEkydPyNEuOUgY5E3nUbZhPZRd9NocGLCqbqHGrs3k32kDUOStaHJrI06Kel
+         AcOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792523035; x=1793127835;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=m+YVhDETtUQWm9g1HvFHGXlxhsLtvKkYiiefCwtpS5Q=;
-        b=lwMMrtz8r7nXCHbRVLUmOt7+uWxxvTTt79HU5bxG+3JuDwncz1JuYKok2Xnnk2lFqu
-         M3Dz8TAjD/+s5L04dj4cQbpPlDUBEVaRiD6bQiek+N1sCm17ZT90/CaQGeNZBRo1bRVZ
-         hEbYsykeiqlwprK2TOpa421YBAN9N2Ir7SG4CuQABCwbNg0f+TR9pJcLH9J/jXr8zAmI
-         zsm2FrOVd5GpTbHvGyaq8weBfY8tpnxWdkXNd88xK1apsEpPnCJdUxQgiaIDhdsGGgpP
-         wZN8tc9gWCxQa5PQgd7ZpmBcoJYNyCJIpdFlzca/wd3hxv3oFypIKkyue0sYkTnA6YoA
-         98mg==
-X-Forwarded-Encrypted: i=1; AKwUvBxFCG8ujAqoKRJPehqbcnUmqps4n0ApBDYP8GwQBirPu4d7yMSM1fczXHDxw6PQksNtYIFkCeVb4ZWV@vger.kernel.org
-X-Gm-Message-State: AFq9FYIqB10iBcVxPxJoxdkE71ckg77jsBS9wUlaYfstWv4yEoOxsUXu
-	EnMSZdYm74Cu3+Vpos7KJgLhJk+2Lg9G9MFdKLdgcvJ4Qzll0ObytZ/o
-X-Gm-Gg: AYBFou2SBUkw3JnZgB/GcamY/gJKFcaxXAgaiLxYDWP8/FKR1FbPfcGnLIyyZb7/GFs
-	tfZYAzO2si4ZXGzZqVXjHtExsDrCFoT86srCL+AeP/c880fbIJURJOLZV7c/bXk/KaA7OZmpE1S
-	ALkmQJdD8YU6a/NaDBaOtzcwFMIGFkz54cV7oVNfmo5t2/xFKNruCxIkUoSO9G6nF7r27NwXEU/
-	MmPAs5y5MhPKkMnmkNyUKhjnNowUbblyoFXEZV7NFZ2snPb9x4aWmpbdmGxENlKyqGPY0WuDNBH
-	dnCKLFfy43mOM6Q7vAs2SY2NMh2MgYo51gAQYEU4Ul6xRftQ2DBMsvEO3ceF4uO6P3HQAUP/KFw
-	bwuYF/7yvnBos3BQyYPkoq7AfDVnvOJEe6Bow7AO9J5lBrKS1RONcK+5zg+XUDUlH2C82fqf/jG
-	rblyCp60VOkGvdKDurVZuBS5BVrFTDZdmI/CQW6blCUBADlHo3lPVTd9Q/72B8yvjeV/wqHZ6Fg
-	7u2HoxC1LExurAHqsxYsXa2/s/AT66dMLGZ8XwrXmXQ7QU4qppp0KjTqmI4AnxHQWWqXxW3M2/l
-	A7SfT+tgdA==
-X-Received: by 2002:a05:6402:c287:b0:6b1:bbff:6ce1 with SMTP id 4fb4d7f45d1cf-6b3a81c7156mr5153026a12.45.1792523035337;
-        Tue, 20 Oct 2026 12:03:55 -0700 (PDT)
-Received: from wlan-199066.nbw.tue.nl (wlan-199066.nbw.tue.nl. [131.155.199.66])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b403110a23sm24516a12.17.2026.10.20.12.03.53
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 20 Oct 2026 12:03:54 -0700 (PDT)
-From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-Subject: [PATCH] ksmbd: reject FILE_ATTRIBUTE_TEMPORARY on directories
-Date: Tue, 20 Oct 2026 21:03:51 +0200
-Message-ID: <20261020190351.9445-1-mike.michalo@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1792525224; x=1793130024;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=e4JsFSb02TA55hrw/5psLRJkNgQYlwZOZtfuBpG76qU=;
+        b=FxNA1BoqduLVQ/cfjFepsB1sq7U5XksiPW2yjRb0PEJ+Nq6Qpl5MTWlJdZjMjZXcxA
+         BxcgGBJY1FTUL1xdkohhQoS9Bn2PvYVQ4LUzLp1m+yC1xJMusT+CRcrUXvl8yWaEI8qo
+         uWPsoGZphxRXOikQEQ4A1SKuhCUY2vio4acvJgyjF7gIrwJ9k3TycRlaaEOhnOIuU4Hs
+         GkybYSIvDGc7O9DaZCXAMCczkIC+8dfGHUY9bHeN3m5DAHhEyTRoPTg+Af3jrLO2Eb9+
+         +XI7Wm6ajAFmZBxjP3aPyUFdIA8ooqOR1pA7Utod7V32dAv5tPMMWcL8NF0ym3mCB39+
+         J0mg==
+X-Forwarded-Encrypted: i=1; AKwUvByxYH22oRJR16ASS6gp2G33aMbvZqzSYu+pKTQiAVAkKcS6t8ILYdCSXfl5P0IN1XaLfp2TAWE4XaRL@vger.kernel.org
+X-Gm-Message-State: AFq9FYLFxQWw8YNrNhQoeotU/ELSrorTHBz2qCfL8uCdqwf9Gt3D/HgZ
+	4+sVDkb53u9Dpr3UxuyGIIRweCWZos3XAzYT975+k/tfMPWT+vWoau9k8B45iDq1jsnXCZiZXVI
+	nj9pheGWmW1JWRmnSNzbv0TyKye1jkcs=
+X-Gm-Gg: AYBFou1s6dmBJ05IVHNmuLr6k5LoUalO5/q2RcpJqKwMdMpR7uGt92ooPmyJJ28Mtep
+	paZ62UASy7h5VNgaq6qJ4i3UqAt2fyNn4+P1qrf7rNRGGbvOfR7avWpxoJ6a53OyRMD2/hQDim9
+	sZrHLFZlLb8sYiXwWBfk4du3EWzC4Wqunw6S+mJzbB6P91Ft3/NtuVuBV5VYdgxeGlcnCZp1dMt
+	9CLuRGxYWFyKRc8IehEM78wIBWywpBtTSWV/LWVcBOYh67NCqg5SkwSMwOHMxbuosjkBfZn/Ooc
+	rsp3x5PCdUC4rIAO3iEeI8IqfsAP1ZYCvbgANHyOtVHlAFEO4oMzHi/PfmpJXKK7cGAPYBmh4ym
+	/b/ax3ExnxeY4dv8EE4+ajSF3ziv59J5W2CDzhv4=
+X-Received: by 2002:a05:690c:788:b0:8a8:8456:a970 with SMTP id
+ 00721157ae682-8b0f21e9dbemr44226057b3.68.1792525224347; Tue, 20 Oct 2026
+ 12:40:24 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -98,60 +103,85 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1792345559.git.jan.koester@gmx.net>
+In-Reply-To: <cover.1792345559.git.jan.koester@gmx.net>
+From: ronnie sahlberg <ronniesahlberg@gmail.com>
+Date: Wed, 21 Oct 2026 05:40:12 +1000
+X-Gm-Features: AclHuK_4nBepdHPIpyzJ4Q-CKoanV6D7TiXN__qc8a6qvpWN2kog280Tj0oflWc
+Message-ID: <CAN05THQGpsya=GJgZjwdNpsrDF7FgRw1mTQePnaoRAgFfKVRgw@mail.gmail.com>
+Subject: Re: [PATCH 0/2] ksmbd: NTLM pass-through to a domain controller
+To: Jan Koester <jan.koester@gmx.net>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Setting FILE_ATTRIBUTE_TEMPORARY on a directory with SMB2 SET_INFO
-(FileBasicInformation) succeeds: ksmbd keeps the attribute and, with
-"store dos attributes" enabled, also writes it to the DOS attribute
-xattr.
+On Mon, 19 Oct 2026 at 03:53, Jan Koester <jan.koester@gmx.net> wrote:
+>
+> Hi,
+>
+> a ksmbd server joined to an Active Directory domain can authenticate
+> domain users with Kerberos, but not with NTLM: it has no password hash
+> for them, so the NTLMv2 response can't be checked locally. Clients that
+> fall back to NTLM (access by IP address, machines outside the domain,
+> mount.cifs with user name and password) are refused.
+>
+> Samba solves this by forwarding the response to a domain controller
+> over NETLOGON (NetrLogonSamLogonEx on a schannel connection). These two
+> patches give ksmbd the kernel half of that, and leave the NETLOGON client
+> to user space, like the rest of ksmbd's user handling:
+>
+> 1/2 adds a KSMBD_USER_FLAG_PASSTHROUGH login flag. For such a user,
+>     ksmbd_decode_ntlmssp_auth_blob() doesn't compute the response from a
+>     local hash. It sends the server challenge, the user, domain and
+>     workstation names and the NT/LM responses to user space in a new
+>     KSMBD_EVENT_NTLM_AUTHEN_REQUEST event, then takes the session base
+>     key from KSMBD_EVENT_NTLM_AUTHEN_RESPONSE and goes on with the
+>     existing key exchange. Both events have a strict netlink policy and
+>     are checked in ipc_validate_msg().
+>
+> 2/2 puts the workgroup, not the netbios name, into MsvAvNbDomainName and
+>     MsvAvDnsDomainName of the challenge's target info. A domain
+>     controller checks these when it verifies the NTLMv2 response (Samba
+>     in NTLMv2_RESPONSE_verify_workstation()), so without this patch
+>     every pass-through login fails with NT_STATUS_LOGON_FAILURE. The
+>     patch also checks that the challenge blob fits the response buffer,
+>     since the workgroup can be longer than the netbios name.
+>
+> Logins of users without the new flag are checked as before. The only
+> change they see is the domain names in the challenge's target info
+> (patch 2/2). ksmbd-tools doesn't set the flag yet. The user space side
+> we tested with is sharedd/adconnect from FenrirOS: it marks domain users
+> without a local hash as pass-through, and it answers the event through
+> a NETLOGON schannel client, tested against a Samba 4.22 AD DC.
+>
+> I can send the matching ksmbd-tools change if the interface looks
+> acceptable.
 
-MS-FSA (FileBasicInformation) says the request must fail with
-STATUS_INVALID_PARAMETER when FILE_ATTRIBUTE_TEMPORARY is set on a
-directory, and Samba rejects it too. smbtorture's
-smb2.create.dosattr_tmp_dir checks this and fails against ksmbd.
+Please see https://github.com/cifsd-team/ksmbd-tools/pull/346
+If added it will give you much improved DCE/RPC support instead of the
+hand-marshalled
+stuff and make it much easier to add additional DCE/RPC functions
+you might need for this in ksmbd-tools.
 
-Return -EINVAL, which is sent as STATUS_INVALID_PARAMETER, when a
-directory is asked to become TEMPORARY. Do the check before any
-timestamp is changed, so a rejected request leaves the open file and
-the inode unchanged.
-
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Assisted-by: LLM
-Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
----
-Tested on ksmbd-for-next 454ae8e5c306 in a QEMU x86_64 VM with
-ksmbd-tools 3.5.7: smb2.create.dosattr_tmp_dir fails before and passes
-after this patch. The 187 smbtorture tests run by the ksmbd CI, plus
-smb2.setinfo and smb2.dosmode, give the same results with and without
-it (smb2.dosmode fails both ways, for an unrelated reason).
-
-The same failure reproduces on the Ubuntu 26.04 arm64 kernel with
-ksmbd-tools 3.5.6 and smbtorture 4.23.6.
-
-MS-FSA (Creation of a New File) also says that creating a directory
-with FILE_ATTRIBUTE_TEMPORARY must fail with STATUS_INVALID_PARAMETER,
-and ksmbd doesn't check that either. I left it out because I have no
-test for it; I can send a follow-up if you want it.
-
- fs/smb/server/smb2pdu.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 40af35c0aa29..1ed8e8135c58 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -8695,6 +8695,11 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 	inode = file_inode(filp);
- 	idmap = file_mnt_idmap(filp);
- 
-+	/* MS-FSA FileBasicInformation: a directory can't be marked TEMPORARY */
-+	if (S_ISDIR(inode->i_mode) &&
-+	    (file_info->Attributes & FILE_ATTRIBUTE_TEMPORARY_LE))
-+		return -EINVAL;
-+
- 	if (file_info->CreationTime)
- 		fp->create_time = le64_to_cpu(file_info->CreationTime);
- 
--- 
-2.56.0
-
+>
+> The series is based on v7.3-rc7.
+>
+> Jan Koester (2):
+>   ksmbd: pass through NTLM authentication to a domain controller
+>   ksmbd: put the workgroup into the NTLMSSP target info's domain names
+>
+>  fs/smb/server/auth.c          | 109 +++++++++++++++++++++++++++++++---
+>  fs/smb/server/ksmbd_netlink.h |  41 +++++++++++++
+>  fs/smb/server/smb2pdu.c       |  21 ++++++-
+>  fs/smb/server/transport_ipc.c |  73 ++++++++++++++++++++++-
+>  fs/smb/server/transport_ipc.h |   3 +
+>  5 files changed, 236 insertions(+), 11 deletions(-)
+>
+>
+> base-commit: 32c52ec87d6245ee2d12ed5dd509e40062939b50
+> --
+> 2.56.0
+>
+>
