@@ -1,101 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.181
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792530642;
-	b=EAsSE9rrO8z6jU5/ntpm58W82LUIfPM6pO3rXXboclhNwo9PyiQcNtbOMAevr9zn1qh0
-	 0rfXe5cRsK2cT01NeAVwLsTCrAgBOnKyrHtSqAaDw/ihExn65HfxSkkTa3k9tt9G0YrNs
-	 dGI0lHtxdY77rrMqwI1lndlWOHIe8+vFv55esU6Vj6DAGK8gwZ6qDhzL6gNIZqiWyK/9L
-	 3OqU46Ej6s3PRqbcqNzA2J1CMuTYWzmdywGFBClZftvYDDTt54XOMilZmb9SL0EnWf95l
-	 rj84iLJBdzOhBc6/xJTq76e/JnLLrsVDiMmj6Sa2KYGViBD74cAgrvuqk/kkM5e4Nuw==
+	t=1792531994;
+	b=mdJ6KctE7ZhQQccUD8a9p2c0wcq/YkymJDvqUq1JtYi9NYCXTOAiRkab7nfXjKtQ63zI
+	 sl8W/QLN3USTomj/pQnd9kuFMLxabwK4wP0qeFMay2UT2UXW9jOUCPmmNmTC8m1u7dZyc
+	 6wsB73fVDH3F8sJHyeNQRd4ZNyvCfJZbEudEFY1LsZiDczekI0KwdCJ0xRWvJqJQYSMzo
+	 pwYOBSF2to8pjqVlY6BCRsov045euKtRVC3X7d1j2i3QjSJb4bINVTqJGZuB6JqWtmnW+
+	 AuFB+rlsp3V6oW/RyVgrVJdnrEsonHykDUe2NOCV0ps862WrJqZR57g2+Amhgt0owAQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792530642;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792531994;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
-	b=PB4XWNiEE2I6QxV0eEBE8SQ/ZgcEmO7edEFCrv7MEvhTtnLsQFYlNIUYPesSrLNW9u6G
-	 nRVGX1K3y8ux9XNicMZt4gtXGIZyQWsnfp1P08rvFFiCKdh9SCJnYwq7lj30wJ6j7pF30
-	 fzMrDi+/DEAH8q3gDPsqE2ljI2Syk7qQNkMxVJxoBPw00c2kJrSbTwROo+OrrnosWRixx
-	 XH/IOJA8Rm6q5iy4ejE2vDvhiooJgT9ND6n+KEHfWm8dfFWE/dnNY5530oGMI0rH2BYT3
-	 gulUIMc8hnbx/8FzgOZnRCflv/wfnETwB+6L5WjqBTnnOwh9OFeL0SCIYKpKLSUU0Yw==
+	bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
+	b=vFiLaOQk9krKzM3yOnMhHeRyld67tSQgDfMjEIIYUp8lj1YSWApxP+ebJB5xnvoJ/BPW
+	 ZNIILkCp9PUibW8j9GUwt+OFzBSVnl1JiUhZr1yxpfZBfkNW3+xnLHGTkG6T9FGTRkYFQ
+	 HWzbyMVnJOXXlyEa4GgHPqKpcc+F3hjmHC85VzTSfluaU83Yt/7zvEVCZJb89E24odJXK
+	 8tKMoLOvc+Ldv4x3gNcMGD06JAPRW3keJwvNaXdQF8A8/7B39THft7aTNMJG/cHCkRuIv
+	 uVGmJ1g83syCZiaSLD0cy6A79OE4Mhmkrxgi8l1kKiPIDyVvaXAbVsU1ZAuM1H+YayA==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=VAlefrrF;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.169
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PstJMPG1;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.181
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CCE606A31E
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 21:10:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 97CCE606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51233606A319
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 21:33:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 51233606A319
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=VAlefrrF
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5ead9f60e26so932868e0c.1
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 14:10:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792530640; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PstJMPG1
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-868b3248b2cso38226b3a.1
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 14:33:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792531994; cv=none;
         d=google.com; s=arc-20260327;
-        b=ch+jgHkzEeCImFD8CAEDOmgqOLM8xtnpiR96BFh4QpLF++EJ1C8o014kH0xOyak0F2
-         WZoGYU+MPt9B3dLI51W4RNtz8P6kNBga/d5tddLcPRWlZuX3aazrn9x7k0BnFJedj89k
-         u+pRxmNnpxys2i5wwjOJ67CxsmCGXrRKHuvo6EOCaD74NJmmmMJmCF5qIiUDfhpFGMH2
-         iq7wMb5tLYJKQRPdYI3bUTNCa7mVZZrmcFHO1HVBGAmhDZXLD/JX32jX9TcTaVlRCy3w
-         sglN/0cJJK3FPyqLfUwrTw8/A6om7dJ0l73pniftgCFgFo+tO5knEQxZ7GO9eMxMKM6D
-         pXUw==
+        b=JqL2HvsVumA+3QGGkD7H3AwizHs6PDMQ4LBYv94Ka8e9RU/Bzv6FlD8TXtj4RhrmBp
+         YVyVL/dvCsOaimWzsKWp1woJ4ArlPgGd7enNCP7DQkbNVkk84w0Cq5qfZQF3XzjcxcNp
+         G22CRtoDKZWnR8O3pIBNLMzenIE0yZkH9xa7P4o5LtAFxktY46TnRrspb2WKjZSdcH02
+         bd14gBSv2LZ1VcdZ8OBFON8W+EWNjQ75WKVYO2SBRK54Q2A4S9f3ArDp8Nnt8+5yZyCP
+         FOGszIaizQ61YvY2NDP1klxSEJIyOBrFb55xI35m1AAV5KaKn/iicljYryHmMoeLzVJI
+         /pbA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
-        fh=WFe13rPjIlJ9uZYEgvg8GmgQAOemYcoQxqY67TJBIOI=;
-        b=cnnbSnpM6EDawJur2UEeLHCEDxHzbo6hUPHYfQPj3REJA5hkpboICxB7bGMmNIdltC
-         CRiCqam/WQ+23rlibGL2pgsm72e+U1Jv1dhMs+5JNrGisuAogNrXSmf4ieT/g62bvPkW
-         kQv2AMb5/o1+kg0tK7AXu1rSS1iIpS8+zdim+qOE5kZi173UB3G7PKA75BVHHSXVH5XU
-         Q65/Z/80oo8fWR95bhoeHIU4A+FFwSphj2xB/9knEVPh1bTfyGeFAi5hkrmG+SKgAK85
-         k9qhkqtyQUElFXV/GQXJK+Xb3iQqFZX2CPJdn3Ftddvjk1Uuxjz+kZr9SB3M/kmIZn+i
-         gPOA==;
+        bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
+        fh=lR4muEjXRyeglZdO5HSTwUFD9FX540bDe3FyTp6dA4c=;
+        b=oILlQB2wDFx0uNgLwkmxcnPtLn+Q6Y87KHSs8M7yw5Hhd3w6wue5rgyOmEHddi5K+G
+         UJrWOXsEwUR0myEiMUIDElpp3yVjJ64k/69FNXGk2M3NchU0SX+DIL77OaFDE9MhAAXD
+         sD42im2VMmnRtklEM1+YTXipXCMuFV2jMEfunRKwGk+rqVJTUn4zBaUw6kuWKYcAgous
+         zxVh7VIsoFU9ydKUmrniQ9Qv/1rVLNw+MfJr3HSCQ8SUmL7JSSFr76J7CoMXEmjGVgNb
+         PlE4RTYwHWQR7gTnYkJ74pBdgjTUhQeaSWh0jnTOZWAtiXMUytQqP1nHBnCJFhtCN8Oa
+         z/DQ==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792530640; x=1793135440; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792531994; x=1793136794; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
-        b=VAlefrrFGpsB10R/HV2ZE8WP35YOUkmlIE4u3r/K38kdKpGrP0RwLQ+dPgC8MofmVf
-         JHODPfUJ2VM1pTEZFlEQKEGrj3tq9bwGzUmyjp9mI6BeQ92VJ0IeZrgUF8i8rek/yzXt
-         V4/B4W+v7jVl5naD5G5wlkvZtDmpqeC1XeAFSf4nO12XqmWA3j8L5Ba6LDoLHpMpQETG
-         FbxWGSe2Sofgb5bYSNxex8qPDxXjFnNQKBNuPA1eppLmFukM7FiyRVQ/z/D5HtoX+Mr+
-         LPaC7kHOoaXQEZT2SO1Nai2Lz8t6lyAXsxLWkZMYBC3YTGsr+8E0kAO4/VXSVuvTJBRn
-         JH+A==
+        bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
+        b=PstJMPG1RCu9TauBU0uB7KK9t8qQe8psNqbqWWlhVLK54wLJTJnY2a5ocHf2B1+BaY
+         j1MoWGReMJHIxTj5NvHLrvWc/33+wXPz0yI3rZZbnOys9hb29EhmglXVTFnWaV7CxVUD
+         jAclk5I4DRiymGDTXibLowpbsasxuYt3ijZWKNluS3euv6k3YwbrcBj24NKlKhtd50ft
+         jXGFc4/Px99ALtZ3Jsksflt/E1jlhhehC45+VuYSPyVRaynzqYfkk2t3F8HBKrrE6zA6
+         UEP61voehlpy2YEWIv4qOpVUkjOlQrM+18YSmELM+ImFQEljc83HQhYJDImCsC5LoHuR
+         yxzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792530640; x=1793135440;
+        d=1e100.net; s=20260707; t=1792531994; x=1793136794;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
-        b=yiVmy0xT1FcEpCAMyMFJXLpEI5kIUCxRdq4HdujN/AmvZlvJ5wWcnvdaA8alOWksUv
-         Fp7gSab5ahBBowuQoLeZcoYTyd1ebqNFg+zBfZA48gtv8MZUWd2UbQDvdJO8QKPLP6u9
-         K9aVEVGzA6rdBTQbFfE7pXnABNtvWBL/Q0Qm/VyVTHApy7TtyGe9EiudfjRKd8oyxrTh
-         T0hkDtYFBPfK8dJ96FxnEe+jUw/I/VyEUVOYfuwnsxSdZJpZ+LrR2L5mF4AhEW4EruQh
-         4ajL2htSrzFnkrluI532RiMLwco5aDizmK+4OOlX1eWhN51EUByGAZxoZu6BRoJQa8Ce
-         mhqQ==
-X-Forwarded-Encrypted: i=1; AKwUvBz1viPfbyHxt6muTuK3nMGx3k1X+W8vVqlmLxK+9I0KAZ+SEYr56N6LDFlWtIJ8h8sy3oYw8rpsKVhJ@vger.kernel.org
-X-Gm-Message-State: AFq9FYIN45XCjlDqf/WpQZ1VCT9bgknZ3NJA3ogrn2yjAgtlQyhrXz99
-	6KWGH7TX2WNq8HeRkVGzstrriCoIt1asyNw+zK8NiV0PnQ6duwgZUVt2yWBWY4zipU+Da8QpjCC
-	AiCBIV38GZOG0FmnrAzKXoLVC/lzRlAM=
-X-Gm-Gg: AYBFou19aRoCgvsoz4p9dpe7U2Ge9WqOAwiKnauQLRuHEB0eN0D3L633PWSZWWsrGLQ
-	54kmAtZ6js+b3RNrPfF8RxQT/Za3K6uGMbFFrI0b9bMw/nuOqXqKuNsRPjEJDQwESA21oM0GwHx
-	LbkfwjQ2qJLW3N9qcY7TXbMqS2zuKcexdwUKE3y15pyiWl94X2Ca9aLpdRHLFPFHmfH6qbI8TPj
-	4sAkksW/8a9RzwuIZhMb1DlfRLqa/Gc4EKj93nbw3b7uRY30wUdPibXtfzYJCfI8K2jAnD3pikZ
-	71ogCwVM7cSgGlefuPJjJvQx23D36Qty728/hoMe9nbEsHRSDMnvhj+86YtT7zvpzAPz6HgCXV/
-	e96wY0SM9ATkE76k5Ih/XFdlrDpFjLTZuvjbsqvQDCMtsbR+hjS/xBgTEGYxbF/F+nU3BFgwz3p
-	NlemrFvBQDWFAX
-X-Received: by 2002:a05:6122:8b0a:b0:5ea:aedd:6077 with SMTP id
- 71dfb90a1353d-5eaebdb8b25mr11924e0c.5.1792530640358; Tue, 20 Oct 2026
- 14:10:40 -0700 (PDT)
+        bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
+        b=hAPhde53twcwe0ILbNnZIzYR7FGr0WJzp/lYXP+2tdInkJ/gpMU0zdY4y91hce4wwr
+         TO/upZAcWEotfsDeV2K7vC58cOty5+1Z8atulVtw8JIW+RtjzhA9ECuh/SPP9qgkeEJx
+         CnjBcXeFLiEy1hxntaPDt00KKH0Bb2H5D/Zw9kZN9dnjzXPrwlVw4mJH71gcaM2AWsiI
+         P0qFfWlVRDebEjfNJOtOie8LT/UYVhJPTTPjeI/9EOmGImCByjR6R0/mer57u20+OXlx
+         owI8wkrCk4cckcZ3P+Y6lF30ITqkKzE5HCj8OFJTEaKhasrF1GXX63TUGA9+mRescnam
+         xBHQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz6/2A27OiCgKfCZUhCiiwkUOKpx1HIG55H5kAGlHtgMy/Yu1ys3GUcG/0DDNT70MMmrif6dlP2RP0u@vger.kernel.org
+X-Gm-Message-State: AFq9FYLmPIgFssg8s2GU4HJJT9Pp4xw9Eh9Z2lG/bkXTd3DZtfdt+Edz
+	WL1ApHnntYZ0os7PIcfebr5mze7cq1BLchEbX39t55kHgA1g+whTu7rF72H3E4YToSPu4/Fmu7r
+	pNL2j9BL8/+DunkNolV3+0cYnyIUz3xc=
+X-Gm-Gg: AYBFou0H6l4LW2PG+ZWvgh0YlpGtmyhfc/0aHsApQ9YEaZV9/pIu4E/FgNrD1nx+o36
+	eSldLTgqwFzDuXpSy/j5AyxtZO+bVzyW0dDj3IvF7ex1wpPMpJL86cG7AdArSxjQvnPIOKzLC4z
+	XNI/n4gmyD2EF5I64PsZffTnZjLSH7/ebjZyJQeX15gzWt5AUqieCZXQKgDYBvgnp/axByYCPOD
+	BOf6ovA53AG5wgTeooVhs6i7B7G6IX1mppNbig16UE8FfVD1n5Cxmjsb6FA0WFcU2JtqF0FXupv
+	loCPoqxe67+RZfgZUwqWRBWSO58tEf4vW7EzKLFPWUzrKUBCdUxjHPTqOjhgJmfxkVOjYtszeLE
+	LJko1TORzt1D1N2xSeahrd35GyQQYJRPsrS31/6OW7WkxMj3/43CXMcSnA30c1pFlgL8U0jsHsI
+	bWI3fmWljRphrR
+X-Received: by 2002:a05:6a00:a0c:b0:89e:779b:d0f with SMTP id
+ d2e1a72fcca58-8a089dfdbb8mr140032b3a.37.1792531993626; Tue, 20 Oct 2026
+ 14:33:13 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,15 +105,14 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <89a17e38fca0c84eb23ccde147942e44034ce05b.1792164438.git.lucien.xin@gmail.com>
- <179244539028.3135.8632269420764172979@kernel.org>
-In-Reply-To: <179244539028.3135.8632269420764172979@kernel.org>
+References: <ae36949f7685ef74318d3c742f02e1398db3b454.1792164438.git.lucien.xin@gmail.com>
+ <179244539859.3135.15973054396060254186@kernel.org>
+In-Reply-To: <179244539859.3135.15973054396060254186@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 20 Oct 2026 17:10:27 -0400
-X-Gm-Features: AclHuK90ubiZ_3Vt7ioV-VUXcLL_AkSfJ2ivx6yoB89OB2lkvKl3ARidx8adw2s
-Message-ID: <CADvbK_fNMJxJq8QFiFLtAE1op_bAGYU7bMi8qZ58Ai-aGGP7KQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v17 04/15] quic: provide family ops for address
- and protocol
+Date: Tue, 20 Oct 2026 17:33:00 -0400
+X-Gm-Features: AclHuK-OS8Rlsq-Vf92z9Ck0SMvPAMUJ9Zd-S0XjwZRWioNbmezgdXlvGsvI2pg
+Message-ID: <CADvbK_en5dm-psb_eXs26y1bYTNq8_76eHv6ZWX_FbcSPjv8Zg@mail.gmail.com>
+Subject: Re: [PATCH net-next v17 08/15] quic: add path management
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -129,13 +128,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 19, 2026 at 5:29=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
+On Mon, Oct 19, 2026 at 5:30=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
 te:
 >
-> Thank you for your contribution! Sashiko AI review found 3 potential
+> Thank you for your contribution! Sashiko AI review found 2 potential
 > issue(s) to consider.
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 2
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 2 =C2=B7 Low: 0
 >
 > If you believe none of the issues are legitimate, please reply to each
 > issue of Medium severity or higher and explain why the AI is wrong.
@@ -145,178 +144,160 @@ k
 y
 > (one such reply per series is enough).
 >
-> - [Medium] quic_common_setsockopt() (net/quic/family.c:416) passes every
->   SOL_IP/SOL_IPV6 option to the core IP stack without filtering.
-> - [Low] The commit message describes the patch as only adding
->   family.{c,h} helpers (routing, transmit, address parsing and=E2=80=A6
-> - [Low] When routing picks a link-local source for a wildcard sa,
->   quic_v6_flow_route() (net/quic/family.c:131) sets=E2=80=A6
+> - [Medium] quic_udp_sock_create() in net/quic/path.c zero-initializes
+>   udp_conf and fills it with quic_udp_conf_init() ->=E2=80=A6
+> - [Medium] IP_FREEBIND (and the IPv6 equivalent) set on a QUIC socket has
+>   no effect when a new UDP tunnel socket is created.
 >
 > --
 >
-> quic: provide family ops for address and protocol
+> quic: add path management
 >
-> This patch adds net/quic/family.{c,h} with IPv4/IPv6 helpers for routing,
-> UDP tunnel transmit, address parsing and comparison, and UDP socket confi=
-g
-> setup. It also connects quic_inet_getname() to quic_get_sk_addr(), and se=
-nds
-> setsockopt/getsockopt calls for any level other than SOL_QUIC to the
-> IP/IPv6 handlers.
+> This adds struct quic_path_group and struct quic_path to manage the
+> active and alternate paths of a QUIC connection. Each path is bound to a
+> kernel UDP tunnel socket, which can be shared and is tracked in a
+> per-port hash table. The patch also adds bind, unbind and swap helpers,
+> alternate path detection for migration, and basic PLPMTUD state handling.
 >
-> > Introduce QUIC address and protocol family operations to handle IPv4/IP=
-v6
-> > specifics consistently. The new family.{c,h} provide helpers for routin=
-g,
-> > skb transmit handling, address parsing and comparison and UDP socket co=
-nfig
-> > initializing etc.
->
-> [Severity: Low]
-> This isn't a bug, but the commit message only talks about new helpers. Th=
-e
-> patch also changes three socket entry points that userspace can see.
->
-> quic_inet_getname() in net/quic/protocol.c used to return -EOPNOTSUPP. It
-> now calls quic_get_sk_addr(), so getsockname() and getpeername() return
-> real addresses. IPv4-mapped results on AF_INET6 sockets are also rewritte=
-n
-> to sockaddr_in.
->
-> quic_setsockopt() and quic_getsockopt() in net/quic/socket.c now pass eve=
-ry
-> level other than SOL_QUIC to ip_setsockopt()/ipv6_setsockopt() and
-> ip_getsockopt()/ipv6_getsockopt(). That makes the full SOL_IP and SOL_IPV=
-6
-> option sets reachable on QUIC sockets.
->
-> The errno for unknown levels changes as well. setsockopt() now returns
-> -ENOPROTOOPT. getsockopt() returns -EOPNOTSUPP from do_ip_getsockopt() on
-> IPv4 sockets and -ENOPROTOOPT from ipv6_getsockopt() on IPv6 sockets.
->
-> Could the commit message mention these changes?
->
-> > diff --git a/net/quic/family.c b/net/quic/family.c
+> > diff --git a/net/quic/path.c b/net/quic/path.c
 > > new file mode 100644
-> > index 0000000000000..dc41a0ae07086
+> > index 0000000000000..ba7e2c952a36a
 > > --- /dev/null
-> > +++ b/net/quic/family.c
-> > @@ -0,0 +1,441 @@
+> > +++ b/net/quic/path.c
+> > @@ -0,0 +1,596 @@
 >
 > [ ... ]
 >
-> > +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da,
-> > +                           union quic_addr *sa, struct flowi *fl)
+> > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk,
+> > +                                               union quic_addr *a)
 > > +{
->
-> [ ... ]
->
-> > +     fl6->flowi6_proto =3D IPPROTO_UDP;
-> > +     fl6->flowi6_oif =3D quic_get_dev_if(sk, da);
->
-> [ ... ]
->
-> > +     dst =3D ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
-> > +     if (IS_ERR(dst))
-> > +             return PTR_ERR(dst);
+> > +     struct udp_tunnel_sock_cfg tuncfg =3D {};
+> > +     struct udp_port_cfg udp_conf =3D {};
+> > +     struct net *net =3D sock_net(sk);
+> > +     struct quic_uhash_head *head;
+> > +     struct quic_udp_sock *us;
+> > +     struct socket *sock;
+> > +     int err;
 > > +
-> > +     if (quic_v6_is_any_addr(sa)) {
-> > +             sa->v6.sin6_family =3D AF_INET6;
-> > +             sa->v6.sin6_addr =3D fl6->saddr;
-> > +             if ((ipv6_addr_type(&fl6->saddr) & IPV6_ADDR_LINKLOCAL))
-> > +                     sa->v6.sin6_scope_id =3D fl6->flowi6_oif;
->
-> [Severity: Low]
-> Is fl6->flowi6_oif the right value to store as the scope id here?
->
-> It holds the oif requested before the lookup, which is
-> quic_get_dev_if(sk, da). The ip6_dst_lookup_flow()->ip6_dst_lookup_tail()
-> path doesn't appear to write the chosen egress device back into it.
->
-> On the fib6 rules path, l3mdev_update_flow() can also clear it when the o=
-if
-> is an L3 master:
->
->         if (netif_is_l3_master(dev))
->                 fl->flowi_oif =3D 0;
->
-> The IPv4 side is different. ip_route_output_flow() sets
-> flp4->flowi4_oif =3D rt->dst.dev->ifindex after the lookup.
->
-> Two cases can store a link-local source with sin6_scope_id =3D=3D 0: an u=
-nbound
-> socket with a link-local destination that has no scope, or routing pickin=
-g
-> a link-local source.
->
-> After that, quic_get_dev_if(sk, sa) falls back to sk->sk_bound_dev_if (0)=
-.
-> quic_v6_udp_conf_init() then asks to bind a link-local local_ip6 with
-> bind_ifindex 0, which __inet6_bind() rejects. The link-local scope check =
-in
-> quic_v6_cmp_sk_addr() is also skipped, because one side's scope is 0.
->
-> Would dst_dev(dst)->ifindex record the real egress interface instead?
->
-> > +     }
-> > +     ip6_dst_store(sk, dst, false, false);
-> > +     return 0;
-> > +}
->
-> [ ... ]
->
-> > +int quic_common_setsockopt(struct sock *sk, int level, int optname,
-> > +                        sockptr_t optval, unsigned int optlen)
-> > +{
-> > +     return quic_pf_ipv4(sk) ?
-> > +            ip_setsockopt(sk, level, optname, optval, optlen) :
-> > +            ipv6_setsockopt(sk, level, optname, optval, optlen);
-> > +}
+> > +     us =3D kmalloc_obj(*us);
+> > +     if (!us)
+> > +             return ERR_PTR(-ENOMEM);
+> > +
+> > +     quic_udp_conf_init(sk, &udp_conf, a);
 >
 > [Severity: Medium]
-> This passes every SOL_IP and SOL_IPV6 option to the core IP stack. The
-> QUIC route and transmit helpers above only use part of the resulting
-> socket state: tos/tclass, uc_ttl/hop_limit, pmtudisc, SNDFLOW flow labels=
-,
-> sk_bound_dev_if, mark and uid.
+> Should the tunnel socket take its IPV6_V6ONLY setting from the QUIC
+> socket that owns it?
 >
-> Can setsockopt() then report success for options that never take effect o=
-n
-> QUIC traffic? Some examples follow.
+> quic_udp_conf_init()->quic_v6_udp_conf_init() fills in the family,
+> address, port, checksum flags and bind_ifindex. It never sets
+> conf->ipv6_v6only:
 >
-> IP_OPTIONS sets inet->inet_opt. However, quic_v4_lower_xmit() goes throug=
-h
-> udp_tunnel_xmit_skb()->iptunnel_xmit(), which always builds a header with
-> no options:
+> net/quic/family.c:quic_v6_udp_conf_init() {
+>         conf->family =3D AF_INET6;
+>         conf->local_ip6 =3D a->v6.sin6_addr;
+>         conf->local_udp_port =3D a->v6.sin6_port;
+>         conf->use_udp6_rx_checksums =3D true;
+>         conf->use_udp6_tx_checksums =3D true;
+>         conf->bind_ifindex =3D quic_get_dev_if(sk, a);
+> }
 >
-> net/ipv4/ip_tunnel_core.c:iptunnel_xmit() {
+> udp_sock_create6() applies v6only only when the config asks for it:
+>
+> net/ipv6/ip6_udp_tunnel.c:udp_sock_create6() {
 >     ...
->         iph->ihl        =3D       sizeof(struct iphdr) >> 2;
+>         if (cfg->ipv6_v6only) {
+>                 err =3D ip6_sock_set_v6only(sock->sk);
 >     ...
 > }
 >
-> quic_v4_flow_route() also does no source route handling.
+> As a result, the kernel UDP socket always gets the net.ipv6.bindv6only
+> default. An IPV6_V6ONLY value set on the QUIC socket through
+> quic_setsockopt()->ipv6_setsockopt() is ignored. A zero cfg value also
+> can't clear an inherited bindv6only=3D1.
 >
-> IPV6_RTHDR, IPV6_HOPOPTS and IPV6_DSTOPTS set np->opt, but
-> udp_tunnel6_xmit_skb() never adds extension headers. The v17 changelog
-> notes this when it drops fl6_update_dst(), yet these options are still
-> accepted.
+> With bindv6only=3D0, could an IPV6_V6ONLY QUIC socket bound to [::]:P get=
+ a
+> dual-stack tunnel? That tunnel would also hold IPv4 port P and could
+> cause unexpected EADDRINUSE for IPv4 binds.
 >
-> IP_UNICAST_IF (inet->uc_index) and IPV6_UNICAST_IF (np->ucast_oif) are
-> ignored, because quic_get_dev_if() only looks at the link-local scope id
-> and sk_bound_dev_if. UDP does use ucast_oif in udpv6_sendmsg():
+> With bindv6only=3D1, a QUIC socket that cleared IPV6_V6ONLY gets a v6-onl=
+y
+> tunnel, and IPv4 UDP lookup skips ipv6_only sockets. Would IPv4 packets
+> for that dual-stack QUIC socket ever be delivered?
 >
->         fl6->flowi6_oif =3D READ_ONCE(np->ucast_oif);
+> quic_udp_sock_lookup() also decides sharing through
+> quic_cmp_sk_addr(us->sk, ...), which checks ipv6_only_sock() on the
+> tunnel socket. A wrong v6only state would therefore also change which
+> QUIC sockets end up sharing a tunnel.
 >
-> The sticky IPV6_PKTINFO (np->sticky_pktinfo) and IP_TRANSPARENT are not
-> checked either.
+> quic_path_bind() has no caller yet in this series, so this would only
+> show up once quic_bind() is wired in by the next patchset.
 >
-> Would an allow-list in quic_common_setsockopt() make sense, returning
-> -EOPNOTSUPP for options the QUIC path can't honour, as MPTCP does?
->
-True.
+False.
 
-But this is more like an improvement, it will take a long time to go over
-all IP/IPv6/SOL socket options. I may leave it for future work.
+This is on purpose, as two quic socket may share the same lower
+udp tunnel socket, we try to make the lower :: bind udp socket always
+with bindv6only =3D 0 (unless net.ipv6.bindv6only =3D 1), so that two socke=
+ts:
+
+- bind(sk1, ::, 1234, ALPN=3D'h3', bindv6only =3D 1)
+- bind(sk2, ::, 1234, ALPN=3D'smbd', bindv6only =3D 0)
+
+can co-exist, the bindv6only check will be performed on the quic
+socket layer like when looking up the listen socket.
+
+if the tunnel socket takes its IPV6_V6ONLY setting from the QUIC,
+the sk2 will never accept IPv4 requests.
+
+> > +     err =3D udp_sock_create(net, &udp_conf, &sock);
+>
+> [Severity: Medium]
+> Is IP_FREEBIND (or its IPv6 equivalent) on the QUIC socket honoured
+> when a new tunnel socket is created here?
+>
+> struct udp_port_cfg has no freebind or transparent field.
+> udp_sock_create4() and udp_sock_create6() call kernel_bind() right after
+> sock_create_kern(), so FREEBIND can never be set on the new socket
+> before it is bound:
+>
+> net/ipv6/ip6_udp_tunnel.c:udp_sock_create6() {
+>         err =3D sock_create_kern(net, AF_INET6, SOCK_DGRAM, 0, &sock);
+>     ...
+>         err =3D kernel_bind(sock, (struct sockaddr_unsized *)&udp6_addr,
+>                           sizeof(udp6_addr));
+>     ...
+> }
+>
+> The bind path then calls inet_addr_valid_or_nonlocal() on the new tunnel
+> socket. That socket doesn't have FREEBIND set, so a nonlocal source
+> address would fail with -EADDRNOTAVAIL.
+>
+> The QUIC socket accepts IP_FREEBIND through
+> quic_common_setsockopt()->ip_setsockopt(). quic_get_user_addr() in the
+> next patchset is described as honouring FREEBIND. Could bind validation
+> then accept the address, only for
+> quic_path_bind()->quic_udp_sock_create() to reject it?
+>
+> It looks like only the netns-wide ip_nonlocal_bind sysctl would make a
+> nonlocal bind work here.
+>
+False.
+
+quic_get_user_addr() will be called to handle IP_FREEBIND for user
+addresses in quic_bind/quic_connect/quic_sock_connection_migrate
+in the next patchset.
 
 Thanks.
+
+> > +     if (err) {
+> > +             pr_debug("%s: failed to create udp sock\n", __func__);
+> > +             kfree(us);
+> > +             return ERR_PTR(err);
+> > +     }
+>
+> [ ... ]
+>
+> --
+> Sashiko AI review =C2=B7 https://netdev-ai.bots.linux.dev/sashiko/#/patch=
+set/cover.1792164438.git.lucien.xin%40gmail.com
