@@ -1,54 +1,62 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.70
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792469176;
-	b=Xc5lwfoIyvDKVr+FNgrOs6MLSWNCxQ601WT88ifQ3jDayyJBSEfNi42lUdQcm/zWu63c
-	 FLB770cQmpKYrRBsw67zE9QLpVDDbtGfF1XyOtryljy/qpsXESq8PCiiJUBbxovtvmjtN
-	 QMabR1WZ/EJJjPr7Xtt2UV+0Kwn4Sz7NXX9VKFtBPkm/qpwpMtcfoU7ufSVlvARPi12lX
-	 kEzCwxV7fDpjQUETgdHjgOUk9l9BO1aRHYw1QcBPjO3pVZPFtV2oMaxuq2Q6gJIuSmPZs
-	 CDjEkIQyjPQ4NKiE34t21pvJ5P0J1N8vSYcVjsYbGUKmHbxeQhx5rjOpQu7buRKd20Q==
+	t=1792469180;
+	b=sHJI08ZR0BPoeMMt6NmEXZUa5sJjDZmEIvcn0I+c7cPHN+J0TVTIjNLFraZS1u2YmKLV
+	 Pq+BQOeG0zSsh17xE8oZhTqduREe2Dn/ZB0ma8GLmr89nKz5rW1JdqL5Vu283GrLEGHZ0
+	 Cesk96EBbqQ9eqJAZc98qERUotnlF/7Vt7ERyi8Xsgifixn4YenkTqYLsysIK+ek2f329
+	 JIkCdF4ub1WfqHlRc376TYrdkK5dyVpzmsjcoR43TCr9Jzxse8rQ7WD/kzKYjq6fdO6kj
+	 nGiY+e3vqu7tBDnXqJMBe8H7yULsAYlcvRfDQ/bTnIdTpH5Op+WQYoFZspiKZoAwzzg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792469176;
-	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:MIME-Version:X-Received:Date:In-Reply-To:
-	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:Message-ID:
-	 Subject:From:To:Cc:Content-Type;
-	bh=X94iF6WQ9utJc+Qff8l5eUqC4oEFwLu3u0KuYxIiRHM=;
-	b=zk2pESMmrFDnknXmmrlvKm/mijQveBEf2UtjRfEz0q9IgAzxuGp3/o57ryInX6bS7ivW
-	 oa4HRfbJ/czWw/r0dZdpBGusM41lL4hWhjVa7qSIAycJzuTdqW4Y31Jm06kNMJUgWC9gG
-	 M6pdbUr1dizFmlg3htUmxHqxRkT3NNuUe3LdFP+0gJtwLlChGqjbPeXvjLWO8tRZey87o
-	 PtAV9XyoQ3y+n7pHTURyrS0RQCxuvEFykhDGIiw5qGI09sqWRQFiiiEJYqxIVngYP3x6S
-	 3eZCM4EZ2rtQufgkf4BBFePDMUYyC962oRW7vMvzQUnGGPjYY1V0s264P4Y5wg8pzbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792469180;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Subject:
+	 In-Reply-To:References:Date:MIME-Version:Content-Type;
+	bh=SlOD94vw3nOguvDcfYjJPVgYa5a7mmw0vwci1C2QK9o=;
+	b=QRme+W34P79LYnOoJhrXdSm8NIl9+2MQGqRHHmMjXrcZUwqLdmCOQk9RQ/40IfAZsHwH
+	 hd5wAD8CQZgHf8Y2LHEB7wMfoTwXB0+7br4vOX3RqvIERlYk0wTQ0LByLLRkYEVXNLsYI
+	 281+YG8AZ11MNT29fzCwlOMkAGkdePsHGxQz+apCK15WGsrUzNOm3Q7IoijkWA00TODPH
+	 HE42KFzWvJe6GYeI/H3kjs5o90JJbabGcOIzZi69ed8JEGFEFbScvbtE7gMRymV55KnvA
+	 kt7yfm0HfHGBKLxPS8wYRXPWiFiolUWiXyoLoc0TzpyJ3Z3Ls3VO7NgAbmm/1pxJhyA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=fail header.from=syzkaller.appspotmail.com;
-	spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com;
-	arc=none smtp.remote-ip=209.85.210.70
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=CAN530zE;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA82B606A31A
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 04:06:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EA82B606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-81447a16061so6479441a34.3
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 21:06:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792469175; x=1793073975;
-        h=content-type:cc:to:from:subject:message-id:in-reply-to:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=X94iF6WQ9utJc+Qff8l5eUqC4oEFwLu3u0KuYxIiRHM=;
-        b=gRELs2yV1/Nv+wm2obpM4c1aoapjK/bY7U00OP8oa4vJ6IF+RgU1cp+C0AcL8/STy5
-         J7/Uvgf0s8POTtlWjkDvM5fhHG90c1q04GTb9ieWVXoD8fNk5uk3LfU951qUr4PijxUh
-         crIdIuUN3uiztHLj4JeMSlPYoCYxwsz38o19TXEi/8wjxO7UoFLz+jAjxr7f3ccsHIrH
-         iIAvCcW84IXYw2GxzPPM9uLqGMXGYdFh4hVN+ljlvaA+vgOx390+WIYT/l0C8jpRs769
-         ORxLknSFIRkWLt3KIfuBYuSRLoKMLyIkMhq05tvvJuqxeFsRYhGK/wblrwWfRg+76re0
-         tEMA==
-X-Forwarded-Encrypted: i=1; AKwUvBxsPxj+xxkZteDBn2pqUIszCEJjCCHDke4O7g9JliEDbZ40wlWZBlKmkG5K4TwuFX+aVAUqwMh3hV3Q@vger.kernel.org
-X-Gm-Message-State: AFq9FYIOi2yrEVwgM667kKIRbpe+T47ESZZ5Ga1SUhosGHAcGLtb2liy
-	tkn+XOONLlePFDyVQZOZB1MOtMUZFO8AxoUVJhZCT/sgZUuAwNq/HptGwWTeB3Wr3/krDMjbK1r
-	svijKlsWjGScrCXpdceLNB5M2IAVVZ6XA1MqnDWO+AgHUbU0ZDae5wywiCWM=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D97606A31E;
+	Tue, 20 Oct 2026 04:06:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09D97606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=CAN530zE
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:To:From:Message-ID:Sender:Cc:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=SlOD94vw3nOguvDcfYjJPVgYa5a7mmw0vwci1C2QK9o=; b=CAN530zE09lhCPEh0rcTUl+pxN
+	GvyJwxeYjEmFNgBSkj1QrB1ztFkRGpTwDdyw4781owZq+Zc9qFLVxIFd9PRNMa98GJP076sNaIeg/
+	aRUDgQcNX4Xsuv2r3tuD/X1RyvceFLd2eW42gBacslkapRkPuijp7S+h/E9op4UqtmAN6TXD7R+t6
+	NZbPmFhdThSvOqxqqn2OLd3/k4a2B0chbyQIsIb1nwqqGYec21tZwHPpIF+dij8mxGOv01CBVJ67O
+	oG4+guZYN3nPQnD91RNixOL6trNg4fVKLpWfc6fWfyiiY8H8UCr1M0At3FSvJn7DD4/HTZcnjsxz5
+	kiRM6sfQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.99.5)
+	id 1xJ171-000000042Et-3NqD;
+	Tue, 20 Oct 2026 01:06:07 -0300
+Message-ID: <8bb0534e33a5f5d152d2b1768d1fd7c6@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: syzbot <syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com>,
+ bharathsm@microsoft.com, linkinjeon@kernel.org,
+ linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ronniesahlberg@gmail.com, samba-technical@lists.samba.org,
+ sprasad@microsoft.com, syzkaller-bugs@googlegroups.com, tom@talpey.com
+Subject: Re: [syzbot] [cifs?] KASAN: slab-use-after-free Read in
+ cifs_crypto_secmech_release
+In-Reply-To: <6ad6be63.a20cb897.960b0.0079.GAE@google.com>
+References: <6ad6be63.a20cb897.960b0.0079.GAE@google.com>
+Date: Tue, 20 Oct 2026 01:06:07 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,24 +66,6 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1707:b0:4c4:5f5b:6918 with SMTP id
- 5614622812f47-53cd1cbc0edmr7852445b6e.16.1792469174897; Mon, 19 Oct 2026
- 21:06:14 -0700 (PDT)
-Date: Mon, 19 Oct 2026 21:06:14 -0700
-In-Reply-To: <8bb0534e33a5f5d152d2b1768d1fd7c6@manguebit.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6ad6e8b6.f84f00d0.6bdd.0010.GAE@google.com>
-Subject: Re: [syzbot] [cifs?] KASAN: slab-use-after-free Read in cifs_crypto_secmech_release
-From: syzbot <syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com>
-To: pc@manguebit.org
-Cc: bharathsm@microsoft.com, linkinjeon@kernel.org, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, pc@manguebit.org, ronniesahlberg@gmail.com, 
-	samba-technical@lists.samba.org, sprasad@microsoft.com, 
-	syzkaller-bugs@googlegroups.com, tom@talpey.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-> #syz test: git://git.manguebit.org/linux.git cifs-fixes
-
-This crash does not have a reproducer. I cannot test it.
-
+#syz test: git://git.manguebit.org/linux.git cifs-fixes
