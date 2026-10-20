@@ -1,101 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.169
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792530193;
-	b=EZfbQzXCAOxsXhlqaGqjfY2oWx9WfYsJIfibG4nMJeECDv+Zf5FnKHvhA7dxxkIHuo4e
-	 yrclrw3McPFVV8a4XiZFCw3z7o7ESgg4z7KtoHiHQrZ3sG2i0nBM7i0ZiB5prVVeeFE2s
-	 Jpf5AcdtxghT/Q99ecXzBNT6dYHmassSgDXKha3ah5Woq59TS2zzv0RqVfmPtTzsU+eJy
-	 mjuRPksTOEs/QYr+aPhBkEAk7CDguc7LuLdemDjmjyWJO7QMlobHUnt7PrHXWxBrFZgET
-	 PVMVJkJWbMoNAgZIh3TInudacikzKDoP+RLVG4It5iVZZ8nIb/m6csHKN++RwJqPD2w==
+	t=1792530642;
+	b=EAsSE9rrO8z6jU5/ntpm58W82LUIfPM6pO3rXXboclhNwo9PyiQcNtbOMAevr9zn1qh0
+	 0rfXe5cRsK2cT01NeAVwLsTCrAgBOnKyrHtSqAaDw/ihExn65HfxSkkTa3k9tt9G0YrNs
+	 dGI0lHtxdY77rrMqwI1lndlWOHIe8+vFv55esU6Vj6DAGK8gwZ6qDhzL6gNIZqiWyK/9L
+	 3OqU46Ej6s3PRqbcqNzA2J1CMuTYWzmdywGFBClZftvYDDTt54XOMilZmb9SL0EnWf95l
+	 rj84iLJBdzOhBc6/xJTq76e/JnLLrsVDiMmj6Sa2KYGViBD74cAgrvuqk/kkM5e4Nuw==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792530193;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792530642;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=P+M7CfskTRpfCCmHZHh6Qk0GgoGpx6QjJDA8d2t+rA0=;
-	b=DEuQoV6wyN78J4L9/wjBedGP6+eO9soIA1+RZbNiLzhLOgbpO0yiZFwYE1C1XSeUirp1
-	 kphGCGmnjxc6eX+4o01f+dp+STFl86QTveBHtw6WUQ2sHY56dgnHWMDnN9ily9xGA4z6Q
-	 pa7AYB45dIbEnMeYUQlVE9nVXzykrYdgd21Hb2Yjd9T5Wt5SEtllOUjNm6qCJIXO9oBya
-	 cLRwIanJvMir9dLLMM09yFCpr5BBTs2Hfk6mrNRUORyw0BZuhjnD1ENXogJqEDo8yruI1
-	 yTsm/MK3N89JAe4kduTfGqquBI7/fu3d65JzguqBMUEhBQXmfdTRstJK0gLQHySTOQQ==
+	bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
+	b=PB4XWNiEE2I6QxV0eEBE8SQ/ZgcEmO7edEFCrv7MEvhTtnLsQFYlNIUYPesSrLNW9u6G
+	 nRVGX1K3y8ux9XNicMZt4gtXGIZyQWsnfp1P08rvFFiCKdh9SCJnYwq7lj30wJ6j7pF30
+	 fzMrDi+/DEAH8q3gDPsqE2ljI2Syk7qQNkMxVJxoBPw00c2kJrSbTwROo+OrrnosWRixx
+	 XH/IOJA8Rm6q5iy4ejE2vDvhiooJgT9ND6n+KEHfWm8dfFWE/dnNY5530oGMI0rH2BYT3
+	 gulUIMc8hnbx/8FzgOZnRCflv/wfnETwB+6L5WjqBTnnOwh9OFeL0SCIYKpKLSUU0Yw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=tJN6tuJI;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.177
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=VAlefrrF;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.169
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71AB606A31C
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 21:03:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D71AB606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CCE606A31E
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 21:10:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 97CCE606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=tJN6tuJI
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-8a06c60065fso33564b3a.1
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 14:03:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792530192; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=VAlefrrF
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-5ead9f60e26so932868e0c.1
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 14:10:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792530640; cv=none;
         d=google.com; s=arc-20260327;
-        b=onAlfsc+Q47CKcPf+menPNwR4JnUcTJ1G3+lLtYgJwz+fP4JmsvSk6RMy9VZMlbxdo
-         fujuawkk5IK/2h12YuOm6B27lZxFLsHtAwMEx44W9o5HuaEDEeDjDqfmdgaI5SP4ZeKN
-         d/dIdJgMHobgk0Tg4d7Y3gAtpTBXVPoLg6Yn4k5fcnPf6uIdYbyTPk0BPQL5T3UJvdGv
-         XhcJTdZSloPvfzct4oOWFl2Vkn5XASf8gtHZhOQ5QVc+o9Qivb3d2Zk0MHvblnRbvxI6
-         xftVzQSJwYH40QMl2it2ep9KbLgkDsKdOrdGks0tAjQfxvdU6Vd0+XJEJDkA479qlmPM
-         SUYg==
+        b=ch+jgHkzEeCImFD8CAEDOmgqOLM8xtnpiR96BFh4QpLF++EJ1C8o014kH0xOyak0F2
+         WZoGYU+MPt9B3dLI51W4RNtz8P6kNBga/d5tddLcPRWlZuX3aazrn9x7k0BnFJedj89k
+         u+pRxmNnpxys2i5wwjOJ67CxsmCGXrRKHuvo6EOCaD74NJmmmMJmCF5qIiUDfhpFGMH2
+         iq7wMb5tLYJKQRPdYI3bUTNCa7mVZZrmcFHO1HVBGAmhDZXLD/JX32jX9TcTaVlRCy3w
+         sglN/0cJJK3FPyqLfUwrTw8/A6om7dJ0l73pniftgCFgFo+tO5knEQxZ7GO9eMxMKM6D
+         pXUw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=P+M7CfskTRpfCCmHZHh6Qk0GgoGpx6QjJDA8d2t+rA0=;
-        fh=bKlVAZIQcIIbUE3UwZ81CAxaOdSdVuB1CfUOyNU3LM8=;
-        b=XAEt6Tw6WM2EMrYih1QcBL/Lk/KxrjD9PqlOFV4v8swTer/aQiiDPf3tncPuWnZNMj
-         88wfl6KeiROyxPHAfNYp81nzwvcZDuE+/lZwgQtVjOTEjzSBRHwrr7pgBTTgX40T3gBz
-         GcnCtkUCrxPo7PAEPDBt24E59GImtf9sXCvfasW6K12Wc+JWYg6hCCp/fV1M2AbJUkn4
-         /BOwyvfx/3HIX1Zd6NaXmsaAZH+9yx/CZ/cGkPPjOcrJH+A4d4ivV4b92k9a3hT3isL3
-         mWzs/lCu3aKD4S65wjhtKxpJ/9g/4mKsSAeLrpdnIKC42dGlKUrkiP3meUegdIqRZ8Dn
-         THPQ==;
+        bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
+        fh=WFe13rPjIlJ9uZYEgvg8GmgQAOemYcoQxqY67TJBIOI=;
+        b=cnnbSnpM6EDawJur2UEeLHCEDxHzbo6hUPHYfQPj3REJA5hkpboICxB7bGMmNIdltC
+         CRiCqam/WQ+23rlibGL2pgsm72e+U1Jv1dhMs+5JNrGisuAogNrXSmf4ieT/g62bvPkW
+         kQv2AMb5/o1+kg0tK7AXu1rSS1iIpS8+zdim+qOE5kZi173UB3G7PKA75BVHHSXVH5XU
+         Q65/Z/80oo8fWR95bhoeHIU4A+FFwSphj2xB/9knEVPh1bTfyGeFAi5hkrmG+SKgAK85
+         k9qhkqtyQUElFXV/GQXJK+Xb3iQqFZX2CPJdn3Ftddvjk1Uuxjz+kZr9SB3M/kmIZn+i
+         gPOA==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792530192; x=1793134992; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792530640; x=1793135440; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=P+M7CfskTRpfCCmHZHh6Qk0GgoGpx6QjJDA8d2t+rA0=;
-        b=tJN6tuJI07puS/lEC0QBVbdXUfg40buwpv40xL8F1KCvDSaFk736Pm3ShYaaE4c1TD
-         7kmos+zWVkhTUdgBjb63aaXL38p8bvDwNQoGESQfaxb8sfzag1B5JWHEIhaDLNObXVdo
-         UTQ53XoB2XNHbnFq9xSJ3jKIQwX/dUvRLyiu570EvEFKETIn/HZGeI8d5mmaT8BQII6h
-         k4oBiDcRRLJUgCQdipIjBTfOvy5PB4X4XxaB0cZZXpao5LpOXbmJL7OXe4SUmut3itMy
-         47+bWftnySVLbdFON2iEYecVKyPcGZ8ck5s3aAUFibFTm0Jw7Ns22gmSvnB4vqCCFkGa
-         7HgA==
+        bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
+        b=VAlefrrFGpsB10R/HV2ZE8WP35YOUkmlIE4u3r/K38kdKpGrP0RwLQ+dPgC8MofmVf
+         JHODPfUJ2VM1pTEZFlEQKEGrj3tq9bwGzUmyjp9mI6BeQ92VJ0IeZrgUF8i8rek/yzXt
+         V4/B4W+v7jVl5naD5G5wlkvZtDmpqeC1XeAFSf4nO12XqmWA3j8L5Ba6LDoLHpMpQETG
+         FbxWGSe2Sofgb5bYSNxex8qPDxXjFnNQKBNuPA1eppLmFukM7FiyRVQ/z/D5HtoX+Mr+
+         LPaC7kHOoaXQEZT2SO1Nai2Lz8t6lyAXsxLWkZMYBC3YTGsr+8E0kAO4/VXSVuvTJBRn
+         JH+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792530192; x=1793134992;
+        d=1e100.net; s=20260707; t=1792530640; x=1793135440;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=P+M7CfskTRpfCCmHZHh6Qk0GgoGpx6QjJDA8d2t+rA0=;
-        b=ZjypDMAj4ivi0XbauUTJcgtITyzVDga+z0NYZ7FxT2HO/iR5xZqUjVZtUub+ccVZ6p
-         twW3nZA+Dx5+vcoxDUIbg6tOiOPfAuBHGiSjJtB51OdpC78Aw6C10jkSUTsrPC//gymS
-         5m13azQFRpu3kLQsVV72b43Ie7+XBD3GAfHMNFz2TC22Hix7CMn56cpa1K/LCTJ4+OLg
-         BgGf71HdxftBmqZwvCmCw1aNzsblB4Z6D7GNn7/YYWTnQzwiKBMGt3spLcHPCECSCPqO
-         EWxTD9mtLV2u8lUmwRUXIygS1JDm6zbOZAyHmfFXcyyXct+0ad7UmWw5qkZueA0gysyH
-         RRZQ==
-X-Forwarded-Encrypted: i=1; AKwUvBwYwpZU4HbeSZq2AbdO0zwHUAQbYARrMDb9YFZKbJcgSJArngG51lNsgi1GxkghPNOK9JC0l2DWTUua@vger.kernel.org
-X-Gm-Message-State: AFq9FYJs2jDNk4p9k6rkp74J+ZLiKaxnaJKcEpOrgtN0UCeD5gG+0dnO
-	4G43d/4oD4Tg1riwH5837msFW65v2adt61jpHTvPbAI1V1BigzyXQtiN/IVAp8ZxRJoa9PbOGEr
-	Afz/FUBK5AIcLsTySYDNXK8AgPOgcZwo=
-X-Gm-Gg: AYBFou2mAfVUxjVj25/5h1H7fD3/NJ4gsRXwH6e+CkKGrhu1BqXs3vHA3+8eRUQPLU3
-	rOAgpVi35QxMq5jS4GtuGHyfWCU1TuCO56CObqdAy9ClwK3odb+g9+LEhBC5wuzLB06KWkx9AKK
-	ySMaKMPoqIYf9pAxo24Tgm2JGMXQ/4YNXUO9f3lvuuSL2Nl1/7uZ3Hq8xoVou7/T9iJcEKl9J4p
-	Rsf0th/KwHkBi1IjpxmFT4d8eWh6TBtXTbfuyK3SfA5NMv098s6z78QSH4CxBJP1+M+rt048hRt
-	zb3EzovquuMuLItKRFMZ7Ozjwa0/Y35lfUL8P8RwtTjS5u0dcjbNNR4LYg0AZMGasqGP8KwJKOZ
-	zF5tuWFqy1AtjnF95QSfCaMsqoRPAKDF84nobvCyT2auKx0BXeB9e6NCg4JjOXfQ2Hya/LlvEhW
-	x5uAuD7dAu3Q7d
-X-Received: by 2002:a05:6a00:2da9:b0:8a0:8848:8c6c with SMTP id
- d2e1a72fcca58-8a089ce8f78mr109412b3a.12.1792530191760; Tue, 20 Oct 2026
- 14:03:11 -0700 (PDT)
+        bh=IjpJhJj3XPvV3nh0FGBKO62yC++yDA1DsEy0orMi22E=;
+        b=yiVmy0xT1FcEpCAMyMFJXLpEI5kIUCxRdq4HdujN/AmvZlvJ5wWcnvdaA8alOWksUv
+         Fp7gSab5ahBBowuQoLeZcoYTyd1ebqNFg+zBfZA48gtv8MZUWd2UbQDvdJO8QKPLP6u9
+         K9aVEVGzA6rdBTQbFfE7pXnABNtvWBL/Q0Qm/VyVTHApy7TtyGe9EiudfjRKd8oyxrTh
+         T0hkDtYFBPfK8dJ96FxnEe+jUw/I/VyEUVOYfuwnsxSdZJpZ+LrR2L5mF4AhEW4EruQh
+         4ajL2htSrzFnkrluI532RiMLwco5aDizmK+4OOlX1eWhN51EUByGAZxoZu6BRoJQa8Ce
+         mhqQ==
+X-Forwarded-Encrypted: i=1; AKwUvBz1viPfbyHxt6muTuK3nMGx3k1X+W8vVqlmLxK+9I0KAZ+SEYr56N6LDFlWtIJ8h8sy3oYw8rpsKVhJ@vger.kernel.org
+X-Gm-Message-State: AFq9FYIN45XCjlDqf/WpQZ1VCT9bgknZ3NJA3ogrn2yjAgtlQyhrXz99
+	6KWGH7TX2WNq8HeRkVGzstrriCoIt1asyNw+zK8NiV0PnQ6duwgZUVt2yWBWY4zipU+Da8QpjCC
+	AiCBIV38GZOG0FmnrAzKXoLVC/lzRlAM=
+X-Gm-Gg: AYBFou19aRoCgvsoz4p9dpe7U2Ge9WqOAwiKnauQLRuHEB0eN0D3L633PWSZWWsrGLQ
+	54kmAtZ6js+b3RNrPfF8RxQT/Za3K6uGMbFFrI0b9bMw/nuOqXqKuNsRPjEJDQwESA21oM0GwHx
+	LbkfwjQ2qJLW3N9qcY7TXbMqS2zuKcexdwUKE3y15pyiWl94X2Ca9aLpdRHLFPFHmfH6qbI8TPj
+	4sAkksW/8a9RzwuIZhMb1DlfRLqa/Gc4EKj93nbw3b7uRY30wUdPibXtfzYJCfI8K2jAnD3pikZ
+	71ogCwVM7cSgGlefuPJjJvQx23D36Qty728/hoMe9nbEsHRSDMnvhj+86YtT7zvpzAPz6HgCXV/
+	e96wY0SM9ATkE76k5Ih/XFdlrDpFjLTZuvjbsqvQDCMtsbR+hjS/xBgTEGYxbF/F+nU3BFgwz3p
+	NlemrFvBQDWFAX
+X-Received: by 2002:a05:6122:8b0a:b0:5ea:aedd:6077 with SMTP id
+ 71dfb90a1353d-5eaebdb8b25mr11924e0c.5.1792530640358; Tue, 20 Oct 2026
+ 14:10:40 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,14 +105,15 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <47ec29f97f3986e6b9cb5b07f109dcae340916e6.1792164438.git.lucien.xin@gmail.com>
- <179244541026.3135.1595523596507400028@kernel.org>
-In-Reply-To: <179244541026.3135.1595523596507400028@kernel.org>
+References: <89a17e38fca0c84eb23ccde147942e44034ce05b.1792164438.git.lucien.xin@gmail.com>
+ <179244539028.3135.8632269420764172979@kernel.org>
+In-Reply-To: <179244539028.3135.8632269420764172979@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 20 Oct 2026 17:02:58 -0400
-X-Gm-Features: AclHuK8v95g8ztNuG9E9AbrqjvVlozrNsBMaZdXl4ZuQOU1-dXrL-PgzpONNaKU
-Message-ID: <CADvbK_eiVcp=00D=2D5WToq+1P-U2n8FenQMqqTPbgS_3goDPw@mail.gmail.com>
-Subject: Re: [PATCH net-next v17 15/15] quic: add packet parser base
+Date: Tue, 20 Oct 2026 17:10:27 -0400
+X-Gm-Features: AclHuK90ubiZ_3Vt7ioV-VUXcLL_AkSfJ2ivx6yoB89OB2lkvKl3ARidx8adw2s
+Message-ID: <CADvbK_fNMJxJq8QFiFLtAE1op_bAGYU7bMi8qZ58Ai-aGGP7KQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v17 04/15] quic: provide family ops for address
+ and protocol
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -128,13 +129,13 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 19, 2026 at 5:30=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
+On Mon, Oct 19, 2026 at 5:29=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
 te:
 >
-> Thank you for your contribution! Sashiko AI review found 6 potential
+> Thank you for your contribution! Sashiko AI review found 3 potential
 > issue(s) to consider.
 >
-> Critical: 0 =C2=B7 High: 1 =C2=B7 Medium: 1 =C2=B7 Low: 4
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 2
 >
 > If you believe none of the issues are legitimate, please reply to each
 > issue of Medium severity or higher and explain why the AI is wrong.
@@ -144,320 +145,178 @@ k
 y
 > (one such reply per series is enough).
 >
-> - [High] When PLPMTUD is disabled, ICMP Packet Too Big messages never
->   lower the MSS.
-> - [Medium] quic_accept_sock_exists() (net/quic/socket.c) passes an skb to
->   an accept socket's sk_backlog_rcv() while atomic: local_bh_disable()=E2=
-=80=A6
-> - [Low] quic_packet_get_connid() rejects any connection ID longer than
->   QUIC_CONN_ID_MAX_LEN (20) regardless of version.
-> - [Low] quic_request_sock_backlog_tail() calls __sk_rmem_schedule(sk,
->   len) before skb_set_owner_r().
-> - [Low] quic_packet_deferred_work() drains deferred_list while holding
->   lock_sock(sk) and never calls cond_resched(): `while ((skb =3D=E2=80=A6
-> - [Low] quic_packet_get_alpn() prints the u32 field alpn->len (struct
->   quic_data in net/quic/common.h) with %d: `pr_debug("%s: alpn_len:=E2=80=
-=A6
+> - [Medium] quic_common_setsockopt() (net/quic/family.c:416) passes every
+>   SOL_IP/SOL_IPV6 option to the core IP stack without filtering.
+> - [Low] The commit message describes the patch as only adding
+>   family.{c,h} helpers (routing, transmit, address parsing and=E2=80=A6
+> - [Low] When routing picks a link-local source for a wildcard sa,
+>   quic_v6_flow_route() (net/quic/family.c:131) sets=E2=80=A6
 >
 > --
 >
-> quic: add packet parser base
+> quic: provide family ops for address and protocol
 >
-> This patch adds the QUIC receive path. Sockets are looked up by
-> connection ID and address, and packets are dispatched by socket state.
-> Listen sockets handle client Initial packets (request sockets, ALPN
-> demux, deferred work), and ICMP Packet Too Big errors update the path
-> MTU.
+> This patch adds net/quic/family.{c,h} with IPv4/IPv6 helpers for routing,
+> UDP tunnel transmit, address parsing and comparison, and UDP socket confi=
+g
+> setup. It also connects quic_inet_getname() to quic_get_sk_addr(), and se=
+nds
+> setsockopt/getsockopt calls for any level other than SOL_QUIC to the
+> IP/IPv6 handlers.
 >
-> > diff --git a/net/quic/packet.c b/net/quic/packet.c
-> > index 56d2b8df292a0..a2f836cc22d70 100644
-> > --- a/net/quic/packet.c
-> > +++ b/net/quic/packet.c
-> > @@ -14,6 +14,801 @@
->
-> [ ... ]
->
-> > +/* Extracts a QUIC Connection ID from a buffer in the long header pack=
-et. */
-> > +static int quic_packet_get_connid(struct quic_conn_id *connid, u8 **pp=
-,
-> > +                               u32 *plen)
-> > +{
-> > +     u64 len;
-> > +
-> > +     if (!quic_get_int(pp, plen, &len, 1) ||
-> > +         len > *plen || len > QUIC_CONN_ID_MAX_LEN)
-> > +             return -EINVAL;
+> > Introduce QUIC address and protocol family operations to handle IPv4/IP=
+v6
+> > specifics consistently. The new family.{c,h} provide helpers for routin=
+g,
+> > skb transmit handling, address parsing and comparison and UDP socket co=
+nfig
+> > initializing etc.
 >
 > [Severity: Low]
-> Should the 20-byte connection ID limit be applied before we know the
-> version is supported?
+> This isn't a bug, but the commit message only talks about new helpers. Th=
+e
+> patch also changes three socket entry points that userspace can see.
 >
-> quic_packet_get_long_header() is called from quic_packet_get_sock() and
-> from quic_packet_listen_process(). Both calls happen before the
-> !quic_packet_compatible_versions(version) branch that sends Version
-> Negotiation.
+> quic_inet_getname() in net/quic/protocol.c used to return -EOPNOTSUPP. It
+> now calls quic_get_sk_addr(), so getsockname() and getpeername() return
+> real addresses. IPv4-mapped results on AF_INET6 sockets are also rewritte=
+n
+> to sockaddr_in.
 >
-> So a long-header packet with an unknown version and a CID longer than
-> 20 bytes is dropped as an invalid header, and no Version Negotiation is
-> sent.
+> quic_setsockopt() and quic_getsockopt() in net/quic/socket.c now pass eve=
+ry
+> level other than SOL_QUIC to ip_setsockopt()/ipv6_setsockopt() and
+> ip_getsockopt()/ipv6_getsockopt(). That makes the full SOL_IP and SOL_IPV=
+6
+> option sets reachable on QUIC sockets.
 >
-> RFC 9000 section 17.2 limits CIDs to 20 bytes only for version 1.
-> Sections 5.2.2 and 6.1 say a server SHOULD be able to read longer CIDs
-> from other versions so that it can send Version Negotiation.
+> The errno for unknown levels changes as well. setsockopt() now returns
+> -ENOPROTOOPT. getsockopt() returns -EOPNOTSUPP from do_ip_getsockopt() on
+> IPv4 sockets and -ENOPROTOOPT from ipv6_getsockopt() on IPv6 sockets.
+>
+> Could the commit message mention these changes?
+>
+> > diff --git a/net/quic/family.c b/net/quic/family.c
+> > new file mode 100644
+> > index 0000000000000..dc41a0ae07086
+> > --- /dev/null
+> > +++ b/net/quic/family.c
+> > @@ -0,0 +1,441 @@
 >
 > [ ... ]
 >
-> > +/* Process PMTU reduction event on a QUIC socket. */
-> > +void quic_packet_rcv_err_pmtu(struct sock *sk)
+> > +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da,
+> > +                           union quic_addr *sa, struct flowi *fl)
 > > +{
 >
 > [ ... ]
 >
-> > +     info =3D clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX=
-_PMTU);
-> > +     /* If PLPMTUD is not enabled, update MSS using route and ICMP inf=
-o. */
-> > +     if (!paths->plpmtud_interval) {
-> > +             if (quic_packet_route(sk))
-> > +                     return;
-> > +
-> > +             dst =3D __sk_dst_get(sk);
-> > +             if (dst) {
-> > +                     dst->ops->update_pmtu(dst, sk, NULL, info, true);
-> > +                     /* Re-read actual MTU after update_pmtu, which ma=
-y have
-> > +                      * rejected the increase. Only use values accepte=
-d by
-> > +                      * route layer to prevent spoofed ICMP from raisi=
-ng MSS.
-> > +                      */
-> > +                     info =3D clamp(dst_mtu(dst), QUIC_PATH_MIN_PMTU,
-> > +                                  QUIC_PATH_MAX_PMTU);
-> > +             }
-> > +             quic_packet_mss_update(sk, info - packet->hlen);
->
-> [Severity: High]
-> Does this ever lower the MSS when PLPMTUD is disabled?
->
-> With skb =3D=3D NULL, ip_rt_update_pmtu() builds its flow key through
-> ip_rt_build_flow_key()->build_sk_flow_key(), which takes the
-> destination from the socket:
->
-> net/ipv4/route.c:build_sk_flow_key() {
->     ...
->         __be32 daddr =3D inet->inet_daddr;
->     ...
-> }
->
-> When there is no packet header, __ip6_rt_update_pmtu() does the same
-> with sk->sk_v6_daddr.
->
-> Nothing in net/quic sets inet_daddr or sk_v6_daddr, and ip6_dst_store()
-> is called with daddr_set false. The exception would then be created for
-> 0.0.0.0 or :: instead of the peer.
-False.
-
-inet_daddr/sk_v6_daddr is always set whenever the dadd is updated/set
-in the quic sk.
-
->
-> Even with the right key there is a second problem. When
-> update_or_create_fnhe() creates a new exception, it only marks the
-> cached routes obsolete:
->
->         WRITE_ONCE(rt->dst.obsolete, DST_OBSOLETE_KILL);
->
-> It does not change their MTU. The IPv6 path inserts a new RTF_CACHE
-> route and leaves the old dst unchanged.
->
-> So re-reading dst_mtu(dst) on the same cached dst would return the old
-> MTU, and quic_packet_mss_update() keeps the old MSS.
->
-> If that's right, the v17 change to re-read the MTU after update_pmtu()
-> makes the ICMP-driven reduction a no-op. plpmtud_interval is 0 by
-> default, so a path whose PMTU is below the local MTU could stall:
-> full-size DF packets are dropped and the PTBs are ignored.
->
-> For comparison, SCTP temporarily sets the socket daddr around
-> update_pmtu() (to_sk_daddr()), and inet_csk_update_pmtu() re-checks the
-> dst with __sk_dst_check() afterwards. Is something similar needed here?
-True.
-
-I will change to just call __sk_dst_reset() after .update_pmtu() and later
-quic_packet_mss_update() will be called to update mss whenever
-quic_packet_route() is called.
-
-Thanks.
-
+> > +     fl6->flowi6_proto =3D IPPROTO_UDP;
+> > +     fl6->flowi6_oif =3D quic_get_dev_if(sk, da);
 >
 > [ ... ]
 >
-> > +     pr_debug("%s: alpn_len: %d\n", __func__, alpn->len);
->
-> [Severity: Low]
-> This isn't a bug, but alpn->len is a u32 in struct quic_data, so %u
-> would match it. The v16 changelog made the same fix in quic_packet_rcv().
->
-> [ ... ]
->
-> > +/* Work function to process packets in the deferred list. */
-> > +static void quic_packet_deferred_work(struct work_struct *work)
-> > +{
-> > +     struct quic_sock *qs =3D container_of(work, struct quic_sock, wor=
-k);
-> > +     struct sock *sk =3D &qs->inet.sk;
-> > +     struct sk_buff_head *head;
-> > +     struct sk_buff *skb;
+> > +     dst =3D ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
+> > +     if (IS_ERR(dst))
+> > +             return PTR_ERR(dst);
 > > +
-> > +     lock_sock(sk);
-> > +     head =3D &quic_packet(sk)->deferred_list;
-> > +     while ((skb =3D __skb_dequeue(head)) !=3D NULL)
-> > +             quic_packet_process(sk, skb, GFP_KERNEL);
+> > +     if (quic_v6_is_any_addr(sa)) {
+> > +             sa->v6.sin6_family =3D AF_INET6;
+> > +             sa->v6.sin6_addr =3D fl6->saddr;
+> > +             if ((ipv6_addr_type(&fl6->saddr) & IPV6_ADDR_LINKLOCAL))
+> > +                     sa->v6.sin6_scope_id =3D fl6->flowi6_oif;
 >
 > [Severity: Low]
-> Was the cond_resched() from the v12 changelog lost in the v15 rework?
-> The v12 entry reads:
+> Is fl6->flowi6_oif the right value to store as the scope id here?
 >
->   "Call cond_resched() in the loop inside quic_packet_backlog_work()."
+> It holds the oif requested before the lookup, which is
+> quic_get_dev_if(sk, da). The ip6_dst_lookup_flow()->ip6_dst_lookup_tail()
+> path doesn't appear to write the chosen egress device back into it.
 >
-> Each iteration here can run synchronous AEAD decryption (cb->sync =3D 1),
-> GFP_KERNEL allocations and token verification, all under lock_sock().
+> On the fib6 rules path, l3mdev_update_flow() can also clear it when the o=
+if
+> is an L3 master:
 >
-> On the quic_listen_sock_switch() path, the listener lock is dropped and
-> re-taken in the middle of this loop. Under sustained traffic, packets
-> processed from the socket backlog in that window can keep adding to
-> deferred_list, so the loop keeps running.
+>         if (netif_is_l3_master(dev))
+>                 fl->flowi_oif =3D 0;
 >
-> > +     release_sock(sk);
-> > +     sock_put(sk);
+> The IPv4 side is different. ip_route_output_flow() sets
+> flp4->flowi4_oif =3D rt->dst.dev->ifindex after the lookup.
+>
+> Two cases can store a link-local source with sin6_scope_id =3D=3D 0: an u=
+nbound
+> socket with a link-local destination that has no scope, or routing pickin=
+g
+> a link-local source.
+>
+> After that, quic_get_dev_if(sk, sa) falls back to sk->sk_bound_dev_if (0)=
+.
+> quic_v6_udp_conf_init() then asks to bind a link-local local_ip6 with
+> bind_ifindex 0, which __inet6_bind() rejects. The link-local scope check =
+in
+> quic_v6_cmp_sk_addr() is also skipped, because one side's scope is 0.
+>
+> Would dst_dev(dst)->ifindex record the real egress interface instead?
+>
+> > +     }
+> > +     ip6_dst_store(sk, dst, false, false);
+> > +     return 0;
 > > +}
 >
 > [ ... ]
 >
-> > diff --git a/net/quic/socket.c b/net/quic/socket.c
-> > index 0173416d0368a..c75d2dcaba9d4 100644
-> > --- a/net/quic/socket.c
-> > +++ b/net/quic/socket.c
-> > @@ -24,6 +24,319 @@ static void quic_enter_memory_pressure(struct sock =
-*sk)
->
-> [ ... ]
->
-> > +int quic_request_sock_backlog_tail(struct sock *sk,
-> > +                                struct quic_request_sock *req,
-> > +                                struct sk_buff *skb)
+> > +int quic_common_setsockopt(struct sock *sk, int level, int optname,
+> > +                        sockptr_t optval, unsigned int optlen)
 > > +{
-> > +     u32 limit =3D sk->sk_rcvbuf / sk->sk_max_ack_backlog;
-> > +     int len =3D skb->truesize;
-> > +
-> > +     limit =3D  max_t(u32, limit, QUIC_MIN_UDP_PAYLOAD * 4);
-> > +     if (req->blen + len > limit || !__sk_rmem_schedule(sk, len, false=
-)) {
-> > +             QUIC_INC_STATS(sock_net(sk), QUIC_MIB_PKT_RCVDROP);
-> > +             kfree_skb(skb);
-> > +             return -ENOBUFS;
-> > +     }
-> > +
-> > +     QUIC_SKB_CB(skb)->backlog =3D 1;
-> > +     skb_set_owner_r(skb, sk);
->
-> [Severity: Low]
-> Can this push sk_forward_alloc negative when the skb is already charged
-> to this listener?
->
-> Consider a second Initial packet for the same connection that was
-> deferred through quic_packet_deferred_schedule(). Its destructor is
-> already sock_rfree, and in quic_packet_listen_process() it takes this
-> path, which skips skb_set_owner_sk_safe():
->
->         req =3D quic_request_sock_lookup(sk);
->         if (req) /* If request sock already exists, enqueue packet direct=
-ly. */
->                 goto out;
->
-> In quic_request_sock_backlog_tail(), __sk_rmem_schedule() reserves the
-> memory first. skb_set_owner_r() then orphans the skb
-> (sock_rfree()->sk_mem_uncharge()->sk_mem_reclaim()) and charges it
-> again.
->
-> The reclaim can return the pages that were just reserved, so the
-> sk_mem_charge() that follows can leave sk_forward_alloc below zero.
->
-> For example, start with forward_alloc 2000 and truesize 2304:
->
->   schedule adds a page:      6096
->   uncharge:                  8400
->   reclaim leaves:            208
->   charge leaves:             -2096
->
-> Would orphaning the skb before the __sk_rmem_schedule() check avoid
-> this?
->
-> > +     __skb_queue_tail(&req->backlog_list, skb);
-> > +     req->blen +=3D len;
->
-> [ ... ]
->
-> > +     /* Look up accepted socket matching packet addresses and DCID. */
-> > +     local_bh_disable();
-> > +     sk =3D quic_sock_lookup(skb, &packet->daddr, &packet->saddr,
-> > +                           quic_path_usock(quic_paths(sk), 0),
-> > +                           &packet->dcid);
-> > +     if (!sk)
-> > +             goto out;
-> > +
-> > +     /* Found a matching accept socket. Process packet with this socke=
-t. */
-> > +     skb_orphan(skb);
-> > +     bh_lock_sock_nested(sk);
-> > +     if (sock_owned_by_user(sk)) {
-> > +             /* Socket is busy (owned by user context): queue to backl=
-og. */
-> > +             if (sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf))) {
-> > +                     QUIC_INC_STATS(sock_net(sk), QUIC_MIB_PKT_RCVDROP=
-);
-> > +                     kfree_skb(skb);
-> > +             }
-> > +     } else {
-> > +             /* Socket not busy: process immediately. */
-> > +             sk->sk_backlog_rcv(sk, skb); /* quic_backlog_rcv(). */
-> > +     }
+> > +     return quic_pf_ipv4(sk) ?
+> > +            ip_setsockopt(sk, level, optname, optval, optlen) :
+> > +            ipv6_setsockopt(sk, level, optname, optval, optlen);
+> > +}
 >
 > [Severity: Medium]
-> Should cb->backlog and cb->sync be cleared before the skb is handed to
-> the accept socket here?
+> This passes every SOL_IP and SOL_IPV6 option to the core IP stack. The
+> QUIC route and transmit helpers above only use part of the resulting
+> socket state: tos/tclass, uc_ttl/hop_limit, pmtudisc, SNDFLOW flow labels=
+,
+> sk_bound_dev_if, mark and uid.
 >
-> When this runs from quic_packet_deferred_work(), the skb came off
-> deferred_list with cb->backlog =3D 1. An skb that went through
-> quic_listen_sock_switch() also has cb->sync =3D 1 and cb->resume =3D 1, s=
-et
-> by quic_packet_get_alpn().
+> Can setsockopt() then report success for options that never take effect o=
+n
+> QUIC traffic? Some examples follow.
 >
-> The call path here is atomic:
+> IP_OPTIONS sets inet->inet_opt. However, quic_v4_lower_xmit() goes throug=
+h
+> udp_tunnel_xmit_skb()->iptunnel_xmit(), which always builds a header with
+> no options:
 >
-> quic_packet_deferred_work()
->   quic_packet_process()
->     quic_packet_listen_process()
->       quic_accept_sock_exists()
->         local_bh_disable()
->         bh_lock_sock_nested(accept_sk)
->         accept_sk->sk_backlog_rcv()
->           quic_packet_process(..., GFP_ATOMIC)
+> net/ipv4/ip_tunnel_core.c:iptunnel_xmit() {
+>     ...
+>         iph->ihl        =3D       sizeof(struct iphdr) >> 2;
+>     ...
+> }
 >
-> Elsewhere the patch treats cb->backlog as meaning the context can sleep,
-> for example in quic_packet_deferred_schedule():
+> quic_v4_flow_route() also does no source route handling.
 >
->         if (cb->backlog)
->                 return 0;
+> IPV6_RTHDR, IPV6_HOPOPTS and IPV6_DSTOPTS set np->opt, but
+> udp_tunnel6_xmit_skb() never adds extension headers. The v17 changelog
+> notes this when it drops fl6_update_dst(), yet these options are still
+> accepted.
 >
-> quic_crypto_decrypt() also checks !cb->backlog before doing a key
-> update, and cb->sync forces a blocking crypto wait.
+> IP_UNICAST_IF (inet->uc_index) and IPV6_UNICAST_IF (np->ucast_oif) are
+> ignored, because quic_get_dev_if() only looks at the link-local scope id
+> and sk_bound_dev_if. UDP does use ucast_oif in udpv6_sendmsg():
 >
-> The handshake and app handlers are still stubs in this patch. Once they
-> are filled in, could these leftover flags make them sleep while holding
-> the spinlock with BH disabled?
+>         fl6->flowi6_oif =3D READ_ONCE(np->ucast_oif);
 >
-> --
-> Sashiko AI review =C2=B7 https://netdev-ai.bots.linux.dev/sashiko/#/patch=
-set/cover.1792164438.git.lucien.xin%40gmail.com
+> The sticky IPV6_PKTINFO (np->sticky_pktinfo) and IP_TRANSPARENT are not
+> checked either.
+>
+> Would an allow-list in quic_common_setsockopt() make sense, returning
+> -EOPNOTSUPP for options the QUIC path can't honour, as MPTCP does?
+>
+True.
+
+But this is more like an improvement, it will take a long time to go over
+all IP/IPv6/SOL socket options. I may leave it for future work.
+
+Thanks.
