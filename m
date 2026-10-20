@@ -1,101 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.217.43
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792531994;
-	b=mdJ6KctE7ZhQQccUD8a9p2c0wcq/YkymJDvqUq1JtYi9NYCXTOAiRkab7nfXjKtQ63zI
-	 sl8W/QLN3USTomj/pQnd9kuFMLxabwK4wP0qeFMay2UT2UXW9jOUCPmmNmTC8m1u7dZyc
-	 6wsB73fVDH3F8sJHyeNQRd4ZNyvCfJZbEudEFY1LsZiDczekI0KwdCJ0xRWvJqJQYSMzo
-	 pwYOBSF2to8pjqVlY6BCRsov045euKtRVC3X7d1j2i3QjSJb4bINVTqJGZuB6JqWtmnW+
-	 AuFB+rlsp3V6oW/RyVgrVJdnrEsonHykDUe2NOCV0ps862WrJqZR57g2+Amhgt0owAQ==
+	t=1792532114;
+	b=2ITVpt54uPBpdI37byeMDhcXS5AWZytDk88Te/cZAzVAMjb4PM/C2mdJ14gU2HwM2afW
+	 Fq4QTjZoLzC2yWtmDVS40jw+GGXdB9VRsZkx8vWMhCRp4cua7h3Tku9FY7ZINRoQWnxg9
+	 DHn9yJMjkehbGxlhWtQNNkye5PFhm1YmNqb3Mz3ORTZHjfRcebgyUwQZx0ghCMihbVq1A
+	 iV3rAkOQycIUzJ0oCRFDoQR1SA4+lzQ67c0pnuoUO3/mg6wWscTCdOCmmphf963XS0K58
+	 kd8Hcj/iZKQ4B0tXNFAEe9ZP8A8hGvjaj9F3aZoOsEcEfuwThKj9WzDoZheziOPQ8sQ==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792531994;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792532114;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
 	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
-	b=vFiLaOQk9krKzM3yOnMhHeRyld67tSQgDfMjEIIYUp8lj1YSWApxP+ebJB5xnvoJ/BPW
-	 ZNIILkCp9PUibW8j9GUwt+OFzBSVnl1JiUhZr1yxpfZBfkNW3+xnLHGTkG6T9FGTRkYFQ
-	 HWzbyMVnJOXXlyEa4GgHPqKpcc+F3hjmHC85VzTSfluaU83Yt/7zvEVCZJb89E24odJXK
-	 8tKMoLOvc+Ldv4x3gNcMGD06JAPRW3keJwvNaXdQF8A8/7B39THft7aTNMJG/cHCkRuIv
-	 uVGmJ1g83syCZiaSLD0cy6A79OE4Mhmkrxgi8l1kKiPIDyVvaXAbVsU1ZAuM1H+YayA==
+	bh=kxbmWpHG63bcj8caJCx8dB80g5mvO4e9eYY/N+k9SP8=;
+	b=Q1OnqxH9aGa3pcWBfkvQtU/cKhbH+eIVbg9PO1pE7EhuAK5NWX+3G5A6nkJjTwQSfbiw
+	 fbM61Yg3iB5wHgpNQ89zdTbVPluynYFRDQ3DaXh9WiZMGqIPkyOafIH5KRDs4JX2iCsiK
+	 5+BGmhtO1vVtVtMSEqNP2jpygcBBnJc5u9/iE9//th8tsr6pRILRAbJt3K/8exKzFr45S
+	 FJrEIDvgOz0aLBEvKkUhqM6iot3s+GWoBY37jOgx5eEbeL6SYrj6aFPXFX2IE6B7KzkEr
+	 b6Uxv9/ScFCAU4TlmvizOvC4IcPKGNKxtwoz9HbB907jpZEtxmChKYoLWEdxyJe7aTw==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PstJMPG1;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.181
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=pOUaCAVr;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.217.43
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51233606A319
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 21:33:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 51233606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB96606A31C
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 21:35:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9CB96606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=PstJMPG1
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-868b3248b2cso38226b3a.1
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 14:33:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792531994; cv=none;
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=pOUaCAVr
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-745497ac8fcso95161137.0
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 14:35:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792532112; cv=none;
         d=google.com; s=arc-20260327;
-        b=JqL2HvsVumA+3QGGkD7H3AwizHs6PDMQ4LBYv94Ka8e9RU/Bzv6FlD8TXtj4RhrmBp
-         YVyVL/dvCsOaimWzsKWp1woJ4ArlPgGd7enNCP7DQkbNVkk84w0Cq5qfZQF3XzjcxcNp
-         G22CRtoDKZWnR8O3pIBNLMzenIE0yZkH9xa7P4o5LtAFxktY46TnRrspb2WKjZSdcH02
-         bd14gBSv2LZ1VcdZ8OBFON8W+EWNjQ75WKVYO2SBRK54Q2A4S9f3ArDp8Nnt8+5yZyCP
-         FOGszIaizQ61YvY2NDP1klxSEJIyOBrFb55xI35m1AAV5KaKn/iicljYryHmMoeLzVJI
-         /pbA==
+        b=rjzFYR6/gXmA7+SKpyaJx64MxrJi/TVButaRcsNmdb9qIFKyiDtQasi+7btdPlAUc/
+         qSaCG94VdYgE6bN+EJ6gkLA/IZrauh/l3+4oaLpA5J7DkDOnyT6qHWF297Lm8nPHSQIv
+         sk6REN4ITHkmDU0cKqddKU6lOU6qpYLvoUX1cTD9y3y9bIvQ7rajifJ9EJkQ3WVB5Is1
+         7xhlMHmLLgTDys1ovAD7rrEi1wYrTe0lM4z2Ekm4AVCPqAPQGClPDGL9/7BryiG6B56l
+         IvFoYImVpGR9pDoMuc/ScMYSdACEprc0XRuzrkOtj7YSuE7nVJHhNs5VuzYBFg1FegeO
+         Uzzw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
-        fh=lR4muEjXRyeglZdO5HSTwUFD9FX540bDe3FyTp6dA4c=;
-        b=oILlQB2wDFx0uNgLwkmxcnPtLn+Q6Y87KHSs8M7yw5Hhd3w6wue5rgyOmEHddi5K+G
-         UJrWOXsEwUR0myEiMUIDElpp3yVjJ64k/69FNXGk2M3NchU0SX+DIL77OaFDE9MhAAXD
-         sD42im2VMmnRtklEM1+YTXipXCMuFV2jMEfunRKwGk+rqVJTUn4zBaUw6kuWKYcAgous
-         zxVh7VIsoFU9ydKUmrniQ9Qv/1rVLNw+MfJr3HSCQ8SUmL7JSSFr76J7CoMXEmjGVgNb
-         PlE4RTYwHWQR7gTnYkJ74pBdgjTUhQeaSWh0jnTOZWAtiXMUytQqP1nHBnCJFhtCN8Oa
-         z/DQ==;
+        bh=kxbmWpHG63bcj8caJCx8dB80g5mvO4e9eYY/N+k9SP8=;
+        fh=QzLyUJT4DNtAXg/q1ElX4OdApnui2FI9nplRfAloQL8=;
+        b=Ex2Z7DukfzN/DPcETmlsu9utPJqNhBDIOGh4YEd/1/EzYAj16LKnbF7zf8xcADjKEU
+         gjXHh3UCXCFdarqtk0TuX341+OB3olaversknhKnD67qcoTbdKqLLqlOVN5oud1wfuLW
+         RsiS+GckF/kEA9YtGfT6sshhwVIwc6ygBWVdKiI/wyHRC+5L1HEP/EqLG99PYKcwJ6DA
+         j7mg7blkcz/Z9LxIv0UteMXlbtcpoie7O7L9zmQLEkxsQcoS6vvnDsLR8wftq25o9iwQ
+         E87sTw1FIHXbR81tQFoBy84oBksZhjvz8xy8zXd2jZ/vlNY2Ju7PE5BhbVCugDKhGbDj
+         l4Jw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792531994; x=1793136794; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792532112; x=1793136912; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
-        b=PstJMPG1RCu9TauBU0uB7KK9t8qQe8psNqbqWWlhVLK54wLJTJnY2a5ocHf2B1+BaY
-         j1MoWGReMJHIxTj5NvHLrvWc/33+wXPz0yI3rZZbnOys9hb29EhmglXVTFnWaV7CxVUD
-         jAclk5I4DRiymGDTXibLowpbsasxuYt3ijZWKNluS3euv6k3YwbrcBj24NKlKhtd50ft
-         jXGFc4/Px99ALtZ3Jsksflt/E1jlhhehC45+VuYSPyVRaynzqYfkk2t3F8HBKrrE6zA6
-         UEP61voehlpy2YEWIv4qOpVUkjOlQrM+18YSmELM+ImFQEljc83HQhYJDImCsC5LoHuR
-         yxzw==
+        bh=kxbmWpHG63bcj8caJCx8dB80g5mvO4e9eYY/N+k9SP8=;
+        b=pOUaCAVrjxYubrKNIq3KlVZ8P8wsutpG2JfiTOZSU2hCnHiDXJSVLwjH8kL9VQ4BeL
+         /P3utoyemwNhyAEQefHUSZzbPprW5gbLPp5bBKV/tOE2gUD6UW4NEBx3d26IqfBuMPVq
+         qSZ9NQukAA23m9+iyQ6v3FJhrHy1Om56+uSgfyCL7QRjXfjax8YVpiRKK9hKE/4uuSFB
+         aocIg51LoZqc+dVUnMAKffzS753u7PCQDvZhOgtpfwB6zvAxtttThOmYaIeqRO7pNVDe
+         wpAgAFtGyle7Vw9wGCdP2sruAtSnRapso3ZBiJYPYmzMqOF+Hfzv+/7WkxidRcmaE0T3
+         Am4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792531994; x=1793136794;
+        d=1e100.net; s=20260707; t=1792532112; x=1793136912;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=2AgfGA8Z+ldUgBgGgA9RrGOTzaa/n9KB7xtFx5qm7gA=;
-        b=hAPhde53twcwe0ILbNnZIzYR7FGr0WJzp/lYXP+2tdInkJ/gpMU0zdY4y91hce4wwr
-         TO/upZAcWEotfsDeV2K7vC58cOty5+1Z8atulVtw8JIW+RtjzhA9ECuh/SPP9qgkeEJx
-         CnjBcXeFLiEy1hxntaPDt00KKH0Bb2H5D/Zw9kZN9dnjzXPrwlVw4mJH71gcaM2AWsiI
-         P0qFfWlVRDebEjfNJOtOie8LT/UYVhJPTTPjeI/9EOmGImCByjR6R0/mer57u20+OXlx
-         owI8wkrCk4cckcZ3P+Y6lF30ITqkKzE5HCj8OFJTEaKhasrF1GXX63TUGA9+mRescnam
-         xBHQ==
-X-Forwarded-Encrypted: i=1; AKwUvBz6/2A27OiCgKfCZUhCiiwkUOKpx1HIG55H5kAGlHtgMy/Yu1ys3GUcG/0DDNT70MMmrif6dlP2RP0u@vger.kernel.org
-X-Gm-Message-State: AFq9FYLmPIgFssg8s2GU4HJJT9Pp4xw9Eh9Z2lG/bkXTd3DZtfdt+Edz
-	WL1ApHnntYZ0os7PIcfebr5mze7cq1BLchEbX39t55kHgA1g+whTu7rF72H3E4YToSPu4/Fmu7r
-	pNL2j9BL8/+DunkNolV3+0cYnyIUz3xc=
-X-Gm-Gg: AYBFou0H6l4LW2PG+ZWvgh0YlpGtmyhfc/0aHsApQ9YEaZV9/pIu4E/FgNrD1nx+o36
-	eSldLTgqwFzDuXpSy/j5AyxtZO+bVzyW0dDj3IvF7ex1wpPMpJL86cG7AdArSxjQvnPIOKzLC4z
-	XNI/n4gmyD2EF5I64PsZffTnZjLSH7/ebjZyJQeX15gzWt5AUqieCZXQKgDYBvgnp/axByYCPOD
-	BOf6ovA53AG5wgTeooVhs6i7B7G6IX1mppNbig16UE8FfVD1n5Cxmjsb6FA0WFcU2JtqF0FXupv
-	loCPoqxe67+RZfgZUwqWRBWSO58tEf4vW7EzKLFPWUzrKUBCdUxjHPTqOjhgJmfxkVOjYtszeLE
-	LJko1TORzt1D1N2xSeahrd35GyQQYJRPsrS31/6OW7WkxMj3/43CXMcSnA30c1pFlgL8U0jsHsI
-	bWI3fmWljRphrR
-X-Received: by 2002:a05:6a00:a0c:b0:89e:779b:d0f with SMTP id
- d2e1a72fcca58-8a089dfdbb8mr140032b3a.37.1792531993626; Tue, 20 Oct 2026
- 14:33:13 -0700 (PDT)
+        bh=kxbmWpHG63bcj8caJCx8dB80g5mvO4e9eYY/N+k9SP8=;
+        b=rU/Snp/qVg6GpslaX+/0mBvD4PdsYpe/DrvFIsMXWQDQ/6GNOqDs+SeOKdHq1scTP3
+         dV1Bb8s0kNHR6m4X1G3bCtxh+8kGtpA7PkJ5JnlJqVG0SbgixoxlFRxSUER7g5AUKoqW
+         NgV9Gqvwv4ZQM6SQzBdYQrAOodHg5qb/p0U+PDYeJPAXsZ3nxF961l8MHjaKnk4kwUcc
+         bfBswLfJi8Jx7gc8OWo+lXmll02KzruiyZWwMy0OWVkwLL6qB90peAtHeCgRKpOG151v
+         GJwFSVj6nNAjYu3NQFIGROSi+TsDszhOsZKqGR0AHnr5T+kM6WI8WErF9u4th+qdjbRy
+         LZeA==
+X-Forwarded-Encrypted: i=1; AKwUvBxCIhw+zVnvt92fS3iEs4Ls8Db+t3EdYIdV7aaNRyo/N/q+/d069IXJcI4jT/GSCBdenWs29JKUvqq/@vger.kernel.org
+X-Gm-Message-State: AFq9FYLsEgKmiu8ZVcoq+SO+/Qybpa1wWVtFXQdPj5MnO8aydxHhUhC5
+	luOAJhu2QJ9sfiIiyz6ULuxs6vniAxnQN80YuwaidYDdTs2DCSs2d4ba/R0jkaVaijOD1bO2Q/U
+	oOiDy/Y5lvQrHfQK41Ba9MAiVCPxGq1s=
+X-Gm-Gg: AYBFou2p+czpFAISizmGDFRjubD8QzbgJ8TRLBHaEUni1Wyc9Y+VET6HOduZO8gpg9J
+	Mwjtg+bVMQ9RIfU0XASDOk/KZgDQt/SWgejOQK4KEqYL3p8K4GF/UL9OJYqp1XP2M83G/shjMy2
+	grLPUwEd12f/tSVHWY6HaVlMEwqefIMyCYE1tQ04bovj9Vq1zee9bndag9CMhUn5ToR4GAfPFzm
+	d4cpf1r1WOeKCv+TGhO22nzzWopDjZH2iL4qlFTjSDqZmA6Rx2Bes+99EArKbMhGUKLOMAy7lKF
+	2YTASVMrTxitCk34oZQko/AyS4+wLnjRXyivp+olKPZQ7WV5QrCTVpgs2HSCasxLCPzQFpGuRgt
+	Z2FyRVjycYn5iU9ALZCk0fD7KedImdjjhdqtLGdkdxqXUdWLQvDSw3vkv9x1yEIxvWd4ClxXpu4
+	mD/EYSuQjbgTz8
+X-Received: by 2002:a05:6102:448f:b0:7cc:2cd0:e73c with SMTP id
+ ada2fe7eead31-7cc926c4d1cmr146631137.25.1792532112476; Tue, 20 Oct 2026
+ 14:35:12 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,14 +105,14 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <ae36949f7685ef74318d3c742f02e1398db3b454.1792164438.git.lucien.xin@gmail.com>
- <179244539859.3135.15973054396060254186@kernel.org>
-In-Reply-To: <179244539859.3135.15973054396060254186@kernel.org>
+References: <9e1c586f76943aa9fcd96cecedec805c66fc6e07.1792164438.git.lucien.xin@gmail.com>
+ <179244540161.3135.791644548439735124@kernel.org>
+In-Reply-To: <179244540161.3135.791644548439735124@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 20 Oct 2026 17:33:00 -0400
-X-Gm-Features: AclHuK-OS8Rlsq-Vf92z9Ck0SMvPAMUJ9Zd-S0XjwZRWioNbmezgdXlvGsvI2pg
-Message-ID: <CADvbK_en5dm-psb_eXs26y1bYTNq8_76eHv6ZWX_FbcSPjv8Zg@mail.gmail.com>
-Subject: Re: [PATCH net-next v17 08/15] quic: add path management
+Date: Tue, 20 Oct 2026 17:34:59 -0400
+X-Gm-Features: AclHuK-cqHur22QaAJB_O1MpvembykENtwhk63DMyFXPnpV5d6Oxh4y7OPcqRQU
+Message-ID: <CADvbK_cWtvHg2Mbgwe1+2TZgGDwF9DY5NO8vjim5RLwufW3e5Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v17 09/15] quic: add congestion control
 To: netdev-bot+sashiko@kernel.org
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
 	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
@@ -131,10 +131,10 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Oct 19, 2026 at 5:30=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
 te:
 >
-> Thank you for your contribution! Sashiko AI review found 2 potential
+> Thank you for your contribution! Sashiko AI review found 3 potential
 > issue(s) to consider.
 >
-> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 2 =C2=B7 Low: 0
+> Critical: 0 =C2=B7 High: 0 =C2=B7 Medium: 1 =C2=B7 Low: 2
 >
 > If you believe none of the issues are legitimate, please reply to each
 > issue of Medium severity or higher and explain why the AI is wrong.
@@ -144,159 +144,182 @@ k
 y
 > (one such reply per series is enough).
 >
-> - [Medium] quic_udp_sock_create() in net/quic/path.c zero-initializes
->   udp_conf and fills it with quic_udp_conf_init() ->=E2=80=A6
-> - [Medium] IP_FREEBIND (and the IPv6 equivalent) set on a QUIC socket has
->   no effect when a new UDP tunnel socket is created.
+> - [Medium] When quic_cong_on_packet_lost() (net/quic/cong.c:94-99)
+>   declares persistent congestion, it sets cong->window =3D=E2=80=A6
+> - [Low] The commit message says the implementation "adjusts the
+>   congestion window accordingly during packet transmission and=E2=80=A6
+> - [Low] quic_cong_rtt_update() (net/quic/cong.c:207-209) throws away the
+>   whole RTT sample when the raw send-to-ACK interval (cong->time - time)=
+=E2=80=A6
 >
 > --
 >
-> quic: add path management
+> quic: add congestion control
 >
-> This adds struct quic_path_group and struct quic_path to manage the
-> active and alternate paths of a QUIC connection. Each path is bound to a
-> kernel UDP tunnel socket, which can be shared and is tracked in a
-> per-port hash table. The patch also adds bind, unbind and swap helpers,
-> alternate path detection for migration, and basic PLPMTUD state handling.
+> This patch adds struct quic_cong and struct quic_cong_ops to the QUIC
+> stack. They cover RTT measurement, loss and ECN handling, and pacing.
+> New Reno is the only algorithm so far, and quic_init_sock() sets it up
+> through quic_cong_init().
 >
-> > diff --git a/net/quic/path.c b/net/quic/path.c
+> > The implementation updates RTT estimates when packets are acknowledged,
+> > reacts to loss and ECN signals, and adjusts the congestion window
+> > accordingly during packet transmission and acknowledgment processing.
+>
+> [Severity: Low]
+> Is this accurate for the transmit path? quic_cong_on_packet_sent() never
+> touches cong->window:
+>
+>     if (cong->ops->on_packet_sent)
+>         cong->ops->on_packet_sent(cong, time, bytes, number);
+>     quic_cong_update_pacing_time(cong, bytes);
+>
+> The New Reno entry in quic_congs[] has no .on_packet_sent, so on transmit
+> only cong->pacing_time changes.
+>
+> The commit message body also doesn't mention pacing. That covers the
+> pacing_rate and pacing_time fields, the 2 * window / smoothed_rtt rate in
+> quic_cong_pace_update(), and quic_cong_update_pacing_time(). Pacing only
+> shows up in the version changelog notes.
+>
+> Could the commit message describe pacing, and drop the part about
+> adjusting the window during transmission?
+>
+> > diff --git a/net/quic/cong.c b/net/quic/cong.c
 > > new file mode 100644
-> > index 0000000000000..ba7e2c952a36a
+> > index 0000000000000..765f50660f0e4
 > > --- /dev/null
-> > +++ b/net/quic/path.c
-> > @@ -0,0 +1,596 @@
+> > +++ b/net/quic/cong.c
+> > @@ -0,0 +1,287 @@
 >
 > [ ... ]
 >
-> > +static struct quic_udp_sock *quic_udp_sock_create(struct sock *sk,
-> > +                                               union quic_addr *a)
+> > +/* NEW RENO APIs */
+> > +static void reno_recovery(struct quic_cong *cong)
 > > +{
-> > +     struct udp_tunnel_sock_cfg tuncfg =3D {};
-> > +     struct udp_port_cfg udp_conf =3D {};
-> > +     struct net *net =3D sock_net(sk);
-> > +     struct quic_uhash_head *head;
-> > +     struct quic_udp_sock *us;
-> > +     struct socket *sock;
-> > +     int err;
+> > +     cong->recovery_time =3D cong->time;
+> > +     cong->ssthresh =3D max(cong->window >> 1U, cong->min_window);
+> > +     cong->window =3D cong->ssthresh;
+> > +}
+>
+> [ ... ]
+>
+> > +/* COMMON APIs */
+> > +void quic_cong_on_packet_lost(struct quic_cong *cong, u64 time, u32 by=
+tes,
+> > +                           s64 number)
+> > +{
+> > +     if (cong->pc_detected)
+> > +             return;
 > > +
-> > +     us =3D kmalloc_obj(*us);
-> > +     if (!us)
-> > +             return ERR_PTR(-ENOMEM);
-> > +
-> > +     quic_udp_conf_init(sk, &udp_conf, a);
->
-> [Severity: Medium]
-> Should the tunnel socket take its IPV6_V6ONLY setting from the QUIC
-> socket that owns it?
->
-> quic_udp_conf_init()->quic_v6_udp_conf_init() fills in the family,
-> address, port, checksum flags and bind_ifindex. It never sets
-> conf->ipv6_v6only:
->
-> net/quic/family.c:quic_v6_udp_conf_init() {
->         conf->family =3D AF_INET6;
->         conf->local_ip6 =3D a->v6.sin6_addr;
->         conf->local_udp_port =3D a->v6.sin6_port;
->         conf->use_udp6_rx_checksums =3D true;
->         conf->use_udp6_tx_checksums =3D true;
->         conf->bind_ifindex =3D quic_get_dev_if(sk, a);
-> }
->
-> udp_sock_create6() applies v6only only when the config asks for it:
->
-> net/ipv6/ip6_udp_tunnel.c:udp_sock_create6() {
->     ...
->         if (cfg->ipv6_v6only) {
->                 err =3D ip6_sock_set_v6only(sock->sk);
->     ...
-> }
->
-> As a result, the kernel UDP socket always gets the net.ipv6.bindv6only
-> default. An IPV6_V6ONLY value set on the QUIC socket through
-> quic_setsockopt()->ipv6_setsockopt() is ignored. A zero cfg value also
-> can't clear an inherited bindv6only=3D1.
->
-> With bindv6only=3D0, could an IPV6_V6ONLY QUIC socket bound to [::]:P get=
- a
-> dual-stack tunnel? That tunnel would also hold IPv4 port P and could
-> cause unexpected EADDRINUSE for IPv4 binds.
->
-> With bindv6only=3D1, a QUIC socket that cleared IPV6_V6ONLY gets a v6-onl=
-y
-> tunnel, and IPv4 UDP lookup skips ipv6_only sockets. Would IPv4 packets
-> for that dual-stack QUIC socket ever be delivered?
->
-> quic_udp_sock_lookup() also decides sharing through
-> quic_cmp_sk_addr(us->sk, ...), which checks ipv6_only_sock() on the
-> tunnel socket. A wrong v6only state would therefore also change which
-> QUIC sockets end up sharing a tunnel.
->
-> quic_path_bind() has no caller yet in this series, so this would only
-> show up once quic_bind() is wired in by the next patchset.
->
-False.
-
-This is on purpose, as two quic socket may share the same lower
-udp tunnel socket, we try to make the lower :: bind udp socket always
-with bindv6only =3D 0 (unless net.ipv6.bindv6only =3D 1), so that two socke=
-ts:
-
-- bind(sk1, ::, 1234, ALPN=3D'h3', bindv6only =3D 1)
-- bind(sk2, ::, 1234, ALPN=3D'smbd', bindv6only =3D 0)
-
-can co-exist, the bindv6only check will be performed on the quic
-socket layer like when looking up the listen socket.
-
-if the tunnel socket takes its IPV6_V6ONLY setting from the QUIC,
-the sk2 will never accept IPv4 requests.
-
-> > +     err =3D udp_sock_create(net, &udp_conf, &sock);
->
-> [Severity: Medium]
-> Is IP_FREEBIND (or its IPv6 equivalent) on the QUIC socket honoured
-> when a new tunnel socket is created here?
->
-> struct udp_port_cfg has no freebind or transparent field.
-> udp_sock_create4() and udp_sock_create6() call kernel_bind() right after
-> sock_create_kern(), so FREEBIND can never be set on the new socket
-> before it is bound:
->
-> net/ipv6/ip6_udp_tunnel.c:udp_sock_create6() {
->         err =3D sock_create_kern(net, AF_INET6, SOCK_DGRAM, 0, &sock);
->     ...
->         err =3D kernel_bind(sock, (struct sockaddr_unsized *)&udp6_addr,
->                           sizeof(udp6_addr));
->     ...
-> }
->
-> The bind path then calls inet_addr_valid_or_nonlocal() on the new tunnel
-> socket. That socket doesn't have FREEBIND set, so a nonlocal source
-> address would fail with -EADDRNOTAVAIL.
->
-> The QUIC socket accepts IP_FREEBIND through
-> quic_common_setsockopt()->ip_setsockopt(). quic_get_user_addr() in the
-> next patchset is described as honouring FREEBIND. Could bind validation
-> then accept the address, only for
-> quic_path_bind()->quic_udp_sock_create() to reject it?
->
-> It looks like only the netns-wide ip_nonlocal_bind sysctl would make a
-> nonlocal bind work here.
->
-False.
-
-quic_get_user_addr() will be called to handle IP_FREEBIND for user
-addresses in quic_bind/quic_connect/quic_sock_connection_migrate
-in the next patchset.
-
-Thanks.
-
-> > +     if (err) {
-> > +             pr_debug("%s: failed to create udp sock\n", __func__);
-> > +             kfree(us);
-> > +             return ERR_PTR(err);
+> > +     if (cong->pc_start_time && time > cong->pc_start_time &&
+> > +         quic_cong_check_persistent_congestion(cong, time)) {
+> > +             cong->pc_detected =3D 1;
+> > +             cong->min_rtt_valid =3D 0;
+> > +             cong->window =3D cong->min_window;
+> > +             return;
 > > +     }
 >
+> [Severity: Medium]
+> Should this branch also reset cong->recovery_time?
+>
+> The recovery state comes only from quic_cong_in_recovery():
+>
+>     return time <=3D cong->recovery_time;
+>
+> The only place that writes recovery_time is reno_recovery(), which sets
+> it to cong->time (now).
+>
+> Take a single loss-detection pass after a link outage:
+>
+>   P1 lost (pc_start_time is 0, first_rtt_time is set, not in recovery)
+>     quic_cong_on_packet_lost()
+>       cong->pc_start_time =3D time of P1
+>       quic_reno_on_packet_lost()
+>         reno_recovery()
+>           cong->recovery_time =3D cong->time;    /* now */
+>
+>   P2 lost, sent more than the persistent congestion duration after P1
+>     quic_cong_on_packet_lost()
+>       quic_cong_check_persistent_congestion() returns true
+>       cong->window =3D cong->min_window;
+>
+> Every packet still in flight was sent before now, so the ACK for each of
+> them returns early here:
+>
+>     quic_cong_on_packet_acked()
+>         if (quic_cong_in_recovery(cong, time))
+>             return;
+>
+> In that case ops->on_packet_acked() is never called. Would the window
+> then stay at min_window for at least one more RTT, until a packet sent
+> after recovery_time is acked?
+>
+> RFC 9002 Appendix B.8 sets congestion_recovery_start_time to 0 on
+> persistent congestion, so these ACKs grow the window in slow start. The
+> state diagram in cong.h shows the same transition:
+>
+>  *             persistent congestion |   Slow     |
+>  *         (O)---------------------->|   Start    |
+>
+> Here, though, the derived state ends up as Recovery Period, not Slow
+> Start.
+>
+> Nothing in this patch calls the quic_cong_on_packet_* hooks yet. This
+> would show up once the outqueue changes start calling them.
+>
+True.
+
+Good catch.
+I will reset congestion_recovery_start_time to 0 on  persistent congestion.
+
+Thanks.
 > [ ... ]
+>
+> > +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> > +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_de=
+lay)
+> > +{
+> > +     u32 adjusted_rtt, rttvar_sample;
+> > +
+> > +     /* Ignore RTT sample if ACK delay is suspiciously large. */
+> > +     if (ack_delay > cong->max_ack_delay * 2 ||
+> > +         cong->time - time > QUIC_RTT_MAX)
+> > +             return;
+>
+> [Severity: Low]
+> Is the 6 second QUIC_RTT_MAX cutoff too tight here?
+>
+> cong->time - time is the raw interval from send to ACK, so it includes
+> the peer's ACK delay. RFC 9000 allows max_ack_delay up to 2^14 ms, which
+> matches common.h:
+>
+>     #define QUIC_MAX_ACK_DELAY  (16384 * 1000)
+>
+> For example, take a peer max_ack_delay of 8s, an ack_delay of 7s and a
+> measured interval of 7.1s. The sample passes the ack_delay check but is
+> still thrown away. The same happens on any path whose RTT stays above
+> 6s.
+>
+> The early return comes before anything is updated. smoothed_rtt and
+> rttvar stay at their initial 333ms and 166ms, and those feed into pto,
+> loss_delay and the pacing rate.
+>
+> first_rtt_time also stays 0, so this condition in
+> quic_cong_on_packet_lost() is never true:
+>
+>     if (!cong->pc_start_time && cong->first_rtt_time &&
+>         time > cong->first_rtt_time)
+>         cong->pc_start_time =3D time;
+>
+> As a result, persistent congestion tracking never starts.
+>
+> The v14 changelog says the cap prevents latest_rtt overflow. latest_rtt
+> is a u32 in microseconds, though, so it doesn't overflow until about
+> 4295 seconds.
+>
+> Could the limit be raised, or could ack_delay be subtracted before the
+> check? Nothing in this patch calls quic_cong_rtt_update() yet, so this
+> only matters once later patches call it.
 >
 > --
 > Sashiko AI review =C2=B7 https://netdev-ai.bots.linux.dev/sashiko/#/patch=
