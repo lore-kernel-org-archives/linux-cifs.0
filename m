@@ -1,95 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.182
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792453700;
-	b=aFDPc8rmhdxX/ep97qF8fuAqNlqE7W7RtFho5oyrJgojYO9uLsiSyfvFCxsu33xkCIDK
-	 rMEvX9bV4Cy3AaK5naUKiUpO1X03uqpCqLt5WRjkn5Kiy4EkxEtQFN0ecubRReAUOcrp6
-	 Z40yqIjlXCi30kpM5MsgUtD5qPHiMyhQwmCzPjIP6pDJtIwnGIZkuLv/iN5Qt4U4093Qv
-	 3NLnAjBxysc+YkCW4sPe/+vs0wf+5r5H95cRBPKVVYdkaC11MNPP6WWZZvCaO0+n/Wrjq
-	 sp42Tbn1Vk0IdQJaB/i7Gu+wbX8Af2qwCuQn2R3tXlMd2A902thxdzr6hwTF+HPG5Yg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792453700;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:From:Date:
-	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type;
-	bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
-	b=rb58G3t2eVvdcQLcPWUDLQTGdawEXKDKOTbiBhwUeg9eSOlaX0hrsDD2qBuzF7o6SiCb
-	 6TymOjGCgl9sExyhXMsc8mgoU+D/y5NZFB2Z+6LF/US9Is4LDNti3kI24tk2y3SsKTcxK
-	 KArbmoj2QwHkNksublppntXeaUtjVc3b9ifsAqgvRnHxZlDlHSPi4rYAAnPGeT99hukx3
-	 DLEmSl2osc4aM5IU03KqUFNJwdQmBqPYHQw79VYiiFaLGrJoFIPyokOCbMJVrOjamb3tL
-	 1qFAYPY7cy+zDJsKhcZpbTip7v+hIJV+pcOmkI9WYMq5Hy+MXnL1HBzPHjrISd3Me9A==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sZ6xiB9D;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.128.182
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792455424;
+	b=nZZIuD+UR1eZB0X4k/oI1wqdek1JnFRXnlPL78VHgICyXkbhINOgC9px+KzuTCSq9J3D
+	 CQ1y4woOdG47lHe2mKVnH1ynaNk0lDiazECka07yatZdxiXUFJN+Ulv1/P72xmKBPWJyN
+	 Y9FrTCRxlB5GbcP3MQxxweSlhnEUm1YPAv3iPXjuf2ujBpmFKi0GnI+EC2c1FZdsSqUJF
+	 N4axMv37fWiMNX2fLvBKcEFoxLLxAniOZ8eMa/GUuQFSRtTYlSv3qOKN5PmvJTG/n7TId
+	 lORknDLaqS5ieiwG1nHMA6L4juPBEklmbvDSqgsxlNInwhPDoXWWLLWk8mpDSSJNypA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792455424;
+	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=5dXr2Vr3AQgTOje1pNgl3aTaTmOXgEBT/oO9jPFVR0M=;
+	b=ifOZzMD5wYIX5ZyijxFKIvlnmgm6d+PAegF6SelbEjTClvlDUmkhb3DOgSGAuonSNMt4
+	 STlNV5wtStLcbvUL8R+DF6vvAkoxpXSli9MxeKwlbdCxJIcaYTfBreqgd7EUSbGyK/9lK
+	 37lYPg4wKFjg4KQl2J7JzG3t/IsZ4y8F3bA5qpwYVkne2VLIxJ4BH0r4nqiVkLgnbdyYI
+	 IRHe9gkmeRCgWUM6IXnJi1Ls+rkbfPHgXEtsRoKhA+AICrG2eFL7ck6qeifqHOoQNyR6h
+	 Ain8yJSXiVsfvLgNoxiNPiT/2ydDNVRMHEHQEvgZ5vB5C6H6+5yxO7gV5XoGug6cfpg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X9DCHw61;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F52606A31B
-	for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 23:48:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 62F52606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6739D606A31D
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 00:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=sZ6xiB9D
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-8ab38a051aaso22489127b3.3
-        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 16:48:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1792453699; cv=none;
-        d=google.com; s=arc-20260327;
-        b=jDyCl51dfyKm8HdVQMTg7PG79ABXUGQ/0VX7kQHa4izHkq+oUhOHmQyjCe3zw7sf0H
-         0pEGhneI5g+7DLlGFYuvyC9uBGnuqrNuDdOto80gv81d2wS/cSYABWCa11HAwIhoECgM
-         Vsw+QqKQ8tFZpBsZUhRmGkcKR3ZY1WEi+rj638mlSombxr/Xjr29WiYRZ4RosNccnIjL
-         2l0sFwYvVJlf6pl9q7En8tCuG0PnPsJUODxyASlzhu1IhccmZXytSOccXEc84qvuvDHx
-         9UWs9EK5FjHNhVFRwSpKM42JBHDUcG6PRWyVhcIsG0W4gxJRI7TTYlQywmX7t6XBS9jR
-         jDdg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:mime-version:dkim-signature;
-        bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
-        fh=kH0xamkYoUp8lVCxIi9w5C9/waAa7UrXU3oXFU5PLC8=;
-        b=XF7+b+Mn6aB6GToo4rE31wWPakY/fudKlKa1znsX95Vah/i9L/ZB588Dm0O9V0KGPH
-         38XiIEcB3J1x1J9GjoPwRlC4KijauCyEKpD7N6o20BQ9yDc7k8FNPunfX2ssLMvWNRhl
-         MzH1rfvbtN+VqdL+LxnnkKorABH8c39sq+l5aVVT10p+fYgSQHtF8+RddCYuDZYe1lpn
-         U8JY2Kikf+qHSNrCC3p+J/SQwp9bhv4fdEtk2+X1khO56x46ki0NO1sjQHjt7ZFuoVTu
-         FZ+1kPMeOCCwmGlFSBg1fjRc3rKjx07UDOUMVUoR6SLCIdhtoIQBibYgmSOm3hnBRFxj
-         17OA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792453699; x=1793058499; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
-        b=sZ6xiB9DuvcbqVv0gIB/zNnczwsp8q30SPuOjUTT9uajYr9Trkdwl5LZ7iAPMFRhB4
-         vWQgSrvjExCHojmr6NPW41q2+N2t8vsnXC0CRNnxlJdLJx9cBjeDhJsV6G0StaWjrWdw
-         +I4Vl1SB+UsQ7UecidixlCOBL7xn5/67LmNFrA5NDnb2izdlycFvHNtglThC9KWhsFpr
-         2j/DG83kTglmE46OhDnqBLIDtDmozPA04Me2koYZ3GCfcA3BJbsOUGeR3BfUfyEmmtIB
-         SS1RxU2tcnDMpR5dv+1Bs2RICDJCe0JkEfNu4/mEW6TOe2qHbh9Hp7IP3/WkOQm2oQLu
-         xDMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792453699; x=1793058499;
-        h=content-type:cc:to:subject:message-id:date:from:mime-version
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=uPR686aha/s9p5KrnYFj4bxjpjg5RBo2/QPkK83r2BY=;
-        b=NU9JHZ2gL/cyMiYpaxrdq6Bv3KczzzPDEcFkBS21cw9hyqNro4nWLcIdcmAbrTbRw1
-         hFRI4NlWsbL/h+GPN6a4M2KirL7dOzMvmZpqTWWw8s6XpPrTkE6w8x8X6tMPgrtUhtUR
-         q36FFM3kcEnEQGYPI1lHkqHZGCpPJXGhRwbbVPy+OUnQVtG7xUPqXhb0/RsmtAXqH3V+
-         KUF1kCp5LR2gZ/Hh/5vi2jeTEx+NH/w56mzJAcozCcg/5ikgnNFBugu/11cJXzIy4uMR
-         CVbkjVcMYEQ+GwnSh42tXPM2ESKy2gJWOgt31QUdD0/4WdLGgnaqYw8BnfdDFquAx+rT
-         iLIg==
-X-Gm-Message-State: AFq9FYLEFJD79aYF/wC+vJbp9kuG6+6igp9eL0XnyujVBIug4IFHSFlA
-	PvMEwrEbelGFtKuwg4XoBJdeDtNqrgHOlwfdcnq0DzP5+ftwC8pL4s4UZ4r/KPJD7KkOwjX4ie/
-	7rQw5YtfobqNtkfykaiid3fEQ8xqTPOA6Fqme
-X-Gm-Gg: AYBFou2Mwpic8wfJG2cGzOEOvZxIuloVmfh+PJEJdml2Qt+aSZtvcCU0LTJYo0efOMR
-	WkJZRq/Lq+sOOKsa2DWyoXINbmj0iFuAhBbQVXibJKVhS43/59Tk0sabt4TAbivLGieq3BxOHCJ
-	UlgCLIV69yrGICItfT51e7hXH3AJsv2miXnaoygHhkKDsijUSyoEEJWRgCjtRZHXcBU9sDp+LjA
-	XiM2fzwvn5LIKgZzpB0aAkK8MmW2FTugYnJqGOOAmqpzXNp6wpLpu9MrGTmcgGP5tGdDIgBOmBo
-	f5uIq3TJX+J3z+nFiBfsQn/SWeeDfq784Y2cUgaP7PxlzoBKFOE0jo/i9TvvpexwJvQ+BtD15RK
-	uIXBIfnKwWjwjxg==
-X-Received: by 2002:a05:690c:447:b0:878:cee5:9885 with SMTP id
- 00721157ae682-8b0f220138bmr32688737b3.43.1792453699302; Mon, 19 Oct 2026
- 16:48:19 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X9DCHw61
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECDAD1F000C5
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 00:17:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792455424;
+	bh=5dXr2Vr3AQgTOje1pNgl3aTaTmOXgEBT/oO9jPFVR0M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=X9DCHw61k+fmQtPiCoPvjbKlJ6A2BccPt95verrZLpB+W4VHPISFB/2U5WzdQbGuj
+	 VcXxfovvMR4Z6yzwNJjrV02kq8HjTZmUEc0qVEl8mJncBz+x1ZnCEiQ2TEVI70zgYH
+	 63xXCHWxEXzoyFxBNg/OCY9G4k1WJpQv8sX06e3yt2PskACqGCVzPMMVGFYyS0NPth
+	 ALimXHVUjIDoTdjq89zWbvofVwGunE4ljFYazkp1jNtu9diyBRqAe3ZRsX6IKWCOG6
+	 Fp2p1W0yzh33iSLiq5C6eOiS9A9gBIMU3Y/2fBWnEd/CMz+gtfe+dHv6LYNiHMCFvM
+	 V7v/A1F3CE8aw==
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c43373ae89aso277116666b.3
+        for <linux-cifs@vger.kernel.org>; Mon, 19 Oct 2026 17:17:03 -0700 (PDT)
+X-Gm-Message-State: AFq9FYKv89EW9qxNsYA3afXjOfFzrLEpCd+Y5J5Cu9LPUGNJhMKSIxEC
+	SB5CJ0MJsDcGj7II639uJ+t/7+zuQNX1xPjlpyrhLFKEjxyuom8+CB/u17C1yFuvVBvVrUBuloM
+	lDdO7zQKwxJa52WJhtpxPH7K51zj8zhE=
+X-Received: by 2002:a17:907:3da5:b0:c29:f5d5:5a97 with SMTP id
+ a640c23a62f3a-c419f31bd1cmr655444466b.33.1792455422491; Mon, 19 Oct 2026
+ 17:17:02 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -99,83 +58,133 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: Mohammed <mohammed.saad.alquraini@gmail.com>
-Date: Tue, 20 Oct 2026 02:48:07 +0300
-X-Gm-Features: AclHuK-gvoCc23Waig2bSdFxXWyGK8fjHfJcG9ab-NPqqE3Ye07teLWp7_WHx80
-Message-ID: <CAD37_9gGnApAuagqOuZ13WB=DW8c_ZpWFBX4cE00YtGhmE2PbQ@mail.gmail.com>
-Subject: [Bug report] ksmbd: fd_limit leaks a slot per durable-handle
- reconnect -> cross-user open DoS
-To: linkinjeon@kernel.org
+References: <CAD37_9gOExjNx7SSB3BFM-t=xCdPCFS--bMNZjQ6eMizf3pF4A@mail.gmail.com>
+In-Reply-To: <CAD37_9gOExjNx7SSB3BFM-t=xCdPCFS--bMNZjQ6eMizf3pF4A@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 20 Oct 2026 09:16:47 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-1+zNJGBtcLeGovxMB+fCkMAiU6MWcicSm+BXGF_w-Sw@mail.gmail.com>
+X-Gm-Features: AclHuK9ZRlWTgtNtGGHMW95KMRltG8s-USHZ_a5cuKPgNeM3X6y6j5GXLbkq9tI
+Message-ID: <CAKYAXd-1+zNJGBtcLeGovxMB+fCkMAiU6MWcicSm+BXGF_w-Sw@mail.gmail.com>
+Subject: Re: [Bug report] ksmbd: IPC$ RPC pipe handles are session-blind ->
+ cross-user DCERPC response interception
+To: Mohammed <mohammed.saad.alquraini@gmail.com>
 Cc: linux-cifs@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Namjae,
-
-ksmbd's global open-file counter (fd_limit) leaks one slot per durable-handle
-reconnect, so an authenticated user can exhaust the server-wide budget and deny
-other users' opens. Validated end-to-end on an unmodified kernel; every number
-below is measured. Found with an LLM-assisted code-analysis pipeline (disclosed
-up front per security-bugs.rst). Low severity -- it needs a non-default config
-and the cap is already soft (see caveat), so this is a regular bug for the
-public list, not a security@ case.
-
-Affected
-========
-fs/smb/server/vfs_cache.c at torvalds master 70dd4ee7 (2026-10-16); the reopen
-path is unchanged in current ksmbd-for-next. Requires "durable handles = yes"
-(the shipped ksmbd.conf.example has it off). Not a regression.
-
-Mechanism
-=========
-fd_limit is one server-global counter. A slot is taken per volatile id in
-__open_id(), and released in exactly two places: final close (__ksmbd_close_fd)
-and the idr-failure path. On disconnect the session is destroyed and a durable
-fp is preserved with its volatile id unpublished but NO fd_limit_close(). On
-reconnect, ksmbd_reopen_durable_fd() calls __open_id(VOLATILE) again for the
-same still-open fp -- a second slot -- and final close returns only one. Net:
-one slot leaked per reconnect cycle, in a server-wide counter, never returned.
-
-Impact (measured)
-=================
-With the shipped default max open files = 10000, 20 authenticated connections --
-each holding exactly one open file -- exhausted the global budget in 56.6 s
-(~177 leaks/s); a different user's CREATE then returned
-STATUS_INSUFFICIENT_RESOURCES (0xc000009a). The leaked slots survive the
-attacker's disconnect; only a restart frees them. The same open/drop/reconnect
-loop is what a benign macOS/Time Machine client does, so a server also degrades
-under normal use.
-
-Caveat, stated plainly: the counter is global with no per-user quota, so one
-user can already exhaust it by holding ~10000 opens; this bug's increment is
-that the leaked slots are unrecoverable and need only a single handle.
-
-Reproducing
-===========
-Self-contained SMB2 client (C, no third-party deps) against a mainline kernel
-with CONFIG_SMB_SERVER and ksmbd-tools; [global] durable handles = yes,
-max open files = 10000. Authenticate; CREATE a file with a batch oplock
-(RequestedOplockLevel=0x09) and a durable-v1 request context ("DHnQ"); read the
-persistent id from the response. Loop: abrupt TCP close (session teardown
-preserves the handle), then reconnect on a new connection with a "DHnC" context
-carrying that id. Each cycle leaks one slot; once the budget is gone a different
-user's CREATE fails with 0xc000009a. Setting max open files = 16 makes it
-visible in ~15 cycles; an instrumented run shows fd_limit going 16->0 with 18
-takes and 0 releases. Full client source and logs on request.
-
-Fix (Not tested yet)
-===================================================================
-Return the slot the preserved fp already holds at reopen, so it keeps exactly
-one slot for its one logical open:
-
-    /* ksmbd_reopen_durable_fd(), fs/smb/server/vfs_cache.c, before
-__open_id() */
-    fd_limit_close();   /* preserved fp's slot; reopen must not double-count */
-    __open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
-
-(or move the accounting to fp lifetime instead of per-volatile-id). Must keep
--EMFILE -> STATUS_INSUFFICIENT_RESOURCES for genuinely new opens.
-
-Tested by hand on arm64 (70dd4ee7); the mechanism is architecture-independent.
-
-Thanks,
-Mohammed Alquraini
+On Tue, Oct 20, 2026 at 7:15=E2=80=AFAM Mohammed
+<mohammed.saad.alquraini@gmail.com> wrote:
+>
+> Hello Namjae,
+>
+> Reporting a missing-authorization issue in ksmbd's IPC$ named-pipe RPC
+> transport: any authenticated SMB user can have its IPC requests processed=
+ on
+> another session's RPC pipe object, receive responses produced for that
+> session's calls, and disrupt that session's RPCs. Found with an LLM-assis=
+ted
+> code-analysis pipeline and verified by hand against the source. Low sever=
+ity / isolation-hardening, not an urgent security issue, so sending to the =
+public list.
+>
+> AFFECTED
+> Present on mainline commit 70dd4ee7 and in current linux-next. smb2_read_=
+pipe(),
+> smb2_write_pipe() and the FSCTL_PIPE_TRANSCEIVE ioctl all pass the
+> client-controlled VolatileFileId to ksmbd_rpc_read/write/ioctl() with no =
+check
+> that the handle belongs to the requesting session. Not a regression (date=
+s to
+> the original IPC transport). Distinct from CVE-2026-89794 (uninitialized =
+padding
+> in smb2_read_pipe); the recent FSCTL_PIPE_TRANSCEIVE no_fileid_ioctl exem=
+ption is
+> a Windows 11 interop fix and adds no ownership check.
+>
+> MECHANISM
+> 1. RPC pipe handles come from one global IDA (ipc_ida, via
+>    ksmbd_session_rpc_open()) -- small sequential ints in one shared space=
+.
+> 2. smb2_read_pipe() passes the client's VolatileFileId straight to
+>    ksmbd_rpc_read(work->sess, id) with no check against sess->rpc_handle_=
+list.
+> 3. handle_response() (transport_ipc.c) matches responses to waiters by ha=
+ndle
+>    only -- the IPC payload carries no session id -- and wakes the newest =
+waiter
+>    (hash_add =3D hlist_add_head). ksmbd.mountd mirrors this: a global pip=
+es_table
+>    keyed by the same handle.
+>
+> So an authenticated user issuing SMB2 READs on IPC$ with a forged Volatil=
+eFileId
+> equal to another session's in-flight pipe handle receives that session's =
+DCERPC
+> response. The attacker cannot execute RPCs on the victim's binding
+> (ksmbd_session_rpc_method() returns 0 for a foreign handle, so the daemon
+> refuses method dispatch) -- the flaw is response-side only, which also ma=
+kes a
+> received payload unambiguously the victim's. A probe also leaves the vict=
+im
+> pipe's RETURN_READY set, breaking the victim's later RPCs on that handle.
+>
+> IMPACT
+> - Cross-user interception of IPC$ RPC responses between authenticated ten=
+ants on
+>   multi-user servers (srvsvc share enumeration measured; lsarpc/samr etc.=
+ use the
+>   same path). Timing-sensitive: deterministic inside the victim's in-flig=
+ht
+>   window, narrow under real client load.
+> - Per-user RPC disruption (more reliable): probing poisons the victim pip=
+e's
+>   state so its subsequent RPCs fail.
+>
+> MEASURED (reproducer, one run each)
+> - Deterministic (both roles timed by the in-tree client): 4 responses
+>   intercepted, up to 180 bytes -- the victim's srvsvc NetShareEnumAll RES=
+PONSE
+>   PDU (share names in UTF-16); victim RPCs broken.
+> - Realistic (victim =3D real smbclient share enumeration; attacker =3D se=
+parate
+>   remote user, 8 sessions, pipelined forged READs): 1 interception in ~52=
+,000
+>   probes, victim's 40/40 enumerations still completed. Real but noisy wit=
+hout
+>   tuned timing.
+>
+> REPRODUCER
+> Self-contained SMB2 client (C, no deps) in a qemu VM with a CONFIG_SMB_SE=
+RVER
+> kernel + ksmbd-tools: two ordinary users; the victim does a srvsvc RPC on=
+ IPC$;
+> the attacker (no pipe of its own) issues IPC$ READs with VolatileFileId s=
+wept
+> over the small handle space, timed into the victim's window. No code chan=
+ges and
+> no non-default server config. I can send the source on request.
+>
+> FIX SHAPE
+> Reject any handle the session does not own, in ksmbd_rpc_read/write/ioctl=
+()
+> (transport_ipc.c), using the per-session lookup already computed there un=
+der
+> sess->rpc_lock. smb2_get_info_file_pipe() already applies exactly this ch=
+eck on
+> the pipe query-info path; the read/write/ioctl paths are an inconsistent
+> omission:
+>
+>     down_read(&sess->rpc_lock);
+>     if (!ksmbd_session_rpc_method(sess, handle)) {   /* 0 =3D not this se=
+ssion's */
+>             up_read(&sess->rpc_lock);
+>             return NULL;   /* -> STATUS_INVALID_HANDLE, no IPC round trip=
+ */
+>     }
+>
+> A more thorough fix also scopes the handle_response()/ipc_msg_send_reques=
+t()
+> waiters by session. I can send a tested patch and run the reproducer agai=
+nst
+> candidate fixes.
+Thanks for the report!. please send the patch to the list and me.
