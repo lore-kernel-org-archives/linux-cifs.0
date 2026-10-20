@@ -1,98 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792518834;
-	b=U8dikpzVLWbcaYX9GCxdfza1YoUWP4frE5/jWM02kiI3feVS11dhpEc7YMa3krPF5NBu
-	 tG95SpmYh36xKhFK1tACQcAMi5rm/nbA6y1jwLI8zhRMHKIs8TltvEF4FIZ9OlFLqLO7l
-	 BIROG6Zp20i/WZJj/NWbha0Ktt8UWguL9i37CipieLloRUvjVs/n8PVTcq0l51q2y8k/e
-	 ycOWkgw4jSfejLDqACHbblysYNnYybLiK0tMK8m9m372/WHnIe0TJXK+kPp24zN60oltM
-	 SoRkURwm/9W6U6jlh+hxH8wnsGEZK2eluG2majwaejgnP7ndFPvrIZJkjONXw0v2KLA==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792518834;
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.42
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1792519120;
+	b=mHSElvhYE+5f2WPf05gYwESLT1IMMy0jamGNXiYWENdQzcgIMJS0NKKXPaX+YAVH22KU
+	 2nQL9B/M31mCHhT0vyrgUEj3xzdjk8/Pzh+Bof9syyuMK9x8EOtndvApv6iQv1yTXfhTb
+	 9j5Pg+QzdNgCplSJilJMQZGamjLDaA/regE24GupepQKNb7Oek1mx4zKUNju3csUpN3dR
+	 WfzhsunScWNO16f8ccCwXTATT2/lg1x2V6f5DHY9qIfThBhvto6+iZlviWaz61v+b8GR4
+	 yDXXWXkbephAjUueAJJLNzI2+L6QcsHNmUDiqxi2TzL8WANRUzBhllzrC5a3PVLrfWg==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792519120;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=Dj8ZuzR0ntDkMQXzMLuFYiD0v2CsY6Dsdijln7ftZSY=;
-	b=UD/JnUrTGCQ8ItB6Uh5+jAhhLkRsWrsqOL6HCKxWVAV8VQ6Nl+hOVznL22+DHia4nFrE
-	 uXucKvMotS/barpIlcbCPq5K/DPJFFDPvQWf8ccgB3wd8IvArYDprA+X8DCaIkzysXBhr
-	 8tVlPv9H5Rg3QJX8ZoUBYGmNbEm2+PW4CnDQEqkAA4J77WD1aWVTZRvqgvmva8CJ7e51M
-	 DAYQgwH45qLlni2eR5R9ke2N0uAAyzUUpLNSduDvxjkRXegPqpxQ8CPeYVuNmN1G1Q/k0
-	 OlAxFPB/QcYKPZ8ZVQqh0kuFc/MgOxU4V7vAvUqzlka7/zC0qEu/WuYH4ZMY6XGVHPA==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:MIME-Version:References:
+	 In-Reply-To:From:Date:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=kcrZTV4N08Els2qRWHt90sKC/lDaR21OyU/ZHFR17pE=;
+	b=QNFKyU2l9RBbQbRLcIr/TvLoOfwEkssKlU5JwOG7uKdaNy6gbwUUA/Kba/XBxMAuqJno
+	 GB2AMk9fBaPHpxW/9yvSVgV344dDC3zfDiFCKtQYFC9I8/WWPjMGczAHe+jhhJGnLPHsI
+	 4/7UC7rLw7UJFnu/uQ4Cw18qHMaiHmqiFynwdQsCvfemqo5fIOnfRlTpcG+vqkvrVziKd
+	 Vhioi19/EyA0k/Voe11M/TraWyHGKMXwWWrLDWmAN7EkJQO7sK2jKVPltdjhJOFuLScwR
+	 93SaKgSiPQvEy0gT+OWbrHNLoyLvK3bzfJPNzm9f4y+PaxM6ANFfDftzhLbtG2ROqLw==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=g6zS3rOJ;
-	arc=none smtp.remote-ip=74.125.82.181
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=a7rxOVVY;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=74.125.224.42
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF81606A32D
-	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 17:53:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4CF81606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676BD606A321
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 17:58:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 676BD606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=g6zS3rOJ
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-35f1f76ea84so6294330eec.1
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 10:53:54 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=a7rxOVVY
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-6768403e9bbso2590852d50.1
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 10:58:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1792519119; cv=none;
+        d=google.com; s=arc-20260327;
+        b=HWc4XFS2fuujNxxOet+nUlvRYWxS24uep6tPMEqmNoy0CrnSVT7cs94o4pI0VOGu6t
+         vpWD/yRuOu019MpK/rY4n20DfZ46i3L3dgSkSn3LPrvngXXenpbAqk2favGLpZlcpprG
+         60cBNyWnqLD6wRIWOHcJBChPIozbdTbicxHArKomx68r/MTGssFbry0JApf9Lgvki4vb
+         0gKFqbPc4HEBAn2eVkIMgiA7QTzHSYbhiThHfwb9issd6dU/encGTouMSWyCrXN/MQyE
+         HxuLwEZSD8i3eAtuwHZWoTS8mzZaFx3B5rhQxrccutd+cURezY19TSnOKbwyxXaUooa+
+         9DqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=kcrZTV4N08Els2qRWHt90sKC/lDaR21OyU/ZHFR17pE=;
+        fh=VWf8lZeTfQjMdpU419BmmO3Q16u//zHZPob0fhVJj4I=;
+        b=nkm/V6znNgxAxmuDWbqzrUH/vqBxRS4vcqQ4YBwaae/PCxVPMwwtQ/Ul18mzeaWk4/
+         +CNaJf3y44Ezgm0PCwrrbV8xzV/2L4sIh2ijd1UZvDBmTxEnhg+t+VbwEF7fwc8qDZbe
+         RPWJ82gu6pzhH/kaz8kZTq7KCBfgPS4nLkkY2HbUhFbA36/hVKklk4rrhtDALPlZjy4p
+         UhhAsuam8U//xdp+tdbOP5SFPkadOa+b+D8X3O7RVXzn+qJJG38Zj0D62ZPirdDzw4w/
+         tSH7xFZ1X9MMUgExnslBOo4QEpogCRnYjr+dLsRXoulvziafPn+oEgtzqoykH/fwH2yo
+         pVjQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792518833; x=1793123633; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Dj8ZuzR0ntDkMQXzMLuFYiD0v2CsY6Dsdijln7ftZSY=;
-        b=g6zS3rOJpQuJvtDA8sYfgp6A7LNiaue9AYt/0pjC77emFhWsv/dk0om2+3FlLLWNEE
-         AQH7Or2XdXonzaHS5NEhDsKEA4YBPDProezqmt9RXgUEv+Dt9445tj5giNwaJlqHyUj0
-         VVRJw9YueG4SkZrfS7W8obBBqoKdXraz9AumV6iOFwwMFnXYfvLgTsA0r+9M6GkGntFV
-         xTXibwayCygDTZ9udhzj0VA0VBIKiyS8r/xx/CzI6jxJWd6CqZOIZopeIAkF4MS7zVTU
-         DSI0b7ry6bHogEpg4I1CeW5HWU+KYyyr0lnyMuCuClJU66xWcrOtNH2GaNJiTZ3ECeQT
-         W/HA==
+        d=gmail.com; s=20251104; t=1792519119; x=1793123919; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=kcrZTV4N08Els2qRWHt90sKC/lDaR21OyU/ZHFR17pE=;
+        b=a7rxOVVYwNQoNm7X+Z3kkqlfq5yAIJkIsxUhn2GjT2PkNlk3HZMSA30LAVJcWAhanu
+         POx5bFDNd57qaGss0ST6V4V8RR9Gk7jHrmvv/JSbx71NJHldnq3IzN5aaMazbwG9yGjw
+         zBr/PhBfNf8KopFuA8oelWMysHVnTwmDWR4pl+R3EyAeEtNI9X+m1EevSZy1xLdjUGbj
+         tQZd/Tp4cdswHbq6Ic5qlVu3QvMd+lbXbPJvBEpBLVP4rzfigKbLh7qOuXiODcjtaPjz
+         wiT74VqqLOWBjPaxYTz0ZueSXCEZ4V2WvyPSq/1WR5uuaqhykQXh+GAfduWUTRMON7U8
+         hjxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792518833; x=1793123633;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Dj8ZuzR0ntDkMQXzMLuFYiD0v2CsY6Dsdijln7ftZSY=;
-        b=lDmgnmUi0uZHiTcuNsXnLAqoKxmY/aI85dSm3Td36xmiKSyaIMeCQf/ETM7N3lAFHs
-         yokWboZ4mLW1svk4OjAaBOZG5DvTRKTYolwLfxAsqYfatJm+hrRmmI/2URVxFxV2yOg/
-         6QMyoMeiTH+J0qIG2xMtA0ZeJEvpAP/rZuAAfsR/hImcYj5GzzlzUcA81vBfEV8w0zA8
-         t9cIRlj5uqHwSmAqQZHl8gn7xCZtmd6GYVmjkWK8/f+yBkmnUJgcnttYkUfj//TB5nXe
-         YmkyulqO6H3GFw9ldObBpbwZ/wiOwLlz5tti7HGfojF4ZN8Cy8S4++MB7hODqNyHmVvx
-         xjUQ==
-X-Gm-Message-State: AFq9FYKafDANC9ppYsKJzvhoy7XgCA/xRc0kC8UIhexQk+d6uA5SWl7n
-	aw9R6pkQ7VLfXSrEpkGsYEQbb6ErSzqWdqRCGZV/juLpanRjJzYpQ9S0
-X-Gm-Gg: AYBFou3jxNxffjzOQvjRzBOKu4ECZJLDpl1QV7l9rSIJyRVtQ1GkkVG4TSdO/YzetEx
-	trpO+2SjbpGufeLKbQ+nrZNVESbFqoFstobUxqnYEC/KpOSP2WHHHcC4B7JkiecH4VYJnhymgWK
-	+KymfeneyCHJ7RiNrFVZ2M8sck4mW5DQppjIrybwKvgLt7hL76/ssHcoYFn9gOD1t20vk/7jpY8
-	672i7pMTM6+v0ChB4V51RfGoK4zB3tEfdi+5rBBZwKi1ihoDRgDDMWkNh8lTjXPOmaGptdD+Gso
-	NQC4YPR/lamUUD9xkuSIofFcfmOsdotRsQeDdW7nYHnpJ2pEj0TBOXP6/dme1cNMRpAVXYNEJyS
-	N0lmUdTpnHZmXnaa/m1z7NegPYoOZfXP8uyvnbk45RYRmQsNqsygsQ9nbCTRJq4R62EPBfz1x7H
-	8ZHLZMS35Qpp8W+cGNWbNKRCnbtdkRS9htjkaDSUbuPnaFgGXLKi4jMEdItSpfi9mRuImp8d/QG
-	govSAlqhYJRHt4awmTpH29dNmkSgrv6YobLxDIqySgzNK/cApWQoXfuA+eQixQWL4t9oZmu9dZt
-	qMehOzQHOlmdymQ2e1ZUIj0ray3e
-X-Received: by 2002:a05:7023:b0f:b0:14d:c53a:f6a0 with SMTP id a92af1059eb24-18512c3833dmr23334898c88.13.1792518832978;
-        Tue, 20 Oct 2026 10:53:52 -0700 (PDT)
-Received: from Terra.tail0ac356.ts.net ([198.176.50.208])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1903b3d0530sm200831c88.11.2026.10.20.10.53.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Oct 2026 10:53:52 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	Steve French <stfrench@microsoft.com>,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>,
-	stable@vger.kernel.org,
-	co+d531129f2f9fbf88@bugs.sh
-Subject: [PATCH] smb/server: prevent file publication after tree disconnect
-Date: Tue, 20 Oct 2026 10:52:55 -0700
-Message-ID: <20261020175254.900284-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1792519119; x=1793123919;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=kcrZTV4N08Els2qRWHt90sKC/lDaR21OyU/ZHFR17pE=;
+        b=j1ZcFVs8D03sT6sTUHdFOHSpEuu82I7hllmedmdwNopn4TDleNO/LKb+51I8Ol83vh
+         HsN71TgfHEYfVugq8l/9LgDPtofRpBTtA/aQY+dqnknm7T57GiJtu51r5PfhvnjbTbGA
+         hTqIPVl9rddulKjugMTBdUIRsDfccyII+h0wCt+gfdigwvDdD0x4+Yi+kdhdtem2SHoe
+         vv+8Uaqu0bPXLCLa3cZ/goRiH6y4vARdmmoT504MVZTFbnjcMNS1uTfYcrm8kYYDO+Ag
+         g7yCOVGcKvTGPJ12Sz7chDK9lEX/WcWrSY8IRHiU28U9N07RO8KsSZDVtBT93aZEBVb6
+         xJiw==
+X-Gm-Message-State: AFq9FYIw3SUCrFYJ9swfzsdpyb5n2VVn3oRlQj+Lh+eY2Buz9rmUDFZK
+	EGJ9B0EDQxgKzMOlvzX5ho+ktSQZM3LoWzPaQI5cY+F+wpe83ULAwBj0naUAD8u6lsCjyEV0in7
+	oG8ifz9A8C9/LckfsgHlRFZqOMNgA/y02gu/v
+X-Gm-Gg: AYBFou1fVZ68Q813cpmuHUC25VkIBQAT3rt+w+/4Zj+FXpsVxV0wUuxn+f397kuqPXX
+	WrevAHQ3LbxpZwaUNmbzZ4u5ndbJBZFFcryE0oCboC2jY4D3zIdSdlC34TbazncFE+L+UNqKg+v
+	75KtcuiFIECwaQVr5MZ4avVW0naXJnr1M4rMNg5bPAQ3fya0P1MzVHyUF7U18/yUcIB4LzL83rj
+	MTF8fZLF9V+E2TaJV8OiWuzn6XyLBdXMei62xRmcn+/UgHm8foHcSclNC1JG+oBLjPKEXYA51ID
+	DCMag0aSeRMCYJ2697toJtJKCbnpdpaj6LcalW+1Ltzn+Q0WjJjPOblFZVZZejrx2Fqo6szDWf7
+	6iL+zO0qhUYDwEPccVcUovac=
+X-Received: by 2002:a05:690e:13cb:b0:677:c075:a57a with SMTP id
+ 956f58d0204a3-679ca9222aamr3644944d50.108.1792519119382; Tue, 20 Oct 2026
+ 10:58:39 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -102,356 +103,49 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAD37_9gGnApAuagqOuZ13WB=DW8c_ZpWFBX4cE00YtGhmE2PbQ@mail.gmail.com>
+ <CAKYAXd_FXeaK2GBRgskkTNBXVjJc92qNDP0S_39u=Eb19h1rBw@mail.gmail.com>
+In-Reply-To: <CAKYAXd_FXeaK2GBRgskkTNBXVjJc92qNDP0S_39u=Eb19h1rBw@mail.gmail.com>
+From: Mohammed <mohammed.saad.alquraini@gmail.com>
+Date: Tue, 20 Oct 2026 20:58:28 +0300
+X-Gm-Features: AclHuK_J5xqqRLd0wMHTkhq_7u7ZWQXtJG7RAlUxkQ9G6Fml8HA1n0SRuPnN5ME
+Message-ID: <CAD37_9i9R1rUjBQU-pS83KzP-Ma_gNkfMGJFq5sH-CObYZdnMg@mail.gmail.com>
+Subject: Re: [Bug report] ksmbd: fd_limit leaks a slot per durable-handle
+ reconnect -> cross-user open DoS
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-TREE_DISCONNECT closes the tree's published file handles before marking and
-removing the tree connection. A concurrent CREATE that already holds a tree
-reference can therefore publish its file after the close pass. When CREATE
-drops its reference, the tree can be freed while the published file still
-points to it.
+Hi Namjae,
 
-Mark and remove the tree connection before closing its files, and serialize
-both new-open and durable-reconnect volatile ID publication with that state
-transition. An opener is then either published in time for the close pass
-or rejected after disconnect with STATUS_NETWORK_NAME_DELETED.
+Yes, this patch fixes the issue. Thanks for the quick response and fix!
 
-Keep a tree reference while a file carries its tree pointer. This protects
-asynchronous users that can defer the file's final destruction past tree
-disconnect.
+Best,
+Mohammed Alquraini
 
-The close pass can race the successful FP_NEW to FP_INITED transition.
-Take the opening request's file reference atomically with that transition.
-This keeps the file alive until request completion even if teardown removes
-the ID immediately.
-
-  BUG: KASAN: slab-use-after-free in proc_show_files (fs/smb/server/vfs_cache.c:126)
-  Read of size 4 at addr ff11000101540f80 by task poc/153
-
-  Call Trace:
-    proc_show_files (fs/smb/server/vfs_cache.c:126)
-    seq_read_iter (fs/seq_file.c:231)
-    proc_reg_read_iter (fs/proc/inode.c:299)
-    vfs_read (fs/read_write.c:574)
-    ksys_read (fs/read_write.c:716)
-    do_syscall_64 (arch/x86/entry/syscall_64.c:84)
-    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
-
-  Allocated by:
-    ksmbd_tree_conn_connect (fs/smb/server/mgmt/tree_connect.c:35)
-    smb2_tree_connect (fs/smb/server/smb2pdu.c:2819)
-    handle_ksmbd_work (fs/smb/server/server.c:368)
-
-  Freed by:
-    kfree (mm/slub.c:6801)
-    handle_ksmbd_work (fs/smb/server/server.c:332)
-
-Fixes: f44158485826 ("cifsd: add file operations")
-Cc: stable@vger.kernel.org
-Reported-by: <co+d531129f2f9fbf88@bugs.sh>
-Assisted-by: LLM
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- fs/smb/server/mgmt/tree_connect.c |  7 ++++
- fs/smb/server/mgmt/tree_connect.h |  2 +
- fs/smb/server/smb2pdu.c           | 37 ++++++++++++++----
- fs/smb/server/vfs_cache.c         | 65 +++++++++++++++++++++----------
- 4 files changed, 83 insertions(+), 28 deletions(-)
-
-diff --git a/fs/smb/server/mgmt/tree_connect.c b/fs/smb/server/mgmt/tree_connect.c
-index dd1db3554cae..837175ac5ce8 100644
---- a/fs/smb/server/mgmt/tree_connect.c
-+++ b/fs/smb/server/mgmt/tree_connect.c
-@@ -103,6 +103,13 @@ ksmbd_tree_conn_connect(struct ksmbd_work *work, const char *share_name)
- 	return status;
- }
- 
-+struct ksmbd_tree_connect *
-+ksmbd_tree_connect_get(struct ksmbd_tree_connect *tcon)
-+{
-+	atomic_inc(&tcon->refcount);
-+	return tcon;
-+}
-+
- void ksmbd_tree_connect_put(struct ksmbd_tree_connect *tcon)
- {
- 	if (atomic_dec_and_test(&tcon->refcount)) {
-diff --git a/fs/smb/server/mgmt/tree_connect.h b/fs/smb/server/mgmt/tree_connect.h
-index f0023d86716f..82891ff9b7b9 100644
---- a/fs/smb/server/mgmt/tree_connect.h
-+++ b/fs/smb/server/mgmt/tree_connect.h
-@@ -51,6 +51,8 @@ struct ksmbd_session;
- 
- struct ksmbd_tree_conn_status
- ksmbd_tree_conn_connect(struct ksmbd_work *work, const char *share_name);
-+struct ksmbd_tree_connect *
-+ksmbd_tree_connect_get(struct ksmbd_tree_connect *tcon);
- void ksmbd_tree_connect_put(struct ksmbd_tree_connect *tcon);
- 
- int ksmbd_tree_conn_disconnect(struct ksmbd_session *sess,
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b7ce67094626..d4d8840a92b1 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3041,9 +3041,10 @@ int smb2_tree_disconnect(struct ksmbd_work *work)
- 		goto err_out;
- 	}
- 
-+	err = ksmbd_tree_conn_disconnect(sess, tcon);
-+
- 	ksmbd_close_tree_conn_fds(work);
- 
--	err = ksmbd_tree_conn_disconnect(sess, tcon);
- 	if (err) {
- 		rsp->hdr.Status = STATUS_NETWORK_NAME_DELETED;
- 		goto err_out;
-@@ -4280,8 +4281,12 @@ int smb2_open(struct ksmbd_work *work)
- 				goto err_out2;
- 
- 			rc = ksmbd_reopen_durable_fd(work, dh_info.fp);
--			if (rc)
-+			if (rc) {
-+				if (rc == -ENOTCONN)
-+					rsp->hdr.Status =
-+						STATUS_NETWORK_NAME_DELETED;
- 				goto err_out2;
-+			}
- 
- 			fp = dh_info.fp;
- 
-@@ -4702,6 +4707,8 @@ int smb2_open(struct ksmbd_work *work)
- 	if (IS_ERR(fp)) {
- 		fput(filp);
- 		rc = PTR_ERR(fp);
-+		if (rc == -ENOTCONN)
-+			rsp->hdr.Status = STATUS_NETWORK_NAME_DELETED;
- 		fp = NULL;
- 		goto err_out;
- 	}
-@@ -5302,11 +5309,20 @@ int smb2_open(struct ksmbd_work *work)
- 
- err_out2:
- 	if (!rc) {
--		if (!dh_info.replay)
-+		if (!dh_info.replay) {
-+			smb2_complete_request_open(work);
- 			rc = ksmbd_update_fstate(&work->sess->file_table, fp,
- 						 FP_INITED);
--		if (!rc)
-+			if (rc == -ENOENT)
-+				rsp->hdr.Status = STATUS_NETWORK_NAME_DELETED;
-+			if (!rc) {
-+				work->request_open = fp;
-+				work->request_open_chseq =
-+					smb3_hdr_channel_sequence(&req->hdr);
-+			}
-+		} else {
- 			rc = smb2_set_request_open(work, fp, &req->hdr, false, false);
-+		}
- 		if (!rc)
- 			rc = ksmbd_iov_pin_rsp(work, (void *)rsp, iov_len);
- 	}
-@@ -5321,8 +5337,7 @@ int smb2_open(struct ksmbd_work *work)
- 				rsp->hdr.Status = STATUS_PRIVILEGE_NOT_HELD;
- 			else
- 				rsp->hdr.Status = STATUS_ACCESS_DENIED;
--		}
--		else if (rc == -ENOENT)
-+		} else if (rc == -ENOENT && !rsp->hdr.Status)
- 			rsp->hdr.Status = STATUS_OBJECT_NAME_INVALID;
- 		else if (rc == -EPERM)
- 			rsp->hdr.Status = STATUS_SHARING_VIOLATION;
-@@ -5345,8 +5360,14 @@ int smb2_open(struct ksmbd_work *work)
- 		if (!rsp->hdr.Status)
- 			rsp->hdr.Status = STATUS_UNEXPECTED_IO_ERROR;
- 
--		if (fp && !dh_info.replay)
--			ksmbd_fd_put(work, fp);
-+		if (fp && !dh_info.replay) {
-+			if (work->request_open == fp) {
-+				ksmbd_close_fd(work, fp->volatile_id);
-+				smb2_complete_request_open(work);
-+			} else {
-+				ksmbd_fd_put(work, fp);
-+			}
-+		}
- 		smb2_set_err_rsp(work);
- 		ksmbd_debug(SMB, "Error response: %x\n", rsp->hdr.Status);
- 	}
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index fd2c595f0486..b72fd915f1e5 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -699,15 +699,17 @@ static void __ksmbd_close_fd(struct ksmbd_file_table *ft, struct ksmbd_file *fp)
- 	}
- 
- 	/*
--	 * Drop fp's strong reference on conn (taken in ksmbd_open_fd() /
--	 * ksmbd_reopen_durable_fd()).  Durable fps that reached the
--	 * scavenger have already had fp->conn cleared by session_fd_check(),
--	 * in which case there is nothing to drop here.
-+	 * Drop fp's strong connection references.  Durable fps that reached
-+	 * the scavenger have already had these cleared by session_fd_check().
- 	 */
- 	if (fp->conn) {
- 		ksmbd_conn_put(fp->conn);
- 		fp->conn = NULL;
- 	}
-+	if (fp->tcon) {
-+		ksmbd_tree_connect_put(fp->tcon);
-+		fp->tcon = NULL;
-+	}
- 
- 	if (ksmbd_stream_fd(fp))
- 		kfree(fp->stream.name);
-@@ -1273,14 +1275,13 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
- 
- 	fp->filp		= filp;
- 	/*
--	 * fp owns a strong reference on fp->conn for as long as fp->conn is
--	 * non-NULL, so session_fd_check() and __ksmbd_close_fd() never
--	 * dereference a dangling pointer.  Paired with ksmbd_conn_put() in
--	 * session_fd_check() (durable preserve), in __ksmbd_close_fd()
--	 * (final close), and on the error paths below.
-+	 * fp owns strong references on fp->conn and fp->tcon for as long as
-+	 * they are non-NULL.  Paired with the puts in session_fd_check()
-+	 * (durable preserve), in __ksmbd_close_fd() (final close), and on the
-+	 * error paths below.
- 	 */
- 	fp->conn		= ksmbd_conn_get(work->conn);
--	fp->tcon		= work->tcon;
-+	fp->tcon		= ksmbd_tree_connect_get(work->tcon);
- 	fp->volatile_id		= KSMBD_NO_FID;
- 	fp->persistent_id	= KSMBD_NO_FID;
- 	fp->f_state		= FP_NEW;
-@@ -1291,7 +1292,13 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
- 		goto err_out;
- 	}
- 
--	ret = __open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
-+	down_read(&work->sess->tree_conns_lock);
-+	if (work->tcon->t_state == TREE_CONNECTED)
-+		ret = __open_id(&work->sess->file_table, fp,
-+				OPEN_ID_TYPE_VOLATILE_ID);
-+	else
-+		ret = -ENOTCONN;
-+	up_read(&work->sess->tree_conns_lock);
- 	if (ret) {
- 		ksmbd_inode_put(fp->f_ci);
- 		goto err_out;
-@@ -1301,7 +1308,8 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
- 	return fp;
- 
- err_out:
--	/* fp->conn was set and refcounted before every branch here. */
-+	/* fp->conn and fp->tcon were refcounted before every branch here. */
-+	ksmbd_tree_connect_put(fp->tcon);
- 	ksmbd_conn_put(fp->conn);
- 	kmem_cache_free(filp_cache, fp);
- 	return ERR_PTR(ret);
-@@ -1315,8 +1323,9 @@ struct ksmbd_file *ksmbd_open_fd(struct ksmbd_work *work, struct file *filp)
-  *
-  * Return: 0 on success.  The FP_NEW -> FP_INITED transition is special:
-  * -ENOENT if teardown already unpublished @fp by advancing the state or
-- * clearing the volatile id.  Other state updates preserve the historical
-- * fire-and-forget behavior.
-+ * clearing the volatile id.  On success it also takes a reference for the
-+ * opening request, which must be released with ksmbd_fd_put().  Other state
-+ * updates preserve the historical fire-and-forget behavior.
-  */
- int ksmbd_update_fstate(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
- 			unsigned int state)
-@@ -1332,6 +1341,8 @@ int ksmbd_update_fstate(struct ksmbd_file_table *ft, struct ksmbd_file *fp,
- 		ret = -ENOENT;
- 	} else {
- 		fp->f_state = state;
-+		if (state == FP_INITED)
-+			atomic_inc(&fp->refcount);
- 		ret = 0;
- 	}
- 	write_unlock(&ft->lock);
-@@ -1763,6 +1774,7 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 	struct ksmbd_inode *ci;
- 	struct oplock_info *op;
- 	struct ksmbd_conn *conn;
-+	struct ksmbd_tree_connect *tree_conn;
- 	struct ksmbd_lock *smb_lock, *tmp_lock;
- 
- 	if (!is_reconnectable(fp))
-@@ -1783,6 +1795,7 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 	 * body of this function regardless of any op->conn puts below.
- 	 */
- 	conn = fp->conn;
-+	tree_conn = fp->tcon;
- 	ci = fp->f_ci;
- 	down_write(&ci->m_lock);
- 	list_for_each_entry_rcu(op, &ci->m_op_list, op_entry,
-@@ -1807,9 +1820,11 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 		ksmbd_conn_put(lock_conn);
- 	}
- 
-+	/* Synchronize pointer removal with global file-table readers. */
-+	write_lock(&global_ft.lock);
- 	fp->conn = NULL;
- 	fp->tcon = NULL;
--	fp->volatile_id = KSMBD_NO_FID;
-+	write_unlock(&global_ft.lock);
- 
- 	if (fp->durable_timeout)
- 		fp->durable_scavenger_timeout =
-@@ -1817,6 +1832,7 @@ static bool session_fd_check(struct ksmbd_tree_connect *tcon,
- 
- 	/* Drop fp's own reference on conn. */
- 	ksmbd_conn_put(conn);
-+	ksmbd_tree_connect_put(tree_conn);
- 	return true;
- }
- 
-@@ -1894,6 +1910,7 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
- 	struct ksmbd_conn *conn = work->conn;
- 	struct ksmbd_lock *smb_lock;
- 	unsigned int old_f_state;
-+	int ret;
- 
- 	write_lock(&global_ft.lock);
- 	if ((!fp->is_durable && !fp->is_persistent) || fp->conn || fp->tcon) {
-@@ -1914,24 +1931,32 @@ int ksmbd_reopen_durable_fd(struct ksmbd_work *work, struct ksmbd_file *fp)
- 	 * concurrent teardown that iterates the table can observe a valid
- 	 * volatile_id with fp->conn == NULL and preserve a
- 	 * partially-initialized fp.  fp owns a strong reference on the new
--	 * conn (see ksmbd_open_fd()); undo it on __open_id() failure.
-+	 * conn (see ksmbd_open_fd()); undo it on __open_id() failure.  Serialize
-+	 * publication with tree disconnect just as ksmbd_open_fd() does.
- 	 */
- 	fp->conn = ksmbd_conn_get(conn);
--	fp->tcon = work->tcon;
-+	fp->tcon = ksmbd_tree_connect_get(work->tcon);
- 	write_unlock(&global_ft.lock);
- 
- 	old_f_state = fp->f_state;
- 	fp->f_state = FP_NEW;
- 
--	__open_id(&work->sess->file_table, fp, OPEN_ID_TYPE_VOLATILE_ID);
--	if (!has_file_id(fp->volatile_id)) {
-+	down_read(&work->sess->tree_conns_lock);
-+	if (work->tcon->t_state == TREE_CONNECTED)
-+		ret = __open_id(&work->sess->file_table, fp,
-+				OPEN_ID_TYPE_VOLATILE_ID);
-+	else
-+		ret = -ENOTCONN;
-+	up_read(&work->sess->tree_conns_lock);
-+	if (ret) {
- 		write_lock(&global_ft.lock);
- 		fp->conn = NULL;
- 		fp->tcon = NULL;
- 		write_unlock(&global_ft.lock);
- 		ksmbd_conn_put(conn);
-+		ksmbd_tree_connect_put(work->tcon);
- 		fp->f_state = old_f_state;
--		return -EBADF;
-+		return ret == -ENOTCONN ? ret : -EBADF;
- 	}
- 
- 	list_for_each_entry(smb_lock, &fp->lock_list, flist) {
--- 
-2.56.0
-
+On Tue, Oct 20, 2026 at 4:47=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Tue, Oct 20, 2026 at 8:48=E2=80=AFAM Mohammed
+> <mohammed.saad.alquraini@gmail.com> wrote:
+> >
+> > Hello Namjae,
+> Hi Mohammed,
+>
+> >
+> > ksmbd's global open-file counter (fd_limit) leaks one slot per durable-=
+handle
+> > reconnect, so an authenticated user can exhaust the server-wide budget =
+and deny
+> > other users' opens. Validated end-to-end on an unmodified kernel; every=
+ number
+> > below is measured. Found with an LLM-assisted code-analysis pipeline (d=
+isclosed
+> > up front per security-bugs.rst). Low severity -- it needs a non-default=
+ config
+> > and the cap is already soft (see caveat), so this is a regular bug for =
+the
+> > public list, not a security@ case.
+> Can you check if an attached patch fixes this issue ?
+> Thanks for the report.
