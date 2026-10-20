@@ -1,99 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.103.33.2
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792522149;
-	b=LiBNUTxLWAWZDL2sGxLTNcN7D1P/PApElYJ0W9AGDlKUS7dYU/wm6+9yllfyMsffK4gC
-	 mN75VADsZw+OvVTI4MWvNmHW30MrZygB1rJjprBHgocnISvYeHcTwtM4zSSHMkkRf8o0m
-	 Rjac1mk2cck1nTsvRvBwhp+TMnMWQnYf/oQ27bdwC84qXeq7PPtHixUIXxy0bvytX8HzS
-	 cZ6dAHJzku3y5r7jrkevyCrmD6j03tfkhxFL3bf3zyNiKZWJbyTHvVETzMBdqgCeN3Rio
-	 ZtYJKJWTE4MsmD/Gu5eA6cEVAE+qaOhXOPJBm3FZPuPjEHbnGU+NoVedKLTYk3LrbNw==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792522149;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 Content-Transfer-Encoding:Content-Type:X-ClientProxiedBy:
-	 X-Microsoft-Original-Message-ID:MIME-Version:
-	 X-MS-Exchange-MessageSentRepresentingType:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=OKG/qGv5ThyZkYxOmlLufr2y6ovRGRKhr3qd05b0ieY=;
-	b=4E2Lof8RVxQzBVGaOX8mS5V5neovKpl+5K6RJw+200u1OFP08cHSz5jQE/RpHdbrKPt1
-	 GDrjCAPVGFPLyHDchCyM0Lru2JiWTgIYK8uHk6OkjkNYdhR5L0EjA2+3s+JMuboND8G2Y
-	 /bIcx2SX/dntJwbDf9PTS9FSenOxJ9j2Vb8EBzylUT+2/EPOh/cPkEPBTb9ZObMqz9B5a
-	 Ce0v7KEpnCgsXYivjZnSgO6M0X9OxJXEU4zL21v/uyPpIAvVqiWFZSdgEgRfHJNQc/tGz
-	 qqhHCbthzl5iyykgRUsX2jXX34AoJh4HzDkd8gBPpuZVvtLqFTC44yxc0y8I6MbchiQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=hotmail.co.uk;
-	spf=pass smtp.mailfrom=hotmail.co.uk;
-	dkim=pass header.d=HOTMAIL.CO.UK header.i=@HOTMAIL.CO.UK header.a=rsa-sha256 header.s=selector1 header.b=EdtwnBYg;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.103.33.2
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazolkn19010002.outbound.protection.outlook.com [52.103.33.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.53
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792523037;
+	b=KnHYw8iomtsC5R19ZaVppruul61yCslfURVDn7VnAYemT4hBNkYApnp4+rHT2beqvirJ
+	 DheXyeSJfjIz3qUih2A66kKA5xsMD9gtZgiWkVwMbjFHjlHQol+QlgxKc2p1PdWTkCOzh
+	 /dkUUbpbAd/coH+xsuScuQ1+PGUliguUdqoL2jxI7rD+8n3gnd3ThmWyCPKlu+7v0GTjW
+	 99l0xUdPnLnhSntMFV1cZl9sfy+4kap1EpKn9+ZCAszP2cuPJ/hSpWgsggWavYEcY8DIH
+	 WrRlsQkZ3dwATYksU2S1cQTVXisEFTT3BekuLOGi5McOIdPLFSHKWFVkAuwPZCs4BjQ==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792523037;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=m+YVhDETtUQWm9g1HvFHGXlxhsLtvKkYiiefCwtpS5Q=;
+	b=NXW2aFTg+/htIM2A/k5Gcy7M9STsAcrqXTnRMsaO/Rl+EnGx9OwpgIU+z+scpR+Oo3cI
+	 W8NWSFePB82uOKxoS5FFW/wNY81arKpqktN6qP9fnNYhB7spPbAFS/v7u2X5XVf3+xRa6
+	 Eh7av0NEw2HkC5NRiLMbslbKBnXwiWWglFYUQ34yrRRbzYOld1OgjLYfcIDJY8w0qMbk6
+	 d5QUHVVQwoC50JDmu7Axo3k/BH2N9YPEzb22/ajOef91Bs1wtwRUwyzAUHlGIqxcrUOEK
+	 SvucUoAwxKc5Ln8SYydiO3IF6FKbix5p/ZunjCIwMJPC0Lte3gooAGSJ580z/KP/9Gg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Yi1QS84B;
+	arc=none smtp.remote-ip=209.85.208.53
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98094606A323;
-	Tue, 20 Oct 2026 18:49:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 98094606A323
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.co.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30202606A319
+	for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 19:03:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 30202606A319
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=HOTMAIL.CO.UK header.i=@HOTMAIL.CO.UK header.a=rsa-sha256 header.s=selector1 header.b=EdtwnBYg
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QvUKFzrDK7XFYYs/ZwdJjo8fA764N5oCfy8udzNPJizqFciMkPhtIV0LYWZ90u1KLiFmiBa0JaieckOJgYS1gW+D8FWJOCeDCLvHIN6M6pL2P4lPtbu0fpx9B6qZH6RyCL5S373997zWON1zB9wUIUggr6mH6ynKwLkk1hG3P+50r+wHzP1gOzrVpdvrfdSZ+bM916Rehrb2c02kqReBCNFcxCM53pjqB9yN1vQFOXzdCMy9R5xRoXp5Z9ekY1e57irJUOARagL4VGnShB1iFew81hRn4XeTKnyr3mqx5xUrs+j/hAw+V6lM5jWCh75OtxCaCpUi/weUkiUDvf1eCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OKG/qGv5ThyZkYxOmlLufr2y6ovRGRKhr3qd05b0ieY=;
- b=c4MlgEoR1OEAGgHBAk/Brkof1vtxvZ+UVR6r4UEDZNeDR1NmsMblyN9XD+k/Vl3iXtVi/KEgTjXXDqSwQqti1so9oi8nqS00xm00AMplTbP6mTY6F5/H6yd+dnLRm/DKTZY+neMHCWSPb7gc4lkVVO8MAne6TTN6F0SVPy27SzPWchvd6cAGrCE9M9eYbUqHajIoNK5ETe1yoPhBkxzX4RDT68YAXlCtiQn8yZk6HXZSyYctQo+DKLRiSI2S9CzIo7UWQXiTge4DZXnEqyGLsHHtQa/GRm+FK8aaPzDAxSzPeYbPm+N3rzQhpaTcwb0Omf2C502idcTOHIjx60nEGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=HOTMAIL.CO.UK;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OKG/qGv5ThyZkYxOmlLufr2y6ovRGRKhr3qd05b0ieY=;
- b=EdtwnBYgg/AwxgVHcJtWg9EwpsAVO4PqoGWbaw22HqW5tW/SAawSiY2wzmgHW18aqIElmLy9pbRZrMPVnWIiqoZ/dIi0azje1tkGpv/jITyflP0go5VOW6Wxh29VoPoXVuNLKlCfnD8myaEbc3fsvjyws6u2lHCZy9LEIBye4zwFiQIzLoG6jo0lgQbDmuAX2PbCZKY+kWFCWg6pZ74wI72fJTnxhFeTlYWpufZwukSWAU8Ge8CH3xKlmIGzBnkklvl3MnoKNNoXgGBceGexwZqcJwOb+nzZ3QxPo7fGtou3cIz5FKi8V/ipCfO9knyDDojMqHzwlhC4h1h58uAOAg==
-Received: from AS8P251MB0001.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:344::22)
- by DB9P251MB0063.EURP251.PROD.OUTLOOK.COM (2603:10a6:10:2c9::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.15; Tue, 20 Oct
- 2026 18:49:06 +0000
-Received: from AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
- ([fe80::2952:d4d0:4ba:8352]) by AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
- ([fe80::2952:d4d0:4ba:8352%3]) with mapi id 15.21.0546.012; Tue, 20 Oct 2026
- 18:49:05 +0000
-From: Aamir Ahmed <elb12345@hotmail.co.uk>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	lsahlber@redhat.com,
-	stfrench@microsoft.com,
-	hyc.lee@gmail.com,
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Yi1QS84B
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6aa9164072cso5012046a12.2
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 12:03:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792523035; x=1793127835; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=m+YVhDETtUQWm9g1HvFHGXlxhsLtvKkYiiefCwtpS5Q=;
+        b=Yi1QS84BGHvS8TsgRfabeYKIqe70t8cUNCXCVXCmavgsqsUzeP1VJbf7UDqxQRbvHX
+         Wk+y8GqSYwdO0exxPbPb3hBvRhyAnCfeNVAoY6WIdDkjacF2+jMOsZ6O85wi2ebiagy6
+         GioTRewLq6QPvGlqHl9+ygm4T/An5kAObTYsZnhek1hxs8BAcMGDMgbCHwiZmjy/RnB5
+         YD5tUsMix7DS3s753iR1oqHU9WTOG64ucFZIQCdMcHen/Z2mUpf2bV1RvKjopYaP3DpJ
+         5nXAcvUs+HJ1uuKHOcvrmICOwUtEkSp0V78sG7A9zdGKwYF5ZAfgwvHeah5uaX5AX2de
+         t2Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792523035; x=1793127835;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=m+YVhDETtUQWm9g1HvFHGXlxhsLtvKkYiiefCwtpS5Q=;
+        b=lwMMrtz8r7nXCHbRVLUmOt7+uWxxvTTt79HU5bxG+3JuDwncz1JuYKok2Xnnk2lFqu
+         M3Dz8TAjD/+s5L04dj4cQbpPlDUBEVaRiD6bQiek+N1sCm17ZT90/CaQGeNZBRo1bRVZ
+         hEbYsykeiqlwprK2TOpa421YBAN9N2Ir7SG4CuQABCwbNg0f+TR9pJcLH9J/jXr8zAmI
+         zsm2FrOVd5GpTbHvGyaq8weBfY8tpnxWdkXNd88xK1apsEpPnCJdUxQgiaIDhdsGGgpP
+         wZN8tc9gWCxQa5PQgd7ZpmBcoJYNyCJIpdFlzca/wd3hxv3oFypIKkyue0sYkTnA6YoA
+         98mg==
+X-Forwarded-Encrypted: i=1; AKwUvBxFCG8ujAqoKRJPehqbcnUmqps4n0ApBDYP8GwQBirPu4d7yMSM1fczXHDxw6PQksNtYIFkCeVb4ZWV@vger.kernel.org
+X-Gm-Message-State: AFq9FYIqB10iBcVxPxJoxdkE71ckg77jsBS9wUlaYfstWv4yEoOxsUXu
+	EnMSZdYm74Cu3+Vpos7KJgLhJk+2Lg9G9MFdKLdgcvJ4Qzll0ObytZ/o
+X-Gm-Gg: AYBFou2SBUkw3JnZgB/GcamY/gJKFcaxXAgaiLxYDWP8/FKR1FbPfcGnLIyyZb7/GFs
+	tfZYAzO2si4ZXGzZqVXjHtExsDrCFoT86srCL+AeP/c880fbIJURJOLZV7c/bXk/KaA7OZmpE1S
+	ALkmQJdD8YU6a/NaDBaOtzcwFMIGFkz54cV7oVNfmo5t2/xFKNruCxIkUoSO9G6nF7r27NwXEU/
+	MmPAs5y5MhPKkMnmkNyUKhjnNowUbblyoFXEZV7NFZ2snPb9x4aWmpbdmGxENlKyqGPY0WuDNBH
+	dnCKLFfy43mOM6Q7vAs2SY2NMh2MgYo51gAQYEU4Ul6xRftQ2DBMsvEO3ceF4uO6P3HQAUP/KFw
+	bwuYF/7yvnBos3BQyYPkoq7AfDVnvOJEe6Bow7AO9J5lBrKS1RONcK+5zg+XUDUlH2C82fqf/jG
+	rblyCp60VOkGvdKDurVZuBS5BVrFTDZdmI/CQW6blCUBADlHo3lPVTd9Q/72B8yvjeV/wqHZ6Fg
+	7u2HoxC1LExurAHqsxYsXa2/s/AT66dMLGZ8XwrXmXQ7QU4qppp0KjTqmI4AnxHQWWqXxW3M2/l
+	A7SfT+tgdA==
+X-Received: by 2002:a05:6402:c287:b0:6b1:bbff:6ce1 with SMTP id 4fb4d7f45d1cf-6b3a81c7156mr5153026a12.45.1792523035337;
+        Tue, 20 Oct 2026 12:03:55 -0700 (PDT)
+Received: from wlan-199066.nbw.tue.nl (wlan-199066.nbw.tue.nl. [131.155.199.66])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b403110a23sm24516a12.17.2026.10.20.12.03.53
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 20 Oct 2026 12:03:54 -0700 (PDT)
+From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Aamir Ahmed <elb12345@hotmail.co.uk>
-Subject: Re: [PATCH v2] ksmbd: deny access for an empty DACL instead of granting the request
-Date: Tue, 20 Oct 2026 19:49:02 +0100
-Message-ID:
- <AS8P251MB00016AA2D945D625E586CF87C8672@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <AS8P251MB000104EEF679ECC44D8791F2C8B92@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
-References: <AS8P251MB000104EEF679ECC44D8791F2C8B92@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P123CA0124.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:192::21) To AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:344::22)
-X-Microsoft-Original-Message-ID:
- <20261020184902.50676-1-elb12345@hotmail.co.uk>
+	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Subject: [PATCH] ksmbd: reject FILE_ATTRIBUTE_TEMPORARY on directories
+Date: Tue, 20 Oct 2026 21:03:51 +0200
+Message-ID: <20261020190351.9445-1-mike.michalo@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -103,73 +98,60 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8P251MB0001:EE_|DB9P251MB0063:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b790745-bb7d-44dc-11f1-08df2edacfa2
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|25031999004|37011999003|15080799012|23021999003|39105399006|24021099003|55001999006|5072599009|22141099003|8060799015|19110799012|260925184616899003|25010399006|4140399003|3412199025|26104999009|440099028|40105399003|1710799026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?hnBecTqoWjJTwgeTq910aNoLu/yZJn3IkDQ7JDyTHk+wM9Tw1qywO0Rk9H/z?=
- =?us-ascii?Q?hoBUAc9uq/NO0XudHdwwcGbgTn+AERYj7YM1k6fTw71qKsid6a/1UO2HO2+m?=
- =?us-ascii?Q?5mPhnNdTb4aFafLDlRguCrnueg1/X6NCSGqwlfKABagqBnoiMn0CSiiBMwQG?=
- =?us-ascii?Q?bCzpdhLXHOTbBXqLMqPHdP06xWY4sFHDMyPvJd4EcnOveilCyYOUpVDAA9QA?=
- =?us-ascii?Q?HQneGA6dhFsZDfuZ6igOCtrpII2ubhNE6/oiPdtPL8OsKADWSmI8nrdMSzu6?=
- =?us-ascii?Q?sBMS4132bULSaXfl7l8fG0psBEGURaRLCZW5yIgSAxzlh2nzlZ9YrZCxNHQN?=
- =?us-ascii?Q?v7RvUnuoEFS6wx5m6VRcbs7G5BU/wvmsBCLBF0KisOC/YXtnybS++F7H/+3q?=
- =?us-ascii?Q?ajUl4zU5a033WEI452Ao30d5JvvAadmqfCDdmaUp02N9Uvu/T77OosA6gdWD?=
- =?us-ascii?Q?H/ST4YzLZYPn03Bj7YxFBRS7c3Kt1MYAzBLhAohjjBrlMo/F1CNsKsydllzQ?=
- =?us-ascii?Q?Zrh8l9k5F7bwC7GV9rQpwX2pouLJHDQE5ekgiTxf4ZQdOCthT+L00YhDNzmF?=
- =?us-ascii?Q?+reB0Z4KA+Gb2Whk6EjOKH1EB3hg4UcKpbs+ij+IXoqMgytrAi+40/F2aJQV?=
- =?us-ascii?Q?/Z4o5mi+wejs3FL0vqf0D7oSCX49cvq3Dgv7oAixR2k+YmWsqktObHaIyre9?=
- =?us-ascii?Q?JKWrNNKnanOp9IJSyhuJmXUe4+kmo+Gtcr4kg/nnDNoMfqIOQAH14rTEj63Y?=
- =?us-ascii?Q?34BEOJqeGmgEW3rjXFULoRVuA1/NnDMdPCH9ZF4uRLg9nes/eX8azId4EV7E?=
- =?us-ascii?Q?ILBJenA2eHnaLDaCuhMnljCA7LG5QgLR8nb450+42/i3C/KVZHWTv9wciU/d?=
- =?us-ascii?Q?364Wsrh2Go/PiuJwMvpdL1SKQ+w5231dX+z5E7hjoeL813Vtbj3WZ40Ds3pn?=
- =?us-ascii?Q?15TPmhu6eeXROTrtQlgudXVY5u+3eFaXHxjxBk8wxLG5PuaabwgoGTdm7AFv?=
- =?us-ascii?Q?+s1mbOI4nh81bj8Sy4TgviTwRfBxmFGZ2/BlJsHouhzXhu4EHHlwOECSAQmv?=
- =?us-ascii?Q?XXHOM3B1Ws74JInOWf7icw+ai6FshQ=3D=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RusvD+ju9bnb3p/cp7jDR8mcdEaqlns7YENppbuOSkmK4AdlTWqnANxoCLuN?=
- =?us-ascii?Q?6CAe3JkMWS3O1egnQ/MTbm+tRcgeQnaGnGUeJf+q7UvPtnJC/nV8Cy4s3VyB?=
- =?us-ascii?Q?xroBDumD/jU/HpoWwMVoW5skEgL24qroTMlYjb32v945Y/1i3U9I1H3plgw+?=
- =?us-ascii?Q?C9rt7g1KgRagkceyZksvn82ea5tgqLDH6POdhRcxbPTwOFEm5mkTY/0NDUJO?=
- =?us-ascii?Q?RlXdWakEHIWSzpMOOY39YGz/CWnpuNjQ8pBIYLpUOHTS6ZgW6L9DlgijHHNW?=
- =?us-ascii?Q?eCuHmTIzcbPzTjSs1sdBqTqVL1KC4A6TqxY9gFdQKGQB0Z1aqoLWEYoWUV/f?=
- =?us-ascii?Q?ShHRUsGVLmK+MkB+RCx6YEIz2UFqZmdEuaaO7dVD+QpM2YtqTetJIdj/ykR1?=
- =?us-ascii?Q?AQwoOF7owW59OPZEDe64Rkyjf7y83iXKgkPu44z3DJr1BZprG6PWHzhPKX0c?=
- =?us-ascii?Q?KMsui1iVdRZRPSflLIr1E7AJZHinAA9b6NTnKdSoswFkMm+sMpxJAjdjWy2O?=
- =?us-ascii?Q?uekq5nNZQx1OumVlPY/5Rbe0ivP4RjkbY59ot8siOR7w0W26GaSUxbRNTYZF?=
- =?us-ascii?Q?Mj+DrEqI0gbDXXoGSyTxy4oxGJ+yha9CS+rOmYC+u8Z0vmbaXNSZVIVl5YqH?=
- =?us-ascii?Q?3Yuqw1z7EWrIuoRRdeX9/06Vp1Fk0g6JK7IVjymE5zPFYn4DhRIlE9SW2rZ5?=
- =?us-ascii?Q?bF9is8jc00vkemwvJK3XjUaxNIAjjyQH3ulZSFNp2f12+dxSNh5qYRd1sVWq?=
- =?us-ascii?Q?eNH3WMGPZkGNgsrLxynWfORkVJKPcRX0/F0+m/NFBIWrCgeswHbzP1+6/Abo?=
- =?us-ascii?Q?wfbQoFH26hGH57DECjqv5FWAQaNAu4u5Cl3eR48rYDiPDc40Sd/ittxvqDIQ?=
- =?us-ascii?Q?+YdPF3ADlAD+IIv3/wscsCVH3HUs2LaAIEclmnUS7kMj4Rg9r9G14pxExU8x?=
- =?us-ascii?Q?8gky1Q1RHEdTm9NwyYuOVNlPP3JshNBOOnFFJZ8vKI4aUC3XRbRZEsscE2Yi?=
- =?us-ascii?Q?2CPrL0K0VESGx4+49u23nT6hzpwwKSu1q+UbjmdVM59E9F9cZVA+ij5x1qdj?=
- =?us-ascii?Q?gyoG8c3dt08UBSbPQ50QRWyI2dgln4QKcZ54zGSkW/sBxHf/+ddUQFx7PklB?=
- =?us-ascii?Q?RWsXlBI08iSXeB7o7Q5T1U9ls0elUxKtwfgcBrJHNVRu9vD5RhhlwWuD4pYm?=
- =?us-ascii?Q?6dl/YWzqrZPBlOyZeRJFFKBTdW18RG2f6nkuAraPsnTZiLMC2ksZeZzDI4y3?=
- =?us-ascii?Q?Q9Tiv6GDXSJS3FMz0dVaPOyqbYMB9qxbllo/9Qa9CG4fkhmaVoaqtvbPrW2O?=
- =?us-ascii?Q?mctveoWuMkdmguohtdXLX1ak8B+HaEZnwqV87rLbKbuoljTIciFsQYLluMJ1?=
- =?us-ascii?Q?Xk6JwNATO9oc51eD3APqRZqjGpscrHh7lGyivM6Wmyl34NVmm9pTRDfPh265?=
- =?us-ascii?Q?mKxdgNw2KHTqV54dZ+y3/+pV/VpvmP1d?=
-X-OriginatorOrg: sct-15-20-9412-3-msonline-outlook-fe3f5.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b790745-bb7d-44dc-11f1-08df2edacfa2
-X-MS-Exchange-CrossTenant-AuthSource: AS8P251MB0001.EURP251.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2026 18:49:04.9766
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9P251MB0063
+Content-Transfer-Encoding: 8bit
 
-Just following up on this -- v2 only added the Assisted-by: LLM tag,
-the code is unchanged from v1.
+Setting FILE_ATTRIBUTE_TEMPORARY on a directory with SMB2 SET_INFO
+(FileBasicInformation) succeeds: ksmbd keeps the attribute and, with
+"store dos attributes" enabled, also writes it to the DOS attribute
+xattr.
 
-Kind Regards
-Aamir A.
+MS-FSA (FileBasicInformation) says the request must fail with
+STATUS_INVALID_PARAMETER when FILE_ATTRIBUTE_TEMPORARY is set on a
+directory, and Samba rejects it too. smbtorture's
+smb2.create.dosattr_tmp_dir checks this and fails against ksmbd.
+
+Return -EINVAL, which is sent as STATUS_INVALID_PARAMETER, when a
+directory is asked to become TEMPORARY. Do the check before any
+timestamp is changed, so a rejected request leaves the open file and
+the inode unchanged.
+
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Assisted-by: LLM
+Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+---
+Tested on ksmbd-for-next 454ae8e5c306 in a QEMU x86_64 VM with
+ksmbd-tools 3.5.7: smb2.create.dosattr_tmp_dir fails before and passes
+after this patch. The 187 smbtorture tests run by the ksmbd CI, plus
+smb2.setinfo and smb2.dosmode, give the same results with and without
+it (smb2.dosmode fails both ways, for an unrelated reason).
+
+The same failure reproduces on the Ubuntu 26.04 arm64 kernel with
+ksmbd-tools 3.5.6 and smbtorture 4.23.6.
+
+MS-FSA (Creation of a New File) also says that creating a directory
+with FILE_ATTRIBUTE_TEMPORARY must fail with STATUS_INVALID_PARAMETER,
+and ksmbd doesn't check that either. I left it out because I have no
+test for it; I can send a follow-up if you want it.
+
+ fs/smb/server/smb2pdu.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 40af35c0aa29..1ed8e8135c58 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -8695,6 +8695,11 @@ static int set_file_basic_info(struct ksmbd_file *fp,
+ 	inode = file_inode(filp);
+ 	idmap = file_mnt_idmap(filp);
+ 
++	/* MS-FSA FileBasicInformation: a directory can't be marked TEMPORARY */
++	if (S_ISDIR(inode->i_mode) &&
++	    (file_info->Attributes & FILE_ATTRIBUTE_TEMPORARY_LE))
++		return -EINVAL;
++
+ 	if (file_info->CreationTime)
+ 		fp->create_time = le64_to_cpu(file_info->CreationTime);
+ 
+-- 
+2.56.0
+
