@@ -1,55 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792573016;
-	b=4CMtJ0cMLw5zy+bNrjJsK3xsQFG17DbSJLFyCd0I0w0Rrgu7gqYLyPxglcVWbYzwPpq+
-	 Vb3csrSEzsaogEUYhFnSK7b4Kd/D7mXViQZU+J3TJqMVSJX1uLsEScdKyM2/lzoKOCDPu
-	 fGqZKAkIyof64ADmZAVFwzLUOt/sreNGq7FzUAVEu3lTHMBSRkqnZyTmHx2Sd3OQPHuto
-	 1JAF/n3mDUgLlWmyVlwy36UnyydZFwPZg1rO665w9RIAxNUKLMh9H8F8gNiRyx9zf9wPA
-	 l0AejUY8Hao0d3az60lUtNeUonFvnli9nPONxGrWvz3PVaKALaKB3cBQRQaszl0qJQA==
+	t=1792576553;
+	b=qVs616oRACE0ABNuZypwThqKaLuR4HQLqC3ANJZfbUbu1SfX++4m/uQTSl8ph/A6xCul
+	 biGyLRmdOuS1uQIDiDYw+RQqJKDn87/CEsi0FzJGZ2uPuJE4bfX5x1PoYgs/QmU+BaBDI
+	 2uw9LfUfHHNYCf6VB9WbcycrrymbmQ54GPBZeH/Nj4T6UAdzjd3o28t9B0tFCMudJxzcl
+	 k0wHs7XP21nmAhLzuwN1Oqeszmif/cr0WVDIbVul2dZ0DWOfKGPK1w2adNjunJU8zb8CL
+	 xuG5ZZkkxGLRQjeBGRnB4ehlvV+cC3rr7FQXM/eKjjbMvbrDj9dwNwE3Oanf2JN/Dcg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792573016;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=SIf+wKLYHtIOa2fs6GA+xJQ9mhiGEJQi8Vfrtnjdw4w=;
-	b=y8HG6C+CMNqix3ikgQxycr94SfrB7f6Zulw9HZNHi+vx8hNlKz65MfD/cP/fRL4oRtVZ
-	 SMkIuXlLCS4P34RrozqJg88XUfX5V7zSiNlJyNdRkDsbJLFvaaqsmneq9nhtwuvvUS5h8
-	 8MtU6R/JYlVN6F+0rhuEpzZB1sBdV1GQqbpALL7IIOg9HBqMSXQQ4zZ/B+BEskBWp2MOe
-	 QuHmluv3eY6bNdf5O2SY2q/naZ8BChBF81pILHLVEiDpPLIlP4/8OWXlOHqvK8B/YTM0i
-	 v01EJG6iCnwvkeBefas5lSo4vtoy/jMLVMWJ5PW4+x4Xw9XNvmXIqdq9bW0TFzfS9IA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792576553;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=IIGWTKmOx1c83FVGvewRkmLSOibVGHHpVBo4E4/42Jo=;
+	b=nkpVFvn1BoDShA0ta9AB0qJaeCWlum7BjEym42lYBAppFRSs0tpthCTYHCN0mGOF+wD6
+	 oX9uI+5wYIX6i07MRlv1fkrdqDnoedV0Y0KMXaoO0vQ/6V7kid12N103DpOjyFvQz0lVR
+	 qHY+u8rbkaIi1SXJzT9t826Mhew2fm4Al9jhduAbV6YT0SRKis0Srph2v+59ZJVzMdKjr
+	 Q/WoM/V/3sNaZtH8lqscL//foBxZ9LT27Yt2DbqkiGPgYMqDfLPKhOU/lzpHE54eZAtat
+	 xkGr3MmVqIE0/fWY3rhIeno6FKJxxtpWtuwYZIV4oNuZEZlFP/js/o2o/RaA5IgkGGg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gU6KFtyX;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Lxb6M2eh;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26381606A31C
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 08:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8524606A319;
+	Wed, 21 Oct 2026 09:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gU6KFtyX
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC34A1F000D0
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 08:56:55 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Lxb6M2eh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520C51F000C9;
+	Wed, 21 Oct 2026 09:55:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792573015;
-	bh=SIf+wKLYHtIOa2fs6GA+xJQ9mhiGEJQi8Vfrtnjdw4w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=gU6KFtyXA/eWF6UAj1J+fcVGy744HCQe+rorS9Y4zWwgTi+XXVuVhRzl7gHJyU8Oo
-	 WoPzNGFmjKWUByO5sUlv0lOWWvTcIrKXRnIhp7kNi4V0FT8FumM3106eH7nNVlZGjd
-	 csxLp9SE6sGldurxb7MLEOcmfvbGC5Q1WQJ+RjDvb8iJ8xgkMyDJNBVwcFOslyPMN7
-	 2fQSxE1dabLQusZEVTD6PAGWE2kci7K+KnC/QtZpGjKIRdyUhEAETu+3qD4Nkj0/RJ
-	 qMamiMudZOKn/Xdwqz+dX0n3Cz3xz2EbfsU/B3+Ob0xx0VZSQUObTRd3TmcVxhORIq
-	 YT/irfw3m3tQg==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6ae14eecc64so634624a12.1
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:56:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByGjK+ttBgKAnK/vMl3d6hBknXPvpTFq5SVaHRM0HILhVScQarGJuC+ubPVgLl8ubSl+RGX2KZmCqmi@vger.kernel.org
-X-Gm-Message-State: AFq9FYLDTxMzkGzfhCCrn1ep8ADi8jNfHkZq8GsBTYyjsjZ9f6RV96nn
-	mn233cEr1zTHW2ApcHHtdGOQn4nvkZ1/AfU52hAtGSdp+mrHxscxYFsno4IqecS6q1s9EXapsUR
-	+TjtORNrivkPbngmhQ5WeP8+nXfrECHI=
-X-Received: by 2002:a17:907:8687:b0:c35:d50a:1352 with SMTP id
- a640c23a62f3a-c4679607763mr110430566b.11.1792573014394; Wed, 21 Oct 2026
- 01:56:54 -0700 (PDT)
+	s=k20260515; t=1792576552;
+	bh=IIGWTKmOx1c83FVGvewRkmLSOibVGHHpVBo4E4/42Jo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Lxb6M2ehmlNxrSdK52xS7hR0Zf/zuU27nsuvJnITQdREM3X13JasaOw5sBhAI+Zjy
+	 YKT3nyR6IxOTVmg/T4litaQH5jzb2lPv+jIM8nyJiCZnXdJxuTIFJC8YOTstUT/cNr
+	 3BjGDbTY/AVnaNuV2k7zQmF8Ud/fsC1ugSkx4PX1Akivozx42Wp72xpH34xKcfyc4k
+	 AyWtiJQKCfnOilgCQ+IjI2dV5xQ2pKCeqSKGMxroNVmMhClzmCpdaOSGyoBHLnzf0U
+	 GnE6FUUp1oZm3pTa3Hah23IAnjLWoqBWRwlpCci/IttRHBd6jxG7NZ5XeMWuBnSj9q
+	 boSQIEitH/YDg==
+Date: Wed, 21 Oct 2026 11:55:47 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: NeilBrown <neil@brown.name>
+Cc: Paulo Alcantara <pc@manguebit.org>, 
+	Namjae Jeon <linkinjeon@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jeff Layton <jlayton@kernel.org>, Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] smb/client(cifs): prepare for locking changes.
+Message-ID: <20261021-sodbrennen-ausdruck-kurven-72d0b7cc7db9@brauner>
+References: <20260928012812.2890035-1-neilb@ownmail.net>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,58 +58,31 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <cover.1792345559.git.jan.koester@gmx.net> <CAKYAXd_2AUVQFZWcmk55fBU2Rk-REb-onj38whT=kNCuZ=COew@mail.gmail.com>
- <0cadbdcf-6074-449c-98f9-3aeda3756160@samba.org> <TYZPR02MB6959BC66EECFB5D178F92012E6672@TYZPR02MB6959.apcprd02.prod.outlook.com>
- <9b5b0f6c-9105-4e30-8608-6f222b0e2a6e@samba.org> <TYZPR02MB6959812BFC392957EDDA8C67E6672@TYZPR02MB6959.apcprd02.prod.outlook.com>
-In-Reply-To: <TYZPR02MB6959812BFC392957EDDA8C67E6672@TYZPR02MB6959.apcprd02.prod.outlook.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 21 Oct 2026 17:56:41 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9ppcrwJEcjFzsqOq0SoD81E5GXDU1utEVP6=ywaL+o9w@mail.gmail.com>
-X-Gm-Features: AclHuK-rqrXSSN_U5qyAKwHz67uGRda1ZtrQ0Kdn46xBn0-lPSiH6U1qPyisTB8
-Message-ID: <CAKYAXd9ppcrwJEcjFzsqOq0SoD81E5GXDU1utEVP6=ywaL+o9w@mail.gmail.com>
-Subject: Re: [PATCH 0/2] ksmbd: NTLM pass-through to a domain controller
-To: Wang Zhaolong <wangzhaolong3@outlook.com>
-Cc: Ralph Boehme <slow@samba.org>, Stefan Metzmacher <metze@samba.org>, Jan Koester <jan.koester@gmx.net>, 
-	linux-cifs@vger.kernel.org, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org, 
-	Tom Talpey <tom@talpey.com>, Wang Zhaolong <wangzhaolong@fygo.io>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, wang zhaolong <wangzhaolong@fnnas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260928012812.2890035-1-neilb@ownmail.net>
 
-On Wed, Oct 21, 2026 at 12:52=E2=80=AFAM Wang Zhaolong
-<wangzhaolong3@outlook.com> wrote:
->
-> Hi Ralph,
->
->
-> > may I ask: why? What's the benefit over using something mature and Open=
- Source that already does all that and more?
-> >
-> > Just curious. :)
-> >
-> > Cheers!
-> > -slow
->
->
-> Fair question! :)
->
-> When I first had this idea, integration between ksmbd and Samba's AD serv=
-ices
-> was still fairly limited, so I started thinking about a more tightly
-> integrated solution for ksmbd-based NAS systems.
->
-> It's great to see the community making progress on this, including Jan's
-> recent patches. I'm happy to see that happening.
->
-> At the same time, I'd still like to try something different: a small,
-> Rust-based AD DC built with ksmbd in mind. I don't know yet whether it'll=
- offer
-> any real advantages over Samba, but I think it's worth exploring.
-I strongly support this work. The benefit, as I see it, is that a
-GPLv2-compatible AD DC implementation integrated with ksmbd could
-provide both file sharing and domain-controller services in one
-ksmbd-based solution. This could be useful for NAS systems that need
-to keep their software stack GPLv2-compatible.
+On Mon, Sep 28, 2026 at 11:25:01AM +1000, NeilBrown wrote:
+> I am working on changes to directory locking.  The medium term goal is
+> to lift d_alloc_parallel() locking above i_rwsem, so d_alloc_paralle()
+> can be run unlocked, and consequently cannot be called when ->i_rwsem is
+> held.
+> 
+> The requires:
+>  1/ that d_alloc_parallel() not be called while i_rwsem is held.  cifs
+>     does this in a couple of places.  A new interface d_alloc_trylock()
+>     is now available and can be used instead.
+> 
+>  2/ a dentry must not be d_drop()ed while an operation is ongoing, as an
+>     unlocked d_alloc_parallel() would then be able to create a new
+>     dentry with the same name.  In particular d_rehash() must be phased
+>     out as it won't be safe.  This particularly affects the mechanism to
+>     block lookups/revalidates while an unlink/rename is happening.  The
+>     mechanism is changed to use one similar to how NFS addresses this
+>     needed, though using the new LOOKUP_PRIVATE flag.
+> 
+> The patches depend on patches recently added to the vfs tree.  I would
+> prefer these land in that tree too with an Acked-by or similar from cifs
+> maintainers.
 
-Thanks.
+Can do, will need an Ack.
