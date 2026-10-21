@@ -1,55 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.163
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792564372;
-	b=36lxHuNn/fJ2eDBvr3qkmElZPoDpXRRbOZcB/mXGF4UK+BDRCUgfrVhg/7dX8KMq9XKp
-	 0L7aKHgL5KPKDMY+6vfYfXkyGee+nuJ8W8fUdrZ1UDJljJ0IwzifnjIE3jgtJoKLJ+JyK
-	 fKOWJfG/avqIqg7Z7cZrSiNFtahXLRqVroUoYf9Ww5ppvdBXmnpEHPE0F0vBEKhqF97UF
-	 trxH7KdXxjoJ6lUdJHvmN24tblZRQc/6wihGBJNYWr96LuaQNuE9Di4ZVTRnqXhEN81tb
-	 f9FydwBC1FUe1bK+MK4SwrxIhWvIBpZiowh19jruACkqhXS0iE1dsv+ePInITGFUXZA==
+	t=1792566196;
+	b=35/u4bvAtnpGdXwUL95U7BGWKWGBo8lHIo+x6NIUoeB7Gm60YrqYNI9oAUOlvWdwX01F
+	 fgeHm26u8MXnAySEr23p3E6agbwuq3ExFPEItDPE56VLk4r5RtogaRJxvE3vnft4+INcE
+	 SDxLuYbhafhfbPqjXeRD0UDoKPB+m67Q6W7FsmvwiDvcX3oDVCGMoKeSG+E/W0qWaDvv5
+	 2wghyHJQQbPdbJBA4+gmgJZ9vSvq2maXzkQKYhuZlME2BWW8H3plCxsfjuNrp6OvaF+0F
+	 ywOKwAtkLzTWcboqkiXAdFpaMcQn4joFLie7XXIzSA2pHmRDO/oawsOwqV1WD/gTINg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792564372;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=A/NVyzvCFNcDr1LXlDK3Ez8QGnN9AH72+DZCVQ+TLgs=;
-	b=UVIOU+L7rACg+Qp+6WKIJ4CCmYT0BHizXLmOIMTlOwwqgv9Di91idJd4G5EVwVRLDygB
-	 1ukvf5uWOYRbPlWNv/bVIwr+Yh/2cW3TvWzXmRhOrY1ghs1D2T3lYQY7VeQ5ty6BbxKrW
-	 hGjBI5+fZ20wJasiHEnaytWkClnw3kljSy5nF1td5o0vczfwZxqZrdMWzad+9v3hNbygS
-	 dvFbp/E01TtGlQMycUxH2u14AN528ETJ1ZUz/38lqC6ZeAehvtXpnwXhgBK4DwyoukCch
-	 b4TvoJY+hY9RnRaBJdM4zNVpuCZufFGGXun8lar5L9Q/QIKmc0Bs9pFn2JE3BXQ+w8Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792566196;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=UeW96EGt9NT4L/FZOox0ScwqiduRGN9r9eR3bqA6I80=;
+	b=UvxyGpKB3zU5ba+U7fr6Lu4nWLTUpbJj83/CT7L+aUCDy80mHPTJbCVUcS3EV2G1hEep
+	 bGPkvX5ghn2vI2UwHTwzuxS6zDBjHf/iAs78ij3yXBtf4diKI3WM0Kr88r670p8cVYhV3
+	 pWjSEEn22shfnN4mqJkbg2ymkWau4ZZH/DRQ5YlwwqZ2Mq8BpZ0cDQYC/Slg7V8Z/oaJQ
+	 RlKlYlZ9/kmpd44ro3C041+OOU9+wwgLp0b60bQOTB1b1yVAVvsmQgmeBl5QCX9818uej
+	 WcYlKU6QIFEZtBsz3or1JcskLGBog5yk0KSPds7tko27mnZzvcWjtf7//6mRcSckF1w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Y/w01IC0";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BYjH5SQH;
+	arc=none smtp.remote-ip=95.215.58.163
+Received: from mta1.migadu.com (out-163.mta1.migadu.com [95.215.58.163])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD41606A319
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 06:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9EC606A31A
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 07:03:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F9EC606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Y/w01IC0
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BABD11F000CF
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 06:32:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792564371;
-	bh=A/NVyzvCFNcDr1LXlDK3Ez8QGnN9AH72+DZCVQ+TLgs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Y/w01IC0fAikJny5cP8bOtYsGxgOuC3Rsb65PGntaFqie2ttO4yCry2XbLle3HiCS
-	 W4/7OIXo08bNcnpt7qvVEj4UQ6FlY/6BqownVzY97nQNKTOI9u6OVpXsKEeypsdUAa
-	 fs7johGO5oSPmY1o/yMVoC3jCoBiGWcRYiL7qYsQ5htADR/eWe1EgBeco7TFOPdblk
-	 u0ULU2TK4su9tZLtpD0JGuZwDGkkm/MeCSKPpu79zMxUK2scD1L90EX+eXP+Vd6OnP
-	 LovwjVkmk8xnfJL0uKsH05/7HOjZmVNRGAmnNcd+Dh5rceGVVxCRAJpCbyIItRd2VV
-	 iU0zUxFNC60NQ==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c418e215671so35670366b.0
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 23:32:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvByPvkDhae0M6SaH3EnYbW381EuxOm2dJsQ909A/mjcCcMB1N0wrC9LoY/OeBQmE3vav7EwOpwNFtgh5@vger.kernel.org
-X-Gm-Message-State: AFq9FYIOe5FMC446fgoyd/LrzgGrvHcOQGsXYWK7MGvgXLeJCcGPzWOq
-	PTHhWXZDZJH6T9wJXhXx6mmHTevaTnPXd6E6bIv0XLeKAi7h/a6MI7apXcReXx+KRBABTzEEhXE
-	YAhBZQ4p8RfRlf9eXH6e57yj6CmwVUy8=
-X-Received: by 2002:a17:907:9719:b0:c40:7381:1b92 with SMTP id
- a640c23a62f3a-c46799a4c65mr91702666b.41.1792564370366; Tue, 20 Oct 2026
- 23:32:50 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=BYjH5SQH
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=Op9DszS3tzdciPj60cuwuNy7LEkCMGdmtqeFFvXIhK0=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792566192; v=1; x=1793170992;
+ b=BYjH5SQHFnl/Icgt+tsyVBZY8MsBFWq6Gl6pw98NIs0ZQNTJ8OuHpau+ULrYk/msJOvt5lgh
+ HjpzFNZt3J4Le9dNbV1Xe04zcnKWXOnVxf2z8ftLnM3H7PV7R+84bu4ilU6PEkqNJsiCRIYyfdK
+ rjgQtrpeg+y2OgXB6nm2HKBA=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id aebe76f51d6c00ad;
+	Wed, 21 Oct 2026 07:03:12 +0000
+X-Mizu-Trace-ID: aebe76f51d6c00ad
+X-Migadu-Flow: FLOW_OUT
+From: ZhangGuoDong <zhang.guodong@linux.dev>
+To: linkinjeon@kernel.org,
+	pc@manguebit.org
+Cc: linux-cifs@vger.kernel.org,
+	ZhangGuoDong <zhangguodong@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH] smb/server: replace deprecated system workqueues
+Date: Wed, 21 Oct 2026 15:02:57 +0800
+Message-ID: <20261021070257.127209-1-zhang.guodong@linux.dev>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,51 +65,100 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261020194545.3254790-1-hackerowskiy@gmail.com>
-In-Reply-To: <20261020194545.3254790-1-hackerowskiy@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 21 Oct 2026 15:32:38 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-sh6bue0HkVhaffja2EQ2N0tPdQkXWg_Tji=XY9Hqyww@mail.gmail.com>
-X-Gm-Features: AclHuK_cOLqucL9cjvuyuPtWIhw6z_j7lb-6IQwjTrHQYVf4q9znoBRDtqGaPpE
-Message-ID: <CAKYAXd-sh6bue0HkVhaffja2EQ2N0tPdQkXWg_Tji=XY9Hqyww@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: hold server info until cifsd exits
-To: Eduard Zateev <hackerowskiy@gmail.com>
-Cc: pc@manguebit.org, linux-cifs@vger.kernel.org, ronniesahlberg@gmail.com, 
-	sprasad@microsoft.com, tom@talpey.com, bharathsm@microsoft.com, 
-	syzbot+5c3ed2a0de3270efc921@syzkaller.appspotmail.com, 
-	syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 21, 2026 at 4:46=E2=80=AFAM Eduard Zateev <hackerowskiy@gmail.c=
-om> wrote:
->
-> The last session reference can be dropped while the cifsd demultiplex
-> thread is still running clean_demultiplex_info(). That thread frees
-> TCP_Server_Info there, racing with cifs_put_tcp_session() as it releases
-> the server crypto state. syzbot reported a KASAN use-after-free in
-> cifs_crypto_secmech_release().
->
-> Keep an object reference for the cifsd thread. Defer final crypto,
-> session-key, network namespace, string, and structure cleanup until both
-> the last session reference and the thread reference are dropped. Drop the
-> thread reference after clean_demultiplex_info() has finished using the
-> server.
->
-> Build-tested with ARCH=3Darm64 and W=3D1 for
-> fs/smb/client/connect.o. The KASAN reproducer was not run on the patched
-> kernel.
->
-> Fixes: a5c3e1c725af ("Revert \"cifs: No need to send SIGKILL to demux_thr=
-ead during umount\"")
-> Reported-by: syzbot+5c3ed2a0de3270efc921@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D5c3ed2a0de3270efc921
-> Reported-by: syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com
-> Closes: https://syzbot.org/bug?extid=3Dc2ec61adfbcb24e5ec20
-> Assisted-by: LLM OpenAI Codex
-> Signed-off-by: Eduard Zateev <hackerowskiy@gmail.com>
-Paulo has already fixed it. See:
-https://git.manguebit.org/linux.git/commit/?h=3Dcifs-fixes&id=3Dfcf942f9eec=
-a644c37e03bcc829d3248c0995348
+From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Thanks.
+Queueing the lease break timer on system_wq triggers the following warning:
+
+  workqueue: work func lease_break_timer [ksmbd] enqueued on deprecated workqueue. Use system_{percpu|dfl}_wq instead.
+
+The oplock break timer and TCP transmit work also use deprecated system
+queues.
+
+Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
+ fs/smb/server/oplock.c        | 4 ++--
+ fs/smb/server/transport_tcp.c | 6 +++---
+ fs/smb/server/vfs_cache.c     | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
+index e76dfc904fb9..d479508c06c5 100644
+--- a/fs/smb/server/oplock.c
++++ b/fs/smb/server/oplock.c
+@@ -178,7 +178,7 @@ static void lease_break_timer(struct work_struct *work)
+ 	lease_break_timer_pending = pending;
+ 	if (pending) {
+ 		lease_break_timer_next = next;
+-		mod_delayed_work(system_wq, &lease_break_timer_work,
++		mod_delayed_work(system_percpu_wq, &lease_break_timer_work,
+ 				 time_after_eq(jiffies, next) ? 0 : next - jiffies);
+ 	}
+ 	mutex_unlock(&lease_break_timer_lock);
+@@ -191,7 +191,7 @@ static void schedule_lease_break_timer(unsigned long timeout)
+ 	    time_before(timeout, lease_break_timer_next)) {
+ 		lease_break_timer_pending = true;
+ 		lease_break_timer_next = timeout;
+-		mod_delayed_work(system_wq, &lease_break_timer_work,
++		mod_delayed_work(system_percpu_wq, &lease_break_timer_work,
+ 				 time_after_eq(jiffies, timeout) ? 0 : timeout - jiffies);
+ 	}
+ 	mutex_unlock(&lease_break_timer_lock);
+diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
+index 9c6ca878d30f..937d321fa364 100644
+--- a/fs/smb/server/transport_tcp.c
++++ b/fs/smb/server/transport_tcp.c
+@@ -573,7 +573,7 @@ static void ksmbd_tcp_tx_work(struct work_struct *work)
+ 	if (READ_ONCE(t->tx_stopped))
+ 		ksmbd_tcp_purge_tx(t);
+ 	else if (!list_empty(&t->tx_queue))
+-		queue_delayed_work(system_unbound_wq, &t->tx_work, delay);
++		queue_delayed_work(system_dfl_wq, &t->tx_work, delay);
+ 	mutex_unlock(&t->tx_lock);
+ 	wake_up_all(&t->transport.conn->req_running_q);
+ 
+@@ -590,7 +590,7 @@ static void ksmbd_tcp_write_space(struct sock *sk)
+ 	if (t) {
+ 		t->write_space(sk);
+ 		if (!READ_ONCE(t->tx_stopped) && sk_stream_is_writeable(sk))
+-			mod_delayed_work(system_unbound_wq, &t->tx_work, 0);
++			mod_delayed_work(system_dfl_wq, &t->tx_work, 0);
+ 	}
+ 	read_unlock_bh(&sk->sk_callback_lock);
+ }
+@@ -687,7 +687,7 @@ static int ksmbd_tcp_writev(struct ksmbd_transport *t,
+ 	msg->deadline = deadline;
+ 	list_add_tail(&msg->list, &tt->tx_queue);
+ 	WRITE_ONCE(tt->tx_queued, tt->tx_queued + msg->len);
+-	queue_delayed_work(system_unbound_wq, &tt->tx_work, 0);
++	queue_delayed_work(system_dfl_wq, &tt->tx_work, 0);
+ 
+ accepted:
+ 	tt->tx_end += tx->size;
+diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
+index bfa28ef197f6..452ce05d1494 100644
+--- a/fs/smb/server/vfs_cache.c
++++ b/fs/smb/server/vfs_cache.c
+@@ -87,7 +87,7 @@ static void ksmbd_oplock_break_timer(struct work_struct *work)
+ 	oplock_break_timer_pending = pending;
+ 	if (pending) {
+ 		oplock_break_timer_next = next;
+-		mod_delayed_work(system_wq, &oplock_break_timer_work,
++		mod_delayed_work(system_percpu_wq, &oplock_break_timer_work,
+ 				 time_after_eq(jiffies, next) ? 0 : next - jiffies);
+ 	}
+ 	mutex_unlock(&oplock_break_timer_lock);
+@@ -100,7 +100,7 @@ void ksmbd_schedule_oplock_break_timer(unsigned long timeout)
+ 	    time_before(timeout, oplock_break_timer_next)) {
+ 		oplock_break_timer_pending = true;
+ 		oplock_break_timer_next = timeout;
+-		mod_delayed_work(system_wq, &oplock_break_timer_work,
++		mod_delayed_work(system_percpu_wq, &oplock_break_timer_work,
+ 				 time_after_eq(jiffies, timeout) ? 0 : timeout - jiffies);
+ 	}
+ 	mutex_unlock(&oplock_break_timer_lock);
+-- 
+2.55.0
+
