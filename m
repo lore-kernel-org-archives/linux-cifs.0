@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=173.212.254.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792552623;
-	b=hWWXk6sdPyJay+TzzyrM9vLq7YNPMCQo//b99VHqZP7SbhlBdq4yAhZaaLcvso8Mw+AF
-	 UgRxvc4zA0gaP8/KuEj5uu3frPttUYf/jjD8pRBYeXUSZKtxTiA7ASnuv+sPdRlsIJhor
-	 Qap4VUCpQk8hjei4y7R6/rlTZ3tO07Nov2dcgqGeNVBNkHm8UAqHyjk3QDplcSir5A+Od
-	 kXrtzSKWEXgKA5GM2599K7KRGYojP2DU5jfMHQ3j0BsNdB1xpWGrsUcMNrN9rdGwslo4j
-	 R3xk0eL7DHKkS9blAoiDTEGoN2rRhsDcnjj5nWE8MIrunufO5KJS/3bPpFBYBNKnsVw==
+	t=1792552629;
+	b=Wulik+IFOG69T6YesJ7wZxEqO/wcHz8rkGrr8D2YAtRmcWusunmLhDAkveN2bwje3ST/
+	 nEUXxJuJYn9zQLeydz7umdfLzl93eQjkojEzmwkbCC82lJ4XgvxygvJcjRVmCqiUkuH42
+	 PtBn6LJB5actBNV0+cCIabIwcbqGaYsNSpiDQ1yaJYhwdTZKYvsfpp5IhkYwvrFcZOwPb
+	 dwsrzlycnsDMxuf8hi/LV9pjz1UitZQ8/eLH8KeHxuR+8AXPnCdVEoAsHVJnrUhLU5enD
+	 xkh+dudQGg/E92zNEccQdo2k5z4cPcxPzSb7pR6lh4Rb0yegQp+k1Kuykiv/4wAzGsg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792552623;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792552629;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:In-Reply-To:
 	 References:From:Subject:To:Cc:Date;
-	bh=vMKDB0NuuGoORFr/IB1kVTjvqvtcQDpz+g3SAxqtEZI=;
-	b=xG9H5vRStBIOPB1jySAwjzkbKtFtzlV5sxrH19mjeWNsWl4dK6+mDB59kfkYNXWjfHxT
-	 Yk1Q6Mo5qqtEZc22UuJZDqEwl5h6WnoQdV7gAYeKBCWCvGlz592clRfJjZHW75Uio59vw
-	 fQQHo2KzlPQ4x/LSH2Y4rVp1Vu6EP3gNhAIpgetnIOLgr4/6f3dxZ5ZGIiHzx+LAM18gs
-	 J8Z/ybVJD3n/mNBct5lRHuR7FhLlI/Pdv9MKXIYeDxpFdMyXNflC8P4dwFoPA4Zfl4WWk
-	 oqFqqPds9+sICyblh/SAs472gIcLk5m/6JEpDf47eMV9QF50IkTtMV8ARpLW1hv07Jg==
+	bh=FoLPiglPVl+us8byBrCSfkhrNtfDFOmejE84GKuPLI4=;
+	b=pEhqURwOHzzvNmBxnVqaXKIsSbGZu9reFpyyFEJRQmmUXoJdcNBmpe3YpcA9FSwtz4p7
+	 hvmBf9bYxIvnBCk5srkgsSyuFXXZyu7GwMxhp3xr6hL6vWMxjf29fo5vYMd7XqQIy6jE1
+	 XWXOitTHvE+J+j1ZmcatFIXlB+PVcyWZaVTxzjK3AUqIkcnNJ0LaSN7yxzlcBiBie9YGX
+	 16UHmiNpB3jo8krURJ0ZE2MaCqWkNndf4jsoC8p8ciFOygh4VDPfUbDbdeJdZe1BoifkE
+	 wBVexiX/cJUqZVuRTi3lBQKeTrv7Gb47SZZmOdJQpbCG65ZHR5zIs0hKPdpofcg/7GA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=tuxist.de;
 	spf=fail smtp.mailfrom=tuxist.de;
-	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=AWm9pFDn;
+	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=C3J+2AEb;
 	arc=none smtp.remote-ip=173.212.254.19
 Received: from groupware.tuxist.de (groupware.tuxist.de [173.212.254.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16EAE6073A2C;
-	Wed, 21 Oct 2026 03:17:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 16EAE6073A2C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D5860A3804;
+	Wed, 21 Oct 2026 03:17:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01D5860A3804
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=AWm9pFDn
+	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=C3J+2AEb
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tuxist.de; s=201705;
-	t=1792552620; bh=nbEHt/gzCOYzynoFgeDQGwy6kFuPGl0cHF7Ii/63+Uo=;
+	t=1792552627; bh=ahHoP+KmbDaq9577t3A0gEq/i+cqumLAzataSt6r+6c=;
 	h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-	b=AWm9pFDnuKmhLmK65IyQB2eGFa89GleAtYQvUgxAJeE5v/y1WArqob9DqnWO6kgot
-	 CJ+3O6nJ6oN5yvnjTVV7k36po4DpK5Bm7N8sHr0Ev9znQEw6Pn3ZFQ52cCbuWTi5qQ
-	 dTqS+Z+GyJ9i140Z3CLMA8Aasol8NSd/DCCrnIRAVhYz6DT6kgO0RuRcu9eODDdUdH
-	 3huLyoiB8P4YvR12ChHkoY+aRiG1rhhGn6/YXZPSIrzbVeR69a4V3EAqPJH0w7bGwF
-	 tMD5/3AEVUq/jmPUY3rVoOwOEJNpHxCuJ7TNfi2p65d6tljsucwLx3EqU7smjI4xhW
-	 DYI92z0v7JJ+g==
+	b=C3J+2AEby3bLJTrGHPCSjycXT81E/5aDLawJ2xISQvBK61i9IDIPm6YIPoaXeHgqX
+	 0cipNhvyMNcVHOLKRdJqr3ZAzf07fD9STA2bdUEP7JL0AvdfBwXDUkOJ4n0oQ4lYrI
+	 42bpYDCofI3uf5AQzJkIc0BIJ5Qd7pQ9Tdqy4QGMHuTHgn0ZbZN++xe/0RWIapOa3o
+	 g23X6hU8LtdtJy7KHeut9KO72V3dMhWvgJlIy3UkIcj3e6RmcGPbxEtTNEVaN2hWBn
+	 rWHygFseUiWCwLshJLkRc6I6b+DZo5KrEFdVkynl5ZS/Lc7SD4S/rSHSSoMKPiI4Sf
+	 buEXQedcnWrbQ==
 Received: from [10.1.1.106] (unknown [10.1.2.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by groupware.tuxist.de (Postfix) with ESMTPSA id 70C078A09A4;
-	Wed, 21 Oct 2026 05:16:59 +0200 (CEST)
-Message-ID: <59988b6ac15fa727c7f5d14d5342ceba4d6e595f.1792552161.git.jan.koester@tuxist.de>
+	by groupware.tuxist.de (Postfix) with ESMTPSA id 7988A8A090D;
+	Wed, 21 Oct 2026 05:17:06 +0200 (CEST)
+Message-ID: <1ced8bf416de4e9600904aafeefd29ed20fd2064.1792552161.git.jan.koester@tuxist.de>
 In-Reply-To: <cover.1792552161.git.jan.koester@tuxist.de>
 References: <cover.1792552161.git.jan.koester@tuxist.de>
 From: Jan Koester <jan.koester@tuxist.de>
-Subject: [RFC PATCH v2 29/41] signal: report the sender's UUID or GUID uid in
- si_uid_r
+Subject: [RFC PATCH v2 31/41] ext4: add the uid_r feature for UUID and GUID
+ owners
 To: Christian Brauner <brauner@kernel.org>,
     Alexander Viro <viro@zeniv.linux.org.uk>,
     "Serge E. Hallyn" <serge@hallyn.com>
@@ -70,7 +70,7 @@ Cc: Jan Kara <jack@suse.cz>,
     audit@vger.kernel.org,
     keyrings@vger.kernel.org,
     linux-kernel@vger.kernel.org
-Date: Wed, 21 Oct 2026 05:15:49 +0200
+Date: Wed, 21 Oct 2026 05:15:51 +0200
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -80,643 +80,289 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 
-si_uid is 32 bits, so a signal from a UUID or GUID user names the
-overflow uid as its sender, and so do SIGCHLD and waitid() for such a
-child.
+Add a read-only compatible feature, uid_r, that lets inodes have UUID
+and GUID owners and groups. The inode gains i_uid_r_type and
+i_gid_r_type (0: the classic i_uid/i_gid apply) and 16 bytes for each
+id after i_projid, which grows i_extra_isize from 32 to 68 bytes; only
+filesystems with the feature reserve the room in new inodes, others
+keep the old size.
 
-Add si_uid_r, the sender's uid as __kernel_uid_r_t, to siginfo_t. union
-__sifields has no room that all kinds of signals with si_uid share, so
-it lives at a fixed offset (96) in the padding of siginfo_t, the same
-in every layout and ABI, compat_siginfo included; kernel_siginfo grows
-to cover it. The kernel sets it wherever it sets si_uid, through
-siginfo_set_uid() and siginfo_set_kernel_uid(), maps it into the
-receiver's user namespace like si_uid, and it is UID_R_NONE where
-nobody set it. Signals queued from userspace carry what the sender put
-there, exactly like si_uid.
+For a UUID or GUID the classic fields hold 0xffffffff. Kernels without
+the feature may only mount read-only, and see such files as owned by an
+id nobody has.
 
-signalfd_siginfo gets ssi_uid_r from its padding, and waitid() (also
-through io_uring, which keeps its waitid_info in the async data now, as
-it no longer fits into the command) fills in si_uid_r.
+With the feature the superblock gets SB_I_UID_R. Inodes from before it,
+or with in-inode xattrs in the way, are expanded when they get such an
+owner, as for project ids; -EOVERFLOW if that fails. The feature needs
+inodes of at least 196 bytes, so in practice 256.
 
 Assisted-by: Claude:claude-opus-5-5
 
 Signed-off-by: Jan Koester <jan.koester@tuxist.de>
 ---
- fs/signalfd.c                      |  3 ++
- include/linux/compat.h             |  6 ++++
- include/linux/ptrace.h             |  2 +-
- include/linux/signal.h             | 22 ++++++++++++++
- include/linux/signal_types.h       |  5 +++-
- include/uapi/asm-generic/siginfo.h | 17 +++++++++++
- include/uapi/linux/signalfd.h      |  4 ++-
- io_uring/waitid.c                  | 32 ++++++++++++--------
- io_uring/waitid.h                  |  1 +
- ipc/mqueue.c                       |  4 +--
- kernel/exit.c                      | 18 +++++++++--
- kernel/exit.h                      |  3 ++
- kernel/signal.c                    | 48 ++++++++++++++++++++----------
- 13 files changed, 129 insertions(+), 36 deletions(-)
+ fs/ext4/ext4.h  |  26 ++++++++++-
+ fs/ext4/inode.c | 115 +++++++++++++++++++++++++++++++++++++++++++++++-
+ fs/ext4/super.c |  16 ++++++-
+ 3 files changed, 152 insertions(+), 5 deletions(-)
 
-diff --git a/fs/signalfd.c b/fs/signalfd.c
-index dff53745e3..8bca9d7f01 100644
---- a/fs/signalfd.c
-+++ b/fs/signalfd.c
-@@ -90,6 +90,7 @@ static int signalfd_copyinfo(struct iov_iter *to, kernel_siginfo_t const *kinfo)
- 	case SIL_KILL:
- 		new.ssi_pid = kinfo->si_pid;
- 		new.ssi_uid = kinfo->si_uid;
-+		new.ssi_uid_r = kinfo->si_uid_r;
- 		break;
- 	case SIL_TIMER:
- 		new.ssi_tid = kinfo->si_tid;
-@@ -125,6 +126,7 @@ static int signalfd_copyinfo(struct iov_iter *to, kernel_siginfo_t const *kinfo)
- 	case SIL_CHLD:
- 		new.ssi_pid    = kinfo->si_pid;
- 		new.ssi_uid    = kinfo->si_uid;
-+		new.ssi_uid_r  = kinfo->si_uid_r;
- 		new.ssi_status = kinfo->si_status;
- 		new.ssi_utime  = kinfo->si_utime;
- 		new.ssi_stime  = kinfo->si_stime;
-@@ -135,6 +137,7 @@ static int signalfd_copyinfo(struct iov_iter *to, kernel_siginfo_t const *kinfo)
- 		 */
- 		new.ssi_pid = kinfo->si_pid;
- 		new.ssi_uid = kinfo->si_uid;
-+		new.ssi_uid_r = kinfo->si_uid_r;
- 		new.ssi_ptr = (long) kinfo->si_ptr;
- 		new.ssi_int = kinfo->si_int;
- 		break;
-diff --git a/include/linux/compat.h b/include/linux/compat.h
-index 8da0a15c95..4b85059008 100644
---- a/include/linux/compat.h
-+++ b/include/linux/compat.h
-@@ -169,6 +169,12 @@ typedef struct compat_siginfo {
- 	union {
- 		int _pad[128/sizeof(int) - 3];
- 
-+		/* si_uid_r, at __SI_UID_R_OFFSET like in siginfo_t */
-+		struct {
-+			int _uid_r_pad[__SI_UID_R_OFFSET / sizeof(int) - 3];
-+			__kernel_uid_r_t _uid_r;
-+		} _sir;
-+
- 		/* kill() */
- 		struct {
- 			compat_pid_t _pid;	/* sender's pid */
-diff --git a/include/linux/ptrace.h b/include/linux/ptrace.h
-index 2839d5c8ea..1d6d41c67f 100644
---- a/include/linux/ptrace.h
-+++ b/include/linux/ptrace.h
-@@ -347,7 +347,7 @@ static inline void user_single_step_report(struct pt_regs *regs)
- 	info.si_errno = 0;
- 	info.si_code = SI_USER;
- 	info.si_pid = 0;
--	info.si_uid = 0;
-+	siginfo_set_kernel_uid(&info);
- 	force_sig_info(&info);
- }
- #endif
-diff --git a/include/linux/signal.h b/include/linux/signal.h
-index f19816832f..928e67e283 100644
---- a/include/linux/signal.h
-+++ b/include/linux/signal.h
-@@ -6,6 +6,7 @@
- #include <linux/list.h>
- #include <linux/signal_types.h>
- #include <linux/string.h>
-+#include <linux/uidgid.h>
- 
- struct task_struct;
- 
-@@ -23,6 +24,27 @@ static inline void clear_siginfo(kernel_siginfo_t *info)
- 	memset(info, 0, sizeof(*info));
- }
- 
-+struct user_namespace;
-+
-+/*
-+ * Sets si_uid and si_uid_r to @uid as seen from @ns (the receiver's user
-+ * namespace), the overflow id if it has no mapping there.
-+ */
-+static inline void siginfo_set_uid(kernel_siginfo_t *info,
-+				   struct user_namespace *ns, kuid_t uid)
-+{
-+	info->si_uid = from_kuid_munged(ns, uid);
-+	from_kuid_r_munged(ns, uid, &info->si_uid_r);
-+}
-+
-+/* si_uid and si_uid_r of a signal from the kernel: 0 */
-+static inline void siginfo_set_kernel_uid(kernel_siginfo_t *info)
-+{
-+	info->si_uid = 0;
-+	memset(&info->si_uid_r, 0, sizeof(info->si_uid_r));
-+	info->si_uid_r.type = UID_R_LEGACY;
-+}
-+
- #define SI_EXPANSION_SIZE (sizeof(struct siginfo) - sizeof(struct kernel_siginfo))
- 
- static inline void copy_siginfo_to_external(siginfo_t *to,
-diff --git a/include/linux/signal_types.h b/include/linux/signal_types.h
-index caf4f7a59a..eaf922e443 100644
---- a/include/linux/signal_types.h
-+++ b/include/linux/signal_types.h
-@@ -10,7 +10,10 @@
- #include <uapi/linux/signal.h>
- 
- typedef struct kernel_siginfo {
--	__SIGINFO;
-+	union {
-+		__SIGINFO;
-+		__SIGINFO_UID_R;
-+	};
- } kernel_siginfo_t;
- 
- struct ucounts;
-diff --git a/include/uapi/asm-generic/siginfo.h b/include/uapi/asm-generic/siginfo.h
-index 5a1ca43b5f..e8f32c942b 100644
---- a/include/uapi/asm-generic/siginfo.h
-+++ b/include/uapi/asm-generic/siginfo.h
-@@ -4,6 +4,7 @@
- 
- #include <linux/compiler.h>
- #include <linux/types.h>
-+#include <linux/uidgid_r.h>
- 
- typedef union sigval {
- 	int sival_int;
-@@ -131,9 +132,24 @@ struct {				\
- }
- #endif /* __ARCH_HAS_SWAPPED_SIGINFO */
- 
-+/*
-+ * The sender's uid as __kernel_uid_r_t (a UUID or GUID too), for the
-+ * signals with si_pid and si_uid. It lives at the same offset in every
-+ * layout and ABI, past the end of union __sifields; UID_R_NONE where the
-+ * kernel doesn't set it.
-+ */
-+#define __SI_UID_R_OFFSET	96
-+
-+#define __SIGINFO_UID_R						\
-+struct {							\
-+	int _uid_r_pad[__SI_UID_R_OFFSET / sizeof(int)];	\
-+	__kernel_uid_r_t _uid_r;				\
-+} _sir
-+
- typedef struct siginfo {
- 	union {
- 		__SIGINFO;
-+		__SIGINFO_UID_R;
- 		int _si_pad[SI_MAX_SIZE/sizeof(int)];
- 	};
- } __ARCH_SI_ATTRIBUTES siginfo_t;
-@@ -143,6 +159,7 @@ typedef struct siginfo {
-  */
- #define si_pid		_sifields._kill._pid
- #define si_uid		_sifields._kill._uid
-+#define si_uid_r	_sir._uid_r
- #define si_tid		_sifields._timer._tid
- #define si_overrun	_sifields._timer._overrun
- #define si_sys_private  _sifields._timer._sys_private
-diff --git a/include/uapi/linux/signalfd.h b/include/uapi/linux/signalfd.h
-index 83429a05b6..471bafc539 100644
---- a/include/uapi/linux/signalfd.h
-+++ b/include/uapi/linux/signalfd.h
-@@ -10,6 +10,7 @@
- #define _UAPI_LINUX_SIGNALFD_H
- 
- #include <linux/types.h>
-+#include <linux/uidgid_r.h>
- /* For O_CLOEXEC and O_NONBLOCK */
- #include <linux/fcntl.h>
- 
-@@ -39,6 +40,7 @@ struct signalfd_siginfo {
- 	__s32 ssi_syscall;
- 	__u64 ssi_call_addr;
- 	__u32 ssi_arch;
-+	__kernel_uid_r_t ssi_uid_r;	/* sender's uid, also a UUID or GUID */
- 
- 	/*
- 	 * Pad strcture to 128 bytes. Remember to update the
-@@ -49,7 +51,7 @@ struct signalfd_siginfo {
- 	 * comes out of a read(2) and we really don't want to have
- 	 * a compat on read(2).
- 	 */
--	__u8 __pad[28];
-+	__u8 __pad[8];
+diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+index 724a27e8be..1cba42b410 100644
+--- a/fs/ext4/ext4.h
++++ b/fs/ext4/ext4.h
+@@ -850,8 +850,29 @@ struct ext4_inode {
+ 	__le32  i_crtime_extra; /* extra FileCreationtime (nsec << 2 | epoch) */
+ 	__le32  i_version_hi;	/* high 32 bits for 64-bit version */
+ 	__le32	i_projid;	/* Project ID */
++	/* uid_r feature: a UUID or GUID owner and group, see EXT4_ID_R_* */
++	__u8	i_uid_r_type;	/* kind of i_uid_r, EXT4_ID_R_LEGACY: i_uid */
++	__u8	i_gid_r_type;	/* kind of i_gid_r, EXT4_ID_R_LEGACY: i_gid */
++	__le16	i_id_r_reserved;
++	__u8	i_uid_r[16];	/* UUID (RFC 9562 order) or GUID owner */
++	__u8	i_gid_r[16];	/* UUID (RFC 9562 order) or GUID group */
  };
  
++/*
++ * Kinds of i_uid_r/i_gid_r. For a UUID or GUID the classic i_uid/i_gid
++ * fields hold 0xffffffff, which kernels without uid_r -- they may only
++ * mount read-only -- see as an id nobody has.
++ */
++#define EXT4_ID_R_LEGACY	0
++#define EXT4_ID_R_UUID		1
++#define EXT4_ID_R_GUID		2
++
++/* i_extra_isize of inodes without and with the uid_r fields */
++#define EXT4_EXTRA_ISIZE_BASE	(offsetofend(struct ext4_inode, i_projid) - \
++				 EXT4_GOOD_OLD_INODE_SIZE)
++#define EXT4_EXTRA_ISIZE_UID_R	(sizeof(struct ext4_inode) - \
++				 EXT4_GOOD_OLD_INODE_SIZE)
++
+ #define EXT4_EPOCH_BITS 2
+ #define EXT4_EPOCH_MASK ((1 << EXT4_EPOCH_BITS) - 1)
+ #define EXT4_NSEC_MASK  (~0UL << EXT4_EPOCH_BITS)
+@@ -2214,6 +2235,7 @@ static inline struct mapping_metadata_bhs *ext4_i_metadata_bhs(
+ #define EXT4_FEATURE_RO_COMPAT_VERITY		0x8000
+ #define EXT4_FEATURE_RO_COMPAT_ORPHAN_PRESENT	0x10000 /* Orphan file may be
+ 							   non-empty */
++#define EXT4_FEATURE_RO_COMPAT_UID_R		0x20000 /* UUID and GUID owners */
  
-diff --git a/io_uring/waitid.c b/io_uring/waitid.c
-index 2b75601742..24f27b67d3 100644
---- a/io_uring/waitid.c
-+++ b/io_uring/waitid.c
-@@ -29,7 +29,6 @@ struct io_waitid {
- 	atomic_t refs;
- 	struct wait_queue_head *head;
- 	struct siginfo __user *infop;
--	struct waitid_info info;
- };
+ #define EXT4_FEATURE_INCOMPAT_COMPRESSION	0x0001
+ #define EXT4_FEATURE_INCOMPAT_FILETYPE		0x0002
+@@ -2313,6 +2335,7 @@ EXT4_FEATURE_RO_COMPAT_FUNCS(readonly,		READONLY)
+ EXT4_FEATURE_RO_COMPAT_FUNCS(project,		PROJECT)
+ EXT4_FEATURE_RO_COMPAT_FUNCS(verity,		VERITY)
+ EXT4_FEATURE_RO_COMPAT_FUNCS(orphan_present,	ORPHAN_PRESENT)
++EXT4_FEATURE_RO_COMPAT_FUNCS(uid_r,		UID_R)
  
- static void io_waitid_free(struct io_kiocb *req)
-@@ -40,8 +39,10 @@ static void io_waitid_free(struct io_kiocb *req)
- 	io_req_async_data_free(req);
- }
+ EXT4_FEATURE_INCOMPAT_FUNCS(compression,	COMPRESSION)
+ EXT4_FEATURE_INCOMPAT_FUNCS(filetype,		FILETYPE)
+@@ -2373,7 +2396,8 @@ EXT4_FEATURE_INCOMPAT_FUNCS(casefold,		CASEFOLD)
+ 					 EXT4_FEATURE_RO_COMPAT_QUOTA |\
+ 					 EXT4_FEATURE_RO_COMPAT_PROJECT |\
+ 					 EXT4_FEATURE_RO_COMPAT_VERITY |\
+-					 EXT4_FEATURE_RO_COMPAT_ORPHAN_PRESENT)
++					 EXT4_FEATURE_RO_COMPAT_ORPHAN_PRESENT |\
++					 EXT4_FEATURE_RO_COMPAT_UID_R)
  
--static bool io_waitid_compat_copy_si(struct io_waitid *iw, int signo)
-+static bool io_waitid_compat_copy_si(struct io_kiocb *req, int signo)
- {
-+	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
-+	struct io_waitid_async *iwa = req->async_data;
- 	struct compat_siginfo __user *infop;
- 	bool ret;
- 
-@@ -52,10 +53,12 @@ static bool io_waitid_compat_copy_si(struct io_waitid *iw, int signo)
- 
- 	unsafe_put_user(signo, &infop->si_signo, Efault);
- 	unsafe_put_user(0, &infop->si_errno, Efault);
--	unsafe_put_user(iw->info.cause, &infop->si_code, Efault);
--	unsafe_put_user(iw->info.pid, &infop->si_pid, Efault);
--	unsafe_put_user(iw->info.uid, &infop->si_uid, Efault);
--	unsafe_put_user(iw->info.status, &infop->si_status, Efault);
-+	unsafe_put_user(iwa->info.cause, &infop->si_code, Efault);
-+	unsafe_put_user(iwa->info.pid, &infop->si_pid, Efault);
-+	unsafe_put_user(iwa->info.uid, &infop->si_uid, Efault);
-+	unsafe_copy_to_user((char __user *)&infop->_sifields._sir._uid_r,
-+			    (const char *)&iwa->info.uid_r, sizeof(iwa->info.uid_r), Efault);
-+	unsafe_put_user(iwa->info.status, &infop->si_status, Efault);
- 	ret = true;
- done:
- 	user_write_access_end();
-@@ -68,23 +71,26 @@ static bool io_waitid_compat_copy_si(struct io_waitid *iw, int signo)
- static bool io_waitid_copy_si(struct io_kiocb *req, int signo)
- {
- 	struct io_waitid *iw = io_kiocb_to_cmd(req, struct io_waitid);
-+	struct io_waitid_async *iwa = req->async_data;
- 	bool ret;
- 
- 	if (!iw->infop)
- 		return true;
- 
- 	if (io_is_compat(req->ctx))
--		return io_waitid_compat_copy_si(iw, signo);
-+		return io_waitid_compat_copy_si(req, signo);
- 
- 	if (!user_write_access_begin(iw->infop, sizeof(*iw->infop)))
- 		return false;
- 
- 	unsafe_put_user(signo, &iw->infop->si_signo, Efault);
- 	unsafe_put_user(0, &iw->infop->si_errno, Efault);
--	unsafe_put_user(iw->info.cause, &iw->infop->si_code, Efault);
--	unsafe_put_user(iw->info.pid, &iw->infop->si_pid, Efault);
--	unsafe_put_user(iw->info.uid, &iw->infop->si_uid, Efault);
--	unsafe_put_user(iw->info.status, &iw->infop->si_status, Efault);
-+	unsafe_put_user(iwa->info.cause, &iw->infop->si_code, Efault);
-+	unsafe_put_user(iwa->info.pid, &iw->infop->si_pid, Efault);
-+	unsafe_put_user(iwa->info.uid, &iw->infop->si_uid, Efault);
-+	unsafe_copy_to_user((char __user *)&iw->infop->si_uid_r,
-+			    (const char *)&iwa->info.uid_r, sizeof(iwa->info.uid_r), Efault);
-+	unsafe_put_user(iwa->info.status, &iw->infop->si_status, Efault);
- 	ret = true;
- done:
- 	user_write_access_end();
-@@ -294,7 +300,7 @@ int io_waitid_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- 	iw->options = READ_ONCE(sqe->file_index);
- 	iw->head = NULL;
- 	iw->infop = u64_to_user_ptr(READ_ONCE(sqe->addr2));
--	memset(&iw->info, 0, sizeof(iw->info));
-+	memset(&iwa->info, 0, sizeof(iwa->info));
+ #define EXTN_FEATURE_FUNCS(ver) \
+ static inline bool ext4_has_unknown_ext##ver##_compat_features(struct super_block *sb) \
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index 26f0f9714f..bed8d535a6 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -4780,6 +4780,75 @@ static int ext4_inode_blocks_set(struct ext4_inode *raw_inode,
  	return 0;
  }
  
-@@ -305,7 +311,7 @@ int io_waitid(struct io_kiocb *req, unsigned int issue_flags)
- 	struct io_ring_ctx *ctx = req->ctx;
- 	int ret;
- 
--	ret = kernel_waitid_prepare(&iwa->wo, iw->which, iw->upid, &iw->info,
-+	ret = kernel_waitid_prepare(&iwa->wo, iw->which, iw->upid, &iwa->info,
- 					iw->options, NULL);
- 	if (ret)
- 		goto done;
-diff --git a/io_uring/waitid.h b/io_uring/waitid.h
-index d5544aaf30..60b744a0e8 100644
---- a/io_uring/waitid.h
-+++ b/io_uring/waitid.h
-@@ -5,6 +5,7 @@
- struct io_waitid_async {
- 	struct io_kiocb *req;
- 	struct wait_opts wo;
-+	struct waitid_info info;
- };
- 
- int io_waitid_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
-diff --git a/ipc/mqueue.c b/ipc/mqueue.c
-index d1dd36a651..f0a319ed97 100644
---- a/ipc/mqueue.c
-+++ b/ipc/mqueue.c
-@@ -802,8 +802,8 @@ static void __do_notify(struct mqueue_inode_info *info)
- 			/* map current pid/uid into info->owner's namespaces */
- 			sig_i.si_pid = task_tgid_nr_ns(current,
- 						ns_of_pid(info->notify_owner));
--			sig_i.si_uid = from_kuid_munged(info->notify_user_ns,
--						current_uid());
-+			siginfo_set_uid(&sig_i, info->notify_user_ns,
-+					current_uid());
- 			/*
- 			 * We can't use kill_pid_info(), this signal should
- 			 * bypass check_kill_permission(). It is from kernel
-diff --git a/kernel/exit.c b/kernel/exit.c
-index 282328d2b4..130234f702 100644
---- a/kernel/exit.c
-+++ b/kernel/exit.c
-@@ -1185,7 +1185,8 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
++/*
++ * uid_r: a UUID or GUID owner and group live in i_uid_r and i_gid_r of
++ * inodes with room for them; i_uid and i_gid then hold 0xffffffff.
++ */
++static int ext4_inode_set_id_r(struct inode *inode, struct ext4_inode *raw_inode)
++{
++	struct ext4_inode_info *ei = EXT4_I(inode);
++	bool fits = EXT4_INODE_SIZE(inode->i_sb) > EXT4_GOOD_OLD_INODE_SIZE &&
++		    EXT4_FITS_IN_INODE(raw_inode, ei, i_gid_r);
++	bool legacy = uid_is_legacy(inode->i_uid) && gid_is_legacy(inode->i_gid);
++
++	if (!legacy && (!ext4_has_feature_uid_r(inode->i_sb) || !fits))
++		return -EOVERFLOW;
++	if (!fits || !ext4_has_feature_uid_r(inode->i_sb))
++		return 0;
++
++	raw_inode->i_id_r_reserved = 0;
++	if (uid_is_legacy(inode->i_uid)) {
++		raw_inode->i_uid_r_type = EXT4_ID_R_LEGACY;
++		memset(raw_inode->i_uid_r, 0, sizeof(raw_inode->i_uid_r));
++	} else {
++		BUILD_BUG_ON(KID_UUID != EXT4_ID_R_UUID ||
++			     KID_GUID != EXT4_ID_R_GUID);
++		raw_inode->i_uid_r_type = inode->i_uid.type;
++		memcpy(raw_inode->i_uid_r, inode->i_uid.uuid.b,
++		       sizeof(raw_inode->i_uid_r));
++	}
++	if (gid_is_legacy(inode->i_gid)) {
++		raw_inode->i_gid_r_type = EXT4_ID_R_LEGACY;
++		memset(raw_inode->i_gid_r, 0, sizeof(raw_inode->i_gid_r));
++	} else {
++		raw_inode->i_gid_r_type = inode->i_gid.type;
++		memcpy(raw_inode->i_gid_r, inode->i_gid.uuid.b,
++		       sizeof(raw_inode->i_gid_r));
++	}
++	return 0;
++}
++
++static int ext4_inode_get_id_r(struct inode *inode, struct ext4_inode *raw_inode)
++{
++	struct ext4_inode_info *ei = EXT4_I(inode);
++	uuid_t id;
++
++	if (!ext4_has_feature_uid_r(inode->i_sb) ||
++	    EXT4_INODE_SIZE(inode->i_sb) <= EXT4_GOOD_OLD_INODE_SIZE ||
++	    !EXT4_FITS_IN_INODE(raw_inode, ei, i_gid_r))
++		return 0;
++
++	if (raw_inode->i_uid_r_type > EXT4_ID_R_GUID ||
++	    raw_inode->i_gid_r_type > EXT4_ID_R_GUID) {
++		ext4_error_inode(inode, __func__, __LINE__, 0,
++				 "iget: bad uid_r kind %u/%u",
++				 raw_inode->i_uid_r_type,
++				 raw_inode->i_gid_r_type);
++		return -EFSCORRUPTED;
++	}
++	if (raw_inode->i_uid_r_type != EXT4_ID_R_LEGACY) {
++		memcpy(id.b, raw_inode->i_uid_r, sizeof(id.b));
++		inode->i_uid = raw_inode->i_uid_r_type == EXT4_ID_R_UUID ?
++			       KUIDT_INIT_UUID(id) : KUIDT_INIT_GUID(*(guid_t *)&id);
++	}
++	if (raw_inode->i_gid_r_type != EXT4_ID_R_LEGACY) {
++		memcpy(id.b, raw_inode->i_gid_r, sizeof(id.b));
++		inode->i_gid = raw_inode->i_gid_r_type == EXT4_ID_R_UUID ?
++			       KGIDT_INIT_UUID(id) : KGIDT_INIT_GUID(*(guid_t *)&id);
++	}
++	return 0;
++}
++
+ static int ext4_fill_raw_inode(struct inode *inode, struct ext4_inode *raw_inode)
  {
- 	int state, status;
- 	pid_t pid = task_pid_vnr(p);
--	uid_t uid = from_kuid_munged(current_user_ns(), task_uid(p));
-+	kuid_t kuid = task_uid(p);
-+	uid_t uid = from_kuid_munged(current_user_ns(), kuid);
- 	struct waitid_info *infop;
+ 	struct ext4_inode_info *ei = EXT4_I(inode);
+@@ -4792,8 +4861,10 @@ static int ext4_fill_raw_inode(struct inode *inode, struct ext4_inode *raw_inode
+ 	err = ext4_inode_blocks_set(raw_inode, ei);
  
- 	if (!likely(wo->wo_flags & WEXITED))
-@@ -1302,6 +1303,7 @@ static int wait_task_zombie(struct wait_opts *wo, struct task_struct *p)
- 		}
- 		infop->pid = pid;
- 		infop->uid = uid;
-+		from_kuid_r_munged(current_user_ns(), kuid, &infop->uid_r);
+ 	raw_inode->i_mode = cpu_to_le16(inode->i_mode);
++	/* a UUID or GUID owner: 0xffffffff here, the id in i_uid_r */
+ 	i_uid = i_uid_read(inode);
+ 	i_gid = i_gid_read(inode);
++	err = err ?: ext4_inode_set_id_r(inode, raw_inode);
+ 	i_projid = from_kprojid(&init_user_ns, ei->i_projid);
+ 	if (!(test_opt(inode->i_sb, NO_UID32))) {
+ 		raw_inode->i_uid_low = cpu_to_le16(low_16_bits(i_uid));
+@@ -5435,6 +5506,9 @@ struct inode *__ext4_iget(struct super_block *sb, unsigned long ino,
  	}
+ 	i_uid_write(inode, i_uid);
+ 	i_gid_write(inode, i_gid);
++	ret = ext4_inode_get_id_r(inode, raw_inode);
++	if (ret)
++		goto bad_inode;
+ 	ei->i_projid = make_kprojid(&init_user_ns, i_projid);
+ 	set_nlink(inode, le16_to_cpu(raw_inode->i_links_count));
  
- 	return pid;
-@@ -1343,6 +1345,7 @@ static int wait_task_stopped(struct wait_opts *wo,
- 	struct waitid_info *infop;
- 	int exit_code, *p_code, why;
- 	uid_t uid = 0; /* unneeded, required by compiler */
-+	kuid_t kuid = INVALID_UID;
- 	pid_t pid;
- 
- 	/*
-@@ -1368,7 +1371,8 @@ static int wait_task_stopped(struct wait_opts *wo,
- 	if (!unlikely(wo->wo_flags & WNOWAIT))
- 		*p_code = 0;
- 
--	uid = from_kuid_munged(current_user_ns(), task_uid(p));
-+	kuid = task_uid(p);
-+	uid = from_kuid_munged(current_user_ns(), kuid);
- unlock_sig:
- 	spin_unlock_irq(&p->sighand->siglock);
- 	if (!exit_code)
-@@ -1399,6 +1403,7 @@ static int wait_task_stopped(struct wait_opts *wo,
- 		infop->status = exit_code;
- 		infop->pid = pid;
- 		infop->uid = uid;
-+		from_kuid_r_munged(current_user_ns(), kuid, &infop->uid_r);
- 	}
- 	return pid;
- }
-@@ -1414,6 +1419,7 @@ static int wait_task_continued(struct wait_opts *wo, struct task_struct *p)
- 	struct waitid_info *infop;
- 	pid_t pid;
- 	uid_t uid;
-+	kuid_t kuid;
- 
- 	if (!unlikely(wo->wo_flags & WCONTINUED))
- 		return 0;
-@@ -1429,7 +1435,8 @@ static int wait_task_continued(struct wait_opts *wo, struct task_struct *p)
- 	}
- 	if (!unlikely(wo->wo_flags & WNOWAIT))
- 		p->signal->flags &= ~SIGNAL_STOP_CONTINUED;
--	uid = from_kuid_munged(current_user_ns(), task_uid(p));
-+	kuid = task_uid(p);
-+	uid = from_kuid_munged(current_user_ns(), kuid);
- 	spin_unlock_irq(&p->sighand->siglock);
- 
- 	pid = task_pid_vnr(p);
-@@ -1447,6 +1454,7 @@ static int wait_task_continued(struct wait_opts *wo, struct task_struct *p)
- 		infop->cause = CLD_CONTINUED;
- 		infop->pid = pid;
- 		infop->uid = uid;
-+		from_kuid_r_munged(current_user_ns(), kuid, &infop->uid_r);
- 		infop->status = SIGCONT;
- 	}
- 	return pid;
-@@ -1846,6 +1854,8 @@ SYSCALL_DEFINE5(waitid, int, which, pid_t, upid, struct siginfo __user *,
- 	unsafe_put_user(info.cause, &infop->si_code, Efault);
- 	unsafe_put_user(info.pid, &infop->si_pid, Efault);
- 	unsafe_put_user(info.uid, &infop->si_uid, Efault);
-+	unsafe_copy_to_user((char __user *)&infop->si_uid_r,
-+			    (const char *)&info.uid_r, sizeof(info.uid_r), Efault);
- 	unsafe_put_user(info.status, &infop->si_status, Efault);
- 	user_write_access_end();
- 	return err;
-@@ -1989,6 +1999,8 @@ COMPAT_SYSCALL_DEFINE5(waitid,
- 	unsafe_put_user(info.cause, &infop->si_code, Efault);
- 	unsafe_put_user(info.pid, &infop->si_pid, Efault);
- 	unsafe_put_user(info.uid, &infop->si_uid, Efault);
-+	unsafe_copy_to_user((char __user *)&infop->_sifields._sir._uid_r,
-+			    (const char *)&info.uid_r, sizeof(info.uid_r), Efault);
- 	unsafe_put_user(info.status, &infop->si_status, Efault);
- 	user_write_access_end();
- 	return err;
-diff --git a/kernel/exit.h b/kernel/exit.h
-index 278faa26a6..f24a6d6917 100644
---- a/kernel/exit.h
-+++ b/kernel/exit.h
-@@ -2,9 +2,12 @@
- #ifndef LINUX_WAITID_H
- #define LINUX_WAITID_H
- 
-+#include <linux/uidgid_r.h>
+@@ -5547,8 +5621,7 @@ struct inode *__ext4_iget(struct super_block *sb, unsigned long ino,
+ 		if (ei->i_extra_isize == 0) {
+ 			/* The extra space is currently unused. Use it. */
+ 			BUILD_BUG_ON(sizeof(struct ext4_inode) & 3);
+-			ei->i_extra_isize = sizeof(struct ext4_inode) -
+-					    EXT4_GOOD_OLD_INODE_SIZE;
++			ei->i_extra_isize = EXT4_SB(inode->i_sb)->s_want_extra_isize;
+ 		} else {
+ 			ret = ext4_iget_extra_inode(inode, raw_inode, ei);
+ 			if (ret)
+@@ -6006,6 +6079,40 @@ static void ext4_wait_for_tail_page_commit(struct inode *inode)
+  *
+  * Called with inode->i_rwsem down.
+  */
++/*
++ * An inode from before uid_r, or with in-inode xattrs in the way, may
++ * lack room for i_uid_r and i_gid_r: make it, before it gets a UUID or
++ * GUID owner or group.
++ */
++static int ext4_make_room_for_id_r(struct mnt_idmap *idmap,
++				   struct inode *inode, struct iattr *attr)
++{
++	struct ext4_iloc iloc;
++	bool legacy = true;
++	int err;
 +
- struct waitid_info {
- 	pid_t pid;
- 	uid_t uid;
-+	__kernel_uid_r_t uid_r;		/* uid as __kernel_uid_r_t */
- 	int status;
- 	int cause;
- };
-diff --git a/kernel/signal.c b/kernel/signal.c
-index d31ebcb6ed..af0793d04b 100644
---- a/kernel/signal.c
-+++ b/kernel/signal.c
-@@ -602,7 +602,7 @@ static void collect_signal(int sig, struct sigpending *list, kernel_siginfo_t *i
- 		info->si_errno = 0;
- 		info->si_code = SI_USER;
- 		info->si_pid = 0;
--		info->si_uid = 0;
-+		siginfo_set_kernel_uid(info);
- 	}
- }
- 
-@@ -1120,9 +1120,8 @@ static int __send_signal_locked(int sig, struct kernel_siginfo *info,
- 			q->info.si_pid = task_tgid_nr_ns(current,
- 							task_active_pid_ns(t));
- 			rcu_read_lock();
--			q->info.si_uid =
--				from_kuid_munged(task_cred_xxx(t, user_ns),
--						 current_uid());
-+			siginfo_set_uid(&q->info, task_cred_xxx(t, user_ns),
-+					current_uid());
- 			rcu_read_unlock();
- 			break;
- 		case (unsigned long) SEND_SIG_PRIV:
-@@ -1131,7 +1130,7 @@ static int __send_signal_locked(int sig, struct kernel_siginfo *info,
- 			q->info.si_errno = 0;
- 			q->info.si_code = SI_KERNEL;
- 			q->info.si_pid = 0;
--			q->info.si_uid = 0;
-+			siginfo_set_kernel_uid(&q->info);
- 			break;
- 		default:
- 			copy_siginfo(&q->info, info);
-@@ -1229,6 +1228,13 @@ int send_signal_locked(int sig, struct kernel_siginfo *info,
- 			info = &rewritten;
- 			uid = make_kuid(current_user_ns(), info->si_uid);
- 			rewritten.si_uid = from_kuid_munged(t_user_ns, uid);
-+			if (rewritten.si_uid_r.type != UID_R_NONE) {
-+				kuid_t uid_r = make_kuid_r(current_user_ns(),
-+							   &rewritten.si_uid_r);
++	if (attr->ia_valid & ATTR_UID)
++		legacy = uid_is_legacy(from_vfsuid(idmap, i_user_ns(inode),
++						   attr->ia_vfsuid));
++	if (attr->ia_valid & ATTR_GID)
++		legacy &= gid_is_legacy(from_vfsgid(idmap, i_user_ns(inode),
++						    attr->ia_vfsgid));
++	if (legacy)
++		return 0;
++	if (!ext4_has_feature_uid_r(inode->i_sb))
++		return -EOVERFLOW;
 +
-+				from_kuid_r_munged(t_user_ns, uid_r,
-+						   &rewritten.si_uid_r);
-+			}
- 		}
- 		rcu_read_unlock();
- #endif
-@@ -1684,7 +1690,7 @@ void force_sig(int sig)
- 	info.si_errno = 0;
- 	info.si_code = SI_KERNEL;
- 	info.si_pid = 0;
--	info.si_uid = 0;
-+	siginfo_set_kernel_uid(&info);
- 	force_sig_info(&info);
- }
- EXPORT_SYMBOL(force_sig);
-@@ -1698,7 +1704,7 @@ void force_fatal_sig(int sig)
- 	info.si_errno = 0;
- 	info.si_code = SI_KERNEL;
- 	info.si_pid = 0;
--	info.si_uid = 0;
-+	siginfo_set_kernel_uid(&info);
- 	force_sig_info_to_task(&info, current, HANDLER_SIG_DFL);
- }
++	err = ext4_get_inode_loc(inode, &iloc);
++	if (err)
++		return err;
++	if (EXT4_FITS_IN_INODE(ext4_raw_inode(&iloc), EXT4_I(inode), i_gid_r)) {
++		brelse(iloc.bh);
++		return 0;
++	}
++	err = ext4_expand_extra_isize(inode, EXT4_EXTRA_ISIZE_UID_R, &iloc);
++	return err ? -EOVERFLOW : 0;
++}
++
+ int ext4_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
+ 		 struct iattr *attr)
+ {
+@@ -6045,6 +6152,10 @@ int ext4_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
+ 	    i_gid_needs_update(idmap, attr, inode)) {
+ 		handle_t *handle;
  
-@@ -1711,7 +1717,7 @@ void force_exit_sig(int sig)
- 	info.si_errno = 0;
- 	info.si_code = SI_KERNEL;
- 	info.si_pid = 0;
--	info.si_uid = 0;
-+	siginfo_set_kernel_uid(&info);
- 	force_sig_info_to_task(&info, current, HANDLER_EXIT);
- }
- 
-@@ -2282,8 +2288,8 @@ bool do_notify_parent(struct task_struct *tsk, int sig)
- 	 */
- 	rcu_read_lock();
- 	info.si_pid = task_pid_nr_ns(tsk, task_active_pid_ns(tsk->parent));
--	info.si_uid = from_kuid_munged(task_cred_xxx(tsk->parent, user_ns),
--				       task_uid(tsk));
-+	siginfo_set_uid(&info, task_cred_xxx(tsk->parent, user_ns),
-+			task_uid(tsk));
- 	rcu_read_unlock();
- 
- 	task_cputime(tsk, &utime, &stime);
-@@ -2377,7 +2383,7 @@ static void do_notify_parent_cldstop(struct task_struct *tsk,
- 	 */
- 	rcu_read_lock();
- 	info.si_pid = task_pid_nr_ns(tsk, task_active_pid_ns(parent));
--	info.si_uid = from_kuid_munged(task_cred_xxx(parent, user_ns), task_uid(tsk));
-+	siginfo_set_uid(&info, task_cred_xxx(parent, user_ns), task_uid(tsk));
- 	rcu_read_unlock();
- 
- 	task_cputime(tsk, &utime, &stime);
-@@ -2582,7 +2588,7 @@ static int ptrace_do_notify(int signr, int exit_code, int why, unsigned long mes
- 	info.si_signo = signr;
- 	info.si_code = exit_code;
- 	info.si_pid = task_pid_vnr(current);
--	info.si_uid = from_kuid_munged(current_user_ns(), current_uid());
-+	siginfo_set_uid(&info, current_user_ns(), current_uid());
- 
- 	/* Let the debugger run.  */
- 	return ptrace_stop(exit_code, why, message, &info);
-@@ -2836,8 +2842,8 @@ static int ptrace_signal(int signr, kernel_siginfo_t *info, enum pid_type type)
- 		info->si_code = SI_USER;
- 		rcu_read_lock();
- 		info->si_pid = task_pid_vnr(current->parent);
--		info->si_uid = from_kuid_munged(current_user_ns(),
--						task_uid(current->parent));
-+		siginfo_set_uid(info, current_user_ns(),
-+				task_uid(current->parent));
- 		rcu_read_unlock();
++		error = ext4_make_room_for_id_r(idmap, inode, attr);
++		if (error)
++			return error;
++
+ 		/* (user+group)*(old+new) structure, inode write (sb,
+ 		 * inode block, ? - but truncate inode update has it) */
+ 		handle = ext4_journal_start(inode, EXT4_HT_QUOTA,
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index d636b89090..34ac087c32 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -4613,9 +4613,17 @@ static int ext4_inode_info_init(struct super_block *sb,
+ 		sb->s_time_min = EXT4_TIMESTAMP_MIN;
  	}
  
-@@ -3639,6 +3645,7 @@ void copy_siginfo_to_external32(struct compat_siginfo *to,
- 	case SIL_KILL:
- 		to->si_pid = from->si_pid;
- 		to->si_uid = from->si_uid;
-+		to->_sifields._sir._uid_r = from->si_uid_r;
- 		break;
- 	case SIL_TIMER:
- 		to->si_tid     = from->si_tid;
-@@ -3678,6 +3685,7 @@ void copy_siginfo_to_external32(struct compat_siginfo *to,
- 	case SIL_CHLD:
- 		to->si_pid = from->si_pid;
- 		to->si_uid = from->si_uid;
-+		to->_sifields._sir._uid_r = from->si_uid_r;
- 		to->si_status = from->si_status;
- 		to->si_utime = from->si_utime;
- 		to->si_stime = from->si_stime;
-@@ -3685,6 +3693,7 @@ void copy_siginfo_to_external32(struct compat_siginfo *to,
- 	case SIL_RT:
- 		to->si_pid = from->si_pid;
- 		to->si_uid = from->si_uid;
-+		to->_sifields._sir._uid_r = from->si_uid_r;
- 		to->si_int = from->si_int;
- 		break;
- 	case SIL_SYS:
-@@ -3717,6 +3726,7 @@ static int post_copy_siginfo_from_user32(kernel_siginfo_t *to,
- 	case SIL_KILL:
- 		to->si_pid = from->si_pid;
- 		to->si_uid = from->si_uid;
-+		to->si_uid_r = from->_sifields._sir._uid_r;
- 		break;
- 	case SIL_TIMER:
- 		to->si_tid     = from->si_tid;
-@@ -3756,6 +3766,7 @@ static int post_copy_siginfo_from_user32(kernel_siginfo_t *to,
- 	case SIL_CHLD:
- 		to->si_pid    = from->si_pid;
- 		to->si_uid    = from->si_uid;
-+		to->si_uid_r  = from->_sifields._sir._uid_r;
- 		to->si_status = from->si_status;
- #ifdef CONFIG_X86_X32_ABI
- 		if (in_x32_syscall()) {
-@@ -3771,6 +3782,7 @@ static int post_copy_siginfo_from_user32(kernel_siginfo_t *to,
- 	case SIL_RT:
- 		to->si_pid = from->si_pid;
- 		to->si_uid = from->si_uid;
-+		to->si_uid_r = from->_sifields._sir._uid_r;
- 		to->si_int = from->si_int;
- 		break;
- 	case SIL_SYS:
-@@ -4008,7 +4020,7 @@ static void prepare_kill_siginfo(int sig, struct kernel_siginfo *info,
- 	info->si_errno = 0;
- 	info->si_code = (type == PIDTYPE_PID) ? SI_TKILL : SI_USER;
- 	info->si_pid = task_tgid_vnr(current);
--	info->si_uid = from_kuid_munged(current_user_ns(), current_uid());
-+	siginfo_set_uid(info, current_user_ns(), current_uid());
- }
++	if (ext4_has_feature_uid_r(sb) &&
++	    sbi->s_inode_size < EXT4_GOOD_OLD_INODE_SIZE + EXT4_EXTRA_ISIZE_UID_R) {
++		ext4_msg(sb, KERN_ERR, "uid_r needs inodes of at least %zu bytes",
++			 EXT4_GOOD_OLD_INODE_SIZE + EXT4_EXTRA_ISIZE_UID_R);
++		return -EINVAL;
++	}
++
+ 	if (sbi->s_inode_size > EXT4_GOOD_OLD_INODE_SIZE) {
+-		sbi->s_want_extra_isize = sizeof(struct ext4_inode) -
+-			EXT4_GOOD_OLD_INODE_SIZE;
++		/* room for the uid_r fields in new inodes only if needed */
++		sbi->s_want_extra_isize = ext4_has_feature_uid_r(sb) ?
++			EXT4_EXTRA_ISIZE_UID_R : EXT4_EXTRA_ISIZE_BASE;
+ 		if (ext4_has_feature_extra_isize(sb)) {
+ 			unsigned v, max = (sbi->s_inode_size -
+ 					   EXT4_GOOD_OLD_INODE_SIZE);
+@@ -5437,6 +5445,10 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
+ 	/* HSM events are allowed by default. */
+ 	sb->s_iflags |= SB_I_ALLOW_HSM;
  
- /*
-@@ -4979,6 +4991,12 @@ static inline void siginfo_buildtime_checks(void)
- 	/* kill */
- 	CHECK_OFFSET(si_pid);
- 	CHECK_OFFSET(si_uid);
-+	CHECK_OFFSET(si_uid_r);
-+	BUILD_BUG_ON(offsetof(siginfo_t, si_uid_r) != __SI_UID_R_OFFSET);
-+#ifdef CONFIG_COMPAT
-+	BUILD_BUG_ON(offsetof(struct compat_siginfo, _sifields._sir._uid_r) !=
-+		     __SI_UID_R_OFFSET);
-+#endif
- 
- 	/* timer */
- 	CHECK_OFFSET(si_tid);
++	/* uid_r: inodes can have UUID and GUID owners */
++	if (ext4_has_feature_uid_r(sb) && !test_opt(sb, NO_UID32))
++		sb->s_iflags |= SB_I_UID_R;
++
+ 	err = ext4_check_feature_compatibility(sb, es, silent);
+ 	if (err)
+ 		goto failed_mount;
 -- 
 2.56.0
 
