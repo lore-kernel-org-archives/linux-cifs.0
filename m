@@ -1,13 +1,13 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.195.118
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.122
 ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792596629;
-	b=UU1pExAGkytu6N2eElGteAJqFK3QZi66sYx82b/BmtEUfRyY1lqxNTYkmzYFYscIZMhG
-	 ZbL8FxdZfAqjhN7sFEUYhG8zhGdaO+xDXTwssLhWo9zVI8DEB0n2MOYhT3krK86Ec/zcU
-	 w++2rx5bplC/pK/jWD+ylimoVcZjdJOTmcsbbBUdKhKJy00Z/88e19bARyYXthWlsbUH/
-	 lpaxvTsR/xjv2DQM1i8Giv0qsZjymMtLVdNIn4T0fTD9tp29RtOiHrotbqg9YyIFA/mQG
-	 JdAH6jFZ85sf8mvSQSM10CvRJAmmthlzqth2Fi/Lt1czwPK7zUaNTgUKwobseZwp5Eg==
+	t=1792596728;
+	b=VuF7d9Wieg7Z4D37bPw5W9V0eiW+cmuJIehkrnM6j9+IJVPKjPKI/OjgE7K7uYVUiqJC
+	 dyYRcwltvbQn98A5RQvDhcVG/M3BLzKZalkzQwuIFfn7tVjc7tv0OIkF2Jm2H5UVdk9GA
+	 i5w/2sHba8wCqUFc8PrCQoqIMeHHMYdeWWhMBgqQrctsXgLB5COQi6jkMnSK9JCgzJMVZ
+	 mVUX9Q1MAxMUufMtXTgkJMdt/WL1tcOa+bd/M38GsWsoeSc9DpAzHknI3US5UhHDEqQXX
+	 O2dZ/qU25UbaXoecvta6+fjrYyCIAh82rjpoNC2it0DHx/76LetKs3BtlAu9GXb4+tg==
 ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792596629;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792596728;
 	h=DMARC-Filter:Received:Received:Message-ID:Date:User-Agent:Subject:To:
 	 Cc:References:From:Content-Language:In-Reply-To:Content-Type:
 	 Content-Transfer-Encoding:X-ClientProxiedBy:MIME-Version:
@@ -24,65 +24,63 @@ ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
 	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
 	 X-MS-Exchange-CrossTenant-UserPrincipalName:
 	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=PLLvHWqgDU70PFgwDhJOzNkURUoknZW3yt42UV4DQZQ=;
-	b=saJdAOLfqU7Q6eNfYZQtbh5AwEtVNjFXhxdSP4gr6CEVevBYtgeWOpq3GucG+Hwo/kNz
-	 1Cvdexpw8++TAUDIg9KHp0wF/P5T9xTQjW2afSOT26O6RzXU4IcqKbdEHEYlus1vzNoTY
-	 zQqxnICVVegZ9UfinOjOWp5G3UYjjLAKTnZBuTppXnBlW2yRIHj1HrwsP/75PadK/oGVW
-	 yij3mU2m25pNs7gOuo73OTvvWSyd9zQ2hAf7hReowGehtMMXtsLiyXY2ETAnGtHPR0MUM
-	 KChod2vdiNtoZbuZjiIObfWkN04qQvYEPcc7WSUPwLjsqFDcUCJW3aiS/JxOC5zLTdA==
+	bh=VY4/2EbML0oS/EYkPdnDhgkVZ8qPwL57pJ2Mlk3u4bQ=;
+	b=1tyqfsWqnTwF7W8pdtiebau2srRy84VwLZMn3gs/JPZl0bC005m/dY/F/pVqb8YIrfQ6
+	 KgeJISeUnWQb7T64tYTFOwng5Hd1j1SS5mHF2bFi4/VF183opHAA+eKlBS9pfeGSTWvb1
+	 0CyTNCwNlYqMh2X+Swa5ExMqN3BvvnXen+NKFBoUKONRmSBMCgZuz5AMu3aDCuTKViPUe
+	 gGq6IoShRSLMHX8eRyEHwyhwuGpq9ZDkXC7832EF5PDVmYd7uhH6Ft4mJH1HiY0nQj3i6
+	 bGqrAvwptyqu4jHCz/vTM1X5g8TXkwtu8fAkcc/tt3MymvV7puxfmHOSvC8D1tG2WDQ==
 ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
 	dmarc=none header.from=talpey.com;
 	spf=pass smtp.mailfrom=talpey.com;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=40.93.195.118
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022118.outbound.protection.outlook.com [40.93.195.118])
+	arc=pass header.oldest-pass=0 smtp.remote-ip=40.107.209.122
+Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11022122.outbound.protection.outlook.com [40.107.209.122])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66449606A31B;
-	Wed, 21 Oct 2026 15:30:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 66449606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BC6606A31E;
+	Wed, 21 Oct 2026 15:32:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 45BC6606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=talpey.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=talpey.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=J6nGzyfSsJanb93ZYrx1Ky89EgtgQblxIOoSXfPsAJj7hZL+yrXi6Hl2Eb3aLTyetnriIcgqLIUKuNeTykdLQJesvVh4eAE1t8hZ5WqZLpSBfcgfQj/fbgrzzMfyV+C4hXlgPo5fN7O9btaUt60Du93BDsenBC2h6wJXW5mFPqrNIF+B8IKR23t7w1+UcYzuSS2MGPpJghkxb4TA47rjxq7Vwy8i1QvFT392eZ+QTE4/N4CbuFT3xhkEB9ZQYjsgkg+ibP7+unTzNJvuSkoB7m7jbO9PqNhhf4We3NySR56jMJnFCr8vGZg41kr/kdNVJGIArhd8ibcnmQnkWJCBEQ==
+ b=SdWFnYKjQqCnIMUexgOkmPDrMBrj8yw/U1M0tZayqVl8g6K8N089WurRgs+3ry7de2KPlQeMKIbT5yOvolQv9YqOCa5T8oejCh8QFRpR12wKw/cKIAkWrrbcCGVl99m0DSES/+q3WFYgDZllJe728lA0j8Tq5b1c3fccXDSlhQVBbuMkGYKPh+WF9mtNdnIr+jDksaLNJMNvXU0OPs7uwSCzVx9p0nMHxadUk09rH81X6Cf4ChPvZMBatFd8FuYsRnE98IS472vjnTlp7pQhSTzgRI52U9+iHs1xXyo67WzFcE/axG85miFR30/tc1iNK6qzJdzbT9zdmoZdnHuHVw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PLLvHWqgDU70PFgwDhJOzNkURUoknZW3yt42UV4DQZQ=;
- b=CcUs/jy/xWiIyTVXmmPgIsC4N6ids30/WtUg0pvfXC+JDt8v3i3F1zZ4qRUl+RQjJnii93mr4eg+rMEbgsA3WNQoVkWtVONoVMvUmxKhfWwInY3cZqgLrSqMH4iDCfsR5UfZp+fa86m7pBNYHJFCyYHTAodvqQenjbJCgtqND5alGxhP2tjQnl7vE6FImBT1dSs9A/wlUJPW5eKfX+hPtx9TiyU5dgkZSMADiLnw061IGUHz7pMBlM52tPUzC7VeZgsxonTUGI/l5qGuEsqY1FAlrcm7RUfxkxGUcu5QlYzrrRGE/CwQrfD8S0vO1V7btFrGQH50QR3xVQMiCr3M7g==
+ bh=VY4/2EbML0oS/EYkPdnDhgkVZ8qPwL57pJ2Mlk3u4bQ=;
+ b=JIBoF1OMY+pE1m8HmIjwEbAsWami/qH+vmThhnnH/OkZHWZ56QkLv8ZXKpeOQFzTGe4rbcRL9B35io5vqPo85niJJMs3DeQffg90qPh/raaMFk5hvXHhPo4KEajXMODJfeMCNUkGYlbkBK4MqgFpzOwNzw62Y5fGcLQnB7N2NbTpBaXZomNRs1EONSTdtnfygRQ8Nyi8w990JYkICkgM1pKbiKSH8s1dcuhGPq11CW/NVYSs+7gZgL8j0sy1CAQcdXdBc/pY84DFF9IJNdjB3wbGltUBhOYiDMQfFnKD+JRfput9jz2a4WJcwnK9hqMPUvBycs8q0A5/tFEYjvr6Sw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=talpey.com; dmarc=pass action=none header.from=talpey.com;
  dkim=pass header.d=talpey.com; arc=none
 Authentication-Results: mx.microsoft.com 1; dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=talpey.com;
 Received: from PH0PR01MB6344.prod.exchangelabs.com (2603:10b6:510:18::16) by
- PH0PR01MB994284.prod.exchangelabs.com (2603:10b6:510:38f::7) with Microsoft
+ LV2PR01MB459893.prod.exchangelabs.com (2603:10b6:408:3a8::22) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.569.2; Wed, 21 Oct 2026 15:30:25 +0000
+ 15.21.569.2; Wed, 21 Oct 2026 15:32:04 +0000
 Received: from PH0PR01MB6344.prod.exchangelabs.com
  ([fe80::eddb:aaf5:fd79:2b08]) by PH0PR01MB6344.prod.exchangelabs.com
  ([fe80::eddb:aaf5:fd79:2b08%6]) with mapi id 15.21.0569.000; Wed, 21 Oct 2026
- 15:30:25 +0000
-Message-ID: <6233e33a-e6e2-4c9d-8372-5aa75f4f3314@talpey.com>
-Date: Wed, 21 Oct 2026 11:30:14 -0400
+ 15:32:03 +0000
+Message-ID: <655e5d4f-7890-4956-88d2-cb571be218d6@talpey.com>
+Date: Wed, 21 Oct 2026 11:31:53 -0400
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] smb/client: don't unhash and rehash to prevent new
- opens.
-To: NeilBrown <neil@brown.name>, Paulo Alcantara <pc@manguebit.org>,
- Namjae Jeon <linkinjeon@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
-Cc: Jeff Layton <jlayton@kernel.org>, Jan Kara <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] smb/client(cifs): prepare for locking changes.
+To: Christian Brauner <brauner@kernel.org>, NeilBrown <neil@brown.name>
+Cc: Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jeff Layton <jlayton@kernel.org>,
+ Jan Kara <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
+ linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20260928012812.2890035-1-neilb@ownmail.net>
- <20260928012812.2890035-2-neilb@ownmail.net>
+ <20261021-sodbrennen-ausdruck-kurven-72d0b7cc7db9@brauner>
 From: Tom Talpey <tom@talpey.com>
 Content-Language: en-US
-In-Reply-To: <20260928012812.2890035-2-neilb@ownmail.net>
+In-Reply-To: <20261021-sodbrennen-ausdruck-kurven-72d0b7cc7db9@brauner>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: YQBPR0101CA0162.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:e::35) To PH0PR01MB6344.prod.exchangelabs.com
+X-ClientProxiedBy: YQBPR0101CA0155.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:e::28) To PH0PR01MB6344.prod.exchangelabs.com
  (2603:10b6:510:18::16)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -94,294 +92,95 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR01MB6344:EE_|PH0PR01MB994284:EE_
-X-MS-Office365-Filtering-Correlation-Id: a30ab429-4fad-43b1-b91c-08df2f883a28
+X-MS-TrafficTypeDiagnostic: PH0PR01MB6344:EE_|LV2PR01MB459893:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59189865-6f73-4edd-de4c-08df2f887525
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|23010399003|376014|7416014|1800799024|18002099003|22082099003|10067099003|4143699003|261009223027099003|56012099006;
+	BCL:0;ARA:13230040|366016|23010399003|376014|7416014|1800799024|18002099003|22082099003|10067099003|4143699003|56012099006;
 X-Microsoft-Antispam-Message-Info:
-	vQGXAiTT03jvxNZyrR7kRiVAopDaUISe4baWaxTqzYC9SpqjKu6G2bBORjwp/rkhLH3Xo6kDHBTmkm7NxbgFeS7Aq2+336qu1piGxaiNnu3FgqSiizNhpFmisKrjBiBHczDaQxnNVoNRo6JadEKLVXRSRqWv5d+E7R/P7HlvWkZTBeDPn5g18LbKyTqfVKsYU1OwzRmCGkcCIKnciv1oBkkmM4HGHBrfU068/TZKLLExQjQDZ5PnOGhMoPQU+zwS9Up599mErh4TzUyR1jKZi+rO5gb3PyXgLEV6uF7auK+npJTqKFH0DuHMTrS7iSIO9GaxQ6/4ToVIreiRif7BOXC/884cCIi6wyC+csBQaDdLzXeRD7dSbS0VXCdQlm6ImSpgIMA2+5k2uzNSFowJcVSy8lpaFUUimJv/ljixQfwViJdp7zMjdbjpo3I+1pwEJK7L3RNfivaITtsK5dBRYgVTWgnV2j+RJ+fRUOPaH/CYuvag6JiGHmRGEdBVLNWiQudKJGiUyxonGLQl8DVg9Gzf3q5bMFEbvpGer2YCngnlGNwa3FvWtZj8En8mutbD3c78GEzUoI+xAft5JiPbnX4+sSzxSg9frWFPkifO46L8XPQQA9S5Cm2CjzfHXg5dtAMrlThZEQ54Dsdtqp/NbdkRNh6qawXMZsDr4e3+q7I=
+	qdiZDXQNfLgu35slC9MSmzTLY84fMM+47eYmatE2ZCKtodGOgSgCOVYrtt+B0OHl6AYgt+L7u/m5EnyJzXVzcPP2xXTLEJF7z1tZVafqnzQqntmk1PJsu3kO588F8WNgKcBpy4rvo2w5FPB5kVe+KpB1tJwY7LawHoK/O0KpOF93OZ917jrSa2kTAYGoY59DbzAiy7T6/hL8SgE3s1F/VapNU7QFsz5l8aayvjLXtS3dZ9PVbjVVAJtOzHv8sl9szygI9hPzRJ7C6H+ezgDoXJJFbAF3lNOMedNPKUUgvuCp1wTrMF8nggBQIfkMxaTNwZWs6h1Y9ZpB0cGdmiha1+2XbDssVud13lHn8p+eTo5cOhS5jiNgbZIqI/oyF8spXm75ag4ziSos7LYXjPlbMqDS5KkTas1wLrCIX4qLsKmRyBJcGSuwAobwIw9Q53IXpsmGTlKBlaFyzuk3G6UQHrOkiuerLcym/H6Es0SXq8J7JDWtjwbUHswmI/tkUfpyMAf5N9MGvr3xktA1kOf6IW5sFS1dPp02FcUWDCAmUnG0Ipc8PuywAsYcori+HCzFIc6Satn1UTJjE8I3W7PtcZ54/KZ5NCv3wYNL/mb+v1OLJUoMCahfAWVya/wA3eVhEIfA2lmkDFFzvXLsAUPQwaiuLzaNEgrqm4SG05sn51E=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB6344.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(7416014)(1800799024)(18002099003)(22082099003)(10067099003)(4143699003)(261009223027099003)(56012099006);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR01MB6344.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(7416014)(1800799024)(18002099003)(22082099003)(10067099003)(4143699003)(56012099006);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?T1VoSzgwcHBXWkVIZnZaNkdLQXNleFR6ZmZyNk0wMEdwMjdwUHR0QzdsSjNk?=
- =?utf-8?B?YXF0V1J6bDVIdk1RSTNMUkJiY1NlWWl2NG1UK3hJUDRNY2RZWGRsaUxiWkw2?=
- =?utf-8?B?MmxlaTdNbHh4UEE2RmRnOVl4bm5oZmpnYngvbE00ZkxEQmtieVZrdEFPeG16?=
- =?utf-8?B?SUEyS0UzbnFVY0lvVUswQWxWSHJNNjdDTUNEZFROR1M3eS9SUEtqR28vOHQr?=
- =?utf-8?B?RDN3bzdjMnR4N0IxcUVjSlpqUm51TG96dDNYcjQyVDVwZVZkSUR5MnVwRGV2?=
- =?utf-8?B?UnRSRWlvdGt6bzFVSEpMRmN5TWlidThHV0ZHcGVWNE5xQlRMTXlDN0hqOGxU?=
- =?utf-8?B?TmN4eUFFYlhScUU2L0x2VGRxOG9iQ081SVZKK2Z5K1J6M1h0OWR5L0h6L0U4?=
- =?utf-8?B?ZGNYT1hOVmlMRjRDRGxUaTlHanR2Y2xLY3ZGUUhtUEdDaS9VMG80Y3o0Z3Vz?=
- =?utf-8?B?ejROVXJ6TVJoNStPOEY4b3JzdVpEVEptenp4cmxEOU5uUWVtWVFLSXBJYUpL?=
- =?utf-8?B?TUdpRkQwSUFEUGVVTHRCWjFHY2NwNWl6UmtQRVBPNy8vakR1M1RLYUdUVDZw?=
- =?utf-8?B?MjcyK1lNNHlpeGZScjdLVVQ3ci81Ym5IUm9kRG9nNHY4elVBeDdNelVmV0xv?=
- =?utf-8?B?MHJaWUw4aS9sbWFBeXRnZC9uUmJTV2xzREh5UTE0R3JMY1JySjJ0bXJJMEp3?=
- =?utf-8?B?SHhOM0ZOQXR3U3h6REMvZXFKOCs1V3ludk51cWNDRG5aeDUwczdFaHB4dzBG?=
- =?utf-8?B?S2N4WHNNRjFia0lwaXJhRTFZWmZJUVpGcTVITDlsK3RCS0FWMnFpNm4rT1dY?=
- =?utf-8?B?VGYvQnl1WjZ3VHBrWXMrbTMwbVI1YnArNWpSVVdEOXQzOHZpc3AvWnVSN0J2?=
- =?utf-8?B?Z3lXd2Nha0NpVXkvOTR6QXhsT2wvc1FFa3FKTkhFMEV3NUF0amg0QlY4VVVz?=
- =?utf-8?B?NHhnU291TDBzWG5wNURuc2dycjVRbjB3Y0ppeUk2b0xhdXJnckZsZEw0U29N?=
- =?utf-8?B?dXcwbzk0MzNTSXZpRWFOYUpvRW42Q280cTFFMmxMeitFSVY2cm1XZEJicWZv?=
- =?utf-8?B?bVRvMTlEbEFzbXhTbXdrQ0x3emJXYXBTb0YycUdKa2lzcWFKSTZpbnYzZ2wv?=
- =?utf-8?B?UWIrS3UxOUlIbk5GbGlRQnFBbXJIMFVRMndPb054ZXZvaWlhc0JsMFUveEM5?=
- =?utf-8?B?VjJEaEpZb1o1TlFKNktMNmMyTDhTUW56M21DRUJ6ZzhWVU5JWHA5a0hMNm1T?=
- =?utf-8?B?UnBOTlluR2xiNU0zc3RyYWdYWUw4YnNHS1JXdlZrbWYrMUU0S3d1R1ZYUk5J?=
- =?utf-8?B?Yi84VURxNE5mQm5kaXM4cG9ieStrYTFqNU5aK1V3QVdrS2Z4Q2s1QkpVak5a?=
- =?utf-8?B?TCt3QnFpNHk5WkQxVWRHQk8yV0p4bnZIbFAySmNoZnNQdXJWWXQvaHI1Wlpz?=
- =?utf-8?B?eTRKMWhJQmlRVDFQN1d1ZEFWSENYSXVGQWtTdXRDUFlNUERGVCtzTnNZNHdQ?=
- =?utf-8?B?WU44dk05YUNrZU1YWmJOM0R6Q2FCbWpxa0Q1MEtKUTEyUHVKdGxJRHBKREo3?=
- =?utf-8?B?TS9WK29FUm9mSldQY0E2cDF0OG1pV1FyQXVwOFVlZ3Z3TUlLdjFmcWZmaklj?=
- =?utf-8?B?bjJ4NUpQRzdrN2gvMXE0Zi85Z1k2RjFCcS9RQmVzK2tkakJtOWZuaUJOaG5B?=
- =?utf-8?B?TUQ5OFE5TGc3RFpuSDQzbjZlb3ZZK09XdzZPYUVzTzRrNmVmNWJLNENuejQw?=
- =?utf-8?B?L0Q1VUpVdEUxSG9VTXZwNDJhczVoY25iaERDOFpUYkt0UklueU9QbzROWEhS?=
- =?utf-8?B?ZTVDeGRrdFdIU1Q3RlJRaklMS0NLb1gyZ2NGZUlUZTdzUEhJWjBOZTEwT0lK?=
- =?utf-8?B?VjMxSXI3dHpyV2dSbTQrY254cnhsM29LZ2JCcjhySXl0SDVCbG55Um1oVEh6?=
- =?utf-8?B?TmIyeGpLSjZRTVpDWk1xQnREd1N1bGhQeHR6MGxTa01OZDB5YmZFVytMZVZZ?=
- =?utf-8?B?UHdUellkd1Z3T1NUQ3dSRldtYS9YbDF4ZGtPa05uaDVkbGcrQ1hmTU03TThF?=
- =?utf-8?B?QkxRL3dGYUpkbmNDc0o3VlY2MXNtVFNXcTVUQlZzeVBNN0FPb0Vlamp3amdi?=
- =?utf-8?B?dWk0OTF5V1NaeDMvSzBsSEpieXhnSVMrbGsvZnp6ODNMRG9JS2d6eERkbDZq?=
- =?utf-8?B?WTB5eWV5d0tkNE9KbzFuZi9JRks2UVlyVnNzTGNkUklKUzNMbit5ZTVUdGh5?=
- =?utf-8?B?WkhwK3RNeDYzbURXZURSWUJNMGVlOWZoMUlyUlZPaTIwalZubWN6UVloazh0?=
- =?utf-8?Q?0dS64ZrLwWpUly6Q8o?=
+	=?utf-8?B?K0lIWTA4RlFXWEkvQjBPbVd4N2VGTDFTdlZDRDlqRTFraDhBUmpwQlFRNVNo?=
+ =?utf-8?B?S29ZVk92V04wREJxYmtpOC9vQWVMK0lPUXhJTzdXQzI1MXIxZy9yMEVUWWpX?=
+ =?utf-8?B?NlVHV1VRRFFvMkR6MEtxQnQwUnlDSWNrRUVFTkVzREM4NW5lS3hQNFM5UlJ0?=
+ =?utf-8?B?d1NBTmd4V3Qxb29MNCsxaW40OTBrcmI5VzVYdFJJUWtXY0Q3ZitLOFAzRXJC?=
+ =?utf-8?B?azJuUEZiZUxLc3MvaVo3Y0lSdFRBOVd0eExWd3hYb2E3QndUYkgrS1ZtZ0Zj?=
+ =?utf-8?B?Q0VlTit6b0ZKSTZmZzhYVHRlUHlVZGR1NzJ4c25VMWQ5YTdicmthYzRybEJD?=
+ =?utf-8?B?WU1Sd2d0RHlPRzBCRWxRRGRlRThjd2JLZTNDMUJGLzZBVGJEbDRXVjNuWEtK?=
+ =?utf-8?B?dzRUSTJWcUdMcUd4TDc1TUliLytCeCtoVDNzVXMwME1mamU0NWliMkRPbmlU?=
+ =?utf-8?B?Sis4QVNMeUY5T2ExVU1SbnhLYUtMbW5sdW43a0E5VGVybEN3RGkzSlpnQjhC?=
+ =?utf-8?B?MC9QUTF1Y1dEbWYwQVZKS05MWURBZDlvNWRaMjZFT2tLZE9YemhaOWlaSVJi?=
+ =?utf-8?B?cnI5T0M0TzU4ZndpZ2tEbEFCVW5jY3RhbERmdmg4Yy9YUHg1ckNXQ012bWFz?=
+ =?utf-8?B?bVhxd0xUV1UrcWhXRDFhd1NLTU9BZFdZRG4rS1JwVURHN3N1enhrVW44aC80?=
+ =?utf-8?B?aVlpSjRrek5JeUlhN1NCZlFJdThhTkpNbCs3QmxrQ0kxem1oQ2lmTk5tcjF2?=
+ =?utf-8?B?T2VKZnVreEhMMnA0cnoxTXprdmF3NTVkVGhlbFNoK3M5cHQ2NVoxNElYZWxK?=
+ =?utf-8?B?a1RjUW83aFh4bCsvVWIrS1BFZmRjTmdaa0QybWtGaHFJR1RNNENQSlNmQW5E?=
+ =?utf-8?B?cmthZ3ZTa2V2dHIwekhIaUJ1SnppSTQwbzg4UjZWU25pamtyTTVzQ3hZaG5z?=
+ =?utf-8?B?RzFCNHNHbm5PZktlWEFSV0xnQ2RGaUNtZjhWOGZJK0p2N0tETkVYNWZuNnJB?=
+ =?utf-8?B?SGFrbzdqMVRsbWlqSFVRdS9zWjVxSE1ldDNKQjF1ZXNSSjVJMVdqeVk4aUZw?=
+ =?utf-8?B?WktxaUw1ZFl5SDk2cHZGU1Z2MEVqU0YvQXBDUDBCSUd3dHUrMlFUNXBCTDZa?=
+ =?utf-8?B?clRlV0JtNzJ0RUl6eEt0bHo1VkNIanpqYzExS0FoL3hTL0Z4a3VZczNtYmha?=
+ =?utf-8?B?bGpISCt0ckRXTXJpRDZvUFVOWEVaQ284Y0FJRXhHQXZHbHZWTlhaL2pTRkg0?=
+ =?utf-8?B?R3lJZFpqQlQyZVZ1WmpWVmQzaUJvc1l1LzdiMW9lWUxUcEVnejhXZE9SdFVU?=
+ =?utf-8?B?akNza0lncGxGdjFEbDN4dDlrbjdZb1huN2llM1AwWjVBN1dFc0wzeTJrSUhO?=
+ =?utf-8?B?Vkxad1JqOHNhRytzeTdpRy9iZ2NxUkdjVHlEc2xYUTdwUlloUkJNeWFCVlkz?=
+ =?utf-8?B?NEk2dXIyVVBtaG1EeHlEU0R0dGpJZmQvTG55eWdNSXNoZVlOZVZHeXlYbm5i?=
+ =?utf-8?B?cUl1L3JJTnhiOUpFVzRMWkk5bm1Xc3Fyc0dsOFNqYXNqYjFzeFVPSXFtcnly?=
+ =?utf-8?B?RHVkMkQyWFdBd0NCVUtiTmhmWjZCRjg4NVhsK1hDdElIS2Z0V1VTK3BZVjFu?=
+ =?utf-8?B?T2FTTlVGTmNLTmZmbi9aUkdLYk85QWRNRzJ6eEhqWUFtUjh2RjNWQ2YxcTFF?=
+ =?utf-8?B?SkRRbktoS1hqSGhQcjVqM0MxOG1DY3FkMm5kc3AxOFRIL3hLVVFIeDlYaEgr?=
+ =?utf-8?B?TGx1bnRMZzlSeksrcTc0Nll3cmhTdzg3eXNyOVFxVUNUU1ViSDYyR0lzdUNk?=
+ =?utf-8?B?Tmlwa2V4cmkxanlVZmVkdDVIQTJJaFZHendzRDRrbUkrQnJCOFBHWnBNZ3lj?=
+ =?utf-8?B?bXJnMUcxSENuTFVMQnNWNXhyWnhyYzJhTzN3bEtMSHZtaUN4MGFjRXJuVi9v?=
+ =?utf-8?B?ZXowKzJJTWNqcnA1N1R1Sjg2NDUvV3BsaFpYVjVwZnV6Wmtsa1hLdmZsMlBZ?=
+ =?utf-8?B?VmFQVXI3S3dITEQ0NmxlUG9ZdVBkbjlSY0N0VlRnMkhzbUJyUW8zYWY3dFBO?=
+ =?utf-8?B?Z2NNaENkdjY2aFdKckQ3N2h1M283bm5saXpSU29vYjN1NFhsVUNacnd6by9u?=
+ =?utf-8?B?dXVBU0I3WHh3Rnl2U3F5eVJYM2s3OW55VGlNcjdNK2pOOTBsd1VsakJHZnps?=
+ =?utf-8?B?NFBmaHFFY3JNSE4yZ0VhVnlRUkJTMFlnMVUyc2dFZzhMVytMOEhRV2xFaUVi?=
+ =?utf-8?B?Rmc3L25rYko5NXB3T1pBd20zelBTYi9hbUs4cGFSUDBMVTMzalA1UTYycFJ1?=
+ =?utf-8?Q?RKaO/0vktMwuR6DcaC?=
 X-OriginatorOrg: talpey.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a30ab429-4fad-43b1-b91c-08df2f883a28
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59189865-6f73-4edd-de4c-08df2f887525
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR01MB6344.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 15:30:24.9572
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2026 15:32:03.9226
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 2b2dcae7-2555-4add-bc80-48756da031d5
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iYHLAK7eIn2n3ykuIElqj0gSCCfSs06pgdOsFLq53EMk3g/44S7urKAJLx7nl8Hz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR01MB994284
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ij/rQVrBrp2Q3FyAxf71nXRPspQafAIS+sqy6zfUFOiOqqBLAoxI3WfgGCRI0hiA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR01MB459893
 
-One nit below...
+On 10/21/2026 5:55 AM, Christian Brauner wrote:
+> On Mon, Sep 28, 2026 at 11:25:01AM +1000, NeilBrown wrote:
+>> I am working on changes to directory locking.  The medium term goal is
+>> to lift d_alloc_parallel() locking above i_rwsem, so d_alloc_paralle()
+>> can be run unlocked, and consequently cannot be called when ->i_rwsem is
+>> held.
+>>
+>> The requires:
+>>   1/ that d_alloc_parallel() not be called while i_rwsem is held.  cifs
+>>      does this in a couple of places.  A new interface d_alloc_trylock()
+>>      is now available and can be used instead.
+>>
+>>   2/ a dentry must not be d_drop()ed while an operation is ongoing, as an
+>>      unlocked d_alloc_parallel() would then be able to create a new
+>>      dentry with the same name.  In particular d_rehash() must be phased
+>>      out as it won't be safe.  This particularly affects the mechanism to
+>>      block lookups/revalidates while an unlink/rename is happening.  The
+>>      mechanism is changed to use one similar to how NFS addresses this
+>>      needed, though using the new LOOKUP_PRIVATE flag.
+>>
+>> The patches depend on patches recently added to the vfs tree.  I would
+>> prefer these land in that tree too with an Acked-by or similar from cifs
+>> maintainers.
+> 
+> Can do, will need an Ack.
+I will defer to Paulo for the Ack, but for the series, modulo my nit
+on DCACHE_BLOCKED:
 
-On 9/27/2026 9:25 PM, NeilBrown wrote:
-> From: NeilBrown <neil@brown.name>
-> 
-> smb/client needs to block new opens of the target of unlink and rename
-> while the operation is progressing.  This stablises d_count() and allows
-> a determination of whether a "silly-rename" is required.
-> 
-> It currently unhashes the dentry which will cause lookup to block on
-> the parent directory i_rwsem.  Proposed changes to locking will cause
-> this approach to stop working as the exclusivity will be provided for
-> the dentry only, and only while it is hashed.
-> 
-> So we introduce a new machanism similar to that used by nfs.
-> DCACHE_PRIVATE (given the name DCACHE_BLOCKED) is set when lookups need
-> to be blocked.  ->d_revalidate checks for this and blocks.  This might
-> still allow d_count() to increment, but once it has been tested as 1,
-> there can be no new opens completed.
-> 
-> Unlike unhash which does not need to be reverted on error, and which
-> must not be reverted on a successful d_move, blocking of opens must
-> always be reverted.  So we don't block the open until after the last
-> early "return", and we always unblock on the final "return".
-> 
-> Strictly speaking it is only necessary to block opens before the value
-> of d_count() is tested under ->d_lock. But we block as early as possible
-> to discourage new opens from starting.  As open is path-based in cifs a
-> concurrent rename can be confused a rename of one other the paths.  Once
-> cifs_open() has generated the full_path it doesn't hold any locks to
-> prevent a rename from making that path invalid.
-> 
-> The important details of the interlock between __cifs_unlink (which both
-> unlink and rename use) and "open" are that __cifs_unlink() sets
-> DCACHE_BLOCKED  *before* testing d_count() which is
-> in a d_lock locked region,  and cifs_d_revalidate() tests the bit *after*
-> ->d_lock is taken by e.g. __d_lookup() to increment d_count().
-> Thus ->d_lock provide serialization between the set and the test
-> even though the test isn't in a locked region.
-> (The fact that cifs_d_revalidate() always returned -ECHILD when
->   LOOKUP_RCU is important for this sequencing to work as it ensures
->   d_revalidate() is called *after* d_count() is incremented).
-> 
-> Signed-off-by: NeilBrown <neil@brown.name>
-> ---
->   fs/smb/client/cifsfs.h |  8 +++++
->   fs/smb/client/dir.c    |  3 ++
->   fs/smb/client/inode.c  | 68 ++++++++++++++++++++++++------------------
->   3 files changed, 50 insertions(+), 29 deletions(-)
-> 
-> diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-> index 0c85daa8386e..bcc0fb5c2c9b 100644
-> --- a/fs/smb/client/cifsfs.h
-> +++ b/fs/smb/client/cifsfs.h
-> @@ -42,6 +42,14 @@ static inline unsigned long cifs_get_time(struct dentry *dentry)
->   	return (unsigned long) dentry->d_fsdata;
->   }
->   
-> +/*
-> + * This is set to block d_revalidate on a dentry that is being removed -
-> + * the target of unlink or rename.  This causes any open attempt to
-> + * block.  There may be existing opens but they can be detected by
-> + * checking d_count() under ->d_lock.
-> + */
-> +#define DCACHE_BLOCKED DCACHE_PRIVATE
-
-Why the alias? The blocking behavior is reasonable but #defining a
-flag value which is purely local to this file seems unnecessary and
-confusing. What if another file in fs/smb/client also overloads the
-DCACHE_PRIVATE flag, for example. Consider removing this hunk.
-
-Tom.
-
-
-> +
->   extern struct file_system_type cifs_fs_type, smb3_fs_type;
->   extern const struct address_space_operations cifs_addr_ops;
->   extern const struct address_space_operations cifs_addr_ops_smallbuf;
-> diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-> index 6fa6d48fdfd3..88fff65320f5 100644
-> --- a/fs/smb/client/dir.c
-> +++ b/fs/smb/client/dir.c
-> @@ -872,6 +872,9 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
->   	if (flags & LOOKUP_RCU)
->   		return -ECHILD;
->   
-> +	/* Wait for pending rename/unlink */
-> +	wait_var_event(&direntry->d_flags, !(direntry->d_flags & DCACHE_BLOCKED));
-> +
->   	if (d_really_is_positive(direntry)) {
->   		int rc;
->   		struct inode *inode = d_inode(direntry);
-> diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> index 12ed8db10e00..4d34c5622cd4 100644
-> --- a/fs/smb/client/inode.c
-> +++ b/fs/smb/client/inode.c
-> @@ -1967,24 +1967,31 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
->   	__u32 dosattr = 0, origattr = 0;
->   	struct TCP_Server_Info *server;
->   	struct iattr *attrs = NULL;
-> -	bool rehash = false;
-> +	bool unblock = false;
->   
->   	cifs_dbg(FYI, "cifs_unlink, dir=0x%p, dentry=0x%p\n", dir, dentry);
->   
->   	if (unlikely(cifs_forced_shutdown(cifs_sb)))
->   		return smb_EIO(smb_eio_trace_forced_shutdown);
->   
-> -	/* Unhash dentry in advance to prevent any concurrent opens */
-> -	spin_lock(&dentry->d_lock);
-> -	if (!d_unhashed(dentry)) {
-> -		__d_drop(dentry);
-> -		rehash = true;
-> -	}
-> -	spin_unlock(&dentry->d_lock);
-> -
->   	tlink = cifs_sb_tlink(cifs_sb);
->   	if (IS_ERR(tlink))
->   		return PTR_ERR(tlink);
-> +
-> +	/* opens might already be blocked by rename */
-> +	if (!(dentry->d_flags & DCACHE_BLOCKED)) {
-> +		/*
-> +		 * Block opens - and all lookups that involve d_revalidate.
-> +		 * This guarantees that if another thread tries to open(), it
-> +		 * will either block, or will increment d_count()
-> +		 * before we test it below.
-> +		 */
-> +		spin_lock(&dentry->d_lock);
-> +		dentry->d_flags |= DCACHE_BLOCKED;
-> +		spin_unlock(&dentry->d_lock);
-> +		unblock = true;
-> +	}
-> +
->   	tcon = tlink_tcon(tlink);
->   	server = tcon->ses->server;
->   
-> @@ -2107,8 +2114,13 @@ static int __cifs_unlink(struct inode *dir, struct dentry *dentry, bool sillyren
->   	kfree(attrs);
->   	free_xid(xid);
->   	cifs_put_tlink(tlink);
-> -	if (rehash)
-> -		d_rehash(dentry);
-> +	/* Allow lookups/opens */
-> +	if (unblock) {
-> +		spin_lock(&dentry->d_lock);
-> +		store_release_wake_up(&dentry->d_flags,
-> +				      dentry->d_flags &~ DCACHE_BLOCKED);
-> +		spin_unlock(&dentry->d_lock);
-> +	}
->   	return rc;
->   }
->   
-> @@ -2536,7 +2548,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->   	struct cifs_sb_info *cifs_sb;
->   	struct tcon_link *tlink;
->   	struct cifs_tcon *tcon;
-> -	bool rehash = false;
->   	unsigned int xid;
->   	int rc, tmprc;
->   	int retry_count = 0;
-> @@ -2552,20 +2563,20 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->   	if (unlikely(cifs_forced_shutdown(cifs_sb)))
->   		return smb_EIO(smb_eio_trace_forced_shutdown);
->   
-> -	/*
-> -	 * Prevent any concurrent opens on the target by unhashing the dentry.
-> -	 * VFS already unhashes the target when renaming directories.
-> -	 */
-> -	if (d_is_positive(target_dentry) && !d_is_dir(target_dentry)) {
-> -		if (!d_unhashed(target_dentry)) {
-> -			d_drop(target_dentry);
-> -			rehash = true;
-> -		}
-> -	}
-> -
->   	tlink = cifs_sb_tlink(cifs_sb);
->   	if (IS_ERR(tlink))
->   		return PTR_ERR(tlink);
-> +
-> +	/*
-> +	 * Block opens - and all lookups that involve d_revalidate.
-> +	 * This guarantees that if another thread tries to open(), it
-> +	 * will either block, or will increment d_count()
-> +	 * before we test it in __cifs_unlink().
-> +	 */
-> +	spin_lock(&target_dentry->d_lock);
-> +	target_dentry->d_flags |= DCACHE_BLOCKED;
-> +	spin_unlock(&target_dentry->d_lock);
-> +
->   	tcon = tlink_tcon(tlink);
->   	server = tcon->ses->server;
->   
-> @@ -2605,8 +2616,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->   		}
->   	}
->   
-> -	if (!rc)
-> -		rehash = false;
->   	/*
->   	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
->   	 */
-> @@ -2698,8 +2707,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->   			}
->   			rc = cifs_do_rename(xid, source_dentry, from_name,
->   					    target_dentry, to_name);
-> -			if (!rc)
-> -				rehash = false;
->   		}
->   	}
->   
-> @@ -2713,8 +2720,11 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
->   	CIFS_I(source_dir)->time = CIFS_I(target_dir)->time = 0;
->   
->   cifs_rename_exit:
-> -	if (rehash)
-> -		d_rehash(target_dentry);
-> +	/* Allow lookups/opens */
-> +	spin_lock(&target_dentry->d_lock);
-> +	store_release_wake_up(&target_dentry->d_flags,
-> +			      target_dentry->d_flags &~ DCACHE_BLOCKED);
-> +	spin_unlock(&target_dentry->d_lock);
->   	kfree(info_buf_source);
->   	free_dentry_path(page2);
->   	free_dentry_path(page1);
-> 
-> base-commit: 3879f51857325da9bf3cfb073280257cd16ae067
-
+Reviewed-by: Tom Talpey <tom@talpey.com>
