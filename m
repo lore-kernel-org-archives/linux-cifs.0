@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=173.212.254.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792552561;
-	b=ytawGHnees0uNzwcCBIH7ZE3vxEixBJUNuklNg3LDrWEp4/tKh+vlqttyvblY/OPjNIE
-	 ecw9AKpf8PsKjP1MN542MNjxX2xD5RIIAAmD4YV3/VkS/8l5MSC4KUrn5CbumulphpWV1
-	 SU56eL8uauFDuJeeSnNdfx2DVOD1OfYALbzHfNc66noCZiPB41G3n/kI1wCM6C+FPc7ew
-	 kiK6pX6eTr/8/loqNDJXOLggzOvyhm+HmCmqrl2ztO+I6ly9OUh5Y9YuRvNs5kkZCWxHS
-	 Ump7f6ccOZW0y30x1SWfb3wIJhzH5S1vDmt710ee45yPh5gnJe2XpOic0TKUTdiZv+g==
+	t=1792552572;
+	b=RFxasV+pvufpiYWbohdoxp4txfXa8EYgSxN1ms9JdlGRWdoylLCGcozlzmqQzKxtTrvB
+	 fS3UoIS5U6fYhdPyBtBEdT1xgHabLc+EcyjXaxh6Eo5OnxHpD/+2kFHk7WEG6LpIRo/wD
+	 U0F45QK1FLGX8xrUQE9ashP9VcfBU4ktwzOYRrCDwp9YM3Jxr9pWyARFpgPCbCvt/BZOz
+	 mSwhTTSQevwMjV2UzkZj+DmoaW/H6MUFf/cOznV3aZ+lZcU7NNYhi658H3yaRQs96k/hS
+	 Sw8mT8RPhryq5QsApaUYMp8X+C/vdsLc2ABxcl/q7/oyxpmhMLumKf2XyKW2e6Nf4Lg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792552561;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792552572;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:In-Reply-To:
 	 References:From:Subject:To:Cc:Date;
-	bh=8auVlpEIa832B22UfxOKY0hTOrXUXPF0AuIXJWKQe2Q=;
-	b=3M4KA2xZes1Uv4YnyAf9WvaiU3In/B84Z8DiugOiKp+iGSlctH8b4I0vEDiOzvqE/LLw
-	 CRaxvSM9J34LrM2pMM0IzbsSf0BwUlHmdmQ16EI1JNxUIuFukuOPpjQ3mwEY+Dh1rPEuv
-	 jIPqVuCkaoQ5cZD9AmQJg3OKqrfVsrawGTfNOrwRGmdyCTWdbiD42hXDfMXtpzvul5HbO
-	 v9muUNICyNCg6723bMZnV9r+uiushGKwX19yRromfx+ru7EindxTFnyfsm9oj8q9ws3N2
-	 yC1VT3JDSYLXSVnP8sG1cWXYqN9QcH285ZK8dSnzNRd7UayCaARnczHh5zQDifQ65+Q==
+	bh=UPUH03U6Oabgaw9Qqnvvk6Mc/Q2z5xz5SUzWvs/+Al4=;
+	b=EwnNVHk+gjoAaryj6uywwvhSlHQlclFkFc2IvxODpfQ1c3rZFCWt5DV2jW6Ya3WyN+y8
+	 x0sJA1KqPjjblWiSmFoV9YKUtKicBExSpJpzD4AicCXbwMbTqqZgPsX/B0LpRNhFdESKh
+	 yiFOLLafjj4ak50EL3pBDfdQD35q0CFqItmF8KGD6cTM6yY0dgd9HEY3P0rdSVnDeYtYJ
+	 QO6pJ52uTs8FUEa0eAvb9L1tYzYJbcusEkr8Xo7IpkAm82AMHwJwyAmVwzaruBjUkak/r
+	 KRaGzlMoOkQ1EJl1t1Cr4cp7NklyfrAAz6nV/mK9jJSVJyNhc1Zh2MS48iuercCOJ+Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=tuxist.de;
 	spf=fail smtp.mailfrom=tuxist.de;
-	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=JlcOijbP;
+	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=C7mvnSm6;
 	arc=none smtp.remote-ip=173.212.254.19
 Received: from groupware.tuxist.de (groupware.tuxist.de [173.212.254.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092CF60A6F4C;
-	Wed, 21 Oct 2026 03:16:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 092CF60A6F4C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682B2606B558;
+	Wed, 21 Oct 2026 03:16:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 682B2606B558
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=JlcOijbP
+	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=C7mvnSm6
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tuxist.de; s=201705;
-	t=1792552559; bh=QpJWmptSSxJ9NCX4CSoJ9NPLuC+5iYwG87QA4+dF8FY=;
+	t=1792552569; bh=gzbOefoC556RIfcul7jBVCLRyUZiYNXLUGDOS94vR1g=;
 	h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-	b=JlcOijbP5hWD/Ia/cdZ8ZUWKzG8cuzkEfgymfID2FBqo4nQ9oF1Uk88rtMV3VyXF5
-	 JZEjouk1I/6H5NsztYId4MrHJXVunH6FX9d9EsQNgH8zyxXn91OU1XAqe691JvrNBN
-	 M9XyBRgRTFXsR0qaxA3I5FrhIR7ZyzxvbxgcwaEQ8ITzUwSTFREgwH2Ykuwh+YKyHN
-	 76BRGkUBfJqV9u9Cm+dW/qKzByMtfmFObP98Vt8JDnGYHCZLMUBSrffybFAl9QkCLB
-	 atADl3zrfqvyscw5zhK0AUiVqevp3gI2yp5QQtZOZew2BIHHzP3XJ9hqASezLWnRc9
-	 w/6fnkp3nhQTw==
+	b=C7mvnSm6jg0A+SyE9a9O+BkYpGvEjGYeBIZ7edK6j03DBVQg9JU91qj9+ToeAtI6R
+	 vYkPrhPVxZnZWd3UA0A3iD2k91OvNQpHOc7WhcszRclmL7btxh/pZbHxietrULDbtA
+	 i96s50gIcWKD2ep6y7Z4tD36cndcFk5LrGhxBuCUN/07qXmfZSNDjnVqW3E8MfGX2U
+	 jcyxBqeHSEVCQHAMRmVd+cihxhXVdXpgNtr0RGeQqZ821zUy7JdPIXz9hfPVqe72FA
+	 akg7FQWtu4IUGDvDnk1Z3n198NlnOawpQQL1NgC2KGHY6HI34hFnv9iv7LMQ++uc5L
+	 vjcPugG1tY97g==
 Received: from [10.1.1.106] (unknown [10.1.2.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by groupware.tuxist.de (Postfix) with ESMTPSA id A38388A091B;
-	Wed, 21 Oct 2026 05:15:58 +0200 (CEST)
-Message-ID: <5b72905c9c3703b283cd9ecd0c39024c4fbb6eaf.1792552161.git.jan.koester@tuxist.de>
+	by groupware.tuxist.de (Postfix) with ESMTPSA id 98C978A08F4;
+	Wed, 21 Oct 2026 05:16:08 +0200 (CEST)
+Message-ID: <88afe10ca34a89b9a0776752d6583cda3cdf747c.1792552161.git.jan.koester@tuxist.de>
 In-Reply-To: <cover.1792552161.git.jan.koester@tuxist.de>
 References: <cover.1792552161.git.jan.koester@tuxist.de>
 From: Jan Koester <jan.koester@tuxist.de>
-Subject: [RFC PATCH v2 11/41] fscrypt: show the whole uid in the description
- of user key claims
+Subject: [RFC PATCH v2 14/41] nfsd: don't hand out uid 0 for read layouts of
+ UUID-owned files
 To: Christian Brauner <brauner@kernel.org>,
     Alexander Viro <viro@zeniv.linux.org.uk>,
     "Serge E. Hallyn" <serge@hallyn.com>
@@ -70,7 +70,7 @@ Cc: Jan Kara <jack@suse.cz>,
     audit@vger.kernel.org,
     keyrings@vger.kernel.org,
     linux-kernel@vger.kernel.org
-Date: Wed, 21 Oct 2026 05:15:31 +0200
+Date: Wed, 21 Oct 2026 05:15:34 +0200
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -80,48 +80,35 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 
-The ".fscrypt" keys that account a master key to a user are described
-as "<identifier>.uid.<uid>". For a UUID or GUID uid that printed -1;
-use kuid_str() so /proc/keys shows who the claim belongs to. Lookups
-compare the kuid itself and are not affected.
+Read-only flexfile layout segments use the owner's uid plus one, so the
+client gets no write access on the data server. For a UUID or GUID
+owner from_kuid() is -1 and the "plus one" makes it 0, root. Use the
+overflow uid for them instead.
 
 Assisted-by: Claude:claude-opus-5-5
 
 Signed-off-by: Jan Koester <jan.koester@tuxist.de>
 ---
- fs/crypto/keyring.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ fs/nfsd/flexfilelayout.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/fs/crypto/keyring.c b/fs/crypto/keyring.c
-index 76e28d1e00..080166267f 100644
---- a/fs/crypto/keyring.c
-+++ b/fs/crypto/keyring.c
-@@ -178,7 +178,7 @@ static struct key_type key_type_fscrypt_user = {
- };
+diff --git a/fs/nfsd/flexfilelayout.c b/fs/nfsd/flexfilelayout.c
+index 6d531285ab..f459d2c1c1 100644
+--- a/fs/nfsd/flexfilelayout.c
++++ b/fs/nfsd/flexfilelayout.c
+@@ -51,7 +51,11 @@ nfsd4_ff_proc_layoutget(struct svc_rqst *rqstp, struct inode *inode,
  
- #define FSCRYPT_MK_USER_DESCRIPTION_SIZE	\
--	(2 * FSCRYPT_KEY_IDENTIFIER_SIZE + CONST_STRLEN(".uid.") + 10 + 1)
-+	(2 * FSCRYPT_KEY_IDENTIFIER_SIZE + CONST_STRLEN(".uid.") + KID_STR_LEN)
- 
- /* Create ->s_master_keys if needed.  Synchronized by fscrypt_add_key_mutex. */
- static int allocate_filesystem_keyring(struct super_block *sb)
-@@ -338,13 +338,14 @@ static int add_master_key_user(struct fscrypt_master_key *mk)
- {
- 	kuid_t uid = current_fsuid();
- 	char description[FSCRYPT_MK_USER_DESCRIPTION_SIZE];
-+	char uidbuf[KID_STR_LEN];
- 	struct key *quota_key;
- 	struct fscrypt_master_key_user *mk_user;
- 	int err;
- 
--	snprintf(description, sizeof(description), "%*phN.uid.%u",
-+	snprintf(description, sizeof(description), "%*phN.uid.%s",
- 		 FSCRYPT_KEY_IDENTIFIER_SIZE, mk->mk_spec.u.identifier,
--		 __kuid_val(uid));
-+		 kuid_str(uid, uidbuf));
- 	quota_key = key_alloc(&key_type_fscrypt_user, description, uid,
- 			      current_gid(), current_cred(),
- 			      KEY_POS_SEARCH | KEY_USR_VIEW, 0, NULL);
+ 	/* Do not allow a IOMODE_READ segment to have write pemissions */
+ 	if (seg->iomode == IOMODE_READ) {
+-		u = from_kuid(&init_user_ns, inode->i_uid) + 1;
++		/* any uid but the owner's; a UUID or GUID has no "+ 1" */
++		if (uid_is_legacy(inode->i_uid))
++			u = from_kuid(&init_user_ns, inode->i_uid) + 1;
++		else
++			u = overflowuid;
+ 		fl->uid = make_kuid(&init_user_ns, u);
+ 	} else
+ 		fl->uid = inode->i_uid;
 -- 
 2.56.0
 
