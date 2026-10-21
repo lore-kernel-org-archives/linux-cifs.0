@@ -1,57 +1,57 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=173.212.254.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792552589;
-	b=R0/B6pHChTxdan1OX9Ktw3LDtBYUyOeh8p5muhoTH2nUxnryCFuUBlJf27snrtDXdhww
-	 EHM2bhWHQXG8oT1WHSkGaSRi0UrX6RFmKs5YgiiNt82RbTlDJbN1EaZqU1ayZJOddyGBS
-	 nnrenHbX/tT7eNUDqztc4QJszHCU+a/7Z5P71QBMlkEh8M3v5/xv0s4qeCZyEJHtgZ62i
-	 GMg3j/9RtjoJOH9KpyIKmZ4rK4hoJ0hnW6c/eqRMegMkTi2ybXHBJvWWL7Qsk2ea1IDxd
-	 WBtOA/E1irf+KPuVjrcob0c6XAdlbKzis21f+ZL9zSurX6sIQBBie1aQy7Y6fjT+kMg==
+	t=1792552596;
+	b=cZUSLehB3NxQf7pgk54AsmCoN6dKhaXA3WrK2aRQrvsL3z3IRSAmigfL+hlINZrzTl42
+	 apiPxmw0AN2BcUILynsB1K5kpfX3PY8lDoN32TXygyfHM80dMlcA7F8onM4sM7vIb6l42
+	 B4ZgtK5/ktPSbd+dp2lQOuw/j+cs4iD49pzk1t60CzYNGzgXv6pKNIHWPElUk81sNs1Qo
+	 +1a+H9d6KCGCGydLcBQ66iM1LogLMAmdq3Yp5XGNKw8+ZI/d80BMP46+nFdR4duv2Xz6R
+	 FnR65GH7LGzZ9bkTKaJUGXwaEMxI1u2dUPEXc7ZRX1w02OxDCUdhujbLtcIEEuQoVFg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792552589;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792552596;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:In-Reply-To:
-	 References:From:Subject:To:Cc:Date:X-Spam;
-	bh=DN63fcAbZOr4DzpoKQai8EJ/O3JjRyHa8in8Eg0V/nQ=;
-	b=2h6yM+r54tAkjckbPb+FexFSHB91sEirPc58gZ9uIPXcLMsYJOZ9TrX4GpGeAaEE3ll4
-	 2+MtSYMy/2U/PIXJZmRb/fCSDb1uz45WakTPGoRyzqXjBFSJ5a4aOwOGYj/A247SmV3br
-	 EOQ7yri/EZGl8kce1GxArBtjhFO+4Zv0kv9BkLf0rIhbKeVqDHBUc33Dqj/BwwZTSFKAi
-	 +WKFM6ZnM3SUBS9zEKAoXhnd/Y61oGAHv++VXW6c+cUGyIJe2fM2EUt5HU9gwyRhM8hN0
-	 YD1uUy0IVEIYxoiFg4Am2CwGDcTXPea5aNFd7yk7LZAPC0VXRG2U9MCh4u3934sdsQw==
+	 References:From:Subject:To:Cc:Date;
+	bh=1Z5EYKR3zuCRsOgoCpct75zMOfdUFTXtn/PScOjLh3g=;
+	b=2Mew+jhy6d1A+O6bzqvg+1PW7ausOEx/ikVHOBf5Hcddeqw7fEe4QV1dHJ7hshK1wNLU
+	 twk72acEEY6CgT2zhvQ9Ite7VP3Z22GIFAc213N2Qgk9DLYP+lHTeoHKNj7nk+4jFECbQ
+	 FfOHAfzLhN+7KbHsbc6OAbOPbVP7qNkoi55YesQEGy8Fr2s6DHjfEZeCGZBZnlPru07sA
+	 CZWGjFeAgRY2ADlNSZvd4ljrQ6OF2+OiGgJwzND5CL5XfufAAPxJhGPVBxc6kPcLNv1/5
+	 ipTmGSP85qIL+RJc7LDx2xY6bXM1E7hWre0bJ5pK9evxAV33AyzhuK0wOu3gtEV+hKQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=tuxist.de;
 	spf=fail smtp.mailfrom=tuxist.de;
-	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=C+Naquet;
+	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=cuAbQ3om;
 	arc=none smtp.remote-ip=173.212.254.19
 Received: from groupware.tuxist.de (groupware.tuxist.de [173.212.254.19])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7F3606D3D0;
-	Wed, 21 Oct 2026 03:16:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2C7F3606D3D0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F64C606E847;
+	Wed, 21 Oct 2026 03:16:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3F64C606E847
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=C+Naquet
+	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=cuAbQ3om
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tuxist.de; s=201705;
-	t=1792552586; bh=0apaDegVOVFS5TwK2iAUEkqmdtB5hM5qhyDUWswSDSE=;
+	t=1792552593; bh=Rpwprzh2eYyYWotnA65KRqh2Jcb7fuYYdOguWAwVUjg=;
 	h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-	b=C+Naquet2wv50WDK1K3yEmAkRfq9pweBCGw49dajG8OaZ3t/XHVKGbVLaLE0I/Mad
-	 X9vhBVpNcQR2D7y1FAZx9bAxy1lSybABMr1AQ5BdKdKsyYou5cOZ41BbyBNjD8RaKp
-	 CwCBT0hChqRu9zx1uADZv1BrWIOz+4uzJd2IEzUyXGAO9dNRWbYgkXLE5PbFSFKDTE
-	 Wo33WKvsvtGFky606hCV3PVERALNrbiyFL6m7cBg2Q2HCD14kscOzijWjG9Ouz6Abp
-	 ZY2xPXxrY3JgEtZuiVH2lYhUcuHHXOhWEbX7Bxxfj9L2pz3YyG6tNBziSgMKr1CKVi
-	 KZfvejnwEzGXg==
+	b=cuAbQ3omm3WMEFrviQQfeekK6DAsAAGK3N1HHZSrIcJGoHsiAk1KlRyltjBlWzyzx
+	 7kfqDLrxSkFxe5pT4LFG1Eh8YazB3xDHmf8f8ZS3TRhwJBKJv2EgVOCCVtYXQxsEEB
+	 r4FAAaBk6SIoNnj9BpU6LsdPt0H+JMDijjSzVw3vjgERC50vA36n7LUqbMa4+QdiOg
+	 f+96hCZ7TN+oeya6qEx5lsXWrA+te6+3v7qzSdZCVtb+p5kFnuvgREfbDyMWxyxm9A
+	 o0E8FmTH2fEqorOKc8uc4OXUyEJsGai6m54qgpmY0FjUrlMrlYYWkD8fwWGozmJfRy
+	 y4orxDPPaCk5Q==
 Received: from [10.1.1.106] (unknown [10.1.2.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by groupware.tuxist.de (Postfix) with ESMTPSA id B91E28A090D;
-	Wed, 21 Oct 2026 05:16:25 +0200 (CEST)
-Message-ID: <86c66380f2654c560e747b9075edbddd610975ca.1792552161.git.jan.koester@tuxist.de>
+	by groupware.tuxist.de (Postfix) with ESMTPSA id 536A88A0912;
+	Wed, 21 Oct 2026 05:16:32 +0200 (CEST)
+Message-ID: <54f57a7ac52b6b2b130b5a6e911e0998c9630da8.1792552161.git.jan.koester@tuxist.de>
 In-Reply-To: <cover.1792552161.git.jan.koester@tuxist.de>
 References: <cover.1792552161.git.jan.koester@tuxist.de>
 From: Jan Koester <jan.koester@tuxist.de>
-Subject: [RFC PATCH v2 19/41] cred: add the *_r variants of the get/set*id()
- system calls
+Subject: [RFC PATCH v2 21/41] fs: add chown_r(), lchown_r(), fchown_r() and
+ fchownat_r()
 To: Christian Brauner <brauner@kernel.org>,
     Alexander Viro <viro@zeniv.linux.org.uk>,
     "Serge E. Hallyn" <serge@hallyn.com>
@@ -70,8 +70,7 @@ Cc: Jan Kara <jack@suse.cz>,
     audit@vger.kernel.org,
     keyrings@vger.kernel.org,
     linux-kernel@vger.kernel.org
-Date: Wed, 21 Oct 2026 05:15:39 +0200
-X-Spam: Yes
+Date: Wed, 21 Oct 2026 05:15:41 +0200
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -81,833 +80,264 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 
-Add getuid_r(), geteuid_r(), getgid_r(), getegid_r(), setuid_r(),
-setgid_r(), setreuid_r(), setregid_r(), setresuid_r(), getresuid_r(),
-setresgid_r(), getresgid_r(), setfsuid_r() and setfsgid_r(). They work
-like the classic calls but take and return pointers to
-__kernel_uid_r_t, so a process can be a UUID or GUID user and group.
-The classic calls see such ids as the overflow id, like the 16 bit
-calls see ids above 65535.
+The chown family with __kernel_uid_r_t owner and group, so files can be
+given UUID and GUID owners on filesystems that support them
+(SB_I_UID_R); others refuse with -EOVERFLOW. NULL pointers, UID_R_NONE
+and the classic -1 leave the owner or group unchanged.
 
-To share the logic, the classic implementations are split into a part
-converting the arguments and a do_*() part working on kuid_t/kgid_t,
-in which an invalid id means "unchanged" -- what -1 converts to. A
-NULL pointer, UID_R_NONE or a classic -1 mean "unchanged" in the new
-calls as well.
-
-UUIDs and GUIDs have no mapping outside the initial user namespace, so
-only CAP_SETUID/CAP_SETGID there can switch to one.
-
-setfsuid_r() and setfsgid_r() differ from the classic calls in one
-respect: they return -EPERM when the change is not allowed instead of
-failing silently, and hand the old id back through a second argument.
-
-The system call numbers are assigned in a later patch.
+The classic calls and the new ones share the lookup and setattr code,
+which now works on a struct chown_ids. The classic calls still report a
+malformed id only once the file is found, as before.
 
 Assisted-by: Claude:claude-opus-5-5
 
 Signed-off-by: Jan Koester <jan.koester@tuxist.de>
 ---
- include/linux/syscalls.h |  27 +++
- kernel/sys.c             | 472 +++++++++++++++++++++++++++++----------
- kernel/sys_ni.c          |  10 +
- 3 files changed, 385 insertions(+), 124 deletions(-)
+ fs/open.c                | 144 +++++++++++++++++++++++++++++++++++----
+ include/linux/syscalls.h |  13 ++++
+ 2 files changed, 145 insertions(+), 12 deletions(-)
 
+diff --git a/fs/open.c b/fs/open.c
+index 6b1c14e684..26175b5aa8 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -785,7 +785,46 @@ static inline bool setattr_vfsgid(struct iattr *attr, kgid_t kgid)
+ 	return true;
+ }
+ 
+-int chown_common(const struct path *path, uid_t user, gid_t group)
++/*
++ * The new owner and group of a chown. Invalid ids stand for "unchanged";
++ * @err is an error of their conversion, reported once the path is found,
++ * which keeps the classic calls' order of errors.
++ */
++struct chown_ids {
++	kuid_t uid;
++	kgid_t gid;
++	int err;
++};
++
++static struct chown_ids chown_ids_classic(uid_t user, gid_t group)
++{
++	struct user_namespace *ns = current_user_ns();
++	struct chown_ids ids = {
++		.uid = make_kuid(ns, user),
++		.gid = make_kgid(ns, group),
++	};
++
++	if ((user != (uid_t)-1 && !uid_valid(ids.uid)) ||
++	    (group != (gid_t)-1 && !gid_valid(ids.gid)))
++		ids.err = -EINVAL;
++	return ids;
++}
++
++static int chown_ids_r(const struct __kernel_uid_r __user *user,
++		       const struct __kernel_uid_r __user *group,
++		       struct chown_ids *ids)
++{
++	struct user_namespace *ns = current_user_ns();
++	int err;
++
++	ids->err = 0;
++	err = get_kuid_r(ns, user, &ids->uid);
++	if (!err)
++		err = get_kgid_r(ns, group, &ids->gid);
++	return err;
++}
++
++static int chown_path(const struct path *path, const struct chown_ids *ids)
+ {
+ 	struct mnt_idmap *idmap;
+ 	struct user_namespace *fs_userns;
+@@ -793,11 +832,9 @@ int chown_common(const struct path *path, uid_t user, gid_t group)
+ 	struct delegated_inode delegated_inode = { };
+ 	int error;
+ 	struct iattr newattrs;
+-	kuid_t uid;
+-	kgid_t gid;
+ 
+-	uid = make_kuid(current_user_ns(), user);
+-	gid = make_kgid(current_user_ns(), group);
++	if (ids->err)
++		return ids->err;
+ 
+ 	idmap = mnt_idmap(path->mnt);
+ 	fs_userns = i_user_ns(inode);
+@@ -806,9 +843,9 @@ int chown_common(const struct path *path, uid_t user, gid_t group)
+ 	newattrs.ia_vfsuid = INVALID_VFSUID;
+ 	newattrs.ia_vfsgid = INVALID_VFSGID;
+ 	newattrs.ia_valid =  ATTR_CTIME;
+-	if ((user != (uid_t)-1) && !setattr_vfsuid(&newattrs, uid))
++	if (uid_valid(ids->uid) && !setattr_vfsuid(&newattrs, ids->uid))
+ 		return -EINVAL;
+-	if ((group != (gid_t)-1) && !setattr_vfsgid(&newattrs, gid))
++	if (gid_valid(ids->gid) && !setattr_vfsgid(&newattrs, ids->gid))
+ 		return -EINVAL;
+ 	error = inode_lock_killable(inode);
+ 	if (error)
+@@ -833,8 +870,15 @@ int chown_common(const struct path *path, uid_t user, gid_t group)
+ 	return error;
+ }
+ 
+-int do_fchownat(int dfd, const char __user *filename, uid_t user, gid_t group,
+-		int flag)
++int chown_common(const struct path *path, uid_t user, gid_t group)
++{
++	struct chown_ids ids = chown_ids_classic(user, group);
++
++	return chown_path(path, &ids);
++}
++
++static int fchownat_ids(int dfd, const char __user *filename,
++			const struct chown_ids *ids, int flag)
+ {
+ 	struct path path;
+ 	int error;
+@@ -850,7 +894,7 @@ int do_fchownat(int dfd, const char __user *filename, uid_t user, gid_t group,
+ 	if (!error) {
+ 		error = mnt_want_write(path.mnt);
+ 		if (!error) {
+-			error = chown_common(&path, user, group);
++			error = chown_path(&path, ids);
+ 			mnt_drop_write(path.mnt);
+ 		}
+ 		path_put(&path);
+@@ -862,6 +906,14 @@ int do_fchownat(int dfd, const char __user *filename, uid_t user, gid_t group,
+ 	return error;
+ }
+ 
++int do_fchownat(int dfd, const char __user *filename, uid_t user, gid_t group,
++		int flag)
++{
++	struct chown_ids ids = chown_ids_classic(user, group);
++
++	return fchownat_ids(dfd, filename, &ids, flag);
++}
++
+ SYSCALL_DEFINE5(fchownat, int, dfd, const char __user *, filename, uid_t, user,
+ 		gid_t, group, int, flag)
+ {
+@@ -879,7 +931,7 @@ SYSCALL_DEFINE3(lchown, const char __user *, filename, uid_t, user, gid_t, group
+ 			   AT_SYMLINK_NOFOLLOW);
+ }
+ 
+-int vfs_fchown(struct file *file, uid_t user, gid_t group)
++static int fchown_ids(struct file *file, const struct chown_ids *ids)
+ {
+ 	int error;
+ 
+@@ -887,11 +939,18 @@ int vfs_fchown(struct file *file, uid_t user, gid_t group)
+ 	if (error)
+ 		return error;
+ 	audit_file(file);
+-	error = chown_common(&file->f_path, user, group);
++	error = chown_path(&file->f_path, ids);
+ 	mnt_drop_write_file(file);
+ 	return error;
+ }
+ 
++int vfs_fchown(struct file *file, uid_t user, gid_t group)
++{
++	struct chown_ids ids = chown_ids_classic(user, group);
++
++	return fchown_ids(file, &ids);
++}
++
+ int ksys_fchown(unsigned int fd, uid_t user, gid_t group)
+ {
+ 	CLASS(fd, f)(fd);
+@@ -907,6 +966,67 @@ SYSCALL_DEFINE3(fchown, unsigned int, fd, uid_t, user, gid_t, group)
+ 	return ksys_fchown(fd, user, group);
+ }
+ 
++/*
++ * The *_r variants take __kernel_uid_r_t ids, which can also be UUIDs or
++ * GUIDs. A NULL pointer, UID_R_NONE or a classic -1 leave the owner or
++ * group unchanged.
++ */
++SYSCALL_DEFINE5(fchownat_r, int, dfd, const char __user *, filename,
++		const struct __kernel_uid_r __user *, user,
++		const struct __kernel_uid_r __user *, group, int, flag)
++{
++	struct chown_ids ids;
++	int error;
++
++	error = chown_ids_r(user, group, &ids);
++	if (error)
++		return error;
++	return fchownat_ids(dfd, filename, &ids, flag);
++}
++
++SYSCALL_DEFINE3(chown_r, const char __user *, filename,
++		const struct __kernel_uid_r __user *, user,
++		const struct __kernel_uid_r __user *, group)
++{
++	struct chown_ids ids;
++	int error;
++
++	error = chown_ids_r(user, group, &ids);
++	if (error)
++		return error;
++	return fchownat_ids(AT_FDCWD, filename, &ids, 0);
++}
++
++SYSCALL_DEFINE3(lchown_r, const char __user *, filename,
++		const struct __kernel_uid_r __user *, user,
++		const struct __kernel_uid_r __user *, group)
++{
++	struct chown_ids ids;
++	int error;
++
++	error = chown_ids_r(user, group, &ids);
++	if (error)
++		return error;
++	return fchownat_ids(AT_FDCWD, filename, &ids, AT_SYMLINK_NOFOLLOW);
++}
++
++SYSCALL_DEFINE3(fchown_r, unsigned int, fd,
++		const struct __kernel_uid_r __user *, user,
++		const struct __kernel_uid_r __user *, group)
++{
++	struct chown_ids ids;
++	int error;
++
++	error = chown_ids_r(user, group, &ids);
++	if (error)
++		return error;
++
++	CLASS(fd, f)(fd);
++	if (fd_empty(f))
++		return -EBADF;
++	return fchown_ids(fd_file(f), &ids);
++}
++
+ static inline int file_get_write_access(struct file *f)
+ {
+ 	int error;
 diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
-index 8413b624ad..09fa1093a9 100644
+index b4b9d5d76f..4a18b59631 100644
 --- a/include/linux/syscalls.h
 +++ b/include/linux/syscalls.h
-@@ -17,6 +17,7 @@ struct iocb;
- struct io_event;
- struct iovec;
- struct __kernel_old_itimerval;
-+struct __kernel_uid_r;
- struct kexec_segment;
- struct linux_dirent;
- struct linux_dirent64;
-@@ -967,6 +968,32 @@ asmlinkage long sys_statx(int dfd, const char __user *path, unsigned flags,
- asmlinkage long sys_rseq(struct rseq __user *rseq, uint32_t rseq_len,
- 			 int flags, uint32_t sig);
- asmlinkage long sys_rseq_slice_yield(void);
-+asmlinkage long sys_getuid_r(struct __kernel_uid_r __user *uid);
-+asmlinkage long sys_geteuid_r(struct __kernel_uid_r __user *uid);
-+asmlinkage long sys_getgid_r(struct __kernel_uid_r __user *gid);
-+asmlinkage long sys_getegid_r(struct __kernel_uid_r __user *gid);
-+asmlinkage long sys_setuid_r(const struct __kernel_uid_r __user *uid);
-+asmlinkage long sys_setgid_r(const struct __kernel_uid_r __user *gid);
-+asmlinkage long sys_setreuid_r(const struct __kernel_uid_r __user *ruid,
-+			       const struct __kernel_uid_r __user *euid);
-+asmlinkage long sys_setregid_r(const struct __kernel_uid_r __user *rgid,
-+			       const struct __kernel_uid_r __user *egid);
-+asmlinkage long sys_setresuid_r(const struct __kernel_uid_r __user *ruid,
-+				const struct __kernel_uid_r __user *euid,
-+				const struct __kernel_uid_r __user *suid);
-+asmlinkage long sys_getresuid_r(struct __kernel_uid_r __user *ruid,
-+				struct __kernel_uid_r __user *euid,
-+				struct __kernel_uid_r __user *suid);
-+asmlinkage long sys_setresgid_r(const struct __kernel_uid_r __user *rgid,
-+				const struct __kernel_uid_r __user *egid,
-+				const struct __kernel_uid_r __user *sgid);
-+asmlinkage long sys_getresgid_r(struct __kernel_uid_r __user *rgid,
-+				struct __kernel_uid_r __user *egid,
-+				struct __kernel_uid_r __user *sgid);
-+asmlinkage long sys_setfsuid_r(const struct __kernel_uid_r __user *uid,
-+			       struct __kernel_uid_r __user *old_uid);
-+asmlinkage long sys_setfsgid_r(const struct __kernel_uid_r __user *gid,
-+			       struct __kernel_uid_r __user *old_gid);
+@@ -998,6 +998,19 @@ asmlinkage long sys_getgroups_r(int gidsetsize,
+ 				struct __kernel_uid_r __user *grouplist);
+ asmlinkage long sys_setgroups_r(int gidsetsize,
+ 				const struct __kernel_uid_r __user *grouplist);
++asmlinkage long sys_chown_r(const char __user *filename,
++			    const struct __kernel_uid_r __user *user,
++			    const struct __kernel_uid_r __user *group);
++asmlinkage long sys_lchown_r(const char __user *filename,
++			     const struct __kernel_uid_r __user *user,
++			     const struct __kernel_uid_r __user *group);
++asmlinkage long sys_fchown_r(unsigned int fd,
++			     const struct __kernel_uid_r __user *user,
++			     const struct __kernel_uid_r __user *group);
++asmlinkage long sys_fchownat_r(int dfd, const char __user *filename,
++			       const struct __kernel_uid_r __user *user,
++			       const struct __kernel_uid_r __user *group,
++			       int flag);
  asmlinkage long sys_open_tree(int dfd, const char __user *path, unsigned flags);
  asmlinkage long sys_open_tree_attr(int dfd, const char __user *path,
  				   unsigned flags,
-diff --git a/kernel/sys.c b/kernel/sys.c
-index 35b538ba84..fad5573234 100644
---- a/kernel/sys.c
-+++ b/kernel/sys.c
-@@ -410,21 +410,12 @@ SYSCALL_DEFINE2(getpriority, int, which, int, who)
-  *      operations (as far as semantic preservation is concerned).
-  */
- #ifdef CONFIG_MULTIUSER
--long __sys_setregid(gid_t rgid, gid_t egid)
-+/* Invalid ids (INVALID_GID) stand for "unchanged" */
-+static long do_setregid(kgid_t krgid, kgid_t kegid)
- {
--	struct user_namespace *ns = current_user_ns();
- 	const struct cred *old;
- 	struct cred *new;
- 	int retval;
--	kgid_t krgid, kegid;
--
--	krgid = make_kgid(ns, rgid);
--	kegid = make_kgid(ns, egid);
--
--	if ((rgid != (gid_t) -1) && !gid_valid(krgid))
--		return -EINVAL;
--	if ((egid != (gid_t) -1) && !gid_valid(kegid))
--		return -EINVAL;
- 
- 	new = prepare_creds();
- 	if (!new)
-@@ -432,7 +423,7 @@ long __sys_setregid(gid_t rgid, gid_t egid)
- 	old = current_cred();
- 
- 	retval = -EPERM;
--	if (rgid != (gid_t) -1) {
-+	if (gid_valid(krgid)) {
- 		if (gid_eq(old->gid, krgid) ||
- 		    gid_eq(old->egid, krgid) ||
- 		    ns_capable_setid(old->user_ns, CAP_SETGID))
-@@ -440,7 +431,7 @@ long __sys_setregid(gid_t rgid, gid_t egid)
- 		else
- 			goto error;
- 	}
--	if (egid != (gid_t) -1) {
-+	if (gid_valid(kegid)) {
- 		if (gid_eq(old->gid, kegid) ||
- 		    gid_eq(old->egid, kegid) ||
- 		    gid_eq(old->sgid, kegid) ||
-@@ -450,8 +441,8 @@ long __sys_setregid(gid_t rgid, gid_t egid)
- 			goto error;
- 	}
- 
--	if (rgid != (gid_t) -1 ||
--	    (egid != (gid_t) -1 && !gid_eq(kegid, old->gid)))
-+	if (gid_valid(krgid) ||
-+	    (gid_valid(kegid) && !gid_eq(kegid, old->gid)))
- 		new->sgid = new->egid;
- 	new->fsgid = new->egid;
- 
-@@ -466,6 +457,22 @@ long __sys_setregid(gid_t rgid, gid_t egid)
- 	return retval;
- }
- 
-+long __sys_setregid(gid_t rgid, gid_t egid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kgid_t krgid, kegid;
-+
-+	krgid = make_kgid(ns, rgid);
-+	kegid = make_kgid(ns, egid);
-+
-+	if ((rgid != (gid_t) -1) && !gid_valid(krgid))
-+		return -EINVAL;
-+	if ((egid != (gid_t) -1) && !gid_valid(kegid))
-+		return -EINVAL;
-+
-+	return do_setregid(krgid, kegid);
-+}
-+
- SYSCALL_DEFINE2(setregid, gid_t, rgid, gid_t, egid)
- {
- 	return __sys_setregid(rgid, egid);
-@@ -476,15 +483,12 @@ SYSCALL_DEFINE2(setregid, gid_t, rgid, gid_t, egid)
-  *
-  * SMP: Same implicit races as above.
-  */
--long __sys_setgid(gid_t gid)
-+static long do_setgid(kgid_t kgid)
- {
--	struct user_namespace *ns = current_user_ns();
- 	const struct cred *old;
- 	struct cred *new;
- 	int retval;
--	kgid_t kgid;
- 
--	kgid = make_kgid(ns, gid);
- 	if (!gid_valid(kgid))
- 		return -EINVAL;
- 
-@@ -512,6 +516,11 @@ long __sys_setgid(gid_t gid)
- 	return retval;
- }
- 
-+long __sys_setgid(gid_t gid)
-+{
-+	return do_setgid(make_kgid(current_user_ns(), gid));
-+}
-+
- SYSCALL_DEFINE1(setgid, gid_t, gid)
- {
- 	return __sys_setgid(gid);
-@@ -567,21 +576,12 @@ static void flag_nproc_exceeded(struct cred *new)
-  * 100% compatible with BSD.  A program which uses just setuid() will be
-  * 100% compatible with POSIX with saved IDs.
-  */
--long __sys_setreuid(uid_t ruid, uid_t euid)
-+/* Invalid ids (INVALID_UID) stand for "unchanged" */
-+static long do_setreuid(kuid_t kruid, kuid_t keuid)
- {
--	struct user_namespace *ns = current_user_ns();
- 	const struct cred *old;
- 	struct cred *new;
- 	int retval;
--	kuid_t kruid, keuid;
--
--	kruid = make_kuid(ns, ruid);
--	keuid = make_kuid(ns, euid);
--
--	if ((ruid != (uid_t) -1) && !uid_valid(kruid))
--		return -EINVAL;
--	if ((euid != (uid_t) -1) && !uid_valid(keuid))
--		return -EINVAL;
- 
- 	new = prepare_creds();
- 	if (!new)
-@@ -589,7 +589,7 @@ long __sys_setreuid(uid_t ruid, uid_t euid)
- 	old = current_cred();
- 
- 	retval = -EPERM;
--	if (ruid != (uid_t) -1) {
-+	if (uid_valid(kruid)) {
- 		new->uid = kruid;
- 		if (!uid_eq(old->uid, kruid) &&
- 		    !uid_eq(old->euid, kruid) &&
-@@ -597,7 +597,7 @@ long __sys_setreuid(uid_t ruid, uid_t euid)
- 			goto error;
- 	}
- 
--	if (euid != (uid_t) -1) {
-+	if (uid_valid(keuid)) {
- 		new->euid = keuid;
- 		if (!uid_eq(old->uid, keuid) &&
- 		    !uid_eq(old->euid, keuid) &&
-@@ -611,8 +611,8 @@ long __sys_setreuid(uid_t ruid, uid_t euid)
- 		if (retval < 0)
- 			goto error;
- 	}
--	if (ruid != (uid_t) -1 ||
--	    (euid != (uid_t) -1 && !uid_eq(keuid, old->uid)))
-+	if (uid_valid(kruid) ||
-+	    (uid_valid(keuid) && !uid_eq(keuid, old->uid)))
- 		new->suid = new->euid;
- 	new->fsuid = new->euid;
- 
-@@ -632,6 +632,22 @@ long __sys_setreuid(uid_t ruid, uid_t euid)
- 	return retval;
- }
- 
-+long __sys_setreuid(uid_t ruid, uid_t euid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kuid_t kruid, keuid;
-+
-+	kruid = make_kuid(ns, ruid);
-+	keuid = make_kuid(ns, euid);
-+
-+	if ((ruid != (uid_t) -1) && !uid_valid(kruid))
-+		return -EINVAL;
-+	if ((euid != (uid_t) -1) && !uid_valid(keuid))
-+		return -EINVAL;
-+
-+	return do_setreuid(kruid, keuid);
-+}
-+
- SYSCALL_DEFINE2(setreuid, uid_t, ruid, uid_t, euid)
- {
- 	return __sys_setreuid(ruid, euid);
-@@ -648,15 +664,12 @@ SYSCALL_DEFINE2(setreuid, uid_t, ruid, uid_t, euid)
-  * will allow a root program to temporarily drop privileges and be able to
-  * regain them by swapping the real and effective uid.
-  */
--long __sys_setuid(uid_t uid)
-+static long do_setuid(kuid_t kuid)
- {
--	struct user_namespace *ns = current_user_ns();
- 	const struct cred *old;
- 	struct cred *new;
- 	int retval;
--	kuid_t kuid;
- 
--	kuid = make_kuid(ns, uid);
- 	if (!uid_valid(kuid))
- 		return -EINVAL;
- 
-@@ -695,6 +708,11 @@ long __sys_setuid(uid_t uid)
- 	return retval;
- }
- 
-+long __sys_setuid(uid_t uid)
-+{
-+	return do_setuid(make_kuid(current_user_ns(), uid));
-+}
-+
- SYSCALL_DEFINE1(setuid, uid_t, uid)
- {
- 	return __sys_setuid(uid);
-@@ -705,42 +723,28 @@ SYSCALL_DEFINE1(setuid, uid_t, uid)
-  * This function implements a generic ability to update ruid, euid,
-  * and suid.  This allows you to implement the 4.4 compatible seteuid().
-  */
--long __sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
-+/* Invalid ids (INVALID_UID) stand for "unchanged" */
-+static long do_setresuid(kuid_t kruid, kuid_t keuid, kuid_t ksuid)
- {
--	struct user_namespace *ns = current_user_ns();
- 	const struct cred *old;
- 	struct cred *new;
- 	int retval;
--	kuid_t kruid, keuid, ksuid;
- 	bool ruid_new, euid_new, suid_new;
- 
--	kruid = make_kuid(ns, ruid);
--	keuid = make_kuid(ns, euid);
--	ksuid = make_kuid(ns, suid);
--
--	if ((ruid != (uid_t) -1) && !uid_valid(kruid))
--		return -EINVAL;
--
--	if ((euid != (uid_t) -1) && !uid_valid(keuid))
--		return -EINVAL;
--
--	if ((suid != (uid_t) -1) && !uid_valid(ksuid))
--		return -EINVAL;
--
- 	old = current_cred();
- 
- 	/* check for no-op */
--	if ((ruid == (uid_t) -1 || uid_eq(kruid, old->uid)) &&
--	    (euid == (uid_t) -1 || (uid_eq(keuid, old->euid) &&
--				    uid_eq(keuid, old->fsuid))) &&
--	    (suid == (uid_t) -1 || uid_eq(ksuid, old->suid)))
-+	if ((!uid_valid(kruid) || uid_eq(kruid, old->uid)) &&
-+	    (!uid_valid(keuid) || (uid_eq(keuid, old->euid) &&
-+				   uid_eq(keuid, old->fsuid))) &&
-+	    (!uid_valid(ksuid) || uid_eq(ksuid, old->suid)))
- 		return 0;
- 
--	ruid_new = ruid != (uid_t) -1        && !uid_eq(kruid, old->uid) &&
-+	ruid_new = uid_valid(kruid)          && !uid_eq(kruid, old->uid) &&
- 		   !uid_eq(kruid, old->euid) && !uid_eq(kruid, old->suid);
--	euid_new = euid != (uid_t) -1        && !uid_eq(keuid, old->uid) &&
-+	euid_new = uid_valid(keuid)          && !uid_eq(keuid, old->uid) &&
- 		   !uid_eq(keuid, old->euid) && !uid_eq(keuid, old->suid);
--	suid_new = suid != (uid_t) -1        && !uid_eq(ksuid, old->uid) &&
-+	suid_new = uid_valid(ksuid)          && !uid_eq(ksuid, old->uid) &&
- 		   !uid_eq(ksuid, old->euid) && !uid_eq(ksuid, old->suid);
- 	if ((ruid_new || euid_new || suid_new) &&
- 	    !ns_capable_setid(old->user_ns, CAP_SETUID))
-@@ -750,7 +754,7 @@ long __sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
- 	if (!new)
- 		return -ENOMEM;
- 
--	if (ruid != (uid_t) -1) {
-+	if (uid_valid(kruid)) {
- 		new->uid = kruid;
- 		if (!uid_eq(kruid, old->uid)) {
- 			retval = set_user(new);
-@@ -758,9 +762,9 @@ long __sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
- 				goto error;
- 		}
- 	}
--	if (euid != (uid_t) -1)
-+	if (uid_valid(keuid))
- 		new->euid = keuid;
--	if (suid != (uid_t) -1)
-+	if (uid_valid(ksuid))
- 		new->suid = ksuid;
- 	new->fsuid = new->euid;
- 
-@@ -780,6 +784,27 @@ long __sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
- 	return retval;
- }
- 
-+long __sys_setresuid(uid_t ruid, uid_t euid, uid_t suid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kuid_t kruid, keuid, ksuid;
-+
-+	kruid = make_kuid(ns, ruid);
-+	keuid = make_kuid(ns, euid);
-+	ksuid = make_kuid(ns, suid);
-+
-+	if ((ruid != (uid_t) -1) && !uid_valid(kruid))
-+		return -EINVAL;
-+
-+	if ((euid != (uid_t) -1) && !uid_valid(keuid))
-+		return -EINVAL;
-+
-+	if ((suid != (uid_t) -1) && !uid_valid(ksuid))
-+		return -EINVAL;
-+
-+	return do_setresuid(kruid, keuid, ksuid);
-+}
-+
- SYSCALL_DEFINE3(setresuid, uid_t, ruid, uid_t, euid, uid_t, suid)
- {
- 	return __sys_setresuid(ruid, euid, suid);
-@@ -807,40 +832,28 @@ SYSCALL_DEFINE3(getresuid, uid_t __user *, ruidp, uid_t __user *, euidp, uid_t _
- /*
-  * Same as above, but for rgid, egid, sgid.
-  */
--long __sys_setresgid(gid_t rgid, gid_t egid, gid_t sgid)
-+/* Invalid ids (INVALID_GID) stand for "unchanged" */
-+static long do_setresgid(kgid_t krgid, kgid_t kegid, kgid_t ksgid)
- {
--	struct user_namespace *ns = current_user_ns();
- 	const struct cred *old;
- 	struct cred *new;
- 	int retval;
--	kgid_t krgid, kegid, ksgid;
- 	bool rgid_new, egid_new, sgid_new;
- 
--	krgid = make_kgid(ns, rgid);
--	kegid = make_kgid(ns, egid);
--	ksgid = make_kgid(ns, sgid);
--
--	if ((rgid != (gid_t) -1) && !gid_valid(krgid))
--		return -EINVAL;
--	if ((egid != (gid_t) -1) && !gid_valid(kegid))
--		return -EINVAL;
--	if ((sgid != (gid_t) -1) && !gid_valid(ksgid))
--		return -EINVAL;
--
- 	old = current_cred();
- 
- 	/* check for no-op */
--	if ((rgid == (gid_t) -1 || gid_eq(krgid, old->gid)) &&
--	    (egid == (gid_t) -1 || (gid_eq(kegid, old->egid) &&
--				    gid_eq(kegid, old->fsgid))) &&
--	    (sgid == (gid_t) -1 || gid_eq(ksgid, old->sgid)))
-+	if ((!gid_valid(krgid) || gid_eq(krgid, old->gid)) &&
-+	    (!gid_valid(kegid) || (gid_eq(kegid, old->egid) &&
-+				   gid_eq(kegid, old->fsgid))) &&
-+	    (!gid_valid(ksgid) || gid_eq(ksgid, old->sgid)))
- 		return 0;
- 
--	rgid_new = rgid != (gid_t) -1        && !gid_eq(krgid, old->gid) &&
-+	rgid_new = gid_valid(krgid)          && !gid_eq(krgid, old->gid) &&
- 		   !gid_eq(krgid, old->egid) && !gid_eq(krgid, old->sgid);
--	egid_new = egid != (gid_t) -1        && !gid_eq(kegid, old->gid) &&
-+	egid_new = gid_valid(kegid)          && !gid_eq(kegid, old->gid) &&
- 		   !gid_eq(kegid, old->egid) && !gid_eq(kegid, old->sgid);
--	sgid_new = sgid != (gid_t) -1        && !gid_eq(ksgid, old->gid) &&
-+	sgid_new = gid_valid(ksgid)          && !gid_eq(ksgid, old->gid) &&
- 		   !gid_eq(ksgid, old->egid) && !gid_eq(ksgid, old->sgid);
- 	if ((rgid_new || egid_new || sgid_new) &&
- 	    !ns_capable_setid(old->user_ns, CAP_SETGID))
-@@ -850,11 +863,11 @@ long __sys_setresgid(gid_t rgid, gid_t egid, gid_t sgid)
- 	if (!new)
- 		return -ENOMEM;
- 
--	if (rgid != (gid_t) -1)
-+	if (gid_valid(krgid))
- 		new->gid = krgid;
--	if (egid != (gid_t) -1)
-+	if (gid_valid(kegid))
- 		new->egid = kegid;
--	if (sgid != (gid_t) -1)
-+	if (gid_valid(ksgid))
- 		new->sgid = ksgid;
- 	new->fsgid = new->egid;
- 
-@@ -869,6 +882,25 @@ long __sys_setresgid(gid_t rgid, gid_t egid, gid_t sgid)
- 	return retval;
- }
- 
-+long __sys_setresgid(gid_t rgid, gid_t egid, gid_t sgid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kgid_t krgid, kegid, ksgid;
-+
-+	krgid = make_kgid(ns, rgid);
-+	kegid = make_kgid(ns, egid);
-+	ksgid = make_kgid(ns, sgid);
-+
-+	if ((rgid != (gid_t) -1) && !gid_valid(krgid))
-+		return -EINVAL;
-+	if ((egid != (gid_t) -1) && !gid_valid(kegid))
-+		return -EINVAL;
-+	if ((sgid != (gid_t) -1) && !gid_valid(ksgid))
-+		return -EINVAL;
-+
-+	return do_setresgid(krgid, kegid, ksgid);
-+}
-+
- SYSCALL_DEFINE3(setresgid, gid_t, rgid, gid_t, egid, gid_t, sgid)
- {
- 	return __sys_setresgid(rgid, egid, sgid);
-@@ -901,40 +933,44 @@ SYSCALL_DEFINE3(getresgid, gid_t __user *, rgidp, gid_t __user *, egidp, gid_t _
-  * whatever uid it wants to). It normally shadows "euid", except when
-  * explicitly set by setfsuid() or for access..
-  */
--long __sys_setfsuid(uid_t uid)
-+/*
-+ * Sets the fsuid to @kuid, unless it is invalid; 0 or -EPERM. The fsuid
-+ * before the call goes to @old.
-+ */
-+static long do_setfsuid(kuid_t kuid, kuid_t *old_fsuid)
- {
- 	const struct cred *old;
- 	struct cred *new;
--	uid_t old_fsuid;
--	kuid_t kuid;
- 
- 	old = current_cred();
--	old_fsuid = from_kuid_munged(old->user_ns, old->fsuid);
-+	*old_fsuid = old->fsuid;
- 
--	kuid = make_kuid(old->user_ns, uid);
--	if (!uid_valid(kuid))
--		return old_fsuid;
-+	if (!uid_valid(kuid) || uid_eq(kuid, old->fsuid))
-+		return 0;
- 
- 	new = prepare_creds();
- 	if (!new)
--		return old_fsuid;
-+		return -ENOMEM;
- 
- 	if (uid_eq(kuid, old->uid)  || uid_eq(kuid, old->euid)  ||
--	    uid_eq(kuid, old->suid) || uid_eq(kuid, old->fsuid) ||
-+	    uid_eq(kuid, old->suid) ||
- 	    ns_capable_setid(old->user_ns, CAP_SETUID)) {
--		if (!uid_eq(kuid, old->fsuid)) {
--			new->fsuid = kuid;
--			if (security_task_fix_setuid(new, old, LSM_SETID_FS) == 0)
--				goto change_okay;
--		}
-+		new->fsuid = kuid;
-+		if (security_task_fix_setuid(new, old, LSM_SETID_FS) == 0)
-+			return commit_creds(new);
- 	}
- 
- 	abort_creds(new);
--	return old_fsuid;
-+	return -EPERM;
-+}
-+
-+long __sys_setfsuid(uid_t uid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kuid_t old_fsuid;
- 
--change_okay:
--	commit_creds(new);
--	return old_fsuid;
-+	do_setfsuid(make_kuid(ns, uid), &old_fsuid);
-+	return from_kuid_munged(ns, old_fsuid);
- }
- 
- SYSCALL_DEFINE1(setfsuid, uid_t, uid)
-@@ -945,46 +981,214 @@ SYSCALL_DEFINE1(setfsuid, uid_t, uid)
- /*
-  * Samma på svenska..
-  */
--long __sys_setfsgid(gid_t gid)
-+/*
-+ * Sets the fsgid to @kgid, unless it is invalid; 0 or -EPERM. The fsgid
-+ * before the call goes to @old.
-+ */
-+static long do_setfsgid(kgid_t kgid, kgid_t *old_fsgid)
- {
- 	const struct cred *old;
- 	struct cred *new;
--	gid_t old_fsgid;
--	kgid_t kgid;
- 
- 	old = current_cred();
--	old_fsgid = from_kgid_munged(old->user_ns, old->fsgid);
-+	*old_fsgid = old->fsgid;
- 
--	kgid = make_kgid(old->user_ns, gid);
--	if (!gid_valid(kgid))
--		return old_fsgid;
-+	if (!gid_valid(kgid) || gid_eq(kgid, old->fsgid))
-+		return 0;
- 
- 	new = prepare_creds();
- 	if (!new)
--		return old_fsgid;
-+		return -ENOMEM;
- 
- 	if (gid_eq(kgid, old->gid)  || gid_eq(kgid, old->egid)  ||
--	    gid_eq(kgid, old->sgid) || gid_eq(kgid, old->fsgid) ||
-+	    gid_eq(kgid, old->sgid) ||
- 	    ns_capable_setid(old->user_ns, CAP_SETGID)) {
--		if (!gid_eq(kgid, old->fsgid)) {
--			new->fsgid = kgid;
--			if (security_task_fix_setgid(new,old,LSM_SETID_FS) == 0)
--				goto change_okay;
--		}
-+		new->fsgid = kgid;
-+		if (security_task_fix_setgid(new, old, LSM_SETID_FS) == 0)
-+			return commit_creds(new);
- 	}
- 
- 	abort_creds(new);
--	return old_fsgid;
-+	return -EPERM;
-+}
-+
-+long __sys_setfsgid(gid_t gid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kgid_t old_fsgid;
- 
--change_okay:
--	commit_creds(new);
--	return old_fsgid;
-+	do_setfsgid(make_kgid(ns, gid), &old_fsgid);
-+	return from_kgid_munged(ns, old_fsgid);
- }
- 
- SYSCALL_DEFINE1(setfsgid, gid_t, gid)
- {
- 	return __sys_setfsgid(gid);
- }
-+
-+/*
-+ * The *_r variants take and return __kernel_uid_r_t, which can also be a
-+ * UUID or a GUID. A NULL pointer, UID_R_NONE or a classic -1 leave an id
-+ * unchanged, like -1 does for the classic calls.
-+ */
-+SYSCALL_DEFINE1(setuid_r, const struct __kernel_uid_r __user *, uid)
-+{
-+	kuid_t kuid;
-+	int err;
-+
-+	err = get_kuid_r(current_user_ns(), uid, &kuid);
-+	if (err)
-+		return err;
-+	return do_setuid(kuid);
-+}
-+
-+SYSCALL_DEFINE1(setgid_r, const struct __kernel_uid_r __user *, gid)
-+{
-+	kgid_t kgid;
-+	int err;
-+
-+	err = get_kgid_r(current_user_ns(), gid, &kgid);
-+	if (err)
-+		return err;
-+	return do_setgid(kgid);
-+}
-+
-+SYSCALL_DEFINE2(setreuid_r, const struct __kernel_uid_r __user *, ruid,
-+		const struct __kernel_uid_r __user *, euid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kuid_t kruid, keuid;
-+	int err;
-+
-+	err = get_kuid_r(ns, ruid, &kruid);
-+	if (!err)
-+		err = get_kuid_r(ns, euid, &keuid);
-+	if (err)
-+		return err;
-+	return do_setreuid(kruid, keuid);
-+}
-+
-+SYSCALL_DEFINE2(setregid_r, const struct __kernel_uid_r __user *, rgid,
-+		const struct __kernel_uid_r __user *, egid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kgid_t krgid, kegid;
-+	int err;
-+
-+	err = get_kgid_r(ns, rgid, &krgid);
-+	if (!err)
-+		err = get_kgid_r(ns, egid, &kegid);
-+	if (err)
-+		return err;
-+	return do_setregid(krgid, kegid);
-+}
-+
-+SYSCALL_DEFINE3(setresuid_r, const struct __kernel_uid_r __user *, ruid,
-+		const struct __kernel_uid_r __user *, euid,
-+		const struct __kernel_uid_r __user *, suid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kuid_t kruid, keuid, ksuid;
-+	int err;
-+
-+	err = get_kuid_r(ns, ruid, &kruid);
-+	if (!err)
-+		err = get_kuid_r(ns, euid, &keuid);
-+	if (!err)
-+		err = get_kuid_r(ns, suid, &ksuid);
-+	if (err)
-+		return err;
-+	return do_setresuid(kruid, keuid, ksuid);
-+}
-+
-+SYSCALL_DEFINE3(setresgid_r, const struct __kernel_uid_r __user *, rgid,
-+		const struct __kernel_uid_r __user *, egid,
-+		const struct __kernel_uid_r __user *, sgid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kgid_t krgid, kegid, ksgid;
-+	int err;
-+
-+	err = get_kgid_r(ns, rgid, &krgid);
-+	if (!err)
-+		err = get_kgid_r(ns, egid, &kegid);
-+	if (!err)
-+		err = get_kgid_r(ns, sgid, &ksgid);
-+	if (err)
-+		return err;
-+	return do_setresgid(krgid, kegid, ksgid);
-+}
-+
-+/* NULL pointers are skipped */
-+SYSCALL_DEFINE3(getresuid_r, struct __kernel_uid_r __user *, ruid,
-+		struct __kernel_uid_r __user *, euid,
-+		struct __kernel_uid_r __user *, suid)
-+{
-+	const struct cred *cred = current_cred();
-+	int err = 0;
-+
-+	if (ruid)
-+		err = put_kuid_r(cred->user_ns, cred->uid, ruid);
-+	if (!err && euid)
-+		err = put_kuid_r(cred->user_ns, cred->euid, euid);
-+	if (!err && suid)
-+		err = put_kuid_r(cred->user_ns, cred->suid, suid);
-+	return err;
-+}
-+
-+SYSCALL_DEFINE3(getresgid_r, struct __kernel_uid_r __user *, rgid,
-+		struct __kernel_uid_r __user *, egid,
-+		struct __kernel_uid_r __user *, sgid)
-+{
-+	const struct cred *cred = current_cred();
-+	int err = 0;
-+
-+	if (rgid)
-+		err = put_kgid_r(cred->user_ns, cred->gid, rgid);
-+	if (!err && egid)
-+		err = put_kgid_r(cred->user_ns, cred->egid, egid);
-+	if (!err && sgid)
-+		err = put_kgid_r(cred->user_ns, cred->sgid, sgid);
-+	return err;
-+}
-+
-+/*
-+ * Unlike setfsuid(), which returns the old fsuid whatever happens,
-+ * setfsuid_r() reports failure: 0, or -EPERM if the caller may not use
-+ * @uid. The fsuid before the call goes to @old_uid unless it is NULL; a
-+ * NULL @uid only queries it.
-+ */
-+SYSCALL_DEFINE2(setfsuid_r, const struct __kernel_uid_r __user *, uid,
-+		struct __kernel_uid_r __user *, old_uid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kuid_t kuid, old_fsuid;
-+	int err;
-+
-+	err = get_kuid_r(ns, uid, &kuid);
-+	if (err)
-+		return err;
-+	err = do_setfsuid(kuid, &old_fsuid);
-+	if (!err && old_uid)
-+		err = put_kuid_r(ns, old_fsuid, old_uid);
-+	return err;
-+}
-+
-+SYSCALL_DEFINE2(setfsgid_r, const struct __kernel_uid_r __user *, gid,
-+		struct __kernel_uid_r __user *, old_gid)
-+{
-+	struct user_namespace *ns = current_user_ns();
-+	kgid_t kgid, old_fsgid;
-+	int err;
-+
-+	err = get_kgid_r(ns, gid, &kgid);
-+	if (err)
-+		return err;
-+	err = do_setfsgid(kgid, &old_fsgid);
-+	if (!err && old_gid)
-+		err = put_kgid_r(ns, old_fsgid, old_gid);
-+	return err;
-+}
- #endif /* CONFIG_MULTIUSER */
- 
- /**
-@@ -1048,6 +1252,26 @@ SYSCALL_DEFINE0(getegid)
- 	return from_kgid_munged(current_user_ns(), current_egid());
- }
- 
-+SYSCALL_DEFINE1(getuid_r, struct __kernel_uid_r __user *, uid)
-+{
-+	return put_kuid_r(current_user_ns(), current_uid(), uid);
-+}
-+
-+SYSCALL_DEFINE1(geteuid_r, struct __kernel_uid_r __user *, uid)
-+{
-+	return put_kuid_r(current_user_ns(), current_euid(), uid);
-+}
-+
-+SYSCALL_DEFINE1(getgid_r, struct __kernel_uid_r __user *, gid)
-+{
-+	return put_kgid_r(current_user_ns(), current_gid(), gid);
-+}
-+
-+SYSCALL_DEFINE1(getegid_r, struct __kernel_uid_r __user *, gid)
-+{
-+	return put_kgid_r(current_user_ns(), current_egid(), gid);
-+}
-+
- static void do_sys_times(struct tms *tms)
- {
- 	u64 tgutime, tgstime, cutime, cstime;
-diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
-index c8be0abaa4..01f14d7a4d 100644
---- a/kernel/sys_ni.c
-+++ b/kernel/sys_ni.c
-@@ -103,6 +103,16 @@ COND_SYSCALL(setfsuid);
- COND_SYSCALL(setfsgid);
- COND_SYSCALL(setgroups);
- COND_SYSCALL(getgroups);
-+COND_SYSCALL(setregid_r);
-+COND_SYSCALL(setgid_r);
-+COND_SYSCALL(setreuid_r);
-+COND_SYSCALL(setuid_r);
-+COND_SYSCALL(setresuid_r);
-+COND_SYSCALL(getresuid_r);
-+COND_SYSCALL(setresgid_r);
-+COND_SYSCALL(getresgid_r);
-+COND_SYSCALL(setfsuid_r);
-+COND_SYSCALL(setfsgid_r);
- COND_SYSCALL(mq_open);
- COND_SYSCALL_COMPAT(mq_open);
- COND_SYSCALL(mq_unlink);
 -- 
 2.56.0
 
