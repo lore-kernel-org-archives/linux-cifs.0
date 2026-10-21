@@ -1,96 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792583646;
-	b=rfH2ZulVgghcvNlSKG4DC8C9VAG3Ol/nauYat6xh2EofKWZwraKsHDMSckmPcgX+Rj1v
-	 h3k+kqN+bgpAkf2adPXoP4Ae5+VQ2X1ypyTPKUbRe0SPNoV4Vt2LamUiyRI4p6GKy6shP
-	 6Np0SxWNISAt43w9wBsvpnbbrhyjxqczmOwvZy0lbNH8SiPgkRnB+paxPzzTo2xfFFBM/
-	 bAnMNj2bY85LEVcDAvR/6pOHhISH8XKm5/pdqbX22Ler2Iag9rHAFIVwBR5tQNAIggiV3
-	 +ca2PukdIvEqG2Mrq6IEtE/4t7l/CvY7U5QuGJSN0arTLeCJ7Jo2jhiHwEwsLsgeeOw==
+	t=1792590252;
+	b=kLzXsodyhBk6Q7GSMcatJpGVNu6ft/qqORG1pjYvfyLZZpcpymbE2Aif9347hM/S+CjA
+	 NYNet155puO3jPwoDC48pydNHg++1QGNdqywuZDp4F8y1ppHZNKbZYcr8huYABV7OR/pM
+	 1NUbnsso3RaJ8ZjzYftYZBgIdUhXrfucvsP7Z76+XOTNxnc7DOXNYRwYCHV0e7VSUYdf7
+	 TRTvZUinGtj6erIBrRqEm3zmFM0i2bzf8/WDyUPoR05OpAu5pN+UR7Sw1l2e8lRxA22Em
+	 Ywh3iks8b6prBfv/7EXQ7fpSjXoTIrqmr7HXWxtY+XFxyfb8aA4fs6DNMAvTybfFUcw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792583646;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=khbtvnCt8sXvEtX9fI1U36fFGjo7tER69Bnnl50Wz8Y=;
-	b=5Vb+dmoS/EhoR/iqidyM4hp8fhwwMesANJlt9O2PQKQB3cSujnRGQSgza0xix8Md8Bm+
-	 Ta1ZYDBFQhbJ0UUZTa/EfYy8NnuFIPE4YpnmauJElyFW/NfvF5SbIWq1jBcNLTBxW3YU2
-	 dPJZQUgzrRN+Wrob8OIZ1Pe/Js9OslHICup9TN5sKA5Dy7/n7EN8Hr5+EWEiyDkr7Wa49
-	 HYkY+8prTOnEiLXn4VXwRMPlriI9GUbgwlL5DRGvq1x106k5PVYj1q6mNjR+7KyWMEFPj
-	 PGxIb/WsRnbGZXEknLbF6lLluFL9XE9nNOvWjum5UgyWuaZ7LorfVPbaHzHxcW3XisQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792590252;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=cqDKtFMuzM9nM0G2aV2TVkGy3zyEu8z8hK7b+kmnLG4=;
+	b=DccDIUrY3Hhd0kxAFwdhPnn83kjINYy1BDd2MBm/KSkotQ1xnjPFf6t6lV7g18ZRU+Ka
+	 Xoc12rh8O9LNfYIjofGaaJe/ziJ0hbGaihcjtWI+pdbeT05NZDgdtDpeJtz5AKjc4+qYP
+	 PbTc7c5OaQmUOGl5mq1fxPydjnIK+9tva1o3xjF72EDXGCeaGURjUr3oJ7cVltRL0i3J8
+	 Vg12RDrpdAsmLASB7cr9gDE8+dx5uBvzU8uQ1gC4KAcm7E4Wwqche/HcXTmOEZPS2LMmY
+	 R6SUnturo8akeLw0QuG6t11g1JJpo7N/Q89zlUHP3IhCBOLATSLz9nNuuoIRLtRP/Cw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=fQaHtPW3;
-	arc=none smtp.remote-ip=209.85.218.41
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ox4s7H7B;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54A2606A338
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 11:54:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C54A2606A338
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC89606A320
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 13:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=fQaHtPW3
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c38ac26cc5dso83436266b.2
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 04:54:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792583644; x=1793188444; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=khbtvnCt8sXvEtX9fI1U36fFGjo7tER69Bnnl50Wz8Y=;
-        b=fQaHtPW35SAPAX1ZgwjLawoatDbVxOsx2Nrww27dOU+l9jUgTNw2h4p0Ee0CHlhmld
-         M3g4uY5JL08XETrxU++gX9/QYc9dUU+r/NKHUwTRuwvoBGOwUiRYHFONMNa903UmTl0a
-         h2/HGLM1zng7GBtJpaxFGv+lGtmg4GNqeL/u1eY+iEqkaYStQtnJmScUNRl69GmgJaVX
-         2CxYjzTOqliW1EE7znJ43U86Xo+rAEOHi2K+a6qXukSxWKvQZeE17k5uhhN9zhcHat7k
-         MNckSt/t1InXV4UY87WOPesjJYIlwLwNrbWgMPoPGO66UzZsLu7sndNbfyNKnoXqDd7B
-         ViOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792583644; x=1793188444;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=khbtvnCt8sXvEtX9fI1U36fFGjo7tER69Bnnl50Wz8Y=;
-        b=dRNevNeGyWf+n7HhiN8avGQSkv7zuFiTytglUmHMIyUZ7wyT3sPuJFdmKjyJeQeiRP
-         vgAa016wATXQLPyQWgb/Dj/geJpND/unHv3930RjCbpcf8F+zcZPev8kY/KdRsTZrC0Y
-         0HMERpAksaRFVtEoiPPHMPcChLgGDkBksiKx6ENLZWNBa8DJWLtZ9Q9r1PthcxIN7xGa
-         yk70HRerqkvz82bskPjZ8HJxso/UtVTWjLuXIGz4RzFeU+T1nLugPAHzZRIJeCDlyzmc
-         9DTzl89i4dUX8OhGhbJdM6q0XJHM8mFg5S7U3/lWB/27hf6dGgz4D/QZZRz78XlnfcQr
-         aI7w==
-X-Forwarded-Encrypted: i=1; AKwUvBw48c2W9BvsDRgxdmmmkb04VgnF/1iqo8UhAsqW+QGuH7bqekjTYalxgWuqkEj/emk9QcnBmIdPYXa+@vger.kernel.org
-X-Gm-Message-State: AFq9FYLhfxi8l9L4Xrfg+GfmUo1jgtQej8JKrSJWtPRS9ajkRoDUMdOW
-	dQFv1TEo5QtW/TD3Ert6xeUVpm5E23l+V3upHKHIpB6EZW+rd2jRAN+x
-X-Gm-Gg: AYBFou2TFk1RJ/nnvjFUi5Cn16dDz5uAeYHZ2AlMGCdYisCzIhbPNuTIL+DraQb9mlp
-	aZIbKDVj5Aty1xXaAKgaFHSj+LWIL4Gk0ut7xRDJ1rkBdwJPMCsyL4TbH3/bJN5kiqgYqi6RF5A
-	K6z4ldOe0SjMnajzLLrRJdXVkEB9zKmfbVVIARWn84xohz4S3ZdttKq1gcZSsUnC6R79cZZe2T1
-	kRh7Vf8k0OjeWSZwPNeiQS4aHK7fn+9G0QGHfoILM7Pj5YB+TPEVZtj2+yG/mDp6yqFm1duPy52
-	Sygf5KGzrQkwo2cZJlEJoeG8dKzdDyOWrdUKDaY0rhk+MaYfCA2hL4wGPFg917awhajfzzDXbFx
-	n5U5/yn65AEUPvRcsAsYHxK3ZZhhZjM9cubLlkbWZDRSNGLA6Op3Lz9Sjj0xISXyjcv1kHZqB+q
-	hI83ZyllD6a/U+IBQBZzvPNa8NWuTD8+Xn+V7GMg57MO9uxSxsOc9wKK0VppUg9LLsGPIwB/w6F
-	x4ZAXhZZh4StKXBCfnEBE/c2Csa7CFX5Z4EITsZsb2kXHyhZobUCRyQU5m5HhnTMdiIMxdWhbVr
-	ofnnhuVh7//HTaYb77aCpLCccHeqQ6UZ5iTR8easBncuOvuLiSKB80TkxlPU52HRpp4K
-X-Received: by 2002:a17:907:868c:b0:c29:f5d8:9c73 with SMTP id a640c23a62f3a-c467979bbffmr167724266b.34.1792583643843;
-        Wed, 21 Oct 2026 04:54:03 -0700 (PDT)
-Received: from wlan-199066.nbw.tue.nl (wlan-199066.nbw.tue.nl. [131.155.199.66])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c4678f77ac4sm69316066b.28.2026.10.21.04.54.03
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 21 Oct 2026 04:54:03 -0700 (PDT)
-From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	regressions@lists.linux.dev,
-	Michail Andreas Michalopoulos <mike.michalo@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: restore Kerberos logins with released ksmbd-tools
-Date: Wed, 21 Oct 2026 13:54:00 +0200
-Message-ID: <20261021115400.30885-1-mike.michalo@gmail.com>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ox4s7H7B
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E4F11F000C8
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 13:44:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792590252;
+	bh=cqDKtFMuzM9nM0G2aV2TVkGy3zyEu8z8hK7b+kmnLG4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Ox4s7H7BoeYAZ8zyjP1xMQfAqSlN7aFGnFrA34DAsPj/FrYMN8nthOupxOowRluNO
+	 1UHuW3V7e5rHXNZW+G4zirVII6VYjzhW7r9PnpP8TN7qXTWFe07numuVI4Nczu2bnG
+	 M0sFy6z6rdZK/zFyCPWLwx3mVg+c7HOJ6tmWC8KEQMVol45a/F/TuPmPcDK+rpC3o5
+	 BhzofZaBn+6uMsG0X0YJU33ohtDw1KydVkSung2QVv8BXSbZybtt/T8WYDqAeLdZGM
+	 93ZQIQPxh6/jUy1bw2jZqar82+av+MVcWTHAn+qm59pTlrn4i3McLgMku+L/izmJtn
+	 bqUvI5U3Xe38Q==
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-6740e7ae219so630640d50.1
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 06:44:12 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBz1iCBZGTlgHSonie4n0J9te2KE09vlsXU+k9gNtdATuYRujKd1aPv9X4KJ0cqsUqxa15OJjeKazWKe@vger.kernel.org
+X-Gm-Message-State: AFq9FYJbVO0MD2Jv1p47T6T6ehC9Z/M4Lygn4eJZg1ZDuxw7qBeY6gff
+	80yh+MG+MxO0yA2SzPFSfNd7mHLYccpM+fWJVWV8Yi02XOuyes6TxhPOUW5hWhbs91Sjx6bBxEW
+	G4KMzyM7X7RqKufuSSmTiOZU9AVTg9T8=
+X-Received: by 2002:a05:690e:804:20b0:677:a8c0:38c6 with SMTP id
+ 956f58d0204a3-67a0e4cf21amr417304d50.57.1792590251399; Wed, 21 Oct 2026
+ 06:44:11 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -100,97 +59,65 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260929024352.1433257-1-neilb@ownmail.net>
+In-Reply-To: <20260929024352.1433257-1-neilb@ownmail.net>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 21 Oct 2026 22:43:57 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8GogxyNSt3NZpcm9-fP019PmWAgsNzwKCdYrQFvOyvkw@mail.gmail.com>
+X-Gm-Features: AclHuK-re9OmwPwi_QV1RyAbfMBgOF9gAwJh6SamYX146AyGEclwJIeQKPZJtkw
+Message-ID: <CAKYAXd8GogxyNSt3NZpcm9-fP019PmWAgsNzwKCdYrQFvOyvkw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] smb/client(cifs): prepare for VFS locking changes.
+To: NeilBrown <neil@brown.name>
+Cc: Paulo Alcantara <pc@manguebit.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jeff Layton <jlayton@kernel.org>, Jan Kara <jack@suse.cz>, 
+	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit a47634cd729b ("ksmbd: expire SMB sessions when Kerberos tickets
-expire") added a __u64 session_expiry field to struct
-ksmbd_spnego_authen_response, growing it from 156 to 168 bytes.
-ipc_validate_msg() requires the response to have exactly that size, so
-the 156-byte response of every released ksmbd-tools, up to 3.5.7, is
-dropped and Kerberos session setup fails with STATUS_LOGON_FAILURE.
-The other way round, kernels without that commit, including the stable
-trees, drop the 168-byte response of current ksmbd-tools master, and
-ksmbd-tools has no way to tell which layout a kernel expects.
-
-Pass the expiry in the reserved area of the embedded struct
-ksmbd_login_response instead. ksmbd-tools releases with that area
-(3.4.4 and later) allocate the response zeroed and never write to it,
-so they send an expiry of 0, which ksmbd already treats as no expiry.
-The response is 156 bytes again, so it works with those releases, and
-every kernel also accepts a response that sets the expiry. Use two
-__u32 halves, as the reserved area is only 4-byte aligned.
-
-Fixes: a47634cd729b ("ksmbd: expire SMB sessions when Kerberos tickets expire")
-Cc: stable@vger.kernel.org
-Closes: https://lore.kernel.org/all/CAO+rqLhpPvY0NLrAnZjFXz0gOXnA6zsXxK8xCgtA42XUkSsAeg@mail.gmail.com/
-Assisted-by: LLM
-Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
----
-The matching ksmbd-tools change (struct layout and mountd/worker.c)
-will follow as a pull request.
-
-Tested with a local MIT KDC and smbclient --use-kerberos=required:
-
-                    3.5.7      master     master + tools change
-  7.2               login OK   fails      login OK
-  7.3               fails      login OK   fails
-  7.3 + this patch  login OK   fails      login OK
-
-With this patch and the tools change, smbtorture smb2.session over
-Kerberos (including expire1n/1s/1e, expire2s/2e and expire_disconnect)
-and the 190 smbtorture tests run by the ksmbd CI over NTLM give the same
-results as 7.3 with ksmbd-tools master, with no kernel warnings. NTLM
-logins also work with 3.5.7. A test-only mountd that overrides the
-expiry (including values above 2^32), the response size and the length
-fields found no wrong session expiry and no kernel warnings in 313
-logins.
-
-Current ksmbd-tools master needs the tools change to work with this
-patch. If you'd rather the kernel also kept accepting the 168-byte
-layout, I can add that in a v2. Only tested with smbclient and
-smbtorture on x86_64.
-
- fs/smb/server/auth.c          | 3 ++-
- fs/smb/server/ksmbd_netlink.h | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 1b24eb3f3998..8e5a1b10db6a 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -464,7 +464,8 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
- 	memcpy(out_blob, resp->payload + resp->session_key_len,
- 	       resp->spnego_blob_len);
- 	*out_len = resp->spnego_blob_len;
--	sess->kerberos_expiry = resp->session_expiry;
-+	sess->kerberos_expiry = (u64)resp->login_response.session_expiry_hi << 32 |
-+				resp->login_response.session_expiry_lo;
- 	retval = 0;
- out:
- 	kvfree_sensitive(resp, sizeof(*resp) + resp->session_key_len +
-diff --git a/fs/smb/server/ksmbd_netlink.h b/fs/smb/server/ksmbd_netlink.h
-index 2673522c76bc..fc6af757e45e 100644
---- a/fs/smb/server/ksmbd_netlink.h
-+++ b/fs/smb/server/ksmbd_netlink.h
-@@ -148,7 +148,9 @@ struct ksmbd_login_response {
- 	__u16	status;
- 	__u16	hash_sz;			/* hash size */
- 	__s8	hash[KSMBD_REQ_MAX_HASH_SZ];	/* password hash */
--	__u32	reserved[16];			/* Reserved room */
-+	__u32	session_expiry_lo;	/* Kerberos ticket expiry, SPNEGO only */
-+	__u32	session_expiry_hi;
-+	__u32	reserved[14];			/* Reserved room */
- };
- 
- /*
-@@ -286,7 +288,6 @@ struct ksmbd_spnego_authen_response {
- 				  * stored in SecurityBuffer of SMB2 SESSION
- 				  * SETUP response
- 				  */
--	__u64	session_expiry;	/* Kerberos ticket expiry time */
- 	__u8	payload[]; /* session key + AP_REP */
- };
- 
--- 
-2.56.0
-
+On Tue, Sep 29, 2026 at 11:44=E2=80=AFAM NeilBrown <neilb@ownmail.net> wrot=
+e:
+>
+> The previous version of this series had a couple of problems reported by =
+sashiko,
+> both in 2/3.
+> 1/ an error from cifs_lookup() wasn't handled properly - it should be fat=
+al
+> 2/ The d_is_positive() tested the wrong dentry.
+>
+> Original intro message below.
+> Thanks,
+> NeilBrown
+>
+>
+> I am working on changes to directory locking.  The medium term goal is
+> to lift d_alloc_parallel() locking above i_rwsem, so d_alloc_paralle()
+> can be run unlocked, and consequently cannot be called when ->i_rwsem is
+> held.
+>
+> The requires:
+>  1/ that d_alloc_parallel() not be called while i_rwsem is held.  cifs
+>     does this in a couple of places.  A new interface d_alloc_trylock()
+>     is now available and can be used instead.
+>
+>  2/ a dentry must not be d_drop()ed while an operation is ongoing, as an
+>     unlocked d_alloc_parallel() would then be able to create a new
+>     dentry with the same name.  In particular d_rehash() must be phased
+>     out as it won't be safe.  This particularly affects the mechanism to
+>     block lookups/revalidates while an unlink/rename is happening.  The
+>     mechanism is changed to use one similar to how NFS addresses this
+>     needed, though using the new LOOKUP_PRIVATE flag.
+>
+> The patches depend on patches recently added to the vfs tree.  I would
+> prefer these land in that tree too with an Acked-by or similar from cifs
+> maintainers.
+>
+> Thanks,
+> NeilBrown
+>
+>  [PATCH v2 1/3] smb/client: don't unhash and rehash to prevent new
+>  [PATCH v2 2/3] smb/client: use d_alloc_trylock in
+>  [PATCH v2 3/3] smb/client: Use d_alloc_trylock() in
+Looks good to me:)
+Acked-by: Namjae Jeon <linkinjeon@kernel.org>
+Thanks!
