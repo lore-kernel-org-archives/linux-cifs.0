@@ -1,55 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792545403;
-	b=eUujZw/ydLh/cs4HicBCm1SwSThR4MI1GkTs37GdP73s2SPDK6A7xd/AHh+KkIHkNC7U
-	 zZG3yvZh/kW2M7bu40epuNZWqfyWInvnNvBJX6RG/zFdXZoD+WPk+KLFrcIeyOyexJ3TM
-	 bP6kDhtQcJMLy+WBE+cPdUHa404rV0upkeoqifKyMtEux1r2xlcJTFcNlDJ3jxYmsdRAD
-	 GHlX82760V9LQz6ZQEs+4a80v98MsrnaBACezpCdu9hcRtC1SShig7gxU4T7R9gVRnyPw
-	 VXcgwjBEzZkNbX4PwpoCdpETotdcH3z7dRcnySNkvGheCWwveEPHjdNaSKvSAzCHJHA==
+	t=1792546297;
+	b=tFZWHklqAH926Q4BKOi+6y6ZP48D7qRWWGy0044EmOQBxyx1QRYH0XTv8KFVso+fC5TT
+	 gBqQH7NGvrjDAj4HqOqCt93NphzG3Lv0eOo4wWkhcbYIHTI/Wfd7ywrZuw6847j7AViP+
+	 x6jU2vHOrk2XU4PuYuxDWA28FW6Mubr8K1BFcxdSXP2XGc8HEIxtqyyy5LDHXPIgMSsLg
+	 aIOc+xOaSdFDg0M8dCD776KQEVu89x8WLtFn/P7ZoyiAubUAjg6/BqxA6gnF0coHM+ASd
+	 v+/Atqxq5W6NBwK0OYmeOT11E8x6pjkq1fzo06CLqkUt+GgPw3WYZffC4/qcWMc4OLA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792545403;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=XQf033HRKJc+nAHb7sUQOAs1qCf2tDOM3C/wF7UdzeQ=;
-	b=BeRSLNB+wyomz0jX/rLjugPgBCmJHAmU+F7iJ9y1wTzT+crcYRKKHaJtJg4qzk50nWAd
-	 4E6cYRYQ6zlfGATyKEbuohSkfnjQTbFXt/tu4PtowH7phCyzkJXmbY9ytQ4fPJqkYORVc
-	 UtKzhli4ULvFVa+cT/it9GiiKdjZ2OAr2pe71XIp1JEGpr7hzbcspZSva4gQ4NO9TKJ8G
-	 koie1sgyFBQSqHHsVhigjzv7RGqnB0cCPLtm+/Kwau/3M81oHbNW2npvI6hgIIvhIha9J
-	 rUFtAYSsMc1xc+VPTWc+4xbu3fadjCEqCEvbMTBMXDP99PNSgzsO3bp5MQxjofd1YSg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792546297;
+	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=bTpr9NpTetHnln92kjh8Q6soXs5SB2dE5Ll01BYhvvE=;
+	b=O7OsCDs/J7UHOP14qAKQjK/RmN4X2iM+oc7WXB7PZWcK7QqklQDEyuUHBhVh+bNeUl9R
+	 5L5vE941YlKgJ+MLAigtWCisOk0DMbQnRQ2H+n/qb2779mz5DXELC9HfpFlEfRs/zVi1e
+	 syDHajFYasYEbOKOjqSvchObwAhKflLnb8m3h1gz8fo88ij1KxIyPpqkRDXUrjZsD/7qR
+	 Tl7RZ12R9nQwfm+tMYCKRQJx3vVw9O2L/I15soQkcXXVe0q1FxT9ilfPPAm6G0muCxGuy
+	 RAF1FtF6ICR4f0p5OuaTjOr1k/WqUlMpCd+fqgU1ID9BLm7lc7BCXqgiFMKgvx+mVtA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X7zC1p+5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="bbKICx/K";
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE893606A31B
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FBC606A31F
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X7zC1p+5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F361F000CC
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:16:42 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bbKICx/K
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25BE31F000CE
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:31:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792545402;
-	bh=XQf033HRKJc+nAHb7sUQOAs1qCf2tDOM3C/wF7UdzeQ=;
+	s=k20260515; t=1792546297;
+	bh=bTpr9NpTetHnln92kjh8Q6soXs5SB2dE5Ll01BYhvvE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=X7zC1p+5JIPTEJoGGdAVY+zGUtkmkg58eKLXH6nNl8jHPcQMp4fh6Mbh2A4MAlqNl
-	 BFc4oYa+YQgLzFNxkNl6LGFRc+JVSr4V0Oux6w64/4ZTfyIXa9FJsNqXtT7ynSwMtw
-	 ZvKDCJyi1ozcQPnnVu2P78xajxhpo5mM9cx1eueft11E0caJWmdA+EzgMApOZwXutu
-	 gKRaYn/Me+WRRGeJ4qvR0ORq4Sj+UMoXZGSkIU5SxWQY4tcSo8XGD2lF3MjMtgZb2A
-	 d2aLyHie8unFpXCeJ62nkw75+hQ9wRrpXRqZVQ40FJaK1e6lQL9bXybFP8m7diBEwY
-	 GRaAv7/Ly2xqA==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c2055573c8cso11649766b.3
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 18:16:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxn0cVzYQwGcGZlVBIUkQW9tu5dkVfMQCFnUmpfSiX+khq+8Mk5f82BF62oAXaEwigbJqItN0yb3+K2@vger.kernel.org
-X-Gm-Message-State: AFq9FYKYSualiUDdjWZye2I0oL8TR/wMV5S1Kj8TA8mWGTkVWKMAGZGE
-	3LWqiZpkjZOAS/OjALDD/lHNvJX0YxCMdV5uYw4shZqMQ/b5keMzQ/w3szIwdNbdnlN3qXeIcHa
-	uYh9i3/zL71oGLULnBZwnIEUdP7ackUM=
-X-Received: by 2002:a17:907:2d92:b0:c46:645f:ced9 with SMTP id
- a640c23a62f3a-c46795e8002mr51901066b.10.1792545401324; Tue, 20 Oct 2026
- 18:16:41 -0700 (PDT)
+	b=bbKICx/KK3P3wZ0KKBlnK5u7NjkUvqFMJpXNBRYU+j72o5FS8tfeis4KXE8YyU5UX
+	 +2SSTJuaU+zWA/I/DZcYJFu6Y/UDnnHwwO5v61OvXx+sdv2c3FEvGRbyT1/43euMP1
+	 69KMubu0kd4VKs5+2HNvDgBfxKFeL5iU5h7ZI5fxn3oqN1YjEcC6FVKsmlxJgOG1lN
+	 VGQpoDaaXKrvCHk7as1jMQUt7X+wPNT09KM06itolmhH02Vdubk2OSLMPYz4wDxaQQ
+	 ji1Irg+sM99bJgTQksYe8jRBWUd+ptuakW3CEwWrVWAqX2JqeXjsUObNDW0UpVTnB+
+	 H/E3Gfy/QdTsg==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6afbc363efeso214521a12.3
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 18:31:37 -0700 (PDT)
+X-Gm-Message-State: AFq9FYIkK/5nfMljB/3fGEU72D0b0IJcMOThv0VXPMfJV6RvacgOdv2Y
+	wJNrJwMNeB8zWOmUOqObtalJSgCI67c4b9oOvaQM1qQCri5mcVJdo/dwOf09kDA9CeE2XsbCswK
+	TnnFhQHRbcmVfI5CxYRzVOzX8XPEirH8=
+X-Received: by 2002:a17:907:3f98:b0:c46:75e7:25af with SMTP id
+ a640c23a62f3a-c46796669c8mr53247766b.11.1792546295786; Tue, 20 Oct 2026
+ 18:31:35 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,69 +58,53 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <AS8P251MB000104EEF679ECC44D8791F2C8B92@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
-In-Reply-To: <AS8P251MB000104EEF679ECC44D8791F2C8B92@AS8P251MB0001.EURP251.PROD.OUTLOOK.COM>
+References: <CAO+rqLhpPvY0NLrAnZjFXz0gOXnA6zsXxK8xCgtA42XUkSsAeg@mail.gmail.com>
+In-Reply-To: <CAO+rqLhpPvY0NLrAnZjFXz0gOXnA6zsXxK8xCgtA42XUkSsAeg@mail.gmail.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 21 Oct 2026 10:16:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_cyS11k387nM-DfNORyZbTpexC9dQBtDjrhjy2FQKT2Q@mail.gmail.com>
-X-Gm-Features: AclHuK-ZDQ3NXb3m5c0xNio5bQaHfkfxZPyPk1f2Yr4vlT42M-8V3UIjNVEiMaQ
-Message-ID: <CAKYAXd_cyS11k387nM-DfNORyZbTpexC9dQBtDjrhjy2FQKT2Q@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: deny access for an empty DACL instead of
- granting the request
-To: Aamir Ahmed <elb12345@hotmail.co.uk>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Ronnie Sahlberg <lsahlber@redhat.com>, 
-	Steve French <stfrench@microsoft.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Date: Wed, 21 Oct 2026 10:31:23 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9Otv_doQutE+gzKJ+Pp9Wi5mjCZpFdfobGJER5=hM4JA@mail.gmail.com>
+X-Gm-Features: AclHuK8fkB3qvtBt_Moreu2LAmL8ZAC9wrTcuR5XTcDmGloZjIbZ6yJjmLOhILo
+Message-ID: <CAKYAXd9Otv_doQutE+gzKJ+Pp9Wi5mjCZpFdfobGJER5=hM4JA@mail.gmail.com>
+Subject: Re: ksmbd: Kerberos login fails on 7.3 with released ksmbd-tools
+To: mixalhs <mike.michalo@gmail.com>
+Cc: linux-cifs@vger.kernel.org, regressions@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 16, 2026 at 7:49=E2=80=AFPM Aamir Ahmed <elb12345@hotmail.co.uk=
-> wrote:
+On Wed, Oct 21, 2026 at 9:39=E2=80=AFAM mixalhs <mike.michalo@gmail.com> wr=
+ote:
 >
-> smb_check_perm_dacl() returns the access mask it computes to the SMB2
-> CREATE handler, which uses it as the granted access for the open. For a
-> security descriptor whose DACL is present but contains no ACEs, the
-> function is supposed to deny access: an empty (non-NULL) DACL grants no
-> access to anyone except the object owner's implicit READ_CONTROL and
-> WRITE_DAC (MS-DTYP 2.4.5).
+> Hi Namjae,
 >
-> The empty-DACL branch only denies when both
+> Kerberos session setup fails on 7.3 with the latest released
+> ksmbd-tools (3.5.7), and ksmbd-tools master fails the same way on 7.2.
 >
->   - the DACL has no trailing bytes (pdacl_size =3D=3D sizeof(struct smb_a=
-cl)),
->     and
->   - the request contains bits beyond READ_CONTROL / WRITE_DAC.
+> struct ksmbd_spnego_authen_response gained a __u64 session_expiry field
+> before payload[] in 7.3 (commit a47634cd729b, not in 7.2), making it
+> 168 bytes; in ksmbd-tools 3.5.7 it is still 156 bytes.  ksmbd-tools
+> only gained the field on master on Oct 18 (4c0ca83), after 3.5.7, and
+> always sends the new layout.  ipc_validate_msg() requires
+> msg_sz =3D=3D sizeof(*resp) + session_key_len + spnego_blob_len, so any
+> mismatch is dropped.
 >
-> In every other case it takes the shared "goto err_out" with rc still 0,
-> which returns success without modifying *pdaccess, so the caller grants
-> the full requested access. Three problems follow:
+> Tested with a local MIT KDC and smbclient --use-kerberos=3Drequired, same
+> realm and user throughout:
 >
->   - The READ_CONTROL / WRITE_DAC carve-out models the owner's implicit
->     rights, but the check runs before is_owner is computed, so those
->     rights are handed to *every* caller, not just the owner. For
->     READ_CONTROL the SMB2 CREATE path does not fall back to
->     inode_permission(), so any user can read the security descriptor of
->     an object whose empty DACL is meant to deny them.
+>                     ksmbd-tools 3.5.7    ksmbd-tools master
+>   7.2 (mainline)    login OK             NT_STATUS_INVALID_PARAMETER
+>   7.3 (ksmbd-next)  NT_STATUS_LOGON_FAILURE   login OK
 >
->   - A request of exactly READ_CONTROL and/or WRITE_DAC is granted to any
->     caller. WRITE_DAC lets the handle rewrite the DACL.
+> In both failing cases ksmbd.mountd logs "Authenticated user `testuser'"
+> and the kernel logs "SPNEGO_AUTHEN_REQUEST failure".  NTLM logins are
+> not affected.
 >
->   - A DACL that declares zero ACEs but carries trailing bytes
->     (pdacl_size > sizeof(struct smb_acl)) skips the deny entirely and is
->     granted whatever was requested.
+> From the code, 6.6.y, 6.12.y and 6.18.y also require the old 156-byte
+> size, so a ksmbd-tools release built from master would break Kerberos
+> there as well (only 7.2 tested).
 >
-> On shares where the NT ACL is the authoritative access control -- e.g.
-> "force user" shares, where every client maps to one POSIX identity so
-> POSIX cannot distinguish users -- this is an access-control bypass.
->
-> Compute is_owner before the empty-DACL branch and deny access from an
-> empty DACL unless the caller is the owner requesting no more than
-> READ_CONTROL / WRITE_DAC.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Assisted-by: LLM
-> Signed-off-by: Aamir Ahmed <elb12345@hotmail.co.uk>
-Applied it to #ksmbd-for-next.
+> Would you like the kernel to accept the old response size again, with
+> ksmbd-tools sending the new layout only to kernels that support it?
+> I'd be more tan happy to write and test the kernel side. :)
+Thanks for the report and testing. The approach sounds good. Please
+send the patch for this issue. Could you also update ksmbd-tools ?
 Thanks!
