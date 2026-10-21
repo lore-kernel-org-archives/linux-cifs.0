@@ -1,51 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792544872;
-	b=kYSva5pnQVsSkQ8Z8gOVk1w+LZsih9lz9hjKr3WE+/9cgNBc8XHnUWxa+9IS1IyIS0Y8
-	 KXgu8XPkEfugT77XV5UJ98eFPUgHUgPi+Zb8Pt3+qNHWr9HVC3wapu51fF1ebQ2bSNMQO
-	 LsyA2b8o/3feA20Nsf13Q5stSedZxrTR7DN5mFQpzH2wd8DtbV1oAZ5f12CqC6yQ8yt1e
-	 TqHZ/elw24NTN3SxXF+jaU+QVcr49OMgdAxwXZdkGP8UyrbM+Bh6izVfvr668Di1j7ic4
-	 HMQzDVJLVNQqdvO1DypyQgo/ehe+ocHbku4ZCHNihwXcAJS8D8OA1Cm2HRui9qxyUbQ==
+	t=1792545382;
+	b=YXe+R7G/N4fvzCBoeWyoidVWf7HhXs9PVOS7TgeYaTrz2iFaiEAVnvfM/VMt0+jBqc7G
+	 acGuz5OVY0gCTfIoiVZSN8lYCXWiBe/PENttVE5gT+KViwZVdAW0geytFuPydLXzIffPA
+	 wuY3IF/pDySlD6mW71ah8LGBkqhhEKWnKBtK3048NStT2Hm/5S70YgPExPVyn/xVUDxKc
+	 XGmUY2bMxUUCE6HBMQFGQ+CFsltBiiQCoKBIXa9G+T088EdaPLoSSwQHTa8Pd9PvvTQPf
+	 YxBEVFV3CobvaSD59SS34N7oPHw94XCI5oXeZhS9CFE5iG1LOiI775ErpfCVymlmdlg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792544872;
-	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=XMC/JKLmO6GsbdiZMLRSa5NCpQOlGMpsGRIQ+M5+oIo=;
-	b=lDGqDH0wF+8NjZP7c9mmgSIpCw56ATm7U88h7HCVC9g5Y8M4vYx1NX/ldIt4QnQMF9pQ
-	 qfvhNhrmWJ+ijRXxMaRu9LtY9PSvKR3W6z8n/ZB2jCG7qEXikx06Yk4OZgFTRpdNFa7oT
-	 ZMffJC6gLpXX/HAc/jYRk5TW4BkxEpY/otAEXXr+daGVFjqrCt6qcKW3VkHyRqyf0RwXP
-	 IAiUYdGH24dJjbMlaKGSWpuc72reD6YUyWcaVW/MUX0V6phb4xt6TTIsiVHYACSyGByey
-	 ATh04Q6MfaFZEUO0/IhVfXu4+SCQ43ULAuaoiDUP9sR2loAHubLjJvqOlwLZkNwqMow==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792545382;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=C1Zu3q/4M5YlSjRAdHqHcdQCF5W+Ve8rWmucPgH6fQo=;
+	b=rSA8bZ3/OnVK7RIyXnWzaFAWeCD4yQ8ahJDazBgy9kjrMw+Et/5X7OgLUj6ptGAG85Nx
+	 8+Qrx/bOKMcjIjAU9jIUUXqcE3iSJkK693ZEFoTy+nD3SPdFJOyNy5xMzucdEsVceT5KS
+	 BJ3woe8QN8rTIGDdMcsn4X3MRH4AxQ6tvE9AYAdLfhPP/IDTnB20jivo/ucmBJgGPkxFG
+	 Xf3NnmYTENXvvqWkvz96gqnUAOLoaFIoi/Mo1K7huFuOOEoMY7eyoPaDXb/+hTgjtbxpY
+	 tNSV+fJImRFAOsBOm+35IsmmgJvMlpYkkWLBmPVCDkiRDTbChmT6Zz08GYKqgm0qRIw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=auQXPbrU;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B52606A31A
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:07:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59BF61F000CB
-	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D876B606A328
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:16:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=auQXPbrU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B8B1F000D1
+	for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 01:16:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792544861;
-	bh=XMC/JKLmO6GsbdiZMLRSa5NCpQOlGMpsGRIQ+M5+oIo=;
+	s=k20260515; t=1792545381;
+	bh=C1Zu3q/4M5YlSjRAdHqHcdQCF5W+Ve8rWmucPgH6fQo=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=A6g4egyVkvIfeRMzGFj/0XleoEIllH8u0WDTi34CWFe5bPLS71whXNLWRKfdy1gZF
-	 Lmp01+B6m805ExLRitei99IbcjU/Qg+Qurb6jB3pz0oNxr8ZITmoaN87jmUnkU5rQq
-	 cyCHpbjef3kllYiZ7Nnjtz+x1CQ+ukv19rxgAY+ME3fSLKow7RlTO7miJ0m8XJVTBs
-	 34VFYfX26GLSXPc3uyoP/sWR/WWdvALpWU8bxDFYbPY6FuDBkmKNVmLCLbmt580px2
-	 xZZREyd4eWCJluqObxiK3UbdBZH5EV4D/BxOipUBBASnp5o+WZWUiKUMH+mCaPyG22
-	 +NZHz8MGc+qfA==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c263415982eso14702966b.0
-        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 18:07:41 -0700 (PDT)
-X-Gm-Message-State: AFq9FYIzkqFp1p/a+W4sKRq6+o0HWMqrb20lo8lcSJ1dOP5vlpQQSwWj
-	HGgLlZFGGCqB8ps/exwYge8DOe2Tm7f8qN/6TibUoMWRaA3dWqMW2L1pPbfr0yW7asUpu/S2QPA
-	TZjaCLPSMVU7SqhNMR+8579EUTX8eFvo=
-X-Received: by 2002:a17:907:9693:b0:c42:9ded:6a8a with SMTP id
- a640c23a62f3a-c46795f0e10mr48388366b.16.1792544859963; Tue, 20 Oct 2026
- 18:07:39 -0700 (PDT)
+	b=auQXPbrU+d46QzeWedty92gQ+SaltsQDpo/cHuW/EfBdR5ovAWkyqbhGuwnAMuOCB
+	 Wa17lUnp/5lGrN9vHgFYNDtp21pbY6+Upty4W4/5hVWwI7Qd8jibYcbn2Gi1O/G/o1
+	 97/L6Ga1ZqCwr7iew6JG37AkKbEle/vIXynv+gue3Qdy1Q4RJ3vKmK2WMjXdignRJ4
+	 o4en5OlJwsyQe4GHmjFik4wCG1ihs2QDiDbMJt3CHeXlWMCzNw1HKU86dxRpe/KAfH
+	 zrynH2OiYcTuoWil19SLb8aQGlY+mz+0UXiOYjpK1A4x91M0nJvehtbXZcwNHsyOA1
+	 ieUCPZCpbO/kg==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-6aa9164072cso209263a12.2
+        for <linux-cifs@vger.kernel.org>; Tue, 20 Oct 2026 18:16:21 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBx9HQqx2wmuMRPecCPMPZ0H0edki6eWq5ZPq+uZv+lRlP3OsHYtP70N20f6CfnWTqxPyOAM5sxQYC0y@vger.kernel.org
+X-Gm-Message-State: AFq9FYJXeaOXQ3znxjefPgnzu5W3fwfZeKhfzWARq4iCmzmHQi5ut3D2
+	4GnTPii9SDN9NX8TattbKmWyh8ocg05gfhK3b8Pe/Jn8v2F5Ll0Q7g9bNaYeywQftD46NKb/QvM
+	pFqdP3OpR4bUQ+Gw2yGKoqZqoxrj82fk=
+X-Received: by 2002:a05:6402:d0e:b0:6ac:765e:def2 with SMTP id
+ 4fb4d7f45d1cf-6b408ee816dmr216752a12.41.1792545380073; Tue, 20 Oct 2026
+ 18:16:20 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -55,25 +59,41 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <CAD37_9gRtYiiKOV-efL7HAaP+_F7CUhv6k-iJhfwnEwuYt3GWg@mail.gmail.com>
-In-Reply-To: <CAD37_9gRtYiiKOV-efL7HAaP+_F7CUhv6k-iJhfwnEwuYt3GWg@mail.gmail.com>
+References: <20261020190351.9445-1-mike.michalo@gmail.com>
+In-Reply-To: <20261020190351.9445-1-mike.michalo@gmail.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 21 Oct 2026 10:07:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9CNgQb0XxZ6Emue_cXWw8YAbmGuO+nk=DVMCKKR15p9A@mail.gmail.com>
-X-Gm-Features: AclHuK-2-U9dNuIKJYVW1bdcw0b-kMfroshV1U87z8YoDffsr0q7mmj1JJ86qrU
-Message-ID: <CAKYAXd9CNgQb0XxZ6Emue_cXWw8YAbmGuO+nk=DVMCKKR15p9A@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: reject foreign RPC pipe handles on IPC$ read and write
-To: Mohammed <mohammed.saad.alquraini@gmail.com>
-Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Wed, 21 Oct 2026 10:16:06 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8Y_+soRjs8s+EupSURydcLoXfwgrrU+LjxYAakzPMbEw@mail.gmail.com>
+X-Gm-Features: AclHuK8arYULqtYMW9gfJfd5c06hmRFBXIgTLGP7s0acrXJOvgNIfJ5Q1906mRM
+Message-ID: <CAKYAXd8Y_+soRjs8s+EupSURydcLoXfwgrrU+LjxYAakzPMbEw@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: reject FILE_ATTRIBUTE_TEMPORARY on directories
+To: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 21, 2026 at 3:19=E2=80=AFAM Mohammed
-<mohammed.saad.alquraini@gmail.com> wrote:
+On Wed, Oct 21, 2026 at 4:03=E2=80=AFAM Michail Andreas Michalopoulos
+<mike.michalo@gmail.com> wrote:
 >
-> Hi Namjae,
+> Setting FILE_ATTRIBUTE_TEMPORARY on a directory with SMB2 SET_INFO
+> (FileBasicInformation) succeeds: ksmbd keeps the attribute and, with
+> "store dos attributes" enabled, also writes it to the DOS attribute
+> xattr.
 >
-> Patch attached for the IPC$ pipe-handle issue I reported. Tested
-> locally. Thanks!
-Appied it to #ksmbd-for-next.
+> MS-FSA (FileBasicInformation) says the request must fail with
+> STATUS_INVALID_PARAMETER when FILE_ATTRIBUTE_TEMPORARY is set on a
+> directory, and Samba rejects it too. smbtorture's
+> smb2.create.dosattr_tmp_dir checks this and fails against ksmbd.
+>
+> Return -EINVAL, which is sent as STATUS_INVALID_PARAMETER, when a
+> directory is asked to become TEMPORARY. Do the check before any
+> timestamp is changed, so a rejected request leaves the open file and
+> the inode unchanged.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Assisted-by: LLM
+> Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Applied it to #ksmbd-for-next.
 Thanks!
