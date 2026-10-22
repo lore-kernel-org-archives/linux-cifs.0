@@ -1,80 +1,80 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792641211;
-	b=0XrHDmt3ssdOeycypJeYJM8GaTnV63zFxEM5u1Ba5XHQxzuNt1Y4iGNAaDAfXuo8zBC7
-	 4UbgRFm6w8lXoK9mf3qBiaUhZJ/09J2NxDF/ApJi/NrdF/qwgB3/zB535+bapJiaACGvH
-	 o8ERyzXzByErn1qeY/xajdARMVCRrEx+IuRgK7NwAmknob1uUGUq1Mb3E0X2OR8DI9pvo
-	 r+7kfwuX5bR2YwdFnOajk2hHuKfF54yc/T2SyNxL8FnHksBrd30nL7gDBhllEt+2XYiE3
-	 /cm6zSn4vZ3Oo4mrBvDSaN9mAtGio00Sl/H1HfjKRYUDtzRqoEwT+XL0SlmqKjsdyrw==
+	t=1792641218;
+	b=jOj/kipPSFYcERTF7WCjF8SoZU31FqTxfp7PNaPAAk3xGxg+2xTNYmX0Oj7uEyj6Guyy
+	 S5oQwtAUCH1+kfq7Un/KsCxajrLj0WUUjB0sKVO4RYSHrdcr4Vvs3ylBhL+JyOraHcdMi
+	 PS1QjlHfXva21w6sF2sWRh2fn1iVUKdsnpbKHDCXpnguPthesQOFMqSQo7i1YuZtzVpq4
+	 r9U2tRiHk9JsoJcq9fuaixIUHuJVMlsi/ESZf/Tqx812YXGkxse5qq5rHgxz9CgHVWFvs
+	 4gJ+l3u+9dXCPwloMFxWZEkaBQjjT9gcdo3CCyU1yj12tCDl8MyKTPOH4V+8cdqgdHg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792641211;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792641218;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
 	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=PFcEYtHPDZ2pIPyW3D/zakCIslo6EG3bD7BCUgb7zS0=;
-	b=X+cMzWPeffziGrQ8Tk4REf4sgcVowdNr/hbTkj/Yjg/weCFf7PkTsrmxDndAyLrzohQ4
-	 Vla84rgJvUzUMTKq6cumcSeYPRgPC7x+VmIzOHoj2ecZ2NriFtmzZes/WJevmnH9EWeSI
-	 YjrdTTnjSUumgiFR2AuE9K04xJPg8Ax8I0EUsYRrZ2wKZci+/NC7GSkZpEyLm5LdMcw49
-	 PX9levwmRxNqO/AiTAb+n+NChuHnK4DAjOE5pjqWTEg3Fmnj3ZE0QkFsxjp9XZlh9Jx8W
-	 mRqYrwik3zS0zMmikGXqN+PQuvoy+tdhqlFs0zxHai3mnVrMBwF+lIwyvvb21Fw6yTA==
+	bh=81J3smnygA2s3kCWaWEydJPIgP+ALOjjSzDrlRy5GOM=;
+	b=X4lxtCi7PJo8j1QICCGnrYlHyqU9aY2G9ZEDVPLqq1lqRzydeyXR9I3BnT3OqhZLgssi
+	 Djiz04UtY21EGvdJZ2LGhBDOurCxw4TCWhsQSUfrFBHA4kHInZb7IRJXOn01OXI5C20Ev
+	 21FcjvdiTUG4owE0jtE4g/zpUDHaaEl8FTGxsyt+BdTCrqwkbYizkEanuJdY2IgSiZemx
+	 DhpxI++MjQLSaEWcYgfZGUGM8nOrb5J/h0e5o4K0PMyvF8CGC4Gsc6dXGP9RIuPx8p2RY
+	 zhZi1XiVztpNQ2tEZPvEN9zs903sl/Zz3GUxRShmqXBbdf74+NQ6sjVfqZ1MpE762Mg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=FMqL+8ZH;
-	arc=none smtp.remote-ip=209.85.128.42
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=h5dPeZ+P;
+	arc=none smtp.remote-ip=209.85.128.48
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FE8606A319
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 03:53:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B7FE8606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A41606A320
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 03:53:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 36A41606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=FMqL+8ZH
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4a1b07c3c5fso12336955e9.1
-        for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 20:53:30 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=h5dPeZ+P
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-49d05d51553so9795545e9.2
+        for <linux-cifs@vger.kernel.org>; Wed, 21 Oct 2026 20:53:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792641209; x=1793246009; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1792641217; x=1793246017; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=PFcEYtHPDZ2pIPyW3D/zakCIslo6EG3bD7BCUgb7zS0=;
-        b=FMqL+8ZH9ONMWspAF8nRpPBJqk5QDZtF5QeuMWh+aapUCPJ7jomchmxdjUxPjq8mOK
-         PbqpzMd/W0i4Zvw5bsbToURV3dwH6Nnpj+7e/a+9VF2iYsIC31hSlsZTVnPduJ1ifdbZ
-         hp5JIeDyf9+4t5+IbMxumxb5jBppGp4ZWY1ASie0brS8yUK+BS1N2116VPnVarnfLAyK
-         rrkKzfrFVQPOAKj6PUaooI81hO59sisaoHFG14VuOrgtvTBbtKkPkcXuKKhnjXwOzevv
-         nPnt5dGNrljKoIkJL/GSfw2RnEh7D6hszsxcXWC+FUxYAbGmIKIcPNeD4TRPk0MALfsw
-         Jzjw==
+        bh=81J3smnygA2s3kCWaWEydJPIgP+ALOjjSzDrlRy5GOM=;
+        b=h5dPeZ+PhvVJ8IkAxiRIc1zrTHCrLKeJW357TN6gvuntRyx0ZT/+C1AcDCauXQtabp
+         WhNMS7vkHg090RJHV7vJwxdspfaISi+2t3JlViBluJldeYQTRTqQdT9duypTfFQXrnWs
+         4w1KFEEPD63yxsjx3m9hvXrthhDen3863XVvyLrVsxYUaCXIlMoJzVXj86wV3oPkjqVS
+         o5t6+90xP9/B5yiWbIyLw0yaHgvkqJaJ0vEHq3sUrri7/bZJmUM9l8DFCFvZYDtTNucb
+         rrTSqQEeiFDAWyQpnerEJfZUYvKdk9uZSaY5BU2mh0a0XDTY5tjQCOCBCkuu9Mnw48Xp
+         tbFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792641209; x=1793246009;
+        d=1e100.net; s=20260707; t=1792641217; x=1793246017;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=PFcEYtHPDZ2pIPyW3D/zakCIslo6EG3bD7BCUgb7zS0=;
-        b=qLukL4ZE5lTOvpnWT5suzIhAtjSNSN0EN9TY1t2DEC2/rgzHRcTw7pvlFkiO2ghn3t
-         4ZvECqfRlWI8M3DqqnB4gt51xEnU/fSyAeBiplVO1hvJ9/UhNO/lPCQ7PUEOIXkmMxpE
-         bz0x3jESgsWxe5g5yQnZguFpJmSjMjQgDHsg+mdMEUqSP5fa9DGU6c6lvEXhSyavZHwm
-         /aXFSM9DhKxCXhmcctyOS7LIJGm3Ufd4fB1KdZPa7QJV1AQswzwODp8aCrnrSCrL770A
-         DVwoWD6nrGhYx47zIxwLp+A3WtcpE+7V/LyAwpXu1gFF6t9zkUMlcsYEzBs5WMelHcnR
-         FAVA==
-X-Gm-Message-State: AFq9FYI3RMAbRsXVp7YEL3aVBUa1KT8NwOLIT31UPywUkJh9ajIBn5Ql
-	N5gTK0b1parWv/8lum96Wy0wW9oWa4z8px+IHME8/RZsPdBYda7KXRvDNLV3t337
-X-Gm-Gg: AYBFou2UdsUMaUMInmdKcEWCco+9EXpFPZzdyBkF/8MH0LqMuqm1uYt4Phf6aHHsLFE
-	uPFNpEGPfLmHP9qRgMarsNGhcasUNnXhND7qeZ5ZGLo+GE1bwEb2sOvxICv44qna1pzaJiiTxGK
-	4whJWO5HwJ6ZyRa6GD9shOX8Nty0RXRzkPBq7F1RUf11j4NrTZfID1maFb3PR9I5U3FJyvS220B
-	hfH5RvOItRUgT84YJ2/7ZGkSBdx8lMAcxu47IpGGxozjXxJKjG0LYGRY10RiRvicDgvyEq0x4uu
-	PK7fwGkgzRCQ4VnPsvV3jL8Bkw6s/E006CG/7OVSjSDVebl/b4OmvHGOrJyKz+QnuU1PJGenCEd
-	lLiICKcpZ3fXOkjpE6dnkAnKLszZ3LdvEGdWBCcDNmAcOdc/XcmDnw2lU+k0fOmRXZmgtkCLWxM
-	iBBHN+wZsRIGWgHQyAcfm9ul9YDVepa79OVLoCIeneNcfHRfTFGj+IcgyBklmPp6kVRFU9lh5OW
-	EibFO1SxFPxpF/DWbZFIPw8gHOJNabIVSBQ91WbvDOAcJicGEcEUyM2ZFKudyCw15Zk9ifea5fK
-	pszWszmESVamdT1+Oaedgudk/DIapbGw
-X-Received: by 2002:a05:600c:6309:b0:4a0:1f90:594b with SMTP id 5b1f17b1804b1-4a1fdd293d6mr68900625e9.22.1792641209082;
-        Wed, 21 Oct 2026 20:53:29 -0700 (PDT)
-Received: from SurHub.localdomain ([102.218.51.146])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a203b42befsm35838025e9.8.2026.10.21.20.53.26
+        bh=81J3smnygA2s3kCWaWEydJPIgP+ALOjjSzDrlRy5GOM=;
+        b=eHqjs8mQnJhi/YCaVtdwcb5n6OqeY8TVVvjekzhMV9eLU8EOURH3i5BxuY78dlrhX9
+         bwUhIViZUfzhCxcfABjgHjjbu6SDNo7c/K/Qq2BYtc3SJdwnqSi18O3R+cfhygNmDSIV
+         b25s+tyZZnNHfGiLO3udg6jH80qmyVBL4wdSrEGlIj8UvxtjxGHo5/plHn5J9BtEs/6x
+         DXK53uJk/fk1PrLhjAMy05MdXACCW8SIN81Pjbcwmx0ZIYqqMlAfIkxspvEUvi6VF0Gm
+         yC6ierK7MpdyJBAFqQeD2DIHonRrGlR7JyUeTfuSfYtcULLEk+ljHP6y1QFUYNFhkoCu
+         bBOg==
+X-Gm-Message-State: AFq9FYKuIf9EG5HZsfg0Uob6ymLbZjwXu+TPkGuFJ7HQIkq9QLHVIhOz
+	SY6vRQgy0wO7R1+p1f5Lg372k1u+hyOR82bnjy74CVIPNMHcfEhSC3mcthyvkA==
+X-Gm-Gg: AYBFou1BoJWXbHjl41bmw+Y5C1TKTE/Ao48Z1vBKhD4JMishSoeV4U0QPYaKcXr1X6x
+	2vsqv2quGNEX2JqRQWsZUSrfNpGtdgrShD0C6j2TXLOUv/uCA8w+FFBRVtCMNtCbI8nWDusP8g8
+	QQ3q3o7EqYabsNkltPbuN9nLB/bOhQsKlFfVAyx3C/cZWJALzmRlsEfZ7guzzzvx5f4gdrS4M25
+	XJZE81AM3V6+ky5eNwhs9xd7okzUWtopWRFDvmox/lY4z/pSZnDYYxAIH0ZRpNTmVDuq9BtF5Vc
+	s2zPJYqJsgYAslVByxCvW3r0FxAsO6YkkfM3xXE30rAaPq5lJ4mvcUPpwAYyPjw0Qp7MnRj3WQE
+	ukDFhAy1HYbgSJr/hsYFovdmxYFbmeL860WQfoNaXFzp7DMuXY0JrtCI/P/+3x+ZShEiUThMwW5
+	syE60aZWGsjIkbbTqiVqRFb1NuXPaoy0G68syF2wBp1yzYFgHtLVTSlifypMHSXvKR+jocGKGiw
+	rKfr2W1mugZO3CMlALsbG4UIjCdUVhUNjNPhFevFI459goB71pWyRBsqVDQYkhh8tAHPvF84uzI
+	C87czLOEKBpYd9udDj8SN4ybPSIWgNs=
+X-Received: by 2002:a05:600d:4:b0:4a1:825a:56fd with SMTP id 5b1f17b1804b1-4a1fdd39eddmr63730625e9.32.1792641216572;
+        Wed, 21 Oct 2026 20:53:36 -0700 (PDT)
+Received: from SurHub.localdomain ([102.213.69.52])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4a1fcd70027sm44020925e9.0.2026.10.21.20.53.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Oct 2026 20:53:28 -0700 (PDT)
+        Wed, 21 Oct 2026 20:53:35 -0700 (PDT)
 From: Abdifatah Suruur <suruurism@gmail.com>
 To: linux-cifs@vger.kernel.org
 Cc: Paulo Alcantara <pc@manguebit.org>,
@@ -85,9 +85,9 @@ Cc: Paulo Alcantara <pc@manguebit.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	samba-technical@lists.samba.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] smb: client: fix fiemap wild read on empty truncated response
-Date: Thu, 22 Oct 2026 06:53:23 +0300
-Message-ID: <20261022035323.17832-1-suruurism@gmail.com>
+Subject: [PATCH] smb: client: validate the data area in SMB2_read()
+Date: Thu, 22 Oct 2026 06:53:29 +0300
+Message-ID: <20261022035329.17871-1-suruurism@gmail.com>
 X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -100,52 +100,75 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb3_fiemap() treats -E2BIG from SMB2_ioctl() as a truncated range blob
-and loops for the next chunk. If the server reports
-STATUS_BUFFER_OVERFLOW with OutputCount == 0, SMB2_ioctl() returns
--E2BIG with out_data == NULL and out_data_len == 0, and the existing
-length checks accept the empty result. The loop then evaluates
+SMB2_read() copies le32_to_cpu(rsp->DataLength) bytes from
+(char *)rsp + rsp->DataOffset without checking that the range lies
+within the response actually received. A READ response with
+DataOffset == 0 makes smb2_get_data_area_len() zero the data length, so
+smb2_check_message() accepts a frame as short as the fixed response,
+while SMB2_read() still uses the server-supplied DataLength, capped only
+by CIFS_MAX_MSGSIZE and the caller's length.
 
-	next = out_data[num - 1].file_offset + ...
+A malicious server can answer the synchronous read used by the
+mfsymlinks (or SFU) symlink parser with an 81-byte READ response
+carrying DataOffset 0 and DataLength 1067, making the client copy 1067
+bytes from a 448-byte receive object (KASAN slab-out-of-bounds; up to
+16 KiB in the general case).
 
-with num == 0, reading 16 bytes before NULL.
-
-Reject a truncated range blob that contains no range, so the resume
-offset is never computed from an empty response.
-
-Reproduced on 6.6.87.2 with a malicious SMB2 server that answers
-FSCTL_QUERY_ALLOCATED_RANGES with STATUS_BUFFER_OVERFLOW and
-OutputCount == 0; an FS_IOC_FIEMAP ioctl on the mount oopses in
-cifs_fiemap() with CR2 = fffffffffffffff8. The code path is unchanged
-on mainline.
+Clamp a zero (or header-overlapping) DataOffset to read_rsp_size, as
+handle_read_data() does for the asynchronous path, and reject the
+response unless DataOffset + DataLength fits within rsp_iov.iov_len.
+The SMB1 helper was fixed the same way in 5be5bdda5863.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Abdifatah Suruur <suruurism@gmail.com>
 Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/client/smb2ops.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ fs/smb/client/smb2pdu.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 20624f5df..7eeb33640 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -4360,6 +4360,15 @@ static int smb3_fiemap(struct cifs_tcon *tcon,
- 		goto out;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index f276acf7b..8291eadd7 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -4947,6 +4947,7 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 	struct kvec iov[1];
+ 	struct kvec rsp_iov;
+ 	unsigned int total_len;
++	u16 data_offset;
+ 	int flags = CIFS_LOG_ERROR;
+ 	struct cifs_ses *ses = io_parms->tcon->ses;
+ 
+@@ -5006,8 +5007,29 @@ SMB2_read(const unsigned int xid, struct cifs_io_parms *io_parms,
+ 		*nbytes = 0;
  	}
  
-+	/*
-+	 * A truncated range blob must contain at least one range, otherwise
-+	 * there is no offset to resume from and out_data is NULL.
-+	 */
-+	if (!last_blob && out_data_len == 0) {
-+		rc = -EINVAL;
-+		goto out;
++	data_offset = rsp->DataOffset;
++	if (data_offset < io_parms->server->vals->read_rsp_size) {
++		/*
++		 * win2k8 sometimes sends an offset of 0 when the read is
++		 * beyond the EOF. Treat it as if the data starts just after
++		 * the header, as handle_read_data() does.
++		 */
++		cifs_dbg(FYI, "data offset %u inside read response header\n",
++			 data_offset);
++		data_offset = io_parms->server->vals->read_rsp_size;
 +	}
 +
- 	num = out_data_len / sizeof(struct file_allocated_range_buffer);
- 	for (i = 0; i < num; i++) {
- 		flags = 0;
++	/* The data area must lie within the response actually received. */
++	if (*nbytes && (size_t)data_offset + *nbytes > rsp_iov.iov_len) {
++		cifs_dbg(FYI, "bad data offset %u length %u for response of %zu\n",
++			 data_offset, *nbytes, rsp_iov.iov_len);
++		rc = smb_EIO2(smb_eio_trace_read_bad_offset,
++			      data_offset, *nbytes);
++		*nbytes = 0;
++	}
++
+ 	if (*buf) {
+-		memcpy(*buf, (char *)rsp + rsp->DataOffset, *nbytes);
++		memcpy(*buf, (char *)rsp + data_offset, *nbytes);
+ 		free_rsp_buf(resp_buftype, rsp_iov.iov_base);
+ 	} else if (resp_buftype != CIFS_NO_BUFFER) {
+ 		*buf = rsp_iov.iov_base;
 -- 
 2.53.0
 
