@@ -1,122 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.209
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792644319;
-	b=NI5aQSUVXlrVFeyN1hFIsc1tp4QJ+YlyMrcyoKicTecKoNku3mKVzOUmbYW70WphDC5X
-	 k/p5tr8EtYYc0ch+IFNv1v/ZgOxLOcnPefq5epXMVEKMgXHZuTGBo2pYbw1ZvLDgb6RrE
-	 LggiavRANmNlSWZuuOe59WMf9svGujP0qtz5G5IU66d5Gfo8zyi59V0qR0LXhdDrXmf1u
-	 WqID02sHAfHsyvwCF8RXL9Ud1EdJlJIQ5S8atuyeZWbQ5zBDD9KjDt3ym8v957yqpTKtI
-	 5zQuWXb5Mnzw2SrWsNY9szrNK+qNJhR20hohgJgp9mtdPtjHSrvMIC06kH+Q4i+R4lw==
+	t=1792661153;
+	b=jRugmDufF3L2AXzMoijsLD54cY91Qzk3TDKypG5KfiShU+sMvuq2/RjDdfSjWAHylYzC
+	 EWWv4SzgLB/PzKrpGY8AFc6r3V5MX+UvnliDdWqR17XqAuE4Zf3BYEGLO09tbnnng3vx6
+	 dNFZEnSUiqaXW2/oXrbJGCqsvALS73pNNErTUtnKRWap09EbCU5vzQd1gfhDplWlbFuZH
+	 FiOBbPM9+9N5K0PEvDOGQTCIGaOjABw610P0kpZvIPzNtCq8avlcuCw2+PD4JSj4NqkBx
+	 vfCmmd86m4R5GpAojLpXksP2n/ugcFFcYwq5eg1M7/Q3oME2BVPe0jZ94MW9ce22n3Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792644319;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To;
-	bh=fvU/xT1n6WUXL6CIEnv7Qj8NyfoBmX5QYCSZ7an/E+s=;
-	b=YXERkYgQnMtUQR+2xys1/42RSDLz4EjhxU4CwbhHpUeqoUouA/k3nWCe2OSp+tP432G6
-	 craou5TEQnRW+qRvcC0RyRg0mV5tZ62MkWrMnFjx3++b4/d1+6cMFWGLMSGoIbn3g70lA
-	 bJXGp8nPVbMK7jjm+jzLeqZR8kfoOSlbNv+9LlGAkh/aflguobAnVX2DZG477JAHEUMtB
-	 jIyc9U2BiLtyOq4gohPlbIaTcVQQ39Iq5VfePClkGXCBpLJMVMKtWjEhU4FWUF0ate8Bu
-	 q+FkQ7xek4PFPAyhS/1r3IWmGMEoIeCndJHKSQgHJT1qjWYOPjcPk/SLwXuIVz+hUjw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792661153;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=AQgdCZwsPjFuYKXLps23Oal53mMZKLM0pyLIrt3gG7g=;
+	b=s3a4mZtNxisA6gz0Yt+73Rp3Z05DeOjYlKAh+5SPuO2v4h7twQfSraSCMtb5vgve5RZB
+	 r2zYbOCQrGBAB7FManAhuRHnK8MQGetQ4fi2yAM7yq8Vr4NL+VCUKnOBO1MxddtO/P0n2
+	 MdjlbBP3AKfP5INJ49P+wjDfK+KcDRKfKAdg/tGwDF1eDEUEiEDnkTZ2iN21lAlLpnOSn
+	 si1C+4APJlAnpC6267MBfccIMPNebAiyrA/18b1vH4whEd+cdyuMj0Njww4bS3nfFWHch
+	 dztsMIHeflJoJ7FXiwVg6kRJZTxvQJdY2iqq8sV/W44JlmGfYxqvxIuuBOHe1atjrow==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kroah.com;
-	spf=pass smtp.mailfrom=kroah.com;
-	dkim=pass header.d=kroah.com header.i=@kroah.com header.a=rsa-sha256 header.s=fm2 header.b=SxVjzwhr;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=y3N5ZDAb;
-	arc=none smtp.remote-ip=202.12.124.149
-Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=R3X1ZN7F;
+	arc=none smtp.remote-ip=95.215.58.209
+Received: from mta1.migadu.com (out-209.mta1.migadu.com [95.215.58.209])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736AF606A320
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 04:45:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 736AF606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A17606A31E
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 09:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 37A17606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kroah.com header.i=@kroah.com header.a=rsa-sha256 header.s=fm2 header.b=SxVjzwhr;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=y3N5ZDAb
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.stl.internal (Postfix) with ESMTP id C66481D000C9
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 00:45:18 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 22 Oct 2026 00:45:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1792644317; x=1792730717; bh=fvU/xT1n6W
-	UXL6CIEnv7Qj8NyfoBmX5QYCSZ7an/E+s=; b=SxVjzwhrQEkqYQj07Ux288k0K+
-	p0UsAA55oN/2oyQJyebLB7wcr72tSxwlZ+E87oRgdbw6caeenuVu6mh0wi82HAUE
-	FuyAAGPtXbNsLwRgryJNBCwjN2mmodzQtyy3pzFd/E6L7huNzR73WZ3wYPk4IY2X
-	t2Wxh4L2hW0wZnk9x2WyRsQDV5uYeD5sNg4Lj9mJmacloZQ5IatbKozxxS1AJyG1
-	ru8HolVUOqooathEzImUBWQa37VR9dq/p7fUVp9EYpcbVwyfRf5DHD233F7klyC2
-	kM6pQTW6DQ97/8RZoLhKalNS0TXXb9BF8utQZpH+dRknpmhFoR5PklXBiqow==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1792644317; x=1792730717; bh=fvU/xT1n6WUXL6CIEnv7Qj8NyfoBmX5QYCS
-	Z7an/E+s=; b=y3N5ZDAbTLdu6C7m8hRxSRoeJzcxHXBvzti60C9CmApQuY7iAe3
-	VG7RWBnInVjBiwynGTiGz2g+nXtge6kSJxWJzIBLYIKT444rZrpDjIQFSOpmaKWI
-	X1vL1EC7opW1d2y4gd+3RmWftRgm0tM489IoJtodq8KipOIxxbGiNFY/sI9P6QA0
-	lDY+OcAW69eM6At2JHxVrauuParMFyXKNQFcrokrKX3VWJAKSg7Ywwj3Y84hWgMy
-	MyPPOTaBlcNyzDDfAsWOvwaHMJDRZhTd+hbWpjYM6hM4vMMY5gxfz7Z05F2xxV/6
-	FGREboCi++S4T0ThxkQjq37GsNOwfQAcqMA==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
-	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
-	action=sign d=kroah.com a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1792644317; d=kroah.com;
-	mf=PGdyZWdAa3JvYWguY29tPg==;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm2:rsa-sha256:OOBfX4M3BFVe91o0rOUVYtdnqBKKuRW1Iek5navSoAk5D+K
-	NjaS/G1i//JzTmdrLtCOrQsXCo8J3CRibr86VCqkGUq2lDYYjOUXtiYdSV0qMsRU
-	3FphZu2o2YRk4QcP+mtTBuGLXLOI8N86cUiv7OMtzwbn4rogj683Bao9a+8f+X/z
-	8ax84b0+6CQ7pWvaFznO39VsOAvwJaBFB4p4utkYbPNAzLVBqI2wud2shj+Q+9AB
-	2Suk+2YQ3zfkQ4QT0dyg3YXf6bVWJkzG8JG/vgEldpF1erPFLKqeZbVK3x8i3/NL
-	LsW2CDLBH7Kg8KW/vx+SbZSzEVIdaoJZUqG7/pA==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
-	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
-	action=mi-m=1; hc=12;
-	hn=cc,content-disposition,content-type,date,feedback-id,from,
-	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:PrCCbUBgXSh3I25FKffQ3ihpERrYJMoFRGN6kYr3OXE=:fvU/xT1n6WUXL6CIEnv7Qj8NyfoBmX5QYCSZ7an/E+s=;
-X-ME-Sender: <xms:3JTZaqjJ1Sv405xCMqt7SrLGs4fBRWL0pKVUlp2BU6i3ApP1WCeKLQ>
-    <xme:3JTZapgKmjP5eZRKdAQVRD8AO6ntNX52s8BkJ2wuMgPBfliSyySQ3NasUl9NFme7C
-    DX0jmR0qvw_EtDHG8sbke9_rUDXZE_qD4QsJsNFpECuedr9rQ>
-X-ME-Received: <xmr:3JTZao4uN2ifIrleo_wIQ1Bjd79X0DOPdiTvnSainKDl3MuWNVjAB7av2i0fYYkAm_grCexxkapPNCsnT0w>
-X-ME-Proxy-Cause: dmFkZTF/ZA7ZzxZlNxSmdfEnbbBE6/8h27D6RdTMZ+FfctkdAlJCzdGPQ7F0jAioJ+DQjw
-    WKNtDOWzQykOmLNynO22Xm430sJUEC2wb4yfnmV4WWYA+E/iWL2nian719md6W7ic5/WFe
-    /DPpMoZAg2Dmw4yaKRuXnRd6kA/AHZhSLbAyK4ogjbsMQrsf9zjgpetk6To8iVV3XmB50t
-    gRYE67UZW/qN17pfdF02WCV01i8p7O7ra0N/bfHsPi9fbZXcmkkg6WuPordqvpAPMJ6jI5
-    AVAu6Pyk72BTHdq96zNM7S2ZoqggrEt+A8BnKWZXe6qyJkMt8lxlHQXrFS/nkj5rd88wof
-    VHdismL7qXKuti4nc6Cmcn5Rbf7gkApRRa3Y1j98WWkVfbBzpc+gK5BYulP5UQwJdwkspN
-    NsTpexew6zyUPmRzA/Tyt9OckUJ5iR/h/aEO1NmeKWLXyLbD81VWLeMzRf7JU9Ngx1Ht7O
-    HGQfW1LmmIPYWV8id85GtuEoL0JVxoFkvVuY5BdaQA+F7/eNS18bilmRWQs50H9sT/6pqZ
-    D+7Je3uQT1uW0TNOjMJGoQY3mZ3vsDUIki0DDq8OABv7pmbPFzZUpAgYvFF4q01FJYsvBC
-    hNo7zwoggm+7y0vUjFCAgTuQeU6fh4yTowE4HeFPX+Nb1+OPYHXmDtMCB5CA
-X-ME-Proxy: <xmx:3JTZajSyoNN9DMAawFjkSpIj22ylf4sbt0wk5exq3GYz-42RzzLqEQ>
-    <xmx:3JTZav_VdasldQOJwEP-69wOljj-UqldKfsDghnF8PdxC8APeXEDfg>
-    <xmx:3JTZasq1u4TvzNJSVCwiMxy5QFvnw_LIAzRpaw1BH_cFJQbUuaUgOQ>
-    <xmx:3JTZatXoJMrH7iIy8QAHdVrpmhl-G9iXuTtacviLMtJoabFAfTwH9w>
-    <xmx:3ZTZag2RpmlODjYLX4TTnwPRZDRB76ckRewzllCwqhEdiWYovvO5QgwU>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 22 Oct 2026 00:45:16 -0400 (EDT)
-Date: Thu, 22 Oct 2026 06:45:02 +0200
-From: Greg KH <greg@kroah.com>
-To: "zdi-disclosures@trendmicro.com" <zdi-disclosures@trendmicro.com>
-Cc: "security@kernel.org" <security@kernel.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	"open list:KERNEL SMB3 SERVER (KSMBD" <linux-cifs@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: ZDI-CAN-33774: New Vulnerability Report
-Message-ID: <2026102244-decade-icing-82ed@gregkh>
-References: <BYAPR01MB383076AC412E19C48CFBEAE980662@BYAPR01MB3830.prod.exchangelabs.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=R3X1ZN7F
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=2yJVVc9YqY0/+reoiHnYhCuNBUGsT9L5rjAhU3GjBh4=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792661150; v=1; x=1793265950;
+ b=R3X1ZN7F+ribIKOTyewA6Eza233ASaLBhnshv8RB1ofp727BI3mhDJZdQMNwPpB4n6dQaOJS
+ qi9t+HTYb1xINYnjxr/9QSl/4T05cAhdBJM5oJjIoZg0hgRxBbtlJMv63E3M2eHio1jYLqy5TZf
+ n28Ie7YL0nNyv1qZ8etVJJDU=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 1d283f1937ad0db6;
+	Thu, 22 Oct 2026 09:25:50 +0000
+X-Mizu-Trace-ID: 1d283f1937ad0db6
+X-Migadu-Flow: FLOW_OUT
+From: Huiwen He <huiwen.he@linux.dev>
+To: linkinjeon@kernel.org
+Cc: linux-cifs@vger.kernel.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	tj@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/4] ksmbd: improve WRITE scheduling and TCP READ sends
+Date: Thu, 22 Oct 2026 17:25:10 +0800
+Message-ID: <20261022092514.2590010-1-huiwen.he@linux.dev>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -126,11 +67,123 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR01MB383076AC412E19C48CFBEAE980662@BYAPR01MB3830.prod.exchangelabs.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 21, 2026 at 09:36:37PM +0000, zdi-disclosures@trendmicro.com wrote:
-> ZDI-CAN-33774: Linux Kernel KSMBD Protocol Dispatch Race Condition Remote Code Execution Vulnerability
+From: Huiwen He <hehuiwen@kylinos.cn>
 
-And again, no patch, and a public list?
+Hi Namjae,
+
+This series addresses two sources of overhead in ksmbd:
+
+- WRITE scheduling: requests from one connection can accumulate on a
+  busy per-CPU worker pool even when other CPUs are available. Route
+  eligible single-channel WRITEs to a CPU-scoped, non-strict unbound
+  workqueue, while keeping other requests on the per-CPU queue.
+
+- READ sending: TCP copies READ data after the filesystem has filled
+  the response buffer. Use page-backed buffers and MSG_SPLICE_PAGES
+  to avoid this copy, with the existing copy path as a fallback.
+
+Test setup:
+  Server: Linux 7.3.0-rc3+, dual socket, 128 CPUs, tmpfs.
+  Client: Linux 7.0.0-38-generic, local 4-vCPU VM; file-data caching
+          bypassed for both protocols.
+  NFS: Linux nfsd, NFSv4.2/TCP, sec=sys, 32 threads.
+  SMB: ksmbd and Samba 4.23.6, SMB3.1.1.
+  fio: 16 jobs, QD32/job, 1 GiB total, libaio; four 30-second runs
+       after warmup. Mixed: --rw=rw --rwmixread=50, READ + WRITE.
+
+1. Baseline throughput (median MiB/s)
+
+  Block  Conn  Workload       NFS      Samba      ksmbd
+  -----  ----  --------  ---------  ---------  ---------
+  4KiB      1  READ         195.59     241.71     292.64
+  4KiB      1  WRITE        154.68     228.92     219.55
+  4KiB      1  mixed        172.49     232.42     236.85
+  4KiB      2  READ         346.23     274.58     401.12
+  4KiB      2  WRITE        312.62     292.39     325.75
+  4KiB      2  mixed        329.28     286.86     345.04
+  4KiB      4  READ         428.34     277.92     463.80
+  4KiB      4  WRITE        387.19     285.59     415.65
+  4KiB      4  mixed        402.74     284.52     397.76
+  64KiB     1  READ        2156.89    1647.55    2152.98
+  64KiB     1  WRITE       1664.58    1956.34    1808.18
+  64KiB     1  mixed       1790.19    1854.00    1961.47
+  64KiB     2  READ        3607.94    1526.36    3345.74
+  64KiB     2  WRITE       2969.75    2706.88    3223.25
+  64KiB     2  mixed       3469.13    1990.95    3285.02
+  64KiB     4  READ        4375.82    1850.92    4213.09
+  64KiB     4  WRITE       2622.47    2908.68    3016.62
+  64KiB     4  mixed       4293.94    1857.41    3950.03
+  1MiB      1  READ        3688.67    2266.23    2142.63
+  1MiB      1  WRITE       3750.42    3782.38    2184.30
+  1MiB      1  mixed       3986.36    3108.39    2827.65
+  1MiB      2  READ        5756.65    2245.04    3960.96
+  1MiB      2  WRITE       3858.07    3418.41    4063.92
+  1MiB      2  mixed       5347.24    3151.78    4614.56
+  1MiB      4  READ        7908.09    2378.32    6750.79
+  1MiB      4  WRITE       3422.60    4138.59    3566.57
+  1MiB      4  mixed       6161.38    2676.61    5471.26
+
+2. Combined throughput (median MiB/s)
+
+Before/After: both optimizations off/on in the same kernel.
+
+  Block  Ch  Workload     Before      After    Paired %
+  -----  --  --------  ---------  ---------  ----------
+  4KiB    1  READ         292.64     282.21      -3.61%
+  4KiB    1  WRITE        219.55     192.84     -11.01%
+  4KiB    1  mixed        236.85     240.15      +0.36%
+  4KiB    2  READ         401.12     404.66      +1.17%
+  4KiB    2  WRITE        325.75     342.19      +5.37%
+  4KiB    2  mixed        345.04     336.34      -2.12%
+  4KiB    4  READ         463.80     456.10      -1.95%
+  4KiB    4  WRITE        415.65     417.24      -1.06%
+  4KiB    4  mixed        397.76     386.93      -2.74%
+  64KiB   1  READ        2152.98    2558.10     +18.34%
+  64KiB   1  WRITE       1808.18    2031.92     +11.69%
+  64KiB   1  mixed       1961.47    2176.16      +9.53%
+  64KiB   2  READ        3345.74    3591.95      +7.32%
+  64KiB   2  WRITE       3223.25    3205.70      -0.54%
+  64KiB   2  mixed       3285.02    3317.22      +2.39%
+  64KiB   4  READ        4213.09    4427.29      +4.65%
+  64KiB   4  WRITE       3016.62    3047.30      -0.59%
+  64KiB   4  mixed       3950.03    3962.34      +0.44%
+  1MiB    1  READ        2142.63    3353.03     +56.51%
+  1MiB    1  WRITE       2184.30    3460.33     +58.75%
+  1MiB    1  mixed       2827.65    3096.88      +9.71%
+  1MiB    2  READ        3960.96    5546.88     +39.95%
+  1MiB    2  WRITE       4063.92    4174.43      +2.75%
+  1MiB    2  mixed       4614.56    4954.98      +7.37%
+  1MiB    4  READ        6750.79    8311.51     +21.79%
+  1MiB    4  WRITE       3566.57    3612.88      +0.74%
+  1MiB    4  mixed       5471.26    5604.89      +3.85%
+
+4 KiB single-channel WRITE regresses by 11.01%. If no better solution
+is found, a request-size check could fall back to the per-CPU queue
+for small WRITEs.
+
+Thanks,
+Huiwen
+
+Huiwen He (4):
+  workqueue: export attribute and sysfs setup helpers
+  ksmbd: route WRITE requests to an unbound workqueue
+  ksmbd: complete TCP frames before reporting send success
+  ksmbd: send READ payloads with MSG_SPLICE_PAGES
+
+ fs/smb/server/connection.c    |   1 +
+ fs/smb/server/connection.h    |   6 ++
+ fs/smb/server/ksmbd_work.c    | 141 ++++++++++++++++++++++++++++------
+ fs/smb/server/ksmbd_work.h    |  11 +++
+ fs/smb/server/server.c        |  78 ++++++++++++++++++-
+ fs/smb/server/smb2pdu.c       | 126 +++++++++++++++++++++++++-----
+ fs/smb/server/smb2pdu.h       |   1 +
+ fs/smb/server/transport_tcp.c |  71 ++++++++++++++++-
+ fs/smb/server/transport_tcp.h |   1 +
+ kernel/workqueue.c            |   4 +
+ 10 files changed, 395 insertions(+), 45 deletions(-)
+
+-- 
+2.43.0
+
