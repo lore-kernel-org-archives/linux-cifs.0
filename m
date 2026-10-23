@@ -1,67 +1,93 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.43
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792758498;
-	b=IHkGNR0jMsc/XL1nPq1PMQ8PSA++1h9FEd+IOMR+uTYIQzghrWP0QQfPhC74qGfO+O+Y
-	 MvNmnNw3tH0atZsseInoWYyR2aneECbmXORw/l9B4IMj+KTH0ZLUu5R0CfoscqdQKnrBA
-	 DZTK7PgUFlB6FkO+EmK5q6xtwprRbWTA25tHl61bZ/jaQqVtU+rtbvS19idJ4OHYLIths
-	 to/rw2lM1Wc3KaDd0EsD2k8syNtJFKjRQfGJOE7x7+q1SD543Ra433304WB+aPRqSza7y
-	 5UdOsVpxZMsTdeuLoavcLLhUKpzDC+ZNW8X2EZNILcL3G4007Gr6u+IOEtB2BeXxUzg==
+	t=1792777705;
+	b=jsMqUIjkdEJsMSPelJZ13KNvFHcooOf+lRUSPzhnCbdqG8cQ6EtILCQmjDI9j2uupeWF
+	 y3OpFYgFLOtXPv+nxIrRychMiqpi2XWzeJLV7kXeKfSPchbUMh8HiRF+x+SpGi7egDf81
+	 iwk7l2VI63vf3VJL7Tv58AO50cIlG19VPDBSW+gfS+ot2aRZ6e1RnqH94/vuTknY+3VKD
+	 nCypYmgd9a1H+lt8sHJd0oZiNmPnFOfjI/CsxrEDFyGRXi15S2S0LbWsxKSIVty4awfMM
+	 oLIGwS4yfgxorPgdSmcAHCOp5VVwB51Iw4+Ly39QM7qYmkj0+6DZJYwtwCho7x6vBww==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792758498;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=zUW3Juk3Hv6ps05jq02d6vrsuj33+so61Tv4SlB/J4w=;
-	b=4/uAi97ygKbKodPklNFyh954eCC11XPxSEQP3FIqqdjAxCuilBASNmU5w2OFFdFsm92s
-	 PX1xdfJRWliCohhZ/b0/F3MBKd4d/87Xa7sjoPdukuJvA6NUc8+jHp4mwKSDgA6t5UrLZ
-	 nKqzELzcjcc2msuJo95UsR7w5D6k5gJa7xAcK5DsgIXw3m2nRbwgu8lYGpitW7luPYqIK
-	 F14DSwNQYz+KLW+mjfaldqCuZoGQEBdh5UySNVD/zWxgMFdUd8MJxp56P5Q2a6kldnUBq
-	 slcfuqYllLw0WCdVqeq0E/xQIwOGDustCl0+2VF5LkIr/8GduGMrxoemduP6UEm+HOQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792777705;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=eXjhl/muhSYc3JZvkf3le3KeLMNcjlVnf0zA1wHM+OE=;
+	b=CWHBYZWO3lJtL+jg2iBiz8hqDyiaymBJOBwJJyNi95zMGWpNf58tUVOJVnTIx5TUWCr2
+	 UTZKIjMU/1IWx8sbYgxk6Qi+fMsx+byW1vhfxqa8g/fixZ6J0CHq9VduhBuSWJ+UYI9Lq
+	 J2Umr0yO1mkyv850x1m0C/wNKx0NdkZ/FGEfHDgNec/N03pBkePsG9nA7mCL+Mx0mKw33
+	 UiTM5YEqpLnE85Rki9dTk8tld6RDBXwQD4o2H5YEHpsH/4S0kQfcK3hJa0xesR6txYBxo
+	 C6XLYaeK+d7aTaNWstRLVRi9Nk3j2r8MTvwXHYqQpp5a+2dgtooY+rbD44YVI9kor+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HJTs4yR7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=o650go5V;
+	arc=none smtp.remote-ip=209.85.208.43
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 055CF606A31B;
-	Fri, 23 Oct 2026 12:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FE1606A31A
+	for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 17:48:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 33FE1606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HJTs4yR7
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 50B0A1F01828;
-	Fri, 23 Oct 2026 12:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792758497;
-	bh=zUW3Juk3Hv6ps05jq02d6vrsuj33+so61Tv4SlB/J4w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=HJTs4yR77oNxlIeDarm7ZYFqHGMjM6njRL20Rb6g5oyO0eFFFaTYvgNpkfWYWiU5l
-	 ScVkHXcShqV2Q8/tn9UR1TBuFTwXs3Sb6dmA8yqW2YOzwp83R3MAeQTB8cL+kCG4Jf
-	 wfKAs5Iete4G7b6syjMM8/FPMaJIUmoRK6Ec081YZgqKxDZ3GcDcqaP4f/OxWWyeu8
-	 dZdC6aiBX0oj8UZG9Ant3u6J9dyGi9G/6439qJuZoiq81giKFxoZh+OeZo1zY6viFo
-	 CVd/E/SHqhNuZN+GrC8eMG6uTV8woIryNgk0+SCVTHF5p9PVhfyjVvq0Z32yhYNHM1
-	 heoT57kP8HPvQ==
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: keyrings@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	stable@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-cifs@vger.kernel.org (open list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
-	samba-technical@lists.samba.org (moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v2 1/6] KEYS: Expand key->{datalen,quotalen} to unsigned int
-Date: Fri, 23 Oct 2026 15:09:21 +0300
-Message-ID: <20261023120953.1206778-2-jarkko@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261023120953.1206778-1-jarkko@kernel.org>
-References: <20261023120953.1206778-1-jarkko@kernel.org>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=o650go5V
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6b1ec41d8e9so1229225a12.0
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 10:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792777703; x=1793382503; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=eXjhl/muhSYc3JZvkf3le3KeLMNcjlVnf0zA1wHM+OE=;
+        b=o650go5VaL1cq/qa4aM55ghk7g/QMFZXazAWMvnWUp8hlV3RMKaeFHLi9KI+20fns9
+         JFU+fBrXxsFbCCZbZMEGXecJWc/9Sl+hYxEMVNtBDauv8LZAvDf1pmBA9vyA/neXfFBK
+         Y5uEJjwBZFdQoOXrpvs1XOCgqy55s3ICHAJX+ebEjRzGQv5GiPITMdkyltwSZFmYjtA9
+         4891WB/f/FJGB023NNyCdiOCmKGS8jiUcrlrWfx15A/jeJMf96We2c66hwuxnOj9ohPm
+         PHwXRGG8jmO8McD8jmtzUJZNlugpViExPX+3Cn47aQ1bso8ym+ILMhl/sFG+45DajLqw
+         E+9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792777703; x=1793382503;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=eXjhl/muhSYc3JZvkf3le3KeLMNcjlVnf0zA1wHM+OE=;
+        b=uZ+C7ze0EOjAlOxJdzLGCgPbKy3+0mt2sqmrNnNX8b3/++HQZdHotINS0Jq9R+9SPF
+         M/zWOhDPpazqZeWHwBSua/hxahgtXzEKe7UudAzxh7bd/KFyE9oiJgbkCG7OJ9sa7NSs
+         fd22r7vfxnIivgWpkiTx59R5uB9KNd+7S3IaHfeaZ71IwvHNlSHCgX2t72YsYNXGnVai
+         wUEajvy6+u4+vh/s02HLwOhcQHiYVjXPG/eR6If4jyzU5ayidgM8XlsbQMy6jxtPD7k+
+         7iCnt+NO8n+6LnELypuRZzHgVCgqVCu9K/gV3JLUC6evcPalVMkhKOZIjeIL8ajxxC5t
+         A/Wg==
+X-Forwarded-Encrypted: i=1; AKwUvBy5QWJwFlVHYGcRCd9b1EydMGTqc/OvJHpykCtpS8Z6h0FEKUZP50oAgpyDtWA/iqaMwcmSkgY9N5i2@vger.kernel.org
+X-Gm-Message-State: AFq9FYIQoaxGJNBlJt+Fh8MiqdrHeHLRpM+toM1GG0HQvqXhom2l8fLi
+	grXF/gquHz2NHvthPqNz/F1u3Qou0738pjfJzxwT8pcVbAqN5Oq2bkfQXSdnKwLWQ+0=
+X-Gm-Gg: AYBFou3t7VE+KZy40PQdIb4OxV+84EZIcvXseIYYCgvyMDA+GvS5OBh0hz1xIHGAjVt
+	xotCEYFRS5niw7FM1HQHfGDpJbPmwExL2BQEA1+8qzeo8xPo2H8mpoQ8jJerdCDUvTreBe0Et9c
+	KHksEMBYoQB75HGB7zp1XIjvZzgqTezcgfXiyLf1QbIztK87RD1JZPZOR0BpA6xoAAUqWUl9YEB
+	J7K7FP5XHKIKoaBMez0f5ePaVlc9mJYkP4yXYLG9HJr9KG1KlaLH5Kyi1eY/VHjcetnAOOw4joo
+	Ro9l4NHsMgcHvRmRBKuGbltYZJsXmzuzQblowcjkMO+3//i7cwH8i+0i4x+7cFZBgABi6++2j1+
+	8TSL/MTGujAjUtWH9fcs2veGffYVf7RbwTyeLiifX0lxGu4Y6bn+xHwUMqUA1BxTW6to8sZRu1c
+	IijBiGD6rlfHwEaj2wybtkC8ygkHnGb1sVJntOaXBt5s48zvjYCFZaZxsL1RsY1e7PZTofKBaKH
+	rtb1gSk6PdoSqzS9O8Dsi6TGoPzI2lwvGSA6uZe3fZZPe92jRnWtcNzFNQLYaf6ao5WiGo2WXfF
+	v68L0oEqWB7QH2ZVFNS8Q0NjvRjg7ijGStR20RUlR2CprmO8xkPqx0A0vFOyYsSRzya7qFn9VOH
+	n596JHP7jMbA=
+X-Received: by 2002:a17:907:d1b:b0:c42:24ea:3220 with SMTP id a640c23a62f3a-c46a926f252mr449665066b.31.1792777703317;
+        Fri, 23 Oct 2026 10:48:23 -0700 (PDT)
+Received: from localhost.localdomain (ip-80-113-117-72.ip.prioritytelecom.net. [80.113.117.72])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46b8da997asm25018766b.79.2026.10.23.10.48.22
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 23 Oct 2026 10:48:22 -0700 (PDT)
+From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Tom Talpey <tom@talpey.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	linux-cifs@vger.kernel.org
+Subject: ksmbd: AES-GMAC signing support?
+Date: Fri, 23 Oct 2026 19:48:21 +0200
+Message-ID: <20261023174821.17552-1-mike.michalo@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -73,89 +99,31 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In key_alloc() and key_payload_reserve(), key->quotalen and key->datalen
-can receive values larger than USHRT_MAX.
+Hi Namjae,
 
-Example:
+ksmbd currently negotiates HMAC-SHA256 and AES-CMAC for SMB 3.1.1
+signing, but not AES-GMAC (SIGNING_ALG_AES_GMAC is defined in
+fs/smb/common/smb2pdu.h but unused), which is what Windows 11 and
+Server 2022 clients prefer when it is offered.
 
-  keyctl new_session >/dev/null
-  owner=$(keyctl newring owner @s)
-  keeper=$(keyctl newring keeper @s)
+Would you be interested in patches adding it? Roughly:
 
-  for ((i=0; i<16384; i++)); do
-      key=$(keyctl add user "k$i" x "$keeper")
-      keyctl link "$key" "$owner"
-  done
+ - accept AES-GMAC in the SMB2_SIGNING_CAPABILITIES negotiate context,
+ - sign and verify with gcm(aes) over the message, using the nonce
+   from MS-SMB2 3.1.4.1 (MessageId plus the request/response and
+   CANCEL bits), and
+ - keep HMAC-SHA256/AES-CMAC behaviour unchanged.
 
-  awk -v uid="$(id -u):" '$1 == uid {print $NF}' /proc/key-users
-  keyctl clear "$owner"
-  awk -v uid="$(id -u):" '$1 == uid {print $NF}' /proc/key-users
+I would test it with smbtorture's signing tests and the ksmbd CI
+tests, and check the existing signing paths against an older Windows
+server I have access to.
 
-Because key->datalen wraps around 65535, the quota refunded upon clearing
-is truncated, causing quota bytes to leak in /proc/key-users.
+I have exams until mid-November, so I would start on it after that,
+and as it is a bigger change it may take a few weeks. If someone
+needs it sooner, I'm happy to leave it to them.
 
-Change the types of key->datalen and key->quotalen from unsigned short to
-unsigned int so that they can carry the full payload length without
-truncation.
+Before I start: is anyone already working on this, or is there
+anything you would like done differently?
 
-Cc: stable@vger.kernel.org
-Assisted-by: LLM
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reviewed-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-Link: https://lore.kernel.org/r/20261020174325.2229448-2-jarkko@kernel.org
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
----
- fs/smb/client/cifsacl.c | 6 +++---
- include/linux/key.h     | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index d1a92bb4d9a5..e7f7ccf2a158 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -385,7 +385,7 @@ id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
- 		goto out_revert_creds;
- 	} else if (sidkey->datalen < CIFS_SID_BASE_SIZE) {
- 		rc = smb_EIO1(smb_eio_trace_malformed_sid_key, sidkey->datalen);
--		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
-+		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u)\n",
- 			 __func__, sidkey->datalen);
- 		goto invalidate_key;
- 	}
-@@ -403,7 +403,7 @@ id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
- 	if (ksid_size > sidkey->datalen) {
- 		rc = smb_EIO2(smb_eio_trace_malformed_ksid_key,
- 			      ksid_size, sidkey->datalen);
--		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu, ksid_size=%u)\n",
-+		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u, ksid_size=%u)\n",
- 			 __func__, sidkey->datalen, ksid_size);
- 		goto invalidate_key;
- 	}
-@@ -498,7 +498,7 @@ sid_to_id(struct cifs_sb_info *cifs_sb, struct smb_sid *psid,
- 	 */
- 	BUILD_BUG_ON(sizeof(uid_t) != sizeof(gid_t));
- 	if (sidkey->datalen != sizeof(uid_t)) {
--		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%hu)\n",
-+		cifs_dbg(FYI, "%s: Downcall contained malformed key (datalen=%u)\n",
- 			 __func__, sidkey->datalen);
- 		key_invalidate(sidkey);
- 		goto out_key_put;
-diff --git a/include/linux/key.h b/include/linux/key.h
-index e40b5267658f..26139c3adf62 100644
---- a/include/linux/key.h
-+++ b/include/linux/key.h
-@@ -216,8 +216,8 @@ struct key {
- 	kuid_t			uid;
- 	kgid_t			gid;
- 	key_perm_t		perm;		/* access permissions */
--	unsigned short		quotalen;	/* length added to quota */
--	unsigned short		datalen;	/* payload data length
-+	unsigned int		quotalen;	/* length added to quota */
-+	unsigned int		datalen;	/* payload data length
- 						 * - may not match RCU dereferenced payload
- 						 * - payload should contain own length
- 						 */
--- 
-2.47.3
-
+Thanks,
+Michalis
