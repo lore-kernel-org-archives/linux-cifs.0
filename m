@@ -1,114 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.222
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792720477;
-	b=of2G2kKchZJMpPx1xUuU/0xB6lq3RASsFVjNCZeLdcZY3ReeBU6BsVdhiv4P6yhv26Ax
-	 7I1orPA2SVUUUxMGXHHBHdPWHG9Q3dQ7CfWvExKTYGSAiVnID7/MocdZBSNhFUNbpGv74
-	 yf0cQ/gvvZeoPrhmNwxYMlxzp+Z7cLTUM9t9IYFn0OtBXjTF7HPd3K5slDWAGKOEYt1wN
-	 L3e8ZLQh+/9vdDP3b7PQCsEsnUuUBFYQfpnAa1tINfNQwIFN61UMUPabAMOkTJguXQaz8
-	 riKksyj1KlSMaWZeR/u6zg7i8ZtVcQWo9xfBRNdic5R48JcvzpSs47pdTiWTXRFOE2w==
+	t=1792737102;
+	b=TS5548k+iAHufYgIiUYXNqKtGMyUZMoZTRO1guZIi/hgpZjcOx86YjNPP5dv6SQZ+GaH
+	 Gsy0D+V7+SJ2kyDKSpTg8/cAYO6TK5/dQuBPBxEPW2tAeZ5Hsn6PzazkKmjWI7kFDM0XO
+	 NV7kRDn0183vM6V+VgIdSmA0XHDyb/8VGRm3vc/LKshW0fJ8fpUsshTjIYmNiIB0nBy9+
+	 ntmL9VJs9sNtB67REuvR7XL7piv1S+1iUDKDs6oOqTvZuuUhVmDJWqn1SZ7gkceeh2ssU
+	 Gtx9WGMPWbQyf/UpgSP4YVsWgInhp7NI4GgX7MOrRwX1bnuDSjvOTKfTDGTL6jw/jzw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792720477;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:Content-Type:Content-Transfer-Encoding:MIME-Version:From:To:
-	 Cc:Subject:In-reply-to:References:Date:Message-id:Reply-To;
-	bh=3cAVfwbFrCNgv2+EqKpRHgNC9c1tU6GEEeKaHSj02bk=;
-	b=vCVX4BnPiXHj0NLwX8wIhiwhU5UlPtA157r1clg0KbP8QdzZF8RJznDtHONOc5dYrSn2
-	 MayfLwo+8GgesiuJ71MAoC/w0HcW5yYjjuwR7CXW1yCNRNarqg6ksj/6rZofZqIW/SFp/
-	 1W6cV6kBLRicxz5clMVLblvjIo5cKlBfYd1cF2CSbnwZre4U97qYRZZbVnaHN9kDM8i8+
-	 hZzFFwCo3+5yGW+04HdEx3qahcyH6UuZ64shShaEThOZkkLuOGhIAmt5SWTI1sgcNj6z3
-	 t4I1xcq073cT3owKPRzmP0mnTJUdkW6gR5SStRDX4anL9u5wqRcjwSH5w37X07IxT/Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792737102;
+	h=DMARC-Filter:dkim-signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+	bh=33tGxL4pQ37PAm6R2PA7y86/iQoPs+fP5QCASbIaiW4=;
+	b=xn1+RmYFdw7qrRYR9dl4JePRPxfSHmmoUuaMKbgZZPOQAU8LUTVS6MbyGc47mZGqmVMA
+	 9hTK5GHmkortqh/zmUl090slU7WW19KEOc/khfyQt8XE7JZiE8qgBaiDJ/eO1Kti9f0PI
+	 qzcEO95xoZzoJor2hANil8Yo/0sqFeiN0KWxzcn3SFcHtjmeHStqPTepLi10yjPOZ3IWO
+	 evsgaKf9GmrBjAUeMMfcNX8c+IgzgehralFgEcmf/hjRqa7AKO7RQhQKOBzZPP8OdZdl2
+	 ei84XwgD2c79KBKlc4HQnYg9BlEbzOf+pFLcu4BNZQKHr6kX0qNZr0u6HsvLcXsVqiQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=ownmail.net;
-	spf=pass smtp.mailfrom=ownmail.net;
-	dkim=pass header.d=ownmail.net header.i=@ownmail.net header.a=rsa-sha256 header.s=fm2 header.b=QpmGQ5bQ;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=x5w1ifjP;
-	arc=none smtp.remote-ip=202.12.124.146
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+	dmarc=pass header.from=huawei.com;
+	spf=pass smtp.mailfrom=huawei.com;
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=fjsQ8MHy;
+	arc=none smtp.remote-ip=113.46.200.222
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952B1606A319
-	for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 01:54:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 952B1606A319
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2176606A31B;
+	Fri, 23 Oct 2026 06:31:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C2176606A31B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ownmail.net header.i=@ownmail.net header.a=rsa-sha256 header.s=fm2 header.b=QpmGQ5bQ;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=x5w1ifjP
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id 112871D001B8
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 21:54:36 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Thu, 22 Oct 2026 21:54:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1792720475; x=1792806875; bh=3cAVfwbFrCNgv2+EqKpRHgNC9c1tU6GEEeK
-	aHSj02bk=; b=QpmGQ5bQ/vFGcY0VBzyytV0t2d+LPSbUHKLzG85hBglwihSanA4
-	F3v5ta1m982ZZe4nU4yQVdHfDVJWwAInl75Jmpj1zfkwjvAmh8VIaHzVkmqktKyG
-	1qzq+fLC1uD6gyC4pplm1sm9J+QPF54hXjGidF6EybUNKdbWS07LMlkFQbuvUG13
-	/jVtM3xOOEpuVwbl000cjyUhDdbxYPIEId7sKpWArx7bfPzUPXRARdDupzzAItAS
-	+azNrOHUwAvtxNHcO/SOij/VGv6TkrCl0K5Bh081NJq8fWyuXXeOb5Skn7UpmaYl
-	85azQKcfx2SebICxXdvXVoK8jVi27mE0dWQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1792720475; x=
-	1792806875; bh=3cAVfwbFrCNgv2+EqKpRHgNC9c1tU6GEEeKaHSj02bk=; b=x
-	5w1ifjPckwX6rKvqGid/Y7cCiumafYmu2kTKVlmWndhiFiTucwCDNjl1365yYi42
-	V1km69YPYLiz6O+7dsyc47tYKndIAamXFkEmQHcpa3NsL5WzGHpVagQoR9m/ofxK
-	CI/paASkAZy3P5sUptBQVK2BD+9odYRdRXuLi3inyMsbWpFS80SmYEDiaalqCqh1
-	4LhcSlTGgH2U/gZ42rlz8qlItfEVq3KtSfDQfORinMLRsCBVk1uYj8QeW1z4ZAOB
-	YuexRn7f1qLTrXMIP7sgbKQyh6HV3VsB5bJbK5MA+XQNuQc+sVwLURXlHOYIJe6S
-	/8DlwXrUOet1WlnyOFeQw==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
-	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
-	action=sign d=ownmail.net a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1792720475; d=ownmail.net;
-	mf=PG5laWxiQG93bm1haWwubmV0Pg==;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm2:rsa-sha256:GVPfxU2KwcqudVLGSYT3zirCsGpq+O0PNMtEEKNXMC/rECp
-	c2o8c7LsjgKhhcGGdIVkaGMDGxroOFrCuUh6FvNk5na9kMhmGVnQDMqgPNSF3HfH
-	6gCpt2b0v1HUtiewOSB7+JtKCsaS7NEVEZP+q2l0COn0CYQ6v1HHJT/0secIIwGu
-	DDV/iN37ZvqwoiqndMIavH2cP1e75q0xkf/dW4tW71HY33VaTP63BNGvTLV16vqS
-	uUFWa523cUOv2Jmd5f2BTpUV/p+LXxne0Nbo6GHxN9zOeQSfvqAYXnpGWZ5LZGAA
-	32g71EuX8ouZMP2ChVMrtm4ZbIyzJgU0in/h3Nw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
-	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
-	action=mi-m=1; hc=13;
-	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
-	from,in-reply-to,message-id,mime-version,references,reply-to,
-	subject,to;
-Message-Instance: m=1; h=sha256:0T7TgnvcBa5HjIfzaYDehm2MTArXF69IgxreKTEz3Go=:3kzvpiJ7RQhrlwH3lZ3Wft1zr+dxHyKsDs6G2XbelBw=;
-X-ME-Sender: <xms:W77aahzE8_h1hFtzVaj42l1tpdz1NqxVDJhh6gEi08EMD51nvXfnRg>
-    <xme:W77aakWpQESpJ_hvVqpX2DdfGnfln6uyQE3vEBhJrsFvgCyK-XKKIBSGwFr-txfyY
-    k0j89z6DULF6N1H75xu5a_q-vj57DT19SZRQVXCTSjPFS4N>
-X-ME-Received: <xmr:W77aal_oVWUzTOt1Z9CaqfdtNKhNfEzW4L3HklInr1gUCXotSpXIyNGVo2moS0JlJwdnTCBoidndssjImts0NmHVyr9seyk>
-X-ME-Proxy-Cause: dmFkZTFVW0+ou5GQ+tyQ7PbmYU7dwTTOW6VjzYJaNLufwkMo9mpseLPBHNMl4drdZj5kj6
-    JpHgXtotuosN1/JJDeTLVtlWX69alxRsy9PhU8qhpt7xFYDkNvJztS2+kB0QvVUhoH5FXA
-    ckVpc+dSK6JmSbWQA6nnnujkvjV+T+M8KFlshJ7mNhPLG3wxz/xCuhRl8oHEwtg+yUU/mA
-    ySJZ6h7+zkNRBW++vw72Oxzf4+Sm7WMqJPY1KMh8xSPZY4vLRt+YgOpsEZvnEtSCe2Fej0
-    AR3Hv6mGB6M2jgCGkr4zQe2q+ST/ZhiyqhQMuWqpJMF0RMrTyPABbDIJYykf88OlD+GTpd
-    9We682YOG/ax0nLOqBpheWrY6sGhyCcht7WPxUBGlsmTJaSPsFeroAplQP0Ve3zCm/kIP1
-    7ln+xAPsjn8o7BHUrNDpFrJzJ/rllHWKD3b7XfVYaxN+bY96Mtx7v33S/mnuNiVxl85HdA
-    xIJwRnOYtUZsn7bTJluwyid50+ckshzDm+N84pOKh4pb4j187RQsbisMihc3Hcxo+mao4o
-    sRajx8Vpp0EOrT8vex5RQ1EetoQWiKEELUNgMNj9zaFzzG62LtAav7mJq6ZW9kNbkdLjI3
-    4YcLWUXvCbN08pCxz9QYAy5/NEu5BhPzSLbZVo604YQ028YsdPORGWZq81kw
-X-ME-Proxy: <xmx:W77aavvB78a1w6lYBhrQHZI9Ewo1FBH8SvAfLJJ-Uc_nPmeWj2HxVQ>
-    <xmx:W77aat2CgS0G5XjuvYRAawgmTlVpdW_7N4roPVAlpJJ8KJ-Hkidzyw>
-    <xmx:W77aasRW5cdLTmN6FFCO_xxm85tJOtPRAdTP_EZJD7bkP5CWA5iydA>
-    <xmx:W77aapfLxKYJVO3BHRyvnC4LxrUQ1YDviZyxkIxqoCXwzvFvbqodQg>
-    <xmx:W77aargL6F7wj5i0ebC2fv9gO7VYdXgewP5Lud4Pygnzm6hxbtvncHmP>
-Feedback-ID: i9d664b8f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 22 Oct 2026 21:54:32 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=fjsQ8MHy
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=33tGxL4pQ37PAm6R2PA7y86/iQoPs+fP5QCASbIaiW4=;
+	b=fjsQ8MHyFLg2DKpb+rChWOhrQ6Agx+aJ4B3WloBfzhk5I42lfFR8N28XAuSRbTqFZgHgChm3O
+	4OwNSVOJK87cDrNiMupTVhF9pAM7IdBGhA0OswOr1fHmf/8LmJiA8sNJ5JxoASQ+9LC7G7GDo6P
+	DlcW4ZEJB+N+XLWejTOA2kU=
+Received: from mail.maildlp.com (unknown [172.19.163.163])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4j9tTJ5rsczLlWr;
+	Fri, 23 Oct 2026 14:31:32 +0800 (CST)
+Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
+	by mail.maildlp.com (Postfix) with ESMTPS id 10C6B40594;
+	Fri, 23 Oct 2026 14:31:36 +0800 (CST)
+Received: from [10.67.110.140] (10.67.110.140) by
+ whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.45; Fri, 23 Oct 2026 14:31:29 +0800
+Message-ID: <a2832263-3e3b-4d05-98bd-dc006d5be689@huawei.com>
+Date: Fri, 23 Oct 2026 14:31:28 +0800
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -118,29 +62,66 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Paulo Alcantara" <pc@manguebit.org>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>
-Cc: "Jeff Layton" <jlayton@kernel.org>, "Jan Kara" <jack@suse.cz>,
- linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/3] smb/client: prepare for locking changes.
-In-reply-to: <20261023014211.2120871-1-neilb@ownmail.net>
-References: <20261023014211.2120871-1-neilb@ownmail.net>
-Date: Fri, 23 Oct 2026 12:54:30 +1100
-Message-id: <179272047063.2068970.18335523787621027348@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 -next 01/18] fs: pass struct path to notify_change()
+To: Christian Brauner <brauner@kernel.org>
+CC: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
+	<skhan@linuxfoundation.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <eddyz87@gmail.com>, <memxor@gmail.com>,
+	<martin.lau@linux.dev>, <song@kernel.org>, <yonghong.song@linux.dev>,
+	<jolsa@kernel.org>, <emil@etsalapatis.com>, <ihor.solodrai@linux.dev>,
+	<rdunlap@infradead.org>, <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
+	<dakr@kernel.org>, <johan@kernel.org>, <dlemoal@kernel.org>, <hch@lst.de>,
+	<axboe@kernel.dk>, <viro@zeniv.linux.org.uk>, <jack@suse.cz>,
+	<dhowells@redhat.com>, <code@tyhicks.com>, <linkinjeon@kernel.org>,
+	<sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
+	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
+	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <hyc.lee@gmail.com>, <miklos@szeredi.hu>,
+	<amir73il@gmail.com>, <senozhatsky@chromium.org>,
+	<chenxiaosong@chenxiaosong.com>, <kpsingh@kernel.org>, <matt@bobrowski.net>,
+	<rostedt@goodmis.org>, <mhiramat@kernel.org>,
+	<mathieu.desnoyers@efficios.com>, <john.johansen@canonical.com>,
+	<georgia.garcia@canonical.com>, <zohar@linux.ibm.com>,
+	<roberto.sassu@huawei.com>, <dmitry.kasatkin@gmail.com>,
+	<eric.snowberg@oracle.com>, <stephen.smalley.work@gmail.com>,
+	<omosnacek@gmail.com>, <casey@schaufler-ca.com>, <takedakn@nttdata.co.jp>,
+	<penguin-kernel@i-love.sakura.ne.jp>, <xiujianfeng@huawei.com>,
+	<nanx95726@gmail.com>, <djwong@kernel.org>, <lujialin4@huawei.com>,
+	<bpf@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
+	<driver-core@lists.linux.dev>, <linux-block@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <netfs@lists.linux.dev>,
+	<ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, <ntfs@lists.linux.dev>,
+	<linux-unionfs@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+	<linux-trace-kernel@vger.kernel.org>, <apparmor@lists.ubuntu.com>,
+	<linux-integrity@vger.kernel.org>, <selinux@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+References: <20261015125425.3246251-1-caixinchen1@huawei.com>
+ <20261015125425.3246251-2-caixinchen1@huawei.com>
+ <20261021-nanotechnologie-gebadet-gepaukt-52a950759f0a@brauner>
+Content-Language: en-US
+From: Cai Xinchen <caixinchen1@huawei.com>
+In-Reply-To: <20261021-nanotechnologie-gebadet-gepaukt-52a950759f0a@brauner>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ whupemk100010.china.huawei.com (7.152.184.41)
 
+Thanks for the explanation, you are right.  I will restore the idmap as 
+a separate argument
 
-[[Missed the Subject on the cover letter - sorry.  ]]
-
-This v3 removes the DCACHE_BLOCKED #define and uses IS_ERR_OR_NULL() as reque=
-sted.
-Also adds the ack-ed by from Namjae Jeon - thanks!
-NeilBrown
-
-[PATCH v3 1/3] smb/client: don't unhash and rehash to prevent new
-[PATCH v3 2/3] smb/client: use d_alloc_trylock in
-[PATCH v3 3/3] smb/client: Use d_alloc_trylock() in
+On 10/21/2026 6:21 PM, Christian Brauner wrote:
+> On Thu, Oct 15, 2026 at 08:54:07PM +0800, Cai Xinchen wrote:
+>> notify_change() takes a struct mnt_idmap and a struct dentry even
+>> though all of its callers either already hold a struct path (or a
+>> struct file) or have to pass &nop_mnt_idmap because no idmapped
+>> mount is involved.  Switch the helper and its declaration to take a
+>> struct path instead and derive the idmap and dentry from it.
+> No, the idmap needs to be passed separately. The whole point is that
+> during path lookup mnt->mnt_idmap can change. So mnt->mnt_idmap is taken
+> of the mount at the time it was checked and passed down to the
+> filesystem so that the VFS and the filesystem are guaranteed to see the
+> same idmap.
