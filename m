@@ -1,112 +1,112 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.155
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.146
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792718600;
-	b=IKGXWgV3/s3ppEZiFWip2bHK58ryHQl0xbBdrS3rqjYDgVLufhyB4GxsFtxFUbUJ+Cvz
-	 ZtZzX/mcp2/Y2Kq0lGdLH5/mxYCLkF91omm8N7UFiR8ROAmHBjWmT16Jp2cu6FrQJt26r
-	 1X6qopVmUx7FAm4UtQ7T4JZhjwkkb+LYUiY+yMkG3/R0BN2drEImS25j48yP+ImrQK5/V
-	 O7ZEoZ8ZQI2BhVVzDMN3GzcPrgbeuLE+aGqWPzwbMYkFiHPIEXHHGgO1OBtMdmX8Ugpuy
-	 D/nlZFQvR+WCQQq7IgeJwSr7P/SwZZQcOEh4FKIqHxmSccjNsmJ0/omLHzWSRglgsSQ==
+	t=1792719168;
+	b=IqzhCrbYVc/rZHPe53g48c+WBgcn9FipsSin8lIR5HECyS7dQyBdyFqLvd5OGcrXt5rR
+	 jzw8TdMXFuyjDvNICMM92SuiEYVkSusk+aT3tf+y8LbiJBpp6RhCjFWu+K7wcsbCoML+L
+	 M9g9JHLSsgfQRWK8tPUqroeZQgkcewBk+quBbQ70ooGWcY5z0p0nDIy1n0v1X3MuXyKh9
+	 4tJXhkVGbrQ+0uIvc2x5ANZUcDgACxyYI7vO2G7OI0eBbbUJ9qBRGnAgYoRGUcC1ztcIF
+	 Z/L9cdiQW7+fMBTWZtM16EPJAoPN3nYYbDdLygYK+/ydHwriJ2kQ/+sa7aiB3o7XSvQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792718600;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792719168;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
 	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
 	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
 	 Received:Content-Type:Content-Transfer-Encoding:MIME-Version:From:To:
 	 Cc:Subject:In-reply-to:References:Date:Message-id:Reply-To;
-	bh=7cFXi0L/JdhyCBHsqgbk8A7Ch3+1Xn76JLKJNL9bMo0=;
-	b=5BNdcehjYBhijRX4APBp0x1neAPtFRCcNvuXtLZodEQZSqBrm8qBF4gLek4ZHnok8CEu
-	 WBsrrlQ3OXLEMO1JWqsCfy6oINoNMqZGC9U1Qsf8FAYAdl7lCM+UOLcGTwuUp1mabAsY/
-	 Tp7bCe0Cr3ALdLubSAyxsE056iNgxtf/IJQ5jXWbozqL/f0v74Q2sD7hiLX1UF1zKzaAl
-	 amYlISbSnm8jcmcXOMhth8uEpUzmxfRdq9K7DuiBJLUi6Ce4eCI058+2bM3EEgLKoHU+2
-	 iITOJ2335E6gHDoj3U/wgt2cLgERCJVBychQGw+X9ZWrHibDSentqQ/zTguAssTHpKA==
+	bh=K8N36CYulDX/mvOaE7QuQvIdZJ+qAIabawlj/o+pdbM=;
+	b=fwt5Wannvkhjy7ZP3FU17VUhMNNcOu+nTrSk/Di9f2KS6sTzSLVbXE40EiNXbeYDt4gM
+	 FeuNUteZBo2uMZi0Z+TzLfKIvZAEhM4VwP3PYxOIPy1agieUTDqBZ7nLatWd9pMxXt5f9
+	 PZxUx+vCEegVaF+zCppKAO/lvo0YT4VZvhiBoS2jczNstXDFBwY0P7IS/ab2DG3uRLwfP
+	 WOHNOhHZpDF2aTjQih8aTiBUTTesYAPysoriwdjVevxKYJBK6/TdNY61Oi0/DkhrkPQRP
+	 A6dgkrl2BDeF19zpyY8e074y4UTpvM7cDRoTiS0QzSNKxkZ7liGdFjNWVAQOD1NRKKQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=ownmail.net;
 	spf=pass smtp.mailfrom=ownmail.net;
-	dkim=pass header.d=ownmail.net header.i=@ownmail.net header.a=rsa-sha256 header.s=fm2 header.b=UfZqc+3Q;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=cmsmFIxe;
-	arc=none smtp.remote-ip=202.12.124.155
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+	dkim=pass header.d=ownmail.net header.i=@ownmail.net header.a=rsa-sha256 header.s=fm2 header.b=JYr5JL0W;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=oOvOcxEW;
+	arc=none smtp.remote-ip=202.12.124.146
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C0A606A319
-	for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 01:23:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B8C0A606A319
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14572606A31B
+	for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 01:32:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 14572606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=ownmail.net header.i=@ownmail.net header.a=rsa-sha256 header.s=fm2 header.b=UfZqc+3Q;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=cmsmFIxe
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 4084E7A0173
-	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 21:23:19 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 22 Oct 2026 21:23:19 -0400
+	dkim=pass (2048-bit key, unprotected) header.d=ownmail.net header.i=@ownmail.net header.a=rsa-sha256 header.s=fm2 header.b=JYr5JL0W;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=oOvOcxEW
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.stl.internal (Postfix) with ESMTP id 7E7421D0020B
+	for <linux-cifs@vger.kernel.org>; Thu, 22 Oct 2026 21:32:47 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Thu, 22 Oct 2026 21:32:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:reply-to:subject:subject:to:to; s=fm2; t=
-	1792718598; x=1792804998; bh=7cFXi0L/JdhyCBHsqgbk8A7Ch3+1Xn76JLK
-	JNL9bMo0=; b=UfZqc+3Qrfv23fsfZc2jvmU7RuFQ/CB0TSGHl3tztznkVS9LqM7
-	u7tpvfZq9C7l71qOZ+tfjia2OgBi6BVDn8ZeNRHSsWtc15OSsiGGbH4P5FmSu4XL
-	hXH0IvFh4K5NEEMEykG2IpTO3rkf/uLChSXzE3/7CqFcu71j1S2uCch/nOMebIFg
-	N+OY8EJpSLd8vzn8zDmmRz1lW8uy3OThMVirxrFNsUh3MkEUrDSCBmAWSIQOFR3o
-	t8oB00oO5c9eveC8hTgi/InXp019gaOPxDsU8DaPRWYGqmfgsCGyBSShFyd4s7g8
-	qyzvhPAs2+HQqWQF8lv1iP9Lp4vCFHAqgbA==
+	1792719166; x=1792805566; bh=K8N36CYulDX/mvOaE7QuQvIdZJ+qAIabawl
+	j/o+pdbM=; b=JYr5JL0WrBdLIgrwIpQxQlMMpgYqmoNxzWAtTrKWPq+OIeoolS8
+	fdeIC/EPMNhPL1Dcyk21i41C8sqT/SRzzYjbplAq2bWrU+HVoW6gmHeXcikIYw8E
+	AG2u6V+rdZB2xo+enSDmX+Iec9pPxqJYfMuCTCmwfIRAJZbjzIGwsLCEsoaGLYga
+	0B+L+DEtLyQ3sjWTNWzkODE+eaaeGEM7oOZpGubF+YRlSTXAo5LcDIdmyCnpHhcT
+	6CArEdRqKsEUC5bF4VSrwnFw7QhiBLy9ALmgrEmhSR1/7Cr03PVYdmFwkbihYPGB
+	cr1LVmSlJmnAGc2Zs8f4rors5blEnRKMp4Q==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:in-reply-to:message-id:mime-version
 	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1792718598; x=
-	1792804998; bh=7cFXi0L/JdhyCBHsqgbk8A7Ch3+1Xn76JLKJNL9bMo0=; b=c
-	msmFIxeN/qxDjXj7JHu74YT46slPjygG0V4YKZ0ulfTzTIB2SMU/d5W+9bYZQkzO
-	Z9U9BDdFOc/PBjzz8vt2JlQzMpyPDoA43SKp869dWkWRNol/in13WFQu1cgMuJ4T
-	g38w357DCAY3rOla4Uy16+UM4nfm2hJ13WULtrYDvfJLs0StgxJO3u6tbt23fcQf
-	Xo6p1qshEEvLbT/q7KHC5zOfGHt90oLMUE7Z8lqkgmJiJ+tGGr+D4HqNkjuSmou7
-	RPDcIVjqmP9RCyCiuU6Og54Yv0jjZbVzPmkY0LjmHSYon0Ndl3I1UKXdFFTRZsGT
-	Fw3O4OBK3dbe6yheVRr4A==
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1792719166; x=
+	1792805566; bh=K8N36CYulDX/mvOaE7QuQvIdZJ+qAIabawlj/o+pdbM=; b=o
+	OvOcxEWQpV4nk8NTtqB5R+x/guaplCvqziMdXChuHrmqApCuLwmRIpzWMqJ8yqxD
+	FTnxYHOPJE/g5Ei8I02/feX6dollb9ZQIUYfoNLZ1tYf21Dy0Z0c1N9QYZNTYmxd
+	/K22/JtpYsPRYwi9Pn2n0b/69h+Uu6TjWy1EWM/z1xLDenQI1Xqh94gUD5iq+YI7
+	PowaCEIggL2HuyDEdM5sqPJxStucGrL/oQOBJgyQdn2YnDWwOLVIQxQ32QX1TwHQ
+	kwSso4N4HFYKIy78EeTOTjxBmTNHIwNat/ydpvsrtuoLDXH7gwz7W9ol/oyAnbIr
+	BtFl7HK6kD6rmlMuFWVKg==
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
 	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
 	action=sign d=ownmail.net a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1792718598; d=ownmail.net;
+DKIM2-Signature: i=1; m=1; t=1792719166; d=ownmail.net;
 	mf=PG5laWxiQG93bm1haWwubmV0Pg==;
 	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm2:rsa-sha256:KtIDB0gsHEpjJ3/Yna0jdkf0LExKzuWV6UKoLnbJRMQEkaH
-	weAYT5uzF2yUVH2h+tbgMHFrq7au1/9SHDnMFaykp2UMxb3VebbUdG7YwO31btEc
-	XMUcFbtC8wPFQoLzxxs88cBddY5TCbJCnycnW5CphNbMsQAyAQSU04CXNplf4+tE
-	nrhb6d3aYy7rXx6N2q0ytV0C5+IM1w3w6dD/cvgxZzIpfK1LZBYFPajak8CgxzLO
-	Efgsl/HOAX7k+Dj5wQ6/UMNBLIaZoiz91swpJdWob/V71xNvaBDnH0caV1u8SA4H
-	Pwa1LwMNIAIHAz6/XdzFnSFd97GeSfTjm4ppTpw==;
+	s=fm2:rsa-sha256:g0X5k3QzJdoa+YDhn1mQ0yGqE6Rp70HvkJRd450ELwBJXOG
+	OA1K+vgWcNAo8upvTGAJwXSov+s6CNhlr59jxguLB8YktTlHmYE3KHWJ6wJmL2Fq
+	ltJBfBqCL9YsQKT2KM3Du8ihc81spIkhknAOMGb3IyrcZSozZo4/U+rR64S4Ubpr
+	pmQvuQAjgr70kqtTLA41Srk/qOVXLxZhFeLYWTM/0v7fO6j1mv46F48vvAkeQnfS
+	Y3h6qOIeawbXXCYOodttBxqWZfs1Fy1lLFnQWQQwDKAVtTfhKY2prTpS6INRccWt
+	cx9ItP+LhY2wEkQfRSELBOGJEn/2XWadUJAzsMg==;
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
 	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
 	action=mi-m=1; hc=13;
 	hn=cc,content-transfer-encoding,content-type,date,feedback-id,
 	from,in-reply-to,message-id,mime-version,references,reply-to,
 	subject,to;
-Message-Instance: m=1; h=sha256:YrN/KlqvJbuKZP5+/zhM5/JVYqXjcKZo0i2ywgzsSYM=:hXcREjO32Ld50T+nbL2hR5exmKKcdTu1Lk84ebTml1k=;
-X-ME-Sender: <xms:BrfaamyaXVGxedXYMFvgKLZdAq8aTe1L7ZMtzPVKUFiRKuiY21AcQw>
-    <xme:BrfaaghOoCO7v3toHGHJI6Nxnvf5DQfxG6kyXV4ot6uGHswML_FQ9ODAJltSPLV9L
-    mhPyeIjLcB0yP5G9GYzXnd6wuixkDzGbhmqwAIlO7dzSeCNF5jo>
-X-ME-Received: <xmr:BrfaahqtCgjZh9fnhHbqjalQDsOuvi1S_aC8Dt44_R4I5wsgak7fcHni8MR37xS_W1SwoFZgH1HHm_nUFIh0DPgIRLFJ6vs>
-X-ME-Proxy-Cause: dmFkZTFOPz9kVuRAJKXCexeAqCEJ3ruIe2UMXhbQkPVg2UFXrQecH2TQP0Zr0KlAgTNkSp
-    FQPdZUhOcjOrbo3H82A3HH0nhqFCKDcix67y6wDLuWb2jiToCxZBBM2lrdj+ind51vGAwU
-    GR9ab9wjgvmbx6ujLCAi0MMKBZUaxKiIob5+udC4a7+6gWEoQa4Hiq3BpWTO2vf+gKIp6J
-    vm4y2vlh8d5zJAhFQ4naGPAGMt1hlMHD1YJj5d/Q8aRxan9IWFa6XtjtvQuLnfb4Vf7d4K
-    Cbifv+b2sOwLuGZ/kXWROmW0/wbwEzJjoyEPVRrFkHmHXubXLJQNaPaw7Uw4JI1G5sePuG
-    OhD5y0oLLdgt0FqDcj++kBSuJY9geFZGVApMi9XaTOhDTzNejzdNxccn4QvU+pvqtUDbyE
-    cWofaU+0T+UxBnz2W7juRDB+jnt08EV0bdc0V7KvSwBe0299ybp65cehBMq8VoAJyeMv9B
-    96VdUM+iq0U9/qjH3z0cfywfuuQlBwjuPLzTgPluPvNvwIzfLwHcXPDetLYYkDXbrVUayB
-    mbQNC8VW5APsArPbdFOAvJqMHCjtQdVuEjtpTemJaE/IIMPEIktQuiJr/VdwweJzA4Jtaa
-    9gjf8hrA3mnx68lCNYA9Ao7nbV2k99y3PRkwZt2Hc4DF3lXZ+ihGwtIYdkqw
-X-ME-Proxy: <xmx:Brfaavji7RqzwhfR13ZV_DCsuBKIsH-quVNcy4lpnxBQYhZtVaIUlw>
-    <xmx:BrfaarOOn01-vrZm67Wv3971pvk2uuVoaFX5XWd9UQxuwh9rox6yOQ>
-    <xmx:Brfaahz_WetjwDvrsrgntQ0787cceiiVZLYM67C9eQFVfn40mpURcQ>
-    <xmx:BrfaaloApk53qIOMRg-shDhcJPwjZEd0lV1M4NJUopTm7DZWWNUA9w>
-    <xmx:BrfaaqcDF_DQeZh0rDC46IK5HxHcb8X-UGBenopU5gf6-uiO-OgFxEeb>
+Message-Instance: m=1; h=sha256:XIxinh98LrcUMlBqqu1+nEpTJYYCLjRyChA8Oy5yB9E=:9Jw1eH3KuDaGsq4lIMiviughjgykboz+B03vzLNRtCA=;
+X-ME-Sender: <xms:PrnaaqdCPXfXjgfwbeVmu17Vt4gdVz6jYEgHGgEiTKE1VmNjsjdV9Q>
+    <xme:PrnaahlDCW-od294us1Bhfresr7t8sh7IzpfPR00aHQqBzouVzvIMSr4w3HAre3jC
+    SSosqkOZcJmZ716-xQ3I-y62DFFu7HJRKiSfb1ihzQ5WkQ0Ymc>
+X-ME-Received: <xmr:Prnaai1_SPvpHnwBd7SBA7Ta4AlTG31foCWI5l1Sn0ZiRSfvPWTqxq-6IXouneiagSYO2QER17Zu_H5foW-I1yyHkDm_Pio>
+X-ME-Proxy-Cause: dmFkZTEF1g41ExZKHi3RiVPgeCw7rhuZ8CNRNnraoiZBe4tkBbbv4Yw4tQfzDeBIhF09RX
+    NL0EkowSG8DArQR+fMt4Ey192gP963cLpIsbaL9idd+bDlKQqG7rlDx5kmwNyuj95/pvV5
+    r2cv6gHm1m3b+BYID3LD+YROiCOAtrdhIANmQLRPmNOzPupoxBGEV6Thdvqstv13dumFPi
+    adCZasEMNeN1jVu/2JC70xOqB8h5RR05EpsShbzfsfr5WBO7u/30eEk0laLPC5CYF5P8v9
+    BeWfAUrumXyd/yxK2ItYHKSxwhAk1Xfub2RO2ZXHBl3kuaQBOfwOPz0OExCFrFjia3edTd
+    sVpmSC91d+n0PHhv79iO3zQYp/vNkFrioDWjysDHRJaPH6pO+ZxB+ezrqLKUwhslbEAL3o
+    W4L1bM9qM/BaNglCKwqaOlJmu2YrGf7TwsFhZoQ+8zQwuCD0TwbgJH7T7sl1v5Ypfz6JSH
+    mDWk52YVSvMJ+lmqxQQabiGTPIl3pbhqMitdLe1nlozkc0dfDbd4/5eSikE9hIfvtQ8/t2
+    hz13cxZE/Epv1ysakUPeCDVp6kR2Jt4+JmPsANlp+kKKe4idlfA35LRnNmD5KCXLSc1ZRz
+    GWmWyw40tH516slGqzbh1nDtfTXTpGYQUC2Tz8l/6t/bB70OuxF6TGTO5Djg
+X-ME-Proxy: <xmx:Prnaaif9XPdSKu21OAkXXz7aQJs2oEu17LThY3r8xGosEzaiiofXjA>
+    <xmx:PrnaakbkbtLDQ0Erw-zMj_C5d7zsFPQTd8dvKyA3gqiFi_CCGM0yjw>
+    <xmx:PrnaavHXUOhzdanqmEy6QlrFiOGYPF5ZFoaiwPhq0YjuZ0bBGdy3kA>
+    <xmx:Prnaaqn9Ev-FsWuluKquY4oOg2SrFrWyG-zkZ6PF69AEGsFWE0KPAQ>
+    <xmx:Prnaamg5r7_57V12ZYl_-WRiR8kky_bAgKwvMgaDbaWi5JB7-JDYrYb0>
 Feedback-ID: i9d664b8f:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 22 Oct 2026 21:23:15 -0400 (EDT)
+ 22 Oct 2026 21:32:43 -0400 (EDT)
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -119,273 +119,91 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 From: NeilBrown <neilb@ownmail.net>
-To: "Tom Talpey" <tom@talpey.com>
-Cc: "Paulo Alcantara" <pc@manguebit.org>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
+To: "Paulo Alcantara" <pc@manguebit.org>
+Cc: "Namjae Jeon" <linkinjeon@kernel.org>,
  "Alexander Viro" <viro@zeniv.linux.org.uk>,
  "Christian Brauner" <brauner@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
  "Jan Kara" <jack@suse.cz>, linux-fsdevel@vger.kernel.org,
  linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject:
- Re: [PATCH 1/3] smb/client: don't unhash and rehash to prevent new opens.
-In-reply-to: <6233e33a-e6e2-4c9d-8372-5aa75f4f3314@talpey.com>
-References: <20260928012812.2890035-1-neilb@ownmail.net>
-  <20260928012812.2890035-2-neilb@ownmail.net>
-  <6233e33a-e6e2-4c9d-8372-5aa75f4f3314@talpey.com>
-Date: Fri, 23 Oct 2026 12:23:11 +1100
-Message-id: <179271859119.2068970.332034501939522955@noble.neil.brown.name>
+ Re: [PATCH v2 3/3] smb/client: Use d_alloc_trylock() in cifs_prime_dcache()
+In-reply-to: <8b7c86a805f36b8556e742c76eaf0a1e@manguebit.org>
+References: <20260929024352.1433257-1-neilb@ownmail.net>
+  <20260929024352.1433257-4-neilb@ownmail.net>
+  <8b7c86a805f36b8556e742c76eaf0a1e@manguebit.org>
+Date: Fri, 23 Oct 2026 12:32:40 +1100
+Message-id: <179271916088.2068970.6748308220146383713@noble.neil.brown.name>
 Reply-To: NeilBrown <neil@brown.name>
 
-On Thu, 22 Oct 2026, Tom Talpey wrote:
-> One nit below...
+On Fri, 23 Oct 2026, Paulo Alcantara wrote:
+> NeilBrown <neilb@ownmail.net> writes:
 >=20
-> On 9/27/2026 9:25 PM, NeilBrown wrote:
-> > From: NeilBrown <neil@brown.name>
-> >=20
-> > smb/client needs to block new opens of the target of unlink and rename
-> > while the operation is progressing.  This stablises d_count() and allows
-> > a determination of whether a "silly-rename" is required.
-> >=20
-> > It currently unhashes the dentry which will cause lookup to block on
-> > the parent directory i_rwsem.  Proposed changes to locking will cause
-> > this approach to stop working as the exclusivity will be provided for
-> > the dentry only, and only while it is hashed.
-> >=20
-> > So we introduce a new machanism similar to that used by nfs.
-> > DCACHE_PRIVATE (given the name DCACHE_BLOCKED) is set when lookups need
-> > to be blocked.  ->d_revalidate checks for this and blocks.  This might
-> > still allow d_count() to increment, but once it has been tested as 1,
-> > there can be no new opens completed.
-> >=20
-> > Unlike unhash which does not need to be reverted on error, and which
-> > must not be reverted on a successful d_move, blocking of opens must
-> > always be reverted.  So we don't block the open until after the last
-> > early "return", and we always unblock on the final "return".
-> >=20
-> > Strictly speaking it is only necessary to block opens before the value
-> > of d_count() is tested under ->d_lock. But we block as early as possible
-> > to discourage new opens from starting.  As open is path-based in cifs a
-> > concurrent rename can be confused a rename of one other the paths.  Once
-> > cifs_open() has generated the full_path it doesn't hold any locks to
-> > prevent a rename from making that path invalid.
-> >=20
-> > The important details of the interlock between __cifs_unlink (which both
-> > unlink and rename use) and "open" are that __cifs_unlink() sets
-> > DCACHE_BLOCKED  *before* testing d_count() which is
-> > in a d_lock locked region,  and cifs_d_revalidate() tests the bit *after*
-> > ->d_lock is taken by e.g. __d_lookup() to increment d_count().
-> > Thus ->d_lock provide serialization between the set and the test
-> > even though the test isn't in a locked region.
-> > (The fact that cifs_d_revalidate() always returned -ECHILD when
-> >   LOOKUP_RCU is important for this sequencing to work as it ensures
-> >   d_revalidate() is called *after* d_count() is incremented).
-> >=20
-> > Signed-off-by: NeilBrown <neil@brown.name>
-> > ---
-> >   fs/smb/client/cifsfs.h |  8 +++++
-> >   fs/smb/client/dir.c    |  3 ++
-> >   fs/smb/client/inode.c  | 68 ++++++++++++++++++++++++------------------
-> >   3 files changed, 50 insertions(+), 29 deletions(-)
-> >=20
-> > diff --git a/fs/smb/client/cifsfs.h b/fs/smb/client/cifsfs.h
-> > index 0c85daa8386e..bcc0fb5c2c9b 100644
-> > --- a/fs/smb/client/cifsfs.h
-> > +++ b/fs/smb/client/cifsfs.h
-> > @@ -42,6 +42,14 @@ static inline unsigned long cifs_get_time(struct dentr=
-y *dentry)
-> >   	return (unsigned long) dentry->d_fsdata;
-> >   }
-> >  =20
-> > +/*
-> > + * This is set to block d_revalidate on a dentry that is being removed -
-> > + * the target of unlink or rename.  This causes any open attempt to
-> > + * block.  There may be existing opens but they can be detected by
-> > + * checking d_count() under ->d_lock.
-> > + */
-> > +#define DCACHE_BLOCKED DCACHE_PRIVATE
+> > @@ -77,36 +77,34 @@ cifs_prime_dcache(struct dentry *parent, struct qstr =
+*name,
+> > =20
+> >  	cifs_dbg(FYI, "%s: for %s\n", __func__, name->name);
+> > =20
+> > -	dentry =3D try_lookup_noperm(name, parent);
+> > -	if (!dentry) {
+> > -		/*
+> > -		 * If we know that the inode will need to be revalidated
+> > -		 * immediately, then don't create a new dentry for it.
+> > -		 * We'll end up doing an on the wire call either way and
+> > -		 * this spares us an invalidation.
+> > -		 */
+> > -retry:
+> > -		if (posix) {
+> > -			switch (fattr->cf_mode & S_IFMT) {
+> > -			case S_IFLNK:
+> > -			case S_IFBLK:
+> > -			case S_IFCHR:
+> > -				reparse_need_reval =3D true;
+> > -				break;
+> > -			default:
+> > -				break;
+> > -			}
+> > -		} else if (fattr->cf_cifsattrs & ATTR_REPARSE_POINT) {
+> > +	/*
+> > +	 * If we know that the inode will need to be revalidated
+> > +	 * immediately, then don't create a new dentry for it.
+> > +	 * We'll end up doing an on the wire call either way and
+> > +	 * this spares us an invalidation.
+> > +	 */
+> > +	if (posix) {
+> > +		switch (fattr->cf_mode & S_IFMT) {
+> > +		case S_IFLNK:
+> > +		case S_IFBLK:
+> > +		case S_IFCHR:
+> >  			reparse_need_reval =3D true;
+> > +			break;
+> > +		default:
+> > +			break;
+> >  		}
+> > +	} else if (fattr->cf_cifsattrs & ATTR_REPARSE_POINT) {
+> > +		reparse_need_reval =3D true;
+> > +	}
+> > =20
+> > -		if (reparse_need_reval ||
+> > -		    (fattr->cf_flags & CIFS_FATTR_NEED_REVAL))
+> > -			return;
+> > +retry:
+> > +	if (reparse_need_reval ||
+> > +	    (fattr->cf_flags & CIFS_FATTR_NEED_REVAL))
+> > +		dentry =3D try_lookup_noperm(name, parent);
+> > +	else
+> > +		dentry =3D d_alloc_trylock(parent, name);
+> > =20
+> > -		dentry =3D d_alloc_parallel(parent, name);
+> > -	}
+> > -	if (IS_ERR(dentry))
+> > +	if (!dentry || IS_ERR(dentry))
 >=20
-> Why the alias? The blocking behavior is reasonable but #defining a
-> flag value which is purely local to this file seems unnecessary and
-> confusing. What if another file in fs/smb/client also overloads the
-> DCACHE_PRIVATE flag, for example. Consider removing this hunk.
+> nit: IS_ERR_OR_NULL(dentry)
+>=20
 
-
-I thought that giving the flag a meaningful name would make the code
-that uses it easier to read. But I'm happy to drop it.
-I'll resend with the IS_ERR_OR_NULL change too.
+I'll fix that thanks.
+We should really try to get rid of functions (try_lookup_noperm() in
+this case) which return a NULL or an error - but that's for another day.
 
 Thanks,
 NeilBrown
-
-
-
-
->=20
-> Tom.
->=20
->=20
-> > +
-> >   extern struct file_system_type cifs_fs_type, smb3_fs_type;
-> >   extern const struct address_space_operations cifs_addr_ops;
-> >   extern const struct address_space_operations cifs_addr_ops_smallbuf;
-> > diff --git a/fs/smb/client/dir.c b/fs/smb/client/dir.c
-> > index 6fa6d48fdfd3..88fff65320f5 100644
-> > --- a/fs/smb/client/dir.c
-> > +++ b/fs/smb/client/dir.c
-> > @@ -872,6 +872,9 @@ cifs_d_revalidate(struct inode *dir, const struct qst=
-r *name,
-> >   	if (flags & LOOKUP_RCU)
-> >   		return -ECHILD;
-> >  =20
-> > +	/* Wait for pending rename/unlink */
-> > +	wait_var_event(&direntry->d_flags, !(direntry->d_flags & DCACHE_BLOCKED=
-));
-> > +
-> >   	if (d_really_is_positive(direntry)) {
-> >   		int rc;
-> >   		struct inode *inode =3D d_inode(direntry);
-> > diff --git a/fs/smb/client/inode.c b/fs/smb/client/inode.c
-> > index 12ed8db10e00..4d34c5622cd4 100644
-> > --- a/fs/smb/client/inode.c
-> > +++ b/fs/smb/client/inode.c
-> > @@ -1967,24 +1967,31 @@ static int __cifs_unlink(struct inode *dir, struc=
-t dentry *dentry, bool sillyren
-> >   	__u32 dosattr =3D 0, origattr =3D 0;
-> >   	struct TCP_Server_Info *server;
-> >   	struct iattr *attrs =3D NULL;
-> > -	bool rehash =3D false;
-> > +	bool unblock =3D false;
-> >  =20
-> >   	cifs_dbg(FYI, "cifs_unlink, dir=3D0x%p, dentry=3D0x%p\n", dir, dentry);
-> >  =20
-> >   	if (unlikely(cifs_forced_shutdown(cifs_sb)))
-> >   		return smb_EIO(smb_eio_trace_forced_shutdown);
-> >  =20
-> > -	/* Unhash dentry in advance to prevent any concurrent opens */
-> > -	spin_lock(&dentry->d_lock);
-> > -	if (!d_unhashed(dentry)) {
-> > -		__d_drop(dentry);
-> > -		rehash =3D true;
-> > -	}
-> > -	spin_unlock(&dentry->d_lock);
-> > -
-> >   	tlink =3D cifs_sb_tlink(cifs_sb);
-> >   	if (IS_ERR(tlink))
-> >   		return PTR_ERR(tlink);
-> > +
-> > +	/* opens might already be blocked by rename */
-> > +	if (!(dentry->d_flags & DCACHE_BLOCKED)) {
-> > +		/*
-> > +		 * Block opens - and all lookups that involve d_revalidate.
-> > +		 * This guarantees that if another thread tries to open(), it
-> > +		 * will either block, or will increment d_count()
-> > +		 * before we test it below.
-> > +		 */
-> > +		spin_lock(&dentry->d_lock);
-> > +		dentry->d_flags |=3D DCACHE_BLOCKED;
-> > +		spin_unlock(&dentry->d_lock);
-> > +		unblock =3D true;
-> > +	}
-> > +
-> >   	tcon =3D tlink_tcon(tlink);
-> >   	server =3D tcon->ses->server;
-> >  =20
-> > @@ -2107,8 +2114,13 @@ static int __cifs_unlink(struct inode *dir, struct=
- dentry *dentry, bool sillyren
-> >   	kfree(attrs);
-> >   	free_xid(xid);
-> >   	cifs_put_tlink(tlink);
-> > -	if (rehash)
-> > -		d_rehash(dentry);
-> > +	/* Allow lookups/opens */
-> > +	if (unblock) {
-> > +		spin_lock(&dentry->d_lock);
-> > +		store_release_wake_up(&dentry->d_flags,
-> > +				      dentry->d_flags &~ DCACHE_BLOCKED);
-> > +		spin_unlock(&dentry->d_lock);
-> > +	}
-> >   	return rc;
-> >   }
-> >  =20
-> > @@ -2536,7 +2548,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode =
-*source_dir,
-> >   	struct cifs_sb_info *cifs_sb;
-> >   	struct tcon_link *tlink;
-> >   	struct cifs_tcon *tcon;
-> > -	bool rehash =3D false;
-> >   	unsigned int xid;
-> >   	int rc, tmprc;
-> >   	int retry_count =3D 0;
-> > @@ -2552,20 +2563,20 @@ cifs_rename2(struct mnt_idmap *idmap, struct inod=
-e *source_dir,
-> >   	if (unlikely(cifs_forced_shutdown(cifs_sb)))
-> >   		return smb_EIO(smb_eio_trace_forced_shutdown);
-> >  =20
-> > -	/*
-> > -	 * Prevent any concurrent opens on the target by unhashing the dentry.
-> > -	 * VFS already unhashes the target when renaming directories.
-> > -	 */
-> > -	if (d_is_positive(target_dentry) && !d_is_dir(target_dentry)) {
-> > -		if (!d_unhashed(target_dentry)) {
-> > -			d_drop(target_dentry);
-> > -			rehash =3D true;
-> > -		}
-> > -	}
-> > -
-> >   	tlink =3D cifs_sb_tlink(cifs_sb);
-> >   	if (IS_ERR(tlink))
-> >   		return PTR_ERR(tlink);
-> > +
-> > +	/*
-> > +	 * Block opens - and all lookups that involve d_revalidate.
-> > +	 * This guarantees that if another thread tries to open(), it
-> > +	 * will either block, or will increment d_count()
-> > +	 * before we test it in __cifs_unlink().
-> > +	 */
-> > +	spin_lock(&target_dentry->d_lock);
-> > +	target_dentry->d_flags |=3D DCACHE_BLOCKED;
-> > +	spin_unlock(&target_dentry->d_lock);
-> > +
-> >   	tcon =3D tlink_tcon(tlink);
-> >   	server =3D tcon->ses->server;
-> >  =20
-> > @@ -2605,8 +2616,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode =
-*source_dir,
-> >   		}
-> >   	}
-> >  =20
-> > -	if (!rc)
-> > -		rehash =3D false;
-> >   	/*
-> >   	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
-> >   	 */
-> > @@ -2698,8 +2707,6 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode =
-*source_dir,
-> >   			}
-> >   			rc =3D cifs_do_rename(xid, source_dentry, from_name,
-> >   					    target_dentry, to_name);
-> > -			if (!rc)
-> > -				rehash =3D false;
-> >   		}
-> >   	}
-> >  =20
-> > @@ -2713,8 +2720,11 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode=
- *source_dir,
-> >   	CIFS_I(source_dir)->time =3D CIFS_I(target_dir)->time =3D 0;
-> >  =20
-> >   cifs_rename_exit:
-> > -	if (rehash)
-> > -		d_rehash(target_dentry);
-> > +	/* Allow lookups/opens */
-> > +	spin_lock(&target_dentry->d_lock);
-> > +	store_release_wake_up(&target_dentry->d_flags,
-> > +			      target_dentry->d_flags &~ DCACHE_BLOCKED);
-> > +	spin_unlock(&target_dentry->d_lock);
-> >   	kfree(info_buf_source);
-> >   	free_dentry_path(page2);
-> >   	free_dentry_path(page1);
-> >=20
-> > base-commit: 3879f51857325da9bf3cfb073280257cd16ae067
->=20
->=20
-
