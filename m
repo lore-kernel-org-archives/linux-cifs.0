@@ -1,90 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792858496;
-	b=gCGucUCZH4i1M7Ug32iONBJxfjFMHffAYd/VR/+bhmhreL03iRLoeqFAQ1vcxiVljo8m
-	 kI43HeKdhBL3svvvYrX/RLmPSvLuC9ExJcSUu9z5goUSqEiwyH70/i/NBFeGjuYMrCK0F
-	 1FHICw3DoxRFfnxfvjQ4/Bp/sLmgCBQbbcDEtSyqvBEAlZOirBo2bFAu1yo1CO7U3tvBb
-	 nR3ELzDGFGFea/S54IyBxjjTJyQuP0WMOzOg+qkHMs3/on7/0mOkabutqpAst9k3wsCqd
-	 2bz7dSCTrZzX3yzXIBQ1hJA0X4P5/gmzg1Hf/IZn+uu8HljrgWK+FTFypITc67rki8A==
+	t=1792867570;
+	b=j/o8fznkZZFovchvE6qrfmm1voc9QLy1oxMauL39PFaq7Tz1Uz1oTD5mCBY/aymN+LFl
+	 dR6umNFZq0U3sFNGbdv5Y5IVpTgRo1LzyUo80WO/0U2BdLLriUz6q0ZK0AlDxV0grxjlp
+	 b7jLByPmbre+W0ANCuzLG565cY/A7977sLkAMzYe7YrnGBcwwoL0cPYa1wvqtY0rFuRYY
+	 7Q2yJsRzj9Zhkb2cr6XMmqvL8+GrU+JE2pKewa3Zc/c5md72AsoK0XrOp/gjM03Xh3Gsh
+	 RDRQQf1TJOXjHB7Y+i6rF9s4mKsXSBSUc47rDDYgLqdUc1dtoh5vmsKuAkWBsgo0smQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792858496;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792867570;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:X-Google-Original-From:Content-Type:Mime-Version:Subject:
-	 In-Reply-To:Date:Cc:Content-Transfer-Encoding:Message-Id:References:
-	 To:X-Mailer;
-	bh=FZEks44/Enad38G510H2E4A6Z3K+IDPntFZmi+/QQ2A=;
-	b=l2T2je/L8t7HkfgHEzV2rBkqMZIs+iTj8NJMqW8BKLTT9JVVPFEj3ly9UTDUOaWXpJmk
-	 dd7bCsfYLt1kopmJiwmyJgfb9RyyE1ce61d9KSipt9ZtkYwk/ojn+0blZf92LU4fRQkpq
-	 kCCX9xzK/rjNqok2VpuGO2bRmDUl2qlYgnbeTN0wGV0N6Gi3nUZRL2NJDGAx2Yav2+k7h
-	 +wcieDQgggE6RRUsNBcPBXGraE0xxBYtKZfXJ42Lk8zO+dJzb8s8mX7GMP+PxTADxXIJy
-	 zbDg/l8n3iGT4jt0N3UBTBcFyz+xsps1oDMbIxUa48U04uoSQA2CIGD4vFNoXx0yymA==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=os+CpApFAeFMQFmoyWApV92IYG427+6BdGY0Jd+kTAA=;
+	b=4dizVQa6/wnaHagKncMgusIPGj1LSHbxI8HIzCsHb/DAuOmt/fyLWD4LZzSS4CVbNrZS
+	 IX37pmI0N3lX1XbgkXJSSI40M7/OaZkf6yL5Fq6VWrxAvmhyZtpe20bvGPtIL3sgrY6xL
+	 aVZHLFTZjBMadLeohTqq0ttOgu7c9E/I8+PZmnmYdECw9o2ozx2QHC+SDOte5W2i5xgXm
+	 ALjLjCEGu21TRP5sK9RHsmpwIsGpndQdahvgxqib/hXUSvccqmaDIkBgg3GZJlaNgwzoq
+	 MQEyoUhiUGXOR2DeFxsS8VdHUWLYFsS3sKiXKZphGOdT1LzkuKrAmr2bYfiLV3K4EPA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=VLOUfyGW;
-	arc=none smtp.remote-ip=209.85.218.53
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=JlCvgwFE;
+	arc=none smtp.remote-ip=209.85.218.47
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E95606A31B
-	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 16:14:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 22E95606A31B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C58606A31B
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 18:46:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 02C58606A31B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=VLOUfyGW
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c45551fa84eso264875966b.3
-        for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 09:14:55 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=JlCvgwFE
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c450ab1483cso251919266b.3
+        for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 11:46:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1792858494; x=1793463294; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:subject:mime-version:content-type:from:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=FZEks44/Enad38G510H2E4A6Z3K+IDPntFZmi+/QQ2A=;
-        b=VLOUfyGWFjQWf63LxZAj2ndIuj+Q10moYTYo5zYZN3fGsDT2Dr7EnVRtu5HMseSyEH
-         BgQx/dRvMYbYzmcIP7F83CJzUeH+qn84CtHO4tQr6lP1Jpwz5opUPyoV0YEg8F7KOde9
-         ZFQtgOwz8+goTPsUuTAm/egWZIOZ6Nn40XxvI0SPRGEaJfsZg2pYFwd+igDUA/Q2W4Rt
-         m6EcQRmCJ4I+VBX2fzevMa3mpmI7KGGRKx1IGMlaqeMk+N/U5fHBXy4Hab+mYfORj0+B
-         kSmPe1QLfLZ8MB4gFh6JoNDa00QdzAO3R4tTJszkYZGO5QM7o42L9GU2Ygv7Z/aTRkJG
-         pK0A==
+        d=gmail.com; s=20251104; t=1792867568; x=1793472368; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=os+CpApFAeFMQFmoyWApV92IYG427+6BdGY0Jd+kTAA=;
+        b=JlCvgwFEtJmWven3RZlWYJVNV/wI8QiKhnv6L8OdjttpmsxQ3YqwRTrhfOUraRHtQe
+         vNaJ8ebwvLE+ayX4JoPkuPrRGjReWjqbOJwFxrYflLxeKGQITSyVxpdfCjHtkO7SlW1L
+         SwcRKkNlHL5qc9JQM1VOxJLGcAdeUefzFL2ZRiz46A5vRekSVtkg1rhG1NRzYegACKGR
+         4nusgAQpMuRhywl/nIiGcbM9E7oUUDwbNAjdz2Tx0riuIVgATKXimbyraW85py+uVSRo
+         fr4jmsWq/mIYYYZjCQiqjbv6TaFydtu52bsEYTcPHwQzCOM1a8qVS5G7JBSQ77PvkjDr
+         A6uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1792858494; x=1793463294;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:subject:mime-version:content-type:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=FZEks44/Enad38G510H2E4A6Z3K+IDPntFZmi+/QQ2A=;
-        b=MB8fB/7F76ne0iIplX0rYNZimkWGJLQ9fht36OdZqKB/1i+QxefEk5/M0NnfQfO1CH
-         TLutExxla0h86DevB5l2FRx5gCUeC1M5IG6hhIxFNIu0Oq9Grxwn34npJ0/SXttbhLPx
-         rtxIsqhT3cd5EPfsksIxmsrR9GnfXiSQ4vTHuIHtcDTXCHjLvI7jMVJM4DayfGnP/VFk
-         z6pWnUSuDl48ECMbRLcVpTcJmlggpmPaLmljc645hU+9mJkXKlo0rb19OBxF+kXIwp0k
-         2iW7SxpH0o9GacEccMS9Cy4mSMB86mukY7JaMXUUsr25Yta6V8msZF/gPAu+gwoy6SVi
-         omFQ==
-X-Forwarded-Encrypted: i=1; AKwUvBx7Z10VQFea7Mn1v66pAqrACmgkdnw5T/tEnV5E7zb3O38gxWWOuInqMzBfcn1Vu3c4abCF21fWI+5u@vger.kernel.org
-X-Gm-Message-State: AFq9FYKJFc7SUVEwGp3JMfJK0MYhK8aM7TC3AAIZxDYr2oWwak3w/ct+
-	r1wi/6TCbs83Vz7zECbJfi+opRkKx/0sh4Hhh/eyjJDFE+vMJmIZrn9C
-X-Gm-Gg: AYBFou0SyfHNC7upS2nWRK/7G2HB6fTxD/t8LMhI6jw+aWPKF7nfBPjxCdtFSdaPSof
-	C3yEz49ZtwWt7HCAQDynP/7lc5Ulb1xFJZIpzJfW0RGCg84i/iEo7ek0KcLA5ZZsZa90IQZSCnY
-	/biv1JmCvoDVz6sXF4s4FJL19AGv75UgsdZege/mVMqsDJDegMeD34QEfcP4W6kWNI1E4ZD3g2M
-	Spdsg2lV1rIsSlDuUD+rsI7NFt43xDA/Aj+w+cUAv9grNXIA0w1pUdpBFfkkfuGVmTugUQK1sns
-	I8jGZ50ZLTULNkGHQYhPHin4deDC8jqyS2MD7xAQ0sk1iAKh3UinKFxXfVrP/zv3P3mmXA2+Ptr
-	b11pNXjp9xdbMHUenhyXeM/UWy6CIqgsD6HtkGVMJ8D+ks3v71hQfIc4/GH/o7iN2qcO2qI9C1a
-	k9nLJuA/wvBptU9tCFGaBCYqDuhvbxMjILsjImfQhPs38kQvAECMoliIOzMpT/eHTnJXlsRIkMk
-	JYZ8hkm/97tUSqCLnEdtjvVHda+/aB8qkdUl9O7AOLPz6oe/IVPmJPDlNNsOk3oa4XmOgInLfPB
-	+YRAoFXcJUeV8DmtuJrcqAoIo896ZHeJs++LvIUquNHaVDurigjEzqY6HfisHrtVpGX5a03N+hF
-	WjIbg
-X-Received: by 2002:a17:907:1c84:b0:c41:8e21:4d58 with SMTP id a640c23a62f3a-c46bda5675cmr264157566b.5.1792858494291;
-        Sat, 24 Oct 2026 09:14:54 -0700 (PDT)
-Received: from smtpclient.apple (wlan-199066.nbw.tue.nl. [131.155.199.66])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd77e1e9sm104445666b.67.2026.10.24.09.14.53
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 24 Oct 2026 09:14:53 -0700 (PDT)
-From: mixalhs <mike.michalo@gmail.com>
-X-Google-Original-From: mixalhs <Mike.michalo@gmail.com>
-Content-Type: text/plain;
-	charset=us-ascii
+        d=1e100.net; s=20260707; t=1792867568; x=1793472368;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=os+CpApFAeFMQFmoyWApV92IYG427+6BdGY0Jd+kTAA=;
+        b=Nur1iMp9IvDfJ24Qg/Ixj3cjE4WB9ujuuYjxCyTDPtsBhhoodOCZOTQSiB5dBTe1ok
+         NYDwiJeh9ISuI60gkZMNYvO7eDip8MOPH0hlluLTFJqvsmXBTdA/lOb3mbaH2Be2ipWP
+         P1CW8ga04Q+3GaFd7TJU1KtC/4GW9ebsHGkR41NFxCKoO5vGNpVGPcUThi6XpIyjWXZz
+         3+yoJHoq8fGVCGWw7CDHTD0QrSsapCrh6LHPNks+QcIkZ3i0b/4dozl/rx5fVVRU7ikU
+         W71p5dCk3Q4yrkf4YLbdzjrL5PFwe47Z4hhF09gIxEhy0dnSd77p/8L8xFDF/Ggp1kSH
+         Kc2w==
+X-Forwarded-Encrypted: i=1; AKwUvBw8/m5tAB2Vrya0PYQNH0roBTCi45i07ThToOxOIEy4DeVa/S7n+Ynm7DZNU8Jj6bGZDMtCpCIP3+3k@vger.kernel.org
+X-Gm-Message-State: AFq9FYLDPK9XxpVzM7z5jWnBZnI/2DtxpvCETPBUZvNYCJO3mZKMzPlv
+	PI9Nu/T5ica2/B/8WisPfygPnzVr0RedSMBeibNs1+HnB6LZGu/84qzG
+X-Gm-Gg: AYBFou3esh/yeigvZH8Ee+4NBMebL6owhtlrx6UaKK9ILpn3h4t3QM2sxSqq3Y3D2MT
+	6Q/iWmoT0rCwpiiS33VQskdXG+ju4Kp6/5zKWHCbQ1N0xZe3q/BDN0DxV1dReiVnltf0OOyivlj
+	yP6u7LD+CGBsX4RLQtmxgYWKZ5Y5Sqh2Oy1RHB9XHwu4raGFezIe8L7ZWF/lEWc/L8X+HEaYvOL
+	RzatTnnwpSlbACH364vu8zd+kQK2oOQu7C2cUjsvva3qWh8tKAD2y9gVWXvTvOVoO5w5kxaJytQ
+	3SXOfWp2ivWRdgpY+pdEW+eOaY25aXYXqWGRqgl5+N72s+HNrr/8cSL4JY44WMJAcpChsCgfkKJ
+	apDi0yiI9Mw/Zxq3x0Lc6lOq+LRznVyRhlIU4ktt0BkNiBRTrzKfcpL3TAB4qkzaLA32sXjaV9W
+	7hBWoDOU6vIIXcyVrNMmGHlfkWT4/e9zpDRHtBiRbH7bZqMh8XCmzXbDqawEB28upDnzxU9Q4Hc
+	enQqZ9MIvGv2gkiXVMIfgO1ydO3+IQyeZgzJnwMVbfTMc/rrZt4SV8s70dJn7GtTOoXpqeHhF7q
+	Dq6bRMPuBNbfYp9bWGKHczX0Ft/miBAzK6+KwPb/kJ6Rl6sutgiCfO7MWLG3kEmSkpFpQOcBAgZ
+	XE1ififMsT0Jc
+X-Received: by 2002:a17:907:930a:b0:c2d:ca32:2176 with SMTP id a640c23a62f3a-c46bdc2abbcmr300585866b.8.1792867568098;
+        Sat, 24 Oct 2026 11:46:08 -0700 (PDT)
+Received: from wlan-199066.nbw.tue.nl (wlan-199066.nbw.tue.nl. [131.155.199.66])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd4e7c94sm117451666b.27.2026.10.24.11.46.07
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 24 Oct 2026 11:46:07 -0700 (PDT)
+From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+To: pc@manguebit.org
+Cc: bharathsm@microsoft.com,
+	linkinjeon@kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ronniesahlberg@gmail.com,
+	samba-technical@lists.samba.org,
+	sprasad@microsoft.com,
+	syzbot+c2ec61adfbcb24e5ec20@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	tom@talpey.com,
+	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Subject: Re: [syzbot] [cifs?] KASAN: slab-use-after-free Read in cifs_crypto_secmech_release
+Date: Sat, 24 Oct 2026 20:46:05 +0200
+Message-ID: <20261024184605.44432-1-mike.michalo@gmail.com>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <8bb0534e33a5f5d152d2b1768d1fd7c6@manguebit.org>
+References: <8bb0534e33a5f5d152d2b1768d1fd7c6@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -93,49 +106,68 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.700.51.1.1\))
-Subject: Re: ksmbd: AES-GMAC signing support?
-In-Reply-To: <D0F05F9A-5097-4A2D-9235-AE395961F456@gmail.com>
-Date: Sat, 24 Oct 2026 18:14:43 +0200
-Cc: Tom Talpey <tom@talpey.com>,
- Enzo Matsumiya <ematsumiya@suse.de>,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- linux-cifs@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <17D8C477-341E-4D81-B585-56629E155153@gmail.com>
-References: <20261023174821.17552-1-mike.michalo@gmail.com>
- <atugaviJxR8nzHQO@suse.de> <47ec7610-9013-4c4b-ae37-f6d88556e59a@talpey.com>
- <F6CE78FA-AA06-4F00-BAE0-80B0819CE6DE@gmail.com>
- <CAKYAXd_zM0K9oAjEMzYinBeZEF=0=ozsd3+LRY6gy_O95btzRw@mail.gmail.com>
- <D0F05F9A-5097-4A2D-9235-AE395961F456@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-X-Mailer: Apple Mail (2.3864.700.51.1.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi all,
+Hi Paulo,
 
-A short addition for question 1: x86 numbers and a Windows test.
+On Tue, Oct 20, 2026, Paulo Alcantara wrote:
+> #syz test: git://git.manguebit.org/linux.git cifs-fixes 
 
-Setup: 2 cloud VMs (AMD EPYC Milan, 4 vCPUs), 3.56 Gbit/s network,
-ksmbd-for-next + the 2 patches.
+Not sure if you already have verified your patch but
+In case this is still helpful:
 
-Windows Server 2025 offered GMAC first and ksmbd answered AES-GMAC;
-a 1 GiB copy to and from the share came back identical.
+syzbot has no reproducer for this one, so I tried to make one. The
+natural window is tiny (the demultiplex thread only rechecks
+tcpStatus when its 7 s receive timeout expires), so I widened it
+with a debug msleep(10000) right after tcpStatus = CifsExiting in
+cifs_put_tcp_session(). The trigger itself is simple: a TCP listener
+on 127.0.0.1:445 that accepts but never answers, a cifs mount of
+//127.0.0.1/share against it, and SIGKILL to the mount after 1 s, so
+cifs_mount() fails with -ERESTARTSYS and drops the last reference.
 
-On x86 the slow part of the library is CBC-MAC, not GHASH:
-aes_cbcmac_blocks() has an arch hook only on arm64, so x86 takes
-the FPU for every 16-byte block. Signing 1 MiB, MB/s:
+Without your patch this gives the same report as syzbot:
 
-                    HMAC-SHA256   AES-CMAC      AES-GMAC
-  library today            1494        207                  1174
-  with experiment       1670      757 (3.7x)          2475 (2.1x)
+  BUG: KASAN: slab-use-after-free in cifs_crypto_secmech_release
+   cifs_put_tcp_session
+  Freed by task ...:
+   clean_demultiplex_info
+  CIFS: VFS: cifs_mount failed w/return code = -512
 
-(experiment: the arm64 GHASH approach ported to x86, plus one FPU
-section per 4 KiB in CBC-MAC; lib/crypto KUnit tests pass.)
+With your patch ("smb: client: fix UAF of TCP_Server_Info in
+cifs_put_tcp_session()", fcf942f9eeca) and the same delay at the
+same point, 5 rounds run without any KASAN report.
 
-End to end, 1M reads: HMAC 449, CMAC 341, GMAC 469 MB/s today
-(HMAC and GMAC at the network limit); CMAC 400 with the experiment.
+Tested on UML (x86_64, KASAN, PREEMPT) on top of ksmbd-for-next
+4623da395dc4, whose fs/smb/client/connect.c is the blob your patch
+applies to. Without the delay, 50 rounds on the unfixed kernel did
+not hit the race.
 
+The reproducer, run as root:
+
+  import ctypes, os, signal, socket, time
+  srv = socket.socket()
+  srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+  srv.bind(("127.0.0.1", 445))
+  srv.listen(64)
+  held = []
+  if os.fork() == 0:          # accept, never reply
+      while True:
+          held.append(srv.accept()[0])
+  libc = ctypes.CDLL(None, use_errno=True)
+  os.makedirs("/run/cifsmnt", exist_ok=True)
+  pid = os.fork()
+  if pid == 0:
+      libc.mount(b"//127.0.0.1/share", b"/run/cifsmnt", b"cifs", 0,
+                 b"username=u,password=p,vers=3.1.1")
+      os._exit(0)
+  time.sleep(1)
+  os.kill(pid, signal.SIGKILL)
+  os.waitpid(pid, 0)
+
+In case it helps when you post the patch:
+
+Tested-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
 
 Thanks,
 Michalis
