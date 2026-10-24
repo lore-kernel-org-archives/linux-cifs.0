@@ -1,54 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792816002;
-	b=Ac3Cq7J5g2My6LsvJSy7msfsibLhJA6LVPtptqeol87Scstn6e+xwHEi1fMdo9klA3rj
-	 UEW3hXINkjAHEw9ersQSAnLkYtUtJ4/9p+7NfpRbdiOPe+RJ3gFpD89yEvfWDTEaLWMS3
-	 JBjP04+t1MvR/EtzEqQ6Um9/NM4XQM7SEi0WFLDvjE2LxyRDhAO34IISvuM9aRggZX2Xu
-	 44+hnZEjTVehi38lJ0bDqJ43ITL6ik/Slmjdy/Q6xIC4A+v+0e/CN4koaEm4I+axnKZSz
-	 /6HjqlTxDaf7nP6o2SioE6pgvY87MaS7SRkRf9wlvACFXIozEkMKqpTWacxo4hNdSNA==
+	t=1792817106;
+	b=pOVG4XtqHx1YImssvaJ5FLcml+tfJDf6JuJq8/AM5lB+RyouP44Fc9FqKTeFdttwNlki
+	 I0DBZiBbwYNHtdrSFcUjgRZsCJSHYTqR2aZxprlpJXcvOkDEXd8rJDoXsXb0NRM6eRSyT
+	 KHOap27DFQFnsBn2iO/wM5EzgACDHJQAczhRYGjtQzVCBR8HoGwMtjxHmkY0pRIAfCHwX
+	 be6x1sz/V2hHnOJNP8RqoZ1VIS7266s3mRBdsMtN9CFPxeHhMFSRaaQdKPDoa6knlUFY2
+	 o4KXMDanH6INkOeGATok1zU+pU4cK8pJQg3o9CbnXAYSLQTT1/dZMsd1/7eJ7fvK3yQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792816002;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792817106;
 	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:
 	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
 	 Content-Type;
-	bh=zO4TeL2VLDwoRhmTApAwmrZ23lSZX//mRkM2rzOefnY=;
-	b=f/N1oh5K5404Nm6rRgkSPc7RmJCsuNOAzQGPpE3Eb89WLUYLa6UNl6Y+RTHrdiEEZmu/
-	 AjCjmAGzwKYYw5QdX5JQoW7LU8e/gvQKKlyUibnozEG6x00L56LzUO/gm0LTDH7pbM5HL
-	 VwurxSGFV2m/eSH4gXpzHsIh9EoZZSJXHecFKWwX2eAlxOPRhBc7tQMKAvs0l2xxxyKWe
-	 mhnJhC4T1YMqaO9ti+qsmHp7Qn0xQRuxLCKeg+naNuTB00dF3kzraIM0PwATuIi8Es6GN
-	 UABKe1Hu7xQ6P9cbTyLpbQSsdpuFB5Cwau9oUcZ21uieSBn48AtPzZDM+8KzbJEvg5A==
+	bh=IkTExJ1xt4czrppb7I7mUL52p2q4p/WVjeziJB6ECHU=;
+	b=CmVd8gMihGMLe3/mTtG3c6muMESsxqdci5f/Q54UJ6DaTwtW0KNO9iRQA5fmudzP1iGz
+	 2yRoGcETLqYLJql9yIWW/36mjB5MDXCfdW/7si4b0QqAPrqUzt4LVS5N2oCY41U/FC8NZ
+	 MSGtnzEzzAeJCmjPt7DJtl7dQq62dsDKw/S/MDOtKNkUwNmigUIFSfaKULNqktHX41N+J
+	 xt3VUZDwPJ08qaylOPzsxhSTdEbu++dyGp5gjMtmkFpNSklXybTBQDDjYc5GKx2L5gmVp
+	 ND5IlLI0o6i5F84Az2uXKGMf6Cqjrzthfzi0Y57hGVk/e95ZHVwf2S+eTNcABf+fvRQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PyUUPtvw;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=if3Z+TJx;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B389E606A31A
-	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 04:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F031606A31B
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 04:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PyUUPtvw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81D811F031E0
-	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 04:26:41 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=if3Z+TJx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E11B41F01829
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 04:45:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792816001;
-	bh=zO4TeL2VLDwoRhmTApAwmrZ23lSZX//mRkM2rzOefnY=;
+	s=k20260515; t=1792817105;
+	bh=IkTExJ1xt4czrppb7I7mUL52p2q4p/WVjeziJB6ECHU=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=PyUUPtvw5bdENw6w18PmlNvwSmCeWycjVf8MggNts0ZTSUSCKzMSvw+bmRZdP4Fw5
-	 qCu3EdzRFqEAMRr3xXMmC+HnISD+8/Hetk6iwgVO/OUfyXJJFMlcczh6Dk3yq2KxeQ
-	 TWtDTuvOz58VsoV1Lu3FBqW3FaSI+AWbBkK+Bi97ns+PbeX4wLgL3jGymHYmCK4Ur0
-	 eNusLZs8imc7QwrTwvHN1VV/4Grp4kPsjd3sC1WtEOcEsCrSO28L6MBBK/hRFN+GWV
-	 6wNxapFgZmyikXKJuOL3IJhwcYw5UOCLgAfOqeNF/Qs3CwXaBYwGZakRpALSEGrvmB
-	 KzPYTyAcgEPXA==
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c45551fa84eso223675966b.3
-        for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 21:26:41 -0700 (PDT)
-X-Gm-Message-State: AFq9FYLqY3o4/loUJHNu6mB6mocmQksfkN3TMZcvyaOxUTNkOtbwZG5a
-	U9DCQbAzh+Tz3oR5ACvvbLw7gjT7iPH2c3/ucDuY1KdiKRF31aMjj2WcXJQm80WwW2x6G/wMGuZ
-	i5q+y/0JWh7qzrs+X980b2ovvYPb9Wfk=
-X-Received: by 2002:a17:906:dc93:b0:c40:4848:f7fa with SMTP id
- a640c23a62f3a-c46bde2f540mr90915866b.44.1792816000198; Fri, 23 Oct 2026
- 21:26:40 -0700 (PDT)
+	b=if3Z+TJxI1bXf/vuydBkj2ivHmkCVAqHzVk9OFXSEy1B+mOLms0ke7TXA039Z7Gs6
+	 t6Vs5LOQzauh6G1nEpx5RCtPuzRJTEay/IMWkhsmTi1M2RUff6El4JtLZiqA1QhtAP
+	 9QZhqJhvRvybwETE2aMycuZrVEaTrWYsh2XHZJIG1QLtK25HKoBztPK+a22j4cOF5g
+	 an2a6xFpk1tKLwkrc+YpotG7GR3bTVFn5Qe5ofiv1NITJel10SbKWb9lfy03vZEzmP
+	 uVGipa0d1fp3Vp6xNAoWHtCSjUZVf7UF0m3YyRuiYpqgW+B73VhJoeOa4GGbJJAtuH
+	 3gwadCRud0pEQ==
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6b40fc523faso1545384a12.3
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 21:45:05 -0700 (PDT)
+X-Gm-Message-State: AFq9FYIpLAN82Va+LCu9k+BBZet2nJrEMD9Dhgv5Z59d1vI6TBSM8jMY
+	Q8ZH4HOH37+jbMcADPgj2GRXc0EdzB/x1JTKJvZXB1ldiCyuiDq4K2AUnPCshM/kUrfJDbtkMBY
+	usDXCE0ACXJ/kLvOiZyqF8r9UkhFz/5s=
+X-Received: by 2002:a17:907:d9f:b0:c45:c030:732c with SMTP id
+ a640c23a62f3a-c46bdea5694mr92508966b.41.1792817104588; Fri, 23 Oct 2026
+ 21:45:04 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,100 +58,81 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261022092514.2590010-1-huiwen.he@linux.dev> <20261022092514.2590010-3-huiwen.he@linux.dev>
-In-Reply-To: <20261022092514.2590010-3-huiwen.he@linux.dev>
+References: <20261022092514.2590010-1-huiwen.he@linux.dev> <20261022092514.2590010-5-huiwen.he@linux.dev>
+In-Reply-To: <20261022092514.2590010-5-huiwen.he@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 24 Oct 2026 13:26:28 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9Ow2SeZ1EjR7UBF3rmMn4=HKZrKajNdFU5TAnLVf=THg@mail.gmail.com>
-X-Gm-Features: AclHuK9uO2_C8bKZjFDaY05N9hxwllj8qT7cYV8El9xw-GBpwNxHYHkFNCN5de0
-Message-ID: <CAKYAXd9Ow2SeZ1EjR7UBF3rmMn4=HKZrKajNdFU5TAnLVf=THg@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/4] ksmbd: route WRITE requests to an unbound workqueue
+Date: Sat, 24 Oct 2026 13:44:52 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9SW_D1gwMhD8gVjVJAcPoxiXvHB0TvDLqnjw8TpGCKRw@mail.gmail.com>
+X-Gm-Features: AclHuK8Kwr3rWA83HAQi48hy7B3QNMUE-TB8Aiiq6UAFJonGlI7eqeiW9f6hFRw
+Message-ID: <CAKYAXd9SW_D1gwMhD8gVjVJAcPoxiXvHB0TvDLqnjw8TpGCKRw@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/4] ksmbd: send READ payloads with MSG_SPLICE_PAGES
 To: Huiwen He <huiwen.he@linux.dev>
 Cc: linux-cifs@vger.kernel.org, senozhatsky@chromium.org, tom@talpey.com, 
 	chenxiaosong@chenxiaosong.com, tj@kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-> @@ -17,6 +18,23 @@
->  static struct kmem_cache *work_cache;
->  static struct workqueue_struct *ksmbd_wq;
+> @@ -35,6 +35,47 @@ bool ksmbd_queue_request(struct ksmbd_work *work, bool use_write_wq)
+>         return queue_work(wq, &work->work);
+>  }
 >
-> +/* Load-time switch for the WRITE request routing policy. */
-> +bool ksmbd_write_wq_enabled;
-> +module_param_named(write_wq, ksmbd_write_wq_enabled, bool, 0444);
-> +MODULE_PARM_DESC(write_wq,
-> +                "Route eligible WRITEs to an unbound workqueue; load-time only");
-> +
-Since this improves performance, why isn't it enabled by default?
-Also, I would like this setting to be on/off via ksmbd.conf.
-
-> +enum ksmbd_wq_class {
-> +       KSMBD_WQ_LOCAL,
-> +       KSMBD_WQ_WRITE,
-> +       KSMBD_WQ_BLOCK_WRITE,
-> +};
-> +
-> +/*
-> + * Classify a complete RFC1002-framed request for workqueue placement only.
-> + * Check bounds before inspecting fields; leave protocol validation to the worker.
-> + */
-> +static enum ksmbd_wq_class ksmbd_smb2_wq_classify(void *buf)
+> +struct aux_read *ksmbd_alloc_read_buf(size_t length, bool allow_splice)
 > +{
-> +       const struct smb2_hdr *hdr = smb_get_msg(buf);
-> +       const struct smb2_write_req *req = (const void *)hdr;
-> +       unsigned int len = get_rfc1002_len(buf);
+> +       struct aux_read *ar;
+> +       size_t alloc_size = ALIGN(length, 8);
 > +
-> +       if (len < sizeof(*hdr) || hdr->ProtocolId != SMB2_PROTO_NUMBER ||
-> +           hdr->NextCommand ||
-> +           (hdr->Flags & (SMB2_FLAGS_SERVER_TO_REDIR | SMB2_FLAGS_ASYNC_COMMAND |
-> +                          SMB2_FLAGS_RELATED_OPERATIONS | SMB2_FLAGS_SIGNED)))
-> +               return KSMBD_WQ_BLOCK_WRITE;
+> +       ar = kzalloc_obj(*ar, KSMBD_DEFAULT_GFP);
+> +       if (!ar)
+> +               return NULL;
 > +
-> +       switch (get_unaligned_le16(&hdr->Command)) {
-> +       case SMB2_WRITE_HE:
-> +               if (len < sizeof(*req) || !req->Length ||
-> +                   req->Channel != SMB2_CHANNEL_NONE || req->Flags)
-> +                       return KSMBD_WQ_BLOCK_WRITE;
-For 4 KiB single-channel WRITEs, throughput drops from 219.55 to
-193.01 MiB/s. Should we add a size check here to keep small WRITEs on
-the per-CPU queue?
+> +       if (allow_splice && length) {
+> +               unsigned int order = get_order(alloc_size);
+> +
+> +               /* TCP references to tails must keep the whole allocation alive. */
+> +               if (order <= MAX_PAGE_ORDER)
+> +                       ar->page = alloc_pages(GFP_KERNEL | __GFP_COMP |
+> +                                              __GFP_NORETRY | __GFP_NOWARN, order);
+Order-8 and order-10 allocations can easily fail when memory is
+fragmented. Since MSG_SPLICE_PAGES does not require physically
+contiguous pages, could we allocate individual pages and use a bvec
+iterator instead? Please see drivers/nvme/host/tcp.c as an example.
 
-> +               return KSMBD_WQ_WRITE;
-> +       case SMB2_NEGOTIATE_HE:
-> +       case SMB2_SESSION_SETUP_HE:
-> +       case SMB2_LOGOFF_HE:
-> +       case SMB2_TREE_CONNECT_HE:
-> +       case SMB2_TREE_DISCONNECT_HE:
-> +       case SMB2_CREATE_HE:
-> +       case SMB2_CLOSE_HE:
-> +       case SMB2_FLUSH_HE:
-> +       case SMB2_CANCEL_HE:
-> +       case SMB2_ECHO_HE:
-> +       case SMB2_QUERY_INFO_HE:
-> +       case SMB2_SET_INFO_HE:
-> +               /* Keep these commands per-CPU without blocking the WRITE queue. */
-> +               return KSMBD_WQ_LOCAL;
-> +       default:
-> +               /* READ and unclassified traffic also keep later WRITEs per-CPU. */
-> +               return KSMBD_WQ_BLOCK_WRITE;
 > +       }
+> +       if (ar->page)
+> +               ar->buf = page_address(ar->page);
+> +       else
+> +               ar->buf = kvmalloc(alloc_size, KSMBD_DEFAULT_GFP);
+> +       if (!ar->buf) {
+> +               kfree(ar);
+> +               return NULL;
+> +       }
+> +       return ar;
 > +}
-> diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-> index b7ce67094626..54ecdd096bd2 100644
-> --- a/fs/smb/server/smb2pdu.c
-> +++ b/fs/smb/server/smb2pdu.c
-> @@ -125,6 +125,12 @@ static int register_session_channel(struct ksmbd_session *sess,
->         if (xa_is_err(old)) {
->                 kfree_sensitive(chann);
->                 rc = xa_err(old);
-> +               goto out;
-> +       }
-> +       if (ksmbd_write_wq_enabled && count) {
-> +               /* Remember the extra channel even if binding later fails. */
-> +               xa_for_each(&sess->ksmbd_chann_list, index, chann)
-> +                       WRITE_ONCE(chann->conn->multichannel_seen, true);
-This walks the entire channel list and sets multichannel_seen again
-whenever an additional channel is registered. Since the flag is
-sticky, all existing channels are already marked when count > 1. Could
-we walk the list only when count == 1, marking both the existing and
-newly added connections, and update only conn->multichannel_seen when
-count > 1? This would avoid the repeated traversal and stores.
+> +
+
+> @@ -47,6 +49,29 @@
+>  #include "transport_tcp.h"
+>  #include "compress.h"
+>
+> +/* Switching affects allocation, not ownership of existing READ buffers. */
+> +static bool read_splice;
+> +
+> +static int read_splice_set(const char *val, const struct kernel_param *kp)
+> +{
+> +       bool enabled;
+> +       int ret;
+> +
+> +       ret = kstrtobool(val ?: "1", &enabled);
+> +       if (!ret)
+> +               WRITE_ONCE(*(bool *)kp->arg, enabled);
+> +       return ret;
+> +}
+> +
+> +static const struct kernel_param_ops read_splice_ops = {
+> +       .flags = KERNEL_PARAM_OPS_FL_NOARG,
+> +       .set = read_splice_set,
+> +       .get = param_get_bool,
+> +};
+> +module_param_cb(read_splice, &read_splice_ops, &read_splice, 0644);
+> +__MODULE_PARM_TYPE(read_splice, "bool");
+> +MODULE_PARM_DESC(read_splice, "Page-backed ordinary TCP READ sends");
+Can we set enable/disable it via ksmbd.conf also ?
