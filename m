@@ -1,61 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792804233;
-	b=33f/HR12CIuKLk65f1wAN7gzFs7lcSBAoAnzISkNHpj7/GJo8KhZNbnWlV1aKkQY6IrC
-	 Xm3qiQ2nSC20U1vYgL4D1nz7rbcUhAbSlH36mz/rIachXDz3vYC6TQ94XAJUDK+3nqXtz
-	 NU5nhDnshNl22XAaGbcoy4dMX9rwK+FBegpMC/LWDnc46kZzwMumQHP96GdfLEdzPhJxG
-	 x5gKaHlx0rJYSELCmVYALHdQFuwBpOPn36WPUjGQA5/s0HDs765FPpMfoo9SzDJFDyicz
-	 AHh6UET3r9EnbiWf5WKZbOg5Pwf8OhLgPPZwiy8klAy/JYIhdBsZZE7n7wLAYha8aYw==
+	t=1792804795;
+	b=xavicsQl5zpdP/sajoAQgTrtPuuoKawkkIcZgEPJ7+eacxhxudcxY1qx7Th/RjpTDpoy
+	 YHaBbFi96uCrlHoWgWJ6h7Gjnsi4hPzd71YwOP3VznnVOjLujpzU0KGGYzQQFbqMggvP1
+	 Z5LSoq0bZafrd/erLZt7hPSW70VhWueDeYf6gpWDZ2umikSWdqj46Fl6rFtpe94DJqlDe
+	 KUaVEZ/xzB6OLLc7eptsIAdKcQ6Tri5Bgi/S1MBNdjm4pPusaEEWulybbiBXR9iEeXyVc
+	 d5mNVz7PLo1wIN9l8IOrrjqtVV9eqqrBAYRftsNNj1sFihUVNWzw28TAiMy87lVUl3A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792804233;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=lOR7XnVD9EiQIXXVZhyBKMhMpZ9htVRrZdY6ZGRy8tk=;
-	b=jJYL9Wt6IJVl/ijnuffUCYhQA3SFqSP7pZ9WIaZEgqJXo1t9/0HLpXtkfy1qkIfiXJWB
-	 ND26Cgw+XcM718tc2XghqrQPaq3Wp5Zw2htrHsVBNqb1IwEePr7zNco+uAVPsGTxGq0Z+
-	 f+Z7oLj9yU8Epw72A8XfcdgN1r4npTCFvT1legV2JrXO/oHm0z9dmFZZJKkG8Z9nk5jJp
-	 jvsS1on+V1hD9YGk9eFIQWqLpOENSUm0EVq/YjzhfWR1nnIL0adcLH7/WJZA7AjR6HdJ0
-	 iSF65HeCoDnWnxn94CGFColKPAgQxY4fL2tj+r63ywHgXQZinP7k2QbCpt6nPI0yn2A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792804795;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=RT08dkW8FxBaFchwPuSHiE6eaEHqdC1KJ6SLXOInNzw=;
+	b=QK3L+AMdfq93ywWhRgVC9tL+x3LrLvPVnjiJrzu9fL2UFq9rRDVXRKqqi6tx3X4c8hzQ
+	 apHqSf/H6MnCrcQDvDMdGCriMcO3RE7qh5X+MiNoikK+m7hlNWw/cQmpTEYcFzYv0oADT
+	 XVO2Vuxzc+MvIbE3kftkIfF+JZS65HDXDfKNupXVUWrUwwC4P3HPR8+nBGmVEPSTuuVtT
+	 Gq2iKlbuc11q9fBJv/ST+3H10PnMUCz1dUoFnGJatcKOA2n8p1IiS5H0FfT6oYvEVlm4T
+	 yDsDThKvrqQUvBfVH0P5e8lPEGIt9Nw/bVszecULwUdF4Ga3ovDk9RnhLtBqrzTgCGA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b="drb/iLhK";
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Ikph/nCc";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C504C606A31A
-	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 01:10:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C504C606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BA8606A31B
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 01:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=drb/iLhK
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lOR7XnVD9EiQIXXVZhyBKMhMpZ9htVRrZdY6ZGRy8tk=; b=drb/iLhKHcrW1i51pjr0P+ib5Z
-	NkS40upfqtrB5oyJPMi+XYxH+ynxQpA2z7iVLplmo9DbQQbsBDrQ5rB6kLZ77fIr5VQtGgWnAWsni
-	w1F+74LER9cD/4pw2Qi1CjkMfo1qX23E7VZt2H3glFzKkc+LrLLf/o7clv3nxEHj9loZ+zcKixtB8
-	nfuqiANOyMnP5bFxR+j0/ksLDNwb6jPXYz3ZktG9SKupFSjIp2h1PkuaBcfu3S97uJWiw3yKXMrQv
-	0SZI16QCiZJaADx4M6gfQd8lMUbNJYdbP2VgCQx6R6PcNH3zNUF4xV709k+vq9Y/26iySD0GBpEx9
-	YXOh2umw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xKQHF-000000007dz-46NU;
-	Fri, 23 Oct 2026 22:10:29 -0300
-Message-ID: <b71198e85e4498dc27853062529daff3@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Dominik Maier <dmnk@google.com>, Steve French <sfrench@samba.org>,
- Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, dmnk+artist@google.com, Dominik Maier
- <dmnk@google.com>
-Subject: Re: [PATCH] smb: client: fix slab-out-of-bounds write in
- id_mode_to_cifs_acl()
-In-Reply-To: <20261022232116.2536320-1-dmnk@google.com>
-References: <20261022232116.2536320-1-dmnk@google.com>
-Date: Fri, 23 Oct 2026 22:10:29 -0300
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ikph/nCc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A79821F01825
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 01:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1792804794;
+	bh=RT08dkW8FxBaFchwPuSHiE6eaEHqdC1KJ6SLXOInNzw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Ikph/nCc1kOs7IXxgqAgYor5jl/nZpyWms3hhoHEjjDyPhWfPKOvGXSQ8CbP3325N
+	 He+aGhUPXq8EtFq2dRu0aYohA6n5IYN2k9TmAvrYShX0rmWVuyINhJAYDMVmNCb1Nr
+	 9q2WnIJmWVtptRIKzz+ouXyAWM+CGz0M4BlcewGg3uPsjMb8fyJi8wVQjoKbD/D0hh
+	 kpBeSmxEVSWuHFg9EHiATYP5oQCpDor8b4h3OaoTVXYvpRHfgFyU3SASfe5W7dwnPa
+	 iSMQw4LZ0ajNFyL+S+lh1WXlic1qOKU5EckYbAlLAO9NSE4getRSVFJelZ2FfSjfhH
+	 I80rickRnG6xg==
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c38ac26cc5dso214264866b.2
+        for <linux-cifs@vger.kernel.org>; Fri, 23 Oct 2026 18:19:54 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBw0CPzC+iEQvHyriCZ6wJu+dMvjcsnXmFqHC232J9vpcxHYNfy8W87vb7bmrK7lgJ9r3hA/uCJabcdn@vger.kernel.org
+X-Gm-Message-State: AFq9FYJCmbvxzVuGd9qvk3n+r0R1zNdIMSTtkuc9K9bwN9ttDXuChFsg
+	+hxpmBNQ+IDWtA6H+ueBA4305DnEV3QHYXwJQxNq4Ow6gwTJa0NoQL+IpkrKGsZdAw/URsg5wr5
+	yljscy/EAYeIaFE+NQJb7YnrX0O9TB3o=
+X-Received: by 2002:a17:907:94ca:b0:c3e:34fa:611d with SMTP id
+ a640c23a62f3a-c46bde7eaf0mr83233866b.35.1792804793341; Fri, 23 Oct 2026
+ 18:19:53 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -65,31 +59,51 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20261023174821.17552-1-mike.michalo@gmail.com>
+ <atugaviJxR8nzHQO@suse.de> <47ec7610-9013-4c4b-ae37-f6d88556e59a@talpey.com> <F6CE78FA-AA06-4F00-BAE0-80B0819CE6DE@gmail.com>
+In-Reply-To: <F6CE78FA-AA06-4F00-BAE0-80B0819CE6DE@gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 24 Oct 2026 10:19:41 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_zM0K9oAjEMzYinBeZEF=0=ozsd3+LRY6gy_O95btzRw@mail.gmail.com>
+X-Gm-Features: AclHuK-WLdDFKY7pNiy2tu6vh0Xvcfdn4F20whBPb-EMN2nOC5566RjM5KUe2Fg
+Message-ID: <CAKYAXd_zM0K9oAjEMzYinBeZEF=0=ozsd3+LRY6gy_O95btzRw@mail.gmail.com>
+Subject: Re: ksmbd: AES-GMAC signing support?
+To: mixalhs <mike.michalo@gmail.com>
+Cc: Tom Talpey <tom@talpey.com>, Enzo Matsumiya <ematsumiya@suse.de>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
+	linux-cifs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dominik Maier <dmnk@google.com> writes:
+On Sat, Oct 24, 2026 at 7:36=E2=80=AFAM mixalhs <mike.michalo@gmail.com> wr=
+ote:
+Hi Michalis,
 
-> In id_mode_to_cifs_acl(), while the chown branch reserves
-> sizeof(struct smb_ntsd) + 2 * sizeof(struct smb_sid) (plus
-> sizeof(struct smb_acl) and the worst-case ACE space after
-> commit 0ee150794c75 ("smb: client: fix heap overflow in DACL owner/group
-> rewrite")), the chmod branch only adds 2 * sizeof(struct smb_ace) or
-> 5 * sizeof(struct smb_ace) to secdesclen (or 1 * sizeof(struct smb_ace)
-> on posix).
 >
-> However, the chmod branch also invokes build_sec_desc() ->
-> copy_sec_desc(), which unconditionally writes the Owner SID at
-> pnntsd + sidsoffset and the Group SID at
-> pnntsd + sidsoffset + sizeof(struct smb_sid) (2 * 68 = 136 bytes total),
-> and set_chmod_dacl() always writes a struct smb_acl header (8 bytes)
-> even when the source descriptor has dacloffset == 0. When a security
-> descriptor has compact or overlapping Owner/Group SIDs (or
-> dacloffset == 0), calling chmod() under-allocates pnntsd and writes past
-> the end of the slab buffer.
+> Hi Enzo, Tom,
 >
-> Reserve sizeof(struct smb_acl) + 2 * sizeof(struct smb_sid) (plus
-> sizeof(struct smb_ntsd) on the posix path) in the chmod branch of
-> id_mode_to_cifs_acl().
-> ...
-
-Applied.
+> On Fri, Oct 23, 2026, Enzo Matsumiya wrote:
+> > I did this 4 years ago for cifs:
+> >
+> > https://github.com/smfrench/smb3-kernel/commits/aes-gmac-v3/
+> > ...
+> > Feel free to use that code as a reference for your implementation.
+>
+> Thanks, that's very helpful, and thanks for the quick replies. ksmbd
+> already sets up gcm(aes) AEAD transforms for encryption, so the server
+> side should be able to reuse most of that. Your branch will save me a
+> lot of time, and I'll credit you wherever I build on it.
+>
+> On Fri, Oct 23, 2026, Tom Talpey wrote:
+> > refreshing the numbers for Linux (especially on ARM64) should be part
+> > of the discussion.
+>
+> Agreed. I'll measure GMAC against CMAC signing on x86_64 and arm64 and
+> include the numbers with the patches, which as mentioned will be after
+> mid-November. Finally have a use for my arm64 machine hehe.
+GMAC signing support has been on my TODO list for quite a while. No
+one else is currently working on this for ksmbd, so I really
+appreciate you taking this on! When you submit the patches, could you
+also update the KSMBD Feature Status table in
+Documentation/filesystems/smb/ksmbd.rst? The =E2=80=9CSMB3.1.1 GMAC signing
+support=E2=80=9D entry is currently marked as =E2=80=9CPlanned for future."
