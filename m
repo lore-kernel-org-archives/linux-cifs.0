@@ -1,138 +1,89 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.84.95
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1792845380;
-	b=Xz+3qxyylNplqJmLaE2igr6DbEsuyRKJu5dC0m4eKN/fCa1ySmjkgimwROjhCgLRcI69
-	 VeOLjL7OPxUxfVclf8+/U7udTOxCGnNxBzyzlzMb9fXeQDnrcUQLnQDHJKBNJtJJRAFBC
-	 mWcFkqbPgZccn0dmMtQMvfqBSM1a/u9V5CeOqY946jNKwb3wQ7/UJsEOQAKrbxG8iBVMo
-	 wF+PJawu30uAwhgos42Uygu93IOmCMFWU1418LcgaZqNnxMXfc8EYV1HoPrkmUfq6+MAE
-	 MfAOBY58EYKrgWZnZuatQHzBzF/gWmTsd3bt0F34n9BJMpQNDTBCIYzms3Vj3NTTxxg==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792845380;
-	h=DMARC-Filter:DKIM-Signature:Received:Received:From:To:CC:Subject:
-	 Thread-Topic:Thread-Index:Date:Message-ID:Accept-Language:
-	 Content-Language:X-MS-Has-Attach:X-MS-TNEF-Correlator:msip_labels:
-	 x-ms-publictraffictype:x-ms-traffictypediagnostic:
-	 x-ms-office365-filtering-correlation-id:x-ms-exchange-senderadcheck:
-	 x-ms-exchange-antispam-relay:x-microsoft-antispam:
-	 x-microsoft-antispam-message-info:x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-AuthAs:X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped;
-	bh=E6x2C4ed46QgklsY33q8+PIVEWQQ+i2A4Y9A2oWICjs=;
-	b=AZ/4kSgmVIvNRq9PXt16rYbcxEO9UzdbfFq5FQXlK2HD//CY82RgevPrqxlBZo23Djik
-	 nO9W0ULg5O1lKOIPrsOW9riDo4uGeRPPmyToJ3JVhYJnlfDDmWuehNMJdynS//cJ22UFH
-	 /Aycahgc8oAMIngDZoLgfMCijIeWfJcjeZOr5bpxfYjNwNE8Jofvr8va75CApxGCHc9Ry
-	 95QHIzN33vWrvDhCdYGKG4WVDrISA+se6r1+STQhyInKmnkTwpuvuzzo95ztCrfOQxwqQ
-	 u443KT/kgSyc8/sjnXRUvN93nxp0CWtbWvb9dJKAZcYThuG2xCfAQGfgSjBcYCmDFnw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=kuleuven.be;
-	spf=pass smtp.mailfrom=kuleuven.be;
-	dkim=pass header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=fld+7UfP;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=52.101.84.95
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11020095.outbound.protection.outlook.com [52.101.84.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (secp384r1) server-signature ECDSA (prime256v1) server-digest SHA256)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.54
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1792846800;
+	b=kDWSKBnu1FeKFBYfnMXf+ujL4Jl0tEc8t9WFJ4pgCwNI4UiLe+SIE1uqiXbTmGkD/sSC
+	 KiCIXga4bFudeSOQsrt35Xddz1z5V/6PcXFL3KVsV+vAZU6KAqnZKZMz+I+511gEvX96z
+	 DTYNTANXxNXfNFEE8nAmpgqi4voqI63NbpLantEeTzDVsUIS5xznEpG5LObsj5QlSHwSC
+	 nOGWB5eQyF86IT1mu6P/DjfSVWi7ktCIaEl7Yiah9PTgolctRYKbdaMHMJaRB9CHSSCZw
+	 FPNnYKYNNdbGtYt/OA/RK7iA+ENd5vcGNTNxmeQNYRA4zks7KB4O4E/2EC2KLUY0fLA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792846800;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:X-Google-Original-From:Content-Type:Mime-Version:Subject:
+	 In-Reply-To:Date:Cc:Content-Transfer-Encoding:Message-Id:References:
+	 To:X-Mailer;
+	bh=dqHs8tDmNMEZi1+5bLJJimo/fl1tge4B3BTmCW5R1Jc=;
+	b=pvLc9J/TqoKxCgpWtR97/ti5hj6L8s+a1FLAS7P2FyIndh3c/sZwdc4FN6YAy9XvLN0W
+	 HO2oKN1JXHIdYmVXH9MDaD7oeBgYUoNoMGAhZK6qFKqbWt2OfUvdckMO9KF7MB9EudtgA
+	 UoqA8QkwuaSWungdasRTyvZdH3CuQoP4RezsYc6ep8qsKHFtgZfffxFbEOHGfsxouFxPy
+	 a1q85UjXJGge2S4r2rboN5rf9nWFeLe+as9blvXbzV91HojOW4bSSplNdX1o4Z+Yg4ej3
+	 ZT0UQqvSknr8zdflntMSY/24LRuEwNsYdp3uMTUncBDPRln0B1H0PXaUKRlZDGdhv9g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b="Htff71u/";
+	arc=none smtp.remote-ip=209.85.218.54
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B0F606A31A
-	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 12:36:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00B0F606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kuleuven.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kuleuven.be
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CA0606A320
+	for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 12:59:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C5CA0606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=kuleuven.be header.i=@kuleuven.be header.a=rsa-sha256 header.s=selector1 header.b=fld+7UfP
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=A48LZ0ZUqOx/xTQQ65r21gJrGDjP7eMboVXneV2W1DcnHV2DlTbjYf5M6FO5roq2P3T3dTdwPC4g5gXDknV5Yy4ENwaWg44xRk186yMQwxFJ/AXUVL61zNmGFTtLviiXlnRpszIvdNYy0M4VyKOB7FJ1cQVaZT30TiRHAO/qu6J9fyHAAQEkznxcplWXpHuEaX/UFnuopIhQIsv8PVCRhu4nEl6Z+nj/FFDuGFiX37hNFj1kkISEArHfMqkVk4Arf/B+2PBXkuZJCOaHzlQ2N0VY8on+ro24Nge3Cw7U7Miqm2P5360sImQlKUWL2N559VyFT7xbDCyXLjPvTm+V2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E6x2C4ed46QgklsY33q8+PIVEWQQ+i2A4Y9A2oWICjs=;
- b=TOy4uUagW6xuW/niHftNJU9KB9vpPrznK0KCArSQD9LbTgxH35SewYkE88qjmJjIYbGxYaHnq/h3MjsXak/cV/7QX2l2f/vsW4OIXmYCGj2qw9dlY8+oI6uQQM+KwOpu+NpRO26Yxdp1yKjmunOZxNCob8DkkzvfJFlOJTutA7DcVh2qvmHw7qP4U+H6ugcuAMusI9pK80Zmqy+aVa6YcdXWwpkd0aXA7E91sQxDtyoxSehJVpvMdF02wHJ+1IV/ALy4LQMArXqTBZDeONQAgtRaKo9goSuAt26dzPIrwU3jYjyrG8O5Utj3NrLh2kzl3XYcj9hpj3OYXTqL1O4pzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=kuleuven.be; dmarc=pass action=none header.from=kuleuven.be;
- dkim=pass header.d=kuleuven.be; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kuleuven.be;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E6x2C4ed46QgklsY33q8+PIVEWQQ+i2A4Y9A2oWICjs=;
- b=fld+7UfPTHXBZbk1JD2v748tFl/Rqgvz93hez52QrrzsxZSgUYMhUtG+GrCz+w+fl9+WHTxta9hLU/D+48bi6o4sFIWc3UCzkVHCgeHAI8YOwjJUZQbWs327tYi8t3I04oKkKTbhHvjuYV3A+f9XvT11ikPwAqGBU78KukLSf9c=
-Received: from DB5PR08MB10062.eurprd08.prod.outlook.com (2603:10a6:10:48f::10)
- by AS8PR08MB5927.eurprd08.prod.outlook.com (2603:10a6:20b:292::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.546.21; Sat, 24 Oct
- 2026 12:36:15 +0000
-Received: from DB5PR08MB10062.eurprd08.prod.outlook.com
- ([fe80::cd17:89dc:ddbb:2f38]) by DB5PR08MB10062.eurprd08.prod.outlook.com
- ([fe80::cd17:89dc:ddbb:2f38%3]) with mapi id 15.21.0546.019; Sat, 24 Oct 2026
- 12:36:15 +0000
-From: Ratnaker Gautam <ratnaker.gautam@kuleuven.be>
-To: "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
-CC: "pc@manguebit.org" <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>
-Subject: [PATCH v2] smb: client: validate SMB1 EA list bounds before parsing
-Thread-Topic: [PATCH v2] smb: client: validate SMB1 EA list bounds before
- parsing
-Thread-Index: AQHdY7P4BJGorWzOi0aRoFw3dBkOdg==
-Date: Sat, 24 Oct 2026 12:36:14 +0000
-Message-ID:
- <DB5PR08MB100624D4B388FF7946505BFDEFD632@DB5PR08MB10062.eurprd08.prod.outlook.com>
-Accept-Language: en-BE, en-US
-Content-Language: aa
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: mx.microsoft.com 1; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=kuleuven.be;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB5PR08MB10062:EE_|AS8PR08MB5927:EE_
-x-ms-office365-filtering-correlation-id: a9484f33-74ac-47e8-7615-08df31cb64db
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|786006|1800799024|376014|10070799003|366016|23010399003|38070700021|260925021311599003|260925022911599003|260925021911599003|11063799006|56012099006|261009223027099003|261021123027099003|261021121427099003|261022105027099003|261022075727099003|261021135927099003|261022115727099003|10067099003|18002099003|3023799007;
-x-microsoft-antispam-message-info:
- XREaQKYuvv/fXbiZuQVINWfyZcsWa+hXQF27oOyx4iKRlSdITypfeUi6XPDAkt6bBE1BFAesjg8paH4rwEYm0ZBQ7fu0CFu7huqFrxC/9h/SkkSJN2XvK9aFLPxBb2g47ZtiV9bCsDKioTt2wb8IAlyrv/1q4sNXnycGs2cbOpB6hI8wJYacT260Y0a2F3da8micFuSsSicgsyCZb4skyCj83vaDbIOG9zgClnYGL0pfY5UVRikCCEeul2gE1pa1rGlwAsQSCAIGT9Ws+nxBB1/lu8HkDPnx4e0por43L+nGqylrKDxsEf+3PF0FuX7v7VHkAjJyAL3AD+bQuX9t6q+C3yUrXWtSFlnPnjbVuA5LV4krMf75LDi3vxmps+YhT3GS39j0Y+SLtDqyNaZ9xkCU69qrk3Eo8+c+Q2/F0QTTpr7HJBt0LOBy67VExRwG8rVDQVWaTilJcOi75cA+Lj0H3dSSoJnQlrqQbXetjWfEO9/aI2FtKgzq0E9khlgDqDIuzouUFpzuhQMMlwufjs48eVItj9/ksSOr4N0hRHJeRY3Fnbj9e2XMkzXWWNxXaak8o6QWC6jgINWGtImCz0MPOjeQIBG3oEIN9S4iiCBzJAUlcYg8P+xZuJLzgLxaroZ7bhOdn4tvmHoQ0OzI5xBxn+R077a4pMBBVpS1Pj2Lma0auHHevYV/OW1eGUXKYO3tr1HBGQoJP8WpypWGSYhDjxTvWBe9y28CU1Qfa8c=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB5PR08MB10062.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(786006)(1800799024)(376014)(10070799003)(366016)(23010399003)(38070700021)(260925021311599003)(260925022911599003)(260925021911599003)(11063799006)(56012099006)(261009223027099003)(261021123027099003)(261021121427099003)(261022105027099003)(261022075727099003)(261021135927099003)(261022115727099003)(10067099003)(18002099003)(3023799007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?z6I9PhnLdYyUr80mfoHGuU8b6xMILYqAYh1kyKjjwS3Ez+8QkI/HzFk36uIs?=
- =?us-ascii?Q?WxECqCab1S4adc+c/F6vWaSgNqUmr1Eoiurdy1W1/79chAH8M5131RKfwH5U?=
- =?us-ascii?Q?vCYzWulHl2gGfSWRAuTfzYfAv6uRbHcB14pvIXsahELIZ/NW1CKJWRtLt/EW?=
- =?us-ascii?Q?zev/EYWgIejfMhcMpwvzZ9f72OwbkyzrAY+WvrCmQch9Mq9xTlJqP2iqCk+z?=
- =?us-ascii?Q?L2zsAI5GP6PIgBmFF4NPEk85jIXOKQNElZKazJc+shk2P/eeVl3kdRzh2WXm?=
- =?us-ascii?Q?DamRkEyb6WTvE13CZlaT4CXQ7kSEnY6zxtKJF/3RaP2X5qwb+/ZtepiqQSPf?=
- =?us-ascii?Q?RsDYWRSdzCX5S6mpfcNSAQTocg+FrjbxJQmzjyY94Nuq3BiD2XfWEracM31j?=
- =?us-ascii?Q?yKRaqxiNMSkrhH08P7sTZHR+/Je9H1eLrKxXgRPmBJHcbVmyeCkTcNJ11GON?=
- =?us-ascii?Q?kOEQg/P5ScQ7Liimr1z4OIQOeNDp8O0wJyK/i4XA7gPmbu8cRXm+xpAa0nAw?=
- =?us-ascii?Q?tkbzTa+L/SPd4MSSCcADhyMWpqJASM6hzsLU/NxK2v9ehBzr6TxwYuciwagU?=
- =?us-ascii?Q?IH9MSpxB4Kn/Lc1BFE0ptc7iPF78XWPhGKd2Of6j+9FScqjyTKhji7r11yBw?=
- =?us-ascii?Q?eQCzawGsWOiYdDVlD/MglXma3MjVTLJTc9JNgPCKsxOJ4CZYVL/kcwliq2ej?=
- =?us-ascii?Q?pnlhokHds5XCsuGxeJ7Mo64V8uFgPS+pl+7uVUCu+MD6/MlPHFSjuq7amBd3?=
- =?us-ascii?Q?mQEoZl15eO4v+M2xa/HnAcEKMivJSQTD+rUpdpkklIxp6h8ECyrYpiGR2kpx?=
- =?us-ascii?Q?5yBjVeRrw6rTTva5i6e1y3xkGZzbCYnBG5A67+H+C8WKqFbFPQ5XXAUbsfDH?=
- =?us-ascii?Q?Axu2xEvJ/AK5NVGI86eZ+dfvTTRSMf1Mxt8BSUpImECPg12U+M9MKjOkIcd1?=
- =?us-ascii?Q?nXDJ+0OjNQVM4yxbkLxYe/3fVxzkradoRsMWM0YnLIbRaIaGtWDRUqi8hyj7?=
- =?us-ascii?Q?o3ZBbB4uU4U5ynNc1ATTsVuAE19/b0EcnFBo2nxKgSwls8kwNxKdCE2LajIZ?=
- =?us-ascii?Q?xF4ERb+moMnCDiyiT/MZMQM/NaykZLKYbww+gTdQhUvRcLPeoTiRUWZk0Yn0?=
- =?us-ascii?Q?UqOTlCe46wrxqNYhzksZ9f/NdF+nZOBAF7qbLbVkJw/dcvhXC7TKQ0xI8PQX?=
- =?us-ascii?Q?DY8FHpPfl9pgwJxpj0eWueOkV0DMKSOJFTXySb40TNHOYlm8EtUW0jyBAa4T?=
- =?us-ascii?Q?k3CNaAFJ7wLS6fDdjM5hETFLpBALXJqosdmpMB2gBuwPSqTbHWKEaPYpW8RY?=
- =?us-ascii?Q?OiE4uSlWONNLNabPq+cuKjlwLu8Vmo4MFctibVDK3IMDgS/3qxuNUfyjUKt5?=
- =?us-ascii?Q?zsTLj0zd6Ym8DO9A+pW5BjocsB2uTEyQ1G7stvuKiGQgB1+ceIorhYHpalpo?=
- =?us-ascii?Q?E0cv2UrergJ0zUUrwhXVccBLuRwzhabM6LuCGcESoF00Y7Q3Jko9RuM7C6Cq?=
- =?us-ascii?Q?fG6pA9VFiY6aOqyJr64I3lPkxmVxn0uF3jGf3pQo823DsQ26WXWFCUoCIyxd?=
- =?us-ascii?Q?sFV5pOgjf1tEc0UebB7ps5bMWekxWb6GMvPjeWKdkC4fx2kGkOG67JhxuKSM?=
- =?us-ascii?Q?jtPTNB+XbMUm8iKOXeUrkIaRtJenNzPxDnStpb91DP/WrmVPGCql/TwM3Ypk?=
- =?us-ascii?Q?alk1y4zyZPACHyNFhf/nvsytQRQFhkWz/ypsgqIgbYfxqxkzSROTI4yA0nKD?=
- =?us-ascii?Q?CW3e7tRk9oGgK/6XX6cNu6u0JMwSEVYn6ARLhnRlM0s2NS6z+GX8?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=Htff71u/
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c46822eefb6so211560066b.2
+        for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 05:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1792846798; x=1793451598; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:subject:mime-version:content-type:from:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=dqHs8tDmNMEZi1+5bLJJimo/fl1tge4B3BTmCW5R1Jc=;
+        b=Htff71u/WVtWjSdou3dc1unebAF6GladU2NLWvY11CmtvdvsF5g0bfeRUWdPlOYZzW
+         ODxyjZTeGzlh8LU2Gthf4zW3CyT9S9KDjVPphbnFZg23hMAZByPx7aYWNFAyT1a7U+/Y
+         pyGiAAoeOm3xQz91x7zRIGlksL9o8S/3ccgFhdU903yB4IPYXadi67w20aVkPTZhXmOL
+         +ukVGJR7d7lrlgJL7CDwWthtpyeyENKpTV6LUOJd/lKhXKnCUYgXaUmKDakTtAI+4Hur
+         EmTGUd3PanHGStybBk53Oh6hfOYHC2tvEeZhKFdYHrShugpArjWDTJQTek1Is50uJcvL
+         2HgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1792846798; x=1793451598;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:subject:mime-version:content-type:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=dqHs8tDmNMEZi1+5bLJJimo/fl1tge4B3BTmCW5R1Jc=;
+        b=i7be6fcVCiUFG3XneGHZrJxQXj30+SQsTSTykMxV/nMATeqFUAibhhQ8wGusIDV6yX
+         j/Cmd0VDuA0uTYefoj28eWgI+mEpBAx/SiGdTuQDqglq5c3HpQluI5tdR9oGt9V2291c
+         PjPG1pagkU0ZC7o18fa/FTsf+Q3FEAZpW514wVyFQ7TlfukBvDH149/nFWeul4WiNQGU
+         DejfOxS3Sw6g/PyHlBdRCzNn6MrrzTtnxYOWp69ld3ORmCuAAVly7kKMHqccfOaBIUp2
+         cWnjY+Uf5k7R4xY04n5MYk4Dh6pdzmaC5Rjbj4Ok/rvsiA2ssy1/8yxf8IPHWC8a+ZCg
+         Skig==
+X-Forwarded-Encrypted: i=1; AKwUvByKBrGPBRhTz4Rxi8joFQdBy7TSngEaX21B4Nw1edJsxexepGsABuIFkJIqHX+eiccnz8TZ5d6Y0MJq@vger.kernel.org
+X-Gm-Message-State: AFq9FYJIE29U+ygtZzqe4nrP6twGN63uHB0M8LztivI0OhrHgp6e3JZk
+	khpvkcQ7DaZkqN58BgjM91EohmZ0YaxAmz+rVFaki5B/zIZsqEOeFNZH
+X-Gm-Gg: AYBFou3pDOzhF2e2QhpL0oRiNT/ucmr1GCTgoDlxHenr2NaE5aSwAtejmHipaI+lPq5
+	MGkYATyH0cgHYMRXCtJYCJ6pzikgj66XI6L/QfXNCuOW5Nl3fZ7tCJ2A+SCURMZL9NzvVXjqmAw
+	rg+84vca3nKpN6is1kjqPB9lyv3ioKsnBb4YIc89xC0JXqW/TY0RHYkoh6e00nuVzUf2HiUgLnv
+	XKzS2TJn0M7FoMsiyWrFE8kS7EyDhk2Q1+icQ11YKKmDnrP08iQ0/LIlMrFivz8smeprndrMpDf
+	9mjBSZfnRjjwsg01/amdQM2SOi9xp5D48RK0l0LFLs/dyaBd/pRNv7Ax7GY6Pg0uf1d/bRtILtT
+	Bc72NbUv8OjWcoCHyDToKpi/quoyefPy+g8wvplrhGEaKXozq4TsQLZ/m356Zbo4ynJzWj1EJU9
+	Oc6osIpkgCu1Td+8GcikFlBp1XNv01r2niopZxbT2/XKgNFDre+4BssTX/s2sXEFLiDj5zeZPzr
+	/4xV0GpreDLP3tsZA4RRpDdjxR+J4waxSKgAnH4sH8uMmZA4vLQL04cmsZjDKe23NTTF48ItY2U
+	6JkXLuJAnBp+aw82SeFUt+/Jlm7NniFWy18t3lcc407TPfxhUjJu3/T8muo=
+X-Received: by 2002:a05:6938:e081:20b0:c45:b99:f282 with SMTP id a640c23a62f3a-c46c19961d9mr119556366b.7.1792846797805;
+        Sat, 24 Oct 2026 05:59:57 -0700 (PDT)
+Received: from smtpclient.apple (wlan-199066.nbw.tue.nl. [131.155.199.66])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c46bd4e99a2sm87430066b.24.2026.10.24.05.59.56
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 24 Oct 2026 05:59:56 -0700 (PDT)
+From: mixalhs <mike.michalo@gmail.com>
+X-Google-Original-From: mixalhs <Mike.michalo@gmail.com>
+Content-Type: text/plain;
+	charset=us-ascii
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -141,107 +92,197 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-X-OriginatorOrg: kuleuven.be
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB5PR08MB10062.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a9484f33-74ac-47e8-7615-08df31cb64db
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Oct 2026 12:36:14.9737
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3973589b-9e40-4eb5-800e-b0b6383d1621
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GyuECSQl+GAa69kA3jhvH/i7GzuarYBtZrRvOTYaL1IZqZcge4BtVsTJ6bH9/hpsvw4yfqFlrDViFdMce7P4Ywte8rFjcPE//I/eILPa3g8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB5927
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.700.51.1.1\))
+Subject: Re: ksmbd: AES-GMAC signing support?
+In-Reply-To: <CAKYAXd_zM0K9oAjEMzYinBeZEF=0=ozsd3+LRY6gy_O95btzRw@mail.gmail.com>
+Date: Sat, 24 Oct 2026 14:59:46 +0200
+Cc: Tom Talpey <tom@talpey.com>,
+ Enzo Matsumiya <ematsumiya@suse.de>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+ linux-cifs@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <D0F05F9A-5097-4A2D-9235-AE395961F456@gmail.com>
+References: <20261023174821.17552-1-mike.michalo@gmail.com>
+ <atugaviJxR8nzHQO@suse.de> <47ec7610-9013-4c4b-ae37-f6d88556e59a@talpey.com>
+ <F6CE78FA-AA06-4F00-BAE0-80B0819CE6DE@gmail.com>
+ <CAKYAXd_zM0K9oAjEMzYinBeZEF=0=ozsd3+LRY6gy_O95btzRw@mail.gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>
+X-Mailer: Apple Mail (2.3864.700.51.1.1)
 
-CIFSSMBQAllEAs() checks the server-provided EA list length by adding it=0A=
-to the response pointer. On 32-bit systems, a positive length can wrap=0A=
-the pointer and pass the comparison. The parser then walks outside the=0A=
-received response while reading the next FEA header.=0A=
-=0A=
-A response with a list length of 0x40000000 reproduces this as a native=0A=
-i386 page fault and kernel panic from listxattr() against an SMB1=0A=
-server.=0A=
-=0A=
-Check that the EA list starts within the SMB byte area before reading=0A=
-its header. Keep its length unsigned and compare it with the bytes left=0A=
-in the response without pointer addition.=0A=
-=0A=
-SMB1 is not negotiated by default and requires an explicit vers=3D1.0=0A=
-mount.=0A=
-=0A=
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")=0A=
-Cc: stable@vger.kernel.org=0A=
-Signed-off-by: Ratnaker Gautam <ratnaker.gautam@kuleuven.be>=0A=
----=0A=
-Resent because my mail client damaged the whitespace of the first copy;=0A=
-the patch is unchanged.=0A=
-=0A=
- fs/smb/client/cifssmb.c | 26 +++++++++++++++++++-------=0A=
- 1 file changed, 19 insertions(+), 7 deletions(-)=0A=
-=0A=
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c=0A=
-index 6dddbd84b93..9843639833c 100644=0A=
---- a/fs/smb/client/cifssmb.c=0A=
-+++ b/fs/smb/client/cifssmb.c=0A=
-@@ -6161,9 +6161,11 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_t=
-con *tcon,=0A=
- 	int rc =3D 0;=0A=
- 	int bytes_returned;=0A=
- 	int list_len;=0A=
-+	u32 ea_list_len;=0A=
- 	struct fealist *ea_response_data;=0A=
- 	struct fea *temp_fea;=0A=
- 	char *temp_ptr;=0A=
-+	char *byte_area;=0A=
- 	char *end_of_smb;=0A=
- 	__u16 params, byte_count, data_offset;=0A=
- 	unsigned int ea_name_len =3D ea_name ? strlen(ea_name) : 0;=0A=
-@@ -6242,9 +6244,19 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_t=
-con *tcon,=0A=
- 	ea_response_data =3D (struct fealist *)=0A=
- 				(((char *) &pSMBr->hdr.Protocol) + data_offset);=0A=
- =0A=
--	list_len =3D le32_to_cpu(ea_response_data->list_len);=0A=
--	cifs_dbg(FYI, "ea length %d\n", list_len);=0A=
--	if (list_len <=3D 8) {=0A=
-+	byte_area =3D (char *)pByteArea(&pSMBr->hdr);=0A=
-+	end_of_smb =3D byte_area + get_bcc(&pSMBr->hdr);=0A=
-+	if ((char *)ea_response_data < byte_area ||=0A=
-+	    (char *)ea_response_data > end_of_smb - sizeof(ea_response_data->list=
-_len)) {=0A=
-+		cifs_dbg(FYI, "EA list starts outside SMB\n");=0A=
-+		rc =3D smb_EIO2(smb_eio_trace_qalleas_overlong,=0A=
-+			      data_offset, get_bcc(&pSMBr->hdr));=0A=
-+		goto QAllEAsOut;=0A=
-+	}=0A=
-+=0A=
-+	ea_list_len =3D le32_to_cpu(ea_response_data->list_len);=0A=
-+	cifs_dbg(FYI, "ea length %u\n", ea_list_len);=0A=
-+	if (ea_list_len <=3D 8) {=0A=
- 		cifs_dbg(FYI, "empty EA list returned from server\n");=0A=
- 		/* didn't find the named attribute */=0A=
- 		if (ea_name)=0A=
-@@ -6253,14 +6265,14 @@ CIFSSMBQAllEAs(const unsigned int xid, struct cifs_=
-tcon *tcon,=0A=
- 	}=0A=
- =0A=
- 	/* make sure list_len doesn't go past end of SMB */=0A=
--	end_of_smb =3D (char *)pByteArea(&pSMBr->hdr) + get_bcc(&pSMBr->hdr);=0A=
--	if ((char *)ea_response_data + list_len > end_of_smb) {=0A=
-+	if (ea_list_len > end_of_smb - (char *)ea_response_data) {=0A=
- 		cifs_dbg(FYI, "EA list appears to go beyond SMB\n");=0A=
- 		rc =3D smb_EIO2(smb_eio_trace_qalleas_overlong,=0A=
--			      (unsigned long)ea_response_data + list_len - (unsigned long)pSMBr=
-,=0A=
--			      (unsigned long)end_of_smb - (unsigned long)pSMBr);=0A=
-+			      ea_list_len,=0A=
-+			      end_of_smb - (char *)ea_response_data);=0A=
- 		goto QAllEAsOut;=0A=
- 	}=0A=
-+	list_len =3D ea_list_len;=0A=
- =0A=
- 	/* account for ea list len */=0A=
- 	list_len -=3D 4;=0A=
--- =0A=
-2.43.0=
+Hi Namjae, all,
+
+A quick follow-up with some early numbers, and a few questions I'd
+like your opinion on before I send the series after mid-November.
+Cc'ing Enzo and Tom since they asked for numbers, and the ksmbd
+reviewers. There are three parts below: the patches, a speed
+experiment in lib/crypto, and the benchmarks.
+
+The series (2 patches, on ksmbd-for-next):
+ 1. ksmbd currently overwrites the algorithm picked from the client's
+    SMB2_SIGNING_CAPABILITIES with AES-CMAC in init_smb3_11_server(),
+    so a client that doesn't offer AES-CMAC (e.g. HMAC-SHA256 or
+    AES-GMAC only) is answered with AES-CMAC and fails to connect.
+    Patch 1 fixes that and keeps each signing key paired with its
+    algorithm (session vs. channel keys for multichannel binding).
+ 2. AES-GMAC signing using the AES-GCM library API, plus the binding
+    checks smbtorture expects for mixed GMAC/non-GMAC channels, and
+    the feature table update.
+
+The patches aren't posted yet; I'm happy to share them, and the
+experiment, earlier if you'd like to look at the code first.
+
+Tested with smbtorture 4.19 and 4.23 (each algorithm forced) and the
+macOS 26 SMB client, which offers AES-GMAC first: 256 MiB copy with
+signing required and encryption disabled, read back identical. I
+haven't tested a Windows client yet.
+
+Numbers on arm64 (Apple M4, Linux VM).
+
+Signing only, 1 MiB message, median of 3 runs:
+
+                    HMAC-SHA256  AES-CMAC   AES-GMAC
+  library today      3160 MB/s  2750 MB/s    990 MB/s
+
+So on arm64 GMAC is currently the slowest. The cause is in lib/crypto,
+not ksmbd: the arm64 GHASH library code processes bulk data with the
+NEON fallback, not PMULL (the migration commit says "though only with
+NEON, not PMULL; for now the goal is just parity with crypto_shash").
+As an experiment I computed GHASH through the existing 8-way PMULL
+POLYVAL code with byte-reversed blocks (no new assembly; the lib/crypto
+KUnit tests for GHASH, POLYVAL, AES-GCM and AES-CMAC pass under QEMU
+and natively on the M4):
+
+                    HMAC-SHA256  AES-CMAC   AES-GMAC
+  with experiment    3150 MB/s  2740 MB/s  12230 MB/s
+
+CMAC and HMAC use the unmodified library code in both tables. They
+are inherently serial (each block depends on the previous one), while
+GHASH can process 8 blocks in parallel.
+
+End to end with smbtorture smb2.bench.read, signing required,
+loopback, median of 6 runs of 5 s:
+
+                     HMAC-SHA256  AES-CMAC   AES-GMAC
+  1M reads, today     1354 MB/s   924 MB/s    797 MB/s
+  1M reads, exp       1355 MB/s   930 MB/s   3370 MB/s
+  4K reads/s, today       22330      21540      21100
+  4K reads/s, exp         22650      21650      23700
+
+These end-to-end numbers don't include the key-caching follow-up
+(question 3); only the library change differs between the rows.
+Small requests (smb2.bench.echo) are the same for all three. The same
+approach on x86 (the kernel's PCLMUL code in a userspace harness,
+Xeon) is about 3.8x faster than today's x86 GHASH (1.7 -> 6.5 GB/s).
+Full numbers and methods are at the end.
+
+Questions:
+ 1. Is the series OK to send as-is, given GMAC is slower on arm64
+    until the library improves? ksmbd uses the client's first choice,
+    and Windows and macOS put GMAC first.
+ 2. Would you mind if I raise the GHASH speedup with Eric Biggers on
+    linux-crypto? It's outside ksmbd, so I wanted to check with you
+    first.
+ 3. I also have a follow-up that prepares signing keys once per
+    session/channel instead of per message (in a microbenchmark of
+    ksmbd's signing path, AES-CMAC on 64-byte messages drops from
+    about 125 to 32 ns on the M4). Should I send that later on its
+    own, or as part of this series?
+
+Full numbers, for reference:
+
+arm64: Apple M4, Linux 7.3 VM (Lima, Apple Virtualization),
+8 vCPUs, ksmbd-for-next + the 2 patches. "today" = unmodified
+lib/crypto, "exp" = with the GHASH experiment.
+
+Summary for AES-GMAC (details below; "cached" = key prepared once):
+
+                       GMAC today   GMAC exp   speedup   vs CMAC (exp)
+  sign 64 B, cached        108 ns      57 ns      1.9x   0.6x (slower)
+  sign 64 B, per-msg       192 ns     234 ns      0.8x   0.5x (slower)
+  sign 256 B, cached       395 ns      68 ns      5.8x   1.5x faster
+  sign 4 KiB, cached      5608 ns     435 ns     12.9x   4.6x faster
+  sign 1 MiB, cached     993 MB/s 12227 MB/s     12.3x   4.5x faster
+  1M reads (smbtorture)  797 MB/s  3370 MB/s      4.2x   3.6x faster
+
+Signing microbenchmark: a module that signs exactly like
+ksmbd_sign_smb3_pdu(), with the key prepared per message (as ksmbd
+does now) or once ("cached"). Median of 3 runs, ns per message:
+
+  64 bytes            HMAC-SHA256   AES-CMAC   AES-GMAC
+  per-msg key, today          125        120        192
+  per-msg key, exp            122        126        234
+  cached key,  today           89         32        108
+  cached key,  exp             78         33         57
+
+  256 bytes           HMAC-SHA256   AES-CMAC   AES-GMAC
+  per-msg key, today          190        184        495
+  per-msg key, exp            188        190        240
+  cached key,  today          155         87        395
+  cached key,  exp            140         99         68
+
+  4 KiB               HMAC-SHA256   AES-CMAC   AES-GMAC
+  per-msg key, today         1842       2083       5756
+  per-msg key, exp           1838       2091        643
+  cached key,  today         1799       1981       5608
+  cached key,  exp           1786       1983        435
+
+  1 MiB, MB/s         HMAC-SHA256   AES-CMAC   AES-GMAC
+  per-msg key, today         3152       2740        994
+  per-msg key, exp           3153       2746      12202
+  cached key,  today         3159       2753        993
+  cached key,  exp           3149       2739      12227
+
+The per-message GMAC cost at 64 bytes goes up with the experiment
+because preparing a GHASH key now also computes H^2..H^8; preparing
+keys once (question 3) removes that.
+
+The kernel's own KUnit benchmarks on the M4 with the experiment
+Show the same picture, in MB/s:
+
+  bytes      GHASH   POLYVAL   AES-CMAC
+  256         8255     12895       2407
+  4096       11047     14028       1507
+  16384      11145     13718       1524
+
+Workload: smbtorture 4.23.6 smb2.bench (nprocs=2, qdepth=4), client
+and server in the same VM over loopback, SMB 3.1.1, signing required,
+encryption off. Median of 6 runs of 5 s each:
+
+                      HMAC-SHA256   AES-CMAC   AES-GMAC
+  echo ops/s,  today        27673      27433      27583
+  echo ops/s,  exp          27861      27900      28002
+  4K reads/s,  today        22330      21537      21097
+  4K reads/s,  exp          22650      21650      23700
+  1M MB/s,     today         1354        924        797
+  1M MB/s,     exp           1355        930       3370
+
+x86: the kernel's x86 GHASH and POLYVAL assembly built into a
+userspace harness, Intel Xeon @ 2.1 GHz (PCLMULQDQ + AVX). GHASH only
+(no AES, no CMAC/HMAC comparison), best of 5, MB/s:
+
+  bytes          GHASH today   via 8-way POLYVAL   speedup
+  64                    1664                3519      2.1x
+  4096                  1772                6674      3.8x
+  1048576               1700                6472      3.8x
+
+The GHASH-via-POLYVAL result matched the real GHASH output bit for bit
+for every block count from 1 to 300 and for 1 MiB.
+
+Disclosure: I used an AI assistant for the experiment. 
+My background is in electrical engineering, and I have
+some familiarity with crypto from security as a hobby, but I'm not
+yet familiar with the kernel's crypto library code; the
+experiment is only meant to show whether there is a gain, and if you
+think it's worth pursuing I'd be very happy to rework it properly
+myself.I ran the arm64 numbers, the native KUnit run and the macOS
+test on my M4. The x86 harness, the KUnit run under QEMU and the
+smbtorture 4.19 runs (UML) were run by the assistant in its own
+environment, and I've reviewed those results; I don't have an x86
+machine at hand right now. I'll also run the tests on a server with
+two Intel Xeons soon; for now I'd mainly like your opinion on how to
+approach this.
+
+Thanks,
+Michalis
+
