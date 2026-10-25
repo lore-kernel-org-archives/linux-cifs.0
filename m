@@ -1,53 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.74
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.186
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792917394;
-	b=xTxPiAyJ2opbzFyF0+Rv3LTF32JjYE+cf+N8G5gHhZcGKIoK/YLyj/hlN3YF05lnrEpW
-	 kpTJ6nv9EgDsHaUm+vjFcTYkeUsZo6yHYV8tPd5FziNQYqbFMuCR+4RK62t+xduXwFI/g
-	 dC5KJb/VThioxUGd5aOf+kC9iWZf2JEOGVDemTziR2vQ+xgFcwLhRH/5Z8FmorK1aRuPM
-	 aofczjJ1b8ymXQwuwcyLaAkZLm7SzHIOq3bbxvjp0X4S4zc+DfajYpkvWusXJ6j8y9MgL
-	 QrraHzKSib0H7lBAkEyf7oVhLwzJaPBckI7kb8qhkf40Tyxj4kMjMcyCYVrUFlT/Ecg==
+	t=1792917401;
+	b=ka9arJsD8YIlAFL+met9rHr8m9EvU8wLc+BqP+r8CImZCX1h9i5iDnmI1zm3BMjmqBFE
+	 /MvW6CU4/d+f+3LG4s6Pe/xj79lho/awsFSFFM1R6WvChpZZEvja7TBKk9z0an7Jz25nu
+	 +3RGDR6S1NyAX+BS1k5waT0cEz92WkkVe8Tl4Sq8ed1Fp7H8yv1LPY575O2iCLhPPgq7n
+	 V46YZAnIOZc8peTXlUFLRQLndEyJ/lns2W5TkP86Qh0aXNd5XwK7WJym6Q7KgZY4YvhSy
+	 4fSysaYe7x3JhV7tN9prSgbgr/FCi8zlw24kabezaH8y1Vv0byIFeQXWSYRKUB88A5g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792917394;
+	a=rsa-sha256; c=relaxed/relaxed; t=1792917401;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=EWeOKukq4SYjmnOeswVpeKcovy+S+01H8ZIuc5bQvzA=;
-	b=oBQXHipBGVcgotnb1HHvefc5g/kRyfoBAyGojG3ss7LdZmXjuy5oKxDqW/ObM9Ow0l6g
-	 ZcsnKfcYYLWP3DjR8G6VY27w0wdniapVdDqCP51A0KlreA7iY7IHh5S/0CJSQ0js0D484
-	 FcidxfI1iPxnEjLCwa1LDQ0apkl2LjrPwKjT4rQ97MuOmwN6ffgA/i766Z0VKD8C7CZ6i
-	 6pqg60fy+o9FLS8lqJkvxALwTLJjFa7/Ee1spxvhLLczGEnWO1Gf7iZikXjYWxEJg63xH
-	 DuguiLSD/NOjHjRxOqvoZf2xcIv9czao15mSPsB+BtWR7VyvmfLBbgeRyeaLgV5schw==
+	bh=Ua6AJ1jqjbrPgQX+2QZX/9WigQDuqUJQjV0PZP1wwd4=;
+	b=UlIBDWLnqS5MHvvr/HeFSNgDHWkYBv2r4D42KwZ673Y6XrNIwOXiejxOpO9weBQhFFh7
+	 LFZxDNduPh7rtTAwU3kg+YzdL/wcwqmbjICbijJR2aFLTJpgaxpanx2FvspLybjsJSDl1
+	 Q30I9g4SNSotUs8DW62IokWHO8E+l91+wspxgtD39sS/9+qfGC26IomAb4hdT61aShMU/
+	 FTFpL37T/bNKg4V3WLDO1LvousmUPENDcrn0oIHtDoJZnp17uvgThGa8cfc+985w1H+Zg
+	 iYZ2b8WNO/lLYOwSV4uVWOAxGad5i43uxEInlC5ajQBQYacpYsHKWbOl5j/FTUxKZEQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=chenxiaosong.com;
 	spf=pass smtp.mailfrom=chenxiaosong.com;
-	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=YkNgfElV;
-	arc=none smtp.remote-ip=91.218.175.74
-Received: from mta0.migadu.com (out-74.mta0.migadu.com [91.218.175.74])
+	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=NpQeKDIx;
+	arc=none smtp.remote-ip=95.215.58.186
+Received: from mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074F0606A31A
-	for <linux-cifs@vger.kernel.org>; Sun, 25 Oct 2026 08:36:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 074F0606A31A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6233C606A31A
+	for <linux-cifs@vger.kernel.org>; Sun, 25 Oct 2026 08:36:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6233C606A31A
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=YkNgfElV
+	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=NpQeKDIx
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=r36aw4n4EeEMxQ1NvkSHmn0SEvawWDtCJtSYJeEHpko=;
+DKIM-Signature: a=rsa-sha256; bh=ehvqDsYFC8QDb/Vuu5cG4AClq4De8U+f4SaDpSKW2k4=;
  c=simple/simple; d=chenxiaosong.com;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1792917392; v=1; x=1793522192;
- b=YkNgfElV5t5rTXuU705jOBtRFTFNc3I1DUhOVRBnHk9Pib4sXwufuLckbBnx39StGsZrjLb2
- ae80EgIavC2RIAHJ5mHv7ra22a1BlphxGzgUlOOOMnUqRACKGn3OCv5lgNz9u9xshf5sGwb+1Zb
- Mbv9BiDuy6IlgMPD7FnOkzUIwfxf9QjjPeUwyau+/ZUDHfI/aRFwbJkfPMovECceUN4ZbA2WX1T
- 3c3DhZvKrqRnaxKHi3FLK3swJfvpQLqH4Qv63Ssk1GdFoTOCJ+LUBx/W0Kl3yNQVsTqnr0Kn1kc
- kzJdhMK7F8JUtG36fmAghuuMS9soH/J5s9lILfyzb8faw==
+ t=1792917398; v=1; x=1793522198;
+ b=NpQeKDIxFRYVUCcRYtVp2Xe5OHxCMJK02xo00/SkrVvutytJiyX/fGf5lsZxwNOM2/3V0k0f
+ OOse9F20IsR2ZegEPZcsjahkF96UXZhsrcJ2xyFEmgy/eTnRyguuFHhPBzAgAzh5GGvH9SX7tmm
+ RZdc7WsUDczx/c1PM4/Gfwn8bB6hq3Lx+9UPyEMz+0WtE9lYdZL0RoK5Hf75Gk5WH25WKJOJiSZ
+ /Ri5N6qTwy75I2j75T1Gf0mGWbPWAkusJKds9LahaUnLC9H+poM7VLCMsIPEWOLyqftqN4RaMbd
+ v6vQlzhYKT9KMqpGnS4y9a1QDgoJ5MhkNkv2wBBZZo6HQ==
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 8c1a9fe6b45334f7;
-	Sun, 25 Oct 2026 08:36:32 +0000
-X-Mizu-Trace-ID: 8c1a9fe6b45334f7
+Received: by smtp.migadu.com with ESMTPS id 912180c7f8351325;
+	Sun, 25 Oct 2026 08:36:38 +0000
+X-Mizu-Trace-ID: 912180c7f8351325
 X-Migadu-Flow: FLOW_OUT
 From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
 To: linkinjeon@kernel.org,
@@ -56,9 +56,9 @@ To: linkinjeon@kernel.org,
 	chenxiaosong@chenxiaosong.com
 Cc: linux-cifs@vger.kernel.org,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH v2 12/13] smb/server: break directory leases before sending notify events
-Date: Sun, 25 Oct 2026 08:34:49 +0000
-Message-ID: <20261025083450.212604-13-chenxiaosong@chenxiaosong.com>
+Subject: [PATCH v2 13/13] smb/server: support change notify for named streams
+Date: Sun, 25 Oct 2026 08:34:50 +0000
+Message-ID: <20261025083450.212604-14-chenxiaosong@chenxiaosong.com>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
 References: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
@@ -75,174 +75,357 @@ Content-Transfer-Encoding: 8bit
 
 From: ChenXiaoSong <chenxiaosong@kylinos.cn>
 
-Reproducer:
+Example:
 
-  1. ksmbd: `ksmbd.conf`:
-     [global]
-             smb2 leases = yes
-  2. ksmbd: systemctl start ksmbd
-  3. Windows 11 File Explorer:
-     Mount the share and enter the top-level directory of the mount point.
-  4. ksmbd: touch /export/file
-  5. Windows 11 File Explorer:
-     `file` does not appear in the top-level directory of the mount point.
+  mount -t cifs  -o nomapposix //${server_ip}/export /mnt
+  smbinfo notify /mnt
+  printf 'file data\n' > /mnt/file
 
-Windows can keep directory data in a cache while it has a directory
-lease. A file change made on the server does not use the SMB request
-path, so the lease is not broken.
+  printf 'named stream\n' > /mnt/file:stream
+  Notifications received, returned data_len is 112
+  Action: 0x00000003, FileName: file
+  Action: 0x00000006, FileName: file:stream
+  Action: 0x00000003, FileName: file
+  Action: 0x00000008, FileName: file:stream
 
-The server sends a notify event, but Windows may still use the old data.
-Some new files are then not shown in File Explorer.
+  smbinfo filestreaminfo /mnt/file
+  Name: stream
+  Size: 13 bytes
+  Allocation size: 13 bytes
+  ...
+
+  printf 'modify named stream\n' > /mnt/file:stream
+  Notifications received, returned data_len is 56
+  Action: 0x00000003, FileName: file
+  Action: 0x00000008, FileName: file:stream
+
+  rm -- /mnt/file:stream
+  Notifications received, returned data_len is 56
+  Action: 0x00000003, FileName: file
+  Action: 0x00000007, FileName: file:stream
 
 Signed-off-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/server/notify.c | 34 +++++++++++++++++++++++++++++++---
- fs/smb/server/oplock.c | 40 ++++++++++++++++++++++++++++++++++++++++
- fs/smb/server/oplock.h |  1 +
- 3 files changed, 72 insertions(+), 3 deletions(-)
+ fs/smb/server/notify.c | 126 ++++++++++++++++++++++++++++++++++++++++-
+ fs/smb/server/notify.h |   7 +++
+ fs/smb/server/vfs.c    |  67 +++++++++++++++++++---
+ 3 files changed, 192 insertions(+), 8 deletions(-)
 
 diff --git a/fs/smb/server/notify.c b/fs/smb/server/notify.c
-index 7c8f36c0b951..8db3fd59990a 100644
+index 8db3fd59990a..5d331c0866be 100644
 --- a/fs/smb/server/notify.c
 +++ b/fs/smb/server/notify.c
-@@ -20,6 +20,7 @@
- #include "connection.h"
- #include "ksmbd_work.h"
- #include "notify.h"
-+#include "oplock.h"
+@@ -24,6 +24,7 @@
  #include "smb_common.h"
  #include "smb2pdu.h"
  #include "vfs_cache.h"
-@@ -432,13 +433,34 @@ static void ksmbd_notify_broadcast(struct ksmbd_notify *notify)
- 	spin_unlock(&notify->lock);
- }
++#include "xattr.h"
+ #include "mgmt/user_session.h"
  
-+static bool ksmbd_notify_events_pending(struct ksmbd_notify *notify)
+ #define KSMBD_NOTIFY_BROADCAST_MSECS	1000
+@@ -32,6 +33,16 @@
+ #define KSMBD_NOTIFY_EVENT_MASK		(FS_ACCESS | FS_ATTRIB | FS_MODIFY | \
+ 					 KSMBD_NOTIFY_NAME_EVENT_MASK)
+ 
++/* Protect the watch list and notify->fp during event delivery. */
++static DECLARE_RWSEM(ksmbd_notify_stream_lock);
++static LIST_HEAD(ksmbd_notify_stream_watches);
++
++/* Only a hint; list traversal still needs ksmbd_notify_stream_lock. */
++bool ksmbd_notify_has_stream_watches(void)
 +{
-+	bool pending;
-+
-+	spin_lock(&notify->lock);
-+	pending = notify->overflow || !list_empty(&notify->events);
-+	spin_unlock(&notify->lock);
-+
-+	return pending;
++	return !list_empty(&ksmbd_notify_stream_watches);
 +}
 +
-+/* Invalidate directory caches before making the change visible to a client. */
-+static void ksmbd_notify_dispatch(struct ksmbd_notify *notify)
+ static const struct {
+ 	u32 notify_mask;
+ 	u32 fsnotify_mask;
+@@ -614,6 +625,109 @@ static char *ksmbd_notify_tree_name(struct ksmbd_notify *notify,
+ 	return name;
+ }
+ 
++static void ksmbd_notify_stream_event(struct ksmbd_notify *notify,
++				      const struct path *path,
++				      const char *stream, size_t stream_len,
++				      u32 action, u32 filter)
 +{
-+	if (!ksmbd_notify_events_pending(notify))
++	struct dentry *root = file_dentry(notify->fp->filp);
++	struct ksmbd_notify_event *event;
++	struct qstr file_name = {}, stream_name;
++	char *name, *full_name;
++
++	if (!(notify->filter & filter) || root->d_sb != path->dentry->d_sb ||
++	    d_inode(root) == d_inode(path->dentry))
 +		return;
 +
-+	smb_break_dir_lease(notify->fp);
-+	ksmbd_notify_broadcast(notify);
-+}
++	if (!notify->watch_tree) {
++		struct dentry *parent = dget_parent(path->dentry);
++		bool match = parent == root;
 +
- static void ksmbd_notify_broadcast_work(struct work_struct *work)
- {
- 	struct ksmbd_notify *notify;
- 
- 	notify = container_of(to_delayed_work(work), struct ksmbd_notify,
- 			      broadcast_work);
--	ksmbd_notify_broadcast(notify);
-+	ksmbd_notify_dispatch(notify);
- }
- 
- static int ksmbd_notify_handle_inode_event(struct ksmbd_notify *notify,
-@@ -818,6 +840,12 @@ ksmbd_notify_take_events(struct ksmbd_notify *notify,
- {
- 	bool pending;
- 
-+	if (!ksmbd_notify_events_pending(notify))
-+		return false;
-+
-+	/* This path bypasses broadcast_work, so break directory leases here. */
-+	smb_break_dir_lease(notify->fp);
-+
- 	spin_lock(&notify->lock);
- 	pending = notify->overflow || notify->num_events;
- 	if (pending && ksmbd_notify_wake_waiter(notify))
-@@ -858,7 +886,7 @@ ksmbd_notify_requeue_events(struct ksmbd_notify *notify,
- 	spin_unlock(&notify->lock);
- 
- 	ksmbd_notify_free_events(notify, &discard);
--	ksmbd_notify_broadcast(notify);
-+	ksmbd_notify_dispatch(notify);
- }
- 
- static int ksmbd_notify_event_cmp(void *priv, const struct list_head *a,
-@@ -1133,7 +1161,7 @@ static int ksmbd_notify_wait(struct ksmbd_work *work,
- 	read_unlock(&work->sess->file_table.lock);
- 
- 	/* Close the race between the synchronous check and queuing the waiter. */
--	ksmbd_notify_broadcast(notify);
-+	ksmbd_notify_dispatch(notify);
- 
- 	ksmbd_debug(NOTIFY, "Notify request pending, async id %d\n",
- 		    work->async_id);
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index d479508c06c5..9ded27df159f 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -1794,6 +1794,46 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 	ksmbd_inode_put(p_ci);
- }
- 
-+/**
-+ * smb_break_dir_lease() - break leases when a directory changes
-+ * @fp: open directory that changed
-+ *
-+ * Some directory changes do not go through the SMB request path. fsnotify
-+ * reports these changes. Break the directory leases before sending the
-+ * changes to the SMB client.
-+ *
-+ * This function can sleep while it waits for a reply from the client. Do not
-+ * call it from the fsnotify callback.
-+ */
-+void smb_break_dir_lease(struct ksmbd_file *fp)
-+{
-+	struct ksmbd_inode *ci = fp->f_ci;
-+	struct oplock_info *opinfo;
-+	LIST_HEAD(brk_list);
-+
-+	down_read(&ci->m_lock);
-+	list_for_each_entry(opinfo, &ci->m_op_list, op_entry) {
-+		if (!opinfo->conn || !opinfo->is_lease ||
-+		    !opinfo->o_lease->is_dir ||
-+		    opinfo->o_lease->state == SMB2_LEASE_NONE_LE)
-+			continue;
-+
-+		if (!atomic_inc_not_zero(&opinfo->refcount))
-+			continue;
-+
-+		if (ksmbd_conn_releasing(opinfo->conn)) {
-+			opinfo_put(opinfo);
-+			continue;
-+		}
-+
-+		if (oplock_break_add(&brk_list, opinfo))
-+			opinfo_put(opinfo);
++		dput(parent);
++		if (!match)
++			return;
 +	}
-+	up_read(&ci->m_lock);
 +
-+	oplock_break_drain_none(&brk_list, ci);
++	name = ksmbd_notify_tree_name(notify, path, FSNOTIFY_EVENT_PATH,
++				      NULL, NULL, &file_name);
++	if (IS_ERR(name)) {
++		if (PTR_ERR(name) != -EXDEV)
++			ksmbd_notify_set_overflow(notify);
++		return;
++	}
++	/* Unknown old size: cannot tell add from modify. */
++	if (!action) {
++		ksmbd_notify_set_overflow(notify);
++		goto out;
++	}
++
++	/* MS-FSA: relative file name + ':' + stream name. */
++	full_name = kasprintf(KSMBD_DEFAULT_GFP, "%s:%.*s", name,
++			      (int)stream_len, stream);
++	if (!full_name) {
++		ksmbd_notify_set_overflow(notify);
++		goto out;
++	}
++	stream_name.name = full_name;
++	stream_name.len = file_name.len + 1 + stream_len;
++	event = ksmbd_notify_alloc_event(notify, action, &stream_name,
++					 KSMBD_DEFAULT_GFP);
++	kfree(full_name);
++	if (event)
++		ksmbd_notify_queue_event(notify, event);
++out:
++	kfree(name);
 +}
 +
- void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
++/**
++ * ksmbd_notify_stream() - report a stream change
++ * @path: base file or directory
++ * @xattr_name: stream xattr name, including the type
++ * @old_size: old length, or -ENODATA for a new stream
++ * @new_size: new length, or -ENODATA for a deleted stream
++ *
++ * FS_ATTRIB has no xattr name or old size. Call this after a successful
++ * stream xattr change.
++ */
++void ksmbd_notify_stream(const struct path *path, const char *xattr_name,
++			 ssize_t old_size, ssize_t new_size)
++{
++	struct ksmbd_notify *notify;
++	const char *stream, *type;
++	u32 action, filter;
++
++	if (strncmp(xattr_name, XATTR_NAME_STREAM, XATTR_NAME_STREAM_LEN))
++		return;
++	stream = xattr_name + XATTR_NAME_STREAM_LEN;
++	type = strrchr(stream, ':');
++	if (!type || type == stream ||
++	    (strcasecmp(type, ":$DATA") &&
++	     strcasecmp(type, ":$INDEX_ALLOCATION")))
++		return;
++
++	if (new_size == -ENODATA) {
++		action = FILE_ACTION_REMOVED_STREAM;
++		filter = FILE_NOTIFY_CHANGE_STREAM_NAME;
++	} else if (old_size == -ENODATA) {
++		action = FILE_ACTION_ADDED_STREAM;
++		filter = FILE_NOTIFY_CHANGE_STREAM_NAME;
++	} else if (old_size < 0) {
++		action = 0;
++		filter = KSMBD_NOTIFY_STREAM_MASK;
++	} else {
++		action = FILE_ACTION_MODIFIED_STREAM;
++		filter = FILE_NOTIFY_CHANGE_STREAM_WRITE;
++		if (old_size != new_size)
++			filter |= FILE_NOTIFY_CHANGE_STREAM_SIZE;
++	}
++
++	down_read(&ksmbd_notify_stream_lock);
++	list_for_each_entry(notify, &ksmbd_notify_stream_watches, stream_list)
++		ksmbd_notify_stream_event(notify, path, stream, type - stream,
++					  action, filter);
++	up_read(&ksmbd_notify_stream_lock);
++}
++
+ static int ksmbd_notify_handle_event(struct fsnotify_group *group, u32 mask,
+ 				     const void *data, int data_type,
+ 				     struct inode *dir,
+@@ -744,6 +858,7 @@ static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
+ 	}
+ 
+ 	notify->fp = fp;
++	INIT_LIST_HEAD(&notify->stream_list);
+ 	spin_lock_init(&notify->lock);
+ 	INIT_LIST_HEAD(&notify->events);
+ 	notify->filter = filter;
+@@ -787,6 +902,11 @@ static int ksmbd_notify_add(struct ksmbd_file *fp, u32 mask, u32 filter,
+ 		notify->tree_mark = tree_mark;
+ 	}
+ 
++	if (filter & KSMBD_NOTIFY_STREAM_MASK) {
++		down_write(&ksmbd_notify_stream_lock);
++		list_add_tail(&notify->stream_list, &ksmbd_notify_stream_watches);
++		up_write(&ksmbd_notify_stream_lock);
++	}
+ 	fp->notify = notify;
+ 	*notify_out = notify;
+ 	ksmbd_debug(NOTIFY,
+@@ -822,6 +942,10 @@ void ksmbd_notify_remove(struct ksmbd_file *fp)
+ 	if (!notify)
+ 		return;
+ 
++	down_write(&ksmbd_notify_stream_lock);
++	list_del_init(&notify->stream_list);
++	up_write(&ksmbd_notify_stream_lock);
++
+ 	ksmbd_debug(NOTIFY,
+ 		    "Removing fsnotify mark, inode %llu, mask 0x%x, watch tree %d\n",
+ 		    (unsigned long long)file_inode(fp->filp)->i_ino,
+@@ -1120,7 +1244,7 @@ ksmbd_notify_setup_watch(struct ksmbd_file *fp,
+ 
+ 	filter = le32_to_cpu(req->CompletionFilter);
+ 	mask = ksmbd_notify_map(filter);
+-	if (!mask)
++	if (!mask && !(filter & KSMBD_NOTIFY_STREAM_MASK))
+ 		ksmbd_debug(NOTIFY,
+ 			    "No mapped completion filter bits; request will remain pending\n");
+ 
+diff --git a/fs/smb/server/notify.h b/fs/smb/server/notify.h
+index b7d8df4bef1d..c8840e46c60f 100644
+--- a/fs/smb/server/notify.h
++++ b/fs/smb/server/notify.h
+@@ -32,6 +32,7 @@ struct ksmbd_notify_event {
+ };
+ 
+ struct ksmbd_notify {
++	struct list_head stream_list;
+ 	struct fsnotify_group *group;
+ 	struct fsnotify_mark *mark;
+ 	struct fsnotify_mark *tree_mark;
+@@ -64,10 +65,16 @@ struct ksmbd_notify_req {
+ #define KSMBD_NOTIFY_MAX_BYTES		SZ_64K
+ #define KSMBD_NOTIFY_NAME_EVENT_MASK	(FS_CREATE | FS_DELETE | \
+ 					 FS_MOVED_FROM | FS_MOVED_TO)
++#define KSMBD_NOTIFY_STREAM_MASK		(FILE_NOTIFY_CHANGE_STREAM_NAME | \
++					 FILE_NOTIFY_CHANGE_STREAM_SIZE | \
++					 FILE_NOTIFY_CHANGE_STREAM_WRITE)
+ 
+ int ksmbd_handle_notify(struct ksmbd_work *work,
+ 			struct smb2_change_notify_req *req,
+ 			struct smb2_change_notify_rsp *rsp);
+ void ksmbd_notify_remove(struct ksmbd_file *fp);
++bool ksmbd_notify_has_stream_watches(void);
++void ksmbd_notify_stream(const struct path *path, const char *xattr_name,
++			 ssize_t old_size, ssize_t new_size);
+ 
+ #endif /* __SMB_SERVER_NOTIFY_H__ */
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 4ee72eda9bc0..989e749a035c 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -34,6 +34,7 @@
+ #include "auth.h"
+ #include "misc.h"
+ #include "stats.h"
++#include "notify.h"
+ 
+ #include "smb_common.h"
+ #include "mgmt/share_config.h"
+@@ -942,6 +943,39 @@ ssize_t ksmbd_vfs_getxattr(const struct mnt_idmap *idmap,
+ 	return xattr_len;
+ }
+ 
++/*
++ * Read the old size and update the xattr under the same inode lock.
++ * Queue the notification before unlocking to keep events in order.
++ */
++static int ksmbd_vfs_set_stream_xattr(const struct mnt_idmap *idmap,
++				      const struct path *path, const char *name,
++				      void *value, size_t size, int flags)
++{
++	struct inode *inode = d_inode(path->dentry);
++	struct delegated_inode delegated_inode = {};
++	ssize_t old_size;
++	int err;
++
++retry_deleg:
++	inode_lock(inode);
++	/* A new watch may need a rescan if the old size was not read. */
++	old_size = -EAGAIN;
++	if (ksmbd_notify_has_stream_watches())
++		old_size = __vfs_getxattr(path->dentry, inode, name, NULL, 0);
++	err = __vfs_setxattr_locked(idmap, path->dentry, name, value, size,
++				    flags, &delegated_inode);
++	if (!err && ksmbd_notify_has_stream_watches())
++		ksmbd_notify_stream(path, name, old_size, size);
++	inode_unlock(inode);
++
++	if (is_delegated(&delegated_inode)) {
++		err = break_deleg_wait(&delegated_inode);
++		if (!err)
++			goto retry_deleg;
++	}
++	return err;
++}
++
+ /**
+  * ksmbd_vfs_setxattr() - vfs helper for smb set extended attributes value
+  * @idmap:	idmap of the relevant mount
+@@ -967,12 +1001,12 @@ int ksmbd_vfs_setxattr(const struct mnt_idmap *idmap,
+ 			return err;
+ 	}
+ 
+-	err = vfs_setxattr(idmap,
+-			   path->dentry,
+-			   attr_name,
+-			   attr_value,
+-			   attr_size,
+-			   flags);
++	if (!strncmp(attr_name, XATTR_NAME_STREAM, XATTR_NAME_STREAM_LEN))
++		err = ksmbd_vfs_set_stream_xattr(idmap, path, attr_name,
++						 attr_value, attr_size, flags);
++	else
++		err = vfs_setxattr(idmap, path->dentry, attr_name, attr_value,
++				   attr_size, flags);
+ 	if (err)
+ 		ksmbd_debug(VFS, "setxattr failed, err %d\n", err);
+ 	if (get_write == true)
+@@ -1251,6 +1285,8 @@ int ksmbd_vfs_remove_xattr(const struct mnt_idmap *idmap,
+ 			   const struct path *path, char *attr_name,
+ 			   bool get_write)
  {
- 	struct oplock_info *opinfo;
-diff --git a/fs/smb/server/oplock.h b/fs/smb/server/oplock.h
-index d81013c514e3..00da63b6ae7e 100644
---- a/fs/smb/server/oplock.h
-+++ b/fs/smb/server/oplock.h
-@@ -130,6 +130,7 @@ int find_same_lease_key(struct ksmbd_conn *conn, struct ksmbd_inode *ci,
- void destroy_lease_table(void);
- void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 				      struct lease_ctx_info *lctx);
-+void smb_break_dir_lease(struct ksmbd_file *fp);
- void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp);
- int smb2_check_durable_oplock(struct ksmbd_conn *conn,
- 			      struct ksmbd_share_config *share,
++	struct inode *inode = d_inode(path->dentry);
++	struct delegated_inode delegated_inode = {};
+ 	int err;
+ 
+ 	if (get_write == true) {
+@@ -1259,8 +1295,25 @@ int ksmbd_vfs_remove_xattr(const struct mnt_idmap *idmap,
+ 			return err;
+ 	}
+ 
+-	err = vfs_removexattr(idmap, path->dentry, attr_name);
++	if (strncmp(attr_name, XATTR_NAME_STREAM, XATTR_NAME_STREAM_LEN)) {
++		err = vfs_removexattr(idmap, path->dentry, attr_name);
++		goto out;
++	}
++
++retry_deleg:
++	inode_lock(inode);
++	err = __vfs_removexattr_locked(idmap, path->dentry, attr_name,
++				       &delegated_inode);
++	if (!err && ksmbd_notify_has_stream_watches())
++		ksmbd_notify_stream(path, attr_name, 0, -ENODATA);
++	inode_unlock(inode);
++	if (is_delegated(&delegated_inode)) {
++		err = break_deleg_wait(&delegated_inode);
++		if (!err)
++			goto retry_deleg;
++	}
+ 
++out:
+ 	if (get_write == true)
+ 		mnt_drop_write(path->mnt);
+ 
 -- 
 2.55.0
 
