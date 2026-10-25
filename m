@@ -1,55 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.127
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792898198;
-	b=vmKh9v7GQYYhcXGzGRjHYPEnY1710jUWNWEe/EadG8G/h89FiTKXw0hT+W2WYUTPr0rv
-	 /YzpAR4HYq6D648HknJfTBOKy9vR1I/hp3lzYTr3jD5jQ6M36pp2naouVKneQ6uUMHDr8
-	 Oe/iHrW/8Sqxo1F9ac41bKYJXQ7n3jhhDw3WJAdpR5hg4h0wTrobFqp9UY8UPkQ1o6Ts7
-	 Yufk8v8X/X4MWZA1I0VDulVWJLSrCVWJFbpOoxF16GC6qPViGlipRu27suZpxOTj61n+R
-	 xdKM4k+1+hvhp7hvINv52p3qKoWfHdaAO+EMq0K6Qw2u7/1THzpNZmycGyZGHjDsCFQ==
+	t=1792917312;
+	b=EoKHXx/z40GHagn9PWKzIe+TPvia/S3azjvPEOurPViYPOxMPYmAnQJS1G8V0rrhgHn8
+	 uRZdbT5tOyRMnQQ1+n01KmEpQ9Cmaz8g9MnuPHnkUFXvvWqhtYrMSHDucdNhOble2KFAi
+	 ZifSRJVtctwdb1qO6x7MeiBozb2u0z25CrYs1KOm4bZ9Rm2Pw//4NZgWuAtviriigIAbe
+	 x6ZoeUD4V8Z6mZgP0uJztzVbqaWFBdkonEphsXG6LdBbL+mCXkUrFD0r5h8mwmxhgLFy0
+	 7PxgX0OBXHsKZ7ScUam8vWcGrF240y+EzH+xw0f5NCdi7fw/Jz7KXiwVMBaChbHA8kw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792898198;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=XKFXrKYRPqU7qAVWjY0wBkwug5TMC39sgy3bzrYOKQQ=;
-	b=KOVDHGsJd6kpqDgsXNp+0qZgfJ0RUV6Z1mKmerPS6iuu4tn34zkv1MffDUVapXXOyYXb
-	 DgPZBow8N8EPKVmWku4+AjrhO7R/ZaDJnOu6Nhdc2wC7MuIOsAiIuv65kjvsGcCoLS76w
-	 UtMhvykOO6/7bbff8utxV+6RVRy77hozuMf/2DzLNPRU/Al3nMtAFfhhlbr8a4NhYNp2E
-	 vnpayuUNxxD+Bln2IqNqORVXopZvfgxjUbj6hXbKit3n8t7CjwchkQAAp7MEzPGch6HnX
-	 y6xlAvj8lT00Lpev0CBCA/MeGBZx8sK9uL3N4OgjnV+8O9Dbj3LXSqMZJhZ+Jljasqg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792917312;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=3nr6bPxei2fSs3vE8kAXEq9e/Pq3RIBdWB9qfKr2oPw=;
+	b=PvCEjSgbFvV6yxUiTTNzA3SwcWQaR73hmf3QQ67Yz7JjlWnBE5wmqft/kuWypi4FsEj+
+	 5Ovr9qzfSzNQJE3X/eOM78NwOq83JCZWXCSTQZiqxYd8zqfQ3N1bc16NUuqcuCwFCXtZd
+	 KuPrLXcv0lfBAjoU+q0Mvlezaa8NRU2LjZ2fULcNR6Q96XkShnngB6GQKk4nnCoVk3L1L
+	 lpk7uD/hLpg0lXYB6pWvSA7RVujaqtPFoqqOD+IR9xrsz1Lzsv8+xUP9aD39a3GSOtr8f
+	 BLElM+ia94Cw5JfiS27s7EJidz30Ve2GV3166PGzh9wS7hWyRn0OMqCIkk9iN6vmRNQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YDf+nn1m;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=chenxiaosong.com;
+	spf=pass smtp.mailfrom=chenxiaosong.com;
+	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=BaJXBT6N;
+	arc=none smtp.remote-ip=95.215.58.127
+Received: from mta1.migadu.com (out-127.mta1.migadu.com [95.215.58.127])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE7E606A31A
-	for <linux-cifs@vger.kernel.org>; Sun, 25 Oct 2026 03:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE29606A31A
+	for <linux-cifs@vger.kernel.org>; Sun, 25 Oct 2026 08:35:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6AE29606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YDf+nn1m
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96DD91F01829
-	for <linux-cifs@vger.kernel.org>; Sun, 25 Oct 2026 03:16:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1792898197;
-	bh=XKFXrKYRPqU7qAVWjY0wBkwug5TMC39sgy3bzrYOKQQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=YDf+nn1mBKCjk1D4pflG8c8QGRGzUPRWY+K47yTkG57gAl7D83GJ//mCD0SIGtUU5
-	 eF712T9OaOkYCcCFm6i2fC3+QFhcUbiOqf+KIfUx1IfqOCJrDk+NNy9bXNbErw5Ajt
-	 6teQL31sLh6jvYwQcx1lVR31glfwydJ7JkqRb2IEhSwT2VuZ7C6c6CA/OgCkw+G79C
-	 Giyr0A1cpZVCYqO5UDD+u7MGuqNjHb6yTqb3ki3xAlxurnargBG3AFLasdk9n6vujW
-	 g8MBEb2/Iwc9nCJV6D3nZWqtSf95LvxhXbn+vsCjpb7mvHIkyIimjeCvvh4qIE1kfv
-	 7ziqFAb01SrBA==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c4322d310e7so297270766b.0
-        for <linux-cifs@vger.kernel.org>; Sat, 24 Oct 2026 20:16:37 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxnRBG1ffBhAurc28cPKzE6cVCP1Qm6xBSGR6EhSBaMkRUMfOxUhEp289QkyP7hPJ0pxu/cqBjXTQFi@vger.kernel.org
-X-Gm-Message-State: AFq9FYLmI8AQEZB/STeVPy3RyOlQn6N2ii7l5P9NNIfEq2hIKTPZv8z3
-	cwuXX1sG3YfF09KZUlbOVbUcey9wzGy63hUnFVQCCpwRfvGyHkdfr4h0OU60Pvyxk3oaCI8fyGx
-	B1pubEv+U9hiq5laThrDlU4er66S7kpU=
-X-Received: by 2002:a17:907:a0c9:b0:c1c:4a80:30c4 with SMTP id
- a640c23a62f3a-c46bddf651cmr394166466b.11.1792898196329; Sat, 24 Oct 2026
- 20:16:36 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=BaJXBT6N
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=T3XACV93ZYc5nr+mva+6S7q6fPbcaQTVKBArdnqBJtc=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1792917308; v=1; x=1793522108;
+ b=BaJXBT6NsfuxPT9RzefaqwN4uLy6rvax55smPraF+UGDFuzLei1yDqB01iJuj+RvDwscDAFC
+ NVD38VeQnI+ELOk5EY3eyM39IvOWGkWWGRQJJntkngmjZjyLcf40F7WIkshga90ugypwfxHFzX3
+ FxlNffuw7EYsD6Gp8Mm9kKrhAkWi2cKtOSOjawOFnLUlwplcNrsLk2CQK5Qp22RJhj66V4qhZ8X
+ YK/CHjFj3+RX+uSbPFEz1GQKJO+m+neGOR7vtdDsTyn5BmLnliCK5zcbwUBm1/QI+/OwIce8gyB
+ 7ByqVS1eVELVsM6eHH4WxeY3wBQGBSEB2tKF3h3RmxWXg==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id ac4fae4eb3cd5904;
+	Sun, 25 Oct 2026 08:35:07 +0000
+X-Mizu-Trace-ID: ac4fae4eb3cd5904
+X-Migadu-Flow: FLOW_OUT
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+To: linkinjeon@kernel.org,
+	tom@talpey.com,
+	senozhatsky@chromium.org,
+	chenxiaosong@chenxiaosong.com
+Cc: linux-cifs@vger.kernel.org,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH v2 00/13] smb/server: change notify support
+Date: Sun, 25 Oct 2026 08:34:37 +0000
+Message-ID: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
+X-Mailer: git-send-email 2.55.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,49 +68,57 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261023174821.17552-1-mike.michalo@gmail.com>
- <atugaviJxR8nzHQO@suse.de> <47ec7610-9013-4c4b-ae37-f6d88556e59a@talpey.com>
- <F6CE78FA-AA06-4F00-BAE0-80B0819CE6DE@gmail.com> <CAKYAXd_zM0K9oAjEMzYinBeZEF=0=ozsd3+LRY6gy_O95btzRw@mail.gmail.com>
- <D0F05F9A-5097-4A2D-9235-AE395961F456@gmail.com> <17D8C477-341E-4D81-B585-56629E155153@gmail.com>
-In-Reply-To: <17D8C477-341E-4D81-B585-56629E155153@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sun, 25 Oct 2026 12:16:23 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-228tBUbzmN=+9wHSaqh2Yzy0rMCTqCVnhf2HYJcr+dQ@mail.gmail.com>
-X-Gm-Features: AclHuK-M0QMLkQXxszaLeDJfQ06h3xcJGdAt9OztCscYVpmMPzrFI2ZZFsp3z7E
-Message-ID: <CAKYAXd-228tBUbzmN=+9wHSaqh2Yzy0rMCTqCVnhf2HYJcr+dQ@mail.gmail.com>
-Subject: Re: ksmbd: AES-GMAC signing support?
-To: mixalhs <mike.michalo@gmail.com>
-Cc: Tom Talpey <tom@talpey.com>, Enzo Matsumiya <ematsumiya@suse.de>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
-	linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sun, Oct 25, 2026 at 1:14=E2=80=AFAM mixalhs <mike.michalo@gmail.com> wr=
-ote:
->
-> Hi all,
->
-> A short addition for question 1: x86 numbers and a Windows test.
->
-> Setup: 2 cloud VMs (AMD EPYC Milan, 4 vCPUs), 3.56 Gbit/s network,
-> ksmbd-for-next + the 2 patches.
->
-> Windows Server 2025 offered GMAC first and ksmbd answered AES-GMAC;
-> a 1 GiB copy to and from the share came back identical.
->
-> On x86 the slow part of the library is CBC-MAC, not GHASH:
-> aes_cbcmac_blocks() has an arch hook only on arm64, so x86 takes
-> the FPU for every 16-byte block. Signing 1 MiB, MB/s:
->
->                     HMAC-SHA256   AES-CMAC      AES-GMAC
->   library today            1494        207                  1174
->   with experiment       1670      757 (3.7x)          2475 (2.1x)
->
-> (experiment: the arm64 GHASH approach ported to x86, plus one FPU
-> section per 4 KiB in CBC-MAC; lib/crypto KUnit tests pass.)
->
-> End to end, 1M reads: HMAC 449, CMAC 341, GMAC 469 MB/s today
-> (HMAC and GMAC at the network limit); CMAC 400 with the experiment.
-Thanks for the update. The results look promising. I've answered your
-questions in my earlier reply.
+From: ChenXiaoSong <chenxiaosong@kylinos.cn>
+
+v1->v2:
+- Patch #04 #07: fix LAST_WRITE and LAST_ACCESS notify event mappings.
+- Patch #04 #08 #09 #11 #12: limit notify event memory per open.
+- Add patch #13: support change notify for named streams.
+
+v1: https://lore.kernel.org/linux-cifs/20260926090518.78547-1-chenxiaosong@chenxiaosong.com/
+
+TODO: The KUnit test cases are still being modified.
+
+To test this feature, the following patches need to be applied to cifs-utils and kernel smb client:
+  - cifs-utils: https://chenxiaosong.com/lkml/cifs-utils-parse-notify
+  - kernel smb client: https://chenxiaosong.com/lkml/cifs-improve-notify
+
+The complete kernel client and server patches are also available at the following link:
+https://chenxiaosong.com/repo/linux/ksmbd-change-notify
+
+ChenXiaoSong (13):
+  smb/server: move change notify handling into notify.c
+  smb/server: add more validation for change notify requests
+  smb/server: add debug type for change notify
+  smb/server: support non-recursive directory change watches
+  smb/server: support recursive directory change watches
+  smb/server: keep notify watches on file handles
+  smb/server: save simple notify events
+  smb/server: save old names for rename notify events
+  smb/server: match rename notify events
+  smb/server: encode notify events
+  smb/server: send notify events to the client
+  smb/server: break directory leases before sending notify events
+  smb/server: support change notify for named streams
+
+ fs/smb/server/Kconfig     |    1 +
+ fs/smb/server/Makefile    |    3 +-
+ fs/smb/server/glob.h      |    3 +-
+ fs/smb/server/notify.c    | 1415 +++++++++++++++++++++++++++++++++++++
+ fs/smb/server/notify.h    |   80 +++
+ fs/smb/server/oplock.c    |   40 ++
+ fs/smb/server/oplock.h    |    1 +
+ fs/smb/server/server.c    |    2 +-
+ fs/smb/server/smb2pdu.c   |  112 +--
+ fs/smb/server/vfs.c       |   67 +-
+ fs/smb/server/vfs_cache.c |    3 +
+ fs/smb/server/vfs_cache.h |    4 +
+ 12 files changed, 1614 insertions(+), 117 deletions(-)
+ create mode 100644 fs/smb/server/notify.c
+ create mode 100644 fs/smb/server/notify.h
+
+-- 
+2.55.0
+
