@@ -1,83 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1792968079;
-	b=VU90g64x+2mLmkFyMcLLAQoq0AI25c2/8PPMlaLV92rfmjoLgxHF45vKUggcqe3Ub4AP
-	 qb/BHOyiWGa9zWjFLg39J8ZCRO3I5tg/BsW0V+YZ5ZN8j9U3yHK0lP7aLV4VF+DYVYJ4+
-	 AWQqwkO1ieL4ijeSGjuhl9vkBE7JYT0mcnlzRowEIAmdOePnxxDUmDDIADUhl65tAZHLT
-	 Y6osg4IHrUU2V28l3Gx4PZ3hZEgm4TJOQsRs616HIXRZJC3Awrfr5SUH3vZ1TEKgDhPS2
-	 +R2ZzU63dSyMkx65k1HN97eNrtNMylDl6PLFdiLLj/5NcrXeEzkci2b8jcM7eR4SyfA==
+	t=1792975610;
+	b=lyocYykakGGVC9SEGf/mDKhPiHQ54YTaWbm4K7/GQAL6/PVJ0bi32oZi5YHe9+Oh77Iz
+	 Lpun6mKlVuaPFc1TYjLL+MUOESsrFrAkXkCbSxvu8Cjy7eWgD/Vp9gRZzIDFYy1+syMmx
+	 ScK0lGNBQUPEGXI5VZWvSKFmeL0NgApwzS0TpxlMhVyqcHwAH0ZLTqd6bez2OCmH2cILb
+	 D7ypGw0BPA6F2fI4CL4NeZ2C5QQ8qXTYQO742B7PLXy5YssUeEiswgP2TsO3pK38Ix1TW
+	 HJX5O4juJUXkckXSi7P37hGm9Z0NIoGfDIKPQ/kQSox9hxs9tu+VM3WVXY4dhM8ZiXA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1792968079;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=BYhwEPlk5ecLTu4XbRi6L+u2Q7cMf+48BjLiZm8/FDg=;
-	b=x8/f+ecJcXFRvF4oTrSN9arGbpG9MJwQKCPsL0xS8m55c8GhpgxkrcxB9Hi7e+nftue0
-	 zmoeXNkcRaOZwoXG2h+nM16QLtEQXUxY8OVUCIaIS3zVVOKRho5hPTA+W4W6zppRknESZ
-	 UlexmTD6lFOqbiWcAq5umjjRL/tA8FlPK47TFVbMzGlXUwyPXS7T5XI9W+Ihv99axRcx/
-	 amQFKjRWkoF+EPeT2WUkoNNBP5ShV7FW+5lL750a+Pu+5szpDB8jMStJqgXxbB4IPdLLf
-	 XPMCcJXcYmqAPvFTtDskhsVGWzZtNihDO9ijDgb1h61RZU40VL/NpvBwhi3zKlr1HFg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1792975610;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
+	bh=Qijv1dlEij20EdMeIbGpdMin8+1h12UwR2e2M8zTwrI=;
+	b=Fv+lNCQ/SqgzrilY0beroAieXXby34xLDIxqPpfVdAnv+Vi1enW8GB2T5MRLIyDVfv6r
+	 UM/O+yOUDGAEeKPjoOPGIleg2t2gUivN7Fr7WiN2Pe8nsGeF2LH3Nkdv7DKG9WuGvwLg3
+	 +QMM8jUrvWSICoUkFia0JGvYK3bPartrShuLqQBziEAHeGMqxc2m9x25WtGJcyjQ/T/n/
+	 is1nlNy0YboxYDcNg0j378J4xmSnwUpBHlOOWLEoXSHALbce/RwksgWo0DuUYLN9bqpZh
+	 5sMi2XtAcpwC7Rs2GjvkJxkv7iGXbfRod8EHFAFbU3Sw70OX3d51NnHN4TQnLB4DJIw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=E1oBN3nm;
-	arc=none smtp.remote-ip=198.175.65.11
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b="zpGmS/j9";
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB051606A31B;
-	Sun, 25 Oct 2026 22:41:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DB051606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF357606A31A;
+	Mon, 26 Oct 2026 00:46:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EF357606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=E1oBN3nm
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1792968078; x=1824504078;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kvzwoR+8VNI8tNzfRJsQ8MOvQ6RSGD+e6l76DLCTh2s=;
-  b=E1oBN3nmDpGkZzzX+C83blUDNOZifLvqsh0p6RZ0Gl1XJn9v59GRO97W
-   jkP9jGtaS4DBlLcF4HQ2gG7X7lbB2ce1fUADT3ez1bno2OiZHN3VgGRuU
-   Ch6bHQbj8vo1UMnKi1fkZH8T57X3oXK/fl0YZvo9OKSJdGDia2qQ0wcyE
-   2VUCbyDhLADV9yvmx99DSRoo2FLQBrbLuP8G1uc9RcYzng/HD+IxUUCc6
-   4T11+Q3SXG3rFR1EzmM1j6knPWinxeo7hJYMDzv1ZaHm/aqXruTLoAxac
-   c9XfxMIu+k5oPZTkeAw2/LxSZ/emoCxXEhwCNb2CkPn1qsJITzSLE51cj
-   w==;
-X-CSE-ConnectionGUID: vl4LqYBJStO0gPX7mIiXTQ==
-X-CSE-MsgGUID: 4DxWcqiQQ+qy5HpYt+uF5w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11946"; a="1516589"
-X-IronPort-AV: E=Sophos;i="6.27,178,1787036400"; 
-   d="scan'208";a="1516589"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2026 15:41:17 -0700
-X-CSE-ConnectionGUID: sldzHzjYQtKokEHKL9G8+A==
-X-CSE-MsgGUID: iaNmNMiMS+mcTQoLjeiqZg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,178,1787036400"; 
-   d="scan'208";a="4009937"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 25 Oct 2026 15:41:16 -0700
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xL6ts-00000000VDO-32qq;
-	Sun, 25 Oct 2026 22:41:12 +0000
-Date: Mon, 26 Oct 2026 06:41:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wang Zhaolong <wangzhaolong3@outlook.com>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=zpGmS/j9
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:Message-ID:
+	Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=Qijv1dlEij20EdMeIbGpdMin8+1h12UwR2e2M8zTwrI=; b=zpGmS/j9i2Cgr9vpSPhJVrLTAg
+	YviDm3y6laX1PP4pjoiOvMY09PC640fXrPxGDvlmyOgbbEnKECW7FFEKxt4V/NWjcmlWpbXPD41aZ
+	TF7wgjR9Wxe6FH1FxKvPyfzAmOU/CvEZO5Jy2oQywxCG23+lCVUgZXNCvpw+gM9IifHZLxYdVxLpF
+	LTtg7OyrQhJHZS2tQ6Xg5nSzv3YbiwsFVHr5RAxsRgFWOI9uyLG7ysGRiqGElNAcsNOlIhmNxeLMJ
+	hXaUMHmatz4llHeY9ZAOhL7lVd9btiyx67NluhrhYsG0IcHt1puCJLf9KB7xfFUcJYh4At4NlmIFP
+	Hrry8Fcw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xL8rL-000000001BJ-2JXR;
+	Sun, 25 Oct 2026 21:46:44 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: linux-cifs@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] ksmbd: fix named-pipe reply loss with small output
- buffers
-Message-ID: <202610260610.5prVfJss-lkp@intel.com>
-References: <TYZPR02MB695916EEB5AC02FE8DBC31BCE6622@TYZPR02MB6959.apcprd02.prod.outlook.com>
+	Bharath SM <bharathsm@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: don't resurrect an exiting tcon from cached dir workers
+Date: Sun, 25 Oct 2026 21:46:44 -0300
+Message-ID: <20261026004644.239554-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -87,35 +67,117 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TYZPR02MB695916EEB5AC02FE8DBC31BCE6622@TYZPR02MB6959.apcprd02.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Wang,
+cfids_laundromat_worker() bumps tcon->tc_count for every expired open
+cfid and queues cached_dir_offload_close() without checking whether the
+tcon is already being torn down.  Racing with the final cifs_put_tcon(),
+the tcon comes back from zero and gets torn down twice:
 
-kernel test robot noticed the following build warnings:
+  T1                                  T2
+  cifs_put_tcon()
+   --tc_count == 0, TID_EXITING
+   tconInfoFree()
+    free_cached_dirs()
+     cancel_delayed_work_sync()       cfids_laundromat_worker()
+                                       ++tc_count == 1
+                                       queue_work(serverclose_wq)
+    kfree(tcon->origin_fullpath)
+    kfree(tcon)
+                                      cached_dir_offload_close()
+                                       close_cached_dir()  [UAF]
+                                       cifs_put_tcon()
+                                        tconInfoFree()     [double free]
 
-[auto build test WARNING on f47d223627f80cb7a1eb14c585fe6cb35de5e984]
+cached_dir_lease_break() also bumps tc_count without tc_lock, racing with
+the laundromat's locked update.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Wang-Zhaolong/ksmbd-avoid-races-between-named-pipe-operations/20261025-173237
-base:   f47d223627f80cb7a1eb14c585fe6cb35de5e984
-patch link:    https://lore.kernel.org/r/TYZPR02MB695916EEB5AC02FE8DBC31BCE6622%40TYZPR02MB6959.apcprd02.prod.outlook.com
-patch subject: [PATCH 2/2] ksmbd: fix named-pipe reply loss with small output buffers
-config: powerpc64-randconfig-1001-20261026 (https://download.01.org/0day-ci/archive/20261026/202610260610.5prVfJss-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 14.4.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261026/202610260610.5prVfJss-lkp@intel.com/reproduce)
+Take the tcon reference through a helper that refuses once the tcon is
+TID_EXITING or its refcount has dropped to zero.  Queued put_work and
+close_work then always hold a tcon reference, so tconInfoFree() can't
+run before they finish and free_cached_dirs() doesn't need to flush any
+workqueue.  If the laundromat can't get a reference, put the cfid back on
+the dying list for free_cached_dirs() to free; its handle goes away with
+the tree connection.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202610260610.5prVfJss-lkp@intel.com/
+The lease break path finds the tcon on ses->tcon_list under
+cifs_tcp_ses_lock, so it can't see TID_EXITING, but it now takes tc_lock.
 
-All warnings (new ones prefixed by >>):
+Fixes: 3fa640d035e5 ("smb: During unmount, ensure all cached dir instances drop their dentry")
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: David Howells <dhowells@redhat.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Bharath SM <bharathsm@microsoft.com>
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/cached_dir.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
->> Warning: fs/smb/server/smb2pdu.c:8670 function parameter 'rpc' not described in 'smb2_pipe_response_done'
->> Warning: fs/smb/server/smb2pdu.c:8670 function parameter 'nbytes' not described in 'smb2_pipe_response_done'
->> Warning: fs/smb/server/smb2pdu.c:8670 expecting prototype for smb2_read_pipe(). Prototype was for smb2_pipe_response_done() instead
+diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
+index 647fa26da4d2..50217f47a0ed 100644
+--- a/fs/smb/client/cached_dir.c
++++ b/fs/smb/client/cached_dir.c
+@@ -649,6 +649,17 @@ void invalidate_all_cached_dirs(struct cifs_tcon *tcon, bool sync)
+ 		flush_delayed_work(&cfids->laundromat_work);
+ }
+ 
++static bool cached_dir_get_tcon(struct cifs_tcon *tcon,
++				enum smb3_tcon_ref_trace trace)
++{
++	guard(spinlock)(&tcon->tc_lock);
++	if (tcon->status == TID_EXITING || tcon->tc_count <= 0)
++		return false;
++	++tcon->tc_count;
++	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count, trace);
++	return true;
++}
++
+ static void
+ cached_dir_offload_close(struct work_struct *work)
+ {
+@@ -693,6 +704,9 @@ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+ 		    !memcmp(lease_key,
+ 			    cfid->fid.lease_key,
+ 			    SMB2_LEASE_KEY_SIZE)) {
++			if (!cached_dir_get_tcon(tcon,
++						 netfs_trace_tcon_ref_get_cached_lease_break))
++				break;
+ 			cfid->has_lease = false;
+ 			cfid->time = 0;
+ 			/*
+@@ -703,9 +717,6 @@ bool cached_dir_lease_break(struct cifs_tcon *tcon, __u8 lease_key[16])
+ 			cfid->on_list = false;
+ 			cfids->num_entries--;
+ 
+-			++tcon->tc_count;
+-			trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
+-					    netfs_trace_tcon_ref_get_cached_lease_break);
+ 			queue_work(cfid_put_wq, &cfid->put_work);
+ 			spin_unlock(&cfids->cfid_list_lock);
+ 			return true;
+@@ -813,12 +824,13 @@ static void cfids_laundromat_worker(struct work_struct *work)
+ 		cfid->dentry = NULL;
+ 
+ 		if (cfid->is_open) {
+-			spin_lock(&cfid->tcon->tc_lock);
+-			++cfid->tcon->tc_count;
+-			trace_smb3_tcon_ref(cfid->tcon->debug_id, cfid->tcon->tc_count,
+-					    netfs_trace_tcon_ref_get_cached_laundromat);
+-			spin_unlock(&cfid->tcon->tc_lock);
+-			queue_work(serverclose_wq, &cfid->close_work);
++			if (cached_dir_get_tcon(cfid->tcon,
++						netfs_trace_tcon_ref_get_cached_laundromat)) {
++				queue_work(serverclose_wq, &cfid->close_work);
++				continue;
++			}
++			scoped_guard(spinlock, &cfids->cfid_list_lock)
++				list_add_tail(&cfid->entry, &cfids->dying);
+ 		} else
+ 			/*
+ 			 * Drop the ref-count from above, either the lease-ref (if there
+-- 
+2.56.0
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
