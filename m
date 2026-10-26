@@ -1,87 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793028014;
-	b=Z85vHJLQOLOfNZ9pm5JM+uTeyCNK09I1yvTQ3Uruqh1CvyX9WvesAc7tTyBfCti7sKCS
-	 6ISzXROXfQGaKx+roAAY2K56O9eOiZLOnixd742E0NWa42RN7KijivsBBh/DwredpraOl
-	 ZypUNRFIL8y4v4693/VMm+B7PBXTHYZK/LI3VBRVUvquBRkr8NCFlH3T02vGVUBO4mMM/
-	 iDRj0jIr9wnQPrurE8dZ3EF3LxKwfLTnmTUZ9wUOsEFSjNGE2Ru0Qpkq5nvVaz2zg2bM6
-	 lLwpw9J49iv6P65CsejPAuL52bAdnY4M40Q+WoqC+rdKnmmiOc2P277wxh2a9DrDSEg==
+	t=1793053573;
+	b=Fofvc+i81dmHE9toTVXYBFtyQMPzRH5dsHlXuIK/yztH6D9uEp67QJI953Jclqm6FoVl
+	 8/hhnjfMJofOza4tJz/dT8gshvd9mouaG4y2EFjKeTVflGnsx0eiXimSzLGBr0Q9oefSX
+	 upiZMFIQVPairMEsIXGdAnS2lwfL49JEz4pVb/BOeNVfpDLFpjs9z4Jw5PbMmEniXawwG
+	 +XBa01M3eR1z10lcN/YrPeIRliV7W4u0Zj2PIhgrhk2FfGFa2v2ZlOZ2tE2yMxpfCEFEV
+	 EAYowSjyFajdtP+yWG2gVfltjvvTB33I1thHWK48ewJa7HFJD8QSD8JChbt+hmjPMLA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793028014;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:To:Cc:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793053573;
+	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-Id:
+	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=GDoT1f97HMSzIl27AFxsGzgU14gBpQzsSaLQbUyRuPE=;
-	b=Vn+6jhYVZijrMs+bn7F4xg5I0sZcwrEsnIIi6JYZ4KbA6oZb9ZMPss66RR80RDbfaK1l
-	 vUIpTJaMrIRUR1yi++c+sL3mYno7LF3uJeOSVf6v21QSmG3nrSxmVMlzeBpsQdoi/5xzP
-	 6JvUmg2rH1/TN+ef14s2BI/kYQFMmxEbP4dxDCT9gxsRbhuu57tAvZRVMtOSpCL/zM+Ci
-	 t90k8yuzmI5tfkpjkWkvEDkLdS4Y1wS9Ek4E+QzN2eR9/ez2uff8fqxqRgnZanBoY8Cgh
-	 gokELWeA6Ds6ojT+/DLtG5qugzaFHS3ZdJy+zns5MtFGyroRVbYhNriZrWK9Jr2DPsA==
+	bh=7VKj4mJ1D2Spwo3h/8zqbn22lXUbnbkbxwIyAxSGCzg=;
+	b=OpJJ6BXMCFd50tto/IZKzDD96d5FzecQTmDJSSLk9ymxglIV81GuNVqu89Kd/RUaASQW
+	 YzkqadhVBJkwDF9J8lfOfbZ/IvhjSaThVuNGW9HWNOjU78k+kTyPqYCviqDm/RtHg8V/N
+	 JbwPNK83a55tJ/JbKy9geDbfVxWdegv16zHNB0v+mDtcEhORdfBzc6OFLpTHEpQwb87cr
+	 lnd9Qp3FN1LIIF5Olb44xHdA/EqEPtTexAoY7ntww/wuR383k2MnFxL6QGElIVMTNcifa
+	 ON6rQz7Dt2adkq/ybaAcKE7F7zZGNJHYA17tTiWQVbHhwcUWKfAjmslx8KsQ3Qcztaw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=ToNzRoTL;
-	arc=none smtp.remote-ip=209.85.216.44
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gi8+F+dc;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1330E606A31B
-	for <linux-cifs@vger.kernel.org>; Mon, 26 Oct 2026 15:20:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1330E606A31B
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9757D606A31A;
+	Mon, 26 Oct 2026 22:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20251104 header.b=ToNzRoTL
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3adf5f6833cso1115028a91.0
-        for <linux-cifs@vger.kernel.org>; Mon, 26 Oct 2026 08:20:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1793028013; x=1793632813; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=GDoT1f97HMSzIl27AFxsGzgU14gBpQzsSaLQbUyRuPE=;
-        b=ToNzRoTLP4HJzM6XNq6Q3Qj8LuNiIenfeWp0aOxyA/K5ytxu5ZsC3I2YihUkowTmBo
-         6xPeIK7d7VwVycUAy+tvEa3GZwfo803+5TJb1itvtPBr/NEiZIYAbLpKdE0YTXA9ANNf
-         2AeuzW1okTGm/goAuj8aI465AEMoDrCdRKDM6fDi9xoG4MpsrbMkmUH6hYutlRz7zi8t
-         1nnsRv4+ERNzZuHxkeZxVX/GWP6HEClUCjqp5Hbd+JQYze4gglesifdNgYVts8EtPLwQ
-         RLDBiFme4GMN/7InZpF7Bxl88jdxwOKnuIjMOHNMuHQUOkAwL6lGJ8jOPGFOuVmORTL3
-         R9HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793028013; x=1793632813;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=GDoT1f97HMSzIl27AFxsGzgU14gBpQzsSaLQbUyRuPE=;
-        b=iGTLwtVnbVeaj+VGhVItiqwGyyJIATq3wyQ04XDUfjMqHiCzxNrzec67vkPTWMkeSj
-         XTegx6ZKxqarLMYOwggUDjq252cyz3BFLqHGJ3pkqs9ygXbych3OZ1hGcrKHjw1CxcXn
-         dd5484Go4cWzeYEaQSPntS/nlnfCG4tZEcdpDYFEShwi32ytnB0ODoUknvsUJuiFUI0z
-         Le4BPLhj9cGs88xyqkLAaWMJRjO4OBk4axQkCPafi+DPeNk1UNhx2b0r2r9dOR/G0qp+
-         /IDblG6YgAwC/lOCLg7ehrGlgJPCkCKQqV0CQpNz4oHfM9nQ7Z1fYsGyUq1ytKfsasH1
-         7roQ==
-X-Forwarded-Encrypted: i=1; AKwUvByERTAPaQ096SeB+snL7ejeLTX/Isf7KKeehSKCl5x+TpK3ae3Gum3tC/XD77XR8RSnBjugNjEZmrDA@vger.kernel.org
-X-Gm-Message-State: AFq9FYK3kmfkS1jrMZfZRBwV2nsyNxZwaY8I0P4uI/IrLC/ugLL6TX/4
-	zGuF3IljXWrLHc9UpP4inPxelISFSecn9uRwFnwPqk2g4zIy3HdKUQw9
-X-Gm-Gg: AYBFou1sMiWfajRFva/0GGlchY3ONs5j6NdGGQpRa52QEer9IqDU1lxNGs9W7VLJjBf
-	tkpt/7AIdpYnD7jWif5WCPcJX5HwQmokh80XmCkcKan3CHWadPVvk4czBr2es/Y6j1yGws6feFT
-	xa1PeV09wogsUuDrGdgdFMrA7uJlr9dONCCbVuQcVjHu5gjxvFSny55t/ot3VbnNE/6HiEfdg0j
-	CSBJoMvCKKvTJnTk+jPm/2AhqWOinZTPT9lKMM84LbT1L7joDnis5QLF2YJcdUpqKqe94KEyIOk
-	RF81xmOajOGsdMYCO+bbpE3rRwAk2OCwXT47ODZ1YwCaS9lj0/1Rftyi4xRXpk4DZfdRB3ff65t
-	AmcG67jDY129B5ueaM5Pt3BmuoRhBIIh1CZkcfBZFszmmHkaw04uZDqhwPdq6FtrswEccRJ0iRy
-	V4odbBvz3tZL44KPzNdfUuorKEEl3i6MwrrjPBFOVLX0rLHUFsQlFbTSOzprnO3I7jwQ4o/8WaX
-	K7REVCWuMdZn00OGBJ3F0tNPs7Xq3OPaj6v0mjgXRBiF1g=
-X-Received: by 2002:a17:90b:4a81:b0:3a8:a98c:ea07 with SMTP id 98e67ed59e1d1-3adea8966e7mr5384743a91.13.1793028011866;
-        Mon, 26 Oct 2026 08:20:11 -0700 (PDT)
-Received: from [198.18.0.1] ([38.182.104.55])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cd8ccc682d8sm1799598a12.18.2026.10.26.08.20.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Oct 2026 08:20:11 -0700 (PDT)
-Message-ID: <af546d6b-d1c0-45df-8f81-ad839e7e4d6d@gmail.com>
-Date: Mon, 26 Oct 2026 23:19:58 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gi8+F+dc
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 274F61F01828;
+	Mon, 26 Oct 2026 22:26:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793053573;
+	bh=7VKj4mJ1D2Spwo3h/8zqbn22lXUbnbkbxwIyAxSGCzg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=gi8+F+dcnh2Zg4WEZ0NimaLyXnj96AiMW6qeUDqsqU0pp8XUY7Vux1cqtCI3aVtZR
+	 ASbnRv0MemVn9XduF/atMh0AyMi7LtWbltcYhTImoXusvn/15OFlPuyglY9fWOH6Ga
+	 eZPGz0L1iHYg1x6y9ZXjRMGA4r3QMszh9ajQUPA9NcoiFvWo4zT7Ux7NjdR+Xgmso/
+	 ebaxWIMOyClKK9qSrjcvjXbqC293TqGIQF8Fkc1awuqtjJQ1GSzDOT2kIm2we7Apsd
+	 abhpPnfx8Kna29S9tlSKlzi37ByrYOIvDHsqT9yEGC6EBl9OmAb7naCiHE0t8d100C
+	 wZKYle1xKIoTg==
+Received: by pali.im (Postfix)
+	id B118E83A; Mon, 26 Oct 2026 23:26:09 +0100 (CET)
+From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v7.3 1/9] cifs: Remove code for querying FILE_INFO_STANDARD via CIFSSMBQPathInfo()
+Date: Mon, 26 Oct 2026 23:25:52 +0100
+Message-Id: <20261026222600.17323-2-pali@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20261026222600.17323-1-pali@kernel.org>
+References: <20261026222600.17323-1-pali@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -91,118 +62,123 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] ksmbd: fix named-pipe reply loss with small output
- buffers
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey
- <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <SEYPR02MB69642EAEE79F3CF02F782597E6612@SEYPR02MB6964.apcprd02.prod.outlook.com>
- <SEYPR02MB69641633E70AC3FBF14BB14FE6612@SEYPR02MB6964.apcprd02.prod.outlook.com>
- <CAKYAXd9vAUH6J_Mbx3ZTzGT9U+unoOsdDL4j_Q8UsDypW3a82g@mail.gmail.com>
-Content-Language: en-US
-From: Wang Zhaolong <wangzhaolong633@gmail.com>
-In-Reply-To: <CAKYAXd9vAUH6J_Mbx3ZTzGT9U+unoOsdDL4j_Q8UsDypW3a82g@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Namjae,
+Querying FILE_INFO_STANDARD structure via SMB_INFO_STANDARD level over
+TRANS2_QUERY_PATH_INFORMATION or TRANS2_QUERY_FILE_INFORMATION command
+(implemented in CIFSSMBQPathInfo() when called with argument legacy=true)
+is mostly unusable.
 
->
-> if (rpc->pending)
->     rsp->hdr.Status = STATUS_BUFFER_OVERFLOW;
-> Should we add this check ?
->
->> +       goto done;
->>
->> +empty:
->> +       err = ksmbd_iov_pin_rsp(work, rsp,
->> +                               offsetof(struct smb2_read_rsp, Buffer));
->> +       if (err)
->> +               goto out_put;
->> +done:
->>         rsp->StructureSize = cpu_to_le16(17);
->>         rsp->DataOffset = 80;
->>         rsp->Reserved = 0;
->> @@ -9349,7 +9375,6 @@ static noinline int smb2_read_pipe(struct ksmbd_work *work)
->>         rsp->hdr.Status = smb2_pipe_error_status(err,
->>                                                 STATUS_UNEXPECTED_IO_ERROR);
->>         smb2_set_err_rsp(work);
->> -       kvfree(rpc_resp);
->>         return err;
->>  }
->>
->> @@ -9947,7 +9972,7 @@ static noinline int smb2_write_pipe(struct ksmbd_work *work)
->>         if (IS_ERR(rpc)) {
->>                 err = PTR_ERR(rpc);
->>                 rsp->hdr.Status = smb2_pipe_error_status(err,
->> -                                                       STATUS_INVALID_HANDLE);
->> +                                                        STATUS_INVALID_HANDLE);
->>                 smb2_set_err_rsp(work);
->>                 return err;
->>         }
->> @@ -11440,20 +11465,25 @@ static int fsctl_pipe_transceive(struct ksmbd_work *work, u64 id,
->>         struct ksmbd_rpc_command *rpc_resp;
->>         struct ksmbd_session_rpc *rpc;
->>         char *data_buf = (char *)req + le32_to_cpu(req->InputOffset);
->> -       unsigned int nbytes;
->> -       int err;
->> +       unsigned int nbytes = 0;
->> +       int ret;
->>
->>         rpc = ksmbd_session_rpc_get(work, id);
->>         if (IS_ERR(rpc)) {
->> -               err = PTR_ERR(rpc);
->> -               rsp->hdr.Status = smb2_pipe_error_status(err,
->> -                                                       STATUS_INVALID_PARAMETER);
->> +               ret = PTR_ERR(rpc);
->> +               rsp->hdr.Status = smb2_pipe_error_status(ret,
->> +                                                STATUS_INVALID_PARAMETER);
->>                 smb2_set_err_rsp(work);
->>                 return 0;
->>         }
->>
->> -       rpc_resp = ksmbd_rpc_ioctl(work->sess, rpc, data_buf,
->> -                                  le32_to_cpu(req->InputCount));
->> +       /* Write new input without reading past an already buffered reply. */
->> +       if (rpc->pending)
->> +               rpc_resp = ksmbd_rpc_write(work->sess, rpc, data_buf,
->> +                                          le32_to_cpu(req->InputCount));
->> +       else
->> +               rpc_resp = ksmbd_rpc_ioctl(work->sess, rpc, data_buf,
->> +                                          le32_to_cpu(req->InputCount));
-> This WRITE leaves KSMBD_DCERPC_RETURN_READY set in mountd. After the
-> cached reply is drained, the next TRANSCEIVE can return the previous
-> reply without processing its own input.
->
-> Thanks.
+Win9x SMB server returns over those commands the FILE_INFO_STANDARD
+structure with swapped TIME and DATE fields, compared with [MS-CIFS] spec
+and Samba server implementation. Therefore this command cannot be used
+unless we know against which server implementation we are connected.
 
+There are already two fallback mechanisms for querying information about
+path which are working correctly against Samba, NT and Win9x servers:
+CIFSFindFirst() and SMBQueryInformation() commands.
 
-Thanks for catching this.
+So remove TRANS2_QUERY_PATH_INFORMATION/SMB_INFO_STANDARD code from
+CIFSSMBQPathInfo() function, when the function is called with legacy=true.
 
-I reproduced the sequence you described and confirmed the problem.
+Note that there is no use of CIFSSMBQPathInfo(legacy=true) anymore.
 
-For the READ path, your suggested STATUS_BUFFER_OVERFLOW check looks
-appropriate when a positive-length read leaves unread bytes from
-the same reply.
+Signed-off-by: Pali Rohár <pali@kernel.org>
+---
+ fs/smb/client/cifssmb.c   | 23 +++--------------------
+ fs/smb/client/smb1ops.c   |  4 ++--
+ fs/smb/client/smb1proto.h |  1 -
+ 3 files changed, 5 insertions(+), 23 deletions(-)
 
-For TRANSCEIVE, I think the correct fix needs some discussion.
-One possibility is to return STATUS_PIPE_BUSY when cached reply
-data remains, without issuing another IPC request or consuming the
-cached data. The client would need to drain that reply through READ
-before submitting another transaction. MS-FSCC §2.3.48[1] lists
-PIPE_BUSY for a pipe containing unread data.
-
-However, I would like to confirm that this is the intended behavior
-for this SMB2 path before preparing v4. Simply omitting the WRITE
-and returning cached data would still silently discard the input.
-
-Would rejecting the transaction with STATUS_PIPE_BUSY be appropriate
-here, or would you prefer a different approach?
-
-[1] https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc/f48cecf1-98d8-48dc-926f-2f3a48f07cf6
-
-Thanks,
-Wang Zhaolong
+diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
+index 6dddbd84b93b..8bdd81af6d21 100644
+--- a/fs/smb/client/cifssmb.c
++++ b/fs/smb/client/cifssmb.c
+@@ -4144,7 +4144,6 @@ CIFSSMBQFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ int
+ CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 		 const char *search_name, FILE_ALL_INFO *data,
+-		 int legacy /* old style infolevel */,
+ 		 const struct nls_table *nls_codepage, int remap)
+ {
+ 	/* level 263 SMB_QUERY_FILE_ALL_INFO */
+@@ -4194,10 +4193,7 @@ CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 	byte_count = params + 1 /* pad */ ;
+ 	pSMB->TotalParameterCount = cpu_to_le16(params);
+ 	pSMB->ParameterCount = pSMB->TotalParameterCount;
+-	if (legacy)
+-		pSMB->InformationLevel = cpu_to_le16(SMB_INFO_STANDARD);
+-	else
+-		pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_FILE_ALL_INFO);
++	pSMB->InformationLevel = cpu_to_le16(SMB_QUERY_FILE_ALL_INFO);
+ 	pSMB->Reserved4 = 0;
+ 	in_len += byte_count;
+ 	pSMB->ByteCount = cpu_to_le16(byte_count);
+@@ -4212,27 +4208,14 @@ CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 		if (rc) /* BB add auto retry on EOPNOTSUPP? */
+ 			rc = smb_EIO2(smb_eio_trace_qpathinfo_invalid,
+ 				      get_bcc(&pSMBr->hdr), 40);
+-		else if (!legacy && get_bcc(&pSMBr->hdr) < 40)
++		else if (get_bcc(&pSMBr->hdr) < 40)
+ 			rc = smb_EIO2(smb_eio_trace_qpathinfo_bcc_too_small,
+ 				      get_bcc(&pSMBr->hdr), 40);
+-		else if (legacy && get_bcc(&pSMBr->hdr) < 24)
+-			/* 24 or 26 expected but we do not read last field */
+-			rc = smb_EIO2(smb_eio_trace_qpathinfo_bcc_too_small,
+-				      get_bcc(&pSMBr->hdr), 24);
+ 		else if (data) {
+ 			int size;
+ 			__u16 data_offset = le16_to_cpu(pSMBr->t2.DataOffset);
+ 
+-			/*
+-			 * On legacy responses we do not read the last field,
+-			 * EAsize, fortunately since it varies by subdialect and
+-			 * also note it differs on Set vs Get, ie two bytes or 4
+-			 * bytes depending but we don't care here.
+-			 */
+-			if (legacy)
+-				size = sizeof(FILE_INFO_STANDARD);
+-			else
+-				size = sizeof(FILE_ALL_INFO);
++			size = sizeof(FILE_ALL_INFO);
+ 			memcpy((char *) data, (char *) &pSMBr->hdr.Protocol +
+ 			       data_offset, size);
+ 		} else
+diff --git a/fs/smb/client/smb1ops.c b/fs/smb/client/smb1ops.c
+index 3ac4126267f6..9c77752cb7f9 100644
+--- a/fs/smb/client/smb1ops.c
++++ b/fs/smb/client/smb1ops.c
+@@ -510,7 +510,7 @@ cifs_is_path_accessible(const unsigned int xid, struct cifs_tcon *tcon,
+ 
+ 	if (tcon->ses->capabilities & CAP_NT_SMBS)
+ 		rc = CIFSSMBQPathInfo(xid, tcon, full_path, &file_info,
+-				      0 /* not legacy */, cifs_sb->local_nls,
++				      cifs_sb->local_nls,
+ 				      cifs_remap(cifs_sb));
+ 
+ 	/*
+@@ -556,7 +556,7 @@ static int cifs_query_path_info(const unsigned int xid,
+ 	 * do not even use CIFSSMBQPathInfo() or CIFSSMBQFileInfo() function.
+ 	 */
+ 	if (tcon->ses->capabilities & CAP_NT_SMBS)
+-		rc = CIFSSMBQPathInfo(xid, tcon, full_path, &fi, 0 /* not legacy */,
++		rc = CIFSSMBQPathInfo(xid, tcon, full_path, &fi,
+ 				      cifs_sb->local_nls, cifs_remap(cifs_sb));
+ 
+ 	/*
+diff --git a/fs/smb/client/smb1proto.h b/fs/smb/client/smb1proto.h
+index 80eaeb3dd2ec..f0350fa3f173 100644
+--- a/fs/smb/client/smb1proto.h
++++ b/fs/smb/client/smb1proto.h
+@@ -141,7 +141,6 @@ int CIFSSMBQFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     u16 netfid, FILE_ALL_INFO *pFindData);
+ int CIFSSMBQPathInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 		     const char *search_name, FILE_ALL_INFO *data,
+-		     int legacy /* old style infolevel */,
+ 		     const struct nls_table *nls_codepage, int remap);
+ int CIFSSMBUnixQFileInfo(const unsigned int xid, struct cifs_tcon *tcon,
+ 			 u16 netfid, FILE_UNIX_BASIC_INFO *pFindData);
+-- 
+2.20.1
 
