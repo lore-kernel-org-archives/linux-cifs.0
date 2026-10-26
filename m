@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793053574;
-	b=0tJLP/EjVFoxuIpQEauyps8RTOLHC/WDe3axQPiivtpJxlb14DJB66v9YH9QT9sP2Zne
-	 RZd16fkqlMSIHANfkzcV74xpQp67ElCAZwczZ2n76ZZDabi8JFotCJKuTilMPXQeWa7jU
-	 2pnEZCCA9to8sXBiIJBj0HxU7rrNwhfAf8427tonmZOiNSSVar6JZm02pXIOp1olqUb+4
-	 LclFo0UCm7bksOwm8uFmJO64Tvr+kec6wJq9jLm7RIKYPbhZMHGSI70/swkLGSivzmtKn
-	 Ygo8T6OftbbLMlgHnPSFiq7lyn62AputE04ng6hSI7D/wSgw47weYzSRehqjJVARt3Q==
+	b=I0byaffaqsEhHL+m+06xDK7NiQXVmktZhsrYrhq+KIxoRQQ1wHSK/y1/C8GJWjNpElHV
+	 Rwib4rl72tuFc8CndLB1+fvNfifm1PDk41extyP0yqNQMHA6+j236y9cqvAFoIbMofgFX
+	 eeF6664HJRmJpAGy1lto2BGBJhvSJKU0vfaGAycQrEkYZeMBBy8UUsANZIEB1cks+qAZQ
+	 faFmFwUepW2h2wqqC2gZ+oMZXu3HLeds6KGwN1/AyTRuGlm0KoDu0as1bB3y4K6s04Ly4
+	 6RTtCmAdubbzejyFfdI9YP9K8UcF3ldZty7idjCkTn04o2F7ZaDk/rdOqd2QgOEO/IA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793053574;
 	h=Received:DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-Id:
 	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=M1v832G2cUYljA4PzdNFQO/+x89tzJMdRaBAycOns94=;
-	b=AXgzaQYzCdyHKBhab+Ge7rv/QQ4NekS63fIOqFHdBNOZsKg0HihMs750vp0eZP+QIYV0
-	 d5pXa1XpqkKiPNfCoYBPxuztLPBQ/a6ffQeSGLY20NmLcs7EgNAxxzEHCuBFtf0jF1j13
-	 bxtFSCVwdTRflxOSTSZetFeBKY4cNmguE7wmoQtHZ4+FG8kPIrZUvn3IhY6P6jefeoYr8
-	 eoFrkQhs+roPv7NVGA9iNZ1A68IM4K6pGJIPcuGRQsmQcLRhiHOkVXMo5j3ND8HGw9J+X
-	 D8CerKYhOsw5iB9OW9J5Acb/ggdJ+bM80dWAZvC7ymoUMaDT1Iy9gZceJLvxBPCagGQ==
+	bh=pWS3JwVxq8BPKl5typ3BsrdaWXW9EhNPjKYs7EHpLwg=;
+	b=q0RxSss6oQvYUUtvSlCAXl9Y3Ib4d/yZJCC+/6uTh8uptkPkb27/XEqsG4GIGVXwT3w8
+	 0A28xHi9YgdSSdqzpiM+7158CpCibby7GOwBzHoyuoBUZerTytAzPHHSlK5QEMJ/3chXw
+	 y2p37A5ZwDRFOU8YOfqEi2g2tbLiuasIf5sI8FfglE77R/EmpsCx26KhU4U1wKGDJ58jK
+	 1mQGIEAzgJGjkn0mpLGeglNzmcwc2UbINXtWKnirrvzQD/Pp3BUrICT1i6Ujg0Ia7Rf6B
+	 KZg6heIIgy1aNF52VPMcMtGUNU4PCHTgWGGyWFLxjbHkGx9OkiBr9ny8ZpXT9KuWA+A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BBdLk391;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dQcr0woO;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DB5606A323;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A48D606A328;
 	Mon, 26 Oct 2026 22:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BBdLk391
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B487A1F031E2;
-	Mon, 26 Oct 2026 22:26:13 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=dQcr0woO
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B7E1F01828;
+	Mon, 26 Oct 2026 22:26:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793053573;
-	bh=M1v832G2cUYljA4PzdNFQO/+x89tzJMdRaBAycOns94=;
+	s=k20260515; t=1793053574;
+	bh=pWS3JwVxq8BPKl5typ3BsrdaWXW9EhNPjKYs7EHpLwg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=BBdLk391fWn8H/SULkim5TtvAqvC5TkatjB6Xjq19HBZ/CVNAB8eajFFJP8mCGrAM
-	 iZVbfXLPQE4WbORHiEu9nifl4CDi1HHah3WAnuZhzQIBhGQvTf5DHiNpXEK3DiWpzv
-	 gu+MXVx4GHB9gmeYqQTe3xJRtZsyExaUT+JyL3CJ22euA4IcOPxA9Ie4zMGgwmYCiM
-	 6Un/++8P3OjxKuz4O99u9tBGCzA2R1X05drRDbI29OtjColCgsl8JGaU56vA4XGzBU
-	 1B5ffU+7dP5f7ar3Rj3OQncRvCHuWd9M0iLxl9UcVFsdS9pLvw6tPNW+TCYCuJL4QQ
-	 7QEwQKtm4aEQQ==
+	b=dQcr0woOdR3JEt37zD4ucJaBAokKOrgpaOFrZfn1T2E+Zng0mor0xLLVH1bR8Ie3y
+	 qeQxtf6u6V+gYeGKKNztY0mwqeKOTUcqZzhj7HnECTeYc4hzjYmXMtmyGBPeaBObeC
+	 Zbo7ixYm2bRyj4q/TlyupmkDX/SC+b6lNinDaEulN+6s5/6TPjl+Sk4STn8ILnh2xX
+	 u4pxVvxJEku7+3MJ/WFcJ9w01VTHsEsix5/MGn7dtXccL6jMbLT3UQFmjwIWDgFMxe
+	 geJgSnfmaqhCqhO02uzcK08iFFA5PVV1RwJRrCa7dPQDoon5IzsUNLbQ9WxBo0leGg
+	 JKXTfN60nXrcA==
 Received: by pali.im (Postfix)
-	id 15204BB6; Mon, 26 Oct 2026 23:26:10 +0100 (CET)
+	id 3815ACA4; Mon, 26 Oct 2026 23:26:10 +0100 (CET)
 From: =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
 To: Paulo Alcantara <pc@manguebit.org>,
 	Namjae Jeon <linkinjeon@kernel.org>
 Cc: linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7.3 3/9] cifs: Fix validation of EAs for WSL reparse points
-Date: Mon, 26 Oct 2026 23:25:54 +0100
-Message-Id: <20261026222600.17323-4-pali@kernel.org>
+Subject: [PATCH v7.3 4/9] cifs: Validate presence of EA $LXMOD for WSL reparse points
+Date: Mon, 26 Oct 2026 23:25:55 +0100
+Message-Id: <20261026222600.17323-5-pali@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20261026222600.17323-1-pali@kernel.org>
 References: <20261026222600.17323-1-pali@kernel.org>
@@ -65,66 +65,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When wsl_to_fattr() is called from readdir() then we should skip validation
-of WSL EAs because readdir FIND_FIRST/NEXT results do not provide EA values
-at all. For readdir() reply in this case return DT_UNKNOWN type instead of
-DT_REG (which is the result of failed WSL EAs validation).
-
-When validation is skipped and some required EAs are missing then returns
-true from wsl_to_fattr() function but do not set fattr->cf_mode. This makes
-readdir() to return DT_UNKNOWN type in the same way as it is doing NFS
-reparse point function.
-
-This change fixes readdir() result that for some WSL reparse points returns
-DT_REG due to missing EAs. After this change it returns DT_UNKNOWN, which
-is better than returning wrong type.
+S_DT part of xattr $LXMOD is mandatory for all WSL reparse points except the
+WSL symlink and Win32 socket. Microsoft WSL subsystem does not recognize
+them without xattr $LXMOD too, and treat such inodes as regular files.
 
 Fixes: ef201e8759d2 ("cifs: Validate EAs for WSL reparse points")
+Fixes: 78e26bec4d6d ("smb: client: parse uid, gid, mode and dev from WSL reparse points")
 Signed-off-by: Pali Rohár <pali@kernel.org>
 ---
- fs/smb/client/reparse.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ fs/smb/client/reparse.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/fs/smb/client/reparse.c b/fs/smb/client/reparse.c
-index 3a27773186ae..e547510ca3c5 100644
+index e547510ca3c5..577cdf49c047 100644
 --- a/fs/smb/client/reparse.c
 +++ b/fs/smb/client/reparse.c
-@@ -1152,6 +1152,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
- 	kuid_t uid = cifs_sb->ctx->linux_uid;
+@@ -1153,6 +1153,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
  	kgid_t gid = cifs_sb->ctx->linux_gid;
  	struct smb2_file_full_ea_info *ea;
-+	bool ignore_missing_eas = false;
+ 	bool ignore_missing_eas = false;
++	bool have_xattr_mode = false;
  	bool have_xattr_dev = false;
  	dev_t rdev = 0;
  	umode_t mode;
-@@ -1174,8 +1175,18 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
- 	case IO_REPARSE_TAG_LX_BLK:
- 		mode |= S_IFBLK;
- 		break;
-+	default:
-+		return false;
- 	}
+@@ -1216,6 +1217,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+ 			if (S_DT(mode) != S_DT(get_unaligned_le32(v)))
+ 				return false;
+ 			mode = get_unaligned_le32(v);
++			have_xattr_mode = true;
+ 		} else if (!strncmp(name, SMB2_WSL_XATTR_DEV, nlen)) {
+ 			rdev = reparse_mkdev(v);
+ 			have_xattr_dev = true;
+@@ -1226,6 +1228,16 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
+ 	if (!have_xattr_dev && (tag == IO_REPARSE_TAG_LX_CHR || tag == IO_REPARSE_TAG_LX_BLK))
+ 		return ignore_missing_eas;
  
 +	/*
-+	 * When reparse buffer is not available then this is from readdir() call
-+	 * which does not provide EAs. readdir() can return DT_UNKNOWN type,
-+	 * which is signaled by no filling the fattr->cf_mode and returning true.
++	 * S_DT part of xattr MODE is mandatory for all WSL reparse points except the WSL symlink.
++	 * Microsoft WSL does not recognize them without xattr MODE too (except the WSL symlink).
++	 * IO_REPARSE_TAG_AF_UNIX is here an exception because this reparse point is used by both
++	 * WSL subsystem and native NT/WinAPI subsystems. And NT/WinAPI creates AF UNIX socket
++	 * without the xattr MODE and recognize it also without the xattr MODE.
 +	 */
-+	if (!data->reparse.buf && !data->wsl.eas_len)
-+		ignore_missing_eas = true;
-+
- 	if (!data->wsl.eas_len)
- 		goto out;
- 
-@@ -1213,7 +1224,7 @@ static bool wsl_to_fattr(struct cifs_open_info_data *data,
- out:
- 	/* Major and minor numbers for char and block devices are mandatory. */
- 	if (!have_xattr_dev && (tag == IO_REPARSE_TAG_LX_CHR || tag == IO_REPARSE_TAG_LX_BLK))
--		return false;
++	if (!have_xattr_mode && (tag != IO_REPARSE_TAG_AF_UNIX && tag != IO_REPARSE_TAG_LX_SYMLINK))
 +		return ignore_missing_eas;
- 
++
  	fattr->cf_uid = uid;
  	fattr->cf_gid = gid;
+ 	fattr->cf_mode = mode;
 -- 
 2.20.1
 
