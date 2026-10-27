@@ -1,55 +1,123 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.145
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793063958;
-	b=D/4O6MI0lnH/hC7JE6iVWA4Nt7dYYQRK5bErhjjXP0IeV1ttQCt3TIiLp89tWQ0i44O6
-	 GMjrhvrHWoYub6Rkdjv6Q29SyC4uIZ4TDzIIxXQDdV/Oz6S903PzX7No494ZGOl3e7KFl
-	 AuNqm3kx9nmtbIzHqkM0ofw9APx/sHjrIhovmndsPGGzkcsR5ERftlQLkPP+pPiMWnScB
-	 HNTKoWUzEYw1mn0ywzgStFMNNEPrWQIP9QXl7PZhhUB2OPa7Z+LxO/PdLFrNbQhKMM/4R
-	 W97H0w7eS68ZqDEtrrtz2Cnc92t98Gi5LhOns7tTY4VAASLknlZfRTJ9pEj6tsJ67Qw==
+	t=1793064608;
+	b=yBpeDzw4d4EWWBfwYsQQXX6pguhEQDD0QIK0xX/7Qvbl1kS28LTY2cSYNiLbduTdNziL
+	 qUbO7GiahIU1eiTEU/B4gl3FgF6gG4Fk3QaG272zyaP7oGpWaicKF9XtUkAm+90vLKChc
+	 tQyY90uqKvT7HmvQOm1EM/WtKBgfV62ghIR0ZiOhQhxzYi67lQDrKCz1o+EcLtpoVM5UE
+	 gr0gs21nLsycf/4jHhILk7gqOd9lNLjv8seJ7XgIE/I1sKmKcEJ4LR3k+4TA8WoEU88B8
+	 7Tn6kmysgnFC3+OtJDNmMy+DRhL2bKlPWkrIvi8UlCsVRorprewoP4YDBI5/ANoJHng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793063958;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=V6ucdF8CVrL1H+b/a6ewy2PMRiq8ZA0KkSsjiF9N63U=;
-	b=0OkvoZixrfoAkOK03iisdyCYF7+wLWCeFWiddHsD70vyXfeLwfoQBrTmphcvy1pvwH2a
-	 r2JpoWrTZQX0dydIlL+xUi+QOADooldskSiEzq1LCE5v2EkgcQC7zFFepjAllmod4PXfn
-	 eQKdIYhHGo6SoEzvD1TkzjMTv6jADjcWk/CcV+Ozy5ioSyWqPqlFDg6NV3T7/mtMtCMCc
-	 0Owt/uCJ5L66fXVY4AQ0azldZ8GJdSqCr9Jo1yIo/zxUkXVog1NBrVgg8/BU0JM66WDKp
-	 RR0yoZHUgDcYt0bfUxBZpZRhNXbOa++O9BbGgwntZfLhyIdtz40cx9nG2Rc4KNiWdbw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793064608;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=Nw6sAIOlxyEJPZz8sIrCLx9P5iIUS4/rUwm28WaKwHs=;
+	b=lYs9KKuogZH1h9hzktV7wyBkMAoeAC4omEMYAv3zeUjWzR1CdmuDGzAKPM5qXSUYIDSR
+	 E4NNfgRwYE+PFGtO3Nz+6NAfHlM1gPxjEdjFFMWlRkt7jtXZQVp13/DVdubTglXD+t8gY
+	 sC7NVeWR4y9VWYlLpjAru6QLxTmDVej2yJjrOyYdqd2vH8duYi5/Zk/AOc4E/a5ISJEet
+	 Ld1iJ8EuH2trQSq7VLwj8JCRA80QHJCV0E6gNCd1CakParLcjJVq85rlsm79gOX3GlDQH
+	 ih46iAp6aKdCqCpYljCOJenG7QW/ntKQRr0BRjjQUeoosxPGLzct0wJIAaEFDXkRHoA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=khbSiHL2;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b="bceoZ/TA";
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=NTeeqMk3;
+	arc=none smtp.remote-ip=103.168.172.145
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A83606A31A
-	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 01:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A62606A31E
+	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 01:30:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A7A62606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=khbSiHL2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7821E1F031E1
-	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 01:19:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793063957;
-	bh=V6ucdF8CVrL1H+b/a6ewy2PMRiq8ZA0KkSsjiF9N63U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=khbSiHL2itRIN80YPJKpp+/eCfuMc/mokXqb3jMicljhAZljQklxBUcxNipY8q4PG
-	 6MAwtjZ4c6mNU0LHZNlb+e2dKvNLbZGimw63AmaCyZ1mbtZJBrwKPU/7uefuKI4qRH
-	 nbKE3dGBPIty9DQoSP5VjTgFvRMls8yg65BC3Va6lXIkfYWHVHstwPeSlPLuQwllQG
-	 zn5VMah3o0jFKkxUA9sABcrPHXW7cpV7x5Mb0X/4J0rolUiX9Yh1NwfTrbfTGxR/UH
-	 Tbr7ijhGWlj3wNq3FHtknO3BBnv6ejhfcwpV0dUG13CY2rXIpeMG/GOvUgltH6tleM
-	 V7MPN1QMvE6Hw==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c40f29667e6so579694666b.0
-        for <linux-cifs@vger.kernel.org>; Mon, 26 Oct 2026 18:19:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwlQZsLInEeKKCK+pXdrEV6PVLrWP3XYnWkEUFSn4aE2OzGNFu1gm47etNQptOwq7EGZ+SLxxICATcb@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ9PbhHaxZFeiWDJ14OfXQqwgPpCX4Ol/VfsgFGlMLnnZoZ/kJE
-	Yy9lFH4ILt/R6EFI3pcsQ7dzY+yuNZy7/101otddCyG+Okr+xEpCMS2IRCLglk48P1irm4Th0TO
-	jC0io4FPf1RfPVoS0K9ZrG7CD/FDETqM=
-X-Received: by 2002:a17:906:d553:b0:c31:c767:ae0b with SMTP id
- a640c23a62f3a-c46bd906647mr905168766b.0.1793063956037; Mon, 26 Oct 2026
- 18:19:16 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b=bceoZ/TA;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=NTeeqMk3
+Received: from phl-compute-08.internal (phl-compute-08.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id E847AEC0823
+	for <linux-cifs@vger.kernel.org>; Mon, 26 Oct 2026 21:30:06 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Mon, 26 Oct 2026 21:30:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1793064606; x=1793151006; bh=Nw6sAIOlxyEJPZz8sIrCL
+	x9P5iIUS4/rUwm28WaKwHs=; b=bceoZ/TATPBixN0j80VTBRSRt4qFvBbR5aI17
+	xkJjhMGLZmrsd6Xbhf9liEAvn+LSP0eVpYtPg5rm+xgiLGMap2HMtRj3LASbZDfT
+	rZvUszjnJ53BZ48cTyNp0Cx3uOi9sc07z797rHGJGYbpjmkf9RNBu71SUn31spYN
+	n0PTLo++PxnqDtm3q5h8Oihc/jdeKNmPnjHX57dyaGFuQ+24ywtYkISylgODnoS2
+	lluB31No6XxKqbuCOEin3361Cuy+VYFdw/40JjRMgkj7/01Q1/dCVTAySeWTTuGS
+	qRIXKg41QTEzuPwC2QOT9SFSqc2MSY3TPXFNoIWm+oxkLzwYw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1793064606; x=1793151006; bh=Nw6sAIOlxyEJPZz8sIrCLx9P5iIUS4/rUwm
+	28WaKwHs=; b=NTeeqMk3Tja3eaio+fFvTPzNvry0D0kKWirMCeQb3yh7UPhdHIn
+	7ZAWAxhC6sQ/aS9pQCrwZB8/0O3nZGttfFKZZtKeOdmEvKrgkDBwnTymDqGKzmbJ
+	i3oUaO6t1pHt2RfnC2DLCobFVqqDn0qZI6/ov9nVD9Hf237WAVqiK3UEopYWtBrC
+	6G8fv+FkRFssf2yQyp1GUg51P2zZN2MMGkZo/MTxG4M05tegcdkwS3nZfIwMAgwj
+	hPs4D0dTD+s+uPKTi4bOw8KIxLX8GrXRLdVK90ZNFkkbitGqmOfvFl9+Tqfl2wn9
+	MAqW5moLs+4GuEHbX5bgaZhIQEfDpWF3qBQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1793064606; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm2:rsa-sha256:k14NFc6Fmz4iEldaTbNvSeITnMwFGyMoejvAOrEEVU2FI6k
+	qfKJu0iVMhLMmwEEYRW7FiF5QcVPj7SjQnFXtKlY6XLUR2KtCSseTs69kRy/dPft
+	Befr9xCRKTTMmJBLYGZRMIpnYmyq6uylHVTspnz5CF4HAhbmY81bNLMafS8RF2IL
+	xcnGB+5LXSea6tFbrbEW8ye8pInsJXYhItXgrLPukPfYTzesun11mhwOKGQcfwRJ
+	KWGL7kMJ3SLIij901kHmKGd2muwFg19xkYDe/eRNWQHNBzhJ3k8DPeNqNAtHNJC3
+	B3WpMbZ1Z17uLfE0hWsr7uLX9gOIEdHF04MmtHQ==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:sAGhZIz/NOe+xUOOF/0QtX+gTH+KTsC2GX7PpaEuRJM=:zC2zVA7/UVzZsvQu4vMW4UxLD0oh9ArSq6JDOjgbqME=;
+X-ME-Sender: <xms:nf7fatOZTzTTmniQOlLLGCyrBaKqg_WdvxJyuv9eYiKhTO1EX2W_gg>
+    <xme:nf7fasj3ZwrlY68mXlB_OJF2CgwqSEHVecmR3K71D1iO_HQS8baks8M0d0JqkA8Qw
+    d8U5I_sTNbcPMwSGtE-4xxdPVMZYUM-7XA8EpiDNCJ_ZRPpSpOdlw>
+X-ME-Received: <xmr:nf7fagtp6CYdyeL_xs1sszkvCl110wIG5XeJ6glsDq_BL5wV3TwR1CXsf2h-nKPT>
+X-ME-Proxy-Cause: dmFkZTEpp17IL1do7w68l88CNNMIlrDD2itkOhM5AWkaeXa/vm9O/8LEwLeYktRhF1hBld
+    nwfrGcfvfvFqrEadI+viedAE7J4cgnGIjooFyvKHcNc/OjHnc+YWYUZklImqJzYwbeR/xZ
+    tjipQfNgfUAnVywwRJvAR60QpL8lIdn9B5EluGfSSPGWPjTj5bTW+7Qg1rkf3xBfhwFS5s
+    4XmTzCfNdPHiSRu4Yz/kqZOeT9U14pyJ7RjWvmoTuqKM4HDuYco3n68Mqjn3cCjfci+LAu
+    A/ID6mYFS/CPavI7GC0ArGyIEDdyl1ubRTKfa9k4IG+1+rFWX42RjdngYPMMAayA5ulZeb
+    s/dlQrHypTT2FwTBbLmv19zIIExajaW+jtpkFOy3YzZulCfjelZseTAIYDwOqNgb8uqHHe
+    B+BMIBZ21rRGxnro8bL6vbB+iUo0AIn5N8GReuCnq0c7Ps2e7zpiq5TtV02xS4h4HQ27lN
+    6lNTJTAWaqvMIkFMsAaSAQ0+m2bTR0pr4S7nhKgr+iT75czzhvTljQBbEZqhdgLOurecr8
+    eFjaXCA+Lu4gdyknKszRPSWbRG1XYtQaFAmYcRrUqWKYwx2OkhBFLaOWacPSKwTKWr/a4W
+    nPTZ0hepek5u59rT0tQAoMAlecgJSmTTTd1pzv/iDP6p1h7SWk9+d3+6vcag
+X-ME-Proxy: <xmx:nf7fagid7e8ROCyxQRbuiRT4I2r7GCwpPM2N4ZtXungxGYj4h1soMw>
+    <xmx:nf7fambkvrKptqld0QPMoDd5ofDd6tcvjMH4vfVutF5VF3UiC_k9fg>
+    <xmx:nf7favZahXfapJnQm7hHV6z614jBL5EupxV3L0k7s8z6vfKlzL_nOg>
+    <xmx:nf7farwnCXb7tldqqFYQGeGgW9MPHredzYz6HXg5Vvkx8eYNyB38FQ>
+    <xmx:nv7fapFOpOZaKLulU5oZyHmM96s8t5NLpBCD6NsESuzUXP64FKtyrD3A>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 26 Oct 2026 21:30:04 -0400 (EDT)
+From: Ian Bridges <icb@fastmail.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Gael Blivet <gael.blivet@gmail.com>,
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>
+Subject: [PATCH] ksmbd: fix SMB2 CREATE response buffer overflow in compound requests
+Date: Mon, 26 Oct 2026 20:29:47 -0500
+Message-ID: <20261027012947.107852-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,142 +127,104 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <SEYPR02MB69642EAEE79F3CF02F782597E6612@SEYPR02MB6964.apcprd02.prod.outlook.com>
- <SEYPR02MB69641633E70AC3FBF14BB14FE6612@SEYPR02MB6964.apcprd02.prod.outlook.com>
- <CAKYAXd9vAUH6J_Mbx3ZTzGT9U+unoOsdDL4j_Q8UsDypW3a82g@mail.gmail.com> <af546d6b-d1c0-45df-8f81-ad839e7e4d6d@gmail.com>
-In-Reply-To: <af546d6b-d1c0-45df-8f81-ad839e7e4d6d@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 27 Oct 2026 10:19:04 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-OpiRi2uQzK81rJpHis0VkS-gTaZpQWJ4TZH_RJFzL6g@mail.gmail.com>
-X-Gm-Features: AclHuK9JxMtnlt53AqO7LF3FG6G1nnO1heXsQG0vFMGDEfz2ZPeUYa9Joj1Z150
-Message-ID: <CAKYAXd-OpiRi2uQzK81rJpHis0VkS-gTaZpQWJ4TZH_RJFzL6g@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] ksmbd: fix named-pipe reply loss with small output buffers
-To: Wang Zhaolong <wangzhaolong633@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 27, 2026 at 12:20=E2=80=AFAM Wang Zhaolong
-<wangzhaolong633@gmail.com> wrote:
->
-> Hi Namjae,
-Hi Wang,
->
-> >
-> > if (rpc->pending)
-> >     rsp->hdr.Status =3D STATUS_BUFFER_OVERFLOW;
-> > Should we add this check ?
-> >
-> >> +       goto done;
-> >>
-> >> +empty:
-> >> +       err =3D ksmbd_iov_pin_rsp(work, rsp,
-> >> +                               offsetof(struct smb2_read_rsp, Buffer)=
-);
-> >> +       if (err)
-> >> +               goto out_put;
-> >> +done:
-> >>         rsp->StructureSize =3D cpu_to_le16(17);
-> >>         rsp->DataOffset =3D 80;
-> >>         rsp->Reserved =3D 0;
-> >> @@ -9349,7 +9375,6 @@ static noinline int smb2_read_pipe(struct ksmbd_=
-work *work)
-> >>         rsp->hdr.Status =3D smb2_pipe_error_status(err,
-> >>                                                 STATUS_UNEXPECTED_IO_E=
-RROR);
-> >>         smb2_set_err_rsp(work);
-> >> -       kvfree(rpc_resp);
-> >>         return err;
-> >>  }
-> >>
-> >> @@ -9947,7 +9972,7 @@ static noinline int smb2_write_pipe(struct ksmbd=
-_work *work)
-> >>         if (IS_ERR(rpc)) {
-> >>                 err =3D PTR_ERR(rpc);
-> >>                 rsp->hdr.Status =3D smb2_pipe_error_status(err,
-> >> -                                                       STATUS_INVALID=
-_HANDLE);
-> >> +                                                        STATUS_INVALI=
-D_HANDLE);
-> >>                 smb2_set_err_rsp(work);
-> >>                 return err;
-> >>         }
-> >> @@ -11440,20 +11465,25 @@ static int fsctl_pipe_transceive(struct ksmb=
-d_work *work, u64 id,
-> >>         struct ksmbd_rpc_command *rpc_resp;
-> >>         struct ksmbd_session_rpc *rpc;
-> >>         char *data_buf =3D (char *)req + le32_to_cpu(req->InputOffset)=
-;
-> >> -       unsigned int nbytes;
-> >> -       int err;
-> >> +       unsigned int nbytes =3D 0;
-> >> +       int ret;
-> >>
-> >>         rpc =3D ksmbd_session_rpc_get(work, id);
-> >>         if (IS_ERR(rpc)) {
-> >> -               err =3D PTR_ERR(rpc);
-> >> -               rsp->hdr.Status =3D smb2_pipe_error_status(err,
-> >> -                                                       STATUS_INVALID=
-_PARAMETER);
-> >> +               ret =3D PTR_ERR(rpc);
-> >> +               rsp->hdr.Status =3D smb2_pipe_error_status(ret,
-> >> +                                                STATUS_INVALID_PARAME=
-TER);
-> >>                 smb2_set_err_rsp(work);
-> >>                 return 0;
-> >>         }
-> >>
-> >> -       rpc_resp =3D ksmbd_rpc_ioctl(work->sess, rpc, data_buf,
-> >> -                                  le32_to_cpu(req->InputCount));
-> >> +       /* Write new input without reading past an already buffered re=
-ply. */
-> >> +       if (rpc->pending)
-> >> +               rpc_resp =3D ksmbd_rpc_write(work->sess, rpc, data_buf=
-,
-> >> +                                          le32_to_cpu(req->InputCount=
-));
-> >> +       else
-> >> +               rpc_resp =3D ksmbd_rpc_ioctl(work->sess, rpc, data_buf=
-,
-> >> +                                          le32_to_cpu(req->InputCount=
-));
-> > This WRITE leaves KSMBD_DCERPC_RETURN_READY set in mountd. After the
-> > cached reply is drained, the next TRANSCEIVE can return the previous
-> > reply without processing its own input.
-> >
-> > Thanks.
->
->
-> Thanks for catching this.
->
-> I reproduced the sequence you described and confirmed the problem.
->
-> For the READ path, your suggested STATUS_BUFFER_OVERFLOW check looks
-> appropriate when a positive-length read leaves unread bytes from
-> the same reply.
->
-> For TRANSCEIVE, I think the correct fix needs some discussion.
-> One possibility is to return STATUS_PIPE_BUSY when cached reply
-> data remains, without issuing another IPC request or consuming the
-> cached data. The client would need to drain that reply through READ
-> before submitting another transaction. MS-FSCC =C2=A72.3.48[1] lists
-> PIPE_BUSY for a pipe containing unread data.
->
-> However, I would like to confirm that this is the intended behavior
-> for this SMB2 path before preparing v4. Simply omitting the WRITE
-> and returning cached data would still silently discard the input.
->
-> Would rejecting the transaction with STATUS_PIPE_BUSY be appropriate
-> here, or would you prefer a different approach?
-I think the former is correct.
+A CREATE response that carries an AAPL create context can reach
+create_rsp_size (572 bytes for SMB 3.1.1). Commit 713c31a3a225
+("ksmbd: fix SMB2 CREATE response buffer overflow") makes
+smb2_allocate_rsp_buf() reserve that much, but only for the first
+command of a compound. A CREATE later in the compound is guarded by
+is_chained_smb2_message() instead, which reserves only
+MAX_CIFS_SMALL_BUFFER_SIZE (448 bytes) for the next response. smb2_open()
+then appends the create contexts without checking the space left.
 
-Thanks.
->
-> [1] https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fscc=
-/f48cecf1-98d8-48dc-926f-2f3a48f07cf6
->
-> Thanks,
-> Wang Zhaolong
->
+That check also uses the unpadded length of the response so far.
+init_chained_smb2_rsp() pads the previous response to 8 bytes before the
+next command runs, so the next response can start up to 7 bytes later
+than the check assumes.
+
+When a CREATE follows a command that fills the response buffer, such as
+QUERY_DIRECTORY, it writes its create contexts past the end of the
+buffer. The AAPL context is written last.
+
+  BUG: KASAN: slab-out-of-bounds in create_aapl_rsp_buf+0x31/0x6e0 [ksmbd]
+  Call Trace:
+   create_aapl_rsp_buf+0x31/0x6e0 [ksmbd]
+   smb2_open+0x4fa8/0xd900 [ksmbd]
+   handle_ksmbd_work+0x88c/0x1cb0 [ksmbd]
+
+When the next command is a CREATE, reserve create_rsp_size, as
+smb2_allocate_rsp_buf() does for a single CREATE, and check the reserve
+against the 8-byte aligned offset where the next response starts.
+
+Fixes: 8f1b796ff113 ("ksmbd: add AAPL kAAPL_SERVER_QUERY create context support")
+Signed-off-by: Ian Bridges <icb@fastmail.org>
+---
+
+Notes:
+    The bug needs a client on a share with "time machine = yes" to send a
+    compound whose earlier commands fill the response buffer (for example
+    QUERY_DIRECTORY), followed by a related CREATE that requests an AAPL
+    create context. Where that share also allows guest access (guest ok),
+    it is reachable without credentials.
+
+    A reproducer is available on request.
+
+    This fix was developed with LLM assistance (code review and KASAN
+    reproduction).
+
+    Tested on ksmbd-for-next 146c3fc6540e with only this patch applied,
+    under KASAN. "smb2 max trans" was lowered (65536, 65560, 65564) so that
+    the response buffer ends in a KASAN redzone. Before the patch, a CREATE
+    after QUERY_DIRECTORY commands that fill the buffer overruns it by 68
+    bytes, and a CREATE after an ECHO (68-byte response, padded to 72)
+    overruns it by 4 bytes. With this patch both are refused ("next response
+    offset exceeds response buffer size") and KASAN stays quiet. A chained
+    CREATE that ends exactly at the end of the buffer is still accepted and
+    returns all its contexts. Standalone and compounded CREATEs, including
+    CREATE+AAPL, are unaffected.
+
+ fs/smb/server/smb2pdu.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index f5fe3cf8ba32..db3a0500f9f3 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -691,6 +691,9 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
+ 	hdr = ksmbd_req_buf_next(work);
+ 	next_cmd = le32_to_cpu(hdr->NextCommand);
+ 	if (next_cmd > 0) {
++		size_t next_rsp_sz = MAX_CIFS_SMALL_BUFFER_SIZE;
++		struct smb2_hdr *next_hdr;
++
+ 		if ((u64)work->next_smb2_rcv_hdr_off + next_cmd +
+ 			__SMB2_HEADER_STRUCTURE_SIZE >
+ 		    get_rfc1002_len(work->request_buf)) {
+@@ -699,8 +702,19 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
+ 			return false;
+ 		}
+ 
+-		if ((u64)get_rfc1002_len(work->response_buf) + MAX_CIFS_SMALL_BUFFER_SIZE >
+-		    work->response_sz) {
++		/*
++		 * The next response starts at the 8-byte aligned end of this one.
++		 * smb2_open() appends create contexts without checking the space
++		 * left, so reserve the largest CREATE response for a chained
++		 * CREATE, as smb2_allocate_rsp_buf() does for a single one.
++		 */
++		next_hdr = (struct smb2_hdr *)((char *)hdr + next_cmd);
++		if (le16_to_cpu(next_hdr->Command) == SMB2_CREATE_HE)
++			next_rsp_sz = max_t(size_t, next_rsp_sz,
++					    work->conn->vals->create_rsp_size);
++
++		if ((u64)ALIGN(get_rfc1002_len(work->response_buf), 8) +
++		    next_rsp_sz > work->response_sz) {
+ 			pr_err("next response offset exceeds response buffer size\n");
+ 			return false;
+ 		}
+
+base-commit: 146c3fc6540e24eef6296395a35bf5b924182e8b
+-- 
+2.47.3
+
