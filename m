@@ -1,99 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793101172;
-	b=NYLOH0CUUFVlw7dSAPEiWPApLJkOGS444tootSDNwYcNtbBnEmeYlgNaJFK0RUbX8LrD
-	 4CZDRR6SFGpHjTy8R/CHi5BI7Ck5Lb7WKD7isGwPRn8fp4VbYZ9RCp60DE49jx2lcPQjx
-	 IdNOqtT6B2nmPvB8E/hi5kkW5Go0VEQHvPQ62/ed6TcLn9xzRc7KdRklEk78wf75gdQFJ
-	 vgbiZrb2UFGhM9ry1AJBzyqSGsigUQ7WSkPZ3i03mkeBjPsY2nAMbCCJkHM+6r2woVsnu
-	 KbOO0joN4X1dHs30lflvmXYZpbtYKeBkedg+moSpgid3rzT5R9u1mTPgyCJK0JwYsvg==
+	t=1793110438;
+	b=dr45zXy9feAeRYpeZ1NdnvixwKI1NFOvikSEP/VHpDlbBCBfm+o5uJ3Iogg1S2B1zcGo
+	 Q0PMww7CEZwmEBQB4KKRQdt1abEAlidW+qp/Q/kd5Gsh4Zi7i1VthhdtpIXH/0Q1D1eX0
+	 y28LDuzX1Jg5dgXWEhjTbS00/K7APxIhomUimIc1PbHCCxWd5PlgwQgPdr+qPUXvJx7n5
+	 upOmWYqMbIHgLBANdkEhvyNFibmQA9/8Wg2PMtHFJbZqUlyEbOIUo0qb5BnAwXJIoi+3U
+	 igLvCpFEsonEmXd4Wzv3nnnJyBJ+ch5iks4oftAj8AaokCIFmewClek+jis8EGuKULw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793101172;
-	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
-	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Type:X-Originating-IP:X-ClientProxiedBy;
-	bh=4gnQWBth/c177Bb08YOlMXVK4RtND6n6IeYO3twMeyU=;
-	b=XOZDy4W0pK9L9C5znw4HKXNBnd+uBjEdq5Bt5/3RNkMjX+goV2MjdmQJSvwIXZy9lqcs
-	 iZ1ezqffof3Bk/GLmDC8VgA4t8UbgQ8Oy4V3/bOPB9T6zZLJtNKXXYaXzaGmFXEqaxMPH
-	 bKl+iXKLKmUZjIM9ASQtk+bDqcBCyuh+DWhPHVprtjZjbiddpxRKWpzTnVipPP3gaWgdT
-	 /C6kRoD+BTqjCzd3u8CkHVDOY2UlcNaMsBxIRTI09hm1FPiLjzaosYjXK17USNVwChr+v
-	 0COAud3cqUoej3crRONL/T3OwgzDSXRdg7xCkpdAapGWWjJW0ClSk2FnVbnrXXPFBdQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793110438;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:Date:MIME-Version:Content-Type;
+	bh=okUsW9Hc+c86czM7kU6xb8YrYGBzKDebW7nIsifDtLw=;
+	b=VFMbgnQqgQHrYYbsHyQ37giuwJS4q3Ms0qYemJJf/MJT9mCvtIO89OiYIyAaKu4uB3qB
+	 dG+Ov6EJAga3dBWwBJ66uNqRdJK6dI+1fF1/Or9eJTsvc3SBbL09Bw/WDZ2BnaeQGTGRu
+	 oOhTy/7smohPbx9+yLGeQ4vBFHwF57wDtFQD24eVZezZRxsCqHzAaPRlMPLYQ4spggvfX
+	 hD81JLK+o86J3HEPTXzGxTEQnxW5xoiEEf47c5XZ2ApaTAwU4BQeOXR3Qb75SgRJfdk3B
+	 hGdt9taL6mcLFjF/hBTBbCTGwcUXuNup72nMjVZ5neJMh4ol0vOz8rYvVjSyUT92rsw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=huawei.com;
-	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=G1SVNDWK;
-	arc=none smtp.remote-ip=113.46.200.227
-Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=aNs+gWNl;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C1860A6F6A;
-	Tue, 27 Oct 2026 11:39:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A3C1860A6F6A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16015606A32F
+	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 14:13:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 16015606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=G1SVNDWK
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=4gnQWBth/c177Bb08YOlMXVK4RtND6n6IeYO3twMeyU=;
-	b=G1SVNDWKcr2QNUjgbDuLk2jxeAvYkuwkX30tA9oqTeZ9bxwp8KDbS69GSj1q9vmV4sEvUVlQJ
-	exZ/ffSO072HZRgGFDNZn4Cz6xPeMgbwA5WACDIBNiJxd63MLTs9hqd7q7iB8W9AF+yFvmrW9c1
-	OfYeTX7VY/CksdLR+h2BeMI=
-Received: from mail.maildlp.com (unknown [172.19.163.200])
-	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4jDT6s6LwDznTZW;
-	Tue, 27 Oct 2026 19:39:33 +0800 (CST)
-Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9DBE64055B;
-	Tue, 27 Oct 2026 19:39:28 +0800 (CST)
-Received: from octopus.huawei.com (10.67.174.191) by
- whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Tue, 27 Oct 2026 19:39:23 +0800
-From: Cai Xinchen <caixinchen1@huawei.com>
-To: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
-	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
-	<skhan@linuxfoundation.org>, <utilityemal77@gmail.com>,
-	<caixinchen1@huawei.com>
-CC: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
-	<eddyz87@gmail.com>, <memxor@gmail.com>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yonghong.song@linux.dev>, <jolsa@kernel.org>,
-	<emil@etsalapatis.com>, <ihor.solodrai@linux.dev>, <rdunlap@infradead.org>,
-	<gregkh@linuxfoundation.org>, <rafael@kernel.org>, <dakr@kernel.org>,
-	<johan@kernel.org>, <dlemoal@kernel.org>, <hch@lst.de>, <axboe@kernel.dk>,
-	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
-	<dhowells@redhat.com>, <code@tyhicks.com>, <linkinjeon@kernel.org>,
-	<sj1557.seo@samsung.com>, <yuezhang.mo@sony.com>,
-	<hirofumi@mail.parknet.co.jp>, <cel@kernel.org>, <jlayton@kernel.org>,
-	<neil@brown.name>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
-	<tom@talpey.com>, <hyc.lee@gmail.com>, <miklos@szeredi.hu>,
-	<amir73il@gmail.com>, <senozhatsky@chromium.org>,
-	<chenxiaosong@chenxiaosong.com>, <dsterba@suse.com>, <mason@kernel.org>,
-	<kpsingh@kernel.org>, <matt@bobrowski.net>, <rostedt@goodmis.org>,
-	<mhiramat@kernel.org>, <mathieu.desnoyers@efficios.com>,
-	<john.johansen@canonical.com>, <georgia.garcia@canonical.com>,
-	<zohar@linux.ibm.com>, <roberto.sassu@huawei.com>,
-	<dmitry.kasatkin@gmail.com>, <eric.snowberg@oracle.com>,
-	<stephen.smalley.work@gmail.com>, <omosnacek@gmail.com>,
-	<casey@schaufler-ca.com>, <takedakn@nttdata.co.jp>,
-	<penguin-kernel@I-love.SAKURA.ne.jp>, <xiujianfeng@huawei.com>,
-	<nanx95726@gmail.com>, <djwong@kernel.org>, <lujialin4@huawei.com>,
-	<bpf@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-	<driver-core@lists.linux.dev>, <linux-block@vger.kernel.org>,
-	<linux-btrfs@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<netfs@lists.linux.dev>, <ecryptfs@vger.kernel.org>, <exfat@lists.linux.dev>,
-	<linux-nfs@vger.kernel.org>, <ntfs@lists.linux.dev>,
-	<linux-unionfs@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <apparmor@lists.ubuntu.com>,
-	<linux-integrity@vger.kernel.org>, <selinux@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH v3 -next 17/18] samples/landlock: Add metadata rights to sandboxer
-Date: Tue, 27 Oct 2026 20:11:50 +0800
-Message-ID: <20261027121151.1887650-18-caixinchen1@huawei.com>
-X-Mailer: git-send-email 2.18.0.huawei.25
-In-Reply-To: <20261027121151.1887650-1-caixinchen1@huawei.com>
-References: <20261027121151.1887650-1-caixinchen1@huawei.com>
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=aNs+gWNl
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=okUsW9Hc+c86czM7kU6xb8YrYGBzKDebW7nIsifDtLw=; b=aNs+gWNl8ZZeC8WngKAS2v4e7z
+	AAC2J3cESGFjA1LKqTjPHgk2oZxSAS8N9Y1fcDz7AJeLVKaei3emFpUBf/c9DdBrZVGdnI7J0TKZG
+	uh2C+OzSRJ3yl4awEsL9wOb6Q6t6+oIdVotjicEZAtHTk5BQjU9O0BQW6zVRTv0UfonaaMi6aopp+
+	ICah3xk6/jSqxQSBDP5oNTmIYiTJKnCap7+pL6872X28x5wJ5thq1mUCFlwTNb89+6bLVfq5e/UCH
+	wWfsDvGgYAunYh8D4tCECaqLmq0WIW8/WXU8fVdywJx/Ws5PV1/uKwpHtXw5AQjHUeg4J9XAC4RSq
+	AHpLjCOQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xLhw0-000000009NZ-3LAl;
+	Tue, 27 Oct 2026 11:13:53 -0300
+Message-ID: <405ae6b2f23f0514d3a7f9dbc778a9ea@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Ratnaker Gautam <ratnaker.gautam@kuleuven.be>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Subject: Re: [PATCH v2] smb: client: validate SMB1 EA list bounds before
+ parsing
+In-Reply-To: <DB5PR08MB100624D4B388FF7946505BFDEFD632@DB5PR08MB10062.eurprd08.prod.outlook.com>
+References: <DB5PR08MB100624D4B388FF7946505BFDEFD632@DB5PR08MB10062.eurprd08.prod.outlook.com>
+Date: Tue, 27 Oct 2026 11:13:53 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -104,77 +65,21 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- whupemk100010.china.huawei.com (7.152.184.41)
 
-Handle the new LANDLOCK_ACCESS_FS_READ_METADATA and
-LANDLOCK_ACCESS_FS_WRITE_METADATA access rights in the sandboxer:
-READ_METADATA is added to the read-only set, WRITE_METADATA to the
-read-write set, and both to ACCESS_FILE.
+Ratnaker Gautam <ratnaker.gautam@kuleuven.be> writes:
 
-Update the ABI version fallback switch to remove the metadata rights
-for ABI < 13, and bump LANDLOCK_ABI_LAST to 13.
+> CIFSSMBQAllEAs() checks the server-provided EA list length by adding it
+> to the response pointer. On 32-bit systems, a positive length can wrap
+> the pointer and pass the comparison. The parser then walks outside the
+> received response while reading the next FEA header.
+>
+> A response with a list length of 0x40000000 reproduces this as a native
+> i386 page fault and kernel panic from listxattr() against an SMB1
+> server.
+>
+> Check that the EA list starts within the SMB byte area before reading
+> its header. Keep its length unsigned and compare it with the bytes left
+> in the response without pointer addition.
+> ...
 
-Signed-off-by: Cai Xinchen <caixinchen1@huawei.com>
----
- samples/landlock/sandboxer.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-index 1362f08ff14b..29965ef90bed 100644
---- a/samples/landlock/sandboxer.c
-+++ b/samples/landlock/sandboxer.c
-@@ -137,6 +137,8 @@ static int parse_path(char *env_path, const char ***const path_list)
- 	LANDLOCK_ACCESS_FS_EXECUTE | \
- 	LANDLOCK_ACCESS_FS_WRITE_FILE | \
- 	LANDLOCK_ACCESS_FS_READ_FILE | \
-+	LANDLOCK_ACCESS_FS_READ_METADATA | \
-+	LANDLOCK_ACCESS_FS_WRITE_METADATA | \
- 	LANDLOCK_ACCESS_FS_TRUNCATE | \
- 	LANDLOCK_ACCESS_FS_IOCTL_DEV | \
- 	LANDLOCK_ACCESS_FS_RESOLVE_UNIX)
-@@ -487,7 +489,8 @@ static bool check_ruleset_scope(const char *const env_var,
- #define ACCESS_FS_ROUGHLY_READ ( \
- 	LANDLOCK_ACCESS_FS_EXECUTE | \
- 	LANDLOCK_ACCESS_FS_READ_FILE | \
--	LANDLOCK_ACCESS_FS_READ_DIR)
-+	LANDLOCK_ACCESS_FS_READ_DIR | \
-+	LANDLOCK_ACCESS_FS_READ_METADATA)
- 
- #define ACCESS_FS_ROUGHLY_WRITE ( \
- 	LANDLOCK_ACCESS_FS_WRITE_FILE | \
-@@ -503,7 +506,8 @@ static bool check_ruleset_scope(const char *const env_var,
- 	LANDLOCK_ACCESS_FS_REFER | \
- 	LANDLOCK_ACCESS_FS_TRUNCATE | \
- 	LANDLOCK_ACCESS_FS_IOCTL_DEV | \
--	LANDLOCK_ACCESS_FS_RESOLVE_UNIX)
-+	LANDLOCK_ACCESS_FS_RESOLVE_UNIX | \
-+	LANDLOCK_ACCESS_FS_WRITE_METADATA)
- 
- /* clang-format on */
- 
-@@ -570,7 +574,7 @@ static int add_quiet_access(const char *const env_var,
- 	return 0;
- }
- 
--#define LANDLOCK_ABI_LAST 12
-+#define LANDLOCK_ABI_LAST 13
- 
- #define XSTR(s) #s
- #define STR(s) XSTR(s)
-@@ -780,6 +784,12 @@ int main(const int argc, char *const argv[], char *const *const envp)
- 		ruleset_attr.handled_permissions &=
- 			~(LANDLOCK_PERMISSION_NAMESPACE_USE |
- 			  LANDLOCK_PERMISSION_CAPABILITY_USE);
-+		__attribute__((fallthrough));
-+	case 12:
-+		/* Removes metadata rights for ABI < 13 */
-+		ruleset_attr.handled_access_fs &=
-+			~(LANDLOCK_ACCESS_FS_READ_METADATA |
-+			  LANDLOCK_ACCESS_FS_WRITE_METADATA);
- 		/* Must be printed for any ABI < LANDLOCK_ABI_LAST. */
- 		fprintf(stderr,
- 			"Hint: You should update the running kernel "
--- 
-2.18.0.huawei.25
-
+Applied.
