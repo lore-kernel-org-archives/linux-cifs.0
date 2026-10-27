@@ -1,96 +1,123 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.231.138
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.151
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793113490;
-	b=MncTFv8JHf3in8EznyJf0rngLWYBbowksQBVKzmBEkWiQS8K6k9BOPQJhA2PbpYhyWYg
-	 43pi8oDvcwQQn1N3STYCKXVjwsDW7HjgIqKPsE9C1Hl3Tj58aoiTxwTec8vkDiAo0N2ck
-	 82nUIdVUxwqLDfOJ/TnJyjrkcyO87ARQKksvIZHykB8MNwlHISUy39d4dIPCvY6A2TYru
-	 COD1tf+TXF8oVI5YFToyCq02z7CctOLnje8i2Cs2fD4Zrovc3fx2RbFcpqBS7UobJtDxw
-	 Yys4l/CyDIYrvra/cploPMf8v+EScsvkAA+BosSoVVQofbW7MssSmBFzvO/zLqs/0bQ==
+	t=1793114509;
+	b=udlp/QTLTVerNyb9MD8CT7Om2FoSbe+2/2cTP6OKPmzjaPelgJao4NzX3KXRlKyiELzo
+	 5UIslumqvCsPAWFW5wyc7iN+OtveCczxADCt62E2xgVB93g3/c0avXdWjcigPVoT+SjSD
+	 LnQNGNkvnVrczqb7MGYb+xm/5huy1YSLw11PH1rOfMRieiYj3YGMCbmU4jEFuP290YfZx
+	 qo0TEtQWSXfkY8z2aYHYp/kjyeoQRqMCE5LoXrf0Jr7JqNMDgMcLKWoeBNq/FJTT9PIjM
+	 18oCQgfiuKBbO1iEt/6SNo6yjDpEdzYFwLdWZ3oaINw0dBBGchuMZs7WGowRxpNg9yg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793113490;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=idHmBdkYB+pGsb4ciFoRZd8OmfSYmN5C47UdDtDs8Ag=;
-	b=0WFLKQ1G9sZzMT8/Vhjdv6KxgnD58YNoksznEkRzzAk2PYjR362wHrzsICrr4mLw0E0w
-	 cSJK0JoYafx/rLfXwy+Fcj9LQwDdr11mCSIr0UoMXLcXvAQhFRdUTV1tqSaH56utb24i3
-	 pLkDVfvKCx1ec5FwNw9jzMMJ+arXGXgRSqMxR/vw+UTpOcd4AKXVekIhMnqwj0B9AX5ND
-	 URc8NaXmUk64iS6hR8Fn3wjcuWTni7fnNRAdv68fyivuXbWF2ZpWcn61DRCQYGVvmRTG1
-	 d/hMHDJp0rXmGYwlWGc1jvaGdi6PlxxzhV66ECB/sD8O887JyMwbGEOlD0zdzyFuM1g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793114509;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=lg7ricNjsihrhZdu+HxttW8s2muYiAp/wLN4SAfTLNg=;
+	b=sY6MSLbqLXHL6q8QErb9+KYLvESVF5SyJ7YPDw+99sEOASsFd2FFSE2iEHw5QyQxpEkl
+	 Dy85iXzK87urujHqkQ/B45QCm3kIDRtBouk+rwlA7FAO0mdLTSDATb0bEzb4f33liy5U9
+	 aVMWjeKuj+9r7Db75jYAxcLE6bCOzZWp24SnqOrxRiHlPBjdISE8xcS8SimhpWqcYRw88
+	 iJh6OUX7XBGSqSIArZdHi4/trrOWriQNsP8RNXsgcTmLBIzQGeFNyZ226NzcvNVrjfZjI
+	 0YKnHHsqSbCaTiCelzUZzgeXrSjTcX7A14B60oZKmfZ09UPzieEbsfgX7Xw8yjayFyg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wPJeWiS1;
-	arc=none smtp.remote-ip=74.125.231.138
-Received: from mail-oo2-f10.google.com (mail-oo2-f10.google.com [74.125.231.138])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b="lJ/+Gir7";
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=C52S9hHA;
+	arc=none smtp.remote-ip=103.168.172.151
+Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D284E606A324
-	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 15:04:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D284E606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1B7606A320
+	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 15:21:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AD1B7606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wPJeWiS1
-Received: by mail-oo2-f10.google.com with SMTP id 006d021491bc7-6dd3bb640bcso5318eaf.0
-        for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 08:04:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793113489; x=1793718289; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=idHmBdkYB+pGsb4ciFoRZd8OmfSYmN5C47UdDtDs8Ag=;
-        b=wPJeWiS1MqHh+MC1Qy4nsxftqxqYus959w86RlVdZQnsO5f5oh1Py4MCQS/18WhtEd
-         0MyW9N/02eePu25tCo/xRE/CKd78CcLihtAzPuMGwG5GTLd2t5bpA3h11IW/lPy3mIok
-         AqBcOAXdYKTnTQkFd6jmRfHcFBFnAYfyz1gl6d0E7WYXm5n/xunyXalOQ6FYQS98UWnO
-         aT0ZHLIpjdUJyZiH1YGBU6YQqFiS+j1LkfpeG9eec/AXG4PX0J0CTwIFJOdgCHcRozvm
-         eoHb0vjgdD4ez2rpVTE4jYD1L0OJhJeHM8XY5ixHC5hFR/zlYMlD8GO7fImsjk/R69ez
-         bONA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793113489; x=1793718289;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=idHmBdkYB+pGsb4ciFoRZd8OmfSYmN5C47UdDtDs8Ag=;
-        b=oOtTdLBH2pbUdBKo4EZisoYsl44AwvPAizXYUop9ENFSlxkJRY1bZBcxB8rwpeA8y+
-         fM+krOtvfKdhdB05DU9U2umhnFZiVVkfLBeaHZM7K6mQ12bgtL0iqsKSGq1pNbs8jH1V
-         0WfvngGSP0BzMjJuzUgLHVvUyb+r/yvYkgN56yyVu7GoRwi9EX7xPKm/Eq+IupslRWtK
-         adg36NHaz+enxicUdwbGgOkhbAqzAjsXRANoLWrlUOdGn+xoQzjT+GqOKdcV7ttCLAHp
-         mSbX2oLMpJZpQx0nnKA1eANlktS2qqlIFkSukM6fij3sqZGYWDIg6hQVxJBj7w/DH+Ew
-         Mlcw==
-X-Gm-Message-State: AFq9FYL5XhKoXllHJWnwtT3T6densY3AEK/H4viRPquHNwRt6v4oAjUS
-	sexKCaUSqd7+S9pAGOlfAhQ9JGYu3CUJPQbEzbky6YfeNxFeG2aMH8ei
-X-Gm-Gg: AYBFou0vZ+U3JrtG3oHHJdeibIVwhkmgkpplJ6ezWBigKpxcr5lll4Ew9thq9KnZwXy
-	Ufjfvi61pktezhRFBB92PhNKZ3i4fmXmZRb8Dv2O/fnCQ+WgHBW8mYJWWO0qppUs0B7b779ENiw
-	oeSeWFZgwCHHHQCXBBHbddHO5aQh79TDmLPyVFlNiZ7BJBcJ6UycqrZfTSpeQkoRrTWon3bmiAS
-	Rll/3m71L6eYktNmMOagGlWqzdSZIykvqN7gBIg3RQfAdb8qYkNMsq+skMBu5aQEoWpyXMx45e3
-	FJTDIZCoanN6bPlMQ3yLIVOgkGHSeO9Pz3VnXdql9hG4gunjrccm3bmo4n+66G1A+P6d3WjhnE5
-	2Z/HTvV40uIDPSpRD9KUK+IKlgQq35jwwy0Aoaf0svHQZFlD3ZxGJIGSPSitHiiPYxxZdRqdzal
-	Ndd/DVZ3MMW+hS/aUpTSTM/dFuUDl6XZ9PfDoGMhvE40R+pcviBxvjRNfkb2oIDqNEbKrbvcxyv
-	ObGIv2hrk4N7EW+C4ZhrH7Tq61r4adV5r1dxuRiGCPHkRIU0BznQXQNPoC9guZ+QOiNtUgnLu4v
-	tVIh8jLtrKplwJqztA==
-X-Received: by 2002:a05:6820:1625:b0:6b4:117e:545 with SMTP id 006d021491bc7-71269638a81mr1504369eaf.13.1793113488681;
-        Tue, 27 Oct 2026 08:04:48 -0700 (PDT)
-Received: from localhost.localdomain ([14.22.11.180])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-71278c864b0sm2824416eaf.9.2026.10.27.08.04.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Oct 2026 08:04:47 -0700 (PDT)
-From: Henry Martin <bsdhenrymartin@gmail.com>
-To: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b=lJ/+Gir7;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=C52S9hHA
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.phl.internal (Postfix) with ESMTP id E6158EC00CF
+	for <linux-cifs@vger.kernel.org>; Tue, 27 Oct 2026 11:21:47 -0400 (EDT)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Tue, 27 Oct 2026 11:21:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1793114507; x=1793200907; bh=lg7ricNjsihrhZdu+Hxtt
+	W8s2muYiAp/wLN4SAfTLNg=; b=lJ/+Gir7oE8spvleM7UyqsOssQS3/ZhHpEg8n
+	lJcUV7sd5Eb/jGVAVln3MysdQVskl/KaTrqKsiTM1jRX+h+mkplHxsE2WrfvUWE/
+	8UuMNmE5rYIU4o8GQ7dxrC9EabUtH0kNivj5XorEEspQeUvOhFCslscu5Z/e1e3D
+	NulyW9b4VqT8pE0clVDLUOejLYHZO07gvQE5lDLN5wbFSzhwcFuWk6OicbhUkPUp
+	2H2om7fApJ0bZGMNHby1WDugnYNVoj9woPhZo2cbDPYHR/0grZMPdz54Hq5nE25b
+	SG9K5vSatV7mPlK6kYuFgsrw9510YgV17BUbzyskc6UlrM5QA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1793114507; x=1793200907; bh=lg7ricNjsihrhZdu+HxttW8s2muYiAp/wLN
+	4SAfTLNg=; b=C52S9hHArXVKC3ikcey4YPI6fhFNTUghaN2JlpnCYRPVN+vhJhX
+	7GJ7tgjMiZwjTg8lnJqmjpUVZaqBmjucRm0aWjdH4hXIxzUd0KgoomDmswIUOWXH
+	urHKEli8c6jq2KvB5jI8naMFvPJGELOlgeAluix8yNxvxD2BNkqKmhGC+khRLIM0
+	SvY8B25USlu/Ba/FVcYj+yvN8SyzMzi5eXgRUTc9C24mtbKXq7k6412wnjHYF/yL
+	nl71BtXTT0Iddwa4V5xyBe4EfjRjQVtkZMpw+/HivdvDFpkqbWCSzXRl52FNUJEr
+	NKiHW/nQcb13SWSts9HbpJJ4rBFm/Jlj1+g==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1793114507; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm2:rsa-sha256:SI1D+Ukfp7whgY0ts4Yi7oWL8vidxzGB4BmAvOHVEe5jN9W
+	u6ORQjYtGlSDV4pGaNDmHnmhv2Ty/n9L3UnetivxJ4o1JTj/bjyBQt9lKKr877Y0
+	nMoI4YQDTBCA1w5LjzMwvPUX1e1tLVXAuAVkFOdgfn0JARdqEM1Xjf258S/GZniv
+	f/3htK+tAfedsfOvMyjlLV9EzIBYnSykw63cR+vYhvviiRn2MyobZVGi27QdIMuT
+	Y3Nae1LDQsYIo2VBf9HV2eeNnqvotkbuBiZD1elyejS5LkSaY+xP2uPNsgFzhpow
+	03x9sgDyouzt9jqSjYNK7LS/oODG/3c3awbY1ng==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-07;
+	repo=github.com/dkim2wg/interop; date=2026-10-18; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:Agl46WJE4hi5pPDRHQ0YdL2pYKz8tOWD0csprg9fNQc=:cq4xNvG/sxAkb1hgRNOLhxsnj/T+nWg/hbu6JRtCDOk=;
+X-ME-Sender: <xms:i8HgaoaMFIWwCTpvCuH1-HsOcjQsSkQVLWDlirsMtlPk4PlPFzuQjw>
+    <xme:i8Hgaj3vKfE8-S2sRWUs49VQuDVXITfIGJfoa4jb7FZNYkyWFtU3MGAVpgBhaHeZ2
+    nR-6JF5-RyHBPDlx_Kp_55PTYYcKlybw9rpOt6BoAp4Lmr1UVTtUlA>
+X-ME-Received: <xmr:i8HgajqnDpfD71jYb80b4fQwoiPR-fNlcl_nN7pjOACYqwcj3i1kW7a1SM6tX03U>
+X-ME-Proxy-Cause: dmFkZTEY0hqEvExQfHV6cxC6UqEohEli4kd2Rib2z7xPHr2/LMCPhaUHUtfYW+lU0I5Aww
+    oGYAZHMf5OP3Kdg+v+8iRaFN5Prw7oD+g8XPM1iLULMnB6pnfbUcJydyuHzmEhR4gnWpBQ
+    TptWhK1Nz7NXUxt7QXtM+aCADuc3Z8EoopnWPtOjFpDE0vgV1ZXUX3AHGqiCLtt3lMkjd6
+    fWhK0iO+w/nonSyaIZNKsN6AJ/AVv0C6NztSQhfns45jsZ4yglShdnYkapCqzGfXbintj0
+    Zi6N1XgD3kMQj8FnpNh4kXhho88xNbl6ku4fcVBJXrl2BqFNrUTfPA2GveE5pel0YtPQlr
+    U5ONpcz6J8qenKgNdsP9q1RMhX5H5Awy6MKn8eIo2M52Lq+Ez8JK2EYfiBZbu/stqJG/9v
+    49uSTU8ieycaJUKPNyndIo5wgwPYRZHSEGz45CIEbOcEsur6gLc3ucHVZm2EGObJKBBk8O
+    jpUFlQsf0+nPWpuiBXp1pIjlXBB6BtN8JbNsfQdJz8gKQOkA61y49jRfAvI8qqjHKM2FB6
+    hvIwHLu7LX1odEpshUB+z2Du73kXiWcrJkAlitqO5aJf4AYdvzg8J666A+5zOt1oALeVaS
+    L92DEPAlPq4BLHwGmvQnZzJqn4d6d9hszq8i4GF9Vns9RuQRlL1C9Pl1iV/Q
+X-ME-Proxy: <xmx:i8HgaqM2v2ig7TLJ9iUqKF35p62DGk6Tzhu23ubnGJVcFRnzOYPfxw>
+    <xmx:i8HgakruapBVITfEaseHTbCzmdHQUFY-74xYJ9P4lhwHhDpBnhUT5w>
+    <xmx:i8HgatvySpjBkvyFbu4zh7_MQNgl7mNU-8KoaYKHL6qcl2INNc7Uzg>
+    <xmx:i8Hgaj0BHFawMkW8rOqH49qhx4zLzaHjdtxi_Fqx8KKQ7_CSap_M9A>
+    <xmx:i8HgahzKxmRPbor3Jlhd-TiIvyxm3I4HG7hAaHA5akX8HqiPhD2pLYAw>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 27 Oct 2026 11:21:46 -0400 (EDT)
+From: Ian Bridges <icb@fastmail.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Cc: linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Steve French <stfrench@microsoft.com>,
+	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Henry Martin <bsdhenrymartin@gmail.com>,
+	Ian Bridges <icb@fastmail.org>,
 	stable@vger.kernel.org
-Subject: [PATCH] cifs: fix UAF read of server->hostname in cifs_get_spnego_key()
-Date: Tue, 27 Oct 2026 23:04:38 +0800
-Message-ID: <20261027150438.943354-1-bsdhenrymartin@gmail.com>
-X-Mailer: git-send-email 2.43.7
+Subject: [PATCH] ksmbd: fix session reference leak on compounded SESSION_SETUP
+Date: Tue, 27 Oct 2026 10:21:35 -0500
+Message-ID: <20261027152135.138259-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -102,58 +129,107 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cifs_get_spnego_key() reads server->hostname without holding
-server->srv_lock (fs/smb/client/cifs_spnego.c):
+A compound request can place SESSION_SETUP after another command. That
+earlier command leaves a reference to its session in work->sess.
+smb2_sess_setup() then overwrites work->sess with the session it looks up
+or creates, and the dispatcher later puts work->sess only once. The
+inherited reference is never dropped. That leaks the session, together
+with its setup connection and socket, and every repeat of the compound
+leaks another.
 
-    const char *hostname = server->hostname;
-    ...
-    desc_len = ... + strlen(hostname) + ...
-    ...
-    dp += sprintf(dp, "ver=0x%x;host=%s;", ..., hostname);
+  unreferenced object (size 512):
+    __kmalloc_cache_noprof+0x32c/0x3a0
+    ksmbd_smb2_session_create+0xf6/0x9c0 [ksmbd]
+    smb2_sess_setup+0xda4/0x6280 [ksmbd]
+    handle_ksmbd_work+0x88c/0x1cb0 [ksmbd]
 
-while the DFS failover path frees and replaces the hostname under
-srv_lock (__reconnect_target_locked(), fs/smb/client/connect.c):
+Save the inherited session on entry. After the request has been
+processed, release it once, but only when smb2_sess_setup() has replaced
+work->sess with its own session or cleared it. Do this after
+ksmbd_conn_unlock() so the put does not run under srv_mutex. An error path
+may instead leave the inherited session in work->sess. Keep it there, so
+the dispatcher still puts it and the error response is still signed or
+encrypted with it as before.
 
-    spin_lock(&server->srv_lock);
-    kfree(server->hostname);
-    server->hostname = hostname;
-    spin_unlock(&server->srv_lock);
-
-The read side runs on the kerberos auth path without the lock, so the
-strlen() and the sprintf() can race with the free.
-
-Take a stable copy of the hostname under srv_lock at function entry,
-before any use.
-
-This issue was discovered by Tencent CodeBuddy Security.
-
-Fixes: 93d5cb517db3 ("cifs: Add support for failover in cifs_reconnect()")
+Fixes: 7aa8804c0b67 ("ksmbd: fix user-after-free from session log off")
 Cc: stable@vger.kernel.org
-Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
+Signed-off-by: Ian Bridges <icb@fastmail.org>
 ---
- fs/smb/client/cifs_spnego.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/fs/smb/client/cifs_spnego.c b/fs/smb/client/cifs_spnego.c
-index 44c4072756804..488ddf6df138d 100644
---- a/fs/smb/client/cifs_spnego.c
-+++ b/fs/smb/client/cifs_spnego.c
-@@ -105,7 +105,15 @@ cifs_get_spnego_key(struct cifs_ses *sesInfo,
- 	char *description, *dp;
- 	size_t desc_len;
- 	struct key *spnego_key;
--	const char *hostname = server->hostname;
-+	char hostname[CIFS_NI_MAXHOST + 1];
-+
-+	/* hostname is replaced under srv_lock by the DFS failover path
-+	 * (kfree + new assignment); take a stable copy while holding the
-+	 * lock so strlen()/sprintf() below cannot race with the free.
-+	 */
-+	spin_lock(&server->srv_lock);
-+	strscpy(hostname, server->hostname, sizeof(hostname));
-+	spin_unlock(&server->srv_lock);
+Notes:
+    The bug needs a compound in which SESSION_SETUP follows another
+    command, for example TREE_CONNECT then SESSION_SETUP. When the later
+    SESSION_SETUP replaces or clears work->sess, the inherited session
+    reference is leaked. The earlier command only needs an established
+    session, not a privileged one, so on a share that maps unknown users
+    to guest this is reachable without credentials. A guest SESSION_SETUP
+    reaches a usable session, and the compounded SESSION_SETUP that leaks
+    need not itself authenticate.
+    
+    A reproducer is available on request.
+    
+    This fix was developed with LLM assistance (code review and kmemleak
+    reproduction).
+    
+    Tested on ksmbd-for-next 714f27729121 under KASAN and kmemleak. A
+    compound [TREE_CONNECT] + [SESSION_SETUP] repeated on fresh connections
+    leaks ksmbd_session objects (traced to ksmbd_smb2_session_create()
+    through smb2_sess_setup()) without the patch and none with it. KASAN
+    stays quiet. The four reference-balance scenarios (new-session
+    replace, failed lookup, same-session reacquire, and a forced
+    ksmbd_session_register() failure) each leave no leaked session with
+    the patch applied. The register failure was forced with a temporary
+    hook that is not part of this patch.
+
+ fs/smb/server/smb2pdu.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b306bc6e21ee..a21ee045848c 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2563,6 +2563,8 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 	struct smb2_sess_setup_req *req;
+ 	struct smb2_sess_setup_rsp *rsp;
+ 	struct ksmbd_session *sess = NULL;
++	struct ksmbd_session *prev_sess = work->sess;
++	bool installed = false;
+ 	struct negotiate_message *negblob;
+ 	unsigned int negblob_len, negblob_off;
+ 	u64 previous_session_id = 0;
+@@ -2679,6 +2681,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 			int sign_ret;
  
- 	/* length of fields (with semicolons): ver=0xyz ip4=ipaddress
- 	   host=hostname sec=mechanism uid=0xFF user=username */
+ 			work->sess = sess;
++			installed = true;
+ 			if (sess->dialect >= SMB30_PROT_ID)
+ 				sign_ret = smb3_check_sign_req(work);
+ 			else
+@@ -2731,6 +2734,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 		conn->binding = false;
+ 	}
+ 	work->sess = sess;
++	installed = true;
+ 
+ 	negblob_off = le16_to_cpu(req->SecurityBufferOffset);
+ 	negblob_len = le16_to_cpu(req->SecurityBufferLength);
+@@ -2928,6 +2932,14 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 	}
+ 
+ 	ksmbd_conn_unlock(conn);
++
++	/*
++	 * Later in a compound, work->sess holds the reference that an
++	 * earlier command took. Drop it once this request has installed
++	 * its own session there or cleared it.
++	 */
++	if (prev_sess && (installed || !work->sess))
++		ksmbd_user_session_put(prev_sess);
+ 	return rc;
+ }
+ 
+
+base-commit: 714f27729121d59f103ca4dad7b0c2d1c125cd71
 -- 
-2.43.7
+2.47.3
+
