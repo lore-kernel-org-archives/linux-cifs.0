@@ -1,55 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=113.46.200.223
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793101146;
-	b=FNpmNQBrZJ7cCv14qeYYoqe7ptgTle2soB9adMhvWJed606easmWnIU64TQE857iKF2i
-	 Jnxg9oNwa7m/QO89U0EnlD1QRbFczNSIkKI6oUuX3PX056r2STdnfKgOXJlLUtfJeNijz
-	 XrXEQ12FH/b+c2NpDqfm84vV0jkdHipchGw/reCsdOu/4NDGYUCK1PjcK+I1SOV9rSZI+
-	 0/5uVRR2SoMlFL/E6TvBFVH/KmfnMr9DfgWP4YTmSIbiX+j75S2MfMT0N6JmYMNPnO3NM
-	 Nc4Mquo4y6d8xK1BhSwjGg1kPcminEwu+TLRJ/6ecwGO1Dt4zcSjwUJfuOzStHvL6WA==
+	t=1793101162;
+	b=UNJH/b8GF1Ib+8kl5EoMWmHsixfFoz+x77/n6mvWEH/gUIQW3XkGBzli6fd/iFtgVX79
+	 aoYhb8MLIst0StjrYEx3Y+bmh99AHYCwoVOI6foszYQ06WHDQRMWSMS9Zpw770TaHXZiN
+	 DDdD1mkz3JUvwGphNUL2idtavkbU3bUt7mlqkl6xKtRuHUTnkKRkg8MutmEN28DSrQ1FG
+	 WaWmALWOFh/9slkUUO26wj3l+Wv/EwQIM0biAEqkfQK/PMmo9hUWObOFDcoI3vL1R0soI
+	 DNC20nvM7pOICCAfiirukk7TmIWPyqt2l9gESZnKYpcD9UaGSpvKAtu8lwuswEkmdSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793101146;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793101162;
 	h=DMARC-Filter:dkim-signature:Received:Received:Received:From:To:CC:
 	 Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Type:X-Originating-IP:X-ClientProxiedBy;
-	bh=ic92MzCf6KpquytFcG/PqE+rOS0TT+6sRbhPjPBtwW4=;
-	b=U+EcxCoQNQ26pIZZGn3JAXWPk4QAC606XX2ncl1oC9yfmMqRpE2IsFSRgiIBEeD/yVbk
-	 4UoQHk9tf/mvcz0RNEZCBKY/T8tGsvSikGm2fkivYayQ4bC+Ag1OecXYjmjWt6uw6u4AB
-	 DSCc2E0HWFeVMmX1Ze3oGkSxZACjudTdqR7zztpM8DJ9mGfrIJorkqXkMxdxc/EdTogzc
-	 H0MAZR/yVvfoW67Uc952kRreB4NgeNSBuwEJHjqp5FZDPxA0fCoI5zQPTvgCxf0lIVndQ
-	 GowUZEHpJ/TDvPGL7TolM7+LN9H+RGjXaOZ2/TzDj2EfGWUXRu0vGIa1qNUULrHRw1g==
+	bh=i8v2NhoJ9ynMPpbzLlLQrAS4ueIrDfKhJGXA39YJhw8=;
+	b=kY0/SnXqdPjaxVlJfEsKQZyLjXVBu5msjAj5+5n7w64hP404Ci2w58596oqCtL1CslhQ
+	 ZyJYISjPvl310Ey/bMMBQWLeLPeoGkD/MXAGTjTblo9SpbY/02Vw/DECESG/wWplYPdjp
+	 o0k0PYQT+QwozS7TRhPn/ldQjD7nI90IrFhJfkKKebQKllYlY++Yd3YnOa2AHRa5xpjRV
+	 Th66BEQvn3Yc2tugVAvhqd3QcNIP2URySFjY7h1tRNbCETHh424Jz4y2d8yrySDwjD80k
+	 ioXUHpBzk22m5yH0YPED2HuQpbUPOlx9xYuYAan/w6Rg19oWAjdbJ+P4zy0n/uh40Tw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=huawei.com;
 	spf=pass smtp.mailfrom=huawei.com;
-	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=uFhmVte5;
-	arc=none smtp.remote-ip=113.46.200.221
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+	dkim=pass header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=fw6xy346;
+	arc=none smtp.remote-ip=113.46.200.223
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFDC606A321;
-	Tue, 27 Oct 2026 11:39:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5DFDC606A321
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43767606A7D2;
+	Tue, 27 Oct 2026 11:39:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 43767606A7D2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=uFhmVte5
+	dkim=pass (1024-bit key, unprotected) header.d=huawei.com header.i=@huawei.com header.a=rsa-sha256 header.s=dkim header.b=fw6xy346
 dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
 	c=relaxed/relaxed; q=dns/txt;
 	h=From;
-	bh=ic92MzCf6KpquytFcG/PqE+rOS0TT+6sRbhPjPBtwW4=;
-	b=uFhmVte5DiIDuz5G9TzMws4H8nIYxUXDaHnqqTirh/REx+XVZI3sQBjoqRfbhvA00Nmj7aaPt
-	swfsWu/1kp5DDdR0sbCC0tFw0ljaMUCkUFAttkXuMZKQggl3UmOSB4Z60PnbLs/dzQX1yXTGmTm
-	NzRIDjVk+vrdZfV3GYQRzO8=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4jDT615BQRzRhtQ;
-	Tue, 27 Oct 2026 19:38:49 +0800 (CST)
+	bh=i8v2NhoJ9ynMPpbzLlLQrAS4ueIrDfKhJGXA39YJhw8=;
+	b=fw6xy346xV+DYzzfACpCaXdKx2P86yDZNytRj67Jclvnru9+9sgM5X9W4Y8eQfmrPDXzgfmct
+	/hpEgLDYbVfsG4NSY/NW/Wxa1s8+uA683g4PkJoMsJApxjLKbyN2SdcqF6PvGWYL7GCzxzjMCHx
+	2l1ewEQ1gkQQCd1I40bX97w=
+Received: from mail.maildlp.com (unknown [172.19.163.127])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4jDT6S48FxzmV7W;
+	Tue, 27 Oct 2026 19:39:12 +0800 (CST)
 Received: from whupemk100010.china.huawei.com (unknown [7.152.184.41])
-	by mail.maildlp.com (Postfix) with ESMTPS id A10344056D;
-	Tue, 27 Oct 2026 19:38:57 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 50E9140561;
+	Tue, 27 Oct 2026 19:39:18 +0800 (CST)
 Received: from octopus.huawei.com (10.67.174.191) by
  whupemk100010.china.huawei.com (7.152.184.41) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.45; Tue, 27 Oct 2026 19:38:52 +0800
+ 15.2.2562.45; Tue, 27 Oct 2026 19:39:12 +0800
 From: Cai Xinchen <caixinchen1@huawei.com>
 To: <mic@digikod.net>, <gnoack@google.com>, <paul@paul-moore.com>,
 	<jmorris@namei.org>, <serge@hallyn.com>, <corbet@lwn.net>,
@@ -88,9 +88,9 @@ CC: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
 	<linux-trace-kernel@vger.kernel.org>, <apparmor@lists.ubuntu.com>,
 	<linux-integrity@vger.kernel.org>, <selinux@vger.kernel.org>,
 	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH v3 -next 11/18] LSM: rename the inode xattr hooks to path_xattr hooks
-Date: Tue, 27 Oct 2026 20:11:44 +0800
-Message-ID: <20261027121151.1887650-12-caixinchen1@huawei.com>
+Subject: [PATCH v3 -next 15/18] landlock: Add READ_METADATA and WRITE_METADATA access rights
+Date: Tue, 27 Oct 2026 20:11:48 +0800
+Message-ID: <20261027121151.1887650-16-caixinchen1@huawei.com>
 X-Mailer: git-send-email 2.18.0.huawei.25
 In-Reply-To: <20261027121151.1887650-1-caixinchen1@huawei.com>
 References: <20261027121151.1887650-1-caixinchen1@huawei.com>
@@ -107,743 +107,519 @@ Content-Type: text/plain
 X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  whupemk100010.china.huawei.com (7.152.184.41)
 
-The inode_setxattr, inode_getxattr, inode_listxattr and
-inode_removexattr hooks receive a struct path, so rename them to
-path_setxattr, path_getxattr, path_listxattr and path_removexattr to
-follow the path_* naming convention used for the other hooks that
-take a struct path (path_chmod, path_chown, ...).  Rename the
-security_inode_*xattr() inline wrappers to security_path_*xattr()
-and the SELinux, Smack, EVM and IMA implementations
-accordingly.  The inode_post_setxattr and inode_post_removexattr
-notification hooks still take a dentry and keep their names.
+Add two new filesystem access rights to control file metadata access:
 
-BPF programs attach to LSM hooks by name ("lsm/inode_getxattr",
-"lsm.s/inode_setxattr", ...), so update the BPF selftests to the new
-names.
+- LANDLOCK_ACCESS_FS_READ_METADATA: Read file or directory metadata
+  (e.g. inode attributes, extended attributes and POSIX ACLs) through
+  stat(2), fstat(2), lstat(2), newfstatat(2), getxattr(2) and
+  friends, listxattr(2) and friends, and the POSIX ACL read
+  operations.
+- LANDLOCK_ACCESS_FS_WRITE_METADATA: Change file or directory
+  metadata through chmod(2) and friends, chown(2) and friends,
+  utimensat(2) and friends, setxattr(2) and friends, removexattr(2)
+  and friends, and the POSIX ACL set and remove operations.
+
+This follows the coarse-grained grouping approach discussed in the
+mailing list [1], where file metadata operations are grouped by
+security relevance rather than by individual syscall.
+
+Implement the two rights by hooking the path_getattr,
+path_file_getattr, path_setattr, path_file_setattr, path_setxattr,
+path_getxattr, path_listxattr, path_removexattr, path_set_acl,
+path_get_acl and path_remove_acl LSM hooks, which now receive a
+struct path thanks to the preceding VFS and LSM refactoring.  All of
+them receive the struct file through which the operation is
+requested, when there is one.  The following system
+calls are now controlled:
+
+- stat(2), fstat(2), lstat(2), newfstatat(2), getxattr(2) and
+  friends, listxattr(2) and friends, POSIX ACL reads, and the
+  chattr(1)/xfs_io style reads: ioctl(FS_IOC_GETFLAGS),
+  ioctl(FS_IOC_FSGETXATTR) and file_getattr(2) via path_getattr,
+  path_getxattr, path_listxattr, path_get_acl and path_file_getattr
+  (READ_METADATA)
+- chmod(2), fchmod(2), fchmodat(2), fchmodat2(2), chown(2), fchown(2),
+  lchown(2), fchownat(2), chgrp(2), utimensat(2) and friends,
+  utime(2), setxattr(2) and friends, removexattr(2) and friends,
+  POSIX ACL set and remove, and the chattr(1)/xfs_io style writes:
+  ioctl(FS_IOC_SETFLAGS), ioctl(FS_IOC_FSSETXATTR) and
+  file_setattr(2) via path_setattr, path_file_setattr, path_setxattr,
+  path_removexattr, path_set_acl and path_remove_acl
+  (WRITE_METADATA)
+
+For operations on already opened files (e.g. fchmod(2), fchown(2),
+utimensat(2) with an empty path, fgetxattr(2), fstat(2), or the
+FS_IOC_* ioctls), it is the access rights at the time of open(2)
+which decide whether the operation is permitted, not the rights of
+the current thread, as for LANDLOCK_ACCESS_FS_TRUNCATE.  To that
+end, READ_METADATA and WRITE_METADATA are included in
+_LANDLOCK_ACCESS_FS_OPTIONAL, deny_masks_t is widened from u8 to u16
+to keep tracking one nibble per optional access right for the audit
+logs, and both rights are recorded in the allowed_access of opened
+files in hook_file_open().  The metadata hooks consume this record
+when they are called with a file, and fall back to the current
+domain's rights for path-based operations.  The hook_file_truncate()
+check is factored out into the shared check_access_file() helper for
+that purpose.
+
+As for truncate, file descriptors therefore carry the rights of the
+process which opened them: a file descriptor opened before sandboxing
+keeps working, whereas a file descriptor opened with a restricted set
+of rights keeps denying metadata accesses even when passed to another
+process.  This also closes the metadata leak through file descriptors
+opened without READ_METADATA, e.g. via fstat(2) or the
+FS_IOC_GETFLAGS ioctl.  O_PATH file descriptors are an exception:
+they are not opened through the open permission checks (cf.
+do_dentry_open()), so they do not carry access rights stashed at open
+time; metadata accesses through them are checked against the current
+domain, like path-based accesses.
+
+hook_path_setattr only restricts explicit metadata changes, i.e. it
+checks WRITE_METADATA only when the ia_valid mask contains
+ATTR_MODE, ATTR_UID, ATTR_GID, ATTR_TIMES_SET or ATTR_TOUCH.
+Metadata changes that the kernel performs implicitly, such as
+timestamp updates on write(2) or size changes on truncate(2), are
+therefore not restricted.  The setuid/setgid bit clearing that the
+kernel performs after write(2) or truncate(2) comes through
+notify_change() with ATTR_FORCE set, and the ATTR_MODE that
+do_notify_change() synthesizes from ATTR_KILL_S[UG]ID is therefore
+ignored; an explicit chown(2), including chown(2) with (-1, -1) on
+a privileged file, does not set ATTR_FORCE and is still checked,
+matching the behavior of the SELinux path_setattr hook.  A chown(2)
+that changes nothing (e.g. with (-1, -1) on a file without privilege
+bits) sets no checkable attribute and is not restricted either.
+
+Stacking filesystems forward fileattr operations to underlying inodes
+without calling the LSM hooks again (cf. the patch passing struct path
+and struct file to the inode fileattr hooks), so a fileattr operation
+on an overlayfs file is checked once on the user-facing merged path
+and is not spuriously denied because of the kernel-side creator
+credentials used for the forward.
+
+Kernel-internal accesses performed with override_creds() (e.g.
+overlayfs and cachefiles) are not affected because Landlock domains
+are attached to credentials, and kernel threads without a Landlock
+domain (e.g. nfsd and ksmbd) are not restricted either.
+
+Both new rights are added to ACCESS_FILE as they apply to both files
+and directories.  Add the names of the new rights to
+_LANDLOCK_ACCESS_FS_NAMES in include/linux/landlock.h, which is
+shared by audit records and trace events, so that denied accesses can
+be reported with a human-readable name and the static assertion on
+fs_access_strings in security/landlock/audit.c stays valid.
+
+Remove stat(2), chmod(2), chown(2), setxattr(2) and utime(2) from the
+list of file-related actions that cannot be restricted yet, and
+increment the Landlock ABI version from 12 to 13.
+
+[1]
+https://lore.kernel.org/all/abc960a1-e66e-792e-6869-cfd201c29dbe@digikod.net/
 
 Signed-off-by: Cai Xinchen <caixinchen1@huawei.com>
 ---
- Documentation/bpf/fs_kfuncs.rst               |  2 +-
- fs/bpf_fs_kfuncs.c                            |  4 +-
- fs/overlayfs/inode.c                          |  2 +-
- fs/xattr.c                                    | 10 ++---
- include/linux/lsm_hook_defs.h                 |  8 ++--
- include/linux/security.h                      | 32 ++++++++--------
- kernel/bpf/bpf_lsm.c                          |  6 +--
- security/integrity/evm/evm_main.c             | 28 +++++++-------
- security/integrity/ima/ima_appraise.c         | 20 +++++-----
- security/security.c                           | 37 ++++++++++---------
- security/selinux/hooks.c                      | 27 +++++++-------
- security/smack/smack_lsm.c                    | 26 ++++++-------
- .../selftests/bpf/prog_tests/fs_kfuncs.c      | 10 ++---
- .../selftests/bpf/progs/test_get_xattr.c      |  4 +-
- .../bpf/progs/test_set_remove_xattr.c         |  8 ++--
- .../bpf/progs/verifier_lsm_init_xattr.c       |  2 +-
- .../selftests/bpf/progs/verifier_vfs_reject.c |  2 +-
- 17 files changed, 115 insertions(+), 113 deletions(-)
+ include/linux/landlock.h      |   4 +-
+ include/uapi/linux/landlock.h |  25 +++-
+ security/landlock/access.h    |  13 +-
+ security/landlock/fs.c        | 232 ++++++++++++++++++++++++++++++----
+ security/landlock/limits.h    |   2 +-
+ security/landlock/syscalls.c  |   2 +-
+ 6 files changed, 241 insertions(+), 37 deletions(-)
 
-diff --git a/Documentation/bpf/fs_kfuncs.rst b/Documentation/bpf/fs_kfuncs.rst
-index 8762c3233a3d..9586dbbbf177 100644
---- a/Documentation/bpf/fs_kfuncs.rst
-+++ b/Documentation/bpf/fs_kfuncs.rst
-@@ -18,4 +18,4 @@ To avoid recursions, these kfuncs follow the following rules:
- 1. These kfuncs are only permitted from BPF LSM function.
- 2. These kfuncs should not call into other LSM hooks, i.e. security_*(). For
-    example, ``bpf_get_file_xattr()`` does not use ``vfs_getxattr()``, because
--   the latter calls LSM hook ``security_inode_getxattr``.
-+   the latter calls LSM hook ``security_path_getxattr``.
-diff --git a/fs/bpf_fs_kfuncs.c b/fs/bpf_fs_kfuncs.c
-index 6500d8419bc1..ab25344e6205 100644
---- a/fs/bpf_fs_kfuncs.c
-+++ b/fs/bpf_fs_kfuncs.c
-@@ -566,10 +566,10 @@ BTF_SET_START(d_inode_locked_hooks)
- BTF_ID(func, bpf_lsm_inode_post_removexattr)
- BTF_ID(func, bpf_lsm_inode_post_setattr)
- BTF_ID(func, bpf_lsm_inode_post_setxattr)
--BTF_ID(func, bpf_lsm_inode_removexattr)
-+BTF_ID(func, bpf_lsm_path_removexattr)
- BTF_ID(func, bpf_lsm_inode_rmdir)
- BTF_ID(func, bpf_lsm_path_setattr)
--BTF_ID(func, bpf_lsm_inode_setxattr)
-+BTF_ID(func, bpf_lsm_path_setxattr)
- BTF_ID(func, bpf_lsm_inode_unlink)
- BTF_SET_END(d_inode_locked_hooks)
+diff --git a/include/linux/landlock.h b/include/linux/landlock.h
+index 0ee4880988ba..ee1234fbc9f0 100644
+--- a/include/linux/landlock.h
++++ b/include/linux/landlock.h
+@@ -41,7 +41,9 @@
+ 	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_REFER, "refer"), \
+ 	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_TRUNCATE, "truncate"), \
+ 	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_IOCTL_DEV, "ioctl_dev"), \
+-	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_RESOLVE_UNIX, "resolve_unix")
++	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_RESOLVE_UNIX, "resolve_unix"), \
++	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_READ_METADATA, "read_metadata"), \
++	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_FS_WRITE_METADATA, "write_metadata")
  
-diff --git a/fs/overlayfs/inode.c b/fs/overlayfs/inode.c
-index 4f1d3077735b..9e6fab3a42d3 100644
---- a/fs/overlayfs/inode.c
-+++ b/fs/overlayfs/inode.c
-@@ -392,7 +392,7 @@ static void ovl_idmap_posix_acl(const struct inode *realinode,
-  * > and following it on overlayfs.
-  * >
-  * > Applying the same logic to acl: we do need to call the
-- * > security_inode_getxattr() on the underlying fs, even if just want to
-+ * > security_path_getxattr() on the underlying fs, even if just want to
-  * > check permissions on overlay. This is currently not done, which is an
-  * > inconsistency.
-  * >
-diff --git a/fs/xattr.c b/fs/xattr.c
-index 7ef3d28e5979..c97fb768ac61 100644
---- a/fs/xattr.c
-+++ b/fs/xattr.c
-@@ -309,8 +309,8 @@ __vfs_setxattr_locked(const struct mnt_idmap *idmap, const struct path *path,
- 	if (error)
- 		return error;
- 
--	error = security_inode_setxattr(idmap, path, name, value, size,
--					flags, file);
-+	error = security_path_setxattr(idmap, path, name, value, size,
-+				       flags, file);
- 	if (error)
- 		goto out;
- 
-@@ -464,7 +464,7 @@ vfs_getxattr(const struct mnt_idmap *idmap, const struct path *path,
- 	if (error)
- 		return error;
- 
--	error = security_inode_getxattr(path, name, file);
-+	error = security_path_getxattr(path, name, file);
- 	if (error)
- 		return error;
- 
-@@ -517,7 +517,7 @@ vfs_listxattr(const struct path *path, char *list, size_t size,
- 	struct inode *inode = d_inode(dentry);
- 	ssize_t error;
- 
--	error = security_inode_listxattr(path, file);
-+	error = security_path_listxattr(path, file);
- 	if (error)
- 		return error;
- 
-@@ -580,7 +580,7 @@ __vfs_removexattr_locked(const struct mnt_idmap *idmap,
- 	if (error)
- 		return error;
- 
--	error = security_inode_removexattr(idmap, path, name, file);
-+	error = security_path_removexattr(idmap, path, name, file);
- 	if (error)
- 		goto out;
- 
-diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-index f64a8a0f94a4..4f3d19bf4644 100644
---- a/include/linux/lsm_hook_defs.h
-+++ b/include/linux/lsm_hook_defs.h
-@@ -156,16 +156,16 @@ LSM_HOOK(void, LSM_RET_VOID, inode_post_setattr, const struct mnt_idmap *idmap,
- LSM_HOOK(int, 0, path_getattr, const struct path *path,
- 	 struct file *file)
- LSM_HOOK(int, 0, inode_xattr_skipcap, const char *name)
--LSM_HOOK(int, 0, inode_setxattr, const struct mnt_idmap *idmap,
-+LSM_HOOK(int, 0, path_setxattr, const struct mnt_idmap *idmap,
- 	 const struct path *path, const char *name, const void *value,
- 	 size_t size, int flags, struct file *file)
- LSM_HOOK(void, LSM_RET_VOID, inode_post_setxattr, struct dentry *dentry,
- 	 const char *name, const void *value, size_t size, int flags)
--LSM_HOOK(int, 0, inode_getxattr, const struct path *path, const char *name,
-+LSM_HOOK(int, 0, path_getxattr, const struct path *path, const char *name,
- 	 struct file *file)
--LSM_HOOK(int, 0, inode_listxattr, const struct path *path,
-+LSM_HOOK(int, 0, path_listxattr, const struct path *path,
- 	 struct file *file)
--LSM_HOOK(int, 0, inode_removexattr, const struct mnt_idmap *idmap,
-+LSM_HOOK(int, 0, path_removexattr, const struct mnt_idmap *idmap,
- 	 const struct path *path, const char *name, struct file *file)
- LSM_HOOK(void, LSM_RET_VOID, inode_post_removexattr, struct dentry *dentry,
- 	 const char *name)
-diff --git a/include/linux/security.h b/include/linux/security.h
-index 17a46b413ed3..afbc12c6e614 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -436,10 +436,10 @@ int security_path_setattr(const struct mnt_idmap *idmap,
- void security_inode_post_setattr(const struct mnt_idmap *idmap, struct dentry *dentry,
- 				 int ia_valid);
- int security_path_getattr(const struct path *path, struct file *file);
--int security_inode_setxattr(const struct mnt_idmap *idmap,
--			    const struct path *path, const char *name,
--			    const void *value, size_t size, int flags,
--			    struct file *file);
-+int security_path_setxattr(const struct mnt_idmap *idmap,
-+			   const struct path *path, const char *name,
-+			   const void *value, size_t size, int flags,
-+			   struct file *file);
- int security_inode_set_acl(const struct mnt_idmap *idmap,
- 			   const struct path *path, const char *acl_name,
- 			   struct posix_acl *kacl, struct file *file);
-@@ -456,13 +456,13 @@ void security_inode_post_remove_acl(const struct mnt_idmap *idmap,
- 				    const char *acl_name);
- void security_inode_post_setxattr(struct dentry *dentry, const char *name,
- 				  const void *value, size_t size, int flags);
--int security_inode_getxattr(const struct path *path,
--			    const char *name, struct file *file);
--int security_inode_listxattr(const struct path *path,
-+int security_path_getxattr(const struct path *path,
-+			   const char *name, struct file *file);
-+int security_path_listxattr(const struct path *path,
-+			    struct file *file);
-+int security_path_removexattr(const struct mnt_idmap *idmap,
-+			      const struct path *path, const char *name,
- 			      struct file *file);
--int security_inode_removexattr(const struct mnt_idmap *idmap,
--			       const struct path *path, const char *name,
--			       struct file *file);
- void security_inode_post_removexattr(struct dentry *dentry, const char *name);
- int security_inode_file_setattr(const struct path *path,
- 				struct file_kattr *fa, struct file *file);
-@@ -1022,7 +1022,7 @@ static inline int security_path_getattr(const struct path *path,
- 	return 0;
- }
- 
--static inline int security_inode_setxattr(const struct mnt_idmap *idmap,
-+static inline int security_path_setxattr(const struct mnt_idmap *idmap,
- 		const struct path *path, const char *name,
- 		const void *value, size_t size, int flags,
- 		struct file *file)
-@@ -1069,19 +1069,19 @@ static inline void security_inode_post_setxattr(struct dentry *dentry,
- 		const char *name, const void *value, size_t size, int flags)
- { }
- 
--static inline int security_inode_getxattr(const struct path *path,
--			const char *name, struct file *file)
-+static inline int security_path_getxattr(const struct path *path,
-+					 const char *name, struct file *file)
- {
- 	return 0;
- }
- 
--static inline int security_inode_listxattr(const struct path *path,
--					   struct file *file)
-+static inline int security_path_listxattr(const struct path *path,
-+					  struct file *file)
- {
- 	return 0;
- }
- 
--static inline int security_inode_removexattr(const struct mnt_idmap *idmap,
-+static inline int security_path_removexattr(const struct mnt_idmap *idmap,
- 					     const struct path *path,
- 					     const char *name,
- 					     struct file *file)
-diff --git a/kernel/bpf/bpf_lsm.c b/kernel/bpf/bpf_lsm.c
-index 32f84356933e..9d7771417812 100644
---- a/kernel/bpf/bpf_lsm.c
-+++ b/kernel/bpf/bpf_lsm.c
-@@ -336,17 +336,17 @@ BTF_ID(func, bpf_lsm_file_receive)
- BTF_ID(func, bpf_lsm_inode_create)
- BTF_ID(func, bpf_lsm_inode_free_security)
- BTF_ID(func, bpf_lsm_path_getattr)
--BTF_ID(func, bpf_lsm_inode_getxattr)
-+BTF_ID(func, bpf_lsm_path_getxattr)
- BTF_ID(func, bpf_lsm_inode_mknod)
- BTF_ID(func, bpf_lsm_inode_need_killpriv)
- BTF_ID(func, bpf_lsm_inode_post_setxattr)
- BTF_ID(func, bpf_lsm_inode_post_removexattr)
- BTF_ID(func, bpf_lsm_inode_readlink)
--BTF_ID(func, bpf_lsm_inode_removexattr)
-+BTF_ID(func, bpf_lsm_path_removexattr)
- BTF_ID(func, bpf_lsm_inode_rename)
- BTF_ID(func, bpf_lsm_inode_rmdir)
- BTF_ID(func, bpf_lsm_path_setattr)
--BTF_ID(func, bpf_lsm_inode_setxattr)
-+BTF_ID(func, bpf_lsm_path_setxattr)
- BTF_ID(func, bpf_lsm_inode_symlink)
- BTF_ID(func, bpf_lsm_inode_unlink)
- BTF_ID(func, bpf_lsm_kernel_module_request)
-diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
-index 962b31a97ec9..025606fe5fe8 100644
---- a/security/integrity/evm/evm_main.c
-+++ b/security/integrity/evm/evm_main.c
-@@ -7,8 +7,8 @@
-  * Kylene Hall <kjhall@us.ibm.com>
+ #define _LANDLOCK_ACCESS_NET_NAMES \
+ 	_LANDLOCK_NAME_ENTRY(LANDLOCK_ACCESS_NET_BIND_TCP, "bind_tcp"), \
+diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+index 24510e5d8479..36dfb499e48e 100644
+--- a/include/uapi/linux/landlock.h
++++ b/include/uapi/linux/landlock.h
+@@ -429,6 +429,25 @@ struct landlock_capability_attr {
   *
-  * File: evm_main.c
-- *	implements evm_inode_setxattr, evm_inode_post_setxattr,
-- *	evm_inode_removexattr, evm_verifyxattr, and evm_inode_set_acl.
-+ *	implements evm_path_setxattr, evm_inode_post_setxattr,
-+ *	evm_path_removexattr, evm_verifyxattr, and evm_inode_set_acl.
-  */
- 
- #define pr_fmt(fmt) "EVM: "fmt
-@@ -593,7 +593,7 @@ static int evm_protect_xattr(const struct mnt_idmap *idmap,
- }
- 
- /**
-- * evm_inode_setxattr - protect the EVM extended attribute
-+ * evm_path_setxattr - protect the EVM extended attribute
-  * @idmap: idmap of the mount
-  * @path: pointer to the affected object
-  * @xattr_name: pointer to the affected extended attribute name
-@@ -608,11 +608,11 @@ static int evm_protect_xattr(const struct mnt_idmap *idmap,
-  * userspace from writing HMAC value.  Writing 'security.evm' requires
-  * requires CAP_SYS_ADMIN privileges.
-  */
--static int evm_inode_setxattr(const struct mnt_idmap *idmap,
--			      const struct path *path,
--			      const char *xattr_name, const void *xattr_value,
--			      size_t xattr_value_len, int flags,
--			      struct file *file)
-+static int evm_path_setxattr(const struct mnt_idmap *idmap,
-+			     const struct path *path,
-+			     const char *xattr_name, const void *xattr_value,
-+			     size_t xattr_value_len, int flags,
-+			     struct file *file)
- {
- 	const struct evm_ima_xattr_data *xattr_data = xattr_value;
- 	struct dentry *dentry = path->dentry;
-@@ -635,7 +635,7 @@ static int evm_inode_setxattr(const struct mnt_idmap *idmap,
- }
- 
- /**
-- * evm_inode_removexattr - protect the EVM extended attribute
-+ * evm_path_removexattr - protect the EVM extended attribute
-  * @idmap: idmap of the mount
-  * @path: pointer to the affected object
-  * @xattr_name: pointer to the affected extended attribute name
-@@ -644,9 +644,9 @@ static int evm_inode_setxattr(const struct mnt_idmap *idmap,
-  * Removing 'security.evm' requires CAP_SYS_ADMIN privileges and that
-  * the current value is valid.
-  */
--static int evm_inode_removexattr(const struct mnt_idmap *idmap,
--				 const struct path *path,
--				 const char *xattr_name, struct file *file)
-+static int evm_path_removexattr(const struct mnt_idmap *idmap,
-+				const struct path *path,
-+				const char *xattr_name, struct file *file)
- {
- 	struct dentry *dentry = path->dentry;
- 
-@@ -1215,13 +1215,13 @@ static struct security_hook_list evm_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(path_setattr, evm_path_setattr),
- 	LSM_HOOK_INIT(inode_post_setattr, evm_inode_post_setattr),
- 	LSM_HOOK_INIT(inode_copy_up_xattr, evm_inode_copy_up_xattr),
--	LSM_HOOK_INIT(inode_setxattr, evm_inode_setxattr),
-+	LSM_HOOK_INIT(path_setxattr, evm_path_setxattr),
- 	LSM_HOOK_INIT(inode_post_setxattr, evm_inode_post_setxattr),
- 	LSM_HOOK_INIT(inode_set_acl, evm_inode_set_acl),
- 	LSM_HOOK_INIT(inode_post_set_acl, evm_inode_post_set_acl),
- 	LSM_HOOK_INIT(inode_remove_acl, evm_inode_remove_acl),
- 	LSM_HOOK_INIT(inode_post_remove_acl, evm_inode_post_remove_acl),
--	LSM_HOOK_INIT(inode_removexattr, evm_inode_removexattr),
-+	LSM_HOOK_INIT(path_removexattr, evm_path_removexattr),
- 	LSM_HOOK_INIT(inode_post_removexattr, evm_inode_post_removexattr),
- 	LSM_HOOK_INIT(inode_init_security, evm_inode_init_security),
- 	LSM_HOOK_INIT(inode_alloc_security, evm_inode_alloc_security),
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index a231f1f419f7..c701dce1e837 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -759,11 +759,11 @@ static int validate_hash_algo(struct dentry *dentry,
- 	return -EACCES;
- }
- 
--static int ima_inode_setxattr(const struct mnt_idmap *idmap,
--			      const struct path *path,
--			      const char *xattr_name, const void *xattr_value,
--			      size_t xattr_value_len, int flags,
--			      struct file *file)
-+static int ima_path_setxattr(const struct mnt_idmap *idmap,
-+			   const struct path *path,
-+			   const char *xattr_name, const void *xattr_value,
-+			   size_t xattr_value_len, int flags,
-+			   struct file *file)
- {
- 	const struct evm_ima_xattr_data *xvalue = xattr_value;
- 	struct dentry *dentry = path->dentry;
-@@ -806,9 +806,9 @@ static int ima_inode_set_acl(const struct mnt_idmap *idmap,
- 	return 0;
- }
- 
--static int ima_inode_removexattr(const struct mnt_idmap *idmap,
--				 const struct path *path,
--				 const char *xattr_name, struct file *file)
-+static int ima_path_removexattr(const struct mnt_idmap *idmap,
-+				const struct path *path,
-+				const char *xattr_name, struct file *file)
- {
- 	int result, digsig = -1;
- 
-@@ -832,9 +832,9 @@ static int ima_inode_remove_acl(const struct mnt_idmap *idmap,
- 
- static struct security_hook_list ima_appraise_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(inode_post_setattr, ima_inode_post_setattr),
--	LSM_HOOK_INIT(inode_setxattr, ima_inode_setxattr),
-+	LSM_HOOK_INIT(path_setxattr, ima_path_setxattr),
- 	LSM_HOOK_INIT(inode_set_acl, ima_inode_set_acl),
--	LSM_HOOK_INIT(inode_removexattr, ima_inode_removexattr),
-+	LSM_HOOK_INIT(path_removexattr, ima_path_removexattr),
- 	LSM_HOOK_INIT(inode_remove_acl, ima_inode_remove_acl),
- };
- 
-diff --git a/security/security.c b/security/security.c
-index 01d4a463c6b1..bca46f5444bd 100644
---- a/security/security.c
-+++ b/security/security.c
-@@ -1921,7 +1921,7 @@ int security_path_getattr(const struct path *path, struct file *file)
- }
- 
- /**
-- * security_inode_setxattr() - Check if setting file xattrs is allowed
-+ * security_path_setxattr() - Check if setting file xattrs is allowed
-  * @idmap: idmap of the mount
-  * @path: file (the VFS makes no guarantees with regard to @path->mnt)
-  * @name: xattr name
-@@ -1947,10 +1947,10 @@ int security_path_getattr(const struct path *path, struct file *file)
+  *   The rationale for this design is described in
+  *   :ref:`Documentation/security/landlock.rst <scoped-flags-interaction>`.
++ * - %LANDLOCK_ACCESS_FS_READ_METADATA: Read file or directory metadata (e.g.
++ *   inode attributes, extended attributes, and POSIX ACLs) through
++ *   :manpage:`stat(2)`, :manpage:`fstat(2)`, :manpage:`lstat(2)`,
++ *   :manpage:`newfstatat(2)`, :manpage:`getxattr(2)`, and
++ *   :manpage:`listxattr(2)`.
++ *
++ *   This access right is available since the thirteenth version of the
++ *   Landlock ABI.
++ * - %LANDLOCK_ACCESS_FS_WRITE_METADATA: Change file or directory metadata
++ *   (e.g. inode attributes, extended attributes, and POSIX ACLs) through
++ *   :manpage:`chmod(2)`, :manpage:`chown(2)`, :manpage:`utimensat(2)`,
++ *   :manpage:`setxattr(2)`, and :manpage:`removexattr(2)`, as well as related
++ *   system calls.  Implicit metadata changes performed by the kernel (e.g.
++ *   timestamp updates with :manpage:`write(2)`, or set-user-ID and
++ *   set-group-ID bit clearing with :manpage:`write(2)` or
++ *   :manpage:`truncate(2)`) are not restricted by this access right.
++ *
++ *   This access right is available since the thirteenth version of the
++ *   Landlock ABI.
   *
-  * Return: Returns 0 if permission is granted.
+  * Whether an opened file can be truncated with :manpage:`ftruncate(2)` or used
+  * with `ioctl(2)` is determined during :manpage:`open(2)`, in the same way as
+@@ -493,9 +512,7 @@ struct landlock_capability_attr {
+  *
+  *   It is currently not possible to restrict some file-related actions
+  *   accessible through these syscall families: :manpage:`chdir(2)`,
+- *   :manpage:`stat(2)`, :manpage:`flock(2)`, :manpage:`chmod(2)`,
+- *   :manpage:`chown(2)`, :manpage:`setxattr(2)`, :manpage:`utime(2)`,
+- *   :manpage:`fcntl(2)`, :manpage:`access(2)`.
++ *   :manpage:`flock(2)`, :manpage:`fcntl(2)`, :manpage:`access(2)`.
+  *   Future Landlock evolutions will enable to restrict them.
   */
--int security_inode_setxattr(const struct mnt_idmap *idmap,
--			    const struct path *path, const char *name,
--			    const void *value, size_t size, int flags,
--			    struct file *file)
-+int security_path_setxattr(const struct mnt_idmap *idmap,
-+			   const struct path *path, const char *name,
-+			   const void *value, size_t size, int flags,
-+			   struct file *file)
- {
- 	int rc;
- 
-@@ -1964,7 +1964,7 @@ int security_inode_setxattr(const struct mnt_idmap *idmap,
- 			return rc;
- 	}
- 
--	return call_int_hook(inode_setxattr, idmap, path, name, value,
-+	return call_int_hook(path_setxattr, idmap, path, name, value,
- 			     size, flags, file);
- }
- 
-@@ -2086,7 +2086,7 @@ void security_inode_post_setxattr(struct dentry *dentry, const char *name,
- }
+ /* clang-format off */
+@@ -516,6 +533,8 @@ struct landlock_capability_attr {
+ #define LANDLOCK_ACCESS_FS_TRUNCATE			(1ULL << 14)
+ #define LANDLOCK_ACCESS_FS_IOCTL_DEV			(1ULL << 15)
+ #define LANDLOCK_ACCESS_FS_RESOLVE_UNIX			(1ULL << 16)
++#define LANDLOCK_ACCESS_FS_READ_METADATA		(1ULL << 17)
++#define LANDLOCK_ACCESS_FS_WRITE_METADATA		(1ULL << 18)
+ /* clang-format on */
  
  /**
-- * security_inode_getxattr() - Check if xattr access is allowed
-+ * security_path_getxattr() - Check if xattr access is allowed
-  * @path: file (the VFS makes no guarantees with regard to @path->mnt)
-  * @name: xattr name
-  * @file: file through which the xattr access is requested, if any
-@@ -2096,16 +2096,16 @@ void security_inode_post_setxattr(struct dentry *dentry, const char *name,
+diff --git a/security/landlock/access.h b/security/landlock/access.h
+index f9eaa2f53686..a719760cdeff 100644
+--- a/security/landlock/access.h
++++ b/security/landlock/access.h
+@@ -31,7 +31,9 @@
+ /* clang-format off */
+ #define _LANDLOCK_ACCESS_FS_OPTIONAL ( \
+ 	LANDLOCK_ACCESS_FS_TRUNCATE | \
+-	LANDLOCK_ACCESS_FS_IOCTL_DEV)
++	LANDLOCK_ACCESS_FS_IOCTL_DEV | \
++	LANDLOCK_ACCESS_FS_READ_METADATA | \
++	LANDLOCK_ACCESS_FS_WRITE_METADATA)
+ /* clang-format on */
+ 
+ typedef u32 access_mask_t;
+@@ -156,11 +158,12 @@ struct layer_masks {
+  * required by update_request().
   *
-  * Return: Returns 0 if permission is granted.
+  * Each nibble represents the layer index of the newest layer which denied a
+- * certain access right.  For file system access rights, the upper four bits are
+- * the index of the layer which denies LANDLOCK_ACCESS_FS_IOCTL_DEV and the
+- * lower nibble represents LANDLOCK_ACCESS_FS_TRUNCATE.
++ * certain access right.  For file system access rights, the nibbles from the
++ * least to the most significant one represent the layers which deny
++ * LANDLOCK_ACCESS_FS_TRUNCATE, LANDLOCK_ACCESS_FS_IOCTL_DEV,
++ * LANDLOCK_ACCESS_FS_READ_METADATA and LANDLOCK_ACCESS_FS_WRITE_METADATA.
   */
--int security_inode_getxattr(const struct path *path,
--			    const char *name, struct file *file)
-+int security_path_getxattr(const struct path *path,
-+			   const char *name, struct file *file)
- {
- 	if (unlikely(IS_PRIVATE(d_backing_inode(path->dentry))))
- 		return 0;
--	return call_int_hook(inode_getxattr, path, name, file);
-+	return call_int_hook(path_getxattr, path, name, file);
- }
+-typedef u8 deny_masks_t;
++typedef u16 deny_masks_t;
  
- /**
-- * security_inode_listxattr() - Check if listing xattrs is allowed
-+ * security_path_listxattr() - Check if listing xattrs is allowed
-  * @path: file (the VFS makes no guarantees with regard to @path->mnt)
-  * @file: file through which the xattr names are listed, if any
-  *
-@@ -2114,15 +2114,16 @@ int security_inode_getxattr(const struct path *path,
-  *
-  * Return: Returns 0 if permission is granted.
-  */
--int security_inode_listxattr(const struct path *path, struct file *file)
-+int security_path_listxattr(const struct path *path,
-+			    struct file *file)
- {
- 	if (unlikely(IS_PRIVATE(d_backing_inode(path->dentry))))
- 		return 0;
--	return call_int_hook(inode_listxattr, path, file);
-+	return call_int_hook(path_listxattr, path, file);
- }
- 
- /**
-- * security_inode_removexattr() - Check if removing an xattr is allowed
-+ * security_path_removexattr() - Check if removing an xattr is allowed
-  * @idmap: idmap of the mount
-  * @path: file (the VFS makes no guarantees with regard to @path->mnt)
-  * @name: xattr name
-@@ -2145,9 +2146,9 @@ int security_inode_listxattr(const struct path *path, struct file *file)
-  *
-  * Return: Returns 0 if permission is granted.
-  */
--int security_inode_removexattr(const struct mnt_idmap *idmap,
--			       const struct path *path, const char *name,
--			       struct file *file)
-+int security_path_removexattr(const struct mnt_idmap *idmap,
-+			      const struct path *path, const char *name,
-+			      struct file *file)
- {
- 	int rc;
- 
-@@ -2161,7 +2162,7 @@ int security_inode_removexattr(const struct mnt_idmap *idmap,
- 			return rc;
- 	}
- 
--	return call_int_hook(inode_removexattr, idmap, path, name, file);
-+	return call_int_hook(path_removexattr, idmap, path, name, file);
- }
- 
- /**
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 4751e300bde6..62053a9f7d9e 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -3389,8 +3389,8 @@ static int selinux_inode_xattr_skipcap(const char *name)
- 	return !strcmp(name, XATTR_NAME_SELINUX);
- }
- 
--static int selinux_inode_setxattr(const struct mnt_idmap *idmap,
--				  const struct path *path,
-+static int selinux_path_setxattr(const struct mnt_idmap *idmap,
-+				 const struct path *path,
- 				  const char *name, const void *value,
- 				  size_t size, int flags, struct file *file)
- {
-@@ -3539,24 +3539,25 @@ static void selinux_inode_post_setxattr(struct dentry *dentry, const char *name,
- 	spin_unlock(&isec->lock);
- }
- 
--static int selinux_inode_getxattr(const struct path *path,
--				  const char *name, struct file *file)
-+static int selinux_path_getxattr(const struct path *path, const char *name,
-+				 struct file *file)
- {
- 	const struct cred *cred = current_cred();
- 
- 	return dentry_has_perm(cred, path->dentry, FILE__GETATTR);
- }
- 
--static int selinux_inode_listxattr(const struct path *path, struct file *file)
-+static int selinux_path_listxattr(const struct path *path,
-+				  struct file *file)
- {
- 	const struct cred *cred = current_cred();
- 
- 	return dentry_has_perm(cred, path->dentry, FILE__GETATTR);
- }
- 
--static int selinux_inode_removexattr(const struct mnt_idmap *idmap,
--				     const struct path *path,
--				     const char *name, struct file *file)
-+static int selinux_path_removexattr(const struct mnt_idmap *idmap,
-+				    const struct path *path,
-+				    const char *name, struct file *file)
- {
- 	/* if not a selinux xattr, only check the ordinary setattr perm */
- 	if (strcmp(name, XATTR_NAME_SELINUX))
-@@ -3636,7 +3637,7 @@ static int selinux_path_notify(const struct path *path, u64 mask,
  /*
-  * Copy the inode security context value to the user.
-  *
-- * Permission check is handled by selinux_inode_getxattr hook.
-+ * Permission check is handled by selinux_path_getxattr hook.
-  */
- static int selinux_inode_getsecurity(const struct mnt_idmap *idmap,
- 				     struct inode *inode, const char *name,
-@@ -7737,11 +7738,11 @@ static struct security_hook_list selinux_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(path_setattr, selinux_path_setattr),
- 	LSM_HOOK_INIT(path_getattr, selinux_path_getattr),
- 	LSM_HOOK_INIT(inode_xattr_skipcap, selinux_inode_xattr_skipcap),
--	LSM_HOOK_INIT(inode_setxattr, selinux_inode_setxattr),
-+	LSM_HOOK_INIT(path_setxattr, selinux_path_setxattr),
- 	LSM_HOOK_INIT(inode_post_setxattr, selinux_inode_post_setxattr),
--	LSM_HOOK_INIT(inode_getxattr, selinux_inode_getxattr),
--	LSM_HOOK_INIT(inode_listxattr, selinux_inode_listxattr),
--	LSM_HOOK_INIT(inode_removexattr, selinux_inode_removexattr),
-+	LSM_HOOK_INIT(path_getxattr, selinux_path_getxattr),
-+	LSM_HOOK_INIT(path_listxattr, selinux_path_listxattr),
-+	LSM_HOOK_INIT(path_removexattr, selinux_path_removexattr),
- 	LSM_HOOK_INIT(inode_file_getattr, selinux_inode_file_getattr),
- 	LSM_HOOK_INIT(inode_file_setattr, selinux_inode_file_setattr),
- 	LSM_HOOK_INIT(inode_set_acl, selinux_inode_set_acl),
-diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-index 1cbcba3fa62b..eed06cf7af99 100644
---- a/security/smack/smack_lsm.c
-+++ b/security/smack/smack_lsm.c
-@@ -1343,7 +1343,7 @@ static int smack_inode_xattr_skipcap(const char *name)
+  * Makes sure all optional access rights can be tied to a layer index (cf.
+diff --git a/security/landlock/fs.c b/security/landlock/fs.c
+index 2ab67bcad198..73c6353ecbf8 100644
+--- a/security/landlock/fs.c
++++ b/security/landlock/fs.c
+@@ -318,6 +318,8 @@ static struct landlock_object *get_inode_object(struct inode *const inode)
+ 	LANDLOCK_ACCESS_FS_EXECUTE | \
+ 	LANDLOCK_ACCESS_FS_WRITE_FILE | \
+ 	LANDLOCK_ACCESS_FS_READ_FILE | \
++	LANDLOCK_ACCESS_FS_READ_METADATA | \
++	LANDLOCK_ACCESS_FS_WRITE_METADATA | \
+ 	LANDLOCK_ACCESS_FS_TRUNCATE | \
+ 	LANDLOCK_ACCESS_FS_IOCTL_DEV | \
+ 	LANDLOCK_ACCESS_FS_RESOLVE_UNIX)
+@@ -1676,6 +1678,192 @@ static int hook_path_truncate(const struct path *const path)
+ 	return current_check_access_path(path, LANDLOCK_ACCESS_FS_TRUNCATE);
  }
+ 
++static int check_access_file(const struct file *const file,
++			     const access_mask_t access)
++{
++	/*
++	 * O_PATH file descriptors do not go through the open permission
++	 * checks (cf. do_dentry_open()) and therefore do not carry the
++	 * access rights stashed at open time: they are checked against the
++	 * current domain, like path-based accesses.
++	 */
++	if (unlikely(file->f_mode & FMODE_PATH))
++		return current_check_access_path(&file->f_path, access);
++
++	/*
++	 * Allows accesses if the requested access right was available at the
++	 * time of opening the file, to get a consistent access check as for
++	 * read, write and execute operations.
++	 *
++	 * Note: For checks done based on the file's Landlock allowed access,
++	 * we enforce them independently of whether the current thread is in
++	 * a Landlock domain, so that open files passed between independent
++	 * processes retain their behaviour.
++	 */
++	if (landlock_file(file)->allowed_access & access)
++		return 0;
++
++	landlock_log_denial(landlock_cred(file->f_cred), &(struct landlock_request) {
++		.type = LANDLOCK_REQUEST_FS_ACCESS,
++		.audit = {
++			.type = LSM_AUDIT_DATA_FILE,
++			.u.file = file,
++		},
++		.all_existing_optional_access = _LANDLOCK_ACCESS_FS_OPTIONAL,
++		.access = access,
++#ifdef CONFIG_SECURITY_LANDLOCK_LOG
++		.deny_masks = landlock_file(file)->deny_masks,
++		.quiet_optional_accesses = landlock_file(file)->quiet_optional_accesses,
++#endif /* CONFIG_SECURITY_LANDLOCK_LOG */
++	});
++	return -EACCES;
++}
++
++static int check_access_path_or_file(const struct path *const path,
++				     const struct file *const file,
++				     const access_mask_t access)
++{
++	if (file)
++		return check_access_file(file, access);
++
++	return current_check_access_path(path, access);
++}
++
++static int hook_path_getattr(const struct path *const path,
++			     struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_READ_METADATA);
++}
++
++static int hook_path_file_getattr(const struct path *const path,
++				  struct file_kattr *const fa,
++				  struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_READ_METADATA);
++}
++
++static int hook_path_setattr(const struct mnt_idmap *const idmap,
++			     const struct path *const path,
++			     struct iattr *const attr,
++			     struct file *const file)
++{
++	unsigned int ia_valid = attr->ia_valid;
++
++	/*
++	 * Only explicit metadata changes are checked: implicit
++	 * timestamp updates never go through notify_change(), and size
++	 * changes (ATTR_SIZE) are governed by the truncate hooks
++	 * instead.  See the "File metadata" section in the user space
++	 * documentation for the full semantics.
++	 *
++	 * The setuid/setgid bit clearing that the kernel performs
++	 * after write(2) or truncate(2) is an implicit change as
++	 * well: it comes through __remove_privs() and do_truncate()
++	 * with ATTR_FORCE set, and do_notify_change() then adds a
++	 * synthesized ATTR_MODE (with these bits removed) before
++	 * calling this hook.  As do_notify_change() makes it a bug for
++	 * callers to pass ATTR_MODE together with a kill flag, an
++	 * ATTR_MODE seen along with ATTR_FORCE is always
++	 * kernel-synthesized and must not be checked.  An explicit
++	 * chown(2) does not set ATTR_FORCE, so the same clearing
++	 * requested through chown(2), including chown(2) with
++	 * (-1, -1) on a privileged file, is still checked through the
++	 * synthesized ATTR_MODE, matching the SELinux behavior.  A
++	 * chown(2) that changes nothing (e.g. with (-1, -1) on a file
++	 * without privilege bits) sets neither a changed attribute
++	 * nor a synthesized ATTR_MODE, and is not checked.
++	 */
++	if (ia_valid & ATTR_FORCE)
++		ia_valid &= ~(ATTR_KILL_SUID | ATTR_KILL_SGID | ATTR_MODE);
++
++	if (!(ia_valid & (ATTR_MODE | ATTR_UID | ATTR_GID |
++			  ATTR_TIMES_SET | ATTR_TOUCH)))
++		return 0;
++
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_WRITE_METADATA);
++}
++
++static int hook_path_file_setattr(const struct path *const path,
++				  struct file_kattr *const fa,
++				  struct file *const file)
++{
++	/*
++	 * The chattr(2) style flags (e.g. FS_IMMUTABLE_FL) and fsxattr
++	 * fields are metadata: writing them requires WRITE_METADATA.  The
++	 * user-facing path is checked here; stacking filesystems skip this
++	 * hook on their internal forwards because they were already
++	 * checked on the user-facing path.
++	 */
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_WRITE_METADATA);
++}
++
++static int hook_path_setxattr(const struct mnt_idmap *const idmap,
++			       const struct path *const path,
++			       const char *const name,
++			       const void *const value, const size_t size,
++			       const int flags,
++			       struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_WRITE_METADATA);
++}
++
++static int hook_path_getxattr(const struct path *const path,
++			      const char *const name,
++			      struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_READ_METADATA);
++}
++
++static int hook_path_listxattr(const struct path *const path,
++			       struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_READ_METADATA);
++}
++
++static int hook_path_removexattr(const struct mnt_idmap *const idmap,
++				  const struct path *const path,
++				  const char *const name,
++				  struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_WRITE_METADATA);
++}
++
++static int hook_path_set_acl(const struct mnt_idmap *const idmap,
++			      const struct path *const path,
++			      const char *const acl_name,
++			      struct posix_acl *const kacl,
++			      struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_WRITE_METADATA);
++}
++
++static int hook_path_get_acl(const struct mnt_idmap *const idmap,
++			      const struct path *const path,
++			      const char *const acl_name,
++			      struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_READ_METADATA);
++}
++
++static int hook_path_remove_acl(const struct mnt_idmap *const idmap,
++				const struct path *const path,
++				const char *const acl_name,
++				struct file *const file)
++{
++	return check_access_path_or_file(path, file,
++					 LANDLOCK_ACCESS_FS_WRITE_METADATA);
++}
++
+ /**
+  * unmask_scoped_access - Remove access right bits in @masks in all layers
+  *                        where @client and @server have the same domain
+@@ -1876,7 +2064,9 @@ static int hook_file_open(struct file *const file)
+ 	 * We look up more access than what we immediately need for open(), so
+ 	 * that we can later authorize operations on opened files.
+ 	 */
+-	optional_access = LANDLOCK_ACCESS_FS_TRUNCATE;
++	optional_access = LANDLOCK_ACCESS_FS_TRUNCATE |
++			  LANDLOCK_ACCESS_FS_READ_METADATA |
++			  LANDLOCK_ACCESS_FS_WRITE_METADATA;
+ 	if (is_device(file))
+ 		optional_access |= LANDLOCK_ACCESS_FS_IOCTL_DEV;
+ 
+@@ -1928,32 +2118,11 @@ static int hook_file_open(struct file *const file)
+ static int hook_file_truncate(struct file *const file)
+ {
+ 	/*
+-	 * Allows truncation if the truncate right was available at the time of
+-	 * opening the file, to get a consistent access check as for read, write
+-	 * and execute operations.
+-	 *
+-	 * Note: For checks done based on the file's Landlock allowed access, we
+-	 * enforce them independently of whether the current thread is in a
+-	 * Landlock domain, so that open files passed between independent
+-	 * processes retain their behaviour.
++	 * Allows truncation if the truncate right was available at the time
++	 * of opening the file, to get a consistent access check as for read,
++	 * write and execute operations.
+ 	 */
+-	if (landlock_file(file)->allowed_access & LANDLOCK_ACCESS_FS_TRUNCATE)
+-		return 0;
+-
+-	landlock_log_denial(landlock_cred(file->f_cred), &(struct landlock_request) {
+-		.type = LANDLOCK_REQUEST_FS_ACCESS,
+-		.audit = {
+-			.type = LSM_AUDIT_DATA_FILE,
+-			.u.file = file,
+-		},
+-		.all_existing_optional_access = _LANDLOCK_ACCESS_FS_OPTIONAL,
+-		.access = LANDLOCK_ACCESS_FS_TRUNCATE,
+-#ifdef CONFIG_SECURITY_LANDLOCK_LOG
+-		.deny_masks = landlock_file(file)->deny_masks,
+-		.quiet_optional_accesses = landlock_file(file)->quiet_optional_accesses,
+-#endif /* CONFIG_SECURITY_LANDLOCK_LOG */
+-	});
+-	return -EACCES;
++	return check_access_file(file, LANDLOCK_ACCESS_FS_TRUNCATE);
+ }
+ 
+ static int hook_file_ioctl_common(const struct file *const file,
+@@ -2100,6 +2269,17 @@ static struct security_hook_list landlock_hooks[] __ro_after_init = {
+ 	LSM_HOOK_INIT(path_unlink, hook_path_unlink),
+ 	LSM_HOOK_INIT(path_rmdir, hook_path_rmdir),
+ 	LSM_HOOK_INIT(path_truncate, hook_path_truncate),
++	LSM_HOOK_INIT(path_getattr, hook_path_getattr),
++	LSM_HOOK_INIT(path_file_getattr, hook_path_file_getattr),
++	LSM_HOOK_INIT(path_setattr, hook_path_setattr),
++	LSM_HOOK_INIT(path_file_setattr, hook_path_file_setattr),
++	LSM_HOOK_INIT(path_setxattr, hook_path_setxattr),
++	LSM_HOOK_INIT(path_getxattr, hook_path_getxattr),
++	LSM_HOOK_INIT(path_listxattr, hook_path_listxattr),
++	LSM_HOOK_INIT(path_removexattr, hook_path_removexattr),
++	LSM_HOOK_INIT(path_set_acl, hook_path_set_acl),
++	LSM_HOOK_INIT(path_get_acl, hook_path_get_acl),
++	LSM_HOOK_INIT(path_remove_acl, hook_path_remove_acl),
+ 	LSM_HOOK_INIT(unix_find, hook_unix_find),
+ 
+ 	LSM_HOOK_INIT(file_alloc_security, hook_file_alloc_security),
+diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+index ddd300e10689..ed606ee3102f 100644
+--- a/security/landlock/limits.h
++++ b/security/landlock/limits.h
+@@ -21,7 +21,7 @@
+ #define LANDLOCK_MAX_NUM_LAYERS		16
+ #define LANDLOCK_MAX_NUM_RULES		U32_MAX
+ 
+-#define LANDLOCK_LAST_ACCESS_FS		LANDLOCK_ACCESS_FS_RESOLVE_UNIX
++#define LANDLOCK_LAST_ACCESS_FS		LANDLOCK_ACCESS_FS_WRITE_METADATA
+ #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
+ #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
+ 
+diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
+index fb5af318b69b..11d3a2abcec1 100644
+--- a/security/landlock/syscalls.c
++++ b/security/landlock/syscalls.c
+@@ -191,7 +191,7 @@ static const struct file_operations ruleset_fops = {
+  * If the change involves a fix that requires userspace awareness, also update
+  * the errata documentation in Documentation/userspace-api/landlock.rst .
+  */
+-const int landlock_abi_version = 12;
++const int landlock_abi_version = 13;
  
  /**
-- * smack_inode_setxattr - Smack check for setting xattrs
-+ * smack_path_setxattr - Smack check for setting xattrs
-  * @idmap: idmap of the mount
-  * @path: the object
-  * @name: name of the attribute
-@@ -1356,8 +1356,8 @@ static int smack_inode_xattr_skipcap(const char *name)
-  *
-  * Returns 0 if access is permitted, an error code otherwise
-  */
--static int smack_inode_setxattr(const struct mnt_idmap *idmap,
--				const struct path *path,
-+static int smack_path_setxattr(const struct mnt_idmap *idmap,
-+			       const struct path *path,
- 				const char *name, const void *value,
- 				size_t size, int flags, struct file *file)
- {
-@@ -1463,15 +1463,15 @@ static void smack_inode_post_setxattr(struct dentry *dentry, const char *name,
- }
- 
- /**
-- * smack_inode_getxattr - Smack check on getxattr
-+ * smack_path_getxattr - Smack check on getxattr
-  * @path: the object
-  * @name: unused
-  * @file: file through which the xattr access is requested, if any
-  *
-  * Returns 0 if access is permitted, an error code otherwise
-  */
--static int smack_inode_getxattr(const struct path *path,
--			const char *name, struct file *file)
-+static int smack_path_getxattr(const struct path *path, const char *name,
-+			       struct file *file)
- {
- 	struct smk_audit_info ad;
- 	struct dentry *dentry = path->dentry;
-@@ -1486,7 +1486,7 @@ static int smack_inode_getxattr(const struct path *path,
- }
- 
- /**
-- * smack_inode_removexattr - Smack check on removexattr
-+ * smack_path_removexattr - Smack check on removexattr
-  * @idmap: idmap of the mount
-  * @path: the object
-  * @name: name of the attribute
-@@ -1496,9 +1496,9 @@ static int smack_inode_getxattr(const struct path *path,
-  *
-  * Returns 0 if access is permitted, an error code otherwise
-  */
--static int smack_inode_removexattr(const struct mnt_idmap *idmap,
--				   const struct path *path,
--				   const char *name, struct file *file)
-+static int smack_path_removexattr(const struct mnt_idmap *idmap,
-+				  const struct path *path,
-+				  const char *name, struct file *file)
- {
- 	struct inode_smack *isp;
- 	struct smk_audit_info ad;
-@@ -5201,10 +5201,10 @@ static struct security_hook_list smack_hooks[] __ro_after_init = {
- 	LSM_HOOK_INIT(path_setattr, smack_path_setattr),
- 	LSM_HOOK_INIT(path_getattr, smack_path_getattr),
- 	LSM_HOOK_INIT(inode_xattr_skipcap, smack_inode_xattr_skipcap),
--	LSM_HOOK_INIT(inode_setxattr, smack_inode_setxattr),
-+	LSM_HOOK_INIT(path_setxattr, smack_path_setxattr),
- 	LSM_HOOK_INIT(inode_post_setxattr, smack_inode_post_setxattr),
--	LSM_HOOK_INIT(inode_getxattr, smack_inode_getxattr),
--	LSM_HOOK_INIT(inode_removexattr, smack_inode_removexattr),
-+	LSM_HOOK_INIT(path_getxattr, smack_path_getxattr),
-+	LSM_HOOK_INIT(path_removexattr, smack_path_removexattr),
- 	LSM_HOOK_INIT(inode_set_acl, smack_inode_set_acl),
- 	LSM_HOOK_INIT(inode_get_acl, smack_inode_get_acl),
- 	LSM_HOOK_INIT(inode_remove_acl, smack_inode_remove_acl),
-diff --git a/tools/testing/selftests/bpf/prog_tests/fs_kfuncs.c b/tools/testing/selftests/bpf/prog_tests/fs_kfuncs.c
-index 43a26ec69a8e..5145b1f03cac 100644
---- a/tools/testing/selftests/bpf/prog_tests/fs_kfuncs.c
-+++ b/tools/testing/selftests/bpf/prog_tests/fs_kfuncs.c
-@@ -53,7 +53,7 @@ static void test_get_xattr(const char *name, const char *value, bool allow_acces
- 	if (!ASSERT_GE(fd, 0, "open_file"))
- 		goto out;
- 
--	/* Trigger security_inode_getxattr */
-+	/* Trigger security_path_getxattr */
- 	err = getxattr(testfile, name, v, sizeof(v));
- 
- 	if (allow_access) {
-@@ -148,13 +148,13 @@ static void test_set_remove_xattr(void)
- 
- 	/* First, test not _locked version of the kfuncs with getxattr. */
- 
--	/* Read security.bpf.foo and trigger test_inode_getxattr. This
-+	/* Read security.bpf.foo and trigger test_path_getxattr. This
- 	 * bpf program will set security.bpf.bar to "world".
- 	 */
- 	read_and_validate_foo(skel);
- 	validate_bar_match(skel);
- 
--	/* Read security.bpf.foo and trigger test_inode_getxattr again.
-+	/* Read security.bpf.foo and trigger test_path_getxattr again.
- 	 * This will remove xattr security.bpf.bar.
- 	 */
- 	read_and_validate_foo(skel);
-@@ -167,13 +167,13 @@ static void test_set_remove_xattr(void)
- 
- 	/* Second, test _locked version of the kfuncs, with setxattr */
- 
--	/* Set security.bpf.foo and trigger test_inode_setxattr. This
-+	/* Set security.bpf.foo and trigger test_path_setxattr. This
- 	 * bpf program will set security.bpf.bar to "world".
- 	 */
- 	set_foo(skel);
- 	validate_bar_match(skel);
- 
--	/* Set security.bpf.foo and trigger test_inode_setxattr again.
-+	/* Set security.bpf.foo and trigger test_path_setxattr again.
- 	 * This will remove xattr security.bpf.bar.
- 	 */
- 	set_foo(skel);
-diff --git a/tools/testing/selftests/bpf/progs/test_get_xattr.c b/tools/testing/selftests/bpf/progs/test_get_xattr.c
-index 97361ff10e9f..c6bde355b58f 100644
---- a/tools/testing/selftests/bpf/progs/test_get_xattr.c
-+++ b/tools/testing/selftests/bpf/progs/test_get_xattr.c
-@@ -55,8 +55,8 @@ int BPF_PROG(test_file_open, struct file *f)
- 	return 0;
- }
- 
--SEC("lsm.s/inode_getxattr")
--int BPF_PROG(test_inode_getxattr, const struct path *path, char *name,
-+SEC("lsm.s/path_getxattr")
-+int BPF_PROG(test_path_getxattr, const struct path *path, char *name,
- 	     struct file *file)
- {
- 	struct bpf_dynptr value_ptr;
-diff --git a/tools/testing/selftests/bpf/progs/test_set_remove_xattr.c b/tools/testing/selftests/bpf/progs/test_set_remove_xattr.c
-index 06656ac9a777..d096b00cf3bf 100644
---- a/tools/testing/selftests/bpf/progs/test_set_remove_xattr.c
-+++ b/tools/testing/selftests/bpf/progs/test_set_remove_xattr.c
-@@ -32,8 +32,8 @@ static inline bool name_match_foo(const char *name)
- }
- 
- /* Test bpf_set_dentry_xattr and bpf_remove_dentry_xattr */
--SEC("lsm.s/inode_getxattr")
--int BPF_PROG(test_inode_getxattr, const struct path *path, char *name,
-+SEC("lsm.s/path_getxattr")
-+int BPF_PROG(test_path_getxattr, const struct path *path, char *name,
- 	     struct file *file)
- {
- 	struct bpf_dynptr value_ptr;
-@@ -87,8 +87,8 @@ bool locked_remove_security_selinux_fail;
-  * not-_locked version in the BPF program. The verifier will fix them up
-  * properly.
-  */
--SEC("lsm.s/inode_setxattr")
--int BPF_PROG(test_inode_setxattr, const struct mnt_idmap *idmap,
-+SEC("lsm.s/path_setxattr")
-+int BPF_PROG(test_path_setxattr, const struct mnt_idmap *idmap,
- 	     const struct path *path,
- 	     const char *name, const void *value, size_t size, int flags,
- 	     struct file *file)
-diff --git a/tools/testing/selftests/bpf/progs/verifier_lsm_init_xattr.c b/tools/testing/selftests/bpf/progs/verifier_lsm_init_xattr.c
-index 9b7a15c1862f..bc728fdd0b0f 100644
---- a/tools/testing/selftests/bpf/progs/verifier_lsm_init_xattr.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_lsm_init_xattr.c
-@@ -232,7 +232,7 @@ int BPF_PROG(reject_lsm_cgroup, struct inode *inode, struct inode *dir,
- 	return 0;
- }
- 
--SEC("lsm/inode_setxattr")
-+SEC("lsm/path_setxattr")
- __failure __msg("calling kernel function bpf_inode_init_xattr is not allowed")
- int BPF_PROG(reject_wrong_hook, const struct mnt_idmap *idmap,
- 	     const struct path *path,
-diff --git a/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c b/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c
-index ed2bd2faebf3..f41750c3fc70 100644
---- a/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c
-+++ b/tools/testing/selftests/bpf/progs/verifier_vfs_reject.c
-@@ -46,7 +46,7 @@ int BPF_PROG(get_task_exe_file_kfunc_null)
- 	return 0;
- }
- 
--SEC("lsm.s/inode_getxattr")
-+SEC("lsm.s/path_getxattr")
- __failure __msg("R1 type=fp expected=ptr_, trusted_ptr_, rcu_ptr_")
- int BPF_PROG(get_task_exe_file_kfunc_fp)
- {
+  * sys_landlock_create_ruleset - Create a new ruleset
 -- 
 2.18.0.huawei.25
 
