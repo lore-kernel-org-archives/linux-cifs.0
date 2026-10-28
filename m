@@ -1,55 +1,53 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793179330;
-	b=fmEKMXw7S7wtgndq5svw8oQ/lT2xjjpGJTrosqrIBrvCrH2ss3xTNvzzsBQBg9Zj7OLq
-	 7Haqgi1g2MQfXXURAGE/2qwKIhZ41XbF4uaYP4v6SBBNd3mgKiVjK/EqeFbFdcK/YffER
-	 Nk+ZINYOyZU02ezLP/87jJ8HRlKe7HmygBDUEQTduXdXfCLluCCyqm62KEGkTXBsODGnG
-	 9Ztx1FKGPKINbmKP88N2JIPs2NHPt5Prdj51mrJWd5ReqaqehynTzRlniP4fsM5v5Ju4h
-	 g0J1Mc9yaCn+ex8K+lLQ6T2qw3OSxR6BKH/Wo58mm/CwwN9+5Xt/HntQSsqLKTTlgFA==
+	t=1793182476;
+	b=X095aYM4bYjnKmjgZayctY8rn105jtung6wI8Y4M6XCNBjgqsZlVIV/H0hD4z0AuDz/X
+	 1Vo1kYMEJZ40l1Y2r1Q2TJYWB4TBxTvXAs0NDel5FnbmMkNbZzH+vJCm7x8wEWmRJ/5mZ
+	 eoPSZMxGDYcrxuqjSyLgGRV2mshhsFbdr1t1uwxhuj/mJLwO+tPOIANW8zYCfdyhmVdL0
+	 2M8OIf10JtGIW5WAusnfnmASo7DaiczZy7qL5mzwOlBbc/QIKtfvUqC5XmDTnLXIJgGXv
+	 BJvB7q4AZhfqilYjOoFoifMY+ArxvoYlQdqluRdMFcnGsZJzu7KzhP0cnu0B62mP4Dw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793179330;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=hcY+X85m3AyWpJktejWbKZDNNIF552M/3mrqBFdc59E=;
-	b=V96dnVHxOpE0bx8PwKmtQgPCB+oSPQfR+epy9bb/z8AqKAEJwxIsIC0BflD3FKhD8GGo
-	 pfPtD73QihhqNYEHmqWXd+8TrmK0ltc4RsP7+j/LBUvLgXPOVOFK+BiraQIJJdhhK0TKz
-	 q3kU18q2P19pwTDNTyQCbFBitnhnepgT91GYPt5R72sI+VZrQGYEwoW+f0SyV4ZexRznh
-	 BP0Z2DgL3lBi5NL+KxVktlR3Vd073kiaOkmRxxEHYE+lUmsLSghPLr4XLKDMzVRSAARZH
-	 abLVWc3dUCstlKbtJOowDcyVLwLdummvfYRRDJjCv54qi9iQ0UVl7Af3fASxrWtVzLA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793182476;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To;
+	bh=9P5+D+ui8UEfwSRO75vUxdqjlTpuzN71t1+jJ94dO0c=;
+	b=XyFI2kxgWMN2HmpW1JzupY1lsnNNyyOmXwozFGQLhpDjIrZaBTr7FN/raxa4hk1x/7L5
+	 4pWyKARLPvtE+ZKyR0bKU+JJBlX8UY/cPFE4eS9B3PvuKTPYpuelmYzn5F8zXac5hP0Sf
+	 XiWMWkapLR6rl6/+YmumzFopI6QuPwuEepwEH9OZuYF3K0xlMQnEOzs2PFQWaEp7i02hO
+	 6/dCZ1TdlemzrVouEed5oRWQ8PVavLYmvc/rLXSSvpxXdfDaRl4SUPT3+hA+5qaITLEGJ
+	 Bl+tbAWjM2dmFQyRw7pCl8X6Uhn5KqcHXWSoL1vyxE8KfGRHfxUlr62/ndZq6B8SYtQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OOD0WjcL;
+	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=h2ky93DO;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C96606A31D
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 09:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C74E606A321;
+	Wed, 28 Oct 2026 10:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OOD0WjcL
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8336A1F01828
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 09:22:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793179329;
-	bh=hcY+X85m3AyWpJktejWbKZDNNIF552M/3mrqBFdc59E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=OOD0WjcLZskXVS+6HeYpFM7vAg8qQGwTupaQ4WTW6wfMJ9HC6f79dWKlpV8d1LRxA
-	 vo7ywX+9UJ93f+fL9bTdqI/a1ufmLGXHp5WNykyzoQs3e2tTvIV6UO8raqDGYeO4jB
-	 VJsFEFZRz81rSyhPNHY+o2Y5dfksYJQoK07NNUj4miBZyLWHB/4SpViffbiOfiCgFF
-	 2j7eK4ToakgBew2gfqfZueP+ljkVVkx9owMC8Hianuji884T4HGxLrhbj7LacYggO9
-	 SM8S6T+R7YhOSm35pXJMGKYFJA6k3ZKQCUvPnV4KVGzOhZHH9hOR/STAPWCFaW3mlO
-	 Y0wNb+M8sz6rA==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c49c32650adso45835566b.0
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 02:22:09 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBxcInHeOKVQ4VVfxvn5spKX7zotdVWQOYoROQBc/8Uk/sp1M9pKzXGhoGLfmttebYoDsVJTLpvcyCG6@vger.kernel.org
-X-Gm-Message-State: AFq9FYIJRQfNy5s/r+bZ3qMX3B/R0PfsptaUXLD3hpYbBWI9M//R3GjN
-	NVIgXrOZ5cEubhDBH2hawm00NJ0ddN6qiUEQPS8FQpYag982TrfSRkKVWHk9DI5Jzu/yxC5NZ1G
-	vmime3AA1AaEiBDFjkKjnLLz1MQBD0WI=
-X-Received: by 2002:a17:907:720b:b0:c3f:a2f0:6cb with SMTP id
- a640c23a62f3a-c49bdf2c6fcmr144196766b.18.1793179328235; Wed, 28 Oct 2026
- 02:22:08 -0700 (PDT)
+	dkim=pass (1024-bit key, unprotected) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=h2ky93DO
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0919B1F01828;
+	Wed, 28 Oct 2026 10:14:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1793182475;
+	bh=9P5+D+ui8UEfwSRO75vUxdqjlTpuzN71t1+jJ94dO0c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=h2ky93DOVbEasxVfqadkANQeIlqtKz8No+WvGJF/PboYB94tf+BD620gQ7rZXlY1T
+	 utVP1BXc0lMZrR/qWiNzTZj43yHEeNFZS1mcMDW4Bfa5gASPXk/RdakloVXP+TQ7Hr
+	 HM64noLKEklOazPawG/pN9nnnp1qaygGMZXtVBio=
+Date: Wed, 28 Oct 2026 11:14:31 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: =?utf-8?B?7J207ISx7ZiE?= <ihopenre@gmail.com>, stable@vger.kernel.org,
+	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
+Subject: Re: Backport request: ksmbd and smbdirect fixes merged in 7.4-rc
+Message-ID: <2026102825-episode-rival-d3fa@gregkh>
+References: <CANTrAmxiBn6GT+N5qivdf=xtGg6yFksK5qN_PhpoNdxXDSpikA@mail.gmail.com>
+ <2026102733-sinner-baguette-1d07@gregkh>
+ <CANTrAmys9yD+KB4Nhkqo5Z1R7vJCbyoXpizDeV6kM5YA4nEMiw@mail.gmail.com>
+ <b69a61a6-47b7-40d3-9235-2c34fa0cfc29@samba.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,61 +57,31 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261027152519.138444-1-icb@fastmail.org>
-In-Reply-To: <20261027152519.138444-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 28 Oct 2026 18:21:56 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9szApOXC1NOQ_9HfT2NnJ+Q_MQmSMdsiJicaeg0mQR3g@mail.gmail.com>
-X-Gm-Features: AclHuK-OBkk1Uz8qpQiUILz-tENYGIxIIBdIXXpbtOr2anft58LiTRlzFQxjsXU
-Message-ID: <CAKYAXd9szApOXC1NOQ_9HfT2NnJ+Q_MQmSMdsiJicaeg0mQR3g@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix use-after-free after a failed durable reconnect
-To: Ian Bridges <icb@fastmail.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Steve French <stfrench@microsoft.com>, 
-	Junyi Liu <moss80199@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b69a61a6-47b7-40d3-9235-2c34fa0cfc29@samba.org>
 
-On Wed, Oct 28, 2026 at 12:25=E2=80=AFAM Ian Bridges <icb@fastmail.org> wro=
-te:
->
-> ksmbd_reopen_durable_fd() republishes a detached durable handle in the
-> reconnecting session's file table and takes no reference for that entry.
-> If smb2_open() then fails, cleanup relies on the final ksmbd_fd_put() to
-> remove the volatile id.
->
-> Two reconnects of the same handle can both take a lookup reference before
-> either attaches it. If the one that reopens first then fails and drops
-> its references first, the other request makes the final put through
-> ksmbd_put_durable_fd(). That frees the handle without removing the first
-> session's table entry, so tearing that session down writes to freed
-> memory.
->
->   BUG: KASAN: slab-use-after-free in __close_file_table_ids+0x14d/0x740 [=
-ksmbd]
->   Call Trace:
->    __close_file_table_ids+0x14d/0x740 [ksmbd]
->    ksmbd_destroy_file_table+0x76/0x100 [ksmbd]
->    ksmbd_session_destroy+0xf8/0x480 [ksmbd]
->    ksmbd_dispose_sessions+0x13e/0x200 [ksmbd]
->    ksmbd_conn_sessions_cleanup+0x4c3/0x6d0 [ksmbd]
->   Freed by task 1030:
->    __ksmbd_close_fd+0x97d/0x1000 [ksmbd]
->    smb2_open+0x14eb/0xd9f0 [ksmbd]
->
-> Commit 3515503322f4 ("ksmbd: fix durable reconnect error path file
-> lifetime") handles a final put made by the reconnecting request, but not
-> one made by another holder.
->
-> Remove the volatile id under the file-table lock on this error path,
-> before the references are dropped, as ksmbd_close_fd() does on the
-> request_open path just above. Removal then no longer depends on which
-> holder makes the final put. The stale comment in the reconnect cleanup
-> is updated to match. A successful reconnect is unchanged.
->
-> Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ian Bridges <icb@fastmail.org>
-Applied it to #ksmbd-for-next.
-Thanks!
+On Wed, Oct 28, 2026 at 10:04:22AM +0100, Stefan Metzmacher wrote:
+> Am 27.10.26 um 17:47 schrieb 이성현:
+> > On Tue, Oct 27, 2026 at 11:44PM, Greg KH wrote:
+> > > Why no tag?  What happened to prevent that?
+> > 
+> > For 3) that is on me. When I sent ef85bad39cf2 on 2026-10-15 the
+> > commit it fixes, 25e414db7033, was only in 7.3-rc, so I assumed there
+> > was no released kernel to backport to and left the tag off. 7.3 was
+> > then released with the bug before the fix reached mainline, which is
+> > why I am asking now.
+> > 
+> > For 1) and 2) I am the reporter, not the author, so I cannot say why
+> > the tags were not added. Namjae and Stefan are on Cc and can answer
+> > that. I only noticed the gap when I checked which of the fixes had
+> > reached a stable tree.
+> 
+> Sorry, I thought that a Fixes: tag would be enough to have commits being backported
+> as needed.
+> 
+> I read Documentation/process/stable-kernel-rules.rst again
+> and will also add stable in addition.
+
+great, thanks!
