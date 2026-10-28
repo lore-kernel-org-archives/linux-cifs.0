@@ -1,55 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.47
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793189076;
-	b=LZ3Ocp5TsFumNLAm3SiPAxnzIV8T1dZd4r8fx79hLih5G+az/5wrqXC2/gYziveaAwqv
-	 q4mfnsbCdnLXEe+qVe5BpQR40WiGDwwMVhmxWtKXgsMf2VM/gEuq2sICVirtZKCb4pNJx
-	 oRw2+sBoUvZxoe8celfgCc//duVzdSE8arBBATsHnl56njIrfaw6oWIKLZhdntpGfBquF
-	 M83QYH8TDy+oAFaZcFJUeTcmq9oUZfu+ZdAEPyFallGn6NFgGFq8gCGFwy1Nt2w80Pm5y
-	 yTVPPGTVDFGxj70RNpt6gUzaYDpUhNHpnFkN/gkr8r3b8BWt3j6U1mko+TZZsreUrAw==
+	t=1793189280;
+	b=yHed/TL2dJu6KevCMAiMM/a1WoXfm305F7fPt7oWTfrLoMSQFY7gubTPy5iga1mLAtc3
+	 gOssoXRy8PMyDjHIf7MhcxzmHyvmabiHjwoFAlgGW3QPwfnYcq6WlDhmggZ7imTbtAbQR
+	 evgUYOEYAgY2lonEah3qG+Mk7s6d6dqMAg5oALzJZE1MZo+o8cDKlBLGI7eQjKMFgamPs
+	 fxElHu0VCFPWRwE5BnSf4f0WVl+IJGJzxmUQf+MxJ3dOTCwr/fGDSA0mh3vjyUKeTO48P
+	 vNplBWOHMaRzPCYAdZXFxHURFL0Q/Jleh1fhG8eTJri6zyrbaPyw+u/wQL/qVbaZ7ag==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793189076;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=0E+KQnN4HyFW/arQzwHlg5y2aXSuNq27FTpVp1Rn45c=;
-	b=Yf8a7Ek4CO7sDyS6qz6l925h2pLCcm9+jTxmpFCuJSze2L5BX3VftBWjDrGq1139mZdK
-	 z3yzhr2h5v3/jGPKHkjws7QQlJcRs7k93EAoSTJH+EA7ezVe0tUWiJqcpXUIjBdU9XdrO
-	 qeRSEcOb0yc6NxypF2oy/HCqZzwaRx516W+QZsLJkmCyA3/gBqUJKkJr4xCf8/AgXT1Uk
-	 7e2+nkCTaTO7t/BjXAtVwvl6q/xyXyuV52Fa0kpqF0tfrHoW00Y6mdzl5a/ujQqdAGdPd
-	 ZFAo8Os+QNxK2USMEn9UjWS8AN9vmX4yFcMAayS9P2PdupAcLO9E7GTgeJYXHIFA25Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793189280;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=dBdYya1daOMCSnh2pTh6bN/xWaoccKgg98csDreqiOs=;
+	b=qYpN36CcYvwMEtO2GyV5R3oQ1zV/fivTC2LIsBz0XMaKRsbrKLa/Oz5FOnUzDYweFb3W
+	 x5GOyIVAZLk5El9zSUrcGQJmd+OMaFFF1tkIt0m6J4CGN0+KrVRIRCubx50s2ezW8dNMo
+	 6qF606aFJZQmhYxyUQgicbosQoYB+eXnwszdioXdWv54tJ8cD/vcaSUsXz0e1Gytbv+7U
+	 yVNa0bzwFgRwDmjnCjWgTy/3Lt1GzPEaYQJMlGeaGN1hDIsbccGSS30yfixLe9n/CB2JL
+	 9H3taZrMBPg2czf74UdwIqT0a3Exc1GgY55ZOYRo5u7WtTqFLYczoc4AqSfNMshSgkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CvkRfbjU;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=chenxiaosong.com;
+	spf=pass smtp.mailfrom=chenxiaosong.com;
+	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=MetWiHXr;
+	arc=none smtp.remote-ip=91.218.175.47
+Received: from mta0.migadu.com (out-47.mta0.migadu.com [91.218.175.47])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731BB606A31D
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 12:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CA8606A31A
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 12:07:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 27CA8606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CvkRfbjU
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EB5B1F031E0
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 12:04:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793189075;
-	bh=0E+KQnN4HyFW/arQzwHlg5y2aXSuNq27FTpVp1Rn45c=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=CvkRfbjU3SfRWQOtdPPV5jGudkOU78KUeR7AZIZZdUKNky5faWGpDQE7zPyS3ie4/
-	 tuN0r5ubSRJwtKU1CTZgHkr/UcH+eHmhe5+DqEfyMpCbGyVymvib/aFoUeKEsIXEAJ
-	 iHzsZb7aC/CuxirlDeT1XoFVgFp7dwg/7jNZt6GRG324LzTTxRXoIXbLq7Cjnf5D7H
-	 DBN44oGkcsFE5seuJYUCoGFlkY32wDVd/iHMtSKxYty9kdSWK1Xw6dxJjhEAVr1Q7A
-	 wH97JyiXGrJWLjeugvpanIvxvTH/q2Q5uvLNnONgpCYAHXwMn1QJ6w0y8ljyhJw8c7
-	 VAkuNVnbCPy9g==
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-c37b612635bso109427166b.3
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 05:04:35 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBx8dbWYHua1Dp500mKVv1fazq7tDQM0Vu+X1Y8H6jlHNRwYLuFnaXVFlsVkf9xdertnKwbI9NwBwrr4@vger.kernel.org
-X-Gm-Message-State: AFq9FYItkPHRneUkXkJY3NhKRjjrIoRX4jpZ8dvMgkCVjjlS0JOyi6In
-	9B+d0PoIot3bICIz1Vm29/da/jg4Jadb8ikHP7suLE///L9lSRzI9oYd7WlXT7Hti/z+Mtf6gbs
-	fmCVz9EJeQgD98cIjbbBT8VeQwY+xICU=
-X-Received: by 2002:a17:907:cb88:b0:c40:80eb:c544 with SMTP id
- a640c23a62f3a-c49bdda7123mr179996766b.4.1793189073972; Wed, 28 Oct 2026
- 05:04:33 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=MetWiHXr
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=VoV7voGegWJd9VxzIwWGHAYUKdGI1CtLDkX7rPTqAqU=;
+ c=simple/simple; d=chenxiaosong.com;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793189275; v=1; x=1793794075;
+ b=MetWiHXrB+aCMwJdGMHiqzTFx3KhLKQ7oyjFbqEi407FDNRPUEbhE3QcerhC6Blb9wRBHAqN
+ +135WLpWMElOAj7fM7fpR3MmaQ2ATDOx6U3vWl7kA4KFt21SdCQC5CxT7cQgIJEq9uaPaC4y/ih
+ xVZQONtgayEMAMHKYEmKL+PJlz8WdNi4sNXCIJTYx/JBUF10LZ01/dAGp+C+2qT7TaZaF5NHtym
+ pKoRalHj7cbg5yN1I0q1d8Xhtgif4NfbPcZEUMKEv7nCWoLIgfuildzoThOLa/wAucHT3RT68OJ
+ qvZl9Cm5xz/qsCaubC1xHvaevxsHECUC1o3a0VaBzAi0g==
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id d81dfed7e1c9c140;
+	Wed, 28 Oct 2026 12:07:55 +0000
+X-Mizu-Trace-ID: d81dfed7e1c9c140
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <44fc7448-e1bd-4e48-a688-42aa8d30b3c4@chenxiaosong.com>
+Date: Wed, 28 Oct 2026 20:07:45 +0800
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,61 +60,29 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
-In-Reply-To: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 28 Oct 2026 21:04:22 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9pbMrBHmSH7SSj3GkGqtPJkFTek0+MFcpyELReTE_qUA@mail.gmail.com>
-X-Gm-Features: AclHuK8N0PsGjJsaJNMA5vL3XjNKHvSiDgzmxoiSwLy1P98IH155__Zp5wQQG2M
-Message-ID: <CAKYAXd9pbMrBHmSH7SSj3GkGqtPJkFTek0+MFcpyELReTE_qUA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 00/13] smb/server: change notify support
-To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org, 
-	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Namjae Jeon <linkinjeon@kernel.org>,
+ ChenXiaoSong <chenxiaosong@kylinos.cn>
+Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org
+References: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
+ <CAKYAXd9pbMrBHmSH7SSj3GkGqtPJkFTek0+MFcpyELReTE_qUA@mail.gmail.com>
+Content-Language: en-US
+From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+In-Reply-To: <CAKYAXd9pbMrBHmSH7SSj3GkGqtPJkFTek0+MFcpyELReTE_qUA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Oct 25, 2026 at 5:35=E2=80=AFPM ChenXiaoSong
-<chenxiaosong@chenxiaosong.com> wrote:
->
-> From: ChenXiaoSong <chenxiaosong@kylinos.cn>
->
-> v1->v2:
-> - Patch #04 #07: fix LAST_WRITE and LAST_ACCESS notify event mappings.
-> - Patch #04 #08 #09 #11 #12: limit notify event memory per open.
-> - Add patch #13: support change notify for named streams.
->
-> v1: https://lore.kernel.org/linux-cifs/20260926090518.78547-1-chenxiaoson=
-g@chenxiaosong.com/
->
-> TODO: The KUnit test cases are still being modified.
->
-> To test this feature, the following patches need to be applied to cifs-ut=
-ils and kernel smb client:
->   - cifs-utils: https://chenxiaosong.com/lkml/cifs-utils-parse-notify
->   - kernel smb client: https://chenxiaosong.com/lkml/cifs-improve-notify
->
-> The complete kernel client and server patches are also available at the f=
-ollowing link:
-> https://chenxiaosong.com/repo/linux/ksmbd-change-notify
->
-> ChenXiaoSong (13):
->   smb/server: move change notify handling into notify.c
->   smb/server: add more validation for change notify requests
->   smb/server: add debug type for change notify
->   smb/server: support non-recursive directory change watches
->   smb/server: support recursive directory change watches
->   smb/server: keep notify watches on file handles
->   smb/server: save simple notify events
->   smb/server: save old names for rename notify events
->   smb/server: match rename notify events
->   smb/server: encode notify events
->   smb/server: send notify events to the client
->   smb/server: break directory leases before sending notify events
->   smb/server: support change notify for named streams
-Can you check the review comments from sashiko ?
+I am already modifying it.
 
-https://sashiko.dev/#/patchset/20261025083450.212604-1-chenxiaosong%40chenx=
-iaosong.com
+On 10/28/26 20:04, Namjae Jeon wrote:
+> Can you check the review comments from sashiko ?
+> 
+> https://sashiko.dev/#/patchset/20261025083450.212604-1- 
+> chenxiaosong%40chenxiaosong.com
 
-Thanks.
+-- 
+ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Chinese Homepage: https://chenxiaosong.com
+English Homepage: https://chenxiaosong.com/en
+
