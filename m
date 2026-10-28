@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793179310;
-	b=1XjnhnWGBj352OHpoZ8OOGC9crWzPYbAL9r1R5gScO2gpTzN1wBCti3GOwVNt8/VFroh
-	 sb0A2ODtSzDQLPua9mWC39+n7BpryU08gEA54H4inWnaEGSLLCthmr2Jx3BGDf7gNPlNW
-	 qejsLgHpDbdc9kO8aac7pmS9bytZqiNxRL3OHYlpNKomZWUECTpO9LL2NwKGgcQT1h8Fi
-	 1J+JGYhy2yvMnuSZEhAGmmQysPKHSag4kx4a54+FH6ywCGuTwUFYAHXrheRrV8r6BUZ5g
-	 9F5FnGobGioOVMljnNi6iIvrVOfBQrSkA3363C65EeL+kiqLBFMjliV2PvWNyco0Yig==
+	t=1793179330;
+	b=fmEKMXw7S7wtgndq5svw8oQ/lT2xjjpGJTrosqrIBrvCrH2ss3xTNvzzsBQBg9Zj7OLq
+	 7Haqgi1g2MQfXXURAGE/2qwKIhZ41XbF4uaYP4v6SBBNd3mgKiVjK/EqeFbFdcK/YffER
+	 Nk+ZINYOyZU02ezLP/87jJ8HRlKe7HmygBDUEQTduXdXfCLluCCyqm62KEGkTXBsODGnG
+	 9Ztx1FKGPKINbmKP88N2JIPs2NHPt5Prdj51mrJWd5ReqaqehynTzRlniP4fsM5v5Ju4h
+	 g0J1Mc9yaCn+ex8K+lLQ6T2qw3OSxR6BKH/Wo58mm/CwwN9+5Xt/HntQSsqLKTTlgFA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793179310;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793179330;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=o0fsosZOYp7Iltbse45HXED8tfR0ddHeSh5Nzos0Djo=;
-	b=KQmSX2K1NxEBWdhujocrkliGFyjnBoE92GrOPBcwupXVi+fDCJf1aMFBYT/HtkkMLoIs
-	 hOxWg1XrKX3L0AtsuX55krV7xBgKUzb5PlpYZ2zOudALNc9RcjKOL1+40YalS4FAibLJ5
-	 NeZJ1U3dWTL9zOuySnufQDZYRHlTtExfiQi82VMs2e0KzsOD9ROcNINVTlYRUqznZ/tqN
-	 Qh/OdRLZ2CzCTcHfaglL+OGah2hG74uipMb6Fam4t92zXKGmEugTF42Us/sMYmxV5Xgp3
-	 g+tKn2saTL4Y3P+fnMSavHxtdYenxusS38osQo3mC4LIjL47Ea3IlicAh/I2yGcLM/w==
+	bh=hcY+X85m3AyWpJktejWbKZDNNIF552M/3mrqBFdc59E=;
+	b=V96dnVHxOpE0bx8PwKmtQgPCB+oSPQfR+epy9bb/z8AqKAEJwxIsIC0BflD3FKhD8GGo
+	 pfPtD73QihhqNYEHmqWXd+8TrmK0ltc4RsP7+j/LBUvLgXPOVOFK+BiraQIJJdhhK0TKz
+	 q3kU18q2P19pwTDNTyQCbFBitnhnepgT91GYPt5R72sI+VZrQGYEwoW+f0SyV4ZexRznh
+	 BP0Z2DgL3lBi5NL+KxVktlR3Vd073kiaOkmRxxEHYE+lUmsLSghPLr4XLKDMzVRSAARZH
+	 abLVWc3dUCstlKbtJOowDcyVLwLdummvfYRRDJjCv54qi9iQ0UVl7Af3fASxrWtVzLA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AMpQNTls;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OOD0WjcL;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FE8606A327
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 09:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C96606A31D
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 09:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AMpQNTls
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 142F01F031E3
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 09:21:49 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OOD0WjcL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8336A1F01828
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 09:22:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793179309;
-	bh=o0fsosZOYp7Iltbse45HXED8tfR0ddHeSh5Nzos0Djo=;
+	s=k20260515; t=1793179329;
+	bh=hcY+X85m3AyWpJktejWbKZDNNIF552M/3mrqBFdc59E=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=AMpQNTlsTq80HIOtpUOXTa0Euc7qWviHRsrqMz4YhJmCw+N+QgsYsclBq+Cg/oYz8
-	 aBStRRUNeRJRl/K1QmlPKrNZhNfaoqGIZol6TYp/KIaFa7ztdflULOvarlhLW+I3jf
-	 OUtKZOkbzVYUpEy+hMi0dNyAeBkHnHTCaUpyDyKwJD3Q1Z0JTNnm3rCITGICZVkDoC
-	 vfB8fyDFr8MWho5VUG6k3jXj1wsytBs8ONDQSghinoZ/4m1SLXC20ienV7Xl+3UNS3
-	 LJVmTlcahChCNSCmWDDDkuOuQXWUqtm4sSS/vStfRni0Dd5SPJlLpbZsFSnjMTQe8+
-	 rQ60exy7zRHAA==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c468bd799ecso89518166b.1
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 02:21:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBx3SX2W2CNFQ8X/4Vg43jo+GWAQLCzyXL8HRYpshpoSb/F+3AXwgWIRYTou1x9ZDeylULFyZ7BIIOJU@vger.kernel.org
-X-Gm-Message-State: AFq9FYJ0NqZR5/qhFV2u8Uun9o7jzMbT7K96aMEabNQbWG/Hse3fSxiI
-	T8fUBlMpldVpprQFp6yAZN3OHObf835BjGLG9nFAgWXdoG+kWPG2IPY0uJICOEFCczGw5Ior4I3
-	+z5Qt1Bk9yKL1MGDN7V/+mchdmIKlhMk=
-X-Received: by 2002:a17:907:7211:b0:c2e:4e08:19ab with SMTP id
- a640c23a62f3a-c49bdf37143mr126307266b.16.1793179307707; Wed, 28 Oct 2026
- 02:21:47 -0700 (PDT)
+	b=OOD0WjcLZskXVS+6HeYpFM7vAg8qQGwTupaQ4WTW6wfMJ9HC6f79dWKlpV8d1LRxA
+	 vo7ywX+9UJ93f+fL9bTdqI/a1ufmLGXHp5WNykyzoQs3e2tTvIV6UO8raqDGYeO4jB
+	 VJsFEFZRz81rSyhPNHY+o2Y5dfksYJQoK07NNUj4miBZyLWHB/4SpViffbiOfiCgFF
+	 2j7eK4ToakgBew2gfqfZueP+ljkVVkx9owMC8Hianuji884T4HGxLrhbj7LacYggO9
+	 SM8S6T+R7YhOSm35pXJMGKYFJA6k3ZKQCUvPnV4KVGzOhZHH9hOR/STAPWCFaW3mlO
+	 Y0wNb+M8sz6rA==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c49c32650adso45835566b.0
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 02:22:09 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBxcInHeOKVQ4VVfxvn5spKX7zotdVWQOYoROQBc/8Uk/sp1M9pKzXGhoGLfmttebYoDsVJTLpvcyCG6@vger.kernel.org
+X-Gm-Message-State: AFq9FYIJRQfNy5s/r+bZ3qMX3B/R0PfsptaUXLD3hpYbBWI9M//R3GjN
+	NVIgXrOZ5cEubhDBH2hawm00NJ0ddN6qiUEQPS8FQpYag982TrfSRkKVWHk9DI5Jzu/yxC5NZ1G
+	vmime3AA1AaEiBDFjkKjnLLz1MQBD0WI=
+X-Received: by 2002:a17:907:720b:b0:c3f:a2f0:6cb with SMTP id
+ a640c23a62f3a-c49bdf2c6fcmr144196766b.18.1793179328235; Wed, 28 Oct 2026
+ 02:22:08 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,49 +59,60 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261027152135.138259-1-icb@fastmail.org>
-In-Reply-To: <20261027152135.138259-1-icb@fastmail.org>
+References: <20261027152519.138444-1-icb@fastmail.org>
+In-Reply-To: <20261027152519.138444-1-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 28 Oct 2026 18:21:35 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8nvApw4QPvHFT_M3V8BMS07bH20MFQmi=u+H-qmH_hGQ@mail.gmail.com>
-X-Gm-Features: AclHuK97M9BYzX6VPIeWldyUJ41r1miiCZlAMSB4h7QWCrhli_kFhVXJLOrMVoc
-Message-ID: <CAKYAXd8nvApw4QPvHFT_M3V8BMS07bH20MFQmi=u+H-qmH_hGQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: fix session reference leak on compounded SESSION_SETUP
+Date: Wed, 28 Oct 2026 18:21:56 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9szApOXC1NOQ_9HfT2NnJ+Q_MQmSMdsiJicaeg0mQR3g@mail.gmail.com>
+X-Gm-Features: AclHuK-OBkk1Uz8qpQiUILz-tENYGIxIIBdIXXpbtOr2anft58LiTRlzFQxjsXU
+Message-ID: <CAKYAXd9szApOXC1NOQ_9HfT2NnJ+Q_MQmSMdsiJicaeg0mQR3g@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix use-after-free after a failed durable reconnect
 To: Ian Bridges <icb@fastmail.org>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Steve French <stfrench@microsoft.com>, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
+	Junyi Liu <moss80199@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 28, 2026 at 12:21=E2=80=AFAM Ian Bridges <icb@fastmail.org> wro=
+On Wed, Oct 28, 2026 at 12:25=E2=80=AFAM Ian Bridges <icb@fastmail.org> wro=
 te:
 >
-> A compound request can place SESSION_SETUP after another command. That
-> earlier command leaves a reference to its session in work->sess.
-> smb2_sess_setup() then overwrites work->sess with the session it looks up
-> or creates, and the dispatcher later puts work->sess only once. The
-> inherited reference is never dropped. That leaks the session, together
-> with its setup connection and socket, and every repeat of the compound
-> leaks another.
+> ksmbd_reopen_durable_fd() republishes a detached durable handle in the
+> reconnecting session's file table and takes no reference for that entry.
+> If smb2_open() then fails, cleanup relies on the final ksmbd_fd_put() to
+> remove the volatile id.
 >
->   unreferenced object (size 512):
->     __kmalloc_cache_noprof+0x32c/0x3a0
->     ksmbd_smb2_session_create+0xf6/0x9c0 [ksmbd]
->     smb2_sess_setup+0xda4/0x6280 [ksmbd]
->     handle_ksmbd_work+0x88c/0x1cb0 [ksmbd]
+> Two reconnects of the same handle can both take a lookup reference before
+> either attaches it. If the one that reopens first then fails and drops
+> its references first, the other request makes the final put through
+> ksmbd_put_durable_fd(). That frees the handle without removing the first
+> session's table entry, so tearing that session down writes to freed
+> memory.
 >
-> Save the inherited session on entry. After the request has been
-> processed, release it once, but only when smb2_sess_setup() has replaced
-> work->sess with its own session or cleared it. Do this after
-> ksmbd_conn_unlock() so the put does not run under srv_mutex. An error pat=
-h
-> may instead leave the inherited session in work->sess. Keep it there, so
-> the dispatcher still puts it and the error response is still signed or
-> encrypted with it as before.
+>   BUG: KASAN: slab-use-after-free in __close_file_table_ids+0x14d/0x740 [=
+ksmbd]
+>   Call Trace:
+>    __close_file_table_ids+0x14d/0x740 [ksmbd]
+>    ksmbd_destroy_file_table+0x76/0x100 [ksmbd]
+>    ksmbd_session_destroy+0xf8/0x480 [ksmbd]
+>    ksmbd_dispose_sessions+0x13e/0x200 [ksmbd]
+>    ksmbd_conn_sessions_cleanup+0x4c3/0x6d0 [ksmbd]
+>   Freed by task 1030:
+>    __ksmbd_close_fd+0x97d/0x1000 [ksmbd]
+>    smb2_open+0x14eb/0xd9f0 [ksmbd]
 >
-> Fixes: 7aa8804c0b67 ("ksmbd: fix user-after-free from session log off")
+> Commit 3515503322f4 ("ksmbd: fix durable reconnect error path file
+> lifetime") handles a final put made by the reconnecting request, but not
+> one made by another holder.
+>
+> Remove the volatile id under the file-table lock on this error path,
+> before the references are dropped, as ksmbd_close_fd() does on the
+> request_open path just above. Removal then no longer depends on which
+> holder makes the final put. The stale comment in the reconnect cleanup
+> is updated to match. A successful reconnect is unchanged.
+>
+> Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Ian Bridges <icb@fastmail.org>
 Applied it to #ksmbd-for-next.
