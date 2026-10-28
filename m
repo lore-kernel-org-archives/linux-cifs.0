@@ -1,56 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.47
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793189280;
-	b=yHed/TL2dJu6KevCMAiMM/a1WoXfm305F7fPt7oWTfrLoMSQFY7gubTPy5iga1mLAtc3
-	 gOssoXRy8PMyDjHIf7MhcxzmHyvmabiHjwoFAlgGW3QPwfnYcq6WlDhmggZ7imTbtAbQR
-	 evgUYOEYAgY2lonEah3qG+Mk7s6d6dqMAg5oALzJZE1MZo+o8cDKlBLGI7eQjKMFgamPs
-	 fxElHu0VCFPWRwE5BnSf4f0WVl+IJGJzxmUQf+MxJ3dOTCwr/fGDSA0mh3vjyUKeTO48P
-	 vNplBWOHMaRzPCYAdZXFxHURFL0Q/Jleh1fhG8eTJri6zyrbaPyw+u/wQL/qVbaZ7ag==
+	t=1793189336;
+	b=H/9QqCNzcPB2erUMriwc5TqZufDRAo4wi13Cr8i5PLGuC+6A9StLeOpmRzdTuqfvoV9h
+	 bM77f6mvLY3SlzrDszCnPPlRYQsd3qMGdz+nD8nU0fnXGvnc4zCoyg7EmiLM7IHxDXnfY
+	 iuulcMDDVFvyBb1hJC4sDu90FCC5r4SVYnsecYnvnp7V8+0xTIHt3F2kMJeWqOafwych2
+	 9eS00OdEWYvYT+HauIVwF+4ADs7VHuVDkFCSKwbutE240TixZAuRvW8L7BRLCaQeGRR44
+	 THzSA7CG9UgbNBPW2MLY5t0B0L9AFh/Ne9dsWvgDHNMikGQ92Jixn4i7ji2wPTs5sZg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793189280;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=dBdYya1daOMCSnh2pTh6bN/xWaoccKgg98csDreqiOs=;
-	b=qYpN36CcYvwMEtO2GyV5R3oQ1zV/fivTC2LIsBz0XMaKRsbrKLa/Oz5FOnUzDYweFb3W
-	 x5GOyIVAZLk5El9zSUrcGQJmd+OMaFFF1tkIt0m6J4CGN0+KrVRIRCubx50s2ezW8dNMo
-	 6qF606aFJZQmhYxyUQgicbosQoYB+eXnwszdioXdWv54tJ8cD/vcaSUsXz0e1Gytbv+7U
-	 yVNa0bzwFgRwDmjnCjWgTy/3Lt1GzPEaYQJMlGeaGN1hDIsbccGSS30yfixLe9n/CB2JL
-	 9H3taZrMBPg2czf74UdwIqT0a3Exc1GgY55ZOYRo5u7WtTqFLYczoc4AqSfNMshSgkw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793189336;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=vDvbLXpvaLACtTQr5IIDsIwg9uV80hfj21Qtt2pIQwc=;
+	b=iGhBFEQDuhh4Ur3g2xz9z5gSSegn9Y5DXnwHyAJO1Veo5lXGbG51LbF4uqNaHfIAI5mN
+	 zQ0CHEE+yLCx5o5s9Br+bVYaHN42zPFDvD0uV0p+Ur6/KnatLxv3FBjnt2/rmKmwX9w1c
+	 P5vNmtQUxuDroecuEhFYedmipA7pHqmFgrhhoukPPR4jssDecRE5SHN1F11y/FjaKTQv6
+	 h4VLBrl3Zqkl1jv5rNo7+u+4R0jvKGS7bJuITqhj0L63ywaBmZhYU3b2KXz2fKhNfy+1P
+	 Hrkm1W41GILocAeWfMbJXce3oV3s8Jej3YKPe6baDN/TLH8caagsBcZoAHt7FWFduuA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chenxiaosong.com;
-	spf=pass smtp.mailfrom=chenxiaosong.com;
-	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=MetWiHXr;
-	arc=none smtp.remote-ip=91.218.175.47
-Received: from mta0.migadu.com (out-47.mta0.migadu.com [91.218.175.47])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jza8fDF3;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27CA8606A31A
-	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 12:07:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 27CA8606A31A
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F6A606A31A
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 12:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=MetWiHXr
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=VoV7voGegWJd9VxzIwWGHAYUKdGI1CtLDkX7rPTqAqU=;
- c=simple/simple; d=chenxiaosong.com;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793189275; v=1; x=1793794075;
- b=MetWiHXrB+aCMwJdGMHiqzTFx3KhLKQ7oyjFbqEi407FDNRPUEbhE3QcerhC6Blb9wRBHAqN
- +135WLpWMElOAj7fM7fpR3MmaQ2ATDOx6U3vWl7kA4KFt21SdCQC5CxT7cQgIJEq9uaPaC4y/ih
- xVZQONtgayEMAMHKYEmKL+PJlz8WdNi4sNXCIJTYx/JBUF10LZ01/dAGp+C+2qT7TaZaF5NHtym
- pKoRalHj7cbg5yN1I0q1d8Xhtgif4NfbPcZEUMKEv7nCWoLIgfuildzoThOLa/wAucHT3RT68OJ
- qvZl9Cm5xz/qsCaubC1xHvaevxsHECUC1o3a0VaBzAi0g==
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id d81dfed7e1c9c140;
-	Wed, 28 Oct 2026 12:07:55 +0000
-X-Mizu-Trace-ID: d81dfed7e1c9c140
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <44fc7448-e1bd-4e48-a688-42aa8d30b3c4@chenxiaosong.com>
-Date: Wed, 28 Oct 2026 20:07:45 +0800
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jza8fDF3
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A23001F01825
+	for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 12:08:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793189335;
+	bh=vDvbLXpvaLACtTQr5IIDsIwg9uV80hfj21Qtt2pIQwc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=jza8fDF3nHzhfGbFhEZHdqrqCYZQNkA6+5UmfX9CZkobimlD/sBdocCM95ktnoFBh
+	 EdO53hyGM1OEZCEJ3fshj4GpFnxsrBwiHzF9MidMyerKHPKqcnVSytOYxlQPz22TSR
+	 o7CGcxAmpv6W1mQ4AaWWkXY5bnrcCyxtMcLcZ/Tx8rkjSFiZHFNQu/26uh5rvMg/6C
+	 uGf4MDJd/9JLwmTNWNBwKCX9SBTBRby/T82vJjslHqGTnRAPDhzIaWXTudYxlIIMnu
+	 mk2xQlPX8ySkFcq0E3ucjBogE0JjDZ4j+k5K/u+9F4dFy72xA/LkkrMWPd0d8HbjE6
+	 jYH312oFP1XRw==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c3fd91337baso135135466b.3
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 05:08:55 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvBwzVEJolTX2P2+v2PlDwRCvsezcne4oiNt8z4z8edvnXvawZeoBbotL8ViJTPmtYbCT1PNJjCyZNTaT@vger.kernel.org
+X-Gm-Message-State: AFq9FYJwxDG28IwrRkPIbVRvmgkgBQPdlW577TJpX7N+eEuRXHR57pgY
+	2QkwmER/jjMRiDDivKKQpYXARSdmhLwuUEGJrGwe8fRWj9QCgY1MCLlUkPbzH4mASPsezvuOkH7
+	hdW1U5NdfVcFhgH/UgrX1NkqJUktEwJg=
+X-Received: by 2002:a17:906:4fcb:b0:c3f:98d4:dfe2 with SMTP id
+ a640c23a62f3a-c49bdf00daamr206458366b.18.1793189334379; Wed, 28 Oct 2026
+ 05:08:54 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -60,29 +59,38 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/13] smb/server: change notify support
-To: Namjae Jeon <linkinjeon@kernel.org>,
- ChenXiaoSong <chenxiaosong@kylinos.cn>
-Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org
-References: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com>
- <CAKYAXd9pbMrBHmSH7SSj3GkGqtPJkFTek0+MFcpyELReTE_qUA@mail.gmail.com>
-Content-Language: en-US
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <CAKYAXd9pbMrBHmSH7SSj3GkGqtPJkFTek0+MFcpyELReTE_qUA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20261025083450.212604-1-chenxiaosong@chenxiaosong.com> <20261025083450.212604-5-chenxiaosong@chenxiaosong.com>
+In-Reply-To: <20261025083450.212604-5-chenxiaosong@chenxiaosong.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Wed, 28 Oct 2026 21:08:41 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_ybS59mdiMBt4xAJb2gz-wAaoPtk7J5tu=mJPf9CZQqQ@mail.gmail.com>
+X-Gm-Features: AclHuK_mHDz9jdvujfEpsidaRiUNE5gZHLcCwzxlRAA3xoD4EAAmkpJB6dr-6gQ
+Message-ID: <CAKYAXd_ybS59mdiMBt4xAJb2gz-wAaoPtk7J5tu=mJPf9CZQqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 04/13] smb/server: support non-recursive directory
+ change watches
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: tom@talpey.com, senozhatsky@chromium.org, linux-cifs@vger.kernel.org, 
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
 
-I am already modifying it.
-
-On 10/28/26 20:04, Namjae Jeon wrote:
-> Can you check the review comments from sashiko ?
-> 
-> https://sashiko.dev/#/patchset/20261025083450.212604-1- 
-> chenxiaosong%40chenxiaosong.com
-
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+> @@ -20,6 +21,40 @@
+>  #include "vfs_cache.h"
+>  #include "mgmt/user_session.h"
+>
+> +static const struct {
+> +       u32 notify_mask;
+> +       u32 fsnotify_mask;
+> +} ksmbd_notify_mapping[] = {
+> +       { FILE_NOTIFY_CHANGE_FILE_NAME,
+> +         KSMBD_NOTIFY_NAME_EVENT_MASK },
+> +       { FILE_NOTIFY_CHANGE_DIR_NAME,
+> +         KSMBD_NOTIFY_NAME_EVENT_MASK },
+> +       { FILE_NOTIFY_CHANGE_ATTRIBUTES,
+> +         FS_ATTRIB | FS_MOVED_FROM | FS_MOVED_TO | FS_MODIFY },
+> +       { FILE_NOTIFY_CHANGE_SIZE, FS_MODIFY },
+> +       { FILE_NOTIFY_CHANGE_LAST_WRITE, FS_ATTRIB | FS_MODIFY },
+> +       { FILE_NOTIFY_CHANGE_LAST_ACCESS, FS_ATTRIB | FS_ACCESS },
+> +       { FILE_NOTIFY_CHANGE_EA, FS_ATTRIB },
+> +       { FILE_NOTIFY_CHANGE_SECURITY, FS_ATTRIB },
+> +};
+FILE_NOTIFY_CHANGE_CREATION is missing here ?
