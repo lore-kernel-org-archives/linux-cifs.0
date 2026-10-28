@@ -1,67 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=173.212.254.19
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=144.76.82.148
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793168416;
-	b=rxotEUM5jal7Q/iCvrq7euEaRGfCDqSf2BOfZZvp0v3ev0cIYxS602/zY7o1sPp3nZqa
-	 RdHtWPqFm7wsnYfXoTlhRon3WUweMgeYEoIC1H8/N/2KmIr8YaKEx0shTIL4QnwV2vgWw
-	 jqpEEKBzfgmJ/Y1pGU08HU7P7IRWtAJBAdhQdydnT1hruvnznGswRohxqMpQMmt6lyEMB
-	 NSxBlLoX19VDLLYe4JopQpl3WqYd4gus6eywP+5uF3eXDJPCyhxhiECTaMogS1Dpq2C12
-	 zBgBMRckc2Bit0BLNsXm7Lv1pmOUa5hlnAk31qSjrqAEPtYIs205rhwC673va5m6iDQ==
+	t=1793178280;
+	b=BzUAL/UQn9kUubaoGoq9O7WCr1lm4FceIxYyxsZCmaIPwoij0sXtgt/+mgVbD2agXoLD
+	 /5xYwtH/0l+2WtdwHqvkYSsvxkSc5Hc8jPcwwjPeobqvhLe9KOoET2k1pVm9dnRoOAZFl
+	 DHpf+xzwdkl/FjAZKrywv7x/PIccViqs1K6NzLDdMMUA8+Bn2v5vHNh+cIIcFDE2jcanm
+	 V8b8PLOQhbnJiLxcPKW70pPD1FujPhV3M5HxpSmZT30UzbNNBsZ6jT62ny1vfwOma+Xnq
+	 fq8fxUko2La9fhM196QQ8HsmN1bgY92974+hLd0Ge5LQkQR7iQkTMXw6qQhb4A6VuHQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793168416;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:In-Reply-To:
-	 References:From:Subject:To:Cc:Date;
-	bh=m4IQ4Pm4PXxCZTpkciy1gGIzoMDodk3bBPfcnrQxOPo=;
-	b=bGRRNhc5cfkhPUE4XiQJlZPqCcyadTfMQW1WTQ2+E1BDmkimH2Exgx3/LG+aU1xfyBzI
-	 qzrqjjvIeKQ6Rn8YOPX3mgU4WIDjpGTDcsORqkdnerH6tOZSyRnrzkYq6NiEuUuth4A3u
-	 HYGLPoUhcyiub1wsarHLkJBSeNZJO3m13NQwAdjs+hSRbBnKXNH8ElzGEsudmpwLKa8i5
-	 cD1s6V5RdqRVu6RNkA7eSmF3ko6I6PWUM+jeoDr/GEWrX8ogQBuTXpIdnC6T380WCaWlh
-	 zavtbFQU+VJ5t6aOQe25/MczSfyGj12pfdF0OvEl3g/VZTV7dC431t9kUqLVFX1KR2Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793178280;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=QgxSQlglSulgYW+zjA2RlQDuafTI1/6f0G7Szlj2ZsU=;
+	b=Idw5sTsMl76z+xntcx1KLN93/gMv0lt9us/b3vXrLNl18Pvk78MsPCj7MHQhFm/ChY3W
+	 W4xPGNREolYtK/Exoy1EQAG8Na6HKyTNwoDhcGaqaLQD7dVxIOz07cTPozVs6mhanHDxF
+	 RHV6B8H8IFUH1kJyEx9kwAbnFZ7jOuZ48BXBnsqBJpGnD9Try1HycpbEDzb1b4sp7o2Om
+	 +UzJR9mZtVGcSSmmFtrqPeCtq4Y1J1UkoIZBrUkgC5cM9trSMhWHLEZE89f1AE5CFJiwj
+	 Fg3OlHRnf1j7HVcuvW5DzTRBvG9FByEQB/3BDHfH2zdE84dsa9hvo/QIXWwKw1HdfiQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=tuxist.de;
-	spf=fail smtp.mailfrom=tuxist.de;
-	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b="Fp/YcHl7";
-	arc=none smtp.remote-ip=173.212.254.19
-Received: from groupware.tuxist.de (groupware.tuxist.de [173.212.254.19])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dmarc=pass header.from=samba.org;
+	spf=pass smtp.mailfrom=samba.org;
+	dkim=pass header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=Lp45J+J0;
+	arc=none smtp.remote-ip=144.76.82.148
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.3 with cipher TLS_CHACHA20_POLY1305_SHA256 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B78606A322;
-	Wed, 28 Oct 2026 06:20:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 00B78606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tuxist.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=tuxist.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0B8606A31A;
+	Wed, 28 Oct 2026 09:04:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF0B8606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=Fp/YcHl7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tuxist.de; s=201705;
-	t=1793168414; bh=2ps7K+buL0YkhooKtwBQxLEjTj8Kr5NqdgO0RcIHkik=;
-	h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-	b=Fp/YcHl7+vJ5GksRMAHUYLVdIVfHvO932pv+MFW82l8LPmPI6VVs6ij4wkZYpTp4h
-	 NUM7ddk5U1xhZx3aXTTl5PHRy/0Ii5Txmhf1csRX6oEay4MpUEWYVmgC9KehBxD17d
-	 XAChyQZRhhc1j4P7cT+qFR38eyVFmFhlyY1pXv1zBp+9We2XMBi64MMCjYH+jAVfdj
-	 L4FJGOlrAWCviso6Q8533TDYeAzWwNZ/dbwY5xnaUwZZ0ij9qKljpW6UlUecsDJ2on
-	 IFr7OgRgpMZtciUxYMhTNK8WtM3QdY2y2zvC+5NadldZz9gRrSDKdcP02Yx70tJ7YY
-	 xWnp4fS22s0Jw==
-Received: from [10.1.1.106] (unknown [10.1.2.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by groupware.tuxist.de (Postfix) with ESMTPSA id 36AB58A09A4;
-	Wed, 28 Oct 2026 07:20:14 +0100 (CET)
-Message-ID: <0b04ce416d93dfe319363357931b474022bb6e8f.1793168155.git.jan.koester@tuxist.de>
-In-Reply-To: <cover.1793168155.git.jan.koester@tuxist.de>
-References: <cover.1793168155.git.jan.koester@tuxist.de>
-From: Jan Koester <jan.koester@tuxist.de>
-Subject: [RFC PATCH 6/6] Documentation: uid_r: describe ksmbd's SID mapping
-To: Namjae Jeon <linkinjeon@kernel.org>,
-    Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-    Tom Talpey <tom@talpey.com>,
-    ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-    Christian Brauner <brauner@kernel.org>,
-    linux-cifs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org,
-    samba-technical@lists.samba.org,
-    linux-kernel@vger.kernel.org
-Date: Wed, 28 Oct 2026 07:20:03 +0100
+	dkim=pass (3072-bit key, unprotected) header.d=samba.org header.i=@samba.org header.a=rsa-sha256 header.s=42 header.b=Lp45J+J0
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=QgxSQlglSulgYW+zjA2RlQDuafTI1/6f0G7Szlj2ZsU=; b=Lp45J+J0cAMXh8imTFkCtBrZ9G
+	l1S0j23aYnLzLEre0pahLwny+7ueGZZBJHjIJ48/FTT6pT7AbOASF4pOQjS1Q8MmCVSIGfZz2epHv
+	7fLdV72b/9EeZXcEUQVNI0/jqIPCkbdu9jmuBnaVwA4jatIAyGsAJcY4m2ks+bTahRwYF+B3G2iRK
+	hVVYIEngnHHBR5vouv4KfIlqYgAr+C5NWB57NMv9cxmANey2gfad2psWdRwRv5iL3DBPlZfnzMPLk
+	vg4jYKAiamZmMqXpht4jZcoG4nDWiLSfgPEfD4lQA8HXwsy+SUMTuxwrVtKIUDGuwsXmZQ3TPJrZU
+	nBiWKXfTUA7dRugic80pPIEhR6tWSmwF6WDxL23yvWe8uHlU5pNdmZJeR9dM8saRTiTKpkHJFLwoU
+	CS57qKEdzU2vV0R00Yb5ZclMdXzmUSgvNjUsEZ5GYQAgD6sMvDiC1h91G03JDzdFPmgxFGgS2+jK5
+	gh8+ny5RTU+YtCK+8+A73M5o;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1xLza6-000000065tj-0JYg;
+	Wed, 28 Oct 2026 09:04:26 +0000
+Message-ID: <b69a61a6-47b7-40d3-9235-2c34fa0cfc29@samba.org>
+Date: Wed, 28 Oct 2026 10:04:22 +0100
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -70,46 +58,41 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Backport request: ksmbd and smbdirect fixes merged in 7.4-rc
+To: =?UTF-8?B?7J207ISx7ZiE?= <ihopenre@gmail.com>,
+ Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, Namjae Jeon <linkinjeon@kernel.org>,
+ linux-cifs@vger.kernel.org
+References: <CANTrAmxiBn6GT+N5qivdf=xtGg6yFksK5qN_PhpoNdxXDSpikA@mail.gmail.com>
+ <2026102733-sinner-baguette-1d07@gregkh>
+ <CANTrAmys9yD+KB4Nhkqo5Z1R7vJCbyoXpizDeV6kM5YA4nEMiw@mail.gmail.com>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CANTrAmys9yD+KB4Nhkqo5Z1R7vJCbyoXpizDeV6kM5YA4nEMiw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Name the SIDs ksmbd gives classic users and groups, and describe
-KSMBD_EVENT_SID_MAP_REQUEST: what user space is asked, the caching and
-what happens when it can't answer.
+Am 27.10.26 um 17:47 schrieb 이성현:
+> On Tue, Oct 27, 2026 at 11:44PM, Greg KH wrote:
+>> Why no tag?  What happened to prevent that?
+> 
+> For 3) that is on me. When I sent ef85bad39cf2 on 2026-10-15 the
+> commit it fixes, 25e414db7033, was only in 7.3-rc, so I assumed there
+> was no released kernel to backport to and left the tag off. 7.3 was
+> then released with the bug before the fix reached mainline, which is
+> why I am asking now.
+> 
+> For 1) and 2) I am the reporter, not the author, so I cannot say why
+> the tags were not added. Namjae and Stefan are on Cc and can answer
+> that. I only noticed the gap when I checked which of the fixes had
+> reached a stable tree.
 
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Jan Koester <jan.koester@tuxist.de>
----
- Documentation/userspace-api/uid_r.rst | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+Sorry, I thought that a Fixes: tag would be enough to have commits being backported
+as needed.
 
-diff --git a/Documentation/userspace-api/uid_r.rst b/Documentation/userspace-api/uid_r.rst
-index d16d4317f5..2e887c296d 100644
---- a/Documentation/userspace-api/uid_r.rst
-+++ b/Documentation/userspace-api/uid_r.rst
-@@ -167,7 +167,23 @@ SMB (ksmbd)
- 	groups appear in security descriptors as
- 	``S-1-22-<kind>-w0-w1-w2-w3``: kind 3 and 4 for a UUID user and group,
- 	5 and 6 for a GUID user and group, w0 to w3 the 16 bytes of the id as
--	big endian words.
-+	big endian words; classic users as ``S-1-22-1-<uid>``, classic groups
-+	as ``S-1-22-2-<gid>``.
-+
-+	A user space that sets ``KSMBD_GLOBAL_FLAG_SID_MAP`` at startup is
-+	asked (``KSMBD_EVENT_SID_MAP_REQUEST``) for the Windows SID of every id
-+	ksmbd shows as owner, group or ACL entry and for the id of every
-+	domain SID (``S-1-5-21-...``) a client sets, also for accounts that
-+	are not logged in. A mapped account appears with its own SID (e.g. a
-+	directory's ``objectSid``), others keep the SIDs above. ksmbd caches
-+	mappings for five minutes and "no mapping" for one; an answer user
-+	space couldn't give is not cached: descriptors then show the SIDs
-+	above, and setting an owner, group or ACL that needs a mapping fails
-+	with ``STATUS_NO_LOGON_SERVERS`` instead of being applied in part. A
-+	domain SID that maps to no user (as owner) or group (as group) is
-+	refused with ``STATUS_INVALID_OWNER`` or ``STATUS_INVALID_PRIMARY_GROUP``
-+	rather than ignored. A session's user matches ACL entries naming its
-+	own or its groups' SIDs, mapped or not.
- 
- NFSv4
- 	Owners and ACL principals that are UUIDs or GUIDs travel as their text
--- 
-2.56.0
+I read Documentation/process/stable-kernel-rules.rst again
+and will also add stable in addition.
 
+metze
