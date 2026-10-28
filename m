@@ -1,85 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793214033;
-	b=B3X7wPbXYT3U8kS4hAjLpT6mkXRV5kbjSXq/Ca7ZNrKOdtF4VHfjzUt4sVSU8Xxm7aPa
-	 RDoiLnCuTlb06Q/OrFgmDWJcQz5iOT4ajBrDNKKV3rCaNCb+EHEWVq2MdoqBk5VKcTOcR
-	 GyYaRQkED2gHvB0N5iH116/SD/FeoLrQuXG6sr3w3mGIKmIf99/E0rhjZ8m/snnVWVMst
-	 AeP4rA3nNPx31ID8zakOe+4ltYxuUsz7GCd0ZggiBOVlAMlo3LtDoYVWLE74UFXTRMTKP
-	 n4NMlLCZktJI8tX0IyC/0jDOVXly2rtE1kYGhUL9OJbAcWJ2r+pb2yeeM2OT6LkLusw==
+	t=1793214273;
+	b=FBkT5yEQp8oZqwJhWPBwJw0JkWkycpmxpzOO96U3thqEpaPi28gym3OH5RRES9EOeXt1
+	 YFFBb7FQ9jw+q1XLSlVWUpwVmYc6Gv01Ao1OJgxCpC9qmjSDh6rs5Bg+eu+Db/EQagcWP
+	 c4r1QFX2mxR9yN6+epqckp/kXTqSp8dM3tOybrPGYS6OTrgwkLL91a7KXX9whTt6vR8iS
+	 HSM0XiV9KNMoVUB9xOZABUZrFln0Ga4Q6o4vGoBabORizbSggvDkP+2zjt0IfC46h7AT2
+	 A9hunLCsxkddk8fagA97EMXU8UG6BZf/081m1iHw2O8w5QueKht3zpZkJOr+GOJ1XGw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793214033;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To;
-	bh=0SF6Z6fkYcC3mNc32hQG4riaKfE87q4Tb0lTvxci1qc=;
-	b=BtN5TInc7hPW8ZBGfgAH8Ru6mNFEbAabxrhceJWw864g2AHkIhlos7nxNzDW64+mr2dQ
-	 SKYqiObjohWLK2krwtDLDBeBWGOcsSDhudtGLaGRlgjrzcLlHkXxPNqQZOoXVF7usSHkr
-	 NY98ZJSiKY3gOq4AtIr94VsAO+jMyXhl0kf9dUyFRJ64+41zZGG2c7dG5Xgvlnnm85Oxv
-	 d+re6CsdHq2TANdiDmDN/U4sIBmJBGFq39XUrSN6Yr4/tiEe24BpZ0Z5fTah3p/S1YoM5
-	 T/ZrMwvYcrjZLaNaWA21aFSXkLVJiqJ1TV0dlcdRTXZVfx/Sk0+nXdUqQWspR76FtWw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793214273;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:User-Agent:X-stable:X-Patchwork-Hint:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=03OPWAPfRAeawCvWNuFYm8tQ7NQsXyTuf4FaquQwQ50=;
+	b=Rfk0j/etIhmw+/O80tzQK9axi9SqYeTVeK6+2nWNvKM7L9Rxv7ybPyArEYcjJHiehbwU
+	 PemmAvucinF9GXAbMLuJnxVko45Hy5QQycOVVoXtLVqk4I+I8+3EzVAVDi2C9YD1EX8a1
+	 kBngEcaDZrww7cuYpXK9j/+mPb4PqeVEGypWaVvYwwyBHqitYuuH6+vvYtRACAqj5rAzn
+	 p32Av6241fk22O1FfaSNWUejiPxcrsH5Kceu1gfNHn4xUnsJVqVhkPLSoOEe17cMlT7dU
+	 yFCo2oVZsrlsEm2IuJIQo6Wnr9i3QIRTeZIVPo8qaJu+Nwo6K3hgrtrDok6HEj1S2Wg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=G1xQ1Pcd;
-	arc=none smtp.remote-ip=198.175.65.17
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=DflmmeC5;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873C6606A321;
-	Wed, 28 Oct 2026 19:00:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 873C6606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F16260A2634;
+	Wed, 28 Oct 2026 19:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=G1xQ1Pcd
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793214028; x=1824750028;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SvF0qrPpa1mze0SmaiTONN6P7h8s1a5USFeiNzRZx70=;
-  b=G1xQ1PcdgHcFibQvoVcLBrnyrlkHd3ndAtpC/bodAco4iVZSYvpVMoNG
-   Jqyqog5aFte9V58AmllbEk64yKbqPEUH3QySzZ92U+pPJ4X6DayrRTLnT
-   4jRAR0NcAva4E4Fa1u5mmDBgWmg+rFzgdHkGPwUsM6cZK2UqbdLLZ2Pbw
-   lz+tNxaQVt1VEf5McV9mvE6akgMjtc1B3K43IlGep2ifh0/LFc/IaN/9k
-   3CaAbj0IqVoP/kb5PLv6st8g9MZWBYrX4nGOvnMq0MPZmMN6QxEjUcl3E
-   8o/kjINzaI8tvrxWttcACZyRX3aNQenoTzsJw2bHE/cC/Viu2YejCA9NH
-   w==;
-X-CSE-ConnectionGUID: y9BkPTHAR8Ong9nD2Mps8g==
-X-CSE-MsgGUID: npGtg7aZTUGVTXqyCn6qUw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11949"; a="1962913"
-X-IronPort-AV: E=Sophos;i="6.27,183,1787036400"; 
-   d="scan'208";a="1962913"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2026 11:59:47 -0700
-X-CSE-ConnectionGUID: kAwP7TzjT2a7K5T1rBaG6Q==
-X-CSE-MsgGUID: zEn4UmG8RQ6ShkL/enzcxg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,183,1787036400"; 
-   d="scan'208";a="4789786"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 28 Oct 2026 11:59:44 -0700
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xM8s9-00000000Z8O-0v7S;
-	Wed, 28 Oct 2026 18:59:41 +0000
-Date: Thu, 29 Oct 2026 02:58:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Henry Martin <bsdhenrymartin@gmail.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-kernel@vger.kernel.org,
-	Henry Martin <bsdhenrymartin@gmail.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] cifs: fix UAF read of server->hostname in
- cifs_get_spnego_key()
-Message-ID: <202610290208.vMXHYOZa-lkp@intel.com>
-References: <20261027150438.943354-1-bsdhenrymartin@gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=DflmmeC5
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4DDD1F01829;
+	Wed, 28 Oct 2026 19:04:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1793214272;
+	bh=03OPWAPfRAeawCvWNuFYm8tQ7NQsXyTuf4FaquQwQ50=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=DflmmeC5DSUbbVRnJxTM+nupas5RbtcpcyRCH/wwREJddj/zs/GRv2iG/jRfn5ail
+	 5ZbKBwpWL5mEMnx1f9YzqYeaAXe9H2YXzhvqc5mBWHF1srMF9Gc/Y8p/HHmI0TaOWp
+	 rK5X2Pp2KN5OAHYVqgOzPObGxfao5yKLw78V3Q8A=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	David Howells <dhowells@redhat.com>,
+	"Paulo Alcantara (Red Hat)" <pc@manguebit.org>,
+	Steve French <stfrench@microsoft.com>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 0799/1887] smb: client: fix potential deadlock when reconnecting channels
+Date: Wed, 28 Oct 2026 17:48:15 +0100
+Message-ID: <20261028170517.612235809@linuxfoundation.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261028170459.200466217@linuxfoundation.org>
+References: <20261028170459.200466217@linuxfoundation.org>
+User-Agent: quilt/0.69
+X-stable: review
+X-Patchwork-Hint: ignore
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -89,50 +64,217 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261027150438.943354-1-bsdhenrymartin@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Henry,
+6.1-stable review patch.  If anyone has any objections, please let me know.
 
-kernel test robot noticed the following build warnings:
+------------------
 
-[auto build test WARNING on manguebit/cifs-next]
-[also build test WARNING on manguebit/cifs-fixes linus/master v7.3 next-20261027]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+From: Paulo Alcantara <pc@manguebit.org>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Henry-Martin/cifs-fix-UAF-read-of-server-hostname-in-cifs_get_spnego_key/20261027-230438
-base:   https://git.manguebit.org/linux.git cifs-next
-patch link:    https://lore.kernel.org/r/20261027150438.943354-1-bsdhenrymartin%40gmail.com
-patch subject: [PATCH] cifs: fix UAF read of server->hostname in cifs_get_spnego_key()
-config: arm-allyesconfig (https://download.01.org/0day-ci/archive/20261029/202610290208.vMXHYOZa-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 16.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261029/202610290208.vMXHYOZa-lkp@intel.com/reproduce)
+[ Upstream commit 711741f94ac3cf9f4e3aa73aa171e76d188c0819 ]
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202610290208.vMXHYOZa-lkp@intel.com/
+Fix cifs_signal_cifsd_for_reconnect() to take the correct lock order
+and prevent the following deadlock from happening
 
-All warnings (new ones prefixed by >>):
+======================================================
+WARNING: possible circular locking dependency detected
+6.16.0-rc3-build2+ #1301 Tainted: G S      W
+------------------------------------------------------
+cifsd/6055 is trying to acquire lock:
+ffff88810ad56038 (&tcp_ses->srv_lock){+.+.}-{3:3}, at: cifs_signal_cifsd_for_reconnect+0x134/0x200
 
-   fs/smb/client/cifs_spnego.c: In function 'cifs_get_spnego_key':
->> fs/smb/client/cifs_spnego.c:199:1: warning: the frame size of 1304 bytes is larger than 1280 bytes [-Wframe-larger-than=]
-     199 | }
-         | ^
+but task is already holding lock:
+ffff888119c64330 (&ret_buf->chan_lock){+.+.}-{3:3}, at: cifs_signal_cifsd_for_reconnect+0xcf/0x200
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&ret_buf->chan_lock){+.+.}-{3:3}:
+       validate_chain+0x1cf/0x270
+       __lock_acquire+0x60e/0x780
+       lock_acquire.part.0+0xb4/0x1f0
+       _raw_spin_lock+0x2f/0x40
+       cifs_setup_session+0x81/0x4b0
+       cifs_get_smb_ses+0x771/0x900
+       cifs_mount_get_session+0x7e/0x170
+       cifs_mount+0x92/0x2d0
+       cifs_smb3_do_mount+0x161/0x460
+       smb3_get_tree+0x55/0x90
+       vfs_get_tree+0x46/0x180
+       do_new_mount+0x1b0/0x2e0
+       path_mount+0x6ee/0x740
+       do_mount+0x98/0xe0
+       __do_sys_mount+0x148/0x180
+       do_syscall_64+0xa4/0x260
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #1 (&ret_buf->ses_lock){+.+.}-{3:3}:
+       validate_chain+0x1cf/0x270
+       __lock_acquire+0x60e/0x780
+       lock_acquire.part.0+0xb4/0x1f0
+       _raw_spin_lock+0x2f/0x40
+       cifs_match_super+0x101/0x320
+       sget+0xab/0x270
+       cifs_smb3_do_mount+0x1e0/0x460
+       smb3_get_tree+0x55/0x90
+       vfs_get_tree+0x46/0x180
+       do_new_mount+0x1b0/0x2e0
+       path_mount+0x6ee/0x740
+       do_mount+0x98/0xe0
+       __do_sys_mount+0x148/0x180
+       do_syscall_64+0xa4/0x260
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #0 (&tcp_ses->srv_lock){+.+.}-{3:3}:
+       check_noncircular+0x95/0xc0
+       check_prev_add+0x115/0x2f0
+       validate_chain+0x1cf/0x270
+       __lock_acquire+0x60e/0x780
+       lock_acquire.part.0+0xb4/0x1f0
+       _raw_spin_lock+0x2f/0x40
+       cifs_signal_cifsd_for_reconnect+0x134/0x200
+       __cifs_reconnect+0x8f/0x500
+       cifs_handle_standard+0x112/0x280
+       cifs_demultiplex_thread+0x64d/0xbc0
+       kthread+0x2f7/0x310
+       ret_from_fork+0x2a/0x230
+       ret_from_fork_asm+0x1a/0x30
+
+other info that might help us debug this:
+
+Chain exists of:
+  &tcp_ses->srv_lock --> &ret_buf->ses_lock --> &ret_buf->chan_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&ret_buf->chan_lock);
+                               lock(&ret_buf->ses_lock);
+                               lock(&ret_buf->chan_lock);
+  lock(&tcp_ses->srv_lock);
+
+ *** DEADLOCK ***
+
+3 locks held by cifsd/6055:
+ #0: ffffffff857de398 (&cifs_tcp_ses_lock){+.+.}-{3:3}, at: cifs_signal_cifsd_for_reconnect+0x7b/0x200
+ #1: ffff888119c64060 (&ret_buf->ses_lock){+.+.}-{3:3}, at: cifs_signal_cifsd_for_reconnect+0x9c/0x200
+ #2: ffff888119c64330 (&ret_buf->chan_lock){+.+.}-{3:3}, at: cifs_signal_cifsd_for_reconnect+0xcf/0x200
+
+Cc: linux-cifs@vger.kernel.org
+Reported-by: David Howells <dhowells@redhat.com>
+Fixes: d7d7a66aacd6 ("cifs: avoid use of global locks for high contention data")
+Reviewed-by: David Howells <dhowells@redhat.com>
+Tested-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Paulo Alcantara (Red Hat) <pc@manguebit.org>
+Signed-off-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Steve French <stfrench@microsoft.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/smb/client/cifsglob.h |  1 +
+ fs/smb/client/connect.c  | 56 ++++++++++++++++++++++++++--------------
+ 2 files changed, 38 insertions(+), 19 deletions(-)
+
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index c37f10eedddf2..4e463ee8e40bb 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -589,6 +589,7 @@ get_rfc1002_length(void *buf)
+ struct TCP_Server_Info {
+ 	struct list_head tcp_ses_list;
+ 	struct list_head smb_ses_list;
++	struct list_head rlist; /* reconnect list */
+ 	spinlock_t srv_lock;  /* protect anything here that is not protected */
+ 	__u64 conn_id; /* connection identifier (useful for debugging) */
+ 	int srv_count; /* reference counter */
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 9172b4136a925..abc03adb692b5 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -185,6 +185,14 @@ static void cifs_resolve_server(struct work_struct *work)
+ 	cifs_server_unlock(server);
+ }
+ 
++#define set_need_reco(server) \
++do { \
++	spin_lock(&server->srv_lock); \
++	if (server->tcpStatus != CifsExiting) \
++		server->tcpStatus = CifsNeedReconnect; \
++	spin_unlock(&server->srv_lock); \
++} while (0)
++
+ /*
+  * Update the tcpStatus for the server.
+  * This is used to signal the cifsd thread to call cifs_reconnect
+@@ -198,35 +206,45 @@ void
+ cifs_signal_cifsd_for_reconnect(struct TCP_Server_Info *server,
+ 				bool all_channels)
+ {
+-	struct TCP_Server_Info *pserver;
++	struct TCP_Server_Info *nserver;
+ 	struct cifs_ses *ses;
++	LIST_HEAD(reco);
+ 	int i;
+ 
+-	/* If server is a channel, select the primary channel */
+-	pserver = CIFS_SERVER_IS_CHAN(server) ? server->primary_server : server;
+-
+ 	/* if we need to signal just this channel */
+ 	if (!all_channels) {
+-		spin_lock(&server->srv_lock);
+-		if (server->tcpStatus != CifsExiting)
+-			server->tcpStatus = CifsNeedReconnect;
+-		spin_unlock(&server->srv_lock);
++		set_need_reco(server);
+ 		return;
+ 	}
+ 
+-	spin_lock(&cifs_tcp_ses_lock);
+-	list_for_each_entry(ses, &pserver->smb_ses_list, smb_ses_list) {
+-		if (cifs_ses_exiting(ses))
+-			continue;
+-		spin_lock(&ses->chan_lock);
+-		for (i = 0; i < ses->chan_count; i++) {
+-			spin_lock(&ses->chans[i].server->srv_lock);
+-			ses->chans[i].server->tcpStatus = CifsNeedReconnect;
+-			spin_unlock(&ses->chans[i].server->srv_lock);
++	if (CIFS_SERVER_IS_CHAN(server))
++		server = server->primary_server;
++	scoped_guard(spinlock, &cifs_tcp_ses_lock) {
++		set_need_reco(server);
++		list_for_each_entry(ses, &server->smb_ses_list, smb_ses_list) {
++			spin_lock(&ses->ses_lock);
++			if (ses->ses_status == SES_EXITING) {
++				spin_unlock(&ses->ses_lock);
++				continue;
++			}
++			spin_lock(&ses->chan_lock);
++			for (i = 1; i < ses->chan_count; i++) {
++				nserver = ses->chans[i].server;
++				if (!nserver)
++					continue;
++				nserver->srv_count++;
++				list_add(&nserver->rlist, &reco);
++			}
++			spin_unlock(&ses->chan_lock);
++			spin_unlock(&ses->ses_lock);
+ 		}
+-		spin_unlock(&ses->chan_lock);
+ 	}
+-	spin_unlock(&cifs_tcp_ses_lock);
++
++	list_for_each_entry_safe(server, nserver, &reco, rlist) {
++		list_del_init(&server->rlist);
++		set_need_reco(server);
++		cifs_put_tcp_session(server, 0);
++	}
+ }
+ 
+ /*
+-- 
+2.53.0
 
 
-vim +199 fs/smb/client/cifs_spnego.c
 
-f1d662a7d5e532 fs/cifs/cifs_spnego.c Steve French  2007-11-05  195  
-f1d662a7d5e532 fs/cifs/cifs_spnego.c Steve French  2007-11-05  196  out:
-f1d662a7d5e532 fs/cifs/cifs_spnego.c Steve French  2007-11-05  197  	kfree(description);
-f1d662a7d5e532 fs/cifs/cifs_spnego.c Steve French  2007-11-05  198  	return spnego_key;
-f1d662a7d5e532 fs/cifs/cifs_spnego.c Steve French  2007-11-05 @199  }
-b74cb9a80268be fs/cifs/cifs_spnego.c Sachin Prabhu 2016-05-17  200  
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
