@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793234840;
-	b=B0mMLkeOMQLVfyKKMHlg0vq+l8Hu6lekveWIto5LTHu1C2VIiwQQ2CHUVrCj7PBXKIQq
-	 NrHmltPPE0GL+52lAxWb0mydj7ycs6yekenIU3dqj0soCC9o5zXgejpe0zUfXfL9/smUG
-	 ZiAMKWoiwAj5+/BoLHHx8btNjMSHYv7FfmgFp7OweIONnO19r627Yy9c/81l+BZcam1c8
-	 G29WGxEXFUcs+87Wcc4CvuvRrUETSLOKukVy/yKubhBifA0fWYa6mbXUwViDacR7gSFDq
-	 6gE/3Tk+afYy5XcSaCbZckxm8x+AtARTApaX7xPZ52+26xK59JF8OT/Gniy7m8OqU4A==
+	t=1793234999;
+	b=KKeeYRcv9jlw6y6koM3O9LecnkmggeSHu+zti3hDE9j7BGw7VNko+vHPX+i5YNe57d44
+	 m66g3nDB4Ba0T9eDjp6r8OOqMwgTIdiVEGzTKaT50QDiy2dSkDbpKx60Slo8UB9L7kr5/
+	 krTduu/BV6zNsFZxw+ni/9bda2QwDKAAZ1CwREtGxLAzLPpfa7UUJgK+UpyA4ejbF4YGl
+	 1/3sP7G+L7owIz8N5zsMxsgYjgvOeC2zEyXQAq4jMSgy6C5GNQUn/S+GrtECJxLi0qzjq
+	 PR/qIhUaXc2pSEvPeh1gKbXW+M8MCY4J4K9Hus3ksMnpJcLVsDDfyHOCAHbPpL2Afvg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793234840;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793234999;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=DB7cgiiNFIMYg+TGa+Y0Nbaz13YDr1tH09PhZ+M5HVg=;
-	b=qH621iMIwr7UqivJco5E37b9LYvzgMqcoXz1yRo4vLHjW+5hIlnfNXhPAlf4d3LlwRMs
-	 BroY1zoD4sXya+1JYFrizNW5IMxXQv0HwDqFEzLsZ65ZkjmhQnCE37SvNfU7ZtNm4OXZm
-	 M2zen5cP0ntkW9Cn4I0857QKyJs9Aj0ZzKE+TMiRogcG28HTI6ff7mT3pvcv06NklfNVF
-	 VQVixvGI/T8aImBjOO5NQoabNxcy2yT6Car9yWSGv0opGFbvDVo9z7p3w4SG136xQ/fRL
-	 scjDPUJAwZoXqCOtymGB/VfZL/I34sTSW8jHANQ/X40F6wejjPvVF4ta742LfDeJpMQ==
+	bh=zMb7KePVlG1NjbN5pBAGqS5NP3hS34WZE0E1IMzOgXU=;
+	b=xUOn1ZhFEQuok0elRZzCPk79Bc927oYzEsoU8TRLd8gvvzDtAOeSdD0G/EYqrtF+1IfZ
+	 hwXrwlbXHd91MPxSil+X1FWtxdSrERemDKLR5vo5JTxjoBoPgaaS4ffyDscA/iZ5FrusO
+	 CPUIt+hXSkW5WheCvyi1CSrE2+1l+gb9htbNc1uUw/MlNF5biysDJ3/uI/t+yDZqH87x0
+	 hpyxI34Z8Q/MYNQ4WjRgH3Y9Dc3TLlBqyBw/bFWYckbPzgvA+Pwmie7jKvk+43cfkR5Tc
+	 WdTa04NmzFqDhc+vBfgwcF7BCjzXoxke1oBAivJppP37fTzyMmE1p80j4FCeeAH3PHw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TPXeJ9NT;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ipbTufuG;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFFA606A31C
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Oct 2026 00:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAA8606A31A
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Oct 2026 00:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TPXeJ9NT
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A28E31F01828
-	for <linux-cifs@vger.kernel.org>; Thu, 29 Oct 2026 00:47:19 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ipbTufuG
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E51E51F01828
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Oct 2026 00:49:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793234839;
-	bh=DB7cgiiNFIMYg+TGa+Y0Nbaz13YDr1tH09PhZ+M5HVg=;
+	s=k20260515; t=1793234998;
+	bh=zMb7KePVlG1NjbN5pBAGqS5NP3hS34WZE0E1IMzOgXU=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TPXeJ9NTr6Xpvoi2jpIZdpItLtVRaOzPJrCQoN+UbL8T3Eyd/EEIPADHpFB9WCewA
-	 l3xHousJit/Lzd3hkT/EWiwB2J8tYw97IeUjMWt1/UFQWEMjoLmri4DDolgbrThVo3
-	 3u0N4dpGUbMzDymeFIGPKkY/BjsU1rRnIna2V8PmlU8YxE1Okx0QoKK8cj2jfkhMG1
-	 07efSr39y57kpskpUewlllkcMppoRLlXMBOwj82qUGnnToygZ8WdzqhxgTRjnHEgdR
-	 ygPMmcYhfgNrw6u5E3bfQbG+bxWkj6Da/6huDhPPNFZyf8JHBVpNoJQuLwBA2E3jXa
-	 HpJpRKPQEptzw==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6b1b13e09ffso2258489a12.3
-        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 17:47:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBzUNgUlr10iBBBmwpcW4iKSp4rpebaiT53W3qLBTEsBf+yH3CjPpp6eWJI4kgL1TD/IZNulAcAmdsVq@vger.kernel.org
-X-Gm-Message-State: AFq9FYLVpg07DPduLxHddwtCBXUr0HZxaXgL25XMjDjSW1RjnSlXziuP
-	lMZyhxl+1CAC/FVQcF2w4j2HkPijfC9iSzXf1aEAxk960Ubq+OJwHlyAEbO4tDgDWV+AjTG7lO7
-	MxXB8NrZzc+/DaQlVjyD2ZUG/z3DXzrs=
-X-Received: by 2002:a17:906:6205:b0:c49:b9b6:4b5e with SMTP id
- a640c23a62f3a-c49bdf37622mr337435566b.20.1793234838384; Wed, 28 Oct 2026
- 17:47:18 -0700 (PDT)
+	b=ipbTufuG+j9FU8i4M5D1b6ojxf41xOTajFZKD62wKaKIhtUZeGeN9h1itTFD3GSDd
+	 DRbwrBgM9fdpAA39bWh4qOJ7sQXQScf2OOjHczelfM0fMo4Lfhxd4tzttfHEIxfe6B
+	 poYJ+KWwJdOXGiqJij14ei4gOFiidpNxBccKxFLAfDd/A+SRz7yy8XBBs06MSHVL65
+	 gop32jjTE75mZIOkaICfBF4xUQ0PyEDya9/2f7JSR3IaSQpxYJcrmku4MKSi3Eo6vl
+	 C+LtJYpR9Qplhq9GCCHTl1ey1Z+UJp9NTUHMywLEZw2z2oL0Gvt7NP9feaFfi49p1/
+	 JwvD5KRRIov2Q==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c411e139259so144858566b.2
+        for <linux-cifs@vger.kernel.org>; Wed, 28 Oct 2026 17:49:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByyzOqlIGzwJ7UnnJNTqqtGiSELP6Oab8VMw4dI8cfiIgJbgQDd2rrvrlc8TVtMqRyTnF4mtowxhpuX@vger.kernel.org
+X-Gm-Message-State: AFq9FYLxbJKboYeQofnTi/pPxghs6kz2hWFPKEDDDVt7U5/tTqTRU5NK
+	hiRfoowMQxJosVovzb7oYfoDe5Mya6WWTm04bVuHCcQiKpmxXYbLDdZ2Jjg1rGawoQ72GL/28L9
+	qYFo+mJoSu1s1wHFozTVe2zam8R5yN68=
+X-Received: by 2002:a17:907:3cc9:b0:c46:9876:e9b1 with SMTP id
+ a640c23a62f3a-c49be039e8dmr335804166b.43.1793234997622; Wed, 28 Oct 2026
+ 17:49:57 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,57 +59,65 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261026222600.17323-1-pali@kernel.org> <20261026222600.17323-9-pali@kernel.org>
- <CAKYAXd-hQXxBLxLQ_dr5omw-_xgL+96fNYfgW_poAihXYqDxmA@mail.gmail.com> <20261028234530.2bnbxbotnegss5ll@pali>
-In-Reply-To: <20261028234530.2bnbxbotnegss5ll@pali>
+References: <20261026222600.17323-1-pali@kernel.org>
+In-Reply-To: <20261026222600.17323-1-pali@kernel.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 29 Oct 2026 09:47:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8KHVA0JwfiZBgnzsbw5rp+jNK7u=uP3Rmy4a-H_i9pBw@mail.gmail.com>
-X-Gm-Features: AclHuK9a6qk7w1o90fukoKk0lkxf2uZ2LwiaWKQYkwxqUYS983ONXfKBL1_6qI4
-Message-ID: <CAKYAXd8KHVA0JwfiZBgnzsbw5rp+jNK7u=uP3Rmy4a-H_i9pBw@mail.gmail.com>
-Subject: Re: [PATCH v7.3 8/9] cifs: Add support for parsing WSL symlinks in
- version 1 format
+Date: Thu, 29 Oct 2026 09:49:45 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd84MA0R+3Xd-SPq4jWqcQR7+Wu5voHAJWKOmVzdhwkRYw@mail.gmail.com>
+X-Gm-Features: AclHuK9fso8DR_4lTSfxfO6FLki4UweW19Ce4XOKWt1DRcLoIEIgc48dhENJEs0
+Message-ID: <CAKYAXd84MA0R+3Xd-SPq4jWqcQR7+Wu5voHAJWKOmVzdhwkRYw@mail.gmail.com>
+Subject: Re: [PATCH v7.3 0/9] Various changes
 To: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>
 Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 29, 2026 at 8:45=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> w=
+On Tue, Oct 27, 2026 at 7:26=E2=80=AFAM Pali Roh=C3=A1r <pali@kernel.org> w=
 rote:
 >
-> On Tuesday 27 October 2026 10:37:45 Namjae Jeon wrote:
-> ...
-> > > +               oparms =3D CIFS_OPARMS(cifs_sb, tcon, full_path, FILE=
-_READ_DATA,
-> > > +                                    FILE_OPEN, CREATE_NOT_DIR | OPEN=
-_REPARSE_POINT,
-> > > +                                    ACL_NO_MODE);
-> > > +               oparms.fid =3D &fid;
-> > Should we pass initialized fid to ->open()? When SMB2/3 leasing is
-> > enabled, the open path copies fid->lease_key into the outgoing CREATE
-> > request, potentially disclosing 16 bytes of stale stack data to the
-> > server ?
+> Rebased changes on top of the v7.3.
+> No functional change, just fixed 3 oneliners from Sashiko.
+> Link to previous: https://lore.kernel.org/linux-cifs/20260825230622.24617=
+-1-pali@kernel.org/
 >
-> I think that I have copied this pattern from somewhere. So maybe the
-> same issue is in other parts of the code.
-Right.
+> Pali Roh=C3=A1r (9):
+>   cifs: Remove code for querying FILE_INFO_STANDARD via
+>     CIFSSMBQPathInfo()
+>   cifs: Remove cifs_backup_query_path_info() and replace it by
+>     cifs_query_path_info()
+>   cifs: Fix validation of EAs for WSL reparse points
+>   cifs: Validate presence of EA $LXMOD for WSL reparse points
+>   cifs: Check if server supports EAs before trying to set it for WSL
+>   cifs: Extend ->set_EA() callback to allow operate on reparse point
+>   cifs: Create native Window socket file compatible also with WSL
+>     subsystem
+For patches 1=E2=80=937:
+
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+
+Paulo, Let me know your thoughts.
+
+Thanks.
+
+>   cifs: Add support for parsing WSL symlinks in version 1 format
+>   cifs: Add support for creating WSL symlinks in version 1 format
 >
-> > So, how about updating it like this ?
-> >
-> > struct cifs_fid fid =3D {};
-> > ...
-> > if (tcon->ses->server->ops->new_lease_key)
-> >     tcon->ses->server->ops->new_lease_key(&fid);
+>  fs/smb/client/cifsglob.h   |  10 +-
+>  fs/smb/client/cifsproto.h  |   1 +
+>  fs/smb/client/cifssmb.c    |  43 ++++---
+>  fs/smb/client/fs_context.c |  11 +-
+>  fs/smb/client/fs_context.h |   3 +-
+>  fs/smb/client/inode.c      |  98 +-------------
+>  fs/smb/client/link.c       |   3 +-
+>  fs/smb/client/reparse.c    | 257 ++++++++++++++++++++++++++++++++-----
+>  fs/smb/client/smb1ops.c    |  11 +-
+>  fs/smb/client/smb1proto.h  |   4 +-
+>  fs/smb/client/smb2ops.c    |   6 +-
+>  fs/smb/client/xattr.c      |   3 +-
+>  fs/smb/common/fscc.h       |   5 +-
+>  13 files changed, 287 insertions(+), 168 deletions(-)
 >
-> I will look at it.
-Okay.
+> --
+> 2.20.1
 >
-> Anyway this series contains various changes and these last two PATCH8
-> and PATCH9 are not needed for rest of them. So if there is no issue with
-> PATCH1-7 I would like if we can process at least first 7 without need to
-> address issues in 8 and 9. I'm waiting for these changes for a longer
-> time and mostly I'm just resending 1-7 without any modification, just
-> rebasing them.
-Agreed.
-Thanks!
