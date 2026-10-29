@@ -1,83 +1,54 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.200
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793269198;
-	b=N0eUr2QGhdcMAgKLUnyhXLw0Ys6ufLO6W5NRlU2GRrY2Kif1vYB82cxlPZCM10jVihF7
-	 MbDN7RjdrJfF/21YSN1r5Zg0j+pSYxvCh4te+2Kn6mGc4T4FVrX/UQZxoB286Y8VVRiyF
-	 pCaaXQVO8qwOcsN/EHIh9NCUwQCCEfJQF44qXfzDNnmgVin5VzklonqR53jicw7l3iHEJ
-	 vQWF1jLQMHsPe0y5jmJBhbrnUDHgtm+PZauldzmM/T+FtYHd/D7dzNpzc5FSxb8p+CsNz
-	 ltjxO2V5SK9Hq7QJ9Oa6H9rsqGrLrEOszn+1nL3joR23XVhgPviYKJUdMB/MRdwA4aQ==
+	t=1793274781;
+	b=CEu7gMM762qxHvudLh+S5dHQIsp9MhZKOFmlz8ugWRwhKCQq35C8sVNaycXcRYKCXv3N
+	 TBbw2KPuYP/lqohk+bqPATAPsB/9ydYXuZYdLj/NsaI2N/s8UjoAVCJI5EPp0YNQddvVo
+	 QI8OYgDztxUDcnionWCktG0cT832lEs2fdIrQzLvOI+GwLttt/X5gC+4Ka8Txo9xk9u38
+	 9Q8uIkPRH3GtWd3+RykVBxzZLQkxpKFkixSM00AgKxh5yn0OqtL76hEI7MEuw/Xgrr59e
+	 koIxNtNxU5ohs3yqll9K1Tm97Jwm7i0MHsnrq9TGe3/3Y1mOWN/7JmZR1rYx1De+xKQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793269198;
-	h=DMARC-Filter:DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:
-	 X-IronPort-AV:X-IronPort-AV:Received:X-CSE-ConnectionGUID:
-	 X-CSE-MsgGUID:X-ExtLoop1:X-IronPort-AV:Received:Received:Date:From:To:
-	 Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:In-Reply-To;
-	bh=zfY9oMoIW/0okd9xFFx3UCLsKMsJOADfA+RNZfH9SM0=;
-	b=cyKSQQNIvmiRrmL6FsNJXYwWuYH0/o0EBJuU5+BwvWWUmVlmeneFiG6xlLZh2QM157r5
-	 STxcSxUJ+9YLyIGkhV2avgXBD4SMZDz0hjutuPC1aUIuY4Nb6gJfG0hfV29tqQfE17aut
-	 k+I2bLnXt1qh2U4A3IU5mEVZaMj/LHjHhMJBF9xREiOSLZZ6xRylhFr/cZQcdBA1WKMaj
-	 gf89p1gi+prmX3YsaAnCRBO4Jdl/LYWvlN8kYpdz2NRnuViiLsY5bbkF8KvMS6oa+cam+
-	 C2KQM/Ld6mc5/42GfR/W0SlE3R7WiqwUNS9ZQvyxV2wY5kg9PEtLFjiXEoqcMGJ+4EA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793274781;
+	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
+	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=B6fFfQE7RrEN57mIZD+kdgqs70BufHGSWfMzjOpwU+U=;
+	b=JOvlYmvxZPGvuZ5RdZPqQ0jYV0H9izM1SZr+i8h97D+UeE3FlquaEZLd6qjUHeqzpDA2
+	 wou+CLM+2sxP1LRZ1JjuZNWbFNutkFTD+yVLRrfvzSUQaOtDNl/jjTkhiULhswfcy51Ic
+	 gaiDtr0PBKZFpoMeZljkEQ4FgtZACTZf8x5PwR9SIfDhx5h3g4xXW6JnqyHoyJBAH+wGB
+	 OD9lp0etr1tOqhtnACN4VE1rprm3hk6EffaTXb+AnhuOpmNVesZjW7ztBQo2r5W1qIoK/
+	 f9x05qE1AI/Ubdv151ytBlR9G2YsYPwn81NgSerBpYNL83ATKaJawPo829KLodO0AXw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=intel.com;
-	spf=pass smtp.mailfrom=intel.com;
-	dkim=pass header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=cM9IhEPC;
-	arc=none smtp.remote-ip=192.198.163.17
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=linux.dev;
+	spf=pass smtp.mailfrom=linux.dev;
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=GqzIuOBU;
+	arc=none smtp.remote-ip=91.218.175.200
+Received: from mta0.migadu.com (out-200.mta0.migadu.com [91.218.175.200])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150CE606A326;
-	Thu, 29 Oct 2026 10:19:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 150CE606A326
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5149D606A31A
+	for <linux-cifs@vger.kernel.org>; Thu, 29 Oct 2026 11:52:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5149D606A31A
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=intel.com header.i=@intel.com header.a=rsa-sha256 header.s=Intel header.b=cM9IhEPC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1793269196; x=1824805196;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Qt6D4YLPwSHv5zAOxXUaLkXyrpRhNSrHIbMspXroy44=;
-  b=cM9IhEPCqBq+zO7PeJUhczV/19F6tI12u0jw53S/+D2fKqJGrpIGVm1z
-   sCeYg5JBVb5AK4SAA2UBqDf9+dqs2t9BqOAnaE30XbY2g6NI2t6qjvFhw
-   /G1ZgmIohvQTQr48h4qNxt2hvWgm/cQHOR/cTqpzAkDEiTpme3Ax8wFdc
-   UsLIBM4g4eTpWHa3SOhjTqzHaTj8T9CYIB8slqBmyjrhrSO8hxmQwx830
-   /2s+mW3PllCCvdZcCtZ5x5VOxEuzR4bz+NrCzVUxCAls5P/Gkyow9gLag
-   o9HcRcPNKA4ePzT4fkiM0GmWCK4xCs7TCfhsbCjQNq/JLinjhRe2tchF3
-   g==;
-X-CSE-ConnectionGUID: egnb8z4LSd2/K1izSh96DQ==
-X-CSE-MsgGUID: XECEAa4RQj+E97eRMg7oMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11949"; a="2024005"
-X-IronPort-AV: E=Sophos;i="6.27,184,1787036400"; 
-   d="scan'208";a="2024005"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2026 03:19:47 -0700
-X-CSE-ConnectionGUID: H6ANZahERZeuR9ZW3Z4ybA==
-X-CSE-MsgGUID: Iq/Jf3wIQGmkAMGQYBYpXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.27,184,1787036400"; 
-   d="scan'208";a="4986684"
-Received: from lkp-server01.sh.intel.com (HELO 0caa9d2d175c) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 29 Oct 2026 03:19:45 -0700
-Received: from kbuild by 0caa9d2d175c with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1xMNEU-00000000ZxU-25rj;
-	Thu, 29 Oct 2026 10:19:42 +0000
-Date: Thu, 29 Oct 2026 18:19:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: =?iso-8859-1?Q?Iv=E1n?= Ezequiel Rodriguez <ivanrwcm25@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	Paulo Alcantara <pc@manguebit.org>, netfs@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, Shyam Prasad N <sprasad@microsoft.com>,
-	Steve French <stfrench@microsoft.com>,
-	linux-fsdevel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH netfs v1 2/2] netfs: add KUnit coverage for reissue
- prepare_write errno
-Message-ID: <202610291753.Jr3HECY2-lkp@intel.com>
-References: <20261028181229.1408342-3-ivanrwcm25@gmail.com>
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=GqzIuOBU
+X-Envelope-To: linux-cifs@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=lS2RsKxNaMi6eyWMVxwMVQS/P8x6d1KNXff8k9wBiKg=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1793274778; v=1; x=1793879578;
+ b=GqzIuOBUOLrrFoTp6swnjL58TcaG22yxSt2Qlg+rHlOgFnSdLX+c08ZFntQ8lnzU52pTYQyR
+ FoirYGwy/CyY4nYzzGH04t/5rYgPd6f188HropH8V2UFlLSH76LwOCrOO+NyMOcL3Ar3V8Fk59F
+ ssY6JhE/K6V11uxbW4il1vvs=
+X-Envelope-To: linux-cifs@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id e413e8c6e9ff3dee;
+	Thu, 29 Oct 2026 11:52:58 +0000
+X-Mizu-Trace-ID: e413e8c6e9ff3dee
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <eebfec12-d0dd-433c-9332-f1e894fdcda8@linux.dev>
+Date: Thu, 29 Oct 2026 19:52:53 +0800
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -87,83 +58,90 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 2/4] ksmbd: route WRITE requests to an unbound
+ workqueue
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, senozhatsky@chromium.org, tom@talpey.com,
+ chenxiaosong@chenxiaosong.com, tj@kernel.org, linux-kernel@vger.kernel.org
+References: <20261022092514.2590010-1-huiwen.he@linux.dev>
+ <20261022092514.2590010-3-huiwen.he@linux.dev>
+ <CAKYAXd9Ow2SeZ1EjR7UBF3rmMn4=HKZrKajNdFU5TAnLVf=THg@mail.gmail.com>
+Content-Language: en-US
+From: hehuiwen <huiwen.he@linux.dev>
+In-Reply-To: <CAKYAXd9Ow2SeZ1EjR7UBF3rmMn4=HKZrKajNdFU5TAnLVf=THg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20261028181229.1408342-3-ivanrwcm25@gmail.com>
 
-Hi Iv�n,
+Hi Namjae,
 
-kernel test robot noticed the following build warnings:
+在 2026/10/24 12:26, Namjae Jeon 写道:
+> Since this improves performance, why isn't it enabled by default?
+> Also, I would like this setting to be on/off via ksmbd.conf.
 
-[auto build test WARNING on brauner-vfs/vfs.all]
-[also build test WARNING on linus/master v7.3 next-20261028]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I left it off by default for now, since I've noticed some
+regressions.I'm testing more cases and trying to find a general
+fix. If those regressions can't be avoided, a ksmbd.conf option
+would be needed.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Iv-n-Ezequiel-Rodriguez/netfs-preserve-prepare_write-errno-on-reissue/20261028-151228
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git vfs.all
-patch link:    https://lore.kernel.org/r/20261028181229.1408342-3-ivanrwcm25%40gmail.com
-patch subject: [PATCH netfs v1 2/2] netfs: add KUnit coverage for reissue prepare_write errno
-config: arm-allyesconfig (https://download.01.org/0day-ci/archive/20261029/202610291753.Jr3HECY2-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 16.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20261029/202610291753.Jr3HECY2-lkp@intel.com/reproduce)
+> For 4 KiB single-channel WRITEs, throughput drops from 219.55 to
+> 193.01 MiB/s. Should we add a size check here to keep small WRITEs on
+> the per-CPU queue?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202610291753.Jr3HECY2-lkp@intel.com/
+I tried keeping small WRITEs on PERCPU and routing only larger ones
+to UNBOUND. However, this did not work well for workloads with mixed
+request sizes. For example, a workload mixing 8 KiB and 64 KiB WRITEs
+still regressed. Small and large WRITEs share the same connection and
+send lock, so a size check alone does not avoid contention.
 
-All warnings (new ones prefixed by >>):
+I then changed the send path to let one worker send several completed
+WRITE responses together, without waiting for more responses. This seems
+to work better:
 
-   fs/netfs/write_reissue_kunit.c: In function 'reissue_preserves_prep_error':
->> fs/netfs/write_reissue_kunit.c:61:1: warning: the frame size of 1400 bytes is larger than 1280 bytes [-Wframe-larger-than=]
-      61 | }
-         | ^
+Single-channel WRITE, 16 jobs, QD32 per job, tmpfs on a 128-CPU server,
+Throughput is in MiB/s.
+
+Size       PERCPU    UNBOUND+batch    Change
+4 KiB       228.12           248.89    +6.96%
+64 KiB     1797.26          2091.17   +15.34%
+1 MiB      2188.42          3330.72   +53.47%
+
+However, I found that there is still a performance regression at QD1.
+
+1 MiB WRITE, one channel, one job:
+
+With schedutil:
+
+QD    PERCPU    UNBOUND+batch    Change
+  1   1945.94          1021.28   -47.52%
+  2   2844.66          2567.18    -9.75%
+  4   2338.03          3547.42   +51.73%
+
+Performance governor on all host CPUs:
+
+QD    PERCPU    UNBOUND+batch    Change
+  1   1974.35          1785.16    -9.58%
+  2   2904.12          3038.52    +4.63%
+  4   2418.45          3659.93   +51.33%
 
 
-vim +61 fs/netfs/write_reissue_kunit.c
+CPU frequency scaling makes the QD1 regression larger.
 
-    25	
-    26	/*
-    27	 * prepare_write_failed() sets FAILED + errno, then write_retry still calls
-    28	 * reissue_write().  Before the fix, reissue wiped error to 0 so terminated
-    29	 * reported success and mapping_set_error(0) was a no-op.
-    30	 */
-    31	static void reissue_preserves_prep_error(struct kunit *test)
-    32	{
-    33		struct term_capture cap = {};
-    34		struct netfs_io_request wreq = {};
-    35		struct netfs_io_stream stream = {
-    36			.source = NETFS_UPLOAD_TO_SERVER,
-    37		};
-    38		struct netfs_io_subrequest subreq = {
-    39			.rreq = &wreq,
-    40			.len = 1,
-    41			.transferred = 0,
-    42			.error = -EIO,
-    43			.source = NETFS_UPLOAD_TO_SERVER,
-    44		};
-    45		char buf[1] = { 0 };
-    46		struct kvec kvec = { .iov_base = buf, .iov_len = 1 };
-    47		struct iov_iter source;
-    48	
-    49		__set_bit(NETFS_SREQ_FAILED, &subreq.flags);
-    50		iov_iter_kvec(&source, ITER_SOURCE, &kvec, 1, 1);
-    51	
-    52		test->priv = &cap;
-    53		kunit_activate_static_stub(test, netfs_write_subrequest_terminated,
-    54					   capture_terminated);
-    55	
-    56		netfs_reissue_write(&stream, &subreq, &source);
-    57	
-    58		KUNIT_EXPECT_TRUE(test, cap.called);
-    59		KUNIT_EXPECT_EQ(test, cap.transferred_or_error, -EIO);
-    60		KUNIT_EXPECT_EQ(test, subreq.error, -EIO);
-  > 61	}
-    62	
+The main challenge seems to be balancing CPU locality and parallelism.
+Keeping the work local helps QD1, while allowing it to run on another
+CPU helps when receiving and processing requests in parallel. I have
+not yet found a suitable policy that works well for both.
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Any ideas about this?
+
+> This walks the entire channel list and sets multichannel_seen again
+> whenever an additional channel is registered. Since the flag is
+> sticky, all existing channels are already marked when count > 1. Could
+> we walk the list only when count == 1, marking both the existing and
+> newly added connections, and update only conn->multichannel_seen when
+> count > 1? This would avoid the repeated traversal and stores.
+
+Agreed. Thanks for pointing this out.
+
+Best regards,
+Huiwen
