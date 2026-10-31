@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793410831;
-	b=UYsFzaoYupjqfMqFO0YCFEOGqrkuhQDL+D74fdC8rkSL9uNf6hvudEZgu0yqAcfm+69f
-	 xWj/MgIKlupoM5spXRkSuI22PY/iuA6eAxyGtMS9idpG2RYNNfkbzpOG5+FdEbDezLfmc
-	 hbWsJ0CsLJ4rDUTdIeNu7/T+8UvovZOp/oGcxIb6JHbgeX7JmzAH7+Hh9meA7UVDQ10iL
-	 AE3mhiUDkVLQlx37nm/W6Za9JrF2Ii3juAJSzIzrNi1uSGJDN8y8sKa6TtPQSd5x4+Up5
-	 BWW1jx0EiHuaSznqLVVA7BEv45JbRVxzIiy32UIzRPG5zp0Jjxs81b+sisa6WjxwxvA==
+	t=1793412586;
+	b=dRcocSfg8w33/bnSXEKO7q5mJEGLJoguU6wvHlRWJdbYx0CEIok9IYhOijEhpXcqmjbX
+	 PDHrv+4/aWl+v2nGCaJE2urp7Qjj6Uy0MMGE759zvfz8u1sjUiy41T2NEwBCTAgfm3jXS
+	 Nr1ZyJfBHk4ZI1qXyRzycpzhUsHR1NNf6Mf6P+dowyuyji5oGyiVYppUwspwgXI/p6jMJ
+	 b2kFejyPILffunKWewsSz2Woc5fNVgoRUSFYAOzb+oQ4KjgJ/9/OSgwpNm2oCNBojXltT
+	 xJv3WP8zyy0aCB98iL9zugELXcE/3xmeky2YbUVvc8wNKWadNVqJ1f/qdvYEnt0ndIg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793410831;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793412586;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=EAJu04mdX0kbVuQyNmSZdbzTKVyihRnShGbuZn9bePU=;
-	b=rxrnPL4PXrFj8AhPTF/ChpxrJOJyuyy/iUKRymhpu4uifBpy5bPFYiZ+yE9sz7hxP6RU
-	 b4utVwLoCG/opCXfW2tlVVzee7qCfKoujOnv/x0gsPNjz4wwS+DhuoJCGw/mvf4H5HRfI
-	 J8DPYyXmZELvC1PJLr7o2vD/SBm/VrVL25mAYEjdqcmSW9Xf9mVFq3GsHdFTssenv/1D/
-	 8VJV/Vu3UeFcHTjZ2aVEpRs6FrUqi+8FCfEezYIRQ70g/c3MoIwrjZENyFGXJNwsv4oTF
-	 L27o9a4D3N7BjneBKP0BlhXYD9ZjXp/Wl+ViPyRJnfEozZsQJfIwxPF9F8A7qx5qOkg==
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=0fhsmLg+/R1e6vDeTMj0qehUFlPHkkHCiukF5Cl8254=;
+	b=3XrFIOp3UQbm4uut3YT/OhIoZbQ1nNcJqsBKZtBRJsx9dhwoSc3rwWPSUItMCm6nBHXq
+	 M+HvnRgz5+vnQZbwW03y39if8+IHQfzQtqW/tZmSVf7LccGMlth1BVbHNocfxDAMARyQR
+	 tpecPnndR9vvWEa1YdxABjqrpLz9mLKUF0yQ+TdpoQVo23hokfhe7JK5HtV7/EjOFA5Fd
+	 CURqad7bQXqGe6dxUDuw3S9VeZoK964WWg8uR2fQrJ8WvR4UGqk+A09l71sScQjjhP9nx
+	 y2hNGgTRQteTdZ0k6XyoKVChVB9YrgXjsYnHLAHOf3+GuhLZmXlPPGC1wt9srBDYEog==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h440Q7dj;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cYco0U6J;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F28606A323
-	for <linux-cifs@vger.kernel.org>; Sat, 31 Oct 2026 01:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2A460A2610
+	for <linux-cifs@vger.kernel.org>; Sat, 31 Oct 2026 02:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=h440Q7dj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 070A51F00A16
-	for <linux-cifs@vger.kernel.org>; Sat, 31 Oct 2026 01:40:31 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cYco0U6J
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B441F00A1C
+	for <linux-cifs@vger.kernel.org>; Sat, 31 Oct 2026 02:09:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793410831;
-	bh=EAJu04mdX0kbVuQyNmSZdbzTKVyihRnShGbuZn9bePU=;
-	h=From:Date:Subject:To:Cc;
-	b=h440Q7dj+vJlHuoUTOuhl5EiVjIDQkw99xOpqG8jahRlgF/g1OKguOp+v3qRoDKXT
-	 boCCQqY17QsqqQHpmY91sQtEsAxjxB5lC4TCdEVu0fM69tALroB336xjdBCoQv+l10
-	 n0M6O4/rVIPhCJHPNNar4g/fP1drV1K14SbVBZ/VuJu+iXmiNFKd1Nt4JgTi52UxAc
-	 wx5/SzYJ+4KXMMcWjH4ii/R6UVaK0GrS6SefB6d9w+O33J47gGuAt9PsI5XwephCyL
-	 KReugybC7ORWCpOYVdh0bL+OleF3TRf6N6ZlkHfvy98m3xp8H7EDibr58WV2mISbQQ
-	 EaFEsThVgDQwA==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c4cb6834eaaso104258966b.2
-        for <linux-cifs@vger.kernel.org>; Fri, 30 Oct 2026 18:40:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBwejf/UJDMgp9mXSlm4arLmaQMS1RYw7oIs+dFbwk9ReHGxi21sMszgF86UXI67dUDzeQF1x0uHYRl2@vger.kernel.org
-X-Gm-Message-State: AFq9FYLgp0F2sF5aHLHEuahY5BGgzHwOwS/H0BLw6mJgI8KksAhdHMzw
-	zGJAFPjVj1tQkDfgRSHSWnC/FqTr6qfESN3dXvOxZWUJz+6PzvBORF0mF/TUymFBYcLef3ZqZ8j
-	9n1AQ6cyRmum34aa/1xGrknSyQxknWUU=
-X-Received: by 2002:a17:907:3e0c:b0:c49:df95:fd0 with SMTP id
- a640c23a62f3a-c4ca7ad10a9mr361084066b.48.1793410829643; Fri, 30 Oct 2026
- 18:40:29 -0700 (PDT)
+	s=k20260515; t=1793412585;
+	bh=0fhsmLg+/R1e6vDeTMj0qehUFlPHkkHCiukF5Cl8254=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=cYco0U6JNhpJm+j9Lu5Q4JNTMLOWJ3wC1e8HjKQGkesV0ebvSZNBMWRFDrDMlu0Zj
+	 m04xvzXwuCOJ5lvuXrYAuM9wUXa5xCDk8hLp70X9b900qcUxxEFNb0tzwdSQAHgRLn
+	 hiIvkRx/C1E3mnANygmh1Y1k/SeDPqNN+yxCvqfb2ZzMJc01SIqOGOoURQu5IxNTy4
+	 DyjWyeXoqgP26JLbsYaLzuZWqGKkndb/c9Zw0B9yg5Qz9r3ml8bSC3ZYlCd6XzrVvJ
+	 +UJ1OQX3z1Gk2JPKsxHmywOGVMUU0ycOkvd20CLUEY14HL4s+/0bdCpMzRlm+zdrof
+	 P1gMS7+UijRgQ==
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6b2237b596cso2470246a12.0
+        for <linux-cifs@vger.kernel.org>; Fri, 30 Oct 2026 19:09:44 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AKwUvByudZQVJ5V2wOJi4JahqIsRDyQJ5tiuoA3iY4eaaxWWLEdHK8/uZ4/RtNrZ+OXCMjXDn1sqQP2H6BGu@vger.kernel.org
+X-Gm-Message-State: AFq9FYI9ThEnxBQo1f36sailVml3ph806RAGn7mBfxngz8Yf+NY9/wtr
+	7dHs9vhYeXm3MRnkopV9u1xQZyzlgGHLFEVPMWOgQtxaA1IqWVetOzDmvl544ZQrS/IoZ7z0Vh4
+	3diBiQ0oeOVltP83N9dvyWST3p4CYKNI=
+X-Received: by 2002:a17:907:96ac:b0:c49:b8ec:a9e3 with SMTP id
+ a640c23a62f3a-c4ca7abe67amr377807566b.43.1793412583658; Fri, 30 Oct 2026
+ 19:09:43 -0700 (PDT)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,111 +59,43 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+References: <20261030020523.302085-1-icb@fastmail.org> <20261030020523.302085-3-icb@fastmail.org>
+In-Reply-To: <20261030020523.302085-3-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 31 Oct 2026 10:40:17 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd98nDs6_4fhaMwn1gbTSsRkNoLefr+ZCxC+RV16j1rEwA@mail.gmail.com>
-X-Gm-Features: AclHuK-GG_1JFYUOpwLFNC18p_eJR7exjJvBr9XQxhpDrQ7RdoI3dyucQxIDvQY
-Message-ID: <CAKYAXd98nDs6_4fhaMwn1gbTSsRkNoLefr+ZCxC+RV16j1rEwA@mail.gmail.com>
-Subject: [GIT PULL] ksmbd server fixes for 7.4-rc1
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Date: Sat, 31 Oct 2026 11:09:31 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd93czbFD=znZUq_pJLXzDR5N3zc_auvAGWT7pzKR1f9Ag@mail.gmail.com>
+X-Gm-Features: AclHuK_pJofjvX5FQy3V3RmY683i0MSmA_O1khwZaSiRXh7FWc04LdLmaOE3Bgs
+Message-ID: <CAKYAXd93czbFD=znZUq_pJLXzDR5N3zc_auvAGWT7pzKR1f9Ag@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ksmbd: exclude guest and anonymous sessions from
+ Authenticated Users ACEs
+To: Ian Bridges <icb@fastmail.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Linus,
+> @@ -1611,7 +1612,8 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+>                         break;
+>                 }
+>                 if (!compare_sids(&sid_everyone, &ace->sid) ||
+> -                   !compare_sids(&sid_authusers, &ace->sid))
+> +                   (authenticated &&
+> +                    !compare_sids(&sid_authusers, &ace->sid)))
+>                         others_ace = ace;
+Skipping this ACE for a guest can leave both found and others_ace
+unset. The POSIX ACL fallback then runs. That code compares ACL_GROUP
+gids with the caller's uid instead of checking group membership. For
+example, consider a guest with uid 1000 who does not belong to group
+1000. The file's DACL contains:
 
-This is ksmbd server fixes pull request for v7.4-rc1. I add a description of
-this pull request below. Please pull ksmbd with following ones.
+  DENY    Authenticated Users   READ_DATA
+  ALLOW  S-1-22-2-1000            read access
+  ALLOW  owner                         full access
 
-Thanks!
-
-The following changes since commit 6b4b543fa18757297ac756a6fe6e64f506b7844a:
-
-  Merge tag 'parisc-for-7.4-rc1' of
-git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
-(2026-10-25 18:04:17 -1000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/linkinjeon/smb.git
-tags/ksmbd-for-7.4-rc1-part2
-
-for you to fetch changes up to 206fc30f71b005156085fd8523ccc84a2c67791b:
-
-  ksmbd: return complete and aligned stream information (2026-10-28
-17:57:07 +0900)
-
-----------------------------------------------------------------
- - Fix compound CREATE response buffer sizing and reserve space for final
-   response padding to prevent buffer overflows and out-of-bounds reads.
-
- - Allocate sufficient space for UTF-16 directory-name conversion,
-   including the terminating NUL.
-
- - Fix an RDMA transfer length underflow that can cause out-of-bounds
-   reads or writes when processing multiple remote buffer descriptors.
-
- - Fix use-after-free bugs during failed durable reconnect cleanup and
-   AppInstanceId supersede racing with session teardown.
-
- - Keep retry timeout clamp bounds constant to fix a MIPS build
-   failure with CONFIG_HZ=1024.
-
- - Fix a session reference leak in compounded SESSION_SETUP and reject
-   compounded session binding to avoid mixing session and tree state
-   after a failed binding.
-
- - Serialize operations on each named pipe and preserve unread RPC reply
-   data for subsequent READ requests when the client's output buffer is
-   too small.
-
- - Return complete, eight-byte-aligned stream information entries and
-   report insufficient output space correctly.
-
- - Use the resolved share root path so shares rooted at mount points
-   list their contents correctly with crossmnt disabled.
-
- - Ignore network-device events outside the initial network namespace,
-   preventing container interfaces from affecting ksmbd listeners.
-
-----------------------------------------------------------------
-Denis Kulikov (1):
-      ksmbd: use the resolved share path for the share root
-
-Ian Bridges (5):
-      ksmbd: fix app-instance non-durable supersede session UAF
-      ksmbd: fix SMB2 CREATE response buffer overflow in compound requests
-      ksmbd: fix out-of-bounds read when padding the final compound response
-      ksmbd: fix use-after-free after a failed durable reconnect
-      ksmbd: fix session reference leak on compounded SESSION_SETUP
-
-Jan Koester (1):
-      ksmbd: ignore network devices of other namespaces
-
-Namjae Jeon (3):
-      ksmbd: prevent session binding in compound requests
-      ksmbd: keep retry timeout clamp bounds constant
-      ksmbd: return complete and aligned stream information
-
-Stefan Metzmacher (1):
-      smb: smbdirect: fix buffer length underflow in RDMA transfers
-
-VeroFess (1):
-      smb: server: size directory name conversion buffer correctly
-
-Wang Zhaolong (2):
-      ksmbd: avoid races between named-pipe operations
-      ksmbd: fix named-pipe reply loss with small output buffers
-
- fs/smb/server/mgmt/user_session.c | 128 ++++++----
- fs/smb/server/mgmt/user_session.h |  18 ++
- fs/smb/server/misc.c              |   8 +-
- fs/smb/server/smb2misc.c          |   8 +
- fs/smb/server/smb2pdu.c           | 517 +++++++++++++++++++++++++-------------
- fs/smb/server/transport_ipc.c     |  45 ++--
- fs/smb/server/transport_ipc.h     |  14 +-
- fs/smb/server/transport_tcp.c     |  11 +-
- fs/smb/server/vfs.c               |   9 +-
- fs/smb/server/vfs_cache.c         |  60 ++++-
- fs/smb/server/vfs_cache.h         |   2 +
- fs/smb/smbdirect/rw.c             |   1 -
- 12 files changed, 569 insertions(+), 252 deletions(-)
+With S-1-22-2-1000 also set as the descriptor's Group SID, DACL
+conversion creates a POSIX group:1000:r-- entry. Before this patch,
+ABE hides the file. After this patch, the fallback mistakes group 1000
+for user 1000 and lists the file, although the guest still fails the
+POSIX read permission check. Please also fix the fallback to check
+actual group membership for ACL_GROUP entries. The UID/GID comparison
+bug already exists, but this change exposes it for the DACL above.
