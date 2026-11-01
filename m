@@ -1,55 +1,124 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.144
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793498541;
-	b=31z9LiJlfd54v/b/u3FyVvdV5J7D2/mYcRxdbqjCZN7TYNH1uvt/2Fn3+klOvfsz1viw
-	 gSw5Wep9Y6czcaJsadXN0rq+Ha91CrOV4b6O/HoYaspcRejT5Ld+Om3tTgpdMQiMUTLSw
-	 M84GcaHGhWs+iJCVuWh4YGPMOZyex5uatrtJteyhL/CF+2i6iVqy5rUzw3/noLLG0zFGu
-	 xn9K+l6hTQnUtiZgUJ5W1t3Ru3e8LUOT8RPZyZ//94Y73fGfT78ORM4GnbzjbLow6INTv
-	 OQfi5qfczMUJT+R2r349G/7L5w9Z26QGJ20KhyymyVoXT4cm0CUPqrcBhFrhWGj5iUg==
+	t=1793569473;
+	b=Re8QlcCz8zj7OVH2PCcXproRUr12WOOHOjT/7YxB6gWqZStJc087r+SNCCi4/Q3k8G1+
+	 IQWvNqNehzI/JMBsWLS9Eb6PlsFThKfVUUc7eNCUNT4XvaBjrLsuwbMQRtnkiz7a3IDyD
+	 iDv6zSyTAz9nNpW1WnBnzOSKq329G+Ogfn4hu4wkpCupdSpdlw6noY0OrlLGqTUkTle4q
+	 AYLnecuzQM3BcL/RgWRkQa+zx5LuJGakUP21XBpsuDLncr4OnogU8yP6eH16G8p4B/75B
+	 B2U7Gog+oiMcBMro89/Ks1nzvU/y68Xkdy9g0CZpEkPKjcmdCu/k7JltFGqDLGLluTg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793498541;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=3b1VjNbfffoLcu1vrfLBvJ6zv61wyRoYnEPPvNT5AxE=;
-	b=KXp0Aeo35pbV8r/b90J/I+xAltdUdxLtO1trqwtsFMj42U0Ozem5A7IbKIpd+hhTGv2j
-	 azwIw6jW0Vm7hSq3zGFmSpzdJNVOFHAqeGVSC67zyL1hMq3NjfX5DVw1nos3jwxQBrZxF
-	 Tvj9hgmCBh8ukjdN8JjbC5wYSlekGZqp+kb317B1qsoU6vzGjjJOrqmhfZQ0d60Kf4axs
-	 OwkT3M+cWN0HnmiqRax+PCHUV4ALV4gCFpZ+MiVzxbJNNUtn1mD5O8vnjw4l3fpOS8gKT
-	 H/A7RqJVeCi5bMAgQQ6Xo3kJR49BvrtLmb6ZtGIrzFMuW8syDuf0zyDRSvoPPmBdA8w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793569473;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=1mMVj/Ylp3Zajqhxi8SVpg1+8G54F1N0w5aojxYs+sA=;
+	b=KpW8/AVpnr1OFJASG0+fgTysSlDjKUTq1x5LyxK/h6B/wb1JG1HqczWrzEvQYBkAdVJH
+	 tMCsZwL0d1pUSPQ6TPYTbYkxj1eccVyCh96w37dYUychldKW0r6C9uCmotvr0+3XosUwA
+	 EzM/Fs3u1UW4WOvh8u9zf8GQ1mQDVYqeDVjkui1fgxqneodnheUq2VthK/xrZ0gC2q2Jc
+	 wVZT0ZrFWzm5PxdS3KrUJZSaE/Xzjo/SJ2H4Rh7fOBnjDwjKBWJCP+Mt1LQIvr6z3vMZC
+	 CRVWOxacIFRPPPfoGJ15bJQqiq7hAjXysQEg3leNvdKVhEtBrkcVJbd+peWFQHQr/Dg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QIgS+2bm;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b=AE7ESmBE;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b="qs1HYt/q";
+	arc=none smtp.remote-ip=202.12.124.144
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC3B606A325
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Nov 2026 02:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA3A606A324
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Nov 2026 21:44:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8EA3A606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QIgS+2bm
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24BEA1F00A17
-	for <linux-cifs@vger.kernel.org>; Sun,  1 Nov 2026 02:02:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793498541;
-	bh=3b1VjNbfffoLcu1vrfLBvJ6zv61wyRoYnEPPvNT5AxE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=QIgS+2bmZiqCkqf7ILRaDcpd9+Hb3kaMvLR4kYt/l1SYw6zIwRa2QYsQNjq4ajGrF
-	 8I2ih9I1xvgEicfziTe514s75n+jdzwLVaOZN9nGa9b7molikJ0WWdx78rugFms6Jx
-	 kEqZjmS5FquFnsl6ymUbROfNwoWBLOCbbCPDceAg/T3K6SqDjsKU0uFU9hoBc3XHki
-	 XjSAK1ediW+wzKZgIbMicKxcGbEhosgt3nnEK2jdmUkLfqYRbS559e2+ii2YOOcDHB
-	 mx9ct+i06Lt5jvKX8TqUDqS9IOVs3pvOunnMlwImI+ZBoPKpuUcoxXIip3xaRdKl5F
-	 SWyG7Gha4eBeg==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c40e02b2ebaso329832466b.1
-        for <linux-cifs@vger.kernel.org>; Sat, 31 Oct 2026 19:02:21 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBx8wRqR2hiq36yuOEsok0ZEEcpBxIh8AFHllwOzNlw6ISP8ZEMO8/qhsJfo1gCB/Y7052fL4h22axWo@vger.kernel.org
-X-Gm-Message-State: AFq9FYJrnYsgDWt2MJcsJnhDamXkICymrziFJfKbmYYT1YAXEkliEwbl
-	ef7Bwe0p3Q/z1Y409osO1kanRfyUROcORlQm3y0YdnwTMpSZf8rXwHjDSQTMF7uFmiqQQlgAhj/
-	MzGHb3Yl682ZfyOJh93uolwO4R/7wvRw=
-X-Received: by 2002:a17:907:6e8a:b0:c3f:d912:ff8e with SMTP id
- a640c23a62f3a-c4ca7a15d8bmr490497966b.16.1793498539744; Sat, 31 Oct 2026
- 19:02:19 -0700 (PDT)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b=AE7ESmBE;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=qs1HYt/q
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id D73E11D001CC
+	for <linux-cifs@vger.kernel.org>; Sun,  1 Nov 2026 16:44:31 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Sun, 01 Nov 2026 16:44:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1793569471; x=
+	1793655871; bh=1mMVj/Ylp3Zajqhxi8SVpg1+8G54F1N0w5aojxYs+sA=; b=A
+	E7ESmBE6MDWnJYpCWrVoCtT02gtzn9NTvwMgTdQLAVXpaqkLfdprHvXCk+hWw3Rr
+	kJseJgZJFHcb4LrtdJza5j83J0USbsdS2pJNE/LFkJvRmQaJhUmy0vrV1ACL+YhB
+	vtuazn397TFJyNEUAX0urpWDOlkPLKrIAYURFRH9wtKLnXOn8fL1G3uwfbF45Z6i
+	iktXULjLjUWTGAgoDpsGDtYWvz+pwCMo/sM4lXOmJOaLFWkdVOd+VrrXN4DPl6YN
+	SzVvW9iHWqeFQ4zRbifW2R1wZ0jZgkI+vzLP29dYdJhN5a5ocE/B4wfUNr13h3ty
+	UoKymClKGyy9DcWS9C6sw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm2; t=1793569471; x=1793655871; bh=1
+	mMVj/Ylp3Zajqhxi8SVpg1+8G54F1N0w5aojxYs+sA=; b=qs1HYt/qSsqGmuJxz
+	swYVYH9gVaA7p3NTG/mQG6XEAmkaYpUQBfKlPKVU0cFF3DxXkN9Leb2YrZLWPmgP
+	MGM8X32lhCzyXpGX95vZkLEwO5CQWe3UQBv/2mz0JMq0V43wDI1Sd8KXcL5U6IAb
+	SnHA9Jewbv5ZvDPaNuh0xuz0nWyiMBNvXaRoAXQ1N3UwUB2bdaUcUi3C7bFwD0hJ
+	1UljXX4y529kzVGIXp8LLJGJOWMuEkHQuXvhvFFTIeH07UZ5arutP3DCzsUy0wgV
+	BHV/AblUTtDZyRz6tkIMmxdVF1p4g5W15gER9pTZH/WNC6/iCq0JDcHNHfEJPJun
+	uTTuQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
+	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1793569471; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm2:rsa-sha256:Aiq3nBLeSEPilQhcFACJYaOJrJXKtzznDSmLTgdwseukwUB
+	7nqmxkNDkU5t0Fv6IzIZDj1qa6WySE/Om1xFW75gUSrlXHOYtYGyVLgbd82F/2tn
+	eNAJve7THldLQzDZ68eF5E/wtlFu6BGrr+gBpt0awZCPWdRm8qD6yGMJtiCp0yHR
+	XEKT4uES2n40ZuClQ9Kub+tXaXp8CNNyB5/2TWtcVk37Qh+cpfw/2wNrkbH0I2Uw
+	Hm0WYZ1aq8TdKOK9JH1iitbUpubSBgepxD2zK4ZxKx9+QBJPXArPeOXy4aXtCu+g
+	aScKLtwCsS8IWoqgVy2+eEwMfUN0xa7zGUgzM/w==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
+	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
+	action=mi-m=1; hc=11;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:s3D0c4wDMJC0cXlZMBmVc9tbHXMHJ9R/y4awmIrt6vw=:1mMVj/Ylp3Zajqhxi8SVpg1+8G54F1N0w5aojxYs+sA=;
+X-ME-Sender: <xms:vrLnauYsv5Wmzj6LdN9_ERDEvm7soB60-BDiWfgT2REDEEi1jJJ3XA>
+    <xme:vrLnaqsxskBrCJBV21CTkdiztgn3ZW-7nj-ya6uEw4alOEy7RxOPBW-BzieoVQBRe
+    zhgxwtGoIjpivQGBuOdmGqeBNLEnbThKo4orET_jTlJnAaKul7rtQqt>
+X-ME-Received: <xmr:vrLnagOXmB4hO6mCQmttswZ_JOqLa7iqV4m0YNlSxL6SNSRUR2Tg3STDfkoe0n8H>
+X-ME-Proxy-Cause: dmFkZTF3NaYCNjGh8GDiquiV6BKvLn2bMNkt+4G+za2RoAktBLWK4JKctLjCjO6hCq7GZ3
+    7rnwthsvRlCv9UYVVrRk2loGsJl/F6CzE3Y9g/blAALzQq7ks4iNzx1pAEH39xpCVQjwek
+    Qdvo+MRPAD6cZ5hbNV2cUyyi7rLPkDTTUiY0Q8K3T/RShhsHjaiUw1eZL0+wfnzlh58JrI
+    zi5S0J6vutAyLNbOY/gRvta14zWuOVd0MrR5Xq1Ftmz4VmdX5u7yXtdViF9qBunFVxYfQI
+    dXx4BY3mmXk8NIHWwjfPkKgSADDBBEvOWzA2U7xHjITY8hzbTtHKrAj00CXwbo8WMj/2iN
+    U0Yngt/+ZCSV+YnN2kFxMjmgg0EqXvU0snjVa3O/XapJlMJpmEjOn+G0XgVWULXMRkmRCW
+    5ZCksZ0Uoyc69Ta+4AqkpulLhMP9UNsOpYnig+WtCdZ7kNio7xBOif3bHkQcjzxXZNjD2e
+    8QGhV6Y9sh0eT+FnXUmmY4G9YgvQDSmH/63M4qoWyCZJFkzW8JWCz1xGW29GZb/sA5RATX
+    J+YXciU+QW0cDBORN7B1wKWWnRfDs1uTV+G63thGA1pZLSMdgbRUF+jIXMgD34d1eXdwKb
+    ytVlbF8dFX8wzr88oUFe118J9VEBQwjhKIn1FCdrJZk6mXZy4YU9WusG535w
+X-ME-Proxy: <xmx:vrLnah4dmX5CsJhLJURZK3OgnP7s8UZrLj8H18o3F9lhDA2qjddv1w>
+    <xmx:vrLnamTQCmGoyAr_D0NC2J__DmbJeqPzVNjQifnLQg4rXNNI0R268A>
+    <xmx:vrLnauCW0tsnLxnCFDTCxC5dP2lIKzNAyulz76wciRMUce-vaqLsKw>
+    <xmx:vrLnamFZ-w1lPa-ZDwXHP-cyDX0CWumwBdEw4oRfVagiXCmZ-Jy_uw>
+    <xmx:v7Lnam11NSn8WAy7S3IHtTvHz5rMOobZ7zdNBWJQBZ4ah9bkrz9hiJoO>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 1 Nov 2026 16:44:29 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] ksmbd: enforce the DACL permission check on delete-on-close opens
+Date: Sun,  1 Nov 2026 15:44:20 -0600
+Message-ID: <20261101214420.731352-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <CAKYAXd94Fe0awVpprg+41Xc+S+nr79g1jU75oeH4Trd2WWwSqg@mail.gmail.com>
+References: <20261029140535.260498-1-icb@fastmail.org> <CAKYAXd94Fe0awVpprg+41Xc+S+nr79g1jU75oeH4Trd2WWwSqg@mail.gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,69 +128,19 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261030213827.2216453-1-andrey.misyrov@gmail.com>
-In-Reply-To: <20261030213827.2216453-1-andrey.misyrov@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sun, 1 Nov 2026 11:02:07 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8+wMSXCJrZqCGewTxQ1k-RmRPfbsMm-iGvS3nQUq4Lag@mail.gmail.com>
-X-Gm-Features: AclHuK94v_vMoId5LA5KD-e2xjl6J8_imqW0IJFJlWUrLqYwJv_4HzPVr4Pvkn8
-Message-ID: <CAKYAXd8+wMSXCJrZqCGewTxQ1k-RmRPfbsMm-iGvS3nQUq4Lag@mail.gmail.com>
-Subject: Re: [PATCH] smb: client: fix OOB write when compounding SMB2_IOCTL
- with encryption
-To: Andrey Misiurov <andrey.misyrov@gmail.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, Steve French <stfrench@microsoft.com>, 
-	Henrique Carvalho <henrique.carvalho@suse.com>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, stable@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 31, 2026 at 6:38=E2=80=AFAM Andrey Misiurov
-<andrey.misyrov@gmail.com> wrote:
->
-> On an encrypted ("seal") mount, SMB2_ioctl_init() keeps the IOCTL input
-> in a separate iov (iov[1]); iov[0] is a 448-byte buffer from
-> cifs_small_buf_get().  When such an IOCTL is not the last request of a
-> compound, smb2_set_next_command() pads it for alignment by copying the
-> whole request into iov[0].  A large enough input overflows that 448-byte
-> buffer and corrupts the slab; the copy also sets rq_nvec to 1, so the
-> input buffer is leaked too.
->
-> An unprivileged user can trigger it by creating a symlink with a long
-> target on such a mount: the native symlink is sent as
-> FSCTL_SET_REPARSE_POINT + QUERY_INFO + CLOSE in one compound, so the
-> IOCTL is not the last request.
->
-> With slub_debug red zones on the cifs_small_rq cache, the overflow is
-> caught on the next allocation from that cache in the same compound (the
-> 0x61 bytes are the 'a' characters of the symlink target):
->
->   BUG cifs_small_rq (Not tainted): Object corrupt
->   [Left Redzone overwritten] 0xffff8a59c7790500-0xffff8a59c779053f First =
-byte 0x61 instead of 0xbb
->   Call Trace:
->    check_object+0x1a8/0x350
->    alloc_debug_processing+0xab/0x110
->    ___slab_alloc+0x7e/0x2f0
->    kmem_cache_alloc_noprof+0x28d/0x4b0
->    mempool_alloc_slab+0x16/0x30
->    cifs_small_buf_get+0x1a/0x30 [cifs]
->    SMB2_close_init+0x8a/0x100 [cifs]
->    smb2_compound_op+0x2571/0x2b50 [cifs]
->    smb2_create_reparse_inode+0x27e/0x490 [cifs]
->    mknod_nfs+0x1ce/0x2e0 [cifs]
->    create_reparse_symlink+0x119/0x180 [cifs]
->    cifs_symlink+0x19f/0x8e0 [cifs]
->    vfs_symlink+0xa3/0x1b0
->    __x64_sys_symlink+0x41/0x70
->
-> Pad the input to a multiple of 8 bytes when encryption is required.  The
-> request is then already aligned and smb2_set_next_command() no longer
-> copies it; InputCount still carries the real length.
->
-> Fixes: 90f7c100d2dd ("smb: client: fix compound alignment with encryption=
-")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Andrey Misiurov <andrey.misyrov@gmail.com>
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
-Thanks.
+Hi Namjae,
+
+Please drop this patch.
+
+I checked Sashiko's comments. It found two real problems in this patch.
+While fixing them I found that checking delete-on-close opens with
+smb_check_perm_dacl() makes some valid opens fail. Other issues need to
+be fixed first.
+
+I will send patches for those issues, then resend a fix for this bug
+once those patches are merged.
+
+Thanks,
+Ian
