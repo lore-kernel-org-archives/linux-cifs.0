@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793660626;
-	b=4c/dILaAq5eFoje0MYinrHKerqteZY/GlR0ABolK0AaPHBzmnxQuyHGfyKKmN3gZCk7P
-	 Q89jt8LA1XISIxfqeyFWRS/6H3nHkf3WOQHgUWSzGb4nAoo1qmmkaCv7Tw5qiMwMEVVoX
-	 M5VhGwj7zI2239EftkrhPe3VhuzNZhCBGnPUiTPbSQzkXbUyvsCPjCmUHuQA6HKIiLbTl
-	 JTmueUclwHyjN/tib72pqBMIhaWjOEiHVX/mZgduRCHUbRIoSUMSLjvcjms7YbLxWaklP
-	 3ved5mY14oLsibyQKAkRcrCA7thVMYC6zI616t4Zpt8NoXTUjY/VJsORIipXO4RtaWw==
+	t=1793662895;
+	b=EcD5FdnMlsNanEod7cpn9P+0rXZrL8v6DahhAuaOfphZrasFt8p0xMbq754Wo67mJ+/c
+	 8NRTHGREYYiCp9m7sXBdoAmi8xPexrA24cY3jwvmw+sbJ25Upm2VxvnkiNEDFqwGWklMn
+	 H1yiPTIF30wIm5sKeX8KqUBBFtPReQLYsBIOtpIGV6i+pdZ5QPngquDAr+psTd9UUhx3M
+	 68UQNw9TNH3/VOHpS+YdAp8vp9s3KZHee3cK8mYhX4gH8nwO8EDUFAhctQCbXZYzfetQ2
+	 6slndGLn8P+BGPQaVEslZ/8EbvqcHJaIp6jAMrn1/aD7y18kFjJ+7Ea2NN5rHikkJbw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793660626;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793662895;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type;
-	bh=TOCj0cvfOMcwdE+2asmc5YrfnJ5Rb+uIiOaWLNlRZwI=;
-	b=FWPCjUtk24VrmUiRMqzCSCzGkD8mhvagrP/jG6jgb2oNx+amCCslcp2yRPKpX1ee3WCs
-	 twnTi3ebwqtYyxMjWx9bWFgbg/ja8gvoayMJVOwA6QzoLKOabhgNiIt0f2p8J0+WLEToP
-	 kASSqWsAMHFJa2+yHQhkbZUXoe9OARkJrkxEIuEqyEo8A+lGxRGNFaxIh1+emQHCV+AEw
-	 3KjFyK2h7rcxOrJcK10aZZEg+SfnNChKSfu/DSzLrOPExvDrplLaesgKxqdMcGSWP18ls
-	 i5emOGBDSN1yONX5XiZMbLVqBM9utbYzg9sbD2CMOeNP7bbIvnNbZUrQJga2csYiotg==
+	bh=Dyb0KNEBDyW9YUH/H8NB1sb2XfBQhpgJT9JPFKBIQR0=;
+	b=mB4mSeHZTwOQ32b4bV+DWfq54RbDN+vQ9DyR48B5jyKqTXPY84v20AHeBEjRMmGoaO/d
+	 V3gmvaCTrJvPsEKcKoKdIJ0o4+DMCcL38tPuZfnO8dPILOomQ9u/uONn2qqn1YPVu4eJK
+	 XbHJE+YYlPle4/eUiWsPZ4feOeO2OwStIeDSSpDiWQmGJVCWD4eCu/bleMXpb/qiJIn30
+	 he6r6PYjjVt+ecWO1cNg14RS3c1amS6tAU0M1EUXDkC9ydMJuL0IBAEeM4fCeWbzymgGU
+	 Wc1GJ8qox/fi9OTHXpTOM8Wemzwy+yA/RhfWQ9bgLhADZgI+hIqTNrpQvO3W3vTKYnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HUMxQjH4;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gcEKMJZr;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629BE606A337
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE8B606A324
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HUMxQjH4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECF1B1F00A1D
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:03:45 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gcEKMJZr
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F311F00A1E
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:41:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793660626;
-	bh=TOCj0cvfOMcwdE+2asmc5YrfnJ5Rb+uIiOaWLNlRZwI=;
+	s=k20260515; t=1793662894;
+	bh=Dyb0KNEBDyW9YUH/H8NB1sb2XfBQhpgJT9JPFKBIQR0=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=HUMxQjH4baTzG8pm5hQhi324eB43eyyV540nF4LklvF0lVZosj0Ok1EUmU+SdsH4a
-	 3h9KBSHeJ6VVTsZVuBA9YZq4WO6d3TXPNLx8FfmSOhD/JafKt4VXJG+k+R5X1ePNgS
-	 q/PQLdHB9y/KxXn1C7Lri+Ut04qtVWXs1eYcff90KPKaSSP+UV1x4iZojSO1M2AIgF
-	 G2JwreVan9DydZjNt2ojlpKClf5jXdtCpnsfYwBOco523Q86nNE5fxGJF4Js68xvI8
-	 wZUs1Mwn47HbPHtK3xv1OZIt5FRICtu4CZwLx8Tz6TJTSd+8oTVMVmVrMce6xKaMzo
-	 3mLOPWgIJxwpA==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c3f04e0e65fso521110166b.2
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 15:03:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBwQLQnatZ6Y81pmnYubeAI80qXqELYmclvf/xfx+6ofMcZFaQb67XRx8olhT9wm9wB+vqUHRGVheBO7@vger.kernel.org
-X-Gm-Message-State: APuU4Z8IcI0+GJvNepgCNuViUJLA7d7MV9Dzt1Ap9Jx4f6vu2l6N5QgZ
-	qyIQqxaplwqMfh0H2zzCWtMXDPTthXkd5hBmKplEt+XLKV2smr2o0Aff1JswuxOCDVXFTz/EX64
-	+Ya3vhTUnC1dRf4QcIYViJlLy55ZJzDU=
-X-Received: by 2002:a17:907:c5ce:b0:c29:63f2:99bb with SMTP id
- a640c23a62f3a-c4ca7acf3a8mr975101066b.47.1793660624646; Mon, 02 Nov 2026
- 15:03:44 -0800 (PST)
+	b=gcEKMJZraK7/1lnoIxsE4M0dToWDBIVmwxvZeTbAW0zRaJ9SXE5zevsln6eLNtZzo
+	 yDxbYFWO3a6eKMh3u+gpl9RLkQfCLMmwPC6UMrPVcpJ7KyYSXdAy7z9hX3WmzNGlE4
+	 rp6EfVtsi7JEA2yppF2327WS85/tKckSlQeRLVR3NzvAxu2/iFLplc8+gh/bAHPtdN
+	 XupmLrstuma9RYmMcF0Eqo2P6v8HdOjbe4EpfAKxT3JDCq7e7M1nQJIBtSadaVrtQ8
+	 11h9HAghsglPYIAc0vQH+rM1a3dnxedJilUTdrxlPWB2bfbloh1G+GN4U+XPJMha6m
+	 DwUMS89EGMIMg==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c4395d31228so551531966b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 15:41:34 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBw/NjQlWaT/lMKJ3HmIFLLYLfa3UdI3pHHnEhjAu0ts9z/3K3mZ7SeH9A7lQMKbmZ4AQ915rswZTFqG@vger.kernel.org
+X-Gm-Message-State: APuU4Z/6z50+NZI2hs0Rf8SnLQ1t+qd74hxZmNPt6ignUPjHbMqBCPMo
+	DJvyOyv279/vZiHREeoU9n3j8YAOHA2LZLLBCOJLHGB3KLoR1maGPH+W//T3WgsjTP1j9YHf8J7
+	7TJHlYHvZ9QwDKwHn6yUT6sy8g597b4o=
+X-Received: by 2002:a17:907:d91:b0:c35:babe:ab44 with SMTP id
+ a640c23a62f3a-c4ca740b297mr962386666b.0.1793662893123; Mon, 02 Nov 2026
+ 15:41:33 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,34 +59,37 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <179362071772.29269.615878810410303214@stu.pku.edu.cn>
-In-Reply-To: <179362071772.29269.615878810410303214@stu.pku.edu.cn>
+References: <20261102200353.884509-1-icb@fastmail.org>
+In-Reply-To: <20261102200353.884509-1-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 3 Nov 2026 08:03:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd96EhhA99O-xZyZ66a=tHB90DkmgFe2YhTwKRKT136bJg@mail.gmail.com>
-X-Gm-Features: AclHuK8qzNqMYHI4Ba66Ka9nSMCYCzbbTHTLaBo2b77zwDgZoRBYxqX7hCpqpTI
-Message-ID: <CAKYAXd96EhhA99O-xZyZ66a=tHB90DkmgFe2YhTwKRKT136bJg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: require NUL-terminated EA names
-To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org, 
-	Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
-	Steve French <stfrench@microsoft.com>, Ronnie Sahlberg <lsahlber@redhat.com>, 
-	Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
+Date: Tue, 3 Nov 2026 08:41:20 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-s-g2V4LNY8e5SsH=+0r3qLY+AeOa5Lp9K0T5p_tnA8A@mail.gmail.com>
+X-Gm-Features: AclHuK9G_vi4S7-_Tc8OkG8LlBlaaJXENvc1ro0Hs3ReisFb84vo12Ihx1bBJSU
+Message-ID: <CAKYAXd-s-g2V4LNY8e5SsH=+0r3qLY+AeOa5Lp9K0T5p_tnA8A@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: grant a caller what its groups and OWNER RIGHTS
+ ACEs allow
+To: Ian Bridges <icb@fastmail.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Aamir Ahmed <elb12345@hotmail.co.uk>, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-> @@ -3419,6 +3419,11 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
->                 if (!eabuf->EaNameLength)
->                         goto next;
->
-> +               if (eabuf->name[eabuf->EaNameLength]) {
-> +                       rc = -EINVAL;
-The NULL-termination check looks correct, but returning -EINVAL here
-causes smb2_set_info() to return STATUS_INVALID_PARAMETER. MS-SMB2
-section 3.3.5.21.1 describes STATUS_EA_LIST_INCONSISTENT as the error
-response for a malformed EA buffer. Please return -EBADMSG for this EA
-format error and map it to STATUS_EA_LIST_INCONSISTENT in
-smb2_set_info(). Since smb2_set_ea() is also called from SMB2 CREATE,
-you need to update the error handling for that caller as well. Also,
-the patch was sent with quoted-printable encoding. Please send it as
-plain text, preferably using git send-email.
-Thanks!
+> @@ -1562,7 +1586,8 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+>                              compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
+>                              compare_sids(&sid_everyone, &ace->sid) &&
+>                              compare_sids(&sid_authusers, &ace->sid) &&
+> -                            compare_sids(&sid_owner_rights, &ace->sid)))
+> +                            compare_sids(&sid_owner_rights, &ace->sid) &&
+> +                            !(groups && smb_sid_in_group(&ace->sid))))
+groups is false for MAXIMUM_ALLOWED, so this skips group deny ACEs
+too. Consider a file owner whose group has a deny ACE for
+FILE_WRITE_RIGHTS, followed by an OWNER RIGHTS ACE granting full
+access. The group deny ACE is skipped, leaving full access in ordered.
+The new fallback then returns those rights.
+An explicit FILE_WRITE_DATA request is denied, but MAXIMUM_ALLOWED
+returns 0x001f01ff, including write access. Before this patch, the
+latter request was rejected. Since smb2_open() uses this mask for the
+handle's access rights, the client can write if the vfs permissions
+allow it. Could we also process group deny ACEs for MAXIMUM_ALLOWED
+requests?
