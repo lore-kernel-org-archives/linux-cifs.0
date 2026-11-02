@@ -1,68 +1,48 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793632538;
-	b=soXhvDK0B6xlfLvwJGe05/xjGOe5NbZHBWKY4GYF2z32gtirnIkbSobZMXmEbXs0zEKp
-	 Gra+VPr9KYKjYEI6fiuX7nY9tebFng3l3937Z/MH0ziY3DNKLmj2+gFx1n81do+55raks
-	 3LkVWtT16TARQjtLyvdvdQe5Qfn6gpYzSa6DoVpREfFtN29CPRBs8XqdMN00zS7ctQ9J/
-	 gM050qGlZarQ0XyRhW/1ezEbWMYAgtv9XunBGZYmfJ7VqJoT57jRdUi3eHJ4QTBSKUZBa
-	 M9+93LcYEIWt+kC6rDUXzWbRjR3aW4cZWVpzK98XYhCmAOYl4xiBd2ymeF5YQ14o2CQ==
+	t=1793632553;
+	b=HSHHpv66tw8sLMAIAg3D2oQ8WyYXrjdItac0M27vHGbkn330FZ4yFLyMOhlup8Q+g5eD
+	 Tyv4Exd9+RpuVwQVJDpONjkyGOVXookPv+Bx4+7NCDYCqvoMXIc1i0SzWAGfoqjn8JY7+
+	 8vFXd25324QcuoOOU1ykdVJvUcdD95oDus9VoTm6b/NSiDaMjgKP+IVArpXMSsQqJuuB4
+	 2O5NoqB0IE0KE+ATvrji1vnSu2D9UUH1O+wWvmXBzAFDT5/B224+7VPNG6VRbz2D5dZmq
+	 rnmG6Lqr3apoRulIbM5c1J6L1QTUoUtsONQrpt3gpTTWRs7QcDUpx5LBnJxb5fduXhA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793632538;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=oHrRbfPdc5vmSpv0Jl6aiMpgO8yh2vSvaFTH5zcOad0=;
-	b=XIYAn8tcJoU60pJdxhaxMq1il055LJbTd9dfCgzIeO2OGa26tiPxsADAqL6i4XxZPhr/
-	 JA1KQdqrz+NrWow+vgkPT7U7Y0k+OiuyW5Eiwedq7SPYq6HtI9vJzamNfAqJmGSHSg+DB
-	 kUDOBiLj2EczAo96ifaojmMyIgyx7Sokxz2ETCdpeuqztHGw5PbWcWr+hSknJIyJIZJX0
-	 QUMqNz0O7KK1NdFu51pmhPSWObZuRd1GWuO+dFBoE4lJJMcz9nO3w4XW3GCIr6JbDci1Z
-	 Y14N9bv8N1Mf8a3XF/EXwiCJvjk4vR/Oh7Fl46kFMwhtBSC4hZch9lf9dI8bb8+pa+Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793632553;
+	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key;
+	bh=/po/gL747wOLzB9LODGeMVhVpt9eaPUzZYdg1qfmMOQ=;
+	b=NimNnJhWmD6b1CcA09T50yIOo9azmmSwIlkcGs4r7i2CfXzcRmaFQc/4TS4+E7eWj8QA
+	 iN+PFMKAntbowaQvTVTawVcLD0dB3ZyKyRsUU6enZEiIJBNZmvP3QoxPcbX9D1paJa7gB
+	 8CKy0I6vFRdg6NNzNV2Tz2dhhz6Ix3kLENYSuCs3uWTWoQAbsb9iOHFbzHIY/w9jqRV51
+	 kbU+5/ya8fKurPyqzRZVNBsCYZOo7HowUyQtMo8JqnZ6N0qamUM3MDppQLmg/kuw5O9nZ
+	 RKb/wg4jp5h4zFMaakfLc36hMwF+EHjUxRnu8hre6x4k5hxRmYmzaY6yS2BCcVeDNBQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=jJNAru9b;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CGKeYdZH;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132B4607B799;
-	Mon,  2 Nov 2026 15:15:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 132B4607B799
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4FD606A58D;
+	Mon,  2 Nov 2026 15:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=jJNAru9b
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
-	Content-ID:Content-Description;
-	bh=oHrRbfPdc5vmSpv0Jl6aiMpgO8yh2vSvaFTH5zcOad0=; b=jJNAru9bfYa80vQmjEG/TJj6Fo
-	kyE4Rn566vNE6C6LZcj2EUQPCFUrGQv53c/qCWbf9upVgsbt40cDiD5I5RQmaoowHO1up99Y8oyF3
-	fgPGCMR3ot1kpRwJFoL7t5KG7sk7sgbNNYnxV99khFpJOqmsson+NpBSfw8FfwUxHzUrNRXWCFwt0
-	JKMubfMGE9RYPA9ILbrwCCP2Uxamebw07+JaB+ntEofFI/o0JJ0bygAMKrCa8LNgVINIzIGz+fGZi
-	nR7O/93kdBH35mGM3WCyVqnJ0HVCcVt5xzCh+Uuy2g2rdKJS+jZARq8c2GcBncmIQDcAg73DjFpnE
-	G/1dIH6Q==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xNtkv-00000000aTB-2JY4;
-	Mon, 02 Nov 2026 12:15:30 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	David Howells <dhowells@redhat.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Christian Brauner <brauner@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH 14/15] smb: client: retry writeback after losing the connection, share or handle
-Date: Mon,  2 Nov 2026 12:15:24 -0300
-Message-ID: <20261102151525.925058-15-pc@manguebit.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261102151525.925058-1-pc@manguebit.org>
-References: <20261102151525.925058-1-pc@manguebit.org>
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CGKeYdZH
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2421F01577;
+	Mon,  2 Nov 2026 15:15:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793632553;
+	bh=/po/gL747wOLzB9LODGeMVhVpt9eaPUzZYdg1qfmMOQ=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=CGKeYdZH3IwAOCMuWH4rKgTK8AFjvD4vT1A8MvChb7ekc5exPD2bZli39nsFA0rll
+	 Wro/pLXxHNScoGUOu2GS9dEhVACBfx94QMr+3AMAn65A2xaiLaTjC73SUe8x8Vxwck
+	 TeCW4nmblkVEQmFIwgDcUhlYB0U0/KpXLfCzgE+9+Se3WYxVgLhbEreVGTJlTh7c4u
+	 7jg8GYZ3EUYQeyZJ6KtO5lHZzH6stQjbxp/hT7OtsLZZLQOnXqbHn3uMLytT76+H+J
+	 11fMUBwYPr5hdM+l9taHXvznWRfSrNsArNpSfoPYVGe++uXgaOyNJuTilC2BxjGnzX
+	 V3ffhGBeXv1JA==
+From: Christian Brauner <brauner@kernel.org>
+Date: Mon, 02 Nov 2026 16:07:23 +0100
+Subject: [PATCH RFC 16/23] fbdev: viafb: let procfs copy in writes
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -72,338 +52,255 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261102-work-procfs-drivers-v1-16-a994bd4d3b1a@kernel.org>
+References: <20261102-work-procfs-drivers-v1-0-a994bd4d3b1a@kernel.org>
+In-Reply-To: <20261102-work-procfs-drivers-v1-0-a994bd4d3b1a@kernel.org>
+To: linux-fsdevel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
+ Jann Horn <jannh@google.com>, Josef Bacik <josef@toxicpanda.com>, 
+ Chris Mason <mason@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
+ NeilBrown <neil@brown.name>, Eric Dumazet <edumazet@kernel.org>, 
+ Thomas Gleixner <tglx@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
+ Jonathan Corbet <corbet@lwn.net>, Christoph Hellwig <hch@lst.de>, 
+ Greg Kroah-Hartman <gregkh@suse.de>, 
+ Joel Granados <joel.granados@kernel.org>, Kees Cook <kees@kernel.org>, 
+ Jan Kara <jack@suse.cz>, Jan Kara <jack@suse.com>, 
+ linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+ linux-acpi@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
+ linux-um@lists.infradead.org, linux-wireless@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org, 
+ ntfs3@lists.linux.dev, platform-driver-x86@vger.kernel.org, 
+ coreteam@netfilter.org, kexec@lists.infradead.org, 
+ linux-pci@vger.kernel.org, linux-sound@vger.kernel.org, 
+ netfilter-devel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ ibm-acpi-devel@lists.sourceforge.net, jfs-discussion@lists.sourceforge.net, 
+ linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-cifs@vger.kernel.org, linux-fbdev@vger.kernel.org, 
+ linux-hwmon@vger.kernel.org, linux-mm@kvack.org, linux-sh@vger.kernel.org, 
+ linux-usb@vger.kernel.org, samba-technical@lists.samba.org, 
+ sparclinux@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
+ linux-doc@vger.kernel.org, linux-serial@vger.kernel.org, 
+ linux-atm-general@lists.sourceforge.net, Takashi Iwai <tiwai@suse.de>, 
+ linux-input@vger.kernel.org, linux-raid@vger.kernel.org, 
+ linux-ext4@vger.kernel.org, linux-modules@vger.kernel.org, 
+ linux-debuggers@vger.kernel.org, 
+ "Christian Brauner (Amutable)" <brauner@kernel.org>, 
+ Chuck Lever <cel@kernel.org>
+X-Mailer: b4 0.17-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7373; i=brauner@kernel.org;
+ h=from:subject:message-id; bh=IvpcER7zxYNfDUB5gfp3pz3pT+0GSZCEEAhc7Zgpx0U=;
+ b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9WG54f1e88Ubf1/OUJVMEWfZ4yKg+n9wdmu7zh8P0w
+ mbtexXfOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbyYx/DP839pVLn/F+/fJc4
+ 901N3fx3nhnHtzv3nPPxi2y8FyOeH8Dw3+1pcIH7Q+ViI6Yijo/tvDyhr4RWLF3tMmnmydKdZ9Y
+ mswMA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp;
+ fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 
-Writeback still fails, dropping its data, when a write gets back an
-error that only means the client lost track of the server for a while:
+Implement ->proc_write_buf() for the files in /proc/viafb so procfs
+copies in what is written before it pins the entry, and parse what was
+written from that copy. Writes larger than PAGE_SIZE - 1 bytes fail with
+-EINVAL now, the output device files refused anything over 63 bytes
+already. kstrtou8_from_user() looked at the first 10 bytes of what was
+written to dfph and dfpl, now the whole write is parsed.
 
- - -EHOSTDOWN from smb2_reconnect() when a soft mount's server stays
-   unreachable for longer than the reconnect wait, or from
-   STATUS_HOST_UNREACHABLE,
- - -EREMCHG from STATUS_NETWORK_NAME_DELETED, for which the receive path
-   already marks the tcon for reconnect,
- - -EBADF from STATUS_FILE_CLOSED or STATUS_INVALID_HANDLE, e.g. after
-   the server lost a durable handle,
- - -ENETRESET and -ESHUTDOWN from STATUS_CONNECTION_RESET and
-   STATUS_REMOTE_DISCONNECT,
- - any replayable error on SMB1, whose async write never retries them,
-   while it retries writes cut short by a reconnect forever, regardless
-   of soft mounts.
-
-Reopening the handle needed by a read or write is worse:
-cifs_prepare_write() and cifs_issue_read() retry cifs_reopen_file() only
-on -EAGAIN, with no limit and no delay, and fail on anything else.  A
-server failing the reopen with a status mapped to -EAGAIN, such as
-STATUS_INSUFFICIENT_RESOURCES, makes them spin forever, past umount -f
-and, when netfs retries from a worker, with no signal to stop them,
-while any of the errors above fails writeback right away.
-
-Retry writeback failing with any of these, as already done for
-interrupts and allocation failures, with backoff and giving up on umount
--f.  On -EBADF, have the retry mark the handle invalid, so that it gets
-reopened, unless it got reopened since the write was issued: a late
--EBADF would otherwise get the new handle replaced too, leaving it open
-on the server along with any byte-range locks pushed to it.
-
-When writeback finally gives up on any of these errors, record -EIO for
-it instead, so that fsync(2) and close(2) don't return transient or
-internal errors such as -EAGAIN or -ERESTARTSYS.
-
-Retry reopens as the read or write needing them gets retried: as above
-for writeback, otherwise per the hard and retrans mount options on
-replayable errors, with backoff and giving up on umount -f.  If any
-channel of the session got reconnected meanwhile, retry once regardless,
-as the reconnect may be what failed the reopen; the next attempt waits
-for the reconnect to finish.  Never retry reopens on
-interrupts, so that dying tasks don't spin there; for writeback, issue
-the subrequest without credits instead, as done for dying tasks, so
-that it gets retried from the netfs collector, where no signals are
-pending.
-
-Don't reopen for requests that predate a umount -f either, unless it is
-a first attempt on a connected server, as with issuing them.  Once a
-reopen for writeback gives up, have the other subrequests of the
-request try only once, rather than each waiting out a retry window of
-its own.
-
-Reopen handles for reads before waiting for credits, as already done
-for writes, so that reads don't hold credits while their reopens get
-retried.  Keep reopening at issue time for handles invalidated in
-between.
-
-Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
-Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-Cc: stable@vger.kernel.org
+Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- fs/smb/client/cifsglob.h |   4 ++
- fs/smb/client/cifssmb.c  |   6 +-
- fs/smb/client/file.c     | 129 ++++++++++++++++++++++++++++++++++-----
- 3 files changed, 122 insertions(+), 17 deletions(-)
+ drivers/video/fbdev/via/viafbdev.c | 46 +++++++++++++++++---------------------
+ 1 file changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 064a2cdab4d9..0c27773e0838 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1458,6 +1458,7 @@ struct cifsFileInfo {
- 	int count;
- 	spinlock_t file_info_lock; /* protects four flag/count fields above */
- 	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
-+	unsigned int reopens;
- 	struct cifs_search_info srch_inf;
- 	struct work_struct oplock_break; /* work for oplock breaks */
- 	struct work_struct put; /* work for the final part of _put */
-@@ -1483,6 +1484,7 @@ struct cifs_io_request {
- 	struct cifsFileInfo		*cfile;
- 	pid_t				pid;
- 	int				umount_aborts;
-+	bool				reopen_gave_up;
+diff --git a/drivers/video/fbdev/via/viafbdev.c b/drivers/video/fbdev/via/viafbdev.c
+index 4b617e80a77c..94b303006915 100644
+--- a/drivers/video/fbdev/via/viafbdev.c
++++ b/drivers/video/fbdev/via/viafbdev.c
+@@ -1121,7 +1121,7 @@ static int viafb_dvp0_proc_show(struct seq_file *m, void *v)
+ }
+ 
+ static ssize_t viafb_dvp0_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
+ {
+ 	char buf[20], *value, *pbuf;
+ 	u8 reg_val = 0;
+@@ -1129,8 +1129,7 @@ static ssize_t viafb_dvp0_proc_write(struct file *file,
+ 	if (count < 1)
+ 		return -EINVAL;
+ 	length = count > 20 ? 20 : count;
+-	if (copy_from_user(&buf[0], buffer, length))
+-		return -EFAULT;
++	memcpy(&buf[0], buffer, length);
+ 	buf[length - 1] = '\0';	/*Ensure end string */
+ 	pbuf = &buf[0];
+ 	for (i = 0; i < 3; i++) {
+@@ -1169,7 +1168,7 @@ static ssize_t viafb_dvp0_proc_write(struct file *file,
+ 
+ static const struct proc_ops viafb_dvp0_proc_ops = {
+ 	.proc_show	= viafb_dvp0_proc_show,
+-	.proc_write	= viafb_dvp0_proc_write,
++	.proc_write_buf	= viafb_dvp0_proc_write,
  };
  
- /* asynchronous read support */
-@@ -1497,6 +1499,8 @@ struct cifs_io_subrequest {
- 	int				result;
- 	bool				have_xid;
- 	bool				replay;
-+	bool				bad_handle;
-+	unsigned int			reopens;
- 	unsigned int			retries;	/* number of retries so far */
- 	unsigned int			cur_sleep;	/* time to sleep before replay */
- 	unsigned long			retry_deadline;
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 2936b38de98f..fcf97b3d6bea 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -1939,12 +1939,14 @@ cifs_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		break;
- 	case MID_REQUEST_SUBMITTED:
- 		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_req_submitted);
--		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-+		if (wdata->rreq->origin != NETFS_WRITEBACK)
-+			__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 		result = -EAGAIN;
- 		break;
- 	case MID_RETRY_NEEDED:
- 		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_retry_needed);
--		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-+		if (wdata->rreq->origin != NETFS_WRITEBACK)
-+			__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 		result = -EAGAIN;
- 		break;
- 	case MID_RESPONSE_MALFORMED:
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 0340933dec82..ab795139aa43 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -90,12 +90,98 @@ static bool cifs_io_aborted(struct cifs_io_subrequest *subreq)
- 	       tcon->need_reconnect;
+ static int viafb_dvp1_proc_show(struct seq_file *m, void *v)
+@@ -1183,7 +1182,7 @@ static int viafb_dvp1_proc_show(struct seq_file *m, void *v)
  }
  
-+static bool cifs_writeback_transient(int rc)
-+{
-+	if (is_replayable_error(rc) || is_interrupt_error(rc))
-+		return true;
-+
-+	switch (rc) {
-+	case -ENOMEM:
-+	case -EHOSTDOWN:
-+	case -ENETRESET:
-+	case -ESHUTDOWN:
-+	case -EREMCHG:
-+	case -EBADF:
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static int cifs_writeback_error(struct netfs_io_subrequest *subreq, int rc)
-+{
-+	if (subreq->rreq->origin == NETFS_WRITEBACK &&
-+	    cifs_writeback_transient(rc))
-+		return -EIO;
-+	return rc;
-+}
-+
- static bool cifs_writeback_dying(struct netfs_io_subrequest *subreq)
+ static ssize_t viafb_dvp1_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
  {
- 	return subreq->rreq->origin == NETFS_WRITEBACK &&
- 		fatal_signal_pending(current);
+ 	char buf[20], *value, *pbuf;
+ 	u8 reg_val = 0;
+@@ -1191,8 +1190,7 @@ static ssize_t viafb_dvp1_proc_write(struct file *file,
+ 	if (count < 1)
+ 		return -EINVAL;
+ 	length = count > 20 ? 20 : count;
+-	if (copy_from_user(&buf[0], buffer, length))
+-		return -EFAULT;
++	memcpy(&buf[0], buffer, length);
+ 	buf[length - 1] = '\0';	/*Ensure end string */
+ 	pbuf = &buf[0];
+ 	for (i = 0; i < 3; i++) {
+@@ -1225,7 +1223,7 @@ static ssize_t viafb_dvp1_proc_write(struct file *file,
+ 
+ static const struct proc_ops viafb_dvp1_proc_ops = {
+ 	.proc_show	= viafb_dvp1_proc_show,
+-	.proc_write	= viafb_dvp1_proc_write,
++	.proc_write_buf	= viafb_dvp1_proc_write,
+ };
+ 
+ static int viafb_dfph_proc_show(struct seq_file *m, void *v)
+@@ -1237,11 +1235,11 @@ static int viafb_dfph_proc_show(struct seq_file *m, void *v)
  }
  
-+static unsigned int cifs_ses_reconnects(struct cifs_ses *ses)
-+{
-+	unsigned int n = 0;
-+
-+	guard(spinlock)(&ses->chan_lock);
-+	for (size_t i = 0; i < ses->chan_count; i++) {
-+		struct TCP_Server_Info *server = ses->chans[i].server;
-+
-+		if (server)
-+			n += READ_ONCE(server->reconnect_instance);
-+	}
-+	return n;
-+}
-+
-+static int cifs_reopen_file_retry(struct cifsFileInfo *cfile, bool can_flush,
-+				  struct cifs_io_subrequest *subreq)
-+{
-+	bool writeback = subreq->rreq->origin == NETFS_WRITEBACK;
-+	struct cifs_ses *ses = tlink_tcon(cfile->tlink)->ses;
-+	unsigned int reconnects;
-+	bool free_retry = true;
-+	bool retrying = false;
-+	int rc;
-+
-+	for (;;) {
-+		if ((retrying && cifs_io_stopped(subreq)) ||
-+		    cifs_io_aborted(subreq))
-+			return -EIO;
-+		retrying = true;
-+		reconnects = cifs_ses_reconnects(ses);
-+		rc = cifs_reopen_file(cfile, can_flush);
-+		if (!rc || is_interrupt_error(rc))
-+			return rc;
-+		if (!is_replayable_error(rc) &&
-+		    !(writeback && cifs_writeback_transient(rc)))
-+			return rc;
-+		if (free_retry && cifs_ses_reconnects(ses) != reconnects &&
-+		    !cifs_io_stopped(subreq)) {
-+			free_retry = false;
-+			continue;
-+		}
-+		if ((writeback && READ_ONCE(subreq->req->reopen_gave_up)) ||
-+		    !cifs_io_should_replay(subreq)) {
-+			if (writeback)
-+				WRITE_ONCE(subreq->req->reopen_gave_up, true);
-+			return rc;
-+		}
-+		msleep(subreq->cur_sleep);
-+	}
-+}
-+
-+static void cifs_invalidate_bad_handle(struct cifs_io_subrequest *wdata)
-+{
-+	struct cifsFileInfo *cfile = wdata->req->cfile;
-+
-+	wdata->bad_handle = false;
-+	guard(mutex)(&cfile->fh_mutex);
-+	if (cfile->reopens == wdata->reopens)
-+		cfile->invalidHandle = true;
-+}
-+
- /*
-  * Prepare a subrequest to upload to the server.  We need to allocate credits
-  * so that we know the maximum amount of data that we can include in it.
-@@ -127,18 +213,20 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 		cifs_negotiate_wsize(server, cifs_sb->ctx,
- 				     tlink_tcon(req->cfile->tlink));
+ static ssize_t viafb_dfph_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
+ {
+ 	int err;
+ 	u8 reg_val;
+-	err = kstrtou8_from_user(buffer, count, 0, &reg_val);
++	err = kstrtou8(buffer, 0, &reg_val);
+ 	if (err)
+ 		return err;
  
-+	if (wdata->bad_handle)
-+		cifs_invalidate_bad_handle(wdata);
-+
- 	if (cifs_writeback_dying(subreq))
- 		goto defer;
+@@ -1251,7 +1249,7 @@ static ssize_t viafb_dfph_proc_write(struct file *file,
  
--retry:
- 	if (open_file->invalidHandle) {
--		rc = cifs_reopen_file(open_file, false);
-+		rc = cifs_reopen_file_retry(open_file, false, wdata);
- 		if (rc < 0) {
--			if (rc == -EAGAIN)
--				goto retry;
--			if (cifs_writeback_dying(subreq))
-+			if (subreq->rreq->origin == NETFS_WRITEBACK &&
-+			    (is_interrupt_error(rc) ||
-+			     fatal_signal_pending(current)))
- 				goto defer;
--			subreq->error = rc;
-+			subreq->error = cifs_writeback_error(subreq, rc);
- 			return netfs_prepare_write_failed(subreq);
- 		}
- 	}
-@@ -148,7 +236,7 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 	if (rc < 0) {
- 		if (cifs_writeback_dying(subreq))
- 			goto defer;
--		subreq->error = rc;
-+		subreq->error = cifs_writeback_error(subreq, rc);
- 		return netfs_prepare_write_failed(subreq);
- 	}
- 	goto out;
-@@ -207,6 +295,7 @@ static void __cifs_issue_write(struct netfs_io_subrequest *subreq)
- 	if (wdata->req->cfile->invalidHandle)
- 		goto fail;
+ static const struct proc_ops viafb_dfph_proc_ops = {
+ 	.proc_show	= viafb_dfph_proc_show,
+-	.proc_write	= viafb_dfph_proc_write,
++	.proc_write_buf	= viafb_dfph_proc_write,
+ };
  
-+	wdata->reopens = READ_ONCE(wdata->req->cfile->reopens);
- 	wdata->server->ops->async_writev(wdata);
- out:
- 	return;
-@@ -230,9 +319,8 @@ static void cifs_issue_write_worker(struct work_struct *work)
- 
- 	wdata = container_of(work, struct cifs_io_subrequest, subreq.work);
- 	cfile = wdata->req->cfile;
--	while (cfile->invalidHandle &&
--	       cifs_reopen_file(cfile, false) == -EAGAIN)
--		;
-+	if (cfile->invalidHandle)
-+		cifs_reopen_file_retry(cfile, false, wdata);
- 	__cifs_issue_write(&wdata->subreq);
+ static int viafb_dfpl_proc_show(struct seq_file *m, void *v)
+@@ -1263,11 +1261,11 @@ static int viafb_dfpl_proc_show(struct seq_file *m, void *v)
  }
  
-@@ -276,6 +364,12 @@ static int cifs_prepare_read(struct netfs_io_subrequest *subreq)
- 		cifs_negotiate_rsize(server, cifs_sb->ctx,
- 				     tlink_tcon(req->cfile->tlink));
+ static ssize_t viafb_dfpl_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
+ {
+ 	int err;
+ 	u8 reg_val;
+-	err = kstrtou8_from_user(buffer, count, 0, &reg_val);
++	err = kstrtou8(buffer, 0, &reg_val);
+ 	if (err)
+ 		return err;
  
-+	if (req->cfile->invalidHandle) {
-+		rc = cifs_reopen_file_retry(req->cfile, true, rdata);
-+		if (rc)
-+			return rc;
-+	}
-+
- 	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
- 					   &size, &rdata->credits);
- 	if (rc)
-@@ -334,9 +428,7 @@ static void cifs_issue_read(struct netfs_io_subrequest *subreq)
- 		goto failed;
+@@ -1277,7 +1275,7 @@ static ssize_t viafb_dfpl_proc_write(struct file *file,
  
- 	if (req->cfile->invalidHandle) {
--		do {
--			rc = cifs_reopen_file(req->cfile, true);
--		} while (rc == -EAGAIN);
-+		rc = cifs_reopen_file_retry(req->cfile, true, rdata);
- 		if (rc)
- 			goto failed;
- 	}
-@@ -1531,6 +1623,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- reopen_success:
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-+	WRITE_ONCE(cfile->reopens, cfile->reopens + 1);
- 	cfile->invalidHandle = false;
- 	mutex_unlock(&cfile->fh_mutex);
- 	cinode = CIFS_I(inode);
-@@ -2749,14 +2842,20 @@ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t
- 		spin_unlock(&inode->i_lock);
- 	}
+ static const struct proc_ops viafb_dfpl_proc_ops = {
+ 	.proc_show	= viafb_dfpl_proc_show,
+-	.proc_write	= viafb_dfpl_proc_write,
++	.proc_write_buf	= viafb_dfpl_proc_write,
+ };
  
--	if ((is_interrupt_error(result) || result == -ENOMEM) &&
--	    wreq->origin == NETFS_WRITEBACK && cifs_io_should_replay(wdata)) {
-+	if (wreq->origin == NETFS_WRITEBACK &&
-+	    !test_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags) &&
-+	    cifs_writeback_transient(result) && cifs_io_should_replay(wdata)) {
-+		if (result == -EBADF)
-+			wdata->bad_handle = true;
- 		wdata->replay = true;
- 		trace_netfs_sreq(&wdata->subreq,
- 				 netfs_sreq_trace_io_retry_needed);
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 	}
- 
-+	if (result < 0 &&
-+	    !test_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags))
-+		result = cifs_writeback_error(&wdata->subreq, result);
- 	netfs_write_subrequest_terminated(&wdata->subreq, result);
+ static int viafb_vt1636_proc_show(struct seq_file *m, void *v)
+@@ -1313,7 +1311,7 @@ static int viafb_vt1636_proc_show(struct seq_file *m, void *v)
  }
  
+ static ssize_t viafb_vt1636_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
+ {
+ 	char buf[30], *value, *pbuf;
+ 	struct IODATA reg_val;
+@@ -1321,8 +1319,7 @@ static ssize_t viafb_vt1636_proc_write(struct file *file,
+ 	if (count < 1)
+ 		return -EINVAL;
+ 	length = count > 30 ? 30 : count;
+-	if (copy_from_user(&buf[0], buffer, length))
+-		return -EFAULT;
++	memcpy(&buf[0], buffer, length);
+ 	buf[length - 1] = '\0';	/*Ensure end string */
+ 	pbuf = &buf[0];
+ 	switch (viaparinfo->chip_info->lvds_chip_info.lvds_chip_name) {
+@@ -1404,7 +1401,7 @@ static ssize_t viafb_vt1636_proc_write(struct file *file,
+ 
+ static const struct proc_ops viafb_vt1636_proc_ops = {
+ 	.proc_show	= viafb_vt1636_proc_show,
+-	.proc_write	= viafb_vt1636_proc_write,
++	.proc_write_buf	= viafb_vt1636_proc_write,
+ };
+ 
+ #endif /* CONFIG_FB_VIA_DIRECT_PROCFS */
+@@ -1416,7 +1413,7 @@ static int __maybe_unused viafb_sup_odev_proc_show(struct seq_file *m, void *v)
+ 	return 0;
+ }
+ 
+-static ssize_t odev_update(const char __user *buffer, size_t count, u32 *odev)
++static ssize_t odev_update(const char *buffer, size_t count, u32 *odev)
+ {
+ 	char buf[64], *ptr = buf;
+ 	u32 devices;
+@@ -1424,8 +1421,7 @@ static ssize_t odev_update(const char __user *buffer, size_t count, u32 *odev)
+ 
+ 	if (count < 1 || count > 63)
+ 		return -EINVAL;
+-	if (copy_from_user(&buf[0], buffer, count))
+-		return -EFAULT;
++	memcpy(&buf[0], buffer, count);
+ 	buf[count] = '\0';
+ 	add = buf[0] == '+';
+ 	sub = buf[0] == '-';
+@@ -1452,7 +1448,7 @@ static int viafb_iga1_odev_proc_show(struct seq_file *m, void *v)
+ }
+ 
+ static ssize_t viafb_iga1_odev_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
+ {
+ 	u32 dev_on, dev_off, dev_old, dev_new;
+ 	ssize_t res;
+@@ -1473,7 +1469,7 @@ static ssize_t viafb_iga1_odev_proc_write(struct file *file,
+ 
+ static const struct proc_ops viafb_iga1_odev_proc_ops = {
+ 	.proc_show	= viafb_iga1_odev_proc_show,
+-	.proc_write	= viafb_iga1_odev_proc_write,
++	.proc_write_buf	= viafb_iga1_odev_proc_write,
+ };
+ 
+ static int viafb_iga2_odev_proc_show(struct seq_file *m, void *v)
+@@ -1483,7 +1479,7 @@ static int viafb_iga2_odev_proc_show(struct seq_file *m, void *v)
+ }
+ 
+ static ssize_t viafb_iga2_odev_proc_write(struct file *file,
+-	const char __user *buffer, size_t count, loff_t *pos)
++	char *buffer, size_t count, loff_t *pos)
+ {
+ 	u32 dev_on, dev_off, dev_old, dev_new;
+ 	ssize_t res;
+@@ -1504,7 +1500,7 @@ static ssize_t viafb_iga2_odev_proc_write(struct file *file,
+ 
+ static const struct proc_ops viafb_iga2_odev_proc_ops = {
+ 	.proc_show	= viafb_iga2_odev_proc_show,
+-	.proc_write	= viafb_iga2_odev_proc_write,
++	.proc_write_buf	= viafb_iga2_odev_proc_write,
+ };
+ 
+ #define IS_VT1636(lvds_chip)	((lvds_chip).lvds_chip_name == VT1636_LVDS)
+
 -- 
-2.56.0
+2.53.0
 
