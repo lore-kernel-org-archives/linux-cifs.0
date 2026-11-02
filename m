@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793632541;
-	b=xFh1+cKuv02DD6fMbBynSpqnofv/CztW1ssyEqWEC2Z63p/Hqe+nwehRRjZuzANHQSFZ
-	 5byO9xVMERMfyj4edQdBstTq/S5x5z8yjvIgp+St3cnsZYJQrcMdFl4N+i6no1mR1KO8b
-	 m259UJc0wSbgms5eHUlLJr/tmTxwVypwT0n0O3O4Ul4ARDEmSrmMj05HdB0v+OE5FLObc
-	 lG2h6ZWyAtkdT6srThZWMIYIor1mzqFry8N3gC7T/Z9/IzOVEKrm3Z301vs20KtvPjph2
-	 xsfzoMJ0luArgjqgKpqYLuZvOZHNCiGf0vGSXUHsw+WafUc5dWv0P5tXt+kNrS0e+vA==
+	t=1793632536;
+	b=I1qvgMGnZwm20M2FIsPaQAjktIgCJkXyJaCUk89w+dxkzJ+3mG4epLBZu4Vy4ZyX1qRr
+	 fEhTMaUlSB39PZ+ExAToovNuYe5hSQHweSobB8hOJXdZyekETbCbkc5hSt0htY+lONhnZ
+	 fqqF4KF3Qu0if522xDrpiccURDwGD/nz582xMhQNz4Vgha6zfh9wavMTkf10IxtOVtzrv
+	 hrOJlTdBMTvn2ZDDsTKhOY3iA9Xp8EjGvq+YCjbvJXrZJnmiKINysuMy0dj2bDhyEKw1m
+	 +hckI96zE1wKQRl6uFhmZfLuRzSrDdzQAesXRxtWBmqb/KeZZJSu8UdaGDf2Set/XxQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793632541;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793632536;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=t5XMK8fX1ODVt+XRhOo7ezBUw2V7gunMfrulrUxZdAg=;
-	b=Eh7OjiThyCs/fDbOrpeOAe10piWsQEjMgPxycRpo1j8aaQWcZCuMQ/z/53tU2EIT9BsV
-	 2HpUt7oZXygY/gv7/ImYhpsYjxe2laDjBhg3cD/nSOzGhaF3QQ95wU99c+s6Ci4u7Q1V/
-	 9F8yrvz9pTjANKI+UlWOqFdlzfFij9E8A765xqoXErrqjOR4OmEzKtu3M6wcJ5wi4e5hq
-	 jOMhacOvz3iMuurt4+IkCoS1y17v/sy7JCZt868eHnPPESs1L4396Pb9Q7NQYf39EHqm5
-	 XQQ9WbKVCD5h8bbFEtuSznxquUBCj5BfaaN7jedzoMe/DNL1kqMSSKKuzwVB1asraXg==
+	bh=psoN07OZx8VL+wRC0EpiVoNXQAalv/VZSYWmZ6HmCa0=;
+	b=Ub/iuQADS68A+t9FcdIZXWgoR06oPsm/7xO1JdOd/HHr7SqWpvO1N1exEni40ji6F5Gw
+	 WLpCw7Wr71YL4sUWGiT2iyAp2TTZuupwKXBFZBthFkRpGWhN0Dt7qgsVzGxrQbmbKgRaG
+	 kii6ClCMT0R6lQev6QsATGaFdkFN6rz/T40/PWaJMLe9a9lvVoqoxqa6yMitzlJJQClEU
+	 5gpDrot4NgRTD0sXXHQPcNlGupmzYybb/z8uO1bqcefeQSreJ1DuWgqXxE6khtjzkOSIK
+	 22rgPYeqVhQSb3n+4sfkivdnSaBtSeWV6l3rP+9iaRv9PJLpVxrTyPUp92gGpTnTrmQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=OGDOQqss;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b="nS/CqIHQ";
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0304560B57DA;
-	Mon,  2 Nov 2026 15:15:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0304560B57DA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B32607B40E;
+	Mon,  2 Nov 2026 15:15:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 29B32607B40E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=OGDOQqss
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=nS/CqIHQ
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=t5XMK8fX1ODVt+XRhOo7ezBUw2V7gunMfrulrUxZdAg=; b=OGDOQqss1rV+zM6cDWwBM3qcfZ
-	k5pSRLhsAcTG9F58EKM5GfinkK6KR96/m2S2LlSzvXVm4pga1FpmChd2ABFMqev1qDIADivkPQZEZ
-	btoi8e/M6BEwxV1UNthM6ecuazg2nZDJJzxr0Big9jHy5KYfeY3s9M3vhL4tKB+nEGY9p8p/IeANL
-	qW2Z5BHJY0OpxY0QTv/+7ecI7VhEEiyEMjaRi5sm3eE56iZy9HVfTSzd80dEkiWIunq+e0IpgPsRh
-	TK0KtOs4FGkyPK+0j2ujO0GFWKkTieq6qkXmKC08vBpuJH91Q66d7TcQgVoV+wQ+VC3r58bF5UnNi
-	zFg9UlvA==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=psoN07OZx8VL+wRC0EpiVoNXQAalv/VZSYWmZ6HmCa0=; b=nS/CqIHQH3E8WhX0OvPTakzrI+
+	bfBhWV9iOq2tleCsQ7WK8YzWOdxbyW4RmPbTVbcCBn+y+rFoFytDjguuz/RBiHdcGv/tLXphd3jJE
+	4YlSKuZ+GZ6tPy1snPd7x2xiqPYjWOOku9DDFyQNh4VXeI8FzRHCOxlx85e7kj/sjAnr7YzNZA8En
+	SrBEi6bOem6UaPtbJkNfqxcXpXTy6U9o6nV0NwKY6bP1tcYvqu0C5oS+rw9R8uCzb8PA+Eqj+IKSj
+	ascvAyWsTjehJzxBDdCVipXWn4o3xZZ91qeVxuaIW5cmX3xQk4AZTn+UipGP7UT5YgRKRhB77/tA9
+	g0Pl9vgg==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xNtkq-00000000aQR-38FV;
-	Mon, 02 Nov 2026 12:15:25 -0300
+	id 1xNtkt-00000000aRy-27Se;
+	Mon, 02 Nov 2026 12:15:28 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -55,11 +55,14 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Shyam Prasad N <sprasad@microsoft.com>,
 	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
-	Christian Brauner <brauner@kernel.org>
-Subject: [PATCH 00/15] smb: client: fix data loss in writeback
-Date: Mon,  2 Nov 2026 12:15:10 -0300
-Message-ID: <20261102151525.925058-1-pc@manguebit.org>
+	Christian Brauner <brauner@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 08/15] smb: client: don't block dying tasks waiting for writeback on close
+Date: Mon,  2 Nov 2026 12:15:18 -0300
+Message-ID: <20261102151525.925058-9-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261102151525.925058-1-pc@manguebit.org>
+References: <20261102151525.925058-1-pc@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -69,120 +72,79 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+cifs_flush() waits uninterruptibly for the writeback it starts.  A task
+that gets killed while closing a file on a hard mount with an
+unresponsive server is stuck in D state until the server comes back.  It
+also consumes any writeback error for a caller that is about to exit,
+hiding it from everyone else.
 
-A task killed while close() flushes its dirty pages gets its writes
-refused by __smb_send_rqst() (fatal signal pending), and netfs then ends
-writeback with the folios clean.  The data never reaches the server and
-no error reaches the application: stat() still reports the cached size
-while the file on the server is short.  It was reported against a RHEL 9
-kernel, where the same trigger makes stat() fail with -EIO after a
-rename(2), and it reproduces on mainline as this silent lost write.
+Wait killably instead.  If the closer gets killed, stop waiting and leave
+the error bits in the mapping for others to see; writeback already in
+flight completes on its own.
 
-Any other failure that is only transient hits the same wall: since the
-move to netfslib, a failed upload ends writeback with the folios clean,
-so a reconnect, a lost handle, an interrupted wait or an -ENOMEM
-silently drops the data.
+This is also needed before letting dying tasks issue their writes from a
+worker, which would otherwise make them wait for every one of them.
 
-This series makes writeback retry instead of giving up:
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/file.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
 
- - writes of a dying task are issued from a new workqueue, and the waits
-   on close() and fsync() are killable (patches 8-10, 12)
- - writeback is retried with exponential backoff, up to 2 seconds, on
-   replayable errors, interrupts, -ENOMEM, and on losing the connection,
-   the share or the handle (patches 6, 7, 11, 13, 14)
- - reopening a handle is retried the same way for all kinds of I/O,
-   instead of looping forever on -EAGAIN (patch 14)
- - umount -f aborts the retries and the reconnect waits of requests that
-   started before it (patches 5, 15)
-
-On hard mounts writeback is retried until the server comes back or
-umount -f.  On soft mounts it gives up after max(3, retrans) *
-echo_interval from the first failure of each write, which is 3 minutes
-by default.  Since cifs only declares a server dead after 3 echo
-intervals, that is about 6 minutes from the outage.  The error recorded
-then is -EIO.  Reads and direct writes still follow the hard and
-retrans mount options.
-
-Patch 1 is independent: writeback could pick a handle opened with
-O_DIRECT, and Windows rejects unaligned writes on those with
-STATUS_INVALID_PARAMETER.  The pages were dropped, 1.2% of the writes in
-xfstests generic/051.  It is first so it can be backported on its own.
-
-Patches 2-4 are netfs fixes the cifs patches depend on.  Patch 2 is
-Ivan's, taken from his posting
-(20261028181229.1408342-1-ivanrwcm25@gmail.com).  Patch 3 stops netfs
-from retrying writes while subrequests are still being prepared, which
-raced on stream->sreq_max_len.  Patch 4 keeps the ->prepare_read() errno
-instead of -ENOMEM when read retries are abandoned.
-
-Tested against a Windows server:
-
- - a reproducer for the problem above: a writer is killed with SIGKILL
-   while close() flushes a large write, or a multithreaded program exits
-   right after writing without closing the file.  The file is then
-   renamed, stat()ed and checked on the server.  The data is lost
-   without the series
- - xfstests generic/051: no rejected writes left after patch 1
- - umount -f with writeback in flight
- - a soft mount with the server down for shorter and longer than the
-   retry window
- - reads with a handle that has to be reopened after a reconnect
-
-Not covered by this series:
-
- - writeback started by the unmount itself after umount -f can still
-   wait on a hard mount
- - tcons shared with other mounts and the per-user tcons of multiuser
-   mounts are not covered by umount -f
- - credit waits and the shutdown ioctl don't stop on umount -f
- - if every writable handle of an inode was opened with O_DIRECT, its
-   unaligned writeback still fails, and the error is reported
-   (e.g. mmap of an O_DIRECT file descriptor)
-
-Thanks,
-Paulo
-
-Iván Ezequiel Rodriguez (1):
-  netfs: preserve prepare_write errno on reissue
-
-Paulo Alcantara (14):
-  smb: client: don't write back through O_DIRECT handles
-  netfs: don't retry writes while subrequests are still being prepared
-  netfs: keep the prepare_read errno when abandoning read retries
-  smb: client: let umount -f abort retried reads and writes
-  smb: client: don't give up writeback on the first replayable error
-  smb: client: don't retry failed writes forever regardless of mount
-    options
-  smb: client: don't block dying tasks waiting for writeback on close
-  smb: client: issue writes from a worker if the task is dying
-  smb: client: don't fail writeback preparation if the task is dying
-  smb: client: retry writeback on interrupts and allocation failures
-  smb: client: don't block dying tasks waiting for writeback on fsync
-  smb: client: retry writes that couldn't be issued due to a reconnect
-  smb: client: retry writeback after losing the connection, share or
-    handle
-  smb: client: let umount -f stop waiting for reconnects on hard mounts
-
- fs/netfs/read_pgpriv2.c    |   3 +-
- fs/netfs/read_retry.c      |  16 +-
- fs/netfs/write_collect.c   |   2 +
- fs/netfs/write_issue.c     |  16 +-
- fs/smb/client/cifs_fs_sb.h |   1 +
- fs/smb/client/cifsfs.c     |  35 +++-
- fs/smb/client/cifsglob.h   |  15 ++
- fs/smb/client/cifsproto.h  |   5 +-
- fs/smb/client/cifssmb.c    |  15 +-
- fs/smb/client/file.c       | 320 ++++++++++++++++++++++++++++++++++---
- fs/smb/client/misc.c       |  16 +-
- fs/smb/client/smb2ops.c    |   9 +-
- fs/smb/client/smb2pdu.c    |  55 +++----
- fs/smb/client/smb2proto.h  |   9 ++
- 14 files changed, 427 insertions(+), 90 deletions(-)
-
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 4864e5d7d9de..7aa67912c78e 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -3030,17 +3030,43 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ 	return rc;
+ }
+ 
++static int cifs_wait_writeback_killable(struct address_space *mapping)
++{
++	struct folio_batch fbatch;
++	pgoff_t index = 0;
++	int rc = 0;
++
++	folio_batch_init(&fbatch);
++	while (!rc &&
++	       filemap_get_folios_tag(mapping, &index, (pgoff_t)-1,
++				      PAGECACHE_TAG_WRITEBACK, &fbatch)) {
++		for (unsigned int i = 0;
++		     !rc && i < folio_batch_count(&fbatch); i++)
++			rc = folio_wait_writeback_killable(fbatch.folios[i]);
++		folio_batch_release(&fbatch);
++		cond_resched();
++	}
++	return rc;
++}
++
+ /*
+  * As file closes, flush all cached write data for this inode checking
+  * for write behind errors.
+  */
+ int cifs_flush(struct file *file, fl_owner_t id)
+ {
++	struct address_space *mapping = file->f_mapping;
+ 	struct inode *inode = file_inode(file);
+-	int rc = 0;
++	int rc = 0, rc2;
+ 
+-	if (file->f_mode & FMODE_WRITE)
+-		rc = filemap_write_and_wait(inode->i_mapping);
++	if (file->f_mode & FMODE_WRITE) {
++		rc = filemap_fdatawrite(mapping);
++		if (cifs_wait_writeback_killable(mapping))
++			return 0;
++		rc2 = filemap_check_errors(mapping);
++		if (!rc)
++			rc = rc2;
++	}
+ 
+ 	cifs_dbg(FYI, "Flush inode %p file %p rc %d\n", inode, file, rc);
+ 	if (rc) {
 -- 
 2.56.0
 
