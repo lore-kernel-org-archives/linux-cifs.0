@@ -1,49 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793632514;
-	b=ZaRQs3znL553tXHnMZ8CJbfATvyABotghT8s4WVG2NppVIWQW3dyI7/01A2WNxam9iUu
-	 jg2uYhFEB5PMFdeZl5ynCc/A0iLqVWMK7i//78/544RyFxuFmoykBC38XqMQxC7AEOkvg
-	 s7QOZIAiv73r+Q6EaS35IB7YYw/6XeG1TI27WApuNMCw81kbMh5+GLqVFL2ogJSQ3FIaa
-	 HOwYfsENiU8m4ssM3ChjZPxjxAWdbXYJ4+Ud1GhMgtIg6t8QMEeBYrcsRzMm9Q/lDukud
-	 kaoRAm1NGmcT33lDGlZehluDDJsroqO5+9B6twjAqSPDe995nD6c1sJW8Ioc036RkQQ==
+	t=1793632536;
+	b=IJ5qVnLJgYUWLhXd6ZTpgKN+YgRRCmlqQrVBgqIBQfVwBKZZ66hsVkw31djCDjrlX9Kh
+	 XxAyoJepRpVbToXxgckOwqaXMwwsJ0uH1L5/mj8uChmHB7fQLgMHjz2g+76tdwGfoaaEb
+	 20WoDxi5PVujznZjj2HEYYd+8nPOI2MIo5TFuLxDHeygS02ff+rwJ0iioeph8hnZLCiZ4
+	 idrP0OFbspmltL6EPm59ysWb9J+ktDONqcKXV6QzVdnRHs6m9kVS8ONgs88oGPUME7qx0
+	 Kxa18nsaICG6d76LUDNzA/Y6NU4dekY/iSyiOBxQN2cg3BOg1/me5R8qtccSb1atHHw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793632514;
-	h=Received:DKIM-Signature:From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
-	 X-Mailer:X-Developer-Signature:X-Developer-Key;
-	bh=bLxRwCxtJ/P3YNIr6jvbkvrLQvoA3ATHIuHzWzBn2J4=;
-	b=A6EOW6w5WTBEZfJXHNi2vqN6EJW+aF+m+pLKyUhwDVj8112zEUBfV5EgOz4sCCzDh9Gw
-	 bNX+mJNHxbtODLK9VpzRLtMdnGASmWIeHyoRhxJErUUC2gGYgSmjXOoJHwIbTn6vC4tr5
-	 IjCewH70mhNC8dx5QOd5VD4Szc8ynpQa1PjiGWY8qDijsTUU1UxmYl/0qtpOtZr0G5P2e
-	 Vy06s+b/1TOFzofbX62gOPZNoGPhBZlZKXZ9+jbspgup45nDcGl0jWNaMLWd4VC2TTk+k
-	 wIOt6JhILUK9K6J8xUigd4YIa1imllvOT95uK9kWfbXMzlrLE+NFK5txWDPCeD/uzBQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793632536;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=0BEMFmOH5KacIdrfQvN/6kDbKvhLOg4ogPk81fGsgK8=;
+	b=VXqxtsvJvyNHKDtTMn24oqiejwlbgpZn6aVar7vnCXDpE4tFHTgPVBpqTF2Dccpqsvzg
+	 2NxYTLdiW8ronJCkoCFE7leAfc2QD5iaMvX82U1kWz5MezxsX4C4dXjTBpTfhxd41Egk7
+	 1Cn2HNYpDAamNDIbiV5MiWqShlRCTDboBmqklMTd449wXxxdPCXUY768gM0FAGY+Gkfj1
+	 Z6/driHgbh1kAO6b0BPjhpcQ/MFxrEDa+h9It6e32xycWEmHuQQsWJKzJuya/cNRs07kk
+	 9z+xa7JiRUWI6jbBxLGBm0wOmVWTNlGKoG3RChKdxGfar6IhT89Hvi6aVAUUEkpltrw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="aJGwG/6h";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=bL73dCaC;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389D9607A89B;
-	Mon,  2 Nov 2026 15:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B8560B57E1;
+	Mon,  2 Nov 2026 15:15:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 29B8560B57E1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aJGwG/6h
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC531F00A1E;
-	Mon,  2 Nov 2026 15:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793632513;
-	bh=bLxRwCxtJ/P3YNIr6jvbkvrLQvoA3ATHIuHzWzBn2J4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=aJGwG/6hEIXyLfWmKFvXVRjD3pi6UQH/DTvV3cC7DcTh4N/HcF4nnCkxWMSznc6hy
-	 c7hGsGqmLuhGImmqBA8HQwtIMWkwLQW5HRs4iHh81hTAWhkgs2OvSuIp/lEwm85W9d
-	 uvjIgGTnlZelSY+8QFDOq9mKlCgW8ew05dUZ423oPWs2PbAaXvTVTer1uR+Q19WcSd
-	 saiX/ZfSnReCygXk6xbkfe3Cv4xjGMpF4N4R3qn7AIIGAKhndeoYMRbVau3i5aPogd
-	 WGrsPu5F3Co+ya30mCf7vuh+bnrNlc3JlBctP1nTSWEk8d19qbLvSzIhcB3xtAk5Zz
-	 cTo6R42Iaq1qg==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 02 Nov 2026 16:07:22 +0100
-Subject: [PATCH RFC 15/23] hwmon: (dell-smm) let procfs copy the i8k ioctl
- arguments
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=bL73dCaC
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=0BEMFmOH5KacIdrfQvN/6kDbKvhLOg4ogPk81fGsgK8=; b=bL73dCaCAn4zn0/vMXLYuzRyx7
+	aQO6YvL4DjuTqFsAQ4KHEnzYY/ilyD9hhYwpODzbv03MSySAqgAzXoDvaM0ycY9OQosPqrpNBFNUB
+	oa7nUCjLfuchwHuisX02lCyA0umA9CT7xGzO/IB27rPJI3t7JYXzVMlcUUFLczy387CCwjZXhK6qU
+	9PCPvJ6CMZZXi3f57IB6XARq0jEG4F1q9DPenp5zpAn7QbttX9GlIjHVT9Rq7x+3xFgBmwFNnwymu
+	LjLC3+OLLTlXIiOyjehfmLClN3fwQKj3hHMcpNqdifCNJhB5u/sogGfo9D8WITRZyczbeP6KCQI/d
+	HWGy1GIQ==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xNtku-00000000aSK-0nhf;
+	Mon, 02 Nov 2026 12:15:29 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	David Howells <dhowells@redhat.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Christian Brauner <brauner@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 10/15] smb: client: don't fail writeback preparation if the task is dying
+Date: Mon,  2 Nov 2026 12:15:20 -0300
+Message-ID: <20261102151525.925058-11-pc@manguebit.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261102151525.925058-1-pc@manguebit.org>
+References: <20261102151525.925058-1-pc@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -53,188 +72,148 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20261102-work-procfs-drivers-v1-15-a994bd4d3b1a@kernel.org>
-References: <20261102-work-procfs-drivers-v1-0-a994bd4d3b1a@kernel.org>
-In-Reply-To: <20261102-work-procfs-drivers-v1-0-a994bd4d3b1a@kernel.org>
-To: linux-fsdevel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
- Jann Horn <jannh@google.com>, Josef Bacik <josef@toxicpanda.com>, 
- Chris Mason <mason@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
- NeilBrown <neil@brown.name>, Eric Dumazet <edumazet@kernel.org>, 
- Thomas Gleixner <tglx@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
- Jonathan Corbet <corbet@lwn.net>, Christoph Hellwig <hch@lst.de>, 
- Greg Kroah-Hartman <gregkh@suse.de>, 
- Joel Granados <joel.granados@kernel.org>, Kees Cook <kees@kernel.org>, 
- Jan Kara <jack@suse.cz>, Jan Kara <jack@suse.com>, 
- linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
- linux-acpi@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-um@lists.infradead.org, linux-wireless@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org, 
- ntfs3@lists.linux.dev, platform-driver-x86@vger.kernel.org, 
- coreteam@netfilter.org, kexec@lists.infradead.org, 
- linux-pci@vger.kernel.org, linux-sound@vger.kernel.org, 
- netfilter-devel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- ibm-acpi-devel@lists.sourceforge.net, jfs-discussion@lists.sourceforge.net, 
- linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-cifs@vger.kernel.org, linux-fbdev@vger.kernel.org, 
- linux-hwmon@vger.kernel.org, linux-mm@kvack.org, linux-sh@vger.kernel.org, 
- linux-usb@vger.kernel.org, samba-technical@lists.samba.org, 
- sparclinux@vger.kernel.org, linux-m68k@lists.linux-m68k.org, 
- linux-doc@vger.kernel.org, linux-serial@vger.kernel.org, 
- linux-atm-general@lists.sourceforge.net, Takashi Iwai <tiwai@suse.de>, 
- linux-input@vger.kernel.org, linux-raid@vger.kernel.org, 
- linux-ext4@vger.kernel.org, linux-modules@vger.kernel.org, 
- linux-debuggers@vger.kernel.org, 
- "Christian Brauner (Amutable)" <brauner@kernel.org>, 
- Chuck Lever <cel@kernel.org>
-X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4573; i=brauner@kernel.org;
- h=from:subject:message-id; bh=negOiIwbpBXFbC2+4UQ2qelUCL0pz2XjdZael8czB8w=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9WG7wfOvG13Ue+TY6YgY/P8p121v+35fv6PEqSTJv0
- 6vT9vcUO0pZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACbScZnhv8ujWTvu1BYxV1XK
- sD6t0T6SdbHl9c1T0T8mMq25dlN2gTIjw/ZM+U1cLyxPWnrVKXeXnrv56tyX2eemZWmU1m/Wczw
- 5jwEA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-Implement ->proc_ioctl_buf() so procfs copies the arguments in before
-it pins the entry and back out after unpinning it. The command numbers
-in <uapi/linux/i8k.h> encode the wrong sizes, so the table lists what
-is really copied: an int or the 16 bytes of the machine id out, and one
-or two ints in.
+cifs_prepare_write() may need to reopen an invalidated handle and to wait
+for credits, both from the context of the task doing writeback.  A dying
+task gets the reopen refused at send time and the killable credit wait
+interrupted, so the subrequest is failed and, as with refused sends, its
+folios end writeback clean and the data is lost.
 
-A NULL argument fails with -EFAULT now instead of -EINVAL, and so does
-a bad pointer to SET_FAN from an unprivileged task, which got -EPERM
-before, since procfs copies the argument in before the entry's own
-checks run. 32-bit tasks can use the commands whose numbers don't
-depend on the size of size_t.
+For writeback in a dying task, skip both and prepare a credit-less
+subrequest capped at SMB2_MAX_BUFFER_SIZE, as already done when the
+server is low on credits.  It gets issued from cifswritebackd, which
+reopens the handle if needed and takes a single credit when sending,
+neither of which can be interrupted there.  Do the same when the reopen
+or credit wait fails because a fatal signal arrived meanwhile.
 
-Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+cifs_begin_writeback() reopens the handle too when all the writable ones
+got invalidated, e.g. by a reconnect.  If that fails, there is no
+upload stream, so netfs ends writeback of every folio clean with no
+error recorded.  Take an invalidated handle as is there and leave
+reopening it to cifs_prepare_write().  If there is no writable handle at
+all, record -EIO for the mapping, so that the loss gets reported.
+
+Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: stable@vger.kernel.org
 ---
- drivers/hwmon/dell-smm-hwmon.c | 48 +++++++++++++++++++++---------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+ fs/smb/client/cifsglob.h |  1 +
+ fs/smb/client/file.c     | 37 ++++++++++++++++++++++++++++++-------
+ 2 files changed, 31 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/hwmon/dell-smm-hwmon.c b/drivers/hwmon/dell-smm-hwmon.c
-index 492b2b6c6d7e..67b8c6e5752f 100644
---- a/drivers/hwmon/dell-smm-hwmon.c
-+++ b/drivers/hwmon/dell-smm-hwmon.c
-@@ -549,16 +549,13 @@ static int i8k_get_power_status(const struct dell_smm_data *data)
-  * Procfs interface
-  */
- 
--static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
-+static long i8k_ioctl(struct file *fp, unsigned int cmd, void *arg)
- {
- 	struct dell_smm_data *data = pde_data(file_inode(fp));
--	int __user *argp = (int __user *)arg;
-+	int *argp = arg;
- 	int speed, err;
- 	int val = 0;
- 
--	if (!argp)
--		return -EINVAL;
--
- 	switch (cmd) {
- 	case I8K_BIOS_VERSION:
- 		if (!isdigit(data->bios_version[0]) || !isdigit(data->bios_version[1]) ||
-@@ -568,17 +565,13 @@ static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
- 		val = (data->bios_version[0] << 16) |
- 				(data->bios_version[1] << 8) | data->bios_version[2];
- 
--		if (copy_to_user(argp, &val, sizeof(val)))
--			return -EFAULT;
--
-+		*argp = val;
- 		return 0;
- 	case I8K_MACHINE_ID:
- 		if (restricted && !capable(CAP_SYS_ADMIN))
- 			return -EPERM;
- 
--		if (copy_to_user(argp, data->bios_machineid, sizeof(data->bios_machineid)))
--			return -EFAULT;
--
-+		memcpy(argp, data->bios_machineid, sizeof(data->bios_machineid));
- 		return 0;
- 	case I8K_FN_STATUS:
- 		val = i8k_get_fn_status(data);
-@@ -593,8 +586,7 @@ static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
- 		break;
- 
- 	case I8K_GET_SPEED:
--		if (copy_from_user(&val, argp, sizeof(int)))
--			return -EFAULT;
-+		val = *argp;
- 
- 		if (val > U8_MAX || val < 0)
- 			return -EINVAL;
-@@ -603,8 +595,7 @@ static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
- 		break;
- 
- 	case I8K_GET_FAN:
--		if (copy_from_user(&val, argp, sizeof(int)))
--			return -EFAULT;
-+		val = *argp;
- 
- 		if (val > U8_MAX || val < 0)
- 			return -EINVAL;
-@@ -616,14 +607,11 @@ static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
- 		if (restricted && !capable(CAP_SYS_ADMIN))
- 			return -EPERM;
- 
--		if (copy_from_user(&val, argp, sizeof(int)))
--			return -EFAULT;
--
-+		val = argp[0];
- 		if (val > U8_MAX || val < 0)
- 			return -EINVAL;
- 
--		if (copy_from_user(&speed, argp + 1, sizeof(int)))
--			return -EFAULT;
-+		speed = argp[1];
- 
- 		speed = clamp_val(speed, 0, data->i8k_fan_max);
- 
-@@ -643,12 +631,22 @@ static long i8k_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
- 	if (val < 0)
- 		return val;
- 
--	if (copy_to_user(argp, &val, sizeof(int)))
--		return -EFAULT;
--
-+	*argp = val;
- 	return 0;
- }
- 
-+/* The command numbers don't encode what is copied, see <uapi/linux/i8k.h>. */
-+static const struct proc_ioctl_arg i8k_ioctl_args[] = {
-+	PROC_IOCTL_ARG(I8K_BIOS_VERSION, 0, sizeof(int)),
-+	PROC_IOCTL_ARG(I8K_MACHINE_ID, 0, sizeof_field(struct dell_smm_data, bios_machineid)),
-+	PROC_IOCTL_ARG(I8K_FN_STATUS, 0, sizeof(int)),
-+	PROC_IOCTL_ARG(I8K_POWER_STATUS, 0, sizeof(int)),
-+	PROC_IOCTL_ARG(I8K_GET_TEMP, 0, sizeof(int)),
-+	PROC_IOCTL_ARG(I8K_GET_SPEED, sizeof(int), sizeof(int)),
-+	PROC_IOCTL_ARG(I8K_GET_FAN, sizeof(int), sizeof(int)),
-+	PROC_IOCTL_ARG(I8K_SET_FAN, 2 * sizeof(int), sizeof(int)),
-+};
-+
- /*
-  * Print the information for /proc/i8k.
-  */
-@@ -696,7 +694,9 @@ static int i8k_proc_show(struct seq_file *seq, void *offset)
- 
- static const struct proc_ops i8k_proc_ops = {
- 	.proc_show	= i8k_proc_show,
--	.proc_ioctl	= i8k_ioctl,
-+	.proc_ioctl_buf	= i8k_ioctl,
-+	.proc_ioctl_args = i8k_ioctl_args,
-+	.proc_nr_ioctl_args = ARRAY_SIZE(i8k_ioctl_args),
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index e211dea91e6e..064a2cdab4d9 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1894,6 +1894,7 @@ enum cifs_find_flags {
+ 	FIND_NO_PENDING_DELETE	= (1U << 2),
+ 	FIND_OPEN_FLAGS		= (1U << 3),
+ 	FIND_NO_DIRECT		= (1U << 4),
++	FIND_NO_REOPEN		= (1U << 5),
  };
  
- static void i8k_exit_procfs(void *param)
-
+ #define   MID_FREE 0
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 2a1d26deefad..8d7d308a785d 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -127,12 +127,17 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
+ 		cifs_negotiate_wsize(server, cifs_sb->ctx,
+ 				     tlink_tcon(req->cfile->tlink));
+ 
++	if (cifs_writeback_dying(subreq))
++		goto defer;
++
+ retry:
+ 	if (open_file->invalidHandle) {
+ 		rc = cifs_reopen_file(open_file, false);
+ 		if (rc < 0) {
+ 			if (rc == -EAGAIN)
+ 				goto retry;
++			if (cifs_writeback_dying(subreq))
++				goto defer;
+ 			subreq->error = rc;
+ 			return netfs_prepare_write_failed(subreq);
+ 		}
+@@ -141,10 +146,17 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
+ 	rc = server->ops->wait_mtu_credits(server, wsize, &stream->sreq_max_len,
+ 					   &wdata->credits);
+ 	if (rc < 0) {
++		if (cifs_writeback_dying(subreq))
++			goto defer;
+ 		subreq->error = rc;
+ 		return netfs_prepare_write_failed(subreq);
+ 	}
++	goto out;
+ 
++defer:
++	wdata->credits = (struct cifs_credits){};
++	stream->sreq_max_len = min_t(size_t, wsize, SMB2_MAX_BUFFER_SIZE);
++out:
+ 	wdata->credits.rreq_debug_id = subreq->rreq->debug_id;
+ 	wdata->credits.rreq_debug_index = subreq->debug_index;
+ 	wdata->credits.in_flight_check = 1;
+@@ -208,10 +220,15 @@ static void __cifs_issue_write(struct netfs_io_subrequest *subreq)
+ 
+ static void cifs_issue_write_worker(struct work_struct *work)
+ {
+-	struct netfs_io_subrequest *subreq;
++	struct cifs_io_subrequest *wdata;
++	struct cifsFileInfo *cfile;
+ 
+-	subreq = container_of(work, struct netfs_io_subrequest, work);
+-	__cifs_issue_write(subreq);
++	wdata = container_of(work, struct cifs_io_subrequest, subreq.work);
++	cfile = wdata->req->cfile;
++	while (cfile->invalidHandle &&
++	       cifs_reopen_file(cfile, false) == -EAGAIN)
++		;
++	__cifs_issue_write(&wdata->subreq);
+ }
+ 
+ static void cifs_issue_write(struct netfs_io_subrequest *subreq)
+@@ -341,15 +358,17 @@ static void cifs_begin_writeback(struct netfs_io_request *wreq)
+ 	struct cifs_io_request *req = container_of(wreq, struct cifs_io_request, rreq);
+ 	int ret;
+ 
+-	ret = cifs_get_writable_file(CIFS_I(wreq->inode), FIND_NO_DIRECT,
++	ret = cifs_get_writable_file(CIFS_I(wreq->inode),
++				     FIND_NO_REOPEN | FIND_NO_DIRECT,
+ 				     &req->cfile);
+ 	if (ret) {
+-		ret = cifs_get_writable_file(CIFS_I(wreq->inode), FIND_ANY,
+-					     &req->cfile);
++		ret = cifs_get_writable_file(CIFS_I(wreq->inode),
++					     FIND_NO_REOPEN, &req->cfile);
+ 	}
+ 	if (ret) {
+ 		cifs_dbg(VFS, "%s: couldn't find writable handle: %d\n",
+ 			 __func__, ret);
++		mapping_set_error(wreq->mapping, -EIO);
+ 		return;
+ 	}
+ 
+@@ -2815,7 +2834,7 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
+ 	}
+ 
+ 	if (test_bit(CIFS_INO_TMPFILE, &cifs_inode->flags))
+-		find_flags &= FIND_NO_DIRECT;
++		find_flags &= FIND_NO_REOPEN | FIND_NO_DIRECT;
+ 
+ 	cifs_sb = CIFS_SB(cifs_inode);
+ 
+@@ -2875,6 +2894,10 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
+ 	spin_unlock(&cifs_inode->open_file_lock);
+ 
+ 	if (inv_file) {
++		if (find_flags & FIND_NO_REOPEN) {
++			*ret_file = inv_file;
++			return 0;
++		}
+ 		rc = cifs_reopen_file(inv_file, false);
+ 		if (!rc) {
+ 			*ret_file = inv_file;
 -- 
-2.53.0
+2.56.0
 
