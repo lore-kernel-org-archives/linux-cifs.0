@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793662895;
-	b=EcD5FdnMlsNanEod7cpn9P+0rXZrL8v6DahhAuaOfphZrasFt8p0xMbq754Wo67mJ+/c
-	 8NRTHGREYYiCp9m7sXBdoAmi8xPexrA24cY3jwvmw+sbJ25Upm2VxvnkiNEDFqwGWklMn
-	 H1yiPTIF30wIm5sKeX8KqUBBFtPReQLYsBIOtpIGV6i+pdZ5QPngquDAr+psTd9UUhx3M
-	 68UQNw9TNH3/VOHpS+YdAp8vp9s3KZHee3cK8mYhX4gH8nwO8EDUFAhctQCbXZYzfetQ2
-	 6slndGLn8P+BGPQaVEslZ/8EbvqcHJaIp6jAMrn1/aD7y18kFjJ+7Ea2NN5rHikkJbw==
+	t=1793663654;
+	b=C+jXcqdKqZ6uHZOaqvJULrKYcGrcD6QHBZijSed3lG5PA62x7JUdf5bFEXNs99UdDPtf
+	 ua2M8j2g8MedQ7Bjfvxz/tZn7GZUkQkcwUrgu6k7BYbXMkHeqKCXiyLsjIS8WipTL9B4t
+	 r0YNRV2L/AAJR9ewH69Gzf6zVsGquMwV0xE3qGemv9yDijPNAgFRtFCJ3aHOPcGofRF+x
+	 BcqtXWI4apqARZZods3bnogPV97qOX4XZyUKOYxf3xsDPLBkvoXJPnfQqZqyygLJnodF+
+	 coC1hOdYXjlKmUd41MxgGPZeyHukj9KR1QQJ24dnfE7Z9LzieuGOU4UDVtHez6XSYFQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793662895;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793663654;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=Dyb0KNEBDyW9YUH/H8NB1sb2XfBQhpgJT9JPFKBIQR0=;
-	b=mB4mSeHZTwOQ32b4bV+DWfq54RbDN+vQ9DyR48B5jyKqTXPY84v20AHeBEjRMmGoaO/d
-	 V3gmvaCTrJvPsEKcKoKdIJ0o4+DMCcL38tPuZfnO8dPILOomQ9u/uONn2qqn1YPVu4eJK
-	 XbHJE+YYlPle4/eUiWsPZ4feOeO2OwStIeDSSpDiWQmGJVCWD4eCu/bleMXpb/qiJIn30
-	 he6r6PYjjVt+ecWO1cNg14RS3c1amS6tAU0M1EUXDkC9ydMJuL0IBAEeM4fCeWbzymgGU
-	 Wc1GJ8qox/fi9OTHXpTOM8Wemzwy+yA/RhfWQ9bgLhADZgI+hIqTNrpQvO3W3vTKYnQ==
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=+UqSyir9zlJtTj6oGLIp9AFPvgL5F/23wHoJo5ierls=;
+	b=fah6ZDW7C0+pPDlhP+rLdKAk9KXjRUOtCK2/tKiJXo4CLRCmuPv+OHb2j+9pyyRb2AQ1
+	 VXbNVc1+CRNM0/LoYXsCT2PDYN0FX6O3E+kdYAsfhdMpMlh/253V8Blon1PyQ7uuKC9Qo
+	 Nj7moVEfYLbTIo8vUOqB7QmTAjzAaOvzKLtRwrpGLZByAFX6bySVI5pb5CgglaDRqk/9i
+	 g6fNtCxKIUV9kc5PYHxNw4O8Y9LyTDxS+4wOvODK4AiV4E2PVFcS5vWP+aXTHXMDJSuLx
+	 m+t1DzecGcGxFimN3MvqKV1a7HgduDiFjPixG5pWAjXi2T7Zt/h9OZC1D9z4RAi92eQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gcEKMJZr;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lChM+1O7;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE8B606A324
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4AB606A324
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gcEKMJZr
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F311F00A1E
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:41:34 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lChM+1O7
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97831F00A1B
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:54:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793662894;
-	bh=Dyb0KNEBDyW9YUH/H8NB1sb2XfBQhpgJT9JPFKBIQR0=;
+	s=k20260515; t=1793663653;
+	bh=+UqSyir9zlJtTj6oGLIp9AFPvgL5F/23wHoJo5ierls=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=gcEKMJZraK7/1lnoIxsE4M0dToWDBIVmwxvZeTbAW0zRaJ9SXE5zevsln6eLNtZzo
-	 yDxbYFWO3a6eKMh3u+gpl9RLkQfCLMmwPC6UMrPVcpJ7KyYSXdAy7z9hX3WmzNGlE4
-	 rp6EfVtsi7JEA2yppF2327WS85/tKckSlQeRLVR3NzvAxu2/iFLplc8+gh/bAHPtdN
-	 XupmLrstuma9RYmMcF0Eqo2P6v8HdOjbe4EpfAKxT3JDCq7e7M1nQJIBtSadaVrtQ8
-	 11h9HAghsglPYIAc0vQH+rM1a3dnxedJilUTdrxlPWB2bfbloh1G+GN4U+XPJMha6m
-	 DwUMS89EGMIMg==
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-c4395d31228so551531966b.1
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 15:41:34 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBw/NjQlWaT/lMKJ3HmIFLLYLfa3UdI3pHHnEhjAu0ts9z/3K3mZ7SeH9A7lQMKbmZ4AQ915rswZTFqG@vger.kernel.org
-X-Gm-Message-State: APuU4Z/6z50+NZI2hs0Rf8SnLQ1t+qd74hxZmNPt6ignUPjHbMqBCPMo
-	DJvyOyv279/vZiHREeoU9n3j8YAOHA2LZLLBCOJLHGB3KLoR1maGPH+W//T3WgsjTP1j9YHf8J7
-	7TJHlYHvZ9QwDKwHn6yUT6sy8g597b4o=
-X-Received: by 2002:a17:907:d91:b0:c35:babe:ab44 with SMTP id
- a640c23a62f3a-c4ca740b297mr962386666b.0.1793662893123; Mon, 02 Nov 2026
- 15:41:33 -0800 (PST)
+	b=lChM+1O75/pz8GnNKwtFDREVmqSf1W++CekSa/AKO8SYp8u5C8LP6XHWXtNQhSXpK
+	 OPAuJMpsoI7q8iDybVE3Wtsq2BCVgj9UD3lSCNHejpt6cq14FrMn8ubIo73ywKi/D5
+	 AIwe5gQjpMbRaD5BLymxg9eYp66tauf1xL0EMdZtE1NpTBQlx76mUwqd9DpLbNpIJi
+	 cjCv3OdG8Z4GWb1FfApBrXnVV/Rj9OI6LCR9ji87+hjTolIbQkzjEYgyTvGp/uPRkS
+	 fGKxqDXuv7RzRC1VQwsMzrYulUDTuwA8ceENOkGwUNW7Aikjm1brN3xI+dmtUnE9LM
+	 WseOHDO/zV4Eg==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c43373ae89aso542778966b.3
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 15:54:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBxhZ+24ItzD5bIS6+hJSUUM+7hcxtUycIktSrjbOcBqIZAsbwDnAZiYiQZzQaBCKEbCw6KXK9xNVPfr@vger.kernel.org
+X-Gm-Message-State: APuU4Z/0Y59LovXf2pDBJgpfS4J81lgWsu9h4manhqwrixOBFRlsOZPU
+	fqZ9x42vb8Vv3AFVjepd8AgsAjtwgqHjYQmR3Dq2uoILC8UJFSYo9m/Hfg3kqQFEdBX7sjzM5nS
+	jTg063f+jFvE6B4s9rKs+4BP1gph6bBw=
+X-Received: by 2002:a17:907:18c3:b0:c26:22ae:b66b with SMTP id
+ a640c23a62f3a-c4ca7aee966mr947443066b.15.1793663652482; Mon, 02 Nov 2026
+ 15:54:12 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,37 +59,52 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261102200353.884509-1-icb@fastmail.org>
-In-Reply-To: <20261102200353.884509-1-icb@fastmail.org>
+References: <179362071771.29269.6848836845989806334@stu.pku.edu.cn>
+In-Reply-To: <179362071771.29269.6848836845989806334@stu.pku.edu.cn>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 3 Nov 2026 08:41:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-s-g2V4LNY8e5SsH=+0r3qLY+AeOa5Lp9K0T5p_tnA8A@mail.gmail.com>
-X-Gm-Features: AclHuK9G_vi4S7-_Tc8OkG8LlBlaaJXENvc1ro0Hs3ReisFb84vo12Ihx1bBJSU
-Message-ID: <CAKYAXd-s-g2V4LNY8e5SsH=+0r3qLY+AeOa5Lp9K0T5p_tnA8A@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: grant a caller what its groups and OWNER RIGHTS
- ACEs allow
-To: Ian Bridges <icb@fastmail.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Aamir Ahmed <elb12345@hotmail.co.uk>, 
-	stable@vger.kernel.org
+Date: Tue, 3 Nov 2026 08:53:59 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9G9VKLYzsKMqS87yj0KLxSjis-8iAAegnPdDzdpv=vGw@mail.gmail.com>
+X-Gm-Features: AclHuK_ZiPl_8EII_1_G4Hx1xfHmBmUEZKMwbV1xvMdMI83u3u7g6JkbLF7jK5g
+Message-ID: <CAKYAXd9G9VKLYzsKMqS87yj0KLxSjis-8iAAegnPdDzdpv=vGw@mail.gmail.com>
+Subject: Re: [PATCH] cifs: bound invalid NTLMSSP signature diagnostic
+To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
+	Steve French <sfrench@us.ibm.com>, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> @@ -1562,7 +1586,8 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
->                              compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
->                              compare_sids(&sid_everyone, &ace->sid) &&
->                              compare_sids(&sid_authusers, &ace->sid) &&
-> -                            compare_sids(&sid_owner_rights, &ace->sid)))
-> +                            compare_sids(&sid_owner_rights, &ace->sid) &&
-> +                            !(groups && smb_sid_in_group(&ace->sid))))
-groups is false for MAXIMUM_ALLOWED, so this skips group deny ACEs
-too. Consider a file owner whose group has a deny ACE for
-FILE_WRITE_RIGHTS, followed by an OWNER RIGHTS ACE granting full
-access. The group deny ACE is skipped, leaving full access in ordered.
-The new fallback then returns those rights.
-An explicit FILE_WRITE_DATA request is denied, but MAXIMUM_ALLOWED
-returns 0x001f01ff, including write access. Before this patch, the
-latter request was rejected. Since smb2_open() uses this mask for the
-handle's access rights, the client can write if the vfs permissions
-allow it. Could we also process group deny ACEs for MAXIMUM_ALLOWED
-requests?
+On Mon, Nov 2, 2026 at 8:58=E2=80=AFPM Yifan Zhang <yfzhang23@stu.pku.edu.c=
+n> wrote:
+>
+> The NTLMSSP Signature field is an eight-byte binary value and need not be
+> NUL-terminated.  decode_ntlmssp_challenge() prints it with %s on the
+> signature-mismatch path, so the diagnostic can continue beyond the receiv=
+ed
+> blob until it encounters a zero byte.
+>
+> KASAN reports:
+>
+>   BUG: KASAN: slab-out-of-bounds in string
+>   Read of size 1
+>   string
+>   vsnprintf
+>   _printk
+>   decode_ntlmssp_challenge
+>
+> Print the fixed-width field with the bounded hexadecimal format.
+>
+> The patched kernel reaches the invalid-signature path and returns -EINVAL
+> without a KASAN report.
+>
+> Fixes: 0b3cc858003b ("[CIFS] NTLMSSP reenabled after move from connect.c =
+to sess.c")
+> Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+
+The patch is quoted-printable encoded, so we can not apply it.
+Please send it as plain text, preferably using git send-email.
+Thanks.
