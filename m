@@ -1,73 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793654102;
-	b=qT9za4HmiEuD+ZhSy07GR0SXesBFK9MHiOMCkp+539oM4rloHdXiFjasef43N2yaKvoF
-	 yWgDYAkekODJ6Q5RA4zGJxCSQlq7cl8NMhlQUvn+l76InJLqww+tZEaGlx5mU1zJlyw+Y
-	 TgG2EQGAMJWQs12Lw60RAFctreWxHHczDww7oavRYYv3Xw4IfPv+pdpvETfZvqE4MvN9G
-	 ytCCrgdwu9maL6lhBYXVnI6YV/1Xm6shFwPZUmV1Lhbc+oKapQSxnCcm175W+dQxxm2CK
-	 OeYPJEXY3+ElmyDni3Kkyfsz11SN4RTq0TNxaRjXGEUNgsyAUjYrS5MPdyEBhtxRztA==
+	t=1793660626;
+	b=4c/dILaAq5eFoje0MYinrHKerqteZY/GlR0ABolK0AaPHBzmnxQuyHGfyKKmN3gZCk7P
+	 Q89jt8LA1XISIxfqeyFWRS/6H3nHkf3WOQHgUWSzGb4nAoo1qmmkaCv7Tw5qiMwMEVVoX
+	 M5VhGwj7zI2239EftkrhPe3VhuzNZhCBGnPUiTPbSQzkXbUyvsCPjCmUHuQA6HKIiLbTl
+	 JTmueUclwHyjN/tib72pqBMIhaWjOEiHVX/mZgduRCHUbRIoSUMSLjvcjms7YbLxWaklP
+	 3ved5mY14oLsibyQKAkRcrCA7thVMYC6zI616t4Zpt8NoXTUjY/VJsORIipXO4RtaWw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793654102;
-	h=Received:DKIM-Signature:Received:Received:X-ME-Sender:
-	 X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:X-Mailer:
-	 MIME-Version:X-ThreadId:Date:From:To:Cc:Message-Id:In-Reply-To:
-	 References:Subject:Content-Type:Content-Transfer-Encoding;
-	bh=IboT5prE1F2zgLUjN3M8JJkwTsSKYt9w9Q1ZY5Lm5jE=;
-	b=kZhG1qmNvaqZXdfbTPxZIK47CnIzlkUO7vCqR2VEgCXzUPMb4JJpdhU9mATIvL3Mi6h/
-	 fWt0AoewxIuKMBumnVRQxvkzjdpDsQbH64qYJGf6YvIF7WqthjJgF2/je++gZ6BW18YaH
-	 vcfau6ZrPONRCu/TPVZJqxnAY3+TGcTa7UA9wE+3JHN1Lwv0mqH0J7C/iaOzUO+EvCc17
-	 iyHOCDPHIvzMYcbybtPnQuxCVchu+nEotEYaE33D/tg68W1lF/u7bhvAH/gUcjKVbOSiD
-	 E4WNqQxXXiERpaKemiXCBHQoioubBCL+HKLrcTJLnt2whMK87+YksileVjytN+lQ91A==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793660626;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=TOCj0cvfOMcwdE+2asmc5YrfnJ5Rb+uIiOaWLNlRZwI=;
+	b=FWPCjUtk24VrmUiRMqzCSCzGkD8mhvagrP/jG6jgb2oNx+amCCslcp2yRPKpX1ee3WCs
+	 twnTi3ebwqtYyxMjWx9bWFgbg/ja8gvoayMJVOwA6QzoLKOabhgNiIt0f2p8J0+WLEToP
+	 kASSqWsAMHFJa2+yHQhkbZUXoe9OARkJrkxEIuEqyEo8A+lGxRGNFaxIh1+emQHCV+AEw
+	 3KjFyK2h7rcxOrJcK10aZZEg+SfnNChKSfu/DSzLrOPExvDrplLaesgKxqdMcGSWP18ls
+	 i5emOGBDSN1yONX5XiZMbLVqBM9utbYzg9sbD2CMOeNP7bbIvnNbZUrQJga2csYiotg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="i4XS/+Qp";
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HUMxQjH4;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3F6606D837;
-	Mon,  2 Nov 2026 21:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629BE606A337
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=i4XS/+Qp
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19181F00A1A;
-	Mon,  2 Nov 2026 21:14:59 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=HUMxQjH4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECF1B1F00A1D
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:03:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793654101;
-	bh=IboT5prE1F2zgLUjN3M8JJkwTsSKYt9w9Q1ZY5Lm5jE=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject;
-	b=i4XS/+Qp/XJpkpHyhLatkkxrTnb76H0AyrbluP9UrYsSjjvFvYed65zWeP+n5bDMR
-	 T4jrppxwRxmsiUoLJtpEDBZOQUgSEb2I7JAqNJICoUtmRZqGDSr+AkbMY5KraB9hcp
-	 LJSetra0CCoguNvIXys8kMbF38qG79C7rZIljzi9OxsucTBr2qJtAKy2hNxphivV7X
-	 SqR7z4TvF6OS2jxQo3eWdNU0GD2TA876qUhcb25obxs7Qa0hq+gMR1c2AKZ0TYfXxl
-	 /PRnwvUkfYbroZLwoik/xUkslivJlp+q60cSPVqp80BDXlYt0jmnPbIlU0+2JbsucT
-	 rjIixFbj3/TrQ==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 3FB84F4006B;
-	Mon,  2 Nov 2026 16:14:59 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Mon, 02 Nov 2026 16:14:59 -0500
-X-ME-Sender: <xms:U_3oagUAPKL0KahIhejOYJwKEPfYb6twqYG_HHugM7_eLn8Er-TgPg>
-    <xme:U_3oavZTuzGHMfK0qXbinG0nc7CYskrIhJQ5eHOz_Ha7XvQtwnXU_T7hJPsGo9qg4
-    BhXiwA3Pdzj3QiIOE4JzHYJnc55BkwZtZcinLkFBcrDsA6sylLxQvo7>
-X-ME-Proxy-Cause: dmFkZTGSCWblgfsMhzNjEIN00ph1bmXztXGhYrK6FQCSJysx8m5mqsCTJHkCuZD0tpZuBG
-    pYnx6qST1krVMCyjpYhoMBo2TltjSYVP2LKGOkZnOBb4t//k/nGoJ/SIXKKJyIATQl84il
-    BuXRlRV3aPeB88TAd/llIDq/9PMZ1EzorVjUV4ox06mXS/IOKUqdbOTFcr2gFtJFq3Gx7F
-    Zq0nEujwlkDiPcDOX28riG6oQW7iLTgD6BaMnfnV9H0ADvTknFe8adm4EFa+o6I1mSuG3K
-    LJ3epAVfTBg3DuzNRu88aZuYWYeuI7KoVJah/eioVIkx6sAoHZjqyTVRvcNhYqHYgvNdOh
-    F7RoapMXPpPy7fnRDGp1EnOzRafp7mYLbQvUWevKonPpL0zVugnrni/xwOB0ZUdq15K6LL
-    U4eIWAyGEDjfaCYO/Dppo1HoBBuP1Ugp4Zki+kXZHcTkA1gjEQVaV70KrwrPcut26vPd/h
-    q5yJSVyn3x/Ch0xklWbVCXPbWoaIS17brwWPL/guaVzJxizQ0P/jgX0plm53NXTsLd+70V
-    110yVl467ZsRMKGBWdC4JnWQHbcxAMHjeZkhkyAsfOuCVSLebxwzvInrQKLcoImyb5UwHY
-    pO0Oc+d4/j2oJCRnrCOkOe51eLIclfMVgyBLq7y/6qqZiV8XA97NvuTzr1lg
-X-ME-Proxy: <xmx:U_3oatxqYhX0hWpcSGJgdTO64UmbQLn1zkSvkgmn2QN3P9YNu5WJ0w>
-    <xmx:U_3oav5HgW2k6KeJbHXAdQUNPTjXcBKAkESvLUwa5JME7gNZc5c0tQ>
-    <xmx:U_3oasSgNqIt2BaGeBZ12VcERyFoy0lpk1cdl0eiT57vWKlvWpphXg>
-    <xmx:U_3oaifZ0cTDaYHT72Jch7KjTqrgvVpyqwgckwFzCeMt7Uwl9HyKaw>
-    <xmx:U_3oapwU7EvPML2sBaImLYgTk9SsDSGibfYemkcHEOBIYG1GVrkdWT-b>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 181AE78273B; Mon,  2 Nov 2026 16:14:59 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=k20260515; t=1793660626;
+	bh=TOCj0cvfOMcwdE+2asmc5YrfnJ5Rb+uIiOaWLNlRZwI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=HUMxQjH4baTzG8pm5hQhi324eB43eyyV540nF4LklvF0lVZosj0Ok1EUmU+SdsH4a
+	 3h9KBSHeJ6VVTsZVuBA9YZq4WO6d3TXPNLx8FfmSOhD/JafKt4VXJG+k+R5X1ePNgS
+	 q/PQLdHB9y/KxXn1C7Lri+Ut04qtVWXs1eYcff90KPKaSSP+UV1x4iZojSO1M2AIgF
+	 G2JwreVan9DydZjNt2ojlpKClf5jXdtCpnsfYwBOco523Q86nNE5fxGJF4Js68xvI8
+	 wZUs1Mwn47HbPHtK3xv1OZIt5FRICtu4CZwLx8Tz6TJTSd+8oTVMVmVrMce6xKaMzo
+	 3mLOPWgIJxwpA==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c3f04e0e65fso521110166b.2
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 15:03:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvBwQLQnatZ6Y81pmnYubeAI80qXqELYmclvf/xfx+6ofMcZFaQb67XRx8olhT9wm9wB+vqUHRGVheBO7@vger.kernel.org
+X-Gm-Message-State: APuU4Z8IcI0+GJvNepgCNuViUJLA7d7MV9Dzt1Ap9Jx4f6vu2l6N5QgZ
+	qyIQqxaplwqMfh0H2zzCWtMXDPTthXkd5hBmKplEt+XLKV2smr2o0Aff1JswuxOCDVXFTz/EX64
+	+Ya3vhTUnC1dRf4QcIYViJlLy55ZJzDU=
+X-Received: by 2002:a17:907:c5ce:b0:c29:63f2:99bb with SMTP id
+ a640c23a62f3a-c4ca7acf3a8mr975101066b.47.1793660624646; Mon, 02 Nov 2026
+ 15:03:44 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -77,61 +59,34 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-ThreadId: AlKaHQIBeldV
-Date: Mon, 02 Nov 2026 16:14:38 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Christian Brauner" <brauner@kernel.org>, linux-fsdevel@vger.kernel.org
-Cc: "Linus Torvalds" <torvalds@linux-foundation.org>,
- "Jann Horn" <jannh@google.com>, "Josef Bacik" <josef@toxicpanda.com>,
- "Chris Mason" <mason@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, "Eric Dumazet" <edumazet@kernel.org>,
- "Thomas Gleixner" <tglx@kernel.org>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Jonathan Corbet" <corbet@lwn.net>, "Christoph Hellwig" <hch@lst.de>,
- "Greg Kroah-Hartman" <gregkh@suse.de>,
- "Joel Granados" <joel.granados@kernel.org>, "Kees Cook" <kees@kernel.org>,
- "Jan Kara" <jack@suse.cz>, "Jan Kara" <jack@suse.com>,
- linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
- linux-acpi@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-s390@vger.kernel.org,
- "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
- linux-um@lists.infradead.org, linux-wireless@vger.kernel.org,
- "Linuxppc Dev" <linuxppc-dev@lists.ozlabs.org>, netdev@vger.kernel.org,
- ntfs3@lists.linux.dev, platform-driver-x86@vger.kernel.org,
- coreteam@netfilter.org, kexec@lists.infradead.org, linux-pci@vger.kernel.org,
- linux-sound@vger.kernel.org, netfilter-devel@vger.kernel.org,
- dri-devel@lists.freedesktop.org, ibm-acpi-devel@lists.sourceforge.net,
- jfs-discussion@lists.sourceforge.net, linux-alpha@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
- linux-fbdev@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-mm@kvack.org,
- linux-sh@vger.kernel.org, linux-usb@vger.kernel.org,
- samba-technical@lists.samba.org, sparclinux@vger.kernel.org,
- linux-m68k@lists.linux-m68k.org, linux-doc@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-atm-general@lists.sourceforge.net,
- "Takashi Iwai" <tiwai@suse.de>, linux-input@vger.kernel.org,
- linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-debuggers@vger.kernel.org
-Message-Id: <961e7e3d-2117-48ee-8a7e-a7a851ec8ef8@app.fastmail.com>
-In-Reply-To: <20261102-work-procfs-fs-v1-6-d09a996317b3@kernel.org>
-References: <20261102-work-procfs-fs-v1-0-d09a996317b3@kernel.org>
- <20261102-work-procfs-fs-v1-6-d09a996317b3@kernel.org>
-Subject: Re: [PATCH RFC 06/27] nfsd: let procfs own the seq_file of
- /proc/fs/nfs/exports
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <179362071772.29269.615878810410303214@stu.pku.edu.cn>
+In-Reply-To: <179362071772.29269.615878810410303214@stu.pku.edu.cn>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 3 Nov 2026 08:03:31 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd96EhhA99O-xZyZ66a=tHB90DkmgFe2YhTwKRKT136bJg@mail.gmail.com>
+X-Gm-Features: AclHuK8qzNqMYHI4Ba66Ka9nSMCYCzbbTHTLaBo2b77zwDgZoRBYxqX7hCpqpTI
+Message-ID: <CAKYAXd96EhhA99O-xZyZ66a=tHB90DkmgFe2YhTwKRKT136bJg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: require NUL-terminated EA names
+To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org, 
+	Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
+	Steve French <stfrench@microsoft.com>, Ronnie Sahlberg <lsahlber@redhat.com>, 
+	Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-
-
-On Mon, Nov 2, 2026, at 10:07 AM, Christian Brauner wrote:
-> Declare the seq_operations and let procfs open and free the seq_file.
-> ->proc_open() and ->proc_release() only set up ->private and take and
-> drop the reference to the network namespace now. Reading the file then
-> no longer holds up its removal.
+> @@ -3419,6 +3419,11 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
+>                 if (!eabuf->EaNameLength)
+>                         goto next;
 >
-> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
-
-Acked-by: Chuck Lever <cel@kernel.org>
-
-
--- 
-Chuck Lever (Come to NFS bake-a-thon! https://nfsv4bat.org)
+> +               if (eabuf->name[eabuf->EaNameLength]) {
+> +                       rc = -EINVAL;
+The NULL-termination check looks correct, but returning -EINVAL here
+causes smb2_set_info() to return STATUS_INVALID_PARAMETER. MS-SMB2
+section 3.3.5.21.1 describes STATUS_EA_LIST_INCONSISTENT as the error
+response for a malformed EA buffer. Please return -EBADMSG for this EA
+format error and map it to STATUS_EA_LIST_INCONSISTENT in
+smb2_set_info(). Since smb2_set_ea() is also called from SMB2 CREATE,
+you need to update the error handling for that caller as well. Also,
+the patch was sent with quoted-printable encoding. Please send it as
+plain text, preferably using git send-email.
+Thanks!
