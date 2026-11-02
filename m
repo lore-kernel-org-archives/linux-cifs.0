@@ -1,123 +1,106 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793649847;
-	b=GT+Q2jU+n14xByKYeIW5ycoNYUdngai9MGs/mqpvFUbbnaGi9x/TrZrW85wXbvDxEXRQ
-	 WgNAOUswUdlh69XzlbFMOrqJT6uekKrP00V+mG8xtQSaZexlRUtnCOOLsFxf3+C3dozfm
-	 eekPGuVTJw+wy5JqxVr5JgAC2gUvRWZENNBQLzjwgJJ6/WV9YWkIiWtGAnb0jpK/64iue
-	 By+T0Ia4dNimoSYV1I7zFvX88VZ0a7KL1IzfcW2d/lJRwQQtCrhv0jf5Arl1ejgvpSVax
-	 AIK0OdeBcffDtudvOPBs9H62Kyjqk08kvIvAoSshxQFx/6DPwsgcGyN2/cfHhXW232A==
+	t=1793650489;
+	b=CLPUAU4rZzJWQb9GlkR0tnXZNm17y+bnkIgV9SUa6MIS+ZHe3R1dugFyM8JS9v1AgE06
+	 mPYvvfGWJoqP7CJsLCbzX9CW/CyVnsQxG9MZ3zcaHwnLiHS8a9drARPjebqalW+yStGFc
+	 8AOf5MXX4nl6iUqt2Vy6c60DMe43tO0X8bljXr2CjdJreYBZ1yQEPKdotAkseINit2zuk
+	 t9bDEaBM3to3Guln8w/06amOiHqJwR+42IkpBvkaaT2QZtYN6Tro2lVIe0L5Uxv201s+2
+	 qiZBsc7W68RlQ6lPcCFltrddWcgXX8eICk7lj4FZYm1+sDWm4YQqj5Ah9e/UZv+Tfiw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793649847;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793650489;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=YiWKeC1MiIyvrH+4z2zS7difmxKk8EqNUVTUaD5g1l0=;
-	b=fCZxXQcqcDhzky+ZpPFrqEbqEFz7TM4QM8HXQRET55Mg1MUERI8lgYZ6+eZDD5EOKux3
-	 SVpwGp/SlwwtgRp4eAWmKPJ4g5OEbDfjoETDf2f7gMoGZJObhLplSFOvwS9DXc/pjjU4I
-	 N7i1i5lsoHKDeaH0pNpmhmr/qAQsqFBXld6rXwG0+qy6ucFYqddlHPBG0bCFQONSO5LXC
-	 0jxciOLhuPOJdbYKVTZW971kP091UV74TjzydCKdArvRy7SfvQzIkW8kplmkrDAbVSH0L
-	 ib55RfrPTOooyQiBvSYPN31A+yAdL/1v0vbriTU2LmivsXieuyXCPzgWrWD3Zk2+26Q==
+	bh=ChwoMCFgtIR2KqbxLT1VLdvZN3wU1IvS74bgkVZalnw=;
+	b=FEn1jmh+omLsmucq9sJ3M1gZPalfiIAI5ZLBLoEtqDT4WHAM4iS35ApTdyvPXpxgQi+F
+	 xWR50sQ9uJrk+OpoqQSeRsre5I9khqyKLcI2+TJl6FIFBsBDrTgynD/yko9YzKqRL6EmR
+	 8XQWG/n5qoB6qHdxfMHZUYrEsXqiNJOJmj7k2clNr/bKDK+PsL0FBoNf+uQlZoP3MndUg
+	 FnqM8KsEEmEbsnZgKF76KhQ+OoC08HCn2bAZjIyzlHsKSCcy3Hv05un69hIMwQZVs5yl2
+	 Yj1SpB3YPZX/mhgzBHlnqF3o8Tglbwj3ZHeLV1w0TSdzmWRm4jJTIMJgtEpW5dazyog==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b=X9V3vRMx;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=CczTawjN;
-	arc=none smtp.remote-ip=103.168.172.155
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tdVavhV1;
+	arc=none smtp.remote-ip=209.85.215.181
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AAB606A327
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 20:04:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0AAB606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D595A606D807
+	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 20:14:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D595A606D807
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm2 header.b=X9V3vRMx;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm2 header.b=CczTawjN
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 0DE5F14001E9
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 15:04:05 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-02.internal (MEProxy); Mon, 02 Nov 2026 15:04:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm2; t=1793649845; x=1793736245; bh=YiWKeC1MiIyvrH+4z2zS7
-	difmxKk8EqNUVTUaD5g1l0=; b=X9V3vRMxgfKszvjZmyV/zgn+Io/TRYJOVTwXJ
-	L/trbm3gR81u68rQVTvb59wW6J/RiIZWe3hwWzkVC3cnjOBe/ZuWKljhwSd/+NAZ
-	Q316lvqM3J6581sI9lX6e46Q7VhqX3FHhabeHoEv0QZtCIZqYYW6DY4UzyIh6/U6
-	J78JEOgSW43kds/uFH+J2qyU9PUkBJ8WRa9fWW9L8VIqVv6tKAKe7GX4YlhGpH+H
-	Sn2+4nlEoJ+yMKpixT4tGoFJm17Uc1TjGtFTNvdrpbrpsBT3JZHuwJDB/Df/tEgX
-	Nm4emxQrxwrKFR9dFdS6mycfaFHW53iiFtlWydlVhVy//9VBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1793649845; x=1793736245; bh=YiWKeC1MiIyvrH+4z2zS7difmxKk8EqNUVT
-	UaD5g1l0=; b=CczTawjNnonTzOf1C8ylUAbdq7bMmMb8OC+ADBV9lcvosm8Sz1/
-	LQV7EStoUFkWTrt42NKPGdalYyE3N+lXUI7UXfYcV4A6GJPl8+Px6W/r1gwDWOqq
-	bYWZuBYHf2e8sC7zlX2h2rY8WygcQrpW2TsKA1+0ayPGpMrJi+xIwj3tLB6bWDld
-	eWFHGdx9uMefzOrTfdt3+gRrRjQ6CTAu0gp6RUsVSjAJ7enGFZ5z4lZr+5BexsE2
-	LHP4R5jPelScrVAyls/LZ+a2yQmVoHEdRlAx/nY29fsMmNtsBCh4JFI8W+WfFgh4
-	Lsi6QadKkJJ7b4PQspUkw1xmBaY+GvAHbnQ==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
-	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1793649845; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm2:rsa-sha256:TyFict5zmeO7dRTdB6l4jK8mDct7U5MzzSQsyCf/uBOgGZm
-	8ntBpLxAsVfxipiCNgLqWelFswmu0prUaB8fUIMNqPrN75nzQvOCPItg2L/fRbvR
-	+0VocJaPc3CrOL+7Sa/PCrAdwNZotTBOsJQYbRaJuEgvZKmjLc+MRc44ZAFmljxW
-	0iyxoZN7I3omLkoyoMIeYCjXpTIEvuPFBXSpIVmw25B4vu2kib40IczTrUcuEo4B
-	U7ApvdgH99hZYge4hl8X/k2gAutFyoL+udW4algaKD/97dsTTtW2L25NdunI71I/
-	uzYmjNSPB/zQRhij+noO4woEHYS9Z0H8bDZjjNw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
-	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:EnuZclC8ZtR2spHq5HetwzIAON1jiGvho0A9vaTSRNI=:zCof2IsTe3dakitPEMe8pw2akIaLdFI/WGUKoQ8MZfA=;
-X-ME-Sender: <xms:tOzoanFLkKOgpDxAZuvuGl1Vkoe9Fg_uNhUBO0gC-BKt3fKqASfjUg>
-    <xme:tOzoag6ML0pHdhewNG_tiOdKmkhR9H_qt8tAiBTyhJ9CcXIeIlnvs9EBMhxEdYnt3
-    FW_00WkF-kgS2IHKpCzd4xCZCND5cefoL4GAizr_QREp2PecO5SXg_Z>
-X-ME-Received: <xmr:tOzoatluoQIg1pxpjHD6I9Re7--lc-Fn6y8xMnEYDe__EFIqydS5ib45dzMOgPwS>
-X-ME-Proxy-Cause: dmFkZTGrI/BYYEHvbLhhTvUJLQmv4G/KVyhmcdqSvkN+WyIMEyRmFK2tpwN/XEfpFxjDVa
-    99fTGbvwEZdY7BAqv+2lsJ3VtAv8BZs/1QISYzCz50Ti5MUg1WENobE6nmcUAoqFGsGeLW
-    Shxuw/16YKL6nKlzrrRYOy/pODakzkw8c7viN1+V95wldA4Ifo8m/0By67Z4Mg2Uj42p3i
-    x2eLKHbC+pWvaob/FN2Wu/pUCrXN6MAbSBVe163KRNKAr+d4V2gVW2YeGhcByXG5SSdYSD
-    nEP3Jk058KYLrlx9aGN54Jvnvn8a1D57Y06Z25UlEuErTGuUiCiQYl+pk3oI/i/6vYUpm7
-    1pONcTrUAbZoz+3uHCq3M7w5KVQ+Ds5aIsFIk1LM3cdjv/0dL5yYr3cyPGpo+X7GrENDt8
-    Whpg88aZeuKcb0JqdWliSrQy+q2Nbr9VKXzp4s82YyifwUATpNIRaGKxuLUwSm8kWuWFFP
-    vwMnygFZq5pRtiG3X6idwjgmtwnxQa9XslugnSCVWRrLg0oCQ5b+/8lEB1Acu01Ltch26z
-    kJNACyUCmFGM78O5YeMp9B4+ebV3iHnCFUVoMfU4Ee6GyC7y534+1JFiOzZhpjkJO/t9cf
-    8f5iG7ggtAtcq8gxNrmZk3e/8qSVr7+zNEkKbKUKcvNA6wy6qEs9L36jXoBw
-X-ME-Proxy: <xmx:tOzoar4p1LZKpWHgKih4uQi4e1v679QnE1fWZV027PIALNFVdsLiMg>
-    <xmx:tOzoauRRHBHG2_JDtTacONUXmbZg6WpKafj2mOEK2l7o7u87rrK6PA>
-    <xmx:tOzoapwt1MmznJR52qAMsgdaWjeNCHj1T7_rBb5q-mjpjtn017Xa1Q>
-    <xmx:tOzoamr84XcVPVJQBP7r9AYAS031A981rDQ5WRCr2c_j48hbN8d7xg>
-    <xmx:tezoaukSqsvTkwhP3m56KQYfDLgzvCh-PAeRMFPRhbyf50yZI3JL5v9d>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Nov 2026 15:04:03 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=tdVavhV1
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-cc52c1b8286so10962a12.1
+        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 12:14:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793650488; x=1794255288; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ChwoMCFgtIR2KqbxLT1VLdvZN3wU1IvS74bgkVZalnw=;
+        b=tdVavhV1RdFgLQZhWKVggX7EMfJQ+eoKkwnDYSDI51I9VO02J6efEOmyM4ae7gZZTW
+         +AJqoql5O96fgTMpP3Dg3Rjbzo1dLYMgARTU9LwkX8s55GaPeNo7SlnuwBBAwoDDM5i1
+         GnTBEiw0WCsGHJ9Olb+LTF3WfKuZMq4DcxFwP37rTBUD8sxk5OZU+stoudLSU+PhqHpX
+         uSAJs7AtS8YdEg6sTC0ATgyTEjKqhVMC7QYv6j8trpJBq7GieXnD41THLWdWk/tBHc9B
+         ZG1xXZtGlmsuxjv68L5LDmQ+Ut4Ce9g6giNupWcE2Ex5x1LqMOXdkw4RnvVmkagqatgw
+         Opuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793650488; x=1794255288;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ChwoMCFgtIR2KqbxLT1VLdvZN3wU1IvS74bgkVZalnw=;
+        b=U1Vt7P1kEFD7e1W+qQ5mgHg75LL+maDovnG0gGj6Zc/8BnLR6qGjyQUGxdk6FWuPrB
+         DhvUU/AjsT9bthy875vsxhox4BTBoEym2V0etjbRWrsE2MGCjTMkYAk05rg6z85Pe6Fa
+         U/57me6b+Jzr5yssYuKnzTe+yxM87CVa9cXtP6mx2uEz7rMq1umhiKjLaiiEWCSKckTy
+         6eV0kApdzQfCVT8wwKS6o2Gr9NhnpzhKTFy7vYyKWCLL1DI1iNV6XnKskCZSUuUiUFvB
+         DCcwHEN8sBNAdchUtK9gJ0raxEOweAWQAO32kMKOKrcXG4GSx1Sy9x6V0KXKONN6LZEZ
+         5vmg==
+X-Forwarded-Encrypted: i=1; AKwUvByaCgq8HefrMA4B5QK0O7FUtygaJGQUsjlobEUZYl3Fn4Ngd79Bco7/ZzYA5wmSeUQ9d6QmhugHFtps@vger.kernel.org
+X-Gm-Message-State: AFq9FYL39qK9cMaWSZMd93UjFnHJdMRX3YvKhYZqHB0pmDKGg7wO3ov+
+	v9ZaP7tw4s9RwmDa+F0HfdBxihXjvrkkDCEX3Ovpysl35bn1kBmt02Ti
+X-Gm-Gg: AYBFou2KkmLTb/z9DRUP+HLIFIC+FSXBE4dCbxPREn56ZLieT8OHxgXWS2vMTZYpseS
+	ZojH68wu2EjJz4u8Pepeo6iZKv/a2BMJxDYj/nUmFIEQTI4aqTjDQxvNL003L+QI+9wc3mCRQ4w
+	H3vj9rsNP5/ePwWlmvgG3Ko+rI9pmI4iQJiuPPJbutUsuRbvM+1z7P/F//Xyol8IT6xbwoiio+7
+	i8Y4PJo5k7LET6oRIjIFakKvbgHmWMF47pcFUd4BcNkwiteZUaWbRhsgYnjFdLk4iH9GeMv1Ngp
+	v5k8Qu2R4VouR9fPKV8XXTnifVXOb7m5crmn/MX56fU22myNxUfgMdsGDW4bO6Eh6+oqf556PTW
+	WxZvU+a9kJHL+PQMGXLm6OWrzNiWnWmgGoaqEl3ErQzvK95STMMs91RkDWa8uxBz3KVCG8WXABF
+	7c8MGcFB+IULZdPqaxTzT+oJUhi3IQF+L+cuDGktJKFmovIx1+N/vXhUHOcXWBDBKqaWdWqCumP
+	blZ1rZDAsy0+Z+NK8fU/N5JAOECGEvHAIuMR+p/zxAd87bAfPkPL682TrFJw4tIMT0tB0dK0l/0
+	7Y9tdaVttUelxj57gvjkNG51BpVV0ovrn80/68Z/GW2DYZnCXSEnnKHt/hs9mF5wwMezZV5graj
+	LC8CZ8aZ9dKRtAiGRUUNMrk3F1FkdkqPoa9EbSu+FgoeURRDpMdODr1Luzzv6lBzzS/SYsqndmJ
+	Gw3cRopkXoioxJJbp5HO46rrIUoV0gNkneYC1TSPl7
+X-Received: by 2002:a05:6a21:496:b0:3e1:42ac:2ee3 with SMTP id adf61e73a8af0-3e92894b72amr6738143637.22.1793650488120;
+        Mon, 02 Nov 2026 12:14:48 -0800 (PST)
+Received: from sid-dev-env.cgrhrlrrq2nuffriizdlnb1x4b.xx.internal.cloudapp.net ([4.155.54.158])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8aad9c09086sm2330530b3a.23.2026.11.02.12.14.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Nov 2026 12:14:47 -0800 (PST)
+From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+To: stable@vger.kernel.org
+Cc: gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	sfrench@samba.org,
+	stfrench@microsoft.com,
+	wozizhi@huawei.com,
+	pc@manguebit.com,
+	lsahlber@redhat.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	glaming@microsoft.com,
 	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Aamir Ahmed <elb12345@hotmail.co.uk>,
-	Ian Bridges <icb@fastmail.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] ksmbd: grant a caller what its groups and OWNER RIGHTS ACEs allow
-Date: Mon,  2 Nov 2026 14:03:53 -0600
-Message-ID: <20261102200353.884509-1-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
+	samba-technical@lists.samba.org,
+	apais@microsoft.com,
+	rlmenge@gmail.com,
+	hargar@linux.microsoft.com,
+	Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+Subject: [PATCH 6.6.y] smb: client: fix busy dentry warning on unmount after DIO
+Date: Mon,  2 Nov 2026 20:14:10 +0000
+Message-ID: <20261102201410.55089-1-sidchintamaneni@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -129,194 +112,263 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb_check_perm_dacl() does not match ACEs for the caller's groups. It
-also refuses an owner named only by an OWNER RIGHTS ACE, although its
-MAXIMUM_ALLOWED walk already counts that ACE. These callers cannot use
-rights the DACL grants them under MS-DTYP 2.5.3.2.
+commit 75f5c412fa867efa0bf9b646bffe0d912109e84a upstream.
 
-Run the existing ordered walk for every request and match Unix group
-ACEs (S-1-22-2) against the caller's credentials. Use its result when
-the existing SID lookup and POSIX ACL fallback do not decide the open.
+In mainline, commit 75f5c412fa86 ("smb: client: fix busy dentry warning
+on unmount after DIO") fixes a busy-dentry warning during unmount by
+tracking in-flight netfs_io_request instances in cifs_init_request() and
+cifs_free_request(), waiting for the counter to reach zero in
+cifs_kill_sb() before kill_anon_super(), and then flushing
+serverclose_wq and fileinfo_put_wq. Because mainline routes all CIFS I/O
+(direct I/O, uncached I/O, buffered readahead, and buffered writeback)
+through netfs_io_request, that single counter covers every path that
+holds a cifsFileInfo reference across asynchronous I/O completion.
 
-Group ACEs remain excluded from MAXIMUM_ALLOWED. An open that asks for
-the maximal access reply is therefore still refused for a caller that
-only group ACEs name. Adding them requires corresponding changes in
-smb2_open(), which derives open flags and the maximal access reply from
-that answer.
+Kernel 6.6 predates the netfs I/O request conversion and instead splits
+I/O across three reference-counted structures that each hold a
+cifsFileInfo reference:
+- struct cifs_aio_ctx, used by direct and uncached I/O (__cifs_readv()
+  and __cifs_writev()).
+- struct cifs_readdata, allocated for uncached reads
+  (cifs_send_async_read()) and directly without a cifs_aio_ctx for
+  buffered readahead (cifs_readahead()).
+- struct cifs_writedata, allocated for uncached writes
+  (cifs_write_from_iter(), cifs_writev_requeue()) and directly without a
+  cifs_aio_ctx for buffered writeback
+  (cifs_write_back_from_locked_folio()).
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ian Bridges <icb@fastmail.org>
+In both the DIO/uncached paths (where collect_uncached_read_data() and
+collect_uncached_write_data() signal completion via complete(&ctx->done)
+or ctx->iocb->ki_complete() before the worker drops its rdata/wdata and
+ctx references) and the buffered paths (where cifs_readahead_complete()
+unlocks folios and cifs_writev_complete() ends folio writeback before
+calling kref_put() on rdata/wdata to drop their cfile reference), a
+racing close() and umount() can reach shrink_dcache_for_umount() before
+the final cifsFileInfo_put() has been queued and flushed. This triggers:
+
+  BUG: Dentry ... still in use (1) [unmount of cifs cifs]
+
+followed by a use-after-free when deferred cifsFileInfo_put_work runs
+after superblock teardown.
+
+Fix this in 6.6 by:
+1. Adding cifs_sb->outstanding_aio and incrementing it whenever
+   ctx->cfile, rdata->cfile, or wdata->cfile is assigned.
+2. Releasing wdata->cfile and rdata->cfile before dropping ctx->refcount
+   in cifs_uncached_writedata_release() and cifs_readdata_release().
+3. Decrementing cifs_sb->outstanding_aio in cifs_aio_ctx_release(),
+   cifs_readdata_release(), and cifs_writedata_release() only after
+   cifsFileInfo_put() has been called, and waiting for it to reach zero
+   in cifs_kill_sb() before flushing serverclose_wq and fileinfo_put_wq.
+
+Fixes: 340cea84f691 ("cifs: open files should not hold ref on superblock")
+Tested-by: Gillian Laming <glaming@microsoft.com>
+Signed-off-by: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 ---
+ fs/smb/client/cifs_fs_sb.h |  1 +
+ fs/smb/client/cifsfs.c     | 11 +++++++++++
+ fs/smb/client/connect.c    |  1 +
+ fs/smb/client/file.c       | 33 ++++++++++++++++++++++++++++-----
+ fs/smb/client/misc.c       |  4 ++++
+ 5 files changed, 45 insertions(+), 5 deletions(-)
 
-Notes:
-    Since v1, clear access_bits after the ordered walk for explicit
-    requests. In v1, when the caller's first ACE had a type the lookup does
-    not handle, such as an allow-callback ACE, an explicit request got the
-    walk's result instead of the earlier refusal. Sashiko found this [1].
-    The message now also says that an open asking for the maximal access
-    reply is still refused for a caller that only group ACEs name.
-    
-    v1: https://lore.kernel.org/linux-cifs/20261102061537.830714-3-icb@fastmail.org/
-    [1] https://sashiko.dev/#/patchset/20261102061537.830714-1-icb%40fastmail.org
-    
-    Reachable on a share with "vfs objects = acl_xattr", for example on a
-    file whose DACL only has ACEs for Unix groups (S-1-22-2) or OWNER
-    RIGHTS.
-    
-    MAXIMUM_ALLOWED does not count groups here because smb2_open() also
-    builds the open flags and the maximal access reply from that answer.
-    Counting them there makes some MAXIMUM_ALLOWED opens fail that work
-    today.
-    
-    Tested on ksmbd-for-next ffc855fe16af with KASAN. Results change for
-    members of the file's group and of other groups the DACL names, and for
-    the owner. A member of a group that the DACL grants full access now
-    reads the file. An owner that only an OWNER RIGHTS ACE names now gets
-    what that ACE allows. Its MAXIMUM_ALLOWED opens, refused before, now
-    succeed with the rights in the maximal access reply. DACLs with no ACE
-    give the same results as before. So do DACLs whose first ACE for the
-    caller has a type the lookup does not handle, such as an allow-callback
-    or audit ACE.
-    
-    A reproducer is available on request.
-    
-    This fix was developed with LLM assistance.
-
- fs/smb/server/smbacl.c | 58 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 49 insertions(+), 9 deletions(-)
-
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index ab76c5c9e0ea..df456c635004 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -1459,6 +1459,22 @@ bool smb_inherit_flags(int flags, bool is_dir)
- 	return false;
+diff --git a/fs/smb/client/cifs_fs_sb.h b/fs/smb/client/cifs_fs_sb.h
+index 6517591922801..5011dd639dd9b 100644
+--- a/fs/smb/client/cifs_fs_sb.h
++++ b/fs/smb/client/cifs_fs_sb.h
+@@ -54,6 +54,7 @@ struct cifs_sb_info {
+ 	struct nls_table *local_nls;
+ 	struct smb3_fs_context *ctx;
+ 	atomic_t active;
++	atomic_t outstanding_aio;	/* nr of AIO contexts not yet fully deinitialized */
+ 	unsigned int mnt_cifs_flags;
+ 	struct delayed_work prune_tlinks;
+ 	struct rcu_head rcu;
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index a3dfeda8144d9..27fc6c888135f 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -301,6 +301,17 @@ static void cifs_kill_sb(struct super_block *sb)
+ 		/* Wait for all opened files to release */
+ 		flush_workqueue(deferredclose_wq);
+ 
++		/*
++		 * Wait for all in-flight AIO contexts to finish cleanup so
++		 * that their cifsFileInfo final puts have been queued, then
++		 * drain the workqueues so the dentry refs are dropped before
++		 * kill_anon_super().
++		 */
++		wait_var_event(&cifs_sb->outstanding_aio,
++			       !atomic_read(&cifs_sb->outstanding_aio));
++		flush_workqueue(serverclose_wq);
++		flush_workqueue(fileinfo_put_wq);
++
+ 		/* finally release root dentry */
+ 		dput(cifs_sb->root);
+ 		cifs_sb->root = NULL;
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index 1c21ae3d61e24..3d0fd8bf8f352 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -3396,6 +3396,7 @@ int cifs_setup_cifs_sb(struct cifs_sb_info *cifs_sb)
+ 
+ 	spin_lock_init(&cifs_sb->tlink_tree_lock);
+ 	cifs_sb->tlink_tree = RB_ROOT;
++	atomic_set(&cifs_sb->outstanding_aio, 0);
+ 
+ 	cifs_dbg(FYI, "file mode: %04ho  dir mode: %04ho\n",
+ 		 ctx->file_mode, ctx->dir_mode);
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index d329b8a3b756d..0ca0381fd7bb3 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -2618,6 +2618,8 @@ cifs_writedata_release(struct kref *refcount)
+ {
+ 	struct cifs_writedata *wdata = container_of(refcount,
+ 					struct cifs_writedata, refcount);
++	struct cifs_sb_info *cifs_sb = NULL;
++
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	if (wdata->mr) {
+ 		smbd_deregister_mr(wdata->mr);
+@@ -2625,10 +2627,15 @@ cifs_writedata_release(struct kref *refcount)
+ 	}
+ #endif
+ 
+-	if (wdata->cfile)
++	if (wdata->cfile) {
++		cifs_sb = CIFS_SB(wdata->cfile->dentry->d_sb);
+ 		cifsFileInfo_put(wdata->cfile);
++	}
+ 
+ 	kfree(wdata);
++
++	if (cifs_sb && atomic_dec_and_test(&cifs_sb->outstanding_aio))
++		wake_up_var(&cifs_sb->outstanding_aio);
  }
  
-+/* Whether the caller's credentials hold the group of an S-1-22-2-<gid> SID */
-+static bool smb_sid_in_group(const struct smb_sid *sid)
-+{
-+	if (sid->num_subauth != 2 || compare_sids(sid, &sid_unix_groups))
-+		return false;
-+	/*
-+	 * ksmbd_override_fsids() builds the caller's credentials with
-+	 * make_kgid(&init_user_ns, ...), so the group membership test must
-+	 * compare in that space.  Applying the mount idmap here (as when
-+	 * resolving a SID to an on-disk gid) would mismatch on idmapped
-+	 * mounts.
-+	 */
-+	return in_group_p(make_kgid(&init_user_ns,
-+				    le32_to_cpu(sid->sub_auth[1])));
-+}
+ /*
+@@ -2690,6 +2697,7 @@ cifs_writev_requeue(struct cifs_writedata *wdata)
+ 			if (!is_retryable_error(rc))
+ 				rc = -EBADF;
+ 		} else {
++			atomic_inc(&CIFS_SB(inode->i_sb)->outstanding_aio);
+ 			wdata2->pid = wdata2->cfile->pid;
+ 			rc = server->ops->async_writev(wdata2,
+ 						       cifs_writedata_release);
+@@ -2998,6 +3006,7 @@ static ssize_t cifs_write_back_from_locked_folio(struct address_space *mapping,
+ 	wdata->pid = cfile->pid;
+ 	wdata->credits = credits_on_stack;
+ 	wdata->cfile = cfile;
++	atomic_inc(&cifs_sb->outstanding_aio);
+ 	wdata->server = server;
+ 	cfile = NULL;
+ 
+@@ -3491,9 +3500,10 @@ cifs_uncached_writedata_release(struct kref *refcount)
+ {
+ 	struct cifs_writedata *wdata = container_of(refcount,
+ 					struct cifs_writedata, refcount);
++	struct cifs_aio_ctx *ctx = wdata->ctx;
+ 
+-	kref_put(&wdata->ctx->refcount, cifs_aio_ctx_release);
+ 	cifs_writedata_release(refcount);
++	kref_put(&ctx->refcount, cifs_aio_ctx_release);
+ }
+ 
+ static void collect_uncached_write_data(struct cifs_aio_ctx *ctx);
+@@ -3704,6 +3714,7 @@ cifs_write_from_iter(loff_t fpos, size_t len, struct iov_iter *from,
+ 		wdata->sync_mode = WB_SYNC_ALL;
+ 		wdata->offset	= (__u64)fpos;
+ 		wdata->cfile	= cifsFileInfo_get(open_file);
++		atomic_inc(&cifs_sb->outstanding_aio);
+ 		wdata->server	= server;
+ 		wdata->pid	= pid;
+ 		wdata->bytes	= cur_len;
+@@ -3852,6 +3863,7 @@ static ssize_t __cifs_writev(
+ 		return -ENOMEM;
+ 
+ 	ctx->cfile = cifsFileInfo_get(cfile);
++	atomic_inc(&cifs_sb->outstanding_aio);
+ 
+ 	if (!is_sync_kiocb(iocb))
+ 		ctx->iocb = iocb;
+@@ -4067,19 +4079,27 @@ cifs_readdata_release(struct kref *refcount)
+ {
+ 	struct cifs_readdata *rdata = container_of(refcount,
+ 					struct cifs_readdata, refcount);
++	struct cifs_aio_ctx *ctx = rdata->ctx;
++	struct cifs_sb_info *cifs_sb = NULL;
+ 
+-	if (rdata->ctx)
+-		kref_put(&rdata->ctx->refcount, cifs_aio_ctx_release);
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+ 	if (rdata->mr) {
+ 		smbd_deregister_mr(rdata->mr);
+ 		rdata->mr = NULL;
+ 	}
+ #endif
+-	if (rdata->cfile)
++	if (rdata->cfile) {
++		cifs_sb = CIFS_SB(rdata->cfile->dentry->d_sb);
+ 		cifsFileInfo_put(rdata->cfile);
++	}
+ 
+ 	kfree(rdata);
 +
- int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			__le32 *pdaccess, __le32 raw_daccess, int uid,
- 			bool strict)
-@@ -1475,13 +1491,16 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 	int granted = requested;
- 	struct smb_ace *ace;
- 	int i, found = 0;
--	unsigned int access_bits = 0, denied = 0;
-+	unsigned int access_bits = 0, denied = 0, ordered = 0;
- 	struct smb_ace *others_ace = NULL;
--	bool or_ace = false;
-+	bool or_ace = false, in_group = false;
- 	struct posix_acl_entry *pa_entry;
- 	unsigned int sid_type = SIDOWNER;
- 	unsigned short ace_size;
- 	bool is_owner, owner_rights = false;
-+	bool maximal = *pdaccess & FILE_MAXIMAL_ACCESS_LE;
-+	/* The answer to MAXIMUM_ALLOWED stays without the caller's groups */
-+	bool groups = !maximal;
- 	vfsuid_t vfsuid;
++	if (ctx)
++		kref_put(&ctx->refcount, cifs_aio_ctx_release);
++
++	if (cifs_sb && atomic_dec_and_test(&cifs_sb->outstanding_aio))
++		wake_up_var(&cifs_sb->outstanding_aio);
+ }
  
- 	ksmbd_debug(SMB, "check permission using windows acl\n");
-@@ -1522,7 +1541,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		 */
- 		if (is_owner)
- 			allowed = READ_CONTROL | WRITE_DAC;
--		if (*pdaccess & FILE_MAXIMAL_ACCESS_LE)
-+		if (maximal)
- 			requested |= allowed;
- 		if (!allowed || requested & ~allowed)
- 			rc = -EACCES;
-@@ -1531,7 +1550,12 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		goto err_out;
+ static void collect_uncached_read_data(struct cifs_aio_ctx *ctx);
+@@ -4234,6 +4254,7 @@ cifs_send_async_read(loff_t fpos, size_t len, struct cifsFileInfo *open_file,
+ 
+ 		rdata->server	= server;
+ 		rdata->cfile	= cifsFileInfo_get(open_file);
++		atomic_inc(&cifs_sb->outstanding_aio);
+ 		rdata->offset	= fpos;
+ 		rdata->bytes	= cur_len;
+ 		rdata->pid	= pid;
+@@ -4387,6 +4408,7 @@ static ssize_t __cifs_readv(
+ 	ctx->direct_io	= direct;
+ 	ctx->len	= len;
+ 	ctx->cfile	= cifsFileInfo_get(cfile);
++	atomic_inc(&cifs_sb->outstanding_aio);
+ 	ctx->nr_pinned_pages = 0;
+ 
+ 	if (!is_sync_kiocb(iocb))
+@@ -4881,6 +4903,7 @@ static void cifs_readahead(struct readahead_control *ractl)
+ 		rdata->offset	= ra_index * PAGE_SIZE;
+ 		rdata->bytes	= nr_pages * PAGE_SIZE;
+ 		rdata->cfile	= cifsFileInfo_get(open_file);
++		atomic_inc(&cifs_sb->outstanding_aio);
+ 		rdata->server	= server;
+ 		rdata->mapping	= ractl->mapping;
+ 		rdata->pid	= pid;
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 8937095184ca6..48197d47ee821 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1185,6 +1185,7 @@ cifs_aio_ctx_release(struct kref *refcount)
+ {
+ 	struct cifs_aio_ctx *ctx = container_of(refcount,
+ 					struct cifs_aio_ctx, refcount);
++	struct cifs_sb_info *cifs_sb = CIFS_SB(ctx->cfile->dentry->d_sb);
+ 
+ 	cifsFileInfo_put(ctx->cfile);
+ 
+@@ -1211,6 +1212,9 @@ cifs_aio_ctx_release(struct kref *refcount)
  	}
  
--	if (*pdaccess & FILE_MAXIMAL_ACCESS_LE) {
-+	/*
-+	 * Evaluate the DACL in order (MS-DTYP 2.5.3.2). MAXIMUM_ALLOWED takes
-+	 * its result, and so does a caller that only group or OWNER RIGHTS
-+	 * ACEs name.
-+	 */
-+	{
- 		ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
- 		aces_size = pdacl_size - sizeof(struct smb_acl);
- 		for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
-@@ -1562,7 +1586,8 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			     compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
- 			     compare_sids(&sid_everyone, &ace->sid) &&
- 			     compare_sids(&sid_authusers, &ace->sid) &&
--			     compare_sids(&sid_owner_rights, &ace->sid)))
-+			     compare_sids(&sid_owner_rights, &ace->sid) &&
-+			     !(groups && smb_sid_in_group(&ace->sid))))
- 				goto next_ace;
+ 	kfree(ctx);
++
++	if (atomic_dec_and_test(&cifs_sb->outstanding_aio))
++		wake_up_var(&cifs_sb->outstanding_aio);
+ }
  
- 			switch (ace->type) {
-@@ -1578,15 +1603,20 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- next_ace:
- 			ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
- 		}
--		if (is_owner && !owner_rights)
-+		ordered = access_bits & ~denied;
-+		if (maximal && is_owner && !owner_rights)
- 			access_bits |= READ_CONTROL | WRITE_DAC |
- 				FILE_READ_ATTRIBUTES | DELETE;
- 		access_bits &= ~denied;
--		if ((raw_daccess & FILE_GENERIC_EXECUTE_LE) &&
-+		if (maximal && (raw_daccess & FILE_GENERIC_EXECUTE_LE) &&
- 		    S_ISREG(d_inode(path->dentry)->i_mode) &&
- 		    (access_bits & GENERIC_READ_FLAGS) == GENERIC_READ_FLAGS)
- 			access_bits |= FILE_EXECUTE;
--		granted = requested | access_bits;
-+		/* An explicit request takes only ordered from this walk */
-+		if (maximal)
-+			granted = requested | access_bits;
-+		else
-+			access_bits = 0;
- 	}
- 
- 	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
-@@ -1615,6 +1645,10 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		if (!compare_sids(&sid_owner_rights, &ace->sid) &&
- 		    !(ace->flags & INHERIT_ONLY_ACE))
- 			or_ace = true;
-+		if (!(ace->flags & INHERIT_ONLY_ACE) &&
-+		    (smb_sid_in_group(&ace->sid) ||
-+		     (is_owner && !compare_sids(&sid_owner_rights, &ace->sid))))
-+			in_group = true;
- 		if (!compare_sids(&sid_everyone, &ace->sid) ||
- 		    !compare_sids(&sid_authusers, &ace->sid))
- 			others_ace = ace;
-@@ -1668,7 +1702,13 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			 */
- 			if (is_owner && !or_ace)
- 				allowed = READ_CONTROL | WRITE_DAC;
--			if (*pdaccess & FILE_MAXIMAL_ACCESS_LE)
-+			/*
-+			 * A group the caller is in, or OWNER RIGHTS for the
-+			 * owner, gives what the DACL grants it in order.
-+			 */
-+			if (in_group)
-+				allowed |= ordered;
-+			if (maximal)
- 				requested |= allowed;
- 			if (!allowed || requested & ~allowed) {
- 				ksmbd_debug(SMB, "Can't find corresponding sid\n");
-
-base-commit: ffc855fe16afe02b22305111aa68cd8d07360941
+ /**
 -- 
-2.47.3
+2.43.0
 
