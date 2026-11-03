@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793728988;
-	b=A9ZgyN/tSZMTgCbDhbP67611xQHIkjwcTTCjuycba8xExubo3lz0Lh4Jbk+GL+NDDNxo
-	 P12SWFXDNOgpBXXPEbxQZNBtITbloW5oxRLJcXk2YqX54hBArHCFIt/fd3LdCok4MERDX
-	 gEjEVi0E8Rm/9sKLQgEoG7O0khHr9HevnX27tj/WJcuagYzOF4nEGFkfOYCWLFc1urPJ9
-	 +pvNKQXTwUbJp18NyZyh60z9kIVhSdS0H/v5c5uQvtURFvAWgLQdYu5rVFIxoe+6PsStE
-	 zvm6sV6v9zcTpIzZn5fo2UP5zDj/FPJoR1rtJaBJ+/2St3shBQ1MNdEweZfUoMAHAvw==
+	b=A6mqaC+TLeSE2mSogaAZd/UnUn5tybG8KI2NhuDCzbHXjqVinjAVnkcp+GOsURjanLdm
+	 1npBZjhNXJXWhLoanYwPaA2t3Bv1OkfuLWUbwapRmTf8HwH1OZVfUU2/VAcK3aGEHO+0V
+	 LGdYSJbn7ZR5FbEzaWPio6+qzWHqIILtEkQMheJONRxC8yJKwrTAe9WmKEsnhvr+nqwIR
+	 ls3AplVhSHOiVWax9nO67ClWFVy9qPNySWhtZs0EaiXAWB4Tr6EBpnbY/uIzzi9scJoL9
+	 VTDgGKNSCxNdJefHeR0bRLB4pfHzz2MiGxAJklEkec2AOvZA2JRO30snpy4gCSYSSaw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793728988;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=1EIAHE+MdGECuBiD31nl6HBHvfGc+YAumqj+fPraepI=;
-	b=BnplzCgVHsM/EhXM0WQuAglohkqrA5ZMKxSFzy7+JzX7N3w2FCQLTNOuC6zAHI/VdrcD
-	 zl0tb3aLKXeCUrgF/5jxC7L7pu3Ge1ml/JKbWRkHfZJqWh14ix8YkBYOTNwHFQsHSu7Gw
-	 rFOOf9Hsh8MJsLDLklX4vdUm33ZuSX2rATnjRoyf4TZWZVWif9yL4T4jFR+EqMh/qdukz
-	 ln3xGszqXQYVdXc9vnHrVWyGy03RQy1WVeVInzLqwPaekV4E+nl3AvmeX5FRfHPdnm2hb
-	 Zcoj0YN94hZmxOQofBPcfLnVFutlSgmSq+jcYmnePCHURbMCwJpCFRTSBpVPEktEreg==
+	bh=TMPJJ1r8DzB1pIyq9j04WfvxyfaByC5gf/0k8c2WGX4=;
+	b=IR13Ki9/hRj3m0DVgMB/5+kzgydjFJYDhCON4liXCyt1BAoVWTr+Y6c46cm0ZplzmF+K
+	 yApwERnhsC8dRhiZ37HoN9UoUygovBOmfXuhy4pBltzJVVpibsXwv6peiygDCG80SZYqb
+	 8fYmyNSHMWFAzVHZH5w4Tylg17eBl4kElbz9+XjjKtcn3MiVkrCR5Ast+FbraJS7GeXbS
+	 LwmdRlkFXRhs2pgt3EtmdphKlpb8HGHi/8IrvMPaL0jHLbK7vnNPkf3CxYGQT8UAHrIhf
+	 I/RfO2pt9arcH5Q5IBd+d41jOaUD376ZBxynGJ6h+RTgE1yGsw4gu9G5B4LNAi2LbYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=vaWfXvq6;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=DHoSw87R;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2E9606A32E;
-	Tue,  3 Nov 2026 18:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8C2E9606A32E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502F0606D82B;
+	Tue,  3 Nov 2026 18:03:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 502F0606D82B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=vaWfXvq6
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=DHoSw87R
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=1EIAHE+MdGECuBiD31nl6HBHvfGc+YAumqj+fPraepI=; b=vaWfXvq6/RMBGIpkf5j+TcHkhW
-	meO05eV643tkRChmAgn5On0cWqdT1dNj6mHl2X3eEhK/a9SZ0E8wJeH092PBsjNbSQbp76YeEx9C8
-	LYEC+nvEd85c/xxN1fdqtR2ZSHK9oD/Fcg0ZuCNkd8otuDJ00L56AIZ6lT9jawTU9yvN3v/wZLaM2
-	yMceroz+mSY3gX0XSVviICFfzcgGAuYNWOCBiaI36CNn/DsIYW1Mq05nI+uUJHYK5w3drv6bJ/1f6
-	mDm1pF/UkF0O5hgzKW6LF9+1LI2OQuOv3EJrkkBn/r/sHv++YUR2XOH8XmK89G0G8YwqDhmrKP9ig
-	aCAx0blQ==;
+	bh=TMPJJ1r8DzB1pIyq9j04WfvxyfaByC5gf/0k8c2WGX4=; b=DHoSw87RlgGCXJr+cwy09mycvL
+	jjALUpcX9O4BS7/mVRVpRsosrKiTMAE/CXB27jzvlpyaS53++VSiY2rEDIoevREcVfatExWVAefB1
+	efKDPPNIrsrn1bkTOTagCIABV4yaBiL9fPF1Bn3D3gAWoYPqkWCIDGQxR7dmdkb7MzoD/lsNOlxJY
+	2qiYnin6GTDuIYZNkq9CCU4XV9XI4+l20qGj/wU+GP6xs3l8lFZufsqiKKuX25AjuAX9MN2wETRph
+	XdQHV74pB9DGGcnBgSvtdh6gHYaUkdDSDwDA0MVOUElr0CBm3mTbLjjezOA6MAuxRRtBcIS9khHFO
+	JSoHGLFw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xOIqX-00000000iv6-3qpt;
-	Tue, 03 Nov 2026 15:02:59 -0300
+	id 1xOIqZ-00000000iwL-3xVQ;
+	Tue, 03 Nov 2026 15:03:01 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 09/16] smb: client: don't fail writeback preparation if the task is dying
-Date: Tue,  3 Nov 2026 15:02:48 -0300
-Message-ID: <20261103180255.1482516-10-pc@manguebit.org>
+Subject: [PATCH v2 15/16] smb: client: don't replay handle reopens inside SMB2_open()
+Date: Tue,  3 Nov 2026 15:02:54 -0300
+Message-ID: <20261103180255.1482516-16-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261103180255.1482516-1-pc@manguebit.org>
 References: <20261103180255.1482516-1-pc@manguebit.org>
@@ -74,146 +74,113 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cifs_prepare_write() may need to reopen an invalidated handle and to wait
-for credits, both from the context of the task doing writeback.  A dying
-task gets the reopen refused at send time and the killable credit wait
-interrupted, so the subrequest is failed and, as with refused sends, its
-folios end writeback clean and the data is lost.
+cifs_reopen_file_retry() reopens a read's or write's handle with backoff,
+per the hard and retrans mount options, giving up on umount -f.  It calls
+cifs_reopen_file() -> SMB2_open(), which replays replayable errors on its
+own, also per hard and retrans.  So each reopen is retried at both
+layers: up to (retrans + 1)^2 opens on a soft mount, and, on a hard
+mount, forever inside SMB2_open() without ever returning to
+cifs_reopen_file_retry() to notice umount -f - a worker doing writeback
+then can't be stopped.
 
-For writeback in a dying task, skip both and prepare a credit-less
-subrequest capped at SMB2_MAX_BUFFER_SIZE, as already done when the
-server is low on credits.  It gets issued from cifswritebackd, which
-reopens the handle if needed and takes a single credit when sending,
-neither of which can be interrupted there.  Do the same when the reopen
-or credit wait fails because a fatal signal arrived meanwhile.
+Have cifs_reopen_file_retry() tell SMB2_open() not to replay, so these
+reopens are bounded and stopped only by cifs_reopen_file_retry().  Other
+callers of cifs_reopen_file() keep SMB2_open()'s replay; SMB1 opens are
+unchanged.
 
-cifs_begin_writeback() reopens the handle too when all the writable ones
-got invalidated, e.g. by a reconnect.  If that fails, there is no
-upload stream, so netfs ends writeback of every folio clean with no
-error recorded.  Take an invalidated handle as is there and leave
-reopening it to cifs_prepare_write().  If there is no writable handle at
-all, record -EIO for the mapping, so that the loss gets reported.
-
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
  fs/smb/client/cifsglob.h |  1 +
- fs/smb/client/file.c     | 37 ++++++++++++++++++++++++++++++-------
- 2 files changed, 31 insertions(+), 7 deletions(-)
+ fs/smb/client/file.c     | 13 ++++++++-----
+ fs/smb/client/smb2pdu.c  |  2 +-
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index e211dea91e6e..064a2cdab4d9 100644
+index 3e65639c27cf..cfdb230beadc 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1894,6 +1894,7 @@ enum cifs_find_flags {
- 	FIND_NO_PENDING_DELETE	= (1U << 2),
- 	FIND_OPEN_FLAGS		= (1U << 3),
- 	FIND_NO_DIRECT		= (1U << 4),
-+	FIND_NO_REOPEN		= (1U << 5),
+@@ -1408,6 +1408,7 @@ struct cifs_open_parms {
+ 	umode_t mode;
+ 	bool reconnect:1;
+ 	bool replay:1; /* indicates that this open is for a replay */
++	bool no_replay:1; /* don't replay this open internally */
+ 	struct kvec *ea_cctx;
+ 	__le32 lease_flags;
  };
- 
- #define   MID_FREE 0
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 31149d7d4498..9baa7f6acb1f 100644
+index d65cae045d74..81988fdd29aa 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -129,12 +129,17 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 		cifs_negotiate_wsize(server, cifs_sb->ctx,
- 				     tlink_tcon(req->cfile->tlink));
+@@ -37,7 +37,8 @@
+ #include "cached_dir.h"
+ #include <trace/events/netfs.h>
  
-+	if (cifs_writeback_dying(subreq))
-+		goto defer;
-+
- retry:
- 	if (open_file->invalidHandle) {
- 		rc = cifs_reopen_file(open_file, false);
- 		if (rc < 0) {
- 			if (rc == -EAGAIN)
- 				goto retry;
-+			if (cifs_writeback_dying(subreq))
-+				goto defer;
- 			subreq->error = rc;
- 			return netfs_prepare_write_failed(subreq);
- 		}
-@@ -143,10 +148,17 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 	rc = server->ops->wait_mtu_credits(server, wsize, &stream->sreq_max_len,
- 					   &wdata->credits);
- 	if (rc < 0) {
-+		if (cifs_writeback_dying(subreq))
-+			goto defer;
- 		subreq->error = rc;
- 		return netfs_prepare_write_failed(subreq);
- 	}
-+	goto out;
+-static int cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush);
++static int cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush,
++			    bool no_replay);
  
-+defer:
-+	wdata->credits = (struct cifs_credits){};
-+	stream->sreq_max_len = min_t(size_t, wsize, SMB2_MAX_BUFFER_SIZE);
-+out:
- 	wdata->credits.rreq_debug_id = subreq->rreq->debug_id;
- 	wdata->credits.rreq_debug_index = subreq->debug_index;
- 	wdata->credits.in_flight_check = 1;
-@@ -210,10 +222,15 @@ static void __cifs_issue_write(struct netfs_io_subrequest *subreq)
- 
- static void cifs_issue_write_worker(struct work_struct *work)
+ bool cifs_io_stopped(struct cifs_io_subrequest *subreq)
  {
--	struct netfs_io_subrequest *subreq;
-+	struct cifs_io_subrequest *wdata;
-+	struct cifsFileInfo *cfile;
- 
--	subreq = container_of(work, struct netfs_io_subrequest, work);
--	__cifs_issue_write(subreq);
-+	wdata = container_of(work, struct cifs_io_subrequest, subreq.work);
-+	cfile = wdata->req->cfile;
-+	while (cfile->invalidHandle &&
-+	       cifs_reopen_file(cfile, false) == -EAGAIN)
-+		;
-+	__cifs_issue_write(&wdata->subreq);
+@@ -169,7 +170,7 @@ static int cifs_reopen_file_retry(struct cifsFileInfo *cfile, bool can_flush,
+ 			return -EIO;
+ 		retrying = true;
+ 		reconnects = cifs_ses_reconnects(ses);
+-		rc = cifs_reopen_file(cfile, can_flush);
++		rc = cifs_reopen_file(cfile, can_flush, true);
+ 		if (!rc || is_interrupt_error(rc))
+ 			return rc;
+ 		if (!is_replayable_error(rc) &&
+@@ -1520,7 +1521,7 @@ cifs_relock_file(struct cifsFileInfo *cfile)
  }
  
- static void cifs_issue_write(struct netfs_io_subrequest *subreq)
-@@ -346,15 +363,17 @@ static void cifs_begin_writeback(struct netfs_io_request *wreq)
- 	struct cifs_io_request *req = container_of(wreq, struct cifs_io_request, rreq);
- 	int ret;
+ static int
+-cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
++cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush, bool no_replay)
+ {
+ 	int rc = -EACCES;
+ 	unsigned int xid;
+@@ -1621,6 +1622,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+ 		.path = full_path,
+ 		.fid = &cfile->fid,
+ 		.reconnect = true,
++		.no_replay = no_replay,
+ 	};
  
--	ret = cifs_get_writable_file(CIFS_I(wreq->inode), FIND_NO_DIRECT,
-+	ret = cifs_get_writable_file(CIFS_I(wreq->inode),
-+				     FIND_NO_REOPEN | FIND_NO_DIRECT,
- 				     &req->cfile);
- 	if (ret) {
--		ret = cifs_get_writable_file(CIFS_I(wreq->inode), FIND_ANY,
--					     &req->cfile);
-+		ret = cifs_get_writable_file(CIFS_I(wreq->inode),
-+					     FIND_NO_REOPEN, &req->cfile);
- 	}
- 	if (ret) {
- 		cifs_dbg(VFS, "%s: couldn't find writable handle: %d\n",
- 			 __func__, ret);
-+		mapping_set_error(wreq->mapping, -EIO);
- 		return;
- 	}
+ 	/*
+@@ -1816,7 +1818,8 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+ 	spin_unlock(&tcon->open_file_lock);
  
-@@ -2820,7 +2839,7 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
- 	}
- 
- 	if (test_bit(CIFS_INO_TMPFILE, &cifs_inode->flags))
--		find_flags &= FIND_NO_DIRECT;
-+		find_flags &= FIND_NO_REOPEN | FIND_NO_DIRECT;
- 
- 	cifs_sb = CIFS_SB(cifs_inode);
- 
-@@ -2880,6 +2899,10 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
- 	spin_unlock(&cifs_inode->open_file_lock);
- 
- 	if (inv_file) {
-+		if (find_flags & FIND_NO_REOPEN) {
-+			*ret_file = inv_file;
-+			return 0;
-+		}
- 		rc = cifs_reopen_file(inv_file, false);
+ 	list_for_each_entry_safe(open_file, tmp, &tmp_list, rlist) {
+-		if (cifs_reopen_file(open_file, false /* do not flush */))
++		/* do not flush */
++		if (cifs_reopen_file(open_file, false, false))
+ 			tcon->need_reopen_files = true;
+ 		list_del_init(&open_file->rlist);
+ 		cifsFileInfo_put(open_file);
+@@ -3048,7 +3051,7 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
+ 			*ret_file = inv_file;
+ 			return 0;
+ 		}
+-		rc = cifs_reopen_file(inv_file, false);
++		rc = cifs_reopen_file(inv_file, false, false);
  		if (!rc) {
  			*ret_file = inv_file;
+ 			return 0;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 33f8d0638a54..c9380aedc1fd 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -3428,7 +3428,7 @@ SMB2_open(const unsigned int xid, struct cifs_open_parms *oparms, __le16 *path,
+ 	SMB2_open_free(&rqst);
+ 	free_rsp_buf(resp_buftype, rsp);
+ 
+-	if (is_replayable_error(rc) &&
++	if (!oparms->no_replay && is_replayable_error(rc) &&
+ 	    smb2_should_replay(tcon, &retries, &cur_sleep))
+ 		goto replay_again;
+ 
 -- 
 2.56.0
 
