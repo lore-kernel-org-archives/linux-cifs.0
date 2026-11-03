@@ -1,69 +1,59 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793717546;
-	b=WoaJfEuKuXMAaOo2ygAgGYPYZkPwy4V/23dKQPuWGz1ykpo3jauqQTvKD5ghAkZXiOGm
-	 G6ji07Hv4Oz0D2YoN3ClZlmrnZNjoLsjzZQWstTYkTuxI52JTM+B3DxK0wJHR8PeQwGGa
-	 G8SSs2jjcc3yq5SCXmS9UAe8V6zuAhh/76CSmQmSBv9jI73RDoF0hyekTaup+2rMTVaSV
-	 dVljJCkToyb2cv6xvnwig9emzh5SnG/a5gFN+CnO0Rn5ot5n/IVDms/cSWP2OeDxdJD/r
-	 XBVyMXsK7nrrMvYlOWCmVwQ1KMi2WSkM6rfYHpH5CkizBOUQfwo9/3dXKemoluFt4oA==
+	t=1793717550;
+	b=olzNrevtSexXwFGPLm9c0mNw8tTaaYTbTwuLG88RzrX6sLeJ7QXuPUuk+S/hJkFwuBBu
+	 aAyF7M3y9A5No/gBjOi/kjPEedILjIfbFSwZQLCqTqSfKPqFfBDpoMq7yFt58w7xXH/sx
+	 X9BAY4MN5an/r6bFtToVdkvWwSa9eUChePyN69orkV7LlMF8wGgp9aeQtzMssJrwF6Irx
+	 wwOrwQD0yTQ1JYkbG9eM44gRLH/+V4Pojon1F5tUG1Oie3NCR8BsRbS4n6uyRhRNhc8g8
+	 j85krcjiGenr9EeiakAtzBnW54cwpBTlNTbMwUeasISFqMKbBSvDkDdpq7f60XUFE7w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793717546;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793717550;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=LrjKfm75hVGdN5FWK5G1yhHfvG92/sfpaw9f0zcNrSw=;
-	b=XJuippDQ/00hbMEc9Jwu6adE2w4ZT2oMCWlp+SC9cPHoTUJkTrtiRbU1zDxEdl3e/T5G
-	 GI0Q6a7tjLnUKD23qCqR6bWK9wORJfWRCJnE9Sch8LCX0bUdD94JEOft9jmQbDJ/l14aH
-	 pNuNM1v3CG5Btp3Kr+2/EzMnkDyQELRU1Glx8tc9mgwAkB8X7mpg5Njj+ZAtDKqQy+3vf
-	 pPBKR1cj+alCxmw0F8wuNBwgjL+/j/tuxM83JlIPnDoVbV7dhdwi4zY2q3w2quDHljCLP
-	 6c3QUonA2ogMp04hfc5inp3b8XTJCn0PrGY419k6w/J8DmEH+DtKr13Jpvpkgs2pGEw==
+	bh=AJ1WNah6upJaca386WWHlJshW9ICPmM2oD8/Sgenk20=;
+	b=NCav488LT+aNQCzuUm6ATrtJMeJwMMtam7LBtsZZlQPj2kn8L6PZgSqU1PsFOyayA5BR
+	 kv+qlgsR8GFxQlFAWoZfofyzqbRLWYF20qQXoeeSBySd8XkMyXAbbU73zwVfoO0Jrmn26
+	 OtSgfWRTU13mOn63Rm8dfRIwYX7jul+lADD2OeV/l/4pN+NVDHMqFZgVc1OjrZ46VBv/9
+	 9+HATn4Jb92J7/QNRuCXUgGxxHmgC+2vmQXDHtBJ+9QNgaF2vtm2GjYjw8Pde9y4t6ycX
+	 s6BGjOKaHPK5+EyDVn0ky/MtNdkg306sIlazHNEn/PlszPQXgt9DVRgEq9+RoZ7Fl2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bjjw7osZ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jYUY5Zyf;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDA4606BA06;
-	Tue,  3 Nov 2026 14:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B91C606BA0F;
+	Tue,  3 Nov 2026 14:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bjjw7osZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C85A1F0093A;
-	Tue,  3 Nov 2026 14:52:24 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=jYUY5Zyf
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9798C1F00919;
+	Tue,  3 Nov 2026 14:52:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793717546;
-	bh=LrjKfm75hVGdN5FWK5G1yhHfvG92/sfpaw9f0zcNrSw=;
+	s=k20260515; t=1793717550;
+	bh=AJ1WNah6upJaca386WWHlJshW9ICPmM2oD8/Sgenk20=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=bjjw7osZ5hwTWIr6a6AiRpO64DK8WGlBnyg87yI+66CWpyujlHVfNsRRtVIZ2Y2n2
-	 LSDNR+qfUuI0Hoo9HgioE5F6Tn6Y7kl6M/cuyPtureD5QuVkeo0FQu0dCTibgvr4ah
-	 rQltvLEY/hQYdejUhRvlcbemc3n+OR4JtfegQRFnKDIkP8ceqnWKgOoC8Tj5uYVv9t
-	 YzRtClxaG63dwkZ+sdJ6SjGwiQ0Xa4a0QSC0Y3loa4dpRfToRZ02dbqa0Xw5KGS9pz
-	 xJBFM7kBMku6TudzDnbm8XhYEzbbuQJYiOX+fEZhYiMwJw4ecOjLT+dyiBUgGinzAf
-	 xxdltvcNv4HUg==
+	b=jYUY5ZyfoOJRN2d3S4i1I88kEP1E9sCQjXpsW3afPmkxfvTByN6fFPsypCTLB7UcU
+	 kiDW8TlLaPcchufTRbfcp/lGb9kq7lFgyPSfzTrMSZIFhzD+3VpHyasGp7oGETQJzC
+	 7FHYyV3uWhQaa1KlUAoFeWZYwbUJOslhSdqwxtZxKFAAFKZvJ+/CseyP/bh71ZE+pv
+	 p6MLo4GOThLr9Of9hAZmgM/XuLJp6I4MdZSALRiQ2KujaNEzs/Hd1bNNsfTpXfVg2e
+	 L0r8UiczTZ6RbS0SfLEhRXWFOPQSvqkG9Y/HfUDCvGtBMGsmLMwjE7QpKkXk6ZV264
+	 xfSu+cV0XgKBA==
 From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>
 Cc: Sasha Levin <sashal@kernel.org>,
-	gregkh@linuxfoundation.org,
-	sfrench@samba.org,
-	stfrench@microsoft.com,
-	wozizhi@huawei.com,
-	pc@manguebit.com,
-	lsahlber@redhat.com,
-	sprasad@microsoft.com,
-	tom@talpey.com,
-	glaming@microsoft.com,
+	Steve French <stfrench@microsoft.com>,
+	stable@vger.kernel.org,
 	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	apais@microsoft.com,
-	rlmenge@gmail.com,
-	hargar@linux.microsoft.com,
-	Siddharth Chintamaneni <sidchintamaneni@gmail.com>
-Subject: Re: [PATCH 6.6.y] smb: client: fix busy dentry warning on unmount after DIO
-Date: Tue,  3 Nov 2026 09:51:59 -0500
-Message-ID: <2026-11-03-1-daily-reply-0011-re-smb-busy-dentry-dio@kernel.org>
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH 6.6.y] ksmbd: fix breaking_cnt leak on early return in oplock_break()
+Date: Tue,  3 Nov 2026 09:52:02 -0500
+Message-ID: <2026-11-03-1-daily-reply-0014-re-ksmbd-breaking-cnt-leak@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261102201410.55089-1-sidchintamaneni@gmail.com>
-References: <20261102201410.55089-1-sidchintamaneni@gmail.com>
+In-Reply-To: <20261103110803.2517085-1-joseph.qi@linux.alibaba.com>
+References: <20261103110803.2517085-1-joseph.qi@linux.alibaba.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -76,17 +66,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-> commit 75f5c412fa867efa0bf9b646bffe0d912109e84a upstream.
->
-> Kernel 6.6 predates the netfs I/O request conversion and instead splits
-> I/O across three reference-counted structures that each hold a
-> cifsFileInfo reference
+> For leases, oplock_break() increments breaking_cnt before calling
+> oplock_break_pending(), and returns early when the pending check
+> reports nothing to break
 
-This is a hand-written 6.6 adaptation of 75f5c412fa86 ("smb: client: fix busy
-dentry warning on unmount after DIO") rather than a cherry-pick, so I need an
-ack from a cifs maintainer (Steve French or Paulo Alcantara) on the list before
-queueing it. 6.1 also has 340cea84f691 and the same bug; please send a 6.1
-variant too.
+This is a stable-only fix, so I need an ack from Namjae Jeon on the list before
+queueing it. 6.18 and 6.12 have the identical bug and this patch applies there
+unchanged, so once it is acked I will queue it for 6.18, 6.12 and 6.6 together.
 
 -- 
 Thanks,
