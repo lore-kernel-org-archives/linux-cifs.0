@@ -1,56 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.56
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.71.155.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793675027;
-	b=j4XD67NrpYEtmHnQHrN8RBDMZNf/6QvhQBoEck0CzUeBudX8Oh0GtZGigAi6o5r8oRxh
-	 q1ltyBxSxzJ9FR5CFMzSgRksUYOGUFbB3OZ/Kfj5VAc2YXuXf45KM6uZgTpbD+JaW8cuV
-	 waxe4xqUgYoz4+rJmHUfNamdiEQg5fgUJ4fMucUoj1LL5pemtsoQHQp6am/uVUoL0xvxv
-	 +iomURh+XM/zuAz+2FM/8fDl4yCK99NeFg653i1zRPyUCJhAuQLvHNqGk7Rb3j0YBG3GC
-	 /R8zqdIuzT9IcscjNoLsOG0dwEDZzdfOg+8DPaAzj4mLtobwv9pTi+VTfJ6XugT4zDw==
+	t=1793676001;
+	b=1Zt5JOnGGngepJa31MLV4kwJmPcjNkgnxzKczaZYifrR9uUd2R8u+Vezyv2YKAC7J4iH
+	 s4PIjXXOWPcgCP8rqP4XwgdYeCEIOL58Bts+Ke3J9NIwNhPiU/eEOKqda9sl52dml3Ypw
+	 jsWZiYJ99T195WCiN+vo/ABGLwr1Bbe7ds97QhU70h8cVn6anLEmvDBJPCRIHudq3JvOG
+	 7TWC+PiDP18WfJhvA8SY5GQGfpv2xg6K18XpYOcvFwjUQ/+2DSYgRacXNmSPyD9//GGba
+	 kt329EHr45PAb34BpZLmdkySMzze3i5vC4+hWYq4qm4adL9YDlKIxG/2W1j1Yzz8w+A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793675027;
-	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
-	 X-Mizu-Trace-ID:X-Migadu-Flow:Message-ID:Date:MIME-Version:User-Agent:
-	 Subject:To:Cc:References:Content-Language:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=Ooyx/43cfLO7FTK575kvS4RSBtp8mYfWZfw4OohOomk=;
-	b=sGnbpgy/4OTqRq60ckHww64XVCxe73fuCRnMcMSp+AZuNjZeiSPBjh+P9tIFUMBVtL0R
-	 zVXO1FULM2l8jGCfqHq4tIxmtqshmRmt4EWN2LGZ9d8a0diEVwS4gwDxru82iAf2NP7a8
-	 yLOKfksdnK2HxoCO2swEX73d7F15VThe2VDU1211OUuROaONeh5NEQ7HUDf7YZjWIAVq3
-	 IQANuo/5c3dO0Uhp1nDgxvr0I5S2jF03sy9lPcw/i3/nWjEdIqiAknn8+wroLvi7lzM9y
-	 o8Desytva8V2McqchZjCpPeYgYxJrInI3M98eBDrL5BVSnlWL05knCW0ijbnGQANMiw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793676001;
+	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:In-Reply-To:
+	 References:Content-Type:Content-Transfer-Encoding:MIME-Version:
+	 X-HM-Tid:X-HM-MType:X-HM-Spam-Status:DKIM-Signature;
+	bh=oJMGcv9Tp+qvWDAs1MK8yVtD4KDhsi+aZLYZ0K0RUgw=;
+	b=EzSr0i0IMOBJCra1M55QRnvqIt6IVEMnOi2GAQAdXeUQHfcT83Wxp908uYkK+cO6memY
+	 kxpG+mwd10b7u/WjfcSZxxhK+No+nk84eWUoPw14Wfcz0YbbcWzSBCMFTQybg+V/xxbbo
+	 x1DBE9pPh0434KTRX+/PouhEZ7kRkFLTNDUlKtUTdJ6U+etJLWZVbpdRZANTZF4VvFED9
+	 g81SlssUz6VX0ycYAR8dLtuSJfr9g5arjLu+Gbj0XQ9855XSzSq9pGvfBC1FqX4bX368Y
+	 nqUKddzsYalbIeYKpDtKm127duRSg+rSugMdo43lyhjqKIGtvxbTZ0V6W6sxNZ+VmLw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=chenxiaosong.com;
-	spf=pass smtp.mailfrom=chenxiaosong.com;
-	dkim=pass header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b="a/jv6JjF";
-	arc=none smtp.remote-ip=95.215.58.56
-Received: from mta1.migadu.com (out-56.mta1.migadu.com [95.215.58.56])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=stu.pku.edu.cn;
+	spf=pass smtp.mailfrom=stu.pku.edu.cn;
+	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=Alf1+nJs;
+	arc=none smtp.remote-ip=101.71.155.101
+Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81635606A331
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Nov 2026 03:03:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 81635606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chenxiaosong.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chenxiaosong.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B1A606A32C;
+	Tue,  3 Nov 2026 03:19:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 52B1A606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=chenxiaosong.com header.i=@chenxiaosong.com header.a=rsa-sha256 header.s=key1 header.b=a/jv6JjF
-X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=qu6++vYIG27+XtXchHhIRccwrxsnE0Ys6DdfwHscTJ8=;
- c=simple/simple; d=chenxiaosong.com;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1793675019; v=1; x=1794279819;
- b=a/jv6JjFukP7pl6VNlRqNcL5fHWh2BOfA9mc2iWj2mylJcEKpUpQPr0aFGKCvc9/A0i8YuEl
- Nw+7TsiuNVeFzugSrOyRT4Ljc6GtUpYmnmsoRrOxyzwh0XaVQfi4Pd4ZD64DveTdiTD0u6x60HP
- HIEXa5WeQTuhVTuRpbb2MhAT76fGcYzsQbvUU2ap7RckBmGeyo4+FBsmqvVTKyK0MyRsgtJSmov
- cbAGG8N4A07sKn798gP/IkajYircvfYhducnPf6v+E6O5BstQWWdAiApwZO0f30DMF490WZoE2T
- gkYWytPF+eTbzPandJ1TAnBOd+EWnrQtSA77htXvzNa5A==
-X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id d880b7f20f2040cd;
-	Tue, 03 Nov 2026 03:03:38 +0000
-X-Mizu-Trace-ID: d880b7f20f2040cd
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <c02b4586-522d-49bb-87d6-69277b45add3@chenxiaosong.com>
-Date: Tue, 3 Nov 2026 11:03:31 +0800
+	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=Alf1+nJs
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [IPV6:2409:8a00:3c11:dbc0:2581:8e:ca0f:59ab])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 5344a3159;
+	Tue, 3 Nov 2026 11:19:55 +0800 (GMT+08:00)
+From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+To: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+ Tom Talpey <tom@talpey.com>, Ronnie Sahlberg <lsahlber@redhat.com>,
+ Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org,
+ Sergey Senozhatsky <senozhatsky@chromium.org>
+Date: Tue, 03 Nov 2026 11:19:54 +0800
+Message-ID: <179367599474.14819.859478551395391125@stu.pku.edu.cn>
+Subject: Re: [PATCH v2] ksmbd: require NUL-terminated EA names
+In-Reply-To: <c02b4586-522d-49bb-87d6-69277b45add3@chenxiaosong.com>
+References: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
+ <c02b4586-522d-49bb-87d6-69277b45add3@chenxiaosong.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -60,53 +59,22 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] ksmbd: require NUL-terminated EA names
-To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>,
- Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org
-Cc: Tom Talpey <tom@talpey.com>, Steve French <stfrench@microsoft.com>,
- Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>,
- linux-kernel@vger.kernel.org, Sergey Senozhatsky <senozhatsky@chromium.org>
-References: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
-Content-Language: en-US
-From: ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-In-Reply-To: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-HM-Tid: 0aa19f6ba91303a2kunma4aa6ea610c5cb
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCGEoZVkxLTBpOGUwZGE8eTVYeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJT0tCQUMaS0tBSBhKSkEfGRhLQUlOQ0pBQx5BGBpLHUFOQh
+	oZWVdZFhoPEhUdFFlBWU9LSFVKS0hKTE1DVUpLS1VKQktLWQY+
+DKIM-Signature: a=rsa-sha256;
+	b=Alf1+nJsTBwt3b7HXfz/bwJyXt/g2p0wetc8hbvsGY42feuYvNOP0i+otKB4N0MAxn64dUwoVvYySOli8ODXWQS2pc7x/JoQkitI67CiDcPqDKoWTuKVzq69UkJtSvgQ7Vk6Nln+lXHgR1koIV8CPVVE+5slsau64wLpNrbHrU0=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
+	bh=oJMGcv9Tp+qvWDAs1MK8yVtD4KDhsi+aZLYZ0K0RUgw=;
+	h=date:mime-version:subject:message-id:from;
 
-Since Namjae provided some suggestions on v1, it would be better to add:
+Thanks. I will add:
 
 Suggested-by: Namjae Jeon <linkinjeon@kernel.org>
 
-On 11/3/26 10:45, Yifan Zhang wrote:
-> smb2_set_ea() verifies that the byte reserved for the declared EA-name
-> terminator lies inside the request, but it does not verify that the byte is
-> zero. With SMB debug logging enabled, the name is passed to %s and the
-> diagnostic reads beyond the request allocation.
-> 
-> KASAN reports:
-> 
->    BUG: KASAN: slab-out-of-bounds in string
->    Read of size 1
->    string
->    vsnprintf
->    _printk
->    smb2_set_ea
->    smb2_set_info
-> 
-> Reject an EA entry whose declared terminator byte is nonzero. Return
-> -EBADMSG for the malformed buffer, and map that error to
-> STATUS_EA_LIST_INCONSISTENT for both SET_INFO and CREATE.
-> 
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Signed-off-by: Yifan Zhang<yfzhang23@stu.pku.edu.cn>
-> ---
-> Changes in v2:
-> - Return -EBADMSG for the malformed EA name terminator.
-> - Map -EBADMSG to STATUS_EA_LIST_INCONSISTENT in SET_INFO and CREATE.
+in the next revision.
 
--- 
-ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Chinese Homepage: https://chenxiaosong.com
-English Homepage: https://chenxiaosong.com/en
-
+Regards,
+Yifan
