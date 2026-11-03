@@ -1,52 +1,91 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.197
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793673944;
-	b=PJqRASfmzaZ8dwZXv1JzehgmR6gsyHwD5vRsQXnr+vw//t3yHSXLukmoe0riBTZk9Scm
-	 IzFj8mxKJ6BepHEBT+GYGa1nYWP1UW56avnrwFliiN9/FLaf8Hhh4vQfTHg0wIFeHkIJG
-	 VW9d9iDRjmbPJq+PKmdLVG7KKCt8EahZvC77f/6nxfdc2vAMOQu/20FGUkFcM7Lm0/Bji
-	 jxGx71ifiXbTATZDisrrm8wjoAi1SZyr3zbkkKS+poMSyRKBQwbKDdU2IaHBcWIYPi3c1
-	 UY9YHQRlJiz70XOxkSoRBRxTSdq+wO+Tq8adXQ0tMrfR6dmIEXNegm+f496Q3KK4ezg==
+	t=1793674980;
+	b=VVs8dwH68LoSsXbGhJSbOFOXcjkB2i6mEa4BEeIHgtvfHZgcb7LSFr0o6uDyhJRKtZKq
+	 0AEcyHos+G46jagNy6bjQNFDfmi11cY7DaYb14loNWGEfx3sEmblhyuXctEPqJrQPNX2E
+	 54YCMJ0B7Z+Zc2ORzV63ZWFzWM+TeOgCX4NghQNmbA4fDZMid0rPxwWlAgHax69kS5IHk
+	 n7pkC6JNDZgcn8VN86JUBVp9uC98X0e+AviwTmd3lDkbeHcaXwsgvB79ktG8Zd3/iMrmr
+	 8jRt5PzGtwaUVqPM1G7SNmLRPvB3i3hDKyLFjtNGVajYoWWoazbXMZUaLNGUhZRRxRA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793673944;
-	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version:X-HM-Tid:
-	 X-HM-MType:X-HM-Spam-Status:DKIM-Signature;
-	bh=nwlAC0OGiFDOCcl9hz0k9DtD6vLQALBgD/KW414bxrI=;
-	b=y2jnBc3O89gSDh/jLAok3hxt3AgY/ApO/WSHX+AEjVBy8avNgIxab0AkL8LAApt7uZX4
-	 MBw7wFsWoqZ8XabfYdeVTaf1yNLAqTjzuDmkwl4/xa7QsQqpNm9UGZsN438l1c5dwOffp
-	 GVljYp/ZB3iG/dkv6jm+rVQspw1hku5xupayw/EcbknkGNMo0Gjszs1S3+pEPE4rC/oQU
-	 tMwVaosBgjA4rayA4/OWkRgxdTjp7RsGcXRAqbSaEEdpRaGdHKLvIcyRpi5tpOEEI73MG
-	 V/1ErHAvPD6WUvRfaLlO2TOLrXfITypI742o4gJdZRnGUy6dIgbHpq0ITcqWda0w5uQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793674980;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=Bqs38DpiAMDTxf3d0DpcOwxUeXEJbfBSjs7xg3AYXJg=;
+	b=BHn0M68NAkjyDpHg4qWB75aaPJWjteWMAQDdw1c0epj/g4AzLxmt6C10KEu7MoCE9ewk
+	 zOEaDwUWkVzzwMLzlmHW8j0dD8xTmc/KoElHpfkw1rr0P2A1S0NVINYx/t3a+bxqi7oQ/
+	 IjEvHw4lJdy9jkZVgW5abU5r6G8sjAlrGOPn3T6DANUp+1ZDqgvl8pr1spDPakJ29ucai
+	 28Rw9Ucr1qdGz/KeY0jbs0iItnF2zltSYRbVq/mzl8Eq6uh5T4jdRD7OocXwOsXIaJUiO
+	 K7h8XTP895+mrxwisY7VycPuM2p69WRAPoYkMXdu9oH8u0e93+2KvSrZqzZa4N4OtEw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=stu.pku.edu.cn;
-	spf=pass smtp.mailfrom=stu.pku.edu.cn;
-	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=cjy4FTON;
-	arc=none smtp.remote-ip=45.254.49.197
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eRxj7l4g;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18823606D80C;
-	Tue,  3 Nov 2026 02:45:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18823606D80C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 113AC606A331;
+	Tue,  3 Nov 2026 03:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=cjy4FTON
-Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [IPV6:2409:8a00:3c11:dbc0:2581:8e:ca0f:59ab])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 534316a46;
-	Tue, 3 Nov 2026 10:45:26 +0800 (GMT+08:00)
-From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-To: Namjae Jeon <linkinjeon@kernel.org>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org
-Cc: Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
- Steve French <stfrench@microsoft.com>, Ronnie Sahlberg <lsahlber@redhat.com>,
- Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
-Date: Tue, 03 Nov 2026 10:45:19 +0800
-Message-ID: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
-Subject: [PATCH v2] ksmbd: require NUL-terminated EA names
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=eRxj7l4g
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 0A28E1F00A1D;
+	Tue,  3 Nov 2026 03:02:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793674979;
+	bh=Bqs38DpiAMDTxf3d0DpcOwxUeXEJbfBSjs7xg3AYXJg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eRxj7l4gaMO4uv0aHYV5FwM76bX2cIwC6eUXrTxVhsv90uNis3SkJCQ0/uU57NSmk
+	 1GGMfWxkLX8sRcNvT4JUuRhjX2VxJTB7CPzFIWFKLYnAWT5J3kLgtiUldLJV89gwMO
+	 p00f6OeASxs/G9iwyzUlj3SKo2dJVJJ363F3TJqG5gnVk0zkKday53CuyU5mW31J2o
+	 IWPnSVGQtvQR55MbRQ1AKShR4OdWUn0Du/wgevd1giuDB1gUa7iIQfB8f2AE+q7X6X
+	 5ROPRlAs3q4xOLKE+D29YxQbgGdgsbPoW3lp6F8eZlcbNTpxAPjfY+HUqnH9H5FC9j
+	 4nBdl8Aew0A/Q==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	linux-integrity@vger.kernel.org,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	keyrings@vger.kernel.org,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Alex Markuze <amarkuze@redhat.com>,
+	Xiubo Li <xiubo.li@clyso.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Thorsten Blum <blum@kernel.org>,
+	Tim Bird <tim.bird@sony.com>,
+	linux-afs@lists.infradead.org (open list:AFS FILESYSTEM),
+	linux-kernel@vger.kernel.org (open list),
+	linux-nfs@vger.kernel.org (open list:NFS, SUNRPC, AND LOCKD CLIENTS),
+	linux-cifs@vger.kernel.org (open list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
+	samba-technical@lists.samba.org (moderated list:COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)),
+	ceph-devel@vger.kernel.org (open list:CEPH COMMON CODE (LIBCEPH)),
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-security-module@vger.kernel.org (open list:SECURITY SUBSYSTEM)
+Subject: [RFC PATCH v2 03/11] dns_resolver: Clear .dns_resolver cache when the last client unloads
+Date: Tue,  3 Nov 2026 05:02:08 +0200
+Message-ID: <20261103030226.2685251-4-jarkko@kernel.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261103030226.2685251-1-jarkko@kernel.org>
+References: <20261103030226.2685251-1-jarkko@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -56,79 +95,240 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-HM-Tid: 0aa19f4c194903a2kunm153cdd6b10a872
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZQkMZVkgdTxlJQx5KQk5LT1YeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJT0tCQUMaS0tBSBhKSkEfGRhLQUlOQ0pBQx5BGBpLHUFOQh
-	oZWVdZFhoPEhUdFFlBWU9LSFVKS0hKTE1DVUpLS1VKQktLWQY+
-DKIM-Signature: a=rsa-sha256;
-	b=cjy4FTONylSIx4uMhfzzjFXxcAxWqBdMUhUqs+j80qD9QD7IGRqMWHmEK193quWLGKBeH1UzFr5BejEu3/0k7XSNjRtIjNwJMQgBslMXKUh/17fE97816ipigXwhniC1RQDLVO88sIt7ZEy6B29CLz/CgXi82+RyzqLQq+DOhqg=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
-	bh=nwlAC0OGiFDOCcl9hz0k9DtD6vLQALBgD/KW414bxrI=;
-	h=date:mime-version:subject:message-id:from;
+Content-Transfer-Encoding: 8bit
 
-smb2_set_ea() verifies that the byte reserved for the declared EA-name
-terminator lies inside the request, but it does not verify that the byte is
-zero. With SMB debug logging enabled, the name is passed to %s and the
-diagnostic reads beyond the request allocation.
+dns_query() caches resolved dns_resolver keys into the module-owned
+.dns_resolver keyring until the TTL expires or module_exit() revokes the
+keyring.
 
-KASAN reports:
+Once live keys pin their key type, cached entries keep dns_resolver.ko
+pinned after its client modules unload.
 
-  BUG: KASAN: slab-out-of-bounds in string
-  Read of size 1
-  string
-  vsnprintf
-  _printk
-  smb2_set_ea
-  smb2_set_info
+Track active kernel client modules with dns_resolver_cache_get() and
+dns_resolver_cache_put(), and do the necessary plumbing for:
 
-Reject an EA entry whose declared terminator byte is nonzero. Return
--EBADMSG for the malformed buffer, and map that error to
-STATUS_EA_LIST_INCONSISTENT for both SET_INFO and CREATE.
+1. nfsv4
+2. cifs
+3. libceph
+4. kafs
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+When the last client unloads, clear .dns_resolver and flush key garbage
+collection so dns_resolver.ko can unload immediately.
+
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
-Changes in v2:
-- Return -EBADMSG for the malformed EA name terminator.
-- Map -EBADMSG to STATUS_EA_LIST_INCONSISTENT in SET_INFO and CREATE.
+ fs/afs/main.c                |  4 ++++
+ fs/nfs/dns_resolve.h         |  7 ++++++-
+ fs/smb/client/cifsfs.c       |  4 ++++
+ include/linux/dns_resolver.h | 13 ++++++++++---
+ net/ceph/ceph_common.c       |  7 +++++++
+ net/dns_resolver/dns_key.c   | 28 ++++++++++++++++++++++++++++
+ 6 files changed, 59 insertions(+), 4 deletions(-)
 
- fs/smb/server/smb2pdu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index be226664b8afc..c0be3265246dd 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3454,6 +3454,11 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
- 		if (!eabuf->EaNameLength)
- 			goto next;
+diff --git a/fs/afs/main.c b/fs/afs/main.c
+index 7a883c59976f..16ae947d371e 100644
+--- a/fs/afs/main.c
++++ b/fs/afs/main.c
+@@ -12,6 +12,7 @@
+ #include <linux/sched.h>
+ #include <linux/random.h>
+ #include <linux/proc_fs.h>
++#include <linux/dns_resolver.h>
+ #define CREATE_TRACE_POINTS
+ #include "internal.h"
  
-+		if (eabuf->name[eabuf->EaNameLength]) {
-+			rc = -EBADMSG;
-+			break;
-+		}
+@@ -183,6 +184,7 @@ static int __init afs_init(void)
+ 	if (ret < 0)
+ 		goto error_net;
+ 
++	dns_resolver_cache_get();
+ 	/* register the filesystems */
+ 	ret = afs_fs_init();
+ 	if (ret < 0)
+@@ -199,6 +201,7 @@ static int __init afs_init(void)
+ error_proc:
+ 	afs_fs_exit();
+ error_fs:
++	dns_resolver_cache_put();
+ 	unregister_pernet_device(&afs_net_ops);
+ error_net:
+ 	destroy_workqueue(afs_lock_manager);
+@@ -232,6 +235,7 @@ static void __exit afs_exit(void)
+ 	destroy_workqueue(afs_wq);
+ 	afs_clean_up_permit_cache();
+ 	rcu_barrier();
++	dns_resolver_cache_put();
+ }
+ 
+ module_exit(afs_exit);
+diff --git a/fs/nfs/dns_resolve.h b/fs/nfs/dns_resolve.h
+index fe3b172c4de1..4b9ecfb4f7fe 100644
+--- a/fs/nfs/dns_resolve.h
++++ b/fs/nfs/dns_resolve.h
+@@ -9,13 +9,18 @@
+ 
+ 
+ #ifdef CONFIG_NFS_USE_KERNEL_DNS
++#include <linux/dns_resolver.h>
 +
- 		ksmbd_debug(SMB,
- 			    "name : <%s>, name_len : %u, value_len : %u, next : %u\n",
- 			    eabuf->name, eabuf->EaNameLength,
-@@ -5606,6 +5611,8 @@ int smb2_open(struct ksmbd_work *work)
- 	if (rc) {
- 		if (rc == -EINVAL)
- 			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-+		else if (rc == -EBADMSG)
-+			rsp->hdr.Status = STATUS_EA_LIST_INCONSISTENT;
- 		else if (rc == -EOPNOTSUPP)
- 			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
- 		else if ((rc == -EACCES || rc == -ESTALE || rc == -EXDEV) &&
-@@ -9304,6 +9311,8 @@ int smb2_set_info(struct ksmbd_work *work)
- 	}
- 	else if (rc == -EINVAL)
- 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
-+	else if (rc == -EBADMSG)
-+		rsp->hdr.Status = STATUS_EA_LIST_INCONSISTENT;
- 	else if (rc == -EMSGSIZE)
- 		rsp->hdr.Status = STATUS_INFO_LENGTH_MISMATCH;
- 	else if (rc == -ENOSPC || rc == -EFBIG)
+ static inline int nfs_dns_resolver_init(void)
+ {
++	dns_resolver_cache_get();
+ 	return 0;
+ }
+ 
+ static inline void nfs_dns_resolver_destroy(void)
+-{}
++{
++	dns_resolver_cache_put();
++}
+ 
+ static inline int nfs_dns_resolver_cache_init(struct net *net)
+ {
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index bf199a5ca084..9788052599ce 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -31,6 +31,7 @@
+ #include <linux/xattr.h>
+ #include <linux/mm.h>
+ #include <linux/key-type.h>
++#include <linux/dns_resolver.h>
+ #include <linux/fileattr.h>
+ #include <uapi/linux/magic.h>
+ #include <net/ipv6.h>
+@@ -2160,6 +2161,7 @@ init_cifs(void)
+ 		goto out_cifs_swn_init;
+ 
+ 	cifs_proc_init();
++	dns_resolver_cache_get();
+ 
+ 	rc = register_filesystem(&cifs_fs_type);
+ 	if (rc)
+@@ -2174,6 +2176,7 @@ init_cifs(void)
+ 	return 0;
+ 
+ out_clean_proc:
++	dns_resolver_cache_put();
+ 	cifs_proc_clean();
+ 	exit_cifs_idmap();
+ out_cifs_swn_init:
+@@ -2242,6 +2245,7 @@ exit_cifs(void)
+ 	destroy_workqueue(serverclose_wq);
+ 	destroy_workqueue(cfid_put_wq);
+ 	destroy_workqueue(cifsiod_wq);
++	dns_resolver_cache_put();
+ }
+ 
+ MODULE_AUTHOR("Steve French");
+diff --git a/include/linux/dns_resolver.h b/include/linux/dns_resolver.h
+index 976cbbdb2832..cc11e09b0df3 100644
+--- a/include/linux/dns_resolver.h
++++ b/include/linux/dns_resolver.h
+@@ -27,8 +27,15 @@
+ #include <uapi/linux/dns_resolver.h>
+ 
+ struct net;
+-extern int dns_query(struct net *net, const char *type, const char *name, size_t namelen,
+-		     const char *options, char **_result, time64_t *_expiry,
+-		     bool invalidate);
++#if IS_ENABLED(CONFIG_DNS_RESOLVER)
++int dns_query(struct net *net, const char *type, const char *name, size_t namelen,
++	      const char *options, char **_result, time64_t *_expiry,
++	      bool invalidate);
++void dns_resolver_cache_get(void);
++void dns_resolver_cache_put(void);
++#else
++static inline void dns_resolver_cache_get(void) { }
++static inline void dns_resolver_cache_put(void) { }
++#endif
+ 
+ #endif /* _LINUX_DNS_RESOLVER_H */
+diff --git a/net/ceph/ceph_common.c b/net/ceph/ceph_common.c
+index a797c7360e3c..df62a269cb73 100644
+--- a/net/ceph/ceph_common.c
++++ b/net/ceph/ceph_common.c
+@@ -8,6 +8,7 @@
+ #include <linux/in6.h>
+ #include <linux/key.h>
+ #include <keys/ceph-type.h>
++#include <linux/dns_resolver.h>
+ #include <linux/module.h>
+ #include <linux/mount.h>
+ #include <linux/nsproxy.h>
+@@ -890,6 +891,9 @@ static int __init init_ceph_lib(void)
+ 	if (ret < 0)
+ 		goto out_msgr;
+ 
++#ifdef CONFIG_CEPH_LIB_USE_DNS_RESOLVER
++	dns_resolver_cache_get();
++#endif
+ 	pr_info("loaded (mon/osd proto %d/%d)\n",
+ 		CEPH_MONC_PROTOCOL, CEPH_OSDC_PROTOCOL);
+ 
+@@ -913,6 +917,9 @@ static void __exit exit_ceph_lib(void)
+ 	ceph_msgr_exit();
+ 	ceph_crypto_shutdown();
+ 	ceph_debugfs_cleanup();
++#ifdef CONFIG_CEPH_LIB_USE_DNS_RESOLVER
++	dns_resolver_cache_put();
++#endif
+ }
+ 
+ module_init(init_ceph_lib);
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 451247864a63..63f4fac0dbc8 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -16,6 +16,7 @@
+ #include <linux/kernel.h>
+ #include <linux/keyctl.h>
+ #include <linux/err.h>
++#include <linux/mutex.h>
+ #include <linux/seq_file.h>
+ #include <linux/dns_resolver.h>
+ #include <keys/dns_resolver-type.h>
+@@ -31,6 +32,8 @@ module_param_named(debug, dns_resolver_debug, uint, 0644);
+ MODULE_PARM_DESC(debug, "DNS Resolver debugging mask");
+ 
+ const struct cred *dns_resolver_cache;
++static DEFINE_MUTEX(dns_resolver_cache_mutex);
++static unsigned int dns_resolver_cache_users;
+ 
+ #define	DNS_ERRORNO_OPTION	"dnserror"
+ 
+@@ -306,6 +309,31 @@ static long dns_resolver_read(const struct key *key,
+ 	return user_read(key, buffer, buflen);
+ }
+ 
++void dns_resolver_cache_get(void)
++{
++	mutex_lock(&dns_resolver_cache_mutex);
++	dns_resolver_cache_users++;
++	mutex_unlock(&dns_resolver_cache_mutex);
++}
++EXPORT_SYMBOL_GPL(dns_resolver_cache_get);
++
++void dns_resolver_cache_put(void)
++{
++	int ret;
++
++	mutex_lock(&dns_resolver_cache_mutex);
++	if (--dns_resolver_cache_users == 0 && dns_resolver_cache) {
++		ret = keyring_clear(dns_resolver_cache->thread_keyring);
++		if (ret)
++			pr_warn_ratelimited("dns_resolver: Failed to clear cache: %d\n",
++					    ret);
++		else
++			key_gc_flush();
++	}
++	mutex_unlock(&dns_resolver_cache_mutex);
++}
++EXPORT_SYMBOL_GPL(dns_resolver_cache_put);
++
+ struct key_type key_type_dns_resolver = {
+ 	.name		= "dns_resolver",
+ 	.flags		= KEY_TYPE_NET_DOMAIN | KEY_TYPE_INSTANT_REAP,
 -- 
-2.39.5 (Apple Git-154)
+2.47.3
+
