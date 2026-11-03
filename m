@@ -1,55 +1,123 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793698217;
-	b=AsVN7bx6v6NfTaP3Ty3veSeN7Z9OuqH7q1YFossqUTGUGxSW2I+2FyVJy/qyfIUQhXVs
-	 gRctfcGErxZ4lmwuycEBYCfBq4myLwVIVWPCD6vxh3KBb9/QtCTBwOZKWAwUjlKRhd4R+
-	 LBlWAITViprLAcr0S4SHcWDE2nk8NTBrR8lorURQl4ObPxLDnu3QRF3/DjplgNqnu5hcs
-	 hRlxbnp8Y5O4uqauKg0HUiRPTtZyBIa1Ixhp/2F8/nPShEC8WPNwGo7tXdTtotuYjIWTT
-	 mY2iCx7hx6slj0aLXU43HGU945TzVqLELXcYzeeJeLNO8vLWSpGwqFap4wk3PG7FVCA==
+	t=1793702481;
+	b=rNYQKEDqsmiP3MogOH/JR171y9Bs0RPAUwcIkgx4wTrTnXiX0EkZzzdiNOoeGUQkJk/N
+	 emtRRJKWq4qI4yD5eWKjFrg065QOuhwb0g69WMOfcom9AczxxmJltma8tJ60qZmDgFI9X
+	 PCFnKfrJzpIayLsjNj1HSXwQYPc1HnpU+UVHoPVucU7VypwaMApYrYxv0w/YEU7iS0B4a
+	 1aMbLFDImW5tkACbeKz65AcT0DCBaMAQoLT2qEitamQvh8IzAE10Fzlwl8LyXjw0f/GVf
+	 41fVQbwRW+xf5uThEmf7ALfYfLztxSin0PNIvk48UJoFuZWdj4cyOcsf3woGgeozWOA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793698217;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=O+D9wSq308n2FS0S7iJCZiW2QM9DTaXSzWFy3LTJf8k=;
-	b=j59u/XAWD9P4UFM/uYNENVjxSH6y8doI9/QyTKRdMaYEKUGeLUaRkkdnib/a9k5WwGG8
-	 N6HcvkJi4QCobfF8Gw3e7R4dcp7tecrDN9LlIdYTg29aNsXpnSdakhKzcWhxgNUjuGlnw
-	 ufJbh1wefQbNnQQ0otMHPNCLoP9wUhlRSQl/RnXEJnHrknFcwwoZg+5cjilrga3uM57/0
-	 w+qEWdNfC94MS1a7joipgnO4DT+Qo7hvr/qCvfFYajO97KZoiBiSlOOnRLdX1KqZQd5c9
-	 pDxg7tVDFVstlktCQuWzg+AnB7kSzGxKsBEOaLMbCD9Y1RmogdxOWHWdIFYzxnLCfEQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793702481;
+	h=DMARC-Filter:Received:Received:Received:Date:Message-ID:From:To:Cc:
+	 Subject:In-Reply-To:References:User-Agent:MIME-Version:Content-Type:
+	 X-Rspamd-Pre-Result:X-Rspamd-Server:X-Spamd-Result:X-Spam-Flag:
+	 X-Spam-Score:X-Spam-Level:X-Rspamd-Queue-Id:X-Rspamd-Pre-Result:
+	 X-Rspamd-Action;
+	bh=n3928gBIWqHxVcE0Q0TQTSHKUQ5+JmJrD1oVco54lEw=;
+	b=HwjEIW3xc83Pm0CwR2K/jkKioKJQAd99tyX6Cj6/AI9N9iW/GZLJnxdXlQ0Md8xjAhXp
+	 UE7o9jZIB+LI63ZtxP6vN6y+Xa2ri8buth6IGDfiJmvMTMZhzbTH0SsXovYkLzVbKMXXq
+	 vFiXEDLAkZ+L9q6fw4jUwFncyR3YRX4/Enl/UY62hCFlYX14DcVGD2BOI8gPoV+9s44Gh
+	 NTh6As2zyA8On/8V/FwUCthQCAD8QE6ugtIC2CMxuUVLpLwWQObkkycenc7WWO7gIR9OU
+	 N7zwdfKQiWgR5tYfGnHvdPnsVNyCZZ3iwLafK2p+H23NKktgtnQh2Lj+IsH/Ghh3akA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OCOLMC5V;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5BD606A329
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Nov 2026 09:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OCOLMC5V
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 609F81F00A17
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Nov 2026 09:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793698216;
-	bh=O+D9wSq308n2FS0S7iJCZiW2QM9DTaXSzWFy3LTJf8k=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=OCOLMC5Ve2epvLxOzbFZRZArgmqBMSxKdQFl9LqIs+xrTVVWKRr2CgOnXAbRSNzxf
-	 vghGoQ2RMU79tOV8kI9JLga7yIiYQQndrGSoZFBSKKzuzZhCgCo93JqiHLy71dLxuI
-	 32bKvl4Iiefm9yK7e6oruL6lQyx9PQETUHAqUTFjPQ2AUmCHt0+qRBspyeOn55wsyw
-	 WnRk0biJ0d6/QaEohdB5FIkUPc4jVt2ilFx9bFDxtgFX4qClOWieE+E8E7VEbRruzi
-	 aVn0seYkEiFXaW/iT6zSB7iNh5WUAiPXh5FCo0Ccy00YWQzVGwEhkRlq1tC2hqO9mg
-	 K0GFBj2AW93JA==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c3fd91337baso668721866b.3
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Nov 2026 01:30:16 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBwJ3v+L9gdOCXAuq3EKdoBoYkOOTaZDal6mBvitL4O1nI549lNDN3gRf3O3ZMEAtWJTRJnQ+n009FAg@vger.kernel.org
-X-Gm-Message-State: AFq9FYKQwtiMbH95tt7gx/asoAusZb5sAzPFKcy7z1Yz9JoD4TqbcWvT
-	ZJn8HH3qkMpTVnwG/OG81AN7pNDvopMwmv0AvrN6v89MfMc6ZALWOEnwKAsyJwWCE8Z7AwYBD7n
-	YG5ObF6KpDFcRq2kDImdpGobdNAu8N78=
-X-Received: by 2002:a17:907:969e:b0:c41:8e21:4d5a with SMTP id
- a640c23a62f3a-c4ca793c08emr997030966b.5.1793698215014; Tue, 03 Nov 2026
- 01:30:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D3A606A81C;
+	Tue,  3 Nov 2026 10:41:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 23D3A606A81C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8017122D12;
+	Tue,  3 Nov 2026 10:41:18 +0000 (UTC)
+Authentication-Results: smtp-out1.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A98D41350A;
+	Tue,  3 Nov 2026 10:41:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id fPJkIE266WqxEgAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Tue, 03 Nov 2026 10:41:17 +0000
+Date: Tue, 03 Nov 2026 11:41:09 +0100
+Message-ID: <87ik2exkmy.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Christian Brauner <brauner@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jann Horn <jannh@google.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Chris Mason <mason@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Christoph Hellwig <hch@lst.de>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Joel Granados <joel.granados@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Jan Kara <jack@suse.com>,
+	linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-um@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	netdev@vger.kernel.org,
+	ntfs3@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org,
+	coreteam@netfilter.org,
+	kexec@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	ibm-acpi-devel@lists.sourceforge.net,
+	jfs-discussion@lists.sourceforge.net,
+	linux-alpha@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-fbdev@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-sh@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	sparclinux@vger.kernel.org,
+	linux-m68k@lists.linux-m68k.org,
+	linux-doc@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-atm-general@lists.sourceforge.net,
+	Takashi Iwai <tiwai@suse.de>,
+	linux-input@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-debuggers@vger.kernel.org,
+	Chuck Lever <cel@kernel.org>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH RFC 09/38] ALSA: info: don't write past the end of a data entry
+In-Reply-To: <20261102-work-procfs-bugfixes-v1-9-59422ed3e465@kernel.org>
+References: <20261102-work-procfs-bugfixes-v1-0-59422ed3e465@kernel.org>
+	<20261102-work-procfs-bugfixes-v1-9-59422ed3e465@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/30.2 Mule/6.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,47 +126,64 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
-In-Reply-To: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 3 Nov 2026 18:30:02 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-Y+oNxpN+-KqhhgM3xW7jCoG-kCxpuHCuOev26_vCeXg@mail.gmail.com>
-X-Gm-Features: AclHuK8_HWjHOWSuf3qmE7IqJsMyYCJVY7j14jnzmNKlDbk8nPC2JkHwb7JZ4W8
-Message-ID: <CAKYAXd-Y+oNxpN+-KqhhgM3xW7jCoG-kCxpuHCuOev26_vCeXg@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: require NUL-terminated EA names
-To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org, 
-	Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
-	Steve French <stfrench@microsoft.com>, Ronnie Sahlberg <lsahlber@redhat.com>, 
-	Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Spam-Flag: NO
+X-Spam-Score: -4.00
+X-Spam-Level: 
+X-Rspamd-Queue-Id: 8017122D12
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Action: no action
 
-On Tue, Nov 3, 2026 at 11:45=E2=80=AFAM Yifan Zhang <yfzhang23@stu.pku.edu.=
-cn> wrote:
->
-> smb2_set_ea() verifies that the byte reserved for the declared EA-name
-> terminator lies inside the request, but it does not verify that the byte =
-is
-> zero. With SMB debug logging enabled, the name is passed to %s and the
-> diagnostic reads beyond the request allocation.
->
-> KASAN reports:
->
->   BUG: KASAN: slab-out-of-bounds in string
->   Read of size 1
->   string
->   vsnprintf
->   _printk
->   smb2_set_ea
->   smb2_set_info
->
-> Reject an EA entry whose declared terminator byte is nonzero. Return
-> -EBADMSG for the malformed buffer, and map that error to
-> STATUS_EA_LIST_INCONSISTENT for both SET_INFO and CREATE.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Applied it to #ksmbd-for-next.
-Thanks!
+On Mon, 02 Nov 2026 15:21:24 +0100,
+Christian Brauner wrote:
+> 
+> snd_info_entry_write() clamps the count to what is left of the entry
+> by computing entry->size - pos as a size_t. For a position past the end
+> that wraps and the write goes to the driver unclamped, for opl4 into
+> sample memory outside of what the entry covers. At the end of the entry
+> the driver gets a count of 0 and vmalloc(0) warns. Before the clamp
+> moved into the common code the driver ignored such writes. Fail them
+> with -ENOSPC instead, like a block device does at the end of the
+> device. Returning 0 would make writers that use stdio retry forever.
+> 
+> Fixes: d97e1b78239c ("ALSA: info - Check file position validity in common layer")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
+
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
+
+
+thanks,
+
+Takashi
+
+> ---
+>  sound/core/info.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/sound/core/info.c b/sound/core/info.c
+> index c4d57d0809ad..982087bc8575 100644
+> --- a/sound/core/info.c
+> +++ b/sound/core/info.c
+> @@ -171,6 +171,8 @@ static ssize_t snd_info_entry_write(struct file *file, const char __user *buffer
+>  	pos = *offset;
+>  	if (!valid_pos(pos, count))
+>  		return -EIO;
+> +	if (pos >= entry->size)
+> +		return count ? -ENOSPC : 0;
+>  	if (count > 0) {
+>  		size_t maxsize = entry->size - pos;
+>  		count = min(count, maxsize);
+> 
+> -- 
+> 2.53.0
+> 
