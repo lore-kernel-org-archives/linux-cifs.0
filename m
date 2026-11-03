@@ -1,59 +1,69 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793717539;
-	b=IMPJJr5EpA+yVbN/bOEVPL21Kk2A4fNja7ybmV3irtSkK+oMIfScKoKhMkuimxV20RaM
-	 m6lmTnAHxBt8M38LlFZ9gfwhHP4Bqn3oDMWcL82JY+KZtbSvf95iaN1Y3nok+QeNhWZUw
-	 o+nUocXVcEAzeysloO1sCs9jdJU6p47cwaPMM4bHCP99l0ez+1QJF/HAzs/JcB+KzCLKQ
-	 Eo/FF1vXyqvpc/bMgx8kXrczzVqAC/8n5IJJxrqR6J3DXBFTnVtYhv22qM+6rWwBzIVzK
-	 +j4zNCxVEixMQdrmF6X1FFwfEYOQYWfrtTFKutqmISLM0ZKkMTd51WTLvdG24/hQlZA==
+	t=1793717546;
+	b=WoaJfEuKuXMAaOo2ygAgGYPYZkPwy4V/23dKQPuWGz1ykpo3jauqQTvKD5ghAkZXiOGm
+	 G6ji07Hv4Oz0D2YoN3ClZlmrnZNjoLsjzZQWstTYkTuxI52JTM+B3DxK0wJHR8PeQwGGa
+	 G8SSs2jjcc3yq5SCXmS9UAe8V6zuAhh/76CSmQmSBv9jI73RDoF0hyekTaup+2rMTVaSV
+	 dVljJCkToyb2cv6xvnwig9emzh5SnG/a5gFN+CnO0Rn5ot5n/IVDms/cSWP2OeDxdJD/r
+	 XBVyMXsK7nrrMvYlOWCmVwQ1KMi2WSkM6rfYHpH5CkizBOUQfwo9/3dXKemoluFt4oA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793717539;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793717546;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=/z15uDLBdE6P9EagLShWc1HhmDJ69kTe5j2d0GSah+U=;
-	b=P6jx00nYoFzKAa1VpXzZ8Sk9GkaJ2ncew6ywjdVuDRixCqM0DZE9mJfvwPK5awR+bV9O
-	 f3OF1sbpMeyjih1d9n8cFa/qsaZfrc/1NpK+chOiIbY8VFyby3C7mITnx7GmS03pAHcFw
-	 VaHec4mtabYmSFWB67pQMu2wF5TiQI2Xbanqz5wB6oQfd5CExHPMJUmdVuqQM4P0uWfgN
-	 N9iyd7Ho2rgSoQP2XLJ4L8nloT28aHNtMIik1oT0XIzb88RzuyFFngfeqwWrlnxDdGmtM
-	 AbULtecoWt9jdJO7898DkWVNaKv4siOzHflA187BPBUlJlJLOmqXuRIEuHrEnj3Qqcg==
+	bh=LrjKfm75hVGdN5FWK5G1yhHfvG92/sfpaw9f0zcNrSw=;
+	b=XJuippDQ/00hbMEc9Jwu6adE2w4ZT2oMCWlp+SC9cPHoTUJkTrtiRbU1zDxEdl3e/T5G
+	 GI0Q6a7tjLnUKD23qCqR6bWK9wORJfWRCJnE9Sch8LCX0bUdD94JEOft9jmQbDJ/l14aH
+	 pNuNM1v3CG5Btp3Kr+2/EzMnkDyQELRU1Glx8tc9mgwAkB8X7mpg5Njj+ZAtDKqQy+3vf
+	 pPBKR1cj+alCxmw0F8wuNBwgjL+/j/tuxM83JlIPnDoVbV7dhdwi4zY2q3w2quDHljCLP
+	 6c3QUonA2ogMp04hfc5inp3b8XTJCn0PrGY419k6w/J8DmEH+DtKr13Jpvpkgs2pGEw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IZLOS2yT;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bjjw7osZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE76B606B25D;
-	Tue,  3 Nov 2026 14:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDA4606BA06;
+	Tue,  3 Nov 2026 14:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=IZLOS2yT
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA8691F0093A;
-	Tue,  3 Nov 2026 14:52:17 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bjjw7osZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C85A1F0093A;
+	Tue,  3 Nov 2026 14:52:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793717538;
-	bh=/z15uDLBdE6P9EagLShWc1HhmDJ69kTe5j2d0GSah+U=;
+	s=k20260515; t=1793717546;
+	bh=LrjKfm75hVGdN5FWK5G1yhHfvG92/sfpaw9f0zcNrSw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=IZLOS2yTNHD3rtXKQcilP+WB81sz2Uc0UO5Xw7CG9fm/uPBxbCWUMC72X1ujlxOxz
-	 JhjsmMWR/njsGOq50IMthL07VdYnOk+nwWp8nzeYVB7Vx9egD10ce5JRNxtwFQ9iUD
-	 eCABV7hTAzWTzXjq+gK31ikpMEkyTn6Ts/+vbvMDwZptw+kAUp82kzX9SukRdURDXK
-	 Ka8EUSz3THqLnfQjmjF9cgPq8upSJQj/a9OF33N/8BxEJcpZSeSoCN06jjm7TeNBVj
-	 JRIN8AccQXHdjcXpLaEoyElj9XrOsq/FMZemN43kpbdof6jt8GBTOZpHUtb9tm/jdW
-	 YhVs4u5Co8c1w==
+	b=bjjw7osZ5hwTWIr6a6AiRpO64DK8WGlBnyg87yI+66CWpyujlHVfNsRRtVIZ2Y2n2
+	 LSDNR+qfUuI0Hoo9HgioE5F6Tn6Y7kl6M/cuyPtureD5QuVkeo0FQu0dCTibgvr4ah
+	 rQltvLEY/hQYdejUhRvlcbemc3n+OR4JtfegQRFnKDIkP8ceqnWKgOoC8Tj5uYVv9t
+	 YzRtClxaG63dwkZ+sdJ6SjGwiQ0Xa4a0QSC0Y3loa4dpRfToRZ02dbqa0Xw5KGS9pz
+	 xJBFM7kBMku6TudzDnbm8XhYEzbbuQJYiOX+fEZhYiMwJw4ecOjLT+dyiBUgGinzAf
+	 xxdltvcNv4HUg==
 From: Sasha Levin <sashal@kernel.org>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>
+To: stable@vger.kernel.org
 Cc: Sasha Levin <sashal@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	stable@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	sfrench@samba.org,
+	stfrench@microsoft.com,
+	wozizhi@huawei.com,
+	pc@manguebit.com,
+	lsahlber@redhat.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	glaming@microsoft.com,
 	linux-cifs@vger.kernel.org,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: Re: [PATCH 6.6.y RESEND] smb: client: base punch-hole EOF decision on server_eof
-Date: Tue,  3 Nov 2026 09:51:54 -0500
-Message-ID: <2026-11-03-1-daily-reply-0006-re-smb-punch-hole-server-eof@kernel.org>
+	samba-technical@lists.samba.org,
+	apais@microsoft.com,
+	rlmenge@gmail.com,
+	hargar@linux.microsoft.com,
+	Siddharth Chintamaneni <sidchintamaneni@gmail.com>
+Subject: Re: [PATCH 6.6.y] smb: client: fix busy dentry warning on unmount after DIO
+Date: Tue,  3 Nov 2026 09:51:59 -0500
+Message-ID: <2026-11-03-1-daily-reply-0011-re-smb-busy-dentry-dio@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261103092918.2363406-1-joseph.qi@linux.alibaba.com>
-References: <20261103092918.2363406-1-joseph.qi@linux.alibaba.com>
+In-Reply-To: <20261102201410.55089-1-sidchintamaneni@gmail.com>
+References: <20261102201410.55089-1-sidchintamaneni@gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -66,14 +76,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-> smb3_punch_hole() decides whether to move the server EOF marker by
-> comparing against netfs_inode(inode)->remote_i_size.  Nothing on this
-> base keeps that field up to date
+> commit 75f5c412fa867efa0bf9b646bffe0d912109e84a upstream.
+>
+> Kernel 6.6 predates the netfs I/O request conversion and instead splits
+> I/O across three reference-counted structures that each hold a
+> cifsFileInfo reference
 
-This is a stable-only fix, so I need an ack from a cifs maintainer (Steve
-French or Paulo Alcantara) on the list before I can queue it. Sashiko also
-flags a possible race with writeback and a stale server_eof in
-smb3_punch_hole(); please address that too.
+This is a hand-written 6.6 adaptation of 75f5c412fa86 ("smb: client: fix busy
+dentry warning on unmount after DIO") rather than a cherry-pick, so I need an
+ack from a cifs maintainer (Steve French or Paulo Alcantara) on the list before
+queueing it. 6.1 also has 340cea84f691 and the same bug; please send a 6.1
+variant too.
 
 -- 
 Thanks,
