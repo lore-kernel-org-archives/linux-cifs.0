@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793728987;
-	b=rLQmj4HcG5hCKlML+/eZHVI0tXvVa397R00WQEIHVfO4gynJTyea25UpOFCRfs8Zz0g0
-	 Mnq9F7oTeufGzzJSGrRWY4ziAt8USEBR4+fXE3kdRrPEf6TTVLuwC4adLycYBjBX+PVvO
-	 cHLjYjlfeXJvLNXT1OGxCQHNMY6W8nfdNGzHLLirmPOrKsXI5wwrhMvpdA2CV9y0+d8Rd
-	 0ZOmILa51MMKEbpCtiA69UUSEMhyqQwv+fpBwXhOeQiYZCLuuDmux27aaUebZt3QHZX4h
-	 R2dt/ZQ5jnDQsrKiefQvkAmOSlBd3R84AQeLoP65xzVUu8Y7Oy7gR5B8/KkeolRj9AQ==
+	b=LMPffIrch/b77xShll/XZycMdIwz2cLs0c9Aqoc9D97XjVsJDbKoPS4VBty6EPpN9h8I
+	 StBLCS1IZlpJLkdt1nlsuVtgmeY97Mqp5A8mQq0Rss/YiwMtQFLWl02sS49VakArlXQ+Y
+	 ahNB7DT7XVd3vRGre9oqxTnSZ3ts36Q7qjbLPyu/RKmJGyOZrr6j3DE0tNkEmtvEXKR3w
+	 j5+ieOwkVSXa004g852wR0819er1THRgtFsL+zJodmYaLgX6VxulnXIz78tVoLGMV9puQ
+	 XKcWZstEP0f40VHQar30yWPOUkHxyhyAj+tGs80oqibo39bLtgU5O4gXUmQgUcDNa2w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793728987;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=oJtXASTa48RwOT6JweuokeA+vIrZ1COV+im6KtcmwTw=;
-	b=zckp227/OnymIQzqndtboPi6nu3wjIX6YVEekklFRnno7sznYh2hr4OrYcsDRDwJ2B/O
-	 Nv7nnRSW3EV/jsMK/OGX0/VLhcG4SQObKdSlnzwCZRjBx3Fxxh0ok5Z7O2DqUcnucAJBb
-	 O8xJLOAf6mKJDmZfCcRPTlmz2F+AW45PGV/aPGRNZP/C9CVSg8BWaQgD259cNN+A9gYyR
-	 KwUYJWtjGrgwEYr/cj2L2OSU+ZdYaK4H+/n+RXMMXlEbzo5q4UOOKCmlRTB9LGvmNdHFs
-	 a4CxmlyMkj8yKKjgLNI/UxoUI7T1iwAfWIj1bG1WbS8OrrYzKw8FVn5W4XzKlsdjsPg==
+	bh=z45gJVenqDQdfqsulcVzTmokKGR0+PriaPFVgi6XmGI=;
+	b=MstDFkA7WHlNg9Lv92/2MC/yWCopU/I61nCUrWxWuOFbLSGhFyAIVyBz/2tVMPuf1qX1
+	 2izBZ4RH4U6IeN5KbfelJAahl00sT2xL14fZMjhv7ciRrxlxLum4vQFyjPprJE5q/lTIe
+	 4F4QewhGqVyu2/zJSiOk798V/rW6XO2apCH4+0cVGWA+qN1HmHuI/LbEU3xyy5Iv8GEpW
+	 p+QVQK5uWmvKp3Jh/lNMjYPl4zhQptmMM3Zn/ELwixQ4H6cy8fOnNkiYDwRNTlxb8LK1e
+	 Yu0YN24oEsZcAmr+SK7ol8wMs1ph5c1wQYuEs90VO06IcWOIWZ9W/ei2D4uvPy9cuQg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=7l8frmfI;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=YKcieQz9;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1FA606A328;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A1E0606A324;
 	Tue,  3 Nov 2026 18:03:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8A1FA606A328
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8A1E0606A324
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=7l8frmfI
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=YKcieQz9
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=oJtXASTa48RwOT6JweuokeA+vIrZ1COV+im6KtcmwTw=; b=7l8frmfI/1jBUVR3stxsxfjo2H
-	YgZBWjtDUGBVZ8D5b0u+tkgeWAOKmt7O+Y2hSHLFN6GnaSLe/QMPoyPYrjGmhCpxHdzg/EYCspBW/
-	hIBSWbVLyVUBMNfzuEkRo3GQcqx1VmLsgs5AtTTsDW5gHejcFcuH21Nt5WpPiN4C5WEffI7Xj7HYt
-	xhDUEr87sPKP4cOJb2llSpEUCOXhlN+oBM1FA5MzMUUcTWz7iFqUML9u+52Mi0B1dzpskTp3WIzH9
-	8c2PYhrb3sNlTMyGdKGnrMOhBSqlKf140meOFLDySxTrzsKMWylTCT/0cTu4K9R6BTNjh0msUXY4F
-	5v4qV9gw==;
+	bh=z45gJVenqDQdfqsulcVzTmokKGR0+PriaPFVgi6XmGI=; b=YKcieQz9tRYSaUKNRzjDJefskX
+	PeVld2LP3Il2PzBTAHv9hczFc8S2smjavM0NNrIGMI2PQeXxORWzrNBubMhP+y27o634GRgPbgYod
+	fbA6qR+OyGCmgMwD4ZV6HOB0UkS6IXotNH/K3SnSdGXb7QA+Jj4RkkAxLwYJ2KjRLWci9z+v+NuJ+
+	2Ff1/fQ5waA7NY/Y6f+mOrJNuSHh8ZmZLFW/XidFEmPl7V44832fezSpVdtdk7oEKK84LKv3riQ65
+	seqynsG0jWi3qAGkUVwXgebyhmc/k+kJZ1RBVMmZMHXNFqDSPGQ+kMq5teYl2lQwBlC4i7H1Jf9VA
+	UZNVZnMQ==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xOIqX-00000000iuv-2QGn;
-	Tue, 03 Nov 2026 15:02:58 -0300
+	id 1xOIqV-00000000itk-3WkO;
+	Tue, 03 Nov 2026 15:02:57 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 08/16] smb: client: issue writes from a worker if the task is dying
-Date: Tue,  3 Nov 2026 15:02:47 -0300
-Message-ID: <20261103180255.1482516-9-pc@manguebit.org>
+Subject: [PATCH v2 03/16] netfs: keep the prepare_read errno when abandoning read retries
+Date: Tue,  3 Nov 2026 15:02:42 -0300
+Message-ID: <20261103180255.1482516-4-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261103180255.1482516-1-pc@manguebit.org>
 References: <20261103180255.1482516-1-pc@manguebit.org>
@@ -74,149 +74,73 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A task with a fatal signal pending can't send on the socket:
-__smb_send_rqst() refuses it upfront with -ERESTARTSYS, as SIGKILL can't
-be blocked and a send interrupted halfway forces a reconnect.  Writeback,
-however, runs in the context of whoever starts it, so when a dying task
-flushes dirty pages - close() racing with SIGKILL, or fd teardown during
-exit_group() - every write subrequest gets refused:
+When ->prepare_read() fails while retrying a read,
+netfs_retry_read_subrequests() marks the subrequest failed and abandons
+the rest, which overwrites the error of every failed subrequest with
+-ENOMEM.  The reader then gets -ENOMEM for e.g. a handle that couldn't be
+reopened (-EHOSTDOWN, -ENOENT), a credit wait interrupted by a signal
+(-ERESTARTSYS) or umount -f (-EIO).  The first pass doesn't have this
+problem, as netfs_cancel_read() keeps the errno.
 
-  smb3_write_err: ... offset=0x1400000 len=0x400000 rc=-512
-  cifs_flush_err: ino=... rc=-512
+Record the errno of ->prepare_read() in the subrequest and keep the error
+of subrequests that already failed, using -ENOMEM only for those
+abandoned while still waiting for a retry.
 
-Since the switch to netfslib, a failed upload ends writeback with the
-folios clean, so the data is silently lost: the server ends up with
-20MiB of a 64MiB file while stat(2) reports the full size.
-
-Issue writeback subrequests of dying tasks from a new cifswritebackd
-workqueue instead, like afs does for all of its writes, so they get sent
-from a context with no signals.  Leave direct and unbuffered writes
-alone, as their callers get the error.  Use a dedicated WQ_UNBOUND
-workqueue as the writes may block for long on credits, sends or reopens,
-e.g. on hard mounts with an unresponsive server, and must not hold up
-other cifs work such as reconnects, nor starve the WQ_MEM_RECLAIM
-rescuer of cifsiod_wq.
-
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsfs.c   | 15 +++++++++++++--
- fs/smb/client/cifsglob.h |  1 +
- fs/smb/client/file.c     | 26 +++++++++++++++++++++++++-
- 3 files changed, 39 insertions(+), 3 deletions(-)
+ fs/netfs/read_retry.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 9db6a32d6e05..c90fb0cc0f0e 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -164,6 +164,7 @@ struct workqueue_struct	*cifsoplockd_wq;
- struct workqueue_struct	*deferredclose_wq;
- struct workqueue_struct	*serverclose_wq;
- struct workqueue_struct	*cfid_put_wq;
-+struct workqueue_struct	*cifs_writeback_wq;
- __u32 cifs_lock_secret;
+diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+index 5bd8dee5a834..8a722995fa9d 100644
+--- a/fs/netfs/read_retry.c
++++ b/fs/netfs/read_retry.c
+@@ -28,6 +28,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 	struct netfs_io_subrequest *subreq;
+ 	struct netfs_io_stream *stream = &rreq->io_streams[0];
+ 	struct list_head *next;
++	int ret;
  
- /*
-@@ -2124,9 +2125,16 @@ init_cifs(void)
- 		goto out_destroy_serverclose_wq;
+ 	_enter("R=%x", rreq->debug_id);
+ 
+@@ -140,8 +141,11 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 
+ 			/* Renegotiate max_len (rsize) */
+ 			stream->sreq_max_len = subreq->len;
+-			if (rreq->netfs_ops->prepare_read &&
+-			    rreq->netfs_ops->prepare_read(subreq) < 0) {
++			ret = 0;
++			if (rreq->netfs_ops->prepare_read)
++				ret = rreq->netfs_ops->prepare_read(subreq);
++			if (ret < 0) {
++				subreq->error = ret;
+ 				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
+ 				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+ 				goto abandon;
+@@ -221,7 +225,9 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 				part = netfs_limit_iter(&source, 0, part, stream->sreq_max_segs);
+ 
+ 			netfs_stat(&netfs_n_rh_download);
+-			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
++			ret = rreq->netfs_ops->prepare_read(subreq);
++			if (ret < 0) {
++				subreq->error = ret;
+ 				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
+ 				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+ 				goto abandon;
+@@ -257,7 +263,9 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 		if (!test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
+ 		    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
+ 			continue;
+-		subreq->error = -ENOMEM;
++		if (!subreq->error ||
++		    !test_bit(NETFS_SREQ_FAILED, &subreq->flags))
++			subreq->error = -ENOMEM;
+ 		__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+ 		__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
  	}
- 
--	rc = cifs_init_inodecache();
--	if (rc)
-+	cifs_writeback_wq = alloc_workqueue("cifswritebackd",
-+					    WQ_UNBOUND | WQ_MEM_RECLAIM, 0);
-+	if (!cifs_writeback_wq) {
-+		rc = -ENOMEM;
- 		goto out_destroy_cfid_put_wq;
-+	}
-+
-+	rc = cifs_init_inodecache();
-+	if (rc)
-+		goto out_destroy_writeback_wq;
- 
- 	rc = cifs_init_netfs();
- 	if (rc)
-@@ -2197,6 +2205,8 @@ init_cifs(void)
- 	cifs_destroy_netfs();
- out_destroy_inodecache:
- 	cifs_destroy_inodecache();
-+out_destroy_writeback_wq:
-+	destroy_workqueue(cifs_writeback_wq);
- out_destroy_cfid_put_wq:
- 	destroy_workqueue(cfid_put_wq);
- out_destroy_serverclose_wq:
-@@ -2242,6 +2252,7 @@ exit_cifs(void)
- 	destroy_workqueue(fileinfo_put_wq);
- 	destroy_workqueue(serverclose_wq);
- 	destroy_workqueue(cfid_put_wq);
-+	destroy_workqueue(cifs_writeback_wq);
- 	destroy_workqueue(cifsiod_wq);
- }
- 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index b6a993cc0245..e211dea91e6e 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -2144,6 +2144,7 @@ extern struct workqueue_struct *cifsoplockd_wq;
- extern struct workqueue_struct *deferredclose_wq;
- extern struct workqueue_struct *serverclose_wq;
- extern struct workqueue_struct *cfid_put_wq;
-+extern struct workqueue_struct *cifs_writeback_wq;
- extern __u32 cifs_lock_secret;
- 
- extern mempool_t *cifs_sm_req_poolp;
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 6a1711bf89d4..31149d7d4498 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -90,6 +90,12 @@ static bool cifs_io_aborted(struct cifs_io_subrequest *subreq)
- 	       tcon->need_reconnect;
- }
- 
-+static bool cifs_writeback_dying(struct netfs_io_subrequest *subreq)
-+{
-+	return subreq->rreq->origin == NETFS_WRITEBACK &&
-+		fatal_signal_pending(current);
-+}
-+
- /*
-  * Prepare a subrequest to upload to the server.  We need to allocate credits
-  * so that we know the maximum amount of data that we can include in it.
-@@ -164,7 +170,7 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- /*
-  * Issue a subrequest to upload to the server.
-  */
--static void cifs_issue_write(struct netfs_io_subrequest *subreq)
-+static void __cifs_issue_write(struct netfs_io_subrequest *subreq)
- {
- 	struct cifs_io_subrequest *wdata =
- 		container_of(subreq, struct cifs_io_subrequest, subreq);
-@@ -202,6 +208,24 @@ static void cifs_issue_write(struct netfs_io_subrequest *subreq)
- 	goto out;
- }
- 
-+static void cifs_issue_write_worker(struct work_struct *work)
-+{
-+	struct netfs_io_subrequest *subreq;
-+
-+	subreq = container_of(work, struct netfs_io_subrequest, work);
-+	__cifs_issue_write(subreq);
-+}
-+
-+static void cifs_issue_write(struct netfs_io_subrequest *subreq)
-+{
-+	if (unlikely(cifs_writeback_dying(subreq))) {
-+		subreq->work.func = cifs_issue_write_worker;
-+		WARN_ON_ONCE(!queue_work(cifs_writeback_wq, &subreq->work));
-+		return;
-+	}
-+	__cifs_issue_write(subreq);
-+}
-+
- static void cifs_netfs_invalidate_cache(struct netfs_io_request *wreq)
- {
- 	cifs_invalidate_cache(wreq->inode, 0);
 -- 
 2.56.0
 
