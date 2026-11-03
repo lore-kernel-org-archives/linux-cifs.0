@@ -1,51 +1,50 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.71.155.101
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=45.254.49.197
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793673936;
-	b=WGrQT9NeE81kDRnduAObMm8avfUieVLkQNEH0aNXg0nlib8umZiOik4THG5p71gRPeZ3
-	 Uqw6wyUhOWVwN3TY5A/wbQGUamHsqFWplT8SBSsKQx7A6SQwd7qqOHHM8QGjxxOMFHECf
-	 bOQzoZpKUDxqsZMcvJQqtu+RhrRi/pinAvmPw8KMmRpLmju6VIqlEi7Scw3Fylxe6mp8w
-	 wZO6wnotiv3aH17orhmKfmeNh0qcD2lh5vl93H3+atKmNffKg/ADH/InVKTp81fpS9MKw
-	 stYOP0mClY7m2qLwe2+rVaxl63qZxJ6ep8LH+J9bG05Gu+7xkB+44MsIUaV8Q1m2DWA==
+	t=1793673944;
+	b=PJqRASfmzaZ8dwZXv1JzehgmR6gsyHwD5vRsQXnr+vw//t3yHSXLukmoe0riBTZk9Scm
+	 IzFj8mxKJ6BepHEBT+GYGa1nYWP1UW56avnrwFliiN9/FLaf8Hhh4vQfTHg0wIFeHkIJG
+	 VW9d9iDRjmbPJq+PKmdLVG7KKCt8EahZvC77f/6nxfdc2vAMOQu/20FGUkFcM7Lm0/Bji
+	 jxGx71ifiXbTATZDisrrm8wjoAi1SZyr3zbkkKS+poMSyRKBQwbKDdU2IaHBcWIYPi3c1
+	 UY9YHQRlJiz70XOxkSoRBRxTSdq+wO+Tq8adXQ0tMrfR6dmIEXNegm+f496Q3KK4ezg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793673936;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793673944;
 	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:
 	 Content-Type:Content-Transfer-Encoding:MIME-Version:X-HM-Tid:
 	 X-HM-MType:X-HM-Spam-Status:DKIM-Signature;
-	bh=60sIn705N//4nJlSER2bDtx2BvMPrluJneFVG1+nFIg=;
-	b=ZmmfQ/X3F0Tn3IwEt7kBmm97VyGYlA2wwmY72/t4tXNP+AtbYVcsXHJPPdTylyI0aZfG
-	 zm50fqd/nfM6wYXR0G3RhB4kl/HIyD51Yp9t750LdYjNYwR94mYQvHyyLe1P2DVzKtMj0
-	 XmIJ/Lknt0v0s5bdvRtDHwnaeFRmcjd90yi4TNsPiEMglfMA5bBPPB9h7urRV61UQruXD
-	 joCD08aq+iZ85px3XtDUNugQ88vxp7NR0yx64m7pokfaT8jTNh1G8/Qa4JeMWVkKmNv/p
-	 pObckqOaN0pPS0tUJKr7V/PVX0ELUJcDDrI49ZMYSj9bY3PPY6k4vHThKRuKgnszS5A==
+	bh=nwlAC0OGiFDOCcl9hz0k9DtD6vLQALBgD/KW414bxrI=;
+	b=y2jnBc3O89gSDh/jLAok3hxt3AgY/ApO/WSHX+AEjVBy8avNgIxab0AkL8LAApt7uZX4
+	 MBw7wFsWoqZ8XabfYdeVTaf1yNLAqTjzuDmkwl4/xa7QsQqpNm9UGZsN438l1c5dwOffp
+	 GVljYp/ZB3iG/dkv6jm+rVQspw1hku5xupayw/EcbknkGNMo0Gjszs1S3+pEPE4rC/oQU
+	 tMwVaosBgjA4rayA4/OWkRgxdTjp7RsGcXRAqbSaEEdpRaGdHKLvIcyRpi5tpOEEI73MG
+	 V/1ErHAvPD6WUvRfaLlO2TOLrXfITypI742o4gJdZRnGUy6dIgbHpq0ITcqWda0w5uQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=stu.pku.edu.cn;
 	spf=pass smtp.mailfrom=stu.pku.edu.cn;
-	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=IjnWpgcu;
-	arc=none smtp.remote-ip=101.71.155.101
-Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
+	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=cjy4FTON;
+	arc=none smtp.remote-ip=45.254.49.197
+Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E583C606D802;
-	Tue,  3 Nov 2026 02:45:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E583C606D802
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18823606D80C;
+	Tue,  3 Nov 2026 02:45:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18823606D80C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=IjnWpgcu
+	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=cjy4FTON
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [IPV6:2409:8a00:3c11:dbc0:2581:8e:ca0f:59ab])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 534316a43;
+	by smtp.qiye.163.com (Hmail) with ESMTP id 534316a46;
 	Tue, 3 Nov 2026 10:45:26 +0800 (GMT+08:00)
 From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-To: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Bharath SM <bharathsm@microsoft.com>, Steve French <sfrench@us.ibm.com>,
- samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+To: Namjae Jeon <linkinjeon@kernel.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org
+Cc: Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+ Steve French <stfrench@microsoft.com>, Ronnie Sahlberg <lsahlber@redhat.com>,
+ Hyunchul Lee <hyc.lee@gmail.com>, linux-kernel@vger.kernel.org
 Date: Tue, 03 Nov 2026 10:45:19 +0800
-Message-ID: <179367391951.8187.8527449085887136856@stu.pku.edu.cn>
-Subject: [PATCH RESEND] cifs: bound invalid NTLMSSP signature diagnostic
+Message-ID: <179367391951.8187.2063761250230294066@stu.pku.edu.cn>
+Subject: [PATCH v2] ksmbd: require NUL-terminated EA names
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -57,21 +56,21 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-X-HM-Tid: 0aa19f4c15e803a2kunm153cdd6b10a86d
+X-HM-Tid: 0aa19f4c194903a2kunm153cdd6b10a872
 X-HM-MType: 10
 X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaQksfVk1KTh8YTx5OSUwfS1YeHw
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZQkMZVkgdTxlJQx5KQk5LT1YeHw
 	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJT0tCQUMaS0tBSBhKSkEfGRhLQUlOQ0pBQx5BGBpLHUFOQh
 	oZWVdZFhoPEhUdFFlBWU9LSFVKS0hKTE1DVUpLS1VKQktLWQY+
 DKIM-Signature: a=rsa-sha256;
-	b=IjnWpgcuabcnngov4hk4t6QNYu2DdHrh2LiVh/N8+92WBwbfI0Gcsa+9/htYlC3YXvIym1cAAN9xtdL8K/UpJ9V4Ysfa2qJZpswm/+uqbdH86ODJf0rtQG/J+vfT/JgUSAIB/4VZDgm0llsawQn2dpbgId6fI1JBrH7LaFM9HZU=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
-	bh=60sIn705N//4nJlSER2bDtx2BvMPrluJneFVG1+nFIg=;
+	b=cjy4FTONylSIx4uMhfzzjFXxcAxWqBdMUhUqs+j80qD9QD7IGRqMWHmEK193quWLGKBeH1UzFr5BejEu3/0k7XSNjRtIjNwJMQgBslMXKUh/17fE97816ipigXwhniC1RQDLVO88sIt7ZEy6B29CLz/CgXi82+RyzqLQq+DOhqg=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
+	bh=nwlAC0OGiFDOCcl9hz0k9DtD6vLQALBgD/KW414bxrI=;
 	h=date:mime-version:subject:message-id:from;
 
-The NTLMSSP Signature field is an eight-byte binary value and need not be
-NUL-terminated. decode_ntlmssp_challenge() prints it with %s on the
-signature-mismatch path, so the diagnostic can continue beyond the received
-blob until it encounters a zero byte.
+smb2_set_ea() verifies that the byte reserved for the declared EA-name
+terminator lies inside the request, but it does not verify that the byte is
+zero. With SMB debug logging enabled, the name is passed to %s and the
+diagnostic reads beyond the request allocation.
 
 KASAN reports:
 
@@ -80,32 +79,56 @@ KASAN reports:
   string
   vsnprintf
   _printk
-  decode_ntlmssp_challenge
+  smb2_set_ea
+  smb2_set_info
 
-Print the fixed-width field with the bounded hexadecimal format.
+Reject an EA entry whose declared terminator byte is nonzero. Return
+-EBADMSG for the malformed buffer, and map that error to
+STATUS_EA_LIST_INCONSISTENT for both SET_INFO and CREATE.
 
-The patched kernel reaches the invalid-signature path and returns -EINVAL
-without a KASAN report.
-
-Fixes: 0b3cc858003b ("[CIFS] NTLMSSP reenabled after move from connect.c to sess.c")
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
 Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
 ---
- fs/smb/client/sess.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v2:
+- Return -EBADMSG for the malformed EA name terminator.
+- Map -EBADMSG to STATUS_EA_LIST_INCONSISTENT in SET_INFO and CREATE.
 
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index c1fc90726e2d1..00c9c99c6701a 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -666,7 +666,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 	}
+ fs/smb/server/smb2pdu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index be226664b8afc..c0be3265246dd 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3454,6 +3454,11 @@ static int smb2_set_ea(struct smb2_ea_info *eabuf, unsigned int buf_len,
+ 		if (!eabuf->EaNameLength)
+ 			goto next;
  
- 	if (memcmp(pblob->Signature, "NTLMSSP", 8)) {
--		cifs_dbg(VFS, "blob signature incorrect %s\n",
-+		cifs_dbg(VFS, "blob signature incorrect %8phN\n",
- 			 pblob->Signature);
- 		return -EINVAL;
++		if (eabuf->name[eabuf->EaNameLength]) {
++			rc = -EBADMSG;
++			break;
++		}
++
+ 		ksmbd_debug(SMB,
+ 			    "name : <%s>, name_len : %u, value_len : %u, next : %u\n",
+ 			    eabuf->name, eabuf->EaNameLength,
+@@ -5606,6 +5611,8 @@ int smb2_open(struct ksmbd_work *work)
+ 	if (rc) {
+ 		if (rc == -EINVAL)
+ 			rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++		else if (rc == -EBADMSG)
++			rsp->hdr.Status = STATUS_EA_LIST_INCONSISTENT;
+ 		else if (rc == -EOPNOTSUPP)
+ 			rsp->hdr.Status = STATUS_NOT_SUPPORTED;
+ 		else if ((rc == -EACCES || rc == -ESTALE || rc == -EXDEV) &&
+@@ -9304,6 +9311,8 @@ int smb2_set_info(struct ksmbd_work *work)
  	}
+ 	else if (rc == -EINVAL)
+ 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
++	else if (rc == -EBADMSG)
++		rsp->hdr.Status = STATUS_EA_LIST_INCONSISTENT;
+ 	else if (rc == -EMSGSIZE)
+ 		rsp->hdr.Status = STATUS_INFO_LENGTH_MISMATCH;
+ 	else if (rc == -ENOSPC || rc == -EFBIG)
 -- 
 2.39.5 (Apple Git-154)
