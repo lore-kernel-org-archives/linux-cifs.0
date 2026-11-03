@@ -1,55 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=101.71.155.101
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793663654;
-	b=C+jXcqdKqZ6uHZOaqvJULrKYcGrcD6QHBZijSed3lG5PA62x7JUdf5bFEXNs99UdDPtf
-	 ua2M8j2g8MedQ7Bjfvxz/tZn7GZUkQkcwUrgu6k7BYbXMkHeqKCXiyLsjIS8WipTL9B4t
-	 r0YNRV2L/AAJR9ewH69Gzf6zVsGquMwV0xE3qGemv9yDijPNAgFRtFCJ3aHOPcGofRF+x
-	 BcqtXWI4apqARZZods3bnogPV97qOX4XZyUKOYxf3xsDPLBkvoXJPnfQqZqyygLJnodF+
-	 coC1hOdYXjlKmUd41MxgGPZeyHukj9KR1QQJ24dnfE7Z9LzieuGOU4UDVtHez6XSYFQ==
+	t=1793673936;
+	b=WGrQT9NeE81kDRnduAObMm8avfUieVLkQNEH0aNXg0nlib8umZiOik4THG5p71gRPeZ3
+	 Uqw6wyUhOWVwN3TY5A/wbQGUamHsqFWplT8SBSsKQx7A6SQwd7qqOHHM8QGjxxOMFHECf
+	 bOQzoZpKUDxqsZMcvJQqtu+RhrRi/pinAvmPw8KMmRpLmju6VIqlEi7Scw3Fylxe6mp8w
+	 wZO6wnotiv3aH17orhmKfmeNh0qcD2lh5vl93H3+atKmNffKg/ADH/InVKTp81fpS9MKw
+	 stYOP0mClY7m2qLwe2+rVaxl63qZxJ6ep8LH+J9bG05Gu+7xkB+44MsIUaV8Q1m2DWA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793663654;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=+UqSyir9zlJtTj6oGLIp9AFPvgL5F/23wHoJo5ierls=;
-	b=fah6ZDW7C0+pPDlhP+rLdKAk9KXjRUOtCK2/tKiJXo4CLRCmuPv+OHb2j+9pyyRb2AQ1
-	 VXbNVc1+CRNM0/LoYXsCT2PDYN0FX6O3E+kdYAsfhdMpMlh/253V8Blon1PyQ7uuKC9Qo
-	 Nj7moVEfYLbTIo8vUOqB7QmTAjzAaOvzKLtRwrpGLZByAFX6bySVI5pb5CgglaDRqk/9i
-	 g6fNtCxKIUV9kc5PYHxNw4O8Y9LyTDxS+4wOvODK4AiV4E2PVFcS5vWP+aXTHXMDJSuLx
-	 m+t1DzecGcGxFimN3MvqKV1a7HgduDiFjPixG5pWAjXi2T7Zt/h9OZC1D9z4RAi92eQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793673936;
+	h=DMARC-Filter:Received:From:To:Cc:Date:Message-ID:Subject:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version:X-HM-Tid:
+	 X-HM-MType:X-HM-Spam-Status:DKIM-Signature;
+	bh=60sIn705N//4nJlSER2bDtx2BvMPrluJneFVG1+nFIg=;
+	b=ZmmfQ/X3F0Tn3IwEt7kBmm97VyGYlA2wwmY72/t4tXNP+AtbYVcsXHJPPdTylyI0aZfG
+	 zm50fqd/nfM6wYXR0G3RhB4kl/HIyD51Yp9t750LdYjNYwR94mYQvHyyLe1P2DVzKtMj0
+	 XmIJ/Lknt0v0s5bdvRtDHwnaeFRmcjd90yi4TNsPiEMglfMA5bBPPB9h7urRV61UQruXD
+	 joCD08aq+iZ85px3XtDUNugQ88vxp7NR0yx64m7pokfaT8jTNh1G8/Qa4JeMWVkKmNv/p
+	 pObckqOaN0pPS0tUJKr7V/PVX0ELUJcDDrI49ZMYSj9bY3PPY6k4vHThKRuKgnszS5A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lChM+1O7;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=stu.pku.edu.cn;
+	spf=pass smtp.mailfrom=stu.pku.edu.cn;
+	dkim=pass header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=IjnWpgcu;
+	arc=none smtp.remote-ip=101.71.155.101
+Received: from mail-m155101.qiye.163.com (mail-m155101.qiye.163.com [101.71.155.101])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4AB606A324
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E583C606D802;
+	Tue,  3 Nov 2026 02:45:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E583C606D802
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=stu.pku.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stu.pku.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lChM+1O7
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97831F00A1B
-	for <linux-cifs@vger.kernel.org>; Mon,  2 Nov 2026 23:54:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793663653;
-	bh=+UqSyir9zlJtTj6oGLIp9AFPvgL5F/23wHoJo5ierls=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=lChM+1O75/pz8GnNKwtFDREVmqSf1W++CekSa/AKO8SYp8u5C8LP6XHWXtNQhSXpK
-	 OPAuJMpsoI7q8iDybVE3Wtsq2BCVgj9UD3lSCNHejpt6cq14FrMn8ubIo73ywKi/D5
-	 AIwe5gQjpMbRaD5BLymxg9eYp66tauf1xL0EMdZtE1NpTBQlx76mUwqd9DpLbNpIJi
-	 cjCv3OdG8Z4GWb1FfApBrXnVV/Rj9OI6LCR9ji87+hjTolIbQkzjEYgyTvGp/uPRkS
-	 fGKxqDXuv7RzRC1VQwsMzrYulUDTuwA8ceENOkGwUNW7Aikjm1brN3xI+dmtUnE9LM
-	 WseOHDO/zV4Eg==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c43373ae89aso542778966b.3
-        for <linux-cifs@vger.kernel.org>; Mon, 02 Nov 2026 15:54:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBxhZ+24ItzD5bIS6+hJSUUM+7hcxtUycIktSrjbOcBqIZAsbwDnAZiYiQZzQaBCKEbCw6KXK9xNVPfr@vger.kernel.org
-X-Gm-Message-State: APuU4Z/0Y59LovXf2pDBJgpfS4J81lgWsu9h4manhqwrixOBFRlsOZPU
-	fqZ9x42vb8Vv3AFVjepd8AgsAjtwgqHjYQmR3Dq2uoILC8UJFSYo9m/Hfg3kqQFEdBX7sjzM5nS
-	jTg063f+jFvE6B4s9rKs+4BP1gph6bBw=
-X-Received: by 2002:a17:907:18c3:b0:c26:22ae:b66b with SMTP id
- a640c23a62f3a-c4ca7aee966mr947443066b.15.1793663652482; Mon, 02 Nov 2026
- 15:54:12 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=stu.pku.edu.cn header.i=@stu.pku.edu.cn header.a=rsa-sha256 header.s=default header.b=IjnWpgcu
+Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa (unknown [IPV6:2409:8a00:3c11:dbc0:2581:8e:ca0f:59ab])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 534316a43;
+	Tue, 3 Nov 2026 10:45:26 +0800 (GMT+08:00)
+From: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+To: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>, Steve French <sfrench@us.ibm.com>,
+ samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Date: Tue, 03 Nov 2026 10:45:19 +0800
+Message-ID: <179367391951.8187.8527449085887136856@stu.pku.edu.cn>
+Subject: [PATCH RESEND] cifs: bound invalid NTLMSSP signature diagnostic
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,52 +57,55 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <179362071771.29269.6848836845989806334@stu.pku.edu.cn>
-In-Reply-To: <179362071771.29269.6848836845989806334@stu.pku.edu.cn>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 3 Nov 2026 08:53:59 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9G9VKLYzsKMqS87yj0KLxSjis-8iAAegnPdDzdpv=vGw@mail.gmail.com>
-X-Gm-Features: AclHuK_ZiPl_8EII_1_G4Hx1xfHmBmUEZKMwbV1xvMdMI83u3u7g6JkbLF7jK5g
-Message-ID: <CAKYAXd9G9VKLYzsKMqS87yj0KLxSjis-8iAAegnPdDzdpv=vGw@mail.gmail.com>
-Subject: Re: [PATCH] cifs: bound invalid NTLMSSP signature diagnostic
-To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Cc: Paulo Alcantara <pc@manguebit.org>, linux-cifs@vger.kernel.org, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Steve French <sfrench@us.ibm.com>, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-HM-Tid: 0aa19f4c15e803a2kunm153cdd6b10a86d
+X-HM-MType: 10
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkaQksfVk1KTh8YTx5OSUwfS1YeHw
+	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJT0tCQUMaS0tBSBhKSkEfGRhLQUlOQ0pBQx5BGBpLHUFOQh
+	oZWVdZFhoPEhUdFFlBWU9LSFVKS0hKTE1DVUpLS1VKQktLWQY+
+DKIM-Signature: a=rsa-sha256;
+	b=IjnWpgcuabcnngov4hk4t6QNYu2DdHrh2LiVh/N8+92WBwbfI0Gcsa+9/htYlC3YXvIym1cAAN9xtdL8K/UpJ9V4Ysfa2qJZpswm/+uqbdH86ODJf0rtQG/J+vfT/JgUSAIB/4VZDgm0llsawQn2dpbgId6fI1JBrH7LaFM9HZU=; s=default; c=relaxed/relaxed; d=stu.pku.edu.cn; v=1;
+	bh=60sIn705N//4nJlSER2bDtx2BvMPrluJneFVG1+nFIg=;
+	h=date:mime-version:subject:message-id:from;
 
-On Mon, Nov 2, 2026 at 8:58=E2=80=AFPM Yifan Zhang <yfzhang23@stu.pku.edu.c=
-n> wrote:
->
-> The NTLMSSP Signature field is an eight-byte binary value and need not be
-> NUL-terminated.  decode_ntlmssp_challenge() prints it with %s on the
-> signature-mismatch path, so the diagnostic can continue beyond the receiv=
-ed
-> blob until it encounters a zero byte.
->
-> KASAN reports:
->
->   BUG: KASAN: slab-out-of-bounds in string
->   Read of size 1
->   string
->   vsnprintf
->   _printk
->   decode_ntlmssp_challenge
->
-> Print the fixed-width field with the bounded hexadecimal format.
->
-> The patched kernel reaches the invalid-signature path and returns -EINVAL
-> without a KASAN report.
->
-> Fixes: 0b3cc858003b ("[CIFS] NTLMSSP reenabled after move from connect.c =
-to sess.c")
-> Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+The NTLMSSP Signature field is an eight-byte binary value and need not be
+NUL-terminated. decode_ntlmssp_challenge() prints it with %s on the
+signature-mismatch path, so the diagnostic can continue beyond the received
+blob until it encounters a zero byte.
 
+KASAN reports:
+
+  BUG: KASAN: slab-out-of-bounds in string
+  Read of size 1
+  string
+  vsnprintf
+  _printk
+  decode_ntlmssp_challenge
+
+Print the fixed-width field with the bounded hexadecimal format.
+
+The patched kernel reaches the invalid-signature path and returns -EINVAL
+without a KASAN report.
+
+Fixes: 0b3cc858003b ("[CIFS] NTLMSSP reenabled after move from connect.c to sess.c")
 Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+---
+ fs/smb/client/sess.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The patch is quoted-printable encoded, so we can not apply it.
-Please send it as plain text, preferably using git send-email.
-Thanks.
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index c1fc90726e2d1..00c9c99c6701a 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -666,7 +666,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 	}
+ 
+ 	if (memcmp(pblob->Signature, "NTLMSSP", 8)) {
+-		cifs_dbg(VFS, "blob signature incorrect %s\n",
++		cifs_dbg(VFS, "blob signature incorrect %8phN\n",
+ 			 pblob->Signature);
+ 		return -EINVAL;
+ 	}
+-- 
+2.39.5 (Apple Git-154)
