@@ -1,90 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793728675;
-	b=p//5TT53xcWu9xGz+aN4TJuxBnobruKi2sgX6GZ4QgnBeQIQ/jdE+DYlN3UOfXR4sEmz
-	 QndXEmB9AVUZodT3ykxsx4AJKrek7lyzKz2BVDv3kxfbPaP1GzbVDCDpwF7tHsEFQxkJl
-	 qasUz6F7/2E2hNL1s3bE5bqRlXEGPxEOEmffaMl+eoW3m0bwT4JrkpJpNPFSIcUisHunB
-	 MLlRErKbMk1PqPv1KlLobMUyY+GqAzmRhkepwXGPtwrQLXgh0P1QtFfB9G+Q5orP114dA
-	 nE+QaFM33pZg0niE8a/Rzyh2KnenKs405lJj4MtbsllDjNcw+i6OUhYbUJQE3UPO48A==
+	t=1793728987;
+	b=QTXwxM1a6wwj1GyubKXM5sKauOx88JOK/wpJtzuRDiyzTEo4FuoK5fZRkRpUA2BARVgL
+	 84rdECeGOZ2EEL2dlqK1SEa7nZtUpqiKUywN8Kw/Q1hYNXSD1EiEzniB1BLT/uHodzMRx
+	 1r1h+9nvnxuwqYn/V1NoxckR53lXCQ1P4GtNRUZjVkCzZzUjOKYgleXHlwnyEPF3pkrYs
+	 2Ocnr44DY0fFhfmyxItu5B/o42uLmUFmzuxm+t0e41kFqZWjUezqUWQSPcqo6IlRsvwIl
+	 LVdbj7uOcF9YZTtCC/xXY/bqFj0FFdjNhKOFNw4m6GAQ6DXaISmbsdcuSlFt4O+vRGA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793728675;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:X-Google-Original-From:Content-Type:Mime-Version:Subject:
-	 In-Reply-To:Date:Cc:Content-Transfer-Encoding:Message-Id:References:
-	 To:X-Mailer;
-	bh=UfwhB7d+jFnDzhdQ9SOzdeKuF6qBwoZCWzda5GUg2nE=;
-	b=cWuvOQvfIZxbeZRFli/ITfStHXSyw6TWCnb4vXOa2BmpRUk1EkSCFrH3euWZr8nmYaCy
-	 Tr6HTbbC5fb7Kv5m0L5xGbuc8NZohLQ629G78Si4UaOWx+ZeoATLsY0st/Bz0Jp6c/JJO
-	 51xhQSue2qi6dqDCDu0kT+hPPePgEZsQ3qqMSfxRmVPLmogBjIj2viOTAfTyP2SkgALMb
-	 jT5dW39PGZwfhy6bp1wG11d656uHtLUvDY7MTM+KIZLyoBiCf7xA35+TVDMOWpX9GcFue
-	 pS3cbM1aVzaV+ICVgJgXqNcOrfjJE3EBwJBvo/HpL40z2nHA4tVO3eMWDQuRSpP7LzA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793728987;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=4f85V0aQrpRfdf6LMEERAWjiP2DLl6H3RfYT4M5DLpo=;
+	b=ziXEWUEk0Q9AOvawvrATHD0qX1vVgCgDQujSK3KWGarDoexGihQ4W5AHCCDPgFTtQi2K
+	 Qf1U47UyK5GEN14Pv5SP6kIyAV+cby3xxP/NWF+feV4Vsbv3fiMjxdQd9uuw8LPcMJM1G
+	 LMAP6g3c8L6SnKWxDMoSdLM8v2RemKT3595dNyoajrrG05ynF6vUSasqIzig+LVEYo9lu
+	 ElrrwTQAZPbM2X4SbvD+TxHFjqwgpnTFqSXr+hNSYHnVmGETCTMbmoCjkgFY8413KbU8W
+	 fkv22TKqA5eOPDpmg7yLmIk9feiaQkIf5SMcrOYo+WdGypO4kOBzxhGbqBJEjMcnBmA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cjtWqbY6;
-	arc=none smtp.remote-ip=209.85.208.45
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=LBgg96ll;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55329606A32C
-	for <linux-cifs@vger.kernel.org>; Tue,  3 Nov 2026 17:57:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 55329606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFA7606A32F;
+	Tue,  3 Nov 2026 18:03:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8CFA7606A32F
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cjtWqbY6
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6b1b13e09ffso6121800a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Nov 2026 09:57:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1793728674; x=1794333474; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:subject:mime-version:content-type:from:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=UfwhB7d+jFnDzhdQ9SOzdeKuF6qBwoZCWzda5GUg2nE=;
-        b=cjtWqbY65Y+iH0vqgkNLVug1GFzj3TX0gT7jH0epqHI9kDWRFlLHgr6kPgPQPmZru7
-         QJQbLzcYLwYhQmz9a7Hg+QQtQXq3fdoOvmdePefUk5PxZs3Dg0GuzvKmpFWUTgSsde9m
-         pbEjN+yejVAQz9/tRmJH67kU7Bx1Gd91QHYqTXCOge5KW/cBIEpSEhcJNWX7ndLSMTHF
-         7/Nk+4SwtYAy29HKcAii25DzO7aduSeFGfsy+2XxUh6JdKwSSbqLqyzm4amhR6IQ3pze
-         7Jj9uGJ7KM2m9sd5irxZvhNh7RgoLUzjjlCvyPRxJOhgYIBRLcVb7wCpxuulFlhq8Tug
-         cwMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1793728674; x=1794333474;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:subject:mime-version:content-type:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=UfwhB7d+jFnDzhdQ9SOzdeKuF6qBwoZCWzda5GUg2nE=;
-        b=NBxdpsQyari8wNZa4OLwbrJsl/nakRZKZDOoEWA52zmVUkWh9SVJ9HrTkExPL44gjb
-         eq6CNyP/dH7FTX+MrhYEedNekdIZzJ3B2hRh0GtXp5EnK/muHJron+2DlTDSw5DLzOwZ
-         izSb//RKFlllEda1rfZwdjYSNKdmGdBjHQeFvVGoRKLC9Fu43GAvQwX3JDbfrmGbgWs2
-         4qXvMDLXuleCvOSajjXnudBBGMyBTvp1VK2eV41MvDU6RrPwSqLr117qN+ibneomBk/9
-         rFVDL1fvd+zFyhcOWmLBAUCN7wR0NiGeZ/Gqdl7u09W1TJXrFMY95J0Eb8bVdgwhVoK+
-         HTxQ==
-X-Forwarded-Encrypted: i=1; AKwUvByvhcLiH3a23dxhE2+S1KP5DMohYPi6o1MukRkyF7Syge7t055vIe5RhVfKKf2AQK29Gz+tpyTQH1yo@vger.kernel.org
-X-Gm-Message-State: APuU4Z88x/+wFh9jRepNukYBym4TnSz0tdRY51FamIKH9vHNSDImACE1
-	EORLHgjUEG6NOAYUYycoIajQyrpU3J29VaCkyluH/aq2ROikmw2mmlu3
-X-Gm-Gg: AYBFou1AjTF5Q7uiLMBcnxz3Hz7JjjSsWuRcZJdlM+RpwN7e9bCeHryijOrJVmqgaHn
-	KSUh8Ic6XFa+cQkPW50+FWMHyN7i2SIv0Tf0roKm/mi2GJvZi3fA0UAvfI9hkppmryu2QUgAZzQ
-	GnCN6XfGb09ZzXovQfckXRT/uajhgQOYJGCtyOPx0BjXZDpIMSNYmCj9UvPLGtgywUn32rZGIN/
-	vbs8KY3uVs7rnSP+nPrWdSsV6fihPwUWbfgsrF+UPfg1KNfoMtnXQa3nexQzHmpSpDbpGK3v8FG
-	z01/GrLDOdKtnRsSUJjV8f4ri0WdA1wM0kFKMlA52AgOzzLXTWLtddjmCnUTLsCIGSqK99c5tbg
-	NuRoT6Uzn4KHk/BhBLjpCoH7mlIWhGAz3xxsRgB0m3usO78oh85yVkf4MxhcdWoW+GQFVy1M8We
-	ZfqcUJE7fTMSdmkLCu8imN/z1Lut3/19ne+kIft1KWE28m19i9Gvj7lpvGn+EzQUBGAI/CRKqlZ
-	2az/X7Z6sYPlG2LxDmlfaqRBqHCwzhZ7226K3qnAx3JY2B3/5IanLeb4I25mjW6eVvHDltWJvsT
-	CNQPtbPEJvkVQnETQ+vapp0Sp6yjqJv3d1XHB9wY+yZQt17d1kQm+OflwOUS94g0/a4oAoIEsst
-	DlKFP4AfglTpbBAucKSLAtUya+XmqXWI0OGziIU70rrLxhOyi
-X-Received: by 2002:aa7:d888:0:b0:6b4:201f:17e3 with SMTP id 4fb4d7f45d1cf-6b4d46766ccmr6791930a12.16.1793728673607;
-        Tue, 03 Nov 2026 09:57:53 -0800 (PST)
-Received: from smtpclient.apple (ip-80-113-116-3.ip.prioritytelecom.net. [80.113.116.3])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6b4ec9eeb26sm4301629a12.9.2026.11.03.09.57.52
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 03 Nov 2026 09:57:52 -0800 (PST)
-From: mixalhs <mike.michalo@gmail.com>
-X-Google-Original-From: mixalhs <Mike.michalo@gmail.com>
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=LBgg96ll
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=4f85V0aQrpRfdf6LMEERAWjiP2DLl6H3RfYT4M5DLpo=; b=LBgg96llYX/6WHicasqGq9V/+N
+	SzA8HQIduP1TJXWNZA/yeq1xFvISOM1geYuQDShrOpJw+eFsNqi/0D+8S3+Ds4u0gXVvF/uG9cZcD
+	jpx6jGmtOnS8BGOfw0IkQqqiw1jqkNmmQjAIQnblDKFWF3PqTflbr9hbwu5DGNsr8lJnEeVgTDIFw
+	pfXtAqStjlJjzA9I8NTX0jMQRFADOVpmek4REqkodgxYIOMvnXZAtepilRiBYgEF7RJ2yuX/z6iZ0
+	wS2mP4XaG2sgoVchHverxdGCdX4dffQEJ/brGS9mzsBAHwffW4nSsn0zoU5PGiUfYU3XEs2QHK7oA
+	KyhhMh1g==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xOIqX-00000000iuk-0sqE;
+	Tue, 03 Nov 2026 15:02:58 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	David Howells <dhowells@redhat.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Christian Brauner <brauner@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 07/16] smb: client: don't block dying tasks waiting for writeback on close
+Date: Tue,  3 Nov 2026 15:02:46 -0300
+Message-ID: <20261103180255.1482516-8-pc@manguebit.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261103180255.1482516-1-pc@manguebit.org>
+References: <20261103180255.1482516-1-pc@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -93,40 +71,80 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.700.51.1.1\))
-Subject: Re: [PATCH 2/2] ksmbd: add AES-GMAC signing support
-In-Reply-To: <20261103171742.18816-1-icb@fastmail.org>
-Date: Tue, 3 Nov 2026 18:57:41 +0100
-Cc: linkinjeon@kernel.org,
- senozhatsky@chromium.org,
- tom@talpey.com,
- chenxiaosong@chenxiaosong.com,
- ematsumiya@suse.de,
- linux-cifs@vger.kernel.org,
- linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A37137ED-872A-4969-A1BD-C23E9B523EDD@gmail.com>
-References: <20261103111453.84804-1-mike.michalo@gmail.com>
- <20261103111453.84804-3-mike.michalo@gmail.com>
- <20261103171742.18816-1-icb@fastmail.org>
-To: Ian Bridges <icb@fastmail.org>
-X-Mailer: Apple Mail (2.3864.700.51.1.1)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Ian,
-Thank you for the careful analysis and the reproducer.=20
+cifs_flush() waits uninterruptibly for the writeback it starts.  A task
+that gets killed while closing a file on a hard mount with an
+unresponsive server is stuck in D state until the server comes back.  It
+also consumes any writeback error for a caller that is about to exit,
+hiding it from everyone else.
 
-You=E2=80=99re right: in the multichannel branch of smb2_sess_setup() =
-the binding=20
-request is never verified with Session.SigningKey, and with AES-GMAC t
-hat turns the existing signing oracle into nonce reuse.
-Namjae, please don=E2=80=99t apply this version. I was unaware of this.
-I=E2=80=99ll send a v2 that first verifies binding requests with the =
-session signing=20
-key before they are processed or any response is signed with it, and=20
-check whether legitimate binding can also reuse a nonce under=20
-the session key.
-Thanks,
+Wait killably instead.  If the closer gets killed, stop waiting and leave
+the error bits in the mapping for others to see; writeback already in
+flight completes on its own.
 
-Michalis
+This is also needed before letting dying tasks issue their writes from a
+worker, which would otherwise make them wait for every one of them.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: stable@vger.kernel.org
+---
+ fs/smb/client/file.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
+
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 6744b3e2b2cc..6a1711bf89d4 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -3035,17 +3035,43 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ 	return rc;
+ }
+ 
++static int cifs_wait_writeback_killable(struct address_space *mapping)
++{
++	struct folio_batch fbatch;
++	pgoff_t index = 0;
++	int rc = 0;
++
++	folio_batch_init(&fbatch);
++	while (!rc &&
++	       filemap_get_folios_tag(mapping, &index, (pgoff_t)-1,
++				      PAGECACHE_TAG_WRITEBACK, &fbatch)) {
++		for (unsigned int i = 0;
++		     !rc && i < folio_batch_count(&fbatch); i++)
++			rc = folio_wait_writeback_killable(fbatch.folios[i]);
++		folio_batch_release(&fbatch);
++		cond_resched();
++	}
++	return rc;
++}
++
+ /*
+  * As file closes, flush all cached write data for this inode checking
+  * for write behind errors.
+  */
+ int cifs_flush(struct file *file, fl_owner_t id)
+ {
++	struct address_space *mapping = file->f_mapping;
+ 	struct inode *inode = file_inode(file);
+-	int rc = 0;
++	int rc = 0, rc2;
+ 
+-	if (file->f_mode & FMODE_WRITE)
+-		rc = filemap_write_and_wait(inode->i_mapping);
++	if (file->f_mode & FMODE_WRITE) {
++		rc = filemap_fdatawrite(mapping);
++		if (cifs_wait_writeback_killable(mapping))
++			return 0;
++		rc2 = filemap_check_errors(mapping);
++		if (!rc)
++			rc = rc2;
++	}
+ 
+ 	cifs_dbg(FYI, "Flush inode %p file %p rc %d\n", inode, file, rc);
+ 	if (rc) {
+-- 
+2.56.0
 
