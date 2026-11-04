@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793827703;
-	b=hePWgD3IifFKLP+G+9cU4eHtTRgZzeHfK8g4jdkFcD2ZZpyQX5Ltekku3YB0P173jXHI
-	 suu8yexNf1lcyk2ItRKrxeBn9GwBsejG/fKyC1zZp9FfW46CpdoJnGV67fOxwr9hpkG2F
-	 GEY1FaOZnAeRogE8xi3bg2u3ua+ejW1HNgc07jwCmVR2EObBmxnkZTgE1ep+88YfcBEdg
-	 xu3+hZoRCFWNHBSW00bNx/RP9giD36uEoGuwH74nBA1S8JehcwTjjF/FAu36cAsi6HUnV
-	 7p7nqRcS6KEsP6w2vlJEpPqF0pwGaHszk+L6TK6TJtC04aZJn8/l9JQcKEeYQ2uNj0g==
+	b=Rx1bzJ3rhR65hlsUmsK6DO+e9wmSq5kOQceVsGpzmD5lpiq1LWW7H1vn/6qdFNBp2vXM
+	 WEO9xe+TSM9GRc0N9pOBpWNhU9WaTI1rA1ZbuIy2ju2Tcdls4XllX1MgsQJFRHjDE+YOW
+	 B1sgUsjLDaRGPPHR4lvUY01iMQpoQUIhGxDcmlLPFl3ecYhhAgsjOn3wLRnyti+kcNOjI
+	 dSww/YwHd2r6p5PqRmIgAJ44bb3PbeT/Y5iXCQV8y2115GhGbIod/umJWSs4X5L+3SDLc
+	 O5RhBoFV+QJmD2tFFGP9kUwHmJ0634hxxEPngFieDZzq5Pm1SEvqq2TjpwkyA8I/1Iw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793827703;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=NexmRAmgux6QUoRdqHZW15zeGFrO/uJtqdA//AeYvaE=;
-	b=G4zILhU23txEcaZEuGSu4tNnXcYVGeJvrVkYbV23PuQsxJNRIlr00rePH+GArU1Rvieb
-	 RYN1ENYUVBr8IiF/veiaYJS9CfJhVcfOA7AT66vKSE6sg70tfE8jciMmB9dXrn/Zh6PL5
-	 XhuIG97mBXVSZlprLI9dpGVpi4Bv7kDyoiz/4Sg/4c7hu3CQALAJPVuHPwHKEVZzZC8wO
-	 ljS7ahUZkK0YHwkqBRne2lRPb59Fy2wrV5lqYSP7XYdFd6UksL2NTXoYYRsrJUV8pwJ7+
-	 zzfL1JZBx5jWgiaJizHRgNLJHOY2vSRiyB4lFvzrrJ7XT4GjTMaO7/+jASvBo8tzY5Q==
+	bh=86Puqo14GUvykkFIIhNOK9+1OUPeTJlYvOahdnnC/zs=;
+	b=LFlX6KLiC/+icHe+a9lUJU/zJGAeeXBOyn9Zmq9ENCpTBhbJr+shRADaWunQz7GsoOku
+	 01pJeevsofV1ugSuMXdV5Q5Kc9NjyB4JsQPNxI5BHjnTQpwyGgPmMjzncJFea943CsJPj
+	 sdffBcyln+k+dFSiShKTR54d2yZR/LNh5an4zCsk6FWZzh0e+0eaWvr6l2lJca6tW8YH8
+	 /SyDQocd+ABLU2jZRFyPHUXPhQNbEiAs9ZfkB9GuszGzkoIgF9T5xPn9F8fmg0GWT3Hsr
+	 XDEzBQl73k3SZfTJBB3dFRNN9dO+8Dh0s0KbNOWlaLjUfokNpIZpDOrVXf6v5pSM6ig==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=7ybvcwfV;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=NOrmRrls;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E75F606CA33;
-	Wed,  4 Nov 2026 21:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5E75F606CA33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB97606C910;
+	Wed,  4 Nov 2026 21:28:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3BB97606C910
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=7ybvcwfV
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=NOrmRrls
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=NexmRAmgux6QUoRdqHZW15zeGFrO/uJtqdA//AeYvaE=; b=7ybvcwfVLw/tt4RT9cfCAZ+qkW
-	lKijTsHztRcadN7yaWS+vyoibPCZsdeL4EV+JztBrYscaUdLHnDQYvH8pOjGpVhGkxjt7GK3AbZra
-	+QpuAMJq2zBn/G45LTzQW80i+SvjGEvAPOTYC6lVVT/BAHbyquLxcQ51BR1UWHZ6ETIdojkFujKjH
-	LD7dzyRfX8/+t38euVOWwY++zYVvvRs++3+Mj8+CeXeuWhoZEa7MYIN/lN8VIkUeTO+m31rfngamH
-	0ixl1c0D+u9mudgb9LTwDHfvJ5U1jsFTqvfyNfO1hS6UCywUIA6lIdTmJFkNsfXGw5+4df5IGbIMf
-	FZJfPAfA==;
+	bh=86Puqo14GUvykkFIIhNOK9+1OUPeTJlYvOahdnnC/zs=; b=NOrmRrlsC3aOpBTUHF9KdGVW9C
+	dxrsmidzmlb/J08lpsPC7Ujt2at+sUsvxFOWD+krMiGRBPX/hc9Re0AtCWjGeApHZcydBb2Ch6VN5
+	7Qeri+uFKVasWCTuK5y/2DvkZ2o0GcvUaKYbYxJ7U60OusfUX81dnhM9rozmLgxt8j/KrTlVwKj+m
+	bMlw86FDFjfDgLQgbSEkkYK1ZAvkroC+KJzeupNtNj4i1UVzu4c+1zLm15bIq1hT7glWXGU14Xoie
+	3rgAfE7DOG6Sx3wDLvvpAHY2wdHlowDqwvn8+U+A7cX8eB6xUu4XOqV5nkYfCifX2EUhodF2WJKAD
+	hWa5h3NQ==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xOiWk-00000000rIE-0rEg;
-	Wed, 04 Nov 2026 18:28:15 -0300
+	id 1xOiWl-00000000rIv-0skD;
+	Wed, 04 Nov 2026 18:28:16 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v4 13/17] smb: client: retry writeback after losing the connection, share or handle
-Date: Wed,  4 Nov 2026 18:28:06 -0300
-Message-ID: <20261104212810.1935575-14-pc@manguebit.org>
+Subject: [PATCH v4 16/17] smb: client: fail writeback sends and reopens fast when the server is gone
+Date: Wed,  4 Nov 2026 18:28:09 -0300
+Message-ID: <20261104212810.1935575-17-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261104212810.1935575-1-pc@manguebit.org>
 References: <20261104212810.1935575-1-pc@manguebit.org>
@@ -74,412 +74,255 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Writeback still fails, dropping its data, when a write gets back an
-error that only means the client lost track of the server for a while:
+A writeback whose send or handle reopen finds the server needing
+reconnect waits in smb2_reconnect() -> cifs_wait_for_server_reconnect()
+for the reconnect to finish - on a hard mount until the server returns or
+umount -f.  But umount -f only breaks that wait for a request that entered
+it before the abort count was bumped; a send or reopen that enters
+afterwards, including the writeback that generic_shutdown_super() ->
+sync_filesystem() starts during the unmount itself, snapshots the
+already-bumped count and waits forever, hanging the unmount.
 
- - -EHOSTDOWN from smb2_reconnect() when a soft mount's server stays
-   unreachable for longer than the reconnect wait, or from
-   STATUS_HOST_UNREACHABLE,
- - -EREMCHG from STATUS_NETWORK_NAME_DELETED, for which the receive path
-   already marks the tcon for reconnect,
- - -EBADF from STATUS_FILE_CLOSED or STATUS_INVALID_HANDLE, e.g. after
-   the server lost a durable handle,
- - -ENETRESET and -ESHUTDOWN from STATUS_CONNECTION_RESET and
-   STATUS_REMOTE_DISCONNECT,
- - any replayable error on SMB1, whose async write never retries them,
-   while it retries writes cut short by a reconnect forever, regardless
-   of soft mounts.
+Issue writeback sends and reopens without waiting for the reconnect: pass
+a nowait flag down to smb2_reconnect() and have it return -EAGAIN from
+every point it would otherwise wait in or loop back to
+cifs_wait_for_server_reconnect() - the initial need-reconnect check, the
+wait itself, a need-reconnect seen after taking the session mutex, and a
+failed renegotiation - not just the first.  The subrequest is then
+retried from the netfs collector, which backs off and re-checks umount -f
+and the retry window before trying again.  Reads, direct writes and every
+other command keep waiting as before.
 
-Reopening the handle needed by a read or write is worse:
-cifs_prepare_write() and cifs_issue_read() retry cifs_reopen_file() only
-on -EAGAIN, with no limit and no delay, and fail on anything else.  A
-server failing the reopen with a status mapped to -EAGAIN, such as
-STATUS_INSUFFICIENT_RESOURCES, makes them spin forever, past umount -f
-and, when netfs retries from a worker, with no signal to stop them,
-while any of the errors above fails writeback right away.
-
-Retry writeback failing with any of these, as already done for
-interrupts and allocation failures, with backoff and giving up on umount
--f.  On -EBADF, have the retry mark the handle invalid, so that it gets
-reopened, unless it got reopened since the write was issued: a late
--EBADF would otherwise get the new handle replaced too, leaving it open
-on the server along with any byte-range locks pushed to it.  Subrequests
-of the same request can fail -EBADF concurrently on different channels,
-so record the bad reopen generation atomically (keeping the newest),
-decide the invalidation under the handle lock, and have a reopen publish
-its new fid before its generation so a -EBADF is attributed to the fid
-that was actually sent.
-
-When writeback finally gives up on any of these errors, record -EIO for
-it instead, so that fsync(2) and close(2) don't return transient or
-internal errors such as -EAGAIN or -ERESTARTSYS.
-
-Retry reopens as the read or write needing them gets retried: as above
-for writeback, otherwise per the hard and retrans mount options on
-replayable errors, with backoff and giving up on umount -f.  If any
-channel of the session got reconnected meanwhile, retry once regardless,
-as the reconnect may be what failed the reopen; the next attempt waits
-for the reconnect to finish.  Never retry reopens on interrupts or once
-the task is dying, so that dying tasks don't spin there; for writeback,
-issue the subrequest without credits instead, as done for dying tasks,
-so that it gets retried from the netfs collector, where no signals are
-pending.
-
-Don't reopen for requests that predate a umount -f either, unless it is
-a first attempt on a connected server, as with issuing them.  Once a
-reopen for writeback gives up, have the other subrequests of the
-request try only once, rather than each waiting out a retry window of
-its own.
-
-Reopen handles for reads in prepare, before acquiring credits, as
-already done for writes, so that reads don't hold credits across a
-reopen.  If the handle is invalidated again between prepare and issue,
-retry the read so prepare reopens and takes fresh credits, rather than
-reopening at issue time and sending with now-stale ones; and don't
-override the reopen's or the send's decision to stop retrying a read
-that could not be issued.
-
-Fixes: 69c3c023af25 ("cifs: Implement netfslib hooks")
+Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsglob.h |   4 +
- fs/smb/client/cifssmb.c  |   6 +-
- fs/smb/client/file.c     | 192 ++++++++++++++++++++++++++++++++++-----
- 3 files changed, 178 insertions(+), 24 deletions(-)
+ fs/smb/client/cifsglob.h  |  1 +
+ fs/smb/client/cifsproto.h |  3 ++-
+ fs/smb/client/cifssmb.c   |  2 +-
+ fs/smb/client/file.c      |  4 +++
+ fs/smb/client/misc.c      |  7 +++++-
+ fs/smb/client/smb2pdu.c   | 52 ++++++++++++++++++++++++++++++++-------
+ 6 files changed, 57 insertions(+), 12 deletions(-)
 
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 064a2cdab4d9..28b44320f062 100644
+index 65f7a08eb751..0cc43ea48b77 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1458,6 +1458,7 @@ struct cifsFileInfo {
- 	int count;
- 	spinlock_t file_info_lock; /* protects four flag/count fields above */
- 	struct mutex fh_mutex; /* prevents reopen race after dead ses*/
-+	unsigned int reopens;
- 	struct cifs_search_info srch_inf;
- 	struct work_struct oplock_break; /* work for oplock breaks */
- 	struct work_struct put; /* work for the final part of _put */
-@@ -1483,6 +1484,8 @@ struct cifs_io_request {
- 	struct cifsFileInfo		*cfile;
- 	pid_t				pid;
- 	int				umount_aborts;
-+	bool				reopen_gave_up;
-+	atomic_t			bad_reopens;	/* bad reopen generation + 1, 0 = none */
+@@ -1409,6 +1409,7 @@ struct cifs_open_parms {
+ 	bool reconnect:1;
+ 	bool replay:1; /* indicates that this open is for a replay */
+ 	bool no_replay:1; /* don't replay this open internally */
++	bool no_reconnect_wait:1; /* fail fast, don't wait for reconnect */
+ 	struct kvec *ea_cctx;
+ 	__le32 lease_flags;
  };
+diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
+index 8b7914dd13af..935fb31912ac 100644
+--- a/fs/smb/client/cifsproto.h
++++ b/fs/smb/client/cifsproto.h
+@@ -443,7 +443,8 @@ static inline int cifs_create_options(struct cifs_sb_info *cifs_sb, int options)
+ }
  
- /* asynchronous read support */
-@@ -1497,6 +1500,7 @@ struct cifs_io_subrequest {
- 	int				result;
- 	bool				have_xid;
- 	bool				replay;
-+	unsigned int			reopens;
- 	unsigned int			retries;	/* number of retries so far */
- 	unsigned int			cur_sleep;	/* time to sleep before replay */
- 	unsigned long			retry_deadline;
+ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server,
+-				   struct cifs_tcon *tcon, int aborts);
++				   struct cifs_tcon *tcon, int aborts,
++				   bool nowait);
+ 
+ static inline void cifs_put_smb_ses(struct cifs_ses *ses)
+ {
 diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index 2936b38de98f..fcf97b3d6bea 100644
+index 712086eb3d1f..68f05a52605f 100644
 --- a/fs/smb/client/cifssmb.c
 +++ b/fs/smb/client/cifssmb.c
-@@ -1939,12 +1939,14 @@ cifs_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
- 		break;
- 	case MID_REQUEST_SUBMITTED:
- 		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_req_submitted);
--		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-+		if (wdata->rreq->origin != NETFS_WRITEBACK)
-+			__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 		result = -EAGAIN;
- 		break;
- 	case MID_RETRY_NEEDED:
- 		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_retry_needed);
--		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
-+		if (wdata->rreq->origin != NETFS_WRITEBACK)
-+			__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 		result = -EAGAIN;
- 		break;
- 	case MID_RESPONSE_MALFORMED:
+@@ -105,7 +105,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
+ 	spin_unlock(&tcon->tc_lock);
+ 
+ again:
+-	rc = cifs_wait_for_server_reconnect(server, tcon, aborts);
++	rc = cifs_wait_for_server_reconnect(server, tcon, aborts, false);
+ 	if (rc)
+ 		return rc;
+ 
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 0a9b241dce40..9e14c764fb61 100644
+index 724523c0cb4a..ad7ff7d2fdda 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -90,12 +90,134 @@ static bool cifs_io_aborted(struct cifs_io_subrequest *subreq)
- 	       tcon->need_reconnect;
+@@ -40,6 +40,7 @@
+ /* flags for cifs_reopen_file() */
+ #define CIFS_REOPEN_BOUND	BIT(0)	/* caller bounds the retries */
+ #define CIFS_REOPEN_REPLAY	BIT(1)	/* replay: reuse GUID + REPLAY op */
++#define CIFS_REOPEN_NOWAIT	BIT(2)	/* fail fast, skip reconnect wait */
+ 
+ static int cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush,
+ 			    unsigned int flags);
+@@ -176,6 +177,8 @@ static int cifs_reopen_file_retry(struct cifsFileInfo *cfile, bool can_flush,
+ 			return -EIO;
+ 		if (retrying)
+ 			flags |= CIFS_REOPEN_REPLAY;
++		if (writeback)
++			flags |= CIFS_REOPEN_NOWAIT;
+ 		reconnects = cifs_ses_reconnects(ses);
+ 		rc = cifs_reopen_file(cfile, can_flush, flags);
+ 		retrying = true;
+@@ -1656,6 +1659,7 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush, unsigned int flags)
+ 		.reconnect = true,
+ 		.no_replay = !!(flags & CIFS_REOPEN_BOUND),
+ 		.replay = !!(flags & CIFS_REOPEN_REPLAY),
++		.no_reconnect_wait = !!(flags & CIFS_REOPEN_NOWAIT),
+ 	};
+ 
+ 	/*
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 13eb067ad88a..4a3ecf5c80f7 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -1081,7 +1081,8 @@ static bool reco_wait_done(struct TCP_Server_Info *server,
  }
  
-+static bool cifs_writeback_transient(int rc)
-+{
-+	if (is_replayable_error(rc) || is_interrupt_error(rc))
-+		return true;
-+
-+	switch (rc) {
-+	case -ENOMEM:
-+	case -EHOSTDOWN:
-+	case -ENETRESET:
-+	case -ESHUTDOWN:
-+	case -EREMCHG:
-+	case -EBADF:
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static int cifs_writeback_error(struct netfs_io_subrequest *subreq, int rc)
-+{
-+	if (subreq->rreq->origin == NETFS_WRITEBACK &&
-+	    cifs_writeback_transient(rc))
-+		return -EIO;
-+	return rc;
-+}
-+
- static bool cifs_writeback_dying(struct netfs_io_subrequest *subreq)
+ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server,
+-				   struct cifs_tcon *tcon, int aborts)
++				   struct cifs_tcon *tcon, int aborts,
++				   bool nowait)
  {
- 	return subreq->rreq->origin == NETFS_WRITEBACK &&
- 		fatal_signal_pending(current);
- }
+ 	int timeout = 10;
+ 	int rc;
+@@ -1091,6 +1092,10 @@ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server,
+ 		spin_unlock(&server->srv_lock);
+ 		return 0;
+ 	}
++	if (nowait) {
++		spin_unlock(&server->srv_lock);
++		return -EAGAIN;
++	}
+ 	timeout *= server->nr_targets;
+ 	spin_unlock(&server->srv_lock);
  
-+static unsigned int cifs_ses_reconnects(struct cifs_ses *ses)
-+{
-+	unsigned int n = 0;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index 7240910f60f1..e404351d577c 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -248,7 +248,8 @@ int smb3_update_ses_channels(struct cifs_ses *ses, struct TCP_Server_Info *serve
+ 
+ static int
+ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+-	       struct TCP_Server_Info *server, bool from_reconnect)
++	       struct TCP_Server_Info *server, bool from_reconnect,
++	       bool nowait)
+ {
+ 	struct cifs_ses *ses;
+ 	int aborts;
+@@ -311,6 +312,10 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 			spin_unlock(&server->srv_lock);
+ 			return -EAGAIN;
+ 		}
++		if (nowait) {
++			spin_unlock(&server->srv_lock);
++			return -EAGAIN;
++		}
+ 	}
+ 
+ 	/* if server is marked for termination, cifsd will cleanup */
+@@ -321,7 +326,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	spin_unlock(&server->srv_lock);
+ 
+ again:
+-	rc = cifs_wait_for_server_reconnect(server, tcon, aborts);
++	rc = cifs_wait_for_server_reconnect(server, tcon, aborts, nowait);
+ 	if (rc)
+ 		return rc;
+ 
+@@ -349,6 +354,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	case CifsNeedReconnect:
+ 		spin_unlock(&server->srv_lock);
+ 		mutex_unlock(&ses->session_mutex);
++		if (nowait)
++			return -EAGAIN;
+ 		if (!cifs_tcon_retry(tcon, aborts))
+ 			return -EHOSTDOWN;
+ 		goto again;
+@@ -380,6 +387,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 	rc = cifs_negotiate_protocol(0, ses, server);
+ 	if (rc) {
+ 		mutex_unlock(&ses->session_mutex);
++		if (nowait)
++			return -EAGAIN;
+ 		if (!cifs_tcon_retry(tcon, aborts))
+ 			return -EHOSTDOWN;
+ 		goto again;
+@@ -592,7 +601,22 @@ static int smb2_plain_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
+ {
+ 	int rc;
+ 
+-	rc = smb2_reconnect(smb2_command, tcon, server, false);
++	rc = smb2_reconnect(smb2_command, tcon, server, false, false);
++	if (rc)
++		return rc;
 +
-+	guard(spinlock)(&ses->chan_lock);
-+	for (size_t i = 0; i < ses->chan_count; i++) {
-+		struct TCP_Server_Info *server = ses->chans[i].server;
-+
-+		if (server)
-+			n += READ_ONCE(server->reconnect_instance);
-+	}
-+	return n;
++	return __smb2_plain_req_init(smb2_command, tcon, server, request_buf,
++				     total_len);
 +}
 +
-+static bool cifs_tcon_reconnecting(struct cifs_tcon *tcon)
++/* As smb2_plain_req_init(), but fail fast instead of waiting for reconnect. */
++static int smb2_io_req_init(__le16 smb2_command, struct cifs_tcon *tcon,
++			    struct TCP_Server_Info *server,
++			    void **request_buf, unsigned int *total_len)
 +{
-+	struct cifs_ses *ses = tcon->ses;
-+
-+	if (tcon->need_reconnect)
-+		return true;
-+
-+	guard(spinlock)(&ses->chan_lock);
-+	for (size_t i = 0; i < ses->chan_count; i++) {
-+		struct TCP_Server_Info *server = ses->chans[i].server;
-+
-+		if (server && READ_ONCE(server->tcpStatus) == CifsNeedReconnect)
-+			return true;
-+	}
-+	return false;
-+}
-+
-+static int cifs_reopen_file_retry(struct cifsFileInfo *cfile, bool can_flush,
-+				  struct cifs_io_subrequest *subreq)
-+{
-+	bool writeback = subreq->rreq->origin == NETFS_WRITEBACK;
-+	struct cifs_tcon *tcon = tlink_tcon(cfile->tlink);
-+	struct cifs_ses *ses = tcon->ses;
-+	unsigned int reconnects;
-+	bool free_retry = true;
-+	bool retrying = false;
 +	int rc;
 +
-+	for (;;) {
-+		if ((retrying && cifs_io_stopped(subreq)) ||
-+		    cifs_io_aborted(subreq))
-+			return -EIO;
-+		retrying = true;
-+		reconnects = cifs_ses_reconnects(ses);
-+		rc = cifs_reopen_file(cfile, can_flush);
-+		if (!rc || is_interrupt_error(rc) ||
-+		    cifs_writeback_dying(&subreq->subreq))
-+			return rc;
-+		if (!is_replayable_error(rc) &&
-+		    !(writeback && cifs_writeback_transient(rc)))
-+			return rc;
-+		if (writeback && READ_ONCE(subreq->req->reopen_gave_up))
-+			return rc;
-+		if (free_retry && !cifs_io_stopped(subreq) &&
-+		    (cifs_ses_reconnects(ses) != reconnects ||
-+		     cifs_tcon_reconnecting(tcon))) {
-+			free_retry = false;
-+			continue;
-+		}
-+		if (!cifs_io_should_replay(subreq)) {
-+			if (writeback)
-+				WRITE_ONCE(subreq->req->reopen_gave_up, true);
-+			return rc;
-+		}
-+		msleep(subreq->cur_sleep);
-+	}
-+}
-+
-+/*
-+ * Record, as generation + 1 (0 means none), the newest reopen generation of a
-+ * handle that a writeback subrequest found bad (-EBADF).  Subrequests of the
-+ * same request can fail concurrently on different channels, so keep the newest.
-+ */
-+static void cifs_mark_bad_handle(struct cifs_io_request *req, unsigned int gen)
-+{
-+	int want = gen + 1;
-+	int cur = atomic_read(&req->bad_reopens);
-+
-+	while (want > cur && !atomic_try_cmpxchg(&req->bad_reopens, &cur, want))
-+		;
-+}
-+
-+static void cifs_invalidate_bad_handle(struct cifs_io_request *req)
-+{
-+	struct cifsFileInfo *cfile = req->cfile;
-+	unsigned int bad;
-+
-+	guard(mutex)(&cfile->fh_mutex);
-+	bad = atomic_read(&req->bad_reopens);
-+	if (bad && bad - 1 == cfile->reopens)
-+		cfile->invalidHandle = true;
-+}
-+
- /*
-  * Prepare a subrequest to upload to the server.  We need to allocate credits
-  * so that we know the maximum amount of data that we can include in it.
-@@ -134,15 +256,16 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 	if (cifs_writeback_dying(subreq))
- 		goto defer;
- 
--retry:
-+	cifs_invalidate_bad_handle(req);
-+
- 	if (open_file->invalidHandle) {
--		rc = cifs_reopen_file(open_file, false);
-+		rc = cifs_reopen_file_retry(open_file, false, wdata);
- 		if (rc < 0) {
--			if (rc == -EAGAIN)
--				goto retry;
--			if (cifs_writeback_dying(subreq))
-+			if (subreq->rreq->origin == NETFS_WRITEBACK &&
-+			    (is_interrupt_error(rc) ||
-+			     fatal_signal_pending(current)))
- 				goto defer;
--			subreq->error = rc;
-+			subreq->error = cifs_writeback_error(subreq, rc);
- 			return netfs_prepare_write_failed(subreq);
- 		}
- 	}
-@@ -152,7 +275,7 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 	if (rc < 0) {
- 		if (cifs_writeback_dying(subreq))
- 			goto defer;
--		subreq->error = rc;
-+		subreq->error = cifs_writeback_error(subreq, rc);
- 		return netfs_prepare_write_failed(subreq);
- 	}
- 	goto out;
-@@ -204,13 +327,15 @@ static void __cifs_issue_write(struct netfs_io_subrequest *subreq)
++	rc = smb2_reconnect(smb2_command, tcon, server, false, true);
  	if (rc)
- 		goto fail;
+ 		return rc;
  
--	rc = -EAGAIN;
--	if (wdata->req->cfile->invalidHandle)
--		goto fail;
--
- 	if (wdata->replay && wdata->cur_sleep)
- 		msleep(wdata->cur_sleep);
+@@ -3147,8 +3171,12 @@ SMB2_open_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
+ 	__le16 *copy_path;
+ 	int rc;
  
-+	rc = -EAGAIN;
-+	if (wdata->req->cfile->invalidHandle)
-+		goto fail;
-+
-+	/* pairs with smp_store_release() in cifs_reopen_file() */
-+	wdata->reopens = smp_load_acquire(&wdata->req->cfile->reopens);
- 	wdata->server->ops->async_writev(wdata);
- out:
- 	return;
-@@ -231,12 +356,19 @@ static void cifs_issue_write_worker(struct work_struct *work)
- {
- 	struct cifs_io_subrequest *wdata;
- 	struct cifsFileInfo *cfile;
-+	int rc = 0;
- 
- 	wdata = container_of(work, struct cifs_io_subrequest, subreq.work);
- 	cfile = wdata->req->cfile;
--	while (cfile->invalidHandle &&
--	       cifs_reopen_file(cfile, false) == -EAGAIN)
--		;
-+	cifs_invalidate_bad_handle(wdata->req);
-+	if (cfile->invalidHandle)
-+		rc = cifs_reopen_file_retry(cfile, false, wdata);
-+	if (rc) {
-+		add_credits_and_wake_if(wdata->server, &wdata->credits, 0);
-+		cifs_write_subrequest_terminated(wdata,
-+				cifs_writeback_error(&wdata->subreq, rc));
-+		return;
-+	}
- 	__cifs_issue_write(&wdata->subreq);
- }
- 
-@@ -285,6 +417,12 @@ static int cifs_prepare_read(struct netfs_io_subrequest *subreq)
- 		cifs_negotiate_rsize(server, cifs_sb->ctx,
- 				     tlink_tcon(req->cfile->tlink));
- 
-+	if (req->cfile->invalidHandle) {
-+		rc = cifs_reopen_file_retry(req->cfile, true, rdata);
-+		if (rc)
-+			return rc;
-+	}
-+
- 	rc = server->ops->wait_mtu_credits(server, cifs_sb->ctx->rsize,
- 					   &size, &rdata->credits);
+-	rc = smb2_plain_req_init(SMB2_CREATE, tcon, server,
+-				 (void **) &req, &total_len);
++	if (oparms->no_reconnect_wait)
++		rc = smb2_io_req_init(SMB2_CREATE, tcon, server,
++				      (void **) &req, &total_len);
++	else
++		rc = smb2_plain_req_init(SMB2_CREATE, tcon, server,
++					 (void **) &req, &total_len);
  	if (rc)
-@@ -336,15 +474,17 @@ static void cifs_issue_read(struct netfs_io_subrequest *subreq)
- 		goto failed;
+ 		return rc;
  
- 	rc = adjust_credits(server, rdata, cifs_trace_rw_credits_issue_read_adjust);
--	if (rc)
-+	if (rc) {
-+		if (rc == -EAGAIN && cifs_io_should_replay(rdata))
-+			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
- 		goto failed;
-+	}
+@@ -4359,7 +4387,8 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	spin_unlock(&cifs_tcp_ses_lock);
  
- 	if (req->cfile->invalidHandle) {
--		do {
--			rc = cifs_reopen_file(req->cfile, true);
--		} while (rc == -EAGAIN);
--		if (rc)
--			goto failed;
-+		rc = -EAGAIN;
-+		if (cifs_io_should_replay(rdata))
-+			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
-+		goto failed;
- 	}
+ 	list_for_each_entry_safe(tcon, tcon2, &tmp_list, rlist) {
+-		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true);
++		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true,
++				    false);
+ 		if (!rc) {
+ 			cifs_renegotiate_iosize(server, tcon);
+ 			cifs_reopen_persistent_handles(tcon);
+@@ -4391,7 +4420,8 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	/* now reconnect sessions for necessary channels */
+ 	list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
+ 		tcon->ses = ses;
+-		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true);
++		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true,
++				    false);
+ 		if (rc)
+ 			resched = true;
+ 		list_del_init(&ses->rlist);
+@@ -5208,8 +5238,12 @@ smb2_async_writev(struct cifs_io_subrequest *wdata)
+ 	};
+ 	io_parms = &_io_parms;
  
- 	if (subreq->rreq->origin != NETFS_UNBUFFERED_READ &&
-@@ -1540,6 +1680,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
- reopen_success:
- #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
-+	/* pairs with smp_load_acquire() in __cifs_issue_write() */
-+	smp_store_release(&cfile->reopens, cfile->reopens + 1);
- 	cfile->invalidHandle = false;
- 	mutex_unlock(&cfile->fh_mutex);
- 	cinode = CIFS_I(inode);
-@@ -2758,14 +2900,20 @@ void cifs_write_subrequest_terminated(struct cifs_io_subrequest *wdata, ssize_t
- 		spin_unlock(&inode->i_lock);
- 	}
- 
--	if ((is_interrupt_error(result) || result == -ENOMEM) &&
--	    wreq->origin == NETFS_WRITEBACK && cifs_io_should_replay(wdata)) {
-+	if (wreq->origin == NETFS_WRITEBACK &&
-+	    !test_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags) &&
-+	    cifs_writeback_transient(result) && cifs_io_should_replay(wdata)) {
-+		if (result == -EBADF)
-+			cifs_mark_bad_handle(wdata->req, wdata->reopens);
- 		wdata->replay = true;
- 		trace_netfs_sreq(&wdata->subreq,
- 				 netfs_sreq_trace_io_retry_needed);
- 		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
- 	}
- 
-+	if (result < 0 &&
-+	    !test_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags))
-+		result = cifs_writeback_error(&wdata->subreq, result);
- 	netfs_write_subrequest_terminated(&wdata->subreq, result);
- }
+-	rc = smb2_plain_req_init(SMB2_WRITE, tcon, server,
+-				 (void **) &req, &total_len);
++	if (wdata->subreq.rreq->origin == NETFS_WRITEBACK)
++		rc = smb2_io_req_init(SMB2_WRITE, tcon, server,
++				      (void **) &req, &total_len);
++	else
++		rc = smb2_plain_req_init(SMB2_WRITE, tcon, server,
++					 (void **) &req, &total_len);
+ 	if (rc)
+ 		goto out;
  
 -- 
 2.56.0
