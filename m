@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793819921;
-	b=EnjVKtLWOooXJmbxBv0s2vLAKYCpEvrfhPbFnTuC7rpWLKU1PzlusnbzKv72tJOp9liH
-	 18BpSPHfxew85uCf+zAfOvM4eu5W3RMGIpmUSTS307s7TnO+hlMoOtXeH61IhSDo3RmHy
-	 DvqoxIf2PFv90yHCOWuwG8X494LwExTHz9pCKcuJxjRl9TUm1qI210aAWTYY9PD84jod7
-	 E0jK0aDECXs7t+vUGfgPuS4gJs14l17nrWQtUUXpt9vja6ktXzTaCspSH3yP11/6ci62C
-	 dRGzOQtJ/0rY4Q0EPZWlOKu5mEABA1WMWZQd955x8VDNxGNAd6eJqzO9wcLQ+tcUhEg==
+	t=1793819950;
+	b=gnM6b721FWOAViWdy38LzFjny4lN3EM1kUn/kZwqtMotMozDOr/d1WwXcM4KsqjOvIy0
+	 dRO7u4qBgbOoLiVpsoRm8YB+fJDHPPwBWJYz3nHD110Mw4rf/sKanJZCFZPKX4ZY50wTK
+	 v2SG5XyfE0ICyf37caFzLkH5XhPEzRemZkp34p0Vgkhw69eYjNya06NPElSOC9iWZQvyT
+	 6VcNh+G7CrNHVrEFhM8/wq8+fr6oxQWbWjZ7nYpqX9QTuT9hJt3Ja9rjLK7cq78wtcthH
+	 UFKbb4pacsPkLzYd0g3AD8qXRx1sIzWdhAM/OWWhp1m0ixZq7NzhKGGEnw+8TtQGg8w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793819921;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793819950;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding;
-	bh=Di83VHF6QbwHOpQhBimI2/C2To6SvYozNijzJKB62VA=;
-	b=kC6yXIFEtvDcI6VfX8ZZfvGLIeazKZo7qmVQTZlAc/S6ulR0fXLV0xhrMdrLh93s6Z/1
-	 Bz1iaWk3Y4eAPOB4NlP+V5/wvwk7W5mAtOz2ImCzwlCBQYwaRtUSNt5Vld6W1sC8tCZ5T
-	 P6qFdc865Gpsg3DFoqYGjRec5+TuyKpYT9NgCjXPwgwfV1sO6K1egx5tAJ4xP5C+CkkCB
-	 aCmtAr0hzyun7QquCXULrFn/Ms5w9dTN8bo9pULmA+Q76GBSA6OJnWBCL+aGOCtLeZmXM
-	 i/YsTOvCGxhQy+B+u+K3Uc6z7JrWnmNuCODFHoKmdR3DlsKwlgD/lQ9r77vqhSGS8KA==
+	bh=mdnthwMs9LvqnLJy6kPpeiwqrlhi6ADC7izliWiN2IE=;
+	b=y0DuHJ6Hqh10zF2HxgCOZ29yff9MPETAKUvhzDGYmuZrZ66COCwSFG90roW8M3j2X2HO
+	 6RaPAgJkkTmKzCWsNIqaatPRF4yf1JcPEM0VF/jnIZ3tr7eQotr698uCF3TcQUtPSJCdN
+	 3SeQ+NTNdoCy8OqpHEJRvd9Z+hJrJAuaqak09hZJpfrDNWryUuYwA3irwmolo/jQ5C5l0
+	 iyGQ1klJiLy6TjA839mbqVHIvI3OTPii9PLWLlma7UjgrAPd1A29Fyll6akOaTUMkCk73
+	 5m7ayUy8M+2qP+ZXXwiL3d2UM1i5P6LJHnaFryRLnLdmKZMp1V4WXD7V+18gbdR0tQA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JIdLOXp6;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ijnLltQe;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390CD606B2D9;
-	Wed,  4 Nov 2026 19:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8603606D834;
+	Wed,  4 Nov 2026 19:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JIdLOXp6
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEFA51F00A16;
-	Wed,  4 Nov 2026 19:18:28 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ijnLltQe
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C86A61F000C1;
+	Wed,  4 Nov 2026 19:18:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793819921;
-	bh=Di83VHF6QbwHOpQhBimI2/C2To6SvYozNijzJKB62VA=;
+	s=k20260515; t=1793819949;
+	bh=mdnthwMs9LvqnLJy6kPpeiwqrlhi6ADC7izliWiN2IE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=JIdLOXp6sxEmZBJpMlxDZmERDwf9C8sLM/z2dbJBoBY9UBXkGBGAj7Yxhgr3YbwIo
-	 WLzNZhjCHsHdhaQxnTFFO0VEGKxMv1vINJffnyQzpOIw9IevG2oqGRabpoxY4U5ohN
-	 dsW1/Ep2BQuneanTV1J2VPfld0/EzmI9Txpbh/m9xuzYl3I8AGELsVFoKVbyxoHr4k
-	 3c7remBwAQpRVBw2eStXkccOoVSUONc3WQN6TCMP9ZphCN52UWu0ZYRKWjmfYAQkhn
-	 K0VZsnobCWkJjfjb7T3ZWzf5xxANP/HeKYAhnhy6yvKDBY5FqItsSBFDLO5ybI5gH0
-	 NwA1fy8O+LCSQ==
+	b=ijnLltQe5Qk+CqE+VUlDwwHbbObH+9ltW/RmuNk6+QVTedz2m/LYfiuF9co7AFJwE
+	 sjrkuOfRO38+K7HcQrICBAwdPPqSWw81opUhQAieZFdKhLDYrT6ksUVuCvctpIzPGG
+	 5IfV2bo/AIGZF92z/NIw2/tSYbEzpTKjlj5R/IpCOGOCq9t1qLgWWrxzM1Ldm3iL6v
+	 jl4JL0l0pT78R+g4k6uEp1SAko5fY5xHs148DGpmxVJocVPvD8ORDyvyCDVv0yKLOp
+	 0BGiObxQ1YUEMDTuDs/OR2Xrm+87BYRn1BsklV+azupKzmP8Z1i0K9CmVfX9sZIjIF
+	 wvV04uPKt3MdQ==
 From: Christian Brauner <brauner@kernel.org>
 To: linux-fsdevel@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>,
@@ -100,9 +100,9 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	linux-debuggers@vger.kernel.org,
 	"Christian Brauner (Amutable)" <brauner@kernel.org>,
 	Chuck Lever <cel@kernel.org>
-Subject: [PATCH RESEND v2 10/51] zorro: size the proc files like what they serve
-Date: Wed,  4 Nov 2026 20:18:26 +0100
-Message-ID: <20261104-work-procfs-bugfixes-v2-10-021c84d852e0@kernel.org>
+Subject: [PATCH RESEND v2 12/51] powerpc/rtas: consume the whole write to /proc/powerpc/rtas/progress
+Date: Wed,  4 Nov 2026 20:18:55 +0100
+Message-ID: <20261104-work-procfs-bugfixes-v2-12-021c84d852e0@kernel.org>
 In-Reply-To: <20261104-work-procfs-bugfixes-v2-0-021c84d852e0@kernel.org>
 References: <20261104-work-procfs-bugfixes-v2-0-021c84d852e0@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -116,33 +116,42 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=796; i=brauner@kernel.org; h=from:subject:message-id; bh=l/jVDuzMOjj8ie0SJoZ9zbu/qnGtbORxwaULd7yJNic=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9bryu4qPpOT1kc4isZaDhv1/bXwk9vbD2UmCm1l1v/ 29zJLs2dpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEyk6jwjw6sm06P+wcoHVfTf +okVXHjMEBzWYri1p826+M+MhiW+0owMC9vz1pp/V1r0kenzR652vZM5y5jOqWdbe18R57A5vkq ZEwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1217; i=brauner@kernel.org; h=from:subject:message-id; bh=uNEn+pHXbIRRMkqtNF6NnFXDW3eMy9Pk3SJ7wJuNwck=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9brzZHzRlctZde+1Go+8eGv7b1+cVSZ7+f//NhYzz+ 8+/DW/t7ChlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZhI5ROG/2mHUo8Ur0zzZ3Z9 kx7D/2mua/jtI8eaYjr1fyTPTo02WcfIcOywWBSj5altb2eddZvFnrJ1ZrTjumSG/rNnerMtg50 vcgMA
 X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-The files under /proc/bus/zorro hand out a struct ConfigDev and seek
-within that, but their size says sizeof(struct zorro_dev). Say
-sizeof(struct ConfigDev).
+ppc_rtas_progress_write() shows the first 255 bytes of a write and
+returns that many, so a writer that loops until everything is written
+shows the rest as a second message. Return the whole count, the rest is
+ignored.
 
 Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- drivers/zorro/proc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/powerpc/kernel/rtas-proc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/zorro/proc.c b/drivers/zorro/proc.c
-index f916bf60b312..4c6f8f1c4d71 100644
---- a/drivers/zorro/proc.c
-+++ b/drivers/zorro/proc.c
-@@ -108,7 +108,7 @@ static int __init zorro_proc_attach_device(unsigned int slot)
- 				 &zorro_autocon[slot]);
- 	if (!entry)
- 		return -ENOMEM;
--	proc_set_size(entry, sizeof(struct zorro_dev));
-+	proc_set_size(entry, sizeof(struct ConfigDev));
- 	return 0;
- }
+diff --git a/arch/powerpc/kernel/rtas-proc.c b/arch/powerpc/kernel/rtas-proc.c
+index f38df72e64b8..89b165986851 100644
+--- a/arch/powerpc/kernel/rtas-proc.c
++++ b/arch/powerpc/kernel/rtas-proc.c
+@@ -311,6 +311,7 @@ static int ppc_rtas_poweron_show(struct seq_file *m, void *v)
+ static ssize_t ppc_rtas_progress_write(struct file *file,
+ 		const char __user *buf, size_t count, loff_t *ppos)
+ {
++	size_t len = count;
+ 	unsigned long hex;
  
+ 	if (count >= MAX_LINELENGTH)
+@@ -324,7 +325,7 @@ static ssize_t ppc_rtas_progress_write(struct file *file,
+ 	hex = simple_strtoul(progress_led, NULL, 10);
+ 
+ 	rtas_progress ((char *)progress_led, hex);
+-	return count;
++	return len;
+ 
+ 	/* clear the line */
+ 	/* rtas_progress("                   ", 0xffff);*/
 
 -- 
 2.53.0
