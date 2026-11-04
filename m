@@ -1,123 +1,107 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793818699;
-	b=yF3UvjuBYJVNSQWUspX+V1zKF/02/wzXFvgjm9vsVP7MDBAZkdnm1LQAaR9T4q/G+ZCx
-	 HeCL0cCsDejwXxv6suMCSKZ/AIXQa+gzK+1D7ajxgMUpInIo+Tw+wkcHa8pk2P9PjVTf6
-	 JeGQVbnVbXuVDYRtIvGY5WAda47TipgNB+PGqARInUPO2uScZ8YAQ4taGrCXot/Mxlk8Q
-	 7vDmXzADpFRTpraVuiTD8gxOntKMdFu4kQPb/1Wz4zVo3vg+2uu6gOzlVBACz+A2Z1gYa
-	 xQ36bwbPh12bqaw7dRGUBvAwfOkwIya82i++LDeIlnEAmUBLgQH/SSHmAzrSZTui7mQ==
+	t=1793819080;
+	b=pguKUzgu7/iFGHYRpmGZjf5UM7EVvax0Q7mY9ZLIy2BF1ERcs25S4EmfHAMM463iQNtk
+	 rrw+lHg0JSjvzfO44FvrWco6zWEbQj3MdVoEC6ojY2C37j9ofitZJ1u8cdy5keTwbU3sj
+	 fy00tMvWU8/9aveWXvBT2WwqgCFyLjE8HYfYNlGhoPJmbYdt81BYlZUZreFXt3EBdK9hK
+	 4Fh5KjRTLNOPntDPMNggQGz7zTHerW4UQAAxnYJkgmZiiwwSmmFetRAHoQ3PGuBSkin2E
+	 zg6pVCVU2V+y9q/TVUTcFHyZThlSp3e3WiRgCB8r4sA34lb2urnXsZoCU+qG10MOJOg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793818699;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793819080;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type:X-Developer-Signature:X-Developer-Key:
 	 Content-Transfer-Encoding;
-	bh=PDnB87zqXJgVJsuOvrO1H7iIUHbjGjYAfANJC/HOKlc=;
-	b=UdPofWOlrlF+3W38pJ+MHWUIHVRNgsHGlXg1BznGTID5gv3jwoMe3bCwLDdhr6EwQJ0X
-	 gsKk8YXZ/m2BF8V/oXz5/ztB1xfYFLdHRi3bnJrpBF09ZBGzKs/ZS4OoMgso2+erff5Eh
-	 EuZtEuwAAL5Ad2cUpB6zQRo1SZW0LhYHvdamonR0xMMxo20L10ijjjBP5TALOg5MpktWP
-	 u0KUXhg0mZIDXPdPoFCFLTHdeAsB8vMi9GunzoivQka7GCJ1LU/nswC+4NsUlHcvKzYdV
-	 xg/DmaApbOLCzyZUtU3bzPJeOP9aJ6nY/zD12aQ6mSDDlV6Atjn18HfUHEOzYCQb9GQ==
+	bh=lAdqJZq7DckAfewXRPAVCUONZuQAofOCOPOWHFZTOPQ=;
+	b=03aQMa+HCJ28vBZBwhiOVdXANJJ9oJpjtYLQ3KApJxxqjqcLYqmIaPr5AAhwEQxUIX7K
+	 KWqJSPubBkDp0XGJBjDB4FluSQjeb5WNgqVHU+a7fF6V1LJ3A17PgJVrTCmFvDFbarDV2
+	 PUTp5Py5ljei0GOllurm2NEZaJW/9sGHb5j3HzV/nKW5opR0QZCMU5eiFrTSpano3KuJ5
+	 U+H/fLATaNC9WCQS0L7bnIIuyGiWJhZNylZ87uFyYOZ903LrDq6nWdqPen5VCj2NwWwSp
+	 itHL7e3BNHxqTl8jnuprPAUVdQmUsGnDGPEytdbN69r+Y8LDyLiLF+SL1yk3uYWH6uQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=Nh+1EBrw;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=0bB8rbN5;
-	arc=none smtp.remote-ip=103.168.172.148
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DiXkLasn;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBF0D606D817
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 18:58:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BBF0D606D817
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A7C606A33F;
+	Wed,  4 Nov 2026 19:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=Nh+1EBrw;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=0bB8rbN5
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id 01670EC24F2
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 13:58:18 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 04 Nov 2026 13:58:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1793818697; x=1793905097; bh=PDnB87zqXJgVJsuOvrO1H
-	7iIUHbjGjYAfANJC/HOKlc=; b=Nh+1EBrwMhUWUB5s8dpl3hJetC3N/ywoAbl6z
-	HQtDYUel0g0lzjRuh2FlI3ozSajaNG0Ur68zeAF4FD/lkZVSmAwtth4GjnC4kIJ0
-	fYZFUs0gagsKhTcC0ut6gvyJw/H/DWrm7WEqrWOSBAXA+71nNWD2z7ZYmnVD3gmm
-	Qe15BSK8Y/cqvznRa4GbvnYAxNumZEgsZgoRj9ulnXS9zi3rGPZyer1eBbbfSPb/
-	Ob+f8avnOKcwoQgwTVHxhujRDJUZipomkbsb8mMnG1+vqGTNj5SqISjRF8hvYEHL
-	181qsNWwZ0vl5iRdJKj15xVydeFzZJwOp5Zm4ewIR+IhWLIow==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1793818697; x=1793905097; bh=PDnB87zqXJgVJsuOvrO1H7iIUHbjGjYAfAN
-	JC/HOKlc=; b=0bB8rbN5+N3eO8saiK7kT2zzbfm0unFXD9/tajbF+nm+b6B5qDy
-	BlWrRdBdfoqtO40Mta/uqXF/C0ohhcoTUjgUa7Zm2C0Y/kKJ4hlWjy7dCadcx4nE
-	Z06Q+uRCfEaQ2YUGlyB7LAaOGeGvOC2FKogr/9nqpDG1YRn8Qd0C+P9A+M31UjK9
-	iBf4STJt8JU5ikpxrp6t+oD0hqwDhFruLSYdHSI6hGAXQAAT4bcgbixJfTNcZuDV
-	O4SobTEk83JW0mXcvsq7NMmyF7J+Uw/7YVR0O63HpAq4bVd7DAk12grAUVgTVBqc
-	jpUGVE9scfICDQhorKKQ6jq3sGwbwd+8pBw==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
-	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1793818697; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:p+xSMPBYv5BPknbuDNsOkTYbL449/I8GM6QdfqbKwIzf4n+
-	XemxBPSHFPq//A2oPZsa5zrzcS99T4mGvDa3uAbN3D4KS/juBMT9fKP5ikUsxR9z
-	mRryt8q4obzIk5wWUBTk8KbIg63A9tezFzdLkf1V4DvL9xris/ufNMJFHl5L9xwT
-	GdIS5oE9vZ39q2Fptk9dr/Am6fO93Gxj5n7ipQXq6I/ePddp9Bcsq24wxumqiS+q
-	p/VAKkXjXhsObwti8R1SVoMDKV55eA4DbGDQB9Jpnm0yRzVEazLqyx2OI928YGe4
-	LP2ZoEYkcCPlaqDo91vg9bV3w6yJnnq/y3ymbfw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-08;
-	repo=github.com/dkim2wg/interop; date=2026-10-28; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:GOQc9oEL9CRL4VZ1M+IEcRc2iyWqZPEnulBWE/pSN7s=:ZV9mob9oFvahRr0psn0UmQT1ggxEltVrOymnMfkUmU0=;
-X-ME-Sender: <xms:SYDraod1MJb-WaL8UGdgRUAxJjyaXhZfYhOBIMOZisEcJpCajISjyg>
-    <xme:SYDramw7eV7M6T6hdC2wr1OXWMH66rtISbfrGt_DWTQJv29HV9JEZEVkjvTu3I1yS
-    IMDcqGwS0IH617Zm7p3KVvZE72pIdP5_VARFHibxpYhw8GTfzX-hhDc>
-X-ME-Received: <xmr:SYDrat-NNwjf71D4F0U5ecEFdH4UW095_LdJ_fi28bSpRuOyKD-VAr1_ZY_Gu6ka>
-X-ME-Proxy-Cause: dmFkZTF6DLgba7+YTaPdYRXZytzB5/UWwePilYiC8EG2tBskM+S36PTfQVDlbsS1tAymfA
-    Fsr0J/TuxlZyvPEL+/BBoEvz/JkiofCUgnzIo0wimp1j5J6GHrMaBW0msUdeB493DayJ10
-    n6QXoxADZPIs11g2m19IexIBbummS26Iakx+FRSSsXUJlieuPL+8c1onlVSm7msmHQ+JSO
-    0x5Y6eGk9MJBFgoHATJ1QKjyGM044wc2rIe35Dlg728F79bovt7hQbFQlx3WWN+Ysj52kD
-    QnMCjREMUtYBippGsR+n/KNq7vNjSpVGgaicg6xMfRccJIbpXGeO4gBpMME1SKC4VNeIOP
-    kirohG/4gR1NcKN0/ePOuP2bypuszCOBG7sckv5PIPVZ5BXPwPAZDkLRTPpkRtrpTROcLg
-    GHVLJdObEDHkmzsZuAxEHsKdUzADNBrjKmXGyn38w02Q6nlHFWbuwTI9Ampm+bBMtuT9M0
-    pv3TD6unNn/+pFAzHD5Ky4VYBff2n2ylenUhbS2Q9jZm0Mg5bfOnRBEXs9f9luPsxNP/ka
-    0st/xKjPcI9cKBgKiFsm+cVxdwtZewQg7HV+ejz2mbUX6CS0JO8h91KXEcrj5Lz2HbTveD
-    XfTXMXCb5w/3GZticqTy+dJWBUJkbuRq4aeIpxW0aXQi+h7mcPdGD6NIALWw
-X-ME-Proxy: <xmx:SYDrakzDJsUPrQFn9wuVXaSzdPYlghbJI5ch7bCUwXrcTw4R2MuspA>
-    <xmx:SYDralpHJRPKMbOh_zueGNaoKN0lpXeC-PmnXP3FUYM4EtMHi8HpHw>
-    <xmx:SYDratq09FDLBb7VhkWaD69wg9goq8Z8xkdIjLwBGY-JRo11XT5RuQ>
-    <xmx:SYDratBFZatfg3JaZF-upVkVD2Z1_Uf7Y_U2QQv3fxb7_wmOjuP9Zw>
-    <xmx:SYDraudfZ2eXDFh38V7f6YVHOkrSdZdPmTobARQYXASerGW7R4OEOuLK>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 4 Nov 2026 13:58:16 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DiXkLasn
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED65F1F00A1A;
+	Wed,  4 Nov 2026 19:04:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1793819079;
+	bh=lAdqJZq7DckAfewXRPAVCUONZuQAofOCOPOWHFZTOPQ=;
+	h=From:To:Cc:Subject:Date;
+	b=DiXkLasnKkCazgXjtl0yo39sGV+Bs41jy0U9vc9qazA5CkiKT/iBgZ8fEt5z2eEi9
+	 oolsufKOcX9//0g1iNEISwDqdj0AJv/jYiRaklcfSgZPROKW3M/UHZ5YJlCQnarqEi
+	 2HOIRavJO+g9paB/C2YYlAYVqmb2kgiut60CyfNdCFnL6BADsAW86gE+rCJv3jhKEU
+	 xhyHkA5QFEeZxb/jz3ezU8fpueKF4UZ9OCtOjslPoDhqLrhjroAW4ZVXzKIkJz9Hyg
+	 6s+UivkH9tasMyPtuGG54ILYcFnrqgSpO4qCMaV233B/QiysszNJThZr4+Y++vVfYT
+	 4RJQDhDv+jwNQ==
+From: Christian Brauner <brauner@kernel.org>
+To: linux-fsdevel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Jann Horn <jannh@google.com>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Chris Mason <mason@kernel.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Christoph Hellwig <hch@lst.de>,
+	Greg Kroah-Hartman <gregkh@suse.de>,
+	Joel Granados <joel.granados@kernel.org>,
+	Kees Cook <kees@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Jan Kara <jack@suse.com>,
 	linux-kernel@vger.kernel.org,
-	Aamir Ahmed <elb12345@hotmail.co.uk>,
-	Ian Bridges <icb@fastmail.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v4] ksmbd: grant a caller what its groups and OWNER RIGHTS ACEs allow
-Date: Wed,  4 Nov 2026 12:58:04 -0600
-Message-ID: <20261104185804.195058-1-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
+	linux-nfs@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-um@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	netdev@vger.kernel.org,
+	ntfs3@lists.linux.dev,
+	platform-driver-x86@vger.kernel.org,
+	coreteam@netfilter.org,
+	kexec@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	ibm-acpi-devel@lists.sourceforge.net,
+	jfs-discussion@lists.sourceforge.net,
+	linux-alpha@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-fbdev@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-sh@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	samba-technical@lists.samba.org,
+	sparclinux@vger.kernel.org,
+	linux-m68k@lists.linux-m68k.org,
+	linux-doc@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-atm-general@lists.sourceforge.net,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Takashi Iwai <tiwai@suse.de>,
+	linux-input@vger.kernel.org,
+	linux-raid@vger.kernel.org,
+	linux-ext4@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-debuggers@vger.kernel.org
+Subject: [PATCH RESEND v2 0/7] proc: move procfs to what kernfs does
+Date: Wed,  4 Nov 2026 20:04:22 +0100
+Message-ID: <20261104-work-procfs-v2-0-b45cd5789ac5@brauner>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -127,300 +111,141 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6699; i=brauner@kernel.org; h=from:subject:message-id; bh=vwrWu4QhJtoloSbOepgjr6FTno3vPTd4Ym/VDTikOkw=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9bnTbzPPv56/PPZvrYp9W3z2QLB/JVrf+pVOeIXfyv BPyhavzOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACby9y8jQ7vUhZjCtt8GL9Re MV4waA022Jc6RTTePbMrWSRxcvj9NYwMH5UzLmm1J8flNhaGGEtmzxJlNtGal3R0vXBtFP/N2H5 GAA==
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-smb_check_perm_dacl() does not match ACEs for the caller's Unix
-groups and refuses an owner named only by OWNER RIGHTS. These callers
-cannot use rights the DACL grants them under MS-DTYP 2.5.3.2.
+This series aims to get rid of copying to and from userspace while pinning
+procfs entries allowing userspace to delay removal as long as it wants.
 
-Match Unix group SIDs (S-1-22-2) against the caller's credentials. Use
-the ordered DACL result when the existing SID lookup and POSIX ACL
-fallback do not decide access. In that result, deny ACEs for the
-caller's groups limit what it grants, also for MAXIMUM_ALLOWED. Count
-only the exact OWNER RIGHTS SID in that result, since compare_sids()
-also matches shorter and longer SIDs, and return only file access
-rights. Preserve the refusal for non-inherit-only object deny ACEs,
-which ksmbd does not parse.
+In essence, it aligns procfs with what kernfs is already doing. That
+gets rid of a big attack surface and a whole bug class in one go. The
+bounce buffer will come with some costs but luckily some codepaths (like
+readdir) have been so criminally slow and buggy that massaging them ends
+up speeding things up or at least leaving them on par with mainline even
+with a bounce buffer in the mix.
 
-MAXIMUM_ALLOWED still excludes group allow ACEs. Including them
-requires corresponding changes in smb2_open() to avoid breaking
-existing opens. An open relying on group grants can therefore still
-fail when it requests a maximal access reply. For the owner, that
-reply leaves out the rights of its groups.
+There was a hackish and very narrow AI solution to a small part of this
+bug class which was sent off-list. In essence, it used a second
+buffering mechanism on top of seqfiles which was really nasty. It also
+didn't address any of the non-seqfile users.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ian Bridges <icb@fastmail.org>
+If we want to get rid of the this whole bug class we need a bigger
+hammer. That means reworking how procfs handles data. So I tried to work
+through all of that. The series is now in a decent shape (I'm not saying
+"glorious" as there's so so many warts. If they were ironed out it could
+be a lot nicer but that's for another day.).
+
+I understand it's big but I think it is nicer to be able to look at the
+end result since we have some transitory states that are gone at the end
+of the series.
+
+I have polished this a bit more and have sorted out a few more bugs and
+tried to clean up some codepaths given the current constraints. Again, I
+think we could go a lot further there if we wanted to but I think that
+blows this out of proportion and at some point it becomes difficult to
+grasp the scope.
+
+So, remove_proc_entry() waits until every call into the procfs entry has
+returned. Most of those calls copy to or from userspace with the entry
+pinned.
+
+A reader or writer can induce a page fault in that copy take as long as
+it wants. For example, with userfaultfd or by punching holes into a
+memfd over and over. Plus, the callers of remove_proc_entry() like to
+hold locks while they wait. For example, addrconf holds RTNL when it
+removes /proc/net/dev_snmp6/<dev> and xt_hashlimit holds a mutex that
+all network namespaces share.
+
+So every network device with IPv6 gets a /proc/net/dev_snmp6/<dev> that
+everyone can read, and addrconf_ifdown() removes it with RTNL held. So
+any local user can keep RTNL for as long as their read stays stalled.
+Until then no device can be registered, removed or renamed and no
+network namespace can be created or torn down.
+
+If the caller lacks privileges for userfaultfd a FUSE mount in a user
+namespace whose daemon never answers is enough to stall the copy.
+Killing the reader ends it, but until then whoever removes the file sits
+in D state.
+
+xt_hashlimit removes the proc file of a table with hashlimit_mutex
+held. Every rule insert in every network namespace takes that mutex and
+so does network namespace cleanup. cleanup_net() runs on a single
+workqueue with pernet_ops_rwsem held, so a stalled reader also stops
+every later network namespace teardown and every module load that
+registers pernet operations. xt_recent does the same with recent_mutex.
+
+And of course, it's not specific to networking. remove_proc_entry(),
+proc_remove() and remove_proc_subtree() have over 200 callers and plenty
+of them hold locks. For example, a stalled reader of
+/proc/fs/ext4/<dev>/options holds up the unmount of that filesystem with
+s_umount held, and every sync(2) with it. The same goes for PCI
+hot-removal, for freeing IRQ descriptors, which CPU bring-up waits on,
+and for unplugging a USB sound card.
+
+And btw, syzbot has hit removal under locks before (cf. [1]), and the
+xt_recent deadlock fixed in (1) below is another one.
+
+Stalling the kernel in a copy to or from userspace is a well-known
+exploitation primitive. It's why unprivileged userfaultfd can't do it
+by default anymore since v5.11 (d0d4730ac2e4), and FUSE has been used
+the same way.
+
+This series touches just about every ->proc_read(), ->proc_write() and
+->proc_ioctl() in the tree, so I've split it up into seven series. They
+go out as replies to this mail:
+
+Part 1/7: proc: fix a few old bugs in /proc handlers (51 patches)
+
+    Bugs in the handlers and in procfs itself that are a lot older than
+    the conversion and that reviewing it turned up. Most of them are for
+    stable. They come first so they can go there on their own and the
+    conversion doesn't have to bother with that crap.
+
+Part 2/7: proc: let procfs own the data path (23 patches)
+
+    The procfs side. procfs owns the seq_file of an entry, copies in
+    writes, copies out reads and copies ioctl arguments in and out, and
+    only calls into an entry with it pinned. The open files procfs has
+    to know and the wait queue a pollable entry is polled on live in an
+    open node that only those entries get, the entry is pinned around
+    the vm_operations of its mappings, and lockdep checks the pin.
+    proc_create_seq() and friends and the plain seq_file users are
+    switched over here too.
+
+Part 3/7: proc: convert the arch and platform entries (23 patches)
+Part 4/7: proc: convert the driver entries (26 patches)
+Part 5/7: proc: convert the fs, kernel and mm entries (30 patches)
+Part 6/7: proc: convert the net entries and the kfifo samples (13 patches)
+
+Part 7/7: proc: drop the __user methods (6 patches)
+
+    Drops the old methods. kcore, kmsg and the kpage files, which are
+    never removed and keep reading straight into userspace, get
+    file_operations of their own, so nothing in struct proc_ops takes a
+    __user pointer anymore, and the new methods get the names kernfs
+    uses, ->proc_read(), ->proc_write() and ->proc_ioctl(). The last
+    patch takes the poll_table away from ->proc_poll(). This needs all
+    four conversion series.
+
+Parts 1 and 2 are the base. Parts 3 to 6 go on top of part 2 in any
+order and don't depend on each other. Part 7 needs all four.
+
+The series should all indicate cleanly what dependencies they have so b4
+should be able to pull it for review.
+
+With all of it on a KASAN and lockdep kernel the removal selftests of
+every part pass, the proc, pktgen and allocinfo selftests behave like
+without it and the bugs from (1) that reproduce in a VM are gone. Every
+patch builds on its own on x86_64 and i386, and with W=1 on the
+architectures it touches.
+
+[1]: https://lore.kernel.org/r/000000000000f24f4705b6988f3e@google.com
+[2]: https://lore.kernel.org/r/20231109212251.213873-7-johannes@sipsolutions.net
+
 ---
+Link to v1: https://patch.msgid.link/20261102-defizit-jobaussicht-kurios-7016c6e67442@brauner
 
-Notes:
-    Since v3
-    - Remove the redundant braces around the ordered DACL walk (Namjae
-      Jeon [3]).
-    - Handle MAXIMUM_ALLOWED after the walk in one branch, drop the
-      redundant in_group flag, use maximal throughout and rename the
-      group masks.
-    - Note that compare_sids() also matches shorter SIDs, and reword the
-      comments.
-    
-    Since v2
-    - Honor deny ACEs for the caller's groups in the new MAXIMUM_ALLOWED
-      fallback (Namjae Jeon [2]).
-    - Count only the exact OWNER RIGHTS SID in the ordered result and
-      return only file access rights.
-    - Keep the existing refusal for non-inherit-only object deny ACEs.
-    
-    Since v1
-    - Clear access_bits for explicit requests, preserving refusals for
-      ACE types the existing lookup does not handle (Sashiko [1]).
-    
-    The hide unreadable listing and the app instance check use the same
-    answer and change with it.
-    
-    Tested on ksmbd-for-next e49296d51ccb with KASAN, with no reports or
-    warnings. A reproducer is available on request.
-    
-    v3: https://lore.kernel.org/linux-cifs/20261103150458.11591-1-icb@fastmail.org/
-    v2: https://lore.kernel.org/linux-cifs/20261102200353.884509-1-icb@fastmail.org/
-    v1: https://lore.kernel.org/linux-cifs/20261102061537.830714-3-icb@fastmail.org/
-    [1] https://sashiko.dev/#/patchset/20261102061537.830714-1-icb%40fastmail.org
-    [2] https://lore.kernel.org/linux-cifs/CAKYAXd-s-g2V4LNY8e5SsH=+0r3qLY+AeOa5Lp9K0T5p_tnA8A@mail.gmail.com/
-    [3] https://lore.kernel.org/linux-cifs/CAKYAXd9xNLn1Nk1QzD_Kep1TcgJmGNsT+UTg6Ed0DjjmRRW4+Q@mail.gmail.com/
-    
-    This fix was developed with LLM assistance.
-
- fs/smb/server/smbacl.c | 162 +++++++++++++++++++++++++++++------------
- 1 file changed, 117 insertions(+), 45 deletions(-)
-
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index ab76c5c9e0ea..32feafe9f73b 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -1459,6 +1459,35 @@ bool smb_inherit_flags(int flags, bool is_dir)
- 	return false;
- }
- 
-+/* Whether the caller's credentials hold the group of an S-1-22-2-<gid> SID */
-+static bool smb_sid_in_group(const struct smb_sid *sid)
-+{
-+	gid_t gid;
-+
-+	if (sid->num_subauth != sid_unix_groups.num_subauth + 1 ||
-+	    compare_sids(sid, &sid_unix_groups))
-+		return false;
-+	gid = le32_to_cpu(sid->sub_auth[sid->num_subauth - 1]);
-+	/*
-+	 * ksmbd_override_fsids() builds the caller's credentials with
-+	 * make_kgid(&init_user_ns, ...), so the group membership test must
-+	 * compare in that space. Applying the mount idmap here (as when
-+	 * resolving a SID to an on-disk gid) would mismatch on idmapped
-+	 * mounts.
-+	 */
-+	return in_group_p(make_kgid(&init_user_ns, gid));
-+}
-+
-+/*
-+ * compare_sids() compares only the sub-authorities both SIDs have, so it
-+ * also matches a shorter or longer SID, such as S-1-3 or S-1-3-4-777
-+ */
-+static bool smb_sid_is_owner_rights(const struct smb_sid *sid)
-+{
-+	return sid->num_subauth == sid_owner_rights.num_subauth &&
-+	       !compare_sids(sid, &sid_owner_rights);
-+}
-+
- int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			__le32 *pdaccess, __le32 raw_daccess, int uid,
- 			bool strict)
-@@ -1475,13 +1504,15 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 	int granted = requested;
- 	struct smb_ace *ace;
- 	int i, found = 0;
--	unsigned int access_bits = 0, denied = 0;
-+	unsigned int access_bits = 0, denied = 0, grp_granted = 0;
-+	unsigned int grp_allowed = 0, grp_denied = 0, bits;
- 	struct smb_ace *others_ace = NULL;
--	bool or_ace = false;
-+	bool or_ace = false, obj_deny = false, member, counted;
- 	struct posix_acl_entry *pa_entry;
- 	unsigned int sid_type = SIDOWNER;
- 	unsigned short ace_size;
- 	bool is_owner, owner_rights = false;
-+	bool maximal = *pdaccess & FILE_MAXIMAL_ACCESS_LE;
- 	vfsuid_t vfsuid;
- 
- 	ksmbd_debug(SMB, "check permission using windows acl\n");
-@@ -1522,7 +1553,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		 */
- 		if (is_owner)
- 			allowed = READ_CONTROL | WRITE_DAC;
--		if (*pdaccess & FILE_MAXIMAL_ACCESS_LE)
-+		if (maximal)
- 			requested |= allowed;
- 		if (!allowed || requested & ~allowed)
- 			rc = -EACCES;
-@@ -1531,53 +1562,83 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		goto err_out;
- 	}
- 
--	if (*pdaccess & FILE_MAXIMAL_ACCESS_LE) {
--		ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
--		aces_size = pdacl_size - sizeof(struct smb_acl);
--		for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
--			if (aces_size < offsetof(struct smb_ace, sid) +
--			    CIFS_SID_BASE_SIZE)
--				break;
--			ace_size = le16_to_cpu(ace->size);
--			if (ace_size > aces_size ||
--			    ace_size < offsetof(struct smb_ace, sid) +
--				       CIFS_SID_BASE_SIZE)
--				break;
--			aces_size -= ace_size;
-+	/*
-+	 * Evaluate the DACL in order (MS-DTYP 2.5.3.2). access_bits collects
-+	 * the MAXIMUM_ALLOWED result. grp_granted collects what ACEs for the
-+	 * caller's groups, or OWNER RIGHTS for the owner, grant. It is used
-+	 * when the SID lookup and POSIX ACL fallback below do not decide.
-+	 */
-+	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
-+	aces_size = pdacl_size - sizeof(struct smb_acl);
-+	for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
-+		if (aces_size < offsetof(struct smb_ace, sid) +
-+		    CIFS_SID_BASE_SIZE)
-+			break;
-+		ace_size = le16_to_cpu(ace->size);
-+		if (ace_size > aces_size ||
-+		    ace_size < offsetof(struct smb_ace, sid) +
-+			       CIFS_SID_BASE_SIZE)
-+			break;
-+		aces_size -= ace_size;
- 
--			if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
--			    ace_size < offsetof(struct smb_ace, sid) +
--				      CIFS_SID_BASE_SIZE +
--				      sizeof(__le32) * ace->sid.num_subauth)
--				break;
-+		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
-+		    ace_size < offsetof(struct smb_ace, sid) +
-+			      CIFS_SID_BASE_SIZE +
-+			      sizeof(__le32) * ace->sid.num_subauth)
-+			break;
- 
--			if (!compare_sids(&sid_owner_rights, &ace->sid)) {
--				owner_rights = true;
--				if (!is_owner)
--					goto next_ace;
--			}
-+		if ((ace->type == ACCESS_DENIED_OBJECT_ACE_TYPE ||
-+		     ace->type == ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE) &&
-+		    !(ace->flags & INHERIT_ONLY_ACE))
-+			obj_deny = true;
- 
--			if (ace->flags & INHERIT_ONLY_ACE ||
--			    (compare_sids(&sid, &ace->sid) &&
--			     compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
--			     compare_sids(&sid_everyone, &ace->sid) &&
--			     compare_sids(&sid_authusers, &ace->sid) &&
--			     compare_sids(&sid_owner_rights, &ace->sid)))
-+		if (!compare_sids(&sid_owner_rights, &ace->sid)) {
-+			owner_rights = true;
-+			if (!is_owner)
- 				goto next_ace;
-+		}
- 
--			switch (ace->type) {
--			case ACCESS_ALLOWED_ACE_TYPE:
--				access_bits |= le32_to_cpu(ace->access_req);
--				break;
--			case ACCESS_DENIED_ACE_TYPE:
--			case ACCESS_DENIED_CALLBACK_ACE_TYPE:
--				denied |= ~access_bits &
--					le32_to_cpu(ace->access_req);
-+		member = smb_sid_in_group(&ace->sid);
-+		/* The grp_ masks count groups and OWNER RIGHTS only */
-+		counted = member ||
-+			  (is_owner && smb_sid_is_owner_rights(&ace->sid));
-+		if (ace->flags & INHERIT_ONLY_ACE ||
-+		    (compare_sids(&sid, &ace->sid) &&
-+		     compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
-+		     compare_sids(&sid_everyone, &ace->sid) &&
-+		     compare_sids(&sid_authusers, &ace->sid) &&
-+		     compare_sids(&sid_owner_rights, &ace->sid) &&
-+		     !member))
-+			goto next_ace;
-+
-+		bits = le32_to_cpu(ace->access_req);
-+		switch (ace->type) {
-+		case ACCESS_ALLOWED_ACE_TYPE:
-+			if (counted)
-+				grp_allowed |= bits;
-+			/* MAXIMUM_ALLOWED takes no group grants */
-+			if (maximal && member)
- 				break;
--			}
--next_ace:
--			ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
-+			if (counted)
-+				grp_granted |= bits;
-+			access_bits |= bits;
-+			break;
-+		case ACCESS_DENIED_ACE_TYPE:
-+		case ACCESS_DENIED_CALLBACK_ACE_TYPE:
-+			if (counted)
-+				grp_denied |= ~grp_allowed & bits;
-+			/* access_bits takes no group denials either */
-+			if (!member)
-+				denied |= ~access_bits & bits;
-+			break;
- 		}
-+next_ace:
-+		ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
-+	}
-+
-+	/* Keep only file rights, not MAXIMUM_ALLOWED or generic bits */
-+	grp_granted &= GENERIC_ALL_FLAGS & ~grp_denied;
-+	if (maximal) {
- 		if (is_owner && !owner_rights)
- 			access_bits |= READ_CONTROL | WRITE_DAC |
- 				FILE_READ_ATTRIBUTES | DELETE;
-@@ -1587,6 +1648,9 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		    (access_bits & GENERIC_READ_FLAGS) == GENERIC_READ_FLAGS)
- 			access_bits |= FILE_EXECUTE;
- 		granted = requested | access_bits;
-+	} else {
-+		/* An explicit request uses only grp_granted and obj_deny */
-+		access_bits = 0;
- 	}
- 
- 	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
-@@ -1668,7 +1732,15 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			 */
- 			if (is_owner && !or_ace)
- 				allowed = READ_CONTROL | WRITE_DAC;
--			if (*pdaccess & FILE_MAXIMAL_ACCESS_LE)
-+			/*
-+			 * Add what ACEs for the caller's groups, or OWNER
-+			 * RIGHTS for the owner, grant in DACL order, unless an
-+			 * object deny ACE, which ksmbd does not parse, could
-+			 * apply.
-+			 */
-+			if (!obj_deny)
-+				allowed |= grp_granted;
-+			if (maximal)
- 				requested |= allowed;
- 			if (!allowed || requested & ~allowed) {
- 				ksmbd_debug(SMB, "Can't find corresponding sid\n");
-@@ -1680,7 +1752,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		}
- 	}
- 
--	if (!(*pdaccess & FILE_MAXIMAL_ACCESS_LE)) {
-+	if (!maximal) {
- 		switch (ace->type) {
- 		case ACCESS_ALLOWED_ACE_TYPE:
- 			access_bits = le32_to_cpu(ace->access_req);
-
-base-commit: e49296d51ccbf2ad0ed0484db1382f1d7217bd6e
 -- 
-2.47.3
-
+Christian Brauner <brauner@kernel.org>
