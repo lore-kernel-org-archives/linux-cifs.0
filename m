@@ -1,55 +1,75 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793781878;
-	b=bE5HCTgOCui6RwJr7smoLlqoVSzpK+m1Y1x1N2Of3yntKC7eA/g3rxJQ66uyqsHv538N
-	 4OX9G6rzODX59q5s0jgZ3+TPKTBPaVqfpc3nvU22hrNU3M8JfcfJhEFhIfRyJyBmLt61u
-	 sTJRFkGLdLEjksnSZneh6sFEzfcOzloZBht9vggbJbdV2sQHpqx8lxTjEJTF0pCQ6aT0X
-	 s56lJjjV9Vyb3EE45tvqXGSyLSs4AtfxXVBAPeAMuz0/iyWpW7L+Yc+hfEfukC1wgcwZS
-	 7Tu3zju/KsYz2uvxBRxvgsTE/zMEvATTOJSsETcGRuguSmnYbWm3nKnn3LgCM06QRoA==
+	t=1793783736;
+	b=heY8DZfjs596eoeBD5Z2sDOUU9B1ozsiyIw9Ub5j5NN18cL3ACo/mUb+8fdUQxz5eknT
+	 AGHLKCBcM82NzD0fuSMaukcw6smbGvzmBLwxSSuq5fKTgnyFK3wIgZtHAwOfjsyOLGNUl
+	 EiCrjnO3XhFFGMySJ3xCOCLWogk3C1BrrMYba4ksBCT8888DurqYn6Vt6hFNjwvkESbOU
+	 /ilzQS+Bmzpgc8XaQVtUdl3qH0LHiLromofkdHAcDZgzYez5ObWIz+6D+m3kF3Mt6fzkT
+	 kzuU+alJ51HWmnUBCnfr72czmjbMxJZizh+ZFsMPXlAwFP7C4rrf0/Ct+Mu9O4f6a7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793781878;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=cxrCkQFSuOyT2sjaoiQVObpyFNJLzTlcWOT51iAX9JU=;
-	b=fel0Q1jay7UEe6uehGnr+RqVyLbzkIpD6TcBLEL++t1zlSLPHAurqKxKRCg03T3QqLgj
-	 IhBB8lABTITjUHfsXiKv7o3CMyTsw6iObXbt6lsxkxtKQEYjl8ErbbvNjoP9neeEI0ECs
-	 cDftBwsS0KvrgN03kj8ILxIGrtlY9TB0ey9JvE3dbrskE6CHI/dxx05scbZYd55VEom4K
-	 WwPJvtPay+LUi9QCH4E+EpTQGYDL9cyHisrJCgzq9EqI0hcV9vAk5O2ib9/Mt4yH74zdV
-	 H2yPeU38GEuvsJbGrxpDk1ARibGUvtAsXdtTt54PMR4LEFFGmyusY66nKh6A/tYFNMA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793783736;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=tun3DxnivT6n8ykyvHDle1jgjloMyn9wMMyaVwUBJtE=;
+	b=xmcr7yec+WPhYpeNieSszKshZJXr/3jZlrcW8PLnr+8Zh4T2kyeXJvf1i/aGPlwa+qVS
+	 R6xPzgd1Ro2Z+SaMXtkyN6ZxEdLAAtVN6DqR2QjzGXvdlwahqdhv6qUOiaQl1kLdUMPPo
+	 svBQYusftCZ8mNsJ9Le9tpJsm1Jf6NSf+sX3zXiHp5gTlqJVORtB3x1oNI6PIm6r1kdGV
+	 PolVhj4xUkvFWlKwY7Lk1oM+acc8YBO0v7qi0n7xFCNGfHNKesXbXw7JqXVKcphP3VWel
+	 PHCWI5ukpuhM5nNOHoVBztxqRAXPCZbK895HWGrw28um8DVKOXnYgI8YqQOODf7vdeA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CIq6I7t5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QF98rpjB;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67497606A328
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 08:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1070606A31B;
+	Wed,  4 Nov 2026 09:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CIq6I7t5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 446891F00919
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 08:44:38 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QF98rpjB
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 786C51F000C1;
+	Wed,  4 Nov 2026 09:15:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793781878;
-	bh=cxrCkQFSuOyT2sjaoiQVObpyFNJLzTlcWOT51iAX9JU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=CIq6I7t5S5XMD0bEAsZoX2EkuwVdeAiipKNIka9NuRteho8hN+h66yqGDXiGcFhwk
-	 K92Izf/R8/DgqpvSWOVcYfvZduuikvXnxQcEIeP22zyjtMklRUpKtS+bDQyyGGUBdg
-	 //UR/7FB+3EpvuNObicgIm9Y+SXnbFCcrC6JN28+66Pd/AZX6JitIBM/F742pRvvSm
-	 z2NbKQ01OwNM2zm89LR+OfHmZ06ViQ5o7pqmMuLjNkEilRzhphmWTgoC4yKlsCBTpl
-	 0s04PO0REerS0cvlyg9UWuzDtwKAWv0Djp2DYYZVIadfGizyc0+uW5xbZK5sXCgO+s
-	 85Zc/re2KA2BA==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c4cdc606b47so64004066b.0
-        for <linux-cifs@vger.kernel.org>; Wed, 04 Nov 2026 00:44:38 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBwHlpcUj+RvfLqkh35MBDv5dZRn+Dxv1OUiJQpPxXeT1b4ggYjTYhJZBTqs9p4BWWRYiKcB2C449oAy@vger.kernel.org
-X-Gm-Message-State: APuU4Z8EigyYcM15G64d4iPnTGmjtxCwT0ukdZrfL2IWeSUd3EHOmMOU
-	trVqBMzJBGvNb7G686W3khClM7KzLXbn2lTXzVc3YN5a8kCxKzyGqkULK3p2nEcwEsonV4oleU6
-	aoYjZb+pZItQp+Rb21IT4Cp4Tn9/6cQE=
-X-Received: by 2002:a17:907:fdcb:b0:c41:f29:72b1 with SMTP id
- a640c23a62f3a-c4ca7aeb21bmr1310103866b.47.1793781876535; Wed, 04 Nov 2026
- 00:44:36 -0800 (PST)
+	s=k20260515; t=1793783735;
+	bh=tun3DxnivT6n8ykyvHDle1jgjloMyn9wMMyaVwUBJtE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QF98rpjBzH7nX1jmz4Zo8ykeu0WPbxz0HGt6XxCXrOQ4V4PB3P/wbn5sluIzZ3bgP
+	 woOpkCVq06Ek6V7bKkHEP2phdvrGGARxXAl1OBE0IhgkRUa/IQ935AFbXxh1YUY5bJ
+	 utfjbIjp7LtybAhtZNGHqFcIoDw2mhpfxaUaUe5IHuBCvHt5tgYAPu/YfrtEAf4jWd
+	 v5zbJS1rE1Hby/io2vM2SNwmccLVR3w7pjdFYCtf7rR4Wu4skeBeZ5GH0Q1ajKmHHR
+	 yetiYqpJqieJOdcKUSYdWCjNW5p22mqd+bHsoVYbOTO4y8Ft2ybe6f5kRc5h/hiSzc
+	 /PiiXfUYZ7Gcw==
+Date: Wed, 4 Nov 2026 10:15:18 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: linux-fsdevel@vger.kernel.org, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Jann Horn <jannh@google.com>, Josef Bacik <josef@toxicpanda.com>, 
+	Chris Mason <mason@kernel.org>, Jeff Layton <jlayton@kernel.org>, NeilBrown <neil@brown.name>, 
+	Eric Dumazet <edumazet@kernel.org>, Thomas Gleixner <tglx@kernel.org>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Christoph Hellwig <hch@lst.de>, 
+	Greg Kroah-Hartman <gregkh@suse.de>, Joel Granados <joel.granados@kernel.org>, 
+	Kees Cook <kees@kernel.org>, Jan Kara <jack@suse.cz>, Jan Kara <jack@suse.com>, 
+	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-um@lists.infradead.org, linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	netdev@vger.kernel.org, ntfs3@lists.linux.dev, platform-driver-x86@vger.kernel.org, 
+	coreteam@netfilter.org, kexec@lists.infradead.org, linux-pci@vger.kernel.org, 
+	linux-sound@vger.kernel.org, netfilter-devel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	ibm-acpi-devel@lists.sourceforge.net, jfs-discussion@lists.sourceforge.net, 
+	linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	linux-fbdev@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-mm@kvack.org, 
+	linux-sh@vger.kernel.org, linux-usb@vger.kernel.org, samba-technical@lists.samba.org, 
+	sparclinux@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-doc@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-atm-general@lists.sourceforge.net, 
+	Takashi Iwai <tiwai@suse.de>, linux-input@vger.kernel.org, linux-raid@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-modules@vger.kernel.org, linux-debuggers@vger.kernel.org, 
+	Chuck Lever <cel@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH RFC 03/38] netfilter: xt_recent: don't remove the proc
+ entries under a spinlock
+Message-ID: <20261104-entgangen-nettigkeiten-intuitiv-f39521735261@brauner>
+References: <20261102-work-procfs-bugfixes-v1-0-59422ed3e465@kernel.org>
+ <20261102-work-procfs-bugfixes-v1-3-59422ed3e465@kernel.org>
+ <auig_zhd3L0HEis3@strlen.de>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,37 +79,12 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261103150458.11591-1-icb@fastmail.org>
-In-Reply-To: <20261103150458.11591-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 4 Nov 2026 17:44:24 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9xNLn1Nk1QzD_Kep1TcgJmGNsT+UTg6Ed0DjjmRRW4+Q@mail.gmail.com>
-X-Gm-Features: AclHuK-JcfuZ648DJ94l5sf55_9ZhNmAEUfsKztm_X1MvB-PgWT_Vi8TDrhO1D0
-Message-ID: <CAKYAXd9xNLn1Nk1QzD_Kep1TcgJmGNsT+UTg6Ed0DjjmRRW4+Q@mail.gmail.com>
-Subject: Re: [PATCH v3] ksmbd: grant a caller what its groups and OWNER RIGHTS
- ACEs allow
-To: Ian Bridges <icb@fastmail.org>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Aamir Ahmed <elb12345@hotmail.co.uk>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <auig_zhd3L0HEis3@strlen.de>
 
-> @@ -1531,7 +1557,12 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
->                 goto err_out;
->         }
->
-> -       if (*pdaccess & FILE_MAXIMAL_ACCESS_LE) {
-> +       /*
-> +        * Evaluate the DACL in order (MS-DTYP 2.5.3.2). MAXIMUM_ALLOWED takes
-> +        * its result, and so does a caller that only group or OWNER RIGHTS
-> +        * ACEs name.
-> +        */
-> +       {
-Please remove the redundant braces and unindent this block, as there
-are no local declarations requiring a separate scope.
-The rest looks good.
-Thanks.
+On Mon, Nov 02, 2026 at 03:41:03PM +0100, Florian Westphal wrote:
+> Yes, but note that this change is already part of a pending nf -> net
+> merge request.
 
->                 ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
->                 aces_size = pdacl_size - sizeof(struct smb_acl);
->                 for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
+Dropped.
