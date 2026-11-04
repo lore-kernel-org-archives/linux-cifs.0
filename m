@@ -1,58 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793804608;
-	b=0Tn0LLemZdsyTNFT6+43FWF2hVsJhTP90Gi3+RnWkae6CjuhgbWxQjLhPPuuiAeje26Y
-	 HOuCqeRwP9+eXiQJwTB+BlEObunGAQ6nBqrR4nDluk245SSPu04zUd/C9MkwRww+RlyrR
-	 3CPMT8Br85QmnKZ7Le0ksJn8YJd8DCNj73jg7xk0Fiw3Io7nJ0EcfxlRYPuvsO8OlIEnb
-	 xkAyYBbCcGRVHQCeS9DHQD+qOwHi48SbwMkHw5tncHRvSLegOW9nRafa/BSsEcI5zh/n7
-	 FbGKu8jxmPmhzytu9KPc9jjeBJmpGOgQufqyxGK+djjjfdfJsRhiHwV3jgvDdwSGsyw==
+	t=1793804619;
+	b=nshwq8K/MCst0dx1822ZFvZVh+YTpiwLf5E7sTMDaX5nyLY9A49enlMxX0xjV3N6NqnD
+	 S4X6mku+/nQtep/WBiE1U5H5saWy4GIAIqXBhK4L/BNkVdPFchHJhUtOmTUe/3axSz5ku
+	 r/g0QN/Nh+0oUi9kdI1DmooBRZ0FN/QTN987vhHdPnVBdvZdX3W7ZxUp+1/kAnMDpT7td
+	 9A4MMQQi44hvjiLWtNrMQiDEbBCNeMePY/XCcTf0fsYmqsbFS4zu91MpywMuar56ZXzpr
+	 BElkU5ZoWVIPOKpqfAno2gTTudoxDBqzkxmoVmm8q1WlFjVXMvND5MrDsihpMOG3l5A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793804608;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793804619;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=xdojI5MulhmiBf3zVV9kSFjtPEvP2aafXP1ED37OKs0=;
-	b=R0kyn8ZcfhjIaLGP9U3Az2DHbLmb+NlS7JuPeSQPsfqW2heFCSl82/bXLFSeUsOmYoXx
-	 4iESX5Ron3vMbGHG9Sv+gVxDogxrCktsLMdBscV63C/ka3a4qjda7PR6J3m1P/G4Mo7w/
-	 VIxqoESgdi2Fq4RQxaRfodpVk1Bn6/o/HzcJfGOm2jdESlZ+iUTXLGtYKCqDxBZH2wa06
-	 e+DfGFRWf7VMXcKiGDnchovK6bz0nlqZlEuRDKGeUl8nshPmYq+ZSvbgFO8mjc1MAxp4A
-	 ukfh51AYfRzLOpxYJ1VyVnI3o1nF9Nyn59QRQHS6c01UKWWf+/XeR1hKbDSQB9VBpMg==
+	bh=DAyjJCj2wXbOfVNE2wFtfyQIhfJLU1v4OIJSdOSX2RA=;
+	b=VA2b1zFTOXmD3ORR+GsPnYtsNAqXVhY28hWg6m6Dc8pnIIckpk+71VzlxapJ+y8hKG4S
+	 XlRy9fgg3GCIAkDBRGZGGyDmo24448egCY0GyflIvXBRhzc9Ra99+Y5HfhbZUK6yZbQIJ
+	 19GQZhjPJN2rAVT4sAx4wb+nnKNnOVQiZnw2MUaL88nOcGY5vC/0AS7alUiVLtry0VTKE
+	 sTgPjTbbuEBqGCjCpR+PjDHSIqWAbLcaLCMzpAfngT+wPcGNrlVOGtf1lTkSMSBM8XW+W
+	 mv30HUa1JtZt+lC/pik3MeC6b3tKXTzYPvba3pI1OAOBdPNaWfPgaOGP0QQ0n5Gf4og==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=a5QnXy7A;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mi9N+EfD;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9885D606A326;
-	Wed,  4 Nov 2026 15:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A0B606D805;
+	Wed,  4 Nov 2026 15:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=a5QnXy7A
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8801F00919;
-	Wed,  4 Nov 2026 15:03:27 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Mi9N+EfD
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A957A1F00A18;
+	Wed,  4 Nov 2026 15:03:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793804608;
-	bh=xdojI5MulhmiBf3zVV9kSFjtPEvP2aafXP1ED37OKs0=;
+	s=k20260515; t=1793804619;
+	bh=DAyjJCj2wXbOfVNE2wFtfyQIhfJLU1v4OIJSdOSX2RA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=a5QnXy7Al8OeQ9R9YjXI9tpmQGN6Tta+nW979NatPw0gdzrKX81qnW5EQxHSD0YGm
-	 jvP4sVqB+1BoqLvHljcdMXCjc3pVZkgthRuIY/ZIkY3GKs6hr7/o7ueB+wiC+b8lL+
-	 DnJ33NjLG6B22BmUaPNvn5b/CJBXX6LRXr7PxkSAxrLofEAKgaVNy5exd2usTml9tG
-	 5OcHxpBH7vWeYx3slCU3afEgwzTaZYxH6MlVzB84nQvmeBhFsfNM2j+2PGMZ3ppuYl
-	 +iTbGy+E9lLOeff8XsY+i61pjQ3YV89tXz9TAf2R6aogtSfrGDN6MZzjAW+2MYvKl/
-	 kMYB+6ddzfMQg==
+	b=Mi9N+EfD4/9heC/T1djMnTxHcdd2zL7Cuqu4kVpl4K4bX74glV8I1XIhSyoh6npLl
+	 aFK4xF7+7mAh0tflr7Q5yw8tKoPgln+NI026P818OqQe6KMIhu+4lbUJsYpkQkv9Le
+	 6ZU1FsUU60wQzr+kCZJFnCBBDvSkV9mLGUbVTrG5tPwdS2EUHxfkEwupmo73p5N4Op
+	 ++uIku3/dY2E0w728BApzVJRYpd521MLQpKOmnL47zLS6b8JBQwp9tLaj1DR65milY
+	 NIwWtnHO0A0vGTF3ozXoIRUO8A3Ri+0pBl/xdZwhOnGFLlHxZMqcCTGDVrtiVFZ14w
+	 y/PVzYDOY9hsA==
 From: Sasha Levin <sashal@kernel.org>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>
+To: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 Cc: Sasha Levin <sashal@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
 	stable@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	wozizhi@huawei.com,
+	lsahlber@redhat.com,
+	sprasad@microsoft.com,
+	tom@talpey.com,
+	glaming@microsoft.com,
 	linux-cifs@vger.kernel.org,
-	Joseph Qi <joseph.qi@linux.alibaba.com>
-Subject: Re: [PATCH 6.6.y v2] smb: client: base punch-hole EOF decision on server_eof
-Date: Wed,  4 Nov 2026 10:03:10 -0500
-Message-ID: <2026-11-04-1-daily-reply-0001-re-smb-punch-hole-v2@kernel.org>
+	apais@microsoft.com,
+	rlmenge@gmail.com,
+	hargar@linux.microsoft.com,
+	Paulo Alcantara <pc@manguebit.org>
+Subject: Re: [PATCH 6.6.y] smb: client: fix busy dentry warning on unmount after DIO
+Date: Wed,  4 Nov 2026 10:03:19 -0500
+Message-ID: <2026-11-04-1-daily-reply-0010-re-smb-busy-dentry-dio@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261104082535.404128-1-joseph.qi@linux.alibaba.com>
-References: <20261104082535.404128-1-joseph.qi@linux.alibaba.com>
+In-Reply-To: <7bd9007e90f271821114f617fda2c1ee@manguebit.org>
+References: <7bd9007e90f271821114f617fda2c1ee@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -64,13 +71,14 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On 2026-11-04, Joseph Qi <joseph.qi@linux.alibaba.com> wrote:
-> Reading remote_i_size therefore compares the punch against whatever the
-> slab object last held.
+On 2026-11-03, Paulo Alcantara <pc@manguebit.org> wrote:
+> LGTM.
+>
+> Acked-by: Paulo Alcantara <pc@manguebit.org>
 
-This is a stable-only change with no upstream commit, so I need an Acked-by or
-Reviewed-by from Steve or Paulo before I can queue it. Steve, Paulo, could you
-review it?
+Thanks Paulo. Queued for 6.6.
+
+Siddharth, I'll pick up the 6.1 variant when you send it.
 
 -- 
 Thanks,
