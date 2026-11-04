@@ -1,45 +1,45 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793820406;
-	b=arFUJcQz48TkIaHwUy+T8uwujsF3LlTBtqAXLBtNcJQcGbUpwhMAGENz+KndOuY4B0gA
-	 XUI7pZqrYkkZTARDG/lHjye1ak3Xyr56ULeK/IcCIxCYzU9xVVvFD7XfMjxG6vSbK3hMk
-	 WhXbIIADc25TSBq8lwZvlcmtQTEJ4A7Bjr4zpm2lrlLox5kwJN+AAVdj0BwV5qRUPp2a9
-	 L9Otg31c8emD3hO5a52RSYrPBys6WPu5JKlzvpdqZINnJZJYyTnmOPrYmDIwir2T8lm4T
-	 eEWScJrmkSDQP+e9ULGjd2A442hAAjHCpCsmJLbtcsinzrZ1xTr1AJCLMevlfWua2Wg==
+	t=1793820435;
+	b=xWhxCiki6OaHOwkl/n/xcBfaC9c/5F0FsmmBpm/G5rPqoKgC0BYqhYaBko/y+ZUty+FB
+	 fndWQHzz3+MoStvvLLYBTaMYlzeyfp8NrTjk0oVbAQQU03/JJojOl32jeFlVjns0dOaOH
+	 n1Ro106woeWZ6AhHwKJXe4KnvDbKpVKQJ2l8pC6gfKQPJ3uE7CIE8qn16BxhfYzI9Nwp+
+	 llQVyatp18GFiZ3USeYtpBLf3C7DvFYJbEuuLwYHMEnEnQuFYjJbpiLBQd0GXTxRr3Ca4
+	 4LBi5HnIGajEv+RW9zawFr3D7fuFCsJG1cT2fbEWfGU9KJ8ICdqgbltqKAIVexmQqbQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793820406;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793820435;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 In-Reply-To:References:MIME-Version:Content-Type:X-Mailer:
 	 X-Developer-Signature:X-Developer-Key:Content-Transfer-Encoding;
-	bh=cd2dCZjA0tUhyc+igqHnY6+9OAULLk3Gm7203fq742M=;
-	b=tahlq7FxQm7LIj2vBJ6IBHQq+LmPg5DgXVeqqAzlvD8gZVWLUoDCL5/mOroZA7G8BS02
-	 ZqjP+e4Uy4XlQJQ7Tgbo2HcZZ1Ow3/I7kH9Ik4mrpe51A4qm2yEO9s0lyghax86YIHXvu
-	 DuJzU8mhalpNtVU1qhU7bLwmjYEj+UC4jK2u65IzNFHiP8XegglWwegzW85JuDId0CMQe
-	 F7P3o3yyYe/+lCxA+e03KkF/8pPIP/6XBncppsTEXMngy5Et0eM7qPSFMKuWo7znAE4to
-	 E1RWvTx9VhI+V8ZjwGDL7KXQxjYYbWggriW+NiSTSBBpLIZ43suhrsKQvyFdJobzL0g==
+	bh=r5+oZHp7BRrXwItSZJfGO9IDNpMhGDSeaixBJWzgZo8=;
+	b=4pz6gdVR9uZaroG8nEbej1ZP2W+9UonfAMEt8EJTxiDVpeCOtVbjv8RBoAFAjJXcYpmA
+	 GdVQKLRC4jnyuu3in0gTV3DNiC9RN+HZSuwbe69Rv5TJUzgmSNAlByqVfHfxXNzR2pZI+
+	 q5L0prlVivPPlAbS5TPVxosGWKJT+SC7ISsIoogyXYCf0YSTTP8AEfpedPgEyTgqwdonZ
+	 m50JX8EJzTXHJQ50YCl0N75PtAEJmgBJEhIHMCShGhTl+wIhFwk6Ginha7B6SYj9jHCPH
+	 zlEGb9DjeUbckxrZC3d49WbDSsPCQSF4ygyIsQNFADwFVmVpvgEvLyLIswrWgmw+dJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ok0iN6uZ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fZMD0huu;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C145607030B;
-	Wed,  4 Nov 2026 19:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5A1607264F;
+	Wed,  4 Nov 2026 19:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Ok0iN6uZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BE81F000C1;
-	Wed,  4 Nov 2026 19:26:33 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=fZMD0huu
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0AAB1F00A02;
+	Wed,  4 Nov 2026 19:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793820405;
-	bh=cd2dCZjA0tUhyc+igqHnY6+9OAULLk3Gm7203fq742M=;
+	s=k20260515; t=1793820434;
+	bh=r5+oZHp7BRrXwItSZJfGO9IDNpMhGDSeaixBJWzgZo8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Ok0iN6uZQVSYaoCJ8QVSJT8l0lXYmNP35ncQljCwM9H9v59k+rKBWDwXyFuH6JO+M
-	 V+A/kQXQfWgbGohORmoO87IV8G5a3EeicQ9/77UKK7TnPSNtklntEWp/u4+8ZixD0c
-	 bRD3pYtw6zhIWR1FS+A6aVjGwZINr1WSqex7QK4NXh4aMIjo3IjIJsUG8/xkIzVtfH
-	 6o2/KO4Dtfl777uLHIT6W89DNE9MAKgRdxN0CGLmaTZrAGaPjU++EC952vB7Nwp+HX
-	 +JJQg7IqWsBi5yUZmEzjETxgVGZ58lqdaOlqsnXdyQP64dFRJssogaTbhl3zVphWpc
-	 sA8Q19qZfKV8A==
+	b=fZMD0huuUQp5LSr9n7+L0WCkQqKPzyWmpwqfqg+XzsqNRlIuKtlf3Iar8GeYyXaoh
+	 Duy1KTIkLZPd4wpyWSeEROyKAch5aD1WchnGy/bdzHJBKTDW5fUbZVdDqnccb3ML1S
+	 ynk82YbCOwpdp9OfHLn4Hk4TAslcNPy+3iNGpY8Onlv8nBJw5pFj50Y4poa5zyKxIw
+	 OVO6zjJj0L1s71YhuEz2nNM9sGb2RL+EkTlUz3tA5wau2YU3GduBQbxH1kPyHOemIX
+	 jzrV1tyP5WTyanlHmpiwciBJbTfxSsr8dPDlHohaL0lhPAdIlgdQvP+X/AxRNITsuF
+	 bSYKsfrnb9SrA==
 From: Christian Brauner <brauner@kernel.org>
 To: linux-fsdevel@vger.kernel.org
 Cc: Linus Torvalds <torvalds@linux-foundation.org>,
@@ -99,11 +99,10 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>,
 	linux-modules@vger.kernel.org,
 	linux-debuggers@vger.kernel.org,
 	"Christian Brauner (Amutable)" <brauner@kernel.org>,
-	Chuck Lever <cel@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH RESEND v2 43/51] powerpc/pseries/lparcfg: return h_get_ppp()'s status as a long
-Date: Wed,  4 Nov 2026 20:26:31 +0100
-Message-ID: <20261104-work-procfs-bugfixes-v2-43-021c84d852e0@kernel.org>
+	Chuck Lever <cel@kernel.org>
+Subject: [PATCH RESEND v2 45/51] selftests/proc: check a sysctl listing while entries come and go
+Date: Wed,  4 Nov 2026 20:27:00 +0100
+Message-ID: <20261104-work-procfs-bugfixes-v2-45-021c84d852e0@kernel.org>
 In-Reply-To: <20261104-work-procfs-bugfixes-v2-0-021c84d852e0@kernel.org>
 References: <20261104-work-procfs-bugfixes-v2-0-021c84d852e0@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -117,45 +116,208 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.17-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1751; i=brauner@kernel.org; h=from:subject:message-id; bh=sCHTY4Gek8l3mLAy0sLNwHA69+qK9OBjRO3AuZdnaeo=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9bmJIPL5OsslnfcA9hxcbt6X7Pli9ZcIKN0trZ+9tW 8ub7XmfdpSyMIhxMciKKbI4tJuEyy3nqdhslKkBM4eVCWQIAxenAEykQojhn5Lb2YKPu5tvWS/Q sTtlvpG7vLPqxuJNXEniS7v7VbrqjRkZ/oRc3st548nj6x0rtvtHXl6Vli/7IVk4c/HNJ0nM2So V7AA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5901; i=brauner@kernel.org; h=from:subject:message-id; bh=PpkRsqulHaX8LI6MUrkW65va02k7nMeISt9l3ZnWEgo=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWS9bmK23C5Vd0CJeVXYmud2s9Pn+J3m37HmVpnFi7ow2 bTfWdpXOkpZGMS4GGTFFFkc2k3C5ZbzVGw2ytSAmcPKBDKEgYtTACYyeRLDfw/N+y99eaf/2OCk /PjiV39BNqFbYdWnZD3mCaZ8OpuwbArDb9buj/tfO6Qb3GbVUb7QsZ5hkv1nv0KD0viMIPmMExu SGQE=
 X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
 
-h_get_ppp() returns the status of the H_GET_PPP hcall as an unsigned
-int. update_ppp() hands it on as its ssize_t result, and
-lparcfg_write() turns the hcall statuses it knows into an errno and
-returns anything else as it is. So when H_GET_PPP fails, say with
-H_PARAMETER (-4), the status comes back as 4294967292 and a write to
-/proc/powerpc/lparcfg reports that many bytes written.
+List /proc/sys/net/ipv4/conf of a new network namespace in two pieces:
 
-Return the status as the long it is. lparcfg_write() then treats it
-like the status of H_SET_PPP: an unknown error status is at least
-negative, and one of the positive long-busy statuses comes back as a
-byte count, as it does for H_SET_PPP already. Before commit
-11529396ea31 ("powerpc/pseries: Split processor entitlement retrieval
-and gathering to helper routines") a failed H_GET_PPP turned into -EIO.
+- with a buffer that holds the dots and "all", register a tun device
+  whose name sorts first, finish the listing: "all" is listed once
 
-Reported-by: Chris Mason <mason@kernel.org>
-Fixes: 11529396ea31 ("powerpc/pseries: Split processor entitlement retrieval and gathering to helper routines")
-Cc: stable@vger.kernel.org
+- with that device registered and a buffer that holds the dots and it,
+  unregister it, finish the listing: "all" is still listed
+
+Both fail without the fix, the first lists "all" twice, the second not
+at all.
+
 Signed-off-by: Christian Brauner (Amutable) <brauner@kernel.org>
 ---
- arch/powerpc/platforms/pseries/lparcfg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/proc/.gitignore            |   1 +
+ tools/testing/selftests/proc/Makefile              |   1 +
+ .../selftests/proc/proc-sysctl-readdir-churn.c     | 152 +++++++++++++++++++++
+ 3 files changed, 154 insertions(+)
 
-diff --git a/arch/powerpc/platforms/pseries/lparcfg.c b/arch/powerpc/platforms/pseries/lparcfg.c
-index 9882f98c0efb..4f6b2975c6e9 100644
---- a/arch/powerpc/platforms/pseries/lparcfg.c
-+++ b/arch/powerpc/platforms/pseries/lparcfg.c
-@@ -113,7 +113,7 @@ struct hvcall_ppp_data {
-  *	          XXXXXX - Entitled procs capacity % available to the
-  *			   partitions pool.
-  */
--static unsigned int h_get_ppp(struct hvcall_ppp_data *ppp_data)
-+static long h_get_ppp(struct hvcall_ppp_data *ppp_data)
- {
- 	unsigned long retbuf[PLPAR_HCALL9_BUFSIZE] = {0};
- 	long rc;
+diff --git a/tools/testing/selftests/proc/.gitignore b/tools/testing/selftests/proc/.gitignore
+index 8520c7878ea2..5b5e24e39cbd 100644
+--- a/tools/testing/selftests/proc/.gitignore
++++ b/tools/testing/selftests/proc/.gitignore
+@@ -25,4 +25,5 @@
+ /self
+ /setns-dcache
+ /setns-sysvipc
++/proc-sysctl-readdir-churn
+ /thread-self
+diff --git a/tools/testing/selftests/proc/Makefile b/tools/testing/selftests/proc/Makefile
+index e0c0d313f4d0..dae09f333455 100644
+--- a/tools/testing/selftests/proc/Makefile
++++ b/tools/testing/selftests/proc/Makefile
+@@ -30,6 +30,7 @@ TEST_GEN_PROGS += setns-sysvipc
+ TEST_GEN_PROGS += thread-self
+ TEST_GEN_PROGS += proc-multiple-procfs
+ TEST_GEN_PROGS += proc-fsconfig-hidepid
++TEST_GEN_PROGS += proc-sysctl-readdir-churn
+ TEST_GEN_PROGS += proc-pidns
+ 
+ include ../lib.mk
+diff --git a/tools/testing/selftests/proc/proc-sysctl-readdir-churn.c b/tools/testing/selftests/proc/proc-sysctl-readdir-churn.c
+new file mode 100644
+index 000000000000..b2ad097b464a
+--- /dev/null
++++ b/tools/testing/selftests/proc/proc-sysctl-readdir-churn.c
+@@ -0,0 +1,152 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * A listing of a /proc/sys directory that takes more than one getdents64()
++ * must not show an entry twice or skip one when an entry is registered or
++ * unregistered in between. /proc/sys/net/ipv4/conf/<dev> of a tun device
++ * comes and goes with the device.
++ */
++#define _GNU_SOURCE
++#include <dirent.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <limits.h>
++#include <linux/if.h>
++#include <linux/if_tun.h>
++#include <sched.h>
++#include <string.h>
++#include <sys/ioctl.h>
++#include <sys/syscall.h>
++#include <unistd.h>
++
++#include "../kselftest_harness.h"
++
++#define CONF_DIR	"/proc/sys/net/ipv4/conf"
++#define TUN_NAME	"a0"		/* sorts before "all" */
++#define TUN_PATH	CONF_DIR "/" TUN_NAME
++#define SMALL_BUF	80		/* ".", ".." and one short name */
++#define NAMES		64
++
++static int tun_open(const char *name)
++{
++	struct ifreq ifr = {};
++	int fd;
++
++	fd = open("/dev/net/tun", O_RDWR | O_CLOEXEC);
++	if (fd < 0)
++		return -1;
++	strncpy(ifr.ifr_name, name, IFNAMSIZ - 1);
++	ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
++	if (ioctl(fd, TUNSETIFF, &ifr)) {
++		close(fd);
++		return -1;
++	}
++	return fd;
++}
++
++/* one getdents64() into @buf, the names appended to @names */
++static int list(int fd, char *buf, size_t size, char names[][NAME_MAX + 1],
++		int *n)
++{
++	long ret, off;
++	int got = 0;
++
++	ret = syscall(__NR_getdents64, fd, buf, size);
++	if (ret < 0)
++		return -errno;
++	for (off = 0; off < ret;) {
++		struct dirent64 *d = (void *)(buf + off);
++
++		if (*n < NAMES)
++			strcpy(names[(*n)++], d->d_name);
++		got++;
++		off += d->d_reclen;
++	}
++	return got;
++}
++
++static int count(char names[][NAME_MAX + 1], int n, const char *name)
++{
++	int i, c = 0;
++
++	for (i = 0; i < n; i++)
++		if (!strcmp(names[i], name))
++			c++;
++	return c;
++}
++
++FIXTURE(sysctl_readdir) {
++	int dir;
++	int n;
++	char names[NAMES][NAME_MAX + 1];
++	char buf[65536];
++};
++
++FIXTURE_SETUP(sysctl_readdir)
++{
++	int tun;
++
++	if (unshare(CLONE_NEWNET))
++		SKIP(return, "unshare(CLONE_NEWNET): %s", strerror(errno));
++	tun = open("/dev/net/tun", O_RDWR | O_CLOEXEC);
++	if (tun < 0)
++		SKIP(return, "/dev/net/tun: %s", strerror(errno));
++	close(tun);
++	self->dir = open(CONF_DIR, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++	if (self->dir < 0)
++		SKIP(return, CONF_DIR ": %s", strerror(errno));
++	self->n = 0;
++}
++
++FIXTURE_TEARDOWN(sysctl_readdir)
++{
++	close(self->dir);
++}
++
++/* a device registered in front of the position doesn't repeat an entry */
++TEST_F(sysctl_readdir, register_in_front)
++{
++	int tun;
++
++	/* ".", ".." and "all", "default" doesn't fit */
++	ASSERT_EQ(list(self->dir, self->buf, SMALL_BUF, self->names, &self->n), 3);
++	ASSERT_EQ(count(self->names, self->n, "all"), 1);
++
++	tun = tun_open(TUN_NAME);
++	ASSERT_GE(tun, 0);
++	ASSERT_EQ(access(TUN_PATH, F_OK), 0);
++
++	while (list(self->dir, self->buf, sizeof(self->buf), self->names,
++		    &self->n) > 0)
++		;
++	EXPECT_EQ(count(self->names, self->n, "all"), 1);
++	EXPECT_EQ(count(self->names, self->n, "default"), 1);
++	EXPECT_EQ(count(self->names, self->n, "lo"), 1);
++	close(tun);
++}
++
++/* a device unregistered in front of the position doesn't skip an entry */
++TEST_F(sysctl_readdir, unregister_in_front)
++{
++	int tun;
++
++	tun = tun_open(TUN_NAME);
++	ASSERT_GE(tun, 0);
++	ASSERT_EQ(access(TUN_PATH, F_OK), 0);
++
++	/* ".", ".." and the device, "all" doesn't fit */
++	ASSERT_EQ(list(self->dir, self->buf, SMALL_BUF, self->names, &self->n), 3);
++	ASSERT_EQ(count(self->names, self->n, TUN_NAME), 1);
++
++	/* closing the device unregisters its sysctls under RTNL */
++	close(tun);
++	ASSERT_EQ(access(TUN_PATH, F_OK), -1);
++
++	while (list(self->dir, self->buf, sizeof(self->buf), self->names,
++		    &self->n) > 0)
++		;
++	EXPECT_EQ(count(self->names, self->n, "all"), 1);
++	EXPECT_EQ(count(self->names, self->n, "default"), 1);
++	EXPECT_EQ(count(self->names, self->n, "lo"), 1);
++}
++
++TEST_HARNESS_MAIN
 
 -- 
 2.53.0
