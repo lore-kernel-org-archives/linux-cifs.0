@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793757183;
-	b=e1iYF+B84aJomsqw4Vk//3trNyHU+RotiRi9mZGvuVLiIkRvs4HIhbkTbuY1FqHQ4+g5
-	 13U9FyClLg0FuK9EkMM+GIPsHqx/RjOpKNn+vzTRJt4VgO5GFA0eIbDJW5GPb2pzjJB4G
-	 0CZbfexmjpmTtXE62NN0VSFPD9mtcyk8RtCDm5mxHdgWt0ByNsQCaBG9sy7aDBjpwbndk
-	 Tsmkw2je7KPPc+kNbNw/PA3eXM4WPbKpM2ffFpeQTLX/XpLSdBrNvYwQdDzkG7lnu2LvT
-	 ym8txgrea2IaFm70FCqYHec0BME/cpzzq2jI7KH9SzJ1JViI2z+ZVSg++j8ankW+09g==
+	t=1793766651;
+	b=ctZDLLEvDFsRRf3HBYFIIPH7+cKG8r2ZhiMUTmFn0wwewOs3kU9eZ1cwpRWDFld/MEoN
+	 Hcj1LzFnOBKATyKwwmyG/poY6ufe+Zf4wToa79rb4QUXauKtPKfL0MWo/r6wVNMb3vlhK
+	 j3WHANkTRbJFzr9LepCOMVZuh91VKuJfsq8cAtYx5y5RVP+h0l/tVjZSka6xMq/kk+z7P
+	 VsneXTonMn67S9MaY2kAkNMSP7sGTjMZ40qFZ901KEKUS2R0OH++tQGuy35vrGGl0RiOx
+	 DZ740hjkfOh3HY7vwS8fDBvrtJrdVVdboYg6KbkvXSzfR4lD6A8G5VRBmVAOHl4Q7fg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793757183;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793766651;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=GQ4mEHI7sQjBBaEIricpvMN6RFFxM9rPq7clRjSmwKg=;
-	b=xZt+A0/KTGK3JbtnEnA637hKjF0VPNCYLc3VL2vNvZ6dptJbNFlRs75jJ8dapA6kYtym
-	 6TtYevX4WKcjNjGQQS90Gq6OncdkGXElUl6aTYJXPJEMsZw2flTT0sStnjSTdizLh7ZOC
-	 V+hfkBTISOiA1XZLopeSo1OfaOZu+u+zjkmcdthbQV5lTLiZeJhhJoKRxfUBIEMI2v5GM
-	 XcLOXR5v/YBTdXYWS7V3GZ+BsgxHMCzgYQFixfhVlcZ2SlqTSAUy62ViZQaBgaZvyqrSm
-	 yDm8N7zC2a8oelnpHghBaxmWf3Iv+VU3pTLYM7B8zU9FpFO3e+aufTzb9JqHJ45InhQ==
+	bh=ZpNcQj24yuMM3GQtiTzILqkIccl+qas6VuLsoUlL4Ug=;
+	b=r0hLv/Go0FIi8OFHfwKZnJy3QfVkBE9/P+idYfNY1B7brUtA2P73zoEUydbAlZBz2hRO
+	 hJmtIDdCwNXf0unlIvK+RM5wSnwrDYGLVTnPn4716f4CsIdCtCsVVYvMhA0HU7hjbLHGi
+	 +qXF91qPHfSEAFpKgvEml7Kv29Ya9LS2cDzBCZY5AwRZVt4g+R4Ol5Aps1OgXluxalYn7
+	 Yl93B0E7qF3zF1B2LYKS0Sz9bFtd7CVQL6awTukzJggHoODOF7R20gyvS/HXnn3LwMajX
+	 UNvqo7NhmJLBzjjaxtlwbwx9Nhdk9nNTKQ0zIZ0Uj01eu727U+GF80dPdM0amvWzcBA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NMKkVY3s;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S6eMCrzx;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5299606A32C
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 01:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8006A606A328
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 04:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=NMKkVY3s
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B21A01F00A15
-	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 01:53:02 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=S6eMCrzx
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE881F00A02
+	for <linux-cifs@vger.kernel.org>; Wed,  4 Nov 2026 04:30:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793757182;
-	bh=GQ4mEHI7sQjBBaEIricpvMN6RFFxM9rPq7clRjSmwKg=;
+	s=k20260515; t=1793766651;
+	bh=ZpNcQj24yuMM3GQtiTzILqkIccl+qas6VuLsoUlL4Ug=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=NMKkVY3sFk5NieJ/HJQbEnMH0jt5LRjMXJGu/Nhi1+qt6+Hiepsyn1pZcY9uBWNnb
-	 29IF4NE8GU83KH5MZHx6nKGUfU9kP8Fch30m6xVAEbZH2gsEP5CLltbd73u9lG8nMN
-	 6hNpTQRUKxx2EQoi0Hv6xBsq+/35qz047oSuv5jE+jbH4GL/oCuJYt9MnkvVMQ8XG8
-	 BN1Lj4xrS3De06nISJmQ24Uu/5lFqYk3WisKQU4YifirKKVmC45qFYvNVH7fRG6uDJ
-	 kfDPyem7anvLkd7BsoB3ByY2Op0KyD7LvdYPTcj5W6TdsPieLxY/ENOp+yiQOTnGNs
-	 EdfsJ6K2mc1/A==
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c4697404c2bso24633466b.2
-        for <linux-cifs@vger.kernel.org>; Tue, 03 Nov 2026 17:53:02 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBw2e0UW/WIzG44nGZe4GJU4VjR3QaXOdGI9zHmQk6u3ZmQYrSb2ssvnGOe8Hst8VgfPyqlT+CdlEZsD@vger.kernel.org
-X-Gm-Message-State: APuU4Z8MBc4GS0NTvflURBk6+GzWaEwLdQScxVDRXKnALP1tl1gg49ta
-	/sxnIvWs0KbmzkjiGNSLG4j/myazHzxAaf3YihydaTyCf12UrVFon8SydzDrTuWJZCNEKHI2ZDc
-	1n+EgIOlLRcnM1trXqY4qJU0eWXOOoiU=
-X-Received: by 2002:a17:906:ef06:b0:c41:1e13:8891 with SMTP id
- a640c23a62f3a-c4ca7a43c0fmr1236027766b.9.1793757181430; Tue, 03 Nov 2026
- 17:53:01 -0800 (PST)
+	b=S6eMCrzxSqAOVgmsmosfiLt8SlqWRJYLyBn3xFly7Axbs+CcnPZ4suZp+uIys3Jgc
+	 4PwgTbTlGU+uYOszuV8JP+quWKwBxKS0umYm/RwW51oNPRYy3PUiyHVWkOxVZxjgx4
+	 iyfRVBNLA48avCLJMCo3K1GIR3vb4qV6CJQFbxTTr0vjQgzk8W7P81bBsbroB1LPs8
+	 yBB7q/qVivwzcHqmmyFRbQkymuYXeNTeHnwepvXQh+s7v3pfcTjSLsX1p7wwCXwz46
+	 CC8oUXW94stSS2g68YvdxCf9/IgebUmbDYhrb+JsOZwoZXblciB5A2GLh+57Fk5YtQ
+	 PRfyBpOd6IrMg==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6b56221d361so68696a12.3
+        for <linux-cifs@vger.kernel.org>; Tue, 03 Nov 2026 20:30:51 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AKwUvByTXRTLrDQ6GIZHIknb5XSuk95N+jF30Bnu4y5M9nJkdf/Cevn6K3rCf5NLoRkp0HXUvt0zwvesvORI@vger.kernel.org
+X-Gm-Message-State: APuU4Z+KnmK5ZZOUeTidBeFtWuueHZD8gCn5uVh6QvPQIalwiQSrxTN5
+	c9+0Ek8iDLW7FYj0Fr5jbOGohXIy8nuxog15iqLkQCHCqYZT+rfAKMypWSXCMwfOH/rDzIMfJzv
+	aTk4wjWFsQvdgb1+P6iuF5yTexp1adiU=
+X-Received: by 2002:a05:6402:a505:10b0:6aa:e46b:2ca with SMTP id
+ 4fb4d7f45d1cf-6b4d5537ae9mr7019046a12.30.1793766649804; Tue, 03 Nov 2026
+ 20:30:49 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,38 +59,38 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261103110803.2517085-1-joseph.qi@linux.alibaba.com> <2026-11-03-1-daily-reply-0014-re-ksmbd-breaking-cnt-leak@kernel.org>
-In-Reply-To: <2026-11-03-1-daily-reply-0014-re-ksmbd-breaking-cnt-leak@kernel.org>
+References: <20261103111453.84804-1-mike.michalo@gmail.com>
+ <20261103111453.84804-3-mike.michalo@gmail.com> <20261103171742.18816-1-icb@fastmail.org>
+ <A37137ED-872A-4969-A1BD-C23E9B523EDD@gmail.com>
+In-Reply-To: <A37137ED-872A-4969-A1BD-C23E9B523EDD@gmail.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 4 Nov 2026 10:52:49 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd__FvF-bCzzq_JHFqCF===_qrVZC8RLjrp4nh1s8sXq_Q@mail.gmail.com>
-X-Gm-Features: AclHuK8LuxqZ51cFZaXEAg-WEfk--Vr4t3lFrt9KWk0uDBpkuGwjwHPpOGXYZf0
-Message-ID: <CAKYAXd__FvF-bCzzq_JHFqCF===_qrVZC8RLjrp4nh1s8sXq_Q@mail.gmail.com>
-Subject: Re: [PATCH 6.6.y] ksmbd: fix breaking_cnt leak on early return in oplock_break()
-To: Sasha Levin <sashal@kernel.org>
-Cc: Paulo Alcantara <pc@manguebit.org>, Steve French <stfrench@microsoft.com>, stable@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, Joseph Qi <joseph.qi@linux.alibaba.com>
+Date: Wed, 4 Nov 2026 13:30:36 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8ozh-WT+iSLspeZ_h2PM3xLSK4c22EsDD+53z7nbzieg@mail.gmail.com>
+X-Gm-Features: AclHuK_UFq3A83cRJ7DhTEK66pNCvFNRdlhviHK4gv1kJtzRQYyXpFPlKH59ijQ
+Message-ID: <CAKYAXd8ozh-WT+iSLspeZ_h2PM3xLSK4c22EsDD+53z7nbzieg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] ksmbd: add AES-GMAC signing support
+To: mixalhs <mike.michalo@gmail.com>
+Cc: Ian Bridges <icb@fastmail.org>, senozhatsky@chromium.org, tom@talpey.com, 
+	chenxiaosong@chenxiaosong.com, ematsumiya@suse.de, linux-cifs@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 3, 2026 at 11:52=E2=80=AFPM Sasha Levin <sashal@kernel.org> wro=
+On Wed, Nov 4, 2026 at 2:57=E2=80=AFAM mixalhs <mike.michalo@gmail.com> wro=
 te:
 >
-> > For leases, oplock_break() increments breaking_cnt before calling
-> > oplock_break_pending(), and returns early when the pending check
-> > reports nothing to break
+> Hi Ian,
+> Thank you for the careful analysis and the reproducer.
 >
-> This is a stable-only fix, so I need an ack from Namjae Jeon on the list =
-before
-> queueing it. 6.18 and 6.12 have the identical bug and this patch applies =
-there
-> unchanged, so once it is acked I will queue it for 6.18, 6.12 and 6.6 tog=
-ether.
-I agree this fix should be queued for all three stable branches.
-Acked-by: Namjae Jeon <linkinjeon@kernel.org>
-
+> You=E2=80=99re right: in the multichannel branch of smb2_sess_setup() the=
+ binding
+> request is never verified with Session.SigningKey, and with AES-GMAC t
+> hat turns the existing signing oracle into nonce reuse.
+> Namjae, please don=E2=80=99t apply this version. I was unaware of this.
+> I=E2=80=99ll send a v2 that first verifies binding requests with the sess=
+ion signing
+> key before they are processed or any response is signed with it, and
+> check whether legitimate binding can also reuse a nonce under
+> the session key.
+Okay, I will check v2 patches.
 Thanks!
->
-> --
-> Thanks,
-> Sasha
