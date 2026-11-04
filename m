@@ -1,75 +1,58 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793783863;
-	b=Mp/cCq9dDUkW6x5kXXovUkU7J2Ex+2BqH69nJ8KhkeNbPD/7prSSk650FUwGrH8lOyLp
-	 DLUKUJJGIMlfk2qSqAmZ/79JddkC6q2vyUYRZMho57P0tgyJb5IbwLTDrbszeDlWXNztD
-	 Gja1FcEBx3NRAJSk+p5KUFPBlfef033sxwY0NreKWyNSaJuJGbZDdwIiB3L7duz0On+6C
-	 615q4ErCCEnxaZzLq9savxhB882DouhijwqN1Nfgxo170QqtMIzPKK5exJfPjdn+LmbV6
-	 SlJLqer8eJaJHAFTkyouKkld5rcONdezwYqmvMHy9LU8sNBpddBCF2OVfjO9cBOD4Qg==
+	t=1793804608;
+	b=0Tn0LLemZdsyTNFT6+43FWF2hVsJhTP90Gi3+RnWkae6CjuhgbWxQjLhPPuuiAeje26Y
+	 HOuCqeRwP9+eXiQJwTB+BlEObunGAQ6nBqrR4nDluk245SSPu04zUd/C9MkwRww+RlyrR
+	 3CPMT8Br85QmnKZ7Le0ksJn8YJd8DCNj73jg7xk0Fiw3Io7nJ0EcfxlRYPuvsO8OlIEnb
+	 xkAyYBbCcGRVHQCeS9DHQD+qOwHi48SbwMkHw5tncHRvSLegOW9nRafa/BSsEcI5zh/n7
+	 FbGKu8jxmPmhzytu9KPc9jjeBJmpGOgQufqyxGK+djjjfdfJsRhiHwV3jgvDdwSGsyw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793783863;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=vFLCfIpQzvj87maXuJncKjZMHxfbMjkVEErOwSrEMzQ=;
-	b=sFWKpBwLggaRTm8knp6AldUbYKl9CFDvHYpYxQ0aIYOK66knpWkwBJGQ6MrbCws4tUW5
-	 /9wYQlWzbbdct9yJklGSVNfw1Qeq5cFbORaIa5K5rluZFtqQOTrVIPaSU4CZtYHG0jcb+
-	 xMaxR5g4+0UmnzCKSr1qjjRNJN3steQAoDhNvG2fi2N/XYXPYtmBGpgeA06dgoa1P/1iT
-	 g+uT2q5j3TNWVFjsOSYaNjz0fftSURMmT1Jn/EFO7OnjczO9MBjHSYgydQl8PmosW8/m6
-	 dEDYZPS0Ljyow+DwVy65NwlNnPA2quntRu/FjrvBzizeDghFWwhhmsSlf+NdH31xglA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793804608;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=xdojI5MulhmiBf3zVV9kSFjtPEvP2aafXP1ED37OKs0=;
+	b=R0kyn8ZcfhjIaLGP9U3Az2DHbLmb+NlS7JuPeSQPsfqW2heFCSl82/bXLFSeUsOmYoXx
+	 4iESX5Ron3vMbGHG9Sv+gVxDogxrCktsLMdBscV63C/ka3a4qjda7PR6J3m1P/G4Mo7w/
+	 VIxqoESgdi2Fq4RQxaRfodpVk1Bn6/o/HzcJfGOm2jdESlZ+iUTXLGtYKCqDxBZH2wa06
+	 e+DfGFRWf7VMXcKiGDnchovK6bz0nlqZlEuRDKGeUl8nshPmYq+ZSvbgFO8mjc1MAxp4A
+	 ukfh51AYfRzLOpxYJ1VyVnI3o1nF9Nyn59QRQHS6c01UKWWf+/XeR1hKbDSQB9VBpMg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AkGIp68v;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=a5QnXy7A;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C20606A31B;
-	Wed,  4 Nov 2026 09:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9885D606A326;
+	Wed,  4 Nov 2026 15:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AkGIp68v
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9461A1F000C1;
-	Wed,  4 Nov 2026 09:17:30 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=a5QnXy7A
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8801F00919;
+	Wed,  4 Nov 2026 15:03:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793783862;
-	bh=vFLCfIpQzvj87maXuJncKjZMHxfbMjkVEErOwSrEMzQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AkGIp68vobiZwB2XixXdCJHgtF8bS2InhigVuwsdqp6n5/W+M82eXJQmgMDIXncGQ
-	 ZsgLev6upKoTph4wRGMw/6Rt8tdd4yiEe0QTNTPemQ626tgZDkM1GcZGQlIINcGmX1
-	 rweyg/M+elK322suBIlSSUF7Ca/phJp24NGzpraEYkCKjrptZL+chTq0rR5ps9q2f2
-	 buSjg3t9Zzbjt9a55NJ2t3tMIsF7dtK6fdeAh04poa02hll2Rco50kbc8I+oEfsxAS
-	 NzUPxVvIxDSaOzz7ERaAm3QpoNHvfOUNEKEQothQH0rTaYd4IAl0SGRh52pJdJDENe
-	 eaiECSjcPGAaQ==
-Date: Wed, 4 Nov 2026 10:17:28 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-fsdevel@vger.kernel.org, Jann Horn <jannh@google.com>, 
-	Josef Bacik <josef@toxicpanda.com>, Chris Mason <mason@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	NeilBrown <neil@brown.name>, Eric Dumazet <edumazet@kernel.org>, 
-	Thomas Gleixner <tglx@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Jonathan Corbet <corbet@lwn.net>, Christoph Hellwig <hch@lst.de>, 
-	Greg Kroah-Hartman <gregkh@suse.de>, Joel Granados <joel.granados@kernel.org>, 
-	Kees Cook <kees@kernel.org>, Jan Kara <jack@suse.cz>, Jan Kara <jack@suse.com>, 
-	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-um@lists.infradead.org, linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	netdev@vger.kernel.org, ntfs3@lists.linux.dev, platform-driver-x86@vger.kernel.org, 
-	coreteam@netfilter.org, kexec@lists.infradead.org, linux-pci@vger.kernel.org, 
-	linux-sound@vger.kernel.org, netfilter-devel@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	ibm-acpi-devel@lists.sourceforge.net, jfs-discussion@lists.sourceforge.net, 
-	linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-mm@kvack.org, 
-	linux-sh@vger.kernel.org, linux-usb@vger.kernel.org, samba-technical@lists.samba.org, 
-	sparclinux@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-doc@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-atm-general@lists.sourceforge.net, 
-	Takashi Iwai <tiwai@suse.de>, linux-input@vger.kernel.org, linux-raid@vger.kernel.org, 
-	linux-ext4@vger.kernel.org, linux-modules@vger.kernel.org, linux-debuggers@vger.kernel.org, 
-	Chuck Lever <cel@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH RFC 01/38] PCI/proc: don't truncate the position of
- config space accesses
-Message-ID: <20261104-beugt-kapern-geehrt-19e2e2dd58f6@brauner>
-References: <20261102-work-procfs-bugfixes-v1-0-59422ed3e465@kernel.org>
- <20261102-work-procfs-bugfixes-v1-1-59422ed3e465@kernel.org>
- <CAHk-=wiSA7-mqmAjTQDaU7UjUyWt0TxYwXHafL8ZAPudy+B_uQ@mail.gmail.com>
+	s=k20260515; t=1793804608;
+	bh=xdojI5MulhmiBf3zVV9kSFjtPEvP2aafXP1ED37OKs0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=a5QnXy7Al8OeQ9R9YjXI9tpmQGN6Tta+nW979NatPw0gdzrKX81qnW5EQxHSD0YGm
+	 jvP4sVqB+1BoqLvHljcdMXCjc3pVZkgthRuIY/ZIkY3GKs6hr7/o7ueB+wiC+b8lL+
+	 DnJ33NjLG6B22BmUaPNvn5b/CJBXX6LRXr7PxkSAxrLofEAKgaVNy5exd2usTml9tG
+	 5OcHxpBH7vWeYx3slCU3afEgwzTaZYxH6MlVzB84nQvmeBhFsfNM2j+2PGMZ3ppuYl
+	 +iTbGy+E9lLOeff8XsY+i61pjQ3YV89tXz9TAf2R6aogtSfrGDN6MZzjAW+2MYvKl/
+	 kMYB+6ddzfMQg==
+From: Sasha Levin <sashal@kernel.org>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>
+Cc: Sasha Levin <sashal@kernel.org>,
+	Steve French <stfrench@microsoft.com>,
+	stable@vger.kernel.org,
+	linux-cifs@vger.kernel.org,
+	Joseph Qi <joseph.qi@linux.alibaba.com>
+Subject: Re: [PATCH 6.6.y v2] smb: client: base punch-hole EOF decision on server_eof
+Date: Wed,  4 Nov 2026 10:03:10 -0500
+Message-ID: <2026-11-04-1-daily-reply-0001-re-smb-punch-hole-v2@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261104082535.404128-1-joseph.qi@linux.alibaba.com>
+References: <20261104082535.404128-1-joseph.qi@linux.alibaba.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -79,28 +62,16 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wiSA7-mqmAjTQDaU7UjUyWt0TxYwXHafL8ZAPudy+B_uQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 02, 2026 at 09:58:51AM -0800, Linus Torvalds wrote:
-> I think this would actually be better with rw_verify_area() just
-> checking a per-file maxbytes.
->
-> We already have that logic for lseek and friends - using that fairly
-> hacky combination of s_maxbytes and !unsigned_offsets().
->
-> We should combine s_maxbytes and unsigned_offsets() at file open time
-> into f_maxbytes and check that not just at lseek but in
-> rw_verify_area.
->
-> And then things like proc_bus_pci could set it's size limit in one single place.
+On 2026-11-04, Joseph Qi <joseph.qi@linux.alibaba.com> wrote:
+> Reading remote_i_size therefore compares the punch against whatever the
+> slab object last held.
 
-Yeah, I like that.
+This is a stable-only change with no upstream commit, so I need an Acked-by or
+Reviewed-by from Steve or Paulo before I can queue it. Steve, Paulo, could you
+review it?
 
-Hm, maybe we should keep this and the isapnp thing small and do that
-change on top.
-
-This also might mean a change in behavior. Because a read past the end
-returns 0 for proc_bus_pci and for a regular file past s_maxbytes. So
-that would potentially need some more changes.
+-- 
+Thanks,
+Sasha
