@@ -1,50 +1,50 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1793918744;
-	b=bcVgvaRivaX+l9cKJ/b61biBJKBHOPj93ypAeHJWWJYNgcNOxl7zq7mKY2EwaG1AiSeg
-	 zYF/UNPbAJO7iDLnW55CHd5xR1F2Y72u78Xw18gGELMHtZvQlcQTe4scEpVxW3jXdHz1b
-	 XCkdm6n8L27Nk2Ir1tsR9v6F6a52bn5JXdLayv7U4WHLdotWug/bfdJ2nVEh5nS6paWzw
-	 2nGuwKQJuarImbgwe/539QQbRal888qnScvjNECDZ1RzkcyKeZvaP+chsfJH3OD/SkEiK
-	 NUq8n6a0DQadYr2cetNTeTGFbkiAOP85mpDgBLUy3y7LNzXNLberp03XMYHvGiEwuqw==
+	b=FhFxkgtQyd7po8KekqzMDmp4Wm7dxPwGvC5kS9zlo910vJT+xgjaDCG37oQyJwJklFqU
+	 O2QkoVHf7Heh2NM/gm4uataRNf4t6tP3EFTVOuKHSfdWXgFJaeK9BvryF0Ar5Gp9AqZxi
+	 kJs6cJwqfoIPdFTOzfpMVmKRIUXuvjyfIABLZUTG69h+OpfJu6u7y7TtZ3rK0xas1djKA
+	 Ro8yb1iiNkeKCU0XWqYw+DZ5N5AV8yTOpNiMwnxaPPDOFyj8+bxq6SML4h+yK63g9McAU
+	 WhLcfjveIxqLxuzfnj9hkxXS3Mdaa2EZWbpkskhZV+wBVJumgDVgpOKT8oMU73tSX7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1793918744;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=zbKLAnuBZe+4yKtzTOQDfDyNndD4zkvcGnWOdV0jqwo=;
-	b=yTPbosaH8PshZWa/qtoVgWyxKbCYGb7edBvq2yuTtO0mCzJJQ303DFk6065bIO2ICwrO
-	 aRC6P9AEk5E6OJB7nqQiVOo+9CwdgvtiW2p8HJo72aByYn30RmSexMxQygwZ49vJa9ils
-	 EvClaQXUAZ92vzOSizOI++TE8aQ79jJ99FcX1OxQysIvkacXwNCndq0BkyCyruVaYF+ws
-	 9H6h2r71GVM4j/aV2Rti8ayIqTr2AOuxhL4IWdSpSv3UQhovERiORsEFEkF3PbhEtSpTm
-	 QGOjdHMTooRkvnKBq40PZdBjVWz1tHGJC9tJPuXt51NWkB3vTCQewgKSSIp0TOlydUQ==
+	bh=Ou/xKQ4DknQm01m4CCWFME78lWod5GyjBbGuJ5Btxkg=;
+	b=NDAntCkDtjJI5O7yDF0qhWaZx/T5zhufkSaOW46MCcnV+dTJocsc81R7bMWfv6E5pYdE
+	 JGZvDzOS6bt44NfTnQBHTEhQBJtmICe6yL4c5qkG1NXIFHbrLjOS8tqVRW5Lmnh9zgxaX
+	 iKIcu5QPf81PiuQX55CR/1EvbeWsv5XJYT3b49nM9fmaaWgXOCe+T0mn/iMoxl/yQ2uWI
+	 vGndzq3Zm0vXU6wA4XrcQckq/fwNLXeAzth+9AmFDRmXgD5zOSBmBH35pEQS2N1A/oDjm
+	 ltxYKiacICEAUtULXCPcb3elXgCWWICVVHpLHmmo3nDV6HC0TOc2tPnHu05papszFPw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=0KKXCMgc;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b="Cn/ve2wH";
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9A3606A32D;
-	Thu,  5 Nov 2026 22:45:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F9A3606A32D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8F0606D824;
+	Thu,  5 Nov 2026 22:45:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2B8F0606D824
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=0KKXCMgc
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Cn/ve2wH
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=zbKLAnuBZe+4yKtzTOQDfDyNndD4zkvcGnWOdV0jqwo=; b=0KKXCMgcJ9IeD1Fr+67ze1OcGB
-	+pjHHSruQIWpVppvR9acChUj3hnHrar4Tq4l9ZmiRPqcIFCqG8Uduc5ZBpNarmZaASb+0EdgCJ0s3
-	gnFVl5bX7cbx+rmKEJpvUpgdye1uKlK/lr7uR4YjQGWQDHfJt51FQvGi07zqoOvXmwgAdNlYOwfaP
-	GLHNt5FwT/UzGdZ40CtawbqDGevjy2AoCZrvVi8+hUSN6qQWUwF8BsBQM99+2ikQPEROtuk1iKAld
-	0fkBN35iRMcvj+0SwgWtRUVgwE5ctIhV1/CKQw03tVBI63zcasV+GqupKKtNSNIh8PoCU7qGFuB57
-	nO4qZdCg==;
+	bh=Ou/xKQ4DknQm01m4CCWFME78lWod5GyjBbGuJ5Btxkg=; b=Cn/ve2wH3/8rEt8LByBXImEq0B
+	h7sRkPJAzbHSU+6YVY6/YhM0uAcmRsYfq1ZcEmd4Hjeb760gIQl2C70UFcWQDKHoFWmlQbM6Yz3P8
+	6qweKP/r/upB9+E7ItpU608heNJhwY6g71USngcb3tJ092EZMfOAygjUXBXA6Z5001sQJH4axOpUe
+	ZQvNergp3d8eh7LfKAX+UU68+4A6qF0iZaJLLCtKsMX3JwCb9U+we1f+dpg2qWtOhEAWvVMRE+8bL
+	edahicLlMR1JCMxqY/qC1cI6R4zUm2I6PQaeM0DT5UAkbI198ZumG8rM/EeAZIarx1MgyhiNFOHWa
+	kaRP074Q==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xP6D8-00000000yo7-0PHh;
+	id 1xP6D8-00000000yoT-3Bnt;
 	Thu, 05 Nov 2026 19:45:35 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v5 09/17] smb: client: don't fail writeback preparation if the task is dying
-Date: Thu,  5 Nov 2026 19:45:23 -0300
-Message-ID: <20261105224531.2316211-10-pc@manguebit.org>
+Subject: [PATCH v5 11/17] smb: client: don't block dying tasks waiting for writeback on fsync
+Date: Thu,  5 Nov 2026 19:45:25 -0300
+Message-ID: <20261105224531.2316211-12-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261105224531.2316211-1-pc@manguebit.org>
 References: <20261105224531.2316211-1-pc@manguebit.org>
@@ -74,146 +74,124 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cifs_prepare_write() may need to reopen an invalidated handle and to wait
-for credits, both from the context of the task doing writeback.  A dying
-task gets the reopen refused at send time and the killable credit wait
-interrupted, so the subrequest is failed and, as with refused sends, its
-folios end writeback clean and the data is lost.
+cifs_fsync() and cifs_strict_fsync() wait uninterruptibly for writeback
+through file_write_and_wait_range().  As with close, a task killed in
+fsync(2) on a hard mount with an unresponsive server is stuck in D state
+until the server comes back.
 
-For writeback in a dying task, skip both and prepare a credit-less
-subrequest capped at SMB2_MAX_BUFFER_SIZE, as already done when the
-server is low on credits.  It gets issued from cifswritebackd, which
-reopens the handle if needed and takes a single credit when sending,
-neither of which can be interrupted there.  Do the same when the reopen
-or credit wait fails because a fatal signal arrived meanwhile.
+Wait killably instead, using the same helper as cifs_flush().  The
+writeback keeps going and its errors stay in the mapping; only the dying
+caller stops waiting for it.
 
-cifs_begin_writeback() reopens the handle too when all the writable ones
-got invalidated, e.g. by a reconnect.  If that fails, there is no
-upload stream, so netfs ends writeback of every folio clean with no
-error recorded.  Take an invalidated handle as is there and leave
-reopening it to cifs_prepare_write().  If there is no writable handle at
-all, record -EIO for the mapping, so that the loss gets reported.
-
-Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsglob.h |  1 +
- fs/smb/client/file.c     | 37 ++++++++++++++++++++++++++++++-------
- 2 files changed, 31 insertions(+), 7 deletions(-)
+ fs/smb/client/file.c | 64 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 42 insertions(+), 22 deletions(-)
 
-diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index e211dea91e6e..064a2cdab4d9 100644
---- a/fs/smb/client/cifsglob.h
-+++ b/fs/smb/client/cifsglob.h
-@@ -1894,6 +1894,7 @@ enum cifs_find_flags {
- 	FIND_NO_PENDING_DELETE	= (1U << 2),
- 	FIND_OPEN_FLAGS		= (1U << 3),
- 	FIND_NO_DIRECT		= (1U << 4),
-+	FIND_NO_REOPEN		= (1U << 5),
- };
- 
- #define   MID_FREE 0
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 1bd8edbc8d7b..396524c3f2b6 100644
+index abbf6a1be9e2..0fc1f74b55b6 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -135,12 +135,17 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 		cifs_negotiate_wsize(server, cifs_sb->ctx,
- 				     tlink_tcon(req->cfile->tlink));
- 
-+	if (cifs_writeback_dying(subreq))
-+		goto defer;
-+
- retry:
- 	if (open_file->invalidHandle) {
- 		rc = cifs_reopen_file(open_file, false);
- 		if (rc < 0) {
- 			if (rc == -EAGAIN)
- 				goto retry;
-+			if (cifs_writeback_dying(subreq))
-+				goto defer;
- 			subreq->error = rc;
- 			return netfs_prepare_write_failed(subreq);
- 		}
-@@ -149,10 +154,17 @@ static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
- 	rc = server->ops->wait_mtu_credits(server, wsize, &stream->sreq_max_len,
- 					   &wdata->credits);
- 	if (rc < 0) {
-+		if (cifs_writeback_dying(subreq))
-+			goto defer;
- 		subreq->error = rc;
- 		return netfs_prepare_write_failed(subreq);
- 	}
-+	goto out;
- 
-+defer:
-+	wdata->credits = (struct cifs_credits){};
-+	stream->sreq_max_len = min_t(size_t, wsize, SMB2_MAX_BUFFER_SIZE);
-+out:
- 	wdata->credits.rreq_debug_id = subreq->rreq->debug_id;
- 	wdata->credits.rreq_debug_index = subreq->debug_index;
- 	wdata->credits.in_flight_check = 1;
-@@ -216,10 +228,15 @@ static void __cifs_issue_write(struct netfs_io_subrequest *subreq)
- 
- static void cifs_issue_write_worker(struct work_struct *work)
- {
--	struct netfs_io_subrequest *subreq;
-+	struct cifs_io_subrequest *wdata;
-+	struct cifsFileInfo *cfile;
- 
--	subreq = container_of(work, struct netfs_io_subrequest, work);
--	__cifs_issue_write(subreq);
-+	wdata = container_of(work, struct cifs_io_subrequest, subreq.work);
-+	cfile = wdata->req->cfile;
-+	while (cfile->invalidHandle &&
-+	       cifs_reopen_file(cfile, false) == -EAGAIN)
-+		;
-+	__cifs_issue_write(&wdata->subreq);
+@@ -3026,6 +3026,45 @@ cifs_get_readable_path(struct cifs_tcon *tcon, const char *name,
+ 	return -ENOENT;
  }
  
- static void cifs_issue_write(struct netfs_io_subrequest *subreq)
-@@ -354,15 +371,17 @@ static void cifs_begin_writeback(struct netfs_io_request *wreq)
- 	struct cifs_io_request *req = container_of(wreq, struct cifs_io_request, rreq);
- 	int ret;
++static int cifs_wait_writeback_killable(struct address_space *mapping,
++					loff_t start, loff_t end)
++{
++	pgoff_t end_index = end >> PAGE_SHIFT;
++	pgoff_t index = start >> PAGE_SHIFT;
++	struct folio_batch fbatch;
++	int rc = 0;
++
++	folio_batch_init(&fbatch);
++	while (!rc &&
++	       filemap_get_folios_tag(mapping, &index, end_index,
++				      PAGECACHE_TAG_WRITEBACK, &fbatch)) {
++		for (unsigned int i = 0;
++		     !rc && i < folio_batch_count(&fbatch); i++)
++			rc = folio_wait_writeback_killable(fbatch.folios[i]);
++		folio_batch_release(&fbatch);
++		cond_resched();
++	}
++	return rc;
++}
++
++static int cifs_file_write_and_wait_killable(struct file *file,
++					     loff_t start, loff_t end)
++{
++	struct address_space *mapping = file->f_mapping;
++	int rc, rc2;
++
++	if (end < start)
++		return 0;
++
++	rc = filemap_fdatawrite_range(mapping, start, end);
++	if (cifs_wait_writeback_killable(mapping, start, end))
++		return -EINTR;
++	rc2 = file_check_and_advance_wb_err(file);
++	if (!rc)
++		rc = rc2;
++	return rc;
++}
++
+ /*
+  * Flush data on a strict file.
+  */
+@@ -3037,7 +3076,7 @@ int cifs_strict_fsync(struct file *file, loff_t start, loff_t end,
+ 	unsigned int xid;
+ 	int rc;
  
--	ret = cifs_get_writable_file(CIFS_I(wreq->inode), FIND_NO_DIRECT,
-+	ret = cifs_get_writable_file(CIFS_I(wreq->inode),
-+				     FIND_NO_REOPEN | FIND_NO_DIRECT,
- 				     &req->cfile);
- 	if (ret) {
--		ret = cifs_get_writable_file(CIFS_I(wreq->inode), FIND_ANY,
--					     &req->cfile);
-+		ret = cifs_get_writable_file(CIFS_I(wreq->inode),
-+					     FIND_NO_REOPEN, &req->cfile);
- 	}
- 	if (ret) {
- 		cifs_dbg(VFS, "%s: couldn't find writable handle: %d\n",
- 			 __func__, ret);
-+		mapping_set_error(wreq->mapping, -EIO);
- 		return;
- 	}
+-	rc = file_write_and_wait_range(file, start, end);
++	rc = cifs_file_write_and_wait_killable(file, start, end);
+ 	if (rc) {
+ 		trace_cifs_fsync_err(inode->i_ino, rc);
+ 		return rc;
+@@ -3069,7 +3108,7 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ 	struct inode *inode = file_inode(file);
+ 	struct cifs_sb_info *cifs_sb = CIFS_SB(file);
  
-@@ -2828,7 +2847,7 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
- 	}
+-	rc = file_write_and_wait_range(file, start, end);
++	rc = cifs_file_write_and_wait_killable(file, start, end);
+ 	if (rc) {
+ 		trace_cifs_fsync_err(file_inode(file)->i_ino, rc);
+ 		return rc;
+@@ -3104,25 +3143,6 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
+ 	return rc;
+ }
  
- 	if (test_bit(CIFS_INO_TMPFILE, &cifs_inode->flags))
--		find_flags &= FIND_NO_DIRECT;
-+		find_flags &= FIND_NO_REOPEN | FIND_NO_DIRECT;
+-static int cifs_wait_writeback_killable(struct address_space *mapping)
+-{
+-	struct folio_batch fbatch;
+-	pgoff_t index = 0;
+-	int rc = 0;
+-
+-	folio_batch_init(&fbatch);
+-	while (!rc &&
+-	       filemap_get_folios_tag(mapping, &index, (pgoff_t)-1,
+-				      PAGECACHE_TAG_WRITEBACK, &fbatch)) {
+-		for (unsigned int i = 0;
+-		     !rc && i < folio_batch_count(&fbatch); i++)
+-			rc = folio_wait_writeback_killable(fbatch.folios[i]);
+-		folio_batch_release(&fbatch);
+-		cond_resched();
+-	}
+-	return rc;
+-}
+-
+ /*
+  * As file closes, flush all cached write data for this inode checking
+  * for write behind errors.
+@@ -3135,7 +3155,7 @@ int cifs_flush(struct file *file, fl_owner_t id)
  
- 	cifs_sb = CIFS_SB(cifs_inode);
- 
-@@ -2888,6 +2907,10 @@ int __cifs_get_writable_file(struct cifsInodeInfo *cifs_inode,
- 	spin_unlock(&cifs_inode->open_file_lock);
- 
- 	if (inv_file) {
-+		if (find_flags & FIND_NO_REOPEN) {
-+			*ret_file = inv_file;
-+			return 0;
-+		}
- 		rc = cifs_reopen_file(inv_file, false);
- 		if (!rc) {
- 			*ret_file = inv_file;
+ 	if (file->f_mode & FMODE_WRITE) {
+ 		rc = filemap_fdatawrite(mapping);
+-		if (cifs_wait_writeback_killable(mapping))
++		if (cifs_wait_writeback_killable(mapping, 0, LLONG_MAX))
+ 			return 0;
+ 		rc2 = filemap_check_errors(mapping);
+ 		if (!rc)
 -- 
 2.56.0
 
