@@ -1,55 +1,65 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793918059;
-	b=Lss8VDmLtq3HgpIS2Cr34xeJGBqkmzoF0IvBalDqzpv/1cNL6tgm1JNoHV2kOt5M/rhj
-	 tNWWplOIKZweNgwWPpz3rSRF9H1Tpg0WfrvvM+wCI7HUr8kgr/OQtYuHv8vWjliTBrINH
-	 5S++G1WX2TKHz6DDy8C80WEE1GCqNjOwGzvG7t08RmylRHt+NrMuhlINqRwhwnWGFeM4b
-	 XJrj+zYIaNqgOpJTX4vuxJOxHS3twtoKNERREiw6WaW4zPbkd6O7Ac8f5ptZS/YViacFz
-	 p6gRovMwOb+hnDlWwajuCeYG8qy6HTvo5C28XWHrIyGT5JAsMt7Pm8l3cGSkTf+1gQw==
+	t=1793918743;
+	b=P4/3oV4CvAPS+2LEmHvECw2RSwZHhBs5c2BdBqPRhuO4yw1QfAiKKG9INdV678uJCMkX
+	 MKjte/3U+3HEOWsBLT1cljwZaMY+WULah5kDqNPEZusawpsKYROyTrRoIXXPLf8i+M2zD
+	 JlQeZDGoL3X/1nelZ+5GtMykJrlN8YYgmYRxpOhQWlfjwsKbCI5sFfCpgu2eCFkByXUCe
+	 Zff4N7TBR3AOz3GeNXqr3wxfxxZh06WsmOoAWqw9vHRhHh0rDqkUp83oJA7Y6qY8VvoJi
+	 uihLJQj9kx2LncATveN3JNX54RJyfJd/uqA1PqBoBGbXxVNQHgKA/6Cxi3gyLWHZHXQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793918059;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=iIWyxXCkV5ahjt2ebCV4WwQbZmTr+s4l0TyythVjJvU=;
-	b=bhFAohEiu9voRaG+tkvPTVHYHzAjqyZi9xhOrm5pgxz2ncZqOqQlZywOrncgpVyKCvje
-	 xu2cU5UTvohZOwFBRFyAF0+q4TH2ndBuZvJncsJaSE7HYnpeKHFqv6WQmhVuGQKsQodv+
-	 abr4jKkyJCphAi7acI51IzUOk9sbTLkvyANpSVqdXDiw+EJlphYvKRZzbmyL0odlp4/Xo
-	 gclriPIJIfe+QvLJ6awEYuLg0pPew3NJRyrtTHGDEgVOeAGCISJnS0q/D90loM2+9Wadu
-	 j/8l9lDvtWSwLgvSNaNpTBDRSzW6YKeeQ741QkuLOJLqVDHr3VJFCN8oG6mz9/Ow2kA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793918743;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=ZTa/Jt/ajk9w2ogu7PpcXWzyo8kd4EG2J929XN7gTMg=;
+	b=qvyU1E+jWiDNV1nE0H+/iA+RR0RwqgrnLsu2r/ki1fz6qvE9Sf84DGzT++kv1857/8tL
+	 OQOPGrdFEqRgMUYcNbxIfAXreLJXRLO6ZdKVc3Vmxuc3AT54l5bxv9u5U4v3+CaYOuf+E
+	 udkreS7xFUvDd8/T/96HbgW8IFgk+7Ubtrc8tFpgnMfWxoZOQ++wYOQBtgA3NqCwrfTlw
+	 DckQmn9+zCfaO4u/Lq7MH8OiXoyvPgbKUCzEjnXZLVXnLKctrkizrTV4ol4jTxAXZqRID
+	 fKtST8lpYEPndZ84SMFCG8jjYGfOU6D51vvQQA/hIv4n9OjReciCnqCRXAD5FZRj+Jg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LpTQOPsa;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=03XOtLq5;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5432606A31B
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Nov 2026 22:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8DA606A326;
+	Thu,  5 Nov 2026 22:45:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F8DA606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LpTQOPsa
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62A711F008A7
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Nov 2026 22:34:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793918058;
-	bh=iIWyxXCkV5ahjt2ebCV4WwQbZmTr+s4l0TyythVjJvU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=LpTQOPsazkS046yyu7iM/H6joY8tK05w+5aAecGuEF859grYWgXiB0qwH94f0v91u
-	 H9ZGV95ZVEp372EQYcpdhqBDbwWyETlxO2MXUA+Kfpvgf4kaeZdumCilG321pHF9fQ
-	 ir6w9AtFriLkQ3QBwri1xhrULnMmAqYMi2mSQZC/w5ZUVw+on9rPT+jT/CJx8win4o
-	 jfxSzyYGtPSo7RvCK6NdMtRJ22dkTptcY9L4IxSHXlxoEvTOO3Zty8Frw2PEg2OQK6
-	 mocIswp3bXfJLwXQtJFWJf++XgzHtVg258tnU4Nh3VhIx2xXS30WX16kqoEB0VDvM6
-	 odTsR0MKM4pPw==
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c4d1b35dc42so10399866b.0
-        for <linux-cifs@vger.kernel.org>; Thu, 05 Nov 2026 14:34:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AKwUvBz3e9n7GK4Yf/Ep7C37x/IA0TTTAJRagIrlRSmLzNRwCw08wdVgOIFEftDOoJFvZPsBcJpYXfP7CiXm@vger.kernel.org
-X-Gm-Message-State: APuU4Z/C/kLxxQHgA6YjuIBB0dGLGcx7HW7yp9lxkcjva9Z3E1kkjnaV
-	K+CcXPrSzorXTPPkB9s9X3c2YIQSvBA4JD+0vc1Wq2l3RH4baFMilqdw2Dt//x8EKAPRQutVgGi
-	Wmw7pjxybQ7jlTeqn/xoIIDYdz48nHJ4=
-X-Received: by 2002:a17:906:ef03:b0:c40:2439:4d9a with SMTP id
- a640c23a62f3a-c4d207ad09fmr313558066b.28.1793918056929; Thu, 05 Nov 2026
- 14:34:16 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=03XOtLq5
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=ZTa/Jt/ajk9w2ogu7PpcXWzyo8kd4EG2J929XN7gTMg=; b=03XOtLq5PQYpBhaTZvjvqUhfh3
+	LaATVwybBIZgfD++pnllTEoxQSSTOuwBIn2IH0oTAR8vj2/6sijNKS+3HrZ7G3vd5VAWlC4d693TA
+	pCm2ajSgT9iNwILHO5ZauTtwXAz0M1egUyV+l0qLmhxEB8byw7Tgfc74TnRqy0gS7v0JJNVuh3jmL
+	L5D7xafjqYgiY+2S4WGy/I9ls+kFjYsC7RGAUe9LvMGvvLAFxWvMAtyKkKvi4I0kCNsKCXLPYI3Ik
+	eroua3jTZUssyH/DlNlpp7g71JCJ3b1e/VsJk5f6+swIkWnJJoTh1fvNh4N48bDRQ9icYs/RY5BoR
+	cUYYG8mw==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xP6D5-00000000ymW-00cL;
+	Thu, 05 Nov 2026 19:45:32 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	David Howells <dhowells@redhat.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Christian Brauner <brauner@kernel.org>
+Subject: [PATCH v5 00/17] smb: client: fix data loss in writeback
+Date: Thu,  5 Nov 2026 19:45:14 -0300
+Message-ID: <20261105224531.2316211-1-pc@manguebit.org>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,33 +69,162 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261105173838.1882328-1-wahidzk0091@gmail.com> <20261105211943.696696-1-icb@fastmail.org>
-In-Reply-To: <20261105211943.696696-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 6 Nov 2026 07:34:04 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8E-tBJhmfYdT7bwikCj2dN_sk_L5aSrAjyKX3-4wAZCA@mail.gmail.com>
-X-Gm-Features: AclHuK9MVVizSVLgfQxPDF_PUbcOqVST15KpDkJmfqMFUIuoIHX5YpXWT38l6mk
-Message-ID: <CAKYAXd8E-tBJhmfYdT7bwikCj2dN_sk_L5aSrAjyKX3-4wAZCA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: refuse to read a handle that is not open for reading
-To: Ian Bridges <icb@fastmail.org>
-Cc: Wahid Khan <wahidzk0091@gmail.com>, smfrench@gmail.com, senozhatsky@chromium.org, 
-	tom@talpey.com, chenxiaosong@chenxiaosong.com, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 6, 2026 at 6:19=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrote=
-:
->
-> On Thu, Nov 05, 2026 at 11:08:38PM +0530, Wahid Khan wrote:
-> > Return STATUS_ACCESS_DENIED when the file is not readable.
->
-> Tested on ksmbd-for-next with KASAN. A READ on a handle opened for
-> FILE_WRITE_DATA | FILE_EXECUTE | FILE_READ_ATTRIBUTES hits the warning
-> before and gets STATUS_ACCESS_DENIED after. smbtorture gives the same
-> results as without the patch.
->
-> Reviewed-by: Ian Bridges <icb@fastmail.org>
-> Tested-by: Ian Bridges <icb@fastmail.org>
-Applied it to #ksmbd-for-next.
-Thanks!
+Hi,
+
+A task killed while close() flushes its dirty pages gets its writes
+refused by __smb_send_rqst() (fatal signal pending), and netfs then ends
+writeback with the folios clean.  The data never reaches the server and
+no error reaches the application: stat() still reports the cached size
+while the file on the server is short.  It was reported against a RHEL 9
+kernel, where the same trigger makes stat() fail with -EIO after a
+rename(2), and it reproduces on mainline as this silent lost write.
+
+Any other failure that is only transient hits the same wall: since the
+move to netfslib, a failed upload ends writeback with the folios clean,
+so a reconnect, a lost handle, an interrupted wait or an -ENOMEM
+silently drops the data.
+
+This series makes writeback retry instead of giving up:
+
+ - a dying task's writeback is issued from a workqueue, and the close()
+   and fsync() waits for it are killable
+ - writeback is retried with exponential backoff on replayable errors,
+   interrupts, -ENOMEM and on losing the connection, share or handle,
+   and handle reopens are retried the same way
+ - umount -f aborts the retries, reconnect waits and replay loops of the
+   mount's requests, and writeback no longer blocks in the reconnect or
+   credit waits so the unmount's own sync can't hang there
+
+On hard mounts writeback is retried until the server comes back or
+umount -f.  On soft mounts it gives up after max(3, retrans) *
+echo_interval from the first failure of each write (3 minutes, and about
+6 minutes from the outage since that is when cifs declares the server
+dead), recording -EIO.  Reads and direct writes still follow the hard
+and retrans mount options.
+
+Patch 1 is independent: writeback could pick a handle opened with
+O_DIRECT, and Windows rejects unaligned writes on those with
+STATUS_INVALID_PARAMETER, dropping 1.2% of the writes in xfstests
+generic/051.  It is first so it can be backported on its own.
+
+Patches 2 and 3 are netfs fixes the cifs patches depend on: patch 2 is
+Ivan's (20261028181229.1408342-1-ivanrwcm25@gmail.com), keeping the
+prepare_write() errno across a reissue; patch 3 does the same for
+prepare_read() when read retries are abandoned.
+
+Not covered by this series:
+
+ - after a umount -f that fails with -EBUSY, reads and writes retrying
+   (e.g. across a reconnect) give up while a remount, freeze or new mount
+   of the same superblock waits on s_umount
+ - if every writable handle of an inode is O_DIRECT (e.g. mmap of an
+   O_DIRECT fd), its unaligned writeback still fails, with the error
+   reported
+
+Thanks,
+Paulo
+
+Changes since v4:
+ - don't let the flusher block the unmount under s_umount in a writeback
+   reopen or credit wait, nor a sync(2) racing umount -f
+ - keep the forced-unmount teardown from reconnecting and replaying until
+   the tree disconnects are done, wake per-user sessions too, and keep
+   doing so on tcons no mount uses any more
+ - replay a durable reopen only when its fresh open had an unknown
+   outcome, tracked per open file, and stop retrying a failed durable
+   reconnect as a fresh open with a stale GUID
+ - don't let umount -f abort reconnect waits on a tcon another mount uses
+ - retry reads that couldn't be sent due to a stale handle or credits
+ - resend direct writes cut short by a reconnect as replays, or fail them
+   with -EIO under umount -f
+ - reopen writeback handles from the worker only once per retry, so a
+   dead mount can't tie it up for the other mounts
+ - reopen persistent handles from the reconnect worker without waiting,
+   rescheduling it only after transient failures
+
+Changes since v3:
+ - new patch to stop a mount's tcons from reconnecting and replaying for
+   the duration of the forced-unmount teardown, so a reconnect wait or a
+   per-PDU replay loop (a close work item in particular) entered after the
+   unmount began can't hang cifs_kill_sb(); it also covers tcons shared
+   with another mount for those moments, and fails the reconnect worker
+   fast so it can't pin and leak the tcon, session, server and cifsd thread
+
+Changes since v2:
+ - stop writeback started after a forced unmount (e.g. the unmount's own
+   sync) from retrying forever on a hard mount
+ - fail writeback sends and reopens fast at every point in
+   smb2_reconnect(), not only the first, so a reconnect that starts
+   midway can't still block the unmount
+ - abort a write's first retry under umount -f even before netfs bumps
+   its retry count
+ - keep a dying task from looping in the reopen retry, and keep a read
+   from looping on a forced -EAGAIN retry
+ - track the bad handle (-EBADF) across out-of-order subrequest failures,
+   and recheck the handle after the backoff sleep
+
+Changes since v1:
+ - new patch to not write back through O_DIRECT handles (data loss of its
+   own, found by generic/051); put first for an independent backport
+ - dropped the netfs patch that deferred write retries until all
+   subrequests were queued (could deadlock writeback under memory
+   pressure); keep the prepare_read() errno on abandoned read retries
+   instead
+ - issue writeback sends and handle reopens without waiting for a
+   reconnect, and make umount -f also stop the credit wait, cover
+   multiuser per-user tcons, and not be gated by tc_count, so the
+   unmount's own sync can't hang
+ - make the reopen retry reconnect-aware and bounded, don't replay
+   reopens inside SMB2_open(), track the bad handle (-EBADF) per request,
+   and fix a retried read failing with -EAGAIN and a dying-task writeback
+   looping on a reopen that gave up
+ - record -EIO (not a transient errno) when writeback finally gives up
+
+Iván Ezequiel Rodriguez (1):
+  netfs: preserve prepare_write errno on reissue
+
+Paulo Alcantara (16):
+  smb: client: don't write back through O_DIRECT handles
+  netfs: keep the prepare_read errno when abandoning read retries
+  smb: client: let umount -f abort retried reads and writes
+  smb: client: don't give up writeback on the first replayable error
+  smb: client: don't retry failed writes forever regardless of mount
+    options
+  smb: client: don't block dying tasks waiting for writeback on close
+  smb: client: issue writes from a worker if the task is dying
+  smb: client: don't fail writeback preparation if the task is dying
+  smb: client: retry writeback on interrupts and allocation failures
+  smb: client: don't block dying tasks waiting for writeback on fsync
+  smb: client: retry writes that couldn't be issued due to a reconnect
+  smb: client: retry writeback after losing the connection, share or
+    handle
+  smb: client: let umount -f stop waiting for reconnects on hard mounts
+  smb: client: don't replay handle reopens inside SMB2_open()
+  smb: client: fail writeback sends and reopens fast when the server is
+    gone
+  smb: client: stop reconnecting and replaying during a forced unmount
+
+ fs/netfs/read_retry.c      |  16 +-
+ fs/netfs/write_issue.c     |   4 +-
+ fs/smb/client/cifs_fs_sb.h |   2 +
+ fs/smb/client/cifsfs.c     | 189 +++++++++++++---
+ fs/smb/client/cifsglob.h   |  33 ++-
+ fs/smb/client/cifsproto.h  |  11 +-
+ fs/smb/client/cifssmb.c    |  15 +-
+ fs/smb/client/connect.c    |  17 +-
+ fs/smb/client/file.c       | 449 ++++++++++++++++++++++++++++++++++---
+ fs/smb/client/misc.c       |  22 +-
+ fs/smb/client/smb2file.c   |   2 +
+ fs/smb/client/smb2ops.c    |  22 +-
+ fs/smb/client/smb2pdu.c    | 128 +++++++----
+ fs/smb/client/smb2proto.h  |   9 +
+ fs/smb/client/trace.h      |   4 +-
+ fs/smb/client/transport.c  |  15 +-
+ 16 files changed, 791 insertions(+), 147 deletions(-)
+
+-- 
+2.56.0
+
