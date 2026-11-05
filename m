@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793840000;
-	b=EgW++X8NSUHY8mYRujZStt1bOcf7ip/MEQxYTfNv8u1y2vObluumbo1/Pf05anmPD59B
-	 q9vobClNpiWpPOCMm6CKBaBdoBIO/t0xjQGuJ9Q/1Iwq3hYCUuAMIaQaclAIUI+UNYYln
-	 5skhrOXFTQa9ogqB0WIGr2sybBnAsS2DvMfBz0Wkuh6iVxVUk4wpb3dbbVzwoIeMRvd70
-	 bnLxSN0s2qv83jWgq0HbkeqlrFxDVaeESZHeN19YtD2XR7lwXqtxGImW60QznRUThBRTw
-	 tgimSunUxTwmxwYmic+feYZi4TT2Wj7gI1SHLDWyzMry3W5opVtkJ3I9Q3fapClKQ/w==
+	t=1793840012;
+	b=n0eZUYmlHXbh1NGtU8JkEltiSd6S+xc4mB5be2om708hscS0pPXSBGCtJFkKCpDsjACO
+	 r/NPJoGLDhItOZGdO//yM/PyeqHttyultinYaX6RG82wGgV73Ql9WYrBcAMwfrjeTVvi0
+	 TeLG902/pNLiCQnWzS5B2uEU8AvgKUEzx6lk0NuuRjafW7dBE7GrDpUT9vtUhLJFYbBcw
+	 ro9eH4dyd0/B0w6nvGz5X5H3vb8bwco0qcUSpDh7IW6uWUEYp1aiplfJhk6HWiM16Ma6S
+	 z+TeLUVErLgmhhiCPEHJ4llr223VWf+lYOKErhE3iMouENor42WnxhFOlN2EiTAFK7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793840000;
+	a=rsa-sha256; c=relaxed/relaxed; t=1793840012;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=VRz/fr2W5XuC5uSGQ1HwHlJlRaYB2g29XfbHOGVqqEg=;
-	b=pm5mI5cER6W4gFqZE9n1CroOs7wYCYqecSSkJjpb8Z68gaQWOkhCrZgijIDAExBhzlhX
-	 brnUF+e8VS6ltqWRds8oh/BaxqhDfk880TD87VUu350Z7rZ/B9HbMz/eg5oM4pWVeqHbZ
-	 4sSEp87GDM/Z7Ak5K2hOctJPyEzXGSdiKYHriuKQhE/6zDDkeQmA4eusomfnftFHfhy/9
-	 mwys7UAz9mMgu66vuq1KX279cigCug0SzqqwTioLrJYn//KSbF5u3fxKk3dcj9GBwg/Cq
-	 oIqx5SpLYAbev/qjFI8sfWCgbkCTsz2mratJS9CkqndBSXPx3tp6AuHcgWQHaAS365g==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=QVH4HUhUjAGbn//KdcTKvYYK0jkAf27rpg6dT7GZY+M=;
+	b=tqza5Uxbue9UNALwAiz7D12LqzSOh5jCN2GgeUtaX9Y467AvVoQhkg/i9f9WIQ8XEaek
+	 b+8UXR/+Tth5k6mMpv9fMZDUPYhGK0eokEPkBXMEfElrEVVH8S5BXmgARscCo8VF9Vh2o
+	 MfuiJqh+zFFL+PawjKq2S+ihe5ZAW3yVtoAWKbMS5mkp6VNu6DIWmChu4gwlUp1qkTTm3
+	 Mm0qHI3w7PMCCdfOIoNcQYYwmPZN6x8W0Crn4KRSVQAJ1gN40hzw8eTM/SSmkbHQ88dFt
+	 TEuqIGfJzAri4Dmec2+n443e5AoyUaFeNSl+AT1BJ7MbFVweIP+t3LbLayft+0Wcb2w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=biGpPmbr;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MiMrQwuM;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 514EC606A31B;
-	Thu,  5 Nov 2026 00:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id ABF21606D80B;
+	Thu,  5 Nov 2026 00:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=biGpPmbr
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 240B21F000C1;
-	Thu,  5 Nov 2026 00:53:19 +0000 (UTC)
+	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MiMrQwuM
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C06D91F00A02;
+	Thu,  5 Nov 2026 00:53:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1793839999;
-	bh=VRz/fr2W5XuC5uSGQ1HwHlJlRaYB2g29XfbHOGVqqEg=;
-	h=From:To:Cc:Subject:Date;
-	b=biGpPmbr7mxbjpmYiMiR7S0h+DjiNBCcSJhGp65qcu7SPBIZ9i/YqIulnrwG0sr50
-	 jYlfxviw16RWhT/60c2g2iu69BB5l2NsJ9QRlw+Zhwnl5XFGSOodjTZ1887uKu6DuE
-	 yjvxfaOffAc0oDY6QPn6bZyXQEt8sCQr7BYNoXiQcfASKiwiNi9Yt//h5o4EZn7G9e
-	 RgU0RWTEmjjSIdxMgRHs5XmLlLfeDwl4pV5fDIp1JVmzna/j7b9ELvTf5UY2kQg2XO
-	 O8RgV4KPvvIEUAaV5nV7A97Ud9lo2sSix9k8hiJvfy0UgT2w6CoDWaKeUHfxDL67q6
-	 iZs3gcyLwkePA==
+	s=k20260515; t=1793840011;
+	bh=QVH4HUhUjAGbn//KdcTKvYYK0jkAf27rpg6dT7GZY+M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=MiMrQwuMBREr4QW2G95o26V2fXh5j8Qsrn2stfvv6IvyRC+Xxb9L4QjZRsKIrQff2
+	 58r11XU2ceL6mI+kXwto2tiiIeakIB/kRiYolt+W8NSgtX/HLoRsQeUDQvjs+eaTmW
+	 ZveBD+0WBsyKbuNlLYLyUfan5gQ/JtvoIpx5V/qzCPpm2h0MWU5MY72l0/0Kpqan3o
+	 LFRWSQ6jzJcDENbM05ItxqNTSRXeclKOVnDo65yfnTMOye3Qq1/D/nBWdQdTcGnbMt
+	 ZfEW7y2FrUzAAPgmOKB5KqyZ7AkXZHhSzp5b1UoE5ajOosLp7cjlSctQvNI9HIBx2L
+	 OQT1x5dkm5x6w==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: David Howells <dhowells@redhat.com>
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -78,10 +78,12 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Trond Myklebust <trondmy@kernel.org>,
 	Vasily Gorbik <gor@linux.ibm.com>
-Subject: [RFC PATCH v3 00/11] KEYS: Sanitize the garbage collector
-Date: Thu,  5 Nov 2026 02:52:59 +0200
-Message-ID: <20261105005311.804098-1-jarkko@kernel.org>
+Subject: [RFC PATCH v3 03/11] NFSv4: Clear idmap keyring cache when the last client unloads
+Date: Thu,  5 Nov 2026 02:53:02 +0200
+Message-ID: <20261105005311.804098-4-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261105005311.804098-1-jarkko@kernel.org>
+References: <20261105005311.804098-1-jarkko@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -93,128 +95,81 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-1. Replace key_type_dead retyping with module reference pinning so live
-   keys and restrictions keep their backing key_type module loaded until
-   key_gc_unused_keys() or keyring_destroy() completes.
-2. Process serial-tree scans and graveyard destruction in fixed 64-key
-   chunks to a bound workqueue execution latency without hurting overall
-   throughput for a significant amount.
+id_resolver_cache->thread_keyring caches id_resolver_legacy keys up until
+nfs_idmap_quit() tears down the keyring.
 
-The first part has a user-space visible effect: rmmod returns -EBUSY while
-keys or keyring restrictions still pin the backing module.
+Once keys pin to the kernel module of their key type, the cached keys
+prevent module_exit() from ever happening.
 
-Internal key caches or transport state bottlenecks are addressed by either
-clearing their private caches on last-client teardown or splitting key
-types into dedicated provider modules.
+Track the active idmap instances under a mutex and clear the idmap cache
+keyring once the last client has been destroyed.
 
-CHANGES
-=======
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+---
+ fs/nfs/nfs4idmap.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-v3:
-- Split dns_resolver and rxrpc key types into dedicated provider modules
-  (dns_resolver_key.ko and rxrpc_keys.ko) instead of client refcounting,
-  so cached or retained keys do not pin dns_resolver.ko or rxrpc.ko.
-- Dropped the standalone nvme-keyring fix as it was picked up by the
-  subsystem maintainers.
-- Hardened key_gc_flush() to serialize against chunked key_gc_work
-  continuations, and fixed a restriction module reference leak on failed
-  keyring instantiation.
-
-v2:
-- Used v1 as a test probe for Sashiko to detect the corner cases instead
-  of trying to resolve even the known ones beforehand.
-- Converted the client subsystems to be compatible with the module
-  pinning semantics.
-
-VERSIONS
-========
-
-- v2:
-  https://lore.kernel.org/linux-integrity/20261103030226.2685251-1-jarkko@kernel.org/
-
-Cc: keyrings@vger.kernel.org
-Cc: linux-afs@lists.infradead.org
-Cc: linux-cifs@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-nfs@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: samba-technical@lists.samba.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Anna Schumaker <anna@kernel.org>
-Cc: Bharath SM <bharathsm@microsoft.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Eric Dumazet <edumazet@kernel.org>
-Cc: Heiko Carstens <hca@linux.ibm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Marc Dionne <marc.dionne@auristor.com>
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: Paulo Alcantara <pc@manguebit.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Sumit Garg <sumit.garg@kernel.org>
-Cc: Sven Schnelle <svens@linux.ibm.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Trond Myklebust <trondmy@kernel.org>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-
-Jarkko Sakkinen (11):
-  KEYS: Add key_gc_flush() for draining RCU callbacks
-  dns_resolver: Move the key type into a separate module
-  NFSv4: Clear idmap keyring cache when the last client unloads
-  smb: client: Clear idmap/SPNEGO caches when the last session is
-    unloaded
-  s390/cert_store: Start tracking subsystem keys
-  KEYS: trusted: TEE: Disable sysfs bind attributes
-  KEYS: trusted: TEE: Synchronize session lifetime
-  rxrpc: Move key types to their own module
-  KEYS: Pin the backing kernel module for a key type
-  KEYS: Remove key_type_dead
-  KEYS: key_garbage_collector(): process in chunks
-
- arch/s390/kernel/cert_store.c             | 161 +++++-------
- fs/nfs/nfs4idmap.c                        |  21 ++
- fs/smb/client/cifs_spnego.c               |   6 +
- fs/smb/client/cifsacl.c                   |   6 +
- fs/smb/client/cifsproto.h                 |   8 +
- fs/smb/client/misc.c                      |  19 +-
- include/linux/key-type.h                  |   6 +-
- include/linux/key.h                       |   2 +
- net/Makefile                              |   4 +-
- net/dns_resolver/Kconfig                  |  15 ++
- net/dns_resolver/Makefile                 |   4 +-
- net/dns_resolver/dns_key.c                |  65 +----
- net/dns_resolver/dns_query.c              |  64 +++++
- net/dns_resolver/internal.h               |   5 -
- net/rxrpc/Kconfig                         |  20 ++
- net/rxrpc/Makefile                        |   7 +-
- net/rxrpc/af_rxrpc.c                      |  19 +-
- net/rxrpc/ar-internal.h                   |  25 +-
- net/rxrpc/key.c                           | 122 +++------
- net/rxrpc/rxgk.c                          |  66 -----
- net/rxrpc/rxkad.c                         |  47 ----
- net/rxrpc/security.c                      | 184 ++++++++++++++
- net/rxrpc/server_key.c                    | 260 ++++++++++++--------
- security/keys/gc.c                        | 287 ++++++++++------------
- security/keys/internal.h                  |   7 +-
- security/keys/key.c                       |  61 +++--
- security/keys/keyring.c                   |  88 +++----
- security/keys/trusted-keys/trusted_core.c |  15 +-
- security/keys/trusted-keys/trusted_tee.c  |  89 +++++--
- 29 files changed, 906 insertions(+), 777 deletions(-)
-
---
+diff --git a/fs/nfs/nfs4idmap.c b/fs/nfs/nfs4idmap.c
+index bc397110d977..c88444cc6bf6 100644
+--- a/fs/nfs/nfs4idmap.c
++++ b/fs/nfs/nfs4idmap.c
+@@ -47,6 +47,8 @@
+ #include <keys/request_key_auth-type.h>
+ #include <linux/module.h>
+ #include <linux/user_namespace.h>
++#include <linux/mutex.h>
++#include <linux/ratelimit.h>
+ 
+ #include "internal.h"
+ #include "netns.h"
+@@ -58,6 +60,10 @@
+ static const struct cred *id_resolver_cache;
+ static struct key_type key_type_id_resolver_legacy;
+ 
++/* Serializes the idmap cache. */
++static DEFINE_MUTEX(nfs_idmap_cache_mutex);
++static unsigned int nfs_idmap_users;
++
+ struct idmap_legacy_upcalldata {
+ 	struct rpc_pipe_msg pipe_msg;
+ 	struct idmap_msg idmap_msg;
+@@ -469,7 +475,10 @@ nfs_idmap_new(struct nfs_client *clp)
+ 	if (error)
+ 		goto err_destroy_pipe;
+ 
++	mutex_lock(&nfs_idmap_cache_mutex);
++	nfs_idmap_users++;
+ 	clp->cl_idmap = idmap;
++	mutex_unlock(&nfs_idmap_cache_mutex);
+ 	return 0;
+ err_destroy_pipe:
+ 	rpc_destroy_pipe_data(idmap->idmap_pipe);
+@@ -483,6 +492,7 @@ void
+ nfs_idmap_delete(struct nfs_client *clp)
+ {
+ 	struct idmap *idmap = clp->cl_idmap;
++	int ret;
+ 
+ 	if (!idmap)
+ 		return;
+@@ -493,6 +503,17 @@ nfs_idmap_delete(struct nfs_client *clp)
+ 	rpc_destroy_pipe_data(idmap->idmap_pipe);
+ 	put_user_ns(idmap->user_ns);
+ 	kfree(idmap);
++
++	mutex_lock(&nfs_idmap_cache_mutex);
++	if (--nfs_idmap_users == 0) {
++		ret = keyring_clear(id_resolver_cache->thread_keyring);
++		if (ret)
++			pr_warn_ratelimited("NFS: Failed to clear idmap cache: %d; cache pins remain\n",
++					    ret);
++		else
++			key_gc_flush();
++	}
++	mutex_unlock(&nfs_idmap_cache_mutex);
+ }
+ 
+ static int nfs_idmap_prepare_message(char *desc, struct idmap *idmap,
+-- 
 2.47.3
 
