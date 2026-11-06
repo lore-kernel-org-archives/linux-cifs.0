@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794007120;
-	b=z93GgzKEd9KpJGU/Np1GjEhQ/jsbCW1Qx7/aN37+2KQRdx3GhCezZOvUwSF9DyJnz44C
-	 LOna7LFSr5lxXbNb23lsQrMcNGuBkju6BLuJVF/7I+S4evAdu52tKiKiPE4amzqe/099f
-	 7uQRAMBeCb/I2a9la4/fCJ3792RR6g+v1PPHs3hPZPmfTn71xTEZrlQEUB2stH5/wFDre
-	 AFEPh6+dUvJeLULIIHQlCNcVYmFsuj6sHGJT6hHxCuMN3gjpQA3ipXCSUZsyl1RN3oAAP
-	 4TXUplIWU06F1Z80/He1iTa/ybb1vALlfEJzEIsXIPBwiBxC1NzCupt/OYjxnAxnkYQ==
+	b=1N4P7SSL5EllP/zJ2TwiHwWk3Wt5UZIWCjzKPgro3QfS9U1uUfjkvwKAUSYV3C9YH0ox
+	 8x7JxpPUR7KY4KbSSGGgUhtIcKPbEaSEHDCkufA6emPJ46CEgaSULdYAGCGSpqm0Ry17s
+	 yE4cZ/YQMDQEu+dbwu6hqGQPMpl5VOjDKw1O69TzwC4g14IqmuGoNWMWu44pYoz9AjTtc
+	 RjdIRVS2BenSjcnFivONaxnbG2lfdbDzqjx4H+HjFyK4MY93SFwpxHHT8G8h4ujt3X9w8
+	 ZPJg1Y+BkL5L7o2jw5FN+O36+lN+6mjSEPCUDZrnY9VC0kGG0HufU1fbwZXxuwVU8Yw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794007120;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=/kHN44ZQ7spcitdWxiKL3R8VBCf+tiohYYozD2JcOnc=;
-	b=AgGtpUNMPrGmhx5LZuLhTStOMqhYHwRIgFydllTBfCpvKpHtjLAp1DILturhqHesSaV2
-	 2HaCIkcpjWhF5m0cDuZFQ05mv0vhDcsUFCaxtEjozho7hUi6Bpv9fMh4onJOBYzCNG1Be
-	 nOgDhdphwz/uG36NsqxywjGC9q3a7+fC2soAry8Id3ukLJDx8XLUyBQuWdAj0mKixNCc0
-	 fSF/yrVt3GRtYrFd8PN+DGSW5IFnS81oL1SavimQCArbRTtm/iW3jVcnPartODQ2eSn0a
-	 OjbPrU16f4XkkajABxvb5071s86KfxPnDKqegpcJ0lC1h1Nm19rgNhutroXqrF0/qiA==
+	bh=lHQnMIa1BPBilg1hVVzdNc6mjRHb1cIB4++UQLG5LpI=;
+	b=mBOMlim7DxCYnSXUJdOqj6yKIv/KYnQFOxgWjYkviT/cybuFE/UImE9UxSSeUb7GKqMc
+	 BHiS5UHWcR2Oy+FGy8YPTO+OJ09Rz7kb5P+8+1uRDwV+OAkyaE+VKEUpnOc4tRfw3sLnF
+	 vfdhHwzYteEBK3lwiJbul+4ua7xasFzfyuznF2GRvHwy54YpqQdYybBjkox9D4Ng9vpmC
+	 5kM/ovZkM20I1yotiRHLlXXbnFsRj7FmLqCIh4B5kmq6/4aSKwSlj2b0cgvERqTBR0Cky
+	 hi6Wf8+7b0Q/HztWvr1W2+ROlDAnMiv4Qxk8EvYrLXDeqy+h7LNN0EjHCdr1k8mX5ag==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=TC7xLfbJ;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=uDs9rW40;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64942606A32E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A24606A334;
 	Fri,  6 Nov 2026 23:18:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 64942606A32E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 64A24606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=TC7xLfbJ
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=uDs9rW40
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=/kHN44ZQ7spcitdWxiKL3R8VBCf+tiohYYozD2JcOnc=; b=TC7xLfbJ09j6XdSiFpU7IFhXWC
-	6aWHeGqT9PKfzMjdRhl9MvucnaarcwCb1/sDspvmvXvOx2a68qOGXROAE81PlIcxU6qAN47wUSErT
-	iCqwEphLt3+msO0wOUz94gRL6/Wv3DomZso9l1/p7nGZ9ferAbq7Wu/pHBSSKqfY/rt5mHQ4rCRJI
-	RwtiTUfLN96T+3eCw1GFkPYdbUMX8RCy7YBui0TC8jvnpBdss7gflJ7UDFG/eMjlvA79981w/lKiP
-	ZIERLNEbHNOHTsWv3/fSxPQxBh0aRTwrcX2zS1YWEEbftj2R1U+CFvGPaYA6rTa555y6kaJ54DzzX
-	A7XYHF9w==;
+	bh=lHQnMIa1BPBilg1hVVzdNc6mjRHb1cIB4++UQLG5LpI=; b=uDs9rW409Z8ngAkzdgiJo2/6EH
+	+thz/yVo+u+jG/pa2GZKuXP2FMpBe/bJdmOadJlH6j80h/sjtIybtSqfeG9XD2oweMvXBPfXBjIR6
+	U64lwCBPBJZ4iiWn4iPeiLbbtRJjkM1IQs80HHcEZeAzfp+BggazkNjX7avXIluabGcz6LH+/R6+M
+	atanB4JLRPdgTEWni5iTEO0Bxfwmumq42dLR26SCUQdn+jpe9hbwhiCkt00rgUALWT+ba/HsjI2uO
+	B1z2Kvod4swIaXMP6E4QIAzs+igvIgmAcVNmZaYtLnVqPkH/OfBPYH4ozCtPpNKQ6zAMSosaVADFG
+	9pQq3WIg==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xPTCW-000000014Dt-13gj;
-	Fri, 06 Nov 2026 20:18:29 -0300
+	id 1xPTCW-000000014E3-3tMU;
+	Fri, 06 Nov 2026 20:18:30 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v7 04/19] netfs: don't hang a read whose retry is abandoned
-Date: Fri,  6 Nov 2026 20:18:12 -0300
-Message-ID: <20261106231827.2604956-5-pc@manguebit.org>
+Subject: [PATCH v7 06/19] smb: client: don't give up writeback on the first replayable error
+Date: Fri,  6 Nov 2026 20:18:14 -0300
+Message-ID: <20261106231827.2604956-7-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261106231827.2604956-1-pc@manguebit.org>
 References: <20261106231827.2604956-1-pc@manguebit.org>
@@ -74,35 +74,122 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When ->prepare_read() fails while retrying a read, or a subrequest can't
-be allocated, netfs_retry_read_subrequests() marks the remaining
-subrequests failed without reissuing them.  If none was reissued in that
-pass, nothing is in progress any more to wake the collector, which
-returned after the retry, so an offloaded read (readahead, async direct
-I/O) never completes and its folios stay locked.
+Read and write retries follow the hard and retrans mount options, and
+mounts are soft with no retrans by default.  For writeback this means
+that a single replayable error, e.g. a reconnect while sending, fails
+the subrequest and netfs ends writeback with its folios clean: the data
+is gone, possibly long after write(2) succeeded, with only fsync(2) left
+to notice.  NFS soft mounts, by comparison, wait minutes for a server to
+answer before failing a request.
 
-Wake the collector after abandoning, so it collects the failed
-subrequests and completes the request.
+Keep retrying writeback on replayable errors, with exponential backoff:
+forever on hard mounts, and on soft mounts for max(3, retrans) echo
+intervals from the first failure - 3 minutes by default, the time after
+which a silent server is considered unresponsive.  The window applies to
+each write sent to the server, not to the whole writeback.  umount -f or
+a shutdown still stops it right away.  Direct and unbuffered writes,
+whose callers get the error, keep following the mount options.
 
-Fixes: e2d46f2ec332 ("netfs: Change the read result collector to only use one work item")
+Fixes: 2c1238a7477a ("cifs: make retry logic in read/write path consistent with other paths")
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
- fs/netfs/read_retry.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/smb/client/cifsglob.h  |  1 +
+ fs/smb/client/file.c      | 21 +++++++++++++++++++++
+ fs/smb/client/smb2ops.c   |  9 +--------
+ fs/smb/client/smb2proto.h |  9 +++++++++
+ 4 files changed, 32 insertions(+), 8 deletions(-)
 
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index 8a722995fa9d..bfaaebea12df 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -269,6 +269,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 		__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
- 		__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
- 	}
-+	netfs_wake_collector(rreq);
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index fb732c178e76..b6a993cc0245 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1499,6 +1499,7 @@ struct cifs_io_subrequest {
+ 	bool				replay;
+ 	unsigned int			retries;	/* number of retries so far */
+ 	unsigned int			cur_sleep;	/* time to sleep before replay */
++	unsigned long			retry_deadline;
+ 	struct kvec			iov[2];
+ 	struct TCP_Server_Info		*server;
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 270858e526f9..e8557c670dc3 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -53,12 +53,33 @@ bool cifs_io_stopped(struct cifs_io_subrequest *subreq)
+ 	return aborts && rwsem_is_contended(&sb->s_umount);
  }
  
- /*
++static bool cifs_writeback_retry_expired(struct cifs_io_subrequest *subreq,
++					 struct cifs_tcon *tcon)
++{
++	struct TCP_Server_Info *server = tcon->ses->server;
++	unsigned long window;
++
++	if (tcon->retry)
++		return false;
++	if (!subreq->retry_deadline) {
++		window = max(3U, server->retrans) * server->echo_interval;
++		subreq->retry_deadline = (jiffies + window) | 1;
++	}
++	return time_after(jiffies, subreq->retry_deadline);
++}
++
+ bool cifs_io_should_replay(struct cifs_io_subrequest *subreq)
+ {
+ 	struct cifs_tcon *tcon = tlink_tcon(subreq->req->cfile->tlink);
+ 
+ 	if (cifs_io_stopped(subreq))
+ 		return false;
++	if (subreq->rreq->origin == NETFS_WRITEBACK) {
++		if (cifs_writeback_retry_expired(subreq, tcon))
++			return false;
++		smb2_replay_backoff(&subreq->cur_sleep);
++		return true;
++	}
+ 	return smb2_should_replay(tcon, &subreq->retries, &subreq->cur_sleep);
+ }
+ 
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index dc55cd512616..457f18ce3245 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2934,14 +2934,7 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
+ 		return false;
+ 
+ 	if (tcon->retry || (*pretries)++ < tcon->ses->server->retrans) {
+-		/* Update sleep time for exponential backoff */
+-		if (!(*pcur_sleep))
+-			(*pcur_sleep) = 1;
+-		else {
+-			(*pcur_sleep) = ((*pcur_sleep) << 1);
+-			if ((*pcur_sleep) > CIFS_MAX_SLEEP)
+-				(*pcur_sleep) = CIFS_MAX_SLEEP;
+-		}
++		smb2_replay_backoff(pcur_sleep);
+ 		return true;
+ 	}
+ 
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index c79e5cb2ce26..b2acff8938f3 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -121,6 +121,15 @@ unsigned long smb_rqst_len(struct TCP_Server_Info *server,
+ void smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst);
+ void smb2_set_related(struct smb_rqst *rqst);
+ void smb2_set_replay(struct TCP_Server_Info *server, struct smb_rqst *rqst);
++
++static inline void smb2_replay_backoff(int *pcur_sleep)
++{
++	if (!*pcur_sleep)
++		*pcur_sleep = 1;
++	else
++		*pcur_sleep = min(*pcur_sleep << 1, CIFS_MAX_SLEEP);
++}
++
+ bool smb2_should_replay(struct cifs_tcon *tcon, int *pretries,
+ 			int *pcur_sleep);
+ 
 -- 
 2.56.0
 
