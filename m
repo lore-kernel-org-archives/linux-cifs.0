@@ -1,126 +1,148 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793937237;
-	b=psUrqA1h8K+hQ4ca7rzrjOMOoBBM8Tg4YJwJenXNPAm1/LJnjZvAXz9V0aHrUh0wo0C0
-	 yokgLIFzo2roxgQJCaqNwD3fW7rHIbRwd2za/RsVjCYs2MfIrqseRYA1hgabwmgtdGS0K
-	 DOJCT89VTM2NkE5nPcuo3QiKnJ+mFoDK2vRlcMR9va3kz32CLSJLKQvjr8BhFceJnr+US
-	 DbDNzgwFDGjtWrS8ZapWseOlHHrIjdlgYUih8UDqrO5ZtCvEmwrBmrglna8Cu321r3yHz
-	 yH+aut3JZkDv4bEpfaKC3y+zkkGjcc94tb/vwTusuwbOp9kfklKwtnhNtvXZwfBSfWg==
+	t=1793952317;
+	b=eaNvDA9Ae7wd/qlWTNBBeZ51HOfyvX2V7iJAoV+aDm2JYbwl831YI+f1fj/krQXbry5X
+	 RrJCLNhNLGOanSBgcB7CLpBi78ZBorKFRjs98eD6qV+1xWQEBRHUG0zJgX2eSBtSEtjHa
+	 2do3HEhmvHsPd3Cwl/8NQYQkercW3csnLzXUlfqqeOqZ5MZ8HsxYTXoV60mKe5TsNmaup
+	 0DjiX4zi6m7X0IevrVgrGvNYSgkBL5SQvbMJJEsfFYJegFfgdJ+lSWGd+b2R3/F7kMXe1
+	 0ztVJ3p9kkWdAsDTQ1TVsniAkInnBwop6FVE8gdXQ1uuFPGZjE/cp4SLamgJlvDizEw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793937237;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=oqmDrOo6CSWs4CP+/hS0yMdv/dJhQgy+wrfGOSgAwrc=;
-	b=M31d5BlY6sgOMQaDd+6/E9HaGZTM+vF+cCu9ySbXD8tvbl4CYUERPNkkv096Q45HllGK
-	 xj7K3es6lY9VoQz6g3GH4W70eT6ro1F4vBOWOy/mg9C9rDkfjMAhnPrgzlC9nxj6/KIeu
-	 qkugAXt+8J1caZ2mYQfiSVCVoq6Ya6MWC+5KlUGxUivCtM2OcYMHbkpQ6b3bb+TJNSKcn
-	 mV5/HoHKAGFNZHT1iAP6Tu1OXYGyT8PGqbBcD29JfZBBj4aMFpE1qvGPXLDQPJLXe7K5v
-	 JsJ3eZs9m19DWmaSHxtBwlDLNaG2rN2yuWFz2uwQJo5JuEGYYrZ2NnKhCwbelVoI+Nw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793952317;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=x07awLmZl1uGnixljrDMUgu9d0OiWf2Z+sJydT2Lbr0=;
+	b=kK90EZVLQTSrwkKFrGbmMmqDgnougbb6rsjrsuwRR4bQDz3QHyODOlITuadiqtzKqvTT
+	 vutzURAuGDiqDetEp3mhvX+D8txijmGRETEeRi2yoUko0Qy7zvZAGd/h9WkOYMSGusLAt
+	 8sOAJap0TCZ1s/ul2gtdTiYo5Te3noxE8yTdKtTO2Iu9v+MaxIUJzg/GHB0WzQns9BJpY
+	 M7sU6jX1AShAfUqbVPcKhFW9Hn90wQ1ehWHT+VykRoAj+l3HwuHkgOFC2JpGg6QJct+vj
+	 0raXbCpGg6asjsA8GhAooILQr4aBH6hzgglUZmuNN1UwbCiPilj08uoFy/mk4uaLEKw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=g1xIj0Lt;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=bADTeO0T;
-	arc=none smtp.remote-ip=103.168.172.157
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=oiRMln23;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D07F606A32E
-	for <linux-cifs@vger.kernel.org>; Fri,  6 Nov 2026 03:53:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6D07F606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1702A606A328;
+	Fri,  6 Nov 2026 08:05:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1702A606A328
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=g1xIj0Lt;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=bADTeO0T
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id B15D11400133
-	for <linux-cifs@vger.kernel.org>; Thu,  5 Nov 2026 22:53:55 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Thu, 05 Nov 2026 22:53:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1793937235; x=
-	1794023635; bh=oqmDrOo6CSWs4CP+/hS0yMdv/dJhQgy+wrfGOSgAwrc=; b=g
-	1xIj0LtZr77iKO2Ht0DMkqJIsenrRo5P7tbbtQKKY8SbU+RvPaLi4XFb+iW2Dnhw
-	TbqcKcoG1fKYRIZnebg2SOj0h//0YfrwKhmGHYBaLdSk/wR6ao+T92JCYvQh+6ue
-	G6kq9zyYfpEclQb9Chk+Uc0GQqRJl2lbJI1FkrdxjZLAyblkvda/IBcLvVaJHz8F
-	jMbynjcDKCUoDnR9aYWhnxie7uV69Xs/gQmcSdas/ATj9nHmSE167KgBKNCm4nKk
-	J2RgWsaPa+VanrsGkib4d0E+Nx8aqTbHviP4LXi1yisIQ8t8KqtwfrrWgrgXtDht
-	0Xs+f3GIKIKmVe6lN1k6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1793937235; x=1794023635; bh=o
-	qmDrOo6CSWs4CP+/hS0yMdv/dJhQgy+wrfGOSgAwrc=; b=bADTeO0TXnfNVaq23
-	uIVxX5FXHpk+ydSMC2tlbYzhM3wvH5LJm34O4aJCWIyoTjYuBF1JWnm6ulxki/Yf
-	LSy4wo+WkHvDoZVuxh15xUCejTAEqL1WkvxHlnPU9hhQO5ze6EghapGla4ANuxKT
-	e4TgBI/gnFDMqBOR//YtbtLMTrnSo9Ttt9eYplBGc3ATn42uDcmMxkW3fCQLmMIo
-	PY7roqOkrX9PbY/5MqYJdZbX3z5IwYVP2zd1QKydBr1bz8NBKHNdeGCqul3hy35y
-	Zb+CSnOhMKWvmat+lH3IjCdVScf6BpUtuSAnPO5X9Dz9L2+2QVwLygN/2ns9yyrq
-	1uFYQ==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1793937235; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:aAQm8D0lhkH9jk95rHMfRRWNCoaFpdVkGNoM7NB9AGxnBPd
-	pxnvz+pnx6G6IfsOoeocPVozTsByxoWhjXQj90pLb2J7agmtAi0jU9DfmGpkEwZH
-	AV52HqO7wutmH4yrwqM3TZdNC+SvfhZJOnDHfXGGlS+h/5oZKuYrqhs3/+0svh7I
-	a+cnwH1I/fz1GUkrKoKREBKYMqzBpPTzAQLg5d3dk8q7Kq2izGvd94E8ybrWPZoY
-	rAiS1JzyQOMoEz0CEixlZq8UyMcfeACRU5D+Vy2A19vJZsUmTyiApZE/QpY2dJ5I
-	AFRKMewkyAGN9z+flcT+XJ2yI0oDbHmxZQThsFw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=11;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:W96i8d2/nelZ2cQ42rB4X0s2uVOjBiE+neRGlPjXCEE=:xXMnsnlzzYg1l1m14B/hIdJJDa9HvNRFBi4Vo8N89Dc=;
-X-ME-Sender: <xms:U0_taq-dNRs24JFftJ6pGaE4PNhpCtUmQbiXHymyCjpGIJEtbZtuMw>
-    <xme:U0_tamtbi8HF_xQD6f21VVSEwcd1xORvtzilehBV1bwxT8H51M3hN6bO6f1FpiQkR
-    vS_d-sgEwmfwRP4ScYBD6f_Ytn-xp645_lCjy8hyp9vTuOeNORWo3oP>
-X-ME-Received: <xmr:U0_taiNf3y8Wj53wt2TmZBDhZU3P4GPVcrM-bmKhTOA2ft5RjzR7N4DT6sudJA1u>
-X-ME-Proxy-Cause: dmFkZTFIjkh/VkrFtaLZ47zpZzzrVb1j87A4M4dFjd8r9QlZeldkq2H9HL9mTFPhexGiWy
-    I0wK29+khresqZAE5vlBKDqddYRQaNjPdsGWL/77YszKh7M0swfOmPyXXm3mqQLXMNsU7l
-    //jsYHqPtoa4/gNJNhb6ERabdIBEzztwM4Pjx+fleEmj3dQUhDne/H180wHsjwOiCzxwP5
-    Y4appzIa6Ek2olO9Rp8Qx/8tY+lq2cKslHR6GV7KjHGBskFIUOVZb9C9RonqmAd8qm8yqA
-    m2DSX62OvTbYVYiBEh7k+5I6i7vhrLQb93jchtUugUltCpS6UMDdqLZgU+qjomZXzVHRt8
-    5PkH5jSk/LknxjUDgtYEsJguRZOXqF909zWLHdaqerf4ANT6Fq5+p4q4CJ1L6nSGkPe9/C
-    /zCfOQojXyEVdTaCflzdm6CO9O669RaAWAxysbr9y+KZu9zPPR09y5beYieRnnZ22eqN0U
-    sQ7gMoVdpHU646q5Xc/a1tpsTKanEVp0Ys71h+tVhJGwXBeZtYu2QC7Z9MavUEJ3/qRGHD
-    T/1rd+r7cQPJmJgroqWdESPDQvOfeYVWzlo4PrSusEXRKWUIf348IHayW+U+ABsS/p5zgz
-    LtQa9VpV9I4ci0IXeDGAWCOk7icknwQ5xjtgshNkKH/wQgGljZG6aUtrMxBA
-X-ME-Proxy: <xmx:U0_tajjUjFJh98NIqAbkm3jLX78jAnPjRQ0s_6Lh_NsdrWYNsPU2mQ>
-    <xmx:U0_tas6AXmcfGXwa-tNfy14HBs8OL_9trvrXJu3bDqXjwuw2RVFaxg>
-    <xmx:U0_tai2halpGc2eOVZd7ParpGqOav1JtNULxl79TZZZdnW9JNRj6wQ>
-    <xmx:U0_tavs9MWmSQCehjDEX00aRu3j6fVMgI5SbvdhZxAdwFRsizlgQ4w>
-    <xmx:U0_tamG1DsbY6sF5_JtN6Zrp3qbz2yMNvErYE7gpcEwsRgri6oSLacuk>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 5 Nov 2026 22:53:54 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ian Bridges <icb@fastmail.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v2 2/2] ksmbd: skip metadata-only stream opens in the delete check
-Date: Thu,  5 Nov 2026 21:53:45 -0600
-Message-ID: <20261106035345.728454-3-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261106035345.728454-1-icb@fastmail.org>
-References: <20261106035345.728454-1-icb@fastmail.org>
+	dkim=pass (2048-bit key, unprotected) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=oiRMln23
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=x07awLmZl1uGnixljrDMUgu9d0OiWf2Z+sJydT2Lbr0=; b=oiRMln23yl/QBuC0DzwXONkLv5
+	qM+sNI41fnd6ZZdtIdfoPIuUSZHjJllyir3jn5dYul9Hhh11zXahz7DjQNGL6kqFmMxym0kEDtOmD
+	JgIADndDf71VAul280x2lDyIVPe6HFQRskf9qC5NU/8P7kjkPPDBDgNWgZKWzmAJG/fm1BZ3LikI4
+	AJReQOjF2xOHtD0/o6EMEslTbPj3TIA0VVZuOvKHyIPeRI6tauCfHZubFGOzh5ORdNmavj6txE4sb
+	V62/yFS1hM13pH3V2NMo05nu4U1qu41e/vy7J1YKCYoB+vzlPGJYOKDkhh/XndWwFf9Phw2nFy/jN
+	8N6Cktqw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xPEvi-0000000BWDm-0Spo;
+	Fri, 06 Nov 2026 08:04:10 +0000
+Date: Fri, 6 Nov 2026 00:04:10 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Bence Csokas <bence.csokas@arm.com>
+Cc: Chengchang Tang <tangchengchang@huawei.com>,
+	Junxian Huang <huangjunxian6@hisilicon.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Jes Sorensen <Jes.Sorensen@gmail.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	Ihor Solodrai <ihor.solodrai@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Vineet Gupta <vgupta@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Philipp Stanner <phasta@kernel.org>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Lyude Paul <lyude@redhat.com>, Danilo Krummrich <dakr@kernel.org>,
+	Zack Rusin <zack.rusin@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Selvin Xavier <selvin.xavier@broadcom.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	Hans de Goede <hansg@kernel.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Benson Leung <bleung@chromium.org>,
+	Tzung-Bi Shih <tzungbi@kernel.org>,
+	Guenter Roeck <groeck@chromium.org>,
+	Nilesh Javali <njavali@marvell.com>,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <mkp@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Carlos Maiolino <cem@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
+	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"Geoffrey D. Bennett" <g@b4.vu>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-snps-arc@lists.infradead.org, linux-bluetooth@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, arm-scmi@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+	linux-hyperv@vger.kernel.org, chrome-platform@lists.linux.dev,
+	linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-xfs@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 0/3] Add offsetofp() and offsetofendp() for pointer
+ arithmetic
+Message-ID: <au2J-lMcEn4p4KGR@infradead.org>
+References: <20261105-offsetof-v1-0-4153f5c10edc@arm.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -130,55 +152,18 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261105-offsetof-v1-0-4153f5c10edc@arm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-A metadata-only named-stream open without FILE_SHARE_DELETE blocks a
-later DELETE open of the file. It also blocks setting the file delete
-pending.
+On Thu, Nov 05, 2026 at 06:16:15PM +0100, Bence Csokas wrote:
+> A common usage pattern for offsetof() is the following:
+> 
+>   offsetof(typeof(*ptr), member)
+> 
+> Condense this operation to one macro for a more maintainable code base.
 
-Ignore a stream open unless its effective access includes data, execute
-or delete access. Reuse the sharing-access helper so overwriting a
-stream, or creating one on an existing file, still counts as
-FILE_WRITE_DATA. The Time Machine AFP_AfpInfo synthesis keeps only its
-requested access.
-
-Fixes: 19043971c947 ("ksmbd: honor stream delete sharing for base file")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ian Bridges <icb@fastmail.org>
----
-
-Notes:
-    This affects shares that use "vfs objects = streams_xattr".
-    
-    Tested on ksmbd-for-next 957772008502 with KASAN. Targeted stream tests
-    and a KUnit matrix covered metadata-only, create and overwrite cases.
-    smbtorture matched the base. There were no KASAN reports or warnings.
-    
-    A reproducer is available on request.
-    
-    This fix was developed with LLM assistance.
-
- fs/smb/server/vfs_cache.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/vfs_cache.c b/fs/smb/server/vfs_cache.c
-index f9079c529d07..c846023e5ada 100644
---- a/fs/smb/server/vfs_cache.c
-+++ b/fs/smb/server/vfs_cache.c
-@@ -420,7 +420,12 @@ bool ksmbd_has_stream_without_delete_share(struct ksmbd_file *fp)
- 		if (file_inode(fp->filp) != file_inode(prev_fp->filp))
- 			continue;
- 
--		if (!(prev_fp->saccess & FILE_SHARE_DELETE_LE)) {
-+		/*
-+		 * A stream open with no right in FILE_SHARE_CHECKED_ACCESS_LE,
-+		 * implied writes included, never conflicts.
-+		 */
-+		if (!(prev_fp->saccess & FILE_SHARE_DELETE_LE) &&
-+		    ksmbd_sharing_daccess(prev_fp) & FILE_SHARE_CHECKED_ACCESS_LE) {
- 			ret = true;
- 			break;
- 		}
--- 
-2.47.3
+What exactly makes non-standard macros with no obvious safety benefit
+more maintainable?
 
