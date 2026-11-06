@@ -1,65 +1,103 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793979439;
-	b=D9lWeE92VWmYgJSqDqs3/d88O2vX9mQSdR1eSvNltAv9xbGEDiy6X+krxVi2htgOJnoL
-	 76srHKuO+kF4oO/sDXEU925HAU5O/sYZdBayrfyiSrKgm+KLSsHgT4vWlw5GDvKfmn1Ds
-	 DI78ZbEa2xVmDciE+icvyZuHGXrdnoDIu0mkOddWhVkbUGxloObLSIG7f4GV3ic8mZDfW
-	 UHvNY2rFbyCh/t7qqVnU44DOSnC9D+uAHXM771lieS7e0+WR+/kQxio9t1oTF+8g1W1ga
-	 +Htf3wFpOEyFrhMJKHWnBLNBbOu8pxYt/Hr1qL+6akYMa+6I/banwO5R5HwG7cgtD0w==
+	t=1793991993;
+	b=wypAEEbbuezf5f79kok2ZA2Ig4z+VNd0cX2btfgRPkF/vvF0quimZQGP51dIj1XPPMiZ
+	 Y9Jl0APMENt+IF5oiEpPZO+1G07ZbQWU1rYqjSvYqxG3bChWW8vpZuS69vtWthzJbZ4bu
+	 2NFlq0xPEOTkk7alPxtKP5Pb9gHT42wfVqPPu83i+yavNdPBabqpRQefIGSTS/tcG3xdB
+	 VB1HXl/4SzBbItKFXj43wsF2d2ABsmXnMzEKR4mWnMkQzdyNymybYGDrt0921wTQRsh6Q
+	 PDO+M1sN/M+hzOm39wfc0PW+XI24TWClXwfau1T/VR1upyx9Vw/WlZ9pbY5lqmKW9pA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793979439;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=uod00NzH5OzvPch+HmcGlYibNHOiGa/43U74CxK6E6k=;
-	b=cketIXeT0+RaMnVa6gP2oavpvBw5ycbQFgt8FSDjisy4MQdH8hrfl9pHbRAcNDaSEA8X
-	 sBE/XaT9op/4llzxlQt+Vonsgv5TOhJhwkeGa81kbprwF/hZ0lui/YwZBsGFAdUuij9ib
-	 dvBObf6yqUslMdEHL3Ame5g9/HF4MdEbrkF2JiIjPqiVdKjHZkgbTtclMbF2OMnly5Da/
-	 3rHiDm5T2m6WoOeGOgllntr+r0rcyfnFMV3HWAayFXGFQEjzFaikMwLGp1bxvU/rwQtiN
-	 btUBRGls08HQAzcjjhyYbHVPke80md2UUu1OJ82DX0DkT5NIcSMxuarqH4UQnjQ4lWA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1793991993;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=bSA9v8W3T7lo5Myhbr3wCFSrLSSjl8OXlhbS86xJyGM=;
+	b=OWtdNplnd9r3UOHCirElQqpQcFYpOxAtkYIyriPdC5LA+V+oQuPUtWSAaLncry0dQRaw
+	 PoDOn4bGBfK/2rU2L5HOXEpRFhBek3biC7oiSbGq/xPf+2eu/vEktUJV13EODadZTcOTK
+	 odaKhJzcXBCfOE1qCNgPfpx+bxCLoC8FdptnMWnlLRhfJVYIPuqizuSfsuov35W3S5QXw
+	 P41A62OYr+mwETCNR+FPuY46ilHJigrUNb5BTWzW80vS/e/gdmW5sZZWPV2x9j/QjwJ6a
+	 9n2V14He8GdbH827gwDmheAfTdvnaZC8cpbhi9Y1MX/Cs8g8bi+M030rP4nmIBmoanw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Srz9x78v;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yBfT0MUb;
+	arc=none smtp.remote-ip=209.85.221.44
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C060F606A330;
-	Fri,  6 Nov 2026 15:37:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C060F606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A83606A329
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Nov 2026 19:06:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E9A83606A329
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Srz9x78v
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=uod00NzH5OzvPch+HmcGlYibNHOiGa/43U74CxK6E6k=; b=Srz9x78vswIsRnjDq51hX7M/t7
-	o0MziYLgIv4JrvUfZn1sxumYgOkn0bDz8OkGJSmEZv0MvowwIQWvz/yyH6keVh0y8ZHIaV3XMA2F/
-	+JwyHnzuR5OR80f29fOSROFkHUD0y2+DHD0xeTur6W1/TR1at2Qj555/tdw8ipYAuIHNy4tx8b7Hn
-	Ep4CsJ03qkM0iU9D9Tjjaap9kxNQPkSxEWAqKWnaYz4tMTPILYvKMboKqHOssvqYXmf6VJTrWEcpD
-	UIUwjgAa3ovG3bLSrWVpUQsXnrQ6Fs/HuX67ct2s7TBvWYM0KKxNqhK7NQ+NWAHV1ubkJSYMOeSyo
-	wMM2eBBQ==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xPM06-000000012YA-1KYB;
-	Fri, 06 Nov 2026 12:37:11 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	David Howells <dhowells@redhat.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Christian Brauner <brauner@kernel.org>
-Subject: [PATCH v6 00/18] smb: client: fix data loss in writeback
-Date: Fri,  6 Nov 2026 12:36:52 -0300
-Message-ID: <20261106153710.2498773-1-pc@manguebit.org>
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=yBfT0MUb
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-48dfc0421d9so1133697f8f.1
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Nov 2026 11:06:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1793991991; x=1794596791; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=bSA9v8W3T7lo5Myhbr3wCFSrLSSjl8OXlhbS86xJyGM=;
+        b=yBfT0MUb8h87VbQCan7nkpZMlMecNwwSNQcSV5CcfwLQY7KQcYy0j28hZ3gKVcVYto
+         7OYDt7qTQbxxLTSgGRZTCGfLaCP8C/suZo7bvIp4K5ugbZcPqZ8ZGLaKett5LXtweDBr
+         ShR0WZV8d3OjUiAdHZGXaoUHnfrpn8LVLTTRIkSM+6UHkTlZLfouEPUDe8Sdlp0JhPMs
+         f/X/NHOzLVKfncmthvQu8bn3SMw9tJXR8aG8NyrsQfnw8xCJd7G/cOXvey+2OR36N4HH
+         fHi2QbAdAKqwUQVoGmWJ8+bZSGtCxWbmq7UYzd+t0ikThdYK3AayPHCSfDARV0rmNk0F
+         Wf2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1793991991; x=1794596791;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=bSA9v8W3T7lo5Myhbr3wCFSrLSSjl8OXlhbS86xJyGM=;
+        b=2CQ66q4qggh3ay5cEux9ukZ+nGdEfRE2PLx+71IdemDshrwxz2mPrHSDDmO9TfH3uL
+         SdWzKisbWxJO8XKfVBmq79XXPfFLo5zWj9xMi0z9z+SgjKUNskjjsXtcJQNc2oeugSB7
+         2LmV/gmHZN0bZIuEJbGb4NgQhx31VrPHYHI/PAhucydE7HxEBY0iRYRFvTK/5XRCcUo9
+         sq5JfA83PIlG6fYwKudGs+uIoWaEZ8fnfu14A+N3QPaNfCDTDQP7KjD1NFaLKAJdKhhJ
+         5oLVI4WDbd+ZBaXRU11v6l67ywaaQeID37HPEXGVJgdhWuVOwM5Zy/RXXrXSdSJmp0uX
+         4jiw==
+X-Forwarded-Encrypted: i=1; AL+hErF97lc4jlxAq7bUfrCBpwzwvU7ORC4H1STsidy3KlWS7l9nilwbc3A0jTqw8HY/+aODgMLWp5lyM6hE@vger.kernel.org
+X-Gm-Message-State: APuU4Z8mcRcSTqUMWQuovJ9QQKqWx7EbMhgFbiCifPNBtb+ML3qYHFJG
+	9e9Sb9/rtwby0N4fDQKD/1Jo6+oscOUQ8R2wBjcRRnrR+fg6QYWw8S7k
+X-Gm-Gg: AYBFou1DhPVEH5FC/oixjAUFv1EtzSwMVeAhYOJEH/qdY3gBl3B/2abuVnUOJVshjZQ
+	Cb9z/hsBq4A46M5bSsV78BAxz0MAM8kjxqxxqq2B36zZrddd0rmcrLwkXv6D0xv/qbRUdXxhGxl
+	Bcw7X+xv5FG52WyngJ/qaxkJWkUuu1+p8tFEsQvtIOTVv6I20H/vLvNyh8JQWYeik/rM3QoGrnV
+	rGMnJXXw0e+WqbfN8A5QDGflZCa1z9J9/FNwQEX98FUxscJF3TURKlqaDCdGavUeqtyzGaq9ces
+	deYorX0fD43A502h7X0ATFRQSVdg+Gx6wGCPS/UQvf6WxS3RaXZUHEAx3CGSxb1lSPSuKJ45hxH
+	M1XzpwKglUpAvTt1g2JsoyE/VdVDFsF62iS+5NAwwqRULGKMbRCJaHl2jqz9XY3sqgH5TsiZiUN
+	LuEV6JGEEsXaQUsOu+NKc5RU69X0/BN0rDi/H64tKaLx5Z0D28PyPXm79zGEHtQkzGPSVQAH3OG
+	k0s58WY3vCsf0TJSC0VMGaAyXPYHGlxyZVVMC48kj4TEHf1lOZwXxrkwfTXKduiAUiKTtez135Y
+	Drs1U8LXfLXAEA8CiEO8bIAxMUek5Dvs/4ieZ3QcTAzV9Cc4CWEnFVxttJaLRmaPFcCZ7JzfuwY
+	UyXIUcT8mMaLPNELth/lvEjm/q8tcI7LF6vLl9w==
+X-Received: by 2002:a05:6000:2089:b0:491:1e11:9ffe with SMTP id ffacd0b85a97d-49273f50710mr7197658f8f.2.1793991991245;
+        Fri, 06 Nov 2026 11:06:31 -0800 (PST)
+Received: from localhost.localdomain ([74.244.226.39])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4930a5a91dbsm3960533f8f.35.2026.11.06.11.06.27
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 06 Nov 2026 11:06:30 -0800 (PST)
+From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+To: linkinjeon@kernel.org,
+	stfrench@microsoft.com
+Cc: icb@fastmail.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	ematsumiya@suse.de,
+	lsahlber@redhat.com,
+	hyc.lee@gmail.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Subject: [PATCH v2 0/4] ksmbd: verify session setup requests before signing with their key
+Date: Fri,  6 Nov 2026 20:06:18 +0100
+Message-ID: <20261106190622.20990-1-mike.michalo@gmail.com>
 X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261103171742.18816-1-icb@fastmail.org>
+References: <20261103171742.18816-1-icb@fastmail.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -69,177 +107,66 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+ksmbd signs some SESSION_SETUP and error responses with a session's key
+without having verified the request, which lets a peer that does not hold
+the key obtain signatures made with it. This series fixes those cases and
+makes ksmbd sign with the SMB 3.1.1 signing algorithm it negotiated.
 
-A task killed while close() flushes its dirty pages gets its writes
-refused by __smb_send_rqst() (fatal signal pending), and netfs then ends
-writeback with the folios clean.  The data never reaches the server and
-no error reaches the application: stat() still reports the cached size
-while the file on the server is short.  It was reported against a RHEL 9
-kernel, where the same trigger makes stat() fail with -EIO after a
-rename(2), and it reproduces on mainline as this silent lost write.
-
-Any other failure that is only transient hits the same wall: since the
-move to netfslib, a failed upload ends writeback with the folios clean,
-so a reconnect, a lost handle, an interrupted wait or an -ENOMEM
-silently drops the data.
-
-This series makes writeback retry instead of giving up:
-
- - a dying task's writeback is issued from a workqueue, and the close()
-   and fsync() waits for it are killable
- - writeback is retried with exponential backoff on replayable errors,
-   interrupts, -ENOMEM and on losing the connection, share or handle,
-   and handle reopens are retried the same way
- - umount -f aborts the retries, reconnect waits and replay loops of the
-   mount's requests, and writeback no longer blocks in the reconnect or
-   credit waits so the unmount's own sync can't hang there
-
-On hard mounts writeback is retried until the server comes back or
-umount -f.  On soft mounts it gives up after max(3, retrans) *
-echo_interval from the first failure of each write (3 minutes, and about
-6 minutes from the outage since that is when cifs declares the server
-dead), recording -EIO.  Reads and direct writes still follow the hard
-and retrans mount options.
-
-Patch 1 is independent: writeback could pick a handle opened with
-O_DIRECT, and Windows rejects unaligned writes on those with
-STATUS_INVALID_PARAMETER, dropping 1.2% of the writes in xfstests
-generic/051.  It is first so it can be backported on its own.
-
-Patches 2-4 are netfs fixes the cifs patches depend on: patch 2 is
-Ivan's (20261028181229.1408342-1-ivanrwcm25@gmail.com), keeping the
-prepare_write() errno across a reissue; patch 3 does the same for
-prepare_read() when read retries are abandoned, and patch 4 keeps such
-a read from hanging.
-
-Not covered by this series:
-
- - after a umount -f that fails with -EBUSY, reads and writes retrying
-   (e.g. across a reconnect) give up while a remount, freeze or new mount
-   of the same superblock waits on s_umount
- - if every writable handle of an inode is O_DIRECT (e.g. mmap of an
-   O_DIRECT fd), its unaligned writeback still fails, with the error
-   reported
-
-Thanks,
-Paulo
-
-Changes since v5:
- - new netfs patch so an abandoned read retry can't hang the read
- - durable reopens: never fall back to a reconnect once the durable handle
-   is gone, and replay the fresh open only if it was built and not
-   interrupted
- - back off once per retry pass instead of per subrequest, let pieces
-   split off by a retry keep their retry state, and fail the remaining
-   subrequests once a writeback reopen gives up
- - check a write's credits for a reconnect before sending, as for reads
- - make the writeback reopen's own credit wait fail fast too
- - pin the mount's tlinks during umount -f so pruning can't race it, and
-   treat tcons no mount references as dying, so their leftover closes
-   and tree disconnect don't hang
-
-Changes since v4:
- - don't let the flusher block the unmount under s_umount in a writeback
-   reopen or credit wait, nor a sync(2) racing umount -f
- - keep the forced-unmount teardown from reconnecting and replaying until
-   the tree disconnects are done, wake per-user sessions too, and keep
-   doing so on tcons no mount uses any more
- - replay a durable reopen only when its fresh open had an unknown
-   outcome, tracked per open file, and stop retrying a failed durable
-   reconnect as a fresh open with a stale GUID
- - don't let umount -f abort reconnect waits on a tcon another mount uses
- - retry reads that couldn't be sent due to a stale handle or credits
- - resend direct writes cut short by a reconnect as replays, or fail them
-   with -EIO under umount -f
- - reopen writeback handles from the worker only once per retry, so a
-   dead mount can't tie it up for the other mounts
- - reopen persistent handles from the reconnect worker without waiting,
-   rescheduling it only after transient failures
-
-Changes since v3:
- - new patch to stop a mount's tcons from reconnecting and replaying for
-   the duration of the forced-unmount teardown, so a reconnect wait or a
-   per-PDU replay loop (a close work item in particular) entered after the
-   unmount began can't hang cifs_kill_sb(); it also covers tcons shared
-   with another mount for those moments, and fails the reconnect worker
-   fast so it can't pin and leak the tcon, session, server and cifsd thread
-
-Changes since v2:
- - stop writeback started after a forced unmount (e.g. the unmount's own
-   sync) from retrying forever on a hard mount
- - fail writeback sends and reopens fast at every point in
-   smb2_reconnect(), not only the first, so a reconnect that starts
-   midway can't still block the unmount
- - abort a write's first retry under umount -f even before netfs bumps
-   its retry count
- - keep a dying task from looping in the reopen retry, and keep a read
-   from looping on a forced -EAGAIN retry
- - track the bad handle (-EBADF) across out-of-order subrequest failures,
-   and recheck the handle after the backoff sleep
+1/4 verifies multichannel binding requests with the session signing key
+    (MS-SMB2 3.3.5.2.4), as reported by Ian Bridges.
+2/4 keeps the negotiated SMB 3.1.1 signing algorithm instead of always
+    using AES-CMAC, and signs each key with its own algorithm.
+3/4 verifies signed reauthentication requests and uses the channel key
+    for session setup on a bound channel. A reauthentication with a
+    forged signature used to get a response signed with the session key.
+4/4 checks the MessageId and signature of a request before signing
+    STATUS_NETWORK_SESSION_EXPIRED, also reported by Ian Bridges.
 
 Changes since v1:
- - new patch to not write back through O_DIRECT handles (data loss of its
-   own, found by generic/051); put first for an independent backport
- - dropped the netfs patch that deferred write retries until all
-   subrequests were queued (could deadlock writeback under memory
-   pressure); keep the prepare_read() errno on abandoned read retries
-   instead
- - issue writeback sends and handle reopens without waiting for a
-   reconnect, and make umount -f also stop the credit wait, cover
-   multiuser per-user tcons, and not be gated by tc_count, so the
-   unmount's own sync can't hang
- - make the reopen retry reconnect-aware and bounded, don't replay
-   reopens inside SMB2_open(), track the bad handle (-EBADF) per request,
-   and fix a retried read failing with -EAGAIN and a dying-task writeback
-   looping on a reopen that gave up
- - record -EIO (not a transient errno) when writeback finally gives up
+- 1/4 is new: verify the signature of session binding requests, as
+  reported by Ian Bridges.
+- 2/4 (v1 1/2): reset the negotiated signing state on every NEGOTIATE;
+  Cc stable, since 3/4 depends on it.
+- 3/4 and 4/4 are new.
+- The AES-GMAC signing patch (v1 2/2) is dropped from this series and
+  will be posted separately.
 
-Iván Ezequiel Rodriguez (1):
-  netfs: preserve prepare_write errno on reissue
+Testing, on a KASAN/lockdep UML kernel with ksmbd-tools: forged and
+replayed binding, reauthentication and expired-session requests, also
+inside compounds, get unsigned refusals with AES-CMAC and HMAC-SHA256;
+randomized requests against these paths and concurrent bind/reauth/
+logoff stress found no signed response to an unverified request and no
+KASAN or lockdep report; the Linux cifs client works with SMB 2.1 to
+3.1.1, signed and encrypted; smbtorture's session, signing, I/O,
+compound, lock, oplock, lease, notify and ioctl suites give the same
+results as without the series. Ian Bridges also tested an earlier
+revision with his own probes and smbtorture. Not tested: Windows
+clients, and Kerberos expiry with a real KDC (it was emulated with a
+test-only change).
 
-Paulo Alcantara (17):
-  smb: client: don't write back through O_DIRECT handles
-  netfs: keep the prepare_read errno when abandoning read retries
-  netfs: don't hang a read whose retry is abandoned
-  smb: client: let umount -f abort retried reads and writes
-  smb: client: don't give up writeback on the first replayable error
-  smb: client: don't retry failed writes forever regardless of mount
-    options
-  smb: client: don't block dying tasks waiting for writeback on close
-  smb: client: issue writes from a worker if the task is dying
-  smb: client: don't fail writeback preparation if the task is dying
-  smb: client: retry writeback on interrupts and allocation failures
-  smb: client: don't block dying tasks waiting for writeback on fsync
-  smb: client: retry writes that couldn't be issued due to a reconnect
-  smb: client: retry writeback after losing the connection, share or
-    handle
-  smb: client: let umount -f stop waiting for reconnects on hard mounts
-  smb: client: don't replay handle reopens inside SMB2_open()
-  smb: client: fail writeback sends and reopens fast when the server is
-    gone
-  smb: client: stop reconnecting and replaying during a forced unmount
+An AI assistant was used to draft the patches and as an independent
+reviewer.
 
- fs/netfs/read_retry.c      |  17 +-
- fs/netfs/write_issue.c     |   4 +-
- fs/smb/client/cifs_fs_sb.h |   2 +
- fs/smb/client/cifsfs.c     | 191 ++++++++++++---
- fs/smb/client/cifsglob.h   |  43 +++-
- fs/smb/client/cifsproto.h  |  11 +-
- fs/smb/client/cifssmb.c    |  15 +-
- fs/smb/client/connect.c    |  16 +-
- fs/smb/client/file.c       | 483 ++++++++++++++++++++++++++++++++++---
- fs/smb/client/misc.c       |  22 +-
- fs/smb/client/smb2file.c   |   2 +
- fs/smb/client/smb2ops.c    |  22 +-
- fs/smb/client/smb2pdu.c    | 132 ++++++----
- fs/smb/client/smb2proto.h  |   9 +
- fs/smb/client/transport.c  |  19 +-
- 15 files changed, 839 insertions(+), 149 deletions(-)
+Michail Andreas Michalopoulos (4):
+  ksmbd: verify the signature of session binding requests
+  ksmbd: sign with the negotiated SMB 3.1.1 signing algorithm
+  ksmbd: use the channel signing key for session setup on a bound
+    channel
+  ksmbd: check a request before signing STATUS_NETWORK_SESSION_EXPIRED
 
+ fs/smb/server/auth.c              |  14 +++-
+ fs/smb/server/auth.h              |   4 +-
+ fs/smb/server/mgmt/user_session.c |   1 +
+ fs/smb/server/mgmt/user_session.h |   2 +
+ fs/smb/server/server.c            |  39 +++++++++-
+ fs/smb/server/smb2ops.c           |   4 +-
+ fs/smb/server/smb2pdu.c           | 114 +++++++++++++++++++++++++-----
+ 7 files changed, 154 insertions(+), 24 deletions(-)
+
+
+base-commit: 05441d697f7f9a927264f4058cbbc6a03dfcac9d
 -- 
-2.56.0
+2.43.0
 
