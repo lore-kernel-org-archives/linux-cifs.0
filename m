@@ -1,68 +1,121 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.157
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1793918743;
-	b=RV2NuH5MvVTy+A/81TEadMhkpKpUJZP2r563j4Ui9QMrfT7w4hd9Ygtu70DY1F2zkyAk
-	 uYb3rhyfpw1ww2ytdxFSghIif3kZ06Uxi8XTVYbR4yR0Bw2m8dnBB/eGr3j0Q4cnSWZjM
-	 ZySOgHoHN4ElX7Mw7ncxU/UFDKugKcl94iuxhXolGidlSbwZQ0i+sOz4O8Ag6gnPUpXyo
-	 N1Vf+k3NTBCxgcgWIhj4fsw0q8kyHOpHwkSyBm7ppWz2H0s3dx795vwhFHz9RaCcIGK9T
-	 fcX604NXGglmAxnyVmz1Jx7JYvi7YObBPeEOZHiSUwDtJzZPskhzXM56HDBeG8+WsFw==
+	t=1793937234;
+	b=K0Ktrwa48EQU5L7QuYcJ0iqJHY4SWy9slh3G5apclURv/gkUJB1bF6S0wsyPznOIDmBm
+	 py/zXLblkN1m2oerag0aTOKDaS4vWsMsOKWPs0+RRFm2w9zOSWI69O5RScUWychCeK7G3
+	 +pSAFQMzl/lzwCpa0Fz01nJ1qM1Xy2W0HB8RySbg2nBPxFFQooEzg2Yr44x5Upfd9xU/F
+	 grgJpp1daYdo9AIVO2/ZAulA4L9Y0mM9KNeCMGc2fW4AY4NMXnIlk+jJw2QdWZfW/ldlH
+	 FlU08be1eWVDVqKJV3qBnLRCI8DBgzHNTetRr/3K8rq3v8AVsnQXMzhrtfZVHNWNtiQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1793918743;
-	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	a=rsa-sha256; c=relaxed/relaxed; t=1793937234;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=pSSvjUHixkiJ+BWiT7OYxD4v58sUh/VX4fp4VpFF4OA=;
-	b=Do3OALKclyIQfV1hmb9XrB+csKfMRUMtqgVTnuw/3Mfm9TRHTZdtTpYxgAwXrMuyFtWY
-	 Y6r2bjC7x52aff626+DnYLQ9u2MHKPnaxRDvCFoNcESbZB2YQy3yFO76GMBXczmuHG1Iu
-	 blImBF0TXtnTmGzhMP6eYJVJSIPAGoTttACXzP9n9xhXovidHylJ7dB2NarWOMN7mnxeA
-	 L9WCSDE+B6JJJux1Q+W9vYSLa0A3qdyQHfjD1osUouU3rhON/JNmCZiqxI/A/VeKA7OJC
-	 fthbASEckay9joE2cq/+XaGCY80qsnBRKIr9fWqZAa6hZdGdR6y/IaSlzjGavKTRD2g==
+	bh=iCrRXtFu864b4MVBFiZe70KJzA1i85H7fePu1ppoOh0=;
+	b=uLZE9dQs9iEMylYeZU52tckPf+fPjcNE83REoGa0kJ3mYM//hUNfo3P0saqXPu83vVhY
+	 nVT9zf4aWXY3ouelBIaWFQmB1bH8PoXPjALKqP7ntzUBm2jt4faR9hElW+pW4ww7/2OuR
+	 h9kZ2EzkHuZeNkIeQxJTCnPs3l6rLuhT+5Eh5IBwqvwGhe+aQwbpt6UaXTThDgK2H+tcq
+	 8U0RDkrxxC0iD7BwvhIeiwwHbhpNUJLHKAvBIGXqa0/1Y/WEdLREsQ8AE8BfnGDuIcj8Q
+	 lnuA3qSBkAviXZJ/DAK2daqGnigYLStxQAmxLKzs6qTSHNDBWFlkFojeAS0sPq7t7Xg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=EFyh9ubz;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=GgafwaO2;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=HwhaSk9g;
+	arc=none smtp.remote-ip=103.168.172.157
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FABE606A330;
-	Thu,  5 Nov 2026 22:45:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8FABE606A330
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92169606A326
+	for <linux-cifs@vger.kernel.org>; Fri,  6 Nov 2026 03:53:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 92169606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=EFyh9ubz
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
-	Content-ID:Content-Description;
-	bh=pSSvjUHixkiJ+BWiT7OYxD4v58sUh/VX4fp4VpFF4OA=; b=EFyh9ubz4smrNyJhY+UXM1Y6bj
-	+a3kKtNCFq0uzNcjWrEsBCZvbdmEANfxpfAiV4z22RYka5y3eB7G1zPYZRQL9/Kyie2aFYgZfWYnF
-	PArPGGlMtl/eUILjjCOel2e8NB0tQYNTFXzMWOxcVdukM3/srmOYYUv5MKjyon14ivkXaQl8HOFgN
-	YlE5uMv3JTA2cfCyQaeKL8xGNibCbTI8fpTeiz7fxNL/u59KUycQ1kI7lHX+NZxNq4SwcuwtMkptm
-	uGfzigqgS8wYfQtaOqMZ/wRJmcZx3qhEMRG8A3Ocu+b1jFmTgyoARiMmMFRvv6OiOyn2lyjRgTOpb
-	6+2SWabw==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xP6D7-00000000ynl-1lHE;
-	Thu, 05 Nov 2026 19:45:34 -0300
-From: Paulo Alcantara <pc@manguebit.org>
-To: linux-cifs@vger.kernel.org,
-	netfs@lists.linux.dev,
-	David Howells <dhowells@redhat.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Christian Brauner <brauner@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH v5 07/17] smb: client: don't block dying tasks waiting for writeback on close
-Date: Thu,  5 Nov 2026 19:45:21 -0300
-Message-ID: <20261105224531.2316211-8-pc@manguebit.org>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261105224531.2316211-1-pc@manguebit.org>
-References: <20261105224531.2316211-1-pc@manguebit.org>
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=GgafwaO2;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=HwhaSk9g
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id AF6D3140012D
+	for <linux-cifs@vger.kernel.org>; Thu,  5 Nov 2026 22:53:51 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Thu, 05 Nov 2026 22:53:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1793937231; x=1794023631; bh=iCrRXtFu864b4MVBFiZe7
+	0KJzA1i85H7fePu1ppoOh0=; b=GgafwaO2tz4QtjgxBq0S/qlTngxcTF11yinFs
+	C+frwnAXKO+5drqkYaIR6kSax3UsiFo44hdmB5BXrsdy/8164nmO9OkLyP6AoJ+j
+	YaHnOXK3g2vs9YG2/cAKjzIN423QZAHH871dSBlVvHT2wpwXE7aHgHUhNL3U17kb
+	XjPNb8Y/+d1JNJodhvXWtX8PzbM7aRKWSrRdhMsi9lJrxSdNzpZH3g4rEASn/f8I
+	d8HEIyy60Lnv4cjJrlD6dB2UDnkV3esPHN/pIxgjUvPIGGXysEDLn/8+rm71UU5w
+	D6h9GloeDeyVnzKItC+4llgA1YowiaPdwvSAlGTeV8DvmXczw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1793937231; x=1794023631; bh=iCrRXtFu864b4MVBFiZe70KJzA1i85H7feP
+	u1ppoOh0=; b=HwhaSk9gpZgBFgQwknaiTvQqo+1HDQbdFgQqeY57Wqauk6wYXKo
+	5uQ9dIBJTBVLAzNVu6tyvYn2VUpWYsf+j/hVb4MNVMnBfWPNsNQvS09fovPqrnby
+	R8DzsoBrtCDfFqCfAcrqQg2H5HS3CEv7wyMrORf4ya5Db0bnNyOY4KG8elMJzugx
+	FJ5FkjtMTuZqVf3iih2G9yc2ujUwADkUfcTzVFZwQ4WTv1oGlHe+VXAVKek+6140
+	FpOffvkcGpc9ShwwD7B3QcUsxPLE8w3uitMJYOjTg0AwzoYs9PqX0Q+jzk7Yro6z
+	iip2Qo55+HPTUil74OntZBFytVeGZTVolYQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1793937231; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:KjO54LlzYZeld5qso0HbQgJhy/jH9t8BM8PX7Zbx8+oH6fb
+	Acf2UEooy+64Dyf+sNH2NeGwRU0bbBQwA22bY0b/gGmAaEeYFeEOahzN5AHwk7cg
+	t+vnMKMgBENtlsPNkYs/BgcyzbMp6SbgpvVxNxcZcu2oPKaxiIcuuB/vML1C5gFd
+	DWI8GSl8nc+1WqhROuuQENJxJ5CSx58Ha8rlyCx/I7zWamVkXEpKmEVkiEsUXh3l
+	OUDndzZ87dQM0tV9qQU9O9N53y6vDdCTku4omx0DWcldhzntMUIHuXdLPFlxEE0o
+	hWl+9T02jRPPcCPAXO6uMCpWeXQa/lzRBTQSEcg==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:hl4vkaF1BfqfxO2vw8BZCcpAC5qj3N5fswZ8HteUm/Q=:zZ5C+QLjjwQnJ4fR0LADgx4P6gvbyDK+qrtUFf8O+jM=;
+X-ME-Sender: <xms:Tk_tajuURj4AGbsVoQQJCm_E5d-XNImeqlZWedGTvnyqmbpPNfkNHw>
+    <xme:Tk_talKNTUyeDgTv4qHxjNCShH5o5K8nfrmXEgdBFMFiG4fAzY8YqoFyTxh09FeNe
+    Vptc1oz2xbBdLbKVGtrrKJ_M8qrHyN4htwdKEQ_BNo55M_JyQlrbdE>
+X-ME-Received: <xmr:Tk_tak-sSdW3Iisg4QZX_0W9t4_n13ywkvJCqbFwqD3F-vVoWRub5ReyRziJewOf>
+X-ME-Proxy-Cause: dmFkZTE4T7gjfdVwdKvS0V82xicFfBN4ch7P0wfxstmEd2tnoXyTtuWBbNP+TGBxseifmE
+    O/vfJ/VGCxNFNUg+5AJGTSPdEfcB+afSP1xLSVL8VPL+Q5GmF8bBx3MRsfwoe+SnZiqobC
+    QzF1Gs4AURf7jkpxZn5bOtqXz2mlNxgKLZ1j46SIHfjdMiKS551bVPfoYhSXOvuuxFMKyb
+    zJ4NZV3B3fSAURTKAT23OrBGJdF4tUDeIvOlegt8FpILRiyqH136kbVVKgGusufcRyA7Z7
+    azJOtF3y8f5VQ/NdYzgEuBeXGYT83XuvBdwbzg4wnUnqh6iy7w/kAHRBFZKTHCfGwlntl1
+    gwSc914vY7dfl1pINvZoqxvE23yQUwPn2sOTEzl139FRlwzkfdz4hbrZrBMJGsalafhUqe
+    VvmuDPvcvJ+lGy4olmFPYcOSM17rJ4KoFhiK7t41IiZbKWbDB+rFjPLkEU+A5R0cyTzniy
+    beVXAin+ftbmUvBwx1XFB1FrZ1pA6omAM03wdgP/eZsFekYiQEmQHO4Zl0t/CWENVF/UeJ
+    kvrh6x9mk9lRlJ/V+oVUOyV8N5udNPpadAsQ4k3sKGxV7gYgCdz4KUrU2PgZQ16QfZ+vjK
+    qZ/C4wYTGn5283Uwn+w1DFLajq6wqlNE1lBNhmObvcudmwXzhG//nUmUaCcQ
+X-ME-Proxy: <xmx:Tk_tamy3Tq5iZ4NWos_Wj9rvy72Gfzzk0XOacoXCAHcw5hdzzr_cLw>
+    <xmx:Tk_tap58uSNO99tXdJqHytJEAOttkMyCKQZqgBVeAWYRBkBzmcSWew>
+    <xmx:Tk_tal_-AFCKLUM9pd3aO_Nbb0LDzfxyhXWCqnXO0DCZxdpcEzbObw>
+    <xmx:Tk_tampmFmpsI0sn4wNtNbdNbtG4hDgSVhscdd9-msDgesGfqa9KGg>
+    <xmx:T0_tavDSuDcGhscwveHUtWMfGySYS59V_Q04777Mfw7iNCW-2FOxF8F_>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 5 Nov 2026 22:53:49 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>
+Subject: [PATCH v2 0/2] ksmbd: exclude metadata-only opens from sharing checks
+Date: Thu,  5 Nov 2026 21:53:43 -0600
+Message-ID: <20261106035345.728454-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -74,77 +127,45 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cifs_flush() waits uninterruptibly for the writeback it starts.  A task
-that gets killed while closing a file on a hard mount with an
-unresponsive server is stuck in D state until the server comes back.  It
-also consumes any writeback error for a caller that is about to exit,
-hiding it from everyone else.
+ksmbd includes opens that hold no data, execute or delete access in
+sharing checks. Such a metadata-only open without sharing can block
+later reads, writes and deletes. A metadata-only stream open can also
+block deleting the file.
 
-Wait killably instead.  If the closer gets killed, stop waiting and leave
-the error bits in the mapping for others to see; writeback already in
-flight completes on its own.
+Patch 1 fixes the general sharing check. Patch 2 fixes the stream delete
+check added in v7.2. They are separate so patch 1 can be backported
+without the stream helper. Patch 2 uses the helper patch 1 adds.
 
-This is also needed before letting dying tasks issue their writes from a
-worker, which would otherwise make them wait for every one of them.
+This series was developed with LLM assistance.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-Cc: stable@vger.kernel.org
 ---
- fs/smb/client/file.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+Changes in v2:
+- Use disposition-implied access in both sharing checks. This covers
+  Namjae's READ_CONTROL plus FILE_OVERWRITE case and named streams.
+- Keep the requested access on the returned handle.
+- Leave the attribute-only pairing rule and Time Machine AFP_AfpInfo
+  synthesis unchanged.
+- Treat FILE_SUPERSEDE as writing because ksmbd implements it by
+  truncating, although MS-FSA grants DELETE.
 
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index e8557c670dc3..0d2db0dd43f2 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -3043,17 +3043,43 @@ int cifs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
- 	return rc;
- }
- 
-+static int cifs_wait_writeback_killable(struct address_space *mapping)
-+{
-+	struct folio_batch fbatch;
-+	pgoff_t index = 0;
-+	int rc = 0;
-+
-+	folio_batch_init(&fbatch);
-+	while (!rc &&
-+	       filemap_get_folios_tag(mapping, &index, (pgoff_t)-1,
-+				      PAGECACHE_TAG_WRITEBACK, &fbatch)) {
-+		for (unsigned int i = 0;
-+		     !rc && i < folio_batch_count(&fbatch); i++)
-+			rc = folio_wait_writeback_killable(fbatch.folios[i]);
-+		folio_batch_release(&fbatch);
-+		cond_resched();
-+	}
-+	return rc;
-+}
-+
- /*
-  * As file closes, flush all cached write data for this inode checking
-  * for write behind errors.
-  */
- int cifs_flush(struct file *file, fl_owner_t id)
- {
-+	struct address_space *mapping = file->f_mapping;
- 	struct inode *inode = file_inode(file);
--	int rc = 0;
-+	int rc = 0, rc2;
- 
--	if (file->f_mode & FMODE_WRITE)
--		rc = filemap_write_and_wait(inode->i_mapping);
-+	if (file->f_mode & FMODE_WRITE) {
-+		rc = filemap_fdatawrite(mapping);
-+		if (cifs_wait_writeback_killable(mapping))
-+			return 0;
-+		rc2 = filemap_check_errors(mapping);
-+		if (!rc)
-+			rc = rc2;
-+	}
- 
- 	cifs_dbg(FYI, "Flush inode %p file %p rc %d\n", inode, file, rc);
- 	if (rc) {
+This differs from my reply to v1, which proposed changing only the
+truncate path and leaving patch 2 unchanged.
+
+v1: https://lore.kernel.org/linux-cifs/20261104183702.192452-1-icb@fastmail.org/
+
+Ian Bridges (2):
+  ksmbd: skip metadata-only opens in sharing checks
+  ksmbd: skip metadata-only stream opens in the delete check
+
+ fs/smb/server/smb2pdu.c    | 30 ++++++++++++++++++++++--------
+ fs/smb/server/smb_common.c | 34 +++++++++++++++++++++++++++++++++-
+ fs/smb/server/smb_common.h |  5 +++++
+ fs/smb/server/vfs_cache.c  |  7 ++++++-
+ fs/smb/server/vfs_cache.h  |  2 ++
+ 5 files changed, 68 insertions(+), 10 deletions(-)
+
+
+base-commit: 957772008502b579bc220aa2167629472f9aa696
 -- 
-2.56.0
+2.47.3
 
