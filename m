@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794057321;
-	b=aS4tueh+1y0V4v5z291yRBTrZLqEc0puys2bivdXRpewQTXokunV+ZkFd645KRfo9ToC
-	 O2KRqb44pTmMxziM/Ajtt3HBagUXQE5eGakIS3P0mqdi39MvzySUA/K7Js1C/pfWwBtbD
-	 YYia7uu6M0n2EhktW/YzbNJypFbZ89d4BI2syXq+BZ/GJxQqwS0Jq3I+P6iWQOHuF4V8D
-	 LteXTVHUI9oFSAfCRzvsNwBu/f/+p9zX/42lRbh65gaIlfo+uTcXrrtEI0DX2XMIMQEQ4
-	 9ohTv9+26fCouk/kd9RaGuQgjP1epyjVUUaI01sbF/W8/RTVUdC7aJcFx9e5R35Y3oQ==
+	t=1794057329;
+	b=GlbXqdz1+S/SDJNSyzPzGxR9e5LLFoS+isijvu6TIWdXoyjaWE3R/MR/o+zJcvPupGXG
+	 LlV5b22R73EGgCOHkL7vAc16N5mmM+v4OLks+K0X8VPo/r2GYDLVu9Mv0TJiCYqS0eSqL
+	 rP0Uc7LhFYUdJ5T23PhXGe6c2AEoopyDiJGO3LVvtB2y+uStj4FqYMoDitWFqHBK/0OAL
+	 450hSIH/cMal1lx+fqM6jYYvrPaekOxZ9p1er19k5foPkmJF1niATWQITZOet6zC3abnL
+	 eZbIKlNdYGklqBm9Wj+XDasD+77+fLihmAUpnviMG9x4CbjS7KNAyoNLKxGXqcielfQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794057321;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794057329;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=NqdnM0cjAIjEzMS++qHY9EMeqK11nPOA5sk99DCFMSM=;
-	b=s1r4VKf7WpCsEF257YE3jk1h5NqQEy7syEYJWlGa6vRg4ov+Yhhone5Bnz6rwrbohiqI
-	 nicVYGttBHxH99K+2NC8mK1pvM4Zxz+1zwcDkt1MCCXEdV0mzDPUzwueC2E2Qjq8fsdBl
-	 qSxCaYCkzqFuuLE1CHzPaooW0Ahjs0GqlJ/9W+KdBd1pj5Rh3H1rYrWZ1skQxtEfhvcaA
-	 5gB/ja+F9X+lflAlT24pSJzjEvZc4u9jmdKVrlvIRecg8Nw3+5I0tSMqd5x7IzARa90O7
-	 3ldeFRnaQELQs8k6D0WAQTtX9znFq8zUtfcjVx5OnBPhO9XVjqVUWCGrUbj89gcbM+w==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=Ib5OOJ4ufUTeso4k1bDQ5VutJZ6SWyjJH7N1HGtkLgQ=;
+	b=PmGtGy5DiiYRckE1iuv2r/GfKyaMFvs2c+i3iyuy5ZHrX7on+faSLtPrpelxMJvju6fF
+	 N+UkKzF+dAs0/xAloADI4l43WhFKEZ5oLtHWnBsBatDMS9RsLqSzAwhJJaEcKcKM9zKmD
+	 8Ycw8L5FXWeGOe0Ekb4VbwDGAYlR4Igxxf3QNzpG6FDXfa8g1EF5mWb9Odq3VtnA4eqY0
+	 R1+EQrg4PLIZUw3pmpAM1KmfXsx/gY0+v0AhqKiJCpOCwzNJ85pUSk3xn/5di9LyS99Kj
+	 BfiiyG265mL+UTux4lr3nI/InB8dDH41tR3u9aexMRzONb3vT2zA11EIb+4VPyy6PSA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oZWmtm2s;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WTXrOVJy;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 2F262606A326;
-	Sat,  7 Nov 2026 13:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id D7A4A606A332;
+	Sat,  7 Nov 2026 13:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oZWmtm2s
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1AD1D1F0089F;
-	Sat,  7 Nov 2026 13:15:20 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WTXrOVJy
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id B87211F008A2;
+	Sat,  7 Nov 2026 13:15:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794057320;
-	bh=NqdnM0cjAIjEzMS++qHY9EMeqK11nPOA5sk99DCFMSM=;
-	h=From:To:Cc:Subject:Date;
-	b=oZWmtm2sJGS5BqQlbb1d+rs53AIQFtiLVYRfPnY69UFdFrPUyI6axVSCLHqfKfg70
-	 6BnKFNfRVFb9c214fZzydXsCQuVugdOIhTgNcxtEqIiMjH/qbNQImGfBRwY1ewGZBl
-	 ld1NALuMs8bwzPAVV70tqOo5OFA46BZAX9rTkMDZnp6XSvGyWOQx2PUsPn1xX1B8Bs
-	 UgPJ3SthJGMLEJ+0YVgbkTEFj7hBImZad8Qgyj3NhYSM9WO/70z3819d6xBxT/hW+R
-	 oNmPt+tSYH848DwJ/qLNJ+GMi0opDd+d4uMv7HiycNM1SU/ZmECK2NBq9uyjmzXXE3
-	 RSs1QcJ3GUL/Q==
+	s=k20260515; t=1794057328;
+	bh=Ib5OOJ4ufUTeso4k1bDQ5VutJZ6SWyjJH7N1HGtkLgQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=WTXrOVJyOJ5aHwmPjqoFS/9dt0b1RJ1BV5xfjQQ2rbZFYQyvllvexd5ACc5hP8hkq
+	 9iYwO8eGhKis77entu/kPxGGr3wvVKGJCjUitqWqzkA/skeMnR6PdFxg6j63R1+62o
+	 19mUMBAR5uVmoLFRAY7ezYcGZnXpXgukeCqzHv7jsHur0ToPv0gdTVepDi1u/NhefM
+	 /Z51yodu4or5SWdY4YC8Z4jmuAqkRVSsuQJKIuDrP9RoBlJ9VeDDmCb4Pj2A8NiijK
+	 aVjmkNuB+Rl9RqUasfv5aUUdmV42Y1TSZuiCKtnsfSbt58lPZCLr1ZNoG9dRMgpeX+
+	 7Km7jrlK/ZCAw==
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: David Howells <dhowells@redhat.com>
 Cc: Jarkko Sakkinen <jarkko@kernel.org>,
@@ -77,10 +77,12 @@ Cc: Jarkko Sakkinen <jarkko@kernel.org>,
 	Tom Talpey <tom@talpey.com>,
 	Trond Myklebust <trondmy@kernel.org>,
 	Vasily Gorbik <gor@linux.ibm.com>
-Subject: [PATCH v4 00/11] KEYS: Sanitize the garbage collector
-Date: Sat,  7 Nov 2026 15:15:01 +0200
-Message-ID: <20261107131512.3603168-1-jarkko@kernel.org>
+Subject: [PATCH v4 02/11] dns_resolver: Move the key type into a separate module
+Date: Sat,  7 Nov 2026 15:15:03 +0200
+Message-ID: <20261107131512.3603168-3-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261107131512.3603168-1-jarkko@kernel.org>
+References: <20261107131512.3603168-1-jarkko@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -92,137 +94,285 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-1. Replace key_type_dead retyping with module reference pinning so live
-   keys and restrictions keep their backing key_type module loaded until
-   key_gc_unused_keys() or keyring_destroy() completes.
-2. Process serial-tree scans and graveyard destruction in fixed 64-key
-   chunks to a bound workqueue execution latency without hurting overall
-   throughput for a significant amount.
+Once keys pin to the kernel module of their key type, having the DNS key
+type in the same modules as the resolver will introduce a circular
+dependency preventing module_exit() from ever running.
 
-The first part has a user-space visible effect: rmmod returns -EBUSY while
-keys or keyring restrictions still pin the backing module.
+Introduce dns_resolver_key.ko containing key_type_dns_resolver. On a module
+exit, drop the credentials and call key_gc_flush() in order the drain the
+remaining RCU callbacks.
 
-Internal key caches or transport state bottlenecks are addressed by either
-clearing their private caches on last-client teardown or splitting key
-types into dedicated provider modules.
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+---
+ net/Makefile                 |  2 +-
+ net/dns_resolver/Kconfig     | 15 +++++++++
+ net/dns_resolver/Makefile    |  4 ++-
+ net/dns_resolver/dns_key.c   | 65 +++++-------------------------------
+ net/dns_resolver/dns_query.c | 64 +++++++++++++++++++++++++++++++++++
+ net/dns_resolver/internal.h  |  5 ---
+ 6 files changed, 92 insertions(+), 63 deletions(-)
 
-CHANGES
-=======
-
-v4:
-- Replaced WARN_ON() around fallible keyring_clear() in CIFS idmap and
-  SPNEGO cache-clearing helpers with pr_warn_ratelimited().
-- Moved key garbage collection from the shared events workqueue onto a
-  dedicated WQ_MEM_RECLAIM | WQ_PERCPU workqueue (key_gc), allocated in
-  key_init(), so WQ_MEM_RECLAIM workers (nfsiod/cifsiod) and reclaim paths
-  can flush key GC safely.
-
-v3:
-- Split dns_resolver and rxrpc key types into dedicated provider modules
-  (dns_resolver_key.ko and rxrpc_keys.ko) instead of client refcounting,
-  so cached or retained keys do not pin dns_resolver.ko or rxrpc.ko.
-- Dropped the standalone nvme-keyring fix as it was picked up by the
-  subsystem maintainers.
-- Hardened key_gc_flush() to serialize against chunked key_gc_work
-  continuations, and fixed a restriction module reference leak on failed
-  keyring instantiation.
-
-v2:
-- Used v1 as a test probe for Sashiko to detect the corner cases instead
-  of trying to resolve even the known ones beforehand.
-- Converted the client subsystems to be compatible with the module
-  pinning semantics.
-
-VERSIONS
-========
-
-- v3:
-  https://lore.kernel.org/keyrings/20261105005311.804098-1-jarkko@kernel.org/
-- v2:
-  https://lore.kernel.org/linux-integrity/20261103030226.2685251-1-jarkko@kernel.org/
-
-Cc: keyrings@vger.kernel.org
-Cc: linux-afs@lists.infradead.org
-Cc: linux-cifs@vger.kernel.org
-Cc: linux-integrity@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-nfs@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Anna Schumaker <anna@kernel.org>
-Cc: Bharath SM <bharathsm@microsoft.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Eric Dumazet <edumazet@kernel.org>
-Cc: Heiko Carstens <hca@linux.ibm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: James Morris <jmorris@namei.org>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Marc Dionne <marc.dionne@auristor.com>
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Paul Moore <paul@paul-moore.com>
-Cc: Paulo Alcantara <pc@manguebit.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
-Cc: "Serge E. Hallyn" <serge@hallyn.com>
-Cc: Shyam Prasad N <sprasad@microsoft.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Sumit Garg <sumit.garg@kernel.org>
-Cc: Sven Schnelle <svens@linux.ibm.com>
-Cc: Tom Talpey <tom@talpey.com>
-Cc: Trond Myklebust <trondmy@kernel.org>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-
-Jarkko Sakkinen (11):
-  KEYS: Add key_gc_flush() for draining RCU callbacks
-  dns_resolver: Move the key type into a separate module
-  NFSv4: Clear idmap keyring cache when the last client unloads
-  smb: client: Clear idmap/SPNEGO caches when the last session is
-    unloaded
-  s390/cert_store: Start tracking subsystem keys
-  KEYS: trusted: TEE: Disable sysfs bind attributes
-  KEYS: trusted: TEE: Synchronize session lifetime
-  rxrpc: Move key types to their own module
-  KEYS: Pin the backing kernel module for a key type
-  KEYS: Remove key_type_dead
-  KEYS: key_garbage_collector(): process in chunks
-
- arch/s390/kernel/cert_store.c             | 161 +++++-------
- fs/nfs/nfs4idmap.c                        |  21 ++
- fs/smb/client/cifs_spnego.c               |  12 +
- fs/smb/client/cifsacl.c                   |  12 +
- fs/smb/client/cifsproto.h                 |   8 +
- fs/smb/client/misc.c                      |  19 +-
- include/linux/key-type.h                  |   6 +-
- include/linux/key.h                       |   2 +
- net/Makefile                              |   4 +-
- net/dns_resolver/Kconfig                  |  15 ++
- net/dns_resolver/Makefile                 |   4 +-
- net/dns_resolver/dns_key.c                |  65 +----
- net/dns_resolver/dns_query.c              |  64 +++++
- net/dns_resolver/internal.h               |   5 -
- net/rxrpc/Kconfig                         |  20 ++
- net/rxrpc/Makefile                        |   7 +-
- net/rxrpc/af_rxrpc.c                      |  19 +-
- net/rxrpc/ar-internal.h                   |  25 +-
- net/rxrpc/key.c                           | 122 +++------
- net/rxrpc/rxgk.c                          |  66 -----
- net/rxrpc/rxkad.c                         |  47 ----
- net/rxrpc/security.c                      | 184 ++++++++++++++
- net/rxrpc/server_key.c                    | 260 +++++++++++--------
- security/keys/gc.c                        | 289 ++++++++++------------
- security/keys/internal.h                  |   8 +-
- security/keys/key.c                       |  65 +++--
- security/keys/keyring.c                   |  88 +++----
- security/keys/trusted-keys/trusted_core.c |  15 +-
- security/keys/trusted-keys/trusted_tee.c  |  89 +++++--
- 29 files changed, 925 insertions(+), 777 deletions(-)
-
---
+diff --git a/net/Makefile b/net/Makefile
+index 5b2dd7f07a85..69c16a7851b4 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -55,7 +55,7 @@ obj-$(CONFIG_IEEE802154)	+= ieee802154/
+ obj-$(CONFIG_MAC802154)		+= mac802154/
+ 
+ obj-$(CONFIG_SYSCTL)		+= sysctl_net.o
+-obj-$(CONFIG_DNS_RESOLVER)	+= dns_resolver/
++obj-$(CONFIG_DNS_KEY)		+= dns_resolver/
+ obj-$(CONFIG_CEPH_LIB)		+= ceph/
+ obj-$(CONFIG_BATMAN_ADV)	+= batman-adv/
+ obj-$(CONFIG_NFC)		+= nfc/
+diff --git a/net/dns_resolver/Kconfig b/net/dns_resolver/Kconfig
+index 7c2dba273e35..2618bad2e771 100644
+--- a/net/dns_resolver/Kconfig
++++ b/net/dns_resolver/Kconfig
+@@ -1,10 +1,25 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++
++#
++# Configuration for DNS Resolver key type
++#
++config DNS_KEY
++	tristate "DNS Resolver key type"
++	depends on KEYS
++	help
++	  Support the key type used to cache DNS lookups independently of
++	  the in-kernel DNS query service.
++
++	  To compile this as a module, choose M here: the module is called
++	  dns_resolver_key.
++
+ #
+ # Configuration for DNS Resolver
+ #
+ config DNS_RESOLVER
+ 	tristate "DNS Resolver support"
+ 	depends on KEYS
++	select DNS_KEY
+ 	help
+ 	  Saying Y here will include support for the DNS Resolver key type
+ 	  which can be used to make upcalls to perform DNS lookups in
+diff --git a/net/dns_resolver/Makefile b/net/dns_resolver/Makefile
+index 877532d662d0..586e4c6514de 100644
+--- a/net/dns_resolver/Makefile
++++ b/net/dns_resolver/Makefile
+@@ -3,6 +3,8 @@
+ # Makefile for the Linux DNS Resolver.
+ #
+ 
++obj-$(CONFIG_DNS_KEY) += dns_resolver_key.o
+ obj-$(CONFIG_DNS_RESOLVER) += dns_resolver.o
+ 
+-dns_resolver-y :=  dns_key.o dns_query.o
++dns_resolver-y := dns_query.o
++dns_resolver_key-y := dns_key.o
+diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+index 451247864a63..fecbdc1d6beb 100644
+--- a/net/dns_resolver/dns_key.c
++++ b/net/dns_resolver/dns_key.c
+@@ -9,8 +9,8 @@
+  *              Wang Lei (wang840925@gmail.com)
+  *		David Howells (dhowells@redhat.com)
+  */
++
+ #include <linux/module.h>
+-#include <linux/moduleparam.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+@@ -22,15 +22,12 @@
+ #include <keys/user-type.h>
+ #include "internal.h"
+ 
+-MODULE_DESCRIPTION("DNS Resolver");
++MODULE_DESCRIPTION("DNS Resolver key type");
+ MODULE_AUTHOR("Wang Lei");
+ MODULE_LICENSE("GPL");
+ 
+ unsigned int dns_resolver_debug;
+-module_param_named(debug, dns_resolver_debug, uint, 0644);
+-MODULE_PARM_DESC(debug, "DNS Resolver debugging mask");
+-
+-const struct cred *dns_resolver_cache;
++EXPORT_SYMBOL_GPL(dns_resolver_debug);
+ 
+ #define	DNS_ERRORNO_OPTION	"dnserror"
+ 
+@@ -318,61 +315,17 @@ struct key_type key_type_dns_resolver = {
+ 	.describe	= dns_resolver_describe,
+ 	.read		= dns_resolver_read,
+ };
++EXPORT_SYMBOL_GPL(key_type_dns_resolver);
+ 
+-static int __init init_dns_resolver(void)
++static int __init init_dns_key(void)
+ {
+-	struct cred *cred;
+-	struct key *keyring;
+-	int ret;
+-
+-	/* create an override credential set with a special thread keyring in
+-	 * which DNS requests are cached
+-	 *
+-	 * this is used to prevent malicious redirections from being installed
+-	 * with add_key().
+-	 */
+-	cred = prepare_kernel_cred(&init_task);
+-	if (!cred)
+-		return -ENOMEM;
+-
+-	keyring = keyring_alloc(".dns_resolver",
+-				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, cred,
+-				(KEY_POS_ALL & ~KEY_POS_SETATTR) |
+-				KEY_USR_VIEW | KEY_USR_READ,
+-				KEY_ALLOC_NOT_IN_QUOTA, NULL, NULL);
+-	if (IS_ERR(keyring)) {
+-		ret = PTR_ERR(keyring);
+-		goto failed_put_cred;
+-	}
+-
+-	ret = register_key_type(&key_type_dns_resolver);
+-	if (ret < 0)
+-		goto failed_put_key;
+-
+-	/* instruct request_key() to use this special keyring as a cache for
+-	 * the results it looks up */
+-	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
+-	cred->thread_keyring = keyring;
+-	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
+-	dns_resolver_cache = cred;
+-
+-	kdebug("DNS resolver keyring: %d\n", key_serial(keyring));
+-	return 0;
+-
+-failed_put_key:
+-	key_put(keyring);
+-failed_put_cred:
+-	put_cred(cred);
+-	return ret;
++	return register_key_type(&key_type_dns_resolver);
+ }
+ 
+-static void __exit exit_dns_resolver(void)
++static void __exit exit_dns_key(void)
+ {
+-	key_revoke(dns_resolver_cache->thread_keyring);
+ 	unregister_key_type(&key_type_dns_resolver);
+-	put_cred(dns_resolver_cache);
+ }
+ 
+-module_init(init_dns_resolver)
+-module_exit(exit_dns_resolver)
+-MODULE_LICENSE("GPL");
++module_init(init_dns_key);
++module_exit(exit_dns_key);
+diff --git a/net/dns_resolver/dns_query.c b/net/dns_resolver/dns_query.c
+index b8fb9a1245bf..ae4dde190101 100644
+--- a/net/dns_resolver/dns_query.c
++++ b/net/dns_resolver/dns_query.c
+@@ -24,8 +24,10 @@
+  */
+ 
+ #include <linux/module.h>
++#include <linux/moduleparam.h>
+ #include <linux/slab.h>
+ #include <linux/cred.h>
++#include <linux/keyctl.h>
+ #include <linux/dns_resolver.h>
+ #include <linux/err.h>
+ #include <net/net_namespace.h>
+@@ -35,6 +37,8 @@
+ 
+ #include "internal.h"
+ 
++static const struct cred *dns_resolver_cache;
++
+ /**
+  * dns_query - Query the DNS
+  * @net: The network namespace to operate in.
+@@ -137,3 +141,63 @@ int dns_query(struct net *net,
+ 	return ret;
+ }
+ EXPORT_SYMBOL(dns_query);
++
++static int __init init_dns_resolver(void)
++{
++	struct cred *cred;
++	struct key *keyring;
++	int ret;
++
++	/*
++	 * Create an override credential set with a special thread keyring in
++	 * which DNS requests are cached.  This prevents malicious redirections
++	 * from being installed with add_key().
++	 */
++	cred = prepare_kernel_cred(&init_task);
++	if (!cred)
++		return -ENOMEM;
++
++	keyring = keyring_alloc(".dns_resolver",
++				GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, cred,
++				(KEY_POS_ALL & ~KEY_POS_SETATTR) |
++				KEY_USR_VIEW | KEY_USR_READ,
++				KEY_ALLOC_NOT_IN_QUOTA, NULL, NULL);
++	if (IS_ERR(keyring)) {
++		ret = PTR_ERR(keyring);
++		goto failed_put_cred;
++	}
++
++	/*
++	 * Instruct request_key() to use this special keyring as a cache for
++	 * the results it looks up.
++	 */
++	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
++	cred->thread_keyring = keyring;
++	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;
++	dns_resolver_cache = cred;
++
++	kdebug("DNS resolver keyring: %d\n", key_serial(keyring));
++	return 0;
++
++failed_put_cred:
++	put_cred(cred);
++	return ret;
++}
++
++static void __exit exit_dns_resolver(void)
++{
++	key_revoke(dns_resolver_cache->thread_keyring);
++	put_cred(dns_resolver_cache);
++	/* Drain deferred credential and keyring destruction. */
++	key_gc_flush();
++}
++
++module_init(init_dns_resolver);
++module_exit(exit_dns_resolver);
++
++MODULE_DESCRIPTION("DNS Resolver");
++MODULE_AUTHOR("Wang Lei");
++MODULE_LICENSE("GPL");
++
++module_param_named(debug, dns_resolver_debug, uint, 0644);
++MODULE_PARM_DESC(debug, "DNS Resolver debugging mask");
+diff --git a/net/dns_resolver/internal.h b/net/dns_resolver/internal.h
+index d0d8edcea092..3478bad78a9a 100644
+--- a/net/dns_resolver/internal.h
++++ b/net/dns_resolver/internal.h
+@@ -18,11 +18,6 @@ enum {
+ 	dns_key_error,
+ };
+ 
+-/*
+- * dns_key.c
+- */
+-extern const struct cred *dns_resolver_cache;
+-
+ /*
+  * debug tracing
+  */
+-- 
 2.47.3
 
