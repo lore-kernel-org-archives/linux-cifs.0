@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.176
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794017030;
-	b=bxYjaNy/Sbm2UtyxNPMy/wv7fnp0WC0Zas26q7Yc2/LWMJHhrCNkIqltoRtzzdqBwwjC
-	 BJaESlhtIT5qHJ2wVMqBH9exkuQFH/QSHQVzpvVyoAPIFGJ/IWCK6YAfqeG+8KPYqhER8
-	 Dj8j8tX+oq5Q0raIlzh9kNb75tys6e/DEgmWj7qymu8VfN7oze0mkdkVi7fjeZmoXVy4Z
-	 h4TWQZpyDBOxK2ab5viZvrBSZb8duE/D3KHmIGhsBYZVggOBuGugIh6+mSG/Un82r+3Sn
-	 71NACSr6kuq1WO5+895Cjhr6rS3bPFeP637vbZe9Ye4EgX12tLpsdnMaiVH/BMoNd+w==
+	t=1794017034;
+	b=f4mfAAlH67tLOCCcVpcHs42yFzL0Tc//8BmCUXBgO3wu9QCe98NFgC9NCEl47gl8fEdj
+	 XfoN76Eo9GmcTPkf/mUR+/YN6TQ7QWGk708u1w15k7k3gdvjwM7H/viHeShiGsBBYAKuw
+	 v00R0Osd7sup2FnLiz8sUvUJBFqFVhHApBaEwQWEXeNcNW5lDGKEvJw1m3eEduBFzILZ6
+	 sPR2OutUqa5KH7kJw+CozwYECxls0DZpcZ3w3dp2ucSbG14/jiTo7tOcuTM9iOEWCKoyG
+	 bPKMsEJnhijAUGBbg023Mt6IVNS9G0lbsp3FaQQW0tQdEA9HuQI/emPzwyHkrAgvU2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794017030;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794017034;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=Wl5HFRGIt4QfvxOhtBp8qjx8hgNbCpOv123HzhwwjRI=;
-	b=DehV9Ywss9mAFaAxIwMGyeQrHozaJj/bOha78ovRERGkavQa1ijzYWInzcU47q9762xq
-	 W3de8aOawVmdqbqIo12BVzM8Gx7DrsBJEr+6wo7PMsmVkFag1VLF1vmqkvfipxV/RGlkr
-	 SojomxDzFeXRGIkO0ObR3RMapPaf+c6VAdi8X8QNk7RqrG9fgaLkXctT9LnJjazyLStuc
-	 lL1dRuDHphLKs6H1iY/fJTzXrS4Wz41Re8ab6bSk/WVJYRiSkL2746swRY2TWqkuSruWO
-	 oyourJ0E6UfV8L4mBXplHM8QMzcjVJOlWxJyWSK8TdVNxuBcCcWd/XoLlw2g2xXNc8w==
+	bh=fag9CAq5RdDK24g6i+Jze72o+KqHUpaocfKTd7BZIO0=;
+	b=HyG0R9oSWib+8sYR9WOz4zNf03SI6Xz9m7tZe72/ASqFd4VMpvpMyxZAo3adA+lzNcsV
+	 EgWEuxDAMHl29hT3B2S1+b0cQGia5LTARLOUVgYKjLwdscGh0hMuvdELorT3j61srRkuk
+	 tOkDX23ZtL7vbyoLoFEjRp1NUWMzFLj5+w4aykflF0IXmXv5vvd9eDiXfDYCDw1MTCmS+
+	 VlhKTtUuIzPE4euMOKgmFTHxWDu2vi8QRifY+Vy4cIlf0RG6GYLHciQtq9mUW38po+1St
+	 VqUFOgENNTpxAfBAAEIfY6QqVsAAt5mTwTtRbfb83wmA8drrXXeiHS8gFm2B4WWecnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QwKGjIsE;
-	arc=none smtp.remote-ip=74.125.82.176
-Received: from mail-dy1-f176.google.com (mail-dy1-f176.google.com [74.125.82.176])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EjNPtQDd;
+	arc=none smtp.remote-ip=74.125.82.180
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967BC606A335
-	for <linux-cifs@vger.kernel.org>; Sat,  7 Nov 2026 02:03:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 967BC606A335
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB9D606A32F
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Nov 2026 02:03:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CB9D606A32F
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=QwKGjIsE
-Received: by mail-dy1-f176.google.com with SMTP id 5a478bee46e88-3700ed8dbe3so1935476eec.0
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Nov 2026 18:03:50 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EjNPtQDd
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-37000e7234bso1590288eec.1
+        for <linux-cifs@vger.kernel.org>; Fri, 06 Nov 2026 18:03:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794017030; x=1794621830; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794017033; x=1794621833; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=Wl5HFRGIt4QfvxOhtBp8qjx8hgNbCpOv123HzhwwjRI=;
-        b=QwKGjIsEZsvCf3chMphuHlcWrPKd9Me9ZWecGJ2rjorVykZAB18sSfoYmTl9qpwEtU
-         XlmPoxYtKBhKBtTJn/FKYRu+ZtDOTVcIh6rxpPrpFGvsSvrbLnV3t2XLosIK7KIxQkUP
-         DEaAStirCPauipCsdHD27k0CT/lG5FjazTOSxr95giaWodxeIqRUv6hm/cVpx40RekHv
-         AE2is/Ezu6wh4LcESv8QWnGQC7VtyL+3u5DDjJvq6Q5duvPGg2byl5qk41MNL49MPzac
-         Gg9heD+YCOQfdX2KhZd1dEszniZDUP/rEP+Ad7eb0/TStC5OFyZy9mmMoQjcEg9RBi9r
-         Xn2Q==
+        bh=fag9CAq5RdDK24g6i+Jze72o+KqHUpaocfKTd7BZIO0=;
+        b=EjNPtQDdfUizC6avFZtZI8RqbdTirz6v/iHvg+7kwZmf+UjAaHZ5etVdklyGbtDOXp
+         18tAeoppS5HrZjnmJhZV949evREpLPB23tunsddoEos0a8e8zQk7C+iCX4vyFih3BR1f
+         E1zr1pjo3TG6g6pb7w6pOQVjJSYGnX7bOljfT9rcQyscyQbZigwH1NqxHXLHpVWtGru9
+         0y03euFxYZ81BAjsVFTE3JHx10zDb6QSCSSXlglK19QQtAusZ66TtKp0Z8Ob8q/aJkTl
+         0b88hhxJorBi6uJJeV2Oj8JphDwxh680XHcTciLnI+YYCa6jvv7GTIoQClv9HUFLxUrF
+         voQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794017030; x=1794621830;
+        d=1e100.net; s=20260707; t=1794017033; x=1794621833;
         h=content-transfer-encoding:content-type:mime-version:references
          :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=Wl5HFRGIt4QfvxOhtBp8qjx8hgNbCpOv123HzhwwjRI=;
-        b=Sml4RBOjOvXnISI1RuHHlSG+brcZpSwM81LC6XCsEINdx3netRql09fXHbh95YsY9G
-         V6z283J9uqImbb3Vn4XycvvryNQAWR+QoJZ2Pedz+bdRo/P8PHwm4JreGd71dVSMNu1v
-         oOI/lAYjjoG1r24XWB3GVrSD8Z0uJfoiqScYvvPsRHxB38Yv/kghPxpkQfwizGLm96Fh
-         5cQwXujFcy7dfEfhpRLklznmiXYXxqm6P4vxC6AIiLAL/xE4o+qOP+PagBgZyjtdFLj6
-         rPNmB8X6TdVKZQyyrF5grTW4eruyHs3x4yBI4Te5g0Nz2KYtZwtt8Mc20qURBqI8FwTY
-         4l+g==
-X-Forwarded-Encrypted: i=1; AL+hErEOGVkWFFeTjn/MlP3tzLNHcA8Z+B17gfSVblv/ZGC/hy5bX2MrWQ5r7dyBR31xNglaGTEfDNoy4TDT@vger.kernel.org
-X-Gm-Message-State: APuU4Z8n1MSH6ETZqSJGwcTbjfrraixjxwfnMDQqCyCvRpsmBayKy/za
-	RDGFGdjRfkrUxn4cDEaJrv1qvilrX2gBKCGWXAtjINEBsfb/1Nr+97vv
-X-Gm-Gg: AYBFou1koPF/3Amk2WghVSyQIN9ojrOQXL0h4zu2mUSig/TDumd/XuOc9zfQuNUnRbN
-	ROqojwhhSseXNJBOaj+OxguoNE0IYERSa20J9iRUQwXuPq57I3iAcKTnt9VFE55pbnHxv59SgdN
-	Uan8suQxovrSlhehBs9Hl0YVwK1fWgXXeVlLU3YPd5sVJDLIB4YgG2VK3CxprfRvU3Gc0VFKDX7
-	6zHe6aV/I8xWZOkExChnNUoKj/gUC6G/xOW1MtcuwmGoFuscexa2IXfg3UKAWWDwKQfIJfBHvTN
-	YfkXm1NcSSqO2GlYXiM/e7AVVidrM9ymfkkrkYsJGb5Lm90RjvanG9+gW/2l6I6b+qt3LgjnbNo
-	J7myubUee2Cavf/Y8iMCHOOMbqHwtPfIuIJHnz6wyUPxQ2YF8LF8+nVzZikFQ0gn+AjT6ZjFMVF
-	p+eUVnZplrQ29nwK/abopjbwQ1K03At04joi+BhBzD82N/pHy873824xurqD9MvCarc3RoIJDi7
-	6o9X/k7d5113dQT/gHKONpebsOx7hZmaUHqf0lOCKW+T+YeoLv/ZCRINY9lqFn65N3WNXtsd9hj
-	4UkL+bNPfcdda/4fpSGfGnBcbVnLY5ZfRZU6t0pTa1dczDRxqM9WlAqNLay0nDAf4fA=
-X-Received: by 2002:a05:693c:8809:10b0:36e:5789:7b1d with SMTP id 5a478bee46e88-36f77bea830mr5764517eec.38.1794017029383;
-        Fri, 06 Nov 2026 18:03:49 -0800 (PST)
+        bh=fag9CAq5RdDK24g6i+Jze72o+KqHUpaocfKTd7BZIO0=;
+        b=SXfeYToY1pTln8wygAHYWNvBzwC1fbcSYB1hiCeaXr0+cy0NM8senYj+aclHmQE2/B
+         5GB985ywBba/3UgIC4lbbG+HFFIZrJF1MHTIzEzXfvHIKPbERYXlykoHfdzgGq7vGjYy
+         JKy0ei3Hm2RBkxT+zBe6Xzod0Y8h1p7UVmZrLkVG3EYE+8Un4rwt1L6PQZ9dAz3/N5A+
+         yjKYIMXhCW07HS7yqLj2ESMqm49hU2QyAXs3SN3Wyol4Ot7W5a5qxkPKb9XUP5THL/Pu
+         en4YwT/7/Siuxw+5b0Xu1hOEZd64GirckwqDx+GlQbNMCyFTafrBoKOjzTnrxqsWW0ov
+         M85w==
+X-Forwarded-Encrypted: i=1; AKwUvBxXs7TE75XjrLLnZDqD9/JtWytNBB6RhKBYaYpDRZXzL28z7YL1vgHYMZCJdkgIGefNYvgPqU8NSurs@vger.kernel.org
+X-Gm-Message-State: APuU4Z/SoEn4jEwhy38R+xsyXE+t0vjUma/tMXHnVSwu1bqsesnUFwng
+	3lB+JjsN6vg8BMk0u4qMKO8+2ZyruJUZiWfX1jb9mq/x/2oGzJts4bSu
+X-Gm-Gg: AYBFou1w3o/N6V9bky/QAYMKTJImLRXAQnL6dIW0My5kkyY+bNyQvOYx5wuHkQ8W/Kx
+	WGSkZ5ND9C0pFGrYM8MZ2+Qfq8pXug0PXyvtTu5zDN/bKS3dBq/j3sqfBFhqj9Xbo8hfFtcesv6
+	WLSbM6MzDvzk5hXRx4z2RSPEB9JYauuFuwCZKB2oEPUoNCAy4HW7gtawIiEzM9DVY/EFMkUW1ce
+	WaaBaASHgTmkzz6g4XyNtuzaPLBD7+30eXlx3PILiseQiv1i/OEys5dBxOzTKvoTjByoVRbixPy
+	kZ18Cjlcq3owreQO9eSX/FBaq6xsdaMTN0s7rX6pTzgekzEIdzy5dGvXBa4nc79/W7a5eJAh6tO
+	N19AYQdE/cjfs9AiGF91Krg81zEhRTZIqhfL00MVaCm0DJom6GK954SedLiprKHVV+PdwbSHR7t
+	IzU+80rMsPnel1mOzChwrIn0PegeZqiT1iMU0c2zzOwU0fk7PWe4XxEm4VgiLY0JUHN+c/nNomp
+	mhKhne7u5naktggAB+X3lUTxnrHe5S2jY6V86mYEM+6uoHMpDwnioqkLNi6Yas2ZndIwtAHpG9W
+	Mc0rM8eLEMM3bCX2M0eijoK4fOfZVtoh2yBHErprV+IZvhJPuEe6N4UiZx0YTcivrno=
+X-Received: by 2002:a05:7301:f0c:b0:36a:18e2:64c with SMTP id 5a478bee46e88-36f75a2afd9mr5001824eec.11.1794017032952;
+        Fri, 06 Nov 2026 18:03:52 -0800 (PST)
 Received: from fred-server.tail1cd3ef.ts.net ([166.199.5.81])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36fa922b205sm10524395eec.11.2026.11.06.18.03.47
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36fa922b205sm10524395eec.11.2026.11.06.18.03.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2026 18:03:49 -0800 (PST)
+        Fri, 06 Nov 2026 18:03:52 -0800 (PST)
 From: Fredric Cover <fredric.cover.lkernel@gmail.com>
 To: Paulo Alcantara <pc@manguebit.org>,
 	Namjae Jeon <linkinjeon@kernel.org>
@@ -90,9 +90,9 @@ Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH 1/2] smb: client: fix out-of-bounds read in dfs_parse_target_referral()
-Date: Sat,  7 Nov 2026 02:02:56 +0000
-Message-ID: <20261107020257.363811-2-fredric.cover.lkernel@gmail.com>
+Subject: [PATCH 2/2] smb: client: fix double conversion of DFS path in setup_dfs_ref()
+Date: Sat,  7 Nov 2026 02:02:57 +0000
+Message-ID: <20261107020257.363811-3-fredric.cover.lkernel@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20261107020257.363811-1-fredric.cover.lkernel@gmail.com>
 References: <20261107020257.363811-1-fredric.cover.lkernel@gmail.com>
@@ -108,64 +108,78 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-dfs_parse_target_referral() decides whether a prefix path remains after
-the consumed part of full_path with:
+setup_dfs_ref() converts the path from the mount charset to the DFS
+cache charset (utf8) via dfs_get_path(), and then passes that already
+converted string to dfs_get_referral().  dfs_cache_find() converts its
+input again, assuming it is still in the mount charset.
 
-	if (strlen(full_path) - ref->path_consumed)
+When the mount charset is not utf8 (iocharset=iso8859-1, or a kernel
+built with a non-utf8 CONFIG_NLS_DEFAULT) and the DFS path contains
+non-ASCII characters, the utf8 bytes are interpreted as mount-charset
+characters and encoded a second time.  For example, "é" is sent as
+c3 83 c2 a9 instead of c3 a9.  The server then fails the second-level
+referral with STATUS_OBJECT_PATH_NOT_FOUND and the mount fails with
+-ENOENT, even though the path exists.
 
-strlen() returns size_t, so if path_consumed is larger than the length
-of full_path, the subtraction wraps around to a huge non-zero value.
-The branch is then taken, prepath is set to a pointer past the
-terminating NUL of full_path, and *prepath reads out of bounds.
+Pass the unconverted path to dfs_get_referral() so that it is converted
+exactly once.
 
-path_consumed can exceed strlen(full_path) when the mount charset is
-not utf8.  The referral code derives path_consumed from the canonical
-path, which is in the DFS cache charset (utf8), but it is applied here
-to full_path, which is in the mount charset.  Each non-ASCII character
-in the consumed part of the path that is longer in utf8 than in the
-mount charset makes the count too large by the difference.
+Such mounts now get past the second-level referral and reach
+dfs_parse_target_referral(), which is why this change depends on
+"smb: client: fix out-of-bounds read in dfs_parse_target_referral()".
 
-This was reproduced with iocharset=iso8859-1 against a Samba DFS root
-containing a link named "café", mounting with the single Latin-1 byte
-0xe9 in the path.  On an unmodified tree such a mount fails earlier
-with -ENOENT because the path is converted to utf8 twice in
-setup_dfs_ref(); with that fixed ("smb: client: fix double conversion
-of DFS path in setup_dfs_ref()"), the mount reaches this code.
-full_path was 29 bytes while path_consumed was 30:
-
-  BUG: KASAN: slab-out-of-bounds in dfs_parse_target_referral+0x26a/0x270
-  Read of size 1 at addr ffff88810db89d5f by task mount/1743
-  ...
-  The buggy address is located 0 bytes to the right of
-   allocated 31-byte region [ffff88810db89d40, ffff88810db89d5f)
-
-Compare path_consumed against the string length instead of subtracting,
-so that no prefix path is used when the consumed count covers the whole
-string.  With the bounds check in place the same mount succeeds and no
-KASAN report is produced.
-
-This only prevents the out-of-bounds access.  path_consumed is still in
-the wrong units, so a non-ASCII link followed by a path component can
-still produce a wrong prefix path.  That needs a separate fix.
+Tested with a Samba DFS root containing a link named "café", mounted
+with iocharset=iso8859-1 and the single Latin-1 byte 0xe9 in the path:
+before, the mount failed with -ENOENT; with both patches applied, it
+succeeds.
 
 Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
 ---
- fs/smb/client/dfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ fs/smb/client/dfs.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index f65a8a90ba27..e6dcaf9b8682 100644
+index e6dcaf9b8682..0660c0a1eefb 100644
 --- a/fs/smb/client/dfs.c
 +++ b/fs/smb/client/dfs.c
-@@ -33,7 +33,7 @@ int dfs_parse_target_referral(const char *full_path, const struct dfs_info3_para
- 	if (WARN_ON_ONCE(!ref->node_name || ref->path_consumed < 0))
- 		return -EINVAL;
+@@ -103,6 +103,7 @@ static int setup_dfs_ref(struct dfs_info3_param *tgt, struct dfs_ref_walk *rw)
+ 	struct cifs_sb_info *cifs_sb = rw->mnt_ctx->cifs_sb;
+ 	struct smb3_fs_context *ctx = rw->mnt_ctx->fs_ctx;
+ 	char *ref_path, *full_path;
++	const char *raw_path;
+ 	int rc;
  
--	if (strlen(full_path) - ref->path_consumed) {
-+	if ((size_t)ref->path_consumed < strlen(full_path)) {
- 		prepath = full_path + ref->path_consumed;
- 		/* skip initial delimiter */
- 		if (*prepath == '/' || *prepath == '\\')
+ 	set_root_smb_session(rw->mnt_ctx);
+@@ -114,9 +115,10 @@ static int setup_dfs_ref(struct dfs_info3_param *tgt, struct dfs_ref_walk *rw)
+ 
+ 	if (!tgt || (tgt->server_type == DFS_TYPE_LINK &&
+ 		     DFS_INTERLINK(tgt->flags)))
+-		ref_path = dfs_get_path(cifs_sb, ctx->UNC);
++		raw_path = ctx->UNC;
+ 	else
+-		ref_path = dfs_get_path(cifs_sb, full_path);
++		raw_path = full_path;
++	ref_path = dfs_get_path(cifs_sb, raw_path);
+ 	if (IS_ERR(ref_path)) {
+ 		rc = PTR_ERR(ref_path);
+ 		kfree(full_path);
+@@ -125,9 +127,13 @@ static int setup_dfs_ref(struct dfs_info3_param *tgt, struct dfs_ref_walk *rw)
+ 	ref_walk_path(rw) = ref_path;
+ 	ref_walk_fpath(rw) = full_path;
+ 
+-	return dfs_get_referral(rw->mnt_ctx,
+-				ref_walk_path(rw) + 1,
+-				ref_walk_tl(rw));
++	/*
++	 * dfs_cache_find() canonicalizes its input from the mount's charset, so
++	 * give it the raw path. Passing ref_walk_path() (already in the cache
++	 * charset) would convert it a second time.
++	 */
++
++	return dfs_get_referral(rw->mnt_ctx, raw_path + 1, ref_walk_tl(rw));
+ }
+ 
+ static int __dfs_referral_walk(struct dfs_ref_walk *rw)
 -- 
 2.53.0
 
