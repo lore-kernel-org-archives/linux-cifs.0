@@ -1,101 +1,68 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794017034;
-	b=f4mfAAlH67tLOCCcVpcHs42yFzL0Tc//8BmCUXBgO3wu9QCe98NFgC9NCEl47gl8fEdj
-	 XfoN76Eo9GmcTPkf/mUR+/YN6TQ7QWGk708u1w15k7k3gdvjwM7H/viHeShiGsBBYAKuw
-	 v00R0Osd7sup2FnLiz8sUvUJBFqFVhHApBaEwQWEXeNcNW5lDGKEvJw1m3eEduBFzILZ6
-	 sPR2OutUqa5KH7kJw+CozwYECxls0DZpcZ3w3dp2ucSbG14/jiTo7tOcuTM9iOEWCKoyG
-	 bPKMsEJnhijAUGBbg023Mt6IVNS9G0lbsp3FaQQW0tQdEA9HuQI/emPzwyHkrAgvU2g==
+	t=1794024587;
+	b=jKAP9hqDrEF+2a2owikt48C/OHh6ME2oURa3QC5WXzJvF+3tKJxOObqoXfdL3z1gCKZs
+	 2+ooLv5woVJlEIRtlq8XW3Nel7tn26f50DcIIETAuJ7w29mD6uM8eKg3IypV67TOR4x+e
+	 STFgq9VwA7htxQygWg3l0HF/ZnrJqU8174XahSZDEbSb+WoF6eCDFOMPSUPoPSu4rfyEs
+	 zCuYfqBNRtoa/xAHJ1FXjH1ryxTUExCzejyFXP5z6BmCjJjIsZgXsP1U0Xpc1mJ8e+wwK
+	 v9+qy88oXXXqchbkORMUyaleHHKptUj9urdMzez+Qn7DAiN93/BoAa8jB2oK8BgeyNA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794017034;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=fag9CAq5RdDK24g6i+Jze72o+KqHUpaocfKTd7BZIO0=;
-	b=HyG0R9oSWib+8sYR9WOz4zNf03SI6Xz9m7tZe72/ASqFd4VMpvpMyxZAo3adA+lzNcsV
-	 EgWEuxDAMHl29hT3B2S1+b0cQGia5LTARLOUVgYKjLwdscGh0hMuvdELorT3j61srRkuk
-	 tOkDX23ZtL7vbyoLoFEjRp1NUWMzFLj5+w4aykflF0IXmXv5vvd9eDiXfDYCDw1MTCmS+
-	 VlhKTtUuIzPE4euMOKgmFTHxWDu2vi8QRifY+Vy4cIlf0RG6GYLHciQtq9mUW38po+1St
-	 VqUFOgENNTpxAfBAAEIfY6QqVsAAt5mTwTtRbfb83wmA8drrXXeiHS8gFm2B4WWecnQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794024587;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=lHQnMIa1BPBilg1hVVzdNc6mjRHb1cIB4++UQLG5LpI=;
+	b=F6yadb025zC3Nw/DhF3thMzXGJWXXclbtXJR2BP9rGRbsGqxK2Ul8Vh3X/hWmlLNDkfV
+	 IuWUX8WbAWP4v3ddZl8MhA3B/ZQPTXGNXz307SnTvy9BDc+NvFzqx3T0ocu94zEZxGjva
+	 A6KHBRLDLFlV4/aDWhMjlJsgilinz5R8iLt1SP0k9Ydx80GdMRTjLY2JVggmoryD7YoKT
+	 YY8mXwoQ2yEDHWYet85P/CTz4fy9tID4kXjGI6XnHvSpl1TkuhfqXM51f11SYX2/Qnrql
+	 Kk9bK9TFz/fpbNKiVmFkNQieDBmYIwRZh/PHIS7azg1+MSa1KJlZIG6giwHWifHVDYg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EjNPtQDd;
-	arc=none smtp.remote-ip=74.125.82.180
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Aj8F2rpm;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB9D606A32F
-	for <linux-cifs@vger.kernel.org>; Sat,  7 Nov 2026 02:03:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2CB9D606A32F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA77606A330;
+	Sat,  7 Nov 2026 04:09:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3EA77606A330
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EjNPtQDd
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-37000e7234bso1590288eec.1
-        for <linux-cifs@vger.kernel.org>; Fri, 06 Nov 2026 18:03:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794017033; x=1794621833; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=fag9CAq5RdDK24g6i+Jze72o+KqHUpaocfKTd7BZIO0=;
-        b=EjNPtQDdfUizC6avFZtZI8RqbdTirz6v/iHvg+7kwZmf+UjAaHZ5etVdklyGbtDOXp
-         18tAeoppS5HrZjnmJhZV949evREpLPB23tunsddoEos0a8e8zQk7C+iCX4vyFih3BR1f
-         E1zr1pjo3TG6g6pb7w6pOQVjJSYGnX7bOljfT9rcQyscyQbZigwH1NqxHXLHpVWtGru9
-         0y03euFxYZ81BAjsVFTE3JHx10zDb6QSCSSXlglK19QQtAusZ66TtKp0Z8Ob8q/aJkTl
-         0b88hhxJorBi6uJJeV2Oj8JphDwxh680XHcTciLnI+YYCa6jvv7GTIoQClv9HUFLxUrF
-         voQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794017033; x=1794621833;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=fag9CAq5RdDK24g6i+Jze72o+KqHUpaocfKTd7BZIO0=;
-        b=SXfeYToY1pTln8wygAHYWNvBzwC1fbcSYB1hiCeaXr0+cy0NM8senYj+aclHmQE2/B
-         5GB985ywBba/3UgIC4lbbG+HFFIZrJF1MHTIzEzXfvHIKPbERYXlykoHfdzgGq7vGjYy
-         JKy0ei3Hm2RBkxT+zBe6Xzod0Y8h1p7UVmZrLkVG3EYE+8Un4rwt1L6PQZ9dAz3/N5A+
-         yjKYIMXhCW07HS7yqLj2ESMqm49hU2QyAXs3SN3Wyol4Ot7W5a5qxkPKb9XUP5THL/Pu
-         en4YwT/7/Siuxw+5b0Xu1hOEZd64GirckwqDx+GlQbNMCyFTafrBoKOjzTnrxqsWW0ov
-         M85w==
-X-Forwarded-Encrypted: i=1; AKwUvBxXs7TE75XjrLLnZDqD9/JtWytNBB6RhKBYaYpDRZXzL28z7YL1vgHYMZCJdkgIGefNYvgPqU8NSurs@vger.kernel.org
-X-Gm-Message-State: APuU4Z/SoEn4jEwhy38R+xsyXE+t0vjUma/tMXHnVSwu1bqsesnUFwng
-	3lB+JjsN6vg8BMk0u4qMKO8+2ZyruJUZiWfX1jb9mq/x/2oGzJts4bSu
-X-Gm-Gg: AYBFou1w3o/N6V9bky/QAYMKTJImLRXAQnL6dIW0My5kkyY+bNyQvOYx5wuHkQ8W/Kx
-	WGSkZ5ND9C0pFGrYM8MZ2+Qfq8pXug0PXyvtTu5zDN/bKS3dBq/j3sqfBFhqj9Xbo8hfFtcesv6
-	WLSbM6MzDvzk5hXRx4z2RSPEB9JYauuFuwCZKB2oEPUoNCAy4HW7gtawIiEzM9DVY/EFMkUW1ce
-	WaaBaASHgTmkzz6g4XyNtuzaPLBD7+30eXlx3PILiseQiv1i/OEys5dBxOzTKvoTjByoVRbixPy
-	kZ18Cjlcq3owreQO9eSX/FBaq6xsdaMTN0s7rX6pTzgekzEIdzy5dGvXBa4nc79/W7a5eJAh6tO
-	N19AYQdE/cjfs9AiGF91Krg81zEhRTZIqhfL00MVaCm0DJom6GK954SedLiprKHVV+PdwbSHR7t
-	IzU+80rMsPnel1mOzChwrIn0PegeZqiT1iMU0c2zzOwU0fk7PWe4XxEm4VgiLY0JUHN+c/nNomp
-	mhKhne7u5naktggAB+X3lUTxnrHe5S2jY6V86mYEM+6uoHMpDwnioqkLNi6Yas2ZndIwtAHpG9W
-	Mc0rM8eLEMM3bCX2M0eijoK4fOfZVtoh2yBHErprV+IZvhJPuEe6N4UiZx0YTcivrno=
-X-Received: by 2002:a05:7301:f0c:b0:36a:18e2:64c with SMTP id 5a478bee46e88-36f75a2afd9mr5001824eec.11.1794017032952;
-        Fri, 06 Nov 2026 18:03:52 -0800 (PST)
-Received: from fred-server.tail1cd3ef.ts.net ([166.199.5.81])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-36fa922b205sm10524395eec.11.2026.11.06.18.03.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Nov 2026 18:03:52 -0800 (PST)
-From: Fredric Cover <fredric.cover.lkernel@gmail.com>
-To: Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Tom Talpey <tom@talpey.com>,
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Aj8F2rpm
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=lHQnMIa1BPBilg1hVVzdNc6mjRHb1cIB4++UQLG5LpI=; b=Aj8F2rpmfhR7MYlnp3c/zhEe+f
+	otPKrJoAgLYc5+LX+VULWH9acKYOR3X2HLoJrD4oTm5j19aICvwUM4jVWpWXA8nQVDJZek19l2CzQ
+	AgaDtbsecMuyScPkFVwIYaSBLsF3cTHOcx4okq+Ow84SnuVQ5FaGZYRZSjURJTWP/fTEnaHvkvTIO
+	/wia9NTrfvK3hH5S0LruRKaabxxrJn8Rpm66yxr4uy0lURwI8i1YYhb0ZlcdQmaEZjY6ceBC7E7M1
+	8jKaP/UPt8sctvZBe23jxArtPbYWpOVDS2mISzzRXlNCEy7BhNaVm4ryFUsoV+vxMzfxJzVDwp2uM
+	3TdEdqfg==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xPXkM-000000015Lm-0TFy;
+	Sat, 07 Nov 2026 01:09:43 -0300
+From: Paulo Alcantara <pc@manguebit.org>
+To: linux-cifs@vger.kernel.org,
+	netfs@lists.linux.dev,
+	David Howells <dhowells@redhat.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
 	Bharath SM <bharathsm@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fredric Cover <fredric.cover.lkernel@gmail.com>
-Subject: [PATCH 2/2] smb: client: fix double conversion of DFS path in setup_dfs_ref()
-Date: Sat,  7 Nov 2026 02:02:57 +0000
-Message-ID: <20261107020257.363811-3-fredric.cover.lkernel@gmail.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20261107020257.363811-1-fredric.cover.lkernel@gmail.com>
-References: <20261107020257.363811-1-fredric.cover.lkernel@gmail.com>
+	Christian Brauner <brauner@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v8 06/19] smb: client: don't give up writeback on the first replayable error
+Date: Sat,  7 Nov 2026 01:09:27 -0300
+Message-ID: <20261107040940.2692656-7-pc@manguebit.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261107040940.2692656-1-pc@manguebit.org>
+References: <20261107040940.2692656-1-pc@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,81 +72,124 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-setup_dfs_ref() converts the path from the mount charset to the DFS
-cache charset (utf8) via dfs_get_path(), and then passes that already
-converted string to dfs_get_referral().  dfs_cache_find() converts its
-input again, assuming it is still in the mount charset.
+Read and write retries follow the hard and retrans mount options, and
+mounts are soft with no retrans by default.  For writeback this means
+that a single replayable error, e.g. a reconnect while sending, fails
+the subrequest and netfs ends writeback with its folios clean: the data
+is gone, possibly long after write(2) succeeded, with only fsync(2) left
+to notice.  NFS soft mounts, by comparison, wait minutes for a server to
+answer before failing a request.
 
-When the mount charset is not utf8 (iocharset=iso8859-1, or a kernel
-built with a non-utf8 CONFIG_NLS_DEFAULT) and the DFS path contains
-non-ASCII characters, the utf8 bytes are interpreted as mount-charset
-characters and encoded a second time.  For example, "é" is sent as
-c3 83 c2 a9 instead of c3 a9.  The server then fails the second-level
-referral with STATUS_OBJECT_PATH_NOT_FOUND and the mount fails with
--ENOENT, even though the path exists.
+Keep retrying writeback on replayable errors, with exponential backoff:
+forever on hard mounts, and on soft mounts for max(3, retrans) echo
+intervals from the first failure - 3 minutes by default, the time after
+which a silent server is considered unresponsive.  The window applies to
+each write sent to the server, not to the whole writeback.  umount -f or
+a shutdown still stops it right away.  Direct and unbuffered writes,
+whose callers get the error, keep following the mount options.
 
-Pass the unconverted path to dfs_get_referral() so that it is converted
-exactly once.
-
-Such mounts now get past the second-level referral and reach
-dfs_parse_target_referral(), which is why this change depends on
-"smb: client: fix out-of-bounds read in dfs_parse_target_referral()".
-
-Tested with a Samba DFS root containing a link named "café", mounted
-with iocharset=iso8859-1 and the single Latin-1 byte 0xe9 in the path:
-before, the mount failed with -ENOENT; with both patches applied, it
-succeeds.
-
-Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+Fixes: 2c1238a7477a ("cifs: make retry logic in read/write path consistent with other paths")
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Cc: stable@vger.kernel.org
 ---
- fs/smb/client/dfs.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ fs/smb/client/cifsglob.h  |  1 +
+ fs/smb/client/file.c      | 21 +++++++++++++++++++++
+ fs/smb/client/smb2ops.c   |  9 +--------
+ fs/smb/client/smb2proto.h |  9 +++++++++
+ 4 files changed, 32 insertions(+), 8 deletions(-)
 
-diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
-index e6dcaf9b8682..0660c0a1eefb 100644
---- a/fs/smb/client/dfs.c
-+++ b/fs/smb/client/dfs.c
-@@ -103,6 +103,7 @@ static int setup_dfs_ref(struct dfs_info3_param *tgt, struct dfs_ref_walk *rw)
- 	struct cifs_sb_info *cifs_sb = rw->mnt_ctx->cifs_sb;
- 	struct smb3_fs_context *ctx = rw->mnt_ctx->fs_ctx;
- 	char *ref_path, *full_path;
-+	const char *raw_path;
- 	int rc;
- 
- 	set_root_smb_session(rw->mnt_ctx);
-@@ -114,9 +115,10 @@ static int setup_dfs_ref(struct dfs_info3_param *tgt, struct dfs_ref_walk *rw)
- 
- 	if (!tgt || (tgt->server_type == DFS_TYPE_LINK &&
- 		     DFS_INTERLINK(tgt->flags)))
--		ref_path = dfs_get_path(cifs_sb, ctx->UNC);
-+		raw_path = ctx->UNC;
- 	else
--		ref_path = dfs_get_path(cifs_sb, full_path);
-+		raw_path = full_path;
-+	ref_path = dfs_get_path(cifs_sb, raw_path);
- 	if (IS_ERR(ref_path)) {
- 		rc = PTR_ERR(ref_path);
- 		kfree(full_path);
-@@ -125,9 +127,13 @@ static int setup_dfs_ref(struct dfs_info3_param *tgt, struct dfs_ref_walk *rw)
- 	ref_walk_path(rw) = ref_path;
- 	ref_walk_fpath(rw) = full_path;
- 
--	return dfs_get_referral(rw->mnt_ctx,
--				ref_walk_path(rw) + 1,
--				ref_walk_tl(rw));
-+	/*
-+	 * dfs_cache_find() canonicalizes its input from the mount's charset, so
-+	 * give it the raw path. Passing ref_walk_path() (already in the cache
-+	 * charset) would convert it a second time.
-+	 */
-+
-+	return dfs_get_referral(rw->mnt_ctx, raw_path + 1, ref_walk_tl(rw));
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index fb732c178e76..b6a993cc0245 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -1499,6 +1499,7 @@ struct cifs_io_subrequest {
+ 	bool				replay;
+ 	unsigned int			retries;	/* number of retries so far */
+ 	unsigned int			cur_sleep;	/* time to sleep before replay */
++	unsigned long			retry_deadline;
+ 	struct kvec			iov[2];
+ 	struct TCP_Server_Info		*server;
+ #ifdef CONFIG_CIFS_SMB_DIRECT
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 270858e526f9..e8557c670dc3 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -53,12 +53,33 @@ bool cifs_io_stopped(struct cifs_io_subrequest *subreq)
+ 	return aborts && rwsem_is_contended(&sb->s_umount);
  }
  
- static int __dfs_referral_walk(struct dfs_ref_walk *rw)
++static bool cifs_writeback_retry_expired(struct cifs_io_subrequest *subreq,
++					 struct cifs_tcon *tcon)
++{
++	struct TCP_Server_Info *server = tcon->ses->server;
++	unsigned long window;
++
++	if (tcon->retry)
++		return false;
++	if (!subreq->retry_deadline) {
++		window = max(3U, server->retrans) * server->echo_interval;
++		subreq->retry_deadline = (jiffies + window) | 1;
++	}
++	return time_after(jiffies, subreq->retry_deadline);
++}
++
+ bool cifs_io_should_replay(struct cifs_io_subrequest *subreq)
+ {
+ 	struct cifs_tcon *tcon = tlink_tcon(subreq->req->cfile->tlink);
+ 
+ 	if (cifs_io_stopped(subreq))
+ 		return false;
++	if (subreq->rreq->origin == NETFS_WRITEBACK) {
++		if (cifs_writeback_retry_expired(subreq, tcon))
++			return false;
++		smb2_replay_backoff(&subreq->cur_sleep);
++		return true;
++	}
+ 	return smb2_should_replay(tcon, &subreq->retries, &subreq->cur_sleep);
+ }
+ 
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index dc55cd512616..457f18ce3245 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2934,14 +2934,7 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
+ 		return false;
+ 
+ 	if (tcon->retry || (*pretries)++ < tcon->ses->server->retrans) {
+-		/* Update sleep time for exponential backoff */
+-		if (!(*pcur_sleep))
+-			(*pcur_sleep) = 1;
+-		else {
+-			(*pcur_sleep) = ((*pcur_sleep) << 1);
+-			if ((*pcur_sleep) > CIFS_MAX_SLEEP)
+-				(*pcur_sleep) = CIFS_MAX_SLEEP;
+-		}
++		smb2_replay_backoff(pcur_sleep);
+ 		return true;
+ 	}
+ 
+diff --git a/fs/smb/client/smb2proto.h b/fs/smb/client/smb2proto.h
+index c79e5cb2ce26..b2acff8938f3 100644
+--- a/fs/smb/client/smb2proto.h
++++ b/fs/smb/client/smb2proto.h
+@@ -121,6 +121,15 @@ unsigned long smb_rqst_len(struct TCP_Server_Info *server,
+ void smb2_set_next_command(struct cifs_tcon *tcon, struct smb_rqst *rqst);
+ void smb2_set_related(struct smb_rqst *rqst);
+ void smb2_set_replay(struct TCP_Server_Info *server, struct smb_rqst *rqst);
++
++static inline void smb2_replay_backoff(int *pcur_sleep)
++{
++	if (!*pcur_sleep)
++		*pcur_sleep = 1;
++	else
++		*pcur_sleep = min(*pcur_sleep << 1, CIFS_MAX_SLEEP);
++}
++
+ bool smb2_should_replay(struct cifs_tcon *tcon, int *pretries,
+ 			int *pcur_sleep);
+ 
 -- 
-2.53.0
+2.56.0
 
