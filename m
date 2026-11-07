@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794071591;
-	b=iSVrHdFzVLkPp7RlvU6Q4OQ2e36PX3a37ctF+46/+On/nLOcQ/wRx7p5mXu6fib+rUcG
-	 YRA9QzA/GkaPHwfsGSVfPuSuq4swceJ5yogmiwyJ5h62pALqUkQiy83ozPnGoa0WHi2Sh
-	 krWGuAShZDmeIXfly8tOLSmT9IStVvTRz4AAneGMRqPFjMpsBFEzv78J+i1+g6oMY4mHW
-	 VfG4paIu6NzY4dUBDgc/DwzOc96U2C+Gv8+RBFrPD2WD0YOLtcl9THAiGgzM04F5vxlck
-	 zs0l6u1O6KKlDIohVhlqCye5L5RvkkZb6cl0957FxOZuN5OKk0MvhEK8H52L7wizbLA==
+	b=vEHpk27MOzBhCiIRXAq/Vm4NuzZ2REnNsQtYlUBLIyQRd8ujtBwz1dKNmehr3xqFOrjX
+	 PGZYtLTIZiKII9Su3FwsDDWjZiZqshwMrtkr1rRq9x+nftyiEiXWvCXfDY/d7HRvsTMKe
+	 eoON7L6WQbMUD+dFWd9AyWQ2B1vaO1P8lsskY8dOsSF/9PeJYjYIHQNi1NA0JomuZxTJr
+	 Ja/JV90RS6CdUyxX8UO/hcKMrKEHCjh3UDZe7JdyWkeEjiSt+uCW/0pEsmfq6B0Av02RQ
+	 /2SkzJ4dLQDM0Y3fRQkONPSmIe5tZXst3373WLcxw0lWCH9t5qkkMKF51D6aWU5HLZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794071591;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=z45gJVenqDQdfqsulcVzTmokKGR0+PriaPFVgi6XmGI=;
-	b=C6FewOG37O1KPRfd1TlvNGRbj7umlbE+iZLIjkBKZG7ZBbpfhpo7nT8O0gk4ZCBkgrLR
-	 hDai+cuqMC3AdIhCqZ+BCB44k9XVljKSSSllY1obOxL2HyDXMIbxaKk3XdwH8nTLGEXSR
-	 i4KGfcULnBi1m8v+e3qNz4C999lx/0qZTatQLR81BzodmMoSLI0FOFO/Y/YHt8hHhfbwj
-	 jCT+yR2TsdWtsRymidFzpi122fCcLNnHxSYB3TjfnsJryDqswk6jzSb8mb54NBxXZIt2y
-	 19tLuhiUG8mY8c5PBkNDhwmd2eFlBVAIKOKEzbPND+B/8QQgnX+lKKcHRyCo8wo4Ryw==
+	bh=BrifJQ4gacd4ZwkZnHpS1JoeGEyUGf/5MClugtFcKkk=;
+	b=Pmx7pS0lgMbB5qXzmWlUCoNI7KiHCO+2pUps2x5uv3EUU9p3Hcd/Qv6anzBVch5FYNi9
+	 M2PBmbVC4MvBM1wy5hqgdu06o9eoLAd49DIpewZONYcJxi8OtuiAPyZ+XQVG80mcOpgb/
+	 IKCMIA9w6kTNobYzkx3wFPLim6aX/9k3KabH2XgQEyAXkhdbcPyfZmzntajX9wjP2eb36
+	 ipORjRYiqL9IH7k15x40HZ2WDbjrc/Cov/l2vyhf0J+zbccdreAaDJ3u3pgjF2/DhZ1FP
+	 NYtqDwXfX4/ZmdtioC3ttQnE6OiG1W++I2RPDeJF2Lm6gjBtwP4FYoFtEd2GXNO/JWA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Rv9ag+QE;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=6UU6T4Bx;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0D0606A32E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF299606A336;
 	Sat,  7 Nov 2026 17:13:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BF0D0606A32E
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CF299606A336
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=Rv9ag+QE
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=6UU6T4Bx
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=z45gJVenqDQdfqsulcVzTmokKGR0+PriaPFVgi6XmGI=; b=Rv9ag+QEngX3+o8ycdhbMnRPqG
-	bRcIVxVK0UAaydBNk7eyRS85hwhA6o+oJh8/cUZKzoclvmV+Hsv2XMQX6McxJCVF5MSu3GmjbN/B2
-	j71P8uHJxDHm54u8E5Bm5BtQ69ui81hYLM+hO5Ck2xOe18JTv5wMKcFexF23aGeOjqEUPSqKGvDt9
-	HwtoE4v7NKyVtRTYVbRxtYhnDnO9+kez1454NxkFOu4RZolhPfyKq5UaA/5S/naA3gLKMymyyBPgr
-	Gw6VXcT7f8j7MnN77Vvl3Iq8b0eVUZRsfOYOfFbur68HtUW5wO39yWT1/xlw65Gds9eri8z/fDtu4
-	3Ttx0P0w==;
+	bh=BrifJQ4gacd4ZwkZnHpS1JoeGEyUGf/5MClugtFcKkk=; b=6UU6T4BxkJHMDBAm6SMVh+rOr5
+	AkmGba0N96rX25Uw1zuPdoJwC/dhUi0hIEGxABTBiLPqFic0XMKNyhqq6rHx4NlgVVq7CK/pmHse+
+	wBDcxlp4Ikltevp9RsAjLhNCFcPGjRHumoKrW8dQwgqFLTA09Q6foBdYHUKMdXAR2sAFdAvk3/r+Z
+	uLsGbXUpJedyjNf15Oh8dLgPwyRB9Ty/zyUpDDmPQltO9q23ZGdgUovwUvEHDgPxgrG6GvajYiRFG
+	bfB2zP+UDNBf3LxrRKU6POnDI1oq0D6xccaaDXzi/fET4OmueUZP42Kj5JHaXljk/1FIFUc7f9Iyk
+	BEKn7nCg==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xPjyT-000000017fA-2ODQ;
-	Sat, 07 Nov 2026 14:13:06 -0300
+	id 1xPjyU-000000017gA-3t5b;
+	Sat, 07 Nov 2026 14:13:08 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v9 03/19] netfs: keep the prepare_read errno when abandoning read retries
-Date: Sat,  7 Nov 2026 14:12:49 -0300
-Message-ID: <20261107171305.2847361-4-pc@manguebit.org>
+Subject: [PATCH v9 07/19] smb: client: don't retry failed writes forever regardless of mount options
+Date: Sat,  7 Nov 2026 14:12:53 -0300
+Message-ID: <20261107171305.2847361-8-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261107171305.2847361-1-pc@manguebit.org>
 References: <20261107171305.2847361-1-pc@manguebit.org>
@@ -74,73 +74,98 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When ->prepare_read() fails while retrying a read,
-netfs_retry_read_subrequests() marks the subrequest failed and abandons
-the rest, which overwrites the error of every failed subrequest with
--ENOMEM.  The reader then gets -ENOMEM for e.g. a handle that couldn't be
-reopened (-EHOSTDOWN, -ENOENT), a credit wait interrupted by a signal
-(-ERESTARTSYS) or umount -f (-EIO).  The first pass doesn't have this
-problem, as netfs_cancel_read() keeps the errno.
+smb2_writev_callback() marks a write for retry whenever the server fails
+it with a replayable status, ignoring smb2_should_replay() and so the
+hard and retrans mount options.  The latter is only used to decide on a
+backoff, so on a soft mount with no retrans, a server that keeps failing
+a write with e.g. STATUS_INSUFFICIENT_RESOURCES gets it resent forever,
+thousands of times per second, hanging anything waiting on its
+writeback:
 
-Record the errno of ->prepare_read() in the subrequest and keep the error
-of subrequests that already failed, using -ENOMEM only for those
-abandoned while still waiting for a retry.
+  smb3_write_err: R=005c359e[2] ... offset=0x27000 len=0xfdf0 rc=-11
+  (569410 times in 255 seconds, same subrequest, no growing delay)
 
-Fixes: ee4cdf7ba857 ("netfs: Speed up buffered reading")
+Only retry such writes when cifs_io_should_replay() allows it, as already
+done for send errors in smb2_async_writev(), otherwise let them fail.
+Writeback thus keeps retrying them with backoff, within its retry
+window.  Base the decision on the result of this attempt rather than on
+wdata->result, which is never reset on success and may hold the error of
+a previous attempt.
+
+Writes cut short by a reconnect get retried regardless too.  Have
+writeback ones go through cifs_io_should_replay() as well, so that they
+back off and soft mounts give up on them after the retry window, as on
+other replayable errors.  Other writes cut short keep being retried,
+without spending the mount's retries, but as replays, since they may
+have reached the server, unless umount -f stopped them, which fails them
+with -EIO.
+
+Fixes: 2c1238a7477a ("cifs: make retry logic in read/write path consistent with other paths")
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
- fs/netfs/read_retry.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ fs/smb/client/smb2pdu.c | 25 ++++++++++++++-----------
+ 1 file changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index 5bd8dee5a834..8a722995fa9d 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -28,6 +28,7 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 	struct netfs_io_subrequest *subreq;
- 	struct netfs_io_stream *stream = &rreq->io_streams[0];
- 	struct list_head *next;
-+	int ret;
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index ecc127d9f0af..736c5c693c79 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -5056,6 +5056,7 @@ smb2_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	};
+ 	unsigned int rreq_debug_id = wdata->rreq->debug_id;
+ 	unsigned int subreq_debug_index = wdata->subreq.debug_index;
++	bool cut_short = false;
+ 	ssize_t result = 0;
+ 	size_t written = 0;
  
- 	_enter("R=%x", rreq->debug_id);
+@@ -5069,10 +5070,7 @@ smb2_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		credits.instance = server->reconnect_instance;
+ 		result = smb2_check_receive(mid, server, 0);
+ 		if (result != 0) {
+-			if (is_replayable_error(result)) {
+-				trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_retry_needed);
+-				__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
+-			} else {
++			if (!is_replayable_error(result)) {
+ 				wdata->subreq.error = result;
+ 				trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_bad);
+ 			}
+@@ -5101,12 +5099,9 @@ smb2_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		break;
+ 	case MID_REQUEST_SUBMITTED:
+ 		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_req_submitted);
+-		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
+-		result = -EAGAIN;
+-		break;
++		fallthrough;
+ 	case MID_RETRY_NEEDED:
+-		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_retry_needed);
+-		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
++		cut_short = true;
+ 		result = -EAGAIN;
+ 		break;
+ 	case MID_RESPONSE_MALFORMED:
+@@ -5160,9 +5155,17 @@ smb2_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 	wdata->credits.value = 0;
  
-@@ -140,8 +141,11 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
+ 	/* see if we need to retry */
+-	if (is_replayable_error(wdata->result) &&
+-	    cifs_io_should_replay(wdata))
++	if (is_replayable_error(result) &&
++	    ((cut_short && wdata->rreq->origin != NETFS_WRITEBACK &&
++	      !cifs_io_stopped(wdata)) ||
++	     cifs_io_should_replay(wdata))) {
+ 		wdata->replay = true;
++		trace_netfs_sreq(&wdata->subreq,
++				 netfs_sreq_trace_io_retry_needed);
++		__set_bit(NETFS_SREQ_NEED_RETRY, &wdata->subreq.flags);
++	} else if (cut_short && cifs_io_stopped(wdata)) {
++		result = -EIO;
++	}
  
- 			/* Renegotiate max_len (rsize) */
- 			stream->sreq_max_len = subreq->len;
--			if (rreq->netfs_ops->prepare_read &&
--			    rreq->netfs_ops->prepare_read(subreq) < 0) {
-+			ret = 0;
-+			if (rreq->netfs_ops->prepare_read)
-+				ret = rreq->netfs_ops->prepare_read(subreq);
-+			if (ret < 0) {
-+				subreq->error = ret;
- 				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
- 				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
- 				goto abandon;
-@@ -221,7 +225,9 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 				part = netfs_limit_iter(&source, 0, part, stream->sreq_max_segs);
- 
- 			netfs_stat(&netfs_n_rh_download);
--			if (rreq->netfs_ops->prepare_read(subreq) < 0) {
-+			ret = rreq->netfs_ops->prepare_read(subreq);
-+			if (ret < 0) {
-+				subreq->error = ret;
- 				trace_netfs_sreq(subreq, netfs_sreq_trace_reprep_failed);
- 				__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
- 				goto abandon;
-@@ -257,7 +263,9 @@ static void netfs_retry_read_subrequests(struct netfs_io_request *rreq)
- 		if (!test_bit(NETFS_SREQ_FAILED, &subreq->flags) &&
- 		    !test_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags))
- 			continue;
--		subreq->error = -ENOMEM;
-+		if (!subreq->error ||
-+		    !test_bit(NETFS_SREQ_FAILED, &subreq->flags))
-+			subreq->error = -ENOMEM;
- 		__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
- 		__clear_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
- 	}
+ 	cifs_write_subrequest_terminated(wdata, result ?: written);
+ 	release_mid(server, mid);
 -- 
 2.56.0
 
