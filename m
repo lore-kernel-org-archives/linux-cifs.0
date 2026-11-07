@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794071593;
-	b=Q5P0TmlTQKsnBR7vF7aD+qQV6rTj/8iXQQcRVFpuPO2fQntmRXD2gNYbCzYiGXVMVJZm
-	 WWagynJtsAvUz//dWUG2vd1flUaAm4P4okjNA84IsonFR8xcTaxRR5JclCMVrgUhrqaxF
-	 6TMCarAtWAZo2jH0u6FaO+WQGylZHUEaZTIZctOP7bxYK78QtgAsL+OnW8FWC5px1r5Rs
-	 RGAyCSAdX0TpoZHH9lDy+6UGs8LWaR4R61bG8RbxNhU1mmsMpbHxOkzBDFZEa2yQM+/7t
-	 A4A2aY3mXpwL1Q7aaBO0FNz47sbj1BPz2gy+hc7kgs8Je3usZgnGCSLa2sRxUohuDpQ==
+	t=1794071594;
+	b=Jc15/wateL5swVSrRFx540J83IWbfN3dnYMgrYZpJgJRrQwphglYYBfBiNQvio4THIRG
+	 /2qYhgZT0VzwoFOaWRgn2po1bzSrpzffOt1XYgFJ99SPwG4w1QxcsxaenYYyxF+2e2Vdc
+	 jyoM64KDH1h44xwAHnYhwWaeDPLVZkIVkkHnO9zgXpl9Y2Fk6rEHqnUM9Abtxgr6jfTGt
+	 f2miCR4I9KJpDpJp1vVA8++R3+GAgVRG+LZR0Q+4MksO51osq2gfnJOs/qQHsTsGn0NZZ
+	 9Na2pktIfV2VKHvxIMrIufFyIbWk5pMiGS32+Eb5XXRbNhkAPpqlNRVVNXSzbV5jK1g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794071593;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794071594;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=DKGFfsk/KmmVfamO6557h5dL90YZ/1l7GpBYp4fy6e8=;
-	b=HqYi00RRF6u3OkFMxlP6WEnShLCvOZQ4IxUG+bwFZnNf9r5tDqQA6swSG1wypB9FapsL
-	 9GB2zROeCl8lCKUnS6BcQrqeTmoKnqBhg4Qusjj154vTrNWjm43G4B3jCLLxV4QCr2wbT
-	 sxtkkHs+U+kJTWgTOaMscCH+6RHv6418s1+VP2DbEpTqujUtSrPHWitGpp3Np8/tooGBh
-	 wKiyNG3UN3J5h550WBKE8c9VYsBjpGL0kOYToaQAbzKqAKxQRfIPgL5eTOOt3UrihKMM+
-	 HbQl9M1kFmIslCj+n+4mzSSQ6s8aK6qGAjeh8yryIb5G9bYuFBFQVWtqyqLm13Dr9SQ==
+	bh=bWb6jBRlX1A1NqPWJN75nzeEQzIcCnV6lLDY33EgiVU=;
+	b=o7RlCymnNKrW1YDNCqHqzH2TAeRb/sAwJ+kru03tgIngW4oVdjrgulhvYbB/fTXmrzhr
+	 lQuZFPG7cldr4eld9aDW/e4BUeaa4XV4QT+UDyWJOaOtRROlwLkNMu1bkhoityoBSn3a6
+	 TuhbtUlp8NkKDDsnn5H//Q5zFqNfLDYLO7+QCAMPxVgs7elXUAd56Z71mc5eRevLLVV4y
+	 S/KAvj70Gy68kA4ZijVkqa2bxcnZu2TKm8vtSLrHxYz7PD/4Aons89jP4aGYrk7ArBxW2
+	 HWVKMB8ehT9oMxQjDfIuIGznl1FiqsYL2qOD9aAy/OKbm8KSyDn3+toyRNe46zbkakw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=imJfKbdn;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=BEKNr0Ip;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D79606EE8E;
-	Sat,  7 Nov 2026 17:13:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 87D79606EE8E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741B7606A33E;
+	Sat,  7 Nov 2026 17:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 741B7606A33E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=imJfKbdn
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=BEKNr0Ip
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
 	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
 	Content-ID:Content-Description;
-	bh=DKGFfsk/KmmVfamO6557h5dL90YZ/1l7GpBYp4fy6e8=; b=imJfKbdnWrsih8Jyipu1zz/oV8
-	wY5oiYLG2m5fm3dhHaNcfBeDEe0OXom55GThfWAMzkG+moBpcBR0WfYJj4B59pB7eS4iCuwXLFiDg
-	/mqu/GmWO1DbqmvZa/yPY0AtaMdlzPOsBcZCq+bQ5Gzo6/dJHsSoQCX9sS1ZNwjyuM/lJKRAexUot
-	OQqD/2zdEqq7jz9XYCWrZcAbkwOYBs71XfZ25yjAbgudoy/fbp82dAjIljqPZ4QUT6hbYYnVyA0LE
-	m1DdKh96XtlUv/JBg7V+q3ove1BIeDlbKSOs4BDZQyn5Q4zjvu5ttRYzag8BvUWnHTbcjUOUQAWPz
-	WrTut63Q==;
+	bh=bWb6jBRlX1A1NqPWJN75nzeEQzIcCnV6lLDY33EgiVU=; b=BEKNr0IpsO0InZ0QcruhJmgdg+
+	mG+D9HA/vPEl29NBi6sISsx39MiZGZo60D3O3PFuMFfuAJKxq4RoY6niPynCTku7dXyTeeAjxtxTe
+	YHqVO0C3h+3Y8yYHD4TQGh1d7NmPCZ4/7J8XKP5Yi9ad5VRpTNILGWkpuk4PnBXcWSCNLos2lPXAI
+	6l4dq39jC+JFQIVoxvm3hoVK7UbJEgECS8iWPXiqN4xow3oLhvw+nh6yoTpxCUOacSJvKBwQgHdMV
+	WQfgl3B6PN6L6aSaXpJDPKBEgV5hMR4zNTDN5iJ9sHOsd+fJIS7ZpYT8G1FdNDgFdKU2LakOHewbG
+	UtUY1iWw==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xPjyX-000000017hx-3xT6;
-	Sat, 07 Nov 2026 14:13:11 -0300
+	id 1xPjyY-000000017iW-3zMH;
+	Sat, 07 Nov 2026 14:13:12 -0300
 From: Paulo Alcantara <pc@manguebit.org>
 To: linux-cifs@vger.kernel.org,
 	netfs@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: Namjae Jeon <linkinjeon@kernel.org>,
 	Bharath SM <bharathsm@microsoft.com>,
 	Christian Brauner <brauner@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v9 16/19] smb: client: let umount -f stop waiting for reconnects on hard mounts
-Date: Sat,  7 Nov 2026 14:13:02 -0300
-Message-ID: <20261107171305.2847361-17-pc@manguebit.org>
+Subject: [PATCH v9 19/19] smb: client: stop reconnecting and replaying during a forced unmount
+Date: Sat,  7 Nov 2026 14:13:05 -0300
+Message-ID: <20261107171305.2847361-20-pc@manguebit.org>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261107171305.2847361-1-pc@manguebit.org>
 References: <20261107171305.2847361-1-pc@manguebit.org>
@@ -74,593 +74,295 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Requests waiting in smb2_reconnect() or cifs_reconnect_tcon() for a
-reconnect wait for as long as it takes on hard mounts.  With the server
-gone, writeback stuck there keeps umount -f hanging in sync_filesystem()
-while it waits for that writeback, even though retries of reads and
-writes started before it now give up.
+umount -f of a gone server on a hard mount hangs the teardown.
+cifs_kill_sb() flushes the deferred-file, cached-dir and oplock-break work
+and then cifs_umount() sends a tree disconnect, but on a hard mount every
+reconnect wait in cifs_wait_for_server_reconnect() and every per-PDU
+replay loop (gated by smb2_should_replay()) retries forever, and the
+per-tcon abort count that umount -f bumps is only snapshotted on entry to
+smb2_reconnect(), so an operation that enters after the unmount began
+never observes it and waits or spins out the teardown (e.g. a close work
+item wedging flush_workqueue()).
 
-Count umount -f attempts per tcon and stop waiting for reconnects, as on
-soft mounts, once one is made after the request started waiting, waking
-up such requests on all channels right away.  Do this for the master
-tcon and for the per-user tcons of a multiuser mount, skipping tcons
-another mount still uses.  Count the references mounts hold on a tcon
-for that, rather than relying on tc_count, which internal references
-such as a reconnect worker also raise: one per tlink in a superblock's
-tree, dropped when the tlink leaves it, and decide under the tree lock so
-that pruning or building a tlink can't skew it.  Have a handle reopen
-started before umount -f stop short of a reconnect it would otherwise
-wait for afterwards.  Requests started after umount -f are unaffected.
+Mark each of the mount's tcons dying, master and per-user alike, waking
+their sessions' waiters, and have cifs_wait_for_server_reconnect(),
+cifs_tcon_retry() and smb2_should_replay() give up while it is set, so
+both the reconnect waits and the replay loops stop at every site, however
+late the operation entered.  Keep it set, with the mount's tlinks pinned,
+until cifs_umount() has dropped them, then drop it on those tcons that
+another superblock still holds, and hand no dying tcon to a new mount.
+Also treat a tcon that no mount references any more as dying, waking its
+waiters when that happens, so that whatever still holds it (e.g. the
+cached directory laundromat, a cancelled close, or its tree disconnect
+after cifs_prune_tlinks()) stops too, and never reuse it.
+
+Also stop the reconnect worker from wedging: smb2_reconnect_server() holds
+a tcon or session reference across cifs_wait_for_server_reconnect(), so
+with the server gone it never returns, pinning the cifsiod worker and
+leaking the tcon, session, server and cifsd thread.  It only needs to
+attempt the reconnect, so fail fast; it is retried once the transport is
+back.  Reopen persistent handles from it once, without waiting, and
+reschedule it if one failed for a transient reason.
+
+Reads, metadata and SMB1 reconnect waits outside teardown still follow the
+hard and retrans mount options, except on a tcon shared with another
+mount, whose waits and replays give up too while the teardown runs; a
+task blocked in one can be killed, and open files keep umount -f from
+reaching teardown (-EBUSY).
 
 Signed-off-by: Paulo Alcantara <pc@manguebit.org>
 Cc: stable@vger.kernel.org
 ---
- fs/smb/client/cifsfs.c    | 118 +++++++++++++++++++++++++++-----------
- fs/smb/client/cifsglob.h  |   8 +++
- fs/smb/client/cifsproto.h |   4 +-
- fs/smb/client/cifssmb.c   |   9 ++-
- fs/smb/client/connect.c   |  69 ++++++++++++++++++----
- fs/smb/client/file.c      |  29 +++++++++-
- fs/smb/client/misc.c      |  16 +++++-
- fs/smb/client/smb2pdu.c   |   9 ++-
- 8 files changed, 206 insertions(+), 56 deletions(-)
+ fs/smb/client/cifsfs.c    | 44 ++++++++++++++++++++++++++++++++++++++-
+ fs/smb/client/cifsglob.h  | 10 ++++++++-
+ fs/smb/client/cifsproto.h |  2 +-
+ fs/smb/client/connect.c   |  9 +++++---
+ fs/smb/client/file.c      | 13 +++++++++---
+ fs/smb/client/misc.c      |  3 ++-
+ fs/smb/client/smb2ops.c   |  4 ++++
+ fs/smb/client/smb2pdu.c   |  7 ++++---
+ 8 files changed, 79 insertions(+), 13 deletions(-)
 
 diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 7146bb22a69e..6a15c6a4fed2 100644
+index 6a15c6a4fed2..7000fb4573c9 100644
 --- a/fs/smb/client/cifsfs.c
 +++ b/fs/smb/client/cifsfs.c
-@@ -294,6 +294,61 @@ cifs_read_super(struct super_block *sb)
- 	return rc;
+@@ -349,9 +349,46 @@ static void put_sb_tcons(struct list_head *tcons)
+ 	}
  }
  
-+struct cifs_tcon_ref {
-+	struct list_head list;
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	bool shared;
-+};
-+
-+static bool used_by_other_mounts(struct cifs_tcon *tcon,
-+				 struct list_head *tcons)
++/*
++ * While a forced unmount tears a superblock down, keep its tcons from
++ * reconnecting or replaying so the teardown (flushing close and oplock work,
++ * sending the tree disconnect) can't hang on a server that is gone.  It is a
++ * count, not a flag, so a tcon shared with another mount only has its retries
++ * suppressed for the duration of this teardown; one no mount uses any more
++ * stays dying until it is freed.
++ */
++static void set_tcons_dying(struct cifs_sb_info *cifs_sb,
++			    struct list_head *tcons)
 +{
 +	struct cifs_tcon_ref *ref;
-+	int n = 0;
 +
-+	list_for_each_entry(ref, tcons, list)
-+		n += ref->tcon == tcon;
-+	guard(spinlock)(&tcon->tc_lock);
-+	return tcon->mnt_refs - tcon->mnt_unlinked > n;
++	get_sb_tcons(cifs_sb, tcons);
++	list_for_each_entry(ref, tcons, list) {
++		atomic_inc(&ref->tcon->dying);
++		cifs_wake_ses_waiters(ref->tcon->ses);
++	}
 +}
 +
-+static void get_sb_tcons(struct cifs_sb_info *cifs_sb, struct list_head *tcons)
++static void clear_tcons_dying(struct list_head *tcons)
 +{
-+	struct rb_root *root = &cifs_sb->tlink_tree;
 +	struct cifs_tcon_ref *ref;
-+	struct tcon_link *tlink;
-+	struct cifs_tcon *tcon;
-+	struct rb_node *node;
 +
-+	guard(spinlock)(&cifs_sb->tlink_tree_lock);
-+	for (node = rb_first(root); node; node = rb_next(node)) {
-+		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
-+		tcon = tlink_tcon(tlink);
-+		if (IS_ERR_OR_NULL(tcon))
-+			continue;
-+		ref = kmalloc_obj(struct cifs_tcon_ref, GFP_ATOMIC);
-+		if (!ref)
-+			break;
-+		ref->tlink = cifs_get_tlink(tlink);
-+		ref->tcon = tcon;
-+		list_add_tail(&ref->list, tcons);
++	flush_workqueue(serverclose_wq);
++	list_for_each_entry(ref, tcons, list) {
++		guard(spinlock)(&ref->tcon->tc_lock);
++		if (ref->tcon->mnt_refs)
++			atomic_dec(&ref->tcon->dying);
 +	}
-+	list_for_each_entry(ref, tcons, list)
-+		ref->shared = used_by_other_mounts(ref->tcon, tcons);
-+}
-+
-+static void put_sb_tcons(struct list_head *tcons)
-+{
-+	struct cifs_tcon_ref *ref, *tmp;
-+
-+	list_for_each_entry_safe(ref, tmp, tcons, list) {
-+		cifs_put_tlink(ref->tlink);
-+		list_del(&ref->list);
-+		kfree(ref);
-+	}
++	put_sb_tcons(tcons);
 +}
 +
  static void cifs_kill_sb(struct super_block *sb)
  {
  	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-@@ -837,47 +892,46 @@ cifs_show_options(struct seq_file *s, struct dentry *root)
- 	return 0;
- }
- 
--static void cifs_umount_begin(struct super_block *sb)
-+static void abort_reconnect(struct cifs_tcon *tcon)
- {
--	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
--	struct cifs_tcon *tcon;
--
--	if (cifs_sb == NULL)
--		return;
--
--	atomic_inc(&cifs_sb->umount_aborts);
--	tcon = cifs_sb_master_tcon(cifs_sb);
--
--	spin_lock(&cifs_tcp_ses_lock);
--	spin_lock(&tcon->tc_lock);
--	trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
--			    netfs_trace_tcon_ref_see_umount);
--	if ((tcon->tc_count > 1) || (tcon->status == TID_EXITING)) {
--		/* we have other mounts to same share or we have
--		   already tried to umount this and woken up
--		   all waiting network requests, nothing to do */
--		spin_unlock(&tcon->tc_lock);
--		spin_unlock(&cifs_tcp_ses_lock);
--		return;
--	}
--	/*
--	 * can not set tcon->status to TID_EXITING yet since we don't know if umount -f will
--	 * fail later (e.g. due to open files).  TID_EXITING will be set just before tdis req sent
--	 */
--	spin_unlock(&tcon->tc_lock);
--	spin_unlock(&cifs_tcp_ses_lock);
-+	scoped_guard(spinlock, &tcon->tc_lock)
-+		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
-+				    netfs_trace_tcon_ref_see_umount);
- 
-+	atomic_inc(&tcon->umount_aborts);
- 	if (tcon->ses && tcon->ses->server) {
- 		cifs_dbg(FYI, "wake up tasks now - umount begin not complete\n");
--		wake_up_all(&tcon->ses->server->request_q);
--		wake_up_all(&tcon->ses->server->response_q);
-+		cifs_wake_ses_waiters(tcon->ses);
- 		msleep(1); /* yield */
- 		/* we have to kick the requests once more */
--		wake_up_all(&tcon->ses->server->response_q);
-+		cifs_wake_ses_waiters(tcon->ses);
- 		msleep(1);
- 	}
-+}
- 
--	return;
-+static void cifs_umount_begin(struct super_block *sb)
-+{
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(sb);
-+	struct cifs_tcon_ref *ref;
 +	LIST_HEAD(tcons);
++	bool force;
 +
-+	if (cifs_sb == NULL)
-+		return;
-+
-+	atomic_inc(&cifs_sb->umount_aborts);
-+
-+	/*
-+	 * Abort the reconnect waits of the master tcon and of any per-user
-+	 * tcons of a multiuser mount that no other mount uses, pinning their
-+	 * tlinks so that they stay alive, and aren't pruned, while we abort and
-+	 * sleep outside the tree lock.
-+	 */
-+	get_sb_tcons(cifs_sb, &tcons);
-+	list_for_each_entry(ref, &tcons, list) {
-+		if (!ref->shared)
-+			abort_reconnect(ref->tcon);
++	force = atomic_read(&cifs_sb->umount_aborts);
+ 
+ 	/*
+ 	 * Reaching here after a umount -f means the mount is going away for
+@@ -359,8 +396,10 @@ static void cifs_kill_sb(struct super_block *sb)
+ 	 * writeback to a server that is gone) rather than looping forever on
+ 	 * a hard mount and hanging the teardown below.
+ 	 */
+-	if (atomic_read(&cifs_sb->umount_aborts))
++	if (force) {
+ 		WRITE_ONCE(cifs_sb->exiting, true);
++		set_tcons_dying(cifs_sb, &tcons);
 +	}
-+	put_sb_tcons(&tcons);
+ 
+ 	/*
+ 	 * We need to release all dentries for the cached directories
+@@ -394,6 +433,9 @@ static void cifs_kill_sb(struct super_block *sb)
+ 
+ 	kill_anon_super(sb);
+ 	cifs_umount(cifs_sb);
++
++	if (force)
++		clear_tcons_dying(&tcons);
  }
  
- static int cifs_freeze(struct super_block *sb)
+ static int
 diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
-index 09bde6a08dd7..78ab6abe5297 100644
+index 0b66f2c9c9a9..4e16347886ed 100644
 --- a/fs/smb/client/cifsglob.h
 +++ b/fs/smb/client/cifsglob.h
-@@ -1196,6 +1196,9 @@ struct cifs_tcon {
- 	struct list_head tcon_list;
- 	int debug_id;		/* Debugging for tracing */
- 	int tc_count;
-+	int mnt_refs;		/* refs held by mounts, under tc_lock */
-+	int mnt_unlinked;	/* mnt_refs of tlinks being built */
-+	atomic_t umount_aborts;	/* nr of umount -f attempts */
+@@ -1207,6 +1207,7 @@ struct cifs_tcon {
+ 	int mnt_refs;		/* refs held by mounts, under tc_lock */
+ 	int mnt_unlinked;	/* mnt_refs of tlinks being built */
+ 	atomic_t umount_aborts;	/* nr of umount -f attempts */
++	atomic_t dying;		/* umount -f: stop reconnects/replays */
  	struct list_head rlist; /* reconnect list */
  	spinlock_t tc_lock;  /* protect anything here that is not protected */
  	atomic_t num_local_opens;  /* num of all opens including disconnected */
-@@ -2382,6 +2385,11 @@ static inline void cifs_reset_oplock(struct cifsInodeInfo *cinode)
+@@ -2408,9 +2409,16 @@ static inline void cifs_reset_oplock(struct cifsInodeInfo *cinode)
  		WRITE_ONCE(cinode->oplock, 0);
  }
  
-+static inline bool cifs_tcon_retry(struct cifs_tcon *tcon, int aborts)
++static inline bool cifs_tcon_dying(struct cifs_tcon *tcon)
 +{
-+	return tcon->retry && atomic_read(&tcon->umount_aborts) == aborts;
++	return atomic_read(&tcon->dying) ||
++	       (!tcon->ipc && !tcon->dummy && !READ_ONCE(tcon->mnt_refs));
 +}
 +
- static inline bool cifs_forced_shutdown(const struct cifs_sb_info *sbi)
+ static inline bool cifs_tcon_retry(struct cifs_tcon *tcon, int aborts)
  {
- 	return cifs_sb_flags(sbi) & CIFS_MOUNT_SHUTDOWN;
+-	return tcon->retry && atomic_read(&tcon->umount_aborts) == aborts;
++	return tcon->retry && atomic_read(&tcon->umount_aborts) == aborts &&
++	       !cifs_tcon_dying(tcon);
+ }
+ 
+ static inline bool cifs_forced_shutdown(const struct cifs_sb_info *sbi)
 diff --git a/fs/smb/client/cifsproto.h b/fs/smb/client/cifsproto.h
-index a37eee2ca54b..1b735a1c5b3d 100644
+index b7a7fe372d47..15123c7b9373 100644
 --- a/fs/smb/client/cifsproto.h
 +++ b/fs/smb/client/cifsproto.h
-@@ -442,7 +442,9 @@ static inline int cifs_create_options(struct cifs_sb_info *cifs_sb, int options)
- 		return options;
- }
+@@ -244,7 +244,7 @@ int cifs_match_super(struct super_block *sb, struct fs_context *fc);
+ int cifs_mount(struct cifs_sb_info *cifs_sb, struct smb3_fs_context *ctx);
+ void cifs_umount(struct cifs_sb_info *cifs_sb);
+ void cifs_mark_open_files_invalid(struct cifs_tcon *tcon);
+-void cifs_reopen_persistent_handles(struct cifs_tcon *tcon);
++bool cifs_reopen_persistent_handles(struct cifs_tcon *tcon);
  
--int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry);
-+void cifs_wake_ses_waiters(struct cifs_ses *ses);
-+int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server,
-+				   struct cifs_tcon *tcon, int aborts);
- 
- static inline void cifs_put_smb_ses(struct cifs_ses *ses)
- {
-diff --git a/fs/smb/client/cifssmb.c b/fs/smb/client/cifssmb.c
-index fcf97b3d6bea..712086eb3d1f 100644
---- a/fs/smb/client/cifssmb.c
-+++ b/fs/smb/client/cifssmb.c
-@@ -73,6 +73,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- {
- 	struct TCP_Server_Info *server;
- 	struct cifs_ses *ses;
-+	int aborts;
- 	int rc;
- 
- 	/*
-@@ -83,6 +84,8 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	if (!tcon)
- 		return 0;
- 
-+	aborts = atomic_read(&tcon->umount_aborts);
-+
- 	ses = tcon->ses;
- 	server = ses->server;
- 
-@@ -102,7 +105,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	spin_unlock(&tcon->tc_lock);
- 
- again:
--	rc = cifs_wait_for_server_reconnect(server, tcon->retry);
-+	rc = cifs_wait_for_server_reconnect(server, tcon, aborts);
- 	if (rc)
- 		return rc;
- 
-@@ -127,7 +130,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	case CifsNeedReconnect:
- 		spin_unlock(&server->srv_lock);
- 		mutex_unlock(&ses->session_mutex);
--		if (!tcon->retry)
-+		if (!cifs_tcon_retry(tcon, aborts))
- 			return -EHOSTDOWN;
- 		goto again;
- 	default:
-@@ -159,7 +162,7 @@ cifs_reconnect_tcon(struct cifs_tcon *tcon, int smb_command)
- 	rc = cifs_negotiate_protocol(0, ses, server);
- 	if (rc) {
- 		mutex_unlock(&ses->session_mutex);
--		if (!tcon->retry)
-+		if (!cifs_tcon_retry(tcon, aborts))
- 			return -EHOSTDOWN;
- 		goto again;
- 	}
+ bool cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset,
+ 			     __u64 length, __u8 type, __u16 flags,
 diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index e68fffb2ab2e..16cfe73acdd3 100644
+index 803cefc61194..900846533d48 100644
 --- a/fs/smb/client/connect.c
 +++ b/fs/smb/client/connect.c
-@@ -2610,7 +2610,8 @@ static int match_tcon(struct cifs_tcon *tcon, struct smb3_fs_context *ctx)
- }
- 
- static struct cifs_tcon *
--cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
-+cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx,
-+	       bool unlinked)
- {
- 	struct cifs_tcon *tcon;
- 
-@@ -2622,6 +2623,8 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
+@@ -2619,7 +2619,7 @@ cifs_find_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx,
+ 	spin_lock(&cifs_tcp_ses_lock);
+ 	list_for_each_entry(tcon, &ses->tcon_list, tcon_list) {
+ 		spin_lock(&tcon->tc_lock);
+-		if (!match_tcon(tcon, ctx)) {
++		if (!match_tcon(tcon, ctx) || cifs_tcon_dying(tcon)) {
+ 			spin_unlock(&tcon->tc_lock);
  			continue;
  		}
- 		++tcon->tc_count;
-+		++tcon->mnt_refs;
-+		tcon->mnt_unlinked += unlinked;
- 		trace_smb3_tcon_ref(tcon->debug_id, tcon->tc_count,
- 				    netfs_trace_tcon_ref_get_find);
- 		spin_unlock(&tcon->tc_lock);
-@@ -2695,10 +2698,44 @@ cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
- #endif
+@@ -2714,8 +2714,11 @@ void cifs_wake_ses_waiters(struct cifs_ses *ses)
+ 
+ static void drop_mnt_ref(struct cifs_tcon *tcon)
+ {
+-	guard(spinlock)(&tcon->tc_lock);
+-	tcon->mnt_refs--;
++	scoped_guard(spinlock, &tcon->tc_lock) {
++		if (--tcon->mnt_refs)
++			return;
++	}
++	cifs_wake_ses_waiters(tcon->ses);
  }
  
-+void cifs_wake_ses_waiters(struct cifs_ses *ses)
-+{
-+	guard(spinlock)(&ses->chan_lock);
-+	for (size_t i = 0; i < ses->chan_count; i++) {
-+		struct TCP_Server_Info *server = ses->chans[i].server;
-+
-+		if (!server)
-+			continue;
-+		wake_up_all(&server->request_q);
-+		wake_up_all(&server->response_q);
-+	}
-+}
-+
-+static void drop_mnt_ref(struct cifs_tcon *tcon)
-+{
-+	guard(spinlock)(&tcon->tc_lock);
-+	tcon->mnt_refs--;
-+}
-+
-+static void put_mnt_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
-+{
-+	drop_mnt_ref(tcon);
-+	cifs_put_tcon(tcon, trace);
-+}
-+
-+static void erase_tlink(struct cifs_sb_info *cifs_sb, struct tcon_link *tlink)
-+{
-+	clear_bit(TCON_LINK_IN_TREE, &tlink->tl_flags);
-+	rb_erase(&tlink->tl_rbnode, &cifs_sb->tlink_tree);
-+	if (!IS_ERR(tlink_tcon(tlink)))
-+		drop_mnt_ref(tlink_tcon(tlink));
-+}
-+
- /**
-  * cifs_get_tcon - get a tcon matching @ctx data from @ses
-  * @ses: smb session to issue the request on
-  * @ctx: the superblock configuration context to use for building the
-+ * @unlinked: the mount reference is for a tlink not yet in a superblock's tree
-  *
-  * - tcon refcount is the number of mount points using the tcon.
-  * - ses refcount is the number of tcon using the session.
-@@ -2718,13 +2755,13 @@ cifs_put_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
-  *    decrement the ses refcount.
-  */
- static struct cifs_tcon *
--cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
-+cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx, bool unlinked)
- {
- 	struct cifs_tcon *tcon;
- 	bool nohandlecache;
- 	int rc, xid;
- 
--	tcon = cifs_find_tcon(ses, ctx);
-+	tcon = cifs_find_tcon(ses, ctx, unlinked);
- 	if (tcon) {
- 		/*
- 		 * tcon has refcount already incremented but we need to
-@@ -2750,6 +2787,8 @@ cifs_get_tcon(struct cifs_ses *ses, struct smb3_fs_context *ctx)
- 		rc = -ENOMEM;
- 		goto out_fail;
- 	}
-+	tcon->mnt_refs = 1;
-+	tcon->mnt_unlinked = unlinked;
- 	tcon->nohandlecache = nohandlecache;
- 
- 	if (ctx->snapshot_time) {
-@@ -3576,7 +3615,7 @@ void cifs_mount_put_conns(struct cifs_mount_ctx *mnt_ctx)
- 	int rc = 0;
- 
- 	if (mnt_ctx->tcon)
--		cifs_put_tcon(mnt_ctx->tcon, netfs_trace_tcon_ref_put_mnt_ctx);
-+		put_mnt_tcon(mnt_ctx->tcon, netfs_trace_tcon_ref_put_mnt_ctx);
- 	else if (mnt_ctx->ses)
- 		cifs_put_smb_ses(mnt_ctx->ses);
- 	else if (mnt_ctx->server)
-@@ -3656,7 +3695,7 @@ int cifs_mount_get_tcon(struct cifs_mount_ctx *mnt_ctx)
- 	cifs_sb = mnt_ctx->cifs_sb;
- 
- 	/* search for existing tcon to this server share */
--	tcon = cifs_get_tcon(mnt_ctx->ses, ctx);
-+	tcon = cifs_get_tcon(mnt_ctx->ses, ctx, false);
- 	if (IS_ERR(tcon)) {
- 		rc = PTR_ERR(tcon);
- 		tcon = NULL;
-@@ -4032,8 +4071,7 @@ cifs_umount(struct cifs_sb_info *cifs_sb)
- 	while ((node = rb_first(root))) {
- 		tlink = rb_entry(node, struct tcon_link, tl_rbnode);
- 		cifs_get_tlink(tlink);
--		clear_bit(TCON_LINK_IN_TREE, &tlink->tl_flags);
--		rb_erase(node, root);
-+		erase_tlink(cifs_sb, tlink);
- 
- 		spin_unlock(&cifs_sb->tlink_tree_lock);
- 		cifs_put_tlink(tlink);
-@@ -4321,7 +4359,7 @@ cifs_construct_tcon(struct cifs_sb_info *cifs_sb, kuid_t fsuid)
- 	}
- #endif
- 
--	tcon = cifs_get_tcon(ses, ctx);
-+	tcon = cifs_get_tcon(ses, ctx, true);
- 	if (IS_ERR(tcon)) {
- 		cifs_put_smb_ses(ses);
- 		goto out;
-@@ -4424,6 +4462,7 @@ cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
- {
- 	struct tcon_link *tlink, *newtlink;
- 	kuid_t fsuid = current_fsuid();
-+	struct cifs_tcon *tcon;
- 	int err;
- 
- 	if (!(cifs_sb_flags(cifs_sb) & CIFS_MOUNT_MULTIUSER))
-@@ -4481,7 +4520,16 @@ cifs_sb_tlink(struct cifs_sb_info *cifs_sb)
- 			goto wait_for_construction;
- 	}
- 
--	tlink->tl_tcon = cifs_construct_tcon(cifs_sb, fsuid);
-+	tcon = cifs_construct_tcon(cifs_sb, fsuid);
-+	scoped_guard(spinlock, &cifs_sb->tlink_tree_lock) {
-+		tlink->tl_tcon = tcon;
-+		if (!IS_ERR(tcon)) {
-+			scoped_guard(spinlock, &tcon->tc_lock)
-+				tcon->mnt_unlinked--;
-+			if (!test_bit(TCON_LINK_IN_TREE, &tlink->tl_flags))
-+				drop_mnt_ref(tcon);
-+		}
-+	}
- 	clear_bit(TCON_LINK_PENDING, &tlink->tl_flags);
- 	wake_up_bit(&tlink->tl_flags, TCON_LINK_PENDING);
- 
-@@ -4530,8 +4578,7 @@ cifs_prune_tlinks(struct work_struct *work)
- 			continue;
- 
- 		cifs_get_tlink(tlink);
--		clear_bit(TCON_LINK_IN_TREE, &tlink->tl_flags);
--		rb_erase(tmp, root);
-+		erase_tlink(cifs_sb, tlink);
- 
- 		spin_unlock(&cifs_sb->tlink_tree_lock);
- 		cifs_put_tlink(tlink);
+ static void put_mnt_tcon(struct cifs_tcon *tcon, enum smb3_tcon_ref_trace trace)
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 904df549a884..7b8e1abd9b92 100644
+index 84125f9a43a4..d5b7d33a7a37 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -1552,6 +1552,16 @@ cifs_relock_file(struct cifsFileInfo *cfile)
- 	return rc;
+@@ -2030,14 +2030,16 @@ int cifs_close(struct inode *inode, struct file *file)
+ 	return 0;
  }
  
-+static bool reopen_aborted(struct cifs_tcon *tcon, int aborts)
-+{
-+	struct TCP_Server_Info *server;
-+
-+	if (atomic_read(&tcon->umount_aborts) == aborts)
-+		return false;
-+	server = cifs_pick_channel(tcon->ses);
-+	return server && READ_ONCE(server->tcpStatus) == CifsNeedReconnect;
-+}
-+
- static int
- cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
+-void
++bool
+ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
  {
-@@ -1570,7 +1580,10 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	int create_options = CREATE_NOT_DIR;
- 	struct cifs_open_parms oparms;
- 	int rdwr_for_fscache = 0;
-+	int aborts;
+ 	struct cifsFileInfo *open_file, *tmp;
+ 	LIST_HEAD(tmp_list);
++	bool retry = false;
++	int rc;
  
-+	tcon = tlink_tcon(cfile->tlink);
-+	aborts = atomic_read(&tcon->umount_aborts);
- 	xid = get_xid();
- 	mutex_lock(&cfile->fh_mutex);
- 	if (!cfile->invalidHandle) {
-@@ -1578,10 +1591,14 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 		free_xid(xid);
- 		return 0;
+ 	if (!tcon->use_persistent || !tcon->need_reopen_files)
+-		return;
++		return false;
+ 
+ 	tcon->need_reopen_files = false;
+ 
+@@ -2055,11 +2057,16 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+ 
+ 	list_for_each_entry_safe(open_file, tmp, &tmp_list, rlist) {
+ 		/* do not flush */
+-		if (cifs_reopen_file(open_file, false, 0))
++		rc = cifs_reopen_file(open_file, false,
++				      CIFS_REOPEN_BOUND | CIFS_REOPEN_NOWAIT);
++		if (rc) {
+ 			tcon->need_reopen_files = true;
++			retry |= is_replayable_error(rc);
++		}
+ 		list_del_init(&open_file->rlist);
+ 		cifsFileInfo_put(open_file);
  	}
-+	if (reopen_aborted(tcon, aborts)) {
-+		mutex_unlock(&cfile->fh_mutex);
-+		free_xid(xid);
-+		return -EHOSTDOWN;
-+	}
++	return retry;
+ }
  
- 	inode = d_inode(cfile->dentry);
- 	cifs_sb = CIFS_SB(inode->i_sb);
--	tcon = tlink_tcon(cfile->tlink);
- 	server = tcon->ses->server;
- 
- 	/*
-@@ -1663,10 +1680,16 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
- 	 * version of file size can be stale. If we knew for sure that inode was
- 	 * not dirty locally we could do this.
- 	 */
--	rc = server->ops->open(xid, &oparms, &oplock, NULL);
-+	if (reopen_aborted(tcon, aborts))
-+		rc = -EHOSTDOWN;
-+	else
-+		rc = server->ops->open(xid, &oparms, &oplock, NULL);
- 	if (rc == -ENOENT && oparms.reconnect == false) {
- 		/* durable handle timeout is expired - open the file again */
--		rc = server->ops->open(xid, &oparms, &oplock, NULL);
-+		if (reopen_aborted(tcon, aborts))
-+			rc = -EHOSTDOWN;
-+		else
-+			rc = server->ops->open(xid, &oparms, &oplock, NULL);
- 		/* indicate that we need to relock the file */
- 		oparms.reconnect = true;
- 	}
+ int cifs_closedir(struct inode *inode, struct file *file)
 diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index ec28f102ea08..13eb067ad88a 100644
+index 4a3ecf5c80f7..4d0df73d15d7 100644
 --- a/fs/smb/client/misc.c
 +++ b/fs/smb/client/misc.c
-@@ -1073,7 +1073,15 @@ int cifs_inval_name_dfs_link_error(const unsigned int xid,
- }
- #endif
- 
--int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry)
-+static bool reco_wait_done(struct TCP_Server_Info *server,
-+			   struct cifs_tcon *tcon, int aborts)
-+{
-+	return server->tcpStatus != CifsNeedReconnect ||
-+		atomic_read(&tcon->umount_aborts) != aborts;
-+}
-+
-+int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server,
-+				   struct cifs_tcon *tcon, int aborts)
+@@ -1077,7 +1077,8 @@ static bool reco_wait_done(struct TCP_Server_Info *server,
+ 			   struct cifs_tcon *tcon, int aborts)
  {
- 	int timeout = 10;
- 	int rc;
-@@ -1096,7 +1104,9 @@ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry)
- 	 */
- 	do {
- 		rc = wait_event_interruptible_timeout(server->response_q,
--						      (server->tcpStatus != CifsNeedReconnect),
-+						      reco_wait_done(server,
-+								     tcon,
-+								     aborts),
- 						      timeout * HZ);
- 		if (rc < 0) {
- 			cifs_dbg(FYI, "%s: aborting reconnect due to received signal\n",
-@@ -1111,7 +1121,7 @@ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server, bool retry)
- 			return 0;
- 		}
- 		spin_unlock(&server->srv_lock);
--	} while (retry);
-+	} while (cifs_tcon_retry(tcon, aborts));
+ 	return server->tcpStatus != CifsNeedReconnect ||
+-		atomic_read(&tcon->umount_aborts) != aborts;
++		atomic_read(&tcon->umount_aborts) != aborts ||
++		cifs_tcon_dying(tcon);
+ }
  
- 	cifs_dbg(FYI, "%s: gave up waiting on reconnect\n", __func__);
- 	return -EHOSTDOWN;
+ int cifs_wait_for_server_reconnect(struct TCP_Server_Info *server,
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 0a487b24f4e7..298f549bd7ed 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -2938,6 +2938,10 @@ bool smb2_should_replay(struct cifs_tcon *tcon,
+ 	if (!pretries || !pcur_sleep)
+ 		return false;
+ 
++	/* the tcon is being torn down; stop replaying */
++	if (cifs_tcon_dying(tcon))
++		return false;
++
+ 	if (tcon->retry || (*pretries)++ < tcon->ses->server->retrans) {
+ 		smb2_replay_backoff(pcur_sleep);
+ 		return true;
 diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index bf22e7f6445d..b603e937d1a8 100644
+index 099fd94c58a4..20e6b948ba21 100644
 --- a/fs/smb/client/smb2pdu.c
 +++ b/fs/smb/client/smb2pdu.c
-@@ -251,6 +251,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	       struct TCP_Server_Info *server, bool from_reconnect)
- {
- 	struct cifs_ses *ses;
-+	int aborts;
- 	int xid;
- 	int rc = 0;
+@@ -4417,10 +4417,11 @@ void smb2_reconnect_server(struct work_struct *work)
  
-@@ -262,6 +263,8 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	if (tcon == NULL)
- 		return 0;
- 
-+	aborts = atomic_read(&tcon->umount_aborts);
-+
- 	if (smb2_command == SMB2_TREE_CONNECT)
- 		return 0;
- 
-@@ -318,7 +321,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	spin_unlock(&server->srv_lock);
- 
- again:
--	rc = cifs_wait_for_server_reconnect(server, tcon->retry);
-+	rc = cifs_wait_for_server_reconnect(server, tcon, aborts);
- 	if (rc)
- 		return rc;
- 
-@@ -346,7 +349,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	case CifsNeedReconnect:
- 		spin_unlock(&server->srv_lock);
- 		mutex_unlock(&ses->session_mutex);
--		if (!tcon->retry)
-+		if (!cifs_tcon_retry(tcon, aborts))
- 			return -EHOSTDOWN;
- 		goto again;
- 	default:
-@@ -377,7 +380,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 	rc = cifs_negotiate_protocol(0, ses, server);
- 	if (rc) {
- 		mutex_unlock(&ses->session_mutex);
--		if (!tcon->retry)
-+		if (!cifs_tcon_retry(tcon, aborts))
- 			return -EHOSTDOWN;
- 		goto again;
- 	}
+ 	list_for_each_entry_safe(tcon, tcon2, &tmp_list, rlist) {
+ 		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true,
+-				    false);
++				    true);
+ 		if (!rc) {
+ 			cifs_renegotiate_iosize(server, tcon);
+-			cifs_reopen_persistent_handles(tcon);
++			if (cifs_reopen_persistent_handles(tcon))
++				resched = true;
+ 		} else
+ 			resched = true;
+ 		list_del_init(&tcon->rlist);
+@@ -4450,7 +4451,7 @@ void smb2_reconnect_server(struct work_struct *work)
+ 	list_for_each_entry_safe(ses, ses2, &tmp_ses_list, rlist) {
+ 		tcon->ses = ses;
+ 		rc = smb2_reconnect(SMB2_INTERNAL_CMD, tcon, server, true,
+-				    false);
++				    true);
+ 		if (rc)
+ 			resched = true;
+ 		list_del_init(&ses->rlist);
 -- 
 2.56.0
 
