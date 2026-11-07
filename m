@@ -1,65 +1,65 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794067769;
-	b=wMyXm76C+VGdRtv3DXByL00t9GNamMm/8Spa6iqsDKdozwj1v1YB50/DIhhGr0uGQ8Xs
-	 XQOEI2GQyvkE1SgcvUIyL84dEFPyin7gISxMk5a0fBCmJqbPYTVMOoQv8unY4SvPsCWed
-	 FbfqaSqsjRZJ4KfEFN6BFny0cHk/v0y3hIQjo+zVv0Ok0EAgxT9g/xTm/4PJrdiIF7rO+
-	 oQUQkFnDVvu0jObwnTl/KI9HwNvcR6MsSywvxgXnj0kQgnFB4WFRKF8LYcj7kUwC0Dup/
-	 rAolMZqKVBPGuKsWIA45uqEtHszv5RBBCgdGMt9oI9/jhqz0QgkwNVoRhoDfu2ozVxg==
+	t=1794067777;
+	b=KK7r7vqGO4Cus6Nr3vSvJalX75bqVZ4eDqWmWD865dUKw8TpI+IF9B9adelmlmzUaavp
+	 phPgzoqmHFKIkIl16Rti29ayG7uIU68wjQkocuFR78RE5WrAG9/DHKzrqJp8rkNcR6KTm
+	 bW76XJ+G32metZtbxzQ9DeSBPwRW20ySDNXztuimV1Ynan/T9iyQbHpxQX+RpjwGnXLSM
+	 cTGIAhVmG3VqpkTro6RRkanaTUUU3hPOM/zZvQTbvPmNco96vUoXA0vBpRyZsT9Ze5gIR
+	 fu99pPVmoWA7H5/bFjk2j21yl7Ya3378kGOJ19W9k9iF8nZhpyqdY2YJ0mMrpKMPPEQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794067769;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794067777;
 	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
 	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
 	 Message-ID:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding:X-Scanned-By;
-	bh=49Iw5Dvv4MaQ0vqM8oeTsa68q9pYyzHgdr7pwjlKt5s=;
-	b=meZp6QQUOUWMdvBnNR8uJAJwNhZY56FzGr31IqfhxreVAh6aGYWpN1TCSRxKpDvFNUgu
-	 gtL9kP+CzQ8kqQKL2LbmgmjNNsjcb7+iVxmgAELeph22btpN45DF2OtgT0gQ3eMcNplEx
-	 eb9g8sgwtUGr1EjqeluriFJEbNlVrC58Bmi9vyMLgKNtlewX25jV7mmuWkBxMewcnOqpS
-	 BrluwZcCY0YWM8zCFhU4iaZyIeFNuoohzmLcD5AdZUqS+LowTpbIWbYicdVoX/9KqV84Z
-	 erO2mH5SGWNOQHbgfWBeJAnpooIue5Pfndx50EQ+Ae5/8/bwHTsgtrj+uF7xQl6bQCw==
+	bh=ZpFzsxVEQvWtIOxAqVEIMN/ft++f1rjW7tVVrkxbWYU=;
+	b=iaBaEXkyNh71ghs1Cu/pOyx3hhFnSGzhkAKxNqVopfSi46QBjmXt6++mlG+jwZ0Hd3p9
+	 BrQ8qqq9DtmOC4PGwCHR86u4CJWOcXRduGPAZc7QrvM33ehbesJ9lZQzjsnA+q4g9Ydon
+	 54juevpwNQJMYvgiGvKo+unBhvvQjJwXSPMaWS5/SVystf7EO3B6+juocT5knCRC654li
+	 olZ+oCmbKPg1PEjJESvaOOCnIizW2hAUrKaeT9b50lEqRoUMVheo3tBv2uiQhnnnIGAB7
+	 KbQVGli0zpdX7rAgLotEuDegeZB176BKyZLdBaH+sEMOrJHbHZ39pGao1gpaJROcjgQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=redhat.com;
 	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=FmL9WBoj;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b="d/itM1lR";
 	arc=none smtp.remote-ip=170.10.129.124
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE3960A383E
-	for <linux-cifs@vger.kernel.org>; Sat,  7 Nov 2026 16:09:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ECE3960A383E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B56606D80B
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Nov 2026 16:09:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C8B56606D80B
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=FmL9WBoj
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=d/itM1lR
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1794067768;
+	s=mimecast20190719; t=1794067776;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=49Iw5Dvv4MaQ0vqM8oeTsa68q9pYyzHgdr7pwjlKt5s=;
-	b=FmL9WBojukK6cNrjaCX+IxA4WaZLJVVlV2NrjF0b3WI17Kp8cXSb3yugEbUnIvWHOkCkkV
-	xN7DW36mJ7fHkHuzFiCMsEAgnsW4Ju06IlaMLiY6R8lwwPl2fmNsVzrG7zdCGKapVfhyN9
-	utdpJ8yZMluWwHy5QfhG5maJ/cF4QO8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=ZpFzsxVEQvWtIOxAqVEIMN/ft++f1rjW7tVVrkxbWYU=;
+	b=d/itM1lRlUhGPRr8cRRJ7VjbxJUhzQJfjwXd6m6pizgIiRc0VyLgAM0Fyl6wLTVXpnEPIq
+	cMzYu85YRz7grpnsx3sto+K5iDYm65AUTi/3w48XaKNz2gSFHkxyRTU6dGxXFkZNQwEFdf
+	MNBlXFRqhbXwu2k2DVgn4JA98diLcS4=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-685-8i4EczFZPTqC8PkV96iUJQ-1; Sat,
- 07 Nov 2026 11:09:20 -0500
-X-MC-Unique: 8i4EczFZPTqC8PkV96iUJQ-1
-X-Mimecast-MFC-AGG-ID: 8i4EczFZPTqC8PkV96iUJQ_1794067758
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-_ABmAehkO76TJRVWeb-oeg-1; Sat,
+ 07 Nov 2026 11:09:29 -0500
+X-MC-Unique: _ABmAehkO76TJRVWeb-oeg-1
+X-Mimecast-MFC-AGG-ID: _ABmAehkO76TJRVWeb-oeg_1794067767
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C03519560A2;
-	Sat,  7 Nov 2026 16:09:17 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B2AA19560B4;
+	Sat,  7 Nov 2026 16:09:27 +0000 (UTC)
 Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 91820195608B;
-	Sat,  7 Nov 2026 16:09:13 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A1607195608B;
+	Sat,  7 Nov 2026 16:09:23 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Christian Brauner <christian@brauner.io>
 Cc: David Howells <dhowells@redhat.com>,
@@ -80,9 +80,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH v16 08/15] netfs: Change netfs_writeback_single() to not look inside the iterator
-Date: Sat,  7 Nov 2026 16:08:11 +0000
-Message-ID: <20261107160823.1465553-9-dhowells@redhat.com>
+Subject: [PATCH v16 10/15] cifs: Use a bvecq for buffering instead of a folioq
+Date: Sat,  7 Nov 2026 16:08:13 +0000
+Message-ID: <20261107160823.1465553-11-dhowells@redhat.com>
 In-Reply-To: <20261107160823.1465553-1-dhowells@redhat.com>
 References: <20261107160823.1465553-1-dhowells@redhat.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -97,254 +97,221 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Change netfs_writeback_single() so that it doesn't look around inside the
-data buffer iterator it is given and doesn't try to submit the folios from
-the list individually.  Instead, it treats it as a DIO write and pushes the
-iterator directly, unsliced, to the cache (or the filesystem) to write
-from.
-
-There are also some changes of behaviour:
-
- (1) netfs_writeback_single() will make a single unbounded monolithic write
-     to the cache.
-
- (2) When writing, sreq_max_len/segs are ignored as the "single" type
-     mandates all the data be transferred in a single op.  Whilst this is
-     not strictly necessary for the cache as the contract is really with
-     the server, it simplifies things for now.
-
- (3) An explicit wait is added to the function to make sure that the write
-     is concluded before returning as there's currently no mechanism to
-     check if the write is completed as page flags aren't used.  This can
-     be fixed later, but may require AFS's dir and symlink handling to
-     check for write completion before allowing further changes be made.
+Use a bvecq for internal buffering for crypto purposes instead of a folioq
+so that the latter can be phased out.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Paulo Alcantara <pc@manguebit.org>
+Reviewed-by: Paulo Alcantara <pc@manguebit.org>
+cc: Namjae Jeon <linkinjeon@kernel.org>
 cc: Matthew Wilcox <willy@infradead.org>
-cc: Marc Dionne <marc.dionne@auristor.com>
 cc: Christoph Hellwig <hch@infradead.org>
-cc: linux-afs@lists.infradead.org
+cc: linux-cifs@vger.kernel.org
 cc: netfs@lists.linux.dev
 cc: linux-fsdevel@vger.kernel.org
 ---
- fs/netfs/write_issue.c | 172 +++++++----------------------------------
- 1 file changed, 28 insertions(+), 144 deletions(-)
+ fs/smb/client/cifsglob.h |  2 +-
+ fs/smb/client/smb2ops.c  | 78 +++++++++++++++++++---------------------
+ 2 files changed, 38 insertions(+), 42 deletions(-)
 
-diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
-index e041023811ed..f084a6796667 100644
---- a/fs/netfs/write_issue.c
-+++ b/fs/netfs/write_issue.c
-@@ -625,133 +625,15 @@ int netfs_writepages(struct address_space *mapping,
+diff --git a/fs/smb/client/cifsglob.h b/fs/smb/client/cifsglob.h
+index d3ca688b6aba..806242d9cce0 100644
+--- a/fs/smb/client/cifsglob.h
++++ b/fs/smb/client/cifsglob.h
+@@ -290,7 +290,7 @@ struct smb_rqst {
+ 	struct kvec	*rq_iov;	/* array of kvecs */
+ 	unsigned int	rq_nvec;	/* number of kvecs in array */
+ 	struct iov_iter	rq_iter;	/* Data iterator */
+-	struct folio_queue *rq_buffer;	/* Buffer for encryption */
++	struct bvecq	*rq_buffer;	/* Buffer for encryption */
+ };
+ 
+ struct mid_q_entry;
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index dc55cd512616..9d462f6e896c 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -13,7 +13,7 @@
+ #include <linux/sort.h>
+ #include <crypto/aead.h>
+ #include <linux/fiemap.h>
+-#include <linux/folio_queue.h>
++#include <linux/bvecq.h>
+ #include <uapi/linux/magic.h>
+ #include "cifsfs.h"
+ #include "cifsglob.h"
+@@ -4918,19 +4918,18 @@ crypt_message(struct TCP_Server_Info *server, int num_rqst,
  }
- EXPORT_SYMBOL(netfs_writepages);
  
--/*
-- * Write some of a pending folio data back to the server and/or the cache.
-- */
--static int netfs_write_folio_single(struct netfs_io_request *wreq,
--				    struct folio *folio)
--{
--	struct netfs_io_stream *upload = &wreq->io_streams[0];
--	struct netfs_io_stream *cache  = &wreq->io_streams[1];
--	struct netfs_io_stream *stream;
--	size_t iter_off = 0;
--	size_t fsize = folio_size(folio), flen;
--	uoff_t fpos = folio_pos(folio);
--	ssize_t ret;
--	bool to_eof = false;
--	bool no_debug = false;
--
--	_enter("");
--
--	flen = folio_size(folio);
--	if (flen > wreq->i_size - fpos) {
--		flen = wreq->i_size - fpos;
--		folio_zero_segment(folio, flen, fsize);
--		to_eof = true;
--	} else if (flen == wreq->i_size - fpos) {
--		to_eof = true;
--	}
--
--	_debug("folio %zx/%zx", flen, fsize);
--
--	if (!upload->avail && !cache->avail) {
--		trace_netfs_folio(folio, netfs_folio_trace_cancel_store);
--		return 0;
--	}
--
--	if (!upload->construct)
--		trace_netfs_folio(folio, netfs_folio_trace_store);
--	else
--		trace_netfs_folio(folio, netfs_folio_trace_store_plus);
--
--	/* Attach the folio to the rolling buffer. */
--	folio_get(folio);
--	ret = rolling_buffer_append(&wreq->buffer, folio, NETFS_ROLLBUF_PUT_MARK, wreq->gfp);
--	if (ret < 0) {
--		folio_put(folio);
--		return ret;
--	}
--
--	/* Move the submission point forward to allow for write-streaming data
--	 * not starting at the front of the page.  We don't do write-streaming
--	 * with the cache as the cache requires DIO alignment.
--	 *
--	 * Also skip uploading for data that's been read and just needs copying
--	 * to the cache.
--	 */
--	for (int s = 0; s < NR_IO_STREAMS; s++) {
--		stream = &wreq->io_streams[s];
--		stream->submit_off = 0;
--		stream->submit_len = flen;
--		if (!stream->avail) {
--			stream->submit_off = UINT_MAX;
--			stream->submit_len = 0;
--		}
--	}
--
--	/* Attach the folio to one or more subrequests.  For a big folio, we
--	 * could end up with thousands of subrequests if the wsize is small -
--	 * but we might need to wait during the creation of subrequests for
--	 * network resources (eg. SMB credits).
--	 */
--	for (;;) {
--		ssize_t part;
--		size_t lowest_off = ULONG_MAX;
--		int choose_s = -1;
--
--		/* Always add to the lowest-submitted stream first. */
--		for (int s = 0; s < NR_IO_STREAMS; s++) {
--			stream = &wreq->io_streams[s];
--			if (stream->submit_len > 0 &&
--			    stream->submit_off < lowest_off) {
--				lowest_off = stream->submit_off;
--				choose_s = s;
--			}
--		}
--
--		if (choose_s < 0)
--			break;
--		stream = &wreq->io_streams[choose_s];
--
--		/* Advance the iterator(s). */
--		if (stream->submit_off > iter_off) {
--			rolling_buffer_advance(&wreq->buffer, stream->submit_off - iter_off);
--			iter_off = stream->submit_off;
--		}
--
--		atomic64_set(&wreq->issued_to, fpos + stream->submit_off);
--		stream->submit_extendable_to = fsize - stream->submit_off;
--		part = netfs_advance_write(wreq, stream, fpos + stream->submit_off,
--					   stream->submit_len, to_eof);
--		stream->submit_off += part;
--		if (part > stream->submit_len)
--			stream->submit_len = 0;
--		else
--			stream->submit_len -= part;
--		if (part > 0)
--			no_debug = true;
--	}
--
--	wreq->buffer.iter.iov_offset = 0;
--	if (fsize > iter_off)
--		rolling_buffer_advance(&wreq->buffer, fsize - iter_off);
--	atomic64_set(&wreq->issued_to, fpos + fsize);
--
--	if (!no_debug)
--		kdebug("R=%x: No submit", wreq->debug_id);
--	_leave(" = 0");
--	return 0;
--}
--
- /**
-- * netfs_writeback_single - Write back a monolithic payload
-+ * netfs_writeback_single - Write back a monolithic payload to cache
-  * @mapping: The mapping to write from
-  * @wbc: Hints from the VM
-- * @iter: Data buffer to write from, must be ITER_FOLIOQ.
-+ * @iter: Data buffer to write from.
-  * @len: Amount of data to write.
-  *
-- * Write a monolithic, non-pagecache object back to the server and/or
-- * the cache.
-+ * Write a monolithic, non-pagecache object back to the cache only.  The data
-+ * is not written to the server.
-  *
-  * The data buffer may be bigger than @len (as set in @iter's count), and if
-  * so, this function will use the extra as needed to provide padding into the
-@@ -766,12 +648,8 @@ int netfs_writeback_single(struct address_space *mapping,
+ /*
+- * Copy data from an iterator to the folios in a folio queue buffer.
++ * Copy data from an iterator to the pages in a bvec queue buffer.
+  */
+-static bool cifs_copy_iter_to_folioq(struct iov_iter *iter, size_t size,
+-				     struct folio_queue *buffer)
++static bool cifs_copy_iter_to_bvecq(struct iov_iter *iter, size_t size,
++				    struct bvecq *buffer)
  {
- 	struct netfs_io_request *wreq;
- 	struct netfs_inode *ictx = netfs_inode(mapping->host);
--	struct folio_queue *fq;
--	size_t size = len;
- 	int ret;
+ 	for (; buffer; buffer = buffer->next) {
+-		for (int s = 0; s < folioq_count(buffer); s++) {
+-			struct folio *folio = folioq_folio(buffer, s);
+-			size_t part = folioq_folio_size(buffer, s);
++		for (int s = 0; s < bvecq_nr_slots_acquire(buffer); s++) {
++			struct bio_vec *bv = &buffer->bv[s];
++			size_t part = umin(bv->bv_len, size);
  
--	if (WARN_ON_ONCE(!iov_iter_is_folioq(iter)))
--		return -EIO;
- 	if (WARN_ON_ONCE(iov_iter_count(iter) < len))
- 		return -EIO;
- 
-@@ -787,36 +665,42 @@ int netfs_writeback_single(struct address_space *mapping,
- 		goto couldnt_start;
- 	}
- 
-+	wreq->buffer.iter = *iter;
-+	wreq->len = len;
-+	wreq->submitted = wreq->len;
-+
- 	__set_bit(NETFS_RREQ_OFFLOAD_COLLECTION, &wreq->flags);
- 	trace_netfs_write(wreq, netfs_write_trace_writeback_single);
- 	netfs_stat(&netfs_n_wh_writepages);
- 
--	if (__test_and_set_bit(NETFS_RREQ_UPLOAD_TO_SERVER, &wreq->flags))
--		wreq->netfs_ops->begin_writeback(wreq);
-+	for (int s = 0; s < NR_IO_STREAMS; s++) {
-+		struct netfs_io_subrequest *subreq;
-+		struct netfs_io_stream *stream = &wreq->io_streams[s];
-+
-+		if (!stream->avail)
-+			continue;
- 
--	for (fq = (struct folio_queue *)iter->folioq; fq; fq = fq->next) {
--		for (int slot = 0; slot < folioq_count(fq); slot++) {
--			struct folio *folio = folioq_folio(fq, slot);
--			size_t part = umin(folioq_folio_size(fq, slot), size);
-+		netfs_prepare_write(wreq, stream, 0);
-+		/* Allocation not allowed to fail in writeback. */
- 
--			_debug("wbiter %lx %llx", folio->index, atomic64_read(&wreq->issued_to));
-+		subreq = stream->construct;
-+		subreq->len = wreq->len;
-+		stream->submit_len = subreq->len;
-+		stream->submit_extendable_to = iov_iter_count(iter) - len;
- 
--			ret = netfs_write_folio_single(wreq, folio);
--			if (ret < 0)
--				goto stop;
--			size -= part;
--			if (size <= 0)
--				goto stop;
--		}
-+		netfs_issue_write(wreq, stream);
- 	}
- 
--stop:
--	for (int s = 0; s < NR_IO_STREAMS; s++)
--		netfs_issue_write(wreq, &wreq->io_streams[s]);
- 	netfs_all_subreqs_queued(wreq);
+-			part = umin(part, size);
 -
- 	netfs_wake_collector(wreq);
+-			if (copy_folio_from_iter(folio, 0, part, iter) != part)
++			if (copy_page_from_iter(bv->bv_page, bv->bv_offset,
++						part, iter) != part)
+ 				return false;
+ 			size -= part;
+ 		}
+@@ -4942,7 +4941,7 @@ void
+ smb3_free_compound_rqst(int num_rqst, struct smb_rqst *rqst)
+ {
+ 	for (int i = 0; i < num_rqst; i++)
+-		netfs_free_folioq_buffer(rqst[i].rq_buffer);
++		bvecq_put(rqst[i].rq_buffer);
+ }
  
-+	/* TODO: Might want to be async here if WB_SYNC_NONE, but then need to
-+	 * wait before modifying.
-+	 */
-+	ret = netfs_wait_for_write(wreq);
-+	if (ret > 0)
-+		ret = 0;
-+
- 	netfs_put_request(wreq, netfs_rreq_trace_put_return);
- 	_leave(" = %d", ret);
- 	return ret;
+ /*
+@@ -4969,7 +4968,7 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+ 	for (int i = 1; i < num_rqst; i++) {
+ 		struct smb_rqst *old = &old_rq[i - 1];
+ 		struct smb_rqst *new = &new_rq[i];
+-		struct folio_queue *buffer = NULL;
++		struct bvecq *buffer = NULL;
+ 		size_t size = iov_iter_count(&old->rq_iter);
+ 
+ 		orig_len += smb_rqst_len(server, old);
+@@ -4977,17 +4976,16 @@ smb3_init_transform_rq(struct TCP_Server_Info *server, int num_rqst,
+ 		new->rq_nvec = old->rq_nvec;
+ 
+ 		if (size > 0) {
+-			size_t cur_size = 0;
+-			rc = netfs_alloc_folioq_buffer(NULL, &buffer, &cur_size,
+-						       size, GFP_NOFS);
+-			new->rq_buffer = buffer;
+-			if (rc < 0)
++			rc = -ENOMEM;
++			buffer = bvecq_alloc_buffer(size, GFP_NOFS, true);
++			if (!buffer)
+ 				goto err_free;
+ 
+-			iov_iter_folio_queue(&new->rq_iter, ITER_SOURCE,
+-					     buffer, 0, 0, size);
++			new->rq_buffer = buffer;
++			iov_iter_bvec_queue(&new->rq_iter, ITER_SOURCE,
++					    buffer, 0, 0, size);
+ 
+-			if (!cifs_copy_iter_to_folioq(&old->rq_iter, size, buffer)) {
++			if (!cifs_copy_iter_to_bvecq(&old->rq_iter, size, buffer)) {
+ 				rc = smb_EIO1(smb_eio_trace_tx_copy_iter_to_buf, size);
+ 				goto err_free;
+ 			}
+@@ -5077,22 +5075,20 @@ decrypt_raw_data(struct TCP_Server_Info *server, char *buf,
+ }
+ 
+ static int
+-cifs_copy_folioq_to_iter(struct folio_queue *folioq, size_t data_size,
+-			 size_t skip, struct iov_iter *iter)
++cifs_copy_bvecq_to_iter(struct bvecq *bq, size_t data_size,
++			size_t skip, struct iov_iter *iter)
+ {
+-	for (; folioq; folioq = folioq->next) {
+-		for (int s = 0; s < folioq_count(folioq); s++) {
+-			struct folio *folio;
+-			size_t fsize, n, len;
++	for (; bq; bq = bq->next) {
++		for (int s = 0; s < bvecq_nr_slots_acquire(bq); s++) {
++			struct bio_vec *bv = &bq->bv[s];
++			size_t n, len;
+ 
+ 			if (data_size == 0)
+ 				return 0;
+ 
+-			folio = folioq_folio(folioq, s);
+-			fsize = folio_size(folio);
+-			len = umin(fsize - skip, data_size);
++			len = umin(bv->bv_len - skip, data_size);
+ 
+-			n = copy_folio_to_iter(folio, skip, len, iter);
++			n = copy_page_to_iter(bv->bv_page, bv->bv_offset + skip, len, iter);
+ 			if (n != len) {
+ 				cifs_dbg(VFS, "%s: something went wrong\n", __func__);
+ 				return smb_EIO2(smb_eio_trace_rx_copy_to_iter,
+@@ -5114,7 +5110,7 @@ cifs_copy_folioq_to_iter(struct folio_queue *folioq, size_t data_size,
+ 
+ static int
+ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+-		 char *buf, unsigned int buf_len, struct folio_queue *buffer,
++		 char *buf, unsigned int buf_len, struct bvecq *buffer,
+ 		 unsigned int buffer_len, bool is_offloaded)
+ {
+ 	unsigned int data_offset;
+@@ -5224,8 +5220,8 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ 		}
+ 
+ 		/* Copy the data to the output I/O iterator. */
+-		rdata->result = cifs_copy_folioq_to_iter(buffer, data_len,
+-							 cur_off, &rdata->subreq.io_iter);
++		rdata->result = cifs_copy_bvecq_to_iter(buffer, data_len,
++							cur_off, &rdata->subreq.io_iter);
+ 		if (rdata->result != 0) {
+ 			if (is_offloaded)
+ 				mid->mid_state = MID_RESPONSE_MALFORMED;
+@@ -5264,7 +5260,7 @@ handle_read_data(struct TCP_Server_Info *server, struct mid_q_entry *mid,
+ struct smb2_decrypt_work {
+ 	struct work_struct decrypt;
+ 	struct TCP_Server_Info *server;
+-	struct folio_queue *buffer;
++	struct bvecq *buffer;
+ 	char *buf;
+ 	unsigned int len;
+ };
+@@ -5278,7 +5274,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
+ 	struct mid_q_entry *mid;
+ 	struct iov_iter iter;
+ 
+-	iov_iter_folio_queue(&iter, ITER_DEST, dw->buffer, 0, 0, dw->len);
++	iov_iter_bvec_queue(&iter, ITER_DEST, dw->buffer, 0, 0, dw->len);
+ 	rc = decrypt_raw_data(dw->server, dw->buf, dw->server->vals->read_rsp_size,
+ 			      &iter, true);
+ 	if (rc) {
+@@ -5328,7 +5324,7 @@ static void smb2_decrypt_offload(struct work_struct *work)
+ 	}
+ 
+ free_pages:
+-	netfs_free_folioq_buffer(dw->buffer);
++	bvecq_put(dw->buffer);
+ 	cifs_small_buf_release(dw->buf);
+ 	kfree(dw);
+ }
+@@ -5374,12 +5370,12 @@ receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid,
+ 	dw->len = len;
+ 	len = round_up(dw->len, PAGE_SIZE);
+ 
+-	size_t cur_size = 0;
+-	rc = netfs_alloc_folioq_buffer(NULL, &dw->buffer, &cur_size, len, GFP_NOFS);
+-	if (rc < 0)
++	rc = -ENOMEM;
++	dw->buffer = bvecq_alloc_buffer(len, GFP_NOFS, false);
++	if (!dw->buffer)
+ 		goto discard_data;
+ 
+-	iov_iter_folio_queue(&iter, ITER_DEST, dw->buffer, 0, 0, len);
++	iov_iter_bvec_queue(&iter, ITER_DEST, dw->buffer, 0, 0, len);
+ 
+ 	/* Read the data into the buffer and clear excess bufferage. */
+ 	rc = cifs_read_iter_from_socket(server, &iter, dw->len);
+@@ -5439,7 +5435,7 @@ receive_encrypted_read(struct TCP_Server_Info *server, struct mid_q_entry **mid,
+ 	}
+ 
+ free_pages:
+-	netfs_free_folioq_buffer(dw->buffer);
++	bvecq_put(dw->buffer);
+ free_dw:
+ 	kfree(dw);
+ 	return rc;
 
