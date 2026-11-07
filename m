@@ -1,88 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794057364;
-	b=dyI1Qto1Px8pEksG/3kT017EMPOOU9L6+imcK7of3VMAcqliqYR1+kTKSmpWOELBfikz
-	 7Ct/h/ZCRuTtHwn2KWgtIcCZ1hNDpI3fYO+pydNCp/Vd0ASSjEdgQd+96+JmZeGLQGy0c
-	 UVKjZfsllIbfAa6kkXc4H+ImwztRA6pye45YMq8U+6pEL81SxPcmmX19D1Zm+OAKwskzQ
-	 tn6v0drNu0DBDV/I2mgcaweZtL5Ahx9d7DOrT+doRHO13pexicynLF7XJAqfbsXB/pN/j
-	 RDnlLxFYEDdOF6hWHLo1oJBC/nb6bP3cdzkwGv2uG2eEAk8jNcgcwAIvJwi5WsY8iSQ==
+	t=1794067720;
+	b=YS42sXttLWm3w0DagXnL9Nln4mxq+5Yk7f7cDDWj0qXFwHg9WQsaQRWfSQWIOGK4bpdp
+	 T5GEOxjDclBJjP6U4uIA+106ZKj9k8DuWUb0n9uIhHRw8fgSKvGjPOfFMXwGa07zfDr1T
+	 ciUEX9CiMx1OwVKqc1YJMK5fEO3XUiTaRRHW94Pv/pTsafUwAv7h5czD+niaaPxQCK7Sc
+	 EbYMhy0ggqgshzN5ElTJSTSTi5LYt1d17njc1LSPN+WvJS++Z00AIjx7fEb+G92OqHaYq
+	 KTEZjFLJTqyj+2qqaT2cpC+eLeGk8PS2bUdOkTXfrm6b8gxWp9qIfAa4RKwf2JZNTDg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794057364;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=xqHF4zuUEcXR6wZYjZGyjyTDBD3DURDuYS84aMabkKE=;
-	b=bIKBYRbOAvr21FKrj1qqftRKL4RrxAn2R8fxa3I62oZcdQfEVrWwKVz6lyLR+JbiJA0r
-	 +t6THacMaepjs9qirMMy0YPfYtP4VU/mLpTW1ZgyJmMTN5j9BJXb9ylrEhNJ4Ey0pZf/b
-	 vpxiVrzmP31+FwhpRW5gpXXl0SOy5WMEmDswBmgse0wbuZGxFxQ28CaqRKcR2Famxqn4A
-	 D4K0VGIni7R4pFtxGaw7JPRmCkfMVsXo7HVqetxzdJ/NInEqUWc+4un271stguyFRh6Qs
-	 OFFXDxYYXnoSeu/Msyh7iXYjjRxm0vlQwNIVhu/jgBzqbjnovwLc/y2lqGJKpPaG6ZA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794067720;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:From:To:Cc:Subject:Date:
+	 Message-ID:MIME-Version:Content-Transfer-Encoding:X-Scanned-By;
+	bh=AkggF1IZMKELF6PrvsMx3bviXaYutAqrhI39oo9RDTg=;
+	b=MwCGe52T9a2T6r3PD1Dv/mQeXDu3+iUfC+6xXWORK1iJHay5hREI9M37p9qBLTg+ciD6
+	 efe/maNfH5zI0J74k0zQLVxA/bNxlh8X9LID8mXGpLP6Abr7b3nnWXLb+9UOu4NajI+Rh
+	 ONZL3zaSWvDJVjCJUj7FMwFK3sSw+R0EyRHKNMdl7U5hosj7EjQhd7eb+IbZCx5ke9Z3a
+	 IHZ0z+DF1OZVVunljYga2G97GZrtczcsbcYC6HdI2AI3Y0vFQ2dmLeoQwX4qOQVCapvZT
+	 Ysvt06D4efk0dMQXp8Dd/nIVzY2HRpnB9PfI1Lnbba0FfHirlh2MWWvl/qpNSS3UnZg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="VI7KR/u+";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b="S5/m/wxI";
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 1499B6082BE6;
-	Sat,  7 Nov 2026 13:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACC5606A32D
+	for <linux-cifs@vger.kernel.org>; Sat,  7 Nov 2026 16:08:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3ACC5606A32D
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VI7KR/u+
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C20A51F0089F;
-	Sat,  7 Nov 2026 13:16:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794057363;
-	bh=xqHF4zuUEcXR6wZYjZGyjyTDBD3DURDuYS84aMabkKE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VI7KR/u+P6QJJKBdJ0NS7vzA0bijemf09PmsFFN7SB67hNhHDjbFcPTyqgAbDVcOU
-	 p6jaBZIp86f4iAnfz6a+TIszA/X+RssP34EPMiLZCEGKYQ8S2CuKK1rKuZlllj0ywq
-	 555j4BCZvUg5TCCuyX9Hjuo2Gs2zQJu1Zn2yd8TT5N8Qwn3OrjvpswU227iM7zAeCd
-	 BeEx59cKw7ZuNYQNLHL+SQBR1DSpy3nEz+jKnZbftKub/gZIWsOfz/rsc8M6pXdnUp
-	 phlGiFUFlgscuapAjFM6QvtYzlt0R+yuBeyS8sTfciMg0FjDJGXxt5PecgcCMIJ5uw
-	 89E3TlMe+WH6w==
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>,
-	keyrings@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=S5/m/wxI
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1794067718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AkggF1IZMKELF6PrvsMx3bviXaYutAqrhI39oo9RDTg=;
+	b=S5/m/wxIiD98q+537ECVOftu16rk4BJHfmYv0kTIUNx1EznZvm1gzFzCOFG0AVZQgGDTlu
+	2TN6/lgMr8ua/NUxcTkNgYpyHG38H74lZLcep4ZLUx2VZpPc8l4lKEWIo2FuuTKVCMePLU
+	GnprQS8TGK2CmdhHGCDzEpoHOcxr/sc=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-500-Y62LxWCdMJWR70Hg0IDtIg-1; Sat,
+ 07 Nov 2026 11:08:34 -0500
+X-MC-Unique: Y62LxWCdMJWR70Hg0IDtIg-1
+X-Mimecast-MFC-AGG-ID: Y62LxWCdMJWR70Hg0IDtIg_1794067712
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 958D4180055E;
+	Sat,  7 Nov 2026 16:08:31 +0000 (UTC)
+Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BC228195608B;
+	Sat,  7 Nov 2026 16:08:25 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: David Howells <dhowells@redhat.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Stefan Metzmacher <metze@samba.org>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	netfs@lists.linux.dev,
 	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	James Morris <jmorris@namei.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Vasily Gorbik <gor@linux.ibm.com>
-Subject: [PATCH v4 11/11] KEYS: key_garbage_collector(): process in chunks
-Date: Sat,  7 Nov 2026 15:15:12 +0200
-Message-ID: <20261107131512.3603168-12-jarkko@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261107131512.3603168-1-jarkko@kernel.org>
-References: <20261107131512.3603168-1-jarkko@kernel.org>
+	ceph-devel@vger.kernel.org,
+	v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v16 00/15] netfs, iov_iter: Use a chain of bio_vec arrays instead of folio_queue
+Date: Sat,  7 Nov 2026 16:08:03 +0000
+Message-ID: <20261107160823.1465553-1-dhowells@redhat.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -93,404 +90,247 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-key_garbage_collector() has a design that is not resistant enough for
-workqueue lockups. The duration scales up relative to the number of items
-in the serial tree, which causes a reoccuring theme of being guilty of
-causing workqueue lockups.
+Hi Christian,
 
-Resolve the problem by processing in chunks:
+Could you pull these patches please into your vfs-7.5.netfs branch?  This
+is the third of five batches (two already having gone upstream), in this
+case replacing the folio_queue struct with a bvecq struct.  It has been
+rebased on v7.4-rc1.  This was split from v11 of a larger netfslib
+series[1].
 
-1. Declare a static variable key_gc_work, which owns the garbage collection
-   in-flight state, and key_schedule_gc_work() for re-scheduling the work.
-2. Define KEY_GC_CHUNK_SIZE, set to 64 keys, as the bound for the number
-   of items scanned and destroyed.
-3. Define KEY_GC_DESTROYING to mark resume to destruction without repeating
-   the RCU grace period.
-4. Define KEY_GC_REAP_REQUESTED for preserving full-pass requests across
-   the continuations.
+This series adds a new type, struct bvecq.  This points to a bounded array
+of bio_vecs with information about how to clean up the memory they point
+to.  A number of bvecq structs can be linked together to form a chain and
+an iterator type, ITER_BVECQ, is provided that can be pointed at the chain
+and can walk it.  Netfslib is then switched to use the new type and
+folio_queue is removed along with ITER_FOLIOQ.
 
-keygcbench results without the patch:
+This is intended as a more flexible replacement for struct folio_queue as
+the latter can only point to whole folios and cannot point to partial pages
+that might be extracted from an ITER_IOVEC/ITER_UBUF for direct or
+unbuffered I/O purposes.
 
-unused:   min=413.359 avg=1817.240 max=3221.120 var=1970880.024
-expired:  min=0.002 avg=1360.124 max=2481.990 var=1055093.994
-combined: min=0.002 avg=1542.970 max=3221.120 var=1471557.422
+These patches make a more or less straight swap between struct folio_queue
+and struct bvecq.  The change is not quite trivial as the folio_queue
+struct contains a folio_batch struct and is basically a list of whole
+folios only, whereas the new bvecq struct is a chain of bio_vec arrays.
 
-keygcbench results with the patch:
+A further patchset will switch the netfslib unbuffered I/O code to using
+bvecqs and then the bvecqs will be passed down into the filesystem rather
+than passing an iterator.
 
-unused:   min=0.005 avg=0.126 max=54.173 var=0.946
-expired:  min=0.002 avg=0.210 max=216.470 var=7.894
-combined: min=0.002 avg=0.158 max=216.470 var=3.627
+The primary reason behind making this change is so that bvecq chains can be
+used in the assembly of network filesystem messages.  Netfslib can furnish
+the filesystem with bvecq chains representing the data buffers that need to
+be read or written and then, for example, for a write RPC, the filesystem
+can add protocol headers and trailers onto the chain without the need to
+copy it and can also glue multiple buffers together to form compound
+operations and/or perform sparse operations.
 
-These results translate to:
+One option here is to add two more fields to the bvecq struct, one to
+increase the offset of the first bio_vec and one to decrease the length of
+the last, thereby allowing a bvecq struct to point at a slice of another
+bio_vec array without having to copy the array - but at the cost of adding
+one or two extra conditional ops when getting the offset or length of a
+segment.
 
-- >99.9% drop in the combined variance.
-- 3.0% increase in the total task time.
+I have in-progress patch sets to rewrite the cifs transport[2] and the ceph
+and rbd transport[3] to make use of bvecq chains.  For the cifs transport,
+the idea is to extend the SMB message concept further up the stack, where
+the PDU-marshalling routines will create individual RPC request blobs that
+the transport can then automatically chain together when it is assembling
+a compound SMB request for transmission.
 
-The value 64 for KEY_GC_CHUNK_SIZE was cherry-picked from the set {1, 2,
-..., 1024} by running the benchmark for each chunk size three times.
+With the ceph transport, the idea is to convert all the different data
+containers it has into just passing around bvecqs.  These can then be
+chained together in order to transmit them.
 
-At the far left variance is 97% lower but at the same time total time
-grows by 133%, when compared to the selected chunk size. The size was
-picked based on getting a reasonable variance with a minimal throughput
-decline.
+This improves efficiency in the TCP stack as we no longer need to cork the
+TCP socket, call sendmsg() multiple times and then uncork; rather we can
+preassemble the message in a bvecq chain and just send the entire message
+in one shot with a single sendmsg() and reduce the number of places doing
+loops.  Using a single sendmsg got an improvement in nfsd performance[4].
 
-Fixes: 0c061b5707ab ("KEYS: Correctly destroy key payloads when their keytype is removed")
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd-test.git/tree/package/keygcbench
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
----
- security/keys/gc.c       | 166 ++++++++++++++++++++++++++-------------
- security/keys/internal.h |   3 +-
- security/keys/key.c      |   4 +-
- security/keys/keyring.c  |   2 +-
- 4 files changed, 117 insertions(+), 58 deletions(-)
+I also have some changes on the TCP receive side for the cifs transport
+(which is also likely applicable to the ceph TCP transport) whereby the
+receive buffers are 'spliced' out into a bvecq in the cifs I/O thread
+rather than being copied.  Using a bvecq chain here is advantageous as we
+don't know in advance how many segments we're going to have.  This allows
+us firstly to avoid copying data with the socket lock held (thus holding up
+sendmsg) and secondly to avoid copying data in the I/O thread (copying can
+be offloaded to the app thread).  The last time I benchmarked this, it
+appeared to get fio reading tests on cifs a 5% speedup.
 
-diff --git a/security/keys/gc.c b/security/keys/gc.c
-index 859f331549ce..4a55ed56c33e 100644
---- a/security/keys/gc.c
-+++ b/security/keys/gc.c
-@@ -11,10 +11,7 @@
- #include <keys/keyring-type.h>
- #include "internal.h"
- 
--/*
-- * Delay between key revocation/expiry in seconds
-- */
--unsigned key_gc_delay = 5 * 60;
-+#define KEY_GC_CHUNK_SIZE 64
- 
- /*
-  * Reaper for unused keys.
-@@ -22,18 +19,22 @@ unsigned key_gc_delay = 5 * 60;
- static void key_garbage_collector(struct work_struct *work);
- 
- struct workqueue_struct *key_gc_wq __ro_after_init;
--DECLARE_WORK(key_gc_work, key_garbage_collector);
- 
--/**
-- * key_gc_flush - Drain the garbage collector RCU callbacks
-+static struct {
-+	time64_t start;			/* expiry range start */
-+	time64_t end;			/* expiry range end */
-+	struct rb_node *cursor;		/* serial tree position */
-+	u8 state;			/* state flags */
-+	atomic_t seq;
-+	struct work_struct work;	/* work item */
-+} key_gc_work = {
-+	.work = __WORK_INITIALIZER(key_gc_work.work, key_garbage_collector),
-+};
-+
-+/*
-+ * Delay between key revocation/expiry in seconds
-  */
--void key_gc_flush(void)
--{
--	do {
--		rcu_barrier();
--	} while (flush_work(&key_gc_work));
--}
--EXPORT_SYMBOL_GPL(key_gc_flush);
-+unsigned int key_gc_delay = 5 * 60;
- 
- /*
-  * Reaper for links from keyrings to dead keys.
-@@ -44,6 +45,42 @@ static DEFINE_TIMER(key_gc_timer, key_gc_timer_func);
- static time64_t key_gc_next_run = TIME64_MAX;
- static unsigned long key_gc_flags;
- #define KEY_GC_KEY_EXPIRED	0	/* A key expired and needs unlinking */
-+#define KEY_GC_REAP_REQUESTED	1	/* Another complete pass was requested */
-+
-+/*
-+ * Schedule a new GC pass or re-schedule an ongoing GC pass.
-+ */
-+void key_schedule_gc_work(bool expired)
-+{
-+	unsigned long flags = BIT(KEY_GC_REAP_REQUESTED);
-+
-+	if (expired)
-+		flags |= BIT(KEY_GC_KEY_EXPIRED);
-+
-+	/* Publish all request flags together, after the caller's updates. */
-+	set_mask_bits(&key_gc_flags, 0, flags);
-+	queue_work(key_gc_wq, &key_gc_work.work);
-+}
-+
-+/**
-+ * key_gc_flush - Drain the garbage collector RCU callbacks
-+ */
-+void key_gc_flush(void)
-+{
-+	int seq;
-+
-+	do {
-+		while (flush_work(&key_gc_work.work) ||
-+		       work_pending(&key_gc_work.work))
-+			cpu_relax();
-+		seq = atomic_read_acquire(&key_gc_work.seq);
-+		rcu_barrier();
-+	} while (flush_work(&key_gc_work.work) ||
-+		 work_pending(&key_gc_work.work) ||
-+		 atomic_read_acquire(&key_gc_work.seq) != seq);
-+}
-+EXPORT_SYMBOL_GPL(key_gc_flush);
-+
- /*
-  * Schedule a garbage collection run.
-  * - time precision isn't particularly important
-@@ -57,7 +94,8 @@ void key_schedule_gc(time64_t gc_at)
- 
- 	if (gc_at <= now) {
- 		kdebug("IMMEDIATE");
--		queue_work(key_gc_wq, &key_gc_work);
-+		/* Catch expirations that became due during the scan. */
-+		key_schedule_gc_work(true);
- 	} else if (gc_at < key_gc_next_run) {
- 		kdebug("DEFERRED");
- 		key_gc_next_run = gc_at;
-@@ -79,15 +117,6 @@ void key_set_expiry(struct key *key, time64_t expiry)
- 	}
- }
- 
--/*
-- * Schedule a dead links collection run.
-- */
--void key_schedule_gc_links(void)
--{
--	set_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags);
--	queue_work(key_gc_wq, &key_gc_work);
--}
--
- /*
-  * Some key's cleanup time was met after it expired, so we need to get the
-  * reaper to go through a cycle finding expired keys.
-@@ -96,7 +125,7 @@ static void key_gc_timer_func(struct timer_list *unused)
- {
- 	kenter("");
- 	key_gc_next_run = TIME64_MAX;
--	key_schedule_gc_links();
-+	key_schedule_gc_work(true);
- }
- 
- /*
-@@ -104,7 +133,9 @@ static void key_gc_timer_func(struct timer_list *unused)
-  */
- static noinline void key_gc_unused_keys(struct list_head *keys)
- {
--	while (!list_empty(keys)) {
-+	unsigned int chunk = KEY_GC_CHUNK_SIZE;
-+
-+	while (!list_empty(keys) && chunk--) {
- 		struct key *key =
- 			list_entry(keys->next, struct key, graveyard_link);
- 		struct module *owner = key->type->owner;
-@@ -157,35 +188,46 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
- static void key_garbage_collector(struct work_struct *work)
- {
- 	static LIST_HEAD(graveyard);
--	u8 gc_state = 0;
-+	typeof(key_gc_work) *gc = &key_gc_work;
- #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
- #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
-+#define KEY_GC_DESTROYING	0x04	/* - We need to destroy keys */
- 
--	struct rb_node *cursor;
-+	unsigned int chunk = KEY_GC_CHUNK_SIZE;
-+	unsigned long flags;
- 	struct key *key;
--	time64_t new_timer, limit, expiry;
-+	time64_t expiry;
- 
--	kenter("[%lx]", key_gc_flags);
-+	kenter("[%lx,%x]", key_gc_flags, gc->state);
- 
--	limit = ktime_get_real_seconds();
-+	if (gc->state & KEY_GC_DESTROYING)
-+		goto destroy_keys;
-+	if (gc->cursor) {
-+		spin_lock(&key_serial_lock);
-+		goto continue_scanning;
-+	}
- 
--	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
--		gc_state |= KEY_GC_REAPING_LINKS;
--	kdebug("new pass %x", gc_state);
-+	flags = xchg(&key_gc_flags, 0);
-+	gc->start = ktime_get_real_seconds();
-+	gc->state = 0;
-+	if (flags & BIT(KEY_GC_KEY_EXPIRED))
-+		gc->state |= KEY_GC_REAPING_LINKS;
-+	kdebug("new pass %x", gc->state);
- 
--	new_timer = TIME64_MAX;
-+	gc->end = TIME64_MAX;
- 
- 	/* As only this function is permitted to remove things from the key
- 	 * serial tree, if cursor is non-NULL then it will always point to a
- 	 * valid node in the tree - even if lock got dropped.
- 	 */
- 	spin_lock(&key_serial_lock);
--	cursor = rb_first(&key_serial_tree);
-+	gc->cursor = rb_first(&key_serial_tree);
- 
- continue_scanning:
--	while (cursor) {
--		key = rb_entry(cursor, struct key, serial_node);
--		cursor = rb_next(cursor);
-+	while (gc->cursor && chunk) {
-+		key = rb_entry(gc->cursor, struct key, serial_node);
-+		gc->cursor = rb_next(gc->cursor);
-+		chunk--;
- 
- 		if (!test_bit_acquire(KEY_FLAG_USER_ALIVE, &key->flags)) {
- 			/* Clobber key->user after final put seen. */
-@@ -196,14 +238,14 @@ static void key_garbage_collector(struct work_struct *work)
- 		if (expiry != TIME64_MAX) {
- 			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
- 				expiry += key_gc_delay;
--			if (expiry > limit && expiry < new_timer) {
-+			if (expiry > gc->start && expiry < gc->end) {
- 				kdebug("will expire %x in %lld",
--				       key_serial(key), key->expiry - limit);
--				new_timer = key->expiry;
-+				       key_serial(key), key->expiry - gc->start);
-+				gc->end = key->expiry;
- 			}
- 		}
- 
--		if ((gc_state & KEY_GC_REAPING_LINKS) &&
-+		if ((gc->state & KEY_GC_REAPING_LINKS) &&
- 		    key->type == &key_type_keyring)
- 			goto found_keyring;
- 
-@@ -215,7 +257,11 @@ static void key_garbage_collector(struct work_struct *work)
- 	spin_unlock(&key_serial_lock);
- 
- maybe_resched:
--	if (cursor) {
-+	if (gc->cursor) {
-+		if (!chunk) {
-+			queue_work(key_gc_wq, &key_gc_work.work);
-+			goto out;
-+		}
- 		cond_resched();
- 		spin_lock(&key_serial_lock);
- 		goto continue_scanning;
-@@ -227,9 +273,9 @@ static void key_garbage_collector(struct work_struct *work)
- 	 */
- 	kdebug("pass complete");
- 
--	if (new_timer != TIME64_MAX) {
--		new_timer += key_gc_delay;
--		key_schedule_gc(new_timer);
-+	if (gc->end != TIME64_MAX) {
-+		gc->end += key_gc_delay;
-+		key_schedule_gc(gc->end);
- 	}
- 
- 	if (!list_empty(&graveyard)) {
-@@ -240,13 +286,27 @@ static void key_garbage_collector(struct work_struct *work)
- 		 */
- 		kdebug("gc sync");
- 		synchronize_rcu();
-+	}
-+
-+	gc->state |= KEY_GC_DESTROYING;
-+
-+destroy_keys:
-+	if (!list_empty(&graveyard)) {
- 		kdebug("gc keys");
- 		key_gc_unused_keys(&graveyard);
-+		if (!list_empty(&graveyard)) {
-+			queue_work(key_gc_wq, &key_gc_work.work);
-+			goto out;
-+		}
- 	}
--
--	if (gc_state & KEY_GC_REAP_AGAIN)
--		queue_work(key_gc_wq, &key_gc_work);
--	kleave(" [end %x]", gc_state);
-+	gc->state &= ~KEY_GC_DESTROYING;
-+
-+	if ((gc->state & KEY_GC_REAP_AGAIN) ||
-+	    test_bit(KEY_GC_REAP_REQUESTED, &key_gc_flags))
-+		queue_work(key_gc_wq, &key_gc_work.work);
-+out:
-+	atomic_inc_return(&gc->seq);
-+	kleave(" [end %x]", gc->state);
- 	return;
- 
- 	/* We found an unreferenced key - once we've removed it from the tree,
-@@ -258,7 +318,7 @@ static void key_garbage_collector(struct work_struct *work)
- 	spin_unlock(&key_serial_lock);
- 
- 	list_add_tail(&key->graveyard_link, &graveyard);
--	gc_state |= KEY_GC_REAP_AGAIN;
-+	gc->state |= KEY_GC_REAP_AGAIN;
- 	goto maybe_resched;
- 
- 	/* We found a keyring and we need to check the payload for links to
-@@ -268,6 +328,6 @@ static void key_garbage_collector(struct work_struct *work)
- 	 */
- found_keyring:
- 	spin_unlock(&key_serial_lock);
--	keyring_gc(key, limit);
-+	keyring_gc(key, gc->start);
- 	goto maybe_resched;
- }
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index f8918b69dc77..6b5bb63b0e9e 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -161,13 +161,12 @@ extern bool lookup_user_key_possessed(const struct key *key,
- extern long join_session_keyring(const char *name);
- extern void key_change_session_keyring(struct callback_head *twork);
- 
--extern struct work_struct key_gc_work;
- extern unsigned key_gc_delay;
- extern struct workqueue_struct *key_gc_wq;
- extern void keyring_gc(struct key *keyring, time64_t limit);
- void key_set_expiry(struct key *key, time64_t expiry);
- extern void key_schedule_gc(time64_t gc_at);
--extern void key_schedule_gc_links(void);
-+void key_schedule_gc_work(bool expired);
- 
- extern int key_task_permission(const key_ref_t key_ref,
- 			       const struct cred *cred,
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 80962c3ae12d..53106bee2d27 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -693,7 +693,7 @@ void key_put(struct key *key)
- 			}
- 			/* Mark key as safe for GC after key->user done. */
- 			clear_bit_unlock(KEY_FLAG_USER_ALIVE, &key->flags);
--			queue_work(key_gc_wq, &key_gc_work);
-+			key_schedule_gc_work(false);
- 		}
- 	}
- }
-@@ -1214,7 +1214,7 @@ void key_invalidate(struct key *key)
- 		down_write_nested(&key->sem, 1);
- 		if (!test_and_set_bit(KEY_FLAG_INVALIDATED, &key->flags)) {
- 			notify_key(key, NOTIFY_KEY_INVALIDATED, 0);
--			key_schedule_gc_links();
-+			key_schedule_gc_work(true);
- 		}
- 		up_write(&key->sem);
- 	}
-diff --git a/security/keys/keyring.c b/security/keys/keyring.c
-index b51abf698aa9..393e6d3fb4bd 100644
---- a/security/keys/keyring.c
-+++ b/security/keys/keyring.c
-@@ -266,7 +266,7 @@ void key_remove_domain(struct key_tag *domain_tag)
- {
- 	domain_tag->removed = true;
- 	if (!key_put_tag(domain_tag))
--		key_schedule_gc_links();
-+		key_schedule_gc_work(true);
- }
- 
- /*
--- 
-2.47.3
+Unfortunately, this doesn't help AFS much as that uses a UDP transport, but
+it might also help 9P, at least with its TCP transport.
+
+The patches can also be found here:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=netfs-next-3
+
+Thanks,
+David
+
+Changes
+=======
+ver #16)
+- Rebase on v7.4-rc1.
+- Add docs for the bvecq tools.
+- Add some kunit tests for the bvecq iterator.
+- Fixed issues found by local review with claude-opus-5-5:
+  - Added missing linux/mempool.h inclusion.
+  - Fix bvecq_alloc_one() to check the rounded-up allocation size against
+    the pool allocation size, not the struct+array size which may have a
+    gap.
+  - Fix bvecq_alloc_one() to limit the max slots to USHRT_MAX to not
+    overrun the slot counters.
+  - Make bvec_kmap_partial()'s bvec pointer const.
+  - Added an iter_to_sg kunit test for bvecq.
+  - Added a patch to make afs symlink's use of ->directory_size
+    consistent.
+  - In netfs_writeback_single(), fix the value ->submit_extendable_to is
+    set to (though a future patch series will remove this).
+  - Split the afs dir bvecq patch into three:
+    - A patch to pass the content length to netfs_writeback_single(),
+      separately from the buffer size in the iov_iter.  The filesystem is
+      then responsible for providing zeroed padding.
+      - A check is added to make sure the buffer is not smaller than the
+        content.
+      - The API doc is updated.
+    - A patch to simplify netfs_writeback_single():
+      - No looking inside the iov_iter.
+      - Effectively do DIO rather than buffered I/O (pagecache not used).
+      - Pass a single op to the cache.
+      - Wait synchronously for op completion for now as the calling
+        filesystem should otherwise do a wait.
+      - Removed the bits to set up a write to the server since it should
+        only write to the cache.
+    - A patch to switch afs dir (and symlink) buffering to use bvecq
+      instead of folio_queue.
+  - Clear new pages as added and clear the tail if shrunk by a third party
+    for AFS directories.
+  - Clear the buffer tail before calling netfs_writeback_single() for AFS
+    symlinks.
+  - Fix netfs_limit_bvecq() to handle empty bvecqs and short chains.
+  - Added missing SPDX to new doc.
+  - Added new files to MAINTAINERS.
+
+ver #15)
+- Fix issues from Sashiko[7]:
+  - Don't need to set page counts after calling alloc_pages_bulk().
+  - Adjust netfs_writeback_single() to return 0 on success, not the amount
+    written.
+  - Remove a couple of unused constants.
+
+ver #14)
+- Fix issues from Sashiko[6]:
+  - In iter_bvecq_get_pages(), use folio_get() not get_pages.
+  - In netfs_read_set_unlock_at(), netfs_read_unlock_folios(),
+    netfs_pgpriv2_unlock_copied_folios() and
+    netfs_writeback_unlock_folios(), skip wholly unoccupied bvecqs.
+  - Remove some now-unused trace bits.
+
+ver #13)
+- Fix issues from Sashiko[5]:
+  - In iter_bvecq_get_pages(), need to add bv_offset when calling
+    want_pages_array().
+  - In iter_bvecq_get_pages(), make the getting of a ref on the page
+    dependent on the page being non-slab.
+  - In bvecq_alloc_one(), use mempool_alloc(), not
+     mempool_alloc_noreserve().
+  - In bvecq_expand_buffer(), don't add __GFP_NORETRY|__GFP_WARN for
+    order 0 allocations.
+  - Drop the netfs_bv_slot tracepoint as it's not used in these patches.
+  - In afs_do_read_single(), afs_dir_get_block() and afs_do_read_symlink(),
+    use mapping_gfp_mask() rather than GFP_KERNEL.
+  - In netfs_writeback_single(), set ->submitted so that
+    netfs_wait_for_write() doesn't then just return -EIO.
+  - In netfs_unlock_abandoned_read_pages(), reset ->first_tail_slot when
+    moving on to next node.
+  - Remove netfs_folioq_trace(s) trace info enum and string set as their
+    tracepoint got removed.
+
+ver #12)
+- Split from v11 of "netfs: Keep track of folios in a segmented bio_vec[]
+  chain"[1]
+
+[1] https://lore.kernel.org/r/20260902173350.3468672-1-dhowells@redhat.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-experimental
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=ceph-iter
+[4] https://lore.kernel.org/netdev/168979108540.1905271.9720708849149797793.stgit@morisot.1015granger.net/
+[5] https://sashiko.dev/#/patchset/20260929075913.2740968-1-dhowells%40redhat.com
+[6] https://sashiko.dev/#/patchset/20260929103412.2807494-1-dhowells%40redhat.com
+[7] https://sashiko.dev/#/patchset/20260930125247.3232130-1-dhowells%40redhat.com
+
+David Howells (15):
+  Add a function to kmap one page of a multipage bio_vec
+  iov_iter: Add a segmented queue of bio_vec[]
+  netfs: Add some tools for managing bvecq chains
+  iov_iter: Add an API document for the bvecq structure
+  iov_iter: Add a bvecq kunit test
+  afs: Fix an inconsistency in the symlink code
+  netfs: Explicitly pass tail padding to netfs_writeback_single()
+  netfs: Change netfs_writeback_single() to not look inside the iterator
+  afs: Use a bvecq to hold dir content rather than folioq
+  cifs: Use a bvecq for buffering instead of a folioq
+  smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
+  netfs: Switch folioq to bvecq
+  smbdirect: Remove support for ITER_FOLIOQ from
+    smbdirect_map_sges_from_iter()
+  iov_iter: Remove ITER_FOLIOQ
+  netfs: Remove folio_queue
+
+ Documentation/core-api/bvecq.rst            | 229 ++++++++
+ Documentation/core-api/folio_queue.rst      | 209 -------
+ Documentation/core-api/index.rst            |   2 +-
+ Documentation/filesystems/netfs_library.rst |  47 +-
+ MAINTAINERS                                 |   3 +
+ fs/afs/dir.c                                |  47 +-
+ fs/afs/dir_edit.c                           |  44 +-
+ fs/afs/dir_search.c                         |  33 +-
+ fs/afs/inode.c                              |   2 +-
+ fs/afs/internal.h                           |   6 +-
+ fs/afs/symlink.c                            |  55 +-
+ fs/netfs/Makefile                           |   1 +
+ fs/netfs/buffered_read.c                    |  34 +-
+ fs/netfs/bvecq.c                            | 357 ++++++++++++
+ fs/netfs/internal.h                         |   8 +-
+ fs/netfs/iterator.c                         |  42 +-
+ fs/netfs/main.c                             |  13 +-
+ fs/netfs/misc.c                             |  96 ----
+ fs/netfs/objects.c                          |   1 -
+ fs/netfs/read_collect.c                     |  48 +-
+ fs/netfs/read_pgpriv2.c                     |  26 +-
+ fs/netfs/read_retry.c                       |  29 +-
+ fs/netfs/rolling_buffer.c                   | 190 ++-----
+ fs/netfs/stats.c                            |   6 +-
+ fs/netfs/write_collect.c                    |  26 +-
+ fs/netfs/write_issue.c                      | 195 ++-----
+ fs/smb/client/cifsglob.h                    |   2 +-
+ fs/smb/client/smb2ops.c                     |  78 ++-
+ fs/smb/smbdirect/connection.c               | 135 +++--
+ include/linux/bvec.h                        |  18 +
+ include/linux/bvecq.h                       | 176 ++++++
+ include/linux/folio_queue.h                 | 282 ---------
+ include/linux/iov_iter.h                    |  87 +--
+ include/linux/netfs.h                       |  18 +-
+ include/linux/rolling_buffer.h              |  42 +-
+ include/linux/uio.h                         |  17 +-
+ include/trace/events/netfs.h                |  37 +-
+ kernel/bpf/btf.c                            |   2 -
+ lib/Kconfig.debug                           |  13 +
+ lib/iov_iter.c                              | 517 ++++++++++++-----
+ lib/scatterlist.c                           |  82 ++-
+ lib/tests/Makefile                          |   1 +
+ lib/tests/kunit_bvecq.c                     | 599 ++++++++++++++++++++
+ lib/tests/kunit_iov_iter.c                  | 124 ++--
+ 44 files changed, 2395 insertions(+), 1584 deletions(-)
+ create mode 100644 Documentation/core-api/bvecq.rst
+ delete mode 100644 Documentation/core-api/folio_queue.rst
+ create mode 100644 fs/netfs/bvecq.c
+ create mode 100644 include/linux/bvecq.h
+ delete mode 100644 include/linux/folio_queue.h
+ create mode 100644 lib/tests/kunit_bvecq.c
 
