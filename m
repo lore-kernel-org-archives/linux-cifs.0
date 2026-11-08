@@ -1,123 +1,123 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.159
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794182105;
-	b=F12tjCKNli3sfKQ7HylgC8ADtrZO/MCk0nyJ/4rDd/34PBpu1/Xhpwe+prfBnIBpz27h
-	 P4mDGpJv3sYaIpfwgIMCghTJLQgLni7l54n2sUaR0IbKq2a8xvvULK6dNYS5u/4cseJ/d
-	 NY0Pltjz5XuZJIlTH5HbIJGG4wvmlAUhwhUCukAjhcLvGNV98aTTnMUqLGZJNO6gYLMyt
-	 zrJ+9dbCMIvyeDecwhXNU1c9sVLue8rRnKwIjkK2gaIF+ePAsKOBMfxhtyU3Z1epN8Hf1
-	 0KFdi7N+uXtRnxP/+QvT4HGgreD4dmyXLBMPWs6a9Vzm07SElVdTufsxRqUJbkFD/VQ==
+	t=1794182294;
+	b=jQWqNjnnZ2EA6Ufx2q+uzYJN2zZkFTxgcwNXKHHnP+RFp6SUBm3oExfvzbXnN6eQGo8A
+	 lxm+9oRFIreO52haXS3okGAiMwjwzelcuBSf3DgGdIgQVmU9NBDkahyZbz9B5RfKOLw/a
+	 jGojgsApDrTPgnHvkGU71a48Pux/B5GxY7Y8FwpMCiPfqmr1xfadrGQwJZXlffD3Emqbz
+	 G1EQzRFRzCcEYQs7W7BGXcNe8gd9qdqpvPcGZyGhJ5BCRLyhsWJfww7J4rnEEYB6Atm9+
+	 qY0iRhmRoniDgUy2mwDEJegAZmsuhkkiJC14mzIrpaDK6G8oyjEi2xjLFI34RMXV86w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794182105;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794182294;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
 	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
 	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=BpndL4iTPvg9OMSM6H3UrWIbx/z0vs888T4mTzoWqEc=;
-	b=5R5sSZQKdYR+WN+lBf9rcYQhe33MwnvJzl2hKXELi+dQKli3TfLYbZXPjf3/cm3Qgth6
-	 zubXYW3sriupgp4nN5a2LFzXTJVyhEZV5ThhL/naws0hDd2FfqBSusUVtM2KR57NSwZbN
-	 VqiGZngFpkTTqC6PJ7oaFnrrYLic0INhWdeZmdkKBS/Q4dWyE+pS3lx7n3HXvhvKzYwaO
-	 eqos79dNqV4naN7wryyyjzXCoH6gob6zJv8HOYeOpc8HgtVv3+huvxee1LtrdF6HqhaH9
-	 hh5UEOmYKPHUn2BsqWmfSjeaHTtXJHKP9JGKz56bsM1We63irNFB+kdbSlAbSTctMRg==
+	bh=6HF7A2w5JZp9CiXgboau4SrAMUsc4/+KR7klwr6o1+E=;
+	b=4di9SzaShA7jABO1b4HYG7stt3hXYk2x261h33DFW0pu2wF6FY2wm/6lpfLM/zIWSD9T
+	 4xFff2wkkXOVPqoGxaLgx/XCD2cgaRxIVVjX4ZZx+oBrcWg4MTpj1pJkK4ULc2X0E5rgo
+	 FkK7CSpqa9LVcNolq9Jp6+XsSziqwTdU01pirLNHplxKI3hiajA7X2eo01ptDfML5E+HJ
+	 H7QVKSqj9QB27HLKKpR3eGuCoZhFWUAO3g9O4C5j18rKcq7rH3r0H1va2rVzjPZjx0HNA
+	 IV4w6hp4ycLKAHNYixQlFU4Sc1YP4a/pG49O/VW9B/7nqWRPcQmecH9YZ4LNsdks1BQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fastmail.org;
 	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b="b+rNV/1u";
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=Mw9Y7Jby;
-	arc=none smtp.remote-ip=202.12.124.150
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=wjt9oy4f;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=Cncy2El6;
+	arc=none smtp.remote-ip=202.12.124.159
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D196A606A320
-	for <linux-cifs@vger.kernel.org>; Sun,  8 Nov 2026 23:55:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D196A606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA45606A31C
+	for <linux-cifs@vger.kernel.org>; Sun,  8 Nov 2026 23:58:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org DFA45606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=b+rNV/1u;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=Mw9Y7Jby
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id 2D7101D00067
-	for <linux-cifs@vger.kernel.org>; Sun,  8 Nov 2026 18:55:04 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Sun, 08 Nov 2026 18:55:04 -0500
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=wjt9oy4f;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=Cncy2El6
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id E18427A007E
+	for <linux-cifs@vger.kernel.org>; Sun,  8 Nov 2026 18:58:12 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Sun, 08 Nov 2026 18:58:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1794182103; x=
-	1794268503; bh=BpndL4iTPvg9OMSM6H3UrWIbx/z0vs888T4mTzoWqEc=; b=b
-	+rNV/1ui0AOHELpOlZTMNj+ewtUYIjwcvDZm/2sk5kvnTa0rb8UkhAVFdJLrPbiW
-	vOWy4+sb6CwLfr+dpTWctz4k0T+AeVmtWv2bPllIZ6+I/s/9oLGf51M1wGRQvP8x
-	+FNiS0Y5iUz8S73rmHyH6+QhXovVIamEcQf8JDeFKr0rWTt2AgdDMbYSjlApb45H
-	TNhh9uxTDkt/xn4laTEftel30H225tj4NnNnH3ej92jIFjBctm08krRnuHmnr2y3
-	Pncm20brCKV7CGSd6vt2gi7RQNVIGEJPrpbI7NHLMqQLSbWmyDArGFA8qHhDrmFk
-	2yqYuH4JR46D0/eU5vnfw==
+	:reply-to:subject:subject:to:to; s=fm3; t=1794182292; x=
+	1794268692; bh=6HF7A2w5JZp9CiXgboau4SrAMUsc4/+KR7klwr6o1+E=; b=w
+	jt9oy4foZOv97TXMfH5t/f9dt5HibPWI2IcYVRGlO/AiDQGJFJeHD1+TsgjOKTp9
+	ZevLPGHkmV4O/KRjHMT8fNjde/VBDFHCHsmIbx4G7+5a2fYZ/QUPA9iTlhoBmz0v
+	MoHytlFZPl4nzWNasSKQpNIpHcY4DkQc0qfuaKj8Ooewh4aY9sXmpBQGJGsimvX/
+	OUg7Ip9gsFrdtyruZ8W5qtLlA4Lo5nZ7vdonlv+Fv0URQJFWAtLNqGJ+Tbq7ieZV
+	1qspDddLAlhjBGNzdWt3E94qovshI+oL5ptNVmJSwIjfryI9vuvh1itV6DGtCBmi
+	pRj9l1T0kDWPx8yPYY1XA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1794182103; x=1794268503; bh=B
-	pndL4iTPvg9OMSM6H3UrWIbx/z0vs888T4mTzoWqEc=; b=Mw9Y7JbyFZXyzkBiy
-	Y+es4blFSDFO+lK1ag1g4F8m/ZIM7F5JLFQQ98EaN6H64ExuY2n1859z417feJd0
-	fP7i1HoJspWM522eoUO0JlhJOuFhj/CN9M5qj8QZY+jxGPMPh+HU56QRIeiC9Syp
-	DjpDqv1KgFB2TCK6SHbT1qv+KdCIo71RdmcxeudalondYzuBLj98vyhqKIKF5Lno
-	TxIjWnQ/zngqv9p9gQv6xgrrEfA0D4nyc7vgR7IXCfrgHK7v7jX5IOAP+2vgX6CQ
-	dJpTHQWKCKPY8Gwmj3tYTAwEPSJ9DjarKhxdxeDcb4bEIpfKEdkfTrjP/72gxQsy
-	bMI8g==
+	:x-me-sender:x-sasl-enc; s=fm3; t=1794182292; x=1794268692; bh=6
+	HF7A2w5JZp9CiXgboau4SrAMUsc4/+KR7klwr6o1+E=; b=Cncy2El6uOBeMd4U7
+	aFc/jFWrGn60r29L1Eo2jUNDu3Ua+WtKOxns9tFB++yLEsrFo+/MUMjbE2PnzZ9l
+	UC+ctkzTZknLH+a1SO80i3wxqbH20R5IqPJHoBitFwdd/zL+iZ2NRIzrD8mfFArp
+	mfl+LS/OUiGyFMYM6P/XgKhZ9H/mRojPs8O0dcp4n0Gx2So4Cis8sZVuyV1kzsAR
+	3syhfqn7HVwgGAlapO6ZpoZWPaZIlKUUS/OveqO/dyho0exFuBYSzhDdPtaK6vAw
+	sZw6HXdrj2FDZJpZvC3l3Rc2jaF9cFH9lLejTPejDHqWSmYgLJ7lbHRleyVwI+40
+	FUzkw==
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794182103; d=fastmail.org;
+DKIM2-Signature: i=1; m=1; t=1794182292; d=fastmail.org;
 	mf=PGljYkBmYXN0bWFpbC5vcmc+;
 	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:eZC3enHzqHJCULzEwYEoGMwquRlhRWT75k7iJgqpYOXW70V
-	nOCquBZdwHSbP1IqZYLc7skFvlllMpjCTmThq5WXZCiyMJXBOALMyZv7WZ3C0WOK
-	iq8YUFDWIyzRtELXn//D2Y+gm/I6W8+VOviGXj6wtrBXr2p547yk9gfiF7+tD3FO
-	xpAxNJesRYGXVPNF9f9FKrgNe+1mID4jab1L01vUKj19veKNnPleXL1LAXcpg5R2
-	mEuMTOfhGdQYohdzjcwdFmIPxqgzAXunGO23G+cAvw0Juoi9wxCkW6B/7Qvh53MR
-	/1KRMLBrxxqxRfCE5hh7do3JmBGU9m/PtcpVhVQ==;
+	s=fm3:rsa-sha256:1nE7x4DWR1VTLl0XWkADLXewuVs3Uee6V5bnDbJVnXP1m9y
+	KSidSPVbxYbfYJBFn05WR5OK81ZB8sGzvvvWpzG84iBV6KQnJSlDxJlL50AIFsie
+	Gy341lxB/9zk2igcyHSZ61cpAMFVwcCKugB8bikvNTSNOnlBFGqOrjIRVZd5FzA6
+	LIhIqlEH9iz5B2RHlBfmvP+eukmwwqQm264Qfi6m7LGpVcpDMgWj0Fhbxni89mOX
+	5k7t3QRFcbsj0SPE4mMnxMDgO2ZnPMr1YvbsHxEhsdB+K5zz3IPckEES+rtvlBZR
+	ahuqSHC2ydJFgg5YZs3dpYP2UaTveoOKYqsgUHA==;
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=mi-m=1; hc=11;
 	hn=cc,content-transfer-encoding,date,feedback-id,from,
 	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:TV0oMHwgxZTxvC9kA6NQUdqRauUlF9WZ3y/3uZ4EOqo=:BpndL4iTPvg9OMSM6H3UrWIbx/z0vs888T4mTzoWqEc=;
-X-ME-Sender: <xms:1wvxamVNdlKWVrIHQp-Zbe2rF0JLpGA7oc9Rn9gFkkPV8GV3lPZDYQ>
-    <xme:1wvxakHcpNos3us5_OxNGfCBUnppLeHoin1INNbQm4oSitj7fQU6Bu-7PFw6tGgL5
-    9S0i5oUSSc1xH5FYbD7dVWwJwUhcxhS34DvW1ZSVFviWxYL-e9zUrSR>
-X-ME-Received: <xmr:1wvxaqfqFdXs-gPdw0j5ZU_c26Fp4I0qAyLdD3KtkoJH5QrYiGPjBHaxVlrxQglY>
-X-ME-Proxy-Cause: dmFkZTEyDnw7Z7VWzhWex0tucN4MtH8vIB2allEtx2PrS/GGZY0nkqQBJE8oy6qoZ7f2aq
-    CxMGjy7leTCHBM59/etU/naH5Lmf784tMvEcmZSGk+XWzl8O3T8RVYLJ4Q0cXcYWfs5xNq
-    +YYr8cVmqi54rfAcbGQXaX9Y470AIhLpjC7EebMPrH71J1WpcbbSeX6soGaovm8QPmEc54
-    83Ft5en6hEmHAH+Xu+MKtV5r4/yc9mPHzBIhBMS7C+oWKMhFARflilGEQ1nfynlX8qfZnm
-    MdeVaSNy6vME6g9V1W35fZDr5FmX8AEfCh8U66eOXBSCiD5lpp0+fslTMZNd9ZBDy28QV3
-    rnSrSg2unt/QDUq+bSERe9yo5ryQVfZcXsWe7QDfCX4bSJnVTbShz3Crh96jGw9v6WjjQx
-    FpvNB6dmVzrMVNpFaTnf+AjDUE0+jI96hqrnVWzoXvdA+5VXBmP4P0JpusRaRh1wwI5n6I
-    ERMaan5c63yMb85uDYQOWd0JaA43zqPEjOrSTz5i7sxJVCsfhmRx3rKFRg1iqNzvakXPLM
-    V1BHXC3ozjN0FaG/0QV3QLtVGLe0CcnqpZ0qhY5CR2Lx0p8arEj+5ZRRwMsN/1IhMs4s7W
-    1afNnt6PhpVRJZq4B0wVASu/HCgcvYsk5/R/Jb/KW8X/uz01/KNlDbC17B1g
-X-ME-Proxy: <xmx:1wvxatJMF5O7XfGAnvjACmNkbH1LY59yidFfZFkEtUbE-J6xA626pw>
-    <xmx:1wvxanGpwdMzxDMxtxgy2xrZj2VTzvRlVntH92ONRs8W7fT0gAqrHg>
-    <xmx:1wvxaoDsTVFvNd-Bi3bUAeXjhgvXXR8RJk7UI2D0Zoflr-YHwvgcXA>
-    <xmx:1wvxai8NbO-DVw1uaL5CGDmCf6IjrtbbHDVyh1dbUCcoDnPRyNqltg>
-    <xmx:1wvxakAVX5GTPQa_UqbUnMtuavdKiDRRtR_CD7lhxUAbxFpjuyTXc4mt>
+Message-Instance: m=1; h=sha256:T7arZ3r6jExF1rOizc+AUn7aiNRo+aCADexJsy3PnPY=:6HF7A2w5JZp9CiXgboau4SrAMUsc4/+KR7klwr6o1+E=;
+X-ME-Sender: <xms:lAzxalCObCPwm-RIwMTJqDugpTAKQhEswLQMbYPMUC2lnLt5EonS8g>
+    <xme:lAzxalCidbSOrGnRVaUhBMEC8mnEx3tV5oIXDoaLkx38jCGCmE3Lnyt1zyIbk4as6
+    6X0FHeTy3BJcawECRljulGqUfiFh7xlja2R5ivZcJd8tH8vPJbtFDs>
+X-ME-Received: <xmr:lAzxagq5v7zZCkfXqqCTjQgdvLcgZjhvGbdM0ycB_n3bIChM-OjSRK0CSUWsNjfi>
+X-ME-Proxy-Cause: dmFkZTG1tboIGfyRP83MqnDVBpyiQnXFYFjtglUn7niQiNXBCd/0FDvY7bOMyu7eyI+Fox
+    3teq3wLO3BI5PkeK6FRUS5Iw34AiDcM4szV+TId30yEliSltD3Ad5mU4d++0M+h6O6VHSg
+    FOzZScghTebcQZL4g5eUgARU5ISRvkx1t6R070O0bLglCJEIp/hJUXNiA1uu37s2whr30H
+    zR3FRZTeFq+8s4Ex0j4m6xplIoCFKK9DSnbd2NVVxZ8RUwn37ZfxArhgZxUVSHJ47pYtwU
+    mEtWVAlQ5ydEBRq5ri9CY3r1Glyg3GRI9ydN0yOKin2wHhoMbLchX1AxgSt+zl6MvqyldQ
+    8a0euoj20TZd9Q7zw1lrCpz/lSSp/HSV5EfYt7PRaciYPrYi/2pcApIJbX8EHDKwrw+d5s
+    3D+79p2gw/CpScKLIAkPmho3/URSi/6bl2l5NIbb+P0IxklZZOvp7LthRtDBLK9q8k5siW
+    2YvZeeqRipuEaBIp9yc8VM0ncZAygl3UH3efTosb1TTh1fGgAhPn63ROYkcUEZTM22SVDW
+    z6ukxQ4BHCOhPXRTTjWtpAxQK2Uiz/akjnmNFiNpMEZ5k39oZdjnBwWvzA22DdCF+HPcsz
+    Ac4jMuJ8340tF3pZjkTn+E8BzRMF/KbkIvZeAmVjJ1duC1JKbpqL32tCiwFw
+X-ME-Proxy: <xmx:lAzxavkeFePWAR1McwVnR-ZMiZ-FOs5LAgDEgZndhqyCb72EkCsBHg>
+    <xmx:lAzxagwul3uJswRnS5T6RDO7uol_PMmCeZpnYYwtkvCIjA-U-PIipA>
+    <xmx:lAzxan-kPkWMSPPAc9g4PN4-Zcu1F21WoyQZv_KsRvh-v2s_KMuSvw>
+    <xmx:lAzxasJ-TdMEbTDSZTfcqUzATPZSF9WaKTFOeipW095uW7SdmR8VKQ>
+    <xmx:lAzxatVlgRBMdBzFIbH1W61261YJT2MVd-V1XKyz2XZhtseFkPyMxOr->
 Feedback-ID: ib53e4b78:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 8 Nov 2026 18:55:03 -0500 (EST)
+ 8 Nov 2026 18:58:11 -0500 (EST)
 From: Ian Bridges <icb@fastmail.org>
 To: Noah Weinberger <NoahWeinberger2003@proton.me>
 Cc: linkinjeon@kernel.org,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ian Bridges <icb@fastmail.org>
-Subject: Re: [PATCH] ksmbd: check sign flag of the current compound command
-Date: Sun,  8 Nov 2026 17:54:57 -0600
-Message-ID: <20261108235457.1919632-1-icb@fastmail.org>
+Subject: Re: [PATCH] ksmbd: take credits lock for SMB1 negotiate accounting
+Date: Sun,  8 Nov 2026 17:58:07 -0600
+Message-ID: <20261108235807.1919994-1-icb@fastmail.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <IQLTi_rZrPgaD4zlFXgSybFdR3EsaBQVIorCAH3otR3SGOlNjacAL7jt2xb4mhqNNcdBMPel5CrrBxTOsKoRIFuil5wToLwoYXtR8AJ9vF8=@proton.me>
-References: <IQLTi_rZrPgaD4zlFXgSybFdR3EsaBQVIorCAH3otR3SGOlNjacAL7jt2xb4mhqNNcdBMPel5CrrBxTOsKoRIFuil5wToLwoYXtR8AJ9vF8=@proton.me>
+In-Reply-To: <oPhvAPE0sxlR5lgMX9hnaRTGnfk-M5xIdlUmNn35FwqbLJ9lx9Rn3gva5lYH0iR9rxit-qJXK4e3IXqlJGu0nAJ2rTD58d-aFphchKYXFhQ=@proton.me>
+References: <oPhvAPE0sxlR5lgMX9hnaRTGnfk-M5xIdlUmNn35FwqbLJ9lx9Rn3gva5lYH0iR9rxit-qJXK4e3IXqlJGu0nAJ2rTD58d-aFphchKYXFhQ=@proton.me>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -129,42 +129,23 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Sun, 08 Nov 2026 22:34:08 +0000, Noah Weinberger wrote:
-> smb2_is_sign_req() decides whether a command must be verified/answered
-> signed based on the FIRST command's header, even when dispatching
-> commands 2..N of a compound, so the SIGNED flag of the current command
-> is ignored and its response goes out unsigned.
+On Sun, 08 Nov 2026 22:34:09 +0000, Noah Weinberger wrote:
+> The SMB1 multi-protocol negotiate path increments
+> conn->outstanding_credits outside conn->credits_lock, while every other
+> writer of that counter holds the lock.
 
-The report is right for the request side. __process_request() runs once
-per compound member, and each member's own SIGNED flag should decide
-whether its signature is checked. I found no bypass either way. A member
-of a session that requires signing is still refused when it is unsigned,
-and a signed member is still verified with its own session's key.
+I can confirm this. smb2_validate_credit_charge(),
+smb2_set_rsp_credits() and the release on the send path all update
+outstanding_credits under credits_lock. The increment in
+ksmbd_verify_smb_message() is the only one outside it. The suggested
+change moves it into the critical section that already follows it. The
+increment is still returned by smb2_set_rsp_credits() as before.
 
-The suggested change does not fix the response side, though. It moves
-the problem there.
-
-__handle_ksmbd_work() calls is_sign_req() a second time to decide
-whether to sign the response. That call comes after
-is_chained_smb2_message(). For every command except the last,
-is_chained_smb2_message() calls init_chained_smb2_rsp(), which has
-already moved next_smb2_rcv_hdr_off to the next request. The response
-that gets signed is the one just built, because smb2_set_sign_rsp() and
-smb3_set_sign_rsp() sign ksmbd_resp_buf_curr(). With the change, whether
-response N is signed therefore depends on the SIGNED flag of request
-N+1.
-
-If request N is signed and request N+1 is not, response N goes out
-unsigned. If request N is unsigned and request N+1 is signed, response N
-goes out signed, although a response to an unsigned request must not be
-signed.
-
-This only matters when the session does not require signing, because a
-session that requires it signs every response anyway. It also needs a
-compound that mixes signed and unsigned commands.
-
-I tested both sides on ksmbd-for-next with compounds of two
-TREE_CONNECTs, on a session that does not require signing.
+I also tried to reproduce the issue, with and without the change. After
+an SMB1 negotiate, an SMB2 session and a few requests, the counter is
+back at 0. Two SMB1 negotiates sent in one write are answered one after
+the other. An SMB1 negotiate on a connection that is already on SMB2 is
+ignored. This matches your reasoning that the race cannot happen.
 
 Thanks,
 Ian
