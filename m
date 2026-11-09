@@ -1,97 +1,127 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794254303;
-	b=O0Pp5z6tKo9fntDuY1oUpj7LKeyQQR/OqcjJPnjoJc9jIUseTD7brJYE16Bvriiht9LH
-	 rlTjNUOfeHYeib+jS4R13bfyGCFVJpWKHqb55SpyNd/0+vWQmNzx3bkhYBd9eTAVHB02a
-	 tdJqbuojlUtTq73UnSJXxv2XHzpddpVXHkynBwiUQW94UxOECuQDTwAJZZe8EH6UN6T9c
-	 FZ2j1n/WFQLawjv+e/lR5mO01OKHnsg9TuNjIx9mP6qee7k6GbNOiUYAxPLyQEnv4CuFB
-	 uEhNcuigPKV9qrXKttCF/X1vs91EPTh/1kam+VWaqc420bTkGEa4USiGEchBNePgHuA==
+	t=1794260762;
+	b=dwrsZu1c+Q7tGAK+3fiXibiI95W3xuKI4Z4/hsT4xel3JKa5EDSsJYP9+qtw3SA7t7aY
+	 HR7609ITz6RN/v+zU3Z6tW0qsvNx69Ue1wHhhkZ6bHQ/TH33yJybUzS31Fix3vJaXn7X4
+	 cJ89E+xy5KDzHMW/UsomgUSgUZYmERGVQ05JZi48Kkiq1sGveq/EQk2HCTiofZ/2eyMMk
+	 SdoDDdNq5aDh5taMG2E5rKLnepTbzlB25ZLoz6nlkAi4pvcj6k5lR1GZvPuICi6Ugvzyj
+	 7vrqt7B9pqxurjD1UbCPcWk2Pwau4YQboLRu3qUbFvVG/T317AVYmXWF30NtftUkcYA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794254303;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794260762;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=LjlIdWOtAx4vgBSOIZMhE9Gxzn2GjEyrd7gwD+Ba4Y0=;
-	b=la+SXNUA3mYjKp7TNybv46htyvWZ9ixQxrW9JZGA8yl7LoxNzpzFgYdEM75ci5i1G3Y6
-	 fbYNwblD5zHekeWqrgyfeprkfWHPIEW4s6hiy1o9jkHl/H7YKXoTk5mRSK47yRMS5V9Ys
-	 4qcHa1spbP3q5BZQ/AFWRjwxeCqFdEOy8DF85kdMdH5MMQelU1qSL+OpxXf8EfxD6R0/V
-	 FIueov9iZ4P1KyFizl+BPcgejxRxKA6sMYHfwHTGxCA6YTB6NP6fpiXiOpRp7RQlhu4lK
-	 e2pawpIHxJXilm6noaJ7H0DutpHOY0UpW9/XrFO4gJU/IWTovkjnb4pIAidIL/SQ2zQ==
+	 Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:X-Mailer:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=874yjmK9ypxK94+nKOJ/uR1d6HpqK0owgIThZQA8ZUA=;
+	b=YiOIVmikptWx9CxySeuGubQEaK+xhhxq5GQCTA7Ijox6mLlsbfjdOXzmFaRXghG+lPx8
+	 d5JDvVgPxCewqac+Dnv9tUDONGWoSK9sYKkFn3pGGLVKd8RP9QahHzY5oUS8Gg/qbNKuL
+	 Z1PPbUnSXXJMMNnhYzPNbnGFlYQXhkOJ9mpYsNKIHcVJS8iiFeLKOb/892ngf86xaz76H
+	 cQIMVAHjzAZXvmW2KLpGjROJKzC5fNjA4UhiLVXAeqVBy8OJuQuBcOvP8LytcSZG/gqUg
+	 FqZIJ8edqe9sFm+Qyn/YIxH9YCQJ+Fc66rQO8ECpOeQ1x3ywrcFa+nTX2bJV0jfrfvA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="R/1WuOAu";
-	arc=none smtp.remote-ip=209.85.210.178
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LaZ0qPv5;
+	arc=none smtp.remote-ip=209.85.221.44
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9BE606A334
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2026 19:58:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C9BE606A334
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90903606A326
+	for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2026 21:46:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 90903606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=R/1WuOAu
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8b5efadd183so583412b3a.1
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2026 11:58:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=LaZ0qPv5
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-492f6b7f70dso881093f8f.0
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2026 13:46:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794254302; x=1794859102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=LjlIdWOtAx4vgBSOIZMhE9Gxzn2GjEyrd7gwD+Ba4Y0=;
-        b=R/1WuOAuCnN/JHW6ktRQlo8KATUbKPdmjv9knkQlezuppBKQ2QFjLENs6otezsL2xP
-         eTi11KqJIzewO8F4GEX9Pf6o4wLrfbGRV4H9OSeZy3ikk84qdvC4VMdEMg/MHDhDNLVv
-         yv4ssmwMsCkU4txSd9s/sNEluf8Pigwe2x3/j3/gXS/kK2AAnjAD+0PdFvTVfnpnzLh/
-         fBvyKMdHhUoSFRmcYglCQljvABVmnVeCkXj1NCgIQil7Gk/POjf49qomsOEd0fN8NByQ
-         wbFuKhXBaMycT4NEbjJxj+bT9JfZWmsfDPrZ9S7aOK25smaHJEJaVgMkSFajcl+3hg6B
-         jaCw==
+        d=gmail.com; s=20260707; t=1794260761; x=1794865561; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=874yjmK9ypxK94+nKOJ/uR1d6HpqK0owgIThZQA8ZUA=;
+        b=LaZ0qPv5+whTFQHjIA7oYo021SUS2QeXnWN8ii9Y4im7Ue68o46nz2xh/hHMwIUfQ/
+         ICad5fyoXePYl6/8nNVhZk6UxBKiDwJbHcHq6QklDSJskt7Ox2MaUqpcgklbAASOb1WD
+         7U13gt1MK2zXHTSuMFiAfjmE40I4QhfpTIR2Mc6nMOBQW6Dg/mqe6U/h69Hyf/QnrKae
+         CyKIviPRPYc2tnG0IM8qOylYYY2PKnrUJzf833wY0ZcFYDbyZdAS7ekVESO+FaUUNtdA
+         WzN6sPDUCv7pE3hPSGmxzNcqgZM1jmpktE+mpPCXGo9ukB9qCsiBySNit7DIM51G+Ivt
+         K68Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794254302; x=1794859102;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=LjlIdWOtAx4vgBSOIZMhE9Gxzn2GjEyrd7gwD+Ba4Y0=;
-        b=glb3h8tr8NItZzCnD3ulrPQcTZAdHxXUkplIRM1AQlrkn9sjhkztJPku6Z7E/CHR/M
-         WxFL8he1aVPTxqbOGKepazzN6ma3f94bGeH0wOF/h3Gt4XhnbjzZNKGAD4Z2m15NFdVL
-         yyBwTatg2OKjktcV4jD0xVL6JOVVGArD+rJdohOtzDc/QYqyaoRoulsl4AEAp8rxb7Jf
-         aKfrwN++GvAF87THlOgWfqHLt0RLRDLUMzEO9c53P4bwas/iljyeDdbNtcVmts7Vg2Pf
-         17h+eQQPz47gDK8XUYOmh4TmNiY7RNa7vy57TSDOa30TBNvA3q6aVnwVPOxkGDtpRfjX
-         COtQ==
-X-Forwarded-Encrypted: i=1; AL+hErEcHjlmXBo21ot1OnQilSlP1R+kSkqdrEee4XKuR7uhF+WDkTxLMYhe6amXvmuAoi7KXBu5OhrL3fKt@vger.kernel.org
-X-Gm-Message-State: APuU4Z9S4LXIlHCT3DykHI9r95mNz+aFGBkEI1zZep5RDVI69EcAGZ4s
-	rsi4N0ICta3RzaPtOX1saNfPi2FsTQI3Z5vlSfWt+zDNTvD+J6Thf/FO
-X-Gm-Gg: AYBFou2QtKFp7eOF+VeDjTg7c6sLH5RYxEEG02H+ThyxCO5VrTnFG0p+j55RcS7r51i
-	WYX1QpFxvZd/E7EqjUwGLoXvHSJ+mnaoUt9RNsWGBuA9aSyS6EU0HAMWxoZbnDK4C8AetsTvm54
-	y2YlycuEmpsMeNkxFfzR9lFqRmn7IKyLpH0hnOzX5OQK7nwI+Hxz1s+yDkOz66cG6X+u/b4z32g
-	Pp6pHWUb0osOWriKEZR0DM+opfLkIymztex7XdIGO+AoHTEJXXB+fHf+cBrtJ6LRf3UFKHO4rM4
-	gjemEI1Br1gZqXliJhHCdjb/9WwJXFYHwhSuQWOhxDtKv9vRscE/G3XVhwGoISr6z+CqgzVDyIF
-	BHbiNTebhFZyeg5b8a0/AUJAHZM/NOZZUJ/V1fKdHoO7VmtwX4wQaeHeDRMc2tt2AXo2gOHErI+
-	/7OK3Ec1KxoIszGWcnpKVoAM0snaO08VIMQt79XjkXrhFTYlUSgbpmLDclLwCzZJvpSwQhDK4HK
-	JynuHNLC/S/VOa14tJDlzTTTJWQ5MenVwkOKWheka0lC51g9gxBrbvnSb6ZLImOY3744raZP6sY
-	3W+cleVs6R3pnE+lP9GdE6ZZ0/AZF2AfqEgf82OevrOai9zjJgjWyKUn0VI+Q5tdxxcS8uuILki
-	TGrmhPA9/0ejSEWZfo6HoKfgMsb/Pf/Bq8j46+UTaWsEGSwY9LfbfBD8=
-X-Received: by 2002:a05:6a21:110:b0:3e2:4e6e:6ca3 with SMTP id adf61e73a8af0-3f18fb8127amr165601637.34.1794254301572;
-        Mon, 09 Nov 2026 11:58:21 -0800 (PST)
-Received: from localhost.localdomain (mx-ll-183.88.2-201.dynamic.3bb.co.th. [183.88.2.201])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baaa2a7fbesm61629b3a.11.2026.11.09.11.58.18
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 09 Nov 2026 11:58:21 -0800 (PST)
-From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-To: linkinjeon@kernel.org,
-	stfrench@microsoft.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michail Andreas Michalopoulos <mike.michalo@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: refuse reauthentication of an expired session as another user
-Date: Tue, 10 Nov 2026 02:58:13 +0700
-Message-ID: <20261109195813.24238-1-mike.michalo@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1794260761; x=1794865561;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=874yjmK9ypxK94+nKOJ/uR1d6HpqK0owgIThZQA8ZUA=;
+        b=XV3uM6qZJheoQJtbiPbBOtZp92LxEKb4KXwUIBxMX62P2QGgOOhl61XtcUOSLtKho6
+         hBABHZyEilqV3593xtIQ9B5tkyvfmsw/nHZpkppzQbyah0kZCv+nvOlYpGC4uDB9K12W
+         v6jxgsKy4WfWQwulW57hFzBRz5tyisUcQWF7dlAJ0vjEe8Gu31MHU96j2efguHFzfPDp
+         rd+zN6iW18lmr91Or4/p/23eomRzlTP+KisY0LP/i6G1R8CP6rVZiejioI7ToJtxN7n+
+         eBO4XECdleUbPOHMNXXZ8tiiLhwexOb2Mycyw4ufkPW32lO7OTufItZW2yt26KLzhdXn
+         Rkng==
+X-Forwarded-Encrypted: i=1; AL+hErH4awyOv/WGUa2ZWsdeMONdupdWBrnfzyUrNILw+khlORXexaGA9fddMldGX5noacVTWDbeZBzj00cB@vger.kernel.org
+X-Gm-Message-State: APuU4Z/FnPB8kB+VGCUE+SoY27xzIYJUNpSqaK+B0jbThlpT+jNNpBs4
+	/tZsg3WeS/9kQyLm5eMBtcl0riNcNUOfEurNKPpGTbuaQjqoJj6GHvKu
+X-Gm-Gg: AYBFou2Sx1n1qet2iQkOpdBUcgM1/ABxqfl1930R2kV2w2PkIGOPuOduSLPlooX7Bi3
+	pGJSigRmsNhQAOFtuVQ4bTAm15dpbxXOt0yzmaOy0aKsSoLoz+HvT84y7p2n3d+ATtHFLR82dLv
+	IJ8VYf2XDNeUWM85I+Kt7nTEKOjoKF/aLw3XXDIvzip5er1j+QX/3k/2ZMEQrjTTe4Oyh/h5jyZ
+	dHNlb2YACWbthhZlOL7Bo2n/pZB8ERy6QnCXiHqitpb3PXJyrd1rL+P7zGAtdTxqYnS8MqJOxxP
+	ffWHHWk00oxLWiQbbqOvVzSrpb6uvsar1Ucx1cGchgZ75b9Hacpvx+vqo8PL6kaOy96sSdNQEWr
+	ScAqRVr1IIT5SBp7Kba3IZc4QR6V5iDJzhCwcofNxa3DdndKV3KlVfZTyGmQTpIIqGhhkT2d1DS
+	WTNcgDYABj7IQ7MxV69/9dG2MllVLQ1Fnflr5IFx5qT22aumKlC25kOpeDaJ7eyj/tbT+poow7x
+	KT0rIwZW+qjUGXLaWAsF1VOX+ubgauNBpApNQFlcMxyNpZSHh/jA9eXDh0BF6RePKM7sO9IRvLR
+	N5RYplTFUG5Q387He8J+5tNySO3dXU4Y5XlyYTm2FkD6MVnBMZzCBW9yTWVWJ/8Y5g==
+X-Received: by 2002:a05:6000:288d:b0:48e:25e1:5eb8 with SMTP id ffacd0b85a97d-4982b28aa42mr1487213f8f.3.1794260760763;
+        Mon, 09 Nov 2026 13:46:00 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4983585c4fdsm1213644f8f.10.2026.11.09.13.45.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2026 13:46:00 -0800 (PST)
+Date: Mon, 9 Nov 2026 21:45:58 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: "Maciej W. Rozycki" <macro@orcam.me.uk>
+Cc: Christian Brauner <brauner@kernel.org>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, linux-fsdevel@vger.kernel.org, Linus Torvalds
+ <torvalds@linux-foundation.org>, Jann Horn <jannh@google.com>, Josef Bacik
+ <josef@toxicpanda.com>, Chris Mason <mason@kernel.org>, Jeff Layton
+ <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Eric Dumazet
+ <edumazet@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Al Viro
+ <viro@zeniv.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Christoph
+ Hellwig <hch@lst.de>, Greg Kroah-Hartman <gregkh@suse.de>, Joel Granados
+ <joel.granados@kernel.org>, Kees Cook <kees@kernel.org>, Jan Kara
+ <jack@suse.cz>, Jan Kara <jack@suse.com>, linux-kernel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ netdev@vger.kernel.org, ntfs3@lists.linux.dev,
+ platform-driver-x86@vger.kernel.org, coreteam@netfilter.org,
+ kexec@lists.infradead.org, linux-pci@vger.kernel.org,
+ linux-sound@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, ibm-acpi-devel@lists.sourceforge.net,
+ jfs-discussion@lists.sourceforge.net, linux-alpha@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-cifs@vger.kernel.org,
+ linux-fbdev@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-mm@kvack.org, linux-sh@vger.kernel.org, linux-usb@vger.kernel.org,
+ samba-technical@lists.samba.org, sparclinux@vger.kernel.org,
+ linux-m68k@lists.linux-m68k.org, linux-doc@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-atm-general@lists.sourceforge.net,
+ Takashi Iwai <tiwai@suse.de>, linux-input@vger.kernel.org,
+ linux-raid@vger.kernel.org, linux-ext4@vger.kernel.org,
+ linux-modules@vger.kernel.org, linux-debuggers@vger.kernel.org, Chuck Lever
+ <cel@kernel.org>
+Subject: Re: [PATCH RESEND v2 14/23] proc: let procfs copy in writes before
+ pinning the entry
+Message-ID: <20261109214558.0d9d5228@pumpkin>
+In-Reply-To: <alpine.DEB.2.21.2611090504170.17804@angie.orcam.me.uk>
+References: <20261104-work-procfs-core-v2-14-76ace653a773@kernel.org>
+	<CAMuHMdVfakapgBK6TBhO1iWX8qzvLDk8jzRS=t2MVa5G=MCUeg@mail.gmail.com>
+	<20261107-akteur-gemieden-eckdaten-21304d085e35@brauner>
+	<20261108185953.28054fb3@pumpkin>
+	<alpine.DEB.2.21.2611090504170.17804@angie.orcam.me.uk>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -101,57 +131,34 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-When a Kerberos session expires, its owner can reauthenticate it. For an
-NTLM reauthentication, ntlm_authenticate() only compares the new user with
-sess->user when the session is still valid. An expired session is in
-SMB2_SESSION_IN_PROGRESS during the reauthentication, so it takes the
-other branch and simply sets sess->user to the new user:
+On Mon, 9 Nov 2026 05:05:57 +0000 (GMT)
+"Maciej W. Rozycki" <macro@orcam.me.uk> wrote:
 
-- the session's open files, tree connects and other state, created under
-  the original user's identity, now belong to whichever user just
-  authenticated, and a later Kerberos reauthentication is compared
-  against that user rather than the original one;
-- the original struct ksmbd_user is overwritten without being freed.
+> On Sun, 8 Nov 2026, David Laight wrote:
+> 
+> > > > While at it, I think it would be good to use this conversion as an
+> > > > opportunity to replace "char *" by "void *", which will probably let
+> > > > you drop several casts from users.    
+> > > 
+> > > So I tried that too. The thing is it drops exactly one u8 * cast in
+> > > ntfs3's label write.   
+> > 
+> > Since char is now unsigned that one isn't even needed...  
+> 
+>  Please excuse me missing the context, but what circumstances does your 
+> claim refer to?
 
-krb5_authenticate() already refuses a different user in this case, and
-the valid-session branch of ntlm_authenticate() does too. Do the same for
-an expired session: compare with the existing user and refuse a different
-one with -EKEYREJECTED, freeing the newly looked-up user either way.
+Just that the cast would have to be:
+	u8 *foo = (u8 *)bar;
+where 'bar' is 'char *', and I don't think you need a cast there when
+char is unsigned.
 
-An AI assistant was used to find and fix this and as an independent
-reviewer.
-
-Fixes: a47634cd729b ("ksmbd: expire SMB sessions when Kerberos tickets expire")
-Cc: stable@vger.kernel.org
-Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
----
- fs/smb/server/smb2pdu.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index b084cca8813cc..234439c1526f9 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -2365,6 +2365,17 @@ static int ntlm_authenticate(struct ksmbd_work *work,
- 			return -EKEYREJECTED;
- 		}
- 		ksmbd_free_user(user);
-+	} else if (sess->user) {
-+		/*
-+		 * Reauthentication of an expired session: as for a valid
-+		 * session, and as krb5_authenticate() does, it must be by the
-+		 * same user. Replacing sess->user would also leak the old one.
-+		 */
-+		if (!ksmbd_compare_user(sess->user, user)) {
-+			ksmbd_free_user(user);
-+			return -EKEYREJECTED;
-+		}
-+		ksmbd_free_user(user);
- 	} else {
- 		sess->user = user;
- 	}
--- 
-2.43.0
+David
+ 
+> 
+>   Maciej
+> 
 
