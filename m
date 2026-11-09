@@ -1,100 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.52
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794189440;
-	b=VoT7T/HnUZsvg/djVDA28QxeiZ3MPPSvnFcbBN0QBrKe2buqaeasVLWhMDbZN+IgMmzY
-	 UKHwmetV2z9kObjXLvz/TRArjyELe/uZO9UC4wBj5Y8iUfg5JQyQyvhx7dG+yz+rRdgRn
-	 oMb4YjAGRX3+br3DrSZgt+ZDd9wdNadVHHCBPDo7JX/shifV+dTHReLaDomkGtR0cJc1L
-	 631K0y1ZkBcTvvG2XmxCNVboeSF4BBJHOGqiuxVcMPZYrASa9bDLRFZTTnq+BmUxIBOy8
-	 njuVWkb1Eec2jx54f6aV7OqYqorUsjnvXU4FgO6yaVptppuK5QmecoaQ7CZa4LYmj2A==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794189440;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=NPpBzy9rsAwjnSihJCJz8r4JLNePzNIyAaNAKyPfXSY=;
-	b=2BRG6YUilgWSb3pfBR6PTD1RItunk+p8DD+2swGUXI5myJ0V83r6O6m5/rDx5fhZhVMU
-	 WZUuxBdgirBl1qXPYnJf+nu58LKr581pNcDA8AhkJx+Z0tpNotRq4Th7IlnXrRqXypS0r
-	 ZFEMVVEPSZwnZWVQ+xmreoCDGOjKesdDEX00o/wFCl2Ikp5bw2BWIi0mhbn4Pcb2nKNwf
-	 u8ChJcVPLyOmBvv0bNE10zNPKRzOs7V7dp9bup1aufh1uhoS/mVUVMcrSNfnm2fhCVvkb
-	 +mzePnwngx3yMF9XRQsBU5sKgtlgF+BqOn+3Doo7VVarLFlf6d1QJ0Wc49iU+TYhQtA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HLuxsJ4I;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.221.52
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=115.124.30.133
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794196740;
+	b=UjX+IAAv6YzOFDJJc7AbWRg5VqXADMzOr9gIEvYcsasPsIaL0R1OsLHyoJyhyfov2hgR
+	 19GPjXAbR7+hu+GOm4xph1Geg/7e/BEiYacfcAr1o/OeryF6Cg8euXyF/wvKFos1XZ+FE
+	 MlW/u5CNCrwUqCycvzVxSZxn+BdtaEiIc4Jxav12hYXJgILhwgeH+nOkeDMEUpYQpqHlR
+	 s7TMUEoWus0XVngBusyHa+jcN2Afs/AXmpiWYWhFFnhqzCG1E/E2+n8oqPTqfyrZ/vDkI
+	 NM+f6MBqpJfVhqLnvvl+6zv/h0ZdSh7ejxR7NIL7tzcaa9Yv6RgFVfvrqABqOFVqhQA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794196740;
+	h=DMARC-Filter:DKIM-Signature:X-Alimail-AntiSpam:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	bh=mNKWKeQaizgMT/LZrjHv0QI/kJLBxPj3nyrlUjJt+Rw=;
+	b=UVMy3qqPWe3xtjMx/f0192WClqj/v6QI1QQJnYIuZKIjS03eiFpCoRDk9dcVcAXC5VQA
+	 /IvolLRKS0GuMYiCPAUWEXr+lOhdFd17SdLFYo8gy/DR7i6wy9bnhbfx+8yxzlhWDwTDK
+	 vzVko1lI/ndujbeIVnwn8cfq68bjlC0AoHEhcEzK81r2XPrH8p6w/FVUK3UT5VexfbQSV
+	 CCTBKPDKECaSR0Kp+V7TBTXNyLFyNyvtga46hmb7pcnEFjJ5HQalEpVC1K/JkJ7TtQpg9
+	 23piT8xUiUxVC0qaGdTJv8a0MZvdLWEN9jZE2W9Ov0DIiVHxMwR0Pyq69acW8DZExiA==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=linux.alibaba.com;
+	spf=pass smtp.mailfrom=linux.alibaba.com;
+	dkim=pass header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=yhXwaODF;
+	arc=none smtp.remote-ip=115.124.30.133
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8DA606A320
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2026 01:57:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D8DA606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19EDD606A31C;
+	Mon,  9 Nov 2026 03:58:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 19EDD606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=HLuxsJ4I
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-48dfc0421d9so301570f8f.1
-        for <linux-cifs@vger.kernel.org>; Sun, 08 Nov 2026 17:57:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794189439; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Mg67JC5bran43bkXvdaF4efSNuBRsNafRHz/VtJj9BnXNyokXfBw53BDW9DBa7F7uk
-         rqW/962txpfz+anMOTR7VoY9g5iXUDPndM8xu5jfjH5w8TsPhSfYMlmLLF9nPeUrgvbG
-         TsFM1n2iNDr4pDxp7829xQkt43NS5EfHozLig54nk3kz/E+80yT1KzNi1wsapoY4ijwY
-         KF1hwOUQqfdsCQlcvh+i85HvMS4t6i9oQkqDjxtMshOUweTqdWIfaE7aSlCF+3kWbfwx
-         mzUvSokbv9wiwfVIuJb7jIoO6r/2jJ7bZsCUCKHLry6lGFjQL0Z4+YQw0j6frweN4Beg
-         Yksg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=NPpBzy9rsAwjnSihJCJz8r4JLNePzNIyAaNAKyPfXSY=;
-        fh=iJ0dS699nvEWcBUCEqCbLFLbiJMulH9KABWW2df2w0I=;
-        b=oCtcGIlIkswKxPZlucZGbm+TMKozDZBqHsQRZvkGeMbXwraWALOrZTkD6MM+kPr1Kw
-         j9hX7ofQgNWsK6qg0XYcLWGei7EHQM1swofpB9IRqgq5Q9VedcacjyvSqtpMEYue+bLx
-         VFJ5kZW53mxHJu1wDOp1d/QdIiy6OcC7kquU7bTRrT5zAlbRrJa/qGwQp26Ff41kA8wt
-         Y1gQl1RPu2IpzJR8TIWSQP3+/sot6wiS5IcZ+f7UoSXMWEbmK3g08rlKbl+LsWw+tV0W
-         ifN0v0zea/cBkhQSptOk3UFW91Vs7GilLKC/MLjShtemNgnKrB3zojAFbOVKclbUsfvR
-         9xgA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794189439; x=1794794239; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=NPpBzy9rsAwjnSihJCJz8r4JLNePzNIyAaNAKyPfXSY=;
-        b=HLuxsJ4IP5OUkWgfPaGUApudypO9O4vX4JMcj9VVgKQP5DaSsTW8OU1dInUeenMjvo
-         dLFWbWsLY1zPtI84efXesdDNOs1L8A0Ij1EzemG0ZJY4hdS+PZ601/ghCcfyL2x0zqlV
-         c4zwBDgYbS4kgDGujAhVMzSe+WDfB4hQDH0DzrznKd9SuH7i/Az47FZm0FLVMG6uf8W2
-         3Nh6R4WXHtYaoFrCTH6NuRLT4+gnKcCEFNfI7/Aps87SPfdpKcTpQE84yAFzL6j60cEN
-         W1YOxmr3QkYZXvMgUMrhcRyyYVwwEfTGVG4pXBSc7PgSHLLH2sfC3/755Tq++sNAPVlZ
-         AG+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794189439; x=1794794239;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=NPpBzy9rsAwjnSihJCJz8r4JLNePzNIyAaNAKyPfXSY=;
-        b=LvnRBhq97AFl+ieJMUmyHz1MGL05EXEc3+aDWpTRkhCZu77FOe/QwOSzhNe9cd6FuE
-         anKdXUlA6S+/KsmQ2L3OzJuZIg3ge6DCjM6OcqjuF0t9reD7uOa0d8mIRHribMc94Qd5
-         GJND/QMNomJ2ZUJQWmyCbD842pHm9DDWYiwoMz9swU7cEJfNmivnBpS75Mmc050CRH1t
-         gB0NeiyM998rITk9x4gGTX/tDbgaDem58GYdmRmdrt4v2zCErjKhJJlVdSTUDq1ETk2/
-         9tNoeHxbV3Yl3A8J54aYMM4/tPikMhDNIIrPsBbKDGB5c9hwDugykF0hVdcgTCv/eGtM
-         l4QA==
-X-Forwarded-Encrypted: i=1; AL+hErGGrr5FzF/mipLTzUPVolXixfJLUHj8a5825tDjtvWhgJiGn80f+r7EmCH4AXJOohjkpZm6ft1eUUmJ@vger.kernel.org
-X-Gm-Message-State: APuU4Z9B9+L6cyx+ZjObVbhvbkGkkQ8q9PfYZARd2YjunfxqYhA1zN6t
-	OiodkrJ5bAAN8SkFPy5WZxlNtUddcqx9+nnh4Re3YMIemKGONGMcnDBSXX+RxJ3H8S78CYyDayD
-	Uhwo6R1Gegk8cXPasxffmI3I02WHEvrE=
-X-Gm-Gg: AYBFou386BikBAjNULKEN7NOJaTfsAgIApO4HtV4C+gAEvoLBhYlUHuoeBIWkhCDzy9
-	ePqEDzgRcgVSfSv3TrJ8SynAe+0NgoGR2SEYrmhtUaO9/HX629I17tOTZ5i7JDvCBiXBSVHR9Ih
-	GFC8/8tDkNtNl2DyQ3zhLBi13NbuYzD93wir0aqCkjYHSWMFiyK+L87cSDBq5NW3dkpfjtMQGL8
-	IDLqeYYKLe8cMWLr19mEJukTcwc/xCYs/X0O79XxiUoDm+8w2W09qysSHl7ZgKDtbjGemFAeEyR
-	onOiH0CBt8G4unmJ0CjCxg2ZQJEpXi9Jrqo2j5Nyz7SgZlHPBBdSsxUUT11/wijzsciprnpdKLq
-	U8RZgaeLDYp5+REc3EJtz/3NehDqQbSP9mgMD3A==
-X-Received: by 2002:a5d:5d06:0:b0:48e:d88:55e2 with SMTP id
- ffacd0b85a97d-4958c779a6dmr4992254f8f.42.1794189438757; Sun, 08 Nov 2026
- 17:57:18 -0800 (PST)
+	dkim=pass (1024-bit key, unprotected) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.a=rsa-sha256 header.s=default header.b=yhXwaODF
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1794196729; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=mNKWKeQaizgMT/LZrjHv0QI/kJLBxPj3nyrlUjJt+Rw=;
+	b=yhXwaODFp3EfLG9PrFG2Igm98j9S4+1rlJqaTrZTcU6Kl0XG1Rqr8W9At8JXhLqJmYvGbEtb+6NB8ltIWKFd1Tgoj1h9JUvQ8JU//6muix+/tq0IOjEDNXVA7M+abRr88tyuQIoknITTP6mykRaXKa5h3KMt7TjXyfyJpfhWcCw=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam011083073210;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0XEITxm8_1794196727;
+Received: from 30.221.146.205(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0XEITxm8_1794196727 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 09 Nov 2026 11:58:48 +0800
+Message-ID: <54a1224e-abc6-4042-8979-2c21441fb4ff@linux.alibaba.com>
+Date: Mon, 9 Nov 2026 11:58:47 +0800
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -104,47 +53,88 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261106104842.441067-1-pkfxxxing@gmail.com> <173fb0ba5a3b968783dde74560d10bf9@manguebit.org>
-In-Reply-To: <173fb0ba5a3b968783dde74560d10bf9@manguebit.org>
-From: Yong Liu <pkfxxxing@gmail.com>
-Date: Mon, 9 Nov 2026 09:57:07 +0800
-X-Gm-Features: AclHuK-Ge004zM02tecHDLrP6fkj9vXH2gJg1fG6dEv2LWtemSwDgssoIQ6OT-Q
-Message-ID: <CAGAoTxyFLVy=BiA=VVgRAGFgectEwio5yeni3rk6DWc1emKfMA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] smb: client: validate ACL lengths and compare encoded SIDs
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] smb: client: hold server ref while queueing reconnect
+ work
 To: Paulo Alcantara <pc@manguebit.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20261103091558.2342761-1-joseph.qi@linux.alibaba.com>
+ <7e2543c16b6b75edb8c55b138175dcd8@manguebit.org>
+From: Joseph Qi <joseph.qi@linux.alibaba.com>
+In-Reply-To: <7e2543c16b6b75edb8c55b138175dcd8@manguebit.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 Hi Paulo,
 
-> Applied with MID_SID_LEN and MIN_SEC_DESC_LEN removed as there were left
-> unused after patch 1/2.
+Thanks for reviewing it.
 
-Thanks for applying the series and cleaning up the unused definitions.
-Thanks also to Namjae for the review.
+On 11/8/26 1:28 AM, Paulo Alcantara wrote:
+> Joseph Qi <joseph.qi@linux.alibaba.com> writes:
+> 
+>> When query_server_interfaces() returns -EOPNOTSUPP on a secondary
+>> channel, smb2_reconnect() calls smb3_update_ses_channels() which for a
+>> channel runs cifs_chan_skip_or_disable().  That clears the channel's
+>> slot in the session and calls cifs_put_tcp_session(), which can drop
+>> the last reference of the channel and tear it down.
+>>
+>> smb2_reconnect() then falls through to skip_add_channels and queues
+>> reconnect work on that server, using a server that may already be
+>> freed.  The send path obtained the channel from cifs_pick_channel(),
+>> which does not take a reference, so the session's channel reference is
+>> the only one.
+>>
+>> Take our own reference on the channel before calling
+>> smb3_update_ses_channels() and drop it after the reconnect work has
+>> been queued, so the channel cannot be freed while it is still used.
+>>
+>> Fixes: f591062bdbf4 ("cifs: handle servers that still advertise multichannel after disabling")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+> 
+> Please check sashiko comments
+> 
+>         https://sashiko.dev/#/patchset/20261103091558.2342761-1-joseph.qi%40linux.alibaba.com
 
-Regards,
-liuyong
+These points are about the multichannel disable path as a whole rather
+than about this change, so let me try to answer them together.
 
-Paulo Alcantara <pc@manguebit.org> =E4=BA=8E2026=E5=B9=B411=E6=9C=889=E6=97=
-=A5=E5=91=A8=E4=B8=80 02:32=E5=86=99=E9=81=93=EF=BC=9A
->
-> liuyong <pkfxxxing@gmail.com> writes:
->
-> > Hello,
-> >
-> > This series fixes two memory-safety issues in the CIFS/SMB3 client,
-> > reproduced on mainline commit f66469d9905b39d2c260a15d7d6db450f4db67c1:
-> >
-> > 1. A zero-length security-query response can bypass the caller's minimu=
-m
-> >    and return ZERO_SIZE_PTR, causing an Oops during an ownership change=
-.
-> > 2. populate_new_aces() compares variable-length SIDs over the maximum
-> >    structure size, causing a KASAN out-of-bounds read during chmod.
-> > ...
->
-> Applied with MID_SID_LEN and MIN_SEC_DESC_LEN removed as there were left
-> unused after patch 1/2.
+What this patch does is narrow.  It holds a reference on the channel
+across smb3_update_ses_channels() so that the final cifs_put_tcp_session()
+runs after cifs_queue_server_reconn() instead of before it.  Previously
+the last reference was dropped inside cifs_chan_skip_or_disable(), which
+cancelled server->reconnect, and skip_add_channels then re-armed it on a
+server whose srv_count was already zero.
+
+Queueing reconnect work on a just-terminated channel is indeed
+pointless, but that comes from f591062bdbf4 ("cifs: handle servers that
+still advertise multichannel after disabling"), which added the goto
+skip_add_channels into a label that already ended with
+mod_delayed_work(cifsiod_wq, &server->reconnect, 0).  With the reference
+held, the work is either cancelled by the final put or runs and bails on
+server->terminate in smb2_reconnect_server(), before it reaches
+smb2_reconnect() and ses->session_mutex.  The send path holds no locks
+there, so neither ordering can deadlock.
+
+The srv_count == 0 race is reachable, and smb3_reconfigure() is the
+clearer path into cifs_decrease_secondary_channels().  But it is older
+than this patch and I don't think it can be closed here.
+cifs_pick_channel() returns a channel without a reference, so once
+srv_count can drop to zero under us the pointer is already stale on
+entry to smb2_reconnect().  Reading server->srv_count to decide whether
+to take a reference would itself be the use-after-free.
+
+The guarded increment is the same idiom smb2_reconnect_server() already
+uses, and it narrows that window rather than widening it.  Refcounting
+the channel selection looks like the real fix, which is a much larger
+change.  There is at least no double put, since cifs_ses_get_chan_index()
+returns CIFS_INVAL_CHAN_INDEX once terminate is set and
+cifs_chan_skip_or_disable() then returns -EHOSTDOWN without putting
+again.
+
+So what's your opinion?
+
+Thanks,
+Joseph
+
