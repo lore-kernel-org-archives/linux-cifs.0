@@ -1,105 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.178
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794253350;
-	b=M5t0wQZFYhST+fDWGyJlyf7ZT8ahY8eNF6ja3nZYdTjFklxO9JvtZoJ2227SN54qyySz
-	 DZYnWggpuzIcE/M+QYfDLy0FqlXaz43EncMZ40mzzuevE5O3ZYS/L8UkBg0Fpu0iBSeyy
-	 JVbhiS/dOkoZTX1+7iyfT/891lZaQ7B3WKoG5HVwHXAsyjhTSYEIz5mLLK7y8o2B1isZn
-	 tWaMRpIV1c1+iZrrrc+yd5QWtLm8ZiW6CrvlPdPdXvinPUKAtno99HydzYL4abU2DJlXv
-	 Lx9EdiXFmEUNQSERAz+RAyuROETDtbWiP04vu9mWKvUW1CmA6rpAfDqp/lUiCX1YBpQ==
+	t=1794254303;
+	b=O0Pp5z6tKo9fntDuY1oUpj7LKeyQQR/OqcjJPnjoJc9jIUseTD7brJYE16Bvriiht9LH
+	 rlTjNUOfeHYeib+jS4R13bfyGCFVJpWKHqb55SpyNd/0+vWQmNzx3bkhYBd9eTAVHB02a
+	 tdJqbuojlUtTq73UnSJXxv2XHzpddpVXHkynBwiUQW94UxOECuQDTwAJZZe8EH6UN6T9c
+	 FZ2j1n/WFQLawjv+e/lR5mO01OKHnsg9TuNjIx9mP6qee7k6GbNOiUYAxPLyQEnv4CuFB
+	 uEhNcuigPKV9qrXKttCF/X1vs91EPTh/1kam+VWaqc420bTkGEa4USiGEchBNePgHuA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794253350;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794254303;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=UEhZmesMv0jigQ7cD/Kn5QG1oqSQq9Q4U814VKFftdc=;
-	b=KJFqL9v88d7/ClcmwbXVVeCuT+30zQjmTEhnVfmVJ8QL9Vo9DNEE//2JAXUurU7T1CjN
-	 St42woRxV9+xIisrUSMI21tRrM+beomW3ZJh6+dyFb8OBYZi8WenV4rNlGeosqQr+JWXW
-	 Id9aGjRhZfcQDSx83jxtUijTkbkpxHSTlYSDiY6zCnorg7txkjgy8pL3XrR+NQZMdcBQc
-	 G3lW4nhDzpsnbIG65oCLLDSGpEZffIfes6aZ2HNIcB4r445zSk91m9Ke8f8LVOdZuvtiV
-	 dUjjCVecCCyo0bWAtgT0NpWLsQMYEVIDfcOk69T/Gm38OdyuZ7JEbAyO0cDWzPGqjng==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=LjlIdWOtAx4vgBSOIZMhE9Gxzn2GjEyrd7gwD+Ba4Y0=;
+	b=la+SXNUA3mYjKp7TNybv46htyvWZ9ixQxrW9JZGA8yl7LoxNzpzFgYdEM75ci5i1G3Y6
+	 fbYNwblD5zHekeWqrgyfeprkfWHPIEW4s6hiy1o9jkHl/H7YKXoTk5mRSK47yRMS5V9Ys
+	 4qcHa1spbP3q5BZQ/AFWRjwxeCqFdEOy8DF85kdMdH5MMQelU1qSL+OpxXf8EfxD6R0/V
+	 FIueov9iZ4P1KyFizl+BPcgejxRxKA6sMYHfwHTGxCA6YTB6NP6fpiXiOpRp7RQlhu4lK
+	 e2pawpIHxJXilm6noaJ7H0DutpHOY0UpW9/XrFO4gJU/IWTovkjnb4pIAidIL/SQ2zQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EKc2b8Wl;
-	arc=none smtp.remote-ip=209.85.214.171
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="R/1WuOAu";
+	arc=none smtp.remote-ip=209.85.210.178
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B07B606A335
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2026 19:42:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B07B606A335
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9BE606A334
+	for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2026 19:58:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C9BE606A334
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=EKc2b8Wl
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2e98798cbddso5945925ad.0
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2026 11:42:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=R/1WuOAu
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-8b5efadd183so583412b3a.1
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2026 11:58:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794253349; x=1794858149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=UEhZmesMv0jigQ7cD/Kn5QG1oqSQq9Q4U814VKFftdc=;
-        b=EKc2b8WlVQAK+QDBBLBJs3pHzNBRz6SdjfsrdP9tAslpxwZc5moiXJfRT9tI5WQCQQ
-         zrAl/FZzen2FYuI3vqvOem38LgmsVVcGmmq90rFjJ6ZO1rFAwz5sT5X5puJiV4QWpf02
-         8dozWpc9Bsb/euLqwJLLlSdltxIUPG50x/JDZ4+YYXlWJpWHuhS8Zp25OqaXxTN+T2OY
-         ANCZ5EQd9Y0k0SH2NgLL5qStUKPB4L6Djwsi6aKpPOZlnpcPDCTZxK379BLIbtSUe4AC
-         S5pNZEF0oE0YUuehpm1rcSf9PK8eL0IuqvHRXvZlWDrsdh7xxTt88VHifS224YuFwXTd
-         PcJQ==
+        d=gmail.com; s=20260707; t=1794254302; x=1794859102; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=LjlIdWOtAx4vgBSOIZMhE9Gxzn2GjEyrd7gwD+Ba4Y0=;
+        b=R/1WuOAuCnN/JHW6ktRQlo8KATUbKPdmjv9knkQlezuppBKQ2QFjLENs6otezsL2xP
+         eTi11KqJIzewO8F4GEX9Pf6o4wLrfbGRV4H9OSeZy3ikk84qdvC4VMdEMg/MHDhDNLVv
+         yv4ssmwMsCkU4txSd9s/sNEluf8Pigwe2x3/j3/gXS/kK2AAnjAD+0PdFvTVfnpnzLh/
+         fBvyKMdHhUoSFRmcYglCQljvABVmnVeCkXj1NCgIQil7Gk/POjf49qomsOEd0fN8NByQ
+         wbFuKhXBaMycT4NEbjJxj+bT9JfZWmsfDPrZ9S7aOK25smaHJEJaVgMkSFajcl+3hg6B
+         jaCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794253349; x=1794858149;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=UEhZmesMv0jigQ7cD/Kn5QG1oqSQq9Q4U814VKFftdc=;
-        b=Mgk2eftMgztLjT5WjLhnYVJGLcFpGpPG2D7/qQsr+C+v5slxbnU1/NrQ8icGlfu7zE
-         lDbBdOsaIu0fF4wolBt1Mh6vKP9+k1eREQPv6Zmd86mTEZ89TL5ZBlXL2D11XGJd68E9
-         7KzSgH2LffmTAGkIKURpRIATmIUdSnkaZSGdElrd5rQsty5lGmcqmwiiz0KZmaGLSnqf
-         bxAEptD5iRXqWeqKQTb47B/bhCQUCKO6k5A92VhjmpM730u48voSKqLBgSbAt493Uvn5
-         QuV2q+4CCPAr4daGgpnoLxy816wWTdLPYthqmsc0wZ/ClC6Sg0KCLjT+LKTS1BOVaAOI
-         nPfw==
-X-Forwarded-Encrypted: i=1; AL+hErFNrWEzheOuIk4Db71nxr1QJdsVzgjlu9vxTLCam2CTnzda0e1JwJIQISw3rO8j6SpWu1k/4gfH2Efb@vger.kernel.org
-X-Gm-Message-State: APuU4Z/DtJECWIrC55m7M+22OgIl5Cp65aGQaeHIwVWasuaooAjGJLm2
-	OqhdD1zp1erAvtj6dFEG07CZnvzKYElYJnwWKPhX4Tb/3PJwv+PMLV0W
-X-Gm-Gg: AYBFou2FIEa9aPv055J9ACzTrXug61bYV8m3rhBidiErEbXgFy3RtWCrkRNWB2T9nEX
-	62LXlvVQbjpreWStjNlKkLgS4OXuUMII7AiEOFePQbSARmMtgeqUbicyPdEV3nA9D6rEemJriY+
-	Bi51r7/9a6TLFFeEZfAtJGJo9Ilz86YXxh6jyw6RfmlSuLs/e+JCtDFIykFjDakq1VRXO+XCQp9
-	M1mcNt3FK0X0aZWyYXUS1idIn03GMZe2N8N4sICABPkZYu04SIy3GUm2iNd9rik43qO+D8z/vky
-	EVpdSDvkSmqUgdmpyV6HAD7J73pk+xCGzYB//jS7tyJ2q3GenmGvwQdL1yDqyfg55gdbfjV6NLG
-	NqXX0+vl5OtwBGxwWumnY2+RUoipmcQOnJKC0rheOcucM2s3rkuM4UA3sN9t97auA2hyu75OZPF
-	6z6XCnfkUPOYDhj9xOLrqcUYduCqYgqbaowhJDLDAS2DtE/RtoQkSnq12n7K4C0kEHeFOtdsRYs
-	ZR0AMJm45jkIm/YSzwwVhr1gecO6jxBW72y/Iu7r2TtbevyfaHD+Z6OwgpxPtjgEGVGVATZK9JV
-	XGIzFnoMQdVVnUUAKO12KrDMjMn8p5Pt9+fN/Ccfb18+bE0th0V8LjauTmE37+r/ACaqiwdTM1B
-	dEu1RRK3rLDwuPMYAJv8giPt1GbSlNh/3PakKcgYshE7GzDMIBm6CPoQ=
-X-Received: by 2002:a17:902:da8b:b0:2e9:9c65:1af9 with SMTP id d9443c01a7336-2edb9227047mr1360425ad.53.1794253348909;
-        Mon, 09 Nov 2026 11:42:28 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794254302; x=1794859102;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=LjlIdWOtAx4vgBSOIZMhE9Gxzn2GjEyrd7gwD+Ba4Y0=;
+        b=glb3h8tr8NItZzCnD3ulrPQcTZAdHxXUkplIRM1AQlrkn9sjhkztJPku6Z7E/CHR/M
+         WxFL8he1aVPTxqbOGKepazzN6ma3f94bGeH0wOF/h3Gt4XhnbjzZNKGAD4Z2m15NFdVL
+         yyBwTatg2OKjktcV4jD0xVL6JOVVGArD+rJdohOtzDc/QYqyaoRoulsl4AEAp8rxb7Jf
+         aKfrwN++GvAF87THlOgWfqHLt0RLRDLUMzEO9c53P4bwas/iljyeDdbNtcVmts7Vg2Pf
+         17h+eQQPz47gDK8XUYOmh4TmNiY7RNa7vy57TSDOa30TBNvA3q6aVnwVPOxkGDtpRfjX
+         COtQ==
+X-Forwarded-Encrypted: i=1; AL+hErEcHjlmXBo21ot1OnQilSlP1R+kSkqdrEee4XKuR7uhF+WDkTxLMYhe6amXvmuAoi7KXBu5OhrL3fKt@vger.kernel.org
+X-Gm-Message-State: APuU4Z9S4LXIlHCT3DykHI9r95mNz+aFGBkEI1zZep5RDVI69EcAGZ4s
+	rsi4N0ICta3RzaPtOX1saNfPi2FsTQI3Z5vlSfWt+zDNTvD+J6Thf/FO
+X-Gm-Gg: AYBFou2QtKFp7eOF+VeDjTg7c6sLH5RYxEEG02H+ThyxCO5VrTnFG0p+j55RcS7r51i
+	WYX1QpFxvZd/E7EqjUwGLoXvHSJ+mnaoUt9RNsWGBuA9aSyS6EU0HAMWxoZbnDK4C8AetsTvm54
+	y2YlycuEmpsMeNkxFfzR9lFqRmn7IKyLpH0hnOzX5OQK7nwI+Hxz1s+yDkOz66cG6X+u/b4z32g
+	Pp6pHWUb0osOWriKEZR0DM+opfLkIymztex7XdIGO+AoHTEJXXB+fHf+cBrtJ6LRf3UFKHO4rM4
+	gjemEI1Br1gZqXliJhHCdjb/9WwJXFYHwhSuQWOhxDtKv9vRscE/G3XVhwGoISr6z+CqgzVDyIF
+	BHbiNTebhFZyeg5b8a0/AUJAHZM/NOZZUJ/V1fKdHoO7VmtwX4wQaeHeDRMc2tt2AXo2gOHErI+
+	/7OK3Ec1KxoIszGWcnpKVoAM0snaO08VIMQt79XjkXrhFTYlUSgbpmLDclLwCzZJvpSwQhDK4HK
+	JynuHNLC/S/VOa14tJDlzTTTJWQ5MenVwkOKWheka0lC51g9gxBrbvnSb6ZLImOY3744raZP6sY
+	3W+cleVs6R3pnE+lP9GdE6ZZ0/AZF2AfqEgf82OevrOai9zjJgjWyKUn0VI+Q5tdxxcS8uuILki
+	TGrmhPA9/0ejSEWZfo6HoKfgMsb/Pf/Bq8j46+UTaWsEGSwY9LfbfBD8=
+X-Received: by 2002:a05:6a21:110:b0:3e2:4e6e:6ca3 with SMTP id adf61e73a8af0-3f18fb8127amr165601637.34.1794254301572;
+        Mon, 09 Nov 2026 11:58:21 -0800 (PST)
 Received: from localhost.localdomain (mx-ll-183.88.2-201.dynamic.3bb.co.th. [183.88.2.201])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2edb6d4b950sm1388585ad.13.2026.11.09.11.42.24
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baaa2a7fbesm61629b3a.11.2026.11.09.11.58.18
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 09 Nov 2026 11:42:28 -0800 (PST)
+        Mon, 09 Nov 2026 11:58:21 -0800 (PST)
 From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
 To: linkinjeon@kernel.org,
 	stfrench@microsoft.com
-Cc: icb@fastmail.org,
-	senozhatsky@chromium.org,
+Cc: senozhatsky@chromium.org,
 	tom@talpey.com,
 	chenxiaosong@chenxiaosong.com,
-	ematsumiya@suse.de,
-	lsahlber@redhat.com,
-	hyc.lee@gmail.com,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Michail Andreas Michalopoulos <mike.michalo@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v3 6/6] ksmbd: consume the sequence number of a request on a failed session
-Date: Tue, 10 Nov 2026 02:41:44 +0700
-Message-ID: <20261109194144.22814-7-mike.michalo@gmail.com>
+Subject: [PATCH] ksmbd: refuse reauthentication of an expired session as another user
+Date: Tue, 10 Nov 2026 02:58:13 +0700
+Message-ID: <20261109195813.24238-1-mike.michalo@gmail.com>
 X-Mailer: git-send-email 2.56.0
-In-Reply-To: <20261109194144.22814-1-mike.michalo@gmail.com>
-References: <CAKYAXd-Jo-ObBDs-AdGfaM+QmDsot3gj1g0oJiyDKczoUDg2TA@mail.gmail.com>
- <20261109194144.22814-1-mike.michalo@gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -111,91 +103,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-__handle_ksmbd_work() calls check_user_session() before
-__process_request(). When the session is unknown, invalid or expired, it
-sets the error status and jumps straight to send, skipping
-__process_request() and therefore ksmbd_verify_smb_message(), which is
-where smb2_check_sequence_number() consumes the request's MessageId from
-the command sequence window and refuses a replay.
+When a Kerberos session expires, its owner can reauthenticate it. For an
+NTLM reauthentication, ntlm_authenticate() only compares the new user with
+sess->user when the session is still valid. An expired session is in
+SMB2_SESSION_IN_PROGRESS during the reauthentication, so it takes the
+other branch and simply sets sess->user to the new user:
 
-Only a signed request on an expired session had its MessageId checked,
-by ksmbd_sign_expired_rsp(). Any other failed-session request (unsigned,
-encrypted, or on an unknown or invalid session) left its MessageId
-unconsumed: conn->seq_low then stays pinned at it while conn->seq_high
-advances as credits are granted, until the window of
-KSMBD_CMD_SEQ_WINDOW ids is full and the connection stalls. A replayed
-MessageId on such a session is not refused either.
+- the session's open files, tree connects and other state, created under
+  the original user's identity, now belong to whichever user just
+  authenticated, and a later Kerberos reauthentication is compared
+  against that user rather than the original one;
+- the original struct ksmbd_user is overwritten without being freed.
 
-Verify the message once at the start of the failed-session path, as
-__process_request() would have, and drop the now redundant check from
-ksmbd_sign_expired_rsp(); verifying twice would consume the MessageId
-twice and refuse a genuine request.
+krb5_authenticate() already refuses a different user in this case, and
+the valid-session branch of ntlm_authenticate() does too. Do the same for
+an expired session: compare with the existing user and refuse a different
+one with -EKEYREJECTED, freeing the newly looked-up user either way.
 
-The commands of a compound that follow the failed one are still neither
-answered nor consumed, as after any error that ends a compound; that is
-a separate problem.
-
-An AI assistant was used to draft the patch and as an independent
+An AI assistant was used to find and fix this and as an independent
 reviewer.
 
-Fixes: fd8c97d7c1cc ("ksmbd: implement the command sequence window")
+Fixes: a47634cd729b ("ksmbd: expire SMB sessions when Kerberos tickets expire")
 Cc: stable@vger.kernel.org
 Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
 ---
- fs/smb/server/server.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ fs/smb/server/smb2pdu.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
-index 7604fdb919a2a..df04b0dd9f2f6 100644
---- a/fs/smb/server/server.c
-+++ b/fs/smb/server/server.c
-@@ -109,9 +109,10 @@ static inline int check_conn_state(struct ksmbd_work *work)
- 
- /*
-  * The keys of a session whose Kerberos ticket has expired are still valid,
-- * so STATUS_NETWORK_SESSION_EXPIRED is signed. Check the MessageId and the
-- * signature first (MS-SMB2 3.3.5.2.3 and 3.3.5.2.4), so that the key never
-- * signs a response to a request it did not sign.
-+ * so STATUS_NETWORK_SESSION_EXPIRED is signed. The caller has already
-+ * checked the MessageId (MS-SMB2 3.3.5.2.3); check the signature
-+ * (3.3.5.2.4) too, so that the key never signs a response to a request it
-+ * did not sign.
-  */
- static void ksmbd_sign_expired_rsp(struct ksmbd_work *work)
- {
-@@ -125,9 +126,7 @@ static void ksmbd_sign_expired_rsp(struct ksmbd_work *work)
- 	if (work->next_smb2_rcv_hdr_off)
- 		return;
- 
--	if (ksmbd_verify_smb_message(work))
--		conn->ops->set_rsp_status(work, STATUS_INVALID_PARAMETER);
--	else if (!conn->ops->check_sign_req(work))
-+	if (!conn->ops->check_sign_req(work))
- 		conn->ops->set_rsp_status(work, STATUS_ACCESS_DENIED);
- 	else
- 		conn->ops->set_sign_rsp(work);
-@@ -288,6 +287,21 @@ static void __handle_ksmbd_work(struct ksmbd_work *work,
- 		if (conn->ops->check_user_session) {
- 			rc = conn->ops->check_user_session(work);
- 			if (rc < 0) {
-+				/*
-+				 * The error reply below skips
-+				 * __process_request(), so check the message
-+				 * and consume its sequence number here, as it
-+				 * would. Otherwise a request on an unknown,
-+				 * invalid or expired session leaves its
-+				 * MessageId unconsumed, which pins the command
-+				 * sequence window, and a replayed MessageId
-+				 * is not refused.
-+				 */
-+				if (ksmbd_verify_smb_message(work)) {
-+					conn->ops->set_rsp_status(work,
-+						STATUS_INVALID_PARAMETER);
-+					goto send;
-+				}
- 				if (rc == -EINVAL)
- 					conn->ops->set_rsp_status(work,
- 						STATUS_INVALID_PARAMETER);
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b084cca8813cc..234439c1526f9 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -2365,6 +2365,17 @@ static int ntlm_authenticate(struct ksmbd_work *work,
+ 			return -EKEYREJECTED;
+ 		}
+ 		ksmbd_free_user(user);
++	} else if (sess->user) {
++		/*
++		 * Reauthentication of an expired session: as for a valid
++		 * session, and as krb5_authenticate() does, it must be by the
++		 * same user. Replacing sess->user would also leak the old one.
++		 */
++		if (!ksmbd_compare_user(sess->user, user)) {
++			ksmbd_free_user(user);
++			return -EKEYREJECTED;
++		}
++		ksmbd_free_user(user);
+ 	} else {
+ 		sess->user = user;
+ 	}
 -- 
 2.43.0
 
