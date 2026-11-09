@@ -1,62 +1,81 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794233477;
-	b=HBKUDjO8HL818iZQCNLkn8Wjt2YrTQvvV2xNqAQvefUnTW8dsr5fijxePTlU9c8TX8aM
-	 OZSCcQfnoUQantAGm6rnVJ32CmF8bImiPJ0vkkZ/Y6u5uKGYtCkRxREZjxrSSyI6w8Ut0
-	 0fNsbaORf2fx98YDygb014j292qXvbGhT8vjXXyDVAWQ1W5jLc73lTJtO3mUmQLqHQjYt
-	 ldpNA+3wE1G8JJQG4g9Fz1RTfagnGU5TVG6ChpJRPzEFdBh7f+tBo5jqgFA1BrF4AFxLs
-	 H9hGL1jPXYaAc+o0QV3Xiic/7AzogMCseo1bGOIVMfXgzfkNIbWYTlNV5zOKwnBgFVQ==
+	t=1794237375;
+	b=uDvc7yHoni8OjAn+ICyzO1JCmVOXxY/bn96DiCV+/UsdKB8mfqzf9Hnf1ztWGiu5spWM
+	 3tawC4ztWDNEFLrgyHPOKojVaCo9Naiws1UUvVXa5SWOfIYIyLQDT08EHDVy8BJD+HZxi
+	 zkNQcm+i6+xb3sxyXP4wPJRkWgaz5cjd5J7sO6loSEl0B7u4Hi0TyoV1S+9s1RwFkimEY
+	 soODaB4Hu+ZNKnPw93wC7B9439DFnjBnp46bvvIpME5V+Bjl8Cn+F1TH5oCRK0eiaHlV+
+	 qWeoBezbQaWTC1pKElF/meg2JZ0SOuP52A7VaN9+skWWSekYroDOX5m4STMqMTzZHtA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794233477;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=hb3VA2ky0l8x+jYMU/yaZ+IaniFv6bm/V5/0Nahxh5w=;
-	b=MsKiMi4e91Lw++9X2Sun+Zck2RrbZX7xsvNQRPTEpL44KoKtT+ey8V//HVx6uYuIHNLP
-	 Zvf/DpZy5sslOr5GATxZLU4rSLU0nq7ix9m7DsvmevUz/705EG7TYhZmuFMB1gTI7z6Dg
-	 uvuCZtpO3bGgywihu+e/hpt8rUH3MOkRbsi8KIbvpXtjBTjZUXoVnmbFwBcAD8BlDbTQ4
-	 Dwzh4sP8//mVvjQsqqe8jvKV0nL0eSQ81a1jwAsFZDBlQ3sTWt2+Jb2UePiRccaxge6ds
-	 bXZHFVuJNFFaNciokFqC+d1HRWqDa1Ct9V8t9ps3ghB9/ft8ac+m/ajyXgk553q7eoQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794237375;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=ILLwKIY1l8/2C2M3tEMK5/2Wk4x1T0msHL+198Sb7AA=;
+	b=vtByuf/G9fMJKnPGQwkxJ4yN0q7Y6uZChp88BqLNWRPoeA96YDoFFgL59MXSzy56Lpwn
+	 DJjmCZ1z+TEpDbzDSssGgf1Yk6LZngNcjEZc+QXFByaymivEXgKH7RxcXMBoeY3mLnZcP
+	 SUhTms/IBqsec9MsBe0RQrXVITffN3LnBy5SNstLE/M7M9Nt26GuPc/z7JtMOtof9MNMg
+	 siDrAn7RLrXGTu5xJcXdEeniH0js+NukDpqTDp3Ig+6TgSltExJXtPBhmE7Vn6CNI5LQU
+	 aoKo7W6gtVJaEQtL85bXynxHLhGAbvoiVCb1YJVDFNMhOo0bDpTwlxWE8G7yKVhbTPQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b="zil/aWz2";
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DE7b8BP7;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F0C606A31C;
-	Mon,  9 Nov 2026 14:11:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5F0C606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 6C7FB606A31C;
+	Mon,  9 Nov 2026 15:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=zil/aWz2
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=hb3VA2ky0l8x+jYMU/yaZ+IaniFv6bm/V5/0Nahxh5w=; b=zil/aWz2b00etxa4TV4SpNFtYJ
-	T8tJ77loIPK7ZHMb07dqAc9TldzoJwrr6SDipzFO8AIZnxgTG3KvtokTRvw8fCJofTT+CnROS/mF8
-	lzoLCQmjVcPj80BwxqpSGAxGvwFCBVPUY08gV022P64CtEQyY3n09lXRqgmqlb9d8aBhu7M6tzeye
-	u0SE1/PWcrKet6qPGl2HNBnIeCkUbVa1r+Obsd71SMHTH0oBU3fwXhw+8PCuHA1uLlwQ1omPqp3eE
-	MBdZt8e1fkTkP57NhvAZYA/XNkCyy6/5EDQcct6OxH7bQDxZTHwlpPnpP78tbwe92IUr5K9YIkhzs
-	uIHLxUkA==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xQQ5X-00000001FsD-0lt1;
-	Mon, 09 Nov 2026 11:11:12 -0300
-Message-ID: <c144ecdd74cb7f659c36ae55c3cd3503@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Joseph Qi <joseph.qi@linux.alibaba.com>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] smb: client: hold server ref while queueing
- reconnect work
-In-Reply-To: <54a1224e-abc6-4042-8979-2c21441fb4ff@linux.alibaba.com>
-References: <20261103091558.2342761-1-joseph.qi@linux.alibaba.com>
- <7e2543c16b6b75edb8c55b138175dcd8@manguebit.org>
- <54a1224e-abc6-4042-8979-2c21441fb4ff@linux.alibaba.com>
-Date: Mon, 09 Nov 2026 11:11:11 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DE7b8BP7
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 5444D1F0089F;
+	Mon,  9 Nov 2026 15:16:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794237375;
+	bh=ILLwKIY1l8/2C2M3tEMK5/2Wk4x1T0msHL+198Sb7AA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=DE7b8BP7Cij3P//t/Vui28Z7jAeD71euvurnOgD5m2eGnFpoJ8cX8Ct+Xn/n+h/Vr
+	 /vfXa0aZBFB80IYdROdppGXAgmseq3YTH7vkDkH9e6IzF24cUT45prMu20v30XQVa3
+	 bJ68sHIanl12vGG+3QWFuX9ngSrv3KDgBbbmSH2CCHNL45Dwx60FpbXNWdcJ4zBIxy
+	 GmHDKnbSG/R8/ZYHoGqE6PIk6ep1OdEFThID70rausnaalZsFsdr/JbqOkh1z2jcqs
+	 wk09RE9oz7EcbZFL8pDOaKfc50mzyvWQqqxmPdjeZwG/u8kOK23oyHmN12jmNg+VRx
+	 xpKODiRtpF+gg==
+Date: Mon, 9 Nov 2026 17:16:11 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Sumit Garg <sumit.garg@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	James Morris <jmorris@namei.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Paul Moore <paul@paul-moore.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Sven Schnelle <svens@linux.ibm.com>, Tom Talpey <tom@talpey.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH v5 07/12] KEYS: trusted: TEE: Disable sysfs bind
+ attributes
+Message-ID: <avHju9kZBiNHhhTu@kernel.org>
+References: <20261108222719.304712-1-jarkko@kernel.org>
+ <20261108222719.304712-8-jarkko@kernel.org>
+ <avF19RckYZWu_3FD@sumit-xelite>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -66,12 +85,26 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <avF19RckYZWu_3FD@sumit-xelite>
 
-Joseph Qi <joseph.qi@linux.alibaba.com> writes:
+On Mon, Nov 09, 2026 at 12:57:49PM +0530, Sumit Garg wrote:
+> On Mon, 09 Nov 2026 at 00:27:13 +0200, Jarkko Sakkinen wrote:
+> > Suppress sysfs bind and unbind attributes on trusted_key_driver so that
+> > userspace cannot unbind the driver and unregister key_type_trusted while
+> > the trusted module remains loaded.
+> > 
+> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+> > ---
+> > security/keys/trusted-keys/trusted_tee.c | 3 ++-
+> > 1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> 
+> Sounds reasonable to me, FWIW:
+> 
+> Reviewed-by: Sumit Garg <sumit.garg@oss.qualcomm.com>
 
-> So what's your opinion?
+Thank you (for both).
 
-LGTM.  Thanks for looking into it.
-
-I've applied it.
+Br, Jarkko
