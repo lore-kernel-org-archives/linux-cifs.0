@@ -1,101 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.215.182
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1794329881;
-	b=RoPpWFJ7xGSHwK2ogmp/C7o6ecn8S58G7BgYRl+1S0BZV53BlXMRdv7y0Qn3w4vScZ/8
-	 LfDxj3MBA0mh0YDaCiyuYhXvE9lKUVb2qSpWcp6VDYP2cH8WpRNcbuFGaFHGhiN8sUqBx
-	 eb7SfiD3ZTe3sA9RJbkl5IW0q3Gpk7jrLcBWc/BgvfTLQzkM53ePfGQ1BD0/yNrF4y6vJ
-	 OTvo0EM0NKc8CuOfZL3MpWG62S73L1simYt8d10t3UGDlpb4nTKyOCgiOG3l9uDuCogiu
-	 nb18CCa38C5mex46tsAfX3cLi533WKyEde+FGY79yXo/FH/5ccbCOu4ZHsIJaSqov1g==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794329881;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.182
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1794329927;
+	b=d62ZdUdQyEGv0NHjTL+Yom9idsU9gk8DEsNqoFbQzMqHjIVu/DXk77gpErzAJKj05cZh
+	 CNg3pFPaLhUBdawwdtTWEsC/rDnI0cV+H3ZLGGuMGBacjMLo0HJKJA6hHAkUPeX2U3Mh+
+	 MdlR1IRnGuTAfGi60X2dSMXPm+w0Yi20YfPptXTtSbeShw5y8B4gZ2Pk1BBAmaupgdoDl
+	 FSk+32bRRRnQmIFDsmn58xdC73vwvYeE1juXb9T4SVkvtwAIbJcrtJbhC+xhMdkDJ+5El
+	 Xn5p9qthHC9jr+DHoa0xu1JukaJLBhMgLGg6RvFCVhe+swSwkFueFLZNgHAKfsGW9ew==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794329927;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=1HlRMg2f8VT1EI4K27T8+cqMdE7ojzLtyN9VMRiohws=;
-	b=SrrJxexQkyT4qp36+MhACwcu9lCnvsQgkNf4UBUhkBVvDyCDVZbzwWd5mqgUvhOD3b0i
-	 VFG4RZz+qn1Oah6rNyM9+2RZQYpOzTJOM8q0LyGaHYJ7s2VCNrElPeKC/VgKGMOnvA4cb
-	 XbZXgFiVfOKvYGy/qUsd4Me6yxToFJGBPR0ABZjoQa+zQpOqQf7lbpEOcUna6UGH5RZNT
-	 L/R/21VVG3gQHRRDbGPOob1sgx5zadDWPajHhnyvsTC8ie5m4jrf1oNEqiUMIOnWQ93jy
-	 MwrnlW8b+hmfVV770jhMdnPE77X7Gvb6vyAcNAtVfyvTZkX5YbDaNEppp/PEPVGzBYg==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=4WuqVXrjAHcNCbBhH0GU+TGhVg7H3NItgvBFauT8hq0=;
+	b=rY/ylGv8irzLcRQG8h9chrjDLlHaMK18m10ct7Ur3w+RlxdhT6h7edpQqWF+3RzrMiVW
+	 1tN+e6OSQCzRVlxzd9NdFFju1mCuvkV8t5/tz8y5ydooeQBgywWOO4F61q7+VSfNm7soT
+	 LTksxXiezlu6TOQsiIOgIeRK8+eQCXn1jPgfF5uNq6RTC4YfBtTKSxj6WHtS5UQpSSJjM
+	 gRxijKRr6W9Efrhr+l25zBVTr4DljYv4UTFAWKH+A/Tg7KTjt45OdJRn38lYAlM0AaTzZ
+	 VRtwQi2WOzHdvYA+rG01nGenc1VamEozxtAx/qXOGvVRE81EhzmMGh5KD10Z/LOan0w==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=t8iT54ru;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.215.182
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sDWcWRKI;
+	arc=none smtp.remote-ip=209.85.210.182
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43F5606A837
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 16:58:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C43F5606A837
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28A1606A803
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 16:58:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F28A1606A803
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=t8iT54ru
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cd69954c755so1590164a12.3
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 08:58:00 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1794329880; cv=none;
-        d=google.com; s=arc-20260327;
-        b=juv/2NpEmrq38YBW3YqhULW5TTEQW+iOM/PLHdjnZei0ERXKtZvujDkpBYyep01LsZ
-         agGdpwifrFX0kynM+kD5JeNMrCeNfHJbzO7jvOwEZma2dhJ8P03QGIZEske/EeAQ46LJ
-         mQ81r2P8jITECL+h2AvfudAzHL7Kz1r3uvPcpl/VMmDOhSBEEDGHVw15P4SdbfKQD7BG
-         6RNyMwqCZ2gF2TpkGmB17JFcclDFam0kEjpG7HSgsehk5v32kTyuFmngADgOioYbIDbV
-         s4MEsObdG6JdBL6hfnZNupVxbt8ey8KlXWOyW3gY35Cs0eWpQHnE1zbZGJApEt7/2s0R
-         htvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=1HlRMg2f8VT1EI4K27T8+cqMdE7ojzLtyN9VMRiohws=;
-        fh=yHOVUp3q0TByAkOdArrB55hzHBQ1VDM1hag9PG2MXig=;
-        b=Lqlg/1Ji/X+fiGWSmOEuClHWcqaj4nTB4XQIJatmf/KlXvuT3a5+BH4SkicQ75BCrv
-         7uItDo90Xww/6see5wIFe0EMs5HtRrqI8wsI6VfnZ/OTiDgE6ieLdjHyUzy9VlQnvsUw
-         6w9PdCpULukZ2Gpq6MzUdrna0nIQMIU9KSac/smKYGf8SWNEcl9Wkzx3Nl438pcSflA3
-         hvtucXeZLwpX5At+akC0pva+c9zElCa+iUhJjYaUKmyDhW7cEvKOrYvBH5u5daYaM4/d
-         sRjzPIfP5B08CBlEaoxwAs8o3/DOdR8eljMDXNbAYfqbqumgSvXlyVmkwUL9Hfdiopqb
-         bXgA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=sDWcWRKI
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-8a070755c8cso1147589b3a.0
+        for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 08:58:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794329880; x=1794934680; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=1HlRMg2f8VT1EI4K27T8+cqMdE7ojzLtyN9VMRiohws=;
-        b=t8iT54ruLSMY3csAPAgojvVYw8cwh2154xKRj95sLz8EdPdBZx8f41EcmmLGuC1F1l
-         ElLJg1Coj8V/Ns9BmZZDFhRsax5ulWClrHftzpsakovCHNkHPvpuPf8qyGPMEvS+ZBpx
-         /8pV8ycjMItO8GluGRwVeuxn5Niim18numJAMJCOkn2GtDYz8TXf89kGi9r++cn8vuAx
-         pUhime1PYdjP5LkIeHAA3e/gHsvVtzNNo30B7FiujRhOh3tTqAzd98atJr4QoUaBJFsF
-         lyo11wt0d95LzOafUNNzZOifg0sIxvglqaOuSTlWwJc5A1Bs05wNjJEnYABaNIonOyUI
-         V+OQ==
+        d=gmail.com; s=20260707; t=1794329926; x=1794934726; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4WuqVXrjAHcNCbBhH0GU+TGhVg7H3NItgvBFauT8hq0=;
+        b=sDWcWRKIfUUCcA/N01Zh4Mg8CUpTGsCQUh6Dcxwh6y75biVggNyJFTafNSlC1Vr0eU
+         AZLUn2fWh18BPpxHIdhfSumjjztU2Jd56ZUAS+lbTRABHedH0SNXdDqQ9x2iTgYZ/1F0
+         z2aNyxi5VvA8t9Sr1igAq38z+rDViJoF4V4EpBJxfWn6LqD9yggd6PCgnwhRlnCe/Z9m
+         uJ2PItpo3rSddmrk6OAPUCqJAZhdO8KSNXXO5ETSSsfaaSxiODEDHkJyqVDIjKOp/TOW
+         b1sEQAcs19c3r0NqA1itPd1aHICl3nHYh9gsHxxgfJ+ff/Ogp+BnSzR9rXQfivR0RQ46
+         b0Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794329880; x=1794934680;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=1HlRMg2f8VT1EI4K27T8+cqMdE7ojzLtyN9VMRiohws=;
-        b=CneZKbUF+FOnD9yTx6ZJ8w8mT+tK13p6l6sNtJFL+hSoA7uUzRyix7cIVEP9ROr7Nv
-         YQULp0h6uLGFx18PMLl5RS+asSCFPZDTb6a3ZR+lTPVrx5/NM6pHrqCxzBfqExC9+Tci
-         gS+IbI8gkMKwz6VBZGXYWs0p17478fnZ1jRftgJ5r2LAB8avymS8MfW6HeU0ZfI0y44M
-         kESSQaply5X3UoXaf7HxL8K5AHHuXNh2Z5d5hnopZl47/a+rCft01oCBmhsTFuCPxTST
-         vhuGzq4IxO7w5aBXsmrvLEMwnmydWxSHV0UNjYp6fqVPqbeYNbGZQO3gf3PPmbs57i4O
-         O4ew==
-X-Forwarded-Encrypted: i=1; AL+hErH0FRmgckcfetSzRGL/55dYpRzK5noJspN8V4kDRQvqR+wkyFo9NF1wmGO4oZIvwgxtjYgVhm5/MccZ@vger.kernel.org
-X-Gm-Message-State: APuU4Z936NZZO0WyKL79OvpMpGMuhB6fdphlZbPY9M5puo99QItvDLT+
-	IL0I5KsMyroyjaRiI6oVbbF5el13+uT56YOc2qsmpRQ9aDuKWKxfIxjPh+fbWH8uZuya9Ddqbht
-	b1cHEKYgzBD6rAxwiEp838IWM65Nzqd8=
-X-Gm-Gg: AYBFou3MX2P5qcthx+WTL3Oo7BmvEdFL1tNGgE5/JE1kiVaef59Dqu7RILEa8gWKBAP
-	saPoqqDVmkRDah3Ts13l46fZiqFEeYuQMdga/d3+ornSqvHcpnnMZq4ySxRikUZYHuSz3od7DLw
-	dS5ZfUPekRQtrPKSlCEPAvEx/+H1/LfPQSjHVBUOQChJUx6647rAvjY9JmSvQfNSMduERn6T5zV
-	VTM9HlGamH3dslYHDpi/TeyJX3jlUGaeTt5nDXsRuYgrb1NfIX8kddu6T08eYGSLNyMMnbjWs9T
-	vqhaKvwWCOuggKdIPkjA5zvDWEBVFAilGoBFx1cyfBgGDUqhJQBHDJFy3CU3gvqL0qZ9xAF2Vuk
-	C5g5TSwLeORh2Fchc8ziDuFwKiFqXPNqwN4uAHUI4v5fzTbD1dr5eXuTaJ2hEjlA1xLd3f4pETO
-	jd9EO/bSWc9kNFGg7ATnG0a4BV4UHZluPf6p3u/w==
-X-Received: by 2002:a05:6a21:4d92:b0:3eb:292d:6667 with SMTP id
- adf61e73a8af0-3f18fc7916bmr3102272637.45.1794329880120; Tue, 10 Nov 2026
- 08:58:00 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794329926; x=1794934726;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=4WuqVXrjAHcNCbBhH0GU+TGhVg7H3NItgvBFauT8hq0=;
+        b=Hxa/abofk2qUowGo1k8J7YiM5u7VryK3Ngj60GSOY5eLXfnvfGUnpNyWJpfjlUCrBU
+         HL6v3H5NkXz3UpZuAphEMXrbxc0tLl3fsfBzwQ2/ArTa/gHtFOI6ct74oG5BcD3CXVfF
+         XXcopgwWf9kQEWQANuLVNukhaovLcEIpC7NwUlHMZYsFCvY8a6ERPmxF2RSyus5n+eJC
+         6OU4H5kZ85JWnKITAAhvImorZlozQ3W5vHy9RW1jQX3xIO0eUAAa0EDeBS6uIIFt5MA3
+         OehNjJyfpNnSpNCKwQlcFJhovgxg/WGJ2De0/cJ0fyVyFYCSnL5u+0c0H0bgsvMOhgNG
+         2Abw==
+X-Forwarded-Encrypted: i=1; AL+hErH+xywrke+2Yh90EPJjRNxv7jvWRLuSu/nN3EVOodYgU51kKbLCmCFDdI+bQj1JE3AuNVhTslUiqM1C@vger.kernel.org
+X-Gm-Message-State: APuU4Z/28O2n2EW3ysB26YkGYf7jrWUDK9m/6OaXnmWJqJRaERzLzdEX
+	FmRlBdsth0wlndoTlUhlSij80HWP2nX59cVqeFxr5FWW3ux7SY23eExE
+X-Gm-Gg: AYBFou3f3sCTNG+DHS5bMPi5AdpdV37m0HVZ1AeUbSpQyVl7jxwvB+TeC6O1pLmckfz
+	rSxFSOYYrCUbGeornixGGo3vPONCpn0dDS4W0Bag3f/129qKpGVEh1O4Htpj7zLk4mH69/Wd0eN
+	BPeWSx/r0aYn2lXf2CgeBv2Xa7sfJmixFOmnUk033Cxpi2KkKUrdtNpQ6jjOJOIF0UwB8GCRCpu
+	emkXIRW0zCkA21Toi+gu2zrjfQR20V8rbBBgT7sJSmb7xoP0I6PYJ7wrGoIRq5cycnotyGhU/Nb
+	Xsb1LzbSzZrXWYFW9qvsn1twKQJ3cgXWDOptXUv2isc9w26VS/uWmH56eq3qdyrB4yq7GzRk+Sx
+	vOjmBWzFf9tVqBOAa1GOfaYkJ3DfUv3nql7lz85v6Y7UxmyjjDdC+vh3m4zM5mInmxmueDtPW+2
+	/ez9WWcODDlXgBIvZG1D5wq/sPV210DlOjbR2anET7l8BQ1StKliIV3e5GYpxBAH+zFLp/DGRcy
+	Sg8T4Qj4LkDBjA+9TIvR+blMjRxhp7Mj5UdFcQesy4245n7zziH8A76/bT9lA/ddco3sC7azQHL
+	+sNx0X8Ed+OcZ3hoFzK+1zXuYHfqvhwLUG4tgYPRJdX3hhyeu6jElJOoeSZ9tBdFypOi5A/iHg6
+	5dfcR2HrAyB7NV3w9ralsNnTRdlkR2P58YpMdPx2KY5cagIUyHY4CFig=
+X-Received: by 2002:a05:6a00:44ce:b0:89f:fc75:6d99 with SMTP id d2e1a72fcca58-8ba881e82c4mr3179615b3a.60.1794329926340;
+        Tue, 10 Nov 2026 08:58:46 -0800 (PST)
+Received: from localhost.localdomain (mx-ll-183.88.2-201.dynamic.3bb.co.th. [183.88.2.201])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8baab4fd5c6sm1157154b3a.46.2026.11.10.08.58.41
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 10 Nov 2026 08:58:45 -0800 (PST)
+From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+To: linkinjeon@kernel.org,
+	stfrench@microsoft.com
+Cc: icb@fastmail.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	ematsumiya@suse.de,
+	lsahlber@redhat.com,
+	hyc.lee@gmail.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+Subject: [PATCH v4 0/6] ksmbd: verify session setup requests before signing with their key
+Date: Tue, 10 Nov 2026 23:58:28 +0700
+Message-ID: <20261110165834.28162-1-mike.michalo@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,56 +104,116 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <cover.1794241654.git.lucien.xin@gmail.com> <20261110074153.4b895bb6@kernel.org>
-In-Reply-To: <20261110074153.4b895bb6@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 10 Nov 2026 11:57:48 -0500
-X-Gm-Features: AclHuK_HpW_I6LMxVTgDVIWnA6pZgPm7vgrtWceSe67s1c1ZnBXYAOFgqXCnPVE
-Message-ID: <CADvbK_e3aoDOyk3hbPtS8pk3U0QSiLtYafpH2oaoNbbR9mV9aw@mail.gmail.com>
-Subject: Re: [PATCH net-next v18 00/15] net: introduce QUIC infrastructure and
- core subcomponents
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, Tom Talpey <tom@talpey.com>, 
-	kernel-tls-handshake@lists.linux.dev, Chuck Lever <cel@kernel.org>, 
-	Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>, 
-	mef@scarletmail.rutgers.edu, paul@jakma.org, 
-	Kuniyuki Iwashima <kuniyu@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 10, 2026 at 10:42=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Mon,  9 Nov 2026 11:27:21 -0500 Xin Long wrote:
-> > The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transp=
-ort
-> > built on top of UDP. It enables low-latency connection establishment,
-> > stream-based communication with flow control, and supports connection
-> > migration across network paths, while ensuring confidentiality, integri=
-ty,
-> > and availability.
->
-> coccicheck says:
->
-> v:250:19-25: ERROR: invalid reference to the index variable of the iterat=
-or on line 241
-> net/quic/connid.c:252:16-22: ERROR: invalid reference to the index variab=
-le of the iterator on line 241
-> --
-> pw-bot: cr
+ksmbd signs some SESSION_SETUP and error responses with a session's key
+without having verified the request, which lets a peer that does not hold
+the key obtain signatures made with it. This series fixes those cases,
+makes ksmbd sign with the SMB 3.1.1 signing algorithm it negotiated, and
+fixes three related problems found in review of v2.
 
-This is a code pattern concern, not a real bug though, as the use_count <=
-=3D 1
-check guarantees the loop always hits break.
+1/6 verifies multichannel binding requests with the session signing key
+    (MS-SMB2 3.3.5.2.4), as reported by Ian Bridges.
+2/6 keeps the negotiated SMB 3.1.1 signing algorithm instead of always
+    using AES-CMAC, and signs each key with its own algorithm.
+3/6 verifies signed reauthentication requests and uses the channel key
+    for session setup on a bound channel. A reauthentication with a
+    forged signature used to get a response signed with the session key.
+4/6 checks the MessageId and signature of a request before signing
+    STATUS_NETWORK_SESSION_EXPIRED, also reported by Ian Bridges.
+5/6 makes the signing decision in a compound follow each command's own
+    header instead of the first command's.
+6/6 consumes the MessageId of a request on an unknown, invalid or
+    expired session, which the error path skipped.
 
-Thanks.
+Changes in v4, following Namjae's review of v3:
+- 1/6: smb2_check_sign_req() and smb3_check_sign_req() now restore the
+  Signature field themselves, using their signature_req buffer, instead
+  of the session-setup helper saving and restoring it.
+- 2/6: use SMB2_HMACSHA256_SIZE for the HMAC-SHA256 buffer.
+- 3/6: no longer changes __process_request(), as the check helpers now
+  restore the field it used to restore there.
+
+v3: https://lore.kernel.org/linux-cifs/20261109194144.22814-1-mike.michalo@gmail.com/
+
+Changes in v3, following Sashiko's review of v2:
+- 1/6: correct a missing negation on the multichannel flag, so an SMB 3.x
+  binding request received while multichannel is disabled is verified
+  and rejected in the non-multichannel branch instead of falling through
+  to the reauthentication path.
+- 3/6: also refuse an unsigned, unencrypted reauthentication when the
+  session requires signing or encryption. Negotiating encryption clears
+  sess->sign even when the connection required signing, so the v2 check
+  let such a reauthentication through. Merely having negotiated
+  encryption is not treated as a requirement, since clients routinely
+  negotiate it and then send unsigned, unencrypted requests.
+- 5/6 is new. With signing not required, a signed later command was
+  processed without its signature being checked, a correctly signed one
+  got an unsigned response, and an unsigned one after a signed first
+  command was refused. It also decides whether to sign each response
+  before moving on to the next command of the compound.
+- 6/6 is new. Only a signed request on an expired session had its
+  MessageId checked (by 4/6); any other failed-session request left it
+  unconsumed, pinning the command sequence window and letting a replayed
+  MessageId be answered again. 4/6's own check moves to the common path,
+  so the MessageId is consumed exactly once.
+
+Testing of v4, on a KASAN/lockdep UML kernel based on next-20261105:
+the binding, expired-session, compound (including SESSION_SETUP inside
+a compound), encrypted-reauthentication and sequence-number tests pass
+as with v3, and the Linux cifs client works signed and encrypted.
+
+Testing of v3, on a KASAN/lockdep UML kernel with ksmbd-tools:
+- forged and replayed binding, reauthentication and expired-session
+  requests, also inside compounds, get unsigned refusals with AES-CMAC
+  and HMAC-SHA256;
+- new targeted tests for 3/6, 5/6 and 6/6, each failing on the kernel
+  without the fix and passing with it (5/6: each response of a compound
+  mixing signed and unsigned commands is signed exactly when its request
+  is). The 3/6 test uses an SMB 3.1.1 client with AES-128-GCM
+  encryption: an unsigned reauthentication is allowed when the session
+  requires neither signing nor encryption, refused when the client
+  required signing, and an encrypted one is allowed;
+- randomized requests against these paths, and 8- and 16-thread
+  bind/reauth/logoff stress (about 130,000 operations), found no signed
+  response to an unverified request and no KASAN or lockdep report;
+- the Linux cifs client works with SMB 2.1 to 3.1.1, signed and
+  encrypted, and recovers after its session expires;
+- smbtorture's session, signing, I/O, compound, lock, oplock, lease,
+  notify and ioctl suites give the same results as without the series.
+  With multichannel disabled, the session tests also pass and fail as
+  without the series; six binding tests that fail either way (the d and
+  s variants of bind_negative_smb2to3, smb3to3 and smb3encGtoC) now get
+  STATUS_ACCESS_DENIED or STATUS_REQUEST_NOT_ACCEPTED instead of
+  STATUS_USER_SESSION_DELETED (they expect STATUS_INVALID_PARAMETER),
+  since 1/6 now rejects such a binding request in the binding branch.
+Ian Bridges also tested an earlier revision with his own probes and
+smbtorture. Not tested: Windows clients, and Kerberos expiry with a real
+KDC (it was emulated with a test-only change).
+
+An AI assistant was used to draft the patches and as an independent
+reviewer.
+
+Michail Andreas Michalopoulos (6):
+  ksmbd: verify the signature of session binding requests
+  ksmbd: sign with the negotiated SMB 3.1.1 signing algorithm
+  ksmbd: use the channel signing key for session setup on a bound
+    channel
+  ksmbd: check a request before signing STATUS_NETWORK_SESSION_EXPIRED
+  ksmbd: use the current command's header for signing in a compound
+  ksmbd: consume the sequence number of a request on a failed session
+
+ fs/smb/server/auth.c              |  14 ++-
+ fs/smb/server/auth.h              |   4 +-
+ fs/smb/server/mgmt/user_session.c |   1 +
+ fs/smb/server/mgmt/user_session.h |   2 +
+ fs/smb/server/server.c            |  69 ++++++++++++--
+ fs/smb/server/smb2ops.c           |   4 +-
+ fs/smb/server/smb2pdu.c           | 145 ++++++++++++++++++++++++++----
+ 7 files changed, 210 insertions(+), 29 deletions(-)
+
+
+base-commit: ddfe51b0a0f5dc9e415cc2c8ad8db17532dd426b
+-- 
+2.43.0
+
