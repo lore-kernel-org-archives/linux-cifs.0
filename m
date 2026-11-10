@@ -1,123 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794278036;
-	b=aai1N9R+jXOebyIpAgSAa0sCEKkOvfWbc+G5BE5lhLWElWlw3YqAEE8/X6a68XIpbOAl
-	 3RnqAVLtrmqYlFf1NfVeN7e5luW/p3MzMWKX6mS6zdlf1+Q60JDK+9A2Vnwdz/OFX6BJw
-	 3zCtJTvLcaalplR/zY3y6LVMgq1Xv5bkL43iaJyhCkBPLVhxtfOzg9kn3jjPn7Rc3Qpdc
-	 9aUHf5BPtdGdbLGLhBYbGN+MU/g8uDGH4C8PuCgdDZOZAzhMYrjGS8Uz/1v91ddrKLNyw
-	 ByyUQQWI1c1Wy7zMEUWTivB4440sL0VZfsV1rsj7sH6ZQQD7YHOiuEIhQ2ERrBT8ecw==
+	t=1794288706;
+	b=xLoR9qnwV3xiMP8YFRAvI/F9NhZimSuYGwfyw7rxnlJnhvcxjdlLx7Eit2QmgChuMX27
+	 KHFcM+3Xg/hwG9bgz/z0wkAMvRMDwlvGOftimjkeS8JfhiJfmbkpHgo+FybBKCi7r4HnF
+	 rTdFRkWqheguSS2D1WmgIAskhPOizzu4ovulvmhciXBjHVMqdZu5sH9cXe4/vTw2rxkyC
+	 ZtdfqmSVjkqLdzMK1COsKc0tq2U+rDA+Yx7oK2NRx8JELe/Akg68ZvaE5NKji0+gcGYi1
+	 k7wzBSLTq3zDe8uAZ7u0SAvgg36T+AIFCHJKeNft433PvJ9dV2X3uOAgxnMoMTSLTOw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794278036;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=g1VIsYyLXpbp2selItXnLHOrtqqaZK6VFKqYqk+/4fE=;
-	b=VIyE+DVmRGYwVi/ZD99SQh5aRvk6lOypar3lCcrIFtcy1N/hvlrgj1v5LvanleflirsM
-	 mgb+T1iYyHCnJ/CD2tnHt8/6qFHp80C4NAytI0gp0Dj3B3xlvlCGWFA71Dj9jajChKt6P
-	 RY7KUKjT5sWhvLO5Xjyc2ITuS2esb1kgsVL3Lyb3rZRvTYL5l8YG0dQ4G4hAHA9qM+6Xq
-	 E6X6uPLsGF0uJ6+vkdibgN0v2KsZYlU6BAzf/rkjltLS44GpYnapBw8hQmIJKCBQya4/V
-	 45DuY0Tsxbptar5IMWydOFRbZhMMNoaqskSo1K68OG4jD/bIusMMNSpEa9bAZRiKYbQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794288706;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=v4N6CEsUv8RrVUeKKYOn2SlTG3d00sO7azLy5/TrcQ0=;
+	b=oqhjtVGq/Nm2H5oQhXmyYKlgcfKnQ9x4b87kLKz/NWwv29QVq4FOO9KsctjB3eItWVVF
+	 fDNqpVv+kpOofkKw9ErCZHyWKnRei7b+gfpvglKRgaLI4kVKbC/hX+rM8bDB7h1a+79VU
+	 w08KMHkMWK/Iy3OXYNrxzBCvRLmS5xm3VmOh4iyJ9ED+owsh/c8vUSOfT2PWvu/83VgXP
+	 EajlS8Bl9J8aot7Up10dyObri5/5P7AktJoNlaQ6TpCaQQMxV8XQRkviY/eBzOQI4phj9
+	 6HU6bYADXAjc5KPJJSOdyKeV6WeZI50KQ33vaHsBLh9mtK1o0dDg+KjNxnuBS8GQngQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=bXj8nXao;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=jMVi2CE1;
-	arc=none smtp.remote-ip=103.168.172.144
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loPadRfd;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA1D606A321
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 02:33:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4FA1D606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE41606A321
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 05:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=bXj8nXao;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=jMVi2CE1
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 96AE5EC04D1
-	for <linux-cifs@vger.kernel.org>; Mon,  9 Nov 2026 21:33:54 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Mon, 09 Nov 2026 21:33:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1794278034; x=1794364434; bh=g1VIsYyLXpbp2selItXnL
-	HOrtqqaZK6VFKqYqk+/4fE=; b=bXj8nXaohzoFelziePzf868blggMXjkn3fFaB
-	TWioAAfimNfjcAImsdDK04HlGQOUUqj6nc2pL4ziDM4HbyVZ6VEw4LjT8AHhmFfz
-	bystM9WZ9Zu/Etdn11YBPp8ypipJ6z18GRr+r8oSU2Xaus10ghsvN2bFgdcsAp2t
-	x1agSYOdu453w5//r/TSYD7dGcZ+onFw/MD7Anm2y2NSCGPik5CtWY3AfbV17Tbr
-	3PSZERX4YZIdTiiTvd1UDjBRniaWT1AKapfp5H1oyNAIzf0+waArqmCbO0OHH03D
-	Em7v7vj7L8W/HwKeCmAywUhYsA1Dp53Z9xiQSPcOV+/DN+uHw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1794278034; x=1794364434; bh=g1VIsYyLXpbp2selItXnLHOrtqqaZK6VFKq
-	Yqk+/4fE=; b=jMVi2CE1TxaDXYqFBo4/thZmhetcJD7HexhKqPekN9byw2tUjfV
-	qJ3StqdgeK/giP/DfQ6b9A9QW6T2yAZCgihAZi32E99aaWH5ilIlGaAJeY8MS+lC
-	AR/9Aim2nFLZn3Roezx+aS5P5//u1XPXQkpAtLhZAm7LkuP1bphnPisNSm4NzZ5O
-	9J1cqSAFitBvRpXZh4V/Kn1dOJkurPgNwEUCrHf16LbM/e7guoi5KFmn9+qMZEfI
-	k1qcwcelJWZ2gxmGEbZmNwAHex8hXw7AN+xd5tJhx2v1vx1cg9VW5ZbQcZL0ESvO
-	ftUf5T24PNX3sZYtXDBDph3XxsKhqtzzS/A==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794278034; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:Myu3xlmxH33MS7pxBoSPRDbP5BgFMEN+3tDBB7X0iLNk95H
-	5z2QijsPpooQT38Jj8gfqgQkfyFVgn8a1BvN1XGYdEE6rA9FXBp1SUL+7g6Mk6dW
-	pbnKqCdhCo/T838H/9lEvnW9eH9oq3SEl1hLbzdRDm0fii2Pw3M4ha4KhA4bVeyq
-	GZzQ3s5xHgofpCMgd2iDe1wPyICLCOuP2qkDNxqki1H4vKYYX4JXE+nrf5Bdn7CZ
-	c5BcO/RUrszpEdi2A+p3vrw3yu2QGIPQVz2Ea4vC2Qcxv9rP8s2bMk+D+0ZTGSu3
-	eG5QrgO0bzpzSEi51k3o8q0+wyyCMqY5BpfWrMg==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:kMWAz0Y7LcfoM4kZwhM6zeRlTGJLvTg9J/ndnRR9zuM=:sG0Hqyd7/PCaADqMeTD+NKc9g3wk445JcBSTksY5AEg=;
-X-ME-Sender: <xms:kYLyak2SpphrsDGHgHi_zG1synKO2rSTajgKkWNXosZo59WkX7Nc7g>
-    <xme:kYLyavgu-1y2yuLOIUa1a9pWNhi019eU5WZNVM-8fYJfwGYbTPGebciNfxlq9BXyR
-    4Uw1yjBaA2kS3coQKZUkkiNKgnLGtGE8frMd2XCFGiQHSizioYKF-LG>
-X-ME-Received: <xmr:kYLyatnLzGjdqQ_B26sgqUfJlzC7QUOd_8gbby5l4UVyU2uMLItjbpVjXvQ6odtV>
-X-ME-Proxy-Cause: dmFkZTEaFI12Qo/RXtAOqBnkLtQHGnHF3OoWfQsLrjLl2B3nKseZbWYD1SlSSdLYdT6M+o
-    e8hnVKv2IA1quSLS0a1l1PpLXpODgHN4VcCJ9WoTKIq1WjgSRLm3GowCs7pYS30cp7MtUe
-    BYEHO17M2s0d+tj+GXIFjnmffkE7+g8EC3xvIigL/ydpa46T3Y+FPXzcsDAMlKkceYMykW
-    WWBFDuqK9pWlFelMeEvubbZ/9UgUxuDOVxrz3Ouni6rwUDOXHG7Dph3x9nLByj6FzCFCFn
-    Mvtx0HfMKKHE0uGqNXN01wCzdGg3kR+xZsb9M5+AdOuipFxxcUyRaFs9FQkLV/6aojAnqn
-    456z3MHg4CaXnU8SMVPMr3/Ez3Sc3sRRTiqQKC0yFdJSfjJkPMUASqwGVIcnePTq0OdoUL
-    M08KGvbdOblfzU8m8EwCwhA0SD7Xh1cb5ImOXxt7UVHAbgR9f30ADUztiq5X8wKVx/3DMa
-    erTmuZKKwjf0bbIC1VUxc/FT6kboeMDq0Qi2hOujQMmq/jMEQ81hNVOQcF8cUQR3qI70yQ
-    SGqIgf42tR1BGi2kuXwjuEhHO4icLs+1G+CknaoHOr3hWkpQhZDrWU/x+R0YJK41k035xh
-    +Q2H+v7WKdhly0GyVOl//KZzv7MewIXA69+RCKROK/chCsBb0bWy2P3QsL0w
-X-ME-Proxy: <xmx:kYLyalaoLzDAlroJXNqKbMXziVTww2WGupcqne2RtUJqqxCy6ZVdxQ>
-    <xmx:kYLyaoEpdow6vX0TeSPPwSeZCQx_kIBA82t6s70WmYf0k5BmL16SkA>
-    <xmx:kYLyakaT-kjGqL77QE9BH7mf5UIHmLdjczuC1QZdQWxrRJY0qr3yAw>
-    <xmx:kYLyasxwpwcSTV8QzA3TB8RJzkD4w4Iwx37ATu_wMBmnZJkGmYaejg>
-    <xmx:koLyatMymf-G8UNhPl_lVw5h1N8FX9hPa-yDvwK4PlXDLjK1azMGv6fd>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Nov 2026 21:33:52 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ian Bridges <icb@fastmail.org>,
-	Sashiko <sashiko-bot@kernel.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: keep group denials when a POSIX ACL entry decides access
-Date: Mon,  9 Nov 2026 20:33:44 -0600
-Message-ID: <20261110023344.2105916-1-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loPadRfd
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17821F0089F
+	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 05:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794288705;
+	bh=v4N6CEsUv8RrVUeKKYOn2SlTG3d00sO7azLy5/TrcQ0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=loPadRfdjOi8S1VAyFya2up5v9Qwgo3NrNbfFnzSpJGwHO6+00k31kXRHnBvW4i4b
+	 csWZpo8GiRr8sBmXlThkF8aPEEVxwJWEO3eMjLRo7SHybFnbNFLwvGvkfBhc3taMMG
+	 aiGV/cx5pCO8e3nnqLrsnq8fRqaz5oRAo1xzUP7l4mOOiymbMRZ5o/p4GabY037D69
+	 7u3LLaBwraIYvoA69QxZEYJFcrf5xSyyEUNVw0aW+vPKl5JgXJLqkkSzIKfyi6G/wp
+	 tgXb+zdU6hVR+e+Yq66ZZBmzgWnpEefYmBxSzFUweRGHv//dNvSdZGjahEUHieBHlx
+	 h+xUddk5Y2yVA==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c4d58c50743so52966666b.1
+        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2026 21:31:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErH5cBm3LVS/evyfD0oNpptGIlkmXHQW9DqMXqP4HKGcotdvU6anO5ZnU/pbpiIhK3UaPEqswnWyLQo4@vger.kernel.org
+X-Gm-Message-State: APuU4Z8l15IodB+X5rlanRohga2jlvfwnUuRjsJ5JV50YFvc6s6GPjeS
+	sxBQRtR8uZtP3V/Lq9ZRYESDgZ7nvACR3ZkpnDqANnH4/F1vCZD8BiW2W6bV0slDFb7TnyQps9/
+	zkPRn5PzfWl+wjh+6k3aFZBTruO5Elcc=
+X-Received: by 2002:a17:907:e915:b0:c4d:456c:4a29 with SMTP id
+ a640c23a62f3a-c5049582a21mr102830766b.14.1794288704427; Mon, 09 Nov 2026
+ 21:31:44 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -127,73 +59,61 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1793168155.git.jan.koester@tuxist.de>
+In-Reply-To: <cover.1793168155.git.jan.koester@tuxist.de>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 10 Nov 2026 14:31:31 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-LSxEBXu2P6S1PGid2rzzWELcCncP02guz6zMGkZc5VQ@mail.gmail.com>
+X-Gm-Features: AclHuK8YWklN2zsAN-HLO_wYWczPvjiJgKOTtoFW1cA9jTP6jMIMdI7Sxp3hAVs
+Message-ID: <CAKYAXd-LSxEBXu2P6S1PGid2rzzWELcCncP02guz6zMGkZc5VQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/6] ksmbd: Windows SIDs for user and group ids
+To: Jan Koester <jan.koester@tuxist.de>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
+	Christian Brauner <brauner@kernel.org>, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, samba-technical@lists.samba.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When no ACE names the caller, Everyone or Authenticated Users,
-smb_check_perm_dacl() lets a POSIX ACL entry for the caller decide
-access. The entry's rights replace the result of the DACL walk. Deny
-ACEs for the caller's groups, and OWNER RIGHTS for the owner, are then
-lost.
+On Wed, Oct 28, 2026 at 3:20=E2=80=AFPM Jan Koester <jan.koester@tuxist.de>=
+ wrote:
+>
+> Hi,
+Hi Jan,
+>
+> Windows names owners and ACL entries by SID; for a domain account that
+> is its objectSid. ksmbd shows a file's owner, group and POSIX ACL
+> entries as S-1-22 SIDs or as its server domain SID + uid, which a
+> Windows client can't relate to the domain's accounts, and a SID a client
+> sets for a domain account doesn't map back to an id at all. This series
+> lets user space, which knows the directory, translate between ids and
+> SIDs in both directions, for accounts that are logged in or not.
+>
+> It applies on top of the UUID/GUID id RFC (uid_r v2,
+How is the uid_r RFC going? This series is based on it, so I would
+like to know its current status and what you plan to do next with it.
 
-For example, a deny of FILE_WRITE_DATA for one of the caller's groups
-should refuse writes. A POSIX ACL entry that gives the caller write
-access still lets the caller write.
+> The user space side is sharedd (FenrirOS' ksmbd user space) with
+> adconnect for the directory lookups. Tested in a VM against a directory
+> server: owner and group of accounts that aren't logged in, ownership and
+> group changes, DACL round trips, a session getting access only through
+> a nested group, inherited CREATOR OWNER ACEs, and the directory going
+> away (cached mappings stay, new ones fail cleanly).
+>
+> Questions:
+> - Is a netlink round trip per uncached id acceptable here, or would you
+>   rather have user space push the mappings of a session's ids at login
+>   only? The latter can't cover owners that aren't logged in.
+On-demand lookup on a cache miss looks right to me. ksmbd kernel
+should cache the results as proposed and query userspace again only
+when an entry expires or is not cached. Loading all mappings up front
+does not scale well and is difficult to keep current.
 
-Remove the requested rights that those ACEs deny from the entry's
-rights. The DACL walk already records them in grp_denied.
+> - compare_sids() matches a SID against any prefix of it; the token uses
+>   an exact comparison. Should the existing callers move to that too?
+Please don't change the existing callers. Some of them rely on prefix
+matching on purpose. If exact comparison is needed, add an exact-match
+helper and convert only the relevant callers.
 
-Fixes: 42ac1f1917ae ("ksmbd: grant a caller what its groups and OWNER RIGHTS ACEs allow")
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Link: https://sashiko.dev/#/patchset/20261102200353.884509-1-icb%40fastmail.org
-Link: https://sashiko.dev/#/patchset/20261103150458.11591-1-icb%40fastmail.org
-Link: https://sashiko.dev/#/patchset/20261107062233.1579198-1-icb%40fastmail.org?part=1
-Link: https://sashiko.dev/#/patchset/20261107231941.1824289-1-icb%40fastmail.org?part=1
-Link: https://sashiko.dev/#/patchset/20261108182011.1888520-1-icb%40fastmail.org?part=1
-Cc: stable@vger.kernel.org
-Signed-off-by: Ian Bridges <icb@fastmail.org>
----
-
-Notes:
-    A POSIX ACL entry that decides can still drop rights that ACEs for
-    the caller's groups grant. The implicit allowances that every
-    non-strict check adds are also unchanged.
-    
-    For MAXIMUM_ALLOWED, only the rights named in the request are
-    checked against these denials. Group deny ACEs still do not limit
-    the rights that MAXIMUM_ALLOWED adds, as on the other paths of this
-    check.
-    
-    Tested with KASAN on ksmbd-for-next 4ab80fd4d1f1, and over SMB on a
-    kernel whose fs/smb/server tree is identical to it. smbtorture
-    results are unchanged.
-    
-    This patch was developed with LLM assistance.
-
- fs/smb/server/smbacl.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 1b387c262d59..45f70a05e21f 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -1764,6 +1764,15 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 					if (!access_bits)
- 						access_bits =
- 							SET_MINIMUM_RIGHTS;
-+					/*
-+					 * Only ACEs for the caller's groups,
-+					 * or OWNER RIGHTS for the owner, apply
-+					 * here. The POSIX ACL entry does not
-+					 * grant an explicitly requested right
-+					 * that they deny first in DACL order.
-+					 */
-+					access_bits &= ~(grp_denied &
-+							 requested);
- 					posix_acl_release(posix_acls);
- 					goto check_access_bits;
- 				}
-
-base-commit: 4ab80fd4d1f1c4363b336ddb3d8818ea37c4997d
--- 
-2.47.3
-
+Thanks.
