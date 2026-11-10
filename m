@@ -1,55 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794322061;
-	b=QuB81CwoBuYWvhrhEoDUiWTMqRFPnKCCmSAK6QZR+IEdtQRWQjeP004oRAYXs3mSBWEA
-	 IA/NJoefqnRFdKiDylhGt7o/5zTgH8XO0JrWIJqjs8ugiakaA/JAq/LiT79rWdXj5cvHk
-	 W17E9L2G1aIMBP6ROfXTUU4TVhqObfj3+nfPjhBe1gE7Bw7oCQFxb4LfO/t+qtgx112Hg
-	 ZR6Z2ETDCH/p8HHrhI/e039ZHmqXzuuEeoKFM3zMm8yW18y2jnxrH4hbqvR8p0y7relyE
-	 +BO2XjGGIVzy4ktF6uXB/vWRuqrxmE4sTEL/jPFACb98VaEl1qsP827ruYNAN+S4EZw==
+	t=1794322383;
+	b=WHufz2yJUeKAOA9GwY4Oxpy9IujtgGaJdNPLOyIxkEvkLF7gpUttI2inpnWK2r6dOw/D
+	 wTeCUG79kG1+U9JNbBbn5NeI57Cve1XbqL2P6/jDpXffZtLxtOi8qPEcVIwC7LpqAk70Y
+	 mek2MWT3Ccq7xj1xiXFYST8s5hnwQhUlboA6okxjh0oKgvpB9YtYL6OAMgIwa7lA2Wfvg
+	 x+ceYLrHF/4X1qjn3//T4Jq3MVkeqP0KLsWBzwSz+V5l16VDxbt/FlGvk2yDlgzMlkaFR
+	 ErSjWL5/beX6XTO1hyti0IZaVgjMLktXujkjXPHGhk3yMqgWI187wOg0fG6va6p2Sdw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794322061;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=KyXEQvhhvbYBNTKWxtCEeL0C1VjaH+7m5+BuhzMfTsA=;
-	b=ZH3pPyZXy+Exiq9WG38XaCFLMXjHOQOHv26sJCUz80x7KhESZJta+a8O9iTz58vpuVa8
-	 CE/kfS5Mu0erL0A+5L/AbtHdHFiSG/NynQFo6I2wSr6iK7BsoYi/+L2EixWGLUnboFFaa
-	 s96yMRB9ZMyYbxRloMQXPH7FF+y1LayKuX4uXZ+nkhKIurhHl80ONyePmzScnhmNz55Nl
-	 8oJ+FNTiGw9SbUyBPtbagEQkls6/8nxGeGHNDegY3IzsLb6VlcDWcJarB+zfIhCXwu7io
-	 ywV6dYsvefYipap7ld41c7sieN8d7yMFn3cYbFAgXBQpR4PwR6G4xiiwocuCgTMhuNA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794322383;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:Date:MIME-Version:Content-Type;
+	bh=igzsGYM2riHiB9kMz5te5OJWhyKS/vyukYoWrtQT28Q=;
+	b=gJnJB7r3c1RQFXBdpGsxvTW1oF65Ejnq1Y71hozglKOqihEoySB/93RHVHOb1h6pG02j
+	 Ph3wfNAEgIW7BYuCrKT09u7Cg53dNw5pRhi/U6FOMmfwAsKn4d3HdyNInkodnRhI972qH
+	 DGlOpF85VY+mD/vtrgU0sdGEASYo9KVUp6mHhJhZwbL7S9MTcLhVi5LQ8hKE3aZes0rUF
+	 bBoHc27mT260Vb7cMIaaJAOqpXryZ2Iqy3p4Afmg3PNq3ibdVbKVxl/rgB068a3py1Lo7
+	 8vpP+G3GxCHL4I1q9xhJ9ComPuMM3o7CsJo2ieTcTmf89fHemJlQI9J8M9WA67By//w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hyoJY1r4;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=zecagOqh;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00D760A2604
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 14:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E11D60A2613;
+	Tue, 10 Nov 2026 14:53:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9E11D60A2613
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hyoJY1r4
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8235A1F00902
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 14:47:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794322060;
-	bh=KyXEQvhhvbYBNTKWxtCEeL0C1VjaH+7m5+BuhzMfTsA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=hyoJY1r44Hfo4INbPlsaEsvNsouafEabkAWIXoqxv6HldmSF9wgi92NBH9mO/NXqP
-	 7ZS4K7tjFi+7pjONpCukTAKCDhaBwUkA8kiRvoF7yHAfX41EIIMigvkiei33wXssX4
-	 uzQcPUOQQDArgOnHRU0t5I19+eV/gAVW69lHZO3tXsRtYJiHFAebh44T5BS4Vwb0XR
-	 Q/NcabtsfRtTGr8c9BgE7i1Iq0aGQJao3PTPHEQQ1ApkndV6sueCbjGi1Zyuyh+FmF
-	 9DhXQUflheQoiGd84kl7TIBUb+cNwy6/tFV7HQXfEIyMoYTdNqW1ZVyHtB/wECog78
-	 Kv8e2HrnDUwbA==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6a642495d81so3269014a12.2
-        for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 06:47:40 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFGlLk8ra1U8XW9PvLbAd/WhEj13Fq7TqPaJZuD1bhagdLC2vyJD67A9qYHr+ZE8u1KtKJfM226uLRL@vger.kernel.org
-X-Gm-Message-State: APuU4Z9yHVGcW4TCrszh0mJ/m1N642ma0SEhm3EGxpHPtG5HQlvAsRNA
-	fO6z2FM51nH/4BQieh2SxPft3oBe5vy84oAjgy9gyBLi+3DO+XPmtjuarCGweLdYFzqQD5SA9vi
-	WkVS5zsC1SV1j+TzdonAIyDcmY+NrOW0=
-X-Received: by 2002:aa7:d582:0:b0:6b4:16fb:b9ba with SMTP id
- 4fb4d7f45d1cf-6b756b05b75mr1604589a12.36.1794322059147; Tue, 10 Nov 2026
- 06:47:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=zecagOqh
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=igzsGYM2riHiB9kMz5te5OJWhyKS/vyukYoWrtQT28Q=; b=zecagOqhontScvij8Oiwv5tRbV
+	J2Ns2FrCnRRmdeY5glIfrWtDTbAbeWVKct3UsnFoXTtjFwJMfP7d8Z7uHX7YGzXeuAhezZ4vSBQsU
+	xWpeKsxiYIssHYZoB0hImdZAZGB6dCqxt5xBQ2G7jrU2X3Py7D2HV4CaNZCqkRpb2ofm7shEr9dZn
+	UCar/CR9banScJ56+87Sv8LgmSO/JGVHP7xaElCbpAiWknAGu8EHEIB+iVavthj5QNKKG5nehKiLW
+	ZmDDTFg6DnIsLv1av4pObPYUS7U5ZhDfO3+p4e9Mr7QHTYdPVIIYEvyc83za5sCBuu3BA0DKMXcl/
+	sE9r5ZIA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xQnDV-00000001MbM-1jwG;
+	Tue, 10 Nov 2026 11:52:58 -0300
+Message-ID: <5773ae99397b259efb80acd386e71fae@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Joseph Qi <joseph.qi@linux.alibaba.com>, Namjae Jeon
+ <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, Joseph Qi
+ <joseph.qi@linux.alibaba.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] smb: client: hold the inode across cifs_oplock_break()
+In-Reply-To: <20261110094829.2133495-1-joseph.qi@linux.alibaba.com>
+References: <20261110094829.2133495-1-joseph.qi@linux.alibaba.com>
+Date: Tue, 10 Nov 2026 11:52:58 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,29 +64,27 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <CAKYAXd-Jo-ObBDs-AdGfaM+QmDsot3gj1g0oJiyDKczoUDg2TA@mail.gmail.com>
- <20261109194144.22814-1-mike.michalo@gmail.com> <20261109194144.22814-3-mike.michalo@gmail.com>
-In-Reply-To: <20261109194144.22814-3-mike.michalo@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 10 Nov 2026 23:47:27 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9FgSFui-RLdywqyciBdxcU8_xZkfxap+qQK=evVqNYqA@mail.gmail.com>
-X-Gm-Features: AclHuK88dHBDDOu7sgSeVl2Sdnz_lJKjB9tYyeuwVC2odqDlQh0fO1-02CBID9E
-Message-ID: <CAKYAXd9FgSFui-RLdywqyciBdxcU8_xZkfxap+qQK=evVqNYqA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/6] ksmbd: sign with the negotiated SMB 3.1.1 signing algorithm
-To: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-Cc: stfrench@microsoft.com, icb@fastmail.org, senozhatsky@chromium.org, 
-	tom@talpey.com, chenxiaosong@chenxiaosong.com, ematsumiya@suse.de, 
-	lsahlber@redhat.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-> +void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, __le16 signing_algorithm,
-> +                        char *key, struct kvec *iov, int n_vec, char *sig)
->  {
->         struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
->         struct aes_cmac_ctx cmac_ctx;
->         int i;
+Joseph Qi <joseph.qi@linux.alibaba.com> writes:
+
+> cifs_oplock_break() drops the handle reference in the middle of the
+> handler and keeps using cinode afterwards, to send the break
+> acknowledgment and again in cifs_done_oplock_break().  The reference
+> cifs_queue_oplock_break() takes is the only pin: the handle holds the
+> dentry and the dentry is what keeps the inode alive.
 >
-> +       if (signing_algorithm == SIGNING_ALG_HMAC_SHA256_LE) {
-> +               u8 mac[SHA256_DIGEST_SIZE];
-We can use SMB2_HMACSHA256_SIZE.
+> When that put is the last reference, the dput() in
+> cifsFileInfo_put_final() kills an unhashed dentry, drops the last
+> i_count and evicts the inode, so the rest of the handler runs on an
+> object whose free is only RCU-deferred.  An unhashed dentry that a
+> handle still references is an ordinary state: unlinking an open file
+> leaves the dentry that way, and so does the dcache teardown at unmount.
+>
+> Take a reference on the inode for the lifetime of the handler and drop
+> it once the break has been reported.  This also covers the
+> cifs_get_tlink() failure path, where the put is followed directly by
+> the out label.
+> ...
+
+Applied.
