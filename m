@@ -1,56 +1,48 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=173.212.254.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794295695;
-	b=xcQwZS/DosPwYC6pkIrPjLS28awrNTTDW61ZizT65x9f5qYaHlCbOfkq24AB8LNG7vGF
-	 I8RT1w+FnCeFYYMxnIXGsm4xvR0kr5nzwsgT92De662qDc9XlNsNlVpHSeY7jEbYsmork
-	 4fOrgCIjiRGgqeV2kT9y/vbF3nbSOH3zLEyOLQmW3PnUTFbpMsjWqLZKVY2XmrPxKYIuI
-	 ZtGrRWAtXliPKId9HGxmKWcy1oGm1inqzVzKLngBmhN2Iqbl7NNpzfUO3TNoRkmQknyC0
-	 gmd91XMaCsmLVBRYnrgvFzqcDRzTQcOxrlLVd2u+sA+k4armlMBOzy9Ui4kJ8Qv4XWg==
+	t=1794301294;
+	b=dBhY+URPmuBGZgItO4yzAjhE5z89/UJS+DCfl8gh4mXLMxmPNjHv8Ya0btW3u7VpLveT
+	 BvK1k+HPwwUa0OnRk/W7srFGaNNnqGjtCIZcPB6z1jHinfaccKWcu48abreUPrDLbjpP6
+	 6qn9yPg68zOBk0xKpWihQ+YWrPkZxfkP5Z3egQGcegZ7yfXfiE+FQnfuo4kA+TGwdbicW
+	 n2aom37CpyIrC37+nO340atxwJGQxBOu3tMJoUWfzK1ONkNEtTDFk2KzZDTViBqgv5lSP
+	 wWmW+hw0tRy0wqGgkO1SO2CXuOLQ5MWZdT0v0CI6Za4GVJoJT31txogX702WcIdspog==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794295695;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794301294;
 	h=DMARC-Filter:DKIM-Signature:X-Virus-Scanned:Received:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Subject:Date:Message-ID:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=M4r2qj7P4QEx7t98vQMOBPu9orxS4AyICajawHUCaJE=;
-	b=hG30X1ijneadVl1JU5H2wV4rctWspJpzABhDbl2ZZyrbUDPS3LCYF3PLv96vDx5zao8W
-	 R3GMn9ih/S7JbaBdicKtpXZsy5dn+2rlra+Q4SS1AV8gsRb7drxTR1IERlWOyvFv1bMEL
-	 6Lfe48GVXCiZnZ6diiP1IXiwWUpmDt3jEeIMYZ7lCcyGe9QWDxMk3mn5BDn5q6JZ9+87L
-	 YVDD/rC7Jpu22Kft0UrydW+ajjaK3jr4IWn7Fo20+zbLv5QBD7xuAW3pJ/vTWxLVsiSi+
-	 rs3U5pyGTI2S9WhySHAaqSSQsVYQUpkXfBro8rT82t4KkngN5kQhKeIpB1DUS0RA3MA==
+	bh=i6U554pIZDyRRDpm5VeHs9j2QQbJD58wC4vG/s0hFZM=;
+	b=Ar0J52qhungGyU10vltKQaHu0Ent+ZdCObUAH+CeXaUnXBFT1Mj4nacp7U3jsbWUKaVK
+	 SDWnfq4IwnhsYqXPgPT3b41wuMWdLDvHjYd+KS1KjW2/WiPEpxinrWC9POC8Qeqkg+ZBh
+	 Sisz7gCpgsnPf4djij8qs7L1pYAmEwnp1Q9KFsStRs4JxnJr/8aaIybn4CnVGu4Gt2iD6
+	 Ah2CY6HxvMmamW96FF+JEVhntYPEXGN4AKOGMNIGuIimao3lsB5q8jFQv/r3yLat1MtEA
+	 sNZ4pZP0cq4alxsKwPqdHki/otIoxbuSJCIK72refj2G7oLsUgAbzfnoyA2kbRX3nlA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=tuxist.de;
 	spf=pass smtp.mailfrom=tuxist.de;
-	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=CqRPeBZR;
+	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=IDk79aKZ;
 	arc=none smtp.remote-ip=173.212.254.19
 Received: from proxyplus-primary (groupware.tuxist.de [173.212.254.19])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B08606A31C;
-	Tue, 10 Nov 2026 07:28:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11B08606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B19606A31C;
+	Tue, 10 Nov 2026 09:01:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D5B19606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=CqRPeBZR
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxist.de; s=201705; h=from:to:subject:date:message-id; bh=M4r2qj7P4QEx7t98vQMOBPu9orxS4AyICajawHUCaJE=; b=CqRPeBZRTid32NIDO1Fo39yS3qxCXMTZoy8RV+och/8pD0WmpfZW6Ce4ilN6pQ/GzQ58wLz5I8hufLVplK3SxIxt4loiMZJq2TrS9Gkw3UxolFM6GJoY8FWSkTMLpPOxzllCgtv84EHi/PTBkGyTjPrHkRM4n1EmEBznFYzHxSp6Ktb/okJzYEwhd4FscwG1pF0jC0ZApDzurln6OT8SctaDL2GEq5v+EEBVcLyYTsntM316ec61U31yl9EFTrMSUt+lQfRJ/FBwOXIs/YvVCQ11EWs7nIVS+FpR58/ZLEsEBKbYEezlivgbZNbH7nLizVT8Vs8ckpDyqKuND3Wsog==
-Authentication-Results: proxyplus-primary; auth=pass smtp.auth=c0b31cfa-45fd-47d9-942d-1f6e173ca729
+	dkim=pass (2048-bit key) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=IDk79aKZ
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxist.de; s=201705; h=from:to:subject:date:message-id; bh=i6U554pIZDyRRDpm5VeHs9j2QQbJD58wC4vG/s0hFZM=; b=IDk79aKZbEKuExt50JnRtrqq6KMFs3kKYbn2VHGuqw6V0s4uvdUiti/J7cP3dGvuDXuS/df1yYqzhJgK2DT2Dp5h7Ndism4U1BTdyoRqyXs2eIB43IlQVivPXJ42CG+u3Em6WgW15USq6Qj5WX5roUht5tRTv1p4VMBzFq388jBqLmDFp7k2b3XZovsec+9N1psgdFKCK1cew6nzLhPpHvqDThU6nTvWZOrRS8luO0YjyBsKneS7o4VE7DzgULLAHIIKGgG4/k63DI8xX+ciptveSB3nL2dEFUOIEVHRYe0GXce6e0iFMxlUw4aERLUDj2m5GRVfNlbSgIXXHAlbJg==
+Authentication-Results: proxyplus-primary; auth=pass smtp.auth=713ee033-d4f8-4c9d-9e24-a891eb9c547d
 X-Virus-Scanned: proxyplus-clamav builtin
-Received: from dibsi-vdi.intranet.tuxist.de ([94.31.110.105]) by proxyplus-primary (ProxyPlus) with ESMTPSA; Tue, 10 Nov 2026 07:27:35 +0000
+Received: from groupi3 ([10.1.2.47]) by proxyplus-primary (ProxyPlus) with ESMTPSA; Tue, 10 Nov 2026 09:00:55 +0000
 From: Jan Koester <jan.koester@tuxist.de>
-To: linkinjeon@kernel.org,
-	smfrench@gmail.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	brauner@kernel.org,
-	linux-cifs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 0/6] ksmbd: Windows SIDs for user and group ids
-Date: Tue, 10 Nov 2026 08:27:39 +0100
-Message-ID: <20261110072745.1546158-1-jan.koester@tuxist.de>
-X-Mailer: git-send-email 2.53.0
+To: linkinjeon@kernel.org, smfrench@gmail.com
+Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, brauner@kernel.org, linux-cifs@vger.kernel.org, linux-fsdevel@vger.kernel.org, samba-technical@lists.samba.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 1/6] ksmbd: don't ignore the owner and group of a descriptor without a DACL
+Date: Tue, 10 Nov 2026 09:02:27 +0000
+Message-ID: <86878858c5973b660bd04a65@groupi3>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -60,94 +52,155 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
+parse_sec_desc() returned before looking at the owner and group SIDs
+when the descriptor had no DACL_PRESENT, so an SMB2 SET_INFO with only
+OWNER_SECURITY_INFORMATION or GROUP_SECURITY_INFORMATION -- what Windows
+sends to take ownership, and smbcacls -C/-G -- did nothing and still
+reported success.
 
-Windows names owners and ACL entries by SID; for a domain account that
-is its objectSid. ksmbd shows a file's owner, group and POSIX ACL
-entries as S-1-22 SIDs or as its server domain SID + uid, which a
-Windows client can't relate to the domain's accounts, and a SID a client
-sets for a domain account doesn't map back to an id at all. This series
-lets user space, which knows the directory, translate between ids and
-SIDs in both directions, for accounts that are logged in or not.
+Map the owner and group in any case and parse the DACL only if there is
+one. set_info_sec() then changes the mode and the POSIX ACLs only for a
+descriptor with a DACL, and leaves the stored descriptor alone without
+one: replacing it would drop its DACL, and the owner shown comes from
+the inode anyway. This also covers the SD buffer create context, so its
+type_check argument goes away.
 
-It applies on top of the UUID/GUID id RFC (uid_r v2,
-<cover.1792552161.git.jan.koester@tuxist.de>) and the NTLM pass-through
-series (<cover.1792345559.git.jan.koester@gmx.net>); the netlink events
-it adds follow theirs. Patches 1-3 are independent of uid_r in substance;
-I can rebase them onto mainline to go on their own if that is preferred.
+Assisted-by: Claude:claude-opus-5-5
+Signed-off-by: Jan Koester <jan.koester@tuxist.de>
+---
+ fs/smb/server/smb2pdu.c |  4 ++--
+ fs/smb/server/smbacl.c  | 39 ++++++++++++++++++++++++++-------------
+ fs/smb/server/smbacl.h  |  2 +-
+ 3 files changed, 29 insertions(+), 16 deletions(-)
 
-Changes since v1
-(https://lore.kernel.org/linux-cifs/cover.1793168155.git.jan.koester@tuxist.de/):
-- 4/6: the token's SIDs are compared with the ACEs' through a new
-  exported smb_sid_equal() next to compare_sids(), which also replaces
-  the private copy of the same comparison in idmap.c. compare_sids()
-  and its existing callers are unchanged, as some rely on its prefix
-  matching (Namjae).
-- 4/6: the SID mapping stays an on-demand lookup on a cache miss, as
-  discussed; no change there.
-- 4/6 also converts the smb_check_perm_dacl() caller in
-  smb2_handle_app_instance_id().
-- samba-technical dropped from Cc: it only takes mail from subscribers.
-
-1/6 ksmbd ignored the owner and group of a descriptor without a DACL,
-    which is what Windows sends to take ownership (and smbcacls -C/-G),
-    and still reported success.
-
-2/6 After setting a POSIX ACL from a DACL, the following chmod used the
-    owning group's bits as the mask and left named entries without
-    effect.
-
-3/6 passes the domain of an NTLM login (NTLMSSP DomainName) to user
-    space in the formerly reserved room of the login request, so a user
-    space serving several domains can tell DOMAIN\user from OTHER\user.
-
-4/6 adds KSMBD_EVENT_SID_MAP_REQUEST/RESPONSE for a user space that sets
-    KSMBD_GLOBAL_FLAG_SID_MAP at startup: the SID of an id ksmbd shows,
-    the id of a domain SID a client sets. Answers are cached (mappings
-    5 minutes, "none" 1 minute, "couldn't say" never). Showing a
-    descriptor never fails on a missing mapping; setting one fails with
-    STATUS_NO_LOGON_SERVERS, STATUS_INVALID_OWNER or
-    STATUS_INVALID_PRIMARY_GROUP instead of being applied in part or
-    ignored. The session user also matches ACEs for its groups' SIDs,
-    like a Windows access token.
-
-5/6 shows classic users as S-1-22-1-<uid> instead of the per-server
-    domain SID + uid, and still takes the old form.
-
-6/6 documents it in Documentation/userspace-api/uid_r.rst.
-
-The user space side is sharedd (FenrirOS' ksmbd user space) with
-adconnect for the directory lookups.
-
-Thanks,
-Jan
-
-Jan Koester (6):
-  ksmbd: don't ignore the owner and group of a descriptor without a DACL
-  ksmbd: keep named ACL entries effective when a DACL sets a POSIX ACL
-  ksmbd: pass the domain of an NTLM login to user space
-  ksmbd: map user and group ids to Windows SIDs through user space
-  ksmbd: show classic users as S-1-22-1-<uid> on every server
-  Documentation: uid_r: describe ksmbd's SID mapping
-
- Documentation/userspace-api/uid_r.rst |  18 +-
- fs/smb/server/Makefile                |   2 +-
- fs/smb/server/idmap.c                 | 315 +++++++++++++++++++++++++++++++++
- fs/smb/server/idmap.h                 |  25 +++
- fs/smb/server/ksmbd_netlink.h         |  62 ++++++-
- fs/smb/server/mgmt/user_config.c      |  21 ++-
- fs/smb/server/mgmt/user_config.h      |   7 +-
- fs/smb/server/server.c                |   2 +
- fs/smb/server/smb2pdu.c               |  37 +++-
- fs/smb/server/smbacl.c                | 267 ++++++++++++++++++++++++----
- fs/smb/server/smbacl.h                |  19 +-
- fs/smb/server/transport_ipc.c         |  72 +++++++-
- fs/smb/server/transport_ipc.h         |   5 +-
- 13 files changed, 797 insertions(+), 55 deletions(-)
- create mode 100644 fs/smb/server/idmap.c
- create mode 100644 fs/smb/server/idmap.h
-
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 230bea45de..8e47d725c1 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3661,7 +3661,7 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
+ 	    sizeof(struct create_sd_buf_req))
+ 		return -EINVAL;
+ 	return set_info_sec(work->conn, work->tcon, path, &sd_buf->ntsd,
+-			    le32_to_cpu(sd_buf->ccontext.DataLength), true, false);
++			    le32_to_cpu(sd_buf->ccontext.DataLength), false);
+ }
+ 
+ static void ksmbd_acls_fattr(struct smb_fattr *fattr,
+@@ -8535,7 +8535,7 @@ static int smb2_set_info_sec(struct ksmbd_file *fp, int addition_info,
+ 		return -EACCES;
+ 
+ 	return set_info_sec(fp->conn, fp->tcon, &fp->filp->f_path, pntsd,
+-			buf_len, false, true);
++			buf_len, true);
+ }
+ 
+ /**
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 126264cc07..d1cf63a9fe 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1017,12 +1017,14 @@ int parse_sec_desc(struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+ 		    le32_to_cpu(pntsd->sacloffset), dacloffset);
+ 
+ 	pntsd_type = le16_to_cpu(pntsd->type);
+-	if (!(pntsd_type & DACL_PRESENT)) {
++	/*
++	 * Without a DACL only the owner and group change (Windows sends that
++	 * to take ownership): don't return before them.
++	 */
++	if (pntsd_type & DACL_PRESENT)
++		pntsd->type = cpu_to_le16(DACL_PRESENT);
++	else
+ 		ksmbd_debug(SMB, "DACL_PRESENT in DACL type is not set\n");
+-		return rc;
+-	}
+-
+-	pntsd->type = cpu_to_le16(DACL_PRESENT);
+ 
+ 	if (pntsd->osidoffset) {
+ 		if (le32_to_cpu(pntsd->osidoffset) < sizeof(struct smb_ntsd))
+@@ -1060,6 +1062,9 @@ int parse_sec_desc(struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+ 		}
+ 	}
+ 
++	if (!(pntsd_type & DACL_PRESENT))
++		return 0;
++
+ 	if ((pntsd_type & (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ)) ==
+ 	    (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ))
+ 		pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
+@@ -1768,18 +1773,21 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 
+ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		 const struct path *path, struct smb_ntsd *pntsd, int ntsd_len,
+-		 bool type_check, bool get_write)
++		 bool get_write)
+ {
+ 	int rc;
+ 	struct smb_fattr fattr = {{0}};
+ 	struct inode *inode = d_inode(path->dentry);
+ 	struct mnt_idmap *idmap = mnt_idmap(path->mnt);
+ 	struct iattr newattrs;
++	bool dacl;
+ 
+ 	fattr.cf_uid = INVALID_UID;
+ 	fattr.cf_gid = INVALID_GID;
+ 	fattr.cf_mode = inode->i_mode;
+ 
++	/* parse_sec_desc() rewrites type */
++	dacl = le16_to_cpu(pntsd->type) & DACL_PRESENT;
+ 	rc = parse_sec_desc(idmap, pntsd, ntsd_len, &fattr);
+ 	if (rc)
+ 		goto out;
+@@ -1793,12 +1801,14 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		newattrs.ia_valid |= ATTR_GID;
+ 		newattrs.ia_gid = fattr.cf_gid;
+ 	}
+-	newattrs.ia_valid |= ATTR_MODE;
+-	newattrs.ia_mode = (inode->i_mode & ~0777) | (fattr.cf_mode & 0777);
+-
+-	ksmbd_vfs_remove_acl_xattrs(idmap, path);
++	/* only the owner and group without a DACL: mode and ACLs stay */
++	if (dacl) {
++		newattrs.ia_valid |= ATTR_MODE;
++		newattrs.ia_mode = (inode->i_mode & ~0777) | (fattr.cf_mode & 0777);
++		ksmbd_vfs_remove_acl_xattrs(idmap, path);
++	}
+ 	/* Update posix acls */
+-	if (IS_ENABLED(CONFIG_FS_POSIX_ACL) && fattr.cf_dacls) {
++	if (IS_ENABLED(CONFIG_FS_POSIX_ACL) && dacl && fattr.cf_dacls) {
+ 		rc = set_posix_acl(idmap, path->dentry,
+ 				   ACL_TYPE_ACCESS, fattr.cf_acls);
+ 		if (rc < 0)
+@@ -1821,8 +1831,11 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	if (rc)
+ 		goto out;
+ 
+-	/* Check it only calling from SD BUFFER context */
+-	if (type_check && !(le16_to_cpu(pntsd->type) & DACL_PRESENT))
++	/*
++	 * The stored descriptor keeps its DACL when only the owner or group
++	 * changed: the owner shown is the inode's anyway.
++	 */
++	if (!dacl)
+ 		goto out;
+ 
+ 	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
+diff --git a/fs/smb/server/smbacl.h b/fs/smb/server/smbacl.h
+index b6a01f0d45..d4c9b679d8 100644
+--- a/fs/smb/server/smbacl.h
++++ b/fs/smb/server/smbacl.h
+@@ -99,7 +99,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 			bool strict);
+ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		 const struct path *path, struct smb_ntsd *pntsd, int ntsd_len,
+-		 bool type_check, bool get_write);
++		 bool get_write);
+ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid);
+ void ksmbd_uid_to_sid(kuid_t uid, uint sidtype, struct smb_sid *ssid);
+ void ksmbd_gid_to_sid(kgid_t gid, uint sidtype, struct smb_sid *ssid);
 -- 
 2.56.0
