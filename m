@@ -1,55 +1,56 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=173.212.254.19
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794288706;
-	b=xLoR9qnwV3xiMP8YFRAvI/F9NhZimSuYGwfyw7rxnlJnhvcxjdlLx7Eit2QmgChuMX27
-	 KHFcM+3Xg/hwG9bgz/z0wkAMvRMDwlvGOftimjkeS8JfhiJfmbkpHgo+FybBKCi7r4HnF
-	 rTdFRkWqheguSS2D1WmgIAskhPOizzu4ovulvmhciXBjHVMqdZu5sH9cXe4/vTw2rxkyC
-	 ZtdfqmSVjkqLdzMK1COsKc0tq2U+rDA+Yx7oK2NRx8JELe/Akg68ZvaE5NKji0+gcGYi1
-	 k7wzBSLTq3zDe8uAZ7u0SAvgg36T+AIFCHJKeNft433PvJ9dV2X3uOAgxnMoMTSLTOw==
+	t=1794295695;
+	b=xcQwZS/DosPwYC6pkIrPjLS28awrNTTDW61ZizT65x9f5qYaHlCbOfkq24AB8LNG7vGF
+	 I8RT1w+FnCeFYYMxnIXGsm4xvR0kr5nzwsgT92De662qDc9XlNsNlVpHSeY7jEbYsmork
+	 4fOrgCIjiRGgqeV2kT9y/vbF3nbSOH3zLEyOLQmW3PnUTFbpMsjWqLZKVY2XmrPxKYIuI
+	 ZtGrRWAtXliPKId9HGxmKWcy1oGm1inqzVzKLngBmhN2Iqbl7NNpzfUO3TNoRkmQknyC0
+	 gmd91XMaCsmLVBRYnrgvFzqcDRzTQcOxrlLVd2u+sA+k4armlMBOzy9Ui4kJ8Qv4XWg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794288706;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=v4N6CEsUv8RrVUeKKYOn2SlTG3d00sO7azLy5/TrcQ0=;
-	b=oqhjtVGq/Nm2H5oQhXmyYKlgcfKnQ9x4b87kLKz/NWwv29QVq4FOO9KsctjB3eItWVVF
-	 fDNqpVv+kpOofkKw9ErCZHyWKnRei7b+gfpvglKRgaLI4kVKbC/hX+rM8bDB7h1a+79VU
-	 w08KMHkMWK/Iy3OXYNrxzBCvRLmS5xm3VmOh4iyJ9ED+owsh/c8vUSOfT2PWvu/83VgXP
-	 EajlS8Bl9J8aot7Up10dyObri5/5P7AktJoNlaQ6TpCaQQMxV8XQRkviY/eBzOQI4phj9
-	 6HU6bYADXAjc5KPJJSOdyKeV6WeZI50KQ33vaHsBLh9mtK1o0dDg+KjNxnuBS8GQngQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794295695;
+	h=DMARC-Filter:DKIM-Signature:X-Virus-Scanned:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=M4r2qj7P4QEx7t98vQMOBPu9orxS4AyICajawHUCaJE=;
+	b=hG30X1ijneadVl1JU5H2wV4rctWspJpzABhDbl2ZZyrbUDPS3LCYF3PLv96vDx5zao8W
+	 R3GMn9ih/S7JbaBdicKtpXZsy5dn+2rlra+Q4SS1AV8gsRb7drxTR1IERlWOyvFv1bMEL
+	 6Lfe48GVXCiZnZ6diiP1IXiwWUpmDt3jEeIMYZ7lCcyGe9QWDxMk3mn5BDn5q6JZ9+87L
+	 YVDD/rC7Jpu22Kft0UrydW+ajjaK3jr4IWn7Fo20+zbLv5QBD7xuAW3pJ/vTWxLVsiSi+
+	 rs3U5pyGTI2S9WhySHAaqSSQsVYQUpkXfBro8rT82t4KkngN5kQhKeIpB1DUS0RA3MA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loPadRfd;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=tuxist.de;
+	spf=pass smtp.mailfrom=tuxist.de;
+	dkim=pass header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=CqRPeBZR;
+	arc=none smtp.remote-ip=173.212.254.19
+Received: from proxyplus-primary (groupware.tuxist.de [173.212.254.19])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE41606A321
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 05:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B08606A31C;
+	Tue, 10 Nov 2026 07:28:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11B08606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=tuxist.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxist.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=loPadRfd
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B17821F0089F
-	for <linux-cifs@vger.kernel.org>; Tue, 10 Nov 2026 05:31:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794288705;
-	bh=v4N6CEsUv8RrVUeKKYOn2SlTG3d00sO7azLy5/TrcQ0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=loPadRfdjOi8S1VAyFya2up5v9Qwgo3NrNbfFnzSpJGwHO6+00k31kXRHnBvW4i4b
-	 csWZpo8GiRr8sBmXlThkF8aPEEVxwJWEO3eMjLRo7SHybFnbNFLwvGvkfBhc3taMMG
-	 aiGV/cx5pCO8e3nnqLrsnq8fRqaz5oRAo1xzUP7l4mOOiymbMRZ5o/p4GabY037D69
-	 7u3LLaBwraIYvoA69QxZEYJFcrf5xSyyEUNVw0aW+vPKl5JgXJLqkkSzIKfyi6G/wp
-	 tgXb+zdU6hVR+e+Yq66ZZBmzgWnpEefYmBxSzFUweRGHv//dNvSdZGjahEUHieBHlx
-	 h+xUddk5Y2yVA==
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-c4d58c50743so52966666b.1
-        for <linux-cifs@vger.kernel.org>; Mon, 09 Nov 2026 21:31:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErH5cBm3LVS/evyfD0oNpptGIlkmXHQW9DqMXqP4HKGcotdvU6anO5ZnU/pbpiIhK3UaPEqswnWyLQo4@vger.kernel.org
-X-Gm-Message-State: APuU4Z8l15IodB+X5rlanRohga2jlvfwnUuRjsJ5JV50YFvc6s6GPjeS
-	sxBQRtR8uZtP3V/Lq9ZRYESDgZ7nvACR3ZkpnDqANnH4/F1vCZD8BiW2W6bV0slDFb7TnyQps9/
-	zkPRn5PzfWl+wjh+6k3aFZBTruO5Elcc=
-X-Received: by 2002:a17:907:e915:b0:c4d:456c:4a29 with SMTP id
- a640c23a62f3a-c5049582a21mr102830766b.14.1794288704427; Mon, 09 Nov 2026
- 21:31:44 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=tuxist.de header.i=@tuxist.de header.a=rsa-sha256 header.s=201705 header.b=CqRPeBZR
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tuxist.de; s=201705; h=from:to:subject:date:message-id; bh=M4r2qj7P4QEx7t98vQMOBPu9orxS4AyICajawHUCaJE=; b=CqRPeBZRTid32NIDO1Fo39yS3qxCXMTZoy8RV+och/8pD0WmpfZW6Ce4ilN6pQ/GzQ58wLz5I8hufLVplK3SxIxt4loiMZJq2TrS9Gkw3UxolFM6GJoY8FWSkTMLpPOxzllCgtv84EHi/PTBkGyTjPrHkRM4n1EmEBznFYzHxSp6Ktb/okJzYEwhd4FscwG1pF0jC0ZApDzurln6OT8SctaDL2GEq5v+EEBVcLyYTsntM316ec61U31yl9EFTrMSUt+lQfRJ/FBwOXIs/YvVCQ11EWs7nIVS+FpR58/ZLEsEBKbYEezlivgbZNbH7nLizVT8Vs8ckpDyqKuND3Wsog==
+Authentication-Results: proxyplus-primary; auth=pass smtp.auth=c0b31cfa-45fd-47d9-942d-1f6e173ca729
+X-Virus-Scanned: proxyplus-clamav builtin
+Received: from dibsi-vdi.intranet.tuxist.de ([94.31.110.105]) by proxyplus-primary (ProxyPlus) with ESMTPSA; Tue, 10 Nov 2026 07:27:35 +0000
+From: Jan Koester <jan.koester@tuxist.de>
+To: linkinjeon@kernel.org,
+	smfrench@gmail.com
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	brauner@kernel.org,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH v2 0/6] ksmbd: Windows SIDs for user and group ids
+Date: Tue, 10 Nov 2026 08:27:39 +0100
+Message-ID: <20261110072745.1546158-1-jan.koester@tuxist.de>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,61 +60,94 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <cover.1793168155.git.jan.koester@tuxist.de>
-In-Reply-To: <cover.1793168155.git.jan.koester@tuxist.de>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 10 Nov 2026 14:31:31 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-LSxEBXu2P6S1PGid2rzzWELcCncP02guz6zMGkZc5VQ@mail.gmail.com>
-X-Gm-Features: AclHuK8YWklN2zsAN-HLO_wYWczPvjiJgKOTtoFW1cA9jTP6jMIMdI7Sxp3hAVs
-Message-ID: <CAKYAXd-LSxEBXu2P6S1PGid2rzzWELcCncP02guz6zMGkZc5VQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/6] ksmbd: Windows SIDs for user and group ids
-To: Jan Koester <jan.koester@tuxist.de>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
-	Christian Brauner <brauner@kernel.org>, linux-cifs@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, samba-technical@lists.samba.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 28, 2026 at 3:20=E2=80=AFPM Jan Koester <jan.koester@tuxist.de>=
- wrote:
->
-> Hi,
-Hi Jan,
->
-> Windows names owners and ACL entries by SID; for a domain account that
-> is its objectSid. ksmbd shows a file's owner, group and POSIX ACL
-> entries as S-1-22 SIDs or as its server domain SID + uid, which a
-> Windows client can't relate to the domain's accounts, and a SID a client
-> sets for a domain account doesn't map back to an id at all. This series
-> lets user space, which knows the directory, translate between ids and
-> SIDs in both directions, for accounts that are logged in or not.
->
-> It applies on top of the UUID/GUID id RFC (uid_r v2,
-How is the uid_r RFC going? This series is based on it, so I would
-like to know its current status and what you plan to do next with it.
+Hi,
 
-> The user space side is sharedd (FenrirOS' ksmbd user space) with
-> adconnect for the directory lookups. Tested in a VM against a directory
-> server: owner and group of accounts that aren't logged in, ownership and
-> group changes, DACL round trips, a session getting access only through
-> a nested group, inherited CREATOR OWNER ACEs, and the directory going
-> away (cached mappings stay, new ones fail cleanly).
->
-> Questions:
-> - Is a netlink round trip per uncached id acceptable here, or would you
->   rather have user space push the mappings of a session's ids at login
->   only? The latter can't cover owners that aren't logged in.
-On-demand lookup on a cache miss looks right to me. ksmbd kernel
-should cache the results as proposed and query userspace again only
-when an entry expires or is not cached. Loading all mappings up front
-does not scale well and is difficult to keep current.
+Windows names owners and ACL entries by SID; for a domain account that
+is its objectSid. ksmbd shows a file's owner, group and POSIX ACL
+entries as S-1-22 SIDs or as its server domain SID + uid, which a
+Windows client can't relate to the domain's accounts, and a SID a client
+sets for a domain account doesn't map back to an id at all. This series
+lets user space, which knows the directory, translate between ids and
+SIDs in both directions, for accounts that are logged in or not.
 
-> - compare_sids() matches a SID against any prefix of it; the token uses
->   an exact comparison. Should the existing callers move to that too?
-Please don't change the existing callers. Some of them rely on prefix
-matching on purpose. If exact comparison is needed, add an exact-match
-helper and convert only the relevant callers.
+It applies on top of the UUID/GUID id RFC (uid_r v2,
+<cover.1792552161.git.jan.koester@tuxist.de>) and the NTLM pass-through
+series (<cover.1792345559.git.jan.koester@gmx.net>); the netlink events
+it adds follow theirs. Patches 1-3 are independent of uid_r in substance;
+I can rebase them onto mainline to go on their own if that is preferred.
 
-Thanks.
+Changes since v1
+(https://lore.kernel.org/linux-cifs/cover.1793168155.git.jan.koester@tuxist.de/):
+- 4/6: the token's SIDs are compared with the ACEs' through a new
+  exported smb_sid_equal() next to compare_sids(), which also replaces
+  the private copy of the same comparison in idmap.c. compare_sids()
+  and its existing callers are unchanged, as some rely on its prefix
+  matching (Namjae).
+- 4/6: the SID mapping stays an on-demand lookup on a cache miss, as
+  discussed; no change there.
+- 4/6 also converts the smb_check_perm_dacl() caller in
+  smb2_handle_app_instance_id().
+- samba-technical dropped from Cc: it only takes mail from subscribers.
+
+1/6 ksmbd ignored the owner and group of a descriptor without a DACL,
+    which is what Windows sends to take ownership (and smbcacls -C/-G),
+    and still reported success.
+
+2/6 After setting a POSIX ACL from a DACL, the following chmod used the
+    owning group's bits as the mask and left named entries without
+    effect.
+
+3/6 passes the domain of an NTLM login (NTLMSSP DomainName) to user
+    space in the formerly reserved room of the login request, so a user
+    space serving several domains can tell DOMAIN\user from OTHER\user.
+
+4/6 adds KSMBD_EVENT_SID_MAP_REQUEST/RESPONSE for a user space that sets
+    KSMBD_GLOBAL_FLAG_SID_MAP at startup: the SID of an id ksmbd shows,
+    the id of a domain SID a client sets. Answers are cached (mappings
+    5 minutes, "none" 1 minute, "couldn't say" never). Showing a
+    descriptor never fails on a missing mapping; setting one fails with
+    STATUS_NO_LOGON_SERVERS, STATUS_INVALID_OWNER or
+    STATUS_INVALID_PRIMARY_GROUP instead of being applied in part or
+    ignored. The session user also matches ACEs for its groups' SIDs,
+    like a Windows access token.
+
+5/6 shows classic users as S-1-22-1-<uid> instead of the per-server
+    domain SID + uid, and still takes the old form.
+
+6/6 documents it in Documentation/userspace-api/uid_r.rst.
+
+The user space side is sharedd (FenrirOS' ksmbd user space) with
+adconnect for the directory lookups.
+
+Thanks,
+Jan
+
+Jan Koester (6):
+  ksmbd: don't ignore the owner and group of a descriptor without a DACL
+  ksmbd: keep named ACL entries effective when a DACL sets a POSIX ACL
+  ksmbd: pass the domain of an NTLM login to user space
+  ksmbd: map user and group ids to Windows SIDs through user space
+  ksmbd: show classic users as S-1-22-1-<uid> on every server
+  Documentation: uid_r: describe ksmbd's SID mapping
+
+ Documentation/userspace-api/uid_r.rst |  18 +-
+ fs/smb/server/Makefile                |   2 +-
+ fs/smb/server/idmap.c                 | 315 +++++++++++++++++++++++++++++++++
+ fs/smb/server/idmap.h                 |  25 +++
+ fs/smb/server/ksmbd_netlink.h         |  62 ++++++-
+ fs/smb/server/mgmt/user_config.c      |  21 ++-
+ fs/smb/server/mgmt/user_config.h      |   7 +-
+ fs/smb/server/server.c                |   2 +
+ fs/smb/server/smb2pdu.c               |  37 +++-
+ fs/smb/server/smbacl.c                | 267 ++++++++++++++++++++++++----
+ fs/smb/server/smbacl.h                |  19 +-
+ fs/smb/server/transport_ipc.c         |  72 +++++++-
+ fs/smb/server/transport_ipc.h         |   5 +-
+ 13 files changed, 797 insertions(+), 55 deletions(-)
+ create mode 100644 fs/smb/server/idmap.c
+ create mode 100644 fs/smb/server/idmap.h
+
+-- 
+2.56.0
