@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794349791;
-	b=RN8x1sojbjwEwqo9R11T+gN/piFkrcmXZLtIGL284YNXuhPObkXZcN2Sy9AHRtM6WY17
-	 CcqZQM3j8FLWQkAc92ydNqLW7I1okCLAG3AIf799daAF15QhScL1kdWpNaC9o/ZlFsyQv
-	 YpTUfsupFh4h+eCMlnASrj5lBNC/jK1fx60lItjOjRgI1PCu9wz+9iVBoC7D4VVlQ1lRU
-	 e0o0nJ1Mx17/WxEAieJBMVnvkzwNue/i8qBZOrhNLBPgXmAlBOElqUtAExLi9/3XqKn5F
-	 AzYWvyirmOuRjADHea4Jq86C2dpABR3RzKXXlmp8JssVtdhKIxu2NTgspw9m6Mg3DoA==
+	t=1794349793;
+	b=l4RrJPLmeJi+m33PWtqdZg6jgFjo9q/gyNJRkbvbimd16ckNz6mVy7ZZrHUxqcdDbVRk
+	 8jvowaJBU9G00i4czwDVXgepYtdrx26UZf7epSZ16xiGAYc6AqSZjUd3wZ/4NnA+UR5C8
+	 mlmJ/zZGcI8PFfoRa1xFkVMm4wXVlTAcnCU9LNU8JkfkvmtbmtbWoq7OWVVEglpa+pwxj
+	 oT9l+ZviKigcWtIsYgvzsyjpChTUjFR4gR9t5/U0DVE6N8zko3ec/EfNEK5+XX0jVKF/1
+	 ilV3sL0HU5/s++GV5Ob7aOdyGaw2q9umnkaCZUhRKKU1nWCoo8Ka09zMpbkzZ5Td/lQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794349791;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794349793;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=A7tASFXnNuPE+e+nS1b06UWislcan1F6/IvDUWRJ6dY=;
-	b=yNL66GEQaEO0EBwlLoL562gKsLnCA+sCfY1witHKsWdL9UQowA5VOHpE+r9KiRTQZW2w
-	 SSYm8qYcw4o29hvRXYk2UaGxLOdadw/59ObxWLyudptE0sk39No/R1++c8+zokW/1uU1f
-	 2MnzL7r5GwaLpoSWzpqH+53A9Z+zlK9tkiqudUFEaVzL5/irseWn+FhVLcf9oS+Ya15Ct
-	 s179dVage5IJHOTNtcFO4mnF4Ozd8nYVOdjnyrdGrryiBOkKVKSLHxo4bc6jjIQ5WM2g9
-	 jyQIE8z/Yq0ErgxuSnQXpKfXt5Nx0WFyJJJwdn9cDiZyWMj9Kz2gw4+0zKgCGS2ViKw==
+	bh=F4/PdHrzBlcggV8YW4nkZrr2K8nMPnl0FAFqU9q+VJw=;
+	b=mJcDvAeeiR7DepTHoFZJPBKDt+DmAfQNBMrUl2hDHacsrgrjF+cZyAtjTkQ35x4hsP9s
+	 yyAHS+LpyWgAdglP6Z0hOLdscEyyCZt8xWSiLgGPklzqRlWUBznWvj8fWBAZCpReS87oq
+	 XRCPrhoJkXM8E22cjMb+m5qgTwXx5dRRffTt1P0w7c+tTenkyIrgX2daPg0KWIOzy+sH2
+	 bzxhA2HLvGDQhDYTfLs4Akm0rxXjwnri5Mkjj1tQaJWLicE/K7BzCZvo/0V5zPf8R7yDp
+	 Ko0x+MwVgT52isVJbXDrWqOlxjDh9sPzR5a1Y1bEls56TUs+3QhClZclKtFFaH7bpnQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XYAFMpwx;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YWw35ylj;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27D0606A325;
-	Tue, 10 Nov 2026 22:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF79606A325;
+	Tue, 10 Nov 2026 22:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XYAFMpwx
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 614441F008A2;
-	Tue, 10 Nov 2026 22:29:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=YWw35ylj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04FA61F008AB;
+	Tue, 10 Nov 2026 22:29:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794349790;
-	bh=A7tASFXnNuPE+e+nS1b06UWislcan1F6/IvDUWRJ6dY=;
+	s=k20260515; t=1794349792;
+	bh=F4/PdHrzBlcggV8YW4nkZrr2K8nMPnl0FAFqU9q+VJw=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=XYAFMpwxw45Mkdk/2AXix7iUkAY1Rlyq/LaeRmxo2ZjGrowkCLXk3KEBUGulsXekV
-	 bmSSzJ4an125Gqm1gKtJKoVoFIJQrnUePTefr1iaTldCLN2lh64LouTcFPx24kMBAE
-	 S2W8xZ9s80qGLkMUUtJDErfiYwzS69M5K6XHgzLVO02mo/2yn5Y+WhJ+16pHFQGX6O
-	 91bwg4+RziJEIUvoSY94FuYsGBzc5MldYAnZgu637Rox3jGNzVoigXhy/9rjpMc3cL
-	 OCYOWyCNOyvW5qqTnydp31qSrF9e/F6zdArpmqUxoGP8HT9MCPDN/AQeXirofAoqmX
-	 O2orAmc+iok1g==
-Subject: Re: [PATCH net-next v18 11/15] quic: add crypto key derivation and
- installation
+	b=YWw35yljPunpBrdubF40KFTSLvsKSfhpEMzZk+WK8MwgvJVemM5C5OIyoP8MOE5VI
+	 XC4gOLm0uZgGUvwDwGM23hJEQZisaDjEdI/XwyrU7mEH07F/NvTnNJaTGM6xYet6wx
+	 gh7YPqcKrI7BG41sILAj4VlssBjXedt0NxkdqYGMb5oNTFoWCB9fzl9omtAPAhZ8/I
+	 Jc1RZEC1kb0DXRbC5E3UwQELxF9kDBQUy12uCrXxW7KUeS13Xu0KLCvX0gXrlBJ16X
+	 gX9jgZV51HHhBta6Y3nN6gn7AZA7ycGHdt019DeyDLkBq9wQ7ZqAG+31OGDJ4BcYn4
+	 1i2CuGOXdbCFA==
+Subject: Re: [PATCH net-next v18 12/15] quic: add crypto packet encryption and
+ decryption
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -55,11 +55,11 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  jbaron@akamai.com, illiliti@protonmail.com, sd@queasysnail.net,
  marcelo.leitner@gmail.com, daniel@haxx.se, andrew.gospodarek@broadcom.com,
  mef@scarletmail.rutgers.edu, paul@jakma.org, kuniyu@google.com
-Date: Tue, 10 Nov 2026 22:29:47 +0000
-Message-ID: <179434978792.994134.17759133431780284123@kernel.org>
-In-Reply-To: <b269e7436d8e9b5816a8e716d661767a2e43c27b.1794241656.git.lucien.xin@gmail.com>
-References: <b269e7436d8e9b5816a8e716d661767a2e43c27b.1794241656.git.lucien.xin@gmail.com>
-X-sashiko-severity: Medium
+Date: Tue, 10 Nov 2026 22:29:50 +0000
+Message-ID: <179434979059.994134.18317543021105952060@kernel.org>
+In-Reply-To: <adecdb94b1bbb4f329cb2cfea6d5f142c52d91a0.1794241656.git.lucien.xin@gmail.com>
+References: <adecdb94b1bbb4f329cb2cfea6d5f142c52d91a0.1794241656.git.lucien.xin@gmail.com>
+X-sashiko-severity: High
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -75,7 +75,7 @@ MIME-Version: 1.0
 Thank you for your contribution! Sashiko AI review found 3 potential
 issue(s) to consider.
 
-Critical: 0 · High: 0 · Medium: 1 · Low: 2
+Critical: 0 · High: 1 · Medium: 0 · Low: 2
 
 If you believe none of the issues are legitimate, please reply to each
 issue of Medium severity or higher and explain why the AI is wrong.
@@ -83,150 +83,168 @@ If any of them are legitimate and you plan to respin, please let patchwork
 know by including "pw-bot: cr" as a separate line at the end of your reply
 (one such reply per series is enough).
 
-- [Medium] quic_crypto_set_cipher() (net/quic/crypto.c:272) stores seven
-  freshly allocated transforms (secret_tfm, rx_tfm[0..1], rx_hp_tfm,…
-- [Low] The commit message that stays in git history leaves out the
-  socket lifecycle changes in net/quic/socket.c.
-- [Low] quic_crypto_set_cipher() allocates the header-protection
-  transforms with crypto_alloc_sync_skcipher(), which returns struct…
+- [High] Retry/NEW_TOKEN tokens can reuse an AES-GCM (key, nonce) pair
+  across sockets.
+- [Low] The AEAD integrity limit is enforced per encryption level, but it
+  is documented as per connection.
+- [Low] crypto->async_pending[] decides when the AEAD transforms can be
+  rekeyed, but every access to it is relaxed.
 
 --
 
-quic: add crypto key derivation and installation
+quic: add crypto packet encryption and decryption
 
-This patch adds net/quic/crypto.c. It provides HKDF helpers, cipher
-transform allocation, traffic secret installation, key update and
-stateless reset token derivation for QUIC. It also allocates one
-struct quic_crypto per encryption level in quic_init_sock(), and a new
-sk_destruct callback defers freeing those contexts to quic_wq.
-
-> quic: add crypto key derivation and installation
->
-> This patch introduces 'quic_crypto', a component responsible for QUIC
-> encryption key derivation and installation across the various key
-> levels: Initial, Handshake, 0-RTT (Early), and 1-RTT (Application).
-
-[ ... ]
-
-> - quic_crypto_derive_secret(): Generate token for stateless reset or
->   master key for session resumption.
->
-> These mechanisms are essential for establishing and maintaining secure
-> communication throughout the QUIC connection lifecycle.
-
-[Severity: Low]
-The commit message describes this patch only as adding crypto helpers.
-Could it also mention the socket lifecycle changes in net/quic/socket.c?
-
-The patch also does the following:
-
-  - installs a new quic_sock_destruct() as sk->sk_destruct in
-    quic_init_sock()
-  - allocates QUIC_CRYPTO_MAX struct quic_crypto contexts per socket
-    with kzalloc_obj()
-  - defers transform teardown to quic_crypto_free_work() on quic_wq,
-    which runs after the socket has been destroyed
-
-The function list also leaves out the new exported helper
-quic_crypto_set_token_secret().
-
-These details appear only in the v18 notes below the --- line, and
-git am drops that text.
+This patch adds AEAD payload protection and QUIC header protection for
+the TX and RX paths, through quic_crypto_encrypt() and
+quic_crypto_decrypt(). It also adds Retry integrity tag computation and
+helpers to generate and verify Retry and address validation tokens.
 
 > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
-> new file mode 100644
-> index 0000000000000..c4bf99b3e8239
-> --- /dev/null
+> index c4bf99b3e8239..54fccaf715105 100644
+> --- a/net/quic/crypto.c
 > +++ b/net/quic/crypto.c
 
 [ ... ]
 
-> +int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type)
+> +int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *skb,
+> +			gfp_t gfp)
 > +{
-> +	const struct quic_cipher *cipher;
-> +	void *tfm;
-> +	int err;
-> +
-> +	if (type < QUIC_CIPHER_MIN || type > QUIC_CIPHER_MAX)
-> +		return -EINVAL;
-> +
-> +	cipher = &ciphers[type - QUIC_CIPHER_MIN];
-> +	tfm = crypto_alloc_shash(cipher->shash, 0, 0);
-> +	if (IS_ERR(tfm))
-> +		return PTR_ERR(tfm);
-> +	crypto->secret_tfm = tfm;
 
 [ ... ]
 
-> +	tfm = crypto_alloc_sync_skcipher(cipher->skc, 0, 0);
-> +	if (IS_ERR(tfm)) {
-> +		err = PTR_ERR(tfm);
-> +		goto err;
-> +	}
-> +	crypto->rx_hp_tfm = tfm;
+> +	phase = cb->key_phase;
+> +	if (phase != crypto->key_phase && !crypto->key_pending) {
+> +		if (!crypto->send_ready) /* Not ready for key update. */
+> +			return -EINVAL;
+> +		if (!cb->backlog) /* Key update requires process context. */
+> +			return -EKEYREVOKED;
+> +		/* Cannot do key update while async crypto is in progress. */
+> +		if (unlikely(atomic_read(&crypto->async_pending[phase])))
+> +			return -EBUSY;
+> +		err = quic_crypto_key_update(crypto); /* Perform key update. */
 
 [Severity: Low]
-Are the types for the header protection transforms consistent here?
+Is the memory ordering here strong enough to make rekeying the tfm safe?
+The async completion path reports that it is done using a void atomic op:
 
-crypto_alloc_sync_skcipher() returns a struct crypto_sync_skcipher *.
-The result passes through the void *tfm local into rx_hp_tfm, and
-tx_hp_tfm is handled the same way. Both fields are declared as struct
-crypto_skcipher * in net/quic/crypto.h.
+quic_crypto_done() {
+    ...
+	crypto = *(struct quic_crypto **)cb->crypto_ctx;
+	atomic_dec(&crypto->async_pending[cb->key_phase]);
+    ...
+}
 
-quic_crypto_free() then releases them with crypto_free_skcipher()
-instead of crypto_free_sync_skcipher():
+This side then checks the counter with a plain atomic_read() before
+quic_crypto_key_update()->quic_crypto_keys_derive_and_install() calls
+crypto_aead_setkey() on the same phase's tfm.
 
-	if (crypto->rx_hp_tfm)
-		crypto_free_skcipher(crypto->rx_hp_tfm);
-	if (crypto->tx_hp_tfm)
-		crypto_free_skcipher(crypto->tx_hp_tfm);
+Documentation/atomic_t.txt says void atomic RMW ops are unordered. So
+nothing orders the driver's earlier reads of the key context before the
+decrement, and there is no acquire on the reader side.
 
-This works today only because struct crypto_sync_skcipher wraps a
-struct crypto_skcipher base at offset 0. Because tfm is a void *, the
-compiler cannot catch the mismatch. The mismatch is still present at
-the end of the series, where quic_crypto_header_protect() uses these
-fields as struct crypto_skcipher *.
+On weakly ordered architectures, could a request completing on one CPU
+still be reading the old key schedule after another CPU has seen
+async_pending == 0 and rekeyed? That request would then run with mixed
+key material.
 
-Should the fields be declared as struct crypto_sync_skcipher * and
-freed with crypto_free_sync_skcipher()?
+Would atomic_dec_return_release() (or smp_mb__before_atomic()) in
+quic_crypto_done(), paired with atomic_read_acquire() here, be enough?
 
 [ ... ]
 
-> +	crypto->tx_hp_tfm = tfm;
-> +
-> +	crypto->cipher = cipher;
-> +	crypto->cipher_type = type;
 > +	return 0;
 > +err:
-> +	quic_crypto_free(crypto);
+> +	if (err == -EBADMSG && ++crypto->rx_fails >= crypto->cipher->rxlimit)
+> +		err = -EKEYEXPIRED;
 > +	return err;
 > +}
 
-[Severity: Medium]
-Can this error path destroy state that this call did not create?
+[Severity: Low]
+Does this enforce the limit per connection? struct quic_cipher in
+net/quic/crypto.h documents it as:
 
-quic_crypto_set_cipher() stores seven newly allocated transforms
-without checking whether the context already holds any. On failure it
-calls quic_crypto_free() on the whole context. That frees every
-transform and then zeroes the structure up to send_offset:
+	u64 rxlimit; /* Max decryption failures per connection */
 
-	memzero_explicit(crypto, offsetof(struct quic_crypto, send_offset));
+The v17 changelog also calls rx_fails a connection-wide counter.
 
-If this ran on a context that was already set up, the old transforms
-would leak. If that second call then failed, it would also wipe the
-live keys, the token secret in tx_secret[1], and the cipher,
-send_ready and recv_ready state.
+However, rx_fails is a field of struct quic_crypto, and quic_init_sock()
+allocates a separate quic_crypto for each of the QUIC_CRYPTO_MAX
+encryption levels. Authentication failures at the Initial, Handshake,
+0-RTT and 1-RTT levels are therefore counted separately and never add
+up.
 
-In this series the only caller is quic_crypto_set_secret(). It calls
-quic_crypto_set_cipher() only when crypto->cipher is NULL, so this
-path does not appear to be reachable yet.
+RFC 9001 section 6.6 counts failures within the connection, across all
+keys. Should the counter be shared across levels, or should the comment
+and changelog be updated?
 
-The notes say later patches call quic_crypto_set_cipher() directly from
-quic_inet_listen(), quic_connect() and quic_accept(). Those patches are
-not part of this series.
+[ ... ]
 
-Would it be safer to reject a context that already has transforms, and
-to unwind only the allocations made by this call?
+> +static int quic_crypto_token_protect(struct quic_crypto *crypto, u8 *token,
+> +				     u32 len, u32 adlen, bool enc)
+> +{
+
+[ ... ]
+
+> +	memcpy(nonce, crypto->tx_iv[1], QUIC_IV_LEN);
+> +
+> +	/* Read counter value from token AAD (bytes 1-8) and XOR with IV. */
+> +	clen = sizeof(c);
+> +	p = token + adlen - clen;
+> +	quic_get_int(&p, &clen, &c, clen);
+> +
+> +	n = cpu_to_be64(c);
+> +	for (i = 0; i < sizeof(n); i++)
+> +		nonce[QUIC_IV_LEN - sizeof(n) + i] ^= ((u8 *)&n)[i];
+
+[ ... ]
+
+> +int quic_crypto_generate_token(struct quic_crypto *crypto, void *addr,
+> +			       u32 addrlen, struct quic_conn_id *conn_id,
+> +			       u8 *token, u32 *tlen)
+> +{
+
+[ ... ]
+
+> +	/* Use counter for nonce derivation to prevent collisions. */
+> +	counter = crypto->tx_count[1]++;
+
+[Severity: High]
+Can this counter value repeat under the same token key on different
+sockets?
+
+quic_crypto_token_protect() builds the AES-GCM nonce as tx_iv[1] XOR
+counter. Both the AEAD key and tx_iv[1] are derived only from
+tx_secret[1] in quic_crypto_set_token_secret(), and that function keeps
+any secret that is already set:
+
+	if (!memchr_inv(srt, 0, TLS_CIPHER_AES_GCM_128_SECRET_SIZE))
+		get_random_bytes(srt, TLS_CIPHER_AES_GCM_128_SECRET_SIZE);
+
+The token secret looks like it is meant to be shared server-wide. Later
+in the series, quic_packet_process() verifies both Retry and
+QUIC_TOKEN_FLAG_REGULAR (NEW_TOKEN) tokens with the listener's Initial
+crypto, but accepted sockets are the ones that issue NEW_TOKEN.
+quic_crypto_derive_secret() also seeds the stateless reset and
+resumption secrets from tx_secret[1].
+
+tx_count[1], on the other hand, is per quic_crypto. quic_init_sock()
+kzalloc's each quic_crypto, so every socket's counter starts at 0.
+quic_crypto_keys_derive_and_install() also resets tx_count[] like a
+packet counter.
+
+So wouldn't the listener's first token and the first token from each
+accepted socket all use nonce tx_iv[1] XOR 0 under the same key?
+
+Two AES-GCM messages with the same (key, nonce) let an attacker recover
+the GHASH key and forge valid tokens. For example, they could swap in a
+different client address or an arbitrary ODCID, which defeats address
+validation. The counter is sent in the clear in the AAD, so collisions
+are easy to spot.
+
+The note after the --- line about token nonce reuse argues from the
+earlier timestamp nonce and socket lock serialization. Does that
+reasoning still apply when separate sockets keep independent counters
+under one shared key?
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1794241654.git.lucien.xin%40gmail.com
