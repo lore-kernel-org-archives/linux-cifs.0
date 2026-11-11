@@ -1,54 +1,54 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794403815;
-	b=INNx8S9nLy+fPMfGbrNdBqqL/lSkLbHNE92Iyz2/XzbSwanA4kXlCKUnQOgIyyFe2zQM
-	 rUi2Z1RZG04vFsd7PA/8yPjBELshjpVDj7Y6Pnq2RLGbKkr6TAjKlu4HE4wiZXG8WCLLi
-	 ulm4CFLG/FX78/Busu/jb0gXPRpXSRLKwGhkgchs45hkRPYFDU7EZ6kicwxs5sIs9Bl4/
-	 9vAw2QXFaB2MTuIwnniNaDguk0OkHqH4hezq7p0CzBnaaa4hak4S4Nq9xaS/bLEjt8y2p
-	 o//WUaLN5pCw9Do7CWLUm9Ih8FqfSMGFTJ4kBgbaF/g9apQVUwZ/PAJBs3OGq5ubM7Q==
+	t=1794404337;
+	b=qWlyyLl1BF4ENATEKpNNPWJefojO8x/bemJKE2fA5AqKtjGpPYbQgQPLvJp3aWnjD0BN
+	 5wzva4gAPW2fna92QNxCgUHckvXN274xT0XQZx8EgcEUKpAKEQdR+OF21j+F4IVKxOH7A
+	 I2O6KYdBPkIODwy1QRm2bIK459xGQdCEboviBLJz7bof+5I0a2CB/mzjvrzqtmlHE9o+B
+	 ltExyreEOdWwR8SGNv9OirO5DUrxOF9nEYVXSybLUpqv7/aCdu8uduXJsuead+o+BFaa8
+	 /gM9kG7MFqtTYOaVxYjNONPuv/AYLbK8N1gOPlsgproPKqL65FC9HZ1nhgjPHRi6Whw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794403815;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794404337;
 	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
 	 MIME-Version:References:In-Reply-To:From:Date:
 	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type;
-	bh=0RxplO1mLFzUBYXU6brprN2sPBQWvCdnZ2OutIiXlC0=;
-	b=Ytea8Km+URr45DcUlaldRQ0i/ZhIYJM/+dBNh6xfnAdKAJs71YnDMEZpehDARP40MfW+
-	 YwCzUOWD6l+3gxgKtqiuhWG6buLDbK4RDw7tu9H31oB+3XyGHHgqB+XJCPKjrKabXrXsZ
-	 XzBxSpBPQyhRgoFdrjg2rYticNTAeRAEntim4oXMY5SsxNKq0JgpPguGLLVrZVcy+84eA
-	 k43qoak2r/yNtKEDvpYDi49RbZgAi9IEZPB/YUZ22lBmb9ePT1hGR95KEtVgdeBn2WAod
-	 tIIWt1YsS5HmDFQkNg56tOQwPMAyn8hKE0/WVaHNssilCcJqsXkCJcJs1ytcPutXE1A==
+	 Content-Type:Content-Transfer-Encoding;
+	bh=rfbv9bhVSLEGgYsnEU6dwbEphMUQAD1S6pv/+5EeMhQ=;
+	b=ZjqEa+vg1FWcrvoq4OSY9upbFY6CmhNvSi2lnvQbjHiKl9BCa/nb8VrHHBEHDkyl9N9d
+	 KxCb3vMURUM5wLWJ8nW1x95FovYMDI9Ab43p4r9Nj5yvqG2GNeZLOCS0/8s/0YEZYUtvF
+	 ze9OC28FAVDBMAkcqY6T988mV0df86y94mS+M9rEFrmTQtSrJsT+XuXp7KxWhv/YN2NBS
+	 U/ZsjXjVIK3M7E3hpPShk2/aJvT/Pih3YzCTWCba3SOW8n0lKXTQmifqcUfvziLmZesCc
+	 JxaqgKmZ6CHj7ffLZgNNQi1wrzxmeYnLuQeCELdYOCrdIGrbtRAy4kQ0+/4vi3TaeHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O7i2zk4Z;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X4i7mr6g;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861AC606A32E
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 13:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF33606A31C
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 13:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=O7i2zk4Z
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53CFE1F00A0B
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 13:30:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X4i7mr6g
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA4C01F00A0B
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 13:38:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794403815;
-	bh=0RxplO1mLFzUBYXU6brprN2sPBQWvCdnZ2OutIiXlC0=;
+	s=k20260515; t=1794404337;
+	bh=rfbv9bhVSLEGgYsnEU6dwbEphMUQAD1S6pv/+5EeMhQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=O7i2zk4ZrbYHmwxkjCRryhVZaWntMoZE8gCgKPyBdwcWQocwleTB2Yvsbkjsf5GvB
-	 fgNjLDPILYGTLOru2D4X8Nsk3jJe18Sm15tLrqu5pSrZR9TmLMsGajpBh8OmmXZVt6
-	 GUpwECkrZztup/qEn/ffwLGDFj/l+v6i5oXsuHfP/2TdhFcRImsQlrSZrsfdmoN5MO
-	 Ztd9xUx+USUGcnY660sIsXwzeQF8TFCGGFGZWxLl82H27LYdL+pS+qkOjhautkDdKo
-	 LrfwVg2MedOjeKwO4s99uzpRB58bfAwGYRW+xqLTCemGeoF4nSHfH5XgR9Egqj2ghp
-	 QKQMcpvhjZPCA==
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6b70880c0a4so3492957a12.2
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 05:30:15 -0800 (PST)
-X-Gm-Message-State: APuU4Z/9aWlbTAB9zrr7UOprtB3HDvzmoN0vCp5IvcH8WpOAXdWUYlE1
-	yyttVGiyBpcDhdY+/4GuDMx6AgEoSSESiKaXtKwkKOOnFGlV3gsqLkqOmZSEsd8KwnqCb1CfZaQ
-	Lu5p15xdkMApEEZ+KeqOK+cSPN58yvro=
-X-Received: by 2002:a05:6402:42d0:b0:6b7:96ca:ca75 with SMTP id
- 4fb4d7f45d1cf-6b796cacd4cmr129344a12.17.1794403813910; Wed, 11 Nov 2026
- 05:30:13 -0800 (PST)
+	b=X4i7mr6gPSSF2E/Ve4zdudovA2+iCNE9re0m77iQC5MgPhHgIIQsqa2fFfJKKPUPA
+	 d3oM8TeZUWahg1Sa1GWwgC5kGhE2cNosbRkHSoQVk1EFc2HMOWLcQ6rIJyUehoDeVJ
+	 lewNK43vv+T29g0Y/GOhSol5AfZ6eIafXxkPRKhWWZ8qNAGxtm/jVoX50KinM0Mfp1
+	 sBcn0/WoeJGDHje7l5fb0trsolW8vfBLdrQRrYBsJOONTdjDi1+SCRcCikA7ItsqI2
+	 OWB2RVTbyOTPJ9miX3Hx/tXwu64JByL/E0TVD1K3orPLiyzLmP6+oZ+GnL/v54VXCV
+	 em66wWrKhrosw==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6b596569640so5092379a12.1
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 05:38:57 -0800 (PST)
+X-Gm-Message-State: APuU4Z9Yoq3aDFSiL5d73RzzkYnzsBVoN7j+qqE5X2sF5l/1aenZyPGe
+	xqV0xJFgOJTgoWRtiZotf7YHwTFeSUhJXNG5mot95bB8pD0WgqotneRygrbr4d+3P/F2EsPOWLX
+	9MtCgvRODFr9THW0dvcg7uAX/UcT1gbk=
+X-Received: by 2002:aa7:c84e:0:b0:6b5:8297:f44e with SMTP id
+ 4fb4d7f45d1cf-6b7773e79d1mr1475665a12.5.1794404336330; Wed, 11 Nov 2026
+ 05:38:56 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,45 +58,36 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261110225412.3937476-1-pc@manguebit.org>
-In-Reply-To: <20261110225412.3937476-1-pc@manguebit.org>
+References: <20261110225412.3937476-1-pc@manguebit.org> <20261110225412.3937476-2-pc@manguebit.org>
+In-Reply-To: <20261110225412.3937476-2-pc@manguebit.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 11 Nov 2026 22:30:01 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-VC8shz7r9P=mS5XvOuGoadBhjJ6XYaaivL1z8v0UGpA@mail.gmail.com>
-X-Gm-Features: AclHuK_OrYgpF5a13YXs1lYPvyoXYAk-ZAYjoaZngRG19B-eSmvBFPb8FUUjIlc
-Message-ID: <CAKYAXd-VC8shz7r9P=mS5XvOuGoadBhjJ6XYaaivL1z8v0UGpA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] smb: client: retry a hard link open without a lease
+Date: Wed, 11 Nov 2026 22:38:44 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_1=BdBt=+8+vgSn+jp80rEZpaK=daTL4=oXmhTA36=1w@mail.gmail.com>
+X-Gm-Features: AclHuK-YZTIwe_wwVHJtgeyyjssQUcMYI0SsUyaMmENMvRZ1g5dI1wTXRrM69hI
+Message-ID: <CAKYAXd_1=BdBt=+8+vgSn+jp80rEZpaK=daTL4=oXmhTA36=1w@mail.gmail.com>
+Subject: Re: [PATCH 2/2] smb: client: flush deferred handles of other names
+ before a hard link open
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, 
 	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Giuseppe Piscitelli <ooonea@gmail.com>, stable@vger.kernel.org
+	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> @@ -214,6 +214,19 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
->                 rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, data, NULL, &err_iov,
->                                &err_buftype);
->         }
-> +       if (rc == -EINVAL && smb2_oplock != SMB2_OPLOCK_LEVEL_NONE &&
-> +           !oparms->pending) {
-> +               cifs_dbg(FYI, "%s: invalid lease key, resending request without lease\n",
-> +                        __func__);
-> +               free_rsp_buf(err_buftype, err_iov.iov_base);
-> +               memset(&err_iov, 0, sizeof(err_iov));
-> +               err_buftype = CIFS_NO_BUFFER;
-> +               smb2_oplock = SMB2_OPLOCK_LEVEL_NONE;
-> +               oparms->reconnect = reconnect;
-> +               oparms->replay = false;
-> +               rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock,
-> +                              data, NULL, &err_iov, &err_buftype);
-Should we retry without FILE_READ_ATTRIBUTES if this retry returns
--EACCES?  EACCES handling above only applies to the first SMB2_open()
-call...
-
-> +       }
->         if (rc && data) {
->                 struct smb2_hdr *hdr = err_iov.iov_base;
+On Wed, Nov 11, 2026 at 7:54=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
+wrote:
 >
-> --
-> 2.56.0
+> cifs_open() flushes an inode's deferred closes before opening a different
+> name (hard link) of it, so the open can take a fresh lease rather than be
+> reissued without one (see "smb: client: retry a hard link open without a
+> lease").  cifs_get_hardlink_path() only triggered that flush when a cache=
+d
+> handle had the same open flags as the new open, so a differently accessed
+> name - written then read, say - skipped it and opened without a lease.
 >
+> Match on the name instead: flush when a cached handle for another name of
+> the inode is open, so those opens keep lease caching too.
+>
+> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+Looks good to me:
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
