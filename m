@@ -1,63 +1,66 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794404697;
-	b=qd8KP3DRSqElxGlIVnPLC9RkdkBRAd73F3FhxuQKKSeLfWr3nHY9isN+KVHA1D1uYqAf
-	 hvXqSrBnsCO1yAft2kQfnFN1UmO2+w4x5mEiyzspK2529E5eYLA0PvPuibJErjxo9gYBg
-	 ZOG/iHvMxcEF6ba/9Uru/DVsHo+o1jnx6NJdC/V5tGKWW3l1feXM3HCUndMTq2oqeosTw
-	 LqGH/EILd2yQvL+HUV187I8dJ4vavRTA4VQpPGdLCOFJx1QGZIkIV6WsOzH92h2lF8ob/
-	 ACk66fW9XWNrbaDMA+T8Zlm5SSO7xjJdIVM7hv+mnwSSJMjN+JzHnV6DRSQMfImiT1Q==
+	t=1794405206;
+	b=p3Bj4FUtJdDmeANl/rDcA5oda5K/Af6i+BYVTh2qhjNTV/Wm6l5s/rIQ3ZM8k2Z4D4F5
+	 7huA4yvS3inNHzeSzdpZCDcZ+GW2arwqlc03Lj4Al0HogvyiscPoU1cear8w2IceAgELv
+	 GzBzP4n/44N9LK6VE+A6o0Sfxdy7IHCbP0zANu/8074bv2631NWYiyceyP8A8gDyD8Zfx
+	 CHLDLVNC6zhdHeNRedQksE17R0WOi3/4O0mZ3MYbdGU2aVoMMHN9iqcW4df1tfXZTn72B
+	 r1A0WPi5cPWmzYdd6Z1Kw34m2iYbZIBp/+Vi/DjoHpKxiSvhn/Sb3wEOFKXPfgeLNyg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794404697;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=L9NVOt4hOFoYtGev0mEhj0TEZnxJ0HjT+1Qu0Bv20T0=;
-	b=E6MY9MRCuzaCDNxcVXF8t0x0zBIZSPrrp17Q3hHwPfe+GGCcm7phmcLNuGfHC2AuTZ0S
-	 PaLCnBsJcLzkl1S4jrz/ltHDWf5M3cUOQS6+xTmmZmLjp7umNaIMQ3XZLSCcR/dv8Si5x
-	 JWwVfKqcw35der4uihEMAACm8bxGv+mQvAUa426MCftGpV+HgxYYXsjIaf3sax9xDQwA0
-	 cPO+WMSMalpmKxQcyUfKzh8EG151TvEi0rl6opQOQ/Hqi1UTjMMScsezJgCFod1sJGhDB
-	 SQHzbsem2sIa2ObQ+07bYsBItPjJ6jZwJDfLIy+QgYqiWXQLPsKqzCbHEx3YUuCqPoA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794405206;
+	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
+	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=WnQ7kTS4QK4Y1l5HtlODrVojIq3DfhLWtwgbnMgLq9M=;
+	b=Tgwq5GQE84fYYFCDvZaX55L0bB+F3ydlB70K/3ofAZAobWi+f7N3jAkqYkkgPm5opKIf
+	 DiIGpf7zopyV8SAwJdV1muO04hgErZz6+SXrOd6ZnaMkFNdVhOB6xPCZsULaWYEzekd6n
+	 DSnB5BBlrX4h1Q4eVTCYJKbnwXxFxOXXim5UyFKDkZyXtNoAvKyn/Ax5rPHxeSO5M5Vhs
+	 IiALF9Wt8svenOl4YbBNuZ2t9TO0w5K0Btt7fV6YtyEXrfHR3oiY3ZLcs0cihgUP7sFNZ
+	 DdmAuXI+yWvaJdzrolutt4GEVrCxBweGLIDZUyZPPg6ahlXEC68iZ8EmMw11s5GFG2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=vV+0FcTB;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=35XvWiev;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81ED606A31C;
-	Wed, 11 Nov 2026 13:44:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E81ED606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FBE606A321;
+	Wed, 11 Nov 2026 13:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 91FBE606A321
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=vV+0FcTB
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=35XvWiev
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=L9NVOt4hOFoYtGev0mEhj0TEZnxJ0HjT+1Qu0Bv20T0=; b=vV+0FcTBoNU5o4OLSQPC6PgnRv
-	fgHstmcDFOtYkngXKEoAi2RMXhliQ/4spjCvQ9nlOI+mZb/xXFgUtY+yiig6PXX9y6k7NOR3Elkvr
-	FM8cqexiY0emYR3TlgAj1TV+tz/qP60mxdF6USCI15sJgqLex7T7rFKWB8Uc1XTxdU39ZqtZRhjI8
-	vbAniFGvU4pH34YgOGgPNOonS1U4UL4eDK5lXgNEN3Gxac5H4kEtMi6j4qWKu9RQ1CZ/PoEDe93zv
-	Ix1OOYGXg81QTqFSZhqqdH3gQPl3tX2Kc0G/o19I9cBSYs1xS4x0jjk7zvhYo0vHV3t36Pe/ZNDGo
-	GrdGWOCA==;
+	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:MIME-Version:References:
+	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Content-Type:Reply-To:
+	Content-ID:Content-Description;
+	bh=WnQ7kTS4QK4Y1l5HtlODrVojIq3DfhLWtwgbnMgLq9M=; b=35XvWieva8+waarRxLUeXbh7QS
+	+8v91od8S56rByhoOqe2PL0uVaje3rdl94Bru5TS0ksjdNInlku182Jcnq1Ycs6Ch/Athkp9zM4we
+	R5ZRpjUiUEP1M6/5Qz6k4y+MfRyWkGhf0KawgyRkEWLwTe4RIbqPZTELSiVbmwtS0g6C6iAcjMne1
+	MFSfE/iTJJGTEKcRBVcqLf3tFhnGS0xXROFOgByoLZJ1GhvDtSyej9OaLTqOxmzZufvGyiDNUJnT5
+	RIomQnoOi2w8veh6PNE8hNCh+GhCBKSRjV7L+6wX5rAYi6vGy42ZiD/i0g5YPBg2Lcv0o6vq02eb1
+	WMMAd6Xg==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xR8d7-00000001Stc-3el0;
-	Wed, 11 Nov 2026 10:44:51 -0300
-Message-ID: <10dd9cea16f8ebff2103ee7ac7e5ec4f@manguebit.org>
+	id 1xR8lP-00000001SwZ-2dLu;
+	Wed, 11 Nov 2026 10:53:24 -0300
 From: Paulo Alcantara <pc@manguebit.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, Ronnie
- Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
- <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
- <bharathsm@microsoft.com>, Giuseppe Piscitelli <ooonea@gmail.com>,
- stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] smb: client: retry a hard link open without a lease
-In-Reply-To: <CAKYAXd-VC8shz7r9P=mS5XvOuGoadBhjJ6XYaaivL1z8v0UGpA@mail.gmail.com>
-References: <20261110225412.3937476-1-pc@manguebit.org>
- <CAKYAXd-VC8shz7r9P=mS5XvOuGoadBhjJ6XYaaivL1z8v0UGpA@mail.gmail.com>
-Date: Wed, 11 Nov 2026 10:44:50 -0300
+To: linux-cifs@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 2/2] smb: client: flush deferred handles of other names before a hard link open
+Date: Wed, 11 Nov 2026 10:53:24 -0300
+Message-ID: <20261111135324.4028153-2-pc@manguebit.org>
+X-Mailer: git-send-email 2.56.0
+In-Reply-To: <20261111135324.4028153-1-pc@manguebit.org>
+References: <20261111135324.4028153-1-pc@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -67,29 +70,39 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Namjae Jeon <linkinjeon@kernel.org> writes:
+cifs_open() flushes an inode's deferred closes before opening a different
+name (hard link) of it, so the open can take a fresh lease rather than be
+reissued without one (see "smb: client: retry a hard link open without a
+lease").  cifs_get_hardlink_path() only triggered that flush when a cached
+handle had the same open flags as the new open, so a differently accessed
+name - written then read, say - skipped it and opened without a lease.
 
->> @@ -214,6 +214,19 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
->>                 rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, data, NULL, &err_iov,
->>                                &err_buftype);
->>         }
->> +       if (rc == -EINVAL && smb2_oplock != SMB2_OPLOCK_LEVEL_NONE &&
->> +           !oparms->pending) {
->> +               cifs_dbg(FYI, "%s: invalid lease key, resending request without lease\n",
->> +                        __func__);
->> +               free_rsp_buf(err_buftype, err_iov.iov_base);
->> +               memset(&err_iov, 0, sizeof(err_iov));
->> +               err_buftype = CIFS_NO_BUFFER;
->> +               smb2_oplock = SMB2_OPLOCK_LEVEL_NONE;
->> +               oparms->reconnect = reconnect;
->> +               oparms->replay = false;
->> +               rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock,
->> +                              data, NULL, &err_iov, &err_buftype);
-> Should we retry without FILE_READ_ATTRIBUTES if this retry returns
-> -EACCES?  EACCES handling above only applies to the first SMB2_open()
-> call...
+Match on the name instead: flush when a cached handle for another name of
+the inode is open, so those opens keep lease caching too.
 
-Indeed.  We should retry on -EACESS without read attr there as well.
-Thanks!
+Fixes: 262b73ef442e ("smb3 client: fix open hardlink on deferred close file error")
+Cc: stable@vger.kernel.org
+Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Signed-off-by: Paulo Alcantara <pc@manguebit.org>
+---
+ fs/smb/client/file.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
+index 1247d73740a0..f51653cb6432 100644
+--- a/fs/smb/client/file.c
++++ b/fs/smb/client/file.c
+@@ -2737,7 +2737,7 @@ cifs_get_hardlink_path(struct cifs_tcon *tcon, struct inode *inode,
+ 	spin_lock(&cinode->open_file_lock);
+ 
+ 	list_for_each_entry(open_file, &cinode->openFileList, flist) {
+-		if (file->f_flags == open_file->f_flags) {
++		if (open_file->dentry != file_dentry(file)) {
+ 			rc = -EINVAL;
+ 			break;
+ 		}
+-- 
+2.56.0
+
