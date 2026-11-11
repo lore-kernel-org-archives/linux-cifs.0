@@ -1,54 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794404337;
-	b=qWlyyLl1BF4ENATEKpNNPWJefojO8x/bemJKE2fA5AqKtjGpPYbQgQPLvJp3aWnjD0BN
-	 5wzva4gAPW2fna92QNxCgUHckvXN274xT0XQZx8EgcEUKpAKEQdR+OF21j+F4IVKxOH7A
-	 I2O6KYdBPkIODwy1QRm2bIK459xGQdCEboviBLJz7bof+5I0a2CB/mzjvrzqtmlHE9o+B
-	 ltExyreEOdWwR8SGNv9OirO5DUrxOF9nEYVXSybLUpqv7/aCdu8uduXJsuead+o+BFaa8
-	 /gM9kG7MFqtTYOaVxYjNONPuv/AYLbK8N1gOPlsgproPKqL65FC9HZ1nhgjPHRi6Whw==
+	t=1794404697;
+	b=qd8KP3DRSqElxGlIVnPLC9RkdkBRAd73F3FhxuQKKSeLfWr3nHY9isN+KVHA1D1uYqAf
+	 hvXqSrBnsCO1yAft2kQfnFN1UmO2+w4x5mEiyzspK2529E5eYLA0PvPuibJErjxo9gYBg
+	 ZOG/iHvMxcEF6ba/9Uru/DVsHo+o1jnx6NJdC/V5tGKWW3l1feXM3HCUndMTq2oqeosTw
+	 LqGH/EILd2yQvL+HUV187I8dJ4vavRTA4VQpPGdLCOFJx1QGZIkIV6WsOzH92h2lF8ob/
+	 ACk66fW9XWNrbaDMA+T8Zlm5SSO7xjJdIVM7hv+mnwSSJMjN+JzHnV6DRSQMfImiT1Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794404337;
-	h=Received:DKIM-Signature:Received:X-Gm-Message-State:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:
-	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=rfbv9bhVSLEGgYsnEU6dwbEphMUQAD1S6pv/+5EeMhQ=;
-	b=ZjqEa+vg1FWcrvoq4OSY9upbFY6CmhNvSi2lnvQbjHiKl9BCa/nb8VrHHBEHDkyl9N9d
-	 KxCb3vMURUM5wLWJ8nW1x95FovYMDI9Ab43p4r9Nj5yvqG2GNeZLOCS0/8s/0YEZYUtvF
-	 ze9OC28FAVDBMAkcqY6T988mV0df86y94mS+M9rEFrmTQtSrJsT+XuXp7KxWhv/YN2NBS
-	 U/ZsjXjVIK3M7E3hpPShk2/aJvT/Pih3YzCTWCba3SOW8n0lKXTQmifqcUfvziLmZesCc
-	 JxaqgKmZ6CHj7ffLZgNNQi1wrzxmeYnLuQeCELdYOCrdIGrbtRAy4kQ0+/4vi3TaeHQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794404697;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:Date:MIME-Version:Content-Type;
+	bh=L9NVOt4hOFoYtGev0mEhj0TEZnxJ0HjT+1Qu0Bv20T0=;
+	b=E6MY9MRCuzaCDNxcVXF8t0x0zBIZSPrrp17Q3hHwPfe+GGCcm7phmcLNuGfHC2AuTZ0S
+	 PaLCnBsJcLzkl1S4jrz/ltHDWf5M3cUOQS6+xTmmZmLjp7umNaIMQ3XZLSCcR/dv8Si5x
+	 JWwVfKqcw35der4uihEMAACm8bxGv+mQvAUa426MCftGpV+HgxYYXsjIaf3sax9xDQwA0
+	 cPO+WMSMalpmKxQcyUfKzh8EG151TvEi0rl6opQOQ/Hqi1UTjMMScsezJgCFod1sJGhDB
+	 SQHzbsem2sIa2ObQ+07bYsBItPjJ6jZwJDfLIy+QgYqiWXQLPsKqzCbHEx3YUuCqPoA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X4i7mr6g;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=vV+0FcTB;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF33606A31C
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 13:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81ED606A31C;
+	Wed, 11 Nov 2026 13:44:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E81ED606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=X4i7mr6g
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA4C01F00A0B
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 13:38:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794404337;
-	bh=rfbv9bhVSLEGgYsnEU6dwbEphMUQAD1S6pv/+5EeMhQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=X4i7mr6gPSSF2E/Ve4zdudovA2+iCNE9re0m77iQC5MgPhHgIIQsqa2fFfJKKPUPA
-	 d3oM8TeZUWahg1Sa1GWwgC5kGhE2cNosbRkHSoQVk1EFc2HMOWLcQ6rIJyUehoDeVJ
-	 lewNK43vv+T29g0Y/GOhSol5AfZ6eIafXxkPRKhWWZ8qNAGxtm/jVoX50KinM0Mfp1
-	 sBcn0/WoeJGDHje7l5fb0trsolW8vfBLdrQRrYBsJOONTdjDi1+SCRcCikA7ItsqI2
-	 OWB2RVTbyOTPJ9miX3Hx/tXwu64JByL/E0TVD1K3orPLiyzLmP6+oZ+GnL/v54VXCV
-	 em66wWrKhrosw==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6b596569640so5092379a12.1
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 05:38:57 -0800 (PST)
-X-Gm-Message-State: APuU4Z9Yoq3aDFSiL5d73RzzkYnzsBVoN7j+qqE5X2sF5l/1aenZyPGe
-	xqV0xJFgOJTgoWRtiZotf7YHwTFeSUhJXNG5mot95bB8pD0WgqotneRygrbr4d+3P/F2EsPOWLX
-	9MtCgvRODFr9THW0dvcg7uAX/UcT1gbk=
-X-Received: by 2002:aa7:c84e:0:b0:6b5:8297:f44e with SMTP id
- 4fb4d7f45d1cf-6b7773e79d1mr1475665a12.5.1794404336330; Wed, 11 Nov 2026
- 05:38:56 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=vV+0FcTB
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=L9NVOt4hOFoYtGev0mEhj0TEZnxJ0HjT+1Qu0Bv20T0=; b=vV+0FcTBoNU5o4OLSQPC6PgnRv
+	fgHstmcDFOtYkngXKEoAi2RMXhliQ/4spjCvQ9nlOI+mZb/xXFgUtY+yiig6PXX9y6k7NOR3Elkvr
+	FM8cqexiY0emYR3TlgAj1TV+tz/qP60mxdF6USCI15sJgqLex7T7rFKWB8Uc1XTxdU39ZqtZRhjI8
+	vbAniFGvU4pH34YgOGgPNOonS1U4UL4eDK5lXgNEN3Gxac5H4kEtMi6j4qWKu9RQ1CZ/PoEDe93zv
+	Ix1OOYGXg81QTqFSZhqqdH3gQPl3tX2Kc0G/o19I9cBSYs1xS4x0jjk7zvhYo0vHV3t36Pe/ZNDGo
+	GrdGWOCA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xR8d7-00000001Stc-3el0;
+	Wed, 11 Nov 2026 10:44:51 -0300
+Message-ID: <10dd9cea16f8ebff2103ee7ac7e5ec4f@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, Ronnie
+ Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N
+ <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Bharath SM
+ <bharathsm@microsoft.com>, Giuseppe Piscitelli <ooonea@gmail.com>,
+ stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] smb: client: retry a hard link open without a lease
+In-Reply-To: <CAKYAXd-VC8shz7r9P=mS5XvOuGoadBhjJ6XYaaivL1z8v0UGpA@mail.gmail.com>
+References: <20261110225412.3937476-1-pc@manguebit.org>
+ <CAKYAXd-VC8shz7r9P=mS5XvOuGoadBhjJ6XYaaivL1z8v0UGpA@mail.gmail.com>
+Date: Wed, 11 Nov 2026 10:44:50 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,36 +67,29 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261110225412.3937476-1-pc@manguebit.org> <20261110225412.3937476-2-pc@manguebit.org>
-In-Reply-To: <20261110225412.3937476-2-pc@manguebit.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 11 Nov 2026 22:38:44 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_1=BdBt=+8+vgSn+jp80rEZpaK=daTL4=oXmhTA36=1w@mail.gmail.com>
-X-Gm-Features: AclHuK-YZTIwe_wwVHJtgeyyjssQUcMYI0SsUyaMmENMvRZ1g5dI1wTXRrM69hI
-Message-ID: <CAKYAXd_1=BdBt=+8+vgSn+jp80rEZpaK=daTL4=oXmhTA36=1w@mail.gmail.com>
-Subject: Re: [PATCH 2/2] smb: client: flush deferred handles of other names
- before a hard link open
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: linux-cifs@vger.kernel.org, David Howells <dhowells@redhat.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Wed, Nov 11, 2026 at 7:54=E2=80=AFAM Paulo Alcantara <pc@manguebit.org> =
-wrote:
->
-> cifs_open() flushes an inode's deferred closes before opening a different
-> name (hard link) of it, so the open can take a fresh lease rather than be
-> reissued without one (see "smb: client: retry a hard link open without a
-> lease").  cifs_get_hardlink_path() only triggered that flush when a cache=
-d
-> handle had the same open flags as the new open, so a differently accessed
-> name - written then read, say - skipped it and opened without a lease.
->
-> Match on the name instead: flush when a cached handle for another name of
-> the inode is open, so those opens keep lease caching too.
->
-> Signed-off-by: Paulo Alcantara <pc@manguebit.org>
-Looks good to me:
-Reviewed-by: Namjae Jeon <linkinjeon@kernel.org>
+Namjae Jeon <linkinjeon@kernel.org> writes:
+
+>> @@ -214,6 +214,19 @@ int smb2_open_file(const unsigned int xid, struct cifs_open_parms *oparms,
+>>                 rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock, data, NULL, &err_iov,
+>>                                &err_buftype);
+>>         }
+>> +       if (rc == -EINVAL && smb2_oplock != SMB2_OPLOCK_LEVEL_NONE &&
+>> +           !oparms->pending) {
+>> +               cifs_dbg(FYI, "%s: invalid lease key, resending request without lease\n",
+>> +                        __func__);
+>> +               free_rsp_buf(err_buftype, err_iov.iov_base);
+>> +               memset(&err_iov, 0, sizeof(err_iov));
+>> +               err_buftype = CIFS_NO_BUFFER;
+>> +               smb2_oplock = SMB2_OPLOCK_LEVEL_NONE;
+>> +               oparms->reconnect = reconnect;
+>> +               oparms->replay = false;
+>> +               rc = SMB2_open(xid, oparms, smb2_path, &smb2_oplock,
+>> +                              data, NULL, &err_iov, &err_buftype);
+> Should we retry without FILE_READ_ATTRIBUTES if this retry returns
+> -EACCES?  EACCES handling above only applies to the first SMB2_open()
+> call...
+
+Indeed.  We should retry on -EACESS without read attr there as well.
+Thanks!
