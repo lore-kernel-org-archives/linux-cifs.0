@@ -1,111 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.146
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794412840;
-	b=YK+Ixcr7BW8IV3cGHasEnqKYiAVh51WUxSbCAcGYQrnGZRywRKESs1pKxRXIyuRkwXbo
-	 2q9YJaCCi9SqCwNHXlW2ylGZ6kN6BGDuCRDpUfpYEhCO+KjKyS4PhTgMFj286w4FIQlJ+
-	 GvLUv615wB/5Bzy9CKusR8KAV59sVQBPP78ZBYL24clSDnP/MmOZMZHDaZZNb4QU8IyKV
-	 R/LtUm6xyFlXdjJpPcp6EuGebzQpWTKziReZ4SiYnU4sJU2udtZ5NSRq8Eb8FfNEFQLRG
-	 RaYHARo2gXXRhPK7U1io/HTtuM5huKZaXJ5Qu3IbY3Sljjx1TZ5o9iqaotQQbS1YD3A==
+	t=1794412962;
+	b=KXi3slsd53UQtpGVmt3BtpQ8XzHXmu8/RlFvJtAg0poW3CLDbMJHxocc2S7Cbivj47Ab
+	 fN7Q83vtp2fOAgI7Vr7dEycD2UHL40VmhFincqXKBeNkG1vPKLknICsyMOfe4wSytCeHE
+	 xXcc0spVj2ZYTPnKnf89ov4pi1nn5HkHaKFahfCNimvxxr3+ohr0NKaCObn9rJWskyInq
+	 iIu3ZDQ1jNy/iBQRBYBJx59QpaF6ROi7Yq2aEmUaZwsFq/9oPxd+q3rVRBiI5+dlJX822
+	 D5THzyH5Jakkcf9SQrTrpCpDSwF8ulynRNKthKd7JbA+hW+onJZbbJGwzy0zb1RdbgA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794412840;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794412962;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
 	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
 	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=AspvNDGkCkJ3NWLJZ31HBiF8pAd3ckj/t1KcoFiBMNQ=;
-	b=PB9bkwfbopJEbbfjSt2yfnJZneFt3H9ve8TgZ9exoArAvhtfL5Xip8UOw1K2AHfv7LL8
-	 6wouWjvlLRZ7/lVhIaDzvGq42xDordkTrbsEWQVNutzTlCqCcEDvUO1gK55zOFMUh2mDs
-	 wbtyTDJ1lRgBY+abWGEZckCnzIZvdUh4Fp3S40YdSHjukxu8BHXdUlaPFGi4OgpcKICVj
-	 v2oeF64uAD9zIvoBCEHEcQt60MFQnMBEPF2vXTni7a+XAJgMf9cHcX0cLAv3Y5DOgtBKm
-	 31ux4iFd7a6bEi/KEB7mb5t+67kN8Ez8awh4H+9vGsg75rF6b14x16w/ul3Sb0XSm9A==
+	bh=VXlHvLrk5SjAjwoJFCfGABg6Gr4cfCjK8WyiPcugm80=;
+	b=ydBWkN6L+1uomXDhpviaaOefGUKzhpJlVDBH5mmBjOuTpGvccGsn8f03uOz4KQPAvBoa
+	 G2GGMm7hZ5L9Z6Orj/POKFUfs23IfQRs8Tu0sJwmfMLkaYR3v1UGG/3/wA59FCRogVOKs
+	 p15NoFfaJgzgza6aMQ6d4o4LV4dgPvmNvFVm078yPVJhN3XFu8ytlpBQY2JRSrHywyHFD
+	 wuicMB6Dme5YyN2ssRfbC1xM53ymepkj9kiLU1LWa80AqXtYIJVbkLMKb02vo0rGkO7D6
+	 eaqLdiSnUrDPCT5EvaXv7TxsnDubwnE5h55lbQXA8T2KpB6QVsOZD/uvxd32m/8NqUg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fastmail.org;
 	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=afkDzEHG;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=q1qL97km;
-	arc=none smtp.remote-ip=103.168.172.159
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=DF2v05z2;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=vr3LyT+6;
+	arc=none smtp.remote-ip=103.168.172.146
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75EAC606A326
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 16:00:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 75EAC606A326
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F88F606A326
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 16:02:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9F88F606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=afkDzEHG;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=q1qL97km
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 8609B1400181
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 11:00:38 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 11 Nov 2026 11:00:38 -0500
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=DF2v05z2;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=vr3LyT+6
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id DEC5DEC0602
+	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 11:02:40 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Wed, 11 Nov 2026 11:02:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1794412838; x=
-	1794499238; bh=AspvNDGkCkJ3NWLJZ31HBiF8pAd3ckj/t1KcoFiBMNQ=; b=a
-	fkDzEHGaluomPGZP1G8gj9zjI3T0mdhkQwgzY4cNADJdtL8cSxyWlqkM/yFstZVA
-	/8ZL/NUB9M3nR8i29zoqIs3cH5OT2rhQQFz2o+RsyaWD7ZVXx9CKDvK3MDgTac11
-	dabYVnuBqmUXiCy6aNaLxTF934xPoIsBWzSv/hKu4zAUjw1UOxETjX/T+uUDjOFH
-	hLMgg44nNonKyaEmvTgtQ3vZOGmPeoXvGnLT+FY0PR1nzlubTSVxlu6ft5SANRMu
-	cJctJ0uPFOmauJvBaBlowgk4cC0PlO/UFeda8WuFf2l1G3Dxk1eaCdfh4I3KIodX
-	KJYR4oYynyc+G79grV76w==
+	:reply-to:subject:subject:to:to; s=fm3; t=1794412960; x=
+	1794499360; bh=VXlHvLrk5SjAjwoJFCfGABg6Gr4cfCjK8WyiPcugm80=; b=D
+	F2v05z2ss63PAVhVoNDKpDTTY6UdOflVH7j1T1sblV637icN48ONY81f9Vu3VYzp
+	oGBx4jb8AYhzjTqRgLlJLWkA8YExcvVeHGTOGXH4HA6PU/UGtJcu+eHSsJXMjhh1
+	OG98uv9d8xaCDTrNJyLYGxe72wfSQ3s2cxBuUP9m/F19Eyx8wP9NODN17CxCFZmw
+	ktlyTJ4JeET/X1C+WmNve3f1/ZyGea4DCg2ECtT57m73k9q0SVyNuXACGDefV1U7
+	imi51BsslVgjoUp9FrL51Ihg3iNu8vz4//1rAXr29D98gyupoFws+LoiahkPCWMY
+	OcxwpwccF9CvuBbeR+0pQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1794412838; x=1794499238; bh=A
-	spvNDGkCkJ3NWLJZ31HBiF8pAd3ckj/t1KcoFiBMNQ=; b=q1qL97kmPYtBYgYYv
-	5gajvuG6QwFLxISundZuWNkT0QVAoN51D79Xvl7QucJlkxuSaDCf2+IXL2JrmUth
-	SuYJ/tUAfJ8cNMVA/w21Xji1JGcwYoUZvqb5bur/QkGwpkzxZ+2xoyF4Fok06SH4
-	w2Q6BZcoIxq52B2zhAO0XTVKzbl8fZkzpXNnAty1rh/PUWWYIu6xedwD2+fzYhWK
-	xXgzp+82qPXFGnxIYcnOFcQ8CrF46QpgREwdZ+8l0b0BJdbRaRy9l4DKfVXYLQER
-	Zbyd7LcZvWxsbk9yv/KXLHrN+Js8By8TWHbevYbtimg5pCFILUtLZKh7sDr3tO2B
-	HAGiQ==
+	:x-me-sender:x-sasl-enc; s=fm3; t=1794412960; x=1794499360; bh=V
+	XlHvLrk5SjAjwoJFCfGABg6Gr4cfCjK8WyiPcugm80=; b=vr3LyT+6JwGuJaLRs
+	tdHa+/zz9niUMkuKLz8SNsyfn6eRMLiaeaqsTBUDl3xn+hcu07CTCOZqFaPBYynN
+	k/eZnWneQx1OQOw1yHiDSCf91cEB/E+hYqif6UYpZRXGloOWxLb2Iwzh1Q/9bBRt
+	CDLeYrpQNIAcQg4Vdff2ik/ObXFTPZwO9wotW0mTCu3lNVSa4GQNd+e2k7K34OQK
+	n0m+lSY034ooheLoxBJTnQivHI1Skq1y7OIBB+AQX3+Qdpd4b1Z6YGa8g4tzCGjS
+	PiC/erKyAN4LbEKmA0wIdmdY/K9yxW9dM+fINqv9O4QbR9ZSs8WYiDmIve3wvHXm
+	E8bcA==
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794412838; d=fastmail.org;
+DKIM2-Signature: i=1; m=1; t=1794412960; d=fastmail.org;
 	mf=PGljYkBmYXN0bWFpbC5vcmc+;
 	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:EwbqS/DcG3NPIIR2KtLGoyOFEKUq60MKVNZ/zHtSgw6+d4b
-	qlraKMUDNGO/TmkLYTX7z391TROuq5QI3LQ4xTCP1pxI6D/uIoTn1bshQLnYYNTY
-	mUrLep2LDQZNuGMyxrWc3f15flbMMKr4BgVFX2EfGzFTa6f1548vKGaqanmZpxY5
-	jwNEi4KNkTcaC+GTShi3CPLGuf2xU+cIAfhXIXtrG/M5AbzT+Deo6jGO6ENSWR4A
-	YL9NcGccnH+Ph6jBXQ7Kv/ivOi8nr6EOY0Bp/5rFpITgZThslprGMqTAcjNfrQHJ
-	ReIrSCBEbO4NclpSGAn79wToe6js/tkR7wCAj0w==;
+	s=fm3:rsa-sha256:UsbVl66EfmvNAawsc6M0R3g304ks5BkvNUxDuVjwouyx5MF
+	2ZuWNXKbAVEAt3A6zkItmkQFKBsReWTWmIzQfzsCgpLrn5LhFW+GvFA+pVW3veem
+	9CXQxyJJlO0jya2nqfV4htC4oqU93rUgdS0RtAehaWl4BnDq7vciWu23Mn8zfHaC
+	1zp+ioBuSpbBV7lY9Q+BilZLm3yI/3vs364rESqUBo7H/dul4Vy597zWEHhQ4blh
+	XCoQFsA4CkACGlzk7a3XOTEd8KaXwn8VOOsyRqlVVgmRts67LV7Qwg/3p0yt3PPI
+	7aWAW0+8kLYAHxm1HJRGO33HI87emIS7mIiIYpA==;
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=mi-m=1; hc=11;
 	hn=cc,content-transfer-encoding,date,feedback-id,from,
 	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:/kRDEj1VEaC2NJgaYg5eQF710A1Pe0jHgn6B2QjUp8k=:Mdc/pp8kO3nuThRxpmSdvNYO3j128aXlX78VIoghsJQ=;
-X-ME-Sender: <xms:JZH0athSBlCYFQZVmjPMoniji3lHgnS30OYzj9lHoL7X26vrA6LZ0w>
-    <xme:JZH0aoDNQUmjxedoiLrI1bEjl_-LKxXjMyGNoUh14EAbR9otNL_rh6Am07Ptutu54
-    WQQC9RGUpk7DEP6UIHeOPv2iH6Spt3G1g6gJ9_8xeHVIxNMRBNR9fbE>
-X-ME-Received: <xmr:JZH0an7oZVW8vKsVC5vXFq4ZEEHkT3jCFl-QDeWv4MJytBwhoTGd7BPSQF8BAk4J>
+Message-Instance: m=1; h=sha256:hsCQhag23nH4elGa8straBEAUZ8V7KBD8JuIDWgYnS8=:vKat5FSHjbFb/AwbssyQrD/nFh/JxoV5QqbU2B/L/8g=;
+X-ME-Sender: <xms:oJH0at2lklOnIXTLPb4BC3GIg59eMEeHionjUEQLsOjwsd9ZH79DdA>
+    <xme:oJH0aqGkM71NvlFWrkFH4E8ATCq8mG8pk7zpu6kLVA8ISJFaAGm0GAvZ_b2MDGdHP
+    PFKpjHgUIVR92UZdHRbcIYBFsC80zzX0bfGSefFkFJ06JEf0T0gy5ru>
+X-ME-Received: <xmr:oJH0aosnEus2aRuOsGyjCWpYsYebGMvaVCAyItgP3fO1OvnaQSnzP5oxQXs1gkEb>
 X-ME-Proxy-Cause: dmFkZTGc6X1pUvRe543ASiFLgXt49mcvnM5Cjqw3BsQ6n9gfX39xWALbbqxtaONqPwhpdE
     VxOOkeWEEmhA8xFSk8iPWJqb0KILOP7BdvtxP9qS4fo1mQud/wWu3W9F5UuvLayBpvlSLy
     LKQ5l9jQTj0oj1NL5ie+DDajFzlVWkN4mYkWVI5PrbcB1vgg4vZOQOMh9W8ge6jRihj93k
     vmMSx2xlv17TpB2ZOwKZgxBV2VfbajR01HJj0W4bcNNAxi5iQMNc0G5xHqOutPsyHzZFsM
-    Z0uNKJLwcAQpfQjKrvKiMKXH+HI7FGJBRAWcY1AQBQnVk3bLX/u9Q+X/5uu+SWO8zyQcMi
-    OfIykN2e6s+Old8Ciu9i9dDQw0JkZeid+qrE8IOVA+BQCq579y+MJR+94rbYxuc9qt40zJ
-    Wb6ucDzjlUiy9rIQTUgoOy8s2EMHraM+7RyZx9A0vvUlXzqGu3vmN+Amd05iMrPu7YKyuJ
-    S3tH8ZVnVYVnRdQFoYz51ZDI+cvnExsmw3/WLKcgumT+we64PYydn1lC0GBWuU26BSobfZ
-    jV091zYKOa6YQl6PER923EZIFQs1SLgK3IMbmr/TnhTDlqFqSWTvmho/IjpLkL9ZYalxkz
-    sntT+UdsXaibJ1JrxWNKg+EWwUsJlYcVsTSx/Q6n9iKf4diQqogBDlB+OXjA
-X-ME-Proxy: <xmx:JZH0alFC30XZ2d7GGkxXDD696K-feC66V3fHxeGqwOuH3hAK8e9t5Q>
-    <xmx:JZH0aqDEyj9dK08pPyPrF0Fg5Y6bzDhEi444r_KA9Ae-ucJnjZrj5g>
-    <xmx:JZH0aiz-9btSnleMKHrInDRGcNW84VDPMFzXfnyU4gufVP6GsdEffw>
-    <xmx:JZH0am4E93nV6zap8iDdEm-73F4xAsl6xHjZNTS3no367A06uA_EFw>
-    <xmx:JpH0anr6Us03r1TcNluJxQQr3xFSRE64yTFDYp2UH2i4Ljj6k19GWu7B>
+    Z0uNKJLwcAQpfQjKrvKiMKXH+HI7FGJBRAWcY1AQBQnVk3bLX/u9Q+X/5uu+SWO8zyQcoq
+    z0qWGgkYzo7Q8bpbfwDEbRFZkcDgf4s8sBUzYUIpji0qpS72eVkkoh3NSYfc+TNUgi2Qb8
+    qIte6dR7XvJ2PexBUI8TJg72tyYo9b82EOwxDPTYvGH9eXhFLjj4IEcNbWvhH6rqqNkvLy
+    NFzzuPBnw/1No0tcFbT7Nun+jjpLM0lDVV4g7GMW2fF+EBEQCTemJsNSjMg/jPFuANimyP
+    iZkCu1P2r9H6pw2kepCeyCF4hRoLZrL6R7JtBQwEns8suNJHRWIA+5eaYEjTKleaUyxe3P
+    8v3qVhw4TeJpQgT1rKd5hB2QlT0QIx9JWbW/foL9fGUFPyqs1zVN3mXj7b4g
+X-ME-Proxy: <xmx:oJH0atrI1yachLXybiQid8NGRaKTZ0PVM88jZn_Z1gQV3-saCsbbRQ>
+    <xmx:oJH0avUixyZOTFlUJCOyQLc5Z2WMWltmAV8JmCLGsYRbxJFozXnjSA>
+    <xmx:oJH0al2Ghn7-U_gFqHVzYyWV6Y2afYHjVdYF3LiCUmS-Yu-PTZ2MCg>
+    <xmx:oJH0aksHCTfQysJscafK_IC2fJU90OPPrTf-cvhzWpr_JRQC4nmPZw>
+    <xmx:oJH0aicYvgmDK0ykD4XycAalfNx_LZbt_SrA4uHxrkB2oicX9MS5Jg73>
 Feedback-ID: ib53e4b78:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 11 Nov 2026 11:00:36 -0500 (EST)
+ 11 Nov 2026 11:02:39 -0500 (EST)
 From: Ian Bridges <icb@fastmail.org>
 To: jan.koester@tuxist.de
 Cc: linkinjeon@kernel.org,
@@ -117,12 +117,12 @@ Cc: linkinjeon@kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ian Bridges <icb@fastmail.org>
-Subject: Re: [RFC PATCH 1/6] ksmbd: don't ignore the owner and group of a descriptor without a DACL
-Date: Wed, 11 Nov 2026 10:00:29 -0600
-Message-ID: <20261111160029.4127378-1-icb@fastmail.org>
+Subject: Re: [RFC PATCH 2/6] ksmbd: keep named ACL entries effective when a DACL sets a POSIX ACL
+Date: Wed, 11 Nov 2026 10:02:35 -0600
+Message-ID: <20261111160235.4127613-1-icb@fastmail.org>
 X-Mailer: git-send-email 2.47.3
-In-Reply-To: <86878858c5973b660bd04a65@groupi3>
-References: <86878858c5973b660bd04a65@groupi3>
+In-Reply-To: <13deb997dee36bdc7f75e2ae@groupi3>
+References: <13deb997dee36bdc7f75e2ae@groupi3>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -136,19 +136,20 @@ Content-Transfer-Encoding: 8bit
 
 Hi Jan,
 
-On Tue, Nov 10, 2026 at 09:02:27AM +0000, Jan Koester wrote:
-> +	/* parse_sec_desc() rewrites type */
-> +	dacl = le16_to_cpu(pntsd->type) & DACL_PRESENT;
+On Tue, Nov 10, 2026 at 09:02:33AM +0000, Jan Koester wrote:
+> +		fattr->cf_mode = (fattr->cf_mode & ~0070) |
+> +				 (acl_state.mask.allow << 3);
 
-Shouldn't the parts to change come from the SecurityInformation of the
-request rather than from DACL_PRESENT? As far as I can see, the Linux
-cifs client's chown can send OWNER_SECURITY_INFORMATION alone with a
-descriptor that still carries the DACL. It does so when no ACE names
-the old owner. Would this patch then parse that DACL again, rebuild the
-POSIX ACL from it and replace the stored descriptor, though the client
-only asked to change the owner? And in the reverse case, would a
-request for the DACL alone still change the owner when the descriptor
-carries one?
+set_info_sec() seems to only log a failed set_posix_acl() and carry
+on, after ksmbd_vfs_remove_acl_xattrs() has removed the old ACL. With
+this change, would the chmod that follows then set the group bits to
+rwx on a file that has no ACL left, giving the owning group rwx in the
+file system?
+
+Could the mode be set first, with the owning group's permissions in
+cf_mode rather than the mask? A successful set_posix_acl() would then
+set the group bits from the mask entry. Should a failed
+set_posix_acl() also be returned rather than only logged?
 
 Thanks,
 Ian
