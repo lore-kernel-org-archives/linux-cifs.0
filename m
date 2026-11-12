@@ -1,122 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.151
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794453537;
-	b=21GY8lRZYFGihcsLAIgblQO0fqxLtannmskzPc7+/wBYBy2fPtvSvXEGjPZ6mdpeGo7i
-	 ZrLUIWps3hXnB7h0q8XaI15dPPLmnkYABqFuJQYAjrqfBhwdVK59loL2h2sK1SMSvNm+a
-	 OAaN0bUWAaqT0JWmz+m0DD4mnvPJji+jrtEi2jhwVx1e8JJ7wuT3DQfu1Z3Xu5D8VLijc
-	 0/aRCelym/5oYl0GuVeHRlhzIm/pakxZPjhtubtRUd5jl8i/8XVQy4M7ajt5tpD5rGsLa
-	 I2q++ckeszLi/PY0mqQCa0g56Ro0KWr5crNCz10X7jAzp96IwZeNz/2OzfUHh37otiA==
+	t=1794456168;
+	b=EG7V2QafITKD5MI04cJbFXchY3FvZvMayqwcql7BitZ0X26c9ZAYSd7ygr30yQIl+9PG
+	 S7V5dAjDohSkHY32iQh72l9wID++s2ginXtdJhO59/DFvOcMt+ooWZbE05xMDHYQRFBWu
+	 nFt3XopQDq4cOXn/2k9bY3XCkfH5Dx/z4LkooIU1/tAfP/nO1ArWnt5Pl+Og7yK7KSeKT
+	 NmIQYyWjVhiYSuW3kd79W35ZOzHXmnv4YYwJBmu5Sm96wrf/TdzSV3d4QtJeDpcCF68L/
+	 vGo1U/yDUgrjGzcGQTp0bTqvjSUCeytO4FFD3hO6j0PMm05ib3trdl/ub+SPfHqnzxQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794453537;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=DxliMSnYix7Z3B5F+OR+QQC2rRyWpstwzDNKYsrKqeQ=;
-	b=y5070YKDJE85TmD+4ihEOBKIcmZEo3tTmQFZD4kJFU5tv5MLdZn41Q7xw8HOVLRmyuSx
-	 5utdOtROpgWE8dctK/rbuiC8Z6CwYabMY7HzS7kolHWEmBSjzOr9Semv6X+XyhswkbkjC
-	 6W+FrD2x9XwJ2VfKDKTfVRTNczzKInLfHSu8Is4E2l3ZU1EWyZL2cHIzew2ePgU39AHRz
-	 u5+I+qlFkeUQ8lMILGgS7iyCTsVuazeJxPnVlaeRxbOHON7OB2xe99ea9k7147a2y9LFv
-	 CatXuxv1ni4AXA1U2Ah7tmjEzundvv7VKI0OW06a3M/IDNQE8yjotQn7FMAZZq/kLJg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794456168;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=dgXA4BlYneZfOpECEiIX+smZ2qtO7I+usA3cuFq7GY0=;
+	b=tdWQWjdA/t8qdsT18RZw20OxRJzEs7qZMOpz30ifH0/tOALhLDdjA8L64Ti4DvRpmO6L
+	 TeRtaHh4UAOTYLXl1dA2JeILnk03fLjnYTjQNlqFbrTWOl56yHn5q7V8fmOeDSfzZHS0t
+	 muZih1yPDnQMm41HeLDq3W9B5+5S+WkwwsFFBBU9I0zMq4wwWw4MHcNtgmn8gOtKLh+pv
+	 C1T7kikYB5ycMp7m1l1Q1hdbpE4MLZ1ADgLaho8lRzQJMIgVDvx0tPJONb0ON6U7eBTwe
+	 Pqs7aPRC+Kd+70iXwqwsOKJgg/Ckc9dxfVoi9lnWgTPVMH3BVjTOxD4OI9n6em5Alww==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=m5GNyJMh;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=WXu2Vwq8;
-	arc=none smtp.remote-ip=103.168.172.151
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MLBPpLzP;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18307606A321
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 03:18:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 18307606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 883C3606A31C;
+	Thu, 12 Nov 2026 04:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=m5GNyJMh;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=WXu2Vwq8
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 44C3DEC01E5
-	for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 22:18:55 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Wed, 11 Nov 2026 22:18:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1794453535; x=1794539935; bh=DxliMSnYix7Z3B5F+OR+Q
-	QC2rRyWpstwzDNKYsrKqeQ=; b=m5GNyJMhPgIM8yeNH5v/iVq+mZwbbUCFhrGtU
-	2h55snlKKrSG7IJYzUCaLnWbFpHMYaGBfMcHmvn9Q5ZHFm0kG9kbPw0o8xCcA+A8
-	pC5eOknZhIqMyxiNNRoyzIR3AreRxp+/I3xJgf6u+s6HBvXveAtpeC4emsny238V
-	fFVdVK1TXt5wJfReaPYNRS6UJ9bKrhI5Lxzl4CJV9Qu21phjfu5VgC5LM61cQJEY
-	Bmttzp5WvbhQhDnm1RaWJaI1atpQbYBz5IpS8KzE+3dMhyGoW73EeTtoPALIMhPh
-	8mbyHqNGkJjCVYtcUYDEz5s1/fLoxbNXLOo/wKaS1MIKcRMEA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1794453535; x=1794539935; bh=DxliMSnYix7Z3B5F+OR+QQC2rRyWpstwzDN
-	KYsrKqeQ=; b=WXu2Vwq8ZzhZRNneZrwxHsXmjQzgy0X0F7FbgpnZzc031cTr5S/
-	NC9xebigYIZfqFS8Eb4Wjz5vLwCSP45uSCc4rNWccr5Q0MhC4g0fNOZRb1CcOWSX
-	jONhjch+VS/pYUNUxUETWjxWR8d+zIbd04mFYmJUhBO9FskKfBu9AFe1Y3VryjWZ
-	CPGmaeIrNJ6kt6EBYtgX0Q2fbuSCZjCJT2WT1uA246N9UxFwyHkqshSm0P1Ud80P
-	Wzm6wLBGOjDj+0fIJlfqHZD11von/HNqWk/NTH3NG7pw17kxhqO/wiup9VHIxnzi
-	7vWsA7ok/yXa6TKZJG0fXSMsMigp2pm+9hQ==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794453535; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:elnnS/aFRsDmuSfbE7o/39OIZpkZcFUOcw+uK6cPddsuin5
-	usmV9K2dKMGTlVQsUb/cmGIkb0AIs5EI0Bo3xbf3GZzr+D2+0G+JD9C1VjZjx6QH
-	2J6AtYrxGYHq2yqaRuZJA5FEZ47It3NDOfTQjh1ICWmbBOloqgntbiAqCyBiUAu0
-	6kkJNVVP2T/Jx3oMnGSK61edv8XoGLGAngRVgCHHDPAonVijmYiKkGgFf3ATOVvB
-	9v5zcNoGqZQ2H2B+GfzDeN2q6IkvbD0UHPJX5z0BgIHkWyybEzVKrMFjvYY9BmbU
-	1fAhn/BJAzC5iZbRQ4PoZTbbs2Enfo1ZHFGVkfw==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:mBg91KtQ9BBe9REXzqGnhXIThVoS/89eW2C6JXOphV0=:wADtaVpL+lPYE1sB30apHbsnl4wJDhhYpBrF3zecc/4=;
-X-ME-Sender: <xms:HzD1alNPSyEaCZ9vVqDuAPxMmaTGCr7MGwOtD6gyh5q42jqdn-KzVQ>
-    <xme:HzD1aoYOewINih3hhrg2pWtskYrxUQXEWl-OT7L7n8AO8h7wY5mPD-8TF1quY8HyU
-    nInABpqcpcmXUYBQe1udM8FqF4Eb052jxD32hQFoXLFCPkagZTV2OSc>
-X-ME-Received: <xmr:HzD1ak-PAP5si52d9Snxx008YHxnZeqtJQmRxgWonW6fEkKCRBUs9cPH3ZNeqfhD>
-X-ME-Proxy-Cause: dmFkZTF1gV8HNpSkgXQ7XXCwAd1i43qIIL91rRT+fSkE1WTDEBeIcw4LaFVdFoP34cTivk
-    V8OgB0rNje/fgYYNvihmcPMbY1CNmAkzTg2oQqFoO3nZR6saPkYT8R3ar1q/yi9iyraLrV
-    hxGOTDHfGvcW5L1PBJEPCUY/RbEpD0LHUQrUwajlTiXElx6rUZ9IjOmoUkHST+RU8iBvUq
-    qFplITDw4zucgst2ggJUJOJpu0IWBC6ix0NshKkac5j4PR1pTCmol82UT/ztgB4eJXFKRY
-    dSDoN74Kr8g5ziPVg6tOyywPi41JTdsbhiCTY+IG7D6tGjkdL2NwWytVbzUnzxn2PGnBfV
-    k+KE1fYNCcOv6LvFEdPBytJkrWalSg5Ldn1I8rKmo/kAEvegq+wFhHBtL92UHpOSj5FaQb
-    f3AEhA7iqNjv68k2QWkpDuA4lF8PTl4wRhXhAcNhRscEzi6gGzuHx2haXovFbWk2Xlh51r
-    tOFnGLXMNr+WVrvktXe/eUYRG0kFe2QMclr2lkNQqE0alW9mX35NaJf7aKeYglPFskgDb9
-    q3tkSoS72jSo+DjtTj1WTa1EF4pdyv73R9+B6eZEaBnPtLsGIjEBl+yPm+50vvnXsj/Xib
-    fk5JNq1QeuM3BDnlrzK5F9Jd6lU2qMOxjXKYef1HqwIv+3x8/9Hs73cEtoIQ
-X-ME-Proxy: <xmx:HzD1apTlnb04gMh0Z2V_b8MTDLuB8xwaVXxMf55ov-ZxstALYZGxuA>
-    <xmx:HzD1aufwkwj8ny_Zzslxj2fjpIoDs37pbWfnNwHy6ISFDG9CjK-ncg>
-    <xmx:HzD1arQd1ijYq3aJVq07Q2WGEKm1odFvj3INElzrF4iZZoJ78uOK7Q>
-    <xmx:HzD1aqI16JdIambvgQnF9swmBKVoxdFl0LCAeFNmp7-21jMEulFRvg>
-    <xmx:HzD1arJmapLqAYWyZnlmjbpNVDk0qAk7b6LZHwYD9_2HROIID3QH7L-T>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 11 Nov 2026 22:18:54 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	mike.michalo@gmail.com,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=MLBPpLzP
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 58EA71F00A05;
+	Thu, 12 Nov 2026 04:02:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794456168;
+	bh=dgXA4BlYneZfOpECEiIX+smZ2qtO7I+usA3cuFq7GY0=;
+	h=From:To:Cc:Subject:Date;
+	b=MLBPpLzPPj/ohUh12HdOqIIGOP4uCE8J6jhKIXHjO3yDLRNc6v0GHF/7zWnW+NT/B
+	 fdHLDXD8EotMYIf6iLQmvciyxhl1vx11bC0PWGBc00Iyf24fsLvc3M893w/jViSqbh
+	 ZfTCAeBFNVVAml6qzUFeMgCMXBsUCCtfG5f7tDFbr7wgp3nLjgvqysQkcNpibOe/vn
+	 dBprGWCABZw0GIhkaP3eMRYF8G54nZeiaoPwmO31M4QkaG1fLYRJHhxF06f7+paOry
+	 c+Gff+WRf6+5Mgg1rghh//qVZbOUcjJ/FjYDeXU4AunPWuGBMad4hVngU7l8TD/I2l
+	 Fo85SGcuyi3dA==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>,
+	keyrings@vger.kernel.org,
+	linux-afs@lists.infradead.org,
 	linux-cifs@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Ian Bridges <icb@fastmail.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: fix out-of-bounds read in expired-session LOCK check
-Date: Wed, 11 Nov 2026 21:18:50 -0600
-Message-ID: <20261112031850.712949-1-icb@fastmail.org>
+	linux-nfs@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	James Morris <jmorris@namei.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Paul Moore <paul@paul-moore.com>,
+	Paulo Alcantara <pc@manguebit.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Sumit Garg <sumit.garg@kernel.org>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Tom Talpey <tom@talpey.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Vasily Gorbik <gor@linux.ibm.com>
+Subject: [PATCH v6 00/13] KEYS: Sanitize the garbage collector
+Date: Thu, 12 Nov 2026 06:02:29 +0200
+Message-ID: <20261112040242.247168-1-jarkko@kernel.org>
 X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
@@ -129,147 +92,165 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-smb2_session_expired_cmd_allowed() runs from smb2_check_user_session()
-before ksmbd_smb2_check_message() has validated the request. For a LOCK
-on an expired Kerberos session it scans the lock elements, using the
-unvalidated NextCommand field as the command length. A malformed request
-makes it read past the request buffer.
+1. Replace key_type_dead retyping with module reference pinning so live
+   keys and restrictions keep their backing key_type module loaded until
+   key_gc_unused_keys() or keyring_destroy() completes.
+2. Process serial-tree scans and graveyard destruction in fixed 64-key
+   chunks to a bound workqueue execution latency without hurting overall
+   throughput for a significant amount.
 
-  BUG: KASAN: slab-out-of-bounds in smb2_session_expired_cmd_allowed+0x260/0x2a0 [ksmbd]
-  Call Trace:
-   smb2_session_expired_cmd_allowed+0x260/0x2a0 [ksmbd]
-   smb2_check_user_session+0x4ff/0x680 [ksmbd]
-   handle_ksmbd_work+0x465/0x1cb0 [ksmbd]
+The first part has a user-space visible effect: rmmod returns -EBUSY while
+keys or keyring restrictions still pin the backing module.
 
-Decide whether a command may run on an expired session from the command
-alone. Move the unlock-only rule for LOCK into smb2_lock(), which runs
-after the request has been validated. An expired session can still
-release byte-range locks but cannot take new ones, as before.
+Internal key caches or transport state bottlenecks are addressed by either
+clearing their private caches on last-client teardown or splitting key
+types into dedicated provider modules.
 
-A LOCK on an expired session now goes through the normal request checks
-before smb2_lock() sees it, as CLOSE and LOGOFF already do. A malformed
-one is rejected by those checks instead of returning
-STATUS_NETWORK_SESSION_EXPIRED.
+CHANGES
+=======
 
-Fixes: a47634cd729b ("ksmbd: expire SMB sessions when Kerberos tickets expire")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ian Bridges <icb@fastmail.org>
----
+v6:
+- Split "KEYS: trusted: TEE: Synchronize session lifetime" into two
+  patches:
+  1. "KEYS: trusted: Update static calls before init"
+  2. "KEYS: trusted: TEE: Synchronize session lifetime"
+  No actual code changes.
 
-Notes:
-    The bug needs an authenticated client whose Kerberos session has
-    expired. The client then sends a malformed LOCK request.
+v5:
+- Another round of fixes resolving Sashiko remarks.
+- Reordered TEE session lifetime synchronization patch before suppressing
+  sysfs bind attributes.
+- Release conn->key in rxrpc_process_event() on init_connection_security()
+  failure
+- Update Documentation/networking/rxrpc.rst to reference
+  net/rxrpc/security.c instead of net/rxrpc/server_key.c.
+- Store the delay-adjusted reap timestamp in gc->end in
+  key_garbage_collector() instead of recording unadjusted key->expiry and
+  adding key_gc_delay a second time.
 
-    A reproducer is available on request.
+v4:
+- Replaced WARN_ON() around fallible keyring_clear() in CIFS idmap and
+  SPNEGO cache-clearing helpers with pr_warn_ratelimited().
+- Moved key garbage collection from the shared events workqueue onto a
+  dedicated WQ_MEM_RECLAIM | WQ_PERCPU workqueue (key_gc), allocated in
+  key_init(), so WQ_MEM_RECLAIM workers (nfsiod/cifsiod) and reclaim paths
+  can flush key GC safely.
 
-    This fix was developed with LLM assistance.
+v3:
+- Split dns_resolver and rxrpc key types into dedicated provider modules
+  (dns_resolver_key.ko and rxrpc_keys.ko) instead of client refcounting,
+  so cached or retained keys do not pin dns_resolver.ko or rxrpc.ko.
+- Dropped the standalone nvme-keyring fix as it was picked up by the
+  subsystem maintainers.
+- Hardened key_gc_flush() to serialize against chunked key_gc_work
+  continuations, and fixed a restriction module reference leak on failed
+  keyring instantiation.
 
-    Tested under KASAN on a kernel whose fs/smb/server matches
-    ksmbd-for-next ffde0bdfc69a. No Kerberos KDC was available, so
-    session expiry was forced with a temporary hook in
-    smb2_session_kerberos_expired() that is not part of this patch.
-    Expiry of a real Kerberos ticket was not tested. With the hook, the
-    malformed LOCK reads out of bounds before the patch and not after
-    it. On an expired session an unlock still succeeds and releases the
-    lock, and a new lock still returns STATUS_NETWORK_SESSION_EXPIRED,
-    also inside a compound. READ is still refused, and CLOSE and LOGOFF
-    still succeed. smbtorture gives the same results as on the base.
+v2:
+- Used v1 as a test probe for Sashiko to detect the corner cases instead
+  of trying to resolve even the known ones beforehand.
+- Converted the client subsystems to be compatible with the module
+  pinning semantics.
 
- fs/smb/server/smb2pdu.c | 57 +++++++++++++++++------------------------
- 1 file changed, 23 insertions(+), 34 deletions(-)
+VERSIONS
+========
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 92843d2944e4..ec87118e50b1 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -1014,39 +1014,15 @@ int smb2_allocate_rsp_buf(struct ksmbd_work *work)
- 	return 0;
- }
- 
--static bool smb2_session_expired_cmd_allowed(struct ksmbd_work *work,
--					      unsigned int cmd)
-+/*
-+ * MS-SMB2 3.3.5.2.9 lets LOGOFF, CLOSE and LOCK proceed on an expired
-+ * session. CANCEL is allowed too. For LOCK, smb2_lock() allows only
-+ * unlocks, after the request has been validated.
-+ */
-+static bool smb2_session_expired_cmd_allowed(unsigned int cmd)
- {
--	struct smb2_lock_req *req;
--	unsigned int len, lock_count, i;
--
--	if (cmd == SMB2_CANCEL_HE || cmd == SMB2_CLOSE_HE ||
--	    cmd == SMB2_LOGOFF_HE)
--		return true;
--	if (cmd != SMB2_LOCK_HE)
--		return false;
--
--	req = ksmbd_req_buf_next(work);
--	if (req->hdr.NextCommand)
--		len = le32_to_cpu(req->hdr.NextCommand);
--	else {
--		len = get_rfc1002_len(work->request_buf);
--		if (len < work->next_smb2_rcv_hdr_off)
--			return false;
--		len -= work->next_smb2_rcv_hdr_off;
--	}
--
--	lock_count = le16_to_cpu(req->LockCount);
--	if (!lock_count || len < offsetof(struct smb2_lock_req, locks) ||
--	    lock_count > (len - offsetof(struct smb2_lock_req, locks)) /
--			 sizeof(struct smb2_lock_element))
--		return false;
--
--	for (i = 0; i < lock_count; i++) {
--		if (le32_to_cpu(req->locks[i].Flags) != SMB2_LOCKFLAG_UNLOCK)
--			return false;
--	}
--	return true;
-+	return cmd == SMB2_CANCEL_HE || cmd == SMB2_CLOSE_HE ||
-+	       cmd == SMB2_LOGOFF_HE || cmd == SMB2_LOCK_HE;
- }
- 
- static bool smb2_session_kerberos_expired(struct ksmbd_session *sess)
-@@ -1124,7 +1100,7 @@ int smb2_check_user_session(struct ksmbd_work *work)
- 			pr_err("compound request on a non-valid session (state %d)\n",
- 					work->sess->state);
- 			if (smb2_session_kerberos_expired(work->sess) &&
--			    smb2_session_expired_cmd_allowed(work, cmd))
-+			    smb2_session_expired_cmd_allowed(cmd))
- 				return 1;
- 			return smb2_session_kerberos_expired(work->sess) ?
- 				-EKEYEXPIRED : -EINVAL;
-@@ -1136,7 +1112,7 @@ int smb2_check_user_session(struct ksmbd_work *work)
- 	work->sess = ksmbd_session_lookup_all_states(conn, sess_id);
- 	if (work->sess) {
- 		if (smb2_session_kerberos_expired(work->sess)) {
--			return smb2_session_expired_cmd_allowed(work, cmd) ?
-+			return smb2_session_expired_cmd_allowed(cmd) ?
- 				1 : -EKEYEXPIRED;
- 		}
- 		if (work->sess->state != SMB2_SESSION_VALID) {
-@@ -10881,6 +10857,19 @@ int smb2_lock(struct ksmbd_work *work)
- 	if (smb2_compound_has_failed(work, &rsp->hdr))
- 		return -EACCES;
- 
-+	/* An expired session may release byte-range locks, not take them. */
-+	if (work->sess && smb2_session_kerberos_expired(work->sess)) {
-+		lock_count = le16_to_cpu(req->LockCount);
-+		for (i = 0; i < lock_count; i++) {
-+			if (le32_to_cpu(req->locks[i].Flags) !=
-+			    SMB2_LOCKFLAG_UNLOCK) {
-+				rsp->hdr.Status = STATUS_NETWORK_SESSION_EXPIRED;
-+				err = -EKEYEXPIRED;
-+				goto out2;
-+			}
-+		}
-+	}
-+
- 	if (work->next_smb2_rcv_hdr_off &&
- 	    !has_file_id(req->VolatileFileId)) {
- 		ksmbd_debug(SMB, "Compound request set FID = %llu\n",
+- v5:
+  https://lore.kernel.org/keyrings/20261108222719.304712-1-jarkko@kernel.org/#t
+- v4:
+  https://lore.kernel.org/keyrings/20261107131512.3603168-1-jarkko@kernel.org/
+- v3:
+  https://lore.kernel.org/keyrings/20261105005311.804098-1-jarkko@kernel.org/
+- v2:
+  https://lore.kernel.org/linux-integrity/20261103030226.2685251-1-jarkko@kernel.org/
 
-base-commit: ffde0bdfc69a0f01a081d9c1a213e63d5719e625
--- 
+Cc: keyrings@vger.kernel.org
+Cc: linux-afs@lists.infradead.org
+Cc: linux-cifs@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-nfs@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Anna Schumaker <anna@kernel.org>
+Cc: Bharath SM <bharathsm@microsoft.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Eric Dumazet <edumazet@kernel.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: James Morris <jmorris@namei.org>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Marc Dionne <marc.dionne@auristor.com>
+Cc: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Paul Moore <paul@paul-moore.com>
+Cc: Paulo Alcantara <pc@manguebit.org>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: Shyam Prasad N <sprasad@microsoft.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Sumit Garg <sumit.garg@kernel.org>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: Tom Talpey <tom@talpey.com>
+Cc: Trond Myklebust <trondmy@kernel.org>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+
+Jarkko Sakkinen (13):
+  KEYS: Add key_gc_flush() for draining RCU callbacks
+  dns_resolver: Move the key type into a separate module
+  NFSv4: Clear idmap keyring cache when the last client unloads
+  smb: client: Clear idmap/SPNEGO caches when the last session is
+    unloaded
+  s390/cert_store: Start tracking subsystem keys
+  KEYS: trusted: Update static calls before init
+  KEYS: trusted: TEE: Synchronize session lifetime
+  KEYS: trusted: TEE: Disable sysfs bind attributes
+  rxrpc: Release conn->key when init_connection_security() fails
+  rxrpc: Move key types to their own module
+  KEYS: Pin the backing kernel module for a key type
+  KEYS: Remove key_type_dead
+  KEYS: key_garbage_collector(): process in chunks
+
+ Documentation/networking/rxrpc.rst        |   2 +-
+ arch/s390/kernel/cert_store.c             | 161 +++++-------
+ fs/nfs/nfs4idmap.c                        |  21 ++
+ fs/smb/client/cifs_spnego.c               |  12 +
+ fs/smb/client/cifsacl.c                   |  12 +
+ fs/smb/client/cifsproto.h                 |   8 +
+ fs/smb/client/misc.c                      |  19 +-
+ include/linux/key-type.h                  |   6 +-
+ include/linux/key.h                       |   2 +
+ net/Makefile                              |   4 +-
+ net/dns_resolver/Kconfig                  |  15 ++
+ net/dns_resolver/Makefile                 |   4 +-
+ net/dns_resolver/dns_key.c                |  65 +----
+ net/dns_resolver/dns_query.c              |  64 +++++
+ net/dns_resolver/internal.h               |   5 -
+ net/rxrpc/Kconfig                         |  20 ++
+ net/rxrpc/Makefile                        |   7 +-
+ net/rxrpc/af_rxrpc.c                      |  19 +-
+ net/rxrpc/ar-internal.h                   |  25 +-
+ net/rxrpc/conn_event.c                    |   7 +-
+ net/rxrpc/key.c                           | 122 +++------
+ net/rxrpc/proc.c                          |   2 +-
+ net/rxrpc/rxgk.c                          |  66 -----
+ net/rxrpc/rxkad.c                         |  47 ----
+ net/rxrpc/security.c                      | 184 ++++++++++++++
+ net/rxrpc/server_key.c                    | 260 +++++++++++--------
+ security/keys/gc.c                        | 289 ++++++++++------------
+ security/keys/internal.h                  |   8 +-
+ security/keys/key.c                       |  65 +++--
+ security/keys/keyring.c                   |  88 +++----
+ security/keys/trusted-keys/trusted_core.c |  15 +-
+ security/keys/trusted-keys/trusted_tee.c  |  89 +++++--
+ 32 files changed, 932 insertions(+), 781 deletions(-)
+
+--
 2.47.3
 
