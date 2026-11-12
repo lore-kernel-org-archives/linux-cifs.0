@@ -1,88 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.170
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794456218;
-	b=A7Yb70BZTh4ysNntM+LwS3nTPedG42I6oADo8hPQfxU2hm6cpFPgkbvpLT04upUzyYWI
-	 Pox4X6Mc6GpTuM2d6Tm0oKEw6twMY4OXMNtnhM1vUN0nlu2kmx9kmH/VglaAT1Yoyaei7
-	 UDnun3sCK6exMW1nLm7uziR/3C1isr23N4q5uZ+smyEVRwARsEx/1kI25tVhTtJW8MbNr
-	 ohzIZBV/OcM1cOJyQ12cZs51Xnnmjk84CL+31xRUKQRFHpNbxTXmyPdTTOyGKNGTELJd2
-	 ODfOUq84Ol5M7VfGqlj1yuXdiRSqgt13HDijLZN/VSryx1pjeiUI8UAQZXaSb3jHifw==
+	t=1794457307;
+	b=LPB7C0GWbQm+BJgBvo0v5MgdnAV/DgRNNTa866tL9yacy3h03gT7czhnWBNQ+9tgL4tA
+	 DoTIuWw7b/VUfuuAp1Im1MoKsLuvjvjMLcdQIG73gnf0zw9FglBJoA4vDfFPp/YUVRHYG
+	 IVEEMHuJP+xnj6uIGTCJipq3R+t+HxmRyjalHX8FHNPwoP6Ii41Ef2pKjY+po6NlPSAUs
+	 NNOmmEDV+sfJlsnp2VicQIpq6IHVonsMnuK9awlOaVhJe/MD9xwLJz1kbDTGXh7y+SNJR
+	 g9sRARfL/qBWYC8x1gcyp0EmxJdYhCiKRBsXFX28SX3/cG5Zs+ab1ba1sEzMMKKNuuA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794456218;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=1Lrr6VmMkyW1zsEn76jFYJKvsjI3Ge4n5qY5HfV8y1g=;
-	b=YChj/f4OXU6xY5bylj4kAbjECSVxzApvWH6j6phl3rK1eLtsAR5LFqCKaF21mZq8M6pW
-	 p9s230B4y1jQpdUPigHh35qMJoiHkLIFqNKZxEJqeW4vtDtREgrRi1na7FR+ygXOvSkFq
-	 /odxciPfUrYqZFnbFk0166LzFUdxUEpFDVpi7KHZV7N6SJc6mBj3jg4MkqYZSki2FYH5C
-	 lDzUM3v6l8m7gM3RdjxXziDC7aDavMqVo/HfVjDG6/ERgxwDIrFWhulCyEGcmXEv0AQds
-	 1riErEW4PIq6/Iv3AfmN2wVTfEsr6ZR4P01g9NQOMQcTxt34eFQs5NZtkHyCNNHRuMQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794457307;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=juANi56qwSWTWzrj5h15PKZII373PLXorjRyBOcmsyk=;
+	b=zsg2406LeNaGT+rcusOMTKqaBw0TPpmgIL2hXYPt/WPGaOErrg+rLzKBJfe350HtCSQf
+	 9DGJ4ZV7+/PiM5RC8KJYsZOZ5dq3V92+E8+FpA877DBr8XoU7u+dPuNVJuzsGc5Ju7ImR
+	 MkIqi1wUztRZ5PUqHOheH1CReznqV2khiXOK9U1+o4wr7I0mJZDPN5I2itLguXLYVnG8T
+	 VCbQqWW/i+eEi2O+XGoNosjg435BMons3ooRFH8JtUlIetFZ4XXwHyLy6wSrTR19JdH6M
+	 +ZmSBjGIhkGs8SR1NS6NmOFfGofyWPQZgup4hqi8IqJgcBXW9rBYPOpHjFFuqaplfFg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="Lq/U+Q4p";
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Dw7uovNY;
+	arc=none smtp.remote-ip=209.85.215.170
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with UTF8SMTPS id 4D38B606A323;
-	Thu, 12 Nov 2026 04:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0174F606A323
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 04:21:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0174F606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Lq/U+Q4p
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 2E8D51F00A05;
-	Thu, 12 Nov 2026 04:03:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794456217;
-	bh=1Lrr6VmMkyW1zsEn76jFYJKvsjI3Ge4n5qY5HfV8y1g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Lq/U+Q4plaSkIuHD7XRq4NppkVH9h+7O3pJamYVU8ctXDnBbmHhyqDzSEW4reSWfC
-	 K/zW9HkAQ3nBkc8w0KzQHzKnvcYv4RmRdqmg8q4mrPhBj4b1Zzqe1V0vdFZeIwAhmV
-	 DZX5y7BY7LJXMBcZhPHTMCqOWXcobqvJCeYIhS0GLqylXf85YdxSvYO2jtbgUPmXNV
-	 BEBKxPZ041llfZO0me84c9xjcfR1zjeXWJ/PnzefLoaUg+F/YKmfGKhuJp+H4MD+BA
-	 JeLRoSd7wZCcEzujXYFvN/8Ze+Eo27rjSVf5kFawjL0nX9K7PVSwJz/bQa/7jqWIXL
-	 iIZ6C33o5hy0g==
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>,
-	keyrings@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	James Morris <jmorris@namei.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Paul Moore <paul@paul-moore.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	Sven Schnelle <svens@linux.ibm.com>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Dw7uovNY
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-cdb9f760337so245612a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 20:21:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794457306; x=1795062106; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=juANi56qwSWTWzrj5h15PKZII373PLXorjRyBOcmsyk=;
+        b=Dw7uovNYBTbAEZaxM1MG/UZBxai/DRQ4KlDIbj+qtHRUJUbGFavjOePAquBTZafw2w
+         QsHna4vo4YI+JpIlO0J1CfUkTJqfiIca2NImwuChbB99Xr8SG9WKBO29RuhdfYhSXOTJ
+         dYf6vtLJmarEPrpeTpAN5O9U16bIYKLDMayHC9V8ttfaHSObS2noSX4hlSm3NDKDvy7L
+         lm7R5sQ1gC+kik+18I+ulyZYp11Xd4kvxVDz/2SiG1U/Kh6CsXBd3CXJ8858pKPQTKCb
+         LkAnObFL/vW1XJpk12r/iKPB8W66LotuX6Qlhl2cRmc4npFMCsMatvRI7zlZeNhZMfFS
+         8tRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794457306; x=1795062106;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=juANi56qwSWTWzrj5h15PKZII373PLXorjRyBOcmsyk=;
+        b=SDy8gUYmxp3WONW+INpqG1DJVO1ufXniHAah38CkpbXgriragY+bqy04G5jZSVWCCR
+         pnwB0CG7tTRUHKtx/lQZnwniANfQJnzu0w22Iis95xcSGfNAldXLRYr0UdG2sLfDkA7L
+         Jlf+VNEaIbl30Iy+tqUT3CrUCujURAFm3qHbYuqDXg+5YoAu0J0lQr89F77y/5BLf+IS
+         /e+MvvpVyZQPZju1t3V+O3xk3fjSUzUeMsXndYjcTkeNIybkC6otjYvEBGPJDzHDRFwp
+         zE7xg4HZIX32UCEReu7CP77QzlLkmnkk5+rwsUSseaRSEYJp8M9YGmEiKR+BX21AZBj4
+         B91A==
+X-Forwarded-Encrypted: i=1; AL+hErHR4QBLxWoyYowc4hdZC5WEIYJrbHBc3L7r2/usKn3lKthyZSTt+2NZSL2Q+HfkjqD77MZ2mdZGgd1+@vger.kernel.org
+X-Gm-Message-State: APuU4Z8vv5PIb7i9WIQgSQTKx7PBF6pfUh6BbBx8lFIiK+DKXHyhxX0o
+	2KfusWBcIqPHLSJm9PK4BGO304K9BcvocVan3/rqQB7x+J7990gElhFZ
+X-Gm-Gg: AYBFou3ZG9S60AYqejwICObbKD295u48k3k0EWHHeWTBVglJ92VfFAmeV7H6ylRflTj
+	uOmtV1CM2kP32BHFhgc64RRRAlvqI8VoS68/d6UFU/mW5EG2LTHBpmIb5ikffo6E/YdubKe+0G2
+	FAxHKwabL6NgCv+zjaXwfzkl/V2G+98Nt/0gFvvikjWCLOO/3DszDZ3GKNK+2TrQmF6DE24QeW+
+	MZ6e2FY3qQrTpnbkZa1vJOo+0HmIBXcithZTZOGc5MgmnHvDKbVdW3RJdvs8IH7LsF3ZRTYYy0f
+	PRsa+k746nlpLDkNNeKEW/7In9+dI4prgbEX1ROsQwfo8oBSXHoUfpoZ5XJrYGL2rR4v9Eabelt
+	8cWFkfGU9I5261iEnssZOr+LU27PlzXVawWlt0CU39vthtb5IRAzAYYUKkgTqL2v+cseEKBqSwU
+	x4h6YkV2j+nJaBBobL/KXaHHILwORH3mH5JgAvZQXEXXTIOWK0Lf162C2szQht8zm1kIuStUz1b
+	Uf0q069Jt4qLWToP8hI9lwRL5XuRDocO6sEqG045eJ2bYzRRbtKKTevoz2XTqnnod/gr26MC3JX
+	dz9UlCd2yD6E8rYR74zGIfu35tlBhf5tnbS8p8dPnNy9xqVfTQc=
+X-Received: by 2002:a17:90b:50cc:b0:3b1:6e2:3693 with SMTP id 98e67ed59e1d1-3b197c93f2fmr920063a91.17.1794457306154;
+        Wed, 11 Nov 2026 20:21:46 -0800 (PST)
+Received: from fred-server.tail1cd3ef.ts.net ([2600:381:9205:b5df::7ff])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b197b76ccesm2439180a91.0.2026.11.11.20.21.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Nov 2026 20:21:45 -0800 (PST)
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
 	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Vasily Gorbik <gor@linux.ibm.com>
-Subject: [PATCH v6 13/13] KEYS: key_garbage_collector(): process in chunks
-Date: Thu, 12 Nov 2026 06:02:42 +0200
-Message-ID: <20261112040242.247168-14-jarkko@kernel.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261112040242.247168-1-jarkko@kernel.org>
-References: <20261112040242.247168-1-jarkko@kernel.org>
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fredric Cover <fredric.cover.lkernel@gmail.com>
+Subject: [PATCH] smb: client: convert path_consumed to mount charset units
+Date: Thu, 12 Nov 2026 04:21:36 +0000
+Message-ID: <20261112042137.1642509-1-fredric.cover.lkernel@gmail.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -92,405 +102,148 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-key_garbage_collector() has a design that is not resistant enough for
-workqueue lockups. The duration scales up relative to the number of items
-in the serial tree, which causes a reoccuring theme of being guilty of
-causing workqueue lockups.
+path_consumed in a DFS referral counts bytes of the canonical path,
+which is in the DFS cache charset (utf8). dfs_parse_target_referral()
+applies it as an offset into full_path, which is in the mount charset.
+When the mount charset is not utf8, each non-ASCII character in the
+consumed part that encodes longer in utf8 than in the mount charset
+makes the offset too large, so leading characters of the prefix path
+are dropped. For example, with iocharset=iso8859-1, mounting
+//srv/dfs/café é/sub yields the prefix "ub" instead of "sub" and the
+mount fails with -ENOENT. (A single accented character only worked
+because the offset happened to land after the delimiter.)
 
-Resolve the problem by processing in chunks:
+Translate the count in parse_dfs_target(), where both strings are
+available, by matching path components: count the delimiters in the
+consumed part of the canonical path and find the same position in the
+mount charset path. Delimiters are ASCII in both and are not affected
+by remapping. If the consumed bytes are identical in both strings,
+which is the case for utf8 mounts and ASCII-only prefixes using the
+default backslash delimiter, the value is used unchanged.
 
-1. Declare a static variable key_gc_work, which owns the garbage collection
-   in-flight state, and key_schedule_gc_work() for re-scheduling the work.
-2. Define KEY_GC_CHUNK_SIZE, set to 64 keys, as the bound for the number
-   of items scanned and destroyed.
-3. Define KEY_GC_DESTROYING to mark resume to destruction without repeating
-   the RCU grace period.
-4. Define KEY_GC_REAP_REQUESTED for preserving full-pass requests across
-   the continuations.
+This assumes the server reports PathConsumed on a component boundary;
+a translated value that ends mid-component is rounded up to the next
+boundary.
 
-keygcbench results without the patch:
+Tested against Samba on a KASAN kernel: with iocharset=iso8859-1, links
+with 0 to 3 accented characters followed by a tail, a two-level tail,
+an accented tail, a link in a subdirectory, and mapposix with an
+accented name; iso8859-15 and cp932 mounts; and iocharset=utf8
+controls. Not tested against Windows servers, with posixpaths, or with
+reserved characters under mapchars/mapposix.
 
-unused:   min=413.359 avg=1817.240 max=3221.120 var=1970880.024
-expired:  min=0.002 avg=1360.124 max=2481.990 var=1055093.994
-combined: min=0.002 avg=1542.970 max=3221.120 var=1471557.422
 
-keygcbench results with the patch:
 
-unused:   min=0.005 avg=0.126 max=54.173 var=0.946
-expired:  min=0.002 avg=0.210 max=216.470 var=7.894
-combined: min=0.002 avg=0.158 max=216.470 var=3.627
+Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
 
-These results translate to:
-
-- >99.9% drop in the combined variance.
-- 3.0% increase in the total task time.
-
-The value 64 for KEY_GC_CHUNK_SIZE was cherry-picked from the set {1, 2,
-..., 1024} by running the benchmark for each chunk size three times.
-
-At the far left variance is 97% lower but at the same time total time
-grows by 133%, when compared to the selected chunk size. The size was
-picked based on getting a reasonable variance with a minimal throughput
-decline.
-
-Fixes: 0c061b5707ab ("KEYS: Correctly destroy key payloads when their keytype is removed")
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd-test.git/tree/package/keygcbench
-Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- security/keys/gc.c       | 166 ++++++++++++++++++++++++++-------------
- security/keys/internal.h |   3 +-
- security/keys/key.c      |   4 +-
- security/keys/keyring.c  |   2 +-
- 4 files changed, 116 insertions(+), 59 deletions(-)
+Hi Paulo,
 
-diff --git a/security/keys/gc.c b/security/keys/gc.c
-index 859f331549ce..704dcc401983 100644
---- a/security/keys/gc.c
-+++ b/security/keys/gc.c
-@@ -11,10 +11,7 @@
- #include <keys/keyring-type.h>
- #include "internal.h"
+This is the follow-up you asked for in your reply to the earlier series.
+Based on cifs-next at 25912ed3b75d.
+
+Separately, reconnecting a mount whose prefix path contains non-ASCII
+characters still fails with a non-utf8 charset; I'm looking at that
+and will send it as its own patch.
+
+---
+ fs/smb/client/dfs.c | 70 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 68 insertions(+), 2 deletions(-)
+
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index 57c90a2512a3..cbc2ea6a190b 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -85,16 +85,82 @@ static void set_root_smb_session(struct cifs_mount_ctx *mnt_ctx)
+ 	ctx->dfs_root_ses = ses;
+ }
  
--/*
-- * Delay between key revocation/expiry in seconds
-- */
--unsigned key_gc_delay = 5 * 60;
-+#define KEY_GC_CHUNK_SIZE 64
- 
- /*
-  * Reaper for unused keys.
-@@ -22,18 +19,22 @@ unsigned key_gc_delay = 5 * 60;
- static void key_garbage_collector(struct work_struct *work);
- 
- struct workqueue_struct *key_gc_wq __ro_after_init;
--DECLARE_WORK(key_gc_work, key_garbage_collector);
- 
--/**
-- * key_gc_flush - Drain the garbage collector RCU callbacks
-+static struct {
-+	time64_t start;			/* expiry range start */
-+	time64_t end;			/* expiry range end */
-+	struct rb_node *cursor;		/* serial tree position */
-+	u8 state;			/* state flags */
-+	atomic_t seq;
-+	struct work_struct work;	/* work item */
-+} key_gc_work = {
-+	.work = __WORK_INITIALIZER(key_gc_work.work, key_garbage_collector),
-+};
-+
-+/*
-+ * Delay between key revocation/expiry in seconds
-  */
--void key_gc_flush(void)
--{
--	do {
--		rcu_barrier();
--	} while (flush_work(&key_gc_work));
--}
--EXPORT_SYMBOL_GPL(key_gc_flush);
-+unsigned int key_gc_delay = 5 * 60;
- 
- /*
-  * Reaper for links from keyrings to dead keys.
-@@ -44,6 +45,42 @@ static DEFINE_TIMER(key_gc_timer, key_gc_timer_func);
- static time64_t key_gc_next_run = TIME64_MAX;
- static unsigned long key_gc_flags;
- #define KEY_GC_KEY_EXPIRED	0	/* A key expired and needs unlinking */
-+#define KEY_GC_REAP_REQUESTED	1	/* Another complete pass was requested */
-+
-+/*
-+ * Schedule a new GC pass or re-schedule an ongoing GC pass.
-+ */
-+void key_schedule_gc_work(bool expired)
++static bool dfs_is_delim(wchar_t c)
 +{
-+	unsigned long flags = BIT(KEY_GC_REAP_REQUESTED);
-+
-+	if (expired)
-+		flags |= BIT(KEY_GC_KEY_EXPIRED);
-+
-+	/* Publish all request flags together, after the caller's updates. */
-+	set_mask_bits(&key_gc_flags, 0, flags);
-+	queue_work(key_gc_wq, &key_gc_work.work);
++	return c == '/' || c == '\\';
 +}
 +
-+/**
-+ * key_gc_flush - Drain the garbage collector RCU callbacks
++/*
++ * @consumed counts bytes of the canonical (cache charset) path @cpath.
++ * Return the matching byte offset in @fpath, which holds the same path in
++ * the mount charset.  Offsets are matched by path component, since the
++ * delimiters are ASCII in every charset and survive remapping.
 + */
-+void key_gc_flush(void)
++static int dfs_consumed_to_local(const struct nls_table *nls,
++				 const char *cpath, const char *fpath,
++				 int consumed)
 +{
-+	int seq;
++	size_t clen = strlen(cpath), flen = strlen(fpath), off = 0;
++	int ndelims = 0, seen = 0, i;
++	bool ends_on_delim;
 +
-+	do {
-+		while (flush_work(&key_gc_work.work) ||
-+		       work_pending(&key_gc_work.work))
-+			cpu_relax();
-+		seq = atomic_read_acquire(&key_gc_work.seq);
-+		rcu_barrier();
-+	} while (flush_work(&key_gc_work.work) ||
-+		 work_pending(&key_gc_work.work) ||
-+		 atomic_read_acquire(&key_gc_work.seq) != seq);
++	if (consumed < 0)
++		return -EINVAL;
++
++	/* Identical bytes in both strings: units already agree */
++	if ((size_t)consumed <= min(clen, flen) && !memcmp(cpath, fpath, consumed))
++		return consumed;
++
++	if ((size_t)consumed > clen)
++		consumed = clen;
++
++	for (i = 0; i < consumed; i++)
++		if (dfs_is_delim(cpath[i]))
++			ndelims++;
++	ends_on_delim = consumed && dfs_is_delim(cpath[consumed - 1]);
++
++	while (off < flen) {
++		wchar_t uni;
++		int len = nls->char2uni((const unsigned char *)fpath + off,
++					flen - off, &uni);
++
++		if (len <= 0) {
++			uni = (unsigned char)fpath[off];
++			len = 1;
++		}
++		if (dfs_is_delim(uni)) {
++			if (!ends_on_delim && seen == ndelims)
++				break;		/* start of next component */
++			seen++;
++			if (ends_on_delim && seen == ndelims) {
++				off += len;	/* just past the last consumed delimiter */
++				break;
++			}
++		}
++		off += len;
++	}
++	return off;
 +}
-+EXPORT_SYMBOL_GPL(key_gc_flush);
 +
- /*
-  * Schedule a garbage collection run.
-  * - time precision isn't particularly important
-@@ -57,7 +94,8 @@ void key_schedule_gc(time64_t gc_at)
- 
- 	if (gc_at <= now) {
- 		kdebug("IMMEDIATE");
--		queue_work(key_gc_wq, &key_gc_work);
-+		/* Catch expirations that became due during the scan. */
-+		key_schedule_gc_work(true);
- 	} else if (gc_at < key_gc_next_run) {
- 		kdebug("DEFERRED");
- 		key_gc_next_run = gc_at;
-@@ -79,15 +117,6 @@ void key_set_expiry(struct key *key, time64_t expiry)
- 	}
- }
- 
--/*
-- * Schedule a dead links collection run.
-- */
--void key_schedule_gc_links(void)
--{
--	set_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags);
--	queue_work(key_gc_wq, &key_gc_work);
--}
--
- /*
-  * Some key's cleanup time was met after it expired, so we need to get the
-  * reaper to go through a cycle finding expired keys.
-@@ -96,7 +125,7 @@ static void key_gc_timer_func(struct timer_list *unused)
+ static inline int parse_dfs_target(struct smb3_fs_context *ctx,
+ 				   struct dfs_ref_walk *rw,
+ 				   struct dfs_info3_param *tgt)
  {
- 	kenter("");
- 	key_gc_next_run = TIME64_MAX;
--	key_schedule_gc_links();
-+	key_schedule_gc_work(true);
- }
+ 	int rc;
+ 	const char *fpath = ref_walk_fpath(rw) + 1;
++	const char *cpath = ref_walk_path(rw) + 1;
  
- /*
-@@ -104,7 +133,9 @@ static void key_gc_timer_func(struct timer_list *unused)
-  */
- static noinline void key_gc_unused_keys(struct list_head *keys)
- {
--	while (!list_empty(keys)) {
-+	unsigned int chunk = KEY_GC_CHUNK_SIZE;
+ 	rc = ref_walk_get_tgt(rw, tgt);
+-	if (!rc)
+-		rc = dfs_parse_target_referral(fpath, tgt, ctx);
++	if (!rc) {
++		struct dfs_info3_param local = *tgt;
++		int off = dfs_consumed_to_local(rw->mnt_ctx->cifs_sb->local_nls,
++						cpath, fpath, tgt->path_consumed);
 +
-+	while (!list_empty(keys) && chunk--) {
- 		struct key *key =
- 			list_entry(keys->next, struct key, graveyard_link);
- 		struct module *owner = key->type->owner;
-@@ -157,35 +188,46 @@ static noinline void key_gc_unused_keys(struct list_head *keys)
- static void key_garbage_collector(struct work_struct *work)
- {
- 	static LIST_HEAD(graveyard);
--	u8 gc_state = 0;
-+	typeof(key_gc_work) *gc = &key_gc_work;
- #define KEY_GC_REAP_AGAIN	0x01	/* - Need another cycle */
- #define KEY_GC_REAPING_LINKS	0x02	/* - We need to reap links */
-+#define KEY_GC_DESTROYING	0x04	/* - We need to destroy keys */
- 
--	struct rb_node *cursor;
-+	unsigned int chunk = KEY_GC_CHUNK_SIZE;
-+	unsigned long flags;
- 	struct key *key;
--	time64_t new_timer, limit, expiry;
-+	time64_t expiry;
- 
--	kenter("[%lx]", key_gc_flags);
-+	kenter("[%lx,%x]", key_gc_flags, gc->state);
- 
--	limit = ktime_get_real_seconds();
-+	if (gc->state & KEY_GC_DESTROYING)
-+		goto destroy_keys;
-+	if (gc->cursor) {
-+		spin_lock(&key_serial_lock);
-+		goto continue_scanning;
++		if (off < 0)
++			return off;
++		local.path_consumed = off;
++		rc = dfs_parse_target_referral(fpath, &local, ctx);
 +	}
- 
--	if (test_and_clear_bit(KEY_GC_KEY_EXPIRED, &key_gc_flags))
--		gc_state |= KEY_GC_REAPING_LINKS;
--	kdebug("new pass %x", gc_state);
-+	flags = xchg(&key_gc_flags, 0);
-+	gc->start = ktime_get_real_seconds();
-+	gc->state = 0;
-+	if (flags & BIT(KEY_GC_KEY_EXPIRED))
-+		gc->state |= KEY_GC_REAPING_LINKS;
-+	kdebug("new pass %x", gc->state);
- 
--	new_timer = TIME64_MAX;
-+	gc->end = TIME64_MAX;
- 
- 	/* As only this function is permitted to remove things from the key
- 	 * serial tree, if cursor is non-NULL then it will always point to a
- 	 * valid node in the tree - even if lock got dropped.
- 	 */
- 	spin_lock(&key_serial_lock);
--	cursor = rb_first(&key_serial_tree);
-+	gc->cursor = rb_first(&key_serial_tree);
- 
- continue_scanning:
--	while (cursor) {
--		key = rb_entry(cursor, struct key, serial_node);
--		cursor = rb_next(cursor);
-+	while (gc->cursor && chunk) {
-+		key = rb_entry(gc->cursor, struct key, serial_node);
-+		gc->cursor = rb_next(gc->cursor);
-+		chunk--;
- 
- 		if (!test_bit_acquire(KEY_FLAG_USER_ALIVE, &key->flags)) {
- 			/* Clobber key->user after final put seen. */
-@@ -196,14 +238,14 @@ static void key_garbage_collector(struct work_struct *work)
- 		if (expiry != TIME64_MAX) {
- 			if (!(key->type->flags & KEY_TYPE_INSTANT_REAP))
- 				expiry += key_gc_delay;
--			if (expiry > limit && expiry < new_timer) {
-+			if (expiry > gc->start && expiry < gc->end) {
- 				kdebug("will expire %x in %lld",
--				       key_serial(key), key->expiry - limit);
--				new_timer = key->expiry;
-+				       key_serial(key), expiry - gc->start);
-+				gc->end = expiry;
- 			}
- 		}
- 
--		if ((gc_state & KEY_GC_REAPING_LINKS) &&
-+		if ((gc->state & KEY_GC_REAPING_LINKS) &&
- 		    key->type == &key_type_keyring)
- 			goto found_keyring;
- 
-@@ -215,7 +257,11 @@ static void key_garbage_collector(struct work_struct *work)
- 	spin_unlock(&key_serial_lock);
- 
- maybe_resched:
--	if (cursor) {
-+	if (gc->cursor) {
-+		if (!chunk) {
-+			queue_work(key_gc_wq, &key_gc_work.work);
-+			goto out;
-+		}
- 		cond_resched();
- 		spin_lock(&key_serial_lock);
- 		goto continue_scanning;
-@@ -227,10 +273,8 @@ static void key_garbage_collector(struct work_struct *work)
- 	 */
- 	kdebug("pass complete");
- 
--	if (new_timer != TIME64_MAX) {
--		new_timer += key_gc_delay;
--		key_schedule_gc(new_timer);
--	}
-+	if (gc->end != TIME64_MAX)
-+		key_schedule_gc(gc->end);
- 
- 	if (!list_empty(&graveyard)) {
- 		/* Make sure that all pending keyring payload destructions are
-@@ -240,13 +284,27 @@ static void key_garbage_collector(struct work_struct *work)
- 		 */
- 		kdebug("gc sync");
- 		synchronize_rcu();
-+	}
-+
-+	gc->state |= KEY_GC_DESTROYING;
-+
-+destroy_keys:
-+	if (!list_empty(&graveyard)) {
- 		kdebug("gc keys");
- 		key_gc_unused_keys(&graveyard);
-+		if (!list_empty(&graveyard)) {
-+			queue_work(key_gc_wq, &key_gc_work.work);
-+			goto out;
-+		}
- 	}
--
--	if (gc_state & KEY_GC_REAP_AGAIN)
--		queue_work(key_gc_wq, &key_gc_work);
--	kleave(" [end %x]", gc_state);
-+	gc->state &= ~KEY_GC_DESTROYING;
-+
-+	if ((gc->state & KEY_GC_REAP_AGAIN) ||
-+	    test_bit(KEY_GC_REAP_REQUESTED, &key_gc_flags))
-+		queue_work(key_gc_wq, &key_gc_work.work);
-+out:
-+	atomic_inc_return(&gc->seq);
-+	kleave(" [end %x]", gc->state);
- 	return;
- 
- 	/* We found an unreferenced key - once we've removed it from the tree,
-@@ -258,7 +316,7 @@ static void key_garbage_collector(struct work_struct *work)
- 	spin_unlock(&key_serial_lock);
- 
- 	list_add_tail(&key->graveyard_link, &graveyard);
--	gc_state |= KEY_GC_REAP_AGAIN;
-+	gc->state |= KEY_GC_REAP_AGAIN;
- 	goto maybe_resched;
- 
- 	/* We found a keyring and we need to check the payload for links to
-@@ -268,6 +326,6 @@ static void key_garbage_collector(struct work_struct *work)
- 	 */
- found_keyring:
- 	spin_unlock(&key_serial_lock);
--	keyring_gc(key, limit);
-+	keyring_gc(key, gc->start);
- 	goto maybe_resched;
- }
-diff --git a/security/keys/internal.h b/security/keys/internal.h
-index f8918b69dc77..6b5bb63b0e9e 100644
---- a/security/keys/internal.h
-+++ b/security/keys/internal.h
-@@ -161,13 +161,12 @@ extern bool lookup_user_key_possessed(const struct key *key,
- extern long join_session_keyring(const char *name);
- extern void key_change_session_keyring(struct callback_head *twork);
- 
--extern struct work_struct key_gc_work;
- extern unsigned key_gc_delay;
- extern struct workqueue_struct *key_gc_wq;
- extern void keyring_gc(struct key *keyring, time64_t limit);
- void key_set_expiry(struct key *key, time64_t expiry);
- extern void key_schedule_gc(time64_t gc_at);
--extern void key_schedule_gc_links(void);
-+void key_schedule_gc_work(bool expired);
- 
- extern int key_task_permission(const key_ref_t key_ref,
- 			       const struct cred *cred,
-diff --git a/security/keys/key.c b/security/keys/key.c
-index 80962c3ae12d..53106bee2d27 100644
---- a/security/keys/key.c
-+++ b/security/keys/key.c
-@@ -693,7 +693,7 @@ void key_put(struct key *key)
- 			}
- 			/* Mark key as safe for GC after key->user done. */
- 			clear_bit_unlock(KEY_FLAG_USER_ALIVE, &key->flags);
--			queue_work(key_gc_wq, &key_gc_work);
-+			key_schedule_gc_work(false);
- 		}
- 	}
- }
-@@ -1214,7 +1214,7 @@ void key_invalidate(struct key *key)
- 		down_write_nested(&key->sem, 1);
- 		if (!test_and_set_bit(KEY_FLAG_INVALIDATED, &key->flags)) {
- 			notify_key(key, NOTIFY_KEY_INVALIDATED, 0);
--			key_schedule_gc_links();
-+			key_schedule_gc_work(true);
- 		}
- 		up_write(&key->sem);
- 	}
-diff --git a/security/keys/keyring.c b/security/keys/keyring.c
-index 2d65356129ba..7776983c3fda 100644
---- a/security/keys/keyring.c
-+++ b/security/keys/keyring.c
-@@ -266,7 +266,7 @@ void key_remove_domain(struct key_tag *domain_tag)
- {
- 	domain_tag->removed = true;
- 	if (!key_put_tag(domain_tag))
--		key_schedule_gc_links();
-+		key_schedule_gc_work(true);
+ 	return rc;
  }
  
- /*
+
+base-commit: 25912ed3b75dcf5ff623dcb549b925dd0d0948f7
 -- 
-2.47.3
+2.53.0
 
