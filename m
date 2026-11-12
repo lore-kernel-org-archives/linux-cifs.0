@@ -1,96 +1,66 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794512874;
-	b=TDTafSs1AH/5fpU/7ph2Xf+fYvqzmexVvwXdxjL09jBJW4z9seRldRo+ugEj+0TEpFTt
-	 CsKN4q1f3OBYzCKaGV0HmJk+J2DJkga9NU+CtqfPabOgQ1I8igkk4Ke4MKuqfmEb8ShY6
-	 mDt4u4GMzc65WbIUSqIsmH7rXXtqOTveU3boivKNwNDh9u9o6LHKb/JdAoM/XFbmLkWTP
-	 eyCER3EFwiRmn1waQ9goKJxGWMNykwaCdvM9pQPW1CghHNfJvCyFgUUpvCewYKyNmTng8
-	 0LdufaemEHHCAK9WYMAOdn0zktIIJkw+WfNY7hqDnZynY4YKQdHMTJ8XARE1D9O7BRg==
+	t=1794513903;
+	b=21n55ut/jhT6kMLwPaClZhXXafqN+oINBdSv4oKUnDwvitYY4VgtVxUu/xrYYLkxCfhA
+	 /Atam2GuVFvEdrK12fs7Jsbx5FgK0hft0V4jO3C5hB9n89VE1fb7/bS41kQn5uCG03kwD
+	 9jDellcS1i+MQCKHmULfDvYrht+V6RJnBijDBdjXIoxK2WZw6GTT6+ftkxB6tPyxpxUze
+	 h6vNvyEpwyLrGQX7DedFzi7ZJWyo3XW+GENv7aiAweclNuKC6snwjrjpjvJCFWbI9VyAX
+	 OfKhuyhML4LIb0hcObqzCzZlH6vsbJPKyZay8tAYFQmSVtd1l7EFO7vsKXAoNJWaWZQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794512874;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=d/WZP9qM01vcu0iQY3R3zS6LO6sreSjN5qCF0e0Ekh4=;
-	b=2g6msD4lTScb4Dan6RVuEa9pw+EAXqizwZsjzmIsXKEXuFp7sSfG7JDGfbPzAUgNKS01
-	 s1WaYHOKXeIckjGxIzPeE+PERdJvv3ko9ZGLFvOyLEll+eGmEq960s3VWvT4cG/l+JWi3
-	 4yNazjIs5ZEd0HVsc4Pcg1oO+1h3OT3EGF6bR9MzoA7Y0g8f0XvHFd+LWT3fcGfEkKAEo
-	 ZLQ/+5OF0YkDMTO+pKvkxM+R21EmmX9RIfM6DTiqtX7tP213wZdx5sZYGYnv8zuwNNQ1F
-	 FyWBLJNQmF3JT2K0dbSGL8/SFmCnrHBVeMIMub4VhzgA1XyEY6vzZoSWDrl0T+ioovg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794513903;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:X-SRS-Rewrite;
+	bh=e/9XtLf1/seQXU14efIT7GgTlHiVF3SyFuteO0A0dz0=;
+	b=vgp/07P5gh2LBLRQQobNv7f+L1yRJ7hWYMcYqIKyHtnIIHL8ZK8sArnjVzu9a32ALeKv
+	 U3TfXzD9BOGFb65gXlawbTXGw6X6APbURKFB7gI0+N5HIqC9Y+Tkx8k7FZ4u9Nl+W39Sg
+	 5j4Lj4kUR5hlb3WEwAnt0ada9+lmTb1MkUWIT61dcD8FHNFMoXxJHy1kc0CYUXiWiUxJq
+	 QTYfPNeTfh6rCD6m0LAc2ooW1fPauy1Ry4/DpsOC6Rvajds0l2GHEUIydP/ODN9qU25Ql
+	 PMIvxWV97d3xgWelBOGAK0+x3WgUzUNIuHiV6g9JxBKUJZlnB4OhXH440TdJfgF1CJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=y3bxZrcN;
-	arc=none smtp.remote-ip=209.85.215.182
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=infradead.org;
+	spf=none smtp.mailfrom=bombadil.srs.infradead.org;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=I1gI4Rv2;
+	arc=none smtp.remote-ip=198.137.202.133
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B798E606A321
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 19:47:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B798E606A321
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781C5606A31C;
+	Thu, 12 Nov 2026 20:05:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 781C5606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=y3bxZrcN
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-cdb9d5c1c8eso148636a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 11:47:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794512873; x=1795117673; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=d/WZP9qM01vcu0iQY3R3zS6LO6sreSjN5qCF0e0Ekh4=;
-        b=y3bxZrcNobyjj6gh4ZbLbGfWGGBHOmGYqRc9kybj3NjnsJYkuynSeg2mi09OqnGtZN
-         yDiqHTPSP3UTpC1cyEnIXEM8S6IP65y6FRvTtWh+JGi9+GzyUeDqxqKU7MMMNSTSberR
-         qlSUY3f0PpVd/VBih7VjoFCGL/OYpMkPtkNo93MineN8I3NPNF0eIavAUPsv86tM+qFh
-         sVPLSHjkWVBXtcMG1nQ7HrIFiKBfWWXj22UCa/MqB3ShqTDCflC9Q5rsCTLxGjkQYBrt
-         FfGpoQlYtt36FY7TbKnhh/xUEv0om8e0brg6G/DEQjmm5t46xLEQtzwW9arBwLiq2uQ7
-         zvMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794512873; x=1795117673;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=d/WZP9qM01vcu0iQY3R3zS6LO6sreSjN5qCF0e0Ekh4=;
-        b=oHFihPQGOHYANAwWWb1e1NpxRioUTVj531W9u1uFyngRFeGbFmpjyA5knzDB9nbYYr
-         vvq/i0+WurVcwAfcFdw4NdkN21BDBcmmZBfjeFy4R3lDNBiMWKcNeDEb7CQ0kmf4DyGP
-         /+zUfQbLoKMq5126XUkVBW6JKOu0CmooS/FJXcY7JJsP3DMJoo22qbUWKqZFNCqq7yJy
-         uIvCcFrIquc3lJ+QmQhlhLJT2d5tpL+JN/n52IVqLN9PXMZZdPtuHvTsxOdlNJO6wsI1
-         qj46LVwlsmvQmj3EELi/NvoGOZfFStZ/Ldlr54CpFgua8QlnMaMLSVBs/Zy0/8hNKzWG
-         sfPA==
-X-Forwarded-Encrypted: i=1; AL+hErHfKfvE0aFPMulgJDhXZXzQacagf0KYeEIZ2klFS2MRuVmiBdx99bXYw8kgGowHVAIMwoJ77q7y1vTx@vger.kernel.org
-X-Gm-Message-State: APuU4Z8001WBcbthY3JJ/BMJjzrKTl7OLmVyJEqQooUDv8M7S3f7wRnF
-	rgksTRu+A0mB/02f1rNbd36fw6NeqUsC3MscHYO9cl5X/x1qQerDgQN5
-X-Gm-Gg: AYBFou2SBqEQ+t4EDkZk1Ob3fskdW1+yxw7DWDADeHgk/mXDYGE9NK887EuxfHlG4A6
-	Pi6ZWXz28WlPwLanSn9C2CE2whIEJc1ir0q4urcRp89eWC43gfjqzbhfD7Dksmt03vxgnkbcvns
-	uEvghLclmoxDB+0EyoETpPyVRUbWKmX7gyLgxhto/ZpMq2CvxC9U7VRnjkybVrmaIbfjUa3mgYu
-	wqUr2tY4ClZwjDeUzOW97hyVWZgtpAX3vx0iMhMXs2OhF9FmkwV+O1cgGRGhs458wDlJ8E1PjAe
-	NK4K/ONxtDJUeeUl8lQ6aTJ8s7bAhQGskSzIabnx7pF5LMhnI53iHuAgSJ86d4I3VeXXZuPpq4r
-	mb4Iz7/5uDMYuPxGrbT3PyS3MSXkbDRlD/xUbvNvLQ2shvWegypVxfoSoF1vK95fRMKRtXkSx4u
-	ah5G9nVSDYDmCEmUm8/SWsrQh4DqrkCpJmj23YXQ/AjK5KuDjxyJKlUIlxK2o9/tdMWIwQkPSDQ
-	jAYdbwrvzPtCuj+FDWbGH0JmI9YQ7uZhQgMPABYnoK/dOzyCJJYNkStEBDD6jLmpy/IrvxoCQtc
-	FlyGPQsXRaIQyXp/65TCYuNm4sCVfJvdQ1b5et3d1YaeSO1RQVQ8XVcZgwzA+8s3kSZ+ToS9nI7
-	RxlPl+zwKehtJE33UfQqEN6WeuQ==
-X-Received: by 2002:a05:6a21:8885:b0:3e9:192a:4a7 with SMTP id adf61e73a8af0-3f7a79c5a31mr173095637.48.1794512872891;
-        Thu, 12 Nov 2026 11:47:52 -0800 (PST)
-Received: from localhost.localdomain ([2405:9800:b901:33ad:cbb:dbe2:bd9d:a035])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b1ae8be5adsm839012a91.0.2026.11.12.11.47.49
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 12 Nov 2026 11:47:52 -0800 (PST)
-From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-To: linkinjeon@kernel.org,
-	stfrench@microsoft.com
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	icb@fastmail.org,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-Subject: [PATCH] ksmbd: sign the last response of a compound that ends early
-Date: Fri, 13 Nov 2026 02:47:44 +0700
-Message-ID: <20261112194744.47047-1-mike.michalo@gmail.com>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=I1gI4Rv2
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=e/9XtLf1/seQXU14efIT7GgTlHiVF3SyFuteO0A0dz0=; b=I1gI4Rv2t0pTMfIbgIjF02KAls
+	z76OX311HlbjXRlaZ3NmPqo05dsjHrMmP2IpEX9WBDtCya+x1EGyaIjc6HQZoyCod3RLVduOBaV/E
+	Pc623NWuxVKTmke0i2QRTeLBjxujw8Dfvnt4PF3CEaM4Sezlc2AWtW3/+rg4hhGCBi0/E4iCF+Hfo
+	Bakb/jf3lT6AheUFRpMhyGi4Xo86wSdvaiJBqZfN4AbTNbFnFAMuyPVQTIQBm+KA4ygM1LBpHJkDl
+	2eIR1zItGCETAR2aIb2NwGZFp6+ynskaS/dyEYtthU2z9kOuTVuw3gTMJV0SFvyWcePLPq+bXvjnc
+	kPCKo8fQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xRb2a-0000000AzZ2-3ibC;
+	Thu, 12 Nov 2026 20:05:00 +0000
+Date: Thu, 12 Nov 2026 12:05:00 -0800
+From: Christoph Hellwig <hch@infradead.org>
+To: Lauri Gates <lauri.gates@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Dave Chinner <dgc@kernel.org>,
+	linux-xfs@vger.kernel.org, Carlos Maiolino <cem@kernel.org>,
+	Christian Brauner <christian@brauner.io>,
+	"Darrick J. Wong" <djwong@kernel.org>, linux-api@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	ocfs2-devel@lists.linux.dev, linux-nfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org
+Subject: Re: Concurrent FIEMAP on reflinked files serialises on the AGF
+ buffer lock
+Message-ID: <avYb7D3bCmnw0Mbw@infradead.org>
+References: <au3wJNbRPXQZG5Op@infradead.org>
+ <20261106204026.14530-1-lauri.gates@gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -100,83 +70,104 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261106204026.14530-1-lauri.gates@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-is_chained_smb2_message() ends a compound early when the next command
-does not fit in the request, or its response would not fit in the
-response buffer. Since commit e2b76ab8b5c9 ("ksmbd: add support for
-read compound"), __handle_ksmbd_work() then signs ksmbd_resp_buf_curr(),
-which is_chained_smb2_message() only moves to the response of the
-command just processed when it chains to the next command or reaches
-the last one. On an early end it returns without moving it, so for a
-command after the first, the previous command's response was signed
-again, over the iovecs of both responses, and the response of this
-command was left unsigned. Neither signature verifies at the client.
+On Fri, Nov 06, 2026 at 10:40:26PM +0200, Lauri Gates wrote:
+> The other is that for a "may share" bit, clear is the unsafe answer,
+> so a filesystem that cannot answer should not look like one that
+> answers "not shared". As I understand it, stx_attributes_mask makes
+> that distinction, while struct file_attr has no validity mask today
+> (it is size-versioned, so one could be added), so through
+> file_getattr() btrfs would currently read as never shared. A spare
+> bit in stx_attributes adds no field to struct statx, which I hope
+> meets the concern Christian raised about spending statx space on the
+> case-folding RFC [2]. If fileattr is preferred, the bit could instead
+> mean "no shared extents", so that clear is the safe default, as it is
+> for FS_XFLAG_CASEFOLD.
 
-Handle an early end as the end of the compound: pad the response to 8
-bytes and make it the current one. smb2_allocate_rsp_buf() leaves room
-for that padding in the response buffer of a compound.
+statx sounds good to me, but I'd really like to hear from Christian.
 
-Only a compound whose NextCommand points past the end of the message,
-or whose responses fill the response buffer, takes this path. Sashiko
-pointed it out in its review of an unrelated series.
+> 
+> > Besides xfs, btrfs and ocfs2 also support reflinks, and nfs (and maybe
+> > cifs?) can export the semanics remotely.  So we really need a way
+> > to indicate if the file system could support reflinks to start with,
+> > and then one that the file could, so we probably need two bits
+> 
+> For du, I think the mask could stand in for the "could support
+> reflinks" bit if it means "this filesystem can answer for this file":
+> 
+>   mask clear            not reported, fall back to FIEMAP
+>   mask set, bit clear   no shared extents
+>   mask set, bit set     may have shared extents
+> 
+> A filesystem that cannot share extents at all would set the mask and
+> leave the bit clear.
 
-An AI assistant was used to draft the patch and as an independent
-reviewer.
+Sounds good.
 
-Fixes: e2b76ab8b5c9 ("ksmbd: add support for read compound")
-Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
----
-Tested on a KASAN/lockdep UML kernel based on ksmbd-for-next: a signed
-compound of two ECHOs whose second NextCommand points past the end of
-the message gets two responses whose signatures did not verify before
-this patch and verify with it; ordinary compounds and the compound,
-encryption and expired-session tests are unchanged, and the Linux cifs
-client works.
+>  - nfs, cifs: I could not find a per-file attribute in NFSv4.2 or
+>    MS-FSCC that could carry it (space_freed comes closest, and nfsd
+>    does not implement it), so no mask bit there.
 
- fs/smb/server/smb2pdu.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+There's definitively nothing in NFS, speaking as the person who added
+the clone support.  If your new Linux syscall API becomes widely useful,
+we could add the equivalent to NFS in a new draft.
 
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 5b046f10e2ce4..438f3d29dc416 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -699,7 +699,7 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
- 		    get_rfc1002_len(work->request_buf)) {
- 			pr_err("next command(%u) offset exceeds smb msg size\n",
- 			       next_cmd);
--			return false;
-+			goto last_rsp;
- 		}
- 
- 		/*
-@@ -716,16 +716,21 @@ bool is_chained_smb2_message(struct ksmbd_work *work)
- 		if ((u64)ALIGN(get_rfc1002_len(work->response_buf), 8) +
- 		    next_rsp_sz > work->response_sz) {
- 			pr_err("next response offset exceeds response buffer size\n");
--			return false;
-+			goto last_rsp;
- 		}
- 
- 		ksmbd_debug(SMB, "got SMB2 chained command\n");
- 		init_chained_smb2_rsp(work);
- 		return true;
--	} else if (work->next_smb2_rcv_hdr_off) {
-+	}
-+
-+last_rsp:
-+	if (work->next_smb2_rcv_hdr_off) {
- 		/*
--		 * This is last request in chained command,
--		 * align response to 8 byte
-+		 * This is the last response of a compound, also when the
-+		 * compound ends early because the next command does not fit.
-+		 * Align it to 8 bytes and make it the current response, which
-+		 * is the one the caller signs.
- 		 */
- 		len = ALIGN(get_rfc1002_len(work->response_buf), 8);
- 		len = len - get_rfc1002_len(work->response_buf);
+> A filesystem-level "could reflink" bit might be a separate need:
+> nfsd encodes clone_blksize for every export and ksmbd advertises
+> FILE_SUPPORTS_BLOCK_REFCOUNTING unconditionally, I assume because
+> neither can ask the exported filesystem. Did you have nfsd and ksmbd
+> in mind for that bit?
 
-base-commit: a4277e7b7682540e23334fc927f201e5bb7df5a3
--- 
-2.43.0
+I just mean we need some way to discover it.  I think the three states
+in statx should cover everything.
+
+> On reliability, my tentative answer is that the bit does not need to
+> be exact for this use. A clear bit must never be wrong,
+
+Yes.
+
+> Stale bits do limit what it saves, though. The flag stays set when
+> the other copy is deleted or the file is overwritten; only truncation
+> to zero and FALLOC_FL_UNSHARE_RANGE (see the caveat below) clear it.
+
+Yes.
+
+> Would there be a reasonable point for XFS to clear the flag once
+> sharing ends? I don't know the code well enough to tell what that
+> would cost.
+
+It is hard to know that nothing is shared, because nothing in the
+inode tracks the shared space, except for XFS_DIFLAG2_REFLINK only
+the reflink btree shared if anyting is reflinked.   To efficiently
+clear the bit in an exact way we'd need to track the number of
+blocks or extents that are shared in the inode, which would be
+an on-disk format change.  But if you run xfs_scrub with online
+repair enable, the online repair can fix the value up as background
+operation, which should be useful once that feature has matured a
+bit and users enable it by default.
+
+> 
+> The caveat, which may be unintended or may be my misreading:
+> FALLOC_FL_UNSHARE_RANGE over a whole shared file does not clear the
+> flag on the first call. bpftrace on 7.2 shows
+> xfs_reflink_clear_inode_flag() entered and
+> xfs_reflink_inode_has_shared_extents() not, so it looks like
+> xfs_can_free_cowblocks() returned false, perhaps on I_DIRTY_PAGES
+> left by the unshare. A second call after sync clears the flag.
+
+Interesting.  Maybe we need a sync before calling
+xfs_reflink_inode_has_shared_extents?
+
+> If the statx direction sounds reasonable, I would be glad to put
+> together an RFC with the uapi bit, xfs and ocfs2 support, a man-pages
+> patch and an xfstest. This would be my first kernel patch, so
+> corrections on any of the above are very welcome.
+
+Happy to help reviewing this if you take on a word.  Just as a warning
+I'm a bit overloaded currently, so some replies might take longer than
+I'd want.
+
