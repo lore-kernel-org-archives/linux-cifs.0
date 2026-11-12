@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794522828;
-	b=hJYwnclWgE4kYi2OEg/VFPwfJn/YXKnup49M+eurGvLpDMn4o7zqiGngMUM1SE8XoNhI
-	 7iqPp34vJvZDJOotllt/5qqxspFvVKHgXNgADBQo0g78VLmqay/fy88g7Nz+ZCz20cEbq
-	 H7AjRuWwD18FRMnR1okaanWKo2Ke+mCghntGkBjDRzk+TNjMfYTpQPadKS90aothkG7Cs
-	 Xx8gGosmNtePkT6WDG03NqBPaRd71xRLLsqEJQqupLeCxEyxfXXxA7hZLBr8ftNfTO4eV
-	 EZdlhPLCgagCljqyOv4sUq0MzO/PoKGuaRz91611SQZ+Jpdz/Xi/r6y8xm7sGvO/bXA==
+	t=1794522850;
+	b=Wh2aPH9bWpkS73FXZbMnsfQ3HKxmPkkKe/IGClhngcl+pIM+GYIsjtr4UjvwknkWqZkX
+	 Y/MLrEjizGpAVlYmX+UwclDujjsXQGCQ4FBKAKaMEJLdb2pHFDT52/b/iVjTCHKE/nbvt
+	 OHzOz7H4HzKBR39Rdyn/GrKRhkn+4L7X3uQdeixvb+nCVG6G+IjNgxQfW0WX0k+u0FVBn
+	 xJBCgbmrlZ8oya7Hl5ZvBRCKBx5bKbvoXAFGgecdNMeMnHggS0VL6uMy1HBJUwHyyvE6K
+	 zW2P++R65sAxz4uUTQkNKND4FKqy1RXO5gzdzdlKC3yTen+lvs17S7zpe6baTMdZW0w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794522828;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794522850;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=pNEn1GU6+1iildeKPZ1PBLMTIFpNYF0T6jPgUs9CnGI=;
-	b=alzsZH9cL7CTJiDpYHebCngpJI0n1wNZhwKRbrLDsFwR4ATDZ2JWFa88V7pbv73s0mGh
-	 a3yog/9JjqvnXPzLg4k4DGh/ZJCTL6wBSEQCUxafZplqKOOAt0a8J0WJ/MA8x98RRKqy7
-	 4Z1wpO/iL9WAgJJsU/2/3nmLPqzgX7AjFHkK7Ty+/NSh3i9zlBx+ETZYPww1ReIX9XvAf
-	 cnYNHPj4TjwaLfuVteq/ElXiSlohPTjuPQ/SIJSWY55cyjkGX3zxJWBweBdJBqJzgcwAV
-	 /g4X+CKW3Tu9edSVfqxjlJmedjuAMh+Ia6smbrA6xxPwRRvaddzpiyW8PgrpHuVqiug==
+	bh=L54BL4DHIvMAW1f3YiW+oYF8hYcaZJufQX76TBLYLdU=;
+	b=ItvZBeqkb34aGlqEZkCQT/zPzpgoZcaQaxRWFGjy5JAHzube8cDAC3WcgPv28yR/EIxg
+	 fz2A6O3iifMwkLaDZLkla6FPGKK1bwABaDhaOZ/1nJrXh74VJd5WmdKprY4d+gvAF6lsc
+	 J6TU4n7tujgYvoK0MUYH8Fc4440lLxArBzzlpV2tlo+SGpec1FJOeJXhTaT+aIV2vaeJ5
+	 h+LAFHv0iiH+aHwf4iTk8BhP9krZoc3tkB3nVXQFLHmG3dLNWSFDQOqI+Ohb37ueXDVuY
+	 z+oHh1nGtLYZDp253hHIrmKyUMIqU6c4ijX3rezwv6VaRFsBvWJQv5fWfUDrdv+KdoQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QlPaxm9e;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=A9e8HYMh;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46DB606A331
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 22:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C23D606A31C
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 22:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=QlPaxm9e
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 709761F000C5
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 22:33:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=A9e8HYMh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD9711F000C7
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 22:34:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794522828;
-	bh=pNEn1GU6+1iildeKPZ1PBLMTIFpNYF0T6jPgUs9CnGI=;
+	s=k20260515; t=1794522849;
+	bh=L54BL4DHIvMAW1f3YiW+oYF8hYcaZJufQX76TBLYLdU=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=QlPaxm9enbHbJLh+jwcI9fl8/fsMqRLsVjWQWtwsq3p7LieVb0xHryu0HOIxAESjf
-	 4/hQimQiRJgjPlh8IpWPDnDJ9Po1bqhd/Bloig5NipOh/g1toBzygP9C7nVKhKogJD
-	 Y1Djmch/2FFhnrGF9dDrR5nyaCpOLUxwcKiOp7lJy/ae1XxQto9yl3uVkc/kctdQvT
-	 kOEJqr1PnPne8zaqKIv6zsA6CMTCenkWiwWMxC1EU+ZPEdb3AfuFYxyd46sWAjqw1H
-	 8J3w85iFkGhvwITIhLpQdau0uvvmG8H+QbimfU1ZKhG+OAbFOoOTwpM08T0J+w688K
-	 WnSuDwlYa2KGg==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c4322d310e7so40710766b.0
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 14:33:48 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGmndBuQSXv0s+vZjSeabHstjHqVyIDNWSjRhlVHuZDpMazLRgUhy1sM03WeY2a4qPAfw/58x7agF/b@vger.kernel.org
-X-Gm-Message-State: APuU4Z9CtFLED9VmkHGN95RnWqiBmvn1NLV4gFrEuvvN2BmfecE0x3Dy
-	3fQYHRdrsuytW4EH0H6ZjcyNOUN9fVUAj/Jqau233aq3ATkLepx7BO/Um/SBt6iCR6v3QTIYM70
-	KxQSyKdn4+OhLALuJUGL5zJ3luDsH+A4=
-X-Received: by 2002:a17:906:c14e:b0:c34:83c0:b92b with SMTP id
- a640c23a62f3a-c509631747amr46327666b.23.1794522827158; Thu, 12 Nov 2026
- 14:33:47 -0800 (PST)
+	b=A9e8HYMhL/MXe6XFiIjGo91IahCUBDY79sWROivBJ3A9v79Kt0O18i3JSIyQNP4AL
+	 tK6kIpbRnpVtepFEh+cK1xEGUEAK3Wix/qc4sHOQJAB3o1xHPWJZzMkm+2+p9704QW
+	 nJzJjpiRvVsu39HO1yIgnHGwPriRFAfvToc/VG9MbypyiTd5Ho4MkeqGPLXaGDs3mo
+	 v6IfCTF7XbzAyfXjlZH/+wimyy+T7z/V8SvjLOp5x5j8zKYDytzOYJ6zrF8ZIuJQMM
+	 4r6/1BzSUiqm0hVZFCrqSdzEmLFNWIslasOBO7VeYQ+XAO5+cA7HSHHzxwlBxr6GX1
+	 BSOWrJQd+4gIA==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c4697404c2bso41995966b.2
+        for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 14:34:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErEua/+xvLbCjHmkHWPSZ8y/FMhzsR24rI0gO8koX8+M2DOvHvxuISae8XRy+CfRK6vD3aBBqqzA30Hc@vger.kernel.org
+X-Gm-Message-State: APuU4Z+kvK4HuyF0bttYmBgPzJjk7Eg4kWvxpRu32gjVuiq5ioXowB1n
+	pLIWIha5p92LdDJVUNlfugGHosJtd9RA5x84LDL/J6yB4+JMgxdjQnjQqiCZ5ctoT6k6oa2B+mG
+	zHUwYEpE7t1TWYPHnSARLM2cZAAbummk=
+X-Received: by 2002:a17:907:8691:b0:c40:4965:72bd with SMTP id
+ a640c23a62f3a-c509640bfcbmr53255166b.19.1794522848652; Thu, 12 Nov 2026
+ 14:34:08 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,33 +59,41 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261112194744.47047-1-mike.michalo@gmail.com> <20261112205551.1668102-1-icb@fastmail.org>
-In-Reply-To: <20261112205551.1668102-1-icb@fastmail.org>
+References: <20261112183607.1660070-1-icb@fastmail.org>
+In-Reply-To: <20261112183607.1660070-1-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 13 Nov 2026 07:33:34 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9DFfHMje35Ttag9dQiDsQmCd6QrAwC6SHF57PeE_ysFA@mail.gmail.com>
-X-Gm-Features: AclHuK-vxVe_X6RT1ZSqcHueQtLc9XnzLHj6z1KurZyaylGVLEQUXucTCRZVtvM
-Message-ID: <CAKYAXd9DFfHMje35Ttag9dQiDsQmCd6QrAwC6SHF57PeE_ysFA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: sign the last response of a compound that ends early
+Date: Fri, 13 Nov 2026 07:33:55 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_BhzKwYCy6GDJt0UzWQe9yraU=txbNpMo6knCMnMdB=w@mail.gmail.com>
+X-Gm-Features: AclHuK81xXH_-OPmQs1rrhBNOCj9FNwZiuS9DtIXUEAS2tO0Y36wabUvT3pnOSE
+Message-ID: <CAKYAXd_BhzKwYCy6GDJt0UzWQe9yraU=txbNpMo6knCMnMdB=w@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: ignore the allocation size create context on a
+ read-only share
 To: Ian Bridges <icb@fastmail.org>
-Cc: mike.michalo@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 13, 2026 at 5:56=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
+On Fri, Nov 13, 2026 at 3:36=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
 e:
 >
-> I tested this with the ksmbd code from ksmbd-for-next. I sent a signed
-> compound of two ECHOs whose second NextCommand covers only that
-> command, so the compound ends early. Before the patch, the first
-> response carried a signature that did not verify and the second was
-> not signed. With the patch, both responses are signed and verify. A
-> normal signed compound gives the same result as before, and the
-> connection keeps working in both cases. smbtorture gives the same
-> results as without the patch, and KASAN reports nothing.
+> On a read-only share, ksmbd refuses writes over SMB, even from a user
+> whose account could write the files in the underlying filesystem. Such
+> a user can still open an existing file for write on the share, but the
+> WRITE requests that follow are refused.
 >
-> Reviewed-by: Ian Bridges <icb@fastmail.org>
-> Tested-by: Ian Bridges <icb@fastmail.org>
+> If the open carries an SMB2_CREATE_ALLOCATION_SIZE create context,
+> smb2_open() still calls vfs_fallocate() on the file, and the filesystem
+> allows it because of the user's write permission. The user can thereby
+> reserve any amount of disk space through the read-only share, up to
+> filling the filesystem. The file's size and data do not change.
+>
+> Ignore the context on read-only shares. It requests space for a file
+> being created or overwritten, and such a share permits neither.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ian Bridges <icb@fastmail.org>
 Applied it to #ksmbd-for-next.
 Thanks!
