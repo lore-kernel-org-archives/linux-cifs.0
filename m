@@ -1,100 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794459168;
-	b=5CrNIn+ldhsaGO+sEHffRJeJ0LAwm2NE1KPQIdHSPMBweGJyrtMA+0Lcv9OPqGb7/uE2
-	 KioE5wpUkJ90lCB9hIYDk5o7QP6GycArG+aeA7fQioqOunzkr+TXBZuWbQ+iRYnHg5wf5
-	 GdvTEqnRnwPeMQIWsIIBWMC4+0Rgq6WJRnll0+w5veiW89R6JARLqlFs5BAVODHaMq33+
-	 YCDyI7pC8CHIQ7zXQ+qxwOksTVF09uuDK4u77XCYrue0+nH5JlrwOL4fLTjJoTzyVGeLZ
-	 FrHhBP+m0DaxNiP1qoQOqMXSn+nUaNasDpmHqC6qOBkFXFA11NNvwnmnYv25JHqDTQA==
+	t=1794468594;
+	b=KAluKBUM6BTqZUxwZ/CqA5n4tgnnHKKXCd/WXGPaSwE2+AkVvWB82yNCUBxSLjiSg9rv
+	 sIq3U8HviWnNrjjcpvL7/nG/PRf938w30/52lQzBXjyqXcy6lb1cZ5fZsG6Vy1DhqP79G
+	 gkw1eCpxE+JV3jJRtC7Bj71u5c6YyqBpj1kUHYUEcTqOWaLc40KvFAeGvybgWfS9tA1Rl
+	 JNxzzMbRtPvATpYUmZ0ZIdl+E9ic1Qo5yqrWZ7h7k6Bji+uzzzmPLOSoYv21KlJB4bH0N
+	 gyDTNJthpShCiMnoDqxktD40PT/FGDI5H52SQzSsnEO5GsP7Om5t4VsD6VP9ZlAzKbg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794459168;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=OLCqWlTLv5zUj1BUTyM/Ud/mFd3BD01LgxIiWW/VVWs=;
-	b=VEwtOpYmndD7iG4oGtxucsZWKK3T9u2wZY6GpAK0yTLwB7jqv1luLn6iDEsLHqzqYTZj
-	 6isqQiV1sT2g7dDzC4gWU0602gQoWW3i090ql4hZY8D0z4ZxshsTfepZFymLo3UxBswxt
-	 stkcBQVHqp6h/t1QUM7VvorOY7Ketf/2cWnlyVk1UUyEVMl+yFLd1tusrL5GCMu8vOtOG
-	 kMnTgCzV3fb269J2OgCDqBXTP1bpIjI46+tNvm+k6x2fdfPtZBYpeyXVhLvrCcmBbn0hZ
-	 qUn8hhxWFYDn9tdbbNDkIs/gfMJTO0FvDmYlZH2bp6aPOwuRcDw4PNl5rNqr87UAimg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794468594;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=lMsj9nudmBv/iI5Os6pRVy6bLDebR7965kvSPVwO+Vg=;
+	b=5BPMRx9z4wCpgyxTTeF+BMMKg2H2MmGLniS/HST4XVZurBYJvIwiijUm/6J7rGfIeOCk
+	 JZ47QZUI/IOra930fPquRdOy6jbcxeAh7C3p45WpREO3XxXp0mTKSfRsg3jInaXcd4RKl
+	 I13xt5iuRR2x1Kj4AJz5C1BMTc9kchujR0HmVp/WFAD9mnPV3w+6Px6winnpzs5N77cTD
+	 qeOhZCutKfWVBZkgoT2UkO/UKuOITsNvAoQeEQyrTz20Uqp+l8qF/1qLl56aRkvtZjxpa
+	 wsnw2LWDQxJGDfH/ig0bN/OlqHugZarrjbBqytm4QMvr3QG0YyjmMXonbHlvcRR0U2A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cgYkWS91;
-	arc=none smtp.remote-ip=74.125.82.48
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OZPX1ieU;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226CE606A31C
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 04:52:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 226CE606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08726606A32A
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 07:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=cgYkWS91
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-1aefd1bf74aso408412c88.1
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 20:52:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794459167; x=1795063967; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=OLCqWlTLv5zUj1BUTyM/Ud/mFd3BD01LgxIiWW/VVWs=;
-        b=cgYkWS91Ht9ZcjTwpuDEo2DfmxVNaqoN9+94ev+m6sCB5GbCKRqt/Sid8ohUVtxNP9
-         sjTVmiz0Ot+4k485OrG6OYVAOX/xnJ1tfB3DBfq3uRPHie+p+A3WxF25odHiZOUANGT9
-         J6s6l8X05k2iHsXWGhjJD9VbiImPAT2ozJec4r4xulPvoDE88MQ6odjhWhh37p7e1gQL
-         +6STwwAaMemdRYhxFqbmpZ1Xi35D9bWKDq3z1WRlUdUXu2+pFVCOZIuVLXIImdvqqEH+
-         ikN9+Q9hRL5ztxidmI2VCBgue4Bs/EiUkuOn7x/jEVJ/kz5yrgoN3BAU3UWvpSUoDk9V
-         n1Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794459167; x=1795063967;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=OLCqWlTLv5zUj1BUTyM/Ud/mFd3BD01LgxIiWW/VVWs=;
-        b=qYf5fxXR+g7/HjbzIT6B53CxPcIz/ZuLXl7eKsK9+7HC/GLtCcGt74T79zQPSTM7Dr
-         JNGIEaiK3mRDpyg3d5jAUA4F0sgNDLOSSpFSk4OI/krxDP/F/PEvE046IvSoynE0PlRp
-         Y7tp2LaIf+YBecByGCF2EimxwucHwC2Usdg1Akqc/+bKmIEEQPKeQ0BAK3TmCcr8e1vz
-         Qe0DTt/bRnM1xwP7vLa2Kp8WMTjJy9nIi5K8zmkMUx47RTT46jm9ylgxIEGc1iXNSAmt
-         lc6dQmYN2XKOTCKc1n32U21Ugm/Uoxv2id4TX2VZllkiDF01FRPFEjH9eCuW5F9ttP/d
-         jlmQ==
-X-Forwarded-Encrypted: i=1; AL+hErHAJh6MwScsj9li+Bm7OYNlWUmXel4Z5JD1qnbR55wkmPgQYg8VBA5iq+5yrrILvr8z5U5rcTZDghAu@vger.kernel.org
-X-Gm-Message-State: APuU4Z8eMCMWM6VJrFmqFVUkCgsJsdNxPUYcIMnnBcJzkWIyhgiyuleR
-	3wprAR5KLlU+k77Ff9XfZJOLxgkeybRpeW1+ptufU6qmklKFu0p0gfQy
-X-Gm-Gg: AYBFou2xaViLLOKNBsCiJirMzwtaBtKE2RFTMOaYC1Kpq5FdxjF/lRXhVFKh7qVKwo9
-	igPstyRe+XNzMhgpOqyU0+I85WbmTXvaqARYcCleYFUBxbv2amOA19KRW2y8okNp976wX4pAFbc
-	g9FPHuvZHqIxwF2ZzJ41NNI+dglLfj1m61nzGtKVpqxltCSnyMXt99ZSlZ4AiT8mvmeH7fLXs68
-	KoTs69e8ItMnzWTXH32eNDtOPMzuPMDEt2ivH2Q5zWRk/HrN+muZg0Zbs19COuNBUC6mHBf32p7
-	s+o8GfCmZL1YfusWRiTkzB67gm+LFA+8vUEDz4YSUO2mbF0u7dnL45uhaiMEzsneBWVzFsdLbbL
-	roRAcqNQ6Jp4UoVCKaJbQBEpfZoErhaxqcrmXE3jsdhAd7m1nr5r3DEBh/wR09LglPhOr4/uvbg
-	Iy7vqeORXzTLeyq4cmIrsjmVm6AC6hpsoQWIsRFlwXdBveNAG29Su9kL/Nzev3O/b+CbgvMFJdV
-	7jXvWbLQXZXBA51z1prGSv5PkD2QgmITCFEuUbfIuW3blpnIpkEPAXh8wnJ/YVq6VeFuG0SHN+5
-	Zcpli1IJuDxa4WMn//80fChjqrii1VNOPm45dvbGEfjVVlZP6jNTxv4dex9HzCSMk4qayx+Ya1G
-	CQ395C+RRbm3UCDZm8e/C5X0vA6esCReD519ED2/17FNNmw==
-X-Received: by 2002:a05:701b:2313:b0:1b3:a8ee:a0e5 with SMTP id a92af1059eb24-1b4f5e7503bmr1295818c88.2.1794459166892;
-        Wed, 11 Nov 2026 20:52:46 -0800 (PST)
-Received: from localhost.localdomain ([2405:9800:b901:33ad:5d51:6f:e2db:335d])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b48a9c34c9sm5378660c88.4.2026.11.11.20.52.43
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 11 Nov 2026 20:52:46 -0800 (PST)
-From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-To: icb@fastmail.org,
-	linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-Subject: Re: [PATCH] ksmbd: fix out-of-bounds read in expired-session LOCK check
-Date: Thu, 12 Nov 2026 11:52:38 +0700
-Message-ID: <20261112045238.4688-1-mike.michalo@gmail.com>
-X-Mailer: git-send-email 2.56.0
-In-Reply-To: <MESSAGE-ID>
-References: <MESSAGE-ID>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=OZPX1ieU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAB41F00A0A
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 07:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794468593;
+	bh=lMsj9nudmBv/iI5Os6pRVy6bLDebR7965kvSPVwO+Vg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=OZPX1ieU+LbZoavvKaae8CDwAXx0pXP/AVuIjvVIEP0B5iqW5LhQXjbWE2Nmk00ow
+	 thRg7jxz6UwzjBfNsrToylEh9RR0J02ECSLdMFzun+Fy03Ax7UAvIp7YXgdR3WaIL2
+	 2ip22Ghvkzq1/YV9OKlCgCgP34BE6rJWRjVrD1lvXNG+iF7B5fIUf3qGjn/c4nG2se
+	 ZJcnsTVICDY7h74vfvoDzKA5u78tH5xp8jkmt8jT5DLdRnoAVMMNrqSfCLxIjqt64E
+	 7S+AwaS1E5uYdLaDoPSv8bRPQqNEzzPOfry0H6Vv/RErkHpEgi+8wnZpx4COFPE6vQ
+	 +lcdFr/WJdCeg==
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6b58cb69927so909740a12.0
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 23:29:53 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErH2PUmn71HzwEB3zg1EdEgDyst04EjmvKsCObgl/sREjPgzRyDT+yJFSaEK9VU95uQgCqDpYNYAos3n@vger.kernel.org
+X-Gm-Message-State: APuU4Z/bVx4Bi7oYy8CiW/2G6KGH7cHLI2fFLaIRCZlCAbqO8/v+7X93
+	ZPmzcDh//3t+zzpUTMVyAQi3ttNej5H5kkyAtm32J/u1zUc3AGfH9Wo0/YFw2XoXVAxGipi9d9a
+	ZmSRXFx/5vOeqzLo7eMJEHPfe3wrUOUU=
+X-Received: by 2002:a17:907:ea8f:b0:c25:4d9e:bb28 with SMTP id
+ a640c23a62f3a-c507b396562mr148147766b.3.1794468592306; Wed, 11 Nov 2026
+ 23:29:52 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -104,30 +59,43 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261111222534.839117-1-koray.fra@gmail.com> <20261112031157.677256-1-icb@fastmail.org>
+In-Reply-To: <20261112031157.677256-1-icb@fastmail.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 12 Nov 2026 16:29:38 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9u1EQWXwxiGfdTyvsDCRoYpDTo97A-hqjPKZ868S+3sA@mail.gmail.com>
+X-Gm-Features: AclHuK89hAf45QYH6l79cOyFN2CoMoYTpTZ7STKRVcYi0T6MEFvVcHL7RDTmuoc
+Message-ID: <CAKYAXd9u1EQWXwxiGfdTyvsDCRoYpDTo97A-hqjPKZ868S+3sA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix timestamp corruption on special values
+To: Ian Bridges <icb@fastmail.org>
+Cc: koray.fra@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
+	chenxiaosong@chenxiaosong.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On top of linux-next 20261105 with the four newer ksmbd-for-next commits
-up to a4277e7b7682, under KASAN, with session expiry forced by a
-test-only hook as in your notes. With well-formed requests on an expired
-session, before and after the patch:
-
-- an unlock succeeds and releases the range; another client can then
-  lock it
-- a new lock, and a request that unlocks one range and locks another,
-  both return STATUS_NETWORK_SESSION_EXPIRED and change nothing
-- a compound of an unlock and a lock returns STATUS_SUCCESS and
-  STATUS_NETWORK_SESSION_EXPIRED
-- READ is refused; CLOSE and LOGOFF succeed
-
-These results are the same with and without the patch, with no KASAN
-reports.
-I did not test the malformed request itself.
-
-One difference, for the better: a LOCK with a bad signature on an
-expired session now goes through the signature check in
-__process_request(), so it gets an unsigned STATUS_ACCESS_DENIED instead
-of a STATUS_NETWORK_SESSION_EXPIRED signed with the session's key. Patch
-5/8 of my v5 signing series fixes the same thing for the other commands;
-the two patches do not overlap.
-
-Tested-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
+On Thu, Nov 12, 2026 at 12:12=E2=80=AFPM Ian Bridges <icb@fastmail.org> wro=
+te:
+>
+> Hi,
+>
+> On Wed, Nov 11, 2026 at 11:25:34PM +0100, koraynilay wrote:
+> > When a timestamp is being sent with "-1" or "-2" as its value because i=
+t
+> > should be ignored, as specified in MS-FSCC 2.4.7 FileBasicInformation,
+> > ksmbd would clobber it in both the xattr and on-disk value by setting i=
+t
+> > to -1.
+>
+> I tested this with the ksmbd code from ksmbd-for-next. Before the
+> patch, setting any of the four times to -1 or -2 stored that value.
+> The access and write times on disk moved to 1901, and the creation
+> time in the DOS attribute xattr was overwritten. With the patch, -1
+> and -2 leave every time unchanged, and valid times are still set as
+> before. smbtorture confirms the result in the commit message, the rest
+> of its results are unchanged, and KASAN reports nothing.
+>
+> Reviewed-by: Ian Bridges <icb@fastmail.org>
+> Tested-by: Ian Bridges <icb@fastmail.org>
+Applied it to #ksmbd-for-next.
+Thanks!
