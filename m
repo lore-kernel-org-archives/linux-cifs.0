@@ -1,84 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794458825;
-	b=J5uPchKXi/YKdzTT8JEO1Okc/yKPYwRFJBFwJegw2tAfuMRTDGDSFB/3ctKaKVqK43Sw
-	 ty1mofOm6ApjczxL+I2ljbpNG715jDLpfzRQv5+DkjyzhmNOH+lHsZe1PV2K4Gj3EvVs9
-	 gXkSpeLA2sQ5W4gjsi0JwTvqnzJ8Q/gNVz+qWl+/gLk2zCigF3RSBtDhK6TQnHaJ8XM7U
-	 ydC0VyYTnz4V5to/Ojomld6gJLrLk59elF+mhD+9vcx9HGZZNUtVWTfAw0NLUsCsPw5uu
-	 dLMkTbN+nXPFAb8Laft/QwgWTw1ROQb0YF/g8j+u4Bg0Jq0SJQBCffsqqlybSeLzSnw==
+	t=1794458833;
+	b=wyjC7NAb/nXTDt6A/F0RnwG7PnXQyZvVnQSCmi/rzZZfxB4kJDswy+0m8lqHWiYBtQ39
+	 KQcZcyTPq7185ge3Q3n8NEj0ohB/h2lRKHfAoSHNgrHeW3UdilJ0NnxTXwGxtgDhP6RXR
+	 SqV/JAaDD6Qv/yV9kfdaCepXiCpyncGxq2SwB85SEkoNO/1qjWlG87OuILxLCPWhwJCPe
+	 weI621hRDpnB4+VAPpYI5A+droE26t30EK2T6EVs104uTTpJlkc8LyP9fopm4uaei6KCq
+	 8lN/GaLyUbkE+RrIA92Z0mHaO1WC53t7dqvy3KpRlcKChX3Q8WoO4AvzDKvWAXuzCoA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794458825;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794458833;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=Q8c3UeDDZ2Cohlo9S9hkBasRTsR/4XAGU8lAirWb5h0=;
-	b=S1floDu51V3w34uwuI/GxahYImKg0IWzn4QTyvrAzpyRh2BIRK78zHwHaJx2E5wxRXhJ
-	 fc+bacK0Udua0puyrlhgefZtWMDUMFVh+Rh5MuYBOtCiSPjdmJi8hUUZo8owkTMaiTGwb
-	 GzTTjD16peymPHiLJ7jF+ZtW4aJQV8LoFeGmJsKwZkLvxeZgJCC38rTd84Q1pkNGNaPoo
-	 c7LLpBmFSIvBEuNAz36W20YLsMjPWvFNqaB5QAG+7gKUsZXP6PSZ8TniEy5XDabHks1kz
-	 1DcZKDrDN/XxZWvf5YSWJgwEpznNHo8Q/nz8vvPtg7m9MytPxoCHyXbmBBO5dZZ9P0A==
+	bh=HDFx2pg4f7Slu2eztLk/kGd0GFHbbPhuhMmkf6+waT4=;
+	b=KHqc+PYz/vujyDlz9alUoZfIZCzrKfwzlxwZHhWTiU8RL1vH7MXIjUQ73Wa357Wy1UXV
+	 0vRgfpukTJ/h2AxKkSFemJcoR8JSRa2/8eSXBjvdYPBajkmWymNocFN78a0TiXEJMKJHr
+	 ENMwNnYwmlPjEVuAhh+OZ3c3aHQhw8pCINyCTuF8otoHt9X45lkLPXHX56WJ6rGSCQGsY
+	 /EIiVh7R2vT3hhkGnuRI5mbFOC5ujIXd8JuT5qhSSmIRQcNpgZwkJQA41+OjlqAe1yugG
+	 Vkg0CsA3U5K7m9Sagch7YvHv5Om/bfKhEcTvffhoIcoMMXOre+0Tm8kTjYyh2LUsAyQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=L1TZdHpe;
-	arc=none smtp.remote-ip=74.125.82.48
-Received: from mail-dl1-f48.google.com (mail-dl1-f48.google.com [74.125.82.48])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WkIA7TsY;
+	arc=none smtp.remote-ip=74.125.82.169
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681ED606A339
-	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 04:47:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 681ED606A339
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3592F606A327
+	for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 04:47:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3592F606A327
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=L1TZdHpe
-Received: by mail-dl1-f48.google.com with SMTP id a92af1059eb24-15ea896ddc8so5910353c88.0
-        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 20:47:05 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=WkIA7TsY
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-37600b0db49so441030eec.1
+        for <linux-cifs@vger.kernel.org>; Wed, 11 Nov 2026 20:47:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794458824; x=1795063624; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794458831; x=1795063631; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Q8c3UeDDZ2Cohlo9S9hkBasRTsR/4XAGU8lAirWb5h0=;
-        b=L1TZdHpecSQ1CfCrPBwQFR3O+wjOmUrSRj+SGSI9kyrG44nLpKV2598297RC5/kJk6
-         AUKMG2I7DHkLejdca8HvWhUZuWKPr1o/MK2c2B3swu0GVOfUnjxqauqqbmsab23cr3u4
-         aAaxGWzBhNFx9I/6OHLy+aDE9i18DCxolaBJTzoDxAE/4asRoLM3zMcPreQXmjgK64Kp
-         lyvkqLbXS8ijrr+uCYxoRt+QAkKTO+0uP71gneFxUxSVpkl/gJKRV5OIMEuAlhuklcy6
-         +oTVnZKcvGO4vqQisFJSIkZWDciS6OYDoit7kONBBl833ThXw2Zof/WYrHoUbImxTaOs
-         ha8w==
+        bh=HDFx2pg4f7Slu2eztLk/kGd0GFHbbPhuhMmkf6+waT4=;
+        b=WkIA7TsYgk5IkCPqLgtdQO9IrRH0ZW1ud0KjTQYhlKuF1VZfpCbIN21Y//l0s4lOkd
+         QEfh0M1mXiv/cL/1WbTtGTz5eZ5bg3Y3/j/f9SdB1Dj74WzMzlw3p+PpbdLfXYJQdpwK
+         v+jFgxvlCpNALM9DZffV9GYTAjtIj3pko39zOA8Ygq+JfuKXdjKA4tPCzkeGk3pOR/jq
+         mG/SDCvw0YCqn4FBvH/v3HPgHwVWvV64suphJ1KH/tpTg5VqYjkztLlC1xZKIcEgs0/+
+         nDkkG8D70D26EwQJO0A2U5k0q05mr1fXn9rIZshAdq+EGd+Jj2/g9k2Q2L6EloIlnYc/
+         fi5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794458824; x=1795063624;
+        d=1e100.net; s=20260707; t=1794458831; x=1795063631;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Q8c3UeDDZ2Cohlo9S9hkBasRTsR/4XAGU8lAirWb5h0=;
-        b=Bj8QqD54XMKepln2KwSnmBhslRqttN1Y4pvGGp3tLqh0PYgQu7PuSQCtAYDsEXgKat
-         UDyAtY2YpHmXcqwXRfxQ9hFaDOl/+uNYMH+CIBvVB5VLT1wTxqjD19d7BMRg9Ox1GuYD
-         aWbgMcTkM7cjUF6DVTs9zKsbmjO04Ujyjz/PXFESVmsCxhO3n+auu9pPX5QouKCgyl8B
-         4lznVWJlXeD07TQXZb2oOvOhxaiU4cCOa9cct7/JAYm341HcnfBU/WEBKUaEUMsisAdz
-         VUKdaiFCHo2YZ9Glg8Lkle4yekHl5YGvPHyuaISUZDtka0m2BHjBz13FOHQg1hqWGf6r
-         VBcw==
-X-Forwarded-Encrypted: i=1; AL+hErF2LO5eahLe9loRTCuad5CJbhIKLmBwZkygRhjLpE7hRuI/BSHrBCkq5sD/ighk1JrePOimzJpXdArm@vger.kernel.org
-X-Gm-Message-State: APuU4Z95HtK9xhxIyZ6EAVrqG38ECIuLa5ShNzW6iLH2tCKtL+xplp4s
-	aP6TPTeo09/rH3Pdj5L5t5SmwBxQDplsPfcwOmt1OYqTgt6BOJZMtOMaGPcRqGq2QPb6ZgNV
-X-Gm-Gg: AYBFou0XBw1Gk7tKKMQLG8O5dDsS1S64u2IcikuTY/2oAk5F1xE47R6zl8uKxEB82Eu
-	DNB+mrzHOl0Q4wFgQ6g6DeLHNFWUR1kxrn2sGW8Xye5ILO1iXfUg9PCohW+pfQKED7Pqj+fh5u7
-	BeSlx+DWBt1e/3fK3Xl4ECcBzck4+bNCFR1CVbLNDzRFXi9R0zV1MfSbTIr8FThMo+QJa/ZxAdS
-	Z6UbAbpNVg6wmUU0HKx8vfYXZqxtxFIi26544udFmwbSdwiYJSmJFd6Qw3iSwdZmUuEZVxeUzgJ
-	WAaeQhqaTqlnIz3Ma+J9pAzkgeZ4r2NKRQEkGEhHcEr7ww0vAs2AqbSuAySvDAcSR/YwZa1rniV
-	xXy41uhr9dxV1BZBNLNBQwcG54EAjtFqCCoVMb8eAcGrx6g7S29vdPQVtvt6v/9I/MWlrRgvsPN
-	LHKApKBYvnaHGw3K01ivON2q3aECP6kdyqTm0z6bq4HP8fOryZT4ATBvR8gXNf5/Tl5/SlI5M2Y
-	fwimWatVOh4J531uulGs9p47qIFuBnfKbQmULUhUXlHh9GEvZF8hzLwNdNrlPWhp8tGbI8s288S
-	RJN//wYIRbRVRUM7QbU197roGTbNOW8VhoIYVJD8xOFYS+yptTAvOOutkpJzQlHqA2nMtBf1/Ls
-	QipkfRN2R/IkgW4zLCkr71RIrn0RKGOsQacVJDXSbcwO2Vw==
-X-Received: by 2002:a05:701b:4207:10b0:1b3:a05f:892d with SMTP id a92af1059eb24-1b3c0353254mr4103959c88.40.1794458824432;
-        Wed, 11 Nov 2026 20:47:04 -0800 (PST)
+        bh=HDFx2pg4f7Slu2eztLk/kGd0GFHbbPhuhMmkf6+waT4=;
+        b=JEfOX9F1oGXRGGv1b5+hFl/+4NTeyHvoGyPWa+wwHlhpcDPJ2Kp1Ec9zEoaxxHy/oB
+         QYW89nT/QZXsCBQpT0/uAXYGEtdTklZSdrB72RfQFadUVwzJdxHgt5Hvj4hyrv4DHnIj
+         YjR2glYH/PaLGK4j7Yzoc6FboFh3PKsIevtm+Gp6yiq0ahtfrlLVVP8Tx1BiZ+nwn1nM
+         tyS/0EJGoFDSc5F67UQ5s4AZwu6aYd2zVJXFaGnsUsGFm/6vwPCRQUtQZKLc3x/Ix8CX
+         YZomG+YC2dIRIYeaqUpKgeXlFSolA+iA3w5/J0zl7ncPDnEzkKmlTRkADC2fXdpgAx/4
+         Qyig==
+X-Forwarded-Encrypted: i=1; AL+hErGe4Bwz/A4wh3HxuEvB8IIB9KCojnrO1QYFsl2CquwVM3t2ASxhnaUhzgfujNJ7ZSMuP9DecpoUl2Jq@vger.kernel.org
+X-Gm-Message-State: APuU4Z/rxQfJvGfhJCCTubkmKV5dWoBNpoORD3quB7ZFbowTCDpn59SD
+	Iia6VSYugeYHuKFfSxY26DwVr+wpkAQeABDAeKsYvWPoE1oV3xzvVv99
+X-Gm-Gg: AYBFou3k8IIyhuPAFGuTNb5HEl7PR9ITRr/kezFlT0df9/AuI4IdYNw778yZut/9yx/
+	x0the1uA+RaCizVeESDwaBhb9XOCcRjRbpms0coX0qZRJDQGXqEqDBrfc2rX1hy/amdj+q3euHs
+	OY2ZOLd4rf/KQPo5ZD4Qpl0+YnTS/xIuyIFDSxEFajWabca/f67QFalC7yaSKAQ9LvYqimZyLNm
+	8eFEtVzPWdPcDX/+ZF701tCsekb/sKYwmKRU0r8mopGH7HjsqSPzDRM2May8OkMK6ruIuZ/yTFj
+	Xl09dmSojquOqNn8YHXKr6nQYq+b3OI5/oDi6mt6i2tAgrADyT7M1lAM156iH8HqPSFQHa5A5b6
+	qNyWRWHTtmeTWDfp0nR2KRAUH/hU2QYp/hd0eUvfasrmFpaDnRBjH1mKLf70IEwbsgNk+w5JFo6
+	c+weJTtRci/u0u9hVuEdq/ivds/9dBb2IWqzQTqTBtA0CY748wy29La5Bv++b47yDYp9Hk3k2yg
+	c8M0oUflv3kwpixSdXGbe90YHdQtxLcQztD1s+iELab6vzUTSEUC+EI0BcMhpS1WM9VtFjiGX+F
+	vaDSMcH0tm6JoY0fxhXRuG0E9JVYjaJBXDg3r7eiGGTXs6yo/VfMeshbM3/aUewT03xQl3T6XDt
+	XyGJIUEfeDsZ+WalbU/g7OO9I
+X-Received: by 2002:a05:701b:4544:10b0:1ab:9742:e860 with SMTP id a92af1059eb24-1b4f5f67318mr1281955c88.20.1794458831076;
+        Wed, 11 Nov 2026 20:47:11 -0800 (PST)
 Received: from localhost.localdomain ([2405:9800:b901:33ad:5d51:6f:e2db:335d])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b3b5b2fc14sm21024827c88.12.2026.11.11.20.46.59
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b3b5b2fc14sm21024827c88.12.2026.11.11.20.47.04
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 11 Nov 2026 20:47:04 -0800 (PST)
+        Wed, 11 Nov 2026 20:47:10 -0800 (PST)
 From: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
 To: linkinjeon@kernel.org,
 	stfrench@microsoft.com
@@ -93,9 +93,9 @@ Cc: icb@fastmail.org,
 	linux-kernel@vger.kernel.org,
 	Michail Andreas Michalopoulos <mike.michalo@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH v5 2/8] ksmbd: sign with the negotiated SMB 3.1.1 signing algorithm
-Date: Thu, 12 Nov 2026 11:46:39 +0700
-Message-ID: <20261112044645.4074-3-mike.michalo@gmail.com>
+Subject: [PATCH v5 3/8] ksmbd: use the channel signing key for session setup on a bound channel
+Date: Thu, 12 Nov 2026 11:46:40 +0700
+Message-ID: <20261112044645.4074-4-mike.michalo@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261112044645.4074-1-mike.michalo@gmail.com>
 References: <20261112044645.4074-1-mike.michalo@gmail.com>
@@ -110,225 +110,283 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-decode_sign_cap_ctxt() stores the algorithm picked from the client's
-SMB2_SIGNING_CAPABILITIES context in conn->signing_algorithm, but it
-runs before init_smb3_11_server(), which then overwrites it with
-AES-CMAC. As a result the negotiate response always selects AES-CMAC,
-even for a client that only offered HMAC-SHA256, and every SMB 3.1.1
-connection is signed with AES-CMAC.
+smb3_check_sign_req() always uses the session signing key for
+SESSION_SETUP, and smb3_set_sign_rsp() does for every SESSION_SETUP
+response but the final one of a binding. That is right for a binding
+request and its non-final responses (MS-SMB2 3.3.5.2.4, 3.3.5.5.3), but
+a reauthentication sent on a channel that is already bound is then also
+verified and signed with the session key instead of that channel's
+key.
 
-Keep the negotiated algorithm and sign with HMAC-SHA256 when that is
-what was negotiated.
+Use the session key for binding requests, for their non-final
+responses, and for SESSION_SETUP on a connection that is not yet a
+channel of the session. Use the channel key for everything else on a
+channel, as the Samba client and smbd do. MS-SMB2 does not give one key
+for a reauthentication on such a channel: 3.3.5.2.4 has the server
+verify the request with Channel.SigningKey, while 3.2.4.1.1 has the
+client sign it with Session.SigningKey. 3.3.4.1.1 has the server sign a
+SESSION_SETUP response with Session.SigningKey unless its status is
+STATUS_SUCCESS, and 3.3.5.5.3 the final response of a non-binding
+session setup too. The two keys only differ on a channel that was bound
+to the session, and that case has not been tested against Windows.
 
-Connections of the same session can now have negotiated different
-algorithms. MS-SMB2 takes the algorithm from the connection a message
-travels on (3.1.4.1, 3.1.5.1), and a client that follows 3.2.4.2.2.2
-offers only the already negotiated algorithm on further connections, so
-for it nothing differs. A client that offers another list on a new
-connection, as the Samba client can, signs the binding request with the
-session signing key and the algorithm of the connection that set up the
-session. smbd verifies it that way, and smbtorture's
-smb2.session.bind_negative_smb3signCtoH and HtoC tests expect such a
-bind to succeed. Do the same: store that connection's algorithm in the
-session and use it together with the session key, while channel keys
-keep using their own connection's algorithm.
+The signature of a reauthentication was not checked at all, because
+SESSION_SETUP is exempt from the check in __process_request(). A
+reauthentication of a live session with a forged signature therefore
+got STATUS_MORE_PROCESSING_REQUIRED signed with the session key, with or
+without multichannel: the same kind of signing oracle as an unverified
+binding request. Verify it with the same helper as binding requests.
+Also refuse an unsigned reauthentication of a session that requires
+signing, as smbtorture's bind_negative tests expect from Windows,
+unless the request arrived encrypted on a session that uses
+encryption. A session that negotiated encryption has sess->sign cleared
+even when signing was required when it was set up, so remember that in
+sess->sign_required and take it and enforced encryption into account
+too; merely having negotiated encryption is not enough, since clients
+such as the Linux one always offer it and then send unsigned,
+unencrypted requests. Do not expire the session when a check fails,
+since the request did not come from its owner.
+
+The checks apply to every session that has been authenticated before,
+which is one that has a user, including while a reauthentication of an
+expired session is in progress.
+
+smb2_sess_setup() copied conn->binding into
+work->session_setup_binding after its error path had cleared it, so the
+response to a failed binding request was signed and added to the
+preauth integrity hash as if the request had not been a binding one.
+Copy it before that.
 
 An AI assistant was used to draft the patch and as an independent
-reviewer. Testing is described in the cover letter.
+reviewer.
 
-Fixes: 378087cd17ee ("ksmbd: add support for negotiating signing algorithm")
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
 Cc: stable@vger.kernel.org
 Signed-off-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
 ---
- fs/smb/server/auth.c              | 14 ++++++++++++--
- fs/smb/server/auth.h              |  4 ++--
- fs/smb/server/mgmt/user_session.c |  1 +
- fs/smb/server/mgmt/user_session.h |  2 ++
- fs/smb/server/smb2ops.c           |  4 +++-
- fs/smb/server/smb2pdu.c           | 20 ++++++++++++++++++--
- 6 files changed, 38 insertions(+), 7 deletions(-)
+ fs/smb/server/mgmt/user_session.h |   2 +
+ fs/smb/server/smb2pdu.c           | 118 +++++++++++++++++++++++-------
+ 2 files changed, 92 insertions(+), 28 deletions(-)
 
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 0c51ca0cb14db..fc6ace49584b1 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -504,19 +504,29 @@ void ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
- /**
-  * ksmbd_sign_smb3_pdu() - function to generate packet signing
-  * @conn:	connection
-+ * @signing_algorithm:	signing algorithm the key was generated for
-  * @key:	signing key
-  * @iov:        buffer iov array
-  * @n_vec:	number of iovecs
-  * @sig:	signature value generated for client request packet
-  *
-  */
--void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
--			 int n_vec, char *sig)
-+void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, __le16 signing_algorithm,
-+			 char *key, struct kvec *iov, int n_vec, char *sig)
- {
- 	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
- 	struct aes_cmac_ctx cmac_ctx;
- 	int i;
- 
-+	if (signing_algorithm == SIGNING_ALG_HMAC_SHA256_LE) {
-+		u8 mac[SMB2_HMACSHA256_SIZE];
-+
-+		ksmbd_sign_smb2_pdu(conn, key, iov, n_vec, mac);
-+		memcpy(sig, mac, SMB2_SIGNATURE_SIZE);
-+		memzero_explicit(mac, sizeof(mac));
-+		return;
-+	}
-+
- 	/* This cannot fail, since we always pass a valid key length. */
- 	static_assert(SMB2_CMACAES_SIZE == AES_KEYSIZE_128);
- 	aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE);
-diff --git a/fs/smb/server/auth.h b/fs/smb/server/auth.h
-index 7ce9c42d58f1e..5a10482678ee4 100644
---- a/fs/smb/server/auth.h
-+++ b/fs/smb/server/auth.h
-@@ -59,8 +59,8 @@ int ksmbd_krb5_authenticate(struct ksmbd_session *sess, char *in_blob,
- 			    char *sess_key);
- void ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
- 			 int n_vec, char *sig);
--void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
--			 int n_vec, char *sig);
-+void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, __le16 signing_algorithm,
-+			 char *key, struct kvec *iov, int n_vec, char *sig);
- int ksmbd_gen_smb30_signingkey(struct ksmbd_session *sess,
- 			       struct ksmbd_conn *conn);
- int ksmbd_gen_smb311_signingkey(struct ksmbd_session *sess,
-diff --git a/fs/smb/server/mgmt/user_session.c b/fs/smb/server/mgmt/user_session.c
-index 15662fd745abb..87aba04a8cbdd 100644
---- a/fs/smb/server/mgmt/user_session.c
-+++ b/fs/smb/server/mgmt/user_session.c
-@@ -557,6 +557,7 @@ int ksmbd_session_register(struct ksmbd_conn *conn,
- 	int ret;
- 
- 	sess->dialect = conn->dialect;
-+	sess->signing_algorithm = conn->signing_algorithm;
- 	memcpy(sess->ClientGUID, conn->ClientGUID, SMB2_CLIENT_GUID_SIZE);
- 	ret = xa_err(xa_store(&conn->sessions, sess->id, sess,
- 			      KSMBD_DEFAULT_GFP));
 diff --git a/fs/smb/server/mgmt/user_session.h b/fs/smb/server/mgmt/user_session.h
-index 5f0f6276e3168..931ca102b8392 100644
+index 931ca102b8392..423f0a10315af 100644
 --- a/fs/smb/server/mgmt/user_session.h
 +++ b/fs/smb/server/mgmt/user_session.h
-@@ -48,6 +48,8 @@ struct ksmbd_session {
- 	u64				id;
+@@ -59,6 +59,8 @@ struct ksmbd_session {
+ 	unsigned int			flags;
  
- 	__u16				dialect;
-+	/* Signing algorithm of the connection that created the session */
-+	__le16				signing_algorithm;
- 	char				ClientGUID[SMB2_CLIENT_GUID_SIZE];
+ 	bool				sign;
++	/* signing was required at setup; sign is cleared with encryption */
++	bool				sign_required;
+ 	bool				enc;
+ 	bool				tearing_down;
  
- 	struct ksmbd_user		*user;
-diff --git a/fs/smb/server/smb2ops.c b/fs/smb/server/smb2ops.c
-index 747276b171bd1..c5b3cf34494e7 100644
---- a/fs/smb/server/smb2ops.c
-+++ b/fs/smb/server/smb2ops.c
-@@ -320,7 +320,9 @@ int init_smb3_11_server(struct ksmbd_conn *conn)
- 	conn->ops = &smb3_11_server_ops;
- 	conn->cmds = smb2_0_server_cmds;
- 	conn->max_cmds = ARRAY_SIZE(smb2_0_server_cmds);
--	conn->signing_algorithm = SIGNING_ALG_AES_CMAC_LE;
-+	/* Keep the algorithm chosen from the client's signing capabilities */
-+	if (!conn->signing_negotiated)
-+		conn->signing_algorithm = SIGNING_ALG_AES_CMAC_LE;
- 
- 	if (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_LEASES)
- 		conn->vals->req_capabilities |= SMB2_GLOBAL_CAP_LEASING |
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 3d9b966235dbb..d15024d34f3d6 100644
+index d15024d34f3d6..7b07108a48c15 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -1858,6 +1858,8 @@ static __le32 deassemble_neg_contexts(struct ksmbd_conn *conn,
- 	bool posix_ctxt_seen = false;
+@@ -2406,8 +2406,10 @@ static int ntlm_authenticate(struct ksmbd_work *work,
  
- 	ksmbd_debug(SMB, "decoding %d negotiate contexts\n", neg_ctxt_cnt);
-+	/* A previous, failed NEGOTIATE must not leave its algorithm behind */
-+	conn->signing_negotiated = false;
- 	if (len_of_smb <= offset) {
- 		ksmbd_debug(SMB, "Invalid response: negotiate context offset\n");
- 		return status;
-@@ -12965,6 +12967,7 @@ int smb3_check_sign_req(struct ksmbd_work *work)
+ 	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
+ 	     (conn->sign || server_conf.enforced_signing)) ||
+-	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
++	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED)) {
+ 		sess->sign = true;
++		sess->sign_required = true;
++	}
+ 
+ 	if (smb3_encryption_negotiated(conn) &&
+ 			!(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
+@@ -2510,8 +2512,10 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ 
+ 	if ((rsp->SessionFlags != SMB2_SESSION_FLAG_IS_GUEST_LE &&
+ 	    (conn->sign || server_conf.enforced_signing)) ||
+-	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED))
++	    (req->SecurityMode & SMB2_NEGOTIATE_SIGNING_REQUIRED)) {
+ 		sess->sign = true;
++		sess->sign_required = true;
++	}
+ 
+ 	if (smb3_encryption_negotiated(conn) &&
+ 	    !(req->Flags & SMB2_SESSION_REQ_FLAG_BINDING)) {
+@@ -2561,22 +2565,47 @@ static int krb5_authenticate(struct ksmbd_work *work,
+ #endif
+ 
+ /*
+- * A binding request must be signed with the signing key of the session it
+- * binds to (MS-SMB2 3.3.5.2.4). Check it before the request is processed
+- * and before any response is signed with that key.
++ * SESSION_SETUP is not covered by the signature check in __process_request(),
++ * because work->sess is not set for it. A binding request must be signed
++ * with the signing key of the session it binds to (MS-SMB2 3.3.5.2.4), and a
++ * signed reauthentication with the key of the channel it arrives on. Check
++ * them before the request is processed and before any response is signed
++ * with that key.
+  */
+-static bool smb2_check_binding_sign_req(struct ksmbd_work *work,
+-					struct ksmbd_session *sess)
++static bool smb2_check_sess_setup_sign_req(struct ksmbd_work *work,
++					   struct ksmbd_session *sess)
+ {
+ 	struct ksmbd_session *prev_sess = work->sess;
+ 	int ret;
+ 
+ 	work->sess = sess;
+-	ret = smb3_check_sign_req(work);
++	/* The key, and so the way it signs, belongs to the session */
++	if (sess->dialect >= SMB30_PROT_ID)
++		ret = smb3_check_sign_req(work);
++	else
++		ret = smb2_check_sign_req(work);
+ 	work->sess = prev_sess;
+ 	return ret;
+ }
+ 
++/*
++ * Whether a reauthentication of @sess must be signed or encrypted. A session
++ * that negotiated encryption has sess->sign cleared even when signing was
++ * required when it was set up, which sess->sign_required remembers, while
++ * encryption itself is only enforced when configured. Merely having
++ * negotiated encryption does not count: clients such as the Linux one always
++ * offer it, and then legitimately send unsigned, unencrypted requests.
++ */
++static bool smb2_sess_needs_protection(struct ksmbd_session *sess)
++{
++	if (sess->sign)
++		return true;
++	if (!sess->enc)
++		return false;
++	return sess->sign_required ||
++	       (server_conf.flags & KSMBD_GLOBAL_FLAG_SMB2_ENCRYPTION);
++}
++
+ int smb2_sess_setup(struct ksmbd_work *work)
  {
  	struct ksmbd_conn *conn = work->conn;
- 	char *signing_key;
-+	__le16 signing_algorithm;
- 	struct smb2_hdr *hdr;
- 	struct channel *chann;
- 	char signature_req[SMB2_SIGNATURE_SIZE];
-@@ -12984,8 +12987,14 @@ int smb3_check_sign_req(struct ksmbd_work *work)
- 		len = get_rfc1002_len(work->request_buf) -
- 			work->next_smb2_rcv_hdr_off;
- 
-+	/*
-+	 * A key must be used with the algorithm it was generated for: the
-+	 * session key with the one of the connection that created the
-+	 * session, which can differ from this connection's when binding.
-+	 */
- 	if (le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE) {
- 		signing_key = work->sess->smb3signingkey;
-+		signing_algorithm = work->sess->signing_algorithm;
- 	} else {
- 		chann = lookup_chann_list(work->sess, conn);
- 		if (!chann) {
-@@ -12993,8 +13002,10 @@ int smb3_check_sign_req(struct ksmbd_work *work)
- 			    !(hdr->Flags & SMB2_FLAGS_SIGNED))
- 				return 0;
- 			signing_key = work->sess->smb3signingkey;
-+			signing_algorithm = work->sess->signing_algorithm;
- 		} else {
- 			signing_key = chann->smb3signingkey;
-+			signing_algorithm = conn->signing_algorithm;
+@@ -2670,7 +2699,7 @@ int smb2_sess_setup(struct ksmbd_work *work)
  		}
+ 
+ 		/* As part of receiving the request (MS-SMB2 3.3.5.2.4) */
+-		if (!smb2_check_binding_sign_req(work, sess)) {
++		if (!smb2_check_sess_setup_sign_req(work, sess)) {
+ 			rc = -EKEYREJECTED;
+ 			goto out_err;
+ 		}
+@@ -2761,6 +2790,29 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 			goto out_err;
+ 		}
+ 
++		/*
++		 * A reauthentication of a session that has keys must prove it
++		 * comes from the session's owner: a signed request must verify,
++		 * and a session that requires signing or encryption must not
++		 * accept an unsigned request unless it arrived encrypted on a
++		 * session that uses encryption, which has already authenticated
++		 * it. The session has keys once it has been authenticated and
++		 * so has a user, including while a reauthentication is in
++		 * progress. Do not expire the session if the check fails: the
++		 * request did not come from its owner.
++		 */
++		if ((READ_ONCE(sess->state) != SMB2_SESSION_IN_PROGRESS ||
++		     sess->user) &&
++		    ((req->hdr.Flags & SMB2_FLAGS_SIGNED) ?
++		     !smb2_check_sess_setup_sign_req(work, sess) :
++		     (!(work->encrypted && sess->enc) &&
++		      smb2_sess_needs_protection(sess)))) {
++			rc = -EKEYREJECTED;
++			ksmbd_user_session_put(sess);
++			sess = NULL;
++			goto out_err;
++		}
++
+ 		if (work->session_setup_reauth)
+ 			WRITE_ONCE(sess->state, SMB2_SESSION_IN_PROGRESS);
+ 
+@@ -2843,6 +2895,8 @@ int smb2_sess_setup(struct ksmbd_work *work)
  	}
  
-@@ -13008,7 +13019,8 @@ int smb3_check_sign_req(struct ksmbd_work *work)
- 	iov[0].iov_base = (char *)&hdr->ProtocolId;
- 	iov[0].iov_len = len;
+ out_err:
++	/* The error path clears conn->binding; response processing needs it */
++	work->session_setup_binding = conn->binding;
+ 	if (rc == -EINVAL)
+ 		rsp->hdr.Status = STATUS_INVALID_PARAMETER;
+ 	else if (rc == -ENOENT)
+@@ -2949,7 +3003,6 @@ int smb2_sess_setup(struct ksmbd_work *work)
+ 			rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+ 	}
  
--	ksmbd_sign_smb3_pdu(conn, signing_key, iov, 1, signature);
-+	ksmbd_sign_smb3_pdu(conn, signing_algorithm, signing_key, iov, 1,
-+			    signature);
- 	/* Restore the request as received, for the SMB 3.1.1 preauth hash */
- 	memcpy(hdr->Signature, signature_req, SMB2_SIGNATURE_SIZE);
+-	work->session_setup_binding = conn->binding;
+ 	if (authenticated) {
+ 		/*
+ 		 * Draining the previous session drops srv_mutex. Finish using the
+@@ -12991,22 +13044,24 @@ int smb3_check_sign_req(struct ksmbd_work *work)
+ 	 * A key must be used with the algorithm it was generated for: the
+ 	 * session key with the one of the connection that created the
+ 	 * session, which can differ from this connection's when binding.
++	 *
++	 * A binding request, or a SESSION_SETUP on a connection that is not
++	 * yet a channel of the session, is verified with the session key. A
++	 * request on an existing channel, including a reauthentication, is
++	 * verified with that channel's key, so that the session key is not
++	 * used at the MessageIds of another connection.
+ 	 */
+-	if (le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE) {
++	chann = lookup_chann_list(work->sess, conn);
++	if (le16_to_cpu(hdr->Command) == SMB2_SESSION_SETUP_HE &&
++	    (!chann || (((struct smb2_sess_setup_req *)hdr)->Flags &
++			SMB2_SESSION_REQ_FLAG_BINDING))) {
+ 		signing_key = work->sess->smb3signingkey;
+ 		signing_algorithm = work->sess->signing_algorithm;
++	} else if (chann) {
++		signing_key = chann->smb3signingkey;
++		signing_algorithm = conn->signing_algorithm;
+ 	} else {
+-		chann = lookup_chann_list(work->sess, conn);
+-		if (!chann) {
+-			if (le16_to_cpu(hdr->Command) != SMB2_SESSION_SETUP_HE ||
+-			    !(hdr->Flags & SMB2_FLAGS_SIGNED))
+-				return 0;
+-			signing_key = work->sess->smb3signingkey;
+-			signing_algorithm = work->sess->signing_algorithm;
+-		} else {
+-			signing_key = chann->smb3signingkey;
+-			signing_algorithm = conn->signing_algorithm;
+-		}
++		return 0;
+ 	}
  
-@@ -13035,6 +13047,7 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
- 	u16 command;
- 	int n_vec;
- 	char *signing_key;
-+	__le16 signing_algorithm;
- 
+ 	if (!signing_key) {
+@@ -13052,17 +13107,24 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
  	hdr = ksmbd_resp_buf_curr(work);
  	command = le16_to_cpu(hdr->Command);
-@@ -13042,12 +13055,14 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
+ 
++	/*
++	 * Responses to binding requests, other than the final one, are signed
++	 * with the session key (MS-SMB2 3.3.5.5.3), as is any SESSION_SETUP
++	 * response on a connection that is not yet a channel. Everything else
++	 * on a channel, including a reauthentication on a secondary channel,
++	 * is signed with that channel's key.
++	 */
++	chann = lookup_chann_list(work->sess, work->conn);
  	if (command == SMB2_SESSION_SETUP_HE &&
- 	    (!work->session_setup_binding || hdr->Status != STATUS_SUCCESS)) {
+-	    (!work->session_setup_binding || hdr->Status != STATUS_SUCCESS)) {
++	    (!chann || (work->session_setup_binding &&
++			hdr->Status != STATUS_SUCCESS))) {
  		signing_key = work->sess->smb3signingkey;
-+		signing_algorithm = work->sess->signing_algorithm;
- 	} else {
- 		chann = lookup_chann_list(work->sess, work->conn);
- 		if (!chann) {
- 			return;
- 		}
+ 		signing_algorithm = work->sess->signing_algorithm;
+-	} else {
+-		chann = lookup_chann_list(work->sess, work->conn);
+-		if (!chann) {
+-			return;
+-		}
++	} else if (chann) {
  		signing_key = chann->smb3signingkey;
-+		signing_algorithm = conn->signing_algorithm;
+ 		signing_algorithm = conn->signing_algorithm;
++	} else {
++		return;
  	}
  
  	if (!signing_key)
-@@ -13058,7 +13073,8 @@ void smb3_set_sign_rsp(struct ksmbd_work *work)
- 
- 	iov = smb2_get_sign_rsp_iov(work, hdr, &n_vec);
- 
--	ksmbd_sign_smb3_pdu(conn, signing_key, iov, n_vec, signature);
-+	ksmbd_sign_smb3_pdu(conn, signing_algorithm, signing_key, iov, n_vec,
-+			    signature);
- 	memcpy(hdr->Signature, signature, SMB2_SIGNATURE_SIZE);
- }
- 
 -- 
 2.43.0
 
