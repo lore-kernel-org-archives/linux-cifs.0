@@ -1,94 +1,78 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.227.136
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794543113;
-	b=HXJbOjC/cwgE9AHVKOjFRy8aAcJISMdZ+BBuTE2L+4mxLQjkgeKVFR6l+OChX9b7fBSy
-	 MqefMwFISmZMgP8iwVc8vQ4qhD3VPNRcwAmAkYoadjSgUWgJAvsI+FhhiWNJ+6s9F/C4v
-	 OGHQ9mmh31b6N2ACLy8Q+H6L8tevzTdEKFDamuFtYW6/VxnjJxEZqiPHOxtk4lsMHvbgE
-	 +cxVBDXnKzG6Na66PAicQDvC8BQtDY13oxeC96MgaB19rwtw8mhVoRLlrYPmguWD/heBH
-	 TloUNwhVpM7Y9aaoLADhdoruXK/gt5a9xynNT44ykWjZuY8lwx5PNYpfEM/GL1Sjsbw==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794543113;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:Date:From:To:Cc:
-	 Subject:Message-ID:MIME-Version:Content-Type:Content-Disposition:
-	 X-Mailer;
-	bh=+QcHvWhel5/dPmS42dqpgmO5CbR6S61U7RfxaWp2X7E=;
-	b=cWewH3sX6Vbc1mVhVRkYzH83hCnI+h3BYVqiBP2v6PZG2U8C1gWRQvvmBupLFinc+iFk
-	 JMXmctyeBqGcJEMfO6RyuivU3sD+4LHpv71k/McZ48gNNBzDCYt7bCdhf+Rs361yQq12/
-	 h33Xuj9PiP2sDY1Zj7dMF6yA7nspz/wx5jYHYJwmNe4zFpe14yNrizU2Zn/gS6SC2ogMp
-	 yAqO7MqZ69IAcKc+Gjk99eEkwbKCdNjAIdI8btxetifqeDbijmVZ32ZZmYkPWbEkelUXT
-	 qnaU39b5SiH9eIZ7MQuiHgtj8rNCeorKzK1mrfQpcEufJW8tMAAKWI750B0KUtYeD3A==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=in9WGua3;
-	arc=none smtp.remote-ip=74.125.227.136
-Received: from mail-pj2-f8.google.com (mail-pj2-f8.google.com [74.125.227.136])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1794571245;
+	b=SzseMz7jaX6RhgJgcC9xpHN/Z7i+7r7uAhcu7BdrvVeVSKnS1Lvpl+Ba2mxvo+d8/zo3
+	 aIAt6BLVsUBDPoQh2k443dLc9JNlJzXGwtN1Vb4yVTgr/KQrT8JeMU5K/PaF90AjFUEPl
+	 0ddPCYbBW52CXT9Wii4xIt/rKJnL18+lMU8e1pRgrwQI5x+GpADGinsMErETGx8Ijpq6P
+	 95f3EkJ9dtA5VvPnnkLcxdPJ17fibgBjopSPMWsc3+gDnxT8JPuH4cr6Vn5/Oq5GnPrfQ
+	 7cKXO9mCzffRu6NL7z8fCGzJF2AoOVQAScBudzH5GYFBvEriXFjWaRLSO5J0R9MpuQA==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794571245;
+	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:Message-Id:X-B4-Tracking:
+	 X-Change-ID:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 X-Endpoint-Received:X-Original-From:Reply-To;
+	bh=r48ECBIn/ZDjW20r1K8xJKQyd/oDeFIv6pFjVhzh+D0=;
+	b=Yg4FREgljRrmwa1R8SJWylW+x2CjctfD0hZlSGvXELr6eb6o6J7cDfB/V5lMsGikt5Ue
+	 fdYlHs9OqoNPj5n7qav3C8aBZqwtpEBPpecwrYpi7Op+jTMujtp4C9s+oiKBnCKL7lre5
+	 VV4pn1/J3KIl95czlXcuMTkVLBN5K0D8+8V3vX7LiGznGIu6qO7CBnenR9kE1nXIlox3V
+	 6RpVy9ivO3CoQDyWc80XzYPD2J24aNJWHcmGIInT8CPCTeRj0b+JgjGt07y2VsJmQh7Pe
+	 UP+w4QlZDiYQAI0QnBs/Xd+BQlz163sLeEW5igRvVAazUcgiLcI+Dsjr41LsAMgc13w==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JKw2rG7N;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9F3606A884;
+	Fri, 13 Nov 2026 12:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JKw2rG7N
+Authentication-Results: smtp.kernel.org; arc=none smtp.remote-ip=100.80.115.77
+ARC-Seal: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256; cv=none;
+	t=1794571245;
+	b=r7D7H54Fy9gKALRBOowWileMoqTeMdUfY99y1/rlcQXrHm6UxtxWVEzBc8S6RsALqzki
+	 8DzaCM9lStSqBo+uqIJxdsHyBfNoWYZNu6Hql10O5D7KL6Ud+RH1/xhS45gGbV1pey3XC
+	 MIhOpZhLiM5us5zGqUZVHrOFQmAVwudxeU0+oeL109zVHEYE7PtC45zmNEJik/2lMV+41
+	 WUzbRXKvVQQqwFbCy627FZWTp6j9hQ61mj/32nw6AOwMla+N+OepBmn87cF9CRa7H4hsA
+	 mE8ekjc/LBmuTDDaiqfw+b19TApBNjZ58eW3O5sDadFU1XwE7xKznViMQOv88B5kXTw==
+ARC-Message-Signature: i=1; d=kernel.org; s=arc20260519; a=rsa-sha256;
+	c=relaxed/relaxed; t=1794571245;
+	h=DKIM-Signature:Received:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:X-B4-Tracking:X-Change-ID:To:Cc:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key:X-Endpoint-Received:
+	 X-Original-From:Reply-To;
+	bh=r48ECBIn/ZDjW20r1K8xJKQyd/oDeFIv6pFjVhzh+D0=;
+	b=hgBAW9VeHKaU4YBimJ/nU70p3AM4mw7xk3roL9A1OaFjoiO2HCkhWuMeZLknlrq8xlku
+	 pLo0gKQTDVXXOKJS24kbQaA/rdVYkoxHyFH8yntXC0nvOWxunrYcU18LvNvhWAyJFqYlZ
+	 xPCy2ETaGVn02L6TgSr2NIgke3KecKxXVgw4SSHvO1ER90g2wXrPqGkgTkacvF96IFMkq
+	 SORRq9K4d8IF9AwedWkf9AXp5FXEadwryPJWsow/Ozoj3iB768Cc2m2f9PmqrzVnOLcK2
+	 IEQ59DJ0LdpcA/LpHtIBDAMgpS2/WOtA9CXps2/uO1NoDDNvsuZtecfTWTaxg2m2FOw==
+ARC-Authentication-Results: i=1; smtp.kernel.org; 
+	arc=none smtp.remote-ip=100.80.115.77
+Received: from lkml.kernel.org (nexus.subspace.kernel.org [100.80.115.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E61F606A32D
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 04:11:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9E61F606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=in9WGua3
-Received: by mail-pj2-f8.google.com with SMTP id 98e67ed59e1d1-3ac749e0719so94107a91.0
-        for <linux-cifs@vger.kernel.org>; Thu, 12 Nov 2026 20:11:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794543112; x=1795147912; darn=vger.kernel.org;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=+QcHvWhel5/dPmS42dqpgmO5CbR6S61U7RfxaWp2X7E=;
-        b=in9WGua39L0omvpYDDCOMC0CXHVNrjEIloyuYM1bOBGeJWgekUruiZ6camBTSkri7l
-         +PqEU4f4Uxw5r5KYBAMkOhKxO6viFjGz9oWcb6ccrvBrRFXCdpnEmdwY+N8Xb5yeeMEZ
-         ACfEDqG+SrcwRnQR/B5iIBFcMpgTCCGNgsOCr1HIpTbba89ULhhaG4IheqsXa6d5zE6v
-         ZVZQe5g+A4KIs0XEfmH6RkhoAwRqzjBKkUzBmYLwYfeNB/+hrEuJ7jGxmUAz3JegFnXx
-         U8p0m4Eygzey4YaXUcwQCxLa5WuWYIZU3jQPcVBQ7fpTB4+yQbNQ0fY67Ch4v9xVbPpZ
-         OsLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794543112; x=1795147912;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=+QcHvWhel5/dPmS42dqpgmO5CbR6S61U7RfxaWp2X7E=;
-        b=hy7wequ/QgK0Y2CQ3c+aDHT1A5d+pfhOOXl7Vib2P7j+rhLV9xin2kdAQamIQXkDBQ
-         TriTwuF/1ByFQ8aJvit+Otd2xAtXzyzcw+OEb6dQ4jTMlMR3VY1lZ4kacag+0k6Iruwh
-         LIHjnoYS89hFlRgmLHv4nScR8ftK5dmkbfA+quSa797SBvtBm+SC3EFvtOfqQET3Doy+
-         ucri3hOv3nIzormiRYecPb1XSSoIAEZj3HegbhC/gE6D809iDKx/VanI3OPas1nyhJ+0
-         B4kjSaQ9Z4MnXOQxTwDRwSNTWKmhFi8B+Z8O3TjZNK53RS7dAe6pB19ASYzvYZ/H4rXi
-         Dcfw==
-X-Gm-Message-State: APuU4Z9XCjB9HtbsQy0oRYHHl44xULxYH4arJfeg9dx5fSoPVYeu5QI9
-	YS8aSvbstY3J8V4AVj/FQrtGzyhTwXPR6OAe+4d5TYzV2yikvae1IFIE
-X-Gm-Gg: AYBFou10eEXiKhzrLiHU3d/GMjvmJn4J9NiD626Yma/fGs+ib7XnC1z60qA5t2AW9wV
-	hLKkdou5/qB8zMdut+KdgXJnUmJU6LZMrMadiIWXx8FCFbPwlQFVXs0inPSs3UPMcIv4Ibnnxtu
-	C43uidqmQnIINmZhtbknCCUtyDYC0o+gd7Q8DXtww8FS+XwYSrBNJ8T8/+u9dWgVRdqqYfymLFU
-	ehmPBS/6Jkz271J0lGCMKqOoH2KmAp2toCp+5R57WhfLWZoVkqYUvO9c8uUxeiaVlurBTKZNkpo
-	XttuvrlrYq7JwwPSwz0ey6yS1b7+9bNH0UkTjWmuqBpYYPmGYVJ8xorQ68YjgBcNHVT4MLnuZWN
-	trxklE659/j9N/Ek6XtkxSB3B1MvKwnQdlLC0ON7yf1u/QsaQIRWeM+yD4O/NGSexUVStVif/ZJ
-	7rqOq+792bpG9dbwuAuk3cSO6mLGnLXq40PGH0qS+0+ijlUVNlKUQ+g6TqMd2w3p/2I1gg8s4Jq
-	bL0xZuCrc87MtCzOhNNckmmFVAAMtaEziJc68UZ8VmzdSQw1n70pEa1Y6ntm9RJP+ZqFZ/sqrqI
-	biv9SPM1nbXQZoMSg6L+
-X-Received: by 2002:a17:90b:1d03:b0:3ab:c80:9365 with SMTP id 98e67ed59e1d1-3b1b0b4cdf7mr951865a91.42.1794543111941;
-        Thu, 12 Nov 2026 20:11:51 -0800 (PST)
-Received: from hhost ([120.231.212.132])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b1b3d279d8sm536744a91.2.2026.11.12.20.11.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Nov 2026 20:11:51 -0800 (PST)
-Date: Fri, 13 Nov 2026 12:11:41 +0800
-From: Xingyuan Mo <hdthky0@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>
-Cc: "open list:KERNEL SMB3 SERVER (KSMBD)" <linux-cifs@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Xingyuan Mo <hdthky0@gmail.com>
-Subject: [PATCH] ksmbd: fix use-after-free of parent dentry in lease break
- notification
-Message-ID: <20261113041112.3736417-1-hdthky0@gmail.com>
+	by smtp.kernel.org (Postfix) with ESMTPS id 76DC21F000C5;
+	Fri, 13 Nov 2026 12:00:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794571244;
+	bh=r48ECBIn/ZDjW20r1K8xJKQyd/oDeFIv6pFjVhzh+D0=;
+	h=From:Date:Subject:To:Cc:Reply-To;
+	b=JKw2rG7NmSJ0OZsoWeMPwc6CUMSfq48TXhD3DOdQHLNCERgim0QtfB5UwTAzXOE51
+	 seLyLd4vVgPf42hcvtfwT0Y2DyGKkhwhCEG/Vc0RoBHVKZm5JRbXUTJa1iaHDVkMF5
+	 dMV8H3xdydbc97gurEhi/blu9A6iTUl2oW/6rEt9tS1uBl7gOUmzMCeS6KctMaFqKt
+	 noseV6Tlfw37TL1ap2LFgTr9fzem6mvAxkMJey1NsFguu36n76zB/rdlIEbmZ+WmoZ
+	 Xio/kzt685Lwb70fKyEsMyHvA85CqEQwxEgZaNGKHj0UGUilMw4UNBvFRC5bwuPoGU
+	 lylAkZ9uOZ0ig==
+Received: from nexus.subspace.kernel.org (localhost [IPv6:::1])
+	by lkml.kernel.org (Postfix) with ESMTP id CA7B34776C;
+	Fri, 13 Nov 2026 12:00:43 +0000 (UTC)
+From: Suyuan Wang via B4 Relay <devnull+shyckless.gmail.com@kernel.org>
+Date: Fri, 13 Nov 2026 12:00:43 +0000
+Subject: [PATCH] smb: client: fail SMB2 responses with a bad signature
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -98,97 +82,109 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.43.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20261113-smb2-sign-v1-1-937ee7c20f08@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAOr79moC/yXM3QpAQBBA4VfRXNsyu+XvVeSCNRhlaQcpeXeLy
+ 69O5wIhzyRQRhd4Olh4cQEYR2DHxg2kuAsGnegUEY2SudVKeHBK9wZTW6DNMwOhXz31fH6vqv4
+ tezuR3d4B3PcDLQXJMW0AAAA=
+X-Change-ID: 20261113-smb2-sign-2f316c91c873
+To: pc@manguebit.org, linkinjeon@kernel.org
+Cc: linux-cifs@vger.kernel.org, sprasad@microsoft.com, ematsumiya@suse.de, 
+ smfrench@gmail.com, ronniesahlberg@gmail.com, bharathsm@microsoft.com, 
+ linux-kernel@vger.kernel.org, daniel.birtwhistle@gehealthcare.com, 
+ samba-technical@lists.samba.org, tom@talpey.com
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1794571242; l=3189;
+ i=shyckless@gmail.com; s=default; h=from:subject:message-id;
+ bh=LRob2AeIi0gkoL5eSGnmBKas0pFGU8uy6TfgbFE1mtQ=;
+ b=HU4LLqGOcXfw3OOVZEtRfeFawNQnt3pvzcrPRSZVVEmzXZD7IVGBnvKk7Mf/cF8D6itDlmZxJ
+ 0j/ps5pnxmcC8GHOzbGfeHx2SNxuIQEKbeQ4VeHeFS1SYyJa14ZuIbT
+X-Developer-Key: i=shyckless@gmail.com; a=ed25519;
+ pk=pMtccVGiWES3bV+7YBFuBclkvq2n2HBHQ5azaBrK2lY=
+X-Endpoint-Received: by B4 Relay for shyckless@gmail.com/default with
+ auth_id=1498
+X-Original-From: Suyuan Wang <shyckless@gmail.com>
+Reply-To: shyckless@gmail.com
 
-smb_send_parent_lease_break_noti() and smb_lazy_parent_lease_break_close()
-pass the raw fp->filp->f_path.dentry->d_parent to
-ksmbd_inode_lookup_lock() without holding a reference on the parent
-dentry.  If the file is renamed out of its parent directory and the now
-empty directory is removed concurrently, the parent dentry can be freed
-before __ksmbd_inode_lookup() dereferences it, leading to a
-use-after-free read of its d_inode field:
+From: Suyuan Wang <stevewong@hust.edu.cn>
 
-  BUG: KASAN: slab-use-after-free in __ksmbd_inode_lookup+0x21/0x100
-  Read of size 8 at addr ffff88801aea06e8 by task kworker/0:7/332
-  Workqueue: ksmbd-io handle_ksmbd_work
-  Call Trace:
-   __asan_load8+0x82/0xb0
-   __ksmbd_inode_lookup+0x21/0x100
-   ksmbd_inode_lookup_lock+0x25/0x50
-   smb_send_parent_lease_break_noti+0x119/0x3a0
-   smb2_open+0x5298/0x5df0
-   handle_ksmbd_work+0x4f3/0xd30
-  Allocated by task 11:
-   __d_alloc+0x3a/0x410
-   __d_alloc_parallel+0xd9/0xc00
-   lookup_slow+0x49/0x70
-  Freed by task 66:
-   kmem_cache_free+0x22d/0x530
-   __d_free+0x26/0x30
-   dentry_free+0x8d/0x130
-   dentry_kill+0x2e8/0x5a0
-   dput+0x17/0x30
-  The buggy address belongs to the object at ffff88801aea0680
-  The buggy address is located 104 bytes inside of freed 352-byte region
+smb2_check_receive() checks the response signature when signing is on,
+but a failed check is only logged:
 
-The read at +104 is exactly the d_inode member of the parent dentry,
-which was freed through dput() -> dentry_kill() -> dentry_free() after
-the file had been renamed out of the directory and the directory was
-removed.
+    rc = smb2_verify_signature(&rqst, server);
+    if (rc)
+            cifs_server_dbg(VFS, "SMB signature verification returned ...",
+                            rc);
+    ...
+    return map_smb2_to_linux_error(mid->resp_buf, log_error);
 
-Pin the parent with dget_parent() around the lookup in both functions so
-that it stays alive until the lookup completes.
+The status from the response is returned as usual, and the caller goes
+on to use a response whose signature is wrong. This is the path for
+synchronous requests and for smb2_writev_callback(). On a signed but
+unencrypted connection, anyone who can modify the traffic can change
+e.g. a directory listing, and the client accepts it.
 
-Fixes: d47d9886aeef7 ("ksmbd: send v2 lease break notification for directory")
-Fixes: c2a721eead712 ("ksmbd: lazy v2 lease break on smb2_write()")
-Signed-off-by: Xingyuan Mo <hdthky0@gmail.com>
+Return the verification error instead.
+
+Unlike the SMB1 fix in commit dc96f01d54cc ("smb: client: terminate
+session upon failed client required signing"), don't reconnect: this
+runs in the thread that sent the request, and only cifsd should call
+cifs_reconnect(). And fail the request whichever side required signing,
+since a response with a bad signature can't be trusted either way.
+
+Found with a static analysis tool and checked by hand.
+
+Reported-by: Daniel Birtwhistle <daniel.birtwhistle@gehealthcare.com>
+Closes: https://lore.kernel.org/linux-cifs/SN4PR22MB28883DAF57E0B4D4BFB1C22AEEC42@SN4PR22MB2888.namprd22.prod.outlook.com/
+Fixes: 3c1bf7e48e9e ("CIFS: Enable signing in SMB2")
+Cc: stable@vger.kernel.org
+Co-developed-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+Signed-off-by: Kaixuan Li <kaixuan.li@ntu.edu.sg>
+Signed-off-by: Suyuan Wang <stevewong@hust.edu.cn>
 ---
- fs/smb/server/oplock.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+We found this on our own and only saw Daniel's report afterwards.
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index d479508c06c5f..c933d1e5f5458 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -1760,13 +1760,16 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- 				      struct lease_ctx_info *lctx)
- {
- 	struct oplock_info *opinfo;
-+	struct dentry *parent;
- 	struct ksmbd_inode *p_ci = NULL;
- 	LIST_HEAD(brk_list);
+For SMB1 Steve wanted to keep just logging when the server, but not the
+client, required signing:
+https://lore.kernel.org/all/CAH2r5msfYRdaGAMuTbni-0T20tQi=N=fT4qxiaQ3siQ_WVm=Qg@mail.gmail.com/
+This patch doesn't make that exception. If you want it here too, I can
+send a v2 that remembers whether the client required signing.
+
+Tested in QEMU with Samba 4.15 (server signing = mandatory, mounted with
+vers=3.1.1,sign) and a proxy in between that renames a file in
+QUERY_DIRECTORY responses and leaves the signature as is. Before the
+patch the renamed file shows up in getdents64(), after it getdents64()
+fails with EACCES. Mount, read and write on the same connection still
+work, and lockdep stayed quiet.
+---
+ fs/smb/client/smb2transport.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index 080864b24a0c..62121d7a44a8 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -711,9 +711,11 @@ smb2_check_receive(struct mid_q_entry *mid, struct TCP_Server_Info *server,
+ 		int rc;
  
- 	if (lctx && lctx->version != 2)
- 		return;
- 
--	p_ci = ksmbd_inode_lookup_lock(fp->filp->f_path.dentry->d_parent);
-+	parent = dget_parent(fp->filp->f_path.dentry);
-+	p_ci = ksmbd_inode_lookup_lock(parent);
-+	dput(parent);
- 	if (!p_ci)
- 		return;
- 
-@@ -1797,6 +1800,7 @@ void smb_send_parent_lease_break_noti(struct ksmbd_file *fp,
- void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
- {
- 	struct oplock_info *opinfo;
-+	struct dentry *parent;
- 	struct ksmbd_inode *p_ci = NULL;
- 	LIST_HEAD(brk_list);
- 
-@@ -1809,7 +1813,9 @@ void smb_lazy_parent_lease_break_close(struct ksmbd_file *fp)
+ 		rc = smb2_verify_signature(&rqst, server);
+-		if (rc)
++		if (rc) {
+ 			cifs_server_dbg(VFS, "SMB signature verification returned error = %d\n",
+ 				 rc);
++			return rc;
++		}
  	}
- 	rcu_read_unlock();
  
--	p_ci = ksmbd_inode_lookup_lock(fp->filp->f_path.dentry->d_parent);
-+	parent = dget_parent(fp->filp->f_path.dentry);
-+	p_ci = ksmbd_inode_lookup_lock(parent);
-+	dput(parent);
- 	if (!p_ci)
- 		return;
- 
--- 
-2.43.0
+ 	return map_smb2_to_linux_error(mid->resp_buf, log_error);
+
+---
+base-commit: 630059a5a632377b9b7b487baccde92b7ae1dd47
+change-id: 20261113-smb2-sign-2f316c91c873
+
+Best regards,
+--  
+Suyuan Wang <shyckless@gmail.com>
+
 
