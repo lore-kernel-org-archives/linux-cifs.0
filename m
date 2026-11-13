@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794578759;
-	b=AwZSWIzLD6qhL9cck7NbjwFVBOCI6S1K/6w8x+ZZnjaTnXLSqCzPgP8k+4fglCg/piId
-	 vqytjUtO/YKHhHul1okeqMS077I5BSVNismbm2mkkk//PhX52I46K2A7R8ihLRF7/yvP6
-	 fqsIqXiNlriMYQahK8ntDe5I3ql5KcvostHBiCXxK6iIxs5xy8DbzkWn8Wpprdr2vZicx
-	 BjP9esS1p//kN89mOWh4u8qFfzOMbYjjj6WNlEzfg0gQ4joNrZN5JW/tkbAqh8iGU4mK1
-	 7NY8ntWLR4ByuV5D2zH7vQfbYUQWV2Tm5At5gvAOSAFWaFeEKAQvQs1jarhEr6W2NbA==
+	t=1794578790;
+	b=Pcv+9M4NgdxjiHgGfs9jMb13I7NjZrwpY+tDFvb1t/22pwEcxS2rV9A6Oca8twyZeIeI
+	 LVSm09a/a8lew9M+RcpRSW3eQQCkM6sg9mvJzGXgsiobXLuUGXqX+EUd0lAs6tQdeSQyq
+	 R1hBITmoZ0bfY4plTPdGe773t2oXVegtmKE87BkUGusjvYu6yLzTwFCPhdLBOPBQ6PNe0
+	 7TaDAERVDE2LMor/xLohB76IH6ulUQTb4bDGKZ9QXYu6pitJHkIZLnZYZeZDrJn1DLL/I
+	 bupkvPZwR+Ves4UcqA8lmwv+bidXQyvhn93hxfZ69MeJGG4l6/R+BwV3AUD0uCbqudQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794578759;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794578790;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type;
-	bh=xJIkWIAhn6eaORk/+4XyI9QAEduquInk9Y+K2HPVW0w=;
-	b=M+Cj5h2uehzo9VNNHDhqXOEgqd2RABBLBH4tLhqNQ/RTStN3bhrehCS7LKKANSwcjVmO
-	 ghb9rI2gxsNOcIPFFCsRfgW893KgCJMH/oXDhXaF7nkeh7kdNrzIC3r6daCvP1X6GLSSI
-	 gs5VWe2GaXDEbd1QihKK1Poc7V9DiK9gtPcXzpfJ7toPgYvAnEHxgoSwouSSVzE75GHxO
-	 bGROEb0PZCOiSffUD0pEJOA7UMMlPqRJN3ExVLtkCWY1Jg2tGzId7hLgeUqlY1bxmFXh0
-	 cdNooQcQEvF6GNpYeRgC3OtNDUIUKt6EV+ctLnMHRyjJD7XzXH4shIwyK/DUBn02EnA==
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=x/6tLgI0j3tVJVglp8MpebFbwZLk7NDdcwx4w7n1XEE=;
+	b=0nkDO+49dWt2frXg/48nDeNQfWCV40gNzM1G2AVSOabJBgDmNiIztx+Zh0+turL4r2YZ
+	 ys9RS5pfS3J8Gz6TIlSpUe1f9TkKB+Bsl4MMeVc4wj/sznTAhDVymKDuMZAqBvxI1NHkT
+	 b9CPUJ8RVWXuzEy00mZ4IjnAf1JHOSK87k60UUaGTtMpaOX86e+Xz/aJMPz/kCWvX67Wa
+	 unumJCq0h7cs/wfeci2duwSIi5eJUv7GNL0WIN0YbRe3En8TjOL6uo8FX/MW4Ic91AaV2
+	 VDwzFbZJ9KQqGfRbQeGc8eedk1zCGIMNEG6ZGbaU1R3lk2CKZglGh6ZWAGhaFviRpkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Z+Dwdge5;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BsAzAhjU;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9DF606A32E
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 14:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B98606A331
+	for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 14:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=Z+Dwdge5
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB8D31F000C6
-	for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 14:05:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=BsAzAhjU
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F09D1F000C8
+	for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 14:06:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794578758;
-	bh=xJIkWIAhn6eaORk/+4XyI9QAEduquInk9Y+K2HPVW0w=;
+	s=k20260515; t=1794578790;
+	bh=x/6tLgI0j3tVJVglp8MpebFbwZLk7NDdcwx4w7n1XEE=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Z+Dwdge5Ra+Qb4v3rNlLoPNWUPLho8Hjpe3H7Cd7446TKwVmY53/Uo2gVeICay5jL
-	 IJ/ZZASdD4PafnFGIRF8GZjyanoN3m3gT9ZbpXEnUsIA6am2cFqhsom8R2A4QMhA53
-	 cCN/9pQYm4s2cW81ZCfxm2U1iUshGauU7UmTlE8tqmYANbh5C49WD/UTgzjmF1RXgF
-	 RUW3joqEuIUu0aReR2TyLo+S1quZ7kPKziL+HZfwcDrrOEsweao74OXe7q4nFdq09N
-	 97GVQFnQVYs2692KRrvoIePh2X3/TeSuMRDE+aOuiuainYY/XEK8ePDFBUHnMQipxQ
-	 ORNpPe2y/FRSA==
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-6798eb0d190so706230d50.3
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 06:05:58 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGBuN3rfZx8d8+eMjJrAYPpPTItdJq1wbWbieE77eXc1T12ehuJlxK6QbwJEppvE60a8e2or8BHqoML@vger.kernel.org
-X-Gm-Message-State: APuU4Z88gE71hoeZRhFGLaAtQKgLe6XN0R5vo7YlaVbqKc7RrYdnrkCk
-	OlERJs8GBUibKNIftaFK9KH3ed0F/8XEHvmwBnZDjLCi/ScQm/8NAWSDO5bIWcgR4l1Cnjh03/2
-	sSESgtFTJ3pRMrgae1RR6d9bKeUmSDdo=
-X-Received: by 2002:a53:d484:0:b0:67b:e219:e623 with SMTP id
- 956f58d0204a3-67d897c8837mr1245914d50.104.1794578758115; Fri, 13 Nov 2026
- 06:05:58 -0800 (PST)
+	b=BsAzAhjU2j2JewHkKnw+C/ZBQ+7xOYCf2ToEfG27qZUBEENCy3g8aymKcFmYbCQh3
+	 dHpg3S+6rtpPM+LYOmi/19+6ymRRRhvsaz+2jCXkoXJbU0JLSCj8GPri4VUIa+J44m
+	 SD1hXzG6TYHETnHlV5rclXMymnk6Ut9lca6Vt2RygEQu5O9vbtK6AmZQR5r8F0NEXz
+	 XyG+hcVKgD0T9isibUa6KUAlFIEpLHkeVvR76qWlY0rgZS0TUf/puFmqlf/j4Rbl07
+	 NcUpiP7TyHqXT8E4nRVU54RWLJE2vr7plhPu7JJmFkKytatV4bsBdXnZjjOw6MFmB0
+	 UX72Vaaym8L1g==
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-67c0bd676eeso848534d50.3
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 06:06:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFhc6CfyOUAWAAgBMmsrdALgqbHU1uGNVlpDVCUgLJc3gw+/IIzaeqT1CxHKpNg7JCjcY7txYT6Aook@vger.kernel.org
+X-Gm-Message-State: APuU4Z8oBCfZsYVT5snrkYZC8/AYnoWvuFu9gUHTNN7AFp6IAXvAUAiy
+	NellCvKzfse/szL6SPF7ycnlSOxeInOUvXtPafvGHj+5CyTv7gryDTxWRMmI6VihSEZ6XVniENW
+	biIThnlUTB8bE8x6dmp+R7h0ri+H93+M=
+X-Received: by 2002:a05:690e:400f:b0:67c:ace:30ec with SMTP id
+ 956f58d0204a3-67d8965a4e5mr1864240d50.29.1794578789333; Fri, 13 Nov 2026
+ 06:06:29 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,32 +59,67 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261112185044.41571-1-mike.michalo@gmail.com>
-In-Reply-To: <20261112185044.41571-1-mike.michalo@gmail.com>
+References: <20261113041112.3736417-1-hdthky0@gmail.com>
+In-Reply-To: <20261113041112.3736417-1-hdthky0@gmail.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 13 Nov 2026 23:05:42 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9p4zt7Z5bQg_+0fW7cc3j2nF+vLkMAGUL-OVa04LfKTA@mail.gmail.com>
-X-Gm-Features: AclHuK8zxv74vsD7TmQgCqfUvXEVQCah9Mc8SlG8GpqRrDyi4FeM2mxXWUWcfwA
-Message-ID: <CAKYAXd9p4zt7Z5bQg_+0fW7cc3j2nF+vLkMAGUL-OVa04LfKTA@mail.gmail.com>
-Subject: Re: [PATCH v7 0/8] ksmbd: verify session setup requests before
- signing with their key
-To: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
-Cc: stfrench@microsoft.com, icb@fastmail.org, senozhatsky@chromium.org, 
-	tom@talpey.com, chenxiaosong@chenxiaosong.com, ematsumiya@suse.de, 
-	lsahlber@redhat.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Fri, 13 Nov 2026 23:06:15 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-Mq2MhQK5Q2zzhbzjBTY3P873JJ7NOiuiQerMaqpSJ7Q@mail.gmail.com>
+X-Gm-Features: AclHuK_a8r9z3A1EdM0ac3pA7WzYDlJ_QM45Gg2MFEYfL3Y_ra2WPhe1Yz4YumA
+Message-ID: <CAKYAXd-Mq2MhQK5Q2zzhbzjBTY3P873JJ7NOiuiQerMaqpSJ7Q@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fix use-after-free of parent dentry in lease break notification
+To: Xingyuan Mo <hdthky0@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
+	"open list:KERNEL SMB3 SERVER (KSMBD)" <linux-cifs@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Michail Andreas Michalopoulos (8):
->   ksmbd: verify the signature of session binding requests
->   ksmbd: sign with the negotiated SMB 3.1.1 signing algorithm
->   ksmbd: use the channel signing key for session setup on a bound
->     channel
->   ksmbd: refuse a binding request on a connection that is already a
->     channel
->   ksmbd: check a request before signing STATUS_NETWORK_SESSION_EXPIRED
->   ksmbd: use the current command's header for signing in a compound
->   ksmbd: consume the sequence number of a request on a failed session
->   ksmbd: account for the credits of a request on a failed session
-Applied them to #ksmbd-for-next.
+On Fri, Nov 13, 2026 at 1:11=E2=80=AFPM Xingyuan Mo <hdthky0@gmail.com> wro=
+te:
+>
+> smb_send_parent_lease_break_noti() and smb_lazy_parent_lease_break_close(=
+)
+> pass the raw fp->filp->f_path.dentry->d_parent to
+> ksmbd_inode_lookup_lock() without holding a reference on the parent
+> dentry.  If the file is renamed out of its parent directory and the now
+> empty directory is removed concurrently, the parent dentry can be freed
+> before __ksmbd_inode_lookup() dereferences it, leading to a
+> use-after-free read of its d_inode field:
+>
+>   BUG: KASAN: slab-use-after-free in __ksmbd_inode_lookup+0x21/0x100
+>   Read of size 8 at addr ffff88801aea06e8 by task kworker/0:7/332
+>   Workqueue: ksmbd-io handle_ksmbd_work
+>   Call Trace:
+>    __asan_load8+0x82/0xb0
+>    __ksmbd_inode_lookup+0x21/0x100
+>    ksmbd_inode_lookup_lock+0x25/0x50
+>    smb_send_parent_lease_break_noti+0x119/0x3a0
+>    smb2_open+0x5298/0x5df0
+>    handle_ksmbd_work+0x4f3/0xd30
+>   Allocated by task 11:
+>    __d_alloc+0x3a/0x410
+>    __d_alloc_parallel+0xd9/0xc00
+>    lookup_slow+0x49/0x70
+>   Freed by task 66:
+>    kmem_cache_free+0x22d/0x530
+>    __d_free+0x26/0x30
+>    dentry_free+0x8d/0x130
+>    dentry_kill+0x2e8/0x5a0
+>    dput+0x17/0x30
+>   The buggy address belongs to the object at ffff88801aea0680
+>   The buggy address is located 104 bytes inside of freed 352-byte region
+>
+> The read at +104 is exactly the d_inode member of the parent dentry,
+> which was freed through dput() -> dentry_kill() -> dentry_free() after
+> the file had been renamed out of the directory and the directory was
+> removed.
+>
+> Pin the parent with dget_parent() around the lookup in both functions so
+> that it stays alive until the lookup completes.
+>
+> Fixes: d47d9886aeef7 ("ksmbd: send v2 lease break notification for direct=
+ory")
+> Fixes: c2a721eead712 ("ksmbd: lazy v2 lease break on smb2_write()")
+> Signed-off-by: Xingyuan Mo <hdthky0@gmail.com>
+Applied it to #ksmbd-for-next.
 Thanks!
