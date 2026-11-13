@@ -1,56 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=195.135.223.130
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794579067;
-	b=Ok5g6GEJ4B5kKwORN3sDm3mz6gUbA62tgfUU/MdN+UjrURHj5SJzfpEqpUrRAc2bz8/D
-	 bUmji0TdePXZI02bDWMgighS7VNb0Y8z1kzKSrIgf8Zf9RU0sl0gks3WG0OUiu097d8H2
-	 DTVUMFys72ex76aeqI3RKP4fqyu117HFf7nz++zAbjIQTstr1StFrhNVtIKIcbvpFoidu
-	 H/Xaiw1fI0xCGsuxY4z/B6/ccwURIGRM0TGw+wJ9TQO/dZQR3aGUmbQFsNW3davn/dUnX
-	 ifKCuNbHaOg7p5n77NeiUgN2tscJItePSxdeupz5sKNrN6h8bW0U/RTI1byFhQ+9jGw==
+	t=1794585575;
+	b=INvyBC7gkjG9q9VoA34uRiHqbCeUsTcW/g2UUBknNBJnHdBYFHi2Qq+kF6S2laMtNrFm
+	 1tAF/Bd16U9wDpdia494jhSocRPy3d1VnXHqB/I7amrPnXyLOnANey+TxVYqsNSXkIMcb
+	 NeGdcWgnhBWTbjEh0RD3kXGlcUPLFXtAj3au/94ovhHdqvIyc32wfBIbJItE2QFuaXOBC
+	 tislJAYufKvG5pMawswaUrUPLy9Nth+29uotSFNbH7oGkwxvrE5ol+896H6s5aDptWQoE
+	 Z9vUAv73KhWe7PWF+EybpOTd9vioLhFo8g/qskdWk8OD7rZAYWF679gfpe/FQUtICfg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794579067;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 Date:MIME-Version:Content-Type:Content-Transfer-Encoding;
-	bh=2Df+5Hg2+npbDZ7+hcsNFY6BQrrU81o8opyCf0Uj9Ww=;
-	b=ezlBNycz7es74p9whaOMkoV+vGlce1mxIV8OkEMXSKW5g2ReaBSQzyqE+IU3GQ7II4J1
-	 p78c8pdUtxyoPwef1rqUakII9P7pjn6sXAempITychCock28TkwV/rQhV8/nIQhc0OnyM
-	 YDd8VJLEzza+4/gT37BLriMwGUIiHQr4zOY5f/8P6XoTX2bIY+Y7EC/pC+1vNpyA9ipns
-	 /yUyi9Np0fSC6ZvXONmiryWCSj3xDwPGs7ZOCG847OiN264TDb4/mgQpYB6Cw3rVxFJWX
-	 Lo3Y2Z/3XCDQWSHx3siNikPcDsu9zzV+NPzJajaylDNETmsGRIMqtc90o3JvS72cS/g==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794585575;
+	h=DMARC-Filter:Received:DKIM-Signature:DKIM-Signature:DKIM-Signature:
+	 DKIM-Signature:Received:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-Rspamd-Queue-Id:X-Spam-Level:X-Rspamd-Server:X-Rspamd-Action:
+	 X-Spam-Flag:X-Spamd-Result:X-Spam-Score;
+	bh=YK5qULkzf7ooh118Tvb3RLqnjqawl89i+ZXQ4lfC3CU=;
+	b=ii6bL3bVO6Ye09o5StbSYmO7rc1NUTc54aBS9Cgo4QUzAGug91oYGohZGi5HdvWy/Fv8
+	 b9rd1OdhFOVGrDdBchwzasXG9SnQjyw+JAmjGQra+vCy1GnQ6CDwmtJZ60mqnM1M1umqB
+	 u85adTBox346UVCOWATkuU66Lcc5mPwvB/Oj0JefzchmLwkWw46pS88MBAXf5kb8frJrZ
+	 z92eAQ55wqE3rXldvQcfmU1rjI6QvpXx1dN0uAkNrESA/yV7EEcnMaE6LU0Mip3+1B/ZL
+	 CXCjYTSSlbg4xb4S3lcQ7R2SkZdUzPyj95BTENCyHtJHVQJ9+RePGLu6ak4OkulTHWA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=kpbj15ra;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dmarc=pass header.from=suse.de;
+	spf=pass smtp.mailfrom=suse.de;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=VzDCrXz5;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=HkZDHMOF;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=VzDCrXz5;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=HkZDHMOF;
+	arc=none smtp.remote-ip=195.135.223.130
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B480606A88F;
-	Fri, 13 Nov 2026 14:11:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4B480606A88F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E478606BABC;
+	Fri, 13 Nov 2026 15:59:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4E478606BABC
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=kpbj15ra
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:Subject:Cc:To:From:Message-ID:Sender:Reply-To:Content-ID:
-	Content-Description:In-Reply-To:References;
-	bh=2Df+5Hg2+npbDZ7+hcsNFY6BQrrU81o8opyCf0Uj9Ww=; b=kpbj15rahdsmtK07ab/8LF9Jar
-	i8Lihj8rKEaMtoI4u2pgYcEA33fE6oB3Iv/SXwR15XxpR6Xc7f9k6IXrNe2lIXHL4krteMPgBWV6g
-	dU2wup+MzzTPqiqg/ZBsAVWt68hkzCNOuugNMA90ZlXMI33XJxz36yLzl5yXhbZ+Jnzl3DMoCjDI1
-	UBTIzmzgGp/DaD6z2MgrLCVqt8pUxVuI5VT8yYy23scGGbltjUrkQbX4ViR8vNqXdAG/pHHyfzrix
-	evyI3YdjnoxAZRMzlvhiOo7Gz3gHrE6XP8KLRr+AjvHqSYLAoEakS9Kyo2FGKlxmkOSBaPwStQ8R5
-	3r49rf+g==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xRrzT-00000001fbo-3TBn;
-	Fri, 13 Nov 2026 11:10:57 -0300
-Message-ID: <e7592016e8a893d7c859ba1e6ee0db61@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org
-Subject: [GIT PULL] smb client fixes for 7.4-rc3
-Date: Fri, 13 Nov 2026 11:10:56 -0300
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=VzDCrXz5;
+	dkim=pass header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=HkZDHMOF;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.a=rsa-sha256 header.s=susede2_rsa header.b=VzDCrXz5;
+	dkim=neutral header.d=suse.de header.i=@suse.de header.a=ed25519-sha256 header.s=susede2_ed25519 header.b=HkZDHMOF
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 06CFF21F07;
+	Fri, 13 Nov 2026 15:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794585571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YK5qULkzf7ooh118Tvb3RLqnjqawl89i+ZXQ4lfC3CU=;
+	b=VzDCrXz5jPyMOdbYzZbm5W3ASbGhNyzhTiWsJ3TcODlV31ustoZZY8ZsnxzVhVRc8vnOoj
+	/OoWYmEqI/X9TquEGwQd+GLerG/bZhD5XwAhEvcXUELUzW7b41BAhKY0fT5YshUVI+al3N
+	l3dcx2RhD4ItnfVdZdk+ZTBUnjMWqzs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794585571;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YK5qULkzf7ooh118Tvb3RLqnjqawl89i+ZXQ4lfC3CU=;
+	b=HkZDHMOFdP44PbXekWBQkQ2XMotATh+UoZvr/fDiUkc/GUMp6L3vILiqwdxr0w5YLYqJ4M
+	1wU6GYoEODp+SGBA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=VzDCrXz5;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=HkZDHMOF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1794585571; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YK5qULkzf7ooh118Tvb3RLqnjqawl89i+ZXQ4lfC3CU=;
+	b=VzDCrXz5jPyMOdbYzZbm5W3ASbGhNyzhTiWsJ3TcODlV31ustoZZY8ZsnxzVhVRc8vnOoj
+	/OoWYmEqI/X9TquEGwQd+GLerG/bZhD5XwAhEvcXUELUzW7b41BAhKY0fT5YshUVI+al3N
+	l3dcx2RhD4ItnfVdZdk+ZTBUnjMWqzs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1794585571;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YK5qULkzf7ooh118Tvb3RLqnjqawl89i+ZXQ4lfC3CU=;
+	b=HkZDHMOFdP44PbXekWBQkQ2XMotATh+UoZvr/fDiUkc/GUMp6L3vILiqwdxr0w5YLYqJ4M
+	1wU6GYoEODp+SGBA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5C3D51344A;
+	Fri, 13 Nov 2026 15:59:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id yAHVN+Ez92rsVgAAD6G6ig
+	(envelope-from <ematsumiya@suse.de>); Fri, 13 Nov 2026 15:59:30 +0000
+Date: Fri, 13 Nov 2026 12:59:28 -0300
+From: Enzo Matsumiya <ematsumiya@suse.de>
+To: Wong Steve <shyckless@gmail.com>
+Cc: pc@manguebit.org, linkinjeon@kernel.org, linux-cifs@vger.kernel.org, 
+	sprasad@microsoft.com, smfrench@gmail.com, ronniesahlberg@gmail.com, 
+	bharathsm@microsoft.com, linux-kernel@vger.kernel.org, 
+	daniel.birtwhistle@gehealthcare.com, samba-technical@lists.samba.org, tom@talpey.com
+Subject: Re: [PATCH] smb: client: fail SMB2 responses with a bad signature
+Message-ID: <avcoB7XgP3i0xd9C@suse.de>
+References: <20261113-smb2-sign-v1-1-937ee7c20f08@gmail.com>
+ <avb81ry-kS6GfWkO@suse.de>
+ <CA+X8Sdi6adfL0jr=t9jDoJ5M+AWHxAw7NzQaVaOoT4O+awfEPA@mail.gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -60,144 +113,88 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CA+X8Sdi6adfL0jr=t9jDoJ5M+AWHxAw7NzQaVaOoT4O+awfEPA@mail.gmail.com>
+X-Rspamd-Queue-Id: 06CFF21F07
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-13.51 / 50.00];
+	SUSE_INTERNAL_BYPASS(-9.00)[];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[12];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[manguebit.org,kernel.org,vger.kernel.org,microsoft.com,gmail.com,gehealthcare.com,lists.samba.org,talpey.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	MISSING_XM_UA(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:email]
+X-Spam-Score: -13.51
 
-Linus,
+On 11/13, Wong Steve wrote:
+>On 11/13, Enzo Matsumiya wrote:
+>> However, I still think the error should only be returned if signing is
+>> required (*) AND rc == -EACCES.
+>>
+>> Any other error should always be returned unconditionally.
+>>
+>> (*) Note that "signing required" at that point means that either/both
+>> client and server required signing, and the other side agreed -- it
+>> doesn't really matter who asked for it.
+>
+>Thanks for looking at it.
+>
+>I think the existing server->sign check already covers that.
+>cifs_enable_signing() only sets server->sign when the server requires
+>signing and the client allows it, or when the client requires it (mount
+>option or SecurityFlags) and the server supports it. Both sides merely
+>supporting signing doesn't turn it on.
+>
+>smb2_verify_signature() is only called under that check, so the new
+>return passes on -EACCES for a mismatch, and any other error from it
+>(e.g. from smb3_calc_signature()) as well.
+>
+>Is there a case I'm missing where server->sign is set but signing isn't
+>required in your sense?
 
-Please consider pulling these smb client fixes for v7.4-rc3.  Most of
-them fix silent data loss in writeback since the move to netfslib; the
-rest are memory-safety and smaller fixes.  All of them are for stable.
+Not really, you're 100% correct, sorry.
 
-Thanks,
-Paulo
+I just remembered that there's a very specific exception to that, and it's
+currently not handled;  SMB 3.1.1 tcon requests (!anonymous && !guest) are
+signed unconditionally, but the responses are never verified because
+they're gated by server->sign.
 
-----------------------------------------------------------------
-The following changes since commit 51b4bf5fe7c90ebf08599b9a3c7620b4a3fd4b22:
+While your patch fix this indirectly, I couldn't find in the spec
+whether such tcon responses should also fail if signing isn't required.
 
-  Merge tag 'cifs-fixes-7.4-rc1' of https://git.manguebit.org/linux (2026-1=
-0-30 13:40:03 -1000)
+Anyway, I think this can be discussed later in a follow up patch.
 
-are available in the Git repository at:
+@Paulo, @Namjae:
+Reviewed-by: Enzo Matsumiya <ematsumiya@suse.de>
 
-  https://git.manguebit.org/linux.git tags/cifs-fixes-7.4-rc3
 
-for you to fetch changes up to 25912ed3b75dcf5ff623dcb549b925dd0d0948f7:
+Cheers,
 
-  smb: client: flush deferred handles of other names before a hard link ope=
-n (2026-11-11 13:51:10 -0300)
-
-----------------------------------------------------------------
-smb client fixes for v7.4-rc3
-
- - Fix silent data loss in writeback: since the move to netfslib a
-   transient failure (a reconnect, a lost handle, an interrupted wait,
-   -ENOMEM, or a task killed while close() flushes its dirty pages)
-   ended writeback with the folios clean and no error, dropping the
-   write; retry it instead, bounded by the hard and retrans mount
-   options, and have umount -f abort the retries and the reconnect and
-   credit waits so the unmount's own sync can't hang
-
- - Prefer a non-O_DIRECT handle for writeback, as Windows rejects
-   unaligned I/O on O_DIRECT handles and silently dropped about 1% of
-   the writes in generic/051
-
- - netfs: keep the prepare_read() and prepare_write() errno across a
-   reissue, and don't hang a read whose retry is abandoned (the
-   writeback fixes depend on these)
-
- - Fix an out-of-bounds write when compounding an encrypted SMB2_IOCTL
-   with a large input, which an unprivileged user can trigger with a
-   long symlink target
-
- - Fix an out-of-bounds read parsing a DFS target referral, and a double
-   conversion of the DFS path in setup_dfs_ref()
-
- - Validate security descriptor headers before allocating the query
-   result, and compare owner and group SIDs by their encoded lengths
-
- - Hold a server reference while queueing reconnect work so the server
-   can't be freed under the worker
-
- - Hold the inode across cifs_oplock_break() so dropping the handle
-   reference can't free it before the break is acknowledged
-
- - Flush an inode's deferred handles before opening another of its hard
-   links, so the open doesn't reuse the lease key under a mismatched
-   name and get rejected with STATUS_INVALID_PARAMETER
-
- - Skip a NULL channel in __cifs_put_smb_ses()
-
- - Bound the invalid NTLMSSP signature diagnostic
-
-----------------------------------------------------------------
-Andrey Misiurov (1):
-      smb: client: fix OOB write when compounding SMB2_IOCTL with encryption
-
-Fredric Cover (2):
-      smb: client: fix out-of-bounds read in dfs_parse_target_referral()
-      smb: client: fix double conversion of DFS path in setup_dfs_ref()
-
-Iv=C3=A1n Ezequiel Rodriguez (1):
-      netfs: preserve prepare_write errno on reissue
-
-Joseph Qi (3):
-      smb: client: skip NULL channel in __cifs_put_smb_ses()
-      smb: client: hold server ref while queueing reconnect work
-      smb: client: hold the inode across cifs_oplock_break()
-
-Paulo Alcantara (19):
-      smb: client: don't write back through O_DIRECT handles
-      netfs: keep the prepare_read errno when abandoning read retries
-      netfs: don't hang a read whose retry is abandoned
-      smb: client: let umount -f abort retried reads and writes
-      smb: client: don't give up writeback on the first replayable error
-      smb: client: don't retry failed writes forever regardless of mount op=
-tions
-      smb: client: don't spend read retries on reads cut short by a reconne=
-ct
-      smb: client: don't block dying tasks waiting for writeback on close
-      smb: client: issue writes from a worker if the task is dying
-      smb: client: don't fail writeback preparation if the task is dying
-      smb: client: retry writeback on interrupts and allocation failures
-      smb: client: don't block dying tasks waiting for writeback on fsync
-      smb: client: retry writes that couldn't be issued due to a reconnect
-      smb: client: retry writeback after losing the connection, share or ha=
-ndle
-      smb: client: let umount -f stop waiting for reconnects on hard mounts
-      smb: client: don't replay handle reopens inside SMB2_open()
-      smb: client: fail writeback sends and reopens fast when the server is=
- gone
-      smb: client: stop reconnecting and replaying during a forced unmount
-      smb: client: flush deferred handles of other names before a hard link=
- open
-
-Yifan Zhang (1):
-      smb: client: bound invalid NTLMSSP signature diagnostic
-
-liuyong (2):
-      smb: client: validate descriptor headers before query result allocati=
-on
-      smb: client: compare owner and group SIDs using their encoded lengths
-
- fs/netfs/read_retry.c      |  17 +-
- fs/netfs/write_issue.c     |   4 +-
- fs/smb/client/cifs_fs_sb.h |   2 +
- fs/smb/client/cifsacl.c    |   5 +-
- fs/smb/client/cifsacl.h    |  14 -
- fs/smb/client/cifsfs.c     | 186 ++++++++++---
- fs/smb/client/cifsglob.h   |  50 +++-
- fs/smb/client/cifsproto.h  |  12 +-
- fs/smb/client/cifssmb.c    |  15 +-
- fs/smb/client/connect.c    |  78 +++++-
- fs/smb/client/dfs.c        |  12 +-
- fs/smb/client/file.c       | 667 +++++++++++++++++++++++++++++++++++++++++=
-+---
- fs/smb/client/misc.c       |  22 +-
- fs/smb/client/sess.c       |   4 +-
- fs/smb/client/smb2file.c   |  18 +-
- fs/smb/client/smb2ops.c    |  22 +-
- fs/smb/client/smb2pdu.c    | 206 ++++++++++----
- fs/smb/client/smb2proto.h  |   9 +
- fs/smb/client/transport.c  |  22 +-
- 19 files changed, 1158 insertions(+), 207 deletions(-)
+Enzo
