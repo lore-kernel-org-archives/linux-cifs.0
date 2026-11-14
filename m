@@ -1,99 +1,127 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.139
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794656986;
-	b=uu/jWdv960B4qICWcmA3uYAtmWfd9aO7pj3YwoHsE0Zta1zli30NXBA3wE6khpPiUVlZ
-	 v7BmJA2qSusxhV9t3FEpA+wT40/igmZF2Ds9RajThiXXsswKpi39Hr865hpe5HUMfdeOz
-	 +ezFsYioZrYtFs1eBY/ZFLjNgfa1mSZgKaa5AnN25ryTPDlVDBpKAY1W7LbTIpwQB3mqw
-	 +dv3R3IOObIzT+LB5BsXNgPu8MHED/pz3XlFWa4FXA9cqjmGV0/WbVg9uOYBysRDw0Hs3
-	 4fLlTzB8BtirUq3xoRtwoWfgxP3s8u4vMV+7KtZh34xsZZkcoXVKI1YOYgT4ut9N06g==
+	t=1794672224;
+	b=wAQmQebgxJxEm47zB3ZhvsMH6KcuoKcAFfBCAj+nFcBjGKXX/pjEU0swVeubHf+Y8XwL
+	 FdVa2BLU0ZeseO7rzUvnngM/ZL38FGMq4mQh3TlvYdlohfaYSx/L5FWTgxK+IOBCI4wdc
+	 YZd2lbcSFo4hgsnf+rvWVYd2iEJyuQzsTdffiJxQxviVSn4q+B5xQozz56PqxucBlPTkO
+	 QjOffgMcREcno9EdVXInx+YdLfEcZm+K5JoQB4DPpG6fZCCEyxTCgpDi+k16v1TtnvoHU
+	 2mHJHUKm545mrLJWZV7kJNpbLmr5WPI1yo72l/wR0dgJmnfipzahXqlbNxtPyFe7RFw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794656986;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=SBkUY1cm8FOuS3mONVtBT6+r4R8usLgyPQkAfTyHpLA=;
-	b=hynH6xeySPtdakNCbxh+dCXalhrzAQc3F/q6b8N34NPRHBlRelYPiXZzsWxl4snzDPrB
-	 ZkXYqZ+9M9Zkytn88v+67256IKgnDLsjgXSLtXcKM+JQYvaHJrGOVphZRXCsaMGK1a+pb
-	 ANuJdwrcHrrkuMxF4CB7nb28d88RVo7P+Qy4XYuyS3WSp/Vl+BY4Fx71jXxPT7oBbVIqf
-	 tN43ewtAsKRGiZ6cw6XtIvv4HG5D4tgtGdfJd3LMVGAOfQhGRRSTl1WNIFJ4351aXzM21
-	 VD3/B8ZNjRO0iJXPNwZbx0g/lXLzk+lO9UXeo5BqTfEIrjpZWI5KMNHFYWLg4SFAO8w==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794672224;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=3tpJcsMXc0aeqXRbj+s5vAgoDF+CaAtCa+UvaxeoDr4=;
+	b=kMQGhcUolVKpPLbDudBYdnEO8TVi662gufFrAvb9Rblldy9ThOHVH7UULkW1rUhVvvqY
+	 YM2IlSORs/kCzvDtfMvoY9dZFFAsBMBOdRhHVsY72D+ljayf9+ZimvtuLK1vRwNNl9Fag
+	 rQEC8Y1R/9oaaJKG7kgC2n4OmXFntIuTVySzT9rv5bEithQKfYFOKWXuH6ltKmbn6PrIs
+	 Coi+6scE051gKRNwXio/kjnvrSjbMFE8SEqfngPRJRYNA9GGTxrkb45D2sd87P4C48Koo
+	 2/Dx0vyaq5ekYovEVDRfcwZDgnazbPJt6jwI1UTFliG1aLmS++huzqtzD0eVbrGR2iQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=cloudlinux.com;
-	spf=pass smtp.mailfrom=cloudlinux.com;
-	dkim=pass header.d=cloudlinux.com header.i=@cloudlinux.com header.a=rsa-sha256 header.s=google header.b=FIw3qrkg;
-	arc=none smtp.remote-ip=209.85.128.54
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=JAoWUZs+;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=vzE15vAo;
+	arc=none smtp.remote-ip=103.168.172.139
+Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071F1606A327
-	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 11:49:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 071F1606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cloudlinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudlinux.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43760606A32E
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 16:03:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 43760606A32E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudlinux.com header.i=@cloudlinux.com header.a=rsa-sha256 header.s=google header.b=FIw3qrkg
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4a1b07c3c5fso23259445e9.1
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 03:49:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudlinux.com; s=google; t=1794656984; x=1795261784; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=SBkUY1cm8FOuS3mONVtBT6+r4R8usLgyPQkAfTyHpLA=;
-        b=FIw3qrkg9ux8aDhj3wVhldGBe0oC3O8T88z58kmruFvtu8y/JyWeYfZAuBdrirwOTa
-         BMUpPg/d3evscMt70nBav/KGTQCiI1x/DbAlt2bB8wXoW6ldtJQbSQcfQ1wd+6aVKSYF
-         HS0pzgm1L7apqlW+esJ1yRZAEgKaTeP4Yh4EKBlqoYCophxz0tnUML62lSPSQlUMsOPH
-         1UhmU/6uLthLe+WlRwjPVZw1MgrotpGvMD8MKVMEFAiu2bN8nXMdmHfGgl/hP2lOAl8c
-         rNm5fTm36WH8Qi5ArHZ8LvlZpmbIIQjTBh+VDoUAT8UhfFkh/WQGIFnHjc+kUfGsUFo6
-         /KqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794656984; x=1795261784;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=SBkUY1cm8FOuS3mONVtBT6+r4R8usLgyPQkAfTyHpLA=;
-        b=BdlEw98JW/qNlBrDr/msSAUlrAvUp8hWNIRwuTYhHAz6XOjThLKcpMZXbicUax7Qzc
-         tErVoX8B56QczpMopwGExgynKUAswgE2Hxr81XZgFNwPdGI3qgkQ0Nj77cEGI+GB5xKx
-         /vtPB8NHRZf8+QDPPAx2VOzmSqeupzN2xD9XY+6TN1hpG6Kbl4x6WxaFPIbIesm/kE4G
-         ic7N2nNx0cVnQd72mWTVnD8G2Dbo0BgIjfrl5O7Mr9Ght1nUpptLdylI3JELCR+D3QWO
-         VAKbeLModpI0Vwu0L9aoQPlWTvm2vyYYYrwqJ7F+99RsCXfffrX3ediyaDOGRYbsbBAn
-         cCxA==
-X-Forwarded-Encrypted: i=1; AL+hErGwye5mypuxBM+4lwF52RE16+AtlKLcq5zguaylmSjomyLR3vg9V7AINCZIb/uJkhSJr2IRAXMQPudB@vger.kernel.org
-X-Gm-Message-State: APuU4Z9g0c0kvigLMJe0eB/HMddGqql6MX31RAe8JuvzXqGUbPnYBzWr
-	u+LYxETxASjjiwYQ52wcflS/Vlcz/j+nb2Yp8D0jd+tTMKuhjzvr8mw2Y45sbEqom8Y=
-X-Gm-Gg: AYBFou1lEUrZJpnafcSxjpYFW63FEX5M9o7hes4E4xcleMNaToSh3bYcv0enQiZjxaO
-	aVBO/KeFWSmjNBIC6hABcmAIj+5H+anuZqy+6FtnR9iEL+38ZhSMdak0zJtf2vZ7qYlmgdZoIpX
-	7kO6ZG07inuqHSay5Sl5+3MmLlrSPpGDTbtNZUBUCYl5CeGDLoZrHmzy/2AGfxZi9dXTdQgxKQG
-	7/Kz3KUZ8PDtgMNNONxOitiaPfTLKBgvScxfzeuIQpB//FvsqQ2L6+/izcq4y+FpQrLr/yBbm+/
-	b890Rc7LC3FYIIou8x6VEmnUzKUAsEJfAfT5Gjae3jSN/PQXR536aLXC9a2tVkcP80bB+cA5s6J
-	OX2YAt67Tj0ZLaga1Mc37l1TB4VqWA0PP5EGtWzCvZj48w73ITUzB3E07O37KMUSKy1OO1Sk5x9
-	j5Hf1tCuGZa5HXOk3jljQp5UaEa/ukwfXCmhpEQpP/7E3rEC1BLMyuOXF90RnbXUyUsczg50Xlx
-	6Hlp32jS2LlzwTyY00Uvb3yPfs86LIenacEjVdeK2HssZJz6Lj5VpNKPJ+Ah8qwXxDnMludFTn8
-	DFOHtwXJ1fbBNV2/tvjH6d4LdCGoV3687DIreiqw+lRTldglL/LtRK0CiE6+qYrB2OHH+vEspKx
-	LvGTc
-X-Received: by 2002:a05:600c:3d92:b0:4ba:e7:ef3d with SMTP id 5b1f17b1804b1-4bb559f7044mr107872145e9.1.1794656984431;
-        Sat, 14 Nov 2026 03:49:44 -0800 (PST)
-Received: from localhost.localdomain (static.16.56.4.46.clients.your-server.de. [46.4.56.16])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb5671059bsm79079895e9.1.2026.11.14.03.49.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Nov 2026 03:49:44 -0800 (PST)
-From: Jaskaran Singh <jsingh@cloudlinux.com>
-To: stable@vger.kernel.org
-Cc: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	linkinjeon@kernel.org,
-	sfrench@samba.org,
-	stfrench@microsoft.com,
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=JAoWUZs+;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=vzE15vAo
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailflow.phl.internal (Postfix) with ESMTP id 5B4631381C55
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 11:03:42 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Sat, 14 Nov 2026 11:03:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1794672222; x=
+	1794679422; bh=3tpJcsMXc0aeqXRbj+s5vAgoDF+CaAtCa+UvaxeoDr4=; b=J
+	AoWUZs+EtMCpd9pU2f+8hv2G7TF5z04QTgCCqWYXZrXeY36rZltQB/97T7EkW4P2
+	szHdjmWTfqJtqoIw3ZiCuZsaAnBUsafkKcjROUTwmu+PUGfzRN46yRE7AeUPwl+o
+	bMWFpuDI0TSwJvUFaAAhCtiO89CbocYnWgvjzlCEBtetCTTQkZUflukuYk2UnNEd
+	t+RjmObEK+gLoNNeTE40p8wso9fcQpOdN2wbJsfq0iDPdzGtgFwyVzjYDGe+75AM
+	b4VFxa6THY3JIBVtwvbd6mDGi65E9xHmRD7ut2mNvNK7bsqVw+0uqZx5uzT5szgl
+	ncthACyjR2poV1qSTtDdQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1794672222; x=1794679422; bh=3
+	tpJcsMXc0aeqXRbj+s5vAgoDF+CaAtCa+UvaxeoDr4=; b=vzE15vAodfT7OSCPQ
+	y/Wj6YrrR2it8mqZQZ0jCTycbIAfx77U3krQG6N8GYeYwWL1lDEFiAn2yFO6Nkch
+	UVXtPiwLvxxVmbSGKRgUPTo3KXZHjkBlQPhm9t51Xic1fK65LzhxuAJX3e3isKCq
+	jYoKQQjTutoXCx6KW0bnmFtzUEQZgqXrBTvM6Em5YSXD53ug2IIqC0QhSFhn6525
+	7hHidbtMG8auCIyPNGM0JqvJ5QeJFGcWLbdQ93Us3mNlF05176YVBqpLPZKO98uz
+	vKcE/bLtbg/OHUH8sGWsg3IJf+SCithPP17mpFv7kFR5BsfoRP7RbKp/E6tBR8ok
+	ELlIw==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1794672222; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:vvdFdBj9Xvy2mR6XQtaMvJ27lyl3rJ5wH1Bz2ZOIVW3SQ3i
+	MpDIb5kMzlODEbxv9v5daFxiHl4M3+B+Ga3QLzD5XQAL53zYKJGEREIAbRgesxBH
+	4fnEwd4J5UxyhjaMX+rYeD7lZ+k5s5XS2zHcAssZz2mNGjJhb0YcYip2AOEG9V33
+	OOqR0WMe1BDStybbdg+sNQ4AV2Hv/4L1Y5Cl96/8TCcpdS9tRl9PgO6PQawYBFcY
+	9bgvYoBjoq91hE7nxFz+Q2bOh1chhVOJc+AFhkLS+YTQvC6iV1aqlmSBjCIOAnkw
+	IMbF4Us50cBZ9nXHpLyfh/GsgbS3cMMkwSm3CeA==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=11;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:G/p1ROslvOk1G9DKe1Y3rHUjedf/qSDUI+C1Sq7G1lo=:vi2diju4+RETOfW0Qo7eWLD38/CL9z0CN81jxOTskvE=;
+X-ME-Sender: <xms:XYb4anIOS0NL6rYeMLuYINpw08xsao_IT9LCSmoCxtxPvJc0lJGN6Q>
+    <xme:XYb4alzCh8QwKFTdNoEKTSS1aDn3qxjochIfAzteGhpzW1_JddavVVYurwVA8DKLa
+    lAeJbBWMlo6iGjxRKvB49QOtcTJTY_n8qezsLrhcdSdGCea1QJIKEtx>
+X-ME-Received: <xmr:XYb4alsf3qzl083ubC2EOBxlk3lkMbziknKxIYadc_kZfIJkUP0rAk4cEfoQ9QXn>
+X-ME-Proxy-Cause: dmFkZTFnmOkQdukqetTLW/QnGIvHAj9CfHD6mbbJyREt0FBmSh0C9osZVwR0I5xCLJ/1ck
+    fHUQB8vF6yiXmE9fWFkFBqCteutak/p6xTNeZfbB5wf4iOJGxTPsWX1nuxYrbeFHo03utX
+    YX1/0WiwUFfw92uWByY2+XEgRpSuaiWectstkdwnpShfS0ckY0uTq/vyKMNtg6+ea6GPQg
+    y42BqFa8DzQwRWHQAMSVBmzASdTli+2FyFBSxf0cQgeKGnqjNhnnMU/AnyGanY+jBBaS50
+    ux5H/9mrMlShs8az++VTlMk6ekDKhxasS9gF2TAYc8I+NiwgAZl+tU1CpeAY8MuMcCwnbJ
+    S/5iA4S5u/8bQ4/kkJlSzKgnur+sFBPo3nxqz2Z1Knxf2bNTOFY4z8WR8yHnoG7XgJVlz6
+    PyKsz4jryU/hJ4k4GSmfJjNUt4ydJg1qLSTWBJfU6pv6dv9+VkSFNO/8nalx3+s4jQS7vC
+    voXwC0J16YfogS8kSDhOU+pfh+M55Tj0Ata5e97n6asaYS+iwnsxpVxylYqhZRKvPMpSmX
+    GOYHGCzZeQ1AMFdbIWljxO1AmaJdUnkB0Fd19e2Dn1lufnH6fbr3O9sgYYepscS+/R7uLA
+    RwouDlhqn0GxeFz6ibKFI/ETWCHeznK+7cN3RCqmguOb8gV8aPtsQq0lNRIw
+X-ME-Proxy: <xmx:XYb4agAYqsVqyfyJbXBcCq1FK1avMVeXkNu-mxhWrR1ZYFQEsWlZVA>
+    <xmx:XYb4avEeyJLGMvmsGX_W-cmW-KfL_jr1mymd-bMTJjmKz12MVKA56g>
+    <xmx:XYb4aoDr00JenlqvukKbUy4SRpJJzXnlP4jkqQ65JgHFwU1cAMeZEg>
+    <xmx:XYb4atlGRSR1etsnAz7wiXL3-4j8oJTysUtXcDAUknXeEte-1IC_uw>
+    <xmx:Xob4anuPFvjx_AwEWDgbi-lTOdFzrpzuZj_8V6augtKG7ZBWBjt8FIv6>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 14 Nov 2026 11:03:40 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: koray.fra@gmail.com
+Cc: linkinjeon@kernel.org,
 	senozhatsky@chromium.org,
 	tom@talpey.com,
-	mmakassikis@freebox.fr,
+	chenxiaosong@chenxiaosong.com,
+	hyc.lee@gmail.com,
 	linux-cifs@vger.kernel.org,
-	jsingh@cloudlinux.com
-Subject: [PATCH 6.1.y] ksmbd: fix NULL pointer dereference in opinfo_put()
-Date: Sat, 14 Nov 2026 11:49:43 +0000
-Message-Id: <20261114114943.5122-1-jsingh@cloudlinux.com>
-X-Mailer: git-send-email 2.39.5
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>
+Subject: Re: [PATCH v2] ksmbd: decode and honor DOS attribute validity flags
+Date: Sat, 14 Nov 2026 10:03:32 -0600
+Message-ID: <20261114160332.2228435-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261114012736.639171-1-koray.fra@gmail.com>
+References: <20261114012736.639171-1-koray.fra@gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,51 +133,44 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit e1b21e606661 ("smb: server: fix use-after-free in smb2_open()")
-is the 6.1.y backport of upstream commit 1e689a561738 ("smb: server: fix
-use-after-free in smb2_open()"). It calls opinfo_put(opinfo)
-unconditionally at the end of smb2_open(). Upstream
-opinfo_put() returns early on a NULL opinfo since commit ee426bfb9d09
-("ksmbd: add refcnt to ksmbd_conn struct"), which is not in 6.1.y, so
-here it dereferences NULL whenever the open got no oplock info.
+Hi,
 
-smb_grant_oplock() allocates none for a directory opened without a v2
-lease, which is how clients open the share root, so the first
-"smbclient -c ls" or cifs mount against ksmbd oopses:
+There is an existing bug that matters when enabling these checks.
 
-  BUG: kernel NULL pointer dereference, address: 000000000000003c
-  RIP: 0010:opinfo_put+0x5/0x30 [ksmbd]
-  Call Trace:
-   smb2_open+0xbf9/0x1f80 [ksmbd]
-   handle_ksmbd_work+0x164/0x430 [ksmbd]
-   process_one_work+0x1c7/0x380
-   worker_thread+0x4d/0x380
+ksmbd stores DOS attributes and the client's creation time in
+user.DOSATTRIB. The xattr also contains flags saying which fields
+are valid. Currently, ndr_decode_dos_attr() reads the values but
+discards those flags.
 
-Return early from opinfo_put() on a NULL opinfo, as upstream does.
+When the sparse or compression code updates an existing xattr,
+it writes the creation time back but sets only
+XATTR_DOSINFO_ATTRIB. The time is still on disk, but its validity
+flag is missing. This has not affected the reported creation time
+because ksmbd currently reads it without checking the flag.
 
-The problem does not exist upstream; this fix is for 6.1.y only.
+Your patch preserves the flags on future updates. However, the new
+read-side checks also apply to xattrs that ksmbd has already written.
+Those files will stop reporting their stored creation time.
 
-Fixes: e1b21e606661 ("smb: server: fix use-after-free in smb2_open()")
-Assisted-by: Claude:claude-opus-5-5
-Signed-off-by: Jaskaran Singh <jsingh@cloudlinux.com>
----
- fs/smb/server/oplock.c | 3 +++
- 1 file changed, 3 insertions(+)
+For example, with DOS attribute storage enabled:
 
-diff --git a/fs/smb/server/oplock.c b/fs/smb/server/oplock.c
-index 932e31a20216..f4ed5bbbeb6e 100644
---- a/fs/smb/server/oplock.c
-+++ b/fs/smb/server/oplock.c
-@@ -196,6 +196,9 @@ static void opinfo_conn_put(struct oplock_info *opinfo)
- 
- void opinfo_put(struct oplock_info *opinfo)
- {
-+	if (!opinfo)
-+		return;
-+
- 	if (!atomic_dec_and_test(&opinfo->refcount))
- 		return;
- 
--- 
-2.43.7
+1. On the unpatched server, create a file over SMB and set its
+   creation time to a date different from its filesystem birth time.
+2. Make the file sparse. Its xattr retains the requested time, but
+   now has only XATTR_DOSINFO_ATTRIB set.
+3. Upgrade to the patched server and reopen the file.
 
+The server now reports the filesystem birth time instead of the
+client's time. Directory listings change too. On a filesystem without
+birth time support, the fallback is ctime.
+
+The affected writers are fsctl_set_sparse() and
+__ksmbd_vfs_set_compression(). Their existing-xattr path differs from
+the no-xattr case in the commit message: it writes flags 0x01, not
+0x51.
+
+I am not sure whether handling these old xattrs belongs in this patch
+or in a separate one. Namjae, what do you think?
+
+Thanks,
+Ian
