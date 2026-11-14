@@ -1,64 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794674974;
-	b=lAkCurQ4uzCUfDm03WBuQ44Wn00XRiebNf1whgnoUSng088cxqZSly9yoexIGrvNYop1
-	 uLSfji6fvqDKZNc7FBAo80eVWMnxTRKzXIW7P8os+Q/WIGCeygd9S80jgPzjGTCo7Pp1v
-	 WUFZ3GHgL2TH9wj7IHtJVOXq3SsZ4qU8zMAr/vJAy9NHwz7fFGKjtMN1j5DfrFMSPy2uB
-	 xAW/VYlTYtW1JTJ1SH8FSF8Gl/p35dX9OaKRhrgGPfzb4AbtU5LDMygbsAPUntu+SyOEW
-	 5aWVLG1R3Bisyg4gdzvWwTv2FFaC00FV5yP7ZPfmjYH7KNusIwT8dqZ2DAREeEIyYpQ==
+	t=1794678148;
+	b=wJxyfGHN5rKVC0MYT60HDj+cfVCH8YfHjdR89cnWOUuagtKZQQHhifKbPWPvgNoLLRSn
+	 fpG8TKhUJgQTQ7lsKaaqsvUDVtLNr8ECdhsGXpR34jBHvGZNrw4VeayczjSgJQUVQ5ma+
+	 Zmnl1oH+gcH+zoBsuYkI1F+vMGNw5iohsCDzVlmqsSY9CVx+lcq8XQFJ/VFaFS2AJDSO1
+	 mcb9i+9O4SucPzra700tx1v2W2+CYmeKLpS5kOkEHFXqu6yh5grp83pK0m9whOwmdQY3/
+	 femVckJKFBkhyHjzs9z391YX9tkqX/euRcz+oTt90KjJikg5bzlhBSbUyDXnMnBUTzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794674974;
-	h=Received:DKIM-Signature:Received:Subject:From:In-Reply-To:References:
-	 X-PR-Tracked-List-Id:X-PR-Tracked-Message-Id:X-PR-Tracked-Remote:
-	 X-PR-Tracked-Commit-Id:X-PR-Merge-Tree:X-PR-Merge-Refname:
-	 X-PR-Merge-Commit-Id:Message-Id:Date:To:Cc;
-	bh=R5PD87DXQGe5z4GXxFpUkZC/qGaFBbI9+9pX0FnLtN0=;
-	b=4ckSc6F3RCK7C51F/dlOegxM+FxR+Too9l/WhwnVWIqFnz4TDasHTudvzTgCvI6MkGlq
-	 wkbQSt09R8HZQgfEJbgQYaBvkEyiPH/c1revbcsiRSIJUwHhz5i0KJsOR8yqpd8jDq1FL
-	 wUMYcYkH4inNhI2x0IosJhwdWCXCbnL5S3/iVjdfawOOLf3sn2KmoG9KE59TVNShFoy5x
-	 rfhk33NBjwNigca7J4Vov2BTFNagMipRMXtWuPi0wsWObio9bdzvdo0WvxHcfm6axs/OV
-	 89cuEH/BxGh1IBnU9frZHnLD3T1ijVAut5Sd2RK8fv43WxY2XdL1nL1sXQVHEHepwXA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794678148;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=SP2UdcMIP5VB9DhKwSmYYPd7qcwbd0CEJPW2lwFlVpM=;
+	b=MLasL1M3GyV43X8wxDjCNjp422sTt86nhjKhM64fS+MvejQNjMU+4KxYVOaknZnVoZgE
+	 YcSfmco2SlgM7n52XGTSxntyrreCn6VucE4dltM3tGK55oIRPavnDjPQ2YU+kmhD5l13+
+	 DMYJtaIqE8bREg2Y5zZ/KoxLghSzMZHI7F3s1xD/WGu2YDk10V5ZzGoWu9NOBlv0dU7T6
+	 JtzGxVPCr77fVXc84+2m6L55ummR5HSrjodLsnhtpH6xai4Na1e0Oc+uJqjG0LJGN8RMY
+	 3XQJh4RUJNlmiv2X3mvGga/1bwHq0bo4QamS/L7HPKZUlUgbGBtAdRwOqp/FxH9VRnA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E2YrsNPc;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LFfZbYCv;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8CA606A33E;
-	Sat, 14 Nov 2026 16:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726E0606A327;
+	Sat, 14 Nov 2026 17:42:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=E2YrsNPc
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE091F000CA;
-	Sat, 14 Nov 2026 16:49:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=LFfZbYCv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBAD71F000C5;
+	Sat, 14 Nov 2026 17:42:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794674973;
-	bh=R5PD87DXQGe5z4GXxFpUkZC/qGaFBbI9+9pX0FnLtN0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=E2YrsNPcVSo1f3iz0IMlCHAK1Y39CshGCKYPMGEYAuDIljUJEHFNE1qUVwGwjeEl0
-	 Jwucxzblqy6p9ObBvvLZ08a/OtxR/JlR7HDCqktoivS8+bf378iUjL0lnaga8qlc+E
-	 9E095TgC2mfP7WKB0JT5kOVIUpYalmspYVIjBKhhrq1q2C6rbpl+zIGW1Ev31rARcy
-	 Lnt5UX3cUGFCgV9ugsRTbcUApLjcQYX22goUu9tA5YgAsO/oDQtnZKeJ8JzgLu7Nvd
-	 QQdZEOTSldRP56q1Em8laPl7bQBIxXT340icuNnnSOaAU10gn0qbzr7SHKi3Hy3Hu3
-	 8tiX3Kdx5kKwA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B4519380821F;
-	Sat, 14 Nov 2026 16:49:33 +0000 (UTC)
-Subject: Re: [GIT PULL] ksmbd server fixes for 7.4-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <CAKYAXd8oLzyQkLpZ9AFxVc=GvdN1GTYN3yGOcV-n0U7uPGrPQQ@mail.gmail.com>
-References: <CAKYAXd8oLzyQkLpZ9AFxVc=GvdN1GTYN3yGOcV-n0U7uPGrPQQ@mail.gmail.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <CAKYAXd8oLzyQkLpZ9AFxVc=GvdN1GTYN3yGOcV-n0U7uPGrPQQ@mail.gmail.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/linkinjeon/smb.git tags/ksmbd-for-7.4-rc3
-X-PR-Tracked-Commit-Id: b0af9a3e6b1534d353ca6ac23caaf46127f62e4a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cba88960471ac67635080708b67ed5c2a2e4e9fd
-Message-Id: <179467497224.2233204.15080018499468700811.pr-tracker-bot@kernel.org>
-Date: Sat, 14 Nov 2026 16:49:32 +0000
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+	s=k20260515; t=1794678148;
+	bh=SP2UdcMIP5VB9DhKwSmYYPd7qcwbd0CEJPW2lwFlVpM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=LFfZbYCvv6RJXd6atmjDGirIasv6pjuUR0HGjgo4ofTdLqwJaecIOMbHZdpOt0dV3
+	 i9+1K7izagVaoQPsb397lafsF5qYxkcatr/+0/BuMeXSzsn3XkLR3YIzE9Sl+wTosR
+	 B1upQzGyxdhcOjbsuUxQcP48TVQWj8IPUr8wphddu81L5IQtqf3KXRwbVi5Aife1XV
+	 ymknfR66KHXn/pkRO9qLDaJ1pTGMkVo96cQfdsevw7wB7kZ5Q+9IxpykNhqi9rUjsX
+	 72SW+MZknrQYjVm3AxtueW9fijt5i9gIcV8ji8A+MKirjYMvZKpDXPpn32llZ3sGSF
+	 MgqwZYZeWHoGw==
+From: Sasha Levin <sashal@kernel.org>
+To: stable@vger.kernel.org
+Cc: Sasha Levin <sashal@kernel.org>,
+	gregkh@linuxfoundation.org,
+	linkinjeon@kernel.org,
+	sfrench@samba.org,
+	stfrench@microsoft.com,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	mmakassikis@freebox.fr,
+	linux-cifs@vger.kernel.org,
+	jsingh@cloudlinux.com
+Subject: Re: [PATCH 6.1.y] ksmbd: fix NULL pointer dereference in opinfo_put()
+Date: Sat, 14 Nov 2026 12:42:14 -0500
+Message-ID: <draft-agent5-0003-re-ksmbd-opinfo-put-61@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20261114114943.5122-1-jsingh@cloudlinux.com>
+References: <20261114114943.5122-1-jsingh@cloudlinux.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -67,16 +65,17 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Sat, 14 Nov 2026 14:29:14 +0900:
+On 2026-11-14, Jaskaran Singh <jsingh@cloudlinux.com> wrote:
+> The problem does not exist upstream; this fix is for 6.1.y only.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/linkinjeon/smb.git tags/ksmbd-for-7.4-rc3
+Thanks. Since this has no upstream commit and only exists for 6.1.y, I would
+like an ack from the ksmbd maintainers before queueing it.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cba88960471ac67635080708b67ed5c2a2e4e9fd
-
-Thank you!
+Namjae, could you take a look?
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks,
+Sasha
