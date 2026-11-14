@@ -1,95 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794619679;
-	b=mjU/wIJabA5TURKWCGEVNMmw2CJg3ZLKJP4c878Yv/3MhzTJc2Pxmvo6yEKHzpao72lS
-	 WcuX0RAJA7hZL5L2aOpxjemdaIzQAPGN6JEFparggwy/hXX52Yd+b7y0mCUsD0Mvc2rz3
-	 zf7OrSgbLtyeBvoPY+bZ8irtU9Tm2k8k8ZEDBvasW77DP1F0E2Yh3JlErXF0V8okLCsJr
-	 LRKUi6ZIVc34H5K8lZ7JNdOjxDtVbm2Yie5Fsk8kD3fsKhoR8OBvTXkadTL8biXicoB3E
-	 6cdM3PEU1ZyZE5o6w5hGh30e2vQHoZHtdzb6Pj8I3yT1iqJcF+pJrADlA0ZroLoGiIQ==
+	t=1794634169;
+	b=IeWPgGUiuzbJJkAPoY05zOi8zrRFuz6S/G/HYcKCcYl31cdkAHgqPMED1pLin6zN2U/J
+	 hOah8I8dGfZsOL4AdhR3So4zFWGzWA1bMZdF89Rb4puUuLlP+SOfl0kkJ0CxYqe603v+j
+	 H9DYbeJwBXb3Hcse8FKXW9TZE5W658+GSkrHwJkZkHS0apmi9bX729nuVZobSGEhXGeZW
+	 +Xacr0G8Sv3F5DohNXnWovoT3AtJl0mUlWjKlSXvldihoL3M93dCFAKc4S40Z8rylN06i
+	 tLMelbpx0rAKMJ7Hrlf44vEJMInn5li4Jg4bSfQtMD2euNYhL10cNjshtnz5aJ9Fn7Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794619679;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=6CvH9xDs6NNAjm4CdXogsoT63KOhmd6mIYSEOWAkQKA=;
-	b=k6XZJChv5k/pQSRxLoQamn3iaBHXZNnFAzamAjyTrVkvOUsliHugBwovSgUZNEd3hTeU
-	 4A26RwbZkVOZlzRZAwupN5v9DFez+/4eEjlAxD5sWcKGmiCjP5prrvsCMiBrfDoypkwIf
-	 F5FC86Aym8nd9TrueX/kuP+sFLVWO/2YqNr1HQ7eElzZGkxx15OFOSpYkaEvhqqTEP9NG
-	 VnAMkk3PHF7qflBvJqmV1bj48IzaeRMgmPdz5zBd3crVGndmBdRY4YynRbhHC5ZRTJ2IP
-	 HwMZYdWAY0Gbac7nRCW99QgijnUWaH9DKu9GuvkQaFTLddrpdpLZ8/QO0aZ2t/wXdgw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794634169;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:From:Date:
+	 X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=uM796BQB6ycmrFIWzMEeX2i4plvDgCgY8fOJiwq52UE=;
+	b=nc6D1u/9Sdof4EKno+53g/KsTzaZzBYVSta9+ESqinyH/8zC3yFi3juTeP1wEkBd7h63
+	 wXxncvQJkvCb3m/VzCU6X4ovGFw4WOY1LH6EexSaU1oskKu/kbGjLtSYZNJ2zwqm/CMaC
+	 oqBpDQdLAMCy2Z2qZInc6hVph5Xc5ZNZoIAjvoTtAT6mUqIqQKFlN4hNHnhl3teC0Ziiz
+	 knlpQKvdW1/bbmiSOuaF2mhmH8jBGe45uNBprroobKrGhkDHT5Ybw2hyWNwbIIjImzZ7p
+	 dZ/C96UtpRjnKUA3gARLdJda6+8GhKhCg/rtjRoLCsbFeOklqIh+I4NaY0KHQk4kv6w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=B6VMhVGV;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kenupOW4;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B099F606A32E
-	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 01:27:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B099F606A32E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 257BC606A329
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 05:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=B6VMhVGV
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a2000d5fb1so7648655e9.1
-        for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 17:27:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794619677; x=1795224477; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=6CvH9xDs6NNAjm4CdXogsoT63KOhmd6mIYSEOWAkQKA=;
-        b=B6VMhVGVelQ9ZrSDC03pRf4miM7zCDR9HUs2ANt98LCkadIWUyeYORv3dqoYws0ndV
-         /q6lhXmAjYSkJkCizR+vwNLly8V5y76WkHz1ESTA2rDEE4VTYnfZpuqA4AF4SGWeghLW
-         njas1NYqvep3tyNevmQWOCOoqnzu16DWaA8iXiEutmUGiHx0IbknsjrhCqPmpE6wbP5F
-         upNqJaHz7K/B1yTyjOWY8xh4PtDAzLi6524msoRpDVQqBKMOJcuZWv24LYCakgDn5Y1t
-         dWNJdWNW5lwVOnOz8ugGME3GtlyFsZ5VrG1727tZH55R+N3skVd0J5lB/n+AMC/T5672
-         BCEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794619677; x=1795224477;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=6CvH9xDs6NNAjm4CdXogsoT63KOhmd6mIYSEOWAkQKA=;
-        b=FyEyzecJjIn79JxGCEMgTm2e5SH3ffAdiS7AHw0YZ6UjuDqqLEg30UUisG34EuFnBz
-         sdxRb4J/8KY78IWWu9K9hCg9ggKofbGPX56AafmZGWFSTHL2JfZY15R9SFJBe6SHTsby
-         rYbtDKQhZVwfMhWGaIv8vGIcvOlBvPmWSpTo/nnJy89AUQ4hk89ZIHoZH+ODZjJqtI3e
-         DRyKV25vO7bXEtzP6Ka4Y3eDIOnKMjjbq2KUIo3/7T3p6OnopMqFIBmxNVC6qWWWBI6T
-         f/jirK/2a8VvXdWuZsS8tpA944trvFfICezp11Lt40AU25+Rb9rQPydcRalrxNBjfOhm
-         iOOA==
-X-Forwarded-Encrypted: i=1; AL+hErG3XjWUGF6L2uGmVYlaf1lWawj1hjnr4ohNVgu8CVYsa6JsBvIjHhe0d0z3CTyYI9ZPjxXzt7zbHmg/@vger.kernel.org
-X-Gm-Message-State: APuU4Z9LrSQ+FA32dtqutFif+3EIl54hWYeIFCooD7WTHGwL/T97tJi6
-	RxZvP1HYqe/0IFdOW3QnExYxP/GFGLugz2u5GXm1+uek4zk+DJyOv/rJWoL6dSX4
-X-Gm-Gg: AYBFou18zaY6dVnnZiwydo0fethEFWuEP2R6y7Hk/I06k0/sJeN9Y+PzUdh4Ggpfpab
-	DBm2svDHG8FEhORK1+dWMqfnUileRifkKtxnML1uBWoEvyWwpQrzLVADNfHzXUAKhpvwp8iPFc8
-	gFmPs70cp7d8rk795RhNs66isx+ZPIhttGz4qepzEGz4DaD4zupFJqvJf1QAHhrYsAStejqAHNH
-	P/EYqTc5tjLlgLhzkfdMpt5BPSJr69xitiIcSYl3+z2IcUO9PIvG5KUQmsobFOCUvSgWB4Odw06
-	jEiK1SJKPnmKp1Ch33xGkiJa3vwg7mMToPjbfcU7tmhq6wxcxW1A5m8rGvp+SHzzQHesK9ZHQrK
-	DsfSvpXBpWcC1la5q/Bzsu2BgMWJuj4IaYnywfZGrBCNsqke+J3H+Clbv1NprR8mBlNQYLyAQJG
-	p1x3HwDRmJ0w38dTBVaQr/uJaaXlGgqh2IdLmru2IVuu2XNMyprzq8cQQWAWCC3rPMdR2ALWiA0
-	nhq7TlQ0iiVVPLBgTGXX23nqw8zlDe23OVKPPW35HcP/48MggQ4vzX5s1kD6mrTCxpuMPMvXAO9
-	4mX8G+mLAQVcTYaxMh4A0yTt
-X-Received: by 2002:a5d:5f46:0:b0:48e:68d5:81a6 with SMTP id ffacd0b85a97d-49c72306b88mr9208114f8f.34.1794619676936;
-        Fri, 13 Nov 2026 17:27:56 -0800 (PST)
-Received: from infinity ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c609c602dsm7904342f8f.46.2026.11.13.17.27.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Nov 2026 17:27:56 -0800 (PST)
-From: koraynilay <koray.fra@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	koraynilay <koray.fra@gmail.com>
-Subject: [PATCH v2] ksmbd: decode and honor DOS attribute validity flags
-Date: Sat, 14 Nov 2026 02:27:36 +0100
-Message-ID: <20261114012736.639171-1-koray.fra@gmail.com>
-X-Mailer: git-send-email 2.56.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=kenupOW4
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FFDA1F000C6
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 05:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794634168;
+	bh=uM796BQB6ycmrFIWzMEeX2i4plvDgCgY8fOJiwq52UE=;
+	h=From:Date:Subject:To:Cc;
+	b=kenupOW4lfaOdYPTzgGL118op9FCVAxavx52Flyr7l1ppaX3LqqNQFnmGnojjBA5z
+	 whSP+2ox3yAapZRamWQ8VanG+/XTgvnj88iIqvw4yEsbD1w12u9rVjx+Hknd4DLQMD
+	 p+WrMzBifrxB1c/elVR2vRp2Zc5ofyeEecULlUr1i7dcfSUxkEnNxSh7keIBhNhJWi
+	 myTNG9rzuygSVg7qwE1nBMXFXa6Fo94hAIiNYqldPfxcy/Wi++6Dm3GomfpnRiKeJ0
+	 8SpCnYMkVsU02+oIRnMEVaFojb0J/PWl3ZA99WXoNIQoeV4W9F0yzVa3ZNzcWXdauB
+	 csQKB5Kr2Jdsw==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-c50bf13091eso4800566b.2
+        for <linux-cifs@vger.kernel.org>; Fri, 13 Nov 2026 21:29:28 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFEx/O0nRTK99WZXPiV2DfORi8k8dMl0WLzn/NPXmcqzEFvWwH7Vm3zqH8D96QxV1mKiP0wmIvPQtHP@vger.kernel.org
+X-Gm-Message-State: APuU4Z9nRcSAp0pcr5RQSfEjFPvJyAcGiIiSXR8F9Q4e8pk5JHgyojWe
+	kC5cFMVWz0O73W8pc4fia4N0E/UhNpFtT0j2yy/n2eyWM3cX2Ao2egGUNFVsYTHVnlOitPe1CV5
+	+EbMuTMlU8yHy7viwh6+tE+ddR85Yon4=
+X-Received: by 2002:a17:906:12d7:b0:c50:ac4e:3770 with SMTP id
+ a640c23a62f3a-c50ac4e5041mr133330466b.34.1794634166974; Fri, 13 Nov 2026
+ 21:29:26 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -99,300 +59,96 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 14 Nov 2026 14:29:14 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8oLzyQkLpZ9AFxVc=GvdN1GTYN3yGOcV-n0U7uPGrPQQ@mail.gmail.com>
+X-Gm-Features: AclHuK8tCaw3EDMrmZHa0qZVz4dqKOIao8TDfIpYGT4hD_V7e3XYydoY-qkkWoY
+Message-ID: <CAKYAXd8oLzyQkLpZ9AFxVc=GvdN1GTYN3yGOcV-n0U7uPGrPQQ@mail.gmail.com>
+Subject: [GIT PULL] ksmbd server fixes for 7.4-rc3
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, CIFS <linux-cifs@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Currently, when setting file attributes via FSCTL_SET_SPARSE,
-FSCTL_SET_COMPRESSION or FileBasicInformation, ksmbd hardcodes
-flags = 0x51 (XATTR_DOSINFO_ATTRIB | XATTR_DOSINFO_CREATE_TIME |
-XATTR_DOSINFO_ITIME). This injects unrequested creation time and itime
-into user.DOSATTRIB on disk, even though the client only requested an
-attribute modification.
+Hi Linus,
 
-Furthermore, ndr_decode_dos_attr() discards the validity flags on read
-by reading them into NULL. When reading a file with an attribute-only
-xattr (flags = 0x01, where create_time on disk is 0), ksmbd treats the 0
-as a valid timestamp and reports NTTIME(0) instead of falling back to
-the underlying filesystem's btime. Modifying any attribute via
-set_file_basic_info() then clobbers the xattr back to 0x51.
+This is ksmbd server fixes pull request for v7.4-rc3. I add a description o=
+f
+this pull request below. Please pull ksmbd with following ones.
 
-Fix this by:
-1. decoding da->flags in ndr_decode_dos_attr() and only updating
-   create_time and itime if their validity flags are set (in
-   smb2_update_xattrs() and ksmbd_vfs_fill_dentry_attrs());
-2. reading existing attributes and only setting XATTR_DOSINFO_ATTRIB in
-   fsctl_set_sparse(), __ksmbd_vfs_set_compression(), and
-   set_file_basic_info() so unrequested timestamps are not injected.
+Thanks!
 
-Reproducer, with /tmp as the local filesystem folder exported as [test]
-in ksmbd.conf and /mnt as the smb folder mounted with mount -t cifs:
+The following changes since commit fa4ad798f6f681031775266044ba1b0cf3c670bd=
+:
 
-  mount -t cifs //127.0.0.1/test /mnt -o username=user,password=pass
+  Merge tag 'for-7.4-rc1-tag' of
+git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux (2026-11-07
+13:52:02 -0800)
 
-test with sparse (for compression, use chattr +c instead of fallocate):
+are available in the Git repository at:
 
-  echo data > /tmp/sparse.txt
-  chmod 777 /tmp/sparse.txt
+  git://git.kernel.org/pub/scm/linux/kernel/git/linkinjeon/smb.git
+tags/ksmbd-for-7.4-rc3
 
-  stat -c 'Local btime (%n): %w' /tmp/sparse.txt
-  getfattr -n user.DOSATTRIB -e hex /tmp/sparse.txt
+for you to fetch changes up to b0af9a3e6b1534d353ca6ac23caaf46127f62e4a:
 
-  # punching hole via CIFS triggers FSCTL_SET_SPARSE
-  fallocate -p -o 0 -l 4 /mnt/sparse.txt
-  getfattr -n user.DOSATTRIB -e hex /tmp/sparse.txt
+  ksmbd: keep group denials when a POSIX ACL entry decides access
+(2026-11-10 23:56:21 +0900)
 
-  stat -c 'CIFS btime (%n):  %w' /mnt/sparse.txt
-  smbclient //127.0.0.1/test -U user%pass -c 'allinfo sparse.txt'
+----------------------------------------------------------------
+- Evaluate explicit-access requests in DACL order with exact SID matching,
+  and prevent guest and anonymous sessions from matching Authenticated
+  Users.
 
-  # evict cache so btime is read fresh again
-  umount /mnt
-  mount -t cifs //127.0.0.1/test /mnt -o username=user,password=pass
-  stat -c 'CIFS btime (%n):  %w' /mnt/sparse.txt
+- Apply Unix group and OWNER RIGHTS ACEs, and keep their denials
+  when POSIX ACL fallback determines access.
 
-which prints:
+- Allow the parent directory=E2=80=99s DACL to grant explicitly requested D=
+ELETE
+  and FILE_READ_ATTRIBUTES through FILE_DELETE_CHILD and FILE_LIST_DIRECTOR=
+Y.
 
-  Local btime (/tmp/sparse.txt): 2026-11-13 21:13:27.167926440 +0000
-  /tmp/sparse.txt: user.DOSATTRIB: No such attribute
+- Exclude metadata-only file and stream opens from sharing conflicts and
+  stream delete-sharing checks, while accounting for writes implied by
+  overwrites and named-stream creation.
 
-  # file: tmp/sparse.txt
-  user.DOSATTRIB=0x000004000400000051000000200200000000000000000000209542d3b373dd01
-     0x51 = 0x1 | 0x10 | 0x40 -----^^         |      unrequested --^^^^^^^^^^^^^^^^
-   (ATTRIB | CREATE_TIME | ITIME)             |   creation time = btime
-                                     SPARSE --^
-  CIFS btime (/mnt/sparse.txt):  2026-11-13 21:13:27.167926400 +0000
-  [...]
-  create_time:    Fri Nov 13 21:13:27 2026 UTC
-  [...]
-  CIFS btime (/mnt/sparse.txt):  2026-11-13 21:13:27.167926400 +0000
+- Return STATUS_ACCESS_DENIED for reads on files lacking FMODE_READ,
+  preventing warnings in __kernel_read() and potential panics.
 
-test with setmode:
+- Pin parent dentries during SMB2 CREATE permission, status, and ACL
+  inheritance operations to prevent use-after-free races with concurrent
+  rename and removal.
 
-  echo data > /tmp/attrib.txt
-  chmod 777 /tmp/attrib.txt
+- Keep expired sessions bound to their original user during NTLM
+  reauthentication, preventing identity changes and a user-object leak.
 
-  stat -c 'Local btime (%n): %w' /tmp/attrib.txt
-  getfattr -n user.DOSATTRIB -e hex /tmp/attrib.txt
+----------------------------------------------------------------
+Ian Bridges (6):
+      ksmbd: grant a caller what its groups and OWNER RIGHTS ACEs allow
+      ksmbd: skip metadata-only opens in sharing checks
+      ksmbd: skip metadata-only stream opens in the delete check
+      ksmbd: evaluate the DACL in order for explicit access requests
+      ksmbd: let the parent's DACL grant DELETE and FILE_READ_ATTRIBUTES
+      ksmbd: keep group denials when a POSIX ACL entry decides access
 
-  # modify attribute via CIFS
-  smbclient //127.0.0.1/test -U user%pass -c 'setmode attrib.txt +r'
-  getfattr -n user.DOSATTRIB -e hex /tmp/attrib.txt
+Jiwoo Kim (1):
+      ksmbd: pin parent dentries in SMB2 CREATE ACL path
 
-  stat -c 'CIFS btime (%n):  %w' /mnt/attrib.txt
-  smbclient //127.0.0.1/test -U user%pass -c 'allinfo attrib.txt'
+Michail Andreas Michalopoulos (1):
+      ksmbd: refuse reauthentication of an expired session as another user
 
-  # evict cache so btime is read fresh again
-  umount /mnt
-  mount -t cifs //127.0.0.1/test /mnt -o username=user,password=pass
-  stat -c 'CIFS btime (%n):  %w' /mnt/attrib.txt
+Wahid Khan (1):
+      ksmbd: refuse to read a handle that is not open for reading
 
-which prints:
-
-  Local btime (/tmp/attrib.txt): 2026-11-13 21:13:27.195647069 +0000
-  /tmp/attrib.txt: user.DOSATTRIB: No such attribute
-
-  # file: tmp/attrib.txt
-  user.DOSATTRIB=0x000004000400000051000000210000000000000000000000f6cf46d3b373dd01
-     0x51 = 0x1 | 0x10 | 0x40 -----^^       |        unrequested --^^^^^^^^^^^^^^^^
-   (ATTRIB | CREATE_TIME | ITIME)           |     creation time = btime
-                                 READONLY --^
-  CIFS btime (/mnt/attrib.txt):  2026-11-13 21:13:27.195647000 +0000
-  [...]
-  create_time:    Fri Nov 13 21:13:27 2026 UTC
-  [...]
-  CIFS btime (/mnt/attrib.txt):  2026-11-13 21:13:27.195647000 +0000
-
-After this patch, the outputs should be:
-
-sparse:
-
-  Local btime (/tmp/sparse.txt): 2026-11-13 21:20:25.856425751 +0000
-  /tmp/sparse.txt: user.DOSATTRIB: No such attribute
-  # file: tmp/sparse.txt
-  user.DOSATTRIB=0x0000040004000000010000002002000000000000000000000000000000000000
-          0x01 = 0x1 (ATTRIB) -----^^         | no creation time --^^^^^^^^^^^^^^^^
-                                     SPARSE --^
-  CIFS btime (/mnt/sparse.txt):  2026-11-13 21:20:25.856425700 +0000
-  create_time:    Fri Nov 13 21:20:26 2026 UTC
-  CIFS btime (/mnt/sparse.txt):  2026-11-13 21:20:25.856425700 +0000
-
-setmode:
-
-  Local btime (/tmp/attrib.txt): 2026-11-13 21:20:25.976415893 +0000
-  /tmp/attrib.txt: user.DOSATTRIB: No such attribute
-  # file: tmp/attrib.txt
-  user.DOSATTRIB=0x0000040004000000010000002100000000000000000000000000000000000000
-          0x01 = 0x1 (ATTRIB) -----^^       |   no creation time --^^^^^^^^^^^^^^^^
-                                 READONLY --^
-  CIFS btime (/mnt/attrib.txt):  2026-11-13 21:20:25.976415800 +0000
-  create_time:    Fri Nov 13 21:20:26 2026 UTC
-  CIFS btime (/mnt/attrib.txt):  2026-11-13 21:20:25.976415800 +0000
-
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3") # ndr decode/basic info
-Fixes: f44158485826 ("cifsd: add file operations") # ksmbd_vfs_fill_dentry_attrs
-Fixes: 159e727f763d ("ksmbd: persist FSCTL_SET_SPARSE state") # sparse
-Fixes: 0fb327626ad9 ("ksmbd: support file compression attributes") # compression
-Cc: stable@vger.kernel.org
-Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.3
-Signed-off-by: koraynilay <koray.fra@gmail.com>
----
-v2 changes:
-- Check XATTR_DOSINFO_ATTRIB on read in smb2_update_xattrs() and
-  ksmbd_vfs_fill_dentry_attrs() to prevent overwriting in-memory attributes
-  with 0 when an xattr lacks DOS attributes (found by sashiko[2]);
-- unconditionally preserve current attributes and set XATTR_DOSINFO_ATTRIB
-  in set_file_basic_info() so setting CreationTime alone does not write
-  zeroed attributes to disk (found by sashiko[2]);
-- decode version 3 fields (ea_size, size, alloc_size, change_time) in
-  ndr_decode_dos_attr() instead of reading into NULL so preserving flags on
-  version 3 xattrs retains their values (found by sashiko[2]).
-
-This should be (hopefully) the last of the fixes needed to implement ptime[1].
-Thanks for testing all of them and merging them <3
-
-Best,
-koraynilay
-
-[1]: https://lore.kernel.org/all/20261101015551.786044-1-koray.fra@gmail.com/T/#t
-[2]: https://sashiko.dev/#/patchset/20261113221610.392113-1-koray.fra%40gmail.com
-
-
- fs/smb/server/ndr.c     | 10 +++++-----
- fs/smb/server/smb2pdu.c | 34 ++++++++++++++++++++++------------
- fs/smb/server/vfs.c     | 11 +++++------
- 3 files changed, 32 insertions(+), 23 deletions(-)
-
-diff --git a/fs/smb/server/ndr.c b/fs/smb/server/ndr.c
-index 7e546c22e284..1376d5a59fc8 100644
---- a/fs/smb/server/ndr.c
-+++ b/fs/smb/server/ndr.c
-@@ -256,7 +256,7 @@ int ndr_decode_dos_attr(struct ndr *n, struct xattr_dos_attrib *da)
- 		return -EINVAL;
- 	}
- 
--	ret = ndr_read_int32(n, NULL);
-+	ret = ndr_read_int32(n, &da->flags);
- 	if (ret)
- 		return ret;
- 
-@@ -271,15 +271,15 @@ int ndr_decode_dos_attr(struct ndr *n, struct xattr_dos_attrib *da)
- 
- 		ret = ndr_read_int64(n, &da->create_time);
- 	} else {
--		ret = ndr_read_int32(n, NULL);
-+		ret = ndr_read_int32(n, &da->ea_size);
- 		if (ret)
- 			return ret;
- 
--		ret = ndr_read_int64(n, NULL);
-+		ret = ndr_read_int64(n, &da->size);
- 		if (ret)
- 			return ret;
- 
--		ret = ndr_read_int64(n, NULL);
-+		ret = ndr_read_int64(n, &da->alloc_size);
- 		if (ret)
- 			return ret;
- 
-@@ -287,7 +287,7 @@ int ndr_decode_dos_attr(struct ndr *n, struct xattr_dos_attrib *da)
- 		if (ret)
- 			return ret;
- 
--		ret = ndr_read_int64(n, NULL);
-+		ret = ndr_read_int64(n, &da->change_time);
- 	}
- 
- 	return ret;
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index dac7cd05e023..748061a0899d 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -3866,9 +3866,12 @@ static void smb2_update_xattrs(struct ksmbd_tree_connect *tcon,
- 					    path->dentry, &da);
- 	if (rc > 0) {
- 		if (store_dos_attrs) {
--			fp->f_ci->m_fattr = cpu_to_le32(da.attr);
--			fp->create_time = da.create_time;
--			fp->itime = da.itime;
-+			if (da.flags & XATTR_DOSINFO_ATTRIB)
-+				fp->f_ci->m_fattr = cpu_to_le32(da.attr);
-+			if (da.flags & XATTR_DOSINFO_CREATE_TIME)
-+				fp->create_time = da.create_time;
-+			if (da.flags & XATTR_DOSINFO_ITIME)
-+				fp->itime = da.itime;
- 		} else {
- 			fp->f_ci->m_fattr &=
- 				~(FILE_ATTRIBUTE_COMPRESSED_LE |
-@@ -9039,12 +9042,22 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 	    (crtime > 0 || file_info->Attributes)) {
- 		struct xattr_dos_attrib da = {0};
- 
--		da.version = 4;
--		da.itime = fp->itime;
--		da.create_time = fp->create_time;
-+		rc = ksmbd_vfs_get_dos_attrib_xattr(idmap, fp->filp->f_path.dentry, &da);
-+		if (rc <= 0) {
-+			da.version = 4;
-+			da.flags = 0;
-+		}
-+
-+		/*
-+		 * itime gets preserved when reading the xattr if already present
-+		 * otherwise don't write it as it wasn't asked for by the client
-+		 */
-+		if (crtime > 0) {
-+			da.create_time = fp->create_time;
-+			da.flags |= XATTR_DOSINFO_CREATE_TIME;
-+		}
- 		da.attr = le32_to_cpu(fp->f_ci->m_fattr);
--		da.flags = XATTR_DOSINFO_ATTRIB | XATTR_DOSINFO_CREATE_TIME |
--			XATTR_DOSINFO_ITIME;
-+		da.flags |= XATTR_DOSINFO_ATTRIB;
- 
- 		rc = ksmbd_vfs_set_dos_attrib_xattr(idmap, &filp->f_path, &da,
- 				true);
-@@ -11877,10 +11890,7 @@ static inline int fsctl_set_sparse(struct ksmbd_work *work, u64 id,
- 						     fp->filp->f_path.dentry, &da);
- 		if (ret <= 0) {
- 			da.version = 4;
--			da.itime = fp->itime;
--			da.create_time = fp->create_time;
--			da.flags = XATTR_DOSINFO_CREATE_TIME |
--				XATTR_DOSINFO_ITIME;
-+			da.flags = 0;
- 		}
- 
- 		da.attr = le32_to_cpu(fp->f_ci->m_fattr);
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 0c95d4668370..40d86abaad7a 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1935,8 +1935,10 @@ int ksmbd_vfs_fill_dentry_attrs(struct ksmbd_work *work,
- 
- 		rc = ksmbd_vfs_get_dos_attrib_xattr(idmap, dentry, &da);
- 		if (rc > 0) {
--			ksmbd_kstat->file_attributes = cpu_to_le32(da.attr);
--			ksmbd_kstat->create_time = da.create_time;
-+			if (da.flags & XATTR_DOSINFO_ATTRIB)
-+				ksmbd_kstat->file_attributes = cpu_to_le32(da.attr);
-+			if (da.flags & XATTR_DOSINFO_CREATE_TIME)
-+				ksmbd_kstat->create_time = da.create_time;
- 		} else {
- 			ksmbd_debug(VFS, "fail to load dos attribute.\n");
- 		}
-@@ -2475,10 +2477,7 @@ static int __ksmbd_vfs_set_compression(struct ksmbd_work *work,
- 		rc = ksmbd_vfs_get_dos_attrib_xattr(idmap, dentry, &da);
- 		if (rc <= 0) {
- 			da.version = 4;
--			da.itime = fp->itime;
--			da.create_time = fp->create_time;
--			da.flags = XATTR_DOSINFO_CREATE_TIME |
--				XATTR_DOSINFO_ITIME;
-+			da.flags = 0;
- 		}
- 
- 		da.attr = le32_to_cpu(fp->f_ci->m_fattr);
-
-base-commit: 2cc92355992022c1c6edad59499c49814e17cac0
-prerequisite-patch-id: 049ae0eba275b5be35a238833107e0b251a55aa2
--- 
-2.56.0
-
+ fs/smb/server/mgmt/user_config.h   |   5 +
+ fs/smb/server/smb2pdu.c            |  91 +++++++++---
+ fs/smb/server/smb_common.c         |  34 ++++-
+ fs/smb/server/smb_common.h         |   5 +
+ fs/smb/server/smbacl.c             | 291 ++++++++++++++++++++++++++++++---=
+----
+ fs/smb/server/smbacl.h             |   2 +-
+ fs/smb/server/tests/smbacl_kunit.c |   4 +-
+ fs/smb/server/vfs.c                |   4 +
+ fs/smb/server/vfs_cache.c          |   7 +-
+ fs/smb/server/vfs_cache.h          |   2 +
+ 10 files changed, 368 insertions(+), 77 deletions(-)
