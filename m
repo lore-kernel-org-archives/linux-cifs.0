@@ -1,83 +1,127 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.140
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794706497;
-	b=CHx00db2SocuYC+CZTGorzh1O9ZVjaTdFkdbK2+niQjFrsZJPioTt1IkerPfZoj9Z6In
-	 LdQqDTLxi99ZkY5U1dDQGk11moBepi0vb8Yo0uaF8Yt2puZC3fOMrOHjUVKdNonHj/rNI
-	 7DlmvQ7Z5ZaNGJsxsbnBa1mHRBxyV+GaTI7N4fffYiZ/x59YGGoV70jTELtQfTw3EA3JC
-	 gHtp+bADRHrIrJCvUG1ySJlUdrwGemS44Q/Am2lYfXufmtouc9ET5/+lqVrV92uJ2Qt9N
-	 7d1o7SeeYrM2WTuCDm/SKWUuUt8XpLSHlOltYGtGEvK3E5P8WinbwNLZMNsy6mXbMNw==
+	t=1794712037;
+	b=S/meFLsy5Mof0PjsnOQvf2cNwmbOl4Xy7dAM+D5ExaMcuL/oQFFaf5axqz+RlN4YLMKQ
+	 9v77Irv8Li6KfwhgZpL/z1wyHuum8iqn1MbiAK2ec+VWBXhHTj585rOGbOcGOOhOplA5e
+	 6fmSmqzQukbDxcnlHPBXT21UZ0dq4qWQ6ovQqiu68Gby/tSGw2N+jl29G5w58Ozo734vv
+	 1zkIPGTS3VjbDIkaQz707Vj/1gUaLDrIVLy1qi1yDxr7lwMBNXmn3tI+bTy4Qy50FQB04
+	 7QbDzzoFoFH3wfQVOmmhPYHWFJmQGQBYIDTz6KenIgWVzaQq+2GwMJvSMZ9snybdsAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794706497;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:X-Mailer:
-	 References:In-Reply-To;
-	bh=OMlLqSrjy+6LHFtfcGTg2faXloa2fdF0Up8sQHmX++U=;
-	b=mikfAET/Q9Ti0nqJ4loMDjzCuKjO72L6aegkmg/uwlyEf7UYTwkXM2lQzZJkl821xqBq
-	 0TbC+cEHfW0Swcp3bJDUe31boEuacEjymylWE22jB9zSlkzwiICFh+un8OTjpuJjNWTQ3
-	 QES1LfxtllmoN/gCSSvE2VUt0+Di8N/CqyeKvlFT2t1RLKTdQkrU24gJuL2qsFYVNxyos
-	 B34VIo5Y8vDXfMuSLQnAQFZLL5BFBS4kVwX7EbJR3zKb9SJuT6i3nFH4YJO1gOlLUZaAw
-	 rSxB/qK1IGO5xS3PNCP9EnLUHlDpQEi8TnkX7KdunZhnDzREOxBSE3vDgt/XmEQwrAw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794712037;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=gKN6VwWTajjvlUFrRVGdiB8bfxUd1ncQwyi3goNdenM=;
+	b=gS51bftevSKX7Fth3D/n/UcCS/AvHh7xPA3oUVVEtVC29OEn28QxjewcdGQDTH4Y0jUX
+	 ie0Cb6cVfftd44l6K5zxhJuSCQ0nsXQ/32jsg4gkJ8FjbxI5d9R2CA9QkkKxQsh0Dfn7B
+	 K0AH6zxck+tgANfLuV7FTcb016B6vrWdfgcdz7Jevfq1u1KMtUOS4qhK5EsxSPAzGYaKF
+	 U+vcM2iFVAGlqKF536kuzZ7zb1FxORhZJndM/CUEMBNhlHBbjQlQ0Rc2nuOqnMuPRxbXj
+	 4cY0uUEItvHQq7CaMTv3PmQnYK8HfolNl29EwprI3G+/iiLsxjxke9q1MGCL+JywZgA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NH91V7uH;
-	arc=none smtp.remote-ip=209.85.128.52
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=KJABPBQL;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=C+T1zwq7;
+	arc=none smtp.remote-ip=103.168.172.140
+Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930E0606A327
-	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 01:34:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 930E0606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5630606A327
+	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 03:07:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E5630606A327
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NH91V7uH
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4a2072b9832so18141315e9.1
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 17:34:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794706495; x=1795311295; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-type:mime-version:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=OMlLqSrjy+6LHFtfcGTg2faXloa2fdF0Up8sQHmX++U=;
-        b=NH91V7uHVhn4uThEXEM9hHqDiasPPqpuxi+21pKdirqLLIOHH4Yfp7qfsfVNoAx7V1
-         7u9TM3geCmMP5fv1vknYHs9ftD0PpWWcNLKQvzevKIFafFsUSg5K8hbjrqtC+vdDBrnB
-         gv4hzDTjOOpU1zWnFV/KgaPQX154tMKD6Yph+OYYePWqkv0tdKQVZeyTikq+v6XrrrMh
-         sRJIUpp4l7mKu8u3g9NIblJZLl6CHsNSuYWMwFrAYpAwIbIsaFCdhZCb/H1kkSm6dRt2
-         sdusnXONVx3bBUkali5uIGRvHdaWAl71JEslGKTRgur+cCBNrGO31Pq+yCMUux08xHi1
-         nQRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794706495; x=1795311295;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=OMlLqSrjy+6LHFtfcGTg2faXloa2fdF0Up8sQHmX++U=;
-        b=xioBr91oC/cJlZRFI+R8rfWjo7Cb69D4Ejjl0862QLmkh7cvR+rTxw6DjjKLDhnkFi
-         yadSC95J5lxJKcwBkKmlcrvOgqzNzGxlqpHu/xLM0P8LLVygTmI9WRaqQTQbVy9JxnCG
-         A4d1av1y40dfysENIuSXDaktMMZ9of1WXoLcTCoDt0Kop6PyWyf3tizmT2i7atxULqEJ
-         hDUFWlKrCCiUAXk73OY3xxmVVkf4h028xrqUMqGVydLtImgUoG6Nh4gLrKJ+g2HLfp07
-         qaK6dYW1C1I8zuS8HFjd02EzC+6pFD5m3BASmg7pftwpdzujgq0i0ZgDtdL1aFeEry4l
-         YZ1w==
-X-Forwarded-Encrypted: i=1; AL+hErGJcO/TTpiyRDLErhvK5Q040JjEDN9stusJYhtr7WBsm3Zay8Kkr1RwFX2q6zBYBAfrdAiSV3MqDsDb@vger.kernel.org
-X-Gm-Message-State: APuU4Z9yM9iiaTLi6BxC4e+j68gQfaVYrbMSauzOw0edYTnzEekyPRyY
-	yfVbrfn18GiztL3hBl+OOyz7KZYi2tdOm8oUqvuSfDYnNhFlIlPGUc+z
-X-Gm-Gg: AYBFou13F0ck5k4z1f6fQcREMP44tpIoslJq5uobSbhJmy3Fk7wnQzS/AtbyOIKmIj6
-	175C9Z9Wmo51re2jbqnd3ydlE4fjvZ/peNpmOJ2e8aYC2Q7hu55XbjljcoKEeioIRKa9mSNq+Hx
-	DtG7iEcjYhhUjiK3A2mO2Sz8CHtMpezoKsDrSLfbsSi9jwI69IMG5WXqVrPXkntaU1k4M8ycB7i
-	Fy5yNBJ5kxMjql7LuFvMtASwHXIhpcsnes/ksiprK3IKTlDE/3J9cZYbcUpZUFRX1zOC+gF6VaX
-	MXhPU56ePpZzTy3wDIKZi5K/0iZyzbwJfZMX0jwPS4x8xVtp9TcRPmRKS51krx2iV4k1eEB6el3
-	4vaw1L4TQdZqlbJb0+6G2sGRuZQhmASQVyM+mrcmBHRkofQyvSBXMxzxDd9LFkUQNNe54SOBnQU
-	7dgQVOArqbes6QGLq+7ZAFHpc6VKYlnG+/RXIhpnfnFtSJpr1iDDjF8JQjtqHNcILjdRc333A6R
-	tk5C7SwHLwn4gB+tHW0V6ORhZ8gXorBNTZ1iaTGb6o8MzKXHTUhCcoPWkWkOXahErTJulphbhHz
-	JMxGG/ZLH+OMvAt4tcR+ti1baTK++y7+o/fFPXH4OEMArrg=
-X-Received: by 2002:a05:600c:2784:b0:4a1:d49e:9ce with SMTP id 5b1f17b1804b1-4bb4e2918b1mr192482965e9.2.1794706494729;
-        Sat, 14 Nov 2026 17:34:54 -0800 (PST)
-Received: from localhost ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c60f8c248sm13643520f8f.58.2026.11.14.17.34.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 14 Nov 2026 17:34:52 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=KJABPBQL;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=C+T1zwq7
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailflow.phl.internal (Postfix) with ESMTP id 192F81381CA9
+	for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 22:07:16 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Sat, 14 Nov 2026 22:07:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1794712036; x=
+	1794719236; bh=gKN6VwWTajjvlUFrRVGdiB8bfxUd1ncQwyi3goNdenM=; b=K
+	JABPBQLg5NoVSoqI5rAeD+skAVRekxAf+DU/sDQcSDo/hJFgvZ95P/eANzp9iQLF
+	UAZ2B9xkDcsQY8iO/CYdG5kbEG/g8ahFsvSXdH9Yt3zkKI5EduBmZwdie/PwJuYN
+	pr1nB0wwaTyAblHINm1kduiiToh1n4/j/pmnDr6jrVEOL7vuhvQtnl4HrOD0i+Qz
+	VJNI9Qs7Z7g/sV1OgO+07SQFs26pkiTSP3Vs60Gkl3NfIhLPjnQ+GIU3l5ZcSMYY
+	6BUrfLEmvcHATBcpnr0Sd/AgOFMyv61EQ6sM1H/SQz550508xTh/pdmQHOStFSC0
+	jPBnhFmy4QnsJpm+0UlzQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1794712036; x=1794719236; bh=g
+	KN6VwWTajjvlUFrRVGdiB8bfxUd1ncQwyi3goNdenM=; b=C+T1zwq7icCIFknb3
+	BIG4jj7WX4TMmdwIUWJHKWSC5MP5FgSOyj6ns0HOXIH2T5YPfN1pXKHLvRJTcCXF
+	4RAfPlQFyaDVvKQjalvWxA4LjJ/6qVhuc95J9QdhnzKhyqGYbskG4iu3zE191pxw
+	WwDwbbTMZ9727IA7maRC0f7969JGpM6O0GDPLjigmcmkhji8OdG0q35gF+hW194f
+	3C6eO2tZZstn27vPqTyWBu8Kl65YabNpMXiXmJOgt3UinjDRAwVd6HRY84Qb8gEy
+	JCXoIx71tjY+5Gw+8DNq279NyDAebk1uTlroKTom4Wr16JwSv/Q0lnbxelj1fm4V
+	PzmoA==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1794712036; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:O/DQ594bSQ9OaWJ4UUhUZcdp+zhmdLgZju3akyyZofcl6tz
+	qD+2rBXcQYV5PWWr3Rq0M0wXivREseEl54CLuBju6dIdj5L5a6ibHm85yATvpyYH
+	x1Ex08sWQVApeDLe++PSy0tY0sNqX1T8fP1aVDOuYCZZvi6An1k0j2PVvZCnQmt3
+	NfpOLHOPEb7cJ81xQIB9iHVuH+kHAK3G3HLjsGLeGSyuBwfxx0jiaIKchm5pXTc2
+	ALzsSl+aw40ysBDTAfoB76nnJR0zARufmdma5az4c/M+hhDaG8GDSIninuvP5g/h
+	w0wpUs6LeiBGfDOTlGDFIP/JYAUbYNpZa3RNL1g==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=11;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:qU66T9RqzEc/y2kIWw23BwyWdGtBWvSxZnwtdXiF8Ss=:hXDVL1qdwuzv6gV0BtJj9GTi8M/VnQk4yRzSODQdsqo=;
+X-ME-Sender: <xms:4yH5aoOSUaVeymwqj7UWvMp8iXIBRkho5J6ZLAlSRXzcZUXwLs4FGA>
+    <xme:4yH5aplDodm1QFOwYsvjA4WZNJuXuztd29NqToRt-R13Q_sveAw5_a4KN3ywR5Ebe
+    NTAdG5j9iksa7k5vda7q-8yBjABUPMAdPYWLVanFRcolBhJIEN_bLSR>
+X-ME-Received: <xmr:4yH5alT0Ep0DPq8_3aiYw54l-eB5XCtJJ-cKgoZ0JVbPkeFnYyYMqwcf9oERuDa5>
+X-ME-Proxy-Cause: dmFkZTEmAQAs53JP0iZyMPv0h/fG6Xq16Gu2IYoashXOzhNO9jFCRsH4vMrd+HZz7QG80G
+    9XhEriyQdLjPfnGHNVzSfRbiMNADgBJkGTmYdzQg/vxpb/wvvP8bfHkAzsiuWXXygOlWkf
+    8yOfk8yvUc+0YjzWoLH9/Y/8zqLIw2ufdO6YEWSAdyodgZOLx1g4CdK1+4TLpE0P7nlmK4
+    YmfuypoXYRoTraxv4pu5WGIiIJVVDtZCpbG5ixSkiq56zVHcMIL1lQANdEtfF5W/6s9fpr
+    KuRExUlT6YMw/i1oNIayOom1b2SOCwpnP0D6f9fOqlX7BbTtzJEemPUPG/IXd/S/3ht8bb
+    4Kk1LQ3R5/ChSaxB7RUpXQG8F/Df1I8fcwi5XBzV7C5p1dthAuiFkypzNAvOqUeX2Yu30H
+    x0IJW2SjmJ0UdRDEmXGeHv0ciT8o4l14rVtyczokKTn9rHM01YyZCof+AKxfKXjiAd1bPR
+    92kXs7krOYyB1KFSiURKrzduMoxwwFgOECrDphX48ku432g25T3pxzoycmc16eaxW+V2Hl
+    mAkJ3oWwm+xaXPEv9Rfkvgenmd9S7R8B3hJB00qhe2ACWUKTOST0tlo3bp8XeeJjQ7lK8e
+    SULpw6jkvdhidJl/Xz4D4u+Edd0y7FY0FJaNbHTS0eDKJp864MJPY5cRxbYg
+X-ME-Proxy: <xmx:4yH5agV8DMdFQnScn6NlqNzWlsRKU67NfRpY0PE0zpW_jvAAF01mmQ>
+    <xmx:4yH5ahIzJRpf-0wwKglGpNRoup8eKEkDkTn78uJ5Ygk8KNM2h9ByQQ>
+    <xmx:4yH5ao0j97GyAMMP1Pjo8J6lHU4sCTefoDZD4Uun3rXoXkY-9-mGJw>
+    <xmx:4yH5amLSmwxD7h-26U445Nrgbi0wG60LkqQ15yxCXbpPo06xdlu3wQ>
+    <xmx:5CH5akwoD7N5qymM2ghAkpUWD0beaUABhW3qf1drfNLSMUmDg7Y5Rsl3>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 14 Nov 2026 22:07:13 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: koray.fra@gmail.com,
+	linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	hyc.lee@gmail.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>
+Subject: Re: [PATCH v2] ksmbd: decode and honor DOS attribute validity flags
+Date: Sat, 14 Nov 2026 21:07:07 -0600
+Message-ID: <20261115030707.2275633-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <DMVECM7B14I1.3GF2HZB9KRUX@gmail.com>
+References: <20261114012736.639171-1-koray.fra@gmail.com> <20261114160332.2228435-1-icb@fastmail.org> <CAKYAXd_qe-dLq6o7XdJzG8orYiKRioAtfEsLjxj33Ca3=PzGjw@mail.gmail.com> <DMVECM7B14I1.3GF2HZB9KRUX@gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -86,117 +130,60 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=7778e8827e5f90a3e7c9592d930e9c3386ae58c962b71883b69d27e225ed;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Sun, 15 Nov 2026 02:34:38 +0100
-Message-Id: <DMVECM7B14I1.3GF2HZB9KRUX@gmail.com>
-From: "koraynilay" <koray.fra@gmail.com>
-To: "Namjae Jeon" <linkinjeon@kernel.org>, "Ian Bridges" <icb@fastmail.org>
-Cc: <koray.fra@gmail.com>, <senozhatsky@chromium.org>, <tom@talpey.com>,
- <chenxiaosong@chenxiaosong.com>, <hyc.lee@gmail.com>,
- <linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] ksmbd: decode and honor DOS attribute validity flags
-X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
-References: <20261114012736.639171-1-koray.fra@gmail.com>
- <20261114160332.2228435-1-icb@fastmail.org>
- <CAKYAXd_qe-dLq6o7XdJzG8orYiKRioAtfEsLjxj33Ca3=PzGjw@mail.gmail.com>
-In-Reply-To: <CAKYAXd_qe-dLq6o7XdJzG8orYiKRioAtfEsLjxj33Ca3=PzGjw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
---7778e8827e5f90a3e7c9592d930e9c3386ae58c962b71883b69d27e225ed
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+On Sun Nov 15, 2026 at 2:34 AM CET, koraynilay wrote:
+> Hello, so I should include the legacy handling in this same patch and
+> separate the bugfix for sparse/compression in another one?
 
-On Sun Nov 15, 2026 at 1:22 AM CET, Namjae Jeon wrote:
-> On Sun, Nov 15, 2026 at 1:03=E2=80=AFAM Ian Bridges <icb@fastmail.org> wr=
-ote:
->>
->> Hi,
->>
->> There is an existing bug that matters when enabling these checks.
->>
->> ksmbd stores DOS attributes and the client's creation time in
->> user.DOSATTRIB. The xattr also contains flags saying which fields
->> are valid. Currently, ndr_decode_dos_attr() reads the values but
->> discards those flags.
->>
->> When the sparse or compression code updates an existing xattr,
->> it writes the creation time back but sets only
->> XATTR_DOSINFO_ATTRIB. The time is still on disk, but its validity
->> flag is missing. This has not affected the reported creation time
->> because ksmbd currently reads it without checking the flag.
->>
->> Your patch preserves the flags on future updates. However, the new
->> read-side checks also apply to xattrs that ksmbd has already written.
->> Those files will stop reporting their stored creation time.
->>
->> For example, with DOS attribute storage enabled:
->>
->> 1. On the unpatched server, create a file over SMB and set its
->>    creation time to a date different from its filesystem birth time.
->> 2. Make the file sparse. Its xattr retains the requested time, but
->>    now has only XATTR_DOSINFO_ATTRIB set.
->> 3. Upgrade to the patched server and reopen the file.
->>
->> The server now reports the filesystem birth time instead of the
->> client's time. Directory listings change too. On a filesystem without
->> birth time support, the fallback is ctime.
->>
->> The affected writers are fsctl_set_sparse() and
->> __ksmbd_vfs_set_compression(). Their existing-xattr path differs from
->> the no-xattr case in the commit message: it writes flags 0x01, not
->> 0x51.
->>
->> I am not sure whether handling these old xattrs belongs in this patch
->> or in a separate one. Namjae, what do you think?
-> Agreed. separate patch in the same series is fine, but the
-> compatibility handling should land together with the read-side checks
-> to avoid changing the creation time reported for existing files.
+One option might be to keep it all in this patch, with a few changes
+so that it stays compatible with the xattrs older ksmbd has already
+stored.
 
-Hello, so I should include the legacy handling in this same patch and
-separate the bugfix for sparse/compression in another one?
+When sparse or compression updates an existing xattr, it keeps the
+creation time, but ndr_decode_dos_attr() discards the flags. The
+writer then stores the time with only XATTR_DOSINFO_ATTRIB set.
+Checking CREATE_TIME on read would hide creation times that ksmbd
+reports today.
 
-The problem I had found when trying this approach (I originally wanted
-to send PATCH 1/2 to fix sparse/compression and 2/2 for the decode/read
-fixes) is that with only the sparse/compression patch applied, ksmbd
-clobbers the time on reading by reporting 0, since it doesn't check
-the flags and reads the timestamp anyway.
+Your changes to decode the flags and keep the existing fields are
+useful. On top of those, something like this might work.
 
-For example:
+- Read the stored attributes unconditionally, including a value of 0.
+  Samba also reads the attributes without checking ATTRIB.
 
-file created on host directly
-sparse through cifs/ksmbd
-file's xattr's creation time is 0 (because sparse is now fixed)
-allinfo reports NTTIME(0) because the reader doesn't check the flags
+- Use a non-zero stored creation time even when CREATE_TIME is clear,
+  and fall back to the filesystem timestamp when it is 0. A comment
+  could explain that older ksmbd writers lost the flag.
 
-I also tried reversing them (so first fix decode and then
-sparse/compression) but I couldn't find a good reproducer for the first
-patch, as it's not really visible.
+- When rewriting an xattr, preserve the other fields and flags, set
+  ATTRIB, and restore CREATE_TIME if the time being written is non-zero.
 
-Please tell me if I wasn't clear, this patch/bug is quite confusing for
-me since it touches a few bugs and they all depend on each other.
-(And one fix introduces another bug fixed by the next fix).
+> The problem I had found when trying this approach (I originally wanted
+> to send PATCH 1/2 to fix sparse/compression and 2/2 for the decode/read
+> fixes) is that with only the sparse/compression patch applied, ksmbd
+> clobbers the time on reading by reporting 0, since it doesn't check
+> the flags and reads the timestamp anyway.
+
+With the reader change in the same patch, a creation time of 0 would
+select the filesystem timestamp. That handles attribute-only xattrs,
+but it would not make the writer change safe to apply on its own.
+
+> Please tell me if I wasn't clear, this patch/bug is quite confusing for
+> me since it touches a few bugs and they all depend on each other.
+> (And one fix introduces another bug fixed by the next fix).
+
+Keeping the current no-xattr initialization would avoid that ordering
+problem altogether. We could fix preservation of existing xattrs here
+and consider changing newly written xattrs separately.
+
+It might also be best to leave changes to ITIME validity policy out of
+this fix. I don't think ksmbd uses the itime for anything it reports, so
+those changes would not affect this bug.
+
+Namjae, would accepting a non-zero creation time despite a missing
+flag be a reasonable compatibility rule for existing ksmbd xattrs?
 
 Thanks,
-koraynilay
-
-> Thanks!
->>
->> Thanks,
->> Ian
-
-
-
---7778e8827e5f90a3e7c9592d930e9c3386ae58c962b71883b69d27e225ed
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSgVimKafU5DQMcjcDmj22qf5IGXAUCavkMLgAKCRDmj22qf5IG
-XBg8AQC0NZYp9aIV0dkoPd8ASyea4rdD9tU+TEW6i8WgdDlNaQD/aIAljJtDYKLj
-IcT/BByomHzQYq8tiaJH9xBykbpu/Ak=
-=MVUY
------END PGP SIGNATURE-----
-
---7778e8827e5f90a3e7c9592d930e9c3386ae58c962b71883b69d27e225ed--
+Ian
