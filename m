@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794702145;
-	b=sjGs8Zo0o/30GLnkQscnruCxaYhRrEFlIYdNvI6kOz9Mw/cN02AF1TqFLmX6/SF38UTF
-	 b+FeLppjcYrqkRGEWDQAfkOkto8p1LA+Jh69dQOl9paGbLufokB4L7wQEOL1oWSkuCCc8
-	 wn1FS7bt+XmQ9jVKQYlmUGFEQdJpTzTXuSpwp4fmOb4ITEYaYEn5sgrxOrAzs8XELySXf
-	 JVhkHUaUetPlSHexE9By+4ye7jFe93VlpPTpipoDN2NNoyEBdKPQj4/Ir3vUE5w3hZ4gJ
-	 SF7TEAHORVIbCCsNn/MnZzPKgfm+8uwaU57YqwKsBzw5PbZgSxYVXwvFnA4enU1zeqQ==
+	t=1794702917;
+	b=SIMe+rx0MaOUvy6yce2G2nzqk4SnaBm9FKRGPGhUUwDCnRPrRmGESfcihYTYRb+3YeUy
+	 t32qADpVWcQN+mp2Osg3EkZzwJm2oUPByM2U83wbp7687nPzN6KJ4uXpYNE42TyzyHfkS
+	 9aQ10psn2Q8H6iX1Y4PmLB1KPocplwrBlNaLoXmycA+21Ytq1W3pjv0ITHPRMADPlOond
+	 9SZcpcWpRahcRJkyXmWKx1Vucd6zhbiEGADWFCQW2ajxAivqTlkDKVP+e7+FQRikH1B7i
+	 6Hvo9XKieMcYqLNZhI+/v3rKam+6M7F0b4N+jc0fYice1kJs1LD5SFV2Q9HkYifL0xw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794702145;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794702917;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=wCcIvzsuQGx469LziUohYtgxI/06BzX+ClZShOsYgGA=;
-	b=HMd5ZJmkOGfYTyFAahr0diVuEU9KYzvJQc0GtbwyWHIROmkCy+D7jajfeyJvvGqcxnCS
-	 B4hnJDazejm8kE+u3gU1Lz+iU0hJo7jDEsZ6qlyz/emQleYsrVLnf71WrgLZ3mXQ0Fmvq
-	 MqHcwTBqTz/SRsOj3I6h6c/rGO23kPOffgM4UTcSGY4RcrXQ/RjNUkd/ejxdARoVfT4C0
-	 hZIcUJxinNUZ86zb7bmD3qQ+T7yZ3xLrek4I8Q5yihFOTL6TkCRF+ExinY+J8o1iP3RYL
-	 4QA2CEvVI+7yww+zuZ66xx3BD6+EO+LwtOrOX57x02qMf6o396WNG++dpq5TAy7+qwQ==
+	bh=vDrv9Rfc66q0u11nw2Ofk2AFrGnK5EZJAdaXF/Wufrk=;
+	b=Dc/QwAx2Jc4Ki6ZiHa+sexUmqYQG/7oVxYaTdPc1P3tuO7+iz0/Sdt11VlHGNH/W97mW
+	 VdB9mYnPC/Nxb/eT0+BSYRIVCsjQ7AFWn3UjLRZL+BRNzuG+K6dhmg+46YoGwDQ1yJUSl
+	 SnLKz97YFrWxc2upbKUvrv2z0bjM8JSF5AVYd9lG7QkNTEJ3v+GWMK/K0KX44v5ZwEy+d
+	 BkGyoh7ybmXKHcX/G2sbPiw+cut5ptnWtX2WE49dEqbBrsofnPojvae9Ix2gieoAl2HJb
+	 WjYTVcs13612FPbdPMm8uM6Uw+FiiNWtu8A2KGQFxUDaXr2axAFV+n+LPj5XDZZPVXQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CPvFgnyZ;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=g8pcmt9U;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546E7606A323
-	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 00:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB5A606A339
+	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 00:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=CPvFgnyZ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31AAE1F000C5
-	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 00:22:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=g8pcmt9U
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB9E91F000C7
+	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 00:35:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794702145;
-	bh=wCcIvzsuQGx469LziUohYtgxI/06BzX+ClZShOsYgGA=;
+	s=k20260515; t=1794702917;
+	bh=vDrv9Rfc66q0u11nw2Ofk2AFrGnK5EZJAdaXF/Wufrk=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=CPvFgnyZ5W27IwipTs1lpzasnMKBpDj2OYZEWrdZsQcmuR5GUK7QPFrcxO2YRCGcR
-	 1OL/M2Vmj4vbmrVHaFCSlKAg45vBp7QIXxSj1jEzylpalMxFmgdaxUzgAjvt/eVTrb
-	 uBWxd8s56c38p2ftsiP3bbM3II0ZVwT3TtJ9ZmZ0SAcVvgrZiUupBcOmBX+05II1Ai
-	 sSTzmYWguMahfyw/V6AKrMhxlA6vRVW7hTOnYegLNAzdGzsGZgUP9ulwsGD4wwtqI4
-	 ComjppMaYRmfxL6eRouSiVjd4+bzB6iB/+GmTuXlbMGpvnWgf7PCtoNIULFLaZPVPx
-	 YWstHq4spjTDw==
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c4d28f75d62so473951066b.0
-        for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 16:22:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErGutiBq2Obektsa5S2u8/6F3/ynDvUlXTrViRUapyXBMcmRTlmsXf7jZgW5skaxMT1Zj2S64p42aj6S@vger.kernel.org
-X-Gm-Message-State: APuU4Z8XQvUoFDvjj1qckUiAZXswFBKWOCU/YrlqpEYsicOO/AnbODOI
-	wYDc31vUS0B/9Q5pQlXuDEqAKtVgW1MxVotPtFTyFKNgepUi2Xhu3us/onmrKiVAprJke2qVhht
-	etnaLTnw5M2Mm7CIH1lzlUcFkQVDVtBw=
-X-Received: by 2002:a17:907:3d92:b0:c27:420b:7c79 with SMTP id
- a640c23a62f3a-c50964057a4mr574674866b.48.1794702143794; Sat, 14 Nov 2026
- 16:22:23 -0800 (PST)
+	b=g8pcmt9UtOsFI1fo9CxKbYPTzvsqw0sWH9ACzZvlMR51axd53xpfjIJHW3wwBJjhq
+	 FFVA3mzmsjlRj+C1s6krHEnLtpMM9pDtWlKfCuGdddXd+8WUIwYX2wkDUE+o5um/Xh
+	 R0P0QjTTbmMouATSYvV06/vhD9iuQMomja4hTmI1n4CDHkYoU9Kyqw4CR/7f+hjdav
+	 TqpEA9lxeek3+otYFVTutJ8EzMNvgyVLTFd9Q4uWVBUmqS7k5s62pNOnHkImiXi2tN
+	 zwTgVauW/K3/DOfeSeC1qpC2kUx9GFCG1zN9cx3+ZdFSBcQ7EcZCyYzd49AIzAJlgS
+	 Ofb4GYI4WnJCQ==
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c5075fa7ed0so414223766b.2
+        for <linux-cifs@vger.kernel.org>; Sat, 14 Nov 2026 16:35:16 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErF7BT2mXNoKAXCmN89oF63jwm0XmfPS7c1neYZvQRtHEOs5amlMsCn/8dnGCeYCemNJkW1Wl8xvb0yK@vger.kernel.org
+X-Gm-Message-State: APuU4Z/GlAUFjsO3nhdpM1hYkhlhwKP3ToWbyntQqpdGzI2OXd1kRz+W
+	3OnKc5JX45Rkp2lFtE4vCIGC8bux5B+fq1K8JmtCxXAconrtPkoCPHEzxkEezi2MkLsGY37rlR3
+	oLUBeT0LZbSxxJGB0LWvv+DI4DyyGNpA=
+X-Received: by 2002:a17:906:c114:b0:c46:8913:d89d with SMTP id
+ a640c23a62f3a-c50962ecaeemr500449966b.14.1794702915613; Sat, 14 Nov 2026
+ 16:35:15 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,67 +59,25 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261114012736.639171-1-koray.fra@gmail.com> <20261114160332.2228435-1-icb@fastmail.org>
-In-Reply-To: <20261114160332.2228435-1-icb@fastmail.org>
+References: <20261114-chipsatz-gutachten-geklingelt-81574928a5f4@brauner>
+In-Reply-To: <20261114-chipsatz-gutachten-geklingelt-81574928a5f4@brauner>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sun, 15 Nov 2026 09:22:11 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_qe-dLq6o7XdJzG8orYiKRioAtfEsLjxj33Ca3=PzGjw@mail.gmail.com>
-X-Gm-Features: AclHuK8sng4ajcW81oalTmmeANU3J1j-6EE0UYzK1YRlD-i3CkmDWMr44z7UGTs
-Message-ID: <CAKYAXd_qe-dLq6o7XdJzG8orYiKRioAtfEsLjxj33Ca3=PzGjw@mail.gmail.com>
-Subject: Re: [PATCH v2] ksmbd: decode and honor DOS attribute validity flags
-To: Ian Bridges <icb@fastmail.org>
-Cc: koray.fra@gmail.com, senozhatsky@chromium.org, tom@talpey.com, 
-	chenxiaosong@chenxiaosong.com, hyc.lee@gmail.com, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Sun, 15 Nov 2026 09:35:03 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd91kBcAJTwkP11gN2igRkv8w_4sFgyxbtiCDhkVeLgs7Q@mail.gmail.com>
+X-Gm-Features: AclHuK8d_OZBXGk4HXH5KANpQvxUhIOawFDebvYhDrOGOjv-Cq0-UfMC5ZNXA8g
+Message-ID: <CAKYAXd91kBcAJTwkP11gN2igRkv8w_4sFgyxbtiCDhkVeLgs7Q@mail.gmail.com>
+Subject: Re: ksmbd: SET_INFO modifies frozen filesystems
+To: Christian Brauner <brauner@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Jan Kara <jack@suse.cz>, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 15, 2026 at 1:03=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
-e:
+On Sat, Nov 14, 2026 at 6:38=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
 >
-> Hi,
->
-> There is an existing bug that matters when enabling these checks.
->
-> ksmbd stores DOS attributes and the client's creation time in
-> user.DOSATTRIB. The xattr also contains flags saying which fields
-> are valid. Currently, ndr_decode_dos_attr() reads the values but
-> discards those flags.
->
-> When the sparse or compression code updates an existing xattr,
-> it writes the creation time back but sets only
-> XATTR_DOSINFO_ATTRIB. The time is still on disk, but its validity
-> flag is missing. This has not affected the reported creation time
-> because ksmbd currently reads it without checking the flag.
->
-> Your patch preserves the flags on future updates. However, the new
-> read-side checks also apply to xattrs that ksmbd has already written.
-> Those files will stop reporting their stored creation time.
->
-> For example, with DOS attribute storage enabled:
->
-> 1. On the unpatched server, create a file over SMB and set its
->    creation time to a date different from its filesystem birth time.
-> 2. Make the file sparse. Its xattr retains the requested time, but
->    now has only XATTR_DOSINFO_ATTRIB set.
-> 3. Upgrade to the patched server and reopen the file.
->
-> The server now reports the filesystem birth time instead of the
-> client's time. Directory listings change too. On a filesystem without
-> birth time support, the fallback is ctime.
->
-> The affected writers are fsctl_set_sparse() and
-> __ksmbd_vfs_set_compression(). Their existing-xattr path differs from
-> the no-xattr case in the commit message: it writes flags 0x01, not
-> 0x51.
->
-> I am not sure whether handling these old xattrs belongs in this patch
-> or in a separate one. Namjae, what do you think?
-Agreed. separate patch in the same series is fine, but the
-compatibility handling should land together with the read-side checks
-to avoid changing the creation time reported for existing files.
-
-Thanks!
->
-> Thanks,
-> Ian
+> I'm working on a freeze protection series and this is the part that
+> affects ksmbd that I don't just want to fix myself.
+Okay, I will fix them.
+Thanks.
