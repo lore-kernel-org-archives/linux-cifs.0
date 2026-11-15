@@ -1,83 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794765852;
-	b=GgbP+zLWt4Tf+xft1Ucf0UET2hcKnuF1R1JsL1YKCReTd6SS1se5OdBDTgaqGlcHBY7r
-	 EqU41pVfs6a37HH8wXrVMYvvbcIndCsVdNJKxtOF/AzdwfJaWAIefCaIYvFgcONZV5yVV
-	 SIVTtlO4c15W4tA9oqU6MJLLgFj3UlgAhFgy8isPeU2SoksAOIcYSqbAlyhdk7ZywF5rK
-	 J66IGhPYQ3O7AaDGAZOR/IFJswQTl+z5dYj/+gvxDwj2u5r7ojQzvpynVHBEdNGKbsxaR
-	 tIrtHRAsI4j+r81ukwgguaxHLith90+lS/34qyYseE0zVblf2MClwll3m7FeSnodffQ==
+	t=1794765854;
+	b=GnxjRr22+9pEVHkHKQCteNSxC68BLcDt96sYb+uoUD6B8qIN3tBCkBcEebN7KuDXKUDI
+	 5mf+HkLpoCmVEPb0qNrmrsjIizR89KqMlGW3NcbyQ499oGukt9zCZvR8Mw8/qc13amr1R
+	 9CuygvZj0ZQIyEGNzYNBswjdudX5FiqvwIJf/RwOhqWK+atbk1qqda8ADmaWI7451+tNC
+	 K0PMoEncZLwjP3wH/hS3sr14WI4tPR/aO5WHt0qx5wvo0tsiUHv1zdLPbFQv9fKvQERpl
+	 L/zYp8fl+xWdDvZ6VPTVRh7cHVGT+WNawPc/FKlG9VVlTPHoEClBPjkSuLABoGa7ewQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794765852;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794765854;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=Q9ImLBzlDc7yTEjXopdjt0wl8ryX8CGKpq0H4Wm2vqQ=;
-	b=48j8+lNF07XCE0oq4hwVTZIlusHwC90qh1EhV9csBlS/O6otWGNoA7RqfpAz0lQAZsN1
-	 o14/znmeN6DODKfcSkInHinY8niZFR/gBwHJNgIJwrIOYyOwhk6l+nnCt55cQ0rbm2ihp
-	 3h89A1SFiVfEg4THU2nLtTKTBxob6O1fkIf1WXkc+Nj3U7lN6e/tudDUnS5tQLBcTnNAE
-	 gc6nWqQIB139rbksTynHEcfeL9tGenf4lFyqJbrvl4xyYCej2BDHYlUTkZx1mLdTAngNs
-	 gN3QwCne+XTVnh7SimT5MEERlWX18o1255Tp8RPdKglhL4rKcawY0XVG8R/9x1lPPSQ==
+	bh=dt00QcB/UAbcoWfb+Nc1N3msJVe+tAMzrHb6Fo7W5/Y=;
+	b=M33LH8gf+GjvG3DQROOK5UwAhrDXGLXEq+8iZ3ReCzalHsucoJUmZraU6kqRw1O2uGVY
+	 xPD7T2HE1Uwlpj2dlK/woBTeYLtdsuzw+8lJqpKOzeFcmoSCQ9Oj32cxcCWWbHt13+aLl
+	 qxjZTbW+sC0p5Nok99SM2RWF+rytBzNn7bikEeREDshWjX/YoAswj09jgjcMH6NBGk8vy
+	 2/zCEjvWCjrK4P3YkF2kA4mrAa/2pnzR3UpppRc6m07K9+xcYnFFlU6xw/07+myALJ9tY
+	 5QXx1kkzKCLCf+U7cCuITaRqEN5rxhdySoDFDejP9aSztaiLkrOGZZWngqrkrjDcwWQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PrrwdsWe;
-	arc=none smtp.remote-ip=209.85.221.41
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gudTlvRy;
+	arc=none smtp.remote-ip=209.85.221.50
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE74C60A3839
-	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 18:04:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EE74C60A3839
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119C960A5BC9
+	for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 18:04:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 119C960A5BC9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=PrrwdsWe
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-48e47347279so1068074f8f.1
-        for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 10:04:11 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=gudTlvRy
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-48dee593f18so2930366f8f.3
+        for <linux-cifs@vger.kernel.org>; Sun, 15 Nov 2026 10:04:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794765850; x=1795370650; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794765852; x=1795370652; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Q9ImLBzlDc7yTEjXopdjt0wl8ryX8CGKpq0H4Wm2vqQ=;
-        b=PrrwdsWewRRetL+OafyuO3TPg/OLhqcGEu4/QpFNufN3gi7kvGZMLO/Sctt0IC+s+h
-         cbMRnv+6lDuwSzJFpIOkfTIs+aSJ0SxPNI9ypZRtLt0fLD9hio3+eIszwQ2U3IoSxsrh
-         PS7S6g8lUJ0NW5zlIX08uaTYtDwhcccd0DGnL99hS6tiBZ2CtIh/F6nRb+3hnL45WYbT
-         cPzanfZvlBhgQwRD4v+7GB7lqxHGlBdFI616/Paa9AKZz3m1GeHWlwP55XheJDJDfV3K
-         WKhyscXlELx/o1NKWLisN+bvDB95Vu7e9bEXfFeTCIId0ltXMLEj8zPqLWNx3RUVtYqH
-         iDEQ==
+        bh=dt00QcB/UAbcoWfb+Nc1N3msJVe+tAMzrHb6Fo7W5/Y=;
+        b=gudTlvRybSJy4KLmYFZtNr9ekZ8L2alX0H3pXn05eEH3Y71gowCbfqSK14PUokehUu
+         4BxfuuQukOHh4LKpkMI/IwaZELD8tsUAHTcYi5wyozwdkClCAzu8+dxdoC5rcEJEm7Bk
+         ZS3WkN+bFmWrei1bYBQWwxIF0tQzF7lyoi5dAnRHKCO7O43Kl9edafYh5X5xlKQTA6Fr
+         I7nyTa4AMxp1KV7GhugUFMg7CipLxXlEcJvUGt/khnJSi70VSYQm0pZTCNUG7Xd7EoAo
+         NOY3cQW0eZ6EPN9T8M9IbWSSCNdWpIzlDs1+JH18HnaoSqfd+dMRGd444+JAqRIqyI2q
+         7gjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794765850; x=1795370650;
+        d=1e100.net; s=20260707; t=1794765852; x=1795370652;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Q9ImLBzlDc7yTEjXopdjt0wl8ryX8CGKpq0H4Wm2vqQ=;
-        b=H02iFnucPqglt65EVl39r0iCLotahjbOWQL7Tv3cMqCfUsGhF0JGG1GJZ4i+Rf0mac
-         /263xgTIi7V13LnQcJPPmSPStJRaIWC4BAogYIxhdUkLrwwn5q9jJbghBWTJTpCG55Ky
-         YWoViCJTBkhM9cmdarCfNn4yh0QzYBFTGJH67gX/hK7z1Ypar1CFJ0aQTN5KuUYyrDsu
-         Tk9AHpikvewslXPw1FkQJH7QIbrUTvqs591nc+g2z/HW1nQhmnf+vkeBlcfZX3w43jnn
-         51O+CWoL0rm+aP2m9zWF36ASVz/hqYvRC9HbT4ycI4Pv9wg1BOjDNq5pl4I32RjLb8MQ
-         hA3w==
-X-Forwarded-Encrypted: i=1; AL+hErGveAESvEZkdt0O5ZKlTf3Fq+/lQlIbVic+/zaF1VPOSEVWYUBSWk3OFcvtSUO4u8Tj3wiJelu34a1U@vger.kernel.org
-X-Gm-Message-State: APuU4Z9R0Iz3qTtKRlk0ZZMssrZWUpZmW7L7sseup6c/HUWhNmq7cKu4
-	b+NDNzMqLtJNoH45Ldj/esE/rRvCojXCHwXTrJAtnxBEJWkmrVP39CsY
-X-Gm-Gg: AYBFou34cMi8zrFnir2Ix2SeVYadxZkrPqVQb0raJTJcD7FHwGGjWuRav9SDVmoxDFy
-	8cHXqqH16WN5E+ik3uO3xQ3DOjPDHKXjnO91YbOD1oLVG/YYdCDwycqQka70StTEdpvU3Z6kIoV
-	D+B/GUKo/Opj+N7CxZXMEeTy6OZuRsu8dJofZrJOEIg7AcOjNkk5VP7UfR+1lQ0oYFZX9/rpNkR
-	6RfxcyaLoP4fSlcL1p129FW2VBe9OosPAyARtHL6sEmU1XIxzfa1zGHhyj5Xt7CqATlgRmcyz5L
-	00Snw6cNkpf3A+1szZthFWFoMNupkZyzduIXo2RwnU8meHTRaR2k1OvMQbNhU9mgc7hPZIuK33Y
-	lI8st3zLliJP9imNHoJNmLU9cGKwHg4Cs+LtsT+HAe9ygv095+5dMZYLDvEIzEsd7jv3q8KdD73
-	v1kmphmv7ZsqNeFN5ZJejCeB4Qi3EduyBSt85pi8fu1CjTWxBaKc3g1zcKlxFvOYBdom50Ol7KS
-	/ONFs1SQOAhVXE834QcmgNXDhR1d5Uo4ZqGKGTFwxRLHslLHwYrYkom+sRo7xMjT+Qb1jOjNE5+
-	0V1HQoe5SzD4jGcOuXDSrkPT7cN2A9d0Pqj0ZnU5itqrmg==
-X-Received: by 2002:a5d:584c:0:b0:48a:f0cd:8712 with SMTP id ffacd0b85a97d-49c7325b837mr20297222f8f.50.1794765850194;
-        Sun, 15 Nov 2026 10:04:10 -0800 (PST)
+        bh=dt00QcB/UAbcoWfb+Nc1N3msJVe+tAMzrHb6Fo7W5/Y=;
+        b=Mik01aR3mg8LcISuQGNgNQEQAX5bn/g+vlkRUkjM6UaytFR0zdG/Dw8n/gFO97/vAi
+         5202QxmefoV/Id6syqs8M8gxH2VYDQ7Um2qNlI94wD1BEX8+V4mUIWNPFrunhCNEacyF
+         Zu5wbQTF+g+etm1sARbn6adyRgageWyOAawm3tkbLbmGrFfETE28BZQE4ivfO4DbKstX
+         I5QaCxu7G5TuCQMIaeM07gcUPFQSUV1QArxa1kI/3oAM4ZRZy7rUuVm1pOmZiIzjIGsw
+         FdM4Gxbb2HdnR2AJpq+Np9seKkMe75qdbjxye6jaAo3eAPbS214bcx9y2DLtsiPdDIfi
+         in6A==
+X-Forwarded-Encrypted: i=1; AL+hErEUQ0oMmKeVOmhNfB6mHQUf4Sd1cdft2zeurSi6+WwEfgSEzq1Vc9ZvNZ7wzWPuC6a51IYV6wWEor5r@vger.kernel.org
+X-Gm-Message-State: APuU4Z8hiHzY7l4uy4heesn6rZWn/w5RxwleJOO0t2CfGaC4OCw7IhGU
+	GiapxQ3SVuGxyNZeOsABkTrdeUOGZKIcu3WEitvkOztKLcjDIWkmNB/0
+X-Gm-Gg: AYBFou0ufJu5/S03t85z9ySBLxRuUVBEC76Mlz2Ax9WyqWEATK/8+FHZSePzBt2p+X4
+	m7bKVSe5OedI8We/2TC+HHaj00Ik1MWZ4LSeAe32w2Hlh37nkpVXm1b8Tj3CgIH/HMduJyjhJGB
+	YBw/Z/igAiC+3x2yAHOhGkueqZjI7V3HLkrWoTYxN5A7K3Q01kB1RdusMi7vuUtinZQnBBssavG
+	HWLe4k0IVQXKJlIDUIsw2HL3875N/HyJhw3jnYNiEk88OA/6Ci5Qdw+ylb8gZ+t0iHjRgTJ0lxH
+	5Uo4oxhPdtt2Fw0fBFCLRQ4EfncrxcamBQV/+qnSLtnU6MhWngHoVHkRBd8oV0PLTi4FcLnNURL
+	3mrjsjQdgPiZ6wxnhPi5D+hWU6hVZz5RHUl4ioMMUkWeaI7LMbjfpe82Mm78201m3MdSt473BO5
+	WFN59bi50JkKJXIV18m3nHUIFMsZeCjsUDDdZU0/tGK8R+VIX7KuuKZRnelVxdW4cYHYk4bIkZi
+	Hrtv4EYUBhJuFLoKGr2JIptpDqIgXqxr2JnfiejmH8QhPoCTqrBehEgRpI3a1W/WGVCELJSmat3
+	PThnQse1TIMbqREN7ZUY/UpV
+X-Received: by 2002:a05:6000:4022:b0:49e:1601:2fb1 with SMTP id ffacd0b85a97d-49e1601310bmr10387323f8f.24.1794765852233;
+        Sun, 15 Nov 2026 10:04:12 -0800 (PST)
 Received: from infinity ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c60f8c248sm17980448f8f.58.2026.11.15.10.04.08
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c60f8c248sm17980448f8f.58.2026.11.15.10.04.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Nov 2026 10:04:09 -0800 (PST)
+        Sun, 15 Nov 2026 10:04:11 -0800 (PST)
 From: koraynilay <koray.fra@gmail.com>
 To: David Sterba <dsterba@suse.com>,
 	Namjae Jeon <linkinjeon@kernel.org>,
@@ -117,9 +117,9 @@ Cc: Chris Mason <mason@kernel.org>,
 	linux-nfs@vger.kernel.org,
 	linux-api@vger.kernel.org,
 	koraynilay <koray.fra@gmail.com>
-Subject: [RFC PATCH v4 05/10] btrfs: add provenance time (ptime)
-Date: Sun, 15 Nov 2026 19:03:38 +0100
-Message-ID: <20261115180343.576773-6-koray.fra@gmail.com>
+Subject: [RFC PATCH v4 06/10] vfs: add __vfs_fileattr_set_locked() for inode_lock()'d callers
+Date: Sun, 15 Nov 2026 19:03:39 +0100
+Message-ID: <20261115180343.576773-7-koray.fra@gmail.com>
 X-Mailer: git-send-email 2.56.0
 In-Reply-To: <20261115180343.576773-1-koray.fra@gmail.com>
 References: <20261115180343.576773-1-koray.fra@gmail.com>
@@ -134,260 +134,197 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement provenance time (ptime) in Btrfs, as introduced in a
-previous commit ("vfs: add provenance time (ptime)").
+Currently there is no way for a caller to invoke vfs_fileattr_set()
+while holding an inode lock without having the kernel go into deadlock.
 
-Update the on-disk format by claiming 12 bytes from the reserved[] space
-in btrfs_inode_item, putting ptime before other timestamps. When loading
-stale garbage data from disk for ptime, warn (rate-limited) to dmesg.
+Fix this by moving the vfs_fileattr_set() logic into
+__vfs_fileattr_set_locked() and making vfs_fileattr_set() a simple
+wrapper that only handles the inode lock.
 
-Advertise support for FS_XFLAG_PTIME using fa_xflags_mask in
-btrfs_fileattr_get(), and validate that only supported xflags are
-requested in btrfs_fileattr_set() using a newly introduced
-BTRFS_SUPPORTED_XFLAGS (containing only FS_XFLAG_PTIME for now).
-
-Also, set .fileattr_[gs]et to btrfs_fileattr_[gs]et() for both symlinks
-and special files and reject any other flag update on them with
--EOPNOTSUPP.
-
-Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.4.7
+Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.7
 Signed-off-by: koraynilay <koray.fra@gmail.com>
 ---
- fs/btrfs/btrfs_inode.h          |  4 ++++
- fs/btrfs/delayed-inode.c        |  6 ++++++
- fs/btrfs/inode.c                | 29 ++++++++++++++++++++++++++++-
- fs/btrfs/ioctl.c                | 24 +++++++++++++++++++++++-
- fs/btrfs/print-tree.c           |  1 +
- fs/btrfs/tree-log.c             |  3 +++
- include/uapi/linux/btrfs_tree.h |  3 ++-
- 7 files changed, 67 insertions(+), 3 deletions(-)
+ fs/file_attr.c           | 139 +++++++++++++++++++++++----------------
+ include/linux/fileattr.h |   2 +
+ 2 files changed, 86 insertions(+), 55 deletions(-)
 
-diff --git a/fs/btrfs/btrfs_inode.h b/fs/btrfs/btrfs_inode.h
-index 0782f917fccc..c9822340567a 100644
---- a/fs/btrfs/btrfs_inode.h
-+++ b/fs/btrfs/btrfs_inode.h
-@@ -332,6 +332,10 @@ struct btrfs_inode {
- 	u64 i_otime_sec;
- 	u32 i_otime_nsec;
- 
-+	/* File *data* creation (provenance) time. */
-+	s64 i_ptime_sec;
-+	u32 i_ptime_nsec;
-+
- 	/* Hook into fs_info->delayed_iputs */
- 	struct list_head delayed_iput;
- 
-diff --git a/fs/btrfs/delayed-inode.c b/fs/btrfs/delayed-inode.c
-index 333ce8b52489..eef73ebb4a52 100644
---- a/fs/btrfs/delayed-inode.c
-+++ b/fs/btrfs/delayed-inode.c
-@@ -1932,6 +1932,9 @@ static void fill_stack_inode_item(struct btrfs_trans_handle *trans,
- 
- 	btrfs_set_stack_timespec_sec(&inode_item->otime, inode->i_otime_sec);
- 	btrfs_set_stack_timespec_nsec(&inode_item->otime, inode->i_otime_nsec);
-+
-+	btrfs_set_stack_timespec_sec(&inode_item->ptime, inode->i_ptime_sec);
-+	btrfs_set_stack_timespec_nsec(&inode_item->ptime, inode->i_ptime_nsec);
- }
- 
- int btrfs_fill_inode(struct btrfs_inode *inode, u32 *rdev)
-@@ -1981,6 +1984,9 @@ int btrfs_fill_inode(struct btrfs_inode *inode, u32 *rdev)
- 	inode->i_otime_sec = btrfs_stack_timespec_sec(&inode_item->otime);
- 	inode->i_otime_nsec = btrfs_stack_timespec_nsec(&inode_item->otime);
- 
-+	inode->i_ptime_sec = btrfs_stack_timespec_sec(&inode_item->ptime);
-+	inode->i_ptime_nsec = btrfs_stack_timespec_nsec(&inode_item->ptime);
-+
- 	vfs_inode->i_generation = inode->generation;
- 	if (S_ISDIR(vfs_inode->i_mode))
- 		inode->index_cnt = (u64)-1;
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index abaa33471456..ff8f7a0caad3 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -4057,6 +4057,17 @@ static int btrfs_read_locked_inode(struct btrfs_inode *inode, struct btrfs_path
- 	inode->i_otime_sec = btrfs_timespec_sec(leaf, &inode_item->otime);
- 	inode->i_otime_nsec = btrfs_timespec_nsec(leaf, &inode_item->otime);
- 
-+	inode->i_ptime_sec = btrfs_timespec_sec(leaf, &inode_item->ptime);
-+	inode->i_ptime_nsec = btrfs_timespec_nsec(leaf, &inode_item->ptime);
-+	/* Avoid old garbage on-disk data making btrfs load a bad value */
-+	if (unlikely(inode->i_ptime_nsec >= NSEC_PER_SEC)) {
-+		btrfs_warn_rl(fs_info,
-+			      "invalid ptime.nsec %u on ino %llu from disk, setting ptime to otime",
-+			      inode->i_ptime_nsec, btrfs_ino(inode));
-+		inode->i_ptime_sec = inode->i_otime_sec;
-+		inode->i_ptime_nsec = inode->i_otime_nsec;
-+	}
-+
- 	inode_set_bytes(vfs_inode, btrfs_inode_nbytes(leaf, inode_item));
- 	inode->generation = btrfs_inode_generation(leaf, inode_item);
- 	inode->last_trans = btrfs_inode_transid(leaf, inode_item);
-@@ -4249,6 +4260,9 @@ static void fill_inode_item(struct btrfs_trans_handle *trans,
- 	btrfs_set_timespec_sec(leaf, &item->otime, BTRFS_I(inode)->i_otime_sec);
- 	btrfs_set_timespec_nsec(leaf, &item->otime, BTRFS_I(inode)->i_otime_nsec);
- 
-+	btrfs_set_timespec_sec(leaf, &item->ptime, BTRFS_I(inode)->i_ptime_sec);
-+	btrfs_set_timespec_nsec(leaf, &item->ptime, BTRFS_I(inode)->i_ptime_nsec);
-+
- 	btrfs_set_inode_nbytes(leaf, item, inode_get_bytes(inode));
- 	btrfs_set_inode_generation(leaf, item, BTRFS_I(inode)->generation);
- 	btrfs_set_inode_sequence(leaf, item, inode_peek_iversion(inode));
-@@ -5988,6 +6002,8 @@ static struct btrfs_inode *new_simple_dir(struct inode *dir,
- 	inode_set_atime_to_ts(vfs_inode, inode_get_atime(dir));
- 	inode->i_otime_sec = ts.tv_sec;
- 	inode->i_otime_nsec = ts.tv_nsec;
-+	inode->i_ptime_sec = ts.tv_sec;
-+	inode->i_ptime_nsec = ts.tv_nsec;
- 
- 	vfs_inode->i_uid = dir->i_uid;
- 	vfs_inode->i_gid = dir->i_gid;
-@@ -6714,6 +6730,8 @@ int btrfs_create_new_inode(struct btrfs_trans_handle *trans,
- 	ts = simple_inode_init_ts(inode);
- 	BTRFS_I(inode)->i_otime_sec = ts.tv_sec;
- 	BTRFS_I(inode)->i_otime_nsec = ts.tv_nsec;
-+	BTRFS_I(inode)->i_ptime_sec = ts.tv_sec;
-+	BTRFS_I(inode)->i_ptime_nsec = ts.tv_nsec;
- 
- 	/*
- 	 * We're going to fill the inode item now, so at this point the inode
-@@ -8048,6 +8066,9 @@ struct inode *btrfs_alloc_inode(struct super_block *sb)
- 	ei->i_otime_sec = 0;
- 	ei->i_otime_nsec = 0;
- 
-+	ei->i_ptime_sec = 0;
-+	ei->i_ptime_nsec = 0;
-+
- 	inode = &ei->vfs_inode;
- 	btrfs_extent_map_tree_init(&ei->extent_tree);
- 
-@@ -8186,9 +8207,11 @@ static int btrfs_getattr(const struct mnt_idmap *idmap,
- 	u32 blocksize = btrfs_sb(inode->i_sb)->sectorsize;
- 	u32 bi_flags = BTRFS_I(inode)->flags;
- 
--	stat->result_mask |= STATX_BTIME;
-+	stat->result_mask |= (STATX_BTIME | STATX_PTIME);
- 	stat->btime.tv_sec = BTRFS_I(inode)->i_otime_sec;
- 	stat->btime.tv_nsec = BTRFS_I(inode)->i_otime_nsec;
-+	stat->ptime.tv_sec = BTRFS_I(inode)->i_ptime_sec;
-+	stat->ptime.tv_nsec = BTRFS_I(inode)->i_ptime_nsec;
- 	if (bi_flags & BTRFS_INODE_APPEND)
- 		stat->attributes |= STATX_ATTR_APPEND;
- 	if (bi_flags & BTRFS_INODE_COMPRESS)
-@@ -10779,6 +10802,8 @@ static const struct inode_operations btrfs_special_inode_operations = {
- 	.get_inode_acl	= btrfs_get_acl,
- 	.set_acl	= btrfs_set_acl,
- 	.update_time	= btrfs_update_time,
-+	.fileattr_get	= btrfs_fileattr_get,
-+	.fileattr_set	= btrfs_fileattr_set,
- };
- static const struct inode_operations btrfs_symlink_inode_operations = {
- 	.get_link	= page_get_link,
-@@ -10787,6 +10812,8 @@ static const struct inode_operations btrfs_symlink_inode_operations = {
- 	.permission	= btrfs_permission,
- 	.listxattr	= btrfs_listxattr,
- 	.update_time	= btrfs_update_time,
-+	.fileattr_get	= btrfs_fileattr_get,
-+	.fileattr_set	= btrfs_fileattr_set,
- };
- 
- const struct dentry_operations btrfs_dentry_operations = {
-diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
-index 6ba883db107b..f6c5bf9bf217 100644
---- a/fs/btrfs/ioctl.c
-+++ b/fs/btrfs/ioctl.c
-@@ -270,11 +270,17 @@ static int btrfs_check_ioctl_vol_args2_subvol_name(const struct btrfs_ioctl_vol_
-  * Set flags/xflags from the internal inode flags. The remaining items of
-  * fsxattr are zeroed.
-  */
-+#define BTRFS_SUPPORTED_XFLAGS		(FS_XFLAG_PTIME)
-+
- int btrfs_fileattr_get(struct dentry *dentry, struct file_kattr *fa)
- {
- 	const struct btrfs_inode *inode = BTRFS_I(d_inode(dentry));
- 
- 	fileattr_fill_flags(fa, btrfs_inode_flags_to_fsflags(inode));
-+	fa->fsx_ptime.tv_sec = inode->i_ptime_sec;
-+	fa->fsx_ptime.tv_nsec = inode->i_ptime_nsec;
-+	fa->fsx_xflags |= FS_XFLAG_PTIME;
-+	fa->fsx_xflags_mask |= FS_XFLAG_PTIME;
+diff --git a/fs/file_attr.c b/fs/file_attr.c
+index 12610fb6a751..063c81fbfa6a 100644
+--- a/fs/file_attr.c
++++ b/fs/file_attr.c
+@@ -288,6 +288,89 @@ static int fileattr_set_prepare(struct inode *inode,
  	return 0;
  }
  
-@@ -294,9 +300,21 @@ int btrfs_fileattr_set(const struct mnt_idmap *idmap,
- 	if (btrfs_root_readonly(root))
- 		return -EROFS;
- 
--	if (fileattr_has_fsx(fa))
-+	/*
-+	 * We now support FS_XFLAG_PTIME, so exclude it from the unsupported
-+	 * check
-+	 */
-+	if (fileattr_has_fsx_mask(fa, BTRFS_SUPPORTED_XFLAGS))
-+		return -EOPNOTSUPP;
++/**
++ * __vfs_fileattr_set_locked - change miscellaneous file attributes while
++ * holding the inode lock
++ *
++ * @idmap:	idmap of the mount
++ * @dentry:	the object to change
++ * @fa:		fileattr pointer
++ *
++ * Same as vfs_fileattr_set(), but caller must hold the inode lock.
++ *
++ * Return: 0 on success, or a negative error on failure.
++ */
++int __vfs_fileattr_set_locked(const struct mnt_idmap *idmap, struct dentry *dentry,
++			      struct file_kattr *fa)
++{
++	struct inode *inode = d_inode(dentry);
++	struct file_kattr old_ma = {};
++	int err;
 +
-+	if (fa->fsx_xflags_mask & ~BTRFS_SUPPORTED_XFLAGS)
- 		return -EOPNOTSUPP;
- 
-+	if (!S_ISREG(inode->vfs_inode.i_mode) && !S_ISDIR(inode->vfs_inode.i_mode)) {
-+		if (fa->flags)
-+			return -EOPNOTSUPP;
++	if (!inode->i_op->fileattr_set)
++		return -ENOIOCTLCMD;
++
++	if (!inode_owner_or_capable(idmap, inode))
++		return -EPERM;
++
++	err = vfs_fileattr_get(dentry, &old_ma);
++	if (err)
++		return err;
++
++	/* initialize missing bits from old_ma */
++	if (fa->flags_valid) {
++		/* FS_IOC_SETFLAGS */
++		fa->fsx_xflags |= (old_ma.fsx_xflags & FS_XFLAGS_MASK) &
++				  ~FS_XFLAG_COMMON;
++		fa->fsx_extsize = old_ma.fsx_extsize;
++		fa->fsx_nextents = old_ma.fsx_nextents;
++		fa->fsx_projid = old_ma.fsx_projid;
++		fa->fsx_cowextsize = old_ma.fsx_cowextsize;
++		fa->fsx_ptime = old_ma.fsx_ptime;
++	} else {
++		/*
++		 * Preserve unmasked xflags when running file_setattr()
++		 * with a mask, which doesn't need a read-modify-write
++		 * so these attributes would be set to 0.
++		 *
++		 * With FS_IOC_FSSETXATTR or mask == 0 (legacy mode)
++		 * this is not needed as userspace does
++		 * read-modify-write already.
++		 */
++		if (fa->fsx_xflags_mask) {
++			fa->fsx_xflags |= old_ma.fsx_xflags &
++					  ~fa->fsx_xflags_mask;
++			fileattr_fill_xflags(fa, fa->fsx_xflags &
++					     ~FS_XFLAG_RDONLY_MASK);
++			if (!(fa->fsx_xflags_mask & FS_XFLAG_EXTSIZE))
++				fa->fsx_extsize = old_ma.fsx_extsize;
++			if (!(fa->fsx_xflags_mask & FS_XFLAG_PROJID))
++				fa->fsx_projid = old_ma.fsx_projid;
++			if (!(fa->fsx_xflags_mask & FS_XFLAG_COWEXTSIZE))
++				fa->fsx_cowextsize = old_ma.fsx_cowextsize;
++		}
++		fa->flags |= old_ma.flags & ~FS_COMMON_FL;
++
++		/* xflags not present in fsxattr */
++		if (!(fa->fsx_xflags_mask & FS_XFLAG_PTIME))
++			fa->fsx_ptime = old_ma.fsx_ptime;
 +	}
 +
- 	fsflags = btrfs_mask_fsflags_for_type(&inode->vfs_inode, fa->flags);
- 	old_fsflags = btrfs_inode_flags_to_fsflags(inode);
- 	ret = check_fsflags(old_fsflags, fsflags);
-@@ -449,6 +467,10 @@ int btrfs_fileattr_set(const struct mnt_idmap *idmap,
- 	}
++	err = fileattr_set_prepare(inode, &old_ma, fa);
++	if (err)
++		return err;
++	err = security_inode_file_setattr(dentry, fa);
++	if (err)
++		return err;
++	err = inode->i_op->fileattr_set(idmap, dentry, fa);
++	if (err)
++		return err;
++	fsnotify_xattr(dentry);
++
++	return 0;
++}
++EXPORT_SYMBOL(__vfs_fileattr_set_locked);
++
+ /**
+  * vfs_fileattr_set - change miscellaneous file attributes
+  * @idmap:	idmap of the mount
+@@ -308,7 +391,6 @@ int vfs_fileattr_set(const struct mnt_idmap *idmap, struct dentry *dentry,
+ 		     struct file_kattr *fa)
+ {
+ 	struct inode *inode = d_inode(dentry);
+-	struct file_kattr old_ma = {};
+ 	int err;
  
- update_flags:
-+	if (!fa->flags_valid && (fa->fsx_xflags_mask & FS_XFLAG_PTIME)) {
-+		inode->i_ptime_sec = fa->fsx_ptime.tv_sec;
-+		inode->i_ptime_nsec = fa->fsx_ptime.tv_nsec;
-+	}
- 	inode->flags = inode_flags;
- 	btrfs_update_inode_mapping_flags(inode);
- 	btrfs_sync_inode_flags_to_i_flags(inode);
-diff --git a/fs/btrfs/print-tree.c b/fs/btrfs/print-tree.c
-index 53e726119ca7..ba385d0ed9ed 100644
---- a/fs/btrfs/print-tree.c
-+++ b/fs/btrfs/print-tree.c
-@@ -263,6 +263,7 @@ static void print_inode_item(const struct extent_buffer *eb, int i)
- 	print_timespec(eb, &ii->ctime, "\t\tctime ", "\n");
- 	print_timespec(eb, &ii->mtime, "\t\tmtime ", "\n");
- 	print_timespec(eb, &ii->otime, "\t\totime ", "\n");
-+	print_timespec(eb, &ii->ptime, "\t\tptime ", "\n");
+ 	if (!inode->i_op->fileattr_set)
+@@ -318,60 +400,7 @@ int vfs_fileattr_set(const struct mnt_idmap *idmap, struct dentry *dentry,
+ 		return -EPERM;
+ 
+ 	inode_lock(inode);
+-	err = vfs_fileattr_get(dentry, &old_ma);
+-	if (!err) {
+-		/* initialize missing bits from old_ma */
+-		if (fa->flags_valid) {
+-			/* FS_IOC_SETFLAGS */
+-			fa->fsx_xflags |= (old_ma.fsx_xflags & FS_XFLAGS_MASK) &
+-					  ~FS_XFLAG_COMMON;
+-			fa->fsx_extsize = old_ma.fsx_extsize;
+-			fa->fsx_nextents = old_ma.fsx_nextents;
+-			fa->fsx_projid = old_ma.fsx_projid;
+-			fa->fsx_cowextsize = old_ma.fsx_cowextsize;
+-			fa->fsx_ptime = old_ma.fsx_ptime;
+-		} else {
+-			/*
+-			 * Preserve unmasked xflags when running file_setattr()
+-			 * with a mask, which doesn't need a read-modify-write
+-			 * so these attributes would be set to 0.
+-			 *
+-			 * With FS_IOC_FSSETXATTR or mask == 0 (legacy mode)
+-			 * this is not needed as userspace does
+-			 * read-modify-write already.
+-			 */
+-			if (fa->fsx_xflags_mask) {
+-				fa->fsx_xflags |= old_ma.fsx_xflags &
+-						  ~fa->fsx_xflags_mask;
+-				fileattr_fill_xflags(fa, fa->fsx_xflags &
+-						     ~FS_XFLAG_RDONLY_MASK);
+-				if (!(fa->fsx_xflags_mask & FS_XFLAG_EXTSIZE))
+-					fa->fsx_extsize = old_ma.fsx_extsize;
+-				if (!(fa->fsx_xflags_mask & FS_XFLAG_PROJID))
+-					fa->fsx_projid = old_ma.fsx_projid;
+-				if (!(fa->fsx_xflags_mask & FS_XFLAG_COWEXTSIZE))
+-					fa->fsx_cowextsize = old_ma.fsx_cowextsize;
+-			}
+-			fa->flags |= old_ma.flags & ~FS_COMMON_FL;
+-
+-			/* xflags not present in fsxattr */
+-			if (!(fa->fsx_xflags_mask & FS_XFLAG_PTIME))
+-				fa->fsx_ptime = old_ma.fsx_ptime;
+-		}
+-
+-		err = fileattr_set_prepare(inode, &old_ma, fa);
+-		if (err)
+-			goto out;
+-		err = security_inode_file_setattr(dentry, fa);
+-		if (err)
+-			goto out;
+-		err = inode->i_op->fileattr_set(idmap, dentry, fa);
+-		if (err)
+-			goto out;
+-		fsnotify_xattr(dentry);
+-	}
+-
+-out:
++	err = __vfs_fileattr_set_locked(idmap, dentry, fa);
+ 	inode_unlock(inode);
+ 	return err;
  }
- 
- static void print_dir_item(const struct extent_buffer *eb, int i)
-diff --git a/fs/btrfs/tree-log.c b/fs/btrfs/tree-log.c
-index 1d9dfb63fc5a..72a4a92b40b9 100644
---- a/fs/btrfs/tree-log.c
-+++ b/fs/btrfs/tree-log.c
-@@ -4631,6 +4631,9 @@ static void fill_inode_item(struct btrfs_trans_handle *trans,
- 	btrfs_set_timespec_sec(leaf, &item->otime, inode->i_otime_sec);
- 	btrfs_set_timespec_nsec(leaf, &item->otime, inode->i_otime_nsec);
- 
-+	btrfs_set_timespec_sec(leaf, &item->ptime, inode->i_ptime_sec);
-+	btrfs_set_timespec_nsec(leaf, &item->ptime, inode->i_ptime_nsec);
-+
- 	/*
- 	 * We do not need to set the nbytes field, in fact during a fast fsync
- 	 * its value may not even be correct, since a fast fsync does not wait
-diff --git a/include/uapi/linux/btrfs_tree.h b/include/uapi/linux/btrfs_tree.h
-index 47ee52859b45..c360b3e95f45 100644
---- a/include/uapi/linux/btrfs_tree.h
-+++ b/include/uapi/linux/btrfs_tree.h
-@@ -900,7 +900,8 @@ struct btrfs_inode_item {
- 	 * a little future expansion, for more than this we can
- 	 * just grow the inode item and version it
- 	 */
--	__le64 reserved[4];
-+	__le32 reserved[5];
-+	struct btrfs_timespec ptime;
- 	struct btrfs_timespec atime;
- 	struct btrfs_timespec ctime;
- 	struct btrfs_timespec mtime;
+diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
+index ba7ed3b387d8..7ff62ee27e58 100644
+--- a/include/linux/fileattr.h
++++ b/include/linux/fileattr.h
+@@ -97,6 +97,8 @@ static inline bool fileattr_has_fsx(const struct file_kattr *fa)
+ int vfs_fileattr_get(struct dentry *dentry, struct file_kattr *fa);
+ int vfs_fileattr_set(const struct mnt_idmap *idmap, struct dentry *dentry,
+ 		     struct file_kattr *fa);
++int __vfs_fileattr_set_locked(const struct mnt_idmap *idmap, struct dentry *dentry,
++			      struct file_kattr *fa);
+ int ioctl_getflags(struct file *file, unsigned int __user *argp);
+ int ioctl_setflags(struct file *file, unsigned int __user *argp);
+ int ioctl_fsgetxattr(struct file *file, void __user *argp);
 -- 
 2.56.0
 
