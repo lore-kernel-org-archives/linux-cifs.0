@@ -1,44 +1,44 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794736081;
-	b=F5D+SOAoG5hTH78G0wLR1NfGkGxq7q4/ymDZARRklQKLimpUaRJvJbikJDjh44fmvouX
-	 vSS3sL9A1iZjeYoKeQTrRg9SWsyE7Z/YDptUZq8AKT7gFOfxiG9zKrOfxiKwk5TW0Oxsb
-	 e6vtRDm8rq1xCBplIBn8FjhYL3BT+ulFAlFS8UnimXs98QDP06CX5Y22qWiAw8RdOff/H
-	 2bBGZKonoahgns7PdI8lO7qNjhTEjLfoLMdTDIet1sruv19FrjTmQAVSgjOEiowMjae8a
-	 NWVVBJOdPi23GOO7fHSqKakeInvOeEZsEOwmTDBeoDF8fY5Mllz8o0W+nX7CW44rReg==
+	t=1794736084;
+	b=pZC8rRfXpVXfs7Vpi7hd/0doZdvy5J7qAUOsWEBnS5YEeaXMf/KUhtyBLR6UkanHwjno
+	 0niZw0Aa3TN1c9tixZrA1AVOD6AyPQUWiAcSrvxCmZRmbmHP5r5SmTU+Ww/iO5mrS6GrO
+	 0K0EYLIS1xUMsWgIsDrJXLVEwMr0uIA4F9WUcqjt4ZqwfpL2AiSiiLkE1xqxWIugtBWbb
+	 SotRBvVx7iZy5pox7nQoT5um9Ls6QNZPiMHj8sx/59yQ3bjC3bZoHrAFFnVoszVLXKWiw
+	 HwUpVpCQH9cXfe/hry5hCeBoqwcILe/te9/kTaViwTAAH77VhJWzUwPiebssE1mQLUg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794736081;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794736084;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=W3YvPVGIUV6UeKNktyOpHIaKZATW29j3wAKF5lED/ZM=;
-	b=TGKhdI7Y5D9CpUg5BOfU3cn1DLCLq+I/JRFPb/ml5xa3ArxypKT/o9ycIa9NSw0xqz5q
-	 REbYpiG7r2HacLp5kZj9X/PHAJNPK9qA1hA7Uy0C2IZsFh72bfrPiJ7977ViQ/8ngBw9b
-	 1Ms7xkoYAQvuC7T3lkYLs4ecyCQDiQkfRaSJAR1UouS+iEgsugCy6CcT16JjscaQSDbES
-	 59t2cOrCN0dW4TX2LuC0QhexJk8Qb2cJWBroZPUoytSi6rN9vmNPqVbWnKqyatX0X1B8z
-	 sbV32LafD6cpyBx9jgr6MlSmXKMGUUfajZ9x1UbEJ14jjTZ5kF2dsSE1dbVc6vUvXWA==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=AlZgloI6wwHeCon3TkjYRmDAZCVeVDQbpt8xdWpWa7k=;
+	b=ZaQIs9FRXEE+CQtk0/8ociGdqebSRHFz7IOQPW7tg/XwlvpkJjDTK9ltaDLKEsUglwOj
+	 yCWfs0eM/tXptHsDfpBTAdYBuIlA0bOAxw049+KkE5XpkbdT9cGQ5skPd3cH3/Sc8A39D
+	 6O3x8tvLTwTpfx9Ygpo2IPkIrtnindtZ32wB+Ur2m60PZunQBWQ20CjziDp+Xd4D/19fN
+	 zybj9qVF2IYqTqaU4fauE9ZHIwRlRc6FqV2JIsDieEC0BH+w+KTqhAzgrII5X/x0vJstf
+	 SKgy1CCWYnv7Z7sg1PVSOEhgph26HM0g9qu0vA6Q0ngfkE2iCPFD9fPUohxYEqoY8wQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lA4H8NIq;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W1H3Xh7f;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55509606A31A;
-	Sun, 15 Nov 2026 09:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6575D606A31D;
+	Sun, 15 Nov 2026 09:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lA4H8NIq
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56EA51F000C4;
-	Sun, 15 Nov 2026 09:47:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=W1H3Xh7f
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67E581F000C4;
+	Sun, 15 Nov 2026 09:48:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794736080;
-	bh=W3YvPVGIUV6UeKNktyOpHIaKZATW29j3wAKF5lED/ZM=;
-	h=From:To:Cc:Subject:Date;
-	b=lA4H8NIq4rbYfksDegTpSngx+ydGH+ws02/MVvVCh+a/ddEUe4NZpOQ/PavRtokmw
-	 4mWUZ+RxWP0BF4EE/qCacmBDAq+u2V9uGusmOLQT2sNLyExVVbWjYAixcXQktLlRcR
-	 flU9z0VFKMvarop6Ci5M06rhO3I4nIewCtDPAK4rrmMpSJm8tWFvPiXN+Qn9oBVpi1
-	 QwYZka0Rg3ErXvgAlLeRPjR939bPWiekbz0hrlMAD4NZjWnPS7znk3eaMZ+fHdyJPE
-	 HrbwQPdUpP+cq0EYmQui7unU6A3s7xJx9/zDvP2KJJbnNAvnXWorhbpPEi5LQ5Hc2L
-	 7zPQzWoOfz7EQ==
+	s=k20260515; t=1794736084;
+	bh=AlZgloI6wwHeCon3TkjYRmDAZCVeVDQbpt8xdWpWa7k=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=W1H3Xh7fTWmxgEDoPdba3IDvkSnN2nqv6vQx4FoIUavc2pjruROFXyHRjmA9YR5OT
+	 mSjCW7LSqq6LXwILyoWVsb510KY9WFV9Z5zm3UR20Kg/OYo8Nn5wfP8GFLPXrWX2KN
+	 3gQgl+V7KOxDnWlV7OXGhCVwf8TCdZS648j7bmWYYB6RTOfMN+ZxqtJjI0+j5uF/sZ
+	 xW31g0VCi5X8YWi3SNCekgZpNuuaBwSdC2oNiwciM+OHDdXHiYDpX26cL++pAWauLi
+	 Upf/lgkarx+EHDlS3IG1H6OYgR8tY7AsOs2TYz5Liq/SM2mQwXcqUh0+tGawkRPh6X
+	 GjOwKM7bYkNcg==
 From: Namjae Jeon <linkinjeon@kernel.org>
 To: linux-cifs@vger.kernel.org
 Cc: senozhatsky@chromium.org,
@@ -51,10 +51,12 @@ Cc: senozhatsky@chromium.org,
 	wangzhaolong633@gmail.com,
 	Namjae Jeon <linkinjeon@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH 1/2] ksmbd: protect SET_INFO metadata updates against filesystem freezing
-Date: Sun, 15 Nov 2026 18:47:36 +0900
-Message-Id: <20261115094737.8532-1-linkinjeon@kernel.org>
+Subject: [PATCH 2/2] ksmbd: protect CREATE metadata updates against filesystem freezing
+Date: Sun, 15 Nov 2026 18:47:37 +0900
+Message-Id: <20261115094737.8532-2-linkinjeon@kernel.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20261115094737.8532-1-linkinjeon@kernel.org>
+References: <20261115094737.8532-1-linkinjeon@kernel.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -66,110 +68,109 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-SET_INFO calls notify_change() and set_posix_acl() without a mount write
-reference. During a filesystem freeze, these updates can reach ext4
-without the usual freeze protection and trigger WARN_ON() in
-ext4_journal_check_start().
+Since commit 4e45cca31d4e, smb2_open() no longer holds a write reference
+after path lookup. The CREATE path still writes EAs, security descriptor
+and stream xattrs, inherited DACLs, and initial POSIX ACLs.
 
-Hold a write reference around the metadata updates. Drop it before storing
-the security descriptor xattrs, whose helpers acquire their own references.
+Request write protection in the xattr helpers and hold a reference around
+the initial POSIX ACL updates.
 
-Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Fixes: 4e45cca31d4e ("smb/server: add ksmbd_vfs_kern_path()")
 Cc: stable@vger.kernel.org
 Signed-off-by: Namjae Jeon <linkinjeon@kernel.org>
 ---
- fs/smb/server/smb2pdu.c | 17 +++++++++++++----
- fs/smb/server/smbacl.c  |  9 +++++++++
- 2 files changed, 22 insertions(+), 4 deletions(-)
+ fs/smb/server/smb2pdu.c | 10 +++++-----
+ fs/smb/server/smbacl.c  |  2 +-
+ fs/smb/server/vfs.c     |  6 ++++++
+ 3 files changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index fc0987d99a57..1b8471d75afa 100644
+index 1b8471d75afa..d8da0b259cfd 100644
 --- a/fs/smb/server/smb2pdu.c
 +++ b/fs/smb/server/smb2pdu.c
-@@ -8998,6 +8998,10 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 	    (file_info->Attributes & FILE_ATTRIBUTE_TEMPORARY_LE))
- 		return -EINVAL;
- 
-+	rc = mnt_want_write_file(filp);
-+	if (rc)
-+		return rc;
-+
- 	crtime = (s64)le64_to_cpu(file_info->CreationTime);
- 	if (crtime > 0)
- 		fp->create_time = crtime;
-@@ -9025,7 +9029,8 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 		if (!S_ISDIR(inode->i_mode) &&
- 		    file_info->Attributes & FILE_ATTRIBUTE_DIRECTORY_LE) {
- 			pr_err("can't change a file to a directory\n");
--			return -EINVAL;
-+			rc = -EINVAL;
-+			goto out;
+@@ -3719,7 +3719,7 @@ static noinline int smb2_set_stream_name_xattr(const struct path *path,
+ 			};
+ 			rc = ksmbd_vfs_setxattr(idmap, path, xattr_stream_name,
+ 						(void *)afpinfo_empty,
+-						sizeof(afpinfo_empty), 0, false);
++						sizeof(afpinfo_empty), 0, true);
+ 			return rc < 0 ? rc : 0;
  		}
+ 		ksmbd_debug(SMB, "XATTR stream name lookup failed: %d\n", rc);
+@@ -3729,7 +3729,7 @@ static noinline int smb2_set_stream_name_xattr(const struct path *path,
+ 	if (!test_tree_conn_flag(fp->tcon, KSMBD_TREE_CONN_FLAG_WRITABLE))
+ 		return -EACCES;
  
- 		if (!(S_ISDIR(inode->i_mode) && file_info->Attributes == FILE_ATTRIBUTE_NORMAL_LE))
-@@ -9046,7 +9051,7 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 			XATTR_DOSINFO_ITIME;
- 
- 		rc = ksmbd_vfs_set_dos_attrib_xattr(idmap, &filp->f_path, &da,
--				true);
-+				false);
- 		if (rc)
- 			ksmbd_debug(SMB,
- 				    "failed to restore file attribute in EA\n");
-@@ -9057,13 +9062,17 @@ static int set_file_basic_info(struct ksmbd_file *fp,
- 		struct dentry *dentry = filp->f_path.dentry;
- 		struct inode *inode = d_inode(dentry);
- 
--		if (IS_IMMUTABLE(inode) || IS_APPEND(inode))
--			return -EACCES;
-+		if (IS_IMMUTABLE(inode) || IS_APPEND(inode)) {
-+			rc = -EACCES;
-+			goto out;
-+		}
- 
- 		inode_lock(inode);
- 		rc = notify_change(idmap, dentry, &attrs, NULL);
- 		inode_unlock(inode);
- 	}
-+out:
-+	mnt_drop_write_file(filp);
- 	return rc;
+-	rc = ksmbd_vfs_setxattr(idmap, path, xattr_stream_name, NULL, 0, 0, false);
++	rc = ksmbd_vfs_setxattr(idmap, path, xattr_stream_name, NULL, 0, 0, true);
+ 	if (rc < 0)
+ 		pr_err("Failed to store XATTR stream name :%d\n", rc);
+ 	else
+@@ -3944,7 +3944,7 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
+ 	    sizeof(struct create_sd_buf_req))
+ 		return -EINVAL;
+ 	return set_info_sec(work->conn, work->tcon, path, &sd_buf->ntsd,
+-			    le32_to_cpu(sd_buf->ccontext.DataLength), true, false,
++			    le32_to_cpu(sd_buf->ccontext.DataLength), true, true,
+ 			    true, true);
  }
  
+@@ -5075,7 +5075,7 @@ int smb2_open(struct ksmbd_work *work)
+ 
+ 			rc = smb2_set_ea(&ea_buf->ea,
+ 					 le32_to_cpu(ea_buf->ccontext.DataLength),
+-					 &path, false);
++					 &path, true);
+ 			if (rc == -EOPNOTSUPP)
+ 				rc = 0;
+ 			else if (rc)
+@@ -5280,7 +5280,7 @@ int smb2_open(struct ksmbd_work *work)
+ 								    &path,
+ 								    pntsd,
+ 								    pntsd_size,
+-								    false);
++								    true);
+ 					kvfree(pntsd);
+ 					if (rc)
+ 						pr_err("failed to store ntacl in xattr : %d\n",
 diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 6b5f22d6280c..04dd4a6d7092 100644
+index 04dd4a6d7092..0ca093de83c6 100644
 --- a/fs/smb/server/smbacl.c
 +++ b/fs/smb/server/smbacl.c
-@@ -12,6 +12,7 @@
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/mnt_idmapping.h>
-+#include <linux/mount.h>
+@@ -1443,7 +1443,7 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 			pntsd_size += sizeof(struct smb_acl) + nt_size;
+ 		}
  
- #include "smbacl.h"
- #include "smb_common.h"
-@@ -1944,6 +1945,12 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 				   (fattr.cf_mode & 0777);
+-		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size, false);
++		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size, true);
+ 		kfree(pntsd);
+ 	}
  
- 	ksmbd_vfs_remove_acl_xattrs(idmap, path);
-+	if (get_write) {
-+		rc = mnt_want_write(path->mnt);
-+		if (rc)
-+			goto out;
-+	}
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 0c95d4668370..09dad151360c 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -2334,6 +2334,10 @@ int ksmbd_vfs_set_init_posix_acl(const struct mnt_idmap *idmap,
+ 	}
+ 	posix_state_to_acl(&acl_state, acls->a_entries);
+ 
++	rc = mnt_want_write(path->mnt);
++	if (rc)
++		goto out;
 +
- 	/* Update posix acls */
- 	if (IS_ENABLED(CONFIG_FS_POSIX_ACL) && fattr.cf_dacls) {
- 		rc = set_posix_acl(idmap, path->dentry,
-@@ -1965,6 +1972,8 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 	inode_lock(inode);
- 	rc = notify_change(idmap, path->dentry, &newattrs, NULL);
- 	inode_unlock(inode);
-+	if (get_write)
-+		mnt_drop_write(path->mnt);
- 	if (rc)
- 		goto out;
+ 	rc = set_posix_acl(idmap, dentry, ACL_TYPE_ACCESS, acls);
+ 	if (rc < 0)
+ 		ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_ACCESS) failed, rc : %d\n",
+@@ -2345,7 +2349,9 @@ int ksmbd_vfs_set_init_posix_acl(const struct mnt_idmap *idmap,
+ 			ksmbd_debug(SMB, "Set posix acl(ACL_TYPE_DEFAULT) failed, rc : %d\n",
+ 				    rc);
+ 	}
++	mnt_drop_write(path->mnt);
  
++out:
+ 	free_acl_state(&acl_state);
+ 	posix_acl_release(acls);
+ 	return rc;
 -- 
 2.25.1
 
