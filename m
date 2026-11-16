@@ -1,76 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.210.200
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794839186;
-	b=hZF3nlFOUdyuhMV/MYmEHh1heW+LVQNxgInOGMsFYPFsx083FKWPiWyBtjaXdY7bwoik
-	 +1WFjWdOSenahZA6Jt7M+MXZMw9HWmoRG2cQTxv1e6IoHC5LHLIm/Ir11ldyhbrXoIR8S
-	 BcklJ5JUbGYEuuY/WUr7fHMDZAqelb3bH3/SvOtoduqKBUDkvnrViKfWkhsAonhMOdSsZ
-	 IJdaiuXRx4hSCJF7sxcXDPoFk+9XAxdP9Rf83FAVvf4+7XaypGho+cKs610K6xukZBfMA
-	 3yHLBW3W6OENySdhddCdpNSPXwOIBzlQCTup51WD+lFSyR5OIKXQV90wWL2Cki+JjMA==
+	t=1794841471;
+	b=iR/OPI4lRpxnUwDRT4laVSyvdwQMIkJW7GdImmLIKrsIUKbOp6Yjp0vVPuACeAA7pKIo
+	 olSznz0KArheWt1yE3NhG1jOcW24UOJrQmkaR3AcfInENlgvXq7M8vvE9Ih21mYj0t9jy
+	 Za01eAfMbq0KHAIjjCTekjRRHngUBEjxkOjaUKiFtdycUyvtHhohZqWsCu0y6gxqgja8G
+	 iL1s8F0LnbG2V5O14buy77MaytmC/2dPjGKyE1p/CInrZHvHDmZ9WPKC65VZY03e6DfHV
+	 cL+U2JXnNZVzPWI+9hGUiNsNIwVV4xJQqDTBI+wfkx+ZyllV0xpnu+iO613iGN4AdYw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794839186;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794841471;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Received:Date:In-Reply-To:
-	 Mime-Version:References:Message-ID:Subject:From:To:Cc:Content-Type:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=Julx96UTlwUpy/yEEb6XKUMDaihQ6nHqBxqUTRWWoDs=;
-	b=pc3F3omOATgW2TwOPLUvifjF1l38RvkgV7wB63a6jjiX38ciJ0EfzVrEe2T5NkroNPnl
-	 ygVgnxBMtnMLDG3UkggBYMdXKuR4kUSOwQ64fLIU11w12Vsbb7v69DY7mMpyLcfsviEZo
-	 31Rz/3v9x6DAPhy/w+0VAT9aEtff3N1rM7nIhXjEmk9eoMmPMoEI7IHnf+QZiQchNsPoU
-	 ubEtqXb2cyjN6z5hD6C3Ea398mjVzIRUF4sezQTlKzxuuHpWE5ZRnfwffm0+WzHFcb7lZ
-	 D2gLuoARbt4x3RUSsyYrLzDZyj4JBOn5xupRYbJZLPR4nuPmuYluyykIeeECPAHYoFQ==
+	bh=MvTRqL1mdtM+813rBnpKCpEGBrHo1i50Gwhh8qIKRW8=;
+	b=TofH/+cBJvJ7qsnrN7SH/a/CQFuqGkGNbWk/YKz9draH8WMrNoAyUE6srsGlXdI+OOEk
+	 nnzIJ2iq0O/oLuWdCfbtijNMoQg4GpXUBZN4sj27ClUcHMZscWCmrB+Bh2SJCcn5142yz
+	 WnHP0kcBQrH9IqMbkefHQyecp18XWm3YS4s8YSRG56BSo7HxQoKKejD2yp20RAxpztrpj
+	 aVBa1rAC+Hb1eQkSi7t368rqFAxCBMN/PSO2AxNL9IM2joJnoOmZWjZyi8bPxSmGd8FI2
+	 cxzVlOTDi9SqzsLe2EP1EbNZCDLupqEWgL9Xjvrpr5YmKkOTJcLajDKHDyY7tKfOViQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=google.com;
-	spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com;
-	dkim=pass header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=o04lO8GG;
-	arc=none smtp.remote-ip=209.85.210.200
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=w6wz4DzJ;
+	arc=none smtp.remote-ip=74.125.82.181
+Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A56606A335
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 14:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 09A56606A335
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7895606A88B
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 15:04:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E7895606A88B
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.a=rsa-sha256 header.s=20260707 header.b=o04lO8GG
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-8b69b8c6dd5so4468420b3a.3
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 06:26:25 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=w6wz4DzJ
+Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-36dbde64409so5183993eec.0
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 07:04:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20260707; t=1794839184; x=1795443984; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=Julx96UTlwUpy/yEEb6XKUMDaihQ6nHqBxqUTRWWoDs=;
-        b=o04lO8GGgXrESFKdzPFhg+2CZ66oWV/D9RCdkmGQv5zmRx4ocR7cMj49UAZWLzQ08p
-         Exgjw5nzv+VU/noSZj1qNSRM42Efhd5UU9M4zYhj9hYL33RguWZjEdRIwhZZKtjjmAWK
-         CZHQW0LenzCeV4Az+D9oYTYe1+JdnXTThTdnyyA0qyK3iEfA5CNu2rFJPxjCMaEbDPPa
-         4GWRcxQfsKciv2s2Xnp6TE4BCnhHiUeXbt2eHpPmzKjfbnT06BfdZVvWfMuXAZ4NfG2z
-         lvfm/r/kXhSPWJ2Thy+3cctCZhv0qphjwQepT6O3eDBYyRmyUCFE1kDkMxO3F8tlJaEg
-         ursQ==
+        d=gmail.com; s=20260707; t=1794841467; x=1795446267; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=MvTRqL1mdtM+813rBnpKCpEGBrHo1i50Gwhh8qIKRW8=;
+        b=w6wz4DzJ/F/IIzt0So0o/kHRzp5pszNlPly2C1qgvQJqxUvtvJ2oG6GdouS1L1wY36
+         X68f4CN1XT0294VaGFL+8fYBxwe+dyWG+ciakFNSRbD9YRL7vGMwwXOoign2edE150+i
+         0oRYSsDNgPvCYF3apJ38dM2bH9FlK16fNxfKchmjvNlfwnOH8aQSVOb/Vobm7G/AIbyY
+         PYGtR9jpc5tpbNl94iruCWA/zAWjPQzlP/lYsLK1iwiEGYSEi0XnO9yUu8VY0n9aJ1uo
+         1ULcIEcOKquvSqs4wOm3PBI164S6OZBfVKtar5ZvxcR4Gs7+zoKILtg6Mm3Ckj58PcrD
+         FhBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794839184; x=1795443984;
-        h=content-transfer-encoding:content-type:cc:to:from:subject
-         :message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Julx96UTlwUpy/yEEb6XKUMDaihQ6nHqBxqUTRWWoDs=;
-        b=VUI3I02Co6SGWA3r/12ecGXM+f+kdogaCE1dhQrkqhYJoWZtD9i47BXAdWpDKKu1+1
-         cWYgxIbyoJdch/hSKV+I8Mj7LDNpE8B7lVbofTwh80cvLuzxfzPpnIVR8z+afIQnJwbS
-         0Taj8nXjlMzAf67hjME+YEZwerXHm5OkieFH+5BVuw/jKDQWjF2x7ibkfn3jF4aNuK2e
-         g8WFSI2WMogu62JvaiUh+jdTw0IyE2snP2ThilE3dUNFUlG3ibuFl3urFP4+VYmsRrEL
-         JuFAtENneeOyAR6FiT34CQ1n2HG1xxhx9a55yvMDVDrJOgqKgQv7BYh/0GoJsUhBoo+I
-         6Ukw==
-X-Forwarded-Encrypted: i=1; AL+hErFEWiYH3/2Ny46iP+sOkCMQgB/RH5XvQuQrnsHtAYWr6znme2uiEncRoWzW5/ls9nBvTBBALwGLZ18Q@vger.kernel.org
-X-Gm-Message-State: APuU4Z8mmaeXqulQ+guXl9ej+go4LEmxAmeMFva6tF7zmWdD/GCHZGTg
-	0btSMS/RxMszJsrAkwK+jg40hnzSMTwt6uSrETylCeDUnv6A9eVlnhlasin6QZtt2EGCFN7tcno
-	xCh11YA==
-X-Received: from pffm4-n2.prod.google.com ([2002:a05:6a00:c304:20b0:8a0:70d8:a2ef])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:4fc3:b0:89f:b166:bde6
- with SMTP id d2e1a72fcca58-8beb8cc8ad6mr9720424b3a.54.1794839183449; Mon, 16
- Nov 2026 06:26:23 -0800 (PST)
-Date: Mon, 16 Nov 2026 06:26:22 -0800
-In-Reply-To: <20261114202653.3113381-10-rdunlap@infradead.org>
+        d=1e100.net; s=20260707; t=1794841467; x=1795446267;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=MvTRqL1mdtM+813rBnpKCpEGBrHo1i50Gwhh8qIKRW8=;
+        b=Rj5nWfkmDUzQ19rH2u8dMDOF4Q+3OEcZZlynsYshNXEAjzi/5PtXaVuUIbE6j2/0Kd
+         vSi0BTBRRlf5LT67iClfOldAT+4DDPVbk0/iDtLvLig1VwOYYzNL+tjVPGRcirxKWXSE
+         uwh/ex+BrNl+BhLncNdR/0iXMLLz1amghIjJc5MLaP8qg1UXw2qbLcielVqsaGw17bfY
+         CFRePNS3iA30BbRIp/XMDhLMVpe1Tb31whZVDzHMte6kkh8G1vzyFgRhckl3vR1wjM9f
+         qf3LJATAMTMSJfyJfzTqI6KrJjNJCTrrAMi4qeOnTSRYnAcGk37DcVdNGINEqUPhW06o
+         6SIw==
+X-Forwarded-Encrypted: i=1; AL+hErHlas853/B8It041PqSIf6ofgX0Xt7Z9ypExrl2R3j/pugky6swNVMuYvNDIGd6CDPXtlBtlBGF6Mv3@vger.kernel.org
+X-Gm-Message-State: APuU4Z9KQa6bYJsiXcNhMX4E/kcoyWh/lymzxhwp6+CsMIdXUkCzRtrc
+	molZAD4YndtRPaffe5Id+BA4cAAXC1tV9GsNUgXYWiDzdbmyWZT9cjNB
+X-Gm-Gg: AZFdTZewGg84pMLhfTQJwuGxzWCRp63JkawAlt2NwDQJW/1i4OkNucZpLNR5QgtIlme
+	q6dwUYzuvpSKfuLKwwBTOUpscP3iZgIVpl67EgV22HX67XaHBjTSRPiPE3sXgNtPg9UrVo3vOo1
+	Wrj9/oSaCkYj10znYbx4+sQfV6UgHznIsuzh+YAx/ZihyiAdeKhqEI7AAkF0m/SIn6IlyQlaAnM
+	8/HMicfjAhC1d3LrIg+rKLLFMpz22dG8wkSdn7gvl2nSY1KVk2lx4jre6+aeV/soEvEO3RvZ4LM
+	Gc5gtBzT5scLT6Rh3c9nTsngYmTLhRo7nYhv02+fvxCDlX1C93cRkl4+LuMFTusQcUy8xVg1dZO
+	JnsQrMf2S5L90Mtz3P27imS8LSgOgYyd+e/fuoC1KZCPfomuNn41aiHnYS8iqBx9COnTdZmeQH+
+	YvD5Tehk5O42nup101NVoKPXWQ+AtyGibML7xPn2gxtGz4Lk3XEtr4O5WQ8NvonjSqL+c9+IZtU
+	m0sQv0vESV89lhFjz4V8zyuRCsfnV27legn0P+CgnRKySNjjM91MKbfPsH0+P3RHyCJ+GS++3iz
+	9ft1y/TuZTOZK6CraKHpS47qifibjJmV283dWO5qejq8C8sNatGiwxW3Ykh/nYTzNih9KUIyfIA
+	RDA==
+X-Received: by 2002:a05:693c:8108:b0:376:5b99:a7e3 with SMTP id 5a478bee46e88-37963660626mr10679088eec.3.1794841466625;
+        Mon, 16 Nov 2026 07:04:26 -0800 (PST)
+Received: from dell (ec2-13-229-224-160.ap-southeast-1.compute.amazonaws.com. [13.229.224.160])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-37956bb0c40sm37141083eec.28.2026.11.16.07.04.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Nov 2026 07:04:21 -0800 (PST)
+From: Yuansheng Yang <0xbeac@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: pin parent dentry in maximal access check
+Date: Mon, 16 Nov 2026 23:04:11 +0800
+Message-ID: <20261116150411.321076-1-0xbeac@gmail.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -79,222 +98,109 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-References: <20261114202653.3113381-1-rdunlap@infradead.org> <20261114202653.3113381-10-rdunlap@infradead.org>
-Message-ID: <avsSjioXqbCOn834@seanjc-mac.roam.internal>
-Subject: Re: [PATCH 09/12] docs: ioctl-number: update virtualization entries
-From: Sean Christopherson <seanjc@google.com>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org, 
-	David Hildenbrand <david@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, linux-mm@kvack.org, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowangio@gmail.com>, 
-	David Heidelberg <david@ixit.cz>, oe-linux-nfc@lists.linux.dev, 
-	Chas Williams <3chas3@gmail.com>, linux-atm-general@lists.sourceforge.net, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Helge Deller <deller@gmx.de>, linux-fbdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, MPT-FusionLinux.pdl@broadcom.com, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org, 
-	Neill Kapron <nkapron@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org, 
-	Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org, 
-	Hans de Goede <hansg@kernel.org>, Arnd Bergmann <arnd@arndb.de>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"Eugenio =?utf-8?B?UMOpcmV6?=" <eperezma@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>, 
-	linux-fsdevel@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>, linux-ext4@vger.kernel.org, 
-	Mike Marshall <hubcap@omnibond.com>, devel@lists.orangefs.org, 
-	Paulo Alcantara <pc@manguebit.org>, Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org, 
-	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>, 
-	linux-f2fs-devel@lists.sourceforge.net, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	Tzung-Bi Shih <tzungbi@kernel.org>, Benson Leung <bleung@chromium.org>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Alex Deucher <alexander.deucher@amd.com>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, amd-gfx@lists.freedesktop.org, 
-	Jani Nikula <jani.nikula@linux.intel.com>, 
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Tvrtko Ursulin <tursulin@ursulin.net>, intel-gfx@lists.freedesktop.org, 
-	Matthew Brost <matthew.brost@intel.com>, 
-	"Thomas =?utf-8?Q?Hellstr=C3=B6m?=" <thomas.hellstrom@linux.intel.com>, intel-xe@lists.freedesktop.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 14, 2026, Randy Dunlap wrote:
-> Update the list of files where virtualization ioctls are defined.
->=20
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> [Since having multiple maintainers trying to merge these would
-> cause some conflicts, it would be more manageable for Jon to
-> take all of these through the docs-next tree.]
->=20
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Shuah Khan <skhan@linuxfoundation.org>
-> Cc: linux-doc@vger.kernel.org
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: xen-devel@lists.xenproject.org
-> Cc: Hans de Goede <hansg@kernel.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowangio@gmail.com>
-> Cc: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Cc: virtualization@lists.linux.dev
->=20
->  Documentation/userspace-api/ioctl/ioctl-number.rst |    6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> --- linux-next-20261113.orig/Documentation/userspace-api/ioctl/ioctl-numb=
-er.rst
-> +++ linux-next-20261113/Documentation/userspace-api/ioctl/ioctl-number.rs=
-t
-> @@ -200,6 +200,7 @@ Code  Seq#    Include File
->  'M'   01-03  drivers/scsi/megaraid/megaraid_sas.h
->  'M'   00-03  drivers/video/fbdev/mb862xx/mb862xxfb.h
->  'M'   00-0F  drivers/video/fsl-diu-fb.h                                c=
-onflict!
-> +'M'   01-03  xen/interface/xen-mca.h                                   c=
-onflict!
->  'N'   00-1F  drivers/usb/scanner.h
->  'N'   40-7F  uapi/linux/nvme_ioctl.h
->  'N'   80-83  uapi/linux/ntsync.h and uapi/linux/nvme_ioctl.h           c=
-onflict!
-> @@ -239,6 +240,7 @@ Code  Seq#    Include File
->  'U'   64     drivers/usb/misc/usbtest.c                                c=
-onflict!
->  'V'   all    linux/vt.h                                                c=
-onflict!
->  'V'   all    linux/videodev2.h                                         c=
-onflict!
-> +'V'   00-1F  linux/vboxguest.h                                         c=
-onflict!
->  'V'   C0     linux/ivtvfb.h                                            c=
-onflict!
->  'V'   C0     linux/ivtv.h                                              c=
-onflict!
->  'V'   C0     media/si4713.h                                            c=
-onflict!
-> @@ -357,6 +359,7 @@ Code  Seq#    Include File
->  '|'   80-9F  samples/                                                  A=
-ny sample and example drivers
->  0x80  00-1F  linux/fb.h
->  0x81  00-1F  linux/vduse.h
-> +             drivers/vdpa/vdpa_user/vduse_dev.c
->  0x89  00-07  asm-generic/sockios.h
->  0x89  06-07  linux/sockios.h
->  0x89  0B-DF  linux/sockios.h
-> @@ -398,8 +401,11 @@ Code  Seq#    Include File
->                                                                         <=
-mailto:kvm@vger.kernel.org>
->  0xAE  40-FF  linux/kvm.h                                               K=
-ernel-based Virtual Machine
->                                                                         <=
-mailto:kvm@vger.kernel.org>
-> +0xAE  C6     arch/x86/kvm/x86.c                                        X=
-86 KVM
+ksmbd_vfs_query_maximal_access() reads dentry->d_parent without holding
+a reference to the parent.  smb2_open() calls it after path lookup has
+returned without the parent inode lock.  The AppInstanceId takeover
+path also calls it on the old handle's filp->f_path without holding
+that lock.  A reference to the child dentry does not pin its old parent
+across a rename.
 
-I'd rather omit this entry.  0xAE C6 is covered by the entry above, and the=
- horror
-in arch/x86/kvm/x86.c is purely a 32-bit compatibility alias for an ioctl t=
-hat is
-defined in kvm.h (the structure payload defines an pointer instead of a __u=
-64).
+A concurrent rename can therefore move the child to another directory
+and drop the last reference to the old parent.  If the old parent is
+then removed and freed, d_inode(parent) reads the d_inode field of a
+freed dentry.  If the sampled parent has become negative, passing its
+NULL inode to inode_permission() can also cause a NULL dereference.
 
-If it's a sticking point, e.g. this will trip automated tooling over and ov=
-er, then
-I vote to move the relevant definitions to uapi headers, e.g.
+KASAN caught the following on an x86_64 QEMU guest with a test-only
+100 ms delay between reading d_parent and d_inode:
 
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kv=
-m.h
-index 00ce265391e1..e02ef7a39f7c 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -230,6 +230,18 @@ struct kvm_msr_filter {
- 	struct kvm_msr_filter_range ranges[KVM_MSR_FILTER_MAX_RANGES];
- };
+  BUG: KASAN: slab-use-after-free in ksmbd_vfs_query_maximal_access+0x2ba/0x300
+  Read of size 8 at addr ffff8881100f0830 by task kworker/2:1/81
+  Workqueue: ksmbd-io handle_ksmbd_work
+  Call Trace:
+   ksmbd_vfs_query_maximal_access+0x2ba/0x300
+   smb2_open+0x60d5/0xec30
+   handle_ksmbd_work+0xad4/0x2110
+   process_one_work+0x745/0x10f0
+   worker_thread+0x511/0xc80
+   kthread+0x330/0x410
+  Allocated by task 319:
+   __d_alloc+0x35/0x860
+   d_alloc+0x46/0x1f0
+   lookup_one_qstr_excl+0x171/0x250
+   filename_mkdirat+0xba/0x4c0
+   __x64_sys_mkdir+0x6a/0x90
+  Freed by task 81:
+   kmem_cache_free+0xb8/0x3b0
+   rcu_core+0x549/0x17d0
 
-+struct kvm_msr_filter_range_compat {
-+	__u32 flags;
-+	__u32 nmsrs;
-+	__u32 base;
-+	__u32 bitmap;
-+};
-+
-+struct kvm_msr_filter_compat {
-+	__u32 flags;
-+	struct kvm_msr_filter_range_compat ranges[KVM_MSR_FILTER_MAX_RANGES];
-+};
-+
- struct kvm_cpuid_entry {
- 	__u32 function;
- 	__u32 eax;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 0771efaf94c8..ef9f92cba589 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4260,21 +4260,6 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
- }
+The read is 48 bytes into a freed 192-byte dentry, which is exactly the
+d_inode member.
 
- #ifdef CONFIG_KVM_COMPAT
--/* for KVM_X86_SET_MSR_FILTER */
--struct kvm_msr_filter_range_compat {
--	__u32 flags;
--	__u32 nmsrs;
--	__u32 base;
--	__u32 bitmap;
--};
--
--struct kvm_msr_filter_compat {
--	__u32 flags;
--	struct kvm_msr_filter_range_compat ranges[KVM_MSR_FILTER_MAX_RANGES];
--};
--
--#define KVM_X86_SET_MSR_FILTER_COMPAT _IOW(KVMIO, 0xc6, struct kvm_msr_fil=
-ter_compat)
--
- long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
- 			      unsigned long arg)
+Commit 2e450920d58b ("ksmbd: move oplock handling after unlock parent
+dir") released the parent lock and reference before the final MXAC
+query in smb2_open(), leaving this helper's bare d_parent access
+unprotected.  Commit 4e45cca31d4e ("smb/server: add
+ksmbd_vfs_kern_path()") later switched the earlier open path to an
+unlocked lookup, exposing the MAXIMUM_ALLOWED query as well.
+
+Commit 0383a66dabd7 ("ksmbd: pin parent dentries in SMB2 CREATE ACL
+path") fixed the same race class in smb2_open() and smb_inherit_dacl(),
+but did not cover this helper.
+
+Take a parent reference with dget_parent() and hold it across the
+permission check.  If the parent has no inode, leave FILE_DELETE unset.
+
+OpenAI Codex assisted with reviewing the fix and revising the changelog.
+
+Fixes: 2e450920d58b ("ksmbd: move oplock handling after unlock parent dir")
+Cc: stable@vger.kernel.org
+Signed-off-by: Yuansheng Yang <0xbeac@gmail.com>
+---
+The parent lease break sites in oplock.c are covered by a separate fix.
+
+Testing used an x86_64 KASAN QEMU guest based on 7e1392a42ea2 with
+0383a66dabd7 applied.  An SMB client issued MAXIMUM_ALLOWED opens while
+a local process in the guest repeatedly renamed the child and removed
+and recreated its old parent directory on tmpfs.
+
+A test-only mdelay(100) between reading d_parent and d_inode triggered
+the UAF within three open attempts.  With the fix, the same delay was
+placed after dget_parent(): 789 open attempts completed, including 561
+successful opens, without a KASAN report.  The delay is not in this
+patch.  Without the delay, the unfixed kernel did not reproduce the
+issue in 67,381 open attempts over 300 seconds.
+
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 7c3edbe6cb77..0f68500183d7 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -124,6 +124,9 @@ static int ksmbd_vfs_path_lookup(struct
+ void ksmbd_vfs_query_maximal_access(const struct mnt_idmap *idmap,
+ 				   struct dentry *dentry, __le32 *daccess)
  {
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 8dff2fc1972e..54dbdabd0e9b 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1477,6 +1477,7 @@ struct kvm_enc_region {
++	struct dentry *parent;
++	struct inode *parent_inode;
++
+ 	*daccess = cpu_to_le32(FILE_READ_ATTRIBUTES | READ_CONTROL |
+ 			       SYNCHRONIZE);
+ 
+@@ -139,8 +142,12 @@ void ksmbd_vfs_query_maximal_access(cons
+ 	if (!inode_permission(idmap, d_inode(dentry), MAY_OPEN | MAY_EXEC))
+ 		*daccess |= FILE_EXECUTE_LE;
+ 
+-	if (!inode_permission(idmap, d_inode(dentry->d_parent), MAY_EXEC | MAY_WRITE))
++	parent = dget_parent(dentry);
++	parent_inode = d_inode(parent);
++	if (parent_inode &&
++	    !inode_permission(idmap, parent_inode, MAY_EXEC | MAY_WRITE))
+ 		*daccess |= FILE_DELETE_LE;
++	dput(parent);
+ }
+ 
+ /**
 
- /* Available with KVM_CAP_X86_MSR_FILTER */
- #define KVM_X86_SET_MSR_FILTER	_IOW(KVMIO,  0xc6, struct kvm_msr_filter)
-+#define KVM_X86_SET_MSR_FILTER_COMPAT _IOW(KVMIO, 0xc6, struct kvm_msr_fil=
-ter_compat)
-
- /* Available with KVM_CAP_DIRTY_LOG_RING */
- #define KVM_RESET_DIRTY_RINGS		_IO(KVMIO, 0xc7)
-
->  0xAE  20-3F  linux/nitro_enclaves.h                                    N=
-itro Enclaves
->  0xAF  00-1F  linux/fsl_hypervisor.h                                    F=
-reescale hypervisor
-> +0xAF  00-8F  linux/vhost.h                                             c=
-onflict!
-> +0xAF  31-32  drivers/vhost/test.h                                      c=
-onflict!
->  0xB0  all                                                              R=
-ATIO devices in development:
->                                                                         <=
-mailto:vgo@ratio.de>
->  0xB1  00-1F                                                            P=
-PPoX
+base-commit: c710c654b8a3c92b34e38740dc17c29daf5b222e
