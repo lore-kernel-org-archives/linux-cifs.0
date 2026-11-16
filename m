@@ -1,95 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.181
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794841471;
-	b=iR/OPI4lRpxnUwDRT4laVSyvdwQMIkJW7GdImmLIKrsIUKbOp6Yjp0vVPuACeAA7pKIo
-	 olSznz0KArheWt1yE3NhG1jOcW24UOJrQmkaR3AcfInENlgvXq7M8vvE9Ih21mYj0t9jy
-	 Za01eAfMbq0KHAIjjCTekjRRHngUBEjxkOjaUKiFtdycUyvtHhohZqWsCu0y6gxqgja8G
-	 iL1s8F0LnbG2V5O14buy77MaytmC/2dPjGKyE1p/CInrZHvHDmZ9WPKC65VZY03e6DfHV
-	 cL+U2JXnNZVzPWI+9hGUiNsNIwVV4xJQqDTBI+wfkx+ZyllV0xpnu+iO613iGN4AdYw==
+	t=1794843942;
+	b=YzYjHydNVdiP1GG5R+J5D5/oYAbF8vG4tcY2+jO2+luml5kOZVhX9lSkQ5JrCSRfcriV
+	 6JXeWpLwFpKrZjA3zKLlG1HGVqP1sbQ9m7uvT6Ysw4Pdls1LwJZfx90IIC1V9Lzc86sTA
+	 YF14qmheHtRmPVUus/mJfO1dPeUGvFqAs62C4Sy8ZXrk/FMl+4EPk+OxoZG95FAJ4U8qs
+	 +SA0lWJ1H5CwF8+vITPoN126t2XbH2gMMfSsu4kW7KtZiwyuBIKnKUyMabgoxQiZfxmpf
+	 dOM9kHvL4pqutU3YbTOfVsxoXbRS4w8TUbwsK6wpnji+ctIwHjpHracBoyCLiHdROxw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794841471;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794843942;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=MvTRqL1mdtM+813rBnpKCpEGBrHo1i50Gwhh8qIKRW8=;
-	b=TofH/+cBJvJ7qsnrN7SH/a/CQFuqGkGNbWk/YKz9draH8WMrNoAyUE6srsGlXdI+OOEk
-	 nnzIJ2iq0O/oLuWdCfbtijNMoQg4GpXUBZN4sj27ClUcHMZscWCmrB+Bh2SJCcn5142yz
-	 WnHP0kcBQrH9IqMbkefHQyecp18XWm3YS4s8YSRG56BSo7HxQoKKejD2yp20RAxpztrpj
-	 aVBa1rAC+Hb1eQkSi7t368rqFAxCBMN/PSO2AxNL9IM2joJnoOmZWjZyi8bPxSmGd8FI2
-	 cxzVlOTDi9SqzsLe2EP1EbNZCDLupqEWgL9Xjvrpr5YmKkOTJcLajDKHDyY7tKfOViQ==
+	bh=YrQg8b1HMQfdVG/FMxGjW2qYHjNymOxo+4+eTQKFo2U=;
+	b=jn2lI1kAYKAcu5zuHQCrc+8BPvfJtNpBA1iOxQw+akIsaSdG0aAkh03vPdmz1D2p9slY
+	 x5Wh3fRTTqNCcCKLZ3DMlgXfmR1jR6fQK7uDnJlzlkJL+3/hmRHJVDx5Tw+X09mel1rQv
+	 lc6jpHs597OIeEnCOck1eK1vzMpyYFOoUN+xVf4e92pYndTDpfb4mWS8fHbzcHy68Hj3k
+	 Si8Ju5LpXbroEOdrI/on+9tWuT4NUvXeVE5MRUZF1GJzCX8+dolQaMkpUT2qWDaXsRkc0
+	 BX/T7sYZGsshq4RyvxSC5W/jte/+jbNTs+SfJO9nQnElW8HFO3s/fP1vqOiMzNYe9LQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=w6wz4DzJ;
-	arc=none smtp.remote-ip=74.125.82.181
-Received: from mail-dy1-f181.google.com (mail-dy1-f181.google.com [74.125.82.181])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oi14qhen;
+	arc=none smtp.remote-ip=209.85.128.50
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7895606A88B
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 15:04:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E7895606A88B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A07606A322
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 15:45:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F2A07606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=w6wz4DzJ
-Received: by mail-dy1-f181.google.com with SMTP id 5a478bee46e88-36dbde64409so5183993eec.0
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 07:04:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oi14qhen
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4bb666304fdso13567945e9.0
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 07:45:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794841467; x=1795446267; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794843940; x=1795448740; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MvTRqL1mdtM+813rBnpKCpEGBrHo1i50Gwhh8qIKRW8=;
-        b=w6wz4DzJ/F/IIzt0So0o/kHRzp5pszNlPly2C1qgvQJqxUvtvJ2oG6GdouS1L1wY36
-         X68f4CN1XT0294VaGFL+8fYBxwe+dyWG+ciakFNSRbD9YRL7vGMwwXOoign2edE150+i
-         0oRYSsDNgPvCYF3apJ38dM2bH9FlK16fNxfKchmjvNlfwnOH8aQSVOb/Vobm7G/AIbyY
-         PYGtR9jpc5tpbNl94iruCWA/zAWjPQzlP/lYsLK1iwiEGYSEi0XnO9yUu8VY0n9aJ1uo
-         1ULcIEcOKquvSqs4wOm3PBI164S6OZBfVKtar5ZvxcR4Gs7+zoKILtg6Mm3Ckj58PcrD
-         FhBw==
+        bh=YrQg8b1HMQfdVG/FMxGjW2qYHjNymOxo+4+eTQKFo2U=;
+        b=oi14qhenTRx25hlwwDKhZ/LWV/uSlT2RNCHeTID3Dz65o3FX3regIYGRq4ugzgS1uB
+         peO8I4FuTjCyiDAE2cipjJM6tIM6etkZZLDY5ujAaGpdR6fBlx1sDLhX42U6n+SvTsDG
+         DhiL9/tiMX1cTyS4BDTxZmbMgw6iQi4h5zsFoC6FsEqPgk2vb+tefD3V5q2KGmyqC7NB
+         Mff6X/6u7EDkfBJo1CR/d68zN9Yp1/E74o13bpic+jGaCJrSrZT0jz5YwZZBRZ6Gd3bn
+         WYWflAMGWHGL79DZX44rHvPl/CnGEb7d8BbOr45PDDSEZQIpTwp+bAIIyu8UoeTC3L1U
+         AUIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794841467; x=1795446267;
+        d=1e100.net; s=20260707; t=1794843940; x=1795448740;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=MvTRqL1mdtM+813rBnpKCpEGBrHo1i50Gwhh8qIKRW8=;
-        b=Rj5nWfkmDUzQ19rH2u8dMDOF4Q+3OEcZZlynsYshNXEAjzi/5PtXaVuUIbE6j2/0Kd
-         vSi0BTBRRlf5LT67iClfOldAT+4DDPVbk0/iDtLvLig1VwOYYzNL+tjVPGRcirxKWXSE
-         uwh/ex+BrNl+BhLncNdR/0iXMLLz1amghIjJc5MLaP8qg1UXw2qbLcielVqsaGw17bfY
-         CFRePNS3iA30BbRIp/XMDhLMVpe1Tb31whZVDzHMte6kkh8G1vzyFgRhckl3vR1wjM9f
-         qf3LJATAMTMSJfyJfzTqI6KrJjNJCTrrAMi4qeOnTSRYnAcGk37DcVdNGINEqUPhW06o
-         6SIw==
-X-Forwarded-Encrypted: i=1; AL+hErHlas853/B8It041PqSIf6ofgX0Xt7Z9ypExrl2R3j/pugky6swNVMuYvNDIGd6CDPXtlBtlBGF6Mv3@vger.kernel.org
-X-Gm-Message-State: APuU4Z9KQa6bYJsiXcNhMX4E/kcoyWh/lymzxhwp6+CsMIdXUkCzRtrc
-	molZAD4YndtRPaffe5Id+BA4cAAXC1tV9GsNUgXYWiDzdbmyWZT9cjNB
-X-Gm-Gg: AZFdTZewGg84pMLhfTQJwuGxzWCRp63JkawAlt2NwDQJW/1i4OkNucZpLNR5QgtIlme
-	q6dwUYzuvpSKfuLKwwBTOUpscP3iZgIVpl67EgV22HX67XaHBjTSRPiPE3sXgNtPg9UrVo3vOo1
-	Wrj9/oSaCkYj10znYbx4+sQfV6UgHznIsuzh+YAx/ZihyiAdeKhqEI7AAkF0m/SIn6IlyQlaAnM
-	8/HMicfjAhC1d3LrIg+rKLLFMpz22dG8wkSdn7gvl2nSY1KVk2lx4jre6+aeV/soEvEO3RvZ4LM
-	Gc5gtBzT5scLT6Rh3c9nTsngYmTLhRo7nYhv02+fvxCDlX1C93cRkl4+LuMFTusQcUy8xVg1dZO
-	JnsQrMf2S5L90Mtz3P27imS8LSgOgYyd+e/fuoC1KZCPfomuNn41aiHnYS8iqBx9COnTdZmeQH+
-	YvD5Tehk5O42nup101NVoKPXWQ+AtyGibML7xPn2gxtGz4Lk3XEtr4O5WQ8NvonjSqL+c9+IZtU
-	m0sQv0vESV89lhFjz4V8zyuRCsfnV27legn0P+CgnRKySNjjM91MKbfPsH0+P3RHyCJ+GS++3iz
-	9ft1y/TuZTOZK6CraKHpS47qifibjJmV283dWO5qejq8C8sNatGiwxW3Ykh/nYTzNih9KUIyfIA
-	RDA==
-X-Received: by 2002:a05:693c:8108:b0:376:5b99:a7e3 with SMTP id 5a478bee46e88-37963660626mr10679088eec.3.1794841466625;
-        Mon, 16 Nov 2026 07:04:26 -0800 (PST)
-Received: from dell (ec2-13-229-224-160.ap-southeast-1.compute.amazonaws.com. [13.229.224.160])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-37956bb0c40sm37141083eec.28.2026.11.16.07.04.14
+        bh=YrQg8b1HMQfdVG/FMxGjW2qYHjNymOxo+4+eTQKFo2U=;
+        b=OWubbHfe+tWNn5A+wdnixh0dXY3B0Y7zfUKjhnzozWDtKX9ExloGlMRq0FuBrbtWkR
+         BfzPeSjRuCVq4ZT9ZLM3NP7tPBDSuoGFAf3VGv1ufthh4uC+U59fHv88tF/CYdxPqHF3
+         nzWanjB2J1U+6+zcxvLyPWdvFMSr6kGTeTaQRsbjvuId+a/EN3PKuZmsK7ErwOPTjwN7
+         eguDysj1dW2MFCW5GJiiP7a5FH2D2V1QNEGL2/oQsAsR5PSeeG6TetBs78ykWcLH7P6L
+         hvw3lzdhqeEoGZx/gmwvJ6bIycApCSUchDiBAmpO5NkB71Q5piMTsdF9R3SdKmgBXJ+T
+         nIPA==
+X-Forwarded-Encrypted: i=1; AL+hErGmZenXJGmNg0rp/4BOIXhTKJvntFWCboaUeBTWRc8XRKqU3bCyxGWTu6hwplIvm3FItHqY3SNT2T/2@vger.kernel.org
+X-Gm-Message-State: APuU4Z9vSP9uTv0dP5Jd9HJCoK/T01oE2yJ4TuJta7uxEe2K1eIyusIB
+	arEpnhqlyoZCx5X0OteKnDHBU8X5chKGBFjGbPhzEg3IeZk/qlMTNKm+
+X-Gm-Gg: AYBFou3HhGEVU2HCgRdzukJlvBijIDJtkCI9MZc+OXoTxzOPNrKl+He18o/W0gQeVL2
+	53JHqvjSt4PSyMhfC41cLctM4yphSSr8ayjYMx3nHhemwTKjwCXQ7MrcSnaoMzkyMrbu2TYhEbW
+	zz/I/SGzskspl2LBjIgmJiWU+1dSswBbXqKc1pW+igQ0TDVS8pvFLoFZm7TCEaAKV7VHsoqTHP+
+	nOCtAMiCcdZcd6RNPI4wyzldDU3/LyWOzuP/JvnmsRAVBMFb//bSzp3YjDlD+sH5En6hJC9ZZo5
+	bIYGL/qjCoOmKWVHjxIeZ9S5LbwZ4ooA05IdZ4VuoAQk8dCcBH0vZd2N89ifF8wbAP6znWLlmoR
+	EC+Je0xiEw6X8ZgM/vRUICOWIIlT7gf80yYRVAXt54gVkIxm9Lo5uNUVQCNqVps82vuSgZ82wA+
+	IwcAC/caVHlsqycr91X57xH0rA3PuAWoMyyAz0DjKTaM/KYumV9zrPINYGn8/v6c7Hx/GsM1rCZ
+	dzb6mExZ0wnXO5RwXAk3VgEwKEbfB4vClPemzHhfPRSRDiSAJi9fxea8KGKtHtlkvpeLI+d/+LR
+	BtdSqCZoSxbHvDHueAlIyOCN
+X-Received: by 2002:a05:600c:1906:b0:4a1:c6f5:2450 with SMTP id 5b1f17b1804b1-4bb55ac2a34mr244233205e9.17.1794843940079;
+        Mon, 16 Nov 2026 07:45:40 -0800 (PST)
+Received: from infinity ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb4e293540sm395008555e9.8.2026.11.16.07.45.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 07:04:21 -0800 (PST)
-From: Yuansheng Yang <0xbeac@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+        Mon, 16 Nov 2026 07:45:39 -0800 (PST)
+From: koraynilay <koray.fra@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.org>
+Cc: Tom Talpey <tom@talpey.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	Aurelien Aptel <aaptel@suse.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: pin parent dentry in maximal access check
-Date: Mon, 16 Nov 2026 23:04:11 +0800
-Message-ID: <20261116150411.321076-1-0xbeac@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	koraynilay <koray.fra@gmail.com>,
+	Sashiko <sashiko-bot@kernel.org>
+Subject: [PATCH] cifs: fix times assignments in cifs_posix_to_fattr()
+Date: Mon, 16 Nov 2026 16:45:26 +0100
+Message-ID: <20261116154526.429315-1-koray.fra@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -101,106 +104,112 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ksmbd_vfs_query_maximal_access() reads dentry->d_parent without holding
-a reference to the parent.  smb2_open() calls it after path lookup has
-returned without the parent inode lock.  The AppInstanceId takeover
-path also calls it on the old handle's filp->f_path without holding
-that lock.  A reference to the child dentry does not pin its old parent
-across a rename.
+Currently cifs_posix_to_fattr() wrongly sets SMB's CreationTime to
+fattr->cf_ctime.
 
-A concurrent rename can therefore move the child to another directory
-and drop the last reference to the old parent.  If the old parent is
-then removed and freed, d_inode(parent) reads the d_inode field of a
-freed dentry.  If the sampled parent has become negative, passing its
-NULL inode to inode_permission() can also cause a NULL dereference.
+Fix this by setting fattr->cf_createtime to SMB's CreationTime and
+fattr->cf_ctime to SMB's ChangeTime, matching the behaviour of
+__dir_info_to_fattr().
 
-KASAN caught the following on an x86_64 QEMU guest with a test-only
-100 ms delay between reading d_parent and d_inode:
+This patch also fixes a few related issues reported by sashiko on
+another patch (see Sashiko Link tag).
 
-  BUG: KASAN: slab-use-after-free in ksmbd_vfs_query_maximal_access+0x2ba/0x300
-  Read of size 8 at addr ffff8881100f0830 by task kworker/2:1/81
-  Workqueue: ksmbd-io handle_ksmbd_work
-  Call Trace:
-   ksmbd_vfs_query_maximal_access+0x2ba/0x300
-   smb2_open+0x60d5/0xec30
-   handle_ksmbd_work+0xad4/0x2110
-   process_one_work+0x745/0x10f0
-   worker_thread+0x511/0xc80
-   kthread+0x330/0x410
-  Allocated by task 319:
-   __d_alloc+0x35/0x860
-   d_alloc+0x46/0x1f0
-   lookup_one_qstr_excl+0x171/0x250
-   filename_mkdirat+0xba/0x4c0
-   __x64_sys_mkdir+0x6a/0x90
-  Freed by task 81:
-   kmem_cache_free+0xb8/0x3b0
-   rcu_core+0x549/0x17d0
+Reproducers for these bugs, with /tmp as the local filesystem folder
+exported as [test] in ksmbd.conf and /mnt as the smb folder mounted with
+mount -t cifs:
 
-The read is 48 bytes into a freed 192-byte dentry, which is exactly the
-d_inode member.
+  mount -t cifs //127.0.0.1/test /mnt -o username=ciao,password=c,posix
 
-Commit 2e450920d58b ("ksmbd: move oplock handling after unlock parent
-dir") released the parent lock and reference before the final MXAC
-query in smb2_open(), leaving this helper's bare d_parent access
-unprotected.  Commit 4e45cca31d4e ("smb/server: add
-ksmbd_vfs_kern_path()") later switched the earlier open path to an
-unlocked lookup, exposing the MAXIMUM_ALLOWED query as well.
+Issue 1: ctime clobbered by CreationTime during readdir
 
-Commit 0383a66dabd7 ("ksmbd: pin parent dentries in SMB2 CREATE ACL
-path") fixed the same race class in smb2_open() and smb_inherit_dacl(),
-but did not cover this helper.
+  mkdir -p /mnt/dir
+  touch /mnt/dir/file
+  sleep 4
+  chmod 644 /mnt/dir/file
+  stat -c "ctime and btime before readdir: %Z %W" /mnt/dir/file
+  ls -lc /mnt/dir > /dev/null
+  stat -c "ctime and btime after readdir:  %Z %W" /mnt/dir/file
+  stat -c "ctime and btime on disk:        %Z %W" /tmp/dir/file
 
-Take a parent reference with dget_parent() and hold it across the
-permission check.  If the parent has no inode, leave FILE_DELETE unset.
+output before the fix, notice how ctime is the same as btime after the
+readdir, while it's 4 seconds ahead (because of the sleep 4) before the
+readdir (on disk timestamps are not touched):
 
-OpenAI Codex assisted with reviewing the fix and revising the changelog.
+  ctime and btime before readdir: 1794842068 1794842064
+  ctime and btime after readdir:  1794842064 1794842064
 
-Fixes: 2e450920d58b ("ksmbd: move oplock handling after unlock parent dir")
+  ctime and btime on disk:        1794842068 1794842064
+
+output after the fix:
+
+  ctime and btime before readdir: 1794842908 1794842904
+  ctime and btime after readdir:  1794842908 1794842904
+
+  ctime and btime on disk:        1794842908 1794842904
+
+Issue 2: btime and ptime wiped out by readdir
+
+[ no reproducer as it only happens after the linked patch series is
+  applied, since it needs cifs_i->createtime = fattr->cf_createtime in
+  cifs_fattr_to_inode() ]
+
+Issue 3: in-memory inode aliasing (flock bypass on hardlink via readdir)
+
+  mkdir -p /mnt/dir1 /mnt/dir2
+  echo "test" > /mnt/dir1/h1
+  ln /mnt/dir1/h1 /mnt/dir2/h2
+  exec 3< /mnt/dir1/h1
+  flock -x -n 3 # get exclusive lock
+  ls /mnt/dir2 > /dev/null
+  exec 4< /mnt/dir2/h2
+  flock -x -n 4
+  if [ $? -eq 0 ];then
+  	echo "acquired: duplicate in-memory inode"
+  else
+  	echo "blocked: same inode"
+  fi
+
+output before the fix:
+
+  acquired: duplicate in-memory inode
+
+output after the fix:
+
+  blocked: same inode
+
+Fixes: 3d519bd1269f ("cifs: plumb smb2 POSIX dir enumeration")
 Cc: stable@vger.kernel.org
-Signed-off-by: Yuansheng Yang <0xbeac@gmail.com>
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Link: https://sashiko.dev/#/patchset/20261115180343.576773-1-koray.fra%40gmail.com?part=10
+Link: https://lore.kernel.org/all/20261115180343.576773-11-koray.fra@gmail.com/
+Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.7
+Signed-off-by: koraynilay <koray.fra@gmail.com>
 ---
-The parent lease break sites in oplock.c are covered by a separate fix.
+Thanks,
+koraynilay
 
-Testing used an x86_64 KASAN QEMU guest based on 7e1392a42ea2 with
-0383a66dabd7 applied.  An SMB client issued MAXIMUM_ALLOWED opens while
-a local process in the guest repeatedly renamed the child and removed
-and recreated its old parent directory on tmpfs.
+ fs/smb/client/readdir.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-A test-only mdelay(100) between reading d_parent and d_inode triggered
-the UAF within three open attempts.  With the fix, the same delay was
-placed after dget_parent(): 789 open attempts completed, including 561
-successful opens, without a KASAN report.  The delay is not in this
-patch.  Without the delay, the unfixed kernel did not reproduce the
-issue in 67,381 open attempts over 300 seconds.
-
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 7c3edbe6cb77..0f68500183d7 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -124,6 +124,9 @@ static int ksmbd_vfs_path_lookup(struct
- void ksmbd_vfs_query_maximal_access(const struct mnt_idmap *idmap,
- 				   struct dentry *dentry, __le32 *daccess)
- {
-+	struct dentry *parent;
-+	struct inode *parent_inode;
-+
- 	*daccess = cpu_to_le32(FILE_READ_ATTRIBUTES | READ_CONTROL |
- 			       SYNCHRONIZE);
+diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
+index 525f99181485..5d335f12eb24 100644
+--- a/fs/smb/client/readdir.c
++++ b/fs/smb/client/readdir.c
+@@ -253,9 +253,10 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
+ 	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
+ 	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
  
-@@ -139,8 +142,12 @@ void ksmbd_vfs_query_maximal_access(cons
- 	if (!inode_permission(idmap, d_inode(dentry), MAY_OPEN | MAY_EXEC))
- 		*daccess |= FILE_EXECUTE_LE;
++	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
+ 	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
+ 	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
+-	fattr->cf_ctime = cifs_NTtimeToUnix(info->CreationTime);
++	fattr->cf_ctime = cifs_NTtimeToUnix(info->ChangeTime);
  
--	if (!inode_permission(idmap, d_inode(dentry->d_parent), MAY_EXEC | MAY_WRITE))
-+	parent = dget_parent(dentry);
-+	parent_inode = d_inode(parent);
-+	if (parent_inode &&
-+	    !inode_permission(idmap, parent_inode, MAY_EXEC | MAY_WRITE))
- 		*daccess |= FILE_DELETE_LE;
-+	dput(parent);
- }
- 
- /**
+ 	fattr->cf_nlink = le32_to_cpu(info->HardLinks);
+ 	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
 
-base-commit: c710c654b8a3c92b34e38740dc17c29daf5b222e
+base-commit: 9928f403dfafd17dfe45678bbc6f623f72528744
+prerequisite-patch-id: 049ae0eba275b5be35a238833107e0b251a55aa2
+-- 
+2.56.0
+
