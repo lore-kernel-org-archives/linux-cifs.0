@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794837744;
-	b=fFCWRhv7XDSjRYrqY4NqYKKiUsLolYdpX1SSolgMqmN9NRaZ/5F5vnRAUVYmdaUPh+c1
-	 jgAJxdZ4xoJGA8LWdzA22yfbJgcEw6XmH0PLm5KUODGSeG5Y1md/HlT8Od5WAmjMMxKhb
-	 6WCiSPclnEIu0HdL2FRBcCXSkcTBaLdY9GqekrR4CafOlTgQwPE/E3QxNHSgHiPzQuGpv
-	 97+O3CGcs295PERtIXLPZPqVtYrynb7e/UvHc4wfZ+to4H8mCe2X3g6rutEgA5MwqZUwT
-	 WcvQktWCqMSEGhjfD9F7cUGZ48yOtEtf3Q9VPv5idGPTt7jSkWuo7/SZvQklnl9M+oQ==
+	t=1794837766;
+	b=gQ7t+PDJ4IxD3YULGtB/nC2SM3yPpv2HI66szDDS07I5bywmLM2vIvVh29KBQKlnkk+i
+	 +U3l+ByWU17AzxxeIzPgRMIgyrZb6BUeYilp3S/tpxwQtvK2PMRsFtAimtUe6qgEG6Md5
+	 5Xki8KeHmnFn3UEguiTAPNTRBcQN3X7srz8PUnKCqDsTE/t8e+biZWUO2R0jdBhdyK+Xq
+	 HI3FY3cejPSJz1h+R3gfBfQmv2gQwf0R1P9hVUriCINVxIvLXtFrWlrwG9keGXPA2EmD5
+	 +a28ibn/pn1MLXX2duXMjaThtD7U6tx+0Na7GmqHOEyYKb5v11EMHI00sLTK3d/CprQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794837744;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794837766;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=boLpSwZovCNSbV6begV60ngPtUAPKB0G+tLPneL5NsI=;
-	b=IcGPSnIriE77TqwPGeHv82vw/A+8Y1JHMOX0dcZOgE2C+IDJd4VQ8M8XF1eb1FJmE55I
-	 FvWIi6JmMAIYDmghncJLUSonke7gYKwbxedr8VEsEzDy2YAg83ezCBjF5nZQsIdkoiLe4
-	 nackSeY43rNMwfkQ9Es2L9r3C6MTaCRqYWMOJ+DgmIi4fIMlZO24/dTAI6j8hFsMefJYF
-	 KjhtllXAv3viuYXiQyd54xdgczi2FW1zZmTBILwNTu/Ru7WWD542xrZsgrzukxo8aHgyc
-	 skQYb893CSh/PQRZhH/6rTlHqpOW03lAvyWss5t8jujq+Fv1vDihZexWGalBFr1jIgQ==
+	bh=TJmPcX0jlQEhCukA/l5pSJzFcBRF+gLl1xeZVV+XUyc=;
+	b=bszIMmuco4v6mt9NptoePffoWzz/qGHyUHKjeQ7EGxwZ5Hzl8ReaAFKED8l30NR7QnLi
+	 9Z7YvUe1S3+zBEf/sylj39eDuXzSwruAIZOfIQrNG26XvJMrpGRZwbA6jWGqM0WWr+2Gc
+	 HbbOqTT22wfff3LRA2UpFp5AobqMz0c5qzKVmO+q60l6qpfVkSEC1pnr+iz7PIkogR22/
+	 +4DgSmHYmQUtrJ7n3c6P+oQwDVIb8/VHljXLLl6KUW/7KsXrX7m1DhgUnZRN7ubB584ys
+	 hDSsNeogRlmZhfeTmpC5JP9JE0jK7g0erw3M1QiJEJS5JVqtSoOcBnq1oBUurmYMY2A==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DoJwrwy9;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=US+yckQj;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E80606A32F
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 14:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235F1606A32A
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 14:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=DoJwrwy9
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E6F01F000C7
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 14:02:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=US+yckQj
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF27D1F000CA
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 14:02:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794837744;
-	bh=boLpSwZovCNSbV6begV60ngPtUAPKB0G+tLPneL5NsI=;
+	s=k20260515; t=1794837765;
+	bh=TJmPcX0jlQEhCukA/l5pSJzFcBRF+gLl1xeZVV+XUyc=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=DoJwrwy9RPsWJ6r6f+qOn0SlMC3i+Ua2zZOcX3/0fGWSGjRU18aF6R762WscXZsYn
-	 9ortOczUXLtL8jmjyUaCx39k/sdCiyUV4ViIlBhwsARJ0BO474UVJimpfnl7CczfMC
-	 9k5QEh9Vj0AwYeYi7TemGA8hak1XNepRP7IJ1QpjPS3AhP6T/6NTp9mKKHfGMOuqEP
-	 tJUMgfGy8YEHzvXwnY33GVuOJRlFsi+ecYxc+mSeqdzMWSm9e26ozdcKYKmgXTY344
-	 +09oWnIxDYNap6Ptgc7XkP0OzwY4QqWBYNSsqmaLBGl6DRaawz1kmHOpSdRawSNgyM
-	 gVjq5QxBdSZkg==
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-679aeeddc6bso3263154d50.2
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 06:02:24 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFdNfWEWSe4ZF/G+UiBh3N0hJCSfCOxTi0vzbhld5tdeHx2WiIUWnONRwpGIXUW7X7itRJUCDOnaBSb@vger.kernel.org
-X-Gm-Message-State: APuU4Z/oQgiIjfyCop86tdjDbAqNQU3pcIhqOMCldg9sYqOOo/zZxgOE
-	ox9qiwlG2VxZ3Na5qCuRhtGZldcOPihdx8sN3ZYU+FGyU92oF8qoEaoV6eO/I/QvL6YcKHnMfJO
-	EonZWWWTtF8oiv5A/pCciVRhdIznsEQ0=
-X-Received: by 2002:a05:690e:128e:b0:676:2dce:8e95 with SMTP id
- 956f58d0204a3-67d89339c46mr5350286d50.13.1794837743410; Mon, 16 Nov 2026
- 06:02:23 -0800 (PST)
+	b=US+yckQjfPhoBBZ2NFnM888mUhXibQLMeBwiTob/UcxyTEIWr4F/3I/OR9+eF97xo
+	 7OgYsGjkTmrTN8KrZxswFtJgnxMU5JB0q/jSr69JajFA+8i+gMeIl1RoKOgDD363Jo
+	 VnjMYpi9xMCAZs9CAdMtHHP1JFssgSlAW31NCHR2l0TU1oDx8DmeNA5lxnM52hCIJQ
+	 cCqkbkpVmXxUBK68rlUMjr5HLLs6BD8tCMcJNYy9CvpncG4bXs9G+HypRNQ2KnvwPe
+	 lonjPrv9OtCaSeBVh22DvP4VZ6AwR9gepfxZrEnNZX8uF+hPx+LajBNaMeGMUx4tuf
+	 T2a1aVYNr8mFg==
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-6798af41644so2437449d50.2
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 06:02:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErExY6wNI23eWQfiseD3NjTl8SALmEBeOOZvn3dTkRtOX4+bod+XQbL1oAchol4nY+Y9beEciaavMXcz@vger.kernel.org
+X-Gm-Message-State: APuU4Z/vwJlomOpwPdNpm8JEK86RQoyRW82dvDur/SC/nz4EVg/c/zD/
+	F/vNeRqxt6dksuxxFp9fal6p9/wZPZiCxwUKasbeAGMwENjGAik15T9u165kR3w6QyX77P/Bu/M
+	zzgPoFMWAEUZDm2vIJMpCepGy2lEB6T4=
+X-Received: by 2002:a05:690e:bc4:b0:67d:ae02:45fc with SMTP id
+ 956f58d0204a3-67dae025d9cmr2328051d50.45.1794837764984; Mon, 16 Nov 2026
+ 06:02:44 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,14 +59,14 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261116124753.2521705-1-icb@fastmail.org>
-In-Reply-To: <20261116124753.2521705-1-icb@fastmail.org>
+References: <20261116124441.2521447-1-icb@fastmail.org>
+In-Reply-To: <20261116124441.2521447-1-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 16 Nov 2026 23:02:07 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd83pm2zOowa03S=LovSAHYWapbj1DVBN7EGKm8pubB5Zg@mail.gmail.com>
-X-Gm-Features: AclHuK89cx2g8b9Yn2D97GID27FDj8i24KcoiqO1OLWd529Xrah391t8xFV_890
-Message-ID: <CAKYAXd83pm2zOowa03S=LovSAHYWapbj1DVBN7EGKm8pubB5Zg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: do not treat an unreadable security descriptor as none
+Date: Mon, 16 Nov 2026 23:02:29 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd-RabFCYgURT4jcAuOPRUYqUfD443Y4+g5-bzjYnsLyyA@mail.gmail.com>
+X-Gm-Features: AclHuK9Caz4wzvgmBauJMGfLXbVcdLp4mgFdfHci7iv10rOa0L_5dZXULXUOFAU
+Message-ID: <CAKYAXd-RabFCYgURT4jcAuOPRUYqUfD443Y4+g5-bzjYnsLyyA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: read create context data at its DataOffset
 To: Ian Bridges <icb@fastmail.org>
 Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
 	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -74,25 +74,25 @@ Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 16, 2026 at 9:48=E2=80=AFPM Ian Bridges <icb@fastmail.org> wrot=
+On Mon, Nov 16, 2026 at 9:44=E2=80=AFPM Ian Bridges <icb@fastmail.org> wrot=
 e:
 >
-> On acl_xattr shares, a failed security descriptor load makes access
-> checks fall back to POSIX permissions. An allocation or read failure
-> can therefore bypass a stored deny ACE. Security queries also fall
-> back, returning a descriptor built from the inode instead.
+> ksmbd reads most create context data at a fixed offset instead of the
+> client's DataOffset. When the data starts later, ksmbd reads padding or
+> other bytes. For a security descriptor, zero padding can be parsed as
+> having no DACL, so CREATE succeeds without applying the client's
+> descriptor.
 >
-> Fail access checks and security queries on allocation and read errors.
-> Keep the existing fallback for missing xattrs, unsupported xattrs, and
-> malformed or stale descriptors.
->
-> Propagate POSIX ACL read and allocation failures during descriptor
-> validation too. Otherwise, hashing an unreadable ACL as absent can
-> make a valid descriptor appear stale and allow the same fallback.
-> Leave the descriptor store path's error handling unchanged.
+> Use DataOffset for security descriptor, extended attribute, lease,
+> durable handle, POSIX and allocation size contexts. The context lookup
+> already validates DataOffset and DataLength. Check each payload's
+> minimum length and keep the existing parser checks. Add
+> smb2_context_data() and a structure for the durable reconnect data, and
+> remove the request structures that no longer have users. Contexts using
+> the usual offset behave as before.
 >
 > Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Fixes: f44158485826 ("cifsd: add file operations")
+> Fixes: c8efcc786146 ("ksmbd: add support for durable handles v1/v2")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Ian Bridges <icb@fastmail.org>
 Applied it to #ksmbd-for-next.
