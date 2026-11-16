@@ -1,83 +1,121 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.137
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794862438;
-	b=mJaGh5Cg4UGOACY1v2WwOFRYZE5Uyevfj/GRKiXjA/DfSEmQt+ZP2mcx6s4obfPicQpu
-	 k3hbt0YLP580Ml1IZ3IvuT/CeVJ8UezIfceHmChPMKnBCLQqMWxzZzWxQ+dIr9AJo33/I
-	 DhkJsQciAN88Vlf2LXRGRbyTxaTqBnc72uJS6lOIU5kExC7WAZCsc/Yaz4OCrBDvxaxa3
-	 FEGJ8qcIXfXCZVSRvp9B/UtNMWBVbKcqWdObSHJ5yGS5+jHZOBJLoIE1E2xyyS56e5YX5
-	 T/5KzZf6/7dLepyPIQzynfarkhZ8yXmKMW8JJnvVeVL6UZSj301R/8GvDMKqELyuhRA==
+	t=1794864370;
+	b=WXvfpkqH92gkW6kUTqz15fFQOqfyZxYfskXrl4AOW+tpcyZyN5ZUFwxbAVE3e279rGOw
+	 Eil2k2t66v67AWaOprVE9EXureBMVjYV+pvRrledbscxj7/I0UoxTnjh0VOiVucQD8ndZ
+	 1k/QcKOu8nWp6QCprtbEqlwBbfKbRUv1O4s5AveJXDpvbLbpVsgzuPn9vv3ND1ev/gWil
+	 SvhH0mot93RoiFTOKuizJshhhCpTSgQg7BrYwtjWCwj+51JxPftU8L37eiK3OpTCEQTon
+	 S0CUGIZMOVMTWJrLMYAv1LPkVNPavMM8e+ZEYIjsqQBv+WEL+jaLbdOEctGVx1MDyzQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794862438;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:X-Mailer:
-	 References:In-Reply-To;
-	bh=tzdH03fxvdHG/WP+ISnD29s1t0jRH5uKJ+YnULP8Tr0=;
-	b=yj9tuuspJve9ppG5g1LoMEGQQvl+G2YpGKn6Z88sHScOTzCENX0gjuTj6A5bmfW3D6dq
-	 3yTjklff840Vqer2FiYSICfodYX/zFiT/FJVZj4dNROlsJZ+vqXUZcxCqmz6zTKRMlorz
-	 YZPvnpngw9EY+E8WSW9PxuBr3Oc53HK2z0mbKH3zGurCPRGiWXVmOhcoh2EKoRjTk7dx1
-	 eAccZLMAVH3qWvSupnYVGm95V1UzjMwoz+SILk65sEzo4X5WzQB3K8ERtxZaZPay5O/XT
-	 uh6+PKsj8YtViLJdPIQAYmwCY2RiqK+JPcpqoA4sSFaQ8ujFkiEw8momPSdjYooP0aw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794864370;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=L0RDOVn9ev2i25ubIASNHRtoVTqDu76QaCLhzgV90Rk=;
+	b=Fcr9LDvM41BZg1trMFWMGWoCJYHItWN6cBPKNYbejz+AjzujaYVzUT5bFxOjpGshZGd6
+	 lCxxl/zKrP5XzlxQiRH3viL+RZGANd7P7s5GnwnmOHc3n/5UNKQfepZf+JMupV7EYw0wH
+	 g88zRILE8tzbDZcAqt2SgDxrSVKHC0IBXO1Jk5RLRHP1GxAZdGmFIK/IMur3oJzxatgQB
+	 Jvj14JLjV6QdYIofUq5LUZA4rY+6J1MkBshBWdDGENKPO9ArWa+Ld+M9NBCjZQc11PTZ2
+	 uGbTeHbeCBtXptFg/IVPl15cGnv/dCAljon2ljaEgtZf0uw8XYYL+998VY3xC8UAdHQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=L5sm9T50;
-	arc=none smtp.remote-ip=209.85.128.43
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=m3ibmhlH;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=QbIiATLi;
+	arc=none smtp.remote-ip=103.168.172.137
+Received: from flow-a2-smtp.messagingengine.com (flow-a2-smtp.messagingengine.com [103.168.172.137])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A1E606A8AC
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 20:53:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E3A1E606A8AC
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1054606A323
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 21:26:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E1054606A323
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=L5sm9T50
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4b79502c27aso32616365e9.1
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 12:53:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794862436; x=1795467236; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:mime-version:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=tzdH03fxvdHG/WP+ISnD29s1t0jRH5uKJ+YnULP8Tr0=;
-        b=L5sm9T50a7sqt8w6n5QqMCx2guZ/ceCCaSawY3J0jxqzahZ/LN4bt26KoGHp/uxFmk
-         WolNlyKBnyZ1ec/7ZBJ64TpLAMa5GpOCqE5CcwXsF6xR2eT/T77xWEVoGtvYUuScpPgN
-         oz4iIqpqxQDYdqVGkZ6S56sYlTHUsvde9FjQULBdQwu+w/8a71UaoF3qQ3EF1S6gzVuf
-         dgE0P/WOfZoYnPuKsQQ5Jt//NJN4mC5iRbQCozXEE4yB0v0DbLjq7YCnC1TvPdkKeY89
-         THDwEB3iExsY9Ok3aiSiUawJk00aXtPKjGcx+g+wp9cCLgujF5NkMGxtzDgjbUuRcBOa
-         A6iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794862436; x=1795467236;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=tzdH03fxvdHG/WP+ISnD29s1t0jRH5uKJ+YnULP8Tr0=;
-        b=PDMZdTvmZ9j5x4eRYyOgh4FH9W0h264tkkPueD6O21Iop407I9CSr7QiMCMtbuRKSU
-         iNQfydFAQgn05tmf4CaWcm4dHiPY/SZARVIRK6VpnGSmKUDfCh44MHeuJ/j5kK8Lb6UB
-         ZXZPvOMHJ73/ypCZkVayd8adZquBBgcnJxVr+zk2E9EqH2kYSvRFfmHJLK5l07cYu3qz
-         Lq/ZaZQujS6M/R/eAqPhVXJtOW0uT3z3sXEY+xXqY41B5JDw5wB7pN0oZHQ7Nq+d9gBQ
-         4iTztpBuHnwbdm7kfjNslVJOXZfBIQD3GGY9jW+DwN0lFgk4NOYtDCzo7cYcv65YTwVm
-         rzdw==
-X-Forwarded-Encrypted: i=1; AL+hErECVQ0h9vBUj59FoIGfQnE73IUEqaDBi1PfKq4znGcHnxKG3A8AUBDXWs5ATJbKGDaKZb+hEjaeaQCu@vger.kernel.org
-X-Gm-Message-State: APuU4Z8jU0JSrQMhhebfd2tHen+DB3qcaT57NmvFDU/+/cyGOeEPf3U8
-	2NE8fMx/NdHGmzk6qFrCXdArh4ZoVWRpufL78mKJjObmPqK+I8r+FMWP
-X-Gm-Gg: AYBFou0lfo9lNh3QtCySp8UKKxRxVlzI6KHzD0/k1e8pP2igy5oJC9u+6Rqf+yr/WLt
-	pEniBDWrX2uiVtOahcpSYmjx8uG2LuXKl95ebSo9ux/+Kr8j2wUI7//jMjjobEvckvYsJxNi/KQ
-	o4HAieZnnsJD8rihK5caVIwuza06T2xWRqRzzNqYOuhB/7wk0DeoJbZfDzlif+Rpps1l/Jg4fe1
-	fq4KG169FM+cZx6gl7duJY7tEHF0WVdqJNTz0tL/nwbFGsxocntNWgEtTt3GS1SEgnL/czRTUDK
-	muDSp7efHJjUYx+wSNmNYq61DDJ2QLFyISRqkB8Yd5ttKdWfKuYryNyGL0CYfAoMDIW4L/k9EC+
-	XpIyIPPEs9XAGC4ao7HRhhKYTmOWlmMpbdM6OWezCHkeCYp2iNDDLPdVYGQ2JjYObT0VVEvtlWJ
-	bBowxhMnYXwPV0I8+x4zig1VwD4TMlFI2RYyjLaJN+vq8nYT5iqV6pXZIDntBfAMl07pye526q2
-	ReyykG9VsYiwo4+plw4tGCQX1wDTIy0AiSpZpRK9frqS6Pp6gxeJCxqQmnKJuqP6Brw0kSrEGlT
-	SrXsgfNcSOl1dhXHxqAKni50iw==
-X-Received: by 2002:a05:600c:3b2a:b0:4a8:9a2f:d27 with SMTP id 5b1f17b1804b1-4bb55aabdf9mr263187925e9.25.1794862436065;
-        Mon, 16 Nov 2026 12:53:56 -0800 (PST)
-Received: from localhost ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-49c5d22394esm24799165f8f.3.2026.11.16.12.53.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Nov 2026 12:53:55 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=m3ibmhlH;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=QbIiATLi
+Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
+	by mailflow.phl.internal (Postfix) with ESMTP id EF3461381B03
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 16:26:07 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Mon, 16 Nov 2026 16:26:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1794864367; x=1794871567; bh=L0RDOVn9ev2i25ubIASNH
+	RtoVTqDu76QaCLhzgV90Rk=; b=m3ibmhlHMoIlJQKNnMZsMTpt2tK1Zz9fREfG9
+	p9OgYzIdLnXY45AhtF4QcyXjnWuA+40m1afe9UOMFy7qaDp1CQBxJMmwMMWRa27k
+	HTABDlfj91LKJz49dayGbvjAfqF6QUgeNX+2/7zGwLTOsdF0frtGVGC5ppVNXDpc
+	0xOqbHvUJRmsN6a7IxXzONFMAfJGGIFivzPX3Diw7BtQk66cfz2YRby3L8UqoEVf
+	F245SDT/Ii36MLJLFt5cT3yguwixJPOpGkrsIRZNwte7zM3DfCTujS420cL4la+/
+	03c3GAFdHZzxadpexuKdpDA3GyZR3gFnncR3hmnFygIy8WzdA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1794864367; x=1794871567; bh=L0RDOVn9ev2i25ubIASNHRtoVTqDu76QaCL
+	hzgV90Rk=; b=QbIiATLi6SjpXfac91b1bk44N1rUxEvI7vtINq2cI8zPbjw2+fs
+	46fVmZc0tgMR1ghby7/hPWSxef0gKTb5a35vglmpC2fM1ylxVCbpn3UGlgLpud1b
+	H0KxK5yeKwaJVTWE0Ai4neIYDCQD0JKJk8sZMbn1zwIhbo3qMVmZ6Rbu+K/2sXjS
+	V4XZDP6JllksFE1IgdTCes3Nljy7joFlFC04JuNr59KnPvQq4428Hvofy7NAKHWv
+	44WtHxuW3XayObMGDJpjLQzN6XHmO7SkgK9VVruJpUKPItQmCQ3lqOyllanLdL1+
+	Bvngr/BuuW7tX+UnHl2C2PuLV+OADycAS2g==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1794864367; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:P8rTWm4EgzUD4gWQEd075Q1V5cBS6ewSktdtp6+vgZDXTNB
+	/PhBNC0d0BjoqBY3CudA2XansUoCq7+m2RqSVIiml7p5Taj0XdVTa7bRfoZZAKAB
+	+GGvQ8LqWq6OKPpb4YBlCdZXaWoPbmAybGjTZ14SPi0Ll2Xtz9Place/ZtLN2YjG
+	UvmreRX72gaROisrlUD7mgXn0oyp1J2Uw3EDKYQrM13dPeHMya7BbqHGtaDBKhnJ
+	UPX8H0d3rgTZmCJkjfXNKvc+wxnznylNAQAcG/i0XvB1XKLLmNkCQPeQgTWPOX9y
+	ampKB7aO4KNxqWeODl7wCmX7JzzAHA8LyB1HEoA==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:/WRZXQIX3NLr3c5F7XHk9pDzN4CKOhzqSqmpEn6Qahs=:jziW9HwR6rQNpuQ0wEqIuVKcRrQJbMkbg3qnvjxkK3w=;
+X-ME-Sender: <xms:73T7amlIlByfuWh08GNradpR9476i7yofHdRvhUuCeJgCRI7vE31aA>
+    <xme:73T7auiYrMFMVpjfJeTB27Y0XsMlovspQb-hgrSYxFi9AX197byrmT1KmaJKjuC7H
+    l7wiFP5QTF8Lcbh5Zo25mu8x8ZOEM76sS52CtSolHVIvKMm0dqfBnjt>
+X-ME-Received: <xmr:73T7ai1fcvUzhhyNEfGYVuqwy1H7OxFwDanU7pYxWiWZqjI5NREqqUD-j6nSoKZSkJBwzw>
+X-ME-Proxy-Cause: dmFkZTE7FLW3HHIAbdmepA7uZE9NnbP27pvPdzNYUvkMnUD65fiPBErq5hYxlxZjn6QO9q
+    oPaaWavQIMOtf94mKyVoP6o1rODTGUhAMslWl1TmKvTYXnbS0yb/A1NyaM4jvnfP9zNTxD
+    rOJMpZgcKPKLyrxY92qlz1/bvnb0hbO6Tn4O0ps0eSjI09ASHc7d4yvZF7bXPTOT3IHs/g
+    52XavaPuMDXwiqwXJnbPvNqrA8D/yKHfWkBH0ESRqUzGVWkyo0TAnqm+xgI+6lBbhKcpzk
+    VQ4E05nj2dsrb+8Jfh3vv005f8+3dGeY1gcRpNhWICfwAYbAwT/aTr50mRM23j2OJSSeQ3
+    J1Yg1V8qrsS7cic2OFLhWTMd+zFNrcFfpbL0LXRaGbdrJ5hlj1VosUnQr0iXlYvhO1mJFH
+    iHDMygP55bPTjVN8UD8wRD05rRRuatxUruFfQIcudc7Yunzw/a5Y0bAzFqcdRFHsNq1uOz
+    XQVpMMhKv98nbIR8H/R6swILYi2UDQ4ZYOoITrlEk2J3d8w2ENnolX9aj4m42C+BDKqqiQ
+    WMfrX7sIFoMpcGZc0PtIPIXjWp4DxL+rZ27dgSeKthEyrh7ry+RIuZDQP1eZZdXo5Gmzch
+    OtBAV/58lKPK/yOcha5xEpjzHZoKi57BjWbnQE968dNNQFFyRaT7hvJUl4vg
+X-ME-Proxy: <xmx:73T7avJT_ljSINWVOw7ibFfVy-SvoO8EsJHw-5MsRCEmUEZQzzLTag>
+    <xmx:73T7aqyFpxbqBJA2R6NerQ07zs-tOaM5iQpGo9u6O91EYcUk2Zt-9g>
+    <xmx:73T7alVtZRgrS6l34RQU7X-IUgkqAgrFF2SFa_jAC5wcipunRuFHgA>
+    <xmx:73T7aiipUpfrsxAiuVf4xniLv8H4dxw2EsQ54nNuSPmqKXXTaIZUmQ>
+    <xmx:73T7auOur-_BGdWDahfA5WKxAZ9O5McyqwbvLiOnD3HfV3GGZJ5tOGwD>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 16 Nov 2026 16:26:06 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>
+Subject: [PATCH] ksmbd: drop the get_write argument that every caller sets
+Date: Mon, 16 Nov 2026 15:25:49 -0600
+Message-ID: <20261116212549.2574919-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -86,299 +124,212 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=37fc961d2ca56be80f03ddce209a59446815f2f70d142ce639c6d949d73f;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Mon, 16 Nov 2026 21:53:49 +0100
-Message-Id: <DMWXMP61YXEH.1W32ZFF7A7Y5H@gmail.com>
-Cc: "David Sterba" <dsterba@suse.com>, "Namjae Jeon"
- <linkinjeon@kernel.org>, "Sungjong Seo" <sj1557.seo@samsung.com>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
- <brauner@kernel.org>, "Trond Myklebust" <trondmy@kernel.org>, "Anna
- Schumaker" <anna@kernel.org>, "Chuck Lever" <cel@kernel.org>, "Jeff Layton"
- <jlayton@kernel.org>, "Konstantin Komarov"
- <almaz.alexandrovich@paragon-software.com>, "Paulo Alcantara"
- <pc@manguebit.org>, "Chris Mason" <mason@kernel.org>, "Yuezhang Mo"
- <yuezhang.mo@sony.com>, "Jan Kara" <jack@suse.cz>, "NeilBrown"
- <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo"
- <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>, "Ronnie Sahlberg"
- <ronniesahlberg@gmail.com>, "Shyam Prasad N" <sprasad@microsoft.com>,
- "Bharath SM" <bharathsm@microsoft.com>, "Sergey Senozhatsky"
- <senozhatsky@chromium.org>, "ChenXiaoSong" <chenxiaosong@chenxiaosong.com>,
- "Darrick J . Wong" <djwong@kernel.org>, "Sean Smith"
- <defendthedisabled@gmail.com>, "Andrey Albershteyn" <aalbersh@kernel.org>,
- "Pedro Falcato" <pfalcato@suse.de>, =?utf-8?q?Pali_Roh=C3=A1r?=
- <pali@kernel.org>, <linux-btrfs@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
- <exfat@lists.linux.dev>, <ntfs3@lists.linux.dev>,
- <linux-cifs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
- <linux-api@vger.kernel.org>
-Subject: Re: [RFC PATCH v4 01/10] vfs: add provenance time (ptime)
-From: "koraynilay" <koray.fra@gmail.com>
-To: "Amir Goldstein" <amir73il@gmail.com>, "koraynilay"
- <koray.fra@gmail.com>
-X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
-References: <20261115180343.576773-1-koray.fra@gmail.com>
- <20261115180343.576773-2-koray.fra@gmail.com>
- <CAOQ4uxi+50NU8qzg+Owvr8gFZ4vYF5FqWg4Hr9vB6ONUpPsFwg@mail.gmail.com>
-In-Reply-To: <CAOQ4uxi+50NU8qzg+Owvr8gFZ4vYF5FqWg4Hr9vB6ONUpPsFwg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
---37fc961d2ca56be80f03ddce209a59446815f2f70d142ce639c6d949d73f
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+Commit 020ad4a0d0ba ("ksmbd: protect SET_INFO metadata updates against
+filesystem freezing") and commit 3c463ed5bb47 ("ksmbd: protect CREATE
+metadata updates against filesystem freezing") made every server caller
+of set_info_sec() and ksmbd_vfs_set_sd_xattr() pass get_write as true.
+Only the two KUnit tests pass false, and they store on a shmem file,
+where taking write access works as well.
 
-On Mon Nov 16, 2026 at 9:10 PM CET, Amir Goldstein wrote:
-> On Sun, Nov 15, 2026 at 7:04=E2=80=AFPM koraynilay <koray.fra@gmail.com> =
-wrote:
->>
->> Add provenance time (ptime), indicating the time when a file or
->> directory was created. This is user-settable via file_setattr() and
->> retrievable via statx(2) (using STATX_PTIME) or file_getattr().
->>
->> The semantics of when to preserve this new timestamp are the same as
->> mtime, the idea being that there is a correspondence like this:
->>
->> ctime <-> btime
->> mtime <-> ptime
->>
->> so every operation (copying, moving, ...) that currently preserves mtime
->> should also preserve ptime.
->>
->> Also add fa_xflags_mask to struct file_attr (and equivalent
->
-> That is a very big "Also" part
-> This is a significant UAPI change that needs to be delivered and
-> explained with a patch on its own.
+Remove the argument from both functions. set_info_sec() now always takes
+write access around the POSIX ACL and attribute update, and
+ksmbd_vfs_set_sd_xattr() always asks ksmbd_vfs_setxattr() to take it.
+Nothing changes for clients.
 
-Right, that definitely makes more sense, I didn't think of that lol.
+Signed-off-by: Ian Bridges <icb@fastmail.org>
+---
 
->> fsx_xflags_mask to struct file_kattr) to let the filesystems advertise
->> their support for specific xflags and users advertise what they want to
->> change, behaving like statx.stx_attributes_mask:
->> - on GET (file_getattr): each filesystem fills the mask according to
->>   their supported xflags, e.g. FS_XFLAG_PTIME or FS_XFLAG_COWEXTSIZE,
->>   and provides the values in the corresponding struct fields;
->> - on SET (file_setattr): userspace fills the mask according to which
->>   xflags it wants to change, VFS validates this and preserves xflags
->>   that were not specified in the mask;
->> - if xflags_mask =3D=3D 0, use legacy full-struct replacement to keep
->>   compatibility with older programs.
->>
->> Furthermore, in order to avoid the legacy FS_IOC_FSSETXATTR accepting
->> FS_XFLAG_PTIME, add an FS_FILE_ATTR_XFLAGS_MASK mask to support new
->> xflags and use it in fileattr_to_file_attr()/file_attr_to_fileattr() to
->> validate that the xflags passed in xflags and xflags_mask fields are
->> valid.
->>
->> Finally, add the missing FS_XFLAG_PROJID flag, to allow userspace to set
->> the projid using file_[sg]etattr().
->
-> This part also belongs with the xflags_mask patch
+The argument no longer selects anything a server caller needs. It only
+leaves a way to store a security descriptor without freeze protection,
+which is the gap the two commits above closed. Without the argument,
+every store through these two functions is protected. set_info_sec()
+also drops one of four bool arguments in a row, so its call sites are
+easier to read. The lower helpers such as ksmbd_vfs_setxattr() keep
+their get_write argument, because some of their callers pass false.
 
-Ok.
+Tested on ksmbd-for-next c710c654b8a3 with KASAN. The stored security
+descriptors and security queries are the same as without the patch for
+SET_INFO, the CREATE security descriptor context, inheritance and the
+default descriptor. The ksmbd KUnit tests pass with GCC and clang.
+smbtorture results match the base.
 
->>
->> [ This is a re-implementation of the initial patch[1] by Sean Smith
->>   <defendthedisabled@gmail.com>, following the advice[2] from Darrick J.
->>   Wong <djwong@kernel.org> of using file_setattr() instead of updating
->>   utimensat() ]
->>
->> [1]: https://lore.kernel.org/20260405195007.1306-2-DefendTheDisabled@gma=
-il.com
->> [2]: https://lore.kernel.org/20260407014129.GC6192@frogsfrogsfrogs
->>
->> Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.4.7
->> Signed-off-by: koraynilay <koray.fra@gmail.com>
->> ---
->>  fs/file_attr.c            | 75 +++++++++++++++++++++++++++++++++++++--
->>  fs/stat.c                 |  2 ++
->>  include/linux/fileattr.h  |  6 ++++
->>  include/linux/stat.h      |  1 +
->>  include/uapi/linux/fs.h   |  9 ++++-
->>  include/uapi/linux/stat.h |  7 +++-
->>  6 files changed, 95 insertions(+), 5 deletions(-)
->>
->> diff --git a/fs/file_attr.c b/fs/file_attr.c
->> index 833e03810b24..12610fb6a751 100644
->> --- a/fs/file_attr.c
->> +++ b/fs/file_attr.c
->> @@ -102,14 +102,23 @@ EXPORT_SYMBOL(vfs_fileattr_get);
->>  static void fileattr_to_file_attr(const struct file_kattr *fa,
->>                                   struct file_attr *fattr)
->>  {
->> -       __u32 mask =3D FS_XFLAGS_MASK;
->> +       /*
->> +        * fsx_xflags_mask contains only flags added after the
->> +        * file_[gs]etattr() API, so we need to tell userspace the files=
-ystem
->> +        * actually supports all legacy and new advertised flags
->> +        */
->> +       __u32 mask =3D (FS_XFLAGS_MASK | fa->fsx_xflags_mask) &
->> +                    FS_FILE_ATTR_XFLAGS_MASK;
->>
->>         memset(fattr, 0, sizeof(struct file_attr));
->>         fattr->fa_xflags =3D fa->fsx_xflags & mask;
->> +       fattr->fa_xflags_mask =3D mask;
->>         fattr->fa_extsize =3D fa->fsx_extsize;
->>         fattr->fa_nextents =3D fa->fsx_nextents;
->>         fattr->fa_projid =3D fa->fsx_projid;
->>         fattr->fa_cowextsize =3D fa->fsx_cowextsize;
->> +       fattr->fa_ptime_sec =3D fa->fsx_ptime.tv_sec;
->> +       fattr->fa_ptime_nsec =3D fa->fsx_ptime.tv_nsec;
->>  }
->>
->>  /**
->> @@ -141,15 +150,23 @@ EXPORT_SYMBOL(copy_fsxattr_to_user);
->>  static int file_attr_to_fileattr(const struct file_attr *fattr,
->>                                  struct file_kattr *fa)
->>  {
->> -       __u64 mask =3D FS_XFLAGS_MASK;
->> +       __u64 mask =3D fattr->fa_xflags_mask ?: FS_XFLAGS_MASK;
->> +
->> +       if (fattr->fa_xflags_mask & ~FS_FILE_ATTR_XFLAGS_MASK)
->> +               return -EINVAL;
->>
->>         if (fattr->fa_xflags & ~mask)
->>                 return -EINVAL;
->>
->>         fileattr_fill_xflags(fa, fattr->fa_xflags & ~FS_XFLAG_RDONLY_MAS=
-K);
->> +       fa->fsx_xflags_mask =3D fattr->fa_xflags_mask;
->>         fa->fsx_extsize =3D fattr->fa_extsize;
->>         fa->fsx_projid =3D fattr->fa_projid;
->>         fa->fsx_cowextsize =3D fattr->fa_cowextsize;
->> +       if (fattr->fa_xflags_mask & FS_XFLAG_PTIME) {
->> +               fa->fsx_ptime.tv_sec =3D fattr->fa_ptime_sec;
->> +               fa->fsx_ptime.tv_nsec =3D fattr->fa_ptime_nsec;
->> +       }
->>
->>         return 0;
->>  }
->> @@ -232,6 +249,23 @@ static int fileattr_set_prepare(struct inode *inode=
-,
->>             !S_ISREG(inode->i_mode) && !S_ISDIR(inode->i_mode))
->>                 return -EINVAL;
->>
->> +       if (fa->fsx_xflags_mask & FS_XFLAG_PTIME) {
->> +               if (!(old_ma->fsx_xflags_mask & FS_XFLAG_PTIME))
->> +                       return -EOPNOTSUPP;
->> +
->> +               if (!(fa->fsx_xflags & FS_XFLAG_PTIME))
->> +                       return -EINVAL;
->> +
->> +               if ((unsigned long)fa->fsx_ptime.tv_nsec >=3D NSEC_PER_S=
-EC)
->> +                       return -EINVAL;
->> +
->> +               fa->fsx_ptime =3D timestamp_truncate(fa->fsx_ptime, inod=
-e);
->> +
->> +               if (!timespec64_equal(&old_ma->fsx_ptime, &fa->fsx_ptime=
-) &&
->> +                   (fa->flags & old_ma->flags) & (FS_APPEND_FL | FS_IMM=
-UTABLE_FL))
->> +                       return -EPERM;
->
-> I don't know what this is but it looks strange.
+This patch was developed with LLM assistance.
 
-That's for preserv- ok nevermind it's probably not needed anymore
-since adding fsx_xflags_mask. I'll check that too for v5.
+ fs/smb/server/smb2pdu.c            |  8 +++-----
+ fs/smb/server/smbacl.c             | 18 +++++++-----------
+ fs/smb/server/smbacl.h             |  2 +-
+ fs/smb/server/tests/smbacl_kunit.c |  6 ++----
+ fs/smb/server/vfs.c                |  5 ++---
+ fs/smb/server/vfs.h                |  3 +--
+ 6 files changed, 16 insertions(+), 26 deletions(-)
 
->
->> +       }
->> +
->>         /*
->>          * It is only valid to set the DAX flag on regular files and
->>          * directories on filesystems.
->> @@ -288,13 +322,41 @@ int vfs_fileattr_set(const struct mnt_idmap *idmap=
-, struct dentry *dentry,
->>         if (!err) {
->>                 /* initialize missing bits from old_ma */
->>                 if (fa->flags_valid) {
->> -                       fa->fsx_xflags |=3D old_ma.fsx_xflags & ~FS_XFLA=
-G_COMMON;
->> +                       /* FS_IOC_SETFLAGS */
->> +                       fa->fsx_xflags |=3D (old_ma.fsx_xflags & FS_XFLA=
-GS_MASK) &
->> +                                         ~FS_XFLAG_COMMON;
->>                         fa->fsx_extsize =3D old_ma.fsx_extsize;
->>                         fa->fsx_nextents =3D old_ma.fsx_nextents;
->>                         fa->fsx_projid =3D old_ma.fsx_projid;
->>                         fa->fsx_cowextsize =3D old_ma.fsx_cowextsize;
->> +                       fa->fsx_ptime =3D old_ma.fsx_ptime;
->>                 } else {
->> +                       /*
->> +                        * Preserve unmasked xflags when running file_se=
-tattr()
->> +                        * with a mask, which doesn't need a read-modify=
--write
->> +                        * so these attributes would be set to 0.
->> +                        *
->> +                        * With FS_IOC_FSSETXATTR or mask =3D=3D 0 (lega=
-cy mode)
->> +                        * this is not needed as userspace does
->> +                        * read-modify-write already.
->> +                        */
->> +                       if (fa->fsx_xflags_mask) {
->> +                               fa->fsx_xflags |=3D old_ma.fsx_xflags &
->> +                                                 ~fa->fsx_xflags_mask;
->> +                               fileattr_fill_xflags(fa, fa->fsx_xflags =
-&
->> +                                                    ~FS_XFLAG_RDONLY_MA=
-SK);
->> +                               if (!(fa->fsx_xflags_mask & FS_XFLAG_EXT=
-SIZE))
->> +                                       fa->fsx_extsize =3D old_ma.fsx_e=
-xtsize;
->> +                               if (!(fa->fsx_xflags_mask & FS_XFLAG_PRO=
-JID))
->> +                                       fa->fsx_projid =3D old_ma.fsx_pr=
-ojid;
->> +                               if (!(fa->fsx_xflags_mask & FS_XFLAG_COW=
-EXTSIZE))
->> +                                       fa->fsx_cowextsize =3D old_ma.fs=
-x_cowextsize;
->> +                       }
->>                         fa->flags |=3D old_ma.flags & ~FS_COMMON_FL;
->> +
->> +                       /* xflags not present in fsxattr */
->> +                       if (!(fa->fsx_xflags_mask & FS_XFLAG_PTIME))
->> +                               fa->fsx_ptime =3D old_ma.fsx_ptime;
->>                 }
->>
->
-> This whole flags/xflags duality needs a closer look
-> This looks a bit too complicated right now.
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index b74dafe6a307..29750970f8da 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -3954,8 +3954,7 @@ static int smb2_create_sd_buffer(struct ksmbd_work *work,
+ 	/* parse_sec_desc() refuses a length shorter than the SD header */
+ 	pntsd = smb2_context_data(context);
+ 	return set_info_sec(work->conn, work->tcon, path, pntsd,
+-			    le32_to_cpu(context->DataLength), true, true,
+-			    true, true);
++			    le32_to_cpu(context->DataLength), true, true, true);
+ }
+ 
+ static int ksmbd_acls_fattr(struct smb_fattr *fattr,
+@@ -5276,8 +5275,7 @@ int smb2_open(struct ksmbd_work *work)
+ 								    idmap,
+ 								    &path,
+ 								    pntsd,
+-								    pntsd_size,
+-								    true);
++								    pntsd_size);
+ 					kvfree(pntsd);
+ 					if (rc)
+ 						pr_err("failed to store ntacl in xattr : %d\n",
+@@ -9419,7 +9417,7 @@ static int smb2_set_info_sec(struct ksmbd_file *fp, int addition_info,
+ 		return -EACCES;
+ 
+ 	return set_info_sec(fp->conn, fp->tcon, &fp->filp->f_path, pntsd,
+-			buf_len, false, true,
++			buf_len, false,
+ 			fp->conn->dialect == SMB311_PROT_ID && fp->is_posix_ctxt,
+ 			addition_info & DACL_SECINFO);
+ }
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 9aac87ff3b4a..a87c22fa9a6e 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1443,7 +1443,7 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 			pntsd_size += sizeof(struct smb_acl) + nt_size;
+ 		}
+ 
+-		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size, true);
++		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size);
+ 		kfree(pntsd);
+ 	}
+ 
+@@ -1905,7 +1905,7 @@ static unsigned int smb_parent_derived_rights(struct ksmbd_conn *conn,
+ 
+ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		 const struct path *path, struct smb_ntsd *pntsd, int ntsd_len,
+-		 bool type_check, bool get_write, bool posix_open,
++		 bool type_check, bool posix_open,
+ 		 bool dacl_requested)
+ {
+ 	int rc;
+@@ -1948,11 +1948,9 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 				   (fattr.cf_mode & 0777);
+ 
+ 	ksmbd_vfs_remove_acl_xattrs(idmap, path);
+-	if (get_write) {
+-		rc = mnt_want_write(path->mnt);
+-		if (rc)
+-			goto out;
+-	}
++	rc = mnt_want_write(path->mnt);
++	if (rc)
++		goto out;
+ 
+ 	/* Update posix acls */
+ 	if (IS_ENABLED(CONFIG_FS_POSIX_ACL) && fattr.cf_dacls) {
+@@ -1975,8 +1973,7 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	inode_lock(inode);
+ 	rc = notify_change(idmap, path->dentry, &newattrs, NULL);
+ 	inode_unlock(inode);
+-	if (get_write)
+-		mnt_drop_write(path->mnt);
++	mnt_drop_write(path->mnt);
+ 	if (rc)
+ 		goto out;
+ 
+@@ -1987,8 +1984,7 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
+ 		/* Update WinACL in xattr */
+ 		ksmbd_vfs_remove_sd_xattrs(idmap, path);
+-		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len,
+-				get_write);
++		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
+ 	}
+ 
+ out:
+diff --git a/fs/smb/server/smbacl.h b/fs/smb/server/smbacl.h
+index 6bb64fef02cd..b51a8c6c1d4e 100644
+--- a/fs/smb/server/smbacl.h
++++ b/fs/smb/server/smbacl.h
+@@ -106,7 +106,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 			bool authenticated, bool strict);
+ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		 const struct path *path, struct smb_ntsd *pntsd, int ntsd_len,
+-		 bool type_check, bool get_write, bool posix_open,
++		 bool type_check, bool posix_open,
+ 		 bool dacl_requested);
+ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid);
+ void ksmbd_init_domain(u32 *sub_auth);
+diff --git a/fs/smb/server/tests/smbacl_kunit.c b/fs/smb/server/tests/smbacl_kunit.c
+index bf28439a7696..39c9f8bb1ea7 100644
+--- a/fs/smb/server/tests/smbacl_kunit.c
++++ b/fs/smb/server/tests/smbacl_kunit.c
+@@ -222,8 +222,7 @@ static void ksmbd_smb_check_perm_dacl_boundary_test(struct kunit *test)
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
+ 
+ 	rc = ksmbd_vfs_set_sd_xattr(NULL, mnt_idmap(file->f_path.mnt),
+-				    &file->f_path, pntsd, ntsd_size,
+-				    false);
++				    &file->f_path, pntsd, ntsd_size);
+ 	KUNIT_EXPECT_EQ(test, 0, rc);
+ 	if (rc)
+ 		goto out;
+@@ -264,8 +263,7 @@ ksmbd_smb_check_perm_dacl_maximal_boundary_test(struct kunit *test)
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
+ 
+ 	rc = ksmbd_vfs_set_sd_xattr(NULL, mnt_idmap(file->f_path.mnt),
+-				    &file->f_path, pntsd, ntsd_size,
+-				    false);
++				    &file->f_path, pntsd, ntsd_size);
+ 	KUNIT_EXPECT_EQ(test, 0, rc);
+ 	if (rc)
+ 		goto out;
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 7c3edbe6cb77..8cb91315ac66 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -1685,8 +1685,7 @@ static struct xattr_smb_acl *ksmbd_vfs_make_xattr_posix_acl(const struct mnt_idm
+ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ 			   const struct mnt_idmap *idmap,
+ 			   const struct path *path,
+-			   struct smb_ntsd *pntsd, int len,
+-			   bool get_write)
++			   struct smb_ntsd *pntsd, int len)
+ {
+ 	int rc;
+ 	struct ndr sd_ndr = {0}, acl_ndr = {0};
+@@ -1743,7 +1742,7 @@ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ 
+ 	rc = ksmbd_vfs_setxattr(idmap, path,
+ 				XATTR_NAME_SD, sd_ndr.data,
+-				sd_ndr.offset, 0, get_write);
++				sd_ndr.offset, 0, true);
+ 	if (rc < 0)
+ 		pr_err("Failed to store XATTR ntacl :%d\n", rc);
+ 
+diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
+index 21b0d29a3db0..8568184ff05b 100644
+--- a/fs/smb/server/vfs.h
++++ b/fs/smb/server/vfs.h
+@@ -164,8 +164,7 @@ int ksmbd_vfs_remove_sd_xattrs(const struct mnt_idmap *idmap, const struct path
+ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ 			   const struct mnt_idmap *idmap,
+ 			   const struct path *path,
+-			   struct smb_ntsd *pntsd, int len,
+-			   bool get_write);
++			   struct smb_ntsd *pntsd, int len);
+ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 			   const struct mnt_idmap *idmap,
+ 			   struct dentry *dentry,
+-- 
+2.47.3
 
-Yes, I agree.
-
-> I don't have time to do the full review so wanted to give you the
-> main feedback first.
->
-> I'll try to get to it this week.
-
-Of course, no problem, I also still have a few kinda unrelated patches
-to work on and a fairly long list of bugs to fix (found by sashiko), so
-v5 will probably be ready this weekend/next week anyway.
-
-Thank you again very much.
-
-Best,
-koraynilay
-
-> Thanks,
-> Amir.
-
---37fc961d2ca56be80f03ddce209a59446815f2f70d142ce639c6d949d73f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSgVimKafU5DQMcjcDmj22qf5IGXAUCavttXQAKCRDmj22qf5IG
-XLKyAQDUbIPDnr/fz9a76CKxleC/LzaQMjyuAgz3koP+G7YFrwD/QwnPpap95GR9
-4QZordaDbvLNae5E2c5s96XsV/AKmAA=
-=1jPB
------END PGP SIGNATURE-----
-
---37fc961d2ca56be80f03ddce209a59446815f2f70d142ce639c6d949d73f--
