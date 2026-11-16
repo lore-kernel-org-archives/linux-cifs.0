@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794829534;
-	b=xlq9z5mGo23Bj2cHDY8Yt58mNiD9PruFyJQTwdCQorZHk/f7kKf/MNoCqHEr14s3EBuD
-	 5AZ1jqGch1qGaU2bjshiEUgN4ELrd5SF5rjx7RBlp/oGklJkLWFakT6pGkQMkp/c2TElN
-	 ZzsL8Fv4vqMRjZuoPdjAGG7w3cfUlh8ULMx6OGv2W0aEmCX9cuphT6bwkoIqm1bxfzQeS
-	 nobr7yn9VEBGJTfieRVUbcGOf2y+tMxjL8/lOXd0HdJwcWumW5V6aG8az9ynR5rFVeXfx
-	 Qzq1YD2GVDgbl9qpJFS7l91qVxm8PMPSlzz0iT1TJuXBIh3hmrqvalltcSxnkJDjKRA==
+	t=1794831033;
+	b=JfKfNQTQ+d6Vsc5rE8NIeN6J4nz9BqUIsq5XwPB6qtSOHB9/BG+aAy8ZFmDZJOrXv4Qt
+	 vf/1jxx7ZvGT2WxCyhLih43h0fmpgN8epyqWYLFUkM8JksgVgYqB3kUVbhEEUeCByub1+
+	 KrsK6ejYrcCz4pAtoTydlT9BMfIp4akuoprrhfchGc/apU9HtcW3bY1ORCxz76+mY54Wa
+	 nS1vMoMNREwyFPTpeEVX3BAqlbEyVEUXIGeMIJSWAA6XfputZXcMlLN56fVQN8ImiPXZ3
+	 UNiI7RucIpBvQ03+rG/73cQxdgy1F67U8UBmB5mB/l9Q60WS+Eb75KPKyk3ZDtitH4A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794829534;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794831033;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=yNKmdsf3yYn/xyXEK4QOIUERiIN+OHKy+Lj3GXdZkPg=;
-	b=ITAlayucGZHLg8K8TebzuJdXraginaSR+1TYij7g2RIEj0Tu+NetoZfHk95f1/6kjaq2
-	 xD/1UVYVeBcxX4tAgwR4SWHXzBlkfM+W7eUyPQpTPunT9ysBM25Y23Wfbt/yc8fvdi290
-	 o+dbGPNfKFPQ73DQqj5AqPOC6SvIt20e3NwvBMn+yuka6cMtVHGqscBorBEbw2drqqOo4
-	 FGROlzQxgGX+weDZRUrtl+QW3UqTtX/WdiaOtlbGujXKHUsTq2JeQxhFAnPrKoYKWygM1
-	 749yZvpN9W3gK04bqh+8ZxPuMgHbqYCiHob/VIWh4CYpeGgFL4e9VyuQeMMTt788rPg==
+	bh=yogqGq6K7jVQChJ/YPRwUkMOSfe+PhV20PoYhuNYLPw=;
+	b=2k1Oh+F6gWLdTTiwmD56q0jovD9a7dsn4mGphY3UG1xF3VqxsBI6eEpJ2dfYYHWIAwuX
+	 4jnqPdQBk6RKZ+vm6HnBPKMdHGi7z6iGOW2iAEeO6eXmAzBC3EJlw3jKQFJeo31teluJo
+	 yGnOmPkj3R19BnWWcpkd9Z7TosuEPOF7LJYPDR5einjFSPw1xrM1kZKABYz7m/sYcxsXE
+	 WzjlOj1hPbCo9qzW8pZpcN7lLUgcpK5MhAnzASjftEhUf5RqtOXq8Wg7vd5k3cOcZd8OK
+	 HY22Z8qoqVayXp7KALcIzuWzLLJVawByoS90jjTwCD0k92jRhFBF9vKYVf04p+alNJw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aQzYR3uw;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=laVHPMRv;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C510D606A32A
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 11:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44889606A31C
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 12:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aQzYR3uw
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F2BD1F000CA
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 11:45:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=laVHPMRv
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 221631F000C6
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 12:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794829534;
-	bh=yNKmdsf3yYn/xyXEK4QOIUERiIN+OHKy+Lj3GXdZkPg=;
+	s=k20260515; t=1794831033;
+	bh=yogqGq6K7jVQChJ/YPRwUkMOSfe+PhV20PoYhuNYLPw=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=aQzYR3uwi0O8puV/x6+awjXSzPCKjZMj2Tsc+VhaA5XCN0IN/L14pt7fGNgI/hVx7
-	 ok7ke/n6CwZzLImcbQoVMGBGsU4kgcvwCoX3+gfwjOu1mb8flxhyiLnNd3hBUvk61n
-	 75l8aMmHBHiQUkg8af4DFLAAubPhf0j2S7EwoDBlR5CmWFkjCSxkW37EkoE+AyaXSt
-	 TFC+e5MlTbztVnJkwd9tjIgewJ4bg6AcEEfKOwedFHLduyaaAA1g+0JYMQW2bhgzRC
-	 CACH7ygXas3AotC29Bg3S4naDXmq4T4p2lFIXcxOl+wNChPx15ChcSL9pJzYBBkCev
-	 QAvVISz6HwoEg==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c4d427836e9so430988466b.1
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 03:45:34 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEmaZU8Y7/J3F6mJkmyrFft++plU5S+neM31iIBobJZRExwYt4Ee4GbL8JvKaI3WiNmBgh/6IQ5dz5S@vger.kernel.org
-X-Gm-Message-State: APuU4Z9n4faTBHCGjZteLSLT9F99HoEYNFbx7dnV49s3Hpt4DcVJISE/
-	xDaRDn1n6g4Fp3MCLtrYv79RNPH9fR3F1veP13N2Dk7v8MqcOhNcNfz4SJYd8Y5W6fkNRk71TE3
-	5QWmVm0zYX2E6yK4/W71DHb3WaikQ1vc=
-X-Received: by 2002:a17:907:3f9e:b0:c49:c76f:dad4 with SMTP id
- a640c23a62f3a-c50963b5cf3mr853853766b.31.1794829533177; Mon, 16 Nov 2026
- 03:45:33 -0800 (PST)
+	b=laVHPMRvx6oakQPHa8D9yynGmLvQU7CtRHDG3k5VsbLKnX6MVJYC16B1n7TEo4pO7
+	 Bfpdt8Koa3ncyPTCCvCfR39R4WAo2jqevyID/eDj2Hpega6j85UEtJxMaDzWtj8Zv0
+	 BMxxoZw2GS0DYgoCt27Ja4AqJ2yCd7H1xauCw83Yev2Au35h9HjzPD1i0y0Pu837Un
+	 HxhSR+M1J0y1Mi/uCPY/oXY39gnjhxLFMStltd6P2wsG2qxPb6+KQk42bpnXnKjprK
+	 Decv25C+QyD1v6AF/32O7JgzZ9cSgBJRgAHWrWT2ZvBkkmn/tEQaFsslZj7TBnhiZP
+	 +Le2R0w3nJTJw==
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-6767d92cde6so3222826d50.0
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 04:10:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErEiCx2FtzyVYAcVcl2qBhIFPPdL7BABcpIclSYsb7szMxn2U672DjKIpHxfrNnkLS0w/R/Jmsm3W4Yl@vger.kernel.org
+X-Gm-Message-State: APuU4Z/fTFQ7+R9Gre18C+feSxKdJEwl7LXYROBry0lSM1oA3xF6LDZg
+	9XPZvpq6rrQdcv3A4Lvl4McWLnNNVge0jjwPSdv7NKNbC1WWxm6cJ2dUbnjk5OCMZkDHRxpBPbx
+	7NlUOvGSg5HUJZP4cE0WgbpKCLcpmjaw=
+X-Received: by 2002:a05:690e:bc2:b0:67d:b274:39d6 with SMTP id
+ 956f58d0204a3-67db274406emr1915423d50.55.1794831032524; Mon, 16 Nov 2026
+ 04:10:32 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,37 +59,53 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261116032314.46458-1-wuyiqing@cmss.chinamobile.com>
-In-Reply-To: <20261116032314.46458-1-wuyiqing@cmss.chinamobile.com>
+References: <20261116074849.475815-1-stefan.chulski@broadcom.com>
+In-Reply-To: <20261116074849.475815-1-stefan.chulski@broadcom.com>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Mon, 16 Nov 2026 20:45:20 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd91MdtF+eFJC+wF3xkSjCrZ7q7R_=LN9aEbYp6QdJbHDQ@mail.gmail.com>
-X-Gm-Features: AclHuK-X8RoIW1SUKIYSe1a_GK5CkT5SqqFxuAc4qHuW9cQDIrxvuL5lO7X0OB8
-Message-ID: <CAKYAXd91MdtF+eFJC+wF3xkSjCrZ7q7R_=LN9aEbYp6QdJbHDQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: remove unreachable input length check in FSCTL_SET_SPARSE
-To: Yiqing Wu <wuyiqing@cmss.chinamobile.com>
+Date: Mon, 16 Nov 2026 21:10:15 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9KT=1vLYsnRKxmiM6pLJQNACXuodD8wNQzb8S5apiuRQ@mail.gmail.com>
+X-Gm-Features: AclHuK-NMgDJ7sKrkDrwDOe1Jm6Lwdix0HevzR3vIhht9ZS3bSgXg6UFWRTgmyo
+Message-ID: <CAKYAXd9KT=1vLYsnRKxmiM6pLJQNACXuodD8wNQzb8S5apiuRQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v1] ksmbd: add use_unbound_wq module parameter for the
+ ksmbd-io workqueue
+To: Stefan Chulski <stefan.chulski@broadcom.com>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ilya Lifshits <ilya.lifshits@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 16, 2026 at 12:23=E2=80=AFPM Yiqing Wu
-<wuyiqing@cmss.chinamobile.com> wrote:
+On Mon, Nov 16, 2026 at 4:49=E2=80=AFPM Stefan Chulski
+<stefan.chulski@broadcom.com> wrote:
 >
-> The FSCTL_SET_SPARSE handler checks whether a nonzero input buffer is
-> smaller than sizeof(struct file_sparse) before parsing it.  That
-> structure holds a single __packed byte, so a nonzero in_buf_len is
-> always at least sizeof(struct file_sparse) and the condition can never
-> be true.  GCC flags the dead test when building with W=3D2:
+> The "ksmbd-io" workqueue has always been per-CPU. Commit 69635d7f4b34
+> ("fs: WQ_PERCPU added to alloc_workqueue users") only made that
+> default explicit as part of the treewide transition to unbound-by-default=
+;
+> it was not a ksmbd-specific decision.
 >
->   fs/smb/server/smb2pdu.c:12035:32: warning: logical and of mutually excl=
-usive tests is always false [-Wlogical-op]
+> Per-CPU work keeps request processing on the CPU that queued it, which
+> is good for cache locality, but it also runs work on CPUs that were
+> isolated from workqueue noise (isolcpus=3D, nohz_full=3D) and prevents th=
+e
+> scheduler from placing blocked or long-running workers elsewhere.
+> Which behaviour is better depends on the workload and platform.
 >
-> Remove the unreachable branch.  A zero-length input is still handled
-> by the call site, which passes the local SetSparse default instead of
-> the request buffer.
+> Add a boolean use_unbound_wq module parameter. It defaults to false, so
+> behaviour is unchanged unless it is set; when true, "ksmbd-io" is
+> allocated with WQ_UNBOUND instead of WQ_PERCPU. The "ksmbd-break"
+> workqueue is already WQ_UNBOUND and is not affected.
 >
-> Signed-off-by: Yiqing Wu <wuyiqing@cmss.chinamobile.com>
-Applied it to #ksmbd-for-next.
-Thanks!
+> Document the parameter in ksmbd.rst.
+>
+> Signed-off-by: Stefan Chulski <stefan.chulski@broadcom.com>
+Hi Stefan,
+
+Do you have numbers comparing the per-CPU and unbound queues,
+How does this compare with the earlier following RFC ?
+
+https://lore.kernel.org/linux-cifs/20261022092514.2590010-1-huiwen.he@linux=
+.dev/
+
+Thanks.
