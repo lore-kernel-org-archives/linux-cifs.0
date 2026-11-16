@@ -1,98 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.46
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794843942;
-	b=YzYjHydNVdiP1GG5R+J5D5/oYAbF8vG4tcY2+jO2+luml5kOZVhX9lSkQ5JrCSRfcriV
-	 6JXeWpLwFpKrZjA3zKLlG1HGVqP1sbQ9m7uvT6Ysw4Pdls1LwJZfx90IIC1V9Lzc86sTA
-	 YF14qmheHtRmPVUus/mJfO1dPeUGvFqAs62C4Sy8ZXrk/FMl+4EPk+OxoZG95FAJ4U8qs
-	 +SA0lWJ1H5CwF8+vITPoN126t2XbH2gMMfSsu4kW7KtZiwyuBIKnKUyMabgoxQiZfxmpf
-	 dOM9kHvL4pqutU3YbTOfVsxoXbRS4w8TUbwsK6wpnji+ctIwHjpHracBoyCLiHdROxw==
+	t=1794844509;
+	b=XbeaWXY8OKGjjBIiFDV72CpefFogyJSLIbx7f5xjU7w6WBu6w6muE+A+A2ffodVvhv9m
+	 1l8bqSLVYAQF00dBtnkfQBjAwqRt99ZQak5YB6yqeEbvmoF338UedgblIUwJV4zYieITj
+	 EmvXYlewMGIIZ6Xesst5E20wOukobxhY2QdLEZZ4yEGNhBv70/6WvYmIDSwISmBkSSZ8c
+	 F1YBcmzeUciuG8dQmIXyfTPwaYidaho0RICGG/ROOfzKyXhhdsFrmNkOLr/hf4IGYq6Fz
+	 eYyMxacHb8Ehp3HRX+MZq7yWiBqVlnyqtcOM+FnSsGVndr9I2KbgdjTqwgJo3g5I0OQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794843942;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794844509;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=YrQg8b1HMQfdVG/FMxGjW2qYHjNymOxo+4+eTQKFo2U=;
-	b=jn2lI1kAYKAcu5zuHQCrc+8BPvfJtNpBA1iOxQw+akIsaSdG0aAkh03vPdmz1D2p9slY
-	 x5Wh3fRTTqNCcCKLZ3DMlgXfmR1jR6fQK7uDnJlzlkJL+3/hmRHJVDx5Tw+X09mel1rQv
-	 lc6jpHs597OIeEnCOck1eK1vzMpyYFOoUN+xVf4e92pYndTDpfb4mWS8fHbzcHy68Hj3k
-	 Si8Ju5LpXbroEOdrI/on+9tWuT4NUvXeVE5MRUZF1GJzCX8+dolQaMkpUT2qWDaXsRkc0
-	 BX/T7sYZGsshq4RyvxSC5W/jte/+jbNTs+SfJO9nQnElW8HFO3s/fP1vqOiMzNYe9LQ==
+	 Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:X-Mailer:
+	 References:In-Reply-To;
+	bh=040W0WtrDSqyLSlnE1PnGtn4Yj+G8VjPGcb4tUhpFSw=;
+	b=t530/xKU2+IRVwapOtrNLcmw6W4jP+3pgJxzYef7j+9v9epvgGbYAecfXXFo3+TSfumI
+	 K6GG0Vb5WREdPKkRXRGNVskPp612dL+ZQsPFKfYATga+m9kv7woCvDyqMb7ek2mdpBEpa
+	 eS1AmykZECWlMPKvKK+R2g2TjUfRRU2G8nnjVPDTaIzuj/02IvT9VN/wcNjo3e29mev4q
+	 6RpTXODvofOrNV/U2PnckCqzvyQWPyIrvm/Jhk5V2K5NbBRy+PcHytmQEPoz1LGOVc7l0
+	 +7YVJvQ0hXYOvYt+nn9Zm2QOKWnxJiWR4k/TX9OMYQx4SETssKNK02CqBMk/VwQM6vg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oi14qhen;
-	arc=none smtp.remote-ip=209.85.128.50
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="pzw1LYv/";
+	arc=none smtp.remote-ip=209.85.128.46
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A07606A322
-	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 15:45:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F2A07606A322
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237E1606A322
+	for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 15:55:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 237E1606A322
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oi14qhen
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4bb666304fdso13567945e9.0
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 07:45:41 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=pzw1LYv/
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4a9a8d6cea8so38419825e9.1
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 07:55:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794843940; x=1795448740; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=YrQg8b1HMQfdVG/FMxGjW2qYHjNymOxo+4+eTQKFo2U=;
-        b=oi14qhenTRx25hlwwDKhZ/LWV/uSlT2RNCHeTID3Dz65o3FX3regIYGRq4ugzgS1uB
-         peO8I4FuTjCyiDAE2cipjJM6tIM6etkZZLDY5ujAaGpdR6fBlx1sDLhX42U6n+SvTsDG
-         DhiL9/tiMX1cTyS4BDTxZmbMgw6iQi4h5zsFoC6FsEqPgk2vb+tefD3V5q2KGmyqC7NB
-         Mff6X/6u7EDkfBJo1CR/d68zN9Yp1/E74o13bpic+jGaCJrSrZT0jz5YwZZBRZ6Gd3bn
-         WYWflAMGWHGL79DZX44rHvPl/CnGEb7d8BbOr45PDDSEZQIpTwp+bAIIyu8UoeTC3L1U
-         AUIA==
+        d=gmail.com; s=20260707; t=1794844507; x=1795449307; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-type:mime-version:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=040W0WtrDSqyLSlnE1PnGtn4Yj+G8VjPGcb4tUhpFSw=;
+        b=pzw1LYv/GrIlyi119CS5O4dqTEojMh2PPNb0YLcVL7AgRpRPj91hUHUDLzwGHiIkuC
+         5ghAwsq0A9srRmVkNB8Ix2AZMHzK2FSmwfF1fpVV6wSxAgjHZbG1qbtI/8JNO2HgW+r3
+         XgDVOXvb5VVxNKCsylQTXVTZZnpIc/RC1U9X4IdocD0LsekYcooCdMYN+Ye/PIugulrR
+         bsLdCqNRm/HCjdSVlog5UWaUqIdJSeiekv7v0ydQZt8YByVGiL3lGc9Lkhi/TNtQ+1ll
+         hw9b6NezzwKImWenA2JKyQoRtyOhZw4ZVaZluabORLOPZCH4hh4orZFsxIpsVOaBSg97
+         1eRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794843940; x=1795448740;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YrQg8b1HMQfdVG/FMxGjW2qYHjNymOxo+4+eTQKFo2U=;
-        b=OWubbHfe+tWNn5A+wdnixh0dXY3B0Y7zfUKjhnzozWDtKX9ExloGlMRq0FuBrbtWkR
-         BfzPeSjRuCVq4ZT9ZLM3NP7tPBDSuoGFAf3VGv1ufthh4uC+U59fHv88tF/CYdxPqHF3
-         nzWanjB2J1U+6+zcxvLyPWdvFMSr6kGTeTaQRsbjvuId+a/EN3PKuZmsK7ErwOPTjwN7
-         eguDysj1dW2MFCW5GJiiP7a5FH2D2V1QNEGL2/oQsAsR5PSeeG6TetBs78ykWcLH7P6L
-         hvw3lzdhqeEoGZx/gmwvJ6bIycApCSUchDiBAmpO5NkB71Q5piMTsdF9R3SdKmgBXJ+T
-         nIPA==
-X-Forwarded-Encrypted: i=1; AL+hErGmZenXJGmNg0rp/4BOIXhTKJvntFWCboaUeBTWRc8XRKqU3bCyxGWTu6hwplIvm3FItHqY3SNT2T/2@vger.kernel.org
-X-Gm-Message-State: APuU4Z9vSP9uTv0dP5Jd9HJCoK/T01oE2yJ4TuJta7uxEe2K1eIyusIB
-	arEpnhqlyoZCx5X0OteKnDHBU8X5chKGBFjGbPhzEg3IeZk/qlMTNKm+
-X-Gm-Gg: AYBFou3HhGEVU2HCgRdzukJlvBijIDJtkCI9MZc+OXoTxzOPNrKl+He18o/W0gQeVL2
-	53JHqvjSt4PSyMhfC41cLctM4yphSSr8ayjYMx3nHhemwTKjwCXQ7MrcSnaoMzkyMrbu2TYhEbW
-	zz/I/SGzskspl2LBjIgmJiWU+1dSswBbXqKc1pW+igQ0TDVS8pvFLoFZm7TCEaAKV7VHsoqTHP+
-	nOCtAMiCcdZcd6RNPI4wyzldDU3/LyWOzuP/JvnmsRAVBMFb//bSzp3YjDlD+sH5En6hJC9ZZo5
-	bIYGL/qjCoOmKWVHjxIeZ9S5LbwZ4ooA05IdZ4VuoAQk8dCcBH0vZd2N89ifF8wbAP6znWLlmoR
-	EC+Je0xiEw6X8ZgM/vRUICOWIIlT7gf80yYRVAXt54gVkIxm9Lo5uNUVQCNqVps82vuSgZ82wA+
-	IwcAC/caVHlsqycr91X57xH0rA3PuAWoMyyAz0DjKTaM/KYumV9zrPINYGn8/v6c7Hx/GsM1rCZ
-	dzb6mExZ0wnXO5RwXAk3VgEwKEbfB4vClPemzHhfPRSRDiSAJi9fxea8KGKtHtlkvpeLI+d/+LR
-	BtdSqCZoSxbHvDHueAlIyOCN
-X-Received: by 2002:a05:600c:1906:b0:4a1:c6f5:2450 with SMTP id 5b1f17b1804b1-4bb55ac2a34mr244233205e9.17.1794843940079;
-        Mon, 16 Nov 2026 07:45:40 -0800 (PST)
-Received: from infinity ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb4e293540sm395008555e9.8.2026.11.16.07.45.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 07:45:39 -0800 (PST)
-From: koraynilay <koray.fra@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>
-Cc: Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Aurelien Aptel <aaptel@suse.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	koraynilay <koray.fra@gmail.com>,
-	Sashiko <sashiko-bot@kernel.org>
-Subject: [PATCH] cifs: fix times assignments in cifs_posix_to_fattr()
-Date: Mon, 16 Nov 2026 16:45:26 +0100
-Message-ID: <20261116154526.429315-1-koray.fra@gmail.com>
-X-Mailer: git-send-email 2.56.0
+        d=1e100.net; s=20260707; t=1794844507; x=1795449307;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=040W0WtrDSqyLSlnE1PnGtn4Yj+G8VjPGcb4tUhpFSw=;
+        b=zgi/kYwxw7tKW1SmyRRKiw6OQ5+xwlgth0lQsG7uMibUk0aiA96ewmDoeiCconoRTI
+         xTn+xTUJ/uYOmloI9fq8QcF+ea4xgyf4e+yztS2mTEhZ0zBPsD2OdzEUONqDTnTxFLj0
+         svRhchtdycCKQM44mDF0C9P39Qr7qvpsXMKpva4vqbIwdFd34BIiOipk04hZ2wzEe7gz
+         x0VdAVSR5PtC5UhOdh8EH+D4vEvw4rZ9cnY9CG1Yw5rE6cuxAGMbagUplaiXwSA/7ltY
+         yJX6Kj6o8yxElfRP8pOWrO6E5uvIIEgsSHvgmbTRTE4ZKQPJdCVPRcL1deOWk22ztPyq
+         mwbw==
+X-Forwarded-Encrypted: i=1; AL+hErHnTNnLvvnP07yU7yACS/XE603FnGUJm/NAMzBq32gm9VfObmupw2RYSY/Q0VMNiTovOuluTw+p8con@vger.kernel.org
+X-Gm-Message-State: APuU4Z+2auf+qLtj1ImyEuak+fbeJWf5wVnKFAbXMQKsB4lnhDbIQRi1
+	y5yt7F2hHTiFbmKWq1CZvDzxXkyzayvfv+YZysx4g9ZQTY6jUWmRhpiQ
+X-Gm-Gg: AYBFou1iuoM8DuAfgS1cF0S2izUSc4ad5HDtMjG1veo6utillViT1iJaf6ZXC2yCU0n
+	z4bQ6AOKFjdLsqIS3tt6PqsWx67izYqaDvA5VQ4K85Ld4XjDxXVwGfxjTNe5MIws4C8qA2yRoDQ
+	HYWjRvGYLe18pcgNM/mrSAAIf3vmVqrcMLuwZIAWIKJmU+JGOImMks2Nkhe0vI4FAoJRm3YPw7n
+	IZOGqep4m/r+IXaADIk48FWPZvuTAKiDN8Bd2jV4UMspmATaPyuSChgnkMKDnvW3L6aWNMNvwoz
+	5kEnb/0jF3wL2yogTVobx2KHZwBqdm1qJQVzrkTWRaW2NvvhzkiCeLEfUe5iJfm8vdzwpaZsyJE
+	pgpHlXQJ11pM9AoLaSs04h6BWp1WGBbbdK8m4EPMDBolu6RrIbx8ehN1IVrRClV0cVXDzp16s+C
+	QJerZlJOx7QrVwS/LoUZI9j7xKknoY8kc1NEtjVqKPHhFml1cewC4cgHx+bNi/1tSuEbk4U9Po6
+	k53afzdtIf1JbM3w0C67RXD3QkkyNXZxtOy+Seeo1UQYrM6eqa5Rx1qw9/qjhhG58FaXx+JFgdk
+	1tl6gHq6NjVDrhj8vU0InOFpZQ==
+X-Received: by 2002:a05:600c:1906:b0:4a1:c6f5:2450 with SMTP id 5b1f17b1804b1-4bb55ac2a34mr244783135e9.17.1794844507334;
+        Mon, 16 Nov 2026 07:55:07 -0800 (PST)
+Received: from localhost ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb55ae501bsm321476945e9.10.2026.11.16.07.55.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Nov 2026 07:55:05 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -101,115 +86,290 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=f93caca3b757f4039ce5a884d522f788c6958abee5364c6a1026cc96907d;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Mon, 16 Nov 2026 16:55:02 +0100
+Message-Id: <DMWR9XOQTPOK.3IDTXWG0BB6CG@gmail.com>
+Subject: Re: [RFC PATCH v4 06/10] vfs: add __vfs_fileattr_set_locked() for
+ inode_lock()'d callers
+From: "koraynilay" <koray.fra@gmail.com>
+To: "Amir Goldstein" <amir73il@gmail.com>, "koraynilay"
+ <koray.fra@gmail.com>
+Cc: "David Sterba" <dsterba@suse.com>, "Namjae Jeon"
+ <linkinjeon@kernel.org>, "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Trond Myklebust" <trondmy@kernel.org>, "Anna
+ Schumaker" <anna@kernel.org>, "Chuck Lever" <cel@kernel.org>, "Jeff Layton"
+ <jlayton@kernel.org>, "Konstantin Komarov"
+ <almaz.alexandrovich@paragon-software.com>, "Paulo Alcantara"
+ <pc@manguebit.org>, "Chris Mason" <mason@kernel.org>, "Yuezhang Mo"
+ <yuezhang.mo@sony.com>, "Jan Kara" <jack@suse.cz>, "NeilBrown"
+ <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo"
+ <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>, "Ronnie Sahlberg"
+ <ronniesahlberg@gmail.com>, "Shyam Prasad N" <sprasad@microsoft.com>,
+ "Bharath SM" <bharathsm@microsoft.com>, "Sergey Senozhatsky"
+ <senozhatsky@chromium.org>, "ChenXiaoSong" <chenxiaosong@chenxiaosong.com>,
+ "Darrick J . Wong" <djwong@kernel.org>, "Sean Smith"
+ <defendthedisabled@gmail.com>, "Andrey Albershteyn" <aalbersh@kernel.org>,
+ "Pedro Falcato" <pfalcato@suse.de>, =?utf-8?q?Pali_Roh=C3=A1r?=
+ <pali@kernel.org>, <linux-btrfs@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+ <exfat@lists.linux.dev>, <ntfs3@lists.linux.dev>,
+ <linux-cifs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+ <linux-api@vger.kernel.org>
+X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
+References: <20261115180343.576773-1-koray.fra@gmail.com>
+ <20261115180343.576773-7-koray.fra@gmail.com>
+ <CAOQ4uxgm+JEu2MGnqQrJ00nTJ45S2ECQ7CBOC2QrgniOfkLYAQ@mail.gmail.com>
+In-Reply-To: <CAOQ4uxgm+JEu2MGnqQrJ00nTJ45S2ECQ7CBOC2QrgniOfkLYAQ@mail.gmail.com>
 
-Currently cifs_posix_to_fattr() wrongly sets SMB's CreationTime to
-fattr->cf_ctime.
+--f93caca3b757f4039ce5a884d522f788c6958abee5364c6a1026cc96907d
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-Fix this by setting fattr->cf_createtime to SMB's CreationTime and
-fattr->cf_ctime to SMB's ChangeTime, matching the behaviour of
-__dir_info_to_fattr().
+On Mon Nov 16, 2026 at 2:52 PM CET, Amir Goldstein wrote:
+> On Sun, Nov 15, 2026 at 7:04=E2=80=AFPM koraynilay <koray.fra@gmail.com> =
+wrote:
+>>
+>> Currently there is no way for a caller to invoke vfs_fileattr_set()
+>> while holding an inode lock without having the kernel go into deadlock.
+>>
+>> Fix this by moving the vfs_fileattr_set() logic into
+>> __vfs_fileattr_set_locked() and making vfs_fileattr_set() a simple
+>> wrapper that only handles the inode lock.
+>>
+>> Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.7
+>> Signed-off-by: koraynilay <koray.fra@gmail.com>
+>> ---
+>>  fs/file_attr.c           | 139 +++++++++++++++++++++++----------------
+>>  include/linux/fileattr.h |   2 +
+>>  2 files changed, 86 insertions(+), 55 deletions(-)
+>>
+>> diff --git a/fs/file_attr.c b/fs/file_attr.c
+>> index 12610fb6a751..063c81fbfa6a 100644
+>> --- a/fs/file_attr.c
+>> +++ b/fs/file_attr.c
+>> @@ -288,6 +288,89 @@ static int fileattr_set_prepare(struct inode *inode=
+,
+>>         return 0;
+>>  }
+>>
+>> +/**
+>> + * __vfs_fileattr_set_locked - change miscellaneous file attributes whi=
+le
+>> + * holding the inode lock
+>> + *
+>> + * @idmap:     idmap of the mount
+>> + * @dentry:    the object to change
+>> + * @fa:                fileattr pointer
+>> + *
+>> + * Same as vfs_fileattr_set(), but caller must hold the inode lock.
+>> + *
+>> + * Return: 0 on success, or a negative error on failure.
+>> + */
+>> +int __vfs_fileattr_set_locked(const struct mnt_idmap *idmap, struct den=
+try *dentry,
+>> +                             struct file_kattr *fa)
+>> +{
+>> +       struct inode *inode =3D d_inode(dentry);
+>> +       struct file_kattr old_ma =3D {};
+>> +       int err;
+>> +
+>> +       if (!inode->i_op->fileattr_set)
+>> +               return -ENOIOCTLCMD;
+>> +
+>> +       if (!inode_owner_or_capable(idmap, inode))
+>> +               return -EPERM;
+>> +
+>> +       err =3D vfs_fileattr_get(dentry, &old_ma);
+>> +       if (err)
+>> +               return err;
+>> +
+>> +       /* initialize missing bits from old_ma */
+>> +       if (fa->flags_valid) {
+>> +               /* FS_IOC_SETFLAGS */
+>> +               fa->fsx_xflags |=3D (old_ma.fsx_xflags & FS_XFLAGS_MASK)=
+ &
+>> +                                 ~FS_XFLAG_COMMON;
+>> +               fa->fsx_extsize =3D old_ma.fsx_extsize;
+>> +               fa->fsx_nextents =3D old_ma.fsx_nextents;
+>> +               fa->fsx_projid =3D old_ma.fsx_projid;
+>> +               fa->fsx_cowextsize =3D old_ma.fsx_cowextsize;
+>> +               fa->fsx_ptime =3D old_ma.fsx_ptime;
+>> +       } else {
+>> +               /*
+>> +                * Preserve unmasked xflags when running file_setattr()
+>> +                * with a mask, which doesn't need a read-modify-write
+>> +                * so these attributes would be set to 0.
+>> +                *
+>> +                * With FS_IOC_FSSETXATTR or mask =3D=3D 0 (legacy mode)
+>> +                * this is not needed as userspace does
+>> +                * read-modify-write already.
+>> +                */
+>> +               if (fa->fsx_xflags_mask) {
+>> +                       fa->fsx_xflags |=3D old_ma.fsx_xflags &
+>> +                                         ~fa->fsx_xflags_mask;
+>> +                       fileattr_fill_xflags(fa, fa->fsx_xflags &
+>> +                                            ~FS_XFLAG_RDONLY_MASK);
+>> +                       if (!(fa->fsx_xflags_mask & FS_XFLAG_EXTSIZE))
+>> +                               fa->fsx_extsize =3D old_ma.fsx_extsize;
+>> +                       if (!(fa->fsx_xflags_mask & FS_XFLAG_PROJID))
+>> +                               fa->fsx_projid =3D old_ma.fsx_projid;
+>> +                       if (!(fa->fsx_xflags_mask & FS_XFLAG_COWEXTSIZE)=
+)
+>> +                               fa->fsx_cowextsize =3D old_ma.fsx_cowext=
+size;
+>> +               }
+>> +               fa->flags |=3D old_ma.flags & ~FS_COMMON_FL;
+>> +
+>> +               /* xflags not present in fsxattr */
+>> +               if (!(fa->fsx_xflags_mask & FS_XFLAG_PTIME))
+>> +                       fa->fsx_ptime =3D old_ma.fsx_ptime;
+>> +       }
+>> +
+>> +       err =3D fileattr_set_prepare(inode, &old_ma, fa);
+>> +       if (err)
+>> +               return err;
+>> +       err =3D security_inode_file_setattr(dentry, fa);
+>> +       if (err)
+>> +               return err;
+>> +       err =3D inode->i_op->fileattr_set(idmap, dentry, fa);
+>> +       if (err)
+>> +               return err;
+>> +       fsnotify_xattr(dentry);
+>> +
+>> +       return 0;
+>> +}
+>> +EXPORT_SYMBOL(__vfs_fileattr_set_locked);
+>> +
+>>  /**
+>>   * vfs_fileattr_set - change miscellaneous file attributes
+>>   * @idmap:     idmap of the mount
+>> @@ -308,7 +391,6 @@ int vfs_fileattr_set(const struct mnt_idmap *idmap, =
+struct dentry *dentry,
+>>                      struct file_kattr *fa)
+>>  {
+>>         struct inode *inode =3D d_inode(dentry);
+>> -       struct file_kattr old_ma =3D {};
+>>         int err;
+>>
+>>         if (!inode->i_op->fileattr_set)
+>> @@ -318,60 +400,7 @@ int vfs_fileattr_set(const struct mnt_idmap *idmap,=
+ struct dentry *dentry,
+>>                 return -EPERM;
+>>
+>>         inode_lock(inode);
+>> -       err =3D vfs_fileattr_get(dentry, &old_ma);
+>> -       if (!err) {
+>> -               /* initialize missing bits from old_ma */
+>> -               if (fa->flags_valid) {
+>> -                       /* FS_IOC_SETFLAGS */
+>> -                       fa->fsx_xflags |=3D (old_ma.fsx_xflags & FS_XFLA=
+GS_MASK) &
+>> -                                         ~FS_XFLAG_COMMON;
+>> -                       fa->fsx_extsize =3D old_ma.fsx_extsize;
+>> -                       fa->fsx_nextents =3D old_ma.fsx_nextents;
+>> -                       fa->fsx_projid =3D old_ma.fsx_projid;
+>> -                       fa->fsx_cowextsize =3D old_ma.fsx_cowextsize;
+>> -                       fa->fsx_ptime =3D old_ma.fsx_ptime;
+>> -               } else {
+>> -                       /*
+>> -                        * Preserve unmasked xflags when running file_se=
+tattr()
+>> -                        * with a mask, which doesn't need a read-modify=
+-write
+>> -                        * so these attributes would be set to 0.
+>> -                        *
+>> -                        * With FS_IOC_FSSETXATTR or mask =3D=3D 0 (lega=
+cy mode)
+>> -                        * this is not needed as userspace does
+>> -                        * read-modify-write already.
+>> -                        */
+>> -                       if (fa->fsx_xflags_mask) {
+>> -                               fa->fsx_xflags |=3D old_ma.fsx_xflags &
+>> -                                                 ~fa->fsx_xflags_mask;
+>> -                               fileattr_fill_xflags(fa, fa->fsx_xflags =
+&
+>> -                                                    ~FS_XFLAG_RDONLY_MA=
+SK);
+>> -                               if (!(fa->fsx_xflags_mask & FS_XFLAG_EXT=
+SIZE))
+>> -                                       fa->fsx_extsize =3D old_ma.fsx_e=
+xtsize;
+>> -                               if (!(fa->fsx_xflags_mask & FS_XFLAG_PRO=
+JID))
+>> -                                       fa->fsx_projid =3D old_ma.fsx_pr=
+ojid;
+>> -                               if (!(fa->fsx_xflags_mask & FS_XFLAG_COW=
+EXTSIZE))
+>> -                                       fa->fsx_cowextsize =3D old_ma.fs=
+x_cowextsize;
+>> -                       }
+>> -                       fa->flags |=3D old_ma.flags & ~FS_COMMON_FL;
+>> -
+>> -                       /* xflags not present in fsxattr */
+>> -                       if (!(fa->fsx_xflags_mask & FS_XFLAG_PTIME))
+>> -                               fa->fsx_ptime =3D old_ma.fsx_ptime;
+>> -               }
+>> -
+>> -               err =3D fileattr_set_prepare(inode, &old_ma, fa);
+>> -               if (err)
+>> -                       goto out;
+>> -               err =3D security_inode_file_setattr(dentry, fa);
+>> -               if (err)
+>> -                       goto out;
+>> -               err =3D inode->i_op->fileattr_set(idmap, dentry, fa);
+>> -               if (err)
+>> -                       goto out;
+>> -               fsnotify_xattr(dentry);
+>> -       }
+>> -
+>> -out:
+>> +       err =3D __vfs_fileattr_set_locked(idmap, dentry, fa);
+>>         inode_unlock(inode);
+>>         return err;
+>>  }
+>> diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
+>> index ba7ed3b387d8..7ff62ee27e58 100644
+>> --- a/include/linux/fileattr.h
+>> +++ b/include/linux/fileattr.h
+>> @@ -97,6 +97,8 @@ static inline bool fileattr_has_fsx(const struct file_=
+kattr *fa)
+>>  int vfs_fileattr_get(struct dentry *dentry, struct file_kattr *fa);
+>>  int vfs_fileattr_set(const struct mnt_idmap *idmap, struct dentry *dent=
+ry,
+>>                      struct file_kattr *fa);
+>> +int __vfs_fileattr_set_locked(const struct mnt_idmap *idmap, struct den=
+try *dentry,
+>> +                             struct file_kattr *fa);
+>
+> There is no reason for __ prefix here and I think it should be discourage=
+d for
+> global scope if possible.
 
-This patch also fixes a few related issues reported by sashiko on
-another patch (see Sashiko Link tag).
+Ah ok, I copied what had been done for __vfs_setxattr_locked() /
+vfs_setxattr() and __vfs_removexattr_locked() / vfs_removexattr(), but I
+agree that __ makes it more "internal", I'll change it for v5.
 
-Reproducers for these bugs, with /tmp as the local filesystem folder
-exported as [test] in ksmbd.conf and /mnt as the smb folder mounted with
-mount -t cifs:
-
-  mount -t cifs //127.0.0.1/test /mnt -o username=ciao,password=c,posix
-
-Issue 1: ctime clobbered by CreationTime during readdir
-
-  mkdir -p /mnt/dir
-  touch /mnt/dir/file
-  sleep 4
-  chmod 644 /mnt/dir/file
-  stat -c "ctime and btime before readdir: %Z %W" /mnt/dir/file
-  ls -lc /mnt/dir > /dev/null
-  stat -c "ctime and btime after readdir:  %Z %W" /mnt/dir/file
-  stat -c "ctime and btime on disk:        %Z %W" /tmp/dir/file
-
-output before the fix, notice how ctime is the same as btime after the
-readdir, while it's 4 seconds ahead (because of the sleep 4) before the
-readdir (on disk timestamps are not touched):
-
-  ctime and btime before readdir: 1794842068 1794842064
-  ctime and btime after readdir:  1794842064 1794842064
-
-  ctime and btime on disk:        1794842068 1794842064
-
-output after the fix:
-
-  ctime and btime before readdir: 1794842908 1794842904
-  ctime and btime after readdir:  1794842908 1794842904
-
-  ctime and btime on disk:        1794842908 1794842904
-
-Issue 2: btime and ptime wiped out by readdir
-
-[ no reproducer as it only happens after the linked patch series is
-  applied, since it needs cifs_i->createtime = fattr->cf_createtime in
-  cifs_fattr_to_inode() ]
-
-Issue 3: in-memory inode aliasing (flock bypass on hardlink via readdir)
-
-  mkdir -p /mnt/dir1 /mnt/dir2
-  echo "test" > /mnt/dir1/h1
-  ln /mnt/dir1/h1 /mnt/dir2/h2
-  exec 3< /mnt/dir1/h1
-  flock -x -n 3 # get exclusive lock
-  ls /mnt/dir2 > /dev/null
-  exec 4< /mnt/dir2/h2
-  flock -x -n 4
-  if [ $? -eq 0 ];then
-  	echo "acquired: duplicate in-memory inode"
-  else
-  	echo "blocked: same inode"
-  fi
-
-output before the fix:
-
-  acquired: duplicate in-memory inode
-
-output after the fix:
-
-  blocked: same inode
-
-Fixes: 3d519bd1269f ("cifs: plumb smb2 POSIX dir enumeration")
-Cc: stable@vger.kernel.org
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Link: https://sashiko.dev/#/patchset/20261115180343.576773-1-koray.fra%40gmail.com?part=10
-Link: https://lore.kernel.org/all/20261115180343.576773-11-koray.fra@gmail.com/
-Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.7
-Signed-off-by: koraynilay <koray.fra@gmail.com>
----
 Thanks,
 koraynilay
 
- fs/smb/client/readdir.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> Thanks,
+> Amir.
 
-diff --git a/fs/smb/client/readdir.c b/fs/smb/client/readdir.c
-index 525f99181485..5d335f12eb24 100644
---- a/fs/smb/client/readdir.c
-+++ b/fs/smb/client/readdir.c
-@@ -253,9 +253,10 @@ cifs_posix_to_fattr(struct cifs_fattr *fattr, struct smb2_posix_info *info,
- 	fattr->cf_bytes = le64_to_cpu(info->AllocationSize);
- 	fattr->cf_eof = le64_to_cpu(info->EndOfFile);
- 
-+	fattr->cf_createtime = le64_to_cpu(info->CreationTime);
- 	fattr->cf_atime = cifs_NTtimeToUnix(info->LastAccessTime);
- 	fattr->cf_mtime = cifs_NTtimeToUnix(info->LastWriteTime);
--	fattr->cf_ctime = cifs_NTtimeToUnix(info->CreationTime);
-+	fattr->cf_ctime = cifs_NTtimeToUnix(info->ChangeTime);
- 
- 	fattr->cf_nlink = le32_to_cpu(info->HardLinks);
- 	fattr->cf_cifsattrs = le32_to_cpu(info->DosAttributes);
 
-base-commit: 9928f403dfafd17dfe45678bbc6f623f72528744
-prerequisite-patch-id: 049ae0eba275b5be35a238833107e0b251a55aa2
--- 
-2.56.0
 
+--f93caca3b757f4039ce5a884d522f788c6958abee5364c6a1026cc96907d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSgVimKafU5DQMcjcDmj22qf5IGXAUCavsnVgAKCRDmj22qf5IG
+XC40APwLpgC2qCi2ygC417CAeeBgnvIyXQNVw3WOnFMBGg8tUQEAsuqI0c//BtxD
++1WkW5Y6mUri16pC/bv/iBr7lSbFFAs=
+=Rkz6
+-----END PGP SIGNATURE-----
+
+--f93caca3b757f4039ce5a884d522f788c6958abee5364c6a1026cc96907d--
