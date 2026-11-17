@@ -1,64 +1,58 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794928285;
-	b=EHE2j9DyF+Aurqs0m/puLSar7P5dgsoUSnb8dXNBkDblg/UgrpdzzldCHy9Vz7bBUxAV
-	 /65QK9vAITYnZK721NlIJZySLGsd8QT/pb2AYhW0rSbdEcOwKEzAMelCti3s7Tj00NcVT
-	 sXEySXVNjxYWKJyxXLWSoRrOr4FvGMsfqlw7wyHjdYQe+9MwdW2F2G3vOjoPBalDDGvSW
-	 SCDmJ1c1i+G0rqL8pzuRV/7YmNPuvsSkCfdp08zNKf3dvphNc5DLyd5loPaof2d9MCPfE
-	 rS/6CFYIAhprNTxc1khzIqD3Lz6wOyxb0Hu7UD1KfvYOdX6TrfOrmz9pWXnl+5BPHMg==
+	t=1794932551;
+	b=uH1StUCwQRlLPH1a4w0KAAdLUwSnFCzbrp1wsHtJi/WhVho+3iRYyPwS+7ic2Y9uIb0g
+	 tmZlJ+XBdLl/VDljV+k+twMYxL3cPM+o+V2vUvAhsNVMbxalx6YGRbo0IdbJ2hKg06nWj
+	 gDo9VyRe9MssGc/3JKEnzMUXxZdTEQYHWSl4UF6joxPus7iWMHDh+1pPhKhVWcGMQQQGo
+	 hPSAwjCyUuXJNteDA8L4Ee+mxkPoqJ/so9o3WbGK8z09/SoIGx2nqnwJNz2+7QvPOJq/N
+	 z+S9roxsHS03VkRrTYuYEsGq4rfRCIjEQNWc3fDUY1M102Nbm8SPp9Ewc4vbXMe9hZA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794928285;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:Date:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=MtphZhFOIkTJ7fYGOaxJ8FZss72jGafiSI5Av5cF0nM=;
-	b=tNE83X5ypaGw6jrsTBX1KhYdg7fUtWdYb6tw6diGT+nMbtS3yUs56SdVoj4CvKj2Y443
-	 yBEIbavkCg6kzmlfmrntkCWsJyPGIXlIsMVnmmQQGaivv+FlGVuQyb47cUuCLZpRhJb0g
-	 lHTQGU0X65ToOhEY8uUUpOmixY9ZyPQV4GZgnjJLu6hVjPKTHhWQmKi9DLzXd72HGD6gO
-	 bZ71KqqORDSoKBK/LMkMhCwmExb3ME1Xsh6ysbBufsIVAq0yQVjVIzfSpO4s36UPAI/fT
-	 5HUpXFgDmqI93CQnhoYq3+7Ns+InMjFS8r41luuerbZ7RWuGdkQANknnllvOgAAas7Q==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794932551;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=7ozHhCZ3ZihxouUI4j459/3H/En+9bEIeJSKv08FLE4=;
+	b=yVRiJgYyRkwZrd7k8QUW4p9aIsqk6ZxNP15ckqIirUpmy2Ue7CZUdkJT+Q67PJW1viWx
+	 UlzeVVze98UkaPSRIhPrQb2nqnSAa38j/NFBWKDPBE3xhQoip2xQesLS9GGYg7KaEIMyj
+	 pxtrNacwMhRbzDmVWpz4TAAdsDNYJHcqjIR70dqali8/wXfeOzjFDWlvdAT6hOZwvX51N
+	 /SyFre08Mi/ussIPP83yQbnDIWa9yVagRHiAzZqk8SjpWI/XfaU0cT0EVVgelo4wEaMFT
+	 Y/Y1iOd0CPwcPGYPUeMTdOvghtgzn7qbwv2oxSQm47SCoSXEKcqRDRFdepOPqp6k0yQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=AdhsOzJh;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XBzmkglJ;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1127606A31C;
-	Tue, 17 Nov 2026 15:11:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D1127606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A04C606A31C;
+	Tue, 17 Nov 2026 16:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=AdhsOzJh
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Date:References:In-Reply-To:Subject:Cc:To:From:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=MtphZhFOIkTJ7fYGOaxJ8FZss72jGafiSI5Av5cF0nM=; b=AdhsOzJhAlGZtkiQZFo7gSZnDC
-	NaWH2CCDWtAP7PuUwIUMkNz6t9vvgS9fgKzdpErbCNJfmEouEJT4B3eA0QZ784o8Ju208vLxJy8LG
-	oRM68jwjmgFdZ5gN/igGtMCHAfScnZ/Y6jTO1EXvc97A1jabDGVeN5Q9S0ItfOzD4TRzdWVMGEWZf
-	uKEBCBtTLwgswfRhYF1dw2xoasNt68eLJiJSUf+bZLzO5P/aO+cQeEfEP4ylWbiSHqSRx3Lh0+2wz
-	Ziu2TuijP0i1CcE/xUXyaArui2APPxwWgvQfRTqOA05eeRfRQJe6hoiMoCCokl5Jr9osG5FtNIivl
-	eRCGuwJg==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xTKq0-00000000C4U-1FXA;
-	Tue, 17 Nov 2026 12:11:12 -0300
-Message-ID: <287aa602b5b30784566310e917cdb9da@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: Fredric Cover <fredric.cover.lkernel@gmail.com>, Namjae Jeon
- <linkinjeon@kernel.org>
-Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>, Tom Talpey
- <tom@talpey.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad
- N <sprasad@microsoft.com>, Bharath SM <bharathsm@microsoft.com>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, Fredric Cover
- <fredric.cover.lkernel@gmail.com>
-Subject: Re: [PATCH] smb: client: convert path_consumed to mount charset units
-In-Reply-To: <20261112042137.1642509-1-fredric.cover.lkernel@gmail.com>
-References: <20261112042137.1642509-1-fredric.cover.lkernel@gmail.com>
-Date: Tue, 17 Nov 2026 12:11:11 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XBzmkglJ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F661F000C5;
+	Tue, 17 Nov 2026 16:22:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794932551;
+	bh=7ozHhCZ3ZihxouUI4j459/3H/En+9bEIeJSKv08FLE4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=XBzmkglJCnMg5frKEMxdQwuLZcGIEMSV7sjuFXYTvopkN7zZ5ZFUQ3qP0rGLI+CQk
+	 WRC8p0qmhXxnJZE0wbGl3QdJQcistyRQLpHbCdLvnn5r2n1kT3qBsjRsSgrSFCujq3
+	 Wm2v/NP0+ZZc9c/9BP5pxGOuxZRBRMf1wSKTJw7G5BE27x/UjgqOGTvJ/FoPztrINA
+	 0huGgA6kO1LyRUvcUKSeWrrd/W+gCjIf9DMwwTbMZwiA/kuZwnogR1+i0SjAeS9Khh
+	 2Kmk2DKuMKjDy038WCdvSbxEhfhFFB1FurDQqLS2WoFMe/DYjGOuFI1pcbPGamrn23
+	 74IkVmv23qblw==
+Date: Tue, 17 Nov 2026 17:22:25 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Christoph Hellwig <hch@infradead.org>
+Cc: Lauri Gates <lauri.gates@gmail.com>, Dave Chinner <dgc@kernel.org>, 
+	linux-xfs@vger.kernel.org, Carlos Maiolino <cem@kernel.org>, 
+	Christian Brauner <christian@brauner.io>, "Darrick J. Wong" <djwong@kernel.org>, linux-api@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org, ocfs2-devel@lists.linux.dev, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org
+Subject: Re: Concurrent FIEMAP on reflinked files serialises on the AGF
+ buffer lock
+Message-ID: <20261117-kiefer-beinfreiheit-entnommen-685343327ac9@brauner>
+References: <au3wJNbRPXQZG5Op@infradead.org>
+ <20261106204026.14530-1-lauri.gates@gmail.com>
+ <avYb7D3bCmnw0Mbw@infradead.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -69,29 +63,27 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <avYb7D3bCmnw0Mbw@infradead.org>
 
-Fredric Cover <fredric.cover.lkernel@gmail.com> writes:
+On Thu, Nov 12, 2026 at 12:05:00PM -0800, Christoph Hellwig wrote:
+> On Fri, Nov 06, 2026 at 10:40:26PM +0200, Lauri Gates wrote:
+> > The other is that for a "may share" bit, clear is the unsafe answer,
+> > so a filesystem that cannot answer should not look like one that
+> > answers "not shared". As I understand it, stx_attributes_mask makes
+> > that distinction, while struct file_attr has no validity mask today
+> > (it is size-versioned, so one could be added), so through
+> > file_getattr() btrfs would currently read as never shared. A spare
+> > bit in stx_attributes adds no field to struct statx, which I hope
+> > meets the concern Christian raised about spending statx space on the
+> > case-folding RFC [2]. If fileattr is preferred, the bit could instead
+> > mean "no shared extents", so that clear is the safe default, as it is
+> > for FS_XFLAG_CASEFOLD.
+> 
+> statx sounds good to me, but I'd really like to hear from Christian.
 
-> path_consumed in a DFS referral counts bytes of the canonical path,
-> which is in the DFS cache charset (utf8). dfs_parse_target_referral()
-> applies it as an offset into full_path, which is in the mount charset.
-> When the mount charset is not utf8, each non-ASCII character in the
-> consumed part that encodes longer in utf8 than in the mount charset
-> makes the offset too large, so leading characters of the prefix path
-> are dropped. For example, with iocharset=3Diso8859-1, mounting
-> //srv/dfs/caf=C3=A9 =C3=A9/sub yields the prefix "ub" instead of "sub" an=
-d the
-> mount fails with -ENOENT. (A single accented character only worked
-> because the offset happened to land after the delimiter.)
->
-> Translate the count in parse_dfs_target(), where both strings are
-> available, by matching path components: count the delimiters in the
-> consumed part of the canonical path and find the same position in the
-> mount charset path. Delimiters are ASCII in both and are not affected
-> by remapping. If the consumed bytes are identical in both strings,
-> which is the case for utf8 mounts and ASCII-only prefixes using the
-> default backslash delimiter, the value is used unchanged.
-> ...
-
-Applied.
+I'm not fond of it mostly because it seems FIEMAP is a debug interface
+and adding bits into statx() to make said debug interface quicker or
+easier to use feels very wrong to me. So I'd like to hear a better
+argument why we should do this. Otherwise, I think using file_attr as
+suggested earlier is good enough.
