@@ -1,121 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.98
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794927011;
-	b=3xjk/rnoruDD2ZX9xqMoy3kL3kW2F8oR67IsD8ni+oeHnbvafQ9pfE3EDx+3AhQzBSd+
-	 DX5g6Tdmqc55lWvVmwdGXWX9suEZk0KFZJ0SxJUaiGH1yUhlRLvPRWsKL4RibD/A3qYey
-	 n9H2BE6oQ/ms5nI8UawUPlhW0uv0/yLNj7AOhlT7Acrh8X/o0pc4mUnjNvgOXqqMNx/e6
-	 5I+wNBJT/uThcpLN0Jk+NQGbwosTyHaSkAITPP0uOYDeyePCG45jqjbagqevEsyFG5hOI
-	 L6Q2IJMu9vqqiZLM2jF6F+upE4XIrA5cZp4UQCKUcSW2MwHKFwx+WpPBQIhxZZ9Dwxw==
+	t=1794927458;
+	b=VLbt4LN4mXiAPb4rfis6GdltBGtJdUAHjlYFh8ZhSfv2iMnGk4IxeuOLuuY28G0Q53BH
+	 h8dGIDceslMvIeyp6i+47p065YER4jE3y4J6U1ZBM/kODPmXDHBIaOS3oK+J4b3seeMQB
+	 srQpLEgBtBhZLgCi0q0Yglzapzzn+UAlGc8mZTYWma3+617EnU19HDpOAXqPqf1IZIVCv
+	 BtYdXxnf27jP7HBJEApEFlD6MO2yBgs5CS0njote6JTYsKMyfewaUzWe2Q8M6eGNd3p3Y
+	 EC9qSpuTp/7XAsrK8XCLd2BsBS9SKAsdzzBe029cWOVOA8Hg+l3EdSkfscBUoEm0zuQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794927011;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=xZcMI80vkbrPSsjuRNnpfexDQWW5J8D26iu4OpFJ3Ks=;
-	b=hV07iOmYGo7MEvBw5IQWGEcivpzxYjTrjl8LlkB5KWtmVndJJW8gwILt0CbXXdwjPBbr
-	 oBtv3p4zw7ml9X6iZuawp8xWNklIxu+86VCrWq43njARe/IDNP6gFIeE7sdLRsSDJPl1x
-	 Jbt757sH+2weNviISYqnCUunX7E3q0h/3Ak/1Tjp1jV+eXZCLaQzr4DOcgAVTXujd0GAb
-	 oTKknhIfq0MYVhEYzERNGRI69CAs0eCi5QsGO31lqPeHhCsfORvbR1UzFPgLsu4ddOKMM
-	 xb6SG8/rNKJPg1BgyffnSoN7w/EQPzBTIYtW76CFJqu5eBYboHXTzqC0aOpUjkL9OEA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794927458;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:X-Relaying-Domain:
+	 X-CFilter-Loop:Received:DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Received:X-Received:MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type:
+	 Content-Transfer-Encoding:X-DetectorID-Processed;
+	bh=VaHYdskxBgJ5f/Er/TW8oHSSBf5pSt0lOXwfBFfdPtk=;
+	b=ZG6ZLiyCAUGAMIy19WvHf5wtoQKm9li21SY8MM2ujEuUJ9MbN+Xx0rucKl/uBiA1Kg/2
+	 Ccnqp3Xs8+mHPJQ4jfsN8oQ6SFMxUIG/1rVUjoDLeKQDekkFK3rZ7JMrbk93BDw0AesGJ
+	 5tOw4AOpKE2OpvBS39AeHrUZO98nfUyDWW6Yz+ShpkzaKURNFgqDBR3aIAH4+JeFQYVS7
+	 WjPrCyTTYtCi/cqEh1H4jJzTWxe+sFBDHN+nGPL53uabA6iOIqZIOLnzHNvT9QCdy6syB
+	 b9V/B5fqMtg1m/YriDfs9gAv+TDcrUebPXMMYWShCUDo4oZEOAdr7GE3/3ZQdzl/mSA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=apXMITRD;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=Ng+X994s;
-	arc=none smtp.remote-ip=103.168.172.146
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=broadcom.com;
+	spf=fail smtp.mailfrom=broadcom.com;
+	dkim=pass header.d=broadcom.com header.i=@broadcom.com header.a=rsa-sha256 header.s=google header.b=NGAkj3mg;
+	arc=none smtp.remote-ip=209.85.216.98
+Received: from mail-pj1-f98.google.com (mail-pj1-f98.google.com [209.85.216.98])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0205606A339
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 14:50:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C0205606A339
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E657606A884
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 14:57:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9E657606A884
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=apXMITRD;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=Ng+X994s
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.phl.internal (Postfix) with ESMTP id DF392EC08B3
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 09:50:09 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Tue, 17 Nov 2026 09:50:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1794927009; x=1795013409; bh=xZcMI80vkbrPSsjuRNnpf
-	exDQWW5J8D26iu4OpFJ3Ks=; b=apXMITRDmKddTWnmpPeVfRSyfifJXLWbton7p
-	bjrxP3iGs7SQ/KvOSuqHz8VHnKNRqgGFVaCK1I2qJmwx0cbZDqIH6yL6L2xWAV0C
-	68fOLC88wI/mvetLQU5IdoboYeOAcbfEPftv9i7b0P9yaerOn6qBiygKJvYhNFHX
-	MT6sJSn46coAkxcVIqOorr5fEPVcIRWwd5+YenVm+/YpMxkxyJDJGZd/HmgO5mlX
-	93k3t27LCjl2hB0PubPogjvOvtqc5lue4p3QP95pfXo2/RvNts1v27Jyr1teaWx5
-	2tcnKxvgxOXpnW+gqcSUQmy46pqSuQYct5Q0lXA1/jyyCuVuA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1794927009; x=1795013409; bh=xZcMI80vkbrPSsjuRNnpfexDQWW5J8D26iu
-	4OpFJ3Ks=; b=Ng+X994sn88uSRfvQ4iNgAahigacaejavG2b1Q5XITSizvu7uW9
-	00hv1hcwVZivLzTW5DlXYdQ/R4gX+WuxZUbTViqR098Tn3ewMeBerK0/Q7497KHl
-	EvUjXQ4KUtRbraLF42skzIpKpweTzQljfXns5mp+32U2txwJV28ONcsAg6wRuckk
-	vLpBnhmXSb3fa2EuHJyLgCV9vQwQEO8opOYBwbMGTLlk6w7bt0rRXUBuOdqn57pE
-	L8EqqIRxfRCScOaxENgqdX9zEQ6gmATFxhip9wESssTMO2xlKCPARNeYlJwSirV7
-	ZIaIXxKPkREO2LJpzzKsObNwFQLDgWl5zdQ==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1794927009; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:h0Xjw/djvhVOsmP2q2DlUmUGuTxz3xeJEaIHdkDNusdAE5n
-	YREzIuTAB1CQID+BT+ER5Nj1NbhCh0lRtbA2Gd/RXi9pYjws0afxnNsyFsDgdizv
-	7JvFVCUvSoCnuYtvRDRJgdY2v2sO4wCk8Q9yrbBH7Vo8ssEQvq3+7XxSCwiM5I6l
-	9d/qaoSxADjE4KneZuqvhAbGNx2AH17BF9+UcS9pVoTDyfczv/2PQjg9vBpgUas4
-	iAI3xW3KQCln7wm4te0EucP/kS9nUetEBDh0Z04EQnaLlDltnCCzxyFh6A3uFouP
-	EtM9fCkyun7SnejGBwnGWwyL80cfgEWKaOm8Xdg==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:s1vYgnlYDBZT7u7R0PmJbmbP6TNgHOmorG1PkYF2pes=:NrSGhQ2L8Usbg0xHiRyq46LfCjp9A/xEvlmwa12Kqj8=;
-X-ME-Sender: <xms:oWn8asOxZ6CdqvmyuoWOmnZn4TNJFuX7GIpE8mpqQlrPN9BD4yMxAA>
-    <xme:oWn8ajpQT_6Nm4FnAIRG9zGZSxsxenQyn0ox4n02LFaaIcJxpAY1X9NIwpjcLDGJm
-    NuRBQokr197h7asyunzslPLxXk5h9ujwBJJ0nGFKnIUCs6lc6wpGBM>
-X-ME-Received: <xmr:oWn8ahcZBhNpgbzspqF5yWWBoduastEXloOx-jVs75WakrTEqH8ke1lZeh9_l1hO>
-X-ME-Proxy-Cause: dmFkZTFlkzG3C+xQNkiy52LhTtmSDdbD5pvVz2yNNzVQq5HZ2kh8/C9ETKvP0bbwnMUWBv
-    WU+aiQhjnVDxyXzILp9x61q3jWtLUYglZcTBVrMHoM64PA07s8Rr/PlJQMXdYjEACz/bSV
-    J5sd/3Xef7uYN8auEwXxjOcHqAkgC8cTRVdJ/6+kaS7htRI+VJpj9yto3DWETl0bfTB2Fc
-    MoGRJAciEMuHbTJHVK9P57t+6bAlFIZ82ZXrFwx0S0DuCXK+aQn3S1d7EpGTDowGeRgK9t
-    UhzptvLBIRI9EX8VYcVTBmFTYIldiL9pX1SQY1CZqsv1S7nQCRiF6z+terab9h+/dTuHiO
-    VZJB8N56JYBWy7U41+FU7zVa/pQV9Vy4PIP7mMFFDPSMAo0xFHvJwLpZtRARxsV/896bsd
-    60FtofCojEhsUJGlM3caDCPcUZ4oooSAbtJbt8jOb2aomgTSZFL6TF+nJ1vR4ttiDifDyY
-    xoeuBp6dRhA4tKMtq+q5g7p6PFzvmcIQXUPIbY6JdfvID4eivpqbzKreoGw85ZNaax/rrk
-    oaRveFYUzPhM8qobGqj1++/csod1SJC1A8fKok4GIIdYAXtuEpbUrP3QgtelZnN0j0ZjRg
-    bZ07M0VsOdQ3UdgHAnmZRpCslTT4S+rSf4XC4jBlHbK0YZqux/vSBwB6sEJg
-X-ME-Proxy: <xmx:oWn8apS4pPn4fCVlDwgs9lzlbX2O23u6lwFSNpiw8HV0JOdrPbRXrQ>
-    <xmx:oWn8aqbqQT0uyxP0reBpkO5F9LmTsXo84boBo3TruGFGiPwubWCltg>
-    <xmx:oWn8ascHUyHFJhs11DE7K201-apBrlHvBwwiYUPEYovwPOXFCjRWYQ>
-    <xmx:oWn8arLXVxpzbuVl_CiTz9pndsQQN3-S9iaSLPHTwrb_zZjY-j4Zmw>
-    <xmx:oWn8agKXh1UljBs6CcnRLnKd1CJut8hGOdcAxk-CjR_ROYeoAmvO4oef>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 17 Nov 2026 09:50:08 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ian Bridges <icb@fastmail.org>
-Subject: [PATCH] ksmbd: do not log a stale security descriptor as an error
-Date: Tue, 17 Nov 2026 08:50:05 -0600
-Message-ID: <20261117145005.2638107-1-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.a=rsa-sha256 header.s=google header.b=NGAkj3mg
+Received: by mail-pj1-f98.google.com with SMTP id 98e67ed59e1d1-3ace1f3897cso2751021a91.0
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 06:57:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794927457; x=1795532257;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:dkim-signature
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=VaHYdskxBgJ5f/Er/TW8oHSSBf5pSt0lOXwfBFfdPtk=;
+        b=y9D7wryu6GAnm/CCbV35B6ZvjlOnl+4jka44zY8ugsVukYB1ghfLBorO+lXonjzw+J
+         ELG4SLcU0XNqehsD50SxBe70pJQf/wxPATVBDEXYqe5AGJSXkk/Ly89NTsOUxt1rSD5h
+         Mw72yoEgggT0oDse2aoV1BsbdcdLaZYzehzej+2rvrdRpaWZrvSJzHkTYlHTyjLhpcxZ
+         KG7+XAN9D074Sv6A4/9VTORDJ/DfkQaVaK3HShdv+zQaXLhiqnh4cK0i9fK5K9E2Aso7
+         Z1p62Do94Ei7qbSh36WSnyQIwH+euU+UWSENdNf8r8vaf4mJ5dUptZ3EwQF5euioEp1c
+         x4wA==
+X-Forwarded-Encrypted: i=1; AL+hErHLr4bfwsVwCO88k5Q6FOi3jMhvVrmu361+KLQgtMFRXkXjwqP0OL1McbCcjej31u/gZnJK5TnGNA+n@vger.kernel.org
+X-Gm-Message-State: APuU4Z9KbOiT/tfjbPxH/9VNi6/Y32hidNMopEpDozUym53rEXrS/4Vv
+	KBvzdyjjJHPxSHMvi9Qw9fpaz8dbkXpDshNfaQVrAGsLCB/JImm08Og+f1sBi9CKfa7HN/r5XLp
+	E47H/+ruySj5uLDwSBkHzzaEs6KmhoA1oEjM+7HShlJRKxAb381HCsHk69cTbc0LMiNz+mtOg22
+	D/5cUY0nkAAVx39I8ZC9Vt7/iO4w0hVW8puaz9nCut8i4JFq5rhT5/28GknTHo9D5+Qon4EETRP
+	HjpxElfxU9628SIw6o=
+X-Gm-Gg: AZFdTZex2LpJu89FXuG5G/xbu4elL1x0w7DLZEsWUvCeaRAbNnMGwXiblmjoYqlnLQG
+	06EnbzqRcvX3h9vg+IbzhUYxPLPaQCbVOa4zw3ZlrXQd9l3Fa5/fHj+umRtmqfwJFnksN/r00X7
+	yTJEknZE1YyPCAYBFL391q5vQ0KMwfiWKlnPFIdFgunNu6xCwS+wTJY1zBmoblEDlxihd737ATY
+	ok9cTMH1MwrQ6qSQV4Bq+Nc16RiIvrvYef4FGy80Ip7LNRCDj7yHugYK9GY6YG9qIKSiyTKuGan
+	jpSOR+fDY3unMcPVcCpbokld48CLuFTU5nOTcfTIUJqd1GpUBucowFiOPZ68maTc/QhZdAiKySJ
+	C22ZeM027PMGDMEUCVCqfm9aBZbzG8r8fc1Mkb5PzvgT6KMEgPy0whWc1LmTifboZTCKSI6sE5N
+	uHpWb2JPOn7KlQh5/DlkHlGEs11INg/fI0KpWQi/7U
+X-Received: by 2002:a17:90b:394d:b0:3ad:47ce:3876 with SMTP id 98e67ed59e1d1-3b1b0ca9dfemr13153456a91.61.1794927456860;
+        Tue, 17 Nov 2026 06:57:36 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-123.dlp.protect.broadcom.com. [144.49.247.123])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3b3abece214sm2086386a91.3.2026.11.17.06.57.35
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 17 Nov 2026 06:57:36 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4a35db2d6b3so33683285e9.3
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 06:57:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1794927453; x=1795532253; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=VaHYdskxBgJ5f/Er/TW8oHSSBf5pSt0lOXwfBFfdPtk=;
+        b=NGAkj3mgM0YCn4r+4HQ9fmXpMrLPf1Q0JvEhb50p763RLeEKqEpXkdSShpJhGrjXRD
+         RX+iN8dE+BY+JktS6CPBjs2oIVYNCsrV2d1ZBJA1esoIpSWjouRiTRFNIA+aN1sXG0ny
+         q0Bgx13TQEcnPJauLQ7zl3uaHNEGpiAZY9C/A=
+X-Forwarded-Encrypted: i=1; AL+hErF+JwiTDBb3gYJouuE2xA5JX3+VDqwKtPbR9/6n0laDp8A6Ec8k1KvIb4sDHzlp/oVwlN3cUZEK+BDW@vger.kernel.org
+X-Received: by 2002:a05:600c:4f4e:b0:4bb:6f45:2a77 with SMTP id 5b1f17b1804b1-4bb6f452d39mr188021405e9.11.1794927453517;
+        Tue, 17 Nov 2026 06:57:33 -0800 (PST)
+X-Received: by 2002:a05:600c:4f4e:b0:4bb:6f45:2a77 with SMTP id
+ 5b1f17b1804b1-4bb6f452d39mr188020445e9.11.1794927452733; Tue, 17 Nov 2026
+ 06:57:32 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -125,49 +99,45 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261116074849.475815-1-stefan.chulski@broadcom.com>
+ <CAKYAXd9KT=1vLYsnRKxmiM6pLJQNACXuodD8wNQzb8S5apiuRQ@mail.gmail.com>
+ <CA+Fu+LPL7xqpV_vjjjehedOFtuuBqgZHZTSqJ+FgweUpYo2uBw@mail.gmail.com>
+ <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
+ <CA+Fu+LPnXMd9rMtywkZL77XzLq8n+8AiBW2T8Cau10YnVbofiQ@mail.gmail.com>
+ <CAKYAXd-xM=gmpjz7g0+n+ZBA4Vb0Sz2i7B89Cs7XdHUY7U6WdA@mail.gmail.com> <1840b905-479a-46e3-97a9-b2f40cd50c29@kylinos.cn>
+In-Reply-To: <1840b905-479a-46e3-97a9-b2f40cd50c29@kylinos.cn>
+From: Stefan Chulski <stefan.chulski@broadcom.com>
+Date: Tue, 17 Nov 2026 16:57:19 +0200
+X-Gm-Features: Aa3M54q6UrvDJCXyy-Tq8up-xKFoPuFafstRfqFIuifIOUygyu9m1cZGcxONfis
+Message-ID: <CA+Fu+LNry=dgUdEpULq6vZhnLRdVX39syn4E0Qafia36dHTn8w@mail.gmail.com>
+Subject: Re: [PATCH RFC v1] ksmbd: add use_unbound_wq module parameter for the
+ ksmbd-io workqueue
+To: Huiwen He <hehuiwen@kylinos.cn>
+Cc: Namjae Jeon <linkinjeon@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, ChenXiaoSong <chenxiaosong@chenxiaosong.com>, 
+	linux-cifs@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ilya Lifshits <ilya.lifshits@broadcom.com>, 
+	Gil Benamar <gil.benamar@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	bcm-kernel-feedback-list@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-ksmbd stores a hash of the file's owner, group, mode and POSIX ACLs with
-each security descriptor. ksmbd_vfs_get_sd_xattr() recomputes the hash
-when it loads the descriptor. If the two differ, the descriptor is stale
-and ksmbd treats it as absent. That is expected after a chmod, chown or
-setfacl on the server, but the function logs "hash value diff" with
-pr_err() every time.
+On Tue, Nov 17, 2026 at 4:40=E2=80=AFPM Huiwen He <hehuiwen@kylinos.cn> wro=
+te:
+>
+> Hi Namjae, Stefan,
+>
+> Simply routing WRITE requests to an unbound workqueue is not sufficient,
+> as I've observed performance regressions across a number of workloads.
+> I've since developed a more complete approach and will post it soon.
+>
+> Thanks,
+> Huiwen
 
-Opens, security queries, hide-unreadable listings and inheritance
-can all load stored descriptors. Repeated opens of a file with a
-stale descriptor can therefore fill the kernel log.
+Sounds good, please cc me on the new patchset when you post it.
+I originally tried to keep my changes as simple as possible, but I
+look forward to seeing your approach.
 
-Report a stale descriptor with ksmbd_debug() instead, and include the
-file name in the message.
-
-Signed-off-by: Ian Bridges <icb@fastmail.org>
----
-
-Tested on ksmbd-for-next c1a783037082 with KASAN. Opening a file whose
-stored descriptor is stale no longer logs an error. With SMB debugging
-on, each open logs the new debug line. smbtorture results match the
-base.
-
-This patch was developed with LLM assistance.
-
- fs/smb/server/vfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 1114f2503ea7..83b0bf783886 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -1829,7 +1829,8 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 	sha256(acl_ndr.data, acl_ndr.offset, cmp_hash);
- 
- 	if (memcmp(cmp_hash, acl.posix_acl_hash, XATTR_SD_HASH_SIZE)) {
--		pr_err("hash value diff\n");
-+		ksmbd_debug(SMB, "stored SD of %pd is stale, not used\n",
-+			    dentry);
- 		rc = -EINVAL;
- 		goto out_free;
- 	}
--- 
-2.47.3
-
+Regards,
+Stefan
