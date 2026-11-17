@@ -1,85 +1,84 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794874664;
-	b=4vrBUAfgq2rLo2nYQVUDbyzHCgBkS9b/h7XrNCOr0HaQ7prlcv1JcSh+lUqvYqnxvP/l
-	 udrJeSyAhMpQhAbtctPri1eTiecBA1o6keGXLfeCmeA0d7WziYpl9QOLXwCaviqX/AJlA
-	 RLZmnq0OlKjpHHpUr7YfhuZq3cgpN5zudGVtPuHs5P/pYMAImnK4fXtwLeVMDv1I4KkB/
-	 AScDbby/2UqA2HbI+Oyz7nPtZDRIeVwDhIrR/aLsmK/LuEbiXYCO6K8b/38qKKVNNyAHN
-	 q+s60AffXJrO6Lv+TWzBVKzevaQ/yfSV3PYI5fYvg4sTOwJyY3NO4exxk0LX7HZqqSw==
+	t=1794874667;
+	b=evYxSwk7iITHiM49T19Mb3208QNYzjBSg0MblRHbXI1P/cfWB/t9+QfSqjvLxi28JY/J
+	 Jy8jKPTmZ2gnv3DS2h9sEtmxwUj/HvIXMpxP4uYEhsgkxqzt7Qbn7ZGctEHFkd9WpFhcZ
+	 I0t8RuduQ/FIr6Z3TIS95p0Gl2gxKzDMVadinxqeEe4wraUlQjeranTQtfaw18zPI+Fw5
+	 8bF+cSXxy3qQfVRGpN3zwzmNnz/9hJL+2uPTs7rJKQ1JmN14+sa+BapUTmbeOPTZn/0R3
+	 SN6B+gAVcBuAi1yE3wliS6uAbnamTSc4osPV8dHJpB1YFR8k3L6+L8kxaVo2SeuxMVw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794874664;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794874667;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=8uYmVLMlUVU+cxd5o4cJaxLmzYdA/McqGttb5PW87pg=;
-	b=Njk3MI1Ar0ij3jKV3LcebSD0XLQfJ4v3pJQ/wJBhUsL+FtqkNNpO+I5DDiA+56JUNVeC
-	 s0eCMv2VyZq12u5cCY7s5ASlxJ4M5a2/9T5ycY08lUz4T13JDsJv3IksghqmnCfEpSWa/
-	 +rk7NhSaNTla86WvkUEbpLlhzoDB3JxGkJAnlPGk5dLi9asS3kyEfPkbo+F5c9A1sPZJ/
-	 eThMJtI1n+NUIznUtwIzpLNkBSdYjtYvxY53raQRfiM4FD+wfQ/Ro6YuccKmrQusFstOj
-	 b2R0+oDGEWdCW5jdC5lRuYsRf/WUwn8xmRhmoIYweqnDNAIunkmwRZ451r6nMHKkzhw==
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=mZCjeYoVLTXgPtFhooWOdAgqkSbxaoBgREf6dkUm8L0=;
+	b=sok81GKSGChPzJ84uMADbcOqI4C4wO5BwdF1x/0PkjHsGNBV0vxioPx43xDIaBM+dad4
+	 c3UnryPL/zzG73R1f0nDBgjtnLPf3j9IgB7VBBxquekUbgn4/+y2L4ttKUYMGBJy9cppD
+	 74ITRyP5vlOQfRDJFqNid586f0alQcktWVP3OYhQltRNXdC5hstbvPJTaRzZ3LIiPAWvR
+	 wm2nwFZin+NhU2t0X7V0fGamQB2L3SXyO2Q1Xyjb4OFnRw21gL5ZvYMp7aZFtfFz1Bhb8
+	 QjstC1eZ8ZzjPyehLLezvgcD+DvTbTkVQOZI6UnX37utujXhrMqTBoKTS8s2KCJ2rLA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hedHCCss;
-	arc=none smtp.remote-ip=209.85.215.169
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bP1+urcu;
+	arc=none smtp.remote-ip=209.85.216.48
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A458B606A8AC
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:17:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A458B606A8AC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDCB606A882
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:17:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CFDCB606A882
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hedHCCss
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cdb75699c7cso1639610a12.2
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 16:17:38 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bP1+urcu
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3b1535be329so3014989a91.3
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 16:17:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794874658; x=1795479458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=8uYmVLMlUVU+cxd5o4cJaxLmzYdA/McqGttb5PW87pg=;
-        b=hedHCCssyR1sZA5kE1raSkzS+NrwJlryckT3Pigc2Xd5W6k/AifZkT1N3a0WslBvS+
-         eXuq0BExtzuNzVEfDs9GK5So+KUWSs0DeDuzMk+5exFiS2L95kLtOo2uXyo15O2igJVs
-         OwyyJRXD0qvXxK4DgQeOg7bOU4c7kd8sbz17Qmidk7APckKgguTH195cTYmrV9JK4FnU
-         m0Xb3xRXeWRKDem2fHbQz2XsuJNqcf2XneYP32KW/OBxKd+y8XFc9z/jLfIdIEdDroa+
-         mkeAG68eqWbDHzH4RjcjKgnGTqplbR0nvmly6gSJzasleHdN7Rq6GseoyZKlCZ2e3OCQ
-         FRAA==
+        d=gmail.com; s=20260707; t=1794874656; x=1795479456; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=mZCjeYoVLTXgPtFhooWOdAgqkSbxaoBgREf6dkUm8L0=;
+        b=bP1+urcuvG16SgYF1OlKCcQwtL5AF2QgxhzyAilER2O/2K10dUgzTXa2OCmKoNV+oR
+         WshNzaqsm8e87NiYj95klrjEPXi07MY0D7RS6hFSkKfj4s321WH0gOOkTIR427iLvMjP
+         DPFfvlDSsAOaWbYKSoUnrLZcjBnC1rocwA20a9NoDnI6K3v3cusl7Hj7SS2YyLqLnB6B
+         fC8Cmlw/fMS9X0nzccc1Fs391BgFFh46sagagHoFRIHIDQ0Ycnd0fu4/7kgzBM8e0Qwd
+         TBN4a4UdNCRqVMOzg1bhktc8KOeFfiAv/Cr/FzXg61GfZenrNe61OMsNR+lZ6ctWo5v9
+         1R6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794874658; x=1795479458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=8uYmVLMlUVU+cxd5o4cJaxLmzYdA/McqGttb5PW87pg=;
-        b=WoTLiC//BT6I4SyIY2dbHMB3UHudzlFoZYi5xR97TrvymTvB00VoyUxRCoKtI6otcK
-         axb+MkXWqJXBKLkBwffsbVyAR1OwbntxzhRaPQgiphpLRvoES92MXCESNYMPc5oid3MB
-         t8QsWoVyRzQ85TnDeOHlMkkZXtDmOx0SxmGSgwzlU99BHXkTkJml2ltKQRIRNtQ2G4QQ
-         drSGjuu9GQA75K+TmZsuQgi1OH/K1jyypQjZJf5AftJnliFHoeKdckhzUjrTV9GGfBVA
-         NTvf0c/YjMM1Qr0zVf0N8WPuu3F3rDKEXgxukseGldpQsku38wCA4uV1cjuFPoEG5EiK
-         gNTA==
-X-Forwarded-Encrypted: i=1; AL+hErH9OxQyqWDWEgUU+vJNJIJfyTb+1AN4BfQEgCEqSqokiC0h3S4HYDADe32o11/1Dr3LmqzUkXreXHoH@vger.kernel.org
-X-Gm-Message-State: APuU4Z/U2XvD8OoQwkDqQWaOEPCsIxqZfDHU+V6k4Q26lp7vhCu2dspj
-	q7bwOrGQui8U3YF49/ii7/YyxO2UnpdpKHXCeQS1nORoCesu9slvW7OK
-X-Gm-Gg: AZFdTZdJ84vjd5c1hkbztA8Ogei7yCZAAscu0l6rZNCGiYywGxbiLNNGAwAfptRG8fz
-	GpH4eq8D2oxDCVSXArh1bNt/qdb/FsAwzIQZXcdW3ms5PlIIpfHKqC/tabv+wGRbCEhXAW8dKg1
-	epQ+UQcjNLyS7aOtjM3uJ4BI5atgD06UTM1cLSgxJeGqlwVkWyh6/wTlnCNppKkyLNFsqAk8V85
-	XrmHZHoEnu/wXFF+6z4kawhbEXbKYk2WLi2o+Cv9VHs2KYPlubd9gBG9DsB+m8WND3T3X8vV3Lc
-	/EqSJJ9WqZ49mLaoZ3UKtDKV+Qn6yUkZ70gamADjZWye/3nux35WsCVxqMielCtlbBeexVUpAJG
-	74FbN6e5xZCI5feGqVfEkCbNMPMb42uACUj1s7UJZpO+N/qZgkzId8tLJyuDhxKQlcGTCQ+8Oqi
-	0N0X0Qo2XjgGoAJUNkuaOYr4Ogvr884UJ6Pyw+O+CA2Y3K1+HUuS8Rp3Px67XMCLwoT1IvAVJe6
-	WZwY3ZxfEungPO9o0OtPS4nN5U2BMZGo1uOxwX+tUgggBoY3wfdsv5goQATUnmylU+Dx2de7ZZK
-	l2wivC+CInkiVFePM86CyGrm0Y/iu+WrOaxYCJbFyn1CIndYm2+U8FBchDds8Yukmc38tM9zdSH
-	wl0nBMeAr8dAEBCh7lPOJKJRA7aF1Svt7IX9h7g6/DRO1OF/dWanlh7fmPqxyvB0VmzLJzYr/5a
-	zV9qA4OU6RpTzpDL7mv9jiF/wGTz1Cd3Y0bTPo3851eQHdc3uLOh8hMUsGxtyQqQ==
-X-Received: by 2002:a17:90b:4c0e:b0:3ac:8741:e2e8 with SMTP id 98e67ed59e1d1-3b1b07ef0bemr13037975a91.8.1794874657803;
-        Mon, 16 Nov 2026 16:17:37 -0800 (PST)
+        d=1e100.net; s=20260707; t=1794874656; x=1795479456;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=mZCjeYoVLTXgPtFhooWOdAgqkSbxaoBgREf6dkUm8L0=;
+        b=NT5rFNU0lcd57J7XrVHaoh1INUA5VWO82jPphkrWNO8EGc+MEm/dlLbSL3puDzncDA
+         nWDH7gTl09oMt1BXuJgZ1pvv0yB+NBwyPqf3gT+kbi7Kjt45vPGEVRrxmdD/t/exc/aj
+         9IJkA8z0Bvv57nbMGsm6N+ofa25bfJHZX2tkMWCiwA4kP0J+6MW6daMbQfRgjZJ+4XKj
+         oFzx49j8BSWbTgTZjWmwUjVnqm1BdlYyKcHOPvHtp+oq9ItwyTps0TwjxrrlcHLkss2c
+         ckTp5shZQCNZbW0y5Y76evOen0GJwEDXs4n01E53InkUo6iUJAwAFK3JX4uQDwpWvHrY
+         LXZA==
+X-Forwarded-Encrypted: i=1; AL+hErEhQXTKYXirH9rrx8MzwC4FJ9llyLdJt95T0UlN/dHZuSTEPRzt0z1UCdLnErP6Zx7alg9wP5d7rtoj@vger.kernel.org
+X-Gm-Message-State: APuU4Z9h1QaIcslUBQ8MRD4FVmHMqN8GOQoRTQsuRhBMEedYHrkzlLDU
+	rS0Decnv0QDcRANQJbQZJmfbVA1sEFJ5gnPBgKqjCZr/y3RJX/PEr2ZQFC90jQ==
+X-Gm-Gg: AZFdTZeGNRMgGMXBBxsX/9Whuq8hcWloxi6uqBCLJNonjETX9Z76Sb0kVPQxJRHbBEk
+	yN+KDGc6mgLkQmvWMOYI6AP2ZiskCNK5r0/AgEyri8MPP2H+y6HhnID0+OV8XYsYmv6X2jL7QYX
+	z4TPENW+ohCcgPP+9d03KU1aEw4zJfxNNZlckicJPw+6CSXw6T6X/i4hT4d3EMH76mkkTGhRco2
+	vr63PGTcxhovmgMD3MvPPC8w+oNFrEEsQEf/A9T+qJKzeHFHLtic5lcJNtOhm+nrJa0mRQ+IQJ+
+	laIgzf4ZnWUMOdgQcmIIQWRlE230egh1/Dl6Fa4R2kZrur/jjy4Cc4s5g7dEXyo7URgFxzJV+9C
+	CzfFJ49L8+uz6EdqD4f0CrFf2LCVF4ZoSlaZBj9iKcS/OSEVq4x7ZbQVEQCnjdqsxeF7WfMsrYq
+	S6jq2PI5eqbQCR9xPj/JEfBOzmZJVRpTSdaQK8jh/PUDaLllR3C7Ntuetxk3V0bmjhKosSh8hLY
+	qEAgqQLrdHxnrV6S4fVsl2I9hpTBz33ckBIdOa+wSqSMmACf4rcQK96IzqEX/rXmBIoMtDlMwC1
+	tNBl28kU+E5S78mQ6OqHFga2X8nc/YCYfFg/9Iauu68JYPH2dRZf5y0Rwl2pYoKQ4Fv33H4sQU/
+	q6o+SsBBDXkUB0kruac3rIGjgCLNCq26voMYtjPAfEi6OkU7ZkdqTB0xDpBRpLPI/OkxVbnsxtk
+	/cU6z/GqlaQH56SiMyngVzf+MIyFHR1dL/IxFUxErw
+X-Received: by 2002:a17:90b:5585:b0:3b0:9e2f:cfc3 with SMTP id 98e67ed59e1d1-3b1b0a0ddf5mr11086246a91.32.1794874655997;
+        Mon, 16 Nov 2026 16:17:35 -0800 (PST)
 Received: from sid-dev-env.cgrhrlrrq2nuffriizdlnb1x4b.xx.internal.cloudapp.net ([4.155.54.158])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3abe77179sm1194081a91.11.2026.11.16.16.17.37
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3abe77179sm1194081a91.11.2026.11.16.16.17.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 16:17:37 -0800 (PST)
+        Mon, 16 Nov 2026 16:17:35 -0800 (PST)
 From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
@@ -93,12 +92,10 @@ Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Siddharth Chintamaneni <sidchintamaneni@gmail.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 2/2] smb: client: fix busy dentry on unmount from persistent handle reopen
-Date: Tue, 17 Nov 2026 00:17:33 +0000
-Message-ID: <20261117001733.192399-3-sidchintamaneni@gmail.com>
+Subject: [PATCH v1 0/2] smb: client: fix unmount busy dentry/inode races on openFileList
+Date: Tue, 17 Nov 2026 00:17:31 +0000
+Message-ID: <20261117001733.192399-1-sidchintamaneni@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20261117001733.192399-1-sidchintamaneni@gmail.com>
-References: <20261117001733.192399-1-sidchintamaneni@gmail.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -110,92 +107,28 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-During unmount, cifs_kill_sb() waits on cifs_sb->outstanding_rreq for
-in-flight netfs I/O requests and oplock breaks to complete before
-flushing serverclose_wq and fileinfo_put_wq.
+This series fixes two unmount races in cifs_kill_sb() where background
+paths walk tcon->openFileList while wait_var_event() is waiting on
+cifs_sb->outstanding_rreq and take new cifsFileInfo references that
+outlive the wait, causing busy dentry/inode warnings and panics in
+generic_shutdown_super():
 
-While cifs_kill_sb() is waiting on outstanding_rreq, any cifsFileInfo
-referenced by an in-flight request (req->cfile) remains on
-tcon->openFileList. On a mount using persistent handles, if a reconnect
-runs on cifsiod_wq during this window, smb2_reconnect_server() calls
-cifs_reopen_persistent_handles(), which walks tcon->openFileList and
-takes a new reference on open_file via cifsFileInfo_get() to reopen the
-handle over the network:
+- Patch 1 counts queued oplock/lease breaks in cifs_sb->outstanding_rreq
+  from cifs_queue_oplock_break() until cifs_oplock_break() completes.
+- Patch 2 counts persistent handle reopens in cifs_sb->outstanding_rreq
+  in cifs_reopen_persistent_handles() until cifsFileInfo_put() drops the
+  handle reference.
 
-  Thread 1 (umount)      Thread 2 (cifsiod_wq)    Thread 3 (workers)
-  -----------------      ---------------------    ------------------
-  cifs_kill_sb()
-  wait(outstanding_rreq)
-    [blocks: rreq == 1]
-                         smb2_reconnect_server()
-                         cifs_reopen_persistent_handles()
-                           finds open_file on list
-                           cifsFileInfo_get(open_file)
-                           [cfile->count: 1 -> 2]
-                           cifs_reopen_file()
-                                                  cifs_free_request()
-                                                    cifsFileInfo_put()
-                                                    [cfile->count: 2 -> 1]
-                                                    dec(outstanding_rreq)
-    [wakes: rreq == 0]
-  flush(serverclose_wq)
-  flush(fileinfo_put_wq)
-  kill_anon_super(sb)
-    -> generic_shutdown_super()
-       BUG: Dentry still in use (1)
-       VFS: Busy inodes after unmount!
+Siddharth Chintamaneni (2):
+  smb: client: fix busy dentry and inode on unmount from late oplock
+    break
+  smb: client: fix busy dentry on unmount from persistent handle reopen
 
-Fix this by incrementing cifs_sb->outstanding_rreq when
-cifs_reopen_persistent_handles() takes a reference on open_file and
-decrementing it after cifsFileInfo_put(open_file), so wait_var_event()
-in cifs_kill_sb() waits for any in-progress persistent handle reopen to
-finish and queue its final put before draining fileinfo_put_wq.
+ fs/smb/client/cifsfs.c | 10 +++++-----
+ fs/smb/client/file.c   |  9 +++++++++
+ fs/smb/client/misc.c   |  6 +++++-
+ 3 files changed, 19 insertions(+), 6 deletions(-)
 
-Fixes: 340cea84f691 ("cifs: open files should not hold ref on superblock")
-Reported-by: Adam Kim <adamkim@microsoft.com>
-Signed-off-by: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
----
- fs/smb/client/file.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index 146ff2adfa244..e0b56c6c2c743 100644
---- a/fs/smb/client/file.c
-+++ b/fs/smb/client/file.c
-@@ -2044,6 +2044,7 @@ bool
- cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
- {
- 	struct cifsFileInfo *open_file, *tmp;
-+	struct cifs_sb_info *cifs_sb;
- 	LIST_HEAD(tmp_list);
- 	bool retry = false;
- 	int rc;
-@@ -2060,12 +2061,16 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
- 	list_for_each_entry(open_file, &tcon->openFileList, tlist) {
- 		if (!open_file->invalidHandle)
- 			continue;
-+		cifs_sb = CIFS_SB(d_inode(open_file->dentry)->i_sb);
- 		cifsFileInfo_get(open_file);
-+		atomic_inc(&cifs_sb->outstanding_rreq);
- 		list_add_tail(&open_file->rlist, &tmp_list);
- 	}
- 	spin_unlock(&tcon->open_file_lock);
- 
- 	list_for_each_entry_safe(open_file, tmp, &tmp_list, rlist) {
-+		cifs_sb = CIFS_SB(d_inode(open_file->dentry)->i_sb);
-+
- 		/* do not flush */
- 		rc = cifs_reopen_file(open_file, false,
- 				      CIFS_REOPEN_BOUND | CIFS_REOPEN_NOWAIT);
-@@ -2075,6 +2080,8 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
- 		}
- 		list_del_init(&open_file->rlist);
- 		cifsFileInfo_put(open_file);
-+		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
-+			wake_up_var(&cifs_sb->outstanding_rreq);
- 	}
- 	return retry;
- }
 -- 
 2.43.0
 
