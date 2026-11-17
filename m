@@ -1,94 +1,95 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.97
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794889433;
-	b=ptdr7GBv4xc/AmAY1ix3IJwN+rBvfRce7+WJM8Iek/o5hd8gERh7Dn/sXkhTlxIlDdns
-	 DaiGTUbuBgFzS9h50l4y//sc8AAGNBquEbQGvvN8TId0KcLjmKrvE0g84fQmSRLA7GROd
-	 FX3crcqz0KgfPYVf5JQnHMfCc2EQQhLIW4Sv5xyni4m+y+kSZqIi7Oy6RBizJ+xXhXnZA
-	 hP/i2/Qra60kMhygHxT3+I9n5jKv7JHrkVZyV9zry3nZ979pnusM4qXldVPdlIf1f28w3
-	 IPug4pfAVtqwfcNt/NUVk/hepSDD7p2ufGVN/VJZsPG9kN7wov5nYcxj2FjZCPgF1Nw==
+	t=1794905509;
+	b=EwJHUntJZzX3quH2PDzp3yalkJ9bnixHm4mHx0CBsGaj/B6ZZfE8A2nrTvjIJDC0w5iB
+	 VdePEipKzPvrC2sKA2rKEqHA4etlOeRBV1JAxERaUDPyeoh5nFLtTOvOnpJS7YYKlNrEK
+	 wQT15QYh7J4Ql+eOVcSshSHePzb9WUCctAAO+FGvXCUdLEZVmLlmo0ARF4FzOIWmR8Mm0
+	 uvvukrCvZLZhj6TgMZhL3TdZozY22+VHqZ2v+qNs0MhgiA3ne1qRc/DWn8eXmQBEPw7xf
+	 RO+X36vX08xUiqNNdC+UrTFBfuq7Cn/UMa1gpe2BBC9p+CSCaWBwcsDYpE9lHfXKoYA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794889433;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=MJFJXL0qA7EgCzo1DXahTwcwkNU+5s7BLIy9HpDlOOY=;
-	b=mUL7NKDlyyG3Ed4xZfk/Pwy+GCWtMtLCS1i0O5vVXw1EhXvF+cTQqZuRcdNZelClZ1/K
-	 gTZuEN0sZxg6GFJIKbdmLvksL+CrRTvoQAGF6VAQzHuSfoehTS7+Dxxz9ETXda952HC2f
-	 jSfmwvBAOq4D1w/StD3+Qoav5qKyWHMunx5f7Qzs61ynJzuHcpWadUB9s+/QzBzyUujdh
-	 uQXYTkK90k8lXlHmBvt93aFgHsTm7Kp8KJ3wx/mnQpT1jd+MqZ1rUOIZi5yE/j8toLwG+
-	 PqTTUASc/yFioH7xMbzxZ2jHh/RxnqLuoczNbRTN76+3XHaqLBYBqdIC1iMpHCZDYOA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794905509;
+	h=DMARC-Filter:Received:X-Google-DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:X-Relaying-Domain:
+	 X-CFilter-Loop:Received:DKIM-Signature:X-Forwarded-Encrypted:
+	 X-Received:X-Received:MIME-Version:References:In-Reply-To:From:Date:
+	 X-Gm-Features:Message-ID:Subject:To:Cc:Content-Type:
+	 Content-Transfer-Encoding:X-DetectorID-Processed;
+	bh=s4yCKzF4YDIiI5PlcqBi7tYBGUxCwcilhm4zOkc48Yg=;
+	b=YnEKYB9BqZQQnajE3yIGN9GmJvAjQV+uY61LzR2NHHG4k4DF7xo3mIbhDThibHr8TQ5T
+	 fDXEA03f1XutXpNXqpLiqYimlwMNCOBMjjETzzo2ayhqivYKeKdj7lbZiBy5DvBBC4mwP
+	 Z7GfU7m7MJcDo/JrY1h1hWmETAoaKlHD90aNDLpGDlsJL/1hIIkyfpYXG+ijFAB+9BT1E
+	 AU/9/tIPzAlkw+/wVfb4szklnit8kpYRENQZIgXGUWbzHuZ2uKogqE3rM4l1M63N6EF9K
+	 uJHH5kn0Ri8Hn6Vgd0OLpHMMo2PieDyScnuQsuv5ogjjgAGqzYkAX9UHOFXIjF4Ks2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lBXCOm5p;
-	arc=none smtp.remote-ip=209.85.215.171
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	dmarc=pass header.from=broadcom.com;
+	spf=fail smtp.mailfrom=broadcom.com;
+	dkim=pass header.d=broadcom.com header.i=@broadcom.com header.a=rsa-sha256 header.s=google header.b=hB58cieY;
+	arc=none smtp.remote-ip=209.85.216.97
+Received: from mail-pj1-f97.google.com (mail-pj1-f97.google.com [209.85.216.97])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E771606A331
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 04:23:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0E771606A331
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D083606A882
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 08:51:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8D083606A882
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lBXCOm5p
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-cd6acc50b8dso2064685a12.3
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 20:23:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794889432; x=1795494232; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MJFJXL0qA7EgCzo1DXahTwcwkNU+5s7BLIy9HpDlOOY=;
-        b=lBXCOm5pef64nqws0Ad4zRtr/Dzy8QWuZeXGQX7VDUF81eeF9+yeWLppPVAKQ8gmO3
-         XVIQojYrU1z4+rTQV5vx4vmGcXwhtELC40Jq61sHsB5ZZnjy+DvL+T6rRnXTtd5tIY4I
-         U1MF1QjzchHtOT/Xnnh03L4pQuPJASsNhKTyVR8UlfiTQycPzolKTP0lgV86RsqCfIBs
-         ZGajV+uy4QBJmdMzqgafBs/8z6ts28HcRM4pr6pedLE9J858hqwlqZ7KlNgKzpV0mFgs
-         s00MxfKcgya9ubqnXiPw2JQEjqxYZnlbp/AbpF9H0zvjmD9oIryIPCT8FwimLKFrtZSD
-         hLog==
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.a=rsa-sha256 header.s=google header.b=hB58cieY
+Received: by mail-pj1-f97.google.com with SMTP id 98e67ed59e1d1-3b37951a397so2169570a91.0
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:51:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794889432; x=1795494232;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=MJFJXL0qA7EgCzo1DXahTwcwkNU+5s7BLIy9HpDlOOY=;
-        b=oJ5MDnLwtJoC9UT6gRHBZLtZ6vn9xtB/ZFrSeSTkUG8DHI1myU0K5sVl5kUl7Y6fqK
-         w0HvSXP+B6MqvQRJ/4SFsfItx+onkVKMDVll9qoMDj0AuADa2v4oa1TS+QnZEd6uB6LV
-         vh5tsDOUz/4VZKteDLeR460wDK2A36pf0uYIgq/ogsaS0m/X9FQNFZFM5siehLsnwjTq
-         pmvIJlXs7uqwPICz1COlnEObOu9Vg3Frm/Q7ucgpAAWsnyKGPWKOLVPxl51Xumln2Yyt
-         INrp16LK4G5scmsTZvw1dw4Z55gnmSPG0qtcrcdl8MOlrMjzE8iSlJZKtuCeq9mv3T0x
-         E/IQ==
-X-Forwarded-Encrypted: i=1; AL+hErHgGQS2/3t370+POJOxpNJFvQ2osL3GtuM1ZQTgSjZnKcxXmfCM0YXo+84Wgyv189dkKkAyRLzadbTv@vger.kernel.org
-X-Gm-Message-State: APuU4Z+1GqFCQvJuwDI7gvv8EKna0v/4jYeqan8KURa8/JyczBBYGFvv
-	EmWeg5znM4UWia72+zmj72zf2d7l/13gSNEIYmTPaNFs4vUCCMyTO3QA
-X-Gm-Gg: AZFdTZduWzi64TQouhKiwlPx+EXw95biK1COUaU8OD9UnXthwwupH0ugqzi1AWg0h4v
-	pbW4brwZD4Rl2E9KHEcq3Q5TF0b1KmpUlx66QqusPdC7lNS5DhSqDmQhJFSHvbYBP1pvkEnogrM
-	LfcVBr+1fWNcmetcexxKsM2DfXFE/heif4bM3L6wG5hXKdiwJiWMR0bCwRl2/T06b76wSKgMWh9
-	0nAAT6mX5GXwGSnPnLqSFUmfVG+vXLoLiAvmitreNcTcHyODgCMrfVYdQAFjvb3BVK8DVqzs5pi
-	DWbk04dx1qU8clpMx7xkI4WrTVhq2etdRojj3ycGyjZconkEupQ/OGj82JbOa0zrtUe5XFzyGzm
-	jaYw++lgK0aO6BsrrfveQj5bi+2DOoGvEuzCdcOcUFNjlm8XCQOMMt3AH2h7v9Jj0Lw8k5JXRTd
-	3CyzItHW4/jG3PfSvFF3SQ1mM/jFVR2V8Ced4v6HM+zEsKhsL3YY2lHPhCIGvLKEANI/pDCV10Y
-	KVDQNM14ME3KgtaKcpyqc/M5dsTGi9F+Oc7IXtB9U8MmBxR4nds5dyueoEiPr7WQogfefgDPleN
-	Fh5fGZ8bQWodBOIuOd0NKlYgv0txWxu8A7ysdpuXLC2AxZ2n
-X-Received: by 2002:a17:90b:1f86:b0:3ac:4e18:237c with SMTP id 98e67ed59e1d1-3b1b05b4590mr12347836a91.0.1794889432387;
-        Mon, 16 Nov 2026 20:23:52 -0800 (PST)
-Received: from hj.. ([163.239.22.29])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b1b39d73c9sm10484995a91.2.2026.11.16.20.23.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 20:23:51 -0800 (PST)
-From: Hyunjung Ko <hj351016@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	linux-cifs@vger.kernel.org,
-	stable@vger.kernel.org,
-	Hyunjung Ko <hj351016@gmail.com>
-Subject: [PATCH] ksmbd: reject SMB2 read on a file opened without read access
-Date: Tue, 17 Nov 2026 13:23:41 +0900
-Message-ID: <20261117042341.4023597-1-hj351016@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20260707; t=1794905508; x=1795510308;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:dkim-signature
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=s4yCKzF4YDIiI5PlcqBi7tYBGUxCwcilhm4zOkc48Yg=;
+        b=XwHdEG42KM63AkoSQ84nftQN9RlT6vJnohmgiAn2F1P6RjQ75SUt278y4UYVOFXJrt
+         /E/o6fOEeUxiPqIuzd5SHczOmbypcrjAdEJQR2LwwLLe6MT6oiOdKrdxNAdyzDaLW3Ok
+         OIro8p66cqBCSM4HZxmEKP7j5wwTlI8f+dGqPRMKx2SAOengyZlvIoN2Mlfo+fI80JVx
+         Fxsg6f3iSZB27F5ij2oefwJ7D0wkltid6cyc/3PRYKWuKZfkUSfuNbJ/zTa8On1jcOJ6
+         8ABmbM5TQt++Sgn+vB2Z7t5JeXLT71hqlkcrqwA3fWbbEaZl+aGL1Hul122/nQeCCxjo
+         M/Yg==
+X-Forwarded-Encrypted: i=1; AL+hErFsariFDLrCqphN776pyvBh9AC2tZ1XE/XKo0lmkU6up4zjT3Ptbu0xoEqh4rhvvh1DKp6k3an34z+L@vger.kernel.org
+X-Gm-Message-State: APuU4Z/eflt8z58g3rNspcsZ47c9LvoMj2BqaJHjRPmbR/rrPvp5BnDU
+	gUAc+BvlUY0pzvJxP+kfBEWpUk4I8Lilyujk+MVmPjvnmLzRcNPZ8vGqoDMYpSgfiA/QSnSVM08
+	Ym0HJwQzD/0zvJMjLu+QlGlq4VlLifpFPhscKyLmWcyNktuDHJY9RO0cIWU5sK7RHV7P0Dq2BLL
+	U+THWCKYqWDOBAB2ctXLLSQQXom42Dj6FyWHuWEyKRfe9yXDog6eWsOkmRVvAZ5vVogjKQWiuhs
+	jMJxX100joXZcJ4nNw=
+X-Gm-Gg: AZFdTZcbDTz91iVcQWl9TytZ5SlGXPy9Svto02IEy2mOSGAljk4SLiRQ2IK/b7caLxH
+	5aKhkYMAbS5BUt6J9zJ9+DRxJcUAdv57HQwuoMnNgmLUa5JYWKSx+SPwH3NIyvqMXVy8BDIe08G
+	fv9VAQXLP7/H1DSsEKxq2lJpsHvCE9PYVFhRfvMKLbkaxNtPRB7+C/DOkr3LcCsrcl2IjkwdBdp
+	pFa3WVBJ96OINQYV7oPKDEWP6SzfN27KK6DI5PhzypCQQ5g6ZLwXHQuUGuj9YkbgaxVtXxkvfvt
+	GKjgyYTqnCfDX36fKLV/8em0YiiRvoqjJnFKyP0ADP0wxNitdai5Qb0Np7C4FGDg2KwsM5pr/cs
+	gCBL9XcWzV+OAIchnLuZbExTTUvrMpmbehJLOlaWcMitR6cyUrRS9unHhD6BKcY/k3pvt3op7gz
+	3VUP8znwKxiCVZVujjPWcuMx9l660FGEf+RHpqfA==
+X-Received: by 2002:a17:90b:2245:b0:3ab:24b2:9016 with SMTP id 98e67ed59e1d1-3b1b0b8c09dmr13575379a91.25.1794905507719;
+        Tue, 17 Nov 2026 00:51:47 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-28.dlp.protect.broadcom.com. [144.49.247.28])
+        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-3b1b25dd0d5sm5979977a91.0.2026.11.17.00.51.47
+        for <linux-cifs@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 17 Nov 2026 00:51:47 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-8a065e2933fso5900951b3a.3
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:51:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1794905506; x=1795510306; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=s4yCKzF4YDIiI5PlcqBi7tYBGUxCwcilhm4zOkc48Yg=;
+        b=hB58cieY5b8UwhK1MBXmQ8KGG0LZz8/e5NSGWg6whcFiDUdWJ3ilIoNekl+HyBk0Dd
+         qjsFbLQ8yyU9+rMOplOuiPp4mR7t5V+zOU66yJGPVJESgEh2RWlOY0arvu0YQBGVRKuZ
+         7cpC3C1yzjKHMiQSkRxarMVSAyY80Q6QlP/9Y=
+X-Forwarded-Encrypted: i=1; AL+hErHXQv27peOI5LGM5xmQZaNjANaq2p6jxnsfqtHzEgKbYEncr/Etd7XdxJ74KfzUUT+pGg7LzvKYgfki@vger.kernel.org
+X-Received: by 2002:a05:6a00:4215:b0:883:71f6:5fb with SMTP id d2e1a72fcca58-8beb5bacc27mr13819088b3a.13.1794905505990;
+        Tue, 17 Nov 2026 00:51:45 -0800 (PST)
+X-Received: by 2002:a05:6a00:4215:b0:883:71f6:5fb with SMTP id
+ d2e1a72fcca58-8beb5bacc27mr13819068b3a.13.1794905505604; Tue, 17 Nov 2026
+ 00:51:45 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -98,44 +99,59 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261116074849.475815-1-stefan.chulski@broadcom.com>
+ <CAKYAXd9KT=1vLYsnRKxmiM6pLJQNACXuodD8wNQzb8S5apiuRQ@mail.gmail.com>
+ <CA+Fu+LPL7xqpV_vjjjehedOFtuuBqgZHZTSqJ+FgweUpYo2uBw@mail.gmail.com> <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
+In-Reply-To: <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
+From: Stefan Chulski <stefan.chulski@broadcom.com>
+Date: Tue, 17 Nov 2026 10:51:33 +0200
+X-Gm-Features: AclHuK_RHNY-A8YWsfLMtfZRg8kMifDdxlLsMR_xEYE8xYRbaSFIuqvBKZGGKlU
+Message-ID: <CA+Fu+LPnXMd9rMtywkZL77XzLq8n+8AiBW2T8Cau10YnVbofiQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v1] ksmbd: add use_unbound_wq module parameter for the
+ ksmbd-io workqueue
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ilya Lifshits <ilya.lifshits@broadcom.com>, Huiwen He <hehuiwen@kylinos.cn>, 
+	Gil Benamar <gil.benamar@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	bcm-kernel-feedback-list@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-smb2_create_open_flags() maps a DesiredAccess that has FILE_EXECUTE but no
-FILE_READ_DATA (e.g. FILE_EXECUTE | FILE_WRITE_DATA) to O_WRONLY, since
-FILE_READ_DESIRED_ACCESS_LE does not include FILE_EXECUTE_LE. The resulting
-file is opened without FMODE_READ, yet fp->daccess still carries
-FILE_EXECUTE_LE.
+On Tue, Nov 17, 2026 at 3:34=E2=80=AFAM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+>
+> On Mon, Nov 16, 2026 at 9:52=E2=80=AFPM Stefan Chulski
+> <stefan.chulski@broadcom.com> wrote:
+> >
+> > On Mon, Nov 16, 2026 at 2:10=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.=
+org> wrote:
+> >
+> > While both address the underlying scheduling limitations of per-CPU
+> > workqueues for ksmbd, my patch introduces the `use_unbound_wq` module
+> > parameter rather than changing the behavior unconditionally. Because
+> > the optimal behavior (cache locality vs. load balancing) heavily
+> > depends on the specific workload and platform, this approach keeps the
+> > existing per-CPU behavior as the default while allowing platforms to
+> > easily opt-in to the unbound workqueue when it yields better
+> > performance.
+> Could you provide the benchmark setup and actual results? If
+> WQ_UNBOUND generally performs better across representative workloads,
+> We could make it the default and provide a module parameter to opt
+> into WQ_PERCPU instead.
 
-ksmbd_vfs_read() only checks fp->daccess & (FILE_READ_DATA_LE |
-FILE_EXECUTE_LE), so such a handle passes the access check and reaches
-kernel_read(), which hits WARN_ON_ONCE(!(file->f_mode & FMODE_READ)) in
-__kernel_read(). A remote client can therefore trigger a kernel warning (and
-a crash under panic_on_warn) by opening a file for execute+write and issuing
-a read.
+These are the results from our embedded systems featuring dual-core ARM CPU=
+s.
+The benchmark setup is fairly simple: writing to a USB disk over the
+network. Because the network traffic is a single 5-tuple TCP stream,
+it is pinned to one of the CPUs (depending on the 5-tuple hash).
 
-Reject the read when the underlying file was not opened for reading.
+We tested this on two different platforms and saw the following
+throughput improvements:
+Platform 1: Improved from 178 MB/s to 210 MB/s
+Platform 2: Improved from 215 MB/s to 263 MB/s
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Hyunjung Ko <hj351016@gmail.com>
----
- fs/smb/server/vfs.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 1f2bc76f0d09..cb3f4f5fe9cf 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -367,6 +367,10 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
- 	if (ksmbd_stream_fd(fp))
- 		return ksmbd_vfs_stream_read(fp, rbuf, pos, count);
- 
-+	/* The access granted on open can include FILE_EXECUTE for a write-only file */
-+	if (!(filp->f_mode & FMODE_READ))
-+		return -EACCES;
-+
- 	if (!fp->is_posix_ctxt) {
- 		int ret;
- 
--- 
-2.43.0
-
+Regards,
+Stefan
