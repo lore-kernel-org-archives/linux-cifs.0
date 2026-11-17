@@ -1,101 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794874667;
-	b=evYxSwk7iITHiM49T19Mb3208QNYzjBSg0MblRHbXI1P/cfWB/t9+QfSqjvLxi28JY/J
-	 Jy8jKPTmZ2gnv3DS2h9sEtmxwUj/HvIXMpxP4uYEhsgkxqzt7Qbn7ZGctEHFkd9WpFhcZ
-	 I0t8RuduQ/FIr6Z3TIS95p0Gl2gxKzDMVadinxqeEe4wraUlQjeranTQtfaw18zPI+Fw5
-	 8bF+cSXxy3qQfVRGpN3zwzmNnz/9hJL+2uPTs7rJKQ1JmN14+sa+BapUTmbeOPTZn/0R3
-	 SN6B+gAVcBuAi1yE3wliS6uAbnamTSc4osPV8dHJpB1YFR8k3L6+L8kxaVo2SeuxMVw==
+	t=1794879268;
+	b=j3eaz3zccHHHViL6jMITDCC4KMEIqq/7gD8lHKMkTLjc3zYzEWP067ka5T8cNdn0HOjz
+	 +9nfHXUG3FvBDKOI3+zDz8uIsTDPE3y5F/Z5ECAeF4UCYyclxfxu6zeSfdo0BJo3Bog/O
+	 QjD+zlv9Tauao1Shta5tWn3StbijzXtmXY5rx3zlLSi1I/k/E+e9HCZzSBvXFwn2L/Pkg
+	 RxBvJhxTvjNccdkFhPT6JEFZ/aHM7mwsjfHHBYzqnpYnB5WNno5bO2CHpdwpZO1ykW1ZI
+	 p2pqrhS441Y+lZqolWq0Lu3cAgARm0KsIFYr3tLWC7OGr95WCtY1C13xGhxtVoRXEeQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794874667;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=mZCjeYoVLTXgPtFhooWOdAgqkSbxaoBgREf6dkUm8L0=;
-	b=sok81GKSGChPzJ84uMADbcOqI4C4wO5BwdF1x/0PkjHsGNBV0vxioPx43xDIaBM+dad4
-	 c3UnryPL/zzG73R1f0nDBgjtnLPf3j9IgB7VBBxquekUbgn4/+y2L4ttKUYMGBJy9cppD
-	 74ITRyP5vlOQfRDJFqNid586f0alQcktWVP3OYhQltRNXdC5hstbvPJTaRzZ3LIiPAWvR
-	 wm2nwFZin+NhU2t0X7V0fGamQB2L3SXyO2Q1Xyjb4OFnRw21gL5ZvYMp7aZFtfFz1Bhb8
-	 QjstC1eZ8ZzjPyehLLezvgcD+DvTbTkVQOZI6UnX37utujXhrMqTBoKTS8s2KCJ2rLA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794879268;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=6NFvMXt49n0aMhQ+tPrYzjCU429v93v4p/pcosygBN4=;
+	b=Fgjnbh52ZAHNE86m3IBNSAPUZJf9Qci9ONLL/EaNYOBMeSRRcgc4OnITQk7rtHHc5ZbS
+	 Mwe4Soh6RGzwT9/o2DLPQgizMTMoTfTMyam6cSeVjy3BYP4PmG6nMtskcyNUp/8kdOfpX
+	 nxZ1UkAV1BPmqIqCUAGX9MepLh0oiNhWZn3NRpx0Z7BaKjjZyOxXnfuxTacdzBHBgBs5X
+	 PhlHhNh3hK5fK04iN8t+3C1ls0lGWrBbcAHsxHSXz0y27NDfhlbGOjgy2n3o2qyh3eizF
+	 Xd2QPOYP9Vr/ORtotnVnw2m60B4LH6VDR3FZqNaPK6/6/dI8ze/x8mEqQrTgHSOS3WQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bP1+urcu;
-	arc=none smtp.remote-ip=209.85.216.48
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lIXtZVi+;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDCB606A882
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:17:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org CFDCB606A882
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E634606A31C
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 01:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bP1+urcu
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3b1535be329so3014989a91.3
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 16:17:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794874656; x=1795479456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mZCjeYoVLTXgPtFhooWOdAgqkSbxaoBgREf6dkUm8L0=;
-        b=bP1+urcuvG16SgYF1OlKCcQwtL5AF2QgxhzyAilER2O/2K10dUgzTXa2OCmKoNV+oR
-         WshNzaqsm8e87NiYj95klrjEPXi07MY0D7RS6hFSkKfj4s321WH0gOOkTIR427iLvMjP
-         DPFfvlDSsAOaWbYKSoUnrLZcjBnC1rocwA20a9NoDnI6K3v3cusl7Hj7SS2YyLqLnB6B
-         fC8Cmlw/fMS9X0nzccc1Fs391BgFFh46sagagHoFRIHIDQ0Ycnd0fu4/7kgzBM8e0Qwd
-         TBN4a4UdNCRqVMOzg1bhktc8KOeFfiAv/Cr/FzXg61GfZenrNe61OMsNR+lZ6ctWo5v9
-         1R6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794874656; x=1795479456;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=mZCjeYoVLTXgPtFhooWOdAgqkSbxaoBgREf6dkUm8L0=;
-        b=NT5rFNU0lcd57J7XrVHaoh1INUA5VWO82jPphkrWNO8EGc+MEm/dlLbSL3puDzncDA
-         nWDH7gTl09oMt1BXuJgZ1pvv0yB+NBwyPqf3gT+kbi7Kjt45vPGEVRrxmdD/t/exc/aj
-         9IJkA8z0Bvv57nbMGsm6N+ofa25bfJHZX2tkMWCiwA4kP0J+6MW6daMbQfRgjZJ+4XKj
-         oFzx49j8BSWbTgTZjWmwUjVnqm1BdlYyKcHOPvHtp+oq9ItwyTps0TwjxrrlcHLkss2c
-         ckTp5shZQCNZbW0y5Y76evOen0GJwEDXs4n01E53InkUo6iUJAwAFK3JX4uQDwpWvHrY
-         LXZA==
-X-Forwarded-Encrypted: i=1; AL+hErEhQXTKYXirH9rrx8MzwC4FJ9llyLdJt95T0UlN/dHZuSTEPRzt0z1UCdLnErP6Zx7alg9wP5d7rtoj@vger.kernel.org
-X-Gm-Message-State: APuU4Z9h1QaIcslUBQ8MRD4FVmHMqN8GOQoRTQsuRhBMEedYHrkzlLDU
-	rS0Decnv0QDcRANQJbQZJmfbVA1sEFJ5gnPBgKqjCZr/y3RJX/PEr2ZQFC90jQ==
-X-Gm-Gg: AZFdTZeGNRMgGMXBBxsX/9Whuq8hcWloxi6uqBCLJNonjETX9Z76Sb0kVPQxJRHbBEk
-	yN+KDGc6mgLkQmvWMOYI6AP2ZiskCNK5r0/AgEyri8MPP2H+y6HhnID0+OV8XYsYmv6X2jL7QYX
-	z4TPENW+ohCcgPP+9d03KU1aEw4zJfxNNZlckicJPw+6CSXw6T6X/i4hT4d3EMH76mkkTGhRco2
-	vr63PGTcxhovmgMD3MvPPC8w+oNFrEEsQEf/A9T+qJKzeHFHLtic5lcJNtOhm+nrJa0mRQ+IQJ+
-	laIgzf4ZnWUMOdgQcmIIQWRlE230egh1/Dl6Fa4R2kZrur/jjy4Cc4s5g7dEXyo7URgFxzJV+9C
-	CzfFJ49L8+uz6EdqD4f0CrFf2LCVF4ZoSlaZBj9iKcS/OSEVq4x7ZbQVEQCnjdqsxeF7WfMsrYq
-	S6jq2PI5eqbQCR9xPj/JEfBOzmZJVRpTSdaQK8jh/PUDaLllR3C7Ntuetxk3V0bmjhKosSh8hLY
-	qEAgqQLrdHxnrV6S4fVsl2I9hpTBz33ckBIdOa+wSqSMmACf4rcQK96IzqEX/rXmBIoMtDlMwC1
-	tNBl28kU+E5S78mQ6OqHFga2X8nc/YCYfFg/9Iauu68JYPH2dRZf5y0Rwl2pYoKQ4Fv33H4sQU/
-	q6o+SsBBDXkUB0kruac3rIGjgCLNCq26voMYtjPAfEi6OkU7ZkdqTB0xDpBRpLPI/OkxVbnsxtk
-	/cU6z/GqlaQH56SiMyngVzf+MIyFHR1dL/IxFUxErw
-X-Received: by 2002:a17:90b:5585:b0:3b0:9e2f:cfc3 with SMTP id 98e67ed59e1d1-3b1b0a0ddf5mr11086246a91.32.1794874655997;
-        Mon, 16 Nov 2026 16:17:35 -0800 (PST)
-Received: from sid-dev-env.cgrhrlrrq2nuffriizdlnb1x4b.xx.internal.cloudapp.net ([4.155.54.158])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3abe77179sm1194081a91.11.2026.11.16.16.17.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 16:17:35 -0800 (PST)
-From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
-To: Paulo Alcantara <pc@manguebit.org>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Allen Pais <apais@microsoft.com>,
-	Rachel Menge <rachelmenge@linux.microsoft.com>,
-	Hardik Garg <hargar@linux.microsoft.com>,
-	Adam Kim <adamkim@microsoft.com>,
-	Siddharth Chintamaneni <sidchintamaneni@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 0/2] smb: client: fix unmount busy dentry/inode races on openFileList
-Date: Tue, 17 Nov 2026 00:17:31 +0000
-Message-ID: <20261117001733.192399-1-sidchintamaneni@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lIXtZVi+
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F02E51F000CA
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 01:34:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794879268;
+	bh=6NFvMXt49n0aMhQ+tPrYzjCU429v93v4p/pcosygBN4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=lIXtZVi+fCWm+GTs6b+USE4T2SqmX3VeNqyLAjeClqIVga3wBTP4CjEKURvJGP4ta
+	 eqzNRgUw3cwF7S1NK7vTNyOYM1GtOOAg3u1dYdapR3q8+/D4bhGfoJMuNgp6cAwbeM
+	 wKsDFmJ2kUQPQaFhEeypS+fOUnmMY5JX00AxWLzI87P4C/f5vw8GqmNrBj4Sf4UamI
+	 797noCQEpa5vt9B0dQjU39xGDxz9hgw8Lc6qDAfR5zt+MI8pZB6UZzk0azJ4X26km/
+	 Z1K/qyFU+Cj67aTSfBfv0vZpHubW34P7gKpXfxc3IwpTR3DDbhYUcbN0fMEPf1jmkh
+	 rbf+CVW9Id8rA==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6b807aab44fso2314864a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 17:34:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErFoMWFD6tc02Nf3aq5QtTGAXWRgAxOx8k/IQmFZxHw8Wb6txQGEM6rmjqWG7G6IzrE8hmzwyfpyQTm2@vger.kernel.org
+X-Gm-Message-State: APuU4Z+yrHzKOYQB0vo2Z6dRuXln6/w7utCw1mM0fIdMuT9cSdj12LwJ
+	l+NACiD/N5O9sAA05fBG6dijaN9+MabnUkrcOTKp9cArLjX3Etn/qUACqeSdpRgxtIMZIHE13l6
+	aAnkjKUplBSdKx+IJmY3EQyPhOM24dGE=
+X-Received: by 2002:a17:906:c14d:b0:c50:5cd7:2901 with SMTP id
+ a640c23a62f3a-c509640bfa8mr990170866b.23.1794879266573; Mon, 16 Nov 2026
+ 17:34:26 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -105,30 +59,92 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261116074849.475815-1-stefan.chulski@broadcom.com>
+ <CAKYAXd9KT=1vLYsnRKxmiM6pLJQNACXuodD8wNQzb8S5apiuRQ@mail.gmail.com> <CA+Fu+LPL7xqpV_vjjjehedOFtuuBqgZHZTSqJ+FgweUpYo2uBw@mail.gmail.com>
+In-Reply-To: <CA+Fu+LPL7xqpV_vjjjehedOFtuuBqgZHZTSqJ+FgweUpYo2uBw@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Tue, 17 Nov 2026 10:34:13 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
+X-Gm-Features: AclHuK-kfPqc8Bh37Jzng9-4IO0zn_61dopqd1mYNeZxWXG2ijut7JfpzpvArRM
+Message-ID: <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
+Subject: Re: [PATCH RFC v1] ksmbd: add use_unbound_wq module parameter for the
+ ksmbd-io workqueue
+To: Stefan Chulski <stefan.chulski@broadcom.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ilya Lifshits <ilya.lifshits@broadcom.com>, Huiwen He <hehuiwen@kylinos.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This series fixes two unmount races in cifs_kill_sb() where background
-paths walk tcon->openFileList while wait_var_event() is waiting on
-cifs_sb->outstanding_rreq and take new cifsFileInfo references that
-outlive the wait, causing busy dentry/inode warnings and panics in
-generic_shutdown_super():
+On Mon, Nov 16, 2026 at 9:52=E2=80=AFPM Stefan Chulski
+<stefan.chulski@broadcom.com> wrote:
+>
+> On Mon, Nov 16, 2026 at 2:10=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.or=
+g> wrote:
+> >
+> > On Mon, Nov 16, 2026 at 4:49=E2=80=AFPM Stefan Chulski
+> > <stefan.chulski@broadcom.com> wrote:
+> > >
+> > > The "ksmbd-io" workqueue has always been per-CPU. Commit 69635d7f4b34
+> > > ("fs: WQ_PERCPU added to alloc_workqueue users") only made that
+> > > default explicit as part of the treewide transition to unbound-by-def=
+ault;
+> > > it was not a ksmbd-specific decision.
+> > >
+> > > Per-CPU work keeps request processing on the CPU that queued it, whic=
+h
+> > > is good for cache locality, but it also runs work on CPUs that were
+> > > isolated from workqueue noise (isolcpus=3D, nohz_full=3D) and prevent=
+s the
+> > > scheduler from placing blocked or long-running workers elsewhere.
+> > > Which behaviour is better depends on the workload and platform.
+> > >
+> > > Add a boolean use_unbound_wq module parameter. It defaults to false, =
+so
+> > > behaviour is unchanged unless it is set; when true, "ksmbd-io" is
+> > > allocated with WQ_UNBOUND instead of WQ_PERCPU. The "ksmbd-break"
+> > > workqueue is already WQ_UNBOUND and is not affected.
+> > >
+> > > Document the parameter in ksmbd.rst.
+> > >
+> > > Signed-off-by: Stefan Chulski <stefan.chulski@broadcom.com>
+> > Hi Stefan,
+> >
+> > Do you have numbers comparing the per-CPU and unbound queues,
+>
+> Yes, on our systems we observed up to an 18% performance improvement
+> when using the unbound workqueue.
+>
+> The primary reason for this improvement is that with the default
+> per-CPU workqueue, ksmbd-io work can sometimes start on a CPU that is
+> already heavily loaded. Because it is bound to that specific CPU, the
+> scheduler cannot move it to a less loaded or idle CPU, leading to
+> bottlenecks. By using WQ_UNBOUND, the scheduler is free to migrate the
+> work to less loaded CPUs, which significantly improves our CPU cycle
+> efficiency.
+>
+> > How does this compare with the earlier following RFC ?
+> >
+> > https://lore.kernel.org/linux-cifs/20261022092514.2590010-1-huiwen.he@l=
+inux.dev/
+> >
+> > Thanks.
+>
+> While both address the underlying scheduling limitations of per-CPU
+> workqueues for ksmbd, my patch introduces the `use_unbound_wq` module
+> parameter rather than changing the behavior unconditionally. Because
+> the optimal behavior (cache locality vs. load balancing) heavily
+> depends on the specific workload and platform, this approach keeps the
+> existing per-CPU behavior as the default while allowing platforms to
+> easily opt-in to the unbound workqueue when it yields better
+> performance.
+Could you provide the benchmark setup and actual results? If
+WQ_UNBOUND generally performs better across representative workloads,
+We could make it the default and provide a module parameter to opt
+into WQ_PERCPU instead.
 
-- Patch 1 counts queued oplock/lease breaks in cifs_sb->outstanding_rreq
-  from cifs_queue_oplock_break() until cifs_oplock_break() completes.
-- Patch 2 counts persistent handle reopens in cifs_sb->outstanding_rreq
-  in cifs_reopen_persistent_handles() until cifsFileInfo_put() drops the
-  handle reference.
-
-Siddharth Chintamaneni (2):
-  smb: client: fix busy dentry and inode on unmount from late oplock
-    break
-  smb: client: fix busy dentry on unmount from persistent handle reopen
-
- fs/smb/client/cifsfs.c | 10 +++++-----
- fs/smb/client/file.c   |  9 +++++++++
- fs/smb/client/misc.c   |  6 +++++-
- 3 files changed, 19 insertions(+), 6 deletions(-)
-
--- 
-2.43.0
-
+Thanks!
+>
+> Thanks,
+> Stefan
