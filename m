@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.169
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794874662;
-	b=XFP+aGRN30K08HorM0tG9NqeLoMwP4ztkSAaeTPC8NZMmHcBfXn4Ddh6eh02aa27p89m
-	 /jH3ozcRGkNvg61BsIjnBadN7xvo/Vj8XvcOOz2KlZXvcp6Zojz7xUCWNF0n8UHHqvPLV
-	 tuSC/QxU3d8aul4QjCzi7dviUt0Jrs5JCa1sDyq4FUog6D50DhuMmGNIujYTFfOXsQpWL
-	 IZz/swIgHjE0bRBF1gEzqNM2Me2RPzJxUaWMcu/nCDa6J0V17ha7MgYeuwtkZMiCERguU
-	 V+DI/gVrny6znvEmHR/xfbB91F/6Z6BfIBxOhz4iWe62Y4cP0v2siJC405CR8VlUj0Q==
+	t=1794874664;
+	b=4vrBUAfgq2rLo2nYQVUDbyzHCgBkS9b/h7XrNCOr0HaQ7prlcv1JcSh+lUqvYqnxvP/l
+	 udrJeSyAhMpQhAbtctPri1eTiecBA1o6keGXLfeCmeA0d7WziYpl9QOLXwCaviqX/AJlA
+	 RLZmnq0OlKjpHHpUr7YfhuZq3cgpN5zudGVtPuHs5P/pYMAImnK4fXtwLeVMDv1I4KkB/
+	 AScDbby/2UqA2HbI+Oyz7nPtZDRIeVwDhIrR/aLsmK/LuEbiXYCO6K8b/38qKKVNNyAHN
+	 q+s60AffXJrO6Lv+TWzBVKzevaQ/yfSV3PYI5fYvg4sTOwJyY3NO4exxk0LX7HZqqSw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794874662;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794874664;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=zgWfq2GAKVFYRnbXQJhzTkKnKyBJBEAwL8blc5h7O/Q=;
-	b=VkuRYJUhrPB3eIpfY87L97Z2oAaFncOovT5ILPJbUmw/3BJFs66RymjUnqvVO3iVd5Oc
-	 C/mnPTs7tGeb9RgY+nb+BZfRCu4xDBgss87Y0kbaC6vQ4Y0mBOMhh9TTOTF8IqLZo/iKN
-	 qasXd5nx8+SXXRNVJRsSyxWQkDASn4vWe0Toq4RhPX/PRn8qYmcbD/3mH79JVbZldBQRx
-	 74Jfx3IdFSKX9oaILjBNXWmVYi8zWbLtij8ULriQKQ299zRyHkUyws9qB7NfcenbOnnY6
-	 OdKlQBchclsXv52PKTn74qxRsvIFLTU4f4MvJUVctterCLh803sWQsTZR6mQ2txBRkQ==
+	bh=8uYmVLMlUVU+cxd5o4cJaxLmzYdA/McqGttb5PW87pg=;
+	b=Njk3MI1Ar0ij3jKV3LcebSD0XLQfJ4v3pJQ/wJBhUsL+FtqkNNpO+I5DDiA+56JUNVeC
+	 s0eCMv2VyZq12u5cCY7s5ASlxJ4M5a2/9T5ycY08lUz4T13JDsJv3IksghqmnCfEpSWa/
+	 +rk7NhSaNTla86WvkUEbpLlhzoDB3JxGkJAnlPGk5dLi9asS3kyEfPkbo+F5c9A1sPZJ/
+	 eThMJtI1n+NUIznUtwIzpLNkBSdYjtYvxY53raQRfiM4FD+wfQ/Ro6YuccKmrQusFstOj
+	 b2R0+oDGEWdCW5jdC5lRuYsRf/WUwn8xmRhmoIYweqnDNAIunkmwRZ451r6nMHKkzhw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Nm28woXf;
-	arc=none smtp.remote-ip=209.85.216.54
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hedHCCss;
+	arc=none smtp.remote-ip=209.85.215.169
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED47B606A31C
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:17:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org ED47B606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A458B606A8AC
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 00:17:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A458B606A8AC
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Nm28woXf
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3b0a519049aso4032918a91.1
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 16:17:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hedHCCss
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-cdb75699c7cso1639610a12.2
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 16:17:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794874657; x=1795479457; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794874658; x=1795479458; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=zgWfq2GAKVFYRnbXQJhzTkKnKyBJBEAwL8blc5h7O/Q=;
-        b=Nm28woXfxOXeWkP5NYI99nnzo7HPpdJBy3Hs3DbMuf6fhXKY2d0loq8FZnHmo0dUqb
-         w7KiVFdWlZHQIu4jwrCQsJmy6zd6zAiKPbXwwhthK3I+kMZHRqUZDunRaW+2NRmbEKEa
-         mBF1hHNwZzzzRBXpDwhxtzZm/mKOAUkltFmfFsoqMFW+uwgRBE475+8rpY+8/goNvluq
-         CQdVN/gEZXCF3teuKAfD46fqZivfvHTB4v+LDtu0F1UJNIrzRs+SPsxd1f1nLp4wxwB+
-         KRiLylU8jMEp0qiisE56YeCAjSbJhMgpEADDxwbIh7nGYZMGExWkJDa+IkIJ2HVDA2Ao
-         g2RA==
+        bh=8uYmVLMlUVU+cxd5o4cJaxLmzYdA/McqGttb5PW87pg=;
+        b=hedHCCssyR1sZA5kE1raSkzS+NrwJlryckT3Pigc2Xd5W6k/AifZkT1N3a0WslBvS+
+         eXuq0BExtzuNzVEfDs9GK5So+KUWSs0DeDuzMk+5exFiS2L95kLtOo2uXyo15O2igJVs
+         OwyyJRXD0qvXxK4DgQeOg7bOU4c7kd8sbz17Qmidk7APckKgguTH195cTYmrV9JK4FnU
+         m0Xb3xRXeWRKDem2fHbQz2XsuJNqcf2XneYP32KW/OBxKd+y8XFc9z/jLfIdIEdDroa+
+         mkeAG68eqWbDHzH4RjcjKgnGTqplbR0nvmly6gSJzasleHdN7Rq6GseoyZKlCZ2e3OCQ
+         FRAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794874657; x=1795479457;
+        d=1e100.net; s=20260707; t=1794874658; x=1795479458;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=zgWfq2GAKVFYRnbXQJhzTkKnKyBJBEAwL8blc5h7O/Q=;
-        b=0BwAiQ+qkISvpQBwDNEEgkOR3ndXL4NF2pI3ScShUXv6scWgut1Kgvtv7Dl9oSGKf3
-         Y8p+AeClVX2jt/KqUWcHVPHk9mIXQN6dQQxse/XUuluR9woSlqWUrH5u/UyOW7jNg9Tu
-         W9FEF9uQ6jUPsJMJ9ISGwCTNjnYMfpZdi3ZQYdQJDQ4bNPT1e+d+Blrn3dyFydVF+Naf
-         GSXbZtv+5r+NksXIkesR6lJKnk3LjtKbrZxOOu8YZwGia8M0uDbLxgvbKswcJshNnsSw
-         dG7ev9+4kMrDDPYnAIwkdkW4ypxF9lwrsikAgIoU0jxK8O+yX5Y9ymz1YsVnwlOFbMCx
-         IM7Q==
-X-Forwarded-Encrypted: i=1; AL+hErF2K4AQWKSMb+PpjTIrCV0x5roBFm69wun+oqXIbe1/7ymzNdySdKU7OZHeMc56O1OJLRjDo0dQ13nC@vger.kernel.org
-X-Gm-Message-State: APuU4Z/gI/HGX+V7DmPG70A7v+ls0HY96mPAj452odLpsqkJ7IHlDFp1
-	d7a2vnH39wtDn2QRZBX2lKUTk/wkMKrXHl1WR54xOibfzEEcGME/W4e8
-X-Gm-Gg: AZFdTZdgyhHrzbQRW6Zcaz59zxCFz8ysDyqDS/cb6wFlxlcZwFiGKz6QgI/fTawx/yz
-	7ojWe2CG7yBHt2+mtilFNrEzyj0AAAMgF0L+Oqd9MNdjHehbJXPkwyVKlhyCYQ2nSq+SRKz3Ymy
-	O6PacW1Grg2vH1OOJL2DbxrTLPvKlcyqk2iRvCR/hhRDNkT7I82ioI4Yue3IXkAmfnIEaG++bj0
-	9Reo/hL0nozaTSrzYVd+nua6wkXYD46TsWKw4njVX9HNGQztaEBD7RuNKeQfK9zwlDAQ1vo25oi
-	ncE92Vu18GpaGUPZx+jpxX9WwtWzjZtcBzWz8/2g0/XHT5UtDSpu6WnyrgAHvVVATbmtLW1SthF
-	GXKfQ4CL6XBwo70csnjh/tPdPH8MTBnM1Syu7ovKlVyQEkWs7XKcYwRKTux42olhCs9Obh8ivwG
-	1FuSzAEMFeb3NDGhKP9R1UKQ0AGWr9S2lSOOQRrYMACT2nHKp5kTNF++6N72QU1DnbLscxPpyRB
-	GtODN8IJHG5eFk6q+YJProEIqFGCPdY/7unb/961addbLVPzcyiIvP+9QJwglUyAAI6sYps2pRR
-	nskzBUFT7r6mi+imXgUPzmlUTfsixDkuQh7eqspALEtmohnRYCKNpig7eq0SFJuNaoZ1o5g4Llw
-	eatJbiFEThSGhSvy2O2Hw7LUqUVurp0JsUPgiuGg/m+AK5nXJblpG1DDxyIX4mHTFqYl1W0Pq5H
-	Yg6iBxCohueEOU9UwhHFFSlNxDtKHuHUooCF5c4Yr3
-X-Received: by 2002:a17:90b:3f46:b0:3b0:78c8:d56e with SMTP id 98e67ed59e1d1-3b1b0b8f0acmr12280481a91.27.1794874657124;
+        bh=8uYmVLMlUVU+cxd5o4cJaxLmzYdA/McqGttb5PW87pg=;
+        b=WoTLiC//BT6I4SyIY2dbHMB3UHudzlFoZYi5xR97TrvymTvB00VoyUxRCoKtI6otcK
+         axb+MkXWqJXBKLkBwffsbVyAR1OwbntxzhRaPQgiphpLRvoES92MXCESNYMPc5oid3MB
+         t8QsWoVyRzQ85TnDeOHlMkkZXtDmOx0SxmGSgwzlU99BHXkTkJml2ltKQRIRNtQ2G4QQ
+         drSGjuu9GQA75K+TmZsuQgi1OH/K1jyypQjZJf5AftJnliFHoeKdckhzUjrTV9GGfBVA
+         NTvf0c/YjMM1Qr0zVf0N8WPuu3F3rDKEXgxukseGldpQsku38wCA4uV1cjuFPoEG5EiK
+         gNTA==
+X-Forwarded-Encrypted: i=1; AL+hErH9OxQyqWDWEgUU+vJNJIJfyTb+1AN4BfQEgCEqSqokiC0h3S4HYDADe32o11/1Dr3LmqzUkXreXHoH@vger.kernel.org
+X-Gm-Message-State: APuU4Z/U2XvD8OoQwkDqQWaOEPCsIxqZfDHU+V6k4Q26lp7vhCu2dspj
+	q7bwOrGQui8U3YF49/ii7/YyxO2UnpdpKHXCeQS1nORoCesu9slvW7OK
+X-Gm-Gg: AZFdTZdJ84vjd5c1hkbztA8Ogei7yCZAAscu0l6rZNCGiYywGxbiLNNGAwAfptRG8fz
+	GpH4eq8D2oxDCVSXArh1bNt/qdb/FsAwzIQZXcdW3ms5PlIIpfHKqC/tabv+wGRbCEhXAW8dKg1
+	epQ+UQcjNLyS7aOtjM3uJ4BI5atgD06UTM1cLSgxJeGqlwVkWyh6/wTlnCNppKkyLNFsqAk8V85
+	XrmHZHoEnu/wXFF+6z4kawhbEXbKYk2WLi2o+Cv9VHs2KYPlubd9gBG9DsB+m8WND3T3X8vV3Lc
+	/EqSJJ9WqZ49mLaoZ3UKtDKV+Qn6yUkZ70gamADjZWye/3nux35WsCVxqMielCtlbBeexVUpAJG
+	74FbN6e5xZCI5feGqVfEkCbNMPMb42uACUj1s7UJZpO+N/qZgkzId8tLJyuDhxKQlcGTCQ+8Oqi
+	0N0X0Qo2XjgGoAJUNkuaOYr4Ogvr884UJ6Pyw+O+CA2Y3K1+HUuS8Rp3Px67XMCLwoT1IvAVJe6
+	WZwY3ZxfEungPO9o0OtPS4nN5U2BMZGo1uOxwX+tUgggBoY3wfdsv5goQATUnmylU+Dx2de7ZZK
+	l2wivC+CInkiVFePM86CyGrm0Y/iu+WrOaxYCJbFyn1CIndYm2+U8FBchDds8Yukmc38tM9zdSH
+	wl0nBMeAr8dAEBCh7lPOJKJRA7aF1Svt7IX9h7g6/DRO1OF/dWanlh7fmPqxyvB0VmzLJzYr/5a
+	zV9qA4OU6RpTzpDL7mv9jiF/wGTz1Cd3Y0bTPo3851eQHdc3uLOh8hMUsGxtyQqQ==
+X-Received: by 2002:a17:90b:4c0e:b0:3ac:8741:e2e8 with SMTP id 98e67ed59e1d1-3b1b07ef0bemr13037975a91.8.1794874657803;
         Mon, 16 Nov 2026 16:17:37 -0800 (PST)
 Received: from sid-dev-env.cgrhrlrrq2nuffriizdlnb1x4b.xx.internal.cloudapp.net ([4.155.54.158])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3abe77179sm1194081a91.11.2026.11.16.16.17.36
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3abe77179sm1194081a91.11.2026.11.16.16.17.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Nov 2026 16:17:36 -0800 (PST)
+        Mon, 16 Nov 2026 16:17:37 -0800 (PST)
 From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
@@ -93,9 +93,9 @@ Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Siddharth Chintamaneni <sidchintamaneni@gmail.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 1/2] smb: client: fix busy dentry and inode on unmount from late oplock break
-Date: Tue, 17 Nov 2026 00:17:32 +0000
-Message-ID: <20261117001733.192399-2-sidchintamaneni@gmail.com>
+Subject: [PATCH v1 2/2] smb: client: fix busy dentry on unmount from persistent handle reopen
+Date: Tue, 17 Nov 2026 00:17:33 +0000
+Message-ID: <20261117001733.192399-3-sidchintamaneni@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261117001733.192399-1-sidchintamaneni@gmail.com>
 References: <20261117001733.192399-1-sidchintamaneni@gmail.com>
@@ -110,38 +110,33 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-During unmount, cifs_kill_sb() flushes cifsoplockd_wq and deferredclose_wq
-before waiting on cifs_sb->outstanding_rreq for in-flight netfs I/O
-requests to finish their cleanup_work in cifs_free_request().
+During unmount, cifs_kill_sb() waits on cifs_sb->outstanding_rreq for
+in-flight netfs I/O requests and oplock breaks to complete before
+flushing serverclose_wq and fileinfo_put_wq.
 
 While cifs_kill_sb() is waiting on outstanding_rreq, any cifsFileInfo
-referenced by an in-flight request (req->cfile) still has cfile->count >= 1
-and remains on tcon->openFileList. If the SMB server sends a lease or
-oplock break for that file during this window, the demultiplex thread
-(cifsd) finds cfile on tcon->openFileList and calls
-cifs_queue_oplock_break(cfile), which takes a new reference on cfile and
-queues cfile->oplock_break onto cifsoplockd_wq after cifsoplockd_wq was
-already flushed:
+referenced by an in-flight request (req->cfile) remains on
+tcon->openFileList. On a mount using persistent handles, if a reconnect
+runs on cifsiod_wq during this window, smb2_reconnect_server() calls
+cifs_reopen_persistent_handles(), which walks tcon->openFileList and
+takes a new reference on open_file via cifsFileInfo_get() to reopen the
+handle over the network:
 
-  Thread 1 (umount)      Thread 2 (cifsd)       Thread 3 (workers)
-  -----------------      ----------------       ------------------
+  Thread 1 (umount)      Thread 2 (cifsiod_wq)    Thread 3 (workers)
+  -----------------      ---------------------    ------------------
   cifs_kill_sb()
-  flush(cifsoplockd_wq)
-  flush(deferredclose_wq)
   wait(outstanding_rreq)
     [blocks: rreq == 1]
-                         SMB2 Lease Break
-                         finds cfile on list
-                         cifs_queue_oplock_break()
-                           queue(cifsoplockd_wq)
-                           cifsFileInfo_get(cfile)
+                         smb2_reconnect_server()
+                         cifs_reopen_persistent_handles()
+                           finds open_file on list
+                           cifsFileInfo_get(open_file)
                            [cfile->count: 1 -> 2]
-                                                cifs_oplock_break()
-                                                  ihold(inode)
-                                                cifs_free_request()
-                                                  cifsFileInfo_put()
-                                                  [cfile->count: 2 -> 1]
-                                                  dec(outstanding_rreq)
+                           cifs_reopen_file()
+                                                  cifs_free_request()
+                                                    cifsFileInfo_put()
+                                                    [cfile->count: 2 -> 1]
+                                                    dec(outstanding_rreq)
     [wakes: rreq == 0]
   flush(serverclose_wq)
   flush(fileinfo_put_wq)
@@ -150,83 +145,57 @@ already flushed:
        BUG: Dentry still in use (1)
        VFS: Busy inodes after unmount!
 
-Furthermore, cifs_oplock_break() itself holds the inode via ihold() after
-dropping cfile and may initiate writeback via filemap_fdatawrite(),
-spawning new netfs I/O requests.
-
-Fix this by counting queued oplock breaks in cifs_sb->outstanding_rreq
-from when cifs_queue_oplock_break() queues the work until
-cifs_oplock_break() finishes, so wait_var_event() in cifs_kill_sb() waits
-for both in-flight I/O requests and any late oplock breaks to complete.
+Fix this by incrementing cifs_sb->outstanding_rreq when
+cifs_reopen_persistent_handles() takes a reference on open_file and
+decrementing it after cifsFileInfo_put(open_file), so wait_var_event()
+in cifs_kill_sb() waits for any in-progress persistent handle reopen to
+finish and queue its final put before draining fileinfo_put_wq.
 
 Fixes: 340cea84f691 ("cifs: open files should not hold ref on superblock")
 Reported-by: Adam Kim <adamkim@microsoft.com>
 Signed-off-by: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 ---
- fs/smb/client/cifsfs.c | 10 +++++-----
- fs/smb/client/file.c   |  2 ++
- fs/smb/client/misc.c   |  6 +++++-
- 3 files changed, 12 insertions(+), 6 deletions(-)
+ fs/smb/client/file.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
-index 8cff7857b4509..9faba158f8b6a 100644
---- a/fs/smb/client/cifsfs.c
-+++ b/fs/smb/client/cifsfs.c
-@@ -418,11 +418,11 @@ static void cifs_kill_sb(struct super_block *sb)
- 		flush_workqueue(deferredclose_wq);
- 
- 		/*
--		 * Wait for all in-flight netfs I/O requests to finish their
--		 * cleanup_work so that any cifsFileInfo final puts they queue
--		 * to fileinfo_put_wq/serverclose_wq have been queued, then
--		 * drain the workqueue so the cfile dentry refs are dropped to
--		 * avoid the busy dentry warning.
-+		 * Wait for all in-flight netfs I/O requests and oplock breaks
-+		 * to finish so that any cifsFileInfo final puts they queue to
-+		 * fileinfo_put_wq/serverclose_wq have been queued, then drain
-+		 * the workqueue so the cfile dentry refs are dropped to avoid
-+		 * the busy dentry warning.
- 		 */
- 		wait_var_event(&cifs_sb->outstanding_rreq,
- 			       !atomic_read(&cifs_sb->outstanding_rreq));
 diff --git a/fs/smb/client/file.c b/fs/smb/client/file.c
-index f51653cb6432a..146ff2adfa244 100644
+index 146ff2adfa244..e0b56c6c2c743 100644
 --- a/fs/smb/client/file.c
 +++ b/fs/smb/client/file.c
-@@ -4023,6 +4023,8 @@ void cifs_oplock_break(struct work_struct *work)
- out:
- 	cifs_done_oplock_break(cinode);
- 	iput(inode);
-+	if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
-+		wake_up_var(&cifs_sb->outstanding_rreq);
- }
- 
- #ifdef CONFIG_SWAP
-diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
-index 4d0df73d15d7a..72a986bfaefc4 100644
---- a/fs/smb/client/misc.c
-+++ b/fs/smb/client/misc.c
-@@ -371,6 +371,8 @@ void cifs_put_writer(struct cifsInodeInfo *cinode)
-  */
- void cifs_queue_oplock_break(struct cifsFileInfo *cfile)
+@@ -2044,6 +2044,7 @@ bool
+ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
  {
-+	struct cifs_sb_info *cifs_sb = CIFS_SB(d_inode(cfile->dentry)->i_sb);
-+
- 	/*
- 	 * Bump the handle refcount now while we hold the
- 	 * open_file_lock to enforce the validity of it for the oplock
-@@ -379,8 +381,10 @@ void cifs_queue_oplock_break(struct cifsFileInfo *cfile)
- 	 *
- 	 * Only take a reference if the work is actually queued.
- 	 */
--	if (queue_work(cifsoplockd_wq, &cfile->oplock_break))
-+	if (queue_work(cifsoplockd_wq, &cfile->oplock_break)) {
- 		cifsFileInfo_get(cfile);
+ 	struct cifsFileInfo *open_file, *tmp;
++	struct cifs_sb_info *cifs_sb;
+ 	LIST_HEAD(tmp_list);
+ 	bool retry = false;
+ 	int rc;
+@@ -2060,12 +2061,16 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+ 	list_for_each_entry(open_file, &tcon->openFileList, tlist) {
+ 		if (!open_file->invalidHandle)
+ 			continue;
++		cifs_sb = CIFS_SB(d_inode(open_file->dentry)->i_sb);
+ 		cifsFileInfo_get(open_file);
 +		atomic_inc(&cifs_sb->outstanding_rreq);
-+	}
- }
+ 		list_add_tail(&open_file->rlist, &tmp_list);
+ 	}
+ 	spin_unlock(&tcon->open_file_lock);
  
- void cifs_done_oplock_break(struct cifsInodeInfo *cinode)
+ 	list_for_each_entry_safe(open_file, tmp, &tmp_list, rlist) {
++		cifs_sb = CIFS_SB(d_inode(open_file->dentry)->i_sb);
++
+ 		/* do not flush */
+ 		rc = cifs_reopen_file(open_file, false,
+ 				      CIFS_REOPEN_BOUND | CIFS_REOPEN_NOWAIT);
+@@ -2075,6 +2080,8 @@ cifs_reopen_persistent_handles(struct cifs_tcon *tcon)
+ 		}
+ 		list_del_init(&open_file->rlist);
+ 		cifsFileInfo_put(open_file);
++		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
++			wake_up_var(&cifs_sb->outstanding_rreq);
+ 	}
+ 	return retry;
+ }
 -- 
 2.43.0
 
