@@ -1,55 +1,94 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.171
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794879268;
-	b=j3eaz3zccHHHViL6jMITDCC4KMEIqq/7gD8lHKMkTLjc3zYzEWP067ka5T8cNdn0HOjz
-	 +9nfHXUG3FvBDKOI3+zDz8uIsTDPE3y5F/Z5ECAeF4UCYyclxfxu6zeSfdo0BJo3Bog/O
-	 QjD+zlv9Tauao1Shta5tWn3StbijzXtmXY5rx3zlLSi1I/k/E+e9HCZzSBvXFwn2L/Pkg
-	 RxBvJhxTvjNccdkFhPT6JEFZ/aHM7mwsjfHHBYzqnpYnB5WNno5bO2CHpdwpZO1ykW1ZI
-	 p2pqrhS441Y+lZqolWq0Lu3cAgARm0KsIFYr3tLWC7OGr95WCtY1C13xGhxtVoRXEeQ==
+	t=1794889433;
+	b=ptdr7GBv4xc/AmAY1ix3IJwN+rBvfRce7+WJM8Iek/o5hd8gERh7Dn/sXkhTlxIlDdns
+	 DaiGTUbuBgFzS9h50l4y//sc8AAGNBquEbQGvvN8TId0KcLjmKrvE0g84fQmSRLA7GROd
+	 FX3crcqz0KgfPYVf5JQnHMfCc2EQQhLIW4Sv5xyni4m+y+kSZqIi7Oy6RBizJ+xXhXnZA
+	 hP/i2/Qra60kMhygHxT3+I9n5jKv7JHrkVZyV9zry3nZ979pnusM4qXldVPdlIf1f28w3
+	 IPug4pfAVtqwfcNt/NUVk/hepSDD7p2ufGVN/VJZsPG9kN7wov5nYcxj2FjZCPgF1Nw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794879268;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=6NFvMXt49n0aMhQ+tPrYzjCU429v93v4p/pcosygBN4=;
-	b=Fgjnbh52ZAHNE86m3IBNSAPUZJf9Qci9ONLL/EaNYOBMeSRRcgc4OnITQk7rtHHc5ZbS
-	 Mwe4Soh6RGzwT9/o2DLPQgizMTMoTfTMyam6cSeVjy3BYP4PmG6nMtskcyNUp/8kdOfpX
-	 nxZ1UkAV1BPmqIqCUAGX9MepLh0oiNhWZn3NRpx0Z7BaKjjZyOxXnfuxTacdzBHBgBs5X
-	 PhlHhNh3hK5fK04iN8t+3C1ls0lGWrBbcAHsxHSXz0y27NDfhlbGOjgy2n3o2qyh3eizF
-	 Xd2QPOYP9Vr/ORtotnVnw2m60B4LH6VDR3FZqNaPK6/6/dI8ze/x8mEqQrTgHSOS3WQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794889433;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=MJFJXL0qA7EgCzo1DXahTwcwkNU+5s7BLIy9HpDlOOY=;
+	b=mUL7NKDlyyG3Ed4xZfk/Pwy+GCWtMtLCS1i0O5vVXw1EhXvF+cTQqZuRcdNZelClZ1/K
+	 gTZuEN0sZxg6GFJIKbdmLvksL+CrRTvoQAGF6VAQzHuSfoehTS7+Dxxz9ETXda952HC2f
+	 jSfmwvBAOq4D1w/StD3+Qoav5qKyWHMunx5f7Qzs61ynJzuHcpWadUB9s+/QzBzyUujdh
+	 uQXYTkK90k8lXlHmBvt93aFgHsTm7Kp8KJ3wx/mnQpT1jd+MqZ1rUOIZi5yE/j8toLwG+
+	 PqTTUASc/yFioH7xMbzxZ2jHh/RxnqLuoczNbRTN76+3XHaqLBYBqdIC1iMpHCZDYOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lIXtZVi+;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lBXCOm5p;
+	arc=none smtp.remote-ip=209.85.215.171
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E634606A31C
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 01:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E771606A331
+	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 04:23:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0E771606A331
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=lIXtZVi+
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F02E51F000CA
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 01:34:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794879268;
-	bh=6NFvMXt49n0aMhQ+tPrYzjCU429v93v4p/pcosygBN4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=lIXtZVi+fCWm+GTs6b+USE4T2SqmX3VeNqyLAjeClqIVga3wBTP4CjEKURvJGP4ta
-	 eqzNRgUw3cwF7S1NK7vTNyOYM1GtOOAg3u1dYdapR3q8+/D4bhGfoJMuNgp6cAwbeM
-	 wKsDFmJ2kUQPQaFhEeypS+fOUnmMY5JX00AxWLzI87P4C/f5vw8GqmNrBj4Sf4UamI
-	 797noCQEpa5vt9B0dQjU39xGDxz9hgw8Lc6qDAfR5zt+MI8pZB6UZzk0azJ4X26km/
-	 Z1K/qyFU+Cj67aTSfBfv0vZpHubW34P7gKpXfxc3IwpTR3DDbhYUcbN0fMEPf1jmkh
-	 rbf+CVW9Id8rA==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6b807aab44fso2314864a12.2
-        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 17:34:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFoMWFD6tc02Nf3aq5QtTGAXWRgAxOx8k/IQmFZxHw8Wb6txQGEM6rmjqWG7G6IzrE8hmzwyfpyQTm2@vger.kernel.org
-X-Gm-Message-State: APuU4Z+yrHzKOYQB0vo2Z6dRuXln6/w7utCw1mM0fIdMuT9cSdj12LwJ
-	l+NACiD/N5O9sAA05fBG6dijaN9+MabnUkrcOTKp9cArLjX3Etn/qUACqeSdpRgxtIMZIHE13l6
-	aAnkjKUplBSdKx+IJmY3EQyPhOM24dGE=
-X-Received: by 2002:a17:906:c14d:b0:c50:5cd7:2901 with SMTP id
- a640c23a62f3a-c509640bfa8mr990170866b.23.1794879266573; Mon, 16 Nov 2026
- 17:34:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=lBXCOm5p
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-cd6acc50b8dso2064685a12.3
+        for <linux-cifs@vger.kernel.org>; Mon, 16 Nov 2026 20:23:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794889432; x=1795494232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=MJFJXL0qA7EgCzo1DXahTwcwkNU+5s7BLIy9HpDlOOY=;
+        b=lBXCOm5pef64nqws0Ad4zRtr/Dzy8QWuZeXGQX7VDUF81eeF9+yeWLppPVAKQ8gmO3
+         XVIQojYrU1z4+rTQV5vx4vmGcXwhtELC40Jq61sHsB5ZZnjy+DvL+T6rRnXTtd5tIY4I
+         U1MF1QjzchHtOT/Xnnh03L4pQuPJASsNhKTyVR8UlfiTQycPzolKTP0lgV86RsqCfIBs
+         ZGajV+uy4QBJmdMzqgafBs/8z6ts28HcRM4pr6pedLE9J858hqwlqZ7KlNgKzpV0mFgs
+         s00MxfKcgya9ubqnXiPw2JQEjqxYZnlbp/AbpF9H0zvjmD9oIryIPCT8FwimLKFrtZSD
+         hLog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794889432; x=1795494232;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=MJFJXL0qA7EgCzo1DXahTwcwkNU+5s7BLIy9HpDlOOY=;
+        b=oJ5MDnLwtJoC9UT6gRHBZLtZ6vn9xtB/ZFrSeSTkUG8DHI1myU0K5sVl5kUl7Y6fqK
+         w0HvSXP+B6MqvQRJ/4SFsfItx+onkVKMDVll9qoMDj0AuADa2v4oa1TS+QnZEd6uB6LV
+         vh5tsDOUz/4VZKteDLeR460wDK2A36pf0uYIgq/ogsaS0m/X9FQNFZFM5siehLsnwjTq
+         pmvIJlXs7uqwPICz1COlnEObOu9Vg3Frm/Q7ucgpAAWsnyKGPWKOLVPxl51Xumln2Yyt
+         INrp16LK4G5scmsTZvw1dw4Z55gnmSPG0qtcrcdl8MOlrMjzE8iSlJZKtuCeq9mv3T0x
+         E/IQ==
+X-Forwarded-Encrypted: i=1; AL+hErHgGQS2/3t370+POJOxpNJFvQ2osL3GtuM1ZQTgSjZnKcxXmfCM0YXo+84Wgyv189dkKkAyRLzadbTv@vger.kernel.org
+X-Gm-Message-State: APuU4Z+1GqFCQvJuwDI7gvv8EKna0v/4jYeqan8KURa8/JyczBBYGFvv
+	EmWeg5znM4UWia72+zmj72zf2d7l/13gSNEIYmTPaNFs4vUCCMyTO3QA
+X-Gm-Gg: AZFdTZduWzi64TQouhKiwlPx+EXw95biK1COUaU8OD9UnXthwwupH0ugqzi1AWg0h4v
+	pbW4brwZD4Rl2E9KHEcq3Q5TF0b1KmpUlx66QqusPdC7lNS5DhSqDmQhJFSHvbYBP1pvkEnogrM
+	LfcVBr+1fWNcmetcexxKsM2DfXFE/heif4bM3L6wG5hXKdiwJiWMR0bCwRl2/T06b76wSKgMWh9
+	0nAAT6mX5GXwGSnPnLqSFUmfVG+vXLoLiAvmitreNcTcHyODgCMrfVYdQAFjvb3BVK8DVqzs5pi
+	DWbk04dx1qU8clpMx7xkI4WrTVhq2etdRojj3ycGyjZconkEupQ/OGj82JbOa0zrtUe5XFzyGzm
+	jaYw++lgK0aO6BsrrfveQj5bi+2DOoGvEuzCdcOcUFNjlm8XCQOMMt3AH2h7v9Jj0Lw8k5JXRTd
+	3CyzItHW4/jG3PfSvFF3SQ1mM/jFVR2V8Ced4v6HM+zEsKhsL3YY2lHPhCIGvLKEANI/pDCV10Y
+	KVDQNM14ME3KgtaKcpyqc/M5dsTGi9F+Oc7IXtB9U8MmBxR4nds5dyueoEiPr7WQogfefgDPleN
+	Fh5fGZ8bQWodBOIuOd0NKlYgv0txWxu8A7ysdpuXLC2AxZ2n
+X-Received: by 2002:a17:90b:1f86:b0:3ac:4e18:237c with SMTP id 98e67ed59e1d1-3b1b05b4590mr12347836a91.0.1794889432387;
+        Mon, 16 Nov 2026 20:23:52 -0800 (PST)
+Received: from hj.. ([163.239.22.29])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b1b39d73c9sm10484995a91.2.2026.11.16.20.23.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Nov 2026 20:23:51 -0800 (PST)
+From: Hyunjung Ko <hj351016@gmail.com>
+To: Namjae Jeon <linkinjeon@kernel.org>,
+	Steve French <smfrench@gmail.com>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Tom Talpey <tom@talpey.com>,
+	linux-cifs@vger.kernel.org,
+	stable@vger.kernel.org,
+	Hyunjung Ko <hj351016@gmail.com>
+Subject: [PATCH] ksmbd: reject SMB2 read on a file opened without read access
+Date: Tue, 17 Nov 2026 13:23:41 +0900
+Message-ID: <20261117042341.4023597-1-hj351016@gmail.com>
+X-Mailer: git-send-email 2.43.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,92 +98,44 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261116074849.475815-1-stefan.chulski@broadcom.com>
- <CAKYAXd9KT=1vLYsnRKxmiM6pLJQNACXuodD8wNQzb8S5apiuRQ@mail.gmail.com> <CA+Fu+LPL7xqpV_vjjjehedOFtuuBqgZHZTSqJ+FgweUpYo2uBw@mail.gmail.com>
-In-Reply-To: <CA+Fu+LPL7xqpV_vjjjehedOFtuuBqgZHZTSqJ+FgweUpYo2uBw@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 17 Nov 2026 10:34:13 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
-X-Gm-Features: AclHuK-kfPqc8Bh37Jzng9-4IO0zn_61dopqd1mYNeZxWXG2ijut7JfpzpvArRM
-Message-ID: <CAKYAXd--x9UajLQwzRUwxRZ7PFW5T02xyHdSAnThAo326p_kxw@mail.gmail.com>
-Subject: Re: [PATCH RFC v1] ksmbd: add use_unbound_wq module parameter for the
- ksmbd-io workqueue
-To: Stefan Chulski <stefan.chulski@broadcom.com>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, linux-cifs@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ilya Lifshits <ilya.lifshits@broadcom.com>, Huiwen He <hehuiwen@kylinos.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 16, 2026 at 9:52=E2=80=AFPM Stefan Chulski
-<stefan.chulski@broadcom.com> wrote:
->
-> On Mon, Nov 16, 2026 at 2:10=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.or=
-g> wrote:
-> >
-> > On Mon, Nov 16, 2026 at 4:49=E2=80=AFPM Stefan Chulski
-> > <stefan.chulski@broadcom.com> wrote:
-> > >
-> > > The "ksmbd-io" workqueue has always been per-CPU. Commit 69635d7f4b34
-> > > ("fs: WQ_PERCPU added to alloc_workqueue users") only made that
-> > > default explicit as part of the treewide transition to unbound-by-def=
-ault;
-> > > it was not a ksmbd-specific decision.
-> > >
-> > > Per-CPU work keeps request processing on the CPU that queued it, whic=
-h
-> > > is good for cache locality, but it also runs work on CPUs that were
-> > > isolated from workqueue noise (isolcpus=3D, nohz_full=3D) and prevent=
-s the
-> > > scheduler from placing blocked or long-running workers elsewhere.
-> > > Which behaviour is better depends on the workload and platform.
-> > >
-> > > Add a boolean use_unbound_wq module parameter. It defaults to false, =
-so
-> > > behaviour is unchanged unless it is set; when true, "ksmbd-io" is
-> > > allocated with WQ_UNBOUND instead of WQ_PERCPU. The "ksmbd-break"
-> > > workqueue is already WQ_UNBOUND and is not affected.
-> > >
-> > > Document the parameter in ksmbd.rst.
-> > >
-> > > Signed-off-by: Stefan Chulski <stefan.chulski@broadcom.com>
-> > Hi Stefan,
-> >
-> > Do you have numbers comparing the per-CPU and unbound queues,
->
-> Yes, on our systems we observed up to an 18% performance improvement
-> when using the unbound workqueue.
->
-> The primary reason for this improvement is that with the default
-> per-CPU workqueue, ksmbd-io work can sometimes start on a CPU that is
-> already heavily loaded. Because it is bound to that specific CPU, the
-> scheduler cannot move it to a less loaded or idle CPU, leading to
-> bottlenecks. By using WQ_UNBOUND, the scheduler is free to migrate the
-> work to less loaded CPUs, which significantly improves our CPU cycle
-> efficiency.
->
-> > How does this compare with the earlier following RFC ?
-> >
-> > https://lore.kernel.org/linux-cifs/20261022092514.2590010-1-huiwen.he@l=
-inux.dev/
-> >
-> > Thanks.
->
-> While both address the underlying scheduling limitations of per-CPU
-> workqueues for ksmbd, my patch introduces the `use_unbound_wq` module
-> parameter rather than changing the behavior unconditionally. Because
-> the optimal behavior (cache locality vs. load balancing) heavily
-> depends on the specific workload and platform, this approach keeps the
-> existing per-CPU behavior as the default while allowing platforms to
-> easily opt-in to the unbound workqueue when it yields better
-> performance.
-Could you provide the benchmark setup and actual results? If
-WQ_UNBOUND generally performs better across representative workloads,
-We could make it the default and provide a module parameter to opt
-into WQ_PERCPU instead.
+smb2_create_open_flags() maps a DesiredAccess that has FILE_EXECUTE but no
+FILE_READ_DATA (e.g. FILE_EXECUTE | FILE_WRITE_DATA) to O_WRONLY, since
+FILE_READ_DESIRED_ACCESS_LE does not include FILE_EXECUTE_LE. The resulting
+file is opened without FMODE_READ, yet fp->daccess still carries
+FILE_EXECUTE_LE.
 
-Thanks!
->
-> Thanks,
-> Stefan
+ksmbd_vfs_read() only checks fp->daccess & (FILE_READ_DATA_LE |
+FILE_EXECUTE_LE), so such a handle passes the access check and reaches
+kernel_read(), which hits WARN_ON_ONCE(!(file->f_mode & FMODE_READ)) in
+__kernel_read(). A remote client can therefore trigger a kernel warning (and
+a crash under panic_on_warn) by opening a file for execute+write and issuing
+a read.
+
+Reject the read when the underlying file was not opened for reading.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Hyunjung Ko <hj351016@gmail.com>
+---
+ fs/smb/server/vfs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 1f2bc76f0d09..cb3f4f5fe9cf 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -367,6 +367,10 @@ int ksmbd_vfs_read(struct ksmbd_work *work, struct ksmbd_file *fp, size_t count,
+ 	if (ksmbd_stream_fd(fp))
+ 		return ksmbd_vfs_stream_read(fp, rbuf, pos, count);
+ 
++	/* The access granted on open can include FILE_EXECUTE for a write-only file */
++	if (!(filp->f_mode & FMODE_READ))
++		return -EACCES;
++
+ 	if (!fp->is_posix_ctxt) {
+ 		int ret;
+ 
+-- 
+2.43.0
+
