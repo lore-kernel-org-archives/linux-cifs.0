@@ -1,55 +1,64 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795038816;
-	b=3FCPexNFSsgcJtDlFVENscd/whRMLS/Q+KmcdLwY/O9DhPYXo/dfOLtcxfIK1czUykNQ
-	 oRyNuQlZs7PAsJWVVdKYw3d4AKDe4DAYFEdS7sksldIhgjrAWMiWeSQresgk6bJej/n8B
-	 6Hk8sHwotfekSKBrAEvWEuE2Hok8xMt5ieT+46SPazqwv6sCN6amrkKggEeQyetR+71B7
-	 YAKg0OwAqQv1M2TgDKW+Mcj2pLN+9pYyXtSTe4TgBlQv+mmKNUWAVFpve/RTPR9intMyA
-	 Ld/ermI+TWO4WCxozRb44wDYVjVWjGZiyEmaW8SkLMRi0T/PiatfhjdFzbFAzCvcpTg==
+	t=1795039372;
+	b=g5ybAXUB1SDqD98Pepw1d69mxHocSQRy999qy1j3/2CfHZCb9yIUj5JvZkVwc8Hha1+k
+	 4aqSjtVmeVhHAm63vH8Lr3j5yGOaSVEG8MfciKmzvDU0mNwXO5+Jvx71/Vf3fgEAgoMs2
+	 Or23pjweEnIZflHGeDw3LNsdueKwpACbRTQcAe0jLUehY6QTNe8MwT8t0VvQ0shYLWour
+	 t7HlJfR4XQK1IQixr7SmAqZfaoHtgzLijVHCuWtxmYju+XYjFNtSfIT2/m5ob7xZ366U4
+	 Nysa6fbXO9LtDBpqJKnEgt5e9LdQ5oTf0DecdXMlTK1/RX3UKpwUJ0h3kVud8GAzDOw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795038816;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=MdGg7b7rxhlsTJTeV38C/+cZfx3rlg88OB46RTb00Rs=;
-	b=SdcHa2LeKBwC40NrKSB5mdw+6xlnx8ql3A9NZ3IdM1OGb23DHw7lg5krQ1vYrvcdmfJk
-	 c18ShoRV/NBnpLyqwdkk0iimg8G6BCeYVWFd3qDP9OBo0pR5qOkG11cwUQDM3d+0b0AKM
-	 i8sgKp+bBN492V5Dmyr21EvEnAY0p1+ihzcIdGq8UNIpyNeQyRvgFHW2Bllx//G2PPBd+
-	 6yWc9085kq/1zY1Ox5F9eLifyb/hUhjP5VmMblmfWFDFThvWOITB5cxYKi1PTrPCuoM2E
-	 i6LKL7IebLwDuCC10BiyV9WXRKs5Ycps/IGYh6AYW9leUaQ1BfqJzvTulzeSKiOpGEQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795039372;
+	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
+	 In-Reply-To:References:Date:MIME-Version:Content-Type;
+	bh=5RMqObuj0fL+2jdnL0nqymmDC8FL7Dnnl2i27KqPBdo=;
+	b=V4n289mhPSn64t0tWL60IbApYWlv1KNfa/wDwVxGtn9cW37G6LpvZfuy/5G5/Br2G9f1
+	 DRCumyUtxvyLousm9BySKDYXw7KJjCrU/9k5MxCEBd+Sn7pqNr32k3qNDjnWvWo0ifRU+
+	 Ji+9i30wUcHb0/7dTFHqQ/eSTbEF4J/tLrxre158fSIfBP1A+tIUhnYw+g5ty0Yba05x8
+	 44LL7s5by1Tgf9VhOYstu71Mm5hhjn/c8fkRx9UZd67B9JBsXworhx6UDGTCzOe1Y/lH0
+	 +/WSEE7vBfEL4QmKuaXgKxisIMMoKOk1RUx6xzPrJQP48tGR7qdLmNJQF4aJ4wCOtOA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WVJOd6pD;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=manguebit.org;
+	spf=pass smtp.mailfrom=manguebit.org;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=lhZEe7j8;
+	arc=none smtp.remote-ip=143.255.12.172
+Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE209606A320
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 21:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDDA606A32C;
+	Wed, 18 Nov 2026 22:02:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5EDDA606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=WVJOd6pD
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7D211F000C7
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 21:53:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795038816;
-	bh=MdGg7b7rxhlsTJTeV38C/+cZfx3rlg88OB46RTb00Rs=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=WVJOd6pDrmsWrQOJCOEgCWSLmfIoPidxmraVEPFoHOHx2WOzTL3G4tIGJ6fK5D8Yb
-	 bjykPCw70Qrf6yC6P9ENM0BY1UUUrjMLWvYQsAB1nL/eKg3gnV3OyBhLsWZOMdla5d
-	 qJ/TK8/s0Ce1EXaWQWjL2LWJfcjiNTdUSdlsxX6Njh/7zqy7p4cMqCdRJHTRyb5L15
-	 RHPnhWQu6ATQpqmfmYNrkjxkcIqGa5sIGg46mnLESklxIOc1yRmkqSfuufE+Jal451
-	 sBXa9uTbCsST7rcCvexctmO8Qt+gVZ9svPkPw5vF3ENpqtTu54bqSNHIyZYTEPohNb
-	 nvSxZz8AqB9xw==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-c50e26763a4so237467566b.1
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 13:53:36 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErEkdM+uYWrazb1v1xFQeiu/3VThGm2s8IRdzeyiYNicfWJPjup9BxC7iOBEaoOQLYvqX1QDspvIMnW+@vger.kernel.org
-X-Gm-Message-State: APuU4Z9k1zi3/7hCbk4JGaWz5ZvGsemYIf6FGVnxtMDJ2ML/yqU+WqHw
-	oxmfHU/mnx/JaohQVQ2akDb33CKber5R5XKPcy2vC1o2W+xtXcrS/M81ootiGOD57Vgg92jNOPl
-	h+58IH+KvXi7ZT3N/iMRy+/EIfGtFuSo=
-X-Received: by 2002:a17:907:3d10:b0:c31:5bb8:4b3b with SMTP id
- a640c23a62f3a-c510dfd72b8mr372753766b.2.1795038815384; Wed, 18 Nov 2026
- 13:53:35 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=lhZEe7j8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5RMqObuj0fL+2jdnL0nqymmDC8FL7Dnnl2i27KqPBdo=; b=lhZEe7j8EqJRkrtOxvTsIzWjRq
+	QFlsxnE1RuPHwRC47VXH3t5xZXqltIiyGYqsJtEXPAtYuJdbGrmzoFA0KyBu8xoWsKA79rRpa+L71
+	WV7vDQ2Szsce3qf7JmiVDp0ZV1YdwmBtgF+1PA4pMzztiW9ve7EsgA7spSnoJ3erfAHkfEXuH5cBx
+	2KzHnpphrlloCD6E/Fz9BVzzNF3iqZ+CO2tHF2zd3Zsf3aim5AfqZwhp0VUs+TRvYbRtT4sWrXUv2
+	6SW5hdfaHj8g4PK7noSYfD2W9XZm7Zvz4jwnH+ls/8XgmS6ae7a/7TOJlgTYxu6/EAegnsPreh8C4
+	RPFnkApA==;
+Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
+	id 1xTnjk-00000000KWJ-08hW;
+	Wed, 18 Nov 2026 19:02:40 -0300
+Message-ID: <696b8c3e063478965da1084ffae1d6cf@manguebit.org>
+From: Paulo Alcantara <pc@manguebit.org>
+To: shyckless@gmail.com, linkinjeon@kernel.org
+Cc: ematsumiya@suse.de, sprasad@microsoft.com, linux-cifs@vger.kernel.org,
+ bharathsm@microsoft.com, ronniesahlberg@gmail.com,
+ samba-technical@lists.samba.org, daniel.birtwhistle@gehealthcare.com,
+ linux-kernel@vger.kernel.org, smfrench@gmail.com, dhowells@redhat.com,
+ tom@talpey.com
+Subject: Re: [PATCH v2 1/2] smb: client: fail SMB2 responses with a bad
+ signature
+In-Reply-To: <20261116-smb2-sign-v2-1-a823a90d0db4@gmail.com>
+References: <20261116-smb2-sign-v2-0-a823a90d0db4@gmail.com>
+ <20261116-smb2-sign-v2-1-a823a90d0db4@gmail.com>
+Date: Wed, 18 Nov 2026 19:02:39 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,37 +68,46 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261117145005.2638107-1-icb@fastmail.org>
-In-Reply-To: <20261117145005.2638107-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 19 Nov 2026 06:53:22 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_4G3K1dbOrX56FFhGRcmk5vb=BNdqMpjTVbjY2NWOemQ@mail.gmail.com>
-X-Gm-Features: AclHuK_FhTDeCkHXhLhFaARSCJM09EedOfHEgPt56CjNCi-eFOuqKduFq79lGjE
-Message-ID: <CAKYAXd_4G3K1dbOrX56FFhGRcmk5vb=BNdqMpjTVbjY2NWOemQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: do not log a stale security descriptor as an error
-To: Ian Bridges <icb@fastmail.org>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Tue, Nov 17, 2026 at 11:50=E2=80=AFPM Ian Bridges <icb@fastmail.org> wro=
-te:
+Suyuan Wang via B4 Relay <devnull+shyckless.gmail.com@kernel.org>
+writes:
+
+> From: Suyuan Wang <stevewong@hust.edu.cn>
 >
-> ksmbd stores a hash of the file's owner, group, mode and POSIX ACLs with
-> each security descriptor. ksmbd_vfs_get_sd_xattr() recomputes the hash
-> when it loads the descriptor. If the two differ, the descriptor is stale
-> and ksmbd treats it as absent. That is expected after a chmod, chown or
-> setfacl on the server, but the function logs "hash value diff" with
-> pr_err() every time.
+> smb2_check_receive() checks the response signature when signing is on,
+> but a failed check is only logged:
 >
-> Opens, security queries, hide-unreadable listings and inheritance
-> can all load stored descriptors. Repeated opens of a file with a
-> stale descriptor can therefore fill the kernel log.
+>     rc = smb2_verify_signature(&rqst, server);
+>     if (rc)
+>             cifs_server_dbg(VFS, "SMB signature verification returned ...",
+>                             rc);
+>     ...
+>     return map_smb2_to_linux_error(mid->resp_buf, log_error);
 >
-> Report a stale descriptor with ksmbd_debug() instead, and include the
-> file name in the message.
+> The status from the response is returned as usual, and the caller goes
+> on to use a response whose signature is wrong. This is the path for
+> synchronous and compound requests and for smb2_writev_callback(). On a
+> signed but unencrypted connection, anyone who can modify the traffic
+> can change e.g. a directory listing or file attributes, and the client
+> accepts it.
 >
-> Signed-off-by: Ian Bridges <icb@fastmail.org>
-Applied it to #ksmbd-for-next.
-Thanks!
+> Return the verification error instead. That alone is not enough for
+> compound_send_recv(), which still hands the response buffer to the
+> caller after check_receive() fails. smb2_compound_op() then maps the
+> status from that buffer again and copies the payload out, and other
+> callers look at the buffer on error too, e.g. smb2_open_file() parses
+> a symlink target out of a STATUS_STOPPED_ON_SYMLINK response. So also
+> mark the mid MID_RESPONSE_MALFORMED, and have compound_send_recv() handle
+> it like a mid in a bad state: mark the earlier mids cancelled, so that a
+> CREATE which did succeed gets its handle closed, and don't pass any
+> response on.
+>
+> Unlike the SMB1 fix in commit dc96f01d54cc ("smb: client: terminate
+> session upon failed client required signing"), don't reconnect: this
+> runs in the thread that sent the request, and only cifsd should call
+> cifs_reconnect(). And fail the request whichever side required signing,
+> since a response with a bad signature can't be trusted either way.
+> ...
+
+Applied.
