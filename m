@@ -1,90 +1,61 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795004844;
-	b=VcYs6cvlK/nE8KOXo4CCZgC626NDo66/D3cPTfq8Ed1hzjSQH8lT9welfCqsJUnvceSW
-	 79t5CiBA/ZqYn6g73/INjjDW8N71m+St6WwFuaWEgEBIKrQZj34j0GIul62I0ZUhe7WPw
-	 4Bp5RdXW4R3hMsr21NtnFSG/BEoTbYtoFDkki6K/iOCjWqWokO43sVLv0CoZkOF67QBdt
-	 U8Icus3L4Q8AYOgi+D+aHwzUMB6MwwRFOXeAmaUpdLZn/ufHtRFXsZzz3NqY5ONHcpdaS
-	 MENaYU9C6dUv4fhM5VejCz0WQlrc1v9vFAJLYSOwrGB24jBBBNC7PM0LhlsWutLxQwg==
+	t=1795005362;
+	b=MArhJEPGoyl1yEnb3veQ5PkEK4KOdZWz4Un5MQpAxQDwz244UdFjyZMWmdTtXHhlS4X+
+	 DFa9gOouM5XWoC/8/rNzUkSKUXpbZHcxEW/3idHV6Ct0FQIsqqEn37X0hBy4yOii9Rrg2
+	 8PmZW7fZsM70ltCUXUSzwFTQkS5QaDzhjHqKUD9UPK9DiwOZzSlADkaUbaKXImzIVhn3Q
+	 Em3FJJJEhWZ0rMrl7vKiwlVM5GEpy1NBICHkCkDQXghVODctVE/f0aMRyqvQ34jJ4Tm48
+	 oYFTZ7nNB0/a4U4SMCelynk+1XInLm5XPKVYSyQayO6/8swseGKg1f4wHufVsODLkNg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795004844;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Gm-Gg:X-Received:Received:From:To:Cc:Subject:
-	 Date:Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=xz2Bk4myv4eiO5R8ei+E2wIg7nTAaAYUNv7l92Ae3Cs=;
-	b=ztIH7Eud/tr0KP3I23IUTBSrraXqQQsCYrnYmkbWfkb1ED4XpS9Wmy+2B9QRuJjFOvwW
-	 0GdG/OJnkvksmYiqW4K2LVIHeDmt4lTXqYlZ3LCx1TzpRRgAssgCejXOSag2sjE725Esf
-	 HhTP1yIRfwIIx3obpdSzFIILXIOxqPiA0pYYZb0pMI2TmADKqCRl/kNmRnj8nvJCMsi5O
-	 5AGqZ+lzfsyAk64bdarr0V8D3Ikq69vFrTebeB0/vLu1GoiK8YhWZHdRA6gXakMHk9pFm
-	 ylvK4pX3G2IBLP6yizj6Ynnboce+q1Bj9Mof0cQux9BfbLiJ/gHMfMZvTGCKhkEuaxg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795005362;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
+	bh=CVVMPE+j7KjW39jvyf6/oFfejt3hTMTeayg9+QfA8JM=;
+	b=jmmW7vD2SjD7LlgDBpvfw0Fk3VUPpIDpHD9EHfEMKSEY/OzfDHLKxaAq4J8piL5+W95O
+	 8ehzi9cZWCkOeiEBZ0J1bzDjMFXGfJLmbX4ChJAEFJGNSkO8+LZ02iRPbHVPQxnoQnRfE
+	 qpNBAMRc2y5ZD/R8P830Pr9ObFvCUk0HAndY1gRgZoIs7YnaSAEX9Ny+KHHYBpuEPGwZj
+	 LM+f3Ps1qHyik2VKuVa0yjUdSIa2+TkoRcFWXNu1KkVjKG1PQzeAE4QgEm+BE/SE0xN1L
+	 4XWUSYf+ChKjcmO8X4NssgP9597GZQZr/zwdHm59UXS/6GHCsJfxxoEy6OT+/uUBFqQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ywd4nucm;
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cmhFiyIL;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E51606A31C
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 12:27:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 82E51606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ECC8606A31C;
+	Wed, 18 Nov 2026 12:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=Ywd4nucm
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4a35a60499eso6988045e9.0
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 04:27:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795004843; x=1795609643; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=xz2Bk4myv4eiO5R8ei+E2wIg7nTAaAYUNv7l92Ae3Cs=;
-        b=Ywd4nucmEYLm0ATf0Lw1ZckaxEs0EzvRGYnkn/XOiMmiBstiWvmgQHqN64PEnM0tWX
-         +TfO+Inb/WfN8XdC17/40AWe51QJW68L4/jKNnFE6XY2JI/pMpkqnPZOMCD+wYbGCRXK
-         Tn8Q/Ap/GNVbC3IrqYJW3ZRrvqv7ChIn1W2VWyE5CxxRaWm+QQzXJ5GQEp+ZhN+NujWW
-         8q4HwHi6LGkl9tEKMtyNIXgyUYqIF7BFkl3SLWHUbichUEgJ7RwAPaOLKPNv7zsEM/S6
-         O2hn9kriQaukT7CMwu8pX12gl95KBr5bLklbZtB5DcWG3p867P91Y1DiNleztWSEfRb4
-         uHmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795004843; x=1795609643;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=xz2Bk4myv4eiO5R8ei+E2wIg7nTAaAYUNv7l92Ae3Cs=;
-        b=nVCB3q+iCmBKrj5LhcJVxiOUUiGPjGFPwz8SdUFaXlDzocCvC6qnq7KADe75i4oZLn
-         UepqlyUZrMjtgqKNh7ktnhILk7qDO1WrkNDEH49kVFkdWJd3tFE6nDTlwoHUvne/fDY4
-         6wM6dDgXLuhoeWytNSz3ouRvjNXo9iNOVQUeFAjNpNs4Y55W2OujgNxnoCkKYnErgljn
-         coJo9WbQv+29ghXY4jELPbHzvcX9LsgyhzeTZu7bqZqL1DLBgQm8SpFqTbanRRkWddu9
-         d/glFIrjgW/SiYuw+dbGIAtFMjhQN6dxHFu8Wdg5GDAYqarcY4Ic2y0rikSH8RIEpHVv
-         zyUg==
-X-Gm-Message-State: APuU4Z/CRI4kRNnRbhcDndEZ4zBGvdnkCs1fTvsNXwZJ2+0iq8Ot/YYN
-	9yxbRK8MtwT6oVIK/5RVGh0xnq2eG49raIf/S4va96wPof0QOu1vf3W/1UOdjoaA244=
-X-Gm-Gg: AYBFou1BLqARDFsUsqBCrLxmaUG0yZSB7+cqquUn2u0lMf3VfeHMT9QB/ugTgKWl4eK
-	NaCGDRVM0KlE31/o2m3sY1KieC3ghDqPK7r1bxyosWVdBr+xT8xXGZz0i0LqlzBtRu4VG0oJ8R+
-	bYsnOAztTux8dwb7Nb5L9u0/4aMOfBA/du+21TTouXdx1MKQEPFYiP4aVq6y0O8suP+EfJYJnup
-	15PblEBhS//K89SewU7xneGNVcFf/lMouAlppFzd6nFBOGBPJXEWqksqSE1AFWEXaK72wUudP0u
-	ehew/QT7wgUqHWbJXYqyQCW/WY/inO5eOTNOxqmoT66peuwiBaHd08lsgVsBCtbpsPxwPZ8R6Cc
-	6CiRKT8yBh1naOEr95zbPT42U0LpDuc51UHum/lKcn1n9UNKgnNeitFaCkMLr7e7uD20aNpU/W0
-	106AvbZlM1WT1ZIeesrDwgoLROyN/jAoEZZXtaC00n0EPPjS9yiIb4h3lrxrvsVrJRaTzOiBCVN
-	cQA8qAOC14CH4wN5Nkkf/MU4f2FkabYJX1VJGXvt07JZl7AofOVIcZcWJSRgT2auWiEK2tH9/Gh
-	mjNnK8uvAguzXIoKopjyxhpJq8tdxcgarpikBNsoBtmKclQOtXheNXYOw1kVqCY/kOp3e0lrPhj
-	F3wRD
-X-Received: by 2002:a05:600d:82c5:b0:4bb:693e:4c8e with SMTP id 5b1f17b1804b1-4bb7da270bamr55401635e9.21.1795004842666;
-        Wed, 18 Nov 2026 04:27:22 -0800 (PST)
-Received: from SurHub.localdomain ([196.188.113.38])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb78430752sm150071565e9.12.2026.11.18.04.27.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Nov 2026 04:27:22 -0800 (PST)
-From: Abdifatah Suruur <suruurism@gmail.com>
-To: Steve French <smfrench@gmail.com>
-Cc: linux-cifs@vger.kernel.org,
-	Abdifatah Suruur <suruurism@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] smb: client: reject oversized SET_INFO data
-Date: Wed, 18 Nov 2026 15:27:17 +0300
-Message-ID: <20261118122718.17236-1-suruurism@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=cmhFiyIL
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AE051F000C4;
+	Wed, 18 Nov 2026 12:35:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795005362;
+	bh=CVVMPE+j7KjW39jvyf6/oFfejt3hTMTeayg9+QfA8JM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=cmhFiyILoty0S/ImExh0a7qYIzr9QxLGbi3BPcVks5rTwq7n4h5eX1E+wtvxecs6I
+	 MICCZIaiZxXPWwL+28p6tfmmoutV1DIq5J14Vkrf1CM5EZ2wqvwX3vLoZKgjMx5D75
+	 KMkyjRhDRpoP/TDY0jxEdlESD4QZAi8dMz/qCheRb7NWLzGd9w71fQfwy519efZtSN
+	 mF4xpdK3Zso7ZVFiTFq3gufRyriGirqmZwg+cd/5bzbaCqo52hnGwXaMIdxdJMQq4M
+	 +nBFYYeTqQSFzMzDB+cmQ77NGLzRNP8L9Bn1nPmZIhdN1rsfL6Fl/FjYvdqjJ2q/QZ
+	 OctztNUtUxvNw==
+Date: Wed, 18 Nov 2026 13:35:54 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Paulo Alcantara <pc@manguebit.org>, 
+	David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, 
+	Matthew Wilcox <willy@infradead.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Marc Dionne <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Dominique Martinet <asmadeus@codewreck.org>, 
+	Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v12 5/5] cachefiles: Preset the state xattr when creating
+ a new file
+Message-ID: <20261118-hebamme-virtuell-boten-055bf85097a3@brauner>
+References: <20260910220242.2165023-1-dhowells@redhat.com>
+ <20260910220242.2165023-6-dhowells@redhat.com>
+ <920f0b50480231f1af8a9c8e7f118f5c@manguebit.org>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -94,64 +65,52 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <920f0b50480231f1af8a9c8e7f118f5c@manguebit.org>
 
-SMB2_set_info_init() copies the variable-length set-info data into the
-SMB2 request object without checking that it fits.  The object is
-CIFSMaxBufSize + MAX_SMB2_HDR_SIZE bytes and the data starts at
-sizeof(struct smb2_set_info_req), leaving 16492 bytes with the default
-CIFSMaxBufSize.  A malicious server can return a nearly maximum-size
-security descriptor; id_mode_to_cifs_acl() retains its ACEs and adds up
-to five new ones, producing a rewritten ACL around 16.8 KB.  A chmod()
-or chown() on a cifsacl mount then makes the memcpy() write up to 336
-bytes past the cifs_request object, and the overrun is also read back
-and sent to the server.
+On Fri, Sep 11, 2026 at 05:21:38PM -0300, Paulo Alcantara wrote:
+> David Howells <dhowells@redhat.com> writes:
+> > +	buf = kzalloc(sizeof(struct cachefiles_xattr) + min(len, sizeof(__be64)), GFP_KERNEL);
+>
+> You should use max() here.
 
-The worst case is much larger: if the server returns a security
-descriptor whose owner and group SIDs map to 15 subauths, the rewritten
-ACL keeps the original ACEs and replaces both SIDs.  With 817 ACEs the
-resulting SET_INFO data is 62256 bytes; KASAN reports a slab-out-of-bounds
-write of 45764 bytes past the 16588-byte cifs_request object on v7.4-rc2
-(where the earlier undersized-allocation issue is already fixed):
+Meh, this is in mainline since v7.4-rc1:
 
-  BUG: KASAN: slab-out-of-bounds in SMB2_set_info_init+0x47c/0x6d0 [cifs]
-  Write of size 62256 at addr ffff88800ee28060 by task python3/86
-  The buggy address is located 96 bytes inside of
-  allocated 16588-byte region
+KASAN catches it reading a file through an -o fsc mount with an ext4
+cache gives:
 
-Reject data that cannot fit before the copy.  This covers SMB2_set_acl(),
-SMB2_set_ea() and the other SMB2_SET_INFO callers.
+  BUG: KASAN: slab-out-of-bounds in ext4_xattr_set_entry+0xf3d/0x1bd0
+  Read of size 58 by task kworker/u32:1/63
+  Workqueue: fscache fscache_cookie_worker
+  Call Trace:
+   __asan_memcpy+0x23/0x60
+   ext4_xattr_set_entry+0xf3d/0x1bd0
+   ext4_xattr_block_set+0x647/0x3080
+   ext4_xattr_set_handle+0xd19/0x1420
+   ext4_xattr_set+0x12a/0x380
+   __vfs_setxattr+0x10a/0x160
+   __vfs_setxattr_noperm+0xef/0x5d0
+   vfs_setxattr+0x148/0x3d0
+   cachefiles_preset_object_xattr+0x191/0x5e0
+   cachefiles_create_tmpfile+0x2c1/0x7f0
+   cachefiles_create_file+0x6a/0x2f0
+   cachefiles_look_up_object+0x715/0x8a0
 
-The vulnerable copy predates the ACE-retention rework, but the rework
-makes the overflow reachable with an ordinary chmod on a cifsacl mount.
+With max() it's gone. David, unless you want to send it yourself I'll
+put this into vfs.fixes:
 
-Fixes: 35143eb5c2e3 ("CIFS: Add SMB2 support for rename operation")
-Cc: stable@vger.kernel.org
-Signed-off-by: Abdifatah Suruur <suruurism@gmail.com>
-
----
- fs/smb/client/smb2pdu.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index f85595136ef8a..beb3abf9724dd 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -5894,6 +5894,17 @@ SMB2_set_info_init(struct cifs_tcon *tcon, struct TCP_Server_Info *server,
- 	req->AdditionalInformation = cpu_to_le32(additional_info);
+diff --git a/fs/cachefiles/xattr.c b/fs/cachefiles/xattr.c
+--- a/fs/cachefiles/xattr.c
++++ b/fs/cachefiles/xattr.c
+@@ -44,7 +44,7 @@ int cachefiles_preset_object_xattr(struct cachefiles_object *object, struct file *file)
+ 	unsigned int len = object->cookie->aux_len;
+ 	int ret;
  
- 	req->BufferOffset = cpu_to_le16(sizeof(struct smb2_set_info_req));
-+
-+	/*
-+	 * The request object is CIFSMaxBufSize + MAX_SMB2_HDR_SIZE bytes
-+	 * and Buffer starts at sizeof(struct smb2_set_info_req).
-+	 */
-+	if (*size > CIFSMaxBufSize + MAX_SMB2_HDR_SIZE -
-+		    sizeof(struct smb2_set_info_req)) {
-+		cifs_buf_release(req);
-+		return -EINVAL;
-+	}
-+
- 	req->BufferLength = cpu_to_le32(*size);
+-	buf = kzalloc(sizeof(struct cachefiles_xattr) + min(len, sizeof(__be64)), GFP_KERNEL);
++	buf = kzalloc(sizeof(struct cachefiles_xattr) + max(len, sizeof(__be64)), GFP_KERNEL);
+ 	if (!buf)
+ 		return -ENOMEM;
  
- 	memcpy(req->Buffer, *data, *size);
+
+-- 
