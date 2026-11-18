@@ -1,85 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.215.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
 	t=1794961535;
-	b=1lfCmyprvY6HMXPUix4uAnTsulasClu1khB+KfNlQTKvrAxQP5GCO7ZxEfUgUxUQ5aAO
-	 sSdOlqSJPqXaHWRsE12Z5AWmwzK+KasbB8zScnnPSoH5T5Kvr7+/U2Nf3IqocNfpOv4Mj
-	 bUMYh9ztFZhqgdUY7HaLJlgFsFYR9xcn3eQtreQFHcTw8IIvPwPPRxdarbR5OhqJt2ucv
-	 AhqXQ2GrgBg9HEjUg5FDQadWleEavlhe1OCSTlmTTYSg2+HC+7Tq922vq3PPhK32mRu6c
-	 Qb1KrpOc9kc/kzCTsz0y4C7T2JgEKcj27MIxr6ZpgaOBmDdHotOPD/PAy7PtU7tGOXg==
+	b=Tr6b/85kO0E5up+dbbxXDnOmWuCKDgd9pxFnCUmr7djqKfmoktJNqhC8xhHl6ww9YSrw
+	 q6AFyspBj44eWhhZqOQtO/YOzZuLxb50tgb9L520iwtLK52orIiba9r7GfD2FLhxZuVpp
+	 k3pSh/B7rk3zN5QRS7FRKVabPIRG8decrOHipeDe9yIrjI1om7FvDdvBu8BFvg4RYqZUO
+	 ciySp4nDILuznZS2nJJfGRBvfCgOlhKQCY8GDdNAsQz04KQ9Yj3qIuILJhNCSSJtziMON
+	 rQq9IIYCIsUiCaHTCRSVJjzttatTWd1Lh2OIz6TDsp1frX0TiCLhjlDs9eKl3DjdEkA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
 	a=rsa-sha256; c=relaxed/relaxed; t=1794961535;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding;
-	bh=B58E4pSFjKm7IGrehgXSmXdGo6N43CbyBCh2MCpRtOs=;
-	b=KATCf5mFlf6LnMNRYOXiU3v82c7/m9tgM+n9tZlsSD2vunRZTNb0M8M8ww7jwvOoM1jM
-	 sUbMD3yGq2s5EWksPaiYS+xgBbh+SxXEEeGsDEflxzgRQj9iAW994gI85hQymwEFAAAZa
-	 0rI084n7GW4sNFAIfWHQzUfd7N32asff1I2SlAWDPIbW6NRKGV0yk0ms9VY6D0HsTRKft
-	 ibfg5wiZ5BttZ4WShjTLZotSx7MiSsLPFGLFABJncajTWf4zobHW7D4XrQggAnZqC1+dc
-	 tRlFHkAdKkohP/e8Ko6PrXwJ94eCayqheqSMdRnYeuS8j0GCf3v0Ln0sK23a5xEUpfg==
+	bh=Z+N2Sizs3DgoA4nmWWFLDvklML3guJTnnLBvLJVgIbY=;
+	b=Pc3JkSpVeuI9B3mQ1PMoxXikU3Wh7cPnhG4XKoLYsdtoMQObV5OjNzjKsEj8JVsiHZcl
+	 F1pfaV36c80oKiPOERTQ3Ipen0IbFrSisoXbOeZxMbxGm9Fs8NPXSuNfAkM4MJM1L0LqH
+	 sUgcsJ3TA3lN+JgAHffOlXo7umR7eKkE3BbRfxYnH3kBqo141bITyMn6S6caWQsgrl1sU
+	 wYkR8tAjqke78wadvBKijxGXzZCv+O1Q7wYzCGFgXxhUtgXB+tUvwZfSZnuRULmH+5FgQ
+	 +xmMW/ofRLBNa91atcr8dqEt4wlrs8EFp/co5cjD2xeS+ONTeySl08h8I7dpz4ILNsg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hXAZEX1l;
-	arc=none smtp.remote-ip=209.85.215.179
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bmu20wZ5;
+	arc=none smtp.remote-ip=209.85.215.173
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF198606A330
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 00:25:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AF198606A330
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636BB606A881
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 00:25:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 636BB606A881
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=hXAZEX1l
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-cdb2893531bso329126a12.1
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 16:25:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=bmu20wZ5
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-cd61cef87f1so322772a12.0
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 16:25:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794961534; x=1795566334; darn=vger.kernel.org;
+        d=gmail.com; s=20260707; t=1794961535; x=1795566335; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=B58E4pSFjKm7IGrehgXSmXdGo6N43CbyBCh2MCpRtOs=;
-        b=hXAZEX1lqtJXHIuAZhdFXkin5h5+Sw7FQSqcvxwn9+jnxeRHLTJAKd6A5NcCvRZYts
-         Co4NdG+FFxfpC+RN9fQ/1R3Txrr18pXmUEL64YHSA1iMM3eHo5xE+8kmIYBK39GJy0JX
-         L32QqnPQtNZgP6Lf2sz+aaMUBajeB2U514Cgnka4WU2FajW7hO6INFsK44sxMgvjFWKh
-         I8tVCfa4rj8cLvZN8gdylEsyGL75LFl6229UQMk738495jg5gRNf0KncDE+j0/A/xCWQ
-         DaP7fFlzl1sC4N39vOVG4MIacfCMxNVVLfVJG4Xjk6dvBxnZGgucL+jEg2tk+6JBQj2k
-         sdtw==
+        bh=Z+N2Sizs3DgoA4nmWWFLDvklML3guJTnnLBvLJVgIbY=;
+        b=bmu20wZ5lXC+T9AYEFLwsA8BVxMCihqGCwXzxaskLrCErvzjh5tj7X0bvjyyguw4rc
+         Jr8h5t6Cw0yr4ux3uoJFOSZIxPjQlzDA0S8m26Olw1wOm1DIVuPgKIYvlK9KaKo72kvo
+         DKylv7wsCVJhOfOAlctpDKpwSCKinK4AZPPpRkXYGBHj5deFtC9C39a2D0pPVLwpm64y
+         +kSEXh/oS/T/2outLOKbcJXb+T4dmT1jgqZBESP3zssXr/IDrs4igb1PAtq1D7IFshBu
+         4OHdpWngYA6vlyNqcAgTQEN6BCg9w1oYS5bJyJdAeujumT3gUoiJ1+MWpDIuzrdayKLn
+         t8ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794961534; x=1795566334;
+        d=1e100.net; s=20260707; t=1794961535; x=1795566335;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=B58E4pSFjKm7IGrehgXSmXdGo6N43CbyBCh2MCpRtOs=;
-        b=bOCJKZDOJaQcsP5XJyJsSkvcNVBFcQ+sZlNygAqKmDzLVY3qOP1kASGApWFTx8d9XZ
-         tUB6p/uwA6syaJEuLHE01h1NdmmjA+DPJF7/ehZB/yyyJcXqR9WCy9GDhO9Bsg02BglZ
-         xUFoSGNh0kUPRlaqOM7v7vmJMaaFMYxcKCao20e5Zz9K/p8yiF6xxn7O5j5MBp8iTsR6
-         pBf78H2JC3MuQRXo5Bt0qhllj+670Ker3+EDcxiM6qtmf6twUYTI5auyNt1FAxPsPaFV
-         AvkrAHEnUn0hBfrCSVnQiqKfXh6vAUbyNRR+qGNcaW6xViEstSdanOCqbKwy9i8aBtE5
-         Irpg==
-X-Forwarded-Encrypted: i=1; AL+hErESwnZkWAr1tGmEzNuChldsWcFIITDvbgRiIcn6TWsF4DzCbnoAv8K473qZye1NNCXxv2lLc8I/4T86@vger.kernel.org
-X-Gm-Message-State: APuU4Z9A5INs7Jk/X2rvf+bOXUX71nit4ocbso3PaifbCRAbS3W+K9YM
-	2opsA0iBEkXZsoJxe6E9qfnoxoOIL5frlv6j3Qh6yeBCeFyCwt3a/LNM
-X-Gm-Gg: AZFdTZdyP2MQWzZjxsE0jZNV2ixT3wPuShUOZqwCm47ljv+szfs0mG/HdEYpVScXHwv
-	zAVXAZ28o0wIMueLZW9OFpXyJA54MVHGyTH2/K00hLQaAvxqLbhp45FGZVveKb26lTF1Il/w0h6
-	CxVsjMr+mCFjYIN54namZ+NKok/QI2n9covy1NV5mBozSpbyCrlmDU0A+ftaCLmUNJISEiwIzxS
-	Fb9HTgO9NvxXsulA27B41oYtvu/QMCNLnvzE5tba6JJff8f6Nyqm5IrgdoEo9t0XMS1q2ZfJ2hS
-	nIjXMnlZHtNZ7g3vfbxbbDrORG9Tv5DvSShz5KK/UesUddn0JtVbnh/hT0gzIKg+QOOkvjepHqN
-	e4hTFgnRDAiAkHXNyiB1JTrdPpCCzigyHzz/HjoI7B6GXR3x3X7eI5EZR8hjeT3A6Xi+MEMVzOg
-	xBPxxiC+vNM5Cr/M+QMZSbcbwYP5iiDGwY87D/k/8S1cfizW1rqphhwMMKYSH+1jyGzG0qRPsJD
-	Kis95ZpSPrPzAnit0LLhp5kEfXWkxtY9FrOoLlVrvN7ptR6ayc4MBxQYZRxqO7Y+c7QgaI6LP9O
-	BQvdUxYqa1fHI/FMHRU7iBh9w4/Xcxa+OCzq8+d5d52MLRaCQMKzHCHjoNeyBaiQGCCg/LKJS7K
-	zYYBWArnLTJ6gY8w6kUnPBpuuuJK0TJ+w4udaMWmNFMFqkAoFrD7uZ0Aj7k+uIyLqEg6prJBrMV
-	csqSUf7VYrsxm8Acp4yPGFcwEEI9T7yUPUQa18fG8H62pZLm9XTAf7fEVuvita1Q==
-X-Received: by 2002:a17:90a:d44b:b0:3b0:d808:a991 with SMTP id 98e67ed59e1d1-3b3d07c3e85mr1057779a91.55.1794961533975;
-        Tue, 17 Nov 2026 16:25:33 -0800 (PST)
+        bh=Z+N2Sizs3DgoA4nmWWFLDvklML3guJTnnLBvLJVgIbY=;
+        b=RYysHt0ClpT5jK6mBUwtrE7iQVkOIFKVdFxiIKiOp2tyxVipJMk3xH+1D1unWyZxMx
+         P4DpdYepFPNQ9ITDZ/2c9pfQ2nMznunyULvnDTm+8NLtKcu37Si15k5oRzeuiyYriRTX
+         tG4pr3a0jyHKrEblgngwRyKKiWvx+Bz5Eh0Mf2EgRL9URsXB4UzDv2qu/WYusUGP1uZU
+         yw2hC19w4dePEtS1mbhnGofgoWgvs3F6kUUT8edEIi7kZeAGr5w6JB2HyLDcc6aDZU35
+         rSiRRrwXpTrUlVDjM4m4Yv6IwYm0rIM5zNLfJwPFP7bHT92w/KmskMS1NPP4R8x8VuCh
+         1dNQ==
+X-Forwarded-Encrypted: i=1; AL+hErEdR7xo//QbqbQBbHDZhoIiPTYQkreZs6hJjjFPjiLG4h9iJwhaGLr0+mfav7DrDHG0wNv/PWkMnPga@vger.kernel.org
+X-Gm-Message-State: APuU4Z/nl7J9ms6LHlw3L0BTf5qO/qfXfon2yom9L8cR8/KzjxYgHAPz
+	iJJrp8BjvofDXOKz18yaZot+kCytx+WsxCb0djAxLrgVeFYBnR+nJBQA
+X-Gm-Gg: AZFdTZfiCodsrBK4kx0wjcC80zO0NFv7f0pEHTuQvrM/o5p8lOi6WkNV+uRRdl4M3ef
+	6Zx7HqAbVPSasfvISmhvsPhLiMzFfy85HhWKxEUc66Wk8MeGuBDRYH9zJIoA2coyXaasyxq4RHv
+	d+WU58x1ZPJGaj82z4Sfi3H7zOF3XZ+VQX89NIj/i82/tRyPQ0HQnWBlcEIKk/hBn1CtK67kzSA
+	yL7c6BYHHGhvGXQujNvmD2FjBKE8lf9qUPdzAsvyFhsXOHpdBvOiSjyQjJp2Idi31ZA6TpaNxEq
+	BIHjeHEnS+LYrvcIAgYfu11DwqnYtmve2TMg+dzeLkfqTWB/035EaYM+OMKa7ER2Uq5vuRlQcA8
+	hwne7zbZXOHmAeo1kbvjwQXcH5t0XayCxaW5APanTjsTzk+0GSLJ39TWfsyWNtdb5huT27Qa0zF
+	h4VZEh1hmCA7Fj08EpOaFcvaFhbp9xgdbi+Id/XSbtLXwstpFsgFt9GmBCzi7xYu4kYYzB730HJ
+	sT4qmd4pMzZH943KzID5+ziqC6KDdomLL3klQKoR3hbMSfEY7N9NHaXiqBwHkGzKKUqo4iMVwHS
+	186/LFWxIQt8zgooQYDtg2T7Ykj722RtYX5abvNRFXHgO8sLq6QJgz0G3qBBVUUmfl5mhagJ8mt
+	h/CFZR8zJ5Ms1235EKiirWQR6XmwA/PWavxSfFdPGlboXS9iappoyCdTcBaOeUOFGzum2+8AAa1
+	bN2c0bOHRG8njRMq9DRRl2SDfzZbpLbPVnuDlFXcua
+X-Received: by 2002:a17:90b:384a:b0:3ac:17c:6e89 with SMTP id 98e67ed59e1d1-3b3d079ffd2mr797101a91.19.1794961534698;
+        Tue, 17 Nov 2026 16:25:34 -0800 (PST)
 Received: from sid-dev-env.cgrhrlrrq2nuffriizdlnb1x4b.xx.internal.cloudapp.net ([4.155.54.158])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3d1c04020sm1212211a91.17.2026.11.17.16.25.33
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3b3d1c04020sm1212211a91.17.2026.11.17.16.25.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Nov 2026 16:25:33 -0800 (PST)
+        Tue, 17 Nov 2026 16:25:34 -0800 (PST)
 From: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 To: Paulo Alcantara <pc@manguebit.org>
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
@@ -93,9 +93,9 @@ Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>,
 	Gillian Laming <glaming@microsoft.com>,
 	linux-cifs@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 1/2] smb: client: drop dentries for dying cached dirs during unmount
-Date: Wed, 18 Nov 2026 00:25:28 +0000
-Message-ID: <20261118002529.250616-2-sidchintamaneni@gmail.com>
+Subject: [PATCH v1 2/2] smb: client: fix busy dentry on unmount from cancelled deferred close
+Date: Wed, 18 Nov 2026 00:25:29 +0000
+Message-ID: <20261118002529.250616-3-sidchintamaneni@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261118002529.250616-1-sidchintamaneni@gmail.com>
 References: <20261118002529.250616-1-sidchintamaneni@gmail.com>
@@ -110,120 +110,166 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-During unmount, cifs_kill_sb() calls close_all_cached_dirs() to release
-all cached directory dentries and flush cfid_put_wq before calling
-kill_anon_super(). Two races allow a cached_fid's dentry reference to
-outlive close_all_cached_dirs() and trigger a busy-dentry panic in
-generic_shutdown_super():
+When cifs_close_deferred_file(), cifs_close_all_deferred_files(), or
+cifs_close_deferred_file_under_dentry() cancels a pending deferred close
+via cancel_delayed_work(&cfile->deferred), the cifsFileInfo is moved to
+a thread-local stack list (file_head) before open_file_lock is dropped
+and _cifsFileInfo_put() is called outside the lock.
 
-1. When invalidate_all_cached_dirs() or
-   cifs_mark_open_handles_for_deleted_file() runs concurrently, it moves
-   cached_fid entries from cfids->entries onto cfids->dying under
-   cfids->cfid_list_lock, then drops cfid_list_lock before laundromat_work
-   runs on cfid_put_wq. If close_all_cached_dirs() runs in that window, it
-   only walks cfids->entries (missing cfids->dying) and flushes cfid_put_wq
-   before laundromat_work is queued, leaving cfid->dentry held:
+Because tcon->openFileList is shared across superblocks using the same
+tree connection, a concurrent operation or unmount on a sibling mount
+sharing the tcon can cancel a deferred close work item belonging to a
+superblock that is concurrently unmounting. Once cancel_delayed_work()
+removes the work from deferredclose_wq, cifs_kill_sb() observes neither
+a pending delayed work item on deferredclose_wq nor a non-zero
+outstanding_rreq counter, and proceeds to kill_anon_super() before
+_cifsFileInfo_put() drops cfile->dentry:
 
-  Thread 1 (umount)               Thread 2 (reconnect / open_dirs)
-  -----------------               --------------------------------
-                                  invalidate_all_cached_dirs()
-                                    spin_lock(&cfid_list_lock)
-                                    list_move(&cfid->entry, &cfids->dying)
-                                    spin_unlock(&cfid_list_lock)
-  cifs_kill_sb()
-    close_all_cached_dirs()
-      spin_lock(&cfid_list_lock)
-      walks cfids->entries (empty)
-      spin_unlock(&cfid_list_lock)
-      flush_workqueue(cfid_put_wq)
-    kill_anon_super(sb)
+  Thread 1 (umount sb1)            Thread 2 (sibling mount / rename)
+  ---------------------            ---------------------------------
+                                   cifs_close_all_deferred_files(tcon)
+                                     spin_lock(&tcon->open_file_lock)
+                                     cancel_delayed_work(&cfile->deferred)
+                                     list_add_tail(..., &file_head)
+                                     spin_unlock(&tcon->open_file_lock)
+  cifs_kill_sb(sb1)
+    cifs_close_all_deferred_files_sb()
+      [delayed_work_pending == false]
+    flush(cifsoplockd_wq)
+    flush(deferredclose_wq)
+    wait(outstanding_rreq == 0)
+    flush(serverclose_wq)
+    flush(fileinfo_put_wq)
+    kill_anon_super(sb1)
       -> generic_shutdown_super()
          BUG: Dentry still in use (1)
          VFS: Busy inodes after unmount!
-                                    mod_delayed_work(cfid_put_wq,
-                                                     &cfids->laundromat_work, 0)
-                                    dput(cfid->dentry) [too late]
+                                     _cifsFileInfo_put(cfile, true, false)
+                                       dput(cfile->dentry) [too late]
 
-2. When two mounts share a cifs_tcon and drop_cached_dir_by_name() (for
-   example via rmdir on the sibling mount) drops the final reference in
-   close_cached_dir() -> smb2_close_cached_fid(), it deletes cfid from
-   cfids->entries under cfids->cfid_list_lock, unlocks cfid_list_lock, and
-   calls dput(cfid->dentry) synchronously outside cfid_put_wq. A
-   concurrent unmount of the superblock owning cfid->dentry can finish
-   close_all_cached_dirs() and reach kill_anon_super() before that dput()
-   completes.
+Fix this by incrementing cifs_sb->outstanding_rreq while still holding
+open_file_lock whenever cancel_delayed_work(&cfile->deferred) succeeds,
+and decrementing it (waking any waiter in cifs_kill_sb()) after
+_cifsFileInfo_put() completes.
 
-Fix the first race by also walking cfids->dying under
-cfids->cfid_list_lock in close_all_cached_dirs() and clearing cfid->dentry
-under the lock. Fix the second race by detaching cfid->dentry under
-cfids->cfid_list_lock in smb2_close_cached_fid() and holding
-cifs_sb->outstanding_rreq across dput(dentry) so cifs_kill_sb() waits for
-the in-flight dput() before calling kill_anon_super().
-
-Fixes: 3fa640d035e5 ("smb: During unmount, ensure all cached dir instances drop their dentry")
+Fixes: 5efdd9122eff ("smb3: allow deferred close timeout to be configurable")
 Signed-off-by: Siddharth Chintamaneni <sidchintamaneni@gmail.com>
 ---
- fs/smb/client/cached_dir.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+ fs/smb/client/misc.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/cached_dir.c b/fs/smb/client/cached_dir.c
-index 50217f47a0ed1..e5c924409078c 100644
---- a/fs/smb/client/cached_dir.c
-+++ b/fs/smb/client/cached_dir.c
-@@ -467,6 +467,8 @@ __releases(&cfid->cfids->cfid_list_lock)
+diff --git a/fs/smb/client/misc.c b/fs/smb/client/misc.c
+index 72a986bfaefc4..5072efd0ea568 100644
+--- a/fs/smb/client/misc.c
++++ b/fs/smb/client/misc.c
+@@ -502,15 +502,19 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
  {
- 	struct cached_fid *cfid = container_of(ref, struct cached_fid,
- 					       refcount);
-+	struct cifs_sb_info *cifs_sb = NULL;
-+	struct dentry *dentry;
- 	int rc;
+ 	struct cifsFileInfo *cfile = NULL, *failed_cfile = NULL;
+ 	struct file_list *tmp_list, *tmp_next_list;
++	struct cifs_sb_info *cifs_sb;
+ 	LIST_HEAD(file_head);
  
- 	lockdep_assert_held(&cfid->cfids->cfid_list_lock);
-@@ -476,10 +478,19 @@ __releases(&cfid->cfids->cfid_list_lock)
- 		cfid->on_list = false;
- 		cfid->cfids->num_entries--;
+ 	if (cifs_inode == NULL)
+ 		return;
+ 
++	cifs_sb = CIFS_SB(cifs_inode->netfs.inode.i_sb);
++
+ 	spin_lock(&cifs_inode->open_file_lock);
+ 	list_for_each_entry(cfile, &cifs_inode->openFileList, flist) {
+ 		if (delayed_work_pending(&cfile->deferred)) {
+ 			if (cancel_delayed_work(&cfile->deferred)) {
++				atomic_inc(&cifs_sb->outstanding_rreq);
+ 				spin_lock(&cifs_inode->deferred_lock);
+ 				cifs_del_deferred_close(cfile);
+ 				spin_unlock(&cifs_inode->deferred_lock);
+@@ -528,11 +532,16 @@ cifs_close_deferred_file(struct cifsInodeInfo *cifs_inode)
  	}
-+	dentry = cfid->dentry;
-+	cfid->dentry = NULL;
-+	if (dentry) {
-+		cifs_sb = CIFS_SB(dentry->d_sb);
-+		atomic_inc(&cifs_sb->outstanding_rreq);
-+	}
- 	spin_unlock(&cfid->cfids->cfid_list_lock);
+ 	spin_unlock(&cifs_inode->open_file_lock);
  
--	dput(cfid->dentry);
--	cfid->dentry = NULL;
-+	if (dentry) {
-+		dput(dentry);
+-	if (failed_cfile)
++	if (failed_cfile) {
+ 		_cifsFileInfo_put(failed_cfile, false, false);
 +		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
 +			wake_up_var(&cifs_sb->outstanding_rreq);
 +	}
  
- 	if (cfid->is_open) {
- 		rc = SMB2_close(0, cfid->tcon, cfid->fid.persistent_fid,
-@@ -594,6 +605,22 @@ void close_all_cached_dirs(struct cifs_sb_info *cifs_sb)
- 
- 			list_add_tail(&tmp_list->entry, &entry);
- 		}
-+		list_for_each_entry(cfid, &cfids->dying, entry) {
-+			if (!cfid->dentry)
-+				continue;
-+			tmp_list = kmalloc_obj(*tmp_list, GFP_ATOMIC);
-+			if (!tmp_list) {
-+				cifs_tcon_dbg(VFS, "Out of memory while dropping dentries\n");
-+				spin_unlock(&cfids->cfid_list_lock);
-+				spin_unlock(&cifs_sb->tlink_tree_lock);
-+				goto done;
-+			}
-+
-+			tmp_list->dentry = cfid->dentry;
-+			cfid->dentry = NULL;
-+
-+			list_add_tail(&tmp_list->entry, &entry);
-+		}
- 		spin_unlock(&cfids->cfid_list_lock);
+ 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
+ 		_cifsFileInfo_put(tmp_list->cfile, false, false);
++		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
++			wake_up_var(&cifs_sb->outstanding_rreq);
+ 		list_del(&tmp_list->list);
+ 		kfree(tmp_list);
  	}
- 	spin_unlock(&cifs_sb->tlink_tree_lock);
+@@ -543,12 +552,15 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+ {
+ 	struct cifsFileInfo *cfile, *failed_cfile = NULL;
+ 	struct file_list *tmp_list, *tmp_next_list;
++	struct cifs_sb_info *cifs_sb;
+ 	LIST_HEAD(file_head);
+ 
+ 	spin_lock(&tcon->open_file_lock);
+ 	list_for_each_entry(cfile, &tcon->openFileList, tlist) {
+ 		if (delayed_work_pending(&cfile->deferred)) {
+ 			if (cancel_delayed_work(&cfile->deferred)) {
++				cifs_sb = CIFS_SB(d_inode(cfile->dentry)->i_sb);
++				atomic_inc(&cifs_sb->outstanding_rreq);
+ 				spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+ 				cifs_del_deferred_close(cfile);
+ 				spin_unlock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+@@ -566,11 +578,18 @@ cifs_close_all_deferred_files(struct cifs_tcon *tcon)
+ 	}
+ 	spin_unlock(&tcon->open_file_lock);
+ 
+-	if (failed_cfile)
++	if (failed_cfile) {
++		cifs_sb = CIFS_SB(d_inode(failed_cfile->dentry)->i_sb);
+ 		_cifsFileInfo_put(failed_cfile, true, false);
++		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
++			wake_up_var(&cifs_sb->outstanding_rreq);
++	}
+ 
+ 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
++		cifs_sb = CIFS_SB(d_inode(tmp_list->cfile->dentry)->i_sb);
+ 		_cifsFileInfo_put(tmp_list->cfile, true, false);
++		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
++			wake_up_var(&cifs_sb->outstanding_rreq);
+ 		list_del(&tmp_list->list);
+ 		kfree(tmp_list);
+ 	}
+@@ -618,6 +637,7 @@ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+ {
+ 	struct file_list *tmp_list, *tmp_next_list;
+ 	struct cifsFileInfo *cfile, *failed_cfile = NULL;
++	struct cifs_sb_info *cifs_sb = CIFS_SB(dentry->d_sb);
+ 	LIST_HEAD(file_head);
+ 
+ 	spin_lock(&tcon->open_file_lock);
+@@ -625,6 +645,7 @@ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+ 		if ((cfile->dentry == dentry) &&
+ 		    delayed_work_pending(&cfile->deferred) &&
+ 		    cancel_delayed_work(&cfile->deferred)) {
++			atomic_inc(&cifs_sb->outstanding_rreq);
+ 			spin_lock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+ 			cifs_del_deferred_close(cfile);
+ 			spin_unlock(&CIFS_I(d_inode(cfile->dentry))->deferred_lock);
+@@ -640,11 +661,16 @@ void cifs_close_deferred_file_under_dentry(struct cifs_tcon *tcon,
+ 	}
+ 	spin_unlock(&tcon->open_file_lock);
+ 
+-	if (failed_cfile)
++	if (failed_cfile) {
+ 		_cifsFileInfo_put(failed_cfile, true, false);
++		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
++			wake_up_var(&cifs_sb->outstanding_rreq);
++	}
+ 
+ 	list_for_each_entry_safe(tmp_list, tmp_next_list, &file_head, list) {
+ 		_cifsFileInfo_put(tmp_list->cfile, true, false);
++		if (atomic_dec_and_test(&cifs_sb->outstanding_rreq))
++			wake_up_var(&cifs_sb->outstanding_rreq);
+ 		list_del(&tmp_list->list);
+ 		kfree(tmp_list);
+ 	}
 -- 
 2.43.0
 
