@@ -1,82 +1,122 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.146
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795014969;
-	b=1MztOJome2HG7D4DQVb5U9xp7r82vf3YZkcaO4kdMFuJxDPy+56ki+prBeHSPh8b4vVM
-	 OeppxtiDiTyLfbVMEOQ5wMN02ZM+/Vu8VIA6UDq+RfEB0EvGaLWQKyjpRHLt6DdQuXAkX
-	 musel8sBhchnv4GnR4PgZCDvSU5KgWjIdAEdrbpyi5BysQOGAunybY7ShgDoNCJx4GDGk
-	 u2m1oJmJ6XsIGhTrPwQ1XoAYFlZn2el+M/SkgMuoeAQHtcqGj3CFTdle/zVfwqKfjlp1U
-	 3XVVdyTrQfTfAf8RtpjWEcGzZUhVG9Q8Ztlm0qvi68v6U9JsTxNbm5cLa/E4uw6xEnw==
+	t=1795017328;
+	b=ciavaw0CMv6S0dWJtJxTKFvH1EJIsxqtTGfp1vk9/+ulpp7wfzfZ6yTJyl6z2OJJcvFL
+	 UJOrAB9opu2G4X1I5L78TPkaYSZ8AVA42rT3NmbqPh0g3dIsWkiNJ1NSzklI/sf2Zfz1a
+	 i+qEuZYut3NbAE7CeX/WG3gPM74n2rVBHbfuIfs0fEleS2LwimordUznO7u3JzGLVEEni
+	 urDFu/vyR2/1Ez84GtqTtUhoP8W9RCoLzRKLvEuRWLzbRNwdm73mqpIcDETFviVJJtLFD
+	 StwLatIk+fxwhxfe+Gm1AdlVK23PmGnNpIq4ZaoCRYwr1ShIBIirmXAy9+L3IoGXa/Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795014969;
-	h=Received:DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To:User-Agent;
-	bh=VJRW+Ov1+hJWYf0GjjALdvkeKgyKhKIHCpws0o2fknE=;
-	b=JjmTaWPzzZRSkdbhDvyRrNGHMWHvq6Cm9QAAivPz214NS+FrGPckFyVXks961ayY8GB8
-	 w89z+FLjIHnqDqMuVmLkD3sDcd0Q0jh0dhHcqU52NOIOW5Fj/R3Hafq2xj8wxEASNs/KI
-	 PEkI53FB7q/RkS3P255xUurhQJYjvqncsmSXxKO76SLPoM86V5peiB6CwHZ7u3voq2Uw3
-	 muS0cGrDK/fUPfTnba+s4pMBZ3sAhwlbMFwM1hxaaoR0ZXa5bhvM7+jKeXNavauVymCgD
-	 h+u6VMUTMMX03pHpG34A+ACEoIRxmEGZR2xOHbSjvlJ66ZtINbi5R5XzkttrCI/88tw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795017328;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=1tS67bCUwoJG/QZK2bvrIJTbgYuji/yc/2nuV8sBM4A=;
+	b=JKdsh/mHi+ryuxNQMZsUjaWptQZata+fhcad+5ZphSYVoP5ePENW7MP9PCNC8hQdtKzC
+	 iiY9XYP2QMsw8SnOpAoP6+PJOVCREzqErX2s84ppSl97tAwT/c7MWTn5prAa/embj1Ool
+	 xNJ6kHM1/Uy9Vy3LfgUOakjhhLKjTPQkF3Q3cxOv61DzOlblbZfRoAyX2nVlPzbJuIAhH
+	 z0iFS6RHqDcWuZ9/aAS6p1kjg2E2COhWdMDgDrLR+SUuoRaW9Ll7yzB90HIN/Cq9HVnzS
+	 JZvgLdq8VTywuzsinvhyb3UVjXwYYTWxtkw72ZuVKSh5bIcqcoVMtnBI2aI+QbT5fYw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TSlE7NJ2;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=tayDF9Sn;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=UkjQtvqL;
+	arc=none smtp.remote-ip=103.168.172.146
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98318606A31C;
-	Wed, 18 Nov 2026 15:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF70606A325
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 15:55:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 0EF70606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=TSlE7NJ2
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1D381F000C5;
-	Wed, 18 Nov 2026 15:16:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795014969;
-	bh=VJRW+Ov1+hJWYf0GjjALdvkeKgyKhKIHCpws0o2fknE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=TSlE7NJ24ZHrQjqby7BRumprQ+X4+8LqupeU9Ic0A3522Ds17DPzXVFZwe0JBd6ho
-	 GubLLYFIVNsVAPkFJEvH648kigG7kxnWoxItJWVuGvXDtAx4ld9RpbXs2YF/i/pHvg
-	 IoJDOWDprbfsVrCrmYBi1JtGbscpSjFHgPu7D9ywJ1hYx1lAHMMhOR3mSl4KulHKpe
-	 fhpajsplHwzdx8QTl+uVQSdbOq7HlfNFgYkCBr2s9W1RH2pLT9VZRBVaMQu/2EN3Lh
-	 S10sgG+OG9bMfh1RookXtJuizdsgEup+XRBW62lyyeePfaTh9PHAuvEFSXv7+XdBtx
-	 FZ53ZvVrlCnDQ==
-Received: by pali.im (Postfix)
-	id 9787F846; Wed, 18 Nov 2026 16:16:05 +0100 (CET)
-Date: Wed, 18 Nov 2026 16:16:05 +0100
-From: Pali =?utf-8?B?Um9ow6Fy?= <pali@kernel.org>
-To: koraynilay <koray.fra@gmail.com>
-Cc: David Sterba <dsterba@suse.com>, Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, Chuck Lever <cel@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Paulo Alcantara <pc@manguebit.org>, Chris Mason <mason@kernel.org>,
-	Yuezhang Mo <yuezhang.mo@sony.com>, Jan Kara <jack@suse.cz>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	Sean Smith <defendthedisabled@gmail.com>,
-	Andrey Albershteyn <aalbersh@kernel.org>,
-	Pedro Falcato <pfalcato@suse.de>,
-	Amir Goldstein <amir73il@gmail.com>, linux-btrfs@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	exfat@lists.linux.dev, ntfs3@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-api@vger.kernel.org
-Subject: Re: [RFC PATCH v4 00/10] add provenance time (ptime)
-Message-ID: <20261118151605.lqtn5fz423kuswk5@pali>
-References: <20261115180343.576773-1-koray.fra@gmail.com>
- <20261118142613.be3r3s6kobkkxnz4@pali>
- <DMYFBDIV4Y08.35ZKR5G86U1H7@gmail.com>
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=tayDF9Sn;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=UkjQtvqL
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 18923EC0B3B
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 10:55:27 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-02.internal (MEProxy); Wed, 18 Nov 2026 10:55:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1795017327; x=1795103727; bh=1tS67bCUwoJG/QZK2bvrI
+	JTbgYuji/yc/2nuV8sBM4A=; b=tayDF9SnxDCDDW+6mr/M64mbOBCtn3qjUhgWt
+	YNwT9ilnrAbc92IwzXk0Bk0XpaYgWAm0UJl6Zk8m66ZSYY5AIG5tzrBI8n/c0i6B
+	J9WH3i5JgW4lK0UQOVaWu+CNwsYzA3VyB/xm1QB5B/LT6pz0ADX3xUw1fryuPbZ/
+	ZBgya7Hn9zRwy4iQvrGm19nPI1T8TYipwriJxwgdm95U+oei+mr3fXV9mczpSTAO
+	BjY/wVkpowgOUUxMrKpGOCEBRUrt9gpw0ldRrlvdMiPvUym/ctjkdt6LfpSH3EPR
+	rjiOI6toS0cr4bXrT7ccna0MEWKnJGlUN4hmkknG3Yglp0/rg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1795017327; x=1795103727; bh=1tS67bCUwoJG/QZK2bvrIJTbgYuji/yc/2n
+	uV8sBM4A=; b=UkjQtvqLSv4pHlDh45I+gd7a2PWBZwP/v790vZpApLsepHHu8JL
+	FXQku8L5V43ojREYoOlZ0UBaUPtV00OoWRSoKmcHfdCOGHIbLPAAhDjVAi1nU6tR
+	3dD8HsHQmOIr2fKISnR16QqCbwk+WFozMeMA2tE8e+RkSINMRA25ybxyRUM3x2Rz
+	74flJWxbXcUMidgCxFqerHE/Q6QRGzLatA8WbAKf8tnKYdkYsEnxyD/VYntsUsHF
+	xhvvaxkPbKXS4EI7ItsDJyZjXIZPpfxy/cr7GRk4Oj0KlptCKNpIReVr31vr+Pls
+	Wvl75ejS1LZVMu+qoqOJNmCjJdFolK6AJiQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1795017327; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:OCkKKf2/+Z5qdFczC8nZJZsclwRmwUH3BpVEpvupAJNW60c
+	Ef07loUj6baWhSJ/Rto0cvxKhmsAqkqnoFhWzO0aMTDxFaKSGZnUOnlzO/tkBJgR
+	j6VWkqA9o9+elrNlde/yksBXepubkv6LwIOSaszVbzVN2ywFjfcVO1vIqHLgTyN/
+	kwiL7knv9GidiBfJkY1a2AEF2eFwASnLxJmBUFWcLpcfVkMo2tYWp+J615oGo8kw
+	W2jCEVCcH/efA9aRAd32xATAJGnAoDTzf3ns7y8WBLJ2w181NwNY+Yi0JFZPKWgd
+	FjaTKem5Eg9fROpHXJH9zFYciR+G/IUC4cHtZPQ==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:zSQ08SB0YDiGX+LZf9asuJBcoLufiYYjhjSs/fNXaN0=:9+VyJJq/wPHhkaOd0j3w+YWPD8nuaKGB3v3MNW6dbq4=;
+X-ME-Sender: <xms:bsr9ajpmNW9-FCEXjXuGiuWmU17fMfADZIxcUFEGZslffmqdxRmtMw>
+    <xme:bsr9apqgxL3DDvKPakZvlPOv3hvvAMXHXL_n-l6oJBRKJrH-KwoR8S0tnCob74vcF
+    6qvVAwZriWhiYTbvqVjZ-ocdVUzz0AIIRpOc9wxhhBXNmxWw_kGSwfq>
+X-ME-Received: <xmr:bsr9aiYOvpENJ9mK8_e0Pzd-4SsPvwiVnvN_4UHNJTKRkptXP0F1BVI0bknREedW>
+X-ME-Proxy-Cause: dmFkZTEaF8Tb080CrFkH3EZ5cmP2Vkp5cmhyZjH2uPuOuXlZoCaqmAbkdsXXjNl6SYEeHR
+    5TNFs9G/XnYbKIKONUOulsOoVTyDdZYWvFaG/y8NhrlmE5shB6SRv9F5+yvWxBhHKg3srM
+    nJzCQzfORaKkFt0ZC0VVm3IzJiQCA8flLztgqzgwL/DJORKIR83TSlb/aKyivXhwTzhdvh
+    dSYhCXgRTYABM11xVUPM/PL+3HamI6oKxoyLdsMue6MCS0mPyexkm9bWYseCqnS7yWtnoV
+    +TgqwSHuNSbgPERCOphR3DYcAu0RR+X2ySdk/dNlq5M3Hid2zfHtaerY1TZOnxIty4BkXJ
+    caThcY2YPwOg8eBCtxSjYY5p+3Y5WLIY0TRaInP2Vu7qtSrGBk5hOV/2ZJylNP5u9AV7Fs
+    XOZJWm0aataEFhYnOfflzW9C0OfT01UO9W09xsrqs0yBmflxODkVQIfVXnWLVtgezIWGP/
+    DV+wm5YpepTMHkJfRNFxC5hZKPozJxKf6nsuEFOxTK96FgiS6ukYwFfV/GDV04QoFAVRmA
+    pOTW/uw/fltTPL3Um4YyigafrKipDsOUy+ZJ+1OxuNU25PooHFKBUbayeQMowmayiVDWPe
+    uaBZpsnyI9eYZjYWo0FVtD3y9zRiRYboFwFL8iKxOENnZcTyTGLor0GgKl/A
+X-ME-Proxy: <xmx:bsr9an8KXgAXLSVshB-HsL4yEaQtFVHbHRxhSs3fEcUtVNpUwyrxug>
+    <xmx:bsr9aglnqvumfjJObC2s7IngLSjBYacVOExnwjWWgB47CJoQ8lKExA>
+    <xmx:bsr9akyq-BcCnFKsy3TOjZM7m1sPuEOCmXO0WRjtsS5n-fH_byhe2g>
+    <xmx:bsr9ai76cAU_zWZTrV3JnNF6wMJTvDzzfkuAByyrlAfk264fFdCjkQ>
+    <xmx:b8r9amTapJZUt_WhH1Smzdz6VVP9Me-LYYWCMYEX6OClcH4Rtir6CfFr>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 18 Nov 2026 10:55:25 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: fail SET_INFO when the security descriptor cannot be stored
+Date: Wed, 18 Nov 2026 09:55:21 -0600
+Message-ID: <20261118155521.70611-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -86,93 +126,71 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <DMYFBDIV4Y08.35ZKR5G86U1H7@gmail.com>
-User-Agent: NeoMutt/20180716
 
-On Wednesday 18 November 2026 15:58:02 koraynilay wrote:
-> On Wed Nov 18, 2026 at 3:26 PM CET, Pali Rohár wrote:
-> > Hello,
-> >
-> > I have just one issue with the userspace API. It does not allow me to
-> > figure out what is the source of statx btime field. If it is fs ptime or
-> > fs btime because this RFC implementation is mixing both fs ptime and
-> > fs btime into the statx btime field.
-> >
-> > I have feeling that this is quite a mess in API and I would like to see
-> > a clear distinguish between btime and ptime in the API, like there is a
-> > difference in the fs storage.
-> >
-> > If the btime is used for forensic analysis then somehow I would expect
-> > that the statx would not report / not fill changeable ptime value into
-> > the statx btime.
-> 
-> Hi, for native linux filesystems it will report ptime as PTIME and btime
-> as BTIME (also semnatically).
+set_info_sec() removes the stored security descriptor and then stores
+the new one with ksmbd_vfs_set_sd_xattr(), but it ignores the result of
+the store. When the store fails, SET_INFO still reports success. The
+old descriptor is gone and the new one is missing, so access falls back
+to the POSIX permissions. Deny ACEs the client just set do not apply.
 
-That is fine.
+A client can make the store fail at will. It only has to send a
+descriptor larger than the xattr space the filesystem has for the file.
+On the ext4 filesystem with 4 KiB blocks used in testing, a DACL of 86
+ACEs was already too large, and the store failed with -ENOSPC.
 
-> for the windows-like ones that only have
-> ptime (semantically) I think it's reasonable to not expect btime to be
-> immutable, since they are meant to be used with other OSs who lack btime
-> semantics.
+Return the store's error from SET_INFO, so the client gets
+STATUS_DISK_FULL in that case. Keep returning success when the
+filesystem does not support the xattr. Keep it for a CREATE with a
+security descriptor context too, because the file already exists at
+that point.
 
-The problem is here that the RFC statx API does not provide this
-information that the fs lacks btime semantics and instead it fills
-non-immutable ptime value there.
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ian Bridges <icb@fastmail.org>
+---
 
-I'm pointing only about this inconsistency.
+This is a narrow fix. It only stops SET_INFO from reporting success
+when the store fails. It does not make the request atomic. By the time
+the store fails, the owner, group, mode and POSIX ACLs are already
+changed and the old descriptor is gone. Restoring them would mean
+saving the old state and writing it back on every failure path, and
+those writes can fail as well. That is a much larger change than this
+fix, so it is left for later.
 
-> > It would be really helpful if the statx API on inode can differ between:
-> >
-> > 1. btime is present and its value is ..., ptime is not supported
-> > 2. btime is not supported, ptime is set to value ...
-> > 3. btime is present and its value is ..., ptime is set to value ...
-> > 4. both btime and ptime are not supported
-> >
-> > This should cover all cases of different filesystems and also allows
-> > userspace to do proper backup of both ptime and btime fields (if it want
-> > to do forensic analysis or anything else).
-> 
-> These should already all be covered by STATX_BTIME/PTIME and their
-> fields in struct statx, the only problems are windows-like filesystems,
-> which IMO shuold be handled as mentioned above.
+Tested on ksmbd-for-next 267029b35ad1 with KASAN. A SET_INFO whose
+DACL does not fit in the xattr space now fails with STATUS_DISK_FULL.
+A store that fails for lack of memory also fails the SET_INFO. A small
+SET_INFO stores the same descriptor as before. On a filesystem without
+xattr support, SET_INFO and a CREATE with a security descriptor context
+still succeed. A CREATE whose descriptor context cannot be stored still
+succeeds and creates the file. smbtorture results match the base.
 
-Exactly, I pointed out about these problems. I somehow expect that the
-new API would be generic and uniform across filesystem. IMHO it does not
-matter if the filesystem is windows-like or not (there are also FreeBSD
-fs and also others which allows to modify that time). So better
-description is fs belongs to category 2. from my above description.
+This patch was developed with LLM assistance.
 
-> Of course, as in the other discussion, I'm open to changing ptime
-> NTFS/exFAT/... support to remove btime altogether and only use ptime for
-> their own crtime if that's what wanted (I'm fairly impartial on this
-> specific issue).
+ fs/smb/server/smbacl.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-I'm giving some ideas how to possible handle this situation:
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index a87c22fa9a6e..3770dda2b3ed 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1984,7 +1984,14 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
+ 		/* Update WinACL in xattr */
+ 		ksmbd_vfs_remove_sd_xattrs(idmap, path);
+-		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
++		rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
++		/*
++		 * The CREATE context (type_check) stays best effort because
++		 * the file exists already. A filesystem without the xattr is
++		 * not an error either.
++		 */
++		if (type_check || rc == -EOPNOTSUPP)
++			rc = 0;
+ 	}
+ 
+ out:
+-- 
+2.47.3
 
-1. do not fill btime it at all when it is not available (remove btime
-   altogether - the case like you wrote above)
-
-2. when userspace ask both ptime and btime, then do not fill btime
-   (remove btime altogether - but only for that new case)
-
-3. fill btime with ptime value, but add a new output flag indicating that
-   the btime is not present at all and instead kernel filled ptime value
-   into the statx btime field
-
-4. let statx btime as currently is, and add two new statx fields:
-   immutable_btime and ptime. immutable_btime would be filled only if the
-   fs supports real btime (so not for ntfs/extfat crtime) and ptime would
-   be what is currently in RFC
-
-Ideas 2. 3. and 4. should be fully backward compatible as it would
-affect statx output only when called with new flags.
-
-> Thanks,
-> koraynilay
-> 
-> >
-> > Pali
