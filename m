@@ -1,100 +1,123 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.43
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795022897;
-	b=USFujz8tBWqKT+v/9sbGd5uHzha8YZVGWuSUXm3rpB64f/4X2HNxJDWNGWTNThHUZBIG
-	 JwyCvyOAk7n1eIKiCkeaBdwjDqFpW+sY4WaxHPwpkDNBGEltRze0G7pS+7ZK73iCGgAn8
-	 8xj4CHgCjQIwyTjGFLzf7bgCv5H77wJy1bW1cQ4eLRMcagGgLhGDEbi8pquHFN0mROf/h
-	 AzlqjpJ6kVcKX9HiP7C3mOOlklfsdhzaNKWB1QscIzOSx1d6HPZxbKm9C8Y4Gnd95wMdI
-	 M88A8yJvdEPIzS8X47lri3CCtQZdWnGWLkhtcozNcPRrt+vr+sKg91LS/r6Ki0i5XRA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795022897;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=BuqsxlOJVL3aXO3esMarU1UAxW5/JG2MFfneSOcfhAg=;
-	b=q1i0j9UsIy4WMCD0SqTF1iom3mbRIxo3z/RrRYnrYMNpClVF+1zz4v+qI5v0DbU7FdeB
-	 7d+j++lAi9JKKbJNsDGHc+fHkKNxl5H92IuTeKJ3lR+9HbbusTKp+XW1y5lUNncWPp24R
-	 Mys+u0X+lrG9Iu85h8Sm5GR4Z0qWVB4ye7/JbXf/i3GUSvGFilfCxpUY9jrA5xZpwBZ5D
-	 +BffQIH8lqoL/AykF0O4Rl8sf/XcDPFGBwMlRXhQi0QX76Y32FEra5ZGB838QEsbFwKia
-	 Om0Q65lD4wEyJratVeDV0kedcHLsHekSeTwfblADfWGZyo0qwuoEOlU4/cY1Ksk1Rlw==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=N0ka0oEp;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.43
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.152
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795023301;
+	b=KtfyqPd9YU69SRvCfgTAfyuz0/W7+G4KmIA4ZE7IesbLQRFK/xMZBE0re2mhLH2XWibf
+	 XZ2pW50SgQZC8cSVlwH9Pdkp7VOnK1JAOz08nenXGl2LRPzNnFYwiIovIig5CZdFY9ZJN
+	 kutxlyKuKhtO3BuCVzGTm1Gn7fdRfggh/Q234tFJY4jmcSHKDDKhm6klfYMLeQjUC9/rc
+	 xhlo6q8MVFJbVrKR4bXp8k4njAr3MDBPZc9ClmDwuS0lBM40i35Vit1wvZ91kKIBfqOVD
+	 iDjQacqPqfV7XZY5B4CuDrwkJlD8+usVZb9Ne3qeQ7f16r9C20Q0VbcLK5S/3VqGIxw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795023301;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=8fZ/Kxw5ysHvm1gRaGTc8BKvj3+nNehSTXXJUGYzQeA=;
+	b=b+k7qQBa69E5/tZnc/TLRVuOs6wjWCDw6U4/wYY4Ggw1hjKYsnpo5J0So77kggxq3agB
+	 r78uTU8Zyf1ZQaLn9W3RW5X9y8K4vNT6nOC+oQo2lFxSJN27EW0Mb3k3/d7YUOJmnggZL
+	 CL8jruvdIPdoahwn1Jf0RRUM8UmEel/s8lhJmIemGjkedKyCHoKqOeihHnQm/bLj1nEJ0
+	 5n0kNXC3fOr45rTZ/XEMeWX/1g4EpldtLFfP7oxnUFlCkFKQp8Vw7oGoX1Dy1/GEoh/Nt
+	 /1+9KUpvaQHkvd2X8NElmO0cK2MFjoFcfgcfb6/7ILspwC15l9G7d7YvQ1LJRU2Zsag==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b="s/xXDjYl";
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=f4Rx2On9;
+	arc=none smtp.remote-ip=103.168.172.152
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB18606B5C1
-	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 17:28:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2AB18606B5C1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED0A606A325
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 17:35:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 3ED0A606A325
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=N0ka0oEp
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-6b894a5ce3dso1472593a12.2
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 09:28:16 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795022895; cv=none;
-        d=google.com; s=arc-20260327;
-        b=ldPHDGatYdeYRLgzkPO094hZRuz5KhJ3hOAuL+12mjzVlu8LmX63nc2deOjriRrv/3
-         jXiZ6f897BV8JkLWuMpYg4mHjddVdtF3ouPGodkke8jxhatEAcR4gAPXO2JwQSB4D03B
-         o1sveKWgHgJ2erwpcSRAFucox5pFQMbVAcXPpxhIDVr2pFZMQdkvgt7JNfhGmrToQp6U
-         UWhAPk6Wi37BSd3EuhrrPvX1dEP8L5+PgyV7Rl9SH2znK8GvbMJRAWg4w+ZqHaM88tGi
-         us38Z9Bele3fJVcepMHrJjFSCuEcfjpsj10Q8OWt6pEFMXkJtiVLmGwgX8vnm13l+JrB
-         m9FA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=BuqsxlOJVL3aXO3esMarU1UAxW5/JG2MFfneSOcfhAg=;
-        fh=evPkjqn/iJSfHmx0clzqcaBJjtvq5zMZuixNGAd8seo=;
-        b=MqJDLyoNPWhBWtdY/NJWszRcYnWMqFZYgY5JvQdr8lVbMpeAef79VVDdB77mDLhEcE
-         E52Y/WgRxlIAJ1v83+JLgOAGBd4IjGdnnbh9gnHYDNjZHjwkyuVR3iTsSf7p/gcFOSdN
-         U77uo5EdZLQb8Dx9w6fZ5kIL+T+bcUGKdNfkSqdvAF7yy8X6n3Wi8aUBJfk00oqxkCYy
-         pG3Jp37BK+XClYddMDQlDsp7PS9Q7olBP8lUthLc7JQ1mlDTMscxFibIL9Ptu1VtYnQm
-         PWbmNYooiJsr7NBADuokPTPdYrOTvkrUloDbsG830bA4bAZjb925wBfagVRZZ0+3kGlr
-         bMtA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795022895; x=1795627695; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=BuqsxlOJVL3aXO3esMarU1UAxW5/JG2MFfneSOcfhAg=;
-        b=N0ka0oEpdc1KBRETx6vJralQzXZsG33VIDKTqxcReCenPkPMzjBbHoAj8OnXpSilUu
-         A1wEHuH4VLiE5fKH/269FevCSo8T3wfaLyXfhAREdtktxpz0vbVp6YSGOZC9WgRHlfHu
-         hoYAGmif14It/vlu3AnFqhAdg5yMe1Sg/7YsqVKfzrahaV9yv6dPM5UvmTS8082UHuOS
-         06xG26st6EFINK/uHEn9QyGnzXtLRyv2nEX5V1QJmRRD5JIk2GNaN6rdZ/XNjZmZiO1f
-         Zdc+3U9kshh5a/xmDA1xX5XPADDc4Xs/h5ZDTj/nHFWfmM/zzjQzTzWGBfhNq4veH5qI
-         tsmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795022895; x=1795627695;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=BuqsxlOJVL3aXO3esMarU1UAxW5/JG2MFfneSOcfhAg=;
-        b=gqCgp4DYfPU+cylW2ttKKbOmt2K3fuNtFeeTu75pW63bkkoz9aGpF0dv3H/lweCdGd
-         jT0wPYpX0q4tMIpGJBiYPsekCoNSdZn3/I7JgoTwQXk3EjySGjVQ2T8/H1f/9egoEZSk
-         SBstOJTMTzYU9V9koWQeuVyWyn7hI38m2/OvBUI/h9TxoxsgrMFBSssWUTuIosxM6SWq
-         QMsCVqjmp8Wdkb5zmA5lwc1tJL8B20NA5prEYpFFRB1QzFoBX54dFQVEs1TYNwRk8Lg2
-         C4Xzeihb8fTmbBOUTAyERqnMoL6TVv50tN6mbZMLilvkmS4ywMklke8kqNWnu+5//WQc
-         JuLw==
-X-Forwarded-Encrypted: i=1; AL+hErG29rvwCC0f92tfgTxXe7CrJHRbL8POgchzxYOymUlnllmUfEN3Rxo3YFMBmp3SfFdYtaPaOm/Gmbgu@vger.kernel.org
-X-Gm-Message-State: APuU4Z9Py5aXyxA3qXo0Ksnvu7NGl5dTWDbgZz68e8poIN10ZHpT2PfZ
-	208WHddrzdGROrBrWPqB7iDmGJ9Wd5GD0xQ/Et1eTU0ThAhg0RiZbRAHS6uZw3PFY65uo+APX8c
-	Qj1MqJ5B5If0eppSohALra36qUAKhr2M=
-X-Gm-Gg: AYBFou206XezZut51feexj4wK8MvhNBLTeYHr3USAhkNo+Ye2vXqEg7zNruJxNllksR
-	VvhJSbZUbvGz4pXQTnpnijTLTHhAi/jdHjIUGz/HDee5JqUHxViIaiwN1BF6MVKdoVZTzVnDWK1
-	aNUbAFSdh8t9tWS2nEAXYvs9qiGNuf3enXJGEGyDmyZcZuudXxFhMzw3Aw+0IB6219IpIpNZKQm
-	MEwUFcDx+56hJsn0IkiUX3utpVP3aE5ByyUh5AnFrMTsJD/eYnFcNtpc17zJ4jqPI6TWlMdG7Bk
-	c5z4HfS6wKV46YndCrWq6P4bxTqqOqprQdAofasTXKLpqO5hFCbhAVj6xmbXrVaTEjwlDdfZ/kq
-	RTSr+f+8JGkjVRpaMKGC7yxVMkUMS/nkpRwLaydNOQwGDNMdmIC5Nc41J6k8NmS2Nrl5xWQ==
-X-Received: by 2002:aa7:c719:0:b0:6b8:7e86:3e90 with SMTP id
- 4fb4d7f45d1cf-6b88810f98fmr2191340a12.38.1795022895320; Wed, 18 Nov 2026
- 09:28:15 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=s/xXDjYl;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=f4Rx2On9
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 72DF0140017A
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 12:34:59 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-07.internal (MEProxy); Wed, 18 Nov 2026 12:34:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1795023299; x=1795109699; bh=8fZ/Kxw5ysHvm1gRaGTc8
+	BKvj3+nNehSTXXJUGYzQeA=; b=s/xXDjYlX6j6oLIXXm/RXaGxPhJBT942EhSVa
+	6WlFozTgMZnTnaDdqDpfsOD4SdwCCxarC6vCcpqXp4r2zHmy/8P5WbmC5sakf2LB
+	lSWpmWlpCaVtedWz4DM51gSOT3cyxJUeg4tSPSbY3pgflnrX3GH0ZPPYbQH/t/7R
+	uZOPbiiLyr+QdrMKaXJ9wfAN5llYXzAECQpcuhKUIeWZBn3Bfh6DHetsvgS/x/iQ
+	jOwAYrUSDgnDwvw5mkeyDr25tbTzbRVrxjJRKKn4OcTZsfcMcbQbJeX6NWt9RmL4
+	8KHyX/XS80ruJXWf7WpZFdREcOTZBGrCN0lLTdPLp636PFBDQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1795023299; x=1795109699; bh=8fZ/Kxw5ysHvm1gRaGTc8BKvj3+nNehSTXX
+	JUGYzQeA=; b=f4Rx2On9nMnBWwQElfC7PUzLSsx1wjfzAhVOFeWpBm7g/TIcW7U
+	VahVs3Q53dhARhph+57xZVuh9Rttzk1M361qgcwgA3BlDOpclh6DU3+45Wf9T8fO
+	aou5tUeujNktENbv7XlrvDZZL7jbKip1T5jfHHSu4a1w4/4nQcTZHXK+4NB9JgNB
+	N4sVbsrFpenWZizgsQ0MCEQldkVVaS+8MWuTEa8m4t7kULpGjHF2tLrINoDHK2s9
+	bgVyvlXFf8DgOIfU6m7Q1BXe8p/H5ooTV/YRt+1Nf4Zk5qKDdISYbP84tczHCwN5
+	euwGJ3HnM4y668G42aCRyhwz/30OxzyGRCQ==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1795023299; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:QOD7szqttB47J0X9f8kCu6An3niROxjnyfNh/tgmR5I6LeT
+	rvL4P7ZSQKwVSmwiv6eyQQ1+xhc5bmGAMmv7403mkfzOKLRs48JQP8va/Lpc1Z2J
+	LQ5jLmV3HVMp/QwMSN5/P3HsTLb+PvYcp3Nqa1CoJC7tkSuXenk6eCjdF1TB6uc8
+	NzjuoTYFkcWCHdy9rdBrN2AGu7vlr8BE0j3msQgPmo7YUBBsFt1WXwOSURiSJRW7
+	+m5tnU9O1tO5xS/as7GdR4NtFVpyyir7c2xs0p8NZ20OcERdesDBKEFqwxH0y4i7
+	JNMxsuZ/g0uzc3t9wkEVlHmkZI1qm58j0rxGfTw==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:Oq7lNfgZIZStWBBZNqx43UlZdX234f4ouEubo9qk+tk=:tAjl/4ejSE5QxYJY++DFPh+rZ+7sOuvFDDtilHFBdd8=;
+X-ME-Sender: <xms:wuH9aolR_7aMHtktEStEcwIk7BrrcVpaDPbJzj2QlOy-gSNgZ3LNzw>
+    <xme:wuH9aoSD5Fc9udPGhRXtoVrI8Zr_LYDeo3SAjH-BkarPGOlgYwPy2vozUN6FNhuX4
+    eivmTXB-UgUgb74FMtSITholn4xh2Ie-30xZ0TknyAjktN-u9EXQUU_>
+X-ME-Received: <xmr:wuH9anWTKzkT8-BEorbhSzlUXhwG2RFs2DjI-dAWsUdC9ZHH7R4AJYMZ4s2IGzzn>
+X-ME-Proxy-Cause: dmFkZTE665ki3z6U4P9eZMFvamr17VPbNJ9oJwqirtbKiFZZVsgSXWFv+TLQIfjnq98VFs
+    own32DuLKLA4btFG9+1UZ+G68Orv8JzrQh8vOuczU971+hKpxbY99Unn11GT48RP+G4t+c
+    WQr4KOkrPQZEjVp0HRQqP+wagVLdA9vcV2653tZT3jhv5SIWfKIQ2dk1LumpTElDPYH5P+
+    rqXyJ3tjgo8NV8hoJmEy6iEvwXjp+kAAiaB7XrTSTw6FEOQL76rCHZD3J68l4UaBsSWaih
+    Vq45vGG7NHubxa6D3beAzL/JMpixr+FqCx3HlZrZZqqQNtw+iGamQ8vGg55rw63Q6wwdck
+    Sxju3lHkTorTlCjLH7ZNuMi6B6/qnu0q1Me+70qQIroFhtFWYE1A2zWZTI+2EshUunPPoy
+    4bmPSUFslPuqkkPSvizFySEBtgNWj19kCgkbUqdiEet+HXDPxkU9K3rJ6r7SFPmJDFuCbD
+    Hfw8W+Ziwp0XmyVvfJG25VS7v9tnjwjlS0SrEN+VUnocLcsPnHyhSCBPoUy2fk5pcA9517
+    JrmAxZqGsmmmUMeOL5qlZI4M41AjYr2OEKhYHrO8BXcnmMawGsENzjymhxRo2I/jJ7eyTe
+    ABCf/uTODmn7y8JOG9NHbNy3o7NHao5wHjyNKX2L5CV6/MEr0xPEk0qlVyrg
+X-ME-Proxy: <xmx:wuH9asLNsFtW-BkdVKpJtwN_ecZhjuQAqI4ONzxBBi-S8C78CAa_pg>
+    <xmx:wuH9an0gokHtNZOD6uA-vBuQw-DmWyWGgM8NKLXPvDwGhwJecdActg>
+    <xmx:wuH9apIk6ST-7xXkYTaY2PAEiWlqvzPqvDJ4iaUtknmGelcIPWy20w>
+    <xmx:wuH9aiiW1dyHiXElb51ucnj2E200HfQVgWs1l8f9uWF--NAgC7wX0A>
+    <xmx:w-H9al0OgwIQW3rVCngcfyBHGtZGIER3lzTSk0A_eOd6Z3L4ZOZ9o5mP>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 18 Nov 2026 12:34:57 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	manizada@pm.me,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>,
+	stable@vger.kernel.org
+Subject: [PATCH] ksmbd: allocate the security descriptor reply at its padded size
+Date: Wed, 18 Nov 2026 11:34:54 -0600
+Message-ID: <20261118173454.76416-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -104,210 +127,58 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261115180343.576773-1-koray.fra@gmail.com> <20261118142613.be3r3s6kobkkxnz4@pali>
- <DMYFBDIV4Y08.35ZKR5G86U1H7@gmail.com> <20261118151605.lqtn5fz423kuswk5@pali> <DMYHPLWKPSH3.MUM1IIZZIWNR@gmail.com>
-In-Reply-To: <DMYHPLWKPSH3.MUM1IIZZIWNR@gmail.com>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Wed, 18 Nov 2026 18:28:04 +0100
-X-Gm-Features: AclHuK_OBRtHc7-5KG7akP_YkM4KJWR2TZsgDeHOUIp0HPbMp3zus5S6xDYf1EQ
-Message-ID: <CAOQ4uxiwpdC-fKkqS5kiZ515q9MenC0jX4USV1idN7h2njx45Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 00/10] add provenance time (ptime)
-To: koraynilay <koray.fra@gmail.com>
-Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
-	David Sterba <dsterba@suse.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Sungjong Seo <sj1557.seo@samsung.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
-	Paulo Alcantara <pc@manguebit.org>, Chris Mason <mason@kernel.org>, Yuezhang Mo <yuezhang.mo@sony.com>, 
-	Jan Kara <jack@suse.cz>, NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, "Darrick J . Wong" <djwong@kernel.org>, 
-	Sean Smith <defendthedisabled@gmail.com>, Andrey Albershteyn <aalbersh@kernel.org>, 
-	Pedro Falcato <pfalcato@suse.de>, linux-btrfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	exfat@lists.linux.dev, ntfs3@lists.linux.dev, linux-cifs@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-api@vger.kernel.org, 
-	Theodore Tso <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 18, 2026 at 5:50=E2=80=AFPM koraynilay <koray.fra@gmail.com> wr=
-ote:
->
-> On Wed Nov 18, 2026 at 4:16 PM CET, Pali Roh=C3=A1r wrote:
-> > On Wednesday 18 November 2026 15:58:02 koraynilay wrote:
-> >> On Wed Nov 18, 2026 at 3:26 PM CET, Pali Roh=C3=A1r wrote:
-> >> > Hello,
-> >> >
-> >> > I have just one issue with the userspace API. It does not allow me t=
-o
-> >> > figure out what is the source of statx btime field. If it is fs ptim=
-e or
-> >> > fs btime because this RFC implementation is mixing both fs ptime and
-> >> > fs btime into the statx btime field.
-> >> >
-> >> > I have feeling that this is quite a mess in API and I would like to =
-see
-> >> > a clear distinguish between btime and ptime in the API, like there i=
-s a
-> >> > difference in the fs storage.
-> >> >
-> >> > If the btime is used for forensic analysis then somehow I would expe=
-ct
-> >> > that the statx would not report / not fill changeable ptime value in=
-to
-> >> > the statx btime.
-> >>
-> >> Hi, for native linux filesystems it will report ptime as PTIME and bti=
-me
-> >> as BTIME (also semnatically).
-> >
-> > That is fine.
-> >
-> >> for the windows-like ones that only have
-> >> ptime (semantically) I think it's reasonable to not expect btime to be
-> >> immutable, since they are meant to be used with other OSs who lack bti=
-me
-> >> semantics.
-> >
-> > The problem is here that the RFC statx API does not provide this
-> > information that the fs lacks btime semantics and instead it fills
-> > non-immutable ptime value there.
-> >
-> > I'm pointing only about this inconsistency.
-> >
-> >> > It would be really helpful if the statx API on inode can differ betw=
-een:
-> >> >
-> >> > 1. btime is present and its value is ..., ptime is not supported
-> >> > 2. btime is not supported, ptime is set to value ...
-> >> > 3. btime is present and its value is ..., ptime is set to value ...
-> >> > 4. both btime and ptime are not supported
-> >> >
-> >> > This should cover all cases of different filesystems and also allows
-> >> > userspace to do proper backup of both ptime and btime fields (if it =
-want
-> >> > to do forensic analysis or anything else).
-> >>
-> >> These should already all be covered by STATX_BTIME/PTIME and their
-> >> fields in struct statx, the only problems are windows-like filesystems=
-,
-> >> which IMO shuold be handled as mentioned above.
-> >
-> > Exactly, I pointed out about these problems. I somehow expect that the
-> > new API would be generic and uniform across filesystem. IMHO it does no=
-t
-> > matter if the filesystem is windows-like or not (there are also FreeBSD
-> > fs and also others which allows to modify that time). So better
-> > description is fs belongs to category 2. from my above description.
->
-> Ah yes, I used windows-like to mean "only have ptime semantics", so same
-> as your category 2.
->
-> >> Of course, as in the other discussion, I'm open to changing ptime
-> >> NTFS/exFAT/... support to remove btime altogether and only use ptime f=
-or
-> >> their own crtime if that's what wanted (I'm fairly impartial on this
-> >> specific issue).
-> >
-> > I'm giving some ideas how to possible handle this situation:
-> >
-> > 1. do not fill btime it at all when it is not available (remove btime
-> >    altogether - the case like you wrote above)
->
-> This would be the most semantically correct option, but would break at
-> least 1 script/program/use case.
->
-> > 2. when userspace ask both ptime and btime, then do not fill btime
-> >    (remove btime altogether - but only for that new case)
->
-> This probably is the best compromise.
->
-> > 3. fill btime with ptime value, but add a new output flag indicating th=
-at
-> >    the btime is not present at all and instead kernel filled ptime valu=
-e
-> >    into the statx btime field
->
-> I don't really like this, it adds complexity and uses memory/1 flag big
-> for a single specific field, IMO it's not worth it.
->
-> > 4. let statx btime as currently is, and add two new statx fields:
-> >    immutable_btime and ptime. immutable_btime would be filled only if t=
-he
-> >    fs supports real btime (so not for ntfs/extfat crtime) and ptime wou=
-ld
-> >    be what is currently in RFC
->
-> I think this is also too complex.
->
-> > Ideas 2. 3. and 4. should be fully backward compatible as it would
-> > affect statx output only when called with new flags.
->
-> Then 2. is probably the best way to go forward (maybe I'll include it in
-> some way in v5), but I think we should let each filesystem maintainer
-> decide if they think their users want to have statx report their own
-> crtime as btime, ptime or both (native linux ones would of course
-> report btime as btime and ptime as ptime).
->
+smb2_get_info_sec() allocates the security descriptor reply with the
+size that smb_acl_sec_desc_scratch_len() estimates. A compound response
+pads the reply to 8 bytes inside that buffer, so after build_sec_desc()
+the query fails with -EFBIG when the padded length does not fit. The
+estimate is not padded, so a descriptor that fits the estimate can
+still fail. A query with AdditionalInformation 0 always fails with
+-EFBIG. Its reply is the 20-byte header, the estimate is 20 bytes, and
+the padded length is 24. The client gets an error instead of the
+header.
 
-Guys,
+Round the allocation up to 8 bytes, as READ does for its data buffer.
 
-Let's take a step back.
+Fixes: fda9522ed6af ("ksmbd: fix OOB write in QUERY_INFO for compound requests")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ian Bridges <icb@fastmail.org>
+---
 
-If this discussion is proving anything is that the btime/ptime
-duality is a big headache and it's going to be a source of confusion to use=
-rs
-even if we come up with some smart pants consistent semantics.
+The size check after build_sec_desc() is kept. It still makes sure the
+descriptor and its padding fit in the buffer.
 
-As Jeff writes, I think we should consider making btime mutable
-be a per-fs choice and not an API limitation.
+Tested on ksmbd-for-next 267029b35ad1 with KASAN. A query with
+AdditionalInformation 0 now returns the 20-byte header, both alone and
+in the middle of a compound. Replies for the other tested
+AdditionalInformation values are unchanged. smbtorture results match
+the base.
 
-A filesystem can even decide to store both the forensics btime
-alongside the user settable crtime.
+This patch was developed with LLM assistance.
 
-There are some precedents in xfs with settable UUID which is
-a different field then the origin UUID from mkfs.
+ fs/smb/server/smb2pdu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Fs that have immutable btime have a few choices:
-1. Keep it immutable
-2. Start making it muttbale (like the Win fs)
-3. Start making the user visible btime (STATX_BTIME) mutable
-    but keep the forensics btime on-disk for, well, forensics
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 29750970f8da..84f840f51297 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -8510,11 +8510,13 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 
+ 	scratch_len = smb_acl_sec_desc_scratch_len(&fattr, ppntsd,
+ 			ppntsd_size, addition_info);
+-	if (!scratch_len || scratch_len == SIZE_MAX) {
++	if (!scratch_len || scratch_len > SIZE_MAX - 7) {
+ 		rc = -EFBIG;
+ 		goto release_acl;
+ 	}
+ 
++	/* A compound response pads the descriptor to 8 bytes in this buffer */
++	scratch_len = ALIGN(scratch_len, 8);
+ 	pntsd = kvzalloc(scratch_len, KSMBD_DEFAULT_GFP);
+ 	if (!pntsd) {
+ 		rc = -ENOMEM;
+-- 
+2.47.3
 
-If btime becomes settable via options 2 or 3, this could require
-admin opt-in (e.g. tune2fs -O crtime).
-
-With option 3 the crtime feature would be ROCOMPAT
-With option 2, it could probably be COMPAT. Maybe.
-
-If we accept this story and the major fs maintainers are
-in agreement with this plan, then I think the missing piece
-is making the "settable mask" visible to users via the new API.
-
-IOW, we need to somehow export FS_XFLAG_RDONLY_MASK
-to userspace instead of only exporting the supported mask.
-And then with the addition of xflags_mask, we could also
--EINVAL on users trying to set readonly flags/values.
-
-Perhaps a single xflags_settable_mask is enough.
-
-For file_setattr(), xflags_mask is anyway a set-those mask.
-For file_getattr(), does it matter if we get an answer
-Filesystem does not support casefold on this file
-OR
-Filesystem does not have casefold on this file and
-you cannot set casefold on this file
-
-It's kind of the same, isn't it?
-
-What do you say?
-
-Shall we drop PTIME in favor of "is BTIME settable?" API?
-Leaving STATX_BTIME exactly as is.
-
-Thanks,
-Amir.
