@@ -1,83 +1,97 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.89.141.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794959827;
-	b=o8kuXdfUEnx3Es3iMc+M5U8Bj7zJA8U5gJvumvKJk3Cvml32wT65XEzT7+X4s0C6sP/Q
-	 ouaT6E8S1kcb6CVLzJTez0zOOF3RmtD9wM36z2Dc7Rhv/vtxSwO2PND5NpjB0NnHFbhOP
-	 hiWD9YS35aKeDalcWZOIFnV6jqm3wuD43u4/p2ecJyVek2zenuh9PAQBN4k6ViTtjDBbg
-	 5yUVvPxfCrXNIWW15S7jMIhFTPUt6ZqQQmWaD+AOnmOMzs29MRWmpcMw+awuDWUS6mfIx
-	 JHWb6GSt+TVj+TwftB1I46gRHfU94iV6awi8NgiR2TeuAFkD4puJSFIg5Rvvyv6osLA==
+	t=1794961022;
+	b=OAqjhafzEdE99D+pQR6x4+7LWi0EwfWZ3lVM18LnzwnLQDr7QRhfNAKrWYn2QGTQ15uv
+	 Xv6VEqVQ9PXkzt/u1MDPHJyoe1TruJEdDSW83DUGHiXI1AwqPTb+fZBcs4MJ7+1DY8qgI
+	 HzvyAcEX7ImnDDiCqIrSD6plxMArjM0b8ka2ij2JNABkM6IPmwtcLLCQwYlwEYVnfxhmC
+	 W+OZv3Nrk/vm4CytQt3OocY1I83afGV260EoOgTGS/cDmN5HrXUYAgmAy3umgNkx/8qNn
+	 b0NYizs6p4+e2FHmBaCEsbw0jHTRXrzLsQCpVbp5N/9kp+xMS8elus1Wql1pmAkNxkQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794959827;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:X-Mailer:
-	 References:In-Reply-To;
-	bh=zBKSUNIiXiILVKYT5fm/zNF8yb/snSQKW4BL97jmOFQ=;
-	b=DsSQ2/P8E4hFoDk3kAKHfy0f9XbMbwoS0NqB421inzO615sTjDkw1nTSfeQy+71rZ2hr
-	 D3Q7fxlf/BekNPYzP7ccDSogUOLud4JTNGIBargNAEHSslHI9bet9R78CN5Q6Zfhy1Wqs
-	 VOt0SyQUS6dyGzIIdFbEiVLjvSJIjhsvedTZjaI68BQMQUXiLEMP3JMJV63Xebjue4OJ3
-	 /8dZPZEki+7v/OtnEueJUwRBroH37sn55Lic+BajX1KMhMB56WMMYuSU/vC8w60oNh1Po
-	 DMYcCpgCuMQCGEwEF6j7qJshPl2KoTVPjAroGhM7wio46v87Ho/FspR4lWQMD824+Wg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794961022;
+	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To:Sender;
+	bh=7Cn7kvyEpPF81PEysHmt35Ci8fEqAoER3KXkfxx0oq8=;
+	b=vluiF4KKqBji1epkz8wi0C5Zr1RD/UccLBmYVBvzjHMW0Rsb1jsfIuYs9Jleglh/6LDE
+	 66ry5GQuO0QVghEvmWVwTCTLIJOQSKA/HBlIsRj1NQkPO/loIBLA54Qx2RyQASc+A8T52
+	 wStDvwk66otjeQCarZ+Lb8dXyHlxk3nKAhFDEQevcCGkZ0hdOhqhdo7PbM5+16/OP0ejm
+	 pgRcjI85jjBFbIQn6aIDoBFwiEv0RXHPDgHKSX5HlnV4aT+8NAlegfS1x/y6v74IR9/KM
+	 OEP5Jx/xx10fKSlWzSZFhazn+dpplMSUvlFsg9dXqB+XWrz2EY2CCIukPbO6xSeOThg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="XeX/kpqg";
-	arc=none smtp.remote-ip=209.85.128.53
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	dmarc=pass header.from=zeniv.linux.org.uk;
+	spf=none smtp.mailfrom=ftp.linux.org.uk;
+	dkim=pass header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=CHOH2EIm;
+	arc=none smtp.remote-ip=62.89.141.173
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CA7606A31C
-	for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 23:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D5CA7606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D3C606A31C;
+	Wed, 18 Nov 2026 00:17:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 14D3C606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XeX/kpqg
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4bb70074ab2so4150005e9.0
-        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 15:57:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1794959825; x=1795564625; darn=vger.kernel.org;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-type:mime-version:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=zBKSUNIiXiILVKYT5fm/zNF8yb/snSQKW4BL97jmOFQ=;
-        b=XeX/kpqgO/1P35ogpjLlwilnlvUFxFQSHMnnNShW2FTydkN5BOOFbOVoiZ1Tt8lCdP
-         nWleJ1xb2SgrnnY9yQ9J6liP7gVP9z1S3U51juI7aanyRwXBCVGUrHcNBONwbjovMIGA
-         ize1km3yalXg/kHQB+YLgd0Je/uGWIV6uDtEnzb6G6RYtBpDw9SqmNxyytBqPn73y2BO
-         O8Mc7OCOL9xSyFnV3BpIDzNIJYJeLqnhDNohQQ3Qqk55TRBfkEsdiw8VlNsKlb+LRcaZ
-         fHdt6yhQVuwnXlUzL/YnSKjia75t3dr5aQ/WGzE8QhPLylqcImcPLkZpnWJIGYUcACu3
-         bT7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1794959825; x=1795564625;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=zBKSUNIiXiILVKYT5fm/zNF8yb/snSQKW4BL97jmOFQ=;
-        b=iiX/hX74ZlyraVKJVZdEPIeYdH0Bk/SUApCfe9r8wnORKyhdQZq8QP8/CUlzbSl7lb
-         nFd7K9d3xfqDioGh7fwQNg/oMWnim0GsWszWW4jz9+vaKsm96G6POUPl4343DzFrpgb1
-         G40WWFY9aLPda+y+PnXy56U4qhmnjxmjMPC1g3i+m2KuDm+l6XmlF2d+a6h6XEJUDntl
-         hq0SGmH8J4MnZeOZVy776E2wphgHSL5hFLDXn4JzJjLjmGw2mtpi+yPIB+LcIJ6q1mF2
-         MAbA3BcYvd18bBuXJoYHxWRIsUSVfRafNPbdSNGTxz4kQVVtJ0WOc/sciUgukYMv4cXO
-         ZJ1g==
-X-Forwarded-Encrypted: i=1; AL+hErHx9m01mFJn+WEpBMqeA8T4FQkotic3KAIgp4o+8pFybjJh0ZilHjxZZ5QpzuQZbcuKdCn2aPPjtrkW@vger.kernel.org
-X-Gm-Message-State: APuU4Z9MYnZUjK/dlYpHIeA/BOk5ToN3HlSXbFKXCGZmLi3Rn7ZkMRH3
-	0AUMCt9Dr8AjhrBGXXN4M4wDiRgmsZKKkFKE/KL8tjJQMRKnpfcseRKl
-X-Gm-Gg: AYBFou2WC08BRWrbDl/KSXM6EjTv9R4zPtnIs1pVObZEOFLnN9H5//LADhWRy/ahAeW
-	AnUrs0dFwEG/7ksqaMl+exAIM2ekCF7nsPnovYxqSWaBb1QcgZgjHKksWyBjShyGRGn46NLBFI8
-	LaO/P4aNj845x8oc/0gBsLmSxdsyXbDftERH+c4IOtEqi5r67Gaw3okwasiCbrRmii04vCh3sft
-	uK/PZpjGDGTRUnZJV9OclBjmmeYP/8qJSzP5T+JT20XSK9DJ2U3iO1zw+rBCGgvaPjaaMYoII6V
-	KLxaV9YOVDro3jKdJjaGuuCV6GlMMmrAR/P8AmkQjKdlQAFER8d2/MRr/DZm9ONDl44LpKQfP2W
-	6ZTu3DgQLSzzB7fZzUG2pb8Yi9oQ9BN1Z0zqq9a06j+4c9T7cH6TTHxBgPIwePCO0cQtsYLKrdR
-	EQ/6E31zsksjAi92BcIpPqvalv2H1QjqPmsy5psKFEQr1wHvPS2LCGxCCWrnHsgdhrZcLjSvGbD
-	MD6Njwz4KLWO1re0e48YUd1nQCPhgaxZPPAB+O4zeok75MhJaONIN/2JffgpDOD8lDzEwYrVrQD
-	grwl2gZOXGciYTSrKSSKUbuBKg==
-X-Received: by 2002:a05:600c:3485:b0:4bb:6c5e:b006 with SMTP id 5b1f17b1804b1-4bb7d6cc1fbmr14508645e9.3.1794959824991;
-        Tue, 17 Nov 2026 15:57:04 -0800 (PST)
-Received: from localhost ([2001:b07:5d26:7a6a:365a:60ff:fe0d:cfc6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb7ddd4614sm11604905e9.6.2026.11.17.15.57.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Nov 2026 15:57:03 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=CHOH2EIm
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=7Cn7kvyEpPF81PEysHmt35Ci8fEqAoER3KXkfxx0oq8=; b=CHOH2EImE32MCKC26QN/24GUrd
+	FBPcI8h/GIcU5ew7o/3rkJXl0BLdIeW7EOEQtMJdSJPzYII29UlVG2JTS5LXEJMYNgr1FvxHbgpd0
+	wrs3m/Xk7A7WTFbuCZuerSAToP2t1LgF0RJCQ1l4R5X2F8IxOGOhv0wJjpZ72x7SvOPqh8bMSNxFM
+	Q1x1tZUC1HinlKerwu2CcDccLmVm8IDK8gfVV57Chx/qlWsowc8nemFxbIXaBkhIjYmr72boTXSUL
+	GuwNXIlWTYrsD2IP9qolOSmjGc0P8Whak/ciC2rL8MnPtzJtyKRrxH3G3ntipwi7x8qAZ5yTkvBLb
+	NA4Y86WQ==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.100.1 #2 (Red Hat Linux))
+	id 1xTTLt-00000007BaR-1POq;
+	Wed, 18 Nov 2026 00:16:41 +0000
+Date: Wed, 18 Nov 2026 00:16:41 +0000
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Cai Xinchen <caixinchen1@huawei.com>
+Cc: mic@digikod.net, gnoack@google.com, paul@paul-moore.com,
+	brauner@kernel.org, jack@suse.cz, amir73il@gmail.com,
+	andrii@kernel.org, apparmor@lists.ubuntu.com, ast@kernel.org,
+	axboe@kernel.dk, bpf@vger.kernel.org, casey@schaufler-ca.com,
+	cel@kernel.org, cem@kernel.org, chenxiaosong@chenxiaosong.com,
+	code@tyhicks.com, corbet@lwn.net, Dai.Ngo@oracle.com,
+	dakr@kernel.org, daniel@iogearbox.net, dhowells@redhat.com,
+	dlemoal@kernel.org, dmitry.kasatkin@gmail.com,
+	driver-core@lists.linux.dev, dsterba@suse.com,
+	ecryptfs@vger.kernel.org, eddyz87@gmail.com, emil@etsalapatis.com,
+	eric.snowberg@oracle.com, exfat@lists.linux.dev,
+	georgia.garcia@canonical.com, gregkh@linuxfoundation.org,
+	hch@lst.de, hirofumi@mail.parknet.co.jp, hyc.lee@gmail.com,
+	ihor.solodrai@linux.dev, jlayton@kernel.org, jmorris@namei.org,
+	johan@kernel.org, john.fastabend@gmail.com,
+	john.johansen@canonical.com, jolsa@kernel.org, kpsingh@kernel.org,
+	linkinjeon@kernel.org, linux-api@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-cifs@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-nfs@vger.kernel.org, linux-security-module@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-unionfs@vger.kernel.org,
+	linux-xfs@vger.kernel.org, liubaolin12138@163.com,
+	martin.lau@linux.dev, mason@kernel.org,
+	mathieu.desnoyers@efficios.com, matt@bobrowski.net,
+	memxor@gmail.com, mhiramat@kernel.org, miklos@szeredi.hu,
+	neil@brown.name, netfs@lists.linux.dev, ntfs@lists.linux.dev,
+	okorniev@redhat.com, omosnacek@gmail.com,
+	penguin-kernel@i-love.sakura.ne.jp, rafael@kernel.org,
+	rdunlap@infradead.org, roberto.sassu@huawei.com,
+	rostedt@goodmis.org, selinux@vger.kernel.org,
+	senozhatsky@chromium.org, serge@hallyn.com, sj1557.seo@samsung.com,
+	skhan@linuxfoundation.org, song@kernel.org,
+	stephen.smalley.work@gmail.com, takedakn@nttdata.co.jp,
+	tom@talpey.com, yonghong.song@linux.dev, yuezhang.mo@sony.com,
+	zohar@linux.ibm.com, utilityemal77@gmail.com, lujialin4@huawei.com
+Subject: Re: [PATCH -next -v4 02/17] LSM: pass struct path to the
+ inode_setsecctx hook
+Message-ID: <20261118001641.GA1669148@ZenIV>
+References: <20261117150542.1169451-1-caixinchen1@huawei.com>
+ <20261117150542.1169451-3-caixinchen1@huawei.com>
+ <20261117184342.GR989762@ZenIV>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -86,57 +100,53 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=b8e4a62509544b067db299bce93de40d8eff238bb48ab78a3f5b1b72ee7a;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Wed, 18 Nov 2026 00:56:24 +0100
-Message-Id: <DMXW51AXC5LC.WAVN6D92YIE3@gmail.com>
-Subject: Re: [PATCH] cifs: fix times assignments in cifs_posix_to_fattr()
-From: "koraynilay" <koray.fra@gmail.com>
-To: "Paulo Alcantara" <pc@manguebit.org>, "koraynilay"
- <koray.fra@gmail.com>, "Namjae Jeon" <linkinjeon@kernel.org>
-Cc: "Tom Talpey" <tom@talpey.com>, "Ronnie Sahlberg"
- <ronniesahlberg@gmail.com>, "Shyam Prasad N" <sprasad@microsoft.com>,
- "Bharath SM" <bharathsm@microsoft.com>, "Aurelien Aptel" <aaptel@suse.com>,
- <linux-cifs@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Sashiko"
- <sashiko-bot@kernel.org>
-X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
-References: <20261116154526.429315-1-koray.fra@gmail.com>
- <f61c83e614c1afdcdb20c958474ac055@manguebit.org>
-In-Reply-To: <f61c83e614c1afdcdb20c958474ac055@manguebit.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20261117184342.GR989762@ZenIV>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
---b8e4a62509544b067db299bce93de40d8eff238bb48ab78a3f5b1b72ee7a
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
+On Tue, Nov 17, 2026 at 06:43:42PM +0000, Al Viro wrote:
+> On Tue, Nov 17, 2026 at 11:05:27PM +0800, Cai Xinchen wrote:
+> > The inode_setsecctx hook and its security_inode_setsecctx() caller in
+> > fs/nfsd operate on a dentry even though both have a struct path
+> > available.  Pass a const struct path so that the coming conversion of the
+> > xattr helpers can be reflected in the implementations; for now SELinux
+> > and Smack keep passing path->dentry and &nop_mnt_idmap to
+> > __vfs_setxattr_locked().
+> > 
+> > Also document in lsm_hook_defs.h what a struct path argument may be used
+> > for: it can be passed to VFS helpers taking a struct path, but nothing is
+> > guaranteed about path->mnt.
+> 
+> No, with the side of Hell, No.
+> 
+> > + * Hooks that take a struct path argument: the VFS only sanctions passing
+> > + * the path to VFS helpers that take a struct path (e.g. notify_change());
+> > + * it makes no guarantees with regard to path->mnt, whose layout and
+> > + * implementation details are subject to change.  Implementations must
+> > + * not rely on its properties.
+> 
+> NAKed-by: Al Viro <viro@zeniv.linux.org.uk>
+> 
+> If that kind of stuff actually does get passed to any existing hooks, we need
+> to fix that ASAP.  If not, consider that a blanket NAK on any patch series
+> that would introduce such.
+> 
+> We are not going there.  At all.  "Must not rely on its properties" ==
+> "must make sure that no existing functions with struct path * arguments
+> ever have such malformed instances passed to them".  Which is not going
+> to be feasible to enforce.  And yes, that very much includes any VFS helpers.
 
-On Tue Nov 17, 2026 at 11:18 PM CET, Paulo Alcantara wrote:
-> koraynilay <koray.fra@gmail.com> writes:
->
->> Currently cifs_posix_to_fattr() wrongly sets SMB's CreationTime to
->> fattr->cf_ctime.
->>
->> Fix this by setting fattr->cf_createtime to SMB's CreationTime and
->> fattr->cf_ctime to SMB's ChangeTime, matching the behaviour of
->> __dir_info_to_fattr().
->> ...
->
-> Applied.
+To elaborate a bit: correctness of quite a few places does depend upon the
+following invaraint:
+	path->mnt->mnt_sb == path->dentry->d_sb		(1)
+for all struct path pointers they might possibly run into.  _Some_
+functions might _currently_ be safe to call with that constraint violated;
+there's neither a list of such functions nor any promise whatsoever that
+call that is currently safe in such conditions will remain safe at any
+later point.
 
-Thanks! (also for applying the other patches)
-
-Best,
-koraynilay
-
---b8e4a62509544b067db299bce93de40d8eff238bb48ab78a3f5b1b72ee7a
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSgVimKafU5DQMcjcDmj22qf5IGXAUCavzpqAAKCRDmj22qf5IG
-XPWVAP9xBbMDNG3wRaQ5otbBeAD3QJd1ciHOLK87Ks45GFkGPQD/Uc49HbHxdsrm
-fBmxh1qMDGjqe7DXxQGBQKhWo/58BQw=
-=lQhA
------END PGP SIGNATURE-----
-
---b8e4a62509544b067db299bce93de40d8eff238bb48ab78a3f5b1b72ee7a--
+_IF_ you can guarantee that (1) is not violated, we have something to
+talk about; otherwise, don't call your object struct path and don't
+pass it to anything that expects to deal with struct path.
