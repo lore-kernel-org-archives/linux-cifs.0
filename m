@@ -1,51 +1,51 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795039372;
-	b=g5ybAXUB1SDqD98Pepw1d69mxHocSQRy999qy1j3/2CfHZCb9yIUj5JvZkVwc8Hha1+k
-	 4aqSjtVmeVhHAm63vH8Lr3j5yGOaSVEG8MfciKmzvDU0mNwXO5+Jvx71/Vf3fgEAgoMs2
-	 Or23pjweEnIZflHGeDw3LNsdueKwpACbRTQcAe0jLUehY6QTNe8MwT8t0VvQ0shYLWour
-	 t7HlJfR4XQK1IQixr7SmAqZfaoHtgzLijVHCuWtxmYju+XYjFNtSfIT2/m5ob7xZ366U4
-	 Nysa6fbXO9LtDBpqJKnEgt5e9LdQ5oTf0DecdXMlTK1/RX3UKpwUJ0h3kVud8GAzDOw==
+	t=1795039379;
+	b=jIKEwf7jVVepOB3mFvpb7zl6gm9MN6NwPZkLQfuWOoJrcX7TSr815NPw4Le5NPfJSxpM
+	 zQGca1fM1hodJKjhPhNwe2S1kKdIH4w5YAXu6ZPt4DWPp9wD2Hthcuy7nVgnd8yhpLLsn
+	 46pUbYJp0efzUue283CbxJeL8q6AgJzCDzJ7Gi5n12BTAQ6UOie/yTXvCiB7ZPfKTEVQV
+	 2oZVJTwfeLVY+g7xvlqyyArq0n17FB5+UE0NlELE25nWNEawQxj0x7utWh4LXr1Mz4a9b
+	 RM+SV5BrbUc8rOr/ZwA5cDZlesig34tNFMJMevTfX4oOdSixZNvm/WOgxg0+TeqO7iA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795039372;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795039379;
 	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
 	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=5RMqObuj0fL+2jdnL0nqymmDC8FL7Dnnl2i27KqPBdo=;
-	b=V4n289mhPSn64t0tWL60IbApYWlv1KNfa/wDwVxGtn9cW37G6LpvZfuy/5G5/Br2G9f1
-	 DRCumyUtxvyLousm9BySKDYXw7KJjCrU/9k5MxCEBd+Sn7pqNr32k3qNDjnWvWo0ifRU+
-	 Ji+9i30wUcHb0/7dTFHqQ/eSTbEF4J/tLrxre158fSIfBP1A+tIUhnYw+g5ty0Yba05x8
-	 44LL7s5by1Tgf9VhOYstu71Mm5hhjn/c8fkRx9UZd67B9JBsXworhx6UDGTCzOe1Y/lH0
-	 +/WSEE7vBfEL4QmKuaXgKxisIMMoKOk1RUx6xzPrJQP48tGR7qdLmNJQF4aJ4wCOtOA==
+	bh=08TOTiTUtxZoeQ6P+kvUrfN6YEoDJaYokr6wulDwfGQ=;
+	b=MtsH/IMD9vAt97hNJKmH+IB/LxIMlSe1SEABqZjptOoxOGAMxaMLqmY9evW+oRGXDXj3
+	 lByZMQh7pSTemRTEq9YsjTsCH6twpnoXicyy0z7ZMQSYkUw015VO0QZ4nWjwMHF2K0wfb
+	 z122l4FW1mSDU+efFbJ+ZHGCZO8JHHg/7bBIRFMlswCC3+44huKbU4PcXUHoGDMo7J/R0
+	 iMSVQDvj7BPomN/2tftElLH/DD8cqLGkrqPHcZTLDk0Hre10ctARL6QCmySHlGoulcOLg
+	 RODjZKf6P6uPlAtqYklLjumPCJE3WWfdPf2V/irB1DVNUV3NW/7TKc9X8Scs5gCEOsg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=manguebit.org;
 	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=lhZEe7j8;
+	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=ImlqKEtx;
 	arc=none smtp.remote-ip=143.255.12.172
 Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDDA606A32C;
-	Wed, 18 Nov 2026 22:02:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 5EDDA606A32C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C55606A325;
+	Wed, 18 Nov 2026 22:02:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 43C55606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=lhZEe7j8
+	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=ImlqKEtx
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
 	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=5RMqObuj0fL+2jdnL0nqymmDC8FL7Dnnl2i27KqPBdo=; b=lhZEe7j8EqJRkrtOxvTsIzWjRq
-	QFlsxnE1RuPHwRC47VXH3t5xZXqltIiyGYqsJtEXPAtYuJdbGrmzoFA0KyBu8xoWsKA79rRpa+L71
-	WV7vDQ2Szsce3qf7JmiVDp0ZV1YdwmBtgF+1PA4pMzztiW9ve7EsgA7spSnoJ3erfAHkfEXuH5cBx
-	2KzHnpphrlloCD6E/Fz9BVzzNF3iqZ+CO2tHF2zd3Zsf3aim5AfqZwhp0VUs+TRvYbRtT4sWrXUv2
-	6SW5hdfaHj8g4PK7noSYfD2W9XZm7Zvz4jwnH+ls/8XgmS6ae7a/7TOJlgTYxu6/EAegnsPreh8C4
-	RPFnkApA==;
+	bh=08TOTiTUtxZoeQ6P+kvUrfN6YEoDJaYokr6wulDwfGQ=; b=ImlqKEtxwjFFtvf6MKkhARt59o
+	zjEnirFTB3vxpp+JvQZvX/ByQIUFNLQuCWndE1iehY7UcWjFF+tj8t521wG/6AXrJXo8nMCQxyms+
+	Jng5NHJqM0dyX12aMkISKWwXfkBki5sR82o1Bfl0159G8P9Bk186mnVrCcP6HiRHh2yGB0FcfKHrY
+	gZ5s4O5B2DLzcy2iI9DBstMr+d74RnTtP5YKv6SfGU5g6gr9qIq5MvHOW2uPwxPVLXmIdIgdveMqp
+	KnzNWz8AaZz/SGyUTobs2YvzcnrdtmOj4XvIX8NnbhoLIr/4mw0FDtfPJb9BviccwNQEoGXO+3caj
+	1B2Lz+qQ==;
 Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xTnjk-00000000KWJ-08hW;
-	Wed, 18 Nov 2026 19:02:40 -0300
-Message-ID: <696b8c3e063478965da1084ffae1d6cf@manguebit.org>
+	id 1xTnk1-00000000KWj-2udr;
+	Wed, 18 Nov 2026 19:02:57 -0300
+Message-ID: <08a684fb935ae094d70dfc3111c03054@manguebit.org>
 From: Paulo Alcantara <pc@manguebit.org>
 To: shyckless@gmail.com, linkinjeon@kernel.org
 Cc: ematsumiya@suse.de, sprasad@microsoft.com, linux-cifs@vger.kernel.org,
@@ -53,12 +53,12 @@ Cc: ematsumiya@suse.de, sprasad@microsoft.com, linux-cifs@vger.kernel.org,
  samba-technical@lists.samba.org, daniel.birtwhistle@gehealthcare.com,
  linux-kernel@vger.kernel.org, smfrench@gmail.com, dhowells@redhat.com,
  tom@talpey.com
-Subject: Re: [PATCH v2 1/2] smb: client: fail SMB2 responses with a bad
- signature
-In-Reply-To: <20261116-smb2-sign-v2-1-a823a90d0db4@gmail.com>
+Subject: Re: [PATCH v2 2/2] smb: client: don't use read data that failed
+ signature verification
+In-Reply-To: <20261116-smb2-sign-v2-2-a823a90d0db4@gmail.com>
 References: <20261116-smb2-sign-v2-0-a823a90d0db4@gmail.com>
- <20261116-smb2-sign-v2-1-a823a90d0db4@gmail.com>
-Date: Wed, 18 Nov 2026 19:02:39 -0300
+ <20261116-smb2-sign-v2-2-a823a90d0db4@gmail.com>
+Date: Wed, 18 Nov 2026 19:02:57 -0300
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -75,39 +75,20 @@ writes:
 
 > From: Suyuan Wang <stevewong@hust.edu.cn>
 >
-> smb2_check_receive() checks the response signature when signing is on,
-> but a failed check is only logged:
+> When smb2_readv_callback() finds a bad signature, it sets the error in
+> rdata->result but leaves rdata->got_bytes alone. Further down, a short
+> read that reaches the remote EOF clears the error again:
 >
->     rc = smb2_verify_signature(&rqst, server);
->     if (rc)
->             cifs_server_dbg(VFS, "SMB signature verification returned ...",
->                             rc);
->     ...
->     return map_smb2_to_linux_error(mid->resp_buf, log_error);
+>     size_t trans = rdata->subreq.transferred + rdata->got_bytes;
+>     if (trans < rdata->subreq.len &&
+>         rdata->subreq.start + trans >= netfs_read_remote_i_size(inode)) {
+>             rdata->result = 0;
 >
-> The status from the response is returned as usual, and the caller goes
-> on to use a response whose signature is wrong. This is the path for
-> synchronous and compound requests and for smb2_writev_callback(). On a
-> signed but unencrypted connection, anyone who can modify the traffic
-> can change e.g. a directory listing or file attributes, and the client
-> accepts it.
+> and got_bytes is then added to subreq.transferred. So the last part of a
+> file, or all of a small one, is returned even though its signature is
+> wrong.
 >
-> Return the verification error instead. That alone is not enough for
-> compound_send_recv(), which still hands the response buffer to the
-> caller after check_receive() fails. smb2_compound_op() then maps the
-> status from that buffer again and copies the payload out, and other
-> callers look at the buffer on error too, e.g. smb2_open_file() parses
-> a symlink target out of a STATUS_STOPPED_ON_SYMLINK response. So also
-> mark the mid MID_RESPONSE_MALFORMED, and have compound_send_recv() handle
-> it like a mid in a bad state: mark the earlier mids cancelled, so that a
-> CREATE which did succeed gets its handle closed, and don't pass any
-> response on.
->
-> Unlike the SMB1 fix in commit dc96f01d54cc ("smb: client: terminate
-> session upon failed client required signing"), don't reconnect: this
-> runs in the thread that sent the request, and only cifsd should call
-> cifs_reconnect(). And fail the request whichever side required signing,
-> since a response with a bad signature can't be trusted either way.
-> ...
+> Clear got_bytes when the signature check fails, as the retry path in the
+> same function already does.
 
-Applied.
+Please check sashiko's review.
