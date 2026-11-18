@@ -1,97 +1,99 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.180
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794961022;
-	b=OAqjhafzEdE99D+pQR6x4+7LWi0EwfWZ3lVM18LnzwnLQDr7QRhfNAKrWYn2QGTQ15uv
-	 Xv6VEqVQ9PXkzt/u1MDPHJyoe1TruJEdDSW83DUGHiXI1AwqPTb+fZBcs4MJ7+1DY8qgI
-	 HzvyAcEX7ImnDDiCqIrSD6plxMArjM0b8ka2ij2JNABkM6IPmwtcLLCQwYlwEYVnfxhmC
-	 W+OZv3Nrk/vm4CytQt3OocY1I83afGV260EoOgTGS/cDmN5HrXUYAgmAy3umgNkx/8qNn
-	 b0NYizs6p4+e2FHmBaCEsbw0jHTRXrzLsQCpVbp5N/9kp+xMS8elus1Wql1pmAkNxkQ==
+	t=1794961323;
+	b=Z0/qcz9jMM/PwdvYWmb9z7/4kbNL++gB2xC+O5D9qAbr4JfZ4vBcJhFMLUfcsiRbENU9
+	 MmnhqS85k4tTDgLY+AkdIMX88f+roT/+MNP7vS7WLVUdluEMFau0UDiH1+5yq1wyAEsZK
+	 OhrpWuWqG3BPOQiNEumMS9m9loY8HTqj6JFu6ME/b23/OQZDRa9UyXUn54D/EqpJWCYpt
+	 PwMSqVsWauof0m2JYetdhku94ZJ0IizhWz9P8H/SWgot8SPSe0PgFTIL2BddYZmbb57u5
+	 KC5BCCMZXmmUgxBk3wW7tHUxY3KE3uxMThBWGgTk/MWmtE7aociWnh7IyeC1s1CIfYw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794961022;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:Sender;
-	bh=7Cn7kvyEpPF81PEysHmt35Ci8fEqAoER3KXkfxx0oq8=;
-	b=vluiF4KKqBji1epkz8wi0C5Zr1RD/UccLBmYVBvzjHMW0Rsb1jsfIuYs9Jleglh/6LDE
-	 66ry5GQuO0QVghEvmWVwTCTLIJOQSKA/HBlIsRj1NQkPO/loIBLA54Qx2RyQASc+A8T52
-	 wStDvwk66otjeQCarZ+Lb8dXyHlxk3nKAhFDEQevcCGkZ0hdOhqhdo7PbM5+16/OP0ejm
-	 pgRcjI85jjBFbIQn6aIDoBFwiEv0RXHPDgHKSX5HlnV4aT+8NAlegfS1x/y6v74IR9/KM
-	 OEP5Jx/xx10fKSlWzSZFhazn+dpplMSUvlFsg9dXqB+XWrz2EY2CCIukPbO6xSeOThg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794961323;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=3pL4qI55xeS4q74Qd8OgYkkf11qD+6PkbWN1emyH6OE=;
+	b=TCnZ8IMgN/FNe2I3j1ojI6kLougTPoKjAgLL/5t3HvcvaBu5imU/ilrQ87U+yBlnrv3V
+	 FrnnDD1slBMGdk8cH4QsWYppmlWRO2tPudgRFQFuVPw/WVBPMvgEcr/wK2PDH8ig+KGcf
+	 7PVdXljomadUjCjl5kKSyKYP5F2/cx1Jt3Dn5QCPS3rETah3aN+hgv14LZEnaFU3RDlWz
+	 A2BiLvOk4AcwhJdIB24pkoxkLtua+2mrr63muDRrQ5ous6ZqhoveygCMSrDgpMMZt/uG1
+	 KI1DlV9Sp4ZDGCQiN1dhUg0sMIWfdz59FhhvDjRqUX4FIALDi/yTHzuH+bafaueiRJA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=zeniv.linux.org.uk;
-	spf=none smtp.mailfrom=ftp.linux.org.uk;
-	dkim=pass header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=CHOH2EIm;
-	arc=none smtp.remote-ip=62.89.141.173
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q3jfxspY;
+	arc=none smtp.remote-ip=74.125.82.180
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D3C606A31C;
-	Wed, 18 Nov 2026 00:17:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 14D3C606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20343606A32C
+	for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 00:22:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 20343606A32C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=CHOH2EIm
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=7Cn7kvyEpPF81PEysHmt35Ci8fEqAoER3KXkfxx0oq8=; b=CHOH2EImE32MCKC26QN/24GUrd
-	FBPcI8h/GIcU5ew7o/3rkJXl0BLdIeW7EOEQtMJdSJPzYII29UlVG2JTS5LXEJMYNgr1FvxHbgpd0
-	wrs3m/Xk7A7WTFbuCZuerSAToP2t1LgF0RJCQ1l4R5X2F8IxOGOhv0wJjpZ72x7SvOPqh8bMSNxFM
-	Q1x1tZUC1HinlKerwu2CcDccLmVm8IDK8gfVV57Chx/qlWsowc8nemFxbIXaBkhIjYmr72boTXSUL
-	GuwNXIlWTYrsD2IP9qolOSmjGc0P8Whak/ciC2rL8MnPtzJtyKRrxH3G3ntipwi7x8qAZ5yTkvBLb
-	NA4Y86WQ==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xTTLt-00000007BaR-1POq;
-	Wed, 18 Nov 2026 00:16:41 +0000
-Date: Wed, 18 Nov 2026 00:16:41 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Cai Xinchen <caixinchen1@huawei.com>
-Cc: mic@digikod.net, gnoack@google.com, paul@paul-moore.com,
-	brauner@kernel.org, jack@suse.cz, amir73il@gmail.com,
-	andrii@kernel.org, apparmor@lists.ubuntu.com, ast@kernel.org,
-	axboe@kernel.dk, bpf@vger.kernel.org, casey@schaufler-ca.com,
-	cel@kernel.org, cem@kernel.org, chenxiaosong@chenxiaosong.com,
-	code@tyhicks.com, corbet@lwn.net, Dai.Ngo@oracle.com,
-	dakr@kernel.org, daniel@iogearbox.net, dhowells@redhat.com,
-	dlemoal@kernel.org, dmitry.kasatkin@gmail.com,
-	driver-core@lists.linux.dev, dsterba@suse.com,
-	ecryptfs@vger.kernel.org, eddyz87@gmail.com, emil@etsalapatis.com,
-	eric.snowberg@oracle.com, exfat@lists.linux.dev,
-	georgia.garcia@canonical.com, gregkh@linuxfoundation.org,
-	hch@lst.de, hirofumi@mail.parknet.co.jp, hyc.lee@gmail.com,
-	ihor.solodrai@linux.dev, jlayton@kernel.org, jmorris@namei.org,
-	johan@kernel.org, john.fastabend@gmail.com,
-	john.johansen@canonical.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linkinjeon@kernel.org, linux-api@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-unionfs@vger.kernel.org,
-	linux-xfs@vger.kernel.org, liubaolin12138@163.com,
-	martin.lau@linux.dev, mason@kernel.org,
-	mathieu.desnoyers@efficios.com, matt@bobrowski.net,
-	memxor@gmail.com, mhiramat@kernel.org, miklos@szeredi.hu,
-	neil@brown.name, netfs@lists.linux.dev, ntfs@lists.linux.dev,
-	okorniev@redhat.com, omosnacek@gmail.com,
-	penguin-kernel@i-love.sakura.ne.jp, rafael@kernel.org,
-	rdunlap@infradead.org, roberto.sassu@huawei.com,
-	rostedt@goodmis.org, selinux@vger.kernel.org,
-	senozhatsky@chromium.org, serge@hallyn.com, sj1557.seo@samsung.com,
-	skhan@linuxfoundation.org, song@kernel.org,
-	stephen.smalley.work@gmail.com, takedakn@nttdata.co.jp,
-	tom@talpey.com, yonghong.song@linux.dev, yuezhang.mo@sony.com,
-	zohar@linux.ibm.com, utilityemal77@gmail.com, lujialin4@huawei.com
-Subject: Re: [PATCH -next -v4 02/17] LSM: pass struct path to the
- inode_setsecctx hook
-Message-ID: <20261118001641.GA1669148@ZenIV>
-References: <20261117150542.1169451-1-caixinchen1@huawei.com>
- <20261117150542.1169451-3-caixinchen1@huawei.com>
- <20261117184342.GR989762@ZenIV>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q3jfxspY
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-380b40312e2so1307051eec.1
+        for <linux-cifs@vger.kernel.org>; Tue, 17 Nov 2026 16:22:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794961322; x=1795566122; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=3pL4qI55xeS4q74Qd8OgYkkf11qD+6PkbWN1emyH6OE=;
+        b=q3jfxspYnnmIioOhnT9WDmbOP6gFnX+nkFOI7kWL1h+Kp911buehA+yTYCfvblGRh9
+         ZWOHch3rQHqhIQAEPJa+Z+5kYNRUDvzeYEBOJ3nqxL/yy22hememUcsYbz3N8pV3IjiH
+         D50KILEjYQhXC/K4+xfniLhGz1AePT5EA/NeXlau5vctxZJUG69xtxJSfsA+t7GuGvmK
+         iTrtetAa/lEwdJWbVKP1+tJWNMbmqqcU0mPe4S1kLIXZjvAdzN4ZzZ9ij/ydQCcs0t8O
+         Vckp+QP5ajZG3pihMPwv190bAIvIOaZw6Fl+skcA56hsR23mHhdQX2hLjYhGQzoSDBuP
+         VXbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794961322; x=1795566122;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3pL4qI55xeS4q74Qd8OgYkkf11qD+6PkbWN1emyH6OE=;
+        b=aw5qqepJmo2jP/g9dlGkoXZ1hQ7KoTeb6ZIqajQ0go0bQeT94SSUlwoFQdZHoJXfwM
+         6nJr6yOgNhnpRdKvcuKxFQQItAhLt0D6G19D7cMuJDjpXDjLArpLLrprQdP9ANrXc1H6
+         OKMDabfnWQ4tYHXYj+FsfJUrFS1NRlMMDv+FGmtwSDNrQFQDy/BY8tYViL5isdaESUNE
+         mwCN5/4n1XxSTXFxhOpouE+G97IIcirWAkrDkjumV8meH5qfucTiiqzhNGCgPbuuMC7M
+         vu6RDoqVx/q1MEQoenD5A44mSdE/9nuUoSe4enhfxiOiVEVIDD7/8dn3S1cu4HtkPNgO
+         TXSQ==
+X-Forwarded-Encrypted: i=1; AL+hErFeMlO4mAi7HiGWBc4hWrbd+3hj5Iq9UKDJBBuMUK3V3CzzbWGhS7aEEPjvGUx297CJf2h5S0INGUzW@vger.kernel.org
+X-Gm-Message-State: APuU4Z+puz2unijvwJgfx+ZKA1T4CYI0WHmMbvN/bjEebovn4cQWc8fX
+	kJFXwVScrAqvYN36qlLkEgUNG8sbLVdLAlpDY5qKWTibm2oNZIDT3Zq6
+X-Gm-Gg: AYBFou10+HGU426csgc5k659qCY7Isnjgy6Vir2FuKj0c5f+ITY6VwIsA1keppQr/GG
+	Fi0WG12V/k7EXHv8HbKpX9wRszmHimEYF4AnFA1s1byynOp0Q6GaKvefz0Ym9fGj05FfTPcerkZ
+	1if72Lrv1tcSWRLAnA6KygqcEfFIPPV+0Ld6rU8dvWsIVY/eqOwZUHrO9IZEqsyfvfjJYxgXjEZ
+	GDK7+JoSskkBJ95gxVNerbRHIyc9fGQ1Q3Ds2jG4WC2YFXWoTPehBhy4raGDIAg5ac+HfSrlkqp
+	bzAPM4L6dEoc3m7cWbNSj2mHeuVgJaWIZHIrFdC3qUV++8oSIIkAx87T/wd4/4c1D385IRh77qj
+	gKzavzwwN33shcTzqXS6tClJa+GN+r2foMU6puxWR/mwMgf2WuejFFV4W4v71cEjRgdm3SdVU4m
+	haxT77VxD7UCH8ZcO0yn/0xa8RB3/hTk8cRIf/I+wkV6jbeD6SQ9jdrVg0Z6Yg7/FyxFFXpuXJs
+	B7V/vhtqj5K7hJzyki4ToX/dacnRzvPsR9b1UqGHmjEz3zPAhpG3dWGkLL+c2DpsVP/8WBFDSo3
+	V8vzDWsIG+bL/rj7BCAXgcV0mLg+B2PcmG1/B/zSuKxE2IKquDEtAvR1Dtm6MUJ3ePqLigHSSBZ
+	9fqeS9tMvQg/6gLVDvI0/4GxP9e1e8KJsdj74urw5cmckFqIrEA==
+X-Received: by 2002:a05:701b:2806:b0:1a4:c892:b130 with SMTP id a92af1059eb24-1b543beb5bemr978760c88.15.1794961322120;
+        Tue, 17 Nov 2026 16:22:02 -0800 (PST)
+Received: from localhost.localdomain ([2601:646:4300:d042:b1a7:bebf:2fc7:37b1])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1b5446f954dsm1665354c88.2.2026.11.17.16.22.01
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 17 Nov 2026 16:22:01 -0800 (PST)
+From: ozgun kultekin <ozgunkultekin@gmail.com>
+To: Paulo Alcantara <pc@manguebit.org>,
+	linux-cifs@vger.kernel.org
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	David Howells <dhowells@redhat.com>,
+	netfs@lists.linux.dev,
+	samba-technical@lists.samba.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] smb: client: do not let the server grow a write subrequest
+Date: Tue, 17 Nov 2026 16:21:59 -0800
+Message-ID: <20261118002159.20576-1-ozgunkultekin@gmail.com>
+X-Mailer: git-send-email 2.56.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -101,52 +103,100 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261117184342.GR989762@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 17, 2026 at 06:43:42PM +0000, Al Viro wrote:
-> On Tue, Nov 17, 2026 at 11:05:27PM +0800, Cai Xinchen wrote:
-> > The inode_setsecctx hook and its security_inode_setsecctx() caller in
-> > fs/nfsd operate on a dentry even though both have a struct path
-> > available.  Pass a const struct path so that the coming conversion of the
-> > xattr helpers can be reflected in the implementations; for now SELinux
-> > and Smack keep passing path->dentry and &nop_mnt_idmap to
-> > __vfs_setxattr_locked().
-> > 
-> > Also document in lsm_hook_defs.h what a struct path argument may be used
-> > for: it can be passed to VFS helpers taking a struct path, but nothing is
-> > guaranteed about path->mnt.
-> 
-> No, with the side of Hell, No.
-> 
-> > + * Hooks that take a struct path argument: the VFS only sanctions passing
-> > + * the path to VFS helpers that take a struct path (e.g. notify_change());
-> > + * it makes no guarantees with regard to path->mnt, whose layout and
-> > + * implementation details are subject to change.  Implementations must
-> > + * not rely on its properties.
-> 
-> NAKed-by: Al Viro <viro@zeniv.linux.org.uk>
-> 
-> If that kind of stuff actually does get passed to any existing hooks, we need
-> to fix that ASAP.  If not, consider that a blanket NAK on any patch series
-> that would introduce such.
-> 
-> We are not going there.  At all.  "Must not rely on its properties" ==
-> "must make sure that no existing functions with struct path * arguments
-> ever have such malformed instances passed to them".  Which is not going
-> to be feasible to enforce.  And yes, that very much includes any VFS helpers.
+smb2_writev_callback() takes the byte count from the SMB2 WRITE
+response, masks it with 0xFFFF if it is larger than the request (for
+old OS/2 servers), and then copies it into wdata->subreq.len.  A server
+can return a count that is still larger than the request after the
+mask, for example 0x8002 for a 5-byte write or 0xFFFF for a 4 KiB
+write, and the subrequest then covers data that was never sent.
 
-To elaborate a bit: correctness of quite a few places does depend upon the
-following invaraint:
-	path->mnt->mnt_sb == path->dentry->d_sb		(1)
-for all struct path pointers they might possibly run into.  _Some_
-functions might _currently_ be safe to call with that constraint violated;
-there's neither a list of such functions nor any promise whatsoever that
-call that is currently safe in such conditions will remain safe at any
-later point.
+netfs uses the subrequest length to decide how far the write collector
+may advance.  With a grown subrequest the collector moves collected_to
+past the data that was issued: netfs_writeback_unlock_folios() walks
+folio_queue slots that were never filled, and
+rolling_buffer_delete_spent() frees folio_queue segments that later
+in-flight subrequests still use.  This is a use-after-free that a
+malicious or broken server triggers from an ordinary write:
 
-_IF_ you can guarantee that (1) is not violated, we have something to
-talk about; otherwise, don't call your object struct path and don't
-pass it to anything that expects to deal with struct path.
+  BUG: KASAN: slab-use-after-free in netfs_limit_iter+0xed4/0x1040
+  Read of size 1 at addr ff11000010561511 by task kworker/u8:4/63
+  Workqueue: events_unbound netfs_write_collection_worker
+   netfs_limit_iter+0xed4/0x1040
+   netfs_retry_writes+0x1410/0x1e90
+   netfs_write_collection+0x2647/0x3880
+   netfs_write_collection_worker+0x1cd/0x3e0
+  Allocated by task 141:
+   netfs_folioq_alloc+0x39a/0x470
+   rolling_buffer_init+0x29/0xc0
+   netfs_create_write_req+0x12f/0x840
+  Freed by task 42:
+   rolling_buffer_delete_spent+0xb1/0x220
+   netfs_write_collection+0x1f62/0x3880
+
+Never change the subrequest length from the response.  If the count is
+still larger than the request after the mask, fail the write with -EIO
+and record it with a new write_overlarge trace point, like the read
+path does with read_overlarge.  A short count still returns -ENOSPC as
+before.
+
+The folio_queue form of the use-after-free exists since
+commit cd0277ed0c18 ("netfs: Use new folio_queue data type and
+iterator instead of xarray iter").
+
+Fixes: 3ee1a1fc3981 ("cifs: Cut over to using netfslib")
+Cc: stable@vger.kernel.org
+Signed-off-by: ozgun kultekin <ozgunkultekin@gmail.com>
+---
+ fs/smb/client/smb2pdu.c | 17 +++++++++++++----
+ fs/smb/client/trace.h   |  1 +
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index b26bfb4bd..2f05ba613 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -5181,14 +5181,23 @@ smb2_writev_callback(struct TCP_Server_Info *server, struct mid_q_entry *mid)
+ 		if (written > wdata->subreq.len)
+ 			written &= 0xFFFF;
+ 
++		/*
++		 * The server must not report more bytes than were sent.  netfs
++		 * uses the subrequest length to work out which folios this
++		 * write has finished with, so it must not be changed here.
++		 */
++		if (written > wdata->subreq.len) {
++			result = smb_EIO2(smb_eio_trace_write_overlarge,
++					  written, wdata->subreq.len);
++			break;
++		}
++
+ 		cifs_stats_bytes_written(tcon, written);
+ 
+-		if (written < wdata->subreq.len) {
++		if (written < wdata->subreq.len)
+ 			result = -ENOSPC;
+-		} else if (written > 0) {
+-			wdata->subreq.len = written;
++		else if (written > 0)
+ 			__set_bit(NETFS_SREQ_MADE_PROGRESS, &wdata->subreq.flags);
+-		}
+ 		break;
+ 	case MID_REQUEST_SUBMITTED:
+ 		trace_netfs_sreq(&wdata->subreq, netfs_sreq_trace_io_req_submitted);
+diff --git a/fs/smb/client/trace.h b/fs/smb/client/trace.h
+index 5331ce6dc..18760a819 100644
+--- a/fs/smb/client/trace.h
++++ b/fs/smb/client/trace.h
+@@ -153,6 +153,7 @@
+ 	EM(smb_eio_trace_user_iter,			"user_iter") \
+ 	EM(smb_eio_trace_write_bad_buf_type,		"write_bad_buf_type") \
+ 	EM(smb_eio_trace_write_mid_state_unknown,	"write_mid_state_unknown") \
++	EM(smb_eio_trace_write_overlarge,		"write_overlarge") \
+ 	EM(smb_eio_trace_write_rsp_malformed,		"write_rsp_malformed") \
+ 	E_(smb_eio_trace_write_too_far,			"write_too_far")
+ 
+-- 
+2.39.5
+
