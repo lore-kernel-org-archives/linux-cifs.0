@@ -1,99 +1,122 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.146
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795067497;
-	b=PizJrPiRdacQOivJN1glKJiYPuAYyuMqqTZl3wR6SZDQCrGB0x8rOMA9QkgdTaT0uV/1
-	 bgLOd87vA/SwIr+H+68jWMEIOv5B4NGuBQ+p7yO9tZmKcyqE8vVdCqqAKSihHDS0K7yDP
-	 7O8b5P+to3XynZpyLjO5JJjiL8lXNU7SReH3SYW6tM7daU8vm4G6OJm+/TaXmJmMg1gyL
-	 Yfxr+8of5GKNaxXhphnWFrQHUHf8SnYjbFzm5o9OfJIDiolqN8uORqfvKszlLXISCHMvK
-	 2be/9YMNQdXf5MwcfuM4NkEwLIA2LOfWAAHBXC1JS/fmxCNDNh8KH2VXQLN9kHFF89Q==
+	t=1795071083;
+	b=Siatgo6Qv39Rb9HxP7/EN7Kf4+n32HiV4ViyRhhkcV1A2nYwuVEWs6f3Y9A1sj+LF+wi
+	 gIR1N4c3gP49XmZ96jsXnOpMSuGhN0I62ysOqz16Zkrp94qVj9Uhd76jYllR3jGM0GMd0
+	 YzCekdCygwqrt45FcpSwM0L0n3XFgIkzHbw4ORiPylD/QFJEImkRW3tH5hSS0SJCcd8YI
+	 YNI/JIvP8jQj2rmOUgUDSG9wCYbpoDYnpEqtWYQ74xyCykXojeDbHbg8FDNcbtnOvQoJO
+	 m8rEc3A9dTzCcNdfnmx+KrIMYcHjU0ueVp6G6RghQAmpKKXU9FCznrEnO6pnhS1L7Fg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795067497;
-	h=DMARC-Filter:DKIM-Signature:Received:Date:From:To:Cc:Subject:
-	 Message-ID:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To:Sender;
-	bh=z8G4571aUTPFuGlDRih4WtoT+MR1zWs5KxPfHLJ0IoQ=;
-	b=K438CdbgINAZblCj2Vo8NMPTupp/jd8A3pokleOc9gKBuaVvr8hgSpT7r+t88U3xpw4R
-	 8lCEgPXLikVJak4pUOOjA4WHRs43tG8gXxCkodM9lU1qGFg3zzn8+XP2CxxHooy1Gayd0
-	 juO8N3HMQBBckyCNTsdUDRwj9NuzbHC90rRyc7Aa3H108FuG2cE5256WaeqxJlJN+wkEj
-	 takEtrZqw7IUaVDHq3aUOrY1e0ps3JpvqlCFmg12LpqYohT5bh1QbKRiHNRdaq2adobsE
-	 vYFosqm6szMv6srf4rGaa0Vd5nVeEHcEzwuULrG4gu1btRDDdAOfuAPwdULTADdmyPg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795071083;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=GhgvklMDjk6zu2WsohNEaN8+xrIHn3P8GxKAAXqhfhU=;
+	b=j8VnE1j0e46+GZ+6JuMZFt30Ijv5oLSsGjoUiKhy5iMvemSMCodvMhWuc0kM4KeXXosS
+	 6L8M4PCc/C1Q6jnvod1WSmW56lRoOhivZEJ++7bSH5rVpOJY+qIAnVOUh0ZITVOAdnjQx
+	 PDMerzIYMN3NYyl6arvAMWj8HfZCgmH59ffUqKsItPGW+x8jXyX7+22v+aNt9AzBQ38qm
+	 ZxeIefTPaQbT4OiPZyuaafXIH5A3JHam0+N8aDOyqYkUQM6bYoljDJaI6tF3wAgv1JLGN
+	 q00OE3esRHesuf/72HACTHuzrk+h+OfnfXaBg/QkAf6uwadlfeyA27mEa6NfnCfcfyQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=zeniv.linux.org.uk;
-	spf=none smtp.mailfrom=ftp.linux.org.uk;
-	dkim=pass header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=HUmq9V2f;
-	arc=none smtp.remote-ip=62.89.141.173
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=GEjmeX3r;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=LTGuFLnN;
+	arc=none smtp.remote-ip=202.12.124.146
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD1F606A325;
-	Thu, 19 Nov 2026 05:51:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EFD1F606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E69606A326
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 06:51:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 99E69606A326
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.a=rsa-sha256 header.s=zeniv-20220401 header.b=HUmq9V2f
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=z8G4571aUTPFuGlDRih4WtoT+MR1zWs5KxPfHLJ0IoQ=; b=HUmq9V2fqWZniya7o9nBaVPeDZ
-	hdLnNqA0+VaoySgEJuKHB41/nmyLaGptpyplTvFZpj9ZsUfvW/Uacb0EujAyxoatj/wEjrTHUy1Y8
-	Jf/0+dvEia8oYQhTDJ2QTEjT6TZu9xP6N/is4httLR57O2jb4I7x7sybjo+/cFqRcKEnzzz9PN71w
-	Fs3s4nF5yw1DIdzaYMKdWCNazNDVu5/+7GdnX+s8wkC+dHul4l8kAJetHVgTfI7IM42m1/kFkA0V+
-	e5cVGVGh3fNAY2bVKP02Pyi9IdxpjMoQwmhSMxh71ivIpbruqUDwYbd4JXLlMVMx0hkbK2WWTq4Oa
-	k2qmfFmA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xTv3O-000000063G7-3IJX;
-	Thu, 19 Nov 2026 05:51:26 +0000
-Date: Thu, 19 Nov 2026 05:51:26 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Cai Xinchen <caixinchen1@huawei.com>, mic@digikod.net,
-	gnoack@google.com, paul@paul-moore.com, jack@suse.cz,
-	amir73il@gmail.com, andrii@kernel.org, apparmor@lists.ubuntu.com,
-	ast@kernel.org, axboe@kernel.dk, bpf@vger.kernel.org,
-	casey@schaufler-ca.com, cel@kernel.org, cem@kernel.org,
-	chenxiaosong@chenxiaosong.com, code@tyhicks.com, corbet@lwn.net,
-	Dai.Ngo@oracle.com, dakr@kernel.org, daniel@iogearbox.net,
-	dhowells@redhat.com, dlemoal@kernel.org, dmitry.kasatkin@gmail.com,
-	driver-core@lists.linux.dev, dsterba@suse.com,
-	ecryptfs@vger.kernel.org, eddyz87@gmail.com, emil@etsalapatis.com,
-	eric.snowberg@oracle.com, exfat@lists.linux.dev,
-	georgia.garcia@canonical.com, gregkh@linuxfoundation.org,
-	hch@lst.de, hirofumi@mail.parknet.co.jp, hyc.lee@gmail.com,
-	ihor.solodrai@linux.dev, jlayton@kernel.org, jmorris@namei.org,
-	johan@kernel.org, john.fastabend@gmail.com,
-	john.johansen@canonical.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linkinjeon@kernel.org, linux-api@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-nfs@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-unionfs@vger.kernel.org,
-	linux-xfs@vger.kernel.org, liubaolin12138@163.com,
-	martin.lau@linux.dev, mason@kernel.org,
-	mathieu.desnoyers@efficios.com, matt@bobrowski.net,
-	memxor@gmail.com, mhiramat@kernel.org, miklos@szeredi.hu,
-	neil@brown.name, netfs@lists.linux.dev, ntfs@lists.linux.dev,
-	okorniev@redhat.com, omosnacek@gmail.com,
-	penguin-kernel@i-love.sakura.ne.jp, rafael@kernel.org,
-	rdunlap@infradead.org, roberto.sassu@huawei.com,
-	rostedt@goodmis.org, selinux@vger.kernel.org,
-	senozhatsky@chromium.org, serge@hallyn.com, sj1557.seo@samsung.com,
-	skhan@linuxfoundation.org, song@kernel.org,
-	stephen.smalley.work@gmail.com, takedakn@nttdata.co.jp,
-	tom@talpey.com, yonghong.song@linux.dev, yuezhang.mo@sony.com,
-	zohar@linux.ibm.com, utilityemal77@gmail.com, lujialin4@huawei.com
-Subject: Re: [PATCH -next -v4 02/17] LSM: pass struct path to the
- inode_setsecctx hook
-Message-ID: <20261119055126.GU989762@ZenIV>
-References: <20261117150542.1169451-1-caixinchen1@huawei.com>
- <20261117150542.1169451-3-caixinchen1@huawei.com>
- <20261117184342.GR989762@ZenIV>
- <20261118001641.GA1669148@ZenIV>
- <20261118-woher-duften-bejubeln-7a8a2099f89f@brauner>
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=GEjmeX3r;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=LTGuFLnN
+Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id 936E01D0026E
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 01:51:20 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Thu, 19 Nov 2026 01:51:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1795071079; x=1795157479; bh=GhgvklMDjk6zu2WsohNEa
+	N8+xrIHn3P8GxKAAXqhfhU=; b=GEjmeX3rzt7TKsjUoTp6okWCltuOnDpuyn9kM
+	N7e7m9YMkhqVVH+Za/9xpywlrAncVZanHNzDeLFJcAYX12d820VWLDFwA0VAfQSF
+	cd+n14XUAtbXS2ZSWFmFnVO7jAiX75jVTH+xWLAXIx7g7ESgUyk8KW8TIZU3Ko01
+	ldeWYIPpxJrRG+f4+0dfMHOQda2fTn8N6QpxyZ/lx/Y02ZCF4NioHCH4TIwMP2wp
+	w2ZIfLGOepgm1+aAbNCIdOgaNZhCkfecM45WIVt7o8UDsYYxDo8QkYDA160HITEz
+	IWbYMmO6Qpwjb2sNH8fbdEZdbDdJtT3Svg2JZlj25bFaL0JOA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1795071079; x=1795157479; bh=GhgvklMDjk6zu2WsohNEaN8+xrIHn3P8GxK
+	AAXqhfhU=; b=LTGuFLnNnUWRBTZCp4NOrsB8Nym3dP+THd7/vYNyCP71Me3LA2g
+	WfaTy+ZAUqGkaCezQtlw6y+7wVu34f57bugQCifMwB/xQ5qVlGkgc2Rp1UpBZl6k
+	Pt2W8msg7G1hozELbCh9x/OJFEvYGfhHJtyrDRR2oC4LIpEs9AVVZiOgc3kaCdEI
+	bgyDyQLthjItVaqTUm4iqP8Cy4fT/HNC3bJlyGDLqKovdxCO2GJLgl/rM82KvUkS
+	pI9Gt7vbA2nnBJRJNH88wN2gAahucH3hkJIbQ98VxvUZ+MeBLIVH/tf9V0Ydd5ma
+	zp/ITRUup0X50tYFzmeEGf8jxlCHpdZksVA==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1795071079; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:jOaID1WniSjmbEVEH9IIXi+10w3t9ZYTffCfwLx5Goc9uyi
+	98hB3qnZCP8PUqoQ9GrED437BsltB4vZEyyTVQbbW6aOmc8IeTTG5fHNVLnhQpyr
+	BMqUpgik8kfTOXcO7RZUmEmbl3SU4RNm7p0El3+CVCXpsVN5q4DkYPeSb5+ANMQb
+	pkPRDYO3rYIQUMiyC2gOKm/zE62QLkt/EF55NUxGhh04rwQsFKB/kuEiED2P3RC1
+	HoIOyFlfhII449yDBGAGKVmMx2wu56KZ9TuZTmSFLJdKhSMT3eRqd4UtF0UvYEMS
+	FSShe6oonDEjSpUW9YDh8TtsC8F0nQ2vdjbYrtQ==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=9;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	message-id,mime-version,subject,to;
+Message-Instance: m=1; h=sha256:+iIXmIpFaGvDjtpixJ8r99a1kDCNsk568HiKsz8awhw=:7o8dBcksPc0H9i8th3cz0zuq9n1I2r6Y5JOzAJNUfaY=;
+X-ME-Sender: <xms:Z5z-aoamnPOxCbHCdT1084c_AvX1L6_fgdkX6yGpqRhmvi8wzT0CGA>
+    <xme:Z5z-avZIjw-x1Mo_VglGm_xvNZ7Nx5OIjr0F5Pg_eWgtlzq4UXa_ygFyXr7_BnziO
+    CiG12u2yLz123aKlaWUnwUSdsFPTpXcl7KAr39ukV8egQOdrk1KZNzt>
+X-ME-Received: <xmr:Z5z-alJlGnVB9Glt9LTeeHj9oFQjBhHIO6UmDc_QMf1Gcjf5pv8GWt8uchc9sPHT>
+X-ME-Proxy-Cause: dmFkZTFqWPrG66/2GIwqIe8I3RcDHcr0y4t8OAuwWc/zqQYvbhEyFEXrsvx94UzAyjWpRw
+    +5nTAr6u/w6lVDp/6PO2Dhs/T81URQcSo5abMU6OjLv/Z3IHWsbUzSWIXV6Aqscysu8xK7
+    +dKxL0CV39EV+lU8W8bpoGb9StGeHX+qQdUnULfyeAGGKxYFpYmUSYmxlZ8i2wgxs3n5T3
+    G1N3YTQCkZY8rjkeOwozlGBlzusb75COgAUJLWkYXnOcWLA37aZHeXRb/Zf59dmZPLXWej
+    aFiMskcMZRSoWoRrXc0SNwC/OiW18Gi5YAswivzsadZ4jOkVN8QU8N/NnHwhOjvRNplnEl
+    mczwnUfFdoGv6P75+ieZ7rZxGCyMCCcZQEw/v/M5J6jhZsER8bUPOdfxaJADO7tQorkTVA
+    KXUOQBKuSNwNEbhBBFvqRJZaBNAWglSD31UEWUeyTytlpXQw2bNxKcr3VQfzO+gdesMWFb
+    smHUjnEIK/ZtEW29aob3cEN/7ewKeXi04pML9Y5lzugv1y5r+mZldDUEsBjXVIxDeg96Sf
+    CEOeEdwyjCyXCCRz9B3OowHPwO1HmVZneWtlKYs13zkiMrxJQd2yAtIToAlFWAJ8h2Mu1g
+    79sJ1XcGX3ZYdIJTOw9prEn0os2W9f7/2Pz/2qa9AuEk3JcYRBWW0oqwi0Zw
+X-ME-Proxy: <xmx:Z5z-ajuwkEmCV-EZrJ24dlbS7vFtr0YHmWztueqCzQfx1tdy03yBzQ>
+    <xmx:Z5z-ahXgcXgxPUfVKqfW2dbT6mvQ20Tjn6KXbu_x3JbHD9rMOUpXog>
+    <xmx:Z5z-amj8t24Ec_SszbhtJ9-XDx9_4zq5lu6gHPhewnqc_Ao6kF5P8g>
+    <xmx:Z5z-ahoYfNISqxjByk5ZX5fJqyAaFOb85XWf5Y3ZeIj1fVSRefGWHA>
+    <xmx:Z5z-apBJvyYaZKYt65hyAwBS4mJtGKv1jzH5tcvR4y028-v1tEG4is5C>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 19 Nov 2026 01:51:18 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: linkinjeon@kernel.org
+Cc: senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] ksmbd: fail SET_INFO when the security descriptor cannot be stored
+Date: Thu, 19 Nov 2026 00:51:07 -0600
+Message-ID: <20261119065107.115679-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -103,123 +126,90 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261118-woher-duften-bejubeln-7a8a2099f89f@brauner>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 18, 2026 at 09:51:27AM +0100, Christian Brauner wrote:
-> On Wed, Nov 18, 2026 at 12:16:41AM +0000, Al Viro wrote:
-> > On Tue, Nov 17, 2026 at 06:43:42PM +0000, Al Viro wrote:
-> > > > + * Hooks that take a struct path argument: the VFS only sanctions passing
-> > > > + * the path to VFS helpers that take a struct path (e.g. notify_change());
-> > > > + * it makes no guarantees with regard to path->mnt, whose layout and
-> > > > + * implementation details are subject to change.  Implementations must
-> > > > + * not rely on its properties.
-> 
-> That comment is a garbled version of an earlier review. It meant that
-> LSMs get no guarantees about struct vfsmount internals and don't get to
-> poke at them. I'm not sure how this can be read as path->mnt being a
-> random mount.
+SET_INFO reports success even when ksmbd cannot store the new security
+descriptor. The old descriptor has already been removed, so the file
+falls back to POSIX permissions. Deny ACEs in the new descriptor are
+lost. This can happen when the descriptor exceeds the filesystem's
+xattr capacity.
 
-"no guarantees with regard to path->mnt" is easy to parse that way when one
-is stuck with a caller that needs to be converted to new API with no relevant
-mount reference in sight.
+Return the storage error to the client. Report -E2BIG as
+STATUS_DISK_FULL, like -ENOSPC and -EFBIG, and report -ENOMEM as
+STATUS_INSUFFICIENT_RESOURCES. Both errors previously fell through to
+STATUS_INVALID_INFO_CLASS. These mappings apply to all SET_INFO
+classes.
 
-> > > If that kind of stuff actually does get passed to any existing hooks, we need
-> > > to fix that ASAP.
-> 
-> Of course there is one...
-> 
->   dent = lookup_one_unlocked(idmap, &QSTR_LEN(...),
->                              priv->dir_fp->filp->f_path.dentry);
->   [...].
->   rc = ksmbd_vfs_fill_dentry_attrs(priv->work, idmap, dent, &ksmbd_kstat);
-> 
-> It passes only the bare dentry, and ksmbd_vfs_fill_dentry_attrs() then
-> makes up a path from the share's root mount:
-> 
->   struct path path = {
->           .mnt = share_conf->vfs_path.mnt,   /* mount the share is exported from */
->           .dentry = dentry,                  /* entry inside the listed dir */
->   };
->   rc = vfs_getattr(&path, ...);
-> 
-> since 5614c8c487f6 ("ksmbd: replace generic_fillattr with vfs_getattr").
-> 
-> So a client that lists a directory on a submount below the share then
-> that dentry belongs to another superblock. So security_inode_getattr()
-> and ->getattr() get a mixed path.
+Preserve success for filesystems that do not support the xattr. Also
+preserve the best-effort store for CREATE, where the file has already
+been created.
 
-So e.g. apparmor hits
-        vfsuid_t vfsuid = i_uid_into_vfsuid(mnt_idmap(path->mnt),
-					    d_backing_inode(path->dentry));
-with path->mnt having nothing to do with path->dentry there?  Fun...
+Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ian Bridges <icb@fastmail.org>
+---
 
-> The third patch in this series fixes this. But we should make this a
-> Fixes: patch really... Something like [1].
-> 
-> > To elaborate a bit: correctness of quite a few places does depend upon the
-> > following invaraint:
-> > 	path->mnt->mnt_sb == path->dentry->d_sb		(1)
-> > for all struct path pointers they might possibly run into.
-> >
-> > _IF_ you can guarantee that (1) is not violated, we have something to
-> > talk about; otherwise, don't call your object struct path and don't
-> > pass it to anything that expects to deal with struct path.
-> 
-> Every struct path the series constructs:
-> 
->   - devtmpfs
->   - nfsd
->   - cachefiles
->   - ecryptfs
->   - overlayfs
->   - ksmbd
-> 
-> doesn't have this bug.
-> 
-> [1]:
-> 
->   --- a/fs/smb/server/smb2pdu.c
->   +++ b/fs/smb/server/smb2pdu.c
->   @@ -6375,13 +6375,14 @@ static int process_query_dir_entries(struct smb2_query_dir_private *priv)
->                           continue;
->                   }
-> 
->   +               path.mnt = priv->dir_fp->filp->f_path.mnt;
->   +               path.dentry = dent;
->   +
->                   if (test_share_config_flag(priv->work->tcon->share_conf,
->                                              KSMBD_SHARE_FLAG_HIDE_UNREADABLE)) {
->                           __le32 daccess = FILE_READ_DATA_LE | FILE_READ_EA_LE |
->                                   FILE_READ_ATTRIBUTES_LE;
-> 
->   -                       path.mnt = priv->dir_fp->filp->f_path.mnt;
->   -                       path.dentry = dent;
->                           rc = smb_check_perm_dacl(priv->work->conn, &path,
->                                                    &daccess, daccess,
->                                                    priv->work->sess->user->uid,
->   @@ -6397,7 +6398,7 @@ static int process_query_dir_entries(struct smb2_query_dir_private *priv)
->   @@ -6397,7 +6398,7 @@ static int process_query_dir_entries(struct smb2_query_dir_private *priv)
->                   if (priv->info_level != FILE_NAMES_INFORMATION) {
->                           rc = ksmbd_vfs_fill_dentry_attrs(priv->work,
->                                                            idmap,
->   -                                                        dent,
->   +                                                        &path,
->                                                            &ksmbd_kstat);
->                           if (rc) {
->                                   dput(dent);
->   --- a/fs/smb/server/smb_common.c
->   +++ b/fs/smb/server/smb_common.c
->   @@ -472,32 +472,36 @@ int ksmbd_populate_dot_dotdot_entries(struct ksmbd_work *work, int info_level,
->           for (i = 0; i < 2; i++) {
->                   struct kstat kstat;
->                   struct ksmbd_kstat ksmbd_kstat;
->   -               struct dentry *dentry;
->   +               struct path path = { .mnt = dir->filp->f_path.mnt };
+Since v1
+- Handle -ENOMEM and -E2BIG as requested by Namjae Jeon. Use
+  STATUS_INSUFFICIENT_RESOURCES and STATUS_DISK_FULL, respectively.
 
-That's just asking for breakage down the road.  Just pass it
-the address of ->f_path for "." and
-	&(struct path){.mnt = dir->filp->f_path.mnt, .dentry = dentry}
-for ".." (and sod the dentry = dget(...) for "." - just have it NULL there)
+A failed SET_INFO can still leave partial changes. The owner, group,
+mode and POSIX ACL updates happen before the store, as does the removal
+of the old descriptor. This patch reports the failure without rolling
+back those changes.
+
+Tested on ksmbd-for-next 267029b35ad1 with KASAN. A DACL too large for
+the tested ext4 filesystem now produces STATUS_DISK_FULL. Injected
+allocation failure produces STATUS_INSUFFICIENT_RESOURCES. A test
+build that substitutes -E2BIG for the store's -ENOSPC also produces
+STATUS_DISK_FULL. Small descriptors and filesystems without xattr
+support behave as before. CREATE still succeeds if storing its
+descriptor fails. smbtorture results match the base.
+
+This patch was developed with LLM assistance.
+
+v1: https://lore.kernel.org/linux-cifs/20261118155521.70611-1-icb@fastmail.org/
+
+ fs/smb/server/smb2pdu.c | 4 +++-
+ fs/smb/server/smbacl.c  | 9 ++++++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 29750970f8da..3382974df8d1 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -9526,8 +9526,10 @@ int smb2_set_info(struct ksmbd_work *work)
+ 		rsp->hdr.Status = STATUS_EA_LIST_INCONSISTENT;
+ 	else if (rc == -EMSGSIZE)
+ 		rsp->hdr.Status = STATUS_INFO_LENGTH_MISMATCH;
+-	else if (rc == -ENOSPC || rc == -EFBIG)
++	else if (rc == -ENOSPC || rc == -EFBIG || rc == -E2BIG)
+ 		rsp->hdr.Status = STATUS_DISK_FULL;
++	else if (rc == -ENOMEM)
++		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+ 	else if (rc == -ESHARE)
+ 		rsp->hdr.Status = STATUS_SHARING_VIOLATION;
+ 	else if (rc == -ENOENT)
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index a87c22fa9a6e..3770dda2b3ed 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -1984,7 +1984,14 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
+ 		/* Update WinACL in xattr */
+ 		ksmbd_vfs_remove_sd_xattrs(idmap, path);
+-		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
++		rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
++		/*
++		 * The CREATE context (type_check) stays best effort because
++		 * the file exists already. A filesystem without the xattr is
++		 * not an error either.
++		 */
++		if (type_check || rc == -EOPNOTSUPP)
++			rc = 0;
+ 	}
+ 
+ out:
+-- 
+2.47.3
+
