@@ -1,55 +1,85 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.133.124
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795088240;
-	b=vwa7yLbK07yXRYVR2oXSGxBOAUJUJkt0joZxQqDeF6+tZW9bXC8VuYuhw6EhQZdB26/u
-	 74By6kPPVhut587GwdDSik2m6/w6ckAotz+TwiDWSrvERb37AQnxsr3ywvEgMPCebJ1aE
-	 dWJ0CrrnLQaQCdHwmL8F17dzy6QAzyEqLNGnSktINVvxWnh3CrohsZN5R4bl74XehgrOO
-	 2Yoj/TLVPnCitU86jmbiNtUvRr9girpFMuZGFGdYf3FDHy5TDUSqXaYPKmF5cAw3Gbc+w
-	 L7SjF3FurwZcZE55CBTKxOe3Z6FdXy7L1eC8k9oK+Pf7zzMnSDf3PA4Re641Hfxitcg==
+	t=1795088973;
+	b=VspZnZ68RQoqwSjIohr3aRad+Qe4QH6E/c+AXJG7geyglxR2FBHL04wa9U8cuDBp5Kn2
+	 KsMRACSnKRRkGx0rILAmYFuJbg4aShyCqCCbj4qxo+NAgFCTKcxOWcS0t+crR4X6jfp/Z
+	 S7SSEgy+y/TJUIK3gNgQnM4SZ7HGl8TBBr2iGSvxbDwWaXM1QupZqsOo5/ENKyJUi20nD
+	 RrA/+DF4P2BSz5avMbj46IOzl+oyjY2025GSH+wvz2mzVlCqEqCveId5geFozXbj5MUtk
+	 a0Lz9eFUDyNW8zZ3PSYYfDKR5D6Zk9LuB3s0Jodw0TF7EebGNxcfc+z7VXFaKTALETA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795088240;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=rcqc+WTD9IhSKmFqP6R73mZ2Ro+j/JKdXcfJz00sz/A=;
-	b=pvzuhnZS9fEnRtflJg887QmgsgcS36r3l7l/Rk58EZ3UQ/axaaEYXGm+srYzZeZfEuFj
-	 Twuk8oDvO/gShHy1e6Tv7K7vNkthrU3RMuwOgpypIBlcus4PJkUpOTca9bRz63bUB1vyG
-	 C2mJnQvGHU2fsaJ8BZJqXfn/oWpprQX7HABWl0npqucna9CEdfXc23f2PAftB4j5uLzST
-	 4tId1RrMkdMSTFZKqE7EGNie8994lbHoXVrzHFfhKKFNSz8nro1VUrDTDMWPQDx+higH9
-	 JVh70kY/twsNdC0kpBRId/FkGQDECm0MQA3d/Grkw/EWqJja0D8hSfND9PC9AZU6FUw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795088973;
+	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
+	 X-Mimecast-MFC-AGG-ID:Received:Received:Organization:In-Reply-To:
+	 References:To:Cc:Subject:MIME-Version:Content-Type:Content-ID:
+	 Content-Transfer-Encoding:From:Date:Message-ID:X-Scanned-By;
+	bh=mDnX51SDsJdD3E0ns8PkWtEeSC5ZSzbEduD4fLsTeX4=;
+	b=q0kbsRXKsH/lkm5ZhinEcydxcNLejJiMiTDN72TtBUBcqrm8gn/BkE53TFLl5J6087Q1
+	 Yp4uVVJIv3JhQXGe8ZjjUV66cZ9/3bwnuBvkvrsXXOpnPCeFuDnEIQW6NVvrEALeK7MXd
+	 cU9aJAoXRNeXX2QwdnKhk64RFHHBSRzELzvyA2lkdsJBl23BUjhM1fakP1npL35H1xtDZ
+	 NIFsdF0aLz00xNuPWqVSiMSbzKsSsg8iZxRgy62puUdMqKfFgqUfb/gXp2GnPfqBRl0Re
+	 ASCjJi5sYn/RfygLS5mrvxe4gZp3QVM/Gv7oTcqsKYqFSPTu2ccCv6Su2itjOLJrItg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oOGWVJLQ;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	dmarc=pass header.from=redhat.com;
+	spf=pass smtp.mailfrom=redhat.com;
+	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=K541cxTA;
+	arc=none smtp.remote-ip=170.10.133.124
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA43606A33B
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83585606A320
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:49:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 83585606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=oOGWVJLQ
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5BA1F000CE
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:37:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795088240;
-	bh=rcqc+WTD9IhSKmFqP6R73mZ2Ro+j/JKdXcfJz00sz/A=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=oOGWVJLQMT9MROIPnXWFDxcv3oaPUNR2WPe+Ll8j0jzvaScGvNqyaM+ldHjR6d4ji
-	 z/IesoVV0lESGfgeQhdoQBYDukAL7Wtn6MQjiLpMTe1Ec8vn33HxTNrmS4c/tIh3YD
-	 HkDovWCXRcOR39ezWfIITSFy9CJpUDh9waYhNRHEmAfVVBsG/Id2L+dlQh67Pa8weY
-	 LAamJ5FPJZCIUkuOxJl/0RDszHDdTKVLSBnkx5lMXF2hQFAzmNIJ+HPpZWq0JrFgY6
-	 tP1N4xPK0SWsUFQuCqielT1c+8MyKoIwu9C8wFK+AEPcRTh1muMJFg2saCpdpd7MYn
-	 kuT3br2QhN89Q==
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6ae305e3bd9so3724355a12.0
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 03:37:20 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFmK6OO14Y0rn6Qo9fxgGGfgY9nt0BFrDasdgG4qqUEZNeFP8JRhvfG/KC1knBJzR+hZU4Wt7czT6Ah@vger.kernel.org
-X-Gm-Message-State: APuU4Z9MTpum17HK9eR5k9YUC1H8O18skg+1FHUEdzo3vOhQB42sMcHH
-	2cIqMtBWkzO8AM/QuPogBwXDMRy4JEjfTqtznJNLtOdgTA3ws5OxBLHLCdZ6tvWQHy/ZWVSO3w8
-	yElEsHUMzlgxfNnVvsTo07xVje1c+CUU=
-X-Received: by 2002:aa7:d94b:0:b0:6b7:853f:5e9b with SMTP id
- 4fb4d7f45d1cf-6b887f0d7fbmr3413317a12.16.1795088239018; Thu, 19 Nov 2026
- 03:37:19 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=K541cxTA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1795088971;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mDnX51SDsJdD3E0ns8PkWtEeSC5ZSzbEduD4fLsTeX4=;
+	b=K541cxTA1OiQdVm45AqhIYv2ukXkmS2R3aHNLIZwLzurRcwFTWkIdCNpBJ6wuyMXD9dDoj
+	X+V6jFt70xhoDZciF4993UwbeEVISISZSSQmk1ccIbwXmbfIIGGgaI+qyyvr86WercAzdU
+	V0yqoCiEUHFwLHhEEj0KM3LKdLlepUA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-194-stBv0V2IPZSPIYz6hREm5Q-1; Thu,
+ 19 Nov 2026 06:49:28 -0500
+X-MC-Unique: stBv0V2IPZSPIYz6hREm5Q-1
+X-Mimecast-MFC-AGG-ID: stBv0V2IPZSPIYz6hREm5Q_1795088966
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4FCC1955DCC;
+	Thu, 19 Nov 2026 11:49:25 +0000 (UTC)
+Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D70A21801971;
+	Thu, 19 Nov 2026 11:49:20 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+In-Reply-To: <20261119083851.3306418-5-dhowells@redhat.com>
+References: <20261119083851.3306418-5-dhowells@redhat.com> <20261119083851.3306418-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>
+Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Stefan Metzmacher <metze@samba.org>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v19 04/17] netfs: Add some tools for managing bvecq chains
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,44 +89,145 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261119073534.118732-1-icb@fastmail.org>
-In-Reply-To: <20261119073534.118732-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 19 Nov 2026 20:37:06 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9FoDgXmR3nedUrjAJg8dYEUbKkO+E-N1U2a=wxn-EpUA@mail.gmail.com>
-X-Gm-Features: AclHuK9osdHfklEjXswVGiM12TtcQ7-egTgsmLQIDqk_Uo_EuHbRQJ108BRcSQI
-Message-ID: <CAKYAXd9FoDgXmR3nedUrjAJg8dYEUbKkO+E-N1U2a=wxn-EpUA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: build an inherited security descriptor with its
- own offsets
-To: Ian Bridges <icb@fastmail.org>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3330734.1795088718.1@dhowells-thinkpadp1gen8.rmtgb.csb>
 Content-Transfer-Encoding: quoted-printable
+From: David Howells <dhowells@redhat.com>
+Date: Thu, 19 Nov 2026 11:49:19 +0000
+Message-ID: <3331436.1795088959@dhowells-thinkpadp1gen8.rmtgb.csb>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Thu, Nov 19, 2026 at 4:35=E2=80=AFPM Ian Bridges <icb@fastmail.org> wrot=
-e:
->
-> A new file or directory can lose the access rules it should inherit from
-> its parent. smb_inherit_dacl() sizes the child's descriptor for its SIDs
-> and inherited ACEs but copies the parent's offsets. The owner and group
-> SIDs keep their sizes, while the child's DACL can be smaller or larger.
-> The parent's offsets may therefore be wrong for the child.
->
-> ksmbd preserves the component order sent by the client. The Linux
-> cifs client puts the DACL before the owner and group SIDs, so their
-> offsets depend on the parent's DACL size. If the child's DACL is
-> smaller, the copied SID offsets can fall outside the allocation.
-> ksmbd then uses a default descriptor, losing inherited deny ACEs.
-> If the child's DACL is larger, it can overwrite the SIDs.
->
-> Build the child in owner, group, DACL order and calculate each offset
-> as its component is copied. These writes exactly fill the allocation,
-> so the checks on the copied parent offsets are no longer needed.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ian Bridges <icb@fastmail.org>
-Applied it to #ksmbd-for-next.
-Thanks!
+Hi Christian,
+
+If you pull this patch, can you apply the attached diff to it to fix some
+issues that Sashiko brought up[1]?
+
+- In bvecq_alloc_buffer2(), fix OOM discard where the requested number of
+  pre-slots fills up a entire bvecq.
+
+- In bvecq_alloc_buffer2(), add comment on why we want to exit the buffer
+  alloc loop immediately.
+
+- In bvecq_put(), clear the prev pointer of the next bvecq if it points
+  back to the one being released.
+
+- Fix bvecq_append() kdoc.
+
+- Change %flags to @flags in function kdoc when referring to func arg.
+
+Thanks,
+David
+
+[1] https://sashiko.dev/#/patchset/20261119083851.3306418-1-dhowells%40red=
+hat.com
+---
+diff --git a/fs/netfs/bvecq.c b/fs/netfs/bvecq.c
+index b140cd47a1fa..1b2ad42e6d50 100644
+--- a/fs/netfs/bvecq.c
++++ b/fs/netfs/bvecq.c
+@@ -61,7 +61,7 @@ EXPORT_SYMBOL(bvecq_dump);
+  * that at least some progress can be made.
+  *
+  * Return: The node pointer or NULL on allocation failure.  BVECQ_HIT_OOM=
+ is
+- * set in *flags if an allocation failure occurs.
++ * set in *@flags if an allocation failure occurs.
+  */
+ struct bvecq *bvecq_alloc_one(size_t nr_slots, gfp_t gfp, unsigned int *f=
+lags)
+ {
+@@ -136,10 +136,10 @@ EXPORT_SYMBOL(bvecq_alloc_one);
+  *
+  * Allocate a chain of bvecq nodes providing at least the requested cumul=
+ative
+  * number of slots.  Each node is a maximum of 4KiB in size.  If
+- * %BVECQ_SHORT_OKAY is set in *%flags, then the chain may be shortened o=
+n OOM.
++ * %BVECQ_SHORT_OKAY is set in *@flags, then the chain may be shortened o=
+n OOM.
+  *
+  * Return: The first node pointer or NULL on allocation failure.  BVECQ_H=
+IT_OOM
+- * is set in *flags if an allocation failure occurs.
++ * is set in *@flags if an allocation failure occurs.
+  */
+ struct bvecq *bvecq_alloc_chain(size_t nr_slots, gfp_t gfp, unsigned int =
+*flags)
+ {
+@@ -191,7 +191,7 @@ EXPORT_SYMBOL(bvecq_alloc_chain);
+  * refcounts set to 1 and can be passed to MSG_SPLICE_PAGES.
+  *
+  * Return: The first node pointer or NULL on allocation failure.  BVECQ_H=
+IT_OOM
+- * is set in *flags if a bvecq chain allocation failure occurs (though if
++ * is set in *@flags if a bvecq chain allocation failure occurs (though i=
+f
+  * %BVECQ_SHORT_OKAY is set, the func may return early but will have at l=
+east
+  * one bvecq in the allocation).
+  */
+@@ -200,6 +200,7 @@ struct bvecq *bvecq_alloc_buffer2(size_t size, unsigne=
+d int pre_slots, gfp_t gfp
+ {
+ 	struct bvecq *head =3D NULL, *tail =3D NULL;
+ 	size_t count =3D pre_slots + DIV_ROUND_UP(size, PAGE_SIZE);
++	bool got_page =3D false;
+ =
+
+ 	_enter("%zx,%zx,%u", size, count, pre_slots);
+ =
+
+@@ -258,7 +259,12 @@ struct bvecq *bvecq_alloc_buffer2(size_t size, unsign=
+ed int pre_slots, gfp_t gfp
+ =
+
+ 		bvecq_filled_to(tail, slot);
+ 		count -=3D got;
++		got_page =3D true;
+ =
+
++		/* TODO: If we got an OOM trying to allocate a bvecq, we should
++		 * probably stop allocating pages unless/until we have an
++		 * emergency pool of those also.
++		 */
+ 		if (unlikely(*flags & BVECQ_HIT_OOM) && (*flags & BVECQ_SHORT_OKAY))
+ 			break;
+ 	} while (count > 0);
+@@ -273,7 +279,9 @@ struct bvecq *bvecq_alloc_buffer2(size_t size, unsigne=
+d int pre_slots, gfp_t gfp
+ 		bvecq_put(tail);
+ 	}
+ oom:
+-	if (!head || (tail =3D=3D head && head->nr_slots =3D=3D pre_slots))
++	if (!head)
++		goto out;
++	if (!got_page && size > 0)
+ 		goto discard; /* Allocated no pages */
+ 	if (*flags & BVECQ_SHORT_OKAY)
+ 		goto out;
+@@ -328,6 +336,8 @@ void bvecq_put(struct bvecq *bq)
+ 		for (int slot =3D 0; slot < bq->nr_slots; slot++)
+ 			bvecq_free_slot(bq, slot);
+ 		next =3D bq->next;
++		if (next && next->prev =3D=3D bq)
++			next->prev =3D NULL;
+ 		netfs_stat_d(&netfs_n_bvecq);
+ =
+
+ 		if (bq->from_pool !=3D BVECQ_USE_NO_POOL)
+diff --git a/include/linux/bvecq.h b/include/linux/bvecq.h
+index f670a031ac44..da2385c91e9a 100644
+--- a/include/linux/bvecq.h
++++ b/include/linux/bvecq.h
+@@ -162,7 +162,7 @@ static inline bool bvecq_acquire_slot(const struct bve=
+cq *bvecq, unsigned int sl
+ }
+ =
+
+ /**
+- * bvecq_append - Get the next bvecq with appropriate barrier
++ * bvecq_append - Attach new bvecq to chain with appropriate barrier
+  * @to: The bvecq to append to
+  * @add: The bvecq to append
+  *
+
