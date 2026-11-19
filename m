@@ -1,83 +1,115 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.84.56
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795080087;
-	b=LyQ6vdWKOoUNQVqxSKPeJ6i3n5esIS/dK/x2GoGaJZmEhU5UnLQzHox2yKS2ioJg++bX
-	 HZG31QDKfSZ9uBa5ydXOWVNlzgfEbJrK6rFfLdy6W4hW6VdOQHjcutiRnt36+2MTb016e
-	 HdoXY8IrTlWqbcmEe3sGD6dFWa7itlKRVYfpzoP3IMawVw/m8O8zGCaRYwjn/SEQuPvsP
-	 Uvto6USiNK7CV330CCkiaBREXvs3HTH3shNWkmgSfaLwYJzz5uZVm+lG7gkVOsCTEe9Hp
-	 MwWPdUX8uYTjUavO3qi0CW9Hqq1YwOYpWno/NFBLUK9UZ8j9DwOGpOYW8SjuInuiCxw==
+	t=1795080913;
+	b=XCvD9CQeNaHfcZi2g/AIQI2G5wMksEH9BP+qnmS0yWz0Ql2S7ZwwyDqW/D+std1tzKPx
+	 klA2ALKLAQWrHgvpAbytLEm/wsOisOnFlacAXcCC4dTzs6rPvkc4ZCesg8Beix+UT6fB3
+	 lUwfPgpogKomUy7V3heDbBX4euYXhWhag1rX2iXuwjbZuME7znZeCDxJt45aHKbRwiQDw
+	 GXbTqf0BW0InG4iGkoutQ1UbPPCw4PPpG6ZxpiqrEegQO/m9xjsDdE/mXjFK4wOIQjUtI
+	 B2aK6iPSz5VTDn186yVIRfGmc+cIT8tFBBi3OTiJuZzIuVfQYFNNF9M8xW0wze3l0yg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795080087;
-	h=DMARC-Filter:X-UUID:X-CID-P-RULE:X-CID-O-INFO:X-CID-META:X-CID-BVR:
-	 X-CID-BAS:X-CID-FACTOR:X-CID-RHF:X-UUID:X-User:Received:From:To:Cc:
-	 Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=phJmb426aoRooYkR2Gofxf73gCjIrRfzoC/1uf618JI=;
-	b=YlKEdRuuI+W/aSyTShtezAE+WtCiDPevniJyAtvWvztS9Wxi9xOrpPkePoVU6KB5kehg
-	 jca8WKr+cluQvIvlV4xha+5qfmeJb9id8A7I5XrQd6uh70rEqE2nJVq/NpckyasG/i0xQ
-	 cBFPqmdwo+iolTmn+zFZ1DwtfMdltUBpnV/nEXD94cjhnFmZkoIcua7mfdup11wt0CP6Z
-	 89FDta1xil5R9n9oOf2mO9FJ57ZsOpOiptPfXiU+kA1PBox1AvZDX32Abag8Gd3yDbv98
-	 oh4249rpWl+D1kGRQhfazqKU3xVHgw0avwuXEjO9gBTttYKwpndCEnyEHQpWp/zaLZQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795080913;
+	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
+	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Last-TLS-Session-Version;
+	bh=CQyK9hhzQUtdCIaKwh8qFL6kiw3hBK7e02jXrxk3Q5M=;
+	b=LhTWe23zs6I7odY3AiALeSklqWjMJTgqIXC7Hsz1GXVxPp/rbJAW5QJrfL40q3rdbVBC
+	 3ZCYphNfkqCR5nQZszX1ONX1DXVWzoCf/oud/OuEs8/GipJXNmBDaAk264tOpy9ssbkJj
+	 0RRrkOisjX8soxKHCifOwG0oJHEYJPDEjtbDaOW9f4igF9ECSplTio+ROFC5HlNVsDFJ0
+	 LQivhiMU5cGC0K0P/dtPmE9j4LU/8JpFEjQKdfanAexDryWOhZeX4NroHjMv1p0OqJK1i
+	 hX6vSg7SXtToAHOvLpUUsPpj3F44LPBEHYtdcZXWOoHLNAHagpTIZLJAEd1GpALqDwQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=none header.from=kylinos.cn;
-	spf=pass smtp.mailfrom=kylinos.cn;
-	arc=none smtp.remote-ip=124.126.103.232
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	dmarc=pass header.from=bootlin.com;
+	spf=pass smtp.mailfrom=bootlin.com;
+	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=trPf9+9S;
+	arc=none smtp.remote-ip=185.246.84.56
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1805606A337;
-	Thu, 19 Nov 2026 09:21:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org A1805606A337
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 93cdc67ee3fa11f19a56ed5b684f684d-20261119
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.19,REQID:3e6c968f-f40c-41d1-b7b3-9939313b65b4,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:20
-X-CID-META: VersionHash:7db8b62,CLOUDID:6521bea9981703ccd9b9ae390e9a61cd,BulkI
-	D:nil,BulkQuantity:0,SF:81|82|83|102|850|865|898,TC:nil,Content:0|15|50|99
-	|100|102|153,EDM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 93cdc67ee3fa11f19a56ed5b684f684d-20261119
-X-User: wangyibo@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <wangyibo@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 727782934; Thu, 19 Nov 2026 17:21:18 +0800
-From: Wang Yibo <wangyibo@kylinos.cn>
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Stefan Metzmacher <metze@samba.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@infradead.org>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v19 01/17] iov_iter: Fix kunit test to remove __init and __refdata marks
-Date: Thu, 19 Nov 2026 17:21:15 +0800
-Message-Id: <20261119092115.3957212-1-wangyibo@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20261119083851.3306418-2-dhowells@redhat.com>
-References: <20261119083851.3306418-2-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7677960A2606;
+	Thu, 19 Nov 2026 09:35:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7677960A2606
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=trPf9+9S
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 895141A170D;
+	Thu, 19 Nov 2026 09:35:08 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3D3E660237;
+	Thu, 19 Nov 2026 09:35:08 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 145C311BC315F;
+	Thu, 19 Nov 2026 10:34:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1795080902; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=CQyK9hhzQUtdCIaKwh8qFL6kiw3hBK7e02jXrxk3Q5M=;
+	b=trPf9+9SmvXq7f3i06Ocu8PXp2wkKO6ORNKTA4/AjOKcQKVFePqcO/1BhMn+K4JKXgVetW
+	9Yr+85a0u4rw/+pGQPZDRSMsRMDGawEXfnQ9jCtNv2zr3C8ZQd4iUe048cU50ECPRyFurf
+	rsmMLyDo3rueQxG7RuwY+EBebjyTZuhqh1PyoyvCDfGRSYoPSTyfx/hwy85QgTWFsAil0Q
+	X6TU5TJA2EpRSA3/3QyU7eQBfCRlHqNmOlSA+ByZVazhopQuZSLgxPNhpRVe5QgDh43L/T
+	HBMPjxwGs9avJmS68J25IgXRGZqvRkZ+RC3EyDq//xlN7GCwXICCDykv7Bhitw==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org,  Jonathan Corbet <corbet@lwn.net>,  Shuah
+ Khan <skhan@linuxfoundation.org>,  linux-doc@vger.kernel.org,  David
+ Hildenbrand <david@kernel.org>,  Andrew Morton
+ <akpm@linux-foundation.org>,  Jason Gunthorpe <jgg@nvidia.com>,  Leon
+ Romanovsky <leonro@nvidia.com>,  linux-mm@kvack.org,  Jaroslav Kysela
+ <perex@perex.cz>,  Takashi Iwai <tiwai@suse.com>,
+  linux-sound@vger.kernel.org,  Jens Axboe <axboe@kernel.dk>,
+  linux-block@vger.kernel.org,  Marcel Holtmann <marcel@holtmann.org>,
+  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+  linux-bluetooth@vger.kernel.org,  Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>,  Jason Wang <jasowangio@gmail.com>,
+  David Heidelberg <david@ixit.cz>,  oe-linux-nfc@lists.linux.dev,  Chas
+ Williams <3chas3@gmail.com>,  "David S. Miller" <davem@davemloft.net>,
+  Eric Dumazet <edumazet@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,
+  Paolo Abeni <pabeni@redhat.com>,  netdev@vger.kernel.org,  Helge Deller
+ <deller@gmx.de>,  linux-fbdev@vger.kernel.org,
+  dri-devel@lists.freedesktop.org,  MPT-FusionLinux.pdl@broadcom.com,
+  "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,  "Martin
+ K. Petersen" <mkp@kernel.org>,  linux-scsi@vger.kernel.org,  Richard
+ Weinberger <richard@nod.at>,  Vignesh Raghavendra <vigneshr@ti.com>,
+  Zhihao Cheng <chengzhihao1@huawei.com>,  linux-mtd@lists.infradead.org,
+  Neill Kapron <nkapron@google.com>,  Andrey Konovalov
+ <andreyknvl@gmail.com>,  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+  linux-usb@vger.kernel.org,  Juergen Gross <jgross@suse.com>,  Stefano
+ Stabellini <sstabellini@kernel.org>,  xen-devel@lists.xenproject.org,
+  Hans de Goede <hansg@kernel.org>,  Arnd Bergmann <arnd@arndb.de>,
+  "Michael S. Tsirkin" <mst@redhat.com>,  Eugenio =?utf-8?Q?P=C3=A9rez?=
+ <eperezma@redhat.com>,  Sean Christopherson <seanjc@google.com>,  Paolo
+ Bonzini <pbonzini@redhat.com>,  kvm@vger.kernel.org,
+  virtualization@lists.linux.dev,  Jan Kara <jack@suse.cz>,
+  linux-fsdevel@vger.kernel.org,  "Theodore Ts'o" <tytso@mit.edu>,
+  linux-ext4@vger.kernel.org,  Mike Marshall <hubcap@omnibond.com>,
+  devel@lists.orangefs.org,  Paulo Alcantara <pc@manguebit.org>,  Namjae
+ Jeon <linkinjeon@kernel.org>,  linux-cifs@vger.kernel.org,  Jaegeuk Kim
+ <jaegeuk@kernel.org>,  Chao Yu <chao@kernel.org>,
+  linux-f2fs-devel@lists.sourceforge.net,  Florian Fainelli
+ <florian.fainelli@broadcom.com>,  Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,  Tzung-Bi Shih
+ <tzungbi@kernel.org>,  Benson Leung <bleung@chromium.org>,  David Airlie
+ <airlied@gmail.com>,  Simona Vetter <simona@ffwll.ch>,  Alex Deucher
+ <alexander.deucher@amd.com>,  Christian =?utf-8?Q?K=C3=B6nig?=
+ <christian.koenig@amd.com>,
+  amd-gfx@lists.freedesktop.org,  Jani Nikula
+ <jani.nikula@linux.intel.com>,  Joonas Lahtinen
+ <joonas.lahtinen@linux.intel.com>,  Rodrigo Vivi <rodrigo.vivi@intel.com>,
+  Tvrtko Ursulin <tursulin@ursulin.net>,  intel-gfx@lists.freedesktop.org,
+  Matthew Brost <matthew.brost@intel.com>,  Thomas =?utf-8?Q?Hellstr=C3=B6?=
+ =?utf-8?Q?m?=
+ <thomas.hellstrom@linux.intel.com>,  intel-xe@lists.freedesktop.org
+Subject: Re: [PATCH v2 07/12] docs: ioctl-number: update MTD entries
+In-Reply-To: <20261119053514.255348-8-rdunlap@infradead.org> (Randy Dunlap's
+	message of "Wed, 18 Nov 2026 21:35:08 -0800")
+References: <20261119053514.255348-1-rdunlap@infradead.org>
+	<20261119053514.255348-8-rdunlap@infradead.org>
+User-Agent: mu4e 1.12.12; emacs 30.2
+Date: Thu, 19 Nov 2026 10:34:37 +0100
+Message-ID: <87bj7lf9le.fsf@bootlin.com>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -87,40 +119,26 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi David,
+Hi Randy,
 
-> Remove the __init marks from the functions in the iov_iter kunit test so
-> that they don't get removed after the module is loaded or if the test is
-> built in as the tests can be triggered through debugfs too.
+On 18/11/2026 at 21:35:08 -08, Randy Dunlap <rdunlap@infradead.org> wrote:
 
-The reasoning looks right to me.  The suite is registered with
-kunit_test_suites(), so it gets a debugfs "run" file and can be re-run
-after the init sections have been freed; calling into an __init function
-from there is a use-after-free, and __refdata on the case array keeps
-modpost from flagging the reference to init text.
+> Update the list of files where MTD ioctls are defined and update
+> the ranges of function numbers that are used.
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 
-There is one more file in the tree with the same problem:
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-  lib/tests/bitfield_kunit.c:60   __init test_bitfields_constants()
-  lib/tests/bitfield_kunit.c:103  __init test_bitfields_variables()
-  lib/tests/bitfield_kunit.c:140  __refdata bitfields_test_cases[]
-  lib/tests/bitfield_kunit.c:151  kunit_test_suites(&bitfields_test_suite)
+> [Since having multiple maintainers trying to merge these would
+> cause some conflicts, it would be more manageable for Jon to
+> take all of these through the docs-next tree.]
 
-(line numbers from v7.4-rc1; test_bitfields_compile() is also marked
-__init but is only built under TEST_BITFIELD_COMPILE and is not in the
-case array)
-
-I went through the other suites that still have __init case functions --
-drivers/char/misc_minor_kunit.c, init/initramfs_test.c,
-security/landlock/id.c and lib/kunit/kunit-example-test.c -- and they
-are fine: they are all registered with
-kunit_test_init_section_suites(), which does not create a "run" file, so
-keeping __init there is correct.
-
-Do you want the bitfields one folded into this series, or would you
-rather I send it separately?
+Agreed.
 
 Thanks,
-Wang Yibo
+Miqu=C3=A8l
