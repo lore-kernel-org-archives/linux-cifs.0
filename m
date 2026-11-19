@@ -1,55 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795048686;
-	b=Paa9LG0i6y3GyHWyk1frcphtjtj24n9NkC9EwU/qB+xk0Hyo7qINPGlbzFld03P0l06g
-	 hkn0WUXaRZX7SdHOC7Jj/J9mHSizbtaVM3+SAif8JqdLQRBthLKOEly68y6o+BNlJwAan
-	 DJfRmM8NWsWJ9D8ee2F/d8quq/qZ11eLAjI5thii4OaQM87ftfaylVZZ6t/kEKzdeH6dM
-	 x1Fnavu76ff1P9pfpJHvmiAzgtoy5Kfno7igA/fVyGtsbx63bipmiaC1PRRT0WOEL8STs
-	 2RCRosj2psBBA6HQOAJpnazWLHG4nqi8UOnnAFou3SKZ0VqVPHpInHn9o8L2psdJBYw==
+	t=1795049568;
+	b=aZ/iEWkIlaFm1vQiFoZzh/YMmfdNbNkugk0m3H3jCig+5cNX8X34b0nWax4EFJC9TZqm
+	 zeO/wPET6ovLPX/8uEM1xy63kob3GSG0AK6bC0+0LcEMXj03ZiyOJx5gD/WwPNm9JihMb
+	 3bmvGiGsb3EdIKN+n0Q9IbZij2B1G7jiZS0OLKJKXtnuCn54eGUp6tytavJ0Af8/s3PKi
+	 RifsuMiqtTimDBctzWUDytmAUKt83gp3apf+0B5UzPNDRjUhTs+srNbzs3mTP6p4UD4kq
+	 MkLcc19EXr5pf/4vrTnDqtIiFCXnf83H5AxBuRdg+U7ssG1bRgQnwdfG1SNGkvY9yPQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795048686;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795049568;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=PtNQN5iYY+jY31+2PAsZJiMk/VcCexNZzkbg/hmJWTs=;
-	b=Zjl+SxCmyngEe9kFTLB5C3SB403GzCxVlCVOBCnlIn5uEZWbgsOKhACZrAP+YcQp7wEu
-	 QD0iVB/9CLWWVOM484ynv8OGlKLQ2iXZ69QDTOOL6n+3aSY4anwJEOl+5BkzZE+owvvzJ
-	 DxpP+mHhUUFhTXwYcX+eHostJzKoHOb7aHUcV+ixfZQWLtJSE0vZ9wJc9Mm5jN+kgWiG6
-	 1TUSRFpSnLA2TPiIHK9ZKeV/1ECV1TOeO/cFCdM3UNqVm931OFMpIcSI/zoOS25cc2gqZ
-	 HYuWb+dScpHTGMMDlRSP406ttuFHKXuHiO4lYkcRbqkq0lnrXm6ZqINE/78Rjix1ylQ==
+	 Subject:To:Cc:Content-Type;
+	bh=3fqxcRA59nGG2GFaHTxSrJALKfPpvhTXvqIt6jzDVGQ=;
+	b=17XjAAmH0ULhtBzaZwiz3gUrtDG0s2TmkeBVGHzla05i4613xjIi4+OxuUX9d1tPVsFH
+	 iojZisBOCeJXBUD1l4xuangMZRXzMQi5mu+4EmCnUeo8KtMirkk5iXlXlBc9LJtMjAMVN
+	 TnG9kNFPYaC/lBx5q12/OXujAckwH40280g9vOFVnG2XtGqhAYeF2KSftjOJnKacKEPNF
+	 4Q+nW/w/9gGTyqrmQoTHwSV/CerNvSC3IbSRDi2e2HocFWIswh9pW2OkeqmeYm/+wqD9+
+	 FIjB4UJ34GPxhahTlMyXEexjaXQYW9+riLTo9+JIJxx+Fs7Ko3bqufzfF8vfnFIosLA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JJWSzLfr;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA22606A32C
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 00:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JJWSzLfr
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D571F000C5
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 00:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42DEA606A33F
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 00:52:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D5EB1F000C4
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 00:52:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795048686;
-	bh=PtNQN5iYY+jY31+2PAsZJiMk/VcCexNZzkbg/hmJWTs=;
+	s=k20260515; t=1795049568;
+	bh=3fqxcRA59nGG2GFaHTxSrJALKfPpvhTXvqIt6jzDVGQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=JJWSzLfrLWZLBh+bEY0S4ycyK9l/DjHDUguV84PKMcPNyaeevfvpGwjeP5NMi9c71
-	 iO1zRMc4UNpYSZkasBAbCngTGqNTi6rJFXgWvtRq2s8zFweQezKoGi+adSu3FXCJ6O
-	 Jz2zEwZ5MpvW8GBWHGmgpbcp4rFbHt5FGxPTYixIUfmHWnFt1Au65Knobt94LrSEPq
-	 OBpFWYzlhRjvHuF0u8FwPAw53oZZ7YBYF9tAksGmXgb9jk+TO5LUqz1kmmCgQoezRx
-	 OtPAjoCfGE1+4hu1Qk1FjFpPlcPfQFYdasd9AECJnfzFloDA6WQMdZa2IRDCpktwWn
-	 yQv6f181rk53Q==
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c4cac7a7d3cso222353966b.3
-        for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 16:38:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErHGHhszqaA5ezvogkqPHF8sJVC5lPr4GF6aQ7kbOPSDRE8frQfL6NNHPDPt0DBrt7edI5qXeY7/Gxit@vger.kernel.org
-X-Gm-Message-State: APuU4Z/VuJ/ED20AYvjB++n8ZQ1onjaAi2ot++nSYqCogjJ/FRH3yvda
-	vjRmmUqg49mI4mxmoKshtWz9qzn/yHYnrM6IKQwibFAuIssAJAImAo0/jyZR8v5j0X2VOBgt9Tx
-	1rO+ISMIFLMsAEI/nYURSLbAl+zSCUtg=
-X-Received: by 2002:a17:907:2d0a:b0:c42:4750:8d49 with SMTP id
- a640c23a62f3a-c510e19f1d9mr421000666b.25.1795048684847; Wed, 18 Nov 2026
- 16:38:04 -0800 (PST)
+	b=AbxgtOSe8H5zVOQqseLvd6hauju7xcjsA9MMWd1u1ANcmQoP9da5w7EeEBSjNDxfy
+	 X+mOhSJUDZtbGbRgHG+dDvdVlubim5OC5GPCWX0n+yLdoeFZB75/NaHp7zS5uZ5UF7
+	 sPPn0DLO9zBorpMAF9Tsn6+iyETmZ3ZS03AxEBKiCJx0trJVxavfjAwh411/MuaW1I
+	 Yy5xvqODqAXf9NiPci/wn3qS1bvDAVMpoPH7eASO73+zYWPG3JOKMsxkZQjRXNFcIP
+	 96HVRyUfJL3239fBf7qj9YrSH3FST1vsf4K/Y6tex0/9gjhxoU07iwqwCvlThs64QN
+	 J0+1Q1DbCGCOQ==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-c4d5b2db4bbso103282466b.0
+        for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 16:52:47 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErHdH/RdyNNxjMqqj/l58Mgoc8hpZ8JWY77V0ehTPQKEIphNRIZ61477s42sn5Qp1hKx5gDqREB9MQmJ@vger.kernel.org
+X-Gm-Message-State: APuU4Z+Ni1FeP40H0wfHSn/LtKMIEEFvEVNOKfkgEqRcSlh7iU8npS4W
+	kviAap3MYeKhFoXkPMv67a8JK47X3DNZP16U1uUMIZKHGFhsUlMDKmcxAKMhtbVYPeVLGMLloAn
+	IxTgSwvZZkPVQaBCMsdqmVHGW9qUc3lE=
+X-Received: by 2002:a17:906:7306:b0:c29:4b57:503e with SMTP id
+ a640c23a62f3a-c512b4373d1mr21641066b.1.1795049566753; Wed, 18 Nov 2026
+ 16:52:46 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,40 +56,40 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261118173454.76416-1-icb@fastmail.org>
-In-Reply-To: <20261118173454.76416-1-icb@fastmail.org>
+References: <20261118155521.70611-1-icb@fastmail.org>
+In-Reply-To: <20261118155521.70611-1-icb@fastmail.org>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 19 Nov 2026 09:37:52 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd-KFizCjxU=qm65Aw+3NYoMWGHZhuaJ_7G5w_+4jFp5MA@mail.gmail.com>
-X-Gm-Features: AclHuK8obTmEl6pbQBPLiW6u_HRdn8tgal2Bb23iPchjtvXRpFt8tnpt1hRJ6bo
-Message-ID: <CAKYAXd-KFizCjxU=qm65Aw+3NYoMWGHZhuaJ_7G5w_+4jFp5MA@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: allocate the security descriptor reply at its
- padded size
+Date: Thu, 19 Nov 2026 09:52:33 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9=4OfQ6HESrMFhuffHANTWDjYyrt9VDQpBFdV8i4Mi4w@mail.gmail.com>
+X-Gm-Features: AclHuK9fpIXSg-K6iwftVqFnqQORnobjsfqgoT_nBWRu89S49TH0_lVl20XZ0Hw
+Message-ID: <CAKYAXd9=4OfQ6HESrMFhuffHANTWDjYyrt9VDQpBFdV8i4Mi4w@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: fail SET_INFO when the security descriptor cannot
+ be stored
 To: Ian Bridges <icb@fastmail.org>
 Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	manizada@pm.me, linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 19, 2026 at 2:35=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
-e:
->
-> smb2_get_info_sec() allocates the security descriptor reply with the
-> size that smb_acl_sec_desc_scratch_len() estimates. A compound response
-> pads the reply to 8 bytes inside that buffer, so after build_sec_desc()
-> the query fails with -EFBIG when the padded length does not fit. The
-> estimate is not padded, so a descriptor that fits the estimate can
-> still fail. A query with AdditionalInformation 0 always fails with
-> -EFBIG. Its reply is the 20-byte header, the estimate is 20 bytes, and
-> the padded length is 24. The client gets an error instead of the
-> header.
->
-> Round the allocation up to 8 bytes, as READ does for its data buffer.
->
-> Fixes: fda9522ed6af ("ksmbd: fix OOB write in QUERY_INFO for compound req=
-uests")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ian Bridges <icb@fastmail.org>
-Applied it to #ksmbd-for-next.
-Thanks!
+> diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+> index a87c22fa9a6e..3770dda2b3ed 100644
+> --- a/fs/smb/server/smbacl.c
+> +++ b/fs/smb/server/smbacl.c
+> @@ -1984,7 +1984,14 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+>         if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
+>                 /* Update WinACL in xattr */
+>                 ksmbd_vfs_remove_sd_xattrs(idmap, path);
+> -               ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
+> +               rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
+> +               /*
+> +                * The CREATE context (type_check) stays best effort because
+> +                * the file exists already. A filesystem without the xattr is
+> +                * not an error either.
+> +                */
+> +               if (type_check || rc == -EOPNOTSUPP)
+> +                       rc = 0;
+-ENOMEM and -E2BIG fall through to STATUS_INVALID_INFO_CLASS. Please
+map -ENOMEM to STATUS_INSUFFICIENT_RESOURCES and assign an appropriate
+status to -E2BIG.
+
+Thanks.
