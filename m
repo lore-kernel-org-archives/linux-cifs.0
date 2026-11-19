@@ -1,82 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.48
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795084698;
-	b=oYQJPtg2GT/+IUfoXdYu6eB+iaf8Ighp/9Hq9F97u6JY5p3lUOTw5VF1ZqN52O81mnbM
-	 o0Kq8Od4AO6L58VjZscOIbmIzmjLNnSqLWQLygooxBMorsbr8e1iFJUvQU6AFNY/ry2qR
-	 8Tk3dlxsPpgYs4vQlUufr4iu0AHwqB+yJOWDc8qJlkHAvjYiNG2Tk48ZqmmZj/nz0hnvk
-	 gBWYoPCCSK1MkXjxnDN+K7ZcAWPvT/Z+06iyonSzkNuzq0lk2tZuajSa8RAYtur0M7RpO
-	 zFsGlOocZqrIxdSD3Y91pJOunDNA4Se47/UW7HYi7rID/7oPQSmLgKR9Jc63pCwr6sw==
+	t=1795084703;
+	b=sTKautLRJDdO3xwgNTYu82SYD20UnujEKwv8ayZ9T8m6hEVpLrWu6SFuWEGfXsusrqYa
+	 Dm599bfEiChZ6slhHaMhApGKBgGk88jw2etkz0qmnywc+fGORA5YdUYCGYiabmQDrgJV8
+	 tLLZX3hkeClPFQ8BwNmqyTrSNrIcLJ9n7OXEIpBj2eqYYt8ta1Du3sSy4E8W12NVwV4nu
+	 Wz9sAEfq91JCLGk8T6T6/YCwzhZAS2S05yL0o2CTZ/3w7KcMZ8cwEt2/0PZuIhSjdyMv0
+	 lc8Mm8rDuEuoJNef24ToEONCOZALLQckXqAe3Zx4ONBnvTUFl8gUsJIBN6rPyraO9lg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795084698;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795084703;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
 	 From:X-Google-Original-From:To:Cc:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	bh=VVyqYLZTV+/+pFE18MYA7QP5vsPlZNWN0V7yac5lwY4=;
-	b=RL6HAUqpwwLdaJjE6r0QSy9PwZnwpt08QyrdWAaT2acTZc6vUPRLAzK8kNgIZkga5kdf
-	 n2OReTmK/qaa0PLnlGtW6atOF3GeuLedZ/nrK297ft9mAHXY2rSxAwOWu9rvTjXSOP9zQ
-	 f9qaPfSTOsE2PKN/gqvhXcBvM0ZKcqiaZNcjaTF2W7yT6PDt64Zhp7F2XvvLyk+IoBSVr
-	 W17Meki5OLKUS/KouH/aenceJ4JIt1vhy2ReA8xeud3N2WR4ZC3L/d/3lAM1cU8nAZz7q
-	 HHaurW4r5Hn1vg91SdaAgG6gCUxCpVk/9QZfFFpiz5Hac38T43diuKp9CQHV3Basx4A==
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
+	bh=N6MGzyJLnkEzYXsRUJ2m4nvPFKylKcskvzAYyTbdVL8=;
+	b=0oEAIi3bwGIvIvXx/rxMXXsuUmXme9Se/duonBDNmwatKC1cwOyhBADy0XcLWLg4CjXb
+	 0QWt0SGpNRqBF20mD61me+aqRGd1fJ3bXZ6Hpw5TPo4sXB+VO9rQtGUZR0VeKGQQX8dY+
+	 zJnPUu2AaUgyrI7sRbGqYjhDbNRAM3EXXQ1DM+SHfDF5Eq7aYAk7Rn9ceWJ0dDlpC8Vta
+	 ExP3+N4YJ7xbZxJKNRt4bXBZsTATiEaBg9IRTMkuWHdk1M2hylagAg3McMfWh3sI4PtxN
+	 tOZ1SG1LaYLwq8JYm/sRsc1taJOc89Ugq9a88rKC4HvkiKBL3B4dQGR/20hSnCmo/DQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=rootsys.at;
 	spf=pass smtp.mailfrom=rootsys.at;
-	dkim=pass header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=MtMRUfe2;
-	arc=none smtp.remote-ip=209.85.128.45
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	dkim=pass header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=d5qrkZdW;
+	arc=none smtp.remote-ip=209.85.221.48
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4B4606A320
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 10:38:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org AA4B4606A320
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12C0606A320
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 10:38:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E12C0606A320
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rootsys.at
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rootsys.at
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=MtMRUfe2
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4bb64ef5a00so15327385e9.3
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 02:38:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=rootsys.at header.i=@rootsys.at header.a=rsa-sha256 header.s=google header.b=d5qrkZdW
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-48e20ed3b9dso1871024f8f.2
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 02:38:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rootsys.at; s=google; t=1795084696; x=1795689496; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=VVyqYLZTV+/+pFE18MYA7QP5vsPlZNWN0V7yac5lwY4=;
-        b=MtMRUfe2W1xsMLBtqGoRNeWnl5lPVIW88SPaXxzN9pDLauN/GjnuqR2fRGkoz9i0sH
-         XsGNVPOFkQMt+o+bpS/X6THTX8U8wurconT4WESlr+4ZkW0it7joxj1GQRykTAqYuonH
-         k/VYft9MXL2o9K0II+X0FRZUpeZjiXaQkc4O9vl04RX/0tsy8f5UZn4jLP9lv277YKRe
-         FCHBqu4Rn45kAN9CeXYhMO+m6ciWSXcoSZrVtfQ31Egr1pqqcuMjoi9fyXlDC2H9g1Gf
-         W2Rd8i05Y0lgkzHQEEyN7Vp02RgjohyV56Rhld/4GRtu48YtOJFPfyIQxEbl/A1tjXJf
-         mW0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795084696; x=1795689496;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=rootsys.at; s=google; t=1795084701; x=1795689501; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=VVyqYLZTV+/+pFE18MYA7QP5vsPlZNWN0V7yac5lwY4=;
-        b=eWRMphB8fOte8RAOBDMV1TK74F8oxhSzUDr+0TXGW6u8DdztxvCrshtFc/evngbHt+
-         0UlBlXFICgVElCHlIGVTOoGtnAQx5AXdiE6e9o9h8GYZTBa9zhq4qmoxEX8Sv8PuyD4R
-         znPxbuqYNAq35/vZD6bPTSVLbdzQ8JaQSuyRoLlNqldu/ORDwpMyJBPr9JRbPhu9XaYu
-         SVZkQnMB+tOP9RA2Gn0Y8/pV6yNYRg1MX6tNm5g7hH1cErUcLK3XEs0N+6WObI6lhVzN
-         OwG8qozkqjP+pNhm8E6jGYGS1CsWibATKls5j9jzvHzKjp3fGTXg9J5VXuFyK1ETh7x3
-         4hiQ==
-X-Forwarded-Encrypted: i=1; AL+hErGTjdqOcJFtyymlqwhzUoee2+wD6b9jmYjDifZEclXMyTWY1RgX1amw69baiMe4lkNAd7bgTrkpOS0Y@vger.kernel.org
-X-Gm-Message-State: APuU4Z+WTw8riSwyAO+yqS4Xd63yavBUq6yHKk9cJgXhPcxvs0UV7bA2
-	HG2laQEGQi9HxQsMmy2oOdiKNKM3rloByj6ZONLf7r5cWI3viRHZaBhwy4BIpfIvz+YC
-X-Gm-Gg: AYBFou2oBpUuOfEcTJiC+85+xY7LmVspfk61QROxFOicf80xPy6ASTMS/O46j9Vy+ID
-	8Ky0Q+2mTZZ1Up7KVHDH9ekxmRaJ41IbiQiKALXW0Ox7FTcqh9/aSNTX8yiPyPTZ/fuxeXiMiQG
-	6wL7x37fTqq4S3zgIwixAZ48Cg3fejPXNULDmYbd3frblYMvJnGQTQqk/UN5YtlavXHV8pEcxEn
-	jCdzSACPeFwQxAFruwjdg8b2EXVNWoJ1rfYa29GwJPcBDaa4DsEFwOsBQjKUPTm1yTHw1qtkTVz
-	NKcqx7+MvzYCqBp4tHzIY3EkNkLcMtXjdEL4VMqmaC+ToO7gryTN8nzKNi5FNr9VmH+A3qt8xKA
-	Gwsdc4Nz5qExEAgA/aUgPA4v64kCw9I5lGeYc/svYUsJeaHuAmgzrqUNw7I3iylfw5/8/5uFwTz
-	q2ED80KaHRntno7DAuTC3FD8cjGCorW0iY+NMoxKlVNfA2kPWJ/kOZ0nvxy9DbWik+uxcA15W++
-	aIVlnpHLgpJS7E0VwjcabCgh58OC53mXv8uKwMUSxSQUHGH/L80tiqVCx4ShaLnLT/G+dcmwPYi
-	Z9hv8id8oUOLQ3wsDLlaZTaKjxpaoXdAEyOkxZN6CBXaoOwo59nniZF3yiBT4kp5rY2x
-X-Received: by 2002:a05:600c:1c1f:b0:4bb:6651:9eda with SMTP id 5b1f17b1804b1-4bb7da1a21bmr125700265e9.14.1795084695902;
-        Thu, 19 Nov 2026 02:38:15 -0800 (PST)
+        bh=N6MGzyJLnkEzYXsRUJ2m4nvPFKylKcskvzAYyTbdVL8=;
+        b=d5qrkZdW/CD1hXQSaLncSq52C14Ox2dRAJ2C5Wtq0ZLJ1kNuGyAdkQrgkH7xsEKMLY
+         1QoI+9+v6RESZF3AupY6hwWhiH4XMtQfExGoIC1rQJyEhhLUB1YIN2OCSb1iTcJH0tUI
+         kAjBfHUrnWu6/1e/4IVO3mgUowI0eYK5pvnA0M0exBILj8ED3vnqK+yE+P26Sm9U7upo
+         7fqqKu2GwuMmGkypIUULeoTxElJUKl2EI8FqzxHtYo8VnJOX8uufTOYWNu1JRVOR9iTa
+         0KNBGoQlHyzuZOWTLG0yqT2vFJGDEfAEuxwnMZPHyLhWdp3yOGafy+TRMoXoy+E2Nbn3
+         Rosg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795084701; x=1795689501;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=N6MGzyJLnkEzYXsRUJ2m4nvPFKylKcskvzAYyTbdVL8=;
+        b=Y7EvuUekPXZepAXTJRCHZlvjvwpo4vASK6k0uSm9ie6miCUpNcOBOEQ3pHFHW1Uc6s
+         rbUW2ubhYh++rQBDDd+F3hXnQei7F05MitLNIsVdFO5ufVZv+3nCQ2S6vs0wUuB1cNOB
+         5XAyq9LhXqgl7nNBS5himko4NCcYO6mlZE4qYcIPx2dlFqVTxQUS0Byks7JWyxTCvw/h
+         fx59WFNvqelmFguUopfQSsF7uZ9LTl9tXtCXUzfTaxBnn7q41aae5j4/vkskfSWB11Cc
+         JhJheh+emVBuKKhzIP7FiKtDJAp7C1PucwVco1MdrHE2OSWyeIaCvLgi3zu8DigQtqEX
+         NKxQ==
+X-Forwarded-Encrypted: i=1; AL+hErGLCvvyVR/GIKxReb82JYZfM98PqsB/tg+8bJH4for95wMUBrfrRiQdTatHaN7mZ9kr1W/Fzhl/tibz@vger.kernel.org
+X-Gm-Message-State: APuU4Z/159UffxScRY6vAqW+G3pu6J4X4kFX3O2DfUHjPI0j6+e4drea
+	pCf0AZYHXJzQblZ3+7KUOldey9mvv1mDgsVTfO3+frEXR4vBEkVAWfpgw2CjDyX85gVj
+X-Gm-Gg: AZFdTZcoqb5U2zoS2LMJhPJvydo7kQTxFumkj8qFbOPKaLmNeOvwmo5qFQ1VdvGXNqQ
+	oGRKWeLFCnt/QLu5l3o5o1cfPHmOEl2HDJMHqe8w7/BCf8wL9aOykcJwAat3Ey4zQrsHviPAieE
+	dVuPLVXk/jIdP9iEX2Y2/YJbMXjtyZePoSp9Boxt8yrzL1GYpCKgJIHY7yYCw04HZPbdSomrSu5
+	VSERuGG3HAV4zQwvUg1+p5jzXWHaNKkj7r4hXf7lhQU9G5PJhXQGjUTD8OZgic3ZwpWoTnKQg1f
+	GnfUZLb/ZC91brVR554PY05Ds4kJA88faZ16BrHMn18W8+3kBZEosN/je1tlkosLn46wVDmhc2J
+	w3sWYzGtOo9k9Dn37Ycu1RkHOEfxpP9lPzdE/iJMrsWOywI6r53n2V6c1/GQj52OTctpBG6t1hs
+	mo+cX9oVZDtuqywku7UFMb2m/xTAYDNZo3lFdNsaLTIu35wuFT/aluqIS1P0YrbE9KO1OHxhK72
+	RYEmxrNipq/FwuLoiFnVa//PQLjxNVZ7zu6DLe7r3XN19xj5Jbgl/Fb/Li5qDnByVzwRD1lb9Q0
+	m7DtXOHnxfTxQQi+bBH+902kRjNWLcALJPGQBKoIKfM3qHmgR+NIdYfvYcgmk3UDSYEb
+X-Received: by 2002:adf:e188:0:b0:4a6:67e2:5c6d with SMTP id ffacd0b85a97d-4a667e25cc9mr10639612f8f.13.1795084701396;
+        Thu, 19 Nov 2026 02:38:21 -0800 (PST)
 Received: from rootsys.at (clnet-p094-053.ikbnet.co.at. [83.175.94.53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a655f9f4a7sm10030927f8f.34.2026.11.19.02.38.15
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4a655f9f4a7sm10030927f8f.34.2026.11.19.02.38.20
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 19 Nov 2026 02:38:15 -0800 (PST)
+        Thu, 19 Nov 2026 02:38:21 -0800 (PST)
 From: RootSys GmbH Research <team@rootsys.at>
 X-Google-Original-From: RootSys GmbH Research <research@rootsys.at>
 To: Namjae Jeon <linkinjeon@kernel.org>
@@ -86,10 +87,12 @@ Cc: Steve French <stfrench@microsoft.com>,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
 	mike.michalo@gmail.com,
 	linux-cifs@vger.kernel.org
-Subject: [PATCH 0/4] ksmbd: enforce mandatory signing and encryption on requests
-Date: Thu, 19 Nov 2026 11:38:01 +0100
-Message-ID: <20261119103805.29514-1-research@rootsys.at>
+Subject: [PATCH 1/4] ksmbd: require signing on sessions that negotiated encryption
+Date: Thu, 19 Nov 2026 11:38:02 +0100
+Message-ID: <20261119103805.29514-2-research@rootsys.at>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20261119103805.29514-1-research@rootsys.at>
+References: <20261119103805.29514-1-research@rootsys.at>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -101,78 +104,55 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ksmbd does not enforce "server signing = mandatory" or "smb3 encryption =
-mandatory" on requests once a client has offered a cipher in NEGOTIATE,
-which the Linux and current Windows clients always do. sess->sign is
-cleared for such sessions, and the gate added by 2bebf2470af1 ("ksmbd:
-enforce signing required by the session") only looks at sess->sign, so
-an unsigned plaintext request is executed on a session that requires
-signing, and a plaintext request on a session that was told
-SMB2_SESSION_FLAG_ENCRYPT_DATA. A client that offers no cipher at all
-gets a plaintext session even with mandatory encryption. On SMB 3.0 and
-3.0.2, one client's SMB2_GLOBAL_CAP_ENCRYPTION is ORed into the static
-per-dialect table and changes how every later session of that dialect
-is set up, until the module is reloaded.
+ntlm_authenticate() and krb5_authenticate() clear sess->sign whenever
+smb3_encryption_negotiated() is true, that is whenever the client
+offered a cipher in NEGOTIATE. Offering a cipher does not mean the
+client will encrypt: unless the server sets
+SMB2_SESSION_FLAG_ENCRYPT_DATA, the client keeps sending plaintext
+requests and signs them because signing is required.
 
-The consequence is that a man-in-the-middle between a client and ksmbd
-can inject requests into an authenticated session and have them run
-with the victim's credentials, and that an NTLM relay to ksmbd is not
-stopped by either setting, which is what the two settings exist for.
+__process_request() only refuses an unsigned plaintext request when
+sess->sign is set, so on a server with "server signing = mandatory",
+or for a client that sent SMB2_NEGOTIATE_SIGNING_REQUIRED, unsigned
+plaintext requests are executed as soon as the client offered a
+cipher. The Linux client always offers one, and so do current Windows
+clients. An attacker on the path between client and server can then
+inject requests that run with the victim's session and tree
+connections, which mandatory signing is meant to prevent; commit
+2bebf2470af1 ("ksmbd: enforce signing required by the session") closed
+this only for sessions that did not negotiate encryption.
 
-The session handling goes back to e2f34481b24d ("cifsd: add server-side
-procedures for SMB3"); the signing part is what is left after
-2bebf2470af1 (v7.2-rc5). We reproduced it on mainline 4405c18c95d2
-(v7.4-rc3-230), on v7.3 and on ksmbd-for-next 267029b35ad1. A
-reproducer is available to the maintainers on request.
+sess->sign_required already records that signing was required when
+the session was set up. Use it in the request gate too.
 
-The series is based on ksmbd-for-next 267029b35ad1, because patch 1
-uses sess->sign_required from the session setup signing series queued
-there. On mainline it applies on top of that series' first three
-commits, 16ab0adace8f ("ksmbd: verify the signature of session binding
-requests"), 42a1d80e64a3 ("ksmbd: sign with the negotiated SMB 3.1.1
-signing algorithm") and ea472ddf7a9a ("ksmbd: use the channel signing
-key for session setup on a bound channel").
+Found with AI-assisted code review and testing.
 
-Patch 1 makes the request gate honour sess->sign_required. Patch 2
-refuses plaintext requests on sessions that were told to encrypt. Patch
-3 applies the existing per-share "needs a negotiated cipher" check to
-tree connects when encryption is mandatory for the whole server, so an
-SMB 2.1 client can no longer connect in that configuration, as
-ksmbd.conf(5) documents. Patch 4 gives each connection its own copy of
-its dialect's capability table.
+Fixes: 2bebf2470af1 ("ksmbd: enforce signing required by the session")
+Cc: stable@vger.kernel.org
+Signed-off-by: RootSys GmbH Research <research@rootsys.at>
+---
+ fs/smb/server/server.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Testing: built with W=1 for CONFIG_SMB_SERVER=y and =m without
-warnings, each patch on its own, and checkpatch --strict clean. On
-KASAN kernels built from ksmbd-for-next 267029b35ad1 and from mainline
-4405c18c95d2 (with the three commits above), each with this series,
-every unsigned or plaintext TREE_CONNECT that gets through on the
-unpatched trees is refused with STATUS_ACCESS_DENIED, and the next
-NEGOTIATE no longer advertises a capability another client offered. The
-in-kernel cifs client still mounts, writes and reads with sign and with
-seal under mandatory signing (vers=2.1, 3.0, 3.0.2 and 3.1.1; seal with
-3.0 and 3.1.1), and with seal under mandatory encryption. Not tested:
-Kerberos sessions (krb5_authenticate() gets the same change), SMB
-Direct and multichannel binding.
-
-We found this with AI-assisted code review and testing; the reproducer
-and the fix were tested by us on current mainline.
-
-RootSys GmbH Research (4):
-  ksmbd: require signing on sessions that negotiated encryption
-  ksmbd: reject plaintext requests on sessions that must be encrypted
-  ksmbd: refuse tree connect without a cipher when encryption is
-    mandatory
-  ksmbd: keep negotiated capabilities per connection
-
- fs/smb/server/connection.h        |  2 ++
- fs/smb/server/mgmt/user_session.h |  2 ++
- fs/smb/server/server.c            | 14 ++++++++++++--
- fs/smb/server/smb2ops.c           | 19 +++++++++++++++----
- fs/smb/server/smb2pdu.c           | 16 ++++++++++++----
- 5 files changed, 43 insertions(+), 10 deletions(-)
-
-
-base-commit: 267029b35ad1245a36d069cafe93b4ea654e0f81
+diff --git a/fs/smb/server/server.c b/fs/smb/server/server.c
+index 962f12e969ba..5d94a3683f7f 100644
+--- a/fs/smb/server/server.c
++++ b/fs/smb/server/server.c
+@@ -203,8 +203,12 @@ static int __process_request(struct ksmbd_work *work, struct ksmbd_conn *conn,
+ 	}
+ 
+ 	signed_req = conn->ops->is_sign_req && conn->ops->is_sign_req(work, command);
+-	if (work->sess && work->sess->sign && !work->encrypted &&
+-	    !signed_req) {
++	/*
++	 * sess->sign is cleared once encryption is negotiated, even when the
++	 * client does not encrypt, so check sess->sign_required as well.
++	 */
++	if (work->sess && (work->sess->sign || work->sess->sign_required) &&
++	    !work->encrypted && !signed_req) {
+ 		conn->ops->set_rsp_status(work, STATUS_ACCESS_DENIED);
+ 		return SERVER_HANDLER_ABORT;
+ 	}
 -- 
 2.43.0
 
