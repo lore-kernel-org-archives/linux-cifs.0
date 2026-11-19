@@ -1,64 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=143.255.12.172
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795039379;
-	b=jIKEwf7jVVepOB3mFvpb7zl6gm9MN6NwPZkLQfuWOoJrcX7TSr815NPw4Le5NPfJSxpM
-	 zQGca1fM1hodJKjhPhNwe2S1kKdIH4w5YAXu6ZPt4DWPp9wD2Hthcuy7nVgnd8yhpLLsn
-	 46pUbYJp0efzUue283CbxJeL8q6AgJzCDzJ7Gi5n12BTAQ6UOie/yTXvCiB7ZPfKTEVQV
-	 2oZVJTwfeLVY+g7xvlqyyArq0n17FB5+UE0NlELE25nWNEawQxj0x7utWh4LXr1Mz4a9b
-	 RM+SV5BrbUc8rOr/ZwA5cDZlesig34tNFMJMevTfX4oOdSixZNvm/WOgxg0+TeqO7iA==
+	t=1795048503;
+	b=npNVUPGRVoUXYZfhQRJG4nhQ7RAWg0536oQTkawl/P3792+AYVo/76teRIH0kM5E6T0N
+	 Dazn15JNgGf3XPqhcAz45hmH4qOiLYp0/HpfO3kmNM4Xpiubc32wWiA7Z8bBqKjil58cI
+	 cDAQg8sKCAsJqphNW7nxI0dNAfVwcwOMK9NVWSHYcR80+U/ZU/SvDDBTAzz7v3gyDiTk9
+	 wQ196ovxkLSr7tvzSslMCKFlq/3Cx6gyRhHHKkMMvLV1CWJCT9Kz0lFYhp5lXaWbSfrpm
+	 B4givPilH+9ggemrtivtqIM5mK4Ys+/es/yhaF2qFHwXX2edKv1c2rmKSrXGkU3kMSg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795039379;
-	h=DMARC-Filter:DKIM-Signature:Received:Message-ID:From:To:Cc:Subject:
-	 In-Reply-To:References:Date:MIME-Version:Content-Type;
-	bh=08TOTiTUtxZoeQ6P+kvUrfN6YEoDJaYokr6wulDwfGQ=;
-	b=MtsH/IMD9vAt97hNJKmH+IB/LxIMlSe1SEABqZjptOoxOGAMxaMLqmY9evW+oRGXDXj3
-	 lByZMQh7pSTemRTEq9YsjTsCH6twpnoXicyy0z7ZMQSYkUw015VO0QZ4nWjwMHF2K0wfb
-	 z122l4FW1mSDU+efFbJ+ZHGCZO8JHHg/7bBIRFMlswCC3+44huKbU4PcXUHoGDMo7J/R0
-	 iMSVQDvj7BPomN/2tftElLH/DD8cqLGkrqPHcZTLDk0Hre10ctARL6QCmySHlGoulcOLg
-	 RODjZKf6P6uPlAtqYklLjumPCJE3WWfdPf2V/irB1DVNUV3NW/7TKc9X8Scs5gCEOsg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795048503;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type;
+	bh=MBBdgGDR7k0GmtCp45XGw03/tk3C3N8PKF7SzK43N5U=;
+	b=PzGDvocrRJoNMzgWY0utkwA03cpK0dUW+ypfbbekOGndQSzu9trWFtoFSOa3Sklw5McB
+	 6j0uGgmlj7iYIQfQkZwZ4/T5mPQ4qWAr5Y0WsZR301XfFNRh+FHFtvE7ab4uzW+mQzYL+
+	 k0i8iVjdNIBCH9Bnkg5+GWeey6mwO6yryEL/ZaPnymAYIaGfEcyL+RNErxD9EF2dVq+MN
+	 VJ/vP3ZP1KvC+t1qBNa3P+0Ntp3hOnNC+pgxoC2kVd9UCsvW4gKI47Je7a0Mgg0Z/tqps
+	 WGkNX6yyWXBvhLPKdWyJ6shhdnYXUfZ/8K4ZJayWBHIj3PT2dpiibrCRNhcElAQQ0KA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=manguebit.org;
-	spf=pass smtp.mailfrom=manguebit.org;
-	dkim=pass header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=ImlqKEtx;
-	arc=none smtp.remote-ip=143.255.12.172
-Received: from mx1.manguebit.org (mx1.manguebit.org [143.255.12.172])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hzdZfoOz;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C55606A325;
-	Wed, 18 Nov 2026 22:02:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 43C55606A325
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manguebit.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manguebit.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CAC606A320
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 00:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manguebit.org header.i=@manguebit.org header.a=rsa-sha256 header.s=dkim header.b=ImlqKEtx
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=manguebit.org; s=dkim; h=Content-Type:MIME-Version:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=08TOTiTUtxZoeQ6P+kvUrfN6YEoDJaYokr6wulDwfGQ=; b=ImlqKEtxwjFFtvf6MKkhARt59o
-	zjEnirFTB3vxpp+JvQZvX/ByQIUFNLQuCWndE1iehY7UcWjFF+tj8t521wG/6AXrJXo8nMCQxyms+
-	Jng5NHJqM0dyX12aMkISKWwXfkBki5sR82o1Bfl0159G8P9Bk186mnVrCcP6HiRHh2yGB0FcfKHrY
-	gZ5s4O5B2DLzcy2iI9DBstMr+d74RnTtP5YKv6SfGU5g6gr9qIq5MvHOW2uPwxPVLXmIdIgdveMqp
-	KnzNWz8AaZz/SGyUTobs2YvzcnrdtmOj4XvIX8NnbhoLIr/4mw0FDtfPJb9BviccwNQEoGXO+3caj
-	1B2Lz+qQ==;
-Received: from pc by mx1.manguebit.org with local (Exim 4.100.1)
-	id 1xTnk1-00000000KWj-2udr;
-	Wed, 18 Nov 2026 19:02:57 -0300
-Message-ID: <08a684fb935ae094d70dfc3111c03054@manguebit.org>
-From: Paulo Alcantara <pc@manguebit.org>
-To: shyckless@gmail.com, linkinjeon@kernel.org
-Cc: ematsumiya@suse.de, sprasad@microsoft.com, linux-cifs@vger.kernel.org,
- bharathsm@microsoft.com, ronniesahlberg@gmail.com,
- samba-technical@lists.samba.org, daniel.birtwhistle@gehealthcare.com,
- linux-kernel@vger.kernel.org, smfrench@gmail.com, dhowells@redhat.com,
- tom@talpey.com
-Subject: Re: [PATCH v2 2/2] smb: client: don't use read data that failed
- signature verification
-In-Reply-To: <20261116-smb2-sign-v2-2-a823a90d0db4@gmail.com>
-References: <20261116-smb2-sign-v2-0-a823a90d0db4@gmail.com>
- <20261116-smb2-sign-v2-2-a823a90d0db4@gmail.com>
-Date: Wed, 18 Nov 2026 19:02:57 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=hzdZfoOz
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C781F000C6
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 00:35:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795048502;
+	bh=MBBdgGDR7k0GmtCp45XGw03/tk3C3N8PKF7SzK43N5U=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=hzdZfoOz4qhWIzfgruDW1Kd+gft1453MXvX7LgOndhJMKzkuW7bajHsyoNI4vFFEy
+	 35C3B7xRaej32NwRr0CIJIsPQlhjCgBOc/d9antnXYkHB4Ly+PjIF3vek2LprObnXZ
+	 dA84J4lXBePzLxKz3NwVFD4e5nlB5V+RZgGD25rpRsD6I/LHJ1ytwQ2vQkAZJ82LVh
+	 0p2NF/kSGjeYoKbo+H/nEtfQoRGSpzTx07vkJeCiuKb6T9DiiadItZAZ7BfD4er4jf
+	 43BZbYwB2Z4s7Dk7uyz5MXBeatmUqbgiShw4HNaLmJ5w1tS8GL5hZQdY3lADZ0XMyO
+	 kg7KLNwdyoG8g==
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-c4cac7a7d3cso222133266b.3
+        for <linux-cifs@vger.kernel.org>; Wed, 18 Nov 2026 16:35:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErE8FbmVrw+tHEmx/fhO1MHkMh7AqCXpkIT/rXiWcu6iWp+h0kHyCUEHKIZhaZxkDrwRsQuZWXP2keR+@vger.kernel.org
+X-Gm-Message-State: APuU4Z8/Ryy4WnfFiNSdU906Xk+89f9/pLWkK5bboAQzIy61PVnC4jET
+	bEDZCbPEAv9Ad5h28ff+/5SDE1JAhW03SlOKaz9Iok1RIXe+ZxCSJAG1ib+D8Db5PCG49rN9yzt
+	Yc4IOtdDKoi9R2j5M02qXpLpH444Ixmc=
+X-Received: by 2002:a17:907:9811:b0:c2a:cf73:63fe with SMTP id
+ a640c23a62f3a-c510debebf5mr392519766b.6.1795048501493; Wed, 18 Nov 2026
+ 16:35:01 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -68,27 +59,28 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20261118174000.76954-1-icb@fastmail.org>
+In-Reply-To: <20261118174000.76954-1-icb@fastmail.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 19 Nov 2026 09:34:48 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8FnWOeohb9gzST+x0oe6_QK_=JqXfqLKZYzzq6Z8EBzA@mail.gmail.com>
+X-Gm-Features: AclHuK97zaeMYjWZZ83Hgsf-wGk-vKxVOO46xSw5KQzFmTQ4PV1AujEyr7nL6Xs
+Message-ID: <CAKYAXd8FnWOeohb9gzST+x0oe6_QK_=JqXfqLKZYzzq6Z8EBzA@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: clear DACL_PRESENT when the query omits the DACL
+To: Ian Bridges <icb@fastmail.org>
+Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Suyuan Wang via B4 Relay <devnull+shyckless.gmail.com@kernel.org>
-writes:
-
-> From: Suyuan Wang <stevewong@hust.edu.cn>
->
-> When smb2_readv_callback() finds a bad signature, it sets the error in
-> rdata->result but leaves rdata->got_bytes alone. Further down, a short
-> read that reaches the remote EOF clears the error again:
->
->     size_t trans = rdata->subreq.transferred + rdata->got_bytes;
->     if (trans < rdata->subreq.len &&
->         rdata->subreq.start + trans >= netfs_read_remote_i_size(inode)) {
->             rdata->result = 0;
->
-> and got_bytes is then added to subreq.transferred. So the last part of a
-> file, or all of a small one, is returned even though its signature is
-> wrong.
->
-> Clear got_bytes when the signature check fails, as the retry path in the
-> same function already does.
-
-Please check sashiko's review.
+> @@ -1077,8 +1077,9 @@ int build_sec_desc(const struct mnt_idmap *idmap,
+>         pntsd->sacloffset = 0;
+>         pntsd->revision = cpu_to_le16(1);
+>         pntsd->type = cpu_to_le16(SELF_RELATIVE);
+> +       /* DACL_PRESENT is set below when the DACL is requested */
+>         if (ppntsd)
+> -               pntsd->type |= ppntsd->type;
+> +               pntsd->type |= ppntsd->type & ~cpu_to_le16(DACL_PRESENT);
+ksmbd can set DACL_PROTECTED or DACL_AUTO_INHERITED as well as
+DACL_PRESENT. But this patch only removes DACL_PRESENT.
+Thanks.
