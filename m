@@ -1,123 +1,100 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.152
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795116014;
-	b=JYDhSSFoqGHjlOWElP0/lvAq3Jm1j+BlHAu6PYwyHGaDNadi0o4CtEJXqIn6/2kMnUq6
-	 6g18inve/lDWbLhQody44Tl4t/hqaTOzANxKE2ZBivbO0LEM7x9TU+GDQ3L6exfdl08a0
-	 /0fI8+Frzlg4/5UAJeg/Kq3tIC1ZX4SohxhXx24PB0Ie+42SFQbN6ywhst0Gu8HFJeUnU
-	 uW15g8attJ2b1mZHWnmJnxDMwybssWPYoST/vXeqWO9Bug0osxwOJSBrA8qQpZT/QaFdG
-	 AfL/GdYBaulDWzAxzNnylTN3ZFdlGy9CIO1uz4gpx95lWRGHVUdeF0HHkH6TKqJPLug==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795116014;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding;
-	bh=wv7me2iXP1ImG2ZXWpCgdwR4YIJXXEoQFMyFT5W6z7U=;
-	b=Xb3Y2KAWr90p/wkz/1sIzS0a9Aj8IQSOT4reYYDwwfeatCq6rBU/FQqazYJ/b6zwXgvp
-	 eCdUE4tgWswlq9NOxYFW7hgd3Fhn1UE4Nwpd+gtmEJ5S+1NY0xB+d+cl15Uky+gOsXwxo
-	 gCNK3k/94i5EKwV0/cDW3dBSciWGNHtfdNLNUmPr4V8gbEr+Ov+VZSn+o1NPQkzU6fRst
-	 PqbBnm/YeKRUTyVIGSw/dnfW28Iy55Y91hXeQIiD7uyyslyzGnfKsp8eRy6aF4zD/ftRU
-	 7UPlwYPAkJVAeeCIRPOvRHWzIFTB06dZps33QQh16HxIe8+LM/hFuUXN8UBNTyCNEIg==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=EEtF43TB;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=gwjgHzxq;
-	arc=none smtp.remote-ip=103.168.172.152
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.54
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795117027;
+	b=My737T5TfHOdlZOgOEndSglfjQYa+Hy5g9SsW54FxykLbosMQUG47jkTruLH5UXj5Ca5
+	 ZCgp33rlzuXeBwSkqs6VDaxnBbWbLIYAVz5dyAuK+ZKJnLGtqCQJmEPWSXTLlAbzR9EPZ
+	 uqexcC1M4yX9oBsC+RpjdxYZ2uqq2Wg6qERJjD82R7xHSfknrBbOusvtkzIi6iBzrHB6+
+	 cJLLdU2tvAjb5oRyNP8rvuGqeV5bUSLg++YeRZIKjGf2LuwGmpIIxDdvLBie+x/KUo7xF
+	 3iOLV+7sSQppi1GqssZoH21zdi+PFtUHlmCJrKlo29drP3iUqXExmJNmPtcGt5NqvUw==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795117027;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=vs2p+NKw9cBxSHvLMTQ1TCNiiuqtzY0tMFYF/M3imDY=;
+	b=N6CbQlboHdjC0vCDEWNM8MUlrK1kJm4Ca8nMVQelF9RTY0+Y8XMCNWTW1jbXIYBtSsJF
+	 cklwTFaztjkUWBsM3jyTAHRua4InaLX1DHdwaEDe5N7vAPJGZSXR30bAS+cRLifGKnvbJ
+	 FSwPdGudesuMCB5bLkBILLr7P8aR/SjijnbYBqdXok2Ca56bst6lIP8zgCOoBWlGKHXNA
+	 /4PNm4M2qyGsjWI5T0eoVwoA+GQkKwKxh4kv4zGYWnIEETjN52B6CL9QPFnWW3gSpr4uW
+	 x23VHYmtJXZbGygyc1ruy8TFQPk7TDJYU/j9gYmOAbWtY6toUQNvOOwpaKDz9ekoVBQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J2P1rliW;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.54
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05DF606A333
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 19:20:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org F05DF606A333
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4320B60A2600
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 19:37:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4320B60A2600
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=EEtF43TB;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=gwjgHzxq
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 29D121400134
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 14:20:12 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Thu, 19 Nov 2026 14:20:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1795116012; x=1795202412; bh=wv7me2iXP1ImG2ZXWpCgd
-	wR4YIJXXEoQFMyFT5W6z7U=; b=EEtF43TBjzSpeHxCfsKHqoXa45GBv6uujSzyt
-	FpZKeJ8Qp3VznuEIQZ6UEChndhF+zIitokFGlCx/lF1TKMRYrKKUUPQdxOFv85NG
-	iMMb5sFxX/k9ihtAaIpLiZc67PyjEQ2/SvM+CvfVbSizHsExC2F9JRRJ3zXFzzA5
-	8sdZBHCm440npapH2L8xVP42BLbFIRTwJutYSRNxzSUA7JSpXpGQQwz3ZDD8MogD
-	qe4CfYxdBI7ut3/K2a+F1p4RvlKpF6WnLQ+s9GKVhv3SiobMYm0gwyeRrCRzyb3z
-	MbUOog/z+Q0ND83Ncbm1bypUdgyM1pjUrV0EDM+XE+zLZm0hg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1795116012; x=1795202412; bh=wv7me2iXP1ImG2ZXWpCgdwR4YIJXXEoQFMy
-	FT5W6z7U=; b=gwjgHzxqYeSmMRp/YXcvlsrFWwg5uF25GRY3FGwRUNbwKXxXRHg
-	6iNLKi0XK3egLIKeCNefaRD/cE3Kvs/Kj1Aol1lq+CQA9GTzT1sx14IeZ+8iB1gf
-	/RuVPfVQM8LN6F+WcdwosxyoJ/OLwOFRHLSOMv3JqNSTXj88yle1FC3f1qP/k0xR
-	rtRlfSIDB46itymBta6DtMlqYimb7wFJ7S5X8BPBM14b3vH7Vy3n+np/bO3SCxw9
-	+NV4TWohCpg985mjlXrOo7XXkZ0spksJsJitHhc2Nxe64Za8nZBAaERSidMSER+T
-	tylSNe5Khao4hb7/2Onfw3fmbV7pWctvLDw==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1795116012; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:TCuJkLxbAQ87TUpeeuYFEPei/OkMfsydCnwoaPkwdRN+oSQ
-	EhI1hLrdITjFj+oyRlldULSypUvNRUPsTJZwq2rprMDwoK3ULRljQtxkLVkJOxaw
-	GBidqyc9swDgNQEvHQzovmLfMJgNWxJ85/wFACrX/QvwfHBEUUhqdTQI6XB+KbEo
-	Q2y7JE0OJANruuo8rhB517w6Mhkr2QEyxB/OLxMH9RyhMgF1ClBislpb2NTvbZYA
-	CoaaEjiVEhfWx/RP/zu2y33uexjLpRTBGFyD6iAtwjXVtd3N+auIjj8qCNdGIEfP
-	x0kg199Fr0KyN18qioWWdgHAntGsECp42hYgTFA==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=9;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	message-id,mime-version,subject,to;
-Message-Instance: m=1; h=sha256:cCXQDtsYhX9arB5JmmB736+eZy7+msVDW6enYqxI8Wg=:fI0NJ3/HRVLGu5s4IgwZ+FTffuBVVGh/zT8k622NL4c=;
-X-ME-Sender: <xms:60v_al1SxSlRAeFrBInsHSur9D6gI88iuGjt9O8XxHV6Yo5Tjm_4QA>
-    <xme:60v_ashVYbYQlu5hCi0Qn2JyTCbb05AMONGz7u1yoMWOftW06Nvbg4iWNBA2Ng0z9
-    u2j62ZzqetPNxfEMbJ8xLSPDX92kBEyNPugRujNj7iGWgecATfjbDkw>
-X-ME-Received: <xmr:60v_amky6mcHCboDAKOAEOSJ9FodWfiDkZryhD_vydWwdREc8iuj0HuFIZ9Avr8n>
-X-ME-Proxy-Cause: dmFkZTE7ccEftIdaGzVvEpGNmivS36tOWNZGwhj8tgj0iJ07c4smmDRo9eupzB7KMMdZiN
-    l3KpTGbIBZhMB9aejkW8W+RalTvIhfoXfhP8KtoUTaO/FsBESMcxD0Nreo43qO5Yz831qa
-    KVW/RZO1in3c3hmxKXl2lwj9TucIRXCVWVk5GgXkD98PkYflXp2LeHzpKUduTBOzC2x/uh
-    3ArJu+YBYedh0C820GTKXw2Im3Kdqp0AABTemwbl4inATJQ85J7nAMqDRG3b6f34fSV3vD
-    KsgyXd+rLEbS0UCL3gpME6ZsCsRlLVPNA1DuXZHEpLTEnrELK8lWfBXwkQryF7evlz4lGV
-    QrwIHQ23DZ5RCXk8zXebBrhdIZ4E//drwi2nFoWAOG0BZZdJwD4KCIbYlmZLADaeWuUOob
-    WsV2MC3hQ+5PKO74PzjIH+KjGDfNqMYDkIQtZA7urcb9tnjskKAUXUU84JN8mPsJSL6nzb
-    oXt6eK+0YZph5wH1QjV+kJ00TxIfK+kW8n8ZIwxv6bf2cjg4U1WBIkmmgBETEPValzcLIJ
-    CdJakkWsj2vkHRpEq+PGQLCBrs3QvLa3LZ81Po35rEVpLEn4MNzNe4sBmP7Bk3K1KRbIh5
-    NE/JcGt9M/3HijQiCX/8nkdEWvVqsMwq7beBHTtxqHmhYP0kTgCx2zYVzpdQ
-X-ME-Proxy: <xmx:60v_aqazmaYyEs5pvnLCjU8-HV_v75ngsgVhaTx7_tE0Fx7GtbTNNw>
-    <xmx:60v_apHahgvLbIsZAQpt9onXmbhvL7VjQE4aNp1kdLjwaL6HQ37ozw>
-    <xmx:60v_ahZX6nwhe3UlfFsZHamcktmlTq7jwaOZEVy4pTc_L86R8B2i7Q>
-    <xmx:60v_alywanIkQ0UGdCJzYqTo-F26to2ADgqyaOyewabQP2H70vLtSA>
-    <xmx:7Ev_ando-lwvPNltHdhxeehhXvSFixEmuYtugRj2TlMiCdoFQUnJZqVZ>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 19 Nov 2026 14:20:11 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: linkinjeon@kernel.org
-Cc: senozhatsky@chromium.org,
-	tom@talpey.com,
-	chenxiaosong@chenxiaosong.com,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tristan@talencesecurity.com,
-	Ian Bridges <icb@fastmail.org>,
-	stable@vger.kernel.org
-Subject: [PATCH] ksmbd: count the ACL header when bounding the DACL size
-Date: Thu, 19 Nov 2026 13:20:07 -0600
-Message-ID: <20261119192007.198258-1-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=J2P1rliW
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6b88bc47e23so126349a12.2
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:37:07 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795117026; cv=none;
+        d=google.com; s=arc-20260327;
+        b=WzTulVFjcqpg45gZmMGDhJc0e6dWokNyVjlvrlz5j6pl+Z07WbioYS1L1KK7+OyeKW
+         WAFSVFOw8UhGF2CcZaMxyRiRrA83c+MdKIB8JXdOcvB7dLFi4YqSpYZDyp1lHR64F41b
+         vIFszVe9RZYHh6+TLdVR4HIZHq1ABN/7mj3sjI9fW0ylzZ+wyPzg9RATuPFNuyBidv+b
+         Bys0JLC8dN2n2gYlCSyjoq/8hYEYx7nczgFnlrZbGZxYT2yeD+LN8YeHHtY6NAfnZ+8c
+         D2DfmVd2u/NZkqOWF4fpplohujKMDzgF4kYOYt5OhP80caJ1KJVcz2U5ASwvBhq+HAdt
+         0Zyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=vs2p+NKw9cBxSHvLMTQ1TCNiiuqtzY0tMFYF/M3imDY=;
+        fh=9HLQS8KbK97ckwGrVjlqMObhOK+KyJkMjUcto3wBbBg=;
+        b=VuyIbCbLUUsiogKglioklYnFpEZuJRGFAHhQkgDaHAqtTfFty8/3etk2315ODGgqOZ
+         KU7a52amkNHE4xfe093UU7tM+n1yDKy9DNMFV6Zzg9GDcI2cqywpMLrFKBCjkxQ/BSmZ
+         QndpELrZpqULQOxeyNG6zTGV7/4WFXiaA0xrIPtMHM3hEWyX1JyWXjmcmMRvo/93I3Tz
+         lkAnz59R6sXDNLJuekUBZ3XObCp+oUSWuXOWd0sOssgsyUYn5GDtxhmS1slDkrGdABRi
+         PO0uwGVEyCPfPqlIv9E1LuPSjlS3Nyn3lIDaQoAXZ7SdZVsfWXDWy6e+dY+fDWk2vc6z
+         jthQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795117026; x=1795721826; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=vs2p+NKw9cBxSHvLMTQ1TCNiiuqtzY0tMFYF/M3imDY=;
+        b=J2P1rliWlWFeXXFXmXF+ohrZY4u8BY5guzLNIZE4zyZEFvv9XjVp6qSFQEuKBYS4gw
+         tRHKICBYDX7EHD7dOjit9dYAF5zAZQoiMjaWziJZS+p8scKNzprADKCa9phj/1Tq5rLq
+         AdLh58YB1IlCzIIphjpmi7F6IODiO1Lb028EXgDFuQRtiOTbHyBQqFgQJ2a9rTkXFmIk
+         rIDw5jsAro28ug3nEE4pf9UY06m6dKeDy1GLSXALfX/FhKkPB24uxc9fzqALY5d5/0zY
+         o3ELAOqepaHkRc8vyIjpo6spF9jSLJ5v2/RpEGLV7zg0pNxm6ebUphbxyHHPfV1Pvs4Y
+         7KvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795117026; x=1795721826;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=vs2p+NKw9cBxSHvLMTQ1TCNiiuqtzY0tMFYF/M3imDY=;
+        b=ySXlMAl0EyjMdXGcTcmjR67vcJBq1jHwcycwcWWgXPwqK4xoybvYxXVp1sEigTKrZI
+         Q6s2zr998eAiSvOfPek7JwhknyEfDi+xLRRnHM47oOE7TWMTOqsVfwP2dl2kqtQhgejr
+         sZsMtmmd+Fq7rN4dRxk5imjEchpHLlur60ktzZ2Su0KAmWkZF1koZdPZsoJT/CQvJf0h
+         C15r5+nRnI6jHt4XnIUmLpENptySgaTqqO8qaGNn8pzP4qeq9scQJb6IWI+OtWeQVP+H
+         FlAZXKM9VpQC1YS4ad35ZxtwUxPHEKBmf+OthhpnDRLHmlVXaeCqH2EjMicEOM7slKJD
+         13VQ==
+X-Forwarded-Encrypted: i=1; AL+hErES4ay9gd7W3pEjL3nLugONETs0qWkUwnQFw+y8cK5cVbRgKuQIdb+A/BRu9w9bfue4/qwEfN/aTxdk@vger.kernel.org
+X-Gm-Message-State: APuU4Z//YjCljKgUFJ6YERpWRMGiQuszScl4YGIBX4WjsVM9IHfk2og8
+	GyQvRXai8CUdP8r84NrPz9zH7mdn4/TF403Ym6FfR9Un/Om12UkSMj884ey3FpgNbkDR4wuxkkN
+	kiTMo9qlziYz78NyVbHOMWIGaoou0F4I=
+X-Gm-Gg: AYBFou1wlDnE/Iu476fHHfCbLvTXJp6Kv+BCzCqLq8ZK868lKMIS/gLCcZ3LwXHhone
+	KZKwHL/YsV+fG/weIhFEAAdk3Er88ZU8+jwnEcyG+jOvjqcrANSfrCoa9CT141RKp43E80qrAhv
+	TqTQHlPg6C2uNOw0Eq6zNRDStErQ7pnZuqlcZTLzsQOwggvnikn0qR49ZplI6tXy4ut/IcwU8/j
+	IfVU+YmIK4dU6CP2ji0ljYiAXUKFLBoIz5w0kvpx6rb6S+Otjm8kXT+5Ddo039NdUxvfxtC8qfJ
+	3LalSVvhD8BpIYFjEsV6C29ymmXslPUE5dFgSglEHqsOCTRDia+PhtTgUcFC/x8oDN3r+HUHeHS
+	SEbaysGv10giaCRSnIy3r8+O/GGUupJTJ79I7qur2Y/pBlIl0tB8aigindk7evMl7pL4IWTA=
+X-Received: by 2002:a05:6402:897:b0:6b8:8328:8e66 with SMTP id
+ 4fb4d7f45d1cf-6ba37d62a2dmr239724a12.7.1795117025446; Thu, 19 Nov 2026
+ 11:37:05 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -127,100 +104,134 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20261115180343.576773-1-koray.fra@gmail.com> <20261115180343.576773-3-koray.fra@gmail.com>
+In-Reply-To: <20261115180343.576773-3-koray.fra@gmail.com>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Thu, 19 Nov 2026 20:36:52 +0100
+X-Gm-Features: AclHuK-9kUyGBTzq0h8pZyp8mMZSXIXsu9pOi4Bu2Y5vLjqBJOsUk2EoN70jtkI
+Message-ID: <CAOQ4uxiRFUqgUMvngvXc1nA7e_HMKSs+aXWVQmAEpcR7yQiQLw@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 02/10] vfs: add fileattr_has_fsx_mask()
+To: koraynilay <koray.fra@gmail.com>
+Cc: David Sterba <dsterba@suse.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Sungjong Seo <sj1557.seo@samsung.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
+	Paulo Alcantara <pc@manguebit.org>, Chris Mason <mason@kernel.org>, Yuezhang Mo <yuezhang.mo@sony.com>, 
+	Jan Kara <jack@suse.cz>, NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, "Darrick J . Wong" <djwong@kernel.org>, 
+	Sean Smith <defendthedisabled@gmail.com>, Andrey Albershteyn <aalbersh@kernel.org>, 
+	Pedro Falcato <pfalcato@suse.de>, =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
+	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, exfat@lists.linux.dev, ntfs3@lists.linux.dev, 
+	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-api@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-set_posix_acl_entries_dacl() and set_ntacl_dacl() stop adding ACEs when
-their total size would no longer fit in 16 bits. The 8-byte ACL header
-is added to that total afterwards, so when the ACEs take 65528 to 65535
-bytes, the DACL size wraps to a value below 8. A POSIX ACL with about
-1800 entries is enough, and tmpfs and XFS can hold one. The security
-descriptor built for a new file is then stored cut off before its DACL,
-and a query returns DACL_PRESENT with no DACL, which reads as a NULL
-DACL.
+On Sun, Nov 15, 2026 at 7:04=E2=80=AFPM koraynilay <koray.fra@gmail.com> wr=
+ote:
+>
+> Add fileattr_has_fsx_mask() as a helper to let filesystems check for
+> unsupported xflags while allowing supported ones. Can be used in the
+> same way as fileattr_has_fsx().
+>
+> Also make fileattr_has_fsx() a wrapper around fileattr_has_fsx_mask().
+>
+> Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.4.7
+> Signed-off-by: koraynilay <koray.fra@gmail.com>
+> ---
+>  include/linux/fileattr.h | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
+> index 42b92ccdc583..ba7ed3b387d8 100644
+> --- a/include/linux/fileattr.h
+> +++ b/include/linux/fileattr.h
+> @@ -65,6 +65,23 @@ int copy_fsxattr_to_user(const struct file_kattr *fa, =
+struct fsxattr __user *ufa
+>  void fileattr_fill_xflags(struct file_kattr *fa, u32 xflags);
+>  void fileattr_fill_flags(struct file_kattr *fa, u32 flags);
+>
+> +/**
+> + * fileattr_has_fsx_mask - check for extended flags/attributes
+> + * @fa:                                fileattr pointer
+> + * @allowed_xflags_mask:       additional xflags permitted
+> + *
+> + * Return: true if any attributes are present that are not represented i=
+n
+> + * ->flags or @allowed_xflags_mask.
+> + */
+> +static inline bool fileattr_has_fsx_mask(const struct file_kattr *fa,
+> +                                        u32 allowed_xflags_mask)
+> +{
+> +       return fa->fsx_valid &&
+> +               ((fa->fsx_xflags & ~(FS_XFLAG_COMMON | allowed_xflags_mas=
+k)) ||
+> +                fa->fsx_extsize !=3D 0 || fa->fsx_projid !=3D 0 ||
+> +                fa->fsx_cowextsize !=3D 0);
+> +}
+> +
 
-Leave room for the header when bounding the ACEs.
+Every patch in your series did:
 
-Fixes: 299f962c0b02 ("ksmbd: use check_add_overflow() to prevent u16 DACL size overflow")
-Cc: stable@vger.kernel.org
-Signed-off-by: Ian Bridges <icb@fastmail.org>
----
+       if (fileattr_has_fsx_mask(fa, EXFAT_SUPPORTED_XFLAGS))
+               return -EOPNOTSUPP;
 
-Tested on ksmbd-for-next 4616bbc5389a with KASAN, on tmpfs. For a new
-file whose POSIX ACL has 1819 named users and one named group, a query
-now returns a DACL of 65516 bytes, which leaves out the last ACE.
-POSIX ACLs with 1800 and 1820 named users give the same results as
-before. smbtorture results match the base.
+       if (fa->fsx_xflags_mask & ~EXFAT_SUPPORTED_XFLAGS)
+               return -EOPNOTSUPP;
 
-This patch was developed with LLM assistance.
+It looks like this helper is not as helpful as it could have been
+and you have raised this question yourself in the cover letter.
 
- fs/smb/server/smbacl.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+Effectively every filesystem that supports fileattr_set() already has
+a defined SUPPORTED mask, so I think it's better to do the negated
+something like:
 
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 2651214c939a..86a59878ae87 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -628,6 +628,18 @@ static int parse_dacl(const struct mnt_idmap *idmap,
- 	return ret;
- }
- 
-+/*
-+ * Add the size of an ACE to the size of the ACEs in a DACL. Fail when the
-+ * DACL with its header would no longer fit in its 16-bit size.
-+ */
-+static bool dacl_add_ace_size(u16 *size, u16 ace_sz)
-+{
-+	if (*size + ace_sz > U16_MAX - sizeof(struct smb_acl))
-+		return false;
-+	*size += ace_sz;
-+	return true;
-+}
-+
- static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 				       struct smb_ace *pndace,
- 				       struct smb_fattr *fattr, u16 *num_aces,
-@@ -685,8 +697,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 		ntace = (struct smb_ace *)((char *)pndace + *size);
- 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
- 				pace->e_perm, 0777);
--		if (check_add_overflow(*size, ace_sz, size)) {
--			*size -= ace_sz;
-+		if (!dacl_add_ace_size(size, ace_sz)) {
- 			kfree(sid);
- 			break;
- 		}
-@@ -700,8 +711,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 			ntace = (struct smb_ace *)((char *)pndace + *size);
- 			ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
- 					0x03, pace->e_perm, 0777);
--			if (check_add_overflow(*size, ace_sz, size)) {
--				*size -= ace_sz;
-+			if (!dacl_add_ace_size(size, ace_sz)) {
- 				kfree(sid);
- 				break;
- 			}
-@@ -746,8 +756,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 		ntace = (struct smb_ace *)((char *)pndace + *size);
- 		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
- 				pace->e_perm, 0777);
--		if (check_add_overflow(*size, ace_sz, size)) {
--			*size -= ace_sz;
-+		if (!dacl_add_ace_size(size, ace_sz)) {
- 			kfree(sid);
- 			break;
- 		}
-@@ -798,10 +807,8 @@ static void set_ntacl_dacl(const struct mnt_idmap *idmap,
- 				goto next_ace;
- 
- 			memcpy((char *)pndace + size, ntace, nt_ace_size);
--			if (check_add_overflow(size, nt_ace_size, &size)) {
--				size -= nt_ace_size;
-+			if (!dacl_add_ace_size(&size, nt_ace_size))
- 				break;
--			}
- 			num_aces++;
- 
- next_ace:
--- 
-2.47.3
+static inline bool fileattr_supported_fsx_mask(const struct file_kattr *fa,
+                                               u32 supported)
+{
+        if (!fa->fsx_valid)
+                return true;
+        if ((fa->fsx_xflags | fa->fsx_xflags_mask) & ~supported)
+                return false;
+        if (fa->fsx_extsize &&
+            !(supported & (FS_XFLAG_EXTSIZE | FS_XFLAG_EXTSZINHERIT)))
+                return false;
+        if (fa->fsx_cowextsize && !(supported & FS_XFLAG_COWEXTSIZE))
+                return false;
+        if (fa->fsx_projid && !(supported & FS_XFLAG_PROJID))
+                return false;
+        return true;
+}
 
+
+...
+
+       if (!fileattr_supported_fsx_mask(fa, EXFAT_SUPPORTED_XFLAGS))
+               return -EOPNOTSUPP;
+
+
+>  /**
+>   * fileattr_has_fsx - check for extended flags/attributes
+>   * @fa:                fileattr pointer
+> @@ -74,9 +91,7 @@ void fileattr_fill_flags(struct file_kattr *fa, u32 fla=
+gs);
+>   */
+>  static inline bool fileattr_has_fsx(const struct file_kattr *fa)
+>  {
+> -       return fa->fsx_valid &&
+> -               ((fa->fsx_xflags & ~FS_XFLAG_COMMON) || fa->fsx_extsize !=
+=3D 0 ||
+> -                fa->fsx_projid !=3D 0 || fa->fsx_cowextsize !=3D 0);
+> +       return fileattr_has_fsx_mask(fa, 0);
+
+            return !fileattr_supported_fsx_mask(fa, FS_XFLAG_COMMON);
+
+I hope I got this right.
+
+Thanks,
+Amir.
