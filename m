@@ -1,52 +1,52 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=198.137.202.133
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795066538;
-	b=tiOQuNQZEKvmTePvoq7eQ1ND+oODhnYwt2hcgafU/Gs8+BVhiKCqwt5BLTbpVCkNgKDy
-	 EicVlk1B9+uFB4jFxDhg7jaAZmsohCngdMOdQFy8qowXiB8QDCtty09DGB7U49RAAeSn7
-	 9dvP44y4RN9ePRGlmrn9D5o5EvMx+wuOk1g4L2lUC2W82b0xr4PX7C3Vxb6k7feS/+AHM
-	 FE/h1oQzVol+yzfj+ZzEapNjuLGXCgQPu8GvLmMSochOVofibbk+8mvbKsJsAYV49grNK
-	 MPtD0qfpwkvgnLPqgDZT3JhWLiD6b9hT38o2xzYccCYin8L0CM7edqqL3HeAPhZwTDQ==
+	t=1795066550;
+	b=cn0W1Vgx1WEDC/P/3JiXGdsBrWz16qRJe/BuzanUn+IrQJM7965ceDTxvWS2ytRJjkdd
+	 cJincr9Nkh+uFG6yM7ZXusrKeCBHd6EmooDZIliOjHMPCQ/rtRKYIiuSem06Qqfc+oY8L
+	 SZVR95liUwjSwPZmpazuK7GrDUifovujNvi+4u6+ulpwQMFB90M3TbX1bgnqOnh4p9Nz9
+	 vtbOqib3F4yWdxdV62Gx90rauv7I2QFEkr3+2gLIyaf2xlJNuSC/pTOL1c2zyCPWldkVc
+	 hg2bg/MzwJrh6dVbalaoTfQA125aMNMBfrtMHct9HNInJnoGub46WRU7KMx9lJW4A4w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795066538;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795066550;
 	h=DMARC-Filter:DKIM-Signature:Received:From:To:Cc:Subject:Date:
 	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=bp3l8rwDPkSKznuZqcxjKl6885TgLTXi4yzkCNzGJRw=;
-	b=pfGIQQWUbB4QlLqlrPPfXytmpuv/YQWdSIpZ07hJfNGNLBKEfPnfcPO5Wq5O/BZVxu2Q
-	 xbhJI8N1CuWQo9+tiFiGEZp3Fzgz8SrF5a1e/3KQAW6sKaWA1aShe67dz9ceIqAHkemeF
-	 yUI1W5xjP3/sy6NtzIt6iEFpER02/3XwqQhkqSF53zOOKDmBZ4gV/JT9HC9kEIkZ4us/W
-	 EM7SJBq9Lx0dBriE3QIPReF9KipMdGLHF7q3X4RTee2QDKA2ZPe33vXsE3ABIKbAcVMtb
-	 WxJGCL8AMqqP2m+59bRv2GIskLHxez9ikVfNR8tj5JYyNkNiPPnW5DdkuM0IXD2069w==
+	bh=iUfRRM/uSWL5Pu2WYkuG9ZMjaMjQfW5Ts9TmnI1Vtsg=;
+	b=KnqcR6+2WKEpOABO2y5Ha9ImyUGpDPbdoNJdIRH+3BaoCQUx4c+tpAL/AHtkTWOD061H
+	 6emTTcvdgaeEkg7Ilp7Qx52P5SflEDVnHoQ8lAb7Db+Eo0YxSIhcuD4J8u26uUkzkVnGh
+	 CcbBWw4g2G6BlOABRP+ZkbmWhkR62GWS3Y3xuJxRgTFDbelpid1CTjDR4FqF9LSBbQjXq
+	 rKBDTaNs/4q/toiRhhiWYUNKgW7yXUCfqkTQ6I7xOgid7L6neunlmVhIQepieVXDaHozT
+	 l0g3d8s+QlEWvE/bRfN+2mRALXSYVTg7o/ZBG1cxTNE4PLZnIXq+5Ht7Ys5fFmAA4zw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=infradead.org;
 	spf=pass smtp.mailfrom=infradead.org;
-	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=a7dJOzVX;
+	dkim=pass header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=DGrnyfoW;
 	arc=none smtp.remote-ip=198.137.202.133
 Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A37160A2610;
-	Thu, 19 Nov 2026 05:35:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9A37160A2610
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AC5606A326;
+	Thu, 19 Nov 2026 05:35:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B7AC5606A326
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=a7dJOzVX
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.a=rsa-sha256 header.s=bombadil.20210309 header.b=DGrnyfoW
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
 	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
 	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=bp3l8rwDPkSKznuZqcxjKl6885TgLTXi4yzkCNzGJRw=; b=a7dJOzVXczfXW7dP1pQdgOXabl
-	T0lzpIGAB3rM4BqjplgBseKhONkiLo8FqjUjC/QeLtOEv1Fip7Bbg9rFvcPURlwylnMWRY0CpS/gv
-	JU5wUuCHK07Kd2uJzstOabVXyZt4lVxplH4grO2i0Fov9cE3snJQwplhvj1bAgYxpZKn2uuMCEksG
-	AEqoJVO3SCDTJYqtI6pdlYiu87NTCrn27queuBQpVaWEEtDQ4/KBC2+LoOVscqpeK5jjkQNZ/gjnG
-	dEOzIUzdnAi7f6M0OtHuWf8AhTPay2QWRe5zwdUlHnod8LdvXypaW4Mj5RRhyQEFTu5DHgX1YAaIh
-	vpjrd9Bw==;
+	bh=iUfRRM/uSWL5Pu2WYkuG9ZMjaMjQfW5Ts9TmnI1Vtsg=; b=DGrnyfoWAgDY4gTArjK85mpfLP
+	YUa39SWVXYFn/eK72WXlCXA9uuRyagIyIF1woWS4EdttvevIcGfjAAhDfNPyAIOfoJJ+XfJxm4mGT
+	bVkFVA7u20Klegz+Ue9YMX8fmqu38qLzw2l6Mvo1BQyhyJJNtM+c9MxognTzcG7V8vEGldl3RnhKr
+	KabGWOjeEC+yc7jJcccxprvCsyDQXoRtyIJIBftIP+C4EOe7n7gE7b/kw0/j0BAuO6DMIZSJhfRCO
+	H9dGPqwbToDijcg/PKpXyVcYExVa/obX176QmbjEtCpmdJ0iCHZ5xvENNH0DXE2DbvWCAV55csStZ
+	hDSDSL3g==;
 Received: from [50.53.43.113] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.100.1 #2 (Red Hat Linux))
-	id 1xTuo2-0000000Aufu-2Ea3;
-	Thu, 19 Nov 2026 05:35:36 +0000
+	id 1xTuoG-0000000Aufu-2x6D;
+	Thu, 19 Nov 2026 05:35:48 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: linux-kernel@vger.kernel.org
 Cc: Randy Dunlap <rdunlap@infradead.org>,
@@ -132,9 +132,9 @@ Cc: Randy Dunlap <rdunlap@infradead.org>,
 	Matthew Brost <matthew.brost@intel.com>,
 	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
 	intel-xe@lists.freedesktop.org
-Subject: [PATCH v2 06/12] docs: ioctl-number: update SCSI entries
-Date: Wed, 18 Nov 2026 21:35:07 -0800
-Message-ID: <20261119053514.255348-7-rdunlap@infradead.org>
+Subject: [PATCH v2 11/12] docs: ioctl-number: update platform entries
+Date: Wed, 18 Nov 2026 21:35:12 -0800
+Message-ID: <20261119053514.255348-12-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.56.1
 In-Reply-To: <20261119053514.255348-1-rdunlap@infradead.org>
 References: <20261119053514.255348-1-rdunlap@infradead.org>
@@ -149,8 +149,8 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Update the list of files where SCSI ioctls are defined and update the
-ranges of function numbers that are used.
+Update the list of platform/ files where ioctls are defined and update
+the ranges of function numbers that are used.
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
@@ -163,30 +163,30 @@ take all of these through the docs-next tree.]
 Cc: Jonathan Corbet <corbet@lwn.net>
 Cc: Shuah Khan <skhan@linuxfoundation.org>
 Cc: linux-doc@vger.kernel.org
-Cc: MPT-FusionLinux.pdl@broadcom.com
-Cc: "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>
-Cc: "Martin K. Petersen" <mkp@kernel.org>
-Cc: linux-scsi@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Cc: Tzung-Bi Shih <tzungbi@kernel.org>
+Cc: Benson Leung <bleung@chromium.org>
 
  Documentation/userspace-api/ioctl/ioctl-number.rst |    3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 --- linux-next-20261116.orig/Documentation/userspace-api/ioctl/ioctl-number.rst
 +++ linux-next-20261116/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -187,7 +187,7 @@ Code  Seq#    Include File
- 'I'   40-4F  linux/mISDNif.h                                           conflict!
- 'K'   all    linux/kd.h
- 'L'   00-1F  linux/loop.h                                              conflict!
--'L'   10-1F  drivers/scsi/mpt3sas/mpt3sas_ctl.h                        conflict!
-+'L'   10-21  drivers/scsi/mpt3sas/mpt3sas_ctl.h                        conflict!
- 'L'   E0-FF  linux/ppdd.h                                              encrypted disk device driver
-                                                                        <http://linux01.gwdg.de/~alatham/ppdd.html>
- 'L'   35-38  arch/m68k/include/asm/fbio.h
-@@ -259,6 +259,7 @@ Code  Seq#    Include File
- 'c'   00-7F  linux/comstats.h                                          conflict!
- 'c'   00-7F  linux/coda.h                                              conflict!
- 'c'   00-1F  linux/chio.h                                              conflict!
-+'c'   08     drivers/scsi/ch.c                                         conflict!
- 'c'   80-9F  arch/s390/include/asm/chsc.h                              conflict!
- 'c'   A0-AF  arch/x86/include/asm/msr.h conflict!
- 'd'   00-FF  linux/char/drm/drm.h                                      conflict!
+@@ -434,6 +434,7 @@ Code  Seq#    Include File
+ 0xBA  00-0F  uapi/linux/liveupdate.h                                   Pasha Tatashin
+                                                                        <mailto:pasha.tatashin@soleen.com>
+ 0xC0  00-0F  linux/usb/iowarrior.h
++0xC4  00-1F  platform/raspberrypi/vchiq-interface/vchiq_ioctl.h
+ 0xCA  00-0F  uapi/misc/cxl.h                                           Dead since 6.15
+ 0xCA  10-2F  uapi/misc/ocxl.h
+ 0xCA  80-BF  uapi/scsi/cxlflash_ioctl.h                                Dead since 6.15
+@@ -446,7 +447,7 @@ Code  Seq#    Include File
+ 0xDD  00-3F                                                            ZFCP device driver see drivers/s390/scsi/
+                                                                        <mailto:aherrman@de.ibm.com>
+ 0xE5  00-3F  linux/fuse.h
+-0xEC  00-01  linux/platform_data/cros_ec_chardev.h                     ChromeOS EC driver
++0xEC  00-02  linux/platform_data/cros_ec_chardev.h                     ChromeOS EC driver
+ 0xEE  00-09  uapi/linux/pfrut.h                                        Platform Firmware Runtime Update and Telemetry
+ 0xEF  00-0F  uapi/linux/ntfs.h                                         NTFS
+ 0xF3  00-3F  drivers/usb/misc/sisusbvga/sisusb.h                       sisfb
