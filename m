@@ -1,83 +1,55 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795086024;
-	b=vkxy51c87Ehlw23f91IZiFNwahuOfFy2VlhIvtxvGUEh1t9RaGa4S5llVZIw4a0S8b/x
-	 icDyrHAKB+QZZMGv3XUbwcC1+5F+ddQYIjdFVeemiFhkD2/big72Rl1ZFOF4giC9qoIHy
-	 zhPoOfoVeQgumKf3+DztlvcAW++Dr845HBsIsXkFFMAZ2G4w64SccZElPmFrbXOO98RAQ
-	 S2KRk1/bNk3Tmpx5wlKXmOTfKPo4tJ4RwDuRm2dMwUqdwiGRuyJEAs0P9juvgL4ifwHdt
-	 iRAHLj9cqXqluw1xLYwDe0rhgWsH3ky5AcHkkzN7i+vfregUizpfIZ44pExW7T8CQtg==
+	t=1795087649;
+	b=fKPCzxp1yER5FBcqtScZI87VRDG5yzNx8i/YH+vtw8jwv0fISyZ1QqHG1b48pWgnNerF
+	 /WFzVSrV1W/EZp5Jt0XDsrn2Fk2+qV9GHhR7Svqa4VyzebQX4mFVh3JxRki9cG2GOfdAH
+	 pr0Qcvfh+KDVkHRNGJFKWzVL5GIPeWWlQUWaXOlOMLFhHI2Ie0JmAOMvihdMKT4aqtoNV
+	 7xNpz+8BORLmUMWVx7c0D7v1qz/7JuvlkoqYnSwRPkGJ79fR7EP+E8Vs6Qz9VWaJ6vc2+
+	 xrCFnotvZBkHKk78/ik9B68Qe9zv8yXqtuxApzS+YXisCx9Keri9jcLBGznfRk8CxnQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795086024;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
-	 Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:X-Mailer:
-	 References:In-Reply-To;
-	bh=A9oz9N9wH00FCW5H3UowtSmH7Mh76gUUYu8lgBfPcTY=;
-	b=kuPBFJCX8g/TmCf0yckGLnQCVy4cIA3U1k55Pxi4HwtLkYiiXL5enwI/OpRSzgvY1z35
-	 lJhfS9nTw083kKKmFAgiRB33vOWHDvIDneWTnYtRZBAGpOTN6zgD/VDvFRpcNF/ndKPj8
-	 JyYJyUVFp6W4OCfZRerxDJa/h9LLVESRSDwq4Jb4THYEme+dyrkwiUX5XWqpirRTtisf4
-	 xEJqe+RP4v2+dsHET0VX1TjoNEO3OQFca+4Syv7TzzZLMvjQQKskFTMKcXzBH7qvggCls
-	 ehileE7b9Jd8+Iacg3ALoAD6cche1mSVMt69s13EDD6g4V0W+fVue+06dThiUb7gQkQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795087649;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=0oDGQwRIzZ1kh/O3TNYwsXtJd0AFwQ/AC6ViOWCRFEU=;
+	b=MFIz56IFcYGASSosg7YQHZIjQn++fefjuTwF8TdHfvnadvUypBIwpdqOhrSpdUD2Bv1O
+	 F0LPpv/LgVDMtiHoWHyrjLbIwqLQyx/jQ79XOzp1J6bGIuTwkp0knJu777PD/9F7k3ijq
+	 6nAO7rAG3OnfmDcP2qyMDk3nFVYk4NDTc5ea4fuWvm+pu0M6WwTLwfK8r5Utsz8q2DuuR
+	 MamxP4mke2/60ftVeX4x+EAh4OpbVEj+3iDQWHVGUwlBJSGqLsqSnIjo8+MJizy5oPOLn
+	 E0Mz4HJiTqmqTyVS/qyM1UUq/y/k2v8fZqSLFzFXxIFGn4akOyYvrOIT0Y/y43nYZQA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p+8y4zX1;
-	arc=none smtp.remote-ip=209.85.128.48
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="JAyc/+x9";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EDB606A324
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:00:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 58EDB606A324
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98111606A326
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=p+8y4zX1
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4bb69f5b161so13216665e9.0
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 03:00:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795086022; x=1795690822; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-type:mime-version:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=A9oz9N9wH00FCW5H3UowtSmH7Mh76gUUYu8lgBfPcTY=;
-        b=p+8y4zX1UI+mfeJMp1kRmcRAREPQADmhTVfjwwRI88EjgnuIVQGkaBCJWGDqulNg56
-         qZLBHTfK06G3YF3YQSRWX8m+vVHiieMTkDYSgmwiy/8pZ2u5p1jzXb+saLyYFE+symgc
-         XwvR7gNzlBUv8jT7ejMAl52+fA6I9fW5y42cG24CLkTfkMuzP35I2d84GrYtRFqMoboA
-         D+VbsUKrj9ueSA9ZvnY0211UUuM7RVIzcOf42AcUSKbYmp8PKmWrDlqpUBrSz09aRZuF
-         vbuqpLlk38nEHuUROa2vow7zuk951pDNkAcPkOuJaXssazOo+udgoIX7xMuJU23oFXVJ
-         36LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795086022; x=1795690822;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=A9oz9N9wH00FCW5H3UowtSmH7Mh76gUUYu8lgBfPcTY=;
-        b=XKiF8iAm7cPajHYBBSIm+yfvGgVXAugvdHGtyjWHAbXRqbG2q7Sqb2pgyVqC7WAha2
-         QnxUDg9BAcbUEcECjiu/kogjqeBgblE7lpdo31fV9rgaNdiJIUQT5O5/0tSxceSdJl1f
-         TquamObRQHNJ02xLgLB+4gJh0rKs3vEAW1Cgv4W47ZEmIAx9mZgwmHDRiVy6j9SF/X0N
-         tkZhlXAsr531/6j11Hv08hClwoZ1ueNJqTwWOYQs0vFf4F3MVuiHXoadla4N7Nr5Ds8X
-         VqoJY9IzWUFJ37yCYnLbZUseQoM0G8Cm7+Qw8J7SpWhkoMdqxDH/QnaAkCjtTumBLgDU
-         5ATw==
-X-Forwarded-Encrypted: i=1; AL+hErF99endReQzLxirKKafqjJA/WNy2bagEUKpNPMPYfm9mE2aBpiCr+M1ipHMrlMXQKYEhqVbU3NShlLb@vger.kernel.org
-X-Gm-Message-State: APuU4Z9PXQG+RUui8NsMOgd1trjI/Gx3AyxsFQ62t5TesUg6n4Mf9UrV
-	tOApuKKCj3cI1JHCYzst9z8yE0CG9FlQnUWL+YswSFzEZ2vdgfJ7tjpP
-X-Gm-Gg: AYBFou1rycWVQJRny0ht/3ysWi8dzSDe05iVZvm99R1DmwjLsf92fWRxOt0ZVzQZIaN
-	DfChetLkOlVQoufhdm0USERo6ZrNCDS8UZKOw466samhCks9YOl3LJaG933F26Lo+BB4hle2FAH
-	hpZMGuiLCLd6BswhoIsLoxdIo+BMVX3gqR2lpzYTx9dwN6PI5Ywo4yn4MKH26rt5Io8gtjHEMbN
-	2c/YPztgW6hB+xnnrPRxKlUTqdvaoBJu46gDuq+CX6EyzMVmE/f1Sie++Vj1h6FHyFyayn94lIL
-	4xhZxAWId/4dMKibHtns835PLMK1vKHvqDMEZOAWnc6/J3vnPN3sx1K1CwTdr2tulaOvLzk/izo
-	lcU3Q5RqBaxe3w6vWt7LymWITn4/IflhmbmiHIQZrGZRiiLrBMZQAryZy08HWLXY+ojqDaCXYOh
-	FzW5Qs+X9xrRtj09X7WML0mYnEoD6h/MSX0xF0TnC7MqKr4F95MAJOI/SY344EITUTkxyyBrOga
-	29gasa4vmcgEJn0KjL4DVP1bGwEApTR8Jm50tyHTLEo5aVobUbDdELTYshrRI8cB0w06Ac6iCLI
-	io6UOJKVQN2YjEltLI66i2chJvbzj0Wr+i//Isrf5Tsuzziy
-X-Received: by 2002:a05:600c:6095:b0:4a2:c2b:a91b with SMTP id 5b1f17b1804b1-4bb7da03b45mr96312765e9.10.1795086021026;
-        Thu, 19 Nov 2026 03:00:21 -0800 (PST)
-Received: from localhost ([130.192.98.149])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb8534d908sm30956005e9.9.2026.11.19.03.00.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Nov 2026 03:00:20 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JAyc/+x9
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B6461F000D0
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:27:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795087649;
+	bh=0oDGQwRIzZ1kh/O3TNYwsXtJd0AFwQ/AC6ViOWCRFEU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=JAyc/+x9fhaY++SPy1B5qiWWMZ17V5JOJCCuHc4FiXy07YwpUNHjdIGU9jSvnU9LH
+	 3mMjOyIkFeKAtKcltA7Yd2HrpMK3rrhrZNEPWGOxFz2Vc0+6PqCOQ4wN7z1RF5KMlZ
+	 +bFFM0NNOGmRk055kx6GUBRbuPnm6OpFHmUhlCppwmzqiZjWb8DxhNi7l8glO12yZQ
+	 183nvg/MedDglLLHQTSSE1SfYgvlfhc4pHBFhDT8l1y7tK1u4gmW3KeLWdiiUkg1/H
+	 Ak5WT5q8xFO1p/Z8kR+J93f0wUJpkujBKkTUZuV6Csijz3Sn561J99YqUe/M7YuES/
+	 T/UGxn5wkVMEQ==
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c40f29667e6so337697966b.0
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 03:27:29 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErG5OQ6O8OIcNNd7btWIdOOxJW4nu81bx1H2qFnAb9j7s8KvV6FH0+MMFWxtNKYtx42q1EWpHZEo1xDw@vger.kernel.org
+X-Gm-Message-State: APuU4Z87JlZrFDMTLtsUeSaStHMBMbq0wmWrWjC5z0oFwp28hzbvtwfZ
+	7P0GET9MQMPN/0qyAgyB+gvNYtE2ov/0yw9yi1fQ5caNgya2vkUS9Efdf96Oy8ITQnB5OeLEe1U
+	kjydZaicrnPbAL8S6YMy/PPOIa4aQERI=
+X-Received: by 2002:a17:907:2d24:b0:c42:4750:8d33 with SMTP id
+ a640c23a62f3a-c510e3a5becmr546933666b.28.1795087647858; Thu, 19 Nov 2026
+ 03:27:27 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -86,272 +58,44 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-Mime-Version: 1.0
-Content-Type: multipart/signed;
- boundary=a790ada8fe7b7f1ee219e7d28021102d19589829fb834fe469ae5db7b9de;
- micalg=pgp-sha512; protocol="application/pgp-signature"
-Date: Thu, 19 Nov 2026 12:00:04 +0100
-Message-Id: <DMZ4VQ7SZ07T.29WMPQ0BQZGSS@gmail.com>
-From: "koraynilay" <koray.fra@gmail.com>
-To: "Lauri Gates" <lauri.gates@gmail.com>, "Dave Chinner" <dgc@kernel.org>
-Cc: "Christian Brauner" <brauner@kernel.org>, "Christoph Hellwig"
- <hch@infradead.org>, <linux-xfs@vger.kernel.org>, "Carlos Maiolino"
- <cem@kernel.org>, "Christian Brauner" <christian@brauner.io>, "Darrick J.
- Wong" <djwong@kernel.org>, <linux-api@vger.kernel.org>,
- <linux-fsdevel@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
- <ocfs2-devel@lists.linux.dev>, <linux-nfs@vger.kernel.org>,
- <linux-cifs@vger.kernel.org>, "Amir Goldstein" <amir73il@gmail.com>
-Subject: Re: Concurrent FIEMAP on reflinked files serialises on the AGF
- buffer lock
-X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
-References: <av4Hn9u80fs8iHZ6@dread>
- <20261119095943.85048-1-lauri.gates@gmail.com>
-In-Reply-To: <20261119095943.85048-1-lauri.gates@gmail.com>
-
---a790ada8fe7b7f1ee219e7d28021102d19589829fb834fe469ae5db7b9de
+MIME-Version: 1.0
+References: <20261119065107.115679-1-icb@fastmail.org>
+In-Reply-To: <20261119065107.115679-1-icb@fastmail.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Thu, 19 Nov 2026 20:27:15 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd_NMZokM_wEENdc9XU5Lat0BRE4zQQwhz=07kfOao0R_Q@mail.gmail.com>
+X-Gm-Features: AclHuK-ovNV8R_ey0_bL4KpoanjusJe8xpgZrWVAg7tcKtx7oUwEJK6mXpxPH1Y
+Message-ID: <CAKYAXd_NMZokM_wEENdc9XU5Lat0BRE4zQQwhz=07kfOao0R_Q@mail.gmail.com>
+Subject: Re: [PATCH v2] ksmbd: fail SET_INFO when the security descriptor
+ cannot be stored
+To: Ian Bridges <icb@fastmail.org>
+Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
 
-On Thu Nov 19, 2026 at 10:59 AM CET, Lauri Gates wrote:
-> On Wed, Nov 18, 2026 at 10:16PM +0200, Dave Chinner wrote:
->> I really don't care if it is exposed by statx or file_attr; checking
->> the flag through either interface will be orders of magnitude faster
->> than using FIEMAP to iterate extents on every file to find shared
->> extents. My concern with statx is coherency - it runs completely
->> unlocked and so can race with operations that add/remove the reflink
->> flag...
+On Thu, Nov 19, 2026 at 3:51=E2=80=AFPM Ian Bridges <icb@fastmail.org> wrot=
+e:
 >
-> Thanks, Dave and Christian. Given Christian's preference and the
-> coherency point, I'll write the RFC against file_attr, once the
-> question at the end is settled. xfs_fileattr_get() already reads the
-> flags under XFS_ILOCK_SHARED, so the new flag gets that without extra
-> work. The answer can still go stale right after the call, as with any
-> stat result: a clone that lands after the read is missed, just as one
-> that lands after FIEMAP returns is missed today.
+> SET_INFO reports success even when ksmbd cannot store the new security
+> descriptor. The old descriptor has already been removed, so the file
+> falls back to POSIX permissions. Deny ACEs in the new descriptor are
+> lost. This can happen when the descriptor exceeds the filesystem's
+> xattr capacity.
 >
-> As I suggested on the 6th, the flag would take the inverted meaning,
-> so that an unset flag stays the safe answer: say FS_XFLAG_NOSHARED
-> ("no extents shared with another file"), read-only, in
-> FS_XFLAG_RDONLY_MASK next to the case-folding flags.
-
-Hello, I don't have any say in the FIEMAP issue, but I wanted to let you
-know that, since also a mask was mentioned and your patch would be
-touching the fileattr API, there is work going[1] on for adding a
-fsx_xflags_mask that filesystem use[2][3] to advertise supported flags (on
-get, like stx_attributes_mask) and users use to say what they want to
-change (on set).
-It doesn't seem like an FS_XFLAG_NOSHARED flag would touch this new
-change, but I thought it was worth pointing out, especially because this
-patch would also add FS_XFLAG_PROJID and a new FS_FILE_ATTR_XFLAGS_MASK
-to have a way to include both legacy and newly added xflags, so
-FS_XFLAG_NOSHARED would maybe also go there (correct me if I'm wrong).
-
-> Christian, one question on the shape within file_attr: would you take
-> the inverted flag, or would you rather keep a plain "may share" flag
-> and add a mask to struct file_attr that says which xflags the
-> filesystem reports?
-
-And if Christian chooses the mask approach, then my patch[4] becomes
-relevant.
-(in [4] I put the patch that will be sent in v5 of [1], since in [1]
-it's merged with the ptime change)
-
-(For Amir who I just CC'd, [5] is the main link for this thread)
-
-Thanks,
-koraynilay
-
-[1]: https://lore.kernel.org/all/20261115180343.576773-1-koray.fra@gmail.co=
-m/T/#u
-[2]: https://lore.kernel.org/all/CAOQ4uxj82K4z+2OiY5W1g7NyWAFOFjqqWnZSS3pry=
-tW36j1LgA@mail.gmail.com/
-[3]: https://lore.kernel.org/all/CAOQ4uxiuJ=3DeZu28FZAUz3rpqPKqCimPxJucOnYY=
-uBowvD09_Cw@mail.gmail.com/
-[5]: https://lore.kernel.org/linux-xfs/20261102193533.93690-1-lauri.gates@g=
-mail.com/T/#u
-
-[4]:
-commit 0efe0de3b5cc2b767aa6e2bb9174eb05b0d818f1
-Author: koraynilay <koray.fra@gmail.com>
-Date:   Tue Nov 17 14:57:47 2026 +0100
-
-    vfs: add xflags mask to file_attr API
-   =20
-    Add fa_xflags_mask to struct file_attr and equivalent fsx_xflags_mask
-    to struct file_kattr.
-   =20
-    This lets filesystems advertise their support for specific xflags and
-    users specify only what they want to change, behaving like
-    statx.stx_attributes_mask:
-    - on GET (file_getattr): each filesystem fills the mask according to
-      its supported xflags, e.g. FS_XFLAG_COWEXTSIZE or FS_XFLAG_EXTSIZE,
-      and provides the values in the corresponding struct fields;
-    - on SET (file_setattr): userspace fills the mask according to which
-      xflags it wants to change, VFS validates this and preserves xflags
-      that were not specified in the mask;
-    - if xflags_mask =3D=3D 0, use legacy full-struct replacement to keep
-      compatibility with older programs.
-   =20
-    Furthermore, add the missing FS_XFLAG_PROJID flag, to allow userspace t=
-o
-    set the projid using file_[sg]etattr().
-   =20
-    Finally, in order to prevent the legacy FS_IOC_FSSETXATTR from acceptin=
-g
-    FS_XFLAG_PROJID, add an FS_FILE_ATTR_XFLAGS_MASK to support new xflags
-    and use it in fileattr_to_file_attr()/file_attr_to_fileattr() to
-    validate that the xflags passed in fa_xflags and fa_xflags_mask fields
-    are valid.
-   =20
-    Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.7
-    Signed-off-by: koraynilay <koray.fra@gmail.com>
----
- fs/file_attr.c           | 46 ++++++++++++++++++++++++++++++++++++++++++--=
---
- include/linux/fileattr.h |  5 +++++
- include/uapi/linux/fs.h  |  3 +++
- 3 files changed, 50 insertions(+), 4 deletions(-)
-
-diff --git a/fs/file_attr.c b/fs/file_attr.c
-index 833e03810b24..56ea65f790f1 100644
---- a/fs/file_attr.c
-+++ b/fs/file_attr.c
-@@ -102,10 +102,18 @@ EXPORT_SYMBOL(vfs_fileattr_get);
- static void fileattr_to_file_attr(const struct file_kattr *fa,
- 				  struct file_attr *fattr)
- {
--	__u32 mask =3D FS_XFLAGS_MASK;
-+	/*
-+	 * fsx_xflags_mask contains only flags added after the
-+	 * file_[gs]etattr() API, so we need to tell userspace the filesystem
-+	 * actually supports all legacy (FS_XFLAGS_MASK and FS_XFLAG_PROJID,
-+	 * which lacked its own bit) and new advertised flags.
-+	 */
-+	__u32 mask =3D (FS_XFLAGS_MASK | FS_XFLAG_PROJID | fa->fsx_xflags_mask) &
-+		     FS_FILE_ATTR_XFLAGS_MASK;
-=20
- 	memset(fattr, 0, sizeof(struct file_attr));
- 	fattr->fa_xflags =3D fa->fsx_xflags & mask;
-+	fattr->fa_xflags_mask =3D mask;
- 	fattr->fa_extsize =3D fa->fsx_extsize;
- 	fattr->fa_nextents =3D fa->fsx_nextents;
- 	fattr->fa_projid =3D fa->fsx_projid;
-@@ -141,12 +149,17 @@ EXPORT_SYMBOL(copy_fsxattr_to_user);
- static int file_attr_to_fileattr(const struct file_attr *fattr,
- 				 struct file_kattr *fa)
- {
--	__u64 mask =3D FS_XFLAGS_MASK;
-+	__u64 mask =3D fattr->fa_xflags_mask ?: FS_XFLAGS_MASK;
-+
-+	if (fattr->fa_xflags_mask & ~FS_FILE_ATTR_XFLAGS_MASK)
-+		return -EINVAL;
-=20
- 	if (fattr->fa_xflags & ~mask)
- 		return -EINVAL;
-=20
--	fileattr_fill_xflags(fa, fattr->fa_xflags & ~FS_XFLAG_RDONLY_MASK);
-+	fileattr_fill_xflags(fa, fattr->fa_xflags & FS_XFLAGS_MASK &
-+				 ~FS_XFLAG_RDONLY_MASK);
-+	fa->fsx_xflags_mask =3D fattr->fa_xflags_mask;
- 	fa->fsx_extsize =3D fattr->fa_extsize;
- 	fa->fsx_projid =3D fattr->fa_projid;
- 	fa->fsx_cowextsize =3D fattr->fa_cowextsize;
-@@ -288,12 +301,37 @@ int vfs_fileattr_set(const struct mnt_idmap *idmap, s=
-truct dentry *dentry,
- 	if (!err) {
- 		/* initialize missing bits from old_ma */
- 		if (fa->flags_valid) {
--			fa->fsx_xflags |=3D old_ma.fsx_xflags & ~FS_XFLAG_COMMON;
-+			/* FS_IOC_SETFLAGS */
-+			fa->fsx_xflags_mask =3D 0;
-+			fa->fsx_xflags |=3D (old_ma.fsx_xflags & FS_XFLAGS_MASK) &
-+					  ~FS_XFLAG_COMMON;
- 			fa->fsx_extsize =3D old_ma.fsx_extsize;
- 			fa->fsx_nextents =3D old_ma.fsx_nextents;
- 			fa->fsx_projid =3D old_ma.fsx_projid;
- 			fa->fsx_cowextsize =3D old_ma.fsx_cowextsize;
- 		} else {
-+			/*
-+			 * Preserve unmasked xflags when running file_setattr()
-+			 * with a mask, which doesn't need a read-modify-write
-+			 * so these attributes would be set to 0.
-+			 *
-+			 * With FS_IOC_FSSETXATTR or mask =3D=3D 0 (legacy mode)
-+			 * this is not needed as userspace does
-+			 * read-modify-write already.
-+			 */
-+			if (fa->fsx_xflags_mask) {
-+				fa->fsx_xflags |=3D (old_ma.fsx_xflags & FS_XFLAGS_MASK) &
-+						  ~fa->fsx_xflags_mask;
-+				fileattr_fill_xflags(fa, fa->fsx_xflags &
-+						     ~FS_XFLAG_RDONLY_MASK);
-+				if (!(fa->fsx_xflags_mask &
-+				      (FS_XFLAG_EXTSIZE | FS_XFLAG_EXTSZINHERIT)))
-+					fa->fsx_extsize =3D old_ma.fsx_extsize;
-+				if (!(fa->fsx_xflags_mask & FS_XFLAG_PROJID))
-+					fa->fsx_projid =3D old_ma.fsx_projid;
-+				if (!(fa->fsx_xflags_mask & FS_XFLAG_COWEXTSIZE))
-+					fa->fsx_cowextsize =3D old_ma.fsx_cowextsize;
-+			}
- 			fa->flags |=3D old_ma.flags & ~FS_COMMON_FL;
- 		}
-=20
-diff --git a/include/linux/fileattr.h b/include/linux/fileattr.h
-index 09e32b84e02a..40ecb29f6235 100644
---- a/include/linux/fileattr.h
-+++ b/include/linux/fileattr.h
-@@ -35,6 +35,10 @@
- 	(FS_XFLAG_COMMON | FS_XFLAG_RDONLY_MASK | FS_XFLAG_VALUES_MASK | \
- 	 FS_XFLAG_DIRONLY_MASK | FS_XFLAG_MISC_MASK)
-=20
-+/* Flags only for fa_ fields */
-+#define FS_FILE_ATTR_XFLAGS_MASK \
-+	(FS_XFLAGS_MASK | FS_XFLAG_PROJID)
-+
- /*
-  * Merged interface for miscellaneous file attributes.  'flags' originates=
- from
-  * ext* and 'fsx_flags' from xfs.  There's some overlap between the two, w=
-hich
-@@ -45,6 +49,7 @@ struct file_kattr {
- 	u32	flags;		/* flags (FS_IOC_GETFLAGS/FS_IOC_SETFLAGS) */
- 	/* struct fsxattr: */
- 	u32	fsx_xflags;	/* xflags field value (get/set) */
-+	u32	fsx_xflags_mask; /* supported xflags (get) / flags to set (set) */
- 	u32	fsx_extsize;	/* extsize field value (get/set)*/
- 	u32	fsx_nextents;	/* nextents field value (get)	*/
- 	u32	fsx_projid;	/* project identifier (get/set) */
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index a46c33692aa2..b168f1b75126 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -229,6 +229,7 @@ struct file_attr {
- 	__u32 fa_nextents;	/* nextents field value (get)   */
- 	__u32 fa_projid;	/* project identifier (get/set) */
- 	__u32 fa_cowextsize;	/* CoW extsize field value (get/set) */
-+	__u32 fa_xflags_mask;   /* supported xflags (get) / flags to set (set) */
- };
-=20
- #define FILE_ATTR_SIZE_VER0 24
-@@ -261,6 +262,8 @@ struct file_attr {
-  */
- #define FS_XFLAG_CASEFOLD	0x00040000	/* case-insensitive lookups */
- #define FS_XFLAG_CASENONPRESERVING 0x00080000	/* case not preserved */
-+
-+#define FS_XFLAG_PROJID		0x00200000	/* project ID */
- #define FS_XFLAG_HASATTR	0x80000000	/* no DIFLAG for this	*/
-=20
- /* the read-only stuff doesn't really belong here, but any other place is
-
---a790ada8fe7b7f1ee219e7d28021102d19589829fb834fe469ae5db7b9de
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRJ2XvJtXGwULYEerQ0bnTtJTDoOAUCav7WtQAKCRA0bnTtJTDo
-OOFTAP9cSbNg14OXapAqT+mncV13potVsiqOZOXJtAk63T7kPgD/SJGc0uh1yl7P
-zMRtZOHywYA/PKzpBOYpIXLlW3BzCg4=
-=/S3z
------END PGP SIGNATURE-----
-
---a790ada8fe7b7f1ee219e7d28021102d19589829fb834fe469ae5db7b9de--
+> Return the storage error to the client. Report -E2BIG as
+> STATUS_DISK_FULL, like -ENOSPC and -EFBIG, and report -ENOMEM as
+> STATUS_INSUFFICIENT_RESOURCES. Both errors previously fell through to
+> STATUS_INVALID_INFO_CLASS. These mappings apply to all SET_INFO
+> classes.
+>
+> Preserve success for filesystems that do not support the xattr. Also
+> preserve the best-effort store for CREATE, where the file has already
+> been created.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ian Bridges <icb@fastmail.org>
+Applied it to #ksmbd-for-next.
+Thanks!
