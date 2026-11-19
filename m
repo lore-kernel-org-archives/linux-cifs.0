@@ -1,100 +1,126 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.50
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795107871;
-	b=l0vxe5VrRvsxIl6WNR7hKaj+gE51Lcb6E9VWvTLKA4WE/yMsKyKkrbbDTeU8fqOigXg+
-	 Rmo8UoynGq/SIt7zztjG8Ns1GGmuN42HciYgbrQhDZXVjV4/rSr+vorW2XPvc6b7QxT3F
-	 FzSUnP7VQrtnhurYaQWDYVrs9ufgAchJz/N/AiwJcUhLMXWlsJ4EE6sMJuW/HIwb0Xp9c
-	 tcO75kxKtPtgskFgfETT0NHu+hG6b9856NVBmmtbKZiJZ0s5RuaptQmuljGlQVnwrpBS7
-	 H4bq76XTR+WyyRNhrJiSqqs0BUSEVSqBJcoVkiCE8UorOe22KyiNccRUu48Dz4F4gDA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795107871;
-	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=2yLuK3u1QEHTUyBs9ayIe02GiJhaVWl6gJPjVQwJ7zg=;
-	b=G+3LSGOnD4Vzms5ZRZiKQbKAtNgUDNAKJWznFk20aUkMAbFv7Od1Rba1S0IE9tfFeeVr
-	 0DWNP6wzu/F3AovvTTMOJoP48A2i4sFOMRAmwhwXogSgQnkL3edVwXKULGapf871A3MaC
-	 nv/LlMWJMZWul5xnhBSqn7bs+VyVHFfFvXVM6ZdRrP+qCgljz6L+pfDAJKVTaRYUbnY1U
-	 WuPsMqzfPd8E+xJekIaCKXfInuGnUW3MCVSWdfnlsNXtsbylnr5C/3Dn0X1lJurdvAy+k
-	 Ka2ub1VP1V4OYal5DNj81KuedgKbyTMjDG8RjUMP4MoGWH35aoKGt6KQ6KfXuMqwZLQ==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=gmail.com;
-	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=s5zc6etq;
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.50
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=202.12.124.153
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795109368;
+	b=hrZc/7MGXivJ7biO+g12yGWexe56ynIFBbm4zyqxxIisq4ddpOx5B7fBH0fZPjMf64Hn
+	 UmS67gFxt88ORKuL385QTQs6i/s7NXjLUmWofy7Z9KhZccR/OQIcsnpsZeEaGL/F0XRf+
+	 HdfWvLNxsGQ2Npz7yLaw42ciIkFh840UZRZ8KBY+YH/AglHzR7VKwUb0Liy233uOkHupM
+	 i05oVAAOikG6rzyo33zzOwPzQU+Dcsq7mX0KymhZDHbHgLAaVG9B75plrhahwk2PWyoX4
+	 n4CTViVIXeP60v5IVrojx4TWR2VEQ5CjhZfsg8uR/cEKAleV1hIF65QNK33PrcLOaRw==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795109368;
+	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
+	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
+	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
+	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+	 References:MIME-Version:Content-Transfer-Encoding;
+	bh=i8tMEDSVYLVKgGjFTuvMU42m5HTOxZCy4VWNBIQuY7o=;
+	b=erYJmNLPEhbFF8XAHSbOfSUvXBBpQu+nUmyE5zx+DEBNr18VyncUs+5pDghQh1ZBLUyD
+	 8UKa7sxv8dWuCb/Xo/bnb16w9t0cXCmWWclbcOPkE8kadS8AU/WxH9mbw5ZSdGtx6JiF3
+	 qoXbfDJwXRKURW0sHGe7kXXTFrhJNXsgCCKtJ7PaDVTNxNnj6ToeVpj2dEzJ9W52BDM7r
+	 Uf21rn7QlrabcQ0ZhBLZiIGKZoAsMx2WVoCVIkHqeR/1zrPUFjU2NrFFLRcmJhFjUxQO9
+	 g5YPK0DRH4Wp3ZKbF1BnxEkoSQPPeyWHGv2kuqC/IjiACHWpR574C4wJLTyvHZnfbRg==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=fastmail.org;
+	spf=pass smtp.mailfrom=fastmail.org;
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=qlEtbqQx;
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=n2dXfaai;
+	arc=none smtp.remote-ip=202.12.124.153
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FB3606A336
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 17:04:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 51FB3606A336
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639D4606A324
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 17:29:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 639D4606A324
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=s5zc6etq
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6ba1e22ff4dso882480a12.2
-        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 09:04:30 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795107869; cv=none;
-        d=google.com; s=arc-20260327;
-        b=G5P9XoxjxnLLXh3oxQCvZqUh1PJLSQHmap2cv3DTZkVNW4AKM50s2uV9EZRkx6YbzO
-         NX8ZY0Auyx6dHmcTovfmAjwOYof1zRMDEo3G0OOveKJOxQhzuL0PVRIgKJhcKvk26P0o
-         P6Ewb7KpH7/DkwkJIWUBasg0XENXTekf3NB1PcNZ8pcn8x6BLGThvV6BOdqdik2yOht1
-         FXIKtfx1L+txuSuhQ1a+XOKDzk717yvpOehkXivwF0I0pIpjLT1E0HxgRcLdkFVCej7i
-         3GuhV1YEGukaI0GzEQWdNG94TY4Rc4R6wmj37CqzaLZKZp78sJQjHhO7U/dVG7SH6Yax
-         lUpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=2yLuK3u1QEHTUyBs9ayIe02GiJhaVWl6gJPjVQwJ7zg=;
-        fh=IIAyQfFWrxWomvXHDHmRz9HLl+4qCYZCWqvZJA0gUhQ=;
-        b=qIId6qeBG+o3xmBXYiywY/8aBnblJDmXrVdEuSe54knEEkfczWJX4daMSGMsRvnGMz
-         +O9UUuAfM4e6/oo0MBN7ml+cZ1/YnTDG8TBg7e76U++b5C6PlLFhkxchpGQdlir9YhPx
-         ODQaNfsOd6E85cHmMiMfG7L4Mg/dhuYmKiRYQ4XNRlKSthklPYvtXACQityaiVrWacvV
-         yWnpES7jKydRI5YSILc/DQVlNB505dbHXMq9+qbjyDECEBJNuRDafWwaIk/qVEdSWpZn
-         BxpFXj1Nl+vXIWlwtKHxj/HsbThs8fvKO1AhFO0Nsx+inag156RbAtRykGoVa6Cb+BM1
-         VCeg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795107869; x=1795712669; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=2yLuK3u1QEHTUyBs9ayIe02GiJhaVWl6gJPjVQwJ7zg=;
-        b=s5zc6etqP3GKrfiHHgIM6qRwBj4GIrrYXAc6mNtEDxVzqmttJaHCzBqV1dtIN+vio3
-         Bnt6ZD+22BFWnuCnU8EfLslCEzR54XnIaMRCfU4Wp6aReVvOjg7SSEeZ++TPablfbh0l
-         nWScX+/5rkWM/Hp/yZ+hSStf6OX4OY+2MyRjQ6hvynNEq3yrt2g+oozsb2uIIRwN9Z0y
-         kqeQwucwtBml5gJuvt9l9W1sgy2+Q505qHa2NQnc54/JOh7uClHStUwVlxpUu36xurI8
-         7fgIaULXH+3INvDRKkck+rkIPO9DQA/oiLHBMSnEoMnziJpuqf6MgQUtU78WnH6opbGH
-         aXRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795107869; x=1795712669;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2yLuK3u1QEHTUyBs9ayIe02GiJhaVWl6gJPjVQwJ7zg=;
-        b=YRfWYZSum3ObbH2ptTv7dy1fdkTO0NsoIGwqCLCheyj8nEzY2JSAJS4HNG8Q/hPHFH
-         +W2g4plc0fqd8i+ozsq2lzahp7VbVrsbP1WUHBz6I3j4zUnn4QTMiHWvMV8/VJy3VYGB
-         2+q0g3e0JhK+rkN//twLZcsGfcxwRUF+3BBRFypuYXTVgoT2imBJ84+JkZa9LfFUBQyn
-         /vnOGoULo+LHvGHUbxZmInwdOEubqhwCwYbsV9Zlo9IwgTh6PWSQZxWdnYFwr9bioBkd
-         H1rE6TTIDGyGrGa7v52GbNu7Zm8zMTmOSqwT7djqYtE80HQVO1vzVFjYJzY6mzGzFjhZ
-         1iPQ==
-X-Forwarded-Encrypted: i=1; AL+hErF8wKVq6n27UKiidS1ZrTIM49oCjy8AaIauMLNI7wSTF8hmL1I86TmumQM2lL8ZF11NTcTpFozCfbRX@vger.kernel.org
-X-Gm-Message-State: APuU4Z/+sM8vGaen1lIfx47WXa47y2UKeQJx8Lc05QSSBG0Hu2D/N2Cs
-	EJX0DdRrwfW0xo9CSDua5KQdTcyrvijtKHmdgS835xMQ4VewxRq8xoyLqgzMEwc6LGLKr+hM8hE
-	j5yFNFMWsadVaIXiqOkiss/JYNcdA2D8=
-X-Gm-Gg: AYBFou0emk3CisXKl/NZhEElizhvrL0SDuEOmpbivw9iHkKiFesafCzLMGPdjmXu9JH
-	GGoIk8V6QLiddUHvue90zySWGJAMc1ax8iRFjCeCpylyeQI1/OPFOzYa+lGuyMLC0D/zYkCnwUj
-	5XKv6FdhnfeBXBGabcUeu6rV8phWS6AU/x1jGqKlCtRruKsz5rPgALnGYoHpKBcaGVBmW6Cf8Ox
-	c10w5Q15T0bVf/er0DXPUB6jo5J/piNDzACqtqf3rbBXDRB/w5nPZieSQnwpTdmJBKszAwBG0YH
-	y6tJRI2921GOqXKChD6gH6tFqqvDTxlOR3uE/SZ51BFWggz3ZC5SSrAte9i7xY2mDZ6nYAq9Mve
-	epoL5Rv61pBQiKLqGKH1+ais4Kr4wXAi07Eo0ieyJOrsJLIMhmhv0inQAmAQ6FKPkCRg4qUk=
-X-Received: by 2002:a05:6402:15cb:b0:6b7:b872:27a0 with SMTP id
- 4fb4d7f45d1cf-6b887e9b3a2mr4758592a12.21.1795107868285; Thu, 19 Nov 2026
- 09:04:28 -0800 (PST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=qlEtbqQx;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=n2dXfaai
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id AC0C97A031F
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 12:29:27 -0500 (EST)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Thu, 19 Nov 2026 12:29:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1795109366; x=
+	1795195766; bh=i8tMEDSVYLVKgGjFTuvMU42m5HTOxZCy4VWNBIQuY7o=; b=q
+	lEtbqQxJEjeyuiUCrN5UuBiI2kp+CZSZKgzp8jzCyxKQgw/h3qkOxtWQEI8xdIkc
+	foNpsoydrsnjp8BQVE3Hi045a9GyEg4n9cD1j+c6+etqYUbKNDDrS5LjAa/k9v/s
+	kpOoQtYErKH0tWidxrbDiSsf0fVIzMt8W5hhHjumPvGPvhsu8Qnw6TJUcb3ns848
+	SypNatsCEqzvHOgIHsLPc5alnqzREs1SuhqFs6PEwnWsa8KuU0tMW0NjrBYKrhFE
+	iG2FHrjXe6nnhm1+bfWrBgXKMPfI6PDvZXqqFPNRk5fbbDLv7T+eeGAQ0AwTBLMR
+	WtWNTTSXwdLuGyBrpLSEQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm3; t=1795109366; x=1795195766; bh=i
+	8tMEDSVYLVKgGjFTuvMU42m5HTOxZCy4VWNBIQuY7o=; b=n2dXfaaicIQLo/dPE
+	fWf7jn5pZNG52oI3rnRW8MTxZKQ+Qbac4viUxBfm5ceYCdoRhs03PGX4vgVwYgBt
+	sqR2SKeRhlHhLmLYUfbEVi/Rn420rbJOFIP57rCYqIkqdWshqP/Ee+E6szKqALNs
+	7Ra4ml6zXs/sfOPhYus8D8A1dY2R89l6nTMT4uRqggnxcKV2tfHY+GxSXri5iNhN
+	z54DQXmUigUz4d2g8ABFsgfFCROkLVIEmTFKfY2y5hdQbDCMdOx7ib49iFhu/0NE
+	9o+JjGRn2zshdjIwqRsi5qWIaECJOWwolK+7MpIyFsw4X8Uwxze0+AwOHreqMvKX
+	ap71w==
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=sign d=fastmail.org a=rsa-sha256;
+DKIM2-Signature: i=1; m=1; t=1795109366; d=fastmail.org;
+	mf=PGljYkBmYXN0bWFpbC5vcmc+;
+	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
+	s=fm3:rsa-sha256:1ztqCYMedTPn+QzRJVu2f1KQcPj6RvleUfLVzqsY6Da5J5Z
+	OD8II7lBr28XynpuiR9jc2uW6tgcRb/fe3R54y3f4+6FE9Yyv7BLKq6iL5/dDG3D
+	WDDtbh8LcKn/p3mgoYdb8/H8BfhHJz71BoVc6TnX1XBk0bZoSJaEYZO4pWwOaFB4
+	Ty7Fxv6lxrpGSvGJlScAnPWk5kLLA7ebqn8twB8nn70wr1X156ORLIYK5Duf/NA0
+	CYAYnMR84qMRuWB6h7/NQU+J4N2Fa0ETcIl6DYhaSNF+5o85l3gs3d456beeEqWj
+	YTQ+oXS+apnfve4vx694QL6TcddL82OGvsMDzRA==;
+X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
+	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
+	action=mi-m=1; hc=11;
+	hn=cc,content-transfer-encoding,date,feedback-id,from,
+	in-reply-to,message-id,mime-version,references,subject,to;
+Message-Instance: m=1; h=sha256:SC1MlWhSOBuW1qvffNjwhRyeMekwHgRXl4hg3mljQUQ=:bo7WvcDcHlIhQrrUMAf26cpEmdBaS88CNPtnpHts9SU=;
+X-ME-Sender: <xms:9TH_ahHqh_M5u5jcxStq6niQgwK3nkoQ9gaYD6QA30RTU3DiVCXtQw>
+    <xme:9TH_albqPuGHu0KVElfbf3-_eskuKLxyqbJ3p_Q9uNviNwMBodF0wFeZPnJAqu10D
+    QqLGCMyrTIviiDDrCe5DI-9LnLPX4RrgmHxpmnbARFpkPTcYrDLL58S>
+X-ME-Received: <xmr:9TH_apXIJ5042cU0fmW9z9RwOUI-ZGLh6UDht95BY9_J9a9Kh4NYaYSCiXJCuXjr>
+X-ME-Proxy-Cause: dmFkZTGSFyIZR6YpkpmoXeA8l5V9uhlH5/peAp/yDdK8XVxH0uVvbAPv9Pr6oa7e7+bF3M
+    YQU3f4IERiBELJhHa4gpR47NR8kgXVMkFgJQFKL0H/BaamC6CadqljiaY6NJqNAMwS6OFt
+    w04AgpE/KBXIHkcMyXHQJk4kjK3c01dC/z8KufQa3+YdDwVXkwFBoHAT/JM1aFb38L0BgM
+    kBBNT2fxGsJFDKaG796alEsjFaxfImdeDskiBVCDsPsS9pbUaZRroCaBnGiRAMBlj4Si1P
+    86MvUyM9o9LG4uqLmGjPYqqcWG7RK96W7RilrSaWyOrMtb5/5rR8vPxSW0JRVZXkdrN6oc
+    mihmVLkAat+ufQrBW3wJ+vOqiQgIT0na3EVs2SrXJq8FcWzCfAQ82zf3TWPvzBR25ibXN0
+    FAFYUIH34nAGmXNr2p8HhWpCVUAro1bVzQXJ7vBU2noql4UY+y8/PBeX6cjumhbflQO19G
+    /mbXzLRMSD/ldkNd+MzMmCmQ0PgXOkvRpAcyhw6TLXHvcqZc2ExOwAwG2IPSkoO+HXNWTh
+    neyw3NH8s18ZZCIWAl50xeVG4Xd/A2MVpeNWGTQedScVWTE/UfoL/ST6dbSvZzjO8kZInG
+    XEBkwX373tGfMChPG0y8OZlfehA7pDrOX9T3+OHDfCk16B9WYQaUKmM9XDAA
+X-ME-Proxy: <xmx:9TH_ajljazxd0iXEsjwpcvXrc0vUrO5c1PEFt540bCLCw1MUAnyeuw>
+    <xmx:9TH_asADqUPRe7z7gYq7DOHI5n-Rxaae6Y0LIjgYFEOe8pNK_XhYQQ>
+    <xmx:9TH_aqgWDX4dpDL24d2y1ru8r3gTe3hfFSHwHqpHQj8UUmsPYMJWbQ>
+    <xmx:9TH_ahzmkIMztuFqamR4DkFouC1sPvprGWefOLhWtTilXqKsEZ52yw>
+    <xmx:9jH_avN4pqyMcOPf9DYpz5rHIIdG-E_l4otWuW8NoFxReJCUG9HM4gMB>
+Feedback-ID: ib53e4b78:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 19 Nov 2026 12:29:24 -0500 (EST)
+From: Ian Bridges <icb@fastmail.org>
+To: team@rootsys.at
+Cc: linkinjeon@kernel.org,
+	senozhatsky@chromium.org,
+	tom@talpey.com,
+	chenxiaosong@chenxiaosong.com,
+	mike.michalo@gmail.com,
+	linux-cifs@vger.kernel.org,
+	Ian Bridges <icb@fastmail.org>
+Subject: Re: [PATCH 0/4] ksmbd: enforce mandatory signing and encryption on requests
+Date: Thu, 19 Nov 2026 11:29:15 -0600
+Message-ID: <20261119172915.190740-1-icb@fastmail.org>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20261119103805.29514-1-research@rootsys.at>
+References: <20261119103805.29514-1-research@rootsys.at>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -104,192 +130,57 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <av4Hn9u80fs8iHZ6@dread> <20261119095943.85048-1-lauri.gates@gmail.com>
- <DMZ4VQ7SZ07T.29WMPQ0BQZGSS@gmail.com>
-In-Reply-To: <DMZ4VQ7SZ07T.29WMPQ0BQZGSS@gmail.com>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Thu, 19 Nov 2026 18:04:14 +0100
-X-Gm-Features: AclHuK_v3fdGGegcviRdfo5LNeBocqyxiM32rnjQTLwAQD9spb3t-0FSAl1IioM
-Message-ID: <CAOQ4uximow25oc=3XEN1ATgQvonQaTXtDPmQufxo75tJ=e355A@mail.gmail.com>
-Subject: Re: Concurrent FIEMAP on reflinked files serialises on the AGF buffer lock
-To: koraynilay <koray.fra@gmail.com>
-Cc: Lauri Gates <lauri.gates@gmail.com>, Dave Chinner <dgc@kernel.org>, 
-	Christian Brauner <brauner@kernel.org>, Christoph Hellwig <hch@infradead.org>, linux-xfs@vger.kernel.org, 
-	Carlos Maiolino <cem@kernel.org>, Christian Brauner <christian@brauner.io>, 
-	"Darrick J. Wong" <djwong@kernel.org>, linux-api@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org, 
-	ocfs2-devel@lists.linux.dev, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 19, 2026 at 12:00=E2=80=AFPM koraynilay <koray.fra@gmail.com> w=
-rote:
->
-> On Thu Nov 19, 2026 at 10:59 AM CET, Lauri Gates wrote:
-> > On Wed, Nov 18, 2026 at 10:16PM +0200, Dave Chinner wrote:
-> >> I really don't care if it is exposed by statx or file_attr; checking
-> >> the flag through either interface will be orders of magnitude faster
-> >> than using FIEMAP to iterate extents on every file to find shared
-> >> extents. My concern with statx is coherency - it runs completely
-> >> unlocked and so can race with operations that add/remove the reflink
-> >> flag...
-> >
-> > Thanks, Dave and Christian. Given Christian's preference and the
-> > coherency point, I'll write the RFC against file_attr, once the
-> > question at the end is settled. xfs_fileattr_get() already reads the
-> > flags under XFS_ILOCK_SHARED, so the new flag gets that without extra
-> > work. The answer can still go stale right after the call, as with any
-> > stat result: a clone that lands after the read is missed, just as one
-> > that lands after FIEMAP returns is missed today.
-> >
-> > As I suggested on the 6th, the flag would take the inverted meaning,
-> > so that an unset flag stays the safe answer: say FS_XFLAG_NOSHARED
-> > ("no extents shared with another file"), read-only, in
-> > FS_XFLAG_RDONLY_MASK next to the case-folding flags.
->
-> Hello, I don't have any say in the FIEMAP issue, but I wanted to let you
-> know that, since also a mask was mentioned and your patch would be
-> touching the fileattr API, there is work going[1] on for adding a
-> fsx_xflags_mask that filesystem use[2][3] to advertise supported flags (o=
-n
-> get, like stx_attributes_mask) and users use to say what they want to
-> change (on set).
-> It doesn't seem like an FS_XFLAG_NOSHARED flag would touch this new
-> change, but I thought it was worth pointing out, especially because this
-> patch would also add FS_XFLAG_PROJID and a new FS_FILE_ATTR_XFLAGS_MASK
-> to have a way to include both legacy and newly added xflags, so
-> FS_XFLAG_NOSHARED would maybe also go there (correct me if I'm wrong).
->
-> > Christian, one question on the shape within file_attr: would you take
-> > the inverted flag, or would you rather keep a plain "may share" flag
-> > and add a mask to struct file_attr that says which xflags the
-> > filesystem reports?
->
-> And if Christian chooses the mask approach, then my patch[4] becomes
-> relevant.
-> (in [4] I put the patch that will be sent in v5 of [1], since in [1]
-> it's merged with the ptime change)
->
-> (For Amir who I just CC'd, [5] is the main link for this thread)
+Hi,
 
-Thanks for the CC and the link
+I tested the series on ksmbd-for-next 4616bbc5389a with KASAN. I used my
+own probes, smbclient, smbtorture, the Linux cifs client and a Windows
+11 client. I compared the series with the unpatched head under four
+server configurations. The first kept the default settings. The second
+made signing mandatory. The third made encryption mandatory. The fourth
+made both mandatory.
 
->
-> Thanks,
-> koraynilay
->
-> [1]: https://lore.kernel.org/all/20261115180343.576773-1-koray.fra@gmail.=
-com/T/#u
-> [2]: https://lore.kernel.org/all/CAOQ4uxj82K4z+2OiY5W1g7NyWAFOFjqqWnZSS3p=
-rytW36j1LgA@mail.gmail.com/
-> [3]: https://lore.kernel.org/all/CAOQ4uxiuJ=3DeZu28FZAUz3rpqPKqCimPxJucOn=
-YYuBowvD09_Cw@mail.gmail.com/
-> [5]: https://lore.kernel.org/linux-xfs/20261102193533.93690-1-lauri.gates=
-@gmail.com/T/#u
->
-> [4]:
-> commit 0efe0de3b5cc2b767aa6e2bb9174eb05b0d818f1
-> Author: koraynilay <koray.fra@gmail.com>
-> Date:   Tue Nov 17 14:57:47 2026 +0100
->
->     vfs: add xflags mask to file_attr API
->
->     Add fa_xflags_mask to struct file_attr and equivalent fsx_xflags_mask
->     to struct file_kattr.
->
->     This lets filesystems advertise their support for specific xflags and
->     users specify only what they want to change, behaving like
->     statx.stx_attributes_mask:
->     - on GET (file_getattr): each filesystem fills the mask according to
->       its supported xflags, e.g. FS_XFLAG_COWEXTSIZE or FS_XFLAG_EXTSIZE,
->       and provides the values in the corresponding struct fields;
->     - on SET (file_setattr): userspace fills the mask according to which
->       xflags it wants to change, VFS validates this and preserves xflags
->       that were not specified in the mask;
->     - if xflags_mask =3D=3D 0, use legacy full-struct replacement to keep
->       compatibility with older programs.
->
->     Furthermore, add the missing FS_XFLAG_PROJID flag, to allow userspace=
- to
->     set the projid using file_[sg]etattr().
+My probes negotiated SMB 2.1, 3.0, 3.0.2 and 3.1.1, with and without
+encryption support. They sent TREE_CONNECT in plaintext, signed and
+encrypted. NTLM sessions ran in all four configurations. Kerberos
+sessions on 3.0 and 3.1.1 ran in the two configurations with mandatory
+encryption. With the series, ksmbd refuses unsigned plaintext requests
+on sessions that require signing and negotiated a cipher. It refuses
+plaintext requests on sessions told to encrypt, and tree connects
+without a cipher when encryption is mandatory. A 3.0 or 3.0.2 client no
+longer sees an encryption capability that only an earlier client
+offered. Encrypted requests get the same results as without the series,
+and so do signed requests on sessions that are not told to encrypt.
 
-Correction. usersapce can already set projid using file_[sg]etattr().
-With FS_XFLAG_PROJID in fsx_xflags_mask, chattr -p <projid>
-could set the projid without having to read and set all the other xflags.
+Linux client file operations matched those without the series in all
+four configurations. The mounts used SMB 2.1, 3.0, 3.0.2 and 3.1.1, each
+without sign or seal, with the sign option and with the seal option. The
+only difference was the expected SMB 2.1 refusal when encryption is
+mandatory. With encryption mandatory, I also tested SMB 3.1.1
+multichannel and Kerberos mounts on SMB 3.0 and 3.1.1. One Kerberos
+mount was still in use after its ticket expired. Windows 11 mapped a
+share and copied, listed and deleted files in all four configurations.
+The smbtorture subset I ran gave the same results with and without the
+series in each configuration, including one test that times out in both
+cases. smbclient also gave the same results, apart from the same SMB 2.1
+refusal. No KASAN reports were recorded.
 
->
->     Finally, in order to prevent the legacy FS_IOC_FSSETXATTR from accept=
-ing
->     FS_XFLAG_PROJID, add an FS_FILE_ATTR_XFLAGS_MASK to support new xflag=
-s
->     and use it in fileattr_to_file_attr()/file_attr_to_fileattr() to
->     validate that the xflags passed in fa_xflags and fa_xflags_mask field=
-s
->     are valid.
->
->     Assisted-by: Gemini:3.8-flash-high antigravity-cli-1.5.7
->     Signed-off-by: koraynilay <koray.fra@gmail.com>
-> ---
->  fs/file_attr.c           | 46 ++++++++++++++++++++++++++++++++++++++++++=
-----
->  include/linux/fileattr.h |  5 +++++
->  include/uapi/linux/fs.h  |  3 +++
->  3 files changed, 50 insertions(+), 4 deletions(-)
->
-> diff --git a/fs/file_attr.c b/fs/file_attr.c
-> index 833e03810b24..56ea65f790f1 100644
-> --- a/fs/file_attr.c
-> +++ b/fs/file_attr.c
-> @@ -102,10 +102,18 @@ EXPORT_SYMBOL(vfs_fileattr_get);
->  static void fileattr_to_file_attr(const struct file_kattr *fa,
->                                   struct file_attr *fattr)
->  {
-> -       __u32 mask =3D FS_XFLAGS_MASK;
-> +       /*
-> +        * fsx_xflags_mask contains only flags added after the
-> +        * file_[gs]etattr() API, so we need to tell userspace the filesy=
-stem
-> +        * actually supports all legacy (FS_XFLAGS_MASK and FS_XFLAG_PROJ=
-ID,
-> +        * which lacked its own bit) and new advertised flags.
-> +        */
-> +       __u32 mask =3D (FS_XFLAGS_MASK | FS_XFLAG_PROJID | fa->fsx_xflags=
-_mask) &
-> +                    FS_FILE_ATTR_XFLAGS_MASK;
+This review leaves out the issues that Sashiko and Michail have already
+raised. Apart from those, I found one response-handling issue in the
+new rejection path in patch 2. Only a client that sends plaintext on a
+session that must encrypt reaches it.
 
-This is not exactly how I envisioned exporting fa_xflags_mask.
+> +	/* MS-SMB2 3.3.5.2.9: a session that must encrypt takes no plaintext */
+> +	if (work->sess && work->sess->enc_required && !work->encrypted) {
+> +		conn->ops->set_rsp_status(work, STATUS_ACCESS_DENIED);
+> +		return SERVER_HANDLER_ABORT;
+> +	}
 
-fa_xflags_mask =3D=3D 0 means old kernel or unmodified fs.
-
-For a new kernel with fs that supports flags other than
-FS_XFLAGS_MASK it's the fs responsibility to advertise its supported
-flags.
-
-Something like:
-
-     __u32 mask =3D (fa->fsx_xflags_mask ?: FS_XFLAGS_MASK) &
-                              FS_FILE_ATTR_XFLAGS_MASK;
-
-     memset(fattr, 0, sizeof(struct file_attr));
-     fattr->fa_xflags =3D fa->fsx_xflags & mask;
-     fattr->fa_xflags_mask =3D fa->fsx_xflags_mask ? mask : 0;
-
-Then you can add filesystems that support get/set of new
-attributes without support for legacy attributes.
-
-And specific filesytems could opt-into the set of an individual
-attribute like projid by advertising
-fa->fsx_xflags_mask =3D FS_XFLAGS_MASK | FS_XFLAG_PROJID
-or a subset thereof.
-
-And I am still on the fence wrt should API also advertise the
-fsx_xflags_ro_mask in addition to the supported mask.
-
-The advantage being that it makes the interface symmetric.
-User can alway setattr() with the buffer they got from getattr()
-and instead of randomly ignoring flags in set, the fsx_ro_mask
-along with fsx_mask defines the behavior exactly.
+An unsigned plaintext SMB2 CANCEL for a request that is not pending now
+gets a STATUS_ACCESS_DENIED response. Without the series it gets no
+response, as MS-SMB2 3.3.5.16 requires. That section verifies the
+session only for a signed CANCEL.
 
 Thanks,
-Amir.
+Ian
