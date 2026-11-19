@@ -1,86 +1,90 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.50
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795088992;
-	b=UE3H0JfflwnIhTTdMAFg2EnbkzoivqftyF0N61LcpTv9BrLT67CWR0bXqjVx8xpzXTf2
-	 XnrdKnf0mFtZ7Z/F9EvVdhiDfWPZku30GWCAggEyuDNg0+X0lU3jxrqaZo13hmUPp5rDA
-	 svEFH5coyYAT0KUm/2ewokfHmIYkX9Egg+ITHRaBmpd0wYxZXenNtrBIxpeYG0XhLX8Xi
-	 yNdGh8rys4f+/MronVYq0jfnvBOQOyXTjzUxcb3SppuSs6Cfj73alfAWGRbI/8kH5D+B1
-	 0P2YBIaic29B3UqlMMFVFgNJNZwQbInL1zxg9j8RZc+BlxhANqYLzy3Qtrp1LlGW4JA==
+	t=1795092702;
+	b=sTasOM5bJdkW/ez0dCzu0sYPLXucU1ohTIUYIrrckwNVKTwDP15hS3FGgcOgiGqo+Esh
+	 HJo3VuyAlCZjHp+V1s0/wUskVW+5KUStNFWw6gtMa4EL2v64eUDSjvnNhzHm3RkChS95e
+	 lr8kag4r+yBvmo80gt9EcLCWeaLluSNkIdZeJMk0+g045mj/oScYaTvkOGXLj2PFu4Vo5
+	 ECSWN2RbhTLopxqZBT0aWmnTAHHMmLldngEpf69LgGZd9UQBK5k0M77oSEGSLHE2Kx57o
+	 /oZsAiixFfXwbIc3l+v8f2RGZTR2azZauLza8z86b40KKb1jg+X/o6Y85tbn0TUgFQw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795088992;
-	h=DMARC-Filter:DKIM-Signature:Received:X-MC-Unique:
-	 X-Mimecast-MFC-AGG-ID:Received:Received:Organization:In-Reply-To:
-	 References:To:Cc:Subject:MIME-Version:Content-Type:Content-ID:
-	 Content-Transfer-Encoding:From:Date:Message-ID:X-Scanned-By;
-	bh=IsxZ3bxno6EnIg0EDPua9HML/+iFhkLvwUEGIoUt8W4=;
-	b=ywseIHcgaKQmHHGEXMrSG5AbTUS6KQpTnLSpeXQTTFYO5Lirxr82sTF1B5P3YJ7hfHhB
-	 OL0SqVWuOZq09f7BLuJus0pzKHStXjMJmtoNcDROLjWFwV62v8DNo22GIdYp/RTpuH18K
-	 exHZLpQNs/1r/MsHapZNT7qXsh63l3hjoegBkRWz6S5xYaVgIs+Rw+qAHfMyZKwkKAp5l
-	 eo5kKoXfrV54fc4X3r0gwUJHjNhPmzsWBoDIkvk8Kpj6psgttUOr0uUY4lj+R8Oeq5Xe4
-	 MUcbgOiOaAIj+DPP5BEPNUFc6qT0PMdgSriVEmK85VeF/EHmyquxKKQV6WWPhZqWMcQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795092702;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:X-Google-Original-From:Content-Type:Mime-Version:Subject:
+	 In-Reply-To:Date:Cc:Content-Transfer-Encoding:Message-Id:References:
+	 To:X-Mailer;
+	bh=f9CWKRySaY+gGPTkMts1lgr3xOnoMTU8fBqxubqcpi8=;
+	b=whyxhelI1+GBMPrZEGsnUAIT9E5xkE3x3n6UyX7e/XrHaxTwxzsos6yuNBfAZB4Eqj2u
+	 aMkbp7OiNJlEGbLI5Ml2yoVZLi8MeGM4vVCSB0kByP6m0xpJ59jY2dJz0KRI04pLeMKSr
+	 t4bNRYXJX5uQk/wVgV4hzUUpWmG2WuDlQgGu1lT5GlxgzpsnCVRGQoWACSLlqLW5UN3EI
+	 jrnauyvkMjSeWsv6T7Rkzx1MHbBLW853qY3wijrWsJkd5w7JosGKl3Ny59OSLd/QayGvz
+	 k9WAl7bOfMJ8dlGoqpbQS3dKlUvSMV1SrVQ89PXzE6RA64JoEoIVJTw1DWkmHQvnERA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=redhat.com;
-	spf=pass smtp.mailfrom=redhat.com;
-	dkim=pass header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=KxFxOqcW;
-	arc=none smtp.remote-ip=170.10.129.124
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wzLPeDSy;
+	arc=none smtp.remote-ip=209.85.218.50
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FCB60A2611
-	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 11:49:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 48FCB60A2611
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC72606A320
+	for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 12:51:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 6CC72606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.a=rsa-sha256 header.s=mimecast20190719 header.b=KxFxOqcW
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1795088990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IsxZ3bxno6EnIg0EDPua9HML/+iFhkLvwUEGIoUt8W4=;
-	b=KxFxOqcWk0ntE2JdHuEATQJeYXRTnub+pEFSsEfK0+FVhcTpx2CIDx6Em/LdXLgo5zcT4L
-	p4jwnaNixvRHfnsTpBqmcnYj7WiVilEy49n36yzw6aK2ADQX2XFgMkfoj1XxS67P9jEMb/
-	K1rpVP01ccvBUNFyKVM7ZC/Tpzvpw/8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-597-tJa0fbcpOc2FEqPbTXJloQ-1; Thu,
- 19 Nov 2026 06:49:47 -0500
-X-MC-Unique: tJa0fbcpOc2FEqPbTXJloQ-1
-X-Mimecast-MFC-AGG-ID: tJa0fbcpOc2FEqPbTXJloQ_1795088984
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A5DBA19560AA;
-	Thu, 19 Nov 2026 11:49:43 +0000 (UTC)
-Received: from dhowells-thinkpadp1gen8.rmtgb.csb (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1C098195B3C6;
-	Thu, 19 Nov 2026 11:49:38 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-In-Reply-To: <20261119083851.3306418-15-dhowells@redhat.com>
-References: <20261119083851.3306418-15-dhowells@redhat.com> <20261119083851.3306418-1-dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: dhowells@redhat.com, Paulo Alcantara <pc@manguebit.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Namjae Jeon <linkinjeon@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Stefan Metzmacher <metze@samba.org>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Shyam Prasad N <sprasad@microsoft.com>,
-    Tom Talpey <tom@talpey.com>, Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v19 14/17] netfs: Switch folioq to bvecq
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=wzLPeDSy
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c4395d31228so342428766b.1
+        for <linux-cifs@vger.kernel.org>; Thu, 19 Nov 2026 04:51:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795092701; x=1795697501; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:subject:mime-version:content-type:from:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=f9CWKRySaY+gGPTkMts1lgr3xOnoMTU8fBqxubqcpi8=;
+        b=wzLPeDSy6hTbygJ/Q/2SrRkTCMNidhSd0+2WweE4zBAU+rlsQWYC1OvMCLf59UIO+G
+         iXWb5FjW8kfcazHDWbrzZctgnxRZYP4CD7hDicL2JqTdNmRnHWcddeXXKQIWdCfap4io
+         0Rqq885co5Hq7sPvZCXBXHqXVjqOhY+OEnI2xASidBjRMyY8Ya/Ija6Vru6nNrQqEjTE
+         0W0R7dk5dZwD66H+TcFh8MTiZ3BGaL7V2aC6WOyADmSgXYJNi1tZS800XqxboERCDSmt
+         0JKEfQ77DybF5qtnb91v1i5vGWEfI5RBxKh6zeSZ09HPnvSPjNx6GwNz1o5Q27CxfPWC
+         etuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795092701; x=1795697501;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:subject:mime-version:content-type:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=f9CWKRySaY+gGPTkMts1lgr3xOnoMTU8fBqxubqcpi8=;
+        b=xFH6LsMGGV47GW15VYY/ucUOzunMb2TC69EM9v87AuFTNI8CDQwvDyL1+tTie68ofu
+         jOg8+TCW8DgFuCsBJndL/aj0sEC7kN42oqbekM1yOZrsnOa6cX5nD4h58mV2+vICevzM
+         nycNW/j+VOYfCFgwozBwg5sKJG/NlM/Qdc+iMqW1V5O/7HS0ecVLjEwbbx/e2FT9pZ9O
+         /DWzIF9GPhdC07T1ik53sW71+giD29eIiAbw2zhkU3jnZ1BoPbI4//LTEA3n5QckA5y/
+         QvvZAIV33VjutoE6TjNtDWguO1bHRvyi12oN+4jXpcJPl+8roKvdjX6nAWevzqxK/uel
+         k0Xw==
+X-Forwarded-Encrypted: i=1; AL+hErE566RDAicPLDlvFoeWtPuJGj3wOogo4wAkycv3bvJU48Sp4sgFq9Tnl106IlMz/NxB9pH2nDl6+M2z@vger.kernel.org
+X-Gm-Message-State: APuU4Z9jHwGBHPjSFqQzpOZpLBQWr5mpdbKMnPO0VqPAPxNSoWaUrPQ7
+	kG3ckmOm67BbF0lnid0rPbbCoD8aFYzg4yGHCBfYW2RNgqc8sW9t/172
+X-Gm-Gg: AYBFou1d+YUAtB/IQZnRoCE4O9Fc+SElJq8B/X71iHF1PtGGGwuOg4uY9XC0K1sSph5
+	vkNruoLlcTeIo5rZpHot1S6C5lXzmYUjBi1PphIK9wwivb99j0HT7PSrrrf24c/b27yahp/Ux18
+	EW0Bo2HibG6rZ0CGszsapC0KaIQME8+nOXSRlrho3aJ8+SYeoch/ZBdiqnf+b7JrRazeY/NPlBr
+	WzFA3P04b9giqmBL7sDiRuVy1KEiFX4NxQetRmZ5TJ2NIKmE0pBJo8mnajscSNIsdSuD0Zp6LOs
+	mZ6tHZqz5xTgi1KI2za9wLmwQdWCEPNlHpJgBHGFKozAPM4voXCW59Cj9oQxk3rxUwe3tJFgipu
+	jCPYNEOQUpB3JXBfwkRfPEKuTHifXR+jjYBa79gxx/cXSEi32Q+7BqZtdSzFNw+A3NSRrdGYK42
+	8Ps54FoP2GFQCPLGV48e8Ju7GKo3hA9LFp4rSjZzbO0RUWvz2C9JH7PYSWnUj6G/Lt0R7h+lSR8
+	p/d5arupe8VjHK4dprNgX4ShfszBbJjj8AVySxsTzODNR8o6XQpO9ilOLqIkg0/Cwqn9gJPj8gB
+	9+tjKQBv+grpOoZbkyc1h6MBKiFTCr59Zd62xLDitNSJOBno7g5dRWWfKIyubwUVSWLwtiF6t9X
+	UkLEN7cCffb26FTo72xfEOQk4e2V3rihQtg==
+X-Received: by 2002:a17:907:eb03:b0:c51:22b1:e797 with SMTP id a640c23a62f3a-c5122b1f2cbmr313585366b.10.1795092700591;
+        Thu, 19 Nov 2026 04:51:40 -0800 (PST)
+Received: from smtpclient.apple (wlan-197239.nbw.tue.nl. [131.155.197.239])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c51233c2fb4sm103765866b.27.2026.11.19.04.51.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Nov 2026 04:51:40 -0800 (PST)
+From: mixalhs <mike.michalo@gmail.com>
+X-Google-Original-From: mixalhs <Mike.michalo@gmail.com>
+Content-Type: text/plain;
+	charset=us-ascii
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -89,50 +93,67 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3330894.1795088857.1@dhowells-thinkpadp1gen8.rmtgb.csb>
-Content-Transfer-Encoding: quoted-printable
-From: David Howells <dhowells@redhat.com>
-Date: Thu, 19 Nov 2026 11:49:38 +0000
-Message-ID: <3331469.1795088978@dhowells-thinkpadp1gen8.rmtgb.csb>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.700.51.1.1\))
+Subject: Re: [PATCH 0/4] ksmbd: enforce mandatory signing and encryption on
+ requests
+In-Reply-To: <20261119103805.29514-1-research@rootsys.at>
+Date: Thu, 19 Nov 2026 13:51:29 +0100
+Cc: Namjae Jeon <linkinjeon@kernel.org>,
+ Steve French <stfrench@microsoft.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Tom Talpey <tom@talpey.com>,
+ ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+ linux-cifs@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <D3CC3C6A-0F15-4533-9687-F776DD1BED94@gmail.com>
+References: <20261119103805.29514-1-research@rootsys.at>
+To: RootSys GmbH Research <team@rootsys.at>
+X-Mailer: Apple Mail (2.3864.700.51.1.1)
 
-Hi Christian,
+Hi,
 
-If you apply this patch, can you apply the attached change to it to fix a
-potential NULL deref spotted by Sashiko[1]?
+I tested the series on top of ksmbd-for-next with the session setup
+signing series: with "server signing = mandatory" an unsigned plaintext
+request on a session that offered a cipher is now refused, with "smb3
+encryption = mandatory" a plaintext request on a session told to
+encrypt is refused, and a client that offers no cipher can no longer
+tree connect. My binding, expired-session, compound, encryption, guest
+and anonymous tests give the same results as without the series, the
+Linux cifs client works, and there were no KASAN reports.
+
+A few comments:
+
+- Signed-off-by: submitting-patches.rst asks for "a known identity
+  (sorry, no anonymous contributions)", and I'm not sure a team name
+  counts, so it may be worth checking. Separately, From: is
+  team@rootsys.at but Signed-off-by is research@rootsys.at, which
+  checkpatch warns about.
+
+- Patch 1 depends on sess->sign_required, which no stable tree has yet,
+  so the Cc: stable tags need a dependency note; patch 4 does not depend
+  on anything and could go first.
+
+- Patch 3: MS-SMB2 3.3.5.5 fails the SESSION_SETUP itself with
+  STATUS_ACCESS_DENIED when encryption is required and the dialect is
+  2.x, or 3.x without SMB2_GLOBAL_CAP_ENCRYPTION, so a relayed login
+  would be stopped before authentication completes. On SMB 3.0 and
+  3.0.2 the tree connect check never triggers under mandatory
+  encryption, since init_smb3_0_server() and init_smb3_02_server() set
+  the capability unconditionally; patch 2 covers those instead.
+
+- Patch 4: in the default "auto" mode the leaked capability gives a
+  later 3.0 client that offered no encryption sess->enc and clears
+  sess->sign, which is the hole patch 1 closes; that may be worth
+  saying in the commit message.
+
+- A signed but plaintext SESSION_SETUP reauthentication is still
+  accepted on a session that was told to encrypt. Should it be refused?
+  MS-SMB2 3.3.5.2.9 fails an unencrypted request on such a session, but
+  I could not find text saying whether that applies to SESSION_SETUP.
+  Only the session's owner can sign it, so it is minor either way.
+
+Tested-by: Michail Andreas Michalopoulos <mike.michalo@gmail.com>
 
 Thanks,
-David
-    =
-
-[1] https://sashiko.dev/#/patchset/20261119083851.3306418-1-dhowells%40red=
-hat.com
----
-diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
-index 852b2cb73435..d229e797ef23 100644
---- a/fs/netfs/buffered_read.c
-+++ b/fs/netfs/buffered_read.c
-@@ -277,14 +277,15 @@ static void netfs_read_to_pagecache(struct netfs_io_=
-request *rreq)
- 		.cached_to[1]	=3D ULLONG_MAX,
- 	};
- 	struct fscache_occupancy *occ =3D &_occ;
--	struct bvecq *mark_bq =3D rreq->buffer.tail, *mark_pin;
-+	struct bvecq *mark_bq =3D rreq->buffer.tail, *mark_pin =3D NULL;
- 	unsigned int mark_offset =3D 0;
- 	ssize_t size =3D rreq->len;
- 	uoff_t start =3D rreq->start;
- 	int ret =3D 0, mark_slot =3D 0;
- =
-
- 	/* Pin the bvecq whilst we mark folios for copying to the cache. */
--	mark_pin =3D bvecq_get(mark_bq);
-+	if (mark_bq)
-+		mark_pin =3D bvecq_get(mark_bq);
- =
-
- 	do {
- 		int (*prepare_read)(struct netfs_io_subrequest *subreq) =3D NULL;
+Michail
 
