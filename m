@@ -1,55 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.128.45
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795173500;
-	b=EOQjhVrbcJDfSr/hxvbW6OPzm26wrWcfe1yCcxm88YV0SxQ4gGgqauH1U4pjy+Vk9AN3
-	 E0H16g1g5Mr8gz9Rdo5QMIN6h5KQ5PDcMEnBaIc/vKGdtClBDyRkf+TlE11wQW5QPFLSl
-	 OnDnzV9QDV6xm7mm0Fcna/rUdhy2jlB9wzk13/wAe+4VTaZVAxR2w5o8ulxMfIcNhZ5VU
-	 osnpBiBHb9ioWpBV9XhXUjHN3ZWHdkpLyXaAF2JA7XZKNdk9pF2m+z5wxTs4WO0kyeav6
-	 8bDkfW13vd3cpwCYyhqZXobC2jsw0TvX6+3FDZ0axd2yF6qX7Bi2ViZAvHbNweRRDMQ==
+	t=1795181033;
+	b=fwVjPFwKK9u6jkWgALkqFKHrAt0qOOdb/a2Hfpw+O2h8rXkUca6rKzg8B1yu1VrJ8d6/
+	 c8nQzqJ7p83OqOX+Cf1pfp7t6tqyrra+ANTndr2sBA9Al2in0kpNXnIPqEeSIT0ACLhSA
+	 Fxw6mn4sJPNrJRLFDwAM8fYwtY73M3YPgNZfVhQ2nZvgSUzDsICg9F5Za6x0DCdHQbOD8
+	 UfcTuOI/XVZWUq3imTac8be2abbBLmiuH9IeoCQIHxLeexjwmhdIGNzQdMqiuBN5E0ckf
+	 BknI6XVNm6gRkcsHL0xcPXVkdvcljqcStjY0D9jEaKUS6W1FWnXtiEDinYOIgyjVSGg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795173500;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=QpwrwuyYefJeguNX3eB2vqlNgBeQx08UOZ2jn4SFsrk=;
-	b=hcojDaE4nQmZpS8yb3RAHE3qoFW7YQlgQFK2YGUppIrf+D8rvcf+u9mSatYv/zwayYPm
-	 XCSpybAo8QpFOO/SEL2Z0D62n+1SDpIStwvrhGbk0P5z9WT5PdV+M0iJ2TF5A8A3H4CK6
-	 1qDfT48f9gpH7x667fiFqEsWW9RGaYWVa9fSGl+iHYjlI0bKBtlXqBlqGmF6w85/KbzxP
-	 zk+E6Qa6Fb2/WcG/lDPi51G7syvOh0Rz84sH3haQvxzWcPYfed1uLagYnKpkyIowiiGY8
-	 xom4ldos4AmTbh6BY3BvRAqJTfKO2Q1KzII166w97OnpZrjd71KK3oqmXfLlT5znXgQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795181033;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:X-Mailer:
+	 References:In-Reply-To;
+	bh=U9t5C73ir3/3QySglAwAwVOJ69q66296+82EjWEvxrc=;
+	b=m2OjQerOa9qf4+fbqz7++N+nw0eJT8jwJJNT8VXl8jvtKTtDOWEkv9uL+s+RclWUEF2G
+	 WOe9/TOHaKEdx2iOZWiK36HGdND1aC/Uqii+zRdYCaxTIK+RXPL/r2MGx0mYCAcCs23zy
+	 x1RozujQZEoy7uuc396o9zSb1DKfk/5W9tPoQqQtl7+oFmIbbjckRui3K1vJYsiRT6YVB
+	 NKaszsDixt+sWRgTIWwD201chqOzDV4o3FcydAZNsAdNEYarckXDT8ughY2KatAPlf/ku
+	 A2mQ43tFgnRBkcxsgD9e9czMiD01aE6HgFxureAIXJZ/BvkZiu8jGOYIFITdpOSfekg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JEFuWw0Z;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TUVe1kLT;
+	arc=none smtp.remote-ip=209.85.128.45
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E413E606A331
-	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 11:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F58B60A261C
+	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 13:23:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8F58B60A261C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JEFuWw0Z
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F5131F000D4
-	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 11:18:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795173499;
-	bh=QpwrwuyYefJeguNX3eB2vqlNgBeQx08UOZ2jn4SFsrk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=JEFuWw0ZqnxSsd9gApfHEoIfvpYKYnbgOZpVdQDg+iQtmNizS8ej3v/qi55B+uett
-	 5XnjAzMHq6DOAVvWkeJ/hj8tk6mrD7ZHOH350tQ22xX3BNBy64/OsCGIwwgccOc9a/
-	 jRgsxZ5WZtfuf6/d9MZpc20dqSNNi/vfbGfNRNZ0LyGl476sJSxHU9Ta13OfmuZSI8
-	 OIlFNsDyZOEpkeICMLkR1XS/BWd1eiz2/Uufuo70ObXUh4BQOnWq28+2zdT719/0Tt
-	 Hm8YvayZWybkMEVuA73pqvHRwehAYlGIgmp7ehiYxZ2vbiXSNVP/49unfHCUVnj1ea
-	 OsgCm3exmW74A==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c5127c7abd5so130853466b.3
-        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 03:18:19 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErH274xCVBKHcsIxOdoZjGUDp9p/YUe3NDC9KuAyjvlUvPvpWwI/a9BOQiEia0Uf5Aj7XwCy5cOEV7Jc@vger.kernel.org
-X-Gm-Message-State: APuU4Z9s9CquOF1AqpT6SIFQFVzZoSSrRavc3Rj7JwhOWNS8RuiCmcUQ
-	SC6nT/LUU/hFyulCmDsnL+N2Kg/N+Fw1ewBnX/WfMUhJzEFDo4dSL8V+p8GIm7QGRIC+xwSgG2T
-	TzTvykGlhngN2M/m/o8Fm2xEsNlH+GKg=
-X-Received: by 2002:a17:907:a890:b0:c50:9432:b7e3 with SMTP id
- a640c23a62f3a-c513aace654mr313122766b.42.1795173498034; Fri, 20 Nov 2026
- 03:18:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=TUVe1kLT
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4a2153c8525so6733955e9.3
+        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 05:23:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795181031; x=1795785831; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-type:mime-version:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=U9t5C73ir3/3QySglAwAwVOJ69q66296+82EjWEvxrc=;
+        b=TUVe1kLTe1RrGjkZcB0Jll6qRkbhub5RAYrrBdXYAW7cCWc5ZfKjmtHsxejUWkMmqG
+         JzPS+ZpHkP7wYDJTT9lXMucUyvaeiJXactdfcKWcDDB8coLAUlZ+SLxV/1HOPt72Y8vR
+         ZlJc2GAvUJ9zeSXBUpYabS2EM7tBgAyo4jIeTRVyCxLex4cLnS2ZffMAZOHSFIBuAhgb
+         IhJ9TGzBnVeS+qk3W+h/M+Afxb+UT1xmww35AkhR+sZmys0qIASFOsZUqQF5VUqAX1D4
+         CPz+yTqfhss6B38ZRKGfmP0RMlFT5D9wepGDZqnoCfxFFAl5qcguvOeWnzTzLCK4pe1x
+         4Yxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795181031; x=1795785831;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=U9t5C73ir3/3QySglAwAwVOJ69q66296+82EjWEvxrc=;
+        b=lqOhbWQQjspgGzz80iJZivwTFVuFkRXphudjo3jlSNEm2x1TQ0qz1NEPk4CnjopYLA
+         WxPtWFqId1zJ4fX8c8P5FLHGD5p0C6ymrHhNe2oFVpqGFppCoCWzFej7YVQ9viba7GZp
+         na4IqMqJQV/0d7MxTbcFAfuWuYUaPA3/UZlqn0rISixRW2uCaNTqgp1tFSmHWzLgo5fd
+         kLMbX6YwqD8PzhrqWnn3Eff4qsmjYXYyGUrCXjVeRwhSHjaPs+gQTzrVOw88wDvzBNj/
+         dHfMZK4seWiRuimNcYj8OJte41VphPeUURDVWPkbHwV5wD6Iqr+2UvK1Uj6jwP74taH/
+         Bg3g==
+X-Forwarded-Encrypted: i=1; AL+hErE3GXZ525p9iKqXb1t+FuSU1NFjAGfy4X/FBWdr23Bo3T+lBat2/cSOzuFlDo5YgVFpux1S8hCvp3dJ@vger.kernel.org
+X-Gm-Message-State: APuU4Z87+xqmsmoLHbY6hZ3l52Z3xv3fTw3EMGbkD1tQjQJ+GzvwzXiT
+	chX9KmyanTufoi/2ehBfTEnEAPWS7905xWj+J8EW+ngI6O06H0DEnZD7
+X-Gm-Gg: AYBFou3sR09H3UCFXSzZgefClnQaaP1wNlmcvz6hWfX6BuMAoQLHI010M3LdRhYj5EP
+	eInNYf7vcLBfsnGN/TkLz+78ZZoVNiRd6TtGzIZLb/8ASMmxygifagzvL8MIrPfXYkHtgojK8RA
+	gqamxnFNXh3IoIpBTEbLd+Yq2OOrqrcVSHrCN5FGro5Wtfb9DwZ5b5nSk9yiCkzPKBLAU9n3h3e
+	b7w1mg/6DGwfl0WIkYHs2iv89vNLlgp50uQRn1cZb7sKJw7ra3A/IsD+k9Rr1Q2CKDqVT39UA11
+	R+KHKCF3tvtfEFShLd5CZLiCectyNCpMwABksH1wK8gSZ3udXwei/ezH5GA4mcLuzpdQZxgd9ox
+	skYvaq+nERCD5d8E04+lLpDXBF1mSLNN3748S9iBYDPSJgaeHlHl/F/X9r8Vaw2D8+Shz26zBja
+	1MgMP/vf1+1mvgqu009Q81KM5Z33ICtMy9y4qM0GYYhNWvZVOiUD9ey+eyr80cQJih19UhZ8rZt
+	y9r5aXnfAsLPXtZD4Dq1ffyJoitHa2BIiSMfl2fbkXH1RjEcN71FJhJq3mK0vevh1+dpNVPXR0X
+	ZSNxEK90iHaILBXy0MDsYysJxHEiJFnLxwlgQsIJnBdmtWUo
+X-Received: by 2002:a05:600c:3b83:b0:4b7:6b96:e431 with SMTP id 5b1f17b1804b1-4bb88822242mr75040685e9.28.1795181030668;
+        Fri, 20 Nov 2026 05:23:50 -0800 (PST)
+Received: from localhost ([130.192.98.149])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab65cb41f4sm5518234f8f.7.2026.11.20.05.23.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Nov 2026 05:23:49 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -58,45 +86,151 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261120071553.28739-1-dennylin0707@gmail.com>
-In-Reply-To: <20261120071553.28739-1-dennylin0707@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 20 Nov 2026 20:18:05 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9GV3R=m5pcebAiRb7vcLRe4tw-Vk8XWgVLR0-OJ+_Wjg@mail.gmail.com>
-X-Gm-Features: Aa3M54ow1AAmnViuCcRhuE3VvWsArW1G6zfjgnzqBu6nqSF7-19scc4JFqMlbdk
-Message-ID: <CAKYAXd9GV3R=m5pcebAiRb7vcLRe4tw-Vk8XWgVLR0-OJ+_Wjg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: refuse to open an append-only file for writing
- without O_APPEND
-To: Hungyu Lin <dennylin0707@gmail.com>
-Cc: stfrench@microsoft.com, senozhatsky@chromium.org, tom@talpey.com, 
-	chenxiaosong@chenxiaosong.com, hyc.lee@gmail.com, lsahlber@redhat.com, 
-	linux-cifs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=7e8bd4a9c12ebb9d8a66b83f0766d89a19a194b2b3f96510da164a6c43d9;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Fri, 20 Nov 2026 14:23:41 +0100
+Message-Id: <DN02K8EYWHSW.1FP154N0I9QCK@gmail.com>
+From: "koraynilay" <koray.fra@gmail.com>
+To: "Amir Goldstein" <amir73il@gmail.com>, "koraynilay"
+ <koray.fra@gmail.com>
+Cc: =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>, "David Sterba"
+ <dsterba@suse.com>, "Namjae Jeon" <linkinjeon@kernel.org>, "Sungjong Seo"
+ <sj1557.seo@samsung.com>, "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ "Christian Brauner" <brauner@kernel.org>, "Trond Myklebust"
+ <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>, "Chuck Lever"
+ <cel@kernel.org>, "Jeff Layton" <jlayton@kernel.org>, "Konstantin Komarov"
+ <almaz.alexandrovich@paragon-software.com>, "Paulo Alcantara"
+ <pc@manguebit.org>, "Chris Mason" <mason@kernel.org>, "Yuezhang Mo"
+ <yuezhang.mo@sony.com>, "Jan Kara" <jack@suse.cz>, "NeilBrown"
+ <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo"
+ <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>, "Ronnie Sahlberg"
+ <ronniesahlberg@gmail.com>, "Shyam Prasad N" <sprasad@microsoft.com>,
+ "Bharath SM" <bharathsm@microsoft.com>, "Sergey Senozhatsky"
+ <senozhatsky@chromium.org>, "ChenXiaoSong" <chenxiaosong@chenxiaosong.com>,
+ "Darrick J . Wong" <djwong@kernel.org>, "Sean Smith"
+ <defendthedisabled@gmail.com>, "Andrey Albershteyn" <aalbersh@kernel.org>,
+ "Pedro Falcato" <pfalcato@suse.de>, <linux-btrfs@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+ <exfat@lists.linux.dev>, <ntfs3@lists.linux.dev>,
+ <linux-cifs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+ <linux-api@vger.kernel.org>
+Subject: Re: [RFC PATCH v4 09/10] ksmbd: add provenance time (ptime) and map
+ it to CreationTime
+X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
+References: <20261115180343.576773-1-koray.fra@gmail.com>
+ <20261115180343.576773-10-koray.fra@gmail.com>
+ <CAOQ4uxhjxp5sxYphWoB=8sgX3XHOv9zLVYf+8ZjYbS_gQDxO3w@mail.gmail.com>
+ <DMZIQG4U1NTH.2IN0S2YIWEYTG@gmail.com>
+ <20261119220936.mssmaixcorn2gzli@pali> <DMZJGB07CO56.IZ20OCGGH6C@gmail.com>
+ <CAOQ4uxhqgsh9ahJsX7C4YyZH2n_r8VwOe9X9jZwsKALCoYvyag@mail.gmail.com>
+In-Reply-To: <CAOQ4uxhqgsh9ahJsX7C4YyZH2n_r8VwOe9X9jZwsKALCoYvyag@mail.gmail.com>
+
+--7e8bd4a9c12ebb9d8a66b83f0766d89a19a194b2b3f96510da164a6c43d9
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-On Fri, Nov 20, 2026 at 4:16=E2=80=AFPM Hungyu Lin <dennylin0707@gmail.com>=
+On Fri Nov 20, 2026 at 7:03 AM CET, Amir Goldstein wrote:
+> On Thu, Nov 19, 2026 at 11:25=E2=80=AFPM koraynilay <koray.fra@gmail.com>=
  wrote:
+>>
+>> On Thu Nov 19, 2026 at 11:09 PM CET, Pali Roh=C3=A1r wrote:
+>> > On Thursday 19 November 2026 22:51:26 koraynilay wrote:
+>> >> On Thu Nov 19, 2026 at 6:34 PM CET, Amir Goldstein wrote:
+>> >> > On Sun, Nov 15, 2026 at 7:04=E2=80=AFPM koraynilay <koray.fra@gmail=
+.com> wrote:
+>> >> >>
+>> >> >> Implement provenance time (ptime) in ksmbd, as introduced in a
+>> >> >> previous commit ("vfs: add provenance time (ptime)").
+>> >> >>
+>> >> >> Map it to SMB's CreationTime, making it settable by SMB clients. W=
+hen
+>> >> >> reporting CreationTime to clients, prioritize ptime over da.create=
+_time
+>> >> >> memorized in the user.DOSATTRIB xattr.
+>> >> >
+>> >> > That doesn't sound like the right thing to do.
+>> >> >
+>> >> > If the server stored a CreationTime that client had set, you cannot
+>> >> > override this.
+>> >>
+>> >> Ah, yes, but how would we handle older files which get a custom
+>> >> CreationTime both before (in the xattr) and after (in ptime) a kernel
+>> >> upgrade?
+>> >
+>> > Just to note that this problem is already there. ksmbd can export for
+>> > example ntfs filesystem on removable disk. And this removable disk can
+>> > be connected to Windows machine which will always only touch
+>> > CreationTime and ignores xattr DOSATTRIB.
+>> >
+>> >> > When the client sets CreationTime, the server can decide if it can =
+and wants
+>> >> > (may be a policy decision) to store CreationTime in PTIME and not s=
+tore
+>> >> > it in user.DOSATTRIB.
+>> >>
+>> >> To fix the above problem we should probably keep storing it in both
+>> >> ptime and the xattr though.
+>> >
+>> > IMHO for a long term solution it is better to not have duplicated
+>> > information in xattr. Because duplicated information are going to be
+>> > out-of-sync. Windows NTFS driver will not update xattr DOSATTRIB.
+>>
+>> Yeah, to avoid out-of-sync issues is why I made ksmbd prefer ptime over
+>> the xattr's CreationTime.
+>>
+>> >
+>> > For me it looks like that this needs some policy / configuration
+>> > decision done by user. We do not know if the user will replug that dis=
+k
+>> > also to Windows NTFS driver (and then those xattr DOSATTRIB could caus=
+e
+>> > out-of-sync issues) or will only use it from Linux or Samba and then
+>> > xattr DOSATTRIB is probably fine.
+>>
+>> I'm not sure if this is the best solution, it doesn't feel too right
+>> to me, but maybe there isn't a better one.
+>>
 >
-> smb2_open() opens the file with dentry_open(), which does not go through
-> may_open(). inode_permission() refuses write access to an immutable
-> inode, but nothing looks at S_APPEND. A client that has write permission
-> on an append-only file can open it for writing and overwrite the data
-> that is already there, which open(2) on the server and nfsd do not
-> allow.
+> If you ask me, this is not your problem and I agree with Pali that
+> this is a policy decision.
 >
-> Refuse an open that asks for FILE_WRITE_DATA or FILE_APPEND_DATA on an
-> append-only file like may_open() does, unless the file is opened with
-> O_APPEND. Leave these two rights out of the maximal access of such a
-> file as well, so that an open with MAXIMUM_ALLOWED still gets a handle
-> for reading.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Hungyu Lin <dennylin0707@gmail.com>
-Can you check Sashiko's review comments ?
+> I would not include this patch at all in the series if I were you.
+> Maybe as a demo user, but you could just as well include a demo
+> user application.
 
-https://sashiko.dev/#/patchset/20261120071553.28739-1-dennylin0707%40gmail.=
-com
+Ah, ok, fair.
 
-Thanks.
+> The nfsd user is a simpler demo, so as long as the nfsd maintainers
+> are on the same page wrt the mutable btime plan, you could include
+> it in your series.
+>
+> The problem you raise with DOSATTRIB xattr is similar to the problems
+> that Chuck raised for ptime vs. btime as the source of FATTR4_TIME_CREATE
+
+Ah right, I can see the parallel, tho before the ptime change you
+couldn't modify the creation time at all from linux with nfsd, so in
+that case unless a user manually changed it after a kernel upgrade, it
+wouldn't have this desync problem (apart from a kernel downgrade).
+
+Thanks,
+koraynilay
+
+> Thanks,
+> Amir.
+
+
+
+--7e8bd4a9c12ebb9d8a66b83f0766d89a19a194b2b3f96510da164a6c43d9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRJ2XvJtXGwULYEerQ0bnTtJTDoOAUCawBJ3gAKCRA0bnTtJTDo
+OJc/AQCn/pvK3+PSezucUXa1GtiKLjE7oMlXGStcJfzdnlWtcAD9GPZFH0ccIs4C
+afAlaO9nsoqLSUJ3Hk7qioPrnGVqrQM=
+=CBTM
+-----END PGP SIGNATURE-----
+
+--7e8bd4a9c12ebb9d8a66b83f0766d89a19a194b2b3f96510da164a6c43d9--
