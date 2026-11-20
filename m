@@ -1,107 +1,63 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795162127;
-	b=cRRasoQTObwdC/WtvTrU3Fd8kuQaVwJV18tht7O7FGKDpbK7L9Z1u2vcDLmrbP6L0ICG
-	 pS8J/zfTkBKcWL/slWeK0tS+fa41sQhuVQyNB+iSHt0lpO5iBAvUQiS3SXrgU3YtrvVN6
-	 +HAeNuKPIbKOgzmy/fc+Wnv/wmZVTxzH7FVfSoxLRi6nld/VhRAvekc6s++ubRGQTxHF4
-	 d2LrjGRxhWdvE+PMajx2foPZjezTiC6kMNnVAFNRPFrTZZ9ICc1JLxYe5AgWP9qSUF4D5
-	 nOgSP1ALSXP0NMsQeuy0VIyuCR7HFxWJpruEeGiMaJzOQc/rShKmeSOuRBFhw65DyzQ==
+	t=1795167522;
+	b=OpkBCQa+hyguvi92icHIP8TNeqUYSEyPd9qN5b0vicJ410LO1LWtvzmfwfb3Ms2JfrAZ
+	 lkwIKRUOYhyDdo/6xvA59eTpurKsOrhIY0dAYgtfWl2UqL453N8sxv9wcOUCYT6hBco5J
+	 TRQr0PCs5WevktPQ52n0TY5TbfESwI0XL1+zzZc+GlyJm0HuyG8+NDFQLFdDQ/B8i4wEH
+	 8OvvKPZMjGrGR/Gy729oyo2Ckqp1XrTi5Z00mnaDPx3PI5f/cd49vcemoJOTKWo6Mj8iH
+	 vZ48N+54b+V24LkV7yWE6kb9oKSlXt0uy3sVZdMBmfMPiCGjFUYb79vf10yDRx1w4RA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795162127;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:In-Reply-To;
-	bh=nhWTtz/XtWf+zHzkg8QT/u7XDoQ0xAQ0UFQlVcaEpd4=;
-	b=4USGx7nU205lARgP8/HDMojtNV3S9Dy3CAbuVMSlQgfXg8a19uE++7GCxTO+NrZXTFce
-	 Q8KX7f9QfjO5hWvd6kdgdDKiEr8yy9Gcl+vstmYOz1yJukXOXHfB5bIB7DRUDsCvja5Fm
-	 2ZqFU1eDKnbRxV8lX46t2HvYovtD+QyCkcCzGoKyjMzm6OCjHThz0mvWMz+etUjca4tej
-	 37f8cwYZRPIC3JiuTKVyuE6Yc7LRUt6R1UhG2/Rj5rJMivZ2ulbiixFm78lNdoazYaOui
-	 S1J8uBaPv5eaVcygetjd8CD/l0hzRwgxIC3LqaU6bFGB2DBWL/oxK4zixZBD3sYAXCQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795167522;
+	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
+	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Mailer;
+	bh=Afd1H3HLHSzEfHiPoIegI1/ZAbqBna+yrjuMxmwAVis=;
+	b=jm6BIZKBbRd72vwuc+dOpELu7YHRywoTj3Y08SkcighrlOVVW7QS2Y7tjuE+CT/AZPvJ
+	 dAcQv/1sjcPXgtaFsFLI6Q5naMScxS3BNRQ8UoWiBLWsBNnV5VDNTLR8yXzkSBQW1Ujse
+	 TsGUuFDPRr1vRXWdYAOkDO3GgNedGwrY3Y7b/6yQRToTMTnHQbcrlnvLxaaIG2Uc/dNB7
+	 i+xBxEcJy1RqW9iRRpmIL17ldY8T8x5YG3otHAi25ddfCD0MdjPro2Ug9fJFqkUgo+Jx3
+	 yPImE8XKgeTxuuoFpDZKsp9fv5EVOjzTPuQaaEts1zbZ3HXk/F1Nl3zXAyDp7/Sh0qw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=oNThT0mS;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P9BgjAry;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F661606A331;
-	Fri, 20 Nov 2026 08:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A995606A33B;
+	Fri, 20 Nov 2026 09:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.a=rsa-sha256 header.s=korg header.b=oNThT0mS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 042371F000CA;
-	Fri, 20 Nov 2026 08:08:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
-	s=korg; t=1795162127;
-	bh=nhWTtz/XtWf+zHzkg8QT/u7XDoQ0xAQ0UFQlVcaEpd4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oNThT0mSGG6kUZAwqZsOB53nYtEkre5+BXqj2CeCW2DezGxoseqckwyiR/VE/H5rV
-	 fasb29VNh/hB3PNLtjFkss79IjJ2QxSftm4LCX3QTWO6ojWb5uhH6sv3drEWCZAFZL
-	 WHSdRIgt+zBwwz1WhpggeQETXK/uvYvzW9vMcVhg=
-Date: Fri, 20 Nov 2026 09:08:23 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>, linux-doc@vger.kernel.org,
-	David Hildenbrand <david@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>, linux-mm@kvack.org,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	linux-block@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowangio@gmail.com>, David Heidelberg <david@ixit.cz>,
-	oe-linux-nfc@lists.linux.dev, Chas Williams <3chas3@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Helge Deller <deller@gmx.de>,
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	MPT-FusionLinux.pdl@broadcom.com,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <mkp@kernel.org>, linux-scsi@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org, Neill Kapron <nkapron@google.com>,
-	Andrey Konovalov <andreyknvl@gmail.com>, linux-usb@vger.kernel.org,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	xen-devel@lists.xenproject.org, Hans de Goede <hansg@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-	linux-ext4@vger.kernel.org, Mike Marshall <hubcap@omnibond.com>,
-	devel@lists.orangefs.org, Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>, linux-cifs@vger.kernel.org,
-	Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-	linux-f2fs-devel@lists.sourceforge.net,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Benson Leung <bleung@chromium.org>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	amd-gfx@lists.freedesktop.org,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	intel-gfx@lists.freedesktop.org,
-	Matthew Brost <matthew.brost@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-xe@lists.freedesktop.org
-Subject: Re: [PATCH v2 08/12] docs: ioctl-number: update USB entries
-Message-ID: <2026112013-crave-ocean-6117@gregkh>
-References: <20261119053514.255348-1-rdunlap@infradead.org>
- <20261119053514.255348-9-rdunlap@infradead.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P9BgjAry
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 243BC1F000D1;
+	Fri, 20 Nov 2026 09:38:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795167522;
+	bh=Afd1H3HLHSzEfHiPoIegI1/ZAbqBna+yrjuMxmwAVis=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date;
+	b=P9BgjAryBt+3bY5m/SLXSxDvgSE1J5cTrN85T5FlspUqiGiRY+TDcTEQ2pB+Nk2WU
+	 s/l3tIaGXPJB9IOZTFkyiZ/fF365eqlMfnnqd9D0DGZLkjU75jkjP13P+Vod8jrI39
+	 jZfj5MkeQITq6V0NHMDic6D3NOk7jBAj1QlAmaX/Nn3pDgRjqlJSpkvDN475/j2XI/
+	 MOBD20m1QYazNVzMBEAmFRDMGtM5LG2aKs6GgBN0tPDHSP9WcIbF3Hq6WccgG0xPE+
+	 T544xi1ba+5i3xtr7VaobdBha5xS9kHMn/K70pDpAY83IRBB3VM8IhXEWr08NU0OBe
+	 Uln8HSiREyYaA==
+From: Christian Brauner <brauner@kernel.org>
+To: Christian Brauner <brauner@kernel.org>, 
+ David Howells <dhowells@redhat.com>
+Cc: Paulo Alcantara <pc@manguebit.org>, 
+ Matthew Wilcox <willy@infradead.org>, Namjae Jeon <linkinjeon@kernel.org>, 
+ Marc Dionne <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, 
+ Eric Van Hensbergen <ericvh@kernel.org>, 
+ Dominique Martinet <asmadeus@codewreck.org>, 
+ Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, 
+ linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20261119083851.3306418-1-dhowells@redhat.com>
+References: <20261119083851.3306418-1-dhowells@redhat.com>
+Subject: Re: [PATCH v19 00/17] netfs, iov_iter: Use a chain of bio_vec
+ arrays instead of folio_queue
+Message-Id: <20261120-koriander-wohnform-parolen-1f10ac9dbc4e@brauner>
+Date: Fri, 20 Nov 2026 10:38:35 +0100
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -111,19 +67,73 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20261119053514.255348-9-rdunlap@infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.17-dev-04696
 
-On Wed, Nov 18, 2026 at 09:35:09PM -0800, Randy Dunlap wrote:
-> Update the list of files where USB ioctls are defined.
+On Thu, 19 Nov 2026 08:38:31 +0000, David Howells wrote:
+> Could you pull these patches please into your vfs-7.5.netfs branch?  This
+> is the third of five batches (two already having gone upstream), in this
+> case replacing the folio_queue struct with a bvecq struct.  It has been
+> rebased on v7.4-rc3.  This was split from v11 of a larger netfslib
+> series[1].
 > 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> ---
-> v2: no change
+> This series adds a new type, struct bvecq.  This points to a bounded array
+> of bio_vecs with information about how to clean up the memory they point
+> to.  A number of bvecq structs can be linked together to form a chain and
+> an iterator type, ITER_BVECQ, is provided that can be pointed at the chain
+> and can walk it.  Netfslib is then switched to use the new type and
+> folio_queue is removed along with ITER_FOLIOQ.
 > 
-> [Since having multiple maintainers trying to merge these would
-> cause some conflicts, it would be more manageable for Jon to
-> take all of these through the docs-next tree.]
+> [...]
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Applied to the vfs-7.5.netfs branch of the vfs/vfs.git tree.
+Patches in the vfs-7.5.netfs branch should appear in linux-next soon.
+
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
+
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-7.5.netfs
+
+[01/17] iov_iter: Fix kunit test to remove __init and __refdata marks
+        https://git.kernel.org/vfs/vfs/c/1bce9def76dd
+[02/17] block: Add a function to kmap one page of a multipage bio_vec
+        https://git.kernel.org/vfs/vfs/c/14e2292a9706
+[03/17] iov_iter: Add a segmented queue of bio_vec[]
+        https://git.kernel.org/vfs/vfs/c/5f1dd24265f0
+[04/17] netfs: Add some tools for managing bvecq chains
+        https://git.kernel.org/vfs/vfs/c/b4e0ea3853e5
+[05/17] iov_iter: Add an API document for the bvecq structure
+        https://git.kernel.org/vfs/vfs/c/ca90a27f2d94
+[06/17] iov_iter: Add a bvecq kunit test
+        https://git.kernel.org/vfs/vfs/c/0a2f9551262e
+[07/17] afs: Fix an inconsistency in the symlink code
+        https://git.kernel.org/vfs/vfs/c/44921a81054c
+[08/17] netfs: Explicitly pass tail padding to netfs_writeback_single()
+        https://git.kernel.org/vfs/vfs/c/7a3a80623cca
+[09/17] netfs: Change netfs_writeback_single() to not look inside the iterator
+        https://git.kernel.org/vfs/vfs/c/6703bfa120ef
+[10/17] netfs: Pass the write length to request creation where appropriate
+        https://git.kernel.org/vfs/vfs/c/c7496c6ed431
+[11/17] afs: Use a bvecq to hold dir content rather than folioq
+        https://git.kernel.org/vfs/vfs/c/65752f84cf61
+[12/17] cifs: Use a bvecq for buffering instead of a folioq
+        https://git.kernel.org/vfs/vfs/c/145d329f12ee
+[13/17] smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
+        https://git.kernel.org/vfs/vfs/c/adf3cafd9933
+[14/17] netfs: Switch folioq to bvecq
+        https://git.kernel.org/vfs/vfs/c/5b95afa0aeaf
+[15/17] smbdirect: Remove support for ITER_FOLIOQ from smbdirect_map_sges_from_iter()
+        https://git.kernel.org/vfs/vfs/c/c7879d1a4e06
+[16/17] iov_iter: Remove ITER_FOLIOQ
+        https://git.kernel.org/vfs/vfs/c/3d9d0bbb7fcd
+[17/17] netfs: Remove folio_queue
+        https://git.kernel.org/vfs/vfs/c/d6d5b8979e5d
+
