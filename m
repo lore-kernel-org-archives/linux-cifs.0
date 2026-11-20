@@ -1,63 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795167522;
-	b=OpkBCQa+hyguvi92icHIP8TNeqUYSEyPd9qN5b0vicJ410LO1LWtvzmfwfb3Ms2JfrAZ
-	 lkwIKRUOYhyDdo/6xvA59eTpurKsOrhIY0dAYgtfWl2UqL453N8sxv9wcOUCYT6hBco5J
-	 TRQr0PCs5WevktPQ52n0TY5TbfESwI0XL1+zzZc+GlyJm0HuyG8+NDFQLFdDQ/B8i4wEH
-	 8OvvKPZMjGrGR/Gy729oyo2Ckqp1XrTi5Z00mnaDPx3PI5f/cd49vcemoJOTKWo6Mj8iH
-	 vZ48N+54b+V24LkV7yWE6kb9oKSlXt0uy3sVZdMBmfMPiCGjFUYb79vf10yDRx1w4RA==
+	t=1795170130;
+	b=f/qhrzyiNl8ual3C3SEUpkoPta+15XILcJcJSygJcz4gCaOOonOcfkXaX5N9JPwZazr1
+	 V+1Xc2hygAenqGqg0Ugu7gVD2cinm//Gv0KV83DIMKHJvQazVahoqyC0bLyHEgx98OzgE
+	 Tid6MEbTFqc3hRpMaNp7O0Iioq6pRttiwsBjcWNtVoCis4QniW/bPNtpVURmyEBPhteSv
+	 WQMf1hoG/5coT1aSqrFt7z7Q6DcBG7HBbWfLQrVvbdODvcF7cUcimkAxrZ0pfFB0LOJS4
+	 6HYjA95veQGgcJ3M/g7DsaSQxbD6UR63S8F8xTBsZW01uI1Q6rGcu1va0KjMJlmKlwA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795167522;
-	h=Received:DKIM-Signature:From:To:Cc:In-Reply-To:References:Subject:
-	 Message-Id:Date:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Mailer;
-	bh=Afd1H3HLHSzEfHiPoIegI1/ZAbqBna+yrjuMxmwAVis=;
-	b=jm6BIZKBbRd72vwuc+dOpELu7YHRywoTj3Y08SkcighrlOVVW7QS2Y7tjuE+CT/AZPvJ
-	 dAcQv/1sjcPXgtaFsFLI6Q5naMScxS3BNRQ8UoWiBLWsBNnV5VDNTLR8yXzkSBQW1Ujse
-	 TsGUuFDPRr1vRXWdYAOkDO3GgNedGwrY3Y7b/6yQRToTMTnHQbcrlnvLxaaIG2Uc/dNB7
-	 i+xBxEcJy1RqW9iRRpmIL17ldY8T8x5YG3otHAi25ddfCD0MdjPro2Ug9fJFqkUgo+Jx3
-	 yPImE8XKgeTxuuoFpDZKsp9fv5EVOjzTPuQaaEts1zbZ3HXk/F1Nl3zXAyDp7/Sh0qw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795170130;
+	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
+	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
+	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
+	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=AomckiH2kg8UdKE0Ufuew6eJMusVeiFlY5GAfq9V6K8=;
+	b=znl/FEOkjwzO2SVMbsHCWrvCN//0k10ZQpRpT6K6LOC1IDpuehu4OYfOGZDmGe5fdMGq
+	 tDjpxUMuZztl4c5ygEswbfZ33BJv32aKHbhxtiw343jQEKRuQSzdW4wbzkALFQRC+sl8T
+	 O7pisvKEBtpKflr6WkXq8GcVCKlqn2sLCABJMUtOuuXOrp9U4DMihX1E5m1akmxxv5rdd
+	 bj+9AW1A8PiVq6btJlqVOaVHH7UB564+pWFnHv6t94ZKg9nPB5YKhFQ/HJbsFgA32HDCx
+	 QUqR9m7/Dh7/WPSggjl4cNrtsz+quK5B7sXcUD5Ug0OJO4Vvub4vYHsmKyzw5lMYDsw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P9BgjAry;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R++Xn4lh;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A995606A33B;
-	Fri, 20 Nov 2026 09:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31730606A32C
+	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 10:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=P9BgjAry
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 243BC1F000D1;
-	Fri, 20 Nov 2026 09:38:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=R++Xn4lh
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C56791F000E1
+	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 10:22:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795167522;
-	bh=Afd1H3HLHSzEfHiPoIegI1/ZAbqBna+yrjuMxmwAVis=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=P9BgjAryBt+3bY5m/SLXSxDvgSE1J5cTrN85T5FlspUqiGiRY+TDcTEQ2pB+Nk2WU
-	 s/l3tIaGXPJB9IOZTFkyiZ/fF365eqlMfnnqd9D0DGZLkjU75jkjP13P+Vod8jrI39
-	 jZfj5MkeQITq6V0NHMDic6D3NOk7jBAj1QlAmaX/Nn3pDgRjqlJSpkvDN475/j2XI/
-	 MOBD20m1QYazNVzMBEAmFRDMGtM5LG2aKs6GgBN0tPDHSP9WcIbF3Hq6WccgG0xPE+
-	 T544xi1ba+5i3xtr7VaobdBha5xS9kHMn/K70pDpAY83IRBB3VM8IhXEWr08NU0OBe
-	 Uln8HSiREyYaA==
-From: Christian Brauner <brauner@kernel.org>
-To: Christian Brauner <brauner@kernel.org>, 
- David Howells <dhowells@redhat.com>
-Cc: Paulo Alcantara <pc@manguebit.org>, 
- Matthew Wilcox <willy@infradead.org>, Namjae Jeon <linkinjeon@kernel.org>, 
- Marc Dionne <marc.dionne@auristor.com>, Stefan Metzmacher <metze@samba.org>, 
- Eric Van Hensbergen <ericvh@kernel.org>, 
- Dominique Martinet <asmadeus@codewreck.org>, 
- Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, 
- linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
- linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <20261119083851.3306418-1-dhowells@redhat.com>
-References: <20261119083851.3306418-1-dhowells@redhat.com>
-Subject: Re: [PATCH v19 00/17] netfs, iov_iter: Use a chain of bio_vec
- arrays instead of folio_queue
-Message-Id: <20261120-koriander-wohnform-parolen-1f10ac9dbc4e@brauner>
-Date: Fri, 20 Nov 2026 10:38:35 +0100
+	s=k20260515; t=1795170129;
+	bh=AomckiH2kg8UdKE0Ufuew6eJMusVeiFlY5GAfq9V6K8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=R++Xn4lh6V23qQ3X8MVDYDHH80q/n/a1Wg/rHWidOPhA6AXPU5TWny73DsL4RwGXw
+	 TOMCQkM35QR8Oc3lCVS3oxq4mnNTicP2FzLDkhyqk2E6kwDiJYu9tOXbf6TF86+U/h
+	 9x1KHe+9IPOYwyIUfHFnJip30nLg5gCYyrdJ++i1U9zXq2aOtnYyNf73dSVcePgW0e
+	 rcW2B7qZsuBUU6a6lCs5zdi/Aqj95MObbyOEdatMdIrPxY8pED5hVMBrpVaY85GEZh
+	 dFbrmHdKBcOllYmAqRnnKpo/1eno5p1dObc74uP7r459IyCm5itlijKbEWOySHfq5B
+	 0DOmRuYTZ15ZQ==
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6b87a240de3so879857a12.1
+        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 02:22:09 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGQaa2RO24h4shUKaolPiwgAkjhLQK5jc1KV8gw5ohq4XttuudMTmD/jZjLJBg7yR/X6gCNcvLvlDK+@vger.kernel.org
+X-Gm-Message-State: APuU4Z9Qxzmv1wrrSdDHnfhjIPC6rRA6pxlaP7Fyn9a9hctnWAPRhjbI
+	adqJh0kWy5VJyhjfh7I1gwUIEg/LAw1zELunqSDxw+1ZtCcw5OUCn9Eyle58x8iGATd57WgLdQf
+	lDTU0hZS7gZrrMkzr6p1qe4hbkbXpGZI=
+X-Received: by 2002:a17:907:da02:b0:c2d:c247:5400 with SMTP id
+ a640c23a62f3a-c513a8493eemr258746566b.27.1795170128427; Fri, 20 Nov 2026
+ 02:22:08 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -67,73 +59,39 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.17-dev-04696
+References: <20261119191036.197225-1-icb@fastmail.org>
+In-Reply-To: <20261119191036.197225-1-icb@fastmail.org>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 20 Nov 2026 19:21:56 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd99_zEgzyf6Qnad0Uq+ok=RP_a20hY381=pwF6=gTesdQ@mail.gmail.com>
+X-Gm-Features: Aa3M54qujItBxVtNWavNvp1BXIUyRdVfvs80xYGd3K-AKL6FQFn7_KDmnkIOJvw
+Message-ID: <CAKYAXd99_zEgzyf6Qnad0Uq+ok=RP_a20hY381=pwF6=gTesdQ@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: compare the whole SID when adding POSIX ACL
+ entries to a DACL
+To: Ian Bridges <icb@fastmail.org>
+Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 19 Nov 2026 08:38:31 +0000, David Howells wrote:
-> Could you pull these patches please into your vfs-7.5.netfs branch?  This
-> is the third of five batches (two already having gone upstream), in this
-> case replacing the folio_queue struct with a bvecq struct.  It has been
-> rebased on v7.4-rc3.  This was split from v11 of a larger netfslib
-> series[1].
-> 
-> This series adds a new type, struct bvecq.  This points to a bounded array
-> of bio_vecs with information about how to clean up the memory they point
-> to.  A number of bvecq structs can be linked together to form a chain and
-> an iterator type, ITER_BVECQ, is provided that can be pointed at the chain
-> and can walk it.  Netfslib is then switched to use the new type and
-> folio_queue is removed along with ITER_FOLIOQ.
-> 
-> [...]
-
-Applied to the vfs-7.5.netfs branch of the vfs/vfs.git tree.
-Patches in the vfs-7.5.netfs branch should appear in linux-next soon.
-
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
-
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-7.5.netfs
-
-[01/17] iov_iter: Fix kunit test to remove __init and __refdata marks
-        https://git.kernel.org/vfs/vfs/c/1bce9def76dd
-[02/17] block: Add a function to kmap one page of a multipage bio_vec
-        https://git.kernel.org/vfs/vfs/c/14e2292a9706
-[03/17] iov_iter: Add a segmented queue of bio_vec[]
-        https://git.kernel.org/vfs/vfs/c/5f1dd24265f0
-[04/17] netfs: Add some tools for managing bvecq chains
-        https://git.kernel.org/vfs/vfs/c/b4e0ea3853e5
-[05/17] iov_iter: Add an API document for the bvecq structure
-        https://git.kernel.org/vfs/vfs/c/ca90a27f2d94
-[06/17] iov_iter: Add a bvecq kunit test
-        https://git.kernel.org/vfs/vfs/c/0a2f9551262e
-[07/17] afs: Fix an inconsistency in the symlink code
-        https://git.kernel.org/vfs/vfs/c/44921a81054c
-[08/17] netfs: Explicitly pass tail padding to netfs_writeback_single()
-        https://git.kernel.org/vfs/vfs/c/7a3a80623cca
-[09/17] netfs: Change netfs_writeback_single() to not look inside the iterator
-        https://git.kernel.org/vfs/vfs/c/6703bfa120ef
-[10/17] netfs: Pass the write length to request creation where appropriate
-        https://git.kernel.org/vfs/vfs/c/c7496c6ed431
-[11/17] afs: Use a bvecq to hold dir content rather than folioq
-        https://git.kernel.org/vfs/vfs/c/65752f84cf61
-[12/17] cifs: Use a bvecq for buffering instead of a folioq
-        https://git.kernel.org/vfs/vfs/c/145d329f12ee
-[13/17] smbdirect: Support ITER_BVECQ in smbdirect_map_sges_from_iter()
-        https://git.kernel.org/vfs/vfs/c/adf3cafd9933
-[14/17] netfs: Switch folioq to bvecq
-        https://git.kernel.org/vfs/vfs/c/5b95afa0aeaf
-[15/17] smbdirect: Remove support for ITER_FOLIOQ from smbdirect_map_sges_from_iter()
-        https://git.kernel.org/vfs/vfs/c/c7879d1a4e06
-[16/17] iov_iter: Remove ITER_FOLIOQ
-        https://git.kernel.org/vfs/vfs/c/3d9d0bbb7fcd
-[17/17] netfs: Remove folio_queue
-        https://git.kernel.org/vfs/vfs/c/d6d5b8979e5d
-
+On Fri, Nov 20, 2026 at 4:10=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
+e:
+>
+> When a query returns a stored DACL, set_posix_acl_entries_dacl() adds
+> an ACE for each POSIX ACL entry that the stored DACL does not already
+> have. It checks that by comparing only the last sub-authority of the
+> SIDs. A POSIX entry is then left out when a stored ACE for another
+> principal ends in the same number. For example, a stored ACE for unix
+> group 1300 hides the POSIX entry for the user with uid 1300, so the
+> query does not show that this user has access.
+>
+> Compare the whole SID. A POSIX entry for uid 0 is shown as S-1-22-1-0,
+> but sid_to_id() maps the domain SID with RID 0 to uid 0, so a stored
+> ACE with that SID also counts for it.
+>
+> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ian Bridges <icb@fastmail.org>
+Applied it to #ksmbd-for-next.
+Thanks!
