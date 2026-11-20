@@ -1,100 +1,83 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.53
-ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
-	t=1795186533;
-	b=4J0QeQdRHEzlTIetwp8egNaRyFjxgGfa0BVPJ5FA76By+we7ccGdo7F5Ef4LDA1Z/O6Z
-	 qFHVYFd3pvR0mWnW8z1tnBt+nwoe75gEtY+0nmiszRyBeSzIQZ+Q+xaj3ZBn8da/Jk9iY
-	 Y8q8fMx75+5F1HdQKyoXYqEhN4KdJOSNoIOvdP8zzAbQBmF585Q03MCx8gCnpFHXz1iwV
-	 1gzQe963ozIuQenN44qLHDZK4KlUajIMsiNgMYzq7BFKB2UnfsS4WZsutO11LEWDkXNHg
-	 mhkyf+Xs+Dc5Do5eN3kY9HhrSZ4BniW5gYWLjYgmZ+tj1pQZo0pkbFjOGjfh6LWsWoA==
-ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795186533;
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.218.49
+ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
+	t=1795188083;
+	b=Qpc4T0SwY07db7Yj2lnsahgjr+/IcQpQiBZjPNL+OJ6mGKPQOpXlU+lo2ZCsO+ciohN9
+	 lnipiqHlZTrBqRptC1cdrgY7JiN2SHXJ+W1cgyYoDyCuxu6JwbdcIlbac0kVONpekbfsr
+	 rvbY9XeriozXMfBUBjUkr1rfMkiUdw/4kC+y9em8ee0pcw4NoLkFAcN0LEojLSs5Zgs0/
+	 oZjUU0ODgzR1EMUbbPTlcNAVnQnd303MszqE3ed2am1DYLen2QYGgfx17ntg9CC3w1nl4
+	 GPSXM0krfP1lAB44G1a3oTiGcMv5TVkYZKrW5awuzxYZC32Nq8Qps0PXX2mUtDrbjdA==
+ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795188083;
 	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
-	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
-	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=zpoWzG1+g8sYeNmdw7RPLfc/0HSn9Ajkmbs7oAG/5Qs=;
-	b=NcYDYw0xeK3oI/Wn+7xw+miWau9BTsDnn7GV7SHWZJf9tY3tfguYcRLj7t3MwLsrM+e5
-	 WscZ5l/iZGZvOdMbePlRKvhBR0lJANXY1ZVacB6WJ6k/cehr+S+fdwlqwg2cOh81joWpk
-	 AqUWItTZS5BoQCyZYOn00zRHFVLLY8LzwXy7mMlcmZ4qezoXUkotRpTjovw1KfvsDWi10
-	 JFvVy+P/HljRq744sTeKPyDxIsIfJnxeAZhOna3SoSAAQsV7k5A94474sh+QTovNJ8rGT
-	 0nEKTPOyIZv7opWBB6mup0uDirQehlKd9F4OWD/VzHxj21UGO5Y+Swksw0RMb1H5WWA==
-ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:X-Mailer:
+	 References:In-Reply-To;
+	bh=EOuNUplOgjccByi+i7DuzKPwQryobm9GZBpfnMCMmUY=;
+	b=Is8vo+vhLvqTVMDxIh2/SYcpcAZnY1IqxG+KVvJ3yVMRWfkixQpedngD90CyYIchRE5w
+	 eYXhblS0yR8TTbJnmdjoBj3LbsQGJkBNTNinnWPyG7atMzmbptpxi5u46CLgZUPfSX2P+
+	 R10IKKl93/bAthjTcKXBnnkve/Y5mj+Fc0pFB7dbIs9CCi9YEJLM9tXxUEaQwMQWoKfnr
+	 eDt0r31gp6CpSP58xRzcCMTmnykW7ERC2jLwxI9a5tFWPMNM12geOS2LBqDKSwtyMs4+u
+	 XPPB0id6AYvv2nSWQDa5hD70xImOpCbAfciyTdh8fCB8+1P/zw9Ejjll01KU5qWUP5g==
+ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=gmail.com;
 	spf=pass smtp.mailfrom=gmail.com;
-	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="XT71/E4r";
-	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.208.53
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NS4+0sJS;
+	arc=none smtp.remote-ip=209.85.218.49
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E95B606A33A
-	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 14:55:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8E95B606A33A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B13606A325
+	for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 15:21:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B3B13606A325
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=XT71/E4r
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6b8786bb305so1228278a12.0
-        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 06:55:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1795186532; cv=none;
-        d=google.com; s=arc-20260327;
-        b=MnoF4llORXNKCEiZR6ZtBXJVJy9ZEcbs5LJeItpEmBP+/y/Wks4HWvFEKwwxoR4Oip
-         lr9PUoXY2jXfmIWj84fty5RbRIxTaZ4iRjV2b7BZMwSAxgkq1aJmStgS84+bxBGvVkD9
-         aT1YpktA2GnEXT4HKa6A9hXMNGSqNgTzpzTFA69Xm/BwxP0OHjeZzo34RrRnnscIc3Iu
-         bMDtMFuKIeDi1wqHg6qg8177ProkC7SblulwEoJb524hLJjwIpjodwocbwlOhse/PrGn
-         X72PiEKAeI/frFDQqr9CFDiVaMwI5b21zBpH+fPnuLpuPO2dm8aFjh66XWKL8f7JLIIu
-         e+Tw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=zpoWzG1+g8sYeNmdw7RPLfc/0HSn9Ajkmbs7oAG/5Qs=;
-        fh=Y8amXDovnGsE2rBMYgKxBo85kuPZpQZ/MyXMUSD0Q5g=;
-        b=pps/NAIccacHqeXep6bsnQ7z98Os5lN5gUevfqKDsELn7hu0gMggPD6VRyhT9CNGR/
-         TErtuX2FoN+lzlGaN0beFsHv1EWoHpibv44cpvNItc4DOmIJqKAvL4KOPrXRZ7d7SGcQ
-         vymEWRS4436dEwB9P0J9GZ3OGpkdtCIBGHn821SG9Kk9DhCmmREePZ8sGiryjRhWw7dr
-         RVKcpdkart4MFRB6Fli3KtLfc+GgTcgq+HMeIr+fx6rItEdEbKgT8MA/RhwKAMWiK/fz
-         hw60bs1WzM1+1OtypkKWf+/JayRB60tHoKAuAWJhLr5foAF8ol9KrhOv/eeEDp6DTIgZ
-         PIFw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=NS4+0sJS
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-c4d581da0aaso132767166b.2
+        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 07:21:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20260707; t=1795186532; x=1795791332; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=zpoWzG1+g8sYeNmdw7RPLfc/0HSn9Ajkmbs7oAG/5Qs=;
-        b=XT71/E4radr+V0uXgPEtpy0gTEoHCeyDzLAY8K94G59n90O+uv++nCc8LBTX/toK/0
-         oCtVL35qsDqsHFCvztHPd6HhjbqSJ8Vwc8ZJfStI7YYUhYzRNmLNpBIQMkc69ILk7c36
-         ZDgsLeuC7kJXyHt7GV7DGWfHYIq4655Im+cirBeI+iUHoUj7bKjfKZyUnrONaVl4D44J
-         ww0U5x8tM0ESZ2EwqzQw4R3/0gUwPfGJym0p5b3otFIF//GO/UwhtCfcmLJW/40OkP+W
-         CdiJIaGOl4B0ABFgWYbTFah8knh1vRGWghRZ7vMT9mim8VxC0/RTV9tBJ5cW6vANuiQ4
-         lwrg==
+        d=gmail.com; s=20260707; t=1795188081; x=1795792881; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:mime-version:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=EOuNUplOgjccByi+i7DuzKPwQryobm9GZBpfnMCMmUY=;
+        b=NS4+0sJSs9ZY/390/dC7VLJUTfAcS54lqeieQtRl8eH5yHWeiW5ytJUQmodv4DKhEJ
+         Piyk+uvIFd6cA17v/LQ32rQmteQ4JvXR1QZozak/uFldjGBchuAxoES2PNfUGoBgDTv2
+         RbPBJZsdPY1/23IPeY0lzOgNMKQtBhaW79XKJ+OjgBo5KzxR2zORITcFzh48Lc61B/4G
+         IpmH+hgmspro/l5uz2hxwnp5j764NrCPcIIHRgzCs3xPLWQwu9A3hyD4S+1gyNKuURVe
+         ByXWj6Mlvb+BbN3iPRxqpawWP9jlY2TCk6M4RWxqsGJ9tZX/mW7dUMoA+Kuqk7L/DFfH
+         KAPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20260707; t=1795186532; x=1795791332;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=zpoWzG1+g8sYeNmdw7RPLfc/0HSn9Ajkmbs7oAG/5Qs=;
-        b=1qG/1uVJXpj6l2L+ePmiYiyr+dlQgBPGr7tz1WkbguCU0YaxjxeSNkpIXzZHdbR0gJ
-         1PzzbvVxIPkkx5esyCoM+cUlMl0YIq/HiDKIgxhkelC2V//4cwfhD4Ap29UWHbvZuarG
-         Wej87YTzx5lZIJHCVLRpkEHj1mMnYgGUlAAyxMlr0/RszVwPEdm7FL1t1XlYAicxTNiJ
-         AAKiAGCYt3EYYJgAxCEuc/bK/q6iLrFMSyU351Gz69WayWy516/DcwqwkLxE7pHNkXVQ
-         QuO20cNlmLx/uPNPQbpMhfr+udwZOQvjn3Kx31DHebfFLAUp83q1S0uKPJSXfQD0wh7u
-         41Qg==
-X-Forwarded-Encrypted: i=1; AL+hErH89UtPRD7JgV9S0NX86rr80uvFO3fqjMM1g/VrH4a1V6zXmZ/Q3LqKVGLZf3ZAY0qxgZ+Q9jhuo0yu@vger.kernel.org
-X-Gm-Message-State: APuU4Z+9TNbTYYYoagDaeRnpSfEirT9zQigbgRHIaUjpVIW1drXXYlxf
-	nA82lDFKJp0MVi4f6UXdKMu/M2nxzOTzRDH2k7RmwuwCNUbomvCdTg8JkeUkHmzFHiqg5mWKHMW
-	qsz7QLtlrb3w51hhvbx5xcX86+KY2Ewc=
-X-Gm-Gg: AZFdTZfQtmqYSwjMKmfqF3wNvZP+6XiTFR3zJFHHWp9Bo2Hs4cusuWGEVHd7uosalTF
-	UbfaHZu/1dauHLil1OTQ1vj6Rq5lfjwkt56nfVONM+HU3Wsq4z6uCl0SxoDSaiLHBcOKl+s3x5B
-	UvnbF59BpbV64f8m7oXB108av5ed8M99UAMOHWkp1ecobmCC2veHPQyofA6p7+mHbcGUWlnbbHa
-	KrurihhU7C3bTpcE7xVMmEDruL2G0nrl5Ws7GLyOLb4GiKcsYGEVl39flEr1hAOMsx2ryxMDPGW
-	APktpKAkUrkG3gelog/m9WtLYK4pJ4WqhvRwmY/+6N2rviJPnh+Hqom1ucAvfjvjy+mxIUgpGgf
-	0oUaUENT7ItOhOVjicfVa8m7t6Cv1qF8gLjzidYkWGnWf5JKoj1CZWcHPcr2iroo96D0ouA==
-X-Received: by 2002:a05:6402:3223:b0:6b8:5f08:931b with SMTP id
- 4fb4d7f45d1cf-6ba37ea44b2mr2503989a12.26.1795186531571; Fri, 20 Nov 2026
- 06:55:31 -0800 (PST)
+        d=1e100.net; s=20260707; t=1795188081; x=1795792881;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-type:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=EOuNUplOgjccByi+i7DuzKPwQryobm9GZBpfnMCMmUY=;
+        b=Dr6nTDJo2K1/xjKINSTmNV3enXqlj7+/yLqso466WlILZrXbKHz7IiKEgyDMu6iNt7
+         apE73E16IFR7FnU+ybw8HJN+rLhcap3h5K+X8TwhkiC2P3Fol0fq2/qudPPSk7C2YQDR
+         OoZu9sbZ3xwsbo3ToJV51Pibpt9aPnieuCvmlrHkG6JgNFZxmuvL9W+iomza/WJp2M5h
+         6e1+2e86NjDOXWKjmdtqUxphVIDHWQ5KZtqzWYzqdTtugcGaRPxcV1JravLppMtqk589
+         UQ+hEWEdZVR5UgjyFzLkA7yGKN5u5/GDjHhC00kKhhC40JYNOl4mMsR/JBF2NIEyJ0ER
+         uDPA==
+X-Forwarded-Encrypted: i=1; AL+hErFJv/k5OYjCAa/8ZO3mJ3O4acV7UvqWd7vhVtQsQ+27g411p5O0CKyfLUPhiTqbJeF6SEbHflzF1F0N@vger.kernel.org
+X-Gm-Message-State: APuU4Z9JM1l24jJYG+f2iJ/yok9bLLq46E+Ypq91Cj6F9pAVJ/iOquAk
+	sCgEoqx7/tw9Sp9aOksyjb73SeF+NKxEBmnRSftn4rd1g0ZIARmOCHJh
+X-Gm-Gg: AZFdTZfSjBd6UtQEZBrCRnm1TX7FIHGA8VIjgFE2EoHR5Ewl3QbAt9CMKocVzeD3sm0
+	8IWKHP2NLT/tNVFCyhEqE9ZuH3uUp5jeZml9VbRQl9OWg2HoaA7Q9D0V2Ej/p4BDoZR7zjETQDG
+	h25c7Iq/3C+CaDzCyCRCb7NFZKgLStiJJ9D+3MI1ypB7EvXHcVYelhp1s3d6pTW/QaYkQEYQLgw
+	Z5zT8iUXBCxXd4wMjjdBizXJ6gB3YlGoa93lhKY4tAA7axk1Ac6wkGUCIfL5YWZIO7ekUyPptHD
+	D2CYJXW6vM2laK4bMik9SrdXkqaTQnkyKrf8kbxWrJMWPlzanebKYx2A3O/XRIEwA6W9Jk+Z45q
+	AmHJXR7SwZY83BvcluuE9E9d6R3nx13xEu5XK49/mfnkr0c0CMogagYS1uqvQUK0rGZNeOQbD28
+	yzT8larYvQFahgoL01AmDJgRtrTLCB8DCmIcV30eOEiu5xYh1szXEkNNdffUyaA5jzvtJ1oIIJe
+	fvnETvmtXnrtZ2WsxpoiRPwwlgijnyXZNpwq3BlGpdB/arIDA5PjAwcrwhTemNn1DIN7ffy0OE6
+	2RLmcHZoQlKQObbyOqOGX/bTNirtsuS4SF3L2X7fQ0irNQmy
+X-Received: by 2002:a17:907:9903:b0:c49:cdc8:10cf with SMTP id a640c23a62f3a-c513ac754cbmr269557266b.40.1795188080773;
+        Fri, 20 Nov 2026 07:21:20 -0800 (PST)
+Received: from localhost ([130.192.98.149])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4ab6c340df4sm7100009f8f.55.2026.11.20.07.21.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Nov 2026 07:21:19 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -103,85 +86,128 @@ List-Subscribe: <mailto:linux-cifs+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
-MIME-Version: 1.0
-References: <20261115180343.576773-1-koray.fra@gmail.com> <20261115180343.576773-9-koray.fra@gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed;
+ boundary=f7e29ba536d1e92db179b4c7b2dcf417c13b9e676632060f29334f2a5d8b;
+ micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Fri, 20 Nov 2026 16:21:11 +0100
+Message-Id: <DN0526U5C1RT.3AQRIHXPB86NS@gmail.com>
+Cc: "David Sterba" <dsterba@suse.com>, "Namjae Jeon"
+ <linkinjeon@kernel.org>, "Sungjong Seo" <sj1557.seo@samsung.com>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>, "Christian Brauner"
+ <brauner@kernel.org>, "Trond Myklebust" <trondmy@kernel.org>, "Anna
+ Schumaker" <anna@kernel.org>, "Chuck Lever" <cel@kernel.org>, "Jeff Layton"
+ <jlayton@kernel.org>, "Konstantin Komarov"
+ <almaz.alexandrovich@paragon-software.com>, "Paulo Alcantara"
+ <pc@manguebit.org>, "Chris Mason" <mason@kernel.org>, "Yuezhang Mo"
+ <yuezhang.mo@sony.com>, "Jan Kara" <jack@suse.cz>, "NeilBrown"
+ <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo"
+ <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>, "Ronnie Sahlberg"
+ <ronniesahlberg@gmail.com>, "Shyam Prasad N" <sprasad@microsoft.com>,
+ "Bharath SM" <bharathsm@microsoft.com>, "Sergey Senozhatsky"
+ <senozhatsky@chromium.org>, "ChenXiaoSong" <chenxiaosong@chenxiaosong.com>,
+ "Darrick J . Wong" <djwong@kernel.org>, "Sean Smith"
+ <defendthedisabled@gmail.com>, "Andrey Albershteyn" <aalbersh@kernel.org>,
+ "Pedro Falcato" <pfalcato@suse.de>, =?utf-8?q?Pali_Roh=C3=A1r?=
+ <pali@kernel.org>, <linux-btrfs@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+ <exfat@lists.linux.dev>, <ntfs3@lists.linux.dev>,
+ <linux-cifs@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+ <linux-api@vger.kernel.org>, "Theodore Tso" <tytso@mit.edu>
+Subject: Re: [RFC PATCH v4 08/10] nfs: add provenance time (ptime) via
+ FATTR4_TIME_CREATE
+From: "koraynilay" <koray.fra@gmail.com>
+To: "Amir Goldstein" <amir73il@gmail.com>, "koraynilay"
+ <koray.fra@gmail.com>
+X-Mailer: aerc 0.22.0-0-gc2f86b7abde3
+References: <20261115180343.576773-1-koray.fra@gmail.com>
+ <20261115180343.576773-9-koray.fra@gmail.com>
  <CAOQ4uxgoNsOH82FyrCxc+qSoid_CFmbmpL0qgWFw-e8E689fFA@mail.gmail.com>
- <DMZJ4PL1JVA4.2YEB7EPYJR5Q7@gmail.com> <CAOQ4uxi6h9BBP7pf4sR+gc2+4XtkEgbxXZha45iZzdB_wGFVgQ@mail.gmail.com>
+ <DMZJ4PL1JVA4.2YEB7EPYJR5Q7@gmail.com>
+ <CAOQ4uxi6h9BBP7pf4sR+gc2+4XtkEgbxXZha45iZzdB_wGFVgQ@mail.gmail.com>
  <DN02S2XNGRZD.1KNOZJ0GGDJNG@gmail.com>
-In-Reply-To: <DN02S2XNGRZD.1KNOZJ0GGDJNG@gmail.com>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Fri, 20 Nov 2026 15:55:19 +0100
-X-Gm-Features: Aa3M54om4CtJTUNd2Te8u7pI-ZPclkwXdtuzgdSJLpiBpdV9ZiFnAJvfZll4Px8
-Message-ID: <CAOQ4uxh+d-wNC0aWLEexPFz7zj=TZjLyu61kaEmwBx9_hKn2gg@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 08/10] nfs: add provenance time (ptime) via FATTR4_TIME_CREATE
-To: koraynilay <koray.fra@gmail.com>
-Cc: David Sterba <dsterba@suse.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Sungjong Seo <sj1557.seo@samsung.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Chuck Lever <cel@kernel.org>, Jeff Layton <jlayton@kernel.org>, 
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, 
-	Paulo Alcantara <pc@manguebit.org>, Chris Mason <mason@kernel.org>, Yuezhang Mo <yuezhang.mo@sony.com>, 
-	Jan Kara <jack@suse.cz>, NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>, "Darrick J . Wong" <djwong@kernel.org>, 
-	Sean Smith <defendthedisabled@gmail.com>, Andrey Albershteyn <aalbersh@kernel.org>, 
-	Pedro Falcato <pfalcato@suse.de>, =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>, 
-	linux-btrfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, exfat@lists.linux.dev, ntfs3@lists.linux.dev, 
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-api@vger.kernel.org, Theodore Tso <tytso@mit.edu>
-Content-Type: text/plain; charset="UTF-8"
+ <CAOQ4uxh+d-wNC0aWLEexPFz7zj=TZjLyu61kaEmwBx9_hKn2gg@mail.gmail.com>
+In-Reply-To: <CAOQ4uxh+d-wNC0aWLEexPFz7zj=TZjLyu61kaEmwBx9_hKn2gg@mail.gmail.com>
+
+--f7e29ba536d1e92db179b4c7b2dcf417c13b9e676632060f29334f2a5d8b
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-On Fri, Nov 20, 2026 at 2:34=E2=80=AFPM koraynilay <koray.fra@gmail.com> wr=
-ote:
+On Fri Nov 20, 2026 at 3:55 PM CET, Amir Goldstein wrote:
+> On Fri, Nov 20, 2026 at 2:34=E2=80=AFPM koraynilay <koray.fra@gmail.com> =
+wrote:
+>>
+>> On Fri Nov 20, 2026 at 7:45 AM CET, Amir Goldstein wrote:
+>> > On Thu, Nov 19, 2026 at 11:10=E2=80=AFPM koraynilay <koray.fra@gmail.c=
+om> wrote:
 >
-> On Fri Nov 20, 2026 at 7:45 AM CET, Amir Goldstein wrote:
-> > On Thu, Nov 19, 2026 at 11:10=E2=80=AFPM koraynilay <koray.fra@gmail.co=
-m> wrote:
-
-> >> >                    fa->fsx_xflags |=3D FS_XFLAG_CASENONPRESERVING;
-> >> > +                 fa->fsx_xflags_mask |=3D FS_XFLAG_CASENONPRESERVIN=
-G;
-> >> > +                 fa->fsx_xflags_ro_mask |=3D FS_XFLAG_CASENONPRESER=
-VING;
-> >> Uhm, why both in _mask and _ro_mask? If it's a RDONLY flag shouldn't
-> >> it *only* be in _ro_mask? (same for CASEFOLD)
-> >>
-> >
-> > Good question. Maybe
-> > I guess if you want to follow some percent
-> > FS_FL_USER_MODIFIABLE is a subset of FS_FL_USER_VISIBLE
-> > but I think that exporting ro_mask and _mask is going to be easier and
-> > cleaner than rw_mask but not sure.
+>> >> >                    fa->fsx_xflags |=3D FS_XFLAG_CASENONPRESERVING;
+>> >> > +                 fa->fsx_xflags_mask |=3D FS_XFLAG_CASENONPRESERVI=
+NG;
+>> >> > +                 fa->fsx_xflags_ro_mask |=3D FS_XFLAG_CASENONPRESE=
+RVING;
+>> >> Uhm, why both in _mask and _ro_mask? If it's a RDONLY flag shouldn't
+>> >> it *only* be in _ro_mask? (same for CASEFOLD)
+>> >>
+>> >
+>> > Good question. Maybe
+>> > I guess if you want to follow some percent
+>> > FS_FL_USER_MODIFIABLE is a subset of FS_FL_USER_VISIBLE
+>> > but I think that exporting ro_mask and _mask is going to be easier and
+>> > cleaner than rw_mask but not sure.
+>>
+>> Hmm I asked that also because you said in the xfs shared extent thread:
+>>
+>> > The advantage being that it makes the interface symmetric.
+>> > User can alway setattr() with the buffer they got from getattr()
+>> > and instead of randomly ignoring flags in set, the fsx_ro_mask
+>> > along with fsx_mask defines the behavior exactly.
+>>
+>> But by putting the ro flags in _mask too, a user would have to clean
+>> them out or vfs will reject the call with -EINVAL/something else, since
+>> in that case the vfs would see the user say "I want to change this [ro]
+>> flag".
+>>
 >
-> Hmm I asked that also because you said in the xfs shared extent thread:
+> That's just a matter of interpretation.
 >
-> > The advantage being that it makes the interface symmetric.
-> > User can alway setattr() with the buffer they got from getattr()
-> > and instead of randomly ignoring flags in set, the fsx_ro_mask
-> > along with fsx_mask defines the behavior exactly.
+> You could say that if flag FS_XFLAG_CASENONPRESERVING
+> is in ro_mask then its value may not be modified and fs needs to
+> fail the set
+
+Yes, that's what I was thinking.
+
+> if the user given value is not a match to the current
+> kernel's value.
+
+Since this is a new API, I think it's fine to -EINVAL if it's in _mask
+anyway, even if the value is the same, no?
+
+> Could be used for an "atomic flag set" operation, but I think
+> this is taking this too far.
 >
-> But by putting the ro flags in _mask too, a user would have to clean
-> them out or vfs will reject the call with -EINVAL/something else, since
-> in that case the vfs would see the user say "I want to change this [ro]
-> flag".
->
+> I am fine with xflags_ro_mask and xflags_rw_mask I guess this
+> is the less ambiguous option.
 
-That's just a matter of interpretation.
-
-You could say that if flag FS_XFLAG_CASENONPRESERVING
-is in ro_mask then its value may not be modified and fs needs to
-fail the set if the user given value is not a match to the current
-kernel's value.
-
-Could be used for an "atomic flag set" operation, but I think
-this is taking this too far.
-
-I am fine with xflags_ro_mask and xflags_rw_mask I guess this
-is the less ambiguous option.
+Yeah I think this is the better approach here, I'll work using that.
 
 Thanks,
-Amir.
+koraynilay
+
+> Thanks,
+> Amir.
+
+
+
+--f7e29ba536d1e92db179b4c7b2dcf417c13b9e676632060f29334f2a5d8b
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRJ2XvJtXGwULYEerQ0bnTtJTDoOAUCawBlZwAKCRA0bnTtJTDo
+ODe1AQCh/kbA9HU+8r+s0ju3A1YAvNO0gdrrV7t8u43sPfGVSwD5AdqpmBpPOV/5
+L+Tc9hTqkeeZYhiO4l4Sy3W9VwznRwk=
+=IwFj
+-----END PGP SIGNATURE-----
+
+--f7e29ba536d1e92db179b4c7b2dcf417c13b9e676632060f29334f2a5d8b--
