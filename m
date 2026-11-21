@@ -1,55 +1,98 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=74.125.82.173
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795220993;
-	b=jrTx6vDiNUQEFzqSsCWpJzc30EDj1x2OeKfmjWhfMbfRb6OZ6llgEAjnW7ebKXLIiJ0J
-	 fQRywDtLmUKoD07Zr+jEctCWg19KVgVXj1SOK9Oq7XuXHvVOR+/lNO/pmz5xPz+QXyKrj
-	 QpNUDc4BoK0gUDmnRozUNdi2MRnweN7yJqxzAUC3h3iNEv/XLMd1rsq8nT7JPkYCyiL6U
-	 68SNGQ+NAl17iz/LK0vUkig0cEphjMJ93DjVHIUxX9vR6Vq+mP0o9cSt7cBR+/P726FYe
-	 2KRMYqlbkHw8SqaRybNBPPpiy2C3FBxh+NvKtrm3dd/uVCQ6/5e455ofyOb2bxEZmHQ==
+	t=1795230609;
+	b=TKKUOis5hlXUzYs2FmEnioc+Sno2zjnMlTfBaUEkx9pvqsKS586X5v9z6RnAJrZzO3x9
+	 ZuwCK5voFrNNb9oGvs2oEfcwFKOjGSIg5vJDRz5u5CBOMWXglCuNvb7vHVvotLj0XWST5
+	 ThWL7imOBV/RvddpBvksvD0HFnPWK50T5v1ZsTzZR45VIH70INl/eQ2Dd6EPM/nY7GSoL
+	 NGsOGqF1JsGY5YEbe3eOh+Y133NM2s4TDi2NIggbicG5aXK6Nvxz66apim2PsFXYm/jZz
+	 bZ/ktdFxQKxQHLbdzdX256LIE63YzCHBfQZT1CbWhARfEOuLqsUOq57Go9AhVWKhj5Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795220993;
-	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
-	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
-	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
-	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=rD7rpVjyDNmPoXFf48R53o3A1muaq1HYLrGi/n8jnLQ=;
-	b=u0rwN76pz9A8BFDbNngTXA7lJ0yC36moYW+Af+r8dw/JZvGlvwOUCL8bWdLYxbf7YRtm
-	 oaQKIs6+CODfg8DE3fp0OvyqC/KbkpqZph32RSP2QcrIb+n1m2k7Jbf7NWVFb5giPclVj
-	 6Ez+3PHu0sqr5n151mrSw//lHyaUIU5WlEPeOhNr0sxHjlsCiDcgzft8LwNKQRfOHOUaL
-	 VRcSA8ZqNq+fn/HQn73VmivB6Aw9J/EYa5S7q/BQ3Gyyj9B5Ra3vMsY9bY4cz0dT2wp/Y
-	 MKSpCMUgv5nhgcnXU2GdvR7qpU+on2NkZxa8Sh8Fn7jxCoaAHtlQgOVUkuV30vwlBrA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795230609;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=Kk0j6F4u8RyOwIi48XCNaJybmEVI2lLpJDiNK74Ze0s=;
+	b=JgHvEwLPZTv+rahr4qjrCtHDgL7XB2Z/U2aukrOKy4farbWhuBCj+fsNt8sXUt9cMiW6
+	 yTZq6Zh2RWLs57crNt3aoSdtQHfbDK0Gro2l1jhKfsmxk8tc9NQgSbX9NXPHkVCzPdaSZ
+	 IQIvr7b0I4O+cmHcowHPHkYuDDqHh5+7TqCLmrt/J/4DRSQHFF8CwVjrlMqKlU1JK2GXW
+	 pva9woD3mYJeyruKcSrw2xbOCOHnm7RJP36a32HArM5xgAppiQYKXZmrglmaimHz+lQV0
+	 mHeo8bh62pBW3YzhZWeH+qrgLPAt2dAZvBxNjymmWlRDPBOFVVvTLHlp5oj+72Ipt/g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VoS50GYo;
-	arc=none smtp.remote-ip=100.103.45.18
-Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KsnBmaIa;
+	arc=none smtp.remote-ip=74.125.82.173
+Received: from mail-dy1-f173.google.com (mail-dy1-f173.google.com [74.125.82.173])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A54606A6BB
-	for <linux-cifs@vger.kernel.org>; Sat, 21 Nov 2026 00:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB0B606A697
+	for <linux-cifs@vger.kernel.org>; Sat, 21 Nov 2026 03:10:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 4CB0B606A697
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=VoS50GYo
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D3C91F000E0
-	for <linux-cifs@vger.kernel.org>; Sat, 21 Nov 2026 00:29:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795220992;
-	bh=rD7rpVjyDNmPoXFf48R53o3A1muaq1HYLrGi/n8jnLQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=VoS50GYoz23WScli6OCrp42uoHzt0bSQGlahzkogaCoa8UR883PfS997g1VhGOemb
-	 omAUOjA4Nf0X0OqCDviwY/JzfotusUP6WjNa3lqJDY+ihoDasF00d8NCWPdJha2i5t
-	 78L6SrETey3o6UscVz+u7vm1/3ytBWjt0WnQZtaiK2eb003Z0HvDjckheuSHierV7y
-	 +gzlFMpmnV4V/h73CFpKv83szNdhG/xiLZcy8I1YGIQ0wDfqSmvSlaeb3sCaYvIQF3
-	 ZDpI2nmBHRj8QQf7RSlSjQcq32YF0YxQzKYZHyR3ELsfWuixpCd0C8+4yBDDl/riap
-	 soaBFAb7Y0UYg==
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6b8b20b2538so1787104a12.3
-        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 16:29:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErFu9eSStpkaOy82k3+xJFbtMtghxoLaEJBnHJphSpns9OhcxKu5vKKvmomR++Kp2naFSp0kxSO3ZwpD@vger.kernel.org
-X-Gm-Message-State: APuU4Z8iYOnAg85zbLV0lXCve4dmpPuzjO/0qB6DCthCddTDq/MayDqt
-	NCbTcBYknCSXAMSXLeD1APhvpzmN2kocprOtlpOWHtII3swaGmo8IFDIB3XnqzSLYu38eD4tjSz
-	NjlncUJO9X5408NiKThdFBMmlDO4L81w=
-X-Received: by 2002:aa7:cd65:0:b0:6b5:823f:3462 with SMTP id
- 4fb4d7f45d1cf-6ba37e83f29mr2483897a12.19.1795220991152; Fri, 20 Nov 2026
- 16:29:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=KsnBmaIa
+Received: by mail-dy1-f173.google.com with SMTP id 5a478bee46e88-38699cf08dfso517933eec.1
+        for <linux-cifs@vger.kernel.org>; Fri, 20 Nov 2026 19:10:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795230601; x=1795835401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=Kk0j6F4u8RyOwIi48XCNaJybmEVI2lLpJDiNK74Ze0s=;
+        b=KsnBmaIaRGc5OUE0Ft0dc+1GePSOdQ5k+IWHdHyRvwT9Hhhw3KaJXrW/fuTQc2vod2
+         EZsCawxL7ZSvd74RNTzC5GL7VbiOx1NyW7Xjbu5pcmQT1l3kf1fp6q1G7lYISYKGxMwW
+         GhTvpmmh9Y4Jxi/PwD6MHfjdwHYJWZqcbKoxuRXmPiVvqnzl/TR6Vx+VR8XByUUIBUxK
+         2LOkMW3qRDol7f4xv38JQUMjO1HqwsmfvGEO687iku6fz/T0kpZO9q6+5JjP35fkgEMD
+         csc/JxIw38NXVMZF3xyhuvc7PMZCuMPUw6ZXXk24RlqbOO9DCxZITpAHdaFApv6LXYzK
+         2yvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795230601; x=1795835401;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=Kk0j6F4u8RyOwIi48XCNaJybmEVI2lLpJDiNK74Ze0s=;
+        b=d1E0j/uuHnltJaJJLB2QTcCGQLc7OUpHtQnfen4a2ae6FZS9h/qmbU48MF9nJS9llw
+         Cca1bQaRqrbqX+jI+6zgkBkNkSppqO8/2unDP0X0jF1Pw4XiVoDDKknXQNj/e2QJY7vH
+         dt2NjpvBazVRcM+JH3Ia3NcFxq4iDQ8vFGKVEIH489gu5lX+pfOLcYrdK7wFcmUKA07F
+         XQJCmbpwFdue//qKhL0wvweXBjdOPmgcEqbHXd2ZW/HA9KMON81vroS860k+JRG36A9z
+         VXehh7e8GEjdrzdHn+ZWgL1SV4ptfxE7Fo5o/YySoi0bOMZFrZYuJoxAatVFSpy4y8fH
+         sGxw==
+X-Forwarded-Encrypted: i=1; AL+hErHcoxK0pWEa0/WtWSUQiDtPWlex/mvG7uVs2n2WSQM8gauV5XFcXgv5OWjs5q8tKEA1yaC3IuXNE0EG@vger.kernel.org
+X-Gm-Message-State: APuU4Z/O8h+dSSX6FgVPjpj1wB61I9CoFQZbzLmGTFL+14pyYrW2CIn0
+	LOrmtdOhrPhrbWhtLxpzsofRS3URiFZtfgf0VriUdzs6Wbk82Z+/Z/ze
+X-Gm-Gg: AZFdTZcDH1Ja4MmVJkapUoXzqr1JQQCfoxeLyvlPiDqrrp6Njjg+Nq5gOrVBwXooquF
+	gpFMUsDPBVj3LOtDg49NyAbRDk3xeHO3muSljGnX0kPY0NU1NgfyPsH0sUVm7zasfNY9hp5lUg+
+	nKvfWrphms6RfQNdbvipc1Lyk1essJR0m1uXdaPd1R1YJmawxHyDIlXgyzfZIBfoFhO/Gmb3czk
+	WFn1aNSo0Elfcxlzzw9yPCXNpOSvgNsYs2zmWsn6OqwPiHtaTo3mNHYvYel42xjJbZzidxkQ2eE
+	YDRaOb5d/jqkbd+B7avMc2cC0pEBMSFA+ym7cl23uWpflk4PX6H85FRegDvw12pQ4MNu1hXUbY2
+	DN2WVw7w01oikcCOBI91t4sIkNa/jiqjVnMcAgqXqw/+jJLZQgiTsmwVC0yXU0cuK+dXngVrKiZ
+	BX74sezREYVIsL0O41P/x2rsn0JpQSl//U9I7eH9l0NbS1rwQ0QHcUIexi2bMnbE3tIOZycqC20
+	nHTJNWSh6TnbKKaonyEb4Y1Jz7GWXyW02nUts51kIZwZvxWDB7cbByARkiPgzppcGF0q1kp2322
+	itQISm63QOexBeKmGQzjo6arLQ6jUQ2W0gbfRfzzitLOS0+ka8wKbKxiF/tkI+iQWtmcqHGI
+X-Received: by 2002:a05:7301:6285:b0:369:f182:8e99 with SMTP id 5a478bee46e88-38570554684mr5874137eec.35.1795230601058;
+        Fri, 20 Nov 2026 19:10:01 -0800 (PST)
+Received: from fred-server.tail1cd3ef.ts.net ([2600:381:4c20:1067::7ff])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-385666e99fdsm15806890eec.5.2026.11.20.19.09.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2026 19:10:00 -0800 (PST)
+From: Fredric Cover <fredric.cover.lkernel@gmail.com>
+To: Paulo Alcantara <pc@manguebit.org>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Cc: ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
+	Tom Talpey <tom@talpey.com>,
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Bharath SM <bharathsm@microsoft.com>,
+	linux-cifs@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fredric Cover <fredric.cover.lkernel@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH] smb: client: convert DFS prefix from cache charset on reconnect
+Date: Sat, 21 Nov 2026 03:09:51 +0000
+Message-ID: <20261121030951.1470502-1-fredric.cover.lkernel@gmail.com>
+X-Mailer: git-send-email 2.53.0
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,36 +102,129 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261120163436.15296-1-icb@fastmail.org>
-In-Reply-To: <20261120163436.15296-1-icb@fastmail.org>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Sat, 21 Nov 2026 09:29:38 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd--8hWBZByqGjt3d8E65uJSS8iyc_VgucMvXuE99MRNhQ@mail.gmail.com>
-X-Gm-Features: Aa3M54qE1Zkgvchom1ErPwtXwjTD47R_3zEhhGyatIfGzxipZ6T7uhWeq9rzynY
-Message-ID: <CAKYAXd--8hWBZByqGjt3d8E65uJSS8iyc_VgucMvXuE99MRNhQ@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: check the ACEs after an NFS mode ACE in a DACL
-To: Ian Bridges <icb@fastmail.org>
-Cc: senozhatsky@chromium.org, tom@talpey.com, chenxiaosong@chenxiaosong.com, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 21, 2026 at 1:34=E2=80=AFAM Ian Bridges <icb@fastmail.org> wrot=
-e:
->
-> An allow ACE with SID S-1-5-88-3-<mode> supplies the POSIX mode
-> directly, and parse_dacl() stops walking the ACEs at the first one.
-> The same walk checks each ACE and maps its generic rights, so the ACEs
-> after the NFS mode ACE are neither checked nor mapped. set_info_sec()
-> still stores the entire DACL and the request succeeds, but part of
-> that DACL can have no effect.
->
-> Continue checking the remaining ACEs and mapping their generic rights,
-> while preserving the mode from the first NFS mode ACE.
->
-> Fixes: e2f34481b24d ("cifsd: add server-side procedures for SMB3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ian Bridges <icb@fastmail.org>
-Applied it to #ksmbd-for-next.
-Thanks!
+The DFS referral cache stores paths and target strings in UTF-8
+(cache_cp), whereas cifs_sb->prepath must be encoded in the mount's
+local charset (cifs_sb->local_nls).
+
+When reconnecting a DFS link in tree_connect_dfs_target(),
+dfs_cache_get_tgt_share() returns @prefix in cache_cp, which was
+passed directly to cifs_update_super_prepath(). On mounts using a
+non-UTF-8 iocharset such as iso8859-1, this overwrites
+cifs_sb->prepath with UTF-8 bytes. Subsequent operations then
+re-encode cifs_sb->prepath to UTF-16LE using cifs_sb->local_nls,
+corrupting non-ASCII characters on the wire and causing lookups to
+fail with -ENOENT.
+
+Add dfs_cache_local_path() to convert a path from cache_cp to a
+caller-specified codepage via UTF-16, and use it in a new
+set_super_prepath_from_cache() helper called by
+tree_connect_dfs_target() so cifs_sb->prepath stays in
+cifs_sb->local_nls across reconnects.
+
+Tested against Samba with iocharset=utf8 and iocharset=iso8859-1
+across multiple smbd restarts.
+
+Fixes: c870a8e70e68 ("cifs: handle different charsets in dfs cache")
+Cc: stable@vger.kernel.org
+Signed-off-by: Fredric Cover <fredric.cover.lkernel@gmail.com>
+---
+ fs/smb/client/dfs.c       | 18 +++++++++++++++++-
+ fs/smb/client/dfs_cache.c | 31 +++++++++++++++++++++++++++++++
+ fs/smb/client/dfs_cache.h |  1 +
+ 3 files changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/fs/smb/client/dfs.c b/fs/smb/client/dfs.c
+index 788cdda9a573..efef00c33321 100644
+--- a/fs/smb/client/dfs.c
++++ b/fs/smb/client/dfs.c
+@@ -404,6 +404,22 @@ static int target_share_matches_server(struct TCP_Server_Info *server, char *sha
+ 	return rc;
+ }
+ 
++/* @prefix is in the DFS cache charset, the superblock prefix in the mount charset */
++static int set_super_prepath_from_cache(struct cifs_sb_info *cifs_sb, const char *prefix)
++{
++	char *lprefix = NULL;
++	int rc;
++
++	if (prefix && *prefix) {
++		lprefix = dfs_cache_local_path(prefix, cifs_sb->local_nls);
++		if (IS_ERR(lprefix))
++			return PTR_ERR(lprefix);
++	}
++	rc = cifs_update_super_prepath(cifs_sb, lprefix);
++	kfree(lprefix);
++	return rc;
++}
++
+ static int tree_connect_dfs_target(const unsigned int xid,
+ 				   struct cifs_tcon *tcon,
+ 				   struct cifs_sb_info *cifs_sb,
+@@ -444,7 +460,7 @@ static int tree_connect_dfs_target(const unsigned int xid,
+ 		rc = ops->tree_connect(xid, tcon->ses, tree,
+ 				       tcon);
+ 		if (islink && !rc && cifs_sb)
+-			rc = cifs_update_super_prepath(cifs_sb, prefix);
++			rc = set_super_prepath_from_cache(cifs_sb, prefix);
+ 		break;
+ 	}
+ 
+diff --git a/fs/smb/client/dfs_cache.c b/fs/smb/client/dfs_cache.c
+index 02864f7acefc..168f563d5ef6 100644
+--- a/fs/smb/client/dfs_cache.c
++++ b/fs/smb/client/dfs_cache.c
+@@ -105,6 +105,37 @@ char *dfs_cache_canonical_path(const char *path, const struct nls_table *cp, int
+ 	return npath;
+ }
+ 
++/**
++ * dfs_cache_local_path - convert a path from the DFS cache charset
++ *
++ * @path: path in the DFS cache charset
++ * @cp: codepage to convert to
++ *
++ * Return the converted path, which the caller must free, or an error pointer.
++ */
++char *dfs_cache_local_path(const char *path, const struct nls_table *cp)
++{
++	char *tmp, *npath;
++	int plen = 0;
++
++	if (!path || !cp || unlikely(!cache_cp))
++		return ERR_PTR(-EINVAL);
++
++	if (!strcmp(cp->charset, cache_cp->charset)) {
++		npath = kstrdup(path, GFP_KERNEL);
++		return npath ?: ERR_PTR(-ENOMEM);
++	}
++
++	tmp = (char *)cifs_strndup_to_utf16(path, strlen(path), &plen,
++					    cache_cp, NO_MAP_UNI_RSVD);
++	if (!tmp)
++		return ERR_PTR(-ENOMEM);
++
++	npath = cifs_strndup_from_utf16(tmp, plen, true, cp);
++	kfree(tmp);
++	return npath ?: ERR_PTR(-ENOMEM);
++}
++
+ static inline bool cache_entry_expired(const struct cache_entry *ce)
+ {
+ 	struct timespec64 ts;
+diff --git a/fs/smb/client/dfs_cache.h b/fs/smb/client/dfs_cache.h
+index c99dc3546c70..636eb1554311 100644
+--- a/fs/smb/client/dfs_cache.h
++++ b/fs/smb/client/dfs_cache.h
+@@ -53,6 +53,7 @@ int dfs_cache_get_tgt_share(char *path,
+ 			    char **share, char **prefix);
+ char *dfs_cache_canonical_path(const char *path, const struct nls_table *cp,
+ 			       int remap);
++char *dfs_cache_local_path(const char *path, const struct nls_table *cp);
+ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb);
+ void dfs_cache_refresh(struct work_struct *work);
+ 
+-- 
+2.53.0
+
