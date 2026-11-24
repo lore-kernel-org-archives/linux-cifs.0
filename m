@@ -1,124 +1,101 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.155
-ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795537431;
-	b=4d7vZuf9jlu5G4qGz+JhEker2mzrxGZR1ViWs+LfCZiwcq8CDdIngvKmVSuoBRNf/f5b
-	 uFXTlncluO5pCz5qXbabDGO94M4rxi7BsWeoAYVPWtHwlPIHYpGjNjau44hImAm0Tu9oM
-	 kX94jaghXnNHdUHTMrPCC8lMjYAlrhPQFKkTXC1s/SyH9TyUjcYXasKfpc/d+6rcU8h5w
-	 OdfHdnfcAkN44zR/Gk8r2kokEC4ULX7WVByOTkGAN134MmD4lSFcxK4ucgIVd44cFXlid
-	 LIdPuJt5b+6hexuJPlXceY6dtdUaEfDqV5aO1HOLp7PuJmBDKDfFoSf5QtG5WrJgn7g==
-ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795537431;
-	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
-	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
-	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
-	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=WEsdR1vLDh5gHFLvWv+A/t6Se60RNK761kHyMIzqWSg=;
-	b=1w7shoZVfexffPBpB88WwUKyHchxYRBs0NR4ebNT4d/wD2w5QGRqMdIjZFMf3HoUGvxn
-	 NXzJmGG1vsGwsZA+GgdiGJqbfNqgKGNtoNATCrRJ4krSd6SniXUt2QxankRcOmfW4xSsj
-	 G3qLSszMZthGxyrpQpbYY46SGSbyrNF/w7i++PWuN2Ga6pgcQCWoMtqpBC5kQghkctZT6
-	 Xi2mOghd7/eRj3kvQjOXlP3q+GCSyh9LWWVSQVRtAW4CPVyiJz3LZBdedsYhQkrTGvQTZ
-	 YNXgfWdk+qxyA/mWVGAfNPARZR87W2zAsu4DNToaoET1w7p2xW9VEy/kSOYChzu7qgQ==
-ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=fastmail.org;
-	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b="w3Z/VN07";
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=mpZuVgGu;
-	arc=none smtp.remote-ip=103.168.172.155
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+Authentication-Results: smtp.subspace.kernel.org; arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.180
+ARC-Seal: i=2; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=pass;
+	t=1795551597;
+	b=Bp+3J5uU+VW/Oas/n4DfwblYNq4XuaV2eoI4wmYEVmQZofF+d3x8CoNFy1NNR72I+Fqh
+	 5nxPz9VXL8XlhyDJTHheIohJ/CJDpNJYqM3FnDm2Nv3f+G7KZCOJvPpcsbxB9fvhEVq4s
+	 aMvLpoqABI9qj2BU6cPyT5kV5NiFMl2KPs4p+jB5vIvCBGEC/yx6D1VFZXIvP2P8L4DhA
+	 jdo4er0xox4FMiVZZkmSRRUfOnIUtxFaPD4gsxX3/QIRoZIISlYlkULa0JVjCVhpHEGXh
+	 +nfGYU7aWpiVX985w2RwB4oQt88vxDvAH5hM5p+806P+kvCDd7qI1yDffzrYC/496qQ==
+ARC-Message-Signature: i=2; d=subspace.kernel.org; s=arc20261015;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795551597;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:
+	 MIME-Version:References:In-Reply-To:From:Date:X-Gm-Features:
+	 Message-ID:Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
+	bh=IWHkOExNTIIKhjxQS3sMtn2Z92YI/DSSmmMbSwEzbEA=;
+	b=BpfBPGDopcVf+6hAuBUkNoV6o2T+k1q7E2Jwd7WcY0BO/TRGgR37OwTI+T8Vjs7uzRXY
+	 SNtMWJKsERZSB381rSdP+oWqJKDrzryX3huLfTBlwa4jseHHDE1+htTwylZteBCY+g3uB
+	 4tXNu/sU1Kr8X5xs748Lla+zwZlJsWE4SDgodZj5W41Vd6K7U+7UuB1C8HVrhVWohmgzO
+	 XtqQXpFJU9ll6TFJddIdpPDx/qK+kWeQfgAwvHPHZaqbse/W6hl1HR50QXQeAUaxyxHL8
+	 oLtOe3AIzMdRjvm9vb8CRXVEnJ5koC0Qks2OgF0a+RVur/Cwu0P07n5AmwUbOJlf1qQ==
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org; 
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oximlhy4;
+	arc=pass header.oldest-pass=0 smtp.remote-ip=209.85.210.180
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8D3606A32D
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 16:23:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C8D3606A32D
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F0C606A33C
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 20:19:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 01F0C606A33C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=w3Z/VN07;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=mpZuVgGu
-Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 3E99514002E8
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 11:23:49 -0500 (EST)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Tue, 24 Nov 2026 11:23:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1795537429; x=
-	1795623829; bh=WEsdR1vLDh5gHFLvWv+A/t6Se60RNK761kHyMIzqWSg=; b=w
-	3Z/VN07UB44c1leig0FeXBI6QFYGTx+seX++T2xAaXQtNrNuNS4+y3lXWpiPHX3h
-	CNS/SfK5K9vmyVRgmlF/VqaeTNiEpP2lkeALxxHGSNqqXtFXlNwB0I+isHElEtXD
-	j81JyNzbndfCH5N2UCu0ptvJrlKHNMsSNiE4NEeO2M8A31rax4pOzd/jTiCsJRBq
-	T2x48ICbR6lowWLezrwBzKM/KXtD9ZxAwkl91SdfeW68A9zfifuTbBHvuSbXOqg9
-	CjrsQprPY2H/4YUYNT4z2KCxzas0PZpiVzYlfyCtwgwZUv7L6OEBRkGM9BH4ZfZ8
-	WvUzbdF7Z+FVVOIjNfNtg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1795537429; x=1795623829; bh=W
-	EsdR1vLDh5gHFLvWv+A/t6Se60RNK761kHyMIzqWSg=; b=mpZuVgGu7xCl62dD0
-	f0yFbaMn2kqTZ7JN6ZbJk4MSTiOz5NABBz4k8CCDNFtPgZPbqz5mcaqNqyluxEMy
-	POFlOBo4unxAN3qvOrfi3HEjgEHWh1cetXNQg4C9cyRIhxVhShclozrUQs7lmV06
-	EknGEVySPWco7THR5l6M83CaUg/8MQ5taJw1sFS7GdmEopVdATWBtwgWIXhLX62G
-	b3m79NLioHEngdCdseHXcndxJn40K1u++uf1X5wqn5b06pkb8W/2VlXGYqgdRGeE
-	fTVEV3bUWCC1XdinQM/mOXxn4SZOcfGr5uEUoutBoQwoaJxqiutMNgaXIHdYUlcS
-	1F4pQ==
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1795537429; d=fastmail.org;
-	mf=PGljYkBmYXN0bWFpbC5vcmc+;
-	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:vnjuOt+mrkarirepTYAGBTxCblY1JcYEoMxjWjYpCToIpPv
-	vqjfvuFOb+fle/pzniRqf5B9i1Gi32cjlBoCR09PNoPN9F0S2xCHhaAwtoer3DKg
-	n+h04XNCul2nJ6zNfZip6tbZYSmChZ+9Jba4kKrALsyj8axKDN3gBMYpT7c3ldbe
-	u4jXnzmtspCGhL10KNCsvy6LGwETwsFx3FtV4twbABsDOQSjB+Qj82mQ70Q8FZtc
-	xMKLXgZNwN4GpISZDWjif9RB92PxN/4/eGl50rKfRLh6TUJzbWHnUdS/yIOvgais
-	ihv+2k46f4WqHbAJ2q6crkkFrMMvnwZeGokZx3g==;
-X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
-	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
-	action=mi-m=1; hc=11;
-	hn=cc,content-transfer-encoding,date,feedback-id,from,
-	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:yXyEPLDrwD7n0/UBOHJKKq0pECeD17dlb6nsF+S2VrY=:hKWPGkDHbPFTBno1nXsnnOJq6fBMpjAXF9rUJJtqlMc=;
-X-ME-Sender: <xms:FLoFayFK6dy7-Tv-iPCB5vmubv_AvPe92aie5rvg4oBNrraFPspbzQ>
-    <xme:FLoFa3B3y5M8S7pHZctl2wKD7LqTIaG9ayFUNH7XrYkKEfxYJkErsykv9TKEOyMhI
-    YgjroR5ZQOOyVP2fZLO8B7J8ry2loKLRw6owCuvWJA-2kaVP-KIsPSb>
-X-ME-Received: <xmr:FLoFa1_V8z6Y85hkkPFOr8l0pTc67xPfqbpxKo63uF4syWLxIobOMjyMI3CCmhWW>
-X-ME-Proxy-Cause: dmFkZTFSvR4e8buJ4s5HUUAHFKsx2Z9PD7zteb3cvtRYBs6KziXojcHnUhxaMTbajLD3Qc
-    U8uFI9I9QBEs1XxGKvZfo2owRGEpKW7T40pTmbTgzKffyaflL+zKYJKM3WkL673uo/p7xQ
-    G4WYbu9KbEa9c47odxt+aN6nS0SOG0Jl2Rh89gAwCFHATP7tDTpe3QP+o1E8OygIeWvcUQ
-    F07Gy3guqbhOxv5028m13yjZtEBmwJ2EpZBMCp6cI94RVgSWAmsTi4fBOScVRzriJ1Uhxt
-    yTNek8gtH6jJwSlLWi97jk0zcXjfLGhXSvaSM40KoDBjwzmoBk9PnHyCCdpU7pUlVjjMNE
-    RMOm202PQArmceggJKfS82Ga7dI5/Grd1dT+VVvnLI5SNctMv6rJvSJbHZuBxpYvIcTmoc
-    +ZVXvDfsyaP8ZNPoytxpXOw/LnkL+sHTDnIGWPd2dmmKfU0d4yzGjNYhOn39I6M6dsmwWE
-    7/BVaAuXY1PSZHIJCISj0uL4lDaI8B8nHpKkXVzyZLNCWwY+V5NUPY6O1xeuPINqAWLYyf
-    hBYkukIon6tZHOkWNMlcA8Y0flqvsKfJRX9by3oP2QFhqv5aVVq+QD81a1nXbLtfvqzrnR
-    rRUGoKugg4mnfisUvolQDG2kjhb32RX2xO2BLTcyzQb/Wfs5WMkh7p0w0xIg
-X-ME-Proxy: <xmx:FLoFazCjBtkLwZuJzN6aPOs6nQCxTy5VUUJWz6Xi-D2NpSBGACLbfg>
-    <xmx:FboFa6RqJtXv6V6AuLAW19gxTArbuG3XUYeXwjEmA4Sm8UkFs69lEA>
-    <xmx:FboFa6veils5RzR6SYHPSvTqtE-fqrPzBLH2xOwASg7feRLXFNZx5A>
-    <xmx:FboFa23n2lu4z1A2287lqDvtA7VW0p8M2_oiKlesBRMNFoL2NKE_dg>
-    <xmx:FboFayjmmSIfT__edIHSOFIjlf9kB1e1bTEnhtCZKfLWCjtprCu21cvE>
-Feedback-ID: ib53e4b78:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 24 Nov 2026 11:23:48 -0500 (EST)
-From: Ian Bridges <icb@fastmail.org>
-To: Namjae Jeon <linkinjeon@kernel.org>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
-	linux-cifs@vger.kernel.org,
-	Ian Bridges <icb@fastmail.org>
-Subject: [RFC PATCH 2/2] ksmbd: use the security descriptor codec in callers
-Date: Tue, 24 Nov 2026 10:23:31 -0600
-Message-ID: <20261124162331.895789-3-icb@fastmail.org>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20261124162331.895789-1-icb@fastmail.org>
-References: <20261124162331.895789-1-icb@fastmail.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=oximlhy4
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-8b5c3288e6cso1937555b3a.3
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 12:19:56 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1795551596; cv=none;
+        d=google.com; s=arc-20260327;
+        b=mZJ/hRBZkWlglmgplxkUvmteoL1XtXBu2P3yYj4bFZHcNgLTGH3d6vIDR5ZULEGXA9
+         8CttmQycOKwupc/g/GXitrZyDqEAEJT+gHxJyo3vZPOQQzhMajGXO+NcS68/9j9HA7Ym
+         JZRoT3tlydHCP2aNYVg6FYNrnL3hn4y94Z0SveIFA3rXs+jzBkrYPYOf8Wm4wsu2UqF3
+         7WAUmTzyDMljDKGACBgY3DtbdtsbQN+EfA3PlGW5Es5nPWtfVNx8KnPl4algNQaXVXkg
+         zq/nAbD28CFPVVPTzh+8oQzxTirt43ttXzwIpHxq4L+yGW/z7S5m9fEnuZGvWYE31Z2+
+         XMUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IWHkOExNTIIKhjxQS3sMtn2Z92YI/DSSmmMbSwEzbEA=;
+        fh=WQkdZ5FGvC44VNjw4PukZVMEE+cPnq/PEQPye2rs0xc=;
+        b=ZbFiSdgOrakeppi2VeRdQaUjLQjcRDQsq6n3Tir+r3vLTloTu/oqsLaN9034qb3+Tx
+         ghcHiqa3OFZ5eG0iTuRddiJo/2Bo+2mcPVBctWCI5LDU/5sWLqPyS6hEsNwMcPKUMIIH
+         rOn8vEXxQV9S/M3wUDEX2QlYT+PeGGertAa1s7ddW72WBPHbt9sslm4gO0XkNDhktnAP
+         Xt/U3yKD7TGIJ8gdmu0GNk2hVQh/O63EYPwCwZIqHUAMlU1KOHGN8VztM36nSGhPIToG
+         st6HRe8eRW4/KgB7nYeg7iMnf0NY15wHWQ6SdCrT8Jkr2xIEBWe5iW2oMTAE8tpmebo7
+         N1NQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1795551596; x=1796156396; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=IWHkOExNTIIKhjxQS3sMtn2Z92YI/DSSmmMbSwEzbEA=;
+        b=oximlhy4LUFgFBargecL3MFyT5UDeJ6JAEXhrRWSyCt5n1M07S5F4fVevgly2MPnlk
+         bCZn1bv8qYAGuExuHI7QXubEzp5hhBF2zVqkK1pujon0shTGoL9KDcOxX2sr2+nnt0p6
+         KLRcryFZmJ6sY9MuQU78mCocYTuxs3Jh9ZQtXyKeJazDHtM7nGGHlqMn33skZRRw+kCE
+         NvNrI6J3CG69WKv/Useuj3CRL9/ymRL5E+CV6Zbk9fcGsmqW8aPBy11eKBJShYsHFoQI
+         1i8B7bnTOjE1wAtagaoWKl0Ju/M6Qobstl4E+w0RTNL+A3KP0pjuPm6GYqzE21eNI9f6
+         hc1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1795551596; x=1796156396;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=IWHkOExNTIIKhjxQS3sMtn2Z92YI/DSSmmMbSwEzbEA=;
+        b=yuKCI33oKQ9vHO6XI6U4OZQsbUrHppW0Jd+1BN+GcraMZKDB7vXDc+3MOIta61VPTn
+         6VpVGGkRLlWBWtBsBTLSVH0McaP3l6vwXJ3R7RHmI9JI5ex401W8S1goPkONxfqjlki7
+         ENWzbZd7agNwM/8BDnCqui640yxzSlYscc3WXKuok5iVCbzWVQx9WBoYkAUSo1KfWPzG
+         6pqZzEiUcHxaX6h423t8tm5sAqwvrLFS5nhbnOwa4xqmmpICn1XRNrBaiQ/rWtaoIk9K
+         kVNtg1+gTZ1NyAExrgAXcno/iLuYAE2IqwgRudSF+0AXzWZLaxqs75zowhfGolc+JGa5
+         bvXw==
+X-Forwarded-Encrypted: i=1; AL+hErEhbn1kMd8Mn55hD/vszMfoEy0rvlJ4iUqsSCVWdpOBi4N4mx4wfU5VgOdQ42o0kfAJPOrnemZ14wlf@vger.kernel.org
+X-Gm-Message-State: APuU4Z8SO460Q/7JyvEKii+CCTJsf6sNEVJtI1kB+eG4kDGHp44/5quj
+	FEPa8yFgHlRbkIMnGe1Wf6MdzIzJjUDu+knvPHFG0B9RlNvU2hsuLDm+wrj/WZWhFxUZSB5NFai
+	vWQw1hoRQ+x58aDL40FPnh2MrrUjYLII=
+X-Gm-Gg: AZFdTZeVZI8Y7dmNpyTvR6f1CVIMG3lJz05FSZgMN3DjVMT7oGDiGal7VIKqKDFV3zO
+	79O/+U9bVErEHFmoj6ybjZ79E819lSx/e5A4WrF4BPEP2m2I+dGjQ0zWYkev81gsncUgNtXDttu
+	1IQBRrZWKN5lD6BCWJ9ZIBPn7UA+koh82VmD8092RpIAYQP+tzeyq64yQ8RnSM40m79RpPZn6wm
+	Xy0oJgVyrQnitQ1rW1FJWyU7DMIviWIG82vWvguIx9MeeCMQJpoGr8HGTo+ZKQtf+LqQ37LqiDB
+	cxrOZf9uzVlG3U3ZmIet2fvOsAMH7XASCMHzoLVgfvuU2yA4nyVS8QuCRxvVdYxK7EvE0+2tY8o
+	FtE3//b4Fqjm+dc1zSV+jDgSDIiBihLCuFlA42x1yBV87uYHdv+4GU/WFXbj3OxVhG9hXbO1wlr
+	s6jISA1xRiUUWq7petH4okGEGSmYcjJGZ3u9/WHlyYId6R9XgA2GaRLC+6
+X-Received: by 2002:aa7:87cf:0:b0:8b6:12fd:7286 with SMTP id
+ d2e1a72fcca58-8cf8604d889mr607750b3a.58.1795551595957; Tue, 24 Nov 2026
+ 12:19:55 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -128,1963 +105,783 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <21e45bc3fabb264d05600bfc7c32f1e680c8140a.1795393691.git.lucien.xin@gmail.com>
+ <179548328461.3135.7564598888424511077@kernel.org>
+In-Reply-To: <179548328461.3135.7564598888424511077@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 24 Nov 2026 15:19:44 -0500
+X-Gm-Features: Aa3M54rfVVIoS2yfErEj9uGMU9IT79u6PyZ7COn7zv9bV2E6axQ8BLvwPXukCPQ
+Message-ID: <CADvbK_cRwWH6xLeQa6HwnTMTAfpo-h1CSyP3LJW+oxLvVvtUgQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v19 12/15] quic: add crypto packet encryption and decryption
+To: netdev-bot+sashiko@kernel.org
+Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, edumazet@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	metze@samba.org, mbuhl@openbsd.org, tfanelli@redhat.com, hepengtao@xiaomi.com, 
+	dreibh@simula.no, jamie.bainbridge@gmail.com, linux-cifs@vger.kernel.org, 
+	pc@manguebit.org, linkinjeon@kernel.org, tom@talpey.com, 
+	kernel-tls-handshake@lists.linux.dev, cel@kernel.org, jlayton@kernel.org, 
+	steved@redhat.com, hare@suse.de, aahringo@redhat.com, dhowells@redhat.com, 
+	matttbe@kernel.org, mail@johnericson.me, xiyou.wangcong@gmail.com, 
+	alibuda@linux.alibaba.com, jbaron@akamai.com, illiliti@protonmail.com, 
+	sd@queasysnail.net, marcelo.leitner@gmail.com, daniel@haxx.se, 
+	andrew.gospodarek@broadcom.com, mef@scarletmail.rutgers.edu, paul@jakma.org, 
+	kuniyu@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replace each walk of a raw security descriptor (SD) with
-ksmbd_sd_decode() and each place that writes one with ksmbd_sd_encode().
-The functions keep their names and their logic. Only the code that read
-or wrote the bytes of an SD changes.
+On Mon, Nov 23, 2026 at 8:21=E2=80=AFPM <netdev-bot+sashiko@kernel.org> wro=
+te:
+>
+> Thank you for your contribution! Sashiko AI review found 3 potential
+> issue(s) to consider.
+>
+> Critical: 0 =C2=B7 High: 1 =C2=B7 Medium: 1 =C2=B7 Low: 1
+>
+> If you believe none of the issues are legitimate, please reply to each
+> issue of Medium severity or higher and explain why the AI is wrong.
+> If any of them are legitimate and you plan to respin, please let patchwor=
+k
+> know by including "pw-bot: cr" as a separate line at the end of your repl=
+y
+> (one such reply per series is enough).
+>
+> - [High] quic: missing packet number decode on backlog retry in
+>   quic_crypto_decrypt()
+> - [Medium] Retry and NEW_TOKEN tokens now carry a sequential 64-bit
+>   counter in cleartext.
+> - [Low] The kernel-doc for quic_crypto_decrypt() says 'Return: 0 on
+>   success, -EINPROGRESS for async operation, or negative error.' It also=
+=E2=80=A6
+>
+> --
+>
+> quic: add crypto packet encryption and decryption
+>
+> This patch adds AEAD payload protection and QUIC header protection for
+> the TX and RX paths through quic_crypto_encrypt() and
+> quic_crypto_decrypt(). It also adds Retry integrity tag computation and
+> helpers to generate and verify Retry and address validation tokens.
+>
+> > diff --git a/net/quic/crypto.c b/net/quic/crypto.c
+> > index c28c6fa565c1a..ccb1050921c34 100644
+> > --- a/net/quic/crypto.c
+> > +++ b/net/quic/crypto.c
+> > @@ -269,6 +270,485 @@ ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] =
+=3D {
+>
+> [ ... ]
+>
+> > +/* Decrypts a QUIC packet after reception.  This function removes head=
+er
+> > + * protection, decrypts the payload, and processes any key updates if =
+the key
+> > + * phase bit changes.
+> > + *
+> > + * Return: 0 on success, -EINPROGRESS for async operation, or negative=
+ error.
+> > + */
+> > +int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *sk=
+b,
+> > +                     gfp_t gfp)
+> > +{
+>
+> [Severity: Low]
+> Is this return documentation complete? quic_crypto_decrypt() also returns
+> several negative values that act as control signals rather than ordinary
+> drop-the-packet errors:
+>
+>         if (!cb->backlog) /* Key update requires process context. */
+>                 return -EKEYREVOKED;
+>         /* Cannot do key update while async crypto is in progress. */
+>         if (unlikely(atomic_read(&crypto->async_pending[phase])))
+>                 return -EBUSY;
+>         ...
+> err:
+>         if (err =3D=3D -EBADMSG && ++crypto->rx_fails >=3D crypto->cipher=
+->rxlimit)
+>                 err =3D -EKEYEXPIRED;
+>
+> -EKEYREVOKED defers the key update to process context. -EBUSY is a
+> transient retry-later result. -EKEYEXPIRED means the integrity limit was
+> reached, and RFC 9001 section 6.6 requires the connection to be closed.
+>
+> The text "processes any key updates if the key phase bit changes" also
+> doesn't hold for the -EKEYREVOKED and -EBUSY cases. In both, the key upda=
+te
+> is postponed.
+>
+> quic_crypto_encrypt() has the same gap for its confidentiality limit:
+>
+>         if (crypto->tx_count[cb->key_phase] >=3D crypto->cipher->txlimit)
+>                 return -EKEYEXPIRED;
+>
+> Could these return values be documented, so that the callers added later =
+in
+> the series know which ones need more than a plain drop? A caller that dro=
+ps
+> on every negative return would lose key-update packets that arrive outsid=
+e
+> backlog context.
+>
+> [ ... ]
+>
+> > @@ -566,6 +1046,257 @@ int quic_crypto_initial_keys_install(struct quic=
+_crypto *crypto,
+>
+> [ ... ]
+>
+> > +int quic_crypto_generate_token(struct quic_crypto *crypto, void *addr,
+> > +                            u32 addrlen, struct quic_conn_id *conn_id,
+> > +                            u8 *token, u32 *tlen)
+> > +{
+>
+> [ ... ]
+>
+> > +     /* Use counter for nonce derivation to prevent collisions. */
+> > +     counter =3D crypto->tx_count[1]++;
+> > +     p =3D token_buf;
+> > +     p =3D quic_put_int(p, flag, sizeof(flag));
+> > +     p =3D quic_put_int(p, counter, sizeof(counter));
+> > +     p =3D quic_put_int(p, ts, tslen);
+> > +     p =3D quic_put_data(p, addr, addrlen);
+> > +     quic_put_data(p, conn_id->data, conn_id->len);
+> > +
+> > +     err =3D quic_crypto_token_protect(crypto, token_buf, len,
+> > +                                     sizeof(flag) + sizeof(counter), t=
+rue);
+>
+> [Severity: Medium]
+> Does this put a linkable sequence number in cleartext into every token?
+>
+> The counter occupies token bytes 1-8. quic_crypto_token_protect() uses it
+> only as AAD and as nonce input (adlen =3D 1 + 8), so it is never encrypte=
+d.
+> quic_crypto_set_token_secret() seeds it only once per crypto instance:
+>
+>         get_random_bytes(&crypto->tx_count[1], sizeof(crypto->tx_count[1]=
+));
+>
+> As a result, successive tokens from the same issuer carry X, X+1, X+2, an=
+d
+> so on in the clear.
+>
+> Clients send these tokens back in cleartext Initial packets. Suppose a
+> server issues several NEW_TOKEN tokens on one connection, and the client
+> uses each one on a separate later connection, as RFC 9000 section 8.1.3
+> asks in order to avoid linking. An on-path observer could still group tho=
+se
+> connections by their adjacent counter values.
+>
+> For a listener that issues Retry tokens, the gap between two observed
+> counters also shows how many tokens were issued in between.
+>
+> The v18 changelog moved the timestamp into the encrypted payload "to
+> prevent exposing server uptime and linking NEW_TOKEN tokens to their
+> issuing connections".
+>
+> Would a random per-token nonce stored in the token, or a nonce input that
+> isn't visible on the wire, keep nonces unique without adding a new linkab=
+le
+> cleartext field?
+>
+> [ ... ]
+>
+> > @@ -269,6 +270,485 @@ ciphers[QUIC_CIPHER_MAX + 1 - QUIC_CIPHER_MIN] =
+=3D {
+> >                   QUIC_AEAD_TX_CHACHA, QUIC_AEAD_RX_CHACHA),
+> >  };
+> >
+> > +static bool quic_crypto_is_cipher_ccm(struct quic_crypto *crypto)
+> > +{
+> > +     return crypto->cipher_type =3D=3D TLS_CIPHER_AES_CCM_128;
+> > +}
+> > +
+> > +static bool quic_crypto_is_cipher_chacha(struct quic_crypto *crypto)
+> > +{
+> > +     return crypto->cipher_type =3D=3D TLS_CIPHER_CHACHA20_POLY1305;
+> > +}
+> > +
+> > +static void *quic_crypto_skcipher_mem_alloc(struct crypto_skcipher *tf=
+m,
+> > +                                         u32 mask_size, u8 **iv,
+> > +                                         struct skcipher_request **req=
+,
+> > +                                         gfp_t gfp)
+> > +{
+> > +     unsigned int iv_size, req_size;
+> > +     unsigned int len;
+> > +     u8 *mem;
+> > +
+> > +     iv_size =3D crypto_skcipher_ivsize(tfm);
+> > +     req_size =3D sizeof(**req) + crypto_skcipher_reqsize(tfm);
+> > +
+> > +     len =3D mask_size;
+> > +     len +=3D iv_size;
+> > +     len +=3D crypto_skcipher_alignmask(tfm) &
+> > +            ~(crypto_tfm_ctx_alignment() - 1);
+> > +     len =3D ALIGN(len, crypto_tfm_ctx_alignment());
+> > +     len +=3D req_size;
+> > +
+> > +     mem =3D kzalloc(len, gfp);
+> > +     if (!mem)
+> > +             return NULL;
+> > +
+> > +     *iv =3D (u8 *)PTR_ALIGN(mem + mask_size,
+> > +                           crypto_skcipher_alignmask(tfm) + 1);
+> > +     *req =3D (struct skcipher_request *)PTR_ALIGN(*iv + iv_size,
+> > +                                                 crypto_tfm_ctx_alignm=
+ent());
+> > +
+> > +     return (void *)mem;
+> > +}
+> > +
+> > +/* Extracts and reconstructs the packet number from an incoming QUIC p=
+acket. */
+> > +static int quic_crypto_get_number(struct sk_buff *skb)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     s64 number_max =3D cb->number;
+> > +     u32 len =3D cb->length;
+> > +     u8 *p;
+> > +
+> > +     /* rfc9000#section-17.1:
+> > +      *
+> > +      * Once header protection is removed, the packet number is decode=
+d by
+> > +      * finding the packet number value that is closest to the next ex=
+pected
+> > +      * packet. The next expected packet is the highest received packe=
+t
+> > +      * number plus one.
+> > +      */
+> > +     p =3D (u8 *)quic_hdr(skb) + cb->number_offset;
+> > +     if (!quic_get_int(&p, &len, &cb->number, cb->number_len))
+> > +             return -EINVAL;
+> > +     cb->number =3D quic_get_num(number_max, cb->number, cb->number_le=
+n);
+> > +     return 0;
+> > +}
+> > +
+> > +#define QUIC_SAMPLE_LEN              16
+> > +
+> > +#define QUIC_HEADER_FORM_BIT 0x80
+> > +#define QUIC_LONG_HEADER_MASK        0x0f
+> > +#define QUIC_SHORT_HEADER_MASK       0x1f
+> > +
+> > +/* Header Protection. */
+> > +static int quic_crypto_header_protect(struct quic_crypto *crypto,
+> > +                                   struct sk_buff *skb, bool enc, gfp_=
+t gfp)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     u8 *mask, *iv, *p, h_mask, chacha;
+> > +     struct skcipher_request *req;
+> > +     struct crypto_skcipher *tfm;
+> > +     struct sk_buff *trailer;
+> > +     struct scatterlist sg;
+> > +     int err, i;
+> > +
+> > +     chacha =3D quic_crypto_is_cipher_chacha(crypto);
+> > +     if (!enc) {
+> > +             tfm =3D crypto->rx_hp_tfm;
+> > +             if (cb->length < QUIC_PN_MAX_LEN + QUIC_SAMPLE_LEN)
+> > +                     return -EINVAL;
+> > +
+> > +             err =3D skb_cow_data(skb, 0, &trailer);
+> > +             if (err < 0)
+> > +                     return err;
+> > +     } else {
+> > +             tfm =3D crypto->tx_hp_tfm;
+> > +     }
+> > +
+> > +     mask =3D quic_crypto_skcipher_mem_alloc(tfm, QUIC_SAMPLE_LEN, &iv=
+, &req,
+> > +                                           gfp);
+> > +     if (!mask)
+> > +             return -ENOMEM;
+> > +
+> > +     /* rfc9001#section-5.4.2: Header Protection Sample:
+> > +      *
+> > +      *   # pn_offset is the start of the Packet Number field.
+> > +      *   sample_offset =3D pn_offset + 4
+> > +      *
+> > +      *   sample =3D packet[sample_offset..sample_offset+sample_length=
+]
+> > +      *
+> > +      * rfc9001#section-5.4.3: AES-Based Header Protection:
+> > +      *
+> > +      *   header_protection(hp_key, sample):
+> > +      *     mask =3D AES-ECB(hp_key, sample)
+> > +      *
+> > +      * rfc9001#section-5.4.4: ChaCha20-Based Header Protection:
+> > +      *
+> > +      *   header_protection(hp_key, sample):
+> > +      *     counter =3D sample[0..3]
+> > +      *     nonce =3D sample[4..15]
+> > +      *     mask =3D ChaCha20(hp_key, counter, nonce, {0,0,0,0,0})
+> > +      */
+> > +     p =3D skb->data + cb->number_offset + QUIC_PN_MAX_LEN;
+> > +     memcpy((chacha ? iv : mask), p, QUIC_SAMPLE_LEN);
+> > +     sg_init_one(&sg, mask, QUIC_SAMPLE_LEN);
+> > +     skcipher_request_set_tfm(req, tfm);
+> > +     skcipher_request_set_crypt(req, &sg, &sg, QUIC_SAMPLE_LEN, iv);
+> > +     err =3D crypto_skcipher_encrypt(req);
+> > +     if (err)
+> > +             goto out;
+> > +
+> > +     /* rfc9001#section-5.4.1:
+> > +      *
+> > +      * mask =3D header_protection(hp_key, sample)
+> > +      *
+> > +      * pn_length =3D (packet[0] & 0x03) + 1
+> > +      * if (packet[0] & 0x80) =3D=3D 0x80:
+> > +      *    # Long header: 4 bits masked
+> > +      *    packet[0] ^=3D mask[0] & 0x0f
+> > +      * else:
+> > +      *    # Short header: 5 bits masked
+> > +      *    packet[0] ^=3D mask[0] & 0x1f
+> > +      *
+> > +      * # pn_offset is the start of the Packet Number field.
+> > +      * packet[pn_offset:pn_offset+pn_length] ^=3D mask[1:1+pn_length]
+> > +      */
+> > +     p =3D skb->data;
+> > +     h_mask =3D ((*p & QUIC_HEADER_FORM_BIT) =3D=3D QUIC_HEADER_FORM_B=
+IT) ?
+> > +              QUIC_LONG_HEADER_MASK : QUIC_SHORT_HEADER_MASK;
+> > +     *p =3D (u8)(*p ^ (mask[0] & h_mask));
+> > +     if (!enc) {
+> > +             if (!quic_hdr(skb)->form)
+> > +                     cb->key_phase =3D quic_hdr(skb)->key;
+> > +             cb->number_len =3D quic_hdr(skb)->pnl + 1;
+> > +     }
+> > +     p +=3D cb->number_offset;
+> > +     for (i =3D 1; i <=3D cb->number_len; i++)
+> > +             *p++ ^=3D mask[i];
+> > +
+> > +     if (!enc)
+> > +             err =3D quic_crypto_get_number(skb);
+> > +out:
+> > +     kfree_sensitive(mask);
+> > +     return err;
+> > +}
+> > +
+> > +static void *quic_crypto_aead_mem_alloc(struct crypto_aead *tfm, u32 c=
+tx_size,
+> > +                                     u8 **iv, struct aead_request **re=
+q,
+> > +                                     struct scatterlist **sg, u32 nsg,
+> > +                                     gfp_t gfp)
+> > +{
+> > +     unsigned int iv_size, req_size;
+> > +     unsigned int len;
+> > +     u8 *mem;
+> > +
+> > +     iv_size =3D crypto_aead_ivsize(tfm);
+> > +     req_size =3D sizeof(**req) + crypto_aead_reqsize(tfm);
+> > +
+> > +     len =3D ctx_size;
+> > +     len +=3D iv_size;
+> > +     len +=3D crypto_aead_alignmask(tfm) & ~(crypto_tfm_ctx_alignment(=
+) - 1);
+> > +     len =3D ALIGN(len, crypto_tfm_ctx_alignment());
+> > +     len +=3D req_size;
+> > +     len =3D ALIGN(len, __alignof__(struct scatterlist));
+> > +     len +=3D nsg * sizeof(**sg);
+> > +
+> > +     mem =3D kzalloc(len, gfp);
+> > +     if (!mem)
+> > +             return NULL;
+> > +
+> > +     *iv =3D (u8 *)PTR_ALIGN(mem + ctx_size, crypto_aead_alignmask(tfm=
+) + 1);
+> > +     *req =3D (struct aead_request *)PTR_ALIGN(*iv + iv_size,
+> > +                                             crypto_tfm_ctx_alignment(=
+));
+> > +     *sg =3D (struct scatterlist *)PTR_ALIGN((u8 *)*req + req_size,
+> > +                                           __alignof__(struct scatterl=
+ist));
+> > +
+> > +     return (void *)mem;
+> > +}
+> > +
+> > +static void quic_crypto_done(void *data, int err)
+> > +{
+> > +     struct sk_buff *skb =3D data;
+> > +     struct quic_crypto *crypto;
+> > +     struct quic_skb_cb *cb;
+> > +
+> > +     if (err =3D=3D -EINPROGRESS)
+> > +             return;
+> > +
+> > +     cb =3D QUIC_SKB_CB(skb);
+> > +     crypto =3D *(struct quic_crypto **)cb->crypto_ctx;
+> > +     atomic_dec(&crypto->async_pending[cb->key_phase]);
+> > +
+> > +     kfree_sensitive(cb->crypto_ctx);
+> > +     cb->crypto_err =3D err;
+> > +     cb->crypto_done(skb);
+> > +}
+> > +
+> > +/* AEAD Usage. */
+> > +static int quic_crypto_payload_protect(struct quic_crypto *crypto,
+> > +                                    struct sk_buff *skb, bool enc, gfp=
+_t gfp)
+> > +{
+> > +     u8 *base_iv, *iv, i, nonce[QUIC_IV_LEN], ccm, phase;
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     u32 len, hlen, sglen, nsg;
+> > +     struct aead_request *req;
+> > +     struct crypto_aead *tfm;
+> > +     struct sk_buff *trailer;
+> > +     struct scatterlist *sg;
+> > +     void *ctx;
+> > +     __be64 n;
+> > +     int err;
+> > +
+> > +     ccm =3D quic_crypto_is_cipher_ccm(crypto);
+> > +     phase =3D cb->key_phase;
+> > +     hlen =3D cb->number_offset + cb->number_len;
+> > +     if (enc) {
+> > +             tfm =3D crypto->tx_tfm[phase];
+> > +             base_iv =3D crypto->tx_iv[phase];
+> > +             len =3D skb->len;
+> > +             err =3D skb_cow_data(skb, QUIC_TAG_LEN, &trailer);
+> > +             if (err < 0)
+> > +                     return err;
+> > +             pskb_put(skb, trailer, QUIC_TAG_LEN);
+> > +             if (!quic_hdr(skb)->form)
+> > +                     quic_hdr(skb)->key =3D phase;
+> > +             sglen =3D skb->len;
+> > +             nsg =3D (u32)err;
+> > +     } else {
+> > +             tfm =3D crypto->rx_tfm[phase];
+> > +             base_iv =3D crypto->rx_iv[phase];
+> > +             len =3D cb->length + cb->number_offset;
+> > +             if (len - hlen < QUIC_TAG_LEN)
+> > +                     return -EINVAL;
+> > +             sglen =3D len;
+> > +             nsg =3D 1;
+> > +     }
+> > +
+> > +     ctx =3D quic_crypto_aead_mem_alloc(tfm, sizeof(void *), &iv, &req=
+, &sg,
+> > +                                      nsg, gfp);
+> > +     if (!ctx)
+> > +             return -ENOMEM;
+> > +
+> > +     sg_init_table(sg, nsg);
+> > +     err =3D skb_to_sgvec(skb, sg, 0, sglen);
+> > +     if (err < 0)
+> > +             goto out;
+> > +
+> > +     /* rfc9001#section-5.3:
+> > +      *
+> > +      * The associated data, A, for the AEAD is the contents of the QU=
+IC
+> > +      * header, starting from the first byte of either the short or lo=
+ng
+> > +      * header, up to and including the unprotected packet number.
+> > +      *
+> > +      * The nonce, N, is formed by combining the packet protection IV =
+with
+> > +      * the packet number.  The 62 bits of the reconstructed QUIC pack=
+et
+> > +      * number in network byte order are left-padded with zeros to the=
+ size
+> > +      * of the IV. The exclusive OR of the padded packet number and th=
+e IV
+> > +      * forms the AEAD nonce.
+> > +      */
+> > +     memcpy(nonce, base_iv, QUIC_IV_LEN);
+> > +     n =3D cpu_to_be64(cb->number);
+> > +     for (i =3D 0; i < sizeof(n); i++)
+> > +             nonce[QUIC_IV_LEN - sizeof(n) + i] ^=3D ((u8 *)&n)[i];
+> > +
+> > +     /* For CCM based ciphers, first byte of IV is a constant. */
+> > +     iv[0] =3D TLS_AES_CCM_IV_B0_BYTE;
+> > +     memcpy(&iv[ccm], nonce, QUIC_IV_LEN);
+> > +     aead_request_set_tfm(req, tfm);
+> > +     aead_request_set_ad(req, hlen);
+> > +     aead_request_set_crypt(req, sg, sg, len - hlen, iv);
+> > +     if (cb->sync) {
+> > +             DECLARE_CRYPTO_WAIT(wait);
+> > +
+> > +             aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG=
+,
+> > +                                       crypto_req_done, &wait);
+> > +             err =3D enc ? crypto_aead_encrypt(req) : crypto_aead_decr=
+ypt(req);
+> > +             if (err =3D=3D -EINPROGRESS || err =3D=3D -EBUSY)
+> > +                     err =3D crypto_wait_req(err, &wait);
+> > +             goto out;
+> > +     }
+> > +
+> > +     aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > +                               quic_crypto_done, skb);
+> > +     *(struct quic_crypto **)ctx =3D crypto;
+> > +     atomic_inc(&crypto->async_pending[phase]);
+> > +     cb->crypto_ctx =3D ctx; /* Async free context for quic_crypto_don=
+e() */
+> > +     err =3D enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req)=
+;
+> > +     if (err =3D=3D -EINPROGRESS || err =3D=3D -EBUSY) {
+> > +             memzero_explicit(nonce, sizeof(nonce));
+> > +             return -EINPROGRESS;
+> > +     }
+> > +     atomic_dec(&crypto->async_pending[phase]);
+> > +     cb->crypto_ctx =3D NULL;
+> > +
+> > +out:
+> > +     kfree_sensitive(ctx);
+> > +     memzero_explicit(nonce, sizeof(nonce));
+> > +     return err;
+> > +}
+> > +
+> > +/* Encrypts a QUIC packet before transmission.  This function performs=
+ AEAD
+> > + * encryption of the packet payload and applies header protection. It =
+handles
+> > + * key phase tracking and key update timing.
+> > + *
+> > + * Return: 0 on success, -EINPROGRESS for async operation, or negative=
+ error.
+> > + */
+> > +int quic_crypto_encrypt(struct quic_crypto *crypto, struct sk_buff *sk=
+b,
+> > +                     gfp_t gfp)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     int err;
+> > +
+> > +     /* Packet payload is already encrypted (e.g., resumed from async)=
+,
+> > +      * proceed to header protection only.
+> > +      */
+> > +     if (cb->resume) {
+> > +             err =3D cb->crypto_err;
+> > +             if (err)
+> > +                     return err;
+> > +             goto out;
+> > +     }
+> > +
+> > +     cb->key_phase =3D crypto->key_phase;
+> > +     if (crypto->tx_count[cb->key_phase] >=3D crypto->cipher->txlimit)
+> > +             return -EKEYEXPIRED;
+> > +     crypto->tx_count[cb->key_phase]++;
+> > +     err =3D quic_crypto_payload_protect(crypto, skb, true, gfp);
+> > +     if (err)
+> > +             return err;
+> > +out:
+> > +     err =3D quic_crypto_header_protect(crypto, skb, true, gfp);
+> > +     if (err)
+> > +             return err;
+> > +     /* If a key update is pending and this is the first packet using =
+the
+> > +      * new key, save the current time. Later used to clear old keys a=
+fter
+> > +      * some time has passed (see quic_crypto_decrypt()).
+> > +      */
+> > +     if (crypto->key_pending && !crypto->key_update_send_time &&
+> > +         cb->key_phase =3D=3D crypto->key_phase)
+> > +             crypto->key_update_send_time =3D quic_ktime_get_us();
+> > +     return 0;
+> > +}
+> > +
+> > +/* Decrypts a QUIC packet after reception.  This function removes head=
+er
+> > + * protection, decrypts the payload, and processes any key updates if =
+the key
+> > + * phase bit changes.
+> > + *
+> > + * Return: 0 on success, -EINPROGRESS for async operation, or negative=
+ error.
+> > + */
+> > +int quic_crypto_decrypt(struct quic_crypto *crypto, struct sk_buff *sk=
+b,
+> > +                     gfp_t gfp)
+> > +{
+> > +     struct quic_skb_cb *cb =3D QUIC_SKB_CB(skb);
+> > +     int err =3D 0;
+> > +     u64 time;
+> > +     u8 phase;
+> > +
+> > +     /* Payload was decrypted asynchronously.  Proceed with parsing pa=
+cket
+> > +      * number and key phase.
+> > +      */
+> > +     if (cb->resume) {
+> > +             err =3D cb->crypto_err;
+> > +             if (err) {
+> > +                     /* Apply same key_pending cleanup as synchronous =
+path to
+> > +                      * avoid deadlock in key update state machine.
+> > +                      */
+> > +                     if (crypto->key_pending &&
+> > +                         cb->key_phase !=3D crypto->key_phase) {
+> > +                             crypto->key_pending =3D 0;
+> > +                             crypto->key_update_time =3D 0;
+> > +                             crypto->key_update_send_time =3D 0;
+> > +                     }
+> > +                     goto err;
+> > +             }
+> > +             err =3D quic_crypto_get_number(skb);
+> > +             if (err)
+> > +                     return err;
+> > +             goto out;
+> > +     }
+> > +     if (!cb->number_len) { /* Packet header not yet decrypted. */
+> > +             err =3D quic_crypto_header_protect(crypto, skb, false, gf=
+p);
+> > +             if (err) {
+> > +                     pr_debug("%s: hd decrypt err %d\n", __func__, err=
+);
+> > +                     return err;
+> > +             }
+> > +     }
+> > +
+> > +     /* rfc9001#section-6:
+> > +      *
+> > +      * The Key Phase bit allows a recipient to detect a change in key=
+ing
+> > +      * material without needing to receive the first packet that trig=
+gered
+> > +      * the change. An endpoint that notices a changed Key Phase bit u=
+pdates
+> > +      * keys and decrypts the packet that contains the changed value.
+> > +      */
+> > +     phase =3D cb->key_phase;
+> > +     if (phase !=3D crypto->key_phase && !crypto->key_pending) {
+> > +             if (!crypto->send_ready) /* Not ready for key update. */
+> > +                     return -EINVAL;
+> > +             if (!cb->backlog) /* Key update requires process context.=
+ */
+> > +                     return -EKEYREVOKED;
+> > +             /* Cannot do key update while async crypto is in progress=
+. */
+> > +             if (unlikely(atomic_read(&crypto->async_pending[phase])))
+> > +                     return -EBUSY;
+> > +             err =3D quic_crypto_key_update(crypto); /* Perform key up=
+date. */
+> > +             if (err) {
+> > +                     cb->errcode =3D QUIC_TRANSPORT_ERROR_KEY_UPDATE;
+> > +                     return err;
+> > +             }
+> > +             cb->sync =3D 1;
+> > +             cb->key_update =3D 1; /* Mark packet as triggering key up=
+date. */
+> > +     }
+> > +
+> > +     err =3D quic_crypto_payload_protect(crypto, skb, false, gfp);
+> > +     if (err) {
+> > +             if (err =3D=3D -EINPROGRESS)
+> > +                     return err;
+> > +             /* When using the old keys can not decrypt the packets, t=
+he
+> > +              * peer might start another key_update. Thus, clear the l=
+ast
+> > +              * key_pending so that next packets will trigger the new
+> > +              * key-update.
+> > +              */
+> > +             if (crypto->key_pending && phase !=3D crypto->key_phase) =
+{
+> > +                     crypto->key_pending =3D 0;
+> > +                     crypto->key_update_time =3D 0;
+> > +                     crypto->key_update_send_time =3D 0;
+> > +             }
+> > +             goto err;
+> > +     }
+> > +
+> > +out:
+> > +     /* rfc9001#section-6.2:
+> > +      *
+> > +      * If a packet is successfully processed using the next key and I=
+V,
+> > +      * then the peer has initiated a key update.
+> > +      */
+> > +     if (cb->key_update) {
+> > +             crypto->key_pending =3D 1;
+> > +             crypto->key_derived =3D 0;
+> > +             crypto->key_phase =3D !crypto->key_phase;
+> > +     }
+> > +     /* rfc9001#section-6.1:
+> > +      *
+> > +      * An endpoint MUST retain old keys until it has successfully
+> > +      * unprotected a packet sent using the new keys. An endpoint SHOU=
+LD
+> > +      * retain old keys for some time after unprotecting a packet sent=
+ using
+> > +      * the new keys.
+> > +      */
+> > +     if (crypto->key_pending && cb->key_phase =3D=3D crypto->key_phase=
+) {
+> > +             time =3D crypto->key_update_send_time;
+> > +             if (time &&
+> > +                 quic_ktime_get_us() - time >=3D crypto->key_update_ti=
+me) {
+> > +                     crypto->key_pending =3D 0;
+> > +                     crypto->key_update_time =3D 0;
+> > +                     crypto->key_update_send_time =3D 0;
+> > +             }
+> > +     }
+> > +     return 0;
+> > +err:
+> > +     if (err =3D=3D -EBADMSG && ++crypto->rx_fails >=3D crypto->cipher=
+->rxlimit)
+> > +             err =3D -EKEYEXPIRED;
+> > +     return err;
+> > +}
+> > +
+> >  int quic_crypto_set_cipher(struct quic_crypto *crypto, u32 type)
+> >  {
+> >       const struct quic_cipher *cipher;
+>
+> [Severity: High]
+> What value does cb->number hold when a deferred key-update packet comes
+> back into quic_crypto_decrypt() from process context?
+>
+> On the first pass in softirq context, cb->number_len is still 0. That
+> means quic_crypto_header_protect() runs: it removes header protection in
+> place, sets cb->key_phase and cb->number_len, and calls
+> quic_crypto_get_number(), which overwrites cb->number with the
+> reconstructed packet number. The flipped key phase then makes the
+> function return -EKEYREVOKED, or -EBUSY while async_pending[phase] is
+> non-zero. The packet is then requeued with cb->backlog set.
+>
+> On the second pass cb->resume is 0 and cb->number_len is non-zero. Header
+> protection removal is correctly skipped, but that also skips the only
+> call to quic_crypto_get_number() outside the resume branch.
+> quic_crypto_payload_protect() then builds the AEAD nonce directly from
+> cb->number.
+>
+> For the cb->resume path, the cover letter says callers reset cb->number
+> to the largest previously seen packet number before re-entering, and
+> quic_crypto_get_number() decodes it again. Suppose the backlog re-entry
+> follows the same caller contract. Then cb->number no longer holds this
+> packet's number, the nonce is wrong, and crypto_aead_decrypt() fails
+> with -EBADMSG.
+False.
 
-ksmbd_vfs_get_sd_xattr() decodes the stored SD and returns a struct
-ksmbd_sd, so the access check, inheritance, and QUERY_INFO no longer
-check offsets and sizes themselves. parse_sec_desc() decodes the SD a
-client sent, and set_info_sec() encodes what it stores. build_sec_desc()
-and smb_inherit_dacl() fill in a struct ksmbd_sd and encode it.
-build_sec_desc() allocates its reply, which removes
-smb_acl_sec_desc_scratch_len() and the size arithmetic in its callers.
-dacl_add_ace_size(), parse_sid(), smb_set_ace(), and
-smb_validate_ntsd_sid() are removed with the walks they served.
+For the backlog re-entry, cb->number_len is set and cb->resume is 0,
+and neither condition fires, so the already-decoded value is preserved.
 
-The changes in behavior follow.
+I will continue to check these Medium findings tomorrow.
 
-A malformed SD is refused whole, and the decoder refuses more than the
-walks did. For example, it refuses a DACL whose AceCount is larger than
-the ACEs it holds.
+Thanks.
 
-- parse_sec_desc() returns -EINVAL for a malformed SD from a client,
-  even if only the SACL is malformed. It now checks the owner and the
-  group when DACL_PRESENT is clear. Before, it checked only OffsetDacl
-  in that case.
-- The loader returns -EBADMSG for a malformed stored SD and logs a
-  rate-limited warning. QUERY_INFO returns
-  STATUS_INVALID_SECURITY_DESCR. The access check denies the request.
-  Inheritance falls back to the SD built from the child's inode.
-- A stored SD shorter than its header is malformed too. Before, it
-  counted as no stored SD.
-
-The other changes follow.
-
-- The SID of an object ACE is read after its GUIDs. Before, its Flags
-  were read as the SID. parse_dacl() still refuses a DACL with an object
-  ACE, and QUERY_INFO still leaves the ACE out. The access check now
-  skips an object ACE. It still records an object ACE that denies,
-  unless the ACE is inherit-only.
-- Inheritance copies an ACE whole. Before, a callback ACE lost its data
-  and an object ACE lost its GUIDs.
-- Inheritance accepts a parent DACL of 16-byte ACEs. Before, it refused
-  an AceCount above (AclSize - 8) / 18.
-- A DACL that holds an object ACE is written with revision 4.
-- A DACL over 65535 bytes fails with -E2BIG. Before, the POSIX ACL
-  entries that did not fit were left out.
-- build_sec_desc() fails with -ENOMEM if it cannot allocate the SIDs of
-  the POSIX ACL entries. Before, the remaining entries were left out.
-- Every stored SD is the one the encoder writes, with SELF_RELATIVE
-  set. Before, SET_INFO stored the buffer the client sent. The format
-  of the xattr does not change.
-- A refused SD from a client is logged with ksmbd_debug(). The pr_err()
-  lines of the walks are gone.
-
-The fixture in smbacl_kunit.c counts two ACEs in its DACL, and only one
-fits inside AclSize. That SD is now refused whole, so the case for
-maximal access expects a denial, as the other case already did. A new
-case sets AceCount to one and checks that maximal access includes read
-and excludes write.
-
-Signed-off-by: Ian Bridges <icb@fastmail.org>
----
- fs/smb/server/smb2pdu.c            |   79 +--
- fs/smb/server/smbacl.c             | 1021 ++++++++--------------------
- fs/smb/server/smbacl.h             |   11 +-
- fs/smb/server/tests/smbacl_kunit.c |   42 ++
- fs/smb/server/vfs.c                |   50 +-
- fs/smb/server/vfs.h                |   10 +-
- 6 files changed, 392 insertions(+), 821 deletions(-)
-
-diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
-index 25e19ae10ad5..6b69dda87105 100644
---- a/fs/smb/server/smb2pdu.c
-+++ b/fs/smb/server/smb2pdu.c
-@@ -5243,33 +5243,13 @@ int smb2_open(struct ksmbd_work *work)
- 					struct smb_fattr fattr;
- 					struct smb_ntsd *pntsd;
- 					int pntsd_size;
--					size_t scratch_len;
- 
- 					rc = ksmbd_acls_fattr(&fattr, idmap, inode);
- 					if (rc)
- 						goto err_out;
- 
--					scratch_len = smb_acl_sec_desc_scratch_len(&fattr,
--							NULL, 0,
--							OWNER_SECINFO | GROUP_SECINFO |
--							DACL_SECINFO);
--					if (!scratch_len || scratch_len == SIZE_MAX) {
--						rc = -EFBIG;
--						posix_acl_release(fattr.cf_acls);
--						posix_acl_release(fattr.cf_dacls);
--						goto err_out;
--					}
--
--					pntsd = kvzalloc(scratch_len, KSMBD_DEFAULT_GFP);
--					if (!pntsd) {
--						rc = -ENOMEM;
--						posix_acl_release(fattr.cf_acls);
--						posix_acl_release(fattr.cf_dacls);
--						goto err_out;
--					}
--
- 					rc = build_sec_desc(idmap,
--							    pntsd, NULL, 0,
-+							    &pntsd, NULL,
- 							    OWNER_SECINFO |
- 							    GROUP_SECINFO |
- 							    DACL_SECINFO,
-@@ -8435,14 +8415,14 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- {
- 	struct ksmbd_file *fp;
- 	const struct mnt_idmap *idmap;
--	struct smb_ntsd *pntsd = NULL, *ppntsd = NULL;
-+	struct smb_ntsd *pntsd = NULL;
-+	struct ksmbd_sd *ppntsd = NULL;
- 	struct smb_fattr fattr = {{0}};
- 	struct inode *inode;
- 	__u32 secdesclen = 0;
- 	unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
- 	int addition_info = le32_to_cpu(req->AdditionalInformation);
--	int rc = 0, ppntsd_size = 0, max_len;
--	size_t scratch_len = 0;
-+	int rc = 0, max_len;
- 
- 	if (addition_info & ~(OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
- 			      PROTECTED_DACL_SECINFO |
-@@ -8494,11 +8474,13 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- 
- 	if (test_share_config_flag(work->tcon->share_conf,
- 				   KSMBD_SHARE_FLAG_ACL_XATTR)) {
--		ppntsd_size = ksmbd_vfs_get_sd_xattr(work->conn, idmap,
--						     fp->filp->f_path.dentry,
--						     &ppntsd);
--		if (ppntsd_size < 0 && !smb_no_stored_sd(ppntsd_size)) {
--			rc = ppntsd_size == -ENOMEM ? -ENOMEM : -EIO;
-+		rc = ksmbd_vfs_get_sd_xattr(work->conn, idmap,
-+					    fp->filp->f_path.dentry, &ppntsd);
-+		if (rc && !smb_no_stored_sd(rc)) {
-+			if (rc == -EBADMSG)
-+				rsp->hdr.Status = STATUS_INVALID_SECURITY_DESCR;
-+			else if (rc != -ENOMEM)
-+				rc = -EIO;
- 			goto release_acl;
- 		}
- 	}
-@@ -8512,32 +8494,18 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- 		goto release_acl;
- 	}
- 
--	scratch_len = smb_acl_sec_desc_scratch_len(&fattr, ppntsd,
--			ppntsd_size, addition_info);
--	if (!scratch_len || scratch_len > SIZE_MAX - 7) {
--		rc = -EFBIG;
--		goto release_acl;
--	}
--
--	/* A compound response pads the descriptor to 8 bytes in this buffer */
--	scratch_len = ALIGN(scratch_len, 8);
--	pntsd = kvzalloc(scratch_len, KSMBD_DEFAULT_GFP);
--	if (!pntsd) {
--		rc = -ENOMEM;
--		goto release_acl;
--	}
--
--	rc = build_sec_desc(idmap, pntsd, ppntsd, ppntsd_size,
--			addition_info, &secdesclen, &fattr);
-+	rc = build_sec_desc(idmap, &pntsd, ppntsd, addition_info, &secdesclen,
-+			    &fattr);
-+	/* The DACL is too large for an SD */
-+	if (rc == -E2BIG)
-+		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
- 
- release_acl:
- 	posix_acl_release(fattr.cf_acls);
- 	posix_acl_release(fattr.cf_dacls);
--	kfree(ppntsd);
-+	kvfree(ppntsd);
- 	ksmbd_fd_put(work, fp);
- 
--	if (!rc && ALIGN(secdesclen, 8) > scratch_len)
--		rc = -EFBIG;
- 	if (rc)
- 		goto err_out;
- 
-@@ -8548,6 +8516,19 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
- 	if (rc)
- 		goto err_out;
- 
-+	/* A compound response pads the descriptor to 8 bytes in this buffer */
-+	if (!IS_ALIGNED(secdesclen, 8)) {
-+		void *padded = kvrealloc(pntsd, ALIGN(secdesclen, 8),
-+					 KSMBD_DEFAULT_GFP);
-+
-+		if (!padded) {
-+			rc = -ENOMEM;
-+			goto err_out;
-+		}
-+		memset(padded + secdesclen, 0, ALIGN(secdesclen, 8) - secdesclen);
-+		pntsd = padded;
-+	}
-+
- 	rc = ksmbd_iov_pin_rsp_read(work, (void *)rsp,
- 			offsetof(struct smb2_query_info_rsp, Buffer),
- 			pntsd, secdesclen);
-diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
-index 49530198a2b6..098c9132ebe6 100644
---- a/fs/smb/server/smbacl.c
-+++ b/fs/smb/server/smbacl.c
-@@ -6,9 +6,11 @@
-  *   Author(s): Namjae Jeon <linkinjeon@kernel.org>
-  */
- 
-+#include <linux/cleanup.h>
- #include <linux/fs.h>
- #include <linux/dcache.h>
- #include <kunit/visibility.h>
-+#include <linux/overflow.h>
- #include <linux/slab.h>
- #include <linux/string.h>
- #include <linux/mnt_idmapping.h>
-@@ -19,6 +21,7 @@
- #include "server.h"
- #include "misc.h"
- #include "mgmt/share_config.h"
-+#include "secdesc.h"
- 
- static const struct smb_sid domain = {1, 4, {0, 0, 0, 0, 0, 5},
- 	{cpu_to_le32(21), cpu_to_le32(1), cpu_to_le32(2), cpu_to_le32(3),
-@@ -196,12 +199,10 @@ static void mode_to_access_flags(umode_t mode, umode_t bits_to_use,
- 		    mode, *pace_flags);
- }
- 
--static __u16 fill_ace_for_sid(struct smb_ace *pntace,
--			      const struct smb_sid *psid, int type, int flags,
--			      umode_t mode, umode_t bits)
-+static void fill_ace_for_sid(struct ksmbd_ace *pntace,
-+			     const struct smb_sid *psid, int type, int flags,
-+			     umode_t mode, umode_t bits)
- {
--	int i;
--	__u16 size = 0;
- 	__u32 access_req = 0;
- 
- 	pntace->type = type;
-@@ -209,19 +210,8 @@ static __u16 fill_ace_for_sid(struct smb_ace *pntace,
- 	mode_to_access_flags(mode, bits, &access_req);
- 	if (!access_req)
- 		access_req = SET_MINIMUM_RIGHTS;
--	pntace->access_req = cpu_to_le32(access_req);
--
--	pntace->sid.revision = psid->revision;
--	pntace->sid.num_subauth = psid->num_subauth;
--	for (i = 0; i < NUM_AUTHS; i++)
--		pntace->sid.authority[i] = psid->authority[i];
--	for (i = 0; i < psid->num_subauth; i++)
--		pntace->sid.sub_auth[i] = psid->sub_auth[i];
--
--	size = 1 + 1 + 2 + 4 + 1 + 1 + 6 + (psid->num_subauth * 4);
--	pntace->size = cpu_to_le16(size);
--
--	return size;
-+	pntace->mask = access_req;
-+	pntace->sid = psid;
- }
- 
- void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
-@@ -261,7 +251,7 @@ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
- }
- 
- static int sid_to_id(const struct mnt_idmap *idmap,
--		     struct smb_sid *psid, uint sidtype,
-+		     const struct smb_sid *psid, uint sidtype,
- 		     struct smb_fattr *fattr)
- {
- 	const struct smb_sid *sid_prefix;
-@@ -387,52 +377,23 @@ void free_acl_state(struct posix_acl_state *state)
- }
- 
- static int parse_dacl(const struct mnt_idmap *idmap,
--		      struct smb_acl *pdacl, char *end_of_acl,
--		      struct smb_sid *pownersid, struct smb_sid *pgrpsid,
--		      struct smb_fattr *fattr)
-+		      struct ksmbd_sd *sd,
-+		      const struct smb_sid *pownersid,
-+		      const struct smb_sid *pgrpsid, struct smb_fattr *fattr)
- {
- 	int i, ret;
- 	u16 num_aces = 0;
--	u16 dacl_size;
--	unsigned int acl_size;
--	char *acl_base;
--	struct smb_ace **ppace;
-+	struct ksmbd_ace *ace;
- 	struct posix_acl_entry *cf_pace, *cf_pdace;
- 	struct posix_acl_state acl_state, default_acl_state;
- 	umode_t mode = 0, acl_mode;
- 	bool owner_found = false, group_found = false, others_found = false;
- 	bool nfs_mode_found = false;
- 
--	if (!pdacl)
--		return 0;
--
--	/* validate that we do not go past end of acl */
--	if (end_of_acl < (char *)pdacl + sizeof(struct smb_acl) ||
--	    end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size)) {
--		pr_err("ACL too small to parse DACL\n");
--		return -EINVAL;
--	}
--
--	ksmbd_debug(SMB, "DACL revision %d size %d num aces %d\n",
--		    le16_to_cpu(pdacl->revision), le16_to_cpu(pdacl->size),
--		    le16_to_cpu(pdacl->num_aces));
--
--	acl_base = (char *)pdacl;
--	acl_size = sizeof(struct smb_acl);
--
--	num_aces = le16_to_cpu(pdacl->num_aces);
-+	num_aces = sd->num_aces;
- 	if (num_aces <= 0)
- 		return 0;
- 
--	dacl_size = le16_to_cpu(pdacl->size);
--	if (dacl_size < sizeof(struct smb_acl))
--		return -EINVAL;
--
--	if (num_aces > (dacl_size - sizeof(struct smb_acl)) /
--			(offsetof(struct smb_ace, sid) +
--			 offsetof(struct smb_sid, sub_auth) + sizeof(__le16)))
--		return -EINVAL;
--
- 	ret = init_acl_state(&acl_state, num_aces);
- 	if (ret)
- 		return ret;
-@@ -442,59 +403,36 @@ static int parse_dacl(const struct mnt_idmap *idmap,
- 		return ret;
- 	}
- 
--	ppace = kmalloc_objs(struct smb_ace *, num_aces, KSMBD_DEFAULT_GFP);
--	if (!ppace) {
--		free_acl_state(&default_acl_state);
--		free_acl_state(&acl_state);
--		return -ENOMEM;
--	}
--
- 	/*
- 	 * reset rwx permissions for user/group/other.
- 	 * Also, if num_aces is 0 i.e. DACL has no ACEs,
- 	 * user/group/other have no permissions
- 	 */
- 	for (i = 0; i < num_aces; ++i) {
--		if (end_of_acl - acl_base < acl_size) {
--			ret = -EINVAL;
--			goto out;
--		}
--
--		ppace[i] = (struct smb_ace *)(acl_base + acl_size);
--		acl_base = (char *)ppace[i];
--		acl_size = offsetof(struct smb_ace, sid) +
--			offsetof(struct smb_sid, sub_auth);
--
--		if (end_of_acl - acl_base < acl_size ||
--		    ppace[i]->sid.num_subauth == 0 ||
--		    ppace[i]->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
--		    (end_of_acl - acl_base <
--		     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth) ||
--		    (le16_to_cpu(ppace[i]->size) <
--		     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth)) {
-+		ace = &sd->aces[i];
-+		/* ksmbd maps no object ACE, so an SD that has one is refused */
-+		if (ace->obj_len || ace->sid->num_subauth == 0) {
- 			ret = -EINVAL;
- 			goto out;
- 		}
- 
--		acl_size = le16_to_cpu(ppace[i]->size);
--		ppace[i]->access_req =
--			smb_map_generic_desired_access(ppace[i]->access_req);
-+		ace->mask = le32_to_cpu(smb_map_generic_desired_access(cpu_to_le32(ace->mask)));
- 
- 		/* ACEs after an NFS mode ACE do not change the POSIX mapping */
- 		if (nfs_mode_found)
- 			continue;
- 
--		if (ppace[i]->type == ACCESS_ALLOWED &&
--		    ppace[i]->sid.num_subauth >= 3 &&
--		    !(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
-+		if (ace->type == ACCESS_ALLOWED &&
-+		    ace->sid->num_subauth >= 3 &&
-+		    !(compare_sids(ace->sid, &sid_unix_NFS_mode))) {
- 			fattr->cf_mode =
--				le32_to_cpu(ppace[i]->sid.sub_auth[2]);
-+				le32_to_cpu(ace->sid->sub_auth[2]);
- 			fattr->cf_posix_mode = true;
- 			nfs_mode_found = true;
--		} else if (!compare_sids(&ppace[i]->sid, pownersid)) {
-+		} else if (!compare_sids(ace->sid, pownersid)) {
- 			acl_mode = access_flags_to_mode(fattr,
--							ppace[i]->access_req,
--							ppace[i]->type);
-+							cpu_to_le32(ace->mask),
-+							ace->type);
- 			acl_mode &= 0700;
- 
- 			if (!owner_found) {
-@@ -502,41 +440,41 @@ static int parse_dacl(const struct mnt_idmap *idmap,
- 				mode |= acl_mode;
- 			}
- 			owner_found = true;
--		} else if (!compare_sids(&ppace[i]->sid, pgrpsid) ||
--			   ppace[i]->sid.sub_auth[ppace[i]->sid.num_subauth - 1] ==
-+		} else if (!compare_sids(ace->sid, pgrpsid) ||
-+			   ace->sid->sub_auth[ace->sid->num_subauth - 1] ==
- 			    DOMAIN_USER_RID_LE) {
- 			acl_mode = access_flags_to_mode(fattr,
--							ppace[i]->access_req,
--							ppace[i]->type);
-+							cpu_to_le32(ace->mask),
-+							ace->type);
- 			acl_mode &= 0070;
- 			if (!group_found) {
- 				mode &= ~(0070);
- 				mode |= acl_mode;
- 			}
- 			group_found = true;
--		} else if (!compare_sids(&ppace[i]->sid, &sid_everyone)) {
-+		} else if (!compare_sids(ace->sid, &sid_everyone)) {
- 			acl_mode = access_flags_to_mode(fattr,
--							ppace[i]->access_req,
--							ppace[i]->type);
-+							cpu_to_le32(ace->mask),
-+							ace->type);
- 			acl_mode &= 0007;
- 			if (!others_found) {
- 				mode &= ~(0007);
- 				mode |= acl_mode;
- 			}
- 			others_found = true;
--		} else if (!compare_sids(&ppace[i]->sid, &creator_owner)) {
-+		} else if (!compare_sids(ace->sid, &creator_owner)) {
- 			continue;
--		} else if (!compare_sids(&ppace[i]->sid, &creator_group)) {
-+		} else if (!compare_sids(ace->sid, &creator_group)) {
- 			continue;
--		} else if (!compare_sids(&ppace[i]->sid, &sid_authusers)) {
-+		} else if (!compare_sids(ace->sid, &sid_authusers)) {
- 			continue;
- 		} else {
- 			struct smb_fattr temp_fattr;
- 
--			acl_mode = access_flags_to_mode(fattr, ppace[i]->access_req,
--							ppace[i]->type);
-+			acl_mode = access_flags_to_mode(fattr, cpu_to_le32(ace->mask),
-+							ace->type);
- 			temp_fattr.cf_uid = INVALID_UID;
--			ret = sid_to_id(idmap, &ppace[i]->sid, SIDOWNER, &temp_fattr);
-+			ret = sid_to_id(idmap, ace->sid, SIDOWNER, &temp_fattr);
- 			if (ret || uid_eq(temp_fattr.cf_uid, INVALID_UID)) {
- 				pr_err_ratelimited("%s: Error %d mapping Owner SID to uid\n",
- 						   __func__, ret);
-@@ -627,7 +565,6 @@ static int parse_dacl(const struct mnt_idmap *idmap,
- 	}
- 	ret = 0;
- out:
--	kfree(ppace);
- 	free_acl_state(&acl_state);
- 	free_acl_state(&default_acl_state);
- 	return ret;
-@@ -652,29 +589,16 @@ static bool ace_is_for_entry(const struct smb_sid *ace_sid,
- 	       !ace_sid->sub_auth[dom->num_subauth];
- }
- 
--/*
-- * Add the size of an ACE to the size of the ACEs in a DACL. Fail when the
-- * DACL with its header would no longer fit in its 16-bit size.
-- */
--static bool dacl_add_ace_size(u16 *size, u16 ace_sz)
--{
--	if (*size + ace_sz > U16_MAX - sizeof(struct smb_acl))
--		return false;
--	*size += ace_sz;
--	return true;
--}
--
- static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
--				       struct smb_ace *pndace,
-+				       struct ksmbd_sd *sd,
- 				       struct smb_fattr *fattr, u16 *num_aces,
--				       u16 *size, u16 existing_nt_aces,
--				       bool had_nt_aces)
-+				       u16 existing_nt_aces, bool had_nt_aces,
-+				       struct smb_sid *sids)
- {
- 	struct posix_acl_entry *pace;
- 	struct smb_sid *sid;
--	struct smb_ace *ntace;
-+	struct ksmbd_ace *ntace;
- 	int i, j;
--	u16 ace_sz;
- 
- 	if (!fattr->cf_acls)
- 		goto posix_default_acl;
-@@ -684,9 +608,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 		int flags = 0;
- 		bool root = false;
- 
--		sid = kmalloc_obj(struct smb_sid, KSMBD_DEFAULT_GFP);
--		if (!sid)
--			break;
-+		sid = sids++;
- 
- 		if (pace->e_tag == ACL_USER) {
- 			uid_t uid;
-@@ -706,49 +628,36 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 		} else if (pace->e_tag == ACL_OTHER && !had_nt_aces) {
- 			smb_copy_sid(sid, &sid_everyone);
- 		} else {
--			kfree(sid);
- 			continue;
- 		}
--		ntace = pndace;
- 		for (j = 0; j < existing_nt_aces; j++) {
--			if (ace_is_for_entry(&ntace->sid, sid, root))
--				goto pass_same_sid;
--			ntace = (struct smb_ace *)((char *)ntace +
--					le16_to_cpu(ntace->size));
-+			if (ace_is_for_entry(sd->aces[j].sid, sid, root))
-+				break;
- 		}
-+		if (j < existing_nt_aces)
-+			continue;
- 
- 		if (S_ISDIR(fattr->cf_mode) && pace->e_tag == ACL_OTHER)
- 			flags = 0x03;
- 
--		ntace = (struct smb_ace *)((char *)pndace + *size);
--		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
--				pace->e_perm, 0777);
--		if (!dacl_add_ace_size(size, ace_sz)) {
--			kfree(sid);
--			break;
--		}
-+		ntace = &sd->aces[*num_aces];
-+		fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
-+				 pace->e_perm, 0777);
- 		(*num_aces)++;
- 		if (pace->e_tag == ACL_USER)
--			ntace->access_req |=
--				FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
-+			ntace->mask |=
-+				le32_to_cpu(FILE_DELETE_LE | FILE_DELETE_CHILD_LE);
- 
- 		if (S_ISDIR(fattr->cf_mode) &&
- 		    (pace->e_tag == ACL_USER || pace->e_tag == ACL_GROUP)) {
--			ntace = (struct smb_ace *)((char *)pndace + *size);
--			ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
--					0x03, pace->e_perm, 0777);
--			if (!dacl_add_ace_size(size, ace_sz)) {
--				kfree(sid);
--				break;
--			}
-+			ntace = &sd->aces[*num_aces];
-+			fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
-+					 0x03, pace->e_perm, 0777);
- 			(*num_aces)++;
- 			if (pace->e_tag == ACL_USER)
--				ntace->access_req |=
--					FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
-+				ntace->mask |=
-+					le32_to_cpu(FILE_DELETE_LE | FILE_DELETE_CHILD_LE);
- 		}
--
--pass_same_sid:
--		kfree(sid);
- 	}
- 
- 	if (had_nt_aces)
-@@ -760,9 +669,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 
- 	pace = fattr->cf_dacls->a_entries;
- 	for (i = 0; i < fattr->cf_dacls->a_count; i++, pace++) {
--		sid = kmalloc_obj(struct smb_sid, KSMBD_DEFAULT_GFP);
--		if (!sid)
--			break;
-+		sid = sids++;
- 
- 		if (pace->e_tag == ACL_USER) {
- 			uid_t uid;
-@@ -775,215 +682,124 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
- 			gid = posix_acl_gid_translate(idmap, pace);
- 			id_to_sid(gid, SIDCREATOR_GROUP, sid);
- 		} else {
--			kfree(sid);
- 			continue;
- 		}
- 
--		ntace = (struct smb_ace *)((char *)pndace + *size);
--		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
--				pace->e_perm, 0777);
--		if (!dacl_add_ace_size(size, ace_sz)) {
--			kfree(sid);
--			break;
--		}
-+		ntace = &sd->aces[*num_aces];
-+		fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
-+				 pace->e_perm, 0777);
- 		(*num_aces)++;
- 		if (pace->e_tag == ACL_USER)
--			ntace->access_req |=
--				FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
--		kfree(sid);
-+			ntace->mask |=
-+				le32_to_cpu(FILE_DELETE_LE | FILE_DELETE_CHILD_LE);
- 	}
- }
- 
- static void set_ntacl_dacl(const struct mnt_idmap *idmap,
--			   struct smb_acl *pndacl,
--			   struct smb_acl *nt_dacl,
--			   unsigned int aces_size,
--			   const struct smb_sid *pownersid,
--			   const struct smb_sid *pgrpsid,
--			   struct smb_fattr *fattr)
-+			   struct ksmbd_sd *sd,
-+			   const struct ksmbd_sd *nt_sd,
-+			   struct smb_fattr *fattr, struct smb_sid *sids)
- {
--	struct smb_ace *ntace, *pndace;
--	u16 nt_num_aces = le16_to_cpu(nt_dacl->num_aces), num_aces = 0;
-+	u16 nt_num_aces = nt_sd->num_aces, num_aces = 0;
- 	u16 copied_nt_aces;
--	unsigned short size = 0;
- 	int i;
- 
--	pndace = (struct smb_ace *)((char *)pndacl + sizeof(struct smb_acl));
--	if (nt_num_aces) {
--		ntace = (struct smb_ace *)((char *)nt_dacl + sizeof(struct smb_acl));
--		for (i = 0; i < nt_num_aces; i++) {
--			unsigned short nt_ace_size;
--
--			if (aces_size < offsetof(struct smb_ace, sid) +
--					CIFS_SID_BASE_SIZE)
--				break;
--
--			nt_ace_size = le16_to_cpu(ntace->size);
--			if (nt_ace_size > aces_size ||
--			    nt_ace_size < offsetof(struct smb_ace, sid) +
--					  CIFS_SID_BASE_SIZE)
--				break;
--
--			if (ntace->sid.num_subauth == 0 ||
--			    ntace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
--			    nt_ace_size < offsetof(struct smb_ace, sid) +
--					  CIFS_SID_BASE_SIZE +
--					  sizeof(__le32) *
--					  ntace->sid.num_subauth)
--				goto next_ace;
--
--			memcpy((char *)pndace + size, ntace, nt_ace_size);
--			if (!dacl_add_ace_size(&size, nt_ace_size))
--				break;
--			num_aces++;
--
--next_ace:
--			aces_size -= nt_ace_size;
--			ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
--		}
-+	for (i = 0; i < nt_num_aces; i++) {
-+		/* ksmbd leaves an object ACE out of the reply */
-+		if (nt_sd->aces[i].obj_len ||
-+		    nt_sd->aces[i].sid->num_subauth == 0)
-+			continue;
-+		sd->aces[num_aces++] = nt_sd->aces[i];
- 	}
- 
- 	copied_nt_aces = num_aces;
--	set_posix_acl_entries_dacl(idmap, pndace, fattr,
--				   &num_aces, &size, copied_nt_aces,
--				   nt_num_aces != 0);
--	pndacl->num_aces = cpu_to_le16(num_aces);
--	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
-+	set_posix_acl_entries_dacl(idmap, sd, fattr,
-+				   &num_aces, copied_nt_aces,
-+				   nt_num_aces != 0, sids);
-+	sd->num_aces = num_aces;
- }
- 
- static void set_mode_dacl(const struct mnt_idmap *idmap,
--			  struct smb_acl *pndacl, struct smb_fattr *fattr)
-+			  struct ksmbd_sd *sd,
-+			  const struct smb_sid *pownersid,
-+			  const struct smb_sid *pgrpsid,
-+			  struct smb_fattr *fattr, struct smb_sid *sids)
- {
--	struct smb_ace *pace, *pndace;
-+	struct ksmbd_ace *pace;
- 	u16 num_aces = 0;
--	u16 size = 0, ace_size = 0;
--	uid_t uid;
--	const struct smb_sid *sid;
- 
--	pace = pndace = (struct smb_ace *)((char *)pndacl + sizeof(struct smb_acl));
-+	pace = sd->aces;
- 
- 	if (fattr->cf_acls) {
--		set_posix_acl_entries_dacl(idmap, pndace, fattr,
--					   &num_aces, &size, num_aces, false);
-+		set_posix_acl_entries_dacl(idmap, sd, fattr,
-+					   &num_aces, num_aces, false, sids);
- 		goto out;
- 	}
- 
- 	/* owner RID */
--	uid = from_kuid(&init_user_ns, fattr->cf_uid);
--	if (uid)
--		sid = &server_conf.domain_sid;
--	else
--		sid = &sid_unix_users;
--	ace_size = fill_ace_for_sid(pace, sid, ACCESS_ALLOWED, 0,
--				    fattr->cf_mode, 0700);
--	pace->sid.sub_auth[pace->sid.num_subauth++] = cpu_to_le32(uid);
--	pace->size = cpu_to_le16(ace_size + 4);
--	size += le16_to_cpu(pace->size);
--	pace = (struct smb_ace *)((char *)pndace + size);
-+	fill_ace_for_sid(pace++, pownersid, ACCESS_ALLOWED, 0,
-+			 fattr->cf_mode, 0700);
- 
- 	/* Group RID */
--	ace_size = fill_ace_for_sid(pace, &sid_unix_groups,
--				    ACCESS_ALLOWED, 0, fattr->cf_mode, 0070);
--	pace->sid.sub_auth[pace->sid.num_subauth++] =
--		cpu_to_le32(from_kgid(&init_user_ns, fattr->cf_gid));
--	pace->size = cpu_to_le16(ace_size + 4);
--	size += le16_to_cpu(pace->size);
--	pace = (struct smb_ace *)((char *)pndace + size);
-+	fill_ace_for_sid(pace++, pgrpsid,
-+			 ACCESS_ALLOWED, 0, fattr->cf_mode, 0070);
- 	num_aces = 3;
- 
- 	if (S_ISDIR(fattr->cf_mode)) {
--		pace = (struct smb_ace *)((char *)pndace + size);
--
- 		/* creator owner */
--		size += fill_ace_for_sid(pace, &creator_owner, ACCESS_ALLOWED,
--					 0x0b, fattr->cf_mode, 0700);
--		pace = (struct smb_ace *)((char *)pndace + size);
-+		fill_ace_for_sid(pace++, &creator_owner, ACCESS_ALLOWED,
-+				 0x0b, fattr->cf_mode, 0700);
- 
- 		/* creator group */
--		size += fill_ace_for_sid(pace, &creator_group, ACCESS_ALLOWED,
--					 0x0b, fattr->cf_mode, 0070);
--		pace = (struct smb_ace *)((char *)pndace + size);
-+		fill_ace_for_sid(pace++, &creator_group, ACCESS_ALLOWED,
-+				 0x0b, fattr->cf_mode, 0070);
- 		num_aces = 5;
- 	}
- 
- 	/* other */
--	size += fill_ace_for_sid(pace, &sid_everyone, ACCESS_ALLOWED, 0,
--				 fattr->cf_mode, 0007);
-+	fill_ace_for_sid(pace, &sid_everyone, ACCESS_ALLOWED, 0,
-+			 fattr->cf_mode, 0007);
- 
- out:
--	pndacl->num_aces = cpu_to_le16(num_aces);
--	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
--}
--
--static int parse_sid(struct smb_sid *psid, char *end_of_acl)
--{
--	/*
--	 * validate that we do not go past end of ACL - sid must be at least 8
--	 * bytes long (assuming no sub-auths - e.g. the null SID
--	 */
--	if (end_of_acl < (char *)psid + 8) {
--		pr_err("ACL too small to parse SID %p\n", psid);
--		return -EINVAL;
--	}
--
--	if (!psid->num_subauth)
--		return 0;
--
--	if (psid->num_subauth > SID_MAX_SUB_AUTHORITIES ||
--	    end_of_acl < (char *)psid + 8 + sizeof(__le32) * psid->num_subauth)
--		return -EINVAL;
--
--	return 0;
-+	sd->num_aces = num_aces;
- }
- 
- /* Convert CIFS ACL to POSIX form */
- int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
--		   int acl_len, struct smb_fattr *fattr)
-+		   int acl_len, struct smb_fattr *fattr, struct ksmbd_sd **psd)
- {
- 	int rc = 0;
--	struct smb_sid *owner_sid_ptr = NULL, *group_sid_ptr = NULL;
--	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
--	char *end_of_acl = ((char *)pntsd) + acl_len;
--	__u32 dacloffset;
-+	const struct smb_sid *owner_sid_ptr = NULL, *group_sid_ptr = NULL;
-+	struct ksmbd_sd *sd __free(kvfree) = NULL;
- 	int pntsd_type;
- 
- 	if (!pntsd)
- 		return -EIO;
- 
--	if (acl_len < sizeof(struct smb_ntsd))
-+	if (acl_len < (int)sizeof(struct smb_ntsd))
- 		return -EINVAL;
- 
--	dacloffset = le32_to_cpu(pntsd->dacloffset);
--	ksmbd_debug(SMB,
--		    "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
--		    pntsd->revision, pntsd->type, le32_to_cpu(pntsd->osidoffset),
--		    le32_to_cpu(pntsd->gsidoffset),
--		    le32_to_cpu(pntsd->sacloffset), dacloffset);
-+	/* An SD from a client is stored whole or not at all */
-+	rc = ksmbd_sd_decode((u8 *)pntsd, acl_len, &sd);
-+	if (rc == -EBADMSG || (!rc && sd->sacl_dropped))
-+		rc = -EINVAL;
-+	if (rc)
-+		return rc;
- 
--	pntsd_type = le16_to_cpu(pntsd->type);
--	if (!(pntsd_type & DACL_PRESENT)) {
-+	pntsd_type = sd->control;
-+	if (sd->dacl == KSMBD_ACL_ABSENT) {
- 		ksmbd_debug(SMB, "DACL_PRESENT in DACL type is not set\n");
--		/* Without DACL_PRESENT, OffsetDacl must be 0 (MS-DTYP 2.4.6) */
--		if (dacloffset)
--			return -EINVAL;
-+		*psd = no_free_ptr(sd);
- 		return rc;
- 	}
- 
--	pntsd->type = cpu_to_le16(DACL_PRESENT);
--
--	if (pntsd->osidoffset) {
--		if (le32_to_cpu(pntsd->osidoffset) < sizeof(struct smb_ntsd) ||
--		    le32_to_cpu(pntsd->osidoffset) >= acl_len)
--			return -EINVAL;
--
--		owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->osidoffset));
--		rc = parse_sid(owner_sid_ptr, end_of_acl);
--		if (rc) {
--			pr_err("%s: Error %d parsing Owner SID\n", __func__, rc);
--			return rc;
--		}
-+	/* The stored SD keeps only the Control bits set below and no SACL */
-+	sd->control = 0;
-+	sd->sacl = KSMBD_ACL_ABSENT;
-+	sd->sacl_len = 0;
- 
-+	if (sd->owner) {
-+		owner_sid_ptr = sd->owner;
- 		rc = sid_to_id(idmap, owner_sid_ptr, SIDOWNER, fattr);
- 		if (rc) {
- 			ksmbd_debug(SMB, "Owner SID has no Unix uid mapping\n");
-@@ -992,19 +808,8 @@ int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
- 		}
- 	}
- 
--	if (pntsd->gsidoffset) {
--		if (le32_to_cpu(pntsd->gsidoffset) < sizeof(struct smb_ntsd) ||
--		    le32_to_cpu(pntsd->gsidoffset) >= acl_len)
--			return -EINVAL;
--
--		group_sid_ptr = (struct smb_sid *)((char *)pntsd +
--				le32_to_cpu(pntsd->gsidoffset));
--		rc = parse_sid(group_sid_ptr, end_of_acl);
--		if (rc) {
--			pr_err("%s: Error %d mapping Owner SID to gid\n",
--			       __func__, rc);
--			return rc;
--		}
-+	if (sd->group) {
-+		group_sid_ptr = sd->group;
- 		rc = sid_to_id(idmap, group_sid_ptr, SIDUNIX_GROUP, fattr);
- 		if (rc) {
- 			ksmbd_debug(SMB, "Group SID has no Unix gid mapping\n");
-@@ -1015,82 +820,34 @@ int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
- 
- 	if ((pntsd_type & (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ)) ==
- 	    (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ))
--		pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
-+		sd->control |= DACL_AUTO_INHERITED;
- 	if (pntsd_type & DACL_PROTECTED)
--		pntsd->type |= cpu_to_le16(DACL_PROTECTED);
--
--	if (dacloffset) {
--		if (dacloffset < sizeof(struct smb_ntsd) || dacloffset >= acl_len)
--			return -EINVAL;
-+		sd->control |= DACL_PROTECTED;
- 
--		dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
--		rc = parse_dacl(idmap, dacl_ptr, end_of_acl,
--				owner_sid_ptr, group_sid_ptr, fattr);
--		if (rc)
--			return rc;
--	}
-+	rc = parse_dacl(idmap, sd, owner_sid_ptr, group_sid_ptr, fattr);
-+	if (rc)
-+		return rc;
- 
-+	*psd = no_free_ptr(sd);
- 	return 0;
- }
- 
--size_t smb_acl_sec_desc_scratch_len(struct smb_fattr *fattr,
--		struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info)
--{
--	size_t len = sizeof(struct smb_ntsd);
--	size_t tmp;
--
--	if (addition_info & OWNER_SECINFO)
--		len += sizeof(struct smb_sid);
--	if (addition_info & GROUP_SECINFO)
--		len += sizeof(struct smb_sid);
--	if (!(addition_info & DACL_SECINFO))
--		return len;
--
--	len += sizeof(struct smb_acl);
--	if (ppntsd && ppntsd_size > 0) {
--		unsigned int dacl_offset = le32_to_cpu(ppntsd->dacloffset);
--
--		if (dacl_offset < ppntsd_size &&
--		    check_add_overflow(len, ppntsd_size - dacl_offset, &len))
--			return 0;
--	}
--
--	if (fattr->cf_acls) {
--		if (check_mul_overflow((size_t)fattr->cf_acls->a_count,
--					2 * sizeof(struct smb_ace), &tmp) ||
--		    check_add_overflow(len, tmp, &len))
--			return 0;
--	} else {
--		/* default/minimum DACL */
--		if (check_add_overflow(len, 5 * sizeof(struct smb_ace), &len))
--			return 0;
--	}
--
--	if (fattr->cf_dacls) {
--		if (check_mul_overflow((size_t)fattr->cf_dacls->a_count,
--					sizeof(struct smb_ace), &tmp) ||
--		    check_add_overflow(len, tmp, &len))
--			return 0;
--	}
--
--	return len;
--}
--
- /* Convert permission bits from mode to equivalent CIFS ACL */
- int build_sec_desc(const struct mnt_idmap *idmap,
--		   struct smb_ntsd *pntsd, struct smb_ntsd *ppntsd,
--		   int ppntsd_size, int addition_info, __u32 *secdesclen,
-+		   struct smb_ntsd **pntsd, const struct ksmbd_sd *ppntsd,
-+		   int addition_info, __u32 *secdesclen,
- 		   struct smb_fattr *fattr)
- {
- 	int rc = 0;
--	__u32 offset;
--	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
- 	struct smb_sid *nowner_sid_ptr, *ngroup_sid_ptr;
--	struct smb_acl *dacl_ptr = NULL; /* no need for SACL ptr */
-+	struct smb_sid *sids = NULL;
-+	struct ksmbd_sd *sd = NULL;
-+	size_t num_aces = 0, num_sids = 0, len = 0;
- 	uid_t uid;
- 	gid_t gid;
- 	unsigned int sid_type = SIDOWNER;
- 
-+	*pntsd = NULL;
- 	nowner_sid_ptr = kmalloc_obj(struct smb_sid, KSMBD_DEFAULT_GFP);
- 	if (!nowner_sid_ptr)
- 		return -ENOMEM;
-@@ -1109,10 +866,30 @@ int build_sec_desc(const struct mnt_idmap *idmap,
- 	gid = from_kgid(&init_user_ns, fattr->cf_gid);
- 	id_to_sid(gid, SIDUNIX_GROUP, ngroup_sid_ptr);
- 
--	offset = sizeof(struct smb_ntsd);
--	pntsd->sacloffset = 0;
--	pntsd->revision = cpu_to_le16(1);
--	pntsd->type = cpu_to_le16(SELF_RELATIVE);
-+	/* Room for every ACE that set_mode_dacl() or set_ntacl_dacl() adds */
-+	if (addition_info & DACL_SECINFO) {
-+		if (ppntsd)
-+			num_aces = ppntsd->num_aces;
-+		if (fattr->cf_acls) {
-+			num_aces += 2 * fattr->cf_acls->a_count;
-+			num_sids = fattr->cf_acls->a_count;
-+		} else if (!ppntsd) {
-+			num_aces = 5;
-+		}
-+		if (fattr->cf_dacls) {
-+			num_aces += fattr->cf_dacls->a_count;
-+			num_sids += fattr->cf_dacls->a_count;
-+		}
-+	}
-+
-+	sd = kvzalloc(struct_size(sd, aces, num_aces), KSMBD_DEFAULT_GFP);
-+	sids = kvmalloc_array(num_sids, sizeof(*sids), KSMBD_DEFAULT_GFP);
-+	if (!sd || !sids) {
-+		rc = -ENOMEM;
-+		goto out;
-+	}
-+	sd->num_aces = num_aces;
-+
- 	if (ppntsd) {
- 		u16 flags = 0;
- 
-@@ -1122,129 +899,51 @@ int build_sec_desc(const struct mnt_idmap *idmap,
- 		if (addition_info & GROUP_SECINFO)
- 			flags |= GROUP_DEFAULTED;
- 		if (addition_info & DACL_SECINFO)
--			flags |= DACL_PRESENT | DACL_DEFAULTED |
--				 DACL_AUTO_INHERITED | DACL_PROTECTED;
--		pntsd->type |= ppntsd->type & cpu_to_le16(flags);
-+			flags |= DACL_DEFAULTED | DACL_AUTO_INHERITED |
-+				 DACL_PROTECTED;
-+		sd->control |= ppntsd->control & flags;
- 	}
- 
--	if (addition_info & OWNER_SECINFO) {
--		pntsd->osidoffset = cpu_to_le32(offset);
--		owner_sid_ptr = (struct smb_sid *)((char *)pntsd + offset);
--		smb_copy_sid(owner_sid_ptr, nowner_sid_ptr);
--		offset += 1 + 1 + 6 + (nowner_sid_ptr->num_subauth * 4);
--	}
-+	if (addition_info & OWNER_SECINFO)
-+		sd->owner = nowner_sid_ptr;
- 
--	if (addition_info & GROUP_SECINFO) {
--		pntsd->gsidoffset = cpu_to_le32(offset);
--		group_sid_ptr = (struct smb_sid *)((char *)pntsd + offset);
--		smb_copy_sid(group_sid_ptr, ngroup_sid_ptr);
--		offset += 1 + 1 + 6 + (ngroup_sid_ptr->num_subauth * 4);
--	}
-+	if (addition_info & GROUP_SECINFO)
-+		sd->group = ngroup_sid_ptr;
- 
- 	if (addition_info & DACL_SECINFO) {
--		pntsd->type |= cpu_to_le16(DACL_PRESENT);
--		dacl_ptr = (struct smb_acl *)((char *)pntsd + offset);
--		dacl_ptr->revision = cpu_to_le16(2);
--		dacl_ptr->size = cpu_to_le16(sizeof(struct smb_acl));
--		dacl_ptr->num_aces = 0;
--
- 		if (!ppntsd) {
--			set_mode_dacl(idmap, dacl_ptr, fattr);
-+			sd->dacl = KSMBD_ACL_PRESENT;
-+			set_mode_dacl(idmap, sd, nowner_sid_ptr, ngroup_sid_ptr,
-+				      fattr, sids);
-+		} else if (ppntsd->dacl == KSMBD_ACL_PRESENT) {
-+			sd->dacl = KSMBD_ACL_PRESENT;
-+			set_ntacl_dacl(idmap, sd, ppntsd, fattr, sids);
- 		} else {
--			struct smb_acl *ppdacl_ptr;
--			unsigned int dacl_offset = le32_to_cpu(ppntsd->dacloffset);
--			int ppdacl_size, ntacl_size = ppntsd_size - dacl_offset;
--			size_t dacl_struct_end;
--
--			if (!dacl_offset ||
--			    check_add_overflow(dacl_offset, sizeof(struct smb_acl),
--					       &dacl_struct_end) ||
--			    dacl_struct_end > (size_t)ppntsd_size)
--				goto out;
--
--			ppdacl_ptr = (struct smb_acl *)((char *)ppntsd + dacl_offset);
--			ppdacl_size = le16_to_cpu(ppdacl_ptr->size);
--			if (ppdacl_size > ntacl_size ||
--			    ppdacl_size < sizeof(struct smb_acl))
--				goto out;
--
--			set_ntacl_dacl(idmap, dacl_ptr, ppdacl_ptr,
--				       ntacl_size - sizeof(struct smb_acl),
--				       nowner_sid_ptr, ngroup_sid_ptr,
--				       fattr);
-+			sd->dacl = KSMBD_ACL_NULL;
- 		}
--		pntsd->dacloffset = cpu_to_le32(offset);
--		offset += le16_to_cpu(dacl_ptr->size);
- 	}
-+	if (sd->dacl != KSMBD_ACL_PRESENT)
-+		sd->num_aces = 0;
- 
-+	rc = ksmbd_sd_encode(sd, (u8 **)pntsd, &len);
-+	*secdesclen = len;
- out:
- 	kfree(nowner_sid_ptr);
- 	kfree(ngroup_sid_ptr);
--	*secdesclen = offset;
-+	kvfree(sids);
-+	kvfree(sd);
- 	return rc;
- }
- 
--static void smb_set_ace(struct smb_ace *ace, const struct smb_sid *sid, u8 type,
--			u8 flags, __le32 access_req)
--{
--	ace->type = type;
--	ace->flags = flags;
--	ace->access_req = access_req;
--	smb_copy_sid(&ace->sid, sid);
--	ace->size = cpu_to_le16(1 + 1 + 2 + 4 + 1 + 1 + 6 +
--				(ace->sid.num_subauth * 4));
--}
--
--static int smb_append_inherited_ace(struct smb_ace **ace, int *nt_size,
--				    u16 *ace_cnt, const struct smb_sid *sid,
--				    u8 type, u8 flags, __le32 access_req)
--{
--	int ace_size;
--
--	smb_set_ace(*ace, sid, type, flags, access_req);
--	ace_size = le16_to_cpu((*ace)->size);
--	/* pdacl->size is __le16 and includes struct smb_acl. */
--	if (check_add_overflow(*nt_size, ace_size, nt_size) ||
--	    *nt_size > U16_MAX - (int)sizeof(struct smb_acl))
--		return -EINVAL;
--
--	(*ace_cnt)++;
--	*ace = (struct smb_ace *)((char *)*ace + ace_size);
--	return 0;
--}
--
--static int smb_validate_ntsd_sid(struct smb_ntsd *pntsd, size_t pntsd_size,
--				  unsigned int sid_offset, struct smb_sid **sid,
--				  size_t *sid_size)
-+static void smb_append_inherited_ace(struct ksmbd_sd *sd, u16 *ace_cnt,
-+				     const struct ksmbd_ace *parent_ace,
-+				     const struct smb_sid *sid, u8 flags)
- {
--	size_t sid_end;
--
--	*sid = NULL;
--	*sid_size = 0;
--
--	if (!sid_offset)
--		return 0;
-+	struct ksmbd_ace *ace = &sd->aces[(*ace_cnt)++];
- 
--	if (sid_offset < sizeof(struct smb_ntsd) ||
--	    check_add_overflow(sid_offset, (size_t)CIFS_SID_BASE_SIZE,
--			       &sid_end) ||
--	    sid_end > pntsd_size)
--		return -EINVAL;
--
--	*sid = (struct smb_sid *)((char *)pntsd + sid_offset);
--	if ((*sid)->num_subauth > SID_MAX_SUB_AUTHORITIES)
--		return -EINVAL;
--
--	if (check_add_overflow((size_t)CIFS_SID_BASE_SIZE,
--			       sizeof(__le32) * (size_t)(*sid)->num_subauth,
--			       &sid_end))
--		return -EINVAL;
--
--	if (sid_offset > pntsd_size || sid_end > pntsd_size - sid_offset)
--		return -EINVAL;
--
--	*sid_size = sid_end;
--	return 0;
-+	*ace = *parent_ace;
-+	ace->flags = flags;
-+	ace->sid = sid;
- }
- 
- int smb_inherit_dacl(struct ksmbd_conn *conn,
-@@ -1252,18 +951,14 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 		     unsigned int uid, unsigned int gid)
- {
- 	const struct smb_sid *psid, *creator = NULL;
--	struct smb_ace *parent_aces, *aces;
--	struct smb_acl *parent_pdacl;
--	struct smb_ntsd *parent_pntsd = NULL;
-+	const struct ksmbd_ace *parent_aces;
-+	struct ksmbd_sd *parent_pntsd = NULL, *sd;
- 	struct smb_sid owner_sid, group_sid;
- 	struct dentry *parent;
- 	const struct mnt_idmap *idmap = mnt_idmap(path->mnt);
--	int inherited_flags = 0, flags = 0, i, nt_size = 0, pdacl_size;
--	int rc = 0, pntsd_type, ppntsd_size, acl_len, aces_size;
--	unsigned int dacloffset;
--	size_t dacl_struct_end;
-+	int inherited_flags = 0, flags = 0, i;
-+	int rc;
- 	u16 num_aces, ace_cnt = 0;
--	char *aces_base;
- 	bool is_dir = S_ISDIR(d_inode(path->dentry)->i_mode);
- 
- 	parent = dget_parent(path->dentry);
-@@ -1271,85 +966,32 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 		dput(parent);
- 		return -ENOENT;
- 	}
--	ppntsd_size = ksmbd_vfs_get_sd_xattr(conn, idmap,
--					    parent, &parent_pntsd);
-+	rc = ksmbd_vfs_get_sd_xattr(conn, idmap, parent, &parent_pntsd);
- 	dput(parent);
--	if (ppntsd_size <= 0)
-+	if (rc)
- 		return -ENOENT;
- 
--	dacloffset = le32_to_cpu(parent_pntsd->dacloffset);
--	if (!dacloffset ||
--	    check_add_overflow(dacloffset, sizeof(struct smb_acl), &dacl_struct_end) ||
--	    dacl_struct_end > (size_t)ppntsd_size) {
--		rc = -EINVAL;
--		goto free_parent_pntsd;
--	}
--
--	parent_pdacl = (struct smb_acl *)((char *)parent_pntsd + dacloffset);
--	acl_len = ppntsd_size - dacloffset;
--	num_aces = le16_to_cpu(parent_pdacl->num_aces);
--	pntsd_type = le16_to_cpu(parent_pntsd->type);
--	pdacl_size = le16_to_cpu(parent_pdacl->size);
--
--	if (pdacl_size > acl_len || pdacl_size < sizeof(struct smb_acl)) {
-+	if (parent_pntsd->dacl != KSMBD_ACL_PRESENT) {
- 		rc = -EINVAL;
- 		goto free_parent_pntsd;
- 	}
- 
--	aces_size = pdacl_size - sizeof(struct smb_acl);
--
--	/*
--	 * Validate num_aces against the DACL payload before allocating.
--	 * Each ACE must be at least as large as its fixed-size header
--	 * (up to the SID base), so num_aces cannot exceed the payload
--	 * divided by the minimum ACE size.  This mirrors the existing
--	 * check in parse_dacl().
--	 */
--	if (num_aces > aces_size / (offsetof(struct smb_ace, sid) +
--				    offsetof(struct smb_sid, sub_auth) +
--				    sizeof(__le16))) {
--		rc = -EINVAL;
--		goto free_parent_pntsd;
--	}
--
--	aces_base = kmalloc_array(num_aces * 2, sizeof(struct smb_ace),
--				  KSMBD_DEFAULT_GFP);
--	if (!aces_base) {
-+	num_aces = parent_pntsd->num_aces;
-+	sd = kvzalloc(struct_size(sd, aces, num_aces * 2), KSMBD_DEFAULT_GFP);
-+	if (!sd) {
- 		rc = -ENOMEM;
- 		goto free_parent_pntsd;
- 	}
-+	sd->num_aces = num_aces * 2;
- 
--	aces = (struct smb_ace *)aces_base;
--	parent_aces = (struct smb_ace *)((char *)parent_pdacl +
--			sizeof(struct smb_acl));
--
--	if (pntsd_type & DACL_AUTO_INHERITED)
-+	if (parent_pntsd->control & DACL_AUTO_INHERITED)
- 		inherited_flags = INHERITED_ACE;
- 
- 	for (i = 0; i < num_aces; i++) {
--		int pace_size;
--
--		if (aces_size < offsetof(struct smb_ace, sid) +
--		    CIFS_SID_BASE_SIZE)
--			break;
--
--		pace_size = le16_to_cpu(parent_aces->size);
--		if (pace_size > aces_size ||
--		    pace_size < offsetof(struct smb_ace, sid) +
--				CIFS_SID_BASE_SIZE)
--			break;
--
--		if (parent_aces->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
--		    pace_size < offsetof(struct smb_ace, sid) +
--				CIFS_SID_BASE_SIZE +
--				sizeof(__le32) * parent_aces->sid.num_subauth)
--			break;
--
--		aces_size -= pace_size;
--
-+		parent_aces = &parent_pntsd->aces[i];
- 		flags = parent_aces->flags;
- 		if (!smb_inherit_flags(flags, is_dir))
--			goto pass;
-+			continue;
- 		if (is_dir) {
- 			flags &= ~(INHERIT_ONLY_ACE | INHERITED_ACE);
- 			if (!(flags & CONTAINER_INHERIT_ACE))
-@@ -1360,121 +1002,52 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
- 			flags = 0;
- 		}
- 
--		if (!compare_sids(&creator_owner, &parent_aces->sid)) {
-+		if (!compare_sids(&creator_owner, parent_aces->sid)) {
- 			creator = &creator_owner;
- 			id_to_sid(uid, SIDOWNER, &owner_sid);
- 			psid = &owner_sid;
--		} else if (!compare_sids(&creator_group, &parent_aces->sid)) {
-+		} else if (!compare_sids(&creator_group, parent_aces->sid)) {
- 			creator = &creator_group;
- 			id_to_sid(gid, SIDUNIX_GROUP, &group_sid);
- 			psid = &group_sid;
- 		} else {
- 			creator = NULL;
--			psid = &parent_aces->sid;
-+			psid = parent_aces->sid;
- 		}
- 
- 		if (is_dir && creator && flags & CONTAINER_INHERIT_ACE) {
--			rc = smb_append_inherited_ace(&aces, &nt_size, &ace_cnt,
--						      psid, parent_aces->type,
--						      inherited_flags,
--						      parent_aces->access_req);
--			if (rc)
--				goto free_aces_base;
-+			smb_append_inherited_ace(sd, &ace_cnt, parent_aces,
-+						 psid, inherited_flags);
- 			flags |= INHERIT_ONLY_ACE;
- 			psid = creator;
- 		} else if (is_dir && !(parent_aces->flags & NO_PROPAGATE_INHERIT_ACE)) {
--			psid = &parent_aces->sid;
-+			psid = parent_aces->sid;
- 		}
- 
--		rc = smb_append_inherited_ace(&aces, &nt_size, &ace_cnt, psid,
--					      parent_aces->type,
--					      flags | inherited_flags,
--					      parent_aces->access_req);
--		if (rc)
--			goto free_aces_base;
--pass:
--		parent_aces = (struct smb_ace *)((char *)parent_aces + pace_size);
-+		smb_append_inherited_ace(sd, &ace_cnt, parent_aces, psid,
-+					 flags | inherited_flags);
- 	}
- 
--	if (nt_size > 0) {
--		struct smb_ntsd *pntsd;
--		struct smb_acl *pdacl;
--		struct smb_sid *powner_sid = NULL, *pgroup_sid = NULL;
--		size_t powner_sid_size = 0, pgroup_sid_size = 0, pntsd_size;
--		size_t pntsd_alloc_size;
-+	if (ace_cnt) {
-+		size_t pntsd_size;
-+		u8 *pntsd;
- 
--		rc = smb_validate_ntsd_sid(parent_pntsd, ppntsd_size,
--					   le32_to_cpu(parent_pntsd->osidoffset),
--					   &powner_sid, &powner_sid_size);
--		if (rc)
--			goto free_aces_base;
--		rc = smb_validate_ntsd_sid(parent_pntsd, ppntsd_size,
--					   le32_to_cpu(parent_pntsd->gsidoffset),
--					   &pgroup_sid, &pgroup_sid_size);
-+		sd->num_aces = ace_cnt;
-+		sd->dacl = KSMBD_ACL_PRESENT;
-+		sd->control = parent_pntsd->control & DACL_AUTO_INHERITED;
-+		sd->owner = parent_pntsd->owner;
-+		sd->group = parent_pntsd->group;
-+		rc = ksmbd_sd_encode(sd, &pntsd, &pntsd_size);
- 		if (rc)
- 			goto free_aces_base;
- 
--		if (check_add_overflow(sizeof(struct smb_ntsd),
--				       (size_t)powner_sid_size,
--				       &pntsd_alloc_size) ||
--		    check_add_overflow(pntsd_alloc_size,
--				       (size_t)pgroup_sid_size,
--				       &pntsd_alloc_size) ||
--		    check_add_overflow(pntsd_alloc_size, sizeof(struct smb_acl),
--				       &pntsd_alloc_size) ||
--		    check_add_overflow(pntsd_alloc_size, (size_t)nt_size,
--				       &pntsd_alloc_size)) {
--			rc = -EINVAL;
--			goto free_aces_base;
--		}
--
--		pntsd = kzalloc(pntsd_alloc_size, KSMBD_DEFAULT_GFP);
--		if (!pntsd) {
--			rc = -ENOMEM;
--			goto free_aces_base;
--		}
--
--		pntsd->revision = cpu_to_le16(1);
--		pntsd->type = cpu_to_le16(SELF_RELATIVE | DACL_PRESENT);
--		if (le16_to_cpu(parent_pntsd->type) & DACL_AUTO_INHERITED)
--			pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
--		pntsd_size = sizeof(struct smb_ntsd);
--
--		/*
--		 * Lay out the child as owner, group and DACL. The parent may
--		 * store its components in another order, so its offsets do
--		 * not fit the child.
--		 */
--		if (powner_sid) {
--			pntsd->osidoffset = cpu_to_le32(pntsd_size);
--			memcpy((char *)pntsd + pntsd_size, powner_sid,
--			       powner_sid_size);
--			pntsd_size += powner_sid_size;
--		}
--
--		if (pgroup_sid) {
--			pntsd->gsidoffset = cpu_to_le32(pntsd_size);
--			memcpy((char *)pntsd + pntsd_size, pgroup_sid,
--			       pgroup_sid_size);
--			pntsd_size += pgroup_sid_size;
--		}
--
--		pntsd->dacloffset = cpu_to_le32(pntsd_size);
--		pdacl = (struct smb_acl *)((char *)pntsd + pntsd_size);
--		pdacl->revision = cpu_to_le16(2);
--		pdacl->size = cpu_to_le16(sizeof(struct smb_acl) + nt_size);
--		pdacl->num_aces = cpu_to_le16(ace_cnt);
--		memcpy((char *)pdacl + sizeof(struct smb_acl), aces_base, nt_size);
--		pntsd_size += sizeof(struct smb_acl) + nt_size;
--
- 		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size);
--		kfree(pntsd);
-+		kvfree(pntsd);
- 	}
--
- free_aces_base:
--	kfree(aces_base);
-+	kvfree(sd);
- free_parent_pntsd:
--	kfree(parent_pntsd);
-+	kvfree(parent_pntsd);
- 	return rc;
- }
- 
-@@ -1536,25 +1109,21 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 			bool authenticated, bool strict)
- {
- 	const struct mnt_idmap *idmap = mnt_idmap(path->mnt);
--	struct smb_ntsd *pntsd = NULL;
--	struct smb_acl *pdacl;
-+	struct ksmbd_sd *sd = NULL;
- 	struct posix_acl *posix_acls;
--	int rc = 0, pntsd_size, acl_size, aces_size, pdacl_size;
--	unsigned int dacl_offset;
--	size_t dacl_struct_end;
-+	int rc;
- 	struct smb_sid sid;
- 	int requested = le32_to_cpu(*pdaccess & ~FILE_MAXIMAL_ACCESS_LE);
- 	int granted = requested;
--	struct smb_ace *ace;
-+	const struct ksmbd_ace *ace;
- 	int i, found = 0;
- 	unsigned int access_bits = 0, denied = 0, grp_granted = 0;
- 	unsigned int grp_allowed = 0, grp_denied = 0, bits;
--	struct smb_ace *others_ace = NULL;
-+	const struct ksmbd_ace *others_ace = NULL;
- 	bool or_ace = false, obj_deny = false, au_ace = false, member, counted;
- 	bool grp_ace = false;
- 	struct posix_acl_entry *pa_entry;
- 	unsigned int sid_type = SIDOWNER;
--	unsigned short ace_size;
- 	bool is_owner, owner_rights = false;
- 	bool maximal = *pdaccess & FILE_MAXIMAL_ACCESS_LE;
- 	/*
-@@ -1567,25 +1136,16 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 	vfsuid_t vfsuid;
- 
- 	ksmbd_debug(SMB, "check permission using windows acl\n");
--	pntsd_size = ksmbd_vfs_get_sd_xattr(conn, idmap,
--					    path->dentry, &pntsd);
--	if (pntsd_size <= 0 || !pntsd) {
--		if (pntsd_size < 0 && !smb_no_stored_sd(pntsd_size))
--			rc = pntsd_size == -ENOMEM ? -ENOMEM : -EACCES;
-+	rc = ksmbd_vfs_get_sd_xattr(conn, idmap, path->dentry, &sd);
-+	if (rc) {
-+		if (smb_no_stored_sd(rc))
-+			rc = 0;
-+		else if (rc != -ENOMEM)
-+			rc = -EACCES;
- 		goto err_out;
- 	}
- 
--	dacl_offset = le32_to_cpu(pntsd->dacloffset);
--	if (!dacl_offset ||
--	    check_add_overflow(dacl_offset, sizeof(struct smb_acl), &dacl_struct_end) ||
--	    dacl_struct_end > (size_t)pntsd_size)
--		goto err_out;
--
--	pdacl = (struct smb_acl *)((char *)pntsd + le32_to_cpu(pntsd->dacloffset));
--	acl_size = pntsd_size - dacl_offset;
--	pdacl_size = le16_to_cpu(pdacl->size);
--
--	if (pdacl_size > acl_size || pdacl_size < sizeof(struct smb_acl))
-+	if (sd->dacl != KSMBD_ACL_PRESENT)
- 		goto err_out;
- 
- 	if (!uid)
-@@ -1594,7 +1154,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 	vfsuid = i_uid_into_vfsuid(idmap, d_inode(path->dentry));
- 	is_owner = uid == from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid));
- 
--	if (!pdacl->num_aces) {
-+	if (!sd->num_aces) {
- 		unsigned int allowed = 0;
- 
- 		/*
-@@ -1627,58 +1187,44 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 	 * owner, grant. It is used when the SID lookup and POSIX ACL fallback
- 	 * below do not decide.
- 	 */
--	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
--	aces_size = pdacl_size - sizeof(struct smb_acl);
--	for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
--		if (aces_size < offsetof(struct smb_ace, sid) +
--		    CIFS_SID_BASE_SIZE)
--			break;
--		ace_size = le16_to_cpu(ace->size);
--		if (ace_size > aces_size ||
--		    ace_size < offsetof(struct smb_ace, sid) +
--			       CIFS_SID_BASE_SIZE)
--			break;
--		aces_size -= ace_size;
--
--		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
--		    ace_size < offsetof(struct smb_ace, sid) +
--			      CIFS_SID_BASE_SIZE +
--			      sizeof(__le32) * ace->sid.num_subauth)
--			break;
--
-+	for (i = 0; i < sd->num_aces; i++) {
-+		ace = &sd->aces[i];
- 		if ((ace->type == ACCESS_DENIED_OBJECT_ACE_TYPE ||
- 		     ace->type == ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE) &&
- 		    !(ace->flags & INHERIT_ONLY_ACE))
- 			obj_deny = true;
-+		/* ksmbd evaluates no object ACE, so one matches no one */
-+		if (ace->obj_len)
-+			continue;
- 
--		if (!compare_sids(&sid_owner_rights, &ace->sid)) {
-+		if (!compare_sids(&sid_owner_rights, ace->sid)) {
- 			owner_rights = true;
- 			if (!is_owner)
--				goto next_ace;
-+				continue;
- 		}
- 
--		member = smb_sid_in_group(&ace->sid);
-+		member = smb_sid_in_group(ace->sid);
- 		/* The grp_ masks count groups and OWNER RIGHTS only */
- 		counted = member ||
--			  (is_owner && smb_sid_is_owner_rights(&ace->sid));
-+			  (is_owner && smb_sid_is_owner_rights(ace->sid));
- 		if (ace->flags & INHERIT_ONLY_ACE ||
--		    (compare_sids(&sid, &ace->sid) &&
--		     compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
--		     compare_sids(&sid_everyone, &ace->sid) &&
-+		    (compare_sids(&sid, ace->sid) &&
-+		     compare_sids(&sid_unix_NFS_mode, ace->sid) &&
-+		     compare_sids(&sid_everyone, ace->sid) &&
- 		     (!authusers ||
--		      compare_sids(&sid_authusers, &ace->sid)) &&
--		     compare_sids(&sid_owner_rights, &ace->sid) &&
-+		      compare_sids(&sid_authusers, ace->sid)) &&
-+		     compare_sids(&sid_owner_rights, ace->sid) &&
- 		     !member))
--			goto next_ace;
-+			continue;
- 		/* Other requests count only SIDs that match exactly */
- 		if (!open_max && !member &&
--		    !smb_sid_equal(&sid, &ace->sid) &&
--		    !smb_sid_equal(&sid_everyone, &ace->sid) &&
--		    !(authusers && smb_sid_equal(&sid_authusers, &ace->sid)) &&
--		    !smb_sid_is_owner_rights(&ace->sid))
--			goto next_ace;
-+		    !smb_sid_equal(&sid, ace->sid) &&
-+		    !smb_sid_equal(&sid_everyone, ace->sid) &&
-+		    !(authusers && smb_sid_equal(&sid_authusers, ace->sid)) &&
-+		    !smb_sid_is_owner_rights(ace->sid))
-+			continue;
- 
--		bits = le32_to_cpu(ace->access_req);
-+		bits = ace->mask;
- 		switch (ace->type) {
- 		case ACCESS_ALLOWED_ACE_TYPE:
- 			grp_ace |= counted;
-@@ -1701,8 +1247,6 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 				denied |= ~access_bits & bits;
- 			break;
- 		}
--next_ace:
--		ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
- 	}
- 
- 	/* Keep only file rights, not MAXIMUM_ALLOWED or generic bits */
-@@ -1731,40 +1275,24 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		access_bits = 0;
- 	}
- 
--	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
--	aces_size = pdacl_size - sizeof(struct smb_acl);
--	for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
--		if (aces_size < offsetof(struct smb_ace, sid) +
--		    CIFS_SID_BASE_SIZE)
--			break;
--		ace_size = le16_to_cpu(ace->size);
--		if (ace_size > aces_size ||
--		    ace_size < offsetof(struct smb_ace, sid) +
--			       CIFS_SID_BASE_SIZE)
--			break;
--		aces_size -= ace_size;
--
--		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
--		    ace_size < offsetof(struct smb_ace, sid) + CIFS_SID_BASE_SIZE +
--			      sizeof(__le32) * ace->sid.num_subauth)
--			break;
--
--		if (!compare_sids(&sid, &ace->sid) ||
--		    !compare_sids(&sid_unix_NFS_mode, &ace->sid)) {
-+	for (i = 0; i < sd->num_aces; i++) {
-+		ace = &sd->aces[i];
-+		if (ace->obj_len)
-+			continue;
-+		if (!compare_sids(&sid, ace->sid) ||
-+		    !compare_sids(&sid_unix_NFS_mode, ace->sid)) {
- 			found = 1;
- 			break;
- 		}
--		if (!compare_sids(&sid_owner_rights, &ace->sid) &&
-+		if (!compare_sids(&sid_owner_rights, ace->sid) &&
- 		    !(ace->flags & INHERIT_ONLY_ACE))
- 			or_ace = true;
--		if (!compare_sids(&sid_everyone, &ace->sid) ||
-+		if (!compare_sids(&sid_everyone, ace->sid) ||
- 		    (authusers &&
--		     !compare_sids(&sid_authusers, &ace->sid)))
-+		     !compare_sids(&sid_authusers, ace->sid)))
- 			others_ace = ace;
--		if (!compare_sids(&sid_authusers, &ace->sid))
-+		if (!compare_sids(&sid_authusers, ace->sid))
- 			au_ace = true;
--
--		ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
- 	}
- 
- 	if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
-@@ -1857,11 +1385,11 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 	if (!maximal && obj_deny) {
- 		switch (ace->type) {
- 		case ACCESS_ALLOWED_ACE_TYPE:
--			access_bits = le32_to_cpu(ace->access_req);
-+			access_bits = ace->mask;
- 			break;
- 		case ACCESS_DENIED_ACE_TYPE:
- 		case ACCESS_DENIED_CALLBACK_ACE_TYPE:
--			access_bits = le32_to_cpu(~ace->access_req);
-+			access_bits = ~ace->mask;
- 			break;
- 		}
- 	}
-@@ -1883,7 +1411,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
- 
- 	*pdaccess = cpu_to_le32(granted);
- err_out:
--	kfree(pntsd);
-+	kvfree(sd);
- 	return rc;
- }
- EXPORT_SYMBOL_IF_KUNIT(smb_check_perm_dacl);
-@@ -1933,6 +1461,10 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 		 bool dacl_requested)
- {
- 	int rc;
-+	struct ksmbd_sd *sd = NULL;
-+	size_t store_len;
-+	u8 *store = NULL;
-+	bool store_sd;
- 	struct smb_fattr fattr = {{0}};
- 	struct inode *inode = d_inode(path->dentry);
- 	const struct mnt_idmap *idmap = mnt_idmap(path->mnt);
-@@ -1942,7 +1474,7 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 	fattr.cf_gid = INVALID_GID;
- 	fattr.cf_mode = inode->i_mode;
- 
--	rc = parse_sec_desc(idmap, pntsd, ntsd_len, &fattr);
-+	rc = parse_sec_desc(idmap, pntsd, ntsd_len, &fattr, &sd);
- 	if (rc)
- 		goto out;
- 	if (fattr.cf_posix_mode && !dacl_requested) {
-@@ -1954,6 +1486,19 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 		goto out;
- 	}
- 
-+	/*
-+	 * Encode the SD to store before anything is changed. The SD of a
-+	 * CREATE context (type_check) is stored only if it has a DACL.
-+	 */
-+	store_sd = test_share_config_flag(tcon->share_conf,
-+					  KSMBD_SHARE_FLAG_ACL_XATTR) &&
-+		   !(type_check && sd->dacl == KSMBD_ACL_ABSENT);
-+	if (store_sd) {
-+		rc = ksmbd_sd_encode(sd, &store, &store_len);
-+		if (rc)
-+			goto out;
-+	}
-+
- 	newattrs.ia_valid = ATTR_CTIME;
- 	if (!uid_eq(fattr.cf_uid, INVALID_UID)) {
- 		newattrs.ia_valid |= ATTR_UID;
-@@ -2001,14 +1546,10 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 	if (rc)
- 		goto out;
- 
--	/* Check it only calling from SD BUFFER context */
--	if (type_check && !(le16_to_cpu(pntsd->type) & DACL_PRESENT))
--		goto out;
--
--	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
-+	if (store_sd) {
- 		/* Update WinACL in xattr */
- 		ksmbd_vfs_remove_sd_xattrs(idmap, path);
--		rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
-+		rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, store, store_len);
- 		/*
- 		 * The CREATE context (type_check) stays best effort because
- 		 * the file exists already. A filesystem without the xattr is
-@@ -2019,6 +1560,8 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 	}
- 
- out:
-+	kvfree(store);
-+	kvfree(sd);
- 	posix_acl_release(fattr.cf_acls);
- 	posix_acl_release(fattr.cf_dacls);
- 	return rc;
-diff --git a/fs/smb/server/smbacl.h b/fs/smb/server/smbacl.h
-index b51a8c6c1d4e..b14bbae6ab48 100644
---- a/fs/smb/server/smbacl.h
-+++ b/fs/smb/server/smbacl.h
-@@ -38,6 +38,7 @@
- #define SELF_RELATIVE		0x8000
- 
- struct ksmbd_conn;
-+struct ksmbd_sd;
- 
- struct smb_fattr {
- 	kuid_t	cf_uid;
-@@ -83,9 +84,9 @@ struct posix_acl_state {
- };
- 
- int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
--		   int acl_len, struct smb_fattr *fattr);
--int build_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
--		   struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info,
-+		   int acl_len, struct smb_fattr *fattr, struct ksmbd_sd **psd);
-+int build_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd **pntsd,
-+		   const struct ksmbd_sd *ppntsd, int addition_info,
- 		   __u32 *secdesclen, struct smb_fattr *fattr);
- int init_acl_state(struct posix_acl_state *state, u16 cnt);
- void free_acl_state(struct posix_acl_state *state);
-@@ -95,7 +96,7 @@ int compare_sids(const struct smb_sid *ctsid, const struct smb_sid *cwsid);
- bool smb_inherit_flags(int flags, bool is_dir);
- int smb_inherit_dacl(struct ksmbd_conn *conn, const struct path *path,
- 		     unsigned int uid, unsigned int gid);
--/* Missing, unsupported, malformed or stale SDs retain the POSIX fallback */
-+/* Missing, unsupported, unreadable, or stale SDs retain the POSIX fallback */
- static inline bool smb_no_stored_sd(int rc)
- {
- 	return rc == -ENODATA || rc == -EOPNOTSUPP || rc == -EINVAL;
-@@ -110,8 +111,6 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
- 		 bool dacl_requested);
- void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid);
- void ksmbd_init_domain(u32 *sub_auth);
--size_t smb_acl_sec_desc_scratch_len(struct smb_fattr *fattr,
--		struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info);
- 
- static inline uid_t posix_acl_uid_translate(const struct mnt_idmap *idmap,
- 					    struct posix_acl_entry *pace)
-diff --git a/fs/smb/server/tests/smbacl_kunit.c b/fs/smb/server/tests/smbacl_kunit.c
-index 37d21c10a144..b5c379f8f4e5 100644
---- a/fs/smb/server/tests/smbacl_kunit.c
-+++ b/fs/smb/server/tests/smbacl_kunit.c
-@@ -262,6 +262,47 @@ ksmbd_smb_check_perm_dacl_maximal_boundary_test(struct kunit *test)
- 				mk_vma_flags(VMA_NORESERVE_BIT));
- 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
- 
-+	rc = ksmbd_vfs_set_sd_xattr(NULL, mnt_idmap(file->f_path.mnt),
-+				    &file->f_path, pntsd, ntsd_size);
-+	KUNIT_EXPECT_EQ(test, 0, rc);
-+	if (rc)
-+		goto out;
-+
-+	rc = smb_check_perm_dacl(NULL, &file->f_path, &daccess,
-+				 FILE_MAXIMAL_ACCESS_LE, 0, true, false);
-+
-+	/*
-+	 * The DACL counts two ACEs and holds one, so the stored descriptor
-+	 * is malformed and every request against it is denied.
-+	 */
-+	KUNIT_EXPECT_EQ(test, -EACCES, rc);
-+out:
-+	fput(file);
-+}
-+
-+/*
-+ * The same descriptor with a DACL that counts its one ACE is well formed.
-+ * The trailing ACE is outside the DACL, so maximal access has the read
-+ * access of the first ACE and not the write access of the trailing one.
-+ */
-+static void ksmbd_smb_check_perm_dacl_maximal_test(struct kunit *test)
-+{
-+	struct file *file;
-+	struct smb_ntsd *pntsd;
-+	struct smb_acl *pdacl;
-+	__le32 daccess = FILE_MAXIMAL_ACCESS_LE;
-+	int ntsd_size, rc;
-+
-+	pntsd = build_boundary_ntsd(test, &test_owner_sid, FILE_READ_DATA,
-+				    FILE_WRITE_DATA, &ntsd_size);
-+	KUNIT_ASSERT_NOT_NULL(test, pntsd);
-+	pdacl = (struct smb_acl *)((char *)pntsd + sizeof(struct smb_ntsd));
-+	pdacl->num_aces = cpu_to_le16(1);
-+
-+	file = shmem_file_setup("ksmbd-kunit-dacl-valid", 0,
-+				mk_vma_flags(VMA_NORESERVE_BIT));
-+	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
-+
- 	rc = ksmbd_vfs_set_sd_xattr(NULL, mnt_idmap(file->f_path.mnt),
- 				    &file->f_path, pntsd, ntsd_size);
- 	KUNIT_EXPECT_EQ(test, 0, rc);
-@@ -319,6 +360,7 @@ static struct kunit_case ksmbd_smbacl_test_cases[] = {
- 	KUNIT_CASE(ksmbd_dacl_walk_must_stop_at_declared_size),
- 	KUNIT_CASE(ksmbd_smb_check_perm_dacl_boundary_test),
- 	KUNIT_CASE(ksmbd_smb_check_perm_dacl_maximal_boundary_test),
-+	KUNIT_CASE(ksmbd_smb_check_perm_dacl_maximal_test),
- 	KUNIT_CASE(ksmbd_vfs_set_sd_xattr_keeps_caller_sd_test),
- 	{}
- };
-diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-index 39bbe6aad629..5b0722fe7788 100644
---- a/fs/smb/server/vfs.c
-+++ b/fs/smb/server/vfs.c
-@@ -29,6 +29,7 @@
- #include "connection.h"
- #include "vfs.h"
- #include "vfs_cache.h"
-+#include "secdesc.h"
- #include "smbacl.h"
- #include "ndr.h"
- #include "auth.h"
-@@ -1699,7 +1700,7 @@ static struct xattr_smb_acl *ksmbd_vfs_make_xattr_posix_acl(const struct mnt_idm
- int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
- 			   const struct mnt_idmap *idmap,
- 			   const struct path *path,
--			   const struct smb_ntsd *pntsd, int len)
-+			   const void *pntsd, int len)
- {
- 	int rc;
- 	struct ndr sd_ndr = {0}, acl_ndr = {0};
-@@ -1780,10 +1781,13 @@ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
- }
- EXPORT_SYMBOL_IF_KUNIT(ksmbd_vfs_set_sd_xattr);
- 
-+/*
-+ * Returns -EBADMSG if the stored SD is malformed. The caller frees *@sd with
-+ * kvfree().
-+ */
- int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 			   const struct mnt_idmap *idmap,
--			   struct dentry *dentry,
--			   struct smb_ntsd **pntsd)
-+			   struct dentry *dentry, struct ksmbd_sd **sd)
- {
- 	int rc;
- 	struct ndr n;
-@@ -1792,10 +1796,12 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 	struct xattr_ntacl acl = {0};
- 	struct xattr_smb_acl *smb_acl = NULL, *def_smb_acl = NULL;
- 	__u8 cmp_hash[XATTR_SD_HASH_SIZE] = {0};
-+	struct smb_ntsd *pntsd;
- 
-+	*sd = NULL;
- 	rc = ksmbd_vfs_getxattr(idmap, dentry, XATTR_NAME_SD, &n.data);
- 	if (rc <= 0)
--		return rc;
-+		return rc ?: -ENODATA;
- 
- 	n.length = rc;
- 	rc = ndr_decode_v4_ntacl(&n, &acl);
-@@ -1836,29 +1842,29 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
- 		goto out_free;
- 	}
- 
--	*pntsd = acl.sd_buf;
-+	pntsd = acl.sd_buf;
- 	if (acl.sd_size < sizeof(struct smb_ntsd)) {
--		pr_err("sd size is invalid\n");
--		rc = -EINVAL;
--		goto out_free;
--	}
--
--	(*pntsd)->osidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->osidoffset) -
--					   NDR_NTSD_OFFSETOF);
--	(*pntsd)->gsidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->gsidoffset) -
--					   NDR_NTSD_OFFSETOF);
--	(*pntsd)->dacloffset = cpu_to_le32(le32_to_cpu((*pntsd)->dacloffset) -
--					   NDR_NTSD_OFFSETOF);
--
--	rc = acl.sd_size;
-+		rc = -EBADMSG;
-+		goto malformed;
-+	}
-+
-+	pntsd->osidoffset = cpu_to_le32(le32_to_cpu(pntsd->osidoffset) -
-+					NDR_NTSD_OFFSETOF);
-+	pntsd->gsidoffset = cpu_to_le32(le32_to_cpu(pntsd->gsidoffset) -
-+					NDR_NTSD_OFFSETOF);
-+	pntsd->dacloffset = cpu_to_le32(le32_to_cpu(pntsd->dacloffset) -
-+					NDR_NTSD_OFFSETOF);
-+
-+	rc = ksmbd_sd_decode(acl.sd_buf, acl.sd_size, sd);
-+malformed:
-+	if (rc == -EBADMSG)
-+		pr_warn_ratelimited("malformed stored security descriptor of %pd\n",
-+				    dentry);
- out_free:
- 	kfree(acl_ndr.data);
- 	kfree(smb_acl);
- 	kfree(def_smb_acl);
--	if (rc < 0) {
--		kfree(acl.sd_buf);
--		*pntsd = NULL;
--	}
-+	kfree(acl.sd_buf);
- 	kfree(n.data);
- 	return rc;
- }
-diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
-index fb184546d26b..a6a42e979022 100644
---- a/fs/smb/server/vfs.h
-+++ b/fs/smb/server/vfs.h
-@@ -164,11 +164,11 @@ int ksmbd_vfs_remove_sd_xattrs(const struct mnt_idmap *idmap, const struct path
- int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
- 			   const struct mnt_idmap *idmap,
- 			   const struct path *path,
--			   const struct smb_ntsd *pntsd, int len);
--int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
--			   const struct mnt_idmap *idmap,
--			   struct dentry *dentry,
--			   struct smb_ntsd **pntsd);
-+			   const void *pntsd, int len);
-+int __must_check ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
-+					const struct mnt_idmap *idmap,
-+					struct dentry *dentry,
-+					struct ksmbd_sd **sd);
- int ksmbd_vfs_set_dos_attrib_xattr(const struct mnt_idmap *idmap,
- 				   const struct path *path,
- 				   struct xattr_dos_attrib *da,
--- 
-2.47.3
-
+>
+> The result would be that every peer-initiated key update whose first
+> packet lands in softirq context gets dropped. cb->key_update never takes
+> effect, so crypto->key_phase never flips. rx_fails is also incremented
+> for a valid packet. Every later packet from the peer under the new phase
+> goes through the same defer-and-fail cycle, so the connection stalls
+> instead of completing the key update.
+>
+> Should quic_crypto_decrypt() call quic_crypto_get_number() when
+> cb->number_len is already set but cb->resume is not? Or must the caller
+> preserve the decoded cb->number across the backlog requeue? If it is the
+> latter, could that be documented next to the cb->number field? The two
+> re-entry paths would then have opposite contracts for the same field.
+>
+> --
+> Sashiko AI review =C2=B7 https://netdev-ai.bots.linux.dev/sashiko/#/patch=
+set/cover.1795393690.git.lucien.xin%40gmail.com
