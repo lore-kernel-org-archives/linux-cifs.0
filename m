@@ -1,51 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.3
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.10
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795507182;
-	b=iUSpN48Kb4lTO69XajC/cJfUtRuVKR9w+1AAUrCnBvli97NnRs3gOomlPIUnJNnBUOKL
-	 jadM9Aja85bK9YB2GkwZj2XBbTXBiSRYs+u8+peoey44UcMVTNL3K6rFbJRa0Tyop+N7k
-	 gSo609o/pbCw3ZehJsN5uI7BiW90+KdcieP9TOCkbgebaPj11qLDkdeGz2SsRz52oE5mN
-	 cn37DVs6g2G99Z0dmLBQ5sDYgIdhPLL18mAgdJurfJP3ZoYa1ZVia0UKlACrVfCobGOa1
-	 UMZJQ/6cgxafgETR7Uqto+tAJAYtZNQzIDD9mltv4U5fpq+Zktj1m9fQ1zER0MCiSWA==
+	t=1795507185;
+	b=h9m86A/EkBmrTSvaWGMpzkdeN8lYcaQjw06GjqeWj86SM0cWfTqx3if7GxXc5qb2nrM9
+	 l3wvZzBn1jNQ/JfieBpvHtsczoHvtJE/0cpZ9jqewkqgeumWYxv0RGCvnpx7HlPuMWlmc
+	 JuhOtw8IQOeRDIcX1wRkTotPIRz1b0+VWMeRHLs0BGwo3ZOu2bZxQoV9V9A9jREVCoRXi
+	 BMNS2NFwx2LKrJRMcZJR+IgXZZAtdCSf3Eikd6d63Rkacikv80Am+UylcKBG2Se+RsMgJ
+	 JqPBr6ua5VGDK3EpDsvQorr8mpTvsD5ksJl/hCdkN+pp7IadCvyNNPqL+fCCfAARBhw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795507182;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795507185;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:
 	 Content-Transfer-Encoding;
-	bh=T5MeZhWZGjZhLAuxAqz8P07n7+0/zY8vywY6aVHI+jA=;
-	b=VE23AZ5hW1ykr+Tw3yqRrbt7xS1OMiJqrfKsheioqqpxp97gc5axXwU/gwgkwemDF2dZ
-	 xIVmqSnDMqodpMixHppTF5sb1HpPRc2AIVSzuTpvUxCJ/VtM9kyx4xB+e6ZFJKmm5dD8v
-	 3Esp9UqlO9QaSCVJsvxNmkE5Qy7+JJ0pGIriSH5PXy7Mv8dRhlcgiCmZc2P/fWFEMFrc8
-	 Z0zrI5J9HaTY9BRnyg5nKUp5iTLQDMtz0FF35SLh0M6kuuEYlMVzkfIcjiuqdUQuuuUSI
-	 zgux6Z1aN7NVutpLPuMGbO8xnhGwhANA3edfP973AFuVmvvj84I1UQS/9BgFlagWiUQ==
+	bh=4OvXlmVDbj+xMLIOv10yP+37UNfCpiJKulfx4V+7HuA=;
+	b=YIevdg0v7usIOfFiMu1oeomXpYbs5q8i/1usXDwFV/WGy3wVlWWAUXpkdvIIq0kW9fhr
+	 IAvEWVzAxgTW0QDnrljjREp7HrmKXewxvSLTl2fNsrYtFNnhCpRTlK67jJYxIynGQ+9oy
+	 kkUYI068M9USXeZNcWn78NhTfJTQVZyZy9rHhiVA8omB0jB9QFjqdJkEysVe6jko25aKA
+	 dqdilbhGXqGNXPM6xCjfAalf/K4Bd5KLwDhgV0m406sYsU8QL2WyLCvLBAwkb6XER5h7e
+	 d37iEN3Upo6l1hg+KD+syHvG9yvG1kibbWyyZ3L53Ib0+h1+MYz8bUl9Y2Oiy6AQB2g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ZPJYRbpH;
-	arc=none smtp.remote-ip=95.215.58.3
-Received: from mta1.migadu.com (out-3.mta1.migadu.com [95.215.58.3])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QA+4gDBz;
+	arc=none smtp.remote-ip=95.215.58.10
+Received: from mta1.migadu.com (out-10.mta1.migadu.com [95.215.58.10])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32277606A31E
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 07:59:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32277606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EF6606A31E
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 07:59:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 34EF6606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ZPJYRbpH
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=QA+4gDBz
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=09B8mj+z86zM566FPtA+Kh1fWFAMDA1D3V8BeFfcAWM=;
+DKIM-Signature: a=rsa-sha256; bh=u1CeqRsOC3qFVy1aH8rMj6Fa7zHv++gfcrsDEpqcCNs=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795507179; v=1; x=1796111979;
- b=ZPJYRbpHYFMqoNf/JdlyUfcjToKvfI8KXUc716q3V3pbm16Dd/JsCzI6CIwEsh/ReYk9T2sU
- n3LiGf4gjtbNSRwfzghIV0PCk1yOXugpNAUhaJy48TF00OQKqwo54Pbb/4y/+dsCLsR4YRrNd2x
- 1BRMVX+HN2d/IFXpQmJHvP1Q=
+ t=1795507183; v=1; x=1796111983;
+ b=QA+4gDBzNIna7LRNU4HLSeTE47LsMtnrr/UyS852szxi2lOI8mdBCvGCH8/HB4kyWOTL4xAD
+ XUy4p5a7s1bNnGA406drjCHjcW1v6u2T1SrrBsmToPMsaEh+1qOxpO514nwW/9IX80L2bgXXhj5
+ LJVuop4C4Wd5LweHDohjuOR0=
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id 62acc32cc6c85167;
-	Tue, 24 Nov 2026 07:59:39 +0000
-X-Mizu-Trace-ID: 62acc32cc6c85167
+Received: by smtp.migadu.com with ESMTPS id ae916bafd3db2c92;
+	Tue, 24 Nov 2026 07:59:43 +0000
+X-Mizu-Trace-ID: ae916bafd3db2c92
 X-Migadu-Flow: FLOW_OUT
 From: ZhangGuoDong <zhang.guodong@linux.dev>
 To: linkinjeon@kernel.org,
@@ -58,9 +58,9 @@ To: linkinjeon@kernel.org,
 Cc: linux-cifs@vger.kernel.org,
 	ZhangGuoDong <zhangguodong@kylinos.cn>,
 	ChenXiaoSong <chenxiaosong@kylinos.cn>
-Subject: [PATCH 1/2] smb/client: fix little-endian values in diagnostic messages
-Date: Tue, 24 Nov 2026 15:59:26 +0800
-Message-ID: <20261124075927.469470-2-zhang.guodong@linux.dev>
+Subject: [PATCH 2/2] smb/client: fix file name conversion on big-endian systems
+Date: Tue, 24 Nov 2026 15:59:27 +0800
+Message-ID: <20261124075927.469470-3-zhang.guodong@linux.dev>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20261124075927.469470-1-zhang.guodong@linux.dev>
 References: <20261124075927.469470-1-zhang.guodong@linux.dev>
@@ -77,168 +77,47 @@ Content-Transfer-Encoding: 8bit
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-Convert to CPU byte order to avoid incorrect debug log
-on big-endian architectures.
+Use CPU byte order for temporary UTF-16 buffers to avoid incorrect
+file name conversion on big-endian architectures.
 
+Fixes: b29103076bec ("Fix to convert SURROGATE PAIR")
 Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 ---
- fs/smb/client/cifsacl.c       | 3 ++-
- fs/smb/client/sess.c          | 2 +-
- fs/smb/client/smb1debug.c     | 5 +++--
- fs/smb/client/smb1misc.c      | 4 ++--
- fs/smb/client/smb2ops.c       | 5 +++--
- fs/smb/client/smb2pdu.c       | 4 ++--
- fs/smb/client/smb2transport.c | 6 +++---
- fs/smb/client/transport.c     | 2 +-
- 8 files changed, 17 insertions(+), 14 deletions(-)
+ fs/smb/client/cifs_unicode.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
-index d8f30c35cbe5..b23cb226c4d3 100644
---- a/fs/smb/client/cifsacl.c
-+++ b/fs/smb/client/cifsacl.c
-@@ -1375,7 +1375,8 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
- 	gsidoffset = le32_to_cpu(pntsd->gsidoffset);
- 	dacloffset = le32_to_cpu(pntsd->dacloffset);
- 	cifs_dbg(NOISY, "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
--		 pntsd->revision, pntsd->type, osidoffset, gsidoffset,
-+		 le16_to_cpu(pntsd->revision), le16_to_cpu(pntsd->type),
-+		 osidoffset, gsidoffset,
- 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
- 	fattr->cf_uid = cifs_sb->ctx->linux_uid;
- 	fattr->cf_gid = cifs_sb->ctx->linux_gid;
-diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
-index fe006e9f2e10..468bdeae2de6 100644
---- a/fs/smb/client/sess.c
-+++ b/fs/smb/client/sess.c
-@@ -672,7 +672,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
- 	}
- 	if (pblob->MessageType != NtLmChallenge) {
- 		cifs_dbg(VFS, "Incorrect message type %d\n",
--			 pblob->MessageType);
-+			 le32_to_cpu(pblob->MessageType));
- 		return -EINVAL;
- 	}
- 
-diff --git a/fs/smb/client/smb1debug.c b/fs/smb/client/smb1debug.c
-index e2d013e751e5..f4a08acd7242 100644
---- a/fs/smb/client/smb1debug.c
-+++ b/fs/smb/client/smb1debug.c
-@@ -15,8 +15,9 @@ void cifs_dump_detail(void *buf, size_t buf_len, struct TCP_Server_Info *server)
- 	struct smb_hdr *smb = buf;
- 
- 	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d Wct: %d\n",
--		 smb->Command, smb->Status.CifsError, smb->Flags,
--		 smb->Flags2, smb->Mid, smb->Pid, smb->WordCount);
-+		 smb->Command, le32_to_cpu(smb->Status.CifsError), smb->Flags,
-+		 le16_to_cpu(smb->Flags2), le16_to_cpu(smb->Mid),
-+		 le16_to_cpu(smb->Pid), smb->WordCount);
- 	if (!server->ops->check_message(buf, buf_len, server->total_read, server)) {
- 		cifs_dbg(VFS, "smb buf %p len %u\n", smb,
- 			 server->ops->calc_smb_size(smb));
-diff --git a/fs/smb/client/smb1misc.c b/fs/smb/client/smb1misc.c
-index cdfbbff24b72..4005a97c0ac5 100644
---- a/fs/smb/client/smb1misc.c
-+++ b/fs/smb/client/smb1misc.c
-@@ -95,14 +95,14 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
- 			pnotify = (struct file_notify_information *)
- 				((char *)&pSMBr->hdr.Protocol + data_offset);
- 			cifs_dbg(FYI, "dnotify on %s Action: 0x%x\n",
--				 pnotify->FileName, pnotify->Action);
-+				 pnotify->FileName, le32_to_cpu(pnotify->Action));
- 			/*   cifs_dump_mem("Rcvd notify Data: ",buf,
- 				sizeof(struct smb_hdr)+60); */
- 			return true;
- 		}
- 		if (pSMBr->hdr.Status.CifsError) {
- 			cifs_dbg(FYI, "notify err 0x%x\n",
--				 pSMBr->hdr.Status.CifsError);
-+				 le32_to_cpu(pSMBr->hdr.Status.CifsError));
- 			return true;
- 		}
- 		return false;
-diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
-index 298f549bd7ed..9c16839576e9 100644
---- a/fs/smb/client/smb2ops.c
-+++ b/fs/smb/client/smb2ops.c
-@@ -454,8 +454,9 @@ smb2_dump_detail(void *buf, size_t buf_len, struct TCP_Server_Info *server)
- 	struct smb2_hdr *shdr = (struct smb2_hdr *)buf;
- 
- 	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
--		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
--		 shdr->Id.SyncId.ProcessId);
-+		 le16_to_cpu(shdr->Command), le32_to_cpu(shdr->Status),
-+		 le32_to_cpu(shdr->Flags), le64_to_cpu(shdr->MessageId),
-+		 le32_to_cpu(shdr->Id.SyncId.ProcessId));
- 	if (!server->ops->check_message(buf, buf_len, server->total_read, server)) {
- 		cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
- 				server->ops->calc_smb_size(buf));
-diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
-index b26bfb4bd91a..21e8a78f6104 100644
---- a/fs/smb/client/smb2pdu.c
-+++ b/fs/smb/client/smb2pdu.c
-@@ -278,7 +278,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
- 		if (smb2_command != SMB2_TREE_DISCONNECT) {
- 			spin_unlock(&tcon->tc_lock);
- 			cifs_tcon_dbg(FYI, "can not send cmd %d while umounting\n",
--				      smb2_command);
-+				      le16_to_cpu(smb2_command));
- 			return -ENODEV;
- 		}
- 	}
-@@ -1294,7 +1294,7 @@ SMB2_negotiate(const unsigned int xid,
- 		goto neg_exit;
- 	}
- 
--	cifs_dbg(FYI, "mode 0x%x\n", rsp->SecurityMode);
-+	cifs_dbg(FYI, "mode 0x%x\n", le16_to_cpu(rsp->SecurityMode));
- 
- 	switch (dialect) {
- 	case SMB20_PROT_ID:
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 080864b24a0c..51dca16463d8 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -380,7 +380,7 @@ generate_smb3signingkey(struct cifs_ses *ses,
- 	 */
- 	cifs_dbg(VFS, "Session Id    %*ph\n", (int)sizeof(ses->Suid),
- 			&ses->Suid);
--	cifs_dbg(VFS, "Cipher type   %d\n", server->cipher_type);
-+	cifs_dbg(VFS, "Cipher type   %d\n", le16_to_cpu(server->cipher_type));
- 	cifs_dbg(VFS, "Session Key   %*ph\n",
- 		 (int)ses->auth_key.len, ses->auth_key.response);
- 	cifs_dbg(VFS, "Signing Key   %*ph\n",
-@@ -570,7 +570,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 	/* Do not need to verify session setups with signature "BSRSPYL " */
- 	if (memcmp(shdr->Signature, "BSRSPYL ", 8) == 0)
- 		cifs_dbg(FYI, "dummy signature received for smb command 0x%x\n",
--			 shdr->Command);
-+			 le16_to_cpu(shdr->Command));
- 
- 	/*
- 	 * Save off the original signature so we can modify the smb and check
-@@ -588,7 +588,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 	if (crypto_memneq(server_response_sig, shdr->Signature,
- 			  SMB2_SIGNATURE_SIZE)) {
- 		cifs_dbg(VFS, "sign fail cmd 0x%x message id 0x%llx\n",
--			shdr->Command, shdr->MessageId);
-+			 le16_to_cpu(shdr->Command), le64_to_cpu(shdr->MessageId));
- 		return -EACCES;
- 	} else
- 		return 0;
-diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
-index c51f99d7be4b..cbeead6e522b 100644
---- a/fs/smb/client/transport.c
-+++ b/fs/smb/client/transport.c
-@@ -101,7 +101,7 @@ void __release_mid(struct TCP_Server_Info *server, struct mid_q_entry *midEntry)
- 			       midEntry->when_sent, midEntry->when_received);
- 		if (cifsFYI & CIFS_TIMER) {
- 			pr_debug("slow rsp: cmd %d mid %llu A: 0x%lx S: 0x%lx R: 0x%lx\n",
--				 midEntry->command, midEntry->mid,
-+				 smb_cmd, midEntry->mid,
- 				 now - midEntry->when_alloc,
- 				 now - midEntry->when_sent,
- 				 now - midEntry->when_received);
+diff --git a/fs/smb/client/cifs_unicode.c b/fs/smb/client/cifs_unicode.c
+index 4a8a591f4bca..264595633b1e 100644
+--- a/fs/smb/client/cifs_unicode.c
++++ b/fs/smb/client/cifs_unicode.c
+@@ -92,7 +92,7 @@ convert_sfm_char(const __u16 src_char, char *target)
+ /*
+  * cifs_mapchar - convert a host-endian char to proper char in codepage
+  * @target - where converted character should be copied
+- * @src_char - 2 byte host-endian source character
++ * @from - 2 byte host-endian source character
+  * @cp - codepage to which character should be converted
+  * @map_type - How should the 7 NTFS/SMB reserved characters be mapped to UCS2?
+  *
+@@ -126,7 +126,7 @@ cifs_mapchar(char *target, const __u16 *from, const struct nls_table *cp,
+ 	/* convert SURROGATE_PAIR and IVS */
+ 	if (strcmp(cp->charset, "utf8"))
+ 		goto unknown;
+-	len = utf16s_to_utf8s(from, 3, UTF16_LITTLE_ENDIAN, target, 6);
++	len = utf16s_to_utf8s(from, 3, UTF16_HOST_ENDIAN, target, 6);
+ 	if (len <= 0)
+ 		goto unknown;
+ 	return len;
+@@ -518,7 +518,7 @@ cifsConvertToUTF16(__le16 *target, const char *source, int srclen,
+ 			} else
+ 				goto unknown;
+ 			ret  = utf8s_to_utf16s(source + i, charlen,
+-					       UTF16_LITTLE_ENDIAN,
++					       UTF16_HOST_ENDIAN,
+ 					       wchar_to, 6);
+ 			if (ret < 0)
+ 				goto unknown;
 -- 
 2.55.0
 
