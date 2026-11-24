@@ -1,47 +1,47 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795483264;
-	b=OsiwFj6wd/boJTWrN99FX7e563fIZqtVaWipBy5yP9TU9x1xWqr+0jaoGvcAimbzrGFg
-	 pRgMMr8Tn7coDlTWuU/jB2b+E92XetsWfl/04RZ1bdTYAUBp/NoOpMRw+egGQcdT3dFjd
-	 RIlUB2j8nAyMn7GDkQB50QYQT4bFH4IShW1QbJJiJ/aScvxQhdm7KiUxlYT1uvyba+hoy
-	 aF5xlIufEQ+n0iSr5/mTdfeQXLUNpBrU27gLYse273hsR9dk5dHL71UNCeJqzn38T+cAt
-	 otXQogfZ/4xs0PQsZkk7GW+s/urhehcsQJ6/I+/8vmD1CeVUAYdgML+u1AOSJlArhNA==
+	t=1795483269;
+	b=fOPEpAJhO2xTXo2Dj1pMNrEeeFXouErKNkiDvSToNhO0asoUYEB0CxJ5Mj4JwlD4vQv7
+	 dRmmdj1MqrZJOKxXomHIP8azHo/HuNv9fzb/IRiJaVtRKmU5+EkmKIIJ9QH0mHZODoUnR
+	 zOQAKMNY9OEM8YAeFR8z8B5t59Fwymf5/0c4nPlhM1+cYbsUPdmLtCC0ZEaNKdfEHHiU0
+	 NlN/nm10HeHyuABDId4hC34ToagyZRSyK671XaRoqRrGAIv9VH3qou2wKsbMvu/0qZjNa
+	 tJ37ObCpqQBdwW95IM79UAg+YZbwhG1qYWpj7+1XNhZ7LDZvJItYQoy7S5g5cCB177Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795483264;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795483269;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=9BDulXHaTFH9WUerzen4hwlWxTAC3ppvvJGAoF+motE=;
-	b=op6KFcKEav1+BuRFaMvYval/e1sZK/zU8ZigS5qPeW3Fne0cYEHLilzytNjTM+hwJ4It
-	 ltHc/JO+q3dRQNfgGSCf0TRQP7IIoi5rqNuty7itJ9oKNI/aA5pJxqIESgjvfELM/dVXB
-	 rne2hbmZfL4VMSndLhNvUJkkaeJZI8sBpdn6dSNEh4NTBswqGl4hWzmvSNjXj0ysHFk6s
-	 ZpGVC/yB1R5WkqFmXXjv0co/pMR6YM3OH1Fz426Px23ZBXZ1O5FCRzq6fi/1g9lJkNPQt
-	 u1qsQ5/aIf73xh1YVlvaf8OHqYIlqoyIkVSLwUtNnxuiGsiuGgs4tqr9YNUz49lmQdA==
+	bh=lsgJbmq9xKAEYd+A+T8Qq8tXEzdvo3g7s2dCZbJ+4cg=;
+	b=M0boh1ZOhnumx2T6keKBM9x4HagrUd3PV20PA6Bi93vU4Ph1q2w9xMX5XQtFOTsRtca2
+	 Sxk/LB1Mvg/uOYY3uZrvL2Qg7Xw3Apro/yiAG42v44xWRDPAFBdVMzdczidUkLLNM43zE
+	 lbW6xzYeg22CZYD7oqd8WmTtE0bA1wXnund4b+og4V2JqnUIG3w1Mo1vPKHPClJk111XR
+	 oRJijBDfBSSsTWnd9bjaG7tXxShtDypCXMUWsBULGg0ojF9ZBl+BKRR4sycmBoLsu35np
+	 ka86KeV97uWgIl91rdj2l40GA303Y5T++G2TheMwWOO97JeMbW739odCvphT+90/hNQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bkne1S9o;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JceiwOb6;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31BB606A31E;
-	Tue, 24 Nov 2026 01:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D014F606A321;
+	Tue, 24 Nov 2026 01:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=bkne1S9o
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 740841F000C0;
-	Tue, 24 Nov 2026 01:21:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=JceiwOb6
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DC1B1F000D1;
+	Tue, 24 Nov 2026 01:21:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795483263;
-	bh=9BDulXHaTFH9WUerzen4hwlWxTAC3ppvvJGAoF+motE=;
+	s=k20260515; t=1795483269;
+	bh=lsgJbmq9xKAEYd+A+T8Qq8tXEzdvo3g7s2dCZbJ+4cg=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=bkne1S9okR19YKrKDubvz0IUMj2gGJv58KhVJgv/j0c8GqH2EiN3J3sfzmUkWtnKn
-	 C/9tbQI2SoZGxOVEFBNj0W/imvtwJQu2oSlqdakV+Em7sinwEP7WLIPKl7GjJITkpT
-	 2l5AUIv0iWo58eYIZcl5H+zOZmGBOYBOxry2wLevzl89WY3q8+4kZ+3ygPzycETtDe
-	 EiNY1YHalsxE6Srkp7f26GaeMNuKEz4q0xSTcjsmh4clf8az3eN1UDNKWSX2dWumyM
-	 j/IX6V+v4kkMg60RA37GA+3L+2VVDEYexKOtU/mXa3my2zJL5td5ce5PtPsToCj8Tv
-	 ouxs2U1C47MVA==
-Subject: Re: [PATCH net-next v19 01/15] net: define IPPROTO_QUIC and SOL_QUIC
- constants
+	b=JceiwOb6FS71vK1l84Mwo8qnobrgFQPAPGgPk21Mk+dCRVUdDN03P/X66qyO1HFxc
+	 /zOQEqLCDYcq1gTmQAIpJxHqj7dJV8cCEGwcWjdR52hDJeKgOaXLsuGHeBHLUMS9l2
+	 lTS/8KVb5Im9s1tVWkbpCzPOiSP48hi/jk//pl7SJGQOwkTzZKJ1sOSsk1OTxz9cmi
+	 qyDRH5m0DwkHzPb/qaBDhQLLrheDB6EC4f4deD1/GXxc1ln4qC/rh7auasqVKqcH7C
+	 t9qDJx3aaQT3lkvpAwhuiP5LHbG/RLHNvPOPCpHme8O1ysHQBLVHSB+OYgvQTJX5LF
+	 FmxR5tIMPU9lg==
+Subject: Re: [PATCH net-next v19 04/15] quic: provide family ops for address
+ and protocol
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -56,11 +56,11 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  sd@queasysnail.net, marcelo.leitner@gmail.com, daniel@haxx.se,
  andrew.gospodarek@broadcom.com, mef@scarletmail.rutgers.edu, paul@jakma.org,
  kuniyu@google.com
-Date: Tue, 24 Nov 2026 01:21:00 +0000
-Message-ID: <179548326096.3135.1557496253047696896@kernel.org>
-In-Reply-To: <ba1d4f03926411d4e61a7587e41a12b0b423d841.1795393691.git.lucien.xin@gmail.com>
-References: <ba1d4f03926411d4e61a7587e41a12b0b423d841.1795393691.git.lucien.xin@gmail.com>
-X-sashiko-severity: Low
+Date: Tue, 24 Nov 2026 01:21:06 +0000
+Message-ID: <179548326686.3135.1885327270671072036@kernel.org>
+In-Reply-To: <e33f69fbe24e60c4f624c08279553be2888558ff.1795393691.git.lucien.xin@gmail.com>
+References: <e33f69fbe24e60c4f624c08279553be2888558ff.1795393691.git.lucien.xin@gmail.com>
+X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-cifs@vger.kernel.org
@@ -73,106 +73,208 @@ List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 
-Thank you for your contribution! Sashiko AI review found more severe
-issue(s) in other patches of this series. This mail is only an FYI, in case
-you want to address the nit picks below when you respin.
+Thank you for your contribution! Sashiko AI review found 4 potential
+issue(s) to consider.
 
-Low priority / nit picks for your consideration:
+Critical: 0 · High: 0 · Medium: 3 · Low: 1
 
-- [Low] This patch edits the tools/ copies of the kernel headers
-  directly: tools/include/uapi/linux/in.h (adds IPPROTO_QUIC = 261) and…
-- [Low] The commit message does not mention the change to
-  include/trace/events/sock.h.
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
+
+- [Medium] quic_flow_route() in net/quic/family.c returns -EINVAL
+  whenever `sa->sa.sa_family` is non-zero and differs from…
+- [Medium] quic_v4_flow_route() in net/quic/family.c accepts any route
+  returned by ip_route_output_flow() and passes it straight to…
+- [Medium] When the selected IPv6 source is link-local,
+  quic_v6_flow_route() in net/quic/family.c runs `sa->v6.sin6_scope_id =…
+- [Low] The commit message does not mention three user-visible behaviour
+  changes.
 
 --
 
-net: define IPPROTO_QUIC and SOL_QUIC constants
+quic: provide family ops for address and protocol
 
-This commit adds the IPPROTO_QUIC (261) and SOL_QUIC (288) constants for
-the in-kernel QUIC socket implementation. It also adds IPPROTO_QUIC to
-the inet_protocol_names trace enum mapping. The tools/ copies of in.h
-and socket.h get the same definitions.
+This patch adds net/quic/family.{c,h} with IPv4/IPv6 helpers for routing,
+transmit, address parsing and comparison, and UDP tunnel socket
+configuration. It also wires quic_inet_getname(), quic_setsockopt() and
+quic_getsockopt() to these helpers.
 
-> diff --git a/include/trace/events/sock.h b/include/trace/events/sock.h
-> index b5310439536e0..ed43fe6d2705b 100644
-> --- a/include/trace/events/sock.h
-> +++ b/include/trace/events/sock.h
-> @@ -20,7 +20,8 @@
->  #define inet_protocol_names		\
->  		EM(IPPROTO_TCP)			\
->  		EM(IPPROTO_SCTP)		\
-> -		EMe(IPPROTO_MPTCP)
-> +		EM(IPPROTO_MPTCP)		\
-> +		EMe(IPPROTO_QUIC)
+> quic: provide family ops for address and protocol
+>
+> Introduce QUIC address and protocol family operations to handle IPv4/IPv6
+> specifics consistently. The new family.{c,h} provide helpers for routing,
+> skb transmit handling, address parsing and comparison and UDP socket config
+> initializing etc.
 
 [Severity: Low]
-This isn't a bug, but could the commit message mention this change?
+This isn't a bug, but the commit message describes only internal helpers.
+The patch also changes user-visible behaviour on QUIC sockets.
 
-inet_protocol_names feeds the TRACE_DEFINE_ENUM exports and
-show_inet_protocol_name(). That helper is used in the TP_printk output
-of inet_sock_set_state, inet_sk_error_report and the sock_msg_length
-class. With this change those events print "IPPROTO_QUIC" instead of a
-raw 261, and a new enum is exported to trace parsers.
+quic_inet_getname() used to return -EOPNOTSUPP. It now calls
+quic_get_sk_addr(), so getsockname() and getpeername() return real
+addresses through inet_getname() or inet6_getname().
 
-The commit body only describes the new UAPI constants. The tracepoint
-change is noted only in the v15 changelog below the "---" line, and
-that text is dropped when the patch is applied. A one-line note in the
-body would cover it.
+quic_setsockopt() and quic_getsockopt() used to return -EOPNOTSUPP for any
+level other than SOL_QUIC. They now pass the call to ip_setsockopt() or
+ipv6_setsockopt(), and to ip_getsockopt() or ipv6_getsockopt(). With
+CONFIG_NETFILTER the call can also reach nf_setsockopt() or
+nf_getsockopt(). For unknown levels the error changes from -EOPNOTSUPP to
+-ENOPROTOOPT.
 
->  
->  #define tcp_state_names			\
->  		EM(TCP_ESTABLISHED)		\
+SOL_IP and SOL_IPV6 options set this way change state that the new helpers
+read: inet_sk(sk)->tos, uc_ttl, np->tclass, SNDFLOW and ipv6_only_sock().
+
+Could the commit message mention these changes? The subject also still
+says "family ops", but v3 replaced the ops abstraction with if/else
+helpers.
+
+> diff --git a/net/quic/family.c b/net/quic/family.c
+> new file mode 100644
+> index 0000000000000..73f3b955e13c4
+> --- /dev/null
+> +++ b/net/quic/family.c
 
 [ ... ]
 
-> diff --git a/tools/include/uapi/linux/in.h b/tools/include/uapi/linux/in.h
-> index ced0fc3c3aa53..e4072152f2e62 100644
-> --- a/tools/include/uapi/linux/in.h
-> +++ b/tools/include/uapi/linux/in.h
-> @@ -85,6 +85,8 @@ enum {
->  #define IPPROTO_RAW		IPPROTO_RAW
->    IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
->  #define IPPROTO_SMC		IPPROTO_SMC
-> +  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed Secure Transport */
-> +#define IPPROTO_QUIC		IPPROTO_QUIC
->    IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
->  #define IPPROTO_MPTCP		IPPROTO_MPTCP
->    IPPROTO_MAX
-> diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
-> index b17fdb7d38a77..7677133953ecf 100644
-> --- a/tools/perf/trace/beauty/include/linux/socket.h
-> +++ b/tools/perf/trace/beauty/include/linux/socket.h
-> @@ -401,6 +401,7 @@ struct ucred {
->  #define SOL_MCTP	285
->  #define SOL_SMC		286
->  #define SOL_VSOCK	287
-> +#define SOL_QUIC	288
+> +static int quic_v4_flow_route(struct sock *sk, union quic_addr *da,
+> +			      union quic_addr *sa, struct flowi *fl)
+> +{
 
-[Severity: Low]
-Should these two tools/ hunks be part of this patch?
+[ ... ]
 
-tools/include/uapi/README says:
+> +	security_sk_classify_flow(sk, flowi4_to_flowi_common(fl4));
+> +	rt = ip_route_output_flow(sock_net(sk), fl4, sk);
+> +	if (IS_ERR(rt))
+> +		return PTR_ERR(rt);
+> +
+> +	if (quic_v4_is_any_addr(sa)) {
+> +		sa->v4.sin_family = AF_INET;
+> +		sa->v4.sin_addr.s_addr = fl4->saddr;
+> +	}
+> +	sk_setup_caps(sk, &rt->dst);
 
-  So its important not to touch the copies in tools/ when doing changes in
-  the original kernel headers, that will be done later, when
-  check-headers.sh inform about the change to the perf tools hackers.
+[Severity: Medium]
+Should quic_v4_flow_route() reject RTCF_BROADCAST and RTCF_MULTICAST
+routes before caching the dst?
 
-tools/perf/check-headers.sh tracks both include/uapi/linux/in.h and
-include/linux/socket.h. The perf maintainers normally sync these copies
-in their own tree and check that the beauty scripts still parse the new
-definitions. Editing the copies from the networking tree skips that
-check and can lead to duplicate or conflicting syncs.
+Other IPv4 socket types check rt->rt_flags at this point. For example,
+__ip4_datagram_connect() does:
 
-The commit body also doesn't mention the tools/ changes. They appear
-only in the v15 changelog below the "---" line.
+	if ((rt->rt_flags & RTCF_BROADCAST) && !sock_flag(sk, SOCK_BROADCAST)) {
+		ip_rt_put(rt);
+		err = -EACCES;
+		goto out;
+	}
 
-Would it make sense to drop the tools/include/uapi/linux/in.h and
-tools/perf/trace/beauty/include/linux/socket.h hunks, or send them as a
-separate patch to the perf-tools maintainers?
+raw_sendmsg() has the same check. tcp_v4_connect() returns -ENETUNREACH
+for both RTCF_MULTICAST and RTCF_BROADCAST.
 
->  
->  /* IPX options */
->  #define IPX_TYPE	1
+Without such a check, a QUIC socket can cache and send on a broadcast
+route (255.255.255.255 or a subnet-directed broadcast) without
+SO_BROADCAST.
+
+On the server side, the reply destination comes from the source address
+of a received packet. With rp_filter=0, the kernel default, a spoofed
+source equal to the local subnet broadcast (e.g. 192.168.1.255) gets past
+ip_route_input_slow() and fib_validate_source().
+
+Would the server's replies then go out as link-layer broadcasts to every
+host on the LAN? That multiplies the 3x anti-amplification budget by the
+number of hosts. A userspace QUIC server on a UDP socket would get -EACCES
+from sendto() in this case.
+
+> +	return 0;
+> +}
+> +
+> +static int quic_v6_flow_route(struct sock *sk, union quic_addr *da,
+> +			      union quic_addr *sa, struct flowi *fl)
+> +{
+
+[ ... ]
+
+> +	dst = ip6_dst_lookup_flow(sock_net(sk), sk, fl6, NULL);
+> +	if (IS_ERR(dst))
+> +		return PTR_ERR(dst);
+> +
+> +	if (quic_v6_is_any_addr(sa)) {
+> +		sa->v6.sin6_family = AF_INET6;
+> +		sa->v6.sin6_addr = fl6->saddr;
+> +		if ((ipv6_addr_type(&fl6->saddr) & IPV6_ADDR_LINKLOCAL))
+> +			sa->v6.sin6_scope_id = dst->dev->ifindex;
+
+[Severity: Medium]
+Is it safe to dereference dst->dev here without rcu_read_lock()?
+
+This code runs in preemptible process context, under lock_sock() through
+quic_packet_route(). A dst reference does not pin the original
+net_device. On unregister, dst_dev_put() does:
+
+	rcu_assign_pointer(dst->dev_rcu, blackhole_netdev);
+	netdev_ref_replace(dev, blackhole_netdev, &dst->dev_tracker,
+			   GFP_ATOMIC);
+
+That drops the reference on the old device. This reader is not inside an
+RCU read-side section, so the synchronize_net() calls during unregister
+do not wait for it.
+
+If the task is preempted after loading dst->dev but before reading
+->ifindex, can it read freed net_device memory? Even in the harmless
+case, it could store blackhole_netdev's ifindex as the scope ID.
+
+include/net/dst.h provides dst_dev() and dst_dev_rcu() for this.
+sk_setup_caps() on the IPv4 path reads the device through dst_dev_rcu()
+under rcu_read_lock().
+
+> +	}
+> +	ip6_dst_store(sk, dst, false, false);
+> +	return 0;
+> +}
+
+[ ... ]
+
+> +int quic_flow_route(struct sock *sk, union quic_addr *da, union quic_addr *sa,
+> +		    struct flowi *fl)
+> +{
+> +	if (sa->sa.sa_family && da->sa.sa_family != sa->sa.sa_family)
+> +		return -EINVAL;
+
+[Severity: Medium]
+Does this check reject a valid dual-stack setup?
+
+An AF_INET6 '::' source (a socket bound to the IPv6 wildcard) with an
+AF_INET destination fails here. quic_v6_cmp_sk_addr() accepts that same
+pairing on receive:
+
+	if (a->sa.sa_family != addr->sa.sa_family) {
+		if (ipv6_only_sock(sk) || a->sa.sa_family == AF_INET)
+			return false;
+		return quic_is_any_addr(a);
+	}
+
+So a stored AF_INET6 '::' address matches AF_INET traffic on receive, but
+routing refuses the same combination on transmit.
+
+Suppose the later bind() and connect() code stores a bound [::] source
+as-is. Would a client bound to [::]:port that connects to an IPv4 peer
+then fail in quic_packet_route()->quic_flow_route() with -EINVAL? The v14
+changelog says IPv4-mapped addresses are converted to AF_INET, so the
+peer address would arrive here as AF_INET. Plain UDP allows this on a
+dual-stack socket.
+
+Dropping the check alone would not fix it. quic_v4_flow_route() reads
+sa->v4.sin_addr, which overlays sin6_flowinfo, so an IPv6-wildcard sa
+would need to be treated as IPv4 ANY.
+
+The v15 changelog shows the family mismatch check is intentional. Was the
+dual-stack wildcard case considered?
+
+> +
+> +	return quic_af_ipv4(da) ? quic_v4_flow_route(sk, da, sa, fl) :
+> +				  quic_v6_flow_route(sk, da, sa, fl);
+> +}
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1795393690.git.lucien.xin%40gmail.com
