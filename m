@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795483272;
-	b=5CRkq1hriDoN8Zy4+bBFDPHL5ca5HK3oYryV/aiHXAgPXYccDhXYfVrucEaeF3tLmgrO
-	 yWmXeiCusXKONgSv1e3JkCB2K0FRqHxS9AJ8YNpu8v6YOnzllw6F6eug4TTVhZ/lwMPhX
-	 FO8EhUam/GVykYe4U6ASWq2SHbHJC/xmOtnnOd1nDVRo0tN4Rr6SsoLGeyYK0UPW8+5wN
-	 ZIlD33dkM9pqkKSlbnkcw6y8F0QRF29dudKVhzKmssX35Vio8CO/ku6+G0pc/HcUIaHu2
-	 fzBt+czuWA76plAWlfXEJuaEbSrUdVQcEs6IqNpalhk+Fyxe2I0FaND2HrPFw7di42A==
+	t=1795483275;
+	b=fSUBm5UJgpOphPWokRMFahjPKLEw8wloSWCEXhs3rcJXleijxeW1GcSF93+LKWoexw5E
+	 zDW1clmWgf3WOAm8/K3Gk8nUbTS1klkC/ut4x8kKRepNmFvu1XwtVmru8SIaG2OQatkpf
+	 iWUiPcMo68IGa0BXXPHDT6VYR7II6sQdDOkDo+rUn2DoJ71SR/21vNaALHU+WjW10K8TB
+	 qDfZyS4S2jmPYmUsH0L1J/xvU/gjqek/fq3qJjfMJMlduydYAMu3wK7CDQ1vUCNA1F0HW
+	 teXV59ndGwXrRs3ZcbX4IeUN4xdV9nyoVXxWCWa0TH4nBjuXXo31QdPQANdaHb4K5ng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795483272;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795483275;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=39GyTO/gzqytPAtnbDSte+JuTTz0fNzUhnOaxl3OEnk=;
-	b=KAw5J7tv9UidbTAkMcpZkTxk1wC0T/m24OVqjaNYsYQDQFCDP7yrZouO8EJ3sI0M1OsF
-	 jCg/pwoSbIss+JGAqlUparqiDqeGNGkFVSS8uFFLVdfXNX+7Fl+yPD/hLZkuhrQIjRFPf
-	 yTFVu7HrohxCTMsyQCdKOB/Tz9LzzE5IebBax4PkzkQr1WPkuCpuRwWwOqcOBFgKvHbqD
-	 RHAELMZyiEelbF803siR/LVx7Vdcjvlu+o8XnYMd9X3AxUFv1VuFbkkGzbumUBElSyKDw
-	 V93hA15ALtEyNWsksIFEjkH2PNoYHRZWVXvgTOAEB1cSenldbN3TLeqeE3Y8DFqPBXQ==
+	bh=7BxqU8scciUBPlVCv6kfp0HrjxqNHAp0nu+Z1dMs47Q=;
+	b=QZzaQHANqni0/yF6h6DCTMomI5GVCELS77TK2FFb4h8Hbng6GNpYFyV7/7lPWGU6pipA
+	 3RgmY5KBupZchLnkMu49UXxFC/Hz0qdWTT4iJilRLNKL6+otgmbUuAdP0DpbVb2+01K8F
+	 r7aQM4DOnRArB3c/daJ8ie7f0tvUKPOM6dda8x1JIFD/Ga7EgFzaheWhKLcwKj0Sd+sbW
+	 +uVl18Bmb1Be0m8EMXmSHVsmVj2ZXPZZGiaMGTkaGsHR5Fucm9Prv8BvKy+F0eSP3sXG6
+	 2x9iSGZDQqaTTDHHnuggUI9NQQ0t3MXjIWIEQc1UvmFJWb9WOt8lMi4/peWtZb53HjQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PAgPguxB;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XYltFTcd;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0E6606A31E;
-	Tue, 24 Nov 2026 01:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C49606A321;
+	Tue, 24 Nov 2026 01:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=PAgPguxB
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48CB51F000D1;
-	Tue, 24 Nov 2026 01:21:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XYltFTcd
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7261F000CF;
+	Tue, 24 Nov 2026 01:21:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795483272;
-	bh=39GyTO/gzqytPAtnbDSte+JuTTz0fNzUhnOaxl3OEnk=;
+	s=k20260515; t=1795483275;
+	bh=7BxqU8scciUBPlVCv6kfp0HrjxqNHAp0nu+Z1dMs47Q=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=PAgPguxBUrHpV+vZfh5OZHAwF6atdXKH2vS0Y2OycYWvh9kAvXyNO5botS1d5Hecw
-	 C2sWpRkk+dw+otuDSZa8m8wDhFBZiwGs9qzUgvnh3tTzXq8iqqWN/7HCUBlce4QmT7
-	 2gQCZJJ1e8ZiR41HFr8hujYbHfsCe8O+VayEy7mxy8M8UOB1IWGN1Ex1xlFPCkFL2t
-	 fVlsfmxOdNRM9of/dx0n2eKLVjYkazfwJ2oPt/RHFPvRlyEL6ulmvbJJ2mvVotvEu9
-	 edHPOZ8zwwfipYkipgxpbPBTJAU6mIar5DCDwuclD+WnPWgraJhcraEsJ6qM8r4W97
-	 UMscRyKzPTVAA==
-Subject: Re: [PATCH net-next v19 06/15] quic: add stream management
+	b=XYltFTcdnj4KUOr9OmoQ9oABFYaMWVxGNR6r3cGPjfnGq13/JFq2uMH7Tf1ScK72/
+	 b6oInXa2z9HZnLBrfMTvLwgYZJM3WxktGM+KSBzzvTYiaSJ3lBsUjntul6AsyQ5oxT
+	 jLioRVygZFw/Sd6FqOggYuxYgvI6lRuW/QXd+bceMSB4CrxfHEKpslz8iPAdj0gWDF
+	 ZGluJ2nXRVgz09QGVMvNH0qSc3TqR6YDFE4bJCW8mI/cWjo7pGVOD5rI/JDcx2wUGE
+	 iZSOHIuvA/zw6WUEBJsqTqcarDRxQoyNCoB4xy24Z8j8dKUj/Dar/b2jJfs9TWz+Dp
+	 BizllNrn5tiRg==
+Subject: Re: [PATCH net-next v19 07/15] quic: add connection id management
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -55,10 +55,10 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  sd@queasysnail.net, marcelo.leitner@gmail.com, daniel@haxx.se,
  andrew.gospodarek@broadcom.com, mef@scarletmail.rutgers.edu, paul@jakma.org,
  kuniyu@google.com
-Date: Tue, 24 Nov 2026 01:21:09 +0000
-Message-ID: <179548326987.3135.7163509585500687471@kernel.org>
-In-Reply-To: <052a21a5f6e57bb7f6db0f6e274dce9d8523805c.1795393691.git.lucien.xin@gmail.com>
-References: <052a21a5f6e57bb7f6db0f6e274dce9d8523805c.1795393691.git.lucien.xin@gmail.com>
+Date: Tue, 24 Nov 2026 01:21:12 +0000
+Message-ID: <179548327264.3135.6491698928014688203@kernel.org>
+In-Reply-To: <a0b0796446aa6da7e62134343e27abb459c3e4cf.1795393691.git.lucien.xin@gmail.com>
+References: <a0b0796446aa6da7e62134343e27abb459c3e4cf.1795393691.git.lucien.xin@gmail.com>
 X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -83,472 +83,107 @@ If any of them are legitimate and you plan to respin, please let patchwork
 know by including "pw-bot: cr" as a separate line at the end of your reply
 (one such reply per series is enough).
 
-- [Medium] quic: broken next stream ID type update in
-  quic_stream_set_param()
+- [Medium] quic_conn_id_retire() (net/quic/connid.c) handles 'retire the
+  last live consecutive CID' with `if (WARN_ON_ONCE(id_set->use_count <=…
 
 --
 
-> diff --git a/net/quic/stream.c b/net/quic/stream.c
+quic: add connection id management
+
+This patch adds struct quic_conn_id_set to manage source and destination
+connection IDs. It provides helpers to add, retire, find and look up CIDs.
+Source CIDs are also inserted into a global RCU hash table, which the RX
+path uses to look up the socket.
+
+> diff --git a/net/quic/connid.c b/net/quic/connid.c
+> new file mode 100644
+> index 0000000000000..1ddf8bc9b7910
 > --- /dev/null
-> +++ b/net/quic/stream.c
-> @@ -0,0 +1,426 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/* QUIC kernel implementation
-> + * (C) Copyright Red Hat Corp. 2023
-> + *
-> + * This file is part of the QUIC kernel implementation
-> + *
-> + * Stream management.
-> + *
-> + * Written or modified by:
-> + *    Xin Long <lucien.xin@gmail.com>
+> +++ b/net/quic/connid.c
+> @@ -0,0 +1,313 @@
+
+[ ... ]
+
+> +/* Retire a connection ID by marking it dead, then remove consecutive dead
+> + * entries from the head of the list. The caller must ensure the number falls
+> + * within the consecutive range [first_number, last_number].
 > + */
-> +
-> +#include <net/netns/hash.h>
-> +#include <linux/jhash.h>
-> +#include <linux/quic.h>
-> +
-> +#include "common.h"
-> +#include "stream.h"
-> +
-> +/* Check if a stream ID is valid for sending or receiving. */
-> +static bool quic_stream_id_valid(s64 stream_id, bool is_serv, bool send)
+> +void quic_conn_id_retire(struct quic_conn_id_set *id_set, u32 number)
 > +{
-> +	u8 type = (stream_id & QUIC_STREAM_TYPE_MASK);
+> +	struct quic_common_conn_id *common, *tmp, *retired = NULL;
+> +	struct list_head *list;
 > +
-> +	if (stream_id < 0)
-> +		return false;
-> +
-> +	if (send) {
-> +		if (is_serv)
-> +			return type != QUIC_STREAM_TYPE_CLIENT_UNI;
-> +		return type != QUIC_STREAM_TYPE_SERVER_UNI;
-> +	}
-> +	if (is_serv)
-> +		return type != QUIC_STREAM_TYPE_SERVER_UNI;
-> +	return type != QUIC_STREAM_TYPE_CLIENT_UNI;
-> +}
-> +
-> +/* Check if a stream ID belongs to the local endpoint. */
-> +static bool quic_stream_id_local(s64 stream_id, bool is_serv)
-> +{
-> +	return is_serv ^ !(stream_id & QUIC_STREAM_TYPE_SERVER_MASK);
-> +}
-> +
-> +/* Check if a stream ID represents a unidirectional stream. */
-> +static bool quic_stream_id_uni(s64 stream_id)
-> +{
-> +	return stream_id & QUIC_STREAM_TYPE_UNI_MASK;
-> +}
-> +
-> +#define QUIC_STREAM_HT_SIZE	64
-> +
-> +static struct hlist_head *quic_stream_head(struct quic_stream_table *streams,
-> +					   s64 stream_id, struct net *net)
-> +{
-> +	u32 hash = jhash_1word((u32)(stream_id >> 1), net_hash_mix(net));
-> +
-> +	return &streams->head[hash & (QUIC_STREAM_HT_SIZE - 1)];
-> +}
-> +
-> +struct quic_stream *quic_stream_find(struct quic_stream_table *streams,
-> +				     s64 stream_id, struct net *net)
-> +{
-> +	struct hlist_head *head = quic_stream_head(streams, stream_id, net);
-> +	struct quic_stream *stream;
-> +
-> +	hlist_for_each_entry(stream, head, node) {
-> +		if (stream->id == stream_id)
+> +	list = &id_set->head;
+> +	list_for_each_entry(common, list, list) {
+> +		if (common->number > number)
 > +			break;
-> +	}
-> +	return stream;
-> +}
-> +
-> +static void quic_stream_add(struct quic_stream_table *streams,
-> +			    struct quic_stream *stream, struct net *net)
-> +{
-> +	struct hlist_head *head;
-> +
-> +	head = quic_stream_head(streams, stream->id, net);
-> +	hlist_add_head(&stream->node, head);
-> +}
-> +
-> +static void quic_stream_delete(struct quic_stream *stream)
-> +{
-> +	hlist_del_init(&stream->node);
-> +	kfree(stream);
-> +}
-> +
-> +/* Create and register new streams for sending or receiving. */
-> +static struct quic_stream *quic_stream_create(struct quic_stream_table *streams,
-> +					      s64 max_stream_id, bool send,
-> +					      bool is_serv, struct net *net,
-> +					      gfp_t gfp)
-> +{
-> +	struct quic_stream *pos, *stream = NULL;
-> +	struct quic_stream_limits *limits;
-> +	struct hlist_node *tmp;
-> +	HLIST_HEAD(head);
-> +	s64 stream_id;
-> +	u32 count = 0;
-> +
-> +	gfp |= __GFP_ACCOUNT;
-> +	limits = send ? &streams->send : &streams->recv;
-> +	stream_id = limits->next_bidi_stream_id;
-> +	if (quic_stream_id_uni(max_stream_id))
-> +		stream_id = limits->next_uni_stream_id;
-> +
-> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in
-> +	 * all streams of that type with lower-numbered stream IDs also being
-> +	 * opened.
-> +	 */
-> +	while (stream_id <= max_stream_id) {
-> +		stream = kzalloc_obj(*stream, gfp);
-> +		if (!stream)
-> +			goto free;
-> +
-> +		stream->id = stream_id;
-> +		if (quic_stream_id_uni(stream_id)) {
-> +			if (send) {
-> +				stream->send.max_bytes =
-> +					limits->max_stream_data_uni;
-> +			} else {
-> +				stream->recv.max_bytes =
-> +					limits->max_stream_data_uni;
-> +				stream->recv.state =
-> +					QUIC_STREAM_RECV_STATE_RECV;
-> +				stream->recv.window = stream->recv.max_bytes;
-> +			}
-> +			hlist_add_head(&stream->node, &head);
-> +			stream_id += QUIC_STREAM_ID_STEP;
-> +			continue;
+> +		if (common->number == number) {
+> +			if (common->dead)
+> +				return;
+> +			retired = common;
+> +			break;
 > +		}
-> +
-> +		if (quic_stream_id_local(stream_id, is_serv)) {
-> +			stream->send.max_bytes =
-> +				streams->send.max_stream_data_bidi_remote;
-> +			stream->recv.max_bytes =
-> +				streams->recv.max_stream_data_bidi_local;
-> +		} else {
-> +			stream->send.max_bytes =
-> +				streams->send.max_stream_data_bidi_local;
-> +			stream->recv.max_bytes =
-> +				streams->recv.max_stream_data_bidi_remote;
-> +		}
-> +		stream->recv.state = QUIC_STREAM_RECV_STATE_RECV;
-> +		stream->recv.window = stream->recv.max_bytes;
-> +		hlist_add_head(&stream->node, &head);
-> +		stream_id += QUIC_STREAM_ID_STEP;
 > +	}
 > +
-> +	hlist_for_each_entry_safe(pos, tmp, &head, node) {
-> +		hlist_del_init(&pos->node);
-> +		quic_stream_add(streams, pos, net);
-> +		count++;
-> +	}
-> +
-> +	/* Streams must be opened sequentially. Update the next stream ID so the
-> +	 * correct starting point is known if an out-of-order open is requested.
-> +	 * Note overflow of next_uni/bidi_stream_id is impossible with s64.
-> +	 */
-> +	if (quic_stream_id_uni(stream_id)) {
-> +		limits->next_uni_stream_id = stream_id;
-> +		limits->streams_uni += count;
-> +		return stream;
-> +	}
-> +
-> +	limits->next_bidi_stream_id = stream_id;
-> +	limits->streams_bidi += count;
-> +	return stream;
-> +
-> +free:
-> +	hlist_for_each_entry_safe(pos, tmp, &head, node) {
-> +		hlist_del_init(&pos->node);
-> +		kfree(pos);
-> +	}
-> +	return NULL;
-> +}
-> +
-> +/* Check if a stream ID was already used. */
-> +static bool quic_stream_id_closed(struct quic_stream_table *streams,
-> +				  s64 stream_id, bool is_serv)
-> +{
-> +	bool local = quic_stream_id_local(stream_id, is_serv);
-> +	struct quic_stream_limits *limits;
-> +
-> +	limits = local ? &streams->send : &streams->recv;
-> +	if (quic_stream_id_uni(stream_id))
-> +		return stream_id < limits->next_uni_stream_id;
-> +	return stream_id < limits->next_bidi_stream_id;
-> +}
-> +
-> +/* Check if a stream ID would exceed local (recv) or peer (send) limits. */
-> +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 stream_id,
-> +			    bool send)
-> +{
-> +	u64 nstreams;
-> +
-> +	if (!send) {
-> +		/* recv.max_uni/bidi_stream_id is updated in
-> +		 * quic_stream_max_streams_update() already based on
-> +		 * next_uni/bidi_stream_id, max_streams_uni/bidi, and
-> +		 * streams_uni/bidi, so only recv.max_uni/bidi_stream_id needs
-> +		 * to be checked.
-> +		 */
-> +		if (quic_stream_id_uni(stream_id))
-> +			return stream_id > streams->recv.max_uni_stream_id;
-> +
-> +		return stream_id > streams->recv.max_bidi_stream_id;
-> +	}
-> +
-> +	if (quic_stream_id_uni(stream_id)) {
-> +		if (stream_id > streams->send.max_uni_stream_id)
-> +			return true;
-> +		stream_id -= streams->send.next_uni_stream_id;
-> +		nstreams = quic_stream_id_to_streams(stream_id);
-> +
-> +		return nstreams + streams->send.streams_uni >
-> +		       streams->send.max_streams_uni;
-> +	}
-> +
-> +	if (stream_id > streams->send.max_bidi_stream_id)
-> +		return true;
-> +	stream_id -= streams->send.next_bidi_stream_id;
-> +	nstreams = quic_stream_id_to_streams(stream_id);
-> +
-> +	return nstreams + streams->send.streams_bidi >
-> +	       streams->send.max_streams_bidi;
-> +}
-> +
-> +/* Get or create a send or recv stream by ID. Requires sock lock held. */
-> +struct quic_stream *quic_stream_get(struct quic_stream_table *streams,
-> +				    s64 stream_id, u32 flags, bool is_serv,
-> +				    bool send, struct net *net, gfp_t gfp)
-> +{
-> +	struct quic_stream *stream;
-> +
-> +	if (!quic_stream_id_valid(stream_id, is_serv, send))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	stream = quic_stream_find(streams, stream_id, net);
-> +	if (stream)
-> +		return stream;
-> +
-> +	if (quic_stream_id_closed(streams, stream_id, is_serv))
-> +		return ERR_PTR(-ENOSTR);
-> +
-> +	/* Cannot create if the other side must initiate this stream. */
-> +	if (send != quic_stream_id_local(stream_id, is_serv))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	if (!(flags & MSG_QUIC_STREAM_NEW))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	if (quic_stream_id_exceeds(streams, stream_id, send))
-> +		return ERR_PTR(-EAGAIN);
-> +
-> +	stream = quic_stream_create(streams, stream_id, send, is_serv, net,
-> +				    gfp);
-> +	if (!stream)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	if (send || quic_stream_id_valid(stream_id, is_serv, !send))
-> +		streams->active_stream_id = stream_id;
-> +
-> +	return stream;
-> +}
-> +
-> +/* Release or clean up a send or recv stream. This function updates stream
-> + * counters and state when a send stream has either successfully sent all data
-> + * or has been reset, or when a recv stream has either received all data or has
-> + * been reset. Requires sock lock held.
-> + */
-> +void quic_stream_put(struct quic_stream_table *streams,
-> +		     struct quic_stream *stream, bool is_serv, bool send)
-> +{
-> +	if (quic_stream_id_uni(stream->id)) {
-> +		/* For uni streams, decrement uni count and delete stream. */
-> +		if (send) {
-> +			streams->send.streams_uni--;
-> +			quic_stream_delete(stream);
-> +			return;
-> +		}
-> +		streams->recv.streams_uni--;
-> +		streams->recv.uni_pending = 1;
-> +		quic_stream_delete(stream);
-> +		return;
-> +	}
-> +
-> +	/* For bidi streams, proceed only if both send and receive in a final
-> +	 * state.
-> +	 */
-> +	if (send) {
-> +		if (stream->recv.state < QUIC_STREAM_RECV_STATE_RECVD)
-> +			return;
-> +	} else {
-> +		if (stream->send.state != QUIC_STREAM_SEND_STATE_RECVD &&
-> +		    stream->send.state != QUIC_STREAM_SEND_STATE_RESET_RECVD)
-> +			return;
-> +	}
-> +	if (quic_stream_id_local(stream->id, is_serv)) {
-> +		/* Local-initiated stream: decrement send.bidi count. */
-> +		streams->send.streams_bidi--;
-> +	} else {
-> +		/* Remote-initiated stream: decrement recv.bidi count. */
-> +		streams->recv.streams_bidi--;
-> +		streams->recv.bidi_pending = 1;
-> +	}
-> +	quic_stream_delete(stream);
-> +}
-> +
-> +/* Updates the maximum allowed incoming stream IDs if any streams were recently
-> + * closed. Recalculates the max_uni and max_bidi stream count limits based on
-> + * the number of open streams and whether any were marked for deletion.
-> + *
-> + * Returns true if either max_uni or max_bidi was updated, indicating that a
-> + * MAX_STREAMS_UNI or MAX_STREAMS_BIDI frame should be sent to the peer.
-> + */
-> +bool quic_stream_max_streams_update(struct quic_stream_table *streams,
-> +				    s64 *max_uni, s64 *max_bidi)
-> +{
-> +	s64 max, rem;
-> +
-> +	*max_uni = 0;
-> +	*max_bidi = 0;
-> +	if (streams->recv.uni_pending) {
-> +		rem = streams->recv.max_streams_uni - streams->recv.streams_uni;
-> +		max = streams->recv.next_uni_stream_id - QUIC_STREAM_ID_STEP +
-> +		      (rem << QUIC_STREAM_TYPE_BITS);
-> +
-> +		streams->recv.max_uni_stream_id = max;
-> +		*max_uni = quic_stream_id_to_streams(max);
-> +		streams->recv.uni_pending = 0;
-> +	}
-> +	if (streams->recv.bidi_pending) {
-> +		rem = streams->recv.max_streams_bidi -
-> +		      streams->recv.streams_bidi;
-> +		max = streams->recv.next_bidi_stream_id - QUIC_STREAM_ID_STEP +
-> +			(rem << QUIC_STREAM_TYPE_BITS);
-> +
-> +		streams->recv.max_bidi_stream_id = max;
-> +		*max_bidi = quic_stream_id_to_streams(max);
-> +		streams->recv.bidi_pending = 0;
-> +	}
-> +
-> +	return *max_uni || *max_bidi;
-> +}
-> +
-> +int quic_stream_init(struct quic_stream_table *streams)
-> +{
-> +	struct hlist_head *head;
-> +	int i;
-> +
-> +	head = kmalloc_objs(*head, QUIC_STREAM_HT_SIZE, GFP_KERNEL_ACCOUNT);
-> +	if (!head)
-> +		return -ENOMEM;
-> +	for (i = 0; i < QUIC_STREAM_HT_SIZE; i++)
-> +		INIT_HLIST_HEAD(&head[i]);
-> +	streams->head = head;
-> +	streams->active_stream_id = -1;
-> +	return 0;
-> +}
-> +
-> +void quic_stream_free(struct quic_stream_table *streams)
-> +{
-> +	struct quic_stream *stream;
-> +	struct hlist_head *head;
-> +	struct hlist_node *tmp;
-> +	int i;
-> +
-> +	if (!streams->head)
+> +	if (!retired)
 > +		return;
 > +
-> +	for (i = 0; i < QUIC_STREAM_HT_SIZE; i++) {
-> +		head = &streams->head[i];
-> +		hlist_for_each_entry_safe(stream, tmp, head, node)
-> +			quic_stream_delete(stream);
-> +	}
-> +	kfree(streams->head);
-> +	streams->head = NULL;
-> +}
-> +
-> +/* Populate transport parameters from stream hash table. */
-> +void quic_stream_get_param(struct quic_stream_table *streams,
-> +			   struct quic_transport_param *p)
-> +{
-> +	struct quic_stream_limits *limits = p->remote ? &streams->send :
-> +							&streams->recv;
-> +
-> +	p->max_stream_data_bidi_remote = limits->max_stream_data_bidi_remote;
-> +	p->max_stream_data_bidi_local = limits->max_stream_data_bidi_local;
-> +	p->max_stream_data_uni = limits->max_stream_data_uni;
-> +	p->max_streams_bidi = limits->max_streams_bidi;
-> +	p->max_streams_uni = limits->max_streams_uni;
-> +}
-> +
-> +/* Configure stream hashtable from transport parameters. */
-> +void quic_stream_set_param(struct quic_stream_table *streams,
-> +			   struct quic_transport_param *p, bool is_serv)
-> +{
-> +	struct quic_stream_limits *limits = p->remote ? &streams->send :
-> +							&streams->recv;
-> +	u8 bidi_type, uni_type;
-> +
-> +	limits->max_stream_data_bidi_local = p->max_stream_data_bidi_local;
-> +	limits->max_stream_data_bidi_remote = p->max_stream_data_bidi_remote;
-> +	limits->max_stream_data_uni = p->max_stream_data_uni;
-> +	limits->max_streams_bidi = p->max_streams_bidi;
-> +	limits->max_streams_uni = p->max_streams_uni;
-> +
-> +	if (p->remote ^ is_serv) {
-> +		bidi_type = QUIC_STREAM_TYPE_CLIENT_BIDI;
-> +		uni_type = QUIC_STREAM_TYPE_CLIENT_UNI;
-> +	} else {
-> +		bidi_type = QUIC_STREAM_TYPE_SERVER_BIDI;
-> +		uni_type = QUIC_STREAM_TYPE_SERVER_UNI;
-> +	}
-> +
-> +	limits->max_bidi_stream_id =
-> +		quic_stream_streams_to_id(p->max_streams_bidi, bidi_type);
-> +	if (limits->next_bidi_stream_id < bidi_type)
-> +		limits->next_bidi_stream_id = bidi_type;
-> +
-> +	limits->max_uni_stream_id =
-> +		quic_stream_streams_to_id(p->max_streams_uni, uni_type);
-> +	if (limits->next_uni_stream_id < uni_type)
-> +		limits->next_uni_stream_id = uni_type;
-> +}
+> +	if (WARN_ON_ONCE(id_set->use_count <= 1))
+> +		return;
 
 [Severity: Medium]
-This guard only works when the low two bits of next_bidi_stream_id
-and next_uni_stream_id already match the type being applied. It does
-not correct them if the role changes before any stream is opened.
+Can a peer reach this WARN_ON_ONCE() using only its own
+RETIRE_CONNECTION_ID frames?
 
-Suppose quic_stream_set_param() is first called for the local
-parameters (p->remote == 0) while quic_is_serv() is still false, for
-example before listen() sets sk_max_ack_backlog. Then
-recv.next_bidi_stream_id becomes 1 and recv.next_uni_stream_id
-becomes 3. When the same parameters are applied again after the
-socket has become a server, bidi_type is 0 and uni_type is 2.
-Neither comparison is true (next < 0 can never be true for the
-client bidi type), so the stale server parity stays.
+For the source set, number comes from the peer. The v19 changelog moved
+this guard below the duplicate-retire check so duplicates would not hit
+the WARN, which suggests peer-chosen numbers are expected to get here.
 
-After that, quic_stream_id_closed() treats client streams 0 and 2 as
-already closed, and quic_stream_get() fails them with -ENOSTR.
+A retired source CID that is not at the head of the list is only marked
+dead. It stays on the list and stays hashed. quic_conn_id_lookup() does
+not check ->dead:
 
-It gets worse if the peer opens stream 4 first. quic_stream_create()
-starts from 1 and steps by QUIC_STREAM_ID_STEP, so it inserts stream
-1 into the hash table, counts it in recv.streams_bidi, and returns it
-in place of stream 4. When quic_stream_put() later releases it,
-quic_stream_id_local(1, true) is true. So send.streams_bidi is
-decremented instead, and that u16 wraps to 65535.
+	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
+		if (net != sock_net(s_conn_id->sk))
+			continue;
+		if (s_conn_id->common.id.len != len ||
+		    memcmp(scid, &s_conn_id->common.id.data, len))
+			continue;
 
-Opening any stream moves next_*_stream_id to at least
-QUIC_STREAM_ID_STEP. Would it be enough to compare against
-QUIC_STREAM_ID_STEP here instead of the type value? Another option
-is to keep the upper bits and replace only the type bits. If
-set_param() can never be re-applied across a client/server
-transition, could that be documented here?
+Later in the series, quic_packet_get_sock() in net/quic/packet.c uses
+this lookup to route the packet to the socket and set cb->seqno. It does
+not check the dead flag either.
+
+Take a source set {0, 1, 2}, all live, use_count = 3, with the peer
+using CID 0:
+
+  peer sends RETIRE(1), then RETIRE(2)
+    -> use_count = 1, CIDs 1 and 2 are dead but still hashed
+  no replacement CID is issued (count still includes the dead middle
+  entries, so max_count or QUIC_CONN_ID_LIMIT may already be reached)
+  peer sends a packet with DCID = CID 1 carrying RETIRE(0)
+    -> quic_conn_id_lookup() still finds CID 1
+    -> quic_conn_id_retire(id_set, 0)
+    -> WARN_ON_ONCE(id_set->use_count <= 1)
+
+RFC 9000 Section 19.16 allows RETIRE(0) in that packet, since sequence
+number 0 is not the DCID of the packet carrying the frame.
+
+On panic_on_warn systems this would be a panic the peer can trigger
+remotely. Without panic_on_warn, the retirement is silently dropped.
+
+quic_conn_id_retire() returns void, so the caller cannot tell a refused
+retirement from a successful one. That means it cannot turn this case
+into a PROTOCOL_VIOLATION.
+
+Would it make sense to return an error here instead of warning? Or to
+reject packets addressed to dead source CIDs?
+
+No caller of quic_conn_id_retire() exists in this series yet. Whether
+this fires depends on how the RETIRE_CONNECTION_ID handler in the
+follow-up patchset checks the number before calling it.
+
+[ ... ]
 
 -- 
 Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/cover.1795393690.git.lucien.xin%40gmail.com
