@@ -1,111 +1,111 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=103.168.172.155
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795537427;
-	b=ttYyGI344OhGsSbmWQEpujr+Iz0gIAfhgn5CsoF6hRMRFeOG6kBmEELlHGAg8rFrlnms
-	 P3pVZWHzgzPGJhvVzi4SfzW7EtCRAHhs5GN7RVCZWveH1re8/42iDHr04d5B/AWnfAaNf
-	 csNTyHec6LAmCVtkVgk3XKuj6nYLitY+s9QwXv74Cy8opkHLfqH+oo7n+GgFd94STvbSL
-	 SHi34sCjoWAPoz1ZbmTqgb1coYnGDw9M/Ktx1nQt/4wMZig9MGzYpG1MW7tNRwSIy6JQf
-	 LSlmHRzJzryr2kgGdP8B/bwcjVg7KlHdEaMLXnu8ySbrbHRm1bREJYflR/gb2+s681g==
+	t=1795537431;
+	b=4d7vZuf9jlu5G4qGz+JhEker2mzrxGZR1ViWs+LfCZiwcq8CDdIngvKmVSuoBRNf/f5b
+	 uFXTlncluO5pCz5qXbabDGO94M4rxi7BsWeoAYVPWtHwlPIHYpGjNjau44hImAm0Tu9oM
+	 kX94jaghXnNHdUHTMrPCC8lMjYAlrhPQFKkTXC1s/SyH9TyUjcYXasKfpc/d+6rcU8h5w
+	 OdfHdnfcAkN44zR/Gk8r2kokEC4ULX7WVByOTkGAN134MmD4lSFcxK4ucgIVd44cFXlid
+	 LIdPuJt5b+6hexuJPlXceY6dtdUaEfDqV5aO1HOLp7PuJmBDKDfFoSf5QtG5WrJgn7g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795537427;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795537431;
 	h=DMARC-Filter:Received:Received:DKIM-Signature:DKIM-Signature:
 	 X-DKIM2-Info:DKIM2-Signature:X-DKIM2-Info:Message-Instance:
 	 X-ME-Sender:X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:
 	 Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding;
-	bh=UPJaFcasLEtKrEgIxll2l1F9fc4txscBJzugZ88bpno=;
-	b=Adups86/zEMOJqqrUBjgDMi70bNNT7Ly4/jdOpLM6IApwK3EjFjvMC6f4uk2ExdQ1tUX
-	 GYuUrWuVnmPIE0uzSKhtNoLnedqXkHghQeMw9hNkm1ghctN19weS17nwUYPqCDNOEZ9YT
-	 sfZDC3+ItpuzPgp0Y97xLeNYVPUfwf2xREbRxMWeK2Y+yYLfn+C2BkMbY+V7iMUVoPwUE
-	 7VvmMZJT7vX95U8+rRCazC2p0IgGKR/pQPqMCQ3gJ/dXqiaa7vCi16eusuo01Hhtt12Z4
-	 BZErEpvkxSHr8olqXhiSCk1a6HHPUSalZVDe5YID5odS6D5kHzDkh5zGAOfCF6xycYg==
+	bh=WEsdR1vLDh5gHFLvWv+A/t6Se60RNK761kHyMIzqWSg=;
+	b=1w7shoZVfexffPBpB88WwUKyHchxYRBs0NR4ebNT4d/wD2w5QGRqMdIjZFMf3HoUGvxn
+	 NXzJmGG1vsGwsZA+GgdiGJqbfNqgKGNtoNATCrRJ4krSd6SniXUt2QxankRcOmfW4xSsj
+	 G3qLSszMZthGxyrpQpbYY46SGSbyrNF/w7i++PWuN2Ga6pgcQCWoMtqpBC5kQghkctZT6
+	 Xi2mOghd7/eRj3kvQjOXlP3q+GCSyh9LWWVSQVRtAW4CPVyiJz3LZBdedsYhQkrTGvQTZ
+	 YNXgfWdk+qxyA/mWVGAfNPARZR87W2zAsu4DNToaoET1w7p2xW9VEy/kSOYChzu7qgQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=fastmail.org;
 	spf=pass smtp.mailfrom=fastmail.org;
-	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=iLIgkP1n;
-	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=vY7b1llG;
-	arc=none smtp.remote-ip=103.168.172.148
-Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
+	dkim=pass header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b="w3Z/VN07";
+	dkim=pass header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=mpZuVgGu;
+	arc=none smtp.remote-ip=103.168.172.155
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1233606A31E
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 16:23:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org B1233606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8D3606A32D
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 16:23:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1C8D3606A32D
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastmail.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=iLIgkP1n;
-	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=vY7b1llG
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id E34A6EC09B6
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 11:23:44 -0500 (EST)
+	dkim=pass (2048-bit key, unprotected) header.d=fastmail.org header.i=@fastmail.org header.a=rsa-sha256 header.s=fm3 header.b=w3Z/VN07;
+	dkim=pass (2048-bit key, unprotected) header.d=messagingengine.com header.i=@messagingengine.com header.a=rsa-sha256 header.s=fm3 header.b=mpZuVgGu
+Received: from phl-compute-09.internal (phl-compute-09.internal [10.202.2.49])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 3E99514002E8
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 11:23:49 -0500 (EST)
 Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 24 Nov 2026 11:23:44 -0500
+  by phl-compute-09.internal (MEProxy); Tue, 24 Nov 2026 11:23:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.org; h=
 	cc:cc:content-transfer-encoding:content-type:date:date:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1795537424; x=
-	1795623824; bh=UPJaFcasLEtKrEgIxll2l1F9fc4txscBJzugZ88bpno=; b=i
-	LIgkP1nFZyDDvdxdUSF3GN0kZ8Pz3Y9AIJoQ8avjmUnD56eQYcYqSXi7noe9AE7l
-	UZO3HYo2JV6ptS6U6Ijrw0rNTOHehFdHQnclbv7ocoq2QYvojyr6UJbzzrnDUn+6
-	tmJi8tbTYtnysuaZ8AZB2cA+1PeYMFgol1FajZ+3A9sopya65N0kNUOdZtmYdXIA
-	QAcnP9ZiMsp4qGKaJTYQ6KmuwOaFnaeufxh580QiDiVCCvhLCRNsldfTCWRr6YCC
-	qL6a3Q8faCz3QaiBKKn3vpn/chgs3wXEDP1xMVp2Y1+AoTXKtmvE+LxJ1vijQZcI
-	B6mpAyHAyKM8JVwulKcAA==
+	:reply-to:subject:subject:to:to; s=fm3; t=1795537429; x=
+	1795623829; bh=WEsdR1vLDh5gHFLvWv+A/t6Se60RNK761kHyMIzqWSg=; b=w
+	3Z/VN07UB44c1leig0FeXBI6QFYGTx+seX++T2xAaXQtNrNuNS4+y3lXWpiPHX3h
+	CNS/SfK5K9vmyVRgmlF/VqaeTNiEpP2lkeALxxHGSNqqXtFXlNwB0I+isHElEtXD
+	j81JyNzbndfCH5N2UCu0ptvJrlKHNMsSNiE4NEeO2M8A31rax4pOzd/jTiCsJRBq
+	T2x48ICbR6lowWLezrwBzKM/KXtD9ZxAwkl91SdfeW68A9zfifuTbBHvuSbXOqg9
+	CjrsQprPY2H/4YUYNT4z2KCxzas0PZpiVzYlfyCtwgwZUv7L6OEBRkGM9BH4ZfZ8
+	WvUzbdF7Z+FVVOIjNfNtg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:date:date:feedback-id:feedback-id:from:from
 	:in-reply-to:in-reply-to:message-id:mime-version:references
 	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1795537424; x=1795623824; bh=U
-	PJaFcasLEtKrEgIxll2l1F9fc4txscBJzugZ88bpno=; b=vY7b1llGgR57KGLpt
-	CpLgfSfLxYWGGZB4M8SdjJvpRxyafg6xIqkbGu74yQl0tTw3pvNjDHfd024V4ZFg
-	9Cb4JWoUxYhxu0hUvUTH+Uhhx5YTAIRZxfs1b2wHgifMhiqPGtgx+cJ1gaOUKrtI
-	KH7zR8ZRWTvRke2xGh5vhJX5HvISlMa+ZGQ3LZKziNWlosv8iPvTb6QBA2Di2BaK
-	j5QiqmlbjhmOlDtf8vRF7kgguiHDYtKw7edx/EIom0JpJCRKQJBlbchQ6PAjxbNn
-	2aNHjjdrRGXfwQTAI6vBWW0h/lDARkr8d40Kk6bvcMFSvTmzfFcNHuI4vxp2OsOH
-	FtfIg==
+	:x-me-sender:x-sasl-enc; s=fm3; t=1795537429; x=1795623829; bh=W
+	EsdR1vLDh5gHFLvWv+A/t6Se60RNK761kHyMIzqWSg=; b=mpZuVgGu7xCl62dD0
+	f0yFbaMn2kqTZ7JN6ZbJk4MSTiOz5NABBz4k8CCDNFtPgZPbqz5mcaqNqyluxEMy
+	POFlOBo4unxAN3qvOrfi3HEjgEHWh1cetXNQg4C9cyRIhxVhShclozrUQs7lmV06
+	EknGEVySPWco7THR5l6M83CaUg/8MQ5taJw1sFS7GdmEopVdATWBtwgWIXhLX62G
+	b3m79NLioHEngdCdseHXcndxJn40K1u++uf1X5wqn5b06pkb8W/2VlXGYqgdRGeE
+	fTVEV3bUWCC1XdinQM/mOXxn4SZOcfGr5uEUoutBoQwoaJxqiutMNgaXIHdYUlcS
+	1F4pQ==
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=sign d=fastmail.org a=rsa-sha256;
-DKIM2-Signature: i=1; m=1; t=1795537424; d=fastmail.org;
+DKIM2-Signature: i=1; m=1; t=1795537429; d=fastmail.org;
 	mf=PGljYkBmYXN0bWFpbC5vcmc+;
 	rt=PGxpbnV4LWNpZnNAdmdlci5rZXJuZWwub3JnPg==;
-	s=fm3:rsa-sha256:LIaMTXQrOLlRdDwmVas0v6Ct5uQCzTrNwUYkqJrQ8Xy3Oeb
-	FUwpOj2aDeG8WUdU38H4k1ilD3Yx/QikvU3A03CC8LsC2tD9Q3ISx3Z4qC3q26zk
-	VHxzvEzqRcvlgCAdWTvg5PAIqhJ6YkXF8NLrrOy8GzF+1WrrYFVnWETrZde8K6wx
-	p9/4W9EiERk1sUaci60ieeRKHNlDYNainNUcCoWVW4q+AfTiK4ubn9J7QSd+duu7
-	/dYgdN37tCoupfSWz58BOOVgqx194R1O3N1UvbzOGhLtEZliKZYZBgfpbzJ5Bt0v
-	8Hv7f1aQM0KMrY0QtIge+C4b3EcW3V+7L6pfO2g==;
+	s=fm3:rsa-sha256:vnjuOt+mrkarirepTYAGBTxCblY1JcYEoMxjWjYpCToIpPv
+	vqjfvuFOb+fle/pzniRqf5B9i1Gi32cjlBoCR09PNoPN9F0S2xCHhaAwtoer3DKg
+	n+h04XNCul2nJ6zNfZip6tbZYSmChZ+9Jba4kKrALsyj8axKDN3gBMYpT7c3ldbe
+	u4jXnzmtspCGhL10KNCsvy6LGwETwsFx3FtV4twbABsDOQSjB+Qj82mQ70Q8FZtc
+	xMKLXgZNwN4GpISZDWjif9RB92PxN/4/eGl50rKfRLh6TUJzbWHnUdS/yIOvgais
+	ihv+2k46f4WqHbAJ2q6crkkFrMMvnwZeGokZx3g==;
 X-DKIM2-Info: draft=ietf-dkim-dkim2-spec-09;
 	repo=github.com/dkim2wg/interop; date=2026-11-03; sw=lmtpprox;
 	action=mi-m=1; hc=11;
 	hn=cc,content-transfer-encoding,date,feedback-id,from,
 	in-reply-to,message-id,mime-version,references,subject,to;
-Message-Instance: m=1; h=sha256:CaroM3K3vgTBhK8hsl2678fmOjUAeO7F46TD2NIZhg4=:x+2kpCAYtkS6bNVB6DJLDCgqKalIJ1vYHcpSDnFaeHw=;
-X-ME-Sender: <xms:ELoFa3lKbnOAQpqxQdOuNWS9D5JJKOT6rxvk2nNq5o05g2bhaxIRBA>
-    <xme:ELoFa-is28kesTkOedegykw_GDmiEc2XVPIOPTLXHncPfL9tX0gjkP_xHlwJYTyrs
-    NX_W1Npni710xephvHjjBX5K9271wqNib5qsBMhwYR4Zi9pnzGJCeEF>
-X-ME-Received: <xmr:ELoFa3dphC6WW-8BdzW3TpVJM0wPiUs0HwxXT0RPiOUD6kyrnuwwKYeakuYn_mFh>
+Message-Instance: m=1; h=sha256:yXyEPLDrwD7n0/UBOHJKKq0pECeD17dlb6nsF+S2VrY=:hKWPGkDHbPFTBno1nXsnnOJq6fBMpjAXF9rUJJtqlMc=;
+X-ME-Sender: <xms:FLoFayFK6dy7-Tv-iPCB5vmubv_AvPe92aie5rvg4oBNrraFPspbzQ>
+    <xme:FLoFa3B3y5M8S7pHZctl2wKD7LqTIaG9ayFUNH7XrYkKEfxYJkErsykv9TKEOyMhI
+    YgjroR5ZQOOyVP2fZLO8B7J8ry2loKLRw6owCuvWJA-2kaVP-KIsPSb>
+X-ME-Received: <xmr:FLoFa1_V8z6Y85hkkPFOr8l0pTc67xPfqbpxKo63uF4syWLxIobOMjyMI3CCmhWW>
 X-ME-Proxy-Cause: dmFkZTFSvR4e8buJ4s5HUUAHFKsx2Z9PD7zteb3cvtRYBs6KziXojcHnUhxaMTbajLD3Qc
     U8uFI9I9QBEs1XxGKvZfo2owRGEpKW7T40pTmbTgzKffyaflL+zKYJKM3WkL673uo/p7xQ
     G4WYbu9KbEa9c47odxt+aN6nS0SOG0Jl2Rh89gAwCFHATP7tDTpe3QP+o1E8OygIeWvcUQ
     F07Gy3guqbhOxv5028m13yjZtEBmwJ2EpZBMCp6cI94RVgSWAmsTi4fBOScVRzriJ1Uhxt
-    yTNek8gtH6jJwSlLWi97jk0zcXjfLGhXSvaSM40KoDBjwzmoBk9PnHyCCdpU7pUlVjjMC3
-    ig4Jpw+70VDpX/Z+8ezPAydOsKE2TdhRcnWHZ2VXfnZg1lc6T4StlyFTwc6QeYNtBneUaf
-    6tdDvsbQiNIJ4dhnjqkXvKxvLzYzncqUIKKQxY6uBfMXH+lovgdr5NG6Cuumkj0DxvjmY5
-    Ls1OFghgRAKzCzHfvxJEyWmx2SYZdcfparWgNO2hNwsZpdnRUXPJntr37Jm7H9rsmcrF7w
-    X+4cAbBEcFiSHfW4vbxGsY98P7TzBFUriLPTmAjvkHWYUZt+qWp0PFeAJoLXKCX8Ah+W0W
-    56m4Lmhm28NLhMr6H5pWa8buXjNhXsctYDJK4q7Mc09yQfXytwLQ0WM4vOgQ
-X-ME-Proxy: <xmx:ELoFa2hBwxT9MzYZQB_Dtk-52Usm6LZe4L3Mg9uU6RmplM9GzEnAxQ>
-    <xmx:ELoFa3wYPCZ3nPBdz21bAk0Hpvra1GZhy5CrWc-1RV3Zhx6YGOmbAA>
-    <xmx:ELoFa6PzFe_T9-TiARq2UN9zYbB_XentR3TAUu-bOmHuV6rj9YbNVg>
-    <xmx:ELoFawWliYcu_YrUrR4vg-MKJyzBIy8gR2TgeXAWbJbkuYElwrYFGA>
-    <xmx:ELoFa4AW39fLxsXmVE4vkKIe-OjbIWQPxZs4V19ITLjepZwej40uaIiu>
+    yTNek8gtH6jJwSlLWi97jk0zcXjfLGhXSvaSM40KoDBjwzmoBk9PnHyCCdpU7pUlVjjMNE
+    RMOm202PQArmceggJKfS82Ga7dI5/Grd1dT+VVvnLI5SNctMv6rJvSJbHZuBxpYvIcTmoc
+    +ZVXvDfsyaP8ZNPoytxpXOw/LnkL+sHTDnIGWPd2dmmKfU0d4yzGjNYhOn39I6M6dsmwWE
+    7/BVaAuXY1PSZHIJCISj0uL4lDaI8B8nHpKkXVzyZLNCWwY+V5NUPY6O1xeuPINqAWLYyf
+    hBYkukIon6tZHOkWNMlcA8Y0flqvsKfJRX9by3oP2QFhqv5aVVq+QD81a1nXbLtfvqzrnR
+    rRUGoKugg4mnfisUvolQDG2kjhb32RX2xO2BLTcyzQb/Wfs5WMkh7p0w0xIg
+X-ME-Proxy: <xmx:FLoFazCjBtkLwZuJzN6aPOs6nQCxTy5VUUJWz6Xi-D2NpSBGACLbfg>
+    <xmx:FboFa6RqJtXv6V6AuLAW19gxTArbuG3XUYeXwjEmA4Sm8UkFs69lEA>
+    <xmx:FboFa6veils5RzR6SYHPSvTqtE-fqrPzBLH2xOwASg7feRLXFNZx5A>
+    <xmx:FboFa23n2lu4z1A2287lqDvtA7VW0p8M2_oiKlesBRMNFoL2NKE_dg>
+    <xmx:FboFayjmmSIfT__edIHSOFIjlf9kB1e1bTEnhtCZKfLWCjtprCu21cvE>
 Feedback-ID: ib53e4b78:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 24 Nov 2026 11:23:44 -0500 (EST)
+ 24 Nov 2026 11:23:48 -0500 (EST)
 From: Ian Bridges <icb@fastmail.org>
 To: Namjae Jeon <linkinjeon@kernel.org>
 Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
@@ -113,9 +113,9 @@ Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
 	ChenXiaoSong <chenxiaosong@chenxiaosong.com>,
 	linux-cifs@vger.kernel.org,
 	Ian Bridges <icb@fastmail.org>
-Subject: [RFC PATCH 1/2] ksmbd: add a security descriptor decoder and encoder
-Date: Tue, 24 Nov 2026 10:23:30 -0600
-Message-ID: <20261124162331.895789-2-icb@fastmail.org>
+Subject: [RFC PATCH 2/2] ksmbd: use the security descriptor codec in callers
+Date: Tue, 24 Nov 2026 10:23:31 -0600
+Message-ID: <20261124162331.895789-3-icb@fastmail.org>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20261124162331.895789-1-icb@fastmail.org>
 References: <20261124162331.895789-1-icb@fastmail.org>
@@ -130,1805 +130,1961 @@ Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ksmbd currently reads and writes security descriptors (SDs) by walking
-the wire format. Each walk repeats the bounds checks for the offsets,
-the ACL sizes, the ACE sizes, and the SID lengths.
+Replace each walk of a raw security descriptor (SD) with
+ksmbd_sd_decode() and each place that writes one with ksmbd_sd_encode().
+The functions keep their names and their logic. Only the code that read
+or wrote the bytes of an SD changes.
 
-Add one decoder and one encoder for the self-relative SD defined in
-MS-DTYP 2.4.6, with struct ksmbd_sd between them. ksmbd_sd_decode()
-validates a whole SD and returns it as a single allocation. The owner,
-the group, and the SID of each ACE are pointers to bytes it has
-checked. ksmbd_sd_encode() checks the struct a caller filled in, works
-out the size, and writes the SD to a buffer it allocates.
+ksmbd_vfs_get_sd_xattr() decodes the stored SD and returns a struct
+ksmbd_sd, so the access check, inheritance, and QUERY_INFO no longer
+check offsets and sizes themselves. parse_sec_desc() decodes the SD a
+client sent, and set_info_sec() encodes what it stores. build_sec_desc()
+and smb_inherit_dacl() fill in a struct ksmbd_sd and encode it.
+build_sec_desc() allocates its reply, which removes
+smb_acl_sec_desc_scratch_len() and the size arithmetic in its callers.
+dacl_add_ace_size(), parse_sid(), smb_set_ace(), and
+smb_validate_ntsd_sid() are removed with the walks they served.
 
-The decoder returns -EBADMSG for an SD that breaks a structural rule of
-MS-DTYP. It keeps what it does not interpret. An ACE of any type that
-MS-DTYP gives a structure is kept with its object GUIDs and its
-application data. The SACL is kept as bytes. Every Control bit is kept
-except SELF_RELATIVE, DACL_PRESENT, and SACL_PRESENT, which the encoder
-sets from the SD it writes.
+The changes in behavior follow.
 
-A malformed SACL does not fail the decode. The decoder drops the SACL
-and sets sacl_dropped, and the caller decides whether to use the rest
-of the SD.
+A malformed SD is refused whole, and the decoder refuses more than the
+walks did. For example, it refuses a DACL whose AceCount is larger than
+the ACEs it holds.
 
-Nothing calls the two functions yet. The KUnit suite has cases for what
-the decoder accepts and refuses and for what the encoder refuses.
+- parse_sec_desc() returns -EINVAL for a malformed SD from a client,
+  even if only the SACL is malformed. It now checks the owner and the
+  group when DACL_PRESENT is clear. Before, it checked only OffsetDacl
+  in that case.
+- The loader returns -EBADMSG for a malformed stored SD and logs a
+  rate-limited warning. QUERY_INFO returns
+  STATUS_INVALID_SECURITY_DESCR. The access check denies the request.
+  Inheritance falls back to the SD built from the child's inode.
+- A stored SD shorter than its header is malformed too. Before, it
+  counted as no stored SD.
+
+The other changes follow.
+
+- The SID of an object ACE is read after its GUIDs. Before, its Flags
+  were read as the SID. parse_dacl() still refuses a DACL with an object
+  ACE, and QUERY_INFO still leaves the ACE out. The access check now
+  skips an object ACE. It still records an object ACE that denies,
+  unless the ACE is inherit-only.
+- Inheritance copies an ACE whole. Before, a callback ACE lost its data
+  and an object ACE lost its GUIDs.
+- Inheritance accepts a parent DACL of 16-byte ACEs. Before, it refused
+  an AceCount above (AclSize - 8) / 18.
+- A DACL that holds an object ACE is written with revision 4.
+- A DACL over 65535 bytes fails with -E2BIG. Before, the POSIX ACL
+  entries that did not fit were left out.
+- build_sec_desc() fails with -ENOMEM if it cannot allocate the SIDs of
+  the POSIX ACL entries. Before, the remaining entries were left out.
+- Every stored SD is the one the encoder writes, with SELF_RELATIVE
+  set. Before, SET_INFO stored the buffer the client sent. The format
+  of the xattr does not change.
+- A refused SD from a client is logged with ksmbd_debug(). The pr_err()
+  lines of the walks are gone.
+
+The fixture in smbacl_kunit.c counts two ACEs in its DACL, and only one
+fits inside AclSize. That SD is now refused whole, so the case for
+maximal access expects a denial, as the other case already did. A new
+case sets AceCount to one and checks that maximal access includes read
+and excludes write.
 
 Signed-off-by: Ian Bridges <icb@fastmail.org>
 ---
- fs/smb/server/Makefile              |   2 +-
- fs/smb/server/secdesc.c             | 775 ++++++++++++++++++++++++
- fs/smb/server/secdesc.h             |  66 +++
- fs/smb/server/tests/Makefile        |   3 +
- fs/smb/server/tests/secdesc_kunit.c | 879 ++++++++++++++++++++++++++++
- 5 files changed, 1724 insertions(+), 1 deletion(-)
- create mode 100644 fs/smb/server/secdesc.c
- create mode 100644 fs/smb/server/secdesc.h
- create mode 100644 fs/smb/server/tests/secdesc_kunit.c
+ fs/smb/server/smb2pdu.c            |   79 +--
+ fs/smb/server/smbacl.c             | 1021 ++++++++--------------------
+ fs/smb/server/smbacl.h             |   11 +-
+ fs/smb/server/tests/smbacl_kunit.c |   42 ++
+ fs/smb/server/vfs.c                |   50 +-
+ fs/smb/server/vfs.h                |   10 +-
+ 6 files changed, 392 insertions(+), 821 deletions(-)
 
-diff --git a/fs/smb/server/Makefile b/fs/smb/server/Makefile
-index 9bc87695a53c..a1b988212a0a 100644
---- a/fs/smb/server/Makefile
-+++ b/fs/smb/server/Makefile
-@@ -8,7 +8,7 @@ ksmbd-y :=	unicode.o auth.o vfs.o vfs_cache.o server.o ndr.o \
- 		misc.o oplock.o connection.o ksmbd_work.o crypto_ctx.o \
- 		mgmt/ksmbd_ida.o mgmt/user_config.o mgmt/share_config.o \
- 		mgmt/tree_connect.o mgmt/user_session.o smb_common.o \
--		transport_tcp.o transport_ipc.o smbacl.o smb2pdu.o \
-+		transport_tcp.o transport_ipc.o smbacl.o secdesc.o smb2pdu.o \
- 		smb2ops.o smb2misc.o ksmbd_spnego_negtokeninit.asn1.o \
- 		ksmbd_spnego_negtokentarg.asn1.o asn1.o compress.o
+diff --git a/fs/smb/server/smb2pdu.c b/fs/smb/server/smb2pdu.c
+index 25e19ae10ad5..6b69dda87105 100644
+--- a/fs/smb/server/smb2pdu.c
++++ b/fs/smb/server/smb2pdu.c
+@@ -5243,33 +5243,13 @@ int smb2_open(struct ksmbd_work *work)
+ 					struct smb_fattr fattr;
+ 					struct smb_ntsd *pntsd;
+ 					int pntsd_size;
+-					size_t scratch_len;
  
-diff --git a/fs/smb/server/secdesc.c b/fs/smb/server/secdesc.c
-new file mode 100644
-index 000000000000..b6c380081a53
---- /dev/null
-+++ b/fs/smb/server/secdesc.c
-@@ -0,0 +1,775 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/* Security descriptor decoder and encoder (MS-DTYP 2.4.6) */
+ 					rc = ksmbd_acls_fattr(&fattr, idmap, inode);
+ 					if (rc)
+ 						goto err_out;
+ 
+-					scratch_len = smb_acl_sec_desc_scratch_len(&fattr,
+-							NULL, 0,
+-							OWNER_SECINFO | GROUP_SECINFO |
+-							DACL_SECINFO);
+-					if (!scratch_len || scratch_len == SIZE_MAX) {
+-						rc = -EFBIG;
+-						posix_acl_release(fattr.cf_acls);
+-						posix_acl_release(fattr.cf_dacls);
+-						goto err_out;
+-					}
+-
+-					pntsd = kvzalloc(scratch_len, KSMBD_DEFAULT_GFP);
+-					if (!pntsd) {
+-						rc = -ENOMEM;
+-						posix_acl_release(fattr.cf_acls);
+-						posix_acl_release(fattr.cf_dacls);
+-						goto err_out;
+-					}
+-
+ 					rc = build_sec_desc(idmap,
+-							    pntsd, NULL, 0,
++							    &pntsd, NULL,
+ 							    OWNER_SECINFO |
+ 							    GROUP_SECINFO |
+ 							    DACL_SECINFO,
+@@ -8435,14 +8415,14 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ {
+ 	struct ksmbd_file *fp;
+ 	const struct mnt_idmap *idmap;
+-	struct smb_ntsd *pntsd = NULL, *ppntsd = NULL;
++	struct smb_ntsd *pntsd = NULL;
++	struct ksmbd_sd *ppntsd = NULL;
+ 	struct smb_fattr fattr = {{0}};
+ 	struct inode *inode;
+ 	__u32 secdesclen = 0;
+ 	unsigned int id = KSMBD_NO_FID, pid = KSMBD_NO_FID;
+ 	int addition_info = le32_to_cpu(req->AdditionalInformation);
+-	int rc = 0, ppntsd_size = 0, max_len;
+-	size_t scratch_len = 0;
++	int rc = 0, max_len;
+ 
+ 	if (addition_info & ~(OWNER_SECINFO | GROUP_SECINFO | DACL_SECINFO |
+ 			      PROTECTED_DACL_SECINFO |
+@@ -8494,11 +8474,13 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 
+ 	if (test_share_config_flag(work->tcon->share_conf,
+ 				   KSMBD_SHARE_FLAG_ACL_XATTR)) {
+-		ppntsd_size = ksmbd_vfs_get_sd_xattr(work->conn, idmap,
+-						     fp->filp->f_path.dentry,
+-						     &ppntsd);
+-		if (ppntsd_size < 0 && !smb_no_stored_sd(ppntsd_size)) {
+-			rc = ppntsd_size == -ENOMEM ? -ENOMEM : -EIO;
++		rc = ksmbd_vfs_get_sd_xattr(work->conn, idmap,
++					    fp->filp->f_path.dentry, &ppntsd);
++		if (rc && !smb_no_stored_sd(rc)) {
++			if (rc == -EBADMSG)
++				rsp->hdr.Status = STATUS_INVALID_SECURITY_DESCR;
++			else if (rc != -ENOMEM)
++				rc = -EIO;
+ 			goto release_acl;
+ 		}
+ 	}
+@@ -8512,32 +8494,18 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 		goto release_acl;
+ 	}
+ 
+-	scratch_len = smb_acl_sec_desc_scratch_len(&fattr, ppntsd,
+-			ppntsd_size, addition_info);
+-	if (!scratch_len || scratch_len > SIZE_MAX - 7) {
+-		rc = -EFBIG;
+-		goto release_acl;
+-	}
+-
+-	/* A compound response pads the descriptor to 8 bytes in this buffer */
+-	scratch_len = ALIGN(scratch_len, 8);
+-	pntsd = kvzalloc(scratch_len, KSMBD_DEFAULT_GFP);
+-	if (!pntsd) {
+-		rc = -ENOMEM;
+-		goto release_acl;
+-	}
+-
+-	rc = build_sec_desc(idmap, pntsd, ppntsd, ppntsd_size,
+-			addition_info, &secdesclen, &fattr);
++	rc = build_sec_desc(idmap, &pntsd, ppntsd, addition_info, &secdesclen,
++			    &fattr);
++	/* The DACL is too large for an SD */
++	if (rc == -E2BIG)
++		rsp->hdr.Status = STATUS_INSUFFICIENT_RESOURCES;
+ 
+ release_acl:
+ 	posix_acl_release(fattr.cf_acls);
+ 	posix_acl_release(fattr.cf_dacls);
+-	kfree(ppntsd);
++	kvfree(ppntsd);
+ 	ksmbd_fd_put(work, fp);
+ 
+-	if (!rc && ALIGN(secdesclen, 8) > scratch_len)
+-		rc = -EFBIG;
+ 	if (rc)
+ 		goto err_out;
+ 
+@@ -8548,6 +8516,19 @@ static int smb2_get_info_sec(struct ksmbd_work *work,
+ 	if (rc)
+ 		goto err_out;
+ 
++	/* A compound response pads the descriptor to 8 bytes in this buffer */
++	if (!IS_ALIGNED(secdesclen, 8)) {
++		void *padded = kvrealloc(pntsd, ALIGN(secdesclen, 8),
++					 KSMBD_DEFAULT_GFP);
 +
-+#include <linux/align.h>
-+#include <linux/array_size.h>
-+#include <linux/bitops.h>
-+#include <linux/bug.h>
++		if (!padded) {
++			rc = -ENOMEM;
++			goto err_out;
++		}
++		memset(padded + secdesclen, 0, ALIGN(secdesclen, 8) - secdesclen);
++		pntsd = padded;
++	}
++
+ 	rc = ksmbd_iov_pin_rsp_read(work, (void *)rsp,
+ 			offsetof(struct smb2_query_info_rsp, Buffer),
+ 			pntsd, secdesclen);
+diff --git a/fs/smb/server/smbacl.c b/fs/smb/server/smbacl.c
+index 49530198a2b6..098c9132ebe6 100644
+--- a/fs/smb/server/smbacl.c
++++ b/fs/smb/server/smbacl.c
+@@ -6,9 +6,11 @@
+  *   Author(s): Namjae Jeon <linkinjeon@kernel.org>
+  */
+ 
 +#include <linux/cleanup.h>
-+#include <linux/errno.h>
-+#include <linux/limits.h>
+ #include <linux/fs.h>
+ #include <linux/dcache.h>
+ #include <kunit/visibility.h>
 +#include <linux/overflow.h>
-+#include <linux/slab.h>
-+#include <linux/stddef.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
-+#include <linux/uuid.h>
-+#include <asm/byteorder.h>
-+#include <kunit/visibility.h>
-+
-+#include "glob.h"
-+#include "smbacl.h"
+ #include <linux/slab.h>
+ #include <linux/string.h>
+ #include <linux/mnt_idmapping.h>
+@@ -19,6 +21,7 @@
+ #include "server.h"
+ #include "misc.h"
+ #include "mgmt/share_config.h"
 +#include "secdesc.h"
-+
-+/*
-+ * The 16-bit revision field of struct smb_ntsd and of struct smb_acl holds
-+ * the Revision byte in its low half and the Sbz1 byte in its high half.
-+ */
-+#define SD_REVISION_MASK	0xff
-+#define SD_SBZ1_SHIFT		8
-+
-+/* The part of an ACE before its SID, or before its object section */
-+#define SD_ACE_HDR_SIZE		offsetof(struct smb_ace, sid)
-+#define SD_ACE_MIN_SIZE		(SD_ACE_HDR_SIZE + CIFS_SID_BASE_SIZE)
-+
-+#define SD_SID_REVISION		1
-+#define SD_ACL_REVISION		2
-+#define SD_ACL_REVISION_DS	4
-+
-+#define SD_ALIGN		4
-+
-+/* Control bits that the encoder sets from the SD, not from sd->control */
-+#define SD_CONTROL_DERIVED	(SELF_RELATIVE | DACL_PRESENT | SACL_PRESENT)
-+
-+/*
-+ * An encoded SID is 8 bytes plus 4 bytes per sub-authority, but struct
-+ * smb_sid always has room for 15 sub-authorities. The decoder pads its
-+ * allocation by the difference, so that a short SID at the end of the
-+ * allocation can be read through a struct smb_sid pointer without going
-+ * out of bounds.
-+ */
-+#define SD_SID_SLACK	(sizeof(struct smb_sid) - CIFS_SID_BASE_SIZE)
-+
-+/*
-+ * The Flags of an object ACE (MS-DTYP 2.4.4.3). Each one says that a GUID
-+ * is present before the SID.
-+ */
-+#define ACE_OBJECT_TYPE_PRESENT			0x1
-+#define ACE_INHERITED_OBJECT_TYPE_PRESENT	0x2
-+#define SD_OBJ_GUID_FLAGS \
-+	(ACE_OBJECT_TYPE_PRESENT | ACE_INHERITED_OBJECT_TYPE_PRESENT)
-+
-+enum sd_ace_layout {
-+	SD_ACE_NONE,
-+	SD_ACE_PLAIN,
-+	SD_ACE_OBJECT,
-+};
-+
-+struct sd_in {
-+	const u8 *p __counted_by_ptr(len);
-+	size_t len;
-+};
-+
-+struct sd_parsed {
-+	u16 control;
-+	u8 sbz1;
-+	struct sd_in owner;
-+	struct sd_in group;
-+	enum ksmbd_acl_state dacl_state;
-+	struct sd_in dacl;
-+	struct smb_acl dacl_hdr;
-+	enum ksmbd_acl_state sacl_state;
-+	struct sd_in sacl;
-+	bool sacl_dropped;
-+};
-+
-+struct sd_writer {
-+	u8 *p __counted_by_ptr(cap);
-+	size_t cap;
-+	size_t pos;
-+	bool bad;
-+};
-+
-+struct sd_layout {
-+	bool object;
-+	/* Each offset is 0 if the SD does not have that part */
-+	size_t owner_off, group_off, dacl_off, sacl_off;
-+	size_t dacl_size;
-+	size_t total;
-+};
-+
-+/*
-+ * Every ACE type that MS-DTYP defines a structure for (2.4.4.2 to
-+ * 2.4.4.16). The types meant for a SACL are included because a client can
-+ * put them in a DACL, and ksmbd has always accepted a DACL that has them.
-+ */
-+static const u8 sd_ace_layouts[] = {
-+	[ACCESS_ALLOWED_ACE_TYPE]		  = SD_ACE_PLAIN,
-+	[ACCESS_DENIED_ACE_TYPE]		  = SD_ACE_PLAIN,
-+	[SYSTEM_AUDIT_ACE_TYPE]			  = SD_ACE_PLAIN,
-+	[ACCESS_ALLOWED_OBJECT_ACE_TYPE]	  = SD_ACE_OBJECT,
-+	[ACCESS_DENIED_OBJECT_ACE_TYPE]		  = SD_ACE_OBJECT,
-+	[SYSTEM_AUDIT_OBJECT_ACE_TYPE]		  = SD_ACE_OBJECT,
-+	[ACCESS_ALLOWED_CALLBACK_ACE_TYPE]	  = SD_ACE_PLAIN,
-+	[ACCESS_DENIED_CALLBACK_ACE_TYPE]	  = SD_ACE_PLAIN,
-+	[ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE] = SD_ACE_OBJECT,
-+	[ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE]  = SD_ACE_OBJECT,
-+	[SYSTEM_AUDIT_CALLBACK_ACE_TYPE]	  = SD_ACE_PLAIN,
-+	[SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE]	  = SD_ACE_OBJECT,
-+	[SYSTEM_MANDATORY_LABEL_ACE_TYPE]	  = SD_ACE_PLAIN,
-+	[SYSTEM_RESOURCE_ATTRIBUTE_ACE_TYPE]	  = SD_ACE_PLAIN,
-+	[SYSTEM_SCOPED_POLICY_ID_ACE_TYPE]	  = SD_ACE_PLAIN,
-+};
-+
-+static enum sd_ace_layout sd_ace_layout(u8 type)
-+{
-+	return type < ARRAY_SIZE(sd_ace_layouts) ? sd_ace_layouts[type] :
-+						   SD_ACE_NONE;
-+}
-+
-+static size_t sd_sid_len(unsigned int num_subauth)
-+{
-+	return CIFS_SID_BASE_SIZE + num_subauth * sizeof(__le32);
-+}
-+
-+/*
-+ * In an object ACE, the mask is followed by a Flags field, then by an
-+ * ObjectType GUID if ACE_OBJECT_TYPE_PRESENT is set, then by an
-+ * InheritedObjectType GUID if ACE_INHERITED_OBJECT_TYPE_PRESENT is set, and
-+ * then by the SID (MS-DTYP 2.4.4.3). Returns the size of what lies between
-+ * the mask and the SID, which is the Flags field and the GUIDs.
-+ */
-+static size_t sd_obj_len(u32 obj_flags)
-+{
-+	unsigned int num_guids = hweight32(obj_flags & SD_OBJ_GUID_FLAGS);
-+
-+	return sizeof(obj_flags) + num_guids * sizeof(guid_t);
-+}
-+
-+static const u8 *sd_in_at(const struct sd_in *input, size_t off, size_t len)
-+{
-+	if (!len || off > input->len || len > input->len - off)
-+		return NULL;
-+	return input->p + off;
-+}
-+
-+static int sd_malformed(const char *why)
-+{
-+	ksmbd_debug(SMB, "malformed security descriptor: %s\n", why);
-+	return -EBADMSG;
-+}
-+
-+/* On success, *@sid points to the SID at @off */
-+static int sd_check_sid(const struct sd_in *input, size_t off,
-+			const struct smb_sid **sid)
-+{
-+	const struct smb_sid *candidate;
-+
-+	candidate = (const void *)sd_in_at(input, off, CIFS_SID_BASE_SIZE);
-+	if (!candidate)
-+		return sd_malformed("SID out of bounds");
-+	if (candidate->revision != SD_SID_REVISION)
-+		return sd_malformed("SID revision is not 1");
-+	if (candidate->num_subauth > SID_MAX_SUB_AUTHORITIES)
-+		return sd_malformed("SID has more than 15 sub-authorities");
-+	if (!sd_in_at(input, off, sd_sid_len(candidate->num_subauth)))
-+		return sd_malformed("SID out of bounds");
-+	*sid = candidate;
-+	return 0;
-+}
-+
-+/*
-+ * Validates the ACE at @pos and returns its size in *@size. If @out is not
-+ * NULL, the ACE is decoded into it, and its pointers point into @aces.
-+ * This is forced inline because the decoder calls it once for every ACE.
-+ */
-+static __always_inline int
-+sd_parse_ace(const struct sd_in *aces, size_t pos, struct ksmbd_ace *out,
-+	     size_t *size)
-+{
-+	size_t len, end, off = SD_ACE_HDR_SIZE;
-+	enum sd_ace_layout layout;
-+	const struct smb_sid *sid;
-+	struct sd_in ace;
-+	const u8 *p;
-+	int rc;
-+
-+	p = sd_in_at(aces, pos, SD_ACE_HDR_SIZE);
-+	if (!p)
-+		return sd_malformed("ACE count exceeds ACL size");
-+	len = get_unaligned_le16(&p[offsetof(struct smb_ace, size)]);
-+	if (len % SD_ALIGN)
-+		return sd_malformed("ACE size not a multiple of 4");
-+	if (!sd_in_at(aces, pos, len))
-+		return sd_malformed("ACE out of bounds");
-+	ace = (struct sd_in){ .len = len, .p = p };
-+	layout = sd_ace_layout(p[offsetof(struct smb_ace, type)]);
-+	if (layout == SD_ACE_NONE)
-+		return sd_malformed("unknown ACE type");
-+
-+	if (layout == SD_ACE_OBJECT) {
-+		u32 obj_flags;
-+
-+		p = sd_in_at(&ace, off, sizeof(obj_flags));
-+		if (!p)
-+			return sd_malformed("object ACE flags out of bounds");
-+		obj_flags = get_unaligned_le32(p);
-+		if (obj_flags & ~(u32)SD_OBJ_GUID_FLAGS)
-+			return sd_malformed("undefined object ACE flags");
-+		off += sd_obj_len(obj_flags);
-+	}
-+
-+	rc = sd_check_sid(&ace, off, &sid);
-+	if (rc)
-+		return rc;
-+	*size = len;
-+	if (!out)
-+		return 0;
-+
-+	end = off + sd_sid_len(sid->num_subauth);
-+	*out = (struct ksmbd_ace){
-+		.type = ace.p[offsetof(struct smb_ace, type)],
-+		.flags = ace.p[offsetof(struct smb_ace, flags)],
-+		.mask = get_unaligned_le32(&ace.p[offsetof(struct smb_ace, access_req)]),
-+		.sid = sid,
-+		.obj_len = off - SD_ACE_HDR_SIZE,
-+		.data_len = len - end,
-+		.obj = off > SD_ACE_HDR_SIZE ? &ace.p[SD_ACE_HDR_SIZE] : NULL,
-+		.data = len > end ? &ace.p[end] : NULL,
-+	};
-+	return 0;
-+}
-+
-+static int sd_parse_acl(const struct sd_in *src, size_t off,
-+			struct sd_in *acl, struct smb_acl *hdr)
-+{
-+	const u8 *p = sd_in_at(src, off, sizeof(*hdr));
-+	unsigned int size, rev;
-+
-+	if (!p)
-+		return sd_malformed("ACL header out of bounds");
-+	memcpy(hdr, p, sizeof(*hdr));
-+	rev = le16_to_cpu(hdr->revision) & SD_REVISION_MASK;
-+	if (rev != SD_ACL_REVISION && rev != SD_ACL_REVISION_DS)
-+		return sd_malformed("ACL revision is not 2 or 4");
-+	size = le16_to_cpu(hdr->size);
-+	if (size < sizeof(*hdr) || !sd_in_at(src, off, size))
-+		return sd_malformed("ACL size out of bounds");
-+	if (le16_to_cpu(hdr->num_aces) > (size - sizeof(*hdr)) / SD_ACE_MIN_SIZE)
-+		return sd_malformed("ACE count exceeds ACL size");
-+	*acl = (struct sd_in){ .len = size, .p = p };
-+	return 0;
-+}
-+
-+static struct sd_in sd_acl_aces(const struct sd_in *acl)
-+{
-+	struct sd_in aces = { .len = acl->len - sizeof(struct smb_acl) };
-+
-+	aces.p = sd_in_at(acl, sizeof(struct smb_acl), aces.len);
-+	return aces;
-+}
-+
-+/*
-+ * Validates an ACL without decoding it. This is for the SACL, which is kept
-+ * as raw bytes.
-+ */
-+static int sd_check_acl(const struct sd_in *src)
-+{
-+	struct sd_in acl, aces;
-+	size_t pos = 0, size;
-+	struct smb_acl hdr;
-+	unsigned int i;
-+	int rc;
-+
-+	rc = sd_parse_acl(src, 0, &acl, &hdr);
-+	if (rc)
-+		return rc;
-+	aces = sd_acl_aces(&acl);
-+	for (i = 0; i < le16_to_cpu(hdr.num_aces); i++) {
-+		rc = sd_parse_ace(&aces, pos, NULL, &size);
-+		if (rc)
-+			return rc;
-+		pos += size;
-+	}
-+	return 0;
-+}
-+
-+static int sd_parse_sid_at(const struct sd_in *src, size_t off,
-+			   struct sd_in *sid)
-+{
-+	const struct smb_sid *checked;
-+	int rc;
-+
-+	rc = sd_check_sid(src, off, &checked);
-+	if (!rc)
-+		*sid = (struct sd_in){ .len = sd_sid_len(checked->num_subauth),
-+				       .p = (const u8 *)checked };
-+	return rc;
-+}
-+
-+static int sd_parse_header(const struct sd_in *src,
-+			   struct sd_parsed *parsed)
-+{
-+	const u8 *p = sd_in_at(src, 0, sizeof(struct smb_ntsd));
-+	u32 owner, group, dacl, sacl;
-+	struct smb_acl sacl_hdr;
-+	struct smb_ntsd hdr;
-+	u16 rev;
-+	int rc;
-+
-+	if (!p)
-+		return sd_malformed("header out of bounds");
-+	memcpy(&hdr, p, sizeof(hdr));
-+	rev = le16_to_cpu(hdr.revision);
-+	if ((rev & SD_REVISION_MASK) != SD_REVISION)
-+		return sd_malformed("revision is not 1");
-+	parsed->sbz1 = rev >> SD_SBZ1_SHIFT;
-+	parsed->control = le16_to_cpu(hdr.type);
-+	owner = le32_to_cpu(hdr.osidoffset);
-+	group = le32_to_cpu(hdr.gsidoffset);
-+	dacl = le32_to_cpu(hdr.dacloffset);
-+	if ((owner && owner < sizeof(hdr)) || (group && group < sizeof(hdr)) ||
-+	    (dacl && dacl < sizeof(hdr)))
-+		return sd_malformed("owner, group, or DACL offset inside header");
-+
-+	if (owner) {
-+		rc = sd_parse_sid_at(src, owner, &parsed->owner);
-+		if (rc)
-+			return rc;
-+	}
-+	if (group) {
-+		rc = sd_parse_sid_at(src, group, &parsed->group);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	/*
-+	 * A nonzero OffsetDacl with DACL_PRESENT clear is refused, because
-+	 * the two fields disagree about whether the SD has a DACL (MS-DTYP
-+	 * 2.4.6).
-+	 */
-+	if (!(parsed->control & DACL_PRESENT)) {
-+		if (dacl)
-+			return sd_malformed("DACL offset without DACL_PRESENT");
-+	} else if (!dacl) {
-+		parsed->dacl_state = KSMBD_ACL_NULL;
-+	} else {
-+		parsed->dacl_state = KSMBD_ACL_PRESENT;
-+		rc = sd_parse_acl(src, dacl, &parsed->dacl, &parsed->dacl_hdr);
-+		if (rc)
-+			return rc;
-+	}
-+
-+	/*
-+	 * A malformed SACL does not fail the decode. The SD is decoded
-+	 * without it and sacl_dropped is set. OffsetSacl is ignored when
-+	 * SACL_PRESENT is clear, as ksmbd has always done.
-+	 */
-+	sacl = le32_to_cpu(hdr.sacloffset);
-+	if (!(parsed->control & SACL_PRESENT))
-+		return 0;
-+	if (!sacl) {
-+		parsed->sacl_state = KSMBD_ACL_NULL;
-+	} else if (sacl < sizeof(hdr)) {
-+		sd_malformed("SACL offset inside header");
-+		parsed->sacl_dropped = true;
-+	} else if (sd_parse_acl(src, sacl, &parsed->sacl, &sacl_hdr)) {
-+		parsed->sacl_dropped = true;
-+	} else {
-+		parsed->sacl_state = KSMBD_ACL_PRESENT;
-+	}
-+	return 0;
-+}
-+
-+/*
-+ * Copies the ACEs of the DACL to @kept and decodes the copy, so that the
-+ * bytes that were validated are the bytes the SD keeps.
-+ */
-+static int sd_decode_dacl(struct ksmbd_sd *sd,
-+			  const struct sd_parsed *parsed,
-+			  const struct sd_in *wire, u8 *kept)
-+{
-+	struct sd_in aces = { .len = wire->len, .p = kept };
-+	u16 rev = le16_to_cpu(parsed->dacl_hdr.revision);
-+	size_t pos = 0, size;
-+	bool object = false;
-+	unsigned int i;
-+	int rc;
-+
-+	if (wire->len)
-+		memcpy(kept, wire->p, wire->len);
-+	for (i = 0; i < sd->num_aces; i++) {
-+		rc = sd_parse_ace(&aces, pos, &sd->aces[i], &size);
-+		if (rc)
-+			return rc;
-+		if (sd->aces[i].obj_len)
-+			object = true;
-+		pos += size;
-+	}
-+	/* A DACL that contains an object ACE has revision 4 (MS-DTYP 2.4.5) */
-+	sd->dacl_revision = object ? SD_ACL_REVISION_DS : rev & SD_REVISION_MASK;
-+	sd->dacl_sbz1 = rev >> SD_SBZ1_SHIFT;
-+	sd->dacl_sbz2 = le16_to_cpu(parsed->dacl_hdr.reserved);
-+	return 0;
-+}
-+
-+static const struct smb_sid *sd_keep_sid(const struct sd_in *sid, u8 *kept)
-+{
-+	if (!sid->len)
-+		return NULL;
-+	return memcpy(kept, sid->p, sid->len);
-+}
-+
-+/**
-+ * ksmbd_sd_decode() - decode a self-relative security descriptor
-+ * @buf:	the encoded SD, which must not change during the call
-+ * @len:	the length of @buf in bytes
-+ * @out:	set to the decoded SD on success and to NULL on error. The
-+ *		caller frees it with kvfree().
-+ *
-+ * The SD is read as self-relative whether or not SELF_RELATIVE is set in
-+ * its Control field. ksmbd has stored SDs with the bit clear, and those
-+ * must still decode.
-+ *
-+ * The decoded SD is a single allocation, and every pointer in it points
-+ * into that allocation and not into @buf.
-+ *
-+ * A well-formed SACL is kept as bytes in sacl_data. A malformed SACL does
-+ * not fail the decode. In that case only, the decoded SD has no SACL and
-+ * sacl_dropped is set.
-+ *
-+ * Return: 0 on success, -EBADMSG if any part of the SD other than the SACL
-+ * is malformed, or -ENOMEM.
-+ */
-+int ksmbd_sd_decode(const u8 *buf, size_t len, struct ksmbd_sd **out)
-+{
-+	struct ksmbd_sd *sd __free(kvfree) = NULL;
-+	struct sd_in src = { .len = len, .p = buf };
-+	struct sd_parsed parsed = {};
-+	struct sd_in wire = {};
-+	size_t fixed, kept_len;
-+	unsigned int num_aces;
-+	u8 *kept;
-+	int rc;
-+
-+	*out = NULL;
-+	rc = sd_parse_header(&src, &parsed);
-+	if (rc)
-+		return rc;
-+	if (parsed.dacl_state == KSMBD_ACL_PRESENT)
-+		wire = sd_acl_aces(&parsed.dacl);
-+	num_aces = le16_to_cpu(parsed.dacl_hdr.num_aces);
-+
-+	/*
-+	 * The allocation holds the struct and its array of ACEs, followed by
-+	 * copies of the owner SID, the group SID, the ACEs of the DACL, and
-+	 * the SACL.
-+	 */
-+	fixed = struct_size(sd, aces, num_aces);
-+	kept_len = parsed.owner.len + parsed.group.len + wire.len +
-+		   parsed.sacl.len;
-+	sd = kvmalloc(size_add(fixed, kept_len + SD_SID_SLACK), KSMBD_DEFAULT_GFP);
-+	if (!sd)
-+		return -ENOMEM;
-+	kept = (u8 *)sd + fixed;
-+	memset(kept + kept_len, 0, SD_SID_SLACK);
-+
+ 
+ static const struct smb_sid domain = {1, 4, {0, 0, 0, 0, 0, 5},
+ 	{cpu_to_le32(21), cpu_to_le32(1), cpu_to_le32(2), cpu_to_le32(3),
+@@ -196,12 +199,10 @@ static void mode_to_access_flags(umode_t mode, umode_t bits_to_use,
+ 		    mode, *pace_flags);
+ }
+ 
+-static __u16 fill_ace_for_sid(struct smb_ace *pntace,
+-			      const struct smb_sid *psid, int type, int flags,
+-			      umode_t mode, umode_t bits)
++static void fill_ace_for_sid(struct ksmbd_ace *pntace,
++			     const struct smb_sid *psid, int type, int flags,
++			     umode_t mode, umode_t bits)
+ {
+-	int i;
+-	__u16 size = 0;
+ 	__u32 access_req = 0;
+ 
+ 	pntace->type = type;
+@@ -209,19 +210,8 @@ static __u16 fill_ace_for_sid(struct smb_ace *pntace,
+ 	mode_to_access_flags(mode, bits, &access_req);
+ 	if (!access_req)
+ 		access_req = SET_MINIMUM_RIGHTS;
+-	pntace->access_req = cpu_to_le32(access_req);
+-
+-	pntace->sid.revision = psid->revision;
+-	pntace->sid.num_subauth = psid->num_subauth;
+-	for (i = 0; i < NUM_AUTHS; i++)
+-		pntace->sid.authority[i] = psid->authority[i];
+-	for (i = 0; i < psid->num_subauth; i++)
+-		pntace->sid.sub_auth[i] = psid->sub_auth[i];
+-
+-	size = 1 + 1 + 2 + 4 + 1 + 1 + 6 + (psid->num_subauth * 4);
+-	pntace->size = cpu_to_le16(size);
+-
+-	return size;
++	pntace->mask = access_req;
++	pntace->sid = psid;
+ }
+ 
+ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
+@@ -261,7 +251,7 @@ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid)
+ }
+ 
+ static int sid_to_id(const struct mnt_idmap *idmap,
+-		     struct smb_sid *psid, uint sidtype,
++		     const struct smb_sid *psid, uint sidtype,
+ 		     struct smb_fattr *fattr)
+ {
+ 	const struct smb_sid *sid_prefix;
+@@ -387,52 +377,23 @@ void free_acl_state(struct posix_acl_state *state)
+ }
+ 
+ static int parse_dacl(const struct mnt_idmap *idmap,
+-		      struct smb_acl *pdacl, char *end_of_acl,
+-		      struct smb_sid *pownersid, struct smb_sid *pgrpsid,
+-		      struct smb_fattr *fattr)
++		      struct ksmbd_sd *sd,
++		      const struct smb_sid *pownersid,
++		      const struct smb_sid *pgrpsid, struct smb_fattr *fattr)
+ {
+ 	int i, ret;
+ 	u16 num_aces = 0;
+-	u16 dacl_size;
+-	unsigned int acl_size;
+-	char *acl_base;
+-	struct smb_ace **ppace;
++	struct ksmbd_ace *ace;
+ 	struct posix_acl_entry *cf_pace, *cf_pdace;
+ 	struct posix_acl_state acl_state, default_acl_state;
+ 	umode_t mode = 0, acl_mode;
+ 	bool owner_found = false, group_found = false, others_found = false;
+ 	bool nfs_mode_found = false;
+ 
+-	if (!pdacl)
+-		return 0;
+-
+-	/* validate that we do not go past end of acl */
+-	if (end_of_acl < (char *)pdacl + sizeof(struct smb_acl) ||
+-	    end_of_acl < (char *)pdacl + le16_to_cpu(pdacl->size)) {
+-		pr_err("ACL too small to parse DACL\n");
+-		return -EINVAL;
+-	}
+-
+-	ksmbd_debug(SMB, "DACL revision %d size %d num aces %d\n",
+-		    le16_to_cpu(pdacl->revision), le16_to_cpu(pdacl->size),
+-		    le16_to_cpu(pdacl->num_aces));
+-
+-	acl_base = (char *)pdacl;
+-	acl_size = sizeof(struct smb_acl);
+-
+-	num_aces = le16_to_cpu(pdacl->num_aces);
++	num_aces = sd->num_aces;
+ 	if (num_aces <= 0)
+ 		return 0;
+ 
+-	dacl_size = le16_to_cpu(pdacl->size);
+-	if (dacl_size < sizeof(struct smb_acl))
+-		return -EINVAL;
+-
+-	if (num_aces > (dacl_size - sizeof(struct smb_acl)) /
+-			(offsetof(struct smb_ace, sid) +
+-			 offsetof(struct smb_sid, sub_auth) + sizeof(__le16)))
+-		return -EINVAL;
+-
+ 	ret = init_acl_state(&acl_state, num_aces);
+ 	if (ret)
+ 		return ret;
+@@ -442,59 +403,36 @@ static int parse_dacl(const struct mnt_idmap *idmap,
+ 		return ret;
+ 	}
+ 
+-	ppace = kmalloc_objs(struct smb_ace *, num_aces, KSMBD_DEFAULT_GFP);
+-	if (!ppace) {
+-		free_acl_state(&default_acl_state);
+-		free_acl_state(&acl_state);
+-		return -ENOMEM;
+-	}
+-
+ 	/*
+ 	 * reset rwx permissions for user/group/other.
+ 	 * Also, if num_aces is 0 i.e. DACL has no ACEs,
+ 	 * user/group/other have no permissions
+ 	 */
+ 	for (i = 0; i < num_aces; ++i) {
+-		if (end_of_acl - acl_base < acl_size) {
+-			ret = -EINVAL;
+-			goto out;
+-		}
+-
+-		ppace[i] = (struct smb_ace *)(acl_base + acl_size);
+-		acl_base = (char *)ppace[i];
+-		acl_size = offsetof(struct smb_ace, sid) +
+-			offsetof(struct smb_sid, sub_auth);
+-
+-		if (end_of_acl - acl_base < acl_size ||
+-		    ppace[i]->sid.num_subauth == 0 ||
+-		    ppace[i]->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
+-		    (end_of_acl - acl_base <
+-		     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth) ||
+-		    (le16_to_cpu(ppace[i]->size) <
+-		     acl_size + sizeof(__le32) * ppace[i]->sid.num_subauth)) {
++		ace = &sd->aces[i];
++		/* ksmbd maps no object ACE, so an SD that has one is refused */
++		if (ace->obj_len || ace->sid->num_subauth == 0) {
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
+ 
+-		acl_size = le16_to_cpu(ppace[i]->size);
+-		ppace[i]->access_req =
+-			smb_map_generic_desired_access(ppace[i]->access_req);
++		ace->mask = le32_to_cpu(smb_map_generic_desired_access(cpu_to_le32(ace->mask)));
+ 
+ 		/* ACEs after an NFS mode ACE do not change the POSIX mapping */
+ 		if (nfs_mode_found)
+ 			continue;
+ 
+-		if (ppace[i]->type == ACCESS_ALLOWED &&
+-		    ppace[i]->sid.num_subauth >= 3 &&
+-		    !(compare_sids(&ppace[i]->sid, &sid_unix_NFS_mode))) {
++		if (ace->type == ACCESS_ALLOWED &&
++		    ace->sid->num_subauth >= 3 &&
++		    !(compare_sids(ace->sid, &sid_unix_NFS_mode))) {
+ 			fattr->cf_mode =
+-				le32_to_cpu(ppace[i]->sid.sub_auth[2]);
++				le32_to_cpu(ace->sid->sub_auth[2]);
+ 			fattr->cf_posix_mode = true;
+ 			nfs_mode_found = true;
+-		} else if (!compare_sids(&ppace[i]->sid, pownersid)) {
++		} else if (!compare_sids(ace->sid, pownersid)) {
+ 			acl_mode = access_flags_to_mode(fattr,
+-							ppace[i]->access_req,
+-							ppace[i]->type);
++							cpu_to_le32(ace->mask),
++							ace->type);
+ 			acl_mode &= 0700;
+ 
+ 			if (!owner_found) {
+@@ -502,41 +440,41 @@ static int parse_dacl(const struct mnt_idmap *idmap,
+ 				mode |= acl_mode;
+ 			}
+ 			owner_found = true;
+-		} else if (!compare_sids(&ppace[i]->sid, pgrpsid) ||
+-			   ppace[i]->sid.sub_auth[ppace[i]->sid.num_subauth - 1] ==
++		} else if (!compare_sids(ace->sid, pgrpsid) ||
++			   ace->sid->sub_auth[ace->sid->num_subauth - 1] ==
+ 			    DOMAIN_USER_RID_LE) {
+ 			acl_mode = access_flags_to_mode(fattr,
+-							ppace[i]->access_req,
+-							ppace[i]->type);
++							cpu_to_le32(ace->mask),
++							ace->type);
+ 			acl_mode &= 0070;
+ 			if (!group_found) {
+ 				mode &= ~(0070);
+ 				mode |= acl_mode;
+ 			}
+ 			group_found = true;
+-		} else if (!compare_sids(&ppace[i]->sid, &sid_everyone)) {
++		} else if (!compare_sids(ace->sid, &sid_everyone)) {
+ 			acl_mode = access_flags_to_mode(fattr,
+-							ppace[i]->access_req,
+-							ppace[i]->type);
++							cpu_to_le32(ace->mask),
++							ace->type);
+ 			acl_mode &= 0007;
+ 			if (!others_found) {
+ 				mode &= ~(0007);
+ 				mode |= acl_mode;
+ 			}
+ 			others_found = true;
+-		} else if (!compare_sids(&ppace[i]->sid, &creator_owner)) {
++		} else if (!compare_sids(ace->sid, &creator_owner)) {
+ 			continue;
+-		} else if (!compare_sids(&ppace[i]->sid, &creator_group)) {
++		} else if (!compare_sids(ace->sid, &creator_group)) {
+ 			continue;
+-		} else if (!compare_sids(&ppace[i]->sid, &sid_authusers)) {
++		} else if (!compare_sids(ace->sid, &sid_authusers)) {
+ 			continue;
+ 		} else {
+ 			struct smb_fattr temp_fattr;
+ 
+-			acl_mode = access_flags_to_mode(fattr, ppace[i]->access_req,
+-							ppace[i]->type);
++			acl_mode = access_flags_to_mode(fattr, cpu_to_le32(ace->mask),
++							ace->type);
+ 			temp_fattr.cf_uid = INVALID_UID;
+-			ret = sid_to_id(idmap, &ppace[i]->sid, SIDOWNER, &temp_fattr);
++			ret = sid_to_id(idmap, ace->sid, SIDOWNER, &temp_fattr);
+ 			if (ret || uid_eq(temp_fattr.cf_uid, INVALID_UID)) {
+ 				pr_err_ratelimited("%s: Error %d mapping Owner SID to uid\n",
+ 						   __func__, ret);
+@@ -627,7 +565,6 @@ static int parse_dacl(const struct mnt_idmap *idmap,
+ 	}
+ 	ret = 0;
+ out:
+-	kfree(ppace);
+ 	free_acl_state(&acl_state);
+ 	free_acl_state(&default_acl_state);
+ 	return ret;
+@@ -652,29 +589,16 @@ static bool ace_is_for_entry(const struct smb_sid *ace_sid,
+ 	       !ace_sid->sub_auth[dom->num_subauth];
+ }
+ 
+-/*
+- * Add the size of an ACE to the size of the ACEs in a DACL. Fail when the
+- * DACL with its header would no longer fit in its 16-bit size.
+- */
+-static bool dacl_add_ace_size(u16 *size, u16 ace_sz)
+-{
+-	if (*size + ace_sz > U16_MAX - sizeof(struct smb_acl))
+-		return false;
+-	*size += ace_sz;
+-	return true;
+-}
+-
+ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
+-				       struct smb_ace *pndace,
++				       struct ksmbd_sd *sd,
+ 				       struct smb_fattr *fattr, u16 *num_aces,
+-				       u16 *size, u16 existing_nt_aces,
+-				       bool had_nt_aces)
++				       u16 existing_nt_aces, bool had_nt_aces,
++				       struct smb_sid *sids)
+ {
+ 	struct posix_acl_entry *pace;
+ 	struct smb_sid *sid;
+-	struct smb_ace *ntace;
++	struct ksmbd_ace *ntace;
+ 	int i, j;
+-	u16 ace_sz;
+ 
+ 	if (!fattr->cf_acls)
+ 		goto posix_default_acl;
+@@ -684,9 +608,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
+ 		int flags = 0;
+ 		bool root = false;
+ 
+-		sid = kmalloc_obj(struct smb_sid, KSMBD_DEFAULT_GFP);
+-		if (!sid)
+-			break;
++		sid = sids++;
+ 
+ 		if (pace->e_tag == ACL_USER) {
+ 			uid_t uid;
+@@ -706,49 +628,36 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
+ 		} else if (pace->e_tag == ACL_OTHER && !had_nt_aces) {
+ 			smb_copy_sid(sid, &sid_everyone);
+ 		} else {
+-			kfree(sid);
+ 			continue;
+ 		}
+-		ntace = pndace;
+ 		for (j = 0; j < existing_nt_aces; j++) {
+-			if (ace_is_for_entry(&ntace->sid, sid, root))
+-				goto pass_same_sid;
+-			ntace = (struct smb_ace *)((char *)ntace +
+-					le16_to_cpu(ntace->size));
++			if (ace_is_for_entry(sd->aces[j].sid, sid, root))
++				break;
+ 		}
++		if (j < existing_nt_aces)
++			continue;
+ 
+ 		if (S_ISDIR(fattr->cf_mode) && pace->e_tag == ACL_OTHER)
+ 			flags = 0x03;
+ 
+-		ntace = (struct smb_ace *)((char *)pndace + *size);
+-		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
+-				pace->e_perm, 0777);
+-		if (!dacl_add_ace_size(size, ace_sz)) {
+-			kfree(sid);
+-			break;
+-		}
++		ntace = &sd->aces[*num_aces];
++		fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, flags,
++				 pace->e_perm, 0777);
+ 		(*num_aces)++;
+ 		if (pace->e_tag == ACL_USER)
+-			ntace->access_req |=
+-				FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
++			ntace->mask |=
++				le32_to_cpu(FILE_DELETE_LE | FILE_DELETE_CHILD_LE);
+ 
+ 		if (S_ISDIR(fattr->cf_mode) &&
+ 		    (pace->e_tag == ACL_USER || pace->e_tag == ACL_GROUP)) {
+-			ntace = (struct smb_ace *)((char *)pndace + *size);
+-			ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
+-					0x03, pace->e_perm, 0777);
+-			if (!dacl_add_ace_size(size, ace_sz)) {
+-				kfree(sid);
+-				break;
+-			}
++			ntace = &sd->aces[*num_aces];
++			fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED,
++					 0x03, pace->e_perm, 0777);
+ 			(*num_aces)++;
+ 			if (pace->e_tag == ACL_USER)
+-				ntace->access_req |=
+-					FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
++				ntace->mask |=
++					le32_to_cpu(FILE_DELETE_LE | FILE_DELETE_CHILD_LE);
+ 		}
+-
+-pass_same_sid:
+-		kfree(sid);
+ 	}
+ 
+ 	if (had_nt_aces)
+@@ -760,9 +669,7 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
+ 
+ 	pace = fattr->cf_dacls->a_entries;
+ 	for (i = 0; i < fattr->cf_dacls->a_count; i++, pace++) {
+-		sid = kmalloc_obj(struct smb_sid, KSMBD_DEFAULT_GFP);
+-		if (!sid)
+-			break;
++		sid = sids++;
+ 
+ 		if (pace->e_tag == ACL_USER) {
+ 			uid_t uid;
+@@ -775,215 +682,124 @@ static void set_posix_acl_entries_dacl(const struct mnt_idmap *idmap,
+ 			gid = posix_acl_gid_translate(idmap, pace);
+ 			id_to_sid(gid, SIDCREATOR_GROUP, sid);
+ 		} else {
+-			kfree(sid);
+ 			continue;
+ 		}
+ 
+-		ntace = (struct smb_ace *)((char *)pndace + *size);
+-		ace_sz = fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
+-				pace->e_perm, 0777);
+-		if (!dacl_add_ace_size(size, ace_sz)) {
+-			kfree(sid);
+-			break;
+-		}
++		ntace = &sd->aces[*num_aces];
++		fill_ace_for_sid(ntace, sid, ACCESS_ALLOWED, 0x0b,
++				 pace->e_perm, 0777);
+ 		(*num_aces)++;
+ 		if (pace->e_tag == ACL_USER)
+-			ntace->access_req |=
+-				FILE_DELETE_LE | FILE_DELETE_CHILD_LE;
+-		kfree(sid);
++			ntace->mask |=
++				le32_to_cpu(FILE_DELETE_LE | FILE_DELETE_CHILD_LE);
+ 	}
+ }
+ 
+ static void set_ntacl_dacl(const struct mnt_idmap *idmap,
+-			   struct smb_acl *pndacl,
+-			   struct smb_acl *nt_dacl,
+-			   unsigned int aces_size,
+-			   const struct smb_sid *pownersid,
+-			   const struct smb_sid *pgrpsid,
+-			   struct smb_fattr *fattr)
++			   struct ksmbd_sd *sd,
++			   const struct ksmbd_sd *nt_sd,
++			   struct smb_fattr *fattr, struct smb_sid *sids)
+ {
+-	struct smb_ace *ntace, *pndace;
+-	u16 nt_num_aces = le16_to_cpu(nt_dacl->num_aces), num_aces = 0;
++	u16 nt_num_aces = nt_sd->num_aces, num_aces = 0;
+ 	u16 copied_nt_aces;
+-	unsigned short size = 0;
+ 	int i;
+ 
+-	pndace = (struct smb_ace *)((char *)pndacl + sizeof(struct smb_acl));
+-	if (nt_num_aces) {
+-		ntace = (struct smb_ace *)((char *)nt_dacl + sizeof(struct smb_acl));
+-		for (i = 0; i < nt_num_aces; i++) {
+-			unsigned short nt_ace_size;
+-
+-			if (aces_size < offsetof(struct smb_ace, sid) +
+-					CIFS_SID_BASE_SIZE)
+-				break;
+-
+-			nt_ace_size = le16_to_cpu(ntace->size);
+-			if (nt_ace_size > aces_size ||
+-			    nt_ace_size < offsetof(struct smb_ace, sid) +
+-					  CIFS_SID_BASE_SIZE)
+-				break;
+-
+-			if (ntace->sid.num_subauth == 0 ||
+-			    ntace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
+-			    nt_ace_size < offsetof(struct smb_ace, sid) +
+-					  CIFS_SID_BASE_SIZE +
+-					  sizeof(__le32) *
+-					  ntace->sid.num_subauth)
+-				goto next_ace;
+-
+-			memcpy((char *)pndace + size, ntace, nt_ace_size);
+-			if (!dacl_add_ace_size(&size, nt_ace_size))
+-				break;
+-			num_aces++;
+-
+-next_ace:
+-			aces_size -= nt_ace_size;
+-			ntace = (struct smb_ace *)((char *)ntace + nt_ace_size);
+-		}
++	for (i = 0; i < nt_num_aces; i++) {
++		/* ksmbd leaves an object ACE out of the reply */
++		if (nt_sd->aces[i].obj_len ||
++		    nt_sd->aces[i].sid->num_subauth == 0)
++			continue;
++		sd->aces[num_aces++] = nt_sd->aces[i];
+ 	}
+ 
+ 	copied_nt_aces = num_aces;
+-	set_posix_acl_entries_dacl(idmap, pndace, fattr,
+-				   &num_aces, &size, copied_nt_aces,
+-				   nt_num_aces != 0);
+-	pndacl->num_aces = cpu_to_le16(num_aces);
+-	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
++	set_posix_acl_entries_dacl(idmap, sd, fattr,
++				   &num_aces, copied_nt_aces,
++				   nt_num_aces != 0, sids);
 +	sd->num_aces = num_aces;
-+	sd->control = parsed.control & ~SD_CONTROL_DERIVED;
-+	sd->sbz1 = parsed.sbz1;
-+	sd->dacl = parsed.dacl_state;
-+	sd->dacl_revision = 0;
-+	sd->dacl_sbz1 = 0;
-+	sd->dacl_sbz2 = 0;
-+	sd->sacl = parsed.sacl_state;
+ }
+ 
+ static void set_mode_dacl(const struct mnt_idmap *idmap,
+-			  struct smb_acl *pndacl, struct smb_fattr *fattr)
++			  struct ksmbd_sd *sd,
++			  const struct smb_sid *pownersid,
++			  const struct smb_sid *pgrpsid,
++			  struct smb_fattr *fattr, struct smb_sid *sids)
+ {
+-	struct smb_ace *pace, *pndace;
++	struct ksmbd_ace *pace;
+ 	u16 num_aces = 0;
+-	u16 size = 0, ace_size = 0;
+-	uid_t uid;
+-	const struct smb_sid *sid;
+ 
+-	pace = pndace = (struct smb_ace *)((char *)pndacl + sizeof(struct smb_acl));
++	pace = sd->aces;
+ 
+ 	if (fattr->cf_acls) {
+-		set_posix_acl_entries_dacl(idmap, pndace, fattr,
+-					   &num_aces, &size, num_aces, false);
++		set_posix_acl_entries_dacl(idmap, sd, fattr,
++					   &num_aces, num_aces, false, sids);
+ 		goto out;
+ 	}
+ 
+ 	/* owner RID */
+-	uid = from_kuid(&init_user_ns, fattr->cf_uid);
+-	if (uid)
+-		sid = &server_conf.domain_sid;
+-	else
+-		sid = &sid_unix_users;
+-	ace_size = fill_ace_for_sid(pace, sid, ACCESS_ALLOWED, 0,
+-				    fattr->cf_mode, 0700);
+-	pace->sid.sub_auth[pace->sid.num_subauth++] = cpu_to_le32(uid);
+-	pace->size = cpu_to_le16(ace_size + 4);
+-	size += le16_to_cpu(pace->size);
+-	pace = (struct smb_ace *)((char *)pndace + size);
++	fill_ace_for_sid(pace++, pownersid, ACCESS_ALLOWED, 0,
++			 fattr->cf_mode, 0700);
+ 
+ 	/* Group RID */
+-	ace_size = fill_ace_for_sid(pace, &sid_unix_groups,
+-				    ACCESS_ALLOWED, 0, fattr->cf_mode, 0070);
+-	pace->sid.sub_auth[pace->sid.num_subauth++] =
+-		cpu_to_le32(from_kgid(&init_user_ns, fattr->cf_gid));
+-	pace->size = cpu_to_le16(ace_size + 4);
+-	size += le16_to_cpu(pace->size);
+-	pace = (struct smb_ace *)((char *)pndace + size);
++	fill_ace_for_sid(pace++, pgrpsid,
++			 ACCESS_ALLOWED, 0, fattr->cf_mode, 0070);
+ 	num_aces = 3;
+ 
+ 	if (S_ISDIR(fattr->cf_mode)) {
+-		pace = (struct smb_ace *)((char *)pndace + size);
+-
+ 		/* creator owner */
+-		size += fill_ace_for_sid(pace, &creator_owner, ACCESS_ALLOWED,
+-					 0x0b, fattr->cf_mode, 0700);
+-		pace = (struct smb_ace *)((char *)pndace + size);
++		fill_ace_for_sid(pace++, &creator_owner, ACCESS_ALLOWED,
++				 0x0b, fattr->cf_mode, 0700);
+ 
+ 		/* creator group */
+-		size += fill_ace_for_sid(pace, &creator_group, ACCESS_ALLOWED,
+-					 0x0b, fattr->cf_mode, 0070);
+-		pace = (struct smb_ace *)((char *)pndace + size);
++		fill_ace_for_sid(pace++, &creator_group, ACCESS_ALLOWED,
++				 0x0b, fattr->cf_mode, 0070);
+ 		num_aces = 5;
+ 	}
+ 
+ 	/* other */
+-	size += fill_ace_for_sid(pace, &sid_everyone, ACCESS_ALLOWED, 0,
+-				 fattr->cf_mode, 0007);
++	fill_ace_for_sid(pace, &sid_everyone, ACCESS_ALLOWED, 0,
++			 fattr->cf_mode, 0007);
+ 
+ out:
+-	pndacl->num_aces = cpu_to_le16(num_aces);
+-	pndacl->size = cpu_to_le16(le16_to_cpu(pndacl->size) + size);
+-}
+-
+-static int parse_sid(struct smb_sid *psid, char *end_of_acl)
+-{
+-	/*
+-	 * validate that we do not go past end of ACL - sid must be at least 8
+-	 * bytes long (assuming no sub-auths - e.g. the null SID
+-	 */
+-	if (end_of_acl < (char *)psid + 8) {
+-		pr_err("ACL too small to parse SID %p\n", psid);
+-		return -EINVAL;
+-	}
+-
+-	if (!psid->num_subauth)
+-		return 0;
+-
+-	if (psid->num_subauth > SID_MAX_SUB_AUTHORITIES ||
+-	    end_of_acl < (char *)psid + 8 + sizeof(__le32) * psid->num_subauth)
+-		return -EINVAL;
+-
+-	return 0;
++	sd->num_aces = num_aces;
+ }
+ 
+ /* Convert CIFS ACL to POSIX form */
+ int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+-		   int acl_len, struct smb_fattr *fattr)
++		   int acl_len, struct smb_fattr *fattr, struct ksmbd_sd **psd)
+ {
+ 	int rc = 0;
+-	struct smb_sid *owner_sid_ptr = NULL, *group_sid_ptr = NULL;
+-	struct smb_acl *dacl_ptr; /* no need for SACL ptr */
+-	char *end_of_acl = ((char *)pntsd) + acl_len;
+-	__u32 dacloffset;
++	const struct smb_sid *owner_sid_ptr = NULL, *group_sid_ptr = NULL;
++	struct ksmbd_sd *sd __free(kvfree) = NULL;
+ 	int pntsd_type;
+ 
+ 	if (!pntsd)
+ 		return -EIO;
+ 
+-	if (acl_len < sizeof(struct smb_ntsd))
++	if (acl_len < (int)sizeof(struct smb_ntsd))
+ 		return -EINVAL;
+ 
+-	dacloffset = le32_to_cpu(pntsd->dacloffset);
+-	ksmbd_debug(SMB,
+-		    "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
+-		    pntsd->revision, pntsd->type, le32_to_cpu(pntsd->osidoffset),
+-		    le32_to_cpu(pntsd->gsidoffset),
+-		    le32_to_cpu(pntsd->sacloffset), dacloffset);
++	/* An SD from a client is stored whole or not at all */
++	rc = ksmbd_sd_decode((u8 *)pntsd, acl_len, &sd);
++	if (rc == -EBADMSG || (!rc && sd->sacl_dropped))
++		rc = -EINVAL;
++	if (rc)
++		return rc;
+ 
+-	pntsd_type = le16_to_cpu(pntsd->type);
+-	if (!(pntsd_type & DACL_PRESENT)) {
++	pntsd_type = sd->control;
++	if (sd->dacl == KSMBD_ACL_ABSENT) {
+ 		ksmbd_debug(SMB, "DACL_PRESENT in DACL type is not set\n");
+-		/* Without DACL_PRESENT, OffsetDacl must be 0 (MS-DTYP 2.4.6) */
+-		if (dacloffset)
+-			return -EINVAL;
++		*psd = no_free_ptr(sd);
+ 		return rc;
+ 	}
+ 
+-	pntsd->type = cpu_to_le16(DACL_PRESENT);
+-
+-	if (pntsd->osidoffset) {
+-		if (le32_to_cpu(pntsd->osidoffset) < sizeof(struct smb_ntsd) ||
+-		    le32_to_cpu(pntsd->osidoffset) >= acl_len)
+-			return -EINVAL;
+-
+-		owner_sid_ptr = (struct smb_sid *)((char *)pntsd +
+-				le32_to_cpu(pntsd->osidoffset));
+-		rc = parse_sid(owner_sid_ptr, end_of_acl);
+-		if (rc) {
+-			pr_err("%s: Error %d parsing Owner SID\n", __func__, rc);
+-			return rc;
+-		}
++	/* The stored SD keeps only the Control bits set below and no SACL */
++	sd->control = 0;
++	sd->sacl = KSMBD_ACL_ABSENT;
 +	sd->sacl_len = 0;
-+	sd->sacl_data = NULL;
-+	sd->sacl_dropped = parsed.sacl_dropped;
-+
-+	sd->owner = sd_keep_sid(&parsed.owner, kept);
-+	kept += parsed.owner.len;
-+	sd->group = sd_keep_sid(&parsed.group, kept);
-+	kept += parsed.group.len;
-+	if (parsed.dacl_state == KSMBD_ACL_PRESENT) {
-+		rc = sd_decode_dacl(sd, &parsed, &wire, kept);
-+		if (rc)
-+			return rc;
-+	}
-+	kept += wire.len;
-+	if (parsed.sacl.len) {
-+		struct sd_in copy = { .len = parsed.sacl.len, .p = kept };
-+
-+		memcpy(kept, parsed.sacl.p, parsed.sacl.len);
-+		if (sd_check_acl(&copy)) {
-+			sd->sacl = KSMBD_ACL_ABSENT;
-+			sd->sacl_dropped = true;
-+		} else {
-+			sd->sacl_len = parsed.sacl.len;
-+			sd->sacl_data = kept;
+ 
++	if (sd->owner) {
++		owner_sid_ptr = sd->owner;
+ 		rc = sid_to_id(idmap, owner_sid_ptr, SIDOWNER, fattr);
+ 		if (rc) {
+ 			ksmbd_debug(SMB, "Owner SID has no Unix uid mapping\n");
+@@ -992,19 +808,8 @@ int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+ 		}
+ 	}
+ 
+-	if (pntsd->gsidoffset) {
+-		if (le32_to_cpu(pntsd->gsidoffset) < sizeof(struct smb_ntsd) ||
+-		    le32_to_cpu(pntsd->gsidoffset) >= acl_len)
+-			return -EINVAL;
+-
+-		group_sid_ptr = (struct smb_sid *)((char *)pntsd +
+-				le32_to_cpu(pntsd->gsidoffset));
+-		rc = parse_sid(group_sid_ptr, end_of_acl);
+-		if (rc) {
+-			pr_err("%s: Error %d mapping Owner SID to gid\n",
+-			       __func__, rc);
+-			return rc;
+-		}
++	if (sd->group) {
++		group_sid_ptr = sd->group;
+ 		rc = sid_to_id(idmap, group_sid_ptr, SIDUNIX_GROUP, fattr);
+ 		if (rc) {
+ 			ksmbd_debug(SMB, "Group SID has no Unix gid mapping\n");
+@@ -1015,82 +820,34 @@ int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+ 
+ 	if ((pntsd_type & (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ)) ==
+ 	    (DACL_AUTO_INHERITED | DACL_AUTO_INHERIT_REQ))
+-		pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
++		sd->control |= DACL_AUTO_INHERITED;
+ 	if (pntsd_type & DACL_PROTECTED)
+-		pntsd->type |= cpu_to_le16(DACL_PROTECTED);
+-
+-	if (dacloffset) {
+-		if (dacloffset < sizeof(struct smb_ntsd) || dacloffset >= acl_len)
+-			return -EINVAL;
++		sd->control |= DACL_PROTECTED;
+ 
+-		dacl_ptr = (struct smb_acl *)((char *)pntsd + dacloffset);
+-		rc = parse_dacl(idmap, dacl_ptr, end_of_acl,
+-				owner_sid_ptr, group_sid_ptr, fattr);
+-		if (rc)
+-			return rc;
+-	}
++	rc = parse_dacl(idmap, sd, owner_sid_ptr, group_sid_ptr, fattr);
++	if (rc)
++		return rc;
+ 
++	*psd = no_free_ptr(sd);
+ 	return 0;
+ }
+ 
+-size_t smb_acl_sec_desc_scratch_len(struct smb_fattr *fattr,
+-		struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info)
+-{
+-	size_t len = sizeof(struct smb_ntsd);
+-	size_t tmp;
+-
+-	if (addition_info & OWNER_SECINFO)
+-		len += sizeof(struct smb_sid);
+-	if (addition_info & GROUP_SECINFO)
+-		len += sizeof(struct smb_sid);
+-	if (!(addition_info & DACL_SECINFO))
+-		return len;
+-
+-	len += sizeof(struct smb_acl);
+-	if (ppntsd && ppntsd_size > 0) {
+-		unsigned int dacl_offset = le32_to_cpu(ppntsd->dacloffset);
+-
+-		if (dacl_offset < ppntsd_size &&
+-		    check_add_overflow(len, ppntsd_size - dacl_offset, &len))
+-			return 0;
+-	}
+-
+-	if (fattr->cf_acls) {
+-		if (check_mul_overflow((size_t)fattr->cf_acls->a_count,
+-					2 * sizeof(struct smb_ace), &tmp) ||
+-		    check_add_overflow(len, tmp, &len))
+-			return 0;
+-	} else {
+-		/* default/minimum DACL */
+-		if (check_add_overflow(len, 5 * sizeof(struct smb_ace), &len))
+-			return 0;
+-	}
+-
+-	if (fattr->cf_dacls) {
+-		if (check_mul_overflow((size_t)fattr->cf_dacls->a_count,
+-					sizeof(struct smb_ace), &tmp) ||
+-		    check_add_overflow(len, tmp, &len))
+-			return 0;
+-	}
+-
+-	return len;
+-}
+-
+ /* Convert permission bits from mode to equivalent CIFS ACL */
+ int build_sec_desc(const struct mnt_idmap *idmap,
+-		   struct smb_ntsd *pntsd, struct smb_ntsd *ppntsd,
+-		   int ppntsd_size, int addition_info, __u32 *secdesclen,
++		   struct smb_ntsd **pntsd, const struct ksmbd_sd *ppntsd,
++		   int addition_info, __u32 *secdesclen,
+ 		   struct smb_fattr *fattr)
+ {
+ 	int rc = 0;
+-	__u32 offset;
+-	struct smb_sid *owner_sid_ptr, *group_sid_ptr;
+ 	struct smb_sid *nowner_sid_ptr, *ngroup_sid_ptr;
+-	struct smb_acl *dacl_ptr = NULL; /* no need for SACL ptr */
++	struct smb_sid *sids = NULL;
++	struct ksmbd_sd *sd = NULL;
++	size_t num_aces = 0, num_sids = 0, len = 0;
+ 	uid_t uid;
+ 	gid_t gid;
+ 	unsigned int sid_type = SIDOWNER;
+ 
++	*pntsd = NULL;
+ 	nowner_sid_ptr = kmalloc_obj(struct smb_sid, KSMBD_DEFAULT_GFP);
+ 	if (!nowner_sid_ptr)
+ 		return -ENOMEM;
+@@ -1109,10 +866,30 @@ int build_sec_desc(const struct mnt_idmap *idmap,
+ 	gid = from_kgid(&init_user_ns, fattr->cf_gid);
+ 	id_to_sid(gid, SIDUNIX_GROUP, ngroup_sid_ptr);
+ 
+-	offset = sizeof(struct smb_ntsd);
+-	pntsd->sacloffset = 0;
+-	pntsd->revision = cpu_to_le16(1);
+-	pntsd->type = cpu_to_le16(SELF_RELATIVE);
++	/* Room for every ACE that set_mode_dacl() or set_ntacl_dacl() adds */
++	if (addition_info & DACL_SECINFO) {
++		if (ppntsd)
++			num_aces = ppntsd->num_aces;
++		if (fattr->cf_acls) {
++			num_aces += 2 * fattr->cf_acls->a_count;
++			num_sids = fattr->cf_acls->a_count;
++		} else if (!ppntsd) {
++			num_aces = 5;
++		}
++		if (fattr->cf_dacls) {
++			num_aces += fattr->cf_dacls->a_count;
++			num_sids += fattr->cf_dacls->a_count;
 +		}
 +	}
 +
-+	*out = no_free_ptr(sd);
-+	return 0;
-+}
-+EXPORT_SYMBOL_IF_KUNIT(ksmbd_sd_decode);
-+
-+/*
-+ * Appends @len bytes to the output. A write that does not fit sets
-+ * writer->bad instead, and every later write is skipped.
-+ */
-+static void sd_put(struct sd_writer *writer, const void *src, size_t len)
-+{
-+	if (!len || writer->bad)
-+		return;
-+	if (WARN_ON_ONCE(writer->pos > writer->cap ||
-+			 len > writer->cap - writer->pos)) {
-+		writer->bad = true;
-+		return;
++	sd = kvzalloc(struct_size(sd, aces, num_aces), KSMBD_DEFAULT_GFP);
++	sids = kvmalloc_array(num_sids, sizeof(*sids), KSMBD_DEFAULT_GFP);
++	if (!sd || !sids) {
++		rc = -ENOMEM;
++		goto out;
 +	}
-+	memcpy(&writer->p[writer->pos], src, len);
-+	writer->pos += len;
-+}
-+
-+static bool sd_sid_fits(const struct smb_sid *sid)
-+{
-+	return sid->revision == SD_SID_REVISION &&
-+	       sid->num_subauth <= SID_MAX_SUB_AUTHORITIES;
-+}
-+
-+/*
-+ * Returns true if the encoder can write @ace. An object ACE must have an
-+ * object section whose length matches its Flags, and any other ACE must
-+ * have no object section.
-+ */
-+static bool sd_ace_fits(const struct ksmbd_ace *ace)
-+{
-+	enum sd_ace_layout layout = sd_ace_layout(ace->type);
-+	u32 obj_flags;
-+
-+	if (layout == SD_ACE_NONE || !ace->sid || !sd_sid_fits(ace->sid) ||
-+	    ace->data_len % SD_ALIGN || (ace->data_len && !ace->data))
-+		return false;
-+	if (layout != SD_ACE_OBJECT)
-+		return !ace->obj_len;
-+	if (!ace->obj || ace->obj_len < sizeof(obj_flags))
-+		return false;
-+	obj_flags = get_unaligned_le32(ace->obj);
-+	return !(obj_flags & ~(u32)SD_OBJ_GUID_FLAGS) &&
-+	       ace->obj_len == sd_obj_len(obj_flags);
-+}
-+
-+static size_t sd_ace_size(const struct ksmbd_ace *ace)
-+{
-+	return SD_ACE_HDR_SIZE + ace->obj_len +
-+	       sd_sid_len(ace->sid->num_subauth) + ace->data_len;
-+}
-+
-+/*
-+ * Returns true if the SACL bytes are exactly one ACL that the decoder would
-+ * accept, with nothing after it.
-+ */
-+static bool sd_sacl_fits(const struct ksmbd_sd *sd)
-+{
-+	struct sd_in sacl = { .len = sd->sacl_len, .p = sd->sacl_data };
-+	const u8 *p;
-+
-+	if (!sd->sacl_data || sd_check_acl(&sacl))
-+		return false;
-+	p = sd_in_at(&sacl, offsetof(struct smb_acl, size), sizeof(__le16));
-+	return p && get_unaligned_le16(p) == sd->sacl_len;
-+}
-+
-+static int __must_check sd_lay_out(const struct ksmbd_sd *sd,
-+				   struct sd_layout *layout)
-+{
-+	size_t off = sizeof(struct smb_ntsd), dacl_size = sizeof(struct smb_acl);
-+	unsigned int i;
-+	size_t size;
-+
-+	*layout = (struct sd_layout){};
-+	if (sd->control & SD_CONTROL_DERIVED)
-+		return -EINVAL;
-+	if ((sd->owner && !sd_sid_fits(sd->owner)) ||
-+	    (sd->group && !sd_sid_fits(sd->group)))
-+		return -EINVAL;
-+	if (sd->dacl > KSMBD_ACL_PRESENT ||
-+	    (sd->dacl != KSMBD_ACL_PRESENT && sd->num_aces))
-+		return -EINVAL;
-+	if (sd->dacl_revision && sd->dacl_revision != SD_ACL_REVISION &&
-+	    sd->dacl_revision != SD_ACL_REVISION_DS)
-+		return -EINVAL;
-+	if (sd->sacl > KSMBD_ACL_PRESENT ||
-+	    (sd->sacl != KSMBD_ACL_PRESENT && sd->sacl_len) ||
-+	    (sd->sacl == KSMBD_ACL_PRESENT && !sd_sacl_fits(sd)))
-+		return -EINVAL;
-+
-+	for (i = 0; i < sd->num_aces; i++) {
-+		const struct ksmbd_ace *ace = &sd->aces[i];
-+
-+		if (!sd_ace_fits(ace))
-+			return -EINVAL;
-+		size = sd_ace_size(ace);
-+		if (size > U16_MAX - dacl_size)
-+			return -E2BIG;
-+		dacl_size += size;
-+		if (ace->obj_len)
-+			layout->object = true;
-+	}
-+	if (sd->dacl_revision == SD_ACL_REVISION_DS)
-+		layout->object = true;
-+
-+	if (sd->owner) {
-+		layout->owner_off = off;
-+		off += sd_sid_len(sd->owner->num_subauth);
-+	}
-+	if (sd->group) {
-+		layout->group_off = off;
-+		off += sd_sid_len(sd->group->num_subauth);
-+	}
-+	if (sd->dacl == KSMBD_ACL_PRESENT) {
-+		layout->dacl_size = dacl_size;
-+		layout->dacl_off = off;
-+		off += dacl_size;
-+	}
-+	if (sd->sacl == KSMBD_ACL_PRESENT) {
-+		layout->sacl_off = off;
-+		off += ALIGN(sd->sacl_len, SD_ALIGN);
-+	}
-+	layout->total = off;
-+	return 0;
-+}
-+
-+static void sd_put_header(struct sd_writer *writer, const struct ksmbd_sd *sd,
-+			  const struct sd_layout *layout)
-+{
-+	u16 control = SELF_RELATIVE | sd->control;
-+	struct smb_ntsd hdr;
-+
-+	if (sd->dacl != KSMBD_ACL_ABSENT)
-+		control |= DACL_PRESENT;
-+	if (sd->sacl != KSMBD_ACL_ABSENT)
-+		control |= SACL_PRESENT;
-+	hdr = (struct smb_ntsd){
-+		.revision = cpu_to_le16(SD_REVISION | sd->sbz1 << SD_SBZ1_SHIFT),
-+		.type = cpu_to_le16(control),
-+		.osidoffset = cpu_to_le32(layout->owner_off),
-+		.gsidoffset = cpu_to_le32(layout->group_off),
-+		.sacloffset = cpu_to_le32(layout->sacl_off),
-+		.dacloffset = cpu_to_le32(layout->dacl_off),
-+	};
-+	sd_put(writer, &hdr, sizeof(hdr));
-+}
-+
-+static void sd_put_ace(struct sd_writer *writer, const struct ksmbd_ace *ace)
-+{
-+	size_t sid_len = sd_sid_len(ace->sid->num_subauth);
-+	size_t size = sd_ace_size(ace);
-+	u8 *p;
-+
-+	if (writer->bad)
-+		return;
-+	if (WARN_ON_ONCE(writer->pos > writer->cap ||
-+			 size > writer->cap - writer->pos)) {
-+		writer->bad = true;
-+		return;
-+	}
-+	p = &writer->p[writer->pos];
-+	p[offsetof(struct smb_ace, type)] = ace->type;
-+	p[offsetof(struct smb_ace, flags)] = ace->flags;
-+	put_unaligned_le16(size, &p[offsetof(struct smb_ace, size)]);
-+	put_unaligned_le32(ace->mask, &p[offsetof(struct smb_ace, access_req)]);
-+	p += SD_ACE_HDR_SIZE;
-+	if (ace->obj_len) {
-+		memcpy(p, ace->obj, ace->obj_len);
-+		p += ace->obj_len;
-+	}
-+	memcpy(p, ace->sid, sid_len);
-+	if (ace->data_len)
-+		memcpy(p + sid_len, ace->data, ace->data_len);
-+	writer->pos += size;
-+}
-+
-+static void sd_put_dacl(struct sd_writer *writer, const struct ksmbd_sd *sd,
-+			const struct sd_layout *layout)
-+{
-+	u16 rev = layout->object ? SD_ACL_REVISION_DS : SD_ACL_REVISION;
-+	const struct smb_acl acl = {
-+		.revision = cpu_to_le16(rev | sd->dacl_sbz1 << SD_SBZ1_SHIFT),
-+		.size = cpu_to_le16(layout->dacl_size),
-+		.num_aces = cpu_to_le16(sd->num_aces),
-+		.reserved = cpu_to_le16(sd->dacl_sbz2),
-+	};
-+	unsigned int i;
-+
-+	sd_put(writer, &acl, sizeof(acl));
-+	for (i = 0; i < sd->num_aces; i++)
-+		sd_put_ace(writer, &sd->aces[i]);
-+}
-+
-+/**
-+ * ksmbd_sd_encode() - encode a security descriptor
-+ * @sd:		the SD to encode, which must not change during the call
-+ * @buf:	set to the encoded SD on success and to NULL on error. The
-+ *		caller frees it with kvfree().
-+ * @len:	set to the length of *@buf in bytes on success and to 0 on
-+ *		error
-+ *
-+ * The owner and the group are written if @sd has them. An ACL is written
-+ * if its state is KSMBD_ACL_PRESENT.
-+ *
-+ * The Control field is written as the bits in @sd plus SELF_RELATIVE, plus
-+ * DACL_PRESENT and SACL_PRESENT for each ACL whose state is not
-+ * KSMBD_ACL_ABSENT.
-+ *
-+ * The DACL is written with revision 4 if it contains an object ACE or if
-+ * dacl_revision in @sd is 4, and with revision 2 otherwise.
-+ *
-+ * Return:
-+ * * 0 - success
-+ * * -EINVAL - @sd is not valid. It has a field that is out of range, an ACE
-+ *   with no SID, a SID, ACE, or SACL that the decoder would refuse, or ACEs
-+ *   or SACL bytes for an ACL whose state is not KSMBD_ACL_PRESENT.
-+ * * -E2BIG - the DACL would be larger than U16_MAX bytes
-+ * * -ENOMEM - the output buffer could not be allocated
-+ * * -EIO - the bytes written do not match the layout that was computed,
-+ *   which means a bug in the encoder or a change to @sd during the call.
-+ *   A warning is logged.
-+ */
-+int ksmbd_sd_encode(const struct ksmbd_sd *sd, u8 **buf, size_t *len)
-+{
-+	struct sd_layout layout;
-+	struct sd_writer writer;
-+	u8 *bytes;
-+	int rc;
-+
-+	*buf = NULL;
-+	*len = 0;
-+	rc = sd_lay_out(sd, &layout);
-+	if (rc)
-+		return rc;
-+	bytes = kvzalloc(layout.total, KSMBD_DEFAULT_GFP);
-+	if (!bytes)
-+		return -ENOMEM;
-+	writer = (struct sd_writer){ .cap = layout.total, .p = bytes };
-+	sd_put_header(&writer, sd, &layout);
-+	if (layout.owner_off)
-+		sd_put(&writer, sd->owner, sd_sid_len(sd->owner->num_subauth));
-+	if (layout.group_off)
-+		sd_put(&writer, sd->group, sd_sid_len(sd->group->num_subauth));
-+	if (layout.dacl_off)
-+		sd_put_dacl(&writer, sd, &layout);
-+	if (layout.sacl_off) {
-+		sd_put(&writer, sd->sacl_data, sd->sacl_len);
-+		/* The padding is already zero, because the buffer was zeroed */
-+		writer.pos = ALIGN(writer.pos, SD_ALIGN);
-+	}
-+	if (WARN_ON_ONCE(writer.bad || writer.pos != layout.total)) {
-+		kvfree(bytes);
-+		return -EIO;
-+	}
-+	*buf = bytes;
-+	*len = layout.total;
-+	return 0;
-+}
-+EXPORT_SYMBOL_IF_KUNIT(ksmbd_sd_encode);
-diff --git a/fs/smb/server/secdesc.h b/fs/smb/server/secdesc.h
-new file mode 100644
-index 000000000000..32675d2b0c8d
---- /dev/null
-+++ b/fs/smb/server/secdesc.h
-@@ -0,0 +1,66 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/* Security descriptor decoder and encoder (MS-DTYP 2.4.6) */
-+
-+#ifndef __KSMBD_SECDESC_H
-+#define __KSMBD_SECDESC_H
-+
-+#include <linux/types.h>
-+
-+#include "../common/smbacl.h"
-+
-+enum ksmbd_acl_state {
-+	KSMBD_ACL_ABSENT,	/* DACL_PRESENT or SACL_PRESENT is clear */
-+	KSMBD_ACL_NULL,		/* the bit is set and there is no ACL */
-+	KSMBD_ACL_PRESENT,	/* the bit is set and there is an ACL */
-+};
-+
-+struct ksmbd_ace {
-+	u8	type;
-+	u8	flags;
-+	u32	mask;
-+	const struct smb_sid *sid;
-+
-+	/*
-+	 * Kept for the encoder, as ksmbd reads neither: the Flags and GUIDs
-+	 * of an object type (MS-DTYP 2.4.4.3), and what follows the SID,
-+	 * such as the ApplicationData of a callback type. An ACE is of an
-+	 * object type if and only if @obj_len is not 0.
-+	 */
-+	const u8 *obj __counted_by_ptr(obj_len);
-+	const u8 *data __counted_by_ptr(data_len);
-+	u16	obj_len;
-+	u16	data_len;
-+};
-+
-+struct ksmbd_sd {
-+	const struct smb_sid *owner;
-+	const struct smb_sid *group;
-+	/*
-+	 * The Control bits other than SELF_RELATIVE, DACL_PRESENT, and
-+	 * SACL_PRESENT. The encoder sets those three itself.
-+	 */
-+	u16	control;
-+	enum ksmbd_acl_state dacl;
-+
-+	/* Kept for the encoder, as ksmbd reads none of these */
-+	const u8 *sacl_data __counted_by_ptr(sacl_len);
-+	u16	sacl_len;
-+	enum ksmbd_acl_state sacl;
-+	u8	sbz1;
-+	u8	dacl_revision;
-+	u8	dacl_sbz1;
-+	u16	dacl_sbz2;
-+
-+	/* The decoder left out a SACL that was malformed */
-+	bool	sacl_dropped;
-+
-+	unsigned int num_aces;		/* of the DACL */
-+	struct ksmbd_ace aces[] __counted_by(num_aces);
-+};
-+
-+int __must_check ksmbd_sd_decode(const u8 *buf, size_t len,
-+				 struct ksmbd_sd **out);
-+int __must_check ksmbd_sd_encode(const struct ksmbd_sd *sd, u8 **buf,
-+				 size_t *len);
-+
-+#endif /* __KSMBD_SECDESC_H */
-diff --git a/fs/smb/server/tests/Makefile b/fs/smb/server/tests/Makefile
-index 8738ab0b0667..753b09cde4a7 100644
---- a/fs/smb/server/tests/Makefile
-+++ b/fs/smb/server/tests/Makefile
-@@ -2,3 +2,6 @@
- # Copyright (C) 2026 Hang Nan <nanx95726@gmail.com>
- 
- obj-$(CONFIG_SMB_SERVER_KUNIT_TESTS) += smbacl_kunit.o
-+
-+ksmbd_secdesc_kunit-y := secdesc_kunit.o
-+obj-$(CONFIG_SMB_SERVER_KUNIT_TESTS) += ksmbd_secdesc_kunit.o
-diff --git a/fs/smb/server/tests/secdesc_kunit.c b/fs/smb/server/tests/secdesc_kunit.c
-new file mode 100644
-index 000000000000..4308ffcce978
---- /dev/null
-+++ b/fs/smb/server/tests/secdesc_kunit.c
-@@ -0,0 +1,879 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * KUnit tests for the security descriptor decoder and encoder.
-+ *
-+ * The SDs are fixed bytes. Most cases use base_sd. t_base_fields() gives the
-+ * same SD as a struct ksmbd_sd filled in by hand, and a malformed SD is
-+ * base_sd with one byte changed.
-+ *
-+ * base_sd and its parts come first, then the helpers, and then the test
-+ * cases in the order they run. The data that only one case uses is just
-+ * above that case.
-+ */
-+
-+#include <kunit/test.h>
-+#include <linux/array_size.h>
-+#include <linux/errno.h>
-+#include <linux/limits.h>
-+#include <linux/overflow.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
-+#include <asm/byteorder.h>
-+
-+#include "../smbacl.h"
-+#include "../secdesc.h"
-+
-+/*
-+ * Offsets of the fields in the structures of MS-DTYP 2.4.6, 2.4.5, 2.4.4,
-+ * and 2.4.2.2
-+ */
-+enum {
-+	O_SD_REVISION = 0, O_SD_CONTROL = 2, O_SD_OWNER = 4, O_SD_GROUP = 8,
-+	O_SD_SACL = 12, O_SD_DACL = 16, O_SD_HDR_LEN = 20,
-+	O_ACL_REVISION = 0, O_ACL_SIZE = 2, O_ACL_COUNT = 4, O_ACL_HDR_LEN = 8,
-+	O_ACE_TYPE = 0, O_ACE_SIZE = 2, O_ACE_MASK = 4, O_ACE_OBJ_FLAGS = 8,
-+	O_SID_REVISION = 0, O_SID_COUNT = 1, O_SID_AUTHORITY = 7,
-+};
-+
-+/*
-+ * An SD with every part: an owner, a group, a DACL with a plain allow ACE,
-+ * a plain deny ACE, an object ACE and a callback ACE, and a SACL with an
-+ * audit ACE and a label ACE. It is laid out as the encoder writes an SD,
-+ * which is owner, group, DACL, and SACL.
-+ */
-+static const u8 base_sd[] = {
-+	/*
-+	 * the header: Control SR|DI|SP|DP, owner at 20, group at 48, SACL
-+	 * at 204, DACL at 76
-+	 */
-+	0x01, 0x00, 0x14, 0x84, 0x14, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00,
-+	0xcc, 0x00, 0x00, 0x00, 0x4c, 0x00, 0x00, 0x00,
-+	/* the owner S-1-5-21-1-2-3-1000 */
-+	0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00,
-+	0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0xe8, 0x03, 0x00, 0x00,
-+	/* the group S-1-5-21-1-2-3-513 */
-+	0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00,
-+	0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0x01, 0x02, 0x00, 0x00,
-+	/* the DACL: revision 4, 128 bytes, 4 ACEs */
-+	0x04, 0x00, 0x80, 0x00, 0x04, 0x00, 0x00, 0x00,
-+	/* allow, OI|CI, 36 bytes, 0x1f01ff, S-1-5-21-1-2-3-1000 */
-+	0x00, 0x03, 0x24, 0x00, 0xff, 0x01, 0x1f, 0x00, 0x01, 0x05, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-+	0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0xe8, 0x03, 0x00, 0x00,
-+	/* deny, 20 bytes, 0x2, S-1-1-0 */
-+	0x01, 0x00, 0x14, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	/* allow object, 40 bytes, 0x10, Flags 1 and a GUID, S-1-1-0 */
-+	0x05, 0x00, 0x28, 0x00, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
-+	0x3c, 0x3d, 0x3e, 0x3f, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-+	0x00, 0x00, 0x00, 0x00,
-+	/* allow callback, 24 bytes, 0x1, S-1-1-0, 4 bytes of data */
-+	0x09, 0x00, 0x18, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/* the SACL: revision 2, 48 bytes, 2 ACEs */
-+	0x02, 0x00, 0x30, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	/* audit, 0x80, 20 bytes, 0x10000, S-1-1-0 */
-+	0x02, 0x80, 0x14, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	/* mandatory label, 20 bytes, 0x1, S-1-16-8192 */
-+	0x11, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x00,
-+};
-+
-+/* Where the parts of base_sd start */
-+enum {
-+	B_OWNER	= 20,
-+	B_DACL	= 76,
-+	B_ACE0	= 84,
-+	B_ACE1	= 120,
-+	B_ACE2	= 140,
-+	B_ACE3	= 180,
-+	B_SACL	= 204,
-+	B_SACE0	= 212,
-+};
-+
-+static const struct smb_sid base_owner = {
-+	1, 5, {0, 0, 0, 0, 0, 5},
-+	{cpu_to_le32(21), cpu_to_le32(1), cpu_to_le32(2), cpu_to_le32(3),
-+	 cpu_to_le32(1000)} };
-+static const struct smb_sid base_group = {
-+	1, 5, {0, 0, 0, 0, 0, 5},
-+	{cpu_to_le32(21), cpu_to_le32(1), cpu_to_le32(2), cpu_to_le32(3),
-+	 cpu_to_le32(513)} };
-+static const struct smb_sid everyone = { 1, 1, {0, 0, 0, 0, 0, 1}, {0} };
-+
-+/* The object section of ACE 2 of base_sd: Flags 1 and one GUID */
-+static const u8 base_obj[20] = {
-+	0x01, 0x00, 0x00, 0x00,
-+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
-+	0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f,
-+};
-+
-+/* The data after the SID of ACE 3 of base_sd (MS-DTYP 2.4.4.17) */
-+static const u8 base_data[4] = { 'a', 'r', 't', 'x' };
-+
-+static void t_sd_free(void *sd)
-+{
-+	kvfree(sd);
-+}
-+
-+/* Arranges for @sd to be freed when the test case ends, and returns it */
-+static struct ksmbd_sd *t_keep_sd(struct kunit *test, struct ksmbd_sd *sd)
-+{
-+	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, t_sd_free, sd), 0);
-+	return sd;
-+}
-+
-+/*
-+ * Returns a zeroed SD with room for @num_aces ACEs. It is freed when the
-+ * test case ends.
-+ */
-+static struct ksmbd_sd *t_alloc(struct kunit *test, size_t num_aces)
-+{
-+	struct ksmbd_sd *sd = kvzalloc(struct_size(sd, aces, num_aces), GFP_KERNEL);
-+
-+	KUNIT_ASSERT_NOT_NULL(test, sd);
 +	sd->num_aces = num_aces;
-+	return t_keep_sd(test, sd);
-+}
 +
-+/* Returns a copy of base_sd that a test can change */
-+static u8 *t_base_copy(struct kunit *test)
-+{
-+	u8 *buf = kunit_kzalloc(test, sizeof(base_sd), GFP_KERNEL);
-+
-+	KUNIT_ASSERT_NOT_NULL(test, buf);
-+	memcpy(buf, base_sd, sizeof(base_sd));
-+	return buf;
-+}
-+
-+/* Returns base_sd as a caller of the encoder would fill it in */
-+static struct ksmbd_sd *t_base_fields(struct kunit *test)
-+{
-+	struct ksmbd_sd *sd = t_alloc(test, 4);
-+
-+	sd->owner = &base_owner;
-+	sd->group = &base_group;
-+	sd->control = DACL_AUTO_INHERITED;
-+	sd->dacl = KSMBD_ACL_PRESENT;
-+	sd->dacl_revision = 4;
-+	sd->aces[0] = (struct ksmbd_ace){
-+		.type = ACCESS_ALLOWED_ACE_TYPE,
-+		.flags = OBJECT_INHERIT_ACE | CONTAINER_INHERIT_ACE,
-+		.mask = 0x001f01ff, .sid = &base_owner,
-+	};
-+	sd->aces[1] = (struct ksmbd_ace){
-+		.type = ACCESS_DENIED_ACE_TYPE, .mask = 0x2, .sid = &everyone,
-+	};
-+	sd->aces[2] = (struct ksmbd_ace){
-+		.type = ACCESS_ALLOWED_OBJECT_ACE_TYPE, .mask = 0x10,
-+		.sid = &everyone, .obj_len = sizeof(base_obj), .obj = base_obj,
-+	};
-+	sd->aces[3] = (struct ksmbd_ace){
-+		.type = ACCESS_ALLOWED_CALLBACK_ACE_TYPE, .mask = 0x1,
-+		.sid = &everyone, .data_len = sizeof(base_data), .data = base_data,
-+	};
-+	sd->sacl = KSMBD_ACL_PRESENT;
-+	sd->sacl_len = sizeof(base_sd) - B_SACL;
-+	sd->sacl_data = &base_sd[B_SACL];
-+	return sd;
-+}
-+
-+/* Decodes bytes that the decoder must accept with nothing left out */
-+static struct ksmbd_sd *t_decode(struct kunit *test, const u8 *buf, size_t len)
-+{
-+	struct ksmbd_sd *sd = NULL;
-+
-+	KUNIT_ASSERT_EQ(test, ksmbd_sd_decode(buf, len, &sd), 0);
-+	KUNIT_ASSERT_NOT_NULL(test, sd);
-+	KUNIT_EXPECT_FALSE(test, sd->sacl_dropped);
-+	return t_keep_sd(test, sd);
-+}
-+
-+/*
-+ * Calls the encoder and returns what it returns. On an error the encoder
-+ * must leave no buffer and a length of 0.
-+ */
-+static int t_try_encode(struct kunit *test, const struct ksmbd_sd *sd)
-+{
-+	u8 *buf = (u8 *)sd;
-+	size_t len = 7;
-+	int rc = ksmbd_sd_encode(sd, &buf, &len);
-+
-+	if (rc) {
-+		KUNIT_EXPECT_NULL(test, buf);
-+		KUNIT_EXPECT_EQ(test, len, 0);
-+	} else {
-+		kvfree(buf);
-+	}
-+	return rc;
-+}
-+
-+/* Expects the encoder to write exactly @want for @sd */
-+static void t_expect_encoding(struct kunit *test, const struct ksmbd_sd *sd,
-+			      const u8 *want, size_t want_len)
-+{
-+	size_t len = 0;
-+	u8 *buf = NULL;
-+	int rc = ksmbd_sd_encode(sd, &buf, &len);
-+
-+	KUNIT_EXPECT_EQ(test, rc, 0);
-+	if (!rc) {
-+		KUNIT_EXPECT_EQ(test, len, want_len);
-+		if (len == want_len)
-+			KUNIT_EXPECT_MEMEQ(test, buf, want, len);
-+	}
-+	kvfree(buf);
-+}
-+
-+/* Returns true if both are the same SID, or if neither is there */
-+static bool t_sid_same(const struct smb_sid *sid, const struct smb_sid *want)
-+{
-+	if (!sid || !want)
-+		return sid == want;
-+	return sid->num_subauth == want->num_subauth &&
-+	       !memcmp(sid, want, CIFS_SID_BASE_SIZE + 4 * want->num_subauth);
-+}
-+
-+/*
-+ * Returns true if both are the same bytes. A pointer with no bytes behind
-+ * it has to be NULL.
-+ */
-+static bool t_bytes_same(const u8 *p, size_t len, const u8 *want, size_t want_len)
-+{
-+	return len == want_len && !p == !len && (!len || !memcmp(p, want, len));
-+}
-+
-+/*
-+ * Expects @sd to have the fields of @want, and the same bytes behind each
-+ * pointer
-+ */
-+static void t_expect_same(struct kunit *test, const struct ksmbd_sd *sd,
-+			  const struct ksmbd_sd *want)
-+{
-+	unsigned int i;
-+
-+	KUNIT_EXPECT_TRUE(test, t_sid_same(sd->owner, want->owner));
-+	KUNIT_EXPECT_TRUE(test, t_sid_same(sd->group, want->group));
-+	KUNIT_EXPECT_EQ(test, sd->control, want->control);
-+	KUNIT_EXPECT_EQ(test, sd->sbz1, want->sbz1);
-+	KUNIT_EXPECT_EQ(test, (int)sd->dacl, (int)want->dacl);
-+	KUNIT_EXPECT_EQ(test, sd->dacl_revision, want->dacl_revision);
-+	KUNIT_EXPECT_EQ(test, sd->dacl_sbz1, want->dacl_sbz1);
-+	KUNIT_EXPECT_EQ(test, sd->dacl_sbz2, want->dacl_sbz2);
-+	KUNIT_EXPECT_EQ(test, (int)sd->sacl, (int)want->sacl);
-+	KUNIT_EXPECT_EQ(test, sd->sacl_dropped, want->sacl_dropped);
-+	KUNIT_EXPECT_TRUE(test, t_bytes_same(sd->sacl_data, sd->sacl_len,
-+					     want->sacl_data, want->sacl_len));
-+	KUNIT_ASSERT_EQ(test, sd->num_aces, want->num_aces);
-+	for (i = 0; i < sd->num_aces; i++) {
-+		const struct ksmbd_ace *a = &sd->aces[i], *w = &want->aces[i];
-+
-+		KUNIT_EXPECT_TRUE_MSG(test, a->type == w->type &&
-+				      a->flags == w->flags && a->mask == w->mask &&
-+				      t_sid_same(a->sid, w->sid), "ACE %u", i);
-+		KUNIT_EXPECT_TRUE_MSG(test, t_bytes_same(a->obj, a->obj_len,
-+							 w->obj, w->obj_len),
-+				      "object section of ACE %u", i);
-+		KUNIT_EXPECT_TRUE_MSG(test, t_bytes_same(a->data, a->data_len,
-+							 w->data, w->data_len),
-+				      "data of ACE %u", i);
-+	}
-+}
-+
-+/*
-+ * Decode base_sd and compare the result with t_base_fields(). Then encode
-+ * the struct of t_base_fields(), which no decoder made, and compare the
-+ * bytes with base_sd.
-+ */
-+static void ksmbd_sd_decode_encode_base_test(struct kunit *test)
-+{
-+	struct ksmbd_sd *want = t_base_fields(test);
-+
-+	t_expect_same(test, t_decode(test, base_sd, sizeof(base_sd)), want);
-+	t_expect_encoding(test, want, base_sd, sizeof(base_sd));
-+}
-+
-+/*
-+ * base_sd in another layout that MS-DTYP 2.4.6 allows. The parts are in
-+ * the order SACL, DACL, owner, and group, with unused bytes between them
-+ * and after the last ACE of the DACL, and the DACL has revision 2 although
-+ * it holds an object ACE. It decodes to the same SD as base_sd.
-+ */
-+static const u8 base_other_layout[] = {
-+	/*
-+	 * the header: Control SR|DI|SP|DP, owner at 205, group at 241, SACL
-+	 * at 20, DACL at 71
-+	 */
-+	0x01, 0x00, 0x14, 0x84, 0xcd, 0x00, 0x00, 0x00, 0xf1, 0x00, 0x00, 0x00,
-+	0x14, 0x00, 0x00, 0x00, 0x47, 0x00, 0x00, 0x00,
-+	/* the SACL: revision 2, 48 bytes, 2 ACEs */
-+	0x02, 0x00, 0x30, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	/* audit, 0x80, 20 bytes, 0x10000, S-1-1-0 */
-+	0x02, 0x80, 0x14, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	/* mandatory label, 20 bytes, 0x1, S-1-16-8192 */
-+	0x11, 0x00, 0x14, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x00,
-+	/* 3 unused bytes */
-+	0xa5, 0xa5, 0xa5,
-+	/* the DACL: revision 2, 134 bytes, 4 ACEs */
-+	0x02, 0x00, 0x86, 0x00, 0x04, 0x00, 0x00, 0x00,
-+	/* allow, OI|CI, 36 bytes, 0x1f01ff, S-1-5-21-1-2-3-1000 */
-+	0x00, 0x03, 0x24, 0x00, 0xff, 0x01, 0x1f, 0x00, 0x01, 0x05, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-+	0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0xe8, 0x03, 0x00, 0x00,
-+	/* deny, 20 bytes, 0x2, S-1-1-0 */
-+	0x01, 0x00, 0x14, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	/* allow object, 40 bytes, 0x10, Flags 1 and a GUID, S-1-1-0 */
-+	0x05, 0x00, 0x28, 0x00, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
-+	0x3c, 0x3d, 0x3e, 0x3f, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-+	0x00, 0x00, 0x00, 0x00,
-+	/* allow callback, 24 bytes, 0x1, S-1-1-0, 4 bytes of data */
-+	0x09, 0x00, 0x18, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/* 6 unused bytes of the DACL */
-+	0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
-+	/* the owner S-1-5-21-1-2-3-1000 */
-+	0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00,
-+	0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0xe8, 0x03, 0x00, 0x00,
-+	/* 8 unused bytes */
-+	0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5,
-+	/* the group S-1-5-21-1-2-3-513 */
-+	0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00,
-+	0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0x01, 0x02, 0x00, 0x00,
-+	/* 5 unused bytes */
-+	0xa5, 0xa5, 0xa5, 0xa5, 0xa5,
-+};
-+
-+/*
-+ * DACL_PRESENT with no DACL, and OWNER_DEFAULTED and GROUP_DEFAULTED with no
-+ * SID
-+ */
-+static const u8 null_dacl_sd[] = {
-+	/*
-+	 * the header: Control SR|DP|GD|OD, no owner, no group, no SACL, no
-+	 * DACL
-+	 */
-+	0x01, 0x00, 0x07, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+};
-+
-+/* No DACL, an owner, a nonzero Sbz1, and every Control bit that is kept */
-+static const u8 no_dacl_sd[] = {
-+	/*
-+	 * the header: Control 0xffeb, Sbz1 0x5a, owner at 20, no group, no
-+	 * SACL, no DACL
-+	 */
-+	0x01, 0x5a, 0xeb, 0xff, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	/* the owner S-1-5-21-1-2-3-1000 */
-+	0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00,
-+	0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0xe8, 0x03, 0x00, 0x00,
-+};
-+
-+/* A group, a DACL with no ACE, and SACL_PRESENT with no SACL */
-+static const u8 empty_dacl_sd[] = {
-+	/*
-+	 * the header: Control SR|SP|DP, no owner, group at 20, no SACL,
-+	 * DACL at 48
-+	 */
-+	0x01, 0x00, 0x14, 0x80, 0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00,
-+	/* the group S-1-5-21-1-2-3-513 */
-+	0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x15, 0x00, 0x00, 0x00,
-+	0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0x01, 0x02, 0x00, 0x00,
-+	/* the DACL: revision 2, 8 bytes, 0 ACEs */
-+	0x02, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
-+};
-+
-+/*
-+ * An owner and a group with 15 sub-authorities each, ACEs whose SIDs have
-+ * none and 15, and an empty SACL with two unused bytes
-+ */
-+static const u8 sids_sd[] = {
-+	/*
-+	 * the header: Control SR|SP|DP, owner at 20, group at 88, SACL at
-+	 * 256, DACL at 156
-+	 */
-+	0x01, 0x00, 0x14, 0x80, 0x14, 0x00, 0x00, 0x00, 0x58, 0x00, 0x00, 0x00,
-+	0x00, 0x01, 0x00, 0x00, 0x9c, 0x00, 0x00, 0x00,
-+	/* the owner S-1-5-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15 */
-+	0x01, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x01, 0x00, 0x00, 0x00,
-+	0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00,
-+	0x05, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00,
-+	0x08, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00,
-+	0x0b, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x0d, 0x00, 0x00, 0x00,
-+	0x0e, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
-+	/* the group S-1-5-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15 */
-+	0x01, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x01, 0x00, 0x00, 0x00,
-+	0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00,
-+	0x05, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00,
-+	0x08, 0x00, 0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00,
-+	0x0b, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x0d, 0x00, 0x00, 0x00,
-+	0x0e, 0x00, 0x00, 0x00, 0x0f, 0x00, 0x00, 0x00,
-+	/* the DACL: revision 2, 100 bytes, 2 ACEs */
-+	0x02, 0x00, 0x64, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	/* allow, 16 bytes, 0x1, S-1-5 */
-+	0x00, 0x00, 0x10, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x05,
-+	/* deny, 76 bytes, 0x2, S-1-5-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15 */
-+	0x01, 0x00, 0x4c, 0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x0f, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x05, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
-+	0x06, 0x00, 0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00,
-+	0x09, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x0b, 0x00, 0x00, 0x00,
-+	0x0c, 0x00, 0x00, 0x00, 0x0d, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00, 0x00,
-+	0x0f, 0x00, 0x00, 0x00,
-+	/* the SACL: revision 2, 10 bytes, 0 ACEs */
-+	0x02, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	/* 2 unused bytes of the SACL */
-+	0xee, 0xee,
-+	/* 2 unused bytes */
-+	0x00, 0x00,
-+};
-+
-+/*
-+ * A plain ACE with data after its SID and with the one AceFlags bit that
-+ * MS-DTYP 2.4.4.1 does not define (0x20), and nonzero reserved fields in
-+ * the DACL
-+ */
-+static const u8 ace_fields_sd[] = {
-+	/* the header: Control SR|DP, no owner, no group, no SACL, DACL at 20 */
-+	0x01, 0x00, 0x04, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00,
-+	/* the DACL: revision 2, 52 bytes, 2 ACEs, Sbz1 7, Sbz2 0x1234 */
-+	0x02, 0x07, 0x34, 0x00, 0x02, 0x00, 0x34, 0x12,
-+	/* allow, 0xa0, 24 bytes, 0x120089, S-1-1-0, 4 bytes of data */
-+	0x00, 0xa0, 0x18, 0x00, 0x89, 0x00, 0x12, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/* deny, CI|IO, 20 bytes, 0x10000, S-1-3-4 */
-+	0x01, 0x0a, 0x14, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00,
-+};
-+
-+/*
-+ * The object and callback layouts (MS-DTYP 2.4.4.3 and 2.4.4.5 to 2.4.4.9):
-+ * object ACEs with no GUID, one GUID of each kind, and both, with and
-+ * without data
-+ */
-+static const u8 layouts_sd[] = {
-+	/* the header: Control SR|DP, no owner, no group, no SACL, DACL at 20 */
-+	0x01, 0x00, 0x04, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00,
-+	/* the DACL: revision 4, 220 bytes, 6 ACEs */
-+	0x04, 0x00, 0xdc, 0x00, 0x06, 0x00, 0x00, 0x00,
-+	/* deny object, 24 bytes, 0x1, Flags 0 and no GUID, S-1-3-4 */
-+	0x06, 0x00, 0x18, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00,
-+	/*
-+	 * allow callback object, 60 bytes, 0x2, Flags 3 and two GUIDs,
-+	 * S-1-1-0, 4 bytes of data
-+	 */
-+	0x0b, 0x00, 0x3c, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00,
-+	0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b,
-+	0x3c, 0x3d, 0x3e, 0x3f, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
-+	0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/* deny callback, 24 bytes, 0x4, S-1-1-0, 4 bytes of data */
-+	0x0a, 0x00, 0x18, 0x00, 0x04, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/*
-+	 * deny callback object, 28 bytes, 0x8, Flags 0 and no GUID,
-+	 * S-1-1-0, 4 bytes of data
-+	 */
-+	0x0c, 0x00, 0x1c, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	0x61, 0x72, 0x74, 0x78,
-+	/*
-+	 * allow object, 56 bytes, 0x10, Flags 2 and a GUID,
-+	 * S-1-5-21-1-2-3-1000
-+	 */
-+	0x05, 0x00, 0x38, 0x00, 0x10, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
-+	0x4c, 0x4d, 0x4e, 0x4f, 0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
-+	0x15, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	0x03, 0x00, 0x00, 0x00, 0xe8, 0x03, 0x00, 0x00,
-+	/* allow, 20 bytes, 0x20, S-1-3-4 */
-+	0x00, 0x00, 0x14, 0x00, 0x20, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x03, 0x04, 0x00, 0x00, 0x00,
-+};
-+
-+/*
-+ * The seven ACE types meant for a SACL (MS-DTYP 2.4.4.10 to 2.4.4.16), in a
-+ * DACL
-+ */
-+static const u8 sacl_types_sd[] = {
-+	/* the header: Control SR|DP, no owner, no group, no SACL, DACL at 20 */
-+	0x01, 0x00, 0x04, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00,
-+	/* the DACL: revision 4, 184 bytes, 7 ACEs */
-+	0x04, 0x00, 0xb8, 0x00, 0x07, 0x00, 0x00, 0x00,
-+	/* audit, 0xc0, 20 bytes, 0x10000, S-1-1-0 */
-+	0x02, 0xc0, 0x14, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	/* audit object, 40 bytes, 0x1, Flags 2 and a GUID, S-1-1-0 */
-+	0x07, 0x00, 0x28, 0x00, 0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-+	0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
-+	0x4c, 0x4d, 0x4e, 0x4f, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-+	0x00, 0x00, 0x00, 0x00,
-+	/* audit callback, 24 bytes, 0x1, S-1-1-0, 4 bytes of data */
-+	0x0d, 0x00, 0x18, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/*
-+	 * audit callback object, 28 bytes, 0x1, Flags 0 and no GUID,
-+	 * S-1-1-0, 4 bytes of data
-+	 */
-+	0x0f, 0x00, 0x1c, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
-+	0x61, 0x72, 0x74, 0x78,
-+	/* resource attribute, 24 bytes, 0x0, S-1-1-0, 4 bytes of data */
-+	0x12, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x78,
-+	/* scoped policy, 20 bytes, 0x0, S-1-17-9 */
-+	0x13, 0x00, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x11, 0x09, 0x00, 0x00, 0x00,
-+	/* mandatory label, 20 bytes, 0x7, S-1-16-28672 */
-+	0x11, 0x00, 0x14, 0x00, 0x07, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x10, 0x00, 0x70, 0x00, 0x00,
-+};
-+
-+/*
-+ * An SD the decoder accepts, with the states and ACE count it decodes to.
-+ * The SDs are rows of a table so that one test function runs for each and
-+ * KUnit reports each as its own case, by name.
-+ */
-+struct t_accept {
-+	const char *name;
-+	const u8 *sd;
-+	size_t	len;
-+	/* What the encoder writes for it, if not the same bytes */
-+	const u8 *encoded;
-+	size_t	encoded_len;
-+	u8	dacl, sacl;
-+	u16	num_aces;
-+};
-+
-+static const struct t_accept accepts[] = {
-+	{ .name = "2.4.6 any order and unused bytes, 2.4.5 revision 2",
-+	  .sd = base_other_layout, .len = sizeof(base_other_layout),
-+	  .encoded = base_sd, .encoded_len = sizeof(base_sd),
-+	  .dacl = KSMBD_ACL_PRESENT, .sacl = KSMBD_ACL_PRESENT, .num_aces = 4 },
-+	{ .name = "2.4.6 NULL DACL",
-+	  .sd = null_dacl_sd, .len = sizeof(null_dacl_sd),
-+	  .dacl = KSMBD_ACL_NULL, .sacl = KSMBD_ACL_ABSENT, .num_aces = 0 },
-+	{ .name = "2.4.6 no DACL, every other Control bit",
-+	  .sd = no_dacl_sd, .len = sizeof(no_dacl_sd),
-+	  .dacl = KSMBD_ACL_ABSENT, .sacl = KSMBD_ACL_ABSENT, .num_aces = 0 },
-+	{ .name = "2.4.5 empty DACL, NULL SACL",
-+	  .sd = empty_dacl_sd, .len = sizeof(empty_dacl_sd),
-+	  .dacl = KSMBD_ACL_PRESENT, .sacl = KSMBD_ACL_NULL, .num_aces = 0 },
-+	{ .name = "2.4.2.2 0 and 15 sub-authorities, empty SACL",
-+	  .sd = sids_sd, .len = sizeof(sids_sd),
-+	  .dacl = KSMBD_ACL_PRESENT, .sacl = KSMBD_ACL_PRESENT, .num_aces = 2 },
-+	{ .name = "2.4.4.1 ACE data, undefined AceFlags, reserved fields",
-+	  .sd = ace_fields_sd, .len = sizeof(ace_fields_sd),
-+	  .dacl = KSMBD_ACL_PRESENT, .sacl = KSMBD_ACL_ABSENT, .num_aces = 2 },
-+	{ .name = "2.4.4 object and callback layouts",
-+	  .sd = layouts_sd, .len = sizeof(layouts_sd),
-+	  .dacl = KSMBD_ACL_PRESENT, .sacl = KSMBD_ACL_ABSENT, .num_aces = 6 },
-+	{ .name = "2.4.4 SACL types in a DACL",
-+	  .sd = sacl_types_sd, .len = sizeof(sacl_types_sd),
-+	  .dacl = KSMBD_ACL_PRESENT, .sacl = KSMBD_ACL_ABSENT, .num_aces = 7 },
-+};
-+
-+KUNIT_ARRAY_PARAM_DESC(accept, accepts, name);
-+
-+/*
-+ * Each SD is decoded, and the decoded SD is encoded again. The encoder
-+ * must write the same bytes, or the bytes given for an SD that is not laid
-+ * out as the encoder lays one out. Nothing the SD holds may be lost on
-+ * the way.
-+ */
-+static void ksmbd_sd_decode_accept_test(struct kunit *test)
-+{
-+	const struct t_accept *a = test->param_value;
-+	struct ksmbd_sd *sd = t_decode(test, a->sd, a->len);
-+
-+	KUNIT_EXPECT_EQ(test, (int)sd->dacl, a->dacl);
-+	KUNIT_EXPECT_EQ(test, (int)sd->sacl, a->sacl);
-+	KUNIT_EXPECT_EQ(test, sd->num_aces, a->num_aces);
-+	if (a->encoded)
-+		t_expect_encoding(test, sd, a->encoded, a->encoded_len);
-+	else
-+		t_expect_encoding(test, sd, a->sd, a->len);
-+}
-+
-+/* What changing one byte of base_sd is expected to do */
-+enum t_effect {
-+	REFUSED,	/* the decoder returns -EBADMSG */
-+	NO_SACL,	/* the SD decodes without its SACL, and sacl_dropped is set */
-+	SACL_UNREAD,	/* the SD decodes without its SACL, which was not read */
-+	AS_BASE,	/* the SD decodes to base_sd, unchanged */
-+};
-+
-+struct t_change {
-+	const char *name;	/* the change and the MS-DTYP section it breaks */
-+	u8	off;
-+	u8	new;
-+	u8	effect;
-+};
-+
-+static const struct t_change changes[] = {
-+	{ "2.4.6 Revision MUST be 1", O_SD_REVISION, 2, REFUSED },
-+	{ "2.4.6 OffsetDacl inside the header", O_SD_DACL, 16, REFUSED },
-+	{ "2.4.6 OffsetOwner past the end", O_SD_OWNER + 1, 1, REFUSED },
-+	{ "2.4.6 OffsetDacl past the end", O_SD_DACL + 1, 1, REFUSED },
-+	{ "2.4.6 OffsetDacl MUST be 0 without DP",
-+	  O_SD_CONTROL, 0x10, REFUSED },
-+	{ "2.4.2.2 owner SID Revision MUST be 1",
-+	  B_OWNER + O_SID_REVISION, 2, REFUSED },
-+	{ "2.4.2.2 owner SID more than 15 sub-authorities",
-+	  B_OWNER + O_SID_COUNT, 16, REFUSED },
-+	{ "2.4.5 DACL AclRevision 3", B_DACL + O_ACL_REVISION, 3, REFUSED },
-+	{ "2.4.5 DACL AclSize below 8", B_DACL + O_ACL_SIZE, 4, REFUSED },
-+	{ "2.4.5 DACL AclSize past the end",
-+	  B_DACL + O_ACL_SIZE + 1, 1, REFUSED },
-+	{ "2.4.5 DACL AceCount more than fits",
-+	  B_DACL + O_ACL_COUNT, 8, REFUSED },
-+	{ "2.4.5 DACL AceCount past its ACEs",
-+	  B_DACL + O_ACL_COUNT, 5, REFUSED },
-+	{ "2.4.4.1 AceSize not a multiple of 4", B_ACE3 + O_ACE_SIZE, 23, REFUSED },
-+	{ "2.4.4.1 AceSize past AclSize", B_ACE3 + O_ACE_SIZE, 28, REFUSED },
-+	{ "2.4.4.1 AceType above 0x13", B_ACE1 + O_ACE_TYPE, 0x14, REFUSED },
-+	{ "2.4.4.1 AceType 0x03 reserved", B_ACE1 + O_ACE_TYPE, 0x03, REFUSED },
-+	{ "2.4.4.1 ACE SID count runs past AceSize",
-+	  B_ACE1 + 8 + O_SID_COUNT, 2, REFUSED },
-+	{ "2.4.4.3 object GUIDs past AceSize",
-+	  B_ACE2 + O_ACE_OBJ_FLAGS, 3, REFUSED },
-+	{ "2.4.4.3 object ACE too short for its Flags",
-+	  B_ACE2 + O_ACE_SIZE, 8, REFUSED },
-+	{ "2.4.4.3 object Flags bit that names no GUID",
-+	  B_ACE2 + O_ACE_OBJ_FLAGS, 5, REFUSED },
-+
-+	/* A malformed SACL is left out */
-+	{ "2.4.6 OffsetSacl inside the header", O_SD_SACL, 12, NO_SACL },
-+	{ "2.4.5 SACL AclRevision 0", B_SACL + O_ACL_REVISION, 0, NO_SACL },
-+	{ "2.4.4.1 SACL AceSize not a multiple of 4",
-+	  B_SACE0 + O_ACE_SIZE, 21, NO_SACL },
-+	/* An OffsetSacl is not read when SACL_PRESENT is clear */
-+	{ "2.4.6 OffsetSacl set without SP", O_SD_CONTROL, 0x04, SACL_UNREAD },
-+
-+	/*
-+	 * Requirements that MS-DTYP states with MUST and the decoder does
-+	 * not enforce
-+	 */
-+	{ "2.4.6 SR not set", O_SD_CONTROL + 1, 0x04, AS_BASE },
-+};
-+
-+KUNIT_ARRAY_PARAM_DESC(change, changes, name);
-+
-+static void ksmbd_sd_decode_byte_change_test(struct kunit *test)
-+{
-+	const struct t_change *c = test->param_value;
-+	struct ksmbd_sd *want = t_base_fields(test);
-+	u8 *buf = t_base_copy(test);
-+	struct ksmbd_sd *sd = (void *)1;
-+	int rc;
-+
-+	/* A case whose new byte equals the old one would test nothing */
-+	KUNIT_ASSERT_TRUE(test, buf[c->off] != c->new);
-+	buf[c->off] = c->new;
-+
-+	rc = ksmbd_sd_decode(buf, sizeof(base_sd), &sd);
-+	if (c->effect == REFUSED) {
-+		KUNIT_EXPECT_EQ(test, rc, -EBADMSG);
-+		KUNIT_EXPECT_NULL(test, sd);
-+		if (!rc)
-+			kvfree(sd);
-+		return;
-+	}
-+	KUNIT_ASSERT_EQ(test, rc, 0);
-+	t_keep_sd(test, sd);
-+	if (c->effect != AS_BASE) {
-+		want->sacl = KSMBD_ACL_ABSENT;
-+		want->sacl_len = 0;
-+		want->sacl_data = NULL;
-+		want->sacl_dropped = c->effect == NO_SACL;
-+	}
-+	t_expect_same(test, sd, want);
-+}
-+
-+/*
-+ * An owner or a group offset that points into the header of the SD (MS-DTYP
-+ * 2.4.6) is refused, even when the bytes there read as a SID. With
-+ * SACL_PRESENT clear OffsetSacl is not read, so here it is set to 1. The
-+ * header then holds the bytes of a SID with no sub-authority at offset 12.
-+ */
-+static void ksmbd_sd_decode_offset_in_header_test(struct kunit *test)
-+{
-+	const size_t len = sizeof(base_sd);
-+	struct ksmbd_sd *sd = NULL;
-+	u8 *buf = t_base_copy(test);
-+
-+	buf[O_SD_CONTROL] &= ~SACL_PRESENT;
-+	put_unaligned_le32(1, &buf[O_SD_SACL]);
-+	KUNIT_ASSERT_EQ(test, ksmbd_sd_decode(buf, len, &sd), 0);
+ 	if (ppntsd) {
+ 		u16 flags = 0;
+ 
+@@ -1122,129 +899,51 @@ int build_sec_desc(const struct mnt_idmap *idmap,
+ 		if (addition_info & GROUP_SECINFO)
+ 			flags |= GROUP_DEFAULTED;
+ 		if (addition_info & DACL_SECINFO)
+-			flags |= DACL_PRESENT | DACL_DEFAULTED |
+-				 DACL_AUTO_INHERITED | DACL_PROTECTED;
+-		pntsd->type |= ppntsd->type & cpu_to_le16(flags);
++			flags |= DACL_DEFAULTED | DACL_AUTO_INHERITED |
++				 DACL_PROTECTED;
++		sd->control |= ppntsd->control & flags;
+ 	}
+ 
+-	if (addition_info & OWNER_SECINFO) {
+-		pntsd->osidoffset = cpu_to_le32(offset);
+-		owner_sid_ptr = (struct smb_sid *)((char *)pntsd + offset);
+-		smb_copy_sid(owner_sid_ptr, nowner_sid_ptr);
+-		offset += 1 + 1 + 6 + (nowner_sid_ptr->num_subauth * 4);
+-	}
++	if (addition_info & OWNER_SECINFO)
++		sd->owner = nowner_sid_ptr;
+ 
+-	if (addition_info & GROUP_SECINFO) {
+-		pntsd->gsidoffset = cpu_to_le32(offset);
+-		group_sid_ptr = (struct smb_sid *)((char *)pntsd + offset);
+-		smb_copy_sid(group_sid_ptr, ngroup_sid_ptr);
+-		offset += 1 + 1 + 6 + (ngroup_sid_ptr->num_subauth * 4);
+-	}
++	if (addition_info & GROUP_SECINFO)
++		sd->group = ngroup_sid_ptr;
+ 
+ 	if (addition_info & DACL_SECINFO) {
+-		pntsd->type |= cpu_to_le16(DACL_PRESENT);
+-		dacl_ptr = (struct smb_acl *)((char *)pntsd + offset);
+-		dacl_ptr->revision = cpu_to_le16(2);
+-		dacl_ptr->size = cpu_to_le16(sizeof(struct smb_acl));
+-		dacl_ptr->num_aces = 0;
+-
+ 		if (!ppntsd) {
+-			set_mode_dacl(idmap, dacl_ptr, fattr);
++			sd->dacl = KSMBD_ACL_PRESENT;
++			set_mode_dacl(idmap, sd, nowner_sid_ptr, ngroup_sid_ptr,
++				      fattr, sids);
++		} else if (ppntsd->dacl == KSMBD_ACL_PRESENT) {
++			sd->dacl = KSMBD_ACL_PRESENT;
++			set_ntacl_dacl(idmap, sd, ppntsd, fattr, sids);
+ 		} else {
+-			struct smb_acl *ppdacl_ptr;
+-			unsigned int dacl_offset = le32_to_cpu(ppntsd->dacloffset);
+-			int ppdacl_size, ntacl_size = ppntsd_size - dacl_offset;
+-			size_t dacl_struct_end;
+-
+-			if (!dacl_offset ||
+-			    check_add_overflow(dacl_offset, sizeof(struct smb_acl),
+-					       &dacl_struct_end) ||
+-			    dacl_struct_end > (size_t)ppntsd_size)
+-				goto out;
+-
+-			ppdacl_ptr = (struct smb_acl *)((char *)ppntsd + dacl_offset);
+-			ppdacl_size = le16_to_cpu(ppdacl_ptr->size);
+-			if (ppdacl_size > ntacl_size ||
+-			    ppdacl_size < sizeof(struct smb_acl))
+-				goto out;
+-
+-			set_ntacl_dacl(idmap, dacl_ptr, ppdacl_ptr,
+-				       ntacl_size - sizeof(struct smb_acl),
+-				       nowner_sid_ptr, ngroup_sid_ptr,
+-				       fattr);
++			sd->dacl = KSMBD_ACL_NULL;
+ 		}
+-		pntsd->dacloffset = cpu_to_le32(offset);
+-		offset += le16_to_cpu(dacl_ptr->size);
+ 	}
++	if (sd->dacl != KSMBD_ACL_PRESENT)
++		sd->num_aces = 0;
+ 
++	rc = ksmbd_sd_encode(sd, (u8 **)pntsd, &len);
++	*secdesclen = len;
+ out:
+ 	kfree(nowner_sid_ptr);
+ 	kfree(ngroup_sid_ptr);
+-	*secdesclen = offset;
++	kvfree(sids);
 +	kvfree(sd);
+ 	return rc;
+ }
+ 
+-static void smb_set_ace(struct smb_ace *ace, const struct smb_sid *sid, u8 type,
+-			u8 flags, __le32 access_req)
+-{
+-	ace->type = type;
+-	ace->flags = flags;
+-	ace->access_req = access_req;
+-	smb_copy_sid(&ace->sid, sid);
+-	ace->size = cpu_to_le16(1 + 1 + 2 + 4 + 1 + 1 + 6 +
+-				(ace->sid.num_subauth * 4));
+-}
+-
+-static int smb_append_inherited_ace(struct smb_ace **ace, int *nt_size,
+-				    u16 *ace_cnt, const struct smb_sid *sid,
+-				    u8 type, u8 flags, __le32 access_req)
+-{
+-	int ace_size;
+-
+-	smb_set_ace(*ace, sid, type, flags, access_req);
+-	ace_size = le16_to_cpu((*ace)->size);
+-	/* pdacl->size is __le16 and includes struct smb_acl. */
+-	if (check_add_overflow(*nt_size, ace_size, nt_size) ||
+-	    *nt_size > U16_MAX - (int)sizeof(struct smb_acl))
+-		return -EINVAL;
+-
+-	(*ace_cnt)++;
+-	*ace = (struct smb_ace *)((char *)*ace + ace_size);
+-	return 0;
+-}
+-
+-static int smb_validate_ntsd_sid(struct smb_ntsd *pntsd, size_t pntsd_size,
+-				  unsigned int sid_offset, struct smb_sid **sid,
+-				  size_t *sid_size)
++static void smb_append_inherited_ace(struct ksmbd_sd *sd, u16 *ace_cnt,
++				     const struct ksmbd_ace *parent_ace,
++				     const struct smb_sid *sid, u8 flags)
+ {
+-	size_t sid_end;
+-
+-	*sid = NULL;
+-	*sid_size = 0;
+-
+-	if (!sid_offset)
+-		return 0;
++	struct ksmbd_ace *ace = &sd->aces[(*ace_cnt)++];
+ 
+-	if (sid_offset < sizeof(struct smb_ntsd) ||
+-	    check_add_overflow(sid_offset, (size_t)CIFS_SID_BASE_SIZE,
+-			       &sid_end) ||
+-	    sid_end > pntsd_size)
+-		return -EINVAL;
+-
+-	*sid = (struct smb_sid *)((char *)pntsd + sid_offset);
+-	if ((*sid)->num_subauth > SID_MAX_SUB_AUTHORITIES)
+-		return -EINVAL;
+-
+-	if (check_add_overflow((size_t)CIFS_SID_BASE_SIZE,
+-			       sizeof(__le32) * (size_t)(*sid)->num_subauth,
+-			       &sid_end))
+-		return -EINVAL;
+-
+-	if (sid_offset > pntsd_size || sid_end > pntsd_size - sid_offset)
+-		return -EINVAL;
+-
+-	*sid_size = sid_end;
+-	return 0;
++	*ace = *parent_ace;
++	ace->flags = flags;
++	ace->sid = sid;
+ }
+ 
+ int smb_inherit_dacl(struct ksmbd_conn *conn,
+@@ -1252,18 +951,14 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 		     unsigned int uid, unsigned int gid)
+ {
+ 	const struct smb_sid *psid, *creator = NULL;
+-	struct smb_ace *parent_aces, *aces;
+-	struct smb_acl *parent_pdacl;
+-	struct smb_ntsd *parent_pntsd = NULL;
++	const struct ksmbd_ace *parent_aces;
++	struct ksmbd_sd *parent_pntsd = NULL, *sd;
+ 	struct smb_sid owner_sid, group_sid;
+ 	struct dentry *parent;
+ 	const struct mnt_idmap *idmap = mnt_idmap(path->mnt);
+-	int inherited_flags = 0, flags = 0, i, nt_size = 0, pdacl_size;
+-	int rc = 0, pntsd_type, ppntsd_size, acl_len, aces_size;
+-	unsigned int dacloffset;
+-	size_t dacl_struct_end;
++	int inherited_flags = 0, flags = 0, i;
++	int rc;
+ 	u16 num_aces, ace_cnt = 0;
+-	char *aces_base;
+ 	bool is_dir = S_ISDIR(d_inode(path->dentry)->i_mode);
+ 
+ 	parent = dget_parent(path->dentry);
+@@ -1271,85 +966,32 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 		dput(parent);
+ 		return -ENOENT;
+ 	}
+-	ppntsd_size = ksmbd_vfs_get_sd_xattr(conn, idmap,
+-					    parent, &parent_pntsd);
++	rc = ksmbd_vfs_get_sd_xattr(conn, idmap, parent, &parent_pntsd);
+ 	dput(parent);
+-	if (ppntsd_size <= 0)
++	if (rc)
+ 		return -ENOENT;
+ 
+-	dacloffset = le32_to_cpu(parent_pntsd->dacloffset);
+-	if (!dacloffset ||
+-	    check_add_overflow(dacloffset, sizeof(struct smb_acl), &dacl_struct_end) ||
+-	    dacl_struct_end > (size_t)ppntsd_size) {
+-		rc = -EINVAL;
+-		goto free_parent_pntsd;
+-	}
+-
+-	parent_pdacl = (struct smb_acl *)((char *)parent_pntsd + dacloffset);
+-	acl_len = ppntsd_size - dacloffset;
+-	num_aces = le16_to_cpu(parent_pdacl->num_aces);
+-	pntsd_type = le16_to_cpu(parent_pntsd->type);
+-	pdacl_size = le16_to_cpu(parent_pdacl->size);
+-
+-	if (pdacl_size > acl_len || pdacl_size < sizeof(struct smb_acl)) {
++	if (parent_pntsd->dacl != KSMBD_ACL_PRESENT) {
+ 		rc = -EINVAL;
+ 		goto free_parent_pntsd;
+ 	}
+ 
+-	aces_size = pdacl_size - sizeof(struct smb_acl);
+-
+-	/*
+-	 * Validate num_aces against the DACL payload before allocating.
+-	 * Each ACE must be at least as large as its fixed-size header
+-	 * (up to the SID base), so num_aces cannot exceed the payload
+-	 * divided by the minimum ACE size.  This mirrors the existing
+-	 * check in parse_dacl().
+-	 */
+-	if (num_aces > aces_size / (offsetof(struct smb_ace, sid) +
+-				    offsetof(struct smb_sid, sub_auth) +
+-				    sizeof(__le16))) {
+-		rc = -EINVAL;
+-		goto free_parent_pntsd;
+-	}
+-
+-	aces_base = kmalloc_array(num_aces * 2, sizeof(struct smb_ace),
+-				  KSMBD_DEFAULT_GFP);
+-	if (!aces_base) {
++	num_aces = parent_pntsd->num_aces;
++	sd = kvzalloc(struct_size(sd, aces, num_aces * 2), KSMBD_DEFAULT_GFP);
++	if (!sd) {
+ 		rc = -ENOMEM;
+ 		goto free_parent_pntsd;
+ 	}
++	sd->num_aces = num_aces * 2;
+ 
+-	aces = (struct smb_ace *)aces_base;
+-	parent_aces = (struct smb_ace *)((char *)parent_pdacl +
+-			sizeof(struct smb_acl));
+-
+-	if (pntsd_type & DACL_AUTO_INHERITED)
++	if (parent_pntsd->control & DACL_AUTO_INHERITED)
+ 		inherited_flags = INHERITED_ACE;
+ 
+ 	for (i = 0; i < num_aces; i++) {
+-		int pace_size;
+-
+-		if (aces_size < offsetof(struct smb_ace, sid) +
+-		    CIFS_SID_BASE_SIZE)
+-			break;
+-
+-		pace_size = le16_to_cpu(parent_aces->size);
+-		if (pace_size > aces_size ||
+-		    pace_size < offsetof(struct smb_ace, sid) +
+-				CIFS_SID_BASE_SIZE)
+-			break;
+-
+-		if (parent_aces->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
+-		    pace_size < offsetof(struct smb_ace, sid) +
+-				CIFS_SID_BASE_SIZE +
+-				sizeof(__le32) * parent_aces->sid.num_subauth)
+-			break;
+-
+-		aces_size -= pace_size;
+-
++		parent_aces = &parent_pntsd->aces[i];
+ 		flags = parent_aces->flags;
+ 		if (!smb_inherit_flags(flags, is_dir))
+-			goto pass;
++			continue;
+ 		if (is_dir) {
+ 			flags &= ~(INHERIT_ONLY_ACE | INHERITED_ACE);
+ 			if (!(flags & CONTAINER_INHERIT_ACE))
+@@ -1360,121 +1002,52 @@ int smb_inherit_dacl(struct ksmbd_conn *conn,
+ 			flags = 0;
+ 		}
+ 
+-		if (!compare_sids(&creator_owner, &parent_aces->sid)) {
++		if (!compare_sids(&creator_owner, parent_aces->sid)) {
+ 			creator = &creator_owner;
+ 			id_to_sid(uid, SIDOWNER, &owner_sid);
+ 			psid = &owner_sid;
+-		} else if (!compare_sids(&creator_group, &parent_aces->sid)) {
++		} else if (!compare_sids(&creator_group, parent_aces->sid)) {
+ 			creator = &creator_group;
+ 			id_to_sid(gid, SIDUNIX_GROUP, &group_sid);
+ 			psid = &group_sid;
+ 		} else {
+ 			creator = NULL;
+-			psid = &parent_aces->sid;
++			psid = parent_aces->sid;
+ 		}
+ 
+ 		if (is_dir && creator && flags & CONTAINER_INHERIT_ACE) {
+-			rc = smb_append_inherited_ace(&aces, &nt_size, &ace_cnt,
+-						      psid, parent_aces->type,
+-						      inherited_flags,
+-						      parent_aces->access_req);
+-			if (rc)
+-				goto free_aces_base;
++			smb_append_inherited_ace(sd, &ace_cnt, parent_aces,
++						 psid, inherited_flags);
+ 			flags |= INHERIT_ONLY_ACE;
+ 			psid = creator;
+ 		} else if (is_dir && !(parent_aces->flags & NO_PROPAGATE_INHERIT_ACE)) {
+-			psid = &parent_aces->sid;
++			psid = parent_aces->sid;
+ 		}
+ 
+-		rc = smb_append_inherited_ace(&aces, &nt_size, &ace_cnt, psid,
+-					      parent_aces->type,
+-					      flags | inherited_flags,
+-					      parent_aces->access_req);
+-		if (rc)
+-			goto free_aces_base;
+-pass:
+-		parent_aces = (struct smb_ace *)((char *)parent_aces + pace_size);
++		smb_append_inherited_ace(sd, &ace_cnt, parent_aces, psid,
++					 flags | inherited_flags);
+ 	}
+ 
+-	if (nt_size > 0) {
+-		struct smb_ntsd *pntsd;
+-		struct smb_acl *pdacl;
+-		struct smb_sid *powner_sid = NULL, *pgroup_sid = NULL;
+-		size_t powner_sid_size = 0, pgroup_sid_size = 0, pntsd_size;
+-		size_t pntsd_alloc_size;
++	if (ace_cnt) {
++		size_t pntsd_size;
++		u8 *pntsd;
+ 
+-		rc = smb_validate_ntsd_sid(parent_pntsd, ppntsd_size,
+-					   le32_to_cpu(parent_pntsd->osidoffset),
+-					   &powner_sid, &powner_sid_size);
+-		if (rc)
+-			goto free_aces_base;
+-		rc = smb_validate_ntsd_sid(parent_pntsd, ppntsd_size,
+-					   le32_to_cpu(parent_pntsd->gsidoffset),
+-					   &pgroup_sid, &pgroup_sid_size);
++		sd->num_aces = ace_cnt;
++		sd->dacl = KSMBD_ACL_PRESENT;
++		sd->control = parent_pntsd->control & DACL_AUTO_INHERITED;
++		sd->owner = parent_pntsd->owner;
++		sd->group = parent_pntsd->group;
++		rc = ksmbd_sd_encode(sd, &pntsd, &pntsd_size);
+ 		if (rc)
+ 			goto free_aces_base;
+ 
+-		if (check_add_overflow(sizeof(struct smb_ntsd),
+-				       (size_t)powner_sid_size,
+-				       &pntsd_alloc_size) ||
+-		    check_add_overflow(pntsd_alloc_size,
+-				       (size_t)pgroup_sid_size,
+-				       &pntsd_alloc_size) ||
+-		    check_add_overflow(pntsd_alloc_size, sizeof(struct smb_acl),
+-				       &pntsd_alloc_size) ||
+-		    check_add_overflow(pntsd_alloc_size, (size_t)nt_size,
+-				       &pntsd_alloc_size)) {
+-			rc = -EINVAL;
+-			goto free_aces_base;
+-		}
+-
+-		pntsd = kzalloc(pntsd_alloc_size, KSMBD_DEFAULT_GFP);
+-		if (!pntsd) {
+-			rc = -ENOMEM;
+-			goto free_aces_base;
+-		}
+-
+-		pntsd->revision = cpu_to_le16(1);
+-		pntsd->type = cpu_to_le16(SELF_RELATIVE | DACL_PRESENT);
+-		if (le16_to_cpu(parent_pntsd->type) & DACL_AUTO_INHERITED)
+-			pntsd->type |= cpu_to_le16(DACL_AUTO_INHERITED);
+-		pntsd_size = sizeof(struct smb_ntsd);
+-
+-		/*
+-		 * Lay out the child as owner, group and DACL. The parent may
+-		 * store its components in another order, so its offsets do
+-		 * not fit the child.
+-		 */
+-		if (powner_sid) {
+-			pntsd->osidoffset = cpu_to_le32(pntsd_size);
+-			memcpy((char *)pntsd + pntsd_size, powner_sid,
+-			       powner_sid_size);
+-			pntsd_size += powner_sid_size;
+-		}
+-
+-		if (pgroup_sid) {
+-			pntsd->gsidoffset = cpu_to_le32(pntsd_size);
+-			memcpy((char *)pntsd + pntsd_size, pgroup_sid,
+-			       pgroup_sid_size);
+-			pntsd_size += pgroup_sid_size;
+-		}
+-
+-		pntsd->dacloffset = cpu_to_le32(pntsd_size);
+-		pdacl = (struct smb_acl *)((char *)pntsd + pntsd_size);
+-		pdacl->revision = cpu_to_le16(2);
+-		pdacl->size = cpu_to_le16(sizeof(struct smb_acl) + nt_size);
+-		pdacl->num_aces = cpu_to_le16(ace_cnt);
+-		memcpy((char *)pdacl + sizeof(struct smb_acl), aces_base, nt_size);
+-		pntsd_size += sizeof(struct smb_acl) + nt_size;
+-
+ 		ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, pntsd_size);
+-		kfree(pntsd);
++		kvfree(pntsd);
+ 	}
+-
+ free_aces_base:
+-	kfree(aces_base);
++	kvfree(sd);
+ free_parent_pntsd:
+-	kfree(parent_pntsd);
++	kvfree(parent_pntsd);
+ 	return rc;
+ }
+ 
+@@ -1536,25 +1109,21 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 			bool authenticated, bool strict)
+ {
+ 	const struct mnt_idmap *idmap = mnt_idmap(path->mnt);
+-	struct smb_ntsd *pntsd = NULL;
+-	struct smb_acl *pdacl;
++	struct ksmbd_sd *sd = NULL;
+ 	struct posix_acl *posix_acls;
+-	int rc = 0, pntsd_size, acl_size, aces_size, pdacl_size;
+-	unsigned int dacl_offset;
+-	size_t dacl_struct_end;
++	int rc;
+ 	struct smb_sid sid;
+ 	int requested = le32_to_cpu(*pdaccess & ~FILE_MAXIMAL_ACCESS_LE);
+ 	int granted = requested;
+-	struct smb_ace *ace;
++	const struct ksmbd_ace *ace;
+ 	int i, found = 0;
+ 	unsigned int access_bits = 0, denied = 0, grp_granted = 0;
+ 	unsigned int grp_allowed = 0, grp_denied = 0, bits;
+-	struct smb_ace *others_ace = NULL;
++	const struct ksmbd_ace *others_ace = NULL;
+ 	bool or_ace = false, obj_deny = false, au_ace = false, member, counted;
+ 	bool grp_ace = false;
+ 	struct posix_acl_entry *pa_entry;
+ 	unsigned int sid_type = SIDOWNER;
+-	unsigned short ace_size;
+ 	bool is_owner, owner_rights = false;
+ 	bool maximal = *pdaccess & FILE_MAXIMAL_ACCESS_LE;
+ 	/*
+@@ -1567,25 +1136,16 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 	vfsuid_t vfsuid;
+ 
+ 	ksmbd_debug(SMB, "check permission using windows acl\n");
+-	pntsd_size = ksmbd_vfs_get_sd_xattr(conn, idmap,
+-					    path->dentry, &pntsd);
+-	if (pntsd_size <= 0 || !pntsd) {
+-		if (pntsd_size < 0 && !smb_no_stored_sd(pntsd_size))
+-			rc = pntsd_size == -ENOMEM ? -ENOMEM : -EACCES;
++	rc = ksmbd_vfs_get_sd_xattr(conn, idmap, path->dentry, &sd);
++	if (rc) {
++		if (smb_no_stored_sd(rc))
++			rc = 0;
++		else if (rc != -ENOMEM)
++			rc = -EACCES;
+ 		goto err_out;
+ 	}
+ 
+-	dacl_offset = le32_to_cpu(pntsd->dacloffset);
+-	if (!dacl_offset ||
+-	    check_add_overflow(dacl_offset, sizeof(struct smb_acl), &dacl_struct_end) ||
+-	    dacl_struct_end > (size_t)pntsd_size)
+-		goto err_out;
+-
+-	pdacl = (struct smb_acl *)((char *)pntsd + le32_to_cpu(pntsd->dacloffset));
+-	acl_size = pntsd_size - dacl_offset;
+-	pdacl_size = le16_to_cpu(pdacl->size);
+-
+-	if (pdacl_size > acl_size || pdacl_size < sizeof(struct smb_acl))
++	if (sd->dacl != KSMBD_ACL_PRESENT)
+ 		goto err_out;
+ 
+ 	if (!uid)
+@@ -1594,7 +1154,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 	vfsuid = i_uid_into_vfsuid(idmap, d_inode(path->dentry));
+ 	is_owner = uid == from_kuid(&init_user_ns, vfsuid_into_kuid(vfsuid));
+ 
+-	if (!pdacl->num_aces) {
++	if (!sd->num_aces) {
+ 		unsigned int allowed = 0;
+ 
+ 		/*
+@@ -1627,58 +1187,44 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 	 * owner, grant. It is used when the SID lookup and POSIX ACL fallback
+ 	 * below do not decide.
+ 	 */
+-	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
+-	aces_size = pdacl_size - sizeof(struct smb_acl);
+-	for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
+-		if (aces_size < offsetof(struct smb_ace, sid) +
+-		    CIFS_SID_BASE_SIZE)
+-			break;
+-		ace_size = le16_to_cpu(ace->size);
+-		if (ace_size > aces_size ||
+-		    ace_size < offsetof(struct smb_ace, sid) +
+-			       CIFS_SID_BASE_SIZE)
+-			break;
+-		aces_size -= ace_size;
+-
+-		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
+-		    ace_size < offsetof(struct smb_ace, sid) +
+-			      CIFS_SID_BASE_SIZE +
+-			      sizeof(__le32) * ace->sid.num_subauth)
+-			break;
+-
++	for (i = 0; i < sd->num_aces; i++) {
++		ace = &sd->aces[i];
+ 		if ((ace->type == ACCESS_DENIED_OBJECT_ACE_TYPE ||
+ 		     ace->type == ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE) &&
+ 		    !(ace->flags & INHERIT_ONLY_ACE))
+ 			obj_deny = true;
++		/* ksmbd evaluates no object ACE, so one matches no one */
++		if (ace->obj_len)
++			continue;
+ 
+-		if (!compare_sids(&sid_owner_rights, &ace->sid)) {
++		if (!compare_sids(&sid_owner_rights, ace->sid)) {
+ 			owner_rights = true;
+ 			if (!is_owner)
+-				goto next_ace;
++				continue;
+ 		}
+ 
+-		member = smb_sid_in_group(&ace->sid);
++		member = smb_sid_in_group(ace->sid);
+ 		/* The grp_ masks count groups and OWNER RIGHTS only */
+ 		counted = member ||
+-			  (is_owner && smb_sid_is_owner_rights(&ace->sid));
++			  (is_owner && smb_sid_is_owner_rights(ace->sid));
+ 		if (ace->flags & INHERIT_ONLY_ACE ||
+-		    (compare_sids(&sid, &ace->sid) &&
+-		     compare_sids(&sid_unix_NFS_mode, &ace->sid) &&
+-		     compare_sids(&sid_everyone, &ace->sid) &&
++		    (compare_sids(&sid, ace->sid) &&
++		     compare_sids(&sid_unix_NFS_mode, ace->sid) &&
++		     compare_sids(&sid_everyone, ace->sid) &&
+ 		     (!authusers ||
+-		      compare_sids(&sid_authusers, &ace->sid)) &&
+-		     compare_sids(&sid_owner_rights, &ace->sid) &&
++		      compare_sids(&sid_authusers, ace->sid)) &&
++		     compare_sids(&sid_owner_rights, ace->sid) &&
+ 		     !member))
+-			goto next_ace;
++			continue;
+ 		/* Other requests count only SIDs that match exactly */
+ 		if (!open_max && !member &&
+-		    !smb_sid_equal(&sid, &ace->sid) &&
+-		    !smb_sid_equal(&sid_everyone, &ace->sid) &&
+-		    !(authusers && smb_sid_equal(&sid_authusers, &ace->sid)) &&
+-		    !smb_sid_is_owner_rights(&ace->sid))
+-			goto next_ace;
++		    !smb_sid_equal(&sid, ace->sid) &&
++		    !smb_sid_equal(&sid_everyone, ace->sid) &&
++		    !(authusers && smb_sid_equal(&sid_authusers, ace->sid)) &&
++		    !smb_sid_is_owner_rights(ace->sid))
++			continue;
+ 
+-		bits = le32_to_cpu(ace->access_req);
++		bits = ace->mask;
+ 		switch (ace->type) {
+ 		case ACCESS_ALLOWED_ACE_TYPE:
+ 			grp_ace |= counted;
+@@ -1701,8 +1247,6 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 				denied |= ~access_bits & bits;
+ 			break;
+ 		}
+-next_ace:
+-		ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
+ 	}
+ 
+ 	/* Keep only file rights, not MAXIMUM_ALLOWED or generic bits */
+@@ -1731,40 +1275,24 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 		access_bits = 0;
+ 	}
+ 
+-	ace = (struct smb_ace *)((char *)pdacl + sizeof(struct smb_acl));
+-	aces_size = pdacl_size - sizeof(struct smb_acl);
+-	for (i = 0; i < le16_to_cpu(pdacl->num_aces); i++) {
+-		if (aces_size < offsetof(struct smb_ace, sid) +
+-		    CIFS_SID_BASE_SIZE)
+-			break;
+-		ace_size = le16_to_cpu(ace->size);
+-		if (ace_size > aces_size ||
+-		    ace_size < offsetof(struct smb_ace, sid) +
+-			       CIFS_SID_BASE_SIZE)
+-			break;
+-		aces_size -= ace_size;
+-
+-		if (ace->sid.num_subauth > SID_MAX_SUB_AUTHORITIES ||
+-		    ace_size < offsetof(struct smb_ace, sid) + CIFS_SID_BASE_SIZE +
+-			      sizeof(__le32) * ace->sid.num_subauth)
+-			break;
+-
+-		if (!compare_sids(&sid, &ace->sid) ||
+-		    !compare_sids(&sid_unix_NFS_mode, &ace->sid)) {
++	for (i = 0; i < sd->num_aces; i++) {
++		ace = &sd->aces[i];
++		if (ace->obj_len)
++			continue;
++		if (!compare_sids(&sid, ace->sid) ||
++		    !compare_sids(&sid_unix_NFS_mode, ace->sid)) {
+ 			found = 1;
+ 			break;
+ 		}
+-		if (!compare_sids(&sid_owner_rights, &ace->sid) &&
++		if (!compare_sids(&sid_owner_rights, ace->sid) &&
+ 		    !(ace->flags & INHERIT_ONLY_ACE))
+ 			or_ace = true;
+-		if (!compare_sids(&sid_everyone, &ace->sid) ||
++		if (!compare_sids(&sid_everyone, ace->sid) ||
+ 		    (authusers &&
+-		     !compare_sids(&sid_authusers, &ace->sid)))
++		     !compare_sids(&sid_authusers, ace->sid)))
+ 			others_ace = ace;
+-		if (!compare_sids(&sid_authusers, &ace->sid))
++		if (!compare_sids(&sid_authusers, ace->sid))
+ 			au_ace = true;
+-
+-		ace = (struct smb_ace *)((char *)ace + le16_to_cpu(ace->size));
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_FS_POSIX_ACL)) {
+@@ -1857,11 +1385,11 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 	if (!maximal && obj_deny) {
+ 		switch (ace->type) {
+ 		case ACCESS_ALLOWED_ACE_TYPE:
+-			access_bits = le32_to_cpu(ace->access_req);
++			access_bits = ace->mask;
+ 			break;
+ 		case ACCESS_DENIED_ACE_TYPE:
+ 		case ACCESS_DENIED_CALLBACK_ACE_TYPE:
+-			access_bits = le32_to_cpu(~ace->access_req);
++			access_bits = ~ace->mask;
+ 			break;
+ 		}
+ 	}
+@@ -1883,7 +1411,7 @@ int smb_check_perm_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 
+ 	*pdaccess = cpu_to_le32(granted);
+ err_out:
+-	kfree(pntsd);
++	kvfree(sd);
+ 	return rc;
+ }
+ EXPORT_SYMBOL_IF_KUNIT(smb_check_perm_dacl);
+@@ -1933,6 +1461,10 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		 bool dacl_requested)
+ {
+ 	int rc;
++	struct ksmbd_sd *sd = NULL;
++	size_t store_len;
++	u8 *store = NULL;
++	bool store_sd;
+ 	struct smb_fattr fattr = {{0}};
+ 	struct inode *inode = d_inode(path->dentry);
+ 	const struct mnt_idmap *idmap = mnt_idmap(path->mnt);
+@@ -1942,7 +1474,7 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	fattr.cf_gid = INVALID_GID;
+ 	fattr.cf_mode = inode->i_mode;
+ 
+-	rc = parse_sec_desc(idmap, pntsd, ntsd_len, &fattr);
++	rc = parse_sec_desc(idmap, pntsd, ntsd_len, &fattr, &sd);
+ 	if (rc)
+ 		goto out;
+ 	if (fattr.cf_posix_mode && !dacl_requested) {
+@@ -1954,6 +1486,19 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		goto out;
+ 	}
+ 
++	/*
++	 * Encode the SD to store before anything is changed. The SD of a
++	 * CREATE context (type_check) is stored only if it has a DACL.
++	 */
++	store_sd = test_share_config_flag(tcon->share_conf,
++					  KSMBD_SHARE_FLAG_ACL_XATTR) &&
++		   !(type_check && sd->dacl == KSMBD_ACL_ABSENT);
++	if (store_sd) {
++		rc = ksmbd_sd_encode(sd, &store, &store_len);
++		if (rc)
++			goto out;
++	}
 +
-+	buf[O_SD_OWNER] = O_SD_SACL;
-+	KUNIT_EXPECT_EQ(test, ksmbd_sd_decode(buf, len, &sd), -EBADMSG);
-+	buf[O_SD_OWNER] = B_OWNER;
-+	buf[O_SD_GROUP] = O_SD_SACL;
-+	KUNIT_EXPECT_EQ(test, ksmbd_sd_decode(buf, len, &sd), -EBADMSG);
+ 	newattrs.ia_valid = ATTR_CTIME;
+ 	if (!uid_eq(fattr.cf_uid, INVALID_UID)) {
+ 		newattrs.ia_valid |= ATTR_UID;
+@@ -2001,14 +1546,10 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	if (rc)
+ 		goto out;
+ 
+-	/* Check it only calling from SD BUFFER context */
+-	if (type_check && !(le16_to_cpu(pntsd->type) & DACL_PRESENT))
+-		goto out;
+-
+-	if (test_share_config_flag(tcon->share_conf, KSMBD_SHARE_FLAG_ACL_XATTR)) {
++	if (store_sd) {
+ 		/* Update WinACL in xattr */
+ 		ksmbd_vfs_remove_sd_xattrs(idmap, path);
+-		rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, pntsd, ntsd_len);
++		rc = ksmbd_vfs_set_sd_xattr(conn, idmap, path, store, store_len);
+ 		/*
+ 		 * The CREATE context (type_check) stays best effort because
+ 		 * the file exists already. A filesystem without the xattr is
+@@ -2019,6 +1560,8 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 	}
+ 
+ out:
++	kvfree(store);
++	kvfree(sd);
+ 	posix_acl_release(fattr.cf_acls);
+ 	posix_acl_release(fattr.cf_dacls);
+ 	return rc;
+diff --git a/fs/smb/server/smbacl.h b/fs/smb/server/smbacl.h
+index b51a8c6c1d4e..b14bbae6ab48 100644
+--- a/fs/smb/server/smbacl.h
++++ b/fs/smb/server/smbacl.h
+@@ -38,6 +38,7 @@
+ #define SELF_RELATIVE		0x8000
+ 
+ struct ksmbd_conn;
++struct ksmbd_sd;
+ 
+ struct smb_fattr {
+ 	kuid_t	cf_uid;
+@@ -83,9 +84,9 @@ struct posix_acl_state {
+ };
+ 
+ int parse_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+-		   int acl_len, struct smb_fattr *fattr);
+-int build_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd *pntsd,
+-		   struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info,
++		   int acl_len, struct smb_fattr *fattr, struct ksmbd_sd **psd);
++int build_sec_desc(const struct mnt_idmap *idmap, struct smb_ntsd **pntsd,
++		   const struct ksmbd_sd *ppntsd, int addition_info,
+ 		   __u32 *secdesclen, struct smb_fattr *fattr);
+ int init_acl_state(struct posix_acl_state *state, u16 cnt);
+ void free_acl_state(struct posix_acl_state *state);
+@@ -95,7 +96,7 @@ int compare_sids(const struct smb_sid *ctsid, const struct smb_sid *cwsid);
+ bool smb_inherit_flags(int flags, bool is_dir);
+ int smb_inherit_dacl(struct ksmbd_conn *conn, const struct path *path,
+ 		     unsigned int uid, unsigned int gid);
+-/* Missing, unsupported, malformed or stale SDs retain the POSIX fallback */
++/* Missing, unsupported, unreadable, or stale SDs retain the POSIX fallback */
+ static inline bool smb_no_stored_sd(int rc)
+ {
+ 	return rc == -ENODATA || rc == -EOPNOTSUPP || rc == -EINVAL;
+@@ -110,8 +111,6 @@ int set_info_sec(struct ksmbd_conn *conn, struct ksmbd_tree_connect *tcon,
+ 		 bool dacl_requested);
+ void id_to_sid(unsigned int cid, uint sidtype, struct smb_sid *ssid);
+ void ksmbd_init_domain(u32 *sub_auth);
+-size_t smb_acl_sec_desc_scratch_len(struct smb_fattr *fattr,
+-		struct smb_ntsd *ppntsd, int ppntsd_size, int addition_info);
+ 
+ static inline uid_t posix_acl_uid_translate(const struct mnt_idmap *idmap,
+ 					    struct posix_acl_entry *pace)
+diff --git a/fs/smb/server/tests/smbacl_kunit.c b/fs/smb/server/tests/smbacl_kunit.c
+index 37d21c10a144..b5c379f8f4e5 100644
+--- a/fs/smb/server/tests/smbacl_kunit.c
++++ b/fs/smb/server/tests/smbacl_kunit.c
+@@ -262,6 +262,47 @@ ksmbd_smb_check_perm_dacl_maximal_boundary_test(struct kunit *test)
+ 				mk_vma_flags(VMA_NORESERVE_BIT));
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
+ 
++	rc = ksmbd_vfs_set_sd_xattr(NULL, mnt_idmap(file->f_path.mnt),
++				    &file->f_path, pntsd, ntsd_size);
++	KUNIT_EXPECT_EQ(test, 0, rc);
++	if (rc)
++		goto out;
 +
-+	/* An SD shorter than its header is refused */
-+	KUNIT_EXPECT_EQ(test, ksmbd_sd_decode(buf, O_SD_HDR_LEN - 1, &sd), -EBADMSG);
-+}
-+
-+/* Returns an SD with one ACE, which the encoder accepts */
-+static struct ksmbd_sd *t_one_ace(struct kunit *test)
-+{
-+	struct ksmbd_sd *sd = t_alloc(test, 1);
-+
-+	sd->dacl = KSMBD_ACL_PRESENT;
-+	sd->aces[0] = (struct ksmbd_ace){
-+		.type = ACCESS_DENIED_ACE_TYPE, .flags = 0x13, .mask = 0x1f01ff,
-+		.sid = &everyone,
-+	};
-+	KUNIT_ASSERT_EQ(test, t_try_encode(test, sd), 0);
-+	return sd;
-+}
-+
-+/* Makes one change to an SD the encoder accepts, and expects -EINVAL */
-+#define T_REFUSES(what, change)						\
-+	do {								\
-+		struct ksmbd_sd *sd = t_one_ace(test);			\
-+		struct ksmbd_ace *ace = &sd->aces[0];			\
-+									\
-+		(void)ace;						\
-+		change;							\
-+		KUNIT_EXPECT_EQ_MSG(test, t_try_encode(test, sd), -EINVAL, what); \
-+	} while (0)
-+
-+/*
-+ * The encoder returns -EINVAL for a struct ksmbd_sd that would encode to a
-+ * malformed SD. Each T_REFUSES line makes one such change to a valid SD.
-+ */
-+static void ksmbd_sd_encode_refuse_test(struct kunit *test)
-+{
-+	static const u8 flags_undefined[4] = { 4 }, flags_one_guid[4] = { 1 };
-+	static const u8 acl_rev3[8] = { 3, 0, 8 }, acl_and_more[12] = { 2, 0, 8 };
-+	static const u8 data[4];
-+	struct smb_sid rev2 = { .revision = 2, .num_subauth = 1 };
-+	struct smb_sid sub16 = { .revision = 1, .num_subauth = 16 };
-+
-+	T_REFUSES("a Control bit the encoder derives", sd->control = DACL_PRESENT);
-+	T_REFUSES("an owner SID of revision 2", sd->owner = &rev2);
-+	T_REFUSES("a group SID of 16 sub-authorities", sd->group = &sub16);
-+	T_REFUSES("a DACL state that is not one of the three", sd->dacl = 3);
-+	T_REFUSES("ACEs with a NULL DACL", sd->dacl = KSMBD_ACL_NULL);
-+	T_REFUSES("a DACL revision of 3", sd->dacl_revision = 3);
-+	T_REFUSES("a SACL state that is not one of the three", sd->sacl = 3);
-+	T_REFUSES("SACL bytes with no SACL",
-+		  sd->sacl_data = acl_and_more; sd->sacl_len = 8);
-+	T_REFUSES("a SACL with no bytes", sd->sacl = KSMBD_ACL_PRESENT);
-+	T_REFUSES("a SACL that the decoder would refuse",
-+		  sd->sacl = KSMBD_ACL_PRESENT; sd->sacl_data = acl_rev3;
-+		  sd->sacl_len = sizeof(acl_rev3));
-+	T_REFUSES("bytes after the SACL",
-+		  sd->sacl = KSMBD_ACL_PRESENT; sd->sacl_data = acl_and_more;
-+		  sd->sacl_len = sizeof(acl_and_more));
-+
-+	T_REFUSES("an ACE type with no layout", ace->type = 0x03);
-+	T_REFUSES("an ACE with no SID", ace->sid = NULL);
-+	T_REFUSES("an ACE SID of revision 2", ace->sid = &rev2);
-+	T_REFUSES("ACE data that is not a multiple of 4 bytes",
-+		  ace->data = data; ace->data_len = 3);
-+	T_REFUSES("an ACE data length with no data", ace->data_len = 4);
-+	T_REFUSES("an object section in an ACE that is not an object ACE",
-+		  ace->obj = flags_one_guid; ace->obj_len = 4);
-+	T_REFUSES("an object ACE with no object section",
-+		  ace->type = ACCESS_ALLOWED_OBJECT_ACE_TYPE; ace->obj_len = 20);
-+	T_REFUSES("an object ACE with an undefined flag",
-+		  ace->type = ACCESS_ALLOWED_OBJECT_ACE_TYPE;
-+		  ace->obj = flags_undefined; ace->obj_len = 4);
-+	T_REFUSES("an object section shorter than its Flags say",
-+		  ace->type = ACCESS_ALLOWED_OBJECT_ACE_TYPE;
-+		  ace->obj = flags_one_guid; ace->obj_len = 4);
-+}
-+
-+#define T_MAX_ACES	((U16_MAX - 8) / 16)
-+
-+/*
-+ * AclSize is 16 bits wide (MS-DTYP 2.4.5), so a DACL holds at most U16_MAX
-+ * bytes, and at most 4095 ACEs since the smallest ACE is 16 bytes. The decoder
-+ * accepts a DACL of 4095 ACEs and the encoder writes it again. The encoder
-+ * refuses a DACL with one ACE more, which would be too large.
-+ */
-+static void ksmbd_sd_decode_encode_max_dacl_test(struct kunit *test)
-+{
-+	const size_t n = T_MAX_ACES, len = O_SD_HDR_LEN + U16_MAX;
-+	struct ksmbd_sd *sd = NULL, *more;
-+	size_t i;
-+	u8 *buf;
++	rc = smb_check_perm_dacl(NULL, &file->f_path, &daccess,
++				 FILE_MAXIMAL_ACCESS_LE, 0, true, false);
 +
 +	/*
-+	 * A DACL of 4095 ACEs whose SIDs have no sub-authority, followed by
-+	 * 7 unused bytes
++	 * The DACL counts two ACEs and holds one, so the stored descriptor
++	 * is malformed and every request against it is denied.
 +	 */
-+	buf = kunit_kzalloc(test, len, GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, buf);
-+	buf[O_SD_REVISION] = 1;
-+	put_unaligned_le16(SELF_RELATIVE | DACL_PRESENT, &buf[O_SD_CONTROL]);
-+	put_unaligned_le32(O_SD_HDR_LEN, &buf[O_SD_DACL]);
-+	buf[O_SD_HDR_LEN + O_ACL_REVISION] = 2;
-+	put_unaligned_le16(U16_MAX, &buf[O_SD_HDR_LEN + O_ACL_SIZE]);
-+	put_unaligned_le16(n, &buf[O_SD_HDR_LEN + O_ACL_COUNT]);
-+	for (i = 0; i < n; i++) {
-+		u8 *ace = &buf[O_SD_HDR_LEN + O_ACL_HDR_LEN + 16 * i];
-+
-+		put_unaligned_le16(16, &ace[O_ACE_SIZE]);
-+		put_unaligned_le32(i + 1, &ace[O_ACE_MASK]);
-+		ace[8 + O_SID_REVISION] = 1;
-+		ace[8 + O_SID_AUTHORITY] = 5;
-+	}
-+	sd = t_decode(test, buf, len);
-+	KUNIT_ASSERT_EQ(test, sd->num_aces, n);
-+	KUNIT_EXPECT_EQ(test, sd->aces[n - 1].mask, n);
-+	KUNIT_EXPECT_EQ(test, t_try_encode(test, sd), 0);
-+	/* One ACE more makes the DACL too large for the encoder */
-+	more = t_alloc(test, n + 1);
-+	more->dacl = KSMBD_ACL_PRESENT;
-+	memcpy(more->aces, sd->aces, flex_array_size(sd, aces, n));
-+	more->aces[n] = sd->aces[0];
-+	KUNIT_EXPECT_EQ(test, t_try_encode(test, more), -E2BIG);
-+	more->num_aces = n;
-+	KUNIT_EXPECT_EQ(test, t_try_encode(test, more), 0);
++	KUNIT_EXPECT_EQ(test, -EACCES, rc);
++out:
++	fput(file);
 +}
 +
-+static struct kunit_case ksmbd_secdesc_test_cases[] = {
-+	KUNIT_CASE(ksmbd_sd_decode_encode_base_test),
-+	KUNIT_CASE_PARAM(ksmbd_sd_decode_accept_test, accept_gen_params),
-+	KUNIT_CASE_PARAM(ksmbd_sd_decode_byte_change_test, change_gen_params),
-+	KUNIT_CASE(ksmbd_sd_decode_offset_in_header_test),
-+	KUNIT_CASE(ksmbd_sd_encode_refuse_test),
-+	KUNIT_CASE(ksmbd_sd_decode_encode_max_dacl_test),
-+	{}
-+};
++/*
++ * The same descriptor with a DACL that counts its one ACE is well formed.
++ * The trailing ACE is outside the DACL, so maximal access has the read
++ * access of the first ACE and not the write access of the trailing one.
++ */
++static void ksmbd_smb_check_perm_dacl_maximal_test(struct kunit *test)
++{
++	struct file *file;
++	struct smb_ntsd *pntsd;
++	struct smb_acl *pdacl;
++	__le32 daccess = FILE_MAXIMAL_ACCESS_LE;
++	int ntsd_size, rc;
 +
-+static struct kunit_suite ksmbd_secdesc_test_suite = {
-+	.name = "ksmbd_secdesc",
-+	.test_cases = ksmbd_secdesc_test_cases,
-+};
++	pntsd = build_boundary_ntsd(test, &test_owner_sid, FILE_READ_DATA,
++				    FILE_WRITE_DATA, &ntsd_size);
++	KUNIT_ASSERT_NOT_NULL(test, pntsd);
++	pdacl = (struct smb_acl *)((char *)pntsd + sizeof(struct smb_ntsd));
++	pdacl->num_aces = cpu_to_le16(1);
 +
-+kunit_test_suite(ksmbd_secdesc_test_suite);
++	file = shmem_file_setup("ksmbd-kunit-dacl-valid", 0,
++				mk_vma_flags(VMA_NORESERVE_BIT));
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, file);
 +
-+MODULE_DESCRIPTION("KUnit tests for the ksmbd security descriptor codec");
-+MODULE_LICENSE("GPL");
-+MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
+ 	rc = ksmbd_vfs_set_sd_xattr(NULL, mnt_idmap(file->f_path.mnt),
+ 				    &file->f_path, pntsd, ntsd_size);
+ 	KUNIT_EXPECT_EQ(test, 0, rc);
+@@ -319,6 +360,7 @@ static struct kunit_case ksmbd_smbacl_test_cases[] = {
+ 	KUNIT_CASE(ksmbd_dacl_walk_must_stop_at_declared_size),
+ 	KUNIT_CASE(ksmbd_smb_check_perm_dacl_boundary_test),
+ 	KUNIT_CASE(ksmbd_smb_check_perm_dacl_maximal_boundary_test),
++	KUNIT_CASE(ksmbd_smb_check_perm_dacl_maximal_test),
+ 	KUNIT_CASE(ksmbd_vfs_set_sd_xattr_keeps_caller_sd_test),
+ 	{}
+ };
+diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+index 39bbe6aad629..5b0722fe7788 100644
+--- a/fs/smb/server/vfs.c
++++ b/fs/smb/server/vfs.c
+@@ -29,6 +29,7 @@
+ #include "connection.h"
+ #include "vfs.h"
+ #include "vfs_cache.h"
++#include "secdesc.h"
+ #include "smbacl.h"
+ #include "ndr.h"
+ #include "auth.h"
+@@ -1699,7 +1700,7 @@ static struct xattr_smb_acl *ksmbd_vfs_make_xattr_posix_acl(const struct mnt_idm
+ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ 			   const struct mnt_idmap *idmap,
+ 			   const struct path *path,
+-			   const struct smb_ntsd *pntsd, int len)
++			   const void *pntsd, int len)
+ {
+ 	int rc;
+ 	struct ndr sd_ndr = {0}, acl_ndr = {0};
+@@ -1780,10 +1781,13 @@ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ }
+ EXPORT_SYMBOL_IF_KUNIT(ksmbd_vfs_set_sd_xattr);
+ 
++/*
++ * Returns -EBADMSG if the stored SD is malformed. The caller frees *@sd with
++ * kvfree().
++ */
+ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 			   const struct mnt_idmap *idmap,
+-			   struct dentry *dentry,
+-			   struct smb_ntsd **pntsd)
++			   struct dentry *dentry, struct ksmbd_sd **sd)
+ {
+ 	int rc;
+ 	struct ndr n;
+@@ -1792,10 +1796,12 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 	struct xattr_ntacl acl = {0};
+ 	struct xattr_smb_acl *smb_acl = NULL, *def_smb_acl = NULL;
+ 	__u8 cmp_hash[XATTR_SD_HASH_SIZE] = {0};
++	struct smb_ntsd *pntsd;
+ 
++	*sd = NULL;
+ 	rc = ksmbd_vfs_getxattr(idmap, dentry, XATTR_NAME_SD, &n.data);
+ 	if (rc <= 0)
+-		return rc;
++		return rc ?: -ENODATA;
+ 
+ 	n.length = rc;
+ 	rc = ndr_decode_v4_ntacl(&n, &acl);
+@@ -1836,29 +1842,29 @@ int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+ 		goto out_free;
+ 	}
+ 
+-	*pntsd = acl.sd_buf;
++	pntsd = acl.sd_buf;
+ 	if (acl.sd_size < sizeof(struct smb_ntsd)) {
+-		pr_err("sd size is invalid\n");
+-		rc = -EINVAL;
+-		goto out_free;
+-	}
+-
+-	(*pntsd)->osidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->osidoffset) -
+-					   NDR_NTSD_OFFSETOF);
+-	(*pntsd)->gsidoffset = cpu_to_le32(le32_to_cpu((*pntsd)->gsidoffset) -
+-					   NDR_NTSD_OFFSETOF);
+-	(*pntsd)->dacloffset = cpu_to_le32(le32_to_cpu((*pntsd)->dacloffset) -
+-					   NDR_NTSD_OFFSETOF);
+-
+-	rc = acl.sd_size;
++		rc = -EBADMSG;
++		goto malformed;
++	}
++
++	pntsd->osidoffset = cpu_to_le32(le32_to_cpu(pntsd->osidoffset) -
++					NDR_NTSD_OFFSETOF);
++	pntsd->gsidoffset = cpu_to_le32(le32_to_cpu(pntsd->gsidoffset) -
++					NDR_NTSD_OFFSETOF);
++	pntsd->dacloffset = cpu_to_le32(le32_to_cpu(pntsd->dacloffset) -
++					NDR_NTSD_OFFSETOF);
++
++	rc = ksmbd_sd_decode(acl.sd_buf, acl.sd_size, sd);
++malformed:
++	if (rc == -EBADMSG)
++		pr_warn_ratelimited("malformed stored security descriptor of %pd\n",
++				    dentry);
+ out_free:
+ 	kfree(acl_ndr.data);
+ 	kfree(smb_acl);
+ 	kfree(def_smb_acl);
+-	if (rc < 0) {
+-		kfree(acl.sd_buf);
+-		*pntsd = NULL;
+-	}
++	kfree(acl.sd_buf);
+ 	kfree(n.data);
+ 	return rc;
+ }
+diff --git a/fs/smb/server/vfs.h b/fs/smb/server/vfs.h
+index fb184546d26b..a6a42e979022 100644
+--- a/fs/smb/server/vfs.h
++++ b/fs/smb/server/vfs.h
+@@ -164,11 +164,11 @@ int ksmbd_vfs_remove_sd_xattrs(const struct mnt_idmap *idmap, const struct path
+ int ksmbd_vfs_set_sd_xattr(struct ksmbd_conn *conn,
+ 			   const struct mnt_idmap *idmap,
+ 			   const struct path *path,
+-			   const struct smb_ntsd *pntsd, int len);
+-int ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
+-			   const struct mnt_idmap *idmap,
+-			   struct dentry *dentry,
+-			   struct smb_ntsd **pntsd);
++			   const void *pntsd, int len);
++int __must_check ksmbd_vfs_get_sd_xattr(struct ksmbd_conn *conn,
++					const struct mnt_idmap *idmap,
++					struct dentry *dentry,
++					struct ksmbd_sd **sd);
+ int ksmbd_vfs_set_dos_attrib_xattr(const struct mnt_idmap *idmap,
+ 				   const struct path *path,
+ 				   struct xattr_dos_attrib *da,
 -- 
 2.47.3
 
