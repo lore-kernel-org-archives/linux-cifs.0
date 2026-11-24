@@ -1,55 +1,55 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795563159;
-	b=UbbRr35QP7dBmKXk2ZMSNM7Omxa7Pr78mlVZ3TxOkru5+JEeoPx6WJxdQavoDbK0XHyA
-	 n9yYFufZSL4p+IqTY7GcraIuFbtATiniUpEDYzsQ3lseicToZlpZEFGC7LjLVT7ZSVIog
-	 KGiwV0In2pZweIxDDd7QfTjOq3mntQphPMTtU+ZqaeBPB5CHJ9R8hHTkiqwu/HjYlv49x
-	 2a5c3ne4VL5VeC59hB5A3120/IAnCKN/3l/dIQ5nMVMKPlHCH4vgjTAEcJcmylW7RWWLo
-	 VbizIo7Lz+9HhFn5VaAYoEv1BC8pA6j6NXNFL+fL2ZM0FW0/cpAZjFGIXyt/8hRO2iw==
+	t=1795563179;
+	b=Ox8O2btqbnwnVS5SKkFj3/3fkkhh0L28iyeYIoTjXSd+0kwOyUDLVZ1yywZil0wk8F3g
+	 rNClqNLlh6pkeYvdxqn5Rdk82sxF4CBcdw64GmZgpUKkGGtoBflxnFo9BZPVious5b8Bz
+	 WQbKCDTHYL/wCEKAr5KhmuF/ToWQl43EC4u8bbh6rgSjhX6PRVwacLswLqxKEP1mdHC63
+	 Gur6Zsl9feCefMS2G/KI6INSG3/jOghMhwBqrGyUhRbi5s27ddjouKuRSM92X4O03UMxl
+	 gQFWe67PKFE0I4AAfQDNe4JRA7R+llvZwfcAeMWaOPG6MUY/JLAXcwYozTvyhMMq78w==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795563159;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795563179;
 	h=Received:DKIM-Signature:Received:X-Forwarded-Encrypted:
 	 X-Gm-Message-State:X-Received:MIME-Version:References:In-Reply-To:
 	 From:Date:X-Gmail-Original-Message-ID:X-Gm-Features:Message-ID:
 	 Subject:To:Cc:Content-Type:Content-Transfer-Encoding;
-	bh=lfQAjb+6J2xALiZM6i0rUZxAcg/9jF48bIl2h88yndY=;
-	b=PhMeCjb/9yWfJJs693rYj+N5uWcbJyQh2LcG/QpizkoOa+yDAmLBVMU9DaPE9IWxcHYm
-	 KUQilmqtFeWpP83Z/D8hjL+mIt7bVXBtIlOXnnBRNTXGPZ0aOftdG3b/RRvdqfnaScDJj
-	 5rPRvcNtdDwIm5HyibvatUaOwdbclbRp/JjVA0wx82kqXVyFL14Xo9mdqR/0fzGiQarK5
-	 e7OF7crmUaXc0N5WD7xRKH7vcn31oKePd9w8lwwRmi9ifPdmygObC2OzkBU067jzKEixa
-	 dlEwJj58CsSfdzFgOvV9V6NIRxI3wR3spkiiZ9UnsHs5o0DJbzRT00wXuUZ8U4CxQlA==
+	bh=biO3B9Kl/OErjoAa33t6cDrrXZV7UDFM5oyQJ9E7oag=;
+	b=PQZQWmCS5mJK5ZxUzS2dMr5Q90EXeYOc6hcO0w2DIn264eiWna644VkQJfGF1toesHL6
+	 MLP7ULDzQMb78p2hpvGaIFG5uM0f0ZUDzGJqB0y+Ju3jaPB0aP3sxPTK7TzxfOf16ZlUZ
+	 VEFbQmpZeia32HbxU1fzRs1PNWzmfm+JT6r4i40R8ESrtEItHDmGCWCuE8hgehuLlkEIi
+	 i9/MUPCxkgVtTWDVx/VzuYMooCq+zfu1iXAAVkYZKrtp1GJ42jWMjEu2ZQMxG9Ul3zpSU
+	 cVnA+8NbGVAIbqyX0aRr5nSUPBtcfPnt+zGOrUoeT0q9oeyiTr0KA53s7U58swY9z0w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gPuPbpLj;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aBL+0eAl;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1287606A31E
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 23:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDAA606A31E
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 23:32:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=gPuPbpLj
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 861C91F000E1
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 23:32:39 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=aBL+0eAl
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E211C1F000D0
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 23:32:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795563159;
-	bh=lfQAjb+6J2xALiZM6i0rUZxAcg/9jF48bIl2h88yndY=;
+	s=k20260515; t=1795563178;
+	bh=biO3B9Kl/OErjoAa33t6cDrrXZV7UDFM5oyQJ9E7oag=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=gPuPbpLjk7YHonQVhtVQenmUgidxVmYpr+RoiL2xcu2Man4kiq1/bcCuaqcXQFLRM
-	 RYdDQBj20YiIxkIIMifS7zkZpj7/Y+HtliRsQbQ3dfjlh31vg18am0OtLdKvuuzj33
-	 zdqR4+fQP1a9hLKLaXiRctct63y0q+ylYwaMkiDW5Co93DbLo+OiHwrwyDdwhJPBZW
-	 Jp5yOMsabXONSY8R6HGFSHwckl72VGns+sVDQQmZJv+1oFC9ymCwMfVTkg9M0EbY7y
-	 oKZUxIcFh11KoYtTpAnsqC57pzPIYXhXkSy5edJjFNzOw65lFIQfSvUb+epS43PcV6
-	 RZP4L1i2AWujw==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c50ac25cdd4so672727466b.1
-        for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 15:32:39 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AL+hErF/9bIwbaFlXQ9j59XLJ9um1TTInFfCKZhI7CHE8Vk1ThpjvqWdXTVT1ST1gi9+N17DUAdnt6JnKRA8@vger.kernel.org
-X-Gm-Message-State: APuU4Z9HHFIQ5ZizbyhYKThZvEP3UMCXQZx4JouN5CPlKstTFmeklNtm
-	1htUQWaFBJLPr++belaIhMyQ4JncHkYbqc9iLeJu4qIBMo50IEgxnouPsUK73Rlp2GXaiO3Y+Ct
-	x+6RuD1GRUKjOaW1c6owcJ5n12ypkVhM=
-X-Received: by 2002:a17:907:2d91:b0:c51:982e:28bf with SMTP id
- a640c23a62f3a-c51982e29d1mr227865566b.40.1795563158133; Tue, 24 Nov 2026
- 15:32:38 -0800 (PST)
+	b=aBL+0eAlBk0bY9QF3GNdwqiLBUJjNLzfZhlzuL390QMlbfJgBeLJSfgkkaDTNOtSr
+	 YCvWCoO5YeRNNnZTMvULdhcKA+f1zSMNCU3OgOqkv1zs178PY4XRZadG+7hmaZWP1u
+	 Ny2+IQWIbjgtoLo3kT8n90XfUUVEk1qaCrbvQLaJPi2rX9oY1pRHmWo3n5XvifBAN7
+	 LiqecKsb+y9mDZOxmNO+vKUspKMzufU2AA+T6qvaMzI6/OALmsZu5jx/PtTJqyXJU+
+	 whf+irEH2ogmZIhcD7OT3ApX7eRRnt25BxBCtwvEOn4GZ4jZu0lCTOLePDf1OCuyOU
+	 mYKfNt+xyH6Fg==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c50933bdf4bso999419166b.1
+        for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 15:32:58 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AL+hErGaj78UKiehhrgfczRDZsnia3G0lsGOgNJvqAxYHnuRdieoBU2NnzANT3+XpAikKs5A+9J2k/0fGPs7@vger.kernel.org
+X-Gm-Message-State: APuU4Z9jt8T2TyTYHxKBfzkwjG2fzT97u1hDUGPDc1MCwPTKVeLc7bZs
+	vuee0AdhNtNziKKk9vZxv9YPj4VGQCGthE1EV2cFh+1qT0kLAM/qAvU4zMRVVpRHTyI1r262xA6
+	8O3CaRvDjY5EvT9Vsu7GkB7NF9mwpmJU=
+X-Received: by 2002:a17:906:9c89:b0:c51:3b7a:f0b6 with SMTP id
+ a640c23a62f3a-c513b7b053bmr1319019466b.3.1795563177553; Tue, 24 Nov 2026
+ 15:32:57 -0800 (PST)
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -59,14 +59,14 @@ List-Unsubscribe: <mailto:linux-cifs+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-cifs+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-References: <20261124075613.469257-1-zhang.guodong@linux.dev> <20261124075613.469257-2-zhang.guodong@linux.dev>
-In-Reply-To: <20261124075613.469257-2-zhang.guodong@linux.dev>
+References: <20261124075613.469257-1-zhang.guodong@linux.dev> <20261124075613.469257-3-zhang.guodong@linux.dev>
+In-Reply-To: <20261124075613.469257-3-zhang.guodong@linux.dev>
 From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Wed, 25 Nov 2026 08:32:25 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_ekTbkqXcnj-8vZTTeVPBaCbnw2bi1f9zWfVA_Dzr6_Q@mail.gmail.com>
-X-Gm-Features: Aa3M54qUQFBsk7nN2pWF3fpIE5MPf7sFg3rqa-Twf6_HIpn9WB9u3Qt4gCrVWsA
-Message-ID: <CAKYAXd_ekTbkqXcnj-8vZTTeVPBaCbnw2bi1f9zWfVA_Dzr6_Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] smb/server: fix little-endian values in diagnostic messages
+Date: Wed, 25 Nov 2026 08:32:45 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8UDVSs_Nxsz7rcsjGrbKv=J-zdTm=Fidt8u_9Aek5VoA@mail.gmail.com>
+X-Gm-Features: Aa3M54qvHh-lyDR0o-1PM3Iqbw134GeNLQilOubGkrFzqadgMzcOOniYLBr3n4I
+Message-ID: <CAKYAXd8UDVSs_Nxsz7rcsjGrbKv=J-zdTm=Fidt8u_9Aek5VoA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] smb/server: fix file name conversion on big-endian systems
 To: ZhangGuoDong <zhang.guodong@linux.dev>
 Cc: tom@talpey.com, senozhatsky@chromium.org, chenxiaosong@chenxiaosong.com, 
 	linux-cifs@vger.kernel.org, ZhangGuoDong <zhangguodong@kylinos.cn>, 
@@ -79,9 +79,10 @@ ev> wrote:
 >
 > From: ZhangGuoDong <zhangguodong@kylinos.cn>
 >
-> Convert to CPU byte order to avoid incorrect debug log
-> on big-endian architectures.
+> Use CPU byte order for temporary UTF-16 buffers to avoid incorrect
+> file name conversion on big-endian architectures.
 >
+> Fixes: 0c180317c654 ("ksmbd: add support for surrogate pair conversion")
 > Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
 > Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
 Applied it to #ksmbd-for-next.
