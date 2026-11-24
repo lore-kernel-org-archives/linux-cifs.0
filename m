@@ -1,46 +1,46 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795483275;
-	b=fSUBm5UJgpOphPWokRMFahjPKLEw8wloSWCEXhs3rcJXleijxeW1GcSF93+LKWoexw5E
-	 zDW1clmWgf3WOAm8/K3Gk8nUbTS1klkC/ut4x8kKRepNmFvu1XwtVmru8SIaG2OQatkpf
-	 iWUiPcMo68IGa0BXXPHDT6VYR7II6sQdDOkDo+rUn2DoJ71SR/21vNaALHU+WjW10K8TB
-	 qDfZyS4S2jmPYmUsH0L1J/xvU/gjqek/fq3qJjfMJMlduydYAMu3wK7CDQ1vUCNA1F0HW
-	 teXV59ndGwXrRs3ZcbX4IeUN4xdV9nyoVXxWCWa0TH4nBjuXXo31QdPQANdaHb4K5ng==
+	t=1795483281;
+	b=svjrlYz85EK8L7hq0SIsVZq/PgV5lEBQJEc5wX4JGOFL1ETtjRFFB31nCUEgKoGl2PtO
+	 BXrVRL3cq3OloAygZmdV5jj1ImtesG2cPV21wZAHf4GAQ4FmaUEGySIX/4zqfQDAcUIq1
+	 MFPJPSSILvo3qMWDcwaU+OhIqY2RAyZJIPxFDJWGjzYpjoiP+W5dGwKuGm7hRkQnVVImc
+	 F5r1lKXej4H0MNDY0LdMT1+sy6OlY+kYRFaTQgz+FIa3x1P4xA3iq2zY5AKKfFz8G6Twm
+	 2tKRC4L9sH2Vb8LxU0aP63V69XTFK/BqU1Nwh6vHrNEbBlE792TEXUrTmBi+OfD2tWA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795483275;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795483281;
 	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
 	 In-Reply-To:References:X-sashiko-severity:Content-Type:
 	 Content-Transfer-Encoding:MIME-Version;
-	bh=7BxqU8scciUBPlVCv6kfp0HrjxqNHAp0nu+Z1dMs47Q=;
-	b=QZzaQHANqni0/yF6h6DCTMomI5GVCELS77TK2FFb4h8Hbng6GNpYFyV7/7lPWGU6pipA
-	 3RgmY5KBupZchLnkMu49UXxFC/Hz0qdWTT4iJilRLNKL6+otgmbUuAdP0DpbVb2+01K8F
-	 r7aQM4DOnRArB3c/daJ8ie7f0tvUKPOM6dda8x1JIFD/Ga7EgFzaheWhKLcwKj0Sd+sbW
-	 +uVl18Bmb1Be0m8EMXmSHVsmVj2ZXPZZGiaMGTkaGsHR5Fucm9Prv8BvKy+F0eSP3sXG6
-	 2x9iSGZDQqaTTDHHnuggUI9NQQ0t3MXjIWIEQc1UvmFJWb9WOt8lMi4/peWtZb53HjQ==
+	bh=WZwDpOMAGe1JJovwAreJRvj62LQnJZ5Y3eTHJLCsFx8=;
+	b=4Dg0OcOUuVHfJABObR3BpmzIkfgKDYLZUM2FpDbSFiN8jT24S8y22fEJ9aNos95/T1V1
+	 QeHAmFmgzUkdsRgjisAxRroY+Y5wEWy7TZg+1uGZZKynA4E9SzVhHeYOQzA/nF5yzWdxA
+	 jq47HUZi45lRrAWJYDNQU9mZldedhgWFC10wIF5siToli6SrJjiNdzp7igY92rHTtlmiG
+	 XFOa5UqM1uEvggkQGuQSyfGz/LnaLJ8US6PR4zOsdyjbaMfRuOBOpD7fhW6aGXLJ+ti4X
+	 1GdbBgYGScEQ1aWYviz4GwujQDbrfPsZ5tQe4ZNi9zXbo4LcUxQU5764OJMN8TVWwrw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XYltFTcd;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d9dJh3gZ;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C49606A321;
-	Tue, 24 Nov 2026 01:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4E4606A322;
+	Tue, 24 Nov 2026 01:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=XYltFTcd
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7261F000CF;
-	Tue, 24 Nov 2026 01:21:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=d9dJh3gZ
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 104B41F000CA;
+	Tue, 24 Nov 2026 01:21:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1795483275;
-	bh=7BxqU8scciUBPlVCv6kfp0HrjxqNHAp0nu+Z1dMs47Q=;
+	s=k20260515; t=1795483280;
+	bh=WZwDpOMAGe1JJovwAreJRvj62LQnJZ5Y3eTHJLCsFx8=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=XYltFTcdnj4KUOr9OmoQ9oABFYaMWVxGNR6r3cGPjfnGq13/JFq2uMH7Tf1ScK72/
-	 b6oInXa2z9HZnLBrfMTvLwgYZJM3WxktGM+KSBzzvTYiaSJ3lBsUjntul6AsyQ5oxT
-	 jLioRVygZFw/Sd6FqOggYuxYgvI6lRuW/QXd+bceMSB4CrxfHEKpslz8iPAdj0gWDF
-	 ZGluJ2nXRVgz09QGVMvNH0qSc3TqR6YDFE4bJCW8mI/cWjo7pGVOD5rI/JDcx2wUGE
-	 iZSOHIuvA/zw6WUEBJsqTqcarDRxQoyNCoB4xy24Z8j8dKUj/Dar/b2jJfs9TWz+Dp
-	 BizllNrn5tiRg==
-Subject: Re: [PATCH net-next v19 07/15] quic: add connection id management
+	b=d9dJh3gZDukMh5XSYkHjAKzOSiyV5ppoKkMZY+GrYXbta0eGmKnrEk5ozrr9b2d0K
+	 IUXyjjdOh+dZ+G7KCnMIng6gi/DaX71ZaE+H+vzirTZH+6KQQs+p0nK3Buk51CCmjk
+	 8/5DAEZZmx9SgWoBf0wGvBz7wHzM0MuCWmiiDknmyoKuBKf3d3IpLweUgTYGFmH1ad
+	 LSe2Khg6v2/of15H+gLuVIwX824f5b0Dk2KVq0bezcUx50mob4KtuZ5gWgr8u6oTbn
+	 UMzT8LRYiVyRTxKERODJ/1pCnyzMid/ISdUVki0qFwZYrZ2PGRrtIhsPv0qvk5M7pC
+	 s6naJ54Fo7kMw==
+Subject: Re: [PATCH net-next v19 09/15] quic: add congestion control
 From: netdev-bot+sashiko@kernel.org
 To: lucien.xin@gmail.com
 Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
@@ -55,10 +55,10 @@ Cc: netdev@vger.kernel.org, quic@lists.linux.dev, davem@davemloft.net,
  sd@queasysnail.net, marcelo.leitner@gmail.com, daniel@haxx.se,
  andrew.gospodarek@broadcom.com, mef@scarletmail.rutgers.edu, paul@jakma.org,
  kuniyu@google.com
-Date: Tue, 24 Nov 2026 01:21:12 +0000
-Message-ID: <179548327264.3135.6491698928014688203@kernel.org>
-In-Reply-To: <a0b0796446aa6da7e62134343e27abb459c3e4cf.1795393691.git.lucien.xin@gmail.com>
-References: <a0b0796446aa6da7e62134343e27abb459c3e4cf.1795393691.git.lucien.xin@gmail.com>
+Date: Tue, 24 Nov 2026 01:21:18 +0000
+Message-ID: <179548327865.3135.16261562840994895440@kernel.org>
+In-Reply-To: <b69a2cad6c2faeab9ee1e90ad11c4b64168c8235.1795393691.git.lucien.xin@gmail.com>
+References: <b69a2cad6c2faeab9ee1e90ad11c4b64168c8235.1795393691.git.lucien.xin@gmail.com>
 X-sashiko-severity: Medium
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -83,105 +83,86 @@ If any of them are legitimate and you plan to respin, please let patchwork
 know by including "pw-bot: cr" as a separate line at the end of your reply
 (one such reply per series is enough).
 
-- [Medium] quic_conn_id_retire() (net/quic/connid.c) handles 'retire the
-  last live consecutive CID' with `if (WARN_ON_ONCE(id_set->use_count <=…
+- [Medium] quic_cong_rtt_update() in net/quic/cong.c begins with `if
+  (ack_delay > cong->max_ack_delay * 2) return;`.
 
 --
 
-quic: add connection id management
+quic: add congestion control
 
-This patch adds struct quic_conn_id_set to manage source and destination
-connection IDs. It provides helpers to add, retire, find and look up CIDs.
-Source CIDs are also inserted into a global RCU hash table, which the RX
-path uses to look up the socket.
+This patch adds struct quic_cong for RTT measurement and congestion
+control, along with struct quic_cong_ops for congestion control
+algorithms. It implements a slow start, congestion avoidance and
+recovery state machine, and currently provides New Reno only.
 
-> diff --git a/net/quic/connid.c b/net/quic/connid.c
+> diff --git a/net/quic/cong.c b/net/quic/cong.c
 > new file mode 100644
-> index 0000000000000..1ddf8bc9b7910
+> index 0000000000000..99fe8045d0170
 > --- /dev/null
-> +++ b/net/quic/connid.c
-> @@ -0,0 +1,313 @@
+> +++ b/net/quic/cong.c
 
 [ ... ]
 
-> +/* Retire a connection ID by marking it dead, then remove consecutive dead
-> + * entries from the head of the list. The caller must ensure the number falls
-> + * within the consecutive range [first_number, last_number].
-> + */
-> +void quic_conn_id_retire(struct quic_conn_id_set *id_set, u32 number)
+> +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> +void quic_cong_rtt_update(struct quic_cong *cong, u64 time, u32 ack_delay)
 > +{
-> +	struct quic_common_conn_id *common, *tmp, *retired = NULL;
-> +	struct list_head *list;
+> +	u32 adjusted_rtt, rttvar_sample;
+> +	u64 raw_rtt;
 > +
-> +	list = &id_set->head;
-> +	list_for_each_entry(common, list, list) {
-> +		if (common->number > number)
-> +			break;
-> +		if (common->number == number) {
-> +			if (common->dead)
-> +				return;
-> +			retired = common;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!retired)
-> +		return;
-> +
-> +	if (WARN_ON_ONCE(id_set->use_count <= 1))
+> +	/* Ignore RTT sample if ACK delay is suspiciously large. */
+> +	if (ack_delay > cong->max_ack_delay * 2)
 > +		return;
 
 [Severity: Medium]
-Can a peer reach this WARN_ON_ONCE() using only its own
-RETIRE_CONNECTION_ID frames?
+Should this early return be here? When it fires, quic_cong_rtt_update()
+skips every update. latest_rtt, min_rtt/min_rtt_valid, smoothed_rtt,
+rttvar and first_rtt_time stay as they are, and quic_cong_pto_update()
+is never called.
 
-For the source set, number comes from the peer. The v19 changelog moved
-this guard below the duplicate-retire check so duplicates would not hit
-the WARN, which suggests peer-chosen numbers are expected to get here.
+RFC 9002 section 5.1 generates an RTT sample whenever the largest
+acknowledged packet is newly acked and at least one newly acked packet
+was ack-eliciting. It has no rule for rejecting a sample because of its
+ack_delay.
 
-A retired source CID that is not at the head of the list is only marked
-dead. It stays on the list and stays hashed. quic_conn_id_lookup() does
-not check ->dead:
+RFC 9002 section 5.3 also says the endpoint SHOULD ignore the peer's
+max_ack_delay until the handshake is confirmed. During the handshake,
+peers can legitimately report delays larger than max_ack_delay (RFC 9000
+sections 13.2.1 and 13.2.5). One example is a peer that buffers
+undecryptable packets until keys arrive.
 
-	hlist_nulls_for_each_entry_rcu(s_conn_id, node, &head->head, node) {
-		if (net != sock_net(s_conn_id->sk))
-			continue;
-		if (s_conn_id->common.id.len != len ||
-		    memcmp(scid, &s_conn_id->common.id.data, len))
-			continue;
+The changelog says callers will cap ack_delay to max_ack_delay after
+handshake confirmation. If so, this check can only fire before
+confirmation, which is the phase where the RFC says to ignore
+max_ack_delay.
 
-Later in the series, quic_packet_get_sock() in net/quic/packet.c uses
-this lookup to route the packet to the socket and set cb->seqno. It does
-not check the dead flag either.
+With the default from quic_cong_init():
 
-Take a source set {0, 1, 2}, all live, use_count = 3, with the peer
-using CID 0:
+	cong->max_ack_delay = QUIC_DEF_ACK_DELAY;
 
-  peer sends RETIRE(1), then RETIRE(2)
-    -> use_count = 1, CIDs 1 and 2 are dead but still hashed
-  no replacement CID is issued (count still includes the dead middle
-  entries, so max_count or QUIC_CONN_ID_LIMIT may already be reached)
-  peer sends a packet with DCID = CID 1 carrying RETIRE(0)
-    -> quic_conn_id_lookup() still finds CID 1
-    -> quic_conn_id_retire(id_set, 0)
-    -> WARN_ON_ONCE(id_set->use_count <= 1)
+any handshake-phase sample with ack_delay above 50ms would be dropped. A
+peer that advertises max_ack_delay of 0, which is a legal value, would
+cause every pre-confirmation sample with a non-zero ack_delay to be
+dropped.
 
-RFC 9000 Section 19.16 allows RETIRE(0) in that packet, since sequence
-number 0 is not the DCID of the packet carrying the frame.
+In that case smoothed_rtt and rttvar would stay at the QUIC_RTT_INIT
+values set by quic_cong_set_srtt(), so pto and loss_delay would not match
+the real path. first_rtt_time would also stay 0. That keeps
+quic_cong_on_packet_lost() from ever setting pc_start_time.
 
-On panic_on_warn systems this would be a panic the peer can trigger
-remotely. Without panic_on_warn, the retirement is silently dropped.
+The RFC already handles a large ack_delay safely further down in this
+function:
 
-quic_conn_id_retire() returns void, so the caller cannot tell a refused
-retirement from a successful one. That means it cannot turn this case
-into a PROTOCOL_VIOLATION.
+> +	adjusted_rtt = cong->latest_rtt;
+> +	if (cong->latest_rtt >= cong->min_rtt + ack_delay)
+> +		adjusted_rtt = cong->latest_rtt - ack_delay;
 
-Would it make sense to return an error here instead of warning? Or to
-reject packets addressed to dead source CIDs?
+Is the drop-the-sample heuristic needed on top of this?
 
-No caller of quic_conn_id_retire() exists in this series yet. Whether
-this fires depends on how the RETIRE_CONNECTION_ID handler in the
-follow-up patchset checks the number before calling it.
+The commit message describes quic_cong_rtt_update() as "Performs RTT
+measurement" and does not mention this deviation from RFC 9002.
+
+This patch has no caller of quic_cong_rtt_update(), so whether this
+triggers depends on the ACK processing code in the later patchset.
 
 [ ... ]
 
