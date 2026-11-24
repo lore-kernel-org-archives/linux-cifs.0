@@ -1,50 +1,51 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=91.218.175.72
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=95.215.58.3
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795507179;
-	b=LeJgHrkW/g2uBA+7ZKXmP+skoHKqwZ2YNoBMzBWky9KL0dgJDwYewlA5TUPlVmi3O+9w
-	 cqLnRrboKKpE1ugwvuS0nH2xAkVZIjjrBqlGSlmXdyb1E24+uWaULIw5yjo+fz8fHlEV8
-	 Sw1NTbahR546GwOmFJCUfmk9iHlwpB3fPFYbBa9duZqSYKTyYNaiyyXsuBkWRdQLQlXQq
-	 YmgGpIYu/vq5iu4HJUV+2WC0uQefp7oxu0Pjp7MLfT5Wjyn0YW5NdBZyzSs+2jAnPXQlw
-	 Xy7VlNXelg8xxNiL8gWIuygfVKeqEZKLqgKjpAwC0dpcWomrWp0kiguUEFlL6GxkvDQ==
+	t=1795507182;
+	b=iUSpN48Kb4lTO69XajC/cJfUtRuVKR9w+1AAUrCnBvli97NnRs3gOomlPIUnJNnBUOKL
+	 jadM9Aja85bK9YB2GkwZj2XBbTXBiSRYs+u8+peoey44UcMVTNL3K6rFbJRa0Tyop+N7k
+	 gSo609o/pbCw3ZehJsN5uI7BiW90+KdcieP9TOCkbgebaPj11qLDkdeGz2SsRz52oE5mN
+	 cn37DVs6g2G99Z0dmLBQ5sDYgIdhPLL18mAgdJurfJP3ZoYa1ZVia0UKlACrVfCobGOa1
+	 UMZJQ/6cgxafgETR7Uqto+tAJAYtZNQzIDD9mltv4U5fpq+Zktj1m9fQ1zER0MCiSWA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795507179;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795507182;
 	h=DMARC-Filter:X-Envelope-To:DKIM-Signature:X-Envelope-To:Received:
 	 X-Mizu-Trace-ID:X-Migadu-Flow:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding;
-	bh=IRPjuTtVTaict1Y9QSgd0o6Pml3CQHOV3SqjbcaTkw4=;
-	b=uLn7UvxVIEwdEX+FpHDI4PmoYnXz2Zd41ExYkw6t2bHAcFn7A5fKqKlnxbiY8VR3GGCW
-	 gfQs+nz1/L0DSi4zbp/10wCq+u0URaftsXprDF8VR8sb+vrYNp6bksPHBpJ4TAcG0krgy
-	 rdbEpOTVTx1gpmoBFds5yv6dm8T9skuHTHxrlCCxpAg4mjzMRL0VujW8NK66RUU6VfP44
-	 AHURwMAjDMptQg/hY6Aoc7H6hH2jY7lrxm/fHwP7edMHpF9gLUUhIzYNM+FVkWYIKZ7u2
-	 1ozi3SfJ/C6B5+bCbEh6JDw8xBfKd8Kt8wuoGIo3BFaVuGhGABB3LyRI+bKvn5Ivc9g==
+	 X-Mailer:In-Reply-To:References:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=T5MeZhWZGjZhLAuxAqz8P07n7+0/zY8vywY6aVHI+jA=;
+	b=VE23AZ5hW1ykr+Tw3yqRrbt7xS1OMiJqrfKsheioqqpxp97gc5axXwU/gwgkwemDF2dZ
+	 xIVmqSnDMqodpMixHppTF5sb1HpPRc2AIVSzuTpvUxCJ/VtM9kyx4xB+e6ZFJKmm5dD8v
+	 3Esp9UqlO9QaSCVJsvxNmkE5Qy7+JJ0pGIriSH5PXy7Mv8dRhlcgiCmZc2P/fWFEMFrc8
+	 Z0zrI5J9HaTY9BRnyg5nKUp5iTLQDMtz0FF35SLh0M6kuuEYlMVzkfIcjiuqdUQuuuUSI
+	 zgux6Z1aN7NVutpLPuMGbO8xnhGwhANA3edfP973AFuVmvvj84I1UQS/9BgFlagWiUQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=linux.dev;
 	spf=pass smtp.mailfrom=linux.dev;
-	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sKA+yxj1;
-	arc=none smtp.remote-ip=91.218.175.72
-Received: from mta0.migadu.com (out-72.mta0.migadu.com [91.218.175.72])
+	dkim=pass header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ZPJYRbpH;
+	arc=none smtp.remote-ip=95.215.58.3
+Received: from mta1.migadu.com (out-3.mta1.migadu.com [95.215.58.3])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7CAB606A31E
-	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 07:59:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D7CAB606A31E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32277606A31E
+	for <linux-cifs@vger.kernel.org>; Tue, 24 Nov 2026 07:59:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 32277606A31E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=sKA+yxj1
+	dkim=pass (1024-bit key, unprotected) header.d=linux.dev header.i=@linux.dev header.a=rsa-sha256 header.s=key1 header.b=ZPJYRbpH
 X-Envelope-To: linux-cifs@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=hmoM+Bf9e40nQuIgPFA5Z/DC2rZNjJ9Er5pQ2HUJYp4=;
+DKIM-Signature: a=rsa-sha256; bh=09B8mj+z86zM566FPtA+Kh1fWFAMDA1D3V8BeFfcAWM=;
  c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1795507176; v=1; x=1796111976;
- b=sKA+yxj1ejI3XCdx0WLkvHpkEK8+0wsfZNlgt6huPJlR3EAXmU20npa6sM+OKrLG3bTyPxUm
- 8NryD/Wry2dVq/HRmpsLcrR2CADVuNpLeNoXv2k5lO2ZCI34njS6GGjuJjSXd1Z6arywksHzrUI
- SflC2RRdPbzu3bvr+VAjpiQ0=
+ t=1795507179; v=1; x=1796111979;
+ b=ZPJYRbpHYFMqoNf/JdlyUfcjToKvfI8KXUc716q3V3pbm16Dd/JsCzI6CIwEsh/ReYk9T2sU
+ n3LiGf4gjtbNSRwfzghIV0PCk1yOXugpNAUhaJy48TF00OQKqwo54Pbb/4y/+dsCLsR4YRrNd2x
+ 1BRMVX+HN2d/IFXpQmJHvP1Q=
 X-Envelope-To: linux-cifs@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id d5ad99790e34285e;
-	Tue, 24 Nov 2026 07:59:36 +0000
-X-Mizu-Trace-ID: d5ad99790e34285e
+Received: by smtp.migadu.com with ESMTPS id 62acc32cc6c85167;
+	Tue, 24 Nov 2026 07:59:39 +0000
+X-Mizu-Trace-ID: 62acc32cc6c85167
 X-Migadu-Flow: FLOW_OUT
 From: ZhangGuoDong <zhang.guodong@linux.dev>
 To: linkinjeon@kernel.org,
@@ -55,11 +56,14 @@ To: linkinjeon@kernel.org,
 	bharathsm@microsoft.com,
 	metze@samba.org
 Cc: linux-cifs@vger.kernel.org,
-	ZhangGuoDong <zhangguodong@kylinos.cn>
-Subject: [PATCH 0/2] smb/client: fix byte order issues on big-endian systems
-Date: Tue, 24 Nov 2026 15:59:25 +0800
-Message-ID: <20261124075927.469470-1-zhang.guodong@linux.dev>
+	ZhangGuoDong <zhangguodong@kylinos.cn>,
+	ChenXiaoSong <chenxiaosong@kylinos.cn>
+Subject: [PATCH 1/2] smb/client: fix little-endian values in diagnostic messages
+Date: Tue, 24 Nov 2026 15:59:26 +0800
+Message-ID: <20261124075927.469470-2-zhang.guodong@linux.dev>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20261124075927.469470-1-zhang.guodong@linux.dev>
+References: <20261124075927.469470-1-zhang.guodong@linux.dev>
 X-Mailing-List: linux-cifs@vger.kernel.org
 List-Id: <linux-cifs.vger.kernel.org>
 List-Post: <mailto:linux-cifs@vger.kernel.org>
@@ -73,11 +77,12 @@ Content-Transfer-Encoding: 8bit
 
 From: ZhangGuoDong <zhangguodong@kylinos.cn>
 
-ZhangGuoDong (2):
-  smb/client: fix little-endian values in diagnostic messages
-  smb/client: fix file name conversion on big-endian systems
+Convert to CPU byte order to avoid incorrect debug log
+on big-endian architectures.
 
- fs/smb/client/cifs_unicode.c  | 6 +++---
+Signed-off-by: ZhangGuoDong <zhangguodong@kylinos.cn>
+Reviewed-by: ChenXiaoSong <chenxiaosong@kylinos.cn>
+---
  fs/smb/client/cifsacl.c       | 3 ++-
  fs/smb/client/sess.c          | 2 +-
  fs/smb/client/smb1debug.c     | 5 +++--
@@ -86,8 +91,154 @@ ZhangGuoDong (2):
  fs/smb/client/smb2pdu.c       | 4 ++--
  fs/smb/client/smb2transport.c | 6 +++---
  fs/smb/client/transport.c     | 2 +-
- 9 files changed, 20 insertions(+), 17 deletions(-)
+ 8 files changed, 17 insertions(+), 14 deletions(-)
 
+diff --git a/fs/smb/client/cifsacl.c b/fs/smb/client/cifsacl.c
+index d8f30c35cbe5..b23cb226c4d3 100644
+--- a/fs/smb/client/cifsacl.c
++++ b/fs/smb/client/cifsacl.c
+@@ -1375,7 +1375,8 @@ static int parse_sec_desc(struct cifs_sb_info *cifs_sb,
+ 	gsidoffset = le32_to_cpu(pntsd->gsidoffset);
+ 	dacloffset = le32_to_cpu(pntsd->dacloffset);
+ 	cifs_dbg(NOISY, "revision %d type 0x%x ooffset 0x%x goffset 0x%x sacloffset 0x%x dacloffset 0x%x\n",
+-		 pntsd->revision, pntsd->type, osidoffset, gsidoffset,
++		 le16_to_cpu(pntsd->revision), le16_to_cpu(pntsd->type),
++		 osidoffset, gsidoffset,
+ 		 le32_to_cpu(pntsd->sacloffset), dacloffset);
+ 	fattr->cf_uid = cifs_sb->ctx->linux_uid;
+ 	fattr->cf_gid = cifs_sb->ctx->linux_gid;
+diff --git a/fs/smb/client/sess.c b/fs/smb/client/sess.c
+index fe006e9f2e10..468bdeae2de6 100644
+--- a/fs/smb/client/sess.c
++++ b/fs/smb/client/sess.c
+@@ -672,7 +672,7 @@ int decode_ntlmssp_challenge(char *bcc_ptr, int blob_len,
+ 	}
+ 	if (pblob->MessageType != NtLmChallenge) {
+ 		cifs_dbg(VFS, "Incorrect message type %d\n",
+-			 pblob->MessageType);
++			 le32_to_cpu(pblob->MessageType));
+ 		return -EINVAL;
+ 	}
+ 
+diff --git a/fs/smb/client/smb1debug.c b/fs/smb/client/smb1debug.c
+index e2d013e751e5..f4a08acd7242 100644
+--- a/fs/smb/client/smb1debug.c
++++ b/fs/smb/client/smb1debug.c
+@@ -15,8 +15,9 @@ void cifs_dump_detail(void *buf, size_t buf_len, struct TCP_Server_Info *server)
+ 	struct smb_hdr *smb = buf;
+ 
+ 	cifs_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Flgs2: 0x%x Mid: %d Pid: %d Wct: %d\n",
+-		 smb->Command, smb->Status.CifsError, smb->Flags,
+-		 smb->Flags2, smb->Mid, smb->Pid, smb->WordCount);
++		 smb->Command, le32_to_cpu(smb->Status.CifsError), smb->Flags,
++		 le16_to_cpu(smb->Flags2), le16_to_cpu(smb->Mid),
++		 le16_to_cpu(smb->Pid), smb->WordCount);
+ 	if (!server->ops->check_message(buf, buf_len, server->total_read, server)) {
+ 		cifs_dbg(VFS, "smb buf %p len %u\n", smb,
+ 			 server->ops->calc_smb_size(smb));
+diff --git a/fs/smb/client/smb1misc.c b/fs/smb/client/smb1misc.c
+index cdfbbff24b72..4005a97c0ac5 100644
+--- a/fs/smb/client/smb1misc.c
++++ b/fs/smb/client/smb1misc.c
+@@ -95,14 +95,14 @@ is_valid_oplock_break(char *buffer, struct TCP_Server_Info *srv)
+ 			pnotify = (struct file_notify_information *)
+ 				((char *)&pSMBr->hdr.Protocol + data_offset);
+ 			cifs_dbg(FYI, "dnotify on %s Action: 0x%x\n",
+-				 pnotify->FileName, pnotify->Action);
++				 pnotify->FileName, le32_to_cpu(pnotify->Action));
+ 			/*   cifs_dump_mem("Rcvd notify Data: ",buf,
+ 				sizeof(struct smb_hdr)+60); */
+ 			return true;
+ 		}
+ 		if (pSMBr->hdr.Status.CifsError) {
+ 			cifs_dbg(FYI, "notify err 0x%x\n",
+-				 pSMBr->hdr.Status.CifsError);
++				 le32_to_cpu(pSMBr->hdr.Status.CifsError));
+ 			return true;
+ 		}
+ 		return false;
+diff --git a/fs/smb/client/smb2ops.c b/fs/smb/client/smb2ops.c
+index 298f549bd7ed..9c16839576e9 100644
+--- a/fs/smb/client/smb2ops.c
++++ b/fs/smb/client/smb2ops.c
+@@ -454,8 +454,9 @@ smb2_dump_detail(void *buf, size_t buf_len, struct TCP_Server_Info *server)
+ 	struct smb2_hdr *shdr = (struct smb2_hdr *)buf;
+ 
+ 	cifs_server_dbg(VFS, "Cmd: %d Err: 0x%x Flags: 0x%x Mid: %llu Pid: %d\n",
+-		 shdr->Command, shdr->Status, shdr->Flags, shdr->MessageId,
+-		 shdr->Id.SyncId.ProcessId);
++		 le16_to_cpu(shdr->Command), le32_to_cpu(shdr->Status),
++		 le32_to_cpu(shdr->Flags), le64_to_cpu(shdr->MessageId),
++		 le32_to_cpu(shdr->Id.SyncId.ProcessId));
+ 	if (!server->ops->check_message(buf, buf_len, server->total_read, server)) {
+ 		cifs_server_dbg(VFS, "smb buf %p len %u\n", buf,
+ 				server->ops->calc_smb_size(buf));
+diff --git a/fs/smb/client/smb2pdu.c b/fs/smb/client/smb2pdu.c
+index b26bfb4bd91a..21e8a78f6104 100644
+--- a/fs/smb/client/smb2pdu.c
++++ b/fs/smb/client/smb2pdu.c
+@@ -278,7 +278,7 @@ smb2_reconnect(__le16 smb2_command, struct cifs_tcon *tcon,
+ 		if (smb2_command != SMB2_TREE_DISCONNECT) {
+ 			spin_unlock(&tcon->tc_lock);
+ 			cifs_tcon_dbg(FYI, "can not send cmd %d while umounting\n",
+-				      smb2_command);
++				      le16_to_cpu(smb2_command));
+ 			return -ENODEV;
+ 		}
+ 	}
+@@ -1294,7 +1294,7 @@ SMB2_negotiate(const unsigned int xid,
+ 		goto neg_exit;
+ 	}
+ 
+-	cifs_dbg(FYI, "mode 0x%x\n", rsp->SecurityMode);
++	cifs_dbg(FYI, "mode 0x%x\n", le16_to_cpu(rsp->SecurityMode));
+ 
+ 	switch (dialect) {
+ 	case SMB20_PROT_ID:
+diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+index 080864b24a0c..51dca16463d8 100644
+--- a/fs/smb/client/smb2transport.c
++++ b/fs/smb/client/smb2transport.c
+@@ -380,7 +380,7 @@ generate_smb3signingkey(struct cifs_ses *ses,
+ 	 */
+ 	cifs_dbg(VFS, "Session Id    %*ph\n", (int)sizeof(ses->Suid),
+ 			&ses->Suid);
+-	cifs_dbg(VFS, "Cipher type   %d\n", server->cipher_type);
++	cifs_dbg(VFS, "Cipher type   %d\n", le16_to_cpu(server->cipher_type));
+ 	cifs_dbg(VFS, "Session Key   %*ph\n",
+ 		 (int)ses->auth_key.len, ses->auth_key.response);
+ 	cifs_dbg(VFS, "Signing Key   %*ph\n",
+@@ -570,7 +570,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	/* Do not need to verify session setups with signature "BSRSPYL " */
+ 	if (memcmp(shdr->Signature, "BSRSPYL ", 8) == 0)
+ 		cifs_dbg(FYI, "dummy signature received for smb command 0x%x\n",
+-			 shdr->Command);
++			 le16_to_cpu(shdr->Command));
+ 
+ 	/*
+ 	 * Save off the original signature so we can modify the smb and check
+@@ -588,7 +588,7 @@ smb2_verify_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+ 	if (crypto_memneq(server_response_sig, shdr->Signature,
+ 			  SMB2_SIGNATURE_SIZE)) {
+ 		cifs_dbg(VFS, "sign fail cmd 0x%x message id 0x%llx\n",
+-			shdr->Command, shdr->MessageId);
++			 le16_to_cpu(shdr->Command), le64_to_cpu(shdr->MessageId));
+ 		return -EACCES;
+ 	} else
+ 		return 0;
+diff --git a/fs/smb/client/transport.c b/fs/smb/client/transport.c
+index c51f99d7be4b..cbeead6e522b 100644
+--- a/fs/smb/client/transport.c
++++ b/fs/smb/client/transport.c
+@@ -101,7 +101,7 @@ void __release_mid(struct TCP_Server_Info *server, struct mid_q_entry *midEntry)
+ 			       midEntry->when_sent, midEntry->when_received);
+ 		if (cifsFYI & CIFS_TIMER) {
+ 			pr_debug("slow rsp: cmd %d mid %llu A: 0x%lx S: 0x%lx R: 0x%lx\n",
+-				 midEntry->command, midEntry->mid,
++				 smb_cmd, midEntry->mid,
+ 				 now - midEntry->when_alloc,
+ 				 now - midEntry->when_sent,
+ 				 now - midEntry->when_received);
 -- 
 2.55.0
 
